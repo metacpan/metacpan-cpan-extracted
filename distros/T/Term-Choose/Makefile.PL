@@ -49,6 +49,7 @@ WriteMakefile(
         'constant'          => 0,
         'strict'            => 0,
         'warnings'          => 0,
+        'Carp'              => 0,
         'Exporter'          => 0,
         %prereqs_os_specific,
     },

@@ -21,15 +21,94 @@ Module::Generic::Null - Null Value Chaining Object Class
 
 =head1 VERSION
 
-    v1.0.0
+    v1.0.1
 
 =head1 DESCRIPTION
 
-Normally this call would have triggered a perl error like C<Cannot call method name on an undefined value>, but since L<Module::Generic/"error"> returns a L<Module::Generic::Null> object, the method B<name> here is called without triggering an error, and of course returns an L<Module::Generic::Null> object when being chained, or undef otherwise. Undefined value is the typical response one gets when an error occurred, so you can check like this :
+Normally the call above would have triggered a perl error like C<Cannot call method name on an undefined value>, but since L<Module::Generic/"error"> returns a L<Module::Generic::Null> object, the method B<name> here is called without triggering an error, and returns the right value based on the expectation of the caller which will ultimately result in C<undef> in scalar context or an empty list in list context.
+
+L<Module::Generic::Null> uses C<AUTOLOAD> to allow any method to work in chaining, but contains the original error within its object.
+
+When the C<AUTOLOAD> is called, it checks the call context and returns the appropriate value (self object, code ref, hash ref, array ref, scalar ref, or simply undef or empty list)
+
+If the caller wants an hash reference, it returns an empty hash reference.
+
+If the caller wants an array reference, it returns an empty array reference.
+
+If the caller wants a scalar reference, it returns a scalar reference pointing to undef.
+
+If the caller wants a code reference, it returns an anonymous subroutine that returns C<undef> or an empty list.
+
+If the caller is calling another method right after, this means this is an object context and L<Module::Generic::Null> will return the current object it was called with.
+
+In any other context, C<undef> is returned or an empty list.
+
+Without using L<Module::Generic::Null>, if you return simply undef, like:
+
+    my $val = $object->return_false->[0];
+    
+    sub return_false{ return }
+
+The above would trigger an error that the value returned by C<return_false> is not an array reference.
+Instead of having the caller checking what kind of returned value was returned, the caller only need to check if it is defined or not, no matter the context in which it is called.
+
+For example:
+
+    my $this = My::Object->new;
+    my $val  = $this->call1;
+    defined( $val ) || die( $this->error );
+    # return undef)
+    
+    # object context
+    $val = $this->call1->call_again;
+    defined( $val ) || die( $this->error );
+    # $val is undefined
+    
+    # hash reference context
+    $val = $this->call1->fake->{name};
+    defined( $val ) || die( $this->error );
+    # $val is undefined
+    
+    # array reference context
+    $val = $this->call1->fake->[0];
+    defined( $val ) || die( $this->error );
+    # $val is undefined
+
+    # code reference context
+    $val = $this->call1->fake->();
+    defined( $val ) || die( $this->error );
+    # $val is undefined
+
+    # scalar reference context
+    $val = ${$this->call1->fake};
+    defined( $val ) || die( $this->error );
+    # $val is undefined
+
+    # simple scalar
+    $val = $this->call1->fake;
+    defined( $val ) || die( $this->error );
+    # $val is undefined
+
+    package My::Object;
+    use parent qw( Module::Generic );
+
+    sub call1
+    {
+        return( shift->call2 );
+    }
+
+    sub call2 { return( shift->new_null ); }
+
+    sub call_again
+    {
+        my $self = shift( @_ );
+        print( "Got here in call_again\n" );
+        return( $self );
+    }
+
+Undefined value is the typical response one gets when an error occurred, so you can check like this, assuming you know you normally would not get a false value :
 
     my $name = $object->customer->name || die( $object->error );
-
-L<Module::Generic::Null> use C<AUTOLOAD> to allow any method to work, but contains the original error within its object.
 
 Apart from that, this does not do anything meaningful.
 
@@ -41,13 +120,17 @@ There is only 1 method. This module makes it possible to call it with any method
 
 This takes an error object and an optional hash reference of key-value pairs and return the object.
 
+=head2 CREDITS
+
+Based on an original idea from L<Brian D. Foy|https://stackoverflow.com/users/2766176/brian-d-foy> discussed on L<StackOverflow|https://stackoverflow.com/a/7068271/4814971> and also on L<Perl Monks|https://www.perlmonks.org/?node_id=265214>
+
 =head1 AUTHOR
 
 Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2000-2020 DEGUEST Pte. Ltd.
+Copyright (c) 2000-2021 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

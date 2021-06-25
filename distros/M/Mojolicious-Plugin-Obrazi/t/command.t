@@ -6,7 +6,7 @@ use Mojo::File qw(curfile path tempdir);
 use Mojo::Util qw(encode decode);
 use lib curfile->dirname->dirname->child('lib')->to_string;
 my $t              = Test::Mojo->new('Mojolicious');
-my $random_tempdir = tempdir('opraziXXXX', TMPDIR => 1, CLEANUP => 0);
+my $random_tempdir = tempdir('opraziXXXX', TMPDIR => 1, CLEANUP => 1);
 
 my $COMMAND = 'Mojolicious::Command::Author::generate::obrazi';
 require_ok($COMMAND);
@@ -25,9 +25,10 @@ my $help = sub {
 
   like $buffer => qr/myapp.pl generate obrazi --from --to/ => 'SYNOPSIS';
   like $buffer => qr/-f, --from/                           => 'SYNOPSIS --from';
-  like $buffer => qr/-t, --to/                             => 'SYNOPSIS --to';
+  like $buffer => qr/    --to/                             => 'SYNOPSIS --to';
   like $buffer => qr/-x, --max/                            => 'SYNOPSIS --max';
   like $buffer => qr/-s, --thumbs/                         => 'SYNOPSIS --thumbs';
+  like $buffer => qr/-i, --index/                          => 'SYNOPSIS --index';
 };
 
 my $defaults = sub {
@@ -50,7 +51,7 @@ my $run = sub {
   {
     open my $handle, '>', \$buffer;
     local *STDERR = $handle;
-    $command->run('-f' => $from_dir, '-t' => $random_tempdir);
+    $command->run('-f' => $from_dir, '-to' => $random_tempdir);
   }
 
   # note $buffer;
@@ -72,7 +73,13 @@ my $run_custom = sub {
     local *STDOUT = $handle;
     $command = $COMMAND->new();
     $command->log->handle(\*STDOUT);
-    $command->run('-f' => $from_dir, '-t' => $random_tempdir, '--max' => '500x500', '--thumbs' => '120x120');
+    $command->run(
+      '-f'       => $from_dir,
+      '--to'     => $random_tempdir,
+      '--max'    => '500x500',
+      '--thumbs' => '120x120',
+      '-t'       => $from_dir->child('obrazi_custom.html.ep')
+    );
   }
 
   like $buffer            => qr/warn.+?Skipping.+?loga4.png. Image error: iCCP/, 'right warning';
@@ -90,6 +97,15 @@ my $run_custom = sub {
     монограм1\.png.+?
     1-7sbi9acdgbt_300x303\.png\,1-7sbi9acdgbt_119x120\.png/xsm, 'right calculate_max_and_thumbs';
   note 'to_dir:' . $command->to_dir;
+
+  # $File::Temp::KEEP_ALL = 1;
+  my $outfile = path($command->template_file)->basename =~ s/\.ep$//r;
+  my $output  = decode U, $command->to_dir->child($outfile)->slurp;
+
+  # note $output;
+  $command->_processed->each(sub {
+    like $output => qr/$_->[-1]/, "$_->[-1] is in $outfile";
+  });
 };
 
 subtest help       => $help;

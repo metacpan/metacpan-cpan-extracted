@@ -3,7 +3,7 @@ package Archive::Libarchive::Extract;
 use strict;
 use warnings;
 use Archive::Libarchive 0.04 qw( ARCHIVE_OK ARCHIVE_WARN ARCHIVE_EOF ARCHIVE_EXTRACT_TIME ARCHIVE_EXTRACT_PERM ARCHIVE_EXTRACT_ACL ARCHIVE_EXTRACT_FFLAGS );
-use Ref::Util qw( is_plain_coderef is_plain_arrayref );
+use Ref::Util qw( is_plain_coderef is_plain_arrayref is_plain_scalarref is_ref );
 use Carp ();
 use File::chdir;
 use Path::Tiny ();
@@ -11,18 +11,28 @@ use 5.020;
 use experimental qw( signatures postderef );
 
 # ABSTRACT: An archive extracting mechanism (using libarchive)
-our $VERSION = '0.02'; # VERSION
+our $VERSION = '0.03'; # VERSION
 
 
 sub new ($class, %options)
 {
-  Carp::croak("Required option: filename")
-    unless defined $options{filename};
+  Carp::croak("Required option: one of filename or memory")
+    unless defined $options{filename} || defined $options{memory};
 
-  foreach my $filename (@{ is_plain_arrayref($options{filename}) ? $options{filename} : [$options{filename}] })
+  Carp::croak("Exactly one of filename or memory is required")
+    if defined $options{filename} && defined $options{memory};
+
+  if(defined $options{filename})
   {
-    Carp::croak("Missing or unreadable: $filename")
-      unless -r $filename;
+    foreach my $filename (@{ is_plain_arrayref($options{filename}) ? $options{filename} : [$options{filename}] })
+    {
+      Carp::croak("Missing or unreadable: $filename")
+        unless -r $filename;
+    }
+  }
+  elsif(!(is_plain_scalarref $options{memory} && defined $options{memory}->$* && !is_ref $options{memory}->$*))
+  {
+    Carp::croak("Option memory must be a scalar reference to a plain non-reference scalar");
   }
 
   Carp::croak("Entry is not a code reference")
@@ -32,6 +42,7 @@ sub new ($class, %options)
     filename   => delete $options{filename},
     passphrase => delete $options{passphrase},
     entry      => delete $options{entry},
+    memory     => delete $options{memory},
   }, $class;
 
   Carp::croak("Illegal options: @{[ sort keys %options ]}")
@@ -79,7 +90,16 @@ sub _archive ($self)
     }
   }
 
-  my $ret = is_plain_arrayref($self->filename) ? $r->open_filenames($self->filename, 10240) : $r->open_filename($self->filename, 10240);
+  my $ret;
+
+  if(defined $self->{filename})
+  {
+    $ret = is_plain_arrayref($self->filename) ? $r->open_filenames($self->filename, 10240) : $r->open_filename($self->filename, 10240);
+  }
+  else
+  {
+    $ret = $r->open_memory($self->{memory});
+  }
 
   if($ret == ARCHIVE_WARN)
   {
@@ -208,7 +228,7 @@ Archive::Libarchive::Extract - An archive extracting mechanism (using libarchive
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 
@@ -247,7 +267,8 @@ representing a single multi-file archive.
 
  my $extract = Archive::Libarchive::Extract->new(%options);
 
-This creates a new instance of the Extract object.
+This creates a new instance of the Extract object.  One of the L</filename> or
+L</memory> option
 
 =over 4
 
@@ -255,7 +276,16 @@ This creates a new instance of the Extract object.
 
  my $extract = Archive::Libarchive::Extract->new( filename => $filename );
 
-This option is required, and is the filename of the archive.
+The filename of the archive to read from.
+
+=item memory
+
+[version 0.03]
+
+ my $peek = Archive::Libarchive::Peek->new( memory => \$content );
+
+A reference to the memory region containing the archive.  Passing in a plain
+scalar will throw an exception.
 
 =item passphrase
 
@@ -286,7 +316,7 @@ be skipped.
 
 =head2 filename
 
-This is the archive filename for the Extract object.
+This is the archive filename for the Extract object.  This will be C<undef> for in-memory archives.
 
 =head2 to
 

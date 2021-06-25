@@ -1,3 +1,10 @@
+1.901     2021-06-16 23:05:54 EDT
+  - Stable release requiring UV 1.909
+
+1.900     2021-06-16 01:23:42 EDT (TRIAL RELEASE)
+  - Changes to support UV 2.0
+  - Update IRC metadata to libera.chat
+
 1.002     2020-04-19 21:40:34 EDT
   - Support changing invocation time of active timers in again method, to
     support keep_alive_timeout added in Mojolicious 8.37

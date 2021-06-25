@@ -7,7 +7,7 @@ use warnings;
 
 use base q(Exporter);
 
-our $VERSION = '0.012'; # VERSION
+our $VERSION = '0.013'; # VERSION
 
 require XSLoader;
 XSLoader::load('Text::SpeedyFx', $VERSION);
@@ -26,7 +26,7 @@ Text::SpeedyFx - tokenize/hash large amount of strings efficiently
 
 =head1 VERSION
 
-version 0.012
+version 0.013
 
 =head1 SYNOPSIS
 
@@ -87,13 +87,13 @@ C<hash_fv()>/C<hash_min()> variants are up to 260% faster!
 
 Parses C<$octets> and returns a feature vector (string of bits) with length C<$n>.
 C<$n> is supposed to be a multiplier of 8, as the length of the resulting feature vector is C<ceil($n / 8)>.
-See the included utilities L<cosine_cmp> and L<uniq_wc>.
+See the included utilities C<cosine_cmp> and C<uniq_wc>.
 
 =head2 hash_min($octets)
 
 Parses C<$octets> and returns the hash with the lowest value.
 Useful in L<MinHash|http://en.wikipedia.org/wiki/MinHash> implementation.
-See also the included L<minhash_cmp> utility.
+See also the included C<minhash_cmp> utility.
 
 =head1 UNICODE SUPPORT
 
@@ -214,7 +214,7 @@ L<Фильтр Блума|http://habrahabr.ru/post/112069/>
 
 =item *
 
-L<cosine_cmp>, L<minhash_cmp> and L<uniq_wc> utilities from this distribution
+C<cosine_cmp>, C<minhash_cmp> and C<uniq_wc> utilities from this distribution
 
 =back
 
@@ -224,7 +224,7 @@ Stanislaw Pusep <stas@sysd.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Stanislaw Pusep.
+This software is copyright (c) 2021 by Stanislaw Pusep.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

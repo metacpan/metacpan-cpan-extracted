@@ -4,7 +4,7 @@ Robots::Validate - Validate that IP addresses are associated with known robots
 
 # VERSION
 
-version v0.2.3
+version v0.2.4
 
 # SYNOPSIS
 
@@ -82,6 +82,11 @@ my $result = $rv->validate($env);
 ```
 
 # KNOWN ISSUES
+
+## Undocumented Rules
+
+Many of these rules are not documented, but have been guessed from web
+traffic.
 
 ## Limitations
 

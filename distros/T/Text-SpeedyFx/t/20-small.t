@@ -4,7 +4,6 @@ use utf8;
 use warnings;
 
 use Data::Dumper;
-use List::MoreUtils qw(distinct);
 use Scalar::Util qw(looks_like_number);
 use Test::More;
 
@@ -69,7 +68,7 @@ my $expect = {
 };
 my $n = scalar keys %$expect;
 
-my $m = scalar distinct map { lc } ($str =~ /(\w+)/gx);
+my $m = unique_count( map { lc } ($str =~ /(\w+)/gx) );
 is($m, $n, qq(tokenization via regexp gave us $m tokens));
 
 ok(
@@ -110,3 +109,8 @@ ok(
 );
 
 done_testing(8 + $n);
+
+sub unique_count { ## no critic (Subroutines::RequireArgUnpacking)
+    my %hash = map { $_ => 1 } @_;
+    return scalar keys %hash;
+}

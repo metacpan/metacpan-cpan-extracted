@@ -38,11 +38,11 @@
    "provides" : {
       "XS::Parse::Keyword" : {
          "file" : "lib/XS/Parse/Keyword.pm",
-         "version" : "0.06"
+         "version" : "0.08"
       },
       "XS::Parse::Keyword::Builder" : {
          "file" : "lib/XS/Parse/Keyword/Builder.pm",
-         "version" : "0.06"
+         "version" : "0.08"
       }
    },
    "release_status" : "stable",
@@ -51,6 +51,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.06",
+   "version" : "0.08",
    "x_serialization_backend" : "JSON::PP version 4.05"
 }

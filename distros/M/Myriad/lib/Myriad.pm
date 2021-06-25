@@ -3,7 +3,7 @@ package Myriad;
 
 use Myriad::Class;
 
-our $VERSION = '0.007';
+our $VERSION = '0.008';
 our $AUTHORITY = 'cpan:DERIV'; # AUTHORITY
 
 =encoding utf8
@@ -226,6 +226,11 @@ has $subscription;
 # The Myriad::Storage instance to manage data
 # stored by the service or access other services data.
 has $storage;
+# Future representing run
+has $run;
+# Future for passing to things that want to react to
+# run, anything outside this file
+has $run_without_cancel;
 # Future representing shutdown
 has $shutdown;
 # Future for passing to things that want to react to
@@ -540,6 +545,9 @@ Requests shutdown.
 =cut
 
 async method shutdown () {
+    # if this is regular shutdown $run should be already resolved
+    $run->fail('Myriad was unable to start correctly') if $run && !$run->is_ready;
+
     my $f = $shutdown
         or die 'attempting to shut down before we have started, this will not end well';
 
@@ -591,6 +599,21 @@ The coderef is expected to return a L<Future> indicating completion.
 method on_shutdown ($code) {
     push $shutdown_tasks->@*, $code;
     $self
+}
+
+=head2 run_future
+
+Returns a copy of the run L<Future>.
+
+This would resolve once the process is running and it's
+ready to accept requests.
+
+=cut
+
+method run_future () {
+    return $run_without_cancel //= (
+        $run //= $self->loop->new_future->set_label('run'),
+    )->without_cancel;
 }
 
 =head2 shutdown_future
@@ -656,6 +679,9 @@ Applies signal handlers for TERM and QUIT, then starts the loop.
 =cut
 
 async method run () {
+    # Initiate the run future.
+    $self->run_future();
+
     for my $signal (qw(TERM INT QUIT)) {
         $self->loop->attach_signal($signal => $self->$curry::weak(method {
             $log->infof("%s received, exit", $signal);
@@ -673,11 +699,15 @@ async method run () {
     }
 
     # Set shutdown future before starting commands.
-    $shutdown //= $self->loop->new_future->set_label('shutdown');
+    $self->shutdown_future();
 
     $commands->run_cmd->retain()->on_fail(sub {
         $self->shutdown->await();
     });
+
+    # Process is running but there is a possibility
+    # the command above failed.
+    $run->done unless $run->is_ready;
 
     await $self->shutdown_future;
 }

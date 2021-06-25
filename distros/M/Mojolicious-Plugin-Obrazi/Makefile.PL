@@ -14,6 +14,7 @@ WriteMakefile(
   AUTHOR           => 'Красимир Беров <berov@cpan.org>',
   PREREQ_PM        => {'Mojolicious' => 9.17, 'Text::CSV_XS' => 1.46, 'Imager' => 1.012,},
   test             => {TESTS         => 't/*.t'},
+  clean            => {FILES         => 'Mojolicious-Plugin-Obraz* READM*'},
   MIN_PERL_VERSION => '5.026000',
   META_MERGE       => {
     dynamic_config => 0,
@@ -28,3 +29,28 @@ WriteMakefile(
     },
   },
 );
+
+sub MY::postamble {
+  my $preop          = qq 'podselect $module_file > README.pod;';
+  my @perltidy_files = qw(Makefile.PL);
+  my $options        = {
+    no_chdir => 1,
+    wanted   => sub {
+      push @perltidy_files, $_ if $_ =~ /\.(PL|pm|pl|t|conf)$/;
+    }
+  };
+  File::Find::find($options, 'lib', 't');
+  my $perltidy_files = join '\\' . $/ . "\t ", @perltidy_files;
+  return <<"TARGETS";
+readme ::
+\t$preop
+dist : readme
+
+perltidy ::
+\tperltidy -pro=.perltidyrc \\
+\t$perltidy_files
+
+TARGETS
+}
+
+

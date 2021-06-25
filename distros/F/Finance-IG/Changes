@@ -4,4 +4,9 @@ Revision history for Finance-IG
 0.02    Small progress towards passing the tests on CPAN
 0.03    Updated Makefile.PL dependencies  as progress towards passing tests on CPAN 
 0.04    Updated Makefile.PL dependencies  as progress towards passing tests on CPAN again. 
+0.05    Improvements imported from ugraded original
+0.06    Changes directory layouts to make publishable, 0.05 cannot be published as it exports someone elses module. 
+0.07, 8 Unsuccesful attemps to correct the problem in 0.05
+0.09    Using Package::Alias to rename package on the fly. 
+0.92    Fixes record REST::CLient, still needs POD
 

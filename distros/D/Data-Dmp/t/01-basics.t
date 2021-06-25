@@ -45,10 +45,10 @@ subtest "dumping %+" => sub {
 # circular
 {
     my $circ = [1]; push @$circ, $circ;
-    is(dmp($circ), q(do{my$a=[1,'fix'];$a->[1]=$a;$a}));
+    is(dmp($circ), q(do{my$var=[1,'$var'];$var->[1]=$var;$var}));
     my $circ2 = {a=>$circ}; push @$circ, $circ2;
     is(dmp($circ),
-       q(do{my$a=[1,'fix',{a=>'fix'}];$a->[1]=$a;$a->[2]{a}=$a;$a}));
+       q(do{my$var=[1,'$var',{a=>'$var'}];$var->[1]=$var;$var->[2]{a}=$var;$var}));
 }
 
 # code

@@ -1,3 +1,9 @@
+0.101   2021-02-21  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Use encoded_content() (content as bytes) instead of
+	  content() so we don't have to deal with encodings.
+
+
 0.100   2020-02-07  Released-By: PERLANCAR; Urgency: medium
 
 	- Add 'lib' to @INC temporarily to allow finding module in the same

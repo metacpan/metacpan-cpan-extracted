@@ -3,9 +3,9 @@
 package Data::Dmp;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-04-07'; # DATE
+our $DATE = '2021-06-24'; # DATE
 our $DIST = 'Data-Dmp'; # DIST
-our $VERSION = '0.240'; # VERSION
+our $VERSION = '0.241'; # VERSION
 
 use 5.010001;
 use strict;
@@ -59,6 +59,14 @@ sub _double_quote {
     return qq("$_");
 }
 # END COPY PASTE FROM Data::Dump
+
+# BEGIN COPY PASTE FROM String::PerlQuote
+sub _single_quote {
+    local($_) = $_[0];
+    s/([\\'])/\\$1/g;
+    return qq('$_');
+}
+# END COPY PASTE FROM String::PerlQuote
 
 sub _dump_code {
     my $code = shift;
@@ -119,9 +127,10 @@ sub _dump {
     my $refaddr = refaddr($val);
     $_subscripts{$refaddr} //= $subscript;
     if ($_seen_refaddrs{$refaddr}++) {
-        push @_fixups, "\$a->$subscript=\$a",
-            ($_subscripts{$refaddr} ? "->$_subscripts{$refaddr}" : ""), ";";
-        return "'fix'";
+        my $target = "\$var" .
+            ($_subscripts{$refaddr} ? "->$_subscripts{$refaddr}" : "");
+        push @_fixups, "\$var->$subscript=$target;";
+        return _single_quote($target);
     }
 
     my $class;
@@ -185,7 +194,7 @@ sub _dd_or_dmp {
         $res = _dump($_[0], '');
     }
     if (@_fixups) {
-        $res = "do{my\$a=$res;" . join("", @_fixups) . "\$a}";
+        $res = "do{my\$var=$res;" . join("", @_fixups) . "\$var}";
     }
 
     if ($_is_ellipsis) {
@@ -222,13 +231,13 @@ Data::Dmp - Dump Perl data structures as Perl code
 
 =head1 VERSION
 
-This document describes version 0.240 of Data::Dmp (from Perl distribution Data-Dmp), released on 2020-04-07.
+This document describes version 0.241 of Data::Dmp (from Perl distribution Data-Dmp), released on 2021-06-24.
 
 =head1 SYNOPSIS
 
  use Data::Dmp; # exports dd() and dmp()
  dd [1, 2, 3]; # prints "[1,2,3]"
- $a = dmp({a => 1}); # -> "{a=>1}"
+ $var = dmp({a => 1}); # -> "{a=>1}"
 
 Print truncated dump (capped at L</$Data::Dmp::OPT_MAX_DUMP_LEN_BEFORE_ELLIPSIS>
 characters):
@@ -314,22 +323,22 @@ Used by L</dd_ellipsis> and L</dmp_ellipsis>.
 =head1 BENCHMARKS
 
  [1..10]:
-                      Rate    Data::Dump Data::Dumper Data::Dmp
- Data::Dump    32032+-55/s            --       -64.6%    -73.9%
- Data::Dumper 90580+-110/s 182.77+-0.59%           --    -26.1%
- Data::Dmp    122575+-43/s 282.66+-0.67% 35.32+-0.17%        --
+              Rate/s Precision/s  Data::Dump Data::Dumper Data::Dmp
+ Data::Dump    25040         100          --       -64.4%    -75.4%
+ Data::Dumper  70280         130 180.6+-1.2%           --    -30.9%
+ Data::Dmp    101744          34 306.3+-1.6% 44.78+-0.28%        --
  
  [1..100]:
-                       Rate    Data::Dump   Data::Dmp Data::Dumper
- Data::Dump   3890.6+-5.9/s            --      -73.7%       -73.7%
- Data::Dmp     14768.3+-5/s 279.59+-0.59%          --        -0.1%
- Data::Dumper   14790+-87/s   280.2+-2.3% 0.15+-0.59%           --
+              Rate/s Precision/s    Data::Dump Data::Dumper Data::Dmp
+ Data::Dump   3141.2         4.7            --       -74.5%    -75.1%
+ Data::Dumper  12308          81   291.8+-2.6%           --     -2.3%
+ Data::Dmp     12597          13 301.04+-0.73%  2.35+-0.68%        --
  
  Some mixed structure:
-                     Rate    Data::Dump   Data::Dmp Data::Dumper
- Data::Dump    9035+-17/s            --      -68.3%       -80.9%
- Data::Dmp    28504+-10/s 215.47+-0.59%          --       -39.6%
- Data::Dumper 47188+-55/s   422.3+-1.1% 65.55+-0.2%           --
+               Rate/s Precision/s  Data::Dump    Data::Dmp Data::Dumper
+ Data::Dump      7619          24          --       -68.8%       -77.9%
+ Data::Dmp    24427.8           8   220.6+-1%           --       -29.0%
+ Data::Dumper   34410          53 351.6+-1.6% 40.86+-0.22%           --
 
 =head1 FUNCTIONS
 
@@ -441,7 +450,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

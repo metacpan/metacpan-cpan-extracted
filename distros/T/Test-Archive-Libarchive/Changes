@@ -1,5 +1,8 @@
 Revision history for Test-Archive-Libarchive},
 
+0.02      2021-06-15 07:15:27 -0600
+  - Bump required version of Test2::V0 (gh#2)
+
 0.01      2021-05-30 08:30:42 -0600
   - initial version
 

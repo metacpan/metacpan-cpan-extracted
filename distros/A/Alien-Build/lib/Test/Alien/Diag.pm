@@ -4,13 +4,13 @@ use strict;
 use warnings;
 use 5.008004;
 use Test2::API qw( context );
-use base qw( Exporter );
+use Exporter qw( import );
 
 our @EXPORT = qw( alien_diag );
 our @EXPORT_OK = @EXPORT;
 
 # ABSTRACT: Print out standard diagnostic for Aliens in the test step.
-our $VERSION = '2.40'; # VERSION
+our $VERSION = '2.41'; # VERSION
 
 
 sub alien_diag ($@)
@@ -79,7 +79,7 @@ Test::Alien::Diag - Print out standard diagnostic for Aliens in the test step.
 
 =head1 VERSION
 
-version 2.40
+version 2.41
 
 =head1 SYNOPSIS
 
@@ -159,6 +159,8 @@ Shawn Laffan (SLAFFAN)
 Paul Evans (leonerd, PEVANS)
 
 Håkon Hægland (hakonhagland, HAKONH)
+
+nick nauwelaerts (INPHOBIA)
 
 =head1 COPYRIGHT AND LICENSE
 

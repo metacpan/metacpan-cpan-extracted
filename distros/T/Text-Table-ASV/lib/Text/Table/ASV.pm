@@ -1,7 +1,7 @@
 package Text::Table::ASV;
 
-our $DATE = '2018-07-23'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2021-02-20'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 #IFUNBUILT
 # # use 5.010001;
@@ -57,7 +57,7 @@ sub _max_array_index {
 }
 
 1;
-# ABSTRACT: Generate TSV
+# ABSTRACT: Generate ASV (ASCII separated value a.k.a. DEL a.ka. delimited ASCII)
 
 __END__
 
@@ -67,11 +67,11 @@ __END__
 
 =head1 NAME
 
-Text::Table::ASV - Generate TSV
+Text::Table::ASV - Generate ASV (ASCII separated value a.k.a. DEL a.ka. delimited ASCII)
 
 =head1 VERSION
 
-This document describes version 0.001 of Text::Table::ASV (from Perl distribution Text-Table-ASV), released on 2018-07-23.
+This document describes version 0.002 of Text::Table::ASV (from Perl distribution Text-Table-ASV), released on 2021-02-20.
 
 =head1 SYNOPSIS
 
@@ -136,7 +136,7 @@ Source repository is at L<https://github.com/perlancar/perl-Text-Table-ASV>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Text-Table-ASV>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Text-Table-ASV/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -158,7 +158,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

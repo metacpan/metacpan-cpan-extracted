@@ -17,7 +17,7 @@ my $api = Webservice::OVH->new_from_json($json_dir);
 ok( $api, "module ok" );
 
 my $projects = $api->cloud->projects;
-
+=head2
 SKIP: {
 
     skip "No project exists for given account" unless scalar @$projects;
@@ -57,5 +57,5 @@ SKIP: {
     }
 
 }
-
+=cut
 done_testing();

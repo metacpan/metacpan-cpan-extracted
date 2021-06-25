@@ -3,6 +3,7 @@ use t::Helper;
 use JSON::Validator::Joi 'joi';
 use Storable 'dclone';
 
+isa_ok +joi->validator, 'JSON::Validator::Schema';
 is_deeply +joi->validator->coerce, {booleans => 1, numbers => 1, strings => 1}, 'default coercion';
 
 is_deeply(
@@ -24,18 +25,18 @@ is_deeply(
     type       => 'object',
     required   => ['email'],
     properties => {
-      age      => {type => 'integer', minimum   => 0,  maximum   => 200},
-      alphanum => {type => 'string',  minLength => 12, maxLength => 12, pattern => '^\w*$'},
-      color    => {type => 'string',  minLength => 2,  maxLength => 12, pattern => '^\w+$'},
-      date_time => {type => 'string', format => 'date-time'},
-      email     => {type => 'string', format => 'email'},
+      age       => {type => 'integer', minimum   => 0,  maximum   => 200},
+      alphanum  => {type => 'string',  minLength => 12, maxLength => 12, pattern => '^\w*$'},
+      color     => {type => 'string',  minLength => 2,  maxLength => 12, pattern => '^\w+$'},
+      date_time => {type => 'string',  format    => 'date-time'},
+      email     => {type => 'string',  format    => 'email'},
       exists    => {type => 'boolean'},
-      lc    => {type => 'string', pattern   => '^\p{Lowercase}*$'},
-      name  => {type => 'string', minLength => 1},
-      pos   => {type => 'number', minimum   => 0},
-      token => {type => 'string', pattern   => '^[a-zA-Z0-9_]+$'},
-      uc    => {type => 'string', pattern   => '^\p{Uppercase}*$'},
-      uri   => {type => 'string', format    => 'uri'},
+      lc        => {type => 'string', pattern   => '^\p{Lowercase}*$'},
+      name      => {type => 'string', minLength => 1},
+      pos       => {type => 'number', minimum   => 0},
+      token     => {type => 'string', pattern   => '^[a-zA-Z0-9_]+$'},
+      uc        => {type => 'string', pattern   => '^\p{Uppercase}*$'},
+      uri       => {type => 'string', format    => 'uri'},
     },
     additionalProperties => false
   },
@@ -78,6 +79,14 @@ joi_ok(
   E('/email', 'Missing property.'),
 );
 
+note 'test that compile and not compile generates same strict result';
+my $strict_obj = joi->object->strict->props({ns => joi->string->required});
+joi_ok({ns => 'plop', toto => 'plouf'}, $strict_obj, E('/', 'Properties not allowed: toto.'));
+for my $item ($strict_obj->compile, $strict_obj) {
+  joi_ok([{ns => 'plop', toto => 'plouf'}], joi->array->strict->items($item), E('/0', 'Properties not allowed: toto.'),
+  );
+}
+
 eval { joi->number->extend(joi->integer) };
 like $@, qr{Cannot extend joi 'number' by 'integer'}, 'need to extend same type';
 
@@ -118,8 +127,8 @@ test_extend(
   joi->object->props(a => joi->integer, b => joi->integer->required),
   joi->object->props(b => joi->integer->required, x => joi->string->required, y => joi->string->required),
   {
-    type     => 'object',
-    required => bag(qw(b x y)),
+    type       => 'object',
+    required   => bag(qw(b x y)),
     properties =>
       {a => {type => 'integer'}, b => {type => 'integer'}, x => {type => 'string'}, y => {type => 'string'}},
   },

@@ -11,6 +11,8 @@ const our $ADDRESS_NAME         => 1 << 1;
 const our $ADDRESS_HOUSE_NUMBER => 1 << 2;
 const our $ADDRESS_STREET       => 1 << 3;
 const our $ADDRESS_UNIT         => 1 << 4;
+
+
 const our $ADDRESS_LOCALITY     => 1 << 7;
 const our $ADDRESS_ADMIN1       => 1 << 8;
 const our $ADDRESS_ADMIN2       => 1 << 9;
@@ -22,7 +24,7 @@ const our $ADDRESS_POSTAL_CODE  => 1 << 14;
 const our $ADDRESS_NEIGHBORHOOD => 1 << 15;
 const our $ADDRESS_ALL          => (1 << 16) - 1;
 
-our $VERSION     = '0.07';
+our $VERSION     = '0.08';
 our %EXPORT_TAGS = ( 'all' => [qw/
     expand_address
     parse_address
@@ -45,10 +47,8 @@ our %EXPORT_TAGS = ( 'all' => [qw/
   /]);
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 
-XSLoader::load();
+XSLoader::load('Geo::libpostal', $VERSION);
 
-# cleanup libpostal
-END { _teardown() }
 1;
 __END__
 =encoding utf8
@@ -166,30 +166,6 @@ C<expand_address> will C<die> on C<undef> and empty addresses, odd numbers of op
 
 =cut
 
-#################################################
-# options are ignored by libpostal
-# https://github.com/openvenues/libpostal/blob/e816b4f77e8c6a7f35207ca77282ffab3712c5b6/src/address_parser.c#L837
-# ##############################################
-# Takes an address string and parses it, returning a list of labels and values.
-# Accepts two optional named parameters:
-# 
-# =over 4
-# 
-# =item *
-# 
-# C<language> - 2 character language code per L<ISO 639-1|https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes>
-# 
-# =item *
-# 
-# C<country> - 2 character country code per L<ISO 3166-1 alpha-2|https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2>
-# 
-# =back
-# 
-# Currently these are ignored by libpostal!
-# 
-# Will C<die> on C<undef> and empty addresses, odd numbers of options and
-# unrecognized options. Exported on request.
-
 =pod
 
 Will C<die> on C<undef> and empty addresses. Exported on request.
@@ -219,14 +195,7 @@ libpostal is not L<thread-safe|https://github.com/openvenues/libpostal/issues/34
 
 =head1 EXTERNAL DEPENDENCIES
 
-L<libpostal|https://github.com/openvenues/libpostal> is required. C<Geo::libpostal> uses pkg-config to support custom install locations. Sometimes pkg-config can't find the library by default, in those cases just do:
-
-  $ find / -name libpostal.pc 2>/dev/null
-  /usr/local/lib/pkgconfig/libpostal.pc
-
-  $ export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig
-
-And then do a manual installation of C<Geo::libpostal>.
+L<libpostal|https://github.com/openvenues/libpostal> is required. This has been tested against L<v1.0.0|https://github.com/openvenues/libpostal/releases/tag/v1.0.0>.
 
 =head1 INSTALLATION
 
@@ -245,7 +214,7 @@ Or clone it from GitHub and install it manually:
 
 =head1 AUTHOR
 
-E<copy> 2016 David Farrell
+E<copy> 2021 David Farrell
 
 =head1 LICENSE
 

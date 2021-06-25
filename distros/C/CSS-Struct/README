@@ -54,6 +54,7 @@ EXAMPLE
              $css = CSS::Struct::Output::Raw->new(%params);
      }
 
+     $css->put(['a', '@charset', 'utf-8']);
      $css->put(['s', 'selector#id']);
      $css->put(['s', 'div div']);
      $css->put(['s', '.class']);
@@ -69,9 +70,10 @@ EXAMPLE
      # Usage: __SCRIPT__ indent
 
      # Output with argument 0:
-     # selector#id,div div,.class{weight:100px;font-size:10em;}
+     # @charset "utf-8";selector#id,div div,.class{weight:100px;font-size:10em;}
 
      # Output with argument 1:
+     # @charset "utf-8";
      # selector#id, div div, .class {
      #         weight: 100px;
      #         font-size: 10em;
@@ -81,11 +83,14 @@ SEE ALSO
     CSS::Struct::Output
         Base class for CSS::Struct::Output::*.
 
+    CSS::Struct::Output::Indent
+        Indent printing 'CSS::Struct' structure to CSS code.
+
     CSS::Struct::Output::Raw
         Raw printing 'CSS::Struct' structure to CSS code.
 
-    CSS::Struct::Output::Indent
-        Indent printing 'CSS::Struct' structure to CSS code.
+    CSS::Struct::Output::Structure
+        Structure class for 'CSS::Struct' output.
 
 AUTHOR
     Michal Josef Špaček <mailto:skim@cpan.org>
@@ -98,5 +103,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.04
+    0.05
 

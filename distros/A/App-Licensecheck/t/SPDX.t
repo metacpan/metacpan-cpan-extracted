@@ -7,9 +7,8 @@ use Path::Tiny;
 
 plan 88;
 
-my $app = App::Licensecheck->new;
+my $app = App::Licensecheck->new( shortname_scheme => 'debian,spdx' );
 $app->lines(0);
-$app->deb_fmt(1);
 
 # TODO: make naming scheme configurable
 # TODO: Detect MPL-1.0 version on separate line

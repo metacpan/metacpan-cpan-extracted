@@ -1,0 +1,10 @@
+Revision history for Compress::LZString
+
+1.4401  Tue Jun 15 00:32:36 2021
+      - Bugfix release.
+      - Added support for old perl.
+
+1.44    Sat Jun  5 20:57:57 2021
+      - Initial distiribution for CPAN.
+      - Integrated lastest lz-string source. (v1.4.4)
+

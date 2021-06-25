@@ -48,6 +48,7 @@ object Prima::Drawable ( Prima::Component)
 	method void  set( HV * profile);
 	method void  set_font( Font font);
 
+	method Bool  can_draw_alpha() => apc_gp_can_draw_alpha;
 	method int   get_bpp();
 	method Font  get_font();
 	method SV *  get_font_abc( int first = -1, int last = -1, int flags = 0);
@@ -61,6 +62,7 @@ object Prima::Drawable ( Prima::Component)
 	method int   get_text_width( SV * text, int flags = 0, int from = 0, int len = -1);
 	method SV *  get_text_box( SV * text, int from = 0, int len = -1);
 	method SV *  render_glyph( int index, HV * profile);
+	static SV *  render_polyline( SV * obj, SV * points, HV * profile);
 	static SV *  render_spline( SV * obj, SV * points, HV * profile);
 
 	# operators
@@ -84,7 +86,7 @@ object Prima::Drawable ( Prima::Component)
 	method Bool  sector( int x, int y, int dX, int dY, double startAngle, double endAngle) => apc_gp_sector;
 	method Bool  text_out( SV * text, int x, int y, int from = 0, int len = -1);
 	method SV*   text_shape( SV * text, HV * profile);
-	method SV*   text_wrap( SV * text, int width, int options = twDefault, int tabIndent = 8, int from = 0, int len = -1);
+	method SV*   text_wrap( SV * text, int width, int options = twDefault, int tabIndent = 8, int from = 0, int len = -1, SV * glyphs = NULL_SV);
 
 	# font_abc caches
 	PFontABC font_abc_ascii;
@@ -92,5 +94,5 @@ object Prima::Drawable ( Prima::Component)
 	PList    font_abc_glyphs;
 	unsigned long * font_abc_glyphs_ranges;
 	int             font_abc_glyphs_n_ranges;
-
+	c_only int*  do_text_wrap( TextWrapRec * tw, GlyphWrapRec * gw, uint16_t * log2vis);
 }

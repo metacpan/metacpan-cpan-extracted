@@ -5,7 +5,7 @@
 
 use Object::Pad 0.19;
 
-package Device::Chip::MCP4725 0.11;
+package Device::Chip::MCP4725 0.12;
 class Device::Chip::MCP4725
    extends Device::Chip;
 

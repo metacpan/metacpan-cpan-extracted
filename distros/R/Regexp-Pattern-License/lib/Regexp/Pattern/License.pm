@@ -13,11 +13,11 @@ Regexp::Pattern::License - Regular expressions for legal licenses
 
 =head1 VERSION
 
-Version v3.4.0
+Version v3.5.1
 
 =cut
 
-our $VERSION = version->declare("v3.4.0");
+our $VERSION = version->declare("v3.5.1");
 
 =head1 DESCRIPTION
 
@@ -35,6 +35,7 @@ L<Regexp::Pattern> is a convention for organizing reusable regex patterns.
 # [  ]          end-of-paragraph space
 # [ ]           end-of-sentence space
 # [.]           full stop
+# [, ]          comma and space (space optional for wide comma)
 # [:"]          colon and maybe one or two quotes
 # [;]           semicolon or colon or comma
 # [']           apostrophe
@@ -47,6 +48,8 @@ L<Regexp::Pattern> is a convention for organizing reusable regex patterns.
 # [-#]          dash or number
 # [- ]          dash or space
 # [ - ]         dash with space around
+# [(]           parens-open
+# [)]           parens-close
 # [<]           less-than
 # [>]           greater-than
 # [#.]          digits and maybe one infix dot
@@ -55,15 +58,19 @@ L<Regexp::Pattern> is a convention for organizing reusable regex patterns.
 # [eg]          exempli gratia, abbreviated
 # [http://]     http or https protocol
 # [ie]          id est, abbreviated
-# [word]        word, maybe space around
+# [word]        word
+# [ word]       space and word
 
 my @_re = (
+	[ qr/\Q[, ]/,  '(?:, |[、，] ?)' ],
 	[ qr/\Q[*)]/,  '(?:\W{0,5}\S{0,2}\W{0,3})' ],
 	[ qr/\Q[:"]/,  '(?::\W{0,2})' ],                    #"
 	[ qr/\Q[-]/,   '[-–]' ],
 	[ qr/\Q[-#]/,  '[-–\d]' ],
 	[ qr/\Q[- ]/,  '[-– ]' ],
 	[ qr/\Q[ - ]/, '(?: [-–—]{1,2} )' ],
+	[ qr/\Q[(]/,   '[(（]' ],
+	[ qr/\Q[)]/,   '[)）]' ],
 	[ qr/\Q[#.]/,  '(?:\d+(?:\.\d+)?)' ],
 	[ qr/\Q[#-,]/, '(?:\d+(?: ?[-–] ?\d+)?,? ?)' ],
 	[ qr/\Q[ ]/,   '(?:\s{1,3})' ],
@@ -71,7 +78,7 @@ my @_re = (
 	[ qr/\Q["]/, "(?:[\"«»˝̏“”„]|['<>`´‘’‹›‚]{0,2})" ],
 	[ qr/\Q[']/, "(?:['`´‘’]?)" ],
 	[ qr/\Q["*]/, '(?:\W{0,2})' ],                      #"
-	[ qr/\Q[;]/,  '[;:,]' ],
+	[ qr/\Q[;]/,  '[;:,、，]' ],
 	[ qr/\Q[\/]/, '(?:[ /]?)' ],
 
 	[ qr/\[à\]/, '(?:[àa]?)' ],
@@ -83,7 +90,8 @@ my @_re = (
 	[ qr/\Q[eg]/,      '(?:ex?\.? ?gr?\.?)' ],
 	[ qr!\Q[http://]!, '(?:(?:https?:?)?(?://)?)' ],
 	[ qr/\Q[ie]/,      '(?:i\.? ?e\.?)' ],
-	[ qr/\Q[word]/,    '(?: ?\S+ ?)' ],
+	[ qr/\Q[word]/,    '(?:\S+)' ],
+	[ qr/\Q[ word]/,   '(?: \S+)' ],
 );
 
 my %P;
@@ -164,11 +172,12 @@ my $fsf_ullr
 
 # internal-only patterns
 # _lang is "basic variants" regex at <https://stackoverflow.com/a/48300605>
-# without upper-case chars (as dictated by DefHash) and no capture groups
+# TODO: maybe tighten _lang to subset of _prop
+# as discussed at <https://github.com/perlancar/perl-DefHash/issues/1>
 my $_delim = '[.(]';
 my $_prop  = '(?:[a-z][a-z0-9_]*)';
 my $_lang
-	= '(?:\([a-z]{2,4}(?:_(?:[a-z]{4}|[0-9]{3}))?(?:_(?:[a-z]{2}|[0-9]{3}))?\))';
+	= '(?:\([A-Za-z]{2,4}([_-][A-Za-z]{4})?([_-]([A-Za-z]{2}|[0-9]{3}))?\))';
 my $_notlang = '[a-z0-9_.]';
 my $_any     = '[a-z0-9_.()]';
 
@@ -292,7 +301,7 @@ $RE{by} = {
 		'type:trait:publisher',
 	],
 
-	'pat.alt.subject.trait' => '(?P<_by> ?(?:as )?published by(?: \S+){1,6})',
+	'pat.alt.subject.trait' => '(?P<_by> ?(?:as )?published by[ word]{1,6})',
 };
 
 $RE{by_apache} = {
@@ -535,7 +544,7 @@ $RE{except_autoconf_2_g10} = {
 	'pat.alt.subject.trait.part.1' =>
 		'g10 Code GmbH gives unlimited permission',
 	'pat.alt.subject.trait.part.2' =>
-		'Certain portions of the mk\S+\.awk source text are designed',
+		'Certain portions of the mk[word]\.awk source text are designed',
 	'pat.alt.subject.trait.part.3' =>
 		'If your modification has such potential, you must delete',
 };
@@ -728,11 +737,11 @@ $RE{except_gstreamer} = {
 	],
 
 	'pat.alt.subject.trait.scope.multisection.part.all' =>
-		'The [word]{1,3} project hereby grant permission '
+		'The[ word]{1,3} project hereby grant permission '
 		. 'for non-gpl compatible GStreamer plugins '
-		. 'to be used and distributed together with GStreamer and [word]{1,3}[.] '
+		. 'to be used and distributed together with GStreamer and[ word]{1,3}[.] '
 		. 'This permission are above and beyond '
-		. 'the permissions granted by the GPL license [word]{1,3} is covered by[.]',
+		. 'the permissions granted by the GPL license[ word]{1,3} is covered by[.]',
 };
 
 =item * except_libtool
@@ -741,7 +750,7 @@ $RE{except_gstreamer} = {
 
 $RE{except_libtool} = {
 	name                  => 'libtool-exception',
-	'name.alt.org.debian' => 'libtool',
+	'name.alt.org.debian' => 'Libtool',
 	caption               => 'Libtool Exception',
 	tags                  => [
 		'family:gnu:gpl',
@@ -808,7 +817,7 @@ $RE{except_openssl} = {
 		. '\(or a modified version of that library\), '
 		. 'containing parts covered '
 		. 'by the terms of the OpenSSL or SSLeay licenses, '
-		. '(?:the authors of(?: \S+){0,8} grant you'
+		. '(?:the authors of[ word]{1,8} grant you'
 		. '|the (?:copyright holder|licensors|Free Software Foundation) grants? you'
 		. '|you are granted) '
 		. 'additional permission to convey the resulting work[.] '
@@ -1128,7 +1137,7 @@ $RE{except_qt_lgpl_1_1} = {
 		'(?:Digia|Nokia|The Qt Company) gives you certain additional rights[.] '
 		. 'These rights are described '
 		. 'in The (?:Digia Qt|Nokia Qt|Qt Company) LGPL Exception version 1\.1, '
-		. 'included in the file \S+ in this package'
+		. 'included in the file [word] in this package'
 };
 
 =item * except_qt_nosource
@@ -1336,7 +1345,7 @@ $RE{generated} = {
 		'All changes made in this file will be lost',
 		'generated file(?:[.] |[ - ])do not (?:edit|modify)[!.]',
 		'DO NOT (?:EDIT|MODIFY) THIS FILE',
-		'generated by [word](?: \([word]{0,3}\))?[  ]'
+		'generated by[ word](?: \([word][ word]{0,2}\))?[  ]'
 			. '(?:Please )?DO NOT delete this file[!]',
 
 # weak, but seems to catch no false positives at end of line
@@ -1344,16 +1353,16 @@ $RE{generated} = {
 
 # too weak: does not mention file explicitly, so may reflect only a subset
 #		'Generated (?:automatically|by|from|data|with)',
-#		'generated (?:by|from|using)(?: the)? [word]{1,2}(?: compiler)?[.][ ]'
+#		'generated (?:by|from|using)(?: the)?[ word]{1,2}(?: compiler)?[.][ ]'
 #			. '(please )?Do not (edit|modify)',
 #		'Machine generated[.][ ](please )?Do not (edit|modify)',
 #		'Do not (edit|modify)[.][ ]Generated (?:by|from|using)',
-#		'(?:created with|trained by) [word][.][ ](please )?Do not edit',
+#		'(?:created with|trained by)[ word][.][ ](please )?Do not edit',
 	],
 	'_pat.alt.subject.trait.scope.sentence.target.autotools' => [
 		'Makefile\.in generated by automake [#.]+ from Makefile\.am[.]',
 		'generated automatically by aclocal [#.]+ -\*?- Autoconf',
-		'Generated(?: from [word])? by GNU Autoconf',
+		'Generated(?: from[ word])? by GNU Autoconf',
 		'(?:Attempt to guess a canonical system name|Configuration validation subroutine script)[.][ ]'
 			. 'Copyright [c] [#-,]+Free Software Foundation',
 		'Calling this script install[-]sh is preferred over install[.]sh, to prevent',
@@ -1494,14 +1503,14 @@ $RE{version_later_postfix} = {
 };
 
 $RE{version_later}{'pat.alt.subject.trait.scope.line.scope.sentence'}
-	= ',? ?(?P<version_later>'
+	= '(?:,? )?(?P<version_later>'
 	. $RE{version_later_postfix}{'pat.alt.subject.trait'} . ')';
 $RE{version_later}{'pat.alt.subject.trait.scope.paragraph'}
-	= '[.][ ](?P<version_later>'
+	= '(?:[.]?[ ])?(?P<version_later>'
 	. $RE{version_later_paragraph}{'pat.alt.subject.trait.scope.paragraph'}
 	. ')';
 $RE{version_later}{'pat.alt.subject.trait'}
-	= '(?:[.][ ]|,? )(?P<version_later>'
+	= '(?:[.]?[ ]|,? )?(?P<version_later>'
 	. $RE{version_later_paragraph}{'pat.alt.subject.trait.scope.paragraph'}
 	. '|'
 	. $RE{version_later_postfix}{'pat.alt.subject.trait'} . ')';
@@ -1527,7 +1536,7 @@ $RE{version_number_suffix} = {
 		'type:trait',
 	],
 
-	'pat.alt.subject.trait' => '(?:(?: of the)? Licen[cs]e)?',
+	'pat.alt.subject.trait' => ' ?(?:(?:of the )?Licen[cs]e)?',
 };
 
 =item * version_only
@@ -1541,7 +1550,7 @@ $RE{version_only} = {
 	],
 
 	'pat.alt.subject.trait' =>
-		'(?P<_version_only> (?:only|\(no other versions\)))',
+		' ?(?P<_version_only>(?:only|\(no other versions\)))',
 };
 
 =item * version_prefix
@@ -1555,7 +1564,7 @@ $RE{version_prefix} = {
 	],
 
 	'pat.alt.subject.trait.scope.line.scope.sentence' =>
-		'(?:[-]|[;]?(?: (?:only |either )?)?|[ - ])?\(?(?:[Vv]ersion [Vv]?|VERSION |rev(?:ision)? |[Vv]\.? ?)?',
+		'(?:[-]|[;]? ?(?:(?:only |either )?)?|[ - ])?\(?(?:[Vv]ersion [Vv]?|VERSION |rev(?:ision)? |[Vv]\.? ?)?',
 	'pat.alt.subject.trait.scope.paragraph' =>
 		':?[ ]\(?(?:Version [Vv]?|VERSION )?',
 	'pat.alt.subject.trait' =>
@@ -1958,11 +1967,13 @@ $RE{agpl_3} = {
 	'name.alt.org.debian'          => 'AGPL-3',
 	'name.alt.org.gnu'             => 'AGPLv3.0',
 	'name.alt.org.osi'             => 'AGPL-3.0',
+	'name.alt.org.perl'            => 'agpl_3',
 	'name.alt.org.spdx'            => 'AGPL-3.0',
 	'name.alt.org.tldr.path.short' => 'agpl3',
 	caption => 'GNU Affero General Public License, Version 3',
 	'caption.alt.org.gnu' =>
 		'GNU Affero General Public License (AGPL) version 3',
+	'caption.alt.org.perl'  => 'GNU Affero General Public License, Version 3',
 	'caption.alt.org.trove' => 'GNU Affero General Public License v3',
 	'caption.alt.org.tldr' =>
 		'GNU Affero General Public License v3 (AGPL-3.0)',
@@ -2215,10 +2226,12 @@ END
 $RE{apache_1_1} = {
 	name                        => 'Apache-1.1',
 	'name.alt.org.osi'          => 'Apache-1.1',
+	'name.alt.org.perl'         => 'apache_1_1',
 	'name.alt.org.spdx'         => 'Apache-1.1',
 	'name.alt.org.tldr'         => 'apache-license-1.1',
 	caption                     => 'Apache License 1.1',
 	'caption.alt.org.osi'       => 'Apache Software License, version 1.1',
+	'caption.alt.org.perl'      => 'Apache Software License, Version 1.1',
 	'caption.alt.org.tldr'      => 'Apache License 1.1 (Apache-1.1)',
 	'caption.alt.misc.software' => 'Apache Software License 1.1',
 	description                 => <<'END',
@@ -2239,7 +2252,7 @@ END
 	licenseversion => '1.1',
 
 	'pat.alt.subject.license.scope.multisection' =>
-		'without prior written permission of(?: \S+){1,5}[.][  ]'
+		'without prior written permission of[ word]{1,5}[.][  ]'
 		. 'THIS SOFTWARE IS PROVIDED',
 	'pat.alt.subject.license.scope.multisection.part.head' =>
 		'(?:Apache License 1\.1[  ]'
@@ -2253,11 +2266,13 @@ END
 $RE{apache_2} = {
 	name                           => 'Apache-2.0',
 	'name.alt.org.osi'             => 'Apache-2.0',
+	'name.alt.org.perl'            => 'apache_2_0',
 	'name.alt.org.spdx'            => 'Apache-2.0',
 	'name.alt.org.tldr.path.short' => 'apache2',
 	caption                        => 'Apache License 2.0',
 	'caption.alt.org.osi'          => 'Apache License, Version 2.0',
 	'caption.alt.org.osi.alt.list' => 'Apache License 2.0 (Apache-2.0)',
+	'caption.alt.org.perl'         => 'Apache License, Version 2.0',
 	'caption.alt.org.tldr'         => 'Apache License 2.0 (Apache-2.0)',
 	'caption.alt.misc.public'      => 'Apache Public License 2.0',
 	'caption.alt.misc.software'    => 'Apache Software License 2.0',
@@ -2497,12 +2512,14 @@ $RE{artistic_1_clarified} = {
 };
 
 $RE{artistic_1_perl} = {
-	name                     => 'Artistic-1.0-Perl',
-	'name.alt.org.spdx'      => 'Artistic-1.0-Perl',
-	caption                  => 'Artistic License 1.0 (Perl)',
-	'caption.alt.org.fedora' => 'Artistic 1.0 (original)',
-	'caption.alt.org.spdx'   => 'Artistic License 1.0 (Perl)',
-	iri                      => 'http://dev.perl.org/licenses/artistic.html',
+	name                                 => 'Artistic-1.0-Perl',
+	'name.alt.org.perl.synth.nogrant'    => 'artistic_1',
+	'name.alt.org.spdx'                  => 'Artistic-1.0-Perl',
+	caption                              => 'Artistic License 1.0 (Perl)',
+	'caption.alt.org.fedora'             => 'Artistic 1.0 (original)',
+	'caption.alt.org.perl.synth.nogrant' => 'Artistic License, (Version 1)',
+	'caption.alt.org.spdx'               => 'Artistic License 1.0 (Perl)',
+	iri => 'http://dev.perl.org/licenses/artistic.html',
 	'iri.alt.old.perl' =>
 		'http://www.perl.com/pub/a/language/misc/Artistic.html',
 	tags => [
@@ -2517,9 +2534,11 @@ $RE{artistic_1_perl} = {
 $RE{artistic_2} = {
 	name                           => 'Artistic-2.0',
 	'name.alt.org.osi'             => 'Artistic-2.0',
+	'name.alt.org.perl'            => 'artistic_2',
 	'name.alt.org.tldr'            => 'artistic-license-2.0-(artistic)',
 	'name.alt.org.tldr.path.short' => 'artistic',
 	caption                        => 'Artistic License (v2.0)',
+	'caption.alt.org.perl'         => 'Artistic License, Version 2.0',
 	'caption.alt.org.tldr'         => 'Artistic License 2.0 (Artistic-2.0)',
 	'caption.alt.org.wikipedia'    => 'Artistic License 2.0',
 	iri => 'http://www.perlfoundation.org/artistic_license_2_0',
@@ -2697,16 +2716,30 @@ $RE{bittorrent_1} = {
 	name                => 'BitTorrent-1.0',
 	'name.alt.org.spdx' => 'BitTorrent-1.0',
 	caption             => 'BitTorrent Open Source License v1.0',
-	tags                => [
+	description         => <<'END',
+Identical to Jabber Open Source License, except...
+* drop description-of-modifications clause
+* drop retain-copyright-notices clause
+* replace references, e.g. "Jabber Server" -> "BitTorrent client"
+* document that license is derived from Jabber Open Source License
+END
+	tags => [
 		'license:contains:grant',
 		'type:singleversion:bittorrent',
 	],
 	licenseversion => '1.0',
 
-	'pat.alt.subject.license.scope.multisection' =>
+	'pat.alt.subject.license.scope.multisection.part.header' =>
 		'BitTorrent Open Source License[  ]'
 		. 'Version 1\.0[  ]'
 		. 'This BitTorrent Open Source License',
+	'pat.alt.subject.license.scope.multisection.part.4' =>
+		' has been made available'
+		. '[.][ ]You are responsible for ensuring'
+		. ' that the Source Code version remains available'
+		. ' even if the Electronic Distribution Mechanism is maintained by a third party'
+		. '[.][  ][*)]'
+		. 'Intellectual Property Matters[.]',
 };
 
 $RE{bittorrent_1_1} = {
@@ -2719,10 +2752,17 @@ $RE{bittorrent_1_1} = {
 	],
 	licenseversion => '1.1',
 
-	'pat.alt.subject.license.scope.multisection' =>
+	'pat.alt.subject.license.scope.multisection.part.header' =>
 		'BitTorrent Open Source License[  ]'
 		. 'Version 1\.1[  ]'
 		. 'This BitTorrent Open Source License',
+	'pat.alt.subject.license.scope.multisection.part.4' =>
+		' is distributed by you'
+		. '[.][ ]You are responsible for ensuring'
+		. ' that the Source Code version remains available'
+		. ' even if the Electronic Distribution Mechanism is maintained by a third party'
+		. '[.][  ][*)]'
+		. 'Intellectual Property Matters[.]',
 };
 
 =item * borceux
@@ -2742,6 +2782,42 @@ $RE{borceux} = {
 		'distribute each of the files in this package',
 };
 
+=item * bsd_0_clause
+
+=cut
+
+$RE{bsd_0_clause} = {
+	name                           => '0BSD',
+	'name.alt.org.osi'             => 'FPL-1.0.0',
+	'name.alt.org.spdx'            => '0BSD',
+	'name.alt.org.tldr'            => 'bsd-0-clause-license',
+	caption                        => 'BSD (0 clause)',
+	'caption.alt.org.osi'          => 'Zero-Clause BSD',
+	'caption.alt.org.osi.alt.free' => 'Free Public License 1.0.0',
+	'caption.alt.org.osi.alt.dualname' =>
+		'Zero-Clause BSD / Free Public License 1.0.0',
+	'caption.alt.org.spdx' => 'BSD Zero Clause License',
+	'caption.alt.org.tldr' => 'BSD 0-Clause License (0BSD)',
+	description            => <<'END',
+Identical to ISC, except...
+* Redistribution of source need not retain any legal text
+* omit requirement of notices appearing in copies
+END
+	tags => [
+		'family:mit',
+		'license:is:grant',
+		'type:unversioned',
+	],
+
+	'pat.alt.subject.name.alt.misc.free' => 'Free Public License' . '(?:'
+		. $RE{version_prefix}
+		{'pat.alt.subject.trait.scope.line.scope.sentence'}
+		. '1(?:\.0){0,2})?',
+	'pat.alt.subject.license.scope.multisection' => $P{granted}
+		. '[.][  ]'
+		. $P{asis_sw_name_discl},
+};
+
 =item * bsd_2_clause
 
 =cut
@@ -2752,6 +2828,7 @@ $RE{bsd_2_clause} = {
 	'name.alt.org.fedora.synth.nogrant' => 'BSD',
 	'name.alt.org.fedora.web.bsd'       => '2ClauseBSD',
 	'name.alt.org.osi'                  => 'BSD-2-Clause',
+	'name.alt.org.perl'                 => 'freebsd',
 	'name.alt.org.spdx'                 => 'BSD-2-Clause',
 	'name.alt.org.tldr'                 => 'bsd-2-clause-license-(freebsd)',
 	'name.alt.org.tldr.path.short'      => 'freebsd',
@@ -2762,6 +2839,7 @@ $RE{bsd_2_clause} = {
 	'caption.alt.org.fedora'            => 'BSD License (two clause)',
 	'caption.alt.org.osi'               => 'The 2-Clause BSD License',
 	'caption.alt.org.osi.alt.list' => '2-clause BSD license (BSD-2-Clause)',
+	'caption.alt.org.perl'         => 'FreeBSD License (two-clause)',
 	'caption.alt.org.spdx'         => 'BSD 2-clause "Simplified" License',
 	'caption.alt.org.tldr' => 'BSD 2-Clause License (FreeBSD/Simplified)',
 	'name.alt.org.wikipedia.bsd' =>
@@ -2779,7 +2857,7 @@ $RE{bsd_2_clause} = {
 		. '[.][  ]'
 		. $P{repro_copr_cond_discl}
 		. '[.][  ]'
-		. $P{asis_sw_by_name},
+		. $P{asis_sw_by},
 };
 
 =item * bsd_3_clause
@@ -2792,6 +2870,7 @@ $RE{bsd_3_clause} = {
 	'name.alt.org.fedora.synth.nogrant' => 'BSD',
 	'name.alt.org.fedora.web.bsd'       => '3ClauseBSD',
 	'name.alt.org.osi'                  => 'BSD-3-Clause',
+	'name.alt.org.perl.synth.nogrant'   => 'bsd',
 	'name.alt.org.spdx'                 => 'BSD-3-Clause',
 	'name.alt.org.tldr.path.short'      => 'bsd3',
 	'name.alt.misc.clauses'             => '3-clause-BSD',
@@ -2802,6 +2881,7 @@ $RE{bsd_3_clause} = {
 	'caption.alt.org.fedora'            => 'BSD License (no advertising)',
 	'caption.alt.org.osi'               => 'The 3-Clause BSD License',
 	'caption.alt.org.osi.alt.list' => '3-clause BSD license (BSD-3-Clause)',
+	'caption.alt.org.perl'         => 'BSD License (three-clause)',
 	'caption.alt.org.spdx' => 'BSD 3-clause "New" or "Revised" License',
 	'caption.alt.org.tldr' => 'BSD 3-Clause License (Revised)',
 	'caption.alt.org.wikipedia.bsd' =>
@@ -2969,6 +3049,41 @@ $RE{bzip2_1_0_6} = {
 		'This program, ["]?bzip2[\"]?(?: and|, the) associated library ["]?libbzip2["]?, '
 		. '(?:and all documentation, )?'
 		. 'are copyright [c] 1996[-]2010',
+};
+
+=item * cal
+
+=item * cal_1
+
+=cut
+
+$RE{cal} = {
+	name    => 'CAL',
+	caption => 'Cryptographic Autonomy License',
+	tags    => [
+		'type:versioned:decimal',
+	],
+};
+
+$RE{cal_1} = {
+	name                  => 'CAL-1.0',
+	'name.alt.org.osi'    => 'CAL-1.1',
+	'name.alt.org.spdx'   => 'CAL-1.1',
+	caption               => 'Cryptographic Autonomy License 1.0',
+	'caption.alt.org.osi' => 'Cryptographic Autonomy License version 1.0',
+	'caption.alt.org.osi.alt.list' => 'Cryptographic Autonomy License v.1.0',
+	'caption.alt.misc.legal' => 'The Cryptographic Autonomy License, v. 1.0',
+	'iri.alt.misc.github' =>
+		'https://github.com/holochain/cryptographic-autonomy-license',
+	tags => [
+		'type:singleversion:cal',
+	],
+	licenseversion => '1.0',
+
+	'pat.alt.subject.license' =>
+		'This Cryptographic Autonomy License \(the [“]License[”]\) '
+		. 'applies to any Work '
+		. 'whose owner has marked it',
 };
 
 =item * caldera
@@ -4403,7 +4518,7 @@ END
 		. '[.][  ]'
 		. $P{repro_copr_cond_discl}
 		. '[.][  ]'
-		. $P{asis_sw_by_name},
+		. $P{asis_sw_by},
 };
 
 =item * cua_opl
@@ -4478,6 +4593,27 @@ $RE{curl} = {
 	'pat.alt.subject.license.scope.multisection' => $P{note_copr_perm}
 		. '[.][  ]'
 		. $P{asis_sw_warranty},
+};
+
+=item * cvw
+
+=cut
+
+$RE{cvw} = {
+	name               => 'CVW',
+	'name.alt.org.osi' => 'CVW',
+	caption            => 'MITRE Collaborative Virtual Workspace License',
+	'caption.alt.org.osi' =>
+		'The MITRE Collaborative Virtual Workspace License',
+	'caption.alt.org.osi.alt.list' =>
+		'MITRE Collaborative Virtual Workspace License',
+	tags => [
+		'type:unversioned',
+	],
+
+	'pat.alt.subject.license' =>
+		'Redistribution of the CVW software or derived works'
+		. " must reproduce MITRE[']s copyright designation",
 };
 
 =item * dsdp
@@ -4869,10 +5005,11 @@ $RE{gfdl_1_1_or_later} = {
 };
 
 $RE{gfdl_1_2} = {
-	name               => 'GFDL-1.2',
-	'name.alt.org.gnu' => 'fdl-1.2',
-	caption            => 'GNU Free Documentation License, Version 1.2',
-	tags               => [
+	name                => 'GFDL-1.2',
+	'name.alt.org.gnu'  => 'fdl-1.2',
+	'name.alt.org.perl' => 'gfdl_1_2',
+	caption             => 'GNU Free Documentation License, Version 1.2',
+	tags                => [
 		'license:published:by_fsf',
 		'type:singleversion:gfdl',
 	],
@@ -4907,6 +5044,7 @@ $RE{gfdl_1_2_or_later} = {
 $RE{gfdl_1_3} = {
 	name                => 'GFDL-1.3',
 	'name.alt.org.gnu'  => 'fdl-1.3',
+	'name.alt.org.perl' => 'gfdl_1_3',
 	'name.alt.org.tldr' => 'gnu-free-documentation-license',
 	'name.alt.org.tldr.path.short.synth.nogrant' => 'fdl',
 	caption                => 'GNU Free Documentation License, Version 1.3',
@@ -5015,8 +5153,9 @@ $RE{gpl} = {
 $RE{gpl_1} = {
 	name                  => 'GPL-1.0',
 	'name.alt.org.debian' => 'GPL-1',
+	'name.alt.org.perl'   => 'gpl_1',
 	'name.alt.org.fsf'    => 'GPLv1',
-	caption               => 'GNU General Public License, version 1',
+	caption               => 'GNU General Public License, Version 1',
 	iri => 'https://www.gnu.org/licenses/old-licenses/gpl-1.0.html',
 	'iri.alt.format.txt' =>
 		'https://www.gnu.org/licenses/old-licenses/gpl-1.0.txt',
@@ -5067,6 +5206,7 @@ $RE{gpl_2} = {
 	'name.alt.org.debian'          => 'GPL-2',
 	'name.alt.org.gnu'             => 'GNUGPLv2',
 	'name.alt.org.osi'             => 'GPL-2.0',
+	'name.alt.org.perl'            => 'gpl_2',
 	'name.alt.org.spdx'            => 'GPL-2.0',
 	'name.alt.org.tldr'            => 'gnu-general-public-license-v2',
 	'name.alt.org.tldr.path.short' => 'gpl2',
@@ -5130,6 +5270,7 @@ $RE{gpl_3} = {
 	'name.alt.org.debian'          => 'GPL-3',
 	'name.alt.org.gnu'             => 'GNUGPLv3',
 	'name.alt.org.osi'             => 'GPL-3.0',
+	'name.alt.org.perl'            => 'gpl_3',
 	'name.alt.org.spdx'            => 'GPL-3.0',
 	'name.alt.org.tldr.path.short' => 'gpl-3.0',
 	caption                        => 'GNU General Public License, Version 3',
@@ -5241,6 +5382,39 @@ $RE{icu} = {
 		. $P{nopromo_except},
 };
 
+=item * intel
+
+=cut
+
+$RE{intel} = {
+	name                           => 'Intel',
+	caption                        => 'Intel Open Source License',
+	'caption.alt.org.osi'          => 'The Intel Open Source License',
+	'caption.alt.org.osi.alt.list' => 'Intel Open Source License',
+	description                    => <<'END',
+Identical to BSD 3 Clause, except...
+* Add export law disclaimer
+END
+	tags => [
+		'family:bsd',
+		'license:contains:license:bsd_3_clause',
+		'license:is:grant',
+		'type:unversioned',
+	],
+
+	'pat.alt.subject.license.scope.multisection' => $P{repro_copr_cond_discl}
+		. '[.]?[  ]'
+		. '(?:[*)]\[?(?:rescinded 22 July 1999'
+		. '|This condition was removed[.])\]?)?' . '[*)]'
+		. $P{nopromo_neither}
+		. '[.][  ]'
+		. $P{discl_warranties}
+		. $P{discl_liability}
+		. 'EXPORT LAWS[:] THIS LICENSE ADDS NO RESTRICTIONS TO THE EXPORT LAWS',
+	'pat.alt.subject.license.part.last' =>
+		'EXPORT LAWS[:] THIS LICENSE ADDS NO RESTRICTIONS TO THE EXPORT LAWS',
+};
+
 =item * ipl
 
 =item * ipl_1
@@ -5274,6 +5448,24 @@ $RE{ipl_1} = {
 		. '[*)][  ]?DEFINITIONS[  ]'
 		. '["]Contribution["] means[:"]?[  ]'
 		. '[*)]in the case of International Business Machines Corporation \(["]IBM["]\), the Original Program',
+};
+
+=item * jabberpl
+
+=cut
+
+$RE{jabberpl} = {
+	name               => 'jabberpl',
+	'name.alt.org.osi' => 'jabberpl',
+	caption            => 'Jabber Open Source License',
+	tags               => [
+		'license:contains:grant',
+		'type:unversioned',
+	],
+
+	'pat.alt.subject.license.part.intro' =>
+		'This Jabber Open Source License \(the ["]License["]\)'
+		. ' applies to Jabber Server and related software products',
 };
 
 =item * json
@@ -5448,6 +5640,7 @@ $RE{lgpl_2_1} = {
 	'name.alt.misc.short'          => 'LGPLv2.1',
 	'name.alt.org.gnu'             => 'LGPLv2.1',
 	'name.alt.org.osi'             => 'LGPL-2.1',
+	'name.alt.org.perl'            => 'lgpl_2_1',
 	'name.alt.org.spdx'            => 'LGPL-2.1',
 	'name.alt.org.tldr.path.short' => 'lgpl2',
 	caption => 'GNU Lesser General Public License, Version 2.1',
@@ -5511,11 +5704,14 @@ $RE{lgpl_3} = {
 	'name.alt.org.debian'          => 'LGPL-3',
 	'name.alt.org.gnu'             => 'LGPLv3',
 	'name.alt.org.osi'             => 'LGPL-3.0',
+	'name.alt.org.perl'            => 'lgpl_3_0',
 	'name.alt.org.spdx'            => 'LGPL-3.0',
 	'name.alt.org.tldr.path.short' => 'lgpl-3.0',
 	caption => 'GNU Lesser General Public License, Version 3',
 	'caption.alt.org.gnu' =>
 		'GNU Lesser General Public License (LGPL) version 3',
+	'caption.alt.org.perl' =>
+		'GNU Lesser General Public License, Version 3.0',
 	'caption.alt.org.trove' =>
 		'GNU Lesser General Public License v3 (LGPLv3)',
 	'caption.alt.org.osi' => 'GNU Lesser General Public License version 3',
@@ -5886,6 +6082,7 @@ $RE{mit_new} = {
 	'name.alt.org.debian'            => 'Expat',
 	'name.alt.org.fedora'            => 'MIT',
 	'name.alt.org.osi'               => 'MIT',
+	'name.alt.org.perl'              => 'mit',
 	'name.alt.org.spdx'              => 'MIT',
 	'name.alt.org.tldr'              => 'mit-license',
 	'name.alt.org.tldr.path.short'   => 'mit',
@@ -5894,6 +6091,7 @@ $RE{mit_new} = {
 	'caption.alt.org.fedora.web.mit' => 'Modern Style with sublicense',
 	'caption.alt.org.osi'            => 'The MIT License',
 	'caption.alt.org.osi.alt.list'   => 'MIT license (MIT)',
+	'caption.alt.org.perl'           => 'MIT (aka X11) License',
 	'caption.alt.org.tldr'           => 'MIT License (Expat)',
 	iri                     => 'http://www.jclark.com/xml/copying.txt',
 	'iri.alt.org.wikipedia' => 'https://en.wikipedia.org/wiki/MIT_License',
@@ -6004,6 +6202,38 @@ $RE{mit_oldstyle_permission} = {
 		. $P{asis_name_sw},
 };
 
+=item * motosoto
+
+=cut
+
+$RE{motosoto} = {
+	name                => 'Motosoto',
+	'name.alt.org.osi'  => 'Motosoto',
+	'name.alt.org.spdx' => 'Motosoto',
+	caption             => 'Motosoto License',
+	description         => <<'END',
+Identical to Jabber Open Source License, except...
+* rephrase grant clause to explicitly cover whole product (not only modified parts)
+* extend grant clause to explicitly cover creation of derivative works
+* replace references, e.g. "Jabber Server" -> "Community Portal Server"
+* document that license is derived from Jabber Open Source License
+* drop some disclaimers
+END
+	tags => [
+		'type:unversioned',
+	],
+
+	'pat.alt.subject.license.part.header' =>
+		'MOTOSOTO OPEN SOURCE LICENSE [-] Version 0\.9\.1',
+	'pat.alt.subject.license.part.intro' =>
+		'This Motosoto Open Source License [(]the ["]License["][)]'
+		. ' applies to ["]Community Portal Server["] and related software products',
+	'pat.alt.subject.license.scope.multisection.part.7' =>
+		'Versions of This License'
+		. '[.][  ][*)]'
+		. 'Version[.][ ]The Motosoto Open Source License is derived',
+};
+
 =item * mpl
 
 =item * mpl_1
@@ -6031,7 +6261,9 @@ $RE{mpl} = {
 
 $RE{mpl_1} = {
 	name                     => 'MPL-1.0',
+	'name.alt.org.perl'      => 'mozilla_1_0',
 	caption                  => 'Mozilla Public License 1.0',
+	'caption.alt.org.perl'   => 'Mozilla Public License, Version 1.0',
 	'caption.alt.misc.trove' => 'Mozilla Public License 1.0 (MPL)',
 	tags                     => [
 		'type:singleversion:mpl',
@@ -6044,7 +6276,9 @@ $RE{mpl_1} = {
 
 $RE{mpl_1_1} = {
 	name                     => 'MPL-1.1',
+	'name.alt.org.perl'      => 'mozilla_1_1',
 	caption                  => 'Mozilla Public License 1.1',
+	'caption.alt.org.perl'   => 'Mozilla Public License, Version 1.1',
 	'caption.alt.misc.trove' => 'Mozilla Public License 1.1 (MPL 1.1)',
 	tags                     => [
 		'type:singleversion:mpl',
@@ -6112,6 +6346,80 @@ $RE{ms_rl} = {
 		'Reciprocal Grants[-] For any file you distribute that contains code',
 	'pat.alt.subject.license.scope.multiparagraph' =>
 		'Microsoft Reciprocal License \(Ms[-]RL\)[  ]This license governs use',
+};
+
+=item * mulan
+
+=item * mulan_1
+
+=item * mulan_2
+
+=cut
+
+$RE{mulan} = {
+	name          => 'MulanPSL',
+	caption       => 'Mulan Permissive Software License',
+	'caption(zh)' => '木兰宽松许可证',
+	tags          => [
+		'type:versioned:decimal',
+	],
+};
+
+$RE{mulan_1} = {
+	name                => 'MulanPSL-1',
+	'name.alt.org.spdx' => 'MulanPSL-1.0',
+	caption             => 'Mulan Permissive Software License, Version 1',
+	'caption(zh)'       => '木兰宽松许可证， 第1版',
+	'caption.alt.misc.shortname' => 'Mulan PSL v1',
+	iri                          => 'https://license.coscl.org.cn/MulanPSL',
+	tags                         => [
+		'license:contains:grant',
+		'type:singleversion:mulan',
+	],
+	licenseversion => '1',
+
+	'pat.alt.subject.license.scope.sentence.part.intro' =>
+		'Your reproduction, use, modification and distribution'
+		. ' of the Software'
+		. ' shall be subject to Mulan PSL v1 [(]this License[)]'
+		. ' with following',
+	'pat.alt.subject.license.scope.sentence.part.intro(zh)' =>
+		'您对["]软件["]的复制[, ]使用'
+		. '[, ]修改及分发受木兰宽松许可证[, ]第1版[(]["]本许可证["][)]'
+		. '的如下条款的约束',
+	'pat.alt.subject.license.scope.multisection.part.grant' =>
+		'[*]Software Name[*] is licensed under the Mulan PSL v1[.][ ]'
+		. 'You can use this software'
+		. ' according to the terms and conditions of the Mulan PSL v1'
+};
+
+$RE{mulan_2} = {
+	name                  => 'MulanPSL-2',
+	'name.alt.org.spdx'   => 'MulanPSL-2.0',
+	caption               => 'Mulan Permissive Software License, Version 2',
+	'caption(zh)'         => '木兰宽松许可证， 第2版',
+	'caption.alt.org.osi' => 'Mulan Permissive Software License v2',
+	'caption.alt.misc.shortname' => 'Mulan PSL v2',
+	iri                          => 'https://license.coscl.org.cn/MulanPSL2',
+	tags                         => [
+		'license:contains:grant',
+		'type:singleversion:mulan',
+	],
+	licenseversion => '2',
+
+	'pat.alt.subject.license.scope.sentence.part.intro' =>
+		'Your reproduction, use, modification and distribution'
+		. ' of the Software'
+		. ' shall be subject to Mulan PSL v2 [(]this License[)]'
+		. ' with the following terms and conditions',
+	'pat.alt.subject.license.scope.sentence.part.intro(zh)' =>
+		'您对["]软件["]的复制[, ]使用'
+		. '[, ]修改及分发受木兰宽松许可证[, ]第2版[(]["]本许可证["][)]'
+		. '的如下条款的约束',
+	'pat.alt.subject.license.scope.multisection.part.grant' =>
+		'[*]Software Name[*] is licensed under Mulan PSL v2[.][ ]'
+		. 'You can use this software'
+		. ' according to the terms and conditions of the Mulan PSL v2',
 };
 
 =item * ngpl
@@ -6372,12 +6680,608 @@ $RE{ogtsl} = {
 		'rename any non-standard executables and testcases',
 };
 
+=item * oldap
+
+=item * oldap_1_1
+
+=item * oldap_1_2
+
+=item * oldap_1_3
+
+=item * oldap_1_4
+
+=item * oldap_2
+
+=item * oldap_2_0_1
+
+=item * oldap_2_1
+
+=item * oldap_2_2
+
+=item * oldap_2_2_1
+
+=item * oldap_2_2_2
+
+=item * oldap_2_3
+
+=item * oldap_2_4
+
+=item * oldap_2_5
+
+=item * oldap_2_6
+
+=item * oldap_2_7
+
+=item * oldap_2_8
+
+=cut
+
+$RE{oldap} = {
+	name    => 'OLDAP',
+	caption => 'Open LDAP Public License',
+	tags    => [
+		'type:versioned:decimal',
+	],
+};
+
+$RE{oldap_1_1} = {
+	name                => 'OLDAP-1.1',
+	'name.alt.org.spdx' => 'OLDAP-1.1',
+	caption             => 'Open LDAP Public License v1.1',
+	tags                => [
+		'type:singleversion:oldap',
+	],
+	licenseversion => '1.1',
+
+	'pat.alt.subject.license.scope.multisection.part.header' =>
+		'The OpenLDAP Public License[  ]Version 1\.1, 25 August 1998',
+	'pat.alt.subject.license.part.intro' =>
+		' as distributed with the Perl Programming Language'
+		. '[.][ ]Its terms are different from those of the ["]Artistic License[.]["]',
+};
+
+$RE{oldap_1_2} = {
+	name                => 'OLDAP-1.2',
+	'name.alt.org.spdx' => 'OLDAP-1.2',
+	caption             => 'Open LDAP Public License v1.2',
+	tags                => [
+		'type:singleversion:oldap',
+	],
+	licenseversion => '1.2',
+
+	'pat.alt.subject.license.scope.multisection.part.header' =>
+		'The OpenLDAP Public License[  ]Version 1\.2, 1 September 1998',
+};
+
+$RE{oldap_1_3} = {
+	name                => 'OLDAP-1.3',
+	'name.alt.org.spdx' => 'OLDAP-1.3',
+	caption             => 'Open LDAP Public License v1.3',
+	tags                => [
+		'type:singleversion:oldap',
+	],
+	licenseversion => '1.3',
+
+	'pat.alt.subject.license.scope.multisection.part.header' =>
+		'The OpenLDAP Public License[  ]Version 1\.3, 17 January 1999',
+	'pat.alt.subject.license.part.8' =>
+		' and do not automatically fall under the copyright of this Package'
+		. ', and the executables produced by linking',
+};
+
+$RE{oldap_1_4} = {
+	name                => 'OLDAP-1.4',
+	'name.alt.org.spdx' => 'OLDAP-1.4',
+	caption             => 'Open LDAP Public License v1.4',
+	tags                => [
+		'type:singleversion:oldap',
+	],
+	licenseversion => '1.4',
+
+	'pat.alt.subject.license.scope.multisection.part.header' =>
+		'The OpenLDAP Public License[  ]Version 1\.4, 18 January 1999',
+	'pat.alt.subject.license.part.8' =>
+		' and do not automatically fall under the copyright of this Package'
+		. '[.][ ]Executables produced by linking',
+};
+
+$RE{oldap_2} = {
+	name                => 'OLDAP-2.0',
+	'name.alt.org.spdx' => 'OLDAP-2.0',
+	caption             => 'Open LDAP Public License v2',
+	tags                => [
+		'type:singleversion:oldap',
+	],
+	licenseversion => '2.0',
+
+	'pat.alt.subject.license.scope.multisection.part.header' =>
+		'The OpenLDAP Public License[  ]Version 2\.0, 7 June 1999',
+	'pat.alt.subject.license.part.clauses_minimal' =>
+		'without prior written permission of the OpenLDAP Foundation'
+		. '[.][ ]OpenLDAP is a registered trademark of the OpenLDAP Foundation',
+	'pat.alt.subject.license.scope.multisection.part.clauses' =>
+		'[*)]Redistributions of source code must retain'
+		. ' copyright statements and notices'
+		. '[.] Redistributions must also contain a copy of this document'
+		. '[.][  ][*)]'
+		. 'Redistributions in binary form must reproduce'
+		. ' the above copyright notice'
+		. ', this list of conditions'
+		. ' and the following disclaimer'
+		. ' in the documentation and[/]or other materials'
+		. ' provided with the distribution'
+		. '[.][  ][*)]'
+		. 'The name ["]OpenLDAP["] must not be used'
+		. ' to endorse or promote products derived from this Software'
+		. ' without prior written permission of the OpenLDAP Foundation'
+		. '[.][ ]For written permission, please contact foundation\@openldap.org'
+		. '[.][  ][*)]'
+		. 'Products derived from this Software may not be called ["]OpenLDAP["]'
+		. ' nor may ["]OpenLDAP["] appear in their names'
+		. ' without prior written permission of the OpenLDAP Foundation'
+		. '[.][ ]OpenLDAP is a registered trademark of the OpenLDAP Foundation'
+		. '[.][  ][*)]'
+		. 'Due credit should be given to the OpenLDAP Project'
+		. ' [(][http://]www.openldap.org[/][)]'
+		. '[.][  ]THIS SOFTWARE IS PROVIDED BY THE OPENLDAP FOUNDATION AND'
+};
+
+$RE{oldap_2_0_1} = {
+	name                => 'OLDAP-2.0.1',
+	'name.alt.org.spdx' => 'OLDAP-2.0.1',
+	caption             => 'Open LDAP Public License v2.0.1',
+	tags                => [
+		'type:singleversion:oldap',
+	],
+	licenseversion => '2.0.1',
+
+	'pat.alt.subject.license.scope.multisection.part.header' =>
+		'The OpenLDAP Public License[  ]Version 2\.0\.1, 21 December 1999',
+	'pat.alt.subject.license.scope.multisection.part.clauses' =>
+		'[*)]Redistributions of source code must retain'
+		. ' copyright statements and notices'
+		. '[.] Redistributions must also contain a copy of this document'
+		. '[.][  ][*)]'
+		. 'Redistributions in binary form must reproduce'
+		. ' the above copyright notice'
+		. ', this list of conditions'
+		. ' and the following disclaimer'
+		. ' in the documentation and[/]or other materials'
+		. ' provided with the distribution'
+		. '[.][  ][*)]'
+		. 'The name ["]OpenLDAP["] must not be used'
+		. ' to endorse or promote products derived from this Software'
+		. ' without prior written permission of the OpenLDAP Foundation'
+		. '[.][ ]For written permission, please contact foundation\@openldap.org'
+		. '[.][  ][*)]'
+		. 'Products derived from this Software may not be called ["]OpenLDAP["]'
+		. ' nor may ["]OpenLDAP["] appear in their names'
+		. ' without prior written permission of the OpenLDAP Foundation'
+		. '[.][ ]OpenLDAP is a trademark of the OpenLDAP Foundation'
+		. '[.][  ][*)]'
+		. 'Due credit should be given to the OpenLDAP Project'
+		. ' [(][http://]www.openldap.org[/][)]'
+		. '[.][  ]THIS SOFTWARE IS PROVIDED BY THE OPENLDAP FOUNDATION AND'
+};
+
+$RE{oldap_2_1} = {
+	name                => 'OLDAP-2.1',
+	'name.alt.org.spdx' => 'OLDAP-2.1',
+	caption             => 'Open LDAP Public License v2.1',
+	tags                => [
+		'type:singleversion:oldap',
+	],
+	licenseversion => '2.1',
+
+	'pat.alt.subject.license.scope.multisection.part.header' =>
+		'The OpenLDAP Public License[  ]Version 2\.1, 29 February 2000',
+	'pat.alt.subject.license.part.clauses_minimal' =>
+		'You may use the Software under terms of this license revision'
+		. ' or under the terms of any subsequent license revision[.]',
+	'pat.alt.subject.license.scope.multisection.part.clauses' =>
+		'[*)]Redistributions of source code must retain'
+		. ' copyright statements and notices'
+		. '[.][ ]Redistributions must also contain a copy of this document'
+		. '[.][  ][*)]'
+		. 'Redistributions in binary form must reproduce'
+		. ' the above copyright notice'
+		. ', this list of conditions'
+		. ' and the following disclaimer'
+		. ' in the documentation and[/]or other materials'
+		. ' provided with the distribution'
+		. '[.][  ][*)]'
+		. 'The name ["]OpenLDAP["] must not be used'
+		. ' to endorse or promote products derived from this Software'
+		. ' without prior written permission of the OpenLDAP Foundation'
+		. '[.][ ]For written permission, please contact foundation\@openldap.org'
+		. '[.][  ][*)]'
+		. 'Products derived from this Software may not be called ["]OpenLDAP["]'
+		. ' nor may ["]OpenLDAP["] appear in their names'
+		. ' without prior written permission of the OpenLDAP Foundation'
+		. '[.][ ]OpenLDAP is a trademark of the OpenLDAP Foundation'
+		. '[.][  ][*)]'
+		. 'Due credit should be given to the OpenLDAP Project'
+		. ' [(]http://www.openldap.org[/][)]'
+		. '[.][  ][*)]'
+		. 'The OpenLDAP Foundation may revise this license from time to time'
+		. '[.][ ]'
+		. 'Each revision is distinguished by a version number'
+		. '[.][ ]'
+		. 'You may use the Software under terms of this license revision'
+		. ' or under the terms of any subsequent license revision[.]',
+};
+
+$RE{oldap_2_2} = {
+	name                => 'OLDAP-2.2',
+	'name.alt.org.spdx' => 'OLDAP-2.2',
+	caption             => 'Open LDAP Public License v2.2',
+	tags                => [
+		'type:singleversion:oldap',
+	],
+	licenseversion => '2.2',
+
+	'pat.alt.subject.license.scope.multisection.part.header' =>
+		'The OpenLDAP Public License[  ]Version 2\.2, 1 March 2000',
+	'pat.alt.subject.license.scope.multisection.part.clauses' =>
+		'[*)]Redistributions of source code must retain'
+		. ' copyright statements and notices'
+		. '[.][ ]Redistributions must also contain a copy of this document'
+		. '[.][  ][*)]'
+		. 'Redistributions in binary form must reproduce'
+		. ' the above copyright notice'
+		. ', this list of conditions'
+		. ' and the following disclaimer'
+		. ' in the documentation and[/]or other materials'
+		. ' provided with the distribution'
+		. '[.][  ][*)]'
+		. 'The name ["]OpenLDAP["] must not be used'
+		. ' to endorse or promote products derived from this Software'
+		. ' without prior written permission of the OpenLDAP Foundation'
+		. '[.][  ][*)]'
+		. 'Products derived from this Software may not be called ["]OpenLDAP["]'
+		. ' nor may ["]OpenLDAP["] appear in their names'
+		. ' without prior written permission of the OpenLDAP Foundation'
+		. '[.][  ][*)]'
+		. 'Due credit should be given to the OpenLDAP Project'
+		. ' [(][http://]www.openldap.org[/][)]'
+		. '[.][  ][*)]'
+		. 'The OpenLDAP Foundation may revise this license from time to time'
+		. '[.][ ]'
+		. 'Each revision is distinguished by a version number'
+		. '[.][ ]'
+		. 'You may use the Software under terms of this license revision'
+		. ' or under the terms of any subsequent the license[.]',
+};
+
+$RE{oldap_2_2_1} = {
+	name                => 'OLDAP-2.2.1',
+	'name.alt.org.spdx' => 'OLDAP-2.2.1',
+	caption             => 'Open LDAP Public License v2.2.1',
+	tags                => [
+		'type:singleversion:oldap',
+	],
+	licenseversion => '2.2.1',
+
+	'pat.alt.subject.license.scope.multisection.part.header' =>
+		'The OpenLDAP Public License[  ]Version 2\.2\.1, 1 March 2000',
+	'pat.alt.subject.license.scope.multisection.part.clauses' =>
+		'[*)]Redistributions of source code must retain'
+		. ' copyright statements and notices'
+		. '[.][ ]Redistributions must also contain a copy of this document'
+		. '[.][  ][*)]'
+		. 'Redistributions in binary form must reproduce'
+		. ' the above copyright notice'
+		. ', this list of conditions'
+		. ' and the following disclaimer'
+		. ' in the documentation and[/]or other materials'
+		. ' provided with the distribution'
+		. '[.][  ][*)]'
+		. 'The name ["]OpenLDAP["] must not be used'
+		. ' to endorse or promote products derived from this Software'
+		. ' without prior written permission of the OpenLDAP Foundation'
+		. '[.][  ][*)]'
+		. 'Products derived from this Software may not be called ["]OpenLDAP["]'
+		. ' nor may ["]OpenLDAP["] appear in their names'
+		. ' without prior written permission of the OpenLDAP Foundation'
+		. '[.][  ][*)]'
+		. 'Due credit should be given to the OpenLDAP Project'
+		. ' [(]http://www.openldap.org[/][)]'
+		. '[.][  ][*)]'
+		. 'The OpenLDAP Foundation may revise this license from time to time'
+		. '[.][ ]'
+		. 'Each revision is distinguished by a version number'
+		. '[.][ ]'
+		. 'You may use the Software under terms of this license revision'
+		. ' or under the terms of any subsequent revision of the license[.]',
+};
+
+$RE{oldap_2_2_2} = {
+	name                => 'OLDAP-2.2.2',
+	'name.alt.org.spdx' => 'OLDAP-2.2.2',
+	caption             => 'Open LDAP Public License v2.2.2',
+	tags                => [
+		'type:singleversion:oldap',
+	],
+	licenseversion => '2.2.2',
+
+	'pat.alt.subject.license.scope.multisection.part.header' =>
+		'The OpenLDAP Public License[  ]Version 2\.2\.2, 28 July 2000',
+	'pat.alt.subject.license.part.clauses_minimal' =>
+		'Due credit should be given to the OpenLDAP Project'
+		. ' [(][http://]www.openldap.org[/][)][.]',
+	'pat.alt.subject.license.scope.multisection.part.clauses' =>
+		'[*)]Redistributions of source code must retain'
+		. ' copyright statements and notices'
+		. '[.][  ][*)]'
+		. 'Redistributions in binary form must reproduce'
+		. ' applicable copyright statements and notices'
+		. ', this list of conditions'
+		. ', and the following disclaimer'
+		. ' in the documentation and[/]or other materials'
+		. ' provided with the distribution'
+		. '[.][  ][*)]'
+		. 'Redistributions must contain a verbatim copy'
+		. ' of this document'
+		. '[.][  ][*)]'
+		. 'The name ["]OpenLDAP["] must not be used'
+		. ' to endorse or promote products derived from this Software'
+		. ' without prior written permission of the OpenLDAP Foundation'
+		. '[.][  ][*)]'
+		. 'Products derived from this Software may not be called ["]OpenLDAP["]'
+		. ' nor may ["]OpenLDAP["] appear in their names'
+		. ' without prior written permission of the OpenLDAP Foundation'
+		. '[.][  ][*)]'
+		. 'Due credit should be given to the OpenLDAP Project'
+		. ' [(][http://]www.openldap.org[/][)]'
+		. '[.][  ][*)]'
+		. 'The OpenLDAP Foundation may revise this license from time to time'
+		. '[.][ ]'
+		. 'Each revision is distinguished by a version number'
+		. '[.][ ]'
+		. 'You may use the Software under terms of this license revision'
+		. ' or under the terms of any subsequent revision of the license[.]',
+};
+
+$RE{oldap_2_3} = {
+	name                => 'OLDAP-2.3',
+	'name.alt.org.spdx' => 'OLDAP-2.3',
+	caption             => 'Open LDAP Public License v2.3',
+	tags                => [
+		'type:singleversion:oldap',
+	],
+	licenseversion => '2.3',
+
+	'pat.alt.subject.license.scope.multisection.part.header' =>
+		'The OpenLDAP Public License[  ]Version 2\.3, 28 July 2000',
+	'pat.alt.subject.license.part.clauses_minimal' =>
+		'Due credit should be given to the OpenLDAP Project'
+		. ' [(][http://]www.openldap.org[/][)][.]',
+	'pat.alt.subject.license.scope.multisection.part.clauses' =>
+		'[*)]Redistributions of source code must retain'
+		. ' copyright statements and notices'
+		. '[.][  ][*)]'
+		. 'Redistributions in binary form must reproduce'
+		. ' applicable copyright statements and notices'
+		. ', this list of conditions'
+		. ', and the following disclaimer'
+		. ' in the documentation and[/]or other materials'
+		. ' provided with the distribution'
+		. '[.][  ][*)]'
+		. 'Redistributions must contain a verbatim copy'
+		. ' of this document'
+		. '[.][  ][*)]'
+		. 'The name ["]OpenLDAP["] must not be used'
+		. ' to endorse or promote products derived from this Software'
+		. ' without prior written permission of the OpenLDAP Foundation'
+		. '[.][  ][*)]'
+		. 'Products derived from this Software may not be called ["]OpenLDAP["]'
+		. ' nor may ["]OpenLDAP["] appear in their names'
+		. ' without prior written permission of the OpenLDAP Foundation'
+		. '[.][  ][*)]'
+		. 'Due credit should be given to the OpenLDAP Project'
+		. ' [(][http://]www.openldap.org[/][)]'
+		. '[.][  ][*)]'
+		. 'The OpenLDAP Foundation may revise this license from time to time'
+		. '[.][ ]'
+		. 'Each revision is distinguished by a version number'
+		. '[.][ ]'
+		. 'You may use the Software under terms of this license revision'
+		. ' or under the terms of any subsequent revision of the license[.]',
+};
+
+$RE{oldap_2_4} = {
+	name                => 'OLDAP-2.4',
+	'name.alt.org.spdx' => 'OLDAP-2.4',
+	caption             => 'Open LDAP Public License v2.4',
+	tags                => [
+		'type:singleversion:oldap',
+	],
+	licenseversion => '2.4',
+
+	'pat.alt.subject.license.scope.multisection.part.header' =>
+		'The OpenLDAP Public License[  ]Version 2\.4, 8 December 2000',
+	'pat.alt.subject.license.part.clauses_minimal' =>
+		'Due credit should be given to the OpenLDAP Project[.]',
+	'pat.alt.subject.license.scope.multisection.part.clauses' =>
+		'[*)]Redistributions of source code must retain'
+		. ' copyright statements and notices'
+		. '[.][  ][*)]'
+		. 'Redistributions in binary form must reproduce'
+		. ' applicable copyright statements and notices'
+		. ', this list of conditions'
+		. ', and the following disclaimer'
+		. ' in the documentation and[/]or other materials'
+		. ' provided with the distribution'
+		. '[.][  ][*)]'
+		. 'Redistributions must contain a verbatim copy'
+		. ' of this document'
+		. '[.][  ][*)]'
+		. 'The names and trademarks of the authors and copyright holders'
+		. ' must not be used in advertising or otherwise'
+		. ' to promote the sale, use or other dealing in this Software'
+		. ' without specific, written prior permission'
+		. '[.][  ][*)]'
+		. 'Due credit should be given to the OpenLDAP Project'
+		. '[.][  ][*)]'
+		. 'The OpenLDAP Foundation may revise this license from time to time'
+		. '[.][ ]'
+		. 'Each revision is distinguished by a version number'
+		. '[.][ ]'
+		. 'You may use the Software under terms of this license revision'
+		. ' or under the terms of any subsequent revision of the license[.]',
+};
+
+$RE{oldap_2_5} = {
+	name                => 'OLDAP-2.5',
+	'name.alt.org.spdx' => 'OLDAP-2.5',
+	caption             => 'Open LDAP Public License v2.5',
+	tags                => [
+		'type:singleversion:oldap',
+	],
+	licenseversion => '2.5',
+
+	'pat.alt.subject.license.scope.multisection.part.header' =>
+		'The OpenLDAP Public License[  ]Version 2\.5, 11 May 2001',
+	'pat.alt.subject.license.scope.multisection.part.clauses_minimal' =>
+		'Due credit should be given to the authors of the Software'
+		. '[.][  ][*)]'
+		. 'The OpenLDAP Foundation may revise',
+	'pat.alt.subject.license.scope.multisection.part.clauses' =>
+		'[*)]Redistributions of source code must retain'
+		. ' copyright statements and notices'
+		. '[.][  ][*)]'
+		. 'Redistributions in binary form must reproduce'
+		. ' applicable copyright statements and notices'
+		. ', this list of conditions'
+		. ', and the following disclaimer'
+		. ' in the documentation and[/]or other materials'
+		. ' provided with the distribution'
+		. '[.][  ][*)]'
+		. 'Redistributions must contain a verbatim copy'
+		. ' of this document'
+		. '[.][  ][*)]'
+		. 'The names and trademarks of the authors and copyright holders'
+		. ' must not be used in advertising'
+		. ' or otherwise to promote the sale, use or other dealing in this Software'
+		. ' without specific, written prior permission'
+		. '[.][  ][*)]'
+		. 'Due credit should be given to the authors of the Software'
+		. '[.][  ][*)]'
+		. 'The OpenLDAP Foundation may revise this license from time to time'
+		. '[.][ ]'
+		. 'Each revision is distinguished by a version number'
+		. '[.][ ]'
+		. 'You may use the Software under terms of this license revision'
+		. ' or under the terms of any subsequent revision of the license[.]',
+};
+
+$RE{oldap_2_6} = {
+	name                => 'OLDAP-2.6',
+	'name.alt.org.spdx' => 'OLDAP-2.6',
+	caption             => 'Open LDAP Public License v2.6',
+	tags                => [
+		'type:singleversion:oldap',
+	],
+	licenseversion => '2.6',
+
+	'pat.alt.subject.license.scope.multisection.part.header' =>
+		'The OpenLDAP Public License[  ]Version 2\.6, 14 June 2001',
+	'pat.alt.subject.license.scope.multisection.part.clauses_minimal' =>
+		' without specific, written prior permission'
+		. '[.][  ][*)]'
+		. 'The OpenLDAP Foundation may revise',
+	'pat.alt.subject.license.scope.multisection.part.clauses' =>
+		'[*)]Redistributions of source code must retain'
+		. ' copyright statements and notices'
+		. '[.][  ][*)]'
+		. 'Redistributions in binary form must reproduce'
+		. ' applicable copyright statements and notices'
+		. ', this list of conditions'
+		. ', and the following disclaimer'
+		. ' in the documentation and[/]or other materials'
+		. ' provided with the distribution'
+		. '[.][  ][*)]'
+		. 'Redistributions must contain a verbatim copy'
+		. ' of this document'
+		. '[.][  ][*)]'
+		. 'The names and trademarks of the authors and copyright holders'
+		. ' must not be used in advertising'
+		. ' or otherwise to promote the sale, use or other dealing in this Software'
+		. ' without specific, written prior permission'
+		. '[.][  ][*)]'
+		. 'The OpenLDAP Foundation may revise this license from time to time'
+		. '[.][ ]'
+		. 'Each revision is distinguished by a version number'
+		. '[.][ ]'
+		. 'You may use the Software under terms of this license revision'
+		. ' or under the terms of any subsequent revision of the license[.]',
+};
+
+$RE{oldap_2_7} = {
+	name                => 'OLDAP-2.7',
+	'name.alt.org.spdx' => 'OLDAP-2.7',
+	caption             => 'Open LDAP Public License v2.7',
+	tags                => [
+		'type:singleversion:oldap',
+	],
+	licenseversion => '2.7',
+
+	'pat.alt.subject.license.scope.multisection.part.header' =>
+		'The OpenLDAP Public License[  ]Version 2\.7, 7 September 2001',
+	'pat.alt.subject.license.part.clauses_minimal' =>
+		'[*)]Redistributions in source form must retain'
+		. ' copyright statements and notices'
+		. '[.][  ][*)]',
+	'pat.alt.subject.license.scope.multisection.part.clauses' =>
+		'[*)]Redistributions in source form must retain'
+		. ' copyright statements and notices'
+		. ',[  ][*)]'
+		. 'Redistributions in binary form must reproduce'
+		. ' applicable copyright statements and notices'
+		. ', this list of conditions'
+		. ', and the following disclaimer'
+		. ' in the documentation and[/]or other materials'
+		. ' provided with the distribution'
+		. ', and[  ][*)]'
+		. 'Redistributions must contain a verbatim copy'
+		. ' of this document[.]',
+};
+
+$RE{oldap_2_8} = {
+	name                => 'OLDAP-2.8',
+	'name.alt.org.spdx' => 'OLDAP-2.8',
+	caption             => 'Open LDAP Public License v2.8',
+	tags                => [
+		'type:singleversion:oldap',
+	],
+	licenseversion => '2.8',
+
+	'pat.alt.subject.license.scope.multisection.part.header' =>
+		'The OpenLDAP Public License[  ]Version 2\.8, 17 August 2003',
+	'pat.alt.subject.license.part.clauses_minimal' =>
+		'[*)]Redistributions in source form must retain'
+		. ' copyright statements and notices[.][  ]',
+	'pat.alt.subject.license.scope.multisection.part.clauses' =>
+		'[*)]Redistributions in source form must retain'
+		. ' copyright statements and notices'
+		. '[.][  ][*)]'
+		. 'Redistributions in binary form must reproduce'
+		. ' applicable copyright statements and notices'
+		. ', this list of conditions'
+		. ', and the following disclaimer'
+		. ' in the documentation and/or other materials'
+		. ' provided with the distribution'
+		. ', and[  ][*)]'
+		. 'Redistributions must contain a verbatim copy of this document[.]',
+};
+
 =item * openssl
 
 =cut
 
 $RE{openssl} = {
 	name                   => 'OpenSSL',
+	'name.alt.org.perl'    => 'openssl',
 	'name.alt.org.spdx'    => 'OpenSSL',
 	caption                => 'OpenSSL License',
 	'caption.alt.org.tldr' => 'OpenSSL License (OpenSSL)',
@@ -6632,9 +7536,11 @@ $RE{qpl} = {
 
 $RE{qpl_1} = {
 	name                    => 'QPL-1.0',
+	'name.alt.org.perl'     => 'qpl_1_0',
 	'name.alt.org.wikidata' => 'Q1396282',
 	caption                 => 'Q Public License 1.0',
 	'caption.alt.org.gnu'   => 'Q Public License (QPL), Version 1.0',
+	'caption.alt.org.perl'  => 'Q Public License, Version 1.0',
 	'caption.alt.org.tldr'  => 'Q Public License 1.0 (QPL-1.0)',
 	tags                    => [
 		'type:singleversion:qpl',
@@ -6887,6 +7793,61 @@ $RE{sgi_b_2} = {
 		. $P{perm_granted},
 };
 
+=item * sissl
+
+=item * sissl_1_1
+
+=item * sissl_1_2
+
+=cut
+
+$RE{sissl} = {
+	name                     => 'SISSL',
+	'name.alt.org.perl'      => 'sun',
+	'name.alt.org.wikipedia' => 'Sun_Industry_Standards_Source_License',
+	'name.alt.org.wikidata'  => 'Q635577',
+	caption                  => 'Sun Industry Standards Source License',
+	'caption.alt.org.perl' => 'Sun Internet Standards Source License (SISSL)',
+	'caption.alt.misc.long' =>
+		'Sun Industry Standards Source License (SISSL)',
+	tags => [
+		'type:versioned:decimal',
+	],
+};
+
+$RE{sissl_1_1} = {
+	name                => 'SISSL-1.1',
+	'name.alt.org.spdx' => 'SISSL',
+	caption => 'Sun Industry Standards Source License - Version 1.1',
+	iri     => 'https://www.openoffice.org/licenses/sissl_license.html',
+	tags    => [
+		'type:singleversion:sissl',
+	],
+	licenseversion => '1.1',
+
+	'pat.alt.subject.license.scope.multisection.part.header' =>
+		'Sun Industry Standards Source License [-] Version 1\.1[  ]'
+		. '1\.0 DEFINITIONS',
+};
+
+$RE{sissl_1_2} = {
+	name                => 'SISSL-1.2',
+	'name.alt.org.osi'  => 'SISSL',
+	'name.alt.org.spdx' => 'SISSL-1.2',
+	caption => 'SUN INDUSTRY STANDARDS SOURCE LICENSE Version 1.2',
+	iri =>
+		'http://gridscheduler.sourceforge.net/Gridengine_SISSL_license.html',
+	tags => [
+		'type:singleversion:sissl',
+	],
+	licenseversion => '1.2',
+
+	'pat.alt.subject.license.scope.multisection.part.header' =>
+		'SUN INDUSTRY STANDARDS SOURCE LICENSE[  ]'
+		. 'Version 1\.2[  ]'
+		. '1\.0 DEFINITIONS',
+};
+
 =item * spl
 
 =item * spl_1
@@ -6923,8 +7884,10 @@ $RE{spl_1} = {
 =cut
 
 $RE{ssleay} = {
-	name => 'SSLeay',
-	tags => [
+	name                   => 'SSLeay',
+	'name.alt.org.perl'    => 'ssleay',
+	'caption.alt.org.perl' => 'Original SSLeay License',
+	tags                   => [
 		'license:contains:license:bsd_2_clause',
 		'license:is:grant',
 		'type:unversioned',
@@ -6935,7 +7898,7 @@ $RE{ssleay} = {
 	'pat.alt.subject.license.scope.multisection' => $P{repro_copr_cond_discl}
 		. '[.][  ]' . '[*)]'
 		. $P{ad_mat_ack_ssleay} . '?',
-	'pat.alt.subject.license.part.clause4_2' =>
+	'pat.alt.subject.license.part.advertising_clause_2' =>
 		'The word ["]cryptographic["] can be left out',
 };
 
@@ -7171,11 +8134,13 @@ $RE{zlib} = {
 	name                                  => 'Zlib',
 	'name.alt.org.fsf'                    => 'Zlib',
 	'name.alt.org.osi'                    => 'Zlib',
+	'name.alt.org.perl'                   => 'zlib',
 	'name.alt.org.spdx'                   => 'Zlib',
 	'name.alt.org.tldr.path.short'        => 'zlib',
 	'name.alt.org.wikidata'               => 'Q207243',
 	caption                               => 'zlib/libpng license',
 	'caption.alt.org.osi'                 => 'The zlib/libpng License',
+	'caption.alt.org.perl'                => 'zlib License',
 	'caption.alt.org.tldr'                => 'Zlib-Libpng License (Zlib)',
 	'caption.alt.org.trove'               => 'zlib/libpng License',
 	'caption.alt.org.wikipedia'           => 'zlib License',
@@ -7328,10 +8293,13 @@ Each of these patterns has the tag B< type:combo >.
 
 $RE{perl} = {
 	name                     => 'Perl',
+	'name.alt.org.perl'      => 'perl_5',
 	'name.alt.org.spdx'      => 'Artistic or GPL-1+',
 	caption                  => 'The Perl 5 License',
 	'caption.alt.misc.short' => 'Perl License',
 	'caption.alt.misc.long'  => 'The Perl 5 programming language License',
+	'caption.alt.org.perl' =>
+		'The Perl 5 License (Artistic 1 & GPL 1 or later)',
 	'caption.alt.org.software_license' =>
 		'same terms as the Perl 5 programming language system itself',
 	summary =>
@@ -7520,25 +8488,25 @@ Pattern may span multiple sections.
 
 =cut
 
-my @gnu_locales
-	= qw(en ar ca de el es fr it ja nl pl pt-br ru sq sr zh-cn zh-tw);
+my @gnu_langs
+	= qw(en ar ca de el es fr it ja nl pl pt_BR ru sq sr zh_CN zh_TW);
 
 my $version_re
 	= qr/$RE{version_numberstring}{'pat.alt.subject.trait.scope.line.scope.sentence'}(?:$RE{version_only}{'pat.alt.subject.trait'}|$RE{version_later}{'pat.alt.subject.trait'})?$/;
-
-my @_OBJECTS = grep {/^[a-z]/} keys(%RE);
 
 # must be simple word (no underscore), to survive getting joined in cache
 # more ideal first: first available is default
 my @_SUBJECTSTACK = qw(license grant name iri trait);
 
+my @_OBJECTS;
 my %_PUBLISHER;
 my %_TYPE;
 my %_SERIES;
 my %_USAGE;
 
 # process metadata tags
-for my $id (@_OBJECTS) {
+@_ = ();
+for my $id ( grep {/^[a-z]/} keys %RE ) {
 
 	# resolve publisher
 	for ( @{ $RE{$id}{tags} } ) {
@@ -7552,8 +8520,13 @@ for my $id (@_OBJECTS) {
 		/^type:($_prop)(?::($_prop)(?::($_prop))?)?/;
 		$_TYPE{$id} = $1
 			if ($1);
-		push @{ $_SERIES{$id} }, $2
-			if ( $2 and $1 eq 'singleversion' );
+		if ( $2 and $1 eq 'singleversion' ) {
+			push @_OBJECTS, $id;
+			push @{ $_SERIES{$id} }, $2;
+		}
+		else {
+			push @_, $id;
+		}
 		if ( $2 and $RE{$2} and $1 eq 'usage' ) {
 			$RE{$id}{licenseversion} = $RE{$2}{licenseversion}
 				|| die "missing version for $id (needed by $1)";
@@ -7570,6 +8543,10 @@ for my $id (@_OBJECTS) {
 	# synthesize metadata: series alternate caption from caption
 	_prop_populate( $id, 'caption', $_ ) for ( @{ $_SERIES{$id} } );
 }
+
+# ensure versioned objects are processed after single-version objects
+push @_OBJECTS, @_;
+
 for my $id (@_OBJECTS) {
 
 	# resolve publisher
@@ -7652,9 +8629,10 @@ for my $id (@_OBJECTS) {
 		if ( $org and $org eq 'gnu' ) {
 			$RE{$id}{"iri.$slug"}
 				||= "https://www.gnu.org/licenses/license-list.html#$RE{$id}{$_}";
-			for my $lang (@gnu_locales) {
+			for my $lang (@gnu_langs) {
+				( my $weblang = lc $lang ) =~ tr/_/-/;
 				$RE{$id}{"iri.$slug($lang)"}
-					||= "https://www.gnu.org/licenses/license-list.$lang.html#$RE{$id}{$_}";
+					||= "https://www.gnu.org/licenses/license-list.$weblang.html#$RE{$id}{$_}";
 			}
 			next NAME;
 		}
@@ -7814,6 +8792,7 @@ for my $id (@_OBJECTS) {
 			s/^(?:[Aa]n? )/(?:[Aa]n? )?/;    # relax (not add)
 			s/^$the?/$the?/;
 			s/(?: [Ll]icen[cs]e)/(?: [Ll]icen[cs]e)?/;
+			s/[、，] ?/[, ]/g;
 			s/,/,?/g;
 			s/'/[']/g;
 			s/-/[-]/g;
@@ -8072,10 +9051,9 @@ sub _prop_populate
 	my ( $id, $property, $series ) = @_;
 
 	for ( keys %{ $RE{$id} } ) {
-		my ( $stem, $slug, $lang )
-			= (/^($property)(?:\.alt)?($_notlang?)($_lang?)/);
-		$RE{$series}{"$property.alt$slug.version.$id$lang"} ||= $RE{$id}{$_}
-			if ($stem);
+		if (/^$property(?:\.alt)?($_notlang*)($_lang?)/) {
+			$RE{$series}{"$property.alt$1.version.$id$2"} ||= $RE{$id}{$_};
+		}
 	}
 }
 

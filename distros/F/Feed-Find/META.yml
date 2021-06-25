@@ -30,4 +30,4 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: git://github.com/davorg/Feed-Find.git
-version: '0.10'
+version: '0.11'

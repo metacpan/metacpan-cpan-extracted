@@ -83,19 +83,19 @@ my @cases = (
         }
     },
     {
-        cookie => "lang=en-US; Expires = Wed, 09 Jun 2021 10:18:14 GMT",
+        cookie => "lang=en-US; Expires = Sun, 09 Jun 2041 10:18:14 GMT",
         parse  => {
             name    => "lang",
             value   => "en-US",
-            expires => 1623233894,
+            expires => 2254385894,
         }
     },
     {
-        cookie => "lang=en-US; Expires = Wed, 09 Jun 2021 10:18:14 GMT; Max-Age=3600",
+        cookie => "lang=en-US; Expires = Sun, 09 Jun 2041 10:18:14 GMT; Max-Age=3600",
         parse  => {
             name      => "lang",
             value     => "en-US",
-            expires   => 1623233894,
+            expires   => 2254385894,
             'max-age' => 3600,
         }
     },

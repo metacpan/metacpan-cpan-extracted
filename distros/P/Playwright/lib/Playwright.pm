@@ -1,5 +1,5 @@
 package Playwright;
-$Playwright::VERSION = '0.006';
+$Playwright::VERSION = '0.007';
 use strict;
 use warnings;
 
@@ -33,7 +33,7 @@ sub _check_node {
     # Check that node is installed
     $node_bin = File::Which::which('node');
     confess("node must exist, be in your PATH and executable")
-      unless -x $node_bin;
+      unless $node_bin && -x $node_bin;
 
     my $global_install = '';
     my $path2here =
@@ -242,6 +242,7 @@ sub launch ( $self, %args ) {
 sub await ( $self, $promise ) {
     confess("Input must be an AsyncData") unless $promise->isa('AsyncData');
     my $obj = $promise->result(1);
+
     return $obj unless $obj->{_type};
     my $class = "Playwright::$obj->{_type}";
     return $class->new(
@@ -297,7 +298,7 @@ sub _start_server ( $port, $timeout, $debug ) {
     $ENV{DEBUG} = 'pw:api' if $debug;
     my $pid = fork // confess("Could not fork");
     if ($pid) {
-        print "Waiting for port to come up..." if $debug;
+        print "Waiting for port to come up...\n" if $debug;
         Net::EmptyPort::wait_port( $port, $timeout )
           or confess("Server never came up after 30s!");
         print "done\n" if $debug;
@@ -321,7 +322,7 @@ Playwright - Perl client for Playwright
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 

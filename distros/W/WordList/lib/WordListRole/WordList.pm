@@ -1,9 +1,9 @@
 package WordListRole::WordList;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-01-28'; # DATE
+our $DATE = '2021-06-23'; # DATE
 our $DIST = 'WordList'; # DIST
-our $VERSION = '0.7.7'; # VERSION
+our $VERSION = '0.7.10'; # VERSION
 
 use Role::Tiny;
 
@@ -31,7 +31,7 @@ WordListRole::WordList - The WordList methods
 
 =head1 VERSION
 
-This document describes version 0.7.7 of WordListRole::WordList (from Perl distribution WordList), released on 2021-01-28.
+This document describes version 0.7.10 of WordListRole::WordList (from Perl distribution WordList), released on 2021-06-23.
 
 =head1 REQUIRED METHODS
 
@@ -69,7 +69,7 @@ Source repository is at L<https://github.com/perlancar/perl-WordList>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-WordList/issues>
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=WordList>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

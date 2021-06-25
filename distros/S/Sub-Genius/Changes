@@ -67,3 +67,25 @@ Changes for Sub::Genius
              - `stubby -x nodeps` skips generating subs for words that look
              like external package calls (looks for '::'); warns
              - fixed `stubby precache` not accepting --prefile as expected
+
+0.13         2021-06-07 14:30:51-05:12 America/New_York
+             - added 'list' subcommand to stubby for enumerating all valid
+               strings (serial execution plans) implied by the PRE
+             - added 'export' subcommand to stubby, which allows one to export
+               the minimized DFA implied by the PRE into GraphViz's "dot" format
+               for rendering using GVs traditional utilities (dot, circo, etc) and
+               other "dot" format explorers like "xdot"
+
+0.13001      2021-06-07 14:30:51-05:12 America/New_York
+             - cleaned up files in the cpan distro
+
+0.314        2021-06-08 14:30:52-03:14 America/New_York
+             - added 3 examples for computing pi using the integration formulation,
+               which is ideal as an example for an unordered, "multithreaded"
+               solution.
+             - bumped vers to pi/10 in honor of this milestone
+
+0.314002     2021-06-18 14:30:52-03:14 America/New_York
+             - documentation-only change
+             - added a noteworthy addition to the POD, after finding Chapel's page
+               describing its memory consistency model - worth the read!

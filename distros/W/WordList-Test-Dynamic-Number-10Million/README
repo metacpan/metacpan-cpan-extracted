@@ -3,9 +3,9 @@ NAME
     "00000001" to "10000000"
 
 VERSION
-    This document describes version 0.003 of
+    This document describes version 0.004 of
     WordList::Test::Dynamic::Number::10Million (from Perl distribution
-    WordList-Test-Dynamic-Number-10Million), released on 2020-05-04.
+    WordList-Test-Dynamic-Number-10Million), released on 2021-02-23.
 
 SYNOPSIS
      use WordList::Test::Dynamic::Number::10Million;
@@ -22,10 +22,14 @@ SYNOPSIS
      # Call a callback for each word
      $wl->each_word(sub { my $word = shift; ... });
 
+     # Iterate
+     my $first_word = $wl->first_word;
+     while (defined(my $word = $wl->next_word)) { ... }
+
      # Get all the words
      my @all_words = $wl->all_words;
 
-STATISTICS
+WORDLIST STATISTICS
      +----------------------------------+----------+
      | key                              | value    |
      +----------------------------------+----------+
@@ -54,8 +58,8 @@ SOURCE
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website
-    <https://rt.cpan.org/Public/Dist/Display.html?Name=WordList-Test-Dynamic
-    -Number-10Million>
+    <https://github.com/perlancar/perl-WordList-Test-Dynamic-Number-10Millio
+    n/issues>
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.
@@ -64,7 +68,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2020, 2018 by perlancar@cpan.org.
+    This software is copyright (c) 2021, 2020, 2018 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

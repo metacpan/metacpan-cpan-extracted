@@ -1,0 +1,22 @@
+runtime:
+  requires:
+    perl: '5.010001'
+    Mojolicious: '7.40'
+    Carp: 0
+    Import::Into: 0
+    Module::Runtime: 0
+    Role::Tiny: '2.000001'
+    Scalar::Util: 0
+  recommends:
+    Log::Any: 0
+test:
+  requires:
+    Test::More: '0.88'
+    Test::Needs: 0
+develop:
+  requires:
+    Log::Any: '1.00'
+    Log::Contextual: '0.008001'
+    Log::Dispatch: 0
+    Log::Dispatchouli: 0
+    Log::Log4perl: 0

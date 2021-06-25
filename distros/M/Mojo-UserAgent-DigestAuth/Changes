@@ -1,5 +1,10 @@
 Revision history for perl distribution Mojo-UserAgent-DigestAuth
 
+0.05 2021-06-17T09:00:58+0900
+ - Add Mojo::UserAgent::Role::DigestAuth
+ - Deprecated Mojo::UserAgent::DigestAuth
+ - Compatible with Mojolicious 9.11
+
 0.04 2016-02-22T18:27:13+0100
  - Fix blocking request while the IOLoop is running #2
    Contributor: Alexey Stavrov

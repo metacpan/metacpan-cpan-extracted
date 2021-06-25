@@ -23,13 +23,8 @@ WriteMakefile(
     },
     META_MERGE => {
         resources => {
-            repository => {
-                url =>
-                  'git@github.com:SysPete/Catalyst-Plugin-PrometheusTiny.git',
-                web =>
-                  'https://github.com/SysPete/Catalyst-Plugin-PrometheusTiny',
-                type => 'git',
-            },
+            repository =>
+              'https://github.com/SysPete/Catalyst-Plugin-PrometheusTiny',
             bugtracker =>
               'https://github.com/SysPete/Catalyst-Plugin-PrometheusTiny/issues',
             IRC     => 'irc://irc.perl.org/#catalyst',

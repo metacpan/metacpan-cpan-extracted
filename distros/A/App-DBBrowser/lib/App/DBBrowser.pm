@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.010001;
 
-our $VERSION = '2.264';
+our $VERSION = '2.268';
 
 use File::Basename        qw( basename );
 use File::Spec::Functions qw( catfile catdir );
@@ -16,7 +16,7 @@ use File::Which    qw( which );
 
 use Term::Choose         qw();
 use Term::Choose::Screen qw( clear_screen );
-use Term::TablePrint     qw( print_table );
+use Term::TablePrint     qw();
 
 #use App::DBBrowser::AttachDB;    # required
 use App::DBBrowser::Auxil;
@@ -39,24 +39,25 @@ BEGIN {
 
 sub new {
     my ( $class ) = @_;
+    my $page = 2; ##
     my $info = {
-        tc_default  => { hide_cursor => 0, undef => '<<', prompt => 'Choose:' },
-        tf_default  => { hide_cursor => 2 },
-        tcu_default => { hide_cursor => 0 },
-        lyt_h       => { order => 0, alignment => 2 },
-        lyt_v       => { undef => '  BACK', layout => 3, },
-        lyt_v_clear => { undef => '  BACK', layout => 3, clear_screen => 1 },
-        dots        => [ [ '...', 3 ], [ '|', 1 ], [] ],
-        quit        => 'QUIT',
-        back        => 'BACK',
-        confirm     => 'CONFIRM',
-        _quit       => '  QUIT',
-        _back       => '  BACK',
-        _continue   => '  CONTINUE',
-        _confirm    => '  CONFIRM',
-        _reset      => '  RESET',
-        ok          => '-OK-',
-        working     => 'Working ... ',
+        tc_default      => { hide_cursor => 0, clear_screen => 1, page => $page, undef => '<<', prompt => 'Choose:' },
+        tf_default      => { hide_cursor => 2, clear_screen => 1, page => $page },
+        tcu_default     => { hide_cursor => 0, clear_screen => 1, page => $page },
+        lyt_h           => { order => 0, alignment => 2 },
+        lyt_v           => { undef => '  BACK', layout => 3 },
+        dots            => [ [ '...', 3 ], [ '|', 1 ], [] ],
+        quit            => 'QUIT',
+        back            => 'BACK',
+        confirm         => 'CONFIRM',
+        _quit           => '  QUIT',
+        _back           => '  BACK',
+        _continue       => '  CONTINUE',
+        _confirm        => '  CONFIRM',
+        _reset          => '  RESET',
+        ok              => '-OK-',
+        working         => 'Working ... ',
+        always_footer   => $page == 2 ? 1 : 0, ##
     };
     return bless { i => $info }, $class;
 }
@@ -167,7 +168,7 @@ sub run {
             # Choose
             my $idx_plugin = $tc->choose(
                 $menu_plugins,
-                { %{$sf->{i}{lyt_v_clear}}, prompt => 'DB Plugin: ', index => 1, default => $old_idx_plugin,
+                { %{$sf->{i}{lyt_v}}, prompt => 'DB Plugin: ', index => 1, default => $old_idx_plugin,
                   undef => $sf->{i}{_quit} }
             );
             if ( defined $idx_plugin ) {
@@ -253,7 +254,7 @@ sub run {
                 # Choose
                 my $idx_db = $tc->choose(
                     $menu_db,
-                    { %{$sf->{i}{lyt_v_clear}}, prompt => $prompt, index => 1, default => $old_idx_db, undef => $back }
+                    { %{$sf->{i}{lyt_v}}, prompt => $prompt, index => 1, default => $old_idx_db, undef => $back }
                 );
                 $db = undef;
                 if ( defined $idx_db ) {
@@ -362,7 +363,7 @@ sub run {
                     # Choose
                     my $idx_sch = $tc->choose(
                         $menu_schema,
-                        { %{$sf->{i}{lyt_v_clear}}, prompt => $prompt, index => 1, default => $old_idx_sch, undef => $back }
+                        { %{$sf->{i}{lyt_v}}, prompt => $prompt, index => 1, default => $old_idx_sch, undef => $back }
                     );
                     if ( defined $idx_sch ) {
                         $schema = $menu_schema->[$idx_sch];
@@ -445,7 +446,7 @@ sub run {
                         # Choose
                         my $idx_tbl = $tc->choose(
                             $menu_table,
-                            { %{$sf->{i}{lyt_v_clear}}, prompt => '', index => 1, default => $old_idx_tbl, undef => $back }
+                            { %{$sf->{i}{lyt_v}}, prompt => '', index => 1, default => $old_idx_tbl, undef => $back }
                         );
                         if ( defined $idx_tbl ) {
                             $table = $menu_table->[$idx_tbl];
@@ -566,7 +567,7 @@ sub __browse_the_table {
     $sql->{table} = $qt_table;
     $sql->{cols} = $qt_columns;
     $sf->{i}{stmt_types} = [ 'Select' ];
-    $ax->print_sql( $sql );
+    $ax->print_sql_info( $sql );
 
     PRINT_TABLE: while ( 1 ) {
         my $all_arrayref;
@@ -581,11 +582,12 @@ sub __browse_the_table {
         if ( ! defined $all_arrayref ) {
             last PRINT_TABLE;
         }
-        if ( $sf->{o}{G}{show_table_name} ) {
-            $sf->{o}{table}{table_name} = '- ' . $sf->{d}{table};
-        }
 
-        print_table( $all_arrayref, $sf->{o}{table} );
+        my $tp = Term::TablePrint->new( $sf->{o}{table} );
+        $tp->print_table(
+            $all_arrayref,
+            { table_name => "     '" . $sf->{d}{table} . "'     " }
+        );
 
         delete $sf->{o}{table}{max_rows}   if exists $sf->{o}{table}{max_rows};
         delete $sf->{o}{table}{table_name} if exists $sf->{o}{table}{table_name};
@@ -621,7 +623,7 @@ sub __create_drop_or_attach {
         # Choose
         my $idx = $tc->choose(
             $menu,
-            { %{$sf->{i}{lyt_v_clear}}, prompt => '', index => 1, default => $old_idx, undef => '  <=' }
+            { %{$sf->{i}{lyt_v}}, prompt => '', index => 1, default => $old_idx, undef => '  <=' }
         );
         if ( ! defined $idx || ! defined $menu->[$idx] ) {
             return;
@@ -711,7 +713,7 @@ sub __derived_table {
     $sf->{i}{stmt_types} = [ 'Select' ];
     my $tmp = { table => '()' };
     $ax->reset_sql( $tmp );
-    $ax->print_sql( $tmp );
+    $ax->print_sql_info( $tmp );
     my $qt_table = $sq->choose_subquery( $tmp );
     if ( ! defined $qt_table ) {
         return;
@@ -719,7 +721,7 @@ sub __derived_table {
     my $alias = $ax->alias( 'subqueries', $qt_table, 'From_SQ' );
     $qt_table .= " AS " . $ax->quote_col_qualified( [ $alias ] );
     $tmp->{table} = $qt_table;
-    $ax->print_sql( $tmp );
+    $ax->print_sql_info( $tmp );
     my $sth = $sf->{d}{dbh}->prepare( "SELECT * FROM " . $qt_table . " LIMIT 0" );
     $sth->execute() if $sf->{i}{driver} ne 'SQLite';
     my $qt_columns = $ax->quote_simple_many( $sth->{NAME} );
@@ -747,7 +749,7 @@ App::DBBrowser - Browse SQLite/MySQL/PostgreSQL databases and their tables inter
 
 =head1 VERSION
 
-Version 2.264
+Version 2.268
 
 =head1 DESCRIPTION
 

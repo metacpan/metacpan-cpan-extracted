@@ -229,6 +229,13 @@ METHODS
 
     The coderef is expected to return a Future indicating completion.
 
+ run_future
+
+    Returns a copy of the run Future.
+
+    This would resolve once the process is running and it's ready to accept
+    requests.
+
  shutdown_future
 
     Returns a copy of the shutdown Future.

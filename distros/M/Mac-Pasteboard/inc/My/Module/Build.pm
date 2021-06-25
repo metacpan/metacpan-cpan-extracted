@@ -8,6 +8,7 @@ our @ISA = qw{ Module::Build };
 
 use Carp;
 
+__PACKAGE__->add_property( my_pl_files => [] );
 
 sub ACTION_authortest {
 ##  my ( $self, @args ) = @_;
@@ -19,6 +20,54 @@ sub ACTION_authortest {
     $self->test_files( qw{ t xt/author } );
     $self->depends_on( 'test' );
 
+    return;
+}
+
+sub ACTION_code {
+    my ( $self, @args ) = @_;
+    $self->depends_on( 'move_perl_files' );
+    return $self->SUPER::ACTION_code();
+}
+
+sub ACTION_constant_files {
+##  my ( $self, @args ) = @_;
+    my ( $self ) = @_;		# Arguments not used
+    $self->up_to_date(
+	'Constant.PL',
+	[ qw{ constant-c.inc constant-h.inc constant-xs.inc } ],
+    ) and return;
+    $self->do_system( $self->perl(), 'Constant.PL' );
+    return;
+}
+
+sub ACTION_move_perl_files {
+##  my ( $self, @args ) = @_;
+    my ( $self ) = @_;		# Arguments not used
+    $self->depends_on( 'constant_files' );
+    my $touch;
+    foreach my $file ( @{ $self->my_pl_files() || [] } ) {
+	$self->copy_if_modified( from => $file, to => "lib/Mac/$file" )
+	    or next;
+	print "$file -> lib/Mac/$file\n";
+	$touch = 1;
+    }
+    if ( $touch ) {
+	# Unlinking the .o file seems to be necessary to prevent
+	# Module::Build::Base::link_c() from including
+	# lib/Mac/Pasteboard.o twice if Pasteboard.xs is touched without
+	# a ./Build realclean. The problem seems to be that link_c()
+	# gathers up all the .o files under the reasonable assumption
+	# that they are needed for the link, but then adds the .o file
+	# it is trying to build on the reasonable-but-wrong assumption
+	# that it has not yet been created.
+	# I unlink the .c as well for good measure.
+	unlink map { "lib/Mac/Pasteboard.$_" } qw{ o c };
+	# On principal. I have not had trouble with this, but I suspect
+	# it is because I have been focussed on the refactor, in which
+	# case this file will never be present because lib/Mac/pbl.c is
+	# not present.
+	unlink 'lib/Mac/pbl.o';
+    }
     return;
 }
 

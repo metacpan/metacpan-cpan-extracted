@@ -1,0 +1,443 @@
+=encoding utf-8
+
+=head1 NAME
+
+Module::Generic::SharedMem - Shared Memory Manipulation
+
+=head1 SYNOPSIS
+
+    # Check if IPC::SysV is supported on this system
+    if( Module::Generic::SharedMem->supported )
+    {
+        my $shmem = Module::Generic::SharedMem->new( key => 'some_identifier' ) ||
+            die( Module::Generic::SharedMem->error );
+    }
+    
+    my $shmem = Module::Generic::SharedMem->new(
+        # Create if necessary, or re-use if already exists
+        create => 1,
+        # Self-destroy upon end of object. Default to false
+        destroy => 0,
+        # make access exclusive
+        exclusive => 1,
+        key => 'some_identifier',
+        mode => 0666,
+        # 100K
+        size => 102400,
+        debug => 3,
+    ) || die( Module::Generic::SharedMem->error );
+
+    # Check if it already exists
+    if( $shmem->exists )
+    {
+        # do something
+    }
+
+    $shmem->create(0);
+    $shmem->destroy(0);
+    $shmem->exclusive(0);
+    # Then get the bitwise flags based on those options set above:
+    my $flags = $shmem->flags;
+    # or specify overriding values:
+    my $flags = $shmem->flags({
+        create => 0,
+        destroy => 0,
+        exclusive => 0,
+        mode => 0644,
+    });
+
+    my $s = $shmem->open || die( $shmem->error );
+
+    # Get the shared memory id
+    my $id = $s->id;
+
+    my $key = $s->key;
+
+    # Get the actual key used in interacting with shared memory
+    # You should not mess with this unless you know what you are doing
+    my $shem_key = $s->serial;
+
+    use Module::Generic::SharedMem qw( :all );
+    $s->lock( LOCK_EX ) || die( $s->error );
+    # Is it locked?
+    my $is_locked = $s->locked;
+
+    # example: 0666
+    my $mode = $s->mode;
+    my $s = $shmem->open || die( $shmem->error );
+
+    # Actually the process pid
+    my $owner = $s->owner;
+
+    # The semaphore pid
+    my $sempid = $s->pid;
+
+    # Get a random key to use to create shared memory block
+    my $random_key = $shmem->rand;
+
+    my $data = $s->read;
+    my $buffer;
+    $s->read( $buffer );
+    # You can control how much to read and allocate a buffer to put the read data onto
+    # Data is automatically transcoded using Storable::thaw
+    my $len = $s->read( $buffer, 1024 ) || die( $s->error );
+
+    $s->remove;
+
+    my $semaphore_id = $s->semid;
+
+    # or $s->size;
+    my $shared_mem_size = $shmem->size;
+
+    # See Module::Generic::SemStat doc
+    my $stat = $s->stat;
+
+    # See Module::Generic::SharedStat doc
+    my $stat = $s->shmstat;
+
+    # Remove lock
+    $s->unlock;
+
+    # Data is automatically transcoded using Storable::freeze
+    $s->write( $data ) || die( $s->error );
+
+=head1 VERSION
+
+    v0.1.0
+
+=head1 DESCRIPTION
+
+L<Module::Generic::SharedMem> provides an easy to use api to manipulate shared memory block. See L<perlipc> for more information.
+
+As stipulated in L<perlport>, this is not supported on the following platforms: android, dos, MSWin32, OS2, VMS and Risc OS.
+
+You can check if the system is supported with L</supported>
+
+    if( Module::Generic::SharedMem->supported )
+    {
+        # do something
+    }
+
+This module only works with reference data, such as array, hash or reference to scalar. Anything that L<Storable> knows how to L<Storable/freeze> and L<Storable/thaw>
+
+=head1 DEBUGGING
+
+To list all used shared memory, at least on Unix type systems such as Linux or FreeBSD (including MacOSX), use:
+
+    ipcs -m
+
+=head1 METHODS
+
+=head2 new
+
+This instantiates a shared memory object. It takes the following parameters:
+
+=over 4
+
+=item I<debug>
+
+A debug value will enable debugging output (equal or above 3 actually)
+
+=item I<create>
+
+A boolean value to indicate whether the shared memory block should be created if it does not exist. Default to false.
+
+=item I<destroy>
+
+A boolean value to indicate if the shared memory block should be removed when the object is destroyed upon end of the script process.
+See L<perlmod> for more about object destruction.
+
+=item I<destroy_semaphore>
+
+A boolean value to indicate if the semaphore should be removed when the object is destroyed upon end of the script process.
+See L<perlmod> for more about object destruction.
+
+I<destroy_semaphore> is automatically enabled if I<destroy> is set to true.
+
+Thus, one can deactive auto removal of the shared memory block, but enable auto removal of the semaphore. This is useful when there are two processes accessing the same shared memory block and one wants to give the first process the authority to create and remove the shared memory block, while the second only access and write to the shared memory block, but does not remove it. Still to avoid having semaphores surviving the process, by enabling this option and disabling I<destroy>, it will remove the semaphore and leave the shared memory.
+
+=item I<exclusive>
+
+A boolean value to set the shared memory as exclusive. This will affect the flags set by L</flags> which are used by L</open>.
+
+=item I<key>
+
+The shared memory key identifier to use. It defaults to C<IPC::SysV::IPC_PRIVATE>
+
+If you provide an empty value, it will revert to C<IPC::SysV::IPC_PRIVATE>.
+
+If you provide a number, it will be used to call L<IPC::SysV/ftok>.
+
+Otherwise, if you provide a key as string, the characters in the string will be converted to their numeric value and added up. The resulting id, called C<project id> by L<IPC::SysV>, will be used to call L<IPC::SysV/ftok> and will produce an hopefully unique and repeatable value.
+
+Either way, the resulting value is used to create a shared memory segment and a semaphore by L</open>.
+
+=item I<mode>
+
+The octal mode value to use when opening the shared memory block.
+
+Shared memory are owned by system users and access to shared memory segment is ruled by the initial permissions set to it.
+
+If you do not want to share it with any other user than yourself, setting mode to C<0600> is fine.
+
+=item I<size>
+
+The size in byte of the shared memory.
+
+This is set once it is created. You can create again the shared memory segment with a smaller size, but not a bigger one. If you want to increase the size, you would need to remove it first.
+
+=back
+
+An object will be returned if it successfully initiated, or undef() upon error, which can then be retrieved with C< Module::Generic::SharedMem->error >. You should always check the return value of the methods used here for their definedness.
+
+    my $shmem = Module::Generic::SharedMem->new(
+        create => 1,
+        destroy => 0,
+        key => 'my_memory',
+        # 64K
+        size => 65536,
+    ) || die( Module::Generic::SharedMem->error );
+
+=head2 addr
+
+Returns the address of the shared memory segment once it has been attached to this address space.
+
+=head2 attach
+
+Attach the shared memory segment to this address space and returns its address.
+
+Upon error, it returns C<undef> and sets an error that can be retrieved with the error method:
+
+    my $addr = $shem->attach || die( $shem->error );
+
+A shared memory segment object must be first created with the L</open> method, because L</attach> calls L<IPC::SysV/shmat> with the shared memory id and this id is returned upon using the L</open> method.
+
+=head2 create
+
+Set or get the boolean value to true to indicate you want to create the shared memory block if it does not exist already. Default to false.
+
+=head2 destroy
+
+Set or get the boolean value to indicate that the shared memory should be automatically destroyed when the module object is destroyed. See L<perlmod> for more information about module object destruction.
+
+=head2 detach
+
+Quoting the IPC documentation, this detaches the shared memory segment located at the address specified by L</attach> from this address space.
+
+It returns C<undef> if it is not attached anymore, but without setting an error.
+
+=head2 exclusive
+
+Set or get the boolean value to affect the open flags in exclusive mode.
+
+=head2 exists
+
+Checks if the shared memory identified with I<key> exists.
+
+It takes the same arguments as L</open> and returns 1 if the shared memory exists or 0 otherwise.
+
+It does this by performing a L<perlfunc/shmget> such as:
+
+    shmget( $shared_mem_key, $size, 0444 );
+
+This will typically return the shared memory id if it exists or C<undef()> with an error set in C<$!> by perl otherwise.
+
+=head2 flags
+
+Provided with an optional hash or hash reference and this return a bitwise value of flags used by L</open>.
+
+    my $flags = $shmem->flags({
+        create => 1,
+        exclusive => 0,
+        mode => 0600,
+    }) || die( $shmem->error );
+
+=head2 id
+
+Returns the id of the shared memory once it has been opened with L</open>
+
+    my $s = $shmem->open || die( $shmem->error );
+    my $id = $s->id;
+
+=head2 key
+
+Sets or gets the shared memory key identifier.
+
+    $shem->key( 'some_identifier' );
+
+=head2 lock
+
+It takes an optional bitwise lock value, and defaults to C<LOCK_SH> if none is provided and issues a lock on the shared memory.
+
+    use Module::Generic::SharedMem qw( :all );
+    my $s = $shem->open || die( $shmem->error );
+    $s->lock( LOCK_EX );
+    # Do something
+    $s->unlock;
+
+=head2 locked
+
+Returns a positive value when a lock is active or 0 when there is no active lock.
+
+The value is the bitwise value of the lock used.
+
+=head2 mode
+
+Sets or gets the mode for the shared memory as used by L</open>
+
+    $shmem->mode( 0666 );
+    my $s = $shmem->open || die( $shmem->error );
+
+=head2 op
+
+Issue an opeation on the L<semaphore|https://en.wikipedia.org/wiki/Semaphore_(programming)>.
+
+Provided value sould be a set of 3.
+
+    ＄s->op( @{$Module::Generic::SharedMem::SEMOP_ARGS->{(LOCK_SH)}} ) ||
+        die( $s->error );
+
+=head2 open
+
+Create an access to the shared memory and return a new L<Module::Generic::SharedMem> object.
+
+    my $shmem = Module::Generic::SharedMem->new(
+        create => 1,
+        destroy => 0,
+        # If not provided, will use the one provided during object instantiation
+        key => 'my_memory',
+        # 64K
+        size => 65536,
+    ) || die( Module::Generic::SharedMem->error );
+    # Overriding some default value set during previous object instantiation
+    my $s = $shmem->open({
+        mode => 0600,
+        size => 1024,
+    }) || die( $shmem->error );
+
+If the L</create> option is set to true, but the shared memory already exists, L</open> will detect it and attempt to open access to the shared memory without the L</create> bit on, which is C<IPC::SysV::IPC_CREAT>
+
+=head2 owner
+
+Sets or gets the shared memory owner, which is by default actually the process id (C<$$>)
+
+=head2 pid
+
+Get the L<semaphore|https://en.wikipedia.org/wiki/Semaphore_(programming)> pid once the shared memory has been opened.
+
+    my $pid = $s->pid || die( $s->error );
+
+=head2 rand
+
+Get a random key to be used as identifier to create a shared memory.
+
+=head2 read
+
+Read the content of the shared memory and decode the data read using L<Storable/thaw>
+
+You can optionally provide a buffer, and a maximum length and it will read that much length and put the shared memory content decoded in that buffer, if it were provided.
+
+It then return the length read, or C<0E0> if no data was retrieved. C<0E0> still is treated as 0, but as a positive value, so you can do:
+
+    my $len = $s->read( $buffer ) || die( $s->error );
+
+But you really should more thoroughly do instead:
+
+    my( $len, $buffer );
+    if( !defined( $len = $s->read( $buffer ) ) )
+    {
+        die( $s->error );
+    }
+
+If you do not provide any buffer, you can call L</read> like this and it will return you the shared memory decoded content:
+
+    my $buffer;
+    if( !defined( $buffer = $s->read ) )
+    {
+        die( $s->error );
+    }
+
+The content is stored in shared memory after being encoded with L<Storable/freeze>.
+
+=head2 remove
+
+Remove entire the shared memory identified with L</key>
+
+=head2 removed
+
+Returns true if the shared memory was removed, false otherwise.
+
+=head2 semid
+
+Return the L<semaphore|https://en.wikipedia.org/wiki/Semaphore_(programming)> id once the shared memory has been opened. See L<perlipc> for more information about semaphore and L<perlfunc>.
+
+=head2 serial
+
+Returns the serial number used to create or access the shared memory segment.
+
+This serial is created based on the I<key> parameter provided either upon object instantiation or upon using the L</open> method.
+
+The serial is created by calling L<IPC::SysV/ftok> to provide a reliable and repeatable numeric identifier.
+
+=head2 size
+
+Sets or gets the shared memory block size.
+
+This should be an integer representing bytes, so typically a multiple of 1024.
+
+=head2 stat
+
+Sets or retrieve value with L<semaphore|https://en.wikipedia.org/wiki/Semaphore_(programming)>.
+
+If one parameter only is provided, it returns its corresponding value set.
+
+It performs:
+
+    # Get the semaphore id
+    my $id = $s->semid;
+    my $value = semctl( $id, $sem, IPC::SysV::GETVAL, 0 );
+
+When 2 parameters are provided, this is treated as a key-value pair and sets the value for the corresponding key.
+
+It performs:
+
+    my $id = $s->semid;
+    semctl( $id, $sem, IPC::SysV::SETVAL, $val )
+
+If no parameter is provided it returns a L<Module::Generic::SemStat> object in scalar context or an array of value in list context.
+
+=head2 supported
+
+Returns true if IPC shared memory segments are supported by the system, and false otherwise.
+
+=head2 unlock
+
+Remove the lock, if any. The shared memory must first be opened.
+
+    $s->unlock || die( $s->error );
+
+=head2 write
+
+Write the data provided to the shared memory, after having encoded it using L<Storable/freeze>.
+
+It returns the current object for chaining, or under if there was an error, which can then be retrieved with L<Module::Generic/error>
+
+=head1 AUTHOR
+
+Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
+
+=head1 SEE ALSO
+
+L<Module::Generic>, L<Module::Generic::SemStat>, L<Module::Generic::SharedStat>
+
+L<perlipc>, L<perlmod>, L<IPC::Semaphore>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright (c) 2021 DEGUEST Pte. Ltd.
+
+You can use, copy, modify and redistribute this package and associated
+files under the same terms as Perl itself.
+
+=cut
+

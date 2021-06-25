@@ -4,13 +4,14 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.731';
+our $VERSION = '1.733';
 
 use Exporter qw( import );
 
 our @EXPORT_OK = qw( line_fold print_columns cut_to_printwidth );
 
-use Term::Choose::Screen qw( normal );
+use Term::Choose::Constants qw( WIDTH_CURSOR );
+use Term::Choose::Screen    qw( normal );
 
 
 BEGIN {
@@ -69,7 +70,7 @@ sub print_columns {
 
 
 sub cut_to_printwidth {
-    my ( $str, $avail_w, $return_rest ) = @_;   # return_remainder
+    my ( $str, $avail_width, $return_rest ) = @_;   # return_remainder
     my $count = 0;
     my $total = 0;
     for my $i ( 0 .. ( length( $str ) - 1 ) ) {
@@ -77,8 +78,8 @@ sub cut_to_printwidth {
         if ( ! defined $cache->[$c] ) {
             $cache->[$c] = char_width( $c )
         }
-        if ( ( $total = $total + $cache->[$c] ) > $avail_w ) {
-            if ( ( $total - $cache->[$c] ) < $avail_w ) {
+        if ( ( $total = $total + $cache->[$c] ) > $avail_width ) {
+            if ( ( $total - $cache->[$c] ) < $avail_width ) {
                 return substr( $str, 0, $count ) . ' ', substr( $str, $count ) if $return_rest;
                 return substr( $str, 0, $count ) . ' ';
             }
@@ -94,15 +95,20 @@ sub cut_to_printwidth {
 
 
 sub line_fold {
-    my ( $str, $avail_w, $opt ) = @_; #copy $str
-    return $str if ! defined $str || ! length $str;
+    my ( $str, $avail_width, $opt ) = @_; #copy $str
+    if ( ! defined $str || ! length $str ) {
+        return $str;
+    }
+    if ( $^O ne 'MSWin32' && $^O ne 'cygwin' ) {
+        $avail_width += WIDTH_CURSOR;
+    }
     for ( $opt->{init_tab}, $opt->{subseq_tab} ) {
         if ( defined $_ && length $_ ) {
             s/\t/ /g;
             s/[\x{000a}-\x{000d}\x{0085}\x{2028}\x{2029}]+/\ \ /g;
             s/[\p{Cc}\p{Noncharacter_Code_Point}\p{Cs}]//g;
-            if ( length > $avail_w / 4 ) {
-                $_ = cut_to_printwidth( $_, int( $avail_w / 2 ) );
+            if ( length > $avail_width / 4 ) {
+                $_ = cut_to_printwidth( $_, int( $avail_width / 2 ) );
             }
         }
         else {
@@ -118,7 +124,7 @@ sub line_fold {
     $str =~ s/[^\x{0a}\x{0b}\x{0c}\x{0d}\x{85}\P{Cc}]//g; # remove control chars but keep vertical spaces
     $str =~ s/[\p{Noncharacter_Code_Point}\p{Cs}]//g;
     my $regex = qr/\x{0d}\x{0a}|[\x{000a}-\x{000d}\x{0085}\x{2028}\x{2029}]/; # \R 5.10
-    if ( $str !~ /$regex/ && print_columns( $opt->{init_tab} . $str ) <= $avail_w && ! @color ) {
+    if ( $str !~ /$regex/ && print_columns( $opt->{init_tab} . $str ) <= $avail_width && ! @color ) {
         return $opt->{init_tab} . $str;
     }
     my @paragraphs;
@@ -130,7 +136,7 @@ sub line_fold {
         my $line = $opt->{init_tab};
 
         for my $i ( 0 .. $#words ) {
-            if ( print_columns( $line . $words[$i] ) <= $avail_w ) {
+            if ( print_columns( $line . $words[$i] ) <= $avail_width ) {
                 $line .= $words[$i];
             }
             else {
@@ -143,11 +149,11 @@ sub line_fold {
                     $words[$i] =~ s/^\s+//;
                     $tmp = $opt->{subseq_tab} . $words[$i];
                 }
-                ( $line, my $remainder ) = cut_to_printwidth( $tmp, $avail_w, 1 );
+                ( $line, my $remainder ) = cut_to_printwidth( $tmp, $avail_width, 1 );
                 while ( length $remainder ) {
                     push( @lines, $line );
                     $tmp = $opt->{subseq_tab} . $remainder;
-                    ( $line, $remainder ) = cut_to_printwidth( $tmp, $avail_w, 1 );
+                    ( $line, $remainder ) = cut_to_printwidth( $tmp, $avail_width, 1 );
                 }
             }
             if ( $i == $#words ) {

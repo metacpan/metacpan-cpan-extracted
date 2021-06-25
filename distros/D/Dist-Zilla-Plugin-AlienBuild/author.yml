@@ -6,6 +6,7 @@ pod_spelling_system:
   stopwords:
     - ffi
     - alienfile
+    - alienized
 
 pod_coverage:
   skip: 0

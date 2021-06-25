@@ -253,6 +253,13 @@ Registers a coderef to be called during shutdown.
 
 The coderef is expected to return a L<Future> indicating completion.
 
+=head2 run_future
+
+Returns a copy of the run L<Future>.
+
+This would resolve once the process is running and it's
+ready to accept requests.
+
 =head2 shutdown_future
 
 Returns a copy of the shutdown L<Future>.

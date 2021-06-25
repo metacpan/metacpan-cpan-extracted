@@ -1,5984 +1,956 @@
-#!perl -T -w
+#!/usr/bin/perl -T -w
 
 use strict;
 use warnings;
 
-use Test::More tests => 5421; #(5*4)*3 + 36 + (36*3 + 21)*2 + 3 + 21;
-use Asm::X86 qw(is_valid_16bit_addr_intel is_valid_32bit_addr_intel
-	is_valid_64bit_addr_intel is_valid_addr_intel);
+use Test::More;
+use Asm::X86 qw(
+	is_valid_16bit_addr_intel
+	is_valid_32bit_addr_intel
+	is_valid_64bit_addr_intel
+	is_valid_addr_intel
+	is_valid_16bit_addr_att
+	is_valid_32bit_addr_att
+	is_valid_64bit_addr_att
+	is_valid_addr_att
+	is_valid_16bit_addr
+	is_valid_32bit_addr
+	is_valid_64bit_addr
+	is_valid_addr
+	);
+
+sub permute3_intel($$$$$$$) {
+
+	my $basereg_sign = shift;
+	my $basereg = shift;
+	my $indexreg_sign = shift;
+	my $indexreg = shift;
+	my $scale = shift;
+	my $disp_sign = shift;
+	my $disp = shift;
+
+	my @result = ();
+
+	$basereg_sign = '+' if not defined $basereg_sign or $basereg_sign eq '';
+	$indexreg_sign = '+' if not defined $indexreg_sign or $indexreg_sign eq '';
+	$disp_sign = '+' if not defined $disp_sign or $disp_sign eq '';
+	if ( ! defined $basereg or $basereg eq '' ) {
+
+		$basereg = undef;
+	}
+	if ( ! defined $indexreg or $indexreg eq '' ) {
+
+		$indexreg = undef;
+	}
+	if ( ! defined $disp or $disp eq '' ) {
+
+		$disp = undef;
+	}
+
+	if ( defined $basereg and defined $indexreg and defined $disp ) {
+
+		if ( defined $scale and $scale ne '' ) {
+
+			push @result, "[$basereg_sign$basereg $indexreg_sign$indexreg * $scale $disp_sign$disp]";
+			push @result, "[$basereg_sign$basereg $indexreg_sign$scale * $indexreg $disp_sign$disp]";
+
+			push @result, "[$basereg_sign$basereg $disp_sign$disp $indexreg_sign$indexreg * $scale]";
+			push @result, "[$basereg_sign$basereg $disp_sign$disp $indexreg_sign$scale * $indexreg]";
+
+			if ( $basereg_sign eq '+' ) {
+				# same thing, just skip the leading sign
+
+				push @result, "[$basereg $indexreg_sign$indexreg * $scale $disp_sign$disp]";
+				push @result, "[$basereg $indexreg_sign$scale * $indexreg $disp_sign$disp]";
+
+				push @result, "[$basereg $disp_sign$disp $indexreg_sign$indexreg * $scale]";
+				push @result, "[$basereg $disp_sign$disp $indexreg_sign$scale * $indexreg]";
+			}
+
+			push @result, "[$indexreg_sign$indexreg * $scale $basereg_sign$basereg $disp_sign$disp]";
+			push @result, "[$indexreg_sign$scale * $indexreg $basereg_sign$basereg $disp_sign$disp]";
+
+			push @result, "[$indexreg_sign$indexreg * $scale $disp_sign$disp $basereg_sign$basereg]";
+			push @result, "[$indexreg_sign$scale * $indexreg $disp_sign$disp $basereg_sign$basereg]";
+
+			if ( $indexreg_sign eq '+' ) {
+
+				push @result, "[$indexreg * $scale $basereg_sign$basereg $disp_sign$disp]";
+				push @result, "[$scale * $indexreg $basereg_sign$basereg $disp_sign$disp]";
+
+				push @result, "[$indexreg * $scale $disp_sign$disp $basereg_sign$basereg]";
+				push @result, "[$scale * $indexreg $disp_sign$disp $basereg_sign$basereg]";
+			}
+
+			push @result, "[$disp_sign$disp $basereg_sign$basereg $indexreg_sign$indexreg * $scale]";
+			push @result, "[$disp_sign$disp $basereg_sign$basereg $indexreg_sign$scale * $indexreg]";
+
+			push @result, "[$disp_sign$disp $indexreg_sign$indexreg * $scale $basereg_sign$basereg]";
+			push @result, "[$disp_sign$disp $indexreg_sign$scale * $indexreg $basereg_sign$basereg]";
+
+			if ( $disp_sign eq '+' ) {
+
+				push @result, "[$disp $basereg_sign$basereg $indexreg_sign$indexreg * $scale]";
+				push @result, "[$disp $basereg_sign$basereg $indexreg_sign$scale * $indexreg]";
+
+				push @result, "[$disp $indexreg_sign$indexreg * $scale $basereg_sign$basereg]";
+				push @result, "[$disp $indexreg_sign$scale * $indexreg $basereg_sign$basereg]";
+			}
+		} else {
+			# no scale given
+			push @result, "[$basereg_sign$basereg $indexreg_sign$indexreg $disp_sign$disp]";
+
+			push @result, "[$basereg_sign$basereg $disp_sign$disp $indexreg_sign$indexreg]";
+
+			if ( $basereg_sign eq '+' ) {
+				# same thing, just skip the leading sign
+
+				push @result, "[$basereg $indexreg_sign$indexreg $disp_sign$disp]";
+
+				push @result, "[$basereg $disp_sign$disp $indexreg_sign$indexreg]";
+			}
+
+			push @result, "[$indexreg_sign$indexreg $basereg_sign$basereg $disp_sign$disp]";
+
+			push @result, "[$indexreg_sign$indexreg $disp_sign$disp $basereg_sign$basereg]";
+
+			if ( $indexreg_sign eq '+' ) {
+
+				push @result, "[$indexreg $basereg_sign$basereg $disp_sign$disp]";
+
+				push @result, "[$indexreg $disp_sign$disp $basereg_sign$basereg]";
+			}
+			push @result, "[$disp_sign$disp $basereg_sign$basereg $indexreg_sign$indexreg]";
+
+			push @result, "[$disp_sign$disp $indexreg_sign$indexreg $basereg_sign$basereg]";
+
+			if ( $disp_sign eq '+' ) {
+
+				push @result, "[$disp $basereg_sign$basereg $indexreg_sign$indexreg]";
+
+				push @result, "[$disp $indexreg_sign$indexreg $basereg_sign$basereg]";
+			}
+		}
+	}
+	elsif ( defined $basereg and defined $indexreg and not defined $disp ) {
+
+		if ( defined $scale and $scale ne '' ) {
+
+			push @result, "[$basereg_sign$basereg $indexreg_sign$indexreg * $scale]";
+			push @result, "[$basereg_sign$basereg $indexreg_sign$scale * $indexreg]";
+
+			if ( $basereg_sign eq '+' ) {
+				# same thing, just skip the leading sign
+
+				push @result, "[$basereg $indexreg_sign$indexreg * $scale]";
+				push @result, "[$basereg $indexreg_sign$scale * $indexreg]";
+			}
+
+			push @result, "[$indexreg_sign$indexreg * $scale $basereg_sign$basereg]";
+			push @result, "[$indexreg_sign$scale * $indexreg $basereg_sign$basereg]";
+
+			if ( $indexreg_sign eq '+' ) {
+
+				push @result, "[$indexreg * $scale $basereg_sign$basereg]";
+				push @result, "[$scale * $indexreg $basereg_sign$basereg]";
+			}
+		} else {
+			# no scale given
+			push @result, "[$basereg_sign$basereg $indexreg_sign$indexreg]";
+
+			if ( $basereg_sign eq '+' ) {
+				# same thing, just skip the leading sign
+
+				push @result, "[$basereg $indexreg_sign$indexreg]";
+			}
+			push @result, "[$indexreg_sign$indexreg $basereg_sign$basereg]";
+
+			if ( $indexreg_sign eq '+' ) {
+				# same thing, just skip the leading sign
+
+				push @result, "[$indexreg $basereg_sign$basereg]";
+			}
+		}
+	}
+	elsif ( defined $basereg and not defined $indexreg and defined $disp ) {
+
+		push @result, "[$basereg_sign$basereg $disp_sign$disp]";
+
+		if ( $basereg_sign eq '+' ) {
+			# same thing, just skip the leading sign
+
+			push @result, "[$basereg $disp_sign$disp]";
+		}
+
+		push @result, "[$disp_sign$disp $basereg_sign$basereg]";
+
+		if ( $disp_sign eq '+' ) {
+
+			push @result, "[$disp $basereg_sign$basereg]";
+		}
+	}
+	elsif ( defined $basereg and not defined $indexreg and not defined $disp ) {
+
+		push @result, "[$basereg_sign$basereg]";
+
+		if ( $basereg_sign eq '+' ) {
+			# same thing, just skip the leading sign
+
+			push @result, "[$basereg]";
+		}
+	}
+	elsif ( not defined $basereg and defined $indexreg and defined $disp ) {
+
+		if ( defined $scale and $scale ne '' ) {
+
+			push @result, "[$indexreg_sign$indexreg * $scale $disp_sign$disp]";
+			push @result, "[$indexreg_sign$scale * $indexreg $disp_sign$disp]";
+
+			if ( $indexreg_sign eq '+' ) {
+				# same thing, just skip the leading sign
+
+				push @result, "[$indexreg * $scale $disp_sign$disp]";
+				push @result, "[$scale * $indexreg $disp_sign$disp]";
+			}
+
+			push @result, "[$disp_sign$disp $indexreg_sign$indexreg * $scale]";
+			push @result, "[$disp_sign$disp $indexreg_sign$scale * $indexreg]";
+
+			if ( $disp_sign eq '+' ) {
+
+				push @result, "[$disp $indexreg_sign$indexreg * $scale]";
+				push @result, "[$disp $indexreg_sign$scale * $indexreg]";
+			}
+		} else {
+			# no scale given
+			push @result, "[$indexreg_sign$indexreg $disp_sign$disp]";
+
+			if ( $indexreg_sign eq '+' ) {
+				# same thing, just skip the leading sign
+
+				push @result, "[$indexreg $disp_sign$disp]";
+			}
+
+			push @result, "[$disp_sign$disp $indexreg_sign$indexreg]";
+
+			if ( $disp_sign eq '+' ) {
+
+				push @result, "[$disp $indexreg_sign$indexreg]";
+			}
+		}
+	}
+	elsif ( not defined $basereg and defined $indexreg and not defined $disp ) {
+
+		if ( defined $scale and $scale ne '' ) {
+
+			push @result, "[$indexreg_sign$indexreg * $scale]";
+			push @result, "[$indexreg_sign$scale * $indexreg]";
+
+			if ( $indexreg_sign eq '+' ) {
+				# same thing, just skip the leading sign
+
+				push @result, "[$indexreg * $scale]";
+				push @result, "[$scale * $indexreg]";
+			}
+		} else {
+			# no scale given
+			push @result, "[$indexreg_sign$indexreg]";
+			if ( $indexreg_sign eq '+' ) {
+				# same thing, just skip the leading sign
+
+				push @result, "[$indexreg]";
+			}
+		}
+	}
+	elsif ( not defined $basereg and not defined $indexreg and defined $disp ) {
+
+		push @result, "[$disp_sign$disp]";
+		if ( $disp_sign eq '+' ) {
+			# same thing, just skip the leading sign
+
+			push @result, "[$disp]";
+		}
+	}
+
+	return @result;
+}
+
+sub permute_intel_segreg($$$$$$$$) {
+
+	my $segreg = shift;
+	my $basereg_sign = shift;
+	my $basereg = shift;
+	my $indexreg_sign = shift;
+	my $indexreg = shift;
+	my $scale = shift;
+	my $disp_sign = shift;
+	my $disp = shift;
+
+	my @result = ();
+
+	if ( defined $segreg and $segreg ne '' ) {
+
+		my @res = permute3_intel ($basereg_sign, $basereg, $indexreg_sign, $indexreg, $scale, $disp_sign, $disp);
+		foreach (@res) {
+
+			push @result, "$segreg:$_";
+			my $repl = $_;
+			$repl =~ s/\[/[$segreg:/;
+			push @result, $repl;
+		}
+
+	} # defined $segreg
+	else {
+		@result = permute3_intel ($basereg_sign, $basereg, $indexreg_sign, $indexreg, $scale, $disp_sign, $disp);
+	}
+
+	return @result;
+}
+
+sub permute_intel($$$$$$$) {
+
+	my $basereg_sign = shift;
+	my $basereg = shift;
+	my $indexreg_sign = shift;
+	my $indexreg = shift;
+	my $scale = shift;
+	my $disp_sign = shift;
+	my $disp = shift;
+
+	my @result = permute_intel_segreg (undef, $basereg_sign, $basereg, $indexreg_sign, $indexreg, $scale, $disp_sign, $disp);
+	push @result, permute_intel_segreg ('ds', $basereg_sign, $basereg, $indexreg_sign, $indexreg, $scale, $disp_sign, $disp);
+
+	return @result;
+}
+
+sub permute_disp_intel($$$$$$) {
+
+	my $basereg_sign = shift;
+	my $basereg = shift;
+	my $indexreg_sign = shift;
+	my $indexreg = shift;
+	my $scale = shift;
+	my $disp = shift;
+
+	my @result = ();
+
+	push @result, permute_intel ($basereg_sign, $basereg, $indexreg_sign, $indexreg, $scale, '', $disp);
+	if ( $disp ne '' ) {
+
+		push @result, permute_intel ($basereg_sign, $basereg, $indexreg_sign, $indexreg, $scale, '-', $disp);
+		push @result, permute_intel ($basereg_sign, $basereg, $indexreg_sign, $indexreg, $scale, '', "-$disp");
+	}
+
+	return @result;
+}
+
+sub permute_disp_intel_all($$$$$$) {
+
+	my $basereg_sign = shift;
+	my $basereg = shift;
+	my $indexreg_sign = shift;
+	my $indexreg = shift;
+	my $scale = shift;
+	my $disp = shift;
+
+	my @result = ();
+
+	push @result, permute_intel ($basereg_sign, $basereg, $indexreg_sign, $indexreg, $scale, '', '');
+	push @result, permute_disp_intel ($basereg_sign, $basereg, $indexreg_sign, $indexreg, $scale, $disp);
+
+	return @result;
+}
+
+sub permute_disp_intel_segreg($$$$$$$) {
+
+	my $segreg = shift;
+	my $basereg_sign = shift;
+	my $basereg = shift;
+	my $indexreg_sign = shift;
+	my $indexreg = shift;
+	my $scale = shift;
+	my $disp = shift;
+
+	my @result = ();
+
+	push @result, permute_intel_segreg ($segreg, $basereg_sign, $basereg, $indexreg_sign, $indexreg, $scale, '', $disp);
+	if ( $disp ne '' ) {
+
+		push @result, permute_intel_segreg ($segreg, $basereg_sign, $basereg, $indexreg_sign, $indexreg, $scale, '-', $disp);
+		push @result, permute_intel_segreg ($segreg, $basereg_sign, $basereg, $indexreg_sign, $indexreg, $scale, '', "-$disp");
+	}
+
+	return @result;
+}
+
+sub permute_disp_intel_segreg_all($$$$$$$) {
+
+	my $segreg = shift;
+	my $basereg_sign = shift;
+	my $basereg = shift;
+	my $indexreg_sign = shift;
+	my $indexreg = shift;
+	my $scale = shift;
+	my $disp = shift;
+
+	my @result = ();
+
+	push @result, permute_intel_segreg ($segreg, $basereg_sign, $basereg, $indexreg_sign, $indexreg, $scale, '', '');
+	push @result, permute_disp_intel_segreg ($segreg, $basereg_sign, $basereg, $indexreg_sign, $indexreg, $scale, $disp);
+
+	return @result;
+}
+
+sub permute_two_reg32_invalid_intel($$$$) {
+
+	my $basereg_sign = shift;
+	my $basereg = shift;
+	my $indexreg_sign = shift;
+	my $indexreg = shift;
+
+	my @result = ();
+
+	push @result, permute_disp_intel ($basereg_sign, $basereg, $indexreg_sign, $indexreg, '', '1');
+	push @result, permute_disp_intel ($basereg_sign, $basereg, $indexreg_sign, $indexreg, '2', '1');
+	push @result, permute_disp_intel ($basereg_sign, $basereg, $indexreg_sign, $indexreg, '2', 'ebx');
+
+	push @result, permute_disp_intel ($basereg_sign, $basereg, $indexreg_sign, $indexreg, 'edx', '1');
+	push @result, permute_disp_intel ($basereg_sign, $basereg, $indexreg_sign, $indexreg, 'edx', 'ebx');
+
+	push @result, permute_disp_intel ($basereg_sign, $basereg, $indexreg_sign, $indexreg, 'ds', '1');
+	push @result, permute_disp_intel ($basereg_sign, $basereg, $indexreg_sign, $indexreg, 'ds', 'ebx');
+
+	return @result;	
+}
+
+sub permute_reg32_invalid_intel($) {
+
+	my $reg = shift;
+	my @result = ();
+
+	push @result, permute_two_reg32_invalid_intel ('', 'eax', '', $reg);
+	push @result, permute_two_reg32_invalid_intel ('-', 'eax', '', $reg);
+	push @result, permute_two_reg32_invalid_intel ('', 'eax', '-', $reg);
+	push @result, permute_two_reg32_invalid_intel ('-', 'eax', '-', $reg);
+
+	push @result, permute_two_reg32_invalid_intel ('', '', '', $reg);
+	push @result, permute_two_reg32_invalid_intel ('', '', '-', $reg);
+	push @result, permute_two_reg32_invalid_intel ('', $reg, '', '');
+	push @result, permute_two_reg32_invalid_intel ('-', $reg, '', '');
+
+	push @result, permute_two_reg32_invalid_intel ('', $reg, '', 'eax');
+	push @result, permute_two_reg32_invalid_intel ('-', $reg, '', 'eax');
+	push @result, permute_two_reg32_invalid_intel ('', $reg, '-', 'eax');
+	push @result, permute_two_reg32_invalid_intel ('-', $reg, '-', 'eax');
+
+	return @result;
+}
+
+sub permute_two_reg64_invalid_intel($$$$) {
+
+	my $basereg_sign = shift;
+	my $basereg = shift;
+	my $indexreg_sign = shift;
+	my $indexreg = shift;
+
+	my @result = ();
+
+	push @result, permute_disp_intel ($basereg_sign, $basereg, $indexreg_sign, $indexreg, '', '1');
+	push @result, permute_disp_intel ($basereg_sign, $basereg, $indexreg_sign, $indexreg, '2', '1');
+	push @result, permute_disp_intel ($basereg_sign, $basereg, $indexreg_sign, $indexreg, '2', 'rbx');
+
+	push @result, permute_disp_intel ($basereg_sign, $basereg, $indexreg_sign, $indexreg, 'rdx', '1');
+	push @result, permute_disp_intel ($basereg_sign, $basereg, $indexreg_sign, $indexreg, 'rdx', 'rbx');
+
+	push @result, permute_disp_intel ($basereg_sign, $basereg, $indexreg_sign, $indexreg, 'ds', '1');
+	push @result, permute_disp_intel ($basereg_sign, $basereg, $indexreg_sign, $indexreg, 'ds', 'rbx');
+
+	return @result;	
+}
+
+sub permute_reg64_invalid_intel($) {
+
+	my $reg = shift;
+	my @result = ();
+
+	push @result, permute_two_reg64_invalid_intel ('', 'rax', '', $reg);
+	push @result, permute_two_reg64_invalid_intel ('-', 'rax', '', $reg);
+	push @result, permute_two_reg64_invalid_intel ('', 'rax', '-', $reg);
+	push @result, permute_two_reg64_invalid_intel ('-', 'rax', '-', $reg);
+
+	push @result, permute_two_reg64_invalid_intel ('', '', '', $reg);
+	push @result, permute_two_reg64_invalid_intel ('', '', '-', $reg);
+	push @result, permute_two_reg64_invalid_intel ('', $reg, '', '');
+	push @result, permute_two_reg64_invalid_intel ('-', $reg, '', '');
+
+	push @result, permute_two_reg64_invalid_intel ('', $reg, '', 'rax');
+	push @result, permute_two_reg64_invalid_intel ('-', $reg, '', 'rax');
+	push @result, permute_two_reg64_invalid_intel ('', $reg, '-', 'rax');
+	push @result, permute_two_reg64_invalid_intel ('-', $reg, '-', 'rax');
+
+	return @result;
+}
+
+sub permute_sign_disp_intel_all($$$$) {
+
+	my $basereg = shift;
+	my $indexreg = shift;
+	my $scale = shift;
+	my $disp = shift;
+
+	my @result = permute_disp_intel_all ('', $basereg, '', $indexreg, $scale, $disp);
+	push @result, permute_disp_intel_all ('', $basereg, '-', $indexreg, $scale, $disp);
+	push @result, permute_disp_intel_all ('-', $basereg, '', $indexreg, $scale, $disp);
+	push @result, permute_disp_intel_all ('-', $basereg, '-', $indexreg, $scale, $disp);
+
+	return @result;
+}
+
+sub permute_sign_disp_intel_segreg_all($$$$$) {
+
+	my $segreg = shift;
+	my $basereg = shift;
+	my $indexreg = shift;
+	my $scale = shift;
+	my $disp = shift;
+
+	my @result = permute_disp_intel_segreg_all ($segreg, '', $basereg, '', $indexreg, $scale, $disp);
+	push @result, permute_disp_intel_segreg_all ($segreg, '', $basereg, '-', $indexreg, $scale, $disp);
+	push @result, permute_disp_intel_segreg_all ($segreg, '-', $basereg, '', $indexreg, $scale, $disp);
+	push @result, permute_disp_intel_segreg_all ($segreg, '-', $basereg, '-', $indexreg, $scale, $disp);
+
+	return @result;
+}
 
 # ----------- 16-bit
 
-is ( is_valid_16bit_addr_intel ("[bX]"), 1, "[bx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[sI]"), 1, "[si] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[Di]"), 1, "[di] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[Bp]"), 1, "[bp] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[1]"), 1, "[1] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[-bX]"), 0, "[-bx] is a valid 16-bit addressing scheme" );
-
-is ( is_valid_16bit_addr_intel ("[bx+bx]"), 0, "[bx+bx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[bx+Si]"), 1, "[bx+si] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[bX+di]"), 1, "[bx+di] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[bx+bp]"), 0, "[bx+bp] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[-bX+di]"), 0, "[-bx+di] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[bX-di]"), 0, "[bx-di] is a valid 16-bit addressing scheme" );
-
-is ( is_valid_16bit_addr_intel ("[sI+bx]"), 1, "[si+bx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[si+si]"), 0, "[si+si] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[si+dI]"), 0, "[si+dI] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[si+bP]"), 1, "[si+bp] is a valid 16-bit addressing scheme" );
-
-is ( is_valid_16bit_addr_intel ("[di+Bx]"), 1, "[di+bx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[di+Si]"), 0, "[di+Si] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[di+di]"), 0, "[di+di] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[Di+bp]"), 1, "[di+bp] is a valid 16-bit addressing scheme" );
-
-is ( is_valid_16bit_addr_intel ("[bp+bX]"), 0, "[bp+bX] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[bP+si]"), 1, "[bp+si] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[bp+Di]"), 1, "[bp+di] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[bp+bP]"), 0, "[bp+bP] is a valid 16-bit addressing scheme" );
-
-# -----------
-
-is ( is_valid_16bit_addr_intel ("[bX+1]"), 1, "[bx+1] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[sI+1]"), 1, "[si+1] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[Di+1]"), 1, "[di+1] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[Bp+1]"), 1, "[bp+1] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[1+3]"), 1, "[1+3] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[-bX+1]"), 0, "[-bx+1] is a valid 16-bit addressing scheme" );
-
-is ( is_valid_16bit_addr_intel ("[bx+bx+1]"), 0, "[bx+bx+1] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[bx+Si+1]"), 1, "[bx+si+1] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[bX+di+1]"), 1, "[bx+di+1] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[bx+bp+1]"), 0, "[bx+bp+1] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[-bX+di+1]"), 0, "[-bx+di+1] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[bX-di+1]"), 0, "[bx-di+1] is a valid 16-bit addressing scheme" );
-
-is ( is_valid_16bit_addr_intel ("[bx+3+1]"), 1, "[bx+3+1] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[3+bp+1]"), 1, "[3+bp+1] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[3+2+1]"), 1, "[3+2+1] is a valid 16-bit addressing scheme" );
-
-is ( is_valid_16bit_addr_intel ("[sI+bx+1]"), 1, "[si+bx+1] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[si+si+1]"), 0, "[si+si+1] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[si+dI+1]"), 0, "[si+dI+1] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[si+bP+1]"), 1, "[si+bp+1] is a valid 16-bit addressing scheme" );
-
-is ( is_valid_16bit_addr_intel ("[di+Bx+1]"), 1, "[di+bx+1] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[di+Si+1]"), 0, "[di+Si+1] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[di+di+1]"), 0, "[di+di+1] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[Di+bp+1]"), 1, "[di+bp+1] is a valid 16-bit addressing scheme" );
-
-is ( is_valid_16bit_addr_intel ("[bp+bX+1]"), 0, "[bp+bX+1] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[bP+si+1]"), 1, "[bp+s+1i] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[bp+Di+1]"), 1, "[bp+di+1] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[bp+bP+1]"), 0, "[bp+bP+1] is a valid 16-bit addressing scheme" );
-
-is ( is_valid_16bit_addr_intel ("[bx+1+bx]"), 0, "[bx+1+bx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[bx+1+Si]"), 1, "[bx+1+si] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[bX+1+di]"), 1, "[bx+1+di] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[bx+1+bp]"), 0, "[bx+1+bp] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[bX+1-di]"), 0, "[bx+1-di] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[-bX+1+di]"), 0, "[-bx+1+di] is a valid 16-bit addressing scheme" );
-
-is ( is_valid_16bit_addr_intel ("[sI+1+bx]"), 1, "[si+1+bx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[si+1+si]"), 0, "[si+1+si] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[si+1+dI]"), 0, "[si+1+dI] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[si+1+bP]"), 1, "[si+1+bp] is a valid 16-bit addressing scheme" );
-
-is ( is_valid_16bit_addr_intel ("[di+1+Bx]"), 1, "[di+1+bx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[di+1+Si]"), 0, "[di+1+Si] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[di+1+di]"), 0, "[di+1+di] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[Di+1+bp]"), 1, "[di+1+bp] is a valid 16-bit addressing scheme" );
-
-is ( is_valid_16bit_addr_intel ("[bp+1+bX]"), 0, "[bp+1+bX] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[bP+1+si]"), 1, "[bp+1+si] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[bp+1+Di]"), 1, "[bp+1+di] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[bp+1+bP]"), 0, "[bp+1+bP] is a valid 16-bit addressing scheme" );
-
-is ( is_valid_16bit_addr_intel ("[1+bx+bx]"), 0, "[1+bx+bx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[1+bx+Si]"), 1, "[1+bx+si] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[1+bX+di]"), 1, "[1+bx+di] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[1+bx+bp]"), 0, "[1+bx+bp] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[1+bx-Si]"), 0, "[1+bx-si] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[1-bx+Si]"), 0, "[1-bx+si] is a valid 16-bit addressing scheme" );
-
-is ( is_valid_16bit_addr_intel ("[1+sI+bx]"), 1, "[1+si+bx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[1+si+si]"), 0, "[1+si+si] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[1+si+dI]"), 0, "[1+si+dI] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[1+si+bP]"), 1, "[1+si+bp] is a valid 16-bit addressing scheme" );
-
-is ( is_valid_16bit_addr_intel ("[1+di+Bx]"), 1, "[1+di+bx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[1+di+Si]"), 0, "[1+di+Si] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[1+di+di]"), 0, "[1+di+di] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[1+Di+bp]"), 1, "[1+di+bp] is a valid 16-bit addressing scheme" );
-
-is ( is_valid_16bit_addr_intel ("[1+bp+bX]"), 0, "[1+bp+bX] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[1+bP+si]"), 1, "[1+bp+si] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[1+bp+Di]"), 1, "[1+bp+di] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[1+bp+bP]"), 0, "[1+bp+bP] is a valid 16-bit addressing scheme" );
-
-is ( is_valid_16bit_addr_intel ("[bX+cx]"), 0, "[bx+cx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[sI+cx]"), 0, "[si+cx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[Di+cx]"), 0, "[di+cx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[Bp+cx]"), 0, "[bp+cx] is a valid 16-bit addressing scheme" );
-
-is ( is_valid_16bit_addr_intel ("[bx+bx+cx]"), 0, "[bx+bx+cx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[bx+Si+cx]"), 0, "[bx+si+cx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[bX+di+cx]"), 0, "[bx+di+cx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[bx+bp+cx]"), 0, "[bx+bp+cx] is a valid 16-bit addressing scheme" );
-
-is ( is_valid_16bit_addr_intel ("[sI+bx+cx]"), 0, "[si+bx+cx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[si+si+cx]"), 0, "[si+si+cx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[si+dI+cx]"), 0, "[si+dI+cx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[si+bP+cx]"), 0, "[si+bp+cx] is a valid 16-bit addressing scheme" );
-
-is ( is_valid_16bit_addr_intel ("[di+Bx+cx]"), 0, "[di+bx+cx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[di+Si+cx]"), 0, "[di+Si+cx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[di+di+cx]"), 0, "[di+di+cx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[Di+bp+cx]"), 0, "[di+bp+cx] is a valid 16-bit addressing scheme" );
-
-is ( is_valid_16bit_addr_intel ("[bp+bX+cx]"), 0, "[bp+bX+cx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[bP+si+cx]"), 0, "[bp+s+cxi] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[bp+Di+cx]"), 0, "[bp+di+cx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[bp+bP+cx]"), 0, "[bp+bP+cx] is a valid 16-bit addressing scheme" );
-
-is ( is_valid_16bit_addr_intel ("[bx+cx+bx]"), 0, "[bx+cx+bx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[bx+cx+Si]"), 0, "[bx+cx+si] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[bX+cx+di]"), 0, "[bx+cx+di] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[bx+cx+bp]"), 0, "[bx+cx+bp] is a valid 16-bit addressing scheme" );
-
-is ( is_valid_16bit_addr_intel ("[sI+cx+bx]"), 0, "[si+cx+bx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[si+cx+si]"), 0, "[si+cx+si] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[si+cx+dI]"), 0, "[si+cx+dI] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[si+cx+bP]"), 0, "[si+cx+bp] is a valid 16-bit addressing scheme" );
-
-is ( is_valid_16bit_addr_intel ("[di+cx+Bx]"), 0, "[di+cx+bx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[di+cx+Si]"), 0, "[di+cx+Si] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[di+cx+di]"), 0, "[di+cx+di] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[Di+cx+bp]"), 0, "[di+cx+bp] is a valid 16-bit addressing scheme" );
-
-is ( is_valid_16bit_addr_intel ("[bp+cx+bX]"), 0, "[bp+cx+bX] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[bP+cx+si]"), 0, "[bp+cx+si] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[bp+cx+Di]"), 0, "[bp+cx+di] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[bp+cx+bP]"), 0, "[bp+cx+bP] is a valid 16-bit addressing scheme" );
-
-is ( is_valid_16bit_addr_intel ("[cx+bx+bx]"), 0, "[cx+bx+bx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[cx+bx+Si]"), 0, "[cx+bx+si] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[cx+bX+di]"), 0, "[cx+bx+di] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[cx+bx+bp]"), 0, "[cx+bx+bp] is a valid 16-bit addressing scheme" );
-
-is ( is_valid_16bit_addr_intel ("[cx+sI+bx]"), 0, "[cx+si+bx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[cx+si+si]"), 0, "[cx+si+si] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[cx+si+dI]"), 0, "[cx+si+dI] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[cx+si+bP]"), 0, "[cx+si+bp] is a valid 16-bit addressing scheme" );
-
-is ( is_valid_16bit_addr_intel ("[cx+di+Bx]"), 0, "[cx+di+bx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[cx+di+Si]"), 0, "[cx+di+Si] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[cx+di+di]"), 0, "[cx+di+di] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[cx+Di+bp]"), 0, "[cx+di+bp] is a valid 16-bit addressing scheme" );
-
-is ( is_valid_16bit_addr_intel ("[cx+bp+bX]"), 0, "[cx+bp+bX] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[cx+bP+si]"), 0, "[cx+bp+si] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[cx+bp+Di]"), 0, "[cx+bp+di] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[cx+bp+bP]"), 0, "[cx+bp+bP] is a valid 16-bit addressing scheme" );
-
-is ( is_valid_16bit_addr_intel ("[cx+bX]"), 0, "[cx+bx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[cx+sI]"), 0, "[cx+si] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[cx+Di]"), 0, "[cx+di] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[cx+Bp]"), 0, "[cx+bp] is a valid 16-bit addressing scheme" );
-
-is ( is_valid_16bit_addr_intel ("[cx+bx+1]"), 0, "[cx+bx+1] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[cx+Si+1]"), 0, "[cx+si+1] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[cX+di+1]"), 0, "[cx+di+1] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[cx+bp+1]"), 0, "[cx+bp+1] is a valid 16-bit addressing scheme" );
-
-# -----------
-
-is ( is_valid_16bit_addr_intel ("cs:[bx]"), 1, "cs:[bx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("cs:[si]"), 1, "cs:[si] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("cs:[di]"), 1, "cs:[di] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("cs:[bp]"), 1, "cs:[bp] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("cs:[1]"), 1, "cs:[1] is a valid 16-bit addressing scheme" );
-
-is ( is_valid_16bit_addr_intel ("ds:[bx+bx]"), 0, "ds:[bx+bx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("ds:[bx+si]"), 1, "ds:[bx+si] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("ds:[bx+di]"), 1, "ds:[bx+di] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("ds:[bx+bp]"), 0, "ds:[bx+bp] is a valid 16-bit addressing scheme" );
-
-is ( is_valid_16bit_addr_intel ("es:[si+bx]"), 1, "es:[si+bx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("es:[si+si]"), 0, "es:[si+si] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("es:[si+dI]"), 0, "es:[si+dI] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("es:[si+bp]"), 1, "es:[si+bp] is a valid 16-bit addressing scheme" );
-
-is ( is_valid_16bit_addr_intel ("fs:[di+bx]"), 1, "fs:[di+bx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("fs:[di+Si]"), 0, "fs:[di+Si] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("gs:[di+di]"), 0, "gs:[di+di] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("gs:[di+bp]"), 1, "gs:[di+bp] is a valid 16-bit addressing scheme" );
-
-is ( is_valid_16bit_addr_intel ("ss:[bp+bX]"), 0, "ss:[bp+bX] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("ss:[bp+si]"), 1, "ss:[bp+si] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("ss:[bp+di]"), 1, "ss:[bp+di] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("ss:[bp+bP]"), 0, "ss:[bp+bP] is a valid 16-bit addressing scheme" );
-
-# -----------
-
-is ( is_valid_16bit_addr_intel ("cs:[bx+1]"), 1, "cs:[bx+1] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("cs:[si+1]"), 1, "cs:[si+1] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("cs:[di+1]"), 1, "cs:[di+1] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("cs:[bp+1]"), 1, "cs:[bp+1] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("cs:[1+3]"), 1, "cs:[1+3] is a valid 16-bit addressing scheme" );
-
-is ( is_valid_16bit_addr_intel ("ds:[bx+bx+1]"), 0, "ds:[bx+bx+1] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("ds:[bx+si+1]"), 1, "ds:[bx+si+1] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("ds:[bx+di+1]"), 1, "ds:[bx+di+1] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("ds:[bx+bp+1]"), 0, "ds:[bx+bp+1] is a valid 16-bit addressing scheme" );
-
-is ( is_valid_16bit_addr_intel ("ds:[bx+3+1]"), 1, "ds:[bx+3+1] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("ds:[3+bp+1]"), 1, "ds:[3+bp+1] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("ds:[3+2+1]"), 1, "ds:[3+2+1] is a valid 16-bit addressing scheme" );
-
-is ( is_valid_16bit_addr_intel ("es:[si+bx+1]"), 1, "es:[si+bx+1] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("es:[si+si+1]"), 0, "es:[si+si+1] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("es:[si+dI+1]"), 0, "es:[si+dI+1] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("es:[si+bp+1]"), 1, "es:[si+bp+1] is a valid 16-bit addressing scheme" );
-
-is ( is_valid_16bit_addr_intel ("fs:[di+bx+1]"), 1, "fs:[di+bx+1] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("fs:[di+Si+1]"), 0, "fs:[di+Si+1] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("gs:[di+di+1]"), 0, "gs:[di+di+1] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("gs:[di+bp+1]"), 1, "gs:[di+bp+1] is a valid 16-bit addressing scheme" );
-
-is ( is_valid_16bit_addr_intel ("ss:[bp+bX+1]"), 0, "ss:[bp+bX+1] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("ss:[bp+si+1]"), 1, "ss:[bp+si+1] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("ss:[bp+di+1]"), 1, "ss:[bp+di+1] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("ss:[bp+bP+1]"), 0, "ss:[bp+bP+1] is a valid 16-bit addressing scheme" );
-
-is ( is_valid_16bit_addr_intel ("ds:[bx+1+bx]"), 0, "ds:[bx+1+bx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("ds:[bx+1+si]"), 1, "ds:[bx+1+si] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("ds:[bx+1+di]"), 1, "ds:[bx+1+di] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("ds:[bx+1+bp]"), 0, "ds:[bx+1+bp] is a valid 16-bit addressing scheme" );
-
-is ( is_valid_16bit_addr_intel ("es:[si+1+bx]"), 1, "es:[si+1+bx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("es:[si+1+si]"), 0, "es:[si+1+si] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("es:[si+1+dI]"), 0, "es:[si+1+dI] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("es:[si+1+bp]"), 1, "es:[si+1+bp] is a valid 16-bit addressing scheme" );
-
-is ( is_valid_16bit_addr_intel ("fs:[di+1+bx]"), 1, "fs:[di+1+bx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("fs:[di+1+Si]"), 0, "fs:[di+1+Si] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("gs:[di+1+di]"), 0, "gs:[di+1+di] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("gs:[di+1+bp]"), 1, "gs:[di+1+bp] is a valid 16-bit addressing scheme" );
-
-is ( is_valid_16bit_addr_intel ("ss:[bp+1+bX]"), 0, "ss:[bp+1+bX] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("ss:[bp+1+si]"), 1, "ss:[bp+1+si] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("ss:[bp+1+di]"), 1, "ss:[bp+1+di] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("ss:[bp+1+bP]"), 0, "ss:[bp+1+bP] is a valid 16-bit addressing scheme" );
-
-is ( is_valid_16bit_addr_intel ("ds:[1+bx+bx]"), 0, "ds:[1+bx+bx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("ds:[1+bx+si]"), 1, "ds:[1+bx+si] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("ds:[1+bx+di]"), 1, "ds:[1+bx+di] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("ds:[1+bx+bp]"), 0, "ds:[1+bx+bp] is a valid 16-bit addressing scheme" );
-
-is ( is_valid_16bit_addr_intel ("es:[1+si+bx]"), 1, "es:[1+si+bx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("es:[1+si+si]"), 0, "es:[1+si+si] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("es:[1+si+dI]"), 0, "es:[1+si+dI] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("es:[1+si+bp]"), 1, "es:[1+si+bp] is a valid 16-bit addressing scheme" );
-
-is ( is_valid_16bit_addr_intel ("fs:[1+di+bx]"), 1, "fs:[1+di+bx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("fs:[1+di+Si]"), 0, "fs:[1+di+Si] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("gs:[1+di+di]"), 0, "gs:[1+di+di] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("gs:[1+di+bp]"), 1, "gs:[1+di+bp] is a valid 16-bit addressing scheme" );
-
-is ( is_valid_16bit_addr_intel ("ss:[1+bp+bX]"), 0, "ss:[1+bp+bX] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("ss:[1+bp+si]"), 1, "ss:[1+bp+si] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("ss:[1+bp+di]"), 1, "ss:[1+bp+di] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("ss:[1+bp+bP]"), 0, "ss:[1+bp+bP] is a valid 16-bit addressing scheme" );
-
-is ( is_valid_16bit_addr_intel ("ds:[bX+cx]"), 0, "ds:[bx+cx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("ds:[sI+cx]"), 0, "ds:[si+cx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("ds:[Di+cx]"), 0, "ds:[di+cx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("ds:[Bp+cx]"), 0, "ds:[bp+cx] is a valid 16-bit addressing scheme" );
-
-is ( is_valid_16bit_addr_intel ("ds:[bx+bx+cx]"), 0, "ds:[bx+bx+cx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("ds:[bx+Si+cx]"), 0, "ds:[bx+si+cx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("ds:[bX+di+cx]"), 0, "ds:[bx+di+cx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("ds:[bx+bp+cx]"), 0, "ds:[bx+bp+cx] is a valid 16-bit addressing scheme" );
-
-is ( is_valid_16bit_addr_intel ("ds:[sI+bx+cx]"), 0, "ds:[si+bx+cx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("ds:[si+si+cx]"), 0, "ds:[si+si+cx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("ds:[si+dI+cx]"), 0, "ds:[si+dI+cx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("ds:[si+bP+cx]"), 0, "ds:[si+bp+cx] is a valid 16-bit addressing scheme" );
-
-is ( is_valid_16bit_addr_intel ("ds:[di+Bx+cx]"), 0, "ds:[di+bx+cx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("ds:[di+Si+cx]"), 0, "ds:[di+Si+cx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("ds:[di+di+cx]"), 0, "ds:[di+di+cx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("ds:[Di+bp+cx]"), 0, "ds:[di+bp+cx] is a valid 16-bit addressing scheme" );
-
-is ( is_valid_16bit_addr_intel ("ds:[bp+bX+cx]"), 0, "ds:[bp+bX+cx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("ds:[bP+si+cx]"), 0, "ds:[bp+s+cxi] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("ds:[bp+Di+cx]"), 0, "ds:[bp+di+cx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("ds:[bp+bP+cx]"), 0, "ds:[bp+bP+cx] is a valid 16-bit addressing scheme" );
-
-is ( is_valid_16bit_addr_intel ("ds:[bx+cx+bx]"), 0, "ds:[bx+cx+bx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("ds:[bx+cx+Si]"), 0, "ds:[bx+cx+si] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("ds:[bX+cx+di]"), 0, "ds:[bx+cx+di] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("ds:[bx+cx+bp]"), 0, "ds:[bx+cx+bp] is a valid 16-bit addressing scheme" );
-
-is ( is_valid_16bit_addr_intel ("ds:[sI+cx+bx]"), 0, "ds:[si+cx+bx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("ds:[si+cx+si]"), 0, "ds:[si+cx+si] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("ds:[si+cx+dI]"), 0, "ds:[si+cx+dI] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("ds:[si+cx+bP]"), 0, "ds:[si+cx+bp] is a valid 16-bit addressing scheme" );
-
-is ( is_valid_16bit_addr_intel ("ds:[di+cx+Bx]"), 0, "ds:[di+cx+bx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("ds:[di+cx+Si]"), 0, "ds:[di+cx+Si] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("ds:[di+cx+di]"), 0, "ds:[di+cx+di] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("ds:[Di+cx+bp]"), 0, "ds:[di+cx+bp] is a valid 16-bit addressing scheme" );
-
-is ( is_valid_16bit_addr_intel ("ds:[bp+cx+bX]"), 0, "ds:[bp+cx+bX] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("ds:[bP+cx+si]"), 0, "ds:[bp+cx+si] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("ds:[bp+cx+Di]"), 0, "ds:[bp+cx+di] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("ds:[bp+cx+bP]"), 0, "ds:[bp+cx+bP] is a valid 16-bit addressing scheme" );
-
-is ( is_valid_16bit_addr_intel ("ds:[cx+bx+bx]"), 0, "ds:[cx+bx+bx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("ds:[cx+bx+Si]"), 0, "ds:[cx+bx+si] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("ds:[cx+bX+di]"), 0, "ds:[cx+bx+di] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("ds:[cx+bx+bp]"), 0, "ds:[cx+bx+bp] is a valid 16-bit addressing scheme" );
-
-is ( is_valid_16bit_addr_intel ("ds:[cx+sI+bx]"), 0, "ds:[cx+si+bx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("ds:[cx+si+si]"), 0, "ds:[cx+si+si] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("ds:[cx+si+dI]"), 0, "ds:[cx+si+dI] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("ds:[cx+si+bP]"), 0, "ds:[cx+si+bp] is a valid 16-bit addressing scheme" );
-
-is ( is_valid_16bit_addr_intel ("ds:[cx+di+Bx]"), 0, "ds:[cx+di+bx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("ds:[cx+di+Si]"), 0, "ds:[cx+di+Si] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("ds:[cx+di+di]"), 0, "ds:[cx+di+di] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("ds:[cx+Di+bp]"), 0, "ds:[cx+di+bp] is a valid 16-bit addressing scheme" );
-
-is ( is_valid_16bit_addr_intel ("ds:[cx+bp+bX]"), 0, "ds:[cx+bp+bX] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("ds:[cx+bP+si]"), 0, "ds:[cx+bp+si] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("ds:[cx+bp+Di]"), 0, "ds:[cx+bp+di] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("ds:[cx+bp+bP]"), 0, "ds:[cx+bp+bP] is a valid 16-bit addressing scheme" );
-
-is ( is_valid_16bit_addr_intel ("es:[cx+bX]"), 0, "es:[cx+bx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("es:[cx+sI]"), 0, "es:[cx+si] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("es:[cx+Di]"), 0, "es:[cx+di] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("es:[cx+Bp]"), 0, "es:[cx+bp] is a valid 16-bit addressing scheme" );
-
-is ( is_valid_16bit_addr_intel ("es:[cx+bx+1]"), 0, "es:[cx+bx+1] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("es:[cx+Si+1]"), 0, "es:[cx+si+1] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("es:[cX+di+1]"), 0, "es:[cx+di+1] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("es:[cx+bp+1]"), 0, "es:[cx+bp+1] is a valid 16-bit addressing scheme" );
-
-# -----------
-
-is ( is_valid_16bit_addr_intel ("[cs:bx]"), 1, "[cs:bx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[cs:si]"), 1, "[cs:si] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[cs:di]"), 1, "[cs:di] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[cs:bp]"), 1, "[cs:bp] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[cs:1]"), 1, "[cs:1] is a valid 16-bit addressing scheme" );
-
-is ( is_valid_16bit_addr_intel ("[ds:bx+bx]"), 0, "[ds:bx+bx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[ds:bx+si]"), 1, "[ds:bx+si] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[ds:bx+di]"), 1, "[ds:bx+di] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[ds:bx+bp]"), 0, "[ds:bx+bp] is a valid 16-bit addressing scheme" );
-
-is ( is_valid_16bit_addr_intel ("[es:si+bx]"), 1, "[es:si+bx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[es:si+si]"), 0, "[es:si+si] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[es:si+dI]"), 0, "[es:si+dI] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[es:si+bp]"), 1, "[es:si+bp] is a valid 16-bit addressing scheme" );
-
-is ( is_valid_16bit_addr_intel ("[fs:di+bx]"), 1, "[fs:di+bx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[fs:di+Si]"), 0, "[fs:di+Si] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[gs:di+di]"), 0, "[gs:di+di] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[gs:di+bp]"), 1, "[gs:di+bp] is a valid 16-bit addressing scheme" );
-
-is ( is_valid_16bit_addr_intel ("[ss:bp+bX]"), 0, "[ss:bp+bX] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[ss:bp+si]"), 1, "[ss:bp+si] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[ss:bp+di]"), 1, "[ss:bp+di] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[ss:bp+bP]"), 0, "[ss:bp+bP] is a valid 16-bit addressing scheme" );
-
-# -----------
-
-is ( is_valid_16bit_addr_intel ("[cs:bx+1]"), 1, "[cs:bx+1] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[cs:si+1]"), 1, "[cs:si+1] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[cs:di+1]"), 1, "[cs:di+1] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[cs:bp+1]"), 1, "[cs:bp+1] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[cs:1+3]"), 1, "[cs:1+3] is a valid 16-bit addressing scheme" );
-
-is ( is_valid_16bit_addr_intel ("[ds:bx+bx+1]"), 0, "[ds:bx+bx+1] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[ds:bx+si+1]"), 1, "[ds:bx+si+1] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[ds:bx+di+1]"), 1, "[ds:bx+di+1] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[ds:bx+bp+1]"), 0, "[ds:bx+bp+1] is a valid 16-bit addressing scheme" );
-
-is ( is_valid_16bit_addr_intel ("[ds:bx+3+1]"), 1, "[ds:bx+3+1] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[ds:3+bp+1]"), 1, "[ds:3+bp+1] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[ds:3+2+1]"), 1, "[ds:3+2+1] is a valid 16-bit addressing scheme" );
-
-is ( is_valid_16bit_addr_intel ("[es:si+bx+1]"), 1, "[es:si+bx+1] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[es:si+si+1]"), 0, "[es:si+si+1] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[es:si+dI+1]"), 0, "[es:si+dI+1] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[es:si+bp+1]"), 1, "[es:si+bp+1] is a valid 16-bit addressing scheme" );
-
-is ( is_valid_16bit_addr_intel ("[fs:di+bx+1]"), 1, "[fs:di+bx+1] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[fs:di+Si+1]"), 0, "[fs:di+Si+1] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[gs:di+di+1]"), 0, "[gs:di+di+1] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[gs:di+bp+1]"), 1, "[gs:di+bp+1] is a valid 16-bit addressing scheme" );
-
-is ( is_valid_16bit_addr_intel ("[ss:bp+bX+1]"), 0, "[ss:bp+bX+1] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[ss:bp+si+1]"), 1, "[ss:bp+si+1] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[ss:bp+di+1]"), 1, "[ss:bp+di+1] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[ss:bp+bP+1]"), 0, "[ss:bp+bP+1] is a valid 16-bit addressing scheme" );
-
-is ( is_valid_16bit_addr_intel ("[ds:bx+1+bx]"), 0, "[ds:bx+1+bx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[ds:bx+1+si]"), 1, "[ds:bx+1+si] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[ds:bx+1+di]"), 1, "[ds:bx+1+di] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[ds:bx+1+bp]"), 0, "[ds:bx+1+bp] is a valid 16-bit addressing scheme" );
-
-is ( is_valid_16bit_addr_intel ("[es:si+1+bx]"), 1, "[es:si+1+bx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[es:si+1+si]"), 0, "[es:si+1+si] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[es:si+1+dI]"), 0, "[es:si+1+dI] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[es:si+1+bp]"), 1, "[es:si+1+bp] is a valid 16-bit addressing scheme" );
-
-is ( is_valid_16bit_addr_intel ("[fs:di+1+bx]"), 1, "[fs:di+1+bx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[fs:di+1+Si]"), 0, "[fs:di+1+Si] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[gs:di+1+di]"), 0, "[gs:di+1+di] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[gs:di+1+bp]"), 1, "[gs:d+1i+bp] is a valid 16-bit addressing scheme" );
-
-is ( is_valid_16bit_addr_intel ("[ss:bp+1+bX]"), 0, "[ss:bp+1+bX] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[ss:bp+1+si]"), 1, "[ss:bp+1+si] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[ss:bp+1+di]"), 1, "[ss:bp+1+di] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[ss:bp+1+bP]"), 0, "[ss:bp+1+bP] is a valid 16-bit addressing scheme" );
-
-is ( is_valid_16bit_addr_intel ("[ds:1+bx+bx]"), 0, "[ds:1+bx+bx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[ds:1+bx+si]"), 1, "[ds:1+bx+si] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[ds:1+bx+di]"), 1, "[ds:1+bx+di] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[ds:1+bx+bp]"), 0, "[ds:1+bx+bp] is a valid 16-bit addressing scheme" );
-
-is ( is_valid_16bit_addr_intel ("[es:1+si+bx]"), 1, "[es:1+si+bx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[es:1+si+si]"), 0, "[es:1+si+si] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[es:1+si+dI]"), 0, "[es:1+si+dI] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[es:1+si+bp]"), 1, "[es:1+si+bp] is a valid 16-bit addressing scheme" );
-
-is ( is_valid_16bit_addr_intel ("[fs:1+di+bx]"), 1, "[fs:1+di+bx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[fs:1+di+Si]"), 0, "[fs:1+di+Si] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[gs:1+di+di]"), 0, "[gs:1+di+di] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[gs:1+di+bp]"), 1, "[gs:1+di+bp] is a valid 16-bit addressing scheme" );
-
-is ( is_valid_16bit_addr_intel ("[ss:1+bp+bX]"), 0, "[ss:1+bp+bX] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[ss:1+bp+si]"), 1, "[ss:1+bp+si] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[ss:1+bp+di]"), 1, "[ss:1+bp+di] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[ss:1+bp+bP]"), 0, "[ss:1+bp+bP] is a valid 16-bit addressing scheme" );
-
-is ( is_valid_16bit_addr_intel ("[ds:bX+cx]"), 0, "[ds:bx+cx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[ds:sI+cx]"), 0, "[ds:si+cx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[ds:Di+cx]"), 0, "[ds:di+cx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[ds:Bp+cx]"), 0, "[ds:bp+cx] is a valid 16-bit addressing scheme" );
-
-is ( is_valid_16bit_addr_intel ("[ds:bx+bx+cx]"), 0, "[ds:bx+bx+cx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[ds:bx+Si+cx]"), 0, "[ds:bx+si+cx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[ds:bX+di+cx]"), 0, "[ds:bx+di+cx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[ds:bx+bp+cx]"), 0, "[ds:bx+bp+cx] is a valid 16-bit addressing scheme" );
-
-is ( is_valid_16bit_addr_intel ("[ds:sI+bx+cx]"), 0, "[ds:si+bx+cx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[ds:si+si+cx]"), 0, "[ds:si+si+cx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[ds:si+dI+cx]"), 0, "[ds:si+dI+cx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[ds:si+bP+cx]"), 0, "[ds:si+bp+cx] is a valid 16-bit addressing scheme" );
-
-is ( is_valid_16bit_addr_intel ("[ds:di+Bx+cx]"), 0, "[ds:di+bx+cx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[ds:di+Si+cx]"), 0, "[ds:di+Si+cx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[ds:di+di+cx]"), 0, "[ds:di+di+cx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[ds:Di+bp+cx]"), 0, "[ds:di+bp+cx] is a valid 16-bit addressing scheme" );
-
-is ( is_valid_16bit_addr_intel ("[ds:bp+bX+cx]"), 0, "[ds:bp+bX+cx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[ds:bP+si+cx]"), 0, "[ds:bp+s+cxi] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[ds:bp+Di+cx]"), 0, "[ds:bp+di+cx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[ds:bp+bP+cx]"), 0, "[ds:bp+bP+cx] is a valid 16-bit addressing scheme" );
-
-is ( is_valid_16bit_addr_intel ("[ds:bx+cx+bx]"), 0, "[ds:bx+cx+bx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[ds:bx+cx+Si]"), 0, "[ds:bx+cx+si] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[ds:bX+cx+di]"), 0, "[ds:bx+cx+di] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[ds:bx+cx+bp]"), 0, "[ds:bx+cx+bp] is a valid 16-bit addressing scheme" );
-
-is ( is_valid_16bit_addr_intel ("[ds:sI+cx+bx]"), 0, "[ds:si+cx+bx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[ds:si+cx+si]"), 0, "[ds:si+cx+si] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[ds:si+cx+dI]"), 0, "[ds:si+cx+dI] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[ds:si+cx+bP]"), 0, "[ds:si+cx+bp] is a valid 16-bit addressing scheme" );
-
-is ( is_valid_16bit_addr_intel ("[ds:di+cx+Bx]"), 0, "[ds:di+cx+bx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[ds:di+cx+Si]"), 0, "[ds:di+cx+Si] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[ds:di+cx+di]"), 0, "[ds:di+cx+di] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[ds:Di+cx+bp]"), 0, "[ds:di+cx+bp] is a valid 16-bit addressing scheme" );
-
-is ( is_valid_16bit_addr_intel ("[ds:bp+cx+bX]"), 0, "[ds:bp+cx+bX] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[ds:bP+cx+si]"), 0, "[ds:bp+cx+si] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[ds:bp+cx+Di]"), 0, "[ds:bp+cx+di] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[ds:bp+cx+bP]"), 0, "[ds:bp+cx+bP] is a valid 16-bit addressing scheme" );
-
-is ( is_valid_16bit_addr_intel ("[ds:cx+bx+bx]"), 0, "[ds:cx+bx+bx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[ds:cx+bx+Si]"), 0, "[ds:cx+bx+si] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[ds:cx+bX+di]"), 0, "[ds:cx+bx+di] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[ds:cx+bx+bp]"), 0, "[ds:cx+bx+bp] is a valid 16-bit addressing scheme" );
-
-is ( is_valid_16bit_addr_intel ("[ds:cx+sI+bx]"), 0, "[ds:cx+si+bx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[ds:cx+si+si]"), 0, "[ds:cx+si+si] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[ds:cx+si+dI]"), 0, "[ds:cx+si+dI] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[ds:cx+si+bP]"), 0, "[ds:cx+si+bp] is a valid 16-bit addressing scheme" );
-
-is ( is_valid_16bit_addr_intel ("[ds:cx+di+Bx]"), 0, "[ds:cx+di+bx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[ds:cx+di+Si]"), 0, "[ds:cx+di+Si] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[ds:cx+di+di]"), 0, "[ds:cx+di+di] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[ds:cx+Di+bp]"), 0, "[ds:cx+di+bp] is a valid 16-bit addressing scheme" );
-
-is ( is_valid_16bit_addr_intel ("[ds:cx+bp+bX]"), 0, "[ds:cx+bp+bX] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[ds:cx+bP+si]"), 0, "[ds:cx+bp+si] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[ds:cx+bp+Di]"), 0, "[ds:cx+bp+di] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[ds:cx+bp+bP]"), 0, "[ds:cx+bp+bP] is a valid 16-bit addressing scheme" );
-
-is ( is_valid_16bit_addr_intel ("[fs:cx+bX]"), 0, "[fs:cx+bx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[fs:cx+sI]"), 0, "[fs:cx+si] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[fs:cx+Di]"), 0, "[fs:cx+di] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[fs:cx+Bp]"), 0, "[fs:cx+bp] is a valid 16-bit addressing scheme" );
-
-is ( is_valid_16bit_addr_intel ("[fs:cx+bx+1]"), 0, "[fs:cx+bx+1] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[fs:cx+Si+1]"), 0, "[fs:cx+si+1] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[fs:cX+di+1]"), 0, "[fs:cx+di+1] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[fs:cx+bp+1]"), 0, "[fs:cx+bp+1] is a valid 16-bit addressing scheme" );
-
-# -----------
-
-is ( is_valid_16bit_addr_intel ("[ax]"), 0, "[ax] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[bx+cx]"), 0, "[bx+cx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[cx+bx]"), 0, "[cx+bx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[bp+al]"), 0, "[bp+al] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[ch+si]"), 0, "[ch+si] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[bx-si]"), 0, "[bx-si] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[bp-2]"), 1, "[bp-2] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[bp-varname]"), 1, "[bp-varname] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[si-ax]"), 0, "[si-ax] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[bp+-2]"), 1, "[bp+-2] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[bp+-si]"), 0, "[bp+-si] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("ad:[bx]"), 0, "ad:[bx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[sc:di]"), 0, "[sc:di] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[2+bp]"), 1, "[2+bp] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[-3+si]"), 1, "[-3+si] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[2+bx]"), 1, "[2+bx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[2+di]"), 1, "[2+di] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[++-3+si]"), 1, "[++-3+si] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[3-si]"), 0, "[3-si] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[--3+si]"), 1, "[--3+si] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[-3-si]"), 0, "[-3-si] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[3+5]"), 1, "[3+5] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[-3]"), 1, "[-3] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[-3+2]"), 1, "[-3+2] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[+2]"), 1, "[+2] is a valid 16-bit addressing scheme" );
-
-is ( is_valid_16bit_addr_intel ("[cs:--3+si]"), 1, "[cs:--3+si] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("cs:[--3+si]"), 1, "cs:[--3+si] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("ds:[+2]"), 1, "ds:[+2] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[ds:+2]"), 1, "[ds:+2] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("ss:[-3]"), 1, "ss:[-3] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[ss:-3+2]"), 1, "[ss:-3+2] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[es:2+bp]"), 1, "[es:2+bp] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[es:2+bx]"), 1, "[es:2+bx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[es:2+si]"), 1, "[es:2+si] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[es:2+di]"), 1, "[es:2+di] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[es:bp+3]"), 1, "[es:bp+3] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[es:bx+5]"), 1, "[es:bx+5] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[es:si+7]"), 1, "[es:si+7] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[es:di+9]"), 1, "[es:di+9] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("eS:[2+bp]"), 1, "es:[2+bp] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("eS:[2+bx]"), 1, "es:[2+bx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("eS:[2+si]"), 1, "es:[2+si] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("eS:[2+di]"), 1, "es:[2+di] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("eS:[bp+3]"), 1, "es:[bp+3] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("eS:[bx+3]"), 1, "es:[bx+3] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("eS:[si+3]"), 1, "es:[si+3] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("eS:[di+3]"), 1, "es:[di+3] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("fs:[++-3+si]"), 1, "fs:[++-3+si] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[fs:++-3+si]"), 1, "[fs:++-3+si] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("es:[bx+si+55]"), 1, "es:[bx+si+55] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("es:[bx+di+55]"), 1, "es:[bx+di+55] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("es:[bx+bp+55]"), 0, "es:[bx+bp+55] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("es:[bx+bx+55]"), 0, "es:[bx+bx+55] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[bx+bp+55]"), 0, "[bx+bp+55] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[bx+bx+55]"), 0, "[bx+bx+55] is a valid 16-bit addressing scheme" );
-
-is ( is_valid_16bit_addr_intel ("[bx+cs]"), 0, "[bx+cs] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[bx+cl]"), 0, "[bx+cl] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[bx+eax]"), 0, "[bx+eax] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[bx+rax]"), 0, "[bx+rax] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[bx+mm0]"), 0, "[bx+mm0] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[cs+bx]"), 0, "[cs+bx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[cl+bx]"), 0, "[bx+cl] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[eax+bx]"), 0, "[bx+eax] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[rax+bx]"), 0, "[bx+rax] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[mm0+bx]"), 0, "[bx+mm0] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[2+ax]"), 0, "[2+ax] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[es:2+cs]"), 0, "[es:2+cs] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[es:2+cl]"), 0, "[es:2+cl] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[es:2+eax]"), 0, "[es:2+eax] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[es:2+rax]"), 0, "[es:2+rax] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[es:2+mm0]"), 0, "[es:2+mm0] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[es:cs+3]"), 0, "[es:cs+3] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[es:cl+3]"), 0, "[es:cl+3] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[es:eax+3]"), 0, "[es:eax+3] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[es:rax+3]"), 0, "[es:rax+3] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[es:mm0+3]"), 0, "[es:mm0+3] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("es:[2+cs]"), 0, "es:[2+cs] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("es:[2+cl]"), 0, "es:[2+cl] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("es:[2+eax]"), 0, "es:[2+eax] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("es:[2+rax]"), 0, "es:[2+rax] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("es:[2+mm0]"), 0, "es:[2+mm0] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("es:[cs+3]"), 0, "es:[cs+3] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("es:[cl+3]"), 0, "es:[cl+3] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("es:[eax+3]"), 0, "es:[eax+3] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("es:[rax+3]"), 0, "es:[rax+3] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("es:[mm0+3]"), 0, "es:[mm0+3] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("es:[1-bx]"), 0, "es:[1-bx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("es:[si-bx]"), 0, "es:[si-bx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("es:[si+br]"), 1, "es:[si+br] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[ds]"), 0, "[ds] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[bl]"), 0, "[bl] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[ebx]"), 0, "[ebx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[rcx]"), 0, "[rcx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[mm1]"), 0, "[mm1] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("es:[ds]"), 0, "es:[ds] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("es:[bl]"), 0, "es:[bl] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("es:[ebx]"), 0, "es:[ebx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("es:[rcx]"), 0, "es:[rcx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("es:[mm1]"), 0, "es:[mm1] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[es:ds]"), 0, "[es:ds] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[es:bl]"), 0, "[es:bl] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[es:ebx]"), 0, "[es:ebx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[es:rcx]"), 0, "[es:rcx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[es:mm1]"), 0, "[es:mm1] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("es:[cx]"), 0, "es:[cx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[es:cx]"), 0, "[es:cx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("es:[-cx]"), 0, "es:[-cx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[es:-cx]"), 0, "[es:-cx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("es:[ds]"), 0, "es:[ds] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[es:ds]"), 0, "[es:ds] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("ax:[bx+bx]"), 0, "ax:[bx+bx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[ax:bx+bx]"), 0, "[ax:bx+bx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("es:[bx+cx]"), 0, "es:[bx+cx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[es:bx+cx]"), 0, "[es:bx+cx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("es:[cx+bx]"), 0, "es:[cx+bx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[es:cx+bx]"), 0, "[es:cx+bx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("es:[bx-cx]"), 0, "es:[bx-cx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[es:bx-cx]"), 0, "[es:bx-cx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("es:[bx-bp]"), 0, "es:[bx-bp] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[es:bx-bp]"), 0, "[es:bx-bp] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("es:[-cx+bx]"), 0, "es:[-cx+bx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[es:-cx+bx]"), 0, "[es:-cx+bx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("es:[bx-si]"), 0, "es:[bx-si] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[es:bx-si]"), 0, "[es:bx-si] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("es:[bx-bx]"), 0, "es:[bx-bx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[es:bx-bx]"), 0, "[es:bx-bx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("es:[2+cx]"), 0, "es:[2+cx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[es:2+cx]"), 0, "[es:2+cx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("es:[2-bp]"), 0, "es:[2-bp] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[es:2-bp]"), 0, "[es:2-bp] is a valid 16-bit addressing scheme" );
-
-is ( is_valid_16bit_addr_intel ("ax:[bx+si+55]"), 0, "ax:[bx+si+55] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("es:[ds+si+55]"), 0, "es:[ds+si+55] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("es:[ax+si+55]"), 0, "es:[ax+si+55] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("es:[bx+fs+55]"), 0, "es:[bx+fs+55] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("es:[bx+cx+55]"), 0, "es:[bx+cx+55] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("es:[bx-si+55]"), 0, "es:[bx-si+55] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("es:[bx-si+ax]"), 0, "es:[bx-si+ax] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("es:[-bx+si+55]"), 0, "es:[-bx+si+55] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("es:[bx+si+gs]"), 0, "es:[bx+si+gs] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("es:[al+si+55]"), 0, "es:[al+si+55] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("es:[bx+bl+55]"), 0, "es:[bx+bl+55] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("es:[bx+si+cl]"), 0, "es:[bx+si+cl] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("es:[si+55+bl]"), 0, "es:[si+55+bl] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("es:[si+55-bx]"), 0, "es:[si+55-bx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("es:[si+cx+bx]"), 0, "es:[si+cx+bx] is a valid 16-bit addressing scheme" );
-
-is ( is_valid_16bit_addr_intel ("es:[al+55+si]"), 0, "es:[al+55+si] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("es:[bx+55+bl]"), 0, "es:[bx+55+bl] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("es:[bx+55+gs]"), 0, "es:[bx+55+gs] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("es:[bx+55+cx]"), 0, "es:[bx+55+cx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("es:[bx+55+eax]"), 0, "es:[bx+55+eax] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("es:[55+al+si]"), 0, "es:[55+al+si] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("es:[55+bx+bl]"), 0, "es:[55+bx+bl] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("es:[55+bx+gs]"), 0, "es:[55+bx+gs] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("es:[55+bx+eax]"), 0, "es:[55+bx+eax] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("es:[55+cx+gs]"), 0, "es:[55+cx+gs] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("es:[55+cx+bx]"), 0, "es:[55+cx+bx] is a valid 16-bit addressing scheme" );
-
-is ( is_valid_16bit_addr_intel ("es:[eax+si+55]"), 0, "es:[eax+si+55] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("es:[bx+ebx+55]"), 0, "es:[bx+ebx+55] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("es:[bx+si+ecx]"), 0, "es:[bx+si+ecx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("es:[mm0+si+55]"), 0, "es:[mm0+si+55] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("es:[bx+mm1+55]"), 0, "es:[bx+mm1+55] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("es:[bx+si+mm2]"), 0, "es:[bx+si+mm2] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("es:[rcx+si+55]"), 0, "es:[rcx+si+55] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("es:[bx+edx+55]"), 0, "es:[bx+rdx+55] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("es:[bx+si+rax]"), 0, "es:[bx+si+rax] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("es:[55+bx+si]"), 1, "es:[55+bx+si] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("es:[55+bx+ax]"), 0, "es:[55+bx+ax] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("es:[55+si-bx]"), 0, "es:[55+si-bx] is a valid 16-bit addressing scheme" );
-
-is ( is_valid_16bit_addr_intel ("[ax:bx+si+55]"), 0, "[ax:bx+si+55] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[es:ds+si+55]"), 0, "[es:ds+si+55] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[es:ax+si+55]"), 0, "[es:ax+si+55] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[es:bx+fs+55]"), 0, "[es:bx+fs+55] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[es:bx+cx+55]"), 0, "[es:bx+cx+55] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[es:bx-si+55]"), 0, "[es:bx-si+55] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[es:bx-si+ax]"), 0, "[es:bx-si+ax] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[es:-bx+si+55]"), 0, "es:[-bx+si+55] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[es:bx+si+gs]"), 0, "[es:bx+si+gs] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[es:al+si+55]"), 0, "[es:al+si+55] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[es:bx+bl+55]"), 0, "[es:bx+bl+55] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[es:bx+si+cl]"), 0, "[es:bx+si+cl] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[es:si+55+bl]"), 0, "[es:si+55+bl] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[es:si+55-bx]"), 0, "[es:si+55-bx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[es:si+cx+bx]"), 0, "[es:si+cx+bx] is a valid 16-bit addressing scheme" );
-
-is ( is_valid_16bit_addr_intel ("[es:al+55+si]"), 0, "[es:al+55+si] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[es:bx+55+bl]"), 0, "[es:bx+55+bl] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[es:bx+55+gs]"), 0, "[es:bx+55+gs] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[es:bx+55+cx]"), 0, "[es:bx+55+cx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[es:bx+55+eax]"), 0, "[es:bx+55+eax] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[es:55+al+si]"), 0, "[es:55+al+si] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[es:55+bx+bl]"), 0, "[es:55+bx+bl] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[es:55+bx+gs]"), 0, "[es:55+bx+gs] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[es:55+bx+eax]"), 0, "[es:55+bx+eax] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[es:55+cx+gs]"), 0, "[es:55+cx+gs] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[es:55+cx+bx]"), 0, "[es:55+cx+bx] is a valid 16-bit addressing scheme" );
-
-is ( is_valid_16bit_addr_intel ("[es:eax+si+55]"), 0, "[es:eax+si+55] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[es:bx+ebx+55]"), 0, "[es:bx+ebx+55] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[es:bx+si+ecx]"), 0, "[es:bx+si+ecx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[es:mm0+si+55]"), 0, "[es:mm0+si+55] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[es:bx+mm1+55]"), 0, "[es:bx+mm1+55] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[es:bx+si+mm2]"), 0, "[es:bx+si+mm2] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[es:rcx+si+55]"), 0, "[es:rcx+si+55] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[es:bx+edx+55]"), 0, "[es:bx+rdx+55] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[es:bx+si+rax]"), 0, "[es:bx+si+rax] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[es:55+bx+si]"), 1, "[es:55+bx+si] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[es:55+bx+ax]"), 0, "[es:55+bx+ax] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[es:55+si-bx]"), 0, "[es:55+si-bx] is a valid 16-bit addressing scheme" );
-
-is ( is_valid_16bit_addr_intel ("[ds+si+55]"), 0, "[ds+si+55] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[ax+si+55]"), 0, "[ax+si+55] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[bx+fs+55]"), 0, "[bx+fs+55] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[bx+cx+55]"), 0, "[bx+cx+55] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[bx-si+55]"), 0, "[bx-si+55] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[bx-si+ax]"), 0, "[bx-si+ax] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[-bx+si+55]"), 0, "[-bx+si+55] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[bx+si+gs]"), 0, "[bx+si+gs] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[al+si+55]"), 0, "[al+si+55] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[bx+bl+55]"), 0, "[bx+bl+55] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[bx+si+cl]"), 0, "[bx+si+cl] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[si+55+bl]"), 0, "[si+55+bl] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[si+55-bx]"), 0, "[si+55-bx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[si+cx+bx]"), 0, "[si+cx+bx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[55+si-bx]"), 0, "[55+si-bx] is a valid 16-bit addressing scheme" );
-
-is ( is_valid_16bit_addr_intel ("[al+55+si]"), 0, "[al+55+si] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[bx+55+bl]"), 0, "[bx+55+bl] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[bx+55+gs]"), 0, "[bx+55+gs] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[bx+55+cx]"), 0, "[bx+55+cx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[bx+55+eax]"), 0, "[bx+55+eax] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[55+al+si]"), 0, "[55+al+si] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[55+bx+bl]"), 0, "[55+bx+bl] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[55+bx+gs]"), 0, "[55+bx+gs] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[55+bx+eax]"), 0, "[55+bx+eax] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[55+cx+gs]"), 0, "[55+cx+gs] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[55+cx+bx]"), 0, "[55+cx+bx] is a valid 16-bit addressing scheme" );
-
-is ( is_valid_16bit_addr_intel ("[eax+si+55]"), 0, "[eax+si+55] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[bx+ebx+55]"), 0, "[bx+ebx+55] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[bx+si+ecx]"), 0, "[bx+si+ecx] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[mm0+si+55]"), 0, "[mm0+si+55] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[bx+mm1+55]"), 0, "[bx+mm1+55] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[bx+si+mm2]"), 0, "[bx+si+mm2] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[rcx+si+55]"), 0, "[rcx+si+55] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[bx+edx+55]"), 0, "[bx+rdx+55] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[bx+si+rax]"), 0, "[bx+si+rax] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[55+bx+si]"), 1, "[55+bx+si] is a valid 16-bit addressing scheme" );
-is ( is_valid_16bit_addr_intel ("[55+bx+ax]"), 0, "[55+bx+ax] is a valid 16-bit addressing scheme" );
+my @valid16 = ();
+my @invalid16 = ();
+
+foreach my $r1 ('bx', 'si', 'di', 'bp') {
+
+	if ( $r1 =~ /^b.$/io ) {
+
+		push @valid16, permute_disp_intel_all ('', $r1, '', '', '', '1');
+		push @valid16, permute_disp_intel_all ('', $r1, '', '', '', 'varname');
+		push @invalid16, permute_disp_intel_all ('-', $r1, '', '', '', '3');
+	}
+	else {
+		push @valid16, permute_disp_intel_all ('', '', '', $r1, '', '5');
+		push @valid16, permute_disp_intel_all ('', '', '', $r1, '', 'varname');
+		push @invalid16, permute_disp_intel_all ('', '', '-', $r1, '', '7');
+		push @invalid16, permute_disp_intel_all ('', 'cx', '', $r1, '', '7');
+	}
+
+	foreach my $r2 ('bx', 'si', 'di', 'bp') {
+
+		if ( ($r1 =~ /^b.$/io && $r2 =~ /^b.$/io)
+			|| ($r1 =~ /^.i$/io && $r2 =~ /^.i$/io)
+		) {
+			push @invalid16, permute_disp_intel_all ('', $r1, '', $r2, '', '9');
+		}
+		else {
+			push @valid16, permute_disp_intel_all ('', $r1, '', $r2, '', '9');
+		}
+
+		push @invalid16, permute_disp_intel_all ('-', $r1, '', $r2, '', '11');
+		push @invalid16, permute_disp_intel_all ('', $r1, '-', $r2, '', '13');
+		push @invalid16, permute_disp_intel ('', $r1, '', $r2, '', 'cx');
+	}
+	push @invalid16, permute_disp_intel_all ('', 'cx', '', $r1, '', '15');
+	push @invalid16, permute_disp_intel_all ('', 'cx', '', $r1, '4', '17');
+	push @invalid16, permute_disp_intel_all ('-', 'cx', '', $r1, '', '19');
+	push @invalid16, permute_disp_intel_all ('-', 'cx', '', $r1, '8', '21');
+	push @invalid16, permute_disp_intel_all ('', $r1, '', 'cx', '', '23');
+	push @invalid16, permute_disp_intel_all ('', $r1, '', 'cx', '2', '25');
+	push @invalid16, permute_disp_intel_all ('', $r1, '-', 'cx', '', '23');
+	push @invalid16, permute_disp_intel_all ('', $r1, '-', 'cx', '2', '25');
+}
+
+push @valid16, permute_intel ('', '', '', '', '', '', '1');
+push @valid16, permute_intel ('', '1', '', '', '', '', '3');
+push @valid16, permute_intel ('', '', '', 'si', '', '', 'br');
+
+push @valid16, permute_intel ('', 'bx', '', '', '', '', '+-1');
+push @valid16, permute_intel ('', 'bx', '', '', '', '', '--1');
+
+push @valid16, permute_intel ('', 'bx', '', '3', '', '', '1');
+push @valid16, permute_intel ('', '3', '', 'bp', '', '', '1');
+push @invalid16, permute_intel ('', '3', '-', 'bp', '', '', '1');
+push @valid16, permute_intel ('', '3', '', '2', '', '', '1');
+push @valid16, permute_intel ('', '3', '', '2', '', '-', '1');
+push @valid16, permute_intel ('', '3', '', '', '', '-', '1');
+push @valid16, permute_intel ('', '', '', '', '', '-', '1');
+push @valid16, permute_intel ('', '', '', '', '', '', '+1');
+
+push @invalid16, permute_intel ('', 'cx', '', '', '', '', '1');
+push @invalid16, permute_intel ('-', 'cx', '', '', '', '', '1');
+
+foreach my $r1 ('ax', 'cs', 'cl', 'eax', 'rax', 'mm0', 'xmm1',
+	'ymm2', 'zmm3', 'k1') {
+
+	push @invalid16, permute_intel ('', '', '', '', '', '', $r1);
+	push @invalid16, permute_disp_intel_all ('', $r1, '', '', '', '23');
+	push @invalid16, permute_disp_intel_all ('', $r1, '', 'si', '', '25');
+	push @invalid16, permute_disp_intel_all ('', '', '', $r1, '', '27');
+	push @invalid16, permute_disp_intel_all ('', 'bx', '', $r1, '', '29');
+	push @invalid16, permute_disp_intel_all ('', 'bp', '', $r1, '1', '31');
+	push @invalid16, permute_disp_intel_all ('-', $r1, '', '', '', '33');
+	push @invalid16, permute_disp_intel_all ('-', $r1, '', 'si', '', '35');
+	push @invalid16, permute_disp_intel_all ('-', $r1, '', 'si', '4', '37');
+	push @invalid16, permute_disp_intel ('', 'bx', '', 'si', '', $r1);
+	push @invalid16, permute_disp_intel ('', 'bx', '', 'si', '8', $r1);
+}
+
+push @invalid16, permute_intel_segreg ('ad', '', 'bx', '', '', '', '', '');
+push @invalid16, permute_intel_segreg ('sc', '', 'di', '', '', '', '', '');
+push @invalid16, permute_intel_segreg ('ax', '', 'bx', '', '', '', '', '');
+push @invalid16, permute_intel_segreg ('ax', '', 'bx', '', 'bx', '', '', '');
+push @invalid16, permute_intel_segreg ('ax', '', 'bx', '', 'si', '', '', '2');
 
 # ----------- 32-bit
 
-is ( is_valid_32bit_addr_intel ("[eax]"), 1, "[eax] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[beax]"), 1, "[beax] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[eaxd]"), 1, "[eaxd] is a valid 32-bit addressing scheme" );
+my @valid32 = ();
+my @invalid32 = ();
 
-is ( is_valid_32bit_addr_intel ("[-eax]"), 0, "[-eax] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[cs]"), 0, "[cs] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[st0]"), 0, "[st0] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[rax]"), 0, "[rax] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[mm0]"), 0, "[mm0] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[dl]"), 0, "[dl] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[cx]"), 0, "[cx] is a valid 32-bit addressing scheme" );
+push @valid32, permute_intel ('', 'eax', '', '', '', '', '');
+push @valid32, permute_intel ('', 'beax', '', '', '', '', '');
+push @valid32, permute_intel ('', 'eaxd', '', '', '', '', '');
 
-is ( is_valid_32bit_addr_intel ("[ebx+77]"), 1, "[ebx+77] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ebx+ecx]"), 1, "[ebx+ecx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ebx+ebx+99]"), 1, "[ebx+ebx+99] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ebx+edi-88]"), 1, "[ebx+edi-88] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ebx+edi+-88]"), 1, "[ebx+edi+-88] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ebx-88+edi]"), 1, "[ebx-88+edi] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[-88+ebx+edi]"), 1, "[-88+ebx+edi] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[-ebx+edi+-88]"), 0, "[-ebx+edi+-88] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[-ebx-88+edi]"), 0, "[-ebx-88+edi] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[-88-ebx+edi]"), 0, "[-88-ebx+edi] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ebx-edi+-88]"), 0, "[ebx-edi+-88] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ebx-88-edi]"), 0, "[ebx-88-edi] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[-88+ebx-edi]"), 0, "[-88+ebx-edi] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[eax+ebx+edi]"), 0, "[eax+ebx+edi] is a valid 32-bit addressing scheme" );
+push @invalid32, permute_intel ('-', 'eax', '', '', '', '', '');
 
-is ( is_valid_32bit_addr_intel ("[ebx + eax*1]"), 1, "[ebx+eax*1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ebx + 1*eax]"), 1, "[ebx+1*eax] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[eax*1 + ebx]"), 1, "[eax*1 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1*eax + ebx]"), 1, "[1*eax + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ebx + eax*2]"), 1, "[ebx+eax*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ebx + 2*eax]"), 1, "[ebx+2*eax] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[eax*2 + ebx]"), 1, "[eax*2 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[2*eax + ebx]"), 1, "[2*eax + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ebx + eax*4]"), 1, "[ebx+eax*4] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ebx + 4*eax]"), 1, "[ebx+4*eax] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[eax*4 + ebx]"), 1, "[eax*4 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[4*eax + ebx]"), 1, "[4*eax + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ebx + eax*8]"), 1, "[ebx+eax*8] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ebx + 8*eax]"), 1, "[ebx+8*eax] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[eax*8 + ebx]"), 1, "[eax*8 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[8*eax + ebx]"), 1, "[8*eax + ebx] is a valid 32-bit addressing scheme" );
+foreach my $r1 ('cx', 'cs', 'st0', 'cl', 'cr0', 'dr2', 'rax', 'r9d', 'mm0',
+	'xmm3', 'ymm2', 'zmm3', 'k1') {
 
-is ( is_valid_32bit_addr_intel ("[eax*8 - ebx]"), 0, "[eax*8 - ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[8*eax - ebx]"), 0, "[8*eax - ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[- eax*8 + ebx]"), 0, "[- eax*8 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[- 8*eax + ebx]"), 0, "[- 8*eax + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1*8 + ebx]"), 1, "[1*8 + ebx] is a valid 32-bit addressing scheme" );
+	push @invalid32, permute_disp_intel_all ('', $r1, '', '', '', '1');
+	push @invalid32, permute_disp_intel_all ('-', $r1, '', '', '', '1');
+	push @invalid32, permute_disp_intel_all ('', $r1, '', 'ebx', '', '1');
+	push @invalid32, permute_disp_intel_all ('', $r1, '', 'ebx', '2', '1');
+	push @invalid32, permute_disp_intel_all ('', '', '', $r1, '', '1');
+	push @invalid32, permute_disp_intel_all ('', '', '', $r1, '2', '1');
+	push @invalid32, permute_disp_intel_all ('', 'ebx', '', $r1, '', '1');
+	push @invalid32, permute_disp_intel_all ('', 'ebx', '', $r1, '2', '1');
 
-is ( is_valid_32bit_addr_intel ("[ebx - eax*8]"), 0, "[ebx - eax*8] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ebx - 8*eax]"), 0, "[ebx - 8*eax] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[- ebx + eax*8]"), 0, "[- ebx + eax*8] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[- ebx + 8*eax]"), 0, "[- ebx + 8*eax] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ebx + 1*8]"), 1, "[ebx + 1*8] is a valid 32-bit addressing scheme" );
+	push @invalid32, permute_reg32_invalid_intel ($r1);
+}
 
-is ( is_valid_32bit_addr_intel ("[ebx+esi*4+66]"), 1, "[ebx+esi*4+66] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ebx+ecx*8-55]"), 1, "[ebx+ecx*8-55] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ebx+ecx*8+-55]"), 1, "[ebx+ecx*8+-55] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ebx+ebp*1]"), 1, "[ebx+ebp*1] is a valid 32-bit addressing scheme" );
+foreach my $s ('', '1', '2', '4', '8') {
 
-is ( is_valid_32bit_addr_intel ("[ebx+4*esi+66]"), 1, "[ebx+4*esi+66] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ebx+8*ecx-55]"), 1, "[ebx+8*ecx-55] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ebx+8*ecx+-55]"), 1, "[ebx+8*ecx+-55] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ebx+1*ebp]"), 1, "[ebx+1*ebp] is a valid 32-bit addressing scheme" );
+	push @valid32, permute_disp_intel_all ('', '', '', 'eax', $s, '1');
+	push @valid32, permute_disp_intel_all ('', 'ebx', '', 'edi', $s, '1');
+	push @valid32, permute_disp_intel_all ('', 'ebx', '', 'edi', $s, 'varname');
+}
 
-is ( is_valid_32bit_addr_intel ("[ecx*2 + ebx]"), 1, "[ecx*2 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ecx*4 + ebx -1]"), 1, "[ecx*4 + ebx -1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ecx*4 + ebx +-1]"), 1, "[ecx*4 + ebx +-1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ecx*8 + ebx+ 44]"), 1, "[ecx*2 + ebx+ 44] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ecx*1 + esp]"), 1, "[ecx*1 + esp] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ecx*4 -1 + ebx]"), 1, "[ecx*4 -1 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ecx*4 +-1 + ebx]"), 1, "[ecx*4 +-1 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ecx*8 +44 + ebx]"), 1, "[ecx*2 +44+ ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ecx*4 -1 + ebx]"), 1, "[ecx*4 -1 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ecx*4 +-1 + ebx]"), 1, "[ecx*4 +-1 + ebx] is a valid 32-bit addressing scheme" );
+push @valid32, permute_disp_intel_all ('', 'eax', '', '', '', '1');
 
-is ( is_valid_32bit_addr_intel ("[ebx + ecx*1 + 1]"), 1, "[ebx + ecx*1 + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ebx + 1*ecx + 1]"), 1, "[ebx + 1*ecx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ebx + 1 + ecx*1]"), 1, "[ebx + 1 + ecx*1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ebx + 1 + 1*ecx]"), 1, "[ebx + 1 + 1*ecx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ebx + ecx*2 + 1]"), 1, "[ebx + ecx*2 + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ebx + 2*ecx + 1]"), 1, "[ebx + 2*ecx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ebx + 1 + ecx*2]"), 1, "[ebx + 1 + ecx*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ebx + 1 + 2*ecx]"), 1, "[ebx + 1 + 2*ecx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ebx + ecx*4 + 1]"), 1, "[ebx + ecx*4 + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ebx + 4*ecx + 1]"), 1, "[ebx + 4*ecx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ebx + 1 + ecx*4]"), 1, "[ebx + 1 + ecx*4] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ebx + 1 + 4*ecx]"), 1, "[ebx + 1 + 4*ecx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ebx + ecx*8 + 1]"), 1, "[ebx + ecx*8 + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ebx + 8*ecx + 1]"), 1, "[ebx + 8*ecx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ebx + 1 + ecx*8]"), 1, "[ebx + 1 + ecx*8] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ebx + 1 + 8*ecx]"), 1, "[ebx + 1 + 8*ecx] is a valid 32-bit addressing scheme" );
+push @invalid32, permute_intel ('-', 'eax', '', '', '', '', '1');
+push @invalid32, permute_intel ('-', 'eax', '', '', '', '', '-1');
 
-is ( is_valid_32bit_addr_intel ("[-ebx + ecx*1 + 1]"), 0, "[-ebx + ecx*1 + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[-ebx + 1*ecx + 1]"), 0, "[-ebx + 1*ecx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ebx - ecx*1 + 1]"), 0, "[ebx - ecx*1 + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ebx - 1*ecx + 1]"), 0, "[ebx - 1*ecx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1 + ecx*1 - eax]"), 0, "[1 + ecx*1 - eax] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1 + 1*ecx - eax]"), 0, "[1 + 1*ecx - eax] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ebx + 1*ecx + eax]"), 0, "[ebx + 1*ecx + eax] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ebx + ecx*1 + eax]"), 0, "[ebx + ecx*1 + eax] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ebx + 2*1 + eax]"), 1, "[ebx + 2*1 + eax] is a valid 32-bit addressing scheme" );
+foreach my $s ('', '2') {
 
-is ( is_valid_32bit_addr_intel ("[-ebx + 1 + ecx*1]"), 0, "[-ebx + 1 + ecx*1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[-ebx + 1 + 1*ecx]"), 0, "[-ebx + 1 + 1*ecx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ebx + 1 - ecx*1]"), 0, "[ebx + 1 - ecx*1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ebx + 1 - 1*ecx]"), 0, "[ebx + 1 - 1*ecx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1 - eax + ecx*1]"), 0, "[1 - eax + ecx*1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1 - eax + 1*ecx]"), 0, "[1 - eax + 1*ecx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ebx + eax + 1*ecx]"), 0, "[ebx + eax + 1*ecx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ebx + eax + ecx*1]"), 0, "[ebx + eax + ecx*1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ebx + eax + 2*1]"), 1, "[ebx + eax + 2*1] is a valid 32-bit addressing scheme" );
+	push @invalid32, permute_disp_intel ('', 'ebx', '', 'edi', $s, 'eax');
+	push @invalid32, permute_disp_intel_all ('-', 'ebx', '', 'edi', $s, 'eax');
+	push @invalid32, permute_disp_intel_all ('', 'ebx', '-', 'edi', $s, 'eax');
+	push @invalid32, permute_disp_intel_all ('-', 'ebx', '-', 'edi', $s, 'eax');
+}
 
-is ( is_valid_32bit_addr_intel ("[ecx*1 - ebx + 1]"), 0, "[ecx*1 - ebx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1*ecx - ebx + 1]"), 0, "[1*ecx - ebx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[- ecx*1 + ebx + 1]"), 0, "[- ecx*1 + ebx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[- 1*ecx + ebx + 1]"), 0, "[- 1*ecx + ebx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ecx*1 + 1 - eax]"), 0, "[ecx*1 + 1 - eax] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1*ecx + 1 - eax]"), 0, "[1*ecx + 1 - eax] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1*ecx + ebx + eax]"), 0, "[1*ecx + ebx + eax] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ecx*1 + ebx + eax]"), 0, "[ecx*1 + ebx + eax] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[2*1 + ebx + eax]"), 1, "[2*1 + ebx + eax] is a valid 32-bit addressing scheme" );
+push @invalid32, permute_disp_intel_all ('-', 'ebx', '', 'edi', '', '1');
 
-is ( is_valid_32bit_addr_intel ("[ecx*1 + ebx + 1]"), 1, "[ecx*1 + ebx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1*ecx + ebx + 1]"), 1, "[1*ecx + ebx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ecx*1 + 1 + ebx]"), 1, "[ecx*1 + 1 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1*ecx + 1 + ebx]"), 1, "[1*ecx + 1 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ecx*2 + ebx + 1]"), 1, "[ecx*2 + ebx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[2*ecx + ebx + 1]"), 1, "[2*ecx + ebx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ecx*2 + 1 + ebx]"), 1, "[ecx*2 + 1 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[2*ecx + 1 + ebx]"), 1, "[2*ecx + 1 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ecx*4 + ebx + 1]"), 1, "[ecx*4 + ebx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[4*ecx + ebx + 1]"), 1, "[4*ecx + ebx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ecx*4 + 1 + ebx]"), 1, "[ecx*4 + 1 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[4*ecx + 1 + ebx]"), 1, "[4*ecx + 1 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ecx*8 + ebx + 1]"), 1, "[ecx*8 + ebx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[8*ecx + ebx + 1]"), 1, "[8*ecx + ebx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ecx*8 + 1 + ebx]"), 1, "[ecx*8 + 1 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[8*ecx + 1 + ebx]"), 1, "[8*ecx + 1 + ebx] is a valid 32-bit addressing scheme" );
+foreach my $r1 ('eax', 'ebp', 'ecx', 'esi') {
 
-is ( is_valid_32bit_addr_intel ("[1 + ebx + ecx*1]"), 1, "[1 + ebx + ecx*1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1 + ebx + 1*ecx]"), 1, "[1 + ebx + 1*ecx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1 + ecx*1 + ebx]"), 1, "[1 + ecx*1 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1 + 1*ecx + ebx]"), 1, "[1 + 1*ecx + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1 + ebx + ecx*2]"), 1, "[1 + ebx + ecx*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1 + ebx + 2*ecx]"), 1, "[1 + ebx + 2*ecx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1 + ecx*2 + ebx]"), 1, "[1 + ecx*2 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1 + 2*ecx + ebx]"), 1, "[1 + 2*ecx + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1 + ebx + ecx*4]"), 1, "[1 + ebx + ecx*4] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1 + ebx + 4*ecx]"), 1, "[1 + ebx + 4*ecx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1 + ecx*4 + ebx]"), 1, "[1 + ecx*4 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1 + 4*ecx + ebx]"), 1, "[1 + 4*ecx + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1 + ebx + ecx*8]"), 1, "[1 + ebx + ecx*8 + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1 + ebx + 8*ecx]"), 1, "[1 + ebx + 8*ecx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1 + ecx*8 + ebx]"), 1, "[1 + ecx*8 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1 + 8*ecx + ebx]"), 1, "[1 + 8*ecx + ebx] is a valid 32-bit addressing scheme" );
+	push @valid32, permute_disp_intel_all ('', 'ebx', '', $r1, '1', '3');
+	push @invalid32, permute_disp_intel_all ('-', 'ebx', '', $r1, '1', '7');
+	push @invalid32, permute_disp_intel_all ('', 'ebx', '-', $r1, '1', '9');
+	push @invalid32, permute_disp_intel_all ('-', 'ebx', '-', $r1, '1', '11');
 
-is ( is_valid_32bit_addr_intel ("[ecx*1]"), 1, "[ecx*1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ecx*2]"), 1, "[ecx*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ecx*4]"), 1, "[ecx*4] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ecx*8]"), 1, "[ecx*8] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[esp*4]"), 0, "[esp*4] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ecx*2 + ebx*8]"), 0, "[ecx*2 + ebx*8] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ecx + esp*2]"), 0, "[ecx + esp*2] is a valid 32-bit addressing scheme" );
+	push @valid32, permute_disp_intel_all ('', '', '', $r1, '1', '3');
+	push @invalid32, permute_disp_intel_all ('', '', '-', $r1, '1', '5');
+}
 
-is ( is_valid_32bit_addr_intel ("[1*esp]"), 1, "[1*esp] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[2*esp]"), 0, "[2*esp] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ecx+1*esp]"), 1, "[ecx+1*esp] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ecx+2*esp]"), 0, "[ecx+2*esp] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1*esp+esi]"), 1, "[1*esp+esi] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[2*esp+esi]"), 0, "[2*esp+esi] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1*esp+1]"), 1, "[1*esp+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[2*esp+1]"), 0, "[2*esp+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1+1*esp]"), 1, "[1+1*esp] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1+2*esp]"), 0, "[1+2*esp] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1+ecx+1*esp]"), 1, "[1+ecx+1*esp] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1+ecx+2*esp]"), 0, "[1+ecx+2*esp] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1+1*esp+esi]"), 1, "[1+1*esp+esi] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1+2*esp+esi]"), 0, "[1+2*esp+esi] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ecx+1+1*esp]"), 1, "[ecx+1+1*esp] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ecx+1+2*esp]"), 0, "[ecx+1+2*esp] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1*esp+1+esi]"), 1, "[1*esp+1+esi] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[2*esp+1+esi]"), 0, "[2*esp+1+esi] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ecx+1*esp+1]"), 1, "[ecx+1*esp+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ecx+2*esp+1]"), 0, "[ecx+2*esp+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1*esp+esi+1]"), 1, "[1*esp+esi+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[2*esp+esi+1]"), 0, "[2*esp+esi+1] is a valid 32-bit addressing scheme" );
+push @valid32, permute_disp_intel_all ('', '', '', '1', '8', '29');
+push @valid32, permute_disp_intel_all ('', '', '-', '1', '8', '29');
 
-is ( is_valid_32bit_addr_intel ("[esp*1]"), 1, "[esp*1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[esp*2]"), 0, "[esp*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ecx+esp*1]"), 1, "[ecx+esp*1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ecx+esp*2]"), 0, "[ecx+esp*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[esp*1+esi]"), 1, "[esp*1+esi] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[esp*2+esi]"), 0, "[esp*2+esi] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[esp*1+1]"), 1, "[esp*1+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[esp*2+1]"), 0, "[esp*2+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1+esp*1]"), 1, "[1+esp*1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1+esp*2]"), 0, "[1+esp*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1+ecx+esp*1]"), 1, "[1+ecx+esp*1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1+ecx+esp*2]"), 0, "[1+ecx+esp*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1+esp*1+esi]"), 1, "[1+esp*1+esi] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1+esp*2+esi]"), 0, "[1+esp*2+esi] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ecx+1+esp*1]"), 1, "[ecx+1+esp*1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ecx+1+esp*2]"), 0, "[ecx+1+esp*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[esp*1+1+esi]"), 1, "[esp*1+1+esi] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[esp*2+1+esi]"), 0, "[esp*2+1+esi] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ecx+esp*1+1]"), 1, "[ecx+esp*1+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ecx+esp*2+1]"), 0, "[ecx+esp*2+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[esp*1+esi+1]"), 1, "[esp*1+esi+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[esp*2+esi+1]"), 0, "[esp*2+esi+1] is a valid 32-bit addressing scheme" );
+push @valid32, permute_disp_intel_all ('', 'ebx', '', '1', '8', '31');
+push @valid32, permute_disp_intel_all ('', 'ebx', '-', '1', '8', '31');
 
-is ( is_valid_32bit_addr_intel ("[z*esp]"), 1, "[z*esp] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ecx+z*esp]"), 1, "[ecx+z*esp] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[z*esp+esi]"), 1, "[z*esp+esi] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[z*esp+1]"), 1, "[z*esp+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1+z*esp]"), 1, "[1+z*esp] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1+ecx+z*esp]"), 1, "[1+ecx+z*esp] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1+z*esp+esi]"), 1, "[1+z*esp+esi] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ecx+1+z*esp]"), 1, "[ecx+1+z*esp] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[z*esp+1+esi]"), 1, "[z*esp+1+esi] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ecx+z*esp+1]"), 1, "[ecx+z*esp+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[z*esp+esi+1]"), 1, "[z*esp+esi+1] is a valid 32-bit addressing scheme" );
+push @valid32, permute_intel ('', 'ebx', '', '1', '8', '', 'eax');
+push @valid32, permute_intel ('', 'ebx', '-', '1', '8', '', 'eax');
 
-is ( is_valid_32bit_addr_intel ("[esp*z]"), 1, "[esp*z] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ecx+esp*z]"), 1, "[ecx+esp*z] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[esp*z+esi]"), 1, "[esp*z+esi] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[esp*z+1]"), 1, "[esp*z+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1+esp*z]"), 1, "[1+esp*z] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1+ecx+esp*z]"), 1, "[1+ecx+esp*z] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1+esp*z+esi]"), 1, "[1+esp*z+esi] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ecx+1+esp*z]"), 1, "[ecx+1+esp*z] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[esp*z+1+esi]"), 1, "[esp*z+1+esi] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ecx+esp*z+1]"), 1, "[ecx+esp*z+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[esp*z+esi+1]"), 1, "[esp*z+esi+1] is a valid 32-bit addressing scheme" );
+push @valid32, permute_disp_intel_all ('', '3', '', 'ebx', '8', '33');
+push @invalid32, permute_disp_intel_all ('', '3', '-', 'ebx', '8', '33');
 
-is ( is_valid_32bit_addr_intel ("[1*ecx]"), 1, "[1*ecx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[2*ecx]"), 1, "[2*ecx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[4*ecx]"), 1, "[4*ecx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[8*ecx]"), 1, "[8*ecx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[4*esp]"), 0, "[4*esp] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[2*ecx + ebx*8]"), 0, "[2*ecx + ebx*8] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ecx + 2*esp]"), 0, "[ecx + 2*esp] is a valid 32-bit addressing scheme" );
+push @invalid32, permute_intel ('', 'ebx*2', '', 'eax', '8', '', '');
 
-is ( is_valid_32bit_addr_intel ("[1+eax]"), 1, "[1+eax] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[-2+edx]"), 1, "[-2+edx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[3+ebx*2]"), 1, "[3+ebx*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[-4+esi*4]"), 1, "[-4+esi*4] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[5+ecx+esi]"), 1, "[5+ecx+esi] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[-6+ecx*2+edi]"), 1, "[-6+ecx*2+edi] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[7+esp+ebp*8]"), 1, "[7+esp+ebp*8] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[-8+esp+ebp*8]"), 1, "[-8+esp+ebp*8] is a valid 32-bit addressing scheme" );
+push @valid32, permute_disp_intel_all ('', 'esp', '', 'ecx', '1', '11');
+push @valid32, permute_disp_intel_all ('', 'esp', '', 'ebp', '1', '11');
 
-is ( is_valid_32bit_addr_intel ("[cs*2 + ebx]"), 0, "[cs*2 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[cs*2 + ebx + 1]"), 0, "[cs*2 + ebx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ecx*2 + cs]"), 0, "[ecx*2 + cs] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ecx*2 + cs + 1]"), 0, "[ecx*2 + cs + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ebx + cs*2]"), 0, "[ebx + cs*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ebx + cs*2 + 1]"), 0, "[ebx + cs*2 + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[cs + ecx*2]"), 0, "[cs + ecx*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[cs + ecx*2 + 1]"), 0, "[cs + ecx*2 + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[cs*2 + 1 + ebx]"), 0, "[cs*2 + 1 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ecx*2 + 1 + cs]"), 0, "[ecx*2 + 1 + cs] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1 + cs*2 + ebx]"), 0, "[1 + cs*2 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1 + ecx*2 + cs]"), 0, "[1 + ecx*2 + cs] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1 + ebx + cs*2]"), 0, "[1 + ebx + cs*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1 + cs + ecx*2]"), 0, "[1 + cs + ecx*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ebx + 1 + cs*2]"), 0, "[ebx + 1 + cs*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[cs + 1 + ecx*2]"), 0, "[cs + 1 + ecx*2] is a valid 32-bit addressing scheme" );
+push @valid32, permute_intel ('', 'esp', '', '2', '1', '', '');
+push @valid32, permute_intel ('', 'esp', '', '2', '1', '', 'eax');
+push @invalid32, permute_intel ('', 'esp', '', '2', '1', '-', 'eax');
+push @invalid32, permute_intel ('', 'esp', '', '2', '1', '', '-eax');
+push @valid32, permute_intel ('', 'esp', '-', '2', '1', '', '');
+push @valid32, permute_intel ('', 'esp', '-', '2', '1', '', 'eax');
+push @invalid32, permute_intel ('', 'esp', '-', '2', '1', '-', 'eax');
+push @invalid32, permute_intel ('', 'esp', '-', '2', '1', '', '-eax');
+push @invalid32, permute_disp_intel_all ('-', 'esp', '', '2', '1', 'eax');
+push @invalid32, permute_disp_intel_all ('-', 'esp', '-', '2', '1', 'eax');
 
-is ( is_valid_32bit_addr_intel ("[cs*eax + ebx]"), 0, "[cs*eax + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[cs*eax + ebx + 1]"), 0, "[cs*eax + ebx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ecx*eax + cs]"), 0, "[ecx*eax + cs] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ecx*eax + cs + 1]"), 0, "[ecx*eax + cs + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ebx + cs*eax]"), 0, "[ebx + cs*eax] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ebx + cs*eax + 1]"), 0, "[ebx + cs*eax + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[cs + ecx*eax]"), 0, "[cs + ecx*eax] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[cs + ecx*eax + 1]"), 0, "[cs + ecx*eax + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[cs*eax + 1 + ebx]"), 0, "[cs*eax + 1 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ecx*eax + 1 + cs]"), 0, "[ecx*eax + 1 + cs] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1 + cs*eax + ebx]"), 0, "[1 + cs*eax + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1 + ecx*eax + cs]"), 0, "[1 + ecx*eax + cs] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1 + ebx + cs*eax]"), 0, "[1 + ebx + cs*eax] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1 + cs + ecx*eax]"), 0, "[1 + cs + ecx*eax] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ebx + 1 + cs*eax]"), 0, "[ebx + 1 + cs*eax] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[cs + 1 + ecx*eax]"), 0, "[cs + 1 + ecx*eax] is a valid 32-bit addressing scheme" );
+foreach my $s ('', '1', 'z') {
 
-is ( is_valid_32bit_addr_intel ("[eax*5 + ebx]"), 0, "[eax*5 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[eax*5 + ebx + 1]"), 0, "[eax*5 + ebx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ecx*5 + eax]"), 0, "[ecx*5 + eax] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ecx*5 + eax + 1]"), 0, "[ecx*5 + eax + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ebx + eax*5]"), 0, "[ebx + eax*5] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ebx + eax*5 + 1]"), 0, "[ebx + eax*5 + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[eax + ecx*5]"), 0, "[eax + ecx*5] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[eax + ecx*5 + 1]"), 0, "[eax + ecx*5 + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[eax*5 + 1 + ebx]"), 0, "[eax*5 + 1 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ecx*5 + 1 + eax]"), 0, "[ecx*5 + 1 + eax] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1 + eax*5 + ebx]"), 0, "[1 + eax*5 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1 + ecx*5 + eax]"), 0, "[1 + ecx*5 + eax] is a valid 32-bit addressing scheme" );
+	push @valid32, permute_disp_intel_all ('', '', '', 'esp', $s, '11');
+	push @valid32, permute_disp_intel_all ('', 'ecx', '', 'esp', $s, '11');
+}
 
-is ( is_valid_32bit_addr_intel ("[edx*eax + ebx]"), 0, "[edx*eax + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ebx + edx*eax]"), 0, "[ebx + edx*eax] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[edx*eax + ebx + 1]"), 0, "[edx*eax + ebx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ebx + edx*eax + 1]"), 0, "[ebx + edx*eax + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[edx*eax + 1 + ebx]"), 0, "[edx*eax + 1 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ebx + 1 + edx*eax]"), 0, "[ebx + 1 + edx*eax] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1 + edx*eax + ebx]"), 0, "[1 + edx*eax + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1 + ebx + edx*eax]"), 0, "[1 + ebx + edx*eax] is a valid 32-bit addressing scheme" );
+push @invalid32, permute_disp_intel_all ('', '', '', 'esp', '2', '11');
+push @invalid32, permute_disp_intel_all ('', 'ecx', '', 'esp', '2', '11');
 
-is ( is_valid_32bit_addr_intel ("[cs*ds + ebx]"), 0, "[cs*ds + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[cs*ds + ebx + 1]"), 0, "[cs*ds + ebx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ecx*ds + cs]"), 0, "[ecx*ds + cs] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ecx*ds + cs + 1]"), 0, "[ecx*ds + cs + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ebx + cs*ds]"), 0, "[ebx + cs*ds] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ebx + cs*ds + 1]"), 0, "[ebx + cs*ds + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[cs + ecx*ds]"), 0, "[cs + ecx*ds] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[cs + ecx*ds + 1]"), 0, "[cs + ecx*ds + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[cs*ds + 1 + ebx]"), 0, "[cs*ds + 1 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ecx*ds + 1 + cs]"), 0, "[ecx*ds + 1 + cs] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1 + cs*ds + ebx]"), 0, "[1 + cs*ds + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1 + ecx*ds + cs]"), 0, "[1 + ecx*ds + cs] is a valid 32-bit addressing scheme" );
+push @invalid32, permute_disp_intel_all ('', '', '', 'eax', '5', '17');
+push @invalid32, permute_disp_intel_all ('', '', '-', 'eax', '5', '17');
+push @invalid32, permute_sign_disp_intel_all ('ebx', 'eax', '5', '17');
 
-is ( is_valid_32bit_addr_intel ("[dl*2 + ebx]"), 0, "[dl*2 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[dl*2 + ebx + 1]"), 0, "[dl*2 + ebx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ecx*2 + dl]"), 0, "[ecx*2 + dl] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ecx*2 + dl + 1]"), 0, "[ecx*2 + dl + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ebx + dl*2]"), 0, "[ebx + dl*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ebx + dl*2 + 1]"), 0, "[ebx + dl*2 + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[dl + ecx*2]"), 0, "[dl + ecx*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[dl + ecx*2 + 1]"), 0, "[dl + ecx*2 + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[dl*2 + 1 + ebx]"), 0, "[dl*2 + 1 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ecx*2 + 1 + dl]"), 0, "[ecx*2 + 1 + dl] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1 + dl*2 + ebx]"), 0, "[1 + dl*2 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1 + ecx*2 + dl]"), 0, "[1 + ecx*2 + dl] is a valid 32-bit addressing scheme" );
+push @invalid32, permute_disp_intel_all ('', '', '', 'eax', 'edx', '19');
+push @invalid32, permute_disp_intel_all ('', '', '-', 'eax', 'edx', '19');
 
-is ( is_valid_32bit_addr_intel ("[cs*2 + ebx + 1]"), 0, "[cs*2 + ebx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[mm1*2 + ebx + 1]"), 0, "[mm1*2 + ebx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[st2*2 + ebx + 1]"), 0, "[st2*2 + ebx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[cr0*2 + ebx + 1]"), 0, "[cr0*2 + ebx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[cx*2 + ebx + 1]"), 0, "[cx*2 + ebx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[rcx*2 + ebx + 1]"), 0, "[rcx*2 + ebx + 1] is a valid 32-bit addressing scheme" );
+push @invalid32, permute_sign_disp_intel_all ('ebx', 'eax', 'edx', '19');
 
-is ( is_valid_32bit_addr_intel ("[2*cs + ebx]"), 0, "[2*cs + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[2*cs + ebx + 1]"), 0, "[2*cs + ebx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[2*ecx + cs]"), 0, "[2*ecx + cs] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[2*ecx + cs + 1]"), 0, "[2*ecx + cs + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ebx + 2*cs]"), 0, "[ebx + 2*cs] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ebx + 2*cs + 1]"), 0, "[ebx + 2*cs + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[cs + 2*ecx]"), 0, "[cs + 2*ecx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[cs + 2*ecx + 1]"), 0, "[cs + 2*ecx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[2*cs + 1 + ebx]"), 0, "[2*cs + 1 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[2*ecx + 1 + cs]"), 0, "[2*ecx + 1 + cs] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1 + 2*cs + ebx]"), 0, "[1 + 2*cs + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1 + 2*ecx + cs]"), 0, "[1 + 2*ecx + cs] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1 + ebx + 2*cs]"), 0, "[1 + ebx + 2*cs] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1 + cs + 2*ecx]"), 0, "[1 + cs + 2*ecx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ebx + 1 + 2*cs]"), 0, "[ebx + 1 + 2*cs] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[cs + 1 + 2*ecx]"), 0, "[cs + 1 + 2*ecx] is a valid 32-bit addressing scheme" );
+push @invalid32, permute_disp_intel_segreg_all ('ax', '', 'ebx', '', '', '', '20');
+push @invalid32, permute_disp_intel_segreg_all ('ax', '-', 'ebx', '', '', '', '20');
 
-is ( is_valid_32bit_addr_intel ("[5*eax + ebx]"), 0, "[5*eax + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[5*eax + ebx + 1]"), 0, "[5*eax + ebx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ecx*5 + eax]"), 0, "[ecx*5 + eax] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ecx*5 + eax + 1]"), 0, "[ecx*5 + eax + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ebx + 5*eax]"), 0, "[ebx + 5*eax] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ebx + 5*eax + 1]"), 0, "[ebx + 5*eax + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[eax + ecx*5]"), 0, "[eax + ecx*5] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[eax + ecx*5 + 1]"), 0, "[eax + ecx*5 + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[5*eax + 1 + ebx]"), 0, "[5*eax + 1 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ecx*5 + 1 + eax]"), 0, "[ec*5x + 1 + eax] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ebx + 1 + 5*eax]"), 0, "[ebx + 1 + 5*eax] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[eax + 1 + ecx*5]"), 0, "[eax + 1 + ecx*5] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1 + 5*eax + ebx]"), 0, "[1 + 5*eax + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1 + ecx*5 + eax]"), 0, "[1 + ecx*5 + eax] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1 + ebx + 5*eax]"), 0, "[1 + ebx + 5*eax] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1 + eax + ecx*5]"), 0, "[1 + eax + ecx*5] is a valid 32-bit addressing scheme" );
+foreach my $s ('', '2') {
 
-is ( is_valid_32bit_addr_intel ("[2*dl + ebx]"), 0, "[2*dl + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[2*dl + ebx + 1]"), 0, "[2*dl + ebx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[2*ecx + dl]"), 0, "[2*ecx + dl] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[2*ecx + dl + 1]"), 0, "[2*ecx + dl + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ebx + 2*dl]"), 0, "[ebx + 2*dl] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ebx + 2*dl + 1]"), 0, "[ebx + 2*dl + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[dl + 2*ecx]"), 0, "[dl + 2*ecx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[dl + 2*ecx + 1]"), 0, "[dl + 2*ecx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[2*dl + 1 + ebx]"), 0, "[2*dl + 1 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[2*ecx + 1 + dl]"), 0, "[2*ecx + 1 + dl] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1 + 2*dl + ebx]"), 0, "[1 + 2*dl + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1 + 2*ecx + dl]"), 0, "[1 + 2*ecx + dl] is a valid 32-bit addressing scheme" );
+	push @invalid32, permute_disp_intel_segreg_all ('ax', '', '', '', 'edi', $s, '21');
+	push @invalid32, permute_disp_intel_segreg_all ('ax', '', '', '-', 'edi', $s, '21');
 
-is ( is_valid_32bit_addr_intel ("[cs + ebx]"), 0, "[cs + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[cs + ebx + 1]"), 0, "[cs + ebx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ecx + cs]"), 0, "[ecx + cs] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ecx + cs + 1]"), 0, "[ecx + cs + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ebx + cs]"), 0, "[ebx + cs] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ebx + cs + 1]"), 0, "[ebx + cs + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[cs + ecx]"), 0, "[cs + ecx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[cs + ecx + 1]"), 0, "[cs + ecx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[cs + 1 + ebx]"), 0, "[cs + 1 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ecx + 1 + cs]"), 0, "[ecx + 1 + cs] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1 + cs + ebx]"), 0, "[1 + cs + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1 + ecx + cs]"), 0, "[1 + ecx + cs] is a valid 32-bit addressing scheme" );
+	push @invalid32, permute_sign_disp_intel_segreg_all ('ax', 'ebx', 'edi', $s, '22');
+	push @invalid32, permute_sign_disp_intel_segreg_all ('ax', 'cs', 'ebx', $s, '24');
+	push @invalid32, permute_sign_disp_intel_segreg_all ('ax', 'ebx', 'cs', $s, '26');
+}
 
-is ( is_valid_32bit_addr_intel ("[cs*2]"), 0, "[cs*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[2*cs]"), 0, "[2*cs] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[dl*2]"), 0, "[dl*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[2*dl]"), 0, "[2*dl] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[cr0*2]"), 0, "[cr0*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[2*cr0]"), 0, "[2*cr0] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ax*2]"), 0, "[ax*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[2*ax]"), 0, "[2*ax] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[mm1*2]"), 0, "[mm1*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[2*mm1]"), 0, "[2*mm1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[st1*2]"), 0, "[st1*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[2*st1]"), 0, "[2*st1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[rcx*2]"), 0, "[rcx*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[2*rcx]"), 0, "[2*rcx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[eax*ebx]"), 0, "[eax*ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[-2*eax]"), 0, "[-2*eax] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[-eax*2]"), 0, "[-eax*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[-1*2]"), 1, "[-1*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[eax*5]"), 0, "[eax*5] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[5*eax]"), 0, "[5*eax] is a valid 32-bit addressing scheme" );
-
-is ( is_valid_32bit_addr_intel ("[dl + ebx]"), 0, "[dl + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ecx + dl]"), 0, "[ecx + dl] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[cr0 + ebx]"), 0, "[cr0 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ecx + cr0]"), 0, "[ecx + cr0] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ax + ebx]"), 0, "[ax + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ecx + ax]"), 0, "[ecx + ax] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[mm2 + ebx]"), 0, "[mm2 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ecx + mm2]"), 0, "[ecx + mm2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[st0 + ebx]"), 0, "[st0 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ecx + st0]"), 0, "[ecx + st0] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[rdx + ebx]"), 0, "[rdx + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ecx + rdx]"), 0, "[ecx + rdx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[eax - ebx]"), 0, "[eax - ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[- ecx + edx]"), 0, "[- ecx + edx] is a valid 32-bit addressing scheme" );
-
-is ( is_valid_32bit_addr_intel ("[2*cr0 + ebx]"), 0, "[2*cr0 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[2*cr0 + ebx + 1]"), 0, "[2*cr0 + ebx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[2*ecx + cr0]"), 0, "[2*ecx + cr0] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[2*ecx + cr0 + 1]"), 0, "[2*ecx + cr0 + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ebx + 2*cr0]"), 0, "[ebx + 2*cr0] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ebx + 2*cr0 + 1]"), 0, "[ebx + 2*cr0 + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[cr0 + 2*ecx]"), 0, "[cr0 + 2*ecx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[cr0 + 2*ecx + 1]"), 0, "[cr0 + 2*ecx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[2*cr0 + 1 + ebx]"), 0, "[2*cr0 + 1 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[2*ecx + 1 + cr0]"), 0, "[2*ecx + 1 + cr0] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1 + 2*cr0 + ebx]"), 0, "[1 + 2*cr0 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1 + 2*ecx + cr0]"), 0, "[1 + 2*ecx + cr0] is a valid 32-bit addressing scheme" );
-
-is ( is_valid_32bit_addr_intel ("[2*mm0 + ebx]"), 0, "[2*mm0 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[2*mm0 + ebx + 1]"), 0, "[2*mm0 + ebx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[2*ecx + mm0]"), 0, "[2*ecx + mm0] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[2*ecx + mm0 + 1]"), 0, "[2*ecx + mm0 + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ebx + 2*mm0]"), 0, "[ebx + 2*mm0] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ebx + 2*mm0 + 1]"), 0, "[ebx + 2*mm0 + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[mm0 + 2*ecx]"), 0, "[mm0 + 2*ecx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[mm0 + 2*ecx + 1]"), 0, "[mm0 + 2*ecx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[2*mm0 + 1 + ebx]"), 0, "[2*mm0 + 1 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[2*ecx + 1 + mm0]"), 0, "[2*ecx + 1 + mm0] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1 + 2*mm0 + ebx]"), 0, "[1 + 2*mm0 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1 + 2*ecx + mm0]"), 0, "[1 + 2*ecx + mm0] is a valid 32-bit addressing scheme" );
-
-is ( is_valid_32bit_addr_intel ("[2*st0 + ebx]"), 0, "[2*st0 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[2*st0 + ebx + 1]"), 0, "[2*st0 + ebx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[2*ecx + st0]"), 0, "[2*ecx + st0] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[2*ecx + st0 + 1]"), 0, "[2*ecx + st0 + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ebx + 2*st0]"), 0, "[ebx + 2*st0] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ebx + 2*st0 + 1]"), 0, "[ebx + 2*st0 + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[st0 + 2*ecx]"), 0, "[st0 + 2*ecx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[st0 + 2*ecx + 1]"), 0, "[st0 + 2*ecx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[2*st0 + 1 + ebx]"), 0, "[2*st0 + 1 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[2*ecx + 1 + st0]"), 0, "[2*ecx + 1 + st0] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1 + 2*st0 + ebx]"), 0, "[1 + 2*st0 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1 + 2*ecx + st0]"), 0, "[1 + 2*ecx + st0] is a valid 32-bit addressing scheme" );
-
-is ( is_valid_32bit_addr_intel ("[2*ax + ebx]"), 0, "[2*ax + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[2*ax + ebx + 1]"), 0, "[2*ax + ebx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[2*ecx + ax]"), 0, "[2*ecx + ax] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[2*ecx + ax + 1]"), 0, "[2*ecx + ax + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ebx + 2*ax]"), 0, "[ebx + 2*ax] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ebx + 2*ax + 1]"), 0, "[ebx + 2*ax + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ax + 2*ecx]"), 0, "[ax + 2*ecx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ax + 2*ecx + 1]"), 0, "[ax + 2*ecx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[2*ax + 1 + ebx]"), 0, "[2*ax + 1 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[2*ecx + 1 + ax]"), 0, "[2*ecx + 1 + ax] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1 + 2*ax + ebx]"), 0, "[1 + 2*ax + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1 + 2*ecx + ax]"), 0, "[1 + 2*ecx + ax] is a valid 32-bit addressing scheme" );
-
-is ( is_valid_32bit_addr_intel ("[2*rax + ebx]"), 0, "[2*rax + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[2*rax + ebx + 1]"), 0, "[2*rax + ebx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[2*ecx + rax]"), 0, "[2*ecx + rax] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[2*ecx + rax + 1]"), 0, "[2*ecx + rax + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ebx + 2*rax]"), 0, "[ebx + 2*rax] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ebx + 2*rax + 1]"), 0, "[ebx + 2*rax + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[rax + 2*ecx]"), 0, "[rax + 2*ecx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[rax + 2*ecx + 1]"), 0, "[rax + 2*ecx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[2*rax + 1 + ebx]"), 0, "[2*rax + 1 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[2*ecx + 1 + rax]"), 0, "[2*ecx + 1 + rax] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1 + 2*rax + ebx]"), 0, "[1 + 2*rax + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1 + 2*ecx + rax]"), 0, "[1 + 2*ecx + rax] is a valid 32-bit addressing scheme" );
-
-# -----------
-
-is ( is_valid_32bit_addr_intel ("cs:[eax]"), 1, "cs:[eax] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("cs:[beax]"), 1, "cs:[beax] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("cs:[eaxd]"), 1, "cs:[eaxd] is a valid 32-bit addressing scheme" );
-
-is ( is_valid_32bit_addr_intel ("cs:[cl]"), 0, "cs:[cl] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("cs:[mm1]"), 0, "cs:[mm1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("cs:[st1]"), 0, "cs:[st1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("cs:[rax]"), 0, "cs:[rax] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("cs:[ax]"), 0, "cs:[ax] is a valid 32-bit addressing scheme" );
-
-is ( is_valid_32bit_addr_intel ("ds:[ebx+77]"), 1, "ds:[ebx+77] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("ds:[ebx+ecx]"), 1, "ds:[ebx+ecx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("ds:[ebx+ebx+99]"), 1, "ds:[ebx+ebx+99] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("ds:[ebx+edi-88]"), 1, "ds:[ebx+edi-88] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("ds:[ebx+edi+-88]"), 1, "ds:[ebx+edi+-88] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("ds:[ebx-88+edi]"), 1, "ds:[ebx-88+edi] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("ds:[-88+ebx+edi]"), 1, "ds:[-88+ebx+edi] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("ds:[-ebx+edi+-88]"), 0, "ds:[-ebx+edi+-88] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("ds:[-ebx-88+edi]"), 0, "ds:[-ebx-88+edi] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("ds:[-88-ebx+edi]"), 0, "ds:[-88-ebx+edi] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("ds:[ebx-edi+-88]"), 0, "ds:[ebx-edi+-88] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("ds:[ebx-88-edi]"), 0, "ds:[ebx-88-edi] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("ds:[-88+ebx-edi]"), 0, "ds:[-88+ebx-edi] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("ds:[eax+ebx+edi]"), 0, "ds:[eax+ebx+edi] is a valid 32-bit addressing scheme" );
-
-is ( is_valid_32bit_addr_intel ("es:[ebx + eax*1]"), 1, "es:[ebx+eax*1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[ebx + 1*eax]"), 1, "es:[ebx+1*eax] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[eax*1 + ebx]"), 1, "es:[eax*1 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[1*eax + ebx]"), 1, "es:[1*eax + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[ebx + eax*2]"), 1, "es:[ebx+eax*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[ebx + 2*eax]"), 1, "es:[ebx+2*eax] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[eax*2 + ebx]"), 1, "es:[eax*2 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[2*eax + ebx]"), 1, "es:[2*eax + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[ebx + eax*4]"), 1, "es:[ebx+eax*4] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[ebx + 4*eax]"), 1, "es:[ebx+4*eax] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[eax*4 + ebx]"), 1, "es:[eax*4 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[4*eax + ebx]"), 1, "es:[4*eax + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[ebx + eax*8]"), 1, "es:[ebx+eax*8] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[ebx + 8*eax]"), 1, "es:[ebx+8*eax] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[eax*8 + ebx]"), 1, "es:[eax*8 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[8*eax + ebx]"), 1, "es:[8*eax + ebx] is a valid 32-bit addressing scheme" );
-
-is ( is_valid_32bit_addr_intel ("es:[ebx+esi*4+66]"), 1, "es:[ebx+esi*4+66] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[ebx+ecx*8-55]"), 1, "es:[ebx+ecx*8-55] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[ebx+ecx*8+-55]"), 1, "es:[ebx+ecx*8+-55] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[ebx+ebp*1]"), 1, "es:[ebx+ebp*1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[ebx+ebp*1 + 2]"), 1, "es:[ebx+ebp*1 + 2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[ebx+ebp*2 + 2]"), 1, "es:[ebx+ebp*2 + 2] is a valid 32-bit addressing scheme" );
-
-is ( is_valid_32bit_addr_intel ("es:[ebx+4*esi+66]"), 1, "es:[ebx+4*esi+66] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[ebx+8*ecx-55]"), 1, "es:[ebx+8*ecx-55] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[ebx+8*ecx+-55]"), 1, "es:[ebx+8*ecx+-55] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[ebx+1*ebp]"), 1, "es:[ebx+1*ebp] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[ebx+1*ebp + 2]"), 1, "es:[ebx+1*ebp + 2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[ebx+2*ebp + 2]"), 1, "es:[ebx+2*ebp + 2] is a valid 32-bit addressing scheme" );
-
-is ( is_valid_32bit_addr_intel ("fs:[ecx*2 + ebx]"), 1, "fs:[ecx*2 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("fs:[ecx*4 + ebx -1]"), 1, "fs:[ecx*4 + ebx -1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("fs:[ecx*4 + ebx +-1]"), 1, "fs:[ecx*4 + ebx +-1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("fs:[ecx*8 + ebx+ 44]"), 1, "fs:[ecx*2 + ebx+ 44] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("fs:[ecx*1 + esp]"), 1, "fs:[ecx*1 + esp] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("fs:[ecx*4 -1 + ebx]"), 1, "fs:[ecx*4 -1 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("fs:[ecx*4 +-1 + ebx]"), 1, "fs:[ecx*4 +-1 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("fs:[ecx*8 +44 + ebx]"), 1, "fs:[ecx*2 +44+ ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("fs:[ecx*4 -1 + ebx]"), 1, "fs:[ecx*4 -1 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("fs:[ecx*4 +-1 + ebx]"), 1, "fs:[ecx*4 +-1 + ebx] is a valid 32-bit addressing scheme" );
-
-is ( is_valid_32bit_addr_intel ("gs:[ebx + ecx*1 + 1]"), 1, "gs:[ebx + ecx*1 + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("gs:[ebx + 1*ecx + 1]"), 1, "gs:[ebx + 1*ecx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("gs:[ebx + 1 + ecx*1]"), 1, "gs:[ebx + 1 + ecx*1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("gs:[ebx + 1 + 1*ecx]"), 1, "gs:[ebx + 1 + 1*ecx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("gs:[ebx + ecx*2 + 1]"), 1, "gs:[ebx + ecx*2 + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("gs:[ebx + 2*ecx + 1]"), 1, "gs:[ebx + 2*ecx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("gs:[ebx + 1 + ecx*2]"), 1, "gs:[ebx + 1 + ecx*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("gs:[ebx + 1 + 2*ecx]"), 1, "gs:[ebx + 1 + 2*ecx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("gs:[ebx + ecx*4 + 1]"), 1, "gs:[ebx + ecx*4 + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("gs:[ebx + 4*ecx + 1]"), 1, "gs:[ebx + 4*ecx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("gs:[ebx + 1 + ecx*4]"), 1, "gs:[ebx + 1 + ecx*4] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("gs:[ebx + 1 + 4*ecx]"), 1, "gs:[ebx + 1 + 4*ecx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("gs:[ebx + ecx*8 + 1]"), 1, "gs:[ebx + ecx*8 + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("gs:[ebx + 8*ecx + 1]"), 1, "gs:[ebx + 8*ecx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("gs:[ebx + 1 + ecx*8]"), 1, "gs:[ebx + 1 + ecx*8] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("gs:[ebx + 1 + 8*ecx]"), 1, "gs:[ebx + 1 + 8*ecx] is a valid 32-bit addressing scheme" );
-
-is ( is_valid_32bit_addr_intel ("gs:[ecx*1 + ebx + 1]"), 1, "gs:[ecx*1 + ebx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("gs:[1*ecx + ebx + 1]"), 1, "gs:[1*ecx + ebx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("gs:[ecx*1 + 1 + ebx]"), 1, "gs:[ecx*1 + 1 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("gs:[1*ecx + 1 + ebx]"), 1, "gs:[1*ecx + 1 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("gs:[ecx*2 + ebx + 1]"), 1, "gs:[ecx*2 + ebx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("gs:[2*ecx + ebx + 1]"), 1, "gs:[2*ecx + ebx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("gs:[ecx*2 + 1 + ebx]"), 1, "gs:[ecx*2 + 1 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("gs:[2*ecx + 1 + ebx]"), 1, "gs:[2*ecx + 1 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("gs:[ecx*4 + ebx + 1]"), 1, "gs:[ecx*4 + ebx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("gs:[4*ecx + ebx + 1]"), 1, "gs:[4*ecx + ebx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("gs:[ecx*4 + 1 + ebx]"), 1, "gs:[ecx*4 + 1 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("gs:[4*ecx + 1 + ebx]"), 1, "gs:[4*ecx + 1 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("gs:[ecx*8 + ebx + 1]"), 1, "gs:[ecx*8 + ebx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("gs:[8*ecx + ebx + 1]"), 1, "gs:[8*ecx + ebx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("gs:[ecx*8 + 1 + ebx]"), 1, "gs:[ecx*8 + 1 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("gs:[8*ecx + 1 + ebx]"), 1, "gs:[8*ecx + 1 + ebx] is a valid 32-bit addressing scheme" );
-
-is ( is_valid_32bit_addr_intel ("gs:[1 + ebx + ecx*1]"), 1, "gs:[1 + ebx + ecx*1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("gs:[1 + ebx + 1*ecx]"), 1, "gs:[1 + ebx + 1*ecx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("gs:[1 + ecx*1 + ebx]"), 1, "gs:[1 + ecx*1 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("gs:[1 + 1*ecx + ebx]"), 1, "gs:[1 + 1*ecx + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("gs:[1 + ebx + ecx*2]"), 1, "gs:[1 + ebx + ecx*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("gs:[1 + ebx + 2*ecx]"), 1, "gs:[1 + ebx + 2*ecx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("gs:[1 + ecx*2 + ebx]"), 1, "gs:[1 + ecx*2 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("gs:[1 + 2*ecx + ebx]"), 1, "gs:[1 + 2*ecx + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("gs:[1 + ebx + ecx*4]"), 1, "gs:[1 + ebx + ecx*4] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("gs:[1 + ebx + 4*ecx]"), 1, "gs:[1 + ebx + 4*ecx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("gs:[1 + ecx*4 + ebx]"), 1, "gs:[1 + ecx*4 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("gs:[1 + 4*ecx + ebx]"), 1, "gs:[1 + 4*ecx + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("gs:[1 + ebx + ecx*8]"), 1, "gs:[1 + ebx + ecx*8 + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("gs:[1 + ebx + 8*ecx]"), 1, "gs:[1 + ebx + 8*ecx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("gs:[1 + ecx*8 + ebx]"), 1, "gs:[1 + ecx*8 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("gs:[1 + 8*ecx + ebx]"), 1, "gs:[1 + 8*ecx + ebx] is a valid 32-bit addressing scheme" );
-
-is ( is_valid_32bit_addr_intel ("gs:[1*esp]"), 1, "gs:[1*esp] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("gs:[2*esp]"), 0, "gs:[2*esp] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("gs:[ecx+1*esp]"), 1, "gs:[ecx+1*esp] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("gs:[ecx+2*esp]"), 0, "gs:[ecx+2*esp] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("gs:[1*esp+esi]"), 1, "gs:[1*esp+esi] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("gs:[2*esp+esi]"), 0, "gs:[2*esp+esi] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("gs:[1*esp+1]"), 1, "gs:[1*esp+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("gs:[2*esp+1]"), 0, "gs:[2*esp+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("gs:[1+1*esp]"), 1, "gs:[1+1*esp] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("gs:[1+2*esp]"), 0, "gs:[1+2*esp] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("gs:[1+ecx+1*esp]"), 1, "gs:[1+ecx+1*esp] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("gs:[1+ecx+2*esp]"), 0, "gs:[1+ecx+2*esp] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("gs:[1+1*esp+esi]"), 1, "gs:[1+1*esp+esi] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("gs:[1+2*esp+esi]"), 0, "gs:[1+2*esp+esi] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("gs:[ecx+1+1*esp]"), 1, "gs:[ecx+1+1*esp] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("gs:[ecx+1+2*esp]"), 0, "gs:[ecx+1+2*esp] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("gs:[1*esp+1+esi]"), 1, "gs:[1*esp+1+esi] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("gs:[2*esp+1+esi]"), 0, "gs:[2*esp+1+esi] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("gs:[ecx+1*esp+1]"), 1, "gs:[ecx+1*esp+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("gs:[ecx+2*esp+1]"), 0, "gs:[ecx+2*esp+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("gs:[1*esp+esi+1]"), 1, "gs:[1*esp+esi+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("gs:[2*esp+esi+1]"), 0, "gs:[2*esp+esi+1] is a valid 32-bit addressing scheme" );
-
-is ( is_valid_32bit_addr_intel ("gs:[esp*1]"), 1, "gs:[esp*1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("gs:[esp*2]"), 0, "gs:[esp*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("gs:[ecx+esp*1]"), 1, "gs:[ecx+esp*1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("gs:[ecx+esp*2]"), 0, "gs:[ecx+esp*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("gs:[esp*1+esi]"), 1, "gs:[esp*1+esi] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("gs:[esp*2+esi]"), 0, "gs:[esp*2+esi] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("gs:[esp*1+1]"), 1, "gs:[esp*1+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("gs:[esp*2+1]"), 0, "gs:[esp*2+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("gs:[1+esp*1]"), 1, "gs:[1+esp*1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("gs:[1+esp*2]"), 0, "gs:[1+esp*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("gs:[1+ecx+esp*1]"), 1, "gs:[1+ecx+esp*1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("gs:[1+ecx+esp*2]"), 0, "gs:[1+ecx+esp*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("gs:[1+esp*1+esi]"), 1, "gs:[1+esp*1+esi] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("gs:[1+esp*2+esi]"), 0, "gs:[1+esp*2+esi] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("gs:[ecx+1+esp*1]"), 1, "gs:[ecx+1+esp*1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("gs:[ecx+1+esp*2]"), 0, "gs:[ecx+1+esp*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("gs:[esp*1+1+esi]"), 1, "gs:[esp*1+1+esi] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("gs:[esp*2+1+esi]"), 0, "gs:[esp*2+1+esi] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("gs:[ecx+esp*1+1]"), 1, "gs:[ecx+esp*1+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("gs:[ecx+esp*2+1]"), 0, "gs:[ecx+esp*2+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("gs:[esp*1+esi+1]"), 1, "gs:[esp*1+esi+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("gs:[esp*2+esi+1]"), 0, "gs:[esp*2+esi+1] is a valid 32-bit addressing scheme" );
-
-is ( is_valid_32bit_addr_intel ("gs:[z*esp]"), 1, "gs:[z*esp] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("gs:[ecx+z*esp]"), 1, "gs:[ecx+z*esp] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("gs:[z*esp+esi]"), 1, "gs:[z*esp+esi] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("gs:[z*esp+1]"), 1, "gs:[z*esp+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("gs:[1+z*esp]"), 1, "gs:[1+z*esp] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("gs:[1+ecx+z*esp]"), 1, "gs:[1+ecx+z*esp] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("gs:[1+z*esp+esi]"), 1, "gs:[1+z*esp+esi] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("gs:[ecx+1+z*esp]"), 1, "gs:[ecx+1+z*esp] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("gs:[z*esp+1+esi]"), 1, "gs:[z*esp+1+esi] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("gs:[ecx+z*esp+1]"), 1, "gs:[ecx+z*esp+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("gs:[z*esp+esi+1]"), 1, "gs:[z*esp+esi+1] is a valid 32-bit addressing scheme" );
-
-is ( is_valid_32bit_addr_intel ("gs:[esp*z]"), 1, "gs:[esp*z] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("gs:[ecx+esp*z]"), 1, "gs:[ecx+esp*z] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("gs:[esp*z+esi]"), 1, "gs:[esp*z+esi] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("gs:[esp*z+1]"), 1, "gs:[esp*z+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("gs:[1+esp*z]"), 1, "gs:[1+esp*z] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("gs:[1+ecx+esp*z]"), 1, "gs:[1+ecx+esp*z] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("gs:[1+esp*z+esi]"), 1, "gs:[1+esp*z+esi] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("gs:[ecx+1+esp*z]"), 1, "gs:[ecx+1+esp*z] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("gs:[esp*z+1+esi]"), 1, "gs:[esp*z+1+esi] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("gs:[ecx+esp*z+1]"), 1, "gs:[ecx+esp*z+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("gs:[esp*z+esi+1]"), 1, "gs:[esp*z+esi+1] is a valid 32-bit addressing scheme" );
-
-is ( is_valid_32bit_addr_intel ("gs:[ecx*2]"), 1, "gs:[ecx*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("gs:[esp*4]"), 0, "gs:[esp*4] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("gs:[ecx*2 + ebx*8]"), 0, "gs:[ecx*2 + ebx*8] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("gs:[ecx + esp*2]"), 0, "gs:[ecx + esp*2] is a valid 32-bit addressing scheme" );
-
-is ( is_valid_32bit_addr_intel ("gs:[2*ecx]"), 1, "gs:[2*ecx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("gs:[4*esp]"), 0, "gs:[4*esp] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("gs:[2*ecx + ebx*8]"), 0, "gs:[2*ecx + ebx*8] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("gs:[ecx + 2*esp]"), 0, "gs:[ecx + 2*esp] is a valid 32-bit addressing scheme" );
-
-is ( is_valid_32bit_addr_intel ("ss:[1+eax]"), 1, "ss:[1+eax] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("ss:[-2+edx]"), 1, "ss:[-2+edx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("ss:[3+ebx*2]"), 1, "ss:[3+ebx*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("ss:[-4+esi*4]"), 1, "ss:[-4+esi*4] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("ss:[5+ecx+esi]"), 1, "ss:[5+ecx+esi] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("ss:[-6+ecx*2+edi]"), 1, "ss:[-6+ecx*2+edi] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("ss:[7+esp+ebp*8]"), 1, "ss:[7+esp+ebp*8] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("ss:[-8+esp+ebp*8]"), 1, "ss:[-8+esp+ebp*8] is a valid 32-bit addressing scheme" );
-
-# -----------
-
-is ( is_valid_32bit_addr_intel ("[ss:eax]"), 1, "[ss:eax] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ss:beax]"), 1, "[ss:beax] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ss:eaxd]"), 1, "[ss:eaxd] is a valid 32-bit addressing scheme" );
-
-is ( is_valid_32bit_addr_intel ("[cs:cl]"), 0, "[cs:cl] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[cs:mm1]"), 0, "[cs:mm1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[cs:st1]"), 0, "[cs:st1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[cs:rax]"), 0, "[cs:rax] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[cs:ax]"), 0, "[cs:ax] is a valid 32-bit addressing scheme" );
-
-is ( is_valid_32bit_addr_intel ("[gs:ebx+77]"), 1, "[gs:ebx+77] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[gs:ebx+ecx]"), 1, "[gs:ebx+ecx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[gs:ebx+ebx+99]"), 1, "[gs:ebx+ebx+99] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[gs:ebx+edi-88]"), 1, "[gs:ebx+edi-88] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[gs:ebx+edi+-88]"), 1, "[gs:ebx+edi+-88] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[gs:ebx-88+edi]"), 1, "[gs:ebx-88+edi] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[gs:-88+ebx+edi]"), 1, "[gs:-88+ebx+edi] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[gs:-ebx+edi+-88]"), 0, "[gs:-ebx+edi+-88] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[gs:-ebx-88+edi]"), 0, "[gs:-ebx-88+edi] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[gs:-88-ebx+edi]"), 0, "[gs:-88-ebx+edi] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[gs:ebx-edi+-88]"), 0, "[gs:ebx-edi+-88] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[gs:ebx-88-edi]"), 0, "[gs:ebx-88-edi] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[gs:-88+ebx-edi]"), 0, "[gs:-88+ebx-edi] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[gs:eax+ebx+edi]"), 0, "[gs:eax+ebx+edi] is a valid 32-bit addressing scheme" );
-
-is ( is_valid_32bit_addr_intel ("[fs:ebx + eax*1]"), 1, "[fs:ebx+eax*1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[fs:ebx + 1*eax]"), 1, "[fs:ebx+1*eax] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[fs:eax*1 + ebx]"), 1, "[fs:eax*1 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[fs:1*eax + ebx]"), 1, "[fs:1*eax + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[fs:ebx + eax*2]"), 1, "[fs:ebx+eax*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[fs:ebx + 2*eax]"), 1, "[fs:ebx+2*eax] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[fs:eax*2 + ebx]"), 1, "[fs:eax*2 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[fs:2*eax + ebx]"), 1, "[fs:2*eax + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[fs:ebx + eax*4]"), 1, "[fs:ebx+eax*4] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[fs:ebx + 4*eax]"), 1, "[fs:ebx+4*eax] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[fs:eax*4 + ebx]"), 1, "[fs:eax*4 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[fs:4*eax + ebx]"), 1, "[fs:4*eax + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[fs:ebx + eax*8]"), 1, "[fs:ebx+eax*8] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[fs:ebx + 8*eax]"), 1, "[fs:ebx+8*eax] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[fs:eax*8 + ebx]"), 1, "[fs:eax*8 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[fs:8*eax + ebx]"), 1, "[fs:8*eax + ebx] is a valid 32-bit addressing scheme" );
-
-is ( is_valid_32bit_addr_intel ("[fs:ebx+esi*4+66]"), 1, "[fs:ebx+esi*4+66] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[fs:ebx+ecx*8-55]"), 1, "[fs:ebx+ecx*8-55] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[fs:ebx+ecx*8+-55]"), 1, "[fs:ebx+ecx*8+-55] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[fs:ebx+ebp*1]"), 1, "[fs:ebx+ebp*1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[fs:ebx+ebp*1 + 2]"), 1, "[fs:ebx+ebp*1 + 2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[fs:ebx+ebp*2 + 2]"), 1, "[fs:ebx+ebp*2 + 2] is a valid 32-bit addressing scheme" );
-
-is ( is_valid_32bit_addr_intel ("[fs:ebx+4*esi+66]"), 1, "[fs:ebx+4*esi+66] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[fs:ebx+8*ecx-55]"), 1, "[fs:ebx+8*ecx-55] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[fs:ebx+8*ecx+-55]"), 1, "[fs:ebx+8*ecx+-55] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[fs:ebx+1*ebp]"), 1, "[fs:ebx+1*ebp] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[fs:ebx+1*ebp + 2]"), 1, "[fs:ebx+1*ebp + 2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[fs:ebx+2*ebp + 2]"), 1, "[fs:ebx+2*ebp + 2] is a valid 32-bit addressing scheme" );
-
-is ( is_valid_32bit_addr_intel ("[es:ecx*2 + ebx]"), 1, "[es:ecx*2 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:ecx*4 + ebx -1]"), 1, "[es:ecx*4 + ebx -1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:ecx*4 + ebx +-1]"), 1, "[es:ecx*4 + ebx +-1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:ecx*8 + ebx+ 44]"), 1, "[es:ecx*2 + ebx+ 44] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:ecx*1 + esp]"), 1, "[es:ecx*1 + esp] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:ecx*4 -1 + ebx]"), 1, "[es:ecx*4 -1 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:ecx*4 +-1 + ebx]"), 1, "[es:ecx*4 +-1 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:ecx*8 +44 + ebx]"), 1, "[es:ecx*2 +44+ ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:ecx*4 -1 + ebx]"), 1, "[es:ecx*4 -1 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:ecx*4 +-1 + ebx]"), 1, "[es:ecx*4 +-1 + ebx] is a valid 32-bit addressing scheme" );
-
-is ( is_valid_32bit_addr_intel ("[ds:ebx + ecx*1 + 1]"), 1, "[ds:ebx + ecx*1 + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:ebx + 1*ecx + 1]"), 1, "[ds:ebx + 1*ecx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:ebx + 1 + ecx*1]"), 1, "[ds:ebx + 1 + ecx*1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:ebx + 1 + 1*ecx]"), 1, "[ds:ebx + 1 + 1*ecx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:ebx + ecx*2 + 1]"), 1, "[ds:ebx + ecx*2 + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:ebx + 2*ecx + 1]"), 1, "[ds:ebx + 2*ecx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:ebx + 1 + ecx*2]"), 1, "[ds:ebx + 1 + ecx*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:ebx + 1 + 2*ecx]"), 1, "[ds:ebx + 1 + 2*ecx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:ebx + ecx*4 + 1]"), 1, "[ds:ebx + ecx*4 + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:ebx + 4*ecx + 1]"), 1, "[ds:ebx + 4*ecx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:ebx + 1 + ecx*4]"), 1, "[ds:ebx + 1 + ecx*4] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:ebx + 1 + 4*ecx]"), 1, "[ds:ebx + 1 + 4*ecx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:ebx + ecx*8 + 1]"), 1, "[ds:ebx + ecx*8 + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:ebx + 8*ecx + 1]"), 1, "[ds:ebx + 8*ecx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:ebx + 1 + ecx*8]"), 1, "[ds:ebx + 1 + ecx*8] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:ebx + 1 + 8*ecx]"), 1, "[ds:ebx + 1 + 8*ecx] is a valid 32-bit addressing scheme" );
-
-is ( is_valid_32bit_addr_intel ("[ds:ecx*1 + ebx + 1]"), 1, "[ds:ecx*1 + ebx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:1*ecx + ebx + 1]"), 1, "[ds:1*ecx + ebx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:ecx*1 + 1 + ebx]"), 1, "[ds:ecx*1 + 1 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:1*ecx + 1 + ebx]"), 1, "[ds:1*ecx + 1 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:ecx*2 + ebx + 1]"), 1, "[ds:ecx*2 + ebx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:2*ecx + ebx + 1]"), 1, "[ds:2*ecx + ebx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:ecx*2 + 1 + ebx]"), 1, "[ds:ecx*2 + 1 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:2*ecx + 1 + ebx]"), 1, "[ds:2*ecx + 1 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:ecx*4 + ebx + 1]"), 1, "[ds:ecx*4 + ebx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:4*ecx + ebx + 1]"), 1, "[ds:4*ecx + ebx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:ecx*4 + 1 + ebx]"), 1, "[ds:ecx*4 + 1 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:4*ecx + 1 + ebx]"), 1, "[ds:4*ecx + 1 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:ecx*8 + ebx + 1]"), 1, "[ds:ecx*8 + ebx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:8*ecx + ebx + 1]"), 1, "[ds:8*ecx + ebx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:ecx*8 + 1 + ebx]"), 1, "[ds:ecx*8 + 1 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:8*ecx + 1 + ebx]"), 1, "[ds:8*ecx + 1 + ebx] is a valid 32-bit addressing scheme" );
-
-is ( is_valid_32bit_addr_intel ("[ds:1 + ebx + ecx*1]"), 1, "[ds:1 + ebx + ecx*1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:1 + ebx + 1*ecx]"), 1, "[ds:1 + ebx + 1*ecx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:1 + ecx*1 + ebx]"), 1, "[ds:1 + ecx*1 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:1 + 1*ecx + ebx]"), 1, "[ds:1 + 1*ecx + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:1 + ebx + ecx*2]"), 1, "[ds:1 + ebx + ecx*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:1 + ebx + 2*ecx]"), 1, "[ds:1 + ebx + 2*ecx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:1 + ecx*2 + ebx]"), 1, "[ds:1 + ecx*2 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:1 + 2*ecx + ebx]"), 1, "[ds:1 + 2*ecx + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:1 + ebx + ecx*4]"), 1, "[ds:1 + ebx + ecx*4] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:1 + ebx + 4*ecx]"), 1, "[ds:1 + ebx + 4*ecx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:1 + ecx*4 + ebx]"), 1, "[ds:1 + ecx*4 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:1 + 4*ecx + ebx]"), 1, "[ds:1 + 4*ecx + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:1 + ebx + ecx*8]"), 1, "[ds:1 + ebx + ecx*8 + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:1 + ebx + 8*ecx]"), 1, "[ds:1 + ebx + 8*ecx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:1 + ecx*8 + ebx]"), 1, "[ds:1 + ecx*8 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:1 + 8*ecx + ebx]"), 1, "[ds:1 + 8*ecx + ebx] is a valid 32-bit addressing scheme" );
-
-is ( is_valid_32bit_addr_intel ("[ds:ecx*1]"), 1, "[ds:ecx*1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:ecx*2]"), 1, "[ds:ecx*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:ecx*4]"), 1, "[ds:ecx*4] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:ecx*8]"), 1, "[ds:ecx*8] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:esp*4]"), 0, "[ds:esp*4] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:ecx*2 + ebx*8]"), 0, "[ds:ecx*2 + ebx*8] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:ecx + esp*2]"), 0, "[ds:ecx + esp*2] is a valid 32-bit addressing scheme" );
-
-is ( is_valid_32bit_addr_intel ("[ds:1*esp]"), 1, "[ds:1*esp] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:2*esp]"), 0, "[ds:2*esp] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:ecx+1*esp]"), 1, "[ds:ecx+1*esp] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:ecx+2*esp]"), 0, "[ds:ecx+2*esp] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:1*esp+esi]"), 1, "[ds:1*esp+esi] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:2*esp+esi]"), 0, "[ds:2*esp+esi] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:1*esp+1]"), 1, "[ds:1*esp+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:2*esp+1]"), 0, "[ds:2*esp+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:1+1*esp]"), 1, "[ds:1+1*esp] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:1+2*esp]"), 0, "[ds:1+2*esp] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:1+ecx+1*esp]"), 1, "[ds:1+ecx+1*esp] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:1+ecx+2*esp]"), 0, "[ds:1+ecx+2*esp] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:1+1*esp+esi]"), 1, "[ds:1+1*esp+esi] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:1+2*esp+esi]"), 0, "[ds:1+2*esp+esi] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:ecx+1+1*esp]"), 1, "[ds:ecx+1+1*esp] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:ecx+1+2*esp]"), 0, "[ds:ecx+1+2*esp] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:1*esp+1+esi]"), 1, "[ds:1*esp+1+esi] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:2*esp+1+esi]"), 0, "[ds:2*esp+1+esi] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:ecx+1*esp+1]"), 1, "[ds:ecx+1*esp+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:ecx+2*esp+1]"), 0, "[ds:ecx+2*esp+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:1*esp+esi+1]"), 1, "[ds:1*esp+esi+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:2*esp+esi+1]"), 0, "[ds:2*esp+esi+1] is a valid 32-bit addressing scheme" );
-
-is ( is_valid_32bit_addr_intel ("[ds:esp*1]"), 1, "[ds:esp*1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:esp*2]"), 0, "[ds:esp*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:ecx+esp*1]"), 1, "[ds:ecx+esp*1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:ecx+esp*2]"), 0, "[ds:ecx+esp*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:esp*1+esi]"), 1, "[ds:esp*1+esi] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:esp*2+esi]"), 0, "[ds:esp*2+esi] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:esp*1+1]"), 1, "[ds:esp*1+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:esp*2+1]"), 0, "[ds:esp*2+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:1+esp*1]"), 1, "[ds:1+esp*1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:1+esp*2]"), 0, "[ds:1+esp*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:1+ecx+esp*1]"), 1, "[ds:1+ecx+esp*1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:1+ecx+esp*2]"), 0, "[ds:1+ecx+esp*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:1+esp*1+esi]"), 1, "[ds:1+esp*1+esi] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:1+esp*2+esi]"), 0, "[ds:1+esp*2+esi] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:ecx+1+esp*1]"), 1, "[ds:ecx+1+esp*1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:ecx+1+esp*2]"), 0, "[ds:ecx+1+esp*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:esp*1+1+esi]"), 1, "[ds:esp*1+1+esi] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:esp*2+1+esi]"), 0, "[ds:esp*2+1+esi] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:ecx+esp*1+1]"), 1, "[ds:ecx+esp*1+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:ecx+esp*2+1]"), 0, "[ds:ecx+esp*2+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:esp*1+esi+1]"), 1, "[ds:esp*1+esi+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:esp*2+esi+1]"), 0, "[ds:esp*2+esi+1] is a valid 32-bit addressing scheme" );
-
-is ( is_valid_32bit_addr_intel ("[ds:z*esp]"), 1, "[ds:z*esp] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:ecx+z*esp]"), 1, "[ds:ecx+z*esp] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:z*esp+esi]"), 1, "[ds:z*esp+esi] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:z*esp+1]"), 1, "[ds:z*esp+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:1+z*esp]"), 1, "[ds:1+z*esp] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:1+ecx+z*esp]"), 1, "[ds:1+ecx+z*esp] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:1+z*esp+esi]"), 1, "[ds:1+z*esp+esi] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:ecx+1+z*esp]"), 1, "[ds:ecx+1+z*esp] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:z*esp+1+esi]"), 1, "[ds:z*esp+1+esi] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:ecx+z*esp+1]"), 1, "[ds:ecx+z*esp+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:z*esp+esi+1]"), 1, "[ds:z*esp+esi+1] is a valid 32-bit addressing scheme" );
-
-is ( is_valid_32bit_addr_intel ("[ds:esp*z]"), 1, "[ds:esp*z] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:ecx+esp*z]"), 1, "[ds:ecx+esp*z] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:esp*z+esi]"), 1, "[ds:esp*z+esi] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:esp*z+1]"), 1, "[ds:esp*z+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:1+esp*z]"), 1, "[ds:1+esp*z] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:1+ecx+esp*z]"), 1, "[ds:1+ecx+esp*z] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:1+esp*z+esi]"), 1, "[ds:1+esp*z+esi] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:ecx+1+esp*z]"), 1, "[ds:ecx+1+esp*z] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:esp*z+1+esi]"), 1, "[ds:esp*z+1+esi] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:ecx+esp*z+1]"), 1, "[ds:ecx+esp*z+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:esp*z+esi+1]"), 1, "[ds:esp*z+esi+1] is a valid 32-bit addressing scheme" );
-
-is ( is_valid_32bit_addr_intel ("[ds:1*ecx]"), 1, "[ds:1*ecx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:2*ecx]"), 1, "[ds:2*ecx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:4*ecx]"), 1, "[ds:4*ecx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:8*ecx]"), 1, "[ds:8*ecx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:4*esp]"), 0, "[ds:4*esp] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:2*ecx + ebx*8]"), 0, "[ds:2*ecx + ebx*8] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ds:ecx + 2*esp]"), 0, "[ds:ecx + 2*esp] is a valid 32-bit addressing scheme" );
-
-is ( is_valid_32bit_addr_intel ("[cs:1+eax]"), 1, "[cs:1+eax] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[cs:-2+edx]"), 1, "[cs:-2+edx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[cs:3+ebx*2]"), 1, "[cs:3+ebx*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[cs:-4+esi*4]"), 1, "[cs:-4+esi*4] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[cs:5+ecx+esi]"), 1, "[cs:5+ecx+esi] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[cs:-6+ecx*2+edi]"), 1, "[cs:-6+ecx*2+edi] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[cs:7+esp+ebp*8]"), 1, "[cs:7+esp+ebp*8] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[cs:-8+esp+ebp*8]"), 1, "[cs:-8+esp+ebp*8] is a valid 32-bit addressing scheme" );
-
-# -----------
-
-is ( is_valid_32bit_addr_intel ("[cr0]"), 0, "[cr0] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:cr0]"), 0, "[es:cr0] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[cr0]"), 0, "es:[cr0] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[cr0+1]"), 0, "[cr0+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:cr0+1]"), 0, "[es:cr0+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[cr0+1]"), 0, "es:[cr0+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[cr0*2+1]"), 0, "[cr0*2+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:cr0*2+1]"), 0, "[es:cr0*2+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[cr0*2+1]"), 0, "es:[cr0*2+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[2*cr0+1]"), 0, "[2*cr0+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:2*cr0+1]"), 0, "[es:2*cr0+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[2*cr0+1]"), 0, "es:[2*cr0+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1 + cr0]"), 0, "[1 + cr0] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:1 + cr0]"), 0, "[es:1 + cr0] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[1 + cr0]"), 0, "es:[1 + cr0] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1 + cr0*2]"), 0, "[1 + cr0*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:1 + cr0*2]"), 0, "[es:1 + cr0*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[1 + cr0*2]"), 0, "es:[1 + cr0*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1 + 2*cr0]"), 0, "[1 + 2*cr0] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:1 + 2*cr0]"), 0, "[es:1 + 2*cr0] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[1 + 2*cr0]"), 0, "es:[1 + 2*cr0] is a valid 32-bit addressing scheme" );
-
-is ( is_valid_32bit_addr_intel ("[cl]"), 0, "[cl] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:cl]"), 0, "[es:cl] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[cl]"), 0, "es:[cl] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[cl+1]"), 0, "[cl+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:cl+1]"), 0, "[es:cl+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[cl+1]"), 0, "es:[cl+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[cl*2+1]"), 0, "[cl*2+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:cl*2+1]"), 0, "[es:cl*2+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[cl*2+1]"), 0, "es:[cl*2+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[2*cl+1]"), 0, "[2*cl+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:2*cl+1]"), 0, "[es:2*cl+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[2*cl+1]"), 0, "es:[2*cl+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1 + cl]"), 0, "[1 + cl] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:1 + cl]"), 0, "[es:1 + cl] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[1 + cl]"), 0, "es:[1 + cl] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1 + cl*2]"), 0, "[1 + cl*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:1 + cl*2]"), 0, "[es:1 + cl*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[1 + cl*2]"), 0, "es:[1 + cl*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1 + 2*cl]"), 0, "[1 + 2*cl] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:1 + 2*cl]"), 0, "[es:1 + 2*cl] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[1 + 2*cl]"), 0, "es:[1 + 2*cl] is a valid 32-bit addressing scheme" );
-
-is ( is_valid_32bit_addr_intel ("[mm3]"), 0, "[mm3] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:mm3]"), 0, "[es:mm3] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[mm3]"), 0, "es:[mm3] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[mm3+1]"), 0, "[mm3+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:mm3+1]"), 0, "[es:mm3+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[mm3+1]"), 0, "es:[mm3+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[mm3*2+1]"), 0, "[mm3*2+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:mm3*2+1]"), 0, "[es:mm3*2+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[mm3*2+1]"), 0, "es:[mm3*2+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[2*mm3+1]"), 0, "[2*mm3+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:2*mm3+1]"), 0, "[es:2*mm3+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[2*mm3+1]"), 0, "es:[2*mm3+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1 + mm3]"), 0, "[1 + mm3] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:1 + mm3]"), 0, "[es:1 + mm3] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[1 + mm3]"), 0, "es:[1 + mm3] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1 + mm3*2]"), 0, "[1 + mm3*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:1 + mm3*2]"), 0, "[es:1 + mm3*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[1 + mm3*2]"), 0, "es:[1 + mm3*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1 + 2*mm3]"), 0, "[1 + 2*mm3] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:1 + 2*mm3]"), 0, "[es:1 + 2*mm3] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[1 + 2*mm3]"), 0, "es:[1 + 2*mm3] is a valid 32-bit addressing scheme" );
-
-is ( is_valid_32bit_addr_intel ("[st2]"), 0, "[st2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:st2]"), 0, "[es:st2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[st2]"), 0, "es:[st2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[st2+1]"), 0, "[st2+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:st2+1]"), 0, "[es:st2+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[st2+1]"), 0, "es:[st2+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[st2*2+1]"), 0, "[st2*2+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:st2*2+1]"), 0, "[es:st2*2+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[st2*2+1]"), 0, "es:[st2*2+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[2*st2+1]"), 0, "[2*st2+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:2*st2+1]"), 0, "[es:2*st2+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[2*st2+1]"), 0, "es:[2*st2+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1 + st2]"), 0, "[1 + st2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:1 + st2]"), 0, "[es:1 + st2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[1 + st2]"), 0, "es:[1 + st2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1 + st2*2]"), 0, "[1 + st2*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:1 + st2*2]"), 0, "[es:1 + st2*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[1 + st2*2]"), 0, "es:[1 + st2*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1 + 2*st2]"), 0, "[1 + 2*st2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:1 + 2*st2]"), 0, "[es:1 + 2*st2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[1 + 2*st2]"), 0, "es:[1 + 2*st2] is a valid 32-bit addressing scheme" );
-
-is ( is_valid_32bit_addr_intel ("[cx]"), 0, "[cx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:cx]"), 0, "[es:cx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[cx]"), 0, "es:[cx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[cx+1]"), 0, "[cx+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:cx+1]"), 0, "[es:cx+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[cx+1]"), 0, "es:[cx+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[cx*2+1]"), 0, "[cx*2+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:cx*2+1]"), 0, "[es:cx*2+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[cx*2+1]"), 0, "es:[cx*2+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[2*cx+1]"), 0, "[2*cx+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:2*cx+1]"), 0, "[es:2*cx+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[2*cx+1]"), 0, "es:[2*cx+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1 + cx]"), 0, "[1 + cx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:1 + cx]"), 0, "[es:1 + cx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[1 + cx]"), 0, "es:[1 + cx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1 + cx*2]"), 0, "[1 + cx*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:1 + cx*2]"), 0, "[es:1 + cx*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[1 + cx*2]"), 0, "es:[1 + cx*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1 + 2*cx]"), 0, "[1 + 2*cx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:1 + 2*cx]"), 0, "[es:1 + 2*cx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[1 + 2*cx]"), 0, "es:[1 + 2*cx] is a valid 32-bit addressing scheme" );
-
-is ( is_valid_32bit_addr_intel ("[rbx]"), 0, "[rbx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:rbx]"), 0, "[es:rbx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[rbx]"), 0, "es:[rbx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[rbx+1]"), 0, "[rbx+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:rbx+1]"), 0, "[es:rbx+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[rbx+1]"), 0, "es:[rbx+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[rbx*2+1]"), 0, "[rbx*2+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:rbx*2+1]"), 0, "[es:rbx*2+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[rbx*2+1]"), 0, "es:[rbx*2+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[2*rbx+1]"), 0, "[2*rbx+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:2*rbx+1]"), 0, "[es:2*rbx+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[2*rbx+1]"), 0, "es:[2*rbx+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1 + rbx]"), 0, "[1 + rbx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:1 + rbx]"), 0, "[es:1 + rbx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[1 + rbx]"), 0, "es:[1 + rbx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1 + rbx*2]"), 0, "[1 + rbx*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:1 + rbx*2]"), 0, "[es:1 + rbx*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[1 + rbx*2]"), 0, "es:[1 + rbx*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1 + 2*rbx]"), 0, "[1 + 2*rbx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:1 + 2*rbx]"), 0, "[es:1 + 2*rbx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[1 + 2*rbx]"), 0, "es:[1 + 2*rbx] is a valid 32-bit addressing scheme" );
-
-is ( is_valid_32bit_addr_intel ("[cr0+ebx]"), 0, "[cr0+ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:cr0+ebx]"), 0, "[es:cr0+ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[cr0+ebx]"), 0, "es:[cr0+ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[cr0*2+ebx]"), 0, "[cr0*2+ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:cr0*2+ebx]"), 0, "[es:cr0*2+ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[cr0*2+ebx]"), 0, "es:[cr0*2+ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[2*cr0+ebx]"), 0, "[2*cr0+ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:2*cr0+ebx]"), 0, "[es:2*cr0+ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[2*cr0+ebx]"), 0, "es:[2*cr0+ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ebx + cr0]"), 0, "[ebx + cr0] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:ebx + cr0]"), 0, "[es:ebx + cr0] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[ebx + cr0]"), 0, "es:[ebx + cr0] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ebx + cr0*2]"), 0, "[ebx + cr0*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:ebx + cr0*2]"), 0, "[es:ebx + cr0*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[ebx + cr0*2]"), 0, "es:[ebx + cr0*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ebx + 2*cr0]"), 0, "[ebx + 2*cr0] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:ebx + 2*cr0]"), 0, "[es:ebx + 2*cr0] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[ebx + 2*cr0]"), 0, "es:[ebx + 2*cr0] is a valid 32-bit addressing scheme" );
-
-is ( is_valid_32bit_addr_intel ("[cl+ebx]"), 0, "[cl+ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:cl+ebx]"), 0, "[es:cl+ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[cl+ebx]"), 0, "es:[cl+ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[cl*2+ebx]"), 0, "[cl*2+ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:cl*2+ebx]"), 0, "[es:cl*2+ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[cl*2+ebx]"), 0, "es:[cl*2+ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[2*cl+ebx]"), 0, "[2*cl+ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:2*cl+ebx]"), 0, "[es:2*cl+ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[2*cl+ebx]"), 0, "es:[2*cl+ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ebx + cl]"), 0, "[ebx + cl] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:ebx + cl]"), 0, "[es:ebx + cl] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[ebx + cl]"), 0, "es:[ebx + cl] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ebx + cl*2]"), 0, "[ebx + cl*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:ebx + cl*2]"), 0, "[es:ebx + cl*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[ebx + cl*2]"), 0, "es:[ebx + cl*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ebx + 2*cl]"), 0, "[ebx + 2*cl] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:ebx + 2*cl]"), 0, "[es:ebx + 2*cl] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[ebx + 2*cl]"), 0, "es:[ebx + 2*cl] is a valid 32-bit addressing scheme" );
-
-is ( is_valid_32bit_addr_intel ("[mm0+ebx]"), 0, "[mm0+ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:mm0+ebx]"), 0, "[es:mm0+ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[mm0+ebx]"), 0, "es:[mm0+ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[mm0*2+ebx]"), 0, "[mm0*2+ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:mm0*2+ebx]"), 0, "[es:mm0*2+ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[mm0*2+ebx]"), 0, "es:[mm0*2+ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[2*mm0+ebx]"), 0, "[2*mm0+ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:2*mm0+ebx]"), 0, "[es:2*mm0+ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[2*mm0+ebx]"), 0, "es:[2*mm0+ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ebx + mm0]"), 0, "[ebx + mm0] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:ebx + mm0]"), 0, "[es:ebx + mm0] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[ebx + mm0]"), 0, "es:[ebx + mm0] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ebx + mm0*2]"), 0, "[ebx + mm0*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:ebx + mm0*2]"), 0, "[es:ebx + mm0*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[ebx + mm0*2]"), 0, "es:[ebx + mm0*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ebx + 2*mm0]"), 0, "[ebx + 2*mm0] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:ebx + 2*mm0]"), 0, "[es:ebx + 2*mm0] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[ebx + 2*mm0]"), 0, "es:[ebx + 2*mm0] is a valid 32-bit addressing scheme" );
-
-is ( is_valid_32bit_addr_intel ("[st0+ebx]"), 0, "[st0+ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:st0+ebx]"), 0, "[es:st0+ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[st0+ebx]"), 0, "es:[st0+ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[st0*2+ebx]"), 0, "[st0*2+ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:st0*2+ebx]"), 0, "[es:st0*2+ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[st0*2+ebx]"), 0, "es:[st0*2+ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[2*st0+ebx]"), 0, "[2*st0+ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:2*st0+ebx]"), 0, "[es:2*st0+ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[2*st0+ebx]"), 0, "es:[2*st0+ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ebx + st0]"), 0, "[ebx + st0] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:ebx + st0]"), 0, "[es:ebx + st0] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[ebx + st0]"), 0, "es:[ebx + st0] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ebx + st0*2]"), 0, "[ebx + st0*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:ebx + st0*2]"), 0, "[es:ebx + st0*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[ebx + st0*2]"), 0, "es:[ebx + st0*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ebx + 2*st0]"), 0, "[ebx + 2*st0] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:ebx + 2*st0]"), 0, "[es:ebx + 2*st0] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[ebx + 2*st0]"), 0, "es:[ebx + 2*st0] is a valid 32-bit addressing scheme" );
-
-is ( is_valid_32bit_addr_intel ("[cx+ebx]"), 0, "[cx+ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:cx+ebx]"), 0, "[es:cx+ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[cx+ebx]"), 0, "es:[cx+ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[cx*2+ebx]"), 0, "[cx*2+ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:cx*2+ebx]"), 0, "[es:cx*2+ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[cx*2+ebx]"), 0, "es:[cx*2+ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[2*cx+ebx]"), 0, "[2*cx+ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:2*cx+ebx]"), 0, "[es:2*cx+ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[2*cx+ebx]"), 0, "es:[2*cx+ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ebx + cx]"), 0, "[ebx + cx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:ebx + cx]"), 0, "[es:ebx + cx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[ebx + cx]"), 0, "es:[ebx + cx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ebx + cx*2]"), 0, "[ebx + cx*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:ebx + cx*2]"), 0, "[es:ebx + cx*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[ebx + cx*2]"), 0, "es:[ebx + cx*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ebx + 2*cx]"), 0, "[ebx + 2*cx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:ebx + 2*cx]"), 0, "[es:ebx + 2*cx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[ebx + 2*cx]"), 0, "es:[ebx + 2*cx] is a valid 32-bit addressing scheme" );
-
-is ( is_valid_32bit_addr_intel ("[rbx+ebx]"), 0, "[rbx+ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:rbx+ebx]"), 0, "[es:rbx+ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[rbx+ebx]"), 0, "es:[rbx+ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[rbx*2+ebx]"), 0, "[rbx*2+ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:rbx*2+ebx]"), 0, "[es:rbx*2+ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[rbx*2+ebx]"), 0, "es:[rbx*2+ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[2*rbx+ebx]"), 0, "[2*rbx+ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:2*rbx+ebx]"), 0, "[es:2*rbx+ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[2*rbx+ebx]"), 0, "es:[2*rbx+ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ebx + rbx]"), 0, "[ebx + rbx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:ebx + rbx]"), 0, "[es:ebx + rbx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[ebx + rbx]"), 0, "es:[ebx + rbx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ebx + rbx*2]"), 0, "[ebx + rbx*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:ebx + rbx*2]"), 0, "[es:ebx + rbx*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[ebx + rbx*2]"), 0, "es:[ebx + rbx*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ebx + 2*rbx]"), 0, "[ebx + 2*rbx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:ebx + 2*rbx]"), 0, "[es:ebx + 2*rbx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[ebx + 2*rbx]"), 0, "es:[ebx + 2*rbx] is a valid 32-bit addressing scheme" );
-
-is ( is_valid_32bit_addr_intel ("[eax+cr0+1]"), 0, "[eax+cr0+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:eax+cr0+1]"), 0, "[es:eax+cr0+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[eax+cr0+1]"), 0, "es:[eax+cr0+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[eax+cr0*2+1]"), 0, "[eax+cr0*2+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:eax+cr0*2+1]"), 0, "[es:eax+cr0*2+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[eax+cr0*2+1]"), 0, "es:[eax+cr0*2+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[eax+2*cr0+1]"), 0, "[eax+2*cr0+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:eax+2*cr0+1]"), 0, "[es:eax+2*cr0+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[eax+2*cr0+1]"), 0, "es:[eax+2*cr0+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[eax+1 + cr0]"), 0, "[eax+1 + cr0] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:eax+1 + cr0]"), 0, "[es:eax+1 + cr0] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[eax+1 + cr0]"), 0, "es:[eax+1 + cr0] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[eax+1 + cr0*2]"), 0, "[eax+1 + cr0*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:eax+1 + cr0*2]"), 0, "[es:eax+1 + cr0*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[eax+1 + cr0*2]"), 0, "es:[eax+1 + cr0*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[eax+1 + 2*cr0]"), 0, "[eax+1 + 2*cr0] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:eax+1 + 2*cr0]"), 0, "[es:eax+1 + 2*cr0] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[eax+1 + 2*cr0]"), 0, "es:[eax+1 + 2*cr0] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1 + eax+cr0]"), 0, "[1 + eax+cr0] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:1 + eax+cr0]"), 0, "[es:1 + eax+cr0] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[1 + eax+cr0]"), 0, "es:[1 + eax+cr0] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1 + eax+cr0*2]"), 0, "[1 + eax+cr0*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:1 + eax+cr0*2]"), 0, "[es:1 + eax+cr0*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[1 + eax+cr0*2]"), 0, "es:[1 + eax+cr0*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1 + eax+2*cr0]"), 0, "[1 + eax+2*cr0] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:1 + eax+2*cr0]"), 0, "[es:1 + eax+2*cr0] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[1 + eax+2*cr0]"), 0, "es:[1 + eax+2*cr0] is a valid 32-bit addressing scheme" );
-
-is ( is_valid_32bit_addr_intel ("[es:eax+dl+1]"), 0, "[es:eax+dl+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[eax+dl+1]"), 0, "es:[eax+dl+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[eax+dl*2+1]"), 0, "[eax+dl*2+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:eax+dl*2+1]"), 0, "[es:eax+dl*2+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[eax+dl*2+1]"), 0, "es:[eax+dl*2+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[eax+2*dl+1]"), 0, "[eax+2*dl+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:eax+2*dl+1]"), 0, "[es:eax+2*dl+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[eax+2*dl+1]"), 0, "es:[eax+2*dl+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[eax+1 + dl]"), 0, "[eax+1 + dl] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:eax+1 + dl]"), 0, "[es:eax+1 + dl] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[eax+1 + dl]"), 0, "es:[eax+1 + dl] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[eax+1 + dl*2]"), 0, "[eax+1 + dl*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:eax+1 + dl*2]"), 0, "[es:eax+1 + dl*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[eax+1 + dl*2]"), 0, "es:[eax+1 + dl*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[eax+1 + 2*dl]"), 0, "[eax+1 + 2*dl] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:eax+1 + 2*dl]"), 0, "[es:eax+1 + 2*dl] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[eax+1 + 2*dl]"), 0, "es:[eax+1 + 2*dl] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1 + eax+dl]"), 0, "[1 + eax+dl] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:1 + eax+dl]"), 0, "[es:1 + eax+dl] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[1 + eax+dl]"), 0, "es:[1 + eax+dl] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1 + eax+dl*2]"), 0, "[1 + eax+dl*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:1 + eax+dl*2]"), 0, "[es:1 + eax+dl*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[1 + eax+dl*2]"), 0, "es:[1 + eax+dl*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1 + eax+2*dl]"), 0, "[1 + eax+2*dl] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:1 + eax+2*dl]"), 0, "[es:1 + eax+2*dl] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[1 + eax+2*dl]"), 0, "es:[1 + eax+2*dl] is a valid 32-bit addressing scheme" );
-
-is ( is_valid_32bit_addr_intel ("[es:eax+mm1+1]"), 0, "[es:eax+mm1+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[eax+mm1+1]"), 0, "es:[eax+mm1+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[eax+mm1*2+1]"), 0, "[eax+mm1*2+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:eax+mm1*2+1]"), 0, "[es:eax+mm1*2+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[eax+mm1*2+1]"), 0, "es:[eax+mm1*2+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[eax+2*mm1+1]"), 0, "[eax+2*mm1+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:eax+2*mm1+1]"), 0, "[es:eax+2*mm1+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[eax+2*mm1+1]"), 0, "es:[eax+2*mm1+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[eax+1 + mm1]"), 0, "[eax+1 + mm1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:eax+1 + mm1]"), 0, "[es:eax+1 + mm1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[eax+1 + mm1]"), 0, "es:[eax+1 + mm1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[eax+1 + mm1*2]"), 0, "[eax+1 + mm1*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:eax+1 + mm1*2]"), 0, "[es:eax+1 + mm1*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[eax+1 + mm1*2]"), 0, "es:[eax+1 + mm1*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[eax+1 + 2*mm1]"), 0, "[eax+1 + 2*mm1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:eax+1 + 2*mm1]"), 0, "[es:eax+1 + 2*mm1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[eax+1 + 2*mm1]"), 0, "es:[eax+1 + 2*mm1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1 + eax+mm1]"), 0, "[1 + eax+mm1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:1 + eax+mm1]"), 0, "[es:1 + eax+mm1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[1 + eax+mm1]"), 0, "es:[1 + eax+mm1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1 + eax+mm1*2]"), 0, "[1 + eax+mm1*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:1 + eax+mm1*2]"), 0, "[es:1 + eax+mm1*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[1 + eax+mm1*2]"), 0, "es:[1 + eax+mm1*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1 + eax+2*mm1]"), 0, "[1 + eax+2*mm1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:1 + eax+2*mm1]"), 0, "[es:1 + eax+2*mm1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[1 + eax+2*mm1]"), 0, "es:[1 + eax+2*mm1] is a valid 32-bit addressing scheme" );
-
-is ( is_valid_32bit_addr_intel ("[es:eax+st1+1]"), 0, "[es:eax+st1+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[eax+st1+1]"), 0, "es:[eax+st1+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[eax+st1*2+1]"), 0, "[eax+st1*2+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:eax+st1*2+1]"), 0, "[es:eax+st1*2+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[eax+st1*2+1]"), 0, "es:[eax+st1*2+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[eax+2*st1+1]"), 0, "[eax+2*st1+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:eax+2*st1+1]"), 0, "[es:eax+2*st1+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[eax+2*st1+1]"), 0, "es:[eax+2*st1+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[eax+1 + st1]"), 0, "[eax+1 + st1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:eax+1 + st1]"), 0, "[es:eax+1 + st1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[eax+1 + st1]"), 0, "es:[eax+1 + st1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[eax+1 + st1*2]"), 0, "[eax+1 + st1*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:eax+1 + st1*2]"), 0, "[es:eax+1 + st1*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[eax+1 + st1*2]"), 0, "es:[eax+1 + st1*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[eax+1 + 2*st1]"), 0, "[eax+1 + 2*st1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:eax+1 + 2*st1]"), 0, "[es:eax+1 + 2*st1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[eax+1 + 2*st1]"), 0, "es:[eax+1 + 2*st1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1 + eax+st1]"), 0, "[1 + eax+st1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:1 + eax+st1]"), 0, "[es:1 + eax+st1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[1 + eax+st1]"), 0, "es:[1 + eax+st1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1 + eax+st1*2]"), 0, "[1 + eax+st1*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:1 + eax+st1*2]"), 0, "[es:1 + eax+st1*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[1 + eax+st1*2]"), 0, "es:[1 + eax+st1*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1 + eax+2*st1]"), 0, "[1 + eax+2*st1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:1 + eax+2*st1]"), 0, "[es:1 + eax+2*st1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[1 + eax+2*st1]"), 0, "es:[1 + eax+2*st1] is a valid 32-bit addressing scheme" );
-
-is ( is_valid_32bit_addr_intel ("[es:eax+dx+1]"), 0, "[es:eax+dx+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[eax+dx+1]"), 0, "es:[eax+dx+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[eax+dx*2+1]"), 0, "[eax+dx*2+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:eax+dx*2+1]"), 0, "[es:eax+dx*2+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[eax+dx*2+1]"), 0, "es:[eax+dx*2+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[eax+2*dx+1]"), 0, "[eax+2*dx+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:eax+2*dx+1]"), 0, "[es:eax+2*dx+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[eax+2*dx+1]"), 0, "es:[eax+2*dx+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[eax+1 + dx]"), 0, "[eax+1 + dx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:eax+1 + dx]"), 0, "[es:eax+1 + dx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[eax+1 + dx]"), 0, "es:[eax+1 + dx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[eax+1 + dx*2]"), 0, "[eax+1 + dx*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:eax+1 + dx*2]"), 0, "[es:eax+1 + dx*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[eax+1 + dx*2]"), 0, "es:[eax+1 + dx*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[eax+1 + 2*dx]"), 0, "[eax+1 + 2*dx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:eax+1 + 2*dx]"), 0, "[es:eax+1 + 2*dx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[eax+1 + 2*dx]"), 0, "es:[eax+1 + 2*dx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1 + eax+dx]"), 0, "[1 + eax+dx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:1 + eax+dx]"), 0, "[es:1 + eax+dx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[1 + eax+dx]"), 0, "es:[1 + eax+dx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1 + eax+dx*2]"), 0, "[1 + eax+dx*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:1 + eax+dx*2]"), 0, "[es:1 + eax+dx*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[1 + eax+dx*2]"), 0, "es:[1 + eax+dx*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1 + eax+2*dx]"), 0, "[1 + eax+2*dx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:1 + eax+2*dx]"), 0, "[es:1 + eax+2*dx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[1 + eax+2*dx]"), 0, "es:[1 + eax+2*dx] is a valid 32-bit addressing scheme" );
-
-is ( is_valid_32bit_addr_intel ("[es:eax+rdx+1]"), 0, "[es:eax+rdx+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[eax+rdx+1]"), 0, "es:[eax+rdx+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[eax+rdx*2+1]"), 0, "[eax+rdx*2+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:eax+rdx*2+1]"), 0, "[es:eax+rdx*2+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[eax+rdx*2+1]"), 0, "es:[eax+rdx*2+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[eax+2*rdx+1]"), 0, "[eax+2*rdx+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:eax+2*rdx+1]"), 0, "[es:eax+2*rdx+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[eax+2*rdx+1]"), 0, "es:[eax+2*rdx+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[eax+1 + rdx]"), 0, "[eax+1 + rdx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:eax+1 + rdx]"), 0, "[es:eax+1 + rdx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[eax+1 + rdx]"), 0, "es:[eax+1 + rdx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[eax+1 + rdx*2]"), 0, "[eax+1 + rdx*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:eax+1 + rdx*2]"), 0, "[es:eax+1 + rdx*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[eax+1 + rdx*2]"), 0, "es:[eax+1 + rdx*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[eax+1 + 2*rdx]"), 0, "[eax+1 + 2*rdx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:eax+1 + 2*rdx]"), 0, "[es:eax+1 + 2*rdx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[eax+1 + 2*rdx]"), 0, "es:[eax+1 + 2*rdx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1 + eax+rdx]"), 0, "[1 + eax+rdx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:1 + eax+rdx]"), 0, "[es:1 + eax+rdx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[1 + eax+rdx]"), 0, "es:[1 + eax+rdx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1 + eax+rdx*2]"), 0, "[1 + eax+rdx*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:1 + eax+rdx*2]"), 0, "[es:1 + eax+rdx*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[1 + eax+rdx*2]"), 0, "es:[1 + eax+rdx*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1 + eax+2*rdx]"), 0, "[1 + eax+2*rdx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:1 + eax+2*rdx]"), 0, "[es:1 + eax+2*rdx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[1 + eax+2*rdx]"), 0, "es:[1 + eax+2*rdx] is a valid 32-bit addressing scheme" );
-
-is ( is_valid_32bit_addr_intel ("[es:cr0+edx+1]"), 0, "[es:cr0+edx+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[cr0+edx+1]"), 0, "es:[cr0+edx+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[cr0+edx*2+1]"), 0, "[cr0+edx*2+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:cr0+edx*2+1]"), 0, "[es:cr0+edx*2+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[cr0+edx*2+1]"), 0, "es:[cr0+edx*2+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[cr0+2*edx+1]"), 0, "[cr0+2*edx+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:cr0+2*edx+1]"), 0, "[es:cr0+2*edx+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[cr0+2*edx+1]"), 0, "es:[cr0+2*edx+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[cr0+1 + edx]"), 0, "[cr0+1 + edx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:cr0+1 + edx]"), 0, "[es:cr0+1 + edx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[cr0+1 + edx]"), 0, "es:[cr0+1 + edx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[cr0+1 + edx*2]"), 0, "[cr0+1 + edx*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:cr0+1 + edx*2]"), 0, "[es:cr0+1 + edx*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[cr0+1 + edx*2]"), 0, "es:[cr0+1 + edx*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[cr0+1 + 2*edx]"), 0, "[cr0+1 + 2*edx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:cr0+1 + 2*edx]"), 0, "[es:cr0+1 + 2*edx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[cr0+1 + 2*edx]"), 0, "es:[cr0+1 + 2*edx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1 + cr0+edx]"), 0, "[1 + cr0+edx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:1 + cr0+edx]"), 0, "[es:1 + cr0+edx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[1 + cr0+edx]"), 0, "es:[1 + cr0+edx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1 + cr0+edx*2]"), 0, "[1 + cr0+edx*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:1 + cr0+edx*2]"), 0, "[es:1 + cr0+edx*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[1 + cr0+edx*2]"), 0, "es:[1 + cr0+edx*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1 + cr0+2*edx]"), 0, "[1 + cr0+2*edx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:1 + cr0+2*edx]"), 0, "[es:1 + cr0+2*edx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[1 + cr0+2*edx]"), 0, "es:[1 + cr0+2*edx] is a valid 32-bit addressing scheme" );
-
-is ( is_valid_32bit_addr_intel ("[es:al+edx+1]"), 0, "[es:al+edx+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[al+edx+1]"), 0, "es:[al+edx+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[al+edx*2+1]"), 0, "[al+edx*2+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:al+edx*2+1]"), 0, "[es:al+edx*2+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[al+edx*2+1]"), 0, "es:[al+edx*2+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[al+2*edx+1]"), 0, "[al+2*edx+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:al+2*edx+1]"), 0, "[es:al+2*edx+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[al+2*edx+1]"), 0, "es:[al+2*edx+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[al+1 + edx]"), 0, "[al+1 + edx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:al+1 + edx]"), 0, "[es:al+1 + edx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[al+1 + edx]"), 0, "es:[al+1 + edx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[al+1 + edx*2]"), 0, "[al+1 + edx*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:al+1 + edx*2]"), 0, "[es:al+1 + edx*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[al+1 + edx*2]"), 0, "es:[al+1 + edx*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[al+1 + 2*edx]"), 0, "[al+1 + 2*edx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:al+1 + 2*edx]"), 0, "[es:al+1 + 2*edx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[al+1 + 2*edx]"), 0, "es:[al+1 + 2*edx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1 + al+edx]"), 0, "[1 + al+edx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:1 + al+edx]"), 0, "[es:1 + al+edx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[1 + al+edx]"), 0, "es:[1 + al+edx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1 + al+edx*2]"), 0, "[1 + al+edx*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:1 + al+edx*2]"), 0, "[es:1 + al+edx*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[1 + al+edx*2]"), 0, "es:[1 + al+edx*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1 + al+2*edx]"), 0, "[1 + al+2*edx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:1 + al+2*edx]"), 0, "[es:1 + al+2*edx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[1 + al+2*edx]"), 0, "es:[1 + al+2*edx] is a valid 32-bit addressing scheme" );
-
-is ( is_valid_32bit_addr_intel ("[es:mm2+edx+1]"), 0, "[es:mm2+edx+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[mm2+edx+1]"), 0, "es:[mm2+edx+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[mm2+edx*2+1]"), 0, "[mm2+edx*2+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:mm2+edx*2+1]"), 0, "[es:mm2+edx*2+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[mm2+edx*2+1]"), 0, "es:[mm2+edx*2+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[mm2+2*edx+1]"), 0, "[mm2+2*edx+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:mm2+2*edx+1]"), 0, "[es:mm2+2*edx+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[mm2+2*edx+1]"), 0, "es:[mm2+2*edx+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[mm2+1 + edx]"), 0, "[mm2+1 + edx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:mm2+1 + edx]"), 0, "[es:mm2+1 + edx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[mm2+1 + edx]"), 0, "es:[mm2+1 + edx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[mm2+1 + edx*2]"), 0, "[mm2+1 + edx*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:mm2+1 + edx*2]"), 0, "[es:mm2+1 + edx*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[mm2+1 + edx*2]"), 0, "es:[mm2+1 + edx*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[mm2+1 + 2*edx]"), 0, "[mm2+1 + 2*edx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:mm2+1 + 2*edx]"), 0, "[es:mm2+1 + 2*edx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[mm2+1 + 2*edx]"), 0, "es:[mm2+1 + 2*edx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1 + mm2+edx]"), 0, "[1 + mm2+edx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:1 + mm2+edx]"), 0, "[es:1 + mm2+edx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[1 + mm2+edx]"), 0, "es:[1 + mm2+edx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1 + mm2+edx*2]"), 0, "[1 + mm2+edx*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:1 + mm2+edx*2]"), 0, "[es:1 + mm2+edx*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[1 + mm2+edx*2]"), 0, "es:[1 + mm2+edx*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1 + mm2+2*edx]"), 0, "[1 + mm2+2*edx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:1 + mm2+2*edx]"), 0, "[es:1 + mm2+2*edx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[1 + mm2+2*edx]"), 0, "es:[1 + mm2+2*edx] is a valid 32-bit addressing scheme" );
-
-is ( is_valid_32bit_addr_intel ("[es:st4+edx+1]"), 0, "[es:st4+edx+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[st4+edx+1]"), 0, "es:[st4+edx+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[st4+edx*2+1]"), 0, "[st4+edx*2+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:st4+edx*2+1]"), 0, "[es:st4+edx*2+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[st4+edx*2+1]"), 0, "es:[st4+edx*2+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[st4+2*edx+1]"), 0, "[st4+2*edx+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:st4+2*edx+1]"), 0, "[es:st4+2*edx+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[st4+2*edx+1]"), 0, "es:[st4+2*edx+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[st4+1 + edx]"), 0, "[st4+1 + edx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:st4+1 + edx]"), 0, "[es:st4+1 + edx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[st4+1 + edx]"), 0, "es:[st4+1 + edx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[st4+1 + edx*2]"), 0, "[st4+1 + edx*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:st4+1 + edx*2]"), 0, "[es:st4+1 + edx*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[st4+1 + edx*2]"), 0, "es:[st4+1 + edx*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[st4+1 + 2*edx]"), 0, "[st4+1 + 2*edx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:st4+1 + 2*edx]"), 0, "[es:st4+1 + 2*edx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[st4+1 + 2*edx]"), 0, "es:[st4+1 + 2*edx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1 + st4+edx]"), 0, "[1 + st4+edx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:1 + st4+edx]"), 0, "[es:1 + st4+edx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[1 + st4+edx]"), 0, "es:[1 + st4+edx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1 + st4+edx*2]"), 0, "[1 + st4+edx*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:1 + st4+edx*2]"), 0, "[es:1 + st4+edx*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[1 + st4+edx*2]"), 0, "es:[1 + st4+edx*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1 + st4+2*edx]"), 0, "[1 + st4+2*edx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:1 + st4+2*edx]"), 0, "[es:1 + st4+2*edx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[1 + st4+2*edx]"), 0, "es:[1 + st4+2*edx] is a valid 32-bit addressing scheme" );
-
-is ( is_valid_32bit_addr_intel ("[es:ax+edx+1]"), 0, "[es:ax+edx+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[ax+edx+1]"), 0, "es:[ax+edx+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ax+edx*2+1]"), 0, "[ax+edx*2+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:ax+edx*2+1]"), 0, "[es:ax+edx*2+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[ax+edx*2+1]"), 0, "es:[ax+edx*2+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ax+2*edx+1]"), 0, "[ax+2*edx+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:ax+2*edx+1]"), 0, "[es:ax+2*edx+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[ax+2*edx+1]"), 0, "es:[ax+2*edx+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ax+1 + edx]"), 0, "[ax+1 + edx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:ax+1 + edx]"), 0, "[es:ax+1 + edx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[ax+1 + edx]"), 0, "es:[ax+1 + edx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ax+1 + edx*2]"), 0, "[ax+1 + edx*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:ax+1 + edx*2]"), 0, "[es:ax+1 + edx*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[ax+1 + edx*2]"), 0, "es:[ax+1 + edx*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ax+1 + 2*edx]"), 0, "[ax+1 + 2*edx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:ax+1 + 2*edx]"), 0, "[es:ax+1 + 2*edx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[ax+1 + 2*edx]"), 0, "es:[ax+1 + 2*edx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1 + ax+edx]"), 0, "[1 + ax+edx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:1 + ax+edx]"), 0, "[es:1 + ax+edx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[1 + ax+edx]"), 0, "es:[1 + ax+edx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1 + ax+edx*2]"), 0, "[1 + ax+edx*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:1 + ax+edx*2]"), 0, "[es:1 + ax+edx*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[1 + ax+edx*2]"), 0, "es:[1 + ax+edx*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1 + ax+2*edx]"), 0, "[1 + ax+2*edx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:1 + ax+2*edx]"), 0, "[es:1 + ax+2*edx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[1 + ax+2*edx]"), 0, "es:[1 + ax+2*edx] is a valid 32-bit addressing scheme" );
-
-is ( is_valid_32bit_addr_intel ("[es:rcx+edx+1]"), 0, "[es:rcx+edx+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[rcx+edx+1]"), 0, "es:[rcx+edx+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[rcx+edx*2+1]"), 0, "[rcx+edx*2+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:rcx+edx*2+1]"), 0, "[es:rcx+edx*2+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[rcx+edx*2+1]"), 0, "es:[rcx+edx*2+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[rcx+2*edx+1]"), 0, "[rcx+2*edx+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:rcx+2*edx+1]"), 0, "[es:rcx+2*edx+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[rcx+2*edx+1]"), 0, "es:[rcx+2*edx+1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[rcx+1 + edx]"), 0, "[rcx+1 + edx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:rcx+1 + edx]"), 0, "[es:rcx+1 + edx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[rcx+1 + edx]"), 0, "es:[rcx+1 + edx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[rcx+1 + edx*2]"), 0, "[rcx+1 + edx*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:rcx+1 + edx*2]"), 0, "[es:rcx+1 + edx*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[rcx+1 + edx*2]"), 0, "es:[rcx+1 + edx*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[rcx+1 + 2*edx]"), 0, "[rcx+1 + 2*edx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:rcx+1 + 2*edx]"), 0, "[es:rcx+1 + 2*edx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[rcx+1 + 2*edx]"), 0, "es:[rcx+1 + 2*edx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1 + rcx+edx]"), 0, "[1 + rcx+edx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:1 + rcx+edx]"), 0, "[es:1 + rcx+edx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[1 + rcx+edx]"), 0, "es:[1 + rcx+edx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1 + rcx+edx*2]"), 0, "[1 + rcx+edx*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:1 + rcx+edx*2]"), 0, "[es:1 + rcx+edx*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[1 + rcx+edx*2]"), 0, "es:[1 + rcx+edx*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[1 + rcx+2*edx]"), 0, "[1 + rcx+2*edx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:1 + rcx+2*edx]"), 0, "[es:1 + rcx+2*edx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[1 + rcx+2*edx]"), 0, "es:[1 + rcx+2*edx] is a valid 32-bit addressing scheme" );
-
-is ( is_valid_32bit_addr_intel ("[eax+cr0+ebx]"), 0, "[eax+cr0+ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:eax+cr0+ebx]"), 0, "[es:eax+cr0+ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[eax+cr0+ebx]"), 0, "es:[eax+cr0+ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[eax+cr0*2+ebx]"), 0, "[eax+cr0*2+ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:eax+cr0*2+ebx]"), 0, "[es:eax+cr0*2+ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[eax+cr0*2+ebx]"), 0, "es:[eax+cr0*2+ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[eax+2*cr0+ebx]"), 0, "[eax+2*cr0+ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:eax+2*cr0+ebx]"), 0, "[es:eax+2*cr0+ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[eax+2*cr0+ebx]"), 0, "es:[eax+2*cr0+ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[eax+ebx + cr0]"), 0, "[eax+ebx + cr0] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:eax+ebx + cr0]"), 0, "[es:eax+ebx + cr0] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[eax+ebx + cr0]"), 0, "es:[eax+ebx + cr0] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[eax+ebx + cr0*2]"), 0, "[eax+ebx + cr0*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:eax+ebx + cr0*2]"), 0, "[es:eax+ebx + cr0*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[eax+ebx + cr0*2]"), 0, "es:[eax+ebx + cr0*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[eax+ebx + 2*cr0]"), 0, "[eax+ebx + 2*cr0] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:eax+ebx + 2*cr0]"), 0, "[es:eax+ebx + 2*cr0] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[eax+ebx + 2*cr0]"), 0, "es:[eax+ebx + 2*cr0] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ebx + eax+cr0]"), 0, "[ebx + eax+cr0] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:ebx + eax+cr0]"), 0, "[es:ebx + eax+cr0] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[ebx + eax+cr0]"), 0, "es:[ebx + eax+cr0] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ebx + eax+cr0*2]"), 0, "[ebx + eax+cr0*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:ebx + eax+cr0*2]"), 0, "[es:ebx + eax+cr0*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[ebx + eax+cr0*2]"), 0, "es:[ebx + eax+cr0*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ebx + eax+2*cr0]"), 0, "[ebx + eax+2*cr0] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:ebx + eax+2*cr0]"), 0, "[es:ebx + eax+2*cr0] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[ebx + eax+2*cr0]"), 0, "es:[ebx + eax+2*cr0] is a valid 32-bit addressing scheme" );
-
-is ( is_valid_32bit_addr_intel ("[cr0+ebx*2+2]"), 0, "[cr0+ebx*2+2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[st7-1]"), 0, "[st7-1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[dr2-2+eax]"), 0, "[dr2-2+eax] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[xmm3]"), 0, "[xmm3] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[mm2]"), 0, "[mm2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[eax+xmm3]"), 0, "[eax+xmm3] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[eax+mm2]"), 0, "[eax+mm2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[eax+ebx*2+xmm3]"), 0, "[eax+ebx*2+xmm3] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[eax+ebx*2+mm2]"), 0, "[eax+ebx*2+mm2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[eax-ebx]"), 0, "[eax-ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[eax-ebx*2]"), 0, "[eax-ebx*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[eax+3-ecx]"), 0, "[eax+3-ecx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[eax+6*2+esp]"), 1, "[eax+6*2+esp] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[eax+2*ebx]"), 1, "[eax+2*ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[4*eax+esi]"), 1, "[4*eax+esi] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[-1+4*eax+esi]"), 1, "[-1+4*eax+esi] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[r12d+eax]"), 0, "[r12d+eax] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[ebx+2*r8d]"), 0, "[ebx+2*r8d] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[edx+8*r9d+1]"), 0, "[edx+8*r9d+1] is a valid 32-bit addressing scheme" );
-
-is ( is_valid_32bit_addr_intel ("[es:-eax + ecx*2 + 1]"), 0, "[es:-eax + ecx*2 + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[-eax + ecx*2 + 1]"), 0, "es:[-eax + ecx*2 + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:-eax + 1 + ecx*2]"), 0, "[es:-eax + 1 + ecx*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[-eax + 1 + ecx*2]"), 0, "es:[-eax + 1 + ecx*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:eax + 1 - ecx*2]"), 0, "[es:eax + 1 - ecx*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[eax + 1 - ecx*2]"), 0, "es:[eax + 1 - ecx*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:1 -eax + ecx*2]"), 0, "[es:1 -eax + ecx*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[1 -eax + ecx*2]"), 0, "es:[1 -eax + ecx*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:1 + eax - ecx*2]"), 0, "[es:1 + eax - ecx*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[1 + eax - ecx*2]"), 0, "es:[1 + eax - ecx*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:1 + ecx*2 -eax]"), 0, "[es:1 + ecx*2 -eax] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[1 + ecx*2 -eax]"), 0, "es:[1 + ecx*2 -eax] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:eax - ecx*2 + 1]"), 0, "[es:eax - ecx*2 + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[eax - ecx*2 + 1]"), 0, "es:[eax - ecx*2 + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:ecx*2 + 1 - eax]"), 0, "[es:ecx*2 + 1-eax] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[ecx*2 + 1 - eax]"), 0, "es:[ecx*2 + 1-eax] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:ecx*2 - eax + 1]"), 0, "[es:ecx*2-eax + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[ecx*2 - eax + 1]"), 0, "es:[ecx*2-eax + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:-ecx*2 + eax + 1]"), 0, "[es:-ecx*2 + eax + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[-ecx*2 + eax + 1]"), 0, "es:[-ecx*2 + eax + 1] is a valid 32-bit addressing scheme" );
-
-is ( is_valid_32bit_addr_intel ("[es:-eax + ecx*2]"), 0, "[es:-eax + ecx*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[-eax + ecx*2]"), 0, "es:[-eax + ecx*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:ecx*2-eax]"), 0, "[es:ecx*2-eax] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[ecx*2-eax]"), 0, "es:[ecx*2-eax] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:eax - ecx*2]"), 0, "[es:eax - ecx*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[eax - ecx*2]"), 0, "es:[eax - ecx*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:-ecx*2+eax]"), 0, "[es:-ecx*2+eax] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[-ecx*2+eax]"), 0, "es:[-ecx*2+eax] is a valid 32-bit addressing scheme" );
-
-is ( is_valid_32bit_addr_intel ("[es:-eax + ecx]"), 0, "[es:-eax + ecx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[-eax + ecx]"), 0, "es:[-eax + ecx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:eax - ecx]"), 0, "[es:eax - ecx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[eax - ecx]"), 0, "es:[eax - ecx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:-eax]"), 0, "[es:-eax] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[-eax]"), 0, "es:[-eax] is a valid 32-bit addressing scheme" );
-
-is ( is_valid_32bit_addr_intel ("[es:cs*2 + ebx]"), 0, "[es:cs*2 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:cs*2 + ebx + 1]"), 0, "[es:cs*2 + ebx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:ecx*2 + cs]"), 0, "[es:ecx*2 + cs] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:ecx*2 + cs + 1]"), 0, "[es:ecx*2 + cs + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:ebx + cs*2]"), 0, "[es:ebx + cs*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:ebx + cs*2 + 1]"), 0, "[es:ebx + cs*2 + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:cs + ecx*2]"), 0, "[es:cs + ecx*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:cs + ecx*2 + 1]"), 0, "[es:cs + ecx*2 + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:cs*2 + 1 + ebx]"), 0, "[es:cs*2 + 1 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:ecx*2 + 1 + cs]"), 0, "[es:ecx*2 + 1 + cs] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:1 + cs*2 + ebx]"), 0, "[es:1 + cs*2 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:1 + ecx*2 + cs]"), 0, "[es:1 + ecx*2 + cs] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:1 + ebx + cs*2]"), 0, "[es:1 + ebx + cs*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:1 + cs + ecx*2]"), 0, "[es:1 + cs + ecx*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:ebx + 1 + cs*2]"), 0, "[es:ebx + 1 + cs*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:cs + 1 + ecx*2]"), 0, "[es:cs + 1 + ecx*2] is a valid 32-bit addressing scheme" );
-
-is ( is_valid_32bit_addr_intel ("[es:eax*5 + ebx]"), 0, "[es:eax*5 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:eax*5 + ebx + 1]"), 0, "[es:eax*5 + ebx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:ebx + eax*5]"), 0, "[es:ebx + eax*5] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:ebx + eax*5 + 1]"), 0, "[es:ebx + eax*5 + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:eax*5 + 1 + ebx]"), 0, "[es:eax*5 + 1 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:1 + eax*5 + ebx]"), 0, "[es:1 + eax*5 + ebx] is a valid 32-bit addressing scheme" );
-
-is ( is_valid_32bit_addr_intel ("[es:eax*2 + ebx + edx]"), 0, "[es:eax*2 + ebx + edx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:2*ecx + eax + edx]"), 0, "[es:2*ecx + eax + edx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:ebx + eax*2 + edx]"), 0, "[es:ebx + eax*2 + edx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:eax + 2*ecx + edx]"), 0, "[es:eax + 2*ecx + edx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:edx + ebx + eax*2]"), 0, "[es:edx + ebx + eax*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:edx + eax + 2*ecx]"), 0, "[es:edx + eax + 2*ecx] is a valid 32-bit addressing scheme" );
-
-is ( is_valid_32bit_addr_intel ("[es:3*2 + ebx]"), 1, "[es:3*2 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:3*2 + ebx + 1]"), 1, "[es:3*2 + ebx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:ecx*2 + 3]"), 1, "[es:ecx*2 + 3] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:ecx*2 + 3 + 1]"), 1, "[es:ecx*2 + 3 + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:ebx + 3*2]"), 1, "[es:ebx + 3*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:ebx + 3*2 + 1]"), 1, "[es:ebx + 3*2 + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:ebx + 1 + 3*2]"), 1, "[es:ebx + 1 + 3*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:3 + ecx*2]"), 1, "[es:3 + ecx*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:3 + ecx*2 + 1]"), 1, "[es:3 + ecx*2 + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:3 + ecx + 1*2]"), 1, "[es:3 + ecx + 1*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:3*2 + 1 + ebx]"), 1, "[es:3*2 + 1 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:ecx*2 + 1 + 3]"), 1, "[es:ecx*2 + 1 + 3] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:1 + 3*2 + ebx]"), 1, "[es:1 + 3*2 + ebx] is a valid 32-bit addressing scheme" );
-
-is ( is_valid_32bit_addr_intel ("[es:cs*eax + ebx]"), 0, "[es:cs*eax + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:cs*eax + ebx + 1]"), 0, "[es:cs*eax + ebx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:ecx*eax + cs]"), 0, "[es:ecx*eax + cs] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:ecx*eax + cs + 1]"), 0, "[es:ecx*eax + cs + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:ebx + cs*eax]"), 0, "[es:ebx + cs*eax] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:ebx + cs*eax + 1]"), 0, "[es:ebx + cs*eax + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:cs + ecx*eax]"), 0, "[es:cs + ecx*eax] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:cs + ecx*eax + 1]"), 0, "[es:cs + ecx*eax + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:cs*eax + 1 + ebx]"), 0, "[es:cs*eax + 1 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:ecx*eax + 1 + cs]"), 0, "[es:ecx*eax + 1 + cs] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:1 + cs*eax + ebx]"), 0, "[es:1 + cs*eax + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:1 + ecx*eax + cs]"), 0, "[es:1 + ecx*eax + cs] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:1 + ebx + cs*eax]"), 0, "[es:1 + ebx + cs*eax] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:1 + cs + ecx*eax]"), 0, "[es:1 + cs + ecx*eax] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:ebx + 1 + cs*eax]"), 0, "[es:ebx + 1 + cs*eax] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:cs + 1 + ecx*eax]"), 0, "[es:cs + 1 + ecx*eax] is a valid 32-bit addressing scheme" );
-
-is ( is_valid_32bit_addr_intel ("[es:edx*eax + ebx]"), 0, "[es:edx*eax + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:ebx + edx*eax]"), 0, "[es:ebx + edx*eax] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:edx*eax + ebx + 1]"), 0, "[es:edx*eax + ebx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:ebx + edx*eax + 1]"), 0, "[es:ebx + edx*eax + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:edx*eax + 1 + ebx]"), 0, "[es:edx*eax + 1 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:ebx + 1 + edx*eax]"), 0, "[es:ebx + 1 + edx*eax] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:1 + edx*eax + ebx]"), 0, "[es:1 + edx*eax + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:1 + ebx + edx*eax]"), 0, "[es:1 + ebx + edx*eax] is a valid 32-bit addressing scheme" );
-
-is ( is_valid_32bit_addr_intel ("[es:cs*ds + ebx]"), 0, "[es:cs*ds + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:cs*ds + ebx + 1]"), 0, "[es:cs*ds + ebx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:ecx*ds + cs]"), 0, "[es:ecx*ds + cs] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:ecx*ds + cs + 1]"), 0, "[es:ecx*ds + cs + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:ebx + cs*ds]"), 0, "[es:ebx + cs*ds] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:ebx + cs*ds + 1]"), 0, "[es:ebx + cs*ds + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:cs + ecx*ds]"), 0, "[es:cs + ecx*ds] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:cs + ecx*ds + 1]"), 0, "[es:cs + ecx*ds + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:cs*ds + 1 + ebx]"), 0, "[es:cs*ds + 1 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:ecx*ds + 1 + cs]"), 0, "[es:ecx*ds + 1 + cs] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:1 + cs*ds + ebx]"), 0, "[es:1 + cs*ds + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:1 + ecx*ds + cs]"), 0, "[es:1 + ecx*ds + cs] is a valid 32-bit addressing scheme" );
-
-is ( is_valid_32bit_addr_intel ("[es:dl*2 + ebx]"), 0, "[es:dl*2 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:dl*2 + ebx + 1]"), 0, "[es:dl*2 + ebx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:ecx*2 + dl]"), 0, "[es:ecx*2 + dl] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:ecx*2 + dl + 1]"), 0, "[es:ecx*2 + dl + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:ebx + dl*2]"), 0, "[es:ebx + dl*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:ebx + dl*2 + 1]"), 0, "[es:ebx + dl*2 + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:dl + ecx*2]"), 0, "[es:dl + ecx*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:dl + ecx*2 + 1]"), 0, "[es:dl + ecx*2 + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:dl*2 + 1 + ebx]"), 0, "[es:dl*2 + 1 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:ecx*2 + 1 + dl]"), 0, "[es:ecx*2 + 1 + dl] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:1 + dl*2 + ebx]"), 0, "[es:1 + dl*2 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:1 + ecx*2 + dl]"), 0, "[es:1 + ecx*2 + dl] is a valid 32-bit addressing scheme" );
-
-is ( is_valid_32bit_addr_intel ("[es:cs*2 + ebx + 1]"), 0, "[es:cs*2 + ebx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:mm1*2 + ebx + 1]"), 0, "[es:mm1*2 + ebx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:st2*2 + ebx + 1]"), 0, "[es:st2*2 + ebx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:cr0*2 + ebx + 1]"), 0, "[es:cr0*2 + ebx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:cx*2 + ebx + 1]"), 0, "[es:cx*2 + ebx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:rcx*2 + ebx + 1]"), 0, "[es:rcx*2 + ebx + 1] is a valid 32-bit addressing scheme" );
-
-is ( is_valid_32bit_addr_intel ("[es:2*cs + ebx]"), 0, "[es:2*cs + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:2*cs + ebx + 1]"), 0, "[es:2*cs + ebx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:2*ecx + cs]"), 0, "[es:2*ecx + cs] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:2*ecx + cs + 1]"), 0, "[es:2*ecx + cs + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:ebx + 2*cs]"), 0, "[es:ebx + 2*cs] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:ebx + 2*cs + 1]"), 0, "[es:ebx + 2*cs + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:cs + 2*ecx]"), 0, "[es:cs + 2*ecx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:cs + 2*ecx + 1]"), 0, "[es:cs + 2*ecx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:2*cs + 1 + ebx]"), 0, "[es:2*cs + 1 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:2*ecx + 1 + cs]"), 0, "[es:2*ecx + 1 + cs] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:1 + 2*cs + ebx]"), 0, "[es:1 + 2*cs + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:1 + 2*ecx + cs]"), 0, "[es:1 + 2*ecx + cs] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:1 + ebx + 2*cs]"), 0, "[es:1 + ebx + 2*cs] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:1 + cs + 2*ecx]"), 0, "[es:1 + cs + 2*ecx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:ebx + 1 + 2*cs]"), 0, "[es:ebx + 1 + 2*cs] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:cs + 1 + 2*ecx]"), 0, "[es:cs + 1 + 2*ecx] is a valid 32-bit addressing scheme" );
-
-is ( is_valid_32bit_addr_intel ("[es:5*eax + ebx]"), 0, "[es:5*eax + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:5*eax + ebx + 1]"), 0, "[es:5*eax + ebx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:ecx*5 + eax]"), 0, "[es:ecx*5 + eax] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:ecx*5 + eax + 1]"), 0, "[es:ecx*5 + eax + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:ebx + 5*eax]"), 0, "[es:ebx + 5*eax] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:ebx + 5*eax + 1]"), 0, "[es:ebx + 5*eax + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:eax + ecx*5]"), 0, "[es:eax + ecx*5] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:eax + ecx*5 + 1]"), 0, "[es:eax + ecx*5 + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:5*eax + 1 + ebx]"), 0, "[es:5*eax + 1 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:ecx*5 + 1 + eax]"), 0, "[es:ec*5x + 1 + eax] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:ebx + 1 + 5*eax]"), 0, "[es:ebx + 1 + 5*eax] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:eax + 1 + ecx*5]"), 0, "[es:eax + 1 + ecx*5] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:1 + 5*eax + ebx]"), 0, "[es:1 + 5*eax + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:1 + ecx*5 + eax]"), 0, "[es:1 + ecx*5 + eax] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:1 + ebx + 5*eax]"), 0, "[es:1 + ebx + 5*eax] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:1 + eax + ecx*5]"), 0, "[es:1 + eax + ecx*5] is a valid 32-bit addressing scheme" );
-
-is ( is_valid_32bit_addr_intel ("[es:2*cr0 + ebx]"), 0, "[es:2*cr0 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:2*cr0 + ebx + 1]"), 0, "[es:2*cr0 + ebx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:2*ecx + cr0]"), 0, "[es:2*ecx + cr0] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:2*ecx + cr0 + 1]"), 0, "[es:2*ecx + cr0 + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:ebx + 2*cr0]"), 0, "[es:ebx + 2*cr0] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:ebx + 2*cr0 + 1]"), 0, "[es:ebx + 2*cr0 + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:cr0 + 2*ecx]"), 0, "[es:cr0 + 2*ecx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:cr0 + 2*ecx + 1]"), 0, "[es:cr0 + 2*ecx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:2*cr0 + 1 + ebx]"), 0, "[es:2*cr0 + 1 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:2*ecx + 1 + cr0]"), 0, "[es:2*ecx + 1 + cr0] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:1 + 2*cr0 + ebx]"), 0, "[es:1 + 2*cr0 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:1 + 2*ecx + cr0]"), 0, "[es:1 + 2*ecx + cr0] is a valid 32-bit addressing scheme" );
-
-is ( is_valid_32bit_addr_intel ("[es:2*mm0 + ebx]"), 0, "[es:2*mm0 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:2*mm0 + ebx + 1]"), 0, "[es:2*mm0 + ebx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:2*ecx + mm0]"), 0, "[es:2*ecx + mm0] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:2*ecx + mm0 + 1]"), 0, "[es:2*ecx + mm0 + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:ebx + 2*mm0]"), 0, "[es:ebx + 2*mm0] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:ebx + 2*mm0 + 1]"), 0, "[es:ebx + 2*mm0 + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:mm0 + 2*ecx]"), 0, "[es:mm0 + 2*ecx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:mm0 + 2*ecx + 1]"), 0, "[es:mm0 + 2*ecx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:2*mm0 + 1 + ebx]"), 0, "[es:2*mm0 + 1 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:2*ecx + 1 + mm0]"), 0, "[es:2*ecx + 1 + mm0] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:1 + 2*mm0 + ebx]"), 0, "[es:1 + 2*mm0 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:1 + 2*ecx + mm0]"), 0, "[es:1 + 2*ecx + mm0] is a valid 32-bit addressing scheme" );
-
-is ( is_valid_32bit_addr_intel ("[es:2*st0 + ebx]"), 0, "[es:2*st0 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:2*st0 + ebx + 1]"), 0, "[es:2*st0 + ebx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:2*ecx + st0]"), 0, "[es:2*ecx + st0] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:2*ecx + st0 + 1]"), 0, "[es:2*ecx + st0 + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:ebx + 2*st0]"), 0, "[es:ebx + 2*st0] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:ebx + 2*st0 + 1]"), 0, "[es:ebx + 2*st0 + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:st0 + 2*ecx]"), 0, "[es:st0 + 2*ecx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:st0 + 2*ecx + 1]"), 0, "[es:st0 + 2*ecx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:2*st0 + 1 + ebx]"), 0, "[es:2*st0 + 1 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:2*ecx + 1 + st0]"), 0, "[es:2*ecx + 1 + st0] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:1 + 2*st0 + ebx]"), 0, "[es:1 + 2*st0 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:1 + 2*ecx + st0]"), 0, "[es:1 + 2*ecx + st0] is a valid 32-bit addressing scheme" );
-
-is ( is_valid_32bit_addr_intel ("[es:2*ax + ebx]"), 0, "[es:2*ax + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:2*ax + ebx + 1]"), 0, "[es:2*ax + ebx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:2*ecx + ax]"), 0, "[es:2*ecx + ax] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:2*ecx + ax + 1]"), 0, "[es:2*ecx + ax + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:ebx + 2*ax]"), 0, "[es:ebx + 2*ax] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:ebx + 2*ax + 1]"), 0, "[es:ebx + 2*ax + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:ax + 2*ecx]"), 0, "[es:ax + 2*ecx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:ax + 2*ecx + 1]"), 0, "[es:ax + 2*ecx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:2*ax + 1 + ebx]"), 0, "[es:2*ax + 1 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:2*ecx + 1 + ax]"), 0, "[es:2*ecx + 1 + ax] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:1 + 2*ax + ebx]"), 0, "[es:1 + 2*ax + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:1 + 2*ecx + ax]"), 0, "[es:1 + 2*ecx + ax] is a valid 32-bit addressing scheme" );
-
-is ( is_valid_32bit_addr_intel ("[es:2*rax + ebx]"), 0, "[es:2*rax + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:2*rax + ebx + 1]"), 0, "[es:2*rax + ebx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:2*ecx + rax]"), 0, "[es:2*ecx + rax] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:2*ecx + rax + 1]"), 0, "[es:2*ecx + rax + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:ebx + 2*rax]"), 0, "[es:ebx + 2*rax] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:ebx + 2*rax + 1]"), 0, "[es:ebx + 2*rax + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:rax + 2*ecx]"), 0, "[es:rax + 2*ecx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:rax + 2*ecx + 1]"), 0, "[es:rax + 2*ecx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:2*rax + 1 + ebx]"), 0, "[es:2*rax + 1 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:2*ecx + 1 + rax]"), 0, "[es:2*ecx + 1 + rax] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:1 + 2*rax + ebx]"), 0, "[es:1 + 2*rax + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:1 + 2*ecx + rax]"), 0, "[es:1 + 2*ecx + rax] is a valid 32-bit addressing scheme" );
-
-is ( is_valid_32bit_addr_intel ("[es:2*dl + ebx]"), 0, "[es:2*dl + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:2*dl + ebx + 1]"), 0, "[es:2*dl + ebx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:2*ecx + dl]"), 0, "[es:2*ecx + dl] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:2*ecx + dl + 1]"), 0, "[es:2*ecx + dl + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:ebx + 2*dl]"), 0, "[es:ebx + 2*dl] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:ebx + 2*dl + 1]"), 0, "[es:ebx + 2*dl + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:dl + 2*ecx]"), 0, "[es:dl + 2*ecx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:dl + 2*ecx + 1]"), 0, "[es:dl + 2*ecx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:2*dl + 1 + ebx]"), 0, "[es:2*dl + 1 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:2*ecx + 1 + dl]"), 0, "[es:2*ecx + 1 + dl] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:1 + 2*dl + ebx]"), 0, "[es:1 + 2*dl + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:1 + 2*ecx + dl]"), 0, "[es:1 + 2*ecx + dl] is a valid 32-bit addressing scheme" );
-
-is ( is_valid_32bit_addr_intel ("[es:cs + ebx]"), 0, "[es:cs + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:cs + ebx + 1]"), 0, "[es:cs + ebx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:ecx + cs]"), 0, "[es:ecx + cs] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:ecx + cs + 1]"), 0, "[es:ecx + cs + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:cs + 1 + ebx]"), 0, "[es:cs + 1 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:ecx + 1 + cs]"), 0, "[es:ecx + 1 + cs] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:1 + cs + ebx]"), 0, "[es:1 + cs + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:1 + ecx + cs]"), 0, "[es:1 + ecx + cs] is a valid 32-bit addressing scheme" );
-
-is ( is_valid_32bit_addr_intel ("[es:cs*2]"), 0, "[es:cs*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:2*cs]"), 0, "[es:2*cs] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:dl*2]"), 0, "[es:dl*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:2*dl]"), 0, "[es:2*dl] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:cr0*2]"), 0, "[es:cr0*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:2*cr0]"), 0, "[es:2*cr0] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:ax*2]"), 0, "[es:ax*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:2*ax]"), 0, "[es:2*ax] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:mm1*2]"), 0, "[es:mm1*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:2*mm1]"), 0, "[es:2*mm1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:st1*2]"), 0, "[es:st1*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:2*st1]"), 0, "[es:2*st1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:rcx*2]"), 0, "[es:rcx*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:2*rcx]"), 0, "[es:2*rcx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:eax*ebx]"), 0, "[es:eax*ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:-2*eax]"), 0, "[es:-2*eax] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:-eax*2]"), 0, "[es:-eax*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:-1*2]"), 1, "[es:-1*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:eax*5]"), 0, "[es:eax*5] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:5*eax]"), 0, "[es:5*eax] is a valid 32-bit addressing scheme" );
-
-is ( is_valid_32bit_addr_intel ("[es:dl + ebx]"), 0, "[es:dl + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:ecx + dl]"), 0, "[es:ecx + dl] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:cr0 + ebx]"), 0, "[es:cr0 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:ecx + cr0]"), 0, "[es:ecx + cr0] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:ax + ebx]"), 0, "[es:ax + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:ecx + ax]"), 0, "[es:ecx + ax] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:mm2 + ebx]"), 0, "[es:mm2 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:ecx + mm2]"), 0, "[es:ecx + mm2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:st0 + ebx]"), 0, "[es:st0 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:ecx + st0]"), 0, "[es:ecx + st0] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:rdx + ebx]"), 0, "[es:rdx + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:ecx + rdx]"), 0, "[es:ecx + rdx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:eax - ebx]"), 0, "[es:eax - ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("[es:- ecx + edx]"), 0, "[es:- ecx + edx] is a valid 32-bit addressing scheme" );
-
-is ( is_valid_32bit_addr_intel ("es:[cs*2 + ebx]"), 0, "es:[cs*2 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[cs*2 + ebx + 1]"), 0, "es:[cs*2 + ebx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[ecx*2 + cs]"), 0, "es:[ecx*2 + cs] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[ecx*2 + cs + 1]"), 0, "es:[ecx*2 + cs + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[ebx + cs*2]"), 0, "es:[ebx + cs*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[ebx + cs*2 + 1]"), 0, "es:[ebx + cs*2 + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[cs + ecx*2]"), 0, "es:[cs + ecx*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[cs + ecx*2 + 1]"), 0, "es:[cs + ecx*2 + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[cs*2 + 1 + ebx]"), 0, "es:[cs*2 + 1 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[ecx*2 + 1 + cs]"), 0, "es:[ecx*2 + 1 + cs] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[1 + cs*2 + ebx]"), 0, "es:[1 + cs*2 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[1 + ecx*2 + cs]"), 0, "es:[1 + ecx*2 + cs] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[1 + ebx + cs*2]"), 0, "es:[1 + ebx + cs*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[1 + cs + ecx*2]"), 0, "es:[1 + cs + ecx*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[ebx + 1 + cs*2]"), 0, "es:[ebx + 1 + cs*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[cs + 1 + ecx*2]"), 0, "es:[cs + 1 + ecx*2] is a valid 32-bit addressing scheme" );
-
-is ( is_valid_32bit_addr_intel ("es:[5*eax + ebx]"), 0, "es:[5*eax + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[5*eax + ebx + 1]"), 0, "es:[5*eax + ebx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[ecx*5 + eax]"), 0, "es:[ecx*5 + eax] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[ecx*5 + eax + 1]"), 0, "es:[ecx*5 + eax + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[ebx + 5*eax]"), 0, "es:[ebx + 5*eax] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[ebx + 5*eax + 1]"), 0, "es:[ebx + 5*eax + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[eax + ecx*5]"), 0, "es:[eax + ecx*5] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[eax + ecx*5 + 1]"), 0, "es:[eax + ecx*5 + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[5*eax + 1 + ebx]"), 0, "es:[5*eax + 1 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[ecx*5 + 1 + eax]"), 0, "es:[ecx*5 + 1 + eax] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[ebx + 1 + 5*eax]"), 0, "es:[ebx + 1 + 5*eax] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[eax + 1 + ecx*5]"), 0, "es:[eax + 1 + ecx*5] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[1 + 5*eax + ebx]"), 0, "es:[1 + 5*eax + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[1 + ecx*5 + eax]"), 0, "es:[1 + ecx*5 + eax] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[1 + ebx + 5*eax]"), 0, "es:[1 + ebx + 5*eax] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[1 + eax + ecx*5]"), 0, "es:[1 + eax + ecx*5] is a valid 32-bit addressing scheme" );
-
-is ( is_valid_32bit_addr_intel ("es:[eax*2 + ebx + edx]"), 0, "es:[eax*2 + ebx + edx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[2*ecx + eax + edx]"), 0, "es:[2*ecx + eax + edx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[ebx + eax*2 + edx]"), 0, "es:[ebx + eax*2 + edx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[eax + 2*ecx + edx]"), 0, "es:[eax + 2*ecx + edx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[edx + ebx + eax*2]"), 0, "es:[edx + ebx + eax*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[edx + eax + 2*ecx]"), 0, "es:[edx + eax + 2*ecx] is a valid 32-bit addressing scheme" );
-
-is ( is_valid_32bit_addr_intel ("es:[3*2 + ebx]"), 1, "es:[3*2 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[3*2 + ebx + 1]"), 1, "es:[3*2 + ebx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[ecx*2 + 3]"), 1, "es:[ecx*2 + 3] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[ecx*2 + 3 + 1]"), 1, "es:[ecx*2 + 3 + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[ebx + 3*2]"), 1, "es:[ebx + 3*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[ebx + 3*2 + 1]"), 1, "es:[ebx + 3*2 + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[ebx + 1 + 3*2]"), 1, "es:[ebx + 1 + 3*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[3 + ecx*2]"), 1, "es:[3 + ecx*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[3 + ecx*2 + 1]"), 1, "es:[3 + ecx*2 + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[3 + ecx + 1*2]"), 1, "es:[3 + ecx*2 + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[3*2 + 1 + ebx]"), 1, "es:[3*2 + 1 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[ecx*2 + 1 + 3]"), 1, "es:[ecx*2 + 1 + 3] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[1 + 3*2 + ebx]"), 1, "es:[1 + 3*2 + ebx] is a valid 32-bit addressing scheme" );
-
-is ( is_valid_32bit_addr_intel ("es:[cs*ds + ebx]"), 0, "es:[cs*ds + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[cs*ds + ebx + 1]"), 0, "es:[cs*ds + ebx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[ecx*ds + cs]"), 0, "es:[ecx*ds + cs] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[ecx*ds + cs + 1]"), 0, "es:[ecx*ds + cs + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[ebx + cs*ds]"), 0, "es:[ebx + cs*ds] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[ebx + cs*ds + 1]"), 0, "es:[ebx + cs*ds + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[cs + ecx*ds]"), 0, "es:[cs + ecx*ds] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[cs + ecx*ds + 1]"), 0, "es:[cs + ecx*ds + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[cs*ds + 1 + ebx]"), 0, "es:[cs*ds + 1 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[ecx*ds + 1 + cs]"), 0, "es:[ecx*ds + 1 + cs] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[1 + cs*ds + ebx]"), 0, "es:[1 + cs*ds + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[1 + ecx*ds + cs]"), 0, "es:[1 + ecx*ds + cs] is a valid 32-bit addressing scheme" );
-
-is ( is_valid_32bit_addr_intel ("es:[cs*eax + ebx]"), 0, "es:[cs*eax + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[cs*eax + ebx + 1]"), 0, "es:[cs*eax + ebx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[ecx*eax + cs]"), 0, "es:[ecx*eax + cs] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[ecx*eax + cs + 1]"), 0, "es:[ecx*eax + cs + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[ebx + cs*eax]"), 0, "es:[ebx + cs*eax] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[ebx + cs*eax + 1]"), 0, "es:[ebx + cs*eax + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[cs + ecx*eax]"), 0, "es:[cs + ecx*eax] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[cs + ecx*eax + 1]"), 0, "es:[cs + ecx*eax + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[cs*eax + 1 + ebx]"), 0, "es:[cs*eax + 1 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[ecx*eax + 1 + cs]"), 0, "es:[ecx*eax + 1 + cs] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[1 + cs*eax + ebx]"), 0, "es:[1 + cs*eax + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[1 + ecx*eax + cs]"), 0, "es:[1 + ecx*eax + cs] is a valid 32-bit addressing scheme" );
-
-is ( is_valid_32bit_addr_intel ("es:[edx*eax + ebx]"), 0, "es:[edx*eax + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[ebx + edx*eax]"), 0, "es:[ebx + edx*eax] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[edx*eax + ebx + 1]"), 0, "es:[edx*eax + ebx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[edx + ecx*eax + 1]"), 0, "es:[edx + ecx*eax + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[edx*eax + 1 + ebx]"), 0, "es:[edx*eax + 1 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[ebx + 1 + edx*eax]"), 0, "es:[ebx + 1 + edx*eax] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[1 + edx*eax + ebx]"), 0, "es:[1 + edx*eax + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[1 + ebx + edx*eax]"), 0, "es:[1 + ebx + edx*eax] is a valid 32-bit addressing scheme" );
-
-is ( is_valid_32bit_addr_intel ("es:[dl*2 + ebx]"), 0, "es:[dl*2 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[dl*2 + ebx + 1]"), 0, "es:[dl*2 + ebx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[ecx*2 + dl]"), 0, "es:[ecx*2 + dl] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[ecx*2 + dl + 1]"), 0, "es:[ecx*2 + dl + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[ebx + dl*2]"), 0, "es:[ebx + dl*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[ebx + dl*2 + 1]"), 0, "es:[ebx + dl*2 + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[dl + ecx*2]"), 0, "es:[dl + ecx*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[dl + ecx*2 + 1]"), 0, "es:[dl + ecx*2 + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[dl*2 + 1 + ebx]"), 0, "es:[dl*2 + 1 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[ecx*2 + 1 + dl]"), 0, "es:[ecx*2 + 1 + dl] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[1 + dl*2 + ebx]"), 0, "es:[1 + dl*2 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[1 + ecx*2 + dl]"), 0, "es:[1 + ecx*2 + dl] is a valid 32-bit addressing scheme" );
-
-is ( is_valid_32bit_addr_intel ("es:[cs*2 + ebx + 1]"), 0, "es:[cs*2 + ebx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[mm1*2 + ebx + 1]"), 0, "es:[mm1*2 + ebx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[st2*2 + ebx + 1]"), 0, "es:[st2*2 + ebx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[cr0*2 + ebx + 1]"), 0, "es:[cr0*2 + ebx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[cx*2 + ebx + 1]"), 0, "es:[cx*2 + ebx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[rcx*2 + ebx + 1]"), 0, "es:[rcx*2 + ebx + 1] is a valid 32-bit addressing scheme" );
-
-is ( is_valid_32bit_addr_intel ("es:[2*cs + ebx]"), 0, "es:[2*cs + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[2*cs + ebx + 1]"), 0, "es:[2*cs + ebx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[2*ecx + cs]"), 0, "es:[2*ecx + cs] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[2*ecx + cs + 1]"), 0, "es:[2*ecx + cs + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[ebx + 2*cs]"), 0, "es:[ebx + 2*cs] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[ebx + 2*cs + 1]"), 0, "es:[ebx + 2*cs + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[cs + 2*ecx]"), 0, "es:[cs + 2*ecx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[cs + 2*ecx + 1]"), 0, "es:[cs + 2*ecx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[2*cs + 1 + ebx]"), 0, "es:[2*cs + 1 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[2*ecx + 1 + cs]"), 0, "es:[2*ecx + 1 + cs] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[1 + 2*cs + ebx]"), 0, "es:[1 + 2*cs + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[1 + 2*ecx + cs]"), 0, "es:[1 + 2*ecx + cs] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[1 + ebx + 2*cs]"), 0, "es:[1 + ebx + 2*cs] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[1 + cs + 2*ecx]"), 0, "es:[1 + cs + 2*ecx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[ebx + 1 + 2*cs]"), 0, "es:[ebx + 1 + 2*cs] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[cs + 1 + 2*ecx]"), 0, "es:[cs + 1 + 2*ecx] is a valid 32-bit addressing scheme" );
-
-is ( is_valid_32bit_addr_intel ("es:[5*eax + ebx]"), 0, "es:[5*eax + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[5*eax + ebx + 1]"), 0, "es:[5*eax + ebx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[5*ecx + eax]"), 0, "es:[5*ecx + eax] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[5*ecx + eax + 1]"), 0, "es:[5*ecx + eax + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[ebx + 5*eax]"), 0, "es:[ebx + 5*eax] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[ebx + 5*eax + 1]"), 0, "es:[ebx + 5*eax + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[eax + 5*ecx]"), 0, "es:[eax + 5*ecx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[eax + 5*ecx + 1]"), 0, "es:[eax + 5*ecx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[5*eax + 1 + ebx]"), 0, "es:[5*eax + 1 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[5*ecx + 1 + eax]"), 0, "es:[5*ecx + 1 + eax] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[1 + 5*eax + ebx]"), 0, "es:[1 + 5*eax + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[1 + 5*ecx + eax]"), 0, "es:[1 + 5*ecx + eax] is a valid 32-bit addressing scheme" );
-
-is ( is_valid_32bit_addr_intel ("es:[2*dl + ebx]"), 0, "es:[2*dl + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[2*dl + ebx + 1]"), 0, "es:[2*dl + ebx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[2*ecx + dl]"), 0, "es:[2*ecx + dl] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[2*ecx + dl + 1]"), 0, "es:[2*ecx + dl + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[ebx + 2*dl]"), 0, "es:[ebx + 2*dl] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[ebx + 2*dl + 1]"), 0, "es:[ebx + 2*dl + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[dl + 2*ecx]"), 0, "es:[dl + 2*ecx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[dl + 2*ecx + 1]"), 0, "es:[dl + 2*ecx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[2*dl + 1 + ebx]"), 0, "es:[2*dl + 1 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[2*ecx + 1 + dl]"), 0, "es:[2*ecx + 1 + dl] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[1 + 2*dl + ebx]"), 0, "es:[1 + 2*dl + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[1 + 2*ecx + dl]"), 0, "es:[1 + 2*ecx + dl] is a valid 32-bit addressing scheme" );
-
-is ( is_valid_32bit_addr_intel ("es:[2*cr0 + ebx]"), 0, "es:[2*cr0 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[2*cr0 + ebx + 1]"), 0, "es:[2*cr0 + ebx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[2*ecx + cr0]"), 0, "es:[2*ecx + cr0] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[2*ecx + cr0 + 1]"), 0, "es:[2*ecx + cr0 + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[ebx + 2*cr0]"), 0, "es:[ebx + 2*cr0] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[ebx + 2*cr0 + 1]"), 0, "es:[ebx + 2*cr0 + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[cr0 + 2*ecx]"), 0, "es:[cr0 + 2*ecx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[cr0 + 2*ecx + 1]"), 0, "es:[cr0 + 2*ecx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[2*cr0 + 1 + ebx]"), 0, "es:[2*cr0 + 1 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[2*ecx + 1 + cr0]"), 0, "es:[2*ecx + 1 + cr0] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[1 + 2*cr0 + ebx]"), 0, "es:[1 + 2*cr0 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[1 + 2*ecx + cr0]"), 0, "es:[1 + 2*ecx + cr0] is a valid 32-bit addressing scheme" );
-
-is ( is_valid_32bit_addr_intel ("es:[2*mm0 + ebx]"), 0, "es:[2*mm0 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[2*mm0 + ebx + 1]"), 0, "es:[2*mm0 + ebx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[2*ecx + mm0]"), 0, "es:[2*ecx + mm0] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[2*ecx + mm0 + 1]"), 0, "es:[2*ecx + mm0 + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[ebx + 2*mm0]"), 0, "es:[ebx + 2*mm0] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[ebx + 2*mm0 + 1]"), 0, "es:[ebx + 2*mm0 + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[mm0 + 2*ecx]"), 0, "es:[mm0 + 2*ecx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[mm0 + 2*ecx + 1]"), 0, "es:[mm0 + 2*ecx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[2*mm0 + 1 + ebx]"), 0, "es:[2*mm0 + 1 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[2*ecx + 1 + mm0]"), 0, "es:[2*ecx + 1 + mm0] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[1 + 2*mm0 + ebx]"), 0, "es:[1 + 2*mm0 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[1 + 2*ecx + mm0]"), 0, "es:[1 + 2*ecx + mm0] is a valid 32-bit addressing scheme" );
-
-is ( is_valid_32bit_addr_intel ("es:[2*st0 + ebx]"), 0, "es:[2*st0 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[2*st0 + ebx + 1]"), 0, "es:[2*st0 + ebx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[2*ecx + st0]"), 0, "es:[2*ecx + st0] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[2*ecx + st0 + 1]"), 0, "es:[2*ecx + st0 + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[ebx + 2*st0]"), 0, "es:[ebx + 2*st0] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[ebx + 2*st0 + 1]"), 0, "es:[ebx + 2*st0 + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[st0 + 2*ecx]"), 0, "es:[st0 + 2*ecx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[st0 + 2*ecx + 1]"), 0, "es:[st0 + 2*ecx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[2*st0 + 1 + ebx]"), 0, "es:[2*st0 + 1 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[2*ecx + 1 + st0]"), 0, "es:[2*ecx + 1 + st0] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[1 + 2*st0 + ebx]"), 0, "es:[1 + 2*st0 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[1 + 2*ecx + st0]"), 0, "es:[1 + 2*ecx + st0] is a valid 32-bit addressing scheme" );
-
-is ( is_valid_32bit_addr_intel ("es:[2*ax + ebx]"), 0, "es:[2*ax + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[2*ax + ebx + 1]"), 0, "es:[2*ax + ebx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[2*ecx + ax]"), 0, "es:[2*ecx + ax] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[2*ecx + ax + 1]"), 0, "es:[2*ecx + ax + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[ebx + 2*ax]"), 0, "es:[ebx + 2*ax] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[ebx + 2*ax + 1]"), 0, "es:[ebx + 2*ax + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[ax + 2*ecx]"), 0, "es:[ax + 2*ecx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[ax + 2*ecx + 1]"), 0, "es:[ax + 2*ecx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[2*ax + 1 + ebx]"), 0, "es:[2*ax + 1 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[2*ecx + 1 + ax]"), 0, "es:[2*ecx + 1 + ax] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[1 + 2*ax + ebx]"), 0, "es:[1 + 2*ax + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[1 + 2*ecx + ax]"), 0, "es:[1 + 2*ecx + ax] is a valid 32-bit addressing scheme" );
-
-is ( is_valid_32bit_addr_intel ("es:[2*rax + ebx]"), 0, "es:[2*rax + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[2*rax + ebx + 1]"), 0, "es:[2*rax + ebx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[2*ecx + rax]"), 0, "es:[2*ecx + rax] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[2*ecx + rax + 1]"), 0, "es:[2*ecx + rax + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[ebx + 2*rax]"), 0, "es:[ebx + 2*rax] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[ebx + 2*rax + 1]"), 0, "es:[ebx + 2*rax + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[rax + 2*ecx]"), 0, "es:[rax + 2*ecx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[rax + 2*ecx + 1]"), 0, "es:[rax + 2*ecx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[2*rax + 1 + ebx]"), 0, "es:[2*rax + 1 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[2*ecx + 1 + rax]"), 0, "es:[2*ecx + 1 + rax] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[1 + 2*rax + ebx]"), 0, "es:[1 + 2*rax + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[1 + 2*ecx + rax]"), 0, "es:[1 + 2*ecx + rax] is a valid 32-bit addressing scheme" );
-
-is ( is_valid_32bit_addr_intel ("es:[cs + ebx]"), 0, "es:[cs + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[cs + ebx + 1]"), 0, "es:[cs + ebx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[ecx + cs]"), 0, "es:[ecx + cs] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[ecx + cs + 1]"), 0, "es:[ecx + cs + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[cs + 1 + ebx]"), 0, "es:[cs + 1 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[ecx + 1 + cs]"), 0, "es:[ecx + 1 + cs] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[1 + cs + ebx]"), 0, "es:[1 + cs + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[1 + ecx + cs]"), 0, "es:[1 + ecx + cs] is a valid 32-bit addressing scheme" );
-
-is ( is_valid_32bit_addr_intel ("es:[cs*2]"), 0, "es:[cs*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[2*cs]"), 0, "es:[2*cs] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[dl*2]"), 0, "es:[dl*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[2*dl]"), 0, "es:[2*dl] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[cr0*2]"), 0, "es:[cr0*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[2*cr0]"), 0, "es:[2*cr0] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[ax*2]"), 0, "es:[ax*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[2*ax]"), 0, "es:[2*ax] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[mm1*2]"), 0, "es:[mm1*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[2*mm1]"), 0, "es:[2*mm1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[st1*2]"), 0, "es:[st1*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[2*st1]"), 0, "es:[2*st1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[rcx*2]"), 0, "es:[rcx*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[2*rcx]"), 0, "es:[2*rcx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[eax*ebx]"), 0, "es:[eax*ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[-2*eax]"), 0, "es:[-2*eax] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[-eax*2]"), 0, "es:[-eax*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[-1*2]"), 1, "es:[-1*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[eax*5]"), 0, "es:[eax*5] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[5*eax]"), 0, "es:[5*eax] is a valid 32-bit addressing scheme" );
-
-is ( is_valid_32bit_addr_intel ("es:[dl + ebx]"), 0, "es:[dl + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[ecx + dl]"), 0, "es:[ecx + dl] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[cr0 + ebx]"), 0, "es:[cr0 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[ecx + cr0]"), 0, "es:[ecx + cr0] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[ax + ebx]"), 0, "es:[ax + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[ecx + ax]"), 0, "es:[ecx + ax] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[mm2 + ebx]"), 0, "es:[mm2 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[ecx + mm2]"), 0, "es:[ecx + mm2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[st0 + ebx]"), 0, "es:[st0 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[ecx + st0]"), 0, "es:[ecx + st0] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[rdx + ebx]"), 0, "es:[rdx + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[ecx + rdx]"), 0, "es:[ecx + rdx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[eax - ebx]"), 0, "es:[eax - ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("es:[- ecx + edx]"), 0, "es:[- ecx + edx] is a valid 32-bit addressing scheme" );
-
-is ( is_valid_32bit_addr_intel ("ax:[cs*2]"), 0, "ax:[cs*2 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("ax:[cs*2 + ebx]"), 0, "ax:[cs*2 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("ax:[cs*2 + ebx + 1]"), 0, "ax:[cs*2 + ebx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("ax:[cs*2 + 1 + ebx]"), 0, "ax:[cs*2 + 1 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("ax:[ebx + cs*2]"), 0, "ax:[ebx + cs*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("ax:[ebx + cs*2 + 1]"), 0, "ax:[ebx + cs*2 + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("ax:[1 + cs*2 + ebx]"), 0, "ax:[1 + cs*2 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("ax:[1 + ebx + cs*2]"), 0, "ax:[1 + ebx + cs*2] is a valid 32-bit addressing scheme" );
-
-is ( is_valid_32bit_addr_intel ("ax:[cs]"), 0, "ax:[cs + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("ax:[cs + ebx]"), 0, "ax:[cs + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("ax:[cs + ebx + 1]"), 0, "ax:[cs + ebx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("ax:[cs + 1 + ebx]"), 0, "ax:[cs + 1 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("ax:[ebx + cs]"), 0, "ax:[ebx + cs] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("ax:[ebx + cs + 1]"), 0, "ax:[ebx + cs + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("ax:[1 + cs + ebx]"), 0, "ax:[1 + cs + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("ax:[1 + ebx + cs]"), 0, "ax:[1 + ebx + cs] is a valid 32-bit addressing scheme" );
-
-is ( is_valid_32bit_addr_intel ("ax:[ecx*2]"), 0, "ax:[ecx*2 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("ax:[ecx*2 + ebx]"), 0, "ax:[ecx*2 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("ax:[ecx*2 + ebx + 1]"), 0, "ax:[ecx*2 + ebx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("ax:[ecx*2 + 1 + ebx]"), 0, "ax:[ecx*2 + 1 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("ax:[ebx + ecx*2]"), 0, "ax:[ebx + ecx*2] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("ax:[ebx + ecx*2 + 1]"), 0, "ax:[ebx + ecx*2 + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("ax:[1 + ecx*2 + ebx]"), 0, "ax:[1 + ecx*2 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("ax:[1 + ebx + ecx*2]"), 0, "ax:[1 + ebx + ecx*2] is a valid 32-bit addressing scheme" );
-
-is ( is_valid_32bit_addr_intel ("ax:[ecx]"), 0, "ax:[ecx + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("ax:[ecx + ebx]"), 0, "ax:[ecx + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("ax:[ecx + ebx + 1]"), 0, "ax:[ecx + ebx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("ax:[ecx + 1 + ebx]"), 0, "ax:[ecx + 1 + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("ax:[ebx + ecx]"), 0, "ax:[ebx + ecx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("ax:[ebx + ecx + 1]"), 0, "ax:[ebx + ecx + 1] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("ax:[1 + ecx + ebx]"), 0, "ax:[1 + ecx + ebx] is a valid 32-bit addressing scheme" );
-is ( is_valid_32bit_addr_intel ("ax:[1 + ebx + ecx]"), 0, "ax:[1 + ebx + ecx] is a valid 32-bit addressing scheme" );
+push @invalid32, permute_disp_intel_segreg_all ('ax', '', 'cs', '', '', '', '24');
+push @invalid32, permute_disp_intel_segreg_all ('ax', '-', 'cs', '', '', '', '24');
 
 # ----------- 64-bit
 
-is ( is_valid_64bit_addr_intel ("[rax]"), 1, "[rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[brax]"), 1, "[brax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[raxd]"), 1, "[raxd] is a valid 64-bit addressing scheme" );
+my @valid64 = ();
+my @invalid64 = ();
 
-is ( is_valid_64bit_addr_intel ("[-rax]"), 0, "[-rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1+2*2+3]"), 1, "[1+2*2+3] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1+3+2*2]"), 1, "[1+3+2*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[2*2+1+3]"), 1, "[2*2+1+3] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[2*2+1]"), 1, "[2*2+1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1+2*2]"), 1, "[1+2*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[2*2]"), 1, "[2*2] is a valid 64-bit addressing scheme" );
+push @valid64, permute_intel ('', 'brax', '', '', '', '', '');
+push @valid64, permute_intel ('', 'raxd', '', '', '', '', '');
 
-is ( is_valid_64bit_addr_intel ("[rbx+77]"), 1, "[rbx+77] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx+rcx]"), 1, "[rbx+rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx+rbx+99]"), 1, "[rbx+rbx+99] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx+rdi-88]"), 1, "[rbx+rdi-88] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx+rdi+-88]"), 1, "[rbx+rdi+-88] is a valid 64-bit addressing scheme" );
+push @valid64, permute_disp_intel_all ('', 'rax', '', '', '', '1');
+push @invalid64, permute_intel ('-', 'rax', '', '', '', '', '');
+push @valid64, permute_intel ('', 'eax', '', '', '', '', '');
 
-is ( is_valid_64bit_addr_intel ("[rbx-88+rdi]"), 1, "[rbx-88+rdi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[-88+rbx+rdi]"), 1, "[-88+rbx+rdi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[-rbx+rdi+-88]"), 0, "[-rbx+rdi+-88] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[-rbx-88+rdi]"), 0, "[-rbx-88+rdi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[-88-rbx+rdi]"), 0, "[-88-rbx+rdi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx-rdi+-88]"), 0, "[rbx-rdi+-88] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx-88-rdi]"), 0, "[rbx-88-rdi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[-88+rbx-rdi]"), 0, "[-88+rbx-rdi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[eax+rbx+rdi]"), 0, "[eax+rbx+rdi] is a valid 64-bit addressing scheme" );
+foreach my $r1 ('cx', 'cs', 'st0', 'cl', 'cr0', 'dr2', 'mm0', 'xmm3',
+	'ymm2', 'zmm3', 'k1') {
 
-is ( is_valid_64bit_addr_intel ("[rbx + rax*1]"), 1, "[rbx+rax*1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + 1*rax]"), 1, "[rbx+1*rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rax*1 + rbx]"), 1, "[rax*1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1*rax + rbx]"), 1, "[1*rax + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + rax*2]"), 1, "[rbx+rax*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + 2*rax]"), 1, "[rbx+2*rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rax*2 + rbx]"), 1, "[rax*2 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[2*rax + rbx]"), 1, "[2*rax + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + rax*4]"), 1, "[rbx+rax*4] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + 4*rax]"), 1, "[rbx+4*rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rax*4 + rbx]"), 1, "[rax*4 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[4*rax + rbx]"), 1, "[4*rax + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + rax*8]"), 1, "[rbx+rax*8] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + 8*rax]"), 1, "[rbx+8*rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rax*8 + rbx]"), 1, "[rax*8 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[8*rax + rbx]"), 1, "[8*rax + rbx] is a valid 64-bit addressing scheme" );
+	push @invalid64, permute_disp_intel_all ('', $r1, '', '', '', '1');
+	push @invalid64, permute_disp_intel_all ('-', $r1, '', '', '', '1');
+	push @invalid64, permute_disp_intel_all ('', $r1, '', 'rbx', '', '1');
+	push @invalid64, permute_disp_intel_all ('', $r1, '', 'rbx', '2', '1');
+	push @invalid64, permute_disp_intel_all ('', '', '', $r1, '', '1');
+	push @invalid64, permute_disp_intel_all ('', '', '', $r1, '2', '1');
+	push @invalid64, permute_disp_intel_all ('', 'rbx', '', $r1, '', '1');
+	push @invalid64, permute_disp_intel_all ('', 'rbx', '', $r1, '2', '1');
 
-is ( is_valid_64bit_addr_intel ("[rax*8 - rbx]"), 0, "[rax*8 - rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[8*rax - rbx]"), 0, "[8*rax - rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[- rax*8 + rbx]"), 0, "[- rax*8 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[- 8*rax + rbx]"), 0, "[- 8*rax + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1*8 + rbx]"), 1, "[1*8 + rbx] is a valid 64-bit addressing scheme" );
+	push @invalid64, permute_reg64_invalid_intel ($r1);
+}
 
-is ( is_valid_64bit_addr_intel ("[rbx - rax*8]"), 0, "[rbx - rax*8] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx - 8*rax]"), 0, "[rbx - 8*rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[- rbx + rax*8]"), 0, "[- rbx + rax*8] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[- rbx + 8*rax]"), 0, "[- rbx + 8*rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + 1*8]"), 1, "[rbx + 1*8] is a valid 64-bit addressing scheme" );
+foreach my $r1 ('r9d', 'ebx') {
 
-is ( is_valid_64bit_addr_intel ("[rbx+rsi*4+66]"), 1, "[rbx+rsi*4+66] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx+rcx*8-55]"), 1, "[rbx+rcx*8-55] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx+rcx*8+-55]"), 1, "[rbx+rcx*8+-55] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx+rbp*1]"), 1, "[rbx+rbp*1] is a valid 64-bit addressing scheme" );
+	foreach my $s ('',  '2') {
 
-is ( is_valid_64bit_addr_intel ("[rbx+4*rsi+66]"), 1, "[rbx+4*rsi+66] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx+8*rcx-55]"), 1, "[rbx+8*rcx-55] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx+8*rcx+-55]"), 1, "[rbx+8*rcx+-55] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx+1*rbp]"), 1, "[rbx+1*rbp] is a valid 64-bit addressing scheme" );
+		push @invalid64, permute_disp_intel_all ('', 'rbx', '', $r1, $s, '1');
+		push @invalid64, permute_disp_intel_all ('', 'rbx', '', $r1, $s, 'varname');
+		push @invalid64, permute_disp_intel_all ('', 'rbx', '', $r1, $s, 'rax');
 
-is ( is_valid_64bit_addr_intel ("[rbx+rsi*4+66]"), 1, "[rbx+rsi*4+66] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx+rcx*8-55]"), 1, "[rbx+rcx*8-55] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx+rcx*8+-55]"), 1, "[rbx+rcx*8+-55] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx+rbp*1]"), 1, "[rbx+rbp*1] is a valid 64-bit addressing scheme" );
+		push @invalid64, permute_disp_intel_all ('', $r1, '', 'rbx', $s, '1');
+		push @invalid64, permute_disp_intel_all ('', $r1, '', 'rbx', $s, 'varname');
+	}
+}
 
-is ( is_valid_64bit_addr_intel ("[rbx+4*rsi+66]"), 1, "[rbx+4*rsi+66] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx+8*rcx-55]"), 1, "[rbx+8*rcx-55] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx+8*rcx+-55]"), 1, "[rbx+8*rcx+-55] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx+1*rbp]"), 1, "[rbx+1*rbp] is a valid 64-bit addressing scheme" );
 
-is ( is_valid_64bit_addr_intel ("[rcx*2 + rbx]"), 1, "[rcx*2 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx*4 + rbx -1]"), 1, "[rcx*4 + rbx -1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx*4 + rbx +-1]"), 1, "[rcx*4 + rbx +-1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx*8 + rbx+ 44]"), 1, "[rcx*2 + rbx+ 44] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx*1 + rsp]"), 1, "[rcx*1 + rsp] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx*4 -1 + rbx]"), 1, "[rcx*4 -1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx*4 +-1 + rbx]"), 1, "[rcx*4 +-1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx*8 +44 + rbx]"), 1, "[rcx*2 +44+ rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx*4 -1 + rbx]"), 1, "[rcx*4 -1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx*4 +-1 + rbx]"), 1, "[rcx*4 +-1 + rbx] is a valid 64-bit addressing scheme" );
+push @valid64, permute_disp_intel_all ('', 'r9d', '', '', '', '1');
+push @valid64, permute_disp_intel_all ('', '', '', 'r9d', '2', '1');
 
-is ( is_valid_64bit_addr_intel ("[rbx + rcx*1 + 1]"), 1, "[rbx + rcx*1 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + 1*rcx + 1]"), 1, "[rbx + 1*rcx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + 1 + rcx*1]"), 1, "[rbx + 1 + rcx*1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + 1 + 1*rcx]"), 1, "[rbx + 1 + 1*rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + rcx*2 + 1]"), 1, "[rbx + rcx*2 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + 2*rcx + 1]"), 1, "[rbx + 2*rcx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + 1 + rcx*2]"), 1, "[rbx + 1 + rcx*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + 1 + 2*rcx]"), 1, "[rbx + 1 + 2*rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + rcx*4 + 1]"), 1, "[rbx + rcx*4 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + 4*rcx + 1]"), 1, "[rbx + 4*rcx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + 1 + rcx*4]"), 1, "[rbx + 1 + rcx*4] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + 1 + 4*rcx]"), 1, "[rbx + 1 + 4*rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + rcx*8 + 1]"), 1, "[rbx + rcx*8 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + 8*rcx + 1]"), 1, "[rbx + 8*rcx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + 1 + rcx*8]"), 1, "[rbx + 1 + rcx*8] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + 1 + 8*rcx]"), 1, "[rbx + 1 + 8*rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + rbx + rcx*8]"), 1, "[1 + rbx + rcx*8] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + rbx + 8*rcx]"), 1, "[1 + rbx + 8*rcx] is a valid 64-bit addressing scheme" );
+push @invalid64, permute_disp_intel_all ('', '', '', 'ebx', 'rbx', '1');
 
-is ( is_valid_64bit_addr_intel ("[rbx + rcx + 1]"), 1, "[rbx + rcx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + rcx + 1]"), 1, "[rbx + 1cx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + 1 + rcx]"), 1, "[rbx + 1 + rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + 1 + rcx]"), 1, "[rbx + 1 + rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + rbx + rcx]"), 1, "[1 + rbx + rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + rbx + rcx]"), 1, "[1 + rbx + rcx] is a valid 64-bit addressing scheme" );
+push @invalid64, permute_disp_intel ('-', 'rax', '', '', '',  '1');
+push @invalid64, permute_disp_intel_all ('-', 'rbx', '', 'rdi', '', '1');
 
-is ( is_valid_64bit_addr_intel ("[-rbx + rcx*1 + 1]"), 0, "[-rbx + rcx*1 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[-rbx + 1*rcx + 1]"), 0, "[-rbx + 1*rcx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx - rcx*1 + 1]"), 0, "[rbx - rcx*1 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx - 1*rcx + 1]"), 0, "[rbx - 1*rcx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + rcx*1 - rax]"), 0, "[1 + rcx*1 - rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + 1*rcx - rax]"), 0, "[1 + 1*rcx - rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + 1*rcx + rax]"), 0, "[rbx + 1*rcx + rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + rcx*1 + rax]"), 0, "[rbx + rcx*1 + rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + 2*1 + rax]"), 1, "[rbx + 2*1 + rax] is a valid 64-bit addressing scheme" );
+foreach my $s ('', '2') {
 
-is ( is_valid_64bit_addr_intel ("[-rbx + 1 + rcx*1]"), 0, "[-rbx + 1 + rcx*1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[-rbx + 1 + 1*rcx]"), 0, "[-rbx + 1 + 1*rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + 1 - rcx*1]"), 0, "[rbx + 1 - rcx*1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + 1 - 1*rcx]"), 0, "[rbx + 1 - 1*rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 - rax + rcx*1]"), 0, "[1 - rax + rcx*1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 - rax + 1*rcx]"), 0, "[1 - rax + 1*rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + rax + 1*rcx]"), 0, "[rbx + rax + 1*rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + rax + rcx*1]"), 0, "[rbx + rax + rcx*1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + rax + 2*1]"), 1, "[rbx + rax + 2*1] is a valid 64-bit addressing scheme" );
+	push @invalid64, permute_disp_intel ('', 'rbx', '', 'rdi', $s, 'rax');
+	push @invalid64, permute_disp_intel_all ('-', 'rbx', '', 'rdi', $s, 'rax');
+	push @invalid64, permute_disp_intel_all ('', 'rbx', '-', 'rdi', $s, 'rax');
+	push @invalid64, permute_disp_intel_all ('-', 'rbx', '-', 'rdi', $s, 'rax');
+	push @valid64, permute_disp_intel_all ('', 'eax', '', 'ebx', $s, '1');
+	push @valid64, permute_disp_intel_all ('', '', '', 'ebx', $s, '1');
+}
 
-is ( is_valid_64bit_addr_intel ("[rcx*1 - rbx + 1]"), 0, "[rcx*1 - rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1*rcx - rbx + 1]"), 0, "[1*rcx - rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[- rcx*1 + rbx + 1]"), 0, "[- rcx*1 + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[- 1*rcx + rbx + 1]"), 0, "[- 1*rcx + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx*1 + 1 - rax]"), 0, "[rcx*1 + 1 - rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1*rcx + 1 - rax]"), 0, "[1*rcx + 1 - rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1*rcx + rbx + rax]"), 0, "[1*rcx + rbx + rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx*1 + rbx + rax]"), 0, "[rcx*1 + rbx + rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[2*1 + rbx + rax]"), 1, "[2*1 + rbx + rax] is a valid 64-bit addressing scheme" );
+foreach my $s ('', '1', '2', '4', '8') {
 
-is ( is_valid_64bit_addr_intel ("[rcx - rbx + 1]"), 0, "[rcx - rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx + 1 - rbx]"), 0, "[rcx + 1 - rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ - rbx + rcx + 1]"), 0, "[- rbx + rcx + 1] is a valid 64-bit addressing scheme" );
+	push @valid64, permute_disp_intel_all ('', '', '', 'rax', $s, '3');
+	push @valid64, permute_disp_intel_all ('', 'rbx', '', 'rax', $s, '3');
+}
 
-is ( is_valid_64bit_addr_intel ("[rcx*1 + rbx + 1]"), 1, "[rcx*1 + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1*rcx + rbx + 1]"), 1, "[1*rcx + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx*1 + 1 + rbx]"), 1, "[rcx*1 + 1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1*rcx + 1 + rbx]"), 1, "[1*rcx + 1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx*2 + rbx + 1]"), 1, "[rcx*2 + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[2*rcx + rbx + 1]"), 1, "[2*rcx + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx*2 + 1 + rbx]"), 1, "[rcx*2 + 1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[2*rcx + 1 + rbx]"), 1, "[2*rcx + 1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx*4 + rbx + 1]"), 1, "[rcx*4 + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[4*rcx + rbx + 1]"), 1, "[4*rcx + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx*4 + 1 + rbx]"), 1, "[rcx*4 + 1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[4*rcx + 1 + rbx]"), 1, "[4*rcx + 1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx*8 + rbx + 1]"), 1, "[rcx*8 + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[8*rcx + rbx + 1]"), 1, "[8*rcx + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx*8 + 1 + rbx]"), 1, "[rcx*8 + 1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[8*rcx + 1 + rbx]"), 1, "[8*rcx + 1 + rbx] is a valid 64-bit addressing scheme" );
+foreach my $r1 ('rax', 'rbp', 'rcx', 'rsi') {
 
-is ( is_valid_64bit_addr_intel ("[1 + rbx + rcx*1]"), 1, "[1 + rbx + rcx*1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + rbx + 1*rcx]"), 1, "[1 + rbx + 1*rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + rcx*1 + rbx]"), 1, "[1 + rcx*1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + 1*rcx + rbx]"), 1, "[1 + 1*rcx + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + rbx + rcx*2]"), 1, "[1 + rbx + rcx*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + rbx + 2*rcx]"), 1, "[1 + rbx + 2*rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + rcx*2 + rbx]"), 1, "[1 + rcx*2 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + 2*rcx + rbx]"), 1, "[1 + 2*rcx + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + rbx + rcx*4]"), 1, "[1 + rbx + rcx*4] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + rbx + 4*rcx]"), 1, "[1 + rbx + 4*rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + rcx*4 + rbx]"), 1, "[1 + rcx*4 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + 4*rcx + rbx]"), 1, "[1 + 4*rcx + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + rbx + rcx*8]"), 1, "[1 + rbx + rcx*8 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + rbx + 8*rcx]"), 1, "[1 + rbx + 8*rcx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + rcx*8 + rbx]"), 1, "[1 + rcx*8 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + 8*rcx + rbx]"), 1, "[1 + 8*rcx + rbx] is a valid 64-bit addressing scheme" );
+	push @valid64, permute_disp_intel_all ('', 'rbx', '', $r1, '1', '3');
+	push @invalid64, permute_disp_intel_all ('-', 'rbx', '', $r1, '1', '7');
+	push @invalid64, permute_disp_intel_all ('', 'rbx', '-', $r1, '1', '9');
+	push @invalid64, permute_disp_intel_all ('-', 'rbx', '-', $r1, '1', '5');
+	push @valid64, permute_disp_intel_all ('', '', '', $r1, '1', '3');
+	push @invalid64, permute_disp_intel_all ('', '', '-', $r1, '1', '5');
+}
 
-is ( is_valid_64bit_addr_intel ("[1*rsp]"), 1, "[1*rsp] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[2*rsp]"), 0, "[2*rsp] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx+1*rsp]"), 1, "[rcx+1*rsp] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx+2*rsp]"), 0, "[rcx+2*rsp] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1*rsp+rsi]"), 1, "[1*rsp+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[2*rsp+rsi]"), 0, "[2*rsp+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1*rsp+1]"), 1, "[1*rsp+1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[2*rsp+1]"), 0, "[2*rsp+1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1+1*rsp]"), 1, "[1+1*rsp] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1+2*rsp]"), 0, "[1+2*rsp] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1+rcx+1*rsp]"), 1, "[1+rcx+1*rsp] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1+rcx+2*rsp]"), 0, "[1+rcx+2*rsp] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1+1*rsp+rsi]"), 1, "[1+1*rsp+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1+2*rsp+rsi]"), 0, "[1+2*rsp+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx+1+1*rsp]"), 1, "[rcx+1+1*rsp] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx+1+2*rsp]"), 0, "[rcx+1+2*rsp] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1*rsp+1+rsi]"), 1, "[1*rsp+1+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[2*rsp+1+rsi]"), 0, "[2*rsp+1+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx+1*rsp+1]"), 1, "[rcx+1*rsp+1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx+2*rsp+1]"), 0, "[rcx+2*rsp+1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1*rsp+rsi+1]"), 1, "[1*rsp+rsi+1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[2*rsp+rsi+1]"), 0, "[2*rsp+rsi+1] is a valid 64-bit addressing scheme" );
+push @valid64, permute_disp_intel_all ('', '', '', '1', '8', '29');
+push @valid64, permute_disp_intel_all ('', '', '-', '1', '8', '29');
 
-is ( is_valid_64bit_addr_intel ("[rsp*1]"), 1, "[rsp*1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rsp*2]"), 0, "[rsp*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx+rsp*1]"), 1, "[rcx+rsp*1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx+rsp*2]"), 0, "[rcx+rsp*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rsp*1+rsi]"), 1, "[rsp*1+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rsp*2+rsi]"), 0, "[rsp*2+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rsp*1+1]"), 1, "[rsp*1+1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rsp*2+1]"), 0, "[rsp*2+1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1+rsp*1]"), 1, "[1+rsp*1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1+rsp*2]"), 0, "[1+rsp*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1+rcx+rsp*1]"), 1, "[1+rcx+rsp*1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1+rcx+rsp*2]"), 0, "[1+rcx+rsp*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1+rsp*1+rsi]"), 1, "[1+rsp*1+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1+rsp*2+rsi]"), 0, "[1+rsp*2+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx+1+rsp*1]"), 1, "[rcx+1+rsp*1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx+1+rsp*2]"), 0, "[rcx+1+rsp*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rsp*1+1+rsi]"), 1, "[rsp*1+1+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rsp*2+1+rsi]"), 0, "[rsp*2+1+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx+rsp*1+1]"), 1, "[rcx+rsp*1+1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx+rsp*2+1]"), 0, "[rcx+rsp*2+1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rsp*1+rsi+1]"), 1, "[rsp*1+rsi+1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rsp*2+rsi+1]"), 0, "[rsp*2+rsi+1] is a valid 64-bit addressing scheme" );
+push @valid64, permute_disp_intel_all ('', 'rbx', '', '1', '8', '31');
+push @valid64, permute_disp_intel_all ('', 'rbx', '-', '1', '8', '31');
 
-is ( is_valid_64bit_addr_intel ("[z*rsp]"), 1, "[z*rsp] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx+z*rsp]"), 1, "[rcx+z*rsp] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[z*rsp+rsi]"), 1, "[z*rsp+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[z*rsp+1]"), 1, "[z*rsp+1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1+z*rsp]"), 1, "[1+z*rsp] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1+rcx+z*rsp]"), 1, "[1+rcx+z*rsp] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1+z*rsp+rsi]"), 1, "[1+z*rsp+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx+1+z*rsp]"), 1, "[rcx+1+z*rsp] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[z*rsp+1+rsi]"), 1, "[z*rsp+1+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx+z*rsp+1]"), 1, "[rcx+z*rsp+1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[z*rsp+rsi+1]"), 1, "[z*rsp+rsi+1] is a valid 64-bit addressing scheme" );
+push @valid64, permute_intel ('', 'rbx', '', '1', '8', '', 'rax');
+push @valid64, permute_intel ('', 'rbx', '-', '1', '8', '', 'rax');
 
-is ( is_valid_64bit_addr_intel ("[rsp*z]"), 1, "[rsp*z] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx+rsp*z]"), 1, "[rcx+rsp*z] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rsp*z+rsi]"), 1, "[rsp*z+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rsp*z+1]"), 1, "[rsp*z+1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1+rsp*z]"), 1, "[1+rsp*z] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1+rcx+rsp*z]"), 1, "[1+rcx+rsp*z] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1+rsp*z+rsi]"), 1, "[1+rsp*z+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx+1+rsp*z]"), 1, "[rcx+1+rsp*z] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rsp*z+1+rsi]"), 1, "[rsp*z+1+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx+rsp*z+1]"), 1, "[rcx+rsp*z+1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rsp*z+rsi+1]"), 1, "[rsp*z+rsi+1] is a valid 64-bit addressing scheme" );
+push @valid64, permute_disp_intel_all ('', '3', '', 'rbx', '8', '33');
+push @invalid64, permute_disp_intel_all ('', '3', '-', 'rbx', '8', '33');
 
-is ( is_valid_64bit_addr_intel ("[1*rip]"), 1, "[1*rip] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[2*rip]"), 0, "[2*rip] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx+1*rip]"), 1, "[rcx+1*rip] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx+2*rip]"), 0, "[rcx+2*rip] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1*rip+rsi]"), 1, "[1*rip+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[2*rip+rsi]"), 0, "[2*rip+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1*rip+1]"), 1, "[1*rip+1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[2*rip+1]"), 0, "[2*rip+1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1+1*rip]"), 1, "[1+1*rip] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1+2*rip]"), 0, "[1+2*rip] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1+rcx+1*rip]"), 1, "[1+rcx+1*rip] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1+rcx+2*rip]"), 0, "[1+rcx+2*rip] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1+1*rip+rsi]"), 1, "[1+1*rip+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1+2*rip+rsi]"), 0, "[1+2*rip+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx+1+1*rip]"), 1, "[rcx+1+1*rip] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx+1+2*rip]"), 0, "[rcx+1+2*rip] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1*rip+1+rsi]"), 1, "[1*rip+1+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[2*rip+1+rsi]"), 0, "[2*rip+1+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx+1*rip+1]"), 1, "[rcx+1*rip+1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx+2*rip+1]"), 0, "[rcx+2*rip+1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1*rip+rsi+1]"), 1, "[1*rip+rsi+1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[2*rip+rsi+1]"), 0, "[2*rip+rsi+1] is a valid 64-bit addressing scheme" );
+push @invalid64, permute_intel ('', 'rbx*2', '', 'rax', '8', '', '');
 
-is ( is_valid_64bit_addr_intel ("[rip*1]"), 1, "[rip*1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rip*2]"), 0, "[rip*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx+rip*1]"), 1, "[rcx+rip*1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx+rip*2]"), 0, "[rcx+rip*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rip*1+rsi]"), 1, "[rip*1+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rip*2+rsi]"), 0, "[rip*2+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rip*1+1]"), 1, "[rip*1+1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rip*2+1]"), 0, "[rip*2+1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1+rip*1]"), 1, "[1+rip*1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1+rip*2]"), 0, "[1+rip*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1+rcx+rip*1]"), 1, "[1+rcx+rip*1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1+rcx+rip*2]"), 0, "[1+rcx+rip*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1+rip*1+rsi]"), 1, "[1+rip*1+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1+rip*2+rsi]"), 0, "[1+rip*2+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx+1+rip*1]"), 1, "[rcx+1+rip*1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx+1+rip*2]"), 0, "[rcx+1+rip*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rip*1+1+rsi]"), 1, "[rip*1+1+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rip*2+1+rsi]"), 0, "[rip*2+1+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx+rip*1+1]"), 1, "[rcx+rip*1+1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx+rip*2+1]"), 0, "[rcx+rip*2+1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rip*1+rsi+1]"), 1, "[rip*1+rsi+1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rip*2+rsi+1]"), 0, "[rip*2+rsi+1] is a valid 64-bit addressing scheme" );
+foreach my $r1 ('rsp', 'rip') {
 
-is ( is_valid_64bit_addr_intel ("[z*rip]"), 1, "[z*rip] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx+z*rip]"), 1, "[rcx+z*rip] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[z*rip+rsi]"), 1, "[z*rip+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[z*rip+1]"), 1, "[z*rip+1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1+z*rip]"), 1, "[1+z*rip] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1+rcx+z*rip]"), 1, "[1+rcx+z*rip] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1+z*rip+rsi]"), 1, "[1+z*rip+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx+1+z*rip]"), 1, "[rcx+1+z*rip] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[z*rip+1+rsi]"), 1, "[z*rip+1+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx+z*rip+1]"), 1, "[rcx+z*rip+1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[z*rip+rsi+1]"), 1, "[z*rip+rsi+1] is a valid 64-bit addressing scheme" );
+	push @valid64, permute_disp_intel_all ('', $r1, '', 'rcx', '1', '11');
+	push @valid64, permute_disp_intel_all ('', $r1, '', 'rbp', '1', '11');
 
-is ( is_valid_64bit_addr_intel ("[rip*z]"), 1, "[rip*z] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx+rip*z]"), 1, "[rcx+rip*z] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rip*z+rsi]"), 1, "[rip*z+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rip*z+1]"), 1, "[rip*z+1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1+rip*z]"), 1, "[1+rip*z] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1+rcx+rip*z]"), 1, "[1+rcx+rip*z] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1+rip*z+rsi]"), 1, "[1+rip*z+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx+1+rip*z]"), 1, "[rcx+1+rip*z] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rip*z+1+rsi]"), 1, "[rip*z+1+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx+rip*z+1]"), 1, "[rcx+rip*z+1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rip*z+rsi+1]"), 1, "[rip*z+rsi+1] is a valid 64-bit addressing scheme" );
+	push @valid64, permute_disp_intel_all ('', '', '', $r1, '1', '11');
+	push @valid64, permute_disp_intel_all ('', '', '', $r1, 'z', '13');
+	push @invalid64, permute_disp_intel_all ('', '', '', $r1, '2', '15');
 
-is ( is_valid_64bit_addr_intel ("[1*rcx]"), 1, "[1*rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[2*rcx]"), 1, "[2*rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[4*rcx]"), 1, "[4*rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[8*rcx]"), 1, "[8*rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx*1]"), 1, "[rcx*1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx*2]"), 1, "[rcx*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx*4]"), 1, "[rcx*4] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx*8]"), 1, "[rcx*8] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[5*rcx]"), 0, "[5*rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx*5]"), 0, "[rcx*5] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[4*rsp]"), 0, "[4*rsp] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[2*rcx + ebx*8]"), 0, "[2*rcx + ebx*8] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx + 2*rsp]"), 0, "[rcx + 2*rsp] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx + 2*rip]"), 0, "[rcx + 2*rip] is a valid 64-bit addressing scheme" );
+	push @valid64, permute_disp_intel_all ('', 'rcx', '', $r1, '1', '11');
+	push @valid64, permute_disp_intel_all ('', 'rcx', '', $r1, 'z', '13');
+	push @invalid64, permute_disp_intel_all ('', 'rcx', '', $r1, '2', '15');
 
-is ( is_valid_64bit_addr_intel ("[rbx+rax*2]"), 1, "[rbx+rax*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx+rsi*4+66]"), 1, "[rbx+rsi*4+66] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx+rcx*8-55]"), 1, "[rbx+rcx*8-55] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx+rcx*8+-55]"), 1, "[rbx+rcx*8+-55] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx+rbp*1]"), 1, "[rbx+rbp*1] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[rcx*2 + rbx]"), 1, "[rcx*2 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx*4 + rbx -1]"), 1, "[rcx*4 + rbx -1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx*4 + rbx +-1]"), 1, "[rcx*4 + rbx +-1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx*8 + rbx+ 44]"), 1, "[rcx*2 + rbx+ 44] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx*1 + rsp]"), 1, "[rcx*1 + rsp] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx*4 -1 + rbx]"), 1, "[rcx*4 -1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx*4 +-1 + rbx]"), 1, "[rcx*4 +-1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx*8 +44 + rbx]"), 1, "[rcx*2 +44+ rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx*4 -1 + rbx]"), 1, "[rcx*4 -1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx*4 +-1 + rbx]"), 1, "[rcx*4 +-1 + rbx] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[rcx*2]"), 1, "[rcx*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rsp*1]"), 1, "[rsp*1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rsp*4]"), 0, "[rsp*4] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rip*1]"), 1, "[rip*1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rip*4]"), 0, "[rip*4] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx*2 + rbx*8]"), 0, "[rcx*2 + rbx*8] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx + rsp*2]"), 0, "[rcx + rsp*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx + rip*2]"), 0, "[rcx + rip*2] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[1+rax]"), 1, "[1+rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[-2+rdx]"), 1, "[-2+rdx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[3+rbx*2]"), 1, "[3+rbx*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[-4+rsi*4]"), 1, "[-4+rsi*4] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[5+rcx+rsi]"), 1, "[5+rcx+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[-6+rcx*2+rdi]"), 1, "[-6+rcx*2+rdi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[7+rsp+rbp*8]"), 1, "[7+rsp+rbp*8] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[-8+rsp+rbp*8]"), 1, "[-8+rsp+rbp*8] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[cs*2 + rbx]"), 0, "[cs*2 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[cs*2 + rbx + 1]"), 0, "[cs*2 + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx*2 + cs]"), 0, "[rcx*2 + cs] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx*2 + cs + 1]"), 0, "[rcx*2 + cs + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + cs*2]"), 0, "[rbx + cs*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + cs*2 + 1]"), 0, "[rbx + cs*2 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[cs + rcx*2]"), 0, "[cs + rcx*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[cs + rcx*2 + 1]"), 0, "[cs + rcx*2 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[cs*2 + 1 + rbx]"), 0, "[cs*2 + 1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx*2 + 1 + cs]"), 0, "[rcx*2 + 1 + cs] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + cs*2 + rbx]"), 0, "[1 + cs*2 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + rcx*2 + cs]"), 0, "[1 + rcx*2 + cs] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + rbx + cs*2]"), 0, "[1 + rbx + cs*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + cs + rcx*2]"), 0, "[1 + cs + rcx*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + 1 + cs*2]"), 0, "[rbx + 1 + cs*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[cs + 1 + rcx*2]"), 0, "[cs + 1 + rcx*2] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[cs + rbx]"), 0, "[cs + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[cs + rbx + 1]"), 0, "[cs + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx + cs]"), 0, "[rcx + cs] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx + cs + 1]"), 0, "[rcx + cs + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + rbx + cs]"), 0, "[1 + rbx + cs] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + cs + rcx]"), 0, "[1 + cs + rcx] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[cs*rax + rbx]"), 0, "[cs*rax + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[cs*rax + rbx + 1]"), 0, "[cs*rax + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx*rax + cs]"), 0, "[rcx*rax + cs] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx*rax + cs + 1]"), 0, "[rcx*rax + cs + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + cs*rax]"), 0, "[rbx + cs*rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + cs*rax + 1]"), 0, "[rbx + cs*rax + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[cs + rcx*rax]"), 0, "[cs + rcx*rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[cs + rcx*rax + 1]"), 0, "[cs + rcx*rax + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[cs*rax + 1 + rbx]"), 0, "[cs*rax + 1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx*rax + 1 + cs]"), 0, "[rcx*rax + 1 + cs] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + cs*rax + rbx]"), 0, "[1 + cs*rax + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + rcx*rax + cs]"), 0, "[1 + rcx*rax + cs] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + rbx + cs*rax]"), 0, "[1 + rbx + cs*rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + cs + rcx*rax]"), 0, "[1 + cs + rcx*rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + 1 + cs*rax]"), 0, "[rbx + 1 + cs*rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[cs + 1 + rcx*rax]"), 0, "[cs + 1 + rcx*rax] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[rax*5 + rbx]"), 0, "[rax*5 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rax*5 + rbx + 1]"), 0, "[rax*5 + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx*5 + rax]"), 0, "[rcx*5 + rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx*5 + rax + 1]"), 0, "[rcx*5 + rax + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + rax*5]"), 0, "[rbx + rax*5] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + rax*5 + 1]"), 0, "[rbx + rax*5 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rax + rcx*5]"), 0, "[rax + rcx*5] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rax + rcx*5 + 1]"), 0, "[rax + rcx*5 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rax*5 + 1 + rbx]"), 0, "[rax*5 + 1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx*5 + 1 + rax]"), 0, "[rcx*5 + 1 + rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + rax*5 + rbx]"), 0, "[1 + rax*5 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + rcx*5 + rax]"), 0, "[1 + rcx*5 + rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + rbx + rax*5]"), 0, "[1 + rbx + rax*5] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + 1 + rax*5]"), 0, "[rbx + 1 + rax*5] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[rdx*rax]"), 0, "[rdx*rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rdx*rax + rbx]"), 0, "[rdx*rax + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + rdx*rax]"), 0, "[rbx + rdx*rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rdx*rax + rbx + 1]"), 0, "[rdx*rax + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + rdx*rax + 1]"), 0, "[rbx + rdx*rax + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rdx*rax + 1 + rbx]"), 0, "[rdx*rax + 1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + 1 + rdx*rax]"), 0, "[rbx + 1 + rdx*rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + rdx*rax + rbx]"), 0, "[1 + rdx*rax + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + rbx + rdx*rax]"), 0, "[1 + rbx + rdx*rax] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[rdx*eax]"), 0, "[rdx*eax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rdx*eax + rbx]"), 0, "[rdx*eax + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + rdx*eax]"), 0, "[rbx + rdx*eax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rdx*eax + rbx + 1]"), 0, "[rdx*eax + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + rdx*eax + 1]"), 0, "[rbx + rdx*eax + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rdx*eax + 1 + rbx]"), 0, "[rdx*eax + 1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + 1 + rdx*eax]"), 0, "[rbx + 1 + rdx*eax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + rdx*eax + rbx]"), 0, "[1 + rdx*eax + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + rbx + rdx*eax]"), 0, "[1 + rbx + rdx*eax] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[cs*ds + rbx]"), 0, "[cs*ds + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[cs*ds + rbx + 1]"), 0, "[cs*ds + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx*ds + cs]"), 0, "[rcx*ds + cs] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx*ds + cs + 1]"), 0, "[rcx*ds + cs + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + cs*ds]"), 0, "[rbx + cs*ds] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + cs*ds + 1]"), 0, "[rbx + cs*ds + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[cs + rcx*ds]"), 0, "[cs + rcx*ds] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[cs + rcx*ds + 1]"), 0, "[cs + rcx*ds + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[cs*ds + 1 + rbx]"), 0, "[cs*ds + 1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx*ds + 1 + cs]"), 0, "[rcx*ds + 1 + cs] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + cs*ds + rbx]"), 0, "[1 + cs*ds + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + rcx*ds + cs]"), 0, "[1 + rcx*ds + cs] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[dl*2 + rbx]"), 0, "[dl*2 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[dl*2 + rbx + 1]"), 0, "[dl*2 + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx*2 + dl]"), 0, "[rcx*2 + dl] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx*2 + dl + 1]"), 0, "[rcx*2 + dl + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + dl*2]"), 0, "[rbx + dl*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + dl*2 + 1]"), 0, "[rbx + dl*2 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[dl + rcx*2]"), 0, "[dl + rcx*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[dl + rcx*2 + 1]"), 0, "[dl + rcx*2 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[dl*2 + 1 + rbx]"), 0, "[dl*2 + 1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx*2 + 1 + dl]"), 0, "[rcx*2 + 1 + dl] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + dl*2 + rbx]"), 0, "[1 + dl*2 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + rcx*2 + dl]"), 0, "[1 + rcx*2 + dl] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[dl + rbx]"), 0, "[dl + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[dl + rbx + 1]"), 0, "[dl + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx + dl]"), 0, "[rcx + dl] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx + dl + 1]"), 0, "[rcx + dl + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + dl + rbx]"), 0, "[1 + dl + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + rcx + dl]"), 0, "[1 + rcx + dl] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[cs*2 + rbx + 1]"), 0, "[cs*2 + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[mm1*2 + rbx + 1]"), 0, "[mm1*2 + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[st2*2 + rbx + 1]"), 0, "[st2*2 + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[cr0*2 + rbx + 1]"), 0, "[cr0*2 + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[cx*2 + rbx + 1]"), 0, "[cx*2 + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ecx*2 + rbx + 1]"), 0, "[ecx*2 + rbx + 1] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[2*cs + rbx]"), 0, "[2*cs + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[2*cs + rbx + 1]"), 0, "[2*cs + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[2*rcx + cs]"), 0, "[2*rcx + cs] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[2*rcx + cs + 1]"), 0, "[2*rcx + cs + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + 2*cs]"), 0, "[rbx + 2*cs] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + 2*cs + 1]"), 0, "[rbx + 2*cs + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[cs + 2*rcx]"), 0, "[cs + 2*rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[cs + 2*rcx + 1]"), 0, "[cs + 2*rcx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[2*cs + 1 + rbx]"), 0, "[2*cs + 1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[2*rcx + 1 + cs]"), 0, "[2*rcx + 1 + cs] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + 2*cs + rbx]"), 0, "[1 + 2*cs + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + 2*rcx + cs]"), 0, "[1 + 2*rcx + cs] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + rbx + 2*cs]"), 0, "[1 + rbx + 2*cs] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + cs + 2*rcx]"), 0, "[1 + cs + 2*rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + 1 + 2*cs]"), 0, "[rbx + 1 + 2*cs] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[cs + 1 + 2*rcx]"), 0, "[cs + 1 + 2*rcx] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[cs*2 + rbx]"), 0, "[cs*2 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[cs*2 + rbx + 1]"), 0, "[cs*2 + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx*2 + cs]"), 0, "[rcx*2 + cs] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx*2 + cs + 1]"), 0, "[rcx*2 + cs + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + cs*2]"), 0, "[rbx + cs*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + cs*2 + 1]"), 0, "[rbx + cs*2 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[cs + rcx*2]"), 0, "[cs + rcx*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[cs + rcx*2 + 1]"), 0, "[cs + rcx*2 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[cs*2 + 1 + rbx]"), 0, "[cs*2 + 1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx*2 + 1 + cs]"), 0, "[rcx*2 + 1 + cs] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + cs*2 + rbx]"), 0, "[1 + cs*2 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + rcx*2 + cs]"), 0, "[1 + rcx*2 + cs] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + rbx + cs*2]"), 0, "[1 + rbx + cs*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + cs + rcx*2]"), 0, "[1 + cs + rcx*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + 1 + cs*2]"), 0, "[rbx + 1 + cs*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[cs + 1 + rcx*2]"), 0, "[cs + 1 + rcx*2] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[cs + rbx]"), 0, "[cs + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[cs + rbx + 1]"), 0, "[cs + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx + cs]"), 0, "[rcx + cs] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx + cs + 1]"), 0, "[rcx + cs + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + cs + rbx]"), 0, "[1 + cs + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + rcx + cs]"), 0, "[1 + rcx + cs] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[rax*cs + rbx]"), 0, "[rax*cs + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rax*cs + rbx + 1]"), 0, "[rax*cs + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + rax*cs]"), 0, "[rbx + rax*cs] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + rax*cs + 1]"), 0, "[rbx + rax*cs + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rax*cs + 1 + rbx]"), 0, "[rax*cs + 1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + rax*cs + rbx]"), 0, "[1 + rax*cs + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + rbx + rax*cs]"), 0, "[1 + rbx + rax*cs] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + 1 + rax*cs]"), 0, "[rbx + 1 + rax*cs] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[5*rax + rbx]"), 0, "[5*rax + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[5*rax + rbx + 1]"), 0, "[5*rax + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx*5 + rax]"), 0, "[rcx*5 + rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx*5 + rax + 1]"), 0, "[rcx*5 + rax + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + 5*rax]"), 0, "[rbx + 5*rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + 5*rax + 1]"), 0, "[rbx + 5*rax + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rax + rcx*5]"), 0, "[rax + rcx*5] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rax + rcx*5 + 1]"), 0, "[rax + rcx*5 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[5*rax + 1 + rbx]"), 0, "[5*rax + 1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx*5 + 1 + rax]"), 0, "[ec*5x + 1 + rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + 1 + 5*rax]"), 0, "[rbx + 1 + 5*rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rax + 1 + rcx*5]"), 0, "[rax + 1 + rcx*5] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + 5*rax + rbx]"), 0, "[1 + 5*rax + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + rcx*5 + rax]"), 0, "[1 + rcx*5 + rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + rbx + 5*rax]"), 0, "[1 + rbx + 5*rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + rax + rcx*5]"), 0, "[1 + rax + rcx*5] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[2*dl + rbx]"), 0, "[2*dl + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[2*dl + rbx + 1]"), 0, "[2*dl + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[2*rcx + dl]"), 0, "[2*rcx + dl] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[2*rcx + dl + 1]"), 0, "[2*rcx + dl + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + 2*dl]"), 0, "[rbx + 2*dl] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + 2*dl + 1]"), 0, "[rbx + 2*dl + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[dl + 2*rcx]"), 0, "[dl + 2*rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[dl + 2*rcx + 1]"), 0, "[dl + 2*rcx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[2*dl + 1 + rbx]"), 0, "[2*dl + 1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[2*rcx + 1 + dl]"), 0, "[2*rcx + 1 + dl] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + 2*dl + rbx]"), 0, "[1 + 2*dl + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + 2*rcx + dl]"), 0, "[1 + 2*rcx + dl] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[dl*2 + rbx]"), 0, "[dl*2 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[dl*2 + rbx + 1]"), 0, "[dl*2 + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx*2 + dl]"), 0, "[rcx*2 + dl] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx*2 + dl + 1]"), 0, "[rcx*2 + dl + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + dl*2]"), 0, "[rbx + dl*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + dl*2 + 1]"), 0, "[rbx + dl*2 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[dl + rcx*2]"), 0, "[dl + rcx*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[dl + rcx*2 + 1]"), 0, "[dl + rcx*2 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[dl*2 + 1 + rbx]"), 0, "[dl*2 + 1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx*2 + 1 + dl]"), 0, "[rcx*2 + 1 + dl] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + dl*2 + rbx]"), 0, "[1 + dl*2 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + rcx*2 + dl]"), 0, "[1 + rcx*2 + dl] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[cs + rbx]"), 0, "[cs + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[cs + rbx + 1]"), 0, "[cs + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx + cs]"), 0, "[rcx + cs] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx + cs + 1]"), 0, "[rcx + cs + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + cs]"), 0, "[rbx + cs] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + cs + 1]"), 0, "[rbx + cs + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[cs + rcx]"), 0, "[cs + rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[cs + rcx + 1]"), 0, "[cs + rcx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[cs + 1 + rbx]"), 0, "[cs + 1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx + 1 + cs]"), 0, "[rcx + 1 + cs] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + cs + rbx]"), 0, "[1 + cs + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + rcx + cs]"), 0, "[1 + rcx + cs] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[cs*2]"), 0, "[cs*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[2*cs]"), 0, "[2*cs] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[dl*2]"), 0, "[dl*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[2*dl]"), 0, "[2*dl] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[cr0*2]"), 0, "[cr0*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[2*cr0]"), 0, "[2*cr0] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ax*2]"), 0, "[ax*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[2*ax]"), 0, "[2*ax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[mm1*2]"), 0, "[mm1*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[2*mm1]"), 0, "[2*mm1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[st1*2]"), 0, "[st1*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[2*st1]"), 0, "[2*st1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ecx*2]"), 1, "[ecx*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[2*ecx]"), 1, "[2*ecx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[r9d*2]"), 1, "[r9d*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[2*r9d]"), 1, "[2*r9d] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rax*rbx]"), 0, "[rax*rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[-2*rax]"), 0, "[-2*rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[-rax*2]"), 0, "[-rax*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[-1*2]"), 1, "[-1*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rax*5]"), 0, "[rax*5] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[5*rax]"), 0, "[5*rax] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[cs]"), 0, "[cs] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[dl]"), 0, "[dl] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[cr0]"), 0, "[cr0] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[r9d]"), 1, "[r9d] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ax]"), 0, "[ax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[mm1]"), 0, "[mm1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[st1]"), 0, "[st1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ecx]"), 1, "[ecx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[-rax]"), 0, "[-rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[-1]"), 1, "[-1] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[dl + rbx]"), 0, "[dl + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx + dl]"), 0, "[rcx + dl] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[cr0 + rbx]"), 0, "[cr0 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx + cr0]"), 0, "[rcx + cr0] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ax + rbx]"), 0, "[ax + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx + ax]"), 0, "[rcx + ax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[mm2 + rbx]"), 0, "[mm2 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx + mm2]"), 0, "[rcx + mm2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[st0 + rbx]"), 0, "[st0 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx + st0]"), 0, "[rcx + st0] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rdx + ebx]"), 0, "[rdx + ebx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ecx + rdx]"), 0, "[ecx + rdx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rax - rbx]"), 0, "[rax - rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[- rcx + rdx]"), 0, "[- rcx + rdx] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[2*cr0 + rbx]"), 0, "[2*cr0 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[2*cr0 + rbx + 1]"), 0, "[2*cr0 + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[2*rcx + cr0]"), 0, "[2*rcx + cr0] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[2*rcx + cr0 + 1]"), 0, "[2*rcx + cr0 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + 2*cr0]"), 0, "[rbx + 2*cr0] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + 2*cr0 + 1]"), 0, "[rbx + 2*cr0 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + 1 + 2*cr0]"), 0, "[rbx + 1 + 2*cr0] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[cr0 + 2*rcx]"), 0, "[cr0 + 2*rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[cr0 + 2*rcx + 1]"), 0, "[cr0 + 2*rcx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[cr0 + 1 + 2*rcx]"), 0, "[cr0 + 1 + 2*rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[2*cr0 + 1 + rbx]"), 0, "[2*cr0 + 1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[2*rcx + 1 + cr0]"), 0, "[2*rcx + 1 + cr0] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + 2*cr0 + rbx]"), 0, "[1 + 2*cr0 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + 2*rcx + cr0]"), 0, "[1 + 2*rcx + cr0] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + rbx + 2*cr0]"), 0, "[1 + rbx + 2*cr0] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + cr0 + 2*rcx]"), 0, "[1 + cr0 + 2*rcx] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[cr0*2 + rbx]"), 0, "[cr0*2 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[cr0*2 + rbx + 1]"), 0, "[cr0*2 + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx*2 + cr0]"), 0, "[rcx*2 + cr0] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx*2 + cr0 + 1]"), 0, "[rcx*2 + cr0 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + cr0*2]"), 0, "[rbx + cr0*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + cr0*2 + 1]"), 0, "[rbx + cr0*2 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + 1 + cr0*2]"), 0, "[rbx + 1 + cr0*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[cr0 + rcx*2]"), 0, "[cr0 + rcx*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[cr0 + rcx*2 + 1]"), 0, "[cr0 + rcx*2 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[cr0 + 1 + rcx*2]"), 0, "[cr0 + 1 + rcx*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[cr0*2 + 1 + rbx]"), 0, "[cr0*2 + 1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx*2 + 1 + cr0]"), 0, "[rcx*2 + 1 + cr0] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + cr0*2 + rbx]"), 0, "[1 + cr0*2 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + rcx*2 + cr0]"), 0, "[1 + rcx*2 + cr0] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + rbx + cr0*2]"), 0, "[1 + rbx + cr0*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + cr0 + rcx*2]"), 0, "[1 + cr0 + rcx*2] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[cr0 + rbx + 1]"), 0, "[cr0 + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx + cr0 + 1]"), 0, "[rcx + cr0 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + 1 + cr0]"), 0, "[rbx + 1 + cr0] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[cr0 + 1 + rcx]"), 0, "[cr0 + 1 + rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + rbx + cr0]"), 0, "[1 + rbx + cr0] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + cr0 + rcx]"), 0, "[1 + cr0 + rcx] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[cr0 + rbx]"), 0, "[cr0 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx + cr0]"), 0, "[rcx + cr0] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[2*r9d + rbx]"), 0, "[2*r9d + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[2*r9d + rbx + 1]"), 0, "[2*r9d + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[2*rcx + r9d]"), 0, "[2*rcx + r9d] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[2*rax + r9d + 1]"), 0, "[2*rax + r9d + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + 2*r9d]"), 0, "[rbx + 2*r9d] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + 2*r9d + 1]"), 0, "[rbx + 2*r9d + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + 1 + 2*r9d]"), 0, "[rbx + 1 + 2*r9d] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[r9d + 2*rcx]"), 0, "[r9d + 2*rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[r9d + 2*rcx + 1]"), 0, "[r9d + 2*rcx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[r9d + 1 + 2*rcx]"), 0, "[r9d + 1 + 2*rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[2*r9d + 1 + rbx]"), 0, "[2*r9d + 1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[2*rcx + 1 + r9d]"), 0, "[2*rcx + 1 + r9d] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + 2*r9d + rbx]"), 0, "[1 + 2*r9d + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + 2*rcx + r9d]"), 0, "[1 + 2*rcx + r9d] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + rbx + 2*r9d]"), 0, "[1 + rbx + 2*r9d] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + r9d + 2*rcx]"), 0, "[1 + r9d + 2*rcx] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[r9d + rbx + 1]"), 0, "[r9d + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[r9d + rax + 1]"), 0, "[r9d + rax + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + 1 + r9d]"), 0, "[rbx + 1 + r9d] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[r9d + 1 + rcx]"), 0, "[r9d + 1 + rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + rbx + r9d]"), 0, "[1 + rbx + r9d] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + r9d + rcx]"), 0, "[1 + r9d + rcx] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[r9d*2 + rbx]"), 0, "[r9d*2 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[r9d*2 + rbx + 1]"), 0, "[r9d*2 + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx*2 + r9d]"), 0, "[rcx*2 + r9d] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rax*2 + r9d + 1]"), 0, "[rax*2 + r9d + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + r9d*2]"), 0, "[rbx + r9d*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + r9d*2 + 1]"), 0, "[rbx + r9d*2 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + 1 + r9d*2]"), 0, "[rbx + 1 + r9d*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[r9d + rcx*2]"), 0, "[r9d + rcx*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[r9d + rcx*2 + 1]"), 0, "[r9d + rcx*2 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[r9d + 1 + rcx*2]"), 0, "[r9d + 1 + rcx*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[r9d*2 + 1 + rbx]"), 0, "[r9d*2 + 1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx*2 + 1 + r9d]"), 0, "[rcx*2 + 1 + r9d] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + r9d*2 + rbx]"), 0, "[1 + r9d*2 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + rcx*2 + r9d]"), 0, "[1 + rcx*2 + r9d] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + rbx + r9d*2]"), 0, "[1 + rbx + r9d*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + r9d + rcx*2]"), 0, "[1 + r9d + rcx*2] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[r9d + rbx]"), 0, "[r9d + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[r9d + rbx + 1]"), 0, "[r9d + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx + r9d]"), 0, "[rcx + r9d] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx + r9d + 1]"), 0, "[rcx + r9d + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + r9d + rbx]"), 0, "[1 + r9d + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + rcx + r9d]"), 0, "[1 + rcx + r9d] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[2*mm0 + rbx]"), 0, "[2*mm0 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[2*mm0 + rbx + 1]"), 0, "[2*mm0 + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[2*rcx + mm0]"), 0, "[2*rcx + mm0] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[2*rcx + mm0 + 1]"), 0, "[2*rcx + mm0 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + 2*mm0]"), 0, "[rbx + 2*mm0] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + 2*mm0 + 1]"), 0, "[rbx + 2*mm0 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + 1 + 2*mm0]"), 0, "[rbx + 1 + 2*mm0] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[mm0 + 2*rcx]"), 0, "[mm0 + 2*rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[mm0 + 2*rcx + 1]"), 0, "[mm0 + 2*rcx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[mm0 + 1 + 2*rcx]"), 0, "[mm0 + 1 + 2*rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[2*mm0 + 1 + rbx]"), 0, "[2*mm0 + 1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[2*rcx + 1 + mm0]"), 0, "[2*rcx + 1 + mm0] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + 2*mm0 + rbx]"), 0, "[1 + 2*mm0 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + 2*rcx + mm0]"), 0, "[1 + 2*rcx + mm0] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + rbx + 2*mm0]"), 0, "[1 + rbx + 2*mm0] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + mm0 + 2*rcx]"), 0, "[1 + mm0 + 2*rcx] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[mm0*2 + rbx]"), 0, "[mm0*2 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[mm0*2 + rbx + 1]"), 0, "[mm0*2 + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx*2 + mm0]"), 0, "[rcx*2 + mm0] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx*2 + mm0 + 1]"), 0, "[rcx*2 + mm0 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + mm0*2]"), 0, "[rbx + mm0*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + mm0*2 + 1]"), 0, "[rbx + mm0*2 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + 1 + mm0*2]"), 0, "[rbx + 1 + mm0*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[mm0 + rcx*2]"), 0, "[mm0 + rcx*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[mm0 + rcx*2 + 1]"), 0, "[mm0 + rcx*2 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[mm0 + 1 + rcx*2]"), 0, "[mm0 + 1 + rcx*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[mm0*2 + 1 + rbx]"), 0, "[mm0*2 + 1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx*2 + 1 + mm0]"), 0, "[rcx*2 + 1 + mm0] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + mm0*2 + rbx]"), 0, "[1 + mm0*2 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + rcx*2 + mm0]"), 0, "[1 + rcx*2 + mm0] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + rbx + mm0*2]"), 0, "[1 + rbx + mm0*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + mm0 + rcx*2]"), 0, "[1 + mm0 + rcx*2] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[mm0 + rbx + 1]"), 0, "[mm0 + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx + mm0 + 1]"), 0, "[rcx + mm0 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + 1 + mm0]"), 0, "[rbx + 1 + mm0] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[mm0 + 1 + rcx]"), 0, "[mm0 + 1 + rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + rbx + mm0]"), 0, "[1 + rbx + mm0] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + mm0 + rcx]"), 0, "[1 + mm0 + rcx] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[mm0 + rbx]"), 0, "[mm0 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx + mm0]"), 0, "[rcx + mm0] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[2*st0 + rbx]"), 0, "[2*st0 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[2*st0 + rbx + 1]"), 0, "[2*st0 + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[2*rcx + st0]"), 0, "[2*rcx + st0] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[2*rcx + st0 + 1]"), 0, "[2*rcx + st0 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + 2*st0]"), 0, "[rbx + 2*st0] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + 2*st0 + 1]"), 0, "[rbx + 2*st0 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + 1 + 2*st0]"), 0, "[rbx + 1 + 2*st0] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[st0 + 2*rcx]"), 0, "[st0 + 2*rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[st0 + 2*rcx + 1]"), 0, "[st0 + 2*rcx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[st0 + 1 + 2*rcx]"), 0, "[st0 + 1 + 2*rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[2*st0 + 1 + rbx]"), 0, "[2*st0 + 1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[2*rcx + 1 + st0]"), 0, "[2*rcx + 1 + st0] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + 2*st0 + rbx]"), 0, "[1 + 2*st0 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + 2*rcx + st0]"), 0, "[1 + 2*rcx + st0] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + rbx + 2*st0]"), 0, "[1 + rbx + 2*st0] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + st0 + 2*rcx]"), 0, "[1 + st0 + 2*rcx] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[st0*2 + rbx]"), 0, "[st0*2 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[st0*2 + rbx + 1]"), 0, "[st0*2 + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx*2 + st0]"), 0, "[rcx*2 + st0] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx*2 + st0 + 1]"), 0, "[rcx*2 + st0 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + st0*2]"), 0, "[rbx + st0*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + st0*2 + 1]"), 0, "[rbx + st0*2 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + 1 + st0*2]"), 0, "[rbx + 1 + st0*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[st0 + rcx*2]"), 0, "[st0 + rcx*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[st0 + rcx*2 + 1]"), 0, "[st0 + rcx*2 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[st0 + 1 + rcx*2]"), 0, "[st0 + 1 + rcx*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[st0*2 + 1 + rbx]"), 0, "[st0*2 + 1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx*2 + 1 + st0]"), 0, "[rcx*2 + 1 + st0] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + st0*2 + rbx]"), 0, "[1 + st0*2 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + rcx*2 + st0]"), 0, "[1 + rcx*2 + st0] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + rbx + st0*2]"), 0, "[1 + rbx + st0*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + st0 + rcx*2]"), 0, "[1 + st0 + rcx*2] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[st0 + rbx + 1]"), 0, "[st0 + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx + st0 + 1]"), 0, "[rcx + st0 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + 1 + st0]"), 0, "[rbx + 1 + st0] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[st0 + 1 + rcx]"), 0, "[st0 + 1 + rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + rbx + st0]"), 0, "[1 + rbx + st0] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + st0 + rcx]"), 0, "[1 + st0 + rcx] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[st0 + rbx]"), 0, "[st0 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx + st0]"), 0, "[rcx + st0] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[2*ax + rbx]"), 0, "[2*ax + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[2*ax + rbx + 1]"), 0, "[2*ax + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[2*rcx + ax]"), 0, "[2*rcx + ax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[2*rcx + ax + 1]"), 0, "[2*rcx + ax + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + 2*ax]"), 0, "[rbx + 2*ax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + 2*ax + 1]"), 0, "[rbx + 2*ax + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + 1 + 2*ax]"), 0, "[rbx + 1 + 2*ax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ax + 2*rcx]"), 0, "[ax + 2*rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ax + 2*rcx + 1]"), 0, "[ax + 2*rcx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ax + 1 + 2*rcx]"), 0, "[ax + 1 + 2*rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[2*ax + 1 + rbx]"), 0, "[2*ax + 1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[2*rcx + 1 + ax]"), 0, "[2*rcx + 1 + ax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + 2*ax + rbx]"), 0, "[1 + 2*ax + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + 2*rcx + ax]"), 0, "[1 + 2*rcx + ax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + rbx + 2*ax]"), 0, "[1 + rbx + 2*ax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + ax + 2*rcx]"), 0, "[1 + ax + 2*rcx] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[ax*2 + rbx]"), 0, "[ax*2 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ax*2 + rbx + 1]"), 0, "[ax*2 + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx*2 + ax]"), 0, "[rcx*2 + ax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx*2 + ax + 1]"), 0, "[rcx*2 + ax + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + ax*2]"), 0, "[rbx + ax*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + ax*2 + 1]"), 0, "[rbx + ax*2 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + 1 + ax*2]"), 0, "[rbx + 1 + ax*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ax + rcx*2]"), 0, "[ax + rcx*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ax + rcx*2 + 1]"), 0, "[ax + rcx*2 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ax + 1 + rcx*2]"), 0, "[ax + 1 + rcx*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ax*2 + 1 + rbx]"), 0, "[ax*2 + 1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx*2 + 1 + ax]"), 0, "[rcx*2 + 1 + ax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + ax*2 + rbx]"), 0, "[1 + ax*2 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + rcx*2 + ax]"), 0, "[1 + rcx*2 + ax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + rbx + ax*2]"), 0, "[1 + rbx + ax*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + ax + rcx*2]"), 0, "[1 + ax + rcx*2] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[ax + rbx + 1]"), 0, "[ax + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx + ax + 1]"), 0, "[rcx + ax + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + 1 + ax]"), 0, "[rbx + 1 + ax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ax + 1 + rcx]"), 0, "[ax + 1 + rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + rbx + ax]"), 0, "[1 + rbx + ax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + ax + rcx]"), 0, "[1 + ax + rcx] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[ax + rbx]"), 0, "[ax + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx + ax]"), 0, "[rcx + ax] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[2*eax + rbx]"), 0, "[2*eax + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[2*rax + ebx + 1]"), 0, "[2*rax + ebx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[2*rcx + eax]"), 0, "[2*rcx + eax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[2*ecx + rax + 1]"), 0, "[2*ecx + rax + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + 2*eax]"), 0, "[rbx + 2*eax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + 2*eax + 1]"), 0, "[rbx + 2*eax + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + 1 + 2*eax]"), 0, "[rbx + 1 + 2*eax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[eax + 2*rcx]"), 0, "[eax + 2*rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[eax + 2*rcx + 1]"), 0, "[eax + 2*rcx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[eax + 1 + 2*rcx]"), 0, "[eax + 1 + 2*rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[2*rax + 1 + ebx]"), 0, "[2*rax + 1 + ebx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[2*rcx + 1 + eax]"), 0, "[2*rcx + 1 + eax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + 2*rax + ebx]"), 0, "[1 + 2*rax + ebx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + 2*ecx + rax]"), 0, "[1 + 2*ecx + rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + ebx + 2*rax]"), 0, "[1 + ebx + 2*rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + rax + 2*ecx]"), 0, "[1 + rax + 2*ecx] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[eax*2 + rbx]"), 0, "[eax*2 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rax*2 + ebx + 1]"), 0, "[rax*2 + ebx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx*2 + eax]"), 0, "[rcx*2 + eax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ecx*2 + rax + 1]"), 0, "[ecx*2 + rax + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + eax*2]"), 0, "[rbx + eax*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + eax*2 + 1]"), 0, "[rbx + eax*2 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + 1 + eax*2]"), 0, "[rbx + 1 + eax*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[eax + rcx*2]"), 0, "[eax + rcx*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[eax + rcx*2 + 1]"), 0, "[eax + rcx*2 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[eax + 1 + rcx*2]"), 0, "[eax + 1 + rcx*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rax*2 + 1 + ebx]"), 0, "[rax*2 + 1 + ebx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx*2 + 1 + eax]"), 0, "[rcx*2 + 1 + eax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + rax*2 + ebx]"), 0, "[1 + rax*2 + ebx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + ecx*2 + rax]"), 0, "[1 + ecx*2 + rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + ebx + rax*2]"), 0, "[1 + ebx + rax*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + rax + ecx*2]"), 0, "[1 + rax + ecx*2] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[rax + ebx + 1]"), 0, "[rax + ebx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ecx + rax + 1]"), 0, "[ecx + rax + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + 1 + eax]"), 0, "[rbx + 1 + eax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[eax + 1 + rcx]"), 0, "[eax + 1 + rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + ebx + rax]"), 0, "[1 + ebx + rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[1 + rax + ecx]"), 0, "[1 + rax + ecx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx + rax + rcx]"), 0, "[rbx + rax + rcx] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[eax + rbx]"), 0, "[eax + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rcx + eax]"), 0, "[rcx + eax] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[eax + ebx]"), 1, "[eax + ebx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ecx + eax]"), 1, "[ecx + eax] is a valid 64-bit addressing scheme" );
-
-# -----------
-
-is ( is_valid_64bit_addr_intel ("cs:[rax]"), 1, "cs:[rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("cs:[brax]"), 1, "cs:[brax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("cs:[raxd]"), 1, "cs:[raxd] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("cs:[cl]"), 0, "cs:[cl] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("cs:[mm1]"), 0, "cs:[mm1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("cs:[st1]"), 0, "cs:[st1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("cs:[eax]"), 1, "cs:[eax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("cs:[ax]"), 0, "cs:[ax] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("cs:[1+2*2+3]"), 1, "cs:[1+2*2+3] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("cs:[1+3+2*2]"), 1, "cs:[1+3+2*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("cs:[2*2+1+3]"), 1, "cs:[2*2+1+3] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("cs:[2*2+1]"), 1, "cs:[2*2+1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("cs:[1+2*2]"), 1, "cs:[1+2*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("cs:[2*2]"), 1, "cs:[2*2] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("ds:[rbx+77]"), 1, "ds:[rbx+77] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rbx+rcx]"), 1, "ds:[rbx+rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rbx+rbx+99]"), 1, "ds:[rbx+rbx+99] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rbx+rdi-88]"), 1, "ds:[rbx+rdi-88] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rbx+rdi+-88]"), 1, "ds:[rbx+rdi+-88] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rbx-88+rdi]"), 1, "ds:[rbx-88+rdi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[-88+rbx+rdi]"), 1, "ds:[-88+rbx+rdi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[-rbx+rdi+-88]"), 0, "ds:[-rbx+rdi+-88] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[-rbx-88+rdi]"), 0, "ds:[-rbx-88+rdi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[-88-rbx+rdi]"), 0, "ds:[-88-rbx+rdi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rbx-rdi+-88]"), 0, "ds:[rbx-rdi+-88] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rbx-88-rdi]"), 0, "ds:[rbx-88-rdi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[-88+rbx-rdi]"), 0, "ds:[-88+rbx-rdi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rax+rbx+rdi]"), 0, "ds:[rax+rbx+rdi] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("es:[rbx + rax*1]"), 1, "es:[rbx+rax*1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[rbx + 1*rax]"), 1, "es:[rbx+1*rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[rax*1 + rbx]"), 1, "es:[rax*1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[1*rax + rbx]"), 1, "es:[1*rax + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[rbx + rax*2]"), 1, "es:[rbx+rax*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[rbx + 2*rax]"), 1, "es:[rbx+2*rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[rax*2 + rbx]"), 1, "es:[rax*2 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[2*rax + rbx]"), 1, "es:[2*rax + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[rbx + rax*4]"), 1, "es:[rbx+rax*4] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[rbx + 4*rax]"), 1, "es:[rbx+4*rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[rax*4 + rbx]"), 1, "es:[rax*4 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[4*rax + rbx]"), 1, "es:[4*rax + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[rbx + rax*8]"), 1, "es:[rbx+rax*8] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[rbx + 8*rax]"), 1, "es:[rbx+8*rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[rax*8 + rbx]"), 1, "es:[rax*8 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[8*rax + rbx]"), 1, "es:[8*rax + rbx] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("ds:[rbx+77]"), 1, "ds:[rbx+77] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rbx+rcx]"), 1, "ds:[rbx+rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rbx+rbx+99]"), 1, "ds:[rbx+rbx+99] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rbx+rdi-88]"), 1, "ds:[rbx+rdi-88] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rbx+rdi+-88]"), 1, "ds:[rbx+rdi+-88] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("ds:[rbx + rax*1]"), 1, "ds:[rbx+rax*1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rbx + 1*rax]"), 1, "ds:[rbx+1*rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rax*1 + rbx]"), 1, "ds:[rax*1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[1*rax + rbx]"), 1, "ds:[1*rax + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rbx + rax*2]"), 1, "ds:[rbx+rax*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rbx + 2*rax]"), 1, "ds:[rbx+2*rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rax*2 + rbx]"), 1, "ds:[rax*2 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[2*rax + rbx]"), 1, "ds:[2*rax + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rbx + rax*4]"), 1, "ds:[rbx+rax*4] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rbx + 4*rax]"), 1, "ds:[rbx+4*rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rax*4 + rbx]"), 1, "ds:[rax*4 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[4*rax + rbx]"), 1, "ds:[4*rax + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rbx + rax*8]"), 1, "ds:[rbx+rax*8] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rbx + 8*rax]"), 1, "ds:[rbx+8*rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rax*8 + rbx]"), 1, "ds:[rax*8 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[8*rax + rbx]"), 1, "ds:[8*rax + rbx] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("ds:[rax*8 - rbx]"), 0, "ds:[rax*8 - rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[8*rax - rbx]"), 0, "ds:[8*rax - rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[- rax*8 + rbx]"), 0, "ds:[- rax*8 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[- 8*rax + rbx]"), 0, "ds:[- 8*rax + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[1*8 + rbx]"), 1, "ds:[1*8 + rbx] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("ds:[rbx - rax*8]"), 0, "ds:[rbx - rax*8] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rbx - 8*rax]"), 0, "ds:[rbx - 8*rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[- rbx + rax*8]"), 0, "ds:[- rbx + rax*8] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[- rbx + 8*rax]"), 0, "ds:[- rbx + 8*rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rbx + 1*8]"), 1, "ds:[rbx + 1*8] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("es:[rbx+rsi*4+66]"), 1, "es:[rbx+rsi*4+66] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[rbx+rcx*8-55]"), 1, "es:[rbx+rcx*8-55] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[rbx+rcx*8+-55]"), 1, "es:[rbx+rcx*8+-55] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[rbx+rbp*1]"), 1, "es:[rbx+rbp*1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[rbx+rbp*1 + 2]"), 1, "es:[rbx+rbp*1 + 2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[rbx+rbp*2 + 2]"), 1, "es:[rbx+rbp*2 + 2] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("ds:[rcx*2 + rbx]"), 1, "ds:[rcx*2 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rcx*4 + rbx -1]"), 1, "ds:[rcx*4 + rbx -1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rcx*4 + rbx +-1]"), 1, "ds:[rcx*4 + rbx +-1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rcx*8 + rbx+ 44]"), 1, "ds:[rcx*2 + rbx+ 44] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rcx*1 + rsp]"), 1, "ds:[rcx*1 + rsp] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rcx*4 -1 + rbx]"), 1, "ds:[rcx*4 -1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rcx*4 +-1 + rbx]"), 1, "ds:[rcx*4 +-1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rcx*8 +44 + rbx]"), 1, "ds:[rcx*2 +44+ rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rcx*4 -1 + rbx]"), 1, "ds:[rcx*4 -1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rcx*4 +-1 + rbx]"), 1, "ds:[rcx*4 +-1 + rbx] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("ds:[rbx + rcx*1 + 1]"), 1, "ds:[rbx + rcx*1 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rbx + 1*rcx + 1]"), 1, "ds:[rbx + 1*rcx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rbx + 1 + rcx*1]"), 1, "ds:[rbx + 1 + rcx*1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rbx + 1 + 1*rcx]"), 1, "ds:[rbx + 1 + 1*rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rbx + rcx*2 + 1]"), 1, "ds:[rbx + rcx*2 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rbx + 2*rcx + 1]"), 1, "ds:[rbx + 2*rcx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rbx + 1 + rcx*2]"), 1, "ds:[rbx + 1 + rcx*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rbx + 1 + 2*rcx]"), 1, "ds:[rbx + 1 + 2*rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rbx + rcx*4 + 1]"), 1, "ds:[rbx + rcx*4 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rbx + 4*rcx + 1]"), 1, "ds:[rbx + 4*rcx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rbx + 1 + rcx*4]"), 1, "ds:[rbx + 1 + rcx*4] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rbx + 1 + 4*rcx]"), 1, "ds:[rbx + 1 + 4*rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rbx + rcx*8 + 1]"), 1, "ds:[rbx + rcx*8 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rbx + 8*rcx + 1]"), 1, "ds:[rbx + 8*rcx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rbx + 1 + rcx*8]"), 1, "ds:[rbx + 1 + rcx*8] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rbx + 1 + 8*rcx]"), 1, "ds:[rbx + 1 + 8*rcx] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("ds:[rbx + rcx + 1]"), 1, "ds:[rbx + rcx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rbx + rcx + 1]"), 1, "ds:[rbx + 1cx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rbx + 1 + rcx]"), 1, "ds:[rbx + 1 + rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rbx + 1 + rcx]"), 1, "ds:[rbx + 1 + rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[1 + rbx + rcx]"), 1, "ds:[1 + rbx + rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[1 + rbx + rcx]"), 1, "ds:[1 + rbx + rcx] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("ds:[-rbx + rcx*1 + 1]"), 0, "ds:[-rbx + rcx*1 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[-rbx + 1*rcx + 1]"), 0, "ds:[-rbx + 1*rcx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rbx - rcx*1 + 1]"), 0, "ds:[rbx - rcx*1 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rbx - 1*rcx + 1]"), 0, "ds:[rbx - 1*rcx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[1 + rcx*1 - rax]"), 0, "ds:[1 + rcx*1 - rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[1 + 1*rcx - rax]"), 0, "ds:[1 + 1*rcx - rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rbx + 1*rcx + rax]"), 0, "ds:[rbx + 1*rcx + rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rbx + rcx*1 + rax]"), 0, "ds:[rbx + rcx*1 + rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rbx + 2*1 + rax]"), 1, "ds:[rbx + 2*1 + rax] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("ds:[-rbx + 1 + rcx*1]"), 0, "ds:[-rbx + 1 + rcx*1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[-rbx + 1 + 1*rcx]"), 0, "ds:[-rbx + 1 + 1*rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rbx + 1 - rcx*1]"), 0, "ds:[rbx + 1 - rcx*1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rbx + 1 - 1*rcx]"), 0, "ds:[rbx + 1 - 1*rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[1 - rax + rcx*1]"), 0, "ds:[1 - rax + rcx*1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[1 - rax + 1*rcx]"), 0, "ds:[1 - rax + 1*rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rbx + rax + 1*rcx]"), 0, "ds:[rbx + rax + 1*rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rbx + rax + rcx*1]"), 0, "ds:[rbx + rax + rcx*1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rbx + rax + 2*1]"), 1, "ds:[rbx + rax + 2*1] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("ds:[rcx*1 - rbx + 1]"), 0, "ds:[rcx*1 - rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[1*rcx - rbx + 1]"), 0, "ds:[1*rcx - rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[- rcx*1 + rbx + 1]"), 0, "ds:[- rcx*1 + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[- 1*rcx + rbx + 1]"), 0, "ds:[- 1*rcx + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rcx*1 + 1 - rax]"), 0, "ds:[rcx*1 + 1 - rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[1*rcx + 1 - rax]"), 0, "ds:[1*rcx + 1 - rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[1*rcx + rbx + rax]"), 0, "ds:[1*rcx + rbx + rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rcx*1 + rbx + rax]"), 0, "ds:[rcx*1 + rbx + rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[2*1 + rbx + rax]"), 1, "ds:[2*1 + rbx + rax] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("ds:[rcx - rbx + 1]"), 0, "ds:[rcx - rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rcx + 1 - rbx]"), 0, "ds:[rcx + 1 - rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[- rbx + rcx + 1]"), 0, "ds:[- rbx + rcx + 1] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("ds:[rcx*1 + rbx + 1]"), 1, "ds:[rcx*1 + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[1*rcx + rbx + 1]"), 1, "ds:[1*rcx + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rcx*1 + 1 + rbx]"), 1, "ds:[rcx*1 + 1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[1*rcx + 1 + rbx]"), 1, "ds:[1*rcx + 1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rcx*2 + rbx + 1]"), 1, "ds:[rcx*2 + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[2*rcx + rbx + 1]"), 1, "ds:[2*rcx + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rcx*2 + 1 + rbx]"), 1, "ds:[rcx*2 + 1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[2*rcx + 1 + rbx]"), 1, "ds:[2*rcx + 1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rcx*4 + rbx + 1]"), 1, "ds:[rcx*4 + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[4*rcx + rbx + 1]"), 1, "ds:[4*rcx + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rcx*4 + 1 + rbx]"), 1, "ds:[rcx*4 + 1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[4*rcx + 1 + rbx]"), 1, "ds:[4*rcx + 1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rcx*8 + rbx + 1]"), 1, "ds:[rcx*8 + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[8*rcx + rbx + 1]"), 1, "ds:[8*rcx + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rcx*8 + 1 + rbx]"), 1, "ds:[rcx*8 + 1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[8*rcx + 1 + rbx]"), 1, "ds:[8*rcx + 1 + rbx] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("ds:[1 + rbx + rcx*1]"), 1, "ds:[1 + rbx + rcx*1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[1 + rbx + 1*rcx]"), 1, "ds:[1 + rbx + 1*rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[1 + rcx*1 + rbx]"), 1, "ds:[1 + rcx*1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[1 + 1*rcx + rbx]"), 1, "ds:[1 + 1*rcx + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[1 + rbx + rcx*2]"), 1, "ds:[1 + rbx + rcx*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[1 + rbx + 2*rcx]"), 1, "ds:[1 + rbx + 2*rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[1 + rcx*2 + rbx]"), 1, "ds:[1 + rcx*2 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[1 + 2*rcx + rbx]"), 1, "ds:[1 + 2*rcx + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[1 + rbx + rcx*4]"), 1, "ds:[1 + rbx + rcx*4] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[1 + rbx + 4*rcx]"), 1, "ds:[1 + rbx + 4*rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[1 + rcx*4 + rbx]"), 1, "ds:[1 + rcx*4 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[1 + 4*rcx + rbx]"), 1, "ds:[1 + 4*rcx + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[1 + rbx + rcx*8]"), 1, "ds:[1 + rbx + rcx*8 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[1 + rbx + 8*rcx]"), 1, "ds:[1 + rbx + 8*rcx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[1 + rcx*8 + rbx]"), 1, "ds:[1 + rcx*8 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[1 + 8*rcx + rbx]"), 1, "ds:[1 + 8*rcx + rbx] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("es:[rbx+rsi*4+66]"), 1, "es:[rbx+rsi*4+66] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[rbx+rcx*8-55]"), 1, "es:[rbx+rcx*8-55] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[rbx+rcx*8+-55]"), 1, "es:[rbx+rcx*8+-55] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[rbx+rbp*1]"), 1, "es:[rbx+rbp*1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[rbx+rbp*1 + 2]"), 1, "es:[rbx+rbp*1 + 2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[rbx+rbp*2 + 2]"), 1, "es:[rbx+rbp*2 + 2] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("es:[cs*2 + rbx]"), 0, "es:[cs*2 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[cs*2 + rbx + 1]"), 0, "es:[cs*2 + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[rcx*2 + cs]"), 0, "es:[rcx*2 + cs] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[rcx*2 + cs + 1]"), 0, "es:[rcx*2 + cs + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[rbx + cs*2]"), 0, "es:[rbx + cs*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[rbx + cs*2 + 1]"), 0, "es:[rbx + cs*2 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[cs + rcx*2]"), 0, "es:[cs + rcx*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[cs + rcx*2 + 1]"), 0, "es:[cs + rcx*2 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[cs*2 + 1 + rbx]"), 0, "es:[cs*2 + 1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[rcx*2 + 1 + cs]"), 0, "es:[rcx*2 + 1 + cs] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[1 + cs*2 + rbx]"), 0, "es:[1 + cs*2 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[1 + rcx*2 + cs]"), 0, "es:[1 + rcx*2 + cs] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[1 + rbx + cs*2]"), 0, "es:[1 + rbx + cs*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[1 + cs + rcx*2]"), 0, "es:[1 + cs + rcx*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[rbx + 1 + cs*2]"), 0, "es:[rbx + 1 + cs*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[cs + 1 + rcx*2]"), 0, "es:[cs + 1 + rcx*2] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("es:[2*cs + rbx]"), 0, "es:[2*cs + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[2*cs + rbx + 1]"), 0, "es:[2*cs + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[rbx + 2*cs]"), 0, "es:[rbx + 2*cs] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[rbx + 2*cs + 1]"), 0, "es:[rbx + 2*cs + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[2*cs + 1 + rbx]"), 0, "es:[2*cs + 1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[1 + 2*cs + rbx]"), 0, "es:[1 + 2*cs + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[1 + rbx + 2*cs]"), 0, "es:[1 + rbx + 2*cs] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[rbx + 1 + 2*cs]"), 0, "es:[rbx + 1 + 2*cs] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("es:[cs + rbx]"), 0, "es:[cs + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[cs + rbx + 1]"), 0, "es:[cs + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[rcx + cs]"), 0, "es:[rcx + cs] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[rcx + cs + 1]"), 0, "es:[rcx + cs + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[1 + rbx + cs]"), 0, "es:[1 + rbx + cs] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[1 + cs + rcx]"), 0, "es:[1 + cs + rcx] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("es:[cs*rax + rbx]"), 0, "es:[cs*rax + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[cs*rax + rbx + 1]"), 0, "es:[cs*rax + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[rcx*rax + cs]"), 0, "es:[rcx*rax + cs] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[rcx*rax + cs + 1]"), 0, "es:[rcx*rax + cs + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[rbx + cs*rax]"), 0, "es:[rbx + cs*rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[rbx + cs*rax + 1]"), 0, "es:[rbx + cs*rax + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[cs + rcx*rax]"), 0, "es:[cs + rcx*rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[cs + rcx*rax + 1]"), 0, "es:[cs + rcx*rax + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[cs*rax + 1 + rbx]"), 0, "es:[cs*rax + 1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[rcx*rax + 1 + cs]"), 0, "es:[rcx*rax + 1 + cs] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[1 + cs*rax + rbx]"), 0, "es:[1 + cs*rax + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[1 + rcx*rax + cs]"), 0, "es:[1 + rcx*rax + cs] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[1 + rbx + cs*rax]"), 0, "es:[1 + rbx + cs*rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[1 + cs + rcx*rax]"), 0, "es:[1 + cs + rcx*rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[rbx + 1 + cs*rax]"), 0, "es:[rbx + 1 + cs*rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[cs + 1 + rcx*rax]"), 0, "es:[cs + 1 + rcx*rax] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("es:[cs*ds + rbx]"), 0, "es:[cs*ds + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[cs*ds + rbx + 1]"), 0, "es:[cs*ds + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[rcx*ds + cs]"), 0, "es:[rcx*ds + cs] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[rcx*ds + cs + 1]"), 0, "es:[rcx*ds + cs + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[rbx + cs*ds]"), 0, "es:[rbx + cs*ds] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[rbx + cs*ds + 1]"), 0, "es:[rbx + cs*ds + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[cs + rcx*ds]"), 0, "es:[cs + rcx*ds] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[cs + rcx*ds + 1]"), 0, "es:[cs + rcx*ds + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[cs*ds + 1 + rbx]"), 0, "es:[cs*ds + 1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[rcx*ds + 1 + cs]"), 0, "es:[rcx*ds + 1 + cs] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[1 + cs*ds + rbx]"), 0, "es:[1 + cs*ds + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[1 + rcx*ds + cs]"), 0, "es:[1 + rcx*ds + cs] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("gs:[rbx + rcx*1 + 1]"), 1, "gs:[rbx + rcx*1 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[rbx + 1*rcx + 1]"), 1, "gs:[rbx + 1*rcx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[rbx + 1 + rcx*1]"), 1, "gs:[rbx + 1 + rcx*1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[rbx + 1 + 1*rcx]"), 1, "gs:[rbx + 1 + 1*rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[rbx + rcx*2 + 1]"), 1, "gs:[rbx + rcx*2 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[rbx + 2*rcx + 1]"), 1, "gs:[rbx + 2*rcx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[rbx + 1 + rcx*2]"), 1, "gs:[rbx + 1 + rcx*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[rbx + 1 + 2*rcx]"), 1, "gs:[rbx + 1 + 2*rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[rbx + rcx*4 + 1]"), 1, "gs:[rbx + rcx*4 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[rbx + 4*rcx + 1]"), 1, "gs:[rbx + 4*rcx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[rbx + 1 + rcx*4]"), 1, "gs:[rbx + 1 + rcx*4] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[rbx + 1 + 4*rcx]"), 1, "gs:[rbx + 1 + 4*rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[rbx + rcx*8 + 1]"), 1, "gs:[rbx + rcx*8 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[rbx + 8*rcx + 1]"), 1, "gs:[rbx + 8*rcx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[rbx + 1 + rcx*8]"), 1, "gs:[rbx + 1 + rcx*8] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[rbx + 1 + 8*rcx]"), 1, "gs:[rbx + 1 + 8*rcx] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("gs:[rcx*1 + rbx + 1]"), 1, "gs:[rcx*1 + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[1*rcx + rbx + 1]"), 1, "gs:[1*rcx + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[rcx*1 + 1 + rbx]"), 1, "gs:[rcx*1 + 1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[1*rcx + 1 + rbx]"), 1, "gs:[1*rcx + 1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[rcx*2 + rbx + 1]"), 1, "gs:[rcx*2 + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[2*rcx + rbx + 1]"), 1, "gs:[2*rcx + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[rcx*2 + 1 + rbx]"), 1, "gs:[rcx*2 + 1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[2*rcx + 1 + rbx]"), 1, "gs:[2*rcx + 1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[rcx*4 + rbx + 1]"), 1, "gs:[rcx*4 + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[4*rcx + rbx + 1]"), 1, "gs:[4*rcx + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[rcx*4 + 1 + rbx]"), 1, "gs:[rcx*4 + 1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[4*rcx + 1 + rbx]"), 1, "gs:[4*rcx + 1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[rcx*8 + rbx + 1]"), 1, "gs:[rcx*8 + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[8*rcx + rbx + 1]"), 1, "gs:[8*rcx + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[rcx*8 + 1 + rbx]"), 1, "gs:[rcx*8 + 1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[8*rcx + 1 + rbx]"), 1, "gs:[8*rcx + 1 + rbx] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("gs:[1 + rbx + rcx*1]"), 1, "gs:[1 + rbx + rcx*1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[1 + rbx + 1*rcx]"), 1, "gs:[1 + rbx + 1*rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[1 + rcx*1 + rbx]"), 1, "gs:[1 + rcx*1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[1 + 1*rcx + rbx]"), 1, "gs:[1 + 1*rcx + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[1 + rbx + rcx*2]"), 1, "gs:[1 + rbx + rcx*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[1 + rbx + 2*rcx]"), 1, "gs:[1 + rbx + 2*rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[1 + rcx*2 + rbx]"), 1, "gs:[1 + rcx*2 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[1 + 2*rcx + rbx]"), 1, "gs:[1 + 2*rcx + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[1 + rbx + rcx*4]"), 1, "gs:[1 + rbx + rcx*4] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[1 + rbx + 4*rcx]"), 1, "gs:[1 + rbx + 4*rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[1 + rcx*4 + rbx]"), 1, "gs:[1 + rcx*4 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[1 + 4*rcx + rbx]"), 1, "gs:[1 + 4*rcx + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[1 + rbx + rcx*8]"), 1, "gs:[1 + rbx + rcx*8 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[1 + rbx + 8*rcx]"), 1, "gs:[1 + rbx + 8*rcx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[1 + rcx*8 + rbx]"), 1, "gs:[1 + rcx*8 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[1 + 8*rcx + rbx]"), 1, "gs:[1 + 8*rcx + rbx] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("gs:[1*rsp]"), 1, "gs:[1*rsp] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[2*rsp]"), 0, "gs:[2*rsp] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[rcx+1*rsp]"), 1, "gs:[rcx+1*rsp] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[rcx+2*rsp]"), 0, "gs:[rcx+2*rsp] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[1*rsp+rsi]"), 1, "gs:[1*rsp+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[2*rsp+rsi]"), 0, "gs:[2*rsp+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[1*rsp+1]"), 1, "gs:[1*rsp+1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[2*rsp+1]"), 0, "gs:[2*rsp+1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[1+1*rsp]"), 1, "gs:[1+1*rsp] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[1+2*rsp]"), 0, "gs:[1+2*rsp] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[1+rcx+1*rsp]"), 1, "gs:[1+rcx+1*rsp] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[1+rcx+2*rsp]"), 0, "gs:[1+rcx+2*rsp] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[1+1*rsp+rsi]"), 1, "gs:[1+1*rsp+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[1+2*rsp+rsi]"), 0, "gs:[1+2*rsp+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[rcx+1+1*rsp]"), 1, "gs:[rcx+1+1*rsp] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[rcx+1+2*rsp]"), 0, "gs:[rcx+1+2*rsp] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[1*rsp+1+rsi]"), 1, "gs:[1*rsp+1+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[2*rsp+1+rsi]"), 0, "gs:[2*rsp+1+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[rcx+1*rsp+1]"), 1, "gs:[rcx+1*rsp+1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[rcx+2*rsp+1]"), 0, "gs:[rcx+2*rsp+1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[1*rsp+rsi+1]"), 1, "gs:[1*rsp+rsi+1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[2*rsp+rsi+1]"), 0, "gs:[2*rsp+rsi+1] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("gs:[rsp*1]"), 1, "gs:[rsp*1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[rsp*2]"), 0, "gs:[rsp*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[rcx+rsp*1]"), 1, "gs:[rcx+rsp*1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[rcx+rsp*2]"), 0, "gs:[rcx+rsp*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[rsp*1+rsi]"), 1, "gs:[rsp*1+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[rsp*2+rsi]"), 0, "gs:[rsp*2+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[rsp*1+1]"), 1, "gs:[rsp*1+1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[rsp*2+1]"), 0, "gs:[rsp*2+1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[1+rsp*1]"), 1, "gs:[1+rsp*1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[1+rsp*2]"), 0, "gs:[1+rsp*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[1+rcx+rsp*1]"), 1, "gs:[1+rcx+rsp*1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[1+rcx+rsp*2]"), 0, "gs:[1+rcx+rsp*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[1+rsp*1+rsi]"), 1, "gs:[1+rsp*1+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[1+rsp*2+rsi]"), 0, "gs:[1+rsp*2+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[rcx+1+rsp*1]"), 1, "gs:[rcx+1+rsp*1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[rcx+1+rsp*2]"), 0, "gs:[rcx+1+rsp*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[rsp*1+1+rsi]"), 1, "gs:[rsp*1+1+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[rsp*2+1+rsi]"), 0, "gs:[rsp*2+1+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[rcx+rsp*1+1]"), 1, "gs:[rcx+rsp*1+1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[rcx+rsp*2+1]"), 0, "gs:[rcx+rsp*2+1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[rsp*1+rsi+1]"), 1, "gs:[rsp*1+rsi+1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[rsp*2+rsi+1]"), 0, "gs:[rsp*2+rsi+1] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("gs:[z*rsp]"), 1, "gs:[z*rsp] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[rcx+z*rsp]"), 1, "gs:[rcx+z*rsp] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[z*rsp+rsi]"), 1, "gs:[z*rsp+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[z*rsp+1]"), 1, "gs:[z*rsp+1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[1+z*rsp]"), 1, "gs:[1+z*rsp] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[1+rcx+z*rsp]"), 1, "gs:[1+rcx+z*rsp] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[1+z*rsp+rsi]"), 1, "gs:[1+z*rsp+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[rcx+1+z*rsp]"), 1, "gs:[rcx+1+z*rsp] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[z*rsp+1+rsi]"), 1, "gs:[z*rsp+1+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[rcx+z*rsp+1]"), 1, "gs:[rcx+z*rsp+1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[z*rsp+rsi+1]"), 1, "gs:[z*rsp+rsi+1] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("gs:[rsp*z]"), 1, "gs:[rsp*z] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[rcx+rsp*z]"), 1, "gs:[rcx+rsp*z] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[rsp*z+rsi]"), 1, "gs:[rsp*z+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[rsp*z+1]"), 1, "gs:[rsp*z+1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[1+rsp*z]"), 1, "gs:[1+rsp*z] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[1+rcx+rsp*z]"), 1, "gs:[1+rcx+rsp*z] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[1+rsp*z+rsi]"), 1, "gs:[1+rsp*z+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[rcx+1+rsp*z]"), 1, "gs:[rcx+1+rsp*z] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[rsp*z+1+rsi]"), 1, "gs:[rsp*z+1+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[rcx+rsp*z+1]"), 1, "gs:[rcx+rsp*z+1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[rsp*z+rsi+1]"), 1, "gs:[rsp*z+rsi+1] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("gs:[1*rip]"), 1, "gs:[1*rip] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[2*rip]"), 0, "gs:[2*rip] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[rcx+1*rip]"), 1, "gs:[rcx+1*rip] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[rcx+2*rip]"), 0, "gs:[rcx+2*rip] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[1*rip+rsi]"), 1, "gs:[1*rip+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[2*rip+rsi]"), 0, "gs:[2*rip+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[1*rip+1]"), 1, "gs:[1*rip+1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[2*rip+1]"), 0, "gs:[2*rip+1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[1+1*rip]"), 1, "gs:[1+1*rip] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[1+2*rip]"), 0, "gs:[1+2*rip] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[1+rcx+1*rip]"), 1, "gs:[1+rcx+1*rip] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[1+rcx+2*rip]"), 0, "gs:[1+rcx+2*rip] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[1+1*rip+rsi]"), 1, "gs:[1+1*rip+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[1+2*rip+rsi]"), 0, "gs:[1+2*rip+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[rcx+1+1*rip]"), 1, "gs:[rcx+1+1*rip] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[rcx+1+2*rip]"), 0, "gs:[rcx+1+2*rip] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[1*rip+1+rsi]"), 1, "gs:[1*rip+1+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[2*rip+1+rsi]"), 0, "gs:[2*rip+1+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[rcx+1*rip+1]"), 1, "gs:[rcx+1*rip+1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[rcx+2*rip+1]"), 0, "gs:[rcx+2*rip+1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[1*rip+rsi+1]"), 1, "gs:[1*rip+rsi+1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[2*rip+rsi+1]"), 0, "gs:[2*rip+rsi+1] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("gs:[rip*1]"), 1, "gs:[rip*1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[rip*2]"), 0, "gs:[rip*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[rcx+rip*1]"), 1, "gs:[rcx+rip*1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[rcx+rip*2]"), 0, "gs:[rcx+rip*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[rip*1+rsi]"), 1, "gs:[rip*1+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[rip*2+rsi]"), 0, "gs:[rip*2+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[rip*1+1]"), 1, "gs:[rip*1+1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[rip*2+1]"), 0, "gs:[rip*2+1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[1+rip*1]"), 1, "gs:[1+rip*1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[1+rip*2]"), 0, "gs:[1+rip*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[1+rcx+rip*1]"), 1, "gs:[1+rcx+rip*1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[1+rcx+rip*2]"), 0, "gs:[1+rcx+rip*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[1+rip*1+rsi]"), 1, "gs:[1+rip*1+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[1+rip*2+rsi]"), 0, "gs:[1+rip*2+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[rcx+1+rip*1]"), 1, "gs:[rcx+1+rip*1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[rcx+1+rip*2]"), 0, "gs:[rcx+1+rip*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[rip*1+1+rsi]"), 1, "gs:[rip*1+1+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[rip*2+1+rsi]"), 0, "gs:[rip*2+1+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[rcx+rip*1+1]"), 1, "gs:[rcx+rip*1+1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[rcx+rip*2+1]"), 0, "gs:[rcx+rip*2+1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[rip*1+rsi+1]"), 1, "gs:[rip*1+rsi+1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[rip*2+rsi+1]"), 0, "gs:[rip*2+rsi+1] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("gs:[z*rip]"), 1, "gs:[z*rip] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[rcx+z*rip]"), 1, "gs:[rcx+z*rip] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[z*rip+rsi]"), 1, "gs:[z*rip+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[z*rip+1]"), 1, "gs:[z*rip+1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[1+z*rip]"), 1, "gs:[1+z*rip] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[1+rcx+z*rip]"), 1, "gs:[1+rcx+z*rip] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[1+z*rip+rsi]"), 1, "gs:[1+z*rip+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[rcx+1+z*rip]"), 1, "gs:[rcx+1+z*rip] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[z*rip+1+rsi]"), 1, "gs:[z*rip+1+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[rcx+z*rip+1]"), 1, "gs:[rcx+z*rip+1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[z*rip+rsi+1]"), 1, "gs:[z*rip+rsi+1] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("gs:[rip*z]"), 1, "gs:[rip*z] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[rcx+rip*z]"), 1, "gs:[rcx+rip*z] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[rip*z+rsi]"), 1, "gs:[rip*z+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[rip*z+1]"), 1, "gs:[rip*z+1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[1+rip*z]"), 1, "gs:[1+rip*z] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[1+rcx+rip*z]"), 1, "gs:[1+rcx+rip*z] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[1+rip*z+rsi]"), 1, "gs:[1+rip*z+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[rcx+1+rip*z]"), 1, "gs:[rcx+1+rip*z] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[rip*z+1+rsi]"), 1, "gs:[rip*z+1+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[rcx+rip*z+1]"), 1, "gs:[rcx+rip*z+1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[rip*z+rsi+1]"), 1, "gs:[rip*z+rsi+1] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("gs:[rcx*2]"), 1, "gs:[rcx*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[rsp*4]"), 0, "gs:[rsp*4] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[rcx*2 + rbx*8]"), 0, "gs:[rcx*2 + rbx*8] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[rcx + rsp*2]"), 0, "gs:[rcx + rsp*2] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("gs:[2*rcx]"), 1, "gs:[2*rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[4*rsp]"), 0, "gs:[4*rsp] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[2*rcx + rbx*8]"), 0, "gs:[2*rcx + rbx*8] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[rcx + 2*rsp]"), 0, "gs:[rcx + 2*rsp] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("ss:[1+rax]"), 1, "ss:[1+rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ss:[-2+rdx]"), 1, "ss:[-2+rdx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ss:[3+rbx*2]"), 1, "ss:[3+rbx*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ss:[-4+rsi*4]"), 1, "ss:[-4+rsi*4] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ss:[5+rcx+rsi]"), 1, "ss:[5+rcx+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ss:[-6+rcx*2+rdi]"), 1, "ss:[-6+rcx*2+rdi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ss:[7+rsp+rbp*8]"), 1, "ss:[7+rsp+rbp*8] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ss:[-8+rsp+rbp*8]"), 1, "ss:[-8+rsp+rbp*8] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("fs:[rcx*2 + rbx]"), 1, "fs:[rcx*2 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("fs:[rcx*4 + rbx -1]"), 1, "fs:[rcx*4 + rbx -1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("fs:[rcx*4 + rbx +-1]"), 1, "fs:[rcx*4 + rbx +-1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("fs:[rcx*8 + rbx+ 44]"), 1, "fs:[rcx*2 + rbx+ 44] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("fs:[rcx*1 + rsp]"), 1, "fs:[rcx*1 + rsp] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("fs:[rcx*4 -1 + rbx]"), 1, "fs:[rcx*4 -1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("fs:[rcx*4 +-1 + rbx]"), 1, "fs:[rcx*4 +-1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("fs:[rcx*8 +44 + rbx]"), 1, "fs:[rcx*2 +44+ rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("fs:[rcx*4 -1 + rbx]"), 1, "fs:[rcx*4 -1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("fs:[rcx*4 +-1 + rbx]"), 1, "fs:[rcx*4 +-1 + rbx] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("gs:[rcx*2]"), 1, "gs:[rcx*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[rsp*1]"), 1, "gs:[rsp*1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[rsp*4]"), 0, "gs:[rsp*4] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[rcx*2 + rbx*8]"), 0, "gs:[rcx*2 + rbx*8] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("gs:[rcx + rsp*2]"), 0, "gs:[rcx + rsp*2] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("ss:[1+rax]"), 1, "ss:[1+rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ss:[-2+rdx]"), 1, "ss:[-2+rdx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ss:[3+rbx*2]"), 1, "ss:[3+rbx*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ss:[-4+rsi*4]"), 1, "ss:[-4+rsi*4] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ss:[5+rcx+rsi]"), 1, "ss:[5+rcx+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ss:[-6+rcx*2+rdi]"), 1, "ss:[-6+rcx*2+rdi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ss:[7+rsp+rbp*8]"), 1, "ss:[7+rsp+rbp*8] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ss:[-8+rsp+rbp*8]"), 1, "ss:[-8+rsp+rbp*8] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("ds:[dl + rbx]"), 0, "ds:[dl + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rcx + dl]"), 0, "ds:[rcx + dl] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[cr0 + rbx]"), 0, "ds:[cr0 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rcx + cr0]"), 0, "ds:[rcx + cr0] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[ax + rbx]"), 0, "ds:[ax + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rcx + ax]"), 0, "ds:[rcx + ax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[mm2 + rbx]"), 0, "ds:[mm2 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rcx + mm2]"), 0, "ds:[rcx + mm2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[st0 + rbx]"), 0, "ds:[st0 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rcx + st0]"), 0, "ds:[rcx + st0] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rdx + ebx]"), 0, "ds:[rdx + ebx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[ecx + rdx]"), 0, "ds:[ecx + rdx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[r9d + rbx]"), 0, "ds:[r9d + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rcx + r9d]"), 0, "ds:[rcx + r9d] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rax - rbx]"), 0, "ds:[rax - rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[- rcx + rdx]"), 0, "ds:[- rcx + rdx] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("ds:[dl*2 + rbx]"), 0, "ds:[dl*2 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[dl*2 + rbx + 1]"), 0, "ds:[dl*2 + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rcx*2 + dl]"), 0, "ds:[rcx*2 + dl] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rcx*2 + dl + 1]"), 0, "ds:[rcx*2 + dl + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rbx + dl*2]"), 0, "ds:[rbx + dl*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rbx + dl*2 + 1]"), 0, "ds:[rbx + dl*2 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[dl + rcx*2]"), 0, "ds:[dl + rcx*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[dl + rcx*2 + 1]"), 0, "ds:[dl + rcx*2 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[dl*2 + 1 + rbx]"), 0, "ds:[dl*2 + 1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rcx*2 + 1 + dl]"), 0, "ds:[rcx*2 + 1 + dl] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[1 + dl*2 + rbx]"), 0, "ds:[1 + dl*2 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[1 + rcx*2 + dl]"), 0, "ds:[1 + rcx*2 + dl] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("ds:[dl + rbx]"), 0, "ds:[dl + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[dl + rbx + 1]"), 0, "ds:[dl + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rcx + dl]"), 0, "ds:[rcx + dl] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rcx + dl + 1]"), 0, "ds:[rcx + dl + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[1 + dl + rbx]"), 0, "ds:[1 + dl + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[1 + rcx + dl]"), 0, "ds:[1 + rcx + dl] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("ds:[2*cr0 + rbx]"), 0, "ds:[2*cr0 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[2*cr0 + rbx + 1]"), 0, "ds:[2*cr0 + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[2*rcx + cr0]"), 0, "ds:[2*rcx + cr0] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[2*rcx + cr0 + 1]"), 0, "ds:[2*rcx + cr0 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rbx + 2*cr0]"), 0, "ds:[rbx + 2*cr0] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rbx + 2*cr0 + 1]"), 0, "ds:[rbx + 2*cr0 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rbx + 1 + 2*cr0]"), 0, "ds:[rbx + 1 + 2*cr0] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[cr0 + 2*rcx]"), 0, "ds:[cr0 + 2*rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[cr0 + 2*rcx + 1]"), 0, "ds:[cr0 + 2*rcx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[cr0 + 1 + 2*rcx]"), 0, "ds:[cr0 + 1 + 2*rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[2*cr0 + 1 + rbx]"), 0, "ds:[2*cr0 + 1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[2*rcx + 1 + cr0]"), 0, "ds:[2*rcx + 1 + cr0] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[1 + 2*cr0 + rbx]"), 0, "ds:[1 + 2*cr0 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[1 + 2*rcx + cr0]"), 0, "ds:[1 + 2*rcx + cr0] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[1 + rbx + 2*cr0]"), 0, "ds:[1 + rbx + 2*cr0] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[1 + cr0 + 2*rcx]"), 0, "ds:[1 + cr0 + 2*rcx] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("ds:[cr0*2 + rbx]"), 0, "ds:[cr0*2 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[cr0*2 + rbx + 1]"), 0, "ds:[cr0*2 + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rcx*2 + cr0]"), 0, "ds:[rcx*2 + cr0] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rcx*2 + cr0 + 1]"), 0, "ds:[rcx*2 + cr0 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rbx + cr0*2]"), 0, "ds:[rbx + cr0*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rbx + cr0*2 + 1]"), 0, "ds:[rbx + cr0*2 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rbx + 1 + cr0*2]"), 0, "ds:[rbx + 1 + cr0*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[cr0 + rcx*2]"), 0, "ds:[cr0 + rcx*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[cr0 + rcx*2 + 1]"), 0, "ds:[cr0 + rcx*2 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[cr0 + 1 + rcx*2]"), 0, "ds:[cr0 + 1 + rcx*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[cr0*2 + 1 + rbx]"), 0, "ds:[cr0*2 + 1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rcx*2 + 1 + cr0]"), 0, "ds:[rcx*2 + 1 + cr0] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[1 + cr0*2 + rbx]"), 0, "ds:[1 + cr0*2 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[1 + rcx*2 + cr0]"), 0, "ds:[1 + rcx*2 + cr0] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[1 + rbx + cr0*2]"), 0, "ds:[1 + rbx + cr0*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[1 + cr0 + rcx*2]"), 0, "ds:[1 + cr0 + rcx*2] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("ds:[cr0 + rbx + 1]"), 0, "ds:[cr0 + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rcx + cr0 + 1]"), 0, "ds:[rcx + cr0 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rbx + 1 + cr0]"), 0, "ds:[rbx + 1 + cr0] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[cr0 + 1 + rcx]"), 0, "ds:[cr0 + 1 + rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[1 + rbx + cr0]"), 0, "ds:[1 + rbx + cr0] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[1 + cr0 + rcx]"), 0, "ds:[1 + cr0 + rcx] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("ds:[cr0 + rbx]"), 0, "ds:[cr0 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rcx + cr0]"), 0, "ds:[rcx + cr0] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("ds:[2*mm0 + rbx]"), 0, "ds:[2*mm0 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[2*mm0 + rbx + 1]"), 0, "ds:[2*mm0 + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[2*rcx + mm0]"), 0, "ds:[2*rcx + mm0] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[2*rcx + mm0 + 1]"), 0, "ds:[2*rcx + mm0 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rbx + 2*mm0]"), 0, "ds:[rbx + 2*mm0] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rbx + 2*mm0 + 1]"), 0, "ds:[rbx + 2*mm0 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rbx + 1 + 2*mm0]"), 0, "ds:[rbx + 1 + 2*mm0] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[mm0 + 2*rcx]"), 0, "ds:[mm0 + 2*rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[mm0 + 2*rcx + 1]"), 0, "ds:[mm0 + 2*rcx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[mm0 + 1 + 2*rcx]"), 0, "ds:[mm0 + 1 + 2*rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[2*mm0 + 1 + rbx]"), 0, "ds:[2*mm0 + 1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[2*rcx + 1 + mm0]"), 0, "ds:[2*rcx + 1 + mm0] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[1 + 2*mm0 + rbx]"), 0, "ds:[1 + 2*mm0 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[1 + 2*rcx + mm0]"), 0, "ds:[1 + 2*rcx + mm0] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[1 + rbx + 2*mm0]"), 0, "ds:[1 + rbx + 2*mm0] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[1 + mm0 + 2*rcx]"), 0, "ds:[1 + mm0 + 2*rcx] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("ds:[mm0*2 + rbx]"), 0, "ds:[mm0*2 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[mm0*2 + rbx + 1]"), 0, "ds:[mm0*2 + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rcx*2 + mm0]"), 0, "ds:[rcx*2 + mm0] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rcx*2 + mm0 + 1]"), 0, "ds:[rcx*2 + mm0 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rbx + mm0*2]"), 0, "ds:[rbx + mm0*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rbx + mm0*2 + 1]"), 0, "ds:[rbx + mm0*2 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rbx + 1 + mm0*2]"), 0, "ds:[rbx + 1 + mm0*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[mm0 + rcx*2]"), 0, "ds:[mm0 + rcx*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[mm0 + rcx*2 + 1]"), 0, "ds:[mm0 + rcx*2 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[mm0 + 1 + rcx*2]"), 0, "ds:[mm0 + 1 + rcx*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[mm0*2 + 1 + rbx]"), 0, "ds:[mm0*2 + 1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rcx*2 + 1 + mm0]"), 0, "ds:[rcx*2 + 1 + mm0] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[1 + mm0*2 + rbx]"), 0, "ds:[1 + mm0*2 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[1 + rcx*2 + mm0]"), 0, "ds:[1 + rcx*2 + mm0] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[1 + rbx + mm0*2]"), 0, "ds:[1 + rbx + mm0*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[1 + mm0 + rcx*2]"), 0, "ds:[1 + mm0 + rcx*2] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("ds:[mm0 + rbx + 1]"), 0, "ds:[mm0 + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rcx + mm0 + 1]"), 0, "ds:[rcx + mm0 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rbx + 1 + mm0]"), 0, "ds:[rbx + 1 + mm0] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[mm0 + 1 + rcx]"), 0, "ds:[mm0 + 1 + rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[1 + rbx + mm0]"), 0, "ds:[1 + rbx + mm0] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[1 + mm0 + rcx]"), 0, "ds:[1 + mm0 + rcx] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("ds:[mm0 + rbx]"), 0, "ds:[mm0 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rcx + mm0]"), 0, "ds:[rcx + mm0] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("ds:[2*st0 + rbx]"), 0, "ds:[2*st0 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[2*st0 + rbx + 1]"), 0, "ds:[2*st0 + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[2*rcx + st0]"), 0, "ds:[2*rcx + st0] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[2*rcx + st0 + 1]"), 0, "ds:[2*rcx + st0 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rbx + 2*st0]"), 0, "ds:[rbx + 2*st0] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rbx + 2*st0 + 1]"), 0, "ds:[rbx + 2*st0 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rbx + 1 + 2*st0]"), 0, "ds:[rbx + 1 + 2*st0] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[st0 + 2*rcx]"), 0, "ds:[st0 + 2*rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[st0 + 2*rcx + 1]"), 0, "ds:[st0 + 2*rcx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[st0 + 1 + 2*rcx]"), 0, "ds:[st0 + 1 + 2*rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[2*st0 + 1 + rbx]"), 0, "ds:[2*st0 + 1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[2*rcx + 1 + st0]"), 0, "ds:[2*rcx + 1 + st0] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[1 + 2*st0 + rbx]"), 0, "ds:[1 + 2*st0 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[1 + 2*rcx + st0]"), 0, "ds:[1 + 2*rcx + st0] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[1 + rbx + 2*st0]"), 0, "ds:[1 + rbx + 2*st0] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[1 + st0 + 2*rcx]"), 0, "ds:[1 + st0 + 2*rcx] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("ds:[st0*2 + rbx]"), 0, "ds:[st0*2 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[st0*2 + rbx + 1]"), 0, "ds:[st0*2 + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rcx*2 + st0]"), 0, "ds:[rcx*2 + st0] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rcx*2 + st0 + 1]"), 0, "ds:[rcx*2 + st0 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rbx + st0*2]"), 0, "ds:[rbx + st0*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rbx + st0*2 + 1]"), 0, "ds:[rbx + st0*2 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rbx + 1 + st0*2]"), 0, "ds:[rbx + 1 + st0*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[st0 + rcx*2]"), 0, "ds:[st0 + rcx*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[st0 + rcx*2 + 1]"), 0, "ds:[st0 + rcx*2 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[st0 + 1 + rcx*2]"), 0, "ds:[st0 + 1 + rcx*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[st0*2 + 1 + rbx]"), 0, "ds:[st0*2 + 1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rcx*2 + 1 + st0]"), 0, "ds:[rcx*2 + 1 + st0] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[1 + st0*2 + rbx]"), 0, "ds:[1 + st0*2 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[1 + rcx*2 + st0]"), 0, "ds:[1 + rcx*2 + st0] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[1 + rbx + st0*2]"), 0, "ds:[1 + rbx + st0*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[1 + st0 + rcx*2]"), 0, "ds:[1 + st0 + rcx*2] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("ds:[st0 + rbx + 1]"), 0, "ds:[st0 + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rcx + st0 + 1]"), 0, "ds:[rcx + st0 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rbx + 1 + st0]"), 0, "ds:[rbx + 1 + st0] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[st0 + 1 + rcx]"), 0, "ds:[st0 + 1 + rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[1 + rbx + st0]"), 0, "ds:[1 + rbx + st0] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[1 + st0 + rcx]"), 0, "ds:[1 + st0 + rcx] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("ds:[st0 + rbx]"), 0, "ds:[st0 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rcx + st0]"), 0, "ds:[rcx + st0] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("ds:[2*ax + rbx]"), 0, "ds:[2*ax + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[2*ax + rbx + 1]"), 0, "ds:[2*ax + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[2*rcx + ax]"), 0, "ds:[2*rcx + ax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[2*rcx + ax + 1]"), 0, "ds:[2*rcx + ax + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rbx + 2*ax]"), 0, "ds:[rbx + 2*ax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rbx + 2*ax + 1]"), 0, "ds:[rbx + 2*ax + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rbx + 1 + 2*ax]"), 0, "ds:[rbx + 1 + 2*ax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[ax + 2*rcx]"), 0, "ds:[ax + 2*rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[ax + 2*rcx + 1]"), 0, "ds:[ax + 2*rcx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[ax + 1 + 2*rcx]"), 0, "ds:[ax + 1 + 2*rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[2*ax + 1 + rbx]"), 0, "ds:[2*ax + 1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[2*rcx + 1 + ax]"), 0, "ds:[2*rcx + 1 + ax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[1 + 2*ax + rbx]"), 0, "ds:[1 + 2*ax + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[1 + 2*rcx + ax]"), 0, "ds:[1 + 2*rcx + ax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[1 + rbx + 2*ax]"), 0, "ds:[1 + rbx + 2*ax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[1 + ax + 2*rcx]"), 0, "ds:[1 + ax + 2*rcx] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("ds:[ax*2 + rbx]"), 0, "ds:[ax*2 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[ax*2 + rbx + 1]"), 0, "ds:[ax*2 + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rcx*2 + ax]"), 0, "ds:[rcx*2 + ax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rcx*2 + ax + 1]"), 0, "ds:[rcx*2 + ax + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rbx + ax*2]"), 0, "ds:[rbx + ax*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rbx + ax*2 + 1]"), 0, "ds:[rbx + ax*2 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rbx + 1 + ax*2]"), 0, "ds:[rbx + 1 + ax*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[ax + rcx*2]"), 0, "ds:[ax + rcx*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[ax + rcx*2 + 1]"), 0, "ds:[ax + rcx*2 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[ax + 1 + rcx*2]"), 0, "ds:[ax + 1 + rcx*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[ax*2 + 1 + rbx]"), 0, "ds:[ax*2 + 1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rcx*2 + 1 + ax]"), 0, "ds:[rcx*2 + 1 + ax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[1 + ax*2 + rbx]"), 0, "ds:[1 + ax*2 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[1 + rcx*2 + ax]"), 0, "ds:[1 + rcx*2 + ax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[1 + rbx + ax*2]"), 0, "ds:[1 + rbx + ax*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[1 + ax + rcx*2]"), 0, "ds:[1 + ax + rcx*2] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("ds:[ax + rbx + 1]"), 0, "ds:[ax + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rcx + ax + 1]"), 0, "ds:[rcx + ax + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rbx + 1 + ax]"), 0, "ds:[rbx + 1 + ax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[ax + 1 + rcx]"), 0, "ds:[ax + 1 + rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[1 + rbx + ax]"), 0, "ds:[1 + rbx + ax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[1 + ax + rcx]"), 0, "ds:[1 + ax + rcx] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("ds:[ax + rbx]"), 0, "ds:[ax + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rcx + ax]"), 0, "ds:[rcx + ax] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("ds:[2*eax + rbx]"), 0, "ds:[2*eax + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[2*rax + ebx + 1]"), 0, "ds:[2*rax + ebx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[2*rcx + eax]"), 0, "ds:[2*rcx + eax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[2*ecx + rax + 1]"), 0, "ds:[2*ecx + rax + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rbx + 2*eax]"), 0, "ds:[rbx + 2*eax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rbx + 2*eax + 1]"), 0, "ds:[rbx + 2*eax + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rbx + 1 + 2*eax]"), 0, "ds:[rbx + 1 + 2*eax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[eax + 2*rcx]"), 0, "ds:[eax + 2*rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[eax + 2*rcx + 1]"), 0, "ds:[eax + 2*rcx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[eax + 1 + 2*rcx]"), 0, "ds:[eax + 1 + 2*rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[2*ebx + 1 + rax]"), 0, "ds:[2*ebx + 1 + eax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[2*rcx + 1 + eax]"), 0, "ds:[2*rcx + 1 + eax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[1 + 2*rbx + eax]"), 0, "ds:[1 + 2*rbx + eax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[1 + 2*ecx + rax]"), 0, "ds:[1 + 2*ecx + rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[1 + eax + 2*rbx]"), 0, "ds:[1 + eax + 2*rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[1 + rax + 2*ecx]"), 0, "ds:[1 + rax + 2*ecx] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("ds:[eax*2 + rbx]"), 0, "ds:[eax*2 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rax*2 + ebx + 1]"), 0, "ds:[rax*2 + ebx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rcx*2 + eax]"), 0, "ds:[rcx*2 + eax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[ecx*2 + rax + 1]"), 0, "ds:[ecx*2 + rax + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rbx + eax*2]"), 0, "ds:[rbx + eax*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rbx + eax*2 + 1]"), 0, "ds:[rbx + eax*2 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rbx + 1 + eax*2]"), 0, "ds:[rbx + 1 + eax*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[eax + rcx*2]"), 0, "ds:[eax + rcx*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[eax + rcx*2 + 1]"), 0, "ds:[eax + rcx*2 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[eax + 1 + rcx*2]"), 0, "ds:[eax + 1 + rcx*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[ebx*2 + 1 + rax]"), 0, "ds:[ebx*2 + 1 + rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rcx*2 + 1 + eax]"), 0, "ds:[rcx*2 + 1 + eax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[1 + rbx*2 + eax]"), 0, "ds:[1 + rbx*2 + eax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[1 + ecx*2 + rax]"), 0, "ds:[1 + ecx*2 + rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[1 + eax + rbx*2]"), 0, "ds:[1 + eax + rbx*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[1 + rax + ecx*2]"), 0, "ds:[1 + rax + ecx*2] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("ds:[eax + rbx]"), 0, "ds:[eax + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rcx + eax]"), 0, "ds:[rcx + eax] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("ds:[2*r9d + rbx]"), 0, "ds:[2*r9d + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[2*r9d + rbx + 1]"), 0, "ds:[2*r9d + ebx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[2*rcx + r9d]"), 0, "ds:[2*rcx + r9d] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[2*r9d + rax + 1]"), 0, "ds:[2*r9d + rax + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rbx + 2*r9d]"), 0, "ds:[rbx + 2*r9d] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rbx + 2*r9d + 1]"), 0, "ds:[rbx + 2*r9d + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rbx + 1 + 2*r9d]"), 0, "ds:[rbx + 1 + 2*r9d] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[r9d + 2*rcx]"), 0, "ds:[r9d + 2*rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[r9d + 2*rcx + 1]"), 0, "ds:[r9d + 2*rcx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[r9d + 1 + 2*rcx]"), 0, "ds:[r9d + 1 + 2*rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[2*r9d + 1 + rbx]"), 0, "ds:[2*r9d + 1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[2*rcx + 1 + r9d]"), 0, "ds:[2*rcx + 1 + r9d] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[1 + 2*r9d + rbx]"), 0, "ds:[1 + 2*r9d + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[1 + 2*rcx + r9d]"), 0, "ds:[1 + 2*ecx + r9d] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[1 + rbx + 2*r9d]"), 0, "ds:[1 + rbx + 2*r9d] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[1 + r9d + 2*rcx]"), 0, "ds:[1 + r9d + 2*rcx] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("ds:[r9d*2 + rbx]"), 0, "ds:[r9d*2 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rax*2 + r9d + 1]"), 0, "ds:[rax*2 + ebx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rcx*2 + r9d]"), 0, "ds:[rcx*2 + r9d] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[r9d*2 + rax + 1]"), 0, "ds:[ecx*2 + rax + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rbx + r9d*2]"), 0, "ds:[rbx + r9d*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rbx + r9d*2 + 1]"), 0, "ds:[rbx + r9d*2 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rbx + 1 + r9d*2]"), 0, "ds:[rbx + 1 + r9d*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[r9d + rcx*2]"), 0, "ds:[r9d + rcx*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[r9d + rcx*2 + 1]"), 0, "ds:[r9d + rcx*2 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[r9d + 1 + rcx*2]"), 0, "ds:[r9d + 1 + rcx*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[r9d*2 + 1 + rbx]"), 0, "ds:[r9d*2 + 1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rcx*2 + 1 + r9d]"), 0, "ds:[rcx*2 + 1 + r9d] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[1 + r9d*2 + rbx]"), 0, "ds:[1 + r9d*2 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[1 + rcx*2 + r9d]"), 0, "ds:[1 + rcx*2 + r9d] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[1 + rbx + r9d*2]"), 0, "ds:[1 + rbx + r9d*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[1 + r9d + rcx*2]"), 0, "ds:[1 + r9d + rcx*2] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("ds:[r9d + rbx + 1]"), 0, "ds:[r9d + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[r9d + rax + 1]"), 0, "ds:[r9d + rax + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rbx + 1 + r9d]"), 0, "ds:[rbx + 1 + r9d] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[r9d + 1 + rcx]"), 0, "ds:[r9d + 1 + rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[1 + rbx + r9d]"), 0, "ds:[1 + rbx + r9d] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[1 + r9d + rcx]"), 0, "ds:[1 + r9d + rcx] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("ds:[r9d + rbx]"), 0, "ds:[r9d + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rcx + r9d]"), 0, "ds:[rcx + r9d] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("ds:[2*cl + rbx]"), 0, "ds:[2*cl + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[2*rax + cl + 1]"), 0, "ds:[2*rax + cl + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[2*rcx + cl]"), 0, "ds:[2*rcx + cl] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[2*cl + rax + 1]"), 0, "ds:[2*cl + rax + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rbx + 2*cl]"), 0, "ds:[rbx + 2*cl] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rbx + 2*cl + 1]"), 0, "ds:[rbx + 2*cl + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rbx + 1 + 2*cl]"), 0, "ds:[rbx + 1 + 2*cl] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[cl + 2*rcx]"), 0, "ds:[cl + 2*rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[cl + 2*rcx + 1]"), 0, "ds:[cl + 2*rcx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[cl + 1 + 2*rcx]"), 0, "ds:[cl + 1 + 2*rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[2*cl + 1 + rax]"), 0, "ds:[2*cl + 1 + rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[2*rcx + 1 + cl]"), 0, "ds:[2*rcx + 1 + cl] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[1 + 2*cl + rbx]"), 0, "ds:[1 + 2*cl + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[1 + 2*rax + cl]"), 0, "ds:[1 + 2*rax + cl] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[1 + rbx + 2*cl]"), 0, "ds:[1 + rbx + 2*cl] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[1 + cl + 2*rax]"), 0, "ds:[1 + cl + 2*rax] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("ds:[cl*2 + rbx]"), 0, "ds:[cl*2 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rax*2 + cl + 1]"), 0, "ds:[rax*2 + cl + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rcx*2 + cl]"), 0, "ds:[rcx*2 + cl] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[cl*2 + rax + 1]"), 0, "ds:[cl*2 + rax + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rbx + cl*2]"), 0, "ds:[rbx + cl*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rbx + cl*2 + 1]"), 0, "ds:[rbx + cl*2 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rbx + 1 + cl*2]"), 0, "ds:[rbx + 1 + cl*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[cl + rcx*2]"), 0, "ds:[cl + rcx*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[cl + rcx*2 + 1]"), 0, "ds:[cl + rcx*2 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[cl + 1 + rcx*2]"), 0, "ds:[cl + 1 + rcx*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[cl*2 + 1 + rax]"), 0, "ds:[cl*2 + 1 + rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rcx*2 + 1 + cl]"), 0, "ds:[rcx*2 + 1 + cl] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[1 + cl*2 + rbx]"), 0, "ds:[1 + cl*2 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[1 + rax*2 + cl]"), 0, "ds:[1 + rax*2 + cl] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[1 + rbx + cl*2]"), 0, "ds:[1 + rbx + cl*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[1 + cl + rax*2]"), 0, "ds:[1 + cl + rax*2] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("es:[cs + rbx]"), 0, "es:[cs + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[cs + rbx + 1]"), 0, "es:[cs + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[rcx + cs]"), 0, "es:[rcx + cs] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[rcx + cs + 1]"), 0, "es:[rcx + cs + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[cs + 1 + rbx]"), 0, "es:[cs + 1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[rcx + 1 + cs]"), 0, "es:[rcx + 1 + cs] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[1 + cs + rbx]"), 0, "es:[1 + cs + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[1 + rcx + cs]"), 0, "es:[1 + rcx + cs] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("es:[cs*2]"), 0, "es:[cs*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[2*cs]"), 0, "es:[2*cs] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[dl*2]"), 0, "es:[dl*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[2*dl]"), 0, "es:[2*dl] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[cr0*2]"), 0, "es:[cr0*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[2*cr0]"), 0, "es:[2*cr0] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[ax*2]"), 0, "es:[ax*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[2*ax]"), 0, "es:[2*ax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[mm1*2]"), 0, "es:[mm1*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[2*mm1]"), 0, "es:[2*mm1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[st1*2]"), 0, "es:[st1*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[2*st1]"), 0, "es:[2*st1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[rcx*2]"), 1, "es:[rcx*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[2*rcx]"), 1, "es:[2*rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[ecx*2]"), 1, "es:[ecx*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[2*ecx]"), 1, "es:[2*ecx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[r9d*2]"), 1, "es:[r9d*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[2*r9d]"), 1, "es:[2*r9d] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[rax*rbx]"), 0, "es:[rax*rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[-2*rax]"), 0, "es:[-2*rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[-rax*2]"), 0, "es:[-rax*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[-1*2]"), 1, "es:[-1*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[rax*5]"), 0, "es:[rax*5] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[5*rax]"), 0, "es:[5*rax] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("es:[cs]"), 0, "es:[cs] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[dl]"), 0, "es:[dl] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[cr0]"), 0, "es:[cr0] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[r9d]"), 1, "es:[r9d] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[ax]"), 0, "es:[ax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[mm1]"), 0, "es:[mm1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[st1]"), 0, "es:[st1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[ecx]"), 1, "es:[ecx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[-rax]"), 0, "es:[-rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[-1]"), 1, "es:[-1] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("es:[cs*ds + rbx]"), 0, "es:[cs*ds + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[cs*ds + rbx + 1]"), 0, "es:[cs*ds + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[rcx*ds + cs]"), 0, "es:[rcx*ds + cs] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[rcx*ds + cs + 1]"), 0, "es:[rcx*ds + cs + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[rbx + cs*ds]"), 0, "es:[rbx + cs*ds] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[rbx + cs*ds + 1]"), 0, "es:[rbx + cs*ds + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[rbx + 1 + cs*ds]"), 0, "es:[rbx + 1 + cs*ds] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[cs + rcx*ds]"), 0, "es:[cs + rcx*ds] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[cs + rcx*ds + 1]"), 0, "es:[cs + rcx*ds + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[cs + 1 + rcx*ds]"), 0, "es:[cs + 1 + rcx*ds] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[cs*ds + 1 + rbx]"), 0, "es:[cs*ds + 1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[rcx*ds + 1 + cs]"), 0, "es:[rcx*ds + 1 + cs] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[1 + cs*ds + rbx]"), 0, "es:[1 + cs*ds + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[1 + rcx*ds + cs]"), 0, "es:[1 + rcx*ds + cs] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[1 + rbx + cs*ds]"), 0, "es:[1 + rbx + cs*ds] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[1 + cs + rcx*ds]"), 0, "es:[1 + cs + rcx*ds] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("es:[rax*5 + rbx]"), 0, "es:[rax*5 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[rax*5 + rbx + 1]"), 0, "es:[rax*5 + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[rcx*5 + rax]"), 0, "es:[rcx*5 + rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[rcx*5 + rax + 1]"), 0, "es:[rcx*5 + rax + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[rbx + rax*5]"), 0, "es:[rbx + rax*5] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[rbx + rax*5 + 1]"), 0, "es:[rbx + rax*5 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[rax + rcx*5]"), 0, "es:[rax + rcx*5] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[rax + rcx*5 + 1]"), 0, "es:[rax + rcx*5 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[rax*5 + 1 + rbx]"), 0, "es:[rax*5 + 1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[rcx*5 + 1 + rax]"), 0, "es:[rcx*5 + 1 + rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[1 + rax*5 + rbx]"), 0, "es:[1 + rax*5 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[1 + rcx*5 + rax]"), 0, "es:[1 + rcx*5 + rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[1 + rbx + rax*5]"), 0, "es:[1 + rbx + rax*5] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[rbx + 1 + rax*5]"), 0, "es:[rbx + 1 + rax*5] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("es:[5*rax + rbx]"), 0, "es:[5*rax + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[5*rax + rbx + 1]"), 0, "es:[5*rax + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[rcx*5 + rax]"), 0, "es:[rcx*5 + rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[rcx*5 + rax + 1]"), 0, "es:[rcx*5 + rax + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[rbx + 5*rax]"), 0, "es:[rbx + 5*rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[rbx + 5*rax + 1]"), 0, "es:[rbx + 5*rax + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[rax + rcx*5]"), 0, "es:[rax + rcx*5] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[rax + rcx*5 + 1]"), 0, "es:[rax + rcx*5 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[5*rax + 1 + rbx]"), 0, "es:[5*rax + 1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[rcx*5 + 1 + rax]"), 0, "es:[ec*5x + 1 + rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[rbx + 1 + 5*rax]"), 0, "es:[rbx + 1 + 5*rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[rax + 1 + rcx*5]"), 0, "es:[rax + 1 + rcx*5] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[1 + 5*rax + rbx]"), 0, "es:[1 + 5*rax + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[1 + rcx*5 + rax]"), 0, "es:[1 + rcx*5 + rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[1 + rbx + 5*rax]"), 0, "es:[1 + rbx + 5*rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[1 + rax + rcx*5]"), 0, "es:[1 + rax + rcx*5] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("es:[rdx*rax + rbx]"), 0, "es:[rdx*rax + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[rbx + rdx*rax]"), 0, "es:[rbx + rdx*rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[rdx*rax + rbx + 1]"), 0, "es:[rdx*rax + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[rdx + rcx*rax + 1]"), 0, "es:[rdx + rcx*rax + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[rdx*rax + 1 + rbx]"), 0, "es:[rdx*rax + 1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[rbx + 1 + rdx*rax]"), 0, "es:[rbx + 1 + rdx*rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[1 + rdx*rax + rbx]"), 0, "es:[1 + rdx*rax + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[1 + rbx + rdx*rax]"), 0, "es:[1 + rbx + rdx*rax] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("es:[rdx*eax]"), 0, "es:[rdx*eax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[rdx*eax + rbx]"), 0, "es:[rdx*eax + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[rbx + rdx*eax]"), 0, "es:[rbx + rdx*eax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[rdx*eax + rbx + 1]"), 0, "es:[rdx*eax + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[rbx + rdx*eax + 1]"), 0, "es:[rbx + rdx*eax + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[rdx*eax + 1 + rbx]"), 0, "es:[rdx*eax + 1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[rbx + 1 + rdx*eax]"), 0, "es:[rbx + 1 + rdx*eax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[1 + rdx*eax + rbx]"), 0, "es:[1 + rdx*eax + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[1 + rbx + rdx*eax]"), 0, "es:[1 + rbx + rdx*eax] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("ax:[cs*2]"), 0, "ax:[cs*2 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ax:[cs*2 + rbx]"), 0, "ax:[cs*2 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ax:[cs*2 + rbx + 1]"), 0, "ax:[cs*2 + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ax:[cs*2 + 1 + rbx]"), 0, "ax:[cs*2 + 1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ax:[rbx + cs*2]"), 0, "ax:[rbx + cs*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ax:[rbx + cs*2 + 1]"), 0, "ax:[rbx + cs*2 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ax:[1 + cs*2 + rbx]"), 0, "ax:[1 + cs*2 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ax:[1 + rbx + cs*2]"), 0, "ax:[1 + rbx + cs*2] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("ax:[cs]"), 0, "ax:[cs + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ax:[cs + rbx]"), 0, "ax:[cs + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ax:[cs + rbx + 1]"), 0, "ax:[cs + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ax:[cs + 1 + rbx]"), 0, "ax:[cs + 1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ax:[rbx + cs]"), 0, "ax:[rbx + cs] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ax:[rbx + cs + 1]"), 0, "ax:[rbx + cs + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ax:[1 + cs + rbx]"), 0, "ax:[1 + cs + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ax:[1 + rbx + cs]"), 0, "ax:[1 + rbx + cs] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("ax:[rcx*2]"), 0, "ax:[rcx*2 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ax:[rcx*2 + rbx]"), 0, "ax:[rcx*2 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ax:[rcx*2 + rbx + 1]"), 0, "ax:[rcx*2 + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ax:[rcx*2 + 1 + rbx]"), 0, "ax:[rcx*2 + 1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ax:[rbx + rcx*2]"), 0, "ax:[rbx + rcx*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ax:[rbx + rcx*2 + 1]"), 0, "ax:[rbx + rcx*2 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ax:[1 + rcx*2 + rbx]"), 0, "ax:[1 + rcx*2 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ax:[1 + rbx + rcx*2]"), 0, "ax:[1 + rbx + rcx*2] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("ax:[rcx]"), 0, "ax:[rcx + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ax:[rcx + rbx]"), 0, "ax:[rcx + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ax:[rcx + rbx + 1]"), 0, "ax:[rcx + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ax:[rcx + 1 + rbx]"), 0, "ax:[rcx + 1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ax:[rbx + rcx]"), 0, "ax:[rbx + rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ax:[rbx + rcx + 1]"), 0, "ax:[rbx + rcx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ax:[1 + rcx + rbx]"), 0, "ax:[1 + rcx + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ax:[1 + rbx + rcx]"), 0, "ax:[1 + rbx + rcx] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("ds:[rax + ebx + 1]"), 0, "ds:[rax + ebx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[ecx + rax + 1]"), 0, "ds:[ecx + rax + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rbx + 1 + eax]"), 0, "ds:[rbx + 1 + eax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[eax + 1 + rcx]"), 0, "ds:[eax + 1 + rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[1 + ebx + rax]"), 0, "ds:[1 + ebx + rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[1 + rax + ecx]"), 0, "ds:[1 + rax + ecx] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("ds:[eax + rbx]"), 0, "ds:[eax + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[rcx + eax]"), 0, "ds:[rcx + eax] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("ds:[eax + ebx]"), 1, "ds:[eax + ebx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("ds:[ecx + eax]"), 1, "ds:[ecx + eax] is a valid 64-bit addressing scheme" );
-
-# -----------
-
-is ( is_valid_64bit_addr_intel ("[ss:rax]"), 1, "[ss:rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ss:brax]"), 1, "[ss:brax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ss:raxd]"), 1, "[ss:raxd] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[cs:cl]"), 0, "[cs:cl] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[cs:mm1]"), 0, "[cs:mm1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[cs:st1]"), 0, "[cs:st1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[cs:eax]"), 1, "[cs:eax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[cs:ax]"), 0, "[cs:ax] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[cs:1+2*2+3]"), 1, "[cs:1+2*2+3] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[cs:1+3+2*2]"), 1, "[cs:1+3+2*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[cs:2*2+1+3]"), 1, "[cs:2*2+1+3] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[cs:2*2+1]"), 1, "[cs:2*2+1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[cs:1+2*2]"), 1, "[cs:1+2*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[cs:2*2]"), 1, "[cs:2*2] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[gs:rbx+77]"), 1, "[gs:rbx+77] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[gs:rbx+rcx]"), 1, "[gs:rbx+rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[gs:rbx+rbx+99]"), 1, "[gs:rbx+rbx+99] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[gs:rbx+rdi-88]"), 1, "[gs:rbx+rdi-88] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[gs:rbx+rdi+-88]"), 1, "[gs:rbx+rdi+-88] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[gs:rbx-88+rdi]"), 1, "[gs:rbx-88+rdi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[gs:-88+rbx+rdi]"), 1, "[gs:-88+rbx+rdi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[gs:-rbx+rdi+-88]"), 0, "[gs:-rbx+rdi+-88] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[gs:-rbx-88+rdi]"), 0, "[gs:-rbx-88+rdi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[gs:-88-rbx+rdi]"), 0, "[gs:-88-rbx+rdi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[gs:rbx-rdi+-88]"), 0, "[gs:rbx-rdi+-88] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[gs:rbx-88-rdi]"), 0, "[gs:rbx-88-rdi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[gs:-88+rbx-rdi]"), 0, "[gs:-88+rbx-rdi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[gs:rax+rbx+rdi]"), 0, "[gs:rax+rbx+rdi] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[fs:rbx + rax*1]"), 1, "[fs:rbx+rax*1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:rbx + 1*rax]"), 1, "[fs:rbx+1*rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:rax*1 + rbx]"), 1, "[fs:rax*1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:1*rax + rbx]"), 1, "[fs:1*rax + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:rbx + rax*2]"), 1, "[fs:rbx+rax*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:rbx + 2*rax]"), 1, "[fs:rbx+2*rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:rax*2 + rbx]"), 1, "[fs:rax*2 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:2*rax + rbx]"), 1, "[fs:2*rax + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:rbx + rax*4]"), 1, "[fs:rbx+rax*4] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:rbx + 4*rax]"), 1, "[fs:rbx+4*rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:rax*4 + rbx]"), 1, "[fs:rax*4 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:4*rax + rbx]"), 1, "[fs:4*rax + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:rbx + rax*8]"), 1, "[fs:rbx+rax*8] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:rbx + 8*rax]"), 1, "[fs:rbx+8*rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:rax*8 + rbx]"), 1, "[fs:rax*8 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:8*rax + rbx]"), 1, "[fs:8*rax + rbx] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[fs:rax*8 - rbx]"), 0, "[fs:rax*8 - rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:8*rax - rbx]"), 0, "[fs:8*rax - rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:- rax*8 + rbx]"), 0, "[fs:- rax*8 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:- 8*rax + rbx]"), 0, "[fs:- 8*rax + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:1*8 + rbx]"), 1, "[fs:1*8 + rbx] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[fs:rbx - rax*8]"), 0, "[fs:rbx - rax*8] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:rbx - 8*rax]"), 0, "[fs:rbx - 8*rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:- rbx + rax*8]"), 0, "[fs:- rbx + rax*8] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:- rbx + 8*rax]"), 0, "[fs:- rbx + 8*rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:rbx + 1*8]"), 1, "[fs:rbx + 1*8] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[fs:rbx + rax*1]"), 1, "[fs:rbx+rax*1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:rbx + 1*rax]"), 1, "[fs:rbx+1*rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:rax*1 + rbx]"), 1, "[fs:rax*1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:1*rax + rbx]"), 1, "[fs:1*rax + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:rbx + rax*2]"), 1, "[fs:rbx+rax*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:rbx + 2*rax]"), 1, "[fs:rbx+2*rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:rax*2 + rbx]"), 1, "[fs:rax*2 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:2*rax + rbx]"), 1, "[fs:2*rax + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:rbx + rax*4]"), 1, "[fs:rbx+rax*4] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:rbx + 4*rax]"), 1, "[fs:rbx+4*rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:rax*4 + rbx]"), 1, "[fs:rax*4 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:4*rax + rbx]"), 1, "[fs:4*rax + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:rbx + rax*8]"), 1, "[fs:rbx+rax*8] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:rbx + 8*rax]"), 1, "[fs:rbx+8*rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:rax*8 + rbx]"), 1, "[fs:rax*8 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:8*rax + rbx]"), 1, "[fs:8*rax + rbx] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[fs:rbx+rsi*4+66]"), 1, "[fs:rbx+rsi*4+66] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:rbx+rcx*8-55]"), 1, "[fs:rbx+rcx*8-55] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:rbx+rcx*8+-55]"), 1, "[fs:rbx+rcx*8+-55] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:rbx+rbp*1]"), 1, "[fs:rbx+rbp*1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:rbx+rbp*1 + 2]"), 1, "[fs:rbx+rbp*1 + 2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:rbx+rbp*1 + 2]"), 1, "[fs:rbx+rbp*1 + 2] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[fs:rcx*2 + rbx]"), 1, "[fs:rcx*2 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:rcx*4 + rbx -1]"), 1, "[fs:rcx*4 + rbx -1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:rcx*4 + rbx +-1]"), 1, "[fs:rcx*4 + rbx +-1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:rcx*8 + rbx+ 44]"), 1, "[fs:rcx*2 + rbx+ 44] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:rcx*1 + rsp]"), 1, "[fs:rcx*1 + rsp] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:rcx*4 -1 + rbx]"), 1, "[fs:rcx*4 -1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:rcx*4 +-1 + rbx]"), 1, "[fs:rcx*4 +-1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:rcx*8 +44 + rbx]"), 1, "[fs:rcx*2 +44+ rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:rcx*4 -1 + rbx]"), 1, "[fs:rcx*4 -1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:rcx*4 +-1 + rbx]"), 1, "[fs:rcx*4 +-1 + rbx] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[fs:rbx + rcx*1 + 1]"), 1, "[fs:rbx + rcx*1 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:rbx + 1*rcx + 1]"), 1, "[fs:rbx + 1*rcx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:rbx + 1 + rcx*1]"), 1, "[fs:rbx + 1 + rcx*1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:rbx + 1 + 1*rcx]"), 1, "[fs:rbx + 1 + 1*rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:rbx + rcx*2 + 1]"), 1, "[fs:rbx + rcx*2 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:rbx + 2*rcx + 1]"), 1, "[fs:rbx + 2*rcx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:rbx + 1 + rcx*2]"), 1, "[fs:rbx + 1 + rcx*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:rbx + 1 + 2*rcx]"), 1, "[fs:rbx + 1 + 2*rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:rbx + rcx*4 + 1]"), 1, "[fs:rbx + rcx*4 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:rbx + 4*rcx + 1]"), 1, "[fs:rbx + 4*rcx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:rbx + 1 + rcx*4]"), 1, "[fs:rbx + 1 + rcx*4] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:rbx + 1 + 4*rcx]"), 1, "[fs:rbx + 1 + 4*rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:rbx + rcx*8 + 1]"), 1, "[fs:rbx + rcx*8 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:rbx + 8*rcx + 1]"), 1, "[fs:rbx + 8*rcx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:rbx + 1 + rcx*8]"), 1, "[fs:rbx + 1 + rcx*8] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:rbx + 1 + 8*rcx]"), 1, "[fs:rbx + 1 + 8*rcx] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[fs:rbx + rcx + 1]"), 1, "[fs:rbx + rcx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:rbx + rcx + 1]"), 1, "[fs:rbx + 1cx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:rbx + 1 + rcx]"), 1, "[fs:rbx + 1 + rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:rbx + 1 + rcx]"), 1, "[fs:rbx + 1 + rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:1 + rbx + rcx]"), 1, "[fs:1 + rbx + rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:1 + rbx + rcx]"), 1, "[fs:1 + rbx + rcx] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[fs:-rbx + rcx*1 + 1]"), 0, "[fs:-rbx + rcx*1 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:-rbx + 1*rcx + 1]"), 0, "[fs:-rbx + 1*rcx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:rbx - rcx*1 + 1]"), 0, "[fs:rbx - rcx*1 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:rbx - 1*rcx + 1]"), 0, "[fs:rbx - 1*rcx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:1 + rcx*1 - rax]"), 0, "[fs:1 + rcx*1 - rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:1 + 1*rcx - rax]"), 0, "[fs:1 + 1*rcx - rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:rbx + 1*rcx + rax]"), 0, "[fs:rbx + 1*rcx + rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:rbx + rcx*1 + rax]"), 0, "[fs:rbx + rcx*1 + rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:rbx + 2*1 + rax]"), 1, "[fs:rbx + 2*1 + rax] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[fs:-rbx + 1 + rcx*1]"), 0, "[fs:-rbx + 1 + rcx*1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:-rbx + 1 + 1*rcx]"), 0, "[fs:-rbx + 1 + 1*rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:rbx + 1 - rcx*1]"), 0, "[fs:rbx + 1 - rcx*1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:rbx + 1 - 1*rcx]"), 0, "[fs:rbx + 1 - 1*rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:1 - rax + rcx*1]"), 0, "[fs:1 - rax + rcx*1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:1 - rax + 1*rcx]"), 0, "[fs:1 - rax + 1*rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:rbx + rax + 1*rcx]"), 0, "[fs:rbx + rax + 1*rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:rbx + rax + rcx*1]"), 0, "[fs:rbx + rax + rcx*1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:rbx + rax + 2*1]"), 1, "[fs:rbx + rax + 2*1] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[fs:rcx - rbx + 1]"), 0, "[fs:rcx - rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:rcx + 1 - rbx]"), 0, "[fs:rcx + 1 - rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs: - rbx + rcx + 1]"), 0, "[fs:- rbx + rcx + 1] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[fs:rcx*1 - rbx + 1]"), 0, "[fs:rcx*1 - rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:1*rcx - rbx + 1]"), 0, "[fs:1*rcx - rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:- rcx*1 + rbx + 1]"), 0, "[fs:- rcx*1 + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:- 1*rcx + rbx + 1]"), 0, "[fs:- 1*rcx + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:rcx*1 + 1 - rax]"), 0, "[fs:rcx*1 + 1 - rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:1*rcx + 1 - rax]"), 0, "[fs:1*rcx + 1 - rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:1*rcx + rbx + rax]"), 0, "[fs:1*rcx + rbx + rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:rcx*1 + rbx + rax]"), 0, "[fs:rcx*1 + rbx + rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:2*1 + rbx + rax]"), 1, "[fs:2*1 + rbx + rax] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[fs:rcx*1 + rbx + 1]"), 1, "[fs:rcx*1 + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:1*rcx + rbx + 1]"), 1, "[fs:1*rcx + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:rcx*1 + 1 + rbx]"), 1, "[fs:rcx*1 + 1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:1*rcx + 1 + rbx]"), 1, "[fs:1*rcx + 1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:rcx*2 + rbx + 1]"), 1, "[fs:rcx*2 + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:2*rcx + rbx + 1]"), 1, "[fs:2*rcx + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:rcx*2 + 1 + rbx]"), 1, "[fs:rcx*2 + 1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:2*rcx + 1 + rbx]"), 1, "[fs:2*rcx + 1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:rcx*4 + rbx + 1]"), 1, "[fs:rcx*4 + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:4*rcx + rbx + 1]"), 1, "[fs:4*rcx + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:rcx*4 + 1 + rbx]"), 1, "[fs:rcx*4 + 1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:4*rcx + 1 + rbx]"), 1, "[fs:4*rcx + 1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:rcx*8 + rbx + 1]"), 1, "[fs:rcx*8 + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:8*rcx + rbx + 1]"), 1, "[fs:8*rcx + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:rcx*8 + 1 + rbx]"), 1, "[fs:rcx*8 + 1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:8*rcx + 1 + rbx]"), 1, "[fs:8*rcx + 1 + rbx] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[fs:1 + rbx + rcx*1]"), 1, "[fs:1 + rbx + rcx*1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:1 + rbx + 1*rcx]"), 1, "[fs:1 + rbx + 1*rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:1 + rcx*1 + rbx]"), 1, "[fs:1 + rcx*1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:1 + 1*rcx + rbx]"), 1, "[fs:1 + 1*rcx + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:1 + rbx + rcx*2]"), 1, "[fs:1 + rbx + rcx*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:1 + rbx + 2*rcx]"), 1, "[fs:1 + rbx + 2*rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:1 + rcx*2 + rbx]"), 1, "[fs:1 + rcx*2 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:1 + 2*rcx + rbx]"), 1, "[fs:1 + 2*rcx + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:1 + rbx + rcx*4]"), 1, "[fs:1 + rbx + rcx*4] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:1 + rbx + 4*rcx]"), 1, "[fs:1 + rbx + 4*rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:1 + rcx*4 + rbx]"), 1, "[fs:1 + rcx*4 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:1 + 4*rcx + rbx]"), 1, "[fs:1 + 4*rcx + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:1 + rbx + rcx*8]"), 1, "[fs:1 + rbx + rcx*8 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:1 + rbx + 8*rcx]"), 1, "[fs:1 + rbx + 8*rcx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:1 + rcx*8 + rbx]"), 1, "[fs:1 + rcx*8 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:1 + 8*rcx + rbx]"), 1, "[fs:1 + 8*rcx + rbx] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[fs:cs*2 + rbx]"), 0, "[fs:cs*2 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:cs*2 + rbx + 1]"), 0, "[fs:cs*2 + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:rcx*2 + cs]"), 0, "[fs:rcx*2 + cs] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:rcx*2 + cs + 1]"), 0, "[fs:rcx*2 + cs + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:rbx + cs*2]"), 0, "[fs:rbx + cs*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:rbx + cs*2 + 1]"), 0, "[fs:rbx + cs*2 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:cs + rcx*2]"), 0, "[fs:cs + rcx*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:cs + rcx*2 + 1]"), 0, "[fs:cs + rcx*2 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:cs*2 + 1 + rbx]"), 0, "[fs:cs*2 + 1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:rcx*2 + 1 + cs]"), 0, "[fs:rcx*2 + 1 + cs] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:1 + cs*2 + rbx]"), 0, "[fs:1 + cs*2 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:1 + rcx*2 + cs]"), 0, "[fs:1 + rcx*2 + cs] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:1 + rbx + cs*2]"), 0, "[fs:1 + rbx + cs*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:1 + cs + rcx*2]"), 0, "[fs:1 + cs + rcx*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:rbx + 1 + cs*2]"), 0, "[fs:rbx + 1 + cs*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:cs + 1 + rcx*2]"), 0, "[fs:cs + 1 + rcx*2] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[fs:2*cs + rbx]"), 0, "[fs:2*cs + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:2*cs + rbx + 1]"), 0, "[fs:2*cs + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:rbx + 2*cs]"), 0, "[fs:rbx + 2*cs] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:rbx + 2*cs + 1]"), 0, "[fs:rbx + 2*cs + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:2*cs + 1 + rbx]"), 0, "[fs:2*cs + 1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:1 + 2*cs + rbx]"), 0, "[fs:1 + 2*cs + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:1 + rbx + 2*cs]"), 0, "[fs:1 + rbx + 2*cs] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:rbx + 1 + 2*cs]"), 0, "[fs:rbx + 1 + 2*cs] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[fs:cs + rbx]"), 0, "[fs:cs + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:cs + rbx + 1]"), 0, "[fs:cs + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:rcx + cs]"), 0, "[fs:rcx + cs] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:rcx + cs + 1]"), 0, "[fs:rcx + cs + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:1 + rbx + cs]"), 0, "[fs:1 + rbx + cs] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:1 + cs + rcx]"), 0, "[fs:1 + cs + rcx] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[fs:cs*rax + rbx]"), 0, "[fs:cs*rax + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:cs*rax + rbx + 1]"), 0, "[fs:cs*rax + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:rcx*rax + cs]"), 0, "[fs:rcx*rax + cs] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:rcx*rax + cs + 1]"), 0, "[fs:rcx*rax + cs + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:rbx + cs*rax]"), 0, "[fs:rbx + cs*rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:rbx + cs*rax + 1]"), 0, "[fs:rbx + cs*rax + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:cs + rcx*rax]"), 0, "[fs:cs + rcx*rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:cs + rcx*rax + 1]"), 0, "[fs:cs + rcx*rax + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:cs*rax + 1 + rbx]"), 0, "[fs:cs*rax + 1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:rcx*rax + 1 + cs]"), 0, "[fs:rcx*rax + 1 + cs] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:1 + cs*rax + rbx]"), 0, "[fs:1 + cs*rax + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:1 + rcx*rax + cs]"), 0, "[fs:1 + rcx*rax + cs] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:1 + rbx + cs*rax]"), 0, "[fs:1 + rbx + cs*rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:1 + cs + rcx*rax]"), 0, "[fs:1 + cs + rcx*rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:rbx + 1 + cs*rax]"), 0, "[fs:rbx + 1 + cs*rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:cs + 1 + rcx*rax]"), 0, "[fs:cs + 1 + rcx*rax] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[fs:cs*ds + rbx]"), 0, "[fs:cs*ds + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:cs*ds + rbx + 1]"), 0, "[fs:cs*ds + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:rcx*ds + cs]"), 0, "[fs:rcx*ds + cs] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:rcx*ds + cs + 1]"), 0, "[fs:rcx*ds + cs + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:rbx + cs*ds]"), 0, "[fs:rbx + cs*ds] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:rbx + cs*ds + 1]"), 0, "[fs:rbx + cs*ds + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:cs + rcx*ds]"), 0, "[fs:cs + rcx*ds] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:cs + rcx*ds + 1]"), 0, "[fs:cs + rcx*ds + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:cs*ds + 1 + rbx]"), 0, "[fs:cs*ds + 1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:rcx*ds + 1 + cs]"), 0, "[fs:rcx*ds + 1 + cs] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:1 + cs*ds + rbx]"), 0, "[fs:1 + cs*ds + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:1 + rcx*ds + cs]"), 0, "[fs:1 + rcx*ds + cs] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[fs:rbx+4*rsi+66]"), 1, "[fs:rbx+4*rsi+66] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:rbx+8*rcx-55]"), 1, "[fs:rbx+8*rcx-55] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:rbx+8*rcx+-55]"), 1, "[fs:rbx+8*rcx+-55] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:rbx+1*rbp]"), 1, "[fs:rbx+1*rbp] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:rbx+1*rbp + 2]"), 1, "[fs:rbx+1*rbp + 2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[fs:rbx+2*rbp + 2]"), 1, "[fs:rbx+2*rbp + 2] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[es:rcx*2 + rbx]"), 1, "[es:rcx*2 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:rcx*4 + rbx -1]"), 1, "[es:rcx*4 + rbx -1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:rcx*4 + rbx +-1]"), 1, "[es:rcx*4 + rbx +-1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:rcx*8 + rbx+ 44]"), 1, "[es:rcx*2 + rbx+ 44] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:rcx*1 + rsp]"), 1, "[es:rcx*1 + rsp] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:rcx*4 -1 + rbx]"), 1, "[es:rcx*4 -1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:rcx*4 +-1 + rbx]"), 1, "[es:rcx*4 +-1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:rcx*8 +44 + rbx]"), 1, "[es:rcx*2 +44+ rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:rcx*4 -1 + rbx]"), 1, "[es:rcx*4 -1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:rcx*4 +-1 + rbx]"), 1, "[es:rcx*4 +-1 + rbx] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[ds:rbx + rcx*1 + 1]"), 1, "[ds:rbx + rcx*1 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rbx + 1*rcx + 1]"), 1, "[ds:rbx + 1*rcx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rbx + 1 + rcx*1]"), 1, "[ds:rbx + 1 + rcx*1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rbx + 1 + 1*rcx]"), 1, "[ds:rbx + 1 + 1*rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rbx + rcx*2 + 1]"), 1, "[ds:rbx + rcx*2 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rbx + 2*rcx + 1]"), 1, "[ds:rbx + 2*rcx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rbx + 1 + rcx*2]"), 1, "[ds:rbx + 1 + rcx*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rbx + 1 + 2*rcx]"), 1, "[ds:rbx + 1 + 2*rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rbx + rcx*4 + 1]"), 1, "[ds:rbx + rcx*4 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rbx + 4*rcx + 1]"), 1, "[ds:rbx + 4*rcx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rbx + 1 + rcx*4]"), 1, "[ds:rbx + 1 + rcx*4] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rbx + 1 + 4*rcx]"), 1, "[ds:rbx + 1 + 4*rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rbx + rcx*8 + 1]"), 1, "[ds:rbx + rcx*8 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rbx + 8*rcx + 1]"), 1, "[ds:rbx + 8*rcx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rbx + 1 + rcx*8]"), 1, "[ds:rbx + 1 + rcx*8] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rbx + 1 + 8*rcx]"), 1, "[ds:rbx + 1 + 8*rcx] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[ds:rcx*1 + rbx + 1]"), 1, "[ds:rcx*1 + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1*rcx + rbx + 1]"), 1, "[ds:1*rcx + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rcx*1 + 1 + rbx]"), 1, "[ds:rcx*1 + 1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1*rcx + 1 + rbx]"), 1, "[ds:1*rcx + 1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rcx*2 + rbx + 1]"), 1, "[ds:rcx*2 + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:2*rcx + rbx + 1]"), 1, "[ds:2*rcx + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rcx*2 + 1 + rbx]"), 1, "[ds:rcx*2 + 1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:2*rcx + 1 + rbx]"), 1, "[ds:2*rcx + 1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rcx*4 + rbx + 1]"), 1, "[ds:rcx*4 + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:4*rcx + rbx + 1]"), 1, "[ds:4*rcx + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rcx*4 + 1 + rbx]"), 1, "[ds:rcx*4 + 1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:4*rcx + 1 + rbx]"), 1, "[ds:4*rcx + 1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rcx*8 + rbx + 1]"), 1, "[ds:rcx*8 + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:8*rcx + rbx + 1]"), 1, "[ds:8*rcx + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rcx*8 + 1 + rbx]"), 1, "[ds:rcx*8 + 1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:8*rcx + 1 + rbx]"), 1, "[ds:8*rcx + 1 + rbx] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[ds:1 + rbx + rcx*1]"), 1, "[ds:1 + rbx + rcx*1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1 + rbx + 1*rcx]"), 1, "[ds:1 + rbx + 1*rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1 + rcx*1 + rbx]"), 1, "[ds:1 + rcx*1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1 + 1*rcx + rbx]"), 1, "[ds:1 + 1*rcx + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1 + rbx + rcx*2]"), 1, "[ds:1 + rbx + rcx*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1 + rbx + 2*rcx]"), 1, "[ds:1 + rbx + 2*rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1 + rcx*2 + rbx]"), 1, "[ds:1 + rcx*2 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1 + 2*rcx + rbx]"), 1, "[ds:1 + 2*rcx + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1 + rbx + rcx*4]"), 1, "[ds:1 + rbx + rcx*4] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1 + rbx + 4*rcx]"), 1, "[ds:1 + rbx + 4*rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1 + rcx*4 + rbx]"), 1, "[ds:1 + rcx*4 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1 + 4*rcx + rbx]"), 1, "[ds:1 + 4*rcx + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1 + rbx + rcx*8]"), 1, "[ds:1 + rbx + rcx*8 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1 + rbx + 8*rcx]"), 1, "[ds:1 + rbx + 8*rcx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1 + rcx*8 + rbx]"), 1, "[ds:1 + rcx*8 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1 + 8*rcx + rbx]"), 1, "[ds:1 + 8*rcx + rbx] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[ds:rcx*1]"), 1, "[ds:rcx*1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rcx*2]"), 1, "[ds:rcx*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rcx*4]"), 1, "[ds:rcx*4] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rcx*8]"), 1, "[ds:rcx*8] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rsp*4]"), 0, "[ds:rsp*4] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rcx*2 + rbx*8]"), 0, "[ds:rcx*2 + rbx*8] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rcx + rsp*2]"), 0, "[ds:rcx + rsp*2] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[ds:1*rsp]"), 1, "[ds:1*rsp] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:2*rsp]"), 0, "[ds:2*rsp] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rcx+1*rsp]"), 1, "[ds:rcx+1*rsp] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rcx+2*rsp]"), 0, "[ds:rcx+2*rsp] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1*rsp+rsi]"), 1, "[ds:1*rsp+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:2*rsp+rsi]"), 0, "[ds:2*rsp+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1*rsp+1]"), 1, "[ds:1*rsp+1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:2*rsp+1]"), 0, "[ds:2*rsp+1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1+1*rsp]"), 1, "[ds:1+1*rsp] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1+2*rsp]"), 0, "[ds:1+2*rsp] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1+rcx+1*rsp]"), 1, "[ds:1+rcx+1*rsp] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1+rcx+2*rsp]"), 0, "[ds:1+rcx+2*rsp] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1+1*rsp+rsi]"), 1, "[ds:1+1*rsp+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1+2*rsp+rsi]"), 0, "[ds:1+2*rsp+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rcx+1+1*rsp]"), 1, "[ds:rcx+1+1*rsp] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rcx+1+2*rsp]"), 0, "[ds:rcx+1+2*rsp] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1*rsp+1+rsi]"), 1, "[ds:1*rsp+1+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:2*rsp+1+rsi]"), 0, "[ds:2*rsp+1+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rcx+1*rsp+1]"), 1, "[ds:rcx+1*rsp+1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rcx+2*rsp+1]"), 0, "[ds:rcx+2*rsp+1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1*rsp+rsi+1]"), 1, "[ds:1*rsp+rsi+1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:2*rsp+rsi+1]"), 0, "[ds:2*rsp+rsi+1] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[ds:rsp*1]"), 1, "[ds:rsp*1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rsp*2]"), 0, "[ds:rsp*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rcx+rsp*1]"), 1, "[ds:rcx+rsp*1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rcx+rsp*2]"), 0, "[ds:rcx+rsp*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rsp*1+rsi]"), 1, "[ds:rsp*1+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rsp*2+rsi]"), 0, "[ds:rsp*2+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rsp*1+1]"), 1, "[ds:rsp*1+1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rsp*2+1]"), 0, "[ds:rsp*2+1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1+rsp*1]"), 1, "[ds:1+rsp*1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1+rsp*2]"), 0, "[ds:1+rsp*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1+rcx+rsp*1]"), 1, "[ds:1+rcx+rsp*1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1+rcx+rsp*2]"), 0, "[ds:1+rcx+rsp*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1+rsp*1+rsi]"), 1, "[ds:1+rsp*1+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1+rsp*2+rsi]"), 0, "[ds:1+rsp*2+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rcx+1+rsp*1]"), 1, "[ds:rcx+1+rsp*1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rcx+1+rsp*2]"), 0, "[ds:rcx+1+rsp*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rsp*1+1+rsi]"), 1, "[ds:rsp*1+1+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rsp*2+1+rsi]"), 0, "[ds:rsp*2+1+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rcx+rsp*1+1]"), 1, "[ds:rcx+rsp*1+1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rcx+rsp*2+1]"), 0, "[ds:rcx+rsp*2+1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rsp*1+rsi+1]"), 1, "[ds:rsp*1+rsi+1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rsp*2+rsi+1]"), 0, "[ds:rsp*2+rsi+1] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[ds:z*rsp]"), 1, "[ds:z*rsp] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rcx+z*rsp]"), 1, "[ds:rcx+z*rsp] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:z*rsp+rsi]"), 1, "[ds:z*rsp+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:z*rsp+1]"), 1, "[ds:z*rsp+1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1+z*rsp]"), 1, "[ds:1+z*rsp] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1+rcx+z*rsp]"), 1, "[ds:1+rcx+z*rsp] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1+z*rsp+rsi]"), 1, "[ds:1+z*rsp+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rcx+1+z*rsp]"), 1, "[ds:rcx+1+z*rsp] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:z*rsp+1+rsi]"), 1, "[ds:z*rsp+1+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rcx+z*rsp+1]"), 1, "[ds:rcx+z*rsp+1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:z*rsp+rsi+1]"), 1, "[ds:z*rsp+rsi+1] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[ds:rsp*z]"), 1, "[ds:rsp*z] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rcx+rsp*z]"), 1, "[ds:rcx+rsp*z] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rsp*z+rsi]"), 1, "[ds:rsp*z+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rsp*z+1]"), 1, "[ds:rsp*z+1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1+rsp*z]"), 1, "[ds:1+rsp*z] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1+rcx+rsp*z]"), 1, "[ds:1+rcx+rsp*z] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1+rsp*z+rsi]"), 1, "[ds:1+rsp*z+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rcx+1+rsp*z]"), 1, "[ds:rcx+1+rsp*z] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rsp*z+1+rsi]"), 1, "[ds:rsp*z+1+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rcx+rsp*z+1]"), 1, "[ds:rcx+rsp*z+1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rsp*z+rsi+1]"), 1, "[ds:rsp*z+rsi+1] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[ds:1*rip]"), 1, "[ds:1*rip] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:2*rip]"), 0, "[ds:2*rip] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rcx+1*rip]"), 1, "[ds:rcx+1*rip] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rcx+2*rip]"), 0, "[ds:rcx+2*rip] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1*rip+rsi]"), 1, "[ds:1*rip+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:2*rip+rsi]"), 0, "[ds:2*rip+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1*rip+1]"), 1, "[ds:1*rip+1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:2*rip+1]"), 0, "[ds:2*rip+1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1+1*rip]"), 1, "[ds:1+1*rip] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1+2*rip]"), 0, "[ds:1+2*rip] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1+rcx+1*rip]"), 1, "[ds:1+rcx+1*rip] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1+rcx+2*rip]"), 0, "[ds:1+rcx+2*rip] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1+1*rip+rsi]"), 1, "[ds:1+1*rip+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1+2*rip+rsi]"), 0, "[ds:1+2*rip+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rcx+1+1*rip]"), 1, "[ds:rcx+1+1*rip] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rcx+1+2*rip]"), 0, "[ds:rcx+1+2*rip] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1*rip+1+rsi]"), 1, "[ds:1*rip+1+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:2*rip+1+rsi]"), 0, "[ds:2*rip+1+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rcx+1*rip+1]"), 1, "[ds:rcx+1*rip+1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rcx+2*rip+1]"), 0, "[ds:rcx+2*rip+1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1*rip+rsi+1]"), 1, "[ds:1*rip+rsi+1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:2*rip+rsi+1]"), 0, "[ds:2*rip+rsi+1] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[ds:rip*1]"), 1, "[ds:rip*1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rip*2]"), 0, "[ds:rip*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rcx+rip*1]"), 1, "[ds:rcx+rip*1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rcx+rip*2]"), 0, "[ds:rcx+rip*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rip*1+rsi]"), 1, "[ds:rip*1+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rip*2+rsi]"), 0, "[ds:rip*2+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rip*1+1]"), 1, "[ds:rip*1+1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rip*2+1]"), 0, "[ds:rip*2+1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1+rip*1]"), 1, "[ds:1+rip*1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1+rip*2]"), 0, "[ds:1+rip*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1+rcx+rip*1]"), 1, "[ds:1+rcx+rip*1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1+rcx+rip*2]"), 0, "[ds:1+rcx+rip*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1+rip*1+rsi]"), 1, "[ds:1+rip*1+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1+rip*2+rsi]"), 0, "[ds:1+rip*2+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rcx+1+rip*1]"), 1, "[ds:rcx+1+rip*1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rcx+1+rip*2]"), 0, "[ds:rcx+1+rip*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rip*1+1+rsi]"), 1, "[ds:rip*1+1+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rip*2+1+rsi]"), 0, "[ds:rip*2+1+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rcx+rip*1+1]"), 1, "[ds:rcx+rip*1+1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rcx+rip*2+1]"), 0, "[ds:rcx+rip*2+1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rip*1+rsi+1]"), 1, "[ds:rip*1+rsi+1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rip*2+rsi+1]"), 0, "[ds:rip*2+rsi+1] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[ds:z*rip]"), 1, "[ds:z*rip] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rcx+z*rip]"), 1, "[ds:rcx+z*rip] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:z*rip+rsi]"), 1, "[ds:z*rip+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:z*rip+1]"), 1, "[ds:z*rip+1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1+z*rip]"), 1, "[ds:1+z*rip] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1+rcx+z*rip]"), 1, "[ds:1+rcx+z*rip] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1+z*rip+rsi]"), 1, "[ds:1+z*rip+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rcx+1+z*rip]"), 1, "[ds:rcx+1+z*rip] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:z*rip+1+rsi]"), 1, "[ds:z*rip+1+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rcx+z*rip+1]"), 1, "[ds:rcx+z*rip+1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:z*rip+rsi+1]"), 1, "[ds:z*rip+rsi+1] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[ds:rip*z]"), 1, "[ds:rip*z] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rcx+rip*z]"), 1, "[ds:rcx+rip*z] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rip*z+rsi]"), 1, "[ds:rip*z+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rip*z+1]"), 1, "[ds:rip*z+1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1+rip*z]"), 1, "[ds:1+rip*z] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1+rcx+rip*z]"), 1, "[ds:1+rcx+rip*z] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1+rip*z+rsi]"), 1, "[ds:1+rip*z+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rcx+1+rip*z]"), 1, "[ds:rcx+1+rip*z] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rip*z+1+rsi]"), 1, "[ds:rip*z+1+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rcx+rip*z+1]"), 1, "[ds:rcx+rip*z+1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rip*z+rsi+1]"), 1, "[ds:rip*z+rsi+1] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[ds:1*rcx]"), 1, "[ds:1*rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:2*rcx]"), 1, "[ds:2*rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:4*rcx]"), 1, "[ds:4*rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:8*rcx]"), 1, "[ds:8*rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:4*rsp]"), 0, "[ds:4*rsp] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:2*rcx + rbx*8]"), 0, "[ds:2*rcx + rbx*8] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rcx + 2*rsp]"), 0, "[ds:rcx + 2*rsp] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[ds:rcx*2]"), 1, "[ds:rcx*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rsp*1]"), 1, "[ds:rsp*1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rsp*4]"), 0, "[ds:rsp*4] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rcx*2 + rbx*8]"), 0, "[ds:rcx*2 + rbx*8] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rcx + rsp*2]"), 0, "[ds:rcx + rsp*2] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[cs:1+rax]"), 1, "[cs:1+rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[cs:-2+rdx]"), 1, "[cs:-2+rdx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[cs:3+rbx*2]"), 1, "[cs:3+rbx*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[cs:-4+rsi*4]"), 1, "[cs:-4+rsi*4] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[cs:5+rcx+rsi]"), 1, "[cs:5+rcx+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[cs:-6+rcx*2+rdi]"), 1, "[cs:-6+rcx*2+rdi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[cs:7+rsp+rbp*8]"), 1, "[cs:7+rsp+rbp*8] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[cs:-8+rsp+rbp*8]"), 1, "[cs:-8+rsp+rbp*8] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[ds:dl + rbx]"), 0, "[ds:dl + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rcx + dl]"), 0, "[ds:rcx + dl] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:cr0 + rbx]"), 0, "[ds:cr0 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rcx + cr0]"), 0, "[ds:rcx + cr0] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:ax + rbx]"), 0, "[ds:ax + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rcx + ax]"), 0, "[ds:rcx + ax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:mm2 + rbx]"), 0, "[ds:mm2 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rcx + mm2]"), 0, "[ds:rcx + mm2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:st0 + rbx]"), 0, "[ds:st0 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rcx + st0]"), 0, "[ds:rcx + st0] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:r9d + rbx]"), 0, "[ds:r9d + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rcx + r9d]"), 0, "[ds:rcx + r9d] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rdx + ebx]"), 0, "[ds:rdx + ebx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:ecx + rdx]"), 0, "[ds:ecx + rdx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rax - rbx]"), 0, "[ds:rax - rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:- rcx + rdx]"), 0, "[ds:- rcx + rdx] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[ds:dl*2 + rbx]"), 0, "[ds:dl*2 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:dl*2 + rbx + 1]"), 0, "[ds:dl*2 + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rcx*2 + dl]"), 0, "[ds:rcx*2 + dl] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rcx*2 + dl + 1]"), 0, "[ds:rcx*2 + dl + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rbx + dl*2]"), 0, "[ds:rbx + dl*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rbx + dl*2 + 1]"), 0, "[ds:rbx + dl*2 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:dl + rcx*2]"), 0, "[ds:dl + rcx*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:dl + rcx*2 + 1]"), 0, "[ds:dl + rcx*2 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:dl*2 + 1 + rbx]"), 0, "[ds:dl*2 + 1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rcx*2 + 1 + dl]"), 0, "[ds:rcx*2 + 1 + dl] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1 + dl*2 + rbx]"), 0, "[ds:1 + dl*2 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1 + rcx*2 + dl]"), 0, "[ds:1 + rcx*2 + dl] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[ds:dl + rbx]"), 0, "[ds:dl + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:dl + rbx + 1]"), 0, "[ds:dl + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rcx + dl]"), 0, "[ds:rcx + dl] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rcx + dl + 1]"), 0, "[ds:rcx + dl + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1 + dl + rbx]"), 0, "[ds:1 + dl + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1 + rcx + dl]"), 0, "[ds:1 + rcx + dl] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[ds:2*cr0 + rbx]"), 0, "[ds:2*cr0 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:2*cr0 + rbx + 1]"), 0, "[ds:2*cr0 + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:2*rcx + cr0]"), 0, "[ds:2*rcx + cr0] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:2*rcx + cr0 + 1]"), 0, "[ds:2*rcx + cr0 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rbx + 2*cr0]"), 0, "[ds:rbx + 2*cr0] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rbx + 2*cr0 + 1]"), 0, "[ds:rbx + 2*cr0 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rbx + 1 + 2*cr0]"), 0, "[ds:rbx + 1 + 2*cr0] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:cr0 + 2*rcx]"), 0, "[ds:cr0 + 2*rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:cr0 + 2*rcx + 1]"), 0, "[ds:cr0 + 2*rcx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:cr0 + 1 + 2*rcx]"), 0, "[ds:cr0 + 1 + 2*rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:2*cr0 + 1 + rbx]"), 0, "[ds:2*cr0 + 1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:2*rcx + 1 + cr0]"), 0, "[ds:2*rcx + 1 + cr0] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1 + 2*cr0 + rbx]"), 0, "[ds:1 + 2*cr0 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1 + 2*rcx + cr0]"), 0, "[ds:1 + 2*rcx + cr0] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1 + rbx + 2*cr0]"), 0, "[ds:1 + rbx + 2*cr0] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1 + cr0 + 2*rcx]"), 0, "[ds:1 + cr0 + 2*rcx] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[ds:cr0*2 + rbx]"), 0, "[ds:cr0*2 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:cr0*2 + rbx + 1]"), 0, "[ds:cr0*2 + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rcx*2 + cr0]"), 0, "[ds:rcx*2 + cr0] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rcx*2 + cr0 + 1]"), 0, "[ds:rcx*2 + cr0 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rbx + cr0*2]"), 0, "[ds:rbx + cr0*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rbx + cr0*2 + 1]"), 0, "[ds:rbx + cr0*2 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rbx + 1 + cr0*2]"), 0, "[ds:rbx + 1 + cr0*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:cr0 + rcx*2]"), 0, "[ds:cr0 + rcx*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:cr0 + rcx*2 + 1]"), 0, "[ds:cr0 + rcx*2 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:cr0 + 1 + rcx*2]"), 0, "[ds:cr0 + 1 + rcx*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:cr0*2 + 1 + rbx]"), 0, "[ds:cr0*2 + 1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rcx*2 + 1 + cr0]"), 0, "[ds:rcx*2 + 1 + cr0] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1 + cr0*2 + rbx]"), 0, "[ds:1 + cr0*2 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1 + rcx*2 + cr0]"), 0, "[ds:1 + rcx*2 + cr0] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1 + rbx + cr0*2]"), 0, "[ds:1 + rbx + cr0*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1 + cr0 + rcx*2]"), 0, "[ds:1 + cr0 + rcx*2] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[ds:cr0 + rbx + 1]"), 0, "[ds:cr0 + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rcx + cr0 + 1]"), 0, "[ds:rcx + cr0 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rbx + 1 + cr0]"), 0, "[ds:rbx + 1 + cr0] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:cr0 + 1 + rcx]"), 0, "[ds:cr0 + 1 + rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1 + rbx + cr0]"), 0, "[ds:1 + rbx + cr0] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1 + cr0 + rcx]"), 0, "[ds:1 + cr0 + rcx] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[ds:cr0 + rbx]"), 0, "[ds:cr0 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rcx + cr0]"), 0, "[ds:rcx + cr0] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[ds:2*mm0 + rbx]"), 0, "[ds:2*mm0 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:2*mm0 + rbx + 1]"), 0, "[ds:2*mm0 + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:2*rcx + mm0]"), 0, "[ds:2*rcx + mm0] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:2*rcx + mm0 + 1]"), 0, "[ds:2*rcx + mm0 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rbx + 2*mm0]"), 0, "[ds:rbx + 2*mm0] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rbx + 2*mm0 + 1]"), 0, "[ds:rbx + 2*mm0 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rbx + 1 + 2*mm0]"), 0, "[ds:rbx + 1 + 2*mm0] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:mm0 + 2*rcx]"), 0, "[ds:mm0 + 2*rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:mm0 + 2*rcx + 1]"), 0, "[ds:mm0 + 2*rcx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:mm0 + 1 + 2*rcx]"), 0, "[ds:mm0 + 1 + 2*rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:2*mm0 + 1 + rbx]"), 0, "[ds:2*mm0 + 1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:2*rcx + 1 + mm0]"), 0, "[ds:2*rcx + 1 + mm0] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1 + 2*mm0 + rbx]"), 0, "[ds:1 + 2*mm0 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1 + 2*rcx + mm0]"), 0, "[ds:1 + 2*rcx + mm0] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1 + rbx + 2*mm0]"), 0, "[ds:1 + rbx + 2*mm0] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1 + mm0 + 2*rcx]"), 0, "[ds:1 + mm0 + 2*rcx] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[ds:mm0*2 + rbx]"), 0, "[ds:mm0*2 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:mm0*2 + rbx + 1]"), 0, "[ds:mm0*2 + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rcx*2 + mm0]"), 0, "[ds:rcx*2 + mm0] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rcx*2 + mm0 + 1]"), 0, "[ds:rcx*2 + mm0 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rbx + mm0*2]"), 0, "[ds:rbx + mm0*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rbx + mm0*2 + 1]"), 0, "[ds:rbx + mm0*2 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rbx + 1 + mm0*2]"), 0, "[ds:rbx + 1 + mm0*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:mm0 + rcx*2]"), 0, "[ds:mm0 + rcx*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:mm0 + rcx*2 + 1]"), 0, "[ds:mm0 + rcx*2 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:mm0 + 1 + rcx*2]"), 0, "[ds:mm0 + 1 + rcx*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:mm0*2 + 1 + rbx]"), 0, "[ds:mm0*2 + 1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rcx*2 + 1 + mm0]"), 0, "[ds:rcx*2 + 1 + mm0] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1 + mm0*2 + rbx]"), 0, "[ds:1 + mm0*2 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1 + rcx*2 + mm0]"), 0, "[ds:1 + rcx*2 + mm0] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1 + rbx + mm0*2]"), 0, "[ds:1 + rbx + mm0*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1 + mm0 + rcx*2]"), 0, "[ds:1 + mm0 + rcx*2] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[ds:mm0 + rbx + 1]"), 0, "[ds:mm0 + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rcx + mm0 + 1]"), 0, "[ds:rcx + mm0 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rbx + 1 + mm0]"), 0, "[ds:rbx + 1 + mm0] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:mm0 + 1 + rcx]"), 0, "[ds:mm0 + 1 + rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1 + rbx + mm0]"), 0, "[ds:1 + rbx + mm0] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1 + mm0 + rcx]"), 0, "[ds:1 + mm0 + rcx] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[ds:mm0 + rbx]"), 0, "[ds:mm0 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rcx + mm0]"), 0, "[ds:rcx + mm0] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[ds:2*st0 + rbx]"), 0, "[ds:2*st0 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:2*st0 + rbx + 1]"), 0, "[ds:2*st0 + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:2*rcx + st0]"), 0, "[ds:2*rcx + st0] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:2*rcx + st0 + 1]"), 0, "[ds:2*rcx + st0 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rbx + 2*st0]"), 0, "[ds:rbx + 2*st0] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rbx + 2*st0 + 1]"), 0, "[ds:rbx + 2*st0 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rbx + 1 + 2*st0]"), 0, "[ds:rbx + 1 + 2*st0] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:st0 + 2*rcx]"), 0, "[ds:st0 + 2*rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:st0 + 2*rcx + 1]"), 0, "[ds:st0 + 2*rcx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:st0 + 1 + 2*rcx]"), 0, "[ds:st0 + 1 + 2*rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:2*st0 + 1 + rbx]"), 0, "[ds:2*st0 + 1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:2*rcx + 1 + st0]"), 0, "[ds:2*rcx + 1 + st0] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1 + 2*st0 + rbx]"), 0, "[ds:1 + 2*st0 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1 + 2*rcx + st0]"), 0, "[ds:1 + 2*rcx + st0] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1 + rbx + 2*st0]"), 0, "[ds:1 + rbx + 2*st0] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1 + st0 + 2*rcx]"), 0, "[ds:1 + st0 + 2*rcx] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[ds:st0*2 + rbx]"), 0, "[ds:st0*2 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:st0*2 + rbx + 1]"), 0, "[ds:st0*2 + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rcx*2 + st0]"), 0, "[ds:rcx*2 + st0] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rcx*2 + st0 + 1]"), 0, "[ds:rcx*2 + st0 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rbx + st0*2]"), 0, "[ds:rbx + st0*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rbx + st0*2 + 1]"), 0, "[ds:rbx + st0*2 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rbx + 1 + st0*2]"), 0, "[ds:rbx + 1 + st0*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:st0 + rcx*2]"), 0, "[ds:st0 + rcx*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:st0 + rcx*2 + 1]"), 0, "[ds:st0 + rcx*2 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:st0 + 1 + rcx*2]"), 0, "[ds:st0 + 1 + rcx*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:st0*2 + 1 + rbx]"), 0, "[ds:st0*2 + 1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rcx*2 + 1 + st0]"), 0, "[ds:rcx*2 + 1 + st0] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1 + st0*2 + rbx]"), 0, "[ds:1 + st0*2 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1 + rcx*2 + st0]"), 0, "[ds:1 + rcx*2 + st0] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1 + rbx + st0*2]"), 0, "[ds:1 + rbx + st0*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1 + st0 + rcx*2]"), 0, "[ds:1 + st0 + rcx*2] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[ds:st0 + rbx + 1]"), 0, "[ds:st0 + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rcx + st0 + 1]"), 0, "[ds:rcx + st0 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rbx + 1 + st0]"), 0, "[ds:rbx + 1 + st0] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:st0 + 1 + rcx]"), 0, "[ds:st0 + 1 + rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1 + rbx + st0]"), 0, "[ds:1 + rbx + st0] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1 + st0 + rcx]"), 0, "[ds:1 + st0 + rcx] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[ds:st0 + rbx]"), 0, "[ds:st0 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rcx + st0]"), 0, "[ds:rcx + st0] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[ds:2*ax + rbx]"), 0, "[ds:2*ax + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:2*ax + rbx + 1]"), 0, "[ds:2*ax + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:2*rcx + ax]"), 0, "[ds:2*rcx + ax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:2*rcx + ax + 1]"), 0, "[ds:2*rcx + ax + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rbx + 2*ax]"), 0, "[ds:rbx + 2*ax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rbx + 2*ax + 1]"), 0, "[ds:rbx + 2*ax + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rbx + 1 + 2*ax]"), 0, "[ds:rbx + 1 + 2*ax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:ax + 2*rcx]"), 0, "[ds:ax + 2*rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:ax + 2*rcx + 1]"), 0, "[ds:ax + 2*rcx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:ax + 1 + 2*rcx]"), 0, "[ds:ax + 1 + 2*rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:2*ax + 1 + rbx]"), 0, "[ds:2*ax + 1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:2*rcx + 1 + ax]"), 0, "[ds:2*rcx + 1 + ax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1 + 2*ax + rbx]"), 0, "[ds:1 + 2*ax + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1 + 2*rcx + ax]"), 0, "[ds:1 + 2*rcx + ax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1 + rbx + 2*ax]"), 0, "[ds:1 + rbx + 2*ax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1 + ax + 2*rcx]"), 0, "[ds:1 + ax + 2*rcx] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[ds:ax*2 + rbx]"), 0, "[ds:ax*2 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:ax*2 + rbx + 1]"), 0, "[ds:ax*2 + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rcx*2 + ax]"), 0, "[ds:rcx*2 + ax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rcx*2 + ax + 1]"), 0, "[ds:rcx*2 + ax + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rbx + ax*2]"), 0, "[ds:rbx + ax*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rbx + ax*2 + 1]"), 0, "[ds:rbx + ax*2 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rbx + 1 + ax*2]"), 0, "[ds:rbx + 1 + ax*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:ax + rcx*2]"), 0, "[ds:ax + rcx*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:ax + rcx*2 + 1]"), 0, "[ds:ax + rcx*2 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:ax + 1 + rcx*2]"), 0, "[ds:ax + 1 + rcx*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:ax*2 + 1 + rbx]"), 0, "[ds:ax*2 + 1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rcx*2 + 1 + ax]"), 0, "[ds:rcx*2 + 1 + ax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1 + ax*2 + rbx]"), 0, "[ds:1 + ax*2 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1 + rcx*2 + ax]"), 0, "[ds:1 + rcx*2 + ax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1 + rbx + ax*2]"), 0, "[ds:1 + rbx + ax*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1 + ax + rcx*2]"), 0, "[ds:1 + ax + rcx*2] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[ds:ax + rbx + 1]"), 0, "[ds:ax + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rcx + ax + 1]"), 0, "[ds:rcx + ax + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rbx + 1 + ax]"), 0, "[ds:rbx + 1 + ax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:ax + 1 + rcx]"), 0, "[ds:ax + 1 + rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1 + rbx + ax]"), 0, "[ds:1 + rbx + ax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1 + ax + rcx]"), 0, "[ds:1 + ax + rcx] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[ds:ax + rbx]"), 0, "[ds:ax + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rcx + ax]"), 0, "[ds:rcx + ax] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[ds:2*eax + rbx]"), 0, "[ds:2*eax + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:2*rax + ebx + 1]"), 0, "[ds:2*rax + ebx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:2*rcx + eax]"), 0, "[ds:2*rcx + eax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:2*ecx + rax + 1]"), 0, "[ds:2*ecx + rax + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rbx + 2*eax]"), 0, "[ds:rbx + 2*eax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rbx + 2*eax + 1]"), 0, "[ds:rbx + 2*eax + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rbx + 1 + 2*eax]"), 0, "[ds:rbx + 1 + 2*eax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:eax + 2*rcx]"), 0, "[ds:eax + 2*rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:eax + 2*rcx + 1]"), 0, "[ds:eax + 2*rcx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:eax + 1 + 2*rcx]"), 0, "[ds:eax + 1 + 2*rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:2*ebx + 1 + rax]"), 0, "[ds:2*ebx + 1 + eax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:2*rcx + 1 + eax]"), 0, "[ds:2*rcx + 1 + eax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1 + 2*rbx + eax]"), 0, "[ds:1 + 2*rbx + eax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1 + 2*ecx + rax]"), 0, "[ds:1 + 2*ecx + rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1 + eax + 2*rbx]"), 0, "[ds:1 + eax + 2*rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1 + rax + 2*ecx]"), 0, "[ds:1 + rax + 2*ecx] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[ds:eax*2 + rbx]"), 0, "[ds:eax*2 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rax*2 + ebx + 1]"), 0, "[ds:rax*2 + ebx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rcx*2 + eax]"), 0, "[ds:rcx*2 + eax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:ecx*2 + rax + 1]"), 0, "[ds:ecx*2 + rax + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rbx + eax*2]"), 0, "[ds:rbx + eax*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rbx + eax*2 + 1]"), 0, "[ds:rbx + eax*2 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rbx + 1 + eax*2]"), 0, "[ds:rbx + 1 + eax*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:eax + rcx*2]"), 0, "[ds:eax + rcx*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:eax + rcx*2 + 1]"), 0, "[ds:eax + rcx*2 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:eax + 1 + rcx*2]"), 0, "[ds:eax + 1 + rcx*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:ebx*2 + 1 + rax]"), 0, "[ds:ebx*2 + 1 + rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rcx*2 + 1 + eax]"), 0, "[ds:rcx*2 + 1 + eax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1 + rbx*2 + eax]"), 0, "[ds:1 + rbx*2 + eax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1 + ecx*2 + rax]"), 0, "[ds:1 + ecx*2 + rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1 + eax + rbx*2]"), 0, "[ds:1 + eax + rbx*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1 + rax + ecx*2]"), 0, "[ds:1 + rax + ecx*2] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[ds:eax + rbx + 1]"), 0, "[ds:eax + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rcx + eax + 1]"), 0, "[ds:rcx + eax + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rbx + 1 + eax]"), 0, "[ds:rbx + 1 + eax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:eax + 1 + rcx]"), 0, "[ds:eax + 1 + rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1 + rbx + eax]"), 0, "[ds:1 + rbx + eax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1 + eax + rcx]"), 0, "[ds:1 + eax + rcx] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[ds:eax + rbx]"), 0, "[ds:eax + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rcx + eax]"), 0, "[ds:rcx + eax] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[ds:2*r9d + rbx]"), 0, "[ds:2*r9d + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:2*r9d + rbx + 1]"), 0, "[ds:2*r9d + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:2*rcx + r9d]"), 0, "[ds:2*rcx + r9d] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:2*r9d + rax + 1]"), 0, "[ds:2*r9d + rax + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rbx + 2*r9d]"), 0, "[ds:rbx + 2*r9d] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rbx + 2*r9d + 1]"), 0, "[ds:rbx + 2*r9d + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rbx + 1 + 2*r9d]"), 0, "[ds:rbx + 1 + 2*r9d] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:r9d + 2*rcx]"), 0, "[ds:r9d + 2*rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:r9d + 2*rcx + 1]"), 0, "[ds:r9d + 2*rcx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:r9d + 1 + 2*rcx]"), 0, "[ds:r9d + 1 + 2*rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:2*r9d + 1 + rbx]"), 0, "[ds:2*r9d + 1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:2*rcx + 1 + r9d]"), 0, "[ds:2*rcx + 1 + r9d] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1 + 2*r9d + rbx]"), 0, "[ds:1 + 2*r9d + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1 + 2*rcx + r9d]"), 0, "[ds:1 + 2*rcx + r9d] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1 + rbx + 2*r9d]"), 0, "[ds:1 + rbx + 2*r9d] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1 + r9d + 2*rcx]"), 0, "[ds:1 + r9d + 2*rcx] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[ds:r9d*2 + rbx]"), 0, "[ds:r9d*2 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:r9d*2 + rbx + 1]"), 0, "[ds:r9d*2 + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rcx*2 + r9d]"), 0, "[ds:rcx*2 + r9d] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:r9d*2 + rax + 1]"), 0, "[ds:r9d*2 + rax + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rbx + r9d*2]"), 0, "[ds:rbx + r9d*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rbx + r9d*2 + 1]"), 0, "[ds:rbx + r9d*2 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rbx + 1 + r9d*2]"), 0, "[ds:rbx + 1 + r9d*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:r9d + rcx*2]"), 0, "[ds:r9d + rcx*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:r9d + rcx*2 + 1]"), 0, "[ds:r9d + rcx*2 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:r9d + 1 + rcx*2]"), 0, "[ds:r9d + 1 + rcx*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:r9d*2 + 1 + rbx]"), 0, "[ds:r9d*2 + 1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rcx*2 + 1 + r9d]"), 0, "[ds:rcx*2 + 1 + r9d] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1 + r9d*2 + rbx]"), 0, "[ds:1 + r9d*2 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1 + rcx*2 + r9d]"), 0, "[ds:1 + rcx*2 + r9d] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1 + rbx + r9d*2]"), 0, "[ds:1 + rbx + r9d*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1 + r9d + rcx*2]"), 0, "[ds:1 + r9d + rcx*2] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[ds:r9d + rbx + 1]"), 0, "[ds:r9d + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:r9d + rax + 1]"), 0, "[ds:r9d + rax + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rbx + 1 + r9d]"), 0, "[ds:rbx + 1 + r9d] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:r9d + 1 + rcx]"), 0, "[ds:r9d + 1 + rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1 + rbx + r9d]"), 0, "[ds:1 + rbx + r9d] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1 + r9d + rcx]"), 0, "[ds:1 + r9d + rcx] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[ds:r9d + rbx]"), 0, "[ds:r9d + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rcx + r9d]"), 0, "[ds:rcx + r9d] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[ds:2*cl + rbx]"), 0, "[ds:2*cl + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:2*rax + cl + 1]"), 0, "[ds:2*rax + cl + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:2*rcx + cl]"), 0, "[ds:2*rcx + cl] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:2*cl + rax + 1]"), 0, "[ds:2*cl + rax + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rbx + 2*cl]"), 0, "[ds:rbx + 2*cl] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rbx + 2*cl + 1]"), 0, "[ds:rbx + 2*cl + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rbx + 1 + 2*cl]"), 0, "[ds:rbx + 1 + 2*cl] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:cl + 2*rcx]"), 0, "[ds:cl + 2*rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:cl + 2*rcx + 1]"), 0, "[ds:cl + 2*rcx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:cl + 1 + 2*rcx]"), 0, "[ds:cl + 1 + 2*rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:2*cl + 1 + rax]"), 0, "[ds:2*cl + 1 + rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:2*rcx + 1 + cl]"), 0, "[ds:2*rcx + 1 + cl] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1 + 2*cl + rbx]"), 0, "[ds:1 + 2*cl + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1 + 2*rax + cl]"), 0, "[ds:1 + 2*rax + cl] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1 + rbx + 2*cl]"), 0, "[ds:1 + rbx + 2*cl] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1 + cl + 2*rax]"), 0, "[ds:1 + cl + 2*rax] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[ds:cl*2 + rbx]"), 0, "[ds:cl*2 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rax*2 + cl + 1]"), 0, "[ds:rax*2 + cl + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rcx*2 + cl]"), 0, "[ds:rcx*2 + cl] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:cl*2 + rax + 1]"), 0, "[ds:cl*2 + rax + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rbx + cl*2]"), 0, "[ds:rbx + cl*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rbx + cl*2 + 1]"), 0, "[ds:rbx + cl*2 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rbx + 1 + cl*2]"), 0, "[ds:rbx + 1 + cl*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:cl + rcx*2]"), 0, "[ds:cl + rcx*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:cl + rcx*2 + 1]"), 0, "[ds:cl + rcx*2 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:cl + 1 + rcx*2]"), 0, "[ds:cl + 1 + rcx*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:cl*2 + 1 + rax]"), 0, "[ds:cl*2 + 1 + rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rcx*2 + 1 + cl]"), 0, "[ds:rcx*2 + 1 + cl] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1 + cl*2 + rbx]"), 0, "[ds:1 + cl*2 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1 + rax*2 + cl]"), 0, "[ds:1 + rax*2 + cl] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1 + rbx + cl*2]"), 0, "[ds:1 + rbx + cl*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1 + cl + rax*2]"), 0, "[ds:1 + cl + rax*2] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[es:cs + rbx]"), 0, "[es:cs + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:cs + rbx + 1]"), 0, "[es:cs + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:ecx + cs]"), 0, "[es:ecx + cs] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:ecx + cs + 1]"), 0, "[es:ecx + cs + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:cs + 1 + rbx]"), 0, "[es:cs + 1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:ecx + 1 + cs]"), 0, "[es:ecx + 1 + cs] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:1 + cs + rbx]"), 0, "[es:1 + cs + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:1 + ecx + cs]"), 0, "[es:1 + ecx + cs] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[es:cs*ds + rbx]"), 0, "[es:cs*ds + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:cs*ds + rbx + 1]"), 0, "[es:cs*ds + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:rcx*ds + cs]"), 0, "[es:rcx*ds + cs] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:rcx*ds + cs + 1]"), 0, "[es:rcx*ds + cs + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:rbx + cs*ds]"), 0, "[es:rbx + cs*ds] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:rbx + cs*ds + 1]"), 0, "[es:rbx + cs*ds + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:rbx + 1 + cs*ds]"), 0, "[es:rbx + 1 + cs*ds] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:cs + rcx*ds]"), 0, "[es:cs + rcx*ds] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:cs + rcx*ds + 1]"), 0, "[es:cs + rcx*ds + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:cs + 1 + rcx*ds]"), 0, "[es:cs + 1 + rcx*ds] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:cs*ds + 1 + rbx]"), 0, "[es:cs*ds + 1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:rcx*ds + 1 + cs]"), 0, "[es:rcx*ds + 1 + cs] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:1 + cs*ds + rbx]"), 0, "[es:1 + cs*ds + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:1 + rcx*ds + cs]"), 0, "[es:1 + rcx*ds + cs] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:1 + rbx + cs*ds]"), 0, "[es:1 + rbx + cs*ds] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:1 + cs + rcx*ds]"), 0, "[es:1 + cs + rcx*ds] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[ds:cs + rbx]"), 0, "[ds:cs + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:cs + rbx + 1]"), 0, "[ds:cs + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:ecx + cs]"), 0, "[ds:ecx + cs] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:ecx + cs + 1]"), 0, "[ds:ecx + cs + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:cs + 1 + rbx]"), 0, "[ds:cs + 1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:ecx + 1 + cs]"), 0, "[ds:ecx + 1 + cs] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1 + cs + rbx]"), 0, "[ds:1 + cs + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1 + ecx + cs]"), 0, "[ds:1 + ecx + cs] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[ds:cs*2]"), 0, "[ds:cs*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:2*cs]"), 0, "[ds:2*cs] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:dl*2]"), 0, "[ds:dl*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:2*dl]"), 0, "[ds:2*dl] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:cr0*2]"), 0, "[ds:cr0*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:2*cr0]"), 0, "[ds:2*cr0] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:ax*2]"), 0, "[ds:ax*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:2*ax]"), 0, "[ds:2*ax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:mm1*2]"), 0, "[ds:mm1*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:2*mm1]"), 0, "[ds:2*mm1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:st1*2]"), 0, "[ds:st1*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:2*st1]"), 0, "[ds:2*st1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:ecx*2]"), 1, "[ds:ecx*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:2*ecx]"), 1, "[ds:2*ecx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:r9d*2]"), 1, "[ds:r9d*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:2*r9d]"), 1, "[ds:2*r9d] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rax*rbx]"), 0, "[ds:rax*rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:-2*rax]"), 0, "[ds:-2*rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:-rax*2]"), 0, "[ds:-rax*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:-1*2]"), 1, "[ds:-1*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rax*5]"), 0, "[ds:rax*5] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:5*rax]"), 0, "[ds:5*rax] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[ds:cs]"), 0, "[ds:cs] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:dl]"), 0, "[ds:dl] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:cr0]"), 0, "[ds:cr0] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:r9d]"), 1, "[ds:r9d] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:ax]"), 0, "[ds:ax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:mm1]"), 0, "[ds:mm1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:st1]"), 0, "[ds:st1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:ecx]"), 1, "[ds:ecx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:-rax]"), 0, "[ds:-rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:-1]"), 1, "[ds:-1] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[es:-rax + rcx*2 + 1]"), 0, "[es:-rax + rcx*2 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[-rax + rcx*2 + 1]"), 0, "es:[-rax + rcx*2 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:-rax + 1 + rcx*2]"), 0, "[es:-rax + 1 + rcx*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[-rax + 1 + rcx*2]"), 0, "es:[-rax + 1 + rcx*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:rax + 1 - rcx*2]"), 0, "[es:rax + 1 - rcx*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[rax + 1 - rcx*2]"), 0, "es:[rax + 1 - rcx*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:1 -rax + rcx*2]"), 0, "[es:1 -rax + rcx*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[1 -rax + rcx*2]"), 0, "es:[1 -rax + rcx*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:1 + rax - rcx*2]"), 0, "[es:1 + rax - rcx*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[1 + rax - rcx*2]"), 0, "es:[1 + rax - rcx*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:1 + rcx*2 -rax]"), 0, "[es:1 + rcx*2 -rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[1 + rcx*2 -rax]"), 0, "es:[1 + rcx*2 -rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:rax - rcx*2 + 1]"), 0, "[es:rax - rcx*2 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[rax - rcx*2 + 1]"), 0, "es:[rax - rcx*2 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:rcx*2 + 1 - rax]"), 0, "[es:rcx*2 + 1-rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[rcx*2 + 1 - rax]"), 0, "es:[rcx*2 + 1-rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:rcx*2 - rax + 1]"), 0, "[es:rcx*2-rax + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[rcx*2 - rax + 1]"), 0, "es:[rcx*2-rax + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:-rcx*2 + rax + 1]"), 0, "[es:-rcx*2 + rax + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[-rcx*2 + rax + 1]"), 0, "es:[-rcx*2 + rax + 1] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[es:-rax + rcx*2]"), 0, "[es:-rax + rcx*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[-rax + rcx*2]"), 0, "es:[-rax + rcx*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:rcx*2-rax]"), 0, "[es:rcx*2-rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[rcx*2-rax]"), 0, "es:[rcx*2-rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:rax - rcx*2]"), 0, "[es:rax - rcx*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[rax - rcx*2]"), 0, "es:[rax - rcx*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:-rcx*2+rax]"), 0, "[es:-rcx*2+rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[-rcx*2+rax]"), 0, "es:[-rcx*2+rax] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[es:-rax + rcx]"), 0, "[es:-rax + rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[-rax + rcx]"), 0, "es:[-rax + rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:rax - rcx]"), 0, "[es:rax - rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[rax - rcx]"), 0, "es:[rax - rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:-rax]"), 0, "[es:-rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("es:[-rax]"), 0, "es:[-rax] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[es:rax*2 + rbx + rdx]"), 0, "[es:rax*2 + rbx + rdx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:2*rcx + rax + rdx]"), 0, "[es:2*rcx + rax + rdx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:rbx + rax*2 + rdx]"), 0, "[es:rbx + rax*2 + rdx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:rax + 2*rcx + rdx]"), 0, "[es:rax + 2*rcx + rdx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:rdx + rbx + rax*2]"), 0, "[es:rdx + rbx + rax*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:rdx + rax + 2*rcx]"), 0, "[es:rdx + rax + 2*rcx] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[es:3*2 + rbx]"), 1, "[es:3*2 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:3*2 + rbx + 1]"), 1, "[es:3*2 + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:rcx*2 + 3]"), 1, "[es:rcx*2 + 3] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:rcx*2 + 3 + 1]"), 1, "[es:rcx*2 + 3 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:rbx + 3*2]"), 1, "[es:rbx + 3*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:rbx + 3*2 + 1]"), 1, "[es:rbx + 3*2 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:rbx + 1 + 3*2]"), 1, "[es:rbx + 1 + 3*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:3 + rcx*2]"), 1, "[es:3 + rcx*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:3 + rcx*2 + 1]"), 1, "[es:3 + rcx*2 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:3 + rcx + 1*2]"), 1, "[es:3 + rcx*2 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:3*2 + 1 + rbx]"), 1, "[es:3*2 + 1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:rcx*2 + 1 + 3]"), 1, "[es:rcx*2 + 1 + 3] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:1 + 3*2 + rbx]"), 1, "[es:1 + 3*2 + rbx] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[es:cs*rax + rbx]"), 0, "[es:cs*rax + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:cs*rax + rbx + 1]"), 0, "[es:cs*rax + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:rcx*rax + cs]"), 0, "[es:rcx*rax + cs] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:rcx*rax + cs + 1]"), 0, "[es:rcx*rax + cs + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:rbx + cs*rax]"), 0, "[es:rbx + cs*rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:rbx + cs*rax + 1]"), 0, "[es:rbx + cs*rax + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:rbx + 1 + cs*rax]"), 0, "[es:rbx + 1 + cs*rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:cs + rcx*rax]"), 0, "[es:cs + rcx*rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:cs + rcx*rax + 1]"), 0, "[es:cs + rcx*rax + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:cs + 1 + rcx*rax]"), 0, "[es:cs + 1 + rcx*rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:cs*rax + 1 + rbx]"), 0, "[es:cs*rax + 1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:rcx*rax + 1 + cs]"), 0, "[es:rcx*rax + 1 + cs] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:1 + cs*rax + rbx]"), 0, "[es:1 + cs*rax + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:1 + rcx*rax + cs]"), 0, "[es:1 + rcx*rax + cs] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:1 + rbx + cs*rax]"), 0, "[es:1 + rbx + cs*rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:1 + cs + rcx*rax]"), 0, "[es:1 + cs + rcx*rax] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[es:rax*5 + rbx]"), 0, "[es:rax*5 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:rax*5 + rbx + 1]"), 0, "[es:rax*5 + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:rcx*5 + rax]"), 0, "[es:rcx*5 + rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:rcx*5 + rax + 1]"), 0, "[es:rcx*5 + rax + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:rbx + rax*5]"), 0, "[es:rbx + rax*5] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:rbx + rax*5 + 1]"), 0, "[es:rbx + rax*5 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:rax + rcx*5]"), 0, "[es:rax + rcx*5] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:rax + rcx*5 + 1]"), 0, "[es:rax + rcx*5 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:rax*5 + 1 + rbx]"), 0, "[es:rax*5 + 1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:rcx*5 + 1 + rax]"), 0, "[es:rcx*5 + 1 + rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:1 + rax*5 + rbx]"), 0, "[es:1 + rax*5 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:1 + rcx*5 + rax]"), 0, "[es:1 + rcx*5 + rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:1 + rbx + rax*5]"), 0, "[es:1 + rbx + rax*5] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:rbx + 1 + rax*5]"), 0, "[es:rbx + 1 + rax*5] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[es:5*rax + rbx]"), 0, "[es:5*rax + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:5*rax + rbx + 1]"), 0, "[es:5*rax + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:rcx*5 + rax]"), 0, "[es:rcx*5 + rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:rcx*5 + rax + 1]"), 0, "[es:rcx*5 + rax + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:rbx + 5*rax]"), 0, "[es:rbx + 5*rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:rbx + 5*rax + 1]"), 0, "[es:rbx + 5*rax + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:rax + rcx*5]"), 0, "[es:rax + rcx*5] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:rax + rcx*5 + 1]"), 0, "[es:rax + rcx*5 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:5*rax + 1 + rbx]"), 0, "[es:5*rax + 1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:rcx*5 + 1 + rax]"), 0, "[es:ec*5x + 1 + rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:rbx + 1 + 5*rax]"), 0, "[es:rbx + 1 + 5*rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:rax + 1 + rcx*5]"), 0, "[es:rax + 1 + rcx*5] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:1 + 5*rax + rbx]"), 0, "[es:1 + 5*rax + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:1 + rcx*5 + rax]"), 0, "[es:1 + rcx*5 + rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:1 + rbx + 5*rax]"), 0, "[es:1 + rbx + 5*rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:1 + rax + rcx*5]"), 0, "[es:1 + rax + rcx*5] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[es:rdx*rax + rbx]"), 0, "[es:rdx*rax + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:rbx + rdx*rax]"), 0, "[es:rbx + rdx*rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:rdx*rax + rbx + 1]"), 0, "[es:rdx*rax + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:rdx + rcx*rax + 1]"), 0, "[es:rdx + rcx*rax + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:rdx*rax + 1 + rbx]"), 0, "[es:rdx*rax + 1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:rbx + 1 + rdx*rax]"), 0, "[es:rbx + 1 + rdx*rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:1 + rdx*rax + rbx]"), 0, "[es:1 + rdx*rax + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:1 + rbx + rdx*rax]"), 0, "[es:1 + rbx + rdx*rax] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[es:rdx*eax]"), 0, "[es:rdx*eax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:rdx*eax + rbx]"), 0, "[es:rdx*eax + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:rbx + rdx*eax]"), 0, "[es:rbx + rdx*eax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:rdx*eax + rbx + 1]"), 0, "[es:rdx*eax + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:rbx + rdx*eax + 1]"), 0, "[es:rbx + rdx*eax + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:rdx*eax + 1 + rbx]"), 0, "[es:rdx*eax + 1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:rbx + 1 + rdx*eax]"), 0, "[es:rbx + 1 + rdx*eax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:1 + rdx*eax + rbx]"), 0, "[es:1 + rdx*eax + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[es:1 + rbx + rdx*eax]"), 0, "[es:1 + rbx + rdx*eax] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[ax:cs*2]"), 0, "[ax:cs*2 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ax:cs*2 + rbx]"), 0, "[ax:cs*2 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ax:cs*2 + rbx + 1]"), 0, "[ax:cs*2 + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ax:cs*2 + 1 + rbx]"), 0, "[ax:cs*2 + 1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ax:rbx + cs*2]"), 0, "[ax:rbx + cs*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ax:rbx + cs*2 + 1]"), 0, "[ax:rbx + cs*2 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ax:1 + cs*2 + rbx]"), 0, "[ax:1 + cs*2 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ax:1 + rbx + cs*2]"), 0, "[ax:1 + rbx + cs*2] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[ax:cs]"), 0, "[ax:cs + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ax:cs + rbx]"), 0, "[ax:cs + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ax:cs + rbx + 1]"), 0, "[ax:cs + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ax:cs + 1 + rbx]"), 0, "[ax:cs + 1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ax:rbx + cs]"), 0, "[ax:rbx + cs] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ax:rbx + cs + 1]"), 0, "[ax:rbx + cs + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ax:1 + cs + rbx]"), 0, "[ax:1 + cs + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ax:1 + rbx + cs]"), 0, "[ax:1 + rbx + cs] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[ax:rcx*2]"), 0, "[ax:rcx*2 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ax:rcx*2 + rbx]"), 0, "[ax:rcx*2 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ax:rcx*2 + rbx + 1]"), 0, "[ax:rcx*2 + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ax:rcx*2 + 1 + rbx]"), 0, "[ax:rcx*2 + 1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ax:rbx + rcx*2]"), 0, "[ax:rbx + rcx*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ax:rbx + rcx*2 + 1]"), 0, "[ax:rbx + rcx*2 + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ax:1 + rcx*2 + rbx]"), 0, "[ax:1 + rcx*2 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ax:1 + rbx + rcx*2]"), 0, "[ax:1 + rbx + rcx*2] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[ax:rcx]"), 0, "[ax:rcx + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ax:rcx + rbx]"), 0, "[ax:rcx + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ax:rcx + rbx + 1]"), 0, "[ax:rcx + rbx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ax:rcx + 1 + rbx]"), 0, "[ax:rcx + 1 + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ax:rbx + rcx]"), 0, "[ax:rbx + rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ax:rbx + rcx + 1]"), 0, "[ax:rbx + rcx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ax:1 + rcx + rbx]"), 0, "[ax:1 + rcx + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ax:1 + rbx + rcx]"), 0, "[ax:1 + rbx + rcx] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[ds:rax + ebx + 1]"), 0, "[ds:rax + ebx + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:ecx + rax + 1]"), 0, "[ds:ecx + rax + 1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rbx + 1 + eax]"), 0, "[ds:rbx + 1 + eax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:eax + 1 + rcx]"), 0, "[ds:eax + 1 + rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1 + ebx + rax]"), 0, "[ds:1 + ebx + rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:1 + rax + ecx]"), 0, "[ds:1 + rax + ecx] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[ds:eax + rbx]"), 0, "[ds:eax + rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:rcx + eax]"), 0, "[ds:rcx + eax] is a valid 64-bit addressing scheme" );
-
-is ( is_valid_64bit_addr_intel ("[ds:eax + ebx]"), 1, "[ds:eax + ebx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ds:ecx + eax]"), 1, "[ds:ecx + eax] is a valid 64-bit addressing scheme" );
-
-# -----------
-
-is ( is_valid_64bit_addr_intel ("[cr0+1]"), 0, "[cr0+1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rax+cr0+1]"), 0, "[rax+cr0+1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[cr0+rbx*2+2]"), 0, "[cr0+rbx*2+2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[st7-1]"), 0, "[st7-1] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[dr2-2+rax]"), 0, "[dr2-2+rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[xmm3]"), 0, "[xmm3] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[mm2]"), 0, "[mm2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rax+xmm3]"), 0, "[rax+xmm3] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rax+mm2]"), 0, "[rax+mm2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rax+rbx*2+xmm3]"), 0, "[rax+rbx*2+xmm3] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rax+rbx*2+mm2]"), 0, "[rax+rbx*2+mm2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rax-rbx]"), 0, "[rax-rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rax-rbx*2]"), 0, "[rax-rbx*2] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rax+3-rcx]"), 0, "[rax+3-rcx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rax+6*2+rsp]"), 1, "[rax+6*2+rsp] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rax+2*rbx]"), 1, "[rax+2*rbx] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[4*rax+rsi]"), 1, "[4*rax+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[-1+4*rax+rsi]"), 1, "[-1+4*rax+rsi] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[r12d+rax]"), 0, "[r12d+rax] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rbx+2*r8d]"), 0, "[rbx+2*r8d] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[rdx+8*r9d+1]"), 0, "[rdx+8*r9d+1] is a valid 64-bit addressing scheme" );
-# the extra 3:
-is ( is_valid_64bit_addr_intel ("[ebx+r10d]"), 1, "[ebx+r10d] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[ebx+2*r8d]"), 1, "[ebx+2*r8d] is a valid 64-bit addressing scheme" );
-is ( is_valid_64bit_addr_intel ("[edx+8*r9d+1]"), 1, "[edx+8*r9d+1] is a valid 64-bit addressing scheme" );
+	push @valid64, permute_intel ('', $r1, '', '2', '1', '', 'rax');
+	push @valid64, permute_intel ('', $r1, '-', '2', '1', '', 'rax');
+	push @invalid64, permute_intel ('', $r1, '', '2', '1', '-', 'rax');
+	push @invalid64, permute_intel ('', $r1, '', '2', '1', '', '-rax');
+	push @invalid64, permute_intel ('', $r1, '-', '2', '1', '-', 'rax');
+	push @invalid64, permute_intel ('', $r1, '-', '2', '1', '', '-rax');
+	push @invalid64, permute_disp_intel_all ('-', $r1, '', '2', '1', 'rax');
+	push @invalid64, permute_disp_intel_all ('-', $r1, '-', '2', '1', 'rax');
+}
+
+push @invalid64, permute_disp_intel_all ('', '', '', 'rax', '5', '17');
+push @invalid64, permute_disp_intel_all ('', '', '-', 'rax', '5', '17');
+push @invalid64, permute_sign_disp_intel_all ('rbx', 'rax', '5', '17');
+
+push @invalid64, permute_disp_intel_all ('', '', '', 'rax', 'rdx', '19');
+push @invalid64, permute_disp_intel_all ('', '', '-', 'rax', 'rdx', '19');
+
+push @invalid64, permute_sign_disp_intel_all ('rbx', 'rax', 'rdx', '19');
+
+push @invalid64, permute_disp_intel_segreg_all ('ax', '', 'rbx', '', '', '', '20');
+push @invalid64, permute_disp_intel_segreg_all ('ax', '-', 'rbx', '', '', '', '20');
+
+foreach my $s ('', '4') {
+
+	push @invalid64, permute_sign_disp_intel_segreg_all ('ax', 'rbx', 'rdi', $s, '23');
+	push @invalid64, permute_sign_disp_intel_segreg_all ('ax', 'cs', 'rbx', $s, '25');
+	push @invalid64, permute_sign_disp_intel_segreg_all ('ax', 'rbx', 'cs', $s, '27');
+}
+
+push @invalid64, permute_disp_intel_segreg_all ('ax', '', '', '', 'rdi', '4', '21');
+push @invalid64, permute_disp_intel_segreg_all ('ax', '', '', '-', 'rdi', '4', '21');
+
+push @invalid64, permute_disp_intel_segreg_all ('ax', '', 'cs', '', '', '', '24');
+push @invalid64, permute_disp_intel_segreg_all ('ax', '-', 'cs', '', '', '', '24');
 
 # ----------- mixed
 
-is ( is_valid_addr_intel ("[ebx+ax]"), 0, "[ebx+ax] is a valid addressing scheme" );
-is ( is_valid_addr_intel ("[si+eax]"), 0, "[si+eax] is a valid addressing scheme" );
-is ( is_valid_addr_intel ("[ebx+2+ax]"), 0, "[ebx+2+ax] is a valid addressing scheme" );
-is ( is_valid_addr_intel ("[2*ebx-cx]"), 0, "[2*ebx-cx] is a valid addressing scheme" );
-is ( is_valid_addr_intel ("[esi*8+si]"), 0, "[esi*8+si] is a valid addressing scheme" );
-is ( is_valid_addr_intel ("[edi+sp]"), 0, "[edi+sp] is a valid addressing scheme" );
+my @valid_mixed = ();
+my @invalid_mixed = ();
 
-is ( is_valid_addr_intel ("[rax+ebx]"), 0, "[rax+ebx] is a valid addressing scheme" );
-is ( is_valid_addr_intel ("[rbx+r8d]"), 0, "[rbx+r8d] is a valid addressing scheme" );
-is ( is_valid_addr_intel ("[ecx+rsi]"), 0, "[ecx+rsi] is a valid addressing scheme" );
-is ( is_valid_addr_intel ("[ecx*2+rsi]"), 0, "[ecx*2+rsi] is a valid addressing scheme" );
-is ( is_valid_addr_intel ("[+-1+ecx+edx]"), 1, "[+-1+ecx+edx] is a valid addressing scheme" );
-is ( is_valid_addr_intel ("[+-1+ecx+rdx]"), 0, "[+-1+ecx+rdx] is a valid addressing scheme" );
-is ( is_valid_addr_intel ("[+-1+ecx*8+rdx]"), 0, "[+-1+ecx*8+rdx] is a valid addressing scheme" );
-is ( is_valid_addr_intel ("[+-1+rdx+ecx*8]"), 0, "[+-1+rdx+ecx*8] is a valid  addressing scheme" );
-is ( is_valid_addr_intel ("[esi+-1+rax]"), 0, "[esi+-1+rax] is a valid  addressing scheme" );
-is ( is_valid_addr_intel ("[esi-rcx]"), 0, "[esi-rcx] is a valid  addressing scheme" );
-is ( is_valid_addr_intel ("[+1-rcx]"), 0, "[+1-rcx] is a valid  addressing scheme" );
-is ( is_valid_addr_intel ("[-1-rcx]"), 0, "[-1-rcx] is a valid  addressing scheme" );
+push @invalid_mixed, '[ebx+ax]';
+push @invalid_mixed, '[si+eax]';
+push @invalid_mixed, '[ebx+2+ax]';
+push @invalid_mixed, '[2*ebx-cx]';
+push @invalid_mixed, '[esi*8+si]';
+push @invalid_mixed, '[edi+sp]';
+push @invalid_mixed, '[rax+ebx]';
+push @invalid_mixed, '[rbx+r8d]';
+push @invalid_mixed, '[ecx+rsi]';
+push @invalid_mixed, '[ecx*2+rsi]';
+push @valid_mixed, '[+-1+ecx+edx]';
+push @invalid_mixed, '[+-1+ecx+rdx]';
+push @invalid_mixed, '[+-1+ecx*8+rdx]';
+push @invalid_mixed, '[+-1+rdx+ecx*8]';
+push @invalid_mixed, '[esi+-1+rax]';
+push @invalid_mixed, '[esi-rcx]';
+push @invalid_mixed, '[+1-rcx]';
+push @invalid_mixed, '[-1-rcx]';
+push @valid_mixed, '[rax+6*2+rsp]';
+push @valid_mixed, '[cs:5+ecx+esi]';
+push @valid_mixed, '[ss:bp+si]';
 
-is ( is_valid_addr_intel ("[rax+6*2+rsp]"), 1, "[rax+6*2+rsp] is a valid addressing scheme" );
-is ( is_valid_addr_intel ("[cs:5+ecx+esi]"), 1, "[cs:5+ecx+esi] is a valid addressing scheme" );
-is ( is_valid_addr_intel ("[ss:bp+si]"), 1, "[ss:bp+si] is a valid addressing scheme" );
+# -----------
 
-#is ( is_valid_addr_intel ("[]"), 0, "[] is a valid addressing scheme" );
+# Test::More:
+plan tests => @valid16 + 3 + @invalid16 + 2
+	+ @valid32 + 3 + @invalid32 + 2
+	+ @valid64 + 3 + @invalid64 + 2
+	+ @valid_mixed + 2 + @invalid_mixed + 2;
+
+foreach (@valid16) {
+	is ( is_valid_16bit_addr_intel ($_), 1, "'$_' is a valid 16-bit Intel addressing scheme" );
+}
+is ( is_valid_16bit_addr_att ($valid16[0]), 0, "'$valid16[0]' is not a valid 16-bit AT&T addressing scheme" );
+is ( is_valid_16bit_addr ($valid16[0]), 1, "'$valid16[0]' is a valid 16-bit addressing scheme" );
+is ( is_valid_addr ($valid16[0]), 1, "'$valid16[0]' is a valid addressing scheme" );
+
+foreach (@invalid16) {
+	is ( is_valid_16bit_addr_intel ($_), 0, "'$_' is not a valid 16-bit Intel addressing scheme" );
+}
+is ( is_valid_16bit_addr_att ($invalid16[0]), 0, "'$invalid16[0]' is not a valid 16-bit AT&T addressing scheme" );
+is ( is_valid_16bit_addr ($invalid16[0]), 0, "'$invalid16[0]' is not a valid 16-bit addressing scheme" );
+# NOTE: no test for is_valid_addr() here, because addresses valid in other modes are present
+
+foreach (@valid32) {
+	is ( is_valid_32bit_addr_intel ($_), 1, "'$_' is a valid 32-bit Intel addressing scheme" );
+}
+is ( is_valid_32bit_addr_att ($valid32[0]), 0, "'$valid32[0]' is not a valid 16-bit AT&T addressing scheme" );
+is ( is_valid_32bit_addr ($valid32[0]), 1, "'$valid32[0]' is a valid 16-bit addressing scheme" );
+is ( is_valid_addr ($valid32[0]), 1, "'$valid32[0]' is a valid addressing scheme" );
+
+foreach (@invalid32) {
+	is ( is_valid_32bit_addr_intel ($_), 0, "'$_' is not a valid 32-bit Intel addressing scheme" );
+}
+is ( is_valid_32bit_addr_att ($invalid32[0]), 0, "'$invalid32[0]' is not a valid 32-bit AT&T addressing scheme" );
+is ( is_valid_32bit_addr ($invalid32[0]), 0, "'$invalid32[0]' is not a valid 32-bit addressing scheme" );
+# NOTE: no test for is_valid_addr() here, because addresses valid in other modes are present
+
+foreach (@valid64) {
+	is ( is_valid_64bit_addr_intel ($_), 1, "'$_' is a valid 64-bit Intel addressing scheme" );
+}
+is ( is_valid_64bit_addr_att ($valid64[0]), 0, "'$valid64[0]' is not a valid 16-bit AT&T addressing scheme" );
+is ( is_valid_64bit_addr ($valid64[0]), 1, "'$valid64[0]' is a valid 16-bit addressing scheme" );
+is ( is_valid_addr ($valid64[0]), 1, "'$valid64[0]' is a valid addressing scheme" );
+
+foreach (@invalid64) {
+	is ( is_valid_64bit_addr_intel ($_), 0, "'$_' is not a valid 64-bit Intel addressing scheme" );
+}
+is ( is_valid_64bit_addr_att ($invalid64[0]), 0, "'$invalid64[0]' is not a valid 64-bit AT&T addressing scheme" );
+is ( is_valid_64bit_addr ($invalid64[0]), 0, "'$invalid64[0]' is not a valid 64-bit addressing scheme" );
+# NOTE: no test for is_valid_addr() here, because addresses valid in other modes are present
+
+foreach (@valid_mixed) {
+	is ( is_valid_addr_intel ($_), 1, "'$_' is a valid Intel addressing scheme" );
+}
+is ( is_valid_addr_att ($valid_mixed[0]), 0, "'$valid_mixed[0]' is a valid 16-bit addressing scheme" );
+is ( is_valid_addr ($valid_mixed[0]), 1, "'$valid_mixed[0]' is a valid addressing scheme" );
+
+foreach (@invalid_mixed) {
+	is ( is_valid_addr_intel ($_), 0, "'$_' is not a valid Intel addressing scheme" );
+}
+is ( is_valid_addr_att ($invalid_mixed[0]), 0, "'$invalid_mixed[0]' is a valid 16-bit addressing scheme" );
+is ( is_valid_addr ($invalid_mixed[0]), 0, "'$invalid_mixed[0]' is a valid addressing scheme" );

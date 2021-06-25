@@ -1,7 +1,7 @@
 package Config::IOD;
 
-our $DATE = '2019-01-17'; # DATE
-our $VERSION = '0.350'; # VERSION
+our $DATE = '2021-06-23'; # DATE
+our $VERSION = '0.352'; # VERSION
 
 use 5.010001;
 use strict;
@@ -194,7 +194,7 @@ Config::IOD - Read and write IOD/INI configuration files
 
 =head1 VERSION
 
-This document describes version 0.350 of Config::IOD (from Perl distribution Config-IOD), released on 2019-01-17.
+This document describes version 0.352 of Config::IOD (from Perl distribution Config-IOD), released on 2021-06-23.
 
 =head1 SYNOPSIS
 
@@ -238,6 +238,12 @@ keys, etc) are also provided.
 
 If you only need to read IOD configuration files, you might want to use
 L<Config::IOD::Reader> instead.
+
+=head1 CONTRIBUTOR
+
+=for stopwords Steven Haryanto
+
+Steven Haryanto <sharyanto@cpan.org>
 
 =head1 ATTRIBUTES
 
@@ -339,7 +345,7 @@ you'll also need to set C<enable_expr> to 1.
 
 =head2 enable_expr => bool (default: 0)
 
-Whether to enable C<expr> encoding. By default this is turned on, for safety.
+Whether to enable C<expr> encoding. By default this is turned off, for safety.
 Please see L</"EXPRESSION"> for more details.
 
 =head2 allow_directives => array
@@ -444,7 +450,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2017, 2016, 2015, 2011 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2019, 2017, 2016, 2015, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

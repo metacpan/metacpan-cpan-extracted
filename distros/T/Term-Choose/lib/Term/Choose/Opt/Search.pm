@@ -4,9 +4,9 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.731';
+our $VERSION = '1.733';
 
-use Term::Choose::Constants qw( :index );
+use Term::Choose::Constants qw( ROW COL );
 use Term::Choose::Screen    qw( up clear_to_end_of_screen );
 
 
@@ -45,7 +45,6 @@ sub __search_begin {
     if ( $self->{f3} == 1 ) {
         $search_str = '(?i)' . $search_str;
     }
-    $self->{backup_list} = [ @{$self->{list}} ];
     my $filtered_list = [];
     for my $i ( 0 .. $#{$self->{list}} ) {
         if ( $self->{list}[$i] =~ /$search_str/ ) {
@@ -58,8 +57,9 @@ sub __search_begin {
         $self->{map_search_list_index} = [ 0 ];
     }
     $self->{mark} = $self->__marked_rc2idx();
+    $self->{backup_list} = [ @{$self->{list}} ];
     $self->{list} = $filtered_list;
-    $self->{backup_length} = [ @{$self->{length}} ];
+    $self->{backup_width_elements} = [ @{$self->{width_elements}} ];
     $self->{backup_col_width} = $self->{col_width};
     $self->__length_list_elements();
     $self->{default} = 0;
@@ -85,8 +85,9 @@ sub __search_begin {
 
 sub __search_end {
     my ( $self ) = @_;
-    if ( defined $self->{map_search_list_index} && @{$self->{map_search_list_index}} ) {
-        $self->{default} = $self->{map_search_list_index}[$self->{rc2idx}[$self->{pos}[ROW]][$self->{pos}[COL]]];
+    if ( @{$self->{map_search_list_index}||[]} ) {
+        my $curr_idx = $self->{rc2idx}[ $self->{pos}[ROW] ][ $self->{pos}[COL] ];
+        $self->{default} = $self->{map_search_list_index}[$curr_idx];
         $self->{mark} = $self->__marked_rc2idx();
         my $tmp_mark = [];
         for my $i ( @{$self->{mark}} ) {
@@ -97,7 +98,7 @@ sub __search_end {
     }
     delete $self->{map_search_list_index};
     delete $self->{backup_mark};
-    for my $key ( qw(list length col_width meta_items no_spacebar) ) {
+    for my $key ( qw(list width_elements col_width meta_items no_spacebar) ) {
         my $key_backup = 'backup_' . $key;
         $self->{$key} = $self->{$key_backup} if defined $self->{$key_backup};
         delete $self->{$key_backup};

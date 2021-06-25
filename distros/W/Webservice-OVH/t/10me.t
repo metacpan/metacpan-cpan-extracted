@@ -17,12 +17,12 @@ use Webservice::OVH;
 
     It is common that no contact change tasks are available so the single search of a task can't be tested.
     In the connected account should be at least one order. There must be something that was ordered, or else testing is senseless with that account.
+=cut
 
-=cut 
 
 my $api = Webservice::OVH->new_from_json($json_dir);
 ok($api, "module ok");
-
+=head2
 my $contacts = $api->me->contacts;
 my $example_contact = $contacts->[0];
 my $search_contact = $api->me->contact($example_contact->id);
@@ -55,6 +55,6 @@ ok( scalar keys %{$api->me->{_contacts}} == scalar @$contacts, 'intern contacts 
 ok( scalar keys %{$api->me->{_tasks_contact_change}} == scalar @$tasks_contact_change, 'intern tasks ok' );
 ok( scalar keys %{$api->me->{_orders}} == scalar @$orders, 'intern orders ok' );
 ok( scalar keys %{$api->me->{_bills}} == scalar @$bills, 'intern bills ok' );
-
+=cut 
 done_testing();
 

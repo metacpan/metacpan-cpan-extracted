@@ -1,0 +1,52 @@
+% use Mojo::Base -signatures;
+% use Mojo::File qw(path);
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="<%= $generator %>" />
+        <title>Обраꙁи</title>
+    </head>
+    <body>
+        <h1>Обраꙁи</h1>
+        <section tabindex="0" class="obrazi">
+% my $cols     = int(12/2); #6
+% my $idx     = 0;
+% my $img_idx = 1;
+% for my $cat(['','',''], @$categories) {
+%    my $images  = $processed->map(sub($img) { $cat->[0] eq $img->[0] ? $img : (); });
+%    next unless @$images;
+%    my $level = $cat->[1] =~ m|(/)|g;
+%    $level += 2; $idx++;
+% if($cat->[2]) {
+        <h<%= $level %> data-index="<%= $idx %>"><%= $cat->[2] %></h<%= $level %>>
+% }
+<section tabindex="<%= $idx %>" class="idx<%= $idx %> level<%= $level %>">
+%    while(my @row = splice @$images, 0, $cols) {
+    <div class="row">
+    %   for my $img(@row) { $img_idx++;
+        <div class="col card"
+            data-index="<%= $img_idx %>"
+            title="<%= $img->[2] %>"
+            style="background-image :url('<%= path($cat->[1]||(), $img->[-1])%>')">
+            <div class="image" id="<%= $img_idx %>"
+                style="background-image: url('<%= path($cat->[1]||(), $img->[-2]) %>')">
+                <div class="prev-next">
+                    <div data-index="<%= $img_idx %>" class="prev pull-left text-left text-light">⏴</div>
+                    <div data-index="<%= $img_idx %>" class="next pull-right text-right text-light">⏵</div>
+                </div>
+                <div class="meta">
+                    <h4><%= $img->[2] %></h4>
+                    <p><%= $img->[3] %></p>
+                </div>
+            </div>
+        </div>
+    % }
+    </div>
+% } # end of while
+</section>
+% } # end for @$categories
+        </section><!-- end section class="obrazi"-->
+    </body>
+</html>

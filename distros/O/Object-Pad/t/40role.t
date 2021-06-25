@@ -15,7 +15,7 @@ role ARole {
    }
 }
 
-class AClass implements ARole {
+class AClass does ARole {
 }
 
 {
@@ -30,7 +30,7 @@ role BRole {
    method two { return 2 }
 }
 
-class BClass implements ARole, BRole {
+class BClass does ARole, BRole {
 }
 
 {
@@ -45,7 +45,7 @@ role CRole {
    requires three;
 }
 
-class CClass implements CRole {
+class CClass does CRole {
    method three { return 3 }
 }
 
@@ -61,7 +61,7 @@ pass( 'CClass compiled OK' );
       }
    }
 
-   class RecurseClass implements RecurseRole {}
+   class RecurseClass does RecurseRole {}
 
    is( RecurseClass->new->recurse( 5 ), 5, 'role methods can be reëntrant' );
 }

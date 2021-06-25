@@ -384,9 +384,9 @@ See L<Prima::Widget/pointerType>
 	cr::SizeSW                  down-right move action pointer
 	cr::Invalid                 invalid action pointer
 	cr::DragNone                pointer for an invalid dragging target
-	cr::DragCopy                pointer to show that a dnd::Copy action can be accepted
-	cr::DragMove                pointer to show that a dnd::Move action can be accepted
-	cr::DragLink                pointer to show that a dnd::Link action can be accepted
+	cr::DragCopy                pointer to indicate that a dnd::Copy action can be accepted
+	cr::DragMove                pointer to indicate that a dnd::Move action can be accepted
+	cr::DragLink                pointer to indicate that a dnd::Link action can be accepted
 	cr::User                    user-defined icon
 
 =head2 dbt::  - device bitmap types
@@ -754,6 +754,23 @@ See L<Prima::Image/stats>.
 	is::StdDev   - standard deviation
 	is::Sum      - sum of pixel values
 	is::Sum2     - sum of squares of pixel values
+
+=head2 ist:: - image scaling types
+
+	ist::None      - image stripped or padded with zeros
+	ist::Box       - image will be scaled using simple box transform
+	ist::BoxX      - columns behave as ist::None, rows as ist::Box
+	ist::BoxY      - rows behave as in ist::None, columns as ist::Box
+	ist::AND       - shrunken pixels AND-end together (black on white)
+	ist::OR        - shrunken pixels OR-end together (white on black) 
+	ist::Triangle  - bilinear interpolation
+	ist::Quadratic - 2rd order (quadratic) B-Spline approximation of Gaussian
+	ist::Sinc      - sine function
+	ist::Hermite   - B-Spline interpolation
+	ist::Cubic     - 3rd order (cubic) B-Spline approximation of Gaussian
+	ist::Gaussian  - Gaussian transform with gamma=0.5
+
+See L<Prima::Image/scaling>.
 
 =head2 kb::  - keyboard virtual codes
 

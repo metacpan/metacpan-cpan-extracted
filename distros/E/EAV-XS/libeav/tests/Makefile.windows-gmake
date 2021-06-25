@@ -68,7 +68,7 @@ check-domain: t-dash-domains.exe t-retired.exe
 check-lpart: t-822-localpart.exe t-5321-localpart.exe
 check-lpart: t-5322-localpart.exe t-6531-localpart.exe
 	$(info # === localpart tests)
-	./t-822-localpart.exe 24 19 ../data/localpart-ascii.txt
+	./t-822-localpart.exe 23 20 ../data/localpart-ascii.txt
 	./t-5321-localpart.exe 21 22 ../data/localpart-ascii.txt
 	./t-5322-localpart.exe 23 20 ../data/localpart-ascii.txt
 ifeq ($(RFC6531_FOLLOW_RFC5322),ON)
@@ -115,7 +115,7 @@ check-email-822: t-822-email.exe
 	$(info =====================================================)
 	$(info === RFC 822 email address tests)
 	$(info =====================================================)
-	./t-822-email.exe 46 0 ../data/pass-email-ascii.txt
+	./t-822-email.exe 45 1 ../data/pass-email-ascii.txt
 	./t-822-email.exe 0 44 ../data/fail-email-ascii.txt
 
 
@@ -281,7 +281,7 @@ else
 	./t-eav.exe 4 20 ../data/email-utf8.txt
 endif
 	./t-eav.exe 7 1 ../data/email-reg.ru.txt
-	./t-eav-all-modes.exe 216 14 ../data/pass-email-ascii.txt
+	./t-eav-all-modes.exe 215 15 ../data/pass-email-ascii.txt
 	./t-eav-all-modes.exe 0 220 ../data/fail-email-ascii.txt
 else
 	$(info # =====================================================)
@@ -293,7 +293,7 @@ else
 	./t-eav.exe 8 16 ../data/email-utf8.txt
 endif
 	./t-eav.exe 7 1 ../data/email-reg.ru.txt
-	./t-eav-all-modes.exe 218 12 ../data/pass-email-ascii.txt
+	./t-eav-all-modes.exe 217 13 ../data/pass-email-ascii.txt
 	./t-eav-all-modes.exe 0 220 ../data/fail-email-ascii.txt
 endif
 else
@@ -307,7 +307,7 @@ else
 	./t-eav.exe 4 20 ../data/email-utf8.txt
 endif
 	./t-eav.exe 7 1 ../data/email-reg.ru.txt
-	./t-eav-all-modes.exe 208 22 ../data/pass-email-ascii.txt
+	./t-eav-all-modes.exe 207 23 ../data/pass-email-ascii.txt
 	./t-eav-all-modes.exe 0 220 ../data/fail-email-ascii.txt
 else
 	$(info # =====================================================)
@@ -319,7 +319,7 @@ else
 	./t-eav.exe 8 16 ../data/email-utf8.txt
 endif
 	./t-eav.exe 7 1 ../data/email-reg.ru.txt
-	./t-eav-all-modes.exe 210 20 ../data/pass-email-ascii.txt
+	./t-eav-all-modes.exe 209 21 ../data/pass-email-ascii.txt
 	./t-eav-all-modes.exe 0 220 ../data/fail-email-ascii.txt
 endif
 endif

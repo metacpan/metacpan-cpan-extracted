@@ -2,12 +2,12 @@ package Archive::BagIt::Plugin::Algorithm::MD5;
 
 use strict;
 use warnings;
-use Carp;
+use Carp qw( croak );
 use Moo;
-use Net::SSLeay;
+use Net::SSLeay ();
 use namespace::autoclean;
 with 'Archive::BagIt::Role::Algorithm';
-our $VERSION = '0.074'; # VERSION
+our $VERSION = '0.075'; # VERSION
 # ABSTRACT: The MD5 algorithm plugin (default for v0.97)
 
 sub BEGIN {
@@ -77,7 +77,7 @@ Archive::BagIt::Plugin::Algorithm::MD5 - The MD5 algorithm plugin (default for v
 
 =head1 VERSION
 
-version 0.074
+version 0.075
 
 =head1 AVAILABILITY
 

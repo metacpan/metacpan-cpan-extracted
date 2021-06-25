@@ -1,5 +1,9 @@
 Revision history for Device-Chip-CC1101
 
+0.06    2021-06-21
+        [CHANGES]
+         * Use `:param` slot attribute from Object::Pad 0.41
+
 0.05    2020-12-06
         [CHANGES]
          * Use toplevel 'await' syntax from Future::AsyncAwait 0.47

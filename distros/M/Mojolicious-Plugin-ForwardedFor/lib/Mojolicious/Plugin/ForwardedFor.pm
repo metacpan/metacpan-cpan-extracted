@@ -3,7 +3,7 @@ package Mojolicious::Plugin::ForwardedFor;
 use Mojo::Base 'Mojolicious::Plugin';
 use Mojo::Util 'trim';
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 sub register {
   my ($self, $app, $options) = @_;
@@ -60,6 +60,11 @@ important to set L</"levels"> no higher than the number of proxies that will
 have appended addresses to the C<X-Forwarded-For> header, as the original
 requests can pass anything as the initial value of the header, and thus spoof
 additional proxy levels.
+
+Since Mojolicious 8.72, you can configure
+L<Mojo::Server::Hypnotoad/"trusted_proxies"> as a more reliable alternative to
+the baseline reverse proxy configuration, affecting
+L<Mojo::Transaction/"remote_address"> directly without need of this plugin.
 
 =head1 HELPERS
 

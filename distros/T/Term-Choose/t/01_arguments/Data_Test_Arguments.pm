@@ -16,7 +16,7 @@ sub valid_values {
         layout       => [ 0, 1, 2, 3 ],
         mouse        => [ 0, 1 ],
         order        => [ 0, 1 ],
-        page         => [ 0, 1 ],
+        page         => [ 0, 1, 2],
 
         # '[ 1-9 ][ 0-9 ]*'
         keep       => [ 1, 2, 100, 999999, undef ],
@@ -74,7 +74,7 @@ sub invalid_values {
         layout       => [ grep { ! /^[ 0 1 2 3 ]\z/x }     @invalid ],
         mouse        => [ grep { ! /^[ 0 1 ]\z/x }         @invalid ],
         order        => [ grep { ! /^[ 0 1 ]\z/x }         @invalid ],
-        page         => [ grep { ! /^[ 0 1 ]\z/x }         @invalid ],
+        page         => [ grep { ! /^[ 0 1 2 ]\z/x }         @invalid ],
         keep         => [ grep { ! /^[ 1-9 ][ 0-9 ]*\z/x } @invalid ],
         ll           => [ grep { ! /^[ 1-9 ][ 0-9 ]*\z/x } @invalid ],
         max_height   => [ grep { ! /^[ 1-9 ][ 0-9 ]*\z/x } @invalid ],
@@ -100,7 +100,7 @@ sub invalid_values {
 sub mixed_invalid_1 {
     return {
         beep  => -1, clear_screen => 2, hide_cursor => 3, index => 4, alignment => '@', layout => 5, mouse => {},
-        order => 1, page => 0, keep => -1, ll => -1, max_height => 0, max_width => 0, default => [], pad => 'a',
+        order => 1, page => 'l', keep => -1, ll => -1, max_height => 0, max_width => 0, default => [], pad => 'a',
         empty => [], prompt => {}, undef => [], lf => 4, no_spacebar => 4, mark => 'o'
     };
 }

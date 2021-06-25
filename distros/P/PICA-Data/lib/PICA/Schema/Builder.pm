@@ -1,7 +1,7 @@
 package PICA::Schema::Builder;
 use v5.14.1;
 
-our $VERSION = '1.24';
+our $VERSION = '1.27';
 
 use PICA::Schema qw(field_identifier);
 use Scalar::Util qw(reftype);
@@ -36,9 +36,10 @@ sub add {
 
         # field has not been inspected yet
         if (!$fields->{$id}) {
+            next if $self->{ignore_unknown};
             $fields->{$id} = {total => 0, tag => $tag, subfields => {},};
             $fields->{$id}{occurrence} = $occ if $occ > 0 && length $id gt 4;
-            $fields->{$id}{required} = \1 unless $self->{total};
+            $fields->{$id}{required}   = \1 unless $self->{total};
         }
 
         my $subfields = $fields->{$id}{subfields};
@@ -118,7 +119,8 @@ This class is a subclass of L<PICA::Schema>.
 =head1 CONSTRUCTOR
 
 The builder can be initialized with information of an existing builder or
-schema, in particular C<fields> and C<total>.
+schema, in particular C<fields> and C<total>. Option C<ignore_unknown> will
+ignore fields not already specified in C<fields>.
 
 =head1 METHODS
 

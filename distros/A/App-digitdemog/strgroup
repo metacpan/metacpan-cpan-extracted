@@ -1,0 +1,242 @@
+#!/usr/bin/perl
+use 5.001 ; use strict ; use warnings ; 
+use Getopt::Std ; getopts ':~12BFcg:h:nrs:t:uxy:' , \my %o ;
+use Encode qw[ decode_utf8 ] ;
+use Term::ANSIColor qw[ color :constants ] ; $Term::ANSIColor::AUTORESET = 1 ;
+    
+$o{h} = 1 if ! defined $o{h} && ! defined $o{t} && ! defined $o{s} ;    
+$o{h} //= 0 ; 
+$o{t} //= 0 ; 
+binmode STDOUT, ':utf8' if $o{u} ;
+my %G ; # グループ
+my ( @ranges , @y_ranges ) ;
+
+& reading ; 
+exit if $o{1} ;
+& y_init ; 
+& writing ; 
+exit 0 ; 
+
+sub y_init ( ) { 
+     my @ranges = split /,/ , $o{y} // '' , -1 ; 
+    grep { $_ = $_ . ".." . $_ unless m/\.\./ }  @ranges ; # = split /,/ , $o{y} // '' , -1 ; 
+    do { m/^(\d*)\.\.(\d*)/ ; push @y_ranges , [ $1||1 , $2||'Inf' ] } for @ranges ; 
+}
+sub y_filter ( $ ) { 
+    do { return not 0 if $_->[0] <= $_[0] && $_[0] <= $_->[1] } for @y_ranges ; 
+    return @y_ranges ? not 1 : not 0 ; # 指定が無かった場合はとにかく真を返す。
+}
+
+sub reading ( ) { 
+  #$o{s} = '\Q' . $o{s}. '\E' if ! $o{r} ; 
+  $o{s} = qr[\Q$o{s}\E] if defined $o{s} && ! $o{r} ; 
+  #print '$o{s}='."$o{s}\n" ;
+  while ( <> ) { 
+    chomp ; 
+    $_ = decode_utf8 ( $_ ) if $o{u} ;
+    my $org = $_ ; # 各行に含まれる元の文字列
+    my $k ;
+    $k = do { s/(.*)($o{s}.*$)/$1/ ; $2 // '' } if defined $o{s} ; # -a で指定された文字列を含めてそれ以降を取り出したい場合
+    $k = ( substr $_ , 0, $o{h} ) . ( substr ' ' x $o{t} . $_ , -$o{t} , $o{t} ) . ($k // '')  ; # -h または -tの片方/両方が指定された場合
+    $org = "$.:$org"  if $o{':'} ; # 後で表示の際に、何番目のデータであったかを示す。
+    print "$k\t$org\n" if $o{1} ;
+    push @{$G{$k}} , $o{x} ? $_ : $org ;
+  }
+}
+
+
+sub writing ( ) {
+  print UNDERLINE join ("\t" , ! $o{F} ? qw[ key cnt inputs ..] : qw[ cnt key inputs ..] ), "\n" unless $o{2} ;
+
+  my @k = ! $o{c} ? sort keys %G : sort { @{$G{$b}} <=> @{$G{$a}} } keys %G ; 
+  @k = reverse @k if $o{'~'} ;
+  for ( @k ) { 
+    my @tmp = @{$G{$_}} ;
+    my $n = @tmp ; 
+    next unless y_filter$n ;
+    @tmp = splice @tmp , 0, $o{g} if defined $o{g} ;
+    @tmp = map { ( GREEN $_ ) . ( RESET $tmp[$_] ) } 0 .. $#tmp if $o{n} ; 
+    $_ = BOLD $_ if $o{B} ;
+    ( $_ , $n ) = ( $n , $_  ) if $o{F} ; # 表示の順序を入れ替える。
+    unshift @tmp , $_ , $n ; 
+    print join ( "\t" ,  @tmp ) . "\n" ;
+  }
+}
+
+
+## ヘルプとバージョン情報
+BEGIN {
+  $Getopt::Std::STANDARD_HELP_VERSION = 1 ; 
+  grep { m/--help/} @ARGV and *VERSION_MESSAGE = sub {} ; 
+  our $VERSION = 0.02 ;
+    # 最初は 0.21 を目安とする。
+    # 1.00 以上とする必要条件は英語版のヘルプをきちんと出すこと。
+    # 2.00 以上とする必要条件はテストコードが含むこと。
+    # 0.23 : 英文ヘルプをPODにした。
+}  
+sub HELP_MESSAGE {
+    use FindBin qw[ $Script $Bin ] ;
+    sub EnvJ ( ) { $ENV{LANG} =~ m/^ja_JP/ ? 1 : 0 } ; # # ja_JP.UTF-8 
+    sub en( ) { grep ( /^en(g(i(sh?)?)?)?/i , @ARGV ) ? 1 : 0 } # English という文字列を先頭から2文字以上を含むか 
+    sub ja( ) { grep ( /^jp$|^ja(p(a(n?)?)?)?/i , @ARGV ) ? 1 : 0 } # jp または japan という文字列を先頭から2文字以上を含むか 
+    sub opt( ) { grep (/^opt(i(o(ns?)?)?)?$/i, @ARGV ) ? 1 : 0 } # options という文字列を先頭から3文字以上含むから
+    sub noPOD ( ) { grep (/^no-?pod\b/i, @ARGV) ? 1 : 0 } # POD を使わないと言う指定がされているかどうか
+    my $jd = "JapaneseManual" ;
+    my $flagE = ! ja && ( en || ! EnvJ ) ; # 英語にするかどうかのフラグ
+
+    exec "perldoc $0" if $flagE &&  ! opt && ! noPOD   ; 
+    $ARGV[1] //= '' ;
+    open my $FH , '<' , $0 ;
+    while(<$FH>){
+        s/\Q'=script='\E/$Script/gi ;
+        s/\Q'=bin='\E/$Bin/gi ;
+        if ( s/^=head1\b\s*// .. s/^=cut\b\s*// ) { 
+            if ( s/^=begin\s+$jd\b\s*// .. s/^=end\s+$jd\b\s*// xor $flagE ) {
+                print $_ if ! opt || m/^\s+\-/  ; 
+            }
+        } 
+        #print $_ if /^=head1/ .. /^=cut\b/ and opt ? m/^\s+\-/ : 1 and ( EnvJ && ! en xor s/^=begin $jd\b// .. s/^=end $jd\b// ) ;
+    }
+    close $FH ;
+    exit 0 ;
+
+}
+
+
+=encoding utf8 
+
+=head1 NAME
+
+strgroup  (This may change its program name into `strsort'.)
+
+=head1 VERSION
+
+0.02
+
+=head1 SYNOPSIS
+
+strgroup 
+
+=head1 DESCRIPTION
+
+   For each character string on each line, group them based on either of 
+   beginning N characters, ending N characters or `the string specified and later'.
+   The output is sorted by the key as defined above with the input frequency and 
+   concrete examples. 
+
+=head1 OPTION (N means a nubmeric parameter, str means the chracter string parameter.)
+
+=over 4
+
+=item B<-g> N 
+
+The number of items for each group is Got at most 2*N. (The smalles N items and the largest N items.)
+
+=item B<-h> N 
+
+Taking N characters from the Head of the charater string. 
+
+=item B<-t> N 
+
+Taking N characters from the Tail of the charater string. 
+
+=item B<-s> str
+
+Taking `str' and *after*. Shortest match.  Example: " -s . "  then you can sort all the file extention.
+
+=item B<-r> 
+
+The flag that you specify the regular expression. So you can use "-r -s '(?<=pattern)foo' " .
+
+=item B<-1>
+
+No aggregation. 
+
+=item B<-:>
+
+In the output, each item is attached with the input line number like '12:item'
+
+=item B<-n>
+
+Numbering the strings with green for each key group.
+
+=item B<-x>
+
+In the output, each item is suppressed of the substring corresponding to the key.
+
+=item B<-c>
+
+Put priority by the total frequency for each group(key).
+
+=item B<-u>
+
+Process as UTF-8.
+
+=item B<-2>
+
+Simple output so that no header in the output.
+
+=item B<-y> N..N[,N..N]..
+
+Filter by the frequency.  N1..N2 means a range. You can specify multiple ranges by ",".
+ 
+=item B<-B>
+
+Key will be bold. Useful to identify that they are keys.
+
+=item B<-~>
+
+Reverse the order of ouput lines.
+
+=item B<--help>
+
+Show this help manual.
+
+=back
+
+=head1 HISTORY
+
+This program has been made since 2018-08-18.
+
+=head1 AUTHOR
+
+"Toshiyuki Shimono", C<< <bin4tsv at gmail.com> >>
+
+=begin JapaneseManual 
+ strgroup 
+
+   各行に与えられた文字列に対して、先頭か末尾の数文字、もしくは「指定された文字列および末尾方向にそれ以降」をキーにして
+   全行を分類して、各キーごとに，何行現れ、具体的にどんな文字列が与えられたかを示す。
+
+オプション:   (Nは数値、strは文字列のパラメータを表す。)
+
+  -g N  : 各グループから最大いくつ取り出すか。
+
+  -h N  :  先頭からN文字を取り出す。
+  -t N  :  末尾からN文字を取り出す。
+  -s str : 文字列strより *以降* を取る。最短一致。ls と組みあわせて -a . の指定で，ファイル名を拡張子毎に分類することができる。
+  -r   : -s による文字列指定が、正規表現による指定であることの指定。肯定的後読み(?<=pattern)foo なども使える。
+
+  -1  ; 先頭と末尾を取り出した値をそのまま出す
+  -:  ; 各入力が何行目から来たのかを出力する様にする。
+  -n  ; 各キー毎に該当する文字列を順番を緑色の数で表示。
+  -x  ; 出力で該当文字列を出力する際に、キーに相当する文字列の部分は抑制する。
+
+  -c  : 出力の順序を、各グループの個数が多いものを優先する。
+  -u  : utf8として処理する。
+  -2  : 出力の各列の属性名を出力しない。
+  -y N..N[,N..N] : 各グループの該当個数でフィルター。N1..N2でN1以上N2以下に限定。N1とN2はどちらか省略可能。,で区間を並べることが可能。
+
+  -B  : 出力でキーを太字にする。(空文字列がキーの場合に識別が容易になる。)
+  -F  : 出力の1列目と2列目を入れ替える。(キーの文字列と出現件数が入れ替える。)
+  -~  : 出力の際に，整列の順序を逆にする。
+
+  --help : このヘルプの表示。
+  --help opt : オプションのヘルプのみを表示。    
+
+ 開発上のメモ:
+  * ヘルプの文面は分かり安くする必要がある。
+  * このコマンドは /usr/local/texlive/2017/texmf-dist/tex/latex のファイルを把握する方法の提案の1つである。
+=end JapaneseManual
+
+=cut

@@ -1,0 +1,23 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+LICENSE
+lib/Geo/H3.pm
+lib/Geo/H3/Base.pm
+lib/Geo/H3/Geo.pm
+lib/Geo/H3/Index.pm
+lib/Geo/H3/GeoBoundary.pm
+scripts/perl-Geo-H3-geo-to-googleearth.pl
+perl-Geo-H3.spec
+t/001_load.t
+t/002_geo.t
+t/003_index.t
+t/004_geo-methods.t
+t/005_h3-methods.t
+t/changes.t
+t/pod-coverage.t
+t/pod-spell.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

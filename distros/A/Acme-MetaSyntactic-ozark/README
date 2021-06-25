@@ -1,0 +1,46 @@
+NAME
+    Acme::MetaSyntactic::ozark - The Ozark theme
+
+VERSION
+    This document describes version 0.001 of Acme::MetaSyntactic::ozark
+    (from Perl distribution Acme-MetaSyntactic-ozark), released on
+    2021-02-21.
+
+SYNOPSIS
+     % perl -MAcme::MetaSyntactic=ozark -le 'print metaname'
+     wendy
+
+     % metasyn ozark --shuf -n2
+     langmore
+     jonah
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Acme-MetaSyntactic-ozark>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Acme-MetaSyntactic-ozark>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://github.com/perlancar/perl-Acme-MetaSyntactic-ozark/issues>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    <https://en.wikipedia.org/wiki/Ozark_(TV_series)>,
+    <https://en.wikipedia.org/wiki/List_of_Ozark_characters>
+
+    Acme::MetaSyntactic
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2021 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -1,2 +1,7 @@
+0.02 2021-06-16T14:33:51+02:00
+ - Add 'css_background_image' constructor parameter.
+ - Add basic tests (constructor and process).
+ - Fix minimal version of Perl.
+
 0.01 2021-06-06T00:13:47+02:00
  - First version.

@@ -1,3 +1,6 @@
+1.002     2021-06-16 00:51:57 EDT
+  - Update IRC metadata to libera.chat
+
 1.001     2018-06-04 18:19:04 EDT
   - Use promises instead of deprecated delay helper from DefaultHelpers.
 

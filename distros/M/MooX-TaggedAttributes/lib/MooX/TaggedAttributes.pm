@@ -2,18 +2,20 @@ package MooX::TaggedAttributes;
 
 # ABSTRACT: Add a tag with an arbitrary value to a an attribute
 
-use 5.008009;
+use v5.10.1;
 
 use strict;
 use warnings;
 
-our $VERSION = '0.09';
+our $VERSION = '0.11';
 
 use Carp;
 use MRO::Compat;
 
 use Scalar::Util qw[ blessed ];
 use Class::Method::Modifiers qw[ install_modifier ];
+
+use MooX::TaggedAttributes::Cache;
 
 our %TAGSTORE;
 our %TAGCACHE;
@@ -125,6 +127,7 @@ sub _install_tag_handler {
         } );
 }
 
+
 # Moo::Role won't compose anything before it was used into a consuming
 # package. Don't want import to be consumed.
 use Moo::Role;
@@ -142,8 +145,7 @@ my $can = sub { ( shift )->next::can };
 around _tag_list => sub {
 
     # 1. call &$orig to handle tag role compositions into the current class
-
-# 2. call up the inheritance stack to handle parent class tag role compositions.
+    # 2. call up the inheritance stack to handle parent class tag role compositions.
 
     my $orig    = shift;
     my $package = caller;
@@ -176,17 +178,7 @@ sub _class_tags {
     # return cached values if available.  They are stored in %TAGCACHE
     # on the first object method call to _tags(), at which point we've
     # decreed the class as being complete.
-    return $TAGCACHE{$class}
-      || do {
-        my %cache;
-        for my $tuple ( @{ $class->_tag_list } ) {
-
-            # my ( $tag, $attrs, $value ) = @$tuple;
-            my $cache = ( $cache{ $tuple->[0] } ||= {} );
-            $cache->{$_} = $tuple->[2] for @{ $tuple->[1] };
-        }
-        \%cache;
-      };
+    return $TAGCACHE{$class} || MooX::TaggedAttributes::Cache->new( $class )
 }
 
 use namespace::clean -except => qw( import  );
@@ -230,7 +222,7 @@ MooX::TaggedAttributes - Add a tag with an arbitrary value to a an attribute
 
 =head1 VERSION
 
-version 0.09
+version 0.11
 
 =head1 SYNOPSIS
 
@@ -270,7 +262,7 @@ version 0.09
  use C1;
  use C2;
  
- use 5.010;
+ use 5.01001;
  
  # get the value of the tag t1, applied to attribute a1
  say C1->new->_tags->{t1}{a1};
@@ -363,8 +355,10 @@ Combining tag roles is as simple as B<use>'ing them in the new role:
 =head2 Accessing tags
 
 Classes and objects are provided a B<_tags> method which returns a
-hash of hashes keyed off of the tags and attribute names.  For
-example, for the following code:
+L<MooX::TaggedAttributes::Cache> object.  For backwards compatibility,
+it can be dereferenced as a hash, providing a hash of hashes keyed
+off of the tags and attribute names.  For example, for the following
+code:
 
  package T;
  use Moo::Role;
@@ -381,12 +375,12 @@ example, for the following code:
 
 The tag structure returned by  C<< C->_tags >>
 
- { t1 => { a => 2 }, t2 => { b => "foo" } }
+ bless({ t1 => { a => 2 }, t2 => { b => "foo" } }, "MooX::TaggedAttributes::Cache")
 
 
 and C<< C->new->_tags >>
 
- { t1 => { a => 2 }, t2 => { b => "foo" } }
+ bless({ t1 => { a => 2 }, t2 => { b => "foo" } }, "MooX::TaggedAttributes::Cache")
 
 
 are identical.
@@ -398,21 +392,21 @@ are identical.
 If a role with tagged attributes is applied to an object, the
 tags for those attributes are not visible.
 
-=head1 BUGS
+=head1 SUPPORT
 
-Please report any bugs or feature requests on the bugtracker website
-L<https://rt.cpan.org/Public/Dist/Display.html?Name=MooX-TaggedAttributes>
-or by email to
-L<bug-MooX-TaggedAttributes@rt.cpan.org|mailto:bug-MooX-TaggedAttributes@rt.cpan.org>.
+=head2 Bugs
 
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
+Please report any bugs or feature requests to bug-moox-taggedattributes@rt.cpan.org  or through the web interface at: https://rt.cpan.org/Public/Dist/Display.html?Name=MooX-TaggedAttributes
 
-=head1 SOURCE
+=head2 Source
 
-The development version is on github at L<https://github.com/djerius/moox-taggedattributes>
-and may be cloned from L<git://github.com/djerius/moox-taggedattributes.git>
+Source is available at
+
+  https://gitlab.com/djerius/moox-taggedattributes
+
+and may be cloned from
+
+  https://gitlab.com/djerius/moox-taggedattributes.git
 
 =head1 AUTHOR
 

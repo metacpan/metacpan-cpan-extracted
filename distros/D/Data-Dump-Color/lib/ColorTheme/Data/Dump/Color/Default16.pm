@@ -1,9 +1,9 @@
 package ColorTheme::Data::Dump::Color::Default16;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-06-05'; # DATE
+our $DATE = '2021-06-24'; # DATE
 our $DIST = 'Data-Dump-Color'; # DIST
-our $VERSION = '0.245'; # VERSION
+our $VERSION = '0.248'; # VERSION
 
 use parent 'ColorThemeBase::Static::FromStructColors';
 use Term::ANSIColor;
@@ -51,7 +51,7 @@ ColorTheme::Data::Dump::Color::Default16 - Default color theme for Data::Dump::C
 
 =head1 VERSION
 
-This document describes version 0.245 of ColorTheme::Data::Dump::Color::Default16 (from Perl distribution Data-Dump-Color), released on 2021-06-05.
+This document describes version 0.248 of ColorTheme::Data::Dump::Color::Default16 (from Perl distribution Data-Dump-Color), released on 2021-06-24.
 
 =head1 HOMEPAGE
 

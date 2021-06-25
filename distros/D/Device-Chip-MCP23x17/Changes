@@ -1,5 +1,9 @@
 Revision history for Device-Chip-MCP23x17
 
+0.04    2021-06-21
+        [CHANGES]
+         * Use `:param` slot attribute from Object::Pad 0.41
+
 0.03    2020-12-15
         [BUGFIXES]
          * Re-packed tarball, removing stale Makefile.PL

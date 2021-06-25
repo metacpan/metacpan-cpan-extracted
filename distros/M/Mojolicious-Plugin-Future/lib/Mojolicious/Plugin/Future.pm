@@ -4,7 +4,7 @@ use Mojo::Base 'Mojolicious::Plugin';
 use Future::Mojo;
 use Scalar::Util 'weaken';
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 my %futures;
 

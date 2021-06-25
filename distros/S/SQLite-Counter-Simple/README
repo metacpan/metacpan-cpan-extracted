@@ -1,0 +1,284 @@
+NAME
+    SQLite::Counter::Simple - A simple counter using SQLite
+
+VERSION
+    This document describes version 0.003 of SQLite::Counter::Simple (from
+    Perl distribution SQLite-Counter-Simple), released on 2021-06-21.
+
+SYNOPSIS
+    From Perl:
+
+     use SQLite::Counter::Simple qw(increment_sqlite_counter get_sqlite_counter);
+
+     # increment and get the dafault counter
+     my $res;
+     $res = increment_sqlite_counter(); # => [200, "OK", 1]
+     $res = increment_sqlite_counter(); # => [200, "OK", 2]
+
+     # dry-run mode
+     $res = increment_sqlite_counter(-dry_run=>1); # => [200, "OK (dry-run)", 3]
+     $res = increment_sqlite_counter(-dry_run=>1); # => [200, "OK (dry-run)", 3]
+
+     # specify database path and counter name, and also the increment
+     $res = increment_sqlite_counter(path=>"/home/ujang/myapp.db", counter=>"counter1"); # => [200, "OK", 1]
+     $res = increment_sqlite_counter(path=>"/home/ujang/myapp.db", counter=>"counter1", increment=>10); # => [200, "OK", 11]
+
+     # get the current value of counter
+     $res = get_sqlite_counter();               # => [200, "OK", 3, {'cmdline.exit_code'=>0}]
+     $res = get_sqlite_counter(counter=>'foo'); # => [200, "OK", undef, {'cmdline.exit_code'=>1}]
+
+    From command-line (install App::SQLiteCounterSimpeUtils):
+
+     # increment the dafault counter
+     % increment-sqlite-counter
+     1
+     % increment-sqlite-counter
+     2
+
+     # dry-run mode
+     % increment-sqlite-counter --dry-run
+     3
+     % increment-sqlite-counter --dry-run
+     3
+
+     # specify database path and counter name, and also the increment
+     % increment-sqlite-counter ~/myapp.db counter1
+     1
+     % increment-sqlite-counter ~/myapp.db counter1 -i 10
+     11
+
+DESCRIPTION
+    This module provides simple counter using SQLite as the storage. The
+    logic is simple; this module just uses row of a table to store a
+    counter. You can implement this yourself, but this module provides the
+    convenience of incrementing or getting the value of a counter using a
+    single function call or a single CLI script invocation.
+
+FUNCTIONS
+  dump_sqlite_counters
+    Usage:
+
+     dump_sqlite_counters(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Return all the counters in a SQLite database as a hash.
+
+    This function is not exported.
+
+    This function supports dry-run operation.
+
+    Arguments ('*' denotes required arguments):
+
+    *   path => *filename*
+
+        Database path.
+
+        If not specified, will default to $HOME/counter.db. If file does not
+        exist, will be created by DBD::SQLite.
+
+        If you want an in-memory database (that will be destroyed after your
+        process exits), use ":memory:".
+
+    Special arguments:
+
+    *   -dry_run => *bool*
+
+        Pass -dry_run=>1 to enable simulation mode.
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
+  get_sqlite_counter
+    Usage:
+
+     get_sqlite_counter(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Get the current value of a counter in a SQLite database.
+
+    Undef (exit code 1 in CLI) can be returned if counter does not exist.
+
+    This function is not exported.
+
+    This function supports dry-run operation.
+
+    Arguments ('*' denotes required arguments):
+
+    *   counter => *str*
+
+        Counter name, defaults to "default" if not specified.
+
+    *   path => *filename*
+
+        Database path.
+
+        If not specified, will default to $HOME/counter.db. If file does not
+        exist, will be created by DBD::SQLite.
+
+        If you want an in-memory database (that will be destroyed after your
+        process exits), use ":memory:".
+
+    Special arguments:
+
+    *   -dry_run => *bool*
+
+        Pass -dry_run=>1 to enable simulation mode.
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
+  increment_sqlite_counter
+    Usage:
+
+     increment_sqlite_counter(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Increment a counter in a SQLite database and return the new incremented
+    value.
+
+    The first time a counter is created, it will be set to 0 then
+    incremented to 1, and 1 will be returned. The next increment will
+    increment the counter to two and return it.
+
+    If dry-run mode is chosen, the value that is returned is the value had
+    the counter been incremented, but the counter will not be actually
+    incremented.
+
+    This function is not exported.
+
+    This function supports dry-run operation.
+
+    Arguments ('*' denotes required arguments):
+
+    *   counter => *str*
+
+        Counter name, defaults to "default" if not specified.
+
+    *   increment => *int* (default: 1)
+
+        Specify by how many should the counter be incremented.
+
+    *   path => *filename*
+
+        Database path.
+
+        If not specified, will default to $HOME/counter.db. If file does not
+        exist, will be created by DBD::SQLite.
+
+        If you want an in-memory database (that will be destroyed after your
+        process exits), use ":memory:".
+
+    Special arguments:
+
+    *   -dry_run => *bool*
+
+        Pass -dry_run=>1 to enable simulation mode.
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
+METHODS
+    Aside from the functional interface, this module also provides the OO
+    interface.
+
+  new
+    Constructor.
+
+    Usage:
+
+     my $counter = SQLite::Counter::Simple->new(%args);
+
+    Known arguments ("*" marks required argument):
+
+    *   path
+
+        Database path, defaults to "$HOME/counter.db".
+
+  increment
+    Increment counter.
+
+    Usage:
+
+     my $newval = $counter->increment(%args);
+
+    Arguments:
+
+    *   counter
+
+        Counter name, defaults to "default".
+
+    *   increment
+
+        Increment, defaults to 1.
+
+  get
+    Get current value of a counter.
+
+    Usage:
+
+     my $val = $counter->get(%args);
+
+    Arguments:
+
+    *   counter
+
+        Counter name, defaults to "default".
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/SQLite-Counter-Simple>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-SQLite-Counter-Simple>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=SQLite-Counter-Simple
+    >
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    SQLite::KeyValueStore::Simple
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2021 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

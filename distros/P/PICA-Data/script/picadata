@@ -46,6 +46,14 @@ Optional (C<o>/C<*>), mandatory (C<.>/C<+>), repeatable (C<+>/C<*>).
 
 Validate data against an Avram schema (C<-s/--schema>).
 
+=head2 diff
+
+Compare PICA records from two inputs. Output is always annotated PICA Plain.
+
+=head2 patch
+
+Apply modifications given in annotated PICA Plain.
+
 =head2 build
 
 Build an Avram schema from input data, optionally based on an existing schema
@@ -79,7 +87,8 @@ C<--schema> this will set annotations C<!> and C<?> to mark validation errors.
 =head2 --path, -p
 
 Select fields or subfield values specified by PICA Path expressions. Multiple
-expressions can be separated by C<|> or by repeating the option. 
+expressions can be separated by C<|> or by repeating the option. Positions such
+as C</3-7> are read as occurrence ranges. 
 
 =head2 --schema, -s
 

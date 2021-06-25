@@ -8,6 +8,7 @@ use Test::NoTabs;
 
 my @files = (
     'lib/MooX/TaggedAttributes.pm',
+    'lib/MooX/TaggedAttributes/Cache.pm',
     't/00-compile.t',
     't/00-report-prereqs.dd',
     't/00-report-prereqs.t',

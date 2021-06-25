@@ -4,10 +4,10 @@ use strict;
 use warnings;
 use 5.008004;
 use Carp qw( croak );
-use base qw( FFI::Platypus::TypeParser );
+use parent qw( FFI::Platypus::TypeParser );
 
 # ABSTRACT: FFI Type Parser Version Zero
-our $VERSION = '1.43'; # VERSION
+our $VERSION = '1.46'; # VERSION
 
 
 our @CARP_NOT = qw( FFI::Platypus FFI::Platypus::TypeParser );
@@ -165,7 +165,7 @@ FFI::Platypus::TypeParser::Version0 - FFI Type Parser Version Zero
 
 =head1 VERSION
 
-version 1.43
+version 1.46
 
 =head1 SYNOPSIS
 
@@ -268,6 +268,8 @@ Diab Jerius (DJERIUS)
 Eric Brine (IKEGAMI)
 
 szTheory
+
+José Joaquín Atria (JJATRIA)
 
 =head1 COPYRIGHT AND LICENSE
 

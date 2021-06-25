@@ -1,8 +1,7 @@
 requires 'perl' => v5.14;
 
-requires 'List::Util' => 1.45;
-
-requires 'Moo' => 1.001000;
+requires 'List::Util' => 1.29;
+requires 'Hash::Util';
 
 requires 'Graphics::ColorNames';
 

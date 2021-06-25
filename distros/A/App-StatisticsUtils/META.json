@@ -28,7 +28,7 @@
             "Test::Rinci" : "0.151"
          },
          "x_spec" : {
-            "Rinci" : "v1.1.94"
+            "Rinci" : "v1.1.96"
          }
       },
       "runtime" : {
@@ -64,7 +64,7 @@
          "web" : "https://github.com/perlancar/perl-App-StatisticsUtils"
       }
    },
-   "version" : "0.001",
+   "version" : "0.002",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"

@@ -51,6 +51,7 @@ t/spec/v3-invalid_include.yaml
 t/spec/v3-petstore.json
 t/spec/v3-valid_file_refs.yaml
 t/spec/v3-valid_include.yaml
+t/v2-basic.t
 t/v2-collectionformat.t
 t/v2-defaults.t
 t/v2-discriminator.t

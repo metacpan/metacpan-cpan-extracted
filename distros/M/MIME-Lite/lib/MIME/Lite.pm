@@ -1,6 +1,7 @@
 package MIME::Lite;
+use 5.006;    ### for /c modifier in m/\G.../gc modifier
 use strict;
-require 5.004;    ### for /c modifier in m/\G.../gc modifier
+use warnings;
 
 =head1 NAME
 
@@ -356,7 +357,7 @@ use vars qw(
 
 
 # GLOBALS, EXTERNAL/CONFIGURATION...
-$VERSION = '3.031';
+$VERSION = '3.033';
 
 ### Automatically interpret CC/BCC for SMTP:
 $AUTO_CC = 1;
@@ -2111,7 +2112,8 @@ sub print {
 
     ### Output head, separator, and body:
     $self->verify_data if $AUTO_VERIFY;    ### prevents missing parts!
-    $out->print( $self->header_as_string, "\n" );
+    $out->print( $self->header_as_string );
+    $out->print( "\n" );
     $self->print_body($out);
 }
 
@@ -2134,7 +2136,8 @@ sub print_for_smtp {
     my $header = $self->fields_as_string( \@fields );
 
     ### Output head, separator, and body:
-    $out->print( $header, "\n" );
+    $out->print( $header );
+    $out->print( "\n" );
     $self->print_body( $out, '1' );
 }
 
@@ -2720,7 +2723,7 @@ sub send_by_sendmail {
         if ( $p{SetSender} ) {
             my $from = $p{FromSender} || ( $self->get('From') )[0];
             if ($from) {
-                my ($from_addr) = extract_full_addrs($from);
+                my ($from_addr) = extract_only_addrs($from);
                 push @cmd, "-f$from_addr" if $from_addr;
             }
         }
@@ -2843,7 +2846,7 @@ if the send was successful or not.
 
 # external opts
 my @_mail_opts     = qw( Size Return Bits Transaction Envelope );
-my @_recip_opts    = qw( SkipBad );
+my @_recip_opts    = qw( SkipBad Notify );
 my @_net_smtp_opts = qw( Hello LocalAddr LocalPort Timeout
                          AuthUser AuthPass SSL
                          Port ExactAddresses Debug );
@@ -3733,7 +3736,7 @@ for any patches you provide.
 
 =head1 VERSION
 
-Version: 3.031
+Version: 3.033
 
 =head1 CHANGE LOG
 

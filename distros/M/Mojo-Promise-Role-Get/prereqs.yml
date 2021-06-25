@@ -1,0 +1,9 @@
+runtime:
+  requires:
+    perl: '5.010001'
+    Carp: 0
+    Mojolicious: '8.0' # promise cloning
+    Role::Tiny: '2.000002'
+test:
+  requires:
+    Test::More: '0.88'

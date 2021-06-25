@@ -1,2 +1,6 @@
+0.002     2021-06-16 00:42:30 EDT
+  - Update IRC metadata to libera.chat
+  - Mention trusted_proxies alternative available since Mojolicious 8.72
+
 0.001     2018-09-05 20:56:40 EDT
   - First release

@@ -5,7 +5,7 @@ use Test::More;
 use File::Temp qw(tempfile);
 
 use EventStore::Tiny;
-use EventStore::Tiny::DataEvent;
+use EventStore::Tiny::TransformationStore;
 
 # Prepare test "file handle"
 package TestFileHandle;
@@ -26,7 +26,8 @@ subtest 'Default logger' => sub {
     subtest 'Dummy event type' => sub {
 
         $logger->log_event(EventStore::Tiny::Event->new(
-            name => 'TestEventTypeStored',
+            name        => 'TestEventTypeStored',
+            trans_store => EventStore::Tiny::TransformationStore->new,
         ));
         is $print_target->length => 1, 'Correct event history size';
         my $log_str = $print_target->history->[0];
@@ -36,9 +37,10 @@ subtest 'Default logger' => sub {
 
     # Log a dummy event
     subtest 'Dummy event' => sub {
-        $logger->log_event(EventStore::Tiny::DataEvent->new(
-            name => 'TestEventStored',
-            data => {a => 17, b => 42},
+        $logger->log_event(EventStore::Tiny::Event->new(
+            name        => 'TestEventStored',
+            trans_store => EventStore::Tiny::TransformationStore->new,
+            data        => {a => 17, b => 42},
         ));
         is $print_target->length => 2, 'Correct event history size';
         my $log_str = $print_target->history->[1];
@@ -55,9 +57,10 @@ subtest 'Default logger' => sub {
             is ref($log_cb) => 'CODE', 'Subroutine reference generated';
 
             # Log a dummy event
-            $log_cb->(EventStore::Tiny::DataEvent->new(
-                name => 'TestEventStored',
-                data => {foo => 1, bar => 2},
+            $log_cb->(EventStore::Tiny::Event->new(
+                name        => 'TestEventStored',
+                trans_store => EventStore::Tiny::TransformationStore->new,
+                data        => {foo => 1, bar => 2},
             ));
 
             # Test
@@ -75,9 +78,10 @@ subtest 'Default logger' => sub {
             );
 
             # Log a dummy event
-            $log_cb->(EventStore::Tiny::DataEvent->new(
-                name => 'TestEventStored',
-                data => {bar => 2, baz => 3},
+            $log_cb->(EventStore::Tiny::Event->new(
+                name        => 'TestEventStored',
+                trans_store => EventStore::Tiny::TransformationStore->new,
+                data        => {bar => 2, baz => 3},
             ));
 
             # Test
@@ -98,9 +102,10 @@ subtest 'Default logger' => sub {
         my $logger = EventStore::Tiny::Logger->new;
 
         # Log a dummy event
-        $logger->log_event(EventStore::Tiny::DataEvent->new(
-            name => 'TestEventStored',
-            data => {baz => 17, quux => 42},
+        $logger->log_event(EventStore::Tiny::Event->new(
+            name        => 'TestEventStored',
+            trans_store => EventStore::Tiny::TransformationStore->new,
+            data        => {baz => 17, quux => 42},
         ));
 
         # Restore STDOUT
@@ -123,12 +128,14 @@ subtest 'Integration' => sub {
         # Prepare logger
         my $logger = EventStore::Tiny::Logger->new(print_target => $print_target);
 
-        subtest 'Event Type' => sub {
+        subtest 'Bare Event' => sub {
 
             # Prepare event
+            my $ts = EventStore::Tiny::TransformationStore->new;
+            $ts->set(Foo => sub {shift->{foo} = 42});
             my $event = EventStore::Tiny::Event->new(
-                name            => 'Foo',
-                transformation  => sub {shift->{foo} = 42},
+                name        => 'Foo',
+                trans_store => $ts,
             );
 
             subtest 'With logger set' => sub {
@@ -151,13 +158,15 @@ subtest 'Integration' => sub {
         subtest 'Data Event' => sub {
 
             # Prepare
-            my $event = EventStore::Tiny::DataEvent->new(
-                name            => 'Bar',
-                data            => {add => 2},
-                transformation  => sub {
-                    my ($state, $data) = @_;
-                    $state->{foo} = 17 + $data->{add};
-                },
+            my $ts = EventStore::Tiny::TransformationStore->new;
+            $ts->set(Bar => sub {
+                my ($state, $data) = @_;
+                $state->{foo} = 17 + $data->{add};
+            });
+            my $event = EventStore::Tiny::Event->new(
+                name        => 'Bar',
+                trans_store => $ts,
+                data        => {add => 2},
             );
 
             subtest 'With logger set' => sub {

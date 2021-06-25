@@ -2,13 +2,13 @@ NAME
     Data::Dmp - Dump Perl data structures as Perl code
 
 VERSION
-    This document describes version 0.240 of Data::Dmp (from Perl
-    distribution Data-Dmp), released on 2020-04-07.
+    This document describes version 0.241 of Data::Dmp (from Perl
+    distribution Data-Dmp), released on 2021-06-24.
 
 SYNOPSIS
      use Data::Dmp; # exports dd() and dmp()
      dd [1, 2, 3]; # prints "[1,2,3]"
-     $a = dmp({a => 1}); # -> "{a=>1}"
+     $var = dmp({a => 1}); # -> "{a=>1}"
 
     Print truncated dump (capped at
     "$Data::Dmp::OPT_MAX_DUMP_LEN_BEFORE_ELLIPSIS" characters):
@@ -85,22 +85,22 @@ VARIABLES
 
 BENCHMARKS
      [1..10]:
-                          Rate    Data::Dump Data::Dumper Data::Dmp
-     Data::Dump    32032+-55/s            --       -64.6%    -73.9%
-     Data::Dumper 90580+-110/s 182.77+-0.59%           --    -26.1%
-     Data::Dmp    122575+-43/s 282.66+-0.67% 35.32+-0.17%        --
+                  Rate/s Precision/s  Data::Dump Data::Dumper Data::Dmp
+     Data::Dump    25040         100          --       -64.4%    -75.4%
+     Data::Dumper  70280         130 180.6+-1.2%           --    -30.9%
+     Data::Dmp    101744          34 306.3+-1.6% 44.78+-0.28%        --
  
      [1..100]:
-                           Rate    Data::Dump   Data::Dmp Data::Dumper
-     Data::Dump   3890.6+-5.9/s            --      -73.7%       -73.7%
-     Data::Dmp     14768.3+-5/s 279.59+-0.59%          --        -0.1%
-     Data::Dumper   14790+-87/s   280.2+-2.3% 0.15+-0.59%           --
+                  Rate/s Precision/s    Data::Dump Data::Dumper Data::Dmp
+     Data::Dump   3141.2         4.7            --       -74.5%    -75.1%
+     Data::Dumper  12308          81   291.8+-2.6%           --     -2.3%
+     Data::Dmp     12597          13 301.04+-0.73%  2.35+-0.68%        --
  
      Some mixed structure:
-                         Rate    Data::Dump   Data::Dmp Data::Dumper
-     Data::Dump    9035+-17/s            --      -68.3%       -80.9%
-     Data::Dmp    28504+-10/s 215.47+-0.59%          --       -39.6%
-     Data::Dumper 47188+-55/s   422.3+-1.1% 65.55+-0.2%           --
+                   Rate/s Precision/s  Data::Dump    Data::Dmp Data::Dumper
+     Data::Dump      7619          24          --       -68.8%       -77.9%
+     Data::Dmp    24427.8           8   220.6+-1%           --       -29.0%
+     Data::Dumper   34410          53 351.6+-1.6% 40.86+-0.22%           --
 
 FUNCTIONS
   dd
@@ -202,7 +202,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2020, 2017, 2016, 2015, 2014 by
+    This software is copyright (c) 2021, 2020, 2017, 2016, 2015, 2014 by
     perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under

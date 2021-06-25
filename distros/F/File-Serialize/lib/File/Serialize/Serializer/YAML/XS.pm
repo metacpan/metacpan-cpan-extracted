@@ -1,7 +1,7 @@
 package File::Serialize::Serializer::YAML::XS;
 our $AUTHORITY = 'cpan:YANICK';
 #ABSTRACT: YAML:XS serializer for File::Serialize
-$File::Serialize::Serializer::YAML::XS::VERSION = '1.5.0';
+$File::Serialize::Serializer::YAML::XS::VERSION = '1.5.1';
 use strict;
 use warnings;
 
@@ -38,7 +38,7 @@ File::Serialize::Serializer::YAML::XS - YAML:XS serializer for File::Serialize
 
 =head1 VERSION
 
-version 1.5.0
+version 1.5.1
 
 =head1 DESCRIPTION
 

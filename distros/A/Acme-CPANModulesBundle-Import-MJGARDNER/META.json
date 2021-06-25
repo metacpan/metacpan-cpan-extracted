@@ -41,6 +41,10 @@
       "x_mentions" : {
          "x_mentions" : {
             "Data::Dumper" : "0",
+            "DateTime" : "0",
+            "DateTime::Locale" : "0",
+            "DateTime::Locale::Catalog" : "0",
+            "HTTP::AcceptLanguage" : "0",
             "Hash::Util" : "0",
             "List::AllUtils" : "0",
             "List::MoreUtils" : "0",
@@ -50,6 +54,7 @@
             "List::Util" : "0",
             "List::Util::MaybeXS" : "0",
             "List::UtilsBy" : "0",
+            "Locale::Maketext" : "0",
             "Scalar::Util" : "0",
             "String::CamelCase" : "0",
             "String::Util" : "0",
@@ -69,7 +74,7 @@
          "web" : "https://github.com/perlancar/perl-Acme-CPANModulesBundle-Import-MJGARDNER"
       }
    },
-   "version" : "0.001",
+   "version" : "0.002",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"

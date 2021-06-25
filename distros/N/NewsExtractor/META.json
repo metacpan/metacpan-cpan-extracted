@@ -34,6 +34,7 @@
             "JSON" : "0",
             "Mojolicious" : "8.25",
             "Moo" : "0",
+            "Ref::Util" : "0",
             "SemanticWeb::Schema" : "0",
             "Test2::V0" : "0",
             "Try::Tiny" : "0",
@@ -46,7 +47,7 @@
    "provides" : {
       "NewsExtractor" : {
          "file" : "lib/NewsExtractor.pm",
-         "version" : "v0.41.0"
+         "version" : "v0.42.0"
       },
       "NewsExtractor::Article" : {
          "file" : "lib/NewsExtractor/Article.pm"
@@ -225,6 +226,9 @@
       "NewsExtractor::SiteSpecificExtractor::www_xinhuanet_com" : {
          "file" : "lib/NewsExtractor/SiteSpecificExtractor/www_xinhuanet_com.pm"
       },
+      "NewsExtractor::SiteSpecificExtractor::yimedia_com_tw" : {
+         "file" : "lib/NewsExtractor/SiteSpecificExtractor/yimedia_com_tw.pm"
+      },
       "NewsExtractor::TXExtractor" : {
          "file" : "lib/NewsExtractor/TXExtractor.pm"
       },
@@ -246,7 +250,7 @@
          "web" : "https://github.com/perltaiwan/NewsExtractor"
       }
    },
-   "version" : "v0.41.0",
+   "version" : "v0.42.0",
    "x_serialization_backend" : "JSON::PP version 4.04",
    "x_spdx_expression" : "CC0-1.0",
    "x_static_install" : "1"

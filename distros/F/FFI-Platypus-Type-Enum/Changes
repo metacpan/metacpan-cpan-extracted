@@ -1,5 +1,7 @@
 Revision history for FFI-Platypus-Type-Enum},
 
+0.06      2021-06-21 18:19:51 -0600
+
 0.05      2021-05-26 20:53:20 -0600
   - Add rev => 'dualvar' option (gh#15)
   - Multiple packages can be specified for constant generation

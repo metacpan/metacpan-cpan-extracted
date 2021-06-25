@@ -6,7 +6,7 @@ use Mojo::Util qw(encode md5_sum);
 use Template;
 use Template::Provider::Mojo;
 
-our $VERSION = '0.005';
+our $VERSION = '0.006';
 
 sub register {
 	my ($self, $app, $conf) = @_;
@@ -28,7 +28,7 @@ sub register {
 		# Helpers
 		foreach my $method (grep { m/^\w+\z/ } keys %{$renderer->helpers}) {
 			my $sub = $renderer->helpers->{$method};
-			$params{$method} = sub { carp "Calling helpers directly in templates is deprecated. Use c.$method or h.$method"; $c->$sub(@_) };
+			$params{$method} = sub { carp "Calling helpers directly in templates is deprecated. Use c.$method"; $c->$sub(@_) };
 		}
 		
 		# Stash values
@@ -107,11 +107,15 @@ you should set L<Mojolicious::Renderer/"paths"> to the appropriate paths.
 L<Mojolicious> stash values will be exposed directly as
 L<variables|Template::Manual::Variables> in the templates, and the current
 controller object will be available as C<c> or C<self>, similar to
-L<Mojolicious::Plugin::EPRenderer>. Helper methods can be called on the
-L<controller object|Mojolicious::Controller/"AUTOLOAD"> or a more efficient
-L<proxy object|Mojolicious::Controller/"helpers"> available as C<h>. See
-L<Mojolicious::Plugin::DefaultHelpers> and L<Mojolicious::Plugin::TagHelpers>
-for a list of all built-in helpers.
+L<Mojolicious::Plugin::EPRenderer>.
+
+Helper methods can be called on the controller object as normal, as well as on
+a L<proxy object|Mojolicious::Controller/"helpers"> available as C<h>. The
+proxy object was previously needed for efficiency as the controller object used
+C<AUTOLOAD> to call helper methods, but since Mojolicious 8.04 the controller
+object uses a more efficient mechanism and the proxy object is no longer
+needed. See L<Mojolicious::Plugin::DefaultHelpers> and
+L<Mojolicious::Plugin::TagHelpers> for a list of all built-in helper methods.
 
 Accessing helper methods directly as variables, rather than via the controller
 or proxy object, is deprecated and may be removed in a future release.
@@ -123,7 +127,7 @@ or proxy object, is deprecated and may be removed in a future release.
    [% engine %] is a [% description %].
  [% END %]
  
- [% h.link_to('Template Toolkit', 'http://www.template-toolkit.org') %]
+ [% c.link_to('Template Toolkit', 'http://www.template-toolkit.org') %]
  
  [% c.param('foo') %]
 

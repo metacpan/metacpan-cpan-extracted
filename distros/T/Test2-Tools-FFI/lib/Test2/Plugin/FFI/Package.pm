@@ -8,7 +8,7 @@ use Cwd qw( getcwd );
 use File::Basename qw( basename );
 
 # ABSTRACT: Plugin to test bundled FFI code without EUMM
-our $VERSION = '0.05'; # VERSION
+our $VERSION = '0.06'; # VERSION
 
 
 sub import
@@ -55,7 +55,7 @@ Test2::Plugin::FFI::Package - Plugin to test bundled FFI code without EUMM
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 

@@ -1,6 +1,6 @@
 package App::venn ;  
-our $VERSION = '0.110' ; 
-our $DATE = '2021-06-08T17:47+09:00' ; 
+our $VERSION = '0.120' ; 
+our $DATE = '2021-06-19T21:58+09:00' ; 
 
 =encoding utf8
 
@@ -26,7 +26,7 @@ $ function y(){ echo -n $* | perl -pe's/./$&\n/g' } # ← Defined a shell functi
 
 $ venn <(y ABCCCC) <(y AABDEF) <(y ABBDEF) <(y DEEEF) # Each <(...) means the process substitution. Each is treated as a file as the result of the contained command. Out follows next 4 lines:
 
-  cardi. file1  file2  file3  file4  strmin strmax
+  cardi. file1  file2  file3  file4  minstr maxstr
   2.     2      3      3      0      'A'    'B'
   1.     4      0      0      0      'C'
   3.     0      3      3      5      'D'    'F'

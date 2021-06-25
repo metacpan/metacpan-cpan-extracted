@@ -93,9 +93,17 @@ SpeedyFxResult *result_addr (SV *self) {
 }
 
 #if PERL_VERSION >= 16
-#define ChrCode(u, v, len) (U32) utf8_to_uvchr_buf(u, v, len);
+#define ChrCode(u, v, len) (U32) utf8_to_uvchr_buf(u, v, len)
 #else
 #define ChrCode(u, v, len) (U32) utf8_to_uvchr(u, len)
+#endif
+
+#if PERL_VERSION >= 32
+#define ChrIsAlphanum(s, end) isWORDCHAR_utf8_safe(s, end)
+#define ChrToLower(p, e, s, lenp) toLOWER_utf8_safe(p, e, s, lenp)
+#else
+#define ChrIsAlphanum(s, end) isALNUM_utf8(s)
+#define ChrToLower(p, e, s, lenp) toLOWER_utf8(p, s, lenp)
 #endif
 
 #define SetBit(a, b)    (((U8 *) a)[(b) >> 3] |= (1 << ((b) & 7)))
@@ -350,8 +358,8 @@ CODE:
                 t = uvchr_to_utf8(s, (UV) i);
                 *t = '\0';
 
-                if (isALNUM_utf8(s)) {
-                    (void) toLOWER_utf8(s, u, &len);
+                if (ChrIsAlphanum(s, t)) {
+                    (void) ChrToLower(s, t, u, &len);
                     *(u + len) = '\0';
                     v = u + len;
 

@@ -1,0 +1,22 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use open qw( :encoding(UTF-8) :std );
+use File::Basename;
+use Pod::PseudoPod::DOM::App::ToHTML;
+
+my @files = map
+{
+    my $file = $_;
+    # HTML output goes to the current working
+    # directory not the source directory.
+    my $outfile = fileparse( $file, qr{\..*} ) . '.html';
+
+    [ $file => $outfile ],
+} @ARGV;
+
+Pod::PseudoPod::DOM::App::ToHTML::process_files_with_output( @files );
+
+exit;

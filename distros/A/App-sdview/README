@@ -1,0 +1,34 @@
+NAME
+
+    App::sdview - a terminal document viewer for POD and other syntaxes
+
+SYNOPSIS
+
+       use App::sdview;
+    
+       exit App::sdview->new->run( "some-file.pod" );
+
+DESCRIPTION
+
+    This module implements a terminal-based program for viewing structured
+    documents. It currently understands POD and some simple Markdown
+    formatting, though future versions are expected to handle nroff (for
+    manpages) and other styles.
+
+    To actually use it, you likely wanted wanted to see the bin/sdview
+    script.
+
+TODO
+
+      * Add more formats. nroff and ReST at least. Perhaps others.
+
+      * Improved Markdown parser. Currently the parser is very simple.
+
+      * Other outputs. Consider a Tickit-based frontend. Also some
+      structured file writers - allowing cross-conversion between POD,
+      Markdown, ReST, nroff and maybe also HTML output.
+
+AUTHOR
+
+    Paul Evans <leonerd@leonerd.org.uk>
+

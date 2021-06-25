@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 package Config::INI::Writer;
-$Config::INI::Writer::VERSION = '0.025';
+$Config::INI::Writer::VERSION = '0.027';
 use Mixin::Linewise::Writers;
 # ABSTRACT: a subclassable .ini-file emitter
 
@@ -511,7 +511,7 @@ Config::INI::Writer - a subclassable .ini-file emitter
 
 =head1 VERSION
 
-version 0.025
+version 0.027
 
 =head1 SYNOPSIS
 
@@ -555,6 +555,16 @@ L<Config::Tiny>, on which it is based.
 The chief difference is that Config::INI::Writer is designed to be subclassed
 to allow for side-effects and self-reconfiguration to occur during the course
 of reading its input.
+
+=head1 PERL VERSION SUPPORT
+
+This module has a long-term perl support period.  That means it will not
+require a version of perl released fewer than five years ago.
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
 
 =head1 METHODS FOR WRITING CONFIG
 
@@ -779,7 +789,7 @@ ephemerally.
 
 =head1 AUTHOR
 
-Ricardo Signes <rjbs@cpan.org>
+Ricardo Signes <rjbs@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -63,6 +63,35 @@ subtest 'sources' => sub {
     done_testing;
 };
 
-done_testing;
+SKIP: {
+    skip 'Sentinel module not installed', 1 unless eval { require Sentinel };
+    subtest 'sentinel' => sub {
+        is(exception {
+            my $v = Ryu::Observable->new("example\n");
+            for($v->lvalue_str) {
+                chomp;
+                is($v->as_string, 'example', 'chomp operation on lvalue_str applied to original instance');
+                $_ = 'test';
+                is($v->as_string, 'test', 'assignment operation on lvalue_str applied to original instance');
+            }
+            is("$v", 'test', 'new value retained on lvalue destruction');
+            is_oneref($v, 'single ref for our observable');
+        }, undef, 'no exceptions raised');
 
+        is(exception {
+            my $v = Ryu::Observable->new(123);
+            for($v->lvalue_num) {
+                $_ *= 2;
+                is($v->as_number, 246, 'multiply operation on lvalue_num applied to original instance');
+                $_ = 8;
+                is($v->as_number, 8, 'assignment operation on lvalue_num applied to original instance');
+            }
+            is(0 + $v, 8, 'new value retained on lvalue destruction');
+            is_oneref($v, 'single ref for our observable');
+        }, undef, 'no exceptions raised');
+        done_testing;
+    };
+}
+
+done_testing;
 

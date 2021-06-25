@@ -1,5 +1,9 @@
 Revision history for perl distribution App-proxyforurl
 
+0.08 2021-06-17T09:10:12+0900
+ - Add support for X-Request-Base
+ - Compatible with Mojolicious 9.11
+
 0.07 2018-03-03T15:33:27+0100
  - Fix pure-min.css URL
  - Fix loading application in tests

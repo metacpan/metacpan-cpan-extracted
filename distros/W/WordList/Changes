@@ -1,3 +1,23 @@
+0.7.10  2021-06-23  Released-By: PERLANCAR; Urgency: low
+
+	- No spec changes.
+
+	- [doc] Mention ArrayData (and HashData & TableData).
+
+
+0.7.9   2021-03-05  Released-By: PERLANCAR; Urgency: low
+
+	- No spec changes.
+
+	- [doc] Mention WordListRole::FromArray, fix module names in
+	  mentions.
+
+
+0.7.8   2021-02-23  Released-By: PERLANCAR; Urgency: medium
+
+	- Add WordListRole::FromArray.
+
+
 0.7.7   2021-01-28  Released-By: PERLANCAR; Urgency: low
 
 	- No spec changes.

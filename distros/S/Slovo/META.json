@@ -39,7 +39,7 @@
             "Mojo::SQLite" : "3.004",
             "Mojolicious" : "9.02",
             "Mojolicious::Plugin::Authentication" : "1.32",
-            "Mojolicious::Plugin::OpenAPI" : "3.40",
+            "Mojolicious::Plugin::OpenAPI" : "4.04",
             "Mojolicious::Plugin::PODViewer" : "0.006",
             "Mojolicious::Plugin::RoutesConfig" : "0.06",
             "Net::SMTP" : "3.11",
@@ -66,6 +66,6 @@
          "web" : "https://github.com/kberov/Slovo"
       }
    },
-   "version" : "v2021.05.21",
+   "version" : "v2021.06.16",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

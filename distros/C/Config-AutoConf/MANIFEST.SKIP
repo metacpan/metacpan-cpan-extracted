@@ -32,3 +32,4 @@ Config-AutoConf-.*
 ^MYMETA\..*
 cover_db
 nytprof
+test*_

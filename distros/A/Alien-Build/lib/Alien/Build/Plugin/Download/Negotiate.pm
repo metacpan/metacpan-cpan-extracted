@@ -8,7 +8,7 @@ use Alien::Build::Util qw( _has_ssl );
 use Carp ();
 
 # ABSTRACT: Download negotiation plugin
-our $VERSION = '2.40'; # VERSION
+our $VERSION = '2.41'; # VERSION
 
 
 has '+url' => undef;
@@ -195,7 +195,7 @@ Alien::Build::Plugin::Download::Negotiate - Download negotiation plugin
 
 =head1 VERSION
 
-version 2.40
+version 2.41
 
 =head1 SYNOPSIS
 
@@ -366,6 +366,8 @@ Shawn Laffan (SLAFFAN)
 Paul Evans (leonerd, PEVANS)
 
 Håkon Hægland (hakonhagland, HAKONH)
+
+nick nauwelaerts (INPHOBIA)
 
 =head1 COPYRIGHT AND LICENSE
 

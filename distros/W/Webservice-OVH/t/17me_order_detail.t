@@ -15,7 +15,7 @@ use Webservice::OVH;
 
 my $api = Webservice::OVH->new_from_json($json_dir);
 ok( $api, "module ok" );
-
+=head2
 my $orders = $api->me->orders;
 my $order = $orders->[0];
 ok( $orders && ref $orders eq 'ARRAY', 'orders ok' );
@@ -33,5 +33,5 @@ ok( $detail->domain, 'id ok');
 ok( $detail->quantity, 'id ok');
 ok( $detail->total_price, 'id ok');
 ok( $detail->unit_price, 'id ok');
-
+=cut
 done_testing();

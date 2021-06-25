@@ -1,0 +1,14 @@
+Revision history for Perl module Mojolicious::Plugin::Obrazi
+
+0.11 11.06.2021 (пт) 14:34:12 EEST
+    Initial release. We have a working command to generate a HTML page - a
+    gallery form a directory full of images.
+
+0.12 12.06.2021 (сб) 17:22:30 EEST
+    Command: Optimised regeneration of HTML. Images are not resized again if they are
+    already found in their --to_dir location. Using not slim version of jQuery
+    to have some nice effects when switching images. Mentioned Chota and jQuery
+    in POD. Added left and right triangle buttons for navigation becide the
+    handling of left and right keypresses. Improved documentation.
+    Added a LICENSE file. Added a README. Now a template can be passed on the
+    command-line via --template.

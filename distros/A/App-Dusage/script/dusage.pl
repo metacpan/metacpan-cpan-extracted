@@ -4,8 +4,8 @@
 # Author          : Johan Vromans
 # Created On      : Sun Jul  1 21:49:37 1990
 # Last Modified By: Johan Vromans
-# Last Modified On: Mon Jan  4 11:43:38 2021
-# Update Count    : 206
+# Last Modified On: Tue Jun 15 08:32:04 2021
+# Update Count    : 212
 # Status          : OK
 #
 # This program requires Perl version 5.10.1, or higher.
@@ -15,7 +15,7 @@
 use strict;
 
 my $my_name = qw( dusage );
-our $VERSION = "2.01";
+our $VERSION = "2.02";
 
 ################ Command line parameters ################
 
@@ -331,9 +331,9 @@ sub report_and_update {
 	    next;
 	}
 
-	print STDERR ("Oops1 $nam\n")
+	warn("Oops1 $nam\n"), next
 	  unless $nam =~ /\*/ || defined $oldblocks{$nam};
-	print STDERR ("Oops2 $nam\n")
+	warn("Oops2 $nam\n"), next
 	  unless $nam =~ /\*/ || defined $newblocks{$nam};
 
 	@a = split (/:/, $oldblocks{$nam} . ":::::::", -1);

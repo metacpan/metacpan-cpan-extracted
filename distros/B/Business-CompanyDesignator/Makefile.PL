@@ -18,6 +18,7 @@ requires      'Unicode::Normalize';
 requires      'YAML' => 0.71;
 
 test_requires 'Data::Dump';
+test_requires 'Encode';
 test_requires 'File::HomeDir';
 test_requires 'Test::More' => 0.88;
 test_requires 'Test::Files';

@@ -7,7 +7,7 @@ use Alien::Build::Plugin;
 use Carp ();
 
 # ABSTRACT: Probe system and determine library or tool properties using the pkg-config command line interface
-our $VERSION = '2.40'; # VERSION
+our $VERSION = '2.41'; # VERSION
 
 
 has '+pkg_name' => sub {
@@ -203,7 +203,7 @@ Alien::Build::Plugin::PkgConfig::CommandLine - Probe system and determine librar
 
 =head1 VERSION
 
-version 2.40
+version 2.41
 
 =head1 SYNOPSIS
 
@@ -315,6 +315,8 @@ Shawn Laffan (SLAFFAN)
 Paul Evans (leonerd, PEVANS)
 
 Håkon Hægland (hakonhagland, HAKONH)
+
+nick nauwelaerts (INPHOBIA)
 
 =head1 COPYRIGHT AND LICENSE
 

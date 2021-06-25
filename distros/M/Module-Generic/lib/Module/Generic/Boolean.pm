@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/Boolean.pm
-## Version v1.0.1
+## Version v1.0.2
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/20
-## Modified 2021/03/20
+## Modified 2021/05/03
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -19,10 +19,19 @@ BEGIN
       "++"     => sub { $_[0] = ${$_[0]} + 1 },
       "--"     => sub { $_[0] = ${$_[0]} - 1 },
       fallback => 1;
-    our( $VERSION ) = 'v1.0.1';
+    use Module::Generic::Array;
+    use Module::Generic::Number;
+    use Module::Generic::Scalar;
+    our( $VERSION ) = 'v1.0.2';
 };
 
 sub new { return( $_[1] ? $true : $false ); }
+
+sub as_array { return( Module::Generic::Array->new( [ ${$_[0]} ] ) ); }
+
+sub as_number { return( Module::Generic::Number->new( ${$_[0]} ) ); }
+
+sub as_scalar { return( Module::Generic::Scalar->new( ${$_[0]} ) ); }
 
 sub defined { return( 1 ); }
 

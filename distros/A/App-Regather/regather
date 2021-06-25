@@ -23,7 +23,7 @@ regather [-h|--help|-? -F] <-c regather.conf> [ -C section.option=value, ... ]
 =head1 DESCRIPTION
 
 I<regather> is a LDAP syncrepl consumer to generate ( B<re-gather> )
-files on LDAP synrepl events or even more, it can perform any action
+files on LDAP syncrepl events or even more, it can perform any action
 you set (like create/delete directories or other).
 
 I<regather> performs all actions through plugins. Plugins currently

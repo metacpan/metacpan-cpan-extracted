@@ -47,7 +47,7 @@ sub do_http {
 
 	$req->referer($$opt{referer}) if $$opt{referer};
 
-	if ($$opt{gzip}) {
+	if ($$opt{compressed} or $$opt{gzip}) {
 		$req->header('Accept-Encoding', 'gzip, deflate');
 		require Compress::Raw::Zlib;
 	}
@@ -77,7 +77,7 @@ sub do_http {
 				my ($h, @hr) = reverse @hrs;
 				$headers_got = 1;
 				$content_encoding = $$h{'content-encoding'};
-				if ($$opt{gzip} and $content_encoding) {
+				if (($$opt{compressed} or $$opt{gzip}) and $content_encoding) {
 					if ($content_encoding eq 'deflate') {
 						$inflate = Compress::Raw::Zlib::Inflate->new();
 					} elsif ($content_encoding eq 'gzip') {
@@ -137,13 +137,11 @@ sub do_http {
 			$cb->($is_success, undef, $h, \@hr);
 	} else {
 		my $content_encoding = $$h{'content-encoding'};
-		if ($res->content and $$opt{gzip} and $content_encoding) {
-			if ($content_encoding eq 'deflate' or $content_encoding eq 'gzip') {
-				my $inflate = Compress::Raw::Zlib::Inflate->new($content_encoding eq 'gzip' ? (-WindowBits => Compress::Raw::Zlib::WANT_GZIP()) : ());
-				my $status = $inflate->inflate($res->content, my $output);
-				$status == Compress::Raw::Zlib::Z_OK() or $status == Compress::Raw::Zlib::Z_STREAM_END() or warn "inflation failed: $status\n";
-				$cb->($is_success, $output, $h, \@hr);
-			}
+		if ($res->content and ($$opt{compressed} or $$opt{gzip}) and $content_encoding and ($content_encoding eq 'deflate' or $content_encoding eq 'gzip')) {
+			my $inflate = Compress::Raw::Zlib::Inflate->new($content_encoding eq 'gzip' ? (-WindowBits => Compress::Raw::Zlib::WANT_GZIP()) : ());
+			my $status = $inflate->inflate($res->content, my $output);
+			$status == Compress::Raw::Zlib::Z_OK() or $status == Compress::Raw::Zlib::Z_STREAM_END() or warn "inflation failed: $status\n";
+			$cb->($is_success, $output, $h, \@hr);
 		} else {
 			$cb->($is_success, $res->content, $h, \@hr);
 		}

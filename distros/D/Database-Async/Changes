@@ -1,5 +1,16 @@
 Revision history for Database-Async
 
+0.014     2021-06-16 00:58:19+08:00 Asia/Kuala_Lumpur
+    [New features]
+
+    - encoding now supported, for cases where all interaction with the database
+    is text-only
+
+    [Bugs fixed]
+
+    - query completion logic has been refactored to cover the different states better,
+    particularly regarding streaming in/out (e.g. COPY in PostgreSQL)
+
 0.013     2020-12-03 00:13:37+08:00 Asia/Kuala_Lumpur
     New features:
 

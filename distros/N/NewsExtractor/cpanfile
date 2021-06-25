@@ -12,3 +12,4 @@ requires 'Type::Tiny';
 requires 'Types::URI';
 requires 'YAML';
 requires 'HTTP::Date';
+requires 'Ref::Util';

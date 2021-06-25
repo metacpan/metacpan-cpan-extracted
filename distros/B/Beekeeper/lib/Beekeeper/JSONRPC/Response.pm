@@ -3,7 +3,7 @@ package Beekeeper::JSONRPC::Response;
 use strict;
 use warnings;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 
 sub new {
@@ -36,7 +36,7 @@ Beekeeper::JSONRPC::Response - Representation of a JSON-RPC response.
  
 =head1 VERSION
  
-Version 0.05
+Version 0.06
 
 =head1 SYNOPSIS
 
@@ -55,8 +55,8 @@ Version 0.05
 
 Objects of this class represents a JSON-RPC response (see L<http://www.jsonrpc.org/specification>).
 
-When a RPC call is made the worker replies with a Beekeeper::JSONRPC::Response object
-if the invoked method was executed successfully. On error, a Beekeeper::JSONRPC::Error
+When a RPC call is made the worker replies with a L<Beekeeper::JSONRPC::Response> object
+if the invoked method was executed successfully. On error, a L<Beekeeper::JSONRPC::Error>
 is returned instead.
 
 Method C<Beekeeper::Client-\>call_remote> returns objects of this class on success.

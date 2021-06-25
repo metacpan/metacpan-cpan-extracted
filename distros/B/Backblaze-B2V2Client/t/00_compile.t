@@ -18,7 +18,7 @@ ok($b2client->{account_id} eq $account_id, $connection_words );
 like($b2client->{account_authorization_token}, qr/4\_$application_key_id/, $connection_words );
 
 # test file download
-$b2client->b2_download_file_by_id($test_file_id);
+my $current_status = $b2client->b2_download_file_by_id($test_file_id);
 ok($b2client->{current_status} eq 'OK', 'Test file could not be downloaded; B2 Msg: '.$b2client->latest_error() );
 ok( length($b2client->{b2_response}{file_contents}) > 15000, 'Test file did not download properly; B2 Msg: '.$b2client->latest_error() );
 

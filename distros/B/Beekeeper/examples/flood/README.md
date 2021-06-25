@@ -28,25 +28,25 @@ Sample output running on a local Mosquitto 2.0.10:
 ```
 # flood -b
 
-1000 notifications   of   0 Kb  in  0.062 sec   16034 /sec   0.06 ms each
+1000 notifications   of   0 Kb  in  0.062 sec   16196 /sec   0.06 ms each
 1000 notifications   of   1 Kb  in  0.075 sec   13308 /sec   0.08 ms each
-1000 notifications   of   5 Kb  in  0.090 sec   11152 /sec   0.09 ms each
-1000 notifications   of  10 Kb  in  0.095 sec   10545 /sec   0.09 ms each
+1000 notifications   of   5 Kb  in  0.086 sec   11676 /sec   0.09 ms each
+1000 notifications   of  10 Kb  in  0.094 sec   10623 /sec   0.09 ms each
 
-1000 sync calls      of   0 Kb  in 11.413 sec      88 /sec  11.41 ms each  <- !!
-1000 sync calls      of   1 Kb  in 11.151 sec      90 /sec  11.15 ms each
-1000 sync calls      of   5 Kb  in  2.677 sec     374 /sec   2.68 ms each
-1000 sync calls      of  10 Kb  in  2.675 sec     374 /sec   2.67 ms each
+1000 sync calls      of   0 Kb  in  2.425 sec     412 /sec   2.43 ms each
+1000 sync calls      of   1 Kb  in  2.419 sec     413 /sec   2.42 ms each
+1000 sync calls      of   5 Kb  in  2.566 sec     390 /sec   2.57 ms each
+1000 sync calls      of  10 Kb  in  2.664 sec     375 /sec   2.66 ms each
 
-1000 async calls     of   0 Kb  in  0.254 sec    3930 /sec   0.25 ms each
-1000 async calls     of   1 Kb  in  0.263 sec    3806 /sec   0.26 ms each
-1000 async calls     of   5 Kb  in  0.263 sec    3807 /sec   0.26 ms each
-1000 async calls     of  10 Kb  in  0.278 sec    3594 /sec   0.28 ms each
+1000 async calls     of   0 Kb  in  0.117 sec    8543 /sec   0.12 ms each
+1000 async calls     of   1 Kb  in  0.126 sec    7915 /sec   0.13 ms each
+1000 async calls     of   5 Kb  in  0.139 sec    7175 /sec   0.14 ms each
+1000 async calls     of  10 Kb  in  0.163 sec    6128 /sec   0.16 ms each
 
-1000 fire & forget   of   0 Kb  in  0.098 sec   10185 /sec   0.10 ms each
-1000 fire & forget   of   1 Kb  in  0.105 sec    9557 /sec   0.10 ms each
-1000 fire & forget   of   5 Kb  in  0.122 sec    8223 /sec   0.12 ms each
-1000 fire & forget   of  10 Kb  in  0.139 sec    7182 /sec   0.14 ms each
+1000 fire & forget   of   0 Kb  in  0.091 sec   11031 /sec   0.09 ms each
+1000 fire & forget   of   1 Kb  in  0.102 sec    9840 /sec   0.10 ms each
+1000 async calls     of   0 Kb  in  0.118 sec    8499 /sec   0.12 ms each
+1000 async calls     of   1 Kb  in  0.126 sec    7915 /sec   0.13 ms each
 ```
 Sample output running on a local HiveMQ 2021.1:
 
@@ -83,19 +83,19 @@ Sample output running a ToyBroker:
 1000 notifications   of   5 Kb  in  0.073 sec   13750 /sec   0.07 ms each
 1000 notifications   of  10 Kb  in  0.082 sec   12160 /sec   0.08 ms each
 
-1000 sync calls      of   0 Kb  in  2.645 sec     378 /sec   2.64 ms each
-1000 sync calls      of   1 Kb  in  2.735 sec     366 /sec   2.73 ms each
-1000 sync calls      of   5 Kb  in  2.783 sec     359 /sec   2.78 ms each
+1000 sync calls      of   0 Kb  in  2.614 sec     382 /sec   2.61 ms each
+1000 sync calls      of   1 Kb  in  2.662 sec     376 /sec   2.66 ms each
+1000 sync calls      of   5 Kb  in  2.751 sec     363 /sec   2.75 ms each
 1000 sync calls      of  10 Kb  in  2.952 sec     339 /sec   2.95 ms each
 
-1000 async calls     of   0 Kb  in  0.335 sec    2982 /sec   0.34 ms each
-1000 async calls     of   1 Kb  in  0.365 sec    2738 /sec   0.37 ms each
-1000 async calls     of   5 Kb  in  0.392 sec    2548 /sec   0.39 ms each
-1000 async calls     of  10 Kb  in  0.427 sec    2343 /sec   0.43 ms each
+1000 async calls     of   0 Kb  in  0.100 sec    9982 /sec   0.10 ms each
+1000 async calls     of   1 Kb  in  0.105 sec    9522 /sec   0.11 ms each
+1000 async calls     of   5 Kb  in  0.116 sec    8604 /sec   0.12 ms each
+1000 async calls     of  10 Kb  in  0.130 sec    7720 /sec   0.13 ms each
 
-1000 fire & forget   of   0 Kb  in  0.078 sec   12889 /sec   0.08 ms each
-1000 fire & forget   of   1 Kb  in  0.088 sec   11306 /sec   0.09 ms each
-1000 fire & forget   of   5 Kb  in  0.102 sec    9798 /sec   0.10 ms each
+1000 fire & forget   of   0 Kb  in  0.074 sec   13473 /sec   0.07 ms each
+1000 fire & forget   of   1 Kb  in  0.080 sec   12466 /sec   0.08 ms each
+1000 fire & forget   of   5 Kb  in  0.101 sec    9890 /sec   0.10 ms each
 1000 fire & forget   of  10 Kb  in  0.116 sec    8654 /sec   0.12 ms each
 ```
 ---
@@ -111,6 +111,7 @@ Mosquitto instance capable of running Beekeper applications with a minimal secur
 Create `/etc/mosquitto/conf.d/beekeeper.conf`
 ```
 per_listener_settings true
+set_tcp_nodelay true
 
 # Backend
 listener 1883 0.0.0.0

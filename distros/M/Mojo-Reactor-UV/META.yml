@@ -8,10 +8,11 @@ build_requires:
   Module::Metadata: '0'
   Scalar::Util: '0'
   Test::More: '0.88'
+  Test::Needs: '0'
 configure_requires:
   Module::Build::Tiny: '0.034'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.014, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -28,23 +29,24 @@ no_index:
 provides:
   Mojo::Reactor::UV:
     file: lib/Mojo/Reactor/UV.pm
-    version: '1.002'
+    version: '1.901'
 requires:
   Carp: '0'
   Mojolicious: '7.37'
   Scalar::Util: '0'
-  UV: '1.000008'
+  UV: '1.909'
   perl: '5.010001'
 resources:
-  IRC: irc://irc.freenode.net/#mojo
+  IRC: ircs://irc.libera.chat/#mojo
   bugtracker: https://github.com/Grinnz/Mojo-Reactor-UV/issues
   homepage: https://github.com/Grinnz/Mojo-Reactor-UV
   repository: https://github.com/Grinnz/Mojo-Reactor-UV.git
-version: '1.002'
+version: '1.901'
 x_contributors:
+  - 'Chase Whitener <cwhitener@gmail.com>'
   - 'Dan Book <grinnz@gmail.com>'
   - 'Dan Book <grinnz@grinnz.com>'
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
-x_generated_by_perl: v5.30.2
+x_generated_by_perl: v5.34.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: Artistic-2.0

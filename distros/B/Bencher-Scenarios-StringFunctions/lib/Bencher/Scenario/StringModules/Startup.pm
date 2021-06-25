@@ -1,7 +1,7 @@
 package Bencher::Scenario::StringModules::Startup;
 
-our $DATE = '2018-09-16'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2021-06-23'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 use strict;
 use warnings;
@@ -32,7 +32,7 @@ Bencher::Scenario::StringModules::Startup - Benchmark startup of string modules
 
 =head1 VERSION
 
-This document describes version 0.001 of Bencher::Scenario::StringModules::Startup (from Perl distribution Bencher-Scenarios-StringFunctions), released on 2018-09-16.
+This document describes version 0.003 of Bencher::Scenario::StringModules::Startup (from Perl distribution Bencher-Scenarios-StringFunctions), released on 2021-06-23.
 
 =head1 SYNOPSIS
 
@@ -56,7 +56,7 @@ L<String::CommonSuffix> 0.01
 
 L<String::Trim::More> 0.03
 
-L<String::Util> 1.26
+L<String::Util> 1.32
 
 =head1 BENCHMARK PARTICIPANTS
 
@@ -90,20 +90,21 @@ L<String::Util>
 
 =head1 SAMPLE BENCHMARK RESULTS
 
-Run on: perl: I<< v5.26.1 >>, CPU: I<< Intel(R) Core(TM) M-5Y71 CPU @ 1.20GHz (2 cores) >>, OS: I<< GNU/Linux LinuxMint version 18.3 >>, OS kernel: I<< Linux version 4.10.0-38-generic >>.
+Run on: perl: I<< v5.34.0 >>, CPU: I<< Intel(R) Core(TM) i5-7200U CPU @ 2.50GHz (2 cores) >>, OS: I<< GNU/Linux Ubuntu version 20.04 >>, OS kernel: I<< Linux version 5.3.0-64-generic >>.
 
 Benchmark with default options (C<< bencher -m StringModules::Startup >>):
 
  #table1#
- +----------------------+-----------+------------------------+------------+---------+---------+
- | participant          | time (ms) | mod_overhead_time (ms) | vs_slowest |  errors | samples |
- +----------------------+-----------+------------------------+------------+---------+---------+
- | String::Util         |      14   |                    8.5 |        1   | 1.5e-05 |      20 |
- | String::Trim::More   |       8.2 |                    2.7 |        1.7 | 1.2e-05 |      24 |
- | String::CommonPrefix |       8.2 |                    2.7 |        1.7 | 9.9e-06 |      20 |
- | String::CommonSuffix |       8.1 |                    2.6 |        1.7 | 1.5e-05 |      20 |
- | perl -e1 (baseline)  |       5.5 |                    0   |        2.5 | 2.3e-05 |      20 |
- +----------------------+-----------+------------------------+------------+---------+---------+
+ {dataset=>undef}
+ +----------------------+-----------+-------------------+-----------------------+-----------------------+---------+---------+
+ | participant          | time (ms) | mod_overhead_time | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors | samples |
+ +----------------------+-----------+-------------------+-----------------------+-----------------------+---------+---------+
+ | String::Util         |      14   |               7.4 |                 0.00% |               118.92% | 3.4e-05 |      20 |
+ | String::CommonPrefix |       9.3 |               2.7 |                54.98% |                41.25% | 4.1e-05 |      22 |
+ | String::Trim::More   |       9.2 |               2.6 |                55.86% |                40.46% | 1.1e-05 |      20 |
+ | String::CommonSuffix |       9.1 |               2.5 |                57.88% |                38.66% | 5.8e-05 |      20 |
+ | perl -e1 (baseline)  |       6.6 |               0   |               118.92% |                 0.00% | 3.5e-05 |      20 |
+ +----------------------+-----------+-------------------+-----------------------+-----------------------+---------+---------+
 
 
 To display as an interactive HTML table on a browser, you can add option C<--format html+datatables>.
@@ -130,7 +131,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

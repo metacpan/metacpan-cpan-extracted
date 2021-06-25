@@ -61,11 +61,18 @@ static int parse2(pTHX_
 
   ENTER_with_name("parse_sublike");
   /* From here onwards any `return` must be prefixed by LEAVE_with_name() */
+  U32 was_scopestack_ix = PL_scopestack_ix;
 
   if(hooksA && hooksA->pre_subparse)
     (*hooksA->pre_subparse)(aTHX_ &ctx, hookdataA);
   if(hooksB && hooksB->pre_subparse)
     (*hooksB->pre_subparse)(aTHX_ &ctx, hookdataB);
+
+#ifdef DEBUGGING
+  if(PL_scopestack_ix != was_scopestack_ix)
+    croak("ARGH: pre_subparse broke the scopestack (was %d, now %d)\n",
+      was_scopestack_ix, PL_scopestack_ix);
+#endif
 
   I32 floor_ix = start_subparse(FALSE, ctx.name ? 0 : CVf_ANON);
   SAVEFREESV(PL_compcv);
@@ -121,6 +128,12 @@ static int parse2(pTHX_
   if(hooksB && hooksB->post_blockstart)
     (*hooksB->post_blockstart)(aTHX_ &ctx, hookdataB);
 
+#ifdef DEBUGGING
+  if(PL_scopestack_ix != was_scopestack_ix)
+    croak("ARGH: post_blockstart broke the scopestack (was %d, now %d)\n",
+      was_scopestack_ix, PL_scopestack_ix);
+#endif
+
 #ifdef HAVE_PARSE_SUBSIGNATURE
   OP *sigop = NULL;
   if(!(skip_parts & XS_PARSE_SUBLIKE_PART_SIGNATURE) && (lex_peek_unichar(0) == '(')) {
@@ -164,6 +177,7 @@ static int parse2(pTHX_
       sigop = parse_subsignature(0);
 
       if(PL_parser->error_count) {
+        assert(PL_scopestack_ix == was_scopestack_ix);
         LEAVE_with_name("parse_sublike");
         return 0;
       }
@@ -201,13 +215,23 @@ static int parse2(pTHX_
      *   See https://rt.cpan.org/Ticket/Display.html?id=130417
      */
     op_free(ctx.body);
+
+    /* REALLY??! Do I really have to do this??
+     * See also:
+     *   https://www.nntp.perl.org/group/perl.perl5.porters/2021/06/msg260642.html
+     */
+    while(PL_scopestack_ix > was_scopestack_ix)
+      LEAVE;
+
     *op_ptr = newOP(OP_NULL, 0);
     if(ctx.name) {
       SvREFCNT_dec(ctx.name);
+      assert(PL_scopestack_ix == was_scopestack_ix);
       LEAVE_with_name("parse_sublike");
       return KEYWORD_PLUGIN_STMT;
     }
     else {
+      assert(PL_scopestack_ix == was_scopestack_ix);
       LEAVE_with_name("parse_sublike");
       return KEYWORD_PLUGIN_EXPR;
     }
@@ -217,6 +241,12 @@ static int parse2(pTHX_
     (*hooksB->pre_blockend)(aTHX_ &ctx, hookdataB);
   if(hooksA && hooksA->pre_blockend)
     (*hooksA->pre_blockend)(aTHX_ &ctx, hookdataA);
+
+#ifdef DEBUGGING
+  if(PL_scopestack_ix != was_scopestack_ix)
+    croak("ARGH: pre_blockend broke the scopestack (was %d, now %d)\n",
+      was_scopestack_ix, PL_scopestack_ix);
+#endif
 
   ctx.body = block_end(save_ix, ctx.body);
 
@@ -231,6 +261,7 @@ static int parse2(pTHX_
   if(hooksB && hooksB->post_newcv)
     (*hooksB->post_newcv)(aTHX_ &ctx, hookdataB);
 
+  assert(PL_scopestack_ix == was_scopestack_ix);
   LEAVE_with_name("parse_sublike");
 
   if(ctx.name) {

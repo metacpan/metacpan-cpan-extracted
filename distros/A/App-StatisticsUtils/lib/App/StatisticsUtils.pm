@@ -1,9 +1,9 @@
 package App::StatisticsUtils;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-01-15'; # DATE
+our $DATE = '2021-02-21'; # DATE
 our $DIST = 'App-StatisticsUtils'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -33,6 +33,12 @@ $SPEC{z2pct} = {
             args => {z=>0},
             result => 50,
         },
+        {
+            args => {z=>-2},
+        },
+        {
+            args => {z=>1},
+        },
     ],
 };
 sub z2pct {
@@ -57,6 +63,12 @@ $SPEC{pct2z} = {
             args => {pct=>50},
             result => 0,
         },
+        {
+            args => {pct=>5},
+        },
+        {
+            args => {pct=>90},
+        },
     ],
 };
 sub pct2z {
@@ -79,7 +91,7 @@ App::StatisticsUtils - CLI utilities related to statistics
 
 =head1 VERSION
 
-This document describes version 0.001 of App::StatisticsUtils (from Perl distribution App-StatisticsUtils), released on 2021-01-15.
+This document describes version 0.002 of App::StatisticsUtils (from Perl distribution App-StatisticsUtils), released on 2021-02-21.
 
 =head1 DESCRIPTION
 
@@ -111,6 +123,14 @@ Examples:
 =item * Example #1:
 
  pct2z(50); # -> 0
+
+=item * Example #2:
+
+ pct2z(5); # -> -1.644854
+
+=item * Example #3:
+
+ pct2z(90); # -> 1.281552
 
 =back
 
@@ -144,6 +164,14 @@ Examples:
 =item * Example #1:
 
  z2pct(0); # -> 50
+
+=item * Example #2:
+
+ z2pct(-2); # -> 2.28655435304153
+
+=item * Example #3:
+
+ z2pct(1); # -> 84.1334538939805
 
 =back
 

@@ -4,7 +4,7 @@
       "Dan Book <dbook@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.014, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -60,7 +60,7 @@
    "provides" : {
       "Mojo::Reactor::POE" : {
          "file" : "lib/Mojo/Reactor/POE.pm",
-         "version" : "1.000"
+         "version" : "1.001"
       }
    },
    "release_status" : "stable",
@@ -74,15 +74,15 @@
          "url" : "https://github.com/Grinnz/Mojo-Reactor-POE.git",
          "web" : "https://github.com/Grinnz/Mojo-Reactor-POE"
       },
-      "x_IRC" : "irc://irc.freenode.net/#mojo"
+      "x_IRC" : "ircs://irc.libera.chat/#mojo"
    },
-   "version" : "1.000",
+   "version" : "1.001",
    "x_contributors" : [
       "Dan Book <grinnz@grinnz.com>",
       "Grinnz <grinnz@gmail.com>"
    ],
-   "x_generated_by_perl" : "v5.30.2",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
+   "x_generated_by_perl" : "v5.34.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.26",
    "x_spdx_expression" : "Artistic-2.0"
 }
 

@@ -43,10 +43,11 @@ WriteMakefile(
         'parent'                  => 0,
         'strict'                  => 0,
         'warnings'                => 0,
+        'Carp'                    => 0,
         'Exporter'                => 0,
         'List::Util'              => '1.33',
-        'Term::Choose'            => '1.731',
-        'Term::Choose::Util'      => '0.123',
+        'Term::Choose'            => '1.733',
+        'Term::Choose::Util'      => '0.124',
         %prereqs_os_specific,
     },
     dist  => {

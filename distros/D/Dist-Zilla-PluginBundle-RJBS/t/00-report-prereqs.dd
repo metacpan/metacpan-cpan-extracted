@@ -14,7 +14,7 @@ do { my $x = {
                     },
        'runtime' => {
                       'requires' => {
-                                      'Dist::Zilla' => '5.014',
+                                      'Dist::Zilla' => '6.019',
                                       'Dist::Zilla::Plugin::AutoPrereqs' => '1.100130',
                                       'Dist::Zilla::Plugin::CheckExtraTests' => '0',
                                       'Dist::Zilla::Plugin::CheckPrereqsIndexed' => '0',
@@ -28,9 +28,13 @@ do { my $x = {
                                       'Dist::Zilla::PluginBundle::Basic' => '0',
                                       'Dist::Zilla::PluginBundle::Filter' => '0',
                                       'Dist::Zilla::PluginBundle::Git' => '0',
+                                      'Dist::Zilla::Role::AfterBuild' => '0',
+                                      'Dist::Zilla::Role::BeforeBuild' => '0',
+                                      'Dist::Zilla::Role::MetaProvider' => '0',
                                       'Dist::Zilla::Role::PluginBundle::Config::Slicer' => '0',
                                       'Dist::Zilla::Role::PluginBundle::Easy' => '0',
                                       'Dist::Zilla::Role::PluginBundle::PluginRemover' => '0.103',
+                                      'Dist::Zilla::Role::PrereqSource' => '0',
                                       'Moose' => '0',
                                       'Pod::Elemental' => '0.092970',
                                       'Pod::Elemental::PerlMunger' => '0.200000',
@@ -39,7 +43,9 @@ do { my $x = {
                                       'Pod::Weaver::Config::Assembler' => '0',
                                       'Pod::Weaver::Section::Contributors' => '0.008',
                                       'Pod::Weaver::Section::GenerateSection' => '0.000',
+                                      'experimental' => '0',
                                       'perl' => 'v5.20.0',
+                                      'utf8' => '0',
                                       'warnings' => '0'
                                     }
                     },

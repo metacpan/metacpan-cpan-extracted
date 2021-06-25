@@ -1,9 +1,9 @@
 package WordList;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-01-28'; # DATE
+our $DATE = '2021-06-23'; # DATE
 our $DIST = 'WordList'; # DIST
-our $VERSION = '0.7.7'; # VERSION
+our $VERSION = '0.7.10'; # VERSION
 
 use strict 'subs', 'vars';
 
@@ -148,7 +148,7 @@ WordList - Specification and base class for WordList::*, modules that contain wo
 
 =head1 VERSION
 
-This document describes version 0.7.7 of WordList (from Perl distribution WordList), released on 2021-01-28.
+This document describes version 0.7.10 of WordList (from Perl distribution WordList), released on 2021-06-23.
 
 =head1 SYNOPSIS
 
@@ -189,10 +189,10 @@ relies on C<first_word()> + C<next_word()>, or C<each_word()>, or C<all_words()>
 to get the list. A deterministic wordlist returns the same list everytime
 C<each_word()> or C<all_words()> is called. A non-deterministic list can return
 a different list for a different C<each_word()> or C<all_words()> call. See
-L<WordListRole::Dynamic::FirstNextResetFromEach> and
-L<WordListRole::Dynamic::EachFromFirstNextReset> if you want to write a dynamic
-wordlist module. It is possible for a dynamic list to return unordered or
-duplicate entries, but it is not encouraged.
+L<WordListRole::FirstNextResetFromEach>,
+L<WordListRole::EachFromFirstNextReset>, L<WordListRole::FromArray> if you want
+to write a dynamic wordlist module. It is possible for a dynamic list to return
+unordered or duplicate entries, but it is not encouraged.
 
 B<Parameterized wordlist.> When instantiating a wordlist class instance, user
 can pass a list of key-value pairs as parameters. Normally only a dynamic
@@ -268,6 +268,12 @@ C<next_word()> just reads another line from the filehandle. C<each_word()> is
 implemented in terms of C<first_word()> and C<next_word()>, and
 C<word_exists()>, C<pick()>, and C<all_words()> are implemented in terms of
 C<each_word()>.
+
+=head1 CONTRIBUTOR
+
+=for stopwords perlancar (on netbook-dell-xps13)
+
+perlancar (on netbook-dell-xps13) <perlancar@gmail.com>
 
 =head1 METHODS
 
@@ -370,7 +376,7 @@ Source repository is at L<https://github.com/perlancar/perl-WordList>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-WordList/issues>
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=WordList>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -378,7 +384,9 @@ feature.
 
 =head1 SEE ALSO
 
-Related specifications: L<Rinci>, L<DefHash>.
+Related projects: L<ArrayData>, L<HashData>, L<TableData> are newer projects
+inspired by WordList. I plan to publish newer wordlists as C<ArrayData::*>
+modules. But WordList will still exist and stabilize its API.
 
 C<WordListRole::*> modules.
 

@@ -2,7 +2,6 @@ use Mojo::Base -strict;
 use Test::Needs {'Mojo::SQLite' => '1.000'};
 
 use Test::More;
-use Role::Tiny::With;
 
 {
   package My::Test::ResultsRole1;
@@ -17,8 +16,7 @@ use Role::Tiny::With;
   sub bar { shift->foo + 1 }
 }
 
-my $sqlite = Mojo::SQLite->new;
-Role::Tiny->apply_roles_to_object($sqlite, 'Mojo::DB::Role::ResultsRoles');
+my $sqlite = Mojo::SQLite->new->with_roles('Mojo::DB::Role::ResultsRoles');
 
 push @{$sqlite->results_roles}, 'My::Test::ResultsRole1';
 my $results = $sqlite->db->query('SELECT 4');

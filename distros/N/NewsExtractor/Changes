@@ -1,3 +1,7 @@
+v0.42.0 2021-06-24T09:23:46+0900
+  - Add a site-specific extractor for yimedia.com.tw w
+  - Update the extractor of news.pts.org.tw to adapt the updates of the website
+
 v0.41.0 2021-03-31T21:26:10+0900
   - Update the extractor of ttv to catchup with the website updates.
   - Update the extractor of www.mdnkids.com to catchup with the website updates.

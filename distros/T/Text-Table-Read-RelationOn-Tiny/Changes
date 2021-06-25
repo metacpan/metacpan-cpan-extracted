@@ -1,16 +1,28 @@
 Revision history for Text-Table-Read-RelationOn-Tiny
 
+v2.0.0     2021/06/25
+           Completely reworked code.
+           Removed methods 'x_elem_ids', 'n_elems' and 'bless_matrix'.
+           Added methods 'eq_ids', 'tab_elems' and 'matrix_named'.
+           Constructor argument 'set' with subarray: changed structure of 'elem_ids' and 'elems'.
+           Constructor: added named argument 'eqs'.
+           Method 'get': use named arguments now and added named argument 'allow_subset'.
+           Method 'matrix': added named argument 'bless'.
+
+v1.2.0     2021/06/13
+           Added method bless_matrix.
+
 v1.1.1     2021/06/07
-           Corrected version info
+           Corrected version info.
 
 v1.1.0     2021/06/07
-           Implemented new feature (duplicates)
+           Implemented new feature (duplicates).
 
 v1.0.3     2021/05/28
            Improved error messages and fixed problem in error case test script.
 
 v1.0.2     2021/05/26
-           Consequently use quotes in error messages
+           Consequently use quotes in error messages.
 
 v1.0.1     2021/05/26
            Switch to modern version string using version 0.77
@@ -19,7 +31,7 @@ v1.0.1     2021/05/26
            New version number hopefully resolves a versioning problem with PAUSE
 
 0.10.2     2021/05/24
-           Added forgotten META.json to distribution.
+           Added forgotten META.json to distribution
 
 0.10.1     2021/05/24
            Added info about new github repo

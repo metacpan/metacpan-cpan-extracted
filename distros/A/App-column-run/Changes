@@ -1,3 +1,31 @@
+0.004   2021-06-25  Released-By: PERLANCAR; Urgency: medium; Backward-Incompatible: yes
+
+	- [incompatible change] Rename option --arg(s) to --common-arg(s).
+
+        - Add option --args-arrays to allow setting per-command arguments.
+
+        - Add option --common-env(s) to allow setting common environment
+          variables.
+
+        - Add option --envs-arrays to allow setting per-command environment
+          variables.
+
+	- [doc][ux] Add sample screenshots & examples.
+
+	- [doc] Mention TODO items.
+
+	- [doc] Mention some other related software.
+
+
+0.003   2021-03-02  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+	- [doc] Add more notes.
+
+	- [doc] Tweak pr options in example.
+
+
 0.002   2020-06-06  Released-By: PERLANCAR; Urgency: medium
 
 	- No functional changes.

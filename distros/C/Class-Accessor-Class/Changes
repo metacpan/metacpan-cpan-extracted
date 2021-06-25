@@ -1,21 +1,25 @@
 Revision history for Class-Accessor-Class
 
+0.504     2021-06-20 17:00:37-04:00 America/New_York
+        - update author information
+        - add "no longer supported" to the docs
+
 0.503     2013-12-13 08:11:27 America/New_York
-          fix repository link, too
+        - fix repository link, too
 
 0.502     2013-07-01 19:33:05 America/New_York
-          repackage, update bugtracker
+        - repackage, update bugtracker
 
 0.501     2006-11-13
-          kwalitee improvements
+        - kwalitee improvements
 
 0.500     2006-06-08 14:20
-          sever implementation from Class::Accessor, which changed and broke us
-          added long-ago-written but not included test to manifest
+        - sever implementation from Class::Accessor, which changed and broke us
+        - added long-ago-written but not included test to manifest
 
 0.12      2004-09-29 14:20
-          make accessors for one class/field re-retrievable
+        - make accessors for one class/field re-retrievable
 
 0.10      2004-09-29 13:20
-          first release
+        - first release
 

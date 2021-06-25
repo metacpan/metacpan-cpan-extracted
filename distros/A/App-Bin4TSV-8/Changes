@@ -1,0 +1,4 @@
+Revision history for the module "App::Bin4TSV::8" : 
+
+0.100   2021-06-17T01:20+09:00 PREREQ_PM を *.PLに書き込む方式を採用。
+0.101   2021-06-17T01:36+09:00 INSTALLの文面を加筆。他のモジュールに依存することを書いた。 

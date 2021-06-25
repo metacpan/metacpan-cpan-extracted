@@ -59,7 +59,6 @@ my $lastFlush = time;
 
 has sql => sub {
     my $self = shift;
- 
     require Mojo::SQLite;
     my $sql = Mojo::SQLite->new($self->config->cfgHash->{BACKEND}{cfg_db});
 
@@ -72,14 +71,14 @@ has sql => sub {
         FetchHashKeyName=>'NAME_lc',
     });
 
+    $sql->on(connection => sub ($sql, $dbh) {
+      $dbh->do('PRAGMA foreign_keys = ON;');
+    });
+
     $sql->migrations
         ->name('cbmig')
         ->from_data(__PACKAGE__,'dbsetup.sql')
         ->migrate;
-
-    $sql->on(connection => sub ($sql, $dbh) {
-      $dbh->do('PRAGMA foreign_keys = ON;');
-    });
 
     return $sql;
 };

@@ -14,7 +14,7 @@ use constant DEBUG => 0;
 sub test_01_term_signal : Test(21) {
     my $self = shift;
 
-    ## Test that broker complete all jobs when workers are stopped with TERM
+    ## Test that broker complete all requests before quitting when workers are stopped with TERM
 
     if ($self->automated_testing) {
         # It is hard to make this test run reliably on smoke testers platforms
@@ -29,7 +29,7 @@ sub test_01_term_signal : Test(21) {
     for (1..20) {
 
         for (1..8) {
-            # Give them more work than they can do, to ensure that the job queue is full
+            # Give them more work than they can do, to ensure that the task queue is full
             push @req, $cli->call_remote_async(
                 method  => 'test.sleep',
                 params  => .5,
@@ -37,7 +37,7 @@ sub test_01_term_signal : Test(21) {
             );
         }
 
-        # When workers are stopped they probably hold a queued job that must be processed 
+        # When workers are stopped they are probably processing a request that must be completed before quitting
         my $old = shift @worker_pids;
         DEBUG && diag "Stopping TERM worker $old";
         kill('TERM', $old);
@@ -53,7 +53,7 @@ sub test_01_term_signal : Test(21) {
     $cli->wait_async_calls;
 
     my @ok = grep { $_->success } @req;
-    is( scalar(@ok), scalar(@req), "All jobs executed " . scalar(@ok). "/". scalar(@req));
+    is( scalar(@ok), scalar(@req), "All calls executed " . scalar(@ok). "/". scalar(@req));
 }
 
 1;

@@ -1,0 +1,15 @@
+This module provides a Unix-like commands: 
+
+ colgrep
+ colsummary
+ crosstable
+ csel
+ digitdemog
+ expandtab
+ freq
+ venn
+
+
+ Copyright (c) 2021 Toshiyuki SHIMONO. All rights reserved.
+ This program is free software; you can redistribute it and/or
+ modify it under the same terms as Perl itself.

@@ -45,7 +45,7 @@ sub __choose_drop_item {
     # Choose
     my $table = $tc->choose(
         [ undef, map { "- $_" } sort @$tables ],
-        { %{$sf->{i}{lyt_v_clear}}, prompt => $prompt, undef => '  <=' }
+        { %{$sf->{i}{lyt_v}}, prompt => $prompt, undef => '  <=' }
     );
     if ( ! defined $table || ! length $table ) {
         return;
@@ -66,44 +66,46 @@ sub __drop {
     $sf->{i}{stmt_types} = [ $stmt_type ];
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
-    $ax->print_sql( $sql );
+    my $info = $ax->get_sql_info( $sql );
     # Choose
     my $ok = $tc->choose(
         [ undef, $sf->{i}{_confirm} . ' Stmt'],
-        { %{$sf->{i}{lyt_v}} }
+        { %{$sf->{i}{lyt_v}}, info => $info }
     );
     if ( ! $ok ) {
         return;
     }
-    $ax->print_sql( $sql );
-    my $prompt = '';
+    #$ax->print_sql_info( $sql );
+    print "\rComputing: ...";
+    my $row_count;
     if ( ! eval {
         my $sth = $sf->{d}{dbh}->prepare( "SELECT * FROM " . $sql->{table} );
         $sth->execute();
         my $col_names = $sth->{NAME}; # mysql: $sth->{NAME} before fetchall_arrayref
         my $all_arrayref = $sth->fetchall_arrayref;
-        my $row_count = @$all_arrayref;
+        $row_count = @$all_arrayref;
         unshift @$all_arrayref, $col_names;
         my $prompt_pt = sprintf "DROP %s %s     (on last look at the %s)\n", uc $type, $sql->{table}, $type;
         my $tp = Term::TablePrint->new( $sf->{o}{table} );
         $tp->print_table(
             $all_arrayref,
-            { grid => 2, prompt => $prompt_pt, max_rows => 0, keep_header => 1,
-              table_expand => $sf->{o}{G}{info_expand} }
+            { prompt => $prompt_pt, max_rows => 0, table_name => "     '" . $sf->{d}{table} . "'     " }
         );
-        $prompt = sprintf 'DROP %s %s  (%s %s)', uc $type, $sql->{table}, insert_sep( $row_count, $sf->{o}{G}{thsd_sep} ), $row_count == 1 ? 'row' : 'rows';
         1; }
     ) {
         $ax->print_error_message( $@ );
-        $prompt = sprintf 'DROP %s %s', uc $type, $sql->{table};
     }
-    $prompt .= "\n\nCONFIRM:";
+    if ( $row_count ) {
+        chomp $info; ###
+        $info .= sprintf "  (%s %s)\n", insert_sep( $row_count, $sf->{o}{G}{thsd_sep} ), $row_count == 1 ? 'row' : 'rows';
+    }
+    my $prompt = "CONFIRM:";
     # Choose
     my $choice = $tc->choose(
         [ undef, 'YES' ],
-        { prompt => $prompt, undef => 'NO', clear_screen => 1 }
+        { info => $info, prompt => $prompt, undef => 'NO', clear_screen => 1 }
     );
-    $ax->print_sql( $sql );
+    $ax->print_sql_info( $sql );
     if ( defined $choice && $choice eq 'YES' ) {
         my $stmt = $ax->get_stmt( $sql, $stmt_type, 'prepare' );
         $sf->{d}{dbh}->do( $stmt ) or die "$stmt failed!";

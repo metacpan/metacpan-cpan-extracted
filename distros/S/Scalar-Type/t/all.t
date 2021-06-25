@@ -138,6 +138,13 @@ subtest "string subsequently used as an int or float" => sub {
         is(type($foo), 'NUMBER', "this does become a float after a numeric operation");
         note(capture_stderr { Dump($foo) });
     };
+
+    subtest "'[MAXINT]'" => sub {
+        my $foo = ''.~0;
+        $foo + 0;
+        is(type($foo), 'INTEGER', "this becomes an integer after a numeric operation, even though the value is a UV (unsigned int), not an IV");
+        note(capture_stderr { Dump($foo) });
+    };
 };
 
 subtest "int subsequently used as a float" => sub {

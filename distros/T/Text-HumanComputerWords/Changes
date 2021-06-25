@@ -1,0 +1,17 @@
+Revision history for Text-HumanComputerWords},
+
+0.04      2021-06-23 20:01:17 -0600
+  - First CPAN release
+
+0.03      2021-04-20 11:42:29 -0600
+  - Added reserved type substitute (gh#4)
+
+0.02      2021-04-18 08:14:48 -0600
+  - Arbitrary types can be defined, and by default not types are defined (gh#3)
+  - Added default_perl method which provides reasonable defaults for Perl
+    technical documentation (this is the old default for the module) (gh#3)
+
+0.01      2021-04-05 11:30:09 -0600
+  - initial version
+
+

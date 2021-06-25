@@ -1,8 +1,12 @@
 Revision history for Perl extension Webservice-OVH
 
-0.43 2021-06-10T15:28:40Z
+0.46 2021-06-14T08:36:34Z
 
-    - dns ordering possible
+    - Add configuration possibility for card items
+
+0.45 2021-06-10T20:15:18Z
+
+    - Add support for cards 
 
 0.42 2018-11-22T09:35:38Z
 

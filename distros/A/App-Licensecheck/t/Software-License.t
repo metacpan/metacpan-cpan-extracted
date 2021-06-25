@@ -47,7 +47,7 @@ my %LICENSES = (
 	PostgreSQL => 'PostgreSQL',
 	'QPL-1.0'  => 'QPL-1.0',
 	SSLeay     => 'SSLeay',
-	SISSL      => 'UNKNOWN',
+	SISSL      => 'SISSL',
 	Zlib       => 'Zlib',
 );
 

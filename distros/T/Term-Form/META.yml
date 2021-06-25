@@ -21,10 +21,11 @@ no_index:
     - t
     - inc
 requires:
+  Carp: '0'
   Exporter: '0'
   List::Util: '1.33'
-  Term::Choose: '1.731'
-  Term::Choose::Util: '0.123'
+  Term::Choose: '1.733'
+  Term::Choose::Util: '0.124'
   parent: '0'
   perl: '5.008003'
   strict: '0'
@@ -32,5 +33,5 @@ requires:
 resources:
   bugtracker: https://github.com/kuerbis/Term-Form/issues
   repository: https://github.com/kuerbis/Term-Form.git
-version: '0.532'
+version: '0.534'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

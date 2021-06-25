@@ -1,9 +1,31 @@
+0.248   2021-06-24  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Add sample screenshots.
+
+
+0.247   2021-06-24  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Fix referring to variable in circular reference fixup.
+
+	- [ux] Make fixup of circular references nicer by showing the
+	  subscripts instead of just 'fix'.
+
+
+0.246   2021-06-23  Released-By: PERLANCAR; Urgency: medium
+
+	- Avoid perl warning about negative count with x operator.
+
+        - Avoid 1 instance of perl undef warning.
+
+
 0.245   2021-06-05  Released-By: PERLANCAR; Urgency: medium
 
 	- Avoid another case of undef warnings.
 
-	- Handle NO_COLOR (NO_COLOR is handled by ColorThemeUtil::ANSI
-	  also, but we directly handle it to be slightly more efficient.
+	- Handle NO_COLOR (NO_COLOR is handled by ColorThemeUtil::ANSI also, but
+	  we directly handle it to be slightly more efficient).
 
 	- [doc] Update FAQ item on color theme.
 

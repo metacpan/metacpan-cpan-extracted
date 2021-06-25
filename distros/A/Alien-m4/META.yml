@@ -6,7 +6,7 @@ build_requires:
   Alien::Build: '0.32'
   Alien::Build::MM: '0.32'
   ExtUtils::MakeMaker: '6.52'
-  Test2::V0: '0.000060'
+  Test2::V0: '0.000121'
   Test::Alien: '0'
   Test::More: '0.98'
   perl: '5.006'
@@ -18,7 +18,7 @@ configure_requires:
   Path::Tiny: '0'
   perl: '5.006'
 dynamic_config: 1
-generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.019, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -32,9 +32,9 @@ resources:
   bugtracker: https://github.com/PerlAlien/Alien-m4/issues
   homepage: https://metacpan.org/pod/Alien::m4
   repository: git://github.com/PerlAlien/Alien-m4.git
-version: '0.20'
+version: '0.21'
 x_alienfile:
-  generated_by: 'Dist::Zilla::Plugin::AlienBuild version 0.31'
+  generated_by: 'Dist::Zilla::Plugin::AlienBuild version 0.32'
   requires:
     share:
       Archive::Tar: '0'

@@ -20,6 +20,7 @@ Printer_init( Handle self, HV * profile)
 	inherited init( self, profile);
 	if ( !apc_prn_create( self))
 		croak("Cannot create printer");
+	opt_set(optSystemDrawable);
 	prn = pget_c( printer);
 	if ( strlen( prn) == 0) prn = my-> get_default_printer( self);
 	my-> set_printer( self, prn);
@@ -37,7 +38,7 @@ Bool
 Printer_validate_owner( Handle self, Handle * owner, HV * profile)
 {
 	dPROFILE;
-	if ( pget_H( owner) != application || application == nilHandle) return false;
+	if ( pget_H( owner) != application || application == NULL_HANDLE) return false;
 	*owner = application;
 	return true;
 }
@@ -189,7 +190,7 @@ XS( Printer_options_FROMPERL)
 		croak ("Invalid usage of Printer.options");
 	SP -= items;
 	self = gimme_the_mate( ST( 0));
-	if ( self == nilHandle)
+	if ( self == NULL_HANDLE)
 		croak( "Illegal object reference passed to Printer.options");
 
 	switch ( items) {
@@ -214,7 +215,7 @@ XS( Printer_options_FROMPERL)
 			free( value);
 		} else {
 			SPAGAIN;
-			XPUSHs( nilSV);
+			XPUSHs( NULL_SV);
 		}
 		PUTBACK;
 		return;
@@ -225,7 +226,7 @@ XS( Printer_options_FROMPERL)
 
 		for ( i = 1; i < items; i+=2) {
 			option = ( char*) SvPV_nolen( ST(i));
-			value  = (SvOK( ST(i+1)) ? ( char*) SvPV_nolen( ST(i+1)) : nil);
+			value  = (SvOK( ST(i+1)) ? ( char*) SvPV_nolen( ST(i+1)) : NULL);
 			if ( !value) continue;
 			if ( !apc_prn_set_option( self, option, value)) continue;
 			success++;

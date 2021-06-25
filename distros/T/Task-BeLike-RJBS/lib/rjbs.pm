@@ -1,6 +1,6 @@
-package rjbs;
+package rjbs 20210619.000;
 # ABSTRACT: all the junk that rjbs likes in his one-offs
-$rjbs::VERSION = '20210316.000';
+
 use 5.20.0;
 use feature ();
 use experimental ();
@@ -30,7 +30,7 @@ rjbs - all the junk that rjbs likes in his one-offs
 
 =head1 VERSION
 
-version 20210316.000
+version 20210619.000
 
 =head1 OVERVIEW
 
@@ -46,7 +46,7 @@ inside" Task::BeLike::RJBS.
 
 =head1 AUTHOR
 
-Ricardo Signes <rjbs@cpan.org>
+Ricardo Signes <rjbs@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

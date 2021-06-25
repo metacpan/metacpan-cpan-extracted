@@ -3,16 +3,15 @@ use strict;
 use warnings;
 use utf8;
 use open ':std', ':encoding(UTF-8)';
-use Encode qw(decode);
-use File::Find;
-use File::Spec;
-use Class::Load qw(load_class);
-use Carp;
-use POSIX qw(strftime);
+use Encode qw( decode );
+use File::Spec ();
+use Class::Load qw( load_class );
+use Carp qw( carp croak );
+use POSIX qw( strftime );
 use Moo;
 with "Archive::BagIt::Role::Portability";
 
-our $VERSION = '0.074'; # VERSION
+our $VERSION = '0.075'; # VERSION
 
 # ABSTRACT: The main module to handle bags.
 
@@ -955,7 +954,7 @@ Archive::BagIt - The main module to handle bags.
 
 =head1 VERSION
 
-version 0.074
+version 0.075
 
 =head1 NAME
 

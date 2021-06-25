@@ -22,7 +22,7 @@ my $build = Module::Build->new(
          ( 'indirect' => 0 ) ),
 
       'perl' => '5.016', # pad_add_name_pvn, pad_add_name_pvs, gv_init_pvn
-      'XS::Parse::Keyword' => '0.06',
+      'XS::Parse::Keyword' => '0.08',
       'XS::Parse::Sublike' => '0.10', # hookdata
    },
    test_requires => {
@@ -33,7 +33,7 @@ my $build = Module::Build->new(
    },
    configure_requires => {
       'Module::Build' => '0.4004', # test_requires
-      'XS::Parse::Keyword::Builder' => '0.06',
+      'XS::Parse::Keyword::Builder' => '0.08',
       'XS::Parse::Sublike::Builder' => '0.10',
    },
    license => 'perl',

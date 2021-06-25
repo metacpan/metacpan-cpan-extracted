@@ -1,3 +1,7 @@
+readme_from = "lib/PICA/Data.pm"
+abstract_from = "lib/PICA/Data.pm"
+authors_from = "lib/PICA/Data.pm"
+
 [FileGatherer]
 include_dotfiles = true
 exclude_match = ['^\.(?!(perltidy|tidyallrc))']

@@ -10,11 +10,11 @@ Regexp::Pattern::License::Parts - Regular expressions for licensing sub-parts
 
 =head1 VERSION
 
-Version v3.4.0
+Version v3.5.1
 
 =cut
 
-our $VERSION = version->declare("v3.4.0");
+our $VERSION = version->declare("v3.5.1");
 
 =head STATUS
 
@@ -43,6 +43,7 @@ It is a class of internally used patterns.
 # [- ]          dash or space
 # [ - ]         dash with space around
 # [http://]     http or https protocol
+# [ word]       space and word
 
 our %RE = (
 
@@ -76,7 +77,7 @@ our %RE = (
 	},
 	any_purpose => { pat => 'for any purpose, ' },
 	to_deal_mat => { pat => 'to deal in the Materials without restriction' },
-	granted     => { pat => 'is(?: hereby)? granted,? ' },
+	granted     => { pat => 'is(?: hereby)? granted' },
 	to_deal_the_sw_rights => {
 		pat =>
 			'to deal in the Software without restriction, including without limitation the rights '
@@ -130,12 +131,12 @@ our %RE = (
 			'If you change this software and redistribute parts or all of it in any form, you must make the source code of the altered version of this software available'
 	},
 	incl => { pat => 'shall be included in ' },
-	name => { pat => '[Tt]he names?(?: \S+){1,15}' },
+	name => { pat => '[Tt]he names?[ word]{1,15}' },
 	namenot =>
-		{ pat => '[Tt]he names?(?: \S+){1,15} (?:may|must|shall) not ' },
+		{ pat => '[Tt]he names?[ word]{1,15} (?:may|must|shall) not ' },
 	neithername => {
 		pat =>
-			'Neither the (?:names?(?: \S+){1,15}|authors?) nor the names of(?: (?:its|their|other|any))? contributors\W? may '
+			'Neither the (?:names?[ word]{1,15}|authors?) nor the names of(?: (?:its|their|other|any))? contributors\W? may '
 	},
 	notice_no_alter =>
 		{ pat => '[*)]?This notice may not be removed or altered' },
@@ -204,15 +205,15 @@ our %RE = (
 			'provided ["]?as[- ]is["]? without express or implied warranty'
 	},
 	asis_mat     => { pat => 'This material is supplied ["]?as[ -]is["]?' },
-	asis_name_sw => { pat => '(?:\S+ ){1,15}PROVIDES? THIS SOFTWARE' },
-	asis_sw_by_name       => { pat => 'THIS SOFTWARE IS PROVIDED BY' },
+	asis_name_sw => { pat => '[word][ word]{0,14} PROVIDES? THIS SOFTWARE' },
+	asis_sw_by   => { pat => 'THIS SOFTWARE IS PROVIDED BY' },
 	asis_sw_expr_warranty => {
 		pat =>
 			'This software is supplied ["]?as[- ]is["]? without express or implied warranty'
 	},
 	asis_sw_name_discl => {
 		pat =>
-			'THE SOFTWARE IS PROVIDED ["*]AS["*]?[- ]["*]?IS["*](?:,?|AND) (?:\S+ ){1,15}DISCLAIMS'
+			'THE SOFTWARE IS PROVIDED ["*]AS["*]?[- ]["*]?IS["*](?:,?|AND)[ word]{1,15} DISCLAIMS'
 	},
 	asis_sw_warranty => {
 		pat =>
@@ -278,11 +279,11 @@ our %RE = (
 
 	# combinations
 	discl_name_warranties =>
-		{ pat => '(?:\S+ ){1,15}DISCLAIMS? ALL WARRANTIES' },
+		{ pat => '[word][ word]{0,14} DISCLAIMS? ALL WARRANTIES' },
 	permission_use_fee_agree => { pat => 'and without a written agreement' },
 );
 
-$RE{perm_granted}{pat} = 'Permission ' . $RE{granted}{pat};
+$RE{perm_granted}{pat} = 'Permission ' . $RE{granted}{pat} . ',? ';
 $RE{ad_mat_ack_this}{pat}
 	= 'All advertising materials mentioning features or use of this software must display '
 	. $RE{ack_dev_by}{pat};
@@ -304,7 +305,7 @@ $RE{repro_code_modcode_cite_copr_avail_note}{pat}
 $RE{repro_copr_perm_warr_appear_doc}{pat}
 	= $RE{copr_perm_warr}{pat} . ' appear in supporting documentation';
 $RE{repro_matlab_cite_authors}{pat}
-	= 'If this code is accessible from within Matlab, then typing(?: \S+){2,5} \(with no arguments\) must cite the Authors';
+	= 'If this code is accessible from within Matlab, then typing[ word]{2,5} \(with no arguments\) must cite the Authors';
 $RE{note_marketing}{pat}
 	= $RE{incl}{pat} . $RE{cp_sw}{pat} . ', its documentation and marketing';
 $RE{note_mod_inc}{pat}
@@ -313,9 +314,9 @@ $RE{note_mod_inc_with_copr}{pat}
 	= 'and a notice that the code was modified is included with '
 	. $RE{above_copr}{pat};
 $RE{retain_copr_appear}{pat}
-	= 'provided that ' . $RE{above_copr}{pat} . ' appears? in all copies';
+	= ',? provided that ' . $RE{above_copr}{pat} . ' appears? in all copies';
 $RE{retain_copr_avail_note}{pat}
-	= 'provided ' . $RE{copr_avail_note}{pat} . ' are retained, ';
+	= ',? provided ' . $RE{copr_avail_note}{pat} . ' are retained, ';
 $RE{retain_copr_avail_orig}{pat}
 	= 'provided that '
 	. $RE{copr_avail_orig}{pat}
@@ -338,7 +339,7 @@ $RE{retain_notice_cond_discl_anywhere}{pat}
 	= 'Redistributions of source code must retain '
 	. $RE{copr_cond_discl_anywhere}{pat};
 $RE{retain_notices}{pat}
-	= 'provided ' . $RE{notices}{pat} . ' are retained, ';
+	= ',? provided ' . $RE{notices}{pat} . ' are retained, ';
 $RE{retain_notices_all}{pat}
 	= 'provided ' . $RE{notices}{pat} . ' are retained on all copies';
 $RE{retain_you_avail_orig}{pat}
@@ -378,6 +379,22 @@ $RE{nopromo_nothing_deemed}{pat}
 $RE{redist_ack_this}{pat}
 	= 'Redistributions of any form whatsoever must retain '
 	. $RE{ack_dev_by}{pat};
+$RE{discl_warranties}{pat}
+	= $RE{asis_sw_by}{pat}
+	. '[ word]{1,15} ["]AS["]?[- ]["]?IS["] '
+	. 'AND ANY EXPRESS OR IMPLIED WARRANTIES, '
+	. 'INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE '
+	. 'ARE DISCLAIMED[.] ';
+$RE{discl_liability}{pat}
+	= 'IN NO EVENT SHALL[ word]{1,15} BE LIABLE'
+	. ' FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES'
+	. ' \(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES[;] '
+	. 'LOSS OF USE, DATA, OR PROFITS[;] OR BUSINESS INTERRUPTION\)'
+	. ' HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY'
+	. ', WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT'
+	. ' \(INCLUDING NEGLIGENCE OR OTHERWISE\)'
+	. ' ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE'
+	. ', EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE[.][  ]';
 
 =encoding UTF-8
 

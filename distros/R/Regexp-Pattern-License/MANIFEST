@@ -16,6 +16,7 @@ lib/Regexp/Pattern/License.pm
 lib/Regexp/Pattern/License/Parts.pm
 t/01-basic.t
 t/02-regexp-pattern.t
+t/coverage-perl.t
 t/lib/MyTest.pm
 t/normalized.t
 t/re2.t

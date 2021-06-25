@@ -24,6 +24,8 @@ recommends 'Text::CSV', 0;
 suggests 'JSON::SL', '>= 1.0.6';
 suggests 'XML::LibXML::SAX::ChunkParser', '>= 0.00008';
 
+suggests 'Sentinel', '>= 0.06';
+
 on 'test' => sub {
 	requires 'Test::More', '>= 0.98';
 	requires 'Test::Deep', '>= 1.124';

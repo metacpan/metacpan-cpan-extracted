@@ -15,7 +15,7 @@ use warnings;
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/Acme/CPANModules/Import/MJGARDNER/ListProcessing.pm','lib/Acme/CPANModulesBundle/Import/MJGARDNER.pm'];
+my $filenames = ['lib/Acme/CPANModules/Import/MJGARDNER/ListProcessing.pm','lib/Acme/CPANModules/Import/MJGARDNER/LocalizingDate.pm','lib/Acme/CPANModulesBundle/Import/MJGARDNER.pm'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

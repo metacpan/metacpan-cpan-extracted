@@ -7,7 +7,7 @@ use Alien::Build::Plugin;
 use File::Basename ();
 
 # ABSTRACT: Plugin to extract links from a directory listing using ftpcopy
-our $VERSION = '2.40'; # VERSION
+our $VERSION = '2.41'; # VERSION
 
 
 sub init
@@ -59,7 +59,7 @@ Alien::Build::Plugin::Decode::DirListingFtpcopy - Plugin to extract links from a
 
 =head1 VERSION
 
-version 2.40
+version 2.41
 
 =head1 SYNOPSIS
 
@@ -143,6 +143,8 @@ Shawn Laffan (SLAFFAN)
 Paul Evans (leonerd, PEVANS)
 
 Håkon Hægland (hakonhagland, HAKONH)
+
+nick nauwelaerts (INPHOBIA)
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -4,7 +4,7 @@
       "Makamaka Hannyaharamitu, E<lt>makamaka[at]cpan.orgE<gt>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -32,7 +32,7 @@
       },
       "runtime" : {
          "recommends" : {
-            "Text::CSV_XS" : "1.02"
+            "Text::CSV_XS" : "1.46"
          },
          "requires" : {
             "IO::Handle" : "0",
@@ -45,7 +45,7 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/makamaka/Text-CSV/issues/"
+         "web" : "https://github.com/makamaka/Text-CSV/issues"
       },
       "license" : [
          "http://dev.perl.org/licenses/"
@@ -54,6 +54,6 @@
          "url" : "https://github.com/makamaka/Text-CSV"
       }
    },
-   "version" : "2.00",
-   "x_serialization_backend" : "JSON::PP version 4.00"
+   "version" : "2.01",
+   "x_serialization_backend" : "JSON::PP version 4.05"
 }

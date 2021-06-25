@@ -14,12 +14,12 @@ use base 'DBIx::Class::Core';
 
 =head1 VERSION
 
-This documentation refers to version 0.013 of
+This documentation refers to version 0.014 of
 Math::DifferenceSet::Planar::Schema::Result::DifferenceSet.
 
 =cut
 
-our $VERSION = '0.013';
+our $VERSION = '0.014';
 
 =head1 TABLE: C<difference_set>
 
@@ -116,7 +116,7 @@ __PACKAGE__->set_primary_key("order_");
 
 =item *
 
-L<Math::DifferenceSet::Planar::Schema> - schema class. 
+L<Math::DifferenceSet::Planar::Schema> - schema class.
 
 =back
 

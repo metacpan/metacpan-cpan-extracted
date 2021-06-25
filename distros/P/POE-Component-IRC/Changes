@@ -1,5 +1,8 @@
 Revision history for Perl extension POE::Component::IRC.
 
+6.93  Tue Jun 15 19:28:17 BST 2021
+    - Update online test to use Libera.chat
+
 6.92  Tue Jun 8 14:31:39 BST 2021
     - v5.8.9 didn't have '>' pack() modifier, switch to use 'N'
 

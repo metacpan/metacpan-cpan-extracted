@@ -1,7 +1,7 @@
 do { my $x = {
        'configure' => {
                         'requires' => {
-                                        'ExtUtils::MakeMaker' => '0'
+                                        'Module::Build::Tiny' => '0.034'
                                       }
                       },
        'develop' => {
@@ -25,8 +25,8 @@ do { my $x = {
                                      'CPAN::Meta' => '2.120900'
                                    },
                    'requires' => {
-                                   'ExtUtils::MakeMaker' => '0',
                                    'File::Spec' => '0',
+                                   'Module::Metadata' => '0',
                                    'Test::More' => '0.88',
                                    'Test::Needs' => '0'
                                  }

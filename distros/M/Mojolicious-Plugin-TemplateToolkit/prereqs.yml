@@ -1,0 +1,13 @@
+runtime:
+  requires:
+    perl: '5.010001'
+    Carp: 0
+    Class::Method::Modifiers: 0
+    Mojolicious: '6.51'
+    parent: 0
+    Scalar::Util: 0
+    Template: '2.26'
+    Template::Provider: '2.94'
+test:
+  requires:
+    Test::More: '0.88'

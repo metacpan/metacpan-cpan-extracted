@@ -3,7 +3,7 @@ package Database::Async::Pool;
 use strict;
 use warnings;
 
-our $VERSION = '0.013'; # VERSION
+our $VERSION = '0.014'; # VERSION
 
 =head1 NAME
 
@@ -16,6 +16,7 @@ Database::Async::Pool - connection manager for L<Database::Async>
 use Database::Async::Backoff;
 
 use Future;
+use Future::AsyncAwait;
 use Scalar::Util qw(blessed);
 use Log::Any qw($log);
 
@@ -99,17 +100,17 @@ Resolves to an engine. May need to wait if there are none available.
 
 =cut
 
-sub next_engine {
+async sub next_engine {
     my ($self) = @_;
     $log->tracef('Have %d ready engines to use', 0 + @{$self->{ready}});
     if(my $engine = shift @{$self->{ready}}) {
-        return Future->done($engine)
+        return $engine;
     }
     push @{$self->{waiting}}, my $f = $self->new_future;
     my $total = $self->count + $self->pending_count;
     $log->tracef('Might request, current count is %d/%d (%d pending, %d active)', $total, $self->max, $self->pending_count, $self->count);
-    $self->request_engine unless $total >= $self->max;
-    return $f;
+    await $self->request_engine unless $total >= $self->max;
+    return await $f;
 }
 
 sub new_future {
@@ -121,11 +122,11 @@ sub new_future {
     )->($label)
 }
 
-sub request_engine {
+async sub request_engine {
     my ($self) = @_;
     $log->tracef('Pool requesting new engine');
     ++$self->{pending_count};
-    $self->{request_engine}->()
+    await $self->{request_engine}->()
 }
 
 1;
@@ -136,5 +137,5 @@ Tom Molesworth C<< <TEAM@cpan.org> >>
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2011-2020. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth 2011-2021. Licensed under the same terms as Perl itself.
 

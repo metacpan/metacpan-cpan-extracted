@@ -2,11 +2,11 @@ package Archive::BagIt::Role::Portability;
 use strict;
 use warnings;
 use namespace::autoclean;
-use Carp;
-use File::Spec;
+use Carp ();
+use File::Spec ();
 use Moo::Role;
 # ABSTRACT: A role that handles filepaths for improved portability
-our $VERSION = '0.074'; # VERSION
+our $VERSION = '0.075'; # VERSION
 
 
 sub chomp_portable {
@@ -58,7 +58,7 @@ Archive::BagIt::Role::Portability - A role that handles filepaths for improved p
 
 =head1 VERSION
 
-version 0.074
+version 0.075
 
 =head1 AVAILABILITY
 

@@ -33,7 +33,7 @@ class Counter {
    is( $counter->count, 5, 'count is 5' );
 }
 
-class TwiceCounter extends Counter {
+class TwiceCounter isa Counter {
    method inc :override { $self->SUPER::inc; $self->SUPER::inc; }
 }
 

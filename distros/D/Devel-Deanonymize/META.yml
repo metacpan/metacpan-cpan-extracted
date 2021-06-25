@@ -1,0 +1,27 @@
+---
+abstract: 'A tool do make anonymous sub visible to Devel::Cover'
+author:
+  - 'Tobias Bossert <tobib at cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Devel-Deanonymize
+no_index:
+  directory:
+    - t
+    - inc
+    - t
+requires:
+  perl: '5.020000'
+resources:
+  bugtracker: https://github.com/oposs/devel-deanonymize/issues
+  license: https://opensource.org/licenses/mit
+  repository: https://github.com/oposs/devel-deanonymize
+version: v0.1.1
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

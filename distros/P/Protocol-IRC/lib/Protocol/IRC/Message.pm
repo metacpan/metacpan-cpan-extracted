@@ -3,12 +3,10 @@
 #
 #  (C) Paul Evans, 2008-2016 -- leonerd@leonerd.org.uk
 
-package Protocol::IRC::Message;
+package Protocol::IRC::Message 0.13;
 
-use strict;
+use v5.14;
 use warnings;
-
-our $VERSION = '0.12';
 
 use Carp;
 our @CARP_NOT = qw( Net::Async::IRC );
@@ -108,7 +106,7 @@ sub new
    $message = Protocol::IRC::Message->new_from_named_args( $command, %args )
 
 Returns a new C<Protocol::IRC::Message> object, initialised from the given
-named argmuents. The argument names must match those required by the given
+named arguments. The argument names must match those required by the given
 command.
 
 =cut
@@ -130,7 +128,7 @@ sub new_from_named_args
       next if $idx eq "pn";
 
       defined( my $value = $args{$name} ) or
-         croak "$command requires a named argmuent of '$name'";
+         croak "$command requires a named argument of '$name'";
 
       if( $idx =~ m/^\d+$/ ) {
          $args[$idx] = $args{$name};
@@ -730,3 +728,15 @@ JOIN | 0=target_name | *join
 609=RPL_NOWISAWAY      | target_name,ident,host,timestamp,text
 
 671=RPL_WHOISSECURE | target_name,text | -whois
+
+# IRCv3.1's SASL
+#   https://ircv3.net/specs/extensions/sasl-3.1
+900=RPL_LOGGEDIN    | useridenthost,account,text
+901=RPL_LOGGEDOUT   | useridenthost,text
+902=ERR_NICKLOCKED  | text
+903=RPL_SASLSUCCESS | text
+904=ERR_SASLFAIL    | text
+905=ERR_SASLTOOLONG | text
+906=ERR_SASLABORTED | text
+907=ERR_SASLALREADY | text
+908=ERR_SASLMECHS   | text

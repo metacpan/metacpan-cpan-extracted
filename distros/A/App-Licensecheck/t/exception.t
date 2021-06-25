@@ -96,7 +96,7 @@ license_is(
 # Libtool
 license_is(
 	't/exception/Libtool/lt__dirent.h',
-	'LGPL-2+ with libtool exception'
+	'LGPL-2+ with Libtool exception'
 );
 
 # non-GPL

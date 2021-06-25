@@ -12,7 +12,7 @@ Module::Generic::Scalar - String Manipulation Object Class
 
 =head1 VERSION
 
-    v1.0.0
+    v1.0.1
 
 =head1 DESCRIPTION
 
@@ -32,6 +32,10 @@ Provided with scalar reference, an array or just a regular string and this retur
 
 If an array reference or an array-based object is provided like L<Module::Generic::Array>, this will concatenate all the array elements
 
+=head2 as_array
+
+Returns the current string value as an L<Module::Generic::Array> object.
+
 =head2 as_boolean
 
 Returns a L<Module::Generic::Boolean> object with its value set to true or false based on the value of the scalar object.
@@ -47,6 +51,10 @@ Returns a L<Module::Generic::Boolean> object with its value set to true or false
     # etc...
 
 L<Module::Generic::Boolean> objects are very useful because they can be used in perl as o or 1 to indicate false or true, but when used in json, they are automatically converted to C<false> or C<true>
+
+=head2 as_number
+
+    Returns the current string as an L<Module::Generic::Number> object.
 
 =head2 as_string
 
@@ -148,6 +156,42 @@ This uses L<Scalar::Util/looks_like_number>
 Returns true if the string contains only upper case characters, or else it returns false.
 
 This uses perl's C<[[:upper:]]> to test.
+
+=head2 join
+
+Takes a string as the delimiter and one or more elements and this will join the current string object and the other string elements provided using the string delimiter. For example:
+
+    my $s = Module::Generic::Scalar->new( 'Jack John Paul Peter' );
+    # Takes the string, split it by space (now an array), join it by comma (now a scalar) and rejoin it with more strings
+    say $s->split( qr/[[:blank:]]+/ )->join( ', ' )->join( ', ', qw( Gabriel Raphael Emmanuel ) );
+    # prints: Jack, John, Paul, Peter, Gabriel, Raphael, Emmanuel
+
+Note that if, among the element passed to L</join>, an aray object is provided, it will not be expanded. Thus, if you do something like this:
+
+    my $a = Module::Generic::Array->new( [qw( John Peter )] );
+    say Module::Generic::Scalar->new( 'Paul' )->join( ', ', $a );
+
+It wil lnot produce C<Paul, John, Peter>, but instead something like: C<Paul, Module::Generic::Array=ARRAY(0x5646f0116470)>
+
+That's because there is no way to guess if the user wanted to pass on a list or just an object and making that kind of assumption is dangerous.
+
+What you woud want to do instead is:
+
+    say Module::Generic::Scalar->new( 'Paul' )->join( ', ', $a->list );
+
+Or maybe
+
+    say Module::Generic::Scalar->new( 'Paul' )->join( ', ', @$a );
+
+Of course, passing an overloaded object that has the stringification capability will transform it automatically into a string before being joined. Thus:
+
+    my $word1 = Module::Generic::Scalar->new( 'Hello' );
+    my $word2 = Module::Generic::Scalar->new( 'world' );
+    say $word1->join( ' ', $word2 );
+
+will yield: C<Hello world> because L<Module::Generic::Scalar> objects have overloaded stringification capability.
+
+It returns the newly formed string as a new L<Module::Generic::Scalar> object.
 
 =head2 lc
 

@@ -1,161 +1,156 @@
+#ifdef USE_PBL_BACKEND
+#define PBL_LONG(x) pbl_##x ()
+#define PBL_SV(sv,x) sv = newSVpv( pbl_##x(), 0 )
+#else	/* ifdef USE_PBL_BACKEND */
+#define PBL_LONG(x) x
+#define PBL_SV(sv,x) CF_TO_SV( sv, x )
+#endif	/* ifdef USE_PBL_BACKEND */
+
 
 long
 badPasteboardFlavorErr ()
     CODE:
-	RETVAL = pbl_badPasteboardFlavorErr ();
+	RETVAL = PBL_LONG( badPasteboardFlavorErr );
     OUTPUT:
 	RETVAL
 
 long
 badPasteboardIndexErr ()
     CODE:
-	RETVAL = pbl_badPasteboardIndexErr ();
+	RETVAL = PBL_LONG( badPasteboardIndexErr );
     OUTPUT:
 	RETVAL
 
 long
 badPasteboardItemErr ()
     CODE:
-	RETVAL = pbl_badPasteboardItemErr ();
+	RETVAL = PBL_LONG( badPasteboardItemErr );
     OUTPUT:
 	RETVAL
 
 long
 badPasteboardSyncErr ()
     CODE:
-	RETVAL = pbl_badPasteboardSyncErr ();
+	RETVAL = PBL_LONG( badPasteboardSyncErr );
     OUTPUT:
 	RETVAL
 
 long
 coreFoundationUnknownErr ()
     CODE:
-	RETVAL = pbl_coreFoundationUnknownErr ();
+	RETVAL = PBL_LONG( coreFoundationUnknownErr );
     OUTPUT:
 	RETVAL
 
 long
 duplicatePasteboardFlavorErr ()
     CODE:
-	RETVAL = pbl_duplicatePasteboardFlavorErr ();
+	RETVAL = PBL_LONG( duplicatePasteboardFlavorErr );
     OUTPUT:
 	RETVAL
 
 unsigned long
 kPasteboardClientIsOwner ()
     CODE:
-	RETVAL = pbl_kPasteboardClientIsOwner ();
+	RETVAL = PBL_LONG( kPasteboardClientIsOwner );
     OUTPUT:
 	RETVAL
 
 SV *
 kPasteboardClipboard ()
-    PPCODE:
-	{
-	    char * text;
-	    text = pbl_kPasteboardClipboard ();
-	    EXTEND (SP, 3);
-	    if (text == NULL) {
-		PUSHs (sv_2mortal (newSV (0)));
-	    } else {
-		PUSHs (sv_2mortal (newSVpv (text, 0)));
-	    }
-	}
+    CODE:
+	SV *sv;
+	PBL_SV( sv, kPasteboardClipboard );
+	RETVAL = sv;
+    OUTPUT:
+	RETVAL
 
 SV *
 kPasteboardFind ()
-    PPCODE:
-	{
-	    char * text;
-	    text = pbl_kPasteboardFind ();
-	    EXTEND (SP, 3);
-	    if (text == NULL) {
-		PUSHs (sv_2mortal (newSV (0)));
-	    } else {
-		PUSHs (sv_2mortal (newSVpv (text, 0)));
-	    }
-	}
+    CODE:
+	SV *sv;
+	PBL_SV( sv, kPasteboardFind );
+	RETVAL = sv;
+    OUTPUT:
+	RETVAL
 
 unsigned long
 kPasteboardFlavorNoFlags ()
     CODE:
-	RETVAL = pbl_kPasteboardFlavorNoFlags ();
+	RETVAL = PBL_LONG( kPasteboardFlavorNoFlags );
     OUTPUT:
 	RETVAL
 
 unsigned long
 kPasteboardFlavorNotSaved ()
     CODE:
-	RETVAL = pbl_kPasteboardFlavorNotSaved ();
+	RETVAL = PBL_LONG( kPasteboardFlavorNotSaved );
     OUTPUT:
 	RETVAL
 
 unsigned long
 kPasteboardFlavorPromised ()
     CODE:
-	RETVAL = pbl_kPasteboardFlavorPromised ();
+	RETVAL = PBL_LONG( kPasteboardFlavorPromised );
     OUTPUT:
 	RETVAL
 
 unsigned long
 kPasteboardFlavorRequestOnly ()
     CODE:
-	RETVAL = pbl_kPasteboardFlavorRequestOnly ();
+	RETVAL = PBL_LONG( kPasteboardFlavorRequestOnly );
     OUTPUT:
 	RETVAL
 
 unsigned long
 kPasteboardFlavorSenderOnly ()
     CODE:
-	RETVAL = pbl_kPasteboardFlavorSenderOnly ();
+	RETVAL = PBL_LONG( kPasteboardFlavorSenderOnly );
     OUTPUT:
 	RETVAL
 
 unsigned long
 kPasteboardFlavorSenderTranslated ()
     CODE:
-	RETVAL = pbl_kPasteboardFlavorSenderTranslated ();
+	RETVAL = PBL_LONG( kPasteboardFlavorSenderTranslated );
     OUTPUT:
 	RETVAL
 
 unsigned long
 kPasteboardFlavorSystemTranslated ()
     CODE:
-	RETVAL = pbl_kPasteboardFlavorSystemTranslated ();
+	RETVAL = PBL_LONG( kPasteboardFlavorSystemTranslated );
     OUTPUT:
 	RETVAL
 
 unsigned long
 kPasteboardModified ()
     CODE:
-	RETVAL = pbl_kPasteboardModified ();
+	RETVAL = PBL_LONG( kPasteboardModified );
     OUTPUT:
 	RETVAL
 
 SV *
 kPasteboardUniqueName ()
-    PPCODE:
-	{
-	    char * text;
-	    text = pbl_kPasteboardUniqueName ();
-	    EXTEND (SP, 3);
-	    if (text == NULL) {
-		PUSHs (sv_2mortal (newSV (0)));
-	    } else {
-		PUSHs (sv_2mortal (newSVpv (text, 0)));
-	    }
-	}
+    CODE:
+	SV *sv;
+	PBL_SV( sv, kPasteboardUniqueName );
+	RETVAL = sv;
+    OUTPUT:
+	RETVAL
 
 long
 noPasteboardPromiseKeeperErr ()
     CODE:
-	RETVAL = pbl_noPasteboardPromiseKeeperErr ();
+	RETVAL = PBL_LONG( noPasteboardPromiseKeeperErr );
     OUTPUT:
 	RETVAL
 
 long
 notPasteboardOwnerErr ()
     CODE:
-	RETVAL = pbl_notPasteboardOwnerErr ();
+	RETVAL = PBL_LONG( notPasteboardOwnerErr );
     OUTPUT:
 	RETVAL
+
+# ex: set filetype=xs :

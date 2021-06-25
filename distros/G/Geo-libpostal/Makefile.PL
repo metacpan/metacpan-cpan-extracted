@@ -1,9 +1,5 @@
 use 5.008005;
 use ExtUtils::MakeMaker;
-
-my @libs = map { chomp;$_ } `pkg-config --libs libpostal`;
-my $inc  = join ' ', map { chomp;$_ } `pkg-config --cflags libpostal`;
-
 WriteMakefile(
     NAME           => 'Geo::libpostal',
     VERSION_FROM   => 'lib/Geo/libpostal.pm',
@@ -11,10 +7,10 @@ WriteMakefile(
     ABSTRACT_FROM  => 'lib/Geo/libpostal.pm',
     AUTHOR         => 'David Farrell',
     CCFLAGS        => '-Wall',
-    LIBS           => \@libs,
+    LIBS           => ['-lpostal'],
     OPTIMIZE       => '-O3',
     DEFINE         => '',
-    INC            => $inc,
+    INC            => '-I.',
     LICENSE        => 'freebsd',
     (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
         'meta-spec' => { version => 2 },

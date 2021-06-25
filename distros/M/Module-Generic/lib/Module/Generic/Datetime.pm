@@ -31,7 +31,7 @@ BEGIN
     );
     use DateTime;
     use DateTime::Format::Strptime;
-    use Nice::Try;
+    use Nice::Try dont_want => 1;
     use Regexp::Common;
     use Scalar::Util ();
     our( $ERROR );
@@ -302,6 +302,7 @@ AUTOLOAD
     }
 };
 
+# XXX package Module::Generic::Datetime::Interval
 package Module::Generic::Datetime::Interval;
 BEGIN
 {

@@ -1,0 +1,63 @@
+NAME
+    String::Trim::NonRegex - String trimming functions that do not use regex
+
+VERSION
+    This document describes version 0.002 of String::Trim::NonRegex (from
+    Perl distribution String-Trim-NonRegex), released on 2021-06-23.
+
+DESCRIPTION
+    For testing/benchmarking purpose only. In general, regex is faster in
+    this case (see benchmark in "SEE ALSO").
+
+FUNCTIONS
+  ltrim
+    Usage:
+
+     my $trimmed = ltrim($str);
+
+    Trim whitespaces (including newlines) at the beginning of string.
+
+  rtrim
+    Usage:
+
+     my $trimmed = rtrim($str);
+
+    Trim whitespaces (including newlines) at the end of string.
+
+  trim
+    Usage:
+
+     my $trimmed = trim($str);
+
+    ltrim + rtrim.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/String-Trim-NonRegex>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-String-Trim-NonRegex>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=String-Trim-NonRegex>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    String::Trim, Text::Trim, String::Strip, String::Util,
+    String::Trim::More, Text::Minify::XS.
+
+    Benchmark: Bencher::Scenario::StringFunctions::Trim
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2021 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

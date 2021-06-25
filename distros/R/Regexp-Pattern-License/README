@@ -2,7 +2,7 @@ NAME
     Regexp::Pattern::License - Regular expressions for legal licenses
 
 VERSION
-    Version v3.4.0
+    Version v3.5.1
 
 DESCRIPTION
     Regexp::Pattern::License provides a hash of regular expression patterns
@@ -268,6 +268,8 @@ PATTERNS
 
     *   borceux
 
+    *   bsd_0_clause
+
     *   bsd_2_clause
 
     *   bsd_3_clause
@@ -283,6 +285,10 @@ PATTERNS
     *   bzip2_1_0_5
 
     *   bzip2_1_0_6
+
+    *   cal
+
+    *   cal_1
 
     *   caldera
 
@@ -432,6 +438,8 @@ PATTERNS
 
     *   curl
 
+    *   cvw
+
     *   dsdp
 
     *   ecl
@@ -510,9 +518,13 @@ PATTERNS
 
     *   icu
 
+    *   intel
+
     *   ipl
 
     *   ipl_1
+
+    *   jabberpl
 
     *   json
 
@@ -580,6 +592,8 @@ PATTERNS
 
     *   mit_oldstyle_permission
 
+    *   motosoto
+
     *   mpl
 
     *   mpl_1
@@ -591,6 +605,12 @@ PATTERNS
     *   ms_pl
 
     *   ms_rl
+
+    *   mulan
+
+    *   mulan_1
+
+    *   mulan_2
 
     *   ngpl
 
@@ -625,6 +645,40 @@ PATTERNS
     *   ofl_1_1_rfn
 
     *   ogtsl
+
+    *   oldap
+
+    *   oldap_1_1
+
+    *   oldap_1_2
+
+    *   oldap_1_3
+
+    *   oldap_1_4
+
+    *   oldap_2
+
+    *   oldap_2_0_1
+
+    *   oldap_2_1
+
+    *   oldap_2_2
+
+    *   oldap_2_2_1
+
+    *   oldap_2_2_2
+
+    *   oldap_2_3
+
+    *   oldap_2_4
+
+    *   oldap_2_5
+
+    *   oldap_2_6
+
+    *   oldap_2_7
+
+    *   oldap_2_8
 
     *   openssl
 
@@ -677,6 +731,12 @@ PATTERNS
     *   sgi_b_1_1
 
     *   sgi_b_2
+
+    *   sissl
+
+    *   sissl_1_1
+
+    *   sissl_1_2
 
     *   spl
 

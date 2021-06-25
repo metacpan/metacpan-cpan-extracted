@@ -6,7 +6,6 @@ use strict;
 require 5.00503;
 
 use Carp qw(croak confess carp);
-use Data::Dumper;
 use IPC::Semaphore;
 use IPC::Shareable::SharedMem;
 use IPC::SysV qw(
@@ -19,7 +18,7 @@ use IPC::SysV qw(
 use Storable 0.6 qw(freeze thaw);
 use Scalar::Util;
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 $SIG{CHLD} = 'IGNORE';
 
@@ -85,6 +84,7 @@ my %default_options = (
     create    => 0,
     exclusive => 0,
     destroy   => 0,
+    graceful  => 0,
     mode      => 0666,
     size      => SHM_BUFSIZ,
 );
@@ -561,7 +561,17 @@ sub _tie {
     my $flags    = _shm_flags($opts);
     my $shm_size = $opts->{size};
 
-    my $seg = IPC::Shareable::SharedMem->new($key, $shm_size, $flags);
+    my $seg;
+
+    if ($opts->{graceful}) {
+        exit if ! eval {
+            $seg = IPC::Shareable::SharedMem->new($key, $shm_size, $flags);
+            1;
+        };
+    }
+    else {
+        $seg = IPC::Shareable::SharedMem->new($key, $shm_size, $flags);
+    }
 
     if (! defined $seg) {
         if (! $opts->{create}) {
@@ -817,22 +827,22 @@ IPC::Shareable - Use shared memory backed variables across processes
 =head1 SYNOPSIS
 
     use IPC::Shareable qw(:lock);
-    
+
     tie SCALAR, 'IPC::Shareable', OPTIONS;
     tie ARRAY,  'IPC::Shareable', OPTIONS;
     tie HASH,   'IPC::Shareable', OPTIONS;
- 
+
     (tied VARIABLE)->lock;
     (tied VARIABLE)->unlock;
-      
-    (tied VARIABLE)->lock(LOCK_SH|LOCK_NB) 
+
+    (tied VARIABLE)->lock(LOCK_SH|LOCK_NB)
         or print "Resource unavailable\n";
 
     my $segment   = (tied VARIABLE)->seg;
     my $semaphore = (tied VARIABLE)->sem;
 
     (tied VARIABLE)->remove;
-               
+
     IPC::Shareable->clean_up;
     IPC::Shareable->clean_up_all;
 
@@ -907,6 +917,20 @@ If B<exclusive> field is set to a true value, calls to C<tie()> will fail
 exists.  If set to a false value, calls to C<tie()> will succeed even if
 a shared memory segment associated with GLUE already exists.
 
+See L</graceful> for a silent, non-exception exit if a second process
+attempts to obtain an in-use C<exclusive> segment.
+
+Default: B<false>
+
+=head2 graceful
+
+If B<exclusive> is set to a true value, we normally C<die()> if a second
+process attempts to obtain the same shared memory segment. Set B<graceful>
+to true and we'll C<exit> silently and gracefully. This option does nothing
+if C<exclusive> isn't set.
+
+Useful for ensuring only a single process is running at a time.
+
 Default: B<false>
 
 =head2 mode
@@ -980,7 +1004,7 @@ Example:
     IPC::Shareable->spawn(key => 'GLUE');
 
 Now, either within the same script, or any other script on the system, your
-data will be available at the key/glue C<GLUE>. Call 
+data will be available at the key/glue C<GLUE>. Call
 L<unspawn()|/unspawn($key, $destroy)> to remove it.
 
 =head2 unspawn($key, $destroy)

@@ -122,7 +122,7 @@ our %EXPORT_TAGS = ( 'all' => [ qw(
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = ();
 
-our $VERSION = "0.5.6";
+our $VERSION = "0.6.0";
 
 require XSLoader;
 XSLoader::load('EAV::XS', $VERSION);

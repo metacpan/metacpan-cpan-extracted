@@ -4,7 +4,7 @@
       "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -34,7 +34,11 @@
          "requires" : {
             "Email::Date::Format" : "1.000",
             "File::Basename" : "0",
-            "File::Spec" : "0"
+            "File::Spec" : "0",
+            "MIME::Base64" : "0",
+            "MIME::QuotedPrint" : "0",
+            "MIME::Types" : "1.28",
+            "Mail::Address" : "1.62"
          }
       }
    },
@@ -44,6 +48,6 @@
          "url" : "http://github.com/rjbs/MIME-Lite"
       }
    },
-   "version" : "3.031",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "3.033",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

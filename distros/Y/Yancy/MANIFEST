@@ -60,6 +60,9 @@ eg/northwind/northwind-schema.sqlite.sql
 eg/northwind/templates/layouts/default.html.ep
 eg/northwind/templates/product_details.html.ep
 eg/northwind/templates/product_list.html.ep
+eg/skeleton/lib/MyApp.pm
+eg/skeleton/my_app.conf
+eg/skeleton/script/my_app
 eg/test-app/.gitignore
 eg/test-app/myapp.auth.conf
 eg/test-app/myapp.conf
@@ -144,12 +147,14 @@ lib/Yancy/Plugin/Editor.pm
 lib/Yancy/Plugin/File.pm
 lib/Yancy/Plugin/Form.pm
 lib/Yancy/Plugin/Form/Bootstrap4.pm
+lib/Yancy/Plugin/Roles.pm
 lib/Yancy/Util.pm
 share/update_resources.sh
 t/00-compile.t
 t/00-report-prereqs.dd
 t/00-report-prereqs.t
 t/api.t
+t/app.t
 t/backend/dbic.t
 t/backend/mock.t
 t/backend/mysql.t
@@ -200,6 +205,12 @@ t/fixtures/markdown/mysql.sql
 t/fixtures/markdown/pg.sql
 t/fixtures/markdown/schema.json
 t/fixtures/markdown/sqlite.sql
+t/fixtures/roles/README.md
+t/fixtures/roles/dbic.pl
+t/fixtures/roles/mysql.sql
+t/fixtures/roles/pg.sql
+t/fixtures/roles/schema.json
+t/fixtures/roles/sqlite.sql
 t/helpers.t
 t/i18n.t
 t/lib/Digest/Broken.pm
@@ -226,6 +237,7 @@ t/plugin/auth/token.t
 t/plugin/editor.t
 t/plugin/file.t
 t/plugin/form/bootstrap4.t
+t/plugin/roles.t
 t/register.t
 t/schema/dbicdump.pl
 t/schema/mysql.sql

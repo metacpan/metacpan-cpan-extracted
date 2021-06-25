@@ -82,9 +82,10 @@ Combining tag roles is as simple as use'ing them in the new role:
 
   Accessing tags
 
-Classes and objects are provided a _tags method which returns a hash of
-hashes keyed off of the tags and attribute names. For example, for the
-following code:
+Classes and objects are provided a _tags method which returns a
+MooX::TaggedAttributes::Cache object. For backwards compatibility, it
+can be dereferenced as a hash, providing a hash of hashes keyed off of
+the tags and attribute names. For example, for the following code:
 
  package T;
  use Moo::Role;
@@ -101,11 +102,11 @@ following code:
 
 The tag structure returned by "C->_tags"
 
- { t1 => { a => 2 }, t2 => { b => "foo" } }
+ bless({ t1 => { a => 2 }, t2 => { b => "foo" } }, "MooX::TaggedAttributes::Cache")
 
 and "C->new->_tags"
 
- { t1 => { a => 2 }, t2 => { b => "foo" } }
+ bless({ t1 => { a => 2 }, t2 => { b => "foo" } }, "MooX::TaggedAttributes::Cache")
 
 are identical.
 

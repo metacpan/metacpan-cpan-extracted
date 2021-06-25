@@ -21,6 +21,7 @@ Alexey
 Andreas
 Andrew
 Anirvan
+Arne
 Asplund
 Atzberger
 Authen
@@ -120,6 +121,7 @@ Jeremy
 Joao
 Joe
 Joerg
+Johannessen
 John
 Jonathan
 Jr
@@ -338,6 +340,7 @@ getprint
 getstore
 gianni
 gisle
+git
 github
 gong
 gopher

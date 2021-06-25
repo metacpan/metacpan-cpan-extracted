@@ -20,15 +20,15 @@ no_index:
 provides:
   App::Dusage:
     file: lib/App/Dusage.pm
-    version: '2.01'
+    version: '2.02'
   dusage:
     file: script/dusage
-    version: '2.01'
+    version: '2.02'
 requires:
   ExtUtils::MakeMaker: '6.5503'
   Test::More: '0'
   perl: '5.010001'
 resources:
   license: http://dev.perl.org/licenses/
-version: '2.01'
+version: '2.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

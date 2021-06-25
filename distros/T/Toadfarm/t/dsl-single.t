@@ -1,4 +1,5 @@
 use lib '.';
+BEGIN { $ENV{MOJO_LOG_LEVEL} //= 'warn' }
 use Mojo::Base -strict;
 use Test::Mojo;
 use Test::More;

@@ -7,6 +7,8 @@ use strict;
 use warnings;
 use utf8;
 use lib './lib';
+use JSON;
+use Nice::Try;
 
 BEGIN { use_ok( 'Module::Generic::Hash' ) || BAIL_OUT( "Unable to load Module::Generic::Hash" ); }
 
@@ -119,3 +121,19 @@ my $h3 = $h->clone;
 # diag( "\$h3 is " . $h3->as_string );
 ok( $h3 eq $h, 'Comparing hashes (eq)' );
 ok( $h ne $h2, 'Comparing hashes (ne)' );
+
+my $hash4 = { name => 'John Doe', age => 42, location => 'here' };
+my $h4 = Module::Generic::Hash->new( $hash4 );
+my $j = JSON->new->convert_blessed->canonical;
+try
+{
+    my $json = $j->encode( $h4 );
+    is( $json, '{"age":42,"location":"here","name":"John Doe"}', 'TO_JSON' );
+}
+catch( $e )
+{
+    # diag( "Error encoding: $e" );
+    fail( 'TO_JSON' );
+}
+
+done_testing();

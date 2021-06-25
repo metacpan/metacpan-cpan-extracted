@@ -80,7 +80,7 @@
    "provides" : {
       "Web::Mention" : {
          "file" : "lib/Web/Mention.pm",
-         "version" : "0.720"
+         "version" : "0.721"
       },
       "Web::Mention::Author" : {
          "file" : "lib/Web/Mention/Author.pm"
@@ -97,11 +97,12 @@
          "web" : "https://github.com/jmacdotorg/webmention-perl"
       }
    },
-   "version" : "0.720",
+   "version" : "0.721",
    "x_contributors" : [
       "Jason McIntosh <jmac@jmac.org>",
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
-      "Tomaz Solc <tomaz.solc@tablix.org>"
+      "Tomaz Solc <tomaz.solc@tablix.org>",
+      "Yanick Champoux <yanick@babyl.dyndns.org>"
    ],
    "x_serialization_backend" : "JSON::PP version 2.27300_01",
    "x_static_install" : 1

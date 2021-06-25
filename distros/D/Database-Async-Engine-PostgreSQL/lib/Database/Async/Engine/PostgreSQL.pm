@@ -4,7 +4,7 @@ package Database::Async::Engine::PostgreSQL;
 use strict;
 use warnings;
 
-our $VERSION = '0.010';
+our $VERSION = '0.011';
 
 use parent qw(Database::Async::Engine);
 
@@ -56,6 +56,8 @@ use Future::AsyncAwait;
 use Database::Async::Query;
 use File::HomeDir;
 use Config::Tiny;
+use Encode ();
+use Unicode::UTF8;
 
 use Protocol::Database::PostgreSQL::Client qw(0.008);
 use Protocol::Database::PostgreSQL::Constants qw(:v1);
@@ -79,11 +81,13 @@ Database::Async::Engine->register_class(
 
 sub configure {
     my ($self, %args) = @_;
-    for (qw(service)) {
+    for (qw(service encoding)) {
         $self->{$_} = delete $args{$_} if exists $args{$_};
     }
     return $self->next::method(%args);
 }
+
+sub encoding { shift->{encoding} }
 
 =head2 connection
 
@@ -445,19 +449,19 @@ our %AUTH_HANDLER = (
         my ($self, $msg) = @_;
         $self->protocol->send_message(
             'PasswordMessage',
-            user          => $self->uri->user,
+            user          => $self->encode_text($self->uri->user),
             password_type => 'plain',
-            password      => $self->uri->password,
+            password      => $self->encode_text($self->uri->password),
         );
     },
     AuthenticationMD5Password => sub {
         my ($self, $msg) = @_;
         $self->protocol->send_message(
             'PasswordMessage',
-            user          => $self->uri->user,
+            user          => $self->encode_text($self->uri->user),
             password_type => 'md5',
             password_salt => $msg->password_salt,
-            password      => $self->uri->password,
+            password      => $self->encode_text($self->uri->password),
         );
     },
     AuthenticationSCMCredential => sub {
@@ -506,12 +510,12 @@ sub protocol {
                     my ($self, %args) = @_;
                     $log->tracef('Auth request received: %s', \%args);
                     $self->protocol->{user} = $self->uri->user;
-                    $self->protocol->send_message('PasswordMessage', password => $self->uri->password);
+                    $self->protocol->send_message('PasswordMessage', password => $self->encode_text($self->uri->password));
                 }),
                 parameter_status => $self->$curry::weak(sub {
                     my ($self, $msg) = @_;
                     $log->tracef('Parameter received: %s', $msg);
-                    $self->set_parameter($msg->key => $msg->value);
+                    $self->set_parameter(map $self->decode_text($_), $msg->key => $msg->value);
                 }),
                 row_description => $self->$curry::weak(sub {
                     my ($self, $msg) = @_;
@@ -522,7 +526,7 @@ sub protocol {
                 data_row => $self->$curry::weak(sub {
                     my ($self, $msg) = @_;
                     $log->tracef('Have row data %s', $msg);
-                    $self->active_query->row([ $msg->fields ]);
+                    $self->active_query->row([ map $self->decode_text($_), $msg->fields ]);
                 }),
                 command_complete => $self->$curry::weak(sub {
                     my ($self, $msg) = @_;
@@ -622,7 +626,7 @@ sub protocol {
                         $log->warnf('No active query for copy data');
                         return;
                     };
-                    $query->row($_) for $msg->rows;
+                    $query->row([ map $self->decode_text($_), @$_ ]) for $msg->rows;
                 }),
                 copy_done => $self->$curry::weak(sub {
                     my ($self, $msg) = @_;
@@ -632,7 +636,7 @@ sub protocol {
                     my ($self, $msg) = @_;
                     my ($chan, $data) = @{$msg}{qw(channel data)};
                     $log->tracef('Notification on channel %s containing %s', $chan, $data);
-                    $self->db->notification($self, $chan, $data);
+                    $self->db->notification($self, map $self->decode_text($_), $chan, $data);
                 }),
                 sub { $log->errorf('Unknown message %s (type %s)', $_, $_->type) }
             );
@@ -645,6 +649,8 @@ sub stream_from {
     my $proto = $self->proto;
     $src->each(sub {
         $log->tracef('Sending %s', $_);
+        # This is already UTF-8 encoded in the protocol handler,
+        # since it's a text-based protocol
         $proto->send_copy_data($_);
     })
 }
@@ -696,8 +702,22 @@ sub simple_query {
         sql      => $sql,
         row_data => my $src = $self->ryu->source
     );
-    $self->protocol->simple_query($query->sql);
+    $self->protocol->simple_query($self->encode_text($query->sql));
     return $src;
+}
+
+sub encode_text {
+    my ($self, $txt) = @_;
+    return $txt unless defined $txt and my $encoding = $self->encoding;
+    return Unicode::UTF8::encode_utf8($txt) if $encoding eq 'UTF-8';
+    return Encode::encode($encoding, $txt, Encode::FB_CROAK);
+}
+
+sub decode_text {
+    my ($self, $txt) = @_;
+    return $txt unless defined $txt and my $encoding = $self->encoding;
+    return Unicode::UTF8::decode_utf8($txt) if $encoding eq 'UTF-8';
+    return Encode::decode($encoding, $txt, Encode::FB_CROAK);
 }
 
 sub handle_query {
@@ -707,14 +727,14 @@ sub handle_query {
     my $proto = $self->protocol;
     $proto->send_message(
         'Parse',
-        sql       => $query->sql,
+        sql       => $self->encode_text($query->sql),
         statement => '',
     );
     $proto->send_message(
         'Bind',
         portal    => '',
         statement => '',
-        param     => [ $query->bind ],
+        param     => [ map $self->encode_text($_), $query->bind ],
     );
     $proto->send_message(
         'Describe',
@@ -726,24 +746,7 @@ sub handle_query {
         portal    => '',
         statement => '',
     );
-    if($query->{in}) {
-        $query->in
-            ->completed
-            ->on_done(sub {
-                $proto->send_message(
-                    'Close',
-                    portal    => '',
-                    statement => '',
-                );
-            })
-            ->on_ready(sub {
-                $proto->send_message(
-                    'Sync',
-                    portal    => '',
-                    statement => '',
-                );
-            });
-    } else {
+    unless($query->{in}) {
         $proto->send_message(
             'Close',
             portal    => '',
@@ -758,17 +761,7 @@ sub handle_query {
     Future->done
 }
 
-sub query {
-    my ($self, $sql, @bind) = @_;
-    die 'use handle_query instead';
-    die 'already have active query' if $self->{active_query};
-    $self->{active_query} = my $query = Database::Async::Query->new(
-        sql      => $sql,
-        bind     => \@bind,
-        row_data => my $src = $self->ryu->source
-    );
-    return $src;
-}
+sub query { die 'use handle_query instead'; }
 
 sub active_query { shift->{active_query} }
 
@@ -838,5 +831,5 @@ Tom Molesworth C<< <TEAM@cpan.org> >>
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2011-2020. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth 2011-2021. Licensed under the same terms as Perl itself.
 

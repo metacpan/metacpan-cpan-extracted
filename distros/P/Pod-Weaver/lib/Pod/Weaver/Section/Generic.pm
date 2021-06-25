@@ -1,6 +1,6 @@
-package Pod::Weaver::Section::Generic;
+package Pod::Weaver::Section::Generic 4.018;
 # ABSTRACT: a generic section, found by lifting sections
-$Pod::Weaver::Section::Generic::VERSION = '4.017';
+
 use Moose;
 with 'Pod::Weaver::Role::Section';
 
@@ -108,7 +108,7 @@ Pod::Weaver::Section::Generic - a generic section, found by lifting sections
 
 =head1 VERSION
 
-version 4.017
+version 4.018
 
 =head1 OVERVIEW
 
@@ -133,6 +133,17 @@ configuration above could be specified just as:
 If the C<required> attribute is given, and true, then an exception will be
 raised if this section can't be found.
 
+=head1 PERL VERSION SUPPORT
+
+This module has the same support period as perl itself:  it supports the two
+most recent versions of perl.  (That is, if the most recently released version
+is v5.40, then this module should work on both v5.40 and v5.38.)
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
+
 =head1 ATTRIBUTES
 
 =head2 required
@@ -148,7 +159,7 @@ The name of this section. Defaults to the plugin name.
 
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@cpan.org>
+Ricardo SIGNES <rjbs@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

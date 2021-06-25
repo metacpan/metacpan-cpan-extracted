@@ -17,7 +17,7 @@ use Types::Standard -types;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.2.3';
+our $VERSION = 'v0.2.4';
 
 
 has resolver => (
@@ -75,6 +75,12 @@ sub _build_robots {
         },
 
         {
+            name   => 'CocCoc',
+            agent  => qr/\bcoccocbot-web\b/,
+            domain => qr/\.coccoc\.com$/,
+        },
+
+        {
             name   => 'Embedly',
             agent  => qr/\bEmbedly\b/,
             domain => qr/\.embed\.ly$/,
@@ -126,6 +132,12 @@ sub _build_robots {
             name   => 'Pinterest',
             agent  => qr/\bPinterest\b/,
             domain => qr/\.pinterest\.com$/,
+        },
+
+        {
+            name   => 'Qwant',
+            agent  => qr/\bQwantify\b/,
+            domain => qr/\.qwant\.com$/,
         },
 
         {
@@ -242,7 +254,7 @@ Robots::Validate - Validate that IP addresses are associated with known robots
 
 =head1 VERSION
 
-version v0.2.3
+version v0.2.4
 
 =head1 SYNOPSIS
 
@@ -322,6 +334,11 @@ Alternatively, you can pass in a Plack environment:
   my $result = $rv->validate($env);
 
 =head1 KNOWN ISSUES
+
+=head2 Undocumented Rules
+
+Many of these rules are not documented, but have been guessed from web
+traffic.
 
 =head2 Limitations
 

@@ -3,14 +3,13 @@
 #
 #  (C) Paul Evans, 2017-2018 -- leonerd@leonerd.org.uk
 
-package String::Tagged::Terminal::Win32Console;
+package String::Tagged::Terminal::Win32Console 0.05;
 
-use strict;
+use v5.14;
 use warnings;
+
 use Win32::Console;
 use List::Util qw( max );
-
-our $VERSION = '0.04';
 
 =head1 NAME
 

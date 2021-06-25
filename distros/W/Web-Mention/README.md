@@ -447,6 +447,7 @@ Jason McIntosh (jmac@jmac.org)
 # CONTRIBUTORS
 
 - Mohammad S Anwar (mohammad.anwar@yahoo.com)
+- Yanick Champoux
 - Tomaž Šolc (tomaz.solc@tablix.org)
 
 # COPYRIGHT AND LICENSE

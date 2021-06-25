@@ -1,11 +1,35 @@
 # CORBA/IDLtree.pm   IDL to symbol tree translator
 # This module is distributed under the same terms as Perl itself.
-# Copyright  (C) 1998-2020, O. Kellogg <okellogg@users.sourceforge.net>
+# Copyright  (C) 1998-2021, O. Kellogg <okellogg@users.sourceforge.net>
 # Main Authors:  Oliver Kellogg, Heiko Schroeder
 #
 # -----------------------------------------------------------------------------
 # Ver. |   Date   | Recent changes (for complete history see file Changes)
 # -----+----------+------------------------------------------------------------
+# 2.05  2021/06/13  * Increase minimum required perl version to 5.8 due to
+#                     addition of "use utf8".
+#                   * Add handling of Windows CP-1252 character encoding in
+#                     input file:
+#                     - Add `use utf8`.
+#                     - Require module Encode::Guess.
+#                     - In sub get_items:
+#                       - On encountering a non printable character call
+#                         Encode::Guess->guess.
+#                       - If the call returns a ref then a decoder was found
+#                         and no special action is required.
+#                       - If the call returns "No appropriate encodings found"
+#                         then assign $l from Encode::decode("cp-1252", $l).
+#                       - If the call returns none of the above then print a
+#                         warning "Unsupported character encoding" and replace
+#                         the non printable characters in $l by space.
+#                     - In sub Parse_File_i case $file case $emucpp call to
+#                       `open $in`, the encoding directive for UTF-8 is no
+#                       longer needed due to use of Encode::Guess (see above).
+#                   * In sub skip_input fix handling of preprocessor directives
+#                     where the "#" is not placed in column 1 but is preceded by
+#                     whitespace.
+#                   * Fix sub scoped_name in case of chained module reopenings.
+#
 # 2.04  2020/06/20  * In sub Parse_File_i case $file case $emucpp open $in
 #                     with encoding(UTF-8) to ensure that IDL files are parsed
 #                     as utf8.
@@ -125,9 +149,11 @@
 package CORBA::IDLtree;
 
 require Carp;
+require Encode::Guess;
 
 use 5.008_003;
 use strict 'vars';
+use utf8;
 use warnings;
 use Exporter qw(import);
 use Math::BigInt;
@@ -148,11 +174,11 @@ CORBA::IDLtree - OMG IDL to symbol tree translator
 
 =head1 VERSION
 
-Version 2.04
+Version 2.05
 
 =cut
 
-our $VERSION = '2.04';
+our $VERSION = '2.05';
 
 =head1 SYNOPSIS
 
@@ -795,7 +821,7 @@ sub Dump_Symbols;
 
 sub Version ()
 {
-    for ('$Revision: 29631 $') { #'){
+    for ('$Revision$') { #'){
         /: *(\S+)/ and return $VERSION . "_" . $1;
     }
     return $VERSION;
@@ -1794,7 +1820,7 @@ sub skip_input {
                 next;
             }
         }
-        next unless ($l =~ /^s*#/);
+        next unless ($l =~ /^\s*#/);
         my @arg = idlsplit($l);
         my $kw = shift @arg;
         # print (join ('|', @arg) . "\n");
@@ -1868,12 +1894,21 @@ sub get_items {  # returns empty list for end-of-file or fatal error
         $line_number[$currfile]++;
         chomp $l;
         $l =~ s/\r//g;  # zap DOS line ending
-        unless ($locale) {
-            $l =~ s/[^[:print:]]/ /g;
-        }
         if ($firstline) {
             $l = discard_bom($l);
             $firstline = 0;
+        }
+        if ($l =~ /[^\t\f[:print:]]/) {
+            my $decoder = Encode::Guess->guess($l);
+            unless (ref $decoder) {
+                # info($decoder);
+                if ($decoder =~ /No appropriate encodings found/) {
+                    $l = Encode::decode("cp-1252", $l);
+                } else {
+                    info "Unsupported character encoding - $decoder";
+                    $l =~ s/[^\t\f[:print:]]/ /g;
+                }
+            }
         }
         if ($l =~ /^\s*$/) {           # empty
             if ($in_comment) {
@@ -2478,7 +2513,7 @@ sub Parse_File_i {
             }
         }
         if ($emucpp) {
-            open($in, , '<:encoding(UTF-8)', $file) or abort("Cannot open file $file");		
+            open($in, , '<', $file) or abort("Cannot open file $file");
         } else {
             my $cpp_args = "";
             foreach (keys %defines) {
@@ -4139,7 +4174,7 @@ sub get_numeric {
     if (isnode($node)) {
         return get_numeric($tree, $node, $wantfloat);
     }
-    warn ("unknown symbol in expression: $value\n");
+    Carp::cluck ("unknown symbol in expression: $value\n");
     return undef;
 }
 
@@ -4370,13 +4405,8 @@ sub scoped_name {
     unless (isnode($node)) {
         return "";
     }
-    my $sc = $node->[SCOPEREF];
-    my @scopes = ($node->[NAME]);
-    while ($sc) {
-        unshift @scopes, $sc->[NAME]
-          unless ($sc->[TYPE] == INCFILE || $sc->[NAME] eq $scopes[0]);
-        $sc = $sc->[SCOPEREF];
-    }
+    my @scopes = get_scope($node->[SCOPEREF]);
+    push @scopes, $node->[NAME];
     return join($scope_sep, @scopes);
 }
 

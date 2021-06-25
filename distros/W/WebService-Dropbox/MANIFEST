@@ -19,6 +19,7 @@ lib/WebService/Dropbox/Files.pm
 lib/WebService/Dropbox/Files/CopyReference.pm
 lib/WebService/Dropbox/Files/ListFolder.pm
 lib/WebService/Dropbox/Files/UploadSession.pm
+lib/WebService/Dropbox/Sharing.pm
 lib/WebService/Dropbox/TokenFromOAuth1.pm
 lib/WebService/Dropbox/Users.pm
 minil.toml
@@ -27,9 +28,11 @@ t/05_accessor.t
 t/10_api.t
 t/11_range.t
 t/12_304.t
+t/15_auth.t
 t/20_copy.t
 t/30_list.t
 t/40_save_url.t
+t/50_sharing.t
 t/sample.png
 META.yml
 MANIFEST

@@ -1,4 +1,9 @@
-0.151   2019-06-20 (PERLANCAR)
+0.152   2021-06-23  Released-By: PERLANCAR; Urgency: medium
+
+        - Bump prereq version Perinci::CmdLine::Lite -> 1.905.
+
+
+0.151   2019-06-20  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -6,14 +11,14 @@
 	  (previously deliberately excluded).
 
 
-0.150   2019-06-20 (PERLANCAR)
+0.150   2019-06-20  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Update dep: Perinci::CmdLine::Lite=1.820.
 
 
-0.14    2017-07-22 (PERLANCAR)
+0.14    2017-07-22  Released-By: PERLANCAR
 
         - [optimize] Reduce startup overhad by avoiding use of strict/warnings
           pragmas in built version.
@@ -23,7 +28,7 @@
         - [dist] Bump prereq versions Perinci::CmdLine::{Lite,Classic} to 1.76.
 
 
-0.13    2016-07-20 (PERLANCAR)
+0.13    2016-07-20  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -31,7 +36,7 @@
           to 1.56, Perinci::CmdLine::Classic to 1.71.
 
 
-0.12    2015-09-03 (PERLANCAR)
+0.12    2015-09-03  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -40,51 +45,51 @@
 	  requirement.
 
 
-0.11    2015-06-18 (PERLANCAR)
+0.11    2015-06-18  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- [doc] Mention Perinci::CmdLine::Inline.
 
 
-0.10    2015-04-12 (PERLANCAR)
+0.10    2015-04-12  Released-By: PERLANCAR
 
 	- Split peri-run to App-PerinciUtils.
 
 
-0.09    2015-02-06 (PERLANCAR)
+0.09    2015-02-06  Released-By: PERLANCAR
 
 	- Adjust to Perinci::CmdLine -> Perinci::CmdLine::Classic, ::Lite
 	  is now the default preferred version.
 
 
-0.08    2014-12-31 (PERLANCAR)
+0.08    2014-12-31  Released-By: PERLANCAR
 
 	- Allow 'lite' and 'classic' in PERINCI_CMDLINE_ANY, as shortcut.
 
 
-0.07     2014-12-29 (PERLANCAR)
+0.07     2014-12-29  Released-By: PERLANCAR
 
          - Add completion for bin/peri-run.
 
 
-0.06     2014-08-16 (SHARYANTO) - Happy 19th CPAN Day!
+0.06     2014-08-16  Released-By: SHARYANTO; Note: Happy 19th CPAN Day!
 
          - Add -prefer_lite.
 
 
-0.05     2014-07-23 (SHARYANTO)
+0.05     2014-07-23  Released-By: SHARYANTO
 
          - Add script: peri-run (moved from Perinci-CmdLine). UPDATE 2015-04-12:
            peri-run now moved to App-PerinciUtils.
 
 
-0.04     2014-07-18 (SHARYANTO)
+0.04     2014-07-18  Released-By: SHARYANTO
 
          - Introduce PERINCI_CMDLINE_ANY to let you override class to use.
 
 
-0.03     2014-07-18 (SHARYANTO)
+0.03     2014-07-18  Released-By: SHARYANTO
 
          - Instead of subclassing (which is problematic in Perinci::CmdLine due
            to color theme role searching in <CLASS>::ColorTheme::*), create a
@@ -92,7 +97,7 @@
            SHARYANTO::Role::ColorTheme searches superclasses too.
 
 
-0.02     2014-07-16 (SHARYANTO)
+0.02     2014-07-16  Released-By: SHARYANTO
 
          - No functional changes.
 
@@ -101,6 +106,6 @@
          - Typos/copy-paste mistakes.
 
 
-0.01     2014-07-16 (SHARYANTO)
+0.01     2014-07-16  Released-By: SHARYANTO
 
          - First release.

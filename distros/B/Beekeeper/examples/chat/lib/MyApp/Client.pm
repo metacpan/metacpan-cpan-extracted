@@ -3,7 +3,6 @@ package MyApp::Client;
 use strict;
 use warnings;
 
-use AnyEvent::Impl::Perl;
 use MyApp::Service::Chat;
 use MyApp::Service::Auth;
 

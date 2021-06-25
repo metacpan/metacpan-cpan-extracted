@@ -2,7 +2,7 @@ package App::Yath::Options::Runner;
 use strict;
 use warnings;
 
-our $VERSION = '1.000057';
+our $VERSION = '1.000058';
 
 use Test2::Util qw/IS_WIN32/;
 use Test2::Harness::Util qw/clean_path/;
@@ -21,6 +21,12 @@ option_group {prefix => 'runner', category => "Runner Options"} => sub {
             return 0 if IS_WIN32;
             return 1;
         },
+    );
+
+    option abort_on_bail => (
+        type => 'b',
+        default => 1,
+        description => "Abort all testing if a bail-out is encountered (default: on)",
     );
 
     option use_timeout => (
@@ -222,6 +228,13 @@ This is where command line options for the runner are defined.
 =head3 Runner Options
 
 =over 4
+
+=item --abort-on-bail
+
+=item --no-abort-on-bail
+
+Abort all testing if a bail-out is encountered (default: on)
+
 
 =item --blib
 

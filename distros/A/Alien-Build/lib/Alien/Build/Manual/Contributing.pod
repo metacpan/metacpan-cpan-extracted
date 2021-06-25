@@ -14,7 +14,7 @@ Alien::Build::Manual::Contributing - Over-detailed contributing guide
 
 =head1 VERSION
 
-version 2.40
+version 2.41
 
 =head1 SYNOPSIS
 
@@ -62,7 +62,7 @@ inherit from L<Alien::Base>, like so:
 
  package Alien::libfoo;
  
- use base qw( Alien::Base );
+ use parent qw( Alien::Base );
  
  1;
 
@@ -252,6 +252,8 @@ Shawn Laffan (SLAFFAN)
 Paul Evans (leonerd, PEVANS)
 
 Håkon Hægland (hakonhagland, HAKONH)
+
+nick nauwelaerts (INPHOBIA)
 
 =head1 COPYRIGHT AND LICENSE
 

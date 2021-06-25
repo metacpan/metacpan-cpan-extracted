@@ -7,13 +7,12 @@ use Path::Tiny ();
 use Carp ();
 use File::chdir;
 use JSON::PP ();
-use Env qw( @PATH );
-use Env qw( @PKG_CONFIG_PATH );
+use Env qw( @PATH @PKG_CONFIG_PATH );
 use Config ();
 use Alien::Build::Log;
 
 # ABSTRACT: Build external dependencies for use in CPAN
-our $VERSION = '2.40'; # VERSION
+our $VERSION = '2.41'; # VERSION
 
 
 sub _path { goto \&Path::Tiny::path }
@@ -1150,7 +1149,6 @@ package Alien::Build::TempDir;
 # redundant).  Happily both are private classes, and either are able to
 # rename, if a good name can be thought of.
 
-use Path::Tiny qw( path );
 use overload '""' => sub { shift->as_string }, bool => sub { 1 }, fallback => 1;
 use File::Temp qw( tempdir );
 
@@ -1158,9 +1156,9 @@ sub new
 {
   my($class, $build, $name) = @_;
   my $root = $build->install_prop->{root};
-  path($root)->mkpath unless -d $root;
+  Path::Tiny->new($root)->mkpath unless -d $root;
   bless {
-    dir => path(tempdir( "${name}_XXXX", DIR => $root)),
+    dir => Path::Tiny->new(tempdir( "${name}_XXXX", DIR => $root)),
   }, $class;
 }
 
@@ -1192,7 +1190,7 @@ Alien::Build - Build external dependencies for use in CPAN
 
 =head1 VERSION
 
-version 2.40
+version 2.41
 
 =head1 SYNOPSIS
 
@@ -2212,6 +2210,8 @@ Shawn Laffan (SLAFFAN)
 Paul Evans (leonerd, PEVANS)
 
 Håkon Hægland (hakonhagland, HAKONH)
+
+nick nauwelaerts (INPHOBIA)
 
 =head1 COPYRIGHT AND LICENSE
 

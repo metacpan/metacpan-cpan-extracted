@@ -6,7 +6,7 @@ use warnings;
 use Class::Utils qw(set_params);
 use Error::Pure qw(err);
 
-our $VERSION = 0.01;
+our $VERSION = 0.02;
 
 # Constructor.
 sub new {
@@ -17,6 +17,9 @@ sub new {
 
 	# 'CSS::Struct::Output' object.
 	$self->{'css'} = undef;
+
+	# Default gradient is left-right direction from red to violet.
+	$self->{'css_background_image'} = 'linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet)';
 
 	# Gradient CSS class.
 	$self->{'css_gradient_class'} = 'gradient';
@@ -81,7 +84,7 @@ sub process_css {
 		['d', 'height', $self->{'height'}.$self->{'unit'}],
 		['d', 'width', $self->{'width'}.$self->{'unit'}],
 		['d', 'background-color', 'red'],
-		['d', 'background-image', 'linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet)'],
+		['d', 'background-image', $self->{'css_background_image'}],
 		['e'],
 	);
 
@@ -125,6 +128,12 @@ Constructor.
 It's required.
 
 Default value is undef.
+
+=item * C<css_background_image>
+
+CSS parameter for background-image of gradient.
+
+Default value is 'linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet)'.
 
 =item * C<css_gradient_class>
 
@@ -303,6 +312,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.01
+0.02
 
 =cut

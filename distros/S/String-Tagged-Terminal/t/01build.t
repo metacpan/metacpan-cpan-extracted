@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
 use Test::More;
@@ -79,7 +79,14 @@ sub is_unqq
       ->append_tagged( "palette colour", fgindex => 50 );
 
    is_unqq( $st->build_terminal, "With \e[38:5:50mpalette colour\e[m",
-      '->build_terminal on Hi16 colour' );
+      '->build_terminal on xterm256 colour' );
+
+   $st = String::Tagged::Terminal->new
+      ->append( "With " )
+      ->append_tagged( "noninteger", fgindex => 3.14159 );
+
+   is_unqq( $st->build_terminal, "With \e[33mnoninteger\e[m",
+      '->build_terminal rounds to integer' );
 }
 
 # Trailing format gets reset

@@ -1,0 +1,57 @@
+---
+abstract: 'parse and generate CFITSIO extended file names.'
+author:
+  - 'Diab Jerius <djerius@cpan.org>'
+build_requires:
+  Data::Dump: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test2::V0: '0'
+  Test::More: '0'
+  vars: '0'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.020, CPAN::Meta::Converter version 2.150010'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Astro-FITS-CFITSIO-FileName
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+provides:
+  Astro::FITS::CFITSIO::FileName:
+    file: lib/Astro/FITS/CFITSIO/FileName.pm
+    version: '0.03'
+  Astro::FITS::CFITSIO::FileName::Regexp:
+    file: lib/Astro/FITS/CFITSIO/FileName/Regexp.pm
+    version: '0.03'
+requires:
+  Carp: '0'
+  Exporter::Shiny: '1.002000'
+  Moo: '0'
+  Ref::Util: '0'
+  Types::Common::Numeric: '0'
+  Types::Standard: '0'
+  experimental: '0'
+  namespace::clean: '0'
+  overload: '0'
+  perl: '5.026003'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Astro-FITS-CFITSIO-FileName
+  repository: https://gitlab.com/djerius/astro-fits-cfitsio-filename.git
+version: '0.03'
+x_generated_by_perl: v5.28.1
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: GPL-3.0-only

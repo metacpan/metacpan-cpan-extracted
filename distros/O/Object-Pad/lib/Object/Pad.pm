@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2019-2020 -- leonerd@leonerd.org.uk
 
-package Object::Pad 0.40;
+package Object::Pad 0.41;
 
 use v5.14;
 use warnings;
@@ -33,12 +33,8 @@ C<Object::Pad> - a simple syntax for lexical slot-based objects
    use Object::Pad;
 
    class Point {
-      has $x = 0;
-      has $y = 0;
-
-      BUILD {
-        ($x, $y) = @_;
-      }
+      has $x :param = 0;
+      has $y :param = 0;
 
       method move ($dX, $dY) {
          $x += $dX;
@@ -50,7 +46,7 @@ C<Object::Pad> - a simple syntax for lexical slot-based objects
       }
    }
 
-   Point->new(5,10)->describe;
+   Point->new(x => 5, y => 10)->describe;
 
 =head1 DESCRIPTION
 
@@ -87,6 +83,16 @@ should perform any C<SUPER> chaining as may be required.
 
    @args = $class->BUILDARGS( @_ )
 
+If any slot in the class has the C<:param> attribute, then the constructor
+will expect to receive its argmuents in an even-sized list of name/value
+pairs. This applies even to slots inherited from the parent class or applied
+roles. It is therefore a good idea to shape the parameters to the constructor
+in this way in roles, and in classes if you intend your class to be extended.
+
+The constructor will also check for required parameters (these are all the
+parameters for slots that do not have default initialisation expressions). If
+any of these are missing an exception is thrown.
+
 =head1 KEYWORDS
 
 =head2 class
@@ -113,15 +119,20 @@ sets the value of the package's C<$VERSION> variable.
 
    class Name VERSION;
 
-A single superclass is supported by the keyword C<extends>
+A single superclass is supported by the keyword C<isa>
 
-   class Name extends BASECLASS {
+I<Since version 0.41.>
+
+   class Name isa BASECLASS {
       ...
    }
 
-   class Name extends BASECLASS BASEVER {
+   class Name isa BASECLASS BASEVER {
       ...
    }
+
+(prior to version 0.41 this was called C<extends>, which is currently
+recognised as a compatibility synonym).
 
 If a package providing the superclass does not exist, an attempt is made to
 load it by code equivalent to
@@ -139,11 +150,16 @@ An optional version check can also be supplied; it performs the equivalent of
 
    BaseClass->VERSION( $ver )
 
-One or more roles can be composed into the class by the keyword C<implements>
+One or more roles can be composed into the class by the keyword C<does>
 
-   class Name implements ROLE, ROLE,... {
+I<Since version 0.41.>
+
+   class Name does ROLE, ROLE,... {
       ...
    }
+
+(prior to version 0.41 this was called C<implements>, which is currently
+recognised as a compatibility synonym).
 
 An optional list of attributes may be supplied in similar syntax as for subs
 or lexical variables. (These are annotations about the class itself; the
@@ -355,6 +371,23 @@ argument checking similar to that used by subroutine signatures, to ensure the
 correct number of arguments are passed - usually zero, but exactly one in the
 case of a C<:writer> method.
 
+=head3 :param, :param(NAME)
+
+I<Since version 0.41.>
+
+Sets this slot to be initialised automatically in the generated constructor.
+This is only permitted on scalar slots. If no name is given, the name of the
+slot is used. A single prefix character C<_> will be removed if present.
+
+Any slot that has C<:param> but does not have a default initialisation
+expression becomes a required argument to the constructor. Attempting to
+invoke the constructor without a named argument for this will throw an
+exception. In order to make a parameter optional, make sure to give it a
+default expression - even if that expression is C<undef>:
+
+   has $x :param;          # this is required
+   has $z :param = undef;  # this is optional
+
 =head2 method
 
    method NAME {
@@ -430,10 +463,9 @@ subroutine signature syntax, as for methods, to assist in unpacking its
 arguments. A build block is not a subroutine and thus is not permitted to use
 subroutine attributes (for example C<:lvalue>).
 
-Currently attempts to create a method named C<BUILD> (i.e. with syntax
-C<method BUILD {...}>) will create a builder block instead. As of version 0.31
-such attempts will print a warning at compiletime, and a later version may
-remove this altogether.
+Note that a C<BUILD> block is a named phaser block and not a method. Attempts
+to create a method named C<BUILD> (i.e. with syntax C<method BUILD {...}>)
+will fail with a compiletime error, to avoid this confusion.
 
 =head2 requires
 
@@ -506,7 +538,7 @@ For example; in the following
       sub get_value { return "A" }
    }
 
-   class DerivedClass extends ClassicPerlBaseClass {
+   class DerivedClass isa ClassicPerlBaseClass {
       has $_value = "B";
       BUILD {
          $_value = "C";
@@ -635,6 +667,7 @@ sub begin_class
    my $class = shift;
    my ( $name, %args ) = @_;
 
+   # TODO: Do we accept an `isa` arg ?
    Object::Pad::_begin_class( $name, $args{extends} );
 }
 

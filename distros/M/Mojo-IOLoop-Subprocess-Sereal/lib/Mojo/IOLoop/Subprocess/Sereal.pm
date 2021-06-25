@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Exporter 'import';
 
-our $VERSION = '1.001';
+our $VERSION = '1.002';
 
 our @EXPORT = '$_subprocess';
 

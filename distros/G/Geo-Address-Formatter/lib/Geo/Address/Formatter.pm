@@ -1,7 +1,7 @@
 # ABSTRACT: take structured address data and format it according to the various global/country rules
 
 package Geo::Address::Formatter;
-$Geo::Address::Formatter::VERSION = '1.94';
+$Geo::Address::Formatter::VERSION = '1.95';
 use strict;
 use warnings;
 use feature qw(say);
@@ -29,6 +29,7 @@ sub new {
     $self->{final_components} = undef;
     bless($self, $class);
 
+    $debug = 1 if (defined($params{debug}) && $params{debug});
     if ($self->_read_configuration($conf_path)){
         return $self;
     }
@@ -144,6 +145,11 @@ sub format_address {
     # 1. make sure empty at the beginning
     $self->{final_components} = undef;    
 
+    if ($debug){
+        say STDERR "start of format_address";
+        say STDERR Dumper $rh_components;
+    }
+
     # 2. deal with the options
 
     # 2a. which country format will we use?
@@ -160,9 +166,12 @@ sub format_address {
     # 2b. should we abbreviate?
     my $abbrv = $rh_options->{abbreviate} // 0;
 
+    if ($debug){
+        say STDERR "component_aliases";
+        say STDERR Dumper $self->{component_aliases};
+    }
     # set the aliases, unless this would overwrite something
-    foreach my $alias (sort keys %{$self->{component_aliases}}) {
-
+    foreach my $alias (sort keys %{$self->{component_aliases}}){
         if (defined($rh_components->{$alias})
             && !defined($rh_components->{$self->{component_aliases}->{$alias}}))
         {
@@ -170,8 +179,17 @@ sub format_address {
         }
     }
 
+    if ($debug){
+        say STDERR "after component_aliases applied";
+        say STDERR Dumper $rh_components;
+    }
+
     # 3. deal wtih terrible inputs
     $self->_sanity_cleaning($rh_components);
+    if ($debug){
+        say STDERR "after sanity_cleaning applied";
+        say STDERR Dumper $rh_components;
+    }
 
     # 4. determine the template
     my $template_text;
@@ -202,12 +220,20 @@ sub format_address {
 
     # 5. clean up the components, possibly add codes
     $self->_fix_country($rh_components);
+    if ($debug){
+        say STDERR "after fix_country";
+        say STDERR Dumper $rh_components;
+    }
+
     $self->_apply_replacements($rh_components, $rh_config->{replace});
+    if ($debug){
+        say STDERR "after applying_replacements applied";
+        say STDERR Dumper $rh_components;
+    }
     $self->_add_state_code($rh_components);
     $self->_add_county_code($rh_components);
-
     if ($debug){
-        say STDERR "after replacements and adding codes";
+        say STDERR "after adding codes";
         say STDERR Dumper $rh_components;
     }
 
@@ -284,10 +310,6 @@ sub _postformat {
     foreach my $ra_fromto (@$raa_rules) {
         try {
             my $regexp = qr/$ra_fromto->[0]/;
-            if ($debug){
-                say STDERR 'text: ' . $text;
-                say STDERR 're: ' . $regexp;
-            }
             my $replacement = $ra_fromto->[1];
 
             # ultra hack to do substitution
@@ -551,11 +573,10 @@ sub _apply_replacements {
     my $rh_components = shift;
     my $raa_rules     = shift;
 
-    #warn "in _apply_replacements";
-    #warn "  raa_rules";
-    #warn Dumper $raa_rules;
-    #warn "  rh_components";
-    #warn Dumper $rh_components;
+    if ($debug){
+        say STDERR "in _apply_replacements";
+        say STDERR Dumper $raa_rules;
+    }
 
     foreach my $component (sort keys %$rh_components) {
         foreach my $ra_fromto (@$raa_rules) {
@@ -568,7 +589,6 @@ sub _apply_replacements {
                         $rh_components->{$component} = $ra_fromto->[1];
                     }
                 } else {
-
                     my $regexp = qr/$ra_fromto->[0]/;
                     $rh_components->{$component} =~ s/$regexp/$ra_fromto->[1]/;
                 }
@@ -627,7 +647,11 @@ sub _abbreviate {
 sub _clean {
     my $self = shift;
     my $out  = shift // return;
-    #warn "entering _clean \n$out";
+    if ($debug){
+        say STDERR "entering _clean \n$out";
+    }
+
+    $out =~ s/\&#39\;/'/g;
 
     $out =~ s/[\},\s]+$//;
     $out =~ s/^[,\s]+//;
@@ -685,6 +709,7 @@ sub _render_template {
 
     # Mustache calls it context
     my $context = clone($components);
+    say STDERR 'context: ' . Dumper $context if ($debug);
     my $output = $thtemplate->render($context);
 
     $output = $self->_evaluate_template_lamdas($output);
@@ -693,6 +718,7 @@ sub _render_template {
     $output = $self->_clean($output);
 
     # is it empty?
+    # if yes and there is only one component then just use that one
     if ($output !~ m/\w/) {
         my @comps = sort keys %$components;
         if (scalar(@comps) == 1) {
@@ -760,7 +786,7 @@ Geo::Address::Formatter - take structured address data and format it according t
 
 =head1 VERSION
 
-version 1.94
+version 1.95
 
 =head1 SYNOPSIS
 

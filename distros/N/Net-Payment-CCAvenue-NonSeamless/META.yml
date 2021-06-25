@@ -1,0 +1,34 @@
+---
+abstract: 'Processing orders using CCAvenue billing page!'
+author:
+  - 'Rakesh Kumar Shardiwal <rakesh.shardiwal@gmail.com>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-Payment-CCAvenue-NonSeamless
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  CGI: '0'
+  Crypt::Mode::CBC: '0'
+  DateTime: '0'
+  Digest::MD5: '0'
+  JSON::XS: '0'
+  Moose: '0'
+  URI: '0'
+  perl: '5.006'
+resources:
+  bugtracker: https://github.com/shardiwal/cpan-Net-Payment-CCAvenue-NonSeamless/issues
+  homepage: https://github.com/shardiwal/cpan-Net-Payment-CCAvenue-NonSeamless/blob/gh-pages/index.md
+  repository: https://github.com/shardiwal/cpan-Net-Payment-CCAvenue-NonSeamless.git
+version: '0.02'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

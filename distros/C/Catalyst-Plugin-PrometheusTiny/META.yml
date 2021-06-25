@@ -33,5 +33,6 @@ requires:
 resources:
   IRC: irc://irc.perl.org/#catalyst
   bugtracker: https://github.com/SysPete/Catalyst-Plugin-PrometheusTiny/issues
-version: '0.005'
+  repository: https://github.com/SysPete/Catalyst-Plugin-PrometheusTiny
+version: '0.006'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

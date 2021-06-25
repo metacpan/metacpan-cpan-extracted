@@ -1,0 +1,201 @@
+NAME
+    CSS::Struct::Output::Structure - Structure class for 'CSS::Struct'
+    output.
+
+SYNOPSIS
+     use CSS::Struct::Output::Structure;
+
+     my $css = CSS::Struct::Output::Structure->new(%parameters);
+     my $ret_or_undef = $css->flush($reset_flag);
+     $css->put(@data);
+     $css->reset;
+
+METHODS
+  "new"
+     my $css = CSS::Struct::Output::Structure->new(%parameters);
+
+    Constructor.
+
+    Returns instance of object.
+
+    *       "auto_flush"
+
+             Auto flush flag.
+             Default is 0.
+
+    *       "output_handler"
+
+             Handler for print output strings.
+             Must be a GLOB.
+             Default is undef.
+
+    *       "skip_bad_types"
+
+             Flag, that means bad 'CSS::Struct' types skipping.
+             Default value is 0.
+
+  "flush"
+     my $ret_or_undef = $css->flush($reset_flag);
+
+    Flush CSS structure in object. If defined 'output_handler' flush to its
+    as structure string. Or return CSS structure as array. If enabled
+    $reset_flag, then resets internal variables via reset method.
+
+    Returns output string or undef.
+
+  "put(@data)"
+     $css->put(@data);
+
+    Put CSS structure in format specified in CSS::Struct.
+
+    Returns undef.
+
+  "reset"
+     $css->reset;
+
+    Resets internal variables.
+
+    Returns undef.
+
+ERRORS
+     From CSS::Struct::Output:
+             Auto-flush can't use without output handler.
+             Bad comment delimeters.
+             Bad data.
+             Bad number of arguments.
+                     ('CSS::Struct' structure array),
+             Bad type of data.
+             Cannot write to output handler.
+             No opened selector.
+             Output handler is bad file handler.
+             Unknown parameter '%s'.
+
+EXAMPLE1
+     use strict;
+     use warnings;
+
+     use CSS::Struct::Output::Structure;
+     use Data::Printer;
+
+     my $css = CSS::Struct::Output::Structure->new;
+
+     # Set structure.
+     $css->put(['c', 'Comment']);
+     $css->put(['a', '@charset', 'utf-8']);
+     $css->put(['s', 'selector#id']);
+     $css->put(['s', 'div div']);
+     $css->put(['s', '.class']);
+     $css->put(['d', 'weight', '100px']);
+     $css->put(['d', 'font-size', '10em']);
+     $css->put(['e']);
+
+     # Get structure.
+     my $css_struct_ar = $css->flush;
+
+     # Dump out.
+     p $css_struct_ar;
+
+     # Output:
+     # \ [
+     #     [0] [
+     #         [0], "c",
+     #         [1], "comment"
+     #     ],
+     #     [1] [
+     #         [0] "a",
+     #         [1] "@charset",
+     #         [2] "utf-8"
+     #     ],
+     #     [2] [
+     #         [0] "s",
+     #         [1] "selector#id"
+     #     ],
+     #     [3] [
+     #         [0] "s",
+     #         [1] "div div"
+     #     ],
+     #     [4] [
+     #         [0] "s",
+     #         [1] ".class"
+     #     ],
+     #     [5] [
+     #         [0] "d",
+     #         [1] "weight",
+     #         [2] "100px"
+     #     ],
+     #     [6] [
+     #         [0] "d",
+     #         [1] "font-size",
+     #         [2] "10em"
+     #     ],
+     #     [7] [
+     #         [0] "e"
+     #     ]
+     # ]
+
+EXAMPLE2
+     use strict;
+     use warnings;
+
+     use CSS::Struct::Output::Structure;
+     use Data::Printer;
+
+     my $css = CSS::Struct::Output::Structure->new(
+            'output_handler' => \*STDOUT,
+     );
+
+     # Set structure.
+     $css->put(['c', 'Comment']);
+     $css->put(['a', 'charset', 'utf-8']);
+     $css->put(['s', 'selector#id']);
+     $css->put(['s', 'div div']);
+     $css->put(['s', '.class']);
+     $css->put(['d', 'weight', '100px']);
+     $css->put(['d', 'font-size', '10em']);
+     $css->put(['e']);
+
+     # Get structure.
+     $css->flush;
+
+     # Output:
+     # ['c', 'comment']
+     # ['a', 'charset', 'utf-8']
+     # ['s', 'selector#id']
+     # ['s', 'div div']
+     # ['s', '.class']
+     # ['d', 'weight', '100px']
+     # ['d', 'font-size', '10em']
+     # ['e']
+
+DEPENDENCIES
+    CSS::Struct::Output, Error::Pure.
+
+SEE ALSO
+    CSS::Struct
+        Struct oriented CSS manipulation.
+
+    CSS::Struct::Output
+        Base class for CSS::Struct::Output::*.
+
+    CSS::Struct::Output::Indent
+        Indent printing 'CSS::Struct' structure to CSS code.
+
+    CSS::Struct::Output::Raw
+        Raw printing 'CSS::Struct' structure to CSS code.
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/CSS-Struct-Output-Structure>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2021 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+VERSION
+    0.02
+

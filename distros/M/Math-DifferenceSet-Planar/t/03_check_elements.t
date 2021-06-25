@@ -3,7 +3,7 @@
 # under the terms of the Artistic License 2.0 (see LICENSE file).
 
 # Before 'make install' is performed this script should be runnable with
-# 'make test'. After 'make install' it should work as 'perl 01_basics.t'
+# 'make test'. After 'make install' it should work as 'perl 03_check_elements.t'
 
 #########################
 

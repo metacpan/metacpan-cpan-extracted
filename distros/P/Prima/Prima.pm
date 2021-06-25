@@ -9,7 +9,7 @@ require DynaLoader;
 use vars qw($VERSION @ISA $__import @preload $pid);
 @ISA = qw(DynaLoader);
 sub dl_load_flags { 0x00 }
-$VERSION = '1.61';
+$VERSION = '1.62';
 $pid = $$;
 bootstrap Prima $VERSION;
 unless ( UNIVERSAL::can('Prima', 'init')) {
@@ -398,13 +398,17 @@ L<Prima::Dialog::PrintDialog> - standard printer setup dialog
 
 =item Drawing helpers
 
+L<Prima::Drawable::Antialias> - plot antialiased shapes
+
 L<Prima::Drawable::CurvedText> - fit text to path
 
 L<Prima::Drawable::Glyphs> - bi-directional text input and complex scripts output
 
 L<Prima::Drawable::Gradient> - gradient fills for primitives
 
-L<Prima::Drawable::Markup> - Allow markup in widgets
+L<Prima::Drawable::Markup> - allow markup in widgets
+
+L<Prima::Drawable::Metafile> - graphic primitive recorder
 
 L<Prima::Drawable::Path> - stroke and fill complex paths
 

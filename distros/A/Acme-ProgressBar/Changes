@@ -1,37 +1,42 @@
 Revision history for Acme-ProgressBar
 
+1.129     2021-06-18 22:01:46-04:00 America/New_York
+        - update author contact info
+        - add perl-support section
+        - happy juneteenth! (early)
+
 1.128     2016-03-05 17:29:35-05:00 America/New_York
-          added a "see also" section to docs (thanks, Sean Zellmer)
+        - added a "see also" section to docs (thanks, Sean Zellmer)
 
 1.127     2013-10-24 22:28:18 America/New_York
-          fix links to repo and issue tracker
+        - fix links to repo and issue tracker
 
 1.126     2010-11-28 08:18:33 America/New_York
-          improve accuracy of timing to subsecond measurements
+        - improve accuracy of timing to subsecond measurements
 
 1.125     2009-01-16
-          packaging tweaks
+        - packaging tweaks
 
 1.124     2007-11-08
-          packaging tweaks
+        - packaging tweaks
 
 1.123     2007-10-31
-          packaging tweaks
+        - packaging tweaks
 
 1.122     2007-10-24
-          packaging tweaks
+        - packaging tweaks
 
 1.121     2005-11-13
-          packaging tweaks
+        - packaging tweaks
 
 1.12      2005-04-02
-          happy april fools day! (belated)
-          fixed manifest file
+        - happy april fools day! (belated)
+        - fixed manifest file
 
 1.10      2004-08-23 13:05
-          code cleanup
-          POD coverage
+        - code cleanup
+        - POD coverage
 
 1.002	    2004-07-04 22:17:58
-          Happy 4th of July!
-          fixed a fencepost error: was only counting to 8, instead of 9
+        - Happy 4th of July!
+        - fixed a fencepost error: was only counting to 8, instead of 9

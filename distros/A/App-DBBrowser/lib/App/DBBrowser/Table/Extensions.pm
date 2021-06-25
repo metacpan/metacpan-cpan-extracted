@@ -24,6 +24,7 @@ sub new {
 
 sub complex_unit {
     my ( $sf, $sql, $clause ) = @_;
+    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my ( $none, $function, $subquery, $all ) = @{$sf->{i}{menu_additions}};
     my $set_to_null = '=N';
@@ -41,10 +42,11 @@ sub complex_unit {
         $type = $types[0];
     }
     else {
+        my $info = $ax->get_sql_info( $sql );
         # Choose
         $type = $tc->choose(
             [ undef, @types ],
-            { %{$sf->{i}{lyt_h}} }
+            { %{$sf->{i}{lyt_h}}, info => $info }
         );
         if ( ! defined $type ) {
             return;

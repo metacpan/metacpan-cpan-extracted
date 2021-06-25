@@ -27,11 +27,13 @@ t/37pieces-vstring.t
 t/40build.t
 t/41structures.t
 t/42scopes.t
+t/43probing.t
 t/50flags-autosemi.t
 t/99pod.t
 t/build.xs
 t/flags.xs
 t/pieces.xs
+t/probing.xs
 t/stages.xs
 t/structures.xs
 t/testcase.pm

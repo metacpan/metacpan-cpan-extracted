@@ -5,8 +5,8 @@ use 5.020;
 use warnings;
 use experimental qw(postderef postderef_qq);
 
-package App::Cmd;
-$App::Cmd::VERSION = '0.333';
+package App::Cmd 0.334;
+
 use parent 'App::Cmd::ArgProcessor';
 # ABSTRACT: write command line apps with less suffering
 
@@ -747,7 +747,7 @@ App::Cmd - write command line apps with less suffering
 
 =head1 VERSION
 
-version 0.333
+version 0.334
 
 =head1 SYNOPSIS
 
@@ -808,6 +808,16 @@ App::Cmd is intended to make it easy to write complex command-line applications
 without having to think about most of the annoying things usually involved.
 
 For information on how to start using App::Cmd, see L<App::Cmd::Tutorial>.
+
+=head1 PERL VERSION SUPPORT
+
+This module has a long-term perl support period.  That means it will not
+require a version of perl released fewer than five years ago.
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
 
 =head1 METHODS
 
@@ -1045,11 +1055,11 @@ publish and use our improved simple input routines
 
 =head1 AUTHOR
 
-Ricardo Signes <rjbs@cpan.org>
+Ricardo Signes <rjbs@semiotic.systems>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Adam Prime ambs Andreas Hernitscheck A. Sinan Unur Chris 'BinGOs' Williams David Golden Steinbrunner Davor Cubranic Denis Ibaev Diab Jerius Glenn Fowler Ingy dot Net Jakob Voss Jérôme Quelin John SJ Anderson Karen Etheridge Kent Fredric Lucas Theisen Matthew Astley mokko Olivier Mengué Ricardo Signes Ryan C. Thompson Salvatore Bonaccorso Sergey Romanov Stephan Loyd Stephen Caldwell Yuval Kogman
+=for stopwords Adam Prime ambs Andreas Hernitscheck A. Sinan Unur Chris 'BinGOs' Williams David Golden Steinbrunner Davor Cubranic Denis Ibaev Diab Jerius Glenn Fowler Ingy dot Net Jakob Voss Jérôme Quelin John SJ Anderson Karen Etheridge Kent Fredric Lucas Theisen Matthew Astley mokko Olivier Mengué Ryan C. Thompson Salvatore Bonaccorso Sergey Romanov Stephan Loyd Stephen Caldwell Yuval Kogman
 
 =over 4
 
@@ -1140,10 +1150,6 @@ mokko <mauricemengel@gmail.com>
 =item *
 
 Olivier Mengué <dolmen@cpan.org>
-
-=item *
-
-Ricardo Signes <rjbs@semiotic.systems>
 
 =item *
 

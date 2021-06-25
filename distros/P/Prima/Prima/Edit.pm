@@ -113,7 +113,7 @@ sub profile_default
 		autoHScroll       => 1,
 		autoVScroll       => 1,
 		blockType         => bt::CUA,
-		borderWidth       => 1,
+		borderWidth       => 2,
 		cursorSize        => [ $::application-> get_default_cursor_width, $font-> { height}],
 		cursorVisible     => 1,
 		cursorX           => 0,
@@ -216,10 +216,10 @@ sub init
 	$profile{selection} = [@{$profile{selStart}}, @{$profile{selEnd}}];
 	$self->{$_} = $profile{$_} for qw(scrollBarClass hScrollBarProfile vScrollBarProfile);
 	for ( qw( hiliteNumbers hiliteQStrings hiliteQQStrings hiliteIDs hiliteChars hiliteREs
-		autoHScroll autoVScroll
+		autoHScroll autoVScroll text
 		textRef syntaxHilite autoIndent persistentBlock blockType hScroll vScroll borderWidth
 		topLine  tabIndent readOnly offset wordDelimiters wantTabs wantReturns
-		wordWrap cursorWrap markers textDirection textLigation))
+		wordWrap cursorWrap markers textDirection textLigation ))
 		{ $self-> $_( $profile{ $_}); }
 	delete $self-> {resetDisabled};
 	$self-> {uChange} = 0;
@@ -745,7 +745,6 @@ sub point2xy
 	my $s = $self-> get_shaped_chunk($ry);
 	$x -= $self->rtl_offset - $s-> get_width($self) if $self->{textDirection};
 	my $ofsx = $ofs + $x;
-	$ofsx = $self-> {maxLineWidth} if $ofsx > $self-> {maxLineWidth};
 	$rx = $s->x2cluster($self, $ofsx);
 	return $self-> logical_to_visual( $rx, $ry), $inBounds;
 }
@@ -1564,6 +1563,33 @@ sub set_selection
 	return if $end < $tl || $start >= $tl + $r + $yT;
 
 	my @a = $self-> get_active_area( 0);
+	if ( $start == $end && $bt != bt::Horizontal) {
+		$self-> begin_paint_info;
+		my $glyphs = $self-> get_shaped_chunk($start);
+		my $old  = ($osx == $oex) ? [] : $glyphs->selection_chunks_clusters($glyphs-> selection2range($osx, $oex - 1));
+		my $new  = ($sx  == $ex)  ? [] : $glyphs->selection_chunks_clusters($glyphs-> selection2range($sx,  $ex - 1));
+		my $diff = $glyphs->selection_diff($old, $new);
+
+		my @cr;
+		my $x = -$self->offset;
+		$x += $self->rtl_offset - $glyphs->get_width($self) if $self-> {textDirection};
+		$glyphs->selection_walk( $diff, 0, undef, sub {
+			my ( $offset, $length, $selected ) = @_;
+			my $dx = $glyphs->get_sub_width($self, $offset, $length);
+			if ( $selected ) {
+				$cr[0] //= $x;
+				$cr[1] = $x + $dx;
+			}
+			$x += $dx;
+		});
+		$self-> end_paint_info;
+		if ( @cr ) {
+			$cr[1]++;
+			$a[0] = $cr[0] if $a[0] < $cr[0];
+			$a[2] = $cr[1] if $a[2] > $cr[1];
+		}
+	}
+
 	$self-> invalidate_rect(
 		$a[0], $a[3] - $fh * ( $end - $tl + 1),
 		$a[2], $a[3] - $fh * ( $start - $tl),
@@ -1584,7 +1610,6 @@ sub set_tab_indent
 sub set_syntax_hilite
 {
 	my ( $self, $sh) = @_;
-	$sh = 0 if $self-> {wordWrap};
 	return if $sh == $self-> {syntaxHilite};
 	$self-> {syntaxHilite} = $sh;
 	$self-> reset_syntaxer if $sh;

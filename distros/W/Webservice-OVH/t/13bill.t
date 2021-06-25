@@ -15,7 +15,7 @@ use Webservice::OVH;
 
 my $api = Webservice::OVH->new_from_json($json_dir);
 ok( $api, "module ok" );
-
+=head2
 my $bills        = $api->me->bills;
 my $bill = $bills->[0];
 ok( $bills,        'bills ok' );
@@ -29,5 +29,5 @@ ok( $bill->price_without_tax, 'price_without_tax ok' );
 ok( $bill->price_with_tax, 'price_with_tax ok' );
 ok( $bill->tax, 'tax ok' );
 ok( $bill->url, 'url ok' );
-
+=cut
 done_testing();

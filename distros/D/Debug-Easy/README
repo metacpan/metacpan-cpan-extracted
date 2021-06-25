@@ -4,13 +4,6 @@ INSTALLATION
 
 To install this module, run the following commands:
 
-    perl Build.PL
-    ./Build
-    ./Build test
-    ./Build install
-
-OR you can use the older ExtUtils::MakeMaker method:
-
     perl Makefile.PL
     make
     make test
@@ -32,21 +25,12 @@ perldoc command.
 
 You can also look for information at:
 
-    AnnoCPAN, Annotated CPAN documentation
-        http://annocpan.org/dist/Debug-Easy
-
-    CPAN Ratings
-        http://cpanratings.perl.org/d/Debug-Easy
-
-    Search CPAN
-        http://search.cpan.org/dist/Debug-Easy/
-
     GitHub
         https://github.com/richcsst/Debug-Easy.git
 
 LICENSE AND COPYRIGHT
 
-Copyright (C) 2013 Richard Kelsch
+Copyright (C) 2013-2021 Richard Kelsch
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

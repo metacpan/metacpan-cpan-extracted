@@ -8,6 +8,7 @@ Makefile.PL
 README
 dist.ini
 lib/Acme/CPANModules/Import/MJGARDNER/ListProcessing.pm
+lib/Acme/CPANModules/Import/MJGARDNER/LocalizingDate.pm
 lib/Acme/CPANModulesBundle/Import/MJGARDNER.pm
 t/00-compile.t
 t/author-critic.t

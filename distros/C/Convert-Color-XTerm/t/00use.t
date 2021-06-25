@@ -1,5 +1,10 @@
 #!/usr/bin/perl
 
-use Test::More tests => 1;
+use v5.14;
+use warnings;
+
+use Test::More;
 
 use_ok( 'Convert::Color::XTerm' );
+
+done_testing;

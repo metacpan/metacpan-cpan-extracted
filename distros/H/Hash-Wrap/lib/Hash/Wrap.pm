@@ -9,18 +9,18 @@ use warnings;
 
 use Scalar::Util qw[ blessed reftype ];
 use Digest::MD5;
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 our @EXPORT = qw[ wrap_hash ];
 
 our @CARP_NOT = qw( Hash::Wrap );
 our $DEBUG    = 0;
 
-my %REGISTRY;
+our %REGISTRY;
 
 sub _croak {
     require Carp;
-    Carp::croak( @_ );
+    goto \&Carp::croak;
 }
 
 sub _find_symbol {
@@ -102,7 +102,7 @@ sub import {
         _croak( "cannot mix -base and -class" )
           if !!$args->{-base} && exists $args->{-class};
 
-        $DEBUG = $ENV{HASH_WRAP_DEBUG} // delete $args->{-debug} ;
+        $DEBUG = $ENV{HASH_WRAP_DEBUG} // delete $args->{-debug};
 
         $args->{-as} = 'wrap_hash' unless exists $args->{-as};
         my $name = delete $args->{-as};
@@ -122,7 +122,7 @@ sub import {
 
         # clean out known attributes
         delete @{$args}{
-            qw[ -base -as -class -lvalue -undef -exists -defined -new -copy -clone -immutable -lockkeys ]
+            qw[ -base -as -class -lvalue -undef -exists -defined -new -copy -clone -immutable -lockkeys -methods ]
         };
 
         if ( keys %$args ) {
@@ -133,7 +133,7 @@ sub import {
 }
 
 # copied from Damian Conway's PPR: PerlIdentifier
-use constant PerlIdentifier => qr/([^\W\d]\w*+)/;
+use constant PerlIdentifier => qr/\A([^\W\d]\w*+)\z/;
 
 sub _build_class {
     my ( $caller, $name, $attr ) = @_;
@@ -250,7 +250,16 @@ sub can {
     my $class = Scalar::Util::blessed( $self );
     return if !defined $class;
 
-    return unless exists $self->{$key};
+    if ( !exists $self->{$key} ) {
+
+      if ( exists $Hash::Wrap::REGISTRY{$class}{methods}{$key} ) {
+         ## no critic (ProhibitNoStrict)
+         no strict 'refs';
+         my $method = "${class}::$key";
+         return *{$method}{CODE}
+      }
+      return;
+    }
 
     my $method = "${class}::$key";
 
@@ -268,17 +277,38 @@ END
 
     if ( !!$attr->{-new} ) {
         my $name = $attr->{-new} =~ PerlIdentifier ? $1 : 'new';
-        _build_constructor( $class, $name, { %$attr, -method => 1 } );
+        _build_constructor( $class, $name, { %$attr, -as_method => 1 } );
+    }
+
+    my $rentry = $REGISTRY{$class} = {};
+
+    if ( $attr->{-methods} ) {
+
+        my $methods = $attr->{-methods};
+        _croak( "-methods option value must be a hashref" )
+          unless 'HASH' eq ref $methods;
+
+        for my $mth ( keys %$methods ) {
+            _croak( "method name '$mth' is not a valid Perl identifier" )
+              if $mth !~ PerlIdentifier;
+
+            my $code = $methods->{$mth};
+            _croak( qq{value for method "$mth" must be a coderef} )
+              unless 'CODE' eq ref $code;
+            no strict 'refs';     ## no critic (ProhibitNoStrict)
+            *{ "${class}::${mth}" } = $code;
+        }
+
+        $rentry->{methods} = { map { $_ => undef } keys %$methods };
     }
 
     push @CARP_NOT, $class;
-    $REGISTRY{$class} = {
-        accessor_template =>
-          _find_symbol( $class, "accessor_template", [ "SCALAR", undef ] ),
-        validate => _find_symbol( $class, 'validate', [ 'REF', 'CODE' ] ),
-    };
+    $rentry->{accessor_template} =
+          _find_symbol( $class, "accessor_template", [ "SCALAR", undef ] );
 
-    Scalar::Util::weaken( $REGISTRY{$class}{validate} );
+    $rentry->{validate} = _find_symbol( $class, 'validate', [ 'REF', 'CODE' ] );
+
+    Scalar::Util::weaken( $rentry->{validate} );
 
     return $class;
 }
@@ -299,7 +329,7 @@ sub _build_constructor {
     );
 
     $dict{class} = do {
-        if ( $args->{-method} ) {
+        if ( $args->{-as_method} ) {
             'shift;';
         }
         else {
@@ -333,7 +363,7 @@ sub _build_constructor {
         elsif ( defined $args->{-lockkeys} ) {
 
             if ( 'ARRAY' eq ref $args->{-lockkeys} ) {
-                _croak( "-lockkeys: attribute name ($_) is not a legal Perl identifier" )
+                _croak( "-lockkeys: attribute name ($_) is not a valid Perl identifier" )
                   for grep { $_ !~ PerlIdentifier } @{ $args->{-lockkeys} };
 
                 push @{ $dict{use} }, q[use Hash::Util ();];
@@ -458,7 +488,7 @@ Hash::Wrap - create on-the-fly objects from hashes
 
 =head1 VERSION
 
-version 0.13
+version 0.14
 
 =head1 SYNOPSIS
 
@@ -526,6 +556,8 @@ On recent enough versions of Perl, accessors can be lvalues, e.g.
    $obj->existing_key = $value;
 
 =back
+
+=for stopwords getter
 
 =head1 USAGE
 
@@ -667,12 +699,12 @@ is used. If a coderef, it will be called as
 
 By default, the object uses the hash directly.
 
-=item C<--immutable> => I<boolean>
+=item C<-immutable> => I<boolean>
 
 The object's attributes and values are locked and may not be altered. Note that this
 locks the underlying hash.
 
-=item C<--lockkeys> => I<boolean> | I<arrayref>
+=item C<-lockkeys> => I<boolean> | I<arrayref>
 
 If the value is I<true>, the object's attributes are restricted to the existing keys in the hash.
 If it is an array reference, it specifies which attributes are allowed, I<in addition to existing attributes>.
@@ -784,6 +816,16 @@ or
    $obj = wrap_hash( { a => 1 } );
    $obj->is_present( 'a' );
 
+=item C<-methods> => { I<method name> => I<code reference>, ... }
+
+Install the passed code references into the class with the specified
+names. These override any attributes in the hash.  For example,
+
+   use Hash::Wrap { -methods => { a => sub { 'b' } } };
+
+   $obj = wrap_hash( { a => 'a' } );
+   $obj->a;  # returns 'b'
+
 =back
 
 =head1 WRAPPER CLASSES
@@ -873,6 +915,8 @@ throws by default, but can optionally return C<undef>
 =item * can use custom package
 
 =item * can copy/clone existing hash. clone may be customized
+
+=item * can add additional methods to the hash object's class
 
 =back
 
@@ -1018,6 +1062,25 @@ is done globally, so all objects are affected.
 
 =back
 
+=item L<Object::Adhoc>
+
+=over
+
+=item * minimal non-core dependencies (L<Exporter::Shiny>
+
+=item * uses L<Class::XSAccessor> if available
+
+=item * only applies object paradigm to top level hash
+
+=item * provides separate getter and predicate methods, but only
+for existing keys in hash.
+
+=item * hash keys are locked.
+
+=item * operates directly on hash.
+
+=back
+
 =back
 
 =for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
@@ -1085,7 +1148,9 @@ This is free software, licensed under:
 
 __END__
 
-
+#pod =for stopwords
+#pod getter
+#pod
 #pod =head1 SYNOPSIS
 #pod
 #pod
@@ -1295,12 +1360,12 @@ __END__
 #pod
 #pod By default, the object uses the hash directly.
 #pod
-#pod =item C<--immutable> => I<boolean>
+#pod =item C<-immutable> => I<boolean>
 #pod
 #pod The object's attributes and values are locked and may not be altered. Note that this
 #pod locks the underlying hash.
 #pod
-#pod =item C<--lockkeys> => I<boolean> | I<arrayref>
+#pod =item C<-lockkeys> => I<boolean> | I<arrayref>
 #pod
 #pod If the value is I<true>, the object's attributes are restricted to the existing keys in the hash.
 #pod If it is an array reference, it specifies which attributes are allowed, I<in addition to existing attributes>.
@@ -1413,6 +1478,16 @@ __END__
 #pod    $obj->is_present( 'a' );
 #pod
 #pod
+#pod =item C<-methods> => { I<method name> => I<code reference>, ... }
+#pod
+#pod Install the passed code references into the class with the specified
+#pod names. These override any attributes in the hash.  For example,
+#pod
+#pod    use Hash::Wrap { -methods => { a => sub { 'b' } } };
+#pod
+#pod    $obj = wrap_hash( { a => 'a' } );
+#pod    $obj->a;  # returns 'b'
+#pod
 #pod =back
 #pod
 #pod =head1 WRAPPER CLASSES
@@ -1505,6 +1580,8 @@ __END__
 #pod =item * can use custom package
 #pod
 #pod =item * can copy/clone existing hash. clone may be customized
+#pod
+#pod =item * can add additional methods to the hash object's class
 #pod
 #pod =back
 #pod
@@ -1651,5 +1728,23 @@ __END__
 #pod
 #pod =back
 #pod
+#pod =item L<Object::Adhoc>
+#pod
+#pod =over
+#pod
+#pod =item * minimal non-core dependencies (L<Exporter::Shiny>
+#pod
+#pod =item * uses L<Class::XSAccessor> if available
+#pod
+#pod =item * only applies object paradigm to top level hash
+#pod
+#pod =item * provides separate getter and predicate methods, but only
+#pod for existing keys in hash.
+#pod
+#pod =item * hash keys are locked.
+#pod
+#pod =item * operates directly on hash.
+#pod
+#pod =back
 #pod
 #pod =back

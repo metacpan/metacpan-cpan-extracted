@@ -49,7 +49,7 @@ sub attach_db {
             # Choose
             my $idx = $tc->choose(
                 $menu,
-                { %{$sf->{i}{lyt_v_clear}}, prompt => "ATTACH DATABASE", info => join( "\n", @info ),
+                { %{$sf->{i}{lyt_v}}, prompt => "ATTACH DATABASE", info => join( "\n", @info ),
                   undef => $sf->{i}{back}, index => 1, default => $old_idx }
             );
             if ( ! defined $idx || ! defined $menu->[$idx] ) {
@@ -71,7 +71,9 @@ sub attach_db {
             push @info, "ATTACH DATABASE $db AS";
 
             ALIAS: while ( 1 ) {
-                my $alias = $tf->readline( 'alias: ',
+                # Readline
+                my $alias = $tf->readline(
+                    'alias: ',
                     { info => join( "\n", @info ), clear_screen => 1 }
                 );
                 if ( ! length $alias ) {
@@ -154,7 +156,7 @@ sub detach_db {
         # Choose
         my $idx = $tc->choose(
             [ @pre, @choices ],
-            { %{$sf->{i}{lyt_v_clear}}, prompt => $prompt, info => $info, index => 1 }
+            { %{$sf->{i}{lyt_v}}, prompt => $prompt, info => $info, index => 1 }
         );
         if ( ! $idx ) {
             return;

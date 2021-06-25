@@ -48,12 +48,13 @@ sub table_write_access {
 
     STMT_TYPE: while ( 1 ) {
         my $hidden = 'Choose SQL type:';
+        my $info = "$sql->{table}\n";
         my @pre = ( $hidden, undef );
         my $menu = [ @pre, map( "- $_", @stmt_types ) ];
         # Choose
         my $idx = $tc->choose(
             $menu,
-            { %{$sf->{i}{lyt_v_clear}}, prompt => '', index => 1, default => $old_idx }
+            { %{$sf->{i}{lyt_v}}, info => $info, prompt => '', index => 1, default => $old_idx }
         );
         if ( ! defined $idx || ! defined $menu->[$idx] ) {
             return;
@@ -96,11 +97,11 @@ sub table_write_access {
 
         CUSTOMIZE: while ( 1 ) {
             my $menu = [ undef, @cu{@{$sub_stmts->{$stmt_type}}} ];
-            $ax->print_sql( $sql );
+            my $info = $ax->get_sql_info( $sql );
             # Choose
             my $idx = $tc->choose(
                 $menu,
-                { %{$sf->{i}{lyt_v}}, prompt => 'Customize:', index => 1, default => $old_idx }
+                { %{$sf->{i}{lyt_v}}, info => $info, prompt => 'Customize:', index => 1, default => $old_idx }
             );
             if ( ! defined $idx || ! defined $menu->[$idx] ) {
                 next STMT_TYPE;
@@ -143,7 +144,7 @@ sub commit_sql {
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $dbh = $sf->{d}{dbh};
     my $waiting = 'DB work ... ';
-    $ax->print_sql( $sql, $waiting );
+    $ax->print_sql_info( $sql, $waiting );
     my $stmt_type = $sf->{i}{stmt_types}[-1]; ##
     my $rows_to_execute = [];
     my $count_affected;
@@ -166,18 +167,18 @@ sub commit_sql {
         ) {
             $ax->print_error_message( $@ );
         }
-        my $prompt = $ax->print_sql( $sql );
-        $prompt .= "Affected records:";
+        # my $info = $ax->get_sql_info( $sql ); # print_table + info
+        my $prompt = $ax->get_sql_info( $sql );
+        $prompt .= "\nAffected records:\n";
         if ( @$all_arrayref > 1 ) {
             my $tp = Term::TablePrint->new( $sf->{o}{table} );
             $tp->print_table(
                 $all_arrayref,
-                { grid => 2, prompt => $prompt, max_rows => 0, keep_header => 1,
-                  table_expand => $sf->{o}{G}{info_expand} }
+                { prompt => $prompt, max_rows => 0, table_name => "     '" . $sf->{d}{table} . "'     " }
             );
         }
     }
-    $ax->print_sql( $sql, $waiting );
+    $ax->print_sql_info( $sql, $waiting );
     my $transaction;
     eval {
         $dbh->{AutoCommit} = 1;
@@ -195,7 +196,7 @@ sub commit_sql {
 }
 
 
-sub __transaction {
+sub __transaction { ##
     my ( $sf, $sql, $stmt_type, $rows_to_execute, $count_affected, $waiting ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
@@ -214,15 +215,16 @@ sub __transaction {
         }
 
         else {
-            $sf->{i}{occupied_term_height} = 3;
             my $commit_ok = sprintf qq(  %s %s "%s"), 'COMMIT', insert_sep( $count_affected, $sf->{o}{G}{thsd_sep} ), $stmt_type;
-            $ax->print_sql( $sql );
+            my $menu = [ undef,  $commit_ok ];
+            $sf->{i}{occupied_term_height} = @$menu + 1;
+            my $info = $ax->get_sql_info( $sql );
             # Choose
             my $choice = $tc->choose(
-                [ undef,  $commit_ok ],
-                { %{$sf->{i}{lyt_v}} }
+                $menu,
+                { %{$sf->{i}{lyt_v}}, info => $info, keep => scalar( @$menu ) }
             );
-            $ax->print_sql( $sql, $waiting );
+            $ax->print_sql_info( $sql, $waiting );
             if ( ! defined $choice || $choice ne $commit_ok ) {
                 # $sth->finish if $sf->{i}{driver} eq 'SQLite'; # finish called automatically when $sth is destroyed ?
                 $dbh->rollback;
@@ -246,7 +248,7 @@ sub __transaction {
 }
 
 
-sub __auto_commit {
+sub __auto_commit { ##
     my ( $sf, $sql, $stmt_type, $rows_to_execute, $count_affected, $waiting ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
@@ -255,15 +257,16 @@ sub __auto_commit {
         # already asked for confirmation (create table + insert data) in Create_table
     }
     else {
-        $sf->{i}{occupied_term_height} = 3;
         my $commit_ok = sprintf qq(  %s %s "%s"), 'EXECUTE', insert_sep( $count_affected, $sf->{o}{G}{thsd_sep} ), $stmt_type;
-        $ax->print_sql( $sql ); #
+        my $menu = [ undef,  $commit_ok ];
+        $sf->{i}{occupied_term_height} = @$menu + 1;
+        my $info = $ax->get_sql_info( $sql ); #
         # Choose
         my $choice = $tc->choose(
-            [ undef,  $commit_ok ],
-            { %{$sf->{i}{lyt_v}}, prompt => '' }
+            $menu,
+            { %{$sf->{i}{lyt_v}}, info => $info, prompt => '', keep => scalar( @$menu ) }
         );
-        $ax->print_sql( $sql, $waiting );
+        $ax->print_sql_info( $sql, $waiting );
         if ( ! defined $choice || $choice ne $commit_ok ) {
             return;
         }
@@ -308,6 +311,7 @@ sub __build_insert_stmt {
 sub __insert_into_stmt_columns {
     my ( $sf, $sql ) = @_;
     my $tu = Term::Choose::Util->new( $sf->{i}{tcu_default} );
+    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $plui = App::DBBrowser::DB->new( $sf->{i}, $sf->{o} );
     $sql->{insert_into_cols} = [];
     my @cols = ( @{$sql->{cols}} );
@@ -315,12 +319,12 @@ sub __insert_into_stmt_columns {
         shift @cols;
     }
     my $bu_cols = [ @cols ];
-    my $info = "Table $sql->{table}";
-    $info .= "\nSelect columns to fill:";
+    my $info = $ax->get_sql_info( $sql );
+    my $prompt = "Select columns to fill:";
     my $idxs = $tu->choose_a_subset(
         [ @cols ],
         { cs_label => 'Cols: ', layout => 0, order => 0, all_by_default => 1,
-          index => 1, confirm => $sf->{i}{ok}, back => '<<', info => $info }
+          index => 1, confirm => $sf->{i}{ok}, back => '<<', info => $info, prompt => $prompt }
     );
     if ( ! defined $idxs ) {
         return;

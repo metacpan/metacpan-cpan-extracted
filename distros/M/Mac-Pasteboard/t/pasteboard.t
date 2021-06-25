@@ -35,7 +35,7 @@ foreach my $name ( qw{ LANG LC_ALL LC_COLLATE LC_CTYPE LC_MONETARY
 }
 
 if ( eval { require Mac::Pasteboard; 1 } ) {
-    foreach my $sub ( qw{ defaultEncode defaultFlavor } ) {
+    foreach my $sub ( qw{ defaultEncode defaultFlavor __variant } ) {
 	my $code = Mac::Pasteboard->can( $sub );
 	my_diag_value( $sub, $code->() );
     }

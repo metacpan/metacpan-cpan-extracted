@@ -7,14 +7,25 @@
  * word = atom / quoted-string
  * atom = 1*<any CHAR except specials, SPACE and CTLs>
  * quoted-string = <"> *(qtext/quoted-pair) <">
- * qtext = <any CHAR excepting <">, "\" & CR, and including linear-white-space>
+ * qtext       =  <any CHAR excepting <">,     ; => may be folded
+ *                 "\" & CR, and including
+ *                 linear-white-space>
  * quoted-pair = "\" CHAR
  * CHAR = <any ASCII character> ; ( 0-177, 0.-127.)
  * specials = "(" / ")" / "<" / ">" / "@"   ; Must be in quoted-
-            / "," / ";" / ":" / "\" / <">   ; string, to use
-            / "." / "[" / "]"               ; within a word.
+ *          / "," / ";" / ":" / "\" / <">   ; string, to use
+ *          / "." / "[" / "]"               ; within a word.
  * CTL = <any ASCII control     ; ( 0- 37, 0.- 31.)
-          character and DEL>    ; ( 177, 127.)
+ *        character and DEL>    ; ( 177, 127.)
+ *
+ *
+ * CR          =  <ASCII CR, carriage return>  ; (     15,      13.)
+ * CRLF        =  CR LF
+ * HTAB        =  <ASCII HT, horizontal-tab>   ; (     11,       9.)
+ * LF          =  <ASCII LF, linefeed>         ; (     12,      10.)
+ * LWSP-char   =  SPACE / HTAB                 ; semantics = SPACE
+ * linear-white-space =  1*([CRLF] LWSP-char)  ; semantics = SPACE
+ *                                             ; CRLF => folding
  */
 extern int
 is_822_local (const char *start, const char *end)
@@ -32,9 +43,11 @@ is_822_local (const char *start, const char *end)
         if (ch > 127)
             return inverse(EEAV_LPART_NOT_ASCII);
         if (!quote) {
-            /* rfc822 allows ALL control chars in quotes */
+            /* SPACE and CTLs outside of quotes & quoted-pairs are forbidden.
+             * See SPACE check below.
+             */
             if (!qpair && ISCNTRL(ch))
-                return inverse(EEAV_LPART_CTRL_CHAR);
+                    return inverse(EEAV_LPART_CTRL_CHAR);
             switch (ch) {
             case '"': {
                 /* quote-strings are allowed at the start
@@ -59,12 +72,24 @@ is_822_local (const char *start, const char *end)
                 return inverse(EEAV_LPART_SPECIAL);
             }
         }
-        else if (qpair)/* any CHAR is allowed in quote-pair */
+        else if (qpair) {
+            /* any CHAR is allowed in quote-pair */
             qpair = 0;
+        }
         else {
+            /* qtext = <any CHAR excepting <">, "\" & CR, and including linear-white-space> */
             switch (ch) {
-            case '"':   quote = 0; break;
-            case '\\':  qpair = 1; break;
+            case '"':  { quote = 0; break; }
+            case '\\': { qpair = 1; break; }
+            /* excepting CR, and including linear-white-space> */
+            case '\r': {
+                /* allow folding, i.e. 1*([CRLF] LWSP-char) */
+                if ((end - cp) >= 2 && cp[1] == '\n' && (cp[2] == '\v' || cp[2] == ' '))
+                    break;
+                /* invalid folding syntax */
+                return inverse(EEAV_LPART_INVALID_FOLDING);
+            }
+            /* XXX: there is should be a check for single LF ... */
             }
         }
     }

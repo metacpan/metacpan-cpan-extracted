@@ -6,11 +6,10 @@ use strict;
 use utf8;
 use warnings;
 
-our $VERSION = '0.012'; # VERSION
+our $VERSION = '0.013'; # VERSION
 
 
 use Getopt::Long;
-use List::MoreUtils qw(distinct);
 use Pod::Usage;
 use Text::SpeedyFx;
 
@@ -54,13 +53,19 @@ my @text = map {
 my $match = 0;
 for my $hash (@{$hashes}) {
     ++$match
-        if 1 == distinct
+        if 1 == unique_count(
             map {
                 $hash->hash_min($_);
-            } @text;
+            } @text
+        );
 }
 
 printf qq(k=%d; similarity=%0.5f\n), $k, $match / $k;
+
+sub unique_count { ## no critic (Subroutines::RequireArgUnpacking)
+    my %hash = map { $_ => 1 } @_;
+    return scalar keys %hash;
+}
 
 __END__
 
@@ -74,7 +79,7 @@ minhash_cmp - uses MinHash & SpeedyFx to compare large text data
 
 =head1 VERSION
 
-version 0.012
+version 0.013
 
 =head1 SYNOPSIS
 
@@ -136,7 +141,7 @@ Stanislaw Pusep <stas@sysd.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Stanislaw Pusep.
+This software is copyright (c) 2021 by Stanislaw Pusep.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

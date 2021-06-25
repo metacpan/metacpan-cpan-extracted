@@ -1,9 +1,9 @@
 use strict;
 use warnings;
 
-package App::Addex::Output::SpamAssassin;
+package App::Addex::Output::SpamAssassin 0.027;
 # ABSTRACT: generate SpamAssassin whitelists from an address book
-$App::Addex::Output::SpamAssassin::VERSION = '0.026';
+
 use parent qw(App::Addex::Output::ToFile);
 
 #pod =head1 DESCRIPTION
@@ -45,12 +45,23 @@ App::Addex::Output::SpamAssassin - generate SpamAssassin whitelists from an addr
 
 =head1 VERSION
 
-version 0.026
+version 0.027
 
 =head1 DESCRIPTION
 
 This plugin produces a file that contains a list of SpamAssassin whitelist
 declarations.
+
+=head1 PERL VERSION SUPPORT
+
+This module has the same support period as perl itself:  it supports the two
+most recent versions of perl.  (That is, if the most recently released version
+is v5.40, then this module should work on both v5.40 and v5.38.)
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
 
 =head1 METHODS
 
@@ -68,7 +79,7 @@ The valid configuration parameters for this plugin are:
 
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@cpan.org>
+Ricardo SIGNES <rjbs@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

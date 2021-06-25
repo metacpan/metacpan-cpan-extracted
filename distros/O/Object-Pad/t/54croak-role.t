@@ -14,7 +14,7 @@ use Object::Pad;
    $SIG{__WARN__} = sub { $warnings .= join "", @_ };
 
    ok( !eval <<'EOPERL',
-      class AClass implements ARole { method m {} }
+      class AClass does ARole { method m {} }
 EOPERL
       'class with clashing method name fails' );
    like( $@, qr/^Method 'm' clashes with the one provided by role ARole /,
@@ -30,7 +30,7 @@ EOPERL
    role BRole { requires bmeth; }
 
    ok( !eval <<'EOPERL',
-      class BClass implements BRole { }
+      class BClass does BRole { }
 EOPERL
       'class with missing required method fails' );
    like( $@, qr/^Class BClass does not provide a required method named 'bmeth' /,

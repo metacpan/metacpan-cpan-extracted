@@ -1,4 +1,6 @@
 package Object::Depot::Role;
+our $VERSION = '0.04';
+use 5.008001;
 use strictures 2;
 
 =encoding utf8
@@ -172,22 +174,16 @@ foreach my $method (qw(
 1;
 __END__
 
-=head1 COPYRIGHT AND LICENSE
+=head1 SUPPORT
 
-Copyright (C) 2020 Aran Clary Deltac
+See L<Object::Depot/SUPPORT>.
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+=head1 AUTHORS
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
+See L<Object::Depot/AUTHORS>.
 
-You should have received a copy of the GNU General Public License
-along with this program. If not, see L<http://www.gnu.org/licenses/>.
+=head1 LICENSE
+
+See L<Object::Depot/LICENSE>.
 
 =cut
-

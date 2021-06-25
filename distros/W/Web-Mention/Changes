@@ -1,5 +1,11 @@
 Revision history for Web::Mention
 
+0.721 2021-06-17T22:42:54Z
+
+    - `new_from_html` no longer throws an exception if any the URLs it
+    targets can't support a new Web::Mention object. (This typically
+    happens when a given source webpage contains a link to itself.)
+
 0.720 2020-07-19T17:19:09Z
 
     - Improved methods for translating webmentions to and from JSON,

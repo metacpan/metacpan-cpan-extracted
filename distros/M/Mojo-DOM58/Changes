@@ -1,3 +1,6 @@
+3.001     2021-06-16 01:28:52 EDT
+  - Update IRC metadata to libera.chat
+
 3.000     2021-04-04 23:34:33 EDT
   - Added head and tail collection methods. (from Mojolicious 8.23)
   - Added EXPERIMENTAL support for :any-link pseudo-class. (from Mojolicious 8.42)

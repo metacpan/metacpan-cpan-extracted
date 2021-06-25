@@ -1,0 +1,56 @@
+{
+   "abstract" : "a webserver that serves Traveller RPG maps",
+   "author" : [
+      "Alex Schroeder"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "agpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "App-traveller",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Modern::Perl" : "1.20180701",
+            "Mojolicious" : "9",
+            "perl" : "5.026000"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Memory::Cycle" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://alexschroeder.ch/cgit/traveller",
+         "web" : "https://alexschroeder.ch/cgit/traveller/about/"
+      }
+   },
+   "version" : 1,
+   "x_serialization_backend" : "JSON::PP version 4.04"
+}

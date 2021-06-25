@@ -1,6 +1,6 @@
 package POE::Component::IRC::Plugin::CTCP;
 our $AUTHORITY = 'cpan:HINRIK';
-$POE::Component::IRC::Plugin::CTCP::VERSION = '6.92';
+$POE::Component::IRC::Plugin::CTCP::VERSION = '6.93';
 use strict;
 use warnings FATAL => 'all';
 use Carp;

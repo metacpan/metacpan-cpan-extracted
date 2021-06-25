@@ -1,0 +1,30 @@
+---
+abstract: 'Trims the spaces off the leading / trailing string.'
+author:
+  - contact@mikelimberger.com
+build_requires: {}
+configure_requires:
+  Module::Build: '0.4224'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: String-Trim-Regex
+provides:
+  String::Trim::Regex:
+    file: lib/String/Trim/Regex.pm
+    version: '20210604'
+requires:
+  Carp: '0'
+  Data::Dump: '0'
+  Test2::API: '0'
+  Test::More: '0'
+  feature: '0'
+resources:
+  bugtracker: https://github.com/8BitMiker/String-Trim-Regex/issues
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/8BitMiker/String-Trim-Regex
+version: '20210604'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

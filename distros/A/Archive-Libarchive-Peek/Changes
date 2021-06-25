@@ -1,5 +1,8 @@
 Revision history for Archive-Libarchive-Peek},
 
+0.03      2021-06-23 12:28:50 -0600
+  - Add memory option for reading archive directly from memory (gh#3)
+
 0.02      2021-06-01 12:40:19 -0600
   - Add as_hash method.  New feature requires Perl 5.22 (gh#2)
 

@@ -3,8 +3,6 @@ libpostal.xs
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
-ppport.h
-README.pod
 t/libpostal.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

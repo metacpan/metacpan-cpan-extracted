@@ -1,9 +1,8 @@
-use 5.006;
 use warnings;
 use strict;
-package Config::Singleton;
+package Config::Singleton 0.006;
 # ABSTRACT: one place for your app's configuration
-$Config::Singleton::VERSION = '0.005';
+
 use Cwd ();
 use File::Basename ();
 use File::HomeDir ();
@@ -379,7 +378,7 @@ Config::Singleton - one place for your app's configuration
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 
@@ -408,6 +407,13 @@ file found in all the usual places. By default, Config::Singleton looks for
 myapp.yml, but an alternate filename may be passed when using the module.
 
 This module was derived from L<Rubric::Config|Rubric::Config>.
+
+=head1 PERL VERSION SUPPORT
+
+This code is effectively abandonware.  Although releases will sometimes be made
+to update contact info or to fix packaging flaws, bug reports will mostly be
+ignored.  Feature requests are even more likely to be ignored.  (If someone
+takes up maintenance of this code, they will presumably remove this notice.)
 
 =head1 USING APP::CONFIG
 
@@ -546,7 +552,7 @@ can say without being boastful, because he wrote the elegant bits.
 
 =item *
 
-Ricardo SIGNES <rjbs@cpan.org>
+Ricardo SIGNES <rjbs@semiotic.systems>
 
 =item *
 

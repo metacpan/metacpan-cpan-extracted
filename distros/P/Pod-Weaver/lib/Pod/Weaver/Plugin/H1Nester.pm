@@ -1,8 +1,16 @@
-package Pod::Weaver::Plugin::H1Nester;
+package Pod::Weaver::Plugin::H1Nester 4.018;
 # ABSTRACT: structure the input pod document into head1-grouped sections
-$Pod::Weaver::Plugin::H1Nester::VERSION = '4.017';
+
 use Moose;
 with 'Pod::Weaver::Role::Transformer';
+
+# BEGIN BOILERPLATE
+use v5.20.0;
+use warnings;
+use utf8;
+no feature 'switch';
+use experimental qw(postderef postderef_qq); # This experiment gets mainlined.
+# END BOILERPLATE
 
 use namespace::autoclean;
 
@@ -48,7 +56,7 @@ Pod::Weaver::Plugin::H1Nester - structure the input pod document into head1-grou
 
 =head1 VERSION
 
-version 4.017
+version 4.018
 
 =head1 OVERVIEW
 
@@ -56,9 +64,20 @@ This plugin is very, very simple:  it uses the
 L<Pod::Elemental::Transformer::Nester> to restructure the document under its
 C<=head1> elements.
 
+=head1 PERL VERSION SUPPORT
+
+This module has the same support period as perl itself:  it supports the two
+most recent versions of perl.  (That is, if the most recently released version
+is v5.40, then this module should work on both v5.40 and v5.38.)
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
+
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@cpan.org>
+Ricardo SIGNES <rjbs@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

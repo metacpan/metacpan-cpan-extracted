@@ -1,3 +1,8 @@
+Revision history for Perl module Nice::Try.
+
+1.1.2 2021-06-18T20:18:33+0900
+    - Corrected a bug that led to stringification of overloaded exception
+
 1.1.1 2021-06-08T05:53:45+0900
     - Corrected a syntax warning in handling the loop control words
 

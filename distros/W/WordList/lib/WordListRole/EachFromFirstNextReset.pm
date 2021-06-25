@@ -1,9 +1,9 @@
 package WordListRole::EachFromFirstNextReset;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-01-28'; # DATE
+our $DATE = '2021-06-23'; # DATE
 our $DIST = 'WordList'; # DIST
-our $VERSION = '0.7.7'; # VERSION
+our $VERSION = '0.7.10'; # VERSION
 
 use Role::Tiny;
 
@@ -44,7 +44,7 @@ WordListRole::EachFromFirstNextReset - Provide each_word(); relies on first_word
 
 =head1 VERSION
 
-This document describes version 0.7.7 of WordListRole::EachFromFirstNextReset (from Perl distribution WordList), released on 2021-01-28.
+This document describes version 0.7.10 of WordListRole::EachFromFirstNextReset (from Perl distribution WordList), released on 2021-06-23.
 
 =head1 DESCRIPTION
 
@@ -53,6 +53,18 @@ providing providing C<first_word()>, C<next_word()>, C<reset_iterator()>. This
 role will add an C<each_word()> method that uses the former three methods.
 
 =for Pod::Coverage .+
+
+=head1 REQUIRED METHODS
+
+=head2 first_word
+
+=head2 next_word
+
+=head2 reset_iterator
+
+=head1 PROVIDED METHODS
+
+=head2 each_word
 
 =head1 HOMEPAGE
 
@@ -64,11 +76,15 @@ Source repository is at L<https://github.com/perlancar/perl-WordList>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-WordList/issues>
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=WordList>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
+
+=head1 SEE ALSO
+
+L<WordListRole::FirstNextResetFromEach>
 
 =head1 AUTHOR
 

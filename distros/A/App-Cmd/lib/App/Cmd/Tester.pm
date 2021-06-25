@@ -1,7 +1,7 @@
 use strict;
 use warnings;
-package App::Cmd::Tester;
-$App::Cmd::Tester::VERSION = '0.333';
+package App::Cmd::Tester 0.334;
+
 # ABSTRACT: for capturing the result of running an app
 
 #pod =head1 SYNOPSIS
@@ -138,9 +138,9 @@ sub _run_with_capture {
 }
 
 {
-  package App::Cmd::Tester::Result;
-$App::Cmd::Tester::Result::VERSION = '0.333';
-sub new {
+  package App::Cmd::Tester::Result 0.334;
+
+  sub new {
     my ($class, $arg) = @_;
     bless $arg => $class;
   }
@@ -154,9 +154,9 @@ sub new {
 }
 
 {
-  package App::Cmd::Tester::Exited;
-$App::Cmd::Tester::Exited::VERSION = '0.333';
-sub throw {
+  package App::Cmd::Tester::Exited 0.334;
+
+  sub throw {
     my ($class, $code) = @_;
     $code = 0 unless defined $code;
     my $self = (bless \$code => $class);
@@ -178,7 +178,7 @@ App::Cmd::Tester - for capturing the result of running an app
 
 =head1 VERSION
 
-version 0.333
+version 0.334
 
 =head1 SYNOPSIS
 
@@ -206,6 +206,16 @@ that they are hard to test.  App::Cmd::Tester is one of the tools App-Cmd
 provides to help make it easy to test App::Cmd-based programs.
 
 It provides one routine: test_app.
+
+=head1 PERL VERSION SUPPORT
+
+This module has a long-term perl support period.  That means it will not
+require a version of perl released fewer than five years ago.
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
 
 =head1 METHODS
 
@@ -241,7 +251,7 @@ L<App::Cmd::Tester::CaptureExternal> instead.
 
 =head1 AUTHOR
 
-Ricardo Signes <rjbs@cpan.org>
+Ricardo Signes <rjbs@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

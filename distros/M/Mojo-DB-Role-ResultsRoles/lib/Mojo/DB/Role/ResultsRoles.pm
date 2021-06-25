@@ -2,7 +2,7 @@ package Mojo::DB::Role::ResultsRoles;
 
 use Mojo::Base -role;
 
-our $VERSION = 'v0.1.0';
+our $VERSION = 'v0.1.1';
 
 requires 'db';
 

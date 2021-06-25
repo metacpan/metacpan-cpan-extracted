@@ -17,7 +17,7 @@ use Mojo::DOM58::_HTML 'tag_to_html';
 use Scalar::Util qw(blessed weaken);
 use Storable 'dclone';
 
-our $VERSION = '3.000';
+our $VERSION = '3.001';
 
 our @EXPORT_OK = 'tag_to_html';
 

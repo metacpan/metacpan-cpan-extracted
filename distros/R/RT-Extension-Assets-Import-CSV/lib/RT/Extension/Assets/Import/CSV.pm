@@ -4,7 +4,7 @@ use warnings;
 package RT::Extension::Assets::Import::CSV;
 use Text::CSV_XS;
 
-our $VERSION = '2.2';
+our $VERSION = '2.3';
 
 sub _column {
     ref($_[0]) ? (ref($_[0]) eq "CODE" ?
@@ -334,7 +334,7 @@ version of this extension; specifically, version 1.4.
 
 May need root permissions
 
-=item Edit your F</opt/rt4/etc/RT_SiteConfig.pm>
+=item Edit your F</opt/rt5/etc/RT_SiteConfig.pm>
 
 Add this line:
 
@@ -434,7 +434,7 @@ or via the web at
 
 =head1 COPYRIGHT
 
-This extension is Copyright (C) 2014-2016 Best Practical Solutions, LLC.
+This extension is Copyright (C) 2014-2021 Best Practical Solutions, LLC.
 
 This is free software, licensed under:
 

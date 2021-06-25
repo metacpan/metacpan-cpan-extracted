@@ -30,6 +30,23 @@ is(colorize("ABCDEF", "text"), "\e[38;5;153m"."text".RESET, "colorize24");
 
 is(colorize24("ABCDEF", "text"), "\e[38;2;171;205;239m"."text".RESET, "colorize24");
 
+{
+    my $text = colorize("R", "AB") . "CD" . colorize("R", "EF");
+    my $rslt = colorize("R", "AB") . colorize("B", "CD") . colorize("R", "EF");
+    is(colorize("B", $text), $rslt, "nested");
+}
+
+{
+    my $text = "AB" . colorize("B", "CD") . "EF";
+    my $rslt = colorize("R", "AB") . colorize("B", "CD") . colorize("R", "EF");
+    is(colorize("R", $text), $rslt, "nested 2");
+}
+
+{
+    my $text = colorize("R", "ABCDEF");
+    is(colorize("B", $text), $text, "nested/unchange");
+}
+
 TODO: {
 
 local $TODO = "\$RGB24 does not update cached data.";

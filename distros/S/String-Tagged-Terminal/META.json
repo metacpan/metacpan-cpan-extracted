@@ -4,7 +4,7 @@
       "Paul Evans <leonerd@leonerd.org.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4224",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "perl_5"
    ],
@@ -25,7 +25,7 @@
             "Convert::Color::XTerm" : "0",
             "String::Tagged" : "0",
             "constant" : "0",
-            "perl" : "5.010"
+            "perl" : "5.014"
          }
       },
       "test" : {
@@ -37,11 +37,11 @@
    "provides" : {
       "String::Tagged::Terminal" : {
          "file" : "lib/String/Tagged/Terminal.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       },
       "String::Tagged::Terminal::Win32Console" : {
          "file" : "lib/String/Tagged/Terminal/Win32Console.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       }
    },
    "release_status" : "stable",
@@ -50,6 +50,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.04",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "0.05",
+   "x_serialization_backend" : "JSON::PP version 4.05"
 }

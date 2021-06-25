@@ -162,7 +162,7 @@ See L<List of Native APIs|/"List-of-Native-APIs"> about included SPVM Native API
 
 =head3 Return Value
 
-The return type is "int32_t" type. If the subroutine raises an exception, "1" is returned. If the subroutine is succeed "0" is returned.
+The return type is "int32_t" type. If the method raises an exception, "1" is returned. If the method is succeed "0" is returned.
 
 =head3 Function Name
 
@@ -176,7 +176,7 @@ Followed by package name "Foo__Bar", which is replaced "::" in Foo::Bar.
 
 Followed by "__".
 
-Followed by subroutine name "sum".
+Followed by method name "sum".
 
 If Native Method Name is invalid, a compile error will occur.
 
@@ -204,7 +204,7 @@ In the above sample, it takes two int type arguments of SPVM, calculates the sum
 
 =head2 Compile Native Method
 
-Native subroutines are compiled into a shared libraries. teay are shared libraries (.so) on Unix/Linux, dynamic link libraries (.dll) on Windows or etc corresponding to your os.
+Native methods are compiled into a shared libraries. teay are shared libraries (.so) on Unix/Linux, dynamic link libraries (.dll) on Windows or etc corresponding to your os.
 
 The compilation is done when SPVM is compiled. The build directory must exist, otherwise an exception occures.
 
@@ -404,38 +404,38 @@ For example, in the case of L<SPVM::Complex_2d>, do the following.
 
 =head2 Call SPVM Method
 
-To call the SPVM subroutine, first use the <a href="#native-api-native-sub-api-sub_id">sub_id</a> function or the <a href = "# native-api-native- Get the ID of the subroutine using the sub-api-method_sub_id ">method_sub_id</a> function
+To call the SPVM method, first use the <a href="#native-api-native-sub-api-method_id">method_id</a> function or the <a href = "# native-api-native- Get the ID of the method using the sub-api-method_method_id ">method_method_id</a> function
 
-  // For a subroutine that is not a method
-  int32_t sub_id = env->get_sub_id(env, "Foo", "sum", "int (int, int)");
+  // For a method that is not a method
+  int32_t method_id = env->get_method_id(env, "Foo", "sum", "int (int, int)");
 
   // For method
-  int32_t sub_id = env->get_sub_id_by_object(env, object, "sum", "int (self, int, int)");
+  int32_t method_id = env->get_method_id_by_object(env, object, "sum", "int (self, int, int)");
 
-If sub_id is less than 0, it means that the subroutine was not found. It is safe to handle exceptions as follows.
+If method_id is less than 0, it means that the method was not found. It is safe to handle exceptions as follows.
 
-  if (sub_id <0) {
+  if (method_id <0) {
     SPVM_DIE ("Can't find sub id", "Foo/Bar.c", __LINE__);
   }
 
-Set the SPVM subroutine argument to stack before calling the subroutine.
+Set the SPVM method argument to stack before calling the method.
 
   stack[0].ival = 1;
   stack[0].ival = 2;
 
-To call a SPVM subroutine, use the <a href="#native-api-native-sub-api-call_sub">call_sub</a> function.
+To call a SPVM method, use the <a href="#native-api-native-sub-api-call_spvm_method">call_spvm_method</a> function.
 
-  int32_t exception_flag = env->call_sub(env, sub_id, stack);
+  int32_t exception_flag = env->call_spvm_method(env, method_id, stack);
 
-Nonzero if the subroutine raised an exception, 0 if no exception occurred.
+Nonzero if the method raised an exception, 0 if no exception occurred.
 
-The return value of the subroutine is stored in the first element of the stack.
+The return value of the method is stored in the first element of the stack.
 
   int32_t total = stack[0].ival;
 
 =head2 Native Method Scope
 
-Native subroutine are entirely enclosed in scope.
+Native method are entirely enclosed in scope.
 
 Objects added to the mortal stack will automatically have their reference count decremented by 1 when the Native Method ends. When the reference count reaches 0, it is released.
 
@@ -751,11 +751,11 @@ Example:
 
   int32_t pkgvar_id = env->get_package_var_id(env, "Foo", "$VAR", "int");
 
-=head2 get_sub_id
+=head2 get_method_id
 
-  int32_t (*get_sub_id)(SPVM_ENV* env, const char* package_name, const char* sub_name, const char* signature);
+  int32_t (*get_method_id)(SPVM_ENV* env, const char* package_name, const char* method_name, const char* signature);
 
-Get the subroutine ID by specifying the package name, subroutine name, and signature. If no subroutine exists, a value less than 0 is returned.
+Get the method ID by specifying the package name, method name, and signature. If no method exists, a value less than 0 is returned.
 
 The signature has the following format: Must not contain white space.
 
@@ -763,229 +763,198 @@ The signature has the following format: Must not contain white space.
 
 Example:
 
-  int32_t sub_id = env->get_sub_id(env, "Foo", "func", "int(long,string)");
+  int32_t method_id = env->get_method_id(env, "Foo", "func", "int(long,string)");
 
-=head2 get_sub_id_by_object
+=head2 get_method_id_by_object
 
-  int32_t (*get_sub_id_by_object)(SPVM_ENV* env, void* object, const char* method_name, const char* signature);
+  int32_t (*get_method_id_by_object)(SPVM_ENV* env, void* object, const char* method_name, const char* signature);
 
-Get the subroutine ID by specifying the object and method name. If the method does not exist, a value less than 0 is returned.
+Get the method ID by specifying the object and method name. If the method does not exist, a value less than 0 is returned.
 
-The signature is the same as the sub_id signature.
+The signature is the same as the method_id signature.
 
 Example:
 
-  int32_t sub_id = env->get_sub_id_by_object(env, object, "method", "int(self,long,string)");
+  int32_t method_id = env->get_method_id_by_object(env, object, "method", "int(self,long,string)");
 
 =head2 new_object_raw
 
   void* (*new_object_raw)(SPVM_ENV* env, int32_t basic_type_id);
 
-Generates a new object with a base type ID. The base type ID must be the correct base type ID obtained by the "basic_type_id function".
-
-This function does not add objects to the mortal stack, so use new_object to avoid memory leaks for normal use.
+Create a new object with a basic type ID. The basic type ID must be the correct base type ID return by C<get_basic_type_id> function.
 
 =head2 new_object
 
   void* (*new_object)(SPVM_ENV* env, int32_t basic_type_id);
 
-Generates and returns a new object with a base type ID. The base type ID must be the correct base type ID obtained in the basic_type_id. Adds a newly generated object to the mortal stack.
+Do the same as C<new_object_raw>, and add the created object to the mortal stack of the environment. Use this function in normal use instead of C<new_object_raw>.
 
 Example:
 
-  int32_t basic_type_id = env->get_basic_type_id(env,"SPVM::Int");
+  int32_t basic_type_id = env->get_basic_type_id(env, "SPVM::Int");
   void* object = env->new_object(env, basic_type_id);
 
 =head2 new_byte_array_raw
 
-Generates a new "byte[] type" object by specifying the length of the array. The initial value of all elements is 0.
-
-
   void* (*new_byte_array_raw)(SPVM_ENV* env, int32_t length);
 
-
-This function does not add objects to the mortal stack, so use new_byte_array to avoid memory leaks for normal use.
+Create a new byte[] type array by specifying the length.
 
 =head2 new_byte_array
 
-Generates and returns a new "byte[] type" object with the length of the array. The initial value of all elements is 0. Adds a newly generated object to the mortal stack.
-
-
   void* (*new_byte_array)(SPVM_ENV* env, int32_t length);
 
+Do the same as C<new_byte_array_raw>, and add the created array to the mortal stack of the environment. Use this function in normal use instead of C<new_byte_array_raw>.
 
 Example:
 
-  void* byte_array_obj = env->new_byte_array(env, 100);
+  void* byte_array = env->new_byte_array(env, 100);
 
 =head2 new_short_array_raw
 
   void* (*new_short_array_raw)(SPVM_ENV* env, int32_t length);
 
-Generates a new "short[] type" object by specifying the length of the array. The initial value of all elements is 0.
-
-This function does not add objects to the mortal stack, so use new_short_array to avoid memory leaks for normal use.
+Create a new short[] type array by specifying the length.
 
 =head2 new_short_array
 
   void* (*new_short_array)(SPVM_ENV* env, int32_t length);
 
-Generates and returns a new "short[] type" object with the length of the array. The initial value of all elements is 0. Adds a newly generated object to the mortal stack.
+Do the same as C<new_short_array_raw>, and add the created array to the mortal stack of the environment. Use this function in normal use instead of C<new_short_array_raw>.
 
 Example:
 
-  void* short_array_obj = env->new_short_array(env, 100);
+  void* short_array = env->new_short_array(env, 100);
 
 =head2 new_int_array_raw
 
   void* (*new_int_array_raw)(SPVM_ENV* env, int32_t length);
 
-Generates a new "int[] type" object by specifying the length of the array. The initial value of all elements is 0.
-
-This function does not add objects to the mortal stack, so normal use should use new_int_array to avoid memory leaks.
+Create a new int[] type array by specifying the length.
 
 =head2 new_int_array
 
   void* (*new_int_array)(SPVM_ENV* env, int32_t length);
 
-Generates and returns a new "int[] type" object with the length of the array. The initial value of all elements is 0. Adds a newly generated object to the mortal stack.
+Do the same as C<new_int_array_raw>, and add the created array to the mortal stack of the environment. Use this function in normal use instead of C<new_int_array_raw>.
 
 Example:
 
-  void* int_array_obj = env->new_int_array(env, 100);
+  void* int_array = env->new_int_array(env, 100);
 
 =head2 new_long_array_raw
 
   void* (*new_long_array_raw)(SPVM_ENV* env, int32_t length);
 
-Creates a new "long[] type" object by specifying the length of the array. The initial value of all elements is 0.
-
-This function does not add objects to the mortal stack, so use normal_new_long_array to avoid memory leaks.
+Create a new long[] type array by specifying the length.
 
 =head2 new_long_array
 
   void* (*new_long_array)(SPVM_ENV* env, int32_t length);
 
-Create a new "long[] type" object by specifying the length of the array and return it. The initial value of all elements is 0. Add the newly created object to the mortal stack.
+Do the same as C<new_long_array_raw>, and add the created array to the mortal stack of the environment. Use this function in normal use instead of C<new_long_array_raw>.
 
 Example:
 
-  void* long_array_obj = env->new_long_array(env, 100);
+  void* long_array = env->new_long_array(env, 100);
 
 =head2 new_float_array_raw
 
   void* (*new_float_array_raw)(SPVM_ENV* env, int32_t length);
 
-Create a new "float[] type" object by specifying the length of the array. The initial value of all elements is 0.
-
-This function does not add any objects to the mortal stack, so use new_float_array for normal use to avoid memory leaks.
+Create a new float[] type array by specifying the length.
 
 =head2 new_float_array
 
   void* (*new_float_array)(SPVM_ENV* env, int32_t length);
 
-Create a new "float[] type" object by specifying the length of the array and return it. The initial value of all elements is 0. Add the newly created object to the mortal stack.
+Do the same as C<new_float_array_raw>, and add the created array to the mortal stack of the environment. Use this function in normal use instead of C<new_float_array_raw>.
 
 Example:
 
-  void* float_array_obj = env->new_float_array(env, 100);
+  void* float_array = env->new_float_array(env, 100);
 
 =head2 new_double_array_raw
 
   void* (*new_double_array_raw)(SPVM_ENV* env, int32_t length);
 
-Creates a new "double[]" object by specifying the length of the array. The initial value of all elements is 0.
-
-This function does not add any objects to the mortal stack, so use normal_new_double_array to avoid memory leaks.
+Create a new double[] type array by specifying the length.
 
 =head2 new_double_array
 
   void* (*new_double_array)(SPVM_ENV* env, int32_t length);
 
-Generate a new "double[] type" object by specifying the length of the array and return it. The initial value of all elements is 0. Add the newly created object to the mortal stack.
+Do the same as C<new_double_array_raw>, and add the created array to the mortal stack of the environment. Use this function in normal use instead of C<new_double_array_raw>.
 
 Example:
 
-  void* double_array_obj = env->new_double_array(env, 100);
-
+  void* double_array = env->new_double_array(env, 100);
 
 =head2 new_object_array_raw
 
   void* (*new_object_array_raw)(SPVM_ENV* env, int32_t basic_type_id, int32_t length);
 
-Create a new object type array by specifying the basic type ID and array length and return it. The basic type ID must be the correct basic type ID obtained with the "basic_type_id function". The initial value of all elements is null.
-
-This function does not add objects to the mortal stack, so use normal_new_object_array to avoid memory leaks.
+Create a new object type array by specifying the basic type ID and the array length. The basic type ID must be the correct basic type ID got by C<get_basic_type_id> function.
 
 =head2 new_object_array
 
   void* (*new_object_array)(SPVM_ENV* env, int32_t basic_type_id, int32_t length);
 
-Create a new object type array by specifying the basic type ID and array length and return it. The basic type ID must be the correct basic type ID obtained with the "basic_type_id function". The initial value of all elements is null. Add the newly created object to the mortal stack.
+Do the same as C<new_object_array_raw>, and add the created array to the mortal stack of the environment. Use this function in normal use instead of C<new_object_array_raw>.
 
 Example:
 
   int32_t basic_type_id = env->get_basic_type_id(env, "SPVM::Int");
-  void* object_array_obj = env->new_object_array(env, basic_type_id, 100);
+  void* object_array = env->new_object_array(env, basic_type_id, 100);
 
 =head2 new_muldim_array_raw
 
   void* (*new_muldim_array_raw)(SPVM_ENV* env, int32_t basic_type_id, int32_t element_dimension, int32_t length);
 
-Generates and returns a new multidimensional object type array by specifying the basic type ID, element type dimension, and array length. The basic type ID must be the correct basic type ID obtained with the "basic_type_id function". The initial value of all elements is null.
-
-This function does not add any objects to the mortal stack, so use new_muldim_array for normal use to avoid memory leaks.
-
+Create a new multi dimension array by specifying the basic type ID, the type dimension of the element, and the array length. The basic type ID must be the correct basic type ID got bu C<get_basic_type_id> function. the type dimension of the element must be less than or equals to 255.
 
 =head2 new_muldim_array
 
   void* (*new_muldim_array_raw)(SPVM_ENV* env, int32_t basic_type_id, int32_t element_dimension, int32_t length);
 
-Generates and returns a new multidimensional object type array by specifying the basic type ID, element type dimension, and array length. The basic type ID must be the correct basic type ID obtained with the "basic_type_id function". The initial value of all elements is null. Add the newly created object to the mortal stack.
-
-Element type dimensions must be less than 255.
+Do the same as C<new_muldim_array_raw>, and add the created array to the mortal stack of the environment. Use this function in normal use instead of C<new_muldim_array_raw>.
 
 Example:
 
   // new SPVM::Int[][][100]
   int32_t basic_type_id = env->get_basic_type_id(env, "SPVM::Int");
-  void* multi_array_obj = env->new_muldim_array(env, basic_type_id, 2, 100);
+  void* multi_array = env->new_muldim_array(env, basic_type_id, 2, 100);
 
 =head2 new_mulnum_array_raw
 
   void* (*new_mulnum_array_raw)(SPVM_ENV* env, int32_t basic_type_id, int32_t length);
 
-Generate a new multi-numeric array by specifying the basic type ID and array length and return it. The basic type ID must be the correct basic type ID acquired by the "basic_type_id function" and must be valid as a composite numeric type. The initial value of all fields for all elements is 0.
-
-This function does not add any objects to the mortal stack, so use new_mulnum_array for normal use to avoid memory leaks.
+Create a new multi-numeric array by specifying the basic type ID and the array length. The basic type ID must be the correct basic type ID got by C<basic_type_id> function.
 
 =head2 new_mulnum_array
 
   void* (*new_mulnum_array)(SPVM_ENV* env, int32_t basic_type_id, int32_t length);
 
-Generate a new multi-numeric array by specifying the basic type ID and array length and return it. The basic type ID must be the correct basic type ID acquired by the "basic_type_id function" and must be valid as a composite numeric type. The initial value of all fields for all elements is 0.
+Do the same as C<new_mulnum_array_raw>, and add the created array to the mortal stack of the environment. Use this function in normal use instead of C<new_mulnum_array_raw>.
 
 Example:
 
   int32_t basic_type_id = env->get_basic_type_id(env, "SPVM::Complex_2d");
-  void* value_array_obj = env->new_mulnum_array(env, basic_type_id, 100);
+  void* value_array = env->new_mulnum_array(env, basic_type_id, 100);
 
 =head2 new_string_nolen_raw
 
   void* (*new_string_nolen_raw)(SPVM_ENV* env, const char* bytes);
 
-Specify a C language string to generate a string type object and return it. The string must end with "\0".
-
-This function does not add any objects to the mortal stack, so for normal use use new_string to avoid memory leaks.
+Create a new string object by specifying C language char* type value. this value must end with "\0".
 
 =head2 new_string_nolen
 
   void* (*new_string_nolen)(SPVM_ENV* env, const char* bytes);
 
-Specify a C language string to generate a string type object and return it. The string must end with "\0". Add the newly created object to the mortal stack.
+Do the same as C<new_string_nolen_raw>, and add the created string object to the mortal stack of the environment. Use this function in normal use instead of C<new_string_nolen_raw>.
 
 Example:
-
 
   void* str_obj = env->new_string_nolen(env, "Hello World");
 
@@ -993,15 +962,13 @@ Example:
 
   void* (*new_string_raw)(SPVM_ENV* env, const char* bytes, int32_t length);
 
-Specify a C language string and length to generate a string type object and return it.
-
-This function does not add any objects to the mortal stack, so for normal use use new_string to avoid memory leaks.
+Create a new string object by specifying C language char* type value and the length.
 
 =head2 new_string
 
   void* (*new_string)(SPVM_ENV* env, const char* bytes, int32_t length);
 
-Generates and returns a character string type object by specifying the character string and length in C language. Add the newly created object to the mortal stack.
+Do the same as C<new_string_raw>, and add the created string object to the mortal stack of the environment. Use this function in normal use instead of C<new_string_raw>.
 
 Example:
 
@@ -1011,15 +978,13 @@ Example:
 
   void* (*new_pointer_raw)(SPVM_ENV* env, int32_t basic_type_id, void* pointer);
 
-Specify a basic type ID and a C language pointer to create a pointer type object and return it. The basic type ID must be the correct basic type ID acquired by the "basic_type_id function" and valid as a pointer type.
-
-This function does not add any objects to the mortal stack, so for normal use use new_pointer to avoid memory leaks.
+Create a pointer type object by specifying a basic type ID and a C language pointer. The basic type ID must be the correct basic type ID got by C<get_basic_type_id> function.
 
 =head2 new_pointer
 
   void* (*new_pointer)(SPVM_ENV* env, int32_t basic_type_id, void* pointer);
 
-Specify a basic type ID and a C language pointer to create a pointer type object and return it. The basic type ID must be the correct basic type ID acquired by the C<get_basic_type_id> function and valid as a pointer type. Add the newly created object to the mortal stack.
+Do the same as C<new_pointer_raw>, and add the created string object to the mortal stack of the environment. Use this function in normal use instead of C<new_pointer_raw>.
 
 Example:
 
@@ -1031,29 +996,27 @@ Example:
 
   void* (*concat_raw)(SPVM_ENV* env, void* string1, void* string2);
 
-Returns a new byte[] type object that is a concatenation of two byte[] type strings.
-
-This function does not add objects to the mortal stack, so use concat for normal use to avoid memory leaks.
+Concat two strings.
 
 =head2 concat
 
   void* (*concat)(SPVM_ENV* env, void* string1, void* string2);
 
-Returns a new byte[] type object that is a concatenation of two byte[] type strings. Add the newly created object to the mortal stack.
+Do the same as C<concat_raw>, and add the created string object to the mortal stack of the environment. Use this function in normal use instead of C<concat_raw>.
 
 =head2 new_stack_trace_raw
 
-  void* (*new_stack_trace_raw)(SPVM_ENV* env, void* exception, const char* package_name, const char* sub_name, const char* file, int32_t line);
+  void* (*new_stack_trace_raw)(SPVM_ENV* env, void* exception, const char* package_name, const char* method_name, const char* file, int32_t line);
 
-If you specify a byte[] type exception message and a package name, subroutine name, file name and line number, the character string of the package name, subroutine name, file name and line number is added to the end of the byte[] type exception message. The added character string will be returned.
+If you specify a byte[] type exception message and a package name, method name, file name and line number, the character string of the package name, method name, file name and line number is added to the end of the byte[] type exception message. The added character string will be returned.
 
 This function does not add objects to the mortal stack, use new_stack_trace to avoid memory leaks for normal use.
 
 =head2 new_stack_trace
 
-  void* (*new_stack_trace)(SPVM_ENV* env, void* exception, const char* package_name, const char* sub_name, const char* file, int32_t line);
+  void* (*new_stack_trace)(SPVM_ENV* env, void* exception, const char* package_name, const char* method_name, const char* file, int32_t line);
 
-When a byte[] type exception message and a package name, subroutine name, file name and line number are specified, the string of the package name, subroutine name, file name and line number is added to the end of the string type exception message. Returns a new string type object. Add the newly created object to the mortal stack.
+When a byte[] type exception message and a package name, method name, file name and line number are specified, the string of the package name, method name, file name and line number is added to the end of the string type exception message. Returns a new string type object. Add the newly created object to the mortal stack.
 
 =head2 length
 
@@ -1135,7 +1098,7 @@ Example:
 
   void* (*get_elem_object)(SPVM_ENV* env, void* array, int32_t index);
 
-Gets an object of an element given an array of object types and a subscript. If the element is a weak reference, the weak reference is removed.
+Gets an object of an element given an array of object types and a methodscript. If the element is a weak reference, the weak reference is removed.
 
 Example:
 
@@ -1145,7 +1108,7 @@ Example:
 
   void (*set_elem_object)(SPVM_ENV* env, void* array, int32_t index, void* value);
 
-If you specify an array of object type and subscript and element objects, the element object is assigned to the corresponding subscript position. If the element's object has a weak reference, the weak reference is removed. The reference count of the originally assigned object is decremented by 1.
+If you specify an array of object type and methodscript and element objects, the element object is assigned to the corresponding methodscript position. If the element's object has a weak reference, the weak reference is removed. The reference count of the originally assigned object is decremented by 1.
 
 Example:
 
@@ -1489,25 +1452,25 @@ Example:
 
 If you specify a pointer type object and a C language pointer, the C language pointer is saved in the internal data of the pointer type object.
 
-=head2 call_sub
+=head2 call_spvm_method
 
-  int32_t (*call_sub)(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* args);
+  int32_t (*call_spvm_method)(SPVM_ENV* env, int32_t method_id, SPVM_VALUE* args);
 
-Call the subroutine by specifying the subroutine ID and argument. The return value is non-zero when an exception occurs in the subroutine, 0 is returned when the exception does not occur.
+Call a method by specifying the method ID and argument. If an exception occurs in the method, The return value is 1. If not, return 0.
 
-The return value of the subroutine is set to "args[0]".
+The return value of the method is set to args[0].
 
 =head2 get_exception
 
   void* (*get_exception)(SPVM_ENV* env);
 
-Returns the byte[] type object saved as an exception.
+Get a exception message which type is byte[].
 
 =head2 set_exception
 
   void (*set_exception)(SPVM_ENV* env, void* exception);
 
-If you specify an object of type byte[], it will be saved as an exception.
+Set a exception message which type is byte[].
 
 =head2 get_ref_count
 
@@ -1836,7 +1799,7 @@ If function is succeeded, C<exception_flag> is set to 0. If a exception occurs, 
 Example:
 
   int32_t e;
-  env->set_field_object_by_name(env, object_simple, "TestCase::Simple", "object_value", "TestCase::Minimal", object_minimal, &e, MFILE, __LINE__);
+  env->set_field_object_by_name(env, object_simple, "TestCase::Simple", "object_value", "TestCase::Minimal", object_minimal, &e, __FILE__, __LINE__);
   if (e) { return e; }
 
 =head2 get_field_byte_by_name
@@ -1948,7 +1911,7 @@ If function is succeeded, C<exception_flag> is get to 0. If a exception occurs, 
 Example:
 
   int32_t e;
-  void* object_minimal = env->get_field_object_by_name(env, object_simple, "TestCase::Simple", "object_value", "TestCase::Minimal", &e, MFILE, __LINE__);
+  void* object_minimal = env->get_field_object_by_name(env, object_simple, "TestCase::Simple", "object_value", "TestCase::Minimal", &e, __FILE__, __LINE__);
   if (e) { return e; }
 
 =head2 set_package_var_byte_by_name
@@ -2076,7 +2039,7 @@ If function is succeeded, C<exception_flag> is get to 0. If a exception occurs, 
 Example:
 
   int32_t e;
-  int8_t value = env->get_package_var_byte_by_name(env, "TestCase::NativeAPI", "$BYTE_VALUE", &e, MFILE, __LINE__);
+  int8_t value = env->get_package_var_byte_by_name(env, "TestCase::NativeAPI", "$BYTE_VALUE", &e, __FILE__, __LINE__);
   if (e) { return e; }
 
 =head2 get_package_var_short_by_name
@@ -2092,7 +2055,7 @@ If function is succeeded, C<exception_flag> is get to 0. If a exception occurs, 
 Example:
 
   int32_t e;
-  int16_t value = env->get_package_var_short_by_name(env, "TestCase::NativeAPI", "$SHORT_VALUE", &e, MFILE, __LINE__);
+  int16_t value = env->get_package_var_short_by_name(env, "TestCase::NativeAPI", "$SHORT_VALUE", &e, __FILE__, __LINE__);
   if (e) { return e; }
 
 =head2 get_package_var_int_by_name
@@ -2108,7 +2071,7 @@ If function is succeeded, C<exception_flag> is get to 0. If a exception occurs, 
 Example:
 
   int32_t e;
-  int8_t value = env->get_package_var_byte_by_name(env, "TestCase::NativeAPI", "$BYTE_VALUE", &e, MFILE, __LINE__);
+  int8_t value = env->get_package_var_byte_by_name(env, "TestCase::NativeAPI", "$BYTE_VALUE", &e, __FILE__, __LINE__);
   if (e) { return e; }
 
 =head2 get_package_var_long_by_name
@@ -2124,7 +2087,7 @@ If function is succeeded, C<exception_flag> is get to 0. If a exception occurs, 
 Example:
 
   int32_t e;
-  int64_t value = env->get_package_var_long_by_name(env, "TestCase::NativeAPI", "$LONG_VALUE", &e, MFILE, __LINE__);
+  int64_t value = env->get_package_var_long_by_name(env, "TestCase::NativeAPI", "$LONG_VALUE", &e, __FILE__, __LINE__);
   if (e) { return e; }
 
 =head2 get_package_var_float_by_name
@@ -2140,7 +2103,7 @@ If function is succeeded, C<exception_flag> is get to 0. If a exception occurs, 
 Example:
 
   int32_t e;
-  float value = env->get_package_var_float_by_name(env, "TestCase::NativeAPI", "$FLOAT_VALUE", &e, MFILE, __LINE__);
+  float value = env->get_package_var_float_by_name(env, "TestCase::NativeAPI", "$FLOAT_VALUE", &e, __FILE__, __LINE__);
   if (e) { return e; }
 
 =head2 get_package_var_double_by_name
@@ -2156,7 +2119,7 @@ If function is succeeded, C<exception_flag> is get to 0. If a exception occurs, 
 Example:
 
   int32_t e;
-  double value = env->get_package_var_double_by_name(env, "TestCase::NativeAPI", "$DOUBLE_VALUE", &e, MFILE, __LINE__);
+  double value = env->get_package_var_double_by_name(env, "TestCase::NativeAPI", "$DOUBLE_VALUE", &e, __FILE__, __LINE__);
   if (e) { return e; }
 
 =head2 get_package_var_object_by_name
@@ -2172,22 +2135,33 @@ If function is succeeded, C<exception_flag> is get to 0. If a exception occurs, 
 Example:
   
   int32_t e;
-  void* value = env->get_package_var_object_by_name(env, "TestCase::NativeAPI", "$MINIMAL_VALUE", "TestCase::Minimal", &e, MFILE, __LINE__);
+  void* value = env->get_package_var_object_by_name(env, "TestCase::NativeAPI", "$MINIMAL_VALUE", "TestCase::Minimal", &e, __FILE__, __LINE__);
   if (e) { return e; }
 
-=head2 call_sub_by_name
+=head2 call_spvm_method_by_name
 
-  int32_t (*call_sub_by_name)(SPVM_ENV* env,
-    const char* package_name, const char* sub_name, const char* signature, SPVM_VALUE* stack,
+  int32_t (*call_spvm_method_by_name)(SPVM_ENV* env,
+    const char* package_name, const char* method_name, const char* signature, SPVM_VALUE* stack,
     const char* file, int32_t line);
+
+This is same as C<call_spvm_method> function, but you can specify the package name and sub name directry.
 
 Example:
 
+  int32_t output;
+  {
+    stack[0].ival = 5;
+    int32_t exception_flag = env->call_spvm_method_by_name(env, "TestCase::NativeAPI", "my_value", "int(int)", stack, __FILE__, __LINE__);
+    if (exception_flag) {
+      return exception_flag;
+    }
+    output = stack[0].ival;
+  }
 
-=head2 call_poly_sub_by_name
+=head2 call_callback_method_by_name
 
-  int32_t (*call_poly_sub_by_name)(SPVM_ENV* env, void* object,
-    const char* sub_name, const char* signature, SPVM_VALUE* stack,
+  int32_t (*call_callback_method_by_name)(SPVM_ENV* env, void* object,
+    const char* method_name, const char* signature, SPVM_VALUE* stack,
     const char* file, int32_t line);
 
 Example:
@@ -2201,18 +2175,23 @@ Example:
 
 Example:
 
-
 =head2 any_object_basic_type_id
 
   void* any_object_basic_type_id;
+
+Basic type ID of any object type. This is used internally.
 
 =head2 dump_raw
 
   void* (*dump_raw)(SPVM_ENV* env, void* object);
 
+Get the string which dump the object. The string is the same as the return value of C<dump> operator.
+
 =head2 dump
 
   void* (*dump)(SPVM_ENV* env, void* object);
+
+Do the same as C<dump_raw>, and add the created string object to the mortal stack of the environment. Use this function in normal use instead of C<dump_raw>.
 
 =head1 Native API indexes
 
@@ -2242,8 +2221,8 @@ Native APIs have indexes which correspond to the names. These indexes are perman
   21 get_field_id
   22 get_field_offset
   23 get_package_var_id
-  24 get_sub_id
-  25 get_sub_id_by_object
+  24 get_method_id
+  25 get_method_id_by_object
   26 new_object_raw
   27 new_object
   28 new_byte_array_raw
@@ -2313,7 +2292,7 @@ Native APIs have indexes which correspond to the names. These indexes are perman
   92 set_package_var_object
   93 get_pointer
   94 set_pointer
-  95 call_sub
+  95 call_spvm_method
   96 get_exception
   97 set_exception
   98 get_ref_count
@@ -2370,8 +2349,8 @@ Native APIs have indexes which correspond to the names. These indexes are perman
   149 get_package_var_float_by_name
   150 get_package_var_double_by_name
   151 get_package_var_object_by_name
-  152 call_sub_by_name
-  153 call_poly_sub_by_name
+  152 call_spvm_method_by_name
+  153 call_callback_method_by_name
   154 get_field_string_chars_by_name
   155 any_object_basic_type_id
   156 dump_raw

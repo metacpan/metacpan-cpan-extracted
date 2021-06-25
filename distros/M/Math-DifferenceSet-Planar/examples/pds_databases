@@ -18,12 +18,19 @@ print "$Math::DifferenceSet::Planar::Data::DATABASE_DIR\n";
 foreach my $db (PDS->list_databases) {
     my $count = eval { PDS->set_database($db) };
     if (defined $count) {
-        my $min = PDS->iterate_available_sets->()->order;
+        my $min = PDS->available_min_order;
         my $max = PDS->available_max_order;
-        print "$db: $count sets, $min <= order <= $max\n";
+        print "$db: $count sets,   $min <= order <= $max\n";
     }
     else {
         print "$db: bad database\n";
+        next;
+    }
+    my $sp_count = PDS->known_space_count;
+    if ($sp_count) {
+        my $min = PDS->available_min_order;
+        my $max = PDS->available_max_order;
+        print "$db: $sp_count spaces, $min <= order <= $max\n";
     }
 }
 

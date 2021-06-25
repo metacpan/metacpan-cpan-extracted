@@ -1,3 +1,6 @@
+1.002     2021-06-16 02:18:44 EDT
+  - Update IRC metadata to libera.chat
+
 1.001     2019-05-30 11:13:04 EDT
   - Fix formatting of Future::Role::Promisify synopsis (haarg, #4)
 

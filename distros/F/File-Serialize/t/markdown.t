@@ -5,8 +5,11 @@ use warnings;
 
 use Test2::V0;
 
-use File::Serialize::Serializer::Markdown;
+use Module::Runtime qw/ use_module /;
 use File::Serialize;
+
+plan skip_all => "dependencies for serializer not met"
+  unless eval { use_module('YAML::XS') };
 
 subtest 'serialize' => sub {
     is deserialize_file(

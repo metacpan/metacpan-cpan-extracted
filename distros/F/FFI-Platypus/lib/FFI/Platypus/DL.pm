@@ -3,14 +3,14 @@ package FFI::Platypus::DL;
 use strict;
 use warnings;
 use 5.008004;
-use base qw( Exporter );
+use Exporter qw( import );
 
 require FFI::Platypus;
 our @EXPORT = qw( dlopen dlerror dlsym dlclose );
 push @EXPORT, grep /RTLD_/, keys %FFI::Platypus::DL::;
 
 # ABSTRACT: Slightly non-portable interface to libdl
-our $VERSION = '1.43'; # VERSION
+our $VERSION = '1.46'; # VERSION
 
 
 1;
@@ -27,7 +27,7 @@ FFI::Platypus::DL - Slightly non-portable interface to libdl
 
 =head1 VERSION
 
-version 1.43
+version 1.46
 
 =head1 SYNOPSIS
 
@@ -214,6 +214,8 @@ Diab Jerius (DJERIUS)
 Eric Brine (IKEGAMI)
 
 szTheory
+
+José Joaquín Atria (JJATRIA)
 
 =head1 COPYRIGHT AND LICENSE
 

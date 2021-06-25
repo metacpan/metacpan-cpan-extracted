@@ -2,8 +2,8 @@ NAME
     App::StatisticsUtils - CLI utilities related to statistics
 
 VERSION
-    This document describes version 0.001 of App::StatisticsUtils (from Perl
-    distribution App-StatisticsUtils), released on 2021-01-15.
+    This document describes version 0.002 of App::StatisticsUtils (from Perl
+    distribution App-StatisticsUtils), released on 2021-02-21.
 
 DESCRIPTION
     This distribution contains the following CLI utilities:
@@ -26,6 +26,14 @@ FUNCTIONS
 
          pct2z(50); # -> 0
 
+    *   Example #2:
+
+         pct2z(5); # -> -1.644854
+
+    *   Example #3:
+
+         pct2z(90); # -> 1.281552
+
     This function is not exported.
 
     Arguments ('*' denotes required arguments):
@@ -46,6 +54,14 @@ FUNCTIONS
     *   Example #1:
 
          z2pct(0); # -> 50
+
+    *   Example #2:
+
+         z2pct(-2); # -> 2.28655435304153
+
+    *   Example #3:
+
+         z2pct(1); # -> 84.1334538939805
 
     This function is not exported.
 

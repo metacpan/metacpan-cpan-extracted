@@ -1,8 +1,8 @@
 use strict;
 use warnings;
-package App::Addex::AddressBook;
+package App::Addex::AddressBook 0.027;
 # ABSTRACT: the address book that addex will consult
-$App::Addex::AddressBook::VERSION = '0.026';
+
 use App::Addex::Entry;
 
 use Carp ();
@@ -66,7 +66,18 @@ App::Addex::AddressBook - the address book that addex will consult
 
 =head1 VERSION
 
-version 0.026
+version 0.027
+
+=head1 PERL VERSION SUPPORT
+
+This module has the same support period as perl itself:  it supports the two
+most recent versions of perl.  (That is, if the most recently released version
+is v5.40, then this module should work on both v5.40 and v5.38.)
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
 
 =head1 METHODS
 
@@ -99,7 +110,7 @@ subclass.
 
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@cpan.org>
+Ricardo SIGNES <rjbs@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

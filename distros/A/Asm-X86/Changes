@@ -1,5 +1,86 @@
 Revision history for Asm-X86
 
+2021-06-19	Bogdan Drozdowski <bogdro@cpan.org>
+
+	* Version 0.61
+	  Fixed compatibility issues.
+	* Makefile.PL: corrected hash keys and values to be strings
+	* t/zz_regs_{att,intel}.t: fix passing parameters and hash usage
+
+2021-06-16	Bogdan Drozdowski <bogdro@cpan.org>
+
+	* Version 0.60
+	  Fixed compatibility issues. Significant code simplification in the
+	  module. Better checks in address validation, especially in AT&T
+	  syntax. More code clean-up in unit tests.
+	* lib/Asm/X86.pm (is_valid_16bit_addr_intel, is_valid_32bit_addr_intel,
+	  is_valid_64bit_addr_intel, is_valid_16bit_addr_att,
+	  is_valid_32bit_addr_att, is_valid_64bit_addr_att): moved common
+	  validation code to private subroutines, saving on duplication
+	* lib/Asm/X86.pm (is_valid_16bit_addr_att): some expressions have been
+	  widened to allow more matches.
+	* lib/Asm/X86.pm (is_valid_16bit_addr_att, is_valid_32bit_addr_att,
+	  is_valid_64bit_addr_att): disallow sign characters inside
+	  parentheses (rejected by GNU as).
+	* lib/Asm/X86.pm (_add_percent, _remove_duplicates, _nopluses): removed
+	  "my sub" and added an underscore to the name to mark the subroutines
+	  as private and still make POD coverage tests skip them.
+	* lib/Asm/X86.pm (is_reg_intel, is_reg_att, is_reg8_intel, is_reg8_att,
+	  is_reg16_intel, is_reg16_att, is_segreg_intel, is_segreg_att,
+	  is_reg32_intel, is_reg32_att, is_addressable32_intel,
+	  is_addressable32_att, is_r32_in64_intel, is_r32_in64_att,
+	  is_reg64_intel, is_reg64_att, is_reg_mm_intel, is_reg_mm_att,
+	  is_reg_fpu_intel, is_reg_fpu_att, is_reg_opmask_intel,
+	  is_reg_opmask_att, is_instr_intel, is_instr_att): use new private
+	  subroutines to search though the arrays and simplify the code
+	* t/{zz_regs_att.t,zz_regs_intel.t}: re-write and simplify the code
+	* t/{zz_addr_att.t,zz_addr_intel.t}: added testing the invalidity of
+	  addresses containing one of the xmm, ymm, zmm or opmask registers
+	* t/zz_{addr_att,addr_intel,conv,duplicates,regs_att,regs_intel}.t:
+	  added prototypes to subroutines and fixed the tests where necessary
+
+2021-06-05	Bogdan Drozdowski <bogdro@cpan.org>
+
+	* Version 0.50
+	  Fixed some defects found by comparing new test results and GNU as
+	  output. Significant rewrite of the unit tests.
+	* lib/Asm/X86.pm (is_valid_16bit_addr_intel): checking the sign in
+	  more cases, corrected one regex
+	* lib/Asm/X86.pm (is_valid_16bit_addr_att): disallow %segreg:var(var)
+	  %segreg:number(number) constructs. Check if %xxx names are registers
+	* lib/Asm/X86.pm (is_valid_16bit_addr_att, is_valid_32bit_addr_att,
+	  is_valid_64bit_addr_att): check if %xxx names are registers in some
+	  cases
+	* lib/Asm/X86.pm (is_valid_32bit_addr_att): disallow %esp as the index
+	  register in more cases (following GNU as). Allow 16-bit addressing
+	  in 32-bit mode.
+	* lib/Asm/X86.pm (is_valid_64bit_addr_att): disallow %rsp and %rip as
+	  the index register in more cases (following GNU as).
+	* lib/Asm/X86.pm (is_reg_intel, is_reg_att, is_reg8_intel, is_reg8_att,
+	  is_reg16_intel, is_reg16_att, is_segreg_intel, is_segreg_att,
+	  is_reg32_intel, is_reg32_att, is_addressable32_intel,
+	  is_addressable32_att, is_r32_in64_intel, is_r32_in64_att,
+	  is_reg64_intel, is_reg64_att, is_reg_mm_intel, is_reg_mm_att,
+	  is_reg_fpu_intel, is_reg_fpu_att, is_reg_opmask_intel,
+	  is_reg_opmask_att, is_instr_intel, is_instr_att): added a pre-check
+	  to check the syntax of the expression before checking the list
+	* lib/Asm/X86.pm (is_valid_32bit_addr_att, is_valid_64bit_addr_att):
+	  allow '(, reg)' modes
+	* lib/Asm/X86.pm (add_percent, remove_duplicates, nopluses): made the
+	  subroutines 'my' and removed them from the manual
+	* lib/Asm/X86.pm: layout fixes for the POD documentation and man page.
+	  Added information that some of the subroutines work best on input
+	  after all preprocessing.
+	* Makefile.PL: added a variable with the module name
+	* MANIFEST, KEY: added the GnuPG key used to sign the module
+	* t/*.t, Makefile.PL: fixed the interpreter line
+	* t/*.t: significant re-write of tests - using generating procedures,
+	  arrays and loops
+	* t/zz_addr_mixed.t: partially merged into zz_addr_att.t and
+	  zz_addr_intel.t with a possibility to extend
+	* t/zz_regs_mixed.t: merged into zz_regs_att.t and zz_regs_intel.t and
+	  deleted the file
+
 2021-05-09	Bogdan Drozdowski <bogdro@cpan.org>
 
 	* Version 0.40
@@ -46,7 +127,7 @@ Revision history for Asm-X86
 	* Makefile.PL: added detecting the "tar" utility type. In case of
 	  detecting BSD tar (default on some systems), use GNU tar mode.
 	  Added a parameter to sign the package.
-	* CONTRIBUTING: added for metacpan.
+	* CONTRIBUTING: added, for metacpan.
 
 2020-05-13	Bogdan Drozdowski <bogdro@cpan.org>
 
@@ -71,7 +152,7 @@ Revision history for Asm-X86
 2019-01-03	Bogdan Drozdowski <bogdro@cpan.org>
 
 	* Version 0.27
-	* Makefile.PL: remove hardcoded INSTALLDIRS, allowing it to be set
+	* Makefile.PL: remove hard-coded INSTALLDIRS, allowing it to be set
 	  during the RPM package build or manual installation.
 	* X86.pm: Updated copyright inside the module.
 	* README: updated copyright inside the file.
@@ -180,7 +261,7 @@ Revision history for Asm-X86
 
 	* Version 0.09:
 	  Updated the instruction list from NASM version 2.08.01. Minor
-	  whitespace changes in the source, for better readbility.
+	  whitespace changes in the source, for better readability.
 
 2009-07-05	Bogdan Drozdowski <bogdro@cpan.org>
 
@@ -261,4 +342,3 @@ Revision history for Asm-X86
 	  Includes functions that check if a given string is a register
 	  (any type or explicit: 8-, 16-, 32-, 64-bit or multimedia) and
 	  functions that check if a given string is a mnemonic.
-

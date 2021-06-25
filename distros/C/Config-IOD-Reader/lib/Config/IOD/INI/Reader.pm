@@ -1,7 +1,7 @@
 package Config::IOD::INI::Reader;
 
-our $DATE = '2019-01-17'; # DATE
-our $VERSION = '0.342'; # VERSION
+our $DATE = '2021-06-23'; # DATE
+our $VERSION = '0.343'; # VERSION
 
 use 5.010001;
 use strict;
@@ -35,7 +35,7 @@ Config::IOD::INI::Reader - Read INI configuration files (using Config::IOD::Read
 
 =head1 VERSION
 
-This document describes version 0.342 of Config::IOD::INI::Reader (from Perl distribution Config-IOD-Reader), released on 2019-01-17.
+This document describes version 0.343 of Config::IOD::INI::Reader (from Perl distribution Config-IOD-Reader), released on 2021-06-23.
 
 =head1 SYNOPSIS
 
@@ -82,7 +82,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2019, 2018, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

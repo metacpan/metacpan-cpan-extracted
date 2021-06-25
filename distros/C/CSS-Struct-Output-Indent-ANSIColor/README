@@ -1,18 +1,18 @@
 NAME
-    CSS::Struct::Output::Indent::AnsiColor - Indent printing 'CSS::Struct'
+    CSS::Struct::Output::Indent::ANSIColor - Indent printing 'CSS::Struct'
     structure to CSS code with ansi color output.
 
 SYNOPSIS
-     use CSS::Struct::Output::Indent::AnsiColor;
+     use CSS::Struct::Output::Indent::ANSIColor;
 
-     my $css = CSS::Struct::Output::Indent::AnsiColor->new(%parameters);
+     my $css = CSS::Struct::Output::Indent::ANSIColor->new(%parameters);
      my $ret_or_undef = $css->flush($reset_flag);
      $css->put(@data);
      $css->reset;
 
 METHODS
   "new"
-     my $css = CSS::Struct::Output::Indent::AnsiColor->new(%parameters);
+     my $css = CSS::Struct::Output::Indent::ANSIColor->new(%parameters);
 
     Constructor.
 
@@ -92,9 +92,9 @@ EXAMPLE
      use strict;
      use warnings;
 
-     use CSS::Struct::Output::Indent::AnsiColor;
+     use CSS::Struct::Output::Indent::ANSIColor;
 
-     my $css = CSS::Struct::Output::Indent::AnsiColor->new(
+     my $css = CSS::Struct::Output::Indent::ANSIColor->new(
              'output_handler' => \*STDOUT,
      );
 
@@ -112,6 +112,13 @@ EXAMPLE
      print "\n";
 
      # Output (in colors):
+     # /* Nice selector. */
+     # @import "file.css";
+     # selector#id, div div, .class, p.class {
+     #         weight: 100px;
+     #         font-size: 10em;
+     #         --border-color: hsl(0, 0%, 83%);
+     # }
 
 DEPENDENCIES
     CSS::Struct::Output, Indent, Readonly.
@@ -129,8 +136,11 @@ SEE ALSO
     CSS::Struct::Output::Indent
         Indent printing 'CSS::Struct' structure to CSS code.
 
+    CSS::Struct::Output::Structure
+        Structure class for 'CSS::Struct' output.
+
 REPOSITORY
-    <https://github.com/michal-josef-spacek/CSS-Struct-Output-Indent-AnsiCol
+    <https://github.com/michal-josef-spacek/CSS-Struct-Output-Indent-ANSICol
     or>
 
 AUTHOR
@@ -144,5 +154,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.01
+    0.02
 

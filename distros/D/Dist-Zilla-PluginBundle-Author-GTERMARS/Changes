@@ -1,5 +1,8 @@
 Revision history for Perl extension Dist::Zilla::PluginBundle::Author::GTERMARS
 
+0.05      2021-06-21 10:20:50-07:00 America/Vancouver
+    - Bump minimum Perl to v5.20 (matching DZil upstream)
+
 0.04      2021-05-04 09:29:38-07:00 America/Vancouver
     - Fix handling of "script/" dirs for StaticInstall
 

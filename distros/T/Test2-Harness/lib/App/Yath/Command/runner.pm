@@ -2,7 +2,7 @@ package App::Yath::Command::runner;
 use strict;
 use warnings;
 
-our $VERSION = '1.000057';
+our $VERSION = '1.000058';
 
 use Config qw/%Config/;
 use File::Spec;
@@ -815,6 +815,13 @@ Type of buffering to use, if "none" then events are written to the db one at a t
 Module that implements 'MODULE->yath_ui_config(%params)' which should return a Test2::Harness::UI::Config instance.
 
 
+=item --yathui-db-coverage
+
+=item --no-yathui-db-coverage
+
+Pull coverage data directly from the database (default: off)
+
+
 =item --yathui-db-driver Pg
 
 =item --yathui-db-drivermysql
@@ -833,6 +840,13 @@ DBI Driver to use
 =item --no-yathui-db-dsn
 
 DSN to use when connecting to the db
+
+
+=item --yathui-db-durations
+
+=item --no-yathui-db-durations
+
+Pull duration data directly from the database (default: off)
 
 
 =item --yathui-db-flush-interval 2
@@ -878,6 +892,15 @@ Password to use when connecting to the db
 =item --no-yathui-db-port
 
 port to use when connecting to the db
+
+
+=item --yathui-db-publisher ARG
+
+=item --yathui-db-publisher=ARG
+
+=item --no-yathui-db-publisher
+
+When using coverage or duration data, only use data uploaded by this user
 
 
 =item --yathui-db-socket ARG

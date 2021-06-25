@@ -1,7 +1,5 @@
-use strict;
-use warnings;
-use Test::More;
-BEGIN { plan skip_all => 'Test requires a threading Perl' unless eval q{ use threads; 1 } }
+use Test2::V0 -no_srand => 1;
+BEGIN { skip_all 'Test requires a threading Perl' unless eval q{ use threads; 1 } }
 use FFI::CheckLib;
 use FFI::Platypus;
 use Config;
@@ -19,6 +17,8 @@ sub otherthread
   undef $ffi;
   $val;
 }
+
+ok 1;
 
 is(threads->create(\&otherthread)->join(), 22, 'works in a thread');
 

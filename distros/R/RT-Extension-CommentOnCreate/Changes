@@ -1,6 +1,12 @@
 Revision history for RT-Extension-CommentOnCreate
 
-0.05 2014-02-06
+1.01 2021-06-11
+  - Add RT 5 support
+
+1.00 2014-12-15
+  - Fix "Use of uninitialized value" warnings
+
+0.06 2014-02-06
   - POD error
 
 0.05 2014-02-06

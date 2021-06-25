@@ -26,7 +26,7 @@ foreach my $type (qw(Plain Plus JSON Binary XML PPXML)) {
     is ref($parser), "PICA::Parser::$type", "parser from file";
 
     my $record = $parser->next;
-    isnt ref($record), 'PICA::Data', 'not blessed by default';
+    is ref($record), 'PICA::Data', 'blessed by default';
 
     is_deeply $record, $first;
 

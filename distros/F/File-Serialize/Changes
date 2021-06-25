@@ -1,5 +1,12 @@
 Revision history for File-Serialize
 
+1.5.1 2021-06-21
+ [BUG FIXES]
+ - Make the Markdown parser depends on the presence of the YAML parser.
+
+ [STATISTICS]
+ - code churn: 3 files changed, 29 insertions(+), 10 deletions(-)
+
 1.5.0 2021-06-07
  [DOCUMENTATION]
  - Mention Markdown serializer in the main documentation.

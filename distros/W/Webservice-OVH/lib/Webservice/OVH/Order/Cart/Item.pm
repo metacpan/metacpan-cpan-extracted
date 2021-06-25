@@ -28,7 +28,7 @@ use strict;
 use warnings;
 use Carp qw{ carp croak };
 
-our $VERSION = 0.43;
+our $VERSION = 0.46;
 
 =head2 _new
 
@@ -188,6 +188,72 @@ sub properties {
 
     $self->{_properties} = $response->content;
     return $self->{_properties};
+}
+
+=head2 configuration_add
+
+Setup configuration item for the product
+
+=over
+
+=item * Return: L<HASHREF>
+
+=item * Synopsis: my $configurations = $item->configuration_add;
+
+=back
+
+=cut
+
+sub configuration_add {
+
+    my ($self, $label, $value) = @_;
+
+    return unless $self->_is_valid;
+
+    my $api      = $self->{_api_wrapper};
+    my $cart_id  = $self->{_cart}->id;
+    my $item_id  = $self->id;
+
+    croak "Missing label" unless $label;
+    croak "Missing value" unless $value;
+
+    my $body = {label => $label, value => $value};
+    my $response = $api->rawCall( method => 'post', path => "/order/cart/$cart_id/item/$item_id/configuration", body => $body, noSignature => 0 );
+    croak $response->error if $response->error;
+
+    return $response->content;
+}
+
+=head2 configuration_delete
+
+Delete configuration item
+
+=over
+
+=item * Return: L<HASHREF>
+
+=item * Synopsis: my $configurations = $item->configuration_delete;
+
+=back
+
+=cut
+
+sub configuration_delete {
+
+    my ($self, $configuration_id) = @_;
+
+    return unless $self->_is_valid;
+
+    my $api      = $self->{_api_wrapper};
+    my $cart_id  = $self->{_cart}->id;
+    my $item_id  = $self->id;
+
+    croak "Missing configuration_id" unless $configuration_id;
+
+    my $response = $api->rawCall( method => 'delete', path => "/order/cart/$cart_id/item/$item_id/configuration/$configuration_id", body => {}, noSignature => 0 );
+    croak $response->error if $response->error;
+
+    return $response->content;
 }
 
 =head2 configurations

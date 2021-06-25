@@ -1,0 +1,6 @@
+
+INSTALL memo for "App::digitdemog" : 
+
+   cpanm App::digitdemog
+
+   

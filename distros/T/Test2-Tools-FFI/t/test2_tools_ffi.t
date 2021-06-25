@@ -5,11 +5,17 @@ use Test2::Tools::FFI;
 subtest 'ffi->runtime' => sub {
 
   my $ffi = ffi->runtime;
-  isa_ok $ffi, 'FFI::Platypus';
-  eval { $ffi->function(t2t_simple_init => [] => 'void') };
-  is $@, '';
 
-  ffi->runtime->symbol_ok('t2t_simple_init');
+  is
+    $ffi,
+    object {
+      call [ isa => 'FFI::Platypus' ] => T();
+      call api => 0;
+      call [ symbol_ok => 't2t_simple_init' ] => T();
+    },
+  ;
+
+  lives { $ffi->function(t2t_simple_init => [] => 'void') };
 
   is(
     intercept { ffi->runtime->symbol_ok('xxx') },
@@ -32,31 +38,39 @@ subtest 'ffi->runtime' => sub {
 subtest 'ffi->test' => sub {
 
   my $ffi = ffi->test;
-  isa_ok $ffi, 'FFI::Platypus';
-  is(
-    $ffi->function(myanswer => [] => 'int')->call,
-    42,
-  );
 
-  ffi->test->symbol_ok('myanswer');
+  is
+    $ffi,
+    object {
+      call [ isa => 'FFI::Platypus' ] => T();
+      call api => 0;
+      call [ function => myanswer => [] => 'int' ] => object {
+        call call => 42;
+      };
+      call [ symbol_ok => 'myanswer' ] => T();
+    },
+  ;
 
 };
 
 subtest 'ffi->combined' => sub {
 
   my $ffi = ffi->combined;
-  isa_ok $ffi, 'FFI::Platypus';
 
-  eval { $ffi->function(t2t_simple_init => [] => 'void') };
-  is $@, '';
+  is
+    $ffi,
+    object {
+      call [ isa => 'FFI::Platypus' ] => T();
+      call api => 0;
+      call [ function => 'myanswer' => [] => 'int' ] => object {
+        call call => 42;
+      };
+      call [ symbol_ok => 't2t_simple_init' ] => T();
+      call [ symbol_ok => 'myanswer' ] => T();
+    }
+  ;
 
-  is(
-    $ffi->function(myanswer => [] => 'int')->call,
-    42,
-  );
-
-  ffi->combined->symbol_ok('t2t_simple_init');
-  ffi->combined->symbol_ok('myanswer');
+  lives { $ffi->function(t2t_simple_init => [] => 'void') };
 };
 
 subtest 'call diagnostics from c' => sub {

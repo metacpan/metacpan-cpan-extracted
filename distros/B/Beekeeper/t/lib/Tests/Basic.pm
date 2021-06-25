@@ -45,7 +45,7 @@ sub test_01_notifications : Test(2) {
     is( $var, $expected, "Catchall notifications received by 2 workers");
 }
 
-sub test_02_sync_jobs : Test(20) {
+sub test_02_sync_calls : Test(20) {
     my $self = shift;
     
     my $cli = Beekeeper::Client->instance;
@@ -105,12 +105,12 @@ sub test_02_sync_jobs : Test(20) {
     # Invalid method
     $resp = eval {
         $cli->call_remote(
-            method  => 'test.#@@@@',
+            method  => 'test.#',
         );
     };
 
     is( $resp, undef );
-    like( $@, qr/Invalid method test.#@@@@ at /); # local error, call not made
+    like( $@, qr/Invalid method 'test.#' at /); # local error, call not made
 
     # Invalid method
     $resp = eval {
@@ -135,7 +135,7 @@ sub test_02_sync_jobs : Test(20) {
     like( $@, qr/Call to 'test.sleep' failed: -31600 Request timeout at /);
 }
 
-sub test_03_background_jobs : Test(1) {
+sub test_03_fire_and_forget_calls : Test(1) {
     my $self = shift;
 
     my $cli = Beekeeper::Client->instance;
@@ -153,10 +153,10 @@ sub test_03_background_jobs : Test(1) {
 
     my $expected = 597;
     my $max_wait = 10; while ($max_wait--) { sleep 0.5; last if $var == $expected }
-    is( $var, $expected, "Background job executed 3 times");
+    is( $var, $expected, "Fire and forget method executed 3 times");
 }
 
-sub test_04_async_jobs : Test(18) {
+sub test_04_async_calls : Test(18) {
     my $self = shift;
 
     my $cli = Beekeeper::Client->instance;
@@ -209,7 +209,43 @@ sub test_04_async_jobs : Test(18) {
     like( $@, qr/Call to 'test.sleep' failed: -31600 Request timeout /);
 }
 
-sub test_05_client_api : Test(8) {
+sub test_05_utf8_serialization : Test(10) {
+    my $self = shift;
+
+    my $utf8_string = "\x{263A}";
+
+    my $binary_blob = $utf8_string;
+    utf8::encode($binary_blob);
+
+    is( length($utf8_string), 1, 'String length is 1 char' );
+    is( length($binary_blob), 3, 'Blob length is 3 bytes' );
+
+    my $cli = Beekeeper::Client->instance;
+
+    my $resp = $cli->call_remote(
+        method => 'test.echo',
+        params => {
+            'utf8_string' => $utf8_string,
+            'binary_blob' => $binary_blob,
+        },
+    );
+
+    isa_ok($resp, 'Beekeeper::JSONRPC::Response');
+    is( $resp->success, 1 );
+
+    my $result = $resp->result;
+
+    ok( $result->{utf8_string}, 'Received string' );
+    ok( $result->{binary_blob}, 'Received blob' );
+
+    is( length($result->{utf8_string}), 1, 'Received string length is 1 char' );
+    is( length($result->{binary_blob}), 3, 'Received blob length is 3 bytes' );
+
+    is( $result->{utf8_string}, $utf8_string, "Got correct utf8 string");
+    is( $result->{binary_blob}, $binary_blob, "Got correct binary blob");
+}
+
+sub test_06_client_api : Test(8) {
     my $self = shift;
 
     use_ok('Tests::Service::Client');

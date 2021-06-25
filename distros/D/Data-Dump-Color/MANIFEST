@@ -14,6 +14,8 @@ lib/Data/Dump/Color.pm
 script/demo-data-dump-color
 share/examples/example.pl
 share/examples/example2.pl
+share/images/Screenshot_20210624_071341.png
+share/images/Screenshot_20210624_071713.png
 t/00-compile.t
 t/01-basics.t
 t/author-critic.t

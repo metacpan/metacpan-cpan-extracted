@@ -20,7 +20,7 @@ resources:
   bugtracker: https://github.com/perlancar/perl-Acme-CPANModulesBundle-Import-MJGARDNER/issues
   homepage: https://metacpan.org/release/Acme-CPANModulesBundle-Import-MJGARDNER
   repository: git://github.com/perlancar/perl-Acme-CPANModulesBundle-Import-MJGARDNER.git
-version: '0.001'
+version: '0.002'
 x_Dist_Zilla:
   perl:
     version: '5.030000'

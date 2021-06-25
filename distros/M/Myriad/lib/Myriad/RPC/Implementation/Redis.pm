@@ -2,7 +2,7 @@ package Myriad::RPC::Implementation::Redis;
 
 use Myriad::Class extends => qw(IO::Async::Notifier);
 
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.008'; # VERSION
 our $AUTHORITY = 'cpan:DERIV'; # AUTHORITY
 
 =encoding utf8
@@ -90,10 +90,10 @@ async method create_group ($rpc) {
 
 async method listen () {
     return $running //= (async sub {
-        while (1) {
-            await &fmap_void($self->$curry::curry(async method ($rpc) {
-                await $self->create_group($rpc);
+        await &fmap_void($self->$curry::curry(async method ($rpc) {
+            await $self->create_group($rpc);
 
+            while (1) {
                 my @items = await $self->redis->read_from_stream(
                     stream => $rpc->{stream},
                     group => $self->group_name,
@@ -110,9 +110,8 @@ async method listen () {
                         await $self->drop($rpc->{stream}, $_->{id});
                     }
                 }
-            }), foreach => [$self->rpc_list->@*], concurrent => 8);
-            await $self->loop->delay_future(after => 0.001);
-        }
+            }
+        }), foreach => [$self->rpc_list->@*], concurrent => scalar $self->rpc_list->@*);
     })->();
 }
 

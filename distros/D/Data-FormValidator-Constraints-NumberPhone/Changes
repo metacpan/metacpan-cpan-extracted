@@ -1,5 +1,8 @@
 Revision history for Data::FormValidator::Constraints::NumberPhone;
 
+0.05      2021-06-21 12:03:27-07:00 America/Vancouver
+    - minor POD cleanups
+
 0.04      2021-01-17 15:59:55-08:00 America/Vancouver
     - switch to Dist::Zilla for release management
     - POD cleanups

@@ -1,0 +1,13 @@
+plugins:
+    PrometheusTiny:
+        metrics:
+            test_counter:
+                help: Test Counter
+                type: counter
+            test_gauge:
+                help: Test Gauge
+                type: gauge
+            test_histogram:
+                help: Test Histogram
+                type: histogram
+                buckets: [1,2,3]

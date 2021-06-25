@@ -1,10 +1,23 @@
 use Test2::V0 -no_srand => 1;
 use Archive::Libarchive::Peek;
+use Path::Tiny qw( path );
 use experimental qw( signatures );
 
 is(
   dies { Archive::Libarchive::Peek->new },
-  match qr/^Required option: filename at t\/archive_libarchiv/,
+  match qr/^Required option: one of filename or memory at t\/archive_libarchiv/,
+  'undef filename',
+);
+
+is(
+  dies { Archive::Libarchive::Peek->new( filename => 'xxx', memory => 'yyy' ) },
+  match qr/^Exactly one of filename or memory is required at t\/archive_libarchiv/,
+  'undef filename',
+);
+
+is(
+  dies { Archive::Libarchive::Peek->new( memory => 'yyy' ) },
+  match qr/^Option memory must be a scalar reference to a plain non-reference scalar at t\/archive_libarchiv/,
   'undef filename',
 );
 
@@ -32,6 +45,20 @@ is(
     ];
   },
   'files'
+);
+
+is(
+  Archive::Libarchive::Peek->new( memory => \path('corpus/archive.tar')->slurp_raw ),
+  object {
+    call [ isa => 'Archive::Libarchive::Peek' ] => T();
+    call filename => U();
+    call_list files => [
+      'archive/',
+      'archive/bar.txt',
+      'archive/foo.txt',
+    ];
+  },
+  'files from memory'
 );
 
 subtest 'iterate' => sub {

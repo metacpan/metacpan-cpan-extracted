@@ -1,5 +1,9 @@
 Revision history for Device-Chip-DS1307
 
+0.05    2021-06-21
+        [CHANGES]
+         * Use `:param` slot attribute from Object::Pad 0.41
+
 0.04    2020-12-06
         [CHANGES]
          * Add unit tests

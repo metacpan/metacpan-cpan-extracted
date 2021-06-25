@@ -1,4 +1,12 @@
 
+
+1.856 22 June 2021
+
+   * Ensure that all *.bak files are cleaned up
+     https://github.com/pmqs/DB_File/pull/9
+     96bcf494625897ab4fcda322481dd6f730bdb668
+
+
 1.855 13 October 2020
 
    * Stop shipping DB_File_BS for the NeXT operating system.

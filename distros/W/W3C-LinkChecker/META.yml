@@ -1,60 +1,61 @@
---- #YAML:1.0
-name:               W3C-LinkChecker
-version:            4.81
-abstract:           W3C Link Checker
+---
+abstract: 'W3C Link Checker'
 author:
-    - W3C QA-dev Team <public-qa-dev@w3.org>
-license:            open_source
-distribution_type:  module
-configure_requires:
-    ExtUtils::MakeMaker:  0
+  - 'W3C QA-dev Team <public-qa-dev@w3.org>'
 build_requires:
-    ExtUtils::MakeMaker:  0
-requires:
-    CGI:                  0
-    CGI::Carp:            0
-    CGI::Cookie:          0
-    Config::General:      2.06
-    CSS::DOM:             0.09
-    CSS::DOM::Constants:  0
-    CSS::DOM::Style:      0
-    CSS::DOM::Util:       0
-    Encode:               0
-    Encode::Locale:       0
-    File::Spec:           0
-    Getopt::Long:         2.17
-    HTML::Entities:       0
-    HTML::Parser:         3.40
-    HTTP::Cookies:        0
-    HTTP::Headers::Util:  0
-    HTTP::Message:        5.827
-    HTTP::Request:        0
-    HTTP::Response:       1.50
-    Locale::Country:      0
-    Locale::Language:     0
-    LWP::RobotUA:         1.19
-    LWP::UserAgent:       0
-    Net::hostent:         0
-    Net::HTTP::Methods:   5.833
-    Net::IP:              0
-    Socket:               0
-    Term::ReadKey:        2
-    Test::More:           0
-    Text::Wrap:           0
-    Time::HiRes:          0
-    URI:                  1.53
-    URI::Escape:          0
-    URI::file:            0
-resources:
-    bugtracker:   http://www.w3.org/Bugs/Public/
-    homepage:     http://validator.w3.org/checklink
-    MailingList:  http://lists.w3.org/Archives/Public/www-validator/
-    repository:   http://dvcs.w3.org/hg/link-checker/
-no_index:
-    directory:
-        - t
-        - inc
-generated_by:       ExtUtils::MakeMaker version 6.56
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: open_source
 meta-spec:
-    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
-    version:  1.4
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: W3C-LinkChecker
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  CGI: '0'
+  CGI::Carp: '0'
+  CGI::Cookie: '0'
+  CSS::DOM: '0.09'
+  CSS::DOM::Constants: '0'
+  CSS::DOM::Style: '0'
+  CSS::DOM::Util: '0'
+  Config::General: '2.06'
+  Encode: '0'
+  Encode::Locale: '0'
+  File::Spec: '0'
+  Getopt::Long: '2.17'
+  HTML::Entities: '0'
+  HTML::Parser: '3.40'
+  HTTP::Cookies: '0'
+  HTTP::Headers::Util: '0'
+  HTTP::Message: '5.827'
+  HTTP::Request: '0'
+  HTTP::Response: '1.50'
+  LWP::RobotUA: '1.19'
+  LWP::UserAgent: '0'
+  Locale::Country: '0'
+  Locale::Language: '0'
+  Net::HTTP::Methods: '5.833'
+  Net::IP: '0'
+  Net::hostent: '0'
+  Socket: '0'
+  Term::ReadKey: '2'
+  Test::More: '0'
+  Text::Wrap: '0'
+  Time::HiRes: '0'
+  URI: '1.53'
+  URI::Escape: '0'
+  URI::file: '0'
+resources:
+  MailingList: https://lists.w3.org/Archives/Public/www-validator/
+  bugtracker: https://github.com/w3c/link-checker/issues/
+  homepage: https://validator.w3.org/checklink
+  repository: https://github.com/w3/link-checker/
+version: v5.0.0
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

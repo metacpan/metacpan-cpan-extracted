@@ -17,7 +17,7 @@ use lib '.';
 use Cwd;
 use Config;
 use DynaLoader;
-use Prima::Gencls;
+use Prima::sys::Gencls;
 use ExtUtils::MakeMaker;
 use File::Find;
 use File::Path;
@@ -386,7 +386,7 @@ sub setup_environment
 		$OPTIMIZE    .= ' -Wall' if gcc;
 		if ($cmd_options{DEBUG}) {
 			$passthru_options{LDDLFLAGS} .= ' -g';
-			$passthru_options{LDDLFLAGS} =~ s/(^| )\-s//;
+			$passthru_options{LDDLFLAGS} =~ s/(^| )\-s\b//;
 		}
 	}
 

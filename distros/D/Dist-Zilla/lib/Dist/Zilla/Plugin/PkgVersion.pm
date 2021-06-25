@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::PkgVersion 6.017;
+package Dist::Zilla::Plugin::PkgVersion 6.020;
 # ABSTRACT: add a $VERSION to your packages
 
 use Moose;
@@ -9,6 +9,14 @@ with(
   },
   'Dist::Zilla::Role::PPI',
 );
+
+# BEGIN BOILERPLATE
+use v5.20.0;
+use warnings;
+use utf8;
+no feature 'switch';
+use experimental qw(postderef postderef_qq); # This experiment gets mainlined.
+# END BOILERPLATE
 
 use namespace::autoclean;
 
@@ -161,6 +169,22 @@ has use_begin => (
   default => 0,
 );
 
+sub _version_assignment {
+  my ($self, $package, $version) = @_;
+
+  # the \x20 hack is here so that when we scan *this* document we don't find
+  # an assignment to version; it shouldn't be needed, but it's been annoying
+  # enough in the past that I'm keeping it here until tests are better
+  my $perl = $self->use_our
+      ? "our \$VERSION\x20=\x20'$version';"
+      : "\$$package\::VERSION\x20=\x20'$version';";
+
+  return
+      $self->use_begin  ? "BEGIN { $perl }"
+    : $self->use_our    ? "{ $perl }"
+                        : $perl;
+}
+
 sub munge_perl {
   my ($self, $file) = @_;
 
@@ -209,6 +233,48 @@ sub munge_perl {
       if $version =~ /\P{ASCII}/;
 
     if ($self->use_package) {
+      if (my ($block) = grep {; $_->isa('PPI::Structure::Block') } $stmt->schildren) {
+        # Okay, we've encountered `package NAME BLOCK` and want to turn it into
+        # `package NAME VERSION BLOCK` but, to quote the PPI documentation,
+        # "we're on our own here".
+        #
+        # This will also preclude us from adding "# TRIAL" because where would
+        # it go?  Look, a block package should (in my opinion) not be the only
+        # or top-level package in a file, so the TRIAL comment can be
+        # elsewhere. -- rjbs, 2021-06-12
+        #
+        # First off, let's make sure we do not already have a version.  If the
+        # "version" has a "{" in it, it's just the block, and we're good.
+        # Otherwise, it's going to be a real version and we need to skip.
+        if ($stmt->version !~ /\{/) {
+          $self->log([
+            "skipping package %s with version %s declared",
+            $stmt->namespace,
+            $stmt->version,
+          ]);
+          next STATEMENT;
+        }
+
+        # Okay, there's a block (which we have in $block) but no version.  So,
+        # we stick a Number in front of the block, then a space between them.
+        $block->insert_before( PPI::Token::Number->new($version) );
+        $block->insert_before( PPI::Token::Whitespace->new(q{ }) );
+        $munged = 1;
+        next STATEMENT;
+      }
+
+      # Now, it's not got a block, but does it already have a version?
+      if (length $stmt->version) {
+        $self->log([
+          "skipping package %s with version %s declared",
+          $stmt->namespace,
+          $stmt->version,
+        ]);
+        next STATEMENT;
+      }
+
+      # Oh, good!  It's just a normal `package NAME` and we are going to add
+      # VERSION to it.  This is stupid, but gets the job done.
       my $perl = sprintf 'package %s %s;', $package, $version;
       $perl .= ' # TRIAL' if $self->zilla->is_trial;
 
@@ -222,14 +288,14 @@ sub munge_perl {
     # the \x20 hack is here so that when we scan *this* document we don't find
     # an assignment to version; it shouldn't be needed, but it's been annoying
     # enough in the past that I'm keeping it here until tests are better
-    my $perl = $self->use_our
-        ? "{ our \$VERSION\x20=\x20'$version'; }"
-        : "\$$package\::VERSION\x20=\x20'$version';";
-
-    $self->use_begin
-      and $perl = "BEGIN { $perl }";
+    my $perl = $self->_version_assignment($package, $version);
     $self->zilla->is_trial
       and $perl .= ' # TRIAL';
+
+    my $clean_version = $version =~ tr/_//dr;
+    if ($version ne $clean_version) {
+      $perl .= "\n" . $self->_version_assignment($package, $clean_version);
+    }
 
     $self->log_debug([
       'adding $VERSION assignment to %s in %s',
@@ -266,20 +332,6 @@ sub munge_perl {
     }
 
     $perl = $blank ? "$perl\n" : "\n$perl";
-
-    my $clean_version = $version =~ tr/_//dr;
-    $perl .= (
-        (
-          $self->use_our
-            ? "\n\$VERSION\x20=\x20'$clean_version';"
-            : "\n\$$package\::VERSION\x20=\x20'$clean_version';"
-        ).
-        (
-          $blank
-            ? "\n"
-            : ""
-        )
-      ) if $version ne $clean_version;
 
     # Why can't I use PPI::Token::Unknown? -- rjbs, 2014-01-11
     my $bogus_token = PPI::Token::Comment->new($perl);
@@ -340,7 +392,7 @@ Dist::Zilla::Plugin::PkgVersion - add a $VERSION to your packages
 
 =head1 VERSION
 
-version 6.017
+version 6.020
 
 =head1 SYNOPSIS
 
@@ -371,6 +423,17 @@ C<package> keyword and the package name, like:
 
 This sort of declaration is also ignored by the CPAN toolchain, and is
 typically used when doing monkey patching or other tricky things.
+
+=head1 PERL VERSION SUPPORT
+
+This module has the same support period as perl itself:  it supports the two
+most recent versions of perl.  (That is, if the most recently released version
+is v5.40, then this module should work on both v5.40 and v5.38.)
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
 
 =head1 ATTRIBUTES
 
@@ -442,11 +505,11 @@ numbers using C<our $VERSION = '...';> and without changing line numbers
 
 =head1 AUTHOR
 
-Ricardo SIGNES 😏 <rjbs@cpan.org>
+Ricardo SIGNES 😏 <rjbs@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Ricardo SIGNES.
+This software is copyright (c) 2021 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

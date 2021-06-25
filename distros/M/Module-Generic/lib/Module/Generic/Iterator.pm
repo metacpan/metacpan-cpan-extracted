@@ -198,6 +198,7 @@ sub _find_pos
     return;
 }
 
+# XXX package Module::Generic::Iterator::Element
 package Module::Generic::Iterator::Element;
 BEGIN
 {

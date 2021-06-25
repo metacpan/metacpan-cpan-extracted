@@ -8,6 +8,7 @@ my %WriteMakefileArgs = (
   ABSTRACT_FROM  => 'lib/App/mojopaste.pm',
   VERSION_FROM   => 'lib/App/mojopaste.pm',
   EXE_FILES      => [qw(script/mojopaste)],
+  OBJECT         => '',
   BUILD_REQUIRES => {}
 ,
   TEST_REQUIRES  => {
@@ -15,7 +16,7 @@ my %WriteMakefileArgs = (
 }
 ,
   PREREQ_PM      => {
-  'Mojolicious' => '8.00',
+  'Mojolicious' => '9.11',
   'Text::CSV' => '1.30'
 }
 ,

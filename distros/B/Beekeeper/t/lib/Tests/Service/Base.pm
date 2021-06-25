@@ -10,7 +10,6 @@ use base 'Test::Class';
 use Beekeeper::Client;
 use Beekeeper::Config;
 use Beekeeper::Service::Supervisor;
-use AnyEvent::Impl::Perl;
 use Time::HiRes 'sleep';
 
 our $DEBUG = 0;

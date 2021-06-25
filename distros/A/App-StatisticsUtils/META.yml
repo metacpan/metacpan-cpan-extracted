@@ -29,7 +29,7 @@ resources:
   bugtracker: https://github.com/perlancar/perl-App-StatisticsUtils/issues
   homepage: https://metacpan.org/release/App-StatisticsUtils
   repository: git://github.com/perlancar/perl-App-StatisticsUtils.git
-version: '0.001'
+version: '0.002'
 x_Dist_Zilla:
   perl:
     version: '5.030000'

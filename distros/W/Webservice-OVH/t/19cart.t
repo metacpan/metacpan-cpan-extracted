@@ -56,14 +56,18 @@ my $nitem;
 eval {$nitem = $cart->add_transfer('test.de');};
 ok( !$nitem, 'no transfer ok' );
 
+#$cart->assign;
 my $offer_dns = $cart->offer_dns('eine-neue-domain-fuer-mich.de'); 
 ok( $offer_dns && ref $offer_dns eq 'ARRAY', 'offers domain ok');
-my $dns_item = $cart->add_dns('eine-neue-domain-fuer-mich.de', plan_code => 'zone', duration => 'P0D', pricing_mode => 'default', quantity => 1 );
+my $dns_item = $cart->add_dns('eine-neue-domain-fuer-mich.de', plan_code => 'zone', duration => 'P1Y', pricing_mode => 'default', quantity => 1 );
 ok($dns_item, 'dns adding to card ok');
+my $config1 = $dns_item->configuration_add('zone', 'eine-neue-domain-fuer-mich.de');
+my $config2 = $dns_item->configuration_add('template', 'minimized');
+ok($config1, "zone config ok");
+ok($config2, "zone template config ok");
 
-# Blarg they destroyed their API again
-#my $checkout = $cart->info_checkout;
-#ok ( $checkout && ref $checkout eq 'HASH', 'info_checkout ok' );
+my $checkout = $cart->info_checkout;
+ok ( $checkout && ref $checkout eq 'HASH', 'info_checkout ok' );
 
 my $items = $cart->items;
 my $example_item = $items->[0];

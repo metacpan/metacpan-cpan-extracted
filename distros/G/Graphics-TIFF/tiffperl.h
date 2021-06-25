@@ -12,12 +12,14 @@
 // Include all of libtiff's headers for internal consistency
 #include <tiffio.h>
 
-// *_t types introduced in C99 and are therefore not available older compilers
-#ifndef _BITS_STDINT_UINTN_H
-#define _BITS_STDINT_UINTN_H 1
+/*
+ * *_t types aren't defined by msvcrt which ming64 (used by Strawberry Perl)
+ * uses instead of glibc
+ */
+#ifdef __MINGW32__
 typedef uint16 uint16_t;
 typedef uint32 uint32_t;
 typedef uint64 uint64_t;
-#endif  // _BITS_STDINT_UINTN_H
+#endif
 
 #endif  // TIFFPERL_H_

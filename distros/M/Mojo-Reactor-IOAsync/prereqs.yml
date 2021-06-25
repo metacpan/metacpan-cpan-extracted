@@ -1,0 +1,11 @@
+runtime:
+  requires:
+    perl:         '5.010001'
+    Carp:         0
+    IO::Async:    '0.65'
+    Mojolicious:  '7.37'
+    Scalar::Util: 0
+test:
+  requires:
+    IO::Socket::INET: 0
+    Test::More: '0.88'

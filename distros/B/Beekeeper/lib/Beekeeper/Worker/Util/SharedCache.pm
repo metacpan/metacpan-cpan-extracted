@@ -3,7 +3,7 @@ package Beekeeper::Worker::Util::SharedCache;
 use strict;
 use warnings;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 use Beekeeper::Worker ':log';
 use AnyEvent;
@@ -129,9 +129,9 @@ sub _setup_sync_listeners {
     $bus->subscribe(
         topic      => "msg/$local_bus/_sync/$cache_id/set",
         on_publish => sub {
-            my ($body_ref, $msg_headers) = @_;
+            my ($payload_ref, $mqtt_properties) = @_;
 
-            my $entry = decode_json($$body_ref);
+            my $entry = decode_json($$payload_ref);
 
             $self->_merge($entry);
         }
@@ -140,9 +140,9 @@ sub _setup_sync_listeners {
     $bus->subscribe(
         topic      => "priv/reply-$uid",
         on_publish => sub {
-            my ($body_ref, $msg_headers) = @_;
+            my ($payload_ref, $mqtt_properties) = @_;
 
-            my $dump = decode_json($$body_ref);
+            my $dump = decode_json($$payload_ref);
 
             $self->_merge_dump($dump);
 
@@ -224,12 +224,12 @@ sub _accept_sync_requests {
     $bus->subscribe(
         topic      => "\$share/BKPR/req/$local_bus/_sync/$cache_id/dump",
         on_publish => sub {
-            my ($body_ref, $msg_headers) = @_;
+            my ($payload_ref, $mqtt_properties) = @_;
 
             my $dump = encode_json( $self->dump );
 
             $bus->publish(
-                topic   => $msg_headers->{'response_topic'},
+                topic   => $mqtt_properties->{'response_topic'},
                 payload => \$dump,
             );
         }
@@ -525,7 +525,7 @@ Beekeeper::Worker::Util::SharedCache - Locally mirrored shared cache
 
 =head1 VERSION
 
-Version 0.05
+Version 0.06
 
 =head1 SYNOPSIS
 
@@ -558,7 +558,7 @@ Even if you are using this cache for small data sets that do not change very
 often, please consider if a distributed memory cache (or even a plain DB) is 
 a better alternative.
 
-Due to propagation costs, B<this cache does not scale>.
+Due to propagation costs, this cache does not scale very well.
 
 =head1 AUTHOR
 

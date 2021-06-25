@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.731';
+our $VERSION = '1.733';
 
 
 use Encode qw( decode );
@@ -16,8 +16,31 @@ use Win32::Console qw( STD_INPUT_HANDLE ENABLE_PROCESSED_INPUT ENABLE_LINE_INPUT
                        FOREGROUND_INTENSITY BACKGROUND_INTENSITY );
 
 use Win32::Console::PatchForRT33513 qw();
-use Term::Choose::Constants         qw( :win32 :keys );
+use Term::Choose::Constants         qw( :all );
 use Term::Choose::Screen            qw( hide_cursor show_cursor normal );
+
+
+use constant {
+    MOUSE_WHEELED                => 0x0004,
+    LEFTMOST_BUTTON_PRESSED      => 0x0001,
+    RIGHTMOST_BUTTON_PRESSED     => 0x0002,
+    FROM_LEFT_2ND_BUTTON_PRESSED => 0x0004,
+
+    VK_CODE_PAGE_UP   => 33,
+    VK_CODE_PAGE_DOWN => 34,
+    VK_CODE_END       => 35,
+    VK_CODE_HOME      => 36,
+    VK_CODE_LEFT      => 37,
+    VK_CODE_UP        => 38,
+    VK_CODE_RIGHT     => 39,
+    VK_CODE_DOWN      => 40,
+    VK_CODE_INSERT    => 45,
+    VK_CODE_DELETE    => 46,
+    VK_CODE_F1        => 112,
+    VK_CODE_F2        => 113,
+    VK_CODE_F3        => 114,
+    VK_CODE_F4        => 115,
+};
 
 
 sub SHIFTED_MASK () {

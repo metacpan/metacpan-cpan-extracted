@@ -5,7 +5,7 @@ use warnings;
 
 use Carp qw/confess/;
 
-our $VERSION = '0.000065';
+our $VERSION = '0.000068';
 
 BEGIN {
     confess "You must first load a Test2::Harness::UI::Schema::NAME module"
@@ -38,13 +38,6 @@ __PACKAGE__->inflate_column(
     },
 );
 
-__PACKAGE__->inflate_column(
-    coverage => {
-        inflate => DBIx::Class::InflateColumn::Serializer::JSON->get_unfreezer('fields', {}),
-        deflate => DBIx::Class::InflateColumn::Serializer::JSON->get_freezer('fields', {}),
-    },
-);
-
 my %COMPLETE_STATUS = (complete => 1, failed => 1, canceled => 1, broken => 1);
 sub complete { return $COMPLETE_STATUS{$_[0]->status} // 0 }
 
@@ -67,8 +60,6 @@ sub TO_JSON {
     # Inflate
     $cols{parameters} = $self->parameters;
     $cols{fields}     = $self->fields;
-
-    $cols{coverage} = $cols{coverage} ? 1 : 0;
 
     $cols{user} = $self->user->username;
     $cols{project} = $self->project->name;

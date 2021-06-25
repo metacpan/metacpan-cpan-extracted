@@ -1,43 +1,38 @@
 {
    "abstract" : "Catmandu modules for working with PICA+ data",
    "author" : [
-      "- Johann Rolschewski and Jakob Voss"
+      "Johann Rolschewski <rolschewski@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.7",
+   "generated_by" : "Dist::Milla version v1.0.20, Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150001",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Catmandu-PICA",
    "no_index" : {
       "directory" : [
-         "t",
-         "xt",
-         "inc",
-         "share",
          "eg",
          "examples",
-         "author",
-         "builder"
+         "inc",
+         "share",
+         "t",
+         "xt"
       ]
    },
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "Module::Build::Tiny" : "0.035"
+            "Module::Build::Tiny" : "0.034"
          }
       },
       "develop" : {
          "requires" : {
-            "Test::CPAN::Meta" : "0",
-            "Test::MinimumVersion::Fast" : "0.04",
-            "Test::PAUSE::Permissions" : "0.07",
-            "Test::Pod" : "1.41",
-            "Test::Spellunker" : "v0.2.7"
+            "Dist::Milla" : "v1.0.20",
+            "Test::Pod" : "1.41"
          }
       },
       "runtime" : {
@@ -45,8 +40,8 @@
             "Catmandu" : "1.20",
             "Catmandu::SRU" : "0.427",
             "Moo" : "1.0",
-            "PICA::Data" : "1.20",
-            "perl" : "v5.12.0"
+            "PICA::Data" : "1.27",
+            "perl" : "v5.14.1"
          }
       },
       "test" : {
@@ -59,52 +54,6 @@
          }
       }
    },
-   "provides" : {
-      "Catmandu::Exporter::PICA" : {
-         "file" : "lib/Catmandu/Exporter/PICA.pm",
-         "version" : "1.04"
-      },
-      "Catmandu::Fix::Bind::pica_each" : {
-         "file" : "lib/Catmandu/Fix/Bind/pica_each.pm",
-         "version" : "1.04"
-      },
-      "Catmandu::Fix::Condition::pica_match" : {
-         "file" : "lib/Catmandu/Fix/Condition/pica_match.pm",
-         "version" : "1.04"
-      },
-      "Catmandu::Fix::pica_add" : {
-         "file" : "lib/Catmandu/Fix/pica_add.pm",
-         "version" : "1.04"
-      },
-      "Catmandu::Fix::pica_map" : {
-         "file" : "lib/Catmandu/Fix/pica_map.pm",
-         "version" : "1.04"
-      },
-      "Catmandu::Fix::pica_set" : {
-         "file" : "lib/Catmandu/Fix/pica_set.pm",
-         "version" : "1.04"
-      },
-      "Catmandu::Importer::PICA" : {
-         "file" : "lib/Catmandu/Importer/PICA.pm",
-         "version" : "1.04"
-      },
-      "Catmandu::Importer::SRU::Parser::picaxml" : {
-         "file" : "lib/Catmandu/Importer/SRU/Parser/picaxml.pm",
-         "version" : "1.04"
-      },
-      "Catmandu::Importer::SRU::Parser::ppxml" : {
-         "file" : "lib/Catmandu/Importer/SRU/Parser/ppxml.pm",
-         "version" : "1.04"
-      },
-      "Catmandu::PICA" : {
-         "file" : "lib/Catmandu/PICA.pm",
-         "version" : "1.04"
-      },
-      "Catmandu::Validator::PICA" : {
-         "file" : "lib/Catmandu/Validator/PICA.pm",
-         "version" : "1.04"
-      }
-   },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
@@ -112,18 +61,22 @@
       },
       "homepage" : "https://github.com/gbv/Catmandu-PICA",
       "repository" : {
-         "url" : "git://github.com/gbv/Catmandu-PICA.git",
+         "type" : "git",
+         "url" : "https://github.com/gbv/Catmandu-PICA.git",
          "web" : "https://github.com/gbv/Catmandu-PICA"
       }
    },
-   "version" : "1.04",
+   "version" : "1.05",
    "x_contributors" : [
       "Carsten Klee <klee@cpan.org>",
       "E. Choroba <choroba@matfyz.cz>",
-      "Jakob Voß <jakob.voss@gbv.de>",
+      "Jakob Vo\u00df <jakob.voss@gbv.de>",
       "Johann Rolschewski <johann@rolschewski.de>",
       "Johann Rolschewski <jorol@cpan.org>",
       "julianladisch <julianladisch@users.noreply.github.com>"
    ],
+   "x_generated_by_perl" : "v5.18.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0213",
    "x_static_install" : 1
 }
+

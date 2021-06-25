@@ -5,7 +5,7 @@ $ENV{MOJO_REACTOR} ||= 'Mojo::Reactor::UV';
 
 use Carp 'croak';
 use Mojo::Util qw(md5_sum steady_time);
-use Scalar::Util 'weaken';
+use Scalar::Util qw(blessed weaken);
 use UV;
 use UV::Poll;
 use UV::Timer;
@@ -13,7 +13,7 @@ use UV::Loop;
 
 use constant DEBUG => $ENV{MOJO_REACTOR_UV_DEBUG} || 0;
 
-our $VERSION = '1.002';
+our $VERSION = '1.901';
 
 my $UV;
 
@@ -39,9 +39,9 @@ sub again {
 		$after *= 1000; # Intervals in milliseconds
 		# Timer will not repeat with (integer) interval of 0
 		$after = 1 if $after < 1;
-		$self->_error($w->repeat($after));
+		eval { $w->repeat($after); 1 } or $self->_error($@);
 	}
-	$self->_error($w->again);
+	eval { $w->again; 1 } or $self->_error($@);
 }
 
 sub io {
@@ -85,7 +85,8 @@ sub remove {
 
 sub reset {
 	my $self = shift;
-	$self->{loop}->walk(sub { $_[0]->close });
+	$_->close for map { $_->{watcher} ? ($_->{watcher}) : () }
+		values %{$self->{io}}, values %{$self->{timers}};
 	$self->SUPER::reset;
 }
 
@@ -104,7 +105,7 @@ sub watch {
 	my $w;
 	unless ($w = $io->{watcher}) { $w = $io->{watcher} = UV::Poll->new(loop => $self->{loop}, fd => $fd); }
 	
-	if ($mode == 0) { $self->_error($w->stop); }
+	if ($mode == 0) { eval { $w->stop; 1 } or $self->_error($@); }
 	else {
 		weaken $self;
 		my $cb = sub {
@@ -115,16 +116,20 @@ sub watch {
 			$self->_try('I/O watcher', $self->{io}{$fd}{cb}, 1)
 				if UV::Poll::UV_WRITABLE & $events && $self->{io}{$fd};
 		};
-		$self->_error($w->start($mode, $cb));
+		eval { $w->start($mode, $cb); 1 } or $self->_error($@);
 	}
 	
 	return $self;
 }
 
 sub _error {
-	my ($self, $code) = @_;
-	$self->emit(error => sprintf "UV error: %s", UV::strerror($code)) if $code < 0;
-	return $code;
+	my ($self, $err) = @_;
+	if (blessed $err and $err->isa('UV::Exception')) {
+		$self->emit(error => sprintf 'UV error: %s', $err->message);
+	} elsif (!ref $err and $err < 0) {
+		$self->emit(error => sprintf 'UV error: %s', UV::strerror($err));
+	}
+	return $err;
 }
 
 sub _id {
@@ -148,7 +153,7 @@ sub _timer {
 		$self->_try('Timer', $cb);
 	};
 	my $w = $self->{timers}{$id}{watcher} = UV::Timer->new(loop => $self->{loop});
-	$self->_error($w->start($after, $recur_after, $wrapper));
+	eval { $w->start($after, $recur_after, $wrapper); 1 } or $self->_error($@);
 	
 	if (DEBUG) {
 		my $is_recurring = $recurring ? ' (recurring)' : '';

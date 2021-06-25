@@ -7,7 +7,7 @@ use List::Util 1.45 qw( uniqstr );
 use Carp qw( croak );
 
 # ABSTRACT: FFI Type Parser
-our $VERSION = '1.43'; # VERSION
+our $VERSION = '1.46'; # VERSION
 
 
 # The TypeParser and Type classes are used internally ONLY and
@@ -120,7 +120,7 @@ FFI::Platypus::TypeParser - FFI Type Parser
 
 =head1 VERSION
 
-version 1.43
+version 1.46
 
 =head1 DESCRIPTION
 
@@ -166,6 +166,8 @@ Diab Jerius (DJERIUS)
 Eric Brine (IKEGAMI)
 
 szTheory
+
+José Joaquín Atria (JJATRIA)
 
 =head1 COPYRIGHT AND LICENSE
 

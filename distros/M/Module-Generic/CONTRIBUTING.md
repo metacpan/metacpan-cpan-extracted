@@ -11,7 +11,7 @@ All contributions are assumed to be provided under the terms of [perl5 license](
 
 ### Issues
 
-File [an issue on CPAN bug tracker](https://rt.cpan.org/Public/Dist/Display.html?Name=Module-Generic) if you think you've found a bug. Please describe
+File [an issue on CPAN bug tracker](https://git.deguest.jp/jack/Module-Generic/issues) if you think you've found a bug. Please describe
 
 1. How can it be reproduced
 
@@ -39,11 +39,11 @@ You can reach me via e-mail <jdeguest@cpan.org>, or via [Telegram](https://t.me/
 
 ## Issue Tracking
 
-Issues are currently reported using CPAN [bug tracker](https://rt.cpan.org/Public/Dist/Display.html?Name=Module-Generic)
+Issues are currently reported using CPAN [bug tracker](https://git.deguest.jp/jack/Module-Generic/issues)
 
 ## More information
 
-Please refer to the [README](https://metacpan.org/source/JDEGUEST/Module-Generic-v0.14.0/README.md)
+Please refer to the [README](https://metacpan.org/source/JDEGUEST/Module-Generic-v0.15.0/README.md)
 
 ## Author
 

@@ -1,0 +1,48 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '6.78'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'Encode' => '0',
+                                      'Test::More' => '0',
+                                      'Test::Pod' => '1.41'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'CPAN::Checksums' => '0',
+                                      'Compress::Zlib' => '0',
+                                      'Cwd' => '0',
+                                      'Data::Section' => '0',
+                                      'File::Find' => '0',
+                                      'File::Next' => '0',
+                                      'File::Path' => '0',
+                                      'File::Spec' => '0',
+                                      'Getopt::Long::Descriptive' => '0',
+                                      'IO::Compress::Gzip' => '0',
+                                      'Module::Faker::Dist' => '0.015',
+                                      'Moose' => '0',
+                                      'Sort::Versions' => '0',
+                                      'Text::Template' => '0',
+                                      'perl' => 'v5.14.0',
+                                      'strict' => '0',
+                                      'warnings' => '0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'File::Temp' => '0',
+                                   'Test::More' => '0.96'
+                                 }
+                 }
+     };
+  $x;
+ }

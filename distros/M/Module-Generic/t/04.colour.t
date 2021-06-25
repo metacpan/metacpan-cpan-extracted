@@ -66,3 +66,4 @@ is(
     'Unknown style parameter -> no change',
 );
 
+done_testing();

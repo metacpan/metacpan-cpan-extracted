@@ -45,6 +45,30 @@ sub token {
     $data;
 }
 
+# https://www.dropbox.com/developers/documentation/http/documentation#oauth2-token
+# This uses the token method with a refresh token to get an updated access token.
+sub refresh_access_token {
+    my ($self, $refresh_token) = @_;
+
+    my $data = $self->api({
+        url => 'https://api.dropboxapi.com/oauth2/token',
+        params => {
+            client_id     => $self->key,
+            client_secret => $self->secret,
+            grant_type    => 'refresh_token',
+            refresh_token => $refresh_token,
+        },
+    });
+
+    # at this point the access token should be in $data
+    # so set it like WebService::Dropbox::Auth::token does
+    if ($data && $data->{access_token}) {
+        $self->access_token($data->{access_token});
+    }
+
+    $data;
+}
+
 # https://www.dropbox.com/developers/documentation/http/documentation#auth-token-revoke
 sub revoke {
     my ($self) = @_;

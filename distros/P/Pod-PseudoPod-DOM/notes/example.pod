@@ -1,0 +1,194 @@
+=head0 Designing a Liftoff
+
+Z<chap:designing_liftoff>
+
+=begin epigraph
+
+X<Himnam, Rachel>
+“Users, not designers, create and communicate meaning.”
+
+---Rachel Himnam, Nokia Research Center
+
+=end epigraph
+
+X<Liftoff; design>
+X<Design, see Liftoff design>
+As every project is unique, every liftoff is unique. As members of a planning group, we specifically design a liftoff for the unique combination of project attributes at hand, including the nature of the product, the nature of the project work, the people, the knowns and unknowns, the work environment, and the circumstances driving delivery.
+
+Here’s where it gets tricky—and where you’ll get agile when you’re working on your own liftoff design. There is no cookie cutter approach, standard recipe, or best practice template. Your unique project characteristics will drive many of the design decisions. In this chapter, we will describe what we know as effective practices, based on our experiences and reports from our colleagues of what has worked for many project teams.
+
+=head1 *Design Considerations
+
+When designing a liftoff, you’ll first spend time in the planning group thinking about what you want to accomplish. Your conclusions will help in selecting a format, developing the flow, deciding how to start and end, and making other design choices.
+
+=head2 *Working within a Format
+
+X<Liftoff; format>
+X<Bootcamp>
+X<Kickoff workshop>
+X<Launch>
+While we use the term liftoff, different organizations prefer other names for this activity, such as kickoff, boot camp, project launch, etc.
+
+Your liftoff format depends on the combination of project attributes facing your planning group, particularly the number of teams and size of the project community. Commonly used liftoff formats include:
+
+=over 4
+
+=item * A single meeting lasting from a half-day to two days. For an example, see Frowin Fajtak’s story at the end of L<chap:lifting_off>.
+
+=item * A series of events spread over a week or more, usually including training or coaching sessions, as well as initial project information and chartering. For an example, see Adam Light and David Worth’s story at the end of L<chap:chartering_context>.
+
+=item * A meeting focused solely on building a draft charter, which may occur in a single day-long session or be broken into several parts over a few days. For more about chartering, see Part II.
+
+=back
+
+=begin tip Design Principle
+
+X<Liftoff design principle, see Design principle>
+X<Design principle>
+B<The best liftoffs create a sense of ownership of the outcomes>. We believe a liftoff design where all participants engage as owners in the process helps sustain commitment to outcomes throughout the project.
+
+=end tip
+
+=head2 *Developing the Agenda
+
+X<Liftoff; Agenda>
+Your agenda should include a good mix of information topics, activities, and social events. You’ll want to create a smooth sequence of events, with each agenda item (presentation, conversation, activity, or training session) leading into and building on the information and understandings emerging from the previous one. Understanding the relationship between liftoff agenda items helps ensure that the agenda sequence works to establish tone, create good information flow, and prepare everyone to begin work.
+
+Based on the planning group’s intention for the liftoff and the answers to the planning questions (see L<chap:planning_liftoff>), you’ll want to select the elements that will establish a rich atmosphere for effective communication, including content topics and activities to start and conclude the liftoff, chartering, training, team building, project planning, and social events.
+
+=head2 *Activities for Starting Your Liftoff
+
+X<Liftoff; activities for starting>
+Begin your liftoff with an introduction that includes welcoming participants, reiterating the reason everyone is present, reviewing the meeting agenda, providing a project overview, and statements of support from executives and sponsors.
+
+=begin tip Design Principle
+
+X<Design Principle>
+B<Only include activities in the liftoff that have a real work purpose.> We believe liftoff participants engage best when they focus on activities specifically related to achieving the liftoff intention and outcomes.
+
+=end tip
+
+Set the stage for the agenda to follow by establishing the tone with activities that reinforce your intention right from the start. Maintain a consistent tone throughout. For a mission-critical, stay-in-business-or-bust project, you may want a serious, no-nonsense approach. For a project that relies on innovation or producing disruptive technologies, you may want a more playful, creative tone to get people thinking in new ways. The way you frame the invitation, introduce the various topics and activities, and the activities you choose, all affect the tone.
+
+=head3 *Introductions
+
+X<Activity; introductions>
+Ensure that the people attending your liftoff have the chance to get acquainted if they don’t already know each other. If everyone is well acquainted, you won’t need introductions. For groups in which people don’t know each other, at minimum have people in table groups exchange names and job titles. For more in-depth introductions, find an introduction or icebreaker activity that fits the tone you want to set.
+
+=begin tip Design Principle
+
+X<Design Principle>
+B<Every liftoff needs a sponsor or executive introduction.> We believe every team and project community needs to hear directly and unambiguously from the top that they have organizational support and commitment for their effort.
+
+=end tip
+
+=head3 *Sponsor statement of support
+
+X<Activity; sponsor support>
+Ask your executive and business sponsors to say a few words describing their views of the project, why it’s urgent and important to the business and its internal functioning or customers, and their appreciation for those who will do the work.
+
+=head3 *One word check-in
+
+X<Activity; check-in>
+Ask each person to say a word or short phrase that summarizes their state of mind or attitude at the beginning of the liftoff—for example, “Concerned,” “Excited,” “Still tired from the last project,” “Waiting to hear more,” or “Enthusiastic!”
+
+=head3 *Speaker Q&A
+
+X<Activity; guest speaker>
+Bring in a domain expert or customer expert to give a short briefing on how the project fits within the business direction or customer use. Plan to follow it with a few minutes of clarifying questions and answers.
+
+=head3 *Graphic check-in
+
+X<Activity; check-in>
+In preparation cover each table with white or light-colored paper (non-sticky flip chart pages will work) and provide a set of colored markers or pencils, crayons, stickers, and other drawing supplies for each table group. As people enter the liftoff space and sit at tables, ask them to use the supplies to create a visual representation of their current understanding about the project, even if their understanding is based rumors, hearsay, or assumptions from past projects. Allow a short time for table groups to work together, then after other introductory activities, ask each group to show their drawing to the whole and explain it. I<Variations:> consider using modeling clay, pipe cleaners, building toys, or other supplies to create three-dimensional models.
+
+=head3 *Retrospective
+
+=begin sidebar
+
+=head2 *What’s a Retrospective?
+
+X<Retrospectives>
+X<Derby, Esther>
+X<Larsen, Diana>
+A retrospective is a group process in which participants review their past through the lens of their present understanding in order to influence their future. Agile teams rely on the practice of retrospectives as a primary continuous improvement technique. Retrospective leaders guide a team through a series of group processes or activities to gather data about the past, generate insights to make meaning of the data, and make decisions about the team’s actions going forward. (For more on leading retrospectives with Agile teams, see I<Agile Retrospectives: Making Good Teams Great> by Diana Larsen and Esther Derby.)
+
+=end sidebar
+
+X<Activity; retrospective>
+
+=head2 *Activities for the Heart of Your Liftoff
+
+X<Activity; agile chartering>
+X<Chartering, see Agile chartering>
+
+=begin tip Design Principle
+
+X<Design Principle>
+X<Agile chartering>
+B<Every work group and project team needs Agile chartering.> We believe every team benefits by including Agile chartering as part of the liftoff. It accelerates common understandings that every project wrestles with sooner or later. Including chartering in the liftoff precludes time wasted later on.
+
+=end tip
+
+=head3 *Training
+
+X<Bootcamp>
+X<Team; training>
+While training is more typical in a boot camp-style liftoff stretching over days or weeks, the decision about whether to include training in a liftoff depends on what the team needs. When people come together at the beginning of a project, you have a great opportunity to help them develop project-related skills in a setting where they can learn together, discuss, and apply what they learned with teammates and the broader project community. It builds shared focus as well as shared practices.
+
+Different groups within the project may need different types of training. As part of planning, solicit suggestions for training topics from managers, scrummasters, Agile coaches, team members, people who have worked on similar or related projects—in short, from anyone who can offer relevant recommendations.
+
+For teams and project communities unfamiliar with Agile methods (during an Agile adoption, for example) you may include an “Agile 101” or “Agile Foundations” training to introduce everyone to the practices and language of Agile.
+
+=begin tip Design Principle
+
+X<Design Principle>
+B<Take the time to include participants in design decisions.> We believe you’ll get a better liftoff outcome if you solicit and include intended participants’ opinions about training topics, planning needs, and other uses of their time.
+
+=end tip
+
+For any project, you might want to focus training on single practices that you want to include or improve, like writing, sizing, and estimating user stories, or test-driven development. You may also have training sessions on new development languages, new technologies, or tools.
+
+If you plan to include training as part of the liftoff, include the trainers in your planning. Remember, arrangements for training will affect logistical considerations, such as facilities requirements, the length of the liftoff, and scheduling activities and content sections.
+
+=head3 *Project Planning
+
+X<Activity; project planning>
+Sometimes project managers choose to include real-time planning as an element of their liftoff. Other times, team assignments, backlog development, release planning, or first iteration planning may be a step just before or right after the liftoff.
+
+The liftoff offers an occasion when all the project stakeholders are together, and it’s tempting to take advantage of that. On the one hand, including project planning as an element of the liftoff makes the whole event longer. On the other hand, holding planning sessions while the purpose is fresh in everyone’s mind can have a positive impact on generating valuable I<minimum marketable features> (or I<MMFs>) and stories for the backlog, as well as on initial planning for the timing of production releases.
+
+X<Liftoff; multiple teams>
+If your liftoff involves multiple teams, you might set aside time for each team to meet separately for their planning, then follow up with time when teams can exchange planning details about their piece of the bigger picture. Everyone can look at the parts and the whole critically to see how they all fit together, or if they need adjustment.  
+
+=head3 *Team Building
+
+X<Team building>
+Holding a liftoff in itself accomplishes a degree of team development. Other conditions surrounding the team dictate the balance you want to strike between team building activities and task-focused liftoff topics. Review the answers you gathered in response to the planning questions to decide the right amount (and what kinds) of team building to include. (For more information, see Nicole Belilos's story about team building in a liftoff at the end of L<chap:chartering_alignment>.)
+
+Team building activities may range from simple getting-acquainted exercises to elaborate ropes course simulations to strengthen trust. You can find many books, websites, and other resources devoted to team building activities. Everyone has his or her favorites. Ask your colleagues about what’s worked well for them.
+
+Before choosing team building activities, calibrate to the group. Think carefully about the liftoff participants, their cultures, their needs, and what they’ll tolerate. In team building, you want the participants to stretch themselves, but you don’t want them to stretch past the breaking point.
+
+Many teams have told us that their Agile chartering discussions acted as a powerful team building experience. A scrummaster at a large public utility said, “When we came to the chartering session, we were just a group of individuals with different skills. After chartering, we’re a team!”
+
+=head3 *Social Events
+
+X<Activity; "Do Food">
+Socializing provides a welcome counterpoint to the intense work of liftoff. Offering lunches, dinners, or non-work-related group activities gives participants time to reflect on the topics and content and return fresher to the work. It also offers an additional way to accomplish team building, as people get to know each other better through social engagement. In I<Fearless Change>, Mary Lynn Manns and Linda Rising describe an influencing pattern they call, “Do Food.” They recommend, “Make an ordinary gathering a special event by including food.”
+
+=head2 *Activities For Ending Your Liftoff
+
+With much of the liftoff buzzing in the heads of the participants, you may offer a call to action. L<app:bibliography> lists several books and resources with useful activities; here are the most popular.
+
+=begin figure A Handful of Principles for Designing Liftoffs
+
+Z<principles_for_designing_liftoffs>
+
+F<images/principles_for_designing_liftoffs.jpg>
+
+=end figure
+
+=head3 *Brief reports
+
+X<Activity; brief reports>

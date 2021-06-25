@@ -1,0 +1,67 @@
+Astro::FITS::CFITSIO::FileName
+
+CFITSIO packs a lot of functionality into a filename; it can include row
+and column filtering, binning and histogramming, image slicing, etc. It
+can be handy to manipulate the various parts that make up a fully
+specified CFITSIO filename.
+
+Astro::FITS::CFITSIO::FileName slices and dices a CFITSIO extended
+filename into its constituent pieces. Or, given the constituent pieces,
+it can craft an extended CFITSIO filename.
+
+Documentation for the CFITSIO extended filename syntax is available in
+Chapter 10 of
+
+  https://heasarc.gsfc.nasa.gov/docs/software/fitsio/c/c_user/cfitsio.html
+
+  Warning!
+
+This module does not actually parse row filters, so it's possible that
+it'll confuse an illegal component as one. For example, in this example,
+"foo.fits[1:512]", the illegal, partial image specification "[1:512]"
+will be identified as a row filter. Oops.
+
+  So many object attributes!
+
+There are many attributes that an object might have; most are optional.
+Each optional attribute has a corresponding predicate method ("has_XXX")
+which will return true if the attribute was set. For example, the
+"pix_filter" attribute is optional; to check if it was set, use the
+"has_pix_filter" method.
+
+  Manipulating a filename
+
+Astro::FITS::CFITSIO::FileName objects are meant to be immutable, so
+manipulating attributes has to be done outside of the object.
+
+One way is to call the "parse_filename" class method on the original
+filename. It returns a hash of attributes. Another is to call the
+"to_hash" object method, which returns a hash of attributes for a
+particular object. Both of these hashes may be fed into the class
+constructor.
+
+INSTALLATION
+
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
+
+  perl Build.PL
+  ./Build
+  ./Build test
+  ./Build install
+
+COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2021 by Smithsonian Astrophysical
+Observatory.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007

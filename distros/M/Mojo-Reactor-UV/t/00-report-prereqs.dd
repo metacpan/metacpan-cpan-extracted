@@ -16,7 +16,7 @@ do { my $x = {
                                       'Carp' => '0',
                                       'Mojolicious' => '7.37',
                                       'Scalar::Util' => '0',
-                                      'UV' => '1.000008',
+                                      'UV' => '1.909',
                                       'perl' => '5.010001'
                                     }
                     },
@@ -29,7 +29,8 @@ do { my $x = {
                                    'IO::Socket::INET' => '0',
                                    'Module::Metadata' => '0',
                                    'Scalar::Util' => '0',
-                                   'Test::More' => '0.88'
+                                   'Test::More' => '0.88',
+                                   'Test::Needs' => '0'
                                  }
                  }
      };

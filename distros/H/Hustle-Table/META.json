@@ -1,0 +1,56 @@
+{
+   "abstract" : "Fast dynamic dispatching to subroutines",
+   "author" : [
+      "Ruben Westerberg <drclaw@mac.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Hustle-Table",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "common::sense" : "0",
+            "enum" : "0",
+            "perl" : "5.024000"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/drclaw1394/perl5-hustle-table.git",
+         "web" : "http://github.com/drclaw1394/perl5-hustle-table"
+      }
+   },
+   "version" : "v0.2.1",
+   "x_serialization_backend" : "JSON::PP version 4.04"
+}

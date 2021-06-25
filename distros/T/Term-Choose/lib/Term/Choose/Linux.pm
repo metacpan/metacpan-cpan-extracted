@@ -4,10 +4,18 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.731';
+our $VERSION = '1.733';
 
-use Term::Choose::Constants qw( :linux :keys TERM_READKEY );
+use Term::Choose::Constants qw( :all );
 use Term::Choose::Screen    qw( hide_cursor show_cursor normal );
+
+
+use constant {
+    SET_ANY_EVENT_MOUSE_1003      => "\e[?1003h",
+    SET_SGR_EXT_MODE_MOUSE_1006   => "\e[?1006h",
+    UNSET_ANY_EVENT_MOUSE_1003    => "\e[?1003l",
+    UNSET_SGR_EXT_MODE_MOUSE_1006 => "\e[?1006l",
+};
 
 
 my $Stty = '';

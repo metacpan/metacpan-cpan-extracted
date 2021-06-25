@@ -88,6 +88,12 @@ METHODS
 
       Dequeue a specific job.
 
+    min_priority
+
+        min_priority => 3
+
+      Do not dequeue jobs with a lower priority.
+
     queues
 
         queues => ['important']

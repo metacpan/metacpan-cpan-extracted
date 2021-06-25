@@ -25,3 +25,4 @@ images/info_icons/info.png
 images/info_icons/warning.png
 lib/W3C/LinkChecker.pm  Dummy *.pm for CPAN indexing purposes
 t/00compile.t
+META.json                                Module JSON meta-data (added by MakeMaker)

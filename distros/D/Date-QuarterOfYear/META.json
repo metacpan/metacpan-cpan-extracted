@@ -4,7 +4,7 @@
       "Neil Bowers <neil@bowers.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -32,12 +32,16 @@
       },
       "test" : {
          "requires" : {
+            "Test::Fatal" : "0",
             "Test::More" : "0.88"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/neilb/Date-QuarterOfYear/issues"
+      },
       "homepage" : "https://github.com/neilb/Date-QuarterOfYear",
       "repository" : {
          "type" : "git",
@@ -45,6 +49,9 @@
          "web" : "https://github.com/neilb/Date-QuarterOfYear"
       }
    },
-   "version" : "0.03"
+   "version" : "0.05",
+   "x_generated_by_perl" : "v5.28.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.24",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

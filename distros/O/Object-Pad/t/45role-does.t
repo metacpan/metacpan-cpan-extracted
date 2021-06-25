@@ -10,7 +10,7 @@ use Object::Pad;
 role ARole {
 }
 
-class AClass implements ARole {
+class AClass does ARole {
 }
 
 {
@@ -23,7 +23,7 @@ class AClass implements ARole {
 role BRole {
 }
 
-class BClass implements ARole, BRole {
+class BClass does ARole, BRole {
 }
 
 {
@@ -35,7 +35,7 @@ class BClass implements ARole, BRole {
 role CRole {
 }
 
-class CClass implements CRole {
+class CClass does CRole {
 }
 
 {
@@ -45,10 +45,10 @@ class CClass implements CRole {
   ok( !$obj->DOES( "BRole" ), 'CClass::DOES NOT BRole' );
 }
 
-class ABase implements ARole {
+class ABase does ARole {
 }
 
-class ADerived extends ABase {
+class ADerived isa ABase {
 }
 
 {
@@ -62,7 +62,7 @@ package FBaseOne {
    sub new { return bless {}, shift; }
 }
 
-class FClassOne extends FBaseOne implements CRole {
+class FClassOne isa FBaseOne does CRole {
 }
 
 {
@@ -80,7 +80,7 @@ package FBaseTwo {
    }
 }
 
-class FClassTwo extends FBaseTwo implements ARole {
+class FClassTwo isa FBaseTwo does ARole {
 }
 
 {

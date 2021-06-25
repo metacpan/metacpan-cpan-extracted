@@ -3,7 +3,7 @@ use v5.14 ; use warnings ; # Already confirmed that 5.001, v5.8.3, 5.011, 5.018 
 use Time::HiRes qw [ gettimeofday tv_interval ] ;
 my ${ dt_start } = [ gettimeofday ] ; 
 use List::Util qw[ sum sum0 ] ; 
-use Getopt::Std ; getopts ':0:12:aefi:kl:nrx:y:=%@:' , \my %o  ; 
+use Getopt::Std ; getopts ':~0:12:aefi:kl:nx:y:=%@:' , \my %o  ; 
 use Term::ANSIColor qw[ color :constants ] ; $Term::ANSIColor::AUTORESET = 1 ;
 use FindBin qw[ $Script ] ; 
 use autodie qw [ open ] ;
@@ -102,7 +102,7 @@ sub output ( ) {
     @k = sort { $a <=> $b } @k if $o{n} ; # -n オプションによりキー文字列であらかじめ、ソートする 
     @k = sort { $a cmp $b } @k if $o{k} ; # -k オプションによりキー文字列であらかじめ、ソートする 
     @k = sort @k unless grep $o{$_}, qw [ f n k] ; # 何も指定がなければ、普通にソート。
-    @k = reverse @k if $o{r} ;   # r オプションで逆順ソート
+    @k = reverse @k if $o{'~'} ;   # r オプションで逆順ソート
     return @k ;
   } ;
 
@@ -195,10 +195,10 @@ sub HELP_MESSAGE {
 
  [出力のオプション]
 
-  -f : 出現数で整列する  -fr なら逆順にする
-  -k : キー文字列で整列する  -kr なら逆順にする
-  -n : キー文字列を数と見なして整列する  -nr なら逆順にする
-  -r : 上記を逆順にする。
+  -f : 出現数で整列する  
+  -k : キー文字列で整列する 
+  -n : キー文字列を数と見なして整列する 
+  -~ : 上記を逆順にする。
   -y 数値範囲 : 頻度が指定回数のもののみ出力。例 -y 1..3 なら3以下。 3.. なら3以上。2,4,6..8 なら2と4と6,7,8。
 
   -a : 累和を出力 (accumulative sum)

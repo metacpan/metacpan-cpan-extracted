@@ -1,6 +1,6 @@
 package Bio::MUST::Apps::TwoScalp::Seq2Seq;
 # ABSTRACT: internal class for two-scalp tool
-$Bio::MUST::Apps::TwoScalp::Seq2Seq::VERSION = '0.201810';
+$Bio::MUST::Apps::TwoScalp::Seq2Seq::VERSION = '0.211710';
 use Moose;
 use namespace::autoclean;
 
@@ -29,20 +29,17 @@ has 'coverage_mul' => (
     default  => 1.1,
 );
 
-
 has 'single_hsp' => (
     is       => 'ro',
     isa      => 'Bool',
     default  => 0,
 );
 
-
 has 'out_suffix' => (
     is       => 'ro',
     isa      => 'Maybe[Str]',
     default  => '-ts',
 );
-
 
 has 'ali' => (
     is       => 'ro',
@@ -51,14 +48,12 @@ has 'ali' => (
     coerce   => 1,
 );
 
-
 has 'lookup' => (
     is       => 'ro',
     isa      => 'Bio::MUST::Core::IdList',
     init_arg => undef,
     writer   => '_set_lookup',
 );
-
 
 has 'new_ali' => (
     is       => 'ro',
@@ -67,7 +62,6 @@ has 'new_ali' => (
     writer   => '_set_new_ali',
 );
 
-
 has 'integrator' => (
     is       => 'ro',
     isa      => 'Bio::MUST::Apps::SlaveAligner::Local',
@@ -75,14 +69,12 @@ has 'integrator' => (
     writer   => '_set_integrator',
 );
 
-
 has 'blastdb' => (
     is       => 'ro',
     isa      => 'Bio::MUST::Drivers::Blast::Database::Temporary',
     init_arg => undef,
     writer   => '_set_blastdb',
 );
-
 
 has 'query_seqs' => (
     is       => 'ro',
@@ -276,7 +268,7 @@ Bio::MUST::Apps::TwoScalp::Seq2Seq - internal class for two-scalp tool
 
 =head1 VERSION
 
-version 0.201810
+version 0.211710
 
 =head1 AUTHOR
 

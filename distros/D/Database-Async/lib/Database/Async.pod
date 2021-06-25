@@ -33,7 +33,7 @@ Database::Async - provides a database abstraction layer for L<IO::Async>
 
  # Simple query
  $db->query(q{select id, some_data from some_table})
-    ->rows_hashref
+    ->row_hashrefs
     ->each(sub {
         printf "ID %d, data %s\n", $_->{id}, $_->{some_data};
     })
@@ -139,7 +139,7 @@ In L<Database::Async>:
    q{select * from something where id = ?},
    bind => [
     $id
-   ])->rows_hashref
+   ])->row_hashrefs
      ->as_arrayref
      ->@*
 
@@ -162,7 +162,7 @@ In L<Database::Async>:
   $sth->bind(0, $id, 'bigint')
    ->then(sub { $sth->execute })
    ->then(sub {
-    $sth->rows_hashref
+    $sth->row_hashrefs
      ->each(sub {
       print $_->{name} . "\n";
      })->completed
@@ -227,6 +227,8 @@ Supports the following named parameters:
 =item * C<engine> - the parameters to pass when instantiating a new L<Database::Async::Engine>
 
 =item * C<pool> - parameters for setting up the pool, or a L<Database::Async::Pool> instance
+
+=item * C<encoding> - default encoding to apply to parameters, queries and results, defaults to C<binary>
 
 =back
 
@@ -406,5 +408,5 @@ Tom Molesworth C<< <TEAM@cpan.org> >>
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2011-2020. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth 2011-2021. Licensed under the same terms as Perl itself.
 

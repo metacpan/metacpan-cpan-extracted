@@ -1,16 +1,20 @@
 Revision history for App-Addex-Plugin-Nobody
 
+0.006     2021-06-19 13:46:40-04:00 America/New_York
+        - update author info
+        - add perl support section
+
 0.005     2013-11-19 23:19:19 America/New_York
-          fix repo link
+        - fix repo link
 
 0.004     2013-06-19 19:41:20 America/New_York
-          update bugtracker
+        - update bugtracker
 
 0.003     2009-01-16
-          include repo link
+        - include repo link
 
 0.002     2008-11-01
-          added LICENSE
+        - added LICENSE
 
 0.001     2008-07-22
-          first release
+        - first release

@@ -1,7 +1,7 @@
 package File::Serialize::Serializer::JSON::MaybeXS;
 our $AUTHORITY = 'cpan:YANICK';
 #ABSTRACT: JSON::MaybeXS serializer for File::Serialize
-$File::Serialize::Serializer::JSON::MaybeXS::VERSION = '1.5.0';
+$File::Serialize::Serializer::JSON::MaybeXS::VERSION = '1.5.1';
 use strict;
 use warnings;
 
@@ -45,7 +45,7 @@ File::Serialize::Serializer::JSON::MaybeXS - JSON::MaybeXS serializer for File::
 
 =head1 VERSION
 
-version 1.5.0
+version 1.5.1
 
 =head1 DESCRIPTION
 

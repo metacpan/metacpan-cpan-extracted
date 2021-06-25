@@ -1,0 +1,31 @@
+Create Corpus object
+    - index
+    - cross references
+    - table of contents
+    - navigation
+
+Add documents to corpus
+    - extract all three elements from each document on addition
+    - add navigation on add
+
+Merge elements
+
+Corpus has an Index
+
+Index has:
+    Index elements
+    Index subelement
+
+Index elements
+    - have name
+    - have indexed character
+    - have (possibly) subelements
+    - can emit themselves
+
+Must sort index before emitting
+
+
+Index:
+    - entries is a hash, keyed on first character symbol
+    - contains IndexEntry objects
+    - if there are no subentries, add it and it's great

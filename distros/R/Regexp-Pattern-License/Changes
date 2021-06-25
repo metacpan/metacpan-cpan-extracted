@@ -7,6 +7,46 @@ Home page:    <https://metacpan.org/release/Regexp-Pattern-License>
 Bug tracker:  <https://bugs.debian.org/libregexp-pattern-license-perl>
 Maintainer:   Jonas Smedegaard (JONASS) <jonass@cpan.org>
 
+v3.5.1	2021-06-02
+
+ [ Bug Fixes ]
+ - use desctructive substitution in tr///, needed with perl older than
+   v5.14
+
+ [ Test Suite ]
+ - cover all license strings of perl CPAN::META spec
+
+v3.5.0	2021-06-22
+
+ [ Bug Fixes ]
+ - always favor single-version metadata when joined in versioned objects
+   (not randomly flip priority)
+ - capitalize name of exception except_openssl
+ - fix language strings to use ll_CC in DefHash and ll-cc in GNU URLs
+ - include all member patterns in series objects (not a random subset)
+   Walter Lozano++
+ - version_later version_only: cover lack of leading punctuation or space
+
+ [ Documentation ]
+ - update TODOs
+
+ [ Other ]
+ - Added: add license bsd_0_clause
+ - Added: add license cvw
+ - Added: add license intel
+ - Added: add license jabberpl
+ - Added: add license motosoto; add description and extend patterns for
+   licenses bittorrent_1 bittorrent_1_1
+ - Added: add licenses cal cal_1
+ - Added: add licenses mulan mulan_1 mulan_2
+ - Added: add licenses oldap oldap_1_1 oldap_1_2 oldap_1_3 oldap_1_4
+   oldap_2 oldap_2_0_1 oldap_2_1 oldap_2_2 oldap_2_2_1 oldap_2_2_2
+   oldap_2_3 oldap_2_4 oldap_2_5 oldap_2_6 oldap_2_7 oldap_2_8
+ - Added: add licenses sissl sissl_1_1 sissl_1_2
+ - Added: add name and caption for perl (as listed in POD of
+   CPAN::Meta::Spec)
+ - annotate more consistently as [word] [ word]
+
 v3.4.0	2020-05-21
 
  [ Bug Fixes ]
@@ -32,7 +72,7 @@ v3.4.0	2020-05-21
  - apache apache_1_1 apache_2: add caption for 'Apache Public License' and
    'Apache Software License'
  - bittorrent_1: fix list alternate SPDX caption (not bogusly as iri)
- - bsd_3_clause: add names 'EPL' 'EPL-1.0', and 'captions 'new BSD License'
+ - bsd_3_clause: add names 'EPL' 'EPL-1.0', and captions 'new BSD License'
    'Eclipse Distribution License'
  - license gpl_2: cover 'is covered by he GNU' (original revision with
    typo)

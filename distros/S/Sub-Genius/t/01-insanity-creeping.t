@@ -15,11 +15,11 @@ can_ok( $sq, qw/new preplan pregex init_plan plan plan plan_nein next dfa run_an
 
 $sq->init_plan;
 
-is( ref $sq->dfa, q{FLAT::DFA}, q{DFA confirmed} );
+is( ref $sq->dfa, q{FLAT::DFA::Minimal}, q{DFA confirmed} );
 
 $sq->init_plan( reset => 1 );
 
-is( ref $sq->dfa, q{FLAT::DFA}, q{DFA confirmed} );
+is( ref $sq->dfa, q{FLAT::DFA::Minimal}, q{DFA confirmed} );
 
 $sq->init_plan;
 
@@ -37,11 +37,11 @@ can_ok( $sq, qw/new preplan pregex init_plan plan plan_nein next dfa run_any run
 
 $sq->init_plan;
 
-is( ref $sq->dfa, q{FLAT::DFA}, q{DFA confirmed} );
+is( ref $sq->dfa, q{FLAT::DFA::Minimal}, q{DFA confirmed} );
 
 $sq->init_plan( reset => 1 );
 
-is( ref $sq->dfa, q{FLAT::DFA}, q{min DFA confirmed} );
+is( ref $sq->dfa, q{FLAT::DFA::Minimal}, q{min DFA confirmed} );
 
 while ( my $plan = $sq->next() ) {
     ok $plan, qq{'$plan' is next};

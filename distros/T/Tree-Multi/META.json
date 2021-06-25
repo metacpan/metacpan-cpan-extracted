@@ -33,7 +33,7 @@
    "provides" : {
       "Tree::Multi" : {
          "file" : "lib/Tree/Multi.pm",
-         "version" : "20210607"
+         "version" : "20210614"
       }
    },
    "release_status" : "stable",
@@ -48,6 +48,6 @@
          "url" : "https://github.com/philiprbrenan/TreeMulti"
       }
    },
-   "version" : "20210607",
+   "version" : "20210614",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

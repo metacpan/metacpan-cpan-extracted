@@ -26,6 +26,10 @@ my %WriteMakefileArgs = (
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Finance-IG-*' },
+    EXE_FILES=>['script/igdisp.pl'],
+    META_ADD => {
+  					  no_index => [ qw{ lib/Finance/IG/Record } ],
+                }, 
 );
 
 # Compatibility with old versions of ExtUtils::MakeMaker

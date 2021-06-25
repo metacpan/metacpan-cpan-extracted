@@ -31,7 +31,7 @@ subtest 'User handling' => sub {
 
             # First user
             my $add_anne = $tama_sto->_event_store->events->events->[0];
-            isa_ok $add_anne => 'EventStore::Tiny::DataEvent';
+            isa_ok $add_anne => 'EventStore::Tiny::Event';
             is $add_anne->name => 'UserAdded', 'Correct event type';
             is_deeply $add_anne->data => {
                 user_id     => $anne,
@@ -40,7 +40,7 @@ subtest 'User handling' => sub {
 
             # Second user
             my $add_bob  = $tama_sto->_event_store->events->events->[1];
-            isa_ok $add_bob => 'EventStore::Tiny::DataEvent';
+            isa_ok $add_bob => 'EventStore::Tiny::Event';
             is $add_bob->name => 'UserAdded', 'Correct event type';
             is_deeply $add_bob->data => {
                 user_id     => $bob,
@@ -69,7 +69,7 @@ subtest 'User handling' => sub {
 
             # Check event data
             my $rename = $tama_sto->_event_store->events->events->[2];
-            isa_ok $rename => 'EventStore::Tiny::DataEvent';
+            isa_ok $rename => 'EventStore::Tiny::Event';
             is $rename->name => 'UserRenamed', 'Correct event type';
             is_deeply $rename->data => {
                 user_id     => $bill,
@@ -97,7 +97,7 @@ subtest 'User handling' => sub {
 
             # Check event data
             my $removal = $tama_sto->_event_store->events->events->[3];
-            isa_ok $removal => 'EventStore::Tiny::DataEvent';
+            isa_ok $removal => 'EventStore::Tiny::Event';
             is $removal->name => 'UserRemoved', 'Correct event type';
             is_deeply $removal->data => {
                 user_id => $anne,
@@ -128,7 +128,7 @@ subtest 'Tamagotchi' => sub {
 
             # Check event data
             my $add_tama = $tama_sto->_event_store->events->events->[4];
-            isa_ok $add_tama => 'EventStore::Tiny::DataEvent';
+            isa_ok $add_tama => 'EventStore::Tiny::Event';
             is $add_tama->name => 'TamagotchiAdded', 'Correct event type';
             is_deeply $add_tama->data => {
                 user_id => $user,
@@ -161,7 +161,7 @@ subtest 'Tamagotchi' => sub {
             # Check event data
             my ($feed1, $age, $feed2) = @{$tama_sto->_event_store
                 ->events->events}[5, 6, 7];
-            isa_ok $_ => 'EventStore::Tiny::DataEvent'
+            isa_ok $_ => 'EventStore::Tiny::Event'
                 for $feed1, $age, $feed2;
             is_deeply $_->data => {tama_id => $tama}, 'Correct event data'
                 for $feed1, $age, $feed2;
@@ -193,7 +193,7 @@ subtest 'Tamagotchi' => sub {
 
             # Check event data
             my $murder = $tama_sto->_event_store->events->events->[8];
-            isa_ok $murder => 'EventStore::Tiny::DataEvent';
+            isa_ok $murder => 'EventStore::Tiny::Event';
             is $murder->name => 'TamagotchiDied', 'Correct event type';
             is_deeply $murder->data => {tama_id => $tama}, 'Correct event data';
         };

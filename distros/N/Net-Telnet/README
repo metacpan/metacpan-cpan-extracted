@@ -1,7 +1,7 @@
 
-                      Net::Telnet, version 3.04
+                      Net::Telnet, version 3.05
 
-    Copyright (c) 1997, 2000, 2002, 2013 Jay Rogers.  All rights
+    Copyright (c) 1997, 2000, 2002, 2013, 2021 Jay Rogers.  All rights
     reserved.  This program is free software; you can
     redistribute it and/or modify it under the same terms as Perl
     itself.
@@ -115,7 +115,8 @@
 
             perl Makefile.PL \
                  INSTALLSITELIB=$HOME/lib/perl \
-                 INSTALLMAN3DIR=$HOME/lib/perl/man/man3
+                 INSTALLSITEARCH=$HOME/lib/perl \
+                 INSTALLSITEMAN3DIR=$HOME/lib/perl/man/man3
             make
             make test
             make pure_install
@@ -128,4 +129,4 @@
 --
 Jay Rogers
 jay@rgrs.com
-April 21, 2013
+June 20, 2021

@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
 use Test::More;
@@ -11,6 +11,29 @@ my $CRLF = "\x0d\x0a"; # because \r\n isn't portable
 my $written = "";
 my @messages;
 my $foo_received;
+
+package TestIRC {
+   use base qw( Protocol::IRC );
+
+   sub new { return bless [], shift }
+
+   sub write { $written .= $_[1] }
+
+   sub on_message
+   {
+      return if $_[3]->{handled};
+      Test::More::is( $_[1], $_[2]->command_name, '$command is $message->command_name' );
+      push @messages, $_[2];
+      return 1;
+   }
+
+   sub on_message_FOO { $foo_received++ }
+
+   sub isupport
+   {
+      return "ascii" if $_[1] eq "CASEMAPPING";
+   }
+}
 
 my $irc = TestIRC->new;
 
@@ -39,25 +62,3 @@ lives_ok { $irc->on_read( $buffer ) } 'Blank lines does not die';
 is( length $buffer, 0, 'Blank lines still eat all buffer' );
 
 done_testing;
-
-package TestIRC;
-use base qw( Protocol::IRC );
-
-sub new { return bless [], shift }
-
-sub write { $written .= $_[1] }
-
-sub on_message
-{
-   return if $_[3]->{handled};
-   Test::More::is( $_[1], $_[2]->command_name, '$command is $message->command_name' );
-   push @messages, $_[2];
-   return 1;
-}
-
-sub on_message_FOO { $foo_received++ }
-
-sub isupport
-{
-   return "ascii" if $_[1] eq "CASEMAPPING";
-}

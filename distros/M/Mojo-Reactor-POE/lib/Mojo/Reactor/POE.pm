@@ -14,7 +14,7 @@ use Scalar::Util 'weaken';
 use constant { POE_IO_READ => 0, POE_IO_WRITE => 1 };
 use constant DEBUG => $ENV{MOJO_REACTOR_POE_DEBUG} || 0;
 
-our $VERSION = '1.000';
+our $VERSION = '1.001';
 
 my $POE;
 

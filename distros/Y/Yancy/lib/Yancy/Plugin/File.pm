@@ -1,5 +1,5 @@
 package Yancy::Plugin::File;
-our $VERSION = '1.073';
+our $VERSION = '1.074';
 # ABSTRACT: Manage file uploads, attachments, and other assets
 
 #pod =head1 SYNOPSIS
@@ -189,7 +189,7 @@ Yancy::Plugin::File - Manage file uploads, attachments, and other assets
 
 =head1 VERSION
 
-version 1.073
+version 1.074
 
 =head1 SYNOPSIS
 

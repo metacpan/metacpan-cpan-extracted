@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    This document describes XXX version 0.35.
+    This document describes XXX version 0.38.
 
 SYNOPSIS
 
@@ -61,6 +61,32 @@ FUNCTIONS
 
       mnemonic: You should confess all your sins before you sleep. zzzzzzzz
 
+    DDD
+
+      DDD will start an interactive debugger session using the Enbugger
+      module. By default it will use the Perl debugger, but you can switch
+      to the fancier Devel::Trepan debugger by setting the enviroment
+      variable PERL_XXX_DEBUGGER=trepan.
+
+      In the debugger session you will be able to both read and modify all
+      variables including lexical variables.
+
+      mnemonic: Debug, Debug, Debug!
+
+USE XXX WITHOUT USE XXX;
+
+    If you export PERL5OPT='-MXXX=global' in your shell environment, then
+    XXX will be always be loaded, and all the functions will also be
+    exported into the main namespace. That means you can call XXX from any
+    package with ::XXX (since :: is a synonym for main::).
+
+    Also XXX will be exported as $::XXX which you can use like this:
+
+        $self->foo->$::WWW->bar;
+
+    This will warn a YAML dump of $self, returning $self so that bar will
+    be called correctly.
+
 CONFIGURATION
 
     By default, XXX uses YAML::PP to dump your data. You can change this
@@ -114,7 +140,7 @@ AUTHOR
 
 COPYRIGHT AND LICENSE
 
-    Copyright 2006-2020. Ingy döt Net.
+    Copyright 2006-2021. Ingy döt Net.
 
     This program is free software; you can redistribute it and/or modify it
     under the same terms as Perl itself.

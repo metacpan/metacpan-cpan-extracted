@@ -3,9 +3,8 @@ package Beekeeper::Service::Sinkhole::Worker;
 use strict;
 use warnings;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
-use AnyEvent::Impl::Perl;
 use Beekeeper::Worker ':log';
 use base 'Beekeeper::Worker';
 
@@ -21,7 +20,7 @@ sub authorize_request {
         return unless $self->__has_authorization_token('BKPR_SYSTEM');
     }
 
-    # All requests will be rejected by reject_job 
+    # All requests will be rejected later by reject_request 
     return BKPR_REQUEST_AUTHORIZED;
 }
 
@@ -71,7 +70,7 @@ sub on_unserviced_queues {
         my $local_bus = $self->{_BUS}->{bus_role};
         log_error "Draining unserviced req/$local_bus/$queue";
 
-        $self->accept_remote_calls( "$queue.*" => 'reject_job' );
+        $self->accept_remote_calls( "$queue.*" => 'reject_request' );
     }
 }
 
@@ -98,12 +97,12 @@ sub on_worker_status {
     }
 }
 
-sub reject_job {
+sub reject_request {
     my ($self, $params, $req) = @_;
 
     # Just return a JSONRPC error response
 
-    if ($req->get_auth_tokens) {
+    if ($req->mqtt_properties->{'auth'}) {
         # When client provided some kind of authentication tell him the truth
         # about the service being down. Otherwise the one trying to fix the 
         # issue may be deceived into looking for auth/permissions problems
@@ -128,7 +127,7 @@ Beekeeper::Service::Sinkhole::Worker - Handle unserviced call topics
 
 =head1 VERSION
  
-Version 0.05
+Version 0.06
 
 =head1 DESCRIPTION
 

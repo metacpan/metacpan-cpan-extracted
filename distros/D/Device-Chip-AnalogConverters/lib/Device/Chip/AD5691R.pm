@@ -6,7 +6,7 @@
 use 5.026;
 use Object::Pad 0.19;
 
-package Device::Chip::AD5691R 0.11;
+package Device::Chip::AD5691R 0.12;
 class Device::Chip::AD5691R
    extends Device::Chip;
 

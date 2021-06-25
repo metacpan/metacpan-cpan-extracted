@@ -1,5 +1,9 @@
 Revision history for Data-GUID
 
+0.050     2021-06-20 20:18:40-04:00 America/New_York
+        - update author contact info
+        - add perl-support section in docs
+
 0.049     2017-01-23 19:04:58-05:00 America/New_York
         - Data::UUID can sometimes produce duplicate UUIDs when a single UUID
           generator is used on both sides of a fork.  Data::GUID now silently

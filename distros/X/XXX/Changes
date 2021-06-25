@@ -1,3 +1,12 @@
+0.38 Wed 23 Jun 2021 04:39:29 PM PDT
+ - Add `DDD` Enbugger debugger breakpoint invocation function
+
+0.37 Sat 19 Jun 2021 10:49:06 AM PDT
+ - Support calling `->$::XXX` with global - mst++ Devel::Dwarn++
+
+0.36 Fri 18 Jun 2021 05:12:02 PM PDT
+ - Support calling `::XXX` without needing `use XXX;`
+
 0.35 Mon Jan 20 15:08:01 PST 2020
  - Add Perl schema to YAML::PP dumping
 

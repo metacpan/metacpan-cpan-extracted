@@ -4,9 +4,9 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.731';
+our $VERSION = '1.733';
 
-use Term::Choose::Constants qw( :keys :index );
+use Term::Choose::Constants qw( :all );
 
 
 sub __key_skipped {

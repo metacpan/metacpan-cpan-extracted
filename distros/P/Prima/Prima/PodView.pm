@@ -24,18 +24,47 @@ sub on_mousedown
 sub on_mousemove
 {
 	my ( $self, $owner, $mod, $x, $y) = @_;
-	my $r = ( $self-> contains( $x, $y) >= 0) ? 0 : 1;
+	my $r = $self-> contains( $x, $y);
 	if ( $r != $owner-> {lastLinkPointer}) {
-		$owner-> pointer( $r ? cr::Text : cr::Hand);
+		my $was_hand = ($owner->{lastLinkPointer} >= 0) ? 1 : 0;
+		my $is_hand  = ($r >= 0) ? 1 : 0;
+		if ( $is_hand != $was_hand) {
+			$owner-> pointer( $is_hand ? cr::Hand : cr::Text );
+		}
+		my $rr = $self->rectangles;
+		my ($dx, $dy) = $owner->point2screen(0,0);
+		my $or = $owner->{lastLinkPointer};
 		$owner-> {lastLinkPointer} = $r;
+		if ( $was_hand ) {
+			$or = $rr->[$or];
+			$owner-> invalidate_rect($or->[0] + $dx, $dy - $or->[1], $or->[2] + $dx, $dy - $or->[3]);
+		}
+		if ( $is_hand ) {
+			$or = $rr->[$r];
+			$owner-> invalidate_rect($or->[0] + $dx, $dy - $or->[1], $or->[2] + $dx, $dy - $or->[3]);
+		}
 	}
 }
 
+sub on_paint
+{
+	my ( $self, $owner, $canvas, $ci ) = @_;
+	my ($dx, $dy) = $owner->point2screen(0,0);
+	my $r  = $self->rectangles->[ $owner->{lastLinkPointer} ];
+	my $c  = $canvas-> color;
+	$canvas-> color( $owner-> {colorMap}->[ $ci ]);
+	$canvas-> translate(0,0);
+	$canvas-> line( $r->[0] + $dx, $dy - $r->[3], $r->[2] + $dx, $dy - $r->[3]);
+	$canvas-> color( $c);
+}
+
 package Prima::PodView;
+
 use vars qw(@ISA %HTML_Escapes $OP_LINK);
 @ISA = qw(Prima::TextView);
 
-use constant DEF_INDENT => 4;
+use constant DEF_INDENT       => 4;
+use constant DEF_FIRST_INDENT => 1;
 
 use constant COLOR_LINK_FOREGROUND => 2 | tb::COLOR_INDEX;
 use constant COLOR_LINK_BACKGROUND => 3 | tb::COLOR_INDEX;
@@ -50,13 +79,27 @@ use constant STYLE_HEAD_3 => 4;
 use constant STYLE_HEAD_4 => 5;
 use constant STYLE_ITEM   => 6;
 use constant STYLE_LINK   => 7;
-use constant STYLE_MAX_ID => 7;
+use constant STYLE_VERBATIM => 8;
+use constant STYLE_MAX_ID => 8;
 
 # model layout indices
-use constant M_INDENT      => 0; # pod-content driven indent
+use constant M_TYPE        => 0; # T_XXXX
+                                 # T_NORMAL
 use constant M_TEXT_OFFSET => 1; # contains same info as BLK_TEXT_OFFSET
-use constant M_FONT_ID     => 2; # 0 or 1 ( i.e., variable or fixed )
-use constant M_START       => 3; # start of data, same purpose as BLK_START
+use constant M_INDENT      => 2; # pod-content driven indent
+use constant M_FONT_ID     => 3; # 0 or 1 ( i.e., variable or fixed )
+use constant M_START       => 4; # start of data, same purpose as BLK_START
+                                 # T_DIV
+use constant MDIV_TAG      => 2;
+use constant MDIV_STYLE    => 3;
+
+# model entries
+use constant T_NORMAL          => 0;
+use constant T_DIV             => 1;
+use constant TDIVTAG_OPEN      => 0;
+use constant TDIVTAG_CLOSE     => 1;
+use constant TDIVSTYLE_SOLID   => 0;
+use constant TDIVSTYLE_OUTLINE => 1;
 
 # topic layout indices
 use constant T_MODEL_START => 0; # beginning of topic
@@ -71,6 +114,28 @@ use constant FORMAT_LINES    => 100;
 use constant FORMAT_TIMEOUT  => 300;
 
 $OP_LINK = tb::opcode(1, 'link');
+
+sub model_create
+{
+	my %opt = @_;
+	return (
+		$opt{type}   // T_NORMAL,
+		$opt{offset} // 0,
+		$opt{indent} // 0,
+		$opt{font}   // 0
+	);
+}
+
+sub div_create
+{
+	my %opt = @_;
+	return (
+		T_DIV,
+		$opt{offset} // 0,
+		$opt{open}  ? TDIVTAG_OPEN : TDIVTAG_CLOSE,
+		$opt{style} // TDIVSTYLE_SOLID,
+	);
+}
 
 {
 my %RNT = (
@@ -90,23 +155,27 @@ sub profile_default
 		colorMap => [
 			$def-> {color},
 			$def-> {backColor},
-			cl::Green,              # link foreground
+			0x337ab7,               # link foreground
 			$def-> {backColor},     # link background
 			cl::Blue,               # code foreground
-			$def-> {backColor},     # code background
+			0xf5f5f5,               # code background
 		],
 		images => [],
 		styles => [
 			{ fontId    => 1,                         # STYLE_CODE
-			color     => COLOR_CODE_FOREGROUND },
+			color     => COLOR_CODE_FOREGROUND, 
+			backColor => COLOR_CODE_BACKGROUND
+			},
 			{ },                                      # STYLE_TEXT
 			{ fontSize => 4, fontStyle => fs::Bold }, # STYLE_HEAD_1
 			{ fontSize => 2, fontStyle => fs::Bold }, # STYLE_HEAD_2
 			{ fontSize => 1, fontStyle => fs::Bold }, # STYLE_HEAD_3
 			{ fontSize => 1, fontStyle => fs::Bold }, # STYLE_HEAD_4
 			{ fontStyle => fs::Bold },                # STYLE_ITEM
-			{ color     => COLOR_LINK_FOREGROUND,     # STYLE_LINK
-			fontStyle => fs::Underlined   },
+			{ color     => COLOR_LINK_FOREGROUND},    # STYLE_LINK
+			{ fontId    => 1,                         # STYLE_VERBATIM
+			color     => COLOR_CODE_FOREGROUND,
+			},
 		],
 		pageName      => '',
 		topicView     => 0,
@@ -145,6 +214,14 @@ sub init
 	return %profile;
 }
 
+sub on_paint
+{
+	my ( $self, $canvas ) = @_;
+	$self-> SUPER::on_paint($canvas);
+	$self-> {contents}-> [0]-> on_paint( $self, $canvas, COLOR_LINK_FOREGROUND & ~tb::COLOR_INDEX )
+		if $self->{lastLinkPointer} >= 0
+}
+
 sub on_size
 {
 	my ( $self, $oldx, $oldy, $x, $y) = @_;
@@ -178,6 +255,7 @@ sub make_bookmark
 	} elsif ( $where =~ /up|next|prev/ ) { # up
 		if ( $self-> {topicView} ) {
 			my $topic = $self-> {modelRange}-> [0];
+			return undef if $where =~ /up|prev/ && $topic == 0; # contents
 			my $tid = -1;
 			my $t;
 			for ( @{$self-> {topics}}) {
@@ -190,21 +268,15 @@ sub make_bookmark
 			if ( $where =~ /next|prev/) {
 				return undef unless defined $t;
 				my $index = scalar @{$self-> {topics}} - 1;
-				$tid = -1 if $tid == $index;
 				$tid += ( $where =~ /next/) ? 1 : -1;
-				if ( $tid == -1) { # simulate index to be the first topic
-					$t = $self-> {topics}-> [-1]-> [T_MODEL_START];
-					return "$self->{pageName}|$t|0";
-				}
-				return undef if $tid < 0 || $tid >= $index;
+				return undef if $tid < 0 || $tid > $index;
 				$t = $self-> {topics}-> [$tid]-> [T_MODEL_START];
 				return "$self->{pageName}|$t|0";
 			}
 
 			return "$self->{pageName}|0|0" unless defined $t;
-			return undef if $tid + 1 >= scalar @{$self-> {topics}}; # already on top
 			if ( $$t[ T_STYLE] >= STYLE_HEAD_1 && $$t[ T_STYLE] <= STYLE_HEAD_4) {
-				$t = $self-> {topics}-> [-1];
+				$t = $self-> {topics}-> [0];
 				return "$self->{pageName}|$$t[T_MODEL_START]|0"
 			}
 			my $state = $$t[ T_STYLE] - STYLE_HEAD_1 + $$t[ T_ITEM_DEPTH];
@@ -597,6 +669,7 @@ sub open_read
 		encoding      => undef,
 		bom           => undef,
 		utf8          => undef,
+		verbatim      => undef,
 
 		@opt,
 	};
@@ -605,35 +678,36 @@ sub open_read
 sub load_image
 {
 	my ( $self, $src, $frame ) = @_;
-	my $index = 0;
-	unless ( -f $src) {
-		$src =~ s!::!/!g;
-		for my $path (
-			map {( "$_", "$_/pod")}
-			grep { defined && length && -d }
-			( length($self-> {manpath}) ? $self-> {manpath} : (), @INC)
-		) {
-			return Prima::Icon-> load( "$path/$src", index => $frame, iconUnmask => 1)
-				if -f "$path/$src" && -r _;
-		}
+	return Prima::Icon-> load( $src, index => $frame, iconUnmask => 1)
+		if -f $src;
+
+	$src =~ s!::!/!g;
+	for my $path (
+		map {( "$_", "$_/pod")}
+		grep { defined && length && -d }
+		( length($self-> {manpath}) ? $self-> {manpath} : (), @INC)
+	) {
+		return Prima::Icon-> load( "$path/$src", index => $frame, iconUnmask => 1)
+			if -f "$path/$src" && -r _;
 	}
 	return;
 }
 
 sub add_image
 {
-	my ( $self, $src, $w, $h, $cut ) = @_;
+	my ( $self, $src, %opt ) = @_;
 
-	$w = $src-> width unless $w;
-	$h = $src-> height unless $h;
+	my $w = $opt{width} // $src-> width;
+	my $h = $opt{height} // $src-> height;
 	my @resolution = $self-> resolution;
 	$w *= 72 / $resolution[0];
 	$h *= 72 / $resolution[1];
 	$src-> {stretch} = [$w, $h];
-	$self-> {readState}-> {pod_cutting} = $cut ? 0 : 1
-		if defined $cut;
+	$self-> {readState}-> {pod_cutting} = $opt{cut} ? 0 : 1
+		if defined $opt{cut};
 
 	my @imgop = (
+		tb::moveto( 2, 0, tb::X_DIMENSION_FONT_HEIGHT),
 		tb::wrap(tb::WRAP_MODE_OFF),
 		tb::extend( $w, $h, tb::X_DIMENSION_POINT),
 		tb::code( \&_imgpaint, $src),
@@ -641,15 +715,39 @@ sub add_image
 		tb::wrap(tb::WRAP_MODE_ON)
 	);
 
-	if ( @{$self-> {model}}) {
-		push @{$self-> {model}-> [-1]}, @imgop;
-	} else {
-		push @{$self-> {model}}, [
-			$self-> {readState}-> {indent},
-			$self-> {readState}-> {bigofs}, 0,
-			@imgop
-		];
+	push @{$self-> {model}},
+		$opt{title} ? [div_create(open => 1, style => TDIVSTYLE_OUTLINE)] : (),
+		[model_create(
+			indent => $self-> {readState}-> {indent},
+			offset => $self-> {readState}-> {bigofs}
+		),
+		@imgop],
+		;
+	if ( $opt{title}) {
+		my $r = $self-> {readState};
+
+		my @g = model_create(
+			indent => $self-> {readState}-> {indent},
+			offset => $r-> {bigofs}
+		);
+		push @g,
+			tb::moveto( 2, 0, tb::X_DIMENSION_FONT_HEIGHT),
+			tb::fontStyle(fs::Italic),
+			tb::text(0, length $opt{title}),
+			tb::fontStyle(fs::Normal),
+			;
+		$opt{title} .= "\n";
+		${$self->{text}} .= $opt{title};
+		$r->{bigofs} += length $opt{title};
+
+		push @{$self-> {model}},
+			[model_create, tb::moveto(0, 1, tb::X_DIMENSION_FONT_HEIGHT)],
+			\@g,
+			[model_create, tb::moveto(0, 1, tb::X_DIMENSION_FONT_HEIGHT)],
+			[div_create(open => 0, style => TDIVSTYLE_OUTLINE) ]
+			;
 	}
+	push @{$self-> {model}}, [model_create, tb::moveto(0, 1, tb::X_DIMENSION_FONT_HEIGHT)];
 }
 
 sub add_formatted
@@ -670,21 +768,17 @@ sub add_formatted
 				$self-> {readState}-> {pod_cutting} = 1;
 			} elsif ( $cmd =~ /^img\s*(.*)$/i) {
 				$cmd = $1;
-				my ( $w, $h, $src, $frame, $cut);
-				$frame = 0;
+				my %opt;
 				while ( $cmd =~ m/\s*([a-z]*)\s*\=\s*(?:(?:'([^']*)')|(?:"([^"]*)")|(\S*))\s*/igcs) {
 					my ( $option, $value) = ( lc $1, defined($2)?$2:(defined $3?$3:$4));
-					if ( $option eq 'width' && $value =~ /^\d+$/) { $w = $value }
-					elsif ( $option eq 'height' && $value =~ /^\d+$/) { $h = $value }
-					elsif ( $option eq 'frame' && $value =~ /^\d+$/) { $frame = $value }
-					elsif ( $option eq 'src') { $src = $value }
-					elsif ( $option eq 'cut' ) { $cut = $value }
+					if ( $option =~ /^(width|height|frame)$/ && $value =~ /^\d+$/) { $opt{$option} = $value }
+					elsif ( $option =~ /^(src|cut|title)$/) { $opt{$option} = $value }
 				}
-				if ( defined $src) {
-					my $img = $self->load_image($src, $frame);
-					$self->add_image($img, $w, $h, $cut) if $img;
-				} elsif ( defined $frame && defined $self->{images}->[$frame]) {
-					$self->add_image($self->{images}->[$frame], $w, $h, $cut);
+				if ( defined $opt{src}) {
+					my $img = $self->load_image($opt{src}, $opt{frame} // 0);
+					$self->add_image($img, %opt) if $img;
+				} elsif ( defined $opt{frame} && defined $self->{images}->[$opt{frame}]) {
+					$self->add_image($self->{images}->[$opt{frame}], %opt);
 				}
 			}
 		}
@@ -700,8 +794,8 @@ sub _imgpaint
 	$dy *= $res[1] / 72;
 	$canvas-> stretch_image( $x, $y, $dx, $dy, $img);
 	if ( $self-> {selectionPaintMode}) {
-		my @save = ( fillPattern => $canvas-> fillPattern, rop => $canvas-> rop);
-		$canvas-> set( fillPattern => fp::Borland, rop => rop::AndPut);
+		my @save = ( fillPattern => $canvas-> fillPattern, rop => $canvas-> rop, fillPatternOffset => [$canvas->fillPatternOffset]);
+		$canvas-> set( fillPattern => fp::Borland, rop => rop::AndPut, fillPatternOffset => [$x, $y]);
 		$canvas-> bar( $x, $y, $x + $dx - 1, $y + $dy - 1);
 		$canvas-> set( @save);
 	}
@@ -735,11 +829,11 @@ sub read_paragraph
 		if ($r-> {begun}) {
 			my $begun = $r-> {begun};
 			if (/^=end\s+$begun/ || /^=cut/) {
-					$r-> {begun} = '';
-					$self-> add_new_line; # end paragraph
-					$r-> {cutting} = 1 if /^=cut/;
+				$r-> {begun} = '';
+				$self-> add_new_line; # end paragraph
+				$r-> {cutting} = 1 if /^=cut/;
 			} else {
-					$self-> add_formatted( $r-> {begun}, $_);
+				$self-> add_formatted( $r-> {begun}, $_);
 			}
 			next;
 		}
@@ -752,10 +846,12 @@ sub read_paragraph
 
 		# Translate verbatim paragraph
 		if (/^\s/) {
-			$self-> add($_,STYLE_CODE,$r-> {indent}) for split "\n", $_;
+			$self-> add_verbatim_mark(1) unless defined $r->{verbatim};
+			$self-> add($_,STYLE_VERBATIM,$r-> {indent}) for split "\n", $_;
 			$self-> add_new_line;
 			next;
 		}
+		$self-> add_verbatim_mark(0);
 
 		if (/^=for\s+(\S+)\s*(.*)/s) {
 			$self-> add_formatted( $1, $2) if defined $2;
@@ -776,16 +872,16 @@ sub read_paragraph
 				$r-> {cutting} = 0;
 			}
 			elsif ($Cmd eq 'head1') {
-				$self-> add( $args, STYLE_HEAD_1, 0);
+				$self-> add( $args, STYLE_HEAD_1, DEF_FIRST_INDENT);
 			}
 			elsif ($Cmd eq 'head2') {
-				$self-> add( $args, STYLE_HEAD_2, 0);
+				$self-> add( $args, STYLE_HEAD_2, DEF_FIRST_INDENT);
 			}
 			elsif ($Cmd eq 'head3') {
-				$self-> add( $args, STYLE_HEAD_3, 0);
+				$self-> add( $args, STYLE_HEAD_3, DEF_FIRST_INDENT);
 			}
 			elsif ($Cmd eq 'head4') {
-				$self-> add( $args, STYLE_HEAD_4, 0);
+				$self-> add( $args, STYLE_HEAD_4, DEF_FIRST_INDENT);
 			}
 			elsif ($Cmd eq 'over') {
 				push(@{$r-> {indentStack}}, $r-> {indent});
@@ -859,6 +955,7 @@ sub close_read
 
 	$topicView = $self-> {topicView} unless defined $topicView;
 	$self-> add_new_line; # end
+	$self-> add_verbatim_mark(0);
 	$self-> {contents}-> [0]-> references( $self-> {links});
 
 	goto NO_INDEX unless $self-> {readState}-> {createIndex};
@@ -878,6 +975,7 @@ sub close_read
 	## and then uses black magic to put it in the front.
 
 	# remember the current end state
+	$self-> _close_topic( STYLE_HEAD_1);
 	my @text_ends_at = (
 		$r-> {bigofs},
 		scalar @{$self->{model}},
@@ -896,16 +994,27 @@ sub close_read
 		$text_ends_at[2]++;
 		$msecid++;
 	}
-	$self-> add( "Index",  STYLE_HEAD_1, 0);
+	my $start = scalar @{ $self->{model} };
 	$self-> add_new_line;
+	$self-> add_verbatim_mark(1);
+	$self-> add( " Contents",  STYLE_HEAD_1, DEF_FIRST_INDENT);
 	$self-> {hasIndex} = 1;
+	$self-> {topics}->[-1]->[T_MODEL_START] = $start;
+	my $last_style = STYLE_HEAD_1;
 	for my $k ( @{$self-> {topics}}) {
 		last if $secid == $msecid; # do not add 'Index' entry
 		my ( $ofs, $end, $text, $style, $depth, $linkStart) = @$k;
+		if ( $style == STYLE_ITEM ) {
+			$style = $last_style;
+		} else {
+			$last_style = $style;
+		}
 		my $indent = DEF_INDENT + ( $style - STYLE_HEAD_1 + $depth ) * 2;
 		$self-> add("L<$text|topic://$secid>", STYLE_TEXT, $indent);
 		$secid++;
 	}
+	$self-> add_new_line;
+	$self-> add_verbatim_mark(0);
 
 	$self-> _close_topic( STYLE_HEAD_1);
 
@@ -1010,31 +1119,31 @@ sub add
 	return unless $r;
 
 	$p =~ s/\n//g;
-	my $g = [ $indent, $r-> {bigofs}, 0];
+	my $g = [ model_create( indent => $indent, offset => $r-> {bigofs}) ];
 	my $styles = $self-> {styles};
 	my $no_push_block;
 	my $itemid = scalar @{$self-> {model}};
 
 	if ( $r-> {bulletMode}) {
-		if ( $style == STYLE_TEXT || $style == STYLE_CODE) {
+		if ( $style == STYLE_TEXT || $style == STYLE_CODE || $style == STYLE_VERBATIM) {
 			return unless length $p;
 			$g = $self-> {model}-> [-1];
-			$$g[1] = $r-> {bigofs};
+			$$g[M_TEXT_OFFSET] = $r-> {bigofs};
 			$no_push_block = 1;
 			$itemid--;
 		}
 		$r-> {bulletMode} = 0;
 	}
 
-	if ( $style == STYLE_CODE) {
-		$$g[ M_FONT_ID] = $styles-> [ STYLE_CODE]-> {fontId} || 1; # fixed font
+	if ( $style == STYLE_CODE || $style == STYLE_VERBATIM) {
+		$$g[ M_FONT_ID] = $styles-> [$style]-> {fontId} || 1; # fixed font
 		push @$g, tb::wrap(tb::WRAP_MODE_OFF);
 	}
 
 	push @$g, @{$self-> {styleInfo}-> [$style * 2]};
 	$cstyle = $styles-> [$style]-> {fontStyle} || 0;
 
-	if ( $style == STYLE_CODE) {
+	if ( $style == STYLE_CODE || $style == STYLE_VERBATIM) {
 		push @$g, tb::text( 0, length $p),
 	} elsif (( $style == STYLE_ITEM) && ( $p =~ /^\*\s*$/ || $p =~ /^\d+\.?$/)) {
 		push @$g,
@@ -1255,8 +1364,28 @@ sub add_new_line
 	return unless $r;
 	my $p = " \n";
 	${$self-> {text}} .= $p;
-	push @{$self-> {model}}, [ 0, $r->{bigofs}, 0, tb::text(0, 1) ];
+	push @{$self-> {model}}, [ model_create( offset => $r->{bigofs} ), tb::text(0, 1) ];
 	$r-> {bigofs} += length $p;
+}
+
+sub add_verbatim_mark
+{
+	my ($self, $on) = @_;
+	my $r = $self-> {readState};
+	return unless $r;
+
+	my $open;
+	if ( $on ) {
+		return if defined $r->{verbatim};
+		$open = 1;
+		$r->{verbatim} = 1;
+	} else {
+		return unless defined $r->{verbatim};
+		$open = 0;
+		undef $r->{verbatim};
+	}
+
+	push @{$self-> {model}}, [ div_create(open => $open, style => TDIVSTYLE_SOLID) ];
 }
 
 sub stop_format
@@ -1329,6 +1458,8 @@ sub format
 		step          => FORMAT_LINES,
 		position      => undef,
 		positionSet   => 0,
+		verbatim      => undef,
+		last_ymap     => 0,
 	};
 
 	$self-> {formatTimer} = $self-> insert( Timer =>
@@ -1355,6 +1486,49 @@ sub FormatTimer_Tick
 	$_[0]-> format_chunks
 }
 
+sub paint_code_div
+{
+	my ( $self, $canvas, $block, $state, $x, $y, $coord) = @_;
+	my $f  = $canvas->font;
+	my ($style, $w, $h) = @$coord;
+	my @x = ( $canvas-> backColor, $canvas-> color );
+	my $path = $canvas->new_path->round_rect($x, $y, $x + $w, $y + $h, 20);
+	if ( $style == TDIVSTYLE_SOLID ) {
+		$canvas->set(backColor => $self->{colorMap}->[5], color => 0xcccccc);
+		$path->fill_stroke;
+		$canvas-> set( backColor => $x[0], color => $x[1] );
+	} else {
+		$canvas->set(color => 0x808080);
+		$path-> stroke;
+		$canvas-> set( color => $x[1] );
+	}
+}
+
+sub add_code_div
+{
+	my ($self, $style, $from, $to) = @_;
+
+	my ($w,$y1,$y2) = (0,($self->{blocks}->[$from]->[tb::BLK_Y]) x 2);
+	for my $b ( @{ $self->{blocks} } [$from .. $to] ) {
+		$w = $$b[tb::BLK_X] + $$b[tb::BLK_WIDTH]  if $w < $$b[tb::BLK_X] + $$b[tb::BLK_WIDTH];
+		$y1 = $$b[tb::BLK_Y] if $y1 > $$b[tb::BLK_Y];
+		$y2 = $$b[tb::BLK_Y] + $$b[tb::BLK_HEIGHT] if $y2 < $$b[tb::BLK_Y] + $$b[tb::BLK_HEIGHT];
+	}
+	my ($fh, $fw) = ( $self->font->height, $self->font->width );
+	my $h = $y2 - $y1;
+	my $b = tb::block_create();
+	$$b[tb::BLK_X] = $self->{blocks}->[$from]->[tb::BLK_X];
+	$$b[tb::BLK_Y] = $y1 - $fh / 2;
+	$w += 2 * $fw;
+	$$b[tb::BLK_WIDTH]  = $w;
+	$$b[tb::BLK_HEIGHT] = $h;
+	$$b[tb::BLK_TEXT_OFFSET] = -1;
+	push @$b,
+		tb::code( \&paint_code_div, [$style, $w, $h]),
+		tb::extend($w, $h);
+	return $b;
+}
+
 sub format_chunks
 {
 	my $self = $_[0];
@@ -1371,12 +1545,25 @@ sub format_chunks
 	my $indents   = $f-> {indents};
 	my $state     = $f-> {state};
 	my $linkRects = $f-> {linkRects};
-	my $start = scalar @{$self-> {blocks}};
 	my $formatWidth = $f-> {formatWidth};
+	my $fw = $self->font->width;
 
 	for ( ; $mid <= $max; $mid++) {
 		my $g = tb::block_create();
 		my $m = $self-> {model}-> [$mid];
+
+		if ( $m->[M_TYPE] == T_DIV ) {
+			if ( $m->[MDIV_TAG] == TDIVTAG_OPEN) {
+				$f->{verbatim} = scalar @{ $self->{blocks} };
+			} else {
+				splice @{ $self->{blocks} },
+					$f->{verbatim}, 0,
+					$self-> add_code_div( $m->[MDIV_STYLE], $f->{verbatim}, $#{$self->{blocks}} );
+				undef $f->{verbatim};
+			}
+			next;
+		}
+
 		my @blocks;
 		$$g[ tb::BLK_TEXT_OFFSET] = $$m[M_TEXT_OFFSET];
 		$$g[ tb::BLK_Y] = undef;
@@ -1420,7 +1607,7 @@ sub format_chunks
 							$rect[0] = $pos[0];
 							$rect[1] = $$b[ tb::BLK_Y];
 						} else {
-							$rect[2] = $pos[0];
+							$rect[2] = $pos[0] + $fw;
 							$rect[3] = $$b[ tb::BLK_Y] + $$b[ tb::BLK_HEIGHT];
 							push @$linkRects, [ @rect, $f-> {linkId} ++ ];
 						}
@@ -1459,9 +1646,18 @@ sub format_chunks
 	}
 
 	$f-> {current} = $mid;
-
-	$self-> recalc_ymap( $start);
 	$self-> end_paint_info;
+
+	if ( ! defined $f->{verbatim} ){
+		$self-> recalc_ymap( $f->{last_ymap} );
+		$f->{last_ymap} = scalar @{ $self->{blocks} };
+		if ( $f->{suppressed_ymap} ) {
+			$f->{suppressed_ymap} = 0;
+			$self->repaint;
+		}
+	} else {
+		$f->{suppressed_ymap} = 1;
+	}
 
 	my $ps = $self-> {paneWidth};
 	if ( $ps != $f-> {paneWidth}) {
@@ -1534,6 +1730,8 @@ sub print
 	for ( ; $mid <= $max; $mid++) {
 		my $g = tb::block_create();
 		my $m = $self-> {model}-> [$mid];
+		next if $$m[M_TYPE] != T_NORMAL; # don't print div background
+
 		my @blocks;
 		$$g[ tb::BLK_TEXT_OFFSET] = $$m[M_TEXT_OFFSET];
 		$$g[ tb::BLK_Y] = undef;
@@ -1866,21 +2064,22 @@ constants:
 C<::styles> property provides access to the styles, applied to different pod
 text parts. These styles are:
 
-	STYLE_CODE   - style for pre-formatted text and C<>
-	STYLE_TEXT   - normal text
-	STYLE_HEAD_1 - =head1
-	STYLE_HEAD_2 - =head2
-	STYLE_HEAD_3 - =head3
-	STYLE_HEAD_4 - =head4
-	STYLE_ITEM   - =item
-	STYLE_LINK   - style for L<> text
+	STYLE_CODE     - style for C<>
+	STYLE_TEXT     - normal text
+	STYLE_HEAD_1   - =head1
+	STYLE_HEAD_2   - =head2
+	STYLE_HEAD_3   - =head3
+	STYLE_HEAD_4   - =head4
+	STYLE_ITEM     - =item
+	STYLE_LINK     - style for L<> text
+	STYLE_VERBATIM - style for pre-formatted text
 
 Each style is a hash with the following keys: C<fontId>, C<fontSize>, C<fontStyle>,
 C<color>, C<backColor>, fully analogous to the tb::BLK_DATA_XXX options.
 This functionality provides another layer of accessibility to the pod formatter.
 
 In addition to styles, Prima::PodView defined C<colormap> entries for
-C<STYLE_LINK> and C<STYLE_CODE>:
+C<STYLE_LINK> , C<STYLE_CODE>, and C<STYLE_VERBATIM>:
 
 	COLOR_LINK_FOREGROUND
 	COLOR_LINK_BACKGROUND

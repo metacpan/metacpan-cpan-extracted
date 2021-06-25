@@ -1,3 +1,10 @@
+0.006   2021-05-19  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- Avoid duplication of 'by $prog' in comment of generated module.
+
+
 0.005   2021-05-19  Released-By: PERLANCAR; Urgency: medium
 
 	- Add CLI: gen-acme-cpanmodules-module-from-webpage.

@@ -38,7 +38,7 @@ whiff - like which, but finds the first of all the given alternatives
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 DESCRIPTION
 
@@ -53,13 +53,23 @@ F<whiff> assumes that all the arguments form a best-first list of alternatives,
 and only prints the path to the first alternative found in the path.  If none
 is found, it prints an error (to stderr!) and exits with an error code.
 
+=head1 PERL VERSION SUPPORT
+
+This module has a long-term perl support period.  That means it will not
+require a version of perl released fewer than five years ago.
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
+
 =head1 USAGE
 
  whiff <command ... >
 
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@cpan.org>
+Ricardo SIGNES <rjbs@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

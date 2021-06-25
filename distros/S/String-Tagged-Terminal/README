@@ -42,6 +42,12 @@ TAGS
     The ECMA-48-corrected string encoding form of CSI 38:5:nnn m is used to
     set the 256 palette values.
 
+    Values will be rounded down to the nearest integer by calling int().
+    This convenience allows things like the rand function for generating
+    random colours:
+
+       $st->append_tagged( "text", fgindex => 1 + rand 6 );
+
 CONSTRUCTORS
 
  new_from_formatting

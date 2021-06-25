@@ -6,20 +6,18 @@
 # based on Renaud Bruyeron's checklink.pl
 #
 # This program is licensed under the W3C(r) Software License:
-#       http://www.w3.org/Consortium/Legal/copyright-software
+#       https://www.w3.org/Consortium/Legal/copyright-software
 #
 # The documentation is at:
-#       http://validator.w3.org/docs/checklink.html
+#       https://validator.w3.org/checklink/docs/checklink.html
 #
-# See the Mercurial interface at:
-#       http://dvcs.w3.org/hg/link-checker/
+# See the Github repository at:
+#       https://github.com/w3c/link-checker/
 #
 # An online version is available at:
-#       http://validator.w3.org/checklink
+#       https://validator.w3.org/checklink
 #
-# Comments and suggestions should be sent to the www-validator mailing list:
-#       www-validator@w3.org (with 'checklink' in the subject)
-#       http://lists.w3.org/Archives/Public/www-validator/ (archives)
+# Comments and suggestions should be filed on github
 
 use strict;
 use 5.008;
@@ -82,7 +80,7 @@ sub new
 
     $self->allow_private_ips(1);
 
-    $self->protocols_forbidden([qw(mailto javascript)]);
+    $self->protocols_allowed([qw(http https ftp)]);
 
     return $self;
 }
@@ -194,6 +192,18 @@ sub ip_disallowed
         );
         $resp->header('Client-Warning', 'Internal response');
     }
+
+#    #defaults to 80
+    my $port = undef;
+    $port = $uri->port();
+    #whitelist regex if short enough
+    if ($port !~ m/^(8[0-9]|21|443)$/ && $port < 1024) {
+        $resp = HTTP::Response->new(403,
+            'Checking certain ports disallowed by link checker configuration'
+        );
+        $resp->header('Client-Warning', 'Internal response');
+    }
+
     return $resp;
 }
 
@@ -226,56 +236,66 @@ use constant RC_ROBOTS_TXT          => -1;
 use constant RC_DNS_ERROR           => -2;
 use constant RC_IP_DISALLOWED       => -3;
 use constant RC_PROTOCOL_DISALLOWED => -4;
+use constant RC_MIXEDCONTENT_BLOCK  => -5;
 
 use constant LINE_UNKNOWN => -1;
 
 use constant MP2 =>
     (exists($ENV{MOD_PERL_API_VERSION}) && $ENV{MOD_PERL_API_VERSION} >= 2);
 
-# Tag=>attribute mapping of things we treat as links.
+# Mixed content status based on https://w3c.github.io/webappsec-mixed-content/
+use constant MC_NONE        => 0;
+use constant MC_OPTIONAL    => 1;
+use constant MC_CONDITIONAL => 2;
+use constant MC_BLOCK       => 3;
+
+# Tag=>[[mixedContentStatus, attribute]] mapping of things we treat as links.
 # Note: meta/@http-equiv gets special treatment, see start() for details.
 use constant LINK_ATTRS => {
-    a => ['href'],
+    a => [[MC_NONE, 'href']],
 
     # base/@href intentionally not checked
-    # http://www.w3.org/mid/200802091439.27764.ville.skytta%40iki.fi
-    area       => ['href'],
-    audio      => ['src'],
-    blockquote => ['cite'],
-    body       => ['background'],
-    command    => ['icon'],
+    # https://www.w3.org/mid/200802091439.27764.ville.skytta%40iki.fi
+    area       => [[MC_NONE, 'href']],
+    audio      => [[MC_OPTIONAL, 'src']],
+    blockquote => [[MC_NONE, 'cite']],
+    body       => [[MC_OPTIONAL, 'background']],
+    command    => [[MC_OPTIONAL, 'icon']], # no spec says how to handle this
+                                          # wrt to mixed content
 
     # button/@formaction not checked (side effects)
-    del => ['cite'],
+    del => [[MC_NONE, 'cite']],
 
     # @pluginspage, @pluginurl, @href: pre-HTML5 proprietary
-    embed => ['href', 'pluginspage', 'pluginurl', 'src'],
+    embed => [[MC_BLOCK, 'href'], [MC_NONE, 'pluginspage'], [MC_NONE, 'pluginurl'], [MC_BLOCK, 'src']],
 
     # form/@action not checked (side effects)
-    frame  => ['longdesc', 'src'],
-    html   => ['manifest'],
-    iframe => ['longdesc', 'src'],
-    img    => ['longdesc', 'src'],
+    frame  => [[MC_BLOCK, 'longdesc'], [MC_BLOCK, 'src']],
+    html   => [[MC_BLOCK, 'manifest']],
+    iframe => [[MC_BLOCK, 'longdesc'], [MC_BLOCK, 'src']],
+    img    => [[MC_BLOCK, 'longdesc'], [MC_CONDITIONAL, 'src']],
 
     # input/@action, input/@formaction not checked (side effects)
-    input  => ['src'],
-    ins    => ['cite'],
-    link   => ['href'],
-    object => ['data'],
-    q      => ['cite'],
-    script => ['src'],
-    source => ['src'],
-    track  => ['src'],
-    video  => ['src', 'poster'],
+    input  => [[MC_BLOCK,'src']],
+    ins    => [[MC_NONE, 'cite']],
+    link   => [[MC_CONDITIONAL, 'href']],
+    object => [[MC_BLOCK, 'data']],
+    q      => [[MC_NONE, 'cite']],
+    script => [[MC_BLOCK, 'src']],
+    source => [[MC_OPTIONAL, 'src']],
+    track  => [[MC_BLOCK, 'src']],
+    video  => [[MC_OPTIONAL, 'src'], [MC_BLOCK, 'poster']],
 };
 
-# Tag=>[separator, attributes] mapping of things we treat as lists of links.
+# Tag=>[separator, subseparator, attributes] mapping of things we treat as lists of links.
 use constant LINK_LIST_ATTRS => {
-    a      => [qr/\s+/,    ['ping']],
-    applet => [qr/[\s,]+/, ['archive']],
-    area   => [qr/\s+/,    ['ping']],
-    head   => [qr/\s+/,    ['profile']],
-    object => [qr/\s+/,    ['archive']],
+    a      => [qr/\s+/, qr/$/,      [MC_BLOCK, 'ping']],
+    applet => [qr/[\s,]+/, qr/$/,   [MC_BLOCK, 'archive']],
+    area   => [qr/\s+/, qr/$/,      [MC_BLOCK, 'ping']],
+    img    => [qr/\s*,\s*/, qr/\s.*$/,   [MC_BLOCK, 'srcset']],
+    head   => [qr/\s+/,  qr/$/,     [MC_NONE, 'profile']],
+    object => [qr/\s+/,  qr/$/,     [MC_BLOCK, 'archive']],
+    source => [qr/\s*,\s*/, qr/\s.*$/, [MC_BLOCK, 'srcset']]
 };
 
 # TBD/TODO:
@@ -295,14 +315,11 @@ BEGIN {
     # Version info
     $PACKAGE  = 'W3C Link Checker';
     $PROGRAM  = 'W3C-checklink';
-    $VERSION  = '4.81';
-    $REVISION = sprintf('version %s (c) 1999-2011 W3C', $VERSION);
+    $VERSION  = '5.0.0';
+    $REVISION = sprintf('version %s (c) 1999-2019 W3C', $VERSION);
     $AGENT    = sprintf(
-        '%s/%s %s',
-        $PROGRAM, $VERSION,
-        (   W3C::UserAgent::USE_ROBOT_UA ? LWP::RobotUA->_agent() :
-                LWP::UserAgent->_agent()
-        )
+        '%s/%s',
+        $PROGRAM, $VERSION
     );
 
     # Pull in mod_perl modules if applicable.
@@ -322,7 +339,7 @@ BEGIN {
     $ContentTypes = qr{\b(?:$re)\b}io;
 
     # Regexp for matching URL values in CSS.
-    $CssUrl = qr/(?:\s|^)url\(\s*(['"]?)(.*?)\1\s*\)(?=\s|$)/;
+    $CssUrl = qr/url\(\s*(['"]?)(.*?)\1\s*\)/;
 
     #
     # Read configuration.  If the W3C_CHECKLINK_CFG environment variable has
@@ -351,10 +368,12 @@ $@
 EOF
         }
     }
-    $Cfg{Markup_Validator_URI} ||= 'http://validator.w3.org/check?uri=%s';
+    $Cfg{Markup_Validator_URI} ||= 'https://validator.w3.org/check?uri=%s';
     $Cfg{CSS_Validator_URI} ||=
-        'http://jigsaw.w3.org/css-validator/validator?uri=%s';
-    $Cfg{Doc_URI} ||= 'http://validator.w3.org/docs/checklink.html';
+        'https://jigsaw.w3.org/css-validator/validator?uri=%s';
+    $Cfg{Doc_URI} ||= 'https://validator.w3.org/checklink/docs/checklink.html';
+    $Cfg{Doc_Base_URI} ||= '/checklink/docs/';
+    $Cfg{Doc_Images_URI} ||= '/checklink/images/';
 
     # Untaint config params that are used as the format argument to (s)printf(),
     # Perl 5.10 does not want to see that in taint mode.
@@ -362,9 +381,9 @@ EOF
     ($Cfg{CSS_Validator_URI})    = ($Cfg{CSS_Validator_URI}    =~ /^(.*)$/);
 
     $DocType =
-        '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">';
-    my $css_url = URI->new_abs('linkchecker.css', $Cfg{Doc_URI});
-    my $js_url  = URI->new_abs('linkchecker.js',  $Cfg{Doc_URI});
+        '<!DOCTYPE html>';
+    my $css_url = $Cfg{Doc_Base_URI} . 'linkchecker.css';
+    my $js_url  = $Cfg{Doc_Base_URI} . 'linkchecker.js';
     $Head =
         sprintf(<<'EOF', HTML::Entities::encode($AGENT), $css_url, $js_url);
 <meta http-equiv="Content-Script-Type" content="text/javascript" />
@@ -401,6 +420,7 @@ my %Opts = (
     Cookies         => undef,
     No_Referer      => 0,
     Hide_Same_Realm => 0,
+    Follow_File_Links        => 0,
     Depth                    => 0,             # < 0 means unlimited recursion.
     Sleep_Time               => 1,
     Connection_Cache_Size    => 2,
@@ -476,11 +496,16 @@ $@
 EOF
 }
 
-# Add configured forbidden protocols
-if ($Cfg{Forbidden_Protocols}) {
-    my $forbidden = $ua->protocols_forbidden();
-    push(@$forbidden, split(/[,\s]+/, lc($Cfg{Forbidden_Protocols})));
-    $ua->protocols_forbidden($forbidden);
+# Add configured allowed protocols
+if ($Cfg{Allowed_Protocols}) {
+    my $allowed = $ua->protocols_allowed();
+    push(@$allowed, split(/[,\s]+/, lc($Cfg{Allowed_Protocols})));
+    $ua->protocols_allowed($allowed);
+}
+if ($Opts{Follow_File_Links}) {
+    my $allowed = $ua->protocols_allowed();
+    push(@$allowed, "file");
+    $ua->protocols_allowed($allowed);
 }
 
 if ($Opts{Command_Line}) {
@@ -492,7 +517,7 @@ if ($Opts{Command_Line}) {
 
     &usage(1) unless scalar(@ARGV);
 
-    $Opts{_Self_URI} = 'http://validator.w3.org/checklink';   # For HTML output
+    $Opts{_Self_URI} = 'https://validator.w3.org/checklink';   # For HTML output
 
     &ask_password() if ($Opts{User} && !$Opts{Password});
 
@@ -518,6 +543,7 @@ if ($Opts{Command_Line}) {
     );
 
     my $check_num = 1;
+    my $has_error = 0;
     my @bases     = @{$Opts{Base_Locations}};
     for my $uri (@ARGV) {
 
@@ -528,7 +554,7 @@ if ($Opts{Command_Line}) {
         # Transform the parameter into a URI
         $uri = &urize($uri);
         $params{uri} = $uri;
-        &check_uri(\%params, $uri, $check_num, $Opts{Depth}, undef, undef, 1);
+        $has_error += &check_uri(\%params, $uri, $check_num, $Opts{Depth}, undef, undef, 1);
         $check_num++;
     }
     undef $check_num;
@@ -539,7 +565,7 @@ if ($Opts{Command_Line}) {
     elsif ($doc_count > 0 && !$Opts{Summary_Only}) {
         printf("\n%s\n", &global_stats());
     }
-
+    exit ($has_error ? 64 : 0);
 }
 else {
 
@@ -547,11 +573,6 @@ else {
     require CGI::Carp;
     CGI::Carp->import(qw(fatalsToBrowser));
     require CGI::Cookie;
-
-    # file: URIs are not allowed in CGI mode
-    my $forbidden = $ua->protocols_forbidden();
-    push(@$forbidden, 'file');
-    $ua->protocols_forbidden($forbidden);
 
     my $query = CGI->new();
 
@@ -617,14 +638,14 @@ else {
         if ($action eq 'clear') {
 
             # Clear the cookie.
-            $cookie = CGI::Cookie->new(-name => $PROGRAM);
+            $cookie = CGI::Cookie->new(-name => $PROGRAM,-value => $PROGRAM);
             $cookie->value({clear => 1});
             $cookie->expires('-1M');
         }
         elsif ($action eq 'set') {
 
             # Set the options.
-            $cookie = CGI::Cookie->new(-name => $PROGRAM);
+            $cookie = CGI::Cookie->new(-name => $PROGRAM,-value => $PROGRAM);
             my %options = $query->Vars();
             delete($options{$_})
                 for qw(url uri check cookie);    # Non-persistent.
@@ -713,8 +734,10 @@ sub parse_arguments ()
                 if $Opts{Depth} == 0;
         },
         'l|location=s'                => \@locs,
-        'X|exclude=s'                 => \$Opts{Exclude},
+        'X|exclude=s@'                => \@{$Opts{Exclude}},
         'exclude-docs=s@'             => \@{$Opts{Exclude_Docs}},
+        'follow-file-links'           => \$Opts{Follow_File_Links},
+        'https'                       => \$Opts{Https},
         'suppress-redirect=s@'        => \@{$Opts{Suppress_Redirect}},
         'suppress-redirect-prefix=s@' => \@{$Opts{Suppress_Redirect_Prefix}},
         'suppress-temp-redirects'     => \$Opts{Suppress_Temp_Redirects},
@@ -776,8 +799,8 @@ sub parse_arguments ()
     $Opts{Depth} = -1 if ($Opts{Depth} == 0 && @locs);
 
     # Precompile/error-check regular expressions.
-    if (defined($Opts{Exclude})) {
-        eval { $Opts{Exclude} = qr/$Opts{Exclude}/o; };
+    for my $i (0 .. $#{$Opts{Exclude}}) {
+        eval { $Opts{Exclude}->[$i] = qr/$Opts{Exclude}->[$i]/; };
         &usage(1, "Error in exclude regexp: $@") if $@;
     }
     for my $i (0 .. $#{$Opts{Exclude_Docs}}) {
@@ -814,7 +837,7 @@ sub parse_arguments ()
     for my $i (0 .. $#{$Opts{Suppress_Broken}}) {
         ${$Opts{Suppress_Broken}}[$i] =~ s/ /:/;
         my $sb_arg = ${$Opts{Suppress_Broken}}[$i];
-        if ($sb_arg !~ /^(-1|[0-9]+):./) {
+        if ($sb_arg !~ /^(-1|[0-9]+)(:.)?/) {
             &usage(1,
                 "Bad suppress-broken argument, should be prefixed by a numeric response code: $sb_arg"
             );
@@ -855,19 +878,20 @@ Usage: checklink <options> <uris>
 Options:
  -s, --summary              Result summary only.
  -b, --broken               Show only the broken links, not the redirects.
- -e, --directory            Hide directory redirects, for example
-                            http://www.w3.org/TR -> http://www.w3.org/TR/
+ -e, --dir-redirects        Hide directory redirects, for example
+                            https://www.w3.org/TR -> https://www.w3.org/TR/
  -r, --recursive            Check the documents linked from the first one.
  -D, --depth N              Check the documents linked from the first one to
                             depth N (implies --recursive).
  -l, --location URI         Scope of the documents checked in recursive mode
                             (implies --recursive).  Can be specified multiple
                             times.  If not specified, the default eg. for
-                            http://www.w3.org/TR/html4/Overview.html
-                            would be http://www.w3.org/TR/html4/
+                            https://www.w3.org/TR/html4/Overview.html
+                            would be https://www.w3.org/TR/html4/
  -X, --exclude REGEXP       Do not check links whose full, canonical URIs
                             match REGEXP; also limits recursion the same way
                             as --exclude-docs with the same regexp would.
+                            This option may be specified multiple times.
  --exclude-docs REGEXP      In recursive mode, do not check links in documents
                             whose full, canonical URIs match REGEXP.  This
                             option may be specified multiple times.
@@ -878,12 +902,16 @@ Options:
                             the first URI to the same child of the second URI.
                             This option may be specified multiple times.
  --suppress-temp-redirects  Suppress warnings about temporary redirects.
- --suppress-broken CODE:URI  Do not report a broken link with the given CODE.
+ --suppress-broken CODE(:URI)  Do not report a broken link with the given CODE.
                             CODE is HTTP response, or -1 for robots exclusion.
-                            This option may be specified multiple times.
+                            This option may be specified multiple times, and
+                            can optionally be limited to a single pair of CODE /
+                            URI.
  --suppress-fragment URI    Do not report the given broken fragment URI.
                             A fragment URI contains \"#\".  This option may be
                             specified multiple times.
+ --follow-file-links        When encountering a file: URI, try to follow it
+                            (disabled by default for security reasons)
  -L, --languages LANGS      Accept-Language header to send.  The special value
                             'auto' causes autodetection from the environment.
  -c, --cookies FILE         Use cookies, load/save them in FILE.  The special
@@ -904,6 +932,7 @@ Options:
                             (default: $trust).
  --masquerade \"BASE1 BASE2\" Masquerade base URI BASE1 as BASE2.  See the
                             manual page for more information.
+ --https                    Check the file as if it was served on https://
  -H, --html                 HTML output.
  -?, -h, --help             Show this message and exit.
  -V, --version              Output version information and exit.
@@ -918,9 +947,7 @@ configuration file to use.  See details in the full manual page, it can
 be displayed with: perldoc checklink
 
 More documentation at: $Cfg{Doc_URI}
-Please send bug reports and comments to the www-validator mailing list:
-  www-validator\@w3.org (with 'checklink' in the subject)
-  Archives are at: http://lists.w3.org/Archives/Public/www-validator/
+Please file bug reports and comments at https://github.com/w3c/link-checker/issues
 ";
     exit $exitval;
 }
@@ -1021,6 +1048,15 @@ sub urize ($)
     return $uri->canonical();
 }
 
+sub should_exclude ($)
+{
+    my ($canon_uri) = @_;
+    for my $ex (@{$Opts{Exclude}}) {
+        return 1 if ($canon_uri =~ $ex);
+    }
+    return 0;
+}
+
 ########################################
 # Check for broken links in a resource #
 ########################################
@@ -1031,6 +1067,7 @@ sub check_uri (\%\$$$$;\$$)
     $is_start ||= ($check_num == 1);
 
     my $start = $Opts{Summary_Only} ? 0 : &get_timestamp();
+    my $error_found = 0;
 
     # Get and parse the document
     my $response = &get_document(
@@ -1039,7 +1076,7 @@ sub check_uri (\%\$$$$;\$$)
     );
 
     # Can we check the resource? If not, we exit here...
-    return if defined($response->{Stop});
+    return 0 if defined($response->{Stop});
 
     if ($Opts{HTML}) {
         &html_header($uri, $cookie) if ($check_num == 1);
@@ -1059,7 +1096,7 @@ sub check_uri (\%\$$$$;\$$)
             hprintf("Not in recursion scope: %s\n")
                 if ($Opts{Verbose});
             $response->content("");
-            return;
+            return $error_found;
         }
     }
 
@@ -1069,7 +1106,7 @@ sub check_uri (\%\$$$$;\$$)
 
     if ($check_num != 1) {
         if ($Opts{HTML}) {
-            $doc_header = "\n<hr />\n";
+            $doc_header = "\n<hr>\n";
         }
         else {
             $doc_header = "\n" . ('-' x 40) . "\n";
@@ -1116,10 +1153,12 @@ Settings used:
 - Accept-Language: %s
 - Referer: %s
 - Cookies: %s
+- Upgrade-Insecure-Requets: 1
 - Sleeping %d second%s between requests to each server
 EOF
-        printf("- Excluding links matching %s\n", $Opts{Exclude})
-            if defined($Opts{Exclude});
+        printf("- Excluding links matching %s\n",
+            join(', ', @{$Opts{Exclude}}))
+            if @{$Opts{Exclude}};
         printf("- Excluding links in documents whose URIs match %s\n",
             join(', ', @{$Opts{Exclude_Docs}}))
             if @{$Opts{Exclude_Docs}};
@@ -1136,9 +1175,9 @@ EOF
 <div class="settings">
 Settings used:
  <ul>
-  <li><tt><a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.1">Accept</a></tt>: %s</li>
-  <li><tt><a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.4">Accept-Language</a></tt>: %s</li>
-  <li><tt><a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.36">Referer</a></tt>: %s</li>
+  <li><tt><a href="https://tools.ietf.org/html/rfc7231#section-5.3.2">Accept</a></tt>: %s</li>
+  <li><tt><a href="https://tools.ietf.org/html/rfc7231#section-5.3.5">Accept-Language</a></tt>: %s</li>
+  <li><tt><a href="https://tools.ietf.org/html/rfc7231#section-5.5.2">Referer</a></tt>: %s</li>
   <li>Sleeping %d second%s between requests to each server</li>
  </ul>
 </div>
@@ -1184,6 +1223,7 @@ EOF
     my $p =
         &parse_document($uri, $response->base(), $response, 1, ($depth != 0));
     my $base = URI->new($p->{base});
+    my $check_mixed_content = ($base->scheme eq 'https' || $Opts{Https});
 
     # Check anchors
     ###############
@@ -1218,6 +1258,9 @@ EOF
 
     # Record all the links found
     while (my ($link, $lines) = each(%{$p->{Links}})) {
+        #my @hash = values(%$lines);
+        #print join(',', map { keys(%$_) } @hash);
+        #print $link, $mixedcontent;
         my $link_uri = URI->new($link);
         my $abs_link_uri = URI->new_abs($link_uri, $base);
 
@@ -1234,7 +1277,7 @@ EOF
 
         my $canon_uri = URI->new($abs_link_uri->canonical());
         my $fragment  = $canon_uri->fragment(undef);
-        if (!defined($Opts{Exclude}) || $canon_uri !~ $Opts{Exclude}) {
+        if (!should_exclude($canon_uri)) {
             if (!exists($links{$canon_uri})) {
                 my $hostport;
                 $hostport = $canon_uri->host_port()
@@ -1242,16 +1285,29 @@ EOF
                 $hostport = '' unless defined $hostport;
                 push(@{$hostlinks{$hostport}}, $canon_uri);
             }
-            for my $line_num (keys(%$lines)) {
+            for my $line_num (keys(%{$lines})) {
+                my @mixedcontent = keys(%{%$lines{$line_num}});
+                my $mc_block = MC_BLOCK;
+                if (grep(/^$mc_block$/, @mixedcontent)) {
+                    push(@{$links{$canon_uri}{mixedcontent}}, $line_num);
+                }
+                # take optional into account if CSP: block-all-mixed-content is set
+                my $mc_optional = MC_OPTIONAL;
+                if (grep(/^block-all-mixed-content$/, $p->{csp})
+                    && grep(/^mc_optional$/, @mixedcontent)) {
+                    push(@{$links{$canon_uri}{mixedcontent}}, $line_num);
+                }
                 if (!defined($fragment) || !length($fragment)) {
 
                     # Document without fragment
-                    $links{$canon_uri}{location}{$line_num} = 1;
+                    $links{$canon_uri}{location}{$line_num} = @mixedcontent;
                 }
                 else {
 
                     # Resource with a fragment
-                    $links{$canon_uri}{fragments}{$fragment}{$line_num} = 1;
+                    if (! grep { $_ eq "$canon_uri#$fragment" } @{$Opts{Suppress_Fragment}}) {
+                        $links{$canon_uri}{fragments}{$fragment}{$line_num} = @mixedcontent;
+                    }
                 }
             }
         }
@@ -1268,6 +1324,7 @@ EOF
         if ($Opts{Verbose});
 
     my %broken;
+    my %blocked;
     my $link_num = 0;
     for my $u (@order) {
         my $ulinks = $links{$u};
@@ -1290,8 +1347,9 @@ EOF
         $link_num++;
 
         # Check that a link is valid
+        my $mixedcontent_lines = $check_mixed_content && %$ulinks{"mixedcontent"} ? %$ulinks{"mixedcontent"} : ();
         &check_validity($uri, $u, ($depth != 0 && &in_recursion_scope($u)),
-            \%links, \%redirects);
+            \%links, \%redirects, $mixedcontent_lines, $p->{csp});
         &hprintf("\tReturn code: %s\n", $results{$u}{location}{code})
             if ($Opts{Verbose});
         if ($results{$u}{location}{success}) {
@@ -1303,9 +1361,9 @@ EOF
 
             # List the broken fragments
             while (my ($fragment, $lines) = each(%{$ulinks->{fragments}})) {
-
-                my $fragment_ok = $results{$u}{fragments}{$fragment};
-
+                my $fragment_ok = $results{$u}{fragments}{$fragment}
+                # 100 matches what we get for ignored error codes
+                || $results{$u}{location}{code} == 100;
                 if ($Opts{Verbose}) {
                     my @line_nums = sort { $a <=> $b } keys(%$lines);
                     &hprintf(
@@ -1321,7 +1379,7 @@ EOF
                 $broken{$u}{fragments}{$fragment} += 2 unless $fragment_ok;
             }
         }
-        elsif (!($Opts{Quiet} && &informational($results{$u}{location}{code})))
+        elsif (!($Opts{Quiet} && defined($results{$u}{location}{code}) && &informational($results{$u}{location}{code})))
         {
 
             # Couldn't find the document
@@ -1331,6 +1389,9 @@ EOF
             for my $fragment (keys %{$ulinks->{fragments}}) {
                 $broken{$u}{fragments}{$fragment}++;
             }
+        }
+        if ($results{$u}{mixedcontent_blocked}) {
+            $blocked{$u} = $results{$u}{mixedcontent_blocked};
         }
     }
     &hprintf(
@@ -1349,8 +1410,10 @@ EOF
     }
     print "\n" unless $Opts{Quiet};
 
-    &links_summary(\%links, \%results, \%broken, \%redirects);
+    &links_summary(\%links, \%results, \%broken, \%redirects, \%blocked);
     &anchors_summary($p->{Anchors}, \%errors);
+
+    $error_found = scalar(keys(%errors)) + scalar(keys(%broken)) + scalar(keys(%blocked));
 
     # Do we want to process other documents?
     if ($depth != 0) {
@@ -1362,7 +1425,7 @@ EOF
             next unless &in_recursion_scope($u);
 
             # Do we understand its content type?
-            next unless ($results{$u}{location}{type} =~ $ContentTypes);
+            next unless (defined $results{$u}{location}{type} && $results{$u}{location}{type} =~ $ContentTypes);
 
             # Have we already processed this URI?
             next if &already_processed($u, $uri);
@@ -1373,7 +1436,7 @@ EOF
                 if (!$Opts{Command_Line}) {
                     if ($doc_count == $Opts{Max_Documents}) {
                         print(
-                            "<hr />\n<p><strong>Maximum number of documents ($Opts{Max_Documents}) reached!</strong></p>\n"
+                            "<hr>\n<p><strong>Maximum number of documents ($Opts{Max_Documents}) reached!</strong></p>\n"
                         );
                     }
                     if ($doc_count >= $Opts{Max_Documents}) {
@@ -1390,14 +1453,14 @@ EOF
             no warnings 'recursion';
 
             if ($depth < 0) {
-                &check_uri($params, $u, 0, -1, $cookie, $uri);
+                $error_found += &check_uri($params, $u, 0, -1, $cookie, $uri);
             }
             else {
-                &check_uri($params, $u, 0, $depth - 1, $cookie, $uri);
+                $error_found += &check_uri($params, $u, 0, $depth - 1, $cookie, $uri);
             }
         }
     }
-    return;
+    return $error_found;
 }
 
 ###############################################################
@@ -1571,7 +1634,7 @@ sub in_recursion_scope (\$)
 
     my $candidate = $uri->canonical();
 
-    return 0 if (defined($Opts{Exclude}) && $candidate =~ $Opts{Exclude});
+    return 0 if should_exclude($candidate);
 
     for my $excluded_doc (@{$Opts{Exclude_Docs}}) {
         return 0 if ($candidate =~ $excluded_doc);
@@ -1666,6 +1729,7 @@ sub get_uri ($\$;\$$\%$$$$)
     $request->header('Accept-Language' => $Opts{Accept_Language})
         if $Opts{Accept_Language};
     $request->header('Accept', $Accept);
+    $request->header('Upgrade-Insecure-Requests', 1);
     $request->accept_decodable();
 
     # Are we providing authentication info?
@@ -1738,9 +1802,9 @@ sub get_uri ($\$;\$$\%$$$$)
 # Record the results of an HTTP request #
 #########################################
 
-sub record_results (\$$$$)
+sub record_results (\$$$$\@)
 {
-    my ($uri, $method, $response, $referer) = @_;
+    my ($uri, $method, $response, $referer, $mixedcontent_lines, @csp) = @_;
     $results{$uri}{referer}        = $referer;
     $results{$uri}{response}       = $response;
     $results{$uri}{method}         = $method;
@@ -1757,6 +1821,7 @@ sub record_results (\$$$$)
     $results{$uri}{location}{code} = RC_PROTOCOL_DISALLOWED()
         if ($results{$uri}{location}{code} == 500 &&
         $response->message() =~ /Access to '[^\']*' URIs has been disabled/);
+
     $results{$uri}{location}{type}    = $response->header('Content-type');
     $results{$uri}{location}{display} = $results{$uri}{location}{code};
 
@@ -1766,14 +1831,23 @@ sub record_results (\$$$$)
         $results{$uri}{location}{orig_message} = $tmp->message() ||
             '(no message)';
     }
+    # dealing with mixed content
+    if ($mixedcontent_lines && $uri->scheme ne 'https') {
+        # Check headers of CSP: upgrade-insecure-request
+        if (! ($uri->scheme eq 'http' && grep(/^upgrade-insecure-requests$/, @csp))) {
+            # Set this the lines where the URL is used in mixedcontent_block context
+            $results{$uri}{mixedcontent_blocked} = $mixedcontent_lines;
+        }
+    }
     $results{$uri}{location}{success} = $response->is_success();
 
     # If a suppressed broken link, fill the data structure like a typical success.
     # print STDERR "success? " . $results{$uri}{location}{success} . ": $uri\n";
     if (!$results{$uri}{location}{success}) {
         my $code = $results{$uri}{location}{code};
-        my $match = grep { $_ eq "$code:$uri" } @{$Opts{Suppress_Broken}};
-        if ($match) {
+        my $matchCodeUri = grep { $_ eq "$code:$uri" } @{$Opts{Suppress_Broken}};
+        my $matchCode = grep { $_ eq "$code" } @{$Opts{Suppress_Broken}};
+        if ($matchCodeUri || $matchCode) {
             $results{$uri}{location}{success} = 1;
             $results{$uri}{location}{code}    = 100;
             $results{$uri}{location}{display} = 100;
@@ -1833,6 +1907,8 @@ sub parse_document (\$\$$$$)
 
     $p = W3C::LinkChecker->new();
     $p->{base} = $base_uri;
+
+    $p->{csp} = $response->header('Content-Security-Policy');
 
     my $stype = $response->header("Content-Style-Type");
     $p->{style_is_css} = !$stype || is_content_type($stype, "text/css");
@@ -2007,7 +2083,7 @@ sub get_anchor
 
 sub add_link
 {
-    my ($self, $uri, $base, $line) = @_;
+    my ($self, $uri, $base, $line, $mixedcontent) = @_;
     if (defined($uri)) {
 
         # Remove repeated slashes after the . or .. in relative links, to avoid
@@ -2015,7 +2091,7 @@ sub add_link
         $uri =~ s|^(\.\.?/)/+|$1|o;
         $uri = Encode::decode_utf8($uri);
         $uri = URI->new_abs($uri, $base) if defined($base);
-        $self->{Links}{$uri}{defined($line) ? $line : LINE_UNKNOWN()}++;
+        $self->{Links}{$uri}{defined($line) ? $line : LINE_UNKNOWN()}{$mixedcontent}++;
     }
     return;
 }
@@ -2052,7 +2128,7 @@ sub start
             {
                 my $content = $attr->{content};
                 if ($content && $content =~ /.*?;\s*(?:url=)?(.+)/i) {
-                    $self->add_link($1, undef, $line);
+                    $self->add_link($1, undef, $line, MC_BLOCK);
                 }
             }
         }
@@ -2074,18 +2150,42 @@ sub start
 
         # Link attributes:
         if (my $link_attrs = LINK_ATTRS()->{$tag}) {
-            for my $la (@$link_attrs) {
-                $self->add_link($attr->{$la}, $tag_local_base, $line);
+            for my $attrdesc (@$link_attrs) {
+                my ($mixedcontent, $la) = @$attrdesc;
+                my $attributes = [];
+                if ($mixedcontent == MC_CONDITIONAL) {
+                    if ($tag eq 'img') {
+                        if ($attr->{crossorigin}) {
+                            $mixedcontent = MC_BLOCK;
+                        } else {
+                            $mixedcontent = MC_OPTIONAL;
+                        }
+                    } elsif ($tag eq 'link') {
+                        my @blocked_link_types = ('stylesheet', 'prefetch', 'preload', 'preconnect', 'prerender', 'modulepreload', 'icon', 'dns-prefetch');
+                        my @link_types = map{ lc($_)} split(/\s+/, $attr->{rel});
+                        for my $type (@link_types) {
+                            if ( grep (/^$type$/, @blocked_link_types)) {
+                                $mixedcontent = MC_BLOCK;
+                                last;
+                            }
+                        }
+                        if ($mixedcontent == MC_CONDITIONAL) {
+                            $mixedcontent = MC_OPTIONAL;
+                        }
+                    }
+                }
+                $self->add_link($attr->{$la}, $tag_local_base, $line, $mixedcontent);
             }
         }
 
         # List of links attributes:
         if (my $link_attrs = LINK_LIST_ATTRS()->{$tag}) {
-            my ($sep, $attrs) = @$link_attrs;
-            for my $la (@$attrs) {
-                if (defined(my $value = $attr->{$la})) {
-                    for my $link (split($sep, $value)) {
-                        $self->add_link($link, $tag_local_base, $line);
+            my ($sep, $subsep, $attrdesc) = @$link_attrs;
+            my ($mixedcontent, $la) = @$attrdesc;
+            if (defined(my $value = $attr->{$la})) {
+                for my $comp (split($sep, $value)) {
+                    for my $link (split($subsep, $comp)) {
+                        $self->add_link($link, $tag_local_base, $line, $mixedcontent);
                     }
                 }
             }
@@ -2127,7 +2227,7 @@ sub parse_css
     my $sheet = CSS::DOM::parse($css);
     for my $rule (@{$sheet->cssRules()}) {
         if ($rule->type() == IMPORT_RULE()) {
-            $self->add_link($rule->href(), $self->{base}, $line);
+            $self->add_link($rule->href(), $self->{base}, $line, MC_BLOCK);
         }
         elsif ($rule->type == STYLE_RULE()) {
             $self->parse_style($rule->style(), $line);
@@ -2147,7 +2247,8 @@ sub parse_style
 
         while ($val =~ /$CssUrl/go) {
             my $url = CSS::DOM::Util::unescape($2);
-            $self->add_link($url, $self->{base}, $line);
+            # FIXME: are there CSS rules with URLs that aren't mixed content blockable?
+            $self->add_link($url, $self->{base}, $line, MC_OPTIONAL);
         }
     }
 
@@ -2175,7 +2276,7 @@ sub declaration
             $self->doctype($1) if $1;
 
             # If there is a link to the DTD, record it
-            $self->add_link($3, undef, $line)
+            $self->add_link($3, undef, $line, MC_NONE)
                 if (!$self->{only_anchors} && $3);
         }
     }
@@ -2205,15 +2306,19 @@ sub end_document
 # Check the validity of a link #
 ################################
 
-sub check_validity (\$\$$\%\%)
+sub check_validity (\$\$$\%\%\$\$)
 {
-    my ($referer, $uri, $want_links, $links, $redirects) = @_;
+    my ($referer, $uri, $want_links, $links, $redirects, $mixedcontent_lines, $csp) = @_;
 
     # $referer is the URI object of the document checked
     # $uri is the URI object of the target that we are verifying
     # $want_links is true if we're interested in links in the target doc
     # $links is a hash of the links in the documents checked
     # $redirects is a map of the redirects encountered
+    # $mixedcontent_lines is an array of lines where the link appears
+    #                     in a mixedcontent context (if any)
+    # $csp is an array of values from the content-security-policy header
+    #                     of the page
 
     # Get the document with the appropriate method: GET if there are
     # fragments to check or links are wanted, HEAD is enough otherwise.
@@ -2229,7 +2334,7 @@ sub check_validity (\$\$$\%\%)
         $response = &get_uri($method, $uri, $referer);
 
         # Get the information back from get_uri()
-        &record_results($uri, $method, $response, $referer);
+        &record_results($uri, $method, $response, $referer, $mixedcontent_lines, $csp);
 
         # Record the redirects
         &record_redirects($redirects, $response);
@@ -2247,9 +2352,13 @@ sub check_validity (\$\$$\%\%)
     if ($being_processed) {
 
         # Can we really parse the document?
-        if (!defined($results{$uri}{location}{type}) ||
-            $results{$uri}{location}{type} !~ $ContentTypes)
-        {
+        if (!defined($results{$uri}{location}{type})) {
+            &hprintf("Can't check content: Content-Type for '%s' is undefined.\n",
+                $uri)
+                if ($Opts{Verbose});
+            $response->content("");
+            return;
+        } elsif ($results{$uri}{location}{type} !~ $ContentTypes) {
             &hprintf("Can't check content: Content-Type for '%s' is '%s'.\n",
                 $uri, $results{$uri}{location}{type})
                 if ($Opts{Verbose});
@@ -2329,7 +2438,7 @@ EOF
 
         printf(
             "%s
-<html lang=\"en\" xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"en\">
+<html lang=\"en\">
 <head>
 <title>W3C Link Checker: 401 Authorization Required</title>
 %s</head>
@@ -2340,7 +2449,7 @@ EOF
         printf(
             '<p>
   %s
-  You need "%s" access to <a href="%s">%s</a> to perform link checking.<br />
+  You need "%s" access to <a href="%s">%s</a> to perform link checking.<br>
 ',
             &status_icon(401),
             &encode($realm), (&encode($response->request()->url())) x 2
@@ -2449,7 +2558,8 @@ sub sort_unique (@)
 {
     my %saw;
     @saw{@_} = ();
-    return (sort { $a <=> $b } keys %saw);
+    # Treat "(N/A)" as 0
+    return sort { (($a =~ /(\d+)/)[0] || 0) <=> (($b =~ /(\d+)/)[0] || 0) } keys %saw;
 }
 
 #####################
@@ -2574,18 +2684,14 @@ sub show_link_report (\%\%\%\%\@;$\%)
         $c = &code_shown($u, $results);
 
         # What to do
-        my $whattodo;
+        my $whattodo = '';
         my $redirect_too;
         if ($todo) {
             if ($u =~ m/^javascript:/) {
                 if ($Opts{HTML}) {
                     $whattodo =
-                        'You must change this link: people using a browser without JavaScript support
-will <em>not</em> be able to follow this link. See the
-<a href="http://www.w3.org/TR/WAI-WEBCONTENT/#tech-scripts">Web Content
-Accessibility Guidelines on the use of scripting on the Web</a> and the
-<a href="http://www.w3.org/TR/WCAG10-HTML-TECHS/#directly-accessible-scripts">techniques
-on how to solve this</a>.';
+                        'You should change this link: people using a browser without JavaScript support
+will <em>not</em> be able to follow this link.';
                 }
                 else {
                     $whattodo =
@@ -2680,7 +2786,7 @@ on how to solve this</a>.';
 
                 # Realm
                 defined($currloc->{realm}) ?
-                    sprintf('Realm: %s<br />', &encode($currloc->{realm})) :
+                    sprintf('Realm: %s<br>', &encode($currloc->{realm})) :
                     '',
 
                 # HTTP original message
@@ -2764,6 +2870,27 @@ on how to solve this</a>.';
     return;
 }
 
+sub show_mixedcontent_report (\@\%)
+{
+    my ($mc_blocked_urls, $blocked) = @_;
+
+    print("\n<dl class=\"report\">") if $Opts{HTML};
+    print("\n") if (!$Opts{Quiet});
+    print("\n<dl class=\"report\">") if $Opts{HTML};
+    for my $url (@$mc_blocked_urls) {
+        if ($Opts{HTML}) {
+            printf("<dt>%s</dt>\n", &show_url($url)) ;
+            printf("<dd>Blocked in mixed content context on lines: <span class='msg_loc'>%s</span></dd>\n", join("</span>, <span class='msg_loc'>", @{%$blocked{$url}}));
+        } else {
+            printf("\n%s\n", $url) ;
+            print "Blocked in mixed content context on lines: ";
+            print join(", ", @{%$blocked{$url}});
+            print "\n\n";
+
+        }
+    }
+}
+
 sub code_shown ($$)
 {
     my ($u, $results) = @_;
@@ -2777,7 +2904,7 @@ sub code_shown ($$)
     }
 }
 
-sub links_summary (\%\%\%\%)
+sub links_summary (\%\%\%\%\%)
 {
 
     # Advices to fix the problems
@@ -2795,6 +2922,8 @@ sub links_summary (\%\%\%\%)
             'This rare status code points to a "See Other" resource. There is generally nothing to be done.',
         307 =>
             'This is a temporary redirect. Update the link if you believe it makes sense, or leave it as is.',
+        308 =>
+            'This is a permanent redirect. The link should be updated to point to the more recent URI.',
         400 =>
             'This is usually the sign of a malformed URL that cannot be parsed by the server. Check the syntax of the link.',
         401 =>
@@ -2835,6 +2964,8 @@ sub links_summary (\%\%\%\%)
                 ('') x 2),
         RC_PROTOCOL_DISALLOWED() =>
             'Accessing links with this URI scheme has been disabled in link checker.',
+        RC_MIXEDCONTENT_BLOCK() =>
+            'The link is blocked as mixed-content. The resource needs to be fetched over https.',
     );
     my %priority = (
         410 => 1,
@@ -2845,10 +2976,11 @@ sub links_summary (\%\%\%\%)
         401 => 20
     );
 
-    my ($links, $results, $broken, $redirects) = @_;
+    my ($links, $results, $broken, $redirects, $blocked) = @_;
 
     # List of the broken links
     my @urls              = keys %{$broken};
+    my @mc_blocked_urls      = keys %{$blocked};
     my @dir_redirect_urls = ();
     if ($Opts{Redirects}) {
 
@@ -2860,7 +2992,7 @@ sub links_summary (\%\%\%\%)
                 !defined($broken->{$l}));
 
             # Check whether we have a "directory redirect"
-            # e.g. http://www.w3.org/TR -> http://www.w3.org/TR/
+            # e.g. https://www.w3.org/TR -> https://www.w3.org/TR/
             my ($redirect_loop, @redirects) = get_redirects($l, %$redirects);
             if ($#redirects == 1) {
                 push(@dir_redirect_urls, $l);
@@ -2869,6 +3001,8 @@ sub links_summary (\%\%\%\%)
             push(@urls, $l);
         }
     }
+
+    @urls = grep { defined($results->{$_}{location}{record}) } @urls;
 
     # Broken links and redirects
     if ($#urls < 0) {
@@ -2959,6 +3093,16 @@ EOF
             \@dir_redirect_urls);
     }
 
+    # Show mixedcontent blocked URLs
+    if ($#mc_blocked_urls > -1) {
+        print_doc_header();
+        print('<h3>') if $Opts{HTML};
+        print("\nList of URLs blocked because they're mixed content");
+        print(
+            "</h3>\n<p>The URLs below are not necessarily broken, but they will be not loaded correctly since they’re  <code>http:</code> URLs loaded in an <code>https:</code> page and will be blocked as mixed content.</p>"
+        ) if $Opts{HTML};
+        &show_mixedcontent_report(\@mc_blocked_urls, \%$blocked);
+    }
     return;
 }
 
@@ -3008,7 +3152,7 @@ sub html_header ($$)
           ' onload="if(document.getElementById){document.getElementById(\'uri_1\').focus()}"';
 
     print $headers, $DocType, "
-<html lang=\"en\" xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"en\">
+<html lang=\"en\">
 <head>
 <title>W3C Link Checker", &encode($title), "</title>
 ",      $Head,   "</head>
@@ -3022,8 +3166,8 @@ sub banner ($)
     my $tagline = "Check links and anchors in Web pages or full Web sites";
 
     printf(
-        <<'EOF', URI->new_abs("../images/no_w3c.png", $Cfg{Doc_URI}), $tagline);
-<div id="banner"><h1 id="title"><a href="http://www.w3.org/" title="W3C"><img alt="W3C" id="logo" src="%s" width="110" height="61" /></a>
+        <<'EOF', $Cfg{Doc_Images_URI} . 'w3c.png', $tagline);
+<div id="banner"><h1 id="title"><a href="https://www.w3.org/" title="W3C"><img alt="W3C" id="logo" src="%s" width="110" height="61"></a>
 <a href="checklink"><span>Link Checker</span></a></h1>
 <p id="tagline">%s</p></div>
 <div id="main">
@@ -3058,8 +3202,8 @@ sub status_icon($)
     else {
         $icon_type = 'error';
     }
-    return sprintf('<span class="err_type"><img src="%s" alt="%s" /></span>',
-        URI->new_abs("../images/info_icons/$icon_type.png", $Cfg{Doc_URI}),
+    return sprintf('<span class="err_type"><img src="%s" alt="%s"></span>',
+        $Cfg{Doc_Images_URI} . 'info_icons/' . $icon_type . '.png',
         $icon_type);
 }
 
@@ -3109,25 +3253,25 @@ sub html_footer ()
     This Link Checker looks for issues in links, anchors and referenced objects
     in a Web page, CSS style sheet, or recursively on a whole Web site. For
     best results, it is recommended to first ensure that the documents checked
-    use Valid <a href="http://validator.w3.org/">(X)HTML Markup</a> and
-    <a href="http://jigsaw.w3.org/css-validator/">CSS</a>. The Link Checker is
-    part of the W3C's <a href="http://www.w3.org/QA/Tools/">validators and
+    use Valid <a href="https://validator.w3.org/">(X)HTML Markup</a> and
+    <a href="https://jigsaw.w3.org/css-validator/">CSS</a>. The Link Checker is
+    part of the W3C's <a href="https://www.w3.org/QA/Tools/">validators and
     Quality Web tools</a>.
   </p>
 </div>
 EOF
     }
-    printf(<<'EOF', $Cfg{Doc_URI}, $Cfg{Doc_URI}, $PACKAGE, $REVISION);
+    printf(<<'EOF', $Cfg{Doc_URI}, $PACKAGE, $REVISION);
 </div><!-- main -->
 <ul class="navbar" id="menu">
   <li><a href="%s" accesskey="3" title="Documentation for this Link Checker Service">Docs</a></li>
   <li><a href="http://search.cpan.org/dist/W3C-LinkChecker/" accesskey="2" title="Download the source / Install this service">Download</a></li>
-  <li><a href="%s#csb" title="feedback: comments, suggestions and bugs" accesskey="4">Feedback</a></li>
-  <li><a href="http://validator.w3.org/" title="Validate your markup with the W3C Markup Validation Service">Validator</a></li>
+  <li><a href="https://github.com/w3c/link-checker" title="feedback: comments, suggestions and bugs" accesskey="4">Feedback</a></li>
+  <li><a href="https://validator.w3.org/" title="Validate your markup with the W3C Markup Validation Service">Validator</a></li>
 </ul>
 <div>
 <address>
-%s<br /> %s
+%s<br> %s
 </address>
 </div>
 </body>
@@ -3177,58 +3321,57 @@ sub print_form (\%$$)
     my $cookie_options = '';
     if ($valid_cookie) {
         $cookie_options = "
-    <label for=\"cookie1_$check_num\"><input type=\"radio\" id=\"cookie1_$check_num\" name=\"cookie\" value=\"nochanges\" checked=\"checked\" /> Don't modify saved options</label>
-    <label for=\"cookie2_$check_num\"><input type=\"radio\" id=\"cookie2_$check_num\" name=\"cookie\" value=\"set\" /> Save these options</label>
-    <label for=\"cookie3_$check_num\"><input type=\"radio\" id=\"cookie3_$check_num\" name=\"cookie\" value=\"clear\" /> Clear saved options</label>";
+    <label for=\"cookie1_$check_num\"><input type=\"radio\" id=\"cookie1_$check_num\" name=\"cookie\" value=\"nochanges\" checked=\"checked\"> Don't modify saved options</label>
+    <label for=\"cookie2_$check_num\"><input type=\"radio\" id=\"cookie2_$check_num\" name=\"cookie\" value=\"set\"> Save these options</label>
+    <label for=\"cookie3_$check_num\"><input type=\"radio\" id=\"cookie3_$check_num\" name=\"cookie\" value=\"clear\"> Clear saved options</label>";
     }
     else {
         $cookie_options = "
-    <label for=\"cookie_$check_num\"><input type=\"checkbox\" id=\"cookie_$check_num\" name=\"cookie\" value=\"set\" /> Save options in a <a href=\"http://www.w3.org/Protocols/rfc2109/rfc2109\">cookie</a></label>";
+    <label for=\"cookie_$check_num\"><input type=\"checkbox\" id=\"cookie_$check_num\" name=\"cookie\" value=\"set\"> Save options in a <a href=\"https://tools.ietf.org/html/rfc6265\">cookie</a></label>";
     }
 
     print "<form action=\"", $Opts{_Self_URI},
         "\" method=\"get\" onsubmit=\"return uriOk($check_num)\" accept-charset=\"UTF-8\">
-<p><label for=\"uri_$check_num\">Enter the address (<a href=\"http://www.w3.org/Addressing/\">URL</a>)
+<p><label for=\"uri_$check_num\">Enter the address (<a href=\"https://www.w3.org/Addressing/\">URL</a>)
 of a document that you would like to check:</label></p>
 <p><input type=\"text\" size=\"50\" id=\"uri_$check_num\" name=\"uri\" value=\"",
-        $requested_uri, "\" /></p>
+        $requested_uri, "\"></p>
 <fieldset id=\"extra_opt_uri_$check_num\" class=\"moreoptions\">
 	<legend class=\"toggletext\">More Options</legend>
 	<div class=\"options\">
   <p>
     <label for=\"summary_$check_num\"><input type=\"checkbox\" id=\"summary_$check_num\" name=\"summary\" value=\"on\"",
-        $sum, " /> Summary only</label>
-    <br />
+        $sum, "> Summary only</label>
+    <br>
     <label for=\"hide_redirects_$check_num\"><input type=\"checkbox\" id=\"hide_redirects_$check_num\" name=\"hide_redirects\" value=\"on\"",
         $red,
-        " /> Hide <a href=\"http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.3\">redirects</a>:</label>
+        "> Hide <a href=\"https://tools.ietf.org/html/rfc7231#section-6.4\">redirects</a>:</label>
     <label for=\"hide_type_all_$check_num\"><input type=\"radio\" id=\"hide_type_all_$check_num\" name=\"hide_type\" value=\"all\"",
-        $all, " /> all</label>
+        $all, "> all</label>
     <label for=\"hide_type_dir_$check_num\"><input type=\"radio\" id=\"hide_type_dir_$check_num\" name=\"hide_type\" value=\"dir\"",
-        $dir, " /> for directories only</label>
-    <br />
+        $dir, "> for directories only</label>
+    <br>
     <label for=\"no_accept_language_$check_num\"><input type=\"checkbox\" id=\"no_accept_language_$check_num\" name=\"no_accept_language\" value=\"on\"",
         $acc,
-        " /> Don't send the <tt><a href=\"http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.4\">Accept-Language</a></tt> header</label>
-    <br />
+        "> Don't send the <tt><a href=\"https://tools.ietf.org/html/rfc7231#section-5.3.5\">Accept-Language</a></tt> header</label>
+    <br>
     <label for=\"no_referer_$check_num\"><input type=\"checkbox\" id=\"no_referer_$check_num\" name=\"no_referer\" value=\"on\"",
         $ref,
-        " /> Don't send the <tt><a href=\"http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.36\">Referer</a></tt> header</label>
-    <br />
+        "> Don't send the <tt><a href=\"https://tools.ietf.org/html/rfc7231#section-5.5.2\">Referer</a></tt> header</label>
+    <br>
     <label title=\"Check linked documents recursively (maximum: ",
         $Opts{Max_Documents},
         " documents)\" for=\"recursive_$check_num\"><input type=\"checkbox\" id=\"recursive_$check_num\" name=\"recursive\" value=\"on\"",
-        $rec, " /> Check linked documents recursively</label>,
+        $rec, "> Check linked documents recursively</label>,
     <label title=\"Depth of the recursion (-1 is the default and means unlimited)\" for=\"depth_$check_num\">recursion depth: <input type=\"text\" size=\"3\" maxlength=\"3\" id=\"depth_$check_num\" name=\"depth\" value=\"",
-        $dep, "\" /></label>
-    <br /><br />", $cookie_options, "
+        $dep, "\"></label>
+    <br><br>", $cookie_options, "
   </p>
   </div>
 </fieldset>
-<p class=\"submit_button\"><input type=\"submit\" name=\"check\" value=\"Check\" /></p>
+<p class=\"submit_button\"><input type=\"submit\" name=\"check\" value=\"Check\"></p>
 </form>
-<div class=\"intro\" id=\"don_program\"></div>
-<script type=\"text/javascript\" src=\"http://www.w3.org/QA/Tools/don_prog.js\"></script>
+<div id=\"w3c-include\"><script type=\"text/javascript\" src=\"//www.w3.org/QA/Tools/w3c-include.js\"></script></div>
 ";
     return;
 }

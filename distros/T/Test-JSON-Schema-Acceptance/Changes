@@ -1,5 +1,10 @@
 Revision history for Test-JSON-Schema-Acceptance
 
+1.010     2021-06-19 18:27:26Z
+        - updated test suite to commit 0aefbb3d80e0caa22f3782677cf09c61b2205aa7
+          (note that "draft-future" is now available as a specification
+          version)
+
 1.009     2021-06-05 17:48:22Z
         - always include specification_version in results
         - pad results with more whitespace, to minimize diffs

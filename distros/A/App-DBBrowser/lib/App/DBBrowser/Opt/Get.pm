@@ -21,7 +21,6 @@ sub defaults {
     my ( $sf, $section, $key ) = @_;
     my $defaults = {
         G => {
-            info_expand          => 0,
             max_rows             => 200_000,
             menu_memory          => 1,
             metadata             => 0,
@@ -30,7 +29,6 @@ sub defaults {
             qualified_table_name => 0,
             quote_identifiers    => 1,
             thsd_sep             => ',',
-            show_table_name      => 1,
             dots                 => 0,
             base_indent          => 1,
             file_find_warnings   => 0,
@@ -79,8 +77,6 @@ sub defaults {
             color             => 0,
             decimal_separator => '.',
             f3                => 1,
-            grid              => 1,
-            keep_header       => 1,
             min_col_width     => 30,
             mouse             => 0,
             progress_bar      => 40_000,

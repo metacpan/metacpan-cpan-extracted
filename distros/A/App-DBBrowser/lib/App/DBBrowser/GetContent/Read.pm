@@ -37,16 +37,14 @@ sub new {
 }
 
 
-sub __print_args {
+sub __get_read_info {
     my ( $sf, $aoa ) = @_;
     my $term_w = get_term_width();
     my @tmp = ( 'Table Data:' );
     for my $row ( @$aoa ) {
         push @tmp, line_fold( join( ', ', @$row ), $term_w, { subseq_tab => ' ' x 4, join => 0 } );
     }
-    my $str = join( "\n", @tmp ) . "\n\n";
-    print clear_screen();
-    print $str;
+    return join( "\n", @tmp ) . "\n";
 }
 
 
@@ -58,10 +56,10 @@ sub from_col_by_col {
     my $aoa = [];
     my $col_names;
     if ( $sf->{i}{stmt_types}[0] eq 'Create_table' ) {
-        $sf->__print_args( $aoa );
+        my $info = $sf->__get_read_info( $aoa );
         # Choose a number
         my $col_count = $tu->choose_a_number( 2,
-            { cs_label => 'Number of columns: ', small_first => 1, confirm => 'Confirm', back => 'Back' }
+            { info => $info, cs_label => 'Number of columns: ', small_first => 1, confirm => 'Confirm', back => 'Back' }
         );
         if ( ! $col_count ) {
             return;
@@ -72,9 +70,9 @@ sub from_col_by_col {
         # Fill_form
         my $form = $tf->fill_form(
             $fields,
-            { prompt => 'Col names:', auto_up => 2, confirm => $sf->{i}{_confirm}, back => $sf->{i}{_back} . '   ' }
+            { info => $info, prompt => 'Col names:', auto_up => 2, confirm => $sf->{i}{_confirm}, back => $sf->{i}{_back} . '   ' }
         );
-        if ( ! $form ) {
+        if ( ! $form ) { ## number of cols
             return;
         }
         $col_names = [ map { $_->[1] } @$form ]; # not quoted
@@ -88,9 +86,12 @@ sub from_col_by_col {
         my $row_idxs = @$aoa;
 
         COLS: for my $col_name ( @$col_names ) {
-            $sf->__print_args( $aoa );
+            my $info = $sf->__get_read_info( $aoa );
             # Readline
-            my $col = $tf->readline( $col_name . ': ' );
+            my $col = $tf->readline(
+                $col_name . ': ',
+                { info => $info }
+            );
             push @{$aoa->[$row_idxs]}, $col;
         }
         my $default = 0;
@@ -99,14 +100,14 @@ sub from_col_by_col {
         }
 
         ASK: while ( 1 ) {
-            $sf->__print_args( $aoa );
+            my $info = $sf->__get_read_info( $aoa );
             my ( $add, $del ) = ( 'Add', 'Del' );
             my @pre = ( undef, $sf->{i}{ok} );
             my $menu = [ @pre, $add, $del ];
             # Choose
             my $add_row = $tc->choose(
                 $menu,
-                { %{$sf->{i}{lyt_h}}, prompt => '', default => $default }
+                { %{$sf->{i}{lyt_h}}, info => $info, prompt => '', default => $default }
             );
             if ( ! defined $add_row ) {
                 if ( @$aoa ) {
@@ -202,7 +203,7 @@ sub from_file {
             # Choose
             my $idx = $tc->choose(
                 $menu,
-                { %{$sf->{i}{lyt_v_clear}}, prompt => '', index => 1, default => $sf->{i}{gc}{old_file_idx}, undef => '  <=' }
+                { %{$sf->{i}{lyt_v}}, prompt => '', index => 1, default => $sf->{i}{gc}{old_file_idx}, undef => '  <=' }
             );
             if ( ! defined $idx || ! defined $menu->[$idx] ) {
                 return if $sf->{o}{insert}{history_dirs} == 1;
@@ -264,7 +265,7 @@ sub __directory {
         # Choose
         my $idx = $tc->choose(
             $menu,
-            { %{$sf->{i}{lyt_v_clear}}, prompt => 'Choose a dir:', index => 1,
+            { %{$sf->{i}{lyt_v}}, prompt => 'Choose a dir:', index => 1,
               default => $sf->{i}{gc}{old_dir_idx}, undef => '  <=' }
         );
         if ( ! defined $idx || ! defined $menu->[$idx] ) {

@@ -1,12 +1,13 @@
 package PICA::Data;
 use v5.14.1;
 
-our $VERSION = '1.24';
+our $VERSION = '1.27';
 
 use Exporter 'import';
 our @EXPORT_OK = qw(pica_parser pica_writer pica_path pica_xml_struct
     pica_match pica_values pica_value pica_fields pica_title pica_holdings pica_items
-    pica_split pica_annotation pica_sort pica_guess clean_pica pica_string pica_id);
+    pica_split pica_annotation pica_sort pica_guess clean_pica pica_string pica_id
+    pica_diff pica_patch pica_empty);
 our %EXPORT_TAGS = (all => [@EXPORT_OK]);
 
 our $ILN_PATH = PICA::Path->new('101@a');
@@ -89,12 +90,9 @@ sub pica_items {
                 }
                 push @record, shift @fields;
             }
-            push @items, {record => \@record, _id => $epn};
+            push @items, bless {record => \@record, _id => $epn},
+                'PICA::Data';
         }
-    }
-
-    if (blessed($_[0])) {
-        bless $_, blessed($_[0]) for @items;
     }
 
     return \@items;
@@ -129,7 +127,7 @@ sub pica_title {
     my $ppn = pica_value($record, '003@0');
     $record->{_id} = $ppn if defined $ppn;
 
-    return blessed($_[0]) ? bless $record, blessed($_[0]) : $record;
+    return bless $record, 'PICA::Data';
 }
 
 sub pica_holdings {
@@ -185,9 +183,7 @@ sub pica_holdings {
             };
     }
 
-    if (blessed($_[0])) {
-        bless $_, blessed($_[0]) for @holdings;
-    }
+    bless $_, 'PICA::Data' for @holdings;
 
     return \@holdings;
 }
@@ -223,6 +219,11 @@ sub pica_id {
     return $_[0]->{_id} if reftype $_[0] eq 'HASH';
 }
 
+sub pica_empty {
+    my $fields = reftype $_[0] eq 'HASH' ? $_[0]->{record} : $_[0];
+    return !@$fields;
+}
+
 sub pica_annotation {
     my $field = shift;
 
@@ -256,7 +257,11 @@ sub pica_annotation {
 *values   = *pica_values;
 *string   = *pica_string;
 *id       = *pica_id;
+*empty    = *pica_empty;
+*diff     = *pica_diff = *PICA::Patch::pica_diff;
+*patch    = *pica_patch = *PICA::Patch::pica_patch;
 
+use PICA::Patch;
 use PICA::Parser::XML;
 use PICA::Parser::Plus;
 use PICA::Parser::Plain;
@@ -335,9 +340,7 @@ sub _pica_module {
 sub write {
     my $pica   = shift;
     my $writer = $_[0];
-    unless (blessed $writer) {
-        $writer = pica_writer(@_ ? @_ : 'plain');
-    }
+    $writer = pica_writer(@_ ? @_ : 'plain') unless blessed $writer;
     $writer->write($pica);
 }
 
@@ -361,9 +364,7 @@ sub pica_xml_struct {
     }
 
     my ($id) = map {$_->[-1]} grep {$_->[0] =~ '003@'} @$record;
-    $record = {_id => $id, record => $record};
-    bless $record, 'PICA::Data' if !!$options{bless};
-    return $record;
+    return bless {_id => $id, record => $record}, 'PICA::Data';
 }
 
 1;
@@ -375,7 +376,7 @@ PICA::Data - PICA record processing
 
 =begin markdown 
 
-[![Unix build Status](https://travis-ci.org/gbv/PICA-Data.png)](https://travis-ci.org/gbv/PICA-Data)
+[![Unix build Status](https://travis-ci.com/gbv/PICA-Data.png)](https://travis-ci.com/gbv/PICA-Data)
 [![Windows build status](https://ci.appveyor.com/api/projects/status/5qjak74x7mjy7ne6?svg=true)](https://ci.appveyor.com/project/nichtich/pica-data)
 [![Coverage Status](https://coveralls.io/repos/gbv/PICA-Data/badge.svg)](https://coveralls.io/r/gbv/PICA-Data)
 [![Kwalitee Score](http://cpants.cpanauthors.org/dist/PICA-Data.png)](http://cpants.cpanauthors.org/dist/PICA-Data)
@@ -408,7 +409,7 @@ PICA::Data - PICA record processing
         my $items    = pica_items($record);
         ...
 
-        # object accessors (if parser option 'bless' enabled)
+        # object accessors
         my $ppn      = $record->id;
         my $ppn      = $record->value('003@0');
         my $ddc      = $record->match('045Ue', split => 1, nested_array => 1);
@@ -419,7 +420,7 @@ PICA::Data - PICA record processing
         # write record
         $writer->write($record);
         
-        # write record via method (if blessed)
+        # write methods
         $record->write($writer);
         $record->write( xml => @options );
         $record->write; # default "plain" writer
@@ -516,8 +517,7 @@ corresponding parser class or C<undef>.
 
 =head2 pica_xml_struct( $xml, %options )
 
-Convert PICA-XML, expressed in L<XML::Struct> structure into an (optionally
-blessed) PICA record structure.
+Convert PICA-XML, expressed in L<XML::Struct> structure into a PICA::Data object.
 
 =head2 pica_writer( $type [, @options] )
 
@@ -584,7 +584,7 @@ expression. The following are virtually equivalent:
 
     pica_values($record, $path);
     $path->record_subfields($record);
-    $record->values($path); # if $record is blessed
+    $record->values($path);
 
 =head2 pica_fields( $record[, $path...] )
 
@@ -593,7 +593,7 @@ one ore more PICA path expression. The following are virtually equivalent:
 
     pica_fields($record, $path);
     $path->record_fields($record);
-    $record->fields($path); # if $record is blessed
+    $record->fields($path);
 
 =head2 pica_title( $record )
 
@@ -623,6 +623,16 @@ level 2 fields not belonging to a level 1, then level 1, each followed by level
 =head2 pica_annotation( $field [, $annotation ] )
 
 Get or set a PICA field annotation. Use C<undef> to remove annotation.
+
+=head2 pica_diff( $before, $after )
+
+Return the difference between two records as annotated record. Also available
+as method C<diff>. See L<PICA::Patch> for details.
+
+=head2 pica_patch( $record, $diff )
+
+Return a new record by application of a difference given as annotated PICA.
+Also available as method C<patch>. See L<PICA::Patch> for details.
 
 =head1 ACCESSORS
 
@@ -662,21 +672,36 @@ where the id of each record contains the EPN (subfield C<203@/**0>).
 
 Returns the record id, if given.
 
+=head2 empty
+
+Tell whether the record is empty (no fields).
+
 =head1 METHODS
 
 =head2 write( [ $type [, @options] ] | $writer )
 
 Write PICA record with given L<PICA::Writer::...|PICA::Writer::Base> or
-L<PICA::Writer::Plain> by default. This method is a shortcut for blessed
-record objects:
+L<PICA::Writer::Plain> by default. This are equivalent:
 
     pica_writer( xml => $file )->write( $record );
-    $record->write( xml => $file ); # equivalent if $record is blessed 
+    $record->write( xml => $file );
 
 =head2 string( [ $type ] )
 
 Serialize PICA record in a given format (C<plain> by default). This method can
 also be used as function C<pica_string>.
+
+=head2 diff( $record )
+
+Calculate the difference of the record to another record.
+
+=head2 patch( $diff )
+
+Calculate a new record by application of an annotated PICA record. Annotations
+C<+> and C<-> denote fields to be added or removed. Fields with blank
+annotations are check to exist in the original record.
+
+The records should not contain multiple records of level 1 and/or level 2.
 
 =head1 CONTRIBUTORS
 

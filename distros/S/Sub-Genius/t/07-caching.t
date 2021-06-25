@@ -23,13 +23,13 @@ ok !-e $sq->cachefile, q{Default cached PRE file doesn't exists};
 $sq->init_plan;    # caching is triggered
 ok -e $sq->cachefile, q{Default cached PRE file exists};
 is_deeply Storable::retrieve( $sq->cachefile ), $sq->dfa, q{Cached DFA from PRE as expected};
-is( ref $sq->dfa, q{FLAT::DFA}, q{DFA confirmed} );
+is( ref $sq->dfa, q{FLAT::DFA::Minimal}, q{DFA confirmed} );
 
 $sq = Sub::Genius->new( preplan => q{A&B&C} );
 ok -e $sq->cachefile, q{Default cached PRE file exists};
 $sq->init_plan;    # caching is triggered
 is_deeply Storable::retrieve( $sq->cachefile ), $sq->dfa, q{Cached DFA from PRE as expected};
-is( ref $sq->dfa, q{FLAT::DFA}, q{DFA confirmed} );
+is( ref $sq->dfa, q{FLAT::DFA::Minimal}, q{DFA confirmed} );
 
 # clean for next test
 unlink $sq->cachefile;
@@ -50,13 +50,13 @@ ok !-e $sq->cachefile, q{Default cached PRE file doesn't exists};
 $sq->init_plan;    # caching is triggered
 ok -e $sq->cachefile, q{Default cached PRE file exists};
 is_deeply Storable::retrieve( $sq->cachefile ), $sq->dfa, q{Cached DFA from PRE as expected};
-is( ref $sq->dfa, q{FLAT::DFA}, q{DFA confirmed} );
+is( ref $sq->dfa, q{FLAT::DFA::Minimal}, q{DFA confirmed} );
 
 $sq = Sub::Genius->new( preplan => q{A&B&C}, cachedir => $dir );
 ok -e $sq->cachefile, q{Default cached PRE file exists};
 $sq->init_plan;    # caching is triggered
 is_deeply Storable::retrieve( $sq->cachefile ), $sq->dfa, q{Cached DFA from PRE as expected};
-is( ref $sq->dfa, q{FLAT::DFA}, q{DFA confirmed} );
+is( ref $sq->dfa, q{FLAT::DFA::Minimal}, q{DFA confirmed} );
 
 # clean for next test
 unlink $sq->cachefile;

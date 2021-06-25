@@ -8,7 +8,7 @@ use FFI::Platypus::Function;
 use FFI::Platypus::Type;
 
 # ABSTRACT: Write Perl bindings to non-Perl libraries with FFI. No XS required.
-our $VERSION = '1.43'; # VERSION
+our $VERSION = '1.46'; # VERSION
 
 # Platypus-Man,
 # Platypus-Man,
@@ -585,7 +585,7 @@ FFI::Platypus - Write Perl bindings to non-Perl libraries with FFI. No XS requir
 
 =head1 VERSION
 
-version 1.43
+version 1.46
 
 =head1 SYNOPSIS
 
@@ -1406,7 +1406,7 @@ L<FFI::Platypus::Memory> module.
    });
  }
  
- # now we can actually use our My::UnixTime class
+ # now we can actually use our Unix::TimeStruct class
  my $time = Unix::TimeStruct->localtime;
  printf "time is %d:%d:%d %s\n",
    $time->tm_hour,
@@ -2506,6 +2506,8 @@ Diab Jerius (DJERIUS)
 Eric Brine (IKEGAMI)
 
 szTheory
+
+José Joaquín Atria (JJATRIA)
 
 =head1 COPYRIGHT AND LICENSE
 

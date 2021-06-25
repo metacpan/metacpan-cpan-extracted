@@ -1,19 +1,17 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2009,2010 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2009-2021 -- leonerd@leonerd.org.uk
 
-package Convert::Color::XTerm;
+package Convert::Color::XTerm 0.06;
 
-use strict;
+use v5.14;
 use warnings;
 use base qw( Convert::Color::RGB8 );
 
 __PACKAGE__->register_color_space( 'xterm' );
 
 use Carp;
-
-our $VERSION = '0.05';
 
 =head1 NAME
 
@@ -23,15 +21,15 @@ C<Convert::Color::XTerm> - indexed colors used by XTerm
 
 Directly:
 
- use Convert::Color::XTerm;
+   use Convert::Color::XTerm;
 
- my $red = Convert::Color::XTerm->new( 1 );
+   my $red = Convert::Color::XTerm->new( 1 );
 
 Via L<Convert::Color>:
 
- use Convert::Color;
+   use Convert::Color;
 
- my $cyan = Convert::Color->new( 'xterm:14' );
+   my $cyan = Convert::Color->new( 'xterm:14' );
 
 =head1 DESCRIPTION
 
@@ -59,9 +57,15 @@ i.e. a dark grey.
 
 16-231: A 6x6x6 RGB color cube.
 
+I<Since version 0.06:> This can also be specified as C<rgb(R,G,B)> where
+each of R, G and B can be C<0> to C<5>, or C<0%> to C<100%>.
+
 =item *
 
 232-255: 24 greyscale ramp.
+
+I<Since version 0.06:> This can also be specified as C<grey(GREY)>, where
+GREY is C<0> to C<23>, or C<0%> to C<100%>.
 
 =back
 
@@ -138,28 +142,59 @@ __PACKAGE__->register_palette(
 
 =cut
 
-=head2 $color = Convert::Color::XTerm->new( $index )
+=head2 new
+
+   $color = Convert::Color::XTerm->new( $index )
 
 Returns a new object to represent the color at that index.
 
 =cut
 
+sub _index_or_percent
+{
+   my ( $name, $val, $max ) = @_;
+
+   if( $val =~ m/^(\d+)%$/ ) {
+      $1 <= 100 or croak "Convert::Color::XTerm: Invalid percentage for $name: '$val'";
+      return int( $max * $1 / 100 );
+   }
+   elsif( $val =~ m/^(\d+)$/ ) {
+      $1 <= $max or croak "Convert::Color::XTerm: Invalid index for $name: '$val'";
+      return $1;
+   }
+   else {
+      croak "Convert::Color::XTerm: Invalid value for $name: '$val'";
+   }
+}
+
 sub new
 {
    my $class = shift;
+   @_ == 1 or
+      croak "usage: Convert::Color::XTerm->new( INDEX )";
 
-   if( @_ == 1 ) {
-      my $index = $_[0];
+   @color or _init_colors;
 
-      @color or _init_colors;
+   if( $_[0] =~ m/^grey\((.*)\)$/ ) {
+      my $grey = _index_or_percent( grey => $1, 23 );
+      return $color[232 + $grey];
+   }
+   elsif( $_[0] =~ m/^rgb\((.*),(.*),(.*)\)$/ ) {
+      my $red   = _index_or_percent( red   => $1, 5 );
+      my $green = _index_or_percent( green => $2, 5 );
+      my $blue  = _index_or_percent( blue  => $3, 5 );
+      return $color[16 + 36*$red + 6*$green + $blue];
+   }
+   elsif( $_[0] =~ m/^(\d+)$/ ) {
+      my $index = $1;
 
       $index >= 0 and $index < 256 or
-         croak "No such XTerm color at index '$index'";
+      croak "No such XTerm color at index '$index'";
 
       return $color[$index];
    }
    else {
-      croak "usage: Convert::Color::XTerm->new( INDEX )";
+      croak "Convert::Color::XTerm: Expected index, grey() or rgb() specification, got '$_[0]'";
    }
 }
 
@@ -167,7 +202,9 @@ sub new
 
 =cut
 
-=head2 $index = $color->index
+=head2 index
+
+   $index = $color->index
 
 The index of the XTerm color.
 
@@ -178,11 +215,6 @@ sub index
    my $self = shift;
    return $self->[3];
 }
-
-# Keep perl happy; keep Britain tidy
-1;
-
-__END__
 
 =head1 SEE ALSO
 
@@ -197,3 +229,7 @@ L<Convert::Color> - color space conversions
 =head1 AUTHOR
 
 Paul Evans <leonerd@leonerd.org.uk>
+
+=cut
+
+0x55AA;

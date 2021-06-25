@@ -52,4 +52,7 @@ pica_annotation($annotated, undef);
 is pica_annotation($field), ' ', 'added annotation';
 is pica_annotation($annotated), undef, 'removed annotation';
 
+ok pica_empty([]), 'empty';
+ok pica_empty({ record => [] }), 'empty';
+
 done_testing;

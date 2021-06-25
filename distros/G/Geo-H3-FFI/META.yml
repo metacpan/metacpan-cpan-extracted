@@ -1,0 +1,31 @@
+---
+abstract: 'Perl FFI binding to H3 library functions'
+author:
+  - 'Michael R. Davis (mrdvt@cpan.org)'
+build_requires:
+  Test::More: '0'
+  Test::Number::Delta: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.52, CPAN::Meta::Converter version 2.150001'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Geo-H3-FFI
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  FFI::C: '0'
+  FFI::CheckLib: '0'
+  FFI::Platypus: '0'
+  Package::New: '0'
+  perl: '5.008'
+resources:
+  bugtracker: https://github.com/mrdvt92/perl-Geo-H3-FFI/issues
+  homepage: https://github.com/mrdvt92/perl-Geo-H3-FFI
+  repository: https://github.com/mrdvt92/perl-Geo-H3-FFI.git
+version: '0.06'

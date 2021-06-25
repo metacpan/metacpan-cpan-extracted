@@ -2,7 +2,7 @@ package Mojolicious::Plugin::Obrazi;
 use feature ':5.26';
 use Mojo::Base 'Mojolicious::Plugin';
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 sub register {
   my ($self, $app) = @_;
@@ -46,6 +46,15 @@ Register plugin in L<Mojolicious> application.
 =head1 NOTES
 
 This plugin requires Perl 5.26+ and Mojolicious 9.17+.
+
+=head1 COPYRIGHT
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+
+The full text of the license can be found in the
+LICENSE file included with this module.
 
 =head1 SEE ALSO
 

@@ -1,5 +1,8 @@
 Revision history for Mojolicious-Plugin-OAuth2-Server
 
+0.48     2021-06-15
+        - Accept error_description from auth methods (GH #26)
+
 0.47     2020-07-20
         - Add t/170_expiry_ttl_callback.t for Net::OAuth2::AuthorizationServer v0.26 changes
 

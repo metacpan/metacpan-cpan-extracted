@@ -1,5 +1,15 @@
 Revision history for Hash-Wrap
 
+0.14      2021-06-21 16:39:56-04:00 America/New_York
+
+  [ENHANCEMENT]
+
+    * methods can be added to the wrapping class via the -methods option.
+
+  [BUILD]
+
+    * use META.json instead of cpanfile as build-from-repo artifact
+
 0.13      2021-04-01 15:45:07-04:00 America/New_York
 
   [ENHANCEMENT]

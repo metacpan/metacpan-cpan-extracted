@@ -75,7 +75,7 @@ sub get_databases {
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my $choice = $tc->choose(
         [ undef, $ok, $change ],
-        { %{$sf->{i}{lyt_v_clear}}, prompt => 'Search path: ' . join( ', ', @$dirs ), info => 'SQLite Databases' }
+        { %{$sf->{i}{lyt_v}}, prompt => 'Search path: ' . join( ', ', @$dirs ), info => 'SQLite Databases' }
     );
     if ( ! defined $choice ) {
         return $databases;

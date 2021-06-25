@@ -1,6 +1,6 @@
 package HTTP::Any;
 
-our $VERSION = '0.13';
+our $VERSION = '0.15';
 
 1;
 
@@ -8,7 +8,7 @@ __END__
 
 =head1 NAME
 
-HTML::Any - a common interface for HTTP clients (LWP, AnyEvent::HTTP, Curl)
+HTTP::Any - a common interface for HTTP clients (LWP, AnyEvent::HTTP, Curl)
 
 =head1 SYNOPSIS
 
@@ -31,7 +31,7 @@ HTML::Any - a common interface for HTTP clients (LWP, AnyEvent::HTTP, Curl)
 
 =head1 MOTIVATION
 
-LWP, AnyEvent::HTTP, Curl - each of them has its advantages, disadvantages and peculiarities. The HTML::Any modules were created during the process of investigation of the strong and weak sides of those above-mentioned HTML clients. They allow quick switching between them to use the best one for each definite case.
+LWP, AnyEvent::HTTP, Curl - each of them has its advantages, disadvantages and peculiarities. The HTTP::Any modules were created during the process of investigation of the strong and weak sides of those above-mentioned HTTP clients. They allow quick switching between them to use the best one for each definite case.
 
 =head1 DESCRIPTION
 
@@ -128,9 +128,9 @@ User agent name
 
 Timeout, seconds
 
-=item gzip
+=item compressed
 
-This option adds 'Accept-Encoding' header with gzip value to the HTTP query and tells that the response must be decoded.
+This option adds 'Accept-Encoding' header to the HTTP query and tells that the response must be decoded.
 If you don't want to decode the response, please add 'Accept-Encoding' header into the 'headers' parameter.
 
 =item headers
@@ -197,7 +197,6 @@ When method parameter is "POST", the POST request is used with body parameter on
 =back
 
 =head3 finish callback function
-
 
  my $cb = sub {
  	my ($is_success, $body, $headers, $redirects) = @_;

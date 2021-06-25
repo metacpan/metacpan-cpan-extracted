@@ -3,7 +3,6 @@ package MyApp::Calculator;
 use strict;
 use warnings;
 
-use AnyEvent::Impl::Perl;
 use Beekeeper::Client;
 use Beekeeper::Config;
 

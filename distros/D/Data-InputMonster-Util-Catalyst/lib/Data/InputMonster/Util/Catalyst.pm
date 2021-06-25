@@ -1,11 +1,18 @@
 use strict;
 use warnings;
-package Data::InputMonster::Util::Catalyst;
-{
-  $Data::InputMonster::Util::Catalyst::VERSION = '0.005';
-}
+package Data::InputMonster::Util::Catalyst 0.006;
 # ABSTRACT: InputMonster sources for common Catalyst sources
 
+#pod =head1 DESCRIPTION
+#pod
+#pod This module exports a bunch of routines to make it easy to use
+#pod Data::InputMonster with Catalyst.  Each method, below, is also available as an
+#pod exported subroutine, through the magic of Sub::Exporter.
+#pod
+#pod These sources will expect to receive the Catalyst object (C<$c>) as the
+#pod C<$input> argument to the monster's C<consume> method.
+#pod
+#pod =cut
 
 use Carp ();
 use Sub::Exporter::Util qw(curry_method);
@@ -18,6 +25,14 @@ use Sub::Exporter -setup => {
   }
 };
 
+#pod =method form_param
+#pod
+#pod   my $source = form_param($field_name);
+#pod
+#pod This source will look for form parameters (with C<< $c->req->params >>) with
+#pod the given field name.
+#pod
+#pod =cut
 
 sub form_param {
   my ($self, $field_name) = @_;
@@ -27,6 +42,14 @@ sub form_param {
   }
 }
 
+#pod =method body_param
+#pod
+#pod   my $source = body_param($field_name);
+#pod
+#pod This source will look for form parameters (with C<< $c->req->body_params >>)
+#pod with the given field name.
+#pod
+#pod =cut
 
 sub body_param {
   my ($self, $field_name) = @_;
@@ -36,6 +59,14 @@ sub body_param {
   }
 }
 
+#pod =method query_param
+#pod
+#pod   my $source = query_param($field_name);
+#pod
+#pod This source will look for form parameters (with C<< $c->req->query_params >>)
+#pod with the given field name.
+#pod
+#pod =cut
 
 sub query_param {
   my ($self, $field_name) = @_;
@@ -45,6 +76,14 @@ sub query_param {
   }
 }
 
+#pod =method session_entry
+#pod
+#pod   my $source = session_entry($locator);
+#pod
+#pod This source will look for an entry in the session for the given locator, using
+#pod the C<dig> utility from L<Data::InputMonster::Util>.
+#pod
+#pod =cut
 
 sub session_entry {
   my ($self, $locator) = @_;
@@ -72,7 +111,7 @@ Data::InputMonster::Util::Catalyst - InputMonster sources for common Catalyst so
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 DESCRIPTION
 
@@ -82,6 +121,13 @@ exported subroutine, through the magic of Sub::Exporter.
 
 These sources will expect to receive the Catalyst object (C<$c>) as the
 C<$input> argument to the monster's C<consume> method.
+
+=head1 PERL VERSION SUPPORT
+
+This code is effectively abandonware.  Although releases will sometimes be made
+to update contact info or to fix packaging flaws, bug reports will mostly be
+ignored.  Feature requests are even more likely to be ignored.  (If someone
+takes up maintenance of this code, they will presumably remove this notice.)
 
 =head1 METHODS
 
@@ -115,11 +161,11 @@ the C<dig> utility from L<Data::InputMonster::Util>.
 
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@cpan.org>
+Ricardo SIGNES <rjbs@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 by Ricardo SIGNES.
+This software is copyright (c) 2021 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

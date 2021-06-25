@@ -23,13 +23,13 @@ our $CSS_DEFINITION_KEY_PREFIX = 'blue';
 our $CSS_DEFINITION_VALUE_NUMBER = 'red';
 our $CSS_DEFINITION_VALUE_STRING = 'blue';
 
-our $VERSION = 0.01;
+our $VERSION = 0.02;
 
 # At-rules.
 sub _put_at_rules {
-	my ($self, $at_rule, $file) = @_;
+	my ($self, $at_rule, $value) = @_;
 	push @{$self->{'flush_code'}}, color($CSS_AT_RULE_KEYWORD).$at_rule.color('reset').
-		' "'.color($CSS_AT_RULE_VALUE).$file.color('reset').'";';
+		' "'.color($CSS_AT_RULE_VALUE).$value.color('reset').'";';
 	$self->{'processed'} = 1;
 	return;
 }
@@ -341,6 +341,10 @@ Raw printing 'CSS::Struct' structure to CSS code.
 
 Indent printing 'CSS::Struct' structure to CSS code.
 
+=item L<CSS::Struct::Output::Structure>
+
+Structure class for 'CSS::Struct' output.
+
 =back
 
 =head1 REPOSITORY
@@ -361,6 +365,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.01
+0.02
 
 =cut

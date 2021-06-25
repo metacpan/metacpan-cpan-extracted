@@ -1,11 +1,11 @@
-Math-DifferenceSet-Planar version 0.013
-=======================================
+Math-DifferenceSet-Planar
+=========================
 
 A planar difference set in a finite group (G, +) is a subset D of G
 with the property that any nonzero element of G can be represented as a
 difference of two elements of D in exactly one way.  If D has k elements
-there are k × (k - 1) differences of unequal elements of D and thus
-k² - k + 1 elements in G.  Planar difference sets are known to exist
+there are k * (k - 1) differences of unequal elements of D and thus
+k^2 - k + 1 elements in G.  Planar difference sets are known to exist
 in modular integer groups where k - 1 is a prime power.  As these finite
 groups are cyclic these sets are called cyclic planar difference sets.
 

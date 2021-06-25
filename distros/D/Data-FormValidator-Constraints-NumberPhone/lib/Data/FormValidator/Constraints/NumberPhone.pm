@@ -8,7 +8,7 @@ use Number::Phone;
 
 ###############################################################################
 # Version number.
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 ###############################################################################
 # Allow our methods to be exported.
@@ -113,7 +113,12 @@ Copyright (C) 2012, Graham TerMarsch.  All Rights Reserved.
 
 =head1 SEE ALSO
 
-L<Data::FormValidator>,
-L<Number::Phone>.
+=over
+
+=item L<Data::FormValidator>
+
+=item L<Number::Phone>
+
+=back
 
 =cut

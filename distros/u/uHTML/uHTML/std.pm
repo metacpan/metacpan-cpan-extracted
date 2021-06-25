@@ -22,7 +22,7 @@ use strict ;
 
 package uHTML::std ;
 
-use version ; our $VERSION = "2.23" ;
+use version ; our $VERSION = "2.24" ;
 
 require Exporter;
 our @ISA = qw(Exporter);
@@ -453,7 +453,8 @@ sub _DoMacro( $ )
   }
   else
   {
-    $Node->HTML( $Macro->HTML() . $Node->HTML() ) ;
+    $Node->HTML( $Macro->HTML() ) ;
+#     $Node->HTML( $Macro->HTML() . $Node->HTML() ) ;  # Orig Version !!!!!
   }
 }
 

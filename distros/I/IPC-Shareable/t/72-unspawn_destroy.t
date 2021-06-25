@@ -1,6 +1,10 @@
 use warnings;
 use strict;
 
+unless ( $ENV{RELEASE_TESTING} ) {
+#    plan( skip_all => "Author test: RELEASE_TESTING not set" );
+}
+
 use Data::Dumper;
 use IPC::Shareable;
 use Test::More;

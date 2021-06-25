@@ -1,11 +1,12 @@
 package App::picadata;
 use v5.14.1;
 
-our $VERSION = '1.24';
+our $VERSION = '1.27';
 
 use Getopt::Long qw(GetOptionsFromArray :config bundling);
 use Pod::Usage;
 use PICA::Data qw(pica_parser pica_writer);
+use PICA::Patch qw(pica_diff pica_patch);
 use PICA::Schema qw(field_identifier);
 use PICA::Schema::Builder;
 use Getopt::Long qw(:config bundling);
@@ -38,8 +39,8 @@ my %COLORS
 sub new {
     my ($class, @argv) = @_;
 
-    my $interactive = -t *STDOUT;                           ## no critic
-    my $command = (!@argv && $interactive) ? 'help' : '';
+    my $interactive = -t *STDOUT;                               ## no critic
+    my $command     = (!@argv && $interactive) ? 'help' : '';
 
     my $number = 0;
     if (my ($i) = grep {$argv[$_] =~ /^-(\d+)$/} (0 .. @argv - 1)) {
@@ -65,8 +66,6 @@ sub new {
         $command = $cmd{shift @argv};
         $command =~ s/^sf$/subfields/;
     }
-    $opt->{error} = "$command not implemented yet"
-        if $command =~ /diff|patch/;
 
     GetOptionsFromArray(
         \@argv,       $opt,           'from|f=s', 'to|t:s',
@@ -82,14 +81,14 @@ sub new {
 
     delete $opt->{$_} for qw(count build help version);
 
-    my $pattern = '[012.][0-9.][0-9.][A-Z@.](\$[^|]+)?';
+    my $pattern = '[012.][0-9.][0-9.][A-Z@.](\$[^|]+|/[0-9.-]+)?';
     while (@argv && $argv[0] =~ /^$pattern(\s*\|\s*($pattern)?)*$/) {
         push @path, shift @argv;
     }
 
     if (@path) {
         @path = map {
-            my $p = eval {PICA::Path->new($_)};
+            my $p = parse_path($_);
             $p || die "invalid PICA Path: $_\n";
         } grep {$_ ne ""} map {split /\s*\|\s*/, $_} @path;
 
@@ -128,7 +127,24 @@ sub new {
         }
     }
 
-    $opt->{schema} = load_schema($opt->{schema}) if $opt->{schema};
+    $opt->{annotate} = 1 if $command eq 'diff';
+    $opt->{annotate} = 0 if $command eq 'patch';
+
+    if ($opt->{schema}) {
+        $opt->{schema} = load_schema($opt->{schema});
+        $opt->{schema}{ignore_unknown} = $opt->{unknown};
+    }
+
+    if ($command =~ qr{diff|patch}) {
+        unshift @argv, '-' if @argv == 1;
+        $opt->{error} = "$command requires two input files" if @argv != 2;
+
+        if ($command eq 'diff') {
+
+            # only Plain and JSON support annotations
+            $opt->{to} = 'plain' unless $TYPES{lc $opt->{to}} eq 'JSON';
+        }
+    }
 
     $opt->{input} = @argv ? \@argv : ['-'];
 
@@ -140,6 +156,9 @@ sub new {
 
     $opt->{to} = $opt->{from}
         if !$opt->{to} and $command =~ /(convert|split|diff|patch)/;
+    $opt->{to} = 'plain'
+        if !$opt->{to} && $command eq 'validate' && $opt->{annotate};
+
     if ($opt->{to}) {
         $opt->{to} = $TYPES{lc $opt->{to}}
             or $opt->{error} = "unknown serialization type: " . $opt->{to};
@@ -148,6 +167,20 @@ sub new {
     $opt->{command} = $command;
 
     bless $opt, $class;
+}
+
+sub parser_from_input {
+    my ($self, $in, $format) = @_;
+
+    if ($in eq '-') {
+        $in = *STDIN;
+        binmode $in, ':encoding(UTF-8)';
+    }
+    else {
+        die "File not found: $in\n" unless -e $in;
+    }
+
+    return pica_parser($format || $self->{from}, $in, bless => 1);
 }
 
 sub load_schema {
@@ -168,10 +201,10 @@ sub load_schema {
 }
 
 sub run {
-    my ($self) = @_;
+    my ($self)  = @_;
     my $command = $self->{command};
-    my @pathes = @{$self->{path} || []};
-    my $schema = $self->{schema};
+    my @pathes  = @{$self->{path} || []};
+    my $schema  = $self->{schema};
 
     # commands that don't parse any input data
     if ($self->{error}) {
@@ -185,13 +218,14 @@ sub run {
     }
     elsif ($command eq 'version') {
         say $PICA::Data::VERSION;
-        exit
+        exit;
     }
     elsif ($command eq 'explain') {
-        explain($schema, $_) for @pathes;
+        $self->explain($schema, $_) for @pathes;
         unless (@pathes) {
             while (<STDIN>) {
-                explain($schema, $2) if $_ =~ /^([^0-9a-z]\s+)?([^ ]+)/;
+                $self->explain($schema, $2)
+                    if $_ =~ /^([^0-9a-z]\s+)?([^ ]+)/;
             }
         }
         exit;
@@ -202,7 +236,7 @@ sub run {
     if ($self->{to}) {
         $writer = pica_writer(
             $self->{to},
-            color => ($self->{color} ? \%COLORS : undef),
+            color    => ($self->{color} ? \%COLORS : undef),
             schema   => $schema,
             annotate => $self->{annotate},
         );
@@ -228,8 +262,8 @@ sub run {
 
         $record = $record->sort if $self->{order};
 
-        $record = {record => $record->fields(@pathes)} if @pathes;
-        next unless @{$record->{record}};    # ignore empty records
+        $record->{record} = $record->fields(@pathes) if @pathes;
+        return if $record->empty;
 
         # TODO: also validate on other commands?
         if ($command eq 'validate') {
@@ -251,32 +285,56 @@ sub run {
         $builder->add($record)  if $builder;
 
         if ($command eq 'count') {
-            $stats->{holdings} += @{$record->holdings};
-            $stats->{items}    += @{$record->items};
-            $stats->{fields}   += @{$record->{record}};
+            $stats->{holdings}
+                += grep {@{$_->fields('1...')}} @{$record->holdings};
+            $stats->{items}  += grep {!$_->empty} @{$record->items};
+            $stats->{fields} += @{$record->{record}};
         }
         $stats->{records}++;
 
         last if $number and $stats->{records} >= $number;
     };
 
-    foreach my $in (@{$self->{input}}) {
-        if ($in eq '-') {
-            $in = *STDIN;
-            binmode $in, ':encoding(UTF-8)';
-        }
-        else {
-            die "File not found: $in\n" unless -e $in;
-        }
-
-        my $parser = pica_parser($self->{from}, $in, bless => 1);
-
-        while (my $record = $parser->next) {
-            if ($command eq 'split') {
-                $process->($_) for $record->split;
+    if ($command eq 'diff') {
+        my @parser = map {$self->parser_from_input($_)} @{$self->{input}};
+        while (1) {
+            my $a = $parser[0]->next;
+            my $b = $parser[1]->next;
+            if ($a or $b) {
+                $writer->write(pica_diff($a || [], $b || []));
             }
             else {
-                $process->($record);
+                last;
+            }
+        }
+    }
+    elsif ($command eq 'patch') {
+        my $parser = $self->parser_from_input($self->{input}[0]);
+
+        # TODO: allow to read diff in PICA/JSON
+        my $patches = $self->parser_from_input($self->{input}[1], 'plain');
+        my $diff;
+        while (my $record = $parser->next) {
+            $diff = $patches->next || $diff;    # keep latest diff
+            die "Missing patch to apply in $self->{input}[1]\n" unless $diff;
+
+            my $changed = eval {pica_patch($record, $diff)};
+            if (!$changed || $@) {
+                warn $@;
+            }
+            else {
+                $writer->write($changed || []);
+            }
+        }
+    }
+    else {
+        foreach my $in (@{$self->{input}}) {
+            my $parser = $self->parser_from_input($in);
+            while (my $next = $parser->next) {
+                for ($command eq 'split' ? $next->split : $next) {
+                    $process->($_);
+                    last if $number and $stats->{records} >= $number;
+                }
             }
         }
     }
@@ -292,12 +350,13 @@ sub run {
         my $fields = $builder->schema->{fields};
         for my $id (sort keys %$fields) {
             if ($command eq 'fields') {
-                document($id, $self->{abbrev} ? 0 : $fields->{$id});
+                $self->document($id, $self->{abbrev} ? 0 : $fields->{$id});
             }
             else {
                 my $sfs = $fields->{$id}->{subfields} || {};
                 for (keys %$sfs) {
-                    document("$id\$$_", $self->{abbrev} ? 0 : $sfs->{$_});
+                    $self->document("$id\$$_",
+                        $self->{abbrev} ? 0 : $sfs->{$_});
                 }
             }
         }
@@ -311,43 +370,46 @@ sub run {
     exit !!$invalid;
 }
 
+sub parse_path {
+    my $path = eval {PICA::Path->new($_[0], position_as_occurrence => 1)};
+    if ($path) {
+    }
+    return $path;
+}
+
 sub explain {
-    my ($schema, $path) = @_;
+    my $self   = shift;
+    my $schema = shift;
+    my $path   = parse_path($_[0]);
 
-    if (my $expr = eval {PICA::Path->new($path)}) {
-        $path = $expr;
+    if (!$path) {
+        warn "invalid PICA Path: $_[0]\n";
+        return;
     }
-    else {
-        warn "invalid PICA Path: $path\n";
-        return
-    }
-
-    if ($path->stringify =~ /[.]/) {
+    elsif ($path->stringify =~ /[.]/) {
         warn "Fields with wildcards cannot be explained yet!\n";
-        return
+        return;
     }
 
     my $tag = $path->fields;
 
-    # Take positions as occurrences to allow PICA Plain syntax
-    my $occ = $path->occurrences // $path->positions;
-    my ($someocc) = grep {$_ > 0} split '-', $occ;
-    my $id = field_identifier($schema, [$tag, $someocc]);
+    my ($firstocc) = grep {$_ > 0} split '-', $path->occurrences;
+    my $id = field_identifier($schema, [$tag, $firstocc]);
 
     my $def = $schema->{fields}{$id};
     if (defined $path->subfields && $def) {
         my $sfdef = $def->{subfields} || {};
         for (split '', $path->subfields) {
-            document("$id\$$_", $sfdef->{$_}, 1);
+            $self->document("$id\$$_", $sfdef->{$_}, 1);
         }
     }
     else {
-        document($id, $def, 1);
+        $self->document($id, $def, 1);
     }
 }
 
 sub document {
-    my ($id, $def, $warn) = @_;
+    my ($self, $id, $def, $warn) = @_;
     if ($def) {
         my $status = ' ';
         if ($def->{required}) {
@@ -359,11 +421,13 @@ sub document {
         my $doc = "$id\t$status\t" . $def->{label} // '';
         say $doc =~ s/[\r\n]+/ /mgr;
     }
-    elsif ($warn) {
-        warn "$id unknown\n";
-    }
-    else {
-        say $id;
+    elsif (!$self->{unknown}) {
+        if ($warn) {
+            warn "$id\t?\n";
+        }
+        else {
+            say $id;
+        }
     }
 }
 

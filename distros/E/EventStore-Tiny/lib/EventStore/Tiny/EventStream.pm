@@ -2,13 +2,14 @@ package EventStore::Tiny::EventStream;
 
 use strict;
 use warnings;
+use feature 'signatures';
+no warnings 'experimental::signatures';
 
 use Class::Tiny {
     events => sub {[]},
 };
 
-sub add_event {
-    my ($self, $event) = @_;
+sub add_event ($self, $event) {
 
     # Append event to internal list
     push @{$self->events}, $event;
@@ -17,28 +18,21 @@ sub add_event {
     return $event;
 }
 
-sub size {
-    my $self = shift;
+sub size ($self) {
     return scalar @{$self->events};
 }
 
-sub first_timestamp {
-    my $self = shift;
+sub first_timestamp ($self) {
     return unless @{$self->events};
     return $self->events->[0]->timestamp;
 }
 
-sub last_timestamp {
-    my $self = shift;
+sub last_timestamp ($self) {
     return unless @{$self->events};
     return $self->events->[$self->size - 1]->timestamp;
 }
 
-sub apply_to {
-    my ($self, $state, $logger) = @_;
-
-    # Start with empty state by default
-    $state = {} unless defined $state;
+sub apply_to ($self, $state = {}, $logger = undef) {
 
     # Apply all events
     $_->apply_to($state, $logger) for @{$self->events};
@@ -47,11 +41,8 @@ sub apply_to {
     return $state;
 }
 
-sub substream {
-    my ($self, $selector) = @_;
-
+sub substream ($self, $selector = sub {1}) {
     # Default selector: take everything
-    $selector = sub {1} unless defined $selector;
 
     # Filter events
     my @filtered = grep {$selector->($_)} @{$self->events};
@@ -60,8 +51,7 @@ sub substream {
     return EventStore::Tiny::EventStream->new(events => \@filtered);
 }
 
-sub before {
-    my ($self, $timestamp) = @_;
+sub before ($self, $timestamp) {
 
     # Shorthand: stream is empty
     return $self if $self->size == 0;
@@ -82,8 +72,7 @@ sub before {
     return EventStore::Tiny::EventStream->new(events => \@before_events);
 }
 
-sub after {
-    my ($self, $timestamp) = @_;
+sub after ($self, $timestamp) {
 
     # Shorthand: stream is empty
     return $self if $self->size == 0;
@@ -153,8 +142,7 @@ Applies the whole stream (all events one after another) to a given state (by def
 
 =head2 substream
 
-    my $filtered = $stream->substream(sub {
-        my $event = shift;
+    my $filtered = $stream->substream(sub ($event) {
         return we_want($event);
     });
 
@@ -178,7 +166,7 @@ L<EventStore::Tiny>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2018 Mirko Westermeier (mail: mirko@westermeier.de)
+Copyright (c) 2018-2021 Mirko Westermeier (mail: mirko@westermeier.de)
 
 Released under the MIT License (see LICENSE.txt for details).
 

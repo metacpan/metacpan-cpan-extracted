@@ -1,14 +1,17 @@
 Revision history for Data-Bucketeer
 
+0.005     2021-06-19 11:39:56-04:00 America/New_York
+        - update author contact info
+        - add perl-support section
+
 0.004     2020-08-21 20:22:14-04:00 America/New_York
-          typo fix (thanks, Graham Knop)
+        - typo fix (thanks, Graham Knop)
 
 0.003     2013-12-13 08:22:28 America/New_York
-          update bugtracker and repo
+        - update bugtracker and repo
 
 0.002     2013-07-05 21:17:08 America/New_York
-          update bugtracker
+        - update bugtracker
 
 0.001     2011-04-06 17:23:03 America/New_York
-
-          first release
+        - first release

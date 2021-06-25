@@ -1,6 +1,6 @@
 package Test::Routine::Runner;
 # ABSTRACT: tools for running Test::Routine tests
-$Test::Routine::Runner::VERSION = '0.027';
+$Test::Routine::Runner::VERSION = '0.028';
 use Moose;
 
 #pod =head1 OVERVIEW
@@ -122,7 +122,7 @@ Test::Routine::Runner - tools for running Test::Routine tests
 
 =head1 VERSION
 
-version 0.027
+version 0.028
 
 =head1 OVERVIEW
 
@@ -133,9 +133,20 @@ running tests, described in L<Test::Routine|Test::Routine/Running Tests>, are
 more stable.  Please use those instead, unless you are willing to deal with
 interface breakage.
 
+=head1 PERL VERSION SUPPORT
+
+This module has the same support period as perl itself:  it supports the two
+most recent versions of perl.  (That is, if the most recently released version
+is v5.40, then this module should work on both v5.40 and v5.38.)
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
+
 =head1 AUTHOR
 
-Ricardo Signes <rjbs@cpan.org>
+Ricardo Signes <rjbs@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

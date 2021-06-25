@@ -5,7 +5,7 @@ use warnings;
 
 use base 'DBIx::Class::Schema';
 
-our $VERSION = '0.013';
+our $VERSION = '0.014';
 
 __PACKAGE__->load_namespaces;
 
@@ -17,7 +17,7 @@ Math::DifferenceSet::Planar::Schema - data schema for planar difference sets
 
 =head1 VERSION
 
-This documentation refers to version 0.013 of
+This documentation refers to version 0.014 of
 Math::DifferenceSet::Planar::Schema.
 
 =head1 SYNOPSIS
@@ -26,6 +26,7 @@ Math::DifferenceSet::Planar::Schema.
 
   $schema = Math::DifferenceSet::Planar::Schema->connect(...);
   $pds    = $schema->resultset('DifferenceSet')->search(...);
+  $spc    = $schema->resultset('DifferenceSetSpace')->search(...);
 
 =head1 DESCRIPTION
 
@@ -39,11 +40,16 @@ supposed to use it directly.
 
 =item *
 
-L<DBIx::Class::Schema> - base class. 
+L<DBIx::Class::Schema> - base class.
 
 =item *
 
-L<Math::DifferenceSet::Planar::Schema::Result::DifferenceSet> - result class. 
+L<Math::DifferenceSet::Planar::Schema::Result::DifferenceSet> - result class.
+
+=item *
+
+L<Math::DifferenceSet::Planar::Schema::Result::DifferenceSetSpace> -
+another result class.
 
 =back
 

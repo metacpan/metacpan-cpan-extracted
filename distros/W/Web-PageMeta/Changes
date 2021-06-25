@@ -1,5 +1,10 @@
 Revision history for Web-PageMeta
 
+0.07    22.06.2021
+    - add real timeout limit
+    - add max_size limit
+    - only text/html content-type for page_body_hdr (#4)
+
 0.06    21.05.2021
     - use Web::Scraper::LibXML = LibXML instead of HTML::TreeBuilder::XPath
 

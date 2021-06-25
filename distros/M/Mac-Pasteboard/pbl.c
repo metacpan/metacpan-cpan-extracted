@@ -40,8 +40,6 @@
 #include <ApplicationServices/ApplicationServices.h>
 #include "pbl.h"
 
-#define ENCODING kCFStringEncodingASCII
-
 /*
  * char *pblx_get_cstring (CFStringRef data)
  *
@@ -57,13 +55,13 @@ char * pblx_get_cstring (CFStringRef data) {
     if (data == NULL) {
 	chars = NULL;
     } else {
-	bytes = CFStringGetCStringPtr (data, ENCODING);
+	bytes = CFStringGetCStringPtr (data, ASCII_ENCODING);
 	if (bytes == NULL) {
 	    len = (size_t) CFStringGetLength (data) + 1;
 	    chars = (char *) MALLOC ("pblx_get_cstring chars 1",
 		    len * sizeof (char));
 	    if (chars != NULL) {
-		if (!CFStringGetCString (data, chars, (CFIndex) len, ENCODING)) {
+		if (!CFStringGetCString (data, chars, (CFIndex) len, ASCII_ENCODING)) {
 		    FREE ("pblx_get_cstring chars", chars);
 		    chars = NULL;
 		}
@@ -83,7 +81,7 @@ char * pblx_get_cstring (CFStringRef data) {
 #include <execinfo.h>
 #include <stdlib.h>
 #define CHECK(sub,var) \
-    fprintf (stderr, "Debug %s - %s returned %ld\n", ROUTINE, sub, var); \
+    fprintf (stderr, "Debug %s - %s returned %ld\n", ROUTINE, sub, ( long ) var); \
     if (var) goto cleanup;
 #define LOG_C(var,dta) { \
     if ((dta) == NULL) { \
@@ -185,7 +183,7 @@ CFStringRef pblx_cfstr (const char *cstr, CFStringRef dflt) {
 	if (dflt != NULL)
 	    CFRetain (dflt);	/* since it will be released elsewhere */
     } else {
-	cfstr = CFStringCreateWithCString (NULL, cstr, ENCODING);
+	cfstr = CFStringCreateWithCString (NULL, cstr, ASCII_ENCODING);
     }
     return cfstr;
 }
@@ -729,7 +727,7 @@ int main (int argc, char **argv) {
 		    data[size] = '\0';
 		    printf( "data: '%s'\n", data );
 		    printf( "size: %lu\n", size );
-		    printf( "flags: %#lx\n", flags );
+		    printf( "flags: %#lx\n", ( unsigned long ) flags );
 		}
 		CFRelease (pbref);
 	    }
@@ -752,7 +750,7 @@ int main (int argc, char **argv) {
 		for ( inx = 0; inx < num_resp; inx++ ) {
 		    printf( "\nid: %lu\n", resp[inx].id );
 		    printf( "flavor: %s\n", resp[inx].flavor );
-		    printf( "flavor flags: %#lx\n", resp[inx].flags );
+		    printf( "flavor flags: %#lx\n", ( unsigned long ) resp[inx].flags );
 		    if ( resp[inx].data != NULL ) {
 			printf( "data: %s\n", resp[inx].data );
 			printf( "size: %lu\n", resp[inx].size );
@@ -771,7 +769,7 @@ int main (int argc, char **argv) {
 	help ();
     }
     if (stat) {
-	fprintf (stderr, "Error - Status = %li\n", stat);
+	fprintf (stderr, "Error - Status = %li\n", ( long ) stat);
     }
     return stat ? 1 : 0;
 }

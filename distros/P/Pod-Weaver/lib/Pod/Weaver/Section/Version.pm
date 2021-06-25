@@ -1,9 +1,17 @@
-package Pod::Weaver::Section::Version;
+package Pod::Weaver::Section::Version 4.018;
 # ABSTRACT: add a VERSION pod section
-$Pod::Weaver::Section::Version::VERSION = '4.017';
+
 use Moose;
-with 'Pod::Weaver::Role::Section';
-with 'Pod::Weaver::Role::StringFromComment';
+with 'Pod::Weaver::Role::Section',
+     'Pod::Weaver::Role::StringFromComment';
+
+# BEGIN BOILERPLATE
+use v5.20.0;
+use warnings;
+use utf8;
+no feature 'switch';
+use experimental qw(postderef postderef_qq); # This experiment gets mainlined.
+# END BOILERPLATE
 
 use Module::Runtime qw(use_module);
 use namespace::autoclean;
@@ -202,7 +210,7 @@ sub build_content {
   }
 
   my $content = q{};
-  LINE: for my $format (@{ $self->format }) {
+  LINE: for my $format ($self->format->@*) {
     my $line = _format_version($format, \%args);
     next if $line =~ s/^$MARKER\s*// and ! $args{is_trial};
 
@@ -232,7 +240,7 @@ sub weave_section {
 
   $self->log_debug('adding ' . $self->header . ' section to pod');
 
-  push @{ $document->children },
+  push $document->children->@*,
     Pod::Elemental::Element::Nested->new({
       command  => 'head1',
       content  => $self->header,
@@ -255,7 +263,7 @@ Pod::Weaver::Section::Version - add a VERSION pod section
 
 =head1 VERSION
 
-version 4.017
+version 4.018
 
 =head1 OVERVIEW
 
@@ -267,6 +275,17 @@ the document being viewed, like this:
   version 1.234
 
 It will do nothing if there is no C<version> entry in the input.
+
+=head1 PERL VERSION SUPPORT
+
+This module has the same support period as perl itself:  it supports the two
+most recent versions of perl.  (That is, if the most recently released version
+is v5.40, then this module should work on both v5.40 and v5.38.)
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
 
 =head1 ATTRIBUTES
 
@@ -363,7 +382,7 @@ overridden in a subclass.
 
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@cpan.org>
+Ricardo SIGNES <rjbs@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

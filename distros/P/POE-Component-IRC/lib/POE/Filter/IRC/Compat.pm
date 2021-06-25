@@ -1,6 +1,6 @@
 package POE::Filter::IRC::Compat;
 our $AUTHORITY = 'cpan:HINRIK';
-$POE::Filter::IRC::Compat::VERSION = '6.92';
+$POE::Filter::IRC::Compat::VERSION = '6.93';
 use strict;
 use warnings FATAL => 'all';
 use Carp;

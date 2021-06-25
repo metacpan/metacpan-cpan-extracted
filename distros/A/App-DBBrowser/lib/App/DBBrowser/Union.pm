@@ -57,11 +57,11 @@ sub union_tables {
         }
         my $prompt = 'Choose UNION table:';
         my $menu  = [ @pre, @tmp_tables, @post ];
-        $ax->print_sql( $union );
+        my $info = $ax->get_sql_info( $union );
         # Choose
         my $idx_tbl = $tc->choose(
             $menu,
-            { %{$sf->{i}{lyt_v}}, prompt => $prompt, index => 1 }
+            { %{$sf->{i}{lyt_v}}, info => $info, prompt => $prompt, index => 1 }
         );
         if ( ! defined $idx_tbl || ! defined $menu->[$idx_tbl] ) {
             if ( @bu ) {
@@ -106,14 +106,14 @@ sub union_tables {
         }
         push @bu, [ [ @{$union->{used_tables}} ], [ @{$union->{subselect_data}} ], [ @{$union->{saved_cols}} ] ];
         push @{$union->{used_tables}}, $union_table;
-        $ax->print_sql( $union );
+        $ax->print_sql_info( $union );
         my $ok = $sf->__union_table_columns( $union, $union_table, $qt_union_table );
         if ( ! $ok ) {
             ( $union->{used_tables}, $union->{subselect_data}, $union->{saved_cols} ) = @{pop @bu};
             next UNION_TABLE;
         }
     }
-    $ax->print_sql( $union );
+    $ax->print_sql_info( $union );
     my $qt_table = $ax->get_stmt( $union, 'Union', 'prepare' );
     # alias: required if mysql, Pg, ...
     my $alias = $ax->alias( 'union', '', "TABLES_UNION" );
@@ -135,11 +135,12 @@ sub __union_table_columns {
 
     while ( 1 ) {
         my @pre = ( undef, $sf->{i}{ok}, @{$union->{saved_cols}} ? $privious_cols : $void );
-        $ax->print_sql( $union );
+        my $info = $ax->get_sql_info( $union );
         # Choose
         my @chosen = $tc->choose(
             [ @pre, @{$sf->{d}{col_names}{$union_table}} ],
-            { %{$sf->{i}{lyt_h}}, prompt => 'Choose Column:', meta_items => [ 0 .. $#pre ], include_highlighted => 2 }
+            { %{$sf->{i}{lyt_h}}, info => $info, prompt => 'Choose Column:',
+              meta_items => [ 0 .. $#pre ], include_highlighted => 2 }
         );
         if ( ! defined $chosen[0] ) {
             if ( @bu_cols ) {
@@ -191,11 +192,11 @@ sub __union_all_tables {
 
     while ( 1 ) {
         $union->{subselect_data} = [ map { [ $_, [ '?' ] ] } @tables_union_auto ];
-        $ax->print_sql( $union );
+        my $info = $ax->get_sql_info( $union );
         # Choose
         my $idx_tbl = $tc->choose(
             $menu,
-            { %{$sf->{i}{lyt_v}}, prompt => 'One UNION table for cols:', index => 1 }
+            { %{$sf->{i}{lyt_v}}, info => $info, prompt => 'One UNION table for cols:', index => 1 }
         );
         if ( ! defined $idx_tbl || ! defined $menu->[$idx_tbl] ) {
             $union->{subselect_data} = [];
@@ -213,7 +214,7 @@ sub __union_all_tables {
     for my $union_table ( @tables_union_auto ) {
         push @{$union->{subselect_data}}, [ $ax->quote_table( $sf->{d}{tables_info}{$union_table} ), $qt_used_cols ];
     }
-    $ax->print_sql( $union );
+    $ax->print_sql_info( $union );
     return 1;
 }
 

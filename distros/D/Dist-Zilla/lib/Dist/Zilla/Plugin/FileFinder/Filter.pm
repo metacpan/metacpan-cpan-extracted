@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::FileFinder::Filter 6.017;
+package Dist::Zilla::Plugin::FileFinder::Filter 6.020;
 # ABSTRACT: filter matches from other FileFinders
 
 use Moose;
@@ -8,6 +8,14 @@ with(
     default_finders => [],
   },
 );
+
+# BEGIN BOILERPLATE
+use v5.20.0;
+use warnings;
+use utf8;
+no feature 'switch';
+use experimental qw(postderef postderef_qq); # This experiment gets mainlined.
+# END BOILERPLATE
 
 use namespace::autoclean;
 
@@ -103,7 +111,7 @@ Dist::Zilla::Plugin::FileFinder::Filter - filter matches from other FileFinders
 
 =head1 VERSION
 
-version 6.017
+version 6.020
 
 =head1 SYNOPSIS
 
@@ -122,6 +130,17 @@ selects files by filtering the selections of other FileFinders.
 You specify one or more FileFinders to generate the initial list of
 files.  Any file whose pathname matches any of the C<skip> regexs is
 removed from that list.
+
+=head1 PERL VERSION SUPPORT
+
+This module has the same support period as perl itself:  it supports the two
+most recent versions of perl.  (That is, if the most recently released version
+is v5.40, then this module should work on both v5.40 and v5.38.)
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
 
 =head1 ATTRIBUTES
 
@@ -145,11 +164,11 @@ find_files
 
 =head1 AUTHOR
 
-Ricardo SIGNES 😏 <rjbs@cpan.org>
+Ricardo SIGNES 😏 <rjbs@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Ricardo SIGNES.
+This software is copyright (c) 2021 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

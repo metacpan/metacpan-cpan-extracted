@@ -2,8 +2,8 @@
 
 use strict;
 use warnings;
-use if $ENV{AUTOMATED_TESTING}, 'Test::DiagINC'; use Test::More tests => 12;
-use Test::Differences;
+use if $ENV{AUTOMATED_TESTING}, 'Test::DiagINC'; use Test2::V0;
+
 use Crypt::OpenToken::Serializer;
 
 ###############################################################################
@@ -16,11 +16,11 @@ simple: {
 
     # Freeze
     my $frozen = Crypt::OpenToken::Serializer::freeze(%data);
-    eq_or_diff $frozen, $serialized, 'simple key/value pair; freeze';
+    is $frozen, $serialized, 'simple key/value pair; freeze';
 
     # Thaw
     my %thawed = Crypt::OpenToken::Serializer::thaw($serialized);
-    eq_or_diff \%thawed, \%data, 'simple key/value pair; thaw';
+    is \%thawed, \%data, 'simple key/value pair; thaw';
 }
 
 ###############################################################################
@@ -40,7 +40,7 @@ key_with_multiple_values: {
 
     # Thaw
     my %thawed = Crypt::OpenToken::Serializer::thaw($serialized);
-    eq_or_diff \%thawed, \%data, 'key w/multiple values; thaw';
+    is \%thawed, \%data, 'key w/multiple values; thaw';
 }
 
 ###############################################################################
@@ -60,7 +60,7 @@ multiple_key_value_pairs: {
 
     # Thaw
     my %thawed = Crypt::OpenToken::Serializer::thaw($serialized);
-    eq_or_diff \%thawed, \%data, 'multiple key/value pairs; thaw';
+    is \%thawed, \%data, 'multiple key/value pairs; thaw';
 }
 
 ###############################################################################
@@ -78,7 +78,7 @@ values_containing_quotes: {
 
     # Thaw
     my %thawed = Crypt::OpenToken::Serializer::thaw($serialized);
-    eq_or_diff \%thawed, \%data, 'value requiring quoting; thaw';
+    is \%thawed, \%data, 'value requiring quoting; thaw';
 }
 
 ###############################################################################
@@ -102,7 +102,7 @@ multi_line_values: {
 
     # Thaw
     my %thawed = Crypt::OpenToken::Serializer::thaw($serialized);
-    eq_or_diff \%thawed, \%data, 'multi-line values; thaw';
+    is \%thawed, \%data, 'multi-line values; thaw';
 }
 
 ###############################################################################
@@ -122,5 +122,8 @@ empty_or_blank_values: {
 
     # Thaw
     my %thawed = Crypt::OpenToken::Serializer::thaw($serialized);
-    eq_or_diff \%thawed, \%data, 'empty/blank values; thaw';
+    is \%thawed, \%data, 'empty/blank values; thaw';
 }
+
+###############################################################################
+done_testing();

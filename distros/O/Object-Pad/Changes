@@ -1,5 +1,16 @@
 Revision history for Object-Pad
 
+0.41    2021-06-21
+        [CHANGES]
+         * Recognise `:param` on slots, assign automatically from constructor,
+           check for required parameters
+         * Accept `isa` as a synonym for `extends`, and `does` as a synonym
+           for `implements`
+         * No longer allow `method BUILD`
+
+        [BUGFIXES]
+         * Complain about a lack of NAME for `class` (related to RT136798)
+
 0.40    2021-06-02
         [CHANGES]
          * Updated for XS::Parse::Keyword v0.06

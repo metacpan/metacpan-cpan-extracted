@@ -11,6 +11,7 @@ add_stopwords(<DATA>);
 all_pod_files_spelling_ok( qw( bin lib ) );
 __DATA__
 Astrophysical
+Cache
 Diab
 Jerius
 MooX

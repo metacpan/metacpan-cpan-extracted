@@ -2,5 +2,5 @@
 package W3C::LinkChecker;
 use strict;
 use vars qw($VERSION);
-$VERSION = "4.81";
+$VERSION = "5.0.0";
 1;

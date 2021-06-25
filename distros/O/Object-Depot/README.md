@@ -201,6 +201,16 @@ arguments. This is synonymous with the difference between
 
 # METHODS
 
+## active\_objects
+
+```perl
+my @objects = $depot->active_objects();
+```
+
+Return an array containing all active objects the depot created via calls to $depot->create().
+
+If per\_process is set, returns only active objects created by the current process/thread.
+
 ## fetch
 
 ```perl
@@ -318,37 +328,23 @@ Adds a key that is an alias to another key.
 
 # SUPPORT
 
-Please submit bugs and feature requests to the
-Object-Depot GitHub issue tracker:
+Please submit bugs and feature requests to the Object-Depot GitHub issue tracker:
 
 [https://github.com/bluefeet/Object-Depot/issues](https://github.com/bluefeet/Object-Depot/issues)
 
 # ACKNOWLEDGEMENTS
 
-Thanks to [ZipRecruiter](https://www.ziprecruiter.com/) for
-encouraging their employees to contribute back to the open source
-ecosystem. Without their dedication to quality software development
-this distribution would not exist.
+Thanks to [ZipRecruiter](https://www.ziprecruiter.com/) for encouraging their employees to
+contribute back to the open source ecosystem.  Without their dedication to quality software
+development this distribution would not exist.
 
-# AUTHOR
+# AUTHORS
 
 ```
 Aran Clary Deltac <bluefeet@gmail.com>
 ```
 
-# COPYRIGHT AND LICENSE
+# LICENSE
 
-Copyright (C) 2020 Aran Clary Deltac
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program. If not, see [http://www.gnu.org/licenses/](http://www.gnu.org/licenses/).
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

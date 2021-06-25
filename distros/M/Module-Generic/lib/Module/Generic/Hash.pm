@@ -14,6 +14,7 @@ package Module::Generic::Hash;
 BEGIN
 {
     use strict;
+    use warnings;
     use warnings::register;
     use parent qw( Module::Generic );
     use overload (
@@ -70,6 +71,13 @@ sub new
 }
 
 sub as_string { return( shift->dump ); }
+
+sub chomp
+{
+    my $self = CORE::shift( @_ );
+    CORE::chomp( %$self );
+    return( $self );
+}
 
 sub clone
 {
@@ -236,6 +244,13 @@ sub merge
 sub reset { %{$_[0]} = () };
 
 sub set { $_[0]->{ $_[1] } = $_[2]; }
+
+sub TO_JSON
+{
+    my $self = shift( @_ );
+    my $ref  = { %$self };
+    return( $ref );
+}
 
 sub undef { %{$_[0]} = () };
 

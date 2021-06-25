@@ -6,7 +6,7 @@ use 5.014;
 
 no if $] >= 5.018, warnings => 'experimental::smartmatch';
 
-our $VERSION = '1.54';
+our $VERSION = '1.56';
 
 use Carp qw(confess cluck);
 use DateTime;
@@ -81,6 +81,12 @@ sub new {
 	$self->{related_stations} = \@related_stations;
 
 	for my $ref (@related_stations) {
+
+       # We (the parent) perform transfer processing, so child requests must not
+       # do it themselves. Otherwise, trains from child requests will be
+       # processed twice and may be lost.
+       # Similarly, child requests must not perform requests to related
+       # stations -- we're already doing that right now.
 		my $ref_status = Travel::Status::DE::IRIS->new(
 			datetime       => $self->{datetime},
 			developer_mode => $self->{developer_mode},
@@ -92,6 +98,7 @@ sub new {
 			realtime_cache => $self->{rt_cache},
 			strptime_obj   => $self->{strptime_obj},
 			user_agent     => $self->{user_agent},
+			keep_transfers => 1,
 			with_related   => 0,
 		);
 		if ( not $ref_status->errstr ) {
@@ -636,7 +643,7 @@ Travel::Status::DE::IRIS - Interface to IRIS based web departure monitors.
 
 =head1 VERSION
 
-version 1.54
+version 1.56
 
 =head1 DESCRIPTION
 

@@ -202,6 +202,12 @@ Running the same control file with differing values of the B<-f>
 (B<--allfiles>) or B<-r> (B<--retain>) options may cause strange
 results.
 
+=head1 CAVEATS
+
+The program will screw up when you have filenames with newlines in
+them. This must be considered an early warning that there may be
+some serious troubles ahead.
+
 =head1 COMPATIBILITY NOTICE
 
 This program is rewritten for Perl 5.005 and later. However, it is

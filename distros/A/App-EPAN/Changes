@@ -1,0 +1,12 @@
+0.002  2021-06-19 11:26:27 CEST
+   - some refactoring
+   - documentation fixes
+
+0.001002  2021-06-14 15:47:32 CEST
+   - use hint about ignoring CPAN::Modulelist via CPAN::Meta stuff
+
+0.001001  2021-06-12 18:23:27 CEST
+   - avoid tripping PAUSE on a text with a package inside   
+
+0.001  2021-06-12 17:59:55 CEST
+   - initial packaging

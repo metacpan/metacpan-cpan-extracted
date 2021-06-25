@@ -1,0 +1,22 @@
+X<>
+    - emits <div id="[% anchor %]">
+    - anchor is based on file/index/etc
+
+L<>
+    - based on anchors
+    - uses title/link destination
+
+=head\d
+    - <h<N>> tags need id attributes
+
+Create index for all files
+    - process all files
+        - store name for each index
+        - canonical name for links
+    - resolve index positions
+
+keep latest heading around to attach to Z<> anchors
+    - use only Z anchor heading
+
+reset when resetting headings
+figure/table should start heading--implies a stack push/pop by begin, not =head!

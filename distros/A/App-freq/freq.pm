@@ -1,6 +1,6 @@
 package App::freq ;  
-our $VERSION = '0.100' ; 
-our $DATE = '2021-06-07T00:52+09:00' ; 
+our $VERSION = '0.110' ; 
+our $DATE = '2021-06-13T23:43+09:00' ; 
 
 =encoding utf8
 

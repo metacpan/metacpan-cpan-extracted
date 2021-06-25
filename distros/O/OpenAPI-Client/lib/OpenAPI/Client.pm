@@ -9,17 +9,17 @@ use Mojo::Promise;
 
 use constant DEBUG => $ENV{OPENAPI_CLIENT_DEBUG} || 0;
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 my $BASE = __PACKAGE__;
 
 has base_url => sub {
-  my $self    = shift;
-  my $schema  = $self->validator;
-  my $schemes = $schema->get('/schemes') || [];
-
-  return Mojo::URL->new->host_port($schema->get('/host') || 'localhost')->path($schema->get('/basePath') || '/')
-    ->scheme($schemes->[0] || 'http');
+  my $self      = shift;
+  my $validator = $self->validator;
+  my $url       = $validator->can('base_url') ? $validator->base_url->clone : Mojo::URL->new;
+  $url->scheme('http')    unless $url->scheme;
+  $url->host('localhost') unless $url->host;
+  return $url;
 };
 
 has ua => sub { Mojo::UserAgent->new };
@@ -74,7 +74,7 @@ HERE
 
   Mojo::Util::monkey_patch($class => validator => sub {$schema});
 
-  for my $route ($schema->routes->each) {
+  for my $route ($schema->can('routes') ? $schema->routes->each : ()) {
     next unless $route->{operation_id};
     warn "[$class] Add method $route->{operation_id}() for $route->{method} $route->{path}\n" if DEBUG;
     $class->_generate_method_bnb($route->{operation_id} => $route);

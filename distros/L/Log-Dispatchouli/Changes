@@ -1,5 +1,9 @@
 Revision history for Log-Dispatchouli
 
+2.023     2021-06-18 21:52:17-04:00 America/New_York
+        - update author contact info
+        - add perl-support section
+
 2.022     2020-08-24 13:50:15-04:00 America/New_York
         - don't duplicate pid in syslog!
 

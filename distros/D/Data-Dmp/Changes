@@ -1,6 +1,13 @@
+0.241   2021-06-24  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux] Make fixup of circular references nicer by showing the
+	  subscripts instead of just 'fix'.
+
+
 0.240   2020-04-07  Released-By: PERLANCAR; Urgency: medium
 
-	- Add dd_ellipsis() and dmp_ellipsis().
+	- Add dd_ellipsis() and dmp_ellipsis(), as well as
+          OPT_MAX_DUMP_LEN_BEFORE_ELLIPSIS.
 
 
 0.23    2017-01-30  Released-By: PERLANCAR

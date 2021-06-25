@@ -11,10 +11,10 @@ use WebService::Dropbox::Files;
 use WebService::Dropbox::Files::CopyReference;
 use WebService::Dropbox::Files::ListFolder;
 use WebService::Dropbox::Files::UploadSession;
-# use WebService::Dropbox::Sharing; comming soon...
+use WebService::Dropbox::Sharing;
 use WebService::Dropbox::Users;
 
-our $VERSION = '2.07';
+our $VERSION = '2.09';
 
 __PACKAGE__->mk_accessors(qw/
     timeout
@@ -340,20 +340,20 @@ WebService::Dropbox - Perl interface to Dropbox API
 
     # Authorization
     if ($access_token) {
-        $box->access_token($access_token);
+        $dropbox->access_token($access_token);
     } else {
-        my $url = $box->authorize;
+        my $url = $dropbox->authorize;
 
         print "Please Access URL and press Enter: $url\n";
         print "Please Input Code: ";
 
         chomp( my $code = <STDIN> );
 
-        unless ($box->token($code)) {
-            die $box->error;
+        unless ($dropbox->token($code)) {
+            die $dropbox->error;
         }
 
-        print "Successfully authorized.\nYour AccessToken: ", $box->access_token, "\n";
+        print "Successfully authorized.\nYour AccessToken: ", $dropbox->access_token, "\n";
     }
 
     my $info = $dropbox->get_current_account or die $dropbox->error;
@@ -962,6 +962,44 @@ Get the space usage information for the current user's account.
     my $result = $dropbox->get_space_usage;
 
 L<https://www.dropbox.com/developers/documentation/http/documentation#users-get_space_usage>
+
+=head2 Sharing
+
+=head3 create_shared_link_with_settings($path, $settings)
+
+Create a shared link with custom settings. If no settings are given then the default visibility is RequestedVisibility.public (The resolved visibility, though, may depend on other aspects such as team and shared folder settings).
+
+    my $result = $dropbox->create_shared_link_with_settings($path, $settings);
+
+L<https://www.dropbox.com/developers/documentation/http/documentation#sharing-create_shared_link_with_settings>
+
+=head3 list_shared_links($path)
+
+List shared links of this user.
+If no path is given, returns a list of all shared links for the current user. For members of business teams using team space and member folders, returns all shared links in the team member's home folder unless the team space ID is specified in the request header. For more information, refer to the Namespace Guide.
+If a non-empty path is given, returns a list of all shared links that allow access to the given path - direct links to the given path and links to parent folders of the given path. Links to parent folders can be suppressed by setting direct_only to true.
+
+    my $result = $dropbox->list_shared_links($path);
+
+L<https://www.dropbox.com/developers/documentation/http/documentation#sharing-list_shared_links>
+
+=head3 modify_shared_link_settings($path, $settings, $remove_expiration)
+
+Modify the shared link's settings.
+If the requested visibility conflict with the shared links policy of the team or the shared folder (in case the linked file is part of a shared folder) then the LinkPermissions.resolved_visibility of the returned SharedLinkMetadata will reflect the actual visibility of the shared link and the LinkPermissions.requested_visibility will reflect the requested visibility.
+
+    my $result = $dropbox->modify_shared_link_settings($path, $settings, $remove_expiration);
+
+L<https://www.dropbox.com/developers/documentation/http/documentation#sharing-modify_shared_link_settings>
+
+=head3 revoke_shared_link($url)
+
+Revoke a shared link.
+Note that even after revoking a shared link to a file, the file may be accessible if there are shared links leading to any of the file parent folders. To list all shared links that enable access to a specific file, you can use the list_shared_links with the file as the ListSharedLinksArg.path argument.
+
+    my $result = $dropbox->revoke_shared_link($url);
+
+L<https://www.dropbox.com/developers/documentation/http/documentation#sharing-revoke_shared_link>
 
 =head2 Error Handling and Debug
 

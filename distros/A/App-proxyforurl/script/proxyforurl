@@ -4,7 +4,7 @@ use NetAddr::IP ();
 use Socket 'inet_ntoa';
 
 get '/' => 'index';
-get '/pac' => 'pac';
+get '/pac', [format => [qw(js)]], => 'pac';
 
 get '/gethostbyname' => sub {
   my $c = shift;
@@ -22,7 +22,8 @@ get '/gethostbyname' => sub {
   else {
     return $c->render(text => "Host missing.", status => 400);
   }
-}, 'gethostbyname';
+  },
+  'gethostbyname';
 
 get '/within' => sub {
   my $c    = shift;
@@ -30,17 +31,24 @@ get '/within' => sub {
   my $net  = $c->param('net');
   my $mask = $c->param('mask');
 
-  unless (2 == grep {$_ and $_ =~ /[:\.]/} $ip, $net) {
+  unless (2 == grep { $_ and $_ =~ /[:\.]/ } $ip, $net) {
     return $c->render(text => "IP or Net is missing.", status => 400);
   }
   unless ($mask and $mask =~ /\d/) {
     return $c->render(text => "Mask is invalid or missing.", status => 400);
   }
 
-  $ip = NetAddr::IP->new($c->param('ip'));
+  $ip  = NetAddr::IP->new($c->param('ip'));
   $net = NetAddr::IP->new(join '/', $net, $mask);
   $c->render(text => $net->contains($ip) ? 1 : 0);
-}, 'within';
+  },
+  'within';
+
+hook before_dispatch => sub {
+  my $c = shift;
+  return unless my $base = $c->req->headers->header('X-Request-Base');
+  $c->req->url->base(Mojo::URL->new($base));
+};
 
 app->start;
 

@@ -11,7 +11,7 @@ use Mojo::SMTP::Client::Exception;
 use Scalar::Util 'weaken';
 use Carp;
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 use constant {
 	CMD_OK       => 2,
@@ -114,7 +114,7 @@ sub send {
 				tls_ca     => $self->tls_ca,
 				tls_cert   => $self->tls_cert,
 				tls_key    => $self->tls_key,
-				tls_verify => $self->tls_verify,
+				tls_options => { SSL_verify_mode => $self->tls_verify },
 			);
 		},
 		sub {

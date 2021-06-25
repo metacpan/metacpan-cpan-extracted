@@ -6,15 +6,17 @@ pds.db - small database with planar difference set samples
 
 =head1 VERSION
 
-This is version 1.0 of the database, created on July 30, 2019.
+This is version 2.0 of the database, created on May 9, 2021.
 
 =head1 DESCRIPTION
 
 This file is the default database distributed with the Perl 5 module
 Math::DifferenceSet::Planar.
 
-It contains 604 cyclic planar difference sets with orders ranging from
-2 to 4096.  The sets are chosen minimal by lexicographic ordering.
+It contains 604 cyclic planar difference sets with orders ranging
+from 2 to 4096.  The sets are chosen minimal by lexicographic ordering.
+It also contains planar difference set space data for the same range
+of orders.
 
 =head1 FILE FORMAT
 
@@ -23,12 +25,20 @@ SQLite 3.x database.
 =head1 SCHEMA
 
   CREATE TABLE difference_set (
-    order_   integer NOT NULL PRIMARY KEY,
-    base     integer NOT NULL,
-    exponent integer NOT NULL,
-    modulus  integer NOT NULL,
-    n_planes integer NOT NULL,
-    deltas   blob    NOT NULL
+    order_      integer NOT NULL PRIMARY KEY,
+    base        integer NOT NULL,
+    exponent    integer NOT NULL,
+    modulus     integer NOT NULL,
+    n_planes    integer NOT NULL,
+    deltas      blob    NOT NULL
+  );
+
+  CREATE TABLE difference_set_space (
+    order_      integer NOT NULL PRIMARY KEY,
+    mul_radix   integer NOT NULL,
+    mul_depth   integer NOT NULL,
+    rot_radices blob    NOT NULL,
+    rot_depths  blob    NOT NULL
   );
 
 =head1 DATA REPRESENTATION
@@ -36,10 +46,19 @@ SQLite 3.x database.
 If I<D = { d_1, d_2, ..., d_k } (mod m)> is a canonical cyclic
 planar difference set of order I<k - 1> with I<d_1 E<8801> 0> and
 I<d_2 E<8801> 1 (mod m)>, I<deltas> is a sequence of I<k - 2> numeric
-values packed in 'w*' format, calculated as differences of consecutive
+values packed in C<'w*'> format, calculated as differences of consecutive
 residue values of I<D> starting with I<d_3 - d_2>.  The difference of
 the smallest two values in a canonical set is always 1 and thus not
 important to store.
+
+If a multiplier set of the form I<{b^k | 0 E<8804> k E<lt> e}>
+with a radix I<b> and depth I<e>, and a rotator base of the form
+I<{r_1^j_1E<183>r_2E<183>j_2E<183>...E<183>r_n^j_n>
+I<| 0 E<8804> j_k E<lt> d_k, 1 E<8804> k E<8804> n}>
+with I<n> radices I<r_k> and I<n> depths I<d_k> describe the
+multiplicative space of difference set planes of a given order,
+I<rot_radices> and I<rot_depths> are vectors of rotation radices and
+depths packed in C<'w*'> format.
 
 =head1 PROVIDER
 
@@ -47,9 +66,14 @@ Martin Becker, E<lt>becker-cpan-mp I<at> cozap.comE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
+Copyright (c) 2019-2021 by Martin Becker, Blaubeuren.
+
+This library is free software; you can distribute it and/or modify it
+under the terms of the Artistic License 2.0 (see the LICENSE file).
+
 The contents of this database are mathematically defined entities.
 The provider believes mathematical constants not to be proprietary or
 subject to copyright legislation, although the software used to calculate
-them may be.
+them and the accompanying documentation certainly are.
 
 =cut

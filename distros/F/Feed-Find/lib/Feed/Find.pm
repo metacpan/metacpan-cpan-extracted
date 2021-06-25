@@ -1,5 +1,6 @@
 package Feed::Find;
 use strict;
+use warnings;
 use 5.008_001;
 
 use base qw( Class::ErrorHandler );
@@ -8,7 +9,7 @@ use HTML::Parser;
 use URI;
 
 use vars qw( $VERSION $ua );
-$VERSION = '0.10';
+$VERSION = '0.11';
 
 use constant FEED_MIME_TYPES => [
     'application/x.atom+xml',
@@ -63,8 +64,11 @@ sub _find_links {
     if ($tag eq 'link') {
         return unless $attr->{rel};
         my %rel = map { $_ => 1 } split /\s+/, lc($attr->{rel});
-        (my $type = lc $attr->{type}) =~ s/^\s*//;
-        $type =~ s/\s*$//;
+        my $type = '';
+        if ($attr->{type}) {
+            ($type = lc $attr->{type}) =~ s/^\s*//;
+            $type =~ s/\s*$//;
+        }
         push @{ $p->{feeds} }, URI->new_abs($attr->{href}, $base_uri)->as_string
                 if $IsFeed{$type} &&
                    ($rel{alternate} || $rel{'service.feed'});

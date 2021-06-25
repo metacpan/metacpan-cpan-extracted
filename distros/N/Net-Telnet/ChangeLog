@@ -1,3 +1,42 @@
+2021-06-20  Jay Rogers  <jay@rgrs.com>
+
+	* Version 3.05 released.
+
+2021-06-20  Jay Rogers  <jay@rgrs.com>
+
+	* Telnet.pm: Fixed new perl warning about argument isn't numeric in
+	numeric ge (>=).
+
+2021-05-30  Jay Rogers  <jay@rgrs.com>
+
+	* Telnet.pm (dump_log input_log option_log output_log): Changed
+	the logging subroutines to also accept a tied filehandle.
+
+2021-03-30  Jay Rogers  <jay@rgrs.com>
+
+	* Telnet.pm (waitfor): Improved the speed to search for the
+	"match", especially when reading a large amount of data, by using
+	the dynamic arrays @- and @+ instead of $` and $&.
+
+2021-03-30  Jay Rogers  <jay@rgrs.com>
+
+	* Telnet.pm (new): Fixed a bug that caused the instantiation to
+	fail when setting one of the *_log input args to an empty string.
+
+2020-02-20  Jay Rogers  <jay@rgrs.com>
+
+	* Telnet.pm: Added a workaround for the "require FileHandle" bug in
+	perl 5.10.1.
+
+2020-02-20  Jay Rogers  <jay@rgrs.com>
+
+	* Telnet.pm: Stopped using the deprecated variable $[ in the
+	autoflush idiom select((select($fh), $|=1)[$[]).
+
+2018-07-12  Jay Rogers  <jay@rgrs.com>
+
+	* Telnet.pm: Fixed some documentation and pod command typos.
+
 2013-04-21  Jay Rogers  <jay@rgrs.com>
 
 	* Version 3.04 released.

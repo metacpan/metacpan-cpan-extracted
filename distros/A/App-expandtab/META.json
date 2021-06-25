@@ -29,8 +29,13 @@
          "requires" : {
             "ExtUtils::MakeMaker" : "0"
          }
+      },
+      "runtime" : {
+         "requires" : {
+            "Text::VisualWidth" : "0.02"
+         }
       }
    },
    "release_status" : "stable",
-   "version" : "0.010"
+   "version" : "0.020"
 }

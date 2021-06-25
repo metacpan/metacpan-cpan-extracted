@@ -1,3 +1,4 @@
+use v5;
 use strict;
 use warnings;
 
@@ -6,7 +7,7 @@ use Module::Build;
 my $build = Module::Build->new(
    module_name => 'Protocol::IRC',
    requires => {
-      'perl' => '5.010', # //, mro c3
+      'perl' => '5.014',
    },
    test_requires => {
       'Future' => 0,
@@ -15,7 +16,6 @@ my $build = Module::Build->new(
    },
    auto_configure_requires => 0, # Don't add M::B to configure_requires
    license => 'perl',
-   create_makefile_pl => 'traditional',
    create_license => 1,
    create_readme  => 1,
 );

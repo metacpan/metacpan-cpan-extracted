@@ -17,6 +17,7 @@ lib/PICA/Parser/PPXML.pm
 lib/PICA/Parser/Plain.pm
 lib/PICA/Parser/Plus.pm
 lib/PICA/Parser/XML.pm
+lib/PICA/Patch.pm
 lib/PICA/Path.pm
 lib/PICA/Schema.pm
 lib/PICA/Schema/Builder.pm
@@ -43,6 +44,7 @@ t/50-schema.t
 t/60-schema-builder.t
 t/70-guess.t
 t/80-picadata.t
+t/90-patch.t
 t/files/annotated.pica
 t/files/bgb.example
 t/files/dump.dat

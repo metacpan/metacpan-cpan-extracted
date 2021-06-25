@@ -1,3 +1,20 @@
+0.008   2021-06-12  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Used the wrong function name of Text::Table::Sprintf.
+
+
+0.007   2021-03-08  Released-By: PERLANCAR; Urgency: medium
+
+	- Replace Text::Table::Tiny with Text::Table::Sprintf.
+
+
+0.006   2021-03-05  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Mention Complete::Bash, Complete::Util et al.
+
+
 0.005   2021-03-05  Released-By: PERLANCAR; Urgency: low
 
 	- Use proper message format in completion response.

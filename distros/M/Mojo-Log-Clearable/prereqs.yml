@@ -1,0 +1,11 @@
+runtime:
+  requires:
+    perl:                     '5.010001'
+    Class::Method::Modifiers: '2.11'
+    Mojolicious:              '7.42'
+    Role::Tiny:               '2.000002'
+test:
+  requires:
+    File::Temp: 0
+    File::Spec::Functions: 0
+    Test::More: '0.88'

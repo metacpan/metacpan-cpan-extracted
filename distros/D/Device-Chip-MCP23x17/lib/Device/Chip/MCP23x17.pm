@@ -1,12 +1,12 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2015-2020 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2015-2021 -- leonerd@leonerd.org.uk
 
 use v5.26;
 use Object::Pad 0.19;
 
-package Device::Chip::MCP23x17 0.03;
+package Device::Chip::MCP23x17 0.04;
 class Device::Chip::MCP23x17
    extends Device::Chip;
 
@@ -242,7 +242,7 @@ L<Device::Chip::MCP23x17::Adapter>.
 method as_adapter
 {
    require Device::Chip::MCP23x17::Adapter;
-   return Device::Chip::MCP23x17::Adapter->new( $self );
+   return Device::Chip::MCP23x17::Adapter->new( chip => $self );
 }
 
 =head1 TODO

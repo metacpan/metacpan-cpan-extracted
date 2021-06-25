@@ -110,7 +110,7 @@ BEGIN {
     # Release version must be bumped, and it is probably past time for a
     # release anyway.
 
-    $VERSION = '20210402';
+    $VERSION = '20210625';
 }
 
 sub DESTROY {
@@ -835,27 +835,27 @@ EOM
     # Ready to go...
     # main loop to process all files in argument list
     #---------------------------------------------------------------
-    my $number_of_files = @ARGV;
-    my $formatter       = undef;
-    my $tokenizer       = undef;
+    my $formatter = undef;
+    my $tokenizer = undef;
+
+    # Remove duplicate filenames.  Otherwise, for example if the user entered
+    #     perltidy -b myfile.pl myfile.pl
+    # the backup version of the original would be lost.
+    if ( @ARGV > 1 ) {
+        my %seen = ();
+        @ARGV = grep { !$seen{$_}++ } @ARGV;
+    }
 
     # If requested, process in order of increasing file size
     # This can significantly reduce perl's virtual memory usage during testing.
-    if ( $number_of_files > 1 && $rOpts->{'file-size-order'} ) {
+    if ( @ARGV > 1 && $rOpts->{'file-size-order'} ) {
         @ARGV =
           map  { $_->[0] }
           sort { $a->[1] <=> $b->[1] }
           map  { [ $_, -e $_ ? -s $_ : 0 ] } @ARGV;
     }
 
-    # Remove duplicate filenames.  Otherwise, for example if the user entered
-    #     perltidy -b myfile.pl myfile.pl
-    # the backup version of the original would be lost.
-    if ( $number_of_files > 1 ) {
-        my %seen = ();
-        @ARGV = grep { !$seen{$_}++ } @ARGV;
-    }
-
+    my $number_of_files = @ARGV;
     while ( my $input_file = shift @ARGV ) {
         my $fileroot;
         my @input_file_stat;
@@ -901,10 +901,11 @@ EOM
                     if ( $input_file =~ /^\'(.+)\'$/ ) { $input_file = $1 }
                     if ( $input_file =~ /^\"(.+)\"$/ ) { $input_file = $1 }
                     my $pattern = fileglob_to_re($input_file);
-                    if ( opendir( DIR, './' ) ) {
+                    my $dh;
+                    if ( opendir( $dh, './' ) ) {
                         my @files =
-                          grep { /$pattern/ && !-d $_ } readdir(DIR);
-                        closedir(DIR);
+                          grep { /$pattern/ && !-d $_ } readdir($dh);
+                        closedir($dh);
                         if (@files) {
                             unshift @ARGV, @files;
                             next;
@@ -1010,6 +1011,9 @@ EOM
         while ( my $line = $source_object->get_line() ) {
             $buf .= $line;
         }
+
+        my $remove_terminal_newline =
+          !$rOpts->{'add-terminal-newline'} && substr( $buf, -1, 1 ) !~ /\n/;
 
         # Decode the input stream if necessary requested
         my $encoding_in              = "";
@@ -1274,6 +1278,7 @@ EOM
         my ( $sink_object, $postfilter_buffer );
         my $use_buffer =
              $postfilter
+          || $remove_terminal_newline
           || $rOpts->{'assert-tidy'}
           || $rOpts->{'assert-untidy'};
 
@@ -1613,9 +1618,29 @@ EOM
                 rOpts                    => $rOpts,
                 rpending_logfile_message => $rpending_logfile_message,
             );
-            while ( my $line = $source_object->get_line() ) {
-                $sink_object->write_line($line);
+
+            # Copy the filtered buffer to the final destination
+            if ( !$remove_terminal_newline ) {
+                while ( my $line = $source_object->get_line() ) {
+                    $sink_object->write_line($line);
+                }
             }
+            else {
+
+                # Copy the filtered buffer but remove the newline char from the
+                # final line
+                my $line;
+                while ( my $next_line = $source_object->get_line() ) {
+                    $sink_object->write_line($line) if ($line);
+                    $line = $next_line;
+                }
+                if ($line) {
+                    $sink_object->set_line_separator(undef);
+                    chomp $line;
+                    $sink_object->write_line($line);
+                }
+            }
+
             $source_object->close_input_file();
         }
 
@@ -1759,9 +1784,11 @@ EOM
 
         #---------------------------------------------------------------
         # Do syntax check if requested and possible
+        # This is permanently deactivated but the code remains for reference
         #---------------------------------------------------------------
         my $infile_syntax_ok = 0;    # -1 no  0=don't know   1 yes
-        if (   $logger_object
+        if (   0
+            && $logger_object
             && $rOpts->{'check-syntax'}
             && $ifname
             && $ofname )
@@ -2219,6 +2246,7 @@ sub generate_options {
     $add_option->( 'standard-output',            'st',    '!' );
     $add_option->( 'use-unicode-gcstring',       'gcs',   '!' );
     $add_option->( 'warning-output',             'w',     '!' );
+    $add_option->( 'add-terminal-newline',       'atnl',  '!' );
 
     # options which are both toggle switches and values moved here
     # to hide from tidyview (which does not show category 0 flags):
@@ -2307,6 +2335,9 @@ sub generate_options {
     $add_option->( 'closing-side-comment-warnings',     'cscw', '!' );
     $add_option->( 'closing-side-comments',             'csc',  '!' );
     $add_option->( 'closing-side-comments-balanced',    'cscb', '!' );
+    $add_option->( 'code-skipping',                     'cs',   '!' );
+    $add_option->( 'code-skipping-begin',               'csb',  '=s' );
+    $add_option->( 'code-skipping-end',                 'cse',  '=s' );
     $add_option->( 'format-skipping',                   'fs',   '!' );
     $add_option->( 'format-skipping-begin',             'fsb',  '=s' );
     $add_option->( 'format-skipping-end',               'fse',  '=s' );
@@ -2540,6 +2571,7 @@ sub generate_options {
     #---------------------------------------------------------------
     my @defaults = qw(
       add-newlines
+      add-terminal-newline
       add-semicolons
       add-whitespace
       blanks-before-blocks
@@ -2641,6 +2673,7 @@ sub generate_options {
       trim-qw
       format=tidy
       backup-file-extension=bak
+      code-skipping
       format-skipping
       default-tabsize=8
 
@@ -2784,8 +2817,8 @@ sub generate_options {
         'conv'       => [qw(it=4)],
         'nconv'      => [qw(it=1)],
 
-        # FIXME: possible future shortcut.  This will remain deactivated until
-        # the -lpxl flag is no longer experimental.
+        # NOTE: This is a possible future shortcut.  But it will remain
+        # deactivated until the -lpxl flag is no longer experimental.
         # 'line-up-function-parentheses' => [ qw(lp), q#lpxl=[ { F(2# ],
         # 'lfp'                          => [qw(line-up-function-parentheses)],
 
@@ -2800,7 +2833,6 @@ sub generate_options {
 
         'mangle' => [
             qw(
-              check-syntax
               keep-old-blank-lines=0
               delete-old-newlines
               delete-old-whitespace
@@ -2826,10 +2858,6 @@ sub generate_options {
         # An interesting use for 'extrude' is to do this:
         #    perltidy -extrude myfile.pl -st | perltidy -o myfile.pl.new
         # which will break up all one-line blocks.
-        #
-        # Removed 'check-syntax' option, which is unsafe because it may execute
-        # code in BEGIN blocks.  Example 'Moose/debugger-duck_type.t'.
-
         'extrude' => [
             qw(
               ci=0
@@ -3213,48 +3241,10 @@ sub check_options {
         $rOpts->{'closing-paren-indentation'}          = $cti;
     }
 
-    # In quiet mode, there is no log file and hence no way to report
-    # results of syntax check, so don't do it.
-    if ( $rOpts->{'quiet'} ) {
-        $rOpts->{'check-syntax'} = 0;
-    }
-
-    # can't check syntax if no output
-    if ( $rOpts->{'format'} ne 'tidy' ) {
-        $rOpts->{'check-syntax'} = 0;
-    }
-
-    # Never let Windows 9x/Me systems run syntax check -- this will prevent a
-    # wide variety of nasty problems on these systems, because they cannot
-    # reliably run backticks.  Don't even think about changing this!
-    if (   $rOpts->{'check-syntax'}
-        && $is_Windows
-        && ( !$Windows_type || $Windows_type =~ /^(9|Me)/ ) )
-    {
-        $rOpts->{'check-syntax'} = 0;
-    }
-
-    ###########################################################################
-    # Added Dec 2017: Deactivating check-syntax for all systems for safety
-    # because unexpected results can occur when code in BEGIN blocks is
-    # executed.  This flag was included to help check for perltidy mistakes,
-    # and may still be useful for debugging.  To activate for testing comment
-    # out the next three lines.  Also fix sub 'do_check_syntax' in this file.
-    ###########################################################################
-    else {
-        $rOpts->{'check-syntax'} = 0;
-    }
-
-    # It's really a bad idea to check syntax as root unless you wrote
-    # the script yourself.  FIXME: not sure if this works with VMS
-    unless ($is_Windows) {
-
-        if ( $< == 0 && $rOpts->{'check-syntax'} ) {
-            $rOpts->{'check-syntax'} = 0;
-            ${$rpending_complaint} .=
-"Syntax check deactivated for safety; you shouldn't run this as root\n";
-        }
-    }
+    # Syntax checking is no longer supported due to concerns about executing
+    # code in BEGIN blocks.  The flag is still accepted for backwards
+    # compatibility but is ignored if set.
+    $rOpts->{'check-syntax'} = 0;
 
     # check iteration count and quietly fix if necessary:
     # - iterations option only applies to code beautification mode

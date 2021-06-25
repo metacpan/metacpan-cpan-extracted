@@ -1,5 +1,11 @@
 Revision history for XS-Parse-Sublike
 
+0.12    2021-06-21
+        [BUGFIXES]
+         * Try to work around parse_block()'s unbalanced scopestack messups
+         * Namespace the static variables in the .h file appropriately in case
+           both this as XSParseKeyword are loaded
+
 0.11    2021-01-18
         [BUGFIXES]
          * Don't SEGV on signature parse error (RT133865)

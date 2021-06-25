@@ -1,15 +1,17 @@
 #!/usr/bin/perl
-
-# t/05.scalar.t - check scalar manipulation object
-
-use Test::More qw( no_plan );
-use strict;
-use warnings;
-use utf8;
-use lib './lib';
-use Config;
-
-BEGIN { use_ok( 'Module::Generic::Scalar' ) || BAIL_OUT( "Unable to load Module::Generic::Scalar" ); }
+BEGIN
+{
+    use strict;
+    use warnings;
+    use utf8;
+    use lib './lib';
+    use Config;
+    use JSON;
+    use Test::More qw( no_plan );
+    use_ok( 'Module::Generic::Scalar' ) || BAIL_OUT( "Unable to load Module::Generic::Scalar" );
+    use Nice::Try;
+    our $DEBUG = 0;
+};
 
 my $str = "Hello world";
 my $s = Module::Generic::Scalar->new( $str ) || BAIL_OUT( "Unable to instantiate an object." );
@@ -133,6 +135,109 @@ is( $obj->type, undef(), 'Test object type property is undef()' );
 is( $obj->name->uc, 'DAVE', 'Object chain method ok' );
 is( $obj->type->length, undef(), 'Chained, but eventually undef' );
 is( $obj->name, 'Dave', 'Overloaded scalar object in scalar context' );
+
+my $s4 = Module::Generic::Scalar->new( '10' );
+isa_ok( $s4->as_number, 'Module::Generic::Number', 'as_number' );
+ok( $s4->as_number == 10, 'number value' );
+my $s5 = Module::Generic::Scalar->new( '+10' );
+isa_ok( $s5->as_number, 'Module::Generic::Number', 'as_number (2)' );
+ok( $s5->as_number == 10, 'number value (2)' );
+
+my $s6 = Module::Generic::Scalar->new( 'world' );
+$s6->prepend( 'Hello ' );
+is( "$s6", 'Hello world', 'prepend' );
+
+my $a6 = $s6->as_array;
+isa_ok( $a6, 'Module::Generic::Array', 'as_array => Module::Generic::Array' );
+is( $a6->[0], 'Hello world', 'as_array' );
+
+my $s7 = Module::Generic::Scalar->new( 'Jack John Paul Peter' );
+my $j = JSON->new->convert_blessed;
+try
+{
+    my $json = $j->encode( $s7 );
+    is( $json, '"Jack John Paul Peter"', 'TO_JSON' );
+}
+catch( $e )
+{
+    # diag( "Error encoding: $e" );
+    fail( 'TO_JSON' );
+}
+
+# Takes the string, split it by space (now an array), join it by comma (now a scalar) and rejoin it with more strings
+my $res8 = $s7->split( qr/[[:blank:]]+/ )->join( ', ' )->join( ', ', qw( Gabriel Raphael Emmanuel ) );
+is( "$res8", 'Jack, John, Paul, Peter, Gabriel, Raphael, Emmanuel', 'join' );
+
+my $s8 = Module::Generic::Scalar->new( 'Hello' );
+my $s9 = Module::Generic::Scalar->new( 'world' );
+is( $s8->join( ' ', $s9 ), 'Hello world', 'join (2)' );
+
+subtest 'scalar io' => sub
+{
+    use utf8;
+    my $text = <<EOT;
+Mignonne, allons voir si la rose
+Qui ce matin avoit desclose
+Sa robe de pourpre au Soleil,
+A point perdu cette vesprée
+Les plis de sa robe pourprée,
+Et son teint au vostre pareil.
+EOT
+    my $s = Module::Generic::Scalar->new;
+    my $io = $s->open || die( $s->error );
+    isa_ok( $io, 'Module::Generic::Scalar::IO', 'open' );
+    diag( "File handle is: '$io'" ) if( $DEBUG );
+    ok( $io->opened, 'opened' );
+    ok( !$io->fileno, 'fileno' );
+    ok( $io->flush, 'flush' );
+    $io->print( $text );
+    diag( "String (", overload::StrVal( $s ), ") is now: $s" ) if( $DEBUG );
+    diag( "String (", overload::StrVal( $io ), ") is now: $io" ) if( $DEBUG );
+    is( "$s", $text, 'print' );
+    $io->printf( "Author: %s\n", 'Pierre de Ronsard' );
+    is( $io->getc, undef(), 'getc' );
+    ok( $io->eof, 'eof' );
+    $text .= sprintf( "Author: %s\n", 'Pierre de Ronsard' );
+    is( $io->tell, length( $text ), 'tell -> end of text' );
+    # diag( "Text is now: $io" ) if( $DEBUG );
+    ok( $io->seek(0,0), 'seek' );
+    is( $io->tell, 0, 'tell -> start of text' );
+    is( $io->getc, 'M', 'getc' );
+    is( $io->getline, "ignonne, allons voir si la rose\n", 'getline' );
+    my $buff;
+    my $n = $io->read( $buff, length( [split(/\n/, $text)]->[1] ) + 1 );
+    is( $buff, [split(/\n/, $text)]->[1] . "\n", 'read buffer check' );
+    my @lines = $io->getlines;
+    is( join( '', @lines ), join( "\n", (split(/\n/, $text, -1))[2..7] ), 'getlines' );
+    # diag( "Total size is: ", $io->length ) if( $DEBUG );
+    $io->seek( $io->length - 1, 0 );
+    my $pos = $io->tell;
+    # diag( "Current position is: $pos" ) if( $DEBUG );
+    # diag( "I am here: ", substr( "$io", $pos - 10, 10 ), "[", substr( "$io", $pos, 1 ), "]" ) if( $DEBUG );
+    # diag( "I am here: ", substr( $text, $pos - 10, 10 ), "[", substr( $text, $pos, 1 ), "]", substr( $text, $pos + 1 ) );
+    # diag( "$io" );
+    my $n = $io->write( ', Les Odes', 10 );
+    # $io->printf( "%s", ', Les Odes' );
+    is( $n, 10, 'write' );
+    substr( $text, -1, 0, ', Les Odes' );
+    # diag( "Text is now:\n$io" );
+    $io->seek(0,0);
+    @lines = $io->getlines;
+    is( $lines[-1], "Author: Pierre de Ronsard, Les Odes\n", 'write resulting value' );
+    $io->seek( $io->length - length( $lines[-1] ) );
+    my $len = $io->truncate( $io->tell );
+    is( $len, length( $lines[-1] ), 'truncate returned length' );
+    $io->seek(0,0);
+    @lines = $io->getlines;
+    is( scalar( @lines ), 6, 'truncate' );
+    diag( "String now is:\n$io" ) if( $DEBUG );
+    
+    ok( $io->close, 'close' );
+    ok( !tied( $io ), 'untied' );
+    ok( !$io->opened, 'opened' );
+};
+
+done_testing();
 
 package MyObject;
 BEGIN

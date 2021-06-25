@@ -18,7 +18,7 @@ my $PREREQ_PM   = {
   'Mojolicious'                         => '9.02',
   'Mojolicious::Plugin::PODViewer'      => '0.006',
   'Mojolicious::Plugin::Authentication' => '1.32',
-  'Mojolicious::Plugin::OpenAPI'        => '3.40',
+  'Mojolicious::Plugin::OpenAPI'        => '4.04',
   'Mojolicious::Plugin::RoutesConfig'   => '0.06',
   'Net::SMTP'                           => '3.11',
   'Role::Tiny'                          => '2.001004',
@@ -47,9 +47,9 @@ WriteMakefile(
   TEST_REQUIRES      => {},
   test               => {TESTS => 't/*.t'},
   EXE_FILES          => ['script/slovo'],
-  clean            => {FILES => '*.conf Slovo-* READM* lib/Slovo/resources/data/*.sqli*'},
-  MIN_PERL_VERSION => '5.026000',
-  META_MERGE       => {
+  clean              => {FILES => '*.conf Slovo-* lib/Slovo/resources/data/*.sqli*'},
+  MIN_PERL_VERSION   => '5.026000',
+  META_MERGE         => {
     dynamic_config => 0,
     'meta-spec'    => {version   => 2},
     no_index       => {directory => ['t']},

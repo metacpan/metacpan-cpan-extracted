@@ -50,7 +50,10 @@ for my $t (@$data) {
       my $res = $bcd->split_designator($t->{name}, allow_embedded => $ae);
       is($res->before, $t->{before} // '', "$t->{name}, allow_embedded '$ae' before ok: " . $res->before);
       is($res->designator, $t->{des}, "$t->{name}, allow_embedded '$ae' designator ok: " . ($res->designator // 'undef'));
-      is($res->designator_std, $t->{des_std}, "$t->{name}, allow_embedded '$ae' designator_std ok: " . ($res->designator_std // 'undef'));
+      # If $designator_std is undef, then it's ambiguous and we should skip this test
+      if ($res->designator_std) {
+        is($res->designator_std, $t->{des_std}, "$t->{name}, allow_embedded '$ae' designator_std ok: " . ($res->designator_std // 'undef'));
+      }
       is($res->after, $t->{after} // '', "$t->{name}, allow_embedded '$ae' after ok: " . ($res->after // 'undef'));
       $i += 4;
     }
@@ -60,7 +63,10 @@ for my $t (@$data) {
       my $res = $bcd->split_designator($t->{name}, allow_embedded => $ae);
       is($res->before, $t->{name}, "$t->{name}, allow_embedded '$ae' before ok: " . $res->before);
       is($res->designator, '', "$t->{name}, allow_embedded '$ae' designator ok: " . ($res->designator // 'undef'));
-      is($res->designator_std, '', "$t->{name}, allow_embedded '$ae' designator_std ok: " . ($res->designator_std // 'undef'));
+      # If $designator_std is undef, then it's ambiguous and we should skip this test
+      if ($res->designator_std) {
+        is($res->designator_std, '', "$t->{name}, allow_embedded '$ae' designator_std ok: " . ($res->designator_std // 'undef'));
+      }
       is($res->after, '', "$t->{name}, allow_embedded '$ae' after ok: " . ($res->after // 'undef'));
       $i += 4;
     }

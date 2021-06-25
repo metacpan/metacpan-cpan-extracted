@@ -14,9 +14,8 @@ use App::Licensecheck;
 use base 'Exporter';
 our @EXPORT = qw(license_is license_like);
 
-my $app = App::Licensecheck->new;
+my $app = App::Licensecheck->new( shortname_scheme => 'debian,spdx' );
 $app->lines(0);
-$app->deb_fmt(1);
 
 sub license_is ($$)
 {

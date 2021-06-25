@@ -1,5 +1,15 @@
 Changelog for Mixin-Linewise
 
+0.110     2021-06-22 22:27:07-04:00 America/New_York
+        - tweak the file test again to exclude directories; (is this going to
+          turn into something more convoluted in several releases? probably)
+
+0.109     2021-06-20 21:10:22-04:00 America/New_York
+        - use "-r" test instead of "-f" test, to allow use on (say) named
+          pipes (thanks, L. Alberto Giménez!)
+        - update author information
+        - add perl support section to docs
+
 0.108     2015-04-08 14:56:06-04:00 America/New_York
         - first argument can be options only if there are two options
 

@@ -4,7 +4,7 @@ Text::Minify::XS - Simple text minification
 
 # VERSION
 
-version v0.4.1
+version v0.4.2
 
 # SYNOPSIS
 
@@ -52,11 +52,36 @@ UTF-8.
 
 # SEE ALSO
 
-[String::Strip](https://metacpan.org/pod/String::Strip)
+There are many string trimming and specialised
+whitespace/comment-removal modules on CPAN.  Some of them are:
 
-[String::Util](https://metacpan.org/pod/String::Util)
+## CSS
 
-[Text::Trim](https://metacpan.org/pod/Text::Trim)
+- [CSS::Minifier](https://metacpan.org/pod/CSS::Minifier)
+- [CSS::Minifier::XS](https://metacpan.org/pod/CSS::Minifier::XS)
+- [CSS::Packer](https://metacpan.org/pod/CSS::Packer)
+
+## HTML
+
+- [HTML::Packer](https://metacpan.org/pod/HTML::Packer)
+
+## JavaScript
+
+- [JavaScript::Minifier](https://metacpan.org/pod/JavaScript::Minifier)
+- [JavaScript::Minifier::XS](https://metacpan.org/pod/JavaScript::Minifier::XS)
+- [JavaScript::Packer](https://metacpan.org/pod/JavaScript::Packer)
+
+## Plain Text
+
+- [String::Strip](https://metacpan.org/pod/String::Strip)
+- [String::Trim](https://metacpan.org/pod/String::Trim)
+- String::Trim::Regex
+- [String::Trim::NonRegex](https://metacpan.org/pod/String::Trim::NonRegex)
+- [String::Util](https://metacpan.org/pod/String::Util)
+- [Text::Trim](https://metacpan.org/pod/Text::Trim)
+
+This list does not include specialised template filters or plugins to
+web frameworks.
 
 # SOURCE
 

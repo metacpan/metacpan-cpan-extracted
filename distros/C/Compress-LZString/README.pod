@@ -1,0 +1,91 @@
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+Compress::LZString - LZ-based compression library
+
+=head1 SYNOPSIS
+
+  use Compress::LZString;
+
+  my $plain_text = "Hello, world.";
+  my $compressed = compress_b64_safe($plain_text);      # BIUwNmD2A0AEDukBOYAmA6IA
+  my $decompressed = decompress_b64_safe($compressed);  # Hello, world.
+
+=head1 DESCRIPTION
+
+L<Compress::LZString> is a perl implementation of lz-string, a fast LZ-based
+compression library written in javascript. It is designed to fulfill the need
+of storing large amounts of data in browser's localStorage, specifically on
+mobile devices.
+
+=head1 FUNCTIONS
+
+=head2 compress
+
+  $compressed = compress($plain_text);
+
+Compresses the given text and returns the result set of bytes.
+
+=head2 compress_b64
+
+  $compressed = compress_b64($plain_text);
+
+Returns a human-readable text stream encoded in base64.
+
+=head2 compress_b64_safe
+
+  $compressed = compress_b64_safe($plain_text);
+
+Returns a text stream encoded in base64 with a few characters replaced to make
+sure the result B<URI safe>, which is ready to be sent to web servers.
+
+=head2 decompress
+
+=head2 decompress_b64
+
+=head2 decompress_b64_safe
+
+Decompresses the binary/text stream processed by the function C<compress>,
+C<compress_b64>, C<compress_b64_safe>, respectively.
+
+=head2 compressToBase64
+
+=head2 compressToEncodedURIComponent
+
+=head2 decompressFromBase64
+
+=head2 decompressFromEncodedURIComponent
+
+Synonyms of C<compress_b64>, C<compress_b64_safe>, C<decompress_b64>,
+C<decompress_b64_safe>, respectively. If you'd like to use the exactly same
+function names as is in the JS version of lz-string, you can simply import
+these functions and play with them.
+
+=head1 VERSION
+
+This is a port of L<lz-string|https://github.com/pieroxy/lz-string> v.1.4.4
+javascript code to perl.
+
+=head1 SEE ALSO
+
+L<pieroxy/lz-string|https://pieroxy.net/blog/pages/lz-string/index.html>
+(released under the MIT License)
+
+=head1 AUTHOR
+
+Lucia Poppová <popp@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2021 by Lucia Poppová
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.28.1 or,
+at your option, any later version of Perl 5 you may have available.
+
+
+=cut
+

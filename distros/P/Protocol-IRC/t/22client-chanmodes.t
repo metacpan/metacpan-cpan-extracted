@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
 use Test::More;
@@ -8,6 +8,21 @@ use Test::More;
 my $CRLF = "\x0d\x0a"; # because \r\n isn't portable
 
 my @messages;
+
+package TestIRC {
+   use base qw( Protocol::IRC::Client );
+
+   sub new { return bless {}, shift }
+
+   sub nick { return "MyNick" }
+
+   sub on_message
+   {
+      my $self = shift;
+      my ( $command, $message, $hints ) = @_;
+      push @messages, [ $command, $message, $hints ];
+   }
+}
 
 my $irc = TestIRC->new;
 sub write_irc
@@ -158,17 +173,3 @@ is_deeply( $modes,
            '$modes[chanmode] for -lh+o HalfOp FullOp' );
 
 done_testing;
-
-package TestIRC;
-use base qw( Protocol::IRC::Client );
-
-sub new { return bless {}, shift }
-
-sub nick { return "MyNick" }
-
-sub on_message
-{
-   my $self = shift;
-   my ( $command, $message, $hints ) = @_;
-   push @messages, [ $command, $message, $hints ];
-}

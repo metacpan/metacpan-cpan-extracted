@@ -34,7 +34,7 @@ use strict;
 use warnings;
 use Carp qw{ carp croak };
 
-our $VERSION = 0.43;
+our $VERSION = 0.46;
 
 use Webservice::OVH::Cloud::Project::Network::Private::Subnet;
 

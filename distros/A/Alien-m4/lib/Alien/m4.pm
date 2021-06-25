@@ -5,7 +5,7 @@ use warnings;
 use base qw( Alien::Base );
 
 # ABSTRACT: Find or build GNU m4
-our $VERSION = '0.20'; # VERSION
+our $VERSION = '0.21'; # VERSION
 
 
 sub alien_helper
@@ -36,7 +36,7 @@ Alien::m4 - Find or build GNU m4
 
 =head1 VERSION
 
-version 0.20
+version 0.21
 
 =head1 SYNOPSIS
 

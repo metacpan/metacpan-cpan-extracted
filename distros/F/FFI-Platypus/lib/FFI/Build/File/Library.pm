@@ -3,11 +3,11 @@ package FFI::Build::File::Library;
 use strict;
 use warnings;
 use 5.008004;
-use base qw( FFI::Build::File::Base );
+use parent qw( FFI::Build::File::Base );
 use constant default_encoding => ':raw';
 
 # ABSTRACT: Class to track object file in FFI::Build
-our $VERSION = '1.43'; # VERSION
+our $VERSION = '1.46'; # VERSION
 
 
 sub default_suffix
@@ -29,7 +29,7 @@ FFI::Build::File::Library - Class to track object file in FFI::Build
 
 =head1 VERSION
 
-version 1.43
+version 1.46
 
 =head1 SYNOPSIS
 
@@ -94,6 +94,8 @@ Diab Jerius (DJERIUS)
 Eric Brine (IKEGAMI)
 
 szTheory
+
+José Joaquín Atria (JJATRIA)
 
 =head1 COPYRIGHT AND LICENSE
 

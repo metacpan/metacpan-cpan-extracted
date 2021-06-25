@@ -22,9 +22,8 @@ our @EXPORT = qw(are_licensed_like_scancode);
 
 my $corpus = File::BaseDir::data_dirs('tests/ScanCode');
 
-my $app = App::Licensecheck->new;
+my $app = App::Licensecheck->new( shortname_scheme => 'debian,spdx' );
 $app->lines(0);
-$app->deb_fmt(1);
 
 sub licenses ($)
 {

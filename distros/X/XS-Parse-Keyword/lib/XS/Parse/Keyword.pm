@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
 
-package XS::Parse::Keyword 0.06;
+package XS::Parse::Keyword 0.08;
 
 use v5.14;
 use warnings;
@@ -189,43 +189,30 @@ relating some optional part of them is present in the incoming source text. In
 this case, the pieces relating to those optional parts must support "probing".
 This ability is also noted below.
 
-The type of each piece should be one of the following macro values. Some
-macros additionally take a set of typeflags; taken from the following list:
-
-=over 2
-
-=item * XPK_TYPEFLAG_SCOPED
-
-On C<XPK_BLOCK_flags>, this will wrap the returned optree in its own lexical
-scope, by calling C<op_scope()>.
-
-=item * XPK_TYPEFLAG_G_VOID, XPK_TYPEFLAG_G_SCALAR, XPK_TYPEFLAG_G_LIST
-
-On optree-returning types, will contextualize the returned optree to put it in
-the given context, by calling C<op_contextualize()>.
-
-=back
-
-Where both a plain and a C<_flags>-suffixed version of the macro exists, the
-flags version will take the flags in an additional argument, and the non-flags
-version will pass zero extra flags.
+The type of each piece should be one of the following macro values.
 
 =head2 XPK_BLOCK
 
-I<atomic, emits op.>
+I<atomic, can probe, emits op.>
 
    XPK_BLOCK
-
-   XPK_BLOCK_flags(flags)
 
 A brace-delimited block of code is expected, passed as an optree in the I<op>
 field. This will be parsed as a block within the current function scope.
 
-Permits the flags C<XPK_TYPEFLAG_SCOPED> and C<XPK_TYPEFLAG_G_*>.
+This can be probed by checking for the presence of an open-brace (C<{>)
+character.
 
-=head2 XPK_BLOCK_SCALARCTX, XPK_BLOCK_LISTCTX
+Be careful defining grammars with this because an open-brace is also a valid
+character to start a term expression, for example. Given a choice between
+C<XPK_BLOCK> and C<XPK_TERMEXPR>, either of them could try to consume such
+code as
 
-Shortcuts for C<XPK_BLOCK_flags()> which wrap a scalar or list-context scope
+   { 123, 456 }
+
+=head2 XPK_BLOCK_VOIDCTX, XPK_BLOCK_SCALARCTX, XPK_BLOCK_LISTCTX
+
+Variants of C<XPK_BLOCK> which wrap a void, scalar or list-context scope
 around the block.
 
 =head2 XPK_PREFIXED_BLOCK
@@ -261,17 +248,12 @@ I<atomic, emits op.>
 
    XPK_TERMEXPR
 
-   XPK_TERMEXPR_flags(flags)
-
 A term expression is expected, parsed using C<parse_termexpr()>, and passed as
 an optree in the I<op> field.
 
-Permits the flags C<XPK_TYPEFLAG_G_*>
+=head2 XPK_TERMEXPR_VOIDCTX, XPK_TERMEXPR_SCALARCTX
 
-=head2 XPK_TERMEXPR_SCALARCTX
-
-A shortcut for C<XPK_TERMEXPR_flags()> which puts the expression in scalar
-context.
+Variants of C<XPK_TERMEXPR> which puts the expression in void or scalar context.
 
 =head2 XPK_LISTEXPR
 
@@ -279,17 +261,12 @@ I<atomic, emits op.>
 
    XPK_LISTEXPR
 
-   XPK_LISTEXPR_flags(flags)
-
 A list expression is expected, parsed using C<parse_listexpr()>, and passed as
 an optree in the I<op> field.
 
-Permits the flags C<XPK_TYPEFLAG_G_*>
-
 =head2 XPK_LISTEXPR_LISTCTX
 
-A shortcut for C<XPK_LISTEXPR_flags()> which puts the expression in list
-context.
+Variant of C<XPK_LISTEXPR> which puts the expression in list context.
 
 =head2 XPK_IDENT
 
@@ -425,7 +402,7 @@ number of repeats it found. The first piece type within must support probe.
 
 =head2 XPK_CHOICE
 
-I<structural, emits i.>
+I<structural, can probe, emits i.>
 
    XPK_CHOICE(options ...)
 
@@ -448,7 +425,7 @@ type C<XPK_FAILURE>. This will cause an error message to be printed instead.
 
 =head2 XPK_TAGGEDCHOICE
 
-I<structural, emits i.>
+I<structural, can probe, emits i.>
 
    XPK_TAGGEDCHOICE(choice, tag, ...)
 

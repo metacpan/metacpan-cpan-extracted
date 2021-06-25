@@ -1,0 +1,12 @@
+Revision history for custom-failures-x-alias
+
+0.02      2021-06-23 16:09:51-04:00 America/New_York
+
+  [BUG FIX]
+
+    * -suffix & -prefix didn't work because of silly typo.
+
+
+0.01      2021-06-23 16:09:51-04:00 America/New_York
+
+* First release upon an unsuspecting world.

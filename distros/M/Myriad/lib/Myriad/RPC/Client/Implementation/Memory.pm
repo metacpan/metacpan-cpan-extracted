@@ -2,7 +2,7 @@ package Myriad::RPC::Client::Implementation::Memory;
 
 use Myriad::Class extends => qw(IO::Async::Notifier);
 
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.008'; # VERSION
 our $AUTHORITY = 'cpan:DERIV'; # AUTHORITY
 
 =encoding utf8
@@ -88,7 +88,7 @@ async method call_rpc ($service, $method, %args) {
             $self->loop->timeout_future(at => $deadline),
             $pending
         );
-        return $message->response;
+        return $message->response->{response};
     } catch ($e) {
         if ($e =~ /Timeout/) {
             $e  = Myriad::Exception::RPC::Timeout->new(reason => 'deadline is due');

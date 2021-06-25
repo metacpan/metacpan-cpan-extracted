@@ -6,7 +6,7 @@ use Import::Into ();
 use Module::Runtime ();
 use Scalar::Util ();
 
-our $VERSION = 'v1.0.1';
+our $VERSION = 'v1.0.3';
 
 our @CARP_NOT = 'Mojolicious::Plugin::Log::Any';
 
@@ -15,28 +15,29 @@ requires 'on';
 sub attach_logger {
   my ($self, $logger, $opt) = @_;
   Carp::croak 'No logger passed' unless defined $logger;
-  my ($category, $prepend);
+  my ($category, $prepend, $separator);
   if (ref $opt) {
-    ($category, $prepend) = @$opt{'category','prepend_level'};
+    ($category, $prepend, $separator) = @$opt{qw[ category prepend_level message_separator ]};
   } else {
     $category = $opt;
   }
   $category //= 'Mojo::Log';
   $prepend //= 1;
-  
+  $separator //= "\n";
+
   my $do_log;
   if (Scalar::Util::blessed($logger)) {
     if ($logger->isa('Log::Any::Proxy')) {
       $do_log = sub {
         my ($self, $level, @msg) = @_;
-        my $msg = @msg > 1 ? join("\n", @msg) : $msg[0];
+        my $msg = @msg > 1 ? join($separator, @msg) : $msg[0];
         $msg = "[$level] $msg" if $prepend;
         $logger->$level($msg);
       };
     } elsif ($logger->isa('Log::Dispatch')) {
       $do_log = sub {
         my ($self, $level, @msg) = @_;
-        my $msg = @msg > 1 ? join("\n", @msg) : $msg[0];
+        my $msg = @msg > 1 ? join($separator, @msg) : $msg[0];
         $msg = "[$level] $msg" if $prepend;
         $level = 'critical' if $level eq 'fatal';
         $logger->log(level => $level, message => $msg);
@@ -44,7 +45,7 @@ sub attach_logger {
     } elsif ($logger->isa('Log::Dispatchouli') or $logger->isa('Log::Dispatchouli::Proxy')) {
       $do_log = sub {
         my ($self, $level, @msg) = @_;
-        my $msg = @msg > 1 ? join("\n", @msg) : $msg[0];
+        my $msg = @msg > 1 ? join($separator, @msg) : $msg[0];
         $msg = "[$level] $msg" if $prepend;
         return $logger->log_debug($msg) if $level eq 'debug';
         # hacky but we don't want to use log_fatal because it throws an
@@ -66,7 +67,7 @@ sub attach_logger {
     $logger = Log::Any->get_logger(category => $category);
     $do_log = sub {
       my ($self, $level, @msg) = @_;
-      my $msg = @msg > 1 ? join("\n", @msg) : $msg[0];
+      my $msg = @msg > 1 ? join($separator, @msg) : $msg[0];
       $msg = "[$level] $msg" if $prepend;
       $logger->$level($msg);
     };
@@ -75,7 +76,7 @@ sub attach_logger {
     $logger = Log::Log4perl->get_logger($category);
     $do_log = sub {
       my ($self, $level, @msg) = @_;
-      my $msg = @msg > 1 ? join("\n", @msg) : $msg[0];
+      my $msg = @msg > 1 ? join($separator, @msg) : $msg[0];
       $msg = "[$level] $msg" if $prepend;
       $logger->$level($msg);
     };
@@ -86,7 +87,7 @@ sub attach_logger {
     "$logger"->import::into(ref($self), values %functions);
     $do_log = sub {
       my ($self, $level, @msg) = @_;
-      my $msg = @msg > 1 ? join("\n", @msg) : $msg[0];
+      my $msg = @msg > 1 ? join($separator, @msg) : $msg[0];
       $msg = "[$level] $msg" if $prepend;
       $self->can($functions{$level})->($msg);
     };
@@ -111,7 +112,7 @@ Mojo::Log::Role::AttachLogger - Use other loggers for Mojo::Log
   my $log = Mojo::Log->with_roles('+AttachLogger')->new->unsubscribe('message');
   
   # Log::Any
-  use Log::Any::Adapter {category => 'Mojo::Log'}, 'Syslog';
+  use Log::Any::Adapter {category => 'Mojo::Log', message_separator => ' '}, 'Syslog';
   $log->attach_logger('Log::Any', 'Some::Category');
   
   # Log::Contextual
@@ -230,6 +231,10 @@ Category name (defaults to Mojo::Log).
 
 Prepend the log level to messages in the form C<[$level]> (default for
 non-L<Mojo::Log> loggers). Set false to disable.
+
+=item message_separator
+
+String to separate multiple messages. Defaults to newline.
 
 =back
 

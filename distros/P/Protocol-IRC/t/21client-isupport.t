@@ -1,11 +1,17 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
 use Test::More;
 
 my $CRLF = "\x0d\x0a"; # because \r\n isn't portable
+
+package TestIRC {
+   use base qw( Protocol::IRC::Client );
+
+   sub new { return bless {}, shift }
+}
 
 my $irc = TestIRC->new;
 sub write_irc
@@ -39,8 +45,3 @@ is( $irc->prefix_flag2mode( "\@" ), "o", 'prefix_flag2mode @ -> o' );
 is_deeply( $irc->isupport( "chanmodes_list" ), [qw( beI k l imnpsta )], 'ISUPPORT chanmodes_list is [qw( beI k l imnpsta )]' );
 
 done_testing;
-
-package TestIRC;
-use base qw( Protocol::IRC::Client );
-
-sub new { return bless {}, shift }

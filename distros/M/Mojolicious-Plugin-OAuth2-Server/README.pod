@@ -11,7 +11,7 @@ Authorization Server / Resource Server with Mojolicious
 
 =head1 VERSION
 
-0.47
+0.48
 
 =head1 SYNOPSIS
 
@@ -101,7 +101,7 @@ use Mojo::Util qw/ b64_decode url_unescape /;
 use Net::OAuth2::AuthorizationServer;
 use Carp qw/ croak /;
 
-our $VERSION = '0.47';
+our $VERSION = '0.48';
 
 my ( $AuthCodeGrant,$PasswordGrant,$ImplicitGrant,$ClientCredentialsGrant,$Grant,$JWTCallback );
 
@@ -280,7 +280,7 @@ sub _authorization_request {
   $Grant = $type eq 'token' ? $ImplicitGrant : $AuthCodeGrant;
 
   my $mojo_url = Mojo::URL->new( $uri );
-  my ( $res,$error ) = $Grant->verify_client(
+  my ( $res,$error,$error_description ) = $Grant->verify_client(
     client_id       => $client_id,
     redirect_uri    => $uri,
     scopes          => [ @scopes ],
@@ -312,6 +312,7 @@ sub _authorization_request {
       elsif ( $res == 0 ) {
         $self->app->log->debug( "OAuth2::Server: Resource owner denied scopes" );
         $error = 'access_denied';
+        $error_description //= 'resource owner denied access';
       }
     }
   }
@@ -345,6 +346,7 @@ sub _authorization_request {
 
   } elsif ( $error ) {
     $mojo_url->query->append( error => $error );
+    $mojo_url->query->append( error_description => $error_description ) if $error_description;
   } else {
     # callback has not returned anything, assume server error
     $mojo_url->query->append(
@@ -424,7 +426,7 @@ sub _access_token_request {
     ? $PasswordGrant : $grant_type eq 'client_credentials'
     ? $ClientCredentialsGrant : $AuthCodeGrant;
 
-  my ( $client,$error,$scope,$user_id,$old_refresh_token ) = _verify_credentials(
+  my ( $client,$error,$scope,$user_id,$old_refresh_token,$error_description ) = _verify_credentials(
     $self,$Grant,$grant_type,$refresh_token,$client_id,$client_secret,
     $auth_code,$username,$password,$uri
   );
@@ -497,6 +499,7 @@ sub _access_token_request {
 
   } elsif ( $error ) {
       $json_response->{error} = $error;
+      $json_response->{error_description} = $error_description if $error_description;
   } else {
     # callback has not returned anything, assume server error
     my $method = $grant_type eq 'password'
@@ -593,10 +596,10 @@ sub _verify_credentials {
     $auth_code,$username,$password,$uri
   ) = @_;
 
-  my ( $client,$error,$scope,$user_id,$old_refresh_token );
+  my ( $client,$error,$scope,$user_id,$old_refresh_token,$error_description );
 
   if ( $grant_type eq 'refresh_token' ) {
-    ( $client,$error,$scope,$user_id ) = $Grant->verify_token_and_scope(
+    ( $client,$error,$scope,$user_id,$error_description ) = $Grant->verify_token_and_scope(
       refresh_token    => $refresh_token,
       auth_header      => $self->req->headers->header( 'Authorization' ),
       mojo_controller  => $self,
@@ -606,7 +609,7 @@ sub _verify_credentials {
   } elsif ( $grant_type eq 'password' ) {
     $scope = $self->every_param( 'scope' );
 
-    ( $client,$error,$scope,$user_id ) = $Grant->verify_user_password(
+    ( $client,$error,$scope,$user_id,$error_description ) = $Grant->verify_user_password(
       client_id       => $client_id,
       client_secret   => $client_secret,
       username        => $username,
@@ -623,7 +626,7 @@ sub _verify_credentials {
     $scope = $self->every_param( 'scope' );
     my $res;
 
-    ( $res,$error ) = $Grant->verify_client(
+    ( $res,$error,$error_description ) = $Grant->verify_client(
       client_id       => $client,
       client_secret   => $client_secret,
       mojo_controller => $self,
@@ -633,7 +636,7 @@ sub _verify_credentials {
     undef( $client ) if ! $res;
 
   } else {
-    ( $client,$error,$scope,$user_id ) = $Grant->verify_auth_code(
+    ( $client,$error,$scope,$user_id,$error_description ) = $Grant->verify_auth_code(
       client_id       => $client_id,
       client_secret   => $client_secret,
       auth_code       => $auth_code,
@@ -646,7 +649,7 @@ sub _verify_credentials {
     ? $client
     : ( $client->{client_id} || $client->{client} );
 
-  return ( $client,$error,$scope,$user_id,$old_refresh_token );
+  return ( $client,$error,$scope,$user_id,$old_refresh_token,$error_description );
 }
 
 =head1 SEE ALSO

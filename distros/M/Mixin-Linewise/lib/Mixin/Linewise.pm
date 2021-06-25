@@ -1,8 +1,8 @@
 use strict;
 use warnings;
-package Mixin::Linewise;
+package Mixin::Linewise 0.110;
 # ABSTRACT: write your linewise code for handles; this does the rest
-$Mixin::Linewise::VERSION = '0.108';
+
 use 5.006;
 use Carp ();
 Carp::confess "not meant to be loaded";
@@ -30,7 +30,7 @@ Mixin::Linewise - write your linewise code for handles; this does the rest
 
 =head1 VERSION
 
-version 0.108
+version 0.110
 
 =head1 DESCRIPTION
 
@@ -39,13 +39,24 @@ handle-like objects, and all that.  With L<Mixin::Linewise::Readers> and
 L<Mixin::Linewise::Writers>, you can just write a method to handle handles, and
 methods for handling strings and filenames are added for you.
 
+=head1 PERL VERSION SUPPORT
+
+This module has the same support period as perl itself:  it supports the two
+most recent versions of perl.  (That is, if the most recently released version
+is v5.40, then this module should work on both v5.40 and v5.38.)
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
+
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@cpan.org>
+Ricardo SIGNES <rjbs@semiotic.systems>
 
 =head1 CONTRIBUTORS
 
-=for stopwords David Golden Steinbrunner Graham Knop
+=for stopwords David Golden Steinbrunner Graham Knop L. Alberto Giménez
 
 =over 4
 
@@ -60,6 +71,10 @@ David Steinbrunner <dsteinbrunner@pobox.com>
 =item *
 
 Graham Knop <haarg@haarg.org>
+
+=item *
+
+L. Alberto Giménez <agimenez@sysvalve.es>
 
 =back
 

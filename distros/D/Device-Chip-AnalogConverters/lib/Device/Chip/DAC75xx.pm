@@ -6,7 +6,7 @@
 use 5.026;
 use Object::Pad 0.19;
 
-package Device::Chip::DAC75xx 0.11;
+package Device::Chip::DAC75xx 0.12;
 class Device::Chip::DAC75xx
    extends Device::Chip;
 

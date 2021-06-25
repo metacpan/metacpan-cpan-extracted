@@ -1,9 +1,9 @@
 package Perinci::CmdLine::Lite;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-04-15'; # DATE
+our $DATE = '2021-06-23'; # DATE
 our $DIST = 'Perinci-CmdLine-Lite'; # DIST
-our $VERSION = '1.904'; # VERSION
+our $VERSION = '1.905'; # VERSION
 
 use 5.010001;
 # use strict; # already enabled by Mo
@@ -31,7 +31,7 @@ has plugins => (
     is => 'rw',
 );
 
-my $formats = [qw/text text-simple text-pretty json json-pretty csv html html+datatables perl/];
+my $formats = [qw/text text-simple text-pretty json json-pretty csv termtable html html+datatables perl/];
 
 sub BUILD {
     my ($self, $args) = @_;
@@ -374,6 +374,10 @@ sub hook_format_result {
         no warnings 'once';
         $Perinci::CmdLine::Base::tempfile_opt_suffix = '.html';
         $ENV{FORMAT_PRETTY_TABLE_BACKEND} //= 'Text::Table::HTML::DataTables';
+    } elsif ($fmt eq 'termtable') {
+        $fmt = 'text-pretty';
+        no warnings 'once';
+        $ENV{FORMAT_PRETTY_TABLE_BACKEND} //= 'Term::TablePrint';
     }
 
     my $fres = Perinci::Result::Format::Lite::format(
@@ -655,7 +659,7 @@ Perinci::CmdLine::Lite - A Rinci/Riap-based command-line application framework
 
 =head1 VERSION
 
-This document describes version 1.904 of Perinci::CmdLine::Lite (from Perl distribution Perinci-CmdLine-Lite), released on 2021-04-15.
+This document describes version 1.905 of Perinci::CmdLine::Lite (from Perl distribution Perinci-CmdLine-Lite), released on 2021-06-23.
 
 =head1 SYNOPSIS
 

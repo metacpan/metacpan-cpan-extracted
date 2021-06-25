@@ -9,12 +9,12 @@
 
 #include <winsock.h>
 
-void __inline my_fd_zero( fd_set* f)           { FD_ZERO( f); }
+void my_fd_zero( fd_set* f)           { FD_ZERO( f); }
 
 #endif
 
 typedef fd_set type_fd_set;
-void __inline std_fd_set( int fd, fd_set * f) { FD_SET(fd, f); }
+void std_fd_set( int fd, fd_set * f) { FD_SET(fd, f); }
 
 #include "win32\win32guts.h"
 #ifndef _APRICOT_H_
@@ -24,7 +24,7 @@ void __inline std_fd_set( int fd, fd_set * f) { FD_SET(fd, f); }
 #include "Component.h"
 #include "File.h"
 
-void __inline my_fd_set( HANDLE fd, type_fd_set * f) { std_fd_set( PTR2UV(fd), f); }
+void my_fd_set( HANDLE fd, type_fd_set * f) { std_fd_set( PTR2UV(fd), f); }
 
 #define var (( PFile) self)->
 #define  sys (( PDrawableData)(( PComponent) self)-> sysData)->
@@ -313,7 +313,7 @@ apc_getdir( const char *dirname, Bool is_utf8)
 #ifdef __CYGWIN__
 	DIR *dh;
 	struct dirent *de;
-	PList dirlist = nil;
+	PList dirlist = NULL;
 	char *type, *dname;
 	char path[ 2048];
 	struct stat s;
@@ -329,7 +329,7 @@ apc_getdir( const char *dirname, Bool is_utf8)
 		while (( de = readdir( dh))) {
 			list_add( dirlist, (Handle)duplicate_string( de-> d_name));
 			snprintf( path, 2047, "%s/%s", dname, de-> d_name);
-			type = nil;
+			type = NULL;
 			if ( stat( path, &s) == 0) {
 				switch ( s. st_mode & S_IFMT) {
 				case S_IFIFO:        type = "fifo";  break;

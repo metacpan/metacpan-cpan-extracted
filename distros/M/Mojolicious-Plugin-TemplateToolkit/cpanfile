@@ -1,9 +1,0 @@
-requires 'perl' => '5.010001';
-requires 'Carp';
-requires 'Class::Method::Modifiers';
-requires 'Mojolicious' => '6.51';
-requires 'parent';
-requires 'Scalar::Util';
-requires 'Template' => '2.26';
-requires 'Template::Provider' => '2.94';
-test_requires 'Test::More' => '0.88';

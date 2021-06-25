@@ -12,6 +12,8 @@ use Mojo::Util qw(getopt);
 has description => 'Send webmentions';
 has usage       => sub { shift->extract_usage };
 
+use open ':std', ':encoding(UTF-8)';
+
 sub run {
     my ( $self, @args ) = @_;
 
@@ -63,10 +65,14 @@ sub _send_many_wms ( $self, $source, $limit_to_content ) {
         say "Attempting to send webmentions to...";
     }
     for my $wm (@wms) {
-        say $wm->target;
         if ( $wm->send ) {
+            print "\x{2705} ";    # check mark
             $success_count++;
         }
+        else {
+            print "\x{274C} ";    # cross mark
+        }
+        say $wm->target;
     }
 
     my $attempt_count = scalar(@wms);

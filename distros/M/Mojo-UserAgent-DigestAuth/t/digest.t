@@ -30,16 +30,18 @@ ok $main::_request_with_digest_auth, 'request_with_digest_auth';
 
   use Mojolicious::Lite;
   get '/plain' => sub { shift->render(text => 'no-auth-needed') };
-  get '/dir/index' => sub {
+  get
+    '/dir/index' => [format => ['html']],
+    {format => 'html'}, sub {
     my $c      = shift;
     my $header = $c->req->headers->authorization;
     return $c->$authenticate unless $header;
     my %auth_param = $header =~ /(\w+)="?([^",]+)"?/g;
-    my $invalid = join ' ', grep { $auth_param{$_} ne $expected{$_} } sort keys %expected;
+    my $invalid    = join ' ', grep { $auth_param{$_} ne $expected{$_} } sort keys %expected;
     $c->res->headers->header('D-Client-Nonce' => $c->req->headers->header('D-Client-Nonce') || 'undef');
     return $c->render(text => $invalid, status => 403) if $invalid;
     return $c->render(text => 'success');
-  };
+    };
 }
 
 my $t   = Test::Mojo->new;
@@ -51,8 +53,9 @@ $t->get_ok('/dir/index.html')->status_is(401)->content_is('missing authorization
 my $tx = $t->ua->$_request_with_digest_auth(get => '/dir/index.html');
 $t->tx($tx)->status_is(401)->content_is('missing authorization');
 
-$t->tx($t->ua->$_request_with_digest_auth(get => $url, { 'D-Client-Nonce' => '0a4f113b' }))->status_is(200)->header_is('D-Client-Nonce', 'undef')->content_is('success', 'success');
+$t->tx($t->ua->$_request_with_digest_auth(get => $url, {'D-Client-Nonce' => '0a4f113b'}))->status_is(200)
+  ->header_is('D-Client-Nonce', 'undef')->content_is('success', 'success');
 
-$t->tx($t->ua->$_request_with_digest_auth(get => $url))->status_is(403)->header_is('D-Client-Nonce', 'undef')->content_is('cnonce nc response');
+$t->tx($t->ua->get($url))->status_is(403)->header_is('D-Client-Nonce', 'undef')->content_is('cnonce nc response');
 
 done_testing;

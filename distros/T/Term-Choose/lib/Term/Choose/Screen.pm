@@ -4,22 +4,16 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.731';
+our $VERSION = '1.733';
 
 use Exporter qw( import );
 
-our @EXPORT_OK = qw( down up left right clear_screen clear_to_end_of_screen clear_to_end_of_line
-                     reverse_video bold underline bold_underline normal show_cursor hide_cursor bell
-                     get_term_size
-                );
-
-our %EXPORT_TAGS = (
-    all => [ qw( down up left right clear_screen clear_to_end_of_screen clear_to_end_of_line
-                 reverse_video bold underline bold_underline normal show_cursor hide_cursor bell
-                 get_term_size
-            )
-        ]
+our @EXPORT_OK = qw(
+    down up left right clear_screen clear_to_end_of_screen clear_to_end_of_line reverse_video bold underline
+    bold_underline normal show_cursor hide_cursor bell get_term_size
 );
+
+our %EXPORT_TAGS = ( all => [ @EXPORT_OK ] );
 
 use Term::Choose::Constants qw( WIDTH_CURSOR TERM_READKEY );
 

@@ -36,6 +36,8 @@ t/examples/epub/bad_links_136561.epub
 t/examples/epub/bad_links_136561.xml
 t/examples/epub/br_133548.epub
 t/examples/epub/br_133548.xml
+t/examples/epub/br_DEV-4607.epub
+t/examples/epub/br_DEV-4607.xml
 t/examples/epub/br_in_h_167811.epub
 t/examples/epub/br_in_h_167811.xml
 t/examples/epub/caption_in_table_189163.epub

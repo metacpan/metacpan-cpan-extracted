@@ -15,7 +15,7 @@ use Webservice::OVH;
 
 my $api = Webservice::OVH->new_from_json($json_dir);
 ok( $api, "module ok" );
-
+=head2
 ok( $api->cloud, "Cloud object ok" );
 ok( $api->cloud->price && ref $api->cloud->price eq 'HASH', "Price information ok" );
 
@@ -31,5 +31,5 @@ if ( scalar @$projects > 0 ) {
     ok( $api->cloud->project_exists( $project->id ), "Project found ok" );
     ok( $test_project,                               "single call ok" );
 }
-
+=cut
 done_testing();

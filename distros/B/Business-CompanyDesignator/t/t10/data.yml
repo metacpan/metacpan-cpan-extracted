@@ -469,3 +469,31 @@
   des_std: E.S.E.
   lang: es
   position: end
+-
+  name: Société Générale SA
+  before: Société Générale
+  des: SA
+  des_std: SA
+  lang: fr
+  position: end
+-
+  name: Société Générale S.A.
+  before: Société Générale
+  des: S.A.
+  des_std: SA
+  lang: fr
+  position: end
+-
+  name: PPBrothers sp. z o.o.
+  before: PPBrothers
+  des: sp. z o.o.
+  des_std: Sp. z o.o.
+  lang: pl
+  position: end
+-
+  name: PPBrothers sp.zo.o.
+  before: PPBrothers
+  des: sp.zo.o.
+  des_std: Sp.zo.o.
+  lang: pl
+  position: end

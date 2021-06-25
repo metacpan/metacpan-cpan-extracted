@@ -1,9 +1,9 @@
 package Perinci::CmdLine::Plugin::DisablePlugin;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-04-15'; # DATE
+our $DATE = '2021-06-23'; # DATE
 our $DIST = 'Perinci-CmdLine-Lite'; # DIST
-our $VERSION = '1.904'; # VERSION
+our $VERSION = '1.905'; # VERSION
 
 # IFUNBUILT
 # use strict;
@@ -82,7 +82,7 @@ Perinci::CmdLine::Plugin::DisablePlugin
 
 =head1 VERSION
 
-This document describes version 1.904 of Perinci::CmdLine::Plugin::DisablePlugin (from Perl distribution Perinci-CmdLine-Lite), released on 2021-04-15.
+This document describes version 1.905 of Perinci::CmdLine::Plugin::DisablePlugin (from Perl distribution Perinci-CmdLine-Lite), released on 2021-06-23.
 
 =head1 SYNOPSIS
 

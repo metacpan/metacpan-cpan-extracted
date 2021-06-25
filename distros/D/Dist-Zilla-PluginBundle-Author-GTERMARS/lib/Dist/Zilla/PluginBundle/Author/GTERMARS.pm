@@ -8,7 +8,7 @@ with qw(
 );
 use namespace::autoclean;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 has fake_release => (
   is         => 'ro',

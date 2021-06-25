@@ -17,4 +17,6 @@ no_index:
   directory:
     - t
     - inc
-version: '0.58'
+requires:
+  Text::CSV: '0'
+version: '0.581'

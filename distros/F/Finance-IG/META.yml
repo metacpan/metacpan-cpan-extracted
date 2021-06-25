@@ -16,13 +16,14 @@ meta-spec:
 name: Finance-IG
 no_index:
   directory:
-    - t
-    - inc
+    - lib/Finance/IG/Record
+  file:
+    - lib/Finance/IG/Record
 requires:
   JSON: '0'
   Moose: '0'
   REST::Client: '0'
   Time::Piece: '0'
   perl: '5.10'
-version: '0.04'
+version: '0.092'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,5 +1,11 @@
 Revision history for Dist-Zilla-Plugin-CheckPrereqsIndexed
 
+0.021     2021-06-19 11:11:39-04:00 America/New_York
+        - BREAKING: $plugin->skips now returns a list, not an arrayref
+        - versions are now parsed before comparison
+        - update author contact info
+        - add perl support section to docs
+
 0.020     2016-09-15 18:51:41-04:00 America/New_York
         - fixed missing test prereq from 0.019 (Karen Etheridge)
 

@@ -1,0 +1,29 @@
+---
+abstract: 'H3 Geospatial Hexagon Indexing System'
+author:
+  - 'Michael R. Davis <mrdvt@cpan.org>'
+build_requires:
+  Test::More: '0'
+  Test::Number::Delta: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.52, CPAN::Meta::Converter version 2.150001'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Geo-H3
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  FFI::CheckLib: '0'
+  Geo::H3::FFI: '0.05'
+  perl: '5.008'
+resources:
+  bugtracker: https://github.com/mrdvt92/perl-Geo-H3/issues
+  homepage: https://github.com/mrdvt92/perl-Geo-H3
+  repository: https://github.com/mrdvt92/perl-Geo-H3.git
+version: '0.06'

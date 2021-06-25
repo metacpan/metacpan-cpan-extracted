@@ -23,7 +23,7 @@ no_index:
 provides:
   App::cpm:
     file: lib/App/cpm.pm
-    version: '0.997003'
+    version: '0.997004'
   App::cpm::CLI:
     file: lib/App/cpm/CLI.pm
   App::cpm::CircularDependency:
@@ -36,8 +36,6 @@ provides:
     file: lib/App/cpm/HTTP.pm
   App::cpm::Installer::Unpacker:
     file: lib/App/cpm/Installer/Unpacker.pm
-  App::cpm::Job:
-    file: lib/App/cpm/Job.pm
   App::cpm::Logger:
     file: lib/App/cpm/Logger.pm
   App::cpm::Logger::File:
@@ -60,6 +58,8 @@ provides:
     file: lib/App/cpm/Resolver/MetaDB.pm
   App::cpm::Resolver::Snapshot:
     file: lib/App/cpm/Resolver/Snapshot.pm
+  App::cpm::Task:
+    file: lib/App/cpm/Task.pm
   App::cpm::Tutorial:
     file: lib/App/cpm/Tutorial.pm
   App::cpm::Util:
@@ -86,7 +86,6 @@ requires:
   CPAN::Meta: '0'
   CPAN::Meta::Requirements: '2.130'
   CPAN::Meta::YAML: '0'
-  Class::Tiny: '0'
   Command::Runner: '0.100'
   ExtUtils::Install: '2.20'
   ExtUtils::InstallPaths: '0.002'
@@ -108,20 +107,21 @@ resources:
   bugtracker: https://github.com/skaji/cpm/issues
   homepage: https://github.com/skaji/cpm
   repository: https://github.com/skaji/cpm.git
-version: '0.997003'
+version: '0.997004'
 x_contributors:
   - 'Andrew Rodland <andrew@cleverdomain.org>'
   - 'Dave Rolsky <autarch@urth.org>'
   - 'Felix Ostmann <felix.ostmann@gmail.com>'
   - 'FUJI Goro <goro@fastly.com>'
   - 'Kenichi Ishigaki <ishigaki@cpan.org>'
+  - 'Maxim Tarasov <mu@magi.net.ru>'
   - 'Mikhail Ivanov <m.ivanych@gmail.com>'
   - 'Nicolas R <atoomic@cpan.org>'
   - 'Nicolas R <cpan@atoomic.org>'
   - 'Olaf Alders <olaf@wundersolutions.com>'
   - 'Shoichi Kaji <skaji@outlook.com>'
   - 'Will Sheppard <will.sheppard.uk@gmail.com>'
-x_generated_by_perl: v5.32.1
+x_generated_by_perl: v5.34.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
 x_static_install: 1

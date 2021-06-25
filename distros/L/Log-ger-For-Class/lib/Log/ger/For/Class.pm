@@ -1,9 +1,9 @@
 package Log::ger::For::Class;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2019-12-09'; # DATE
+our $DATE = '2021-06-14'; # DATE
 our $DIST = 'Log-ger-For-Class'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 use 5.010001;
 use strict;
@@ -125,7 +125,7 @@ Log::ger::For::Class - Add logging to class
 
 =head1 VERSION
 
-This document describes version 0.004 of Log::ger::For::Class (from Perl distribution Log-ger-For-Class), released on 2019-12-09.
+This document describes version 0.005 of Log::ger::For::Class (from Perl distribution Log-ger-For-Class), released on 2021-06-14.
 
 =head1 SYNOPSIS
 
@@ -137,6 +137,12 @@ This document describes version 0.004 of Log::ger::For::Class (from Perl distrib
 
 Most of the things that apply to L<Log::ger::For::Package> also applies to this
 module, since this module uses add_logging_to_package() as its backend.
+
+=head1 CONTRIBUTOR
+
+=for stopwords perlancar (on netbook-zenbook-ux305)
+
+perlancar (on netbook-zenbook-ux305) <perlancar@gmail.com>
 
 =head1 FUNCTIONS
 
@@ -250,6 +256,7 @@ be supplied via environment C<LOG_SUB_ARGS>.
 Whether to display subroutine result when logging subroutine exit. The default
 can also be set via environment C<LOG_SUB_RESULT>.
 
+
 =back
 
 Return value:  (any)
@@ -282,7 +289,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2017 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2019, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

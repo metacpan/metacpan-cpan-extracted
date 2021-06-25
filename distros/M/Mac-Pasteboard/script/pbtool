@@ -125,7 +125,7 @@ BEGIN {
     die "Neither YAML nor Data::Dumper available.\n";
 }
 
-our $VERSION = '0.015';
+our $VERSION = '0.100';
 our $ALPHA_VERSION = $VERSION;
 $VERSION =~ s/_//g;
 
@@ -215,7 +215,9 @@ sub clear {
     return;
 }
 
-=head2 copy data [flavor [flags]]
+=head2 copy
+
+ pbtool> copy data [flavor [flags]]
 
 This command copies the given data to the current pasteboard as the
 given flavor and the given flavor flags. The flavor flags default to 0,
@@ -235,7 +237,9 @@ sub copy {
     return;
 }
 
-=head2 copy_file file_name [flavor [flags]]
+=head2 copy_file
+
+ pbtool> copy_file file_name [flavor [flags]]
 
 This command copies the contents of the given file to the current
 pasteboard as the given flavor and the given flavor flags. The flavor
@@ -268,7 +272,9 @@ sub copy_file {
     return;
 }
 
-=head2 create [name]
+=head2 create
+
+ pbtool> create [name]
 
 The named pasteboard is created if necessary, and becomes the current
 pasteboard. If no name is specified, you get the system clipboard, named
@@ -292,6 +298,8 @@ pasteboard. If no name is specified, you get the system clipboard, named
 
 =head2 dump
 
+ pbtool> dump
+
 This command copies the current pasteboard object to standard out in
 Data::Dumper format.
 
@@ -306,6 +314,8 @@ sub dump {	## no critic (ProhibitBuiltinHomonyms)
 
 =head2 exit
 
+ pbtool> exit
+
 This command causes the script to exit. End-of-file also has this
 effect.
 
@@ -316,6 +326,8 @@ sub exit {	## no critic (ProhibitBuiltinHomonyms)
 }
 
 =head2 encode
+
+ pbtool> encode [boolean]
 
 This command displays whether data are encoded onto and decoded from the
 pasteboard. If an argument is passed, it becomes the new setting. The
@@ -338,6 +350,8 @@ sub encode {
 
 =head2 flavor
 
+ pbtool> flavor [new_default_flavor]
+
 This command displays the name of the current default flavor. If an
 argument is passed, this becomes the new default flavor.
 
@@ -352,7 +366,9 @@ sub flavor {
     return;
 }
 
-=head2 flavors [conforms_to]
+=head2 flavors
+
+ pbtool> flavors [conforms_to]
 
 This command dumps the flavors of data present on the clipboard which
 conform to the given flavor, If no conforming flavor is given, all
@@ -376,7 +392,7 @@ The tags hash will contain zero or more of the following keys:
  pboard: the preferred NSPBoard type for the flavor.
 
 See
-L<http://developer.apple.com/documentation/Carbon/Conceptual/understanding_utis/>
+L<https://developer.apple.com/library/archive/documentation/FileManagement/Conceptual/understanding_utis/understand_utis_intro/understand_utis_intro.html>
 for the concept of conformance. As a trivial example,
 
  pbtool> flavors public.text
@@ -403,6 +419,8 @@ sub flavors {
 
 =head2 help
 
+ pbtool> help
+
 This command displays the documentation for pbtool.
 
 =cut
@@ -413,6 +431,8 @@ sub help {
 }
 
 =head2 name
+
+ pbtool> name
 
 This command displays the name of the current pasteboard. If there is no
 current pasteboard, the system clipboard is made the current pasteboard,
@@ -427,6 +447,8 @@ sub name {
 }
 
 =head2 opt
+
+ pbtool> opt [ new options ]
 
 This command displays the options currently in effect. If it has any
 arguments, they are interpreted as options, with the leading '-' on the
@@ -462,7 +484,9 @@ still in effect):
     }
 }
 
-=head2 output (encoding)
+=head2 output
+
+ pbtool output (encoding)
 
 This command displays the encoding used for non-binary output to
 standard out. If no encoding has been specified, the display will be
@@ -493,15 +517,18 @@ sub output {
     return;
 }
 
-=head2 paste [flavor]
+=head2 paste
+
+ pbtool> paste [flavor]
 
 This command retrieves the given flavor from the current pasteboard and
 copies it to standard out. The default flavor is
-'com.apple.traditional-mac-plain-text'. The flavor flags are written to
-standard error. If no pasteboard is current, the system pasteboard is
-made current. If the I<id> setting is undef, the last occurrence of the
-desired flavor (if any) is returned; otherwise the flavor is returned
-from the item whose ID is the given I<id>.
+C<'public.utf8-plain-text'> if built with UTF-8 support, or
+C<'com.apple.traditional-mac-plain-text'> otherwise. The flavor flags
+are written to standard error. If no pasteboard is current, the system
+pasteboard is made current. If the I<id> setting is undef, the last
+occurrence of the desired flavor (if any) is returned; otherwise the
+flavor is returned from the item whose ID is the given I<id>.
 
 =cut
 
@@ -511,12 +538,14 @@ sub paste {
     my ($data, $flags) = $pb->paste (@args);
     print STDERR "Flags = $flags (",
 	scalar $pb->flavor_flag_names ($flags), ")\n";
-    print $data;
-    substr ($data, -1, 1) eq "\n" or print "\n";
+    chomp $data;
+    print $data, "\n";
     return;
 }
 
-=head2 paste_all [conforms_to]
+=head2 paste_all
+
+ pbtool> paste_all [conforms_to]
 
 This command displays all data on the current pasteboard conforming to
 the given flavor. If no flavor is given, all flavors are displayed. If
@@ -527,7 +556,7 @@ The output is the same as for L<flavors|/flavors>, but in addition the
 system pasteboard is made the current clipboard.
 
 See
-L<http://developer.apple.com/documentation/Carbon/Conceptual/understanding_utis/index.html>
+L<https://developer.apple.com/library/archive/documentation/FileManagement/Conceptual/understanding_utis/understand_utis_intro/understand_utis_intro.html>
 for the concept of conformance.
 
 =cut
@@ -542,6 +571,8 @@ sub paste_all {
 }
 
 =head2 pbpaste
+
+ pbtool> pbpaste
 
 This command is equivalent to I<paste>, but always uses the system
 clipboard.
@@ -582,7 +613,9 @@ sub show {
     goto &opt;
 }
 
-=head2 status [value]
+=head2 status
+
+ pbtool> status [new_value]
 
 This command displays the current status setting of the current
 pasteboard, optionally setting it first to the given value.  If there is
@@ -599,7 +632,9 @@ sub status {
     return;
 }
 
-=head2 synch [name]
+=head2 synch
+
+ pbtool> synch [pasteboard_name]
 
 This command synchronizes with the current pasteboard. If a name is
 given, that pasteboard is made the current pasteboard, and it is
@@ -622,8 +657,10 @@ sub synch {
 
 =head2 unique
 
+ pbtool> unique
+
 This command creates a pasteboard with a unique name. Under Mac OS 10.4
-and above, this name is available via the 'name' command.
+and above, this name is available via the L<name|/name> command.
 
 =cut
 

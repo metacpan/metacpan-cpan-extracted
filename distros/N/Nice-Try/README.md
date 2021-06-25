@@ -105,7 +105,8 @@ aware:
         my $name = ${$o->info};
 
 And you also have granual power in the catch block to filter which
-exception to handle:
+exception to handle. See more on this in [\"EXCEPTION
+CLASS\"](#exception-class){.perl-module}
 
         try
         {
@@ -119,7 +120,7 @@ exception to handle:
         {
             # should reach here.
         }
-        catch( $oh_well isa("Exception") )
+        catch( $oh_well isa("Exception") ) # or you can also write catch( Exception $oh_well )
         {
             # Default using another way to filter by Exception
         }
@@ -136,7 +137,7 @@ exception to handle:
 VERSION
 =======
 
-        v1.1.0
+        v1.1.1
 
 DESCRIPTION
 ===========
@@ -209,6 +210,36 @@ Here is a list of its distinctive features:
             {
                 return( "Oh no: $funky_variable_name" );
             }
+
+-   `catch` can filter by exception class. For example:
+
+            try
+            {
+                die( My::Exception->new( "Not alllowed here.", { code => 401 }) );
+            }
+            catch( My::Exception $e where { $_->code == 500 })
+            {
+                print( "Oopsie\n" );
+            }
+            catch( My::Exception $e where { $_->code == 401 })
+            {
+                print( "Get away!\n" );
+            }
+            catch( My::Exception $e )
+            {
+                print( "Got an exception: $e\n" );
+            }
+            catch( $default )
+            {
+                print( "Something weird has happened: $e\n" );
+            }
+            finally
+            {
+                $dbh->disconnect;
+            }
+
+    See more on this in [\"EXCEPTION
+    CLASS\"](#exception-class){.perl-module}
 
 -   `$@` is always available too
 -   You can return a value from try-catch blocks, even with embedded
@@ -648,8 +679,7 @@ EXCEPTION CLASS
 ===============
 
 As mentioned above, you can use class when raising exceptions and you
-can filter them in a variety of way since version 1.0.7 when you catch
-them.
+can filter them in a variety of way when you catch them.
 
 Here are your options:
 
@@ -659,8 +689,8 @@ Here are your options:
 
 2. catch( Exception::Class \$error\_variable where { \$condition } ) { }
 
-:   Here `$condition` could be anything that fits in a legitimate
-    perl\'s block, such as:
+:   Here `$condition` could be anything that fits in a legitimate perl
+    block, such as:
 
             try
             {
@@ -673,20 +703,20 @@ Here are your options:
 
     In the condition block `$_` will always be made available and will
     correspond to the exception object thrown, just like `$oopsie` in
-    this example. `$@` is also availble with the exception object as its
-    value.
+    this example. `$@` is also available with the exception object as
+    its value.
 
 3. catch( \$e isa Exception::Class ) { }
 
-:   
+:   This is a variant of the `catch( Exception::Class $e ) {}` form
 
 4. catch( \$e isa(\'Exception::Class\') ) { }
 
-:   
+:   A variant of the one above if you want to use single quotes.
 
 5. catch( \$e isa(\"Exception::Class\") ) { }
 
-:   
+:   A variant of the one above if you want to use double quotes.
 
 6. catch( \$e isa Exception::Class where { \$condition } ) { }
 
@@ -702,7 +732,7 @@ Here are your options:
 
 9. catch( \$e where { \$condition } ) { }
 
-:   This is not a class execption catching, but worse mentioning. For
+:   This is not a class exception catching, but worth mentioning. For
     example:
 
             try
@@ -990,7 +1020,7 @@ which I borrowed some code.
 AUTHOR
 ======
 
-Jacques Deguest \<`jack@deguest.jp`{classes="ARRAY(0x557f074ad428)"}\>
+Jacques Deguest \<`jack@deguest.jp`{classes="ARRAY(0x555fc0e5db78)"}\>
 
 SEE ALSO
 ========

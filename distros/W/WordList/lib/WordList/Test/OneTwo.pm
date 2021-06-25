@@ -1,12 +1,12 @@
 package WordList::Test::OneTwo;
 
-our $DATE = '2021-01-28'; # DATE
-our $VERSION = '0.7.7'; # VERSION
+our $DATE = '2021-06-23'; # DATE
+our $VERSION = '0.7.10'; # VERSION
 
 use WordList;
 our @ISA = qw(WordList);
 
-our %STATS = ("num_words",2,"shortest_word_len",3,"num_words_contains_nonword_chars",0,"num_words_contain_nonword_chars",0,"num_words_contains_unicode",0,"num_words_contain_whitespace",0,"num_words_contain_unicode",0,"num_words_contains_whitespace",0,"longest_word_len",3,"avg_word_len",3); # STATS
+our %STATS = ("num_words",2,"num_words_contains_unicode",0,"shortest_word_len",3,"num_words_contain_nonword_chars",0,"longest_word_len",3,"avg_word_len",3,"num_words_contain_unicode",0,"num_words_contains_whitespace",0,"num_words_contain_whitespace",0,"num_words_contains_nonword_chars",0); # STATS
 
 1;
 # ABSTRACT: Wordlist that contains "one" and "two"
@@ -21,7 +21,7 @@ WordList::Test::OneTwo - Wordlist that contains "one" and "two"
 
 =head1 VERSION
 
-This document describes version 0.7.7 of WordList::Test::OneTwo (from Perl distribution WordList), released on 2021-01-28.
+This document describes version 0.7.10 of WordList::Test::OneTwo (from Perl distribution WordList), released on 2021-06-23.
 
 =head1 SYNOPSIS
 
@@ -30,11 +30,12 @@ This document describes version 0.7.7 of WordList::Test::OneTwo (from Perl distr
  my $wl = WordList::Test::OneTwo->new;
 
  # Pick a (or several) random word(s) from the list
- my $word = $wl->pick;
- my @words = $wl->pick(3);
+ my ($word) = $wl->pick;
+ my ($word) = $wl->pick(1);  # ditto
+ my @words  = $wl->pick(3);  # no duplicates
 
  # Check if a word exists in the list
- if ($wl->word_exists('foo')) { ... }
+ if ($wl->word_exists('foo')) { ... }  # case-sensitive
 
  # Call a callback for each word
  $wl->each_word(sub { my $word = shift; ... });
@@ -43,7 +44,7 @@ This document describes version 0.7.7 of WordList::Test::OneTwo (from Perl distr
  my $first_word = $wl->first_word;
  while (defined(my $word = $wl->next_word)) { ... }
 
- # Get all the words
+ # Get all the words (beware, some wordlists are *huge*)
  my @all_words = $wl->all_words;
 
 =head1 HOMEPAGE
@@ -56,7 +57,7 @@ Source repository is at L<https://github.com/perlancar/perl-WordList>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-WordList/issues>
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=WordList>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

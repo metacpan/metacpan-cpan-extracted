@@ -3,21 +3,24 @@ abstract: 'indexed colors used by XTerm'
 author:
   - 'Paul Evans <leonerd@leonerd.org.uk>'
 build_requires:
-  Test::More: 0
+  Test::More: '0.88'
 configure_requires:
-  Module::Build: 0.36
-generated_by: 'Module::Build version 0.3607'
+  Module::Build: '0.4004'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Convert-Color-XTerm
 provides:
   Convert::Color::XTerm:
     file: lib/Convert/Color/XTerm.pm
-    version: 0.05
+    version: '0.06'
 requires:
-  Convert::Color: 0.06
+  Convert::Color: '0.06'
+  perl: '5.014'
 resources:
   license: http://dev.perl.org/licenses/
-version: 0.05
+version: '0.06'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -6,6 +6,7 @@ use Test::More;
 
 my $spec = path(qw(t spec with-ref.json))->to_abs;
 plan skip_all => 'Cannot read spec' unless -r $spec;
+$ENV{MOJO_LOG_LEVEL} //= 'warn';
 
 eval {
   my $app = Mojolicious->new;

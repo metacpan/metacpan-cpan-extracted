@@ -1,0 +1,18 @@
+runtime:
+  requires:
+    perl: '5.010001'
+    Carp: 0
+    Future: '0.36'
+    Mojolicious: '7.54'
+    parent: 0
+    Role::Tiny: '2.000002'
+    Scalar::Util: 0
+test:
+  requires:
+    Test::Identity: 0
+    Test::More: '0.94'
+    Test::Needs: 0
+develop:
+  requires:
+    IO::Async::Loop: '0.56'
+    IO::Async::Loop::Mojo: '0.04'

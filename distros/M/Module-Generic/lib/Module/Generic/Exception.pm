@@ -14,6 +14,7 @@ package Module::Generic::Exception;
 BEGIN
 {
     use strict;
+    use warnings;
     use parent qw( Module::Generic );
     use Scalar::Util;
     use Devel::StackTrace;
@@ -148,7 +149,7 @@ sub init
     $self->{file} = $frame->filename;
     $self->{line} = $frame->line;
     ## The caller sub routine ( caller( n ) )[3] returns the sub called by our caller instead of the sub that called our caller, so we go one frame back to get it
-    $self->{subroutine} = $frame2->subroutine;
+    $self->{subroutine} = $frame2->subroutine if( $frame2 );
     $self->{package} = $frame->package;
     $self->{trace} = $trace;
     return( $self );

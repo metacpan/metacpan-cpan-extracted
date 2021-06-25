@@ -1,0 +1,39 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '6.78'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'Test::More' => '0',
+                                      'Test::Pod' => '1.41'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'App::Addex::AddressBook' => '0',
+                                      'App::Addex::Entry' => '0',
+                                      'App::Addex::Entry::EmailAddress' => '0',
+                                      'Encode' => '0',
+                                      'File::Temp' => '0',
+                                      'experimental' => '0',
+                                      'parent' => '0',
+                                      'perl' => 'v5.20.0',
+                                      'strict' => '0',
+                                      'warnings' => '0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'Test::More' => '0.96'
+                                 }
+                 }
+     };
+  $x;
+ }

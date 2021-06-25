@@ -1,5 +1,9 @@
 Revision history for App-Uni
 
+9.005     2021-06-18 22:24:18-04:00 America/New_York
+        - update author contact info
+        - add supported versions to docs
+
 9.004     2020-07-03 11:55:58-04:00 America/New_York
         - add the most basic of test files
         - work with perl 5.32.0, where the secret bit of guts we used has

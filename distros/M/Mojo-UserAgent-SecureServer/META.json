@@ -30,7 +30,8 @@
       },
       "runtime" : {
          "requires" : {
-            "Mojolicious" : "8.00"
+            "IO::Socket::SSL" : "2.009",
+            "Mojolicious" : "9.00"
          }
       },
       "test" : {
@@ -51,7 +52,7 @@
          "web" : "https://github.com/jhthorsen/mojo-useragent-secureserver"
       }
    },
-   "version" : "0.02",
+   "version" : "0.03",
    "x_contributors" : [
       "Jan Henning Thorsen"
    ],

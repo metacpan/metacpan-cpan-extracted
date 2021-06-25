@@ -4,8 +4,14 @@ use warnings;
 use Module::Build;
 use File::Which 'which';
 
-unless (defined which 'math') {
-  my $message = "Math::Mathematica requires an installed version of Mathematica and the 'math' shell\n";
+my $found = defined($ENV{PERL_MATHEMATICA_EXECUTABLE}) || defined(which 'math');
+
+unless ($found) {
+  my $message = <<"END";
+Math::Mathematica requires an installed version of Mathematica and the 'math' shell which is not found in the path.
+Please install Mathematica, correct your PATH to contain the executable or set PERL_MATHEMATICA_EXECUTABLE to the correct location.
+END
+
   if ($ENV{AUTOMATED_TESTING}) {
     print $message;
     exit 0;

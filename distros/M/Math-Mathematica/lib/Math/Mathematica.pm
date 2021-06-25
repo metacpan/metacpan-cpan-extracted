@@ -21,7 +21,7 @@ This module does not contain a Mathematica interpreter. Mathematica must be inst
 use strict;
 use warnings;
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 $VERSION = eval $VERSION;
 
 use Carp;
@@ -44,7 +44,7 @@ log - If set to a true value (true by default), the full log will be available v
 
 =item *
 
-command - The command to invoke to start the Mathematica interpreter. The default is C<math>.
+command - The command to invoke to start the Mathematica interpreter. The default is C<math> or the value of C<PERL_MATHEMATICA_EXECUTABLE> in your environment.
 
 =item *
 
@@ -71,7 +71,7 @@ sub new {
   my $self = {
     pty        => $opts{pty}        || IO::Pty::Easy->new(),
     warn_after => $opts{warn_after} || 10,
-    command    => $opts{command}    || 'math',
+    command    => $opts{command}    || $ENV{PERL_MATHEMATICA_EXECUTABLE} || 'math',
     log        => $opts{log} ? '' : undef,
     debug      => $opts{debug} || $ENV{PERL_MATHEMATICA_DEBUG} || 0,
   };

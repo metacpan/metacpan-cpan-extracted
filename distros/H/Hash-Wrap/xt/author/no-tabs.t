@@ -21,6 +21,7 @@ my @files = (
     't/lockkeys.t',
     't/lvalue.t',
     't/lvalue_undef.t',
+    't/methods.t',
     't/subclass.t',
     't/undef.t'
 );

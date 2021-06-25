@@ -268,7 +268,7 @@ sub draw_caption
 	my ( $self, $canvas, $x, $y) = @_;
 	my ($cap, $tilde) = @{ $self-> text_wrap_shape( $self-> text, 
 		undef, 
-		options => tw::CalcMnemonic|tw::CollapseTilde|tw::ExpandTabs,
+		options => tw::CalcMnemonic|tw::CollapseTilde|tw::ExpandTabs|tw::ReturnGlyphs,
 		tabs    => 1,
 	) };
 	unless ( $self->enabled) {
@@ -313,17 +313,14 @@ sub pressed
 	$_[0]-> repaint;
 }
 
-
-sub text
+sub set_text
 {
-	return $_[0]-> SUPER::text unless $#_;
 	my ( $self, $caption) = @_;
-	$self-> SUPER::text( $caption );
+	$self-> SUPER::set_text( $caption );
 	$self-> {accel} = lc($1) if $caption =~ /~([a-z0-9])/i;
 	$self-> check_auto_size;
 	$self-> repaint;
 }
-
 
 sub on_enable  { $_[0]-> repaint; }
 sub on_disable { $_[0]-> cancel_transaction; $_[0]-> repaint; }
@@ -480,25 +477,44 @@ sub on_paint
 		my $sh = $ph * $is;
 		my $imgNo = $self-> {defaultGlyph};
 		my $useVeil = 0;
+		my $image = $self->{image};
 		if ( $self-> {hilite}) {
-			$imgNo = $self-> {hiliteGlyph}
-				if $self-> {glyphs} > $self-> {hiliteGlyph} &&
-					$self-> {hiliteGlyph} >= 0;
+			if ( $self->{glyphs} > 1 ) {
+				$imgNo = $self-> {hiliteGlyph}
+					if $self-> {glyphs} > $self-> {hiliteGlyph} &&
+						$self-> {hiliteGlyph} >= 0;
+			} elsif ( ref($self-> {hiliteGlyph})) {
+				$image = $self->{hiliteGlyph};
+			}
 		}
 		if ( $self-> {checked}) {
-			$imgNo = $self-> {holdGlyph} if
-				$self-> {glyphs} > $self-> {holdGlyph} &&
-					$self-> {holdGlyph} >= 0;
+			if ( $self->{glyphs} > 1 ) {
+				$imgNo = $self-> {holdGlyph} if
+					$self-> {glyphs} > $self-> {holdGlyph} &&
+						$self-> {holdGlyph} >= 0;
+			} elsif ( ref($self->{holdGlyph})) {
+				$image = $self->{holdGlyph};
+			}
 		}
 		if ( $self-> {pressed}) {
-			$imgNo = $self-> {pressedGlyph} if
-				$self-> {glyphs} > $self-> {pressedGlyph} &&
-					$self-> {pressedGlyph} >= 0;
+			if ( $self->{glyphs} > 1 ) {
+				$imgNo = $self-> {pressedGlyph} if
+					$self-> {glyphs} > $self-> {pressedGlyph} &&
+						$self-> {pressedGlyph} >= 0;
+			} elsif ( ref($self->{pressedGlyph}) ) {
+				$image = $self->{pressedGlyph};
+			}
 		}
 		if ( !$self-> enabled) {
-			( $self-> {glyphs} > $self-> {disabledGlyph} && $self-> {disabledGlyph} >= 0) ?
-				$imgNo = $self-> {disabledGlyph} :
-					$useVeil = 1;
+			if ( $self->{glyphs} > 1 ) {
+				( $self-> {glyphs} > $self-> {disabledGlyph} && $self-> {disabledGlyph} >= 0) ?
+					$imgNo = $self-> {disabledGlyph} :
+						$useVeil = 1;
+			} elsif (ref($self->{disabledGlyph})) {
+				$image = $self->{disabledGlyph};
+			} else {
+				$useVeil = 1;
+			}
 		}
 
 		my ( $imAtX, $imAtY);
@@ -521,7 +537,16 @@ sub on_paint
 			$imAtY = ( $size[1] - $sh) / 2 - $shift;
 		}
 
-		my $image = $self->{image};
+		if ( $image && UNIVERSAL::isa($image, 'Prima::Drawable::Metafile')) {
+			if ( !$self->enabled && $useVeil && $image->type == dbt::Bitmap) {
+				$canvas->color(cl::White);
+				$image->execute($canvas, $imAtX+1, $imAtY-1);
+				$useVeil = 0;
+			}
+			$canvas->color($clr[0]);
+			$image->execute($canvas, $imAtX, $imAtY);
+			goto CAPTION;
+		}
 		if ( $self-> {smoothScaling} && $is != 1.0 ) {
 			my $c = $self->{smooth_cache} //= {
 				zoom  => -1,
@@ -548,6 +573,7 @@ sub on_paint
 			$pw, $ph,
 			rop::CopyPut
 		);
+CAPTION:
 		$self-> draw_veil( $canvas, $imAtX, $imAtY, $imAtX + $sw, $imAtY + $sh)
 			if $useVeil;
 	} else {
@@ -1429,13 +1455,13 @@ the 'default' action. Useful for OK-buttons in dialogs.
 
 Default value: 0
 
-=item defaultGlyph INTEGER
+=item defaultGlyph INTEGER | IMAGE | METAFILE
 
 Selects index of the default sub-image.
 
 Default value: 0
 
-=item disabledGlyph INTEGER
+=item disabledGlyph INTEGER | IMAGE | METAFILE
 
 Selects index of the sub-image for the disabled button state.
 If C<image> does not contain such sub-image, the C<defaultGlyph>
@@ -1466,7 +1492,7 @@ L<hiliteGlyph>, L<disabledGlyph>, L<pressedGlyph>, L<holdGlyph>.
 
 Default value: 1
 
-=item hiliteGlyph INTEGER
+=item hiliteGlyph INTEGE | IMAGE | METAFILER
 
 Selects index of the sub-image for the state when the mouse pointer is
 over the button. This image is used only when L<flat> property is set.
@@ -1474,7 +1500,7 @@ If C<image> does not contain such sub-image, the C<defaultGlyph> sub-image is dr
 
 Default value: 0
 
-=item holdGlyph INTEGER
+=item holdGlyph INTEGE | IMAGE | METAFILER
 
 Selects index of the sub-image for the state when the button is L<checked>.
 This image is used only when L<checkable> property is set.
@@ -1487,6 +1513,9 @@ Default value: 3
 If set, the image object is drawn next with the button text, over or left to it
 ( see L<vertical> property ). If OBJECT contains several sub-images, then the
 corresponding sub-image is drawn for each button state. See L<glyphs> property.
+
+Can also be a C<Prima::Drawable::Metafile> object, however, C<imageScale> factor
+wouldn't work on it.
 
 Default value: undef
 
@@ -1546,7 +1575,7 @@ Default value: true
 
 See also: L<Prima::Image/ui_scale> .
 
-=item pressedGlyph INTEGER
+=item pressedGlyph INTEGER | IMAGE | METAFILE
 
 Selects index of the sub-image for the pressed state of the button.
 If C<image> does not contain such sub-image, the C<defaultGlyph> sub-image is drawn.
@@ -1711,6 +1740,7 @@ Dmitry Karasik, E<lt>dmitry@karasik.eu.orgE<gt>.
 =head1 SEE ALSO
 
 L<Prima>, L<Prima::Widget>, L<Prima::Window>, L<Prima::IntUtils>,
+L<Prima::Drawable::Metafile>,
 L<Prima::StdBitmap>, F<examples/buttons.pl>, F<examples/buttons2.pl>.
 
 =cut

@@ -1,4 +1,4 @@
-use strict;
+use v5;
 use warnings;
 
 use Module::Build;
@@ -13,7 +13,7 @@ my $build = Module::Build->new(
       ( $^O eq "MSWin32" ?
          ( "Win32::Console" => 0 ) :
          () ),
-      'perl' => '5.010',
+      'perl' => '5.014',
    },
    test_requires => {
       'Test::More' => '0.88', # done_testing

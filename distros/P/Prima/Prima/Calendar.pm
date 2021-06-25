@@ -201,7 +201,7 @@ sub Day_Paint
 	my @sz = $self-> size;
 	$canvas-> set( color => $self-> disabledColor, backColor => $self-> disabledBackColor)
 		unless $self-> enabled;
-	$canvas-> rect3d( 0, 0, $sz[0]-1, $sz[1]-1, 2,
+	$canvas-> rect3d( Prima::rect->new(@sz)->inclusive, 2,
 		$self-> dark3DColor, $self-> light3DColor, $self-> backColor);
 
 	my @zs = ( $self-> {X}, $self-> {Y}, $self-> {CX1}, $self-> {CY});
@@ -210,12 +210,15 @@ sub Day_Paint
 	$canvas-> color( $self-> prelight_color($canvas-> backColor));
 	$canvas-> bar( 2, $sz[1] - $zs[1] - 3, $sz[0] - 3, $sz[1] - 3);
 	$canvas-> color($c);
-	$canvas-> clipRect( 2, 2, $sz[0] - 3, $sz[1] - 3);
+	$canvas-> clipRect( Prima::rect->new(@sz)->shrink(2)->inclusive );
+	my $fdo = $owner-> firstDayOfWeek ? 6 : 0;
 	for ( $i = 0; $i < 7; $i++) {
 		my $tw = $canvas->get_text_width( $owner-> {days}-> [$i] );
+		$canvas-> color( 0xc00000 ) if $i == $fdo;
 		$canvas-> text_shape_out( $owner-> {days}-> [$i],
 			$i * $zs[0] + ($self->{X} - $tw)/2, $sz[1]-$zs[1]+$zs[3],
 		);
+		$canvas-> color( $c ) if $i == $fdo;
 	}
 
 	my ( $d, $m, $y) = @{$owner-> {date}};
@@ -234,6 +237,7 @@ sub Day_Paint
 				( 1 + $dow) * $zs[0] - 1, $y - $zs[3] + $zs[1] - 1
 			);
 			$canvas-> color(( $d == $i) ? cl::HiliteText : cl::Fore);
+			$canvas-> color( 0xc00000 ) if $d != $i && $dow == $fdo;
 			$canvas-> text_shape_out( $i + 1, $dow * $zs[0] + $zs[2], $y);
 			$canvas-> rect_focus(
 				$dow * $zs[0] + 2, $y - $zs[3],
@@ -241,7 +245,9 @@ sub Day_Paint
 			) if $d == $i && $self-> focused;
 			$canvas-> color( $c);
 		} else {
+			$canvas-> color( 0xc00000 ) if $dow == $fdo;
 			$canvas-> text_shape_out( $i + 1, $dow * $zs[0] + $zs[2], $y);
+			$canvas-> color( $c ) if $dow == $fdo;
 		}
 		$zs[2] = $self-> {CX2} if $i == 8;
 		next unless $dow++ == 6;
@@ -284,6 +290,21 @@ sub xy2day
 	return ($day <= 0 || $day > $v) ? undef : $day;
 }
 
+sub day2xy
+{
+	my ($self, $day) = @_;
+	my (undef, $month, $year) = @{$self-> {date}};
+	my $v = $days_in_months[ $month] + (((( $year % 4) == 0) && ( $month == 1)) ? 1 : 0);
+	return if $day <= 0 || $day > $v;
+	my $widget = $self->Day;
+	my @zs = ( $widget-> {X}, $widget-> {Y});
+	my @sz = $widget-> size;
+
+	$day = $day - 1 + $self->day_of_week(1, $month, $year);
+	my ($x, $y) =  ($zs[0] * ($day % 7) + 2, $sz[1] - 2 - $zs[1] * (2 + int($day / 7)) - 1);
+	return $x, $y, $x + $zs[0] + 1, $y + $zs[1];
+}
+
 sub Day_MouseDown
 {
 	my ( $owner, $self, $btn, $mod, $x, $y) = @_;
@@ -293,6 +314,7 @@ sub Day_MouseDown
 	$self-> clear_event;
 	return unless defined $day;
 	$self-> {mouseTransaction} = 1;
+	delete $self->{prelight};
 	$owner-> date( $day, $month, $year);
 }
 
@@ -303,8 +325,11 @@ sub Day_MouseMove
 	my $day = $owner->xy2day($x,$y);
 	unless ($self-> {mouseTransaction}) {
 		if (( $self->{prelight} // -1 ) != ( $day // -1 )) {
+			my $p = $self->{prelight};
 			$self->{prelight} = $day;
-			$self-> invalidate_rect( 2, 2, $self-> width - 3, $self-> height - $self-> {Y} - 3);
+			my $r = Prima::rect->new( defined($p) ? $owner->day2xy($p) : ());
+			$r = $r->union( Prima::rect->new( $owner->day2xy($day) )) if defined $day;
+			$self->invalidate_rect( @$r ) unless $r->is_empty;
 		}
 		return;
 	}
@@ -322,8 +347,10 @@ sub Day_MouseUp
 
 sub Day_MouseLeave
 {
-	my $self = $_[1];
-	$self->repaint if delete $self->{prelight};
+	my ($owner,$self) = @_;
+	my $p = delete $self->{prelight} or return;
+	my @p = $owner-> day2xy($p) or return;
+	$self-> invalidate_rect(@p);
 }
 
 sub Day_MouseWheel
@@ -415,8 +442,15 @@ sub date
 	$self-> {date} = [ $day, $month, $year ];
 	$self-> Year-> value( $year + 1900);
 	$self-> Month-> focusedItem( $month);
-	$day = $self-> Day;
-	$day-> invalidate_rect( 2, 2, $day-> width - 3, $day-> height - $day-> {Y} - 3);
+	my $widget = $self->Day;
+	if ( $month == $od[1] && $year == $od[2] ) {
+		my $r = Prima::rect->new( $self->day2xy($od[0]) );
+		$r = $r->union( Prima::rect->new(  $self->day2xy($day) ));
+		$widget->invalidate_rect( @$r ) unless $r->is_empty;
+	} else {
+		delete $widget->{prelight};
+		$widget->invalidate_rect( 2, 2, $widget-> width - 3, $widget-> height - $widget-> {Y} - 3);
+	}
 	$self-> notify(q(Change));
 }
 

@@ -19,7 +19,7 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "YAML::PP" => "0.018"
   },
-  "VERSION" => "0.35",
+  "VERSION" => "0.38",
   "test" => {
     "TESTS" => "t/*.t"
   }

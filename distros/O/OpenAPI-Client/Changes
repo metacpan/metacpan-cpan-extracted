@@ -1,5 +1,8 @@
 Revision history for perl distribution OpenAPI-Client
 
+1.01 2021-06-17T12:45:28+0900
+ - Fix generating correct base URL for OpenAPIv3 schemas
+
 1.00 2021-02-23T15:25:00+0900
  - Updated to use new JSON::Validator schema API
  - Add support for JSON::Validator::Schema::OpenAPIv3

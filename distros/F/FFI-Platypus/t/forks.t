@@ -1,6 +1,4 @@
-use strict;
-use warnings;
-use Test::More;
+use Test2::V0 -no_srand => 1;
 use FFI::CheckLib;
 use FFI::Platypus;
 use File::Spec;
@@ -32,6 +30,8 @@ sub otherthread
   undef $ffi;
   $val;
 }
+
+ok 1;
 
 is(threads->create(\&otherthread)->join(), 22, 'works in a thread');
 

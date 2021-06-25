@@ -1,6 +1,6 @@
 package App::csv2tsv ;  
-our $VERSION = '0.58' ; 
-our $DATE = '2021-06-10T12:37+09:00' ; 
+our $VERSION = '0.581' ; 
+our $DATE = '2021-06-11T23:02+09:00' ; 
 
 =encoding utf8
 

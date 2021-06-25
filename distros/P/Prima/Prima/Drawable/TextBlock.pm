@@ -265,7 +265,7 @@ sub _debug_block
 			print STDERR ": OP_COLOR $bk$color\n";
 		} elsif ( $cmd == OP_TRANSPOSE) {
 			my $x = $$b[ $i + X_X ];
-			my $y = $$b[ $i + X_X ];
+			my $y = $$b[ $i + X_Y ];
 			my $f = $$b[ $i + X_FLAGS ] ? 'EXTEND' : 'TRANSPOSE';
 			print STDERR ": OP_TRANSPOSE $x $y $f\n";
 		} elsif ( $cmd == OP_CODE ) {
@@ -527,8 +527,10 @@ sub block_wrap
 					$leadingSpaces = $1;
 					$str =~ s/^\s+//;
 				}
+				my $shaped = $canvas-> text_shape($str, rtl => $flags);
 				my $l = $canvas-> text_wrap( $str, $width - $apx - $x,
-					tw::ReturnFirstLineLength | tw::BreakSingle | $wrap_opts );
+					tw::ReturnFirstLineLength | tw::BreakSingle | $wrap_opts,
+					8, 0, -1, $shaped || undef);
 				if ( $l > 0) {
 					if ( $has_text) {
 						push @$z, OP_TEXT,
@@ -922,6 +924,7 @@ sub text_wrap
 {
 	my ( $self, $canvas, $width, $opt, $indent) = @_;
 	$opt //= tw::Default;
+	$width = 2_000_000 if $width < 0; 
 
 	# Ignored options: ExpandTabs, CalcTabs .
 

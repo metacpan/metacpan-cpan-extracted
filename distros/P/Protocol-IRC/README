@@ -197,9 +197,9 @@ METHODS
     Shortcut to sending a CTCP message. Sends a PRIVMSG to the given
     target, containing the given verb and argument string.
 
- send_ctcprely
+ send_ctcpreply
 
-       $irc->send_ctcprely( $prefix, $target, $verb, $argstr )
+       $irc->send_ctcpreply( $prefix, $target, $verb, $argstr )
 
     Shortcut to sending a CTCP reply. As send_ctcp but using a NOTICE
     instead.

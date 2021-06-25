@@ -4,7 +4,7 @@ use warnings;
 
 package HTTP::CookieJar;
 # ABSTRACT: A minimalist HTTP user agent cookie jar
-our $VERSION = '0.010';
+our $VERSION = '0.012';
 
 use Carp       ();
 use HTTP::Date ();
@@ -388,7 +388,7 @@ HTTP::CookieJar - A minimalist HTTP user agent cookie jar
 
 =head1 VERSION
 
-version 0.010
+version 0.012
 
 =head1 SYNOPSIS
 
@@ -597,6 +597,25 @@ L<HTTP::Cookies>
 L<Mojo::UserAgent::CookieJar>
 
 =back
+
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+
+=head1 SUPPORT
+
+=head2 Bugs / Feature Requests
+
+Please report any bugs or feature requests through the issue tracker
+at L<https://github.com/dagolden/HTTP-CookieJar/issues>.
+You will be notified automatically of any progress on your issue.
+
+=head2 Source Code
+
+This is open source software.  The code repository is available for
+public review and contribution under the terms of the license.
+
+L<https://github.com/dagolden/HTTP-CookieJar>
+
+  git clone https://github.com/dagolden/HTTP-CookieJar.git
 
 =head1 AUTHOR
 

@@ -1,0 +1,21 @@
+Revision history for Dancer2::Plugin::PrometheusTiny
+
+0.005 - 2021-06-20
+
+    * add missing Time::HiRes dep.
+
+0.004 - 2021-06-20
+
+    * Switch from Dancer2::Core::Types to Types::Standard for D2 < 0.205000
+
+0.003 - 2021-06-20
+
+    * test fix only
+
+0.002 - 2021-06-19
+
+    * Add files missing from initial release
+
+0.001 - 2021-06-19
+
+    * Initial release

@@ -1,0 +1,7 @@
+runtime:
+  requires:
+    perl: '5.010001'
+    Mojolicious: '7.0'
+test:
+  requires:
+    Test::More: '0.88'

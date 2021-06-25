@@ -3,7 +3,8 @@
 use strict;
 use warnings;
 use if $ENV{AUTOMATED_TESTING}, 'Test::DiagINC'; use POSIX qw(strftime);
-use Test::More tests => 16;
+use Test2::V0;
+
 use Crypt::OpenToken::Token;
 
 ###############################################################################
@@ -116,3 +117,6 @@ sub _make_iso8601_date {
     my $time_t = shift;
     return strftime('%Y-%m-%dT%H:%M:%SGMT', gmtime($time_t));
 }
+
+###############################################################################
+done_testing();

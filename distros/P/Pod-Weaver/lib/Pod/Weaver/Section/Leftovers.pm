@@ -1,11 +1,17 @@
-package Pod::Weaver::Section::Leftovers;
+package Pod::Weaver::Section::Leftovers 4.018;
 # ABSTRACT: a place to put everything that nothing else used
-$Pod::Weaver::Section::Leftovers::VERSION = '4.017';
+
 use Moose;
-with(
-  'Pod::Weaver::Role::Section',
-  'Pod::Weaver::Role::Finalizer',
-);
+with 'Pod::Weaver::Role::Section',
+     'Pod::Weaver::Role::Finalizer';
+
+# BEGIN BOILERPLATE
+use v5.20.0;
+use warnings;
+use utf8;
+no feature 'switch';
+use experimental qw(postderef postderef_qq); # This experiment gets mainlined.
+# END BOILERPLATE
 
 #pod =head1 OVERVIEW
 #pod
@@ -44,7 +50,7 @@ sub weave_section {
     content     => '',
   });
 
-  push @{ $document->children }, $placeholder;
+  push $document->children->@*, $placeholder;
 }
 
 sub finalize_document {
@@ -53,13 +59,13 @@ sub finalize_document {
   my $children = $input->{pod_document}->children;
   $input->{pod_document}->children([]);
 
-  INDEX: for my $i (0 .. @{ $document->children } - 1) {
+  INDEX: for my $i (0 .. $document->children->$#*) {
     my $para = $document->children->[$i];
     next unless $para->isa('Pod::Elemental::Element::Pod5::Region')
          and    $para->format_name eq $self->_marker;
 
     $self->log_debug('splicing leftovers back into pod');
-    splice @{ $document->children }, $i, 1, @$children;
+    splice $document->children->@*, $i, 1, @$children;
     last INDEX;
   }
 }
@@ -79,7 +85,7 @@ Pod::Weaver::Section::Leftovers - a place to put everything that nothing else us
 
 =head1 VERSION
 
-version 4.017
+version 4.018
 
 =head1 OVERVIEW
 
@@ -91,9 +97,20 @@ sections that are consumed.  At the end of all section weaving, the Leftovers
 section will inject any leftover input Pod into its position in the output
 document.
 
+=head1 PERL VERSION SUPPORT
+
+This module has the same support period as perl itself:  it supports the two
+most recent versions of perl.  (That is, if the most recently released version
+is v5.40, then this module should work on both v5.40 and v5.38.)
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
+
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@cpan.org>
+Ricardo SIGNES <rjbs@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

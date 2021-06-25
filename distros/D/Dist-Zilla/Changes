@@ -1,5 +1,20 @@
 Revision history for Dist-Zilla
 
+6.020     2021-06-14 12:16:09-04:00 America/New_York
+        - The log colorization code was trying to use 24-bit color even when
+          the installed Term::ANSIColor couldn't support it.  This has been
+          fixed by requiring Term::ANSIColor v5.  Thanks, Robert Rothenberg,
+          Michael McClimon, and Matthew Horsfall.
+
+6.019     2021-06-13 08:39:14-04:00 America/New_York
+        - When using "use_package" in PkgVersion, do not eradicate the entire
+          block of "package NAME BLOCK" syntax!  Wow, what a bug...
+
+6.018     2021-04-03 21:07:54-04:00 America/New_York (TRIAL RELEASE)
+        - add Test::CleanNamespaces, clean all namespaces
+        - add the same boilerplate of version/pragma/features to every module
+        - colorize logger prefix when running in a terminal
+
 6.017     2020-11-02 19:30:21-05:00 America/New_York
         - replace broken 6.016, released from a confused git repo
 

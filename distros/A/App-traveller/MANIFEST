@@ -1,0 +1,19 @@
+lib/App/traveller.pm
+lib/Traveller/Hex.pm
+lib/Traveller/Mapper.pm
+lib/Traveller/Mapper/Classic.pm
+lib/Traveller/Mapper/Classic/MPTS.pm
+lib/Traveller/Subsector.pm
+lib/Traveller/System.pm
+lib/Traveller/System/Classic.pm
+lib/Traveller/System/Classic/MPTS.pm
+lib/Traveller/Util.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README.md
+script/traveller
+t/basic.t
+t/memory.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

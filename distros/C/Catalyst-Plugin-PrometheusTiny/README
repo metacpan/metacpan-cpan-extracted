@@ -140,6 +140,8 @@ AUTHOR
 CONTRIBUTORS
     Curtis "Ovid" Poe
 
+    Graham Christensen <graham@grahamc.com>
+
 COPYRIGHT
     Copyright (c) 2021 the Catalyst::Plugin::PrometheusTiny "AUTHOR" and
     "CONTRIBUTORS" as listed above.

@@ -22,7 +22,7 @@ use JSON;
 use Web::Microformats2::Parser;
 use Web::Mention::Author;
 
-our $VERSION = '0.720';
+our $VERSION = '0.721';
 
 Readonly my @VALID_RSVP_TYPES => qw(yes no maybe interested);
 
@@ -169,7 +169,7 @@ sub BUILD {
     }
 
     if ( $source->eq( $target ) ) {
-	die "Inavlid webmention; source and target have the same URL "
+	die "Invalid webmention; source and target have the same URL "
 	    . "($source)\n";
     }
 }
@@ -219,8 +219,12 @@ sub new_from_html {
     my $dom = Mojo::DOM58->new( $html );
     my $nodes_ref = $dom->find( 'a[href]' );
     for my $node ( @$nodes_ref ) {
-        push @webmentions,
-            $class->new( source => $source, target => $node->attr( 'href' ) );
+        try {
+            push @webmentions,
+                $class->new(
+                    source => $source, target => $node->attr( 'href' )
+                );
+        };
     }
 
     return @webmentions;
@@ -237,8 +241,7 @@ sub verify {
     # target URL in the source doc. We search for the latter to account for
     # sites like Tumblr, who treat outgoing hyperlinks as weird internally-
     # pointing links that pass external URLs as query-string parameters.
-    my $target = "$self->target";
-    if ( ($response->content =~ $self->target)
+    if ( ($response->content =~ quotemeta( $self->target ) )
          || ($response->content =~ uri_escape( $self->target ) )
     ) {
         $self->time_verified( DateTime->now );
@@ -1129,6 +1132,10 @@ Jason McIntosh (jmac@jmac.org)
 =item *
 
 Mohammad S Anwar (mohammad.anwar@yahoo.com)
+
+=item *
+
+Yanick Champoux
 
 =item *
 

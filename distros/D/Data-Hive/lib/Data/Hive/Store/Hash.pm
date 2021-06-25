@@ -1,8 +1,8 @@
 use strict;
 use warnings;
-package Data::Hive::Store::Hash;
+package Data::Hive::Store::Hash 1.014;
 # ABSTRACT: store a hive in a flat hashref
-$Data::Hive::Store::Hash::VERSION = '1.013';
+
 use parent 'Data::Hive::Store';
 
 #pod =head1 DESCRIPTION
@@ -136,7 +136,7 @@ Data::Hive::Store::Hash - store a hive in a flat hashref
 
 =head1 VERSION
 
-version 1.013
+version 1.014
 
 =head1 DESCRIPTION
 
@@ -162,6 +162,16 @@ We would end up with C<$href> containing something like:
     foo => 1,
     'foo.bar.baz' => 2
   }
+
+=head1 PERL VERSION SUPPORT
+
+This module has a long-term perl support period.  That means it will not
+require a version of perl released fewer than five years ago.
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
 
 =head1 METHODS
 
@@ -200,7 +210,7 @@ Hans Dieter Pearcey <hdp@cpan.org>
 
 =item *
 
-Ricardo Signes <rjbs@cpan.org>
+Ricardo Signes <rjbs@semiotic.systems>
 
 =back
 

@@ -5,6 +5,7 @@ use Prima::PodView;
 use Prima::Buttons;
 use Prima::InputLine;
 use Prima::IniFile;
+use Prima::Drawable::Metafile;
 use Prima::Utils;
 use Prima::Dialog::FileDialog;
 use Prima::Dialog::FindDialog;
@@ -91,7 +92,7 @@ sub load_link
 {
 	my ( $self, $link) = @_;
 
-	if ( $link =~ /^(http|ftp):\//) {
+	if ( $link =~ /^(https?|ftp):\//) {
 		$self-> owner-> status("Starting browser for $link...");
 		if ( Prima::Application-> get_system_info-> {apc} == apc::Win32) {
 			open UNIQUE_FILE_HANDLE_NEVER_TO_BE_CLOSED, "|start $link";
@@ -162,6 +163,33 @@ sub on_keydown
 	$self-> SUPER::on_keydown( $code, $key, $mod, $r);
 }
 
+sub on_mouseclick
+{
+	my ( $self, $btn, $mod, $x, $y, $dbl) = @_;
+	if ( !$dbl ) {
+		if ( $btn == mb::b4 || $btn == mb::b8) {
+			$self->clear_event;
+			$self->owner->back;
+			return;
+		} elsif ( $btn == mb::b5 || $btn == mb::b9 ) {
+			$self->clear_event;
+			$self->owner->forward;
+			return;
+		}
+	}
+	$self->SUPER::on_mouseclick($btn, $mod, $x, $y, $dbl);
+}
+
+sub on_mousewheel
+{
+	my ( $self, $mod, $x, $y, $z) = @_;
+	if ($mod & km::Ctrl) {
+		$self-> owner-> increase_font_size(($z > 0) ? 1 : -1);
+	} else {
+		$self->SUPER::on_mousewheel($mod, $x, $y, $z);
+	}
+}
+
 package Prima::PodViewWindow;
 use vars qw(@ISA $finddlg $prndlg $setupdlg $inifile
 $defaultVariableFont $defaultFixedFont);
@@ -193,8 +221,8 @@ sub profile_default
 			['~Close window' => 'Ctrl-W' => '^W' => sub { $_[0]-> close }],
 			['E~xit' => 'Ctrl+Q' => '^Q' => sub { Prima::HelpViewer-> close }],
 		]], [ '~View' => [
-			[ '~Increase font' => 'Ctrl +' => '^+' => sub { $_[0]-> increase_font_size(2)  }],
-			[ '~Decrease font' => 'Ctrl -' => '^-' => sub { $_[0]-> increase_font_size(-2) }],
+			[ '~Increase font' => 'Ctrl +' => '^+' => sub { $_[0]-> increase_font_size(1)  }],
+			[ '~Decrease font' => 'Ctrl -' => '^-' => sub { $_[0]-> increase_font_size(-1) }],
 			[],
 			[ 'fullView' => 'Full text ~view' => 'Ctrl+V' => '^V' => sub {
 				$_[0]-> {text}-> topicView( ! $_[0]-> menu-> toggle( $_[1]));
@@ -244,6 +272,50 @@ sub profile_default
 	return $def;
 }
 
+sub metafile
+{
+	my ($t, $p) = @_;
+	my $m1 = Prima::Drawable::Metafile->new( size => [$t, $t] );
+	my $d = 0;
+	$d += 0.5, $t++ while $t % 4;
+	$p = $m1->render_polyline($p, matrix => [$t, 0, 0, $t, -$d, -$d], integer => 1);
+	push @$p, @$p[0,1];
+	$m1->begin_paint;
+	$m1->color(cl::Black);
+	$m1->polyline($p) ;
+	$m1->end_paint;
+	my $m2 = Prima::Drawable::Metafile->new( size => [$t, $t] );
+	$m2->begin_paint;
+	$m2->color(wc::Menu|cl::Hilite);
+	$m2->fillWinding(fm::Winding|fm::Overlay);
+	$m2->fillpoly($p);
+	$m2->color(cl::Black);
+	$m2->polyline($p) ;
+	$m2->end_paint;
+	my $m3 = Prima::Drawable::Metafile->new( size => [$t, $t], type => dbt::Bitmap);
+	$m3->begin_paint;
+	$m3->color(cl::White);
+	$m3->translate(1,-1);
+	$m3->polyline($p);
+	$m3->color(wc::Button|cl::DisabledText);
+	$m3->translate(0,0);
+	$m3->polyline($p) ;
+	$m3->end_paint;
+	return [$m1, $m2, $m3];
+}
+
+sub create_images
+{
+	my $t = shift;
+	return (
+		Forward => metafile( $t, [ 0.25, 0.25, 0.75, 0.5, 0.25, 0.75 ]),
+		Back    => metafile( $t, [ 0.75, 0.25, 0.25, 0.5 ,0.75, 0.75 ]),
+		Up      => metafile( $t, [ 0.22, 0.25, 0.78, 0.25, 0.5, 0.75 ]),
+		Next    => metafile( $t, [ map { .1 + $_ * 0.8 } 0.5, 0.5, 0.0, 0.25, 0.0, 0.75, 0.5, 0.5, 0.5, 0.25, 1.0, 0.5, 0.5, 0.75]),
+		Prev    => metafile( $t, [ map { .1 + $_ * 0.8 } 0.5, 0.5, 1.0, 0.25, 1.0, 0.75, 0.5, 0.5, 0.5, 0.25, 0.0, 0.5, 0.5, 0.75]),
+	);
+}
+
 sub init
 {
 	my $self = shift;
@@ -262,19 +334,24 @@ sub init
 	}
 
 	my ( $x, $y) = ( 0, $self-> height - $t - 4);
+	my %mf = create_images($t);
 	for ( qw(Back Forward Up Prev Next)) {
 		my $lc = lc;
 		my $text = $_;
-		$text = '<<' if $text eq 'Prev';
-		$text = '>>' if $text eq 'Next';
-		my $b = $self-> insert( Button =>
-			text => $text,
+		my $b = $self-> insert( SpeedButton =>
+			image => $mf{$_}->[0],
+			hiliteGlyph => $mf{$_}->[1],
+			disabledGlyph => $mf{$_}->[2],
 			name => $_,
+			hint => $_,
+			flat => 1,
 			origin => [ $x, $y],
 			height => $t + 4,
 			selectable => 0,
 			enabled => 0,
 			growMode => gm::GrowLoY,
+			backColor => cl::Back | wc::Window,
+			disabledBackColor => cl::Back | wc::Window,
 			onClick => sub { $self-> $lc(); }
 
 		);

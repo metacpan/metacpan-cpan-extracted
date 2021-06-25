@@ -2,6 +2,7 @@ package Tamagotchi;
 
 use strict;
 use warnings;
+use Carp;
 
 use FindBin;
 use lib "$FindBin::Bin/../../lib";
@@ -87,7 +88,7 @@ sub rename_user {
     my ($self, $user_id, $name) = @_;
 
     # Try to find user
-    die "Unknown user: $user_id\n"
+    croak "Unknown user: $user_id\n"
         unless exists $self->data->{users}{$user_id};
 
     # OK, store rename event
@@ -101,7 +102,7 @@ sub remove_user {
     my ($self, $user_id) = @_;
 
     # Try to find user
-    die "Unknown user: $user_id\n"
+    croak "Unknown user: $user_id\n"
         unless exists $self->data->{users}{$user_id};
 
     # OK, store removal event
@@ -112,7 +113,7 @@ sub add_tamagotchi {
     my ($self, $user_id) = @_;
 
     # Try to find user
-    die "Unknown user: $user_id\n"
+    croak "Unknown user: $user_id\n"
         unless exists $self->data->{users}{$user_id};
 
     # Find free tamagotchi id
@@ -133,7 +134,7 @@ sub feed_tamagotchi {
     my ($self, $tama_id) = @_;
 
     # Try to find tamagotchi
-    die "Unknown tamagotchi: $tama_id\n"
+    croak "Unknown tamagotchi: $tama_id\n"
         unless exists $self->data->{tamas}{$tama_id};
 
     # OK, feed it
@@ -144,7 +145,7 @@ sub age_tamagotchi {
     my ($self, $tama_id) = @_;
 
     # Try to find tamagotchi
-    die "Unknown tamagotchi: $tama_id\n"
+    croak "Unknown tamagotchi: $tama_id\n"
         unless exists $self->data->{tamas}{$tama_id};
 
     # OK, feed it
@@ -157,7 +158,7 @@ sub die_tamagotchi {
     my ($self, $tama_id) = @_;
 
     # Try to find tamagotchi
-    die "Unknown tamagotchi: $tama_id\n"
+    croak "Unknown tamagotchi: $tama_id\n"
         unless exists $self->data->{tamas}{$tama_id};
 
     # OK, murder it

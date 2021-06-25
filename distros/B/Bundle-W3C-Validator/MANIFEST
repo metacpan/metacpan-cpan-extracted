@@ -5,3 +5,4 @@ README                          Start by reading this
 SIGNATURE
 lib/Bundle/W3C/Validator.pm
 t/00load.t
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -6,9 +6,12 @@ no strict 'refs';
 use warnings;
 
 =encoding utf8
+
 =head1 NAME
 
 Finance::IG - - Module for doing useful stuff with IG Markets REST API.
+
+=head1 DESCRIPTION
 
 This is very much a first draft, but will enable you to get simple arrays of positions, print them out possily some simple trading.
 
@@ -20,11 +23,11 @@ You will need an API key to use this module, available free from IG Markets.
 
 =head1 VERSION
 
-Version 0.04
+Version 0.092
 
 =cut
 
-our $VERSION = '0.04';
+our $VERSION = '0.092';
 
 
 =head1 SYNOPSIS
@@ -54,6 +57,10 @@ our $VERSION = '0.04';
    { 
        $ig-> printpos("stdout" ,$position,$format); 
    } 
+
+=head1 UTILITIES
+
+The utility igdisp.pl is installed with this module and may be used to list your positions on IG.  A help message can be obtained with igdisp.pl -h 
 
 =head1 SUBROUTINES/METHODS
 
@@ -166,6 +173,15 @@ has 'uds' => (
                         default=>'',
                      );
 
+around 'new' => sub {
+    my $orig = shift;
+    my $self = shift;
+    my $r; 
+ 
+    $r=$self->$orig(@_);
+    $r->login; 
+    return $r; 
+};
 sub _url
 {
                my ($self) = @_;
@@ -839,16 +855,20 @@ sub agg
   my ($self,$positions,$sortlist)=@_;
   my %totals;  # aggregated totals as arrays of individuals. 
 
+  $self->flatten($positions, [qw/market position/]);
   for my $position (@$positions)
   {
 
    my $json = JSON->new;
-
+#   $position->{size}= -abs($position->{size}) if ($position->{direction}//'' ne 'BUY'); 
    $position->{profit}=($self->fetch($position,'bid')-$self->fetch($position,'level'))*$self->fetch($position,'size');
-   # create new profits element 
 
-   my $ra=($totals{$self->fetch($position,'instrumentName')}||=[]);
+   $position->{held}=Time::Piece->strptime($position->{createdDateUTC},"%Y-%m-%dT%H:%M:%S")  or die "strptime failed for ".$position->{createdDateOnly}; 
+   $position->{held}=(gmtime()-$position->{held})/(24*3600); 
+
+   my $ra=($totals{$position->{instrumentName}}||=[]);
    push(@$ra,$position);
+
   }
 
   # totals is a hash on instrument name each element is a pointer to an array of positions for the same instrument. 
@@ -858,63 +878,59 @@ sub agg
   {                                    # for one particular name 
      my $position={};                  # initialise the new aggregate position
 
-     $position->{size}=0;
      $position->{profit}=0;
-     # $position->{stopLevel}=[]; 
-     $position->{createdDate}='';
-     my $sl=[];
-     #for my $subtotal (sort {"$a->{createdDate}" cmp "$b->{createdDate}"  } @$total)         # go through all the positions for that one name
+     $position->{size}=0; 
+     $position->{held}=0; 
+     $position->{stopLevel}=[]; 
+     $position->{createdDate}=[]; 
+     $position->{createdDateUTC}=[]; 
+
      for my $subtotal ( @$total)         # go through all the positions for that one name
      {
-      $position->{instrumentName}//=$self->fetch($subtotal,'instrumentName');
-      $position->{size}+=$self->fetch($subtotal,'size');
-      $position->{bid}//=$self->fetch($subtotal,'bid');
-      $position->{profit}+=$self->fetch($subtotal,'profit');
-      $position->{epic}//=$self->fetch($subtotal,'epic');
+      $position->{instrumentName}//=$subtotal->{instrumentName};
+      $position->{size}+=$subtotal->{size};
+      my $h; 
+      $h=Time::Piece->strptime($subtotal->{createdDateUTC},"%Y-%m-%dT%H:%M:%S")  or die "strptime failed for ".$subtotal->{createdDateOnly}; 
+      $h=(gmtime()-$h)/(24*3600); 
+      $h=int($h*10)/10; 
+      $subtotal->{held}=$h;
+      $position->{held}+=$subtotal->{held}*$subtotal->{size}; # this is a size-weighted average. Needs division by total size.  
+      $position->{bid}//=$subtotal->{bid};
+      $position->{profit}+=$subtotal->{profit} ;
+      $position->{epic}//=$subtotal->{epic};
 
-      $position->{currency}//=$self->fetch($subtotal,'currency');
-      $position->{marketStatus}//=$self->fetch($subtotal,'marketStatus');
+      $position->{currency}//=$subtotal->{currency}; 
+      $position->{marketStatus}//=$subtotal->{marketStatus}; 
 
-      #$sl=($position->{stopLevel}//=[]); 
-
-      @$sl=map {defined($_) } @$sl;
-      if (0==grep {$_==($self->fetch($subtotal,'stopLevel')//0) } @$sl)
-      # if (0==grep {$_==$self->fetch($subtotal,'stopLevel') } @$sl)
-      {
-         push(@$sl,$self->fetch($subtotal,'stopLevel'));
-         # print "pushing ".fetch($subtotal,'stopLevel')."\n"; 
-      }
-      #$position->{createdDate}.=$self->fetch($subtotal,'createdDate').","; 
-      #$position->{createdDateUTC}.=$self->fetch($subtotal,'createdDateUTC').","; 
-
-#      if ($position->{createdDate})
-#      { 
-#        $position->{createdDate}=~s/-.*$//; 
-#        $position->{createdDate}.="-".$self->fetch($subtotal,'createdDate');
-#      } 
-#      else
-#      {       
-#        $position->{createdDate}=$self->fetch($subtotal,'createdDate'); 
-#      } 
-      $position->{createdDateUTC}=$self->fetch($subtotal,'createdDateUTC');
-      $position->{createdDate}=$self->fetch($subtotal,'createdDate');
+      push(@{$position->{stopLevel}},$subtotal->{stopLevel}) if $subtotal->{stopLevel}; 
+      push(@{$position->{createdDate}},$subtotal->{createdDate}); 
+      push(@{$position->{createdDateUTC}},$subtotal->{createdDateUTC}); 
      }
-     my $open=$position->{bid}-$position->{profit}/$position->{size};
-     $position->{level}=$open;
-     $position->{profitpc}=int(0.5+1000*$position->{profit}/($position->{level}*$position->{size}))/10;
+
+     # now we have various housekeeping to do in some cases, eg where an average is calculated as a sum above, we divide by the number to get a true mean. 
+     ###########
+
+     $position->{held}=sprintf("%0.1f",$position->{held}/$position->{size});  $position->{held}.=" av" if (@$total>1); 
+
+
+     $position->{level}=$position->{bid}-$position->{profit}/$position->{size}; # open level for multiple positions
+
+     $position->{profitpc}=int(0.5+1000*$position->{profit}/($position->{level}*abs($position->{size})))/10 if ($position->{level}>0); 
+
      $position->{atrisk}=$position->{bid}*$position->{size};
-     $position->{createdDateOnly}=$position->{createdDate};
-     $position->{createdDateOnly}=~s/ .*$//;
-     if (@$sl==0 || 1)
-     {
-       $position->{stopLevel}='';
-       $position->{slpc}='';
-     }
-     else
-     {
-        $position->{stopLevel}=join(',',map { $_//''} @$sl);
-        $position->{slpc}=join(',', map { $_?(int(1000.0*$_/$position->{bid})/10):''} @$sl);
-     }
+
+     $position->{createdDate}=$self->sortrange($position->{createdDate}); 
+     $position->{createdDateUTC}=$self->sortrange($position->{createdDateUTC}); 
+     $position->{createdDateOnly}=$position->{createdDate}; 
+     $position->{createdDateOnly}=~s/T[^-]+//g; 
+
+     $position->{slpc}=join(',',map { $_?(int(1000.0*$_/$position->{bid})/10):''} @{$position->{stopLevel}});
+     $position->{stopLevel}=join(',',@{$position->{stopLevel}}); 
+     
+     ########### 
+     # end of aggregated operations 
+
+
      push(@$aggregated,$position);
    }
 
@@ -940,30 +956,62 @@ Parameters
 
 =cut 
 ##########################################################################
+#sub nonagg
+#{
+#  my ($self,$positions,$sortlist)=@_;
+#  my %totals;  # aggregated totals as arrays of individuals. 
+#
+#  $self->flatten($positions, [qw/market position/]);
+#  for my $position (@$positions)
+#  {
+#
+#   my $json = JSON->new;
+#
+#   $position->{profit}=($self->fetch($position,'bid')-$self->fetch($position,'level'))*$self->fetch($position,'size');
+#   # create new profits element 
+#
+#     my $open=$position->{bid}-$position->{profit}/$position->{size};
+#     $position->{level}=$open;
+#     $position->{profitpc}=int(0.5+1000*$position->{profit}/($position->{level}*$position->{size}))/10;
+#     $position->{atrisk}=$position->{bid}*$position->{size};
+#     $position->{createdDateOnly}=$position->{createdDate};
+#     $position->{createdDateOnly}=~s/ .*$//;
+#   }
+#
+#   $sortlist//=[qw(-profitpc instrumentName)]; # default sort 
+#   $self->sorter($sortlist,$positions);
+#   return $positions;
+#}
 sub nonagg
 {
   my ($self,$positions,$sortlist)=@_;
   my %totals;  # aggregated totals as arrays of individuals. 
 
-  $self->flatten($positions, [qw/market position/]);
+  $self->flatten($positions, [qw/market position/]); 
   for my $position (@$positions)
   {
 
    my $json = JSON->new;
 
-   $position->{profit}=($self->fetch($position,'bid')-$self->fetch($position,'level'))*$self->fetch($position,'size');
+   $position->{size}=-abs($position->{size}) if ($position->{direction} eq 'SELL'); 
+   $position->{profit}=($position->{bid}-$position->{level})*$position->{size};
    # create new profits element 
 
-     my $open=$position->{bid}-$position->{profit}/$position->{size};
-     $position->{level}=$open;
-     $position->{profitpc}=int(0.5+1000*$position->{profit}/($position->{level}*$position->{size}))/10;
+ #     my $open=$position->{bid}-$position->{profit}/$position->{size};
+ #    $position->{level}=$open;
+     $position->{profitpc}=int(0.5+1000*$position->{profit}/($position->{level}*abs($position->{size})))/10;
      $position->{atrisk}=$position->{bid}*$position->{size};
-     $position->{createdDateOnly}=$position->{createdDate};
-     $position->{createdDateOnly}=~s/ .*$//;
+     $position->{createdDateOnly}=$position->{createdDate}; 
+     $position->{createdDateOnly}=~s/ .*$//; 
+     $position->{held}=Time::Piece->strptime($position->{createdDateUTC},"%Y-%m-%dT%H:%M:%S")  or die "strptime failed for ".$position->{createdDateOnly}; 
+     $position->{held}=(gmtime()-$position->{held})/(24*3600); 
+    $position->{held}=int($position->{held}*10+0.5)/10;  
+     $position->{dailyp}=((1+$position->{profitpc}/100.0)**(1/$position->{held})-1)*100; 
+    
    }
 
    $sortlist//=[qw(-profitpc instrumentName)]; # default sort 
-   $self->sorter($sortlist,$positions);
+   $self->sorter($sortlist,$positions); 
    return $positions;
 }
 ####################################################################
@@ -1566,16 +1614,16 @@ Parameters
 
     1 Path to a file to read 
 
-This function calls IG's search API looking for a match to the name. If found 
-the value of the epic is returned. 
-
 A file readable by this function may be generated by using printpos with  format as follows: 
            "%sepic|%sinstrumentName|%0.2fsize|%-0.2flevel|".
            "%-0.2fbid|£%-0.2fprofit|%0.1fprofitpc%%|£%0.2fatrisk|%smarketStatus\n", 
 
 =head3 Status - downright broken (for you). Sorry! 
 
-May contains print and die statements. Contaions hardcoded paths that will need to be 
+The function contains a hardcoded path for reading the files.  You would need a 
+crontab entry to generate them.   
+
+May contain print and die statements. Contains hardcoded paths that will need to be 
 changed. 
 
 =cut 
@@ -1667,6 +1715,35 @@ sub readfile
 #        can be a coloration function of position. 
 #        just one function, so no down ever. 
 #        function takes argument position, and returns optional colors 
+#####################################################################
+
+=head2 printpos 
+
+=head3 Parmeters
+
+A file handle or the word stdout, all output sent here. 
+
+A hashref  of items to print 
+OR: If this is an array ref, then a title line is ptinted using the format string 
+and the referenced array of titles
+OR: If empty string or undef, derive titles from the format 
+string and print a title line.  
+
+A formatting string. Can contain text, containing embedded 
+format instructions like %6.2fsize here %6.2f is a print f 
+specifier and size is the name of the item to retrieve from the hash. 
+
+OPTIONAL up     can be percent gives green if > up, bold green if > 5*up. 
+can be a coloration function of position.  Just one function, so no down ever if a function is given 
+function takes argument position, and returns optional colors 
+
+OPTIONAL down   can be percent gives red if <down , bold red if < 5*down. 
+
+=head3 Description
+
+This is a very general function will work with any hash. 
+
+=cut
 #####################################################################
 sub printpos
 {
@@ -1862,6 +1939,36 @@ sub printpos
   }
 
 }
+
+
+
+=head2 sortrange 
+
+=head3 Parameters
+   
+  Ref to an array containing dates in printed ascii format. 
+
+If there are no dates or an empty array, an empty string is returned. 
+
+If there is one date, then that date is returned
+
+If there is more than one then the first and last after sorting is returned, with a dash between them. 
+
+This is used in aggregation of positions and relates to creation dates with multiple positions
+in the same security purchased at different times. 
+
+=cut 
+
+sub sortrange
+{ 
+   my ($self,$ar)=@_; 
+
+   my @dates=sort @$ar; 
+    
+   return '' if (@dates==0); 
+   return $dates[0] if (@dates==1); 
+   return $dates[0] . "-".$dates[-1]; 
+} 
 
 =head1 DEPENDENCIES
 

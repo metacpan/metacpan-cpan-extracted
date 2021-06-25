@@ -1,0 +1,10 @@
+Revision history for Pod-PseudoPod-DOM
+
+1.20210620.2040 2021-06-20 13:40:11-07:00 America/Los_Angeles
+
+1.20210620.2032 2021-06-20 13:32:06-07:00 America/Los_Angeles
+    - make emitted HTML5 compliant with spec
+    - add HTML with stylesheet for generated Table of Contents
+
+1.20210620.2004 2021-06-20 13:04:22-07:00 America/Los_Angeles
+    - fix tests for unescaped left curly brackets

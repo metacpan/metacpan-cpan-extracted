@@ -1,6 +1,6 @@
-package Dist::Zilla::PluginBundle::RJBS;
+package Dist::Zilla::PluginBundle::RJBS 5.018;
 # ABSTRACT: BeLike::RJBS when you build your dists
-$Dist::Zilla::PluginBundle::RJBS::VERSION = '5.015';
+
 use Moose;
 use Dist::Zilla 2.100922; # TestRelease
 with
@@ -9,6 +9,8 @@ with
     'Dist::Zilla::Role::PluginBundle::Config::Slicer';
 
 use v5.20.0;
+use experimental 'postderef'; # Not really an experiment anymore.
+use utf8;
 
 #pod =head1 DESCRIPTION
 #pod
@@ -63,6 +65,54 @@ use Dist::Zilla::PluginBundle::Basic;
 use Dist::Zilla::PluginBundle::Filter;
 use Dist::Zilla::PluginBundle::Git;
 
+package Dist::Zilla::Plugin::RJBSMisc 5.018 {
+  use Moose;
+  with 'Dist::Zilla::Role::BeforeBuild',
+       'Dist::Zilla::Role::AfterBuild',
+       'Dist::Zilla::Role::MetaProvider',
+       'Dist::Zilla::Role::PrereqSource';
+
+  has perl_support => (is => 'ro');
+  has package_name_version => (is => 'ro');
+
+  sub metadata {
+    my ($self) = @_;
+
+    return { x_rjbs_perl_support => $self->perl_support };
+  }
+
+  sub register_prereqs {
+    my ($self) = @_;
+
+    if ($self->package_name_version) {
+      $self->zilla->register_prereqs(
+        { phase => 'runtime', type => 'requires' },
+        perl => '5.012',
+      );
+    }
+  }
+
+  sub before_build {
+    my ($self) = @_;
+
+    if (($self->perl_support // '') eq 'toolchain' && $self->package_name_version) {
+      $self->log_fatal('This dist claims to be toolchain but uses "package NAME VERSION"');
+    }
+
+    unless (defined $self->perl_support) {
+      $self->log("❗️ did not set perl-support!");
+    }
+  }
+
+  sub after_build {
+    my ($self) = @_;
+
+    if (grep {; /rjbs\@cpan\.org/ } $self->zilla->authors->@*) {
+      $self->log('Authors still contain rjbs@cpan.org!  Needs an update.');
+    }
+  }
+}
+
 has manual_version => (
   is      => 'ro',
   isa     => 'Bool',
@@ -107,7 +157,17 @@ has weaver_config => (
 
 sub mvp_multivalue_args { qw(dont_compile) }
 
-sub mvp_aliases { return { 'perl-support' => 'perl_support' } }
+sub mvp_aliases {
+  return {
+    'is-task'       => 'is_task',
+    'major-version' => 'major_version',
+    'perl-support'  => 'perl_support',
+    'dont-compile'  => 'dont_compile',
+    'weaver-config' => 'weaver_config',
+    'manual-version'       => 'manual_version',
+    'package-name-version' => 'package_name_version',
+  }
+}
 
 has dont_compile => (
   is      => 'ro',
@@ -120,18 +180,39 @@ has package_name_version => (
   is      => 'ro',
   isa     => 'Bool',
   lazy    => 1,
-  default => sub { $_[0]->payload->{package_name_version} // 0 },
+  default => sub { $_[0]->payload->{package_name_version}
+                // $_[0]->payload->{'package-name-version'}
+                // 1
+  },
 );
 
 has perl_support => (
   is      => 'ro',
-  default => sub { $_[0]->payload->{perl_support} },
+  lazy    => 1,
+  default => sub {
+    # XXX: Fix this better.
+    # See, we have all these mvp aliases to convert foo-bar to foo_bar, but
+    # those aliases aren't run on the bundle options when passed through a
+    # @Filter.  So:
+    #
+    # [@Filter]
+    # -bundle = @RJBS
+    # perl-support = no-mercy
+    #
+    # ...didn't work, because the payload had 'perl-support' and not
+    # 'perl_support'.  Probably this aliasing should happen during the @Filter
+    # process, but it's kind of a hot mess in here.  This key is the most
+    # important one, and this comment is here to remind me what happened if I
+    # ever hear this on some other library.
+    $_[0]->payload->{perl_support} // $_[0]->payload->{'perl-support'}
+  },
 );
 
 sub configure {
   my ($self) = @_;
 
-  $self->log_fatal("you must not specify both weaver_config and is_task")
+  # It'd be nice to have a Logger here... -- rjbs, 2021-04-24
+  die "you must not specify both weaver_config and is_task"
     if $self->is_task and $self->weaver_config ne '@RJBS';
 
   $self->add_plugins('Git::GatherDir');
@@ -145,6 +226,7 @@ sub configure {
     [ PromptIfStale => 'CPAN-Outdated' => {
       phase => 'release',
       check_all_plugins => 1,
+      skip  => [ 'Dist::Zilla::Plugin::RJBSMisc' ],
       # check_all_prereqs => 1, # <-- not sure yet -- rjbs, 2013-09-23
     } ],
   );
@@ -223,6 +305,15 @@ sub configure {
   }
 
   $self->add_plugins(
+    [ RJBSMisc => {
+        map {; $_ => scalar $self->$_ } qw(
+          package_name_version
+          perl_support
+        )
+    } ],
+  );
+
+  $self->add_plugins(
     [ GithubMeta => {
       remote => [ qw(github) ],
       issues => $self->github_issues,
@@ -257,7 +348,7 @@ Dist::Zilla::PluginBundle::RJBS - BeLike::RJBS when you build your dists
 
 =head1 VERSION
 
-version 5.015
+version 5.018
 
 =head1 DESCRIPTION
 

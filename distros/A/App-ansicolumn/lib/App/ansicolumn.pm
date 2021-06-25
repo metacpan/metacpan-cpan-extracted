@@ -1,6 +1,6 @@
 package App::ansicolumn;
 
-our $VERSION = "1.07";
+our $VERSION = "1.08";
 
 use v5.14;
 use warnings;
@@ -14,6 +14,7 @@ Configure "bundling";
 
 use Data::Dumper;
 use List::Util qw(max);
+use Hash::Util qw(lock_keys lock_keys_plus unlock_keys);
 use Text::ANSI::Fold qw(ansi_fold);
 use Text::ANSI::Fold::Util qw(ansi_width);
 use Text::ANSI::Printf qw(ansi_printf ansi_sprintf);
@@ -22,45 +23,59 @@ use App::ansicolumn::Border;
 
 sub new {
     my $class = shift;
-    bless {
-	width            => undef,
-	fillrows         => undef,
-	table            => undef,
-	table_right      => '',
-	separator        => ' ',
-	output_separator => '  ',
-	page             => undef,
-	height           => 0,
-	column_unit      => 8,
-	pane             => 0,
-	pane_width       => undef,
-	tabstop          => 8,
-	tabhead          => undef,
-	tabspace         => undef,
-	tabstyle         => undef,
-	ignore_space     => 1,
-	fullwidth        => undef,
-	linestyle        => '',
-	boundary         => '',
-	linebreak        => '',
-	pagebreak        => 1,
-	runin            => 2,
-	runout           => 2,
-	border           => undef,
-	border_style     => 'vbar',
-	document         => undef,
-	insert_space     => undef,
-	white_space      => 2,
-	isolation        => 2,
-	fillup           => undef,
-	fillup_str       => '',
-	ambiguous        => 'narrow',
-	discard_el       => 1,
-	padchar          => ' ',
-	colormap         => [],
-	COLORHASH        => {},
-	COLORLIST        => [],
-    }, $class;
+    my $obj = bless {
+	width               => undef,
+	fillrows            => undef,
+	table               => undef,
+	table_columns_limit => 0,
+	table_right         => '',
+	separator           => ' ',
+	output_separator    => '  ',
+	page                => undef,
+	height              => 0,
+	column_unit         => 8,
+	pane                => 0,
+	pane_width          => undef,
+	tabstop             => 8,
+	tabhead             => undef,
+	tabspace            => undef,
+	tabstyle            => undef,
+	ignore_space        => 1,
+	fullwidth           => undef,
+	linestyle           => '',
+	boundary            => '',
+	linebreak           => '',
+	pagebreak           => 1,
+	runin               => 2,
+	runout              => 2,
+	border              => undef,
+	border_style        => 'vbar',
+	document            => undef,
+	insert_space        => undef,
+	white_space         => 2,
+	isolation           => 2,
+	fillup              => undef,
+	fillup_str          => '',
+	ambiguous           => 'narrow',
+	discard_el          => 1,
+	padchar             => ' ',
+	term_size           => undef,
+	debug               => undef,
+	version             => undef,
+	colormap            => [],
+	COLORHASH           => {},
+	COLORLIST           => [],
+	COLOR               => undef,
+	BORDER              => undef,
+	}, $class;
+    lock_keys %{$obj};
+    $obj;
+}
+
+sub use_keys {
+    my $obj = shift;
+    unlock_keys %{$obj};
+    lock_keys_plus %{$obj}, @_;
 }
 
 sub run {
@@ -72,6 +87,7 @@ sub run {
 	width|output_width|c=s
 	fillrows|x
 	table|t
+	table_columns_limit|l=i
 	table_right|R=s
 	separator|s=s
 	output_separator|o=s
@@ -227,6 +243,7 @@ sub column_out {
     my $max_length = max @length;
     my $unit = $obj->{column_unit} || 1;
 
+    $obj->use_keys(qw(span panes));
     ($obj->{span}, $obj->{panes}) = do {
 	my $span;
 	my $panes;
@@ -253,6 +270,7 @@ sub column_out {
 	@data = map { $sub->($_) } @data;
     }
 
+    $obj->use_keys(qw(border_height));
     $obj->{border_height} = grep length, map $obj->border($_), qw(top bottom);
     $obj->{height} ||= div(0+@data, $obj->{panes}) + $obj->{border_height};
 
@@ -299,7 +317,7 @@ sub table_out {
 	    qr/[\Q$obj->{separator}\E]/;
 	}
     };
-    my @lines  = map { [ split $split, $_ ] } @_;
+    my @lines  = map { [ split $split, $_, $obj->{table_columns_limit} ] } @_;
     my @length = map { [ map { ansi_width $_ } @$_ ] } @lines;
     my @max    = map { max @$_ } zip @length;
     my @align  = newlist(count => 0+@max, default => '-',

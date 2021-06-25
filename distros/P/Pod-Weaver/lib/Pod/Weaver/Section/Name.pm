@@ -1,9 +1,17 @@
-package Pod::Weaver::Section::Name;
+package Pod::Weaver::Section::Name 4.018;
 # ABSTRACT: add a NAME section with abstract (for your Perl module)
-$Pod::Weaver::Section::Name::VERSION = '4.017';
+
 use Moose;
-with 'Pod::Weaver::Role::Section';
-with 'Pod::Weaver::Role::StringFromComment';
+with 'Pod::Weaver::Role::Section',
+     'Pod::Weaver::Role::StringFromComment';
+
+# BEGIN BOILERPLATE
+use v5.20.0;
+use warnings;
+use utf8;
+no feature 'switch';
+use experimental qw(postderef postderef_qq); # This experiment gets mainlined.
+# END BOILERPLATE
 
 #pod =head1 OVERVIEW
 #pod
@@ -106,7 +114,7 @@ sub weave_section {
     ],
   });
 
-  push @{ $document->children }, $name_para;
+  push $document->children->@*, $name_para;
 }
 
 __PACKAGE__->meta->make_immutable;
@@ -124,7 +132,7 @@ Pod::Weaver::Section::Name - add a NAME section with abstract (for your Perl mod
 
 =head1 VERSION
 
-version 4.017
+version 4.018
 
 =head1 OVERVIEW
 
@@ -144,6 +152,17 @@ must be given.  It looks for comments in the form:
 If no C<PODNAME> comment is present, but a package declaration can be found,
 the package name will be used as the document name.
 
+=head1 PERL VERSION SUPPORT
+
+This module has the same support period as perl itself:  it supports the two
+most recent versions of perl.  (That is, if the most recently released version
+is v5.40, then this module should work on both v5.40 and v5.38.)
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
+
 =head1 ATTRIBUTES
 
 =head2 header
@@ -153,7 +172,7 @@ The title of the header to be added.
 
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@cpan.org>
+Ricardo SIGNES <rjbs@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

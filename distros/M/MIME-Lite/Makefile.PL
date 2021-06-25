@@ -1,4 +1,5 @@
 #!/usr/bin/perl
+use 5.006;
 use strict;
 use ExtUtils::MakeMaker;
 
@@ -8,21 +9,21 @@ use ExtUtils::MakeMaker;
 my %extra_prereq = (
   'Mail::Address'     => 1.62,
   'MIME::Types'       => 1.28,
-  'MIME::Base64'      => undef,
-  'MIME::QuotedPrint' => undef,
+  'MIME::Base64'      => 0,
+  'MIME::QuotedPrint' => 0,
 );
-
-for my $module (sort keys %extra_prereq) {
-  local $@;
-  my $ok = eval "require $module; \$extra_prereq{\$module} && \$module->VERSION(\$extra_prereq{\$module}); 1";
-  delete $extra_prereq{ $module } if $ok;
-}
 
 my %prereq = (
   'File::Spec'          => 0,
   'File::Basename'      => 0,
   'Email::Date::Format' => '1.000', # first release
 );
+
+for my $module (sort keys %extra_prereq) {
+  local $@;
+  my $ok = eval "require $module; \$extra_prereq{\$module} && \$module->VERSION(\$extra_prereq{\$module}); 1";
+  $prereq{ $module } = delete $extra_prereq{ $module } if $ok;
+}
 
 if (%extra_prereq) {
   print "MIME::Lite is designed to take advantage of a variety of external modules\n",

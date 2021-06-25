@@ -2,8 +2,8 @@ NAME
     App::metasyn - Alternative front-end to Acme::MetaSyntactic
 
 VERSION
-    This document describes version 0.005 of App::metasyn (from Perl
-    distribution App-metasyn), released on 2019-07-05.
+    This document describes version 0.006 of App::metasyn (from Perl
+    distribution App-metasyn), released on 2021-02-21.
 
 SYNOPSIS
     Use the included script metasyn.
@@ -20,7 +20,40 @@ FUNCTIONS
 
     *   List all installed themes:
 
-         metasyn( action => "list-themes"); # -> ["any", "christmas", "contributors", "foo"]
+         metasyn( action => "list-themes");
+
+        Result:
+
+         [
+           200,
+           "OK",
+           [
+             "abba",
+             "afke",
+             "alice",
+             "alphabet",
+         # ...snipped 137 lines for brevity...
+             "viclones",
+             "wales_towns",
+             "weekdays",
+             "yapc",
+             "zodiac",
+           ],
+           {},
+         ]
+
+    *   List 3 random themes:
+
+         metasyn( action => "list-themes", number => 3, shuffle => 1);
+
+        Result:
+
+         [
+           200,
+           "OK",
+           ["display_resolution", "loremipsum", "jabberwocky"],
+           {},
+         ]
 
     *   List all installed themes, along with all their categories:
 
@@ -29,15 +62,21 @@ FUNCTIONS
         Result:
 
          [
-           "any",
-           "christmas/elf",
-           "christmas/reindeer",
-           "christmas/santa",
-           "christmas/snowman",
-           "contributors",
-           "foo/en",
-           "foo/fr",
-           "foo/nl",
+           200,
+           "OK",
+           [
+             "abba",
+             "afke",
+             "alice",
+             "alphabet/en",
+         # ...snipped 2209 lines for brevity...
+             "zodiac/Chinese",
+             "zodiac/Vedic",
+             "zodiac/Western",
+             "zodiac/Western/Real",
+             "zodiac/Western/Traditional",
+           ],
+           {},
          ]
 
     *   List all names from a theme:
@@ -47,47 +86,38 @@ FUNCTIONS
         Result:
 
          [
-           "foo",
-           "bar",
-           "baz",
-           "foobar",
-           "fubar",
-           "qux",
-           "quux",
-         # ...snipped 32 lines for brevity...
-           "kees",
-           "bok",
-           "weide",
-           "does",
-           "hok",
-           "duif",
-           "schapen",
+           200,
+           "OK",
+           [
+             "foo",
+             "bar",
+             "baz",
+             "foobar",
+         # ...snipped 37 lines for brevity...
+             "weide",
+             "does",
+             "hok",
+             "duif",
+             "schapen",
+           ],
+           {},
          ]
 
-    *   List all names from a theme in random order:
+    *   List all names from a theme in random order, return only 3:
 
-         metasyn( theme => "christmas/elf", shuffle => 1);
+         metasyn( theme => "christmas/elf", number => 3, shuffle => 1);
 
         Result:
 
-         [
-           "shinny",
-           "wunorse",
-           "mary",
-           "pepper",
-           "evergreen",
-           "bushy",
-           "snowball",
-           "minstix",
-           "alabaster",
-           "opneslae",
-           "upatree",
-           "sugarplum",
-         ]
+         [200, "OK", ["opneslae", "minstix", "snowball"], {}]
 
     *   List all categories from a theme:
 
-         metasyn( theme => "christmas", categories => 1); # -> ["elf", "reindeer", "santa", "snowman"]
+         metasyn( theme => "christmas", categories => 1);
+
+        Result:
+
+         [200, "OK", ["elf", "reindeer", "santa", "snowman"], {}]
 
     This script is an alternative front-end to Acme::MetaSyntactic. Compared
     to the official CLI meta, this CLI is more oriented towards listing
@@ -100,6 +130,10 @@ FUNCTIONS
     *   action => *str* (default: "list-names")
 
     *   categories => *bool*
+
+    *   number => *posint*
+
+        Limit only return this number of results.
 
     *   shuffle => *bool*
 
@@ -125,19 +159,16 @@ SOURCE
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website
-    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-metasyn>
+    <https://github.com/perlancar/perl-App-metasyn/issues>
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.
-
-SEE ALSO
-    meta.
 
 AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019, 2017 by perlancar@cpan.org.
+    This software is copyright (c) 2021, 2019, 2017 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

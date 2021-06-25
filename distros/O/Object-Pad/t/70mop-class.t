@@ -19,7 +19,7 @@ is_deeply( [ $meta->superclasses ], [], '$meta->superclasses' );
 
 is_deeply( [ $meta->roles ], [], '$meta->roles' );
 
-class Example2 extends Example {}
+class Example2 isa Example {}
 
 is_deeply( [ Object::Pad::MOP::Class->for_class( "Example2" )->superclasses ],
    [ $meta ],

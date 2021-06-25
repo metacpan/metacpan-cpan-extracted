@@ -5,7 +5,7 @@ use warnings;
 use 5.008004;
 
 # ABSTRACT: FFI support for structured records data
-our $VERSION = '1.43'; # VERSION
+our $VERSION = '1.46'; # VERSION
 
 
 {
@@ -85,7 +85,7 @@ FFI::Platypus::Record::Meta - FFI support for structured records data
 
 =head1 VERSION
 
-version 1.43
+version 1.46
 
 =head1 DESCRIPTION
 
@@ -131,6 +131,8 @@ Diab Jerius (DJERIUS)
 Eric Brine (IKEGAMI)
 
 szTheory
+
+José Joaquín Atria (JJATRIA)
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -1,8 +1,8 @@
 use strict;
 use warnings;
-package App::Uni;
+package App::Uni 9.005;
 # ABSTRACT: command-line utility to find or display Unicode characters
-$App::Uni::VERSION = '9.004';
+
 #pod =encoding utf8
 #pod
 #pod =head1 NAME
@@ -282,7 +282,7 @@ App::Uni - command-line utility to find or display Unicode characters
 
 =head1 VERSION
 
-version 9.004
+version 9.005
 
 =head1 SYNOPSIS
 
@@ -304,6 +304,17 @@ the Unicode database included in the current Perl 5 installation.
 
 For information on how to use F<uni> consult the L<uni> documentation.
 
+=head1 PERL VERSION SUPPORT
+
+This module has the same support period as perl itself:  it supports the two
+most recent versions of perl.  (That is, if the most recently released version
+is v5.40, then this module should work on both v5.40 and v5.38.)
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
+
 =head1 NAME
 
 App::Uni - Command-line utility to grep UnicodeData.txt
@@ -322,7 +333,7 @@ Thank-you, Larry, for everything. ♡
 
 =head1 AUTHOR
 
-Ricardo Signes <rjbs@cpan.org>
+Ricardo Signes <rjbs@semiotic.systems>
 
 =head1 CONTRIBUTORS
 
@@ -336,7 +347,7 @@ Dagfinn Ilmari Mannsåker <ilmari@ilmari.org>
 
 =item *
 
-Ricardo Signes <rjbs@semiotic.systems>
+Ricardo Signes <rjbs@cpan.org>
 
 =back
 

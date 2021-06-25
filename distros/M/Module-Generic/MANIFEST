@@ -1,5 +1,5 @@
-CHANGES
 Changes
+CHANGES
 CONTRIBUTING.md
 lib/Module/Generic.pm
 lib/Module/Generic/Array.pm
@@ -11,6 +11,8 @@ lib/Module/Generic/Dynamic.pm
 lib/Module/Generic/Dynamic.pod
 lib/Module/Generic/Exception.pm
 lib/Module/Generic/Exception.pod
+lib/Module/Generic/File.pm
+lib/Module/Generic/Finfo.pm
 lib/Module/Generic/Hash.pm
 lib/Module/Generic/Hash.pod
 lib/Module/Generic/Iterator.pm
@@ -22,6 +24,10 @@ lib/Module/Generic/Number.pm
 lib/Module/Generic/Number.pod
 lib/Module/Generic/Scalar.pm
 lib/Module/Generic/Scalar.pod
+lib/Module/Generic/Scalar/IO.pod
+lib/Module/Generic/SemStat.pod
+lib/Module/Generic/SharedMem.pm
+lib/Module/Generic/SharedMem.pod
 lib/Module/Generic/Tie.pm
 lib/Module/Generic/Tie.pod
 lib/Module/Generic/TieHash.pm
@@ -39,5 +45,12 @@ t/05.scalar.t
 t/06.array.t
 t/07.iterator.t
 t/08.datetime.t
+t/09.other.t
+t/10.file.t
+t/11.finfo.t
+t/12.sharedmem.pl
+t/12.sharedmem.t
 t/99.kwalitee.t
+t/test.bat
+t/test.pl
 META.json                                Module JSON meta-data (added by MakeMaker)

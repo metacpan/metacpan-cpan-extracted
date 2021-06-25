@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use IPC::Open3;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 sub new
 {
@@ -135,6 +135,7 @@ sub mediainfo
     my $audio_language;
     my $audio_channel;
     my $audio_channel_original;
+    my $audio_channel_layout;
 
     if ($audio_info)
     {
@@ -156,8 +157,9 @@ sub mediainfo
         ($audio_channel) = $audio_info =~ /Channel\(s\)\s*:\s*(\d+)\n/;
         ($audio_channel_original) =
           $audio_info =~ /Channel\(s\)_Original\s*:\s*(\d+)\n/;
-        my ($channel_layout) = $audio_info =~ /ChannelLayout\s*:\s*([\w\s]+)/;
-        my @layout = split(/ /, $channel_layout);
+        ($audio_channel_layout) = $audio_info =~ /ChannelLayout\s*:\s*([\w\s]+)/;
+        my @layout;
+        @layout = split(/ /, $audio_channel_layout) if $audio_channel_layout;
         if ($audio_channel_original)
         {
             if (    $audio_channel_original == scalar @layout

@@ -1,0 +1,45 @@
+---
+abstract: 'Fork Based Promise with Asynchronous Execution, Async, Await and Shared Data'
+author:
+  - 'Jacques Deguest (jack@deguest.jp)'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::File: '0'
+  Module::Generic::File: '0'
+  Test::More: '1.302162'
+  Test::Pod: '1.52'
+  Time::HiRes: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Promise-Me
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Clone: '0.45'
+  Config: '0'
+  Filter::Util::Call: '1.59'
+  Module::Generic: v0.15.0
+  Module::Generic::SharedMem: v0.1.0
+  Nice::Try: v1.1.2
+  POSIX: '0'
+  Scalar::Util: '1.50'
+  Storable: '3.15'
+  Want: '0.29'
+  parent: '0'
+  perl: '5.014000'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://git.deguest.jp/jack/Promise-Me/issues
+  repository: https://git.deguest.jp/jack/Promise-Me
+version: v0.1.1
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,9 +1,9 @@
 package App::ThisDist;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-04-02'; # DATE
+our $DATE = '2021-06-22'; # DATE
 our $DIST = 'App-ThisDist'; # DIST
-our $VERSION = '0.009'; # VERSION
+our $VERSION = '0.011'; # VERSION
 
 use strict;
 use warnings;
@@ -187,6 +187,13 @@ sub this_dist {
     $extract_version ? "$distname ".(defined $distver ? $distver : "?") : $distname;
 }
 
+sub this_mod {
+    my $res = this_dist(@_);
+    return $res unless defined $res && $res =~ /\S/;
+    $res =~ s/-/::/g;
+    $res;
+}
+
 1;
 # ABSTRACT: Print Perl {distribution,module,author,...} associated with current directory
 
@@ -202,7 +209,7 @@ App::ThisDist - Print Perl {distribution,module,author,...} associated with curr
 
 =head1 VERSION
 
-This document describes version 0.009 of App::ThisDist (from Perl distribution App-ThisDist), released on 2021-04-02.
+This document describes version 0.011 of App::ThisDist (from Perl distribution App-ThisDist), released on 2021-06-22.
 
 =head1 DESCRIPTION
 
@@ -218,6 +225,12 @@ See included scripts:
 
 
 
+=head1 CONTRIBUTOR
+
+=for stopwords perlancar (on netbook-dell-xps13)
+
+perlancar (on netbook-dell-xps13) <perlancar@gmail.com>
+
 =head1 FUNCTIONS
 
 =head2 this_dist
@@ -230,6 +243,11 @@ If C<$dir> is not specified, will default to current directory. If
 C<$extract_version> is set to true, will also try to extract distribution
 version and will return "?" for version when version cannot be found.
 
+=head2 this_mod
+
+A thin wrapper for L</this_dist>. It just converts "-" in the result to "::", so
+"Foo-Bar" becomes "Foo::Bar".
+
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/App-ThisDist>.
@@ -240,7 +258,7 @@ Source repository is at L<https://github.com/perlancar/perl-App-ThisDist>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-App-ThisDist/issues>
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-ThisDist>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

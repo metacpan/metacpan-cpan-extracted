@@ -1,5 +1,9 @@
 Revision history for Perl module Geo::Address::Formatter.
 
+1.95   2021-06-19
+       - deal with encodes apostrophes
+       - newest address-formatting
+
 1.94   2021-06-08
        - ability to pass an "address_template" option to format_address
          to overwrite the template specified in conf

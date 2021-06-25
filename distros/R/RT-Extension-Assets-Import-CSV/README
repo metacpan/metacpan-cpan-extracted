@@ -14,7 +14,7 @@ INSTALLATION
     make install
         May need root permissions
 
-    Edit your /opt/rt4/etc/RT_SiteConfig.pm
+    Edit your /opt/rt5/etc/RT_SiteConfig.pm
         Add this line:
 
             Plugin('RT::Extension::Assets::Import::CSV');
@@ -102,7 +102,7 @@ BUGS
         L<rt.cpan.org|http://rt.cpan.org/Public/Dist/Display.html?Name=RT-Extension-Assets-Import-CSV>.
 
 COPYRIGHT
-    This extension is Copyright (C) 2014-2016 Best Practical Solutions, LLC.
+    This extension is Copyright (C) 2014-2021 Best Practical Solutions, LLC.
 
     This is free software, licensed under:
 

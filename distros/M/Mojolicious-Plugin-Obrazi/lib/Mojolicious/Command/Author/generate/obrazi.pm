@@ -23,9 +23,10 @@ has files_per_subproc => sub {
   my $all = scalar @{$_[0]->matrix} > 1 ? grep { $_->[1] =~ $FILETYPES } @{$_[0]->matrix} : 100;
   return int($all / $_[0]->subprocs_num) + 1;
 };
-has csv_filename => 'index.csv';
-has subprocs_num => 4;
-has to_dir       => sub { $_[0]->app->home->child('public') };
+has csv_filename  => 'index.csv';
+has subprocs_num  => 4;
+has template_file => '';
+has to_dir        => sub { $_[0]->app->home->child('public') };
 
 # Default titles and descriptions
 has defaults => sub { {
@@ -72,12 +73,17 @@ sub thumbs {
 
 sub run ($self, @args) {
   getopt \@args,
-    'f|from=s'   => \(my $from_dir     = $self->from_dir),
-    't|to=s'     => \(my $to_dir       = $self->to_dir),
-    'x|max=s'    => \(my $max          = $self->max),
-    's|thumbs=s' => \(my $thumbs       = $self->thumbs),
-    'i|index=s'  => \(my $csv_filename = $self->csv_filename),
+    'f|from=s'     => \(my $from_dir     = $self->from_dir),
+    'to=s'         => \(my $to_dir       = $self->to_dir),
+    'x|max=s'      => \(my $max          = $self->max),
+    's|thumbs=s'   => \(my $thumbs       = $self->thumbs),
+    'i|index=s'    => \(my $csv_filename = $self->csv_filename),
+    't|template=s' => \(my $template     = $self->template_file),
     ;
+  if ($template ne $self->template_file and not -f $template) {
+    Carp::croak("Template $template does not exist. " . "Please provide an existing template file.");
+  }
+  $self->template_file($template) if $template;
   $self->from_dir(path($from_dir)->to_abs)->to_dir(path($to_dir)->to_abs)->max($max)->thumbs($thumbs)
     ->csv_filename($csv_filename);
   $self->_do_csv->_resize_and_copy_to_dir->_do_html;
@@ -100,7 +106,12 @@ sub calculate_max_and_thumbs ($self, $path, $raw_path) {
   my $thumbs     = $self->thumbs;
   my %size       = %$max;
   my %thumb_size = %$thumbs;
-  if (not eval { $img = $imager->read(file => $raw_path) }) {
+  my $fh         = $raw_path->open();
+  unless ($fh->binmode) {
+    $log->warn(" !!! Skipping $path.  Error: " . $!);
+    return ('', '');
+  }
+  if (not eval { $img = $imager->read(fh => $fh) }) {
     $log->warn(" !!! Skipping $path. Image error: " . $imager->errstr());
     return ('', '');
   }
@@ -233,6 +244,14 @@ sub _process_chunk_of_files ($self, $files = []) {
       if (!$row->[-2] || !$row->[-1]) {
         ($row->[-2], $row->[-1]) = $self->calculate_max_and_thumbs($row->[1], $raw_path);
       }
+      my $to_path    = $to_dir->child($row->[1])->dirname;
+      my $sized_path = $to_path->child($row->[-2])->to_string;
+      my $thumb_path = $to_path->child($row->[-1])->to_string;
+      if (-s $sized_path && -s $thumb_path) {
+        $log->info("$row->[-2] and $row->[-1] were already produced. Skipping ...");
+        push @$processed, $row;
+        next;
+      }
       $log->info("Producing $row->[-2] and $row->[-1] from $row->[1] ...");
       my (%sized, %thumb);
       @sized{qw(xpixels ypixels)} = $row->[-2] =~ /_(\d+)x(\d+)\./;
@@ -242,13 +261,11 @@ sub _process_chunk_of_files ($self, $files = []) {
         $log->warn(" !!! Skipping $row->[1]. Image error: " . $imager->errstr());
         next;
       }
-      my $to_path = $to_dir->child($row->[1])->dirname;
       unless (eval { $to_path->make_path({mode => 0711}); 1 }) {
         $log->warn("!!! Skipping $row->[1]. Error: $@");
         next;
       }
-      my $sized_path = $to_path->child($row->[-2])->to_string;
-      my $maxi       = $img->scale(%sized);
+      my $maxi = $img->scale(%sized);
       $maxi->settag(name => 'i_xres', value => 96);
       $maxi->settag(name => 'i_yres', value => 96);
       unless ($maxi->write(file => $sized_path)) {
@@ -257,8 +274,7 @@ sub _process_chunk_of_files ($self, $files = []) {
       else {
         $log->info("Written $sized_path.");
       }
-      my $thumb_path = $to_path->child($row->[-1])->to_string;
-      my $thumbi     = $img->scale(%thumb);
+      my $thumbi = $img->scale(%thumb);
       $thumbi->settag(name => 'i_xres', value => 96);
       $thumbi->settag(name => 'i_yres', value => 96);
       unless ($thumbi->write(file => $thumb_path)) {
@@ -294,39 +310,37 @@ sub _process_chunk_of_files ($self, $files = []) {
 
 sub _do_html($self) {
   state $app = $self->app;
-  my $categories = $self->matrix->grep(sub { !$_->[-1] && !$_->[-2] && $_->[1] =~ /$_->[0]$/ });
-  my $processed  = $self->_processed;
-#  my $obrazi     = $categories->map(sub($cat) {
-#    my $level = $cat->[1] =~ m|(/)|g;
-#    $level += 2;
-#    my $title   = $app->t('h' . $level, id => $cat->[1], $cat->[2]);
-#    my $images  = $processed->map(sub($img) { $cat->[0] eq $img->[0] ? $img : (); });
-#    my $section = $images->map(sub($img) {
-#      my $path = path($cat->[1]);
-#      $app->t(
-#        'div',
-#        class => "card col",
-#        sub { $app->t('img', 'data-img' => $path->child($img->[-2]), src => $path->child($img->[-1])); }
-#      );
-#    })->join($/);
-#    return $title . $app->t('section', class => 'row', sub { $/ . $section });
-#  })->join($/);
+  my $categories    = $self->matrix->grep(sub { !$_->[-1] && !$_->[-2] && $_->[1] =~ /$_->[0]$/ });
+  my $processed     = $self->_processed;
+  my $template_file = $self->template_file;
+  my $vars          = {
+    generator  => __PACKAGE__,
+    categories => $categories,
+    processed  => $processed,
+    app        => $app,
+    thumbs     => $self->thumbs
+  };
+  if ($template_file) {
 
-  my $html_file       = $self->to_dir->child('obrazi.html');
-  #my $html = $self->render_data('obrazi.html', {obrazi => $obrazi});
-  my $html = $self->render_data('obrazi.html',
-    {categories => $categories, processed => $processed, app => $app, thumbs => $self->thumbs});
-$self->write_file($html_file => encode _U, $html)
-# $self->chmod_file($html, oct(644));
+    my $html = Mojo::Template->new($self->template)->name($template_file)->render_file($template_file => $vars);
+    $self->to_dir->child(path($template_file)->basename =~ s/\.ep$//r)->spurt(encode _U, $html);
+  }
+  else {
+    my $tpl = 'obrazi.html';
+    $self->write_file($self->to_dir->child($tpl), encode _U, $self->render_data($tpl => $vars));
+  }
 
+  return;
 }
+
 1;
 
 =encoding utf8
 
 =head1 NAME
 
-Mojolicious::Command::Author::generate::obrazi - a gallery generator command
+Mojolicious::Command::Author::generate::obrazi - Обраꙁи for your site – a
+gallery generator command
 
 =head1 SYNOPSIS
 
@@ -340,13 +354,17 @@ Mojolicious::Command::Author::generate::obrazi - a gallery generator command
         --to /opt/myapp/public/albums/summer-2021 -x 800x600 -s 96x96
 
   Options:
-    -h, --help   Show this summary of available options
-    -f, --from   Root of directory structure from which the images
-                 will be taken. Defaults to ./.
-    -t, --to     Root directory where the gallery will be put. Defaults to ./.
-    -x, --max    Maximal image dimesnions in pixels in format 'widthxheight'.
-                 Defaults to 1000x1000.
-    -s, --thumbs Thumbnails maximal dimensions. Defaults to 100x100 pixels.
+    -h, --help       Show this summary of available options
+    -f, --from       Root of directory structure from which the images
+                     will be taken. Defaults to ./.
+        --to         Root directory where the gallery will be put. Defaults to ./.
+    -x, --max        Maximal image dimesnions in pixels in format 'widthxheight'.
+                     Defaults to 1000x1000.
+    -s, --thumbs     Thumbnails maximal dimensions. Defaults to 100x100 pixels.
+    -i, --index      Name of the CSV index file to be generated or read in the
+                     --from directory.
+    -t, --template   Path to template file. Defaults to embedded template
+                     obrazi.html.ep.
 
 =head1 DESCRIPTION
 
@@ -372,13 +390,26 @@ nominative case (обраꙁи).
     3. The runner gives the produced csv file to the images producer. Fixes
         problems with ICC profiles etc. Notifies the producer for eventual
         naming convetions, possible problems. The producer fills in the
-        description and titles and gives back the file to the command-runner.
-        This may take some time.
+        description and titles in the comfort of LibreOffice Calc or MS Excel
+        and gives back the file to the command-runner. This may take some time.
     4. The runner runs again the command with the new csv file, reviews the
         produced file. Takes the HTML and puts it in a page on the Web.
     5. The images' owner/producer enjois the gallery, prise him/herself with it
         or goes back to the runner to report problems.
     6. DONE or go to some of the previous steps.
+
+=head1 FEATURES
+
+Recursively traverses subdirectories and scales images (four at a time) to
+given width and height and produces thumbnails for those images. Thumbnail
+sizes can also be set.
+
+Produces an index CSV file which can be edited to add titles and descriptions
+for the images.
+
+Produces an HTML file with fully functional lightbox-like gallery, implemented
+only using jQuery  and CSS – no plugins. Left/right keyboard buttons navigation
+to next and previous image.
 
 =head1 ATTRIBUTES
 
@@ -390,9 +421,10 @@ L<Mojolicious::Command> and implements the following new ones.
     my $filename = $self->csv_filename; # index.csv
     my $обраꙁи = $self->csv_filename('gallery.csv');
 
-    The name of the CSV file which will be created in L</from_dir>. This file
-    after being edited and after the images are processed will be copied
-    together with the images to L</to_dir>. Defaults to C<index.csv>.
+The name of the CSV file which will be created in L</from_dir>. This file,
+after being edited and after the images are processed, will be copied together
+with the images to L</to_dir>. Defaults to C<index.csv>. Can be passed on the
+command-line via the C<--index> argument.
 
 =head2 defaults
 
@@ -420,7 +452,7 @@ Short description of this command, used for the application's command list.
     $self         = $обраꙁи->files_per_subproc(10);
 
 Number of files to be processed by one subprocess. Defaults to
-C<int($number_of_images/$self->subprocs_num) +1>. The last chunk of files is
+C<int($number_of_images/$self-E<gt>subprocs_num) +1>. The last chunk of files is
 the remainder — usually smaller than the previous chunks.
 
 =head2 from_dir
@@ -497,6 +529,15 @@ Integer, used to split the number of files found into equal chunks, each of
 which will be processed in a separate subprocess in parallel. Defaults to 4.
 See also L</files_per_subproc>.
 
+=head2 template_file
+
+    my $self = $self->template_file('path/to/template.html.ep');
+    my $tpl  = $self->template_file;
+
+Path to template file to be used for generating the HTML for the gallery.
+Defaults to embedded template obrazi.html.ep. Can be passed as argument on the
+command-line via C<--template>.
+
 =head2 thumbs
 
     my $thumbs_sizes = $self->thumbs; #{width => 1000, height => 1000}
@@ -550,13 +591,16 @@ Run this command.
 =head2 TEMPLATES
 
 L<Mojolicious::Command::Author::generate::obrazi> contains an embedded template
-C<obrazi.html>. TODO: Make the template inflatable and allow a template
-filename to be passed on the command-line.
+C<obrazi.html.ep>. TODO: Make the template inflatable.
 
 =head1 SEE ALSO
 
 L<Imager>, L<Text::CSV_XS>
-L<Mojolicious>, L<Mojolicious::Guides>, L<https://mojolicious.org>.
+L<Mojolicious>, L<Mojolicious::Guides>, L<https://mojolicious.org>,
+
+L<jQuery – used for implementing the example embedded template|https://jquery.com/>,
+
+L<Chota (A micro (~3kb) CSS framework) – also used for the example implementation|https://jenil.github.io/chota/>.
 
 =cut
 
@@ -565,17 +609,17 @@ __DATA__
 @@ obrazi.html
 % use Mojo::Base -signatures;
 % use Mojo::File qw(path);
-% use Mojo::Util qw(url_escape);
 <!DOCTYPE html>
 <html>
     <head>
         <meta charset="utf-8" />
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="<%= $generator %>" />
         <title>Обраꙁи</title>
         <script
-			src="https://code.jquery.com/jquery-3.6.0.slim.js"
-		    integrity="sha256-HwWONEZrpuoh951cQD1ov2HUK5zA5DwJ1DNUXaM6FsY="
-			crossorigin="anonymous"></script>
+			  src="https://code.jquery.com/jquery-3.6.0.min.js"
+			  integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+			  crossorigin="anonymous"></script>
         <link rel="stylesheet" href="https://unpkg.com/chota@latest">
         <style>
             section .card {
@@ -593,6 +637,7 @@ __DATA__
                 height: 100% !important;
                 background-position: center;
                 background-repeat: no-repeat;
+                background-size: contain;
                 background-color: rgba(11, 11, 11, 0.9);
                 color: #fff;
                 text-shadow: 2px 2px 4px #000;
@@ -602,7 +647,30 @@ __DATA__
                 top: 0;
                 display: none;
                 z-index: 1024;
+                cursor: default;
+            }
+            section .card .image h4 {
+                margin-left: 0;
+            }
+            section .card .image .meta {
+                position: absolute;
+                bottom: 0;
+                left:0;
                 padding: 1em;
+            }
+            .prev-next {
+                position: absolute;
+                top: 50%;
+                margin-top: -4rem;
+                width: 100%;
+                height:6rem;
+            }
+            .image .prev, .image .next {
+                font-size: 6rem;
+                padding-left: 3rem !important;
+                padding-right: 3rem !important;
+                height: 6rem;
+                cursor: pointer;
             }
             section[class^=level] {
                 display: none;
@@ -624,28 +692,35 @@ __DATA__
     <body>
         <h1>Обраꙁи</h1>
         <section tabindex="0" class="obrazi">
-        <%#= $obrazi %>
-% my $col = 2;
-% my $idx =0;
+% my $cols     = int(12/2); #6
+% my $idx     = 0;
 % my $img_idx = 1;
-% for my $cat(@$categories){
+% for my $cat(['','',''], @$categories) {
+%    my $images  = $processed->map(sub($img) { $cat->[0] eq $img->[0] ? $img : (); });
+%    next unless @$images;
 %    my $level = $cat->[1] =~ m|(/)|g;
 %    $level += 2; $idx++;
-<h<%= $level %> data-index="<%= $idx %>"><%= $cat->[2] %></h<%= $level %>>
-%    my $images  = $processed->map(sub($img) { $cat->[0] eq $img->[0] ? $img : (); });
+% if($cat->[2]) {
+        <h<%= $level %> data-index="<%= $idx %>"><%= $cat->[2] %></h<%= $level %>>
+% }
 <section tabindex="<%= $idx %>" class="idx<%= $idx %> level<%= $level %>">
-%    while(my @row = splice @$images, 0,int(12/$col)) {
+%    while(my @row = splice @$images, 0, $cols) {
     <div class="row">
     %   for my $img(@row) { $img_idx++;
-    %       my $path = path($cat->[1]);
         <div class="col card"
             data-index="<%= $img_idx %>"
             title="<%= $img->[2] %>"
-            style="background-image :url('<%= join '/', map {url_escape $_} @{$path->child($img->[-1])->to_array}%>')">
+            style="background-image :url('<%= path($cat->[1]||(), $img->[-1])%>')">
             <div class="image" id="<%= $img_idx %>"
-                style="background-image: url(<%= join '/', map {url_escape $_} @{$path->child($img->[-2])->to_array} %>)">
-                <h1><%= $img->[2] %></h1>
-                <p><%= $img->[3] %></p>
+                style="background-image: url('<%= path($cat->[1]||(), $img->[-2]) %>')">
+                <div class="prev-next">
+                    <div data-index="<%= $img_idx %>" class="prev pull-left text-left text-light">⏴</div>
+                    <div data-index="<%= $img_idx %>" class="next pull-right text-right text-light">⏵</div>
+                </div>
+                <div class="meta">
+                    <h4><%= $img->[2] %></h4>
+                    <p><%= $img->[3] %></p>
+                </div>
             </div>
         </div>
     % }
@@ -653,6 +728,7 @@ __DATA__
 % } # end of while
 </section>
 % } # end for @$categories
+        </section><!-- end section class="obrazi"-->
 <script>
 
 // Clicking on a category title shows/hides the category's <section> element.
@@ -662,7 +738,11 @@ $('h2,h2,h3').click(function(e) {
     $('section.idx' + idx).toggle('slow');
 })
 
-// open
+/*
+    Clicking on a thumbnail opens a full-sized image in a 100%x100% scren-sized
+    overlay box. Sets a more visible border on the thumbnail to remind the user
+    where he/she was.
+*/
 $('section .card').click(function(e){
     e.stopPropagation();
     let self = $(e.target);
@@ -672,48 +752,69 @@ $('section .card').click(function(e){
     self.css({border: "1px solid #333"});
 });
 
-// close
+/*
+    Clicking anywhere on the full-sized image box toggles the visibility of the
+    box. Effecrively hiding it.
+*/
 $('section .card .image').click(function(e) {
     e.stopPropagation();
     $(e.target).toggle('slow');
 });
 
+/*
+    To be bound to the keydown event, the sections need to have the attribute
+    tabindex set in a meaningful sequence.
+    This event is handled for every <section>. It handles the right/left and
+    up/down keypresses. When the corresponding key is pressed the image box is
+    replaced with the respectively previous or next image.
+*/
 $('section.obrazi,section[class^="level"]').keydown(function(e) {
-    e.preventDefault();
+    // e.preventDefault();
     e.stopPropagation();
-    // close this image and open
     $('section .card').css({border:"0px"});
+    // close the currently visible image...
     let img = $('section .card .image:visible');
-    if(img.get(0) == undefined) return;
-    let id = img.attr('id');
-    console.log("id" +id);
-    switch (e.key) {
-        case "ArrowLeft":
-            // the previous
-            id--;
-            $('#' + id).toggle('slow');
-            $('#' + id).parent().css({border: "1px solid #333"});
-            break;
-        case "ArrowRight":
-            // the next
-            id++;
-            $('#' + id).toggle('slow');
-            $('#' + id).parent().css({border: "1px solid #333"});
-            break;
-        case "ArrowUp":
-            // the previous
-            id--;
-            $('#' + id).toggle('slow');
-            break;
-        case "ArrowDown":
-            // the next
-            id++;
-            $('#' + id).toggle('slow');
-            break;
+    if(img.get(0) === undefined) return;
+    if(e.key === 'Escape'){
+        img.hide();
+        return;
     }
-img.toggle();
+    let id = img.attr('id');
+    re_prev = /^Arrow(Left|Up)$/;
+    re_next = /^Arrow(Right|Down)$/;
+    // ... and open
+    if(e.key.match(re_prev) ){
+        id--;
+    }
+    else if(e.key.match(re_next) ){
+        id++;
+    }
+    $('#' + id).toggle('slow');
+    $('#' + id).parent().css({border: "1px solid #333"});
+    img.toggle(900);
 });
+
+/*
+    Pressing the right and left buttons in the image closes the image and opens the
+    previous and next image.
+*/
+
+$('.image .prev, .image .next').click(function(e) {
+    e.stopPropagation();
+    let self = $(e.target);
+    let img = self.parent().parent();
+    let id = img.attr('id');
+    if(self.hasClass('next')) {
+        id++;
+    }
+    else {
+        id--;
+    }
+    $('#' + id).toggle('slow');
+    $('#' + id).parent().css({border: "1px solid #333"});
+    img.toggle(900);
+});
+
 </script>
-        </section><!-- end section class="obrazi"-->
     </body>
 </html>

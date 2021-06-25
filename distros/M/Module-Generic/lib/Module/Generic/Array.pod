@@ -13,7 +13,7 @@ Module::Generic::Array - An Array Manipulation Object Class
 
 =head1 VERSION
 
-    v1.0.0
+    v1.0.1
 
 =head1 DESCRIPTION
 
@@ -24,6 +24,10 @@ The purpose of this class/package is to provide an object-oriented approach at a
 =head2 new
 
 Provided with an optional array reference or an array object such as L<Module::Generic::Array>, this will create a new object and return it.
+
+=head2 as_array
+
+This simply returns the current object, so it does nothing special. It is here, so that one can blindly call C<as_array> on any of the L<Module::Generic::Array>, L<Module::Generic::Boolean>, L<Module::Generic::Number> or L<Module::Generic::Scalar> object and get an L<Module::Generic::Array> object in return.
 
 =head2 as_string
 
@@ -55,6 +59,16 @@ Example:
         John => 2,
         Peter => 3,
     }
+
+=head2 chomp
+
+Performs a L<perlfunc/chomp> on the entire array and returns the current object it was called with.
+
+For example, assuming a file whose lines were read onto an array, and each being terminated by C<\n>, the following will remove each line's new lines characters.
+
+    my $lines = Module::Generic::Array->new( \@lines );
+    $lines->chomp;
+    # Now @lines does not contain any \n at the end
 
 =head2 clone
 
@@ -89,13 +103,51 @@ To exit the loop, return C<undef()>, for example:
         print( "ok, this one\n" );
     });
 
+=head2 empty
+
+This is just an intuitive alias for L</reset>
+
 =head2 exists
 
 Provided with a value and this returns the number of match, as an L<Module::Generic::Number> object, if it is found in the array, or false otherwise.
 
+=head2 even
+
+Returns a new L<Module::Generic::Array> object of elements whose position in the array are an even number, starting from 0.
+
+For example:
+
+my $a = Module::Generic::Array->new( [qw( 1 2 3 4 5 6 7 8 9 10 )] );
+my $even = $a->even;
+say "@$even";
+
+Produces: C<1 3 5 7 9>
+
+See also L</odd>
+
 =head2 first
 
-Returns the first element of the array, if any. If there are none, to ensure chaining will work, it will return a L<Module::Generic::Null> object.
+Returns the first element of the array, if any.
+
+If there are none and this method is called in an object context, to ensure chaining will work, it will return a L<Module::Generic::Null> object. Otherwise, it will return simply the first element of the array whatever that is.
+
+For example:
+
+    # Getting the last_name property from a Person object stored in an array
+    $a->first->last_name;
+
+Even if there is no such Person object, L</first> will return a L<odule::Generic::Null> object so the call to C<last_name> does not ends up in a perl exception.
+
+But:
+
+    my $person = $a->first;
+
+will return whatever is in the first position of the array in non-object context, and in object context if the value is not a reference of any sort, a L<Module::Generic::Scalar> object representing that value. For example:
+
+    my $a = Module::Generic::Array->new( [qw( Hello world )] );
+    say $a->first->length; # 5
+    # but
+    say $a->first; # returns "Hello" as a regular string
 
 =head2 for
 
@@ -119,6 +171,40 @@ To exit the loop, return C<undef()>, for example:
         print( "ok, this one\n" );
     });
 
+If you wanted to affect the current offset position relative to the current counter value, you can return a scalar reference containing an integer. For example:
+
+    my $a = Module::Generic::Array->new( [qw( Jack John Peter Peter Gabriel Raphael Emmanuel )] );
+
+    $a->for(sub
+    {
+        my( $i, $name ) = @_;
+        if( $name eq 'Peter' )
+        {
+            $a->splice( $i, 1 );
+            return( \-1 );
+        }
+        # return true
+        return( 1 );
+    });
+    say "@$a"; # Jack John Gabriel Raphael Emmanuel
+
+And if you wanted to modify the counter value itself, you can change the value of the first argument provided. For example:
+
+    $a->for(sub
+    {
+        my( $i, $name ) = @_;
+        if( $name eq 'Peter' )
+        {
+            $a->splice( $i, 1 );
+            $_[0]--;
+        }
+        # return true
+        return( 1 );
+    });
+    say "@$a"; # Jack John Gabriel Raphael Emmanuel
+
+This is useful if you want to modify the array and avoid getting unexpected results.
+
 =head2 foreach
 
 Provided with a subroutine reference and this will call the subroutine reference, passing it the value for each entry in the array.
@@ -130,6 +216,10 @@ Provided with a subroutine reference and this will call the subroutine reference
     })
 
 It returns the object itself so this can be chained.
+
+P.S. : Do not use L</splice> while using L</foreach>. Perl wanrs you against it in L<perlsync|https://metacpan.org/pod/perlsyn#Foreach-Loops>: "foreach will get very confused if you add or remove elements within the loop body, for example with L</splice>. So don't do that."
+
+Instead use L</for>. See example provided there on how to do it.
 
 C<$_> is made available and contains the value of C<$val>
 
@@ -151,6 +241,13 @@ Provided an integer representing an offset and this returns the corresponding va
     $a->get( undef() ); # abc
     $a->get( -1 ); # ghi
 
+In non-object context, will return the value as is, and in object context and if the value is not a reference of any sort, it returns a L<Module::Generic::Scalar> object representing that value. For example:
+
+    my $a = Module::Generic::Array->new( [qw( Hello world )] );
+    say $a->get(0)->length; # 5
+    # but
+    say $a->get(0); # returns "Hello" as a regular string
+
 See also L</index>
 
 =head2 grep
@@ -169,14 +266,18 @@ This is an alias for L</exists>
 
 =head2 index
 
-Provided with an index of an element in the array and this returns its corresponding value.
+Provided with an index of an element in the array and this returns its corresponding value as is in non-object context, and in object context and if the value is not a reference of any sort, it returns a L<Module::Generic::Scalar> object.
 
 It takes an integer and this ensures the value used is an integer by applying L<perlfunc/int>
 
     my $a = Module::Generic::Array->new( [qw( John Jack Peter )] );
     $a->index( 1 ); # returns Jack
 
-If there is nothing at the given offset, possibly because the array is smaller, then this would return undef.
+And in object context:
+
+    say $a->index( 1 )->substr( 0, 2 ); # returns "Ja"
+
+If there is nothing at the given offset, possibly because the array is smaller, then this would return undef in non-object context, or in object context, a L<Module::Generic::Scalar> object representing C<undef()>
 
 =head2 iterator
 
@@ -201,7 +302,15 @@ This works as documented in L<perlfunc/"keys"> and returns a list of offset valu
 
 =head2 last
 
-Returns the last element of the array. If there are none, instead it will return a L<Module::Generic::Null> to ensure chaining will still work.
+Returns the last element of the array, whatever that is, in non-object context, and in object context and if the value is not a reference of any sort, it returns a L<Module::Generic::Scalar> object representing that value.
+If there are none, instead it will return a L<Module::Generic::Null> to ensure chaining will still work.
+
+For example:
+
+    my $a = Module::Generic::Array->new( [qw( Hello world )] );
+    say $a->last->length; # 5
+    # but
+    say $a->last; # returns "world" as a regular string
 
 =head2 length
 
@@ -225,13 +334,84 @@ For each iteration of the array, C<$_> is made available.
 
     print( $a->map(sub{ $_->value })->join( "\n" ), "\n" );
 
+=head2 merge
+
+Provided with a list of L<Module::Generic::Array> object and this will merge them with our current one, i.e. the one used to call this L</merge> method.
+
+For example:
+
+    my $a = Module::Generic::Array->new( [qw( Jack John Peter )] );
+    my $b = Module::Generic::Array->new( [qw( Gabriel Raphael Emmanuel )] );
+    $a->merge( $b );
+    print( $a->join( ' ' ), "\n" ); # Jack John Peter Gabriel Raphael Emmanuel
+
+Alternatively, you could simply do:
+
+    $a->push( $b->list );
+
+=head2 odd
+
+Returns a new L<Module::Generic::Array> object of elements whose position in the array are an odd number, starting from 0.
+
+For example:
+
+my $a = Module::Generic::Array->new( [qw( 1 2 3 4 5 6 7 8 9 10 )] );
+my $odd = $a->odd;
+say "@$odd";
+
+Produces: C<2 4 6 8 10>
+
+See also L</even>
+
+=head2 offset
+
+This takes 2 integer as arguments: an offset and optionally a length and it will return a L<Module::Generic::Array> object representing this segment from the current array. Offset starts at 0.
+
+For example:
+
+    my $a = $m->new_array( [qw( Jack John Peter Gabriel Raphael Emmanuel )] );
+    print( $a->offset( 2, 3 )->join( ' ' ), "\n" ); # John Peter Gabriel
+
+Note that the a arguments are converted into an integer, so if you provide a non integer value, it will be turned into one. In this regard, C<undef> would torn into zero.
+
+    print( $a->offset( 2, undef )->join( ' ' ), "\n" ); # returns nothing, because length (undef) became 0
+
+If you provide a negative length, it will start back by that much from the offset point up to the offset point.
+
+    print( $a->offset( 2, -1 )->join( ' ' ), "\n" ); # John Peter
+
+And if the length is negative, it will start back from the end of the array
+
+    print( $a->offset( 2, -3 )->join( ' ' ), "\n" ); # Emmanuel Jack John Peter
+
+The offset itself can be negative and it will position it starting from the end of the array
+
+    print( $a->offset( -2, 3 )->join( ' ' ), "\n" ); # Raphael Emmanuel Jack
+
+If only an offset position is provided and no length, it will return all elements from that position until the end of the array:
+
+    print( $a->offset(3)->join( ' ' ), "\n" ); # Gabriel Raphael Emmanuel
+
+See L</splice> especially if you want to remove segments of elements from the current array, such as:
+
+    print( $a->splice( 1 ) ); # removes and returns John Peter Gabriel Raphael Emmanuel
+
+See L</get> or L</index> if you want to return only one element at a certain offset position.
+
 =head2 pop
 
-Returns the last entry in the array.
+In non-object context, it returns the last entry in the array, whatever that is. In object context and if the value is not a reference of any sort, this returns a L<Module::Generic::Scalar> object.
+
+For example:
+
+    my $a = Module::Generic::Array->new( [qw( Hello world )] );
+    say $a->pop->length; # 5
+    # but
+    say $a->pop; # returns "world" as a regular string
 
 =head2 pos
 
-Provided with some value (references are ok too), and this will return the position of it in the array, or undef if nothing was found.
+Provided with some value (references are ok too), and this will return the position (starting from 0) of it in the array, or undef if nothing was found.
 
     my $a = Module::Generic::Array->new( [qw( John Jack Peter )] );
     my $offset = $a->pos( 'Jack' ); # returns 1
@@ -246,6 +426,23 @@ Note that it returns the position in the array of the first occurrence found. Ma
 
 Provided with some data and this adds it at the end of the array.
 
+Note that pushing an L<Module::Generic::Array> object into another L<Module::Generic::Array> object does not actually expand it, because this would imply makin an assumption on what the user actually wants. Thus, you would need to make that clear yourself.
+
+    my $a = Module::Generic::Array->new( [qw( John Jack Peter )] );
+    my $b = Module::Generic::Array->new( [qw( Gabriel Raphael Emmanuel )] );
+    $a->push( $b );
+    # Now $a contains something like: John Jack Peter Module::Generic::Array=ARRAY(0x557d2c2983e8)
+
+Instead you might want to do:
+
+    $a->push( $b->list );
+
+Or if you prefer:
+
+    $a->merge( $b ); # $a now is: John Jack Peter Gabriel Raphael Emmanuel
+
+which will merge array object C<$b> into C<$a>, by pushing all of C<$b>' elements at the end of C<$a>'s stack.
+
 =head2 push_arrayref
 
 Provided with an array reference, and this add all its entry at the end of the array.
@@ -255,9 +452,52 @@ Provided with an array reference, and this add all its entry at the end of the a
     print( $ar->join( "," ), "\n" );
     # Now prints: John, Joe, Mary, Jack, Peter
 
+=head2 remove
+
+This takes an L<Module::Generic::Array> object, or an array reference, or a regular array (i.e. a list) of element and will remove them from the current array object. It works on reference too.
+
+    my $dummy = { class => 'Hello' };
+    my $a = Module::Generic::Array->new( ['Jack', 'John', $dummy, 'Paul', 'Peter', 'Gabriel', 'Raphael', 'Emmanuel'] );
+    $a->remove( $dummy, qw( John Paul Peter Emmanuel ) );
+    say( "@$a" ); # Jack Gabriel Raphael
+
+It returns the current object.
+
 =head2 reset
 
 This empty the array, just like L</"undef">
+
+=head2 return
+
+This method is used to send the calling array a return value. It works across multiple embedded loops. For example:
+
+Telling the loop for array C<$a> to terminate while we are in loop for array C<$b>:
+
+    $a->for(sub
+    {
+        my( $i, $n ) = @_;
+        $pos = $n;
+        $b->for(sub
+        {
+            my( $j, $v ) = @_;
+            # Tell loop for array $a to stop
+            $a->return( undef() ) if( $n == 7 && $v == 27 );
+        });
+        # some more stuff here....
+    });
+
+Telling the loop for array C<$a> to skip 1:
+
+    my $a = Module::Generic::Array->new( [qw( Jack John Peter Paul Gabriel Raphael Emmanuel )] );
+    $a->for(sub
+    {
+        my( $i, $n ) = @_;
+        # tell it to skip Peter
+        $a->return( +1 ) if( $n eq 'John' );
+        return( 1 );
+    });
+
+It works by having the loop for the given array check for a return value assign to it at each iteration. Because it is just a check in an hash, it is very lightweight. When a return value is found, it is reset immediately.
 
 =head2 reverse
 
@@ -279,7 +519,15 @@ Note that if an array object is provided, it will copy the content of that objec
 
 =head2 shift
 
-Remove the first entry and returns it.
+Remove the first entry and returns it as is.
+In non-object context, it removes the first entry in the array and returns it, whatever that is. In object context and if the value is not a reference of any sort, this returns a L<Module::Generic::Scalar> object.
+
+For example:
+
+    my $a = Module::Generic::Array->new( [qw( Hello world )] );
+    say $a->shift->length; # 5
+    # but
+    say $a->shift; # returns "Hello" as a regular string
 
 =head2 size
 
@@ -299,9 +547,22 @@ Takes the same arguments as the L<perlfunc/"splice"> function, but its return va
 
 If L</splice> is called to add new element, the array object is returned to allow chaining.
 
-If no argument is provided, it just empties the array and return the array object is returned to allow chaining.
+If no argument is provided, it just empties the array and the array object is returned to allow chaining.
 
-When offset and/or length are provided, it returns the list of elements found.
+When only an offset and/or length are provided, it returns the list of elements found as a regular list (not an object) in non-object context. However, In object context, this returns a new L<Module::Generic::Array> object.
+
+For example:
+
+    my $a = Module::Generic::Array->new( [qw( I disapprove of what you say, but I will defend to the death your right to say it )] );
+    say $a->splice( 7, 3 ); # returns a list containing "I", "will", "defend"
+    say $a->splice( 7 ); # returns a list containing "I", "will", "defend", "to", "the", "death", "your", "right", "to", "say", "it"
+
+But in object context:
+
+    say a->splice( 7, 3 )->length; # returns 3 obviously
+    say a->splice( 7 )->length; # returns 11
+
+Here we use the method "length" but any L<Module::Generic::Array> method workds
 
 =head2 split
 
@@ -312,6 +573,21 @@ It returns the list in list context, and returns a new L<Module::Generic::Array>
 =head2 undef
 
 Just like L</"reset">, this empty the array.
+
+=head2 unique
+
+Uses L<List::Util> to filter out any duplicates, including reference, and return a new L<Module::Generic::Array> object of the resulting array.
+
+Optionally, you can pass it a true value, and it will update the currently used object instead.
+
+    my $dummy = { class => 'Hello' };
+    my $a = Module::Generic::Array->new( ['Jack', 'John', $dummy, 'Paul', 'Peter', 'Gabriel', $dummy, 'Peter', 'Raphael', 'Emmanuel'] );
+    my $b = $a->unique;
+    # $b now contains: 'Jack', 'John', $dummy, 'Paul', 'Peter', 'Gabriel', 'Raphael', 'Emmanuel'
+
+or to update C<$a> directly:
+
+    $a->unique(1);
 
 =head2 unshift
 

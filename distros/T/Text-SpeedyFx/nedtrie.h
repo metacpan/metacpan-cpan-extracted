@@ -28,7 +28,9 @@ DEALINGS IN THE SOFTWARE.
 */
 
 #include <assert.h>
+#include <stdint.h>
 #include <stdlib.h>
+#include <string.h> /* for memset */
 #include <limits.h> /* For INT_MAX */
 
 #ifdef _MSC_VER
@@ -164,7 +166,7 @@ static INLINE unsigned nedtriebitscanr(size_t value)
     return (unsigned) bitpos;
   }
 #elif defined(__GNUC__)
-  return sizeof(value)*__CHAR_BIT__ - 1 - (unsigned) __builtin_clzl(value);
+  return sizeof(value)*CHAR_BIT - 1 - (unsigned) __builtin_clzl(value);
 #else
   /* The following code is illegal C, but it almost certainly will work.
   If not use the legal implementation below */
@@ -184,20 +186,22 @@ static INLINE unsigned nedtriebitscanr(size_t value)
 #endif
 	return (unsigned) n;
 #else
+#if CHAR_BIT != 8
+#error CHAR_BIT is not eight, and therefore this generic bitscan routine will need adjusting!
+#endif
   /* This is a generic 32 and 64 bit compatible branch free bitscan right */
   size_t x=value;
-  const size_t allbits1=~(size_t)0;
   x = x | (x >> 1);
   x = x | (x >> 2);
   x = x | (x >> 4);
   x = x | (x >> 8);
-  x = x | (x >>16);
-  if(8==sizeof(x)) x = x | (x >>32);
+  if(16 < sizeof(x)*CHAR_BIT) x = x | (x >>16);
+  if(32 < sizeof(x)*CHAR_BIT) x = x | (x >>32);
   x = ~x;
-  x = x - ((x >> 1) & (allbits1/3));
-  x = (x & (allbits1/15*3)) + ((x >> 2) & (allbits1/15*3));
-  x = ((x + (x >> 4)) & (allbits1/255*15)) * (allbits1/255);
-  x = (8*sizeof(x)-1) - (x >> (8*(sizeof(x)-1)));
+  x = x - ((x >> 1) & (SIZE_MAX/3));
+  x = (x & (SIZE_MAX/15*3)) + ((x >> 2) & (SIZE_MAX/15*3));
+  x = ((x + (x >> 4)) & (SIZE_MAX/UCHAR_MAX*15)) * (SIZE_MAX/UCHAR_MAX);
+  x = (CHAR_BIT*sizeof(x)-1) - (x >> (CHAR_BIT*(sizeof(x)-1)));
   return (unsigned) x;
 #endif
 #endif
@@ -1003,7 +1007,7 @@ namespace nedtries {
     const TrieLink_t<type> *RESTRICT nodelink, *RESTRICT rlink=0;
     unsigned bitidx;
 
-    if((node=triebranchprev<trietype, type, fieldoffset, keyfunct>(r, &rlink))) return (type *) node;
+    if((node=triebranchprev<trietype, type, fieldoffset, keyfunct>(r, &rlink)) || !rlink) return (type *) node;
     /* I have reached the top of my trie, so on to prev bin */
     bitidx=(unsigned)(((size_t) rlink->trie_parent)>>2);
     assert(head->triebins[bitidx]==r);
@@ -1453,7 +1457,7 @@ namespace nedtries {
         bitidx=(unsigned)(((size_t) nodelink->trie_parent)>>2);
         assert(bitidx==n);
         assert(head->triebins[bitidx]==node);
-        assert(((((size_t)-1)<<bitidx) & nodekey)==((size_t) 1<<bitidx));
+        assert(!nodekey || ((((size_t)-1)<<bitidx) & nodekey)==((size_t) 1<<bitidx));
         assert(!nodelink->trie_prev);
         while((child=nodelink->trie_next))
         {
@@ -1475,7 +1479,7 @@ namespace nedtries {
           state.smallestkey=(size_t)-1;
           state.largestkey=0;
           triecheckvaliditybranch<trietype, type, fieldoffset, keyfunct>(head, nodelink->trie_child[0], bitidx-1, state);
-          assert(state.smallestkey>=(size_t)1<<bitidx);
+          assert(!state.smallestkey || state.smallestkey>=(size_t)1<<bitidx);
           assert(state.largestkey<(size_t)1<<(bitidx+1));
         }
         if(nodelink->trie_child[1])
@@ -1521,6 +1525,7 @@ namespace nedtries {
 #endif /* !NDEBUG */
   }
 
+#if NEDTRIE_ENABLE_STL_CONTAINERS
   /*! \def HAVE_CPP0XRVALUEREFS
   \ingroup C++
   \brief Enables rvalue references
@@ -1816,6 +1821,8 @@ namespace nedtries {
   /*! \class trie_map
   \ingroup C++
   \brief A STL container wrapper using nedtries to map keys to values.
+  
+  \note Enable this by defining `NEDTRIE_ENABLE_STL_CONTAINERS`.
 
   This class can be used to wrap any arbitrary STL container with nedtrie associativity. For example, if you
   had a std::vector<> list of items, you could add nedtrie's fast nearly constant time algorithm for accessing them -
@@ -2130,6 +2137,8 @@ namespace nedtries {
   \ingroup C++
   \brief A STL container wrapper using nedtries to map keys to values.
 
+  \note Enable this by defining `NEDTRIE_ENABLE_STL_CONTAINERS`.
+
   This class can be used to wrap any arbitrary STL container with nedtrie associativity. For example, if you
   had a std::vector<> list of items, you could add nedtrie's fast nearly constant time algorithm for accessing them -
   though one would expect that a std::list<> would be the most common combination. There is no strict reason why
@@ -2389,6 +2398,8 @@ namespace nedtries {
   {
     return static_cast<const stlcontainer &>(a)>=static_cast<const stlcontainer &>(b);
   }
+
+#endif
 
 } /* namespace */
 

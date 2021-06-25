@@ -45,5 +45,7 @@ COPYRIGHT
 
 SEE ALSO
 
-    Data::FormValidator, Number::Phone.
+    Data::FormValidator
+
+    Number::Phone
 

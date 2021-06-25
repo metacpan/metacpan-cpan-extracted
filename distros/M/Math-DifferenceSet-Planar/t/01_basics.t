@@ -11,7 +11,7 @@ use strict;
 use warnings;
 use File::Spec;
 
-use Test::More tests => 137;
+use Test::More tests => 149;
 BEGIN { use_ok('Math::DifferenceSet::Planar') };
 
 #########################
@@ -53,6 +53,11 @@ ok(!Math::DifferenceSet::Planar->available(0, 2));
 ok(!Math::DifferenceSet::Planar->available(2, 30));
 ok(!Math::DifferenceSet::Planar->available(3, -1));
 ok(!Math::DifferenceSet::Planar->available(2, 40));
+
+ok(Math::DifferenceSet::Planar->known_space(9));
+ok(!Math::DifferenceSet::Planar->known_space(6));
+ok(!Math::DifferenceSet::Planar->known_space(-1));
+ok(!Math::DifferenceSet::Planar->known_space(~0>>1&~1));
 
 my $ds = Math::DifferenceSet::Planar->new(9);
 my @el = $ds->elements;
@@ -134,6 +139,7 @@ ok($eta == $eta2);
 
 SequentialIteratorTest: {
     local $Math::DifferenceSet::Planar::_MAX_ENUM_COUNT = 0;
+    local $Math::DifferenceSet::Planar::_USE_SPACES_DB  = 0;
     my $it = $ds->iterate_rotators;
     is(ref($it), 'CODE');
     my @p = ();
@@ -149,17 +155,35 @@ SequentialIteratorTest: {
     is("@p", '1 3 5 9 11 13 17 25');
 }
 
-is($ds->n_planes, 12);
-my $it = $ds->iterate_rotators;
-my $it2 = $ds->iterate_rotators;
-is(ref($it), 'CODE');
-my @p = ();
-while (my $ro = $it->()) {
-  push @p, $ro;
+UnstructuredIteratorTest: {
+    local $Math::DifferenceSet::Planar::_USE_SPACES_DB  = 0;
+    is($ds->n_planes, 12);
+    my $it = $ds->iterate_rotators;
+    my $it2 = $ds->iterate_rotators;
+    is(ref($it), 'CODE');
+    my @p = ();
+    while (my $ro = $it->()) {
+      push @p, $ro;
+    }
+    is("@p", '1 2 4 5 8 10 16 19 20 23 29 46');
+    undef $it;
+    is($it2->(), 1);
 }
-is("@p", '1 2 4 5 8 10 16 19 20 23 29 46');
-undef $it;
-is($it2->(), 1);
+
+StructuredIteratorTest: {
+    $ds = Math::DifferenceSet::Planar->new(9);
+    is($ds->n_planes, 12);
+    my $it = $ds->iterate_rotators;
+    my $it2 = $ds->iterate_rotators;
+    is(ref($it), 'CODE');
+    my @p = ();
+    while (my $ro = $it->()) {
+      push @p, $ro;
+    }
+    like("@p", qr/^1 2 4 8 16 32 [0-9]+ [0-9]+ [0-9]+ [0-9]+ [0-9]+ [0-9]+\z/);
+    undef $it;
+    is($it2->(), 1);
+}
 
 my $it3 = $ds->iterate_planes;
 pds_ok($it3->(), "@el");
@@ -355,9 +379,31 @@ my $count = Math::DifferenceSet::Planar->available_count;
 diag("number of available sets is $count");
 like($count, qr/^[1-9][0-9]*\z/);
 
+my $min = Math::DifferenceSet::Planar->available_min_order;
+diag("minimal available order is $min");
+is($min, 2);
+
 my $max = Math::DifferenceSet::Planar->available_max_order;
 diag("maximal available order is $max");
 like($max, qr/^[1-9][0-9]*\z/);
+
+$count = Math::DifferenceSet::Planar->known_space_count;
+diag("number of known spaces is $count");
+like($count, qr/^(?:0|[1-9][0-9]*)\z/);
+
+$min = Math::DifferenceSet::Planar->known_space_min_order;
+my $qmin = defined($min)? $min: 'undefined';
+diag("minimal known space order is $qmin");
+if($count) {
+    like($min, qr/^[1-9][0-9]*\z/);
+}
+else {
+    ok(!defined $min);
+}
+
+$max = Math::DifferenceSet::Planar->known_space_max_order;
+diag("maximal known space order is $max");
+like($max, qr/^(?:0|[1-9][0-9]*)\z/);
 
 my @db = Math::DifferenceSet::Planar->list_databases;
 diag("available databases: @db");

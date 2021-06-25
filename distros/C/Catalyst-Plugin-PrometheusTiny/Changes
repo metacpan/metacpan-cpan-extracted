@@ -1,5 +1,9 @@
 Revision history for Catalyst::Plugin::PrometheusTiny
 
+0.006 - 2021-06-20
+
+    * refresh README, fixup META resources
+
 0.005 - 2021-06-08
 
     * add META resources

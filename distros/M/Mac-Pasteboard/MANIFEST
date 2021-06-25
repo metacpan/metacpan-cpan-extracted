@@ -17,7 +17,6 @@ LICENSES/Copying
 Makefile.PL
 MANIFEST
 MANIFEST.SKIP
-MBCopy.PL
 META.json
 META.yml
 Pasteboard.xs
@@ -42,5 +41,7 @@ xt/author/minimum_perl.t
 xt/author/perlcriticrc
 xt/author/pod.t
 xt/author/pod_coverage.t
+xt/author/pod_links.t
 xt/author/pod_spelling.t
 xt/author/prereq.t
+xt/author/taint.t

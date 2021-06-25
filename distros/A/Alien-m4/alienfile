@@ -15,7 +15,7 @@ probe sub {
   {
     my @stdout;
     capture { @stdout = `$command --version` };
-    if(defined $stdout[0] && $stdout[0] =~ /^(GNU |)m4/i && $stdout[0] =~ /([0-9\.]+)$/)
+    if(defined $stdout[0] && $stdout[0] =~ /^(GNU |)m4/i && $stdout[0] =~ /([0-9]+\.[0-9]+\.[0-9]+)/)
     {
       my $version = $1;
       my @version = split /\./, $version;

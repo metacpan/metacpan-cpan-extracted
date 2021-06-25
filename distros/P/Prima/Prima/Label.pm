@@ -26,6 +26,7 @@ sub profile_default
 		showPartial    => 1,
 		tabStop        => 0,
 		textDirection  => $rtl,
+		textJustify    => 0,
 		valignment     => ta::Top,
 		widgetClass    => wc::Label,
 		wordWrap       => 0,
@@ -64,6 +65,7 @@ sub init
 	$self->{lock} = 1;
 	$self->{textLines} = 0;
 	my %profile = $self-> SUPER::init(@_);
+	$self->textJustify($profile{textJustify});
 	$self-> {$_} = $profile{$_} for qw(
 		textDirection alignment valignment autoHeight autoWidth
 		wordWrap focusLink showAccelChar showPartial hotKey
@@ -96,7 +98,6 @@ sub on_paint
 
 	my $fh = $canvas-> font-> height;
 	my $ta = $self-> {alignment};
-	my $wx = $self-> {widths};
 	my $ws = $self-> {words};
 	my ($starty,$ycommon) = (0, scalar @{$ws} * $fh);
 
@@ -113,25 +114,38 @@ sub on_paint
 	my $i;
 	my $paintLine = !$self-> {showAccelChar} && defined($tl) && $tl < scalar @{$ws};
 
+	my (@wx, @wss);
+	my %justify = ( %{$self->textJustify}, rtl => $self->textDirection);
+	for ( my $i = 0; $i < @$ws; $i++) {
+		my $s = $canvas->text_shape($ws->[$i], %justify );
+		$s->justify(
+			$canvas, $ws->[$i], $size[0],
+			%justify,
+			($i == $#$ws) ? (letter => 0, word => 0) : ()
+		) if $s;
+		push @wss, $s // $ws->[$i];
+		push @wx, $canvas->get_text_width($wss[-1]);
+	}
+
 	unless ( $self-> enabled) {
 		$canvas-> color( $self-> light3DColor);
-		for ( $i = 0; $i < scalar @{$ws}; $i++) {
+		for ( $i = 0; $i < @wss; $i++) {
 			my $x = 0;
 			if ( $ta == ta::Center) {
-				$x = ( $size[0] - $$wx[$i]) / 2;
+				$x = ( $size[0] - $wx[$i]) / 2;
 			} elsif ( $ta == ta::Right) {
-				$x = $size[0] - $$wx[$i];
+				$x = $size[0] - $wx[$i];
 			}
-			$canvas-> text_out( $$ws[$i], $x + 1, $y - 1);
+			$canvas-> text_out( $wss[$i], $x + 1, $y - 1);
 			$y -= $fh;
 		}
 		$y   = $starty;
 		if ( $paintLine) {
 			my $x = 0;
 			if ( $ta == ta::Center) {
-				$x = ( $size[0] - $$wx[$tl]) / 2;
+				$x = ( $size[0] - $wx[$tl]) / 2;
 			} elsif ( $ta == ta::Right) {
-				$x = $size[0] - $$wx[$tl];
+				$x = $size[0] - $wx[$tl];
 			}
 			$canvas-> line(
 				$x + $self-> {tildeStart} + 1, $starty - $fh * $tl - 1,
@@ -141,20 +155,20 @@ sub on_paint
 	}
 
 	$canvas-> color( $clr[0]);
-	for ( $i = 0; $i < scalar @{$ws}; $i++) {
+	for ( $i = 0; $i < @wss; $i++) {
 		my $x = 0;
 		if ( $ta == ta::Center) {
-			$x = ( $size[0] - $$wx[$i]) / 2;
+			$x = ( $size[0] - $wx[$i]) / 2;
 		} elsif ( $ta == ta::Right) {
-			$x = $size[0] - $$wx[$i];
+			$x = $size[0] - $wx[$i];
 		}
-		$canvas-> text_out( $$ws[$i], $x, $y);
+		$canvas-> text_out( $wss[$i], $x, $y);
 		$y -= $fh;
 	}
 	if ( $paintLine) {
 		my $x = 0;
-		if ( $ta == ta::Center) { $x = ( $size[0] - $$wx[$tl]) / 2; }
-		elsif ( $ta == ta::Right) { $x = $size[0] - $$wx[$tl]; }
+		if ( $ta == ta::Center) { $x = ( $size[0] - $wx[$tl]) / 2; }
+		elsif ( $ta == ta::Right) { $x = $size[0] - $wx[$tl]; }
 		$canvas-> line(
 			$x + $self-> {tildeStart}, $starty - $fh * $tl,
 			$x + $self-> {tildeEnd},   $starty - $fh * $tl
@@ -163,11 +177,10 @@ sub on_paint
 }
 
 
-sub text
+sub set_text
 {
-	return $_[0]-> SUPER::text unless $#_;
 	my $self = $_[0];
-	$self-> SUPER::text( $_[1]);
+	$self-> SUPER::set_text( $_[1]);
 	$self-> check_auto_size;
 	$self-> repaint;
 }
@@ -268,7 +281,10 @@ sub reset_lines
 
 	$self-> begin_paint_info;
 
-	my $lines = $self-> text_wrap_shape( $self-> text, $width, options => $opt, rtl => $self->textDirection);
+	my $lines = $self-> text_wrap_shape( $self-> text, $width,
+		options => $opt,
+		rtl     => $self->textDirection,
+	);
 	my $lastRef = pop @{$lines};
 
 	$self-> {textLines} = scalar @$lines;
@@ -277,10 +293,6 @@ sub reset_lines
 	$self-> {accel} = defined($self-> {tildeStart}) ? lc( $lastRef-> {tildeChar}) : undef;
 	splice( @{$lines}, $maxLines) if scalar @{$lines} > $maxLines && !$nomaxlines;
 	$self-> {words} = $lines;
-
-	my @len;
-	for ( @{$lines}) { push @len, $self-> get_text_width( $_); }
-	$self-> {widths} = [@len];
 
 	$self-> end_paint_info;
 }
@@ -379,6 +391,22 @@ sub textDirection
 	$self-> {textDirection} = $td;
 	$self-> text( $self-> text );
 	$self-> alignment( $td ? ta::Right : ta::Left );
+}
+
+sub textJustify
+{
+	return {%{$_[0]-> {textJustify}}} unless $#_;
+	my $self = shift;
+	if ( @_ % 2 ) {
+		my $tj = shift;
+		my %tj = ref($tj) ? %$tj : map { ($_, !!$tj) } qw(letter word kashida);
+		$tj{$_} //= 0 for qw(letter word kashida min_kashida);
+		$self->{textJustify} = \%tj;
+	} else {
+		my %h = @_;
+		$self->{textJustify}->{$_} = $h{$_} for keys %h;
+	}
+	$self-> text( $self-> text );
 }
 
 1;
@@ -486,6 +514,21 @@ last line is shown even if not visible in full. If 0, only full
 lines are drawn.
 
 Default value: 1
+
+=item textJustify $BOOL | { letter => 0, word => 0, kashida => 0, min_kashida => 0 } | %VALUES
+
+If set, justifies wrapped text according to the option passwd in the hash
+( see L<Prima::Drawable::Glyphs/arabic_justify> and L<Prima::Drawable::Glyphs/interspace_justify> ).
+Can accept three forms:
+
+If anonymous hash is used, overwrites all the currently defined options.
+
+If C<$BOOL> is used, treated as a shortcut for C<< { letter => $BOOL, word => $BOOL, kashida => $BOOL } >>;
+consequent get-calls return full hash, not the C<$BOOL>.
+
+If C<%VALUES> form is used, overwrites only values found in C<%VALUES>.
+
+Only actual when C<wordWrap> is set.
 
 =item textDirection BOOLEAN
 

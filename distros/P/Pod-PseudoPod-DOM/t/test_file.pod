@@ -1,0 +1,284 @@
+=head0 Some Document
+
+Z<startofdocument>
+
+Here is some ignorable text.
+
+=head1 A Heading
+
+Z<next_heading>
+
+This is part of some document (L<startofdocument>; A<startofdocument>).
+
+=begin programlisting
+
+  "This text should not be escaped -- it is normal $text."
+
+    #!/bin/perl does need escaping, but not \ (backslashes)
+
+=end programlisting
+
+  This indented text should come through unmodified too -- it is also "normal"
+  $text.
+
+=begin screen
+
+  This should also be $unm0d+ified
+
+=end screen
+
+=begin blockquote
+
+Blockquoted text may or may not need "escaped".  I haven't decided.
+
+=end blockquote
+
+=head2 B heading
+
+Z<slightly complex?heading>
+
+Encode the noble octothorpe, #, and the slash used for escaping: \.  There are
+lots of other escapable characters, including $ & % and _.  The curly braces,
+{}, get escaped too.  The tilde, ~, has something special too.
+
+"The interesting thing is that when you use double quotes," he said, "they turn
+into double single quotes going in the correct direction."
+
+The caret ^ is interesting too.
+
+(A<slightly complex?heading> links to this section! L<next_heading> links to
+the previous.)
+
+=head3 c heading
+
+When you leave out words, add an ellipsis... and get out an escaped version.
+
+Words like flame, filk, and ineffable have interesting ligatures -- and you
+need a bit of work to make the typography work out nicely.
+
+Diacritics are more difficult E<aacute> la the naE<iuml>ve attachE<egrave> and
+the E<copy> caper, E<plusmn> some constant.  FranE<ccedilla>aise has some fun
+onesE<trademark>.
+
+=for sidebar
+
+Hello, this is a sidebar
+
+=end
+
+=begin sidebar Sidebar Has Title
+
+Hello, this is a =begin sidebar.
+
+=end sidebar
+
+X<Special formatting>
+
+Special formatting is B<very> important, especially in C<code-like text>, for
+special F<emphasis>, and I<semantic-only emphasis>N<but beware of footnotes!>.
+Try to format correctly Google URL: U<< http://www.google.com/ >>. A false
+value such as C<0> or I<0> should work even in inline markup. Decrement
+behavior (C<$some_variable-->) should be fine too. C<'single quotes'> need to
+be single quotes, not fancy curly apostrophes.
+
+X<Special formatting>
+X<sigils; &>
+X<F<.t> files>
+X<<< operators; C<< E<lt> >> >>>
+
+Index entries are more fun, as more special characters must be escaped, with a
+quote sign. E.g. X<negation ! operator>, X<array @ sigil>, X<the pipe |> and
+X<strange quote a"a>, not to mention X<C<$^W>; carats>. X<C<code> and
+I<italics> text> should appear properly too. X<arrays; C<splice>> is even more
+fun, as is X<C<< <=> >>; numeric comparison operator> and C<< E<lt>=E<gt> >>.
+
+More, we should be able to have superscripts like I<E = mcG<2>> or
+subscripts, like I<HH<2>O>.
+
+=for latex
+
+  Sometimes it would be good to send direct commands to \LaTeX
+  Indentation should not be verbatim. Nothing should be touched.
+
+=end
+
+=for html
+
+  <p>HTML here</p>
+
+=end
+
+Hierarchical terms are also possible, separating single terms with a semicolon.
+Spaces around comma (e.g. in X< hierarchical terms ; omitting trailing spaces>)
+should be ignored, as they influence sorting order.
+
+
+Lists are fun:
+
+=over 4
+
+=item Verbatim
+
+=item List
+
+=item items
+
+=back
+
+Bulleted lists rule too:
+
+=over 4
+
+=item * BANG
+
+=item * $BANG BANG$
+
+And they might have more lines. And they _ are $ properly %  escaped.
+
+=item * BANGERANG!
+
+=back
+
+Definition lists are useful:
+
+=over 4
+
+=item wakawaka
+
+What Pac-Man says.
+
+=item has_method
+
+And add_method are escaped
+
+=item ook ook
+
+What the librarian says.
+
+=back
+
+Numeric lists are more fun:
+
+=over 4
+
+=item 2
+
+First
+
+=item 33
+
+Second
+
+=item 77
+
+Fooled you!
+
+=back
+
+And of course, normal numbered lists:
+
+=over 4
+
+=item 1
+
+Something.
+
+=item 2
+
+Or.
+
+=item 3
+
+Other.
+
+=back
+
+=begin foo Title
+
+Something
+
+=end foo
+
+Now here is a table.
+
+=begin table A Table of I<Fun> Things
+
+=headrow
+
+=cell I<Left Column>
+
+=cell I<Right Column>
+
+=bodyrows
+
+=row
+
+=cell Left Cell One
+
+=cell
+
+=over 4
+
+=item * First item in right column
+
+=item * Second item in right column
+
+=item * Third item in right column
+
+=back
+
+=row
+
+=cell Left Cell Two
+
+=cell Right Cell Two
+
+=end table
+
+Basic bulleted list:
+
+=over 4
+
+=item * First item
+
+=item * Second item
+
+=item * Third item
+
+=back
+
+=begin figure A Figure with Caption
+
+Z<figure_link>
+
+F<some/path/to/image_file.png>
+
+=end figure
+
+=head0 *Another Suppressed Heading
+
+=head1 *A Suppressed Heading
+
+=head2 *Yet Another Suppressed Heading
+
+=begin literal \\
+
+Here are several paragraphs.\\
+They should have I<newlines> in between them.\\\\
+... and that is all.
+
+=end literal
+
+=begin tip Design Principle of C<Code> I<fun>
+
+This is a design principle.
+
+It has multiple parts.
+
+=end tip
+
+=for latex
+
+\pagebreak
+
+=end for

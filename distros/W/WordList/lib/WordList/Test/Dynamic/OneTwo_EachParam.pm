@@ -1,9 +1,9 @@
 package WordList::Test::Dynamic::OneTwo_EachParam;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-01-28'; # DATE
+our $DATE = '2021-06-23'; # DATE
 our $DIST = 'WordList'; # DIST
-our $VERSION = '0.7.7'; # VERSION
+our $VERSION = '0.7.10'; # VERSION
 
 use strict;
 
@@ -38,7 +38,7 @@ WordList::Test::Dynamic::OneTwo_EachParam - Wordlist that returns one, two (via 
 
 =head1 VERSION
 
-This document describes version 0.7.7 of WordList::Test::Dynamic::OneTwo_EachParam (from Perl distribution WordList), released on 2021-01-28.
+This document describes version 0.7.10 of WordList::Test::Dynamic::OneTwo_EachParam (from Perl distribution WordList), released on 2021-06-23.
 
 =head1 SYNOPSIS
 
@@ -47,11 +47,12 @@ This document describes version 0.7.7 of WordList::Test::Dynamic::OneTwo_EachPar
  my $wl = WordList::Test::Dynamic::OneTwo_EachParam->new;
 
  # Pick a (or several) random word(s) from the list
- my $word = $wl->pick;
- my @words = $wl->pick(3);
+ my ($word) = $wl->pick;
+ my ($word) = $wl->pick(1);  # ditto
+ my @words  = $wl->pick(3);  # no duplicates
 
  # Check if a word exists in the list
- if ($wl->word_exists('foo')) { ... }
+ if ($wl->word_exists('foo')) { ... }  # case-sensitive
 
  # Call a callback for each word
  $wl->each_word(sub { my $word = shift; ... });
@@ -60,7 +61,7 @@ This document describes version 0.7.7 of WordList::Test::Dynamic::OneTwo_EachPar
  my $first_word = $wl->first_word;
  while (defined(my $word = $wl->next_word)) { ... }
 
- # Get all the words
+ # Get all the words (beware, some wordlists are *huge*)
  my @all_words = $wl->all_words;
 
 =head1 DESCRIPTION
@@ -100,7 +101,7 @@ Source repository is at L<https://github.com/perlancar/perl-WordList>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-WordList/issues>
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=WordList>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

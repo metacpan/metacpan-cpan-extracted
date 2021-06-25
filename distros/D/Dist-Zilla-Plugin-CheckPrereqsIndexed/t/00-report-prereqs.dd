@@ -1,15 +1,15 @@
 do { my $x = {
        'configure' => {
                         'requires' => {
-                                        'ExtUtils::MakeMaker' => '0'
+                                        'ExtUtils::MakeMaker' => '6.78'
                                       }
                       },
        'develop' => {
                       'requires' => {
+                                      'Encode' => '0',
                                       'Test::More' => '0',
                                       'Test::Pod' => '1.41',
-                                      'strict' => '0',
-                                      'warnings' => '0'
+                                      'strict' => '0'
                                     }
                     },
        'runtime' => {
@@ -19,9 +19,13 @@ do { my $x = {
                                       'List::Util' => '1.33',
                                       'Moose' => '0',
                                       'YAML::Tiny' => '0',
+                                      'experimental' => '0',
+                                      'feature' => '0',
                                       'namespace::autoclean' => '0',
-                                      'perl' => 'v5.10.0',
-                                      'version' => '0'
+                                      'perl' => 'v5.20.0',
+                                      'utf8' => '0',
+                                      'version' => '0',
+                                      'warnings' => '0'
                                     }
                     },
        'test' => {
@@ -38,8 +42,7 @@ do { my $x = {
                                    'Test::More' => '0.96',
                                    'Test::RequiresInternet' => '0',
                                    'if' => '0',
-                                   'strict' => '0',
-                                   'warnings' => '0'
+                                   'strict' => '0'
                                  }
                  }
      };

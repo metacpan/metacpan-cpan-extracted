@@ -25,7 +25,7 @@ for my $abbrev (@abbrev) {
     my $long = $record->long;
     ok($long && ! ref $long, "long is string: " . $long);
     my @abbr = $record->abbr;
-    ok($abbrev ~~ @abbr, "abbrev $abbrev included in '$long' abbreviations");
+    ok(grep { $_ eq $abbrev } @abbr, "abbrev $abbrev included in '$long' abbreviations");
     if (my $abbr1 = $record->abbr1) {
       ok(! ref $abbr1, "abbr1 is string: " . $abbr1);
     }
@@ -41,9 +41,6 @@ for my $long (@long) {
   for my $record (@records) {
     ok(ref $record && $record->isa('Business::CompanyDesignator::Record'), 'record isa Business::CompanyDesignator::Record');
     is($record->long, $long, "\$record->long is '$long'");
-    if (my @abbr = $record->abbr) {
-      ok(@abbr, "abbr is array: " . join(',', @abbr));
-    }
     if (my @abbr = $record->abbr) {
       ok(@abbr, "abbr is array: " . join(',', @abbr));
     }

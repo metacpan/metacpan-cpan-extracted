@@ -21,5 +21,6 @@ README
 SIGNATURE
 t/CSS-Struct-Output-Indent-ANSIColor/01-use.t
 t/CSS-Struct-Output-Indent-ANSIColor/02-version.t
+t/CSS-Struct-Output-Indent-ANSIColor/03-new.t
 xt/CSS-Struct-Output-Indent-ANSIColor/01-pod_coverage.t
 xt/CSS-Struct-Output-Indent-ANSIColor/02-pod.t

@@ -1,6 +1,6 @@
-package Email::Sender::Transport::SQLite;
+package Email::Sender::Transport::SQLite 1.500;
 # ABSTRACT: deliver mail to an sqlite db for testing
-$Email::Sender::Transport::SQLite::VERSION = '0.092003';
+
 use Moo;
 with 'Email::Sender::Transport';
 
@@ -181,7 +181,7 @@ Email::Sender::Transport::SQLite - deliver mail to an sqlite db for testing
 
 =head1 VERSION
 
-version 0.092003
+version 1.500
 
 =head1 DESCRIPTION
 
@@ -212,6 +212,16 @@ recipient to the F<recipients> table.
 
 Delivery to this transport should never fail.
 
+=head1 PERL VERSION SUPPORT
+
+This module has a long-term perl support period.  That means it will not
+require a version of perl released fewer than five years ago.
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
+
 =head1 METHODS
 
 =head2 retrieve_deliveries
@@ -231,11 +241,11 @@ More fields may be added in the future.
 
 =head1 AUTHOR
 
-Ricardo Signes <rjbs@cpan.org>
+Ricardo Signes <rjbs@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Ricardo Signes.
+This software is copyright (c) 2021 by Ricardo Signes.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

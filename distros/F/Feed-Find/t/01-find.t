@@ -9,10 +9,9 @@ use FindBin '$RealBin';
 
 use Feed::Find;
 
-my %html;
-
-$html{link} = get_file('link.html');
-$html{href} = get_file('href.html');
+my %html = map {
+  $_ => get_file("$_.html")
+} qw[ link href ];
 
 use constant BASE => 'http://example.com/';
 

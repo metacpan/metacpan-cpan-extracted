@@ -204,6 +204,18 @@ subtest 'define errors' => sub {
   );
 };
 
+subtest 'make constants with mixed case' => sub {
+  my $ffi = FFI::Platypus->new( api => 1 );
+
+  $ffi->load_custom_type('::Enum', 'enum1', { package => 'Foo3', casing => 'keep' },
+    'CrAzY',
+    'cOnStAnTs',
+  );
+
+  is(Foo3::CrAzY(), 0);
+  is(Foo3::cOnStAnTs(), 1);
+};
+
 sub dv
 {
   [ isdual $_[0] ? (int($_[0]), "$_[0]") : $_[0] ];

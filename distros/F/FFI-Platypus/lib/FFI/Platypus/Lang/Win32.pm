@@ -6,7 +6,7 @@ use 5.008004;
 use Config;
 
 # ABSTRACT: Documentation and tools for using Platypus with the Windows API
-our $VERSION = '1.43'; # VERSION
+our $VERSION = '1.46'; # VERSION
 
 
 sub abi
@@ -197,7 +197,7 @@ FFI::Platypus::Lang::Win32 - Documentation and tools for using Platypus with the
 
 =head1 VERSION
 
-version 1.43
+version 1.46
 
 =head1 SYNOPSIS
 
@@ -440,6 +440,8 @@ Diab Jerius (DJERIUS)
 Eric Brine (IKEGAMI)
 
 szTheory
+
+José Joaquín Atria (JJATRIA)
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -2,14 +2,14 @@ NAME
     Acme::CPANModules::Org - Modules related to Org format
 
 VERSION
-    This document describes version 0.003 of Acme::CPANModules::Org (from
-    Perl distribution Acme-CPANModules-Org), released on 2020-01-12.
+    This document describes version 0.004 of Acme::CPANModules::Org (from
+    Perl distribution Acme-CPANModules-Org), released on 2021-05-17.
 
 DESCRIPTION
-    Modules related to Org format.
-
-INCLUDED MODULES
+ACME::CPANMODULES ENTRIES
     *   App::org2wp
+
+    *   App::orgdaemon
 
     *   App::orgsel
 
@@ -40,9 +40,16 @@ INCLUDED MODULES
     *   Text::Table::Org
 
 FAQ
-  What are ways to use this module?
-    Aside from reading it, you can install all the listed modules using
-    cpanmodules:
+  What is an Acme::CPANModules::* module?
+    An Acme::CPANModules::* module, like this module, contains just a list
+    of module names that share a common characteristics. It is a way to
+    categorize modules and document CPAN. See Acme::CPANModules for more
+    details.
+
+  What are ways to use this Acme::CPANModules module?
+    Aside from reading this Acme::CPANModules module's POD documentation,
+    you can install all the listed modules (entries) using cpanmodules CLI
+    (from App::cpanmodules distribution):
 
         % cpanmodules ls-entries Org | cpanm -n
 
@@ -50,9 +57,13 @@ FAQ
 
         % perl -MAcme::CM::Get=Org -E'say $_->{module} for @{ $LIST->{entries} }' | cpanm -n
 
-    This module also helps lcpan produce a more meaningful result for "lcpan
-    related-mods" when it comes to finding related modules for the modules
-    listed in this Acme::CPANModules module.
+    or directly:
+
+        % perl -MAcme::CPANModules::Org -E'say $_->{module} for @{ $Acme::CPANModules::Org::LIST->{entries} }' | cpanm -n
+
+    This Acme::CPANModules module also helps lcpan produce a more meaningful
+    result for "lcpan related-mods" command when it comes to finding related
+    modules for the modules listed in this Acme::CPANModules module.
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -64,7 +75,7 @@ SOURCE
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website
-    <https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-Org>
+    <https://github.com/perlancar/perl-Acme-CPANModules-Org/issues>
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.
@@ -80,7 +91,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
+    This software is copyright (c) 2021, 2020, 2019 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

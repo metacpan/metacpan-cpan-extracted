@@ -1,14 +1,53 @@
 use strict;
 use warnings;
 package Sub::Exporter::Util;
-{
-  $Sub::Exporter::Util::VERSION = '0.987';
-}
 # ABSTRACT: utilities to make Sub::Exporter easier
-
+$Sub::Exporter::Util::VERSION = '0.988';
 use Data::OptList ();
 use Params::Util ();
 
+#pod =head1 DESCRIPTION
+#pod
+#pod This module provides a number of utility functions for performing common or
+#pod useful operations when setting up a Sub::Exporter configuration.  All of the
+#pod utilities may be exported, but none are by default.
+#pod
+#pod =head1 THE UTILITIES
+#pod
+#pod =head2 curry_method
+#pod
+#pod   exports => {
+#pod     some_method => curry_method,
+#pod   }
+#pod
+#pod This utility returns a generator which will produce an invocant-curried version
+#pod of a method.  In other words, it will export a method call with the exporting
+#pod class built in as the invocant.
+#pod
+#pod A module importing the code some the above example might do this:
+#pod
+#pod   use Some::Module qw(some_method);
+#pod
+#pod   my $x = some_method;
+#pod
+#pod This would be equivalent to:
+#pod
+#pod   use Some::Module;
+#pod
+#pod   my $x = Some::Module->some_method;
+#pod
+#pod If Some::Module is subclassed and the subclass's import method is called to
+#pod import C<some_method>, the subclass will be curried in as the invocant.
+#pod
+#pod If an argument is provided for C<curry_method> it is used as the name of the
+#pod curried method to export.  This means you could export a Widget constructor
+#pod like this:
+#pod
+#pod   exports => { widget => curry_method('new') }
+#pod
+#pod This utility may also be called as C<curry_class>, for backwards compatibility.
+#pod
+#pod =cut
 
 sub curry_method {
   my $override_name = shift;
@@ -21,6 +60,36 @@ sub curry_method {
 
 BEGIN { *curry_class = \&curry_method; }
 
+#pod =head2 curry_chain
+#pod
+#pod C<curry_chain> behaves like C<L</curry_method>>, but is meant for generating
+#pod exports that will call several methods in succession.
+#pod
+#pod   exports => {
+#pod     reticulate => curry_chain(
+#pod       new => gather_data => analyze => [ detail => 100 ] => 'results'
+#pod     ),
+#pod   }
+#pod
+#pod If imported from Spliner, calling the C<reticulate> routine will be equivalent
+#pod to:
+#pod
+#pod   Spliner->new->gather_data->analyze(detail => 100)->results;
+#pod
+#pod If any method returns something on which methods may not be called, the routine
+#pod croaks.
+#pod
+#pod The arguments to C<curry_chain> form an optlist.  The names are methods to be
+#pod called and the arguments, if given, are arrayrefs to be dereferenced and passed
+#pod as arguments to those methods.  C<curry_chain> returns a generator like those
+#pod expected by Sub::Exporter.
+#pod
+#pod B<Achtung!> at present, there is no way to pass arguments from the generated
+#pod routine to the method calls.  This will probably be solved in future revisions
+#pod by allowing the opt list's values to be subroutines that will be called with
+#pod the generated routine's stack.
+#pod
+#pod =cut
 
 sub curry_chain {
   # In the future, we can make \%arg an optional prepend, like the "special"
@@ -100,6 +169,22 @@ sub curry_chain {
 #   return %map;
 # }
 
+#pod =head2 merge_col
+#pod
+#pod   exports => {
+#pod     merge_col(defaults => {
+#pod       twiddle => \'_twiddle_gen',
+#pod       tweak   => \&_tweak_gen,
+#pod     }),
+#pod   }
+#pod
+#pod This utility wraps the given generator in one that will merge the named
+#pod collection into its args before calling it.  This means that you can support a
+#pod "default" collector in multiple exports without writing the code each time.
+#pod
+#pod You can specify as many pairs of collection names and generators as you like.
+#pod
+#pod =cut
 
 sub merge_col {
   my (%groups) = @_;
@@ -127,6 +212,22 @@ sub merge_col {
   return %merged;
 }
 
+#pod =head2 mixin_installer
+#pod
+#pod   use Sub::Exporter -setup => {
+#pod     installer => Sub::Exporter::Util::mixin_installer,
+#pod     exports   => [ qw(foo bar baz) ],
+#pod   };
+#pod
+#pod This utility returns an installer that will install into a superclass and
+#pod adjust the ISA importing class to include the newly generated superclass.
+#pod
+#pod If the target of importing is an object, the hierarchy is reversed: the new
+#pod class will be ISA the object's class, and the object will be reblessed.
+#pod
+#pod B<Prerequisites>: This utility requires that Package::Generator be installed.
+#pod
+#pod =cut
 
 sub __mixin_class_for {
   my ($class, $mix_into) = @_;
@@ -164,6 +265,27 @@ sub mixin_exporter {
   return mixin_installer;
 }
 
+#pod =head2 like
+#pod
+#pod It's a collector that adds imports for anything like given regex.
+#pod
+#pod If you provide this configuration:
+#pod
+#pod   exports    => [ qw(igrep imap islurp exhausted) ],
+#pod   collectors => { -like => Sub::Exporter::Util::like },
+#pod
+#pod A user may import from your module like this:
+#pod
+#pod   use Your::Iterator -like => qr/^i/; # imports igre, imap, islurp
+#pod
+#pod or
+#pod
+#pod   use Your::Iterator -like => [ qr/^i/ => { -prefix => 'your_' } ];
+#pod
+#pod The group-like prefix and suffix arguments are respected; other arguments are
+#pod passed on to the generators for matching exports.
+#pod
+#pod =cut
 
 sub like {
   sub {
@@ -212,19 +334,31 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Sub::Exporter::Util - utilities to make Sub::Exporter easier
 
 =head1 VERSION
 
-version 0.987
+version 0.988
 
 =head1 DESCRIPTION
 
 This module provides a number of utility functions for performing common or
 useful operations when setting up a Sub::Exporter configuration.  All of the
 utilities may be exported, but none are by default.
+
+=head1 PERL VERSION SUPPORT
+
+This module has a long-term perl support period.  That means it will not
+require a version of perl released fewer than five years ago.
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
 
 =head1 THE UTILITIES
 
@@ -342,7 +476,7 @@ passed on to the generators for matching exports.
 
 =head1 AUTHOR
 
-Ricardo Signes <rjbs@cpan.org>
+Ricardo Signes <rjbs@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

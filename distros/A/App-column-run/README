@@ -3,42 +3,72 @@ NAME
     multiple columns
 
 VERSION
-    This document describes version 0.002 of App::column::run (from Perl
-    distribution App-column-run), released on 2020-06-06.
+    This document describes version 0.004 of App::column::run (from Perl
+    distribution App-column-run), released on 2021-06-25.
+
+DESCRIPTION
+    Sample screenshots:
 
 FUNCTIONS
   column_run
     Usage:
 
-     column_run(%args) -> [status, msg, payload, meta]
+     column_run(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
     Run several commands and show their output in multiple columns.
 
     This utility is similar to using the Unix utility pr to columnate
     output, something like (in bash):
 
-     % pr -t -m -w $COLUMNS -l 99999 <(command1 args...) <(command2 args...)
+     % pr -T -m -w $COLUMNS <(command1 args...) <(command2 args...)
 
-    except with the following features:
+    except with the following differences:
 
-    *   ANSI color and wide character handling
+    *   commands are run in sequence, not in parallel (although parallel
+        execution is a TODO list item);
+
+    *   all output are collected first, then displayed (although streaming
+        output is a TODO list item);
+
+    *   multiplexing STDIN to all commands;
+
+    *   ANSI color and wide character handling;
 
     *   passing adjusted COLUMNS environment to commands so they can adjust
-        output
+        output;
 
-    *   Passing common arguments to all commands
-
-    *   Multiplexing STDIN to all commands
+    *   passing common arguments and environment variables to all commands
+        (as well as allowing each command to have its unique arguments or
+        environment variables).
 
     This function is not exported.
 
     Arguments ('*' denotes required arguments):
 
-    *   args => *array[str]*
+    *   args_arrays => *array[aos]*
 
-        Common arguments to pass to each program.
+        Arguments to give to each command (an array of arrays of strings).
+
+        If "--common-args" is also set, then the common arguments will be
+        added first, then the per-command arguments.
 
     *   commands* => *array[str]*
+
+    *   common_args => *array[str]*
+
+        Common arguments to pass to each command.
+
+        If "--args-arrays" is also set, then the common arguments will be
+        added first, then the per-command arguments.
+
+    *   common_envs => *hash*
+
+        Common environment variables to pass to each command.
+
+    *   envs_arrays => *array[hos]*
+
+        Environment variables to give to each command (an array of hashes of
+        strings).
 
     *   linum_width => *posint*
 
@@ -58,12 +88,15 @@ FUNCTIONS
 
     Returns an enveloped result (an array).
 
-    First element (status) is an integer containing HTTP status code (200
-    means OK, 4xx caller error, 5xx function error). Second element (msg) is
-    a string containing error message, or 'OK' if status is 200. Third
-    element (payload) is optional, the actual result. Fourth element (meta)
-    is called result metadata and is optional, a hash that contains extra
-    information.
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
 
     Return value: (any)
 
@@ -83,17 +116,15 @@ BUGS
     to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-    pr. Perinci::To::POD=HASH(0x55c267e37168).
+    Terminal multiplexers: tmux, screen.
 
-    column. Perinci::To::POD=HASH(0x55c267e37168).
-
-    diff. Perinci::To::POD=HASH(0x55c267e37168).
+    Terminal emulator with multiple tabs, e.g. Konsole, GNOME Terminal.
 
 AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2020 by perlancar@cpan.org.
+    This software is copyright (c) 2021, 2020 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

@@ -1,0 +1,29 @@
+Revision history for Pod-Simple-Words},
+
+0.07      2021-06-24 00:37:42 -0600
+  - First CPAN release
+
+0.06      2021-04-18 16:32:12 -0600
+  - Add splitter property.  This is a Text::HumanComputerWords
+    instance by default, but anything with a compatible split
+    method can be used.  (gh#10)
+
+0.05      2021-04-04 15:08:19 -0600
+  - Added section events (gh#6)
+
+0.04      2021-04-04 11:49:06 -0600
+  - Breaking change: links are provided as a array ref pair,
+    the first being the URL/podname/manname and the second
+    being the fragment/section to link to.  Either can be
+    undef depending.  (gh#5)
+
+0.03      2021-04-04 06:42:28 -0600
+  - Link parsing improvements to reduce false negatives (gh#3)
+
+0.02      2021-03-30 10:13:20 -0600
+  - Add skip_sections method (gh#2)
+
+0.01      2021-03-29 16:39:44 -0600
+  - initial version
+
+

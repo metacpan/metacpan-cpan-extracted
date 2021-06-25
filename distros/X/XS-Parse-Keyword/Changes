@@ -1,5 +1,21 @@
 Revision history for XS-Parse-Keyword
 
+0.08    2021-06-17
+        [CHANGES]
+         * Support probe in XPK_CHOICE and XPK_TAGGEDCHOICE
+
+        [BUGFIXES]
+         * Remember to mask off the typeflags in probe_piece()
+
+0.07    2021-06-16
+        [CHANGES]
+         * Added XPK_BLOCK_VOIDCTX and XPK_TERMEXPR_VOIDCTX
+         * Undocumented the _flags() variants of XPK_BLOCK and XPK_TERMEXPR,
+           and all the flags for them
+         * Support probing in XPK_BLOCK
+         * (undocumented) trial to see if all supported platforms support
+           anonymous unions
+
 0.06    2021-06-01
         [BREAKING CHANGES]
          * ABI version is now 1 - this will require a from-source rebuild of

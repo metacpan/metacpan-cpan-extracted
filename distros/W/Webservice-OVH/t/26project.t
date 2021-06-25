@@ -18,7 +18,7 @@ ok( $api, "module ok" );
 
 # Get example project
 my $project = $api->cloud->projects->[0];
-
+=head2
 SKIP: {
 
     skip "No project exists for given account" unless $project;
@@ -89,5 +89,5 @@ SKIP: {
     ok( $project->network && ref $project->network eq 'Webservice::OVH::Cloud::Project::Network', 'network ok' );
     ok( $project->ip      && ref $project->ip eq 'Webservice::OVH::Cloud::Project::IP',           'ip ok' );
 }
-
+=cut
 done_testing();

@@ -1,231 +1,294 @@
-#!perl -T -w
+#!/usr/bin/perl -T -w
 
 use strict;
 use warnings;
 
-use Test::More tests => 9 + 188; # 9 + 14*9 + 6 + 22;
+use Test::More;
 use Asm::X86 qw(
 	@regs8_intel @regs16_intel @segregs_intel @regs32_intel @regs64_intel
 	@regs_mm_intel @regs_intel @regs_fpu_intel @regs_opmask_intel
+
 	is_reg_intel is_reg8_intel is_reg16_intel is_reg32_intel is_reg64_intel
 	is_reg_mm_intel is_segreg_intel is_reg_fpu_intel is_reg_opmask_intel
 	is_addressable32_intel is_r32_in64_intel
-	);
 
-cmp_ok ( $#regs8_intel,   '>', 0, "Non-empty 8-bit register list" );
-cmp_ok ( $#regs16_intel,  '>', 0, "Non-empty 16-bit register list" );
-cmp_ok ( $#segregs_intel, '>', 0, "Non-empty segment register list" );
-cmp_ok ( $#regs32_intel,  '>', 0, "Non-empty 32-bit register list" );
-cmp_ok ( $#regs64_intel,  '>', 0, "Non-empty 64-bit register list" );
-cmp_ok ( $#regs_mm_intel, '>', 0, "Non-empty multimedia register list" );
-cmp_ok ( $#regs_fpu_intel,'>', 0, "Non-empty FPU register list" );
-cmp_ok ( $#regs_opmask_intel,'>', 0, "Non-empty opmask register list" );
-cmp_ok ( $#regs_intel,    '>', 0, "Non-empty register list" );
+	is_reg_att is_reg8_att is_reg16_att is_reg32_att is_reg64_att
+	is_reg_mm_att is_segreg_att is_reg_fpu_att is_reg_opmask_att
+	is_addressable32_att is_r32_in64_att
 
-is ( is_reg_intel   ("AL"), 1, "AL is a register" );
-is ( is_reg8_intel  ("AL"), 1, "AL is an 8-bit register" );
-is ( is_reg16_intel ("AL"), 0, "AL is a 16-bit register" );
-is ( is_reg32_intel ("AL"), 0, "AL is a 32-bit register" );
-is ( is_reg64_intel ("AL"), 0, "AL is a 64-bit register" );
-is ( is_reg_mm_intel("AL"), 0, "AL is a multimedia register" );
-is ( is_segreg_intel("AL"), 0, "AL is a segment register" );
-is ( is_reg_fpu_intel("AL"), 0, "AL is an FPU register" );
-is ( is_reg_opmask_intel("AL"), 0, "AL is an opmask register" );
+	is_reg is_reg8 is_reg16 is_reg32 is_reg64
+	is_reg_mm is_segreg is_reg_fpu is_reg_opmask
+	is_addressable32 is_r32_in64
+);
 
-is ( is_reg_intel   ("r15b"), 1, "r15b is a register" );
-is ( is_reg8_intel  ("r15b"), 1, "r15b is an 8-bit register" );
-is ( is_reg16_intel ("r15b"), 0, "r15b is a 16-bit register" );
-is ( is_reg32_intel ("r15b"), 0, "r15b is a 32-bit register" );
-is ( is_reg64_intel ("r15b"), 0, "r15b is a 64-bit register" );
-is ( is_reg_mm_intel("r15b"), 0, "r15b is a multimedia register" );
-is ( is_segreg_intel("r15b"), 0, "r15b is a segment register" );
-is ( is_reg_fpu_intel("r15b"), 0, "r15b is an FPU register" );
-is ( is_reg_opmask_intel("r15b"), 0, "r15b is an opmask register" );
+my @addressable32 = (
+		'eax',	'ebx', 'ecx', 'edx', 'esi', 'edi', 'esp', 'ebp',
+);
 
-is ( is_reg_intel   ("AX"), 1, "AX is a register" );
-is ( is_reg8_intel  ("AX"), 0, "AX is an 8-bit register" );
-is ( is_reg16_intel ("AX"), 1, "AX is a 16-bit register" );
-is ( is_reg32_intel ("AX"), 0, "AX is a 32-bit register" );
-is ( is_reg64_intel ("AX"), 0, "AX is a 64-bit register" );
-is ( is_reg_mm_intel("AX"), 0, "AX is a multimedia register" );
-is ( is_segreg_intel("AX"), 0, "AX is a segment register" );
-is ( is_reg_fpu_intel("AX"), 0, "AX is an FPU register" );
-is ( is_reg_opmask_intel("AX"), 0, "AX is an opmask register" );
+my @r32_in64 = (
+		'r8d', 'r8l', 'r9d', 'r9l', 'r10d', 'r10l', 'r11d', 'r11l',
+		'r12d', 'r12l', 'r13d', 'r13l', 'r14d', 'r14l', 'r15d', 'r15l',
+);
 
-is ( is_reg_intel   ("r10w"), 1, "r10w is a register" );
-is ( is_reg8_intel  ("r10w"), 0, "r10w is an 8-bit register" );
-is ( is_reg16_intel ("r10w"), 1, "r10w is a 16-bit register" );
-is ( is_reg32_intel ("r10w"), 0, "r10w is a 32-bit register" );
-is ( is_reg64_intel ("r10w"), 0, "r10w is a 64-bit register" );
-is ( is_reg_mm_intel("r10w"), 0, "r10w is a multimedia register" );
-is ( is_segreg_intel("r10w"), 0, "r10w is a segment register" );
-is ( is_reg_fpu_intel("r10w"), 0, "r10w is an FPU register" );
-is ( is_reg_opmask_intel("r10w"), 0, "r10w is an opmask register" );
+my @invalid_regs = ('axmm6', 'cax', 'abx', 'dal', 'ald', 'rsid',
+	'eabx', 'ceax', 'ebxc', 'amm1', 'mm30', 'r15db',
+	'ar15d', 'ads', 'esx', 'ast0',
+	'st5b', 'k02', 'cal', 'dax', 'reax', 'amm0', 'xmm',
+	'ymm', 'zmm', 'k12', 'axh', 'eaxl', 'r10ld', 'mm0l',
+	'xmm0d', 'ymm0l', 'zmm0d', 'k3l', '[eax', 'eax]'
+);
 
-is ( is_reg_intel   ("EBX"), 1, "EBX is a register" );
-is ( is_reg8_intel  ("EBX"), 0, "EBX is an 8-bit register" );
-is ( is_reg16_intel ("EBX"), 0, "EBX is a 16-bit register" );
-is ( is_reg32_intel ("EBX"), 1, "EBX is a 32-bit register" );
-is ( is_reg64_intel ("EBX"), 0, "EBX is a 64-bit register" );
-is ( is_reg_mm_intel("EBX"), 0, "EBX is a multimedia register" );
-is ( is_segreg_intel("EBX"), 0, "EBX is a segment register" );
-is ( is_reg_fpu_intel("EBX"), 0, "EBX is an FPU register" );
-is ( is_reg_opmask_intel("EBX"), 0, "EBX is an opmask register" );
+# Test::More:
+plan tests => 9
+	+ (@regs8_intel + 1) * 33
+	+ (@regs16_intel + 1) * 31 + 33
+	+ (@regs32_intel + 1) * 29 + 31 + 31
+	+ (@regs64_intel + 1) * 33
+	+ (@regs_mm_intel + 4) * 33
+	+ (@regs_fpu_intel + 1) * 33
+	+ (@segregs_intel + 1) * 33
+	+ (@regs_opmask_intel + 1) * 33
+	+ @addressable32 * 33
+	+ (@r32_in64 + 1) * 33
+	+ @invalid_regs * 33
+	;
 
-is ( is_reg_intel   ("r8l"), 1, "r8l is a register" );
-is ( is_reg8_intel  ("r8l"), 0, "r8l is an 8-bit register" );
-is ( is_reg16_intel ("r8l"), 0, "r8l is a 16-bit register" );
-is ( is_reg32_intel ("r8l"), 1, "r8l is a 32-bit register" );
-is ( is_reg64_intel ("r8l"), 0, "r8l is a 64-bit register" );
-is ( is_reg_mm_intel("r8l"), 0, "r8l is a multimedia register" );
-is ( is_segreg_intel("r8l"), 0, "r8l is a segment register" );
-is ( is_reg_fpu_intel("r8l"), 0, "r8l is an FPU register" );
-is ( is_reg_opmask_intel("r8l"), 0, "r8l is an opmask register" );
+cmp_ok ( $#regs8_intel,   '>', 0, 'Non-empty 8-bit register list' );
+cmp_ok ( $#regs16_intel,  '>', 0, 'Non-empty 16-bit register list' );
+cmp_ok ( $#segregs_intel, '>', 0, 'Non-empty segment register list' );
+cmp_ok ( $#regs32_intel,  '>', 0, 'Non-empty 32-bit register list' );
+cmp_ok ( $#regs64_intel,  '>', 0, 'Non-empty 64-bit register list' );
+cmp_ok ( $#regs_mm_intel, '>', 0, 'Non-empty multimedia register list' );
+cmp_ok ( $#regs_fpu_intel,'>', 0, 'Non-empty FPU register list' );
+cmp_ok ( $#regs_opmask_intel,'>', 0, 'Non-empty opmask register list' );
+cmp_ok ( $#regs_intel,    '>', 0, 'Non-empty register list' );
 
-is ( is_reg_intel   ("rdi"), 1, "rdi is a register" );
-is ( is_reg8_intel  ("rdi"), 0, "rdi is an 8-bit register" );
-is ( is_reg16_intel ("rdi"), 0, "rdi is a 16-bit register" );
-is ( is_reg32_intel ("rdi"), 0, "rdi is a 32-bit register" );
-is ( is_reg64_intel ("rdi"), 1, "rdi is a 64-bit register" );
-is ( is_reg_mm_intel("rdi"), 0, "rdi is a multimedia register" );
-is ( is_segreg_intel("rdi"), 0, "rdi is a segment register" );
-is ( is_reg_fpu_intel("rdi"), 0, "rdi is an FPU register" );
-is ( is_reg_opmask_intel("rdi"), 0, "rdi is an opmask register" );
+my ($name_reg, $name_reg8, $name_reg16, $name_reg32, $name_reg64,
+	$name_reg_mm, $name_reg_seg, $name_reg_fpu, $name_reg_opmask,
+	$name_reg_add32, $name_reg32_64)
+= ('reg', 'reg8', 'reg16', 'reg32', 'reg64', 'regmm', 'segreg', 'fpureg',
+	'opmaskreg', 'reg_address32', 'reg32_in_64');
 
-is ( is_reg_intel   ("xmm9"), 1, "xmm9 is a register" );
-is ( is_reg8_intel  ("xmm9"), 0, "xmm9 is an 8-bit register" );
-is ( is_reg16_intel ("xmm9"), 0, "xmm9 is a 16-bit register" );
-is ( is_reg32_intel ("xmm9"), 0, "xmm9 is a 32-bit register" );
-is ( is_reg64_intel ("xmm9"), 0, "xmm9 is a 64-bit register" );
-is ( is_reg_mm_intel("xmm9"), 1, "xmm9 is a multimedia register" );
-is ( is_segreg_intel("xmm9"), 0, "xmm9 is a segment register" );
-is ( is_reg_fpu_intel("xmm9"), 0, "xmm9 is an FPU register" );
-is ( is_reg_opmask_intel("xmm9"), 0, "xmm9 is an opmask register" );
+sub check_reg_intel($$) {
 
-is ( is_reg_intel   ("mm6"), 1, "mm6 is a register" );
-is ( is_reg8_intel  ("mm6"), 0, "mm6 is an 8-bit register" );
-is ( is_reg16_intel ("mm6"), 0, "mm6 is a 16-bit register" );
-is ( is_reg32_intel ("mm6"), 0, "mm6 is a 32-bit register" );
-is ( is_reg64_intel ("mm6"), 0, "mm6 is a 64-bit register" );
-is ( is_reg_mm_intel("mm6"), 1, "mm6 is a multimedia register" );
-is ( is_segreg_intel("mm6"), 0, "mm6 is a segment register" );
-is ( is_reg_fpu_intel("mm6"), 0, "mm6 is an FPU register" );
-is ( is_reg_opmask_intel("mm6"), 0, "mm6 is an opmask register" );
+	my $regs = shift;
+	my $types = shift;
+	foreach my $r (@$regs) {
 
-is ( is_reg_intel   ("st0"), 1, "st0 is a register" );
-is ( is_reg8_intel  ("st0"), 0, "st0 is an 8-bit register" );
-is ( is_reg16_intel ("st0"), 0, "st0 is a 16-bit register" );
-is ( is_reg32_intel ("st0"), 0, "st0 is a 32-bit register" );
-is ( is_reg64_intel ("st0"), 0, "st0 is a 64-bit register" );
-is ( is_reg_mm_intel("st0"), 0, "st0 is a multimedia register" );
-is ( is_segreg_intel("st0"), 0, "st0 is a segment register" );
-is ( is_reg_fpu_intel("st0"), 1, "st0 is an FPU register" );
-is ( is_reg_opmask_intel("st0"), 0, "st0 is an opmask register" );
+		is ( is_reg_intel ($r), $$types{$name_reg}, "'$r' is a valid Intel-syntax register" ) if defined $$types{$name_reg};
+		is ( is_reg8_intel ($r), $$types{$name_reg8}, "'$r' is a valid Intel-syntax 8-bit register" ) if defined $$types{$name_reg8};
+		is ( is_reg16_intel ($r), $$types{$name_reg16}, "'$r' is a valid Intel-syntax 16-bit register" ) if defined $$types{$name_reg16};
+		is ( is_reg32_intel ($r), $$types{$name_reg32}, "'$r' is a valid Intel-syntax 32-bit register" ) if defined $$types{$name_reg32};
+		is ( is_reg64_intel ($r), $$types{$name_reg64}, "'$r' is a valid Intel-syntax 64-bit register" ) if defined $$types{$name_reg64};
+		is ( is_reg_mm_intel ($r), $$types{$name_reg_mm}, "'$r' is a valid Intel-syntax multimedia register" ) if defined $$types{$name_reg_mm};
+		is ( is_segreg_intel ($r), $$types{$name_reg_seg}, "'$r' is a valid Intel-syntax segment register" ) if defined $$types{$name_reg_seg};
+		is ( is_reg_fpu_intel ($r), $$types{$name_reg_fpu}, "'$r' is a valid Intel-syntax FPU register" ) if defined $$types{$name_reg_fpu};
+		is ( is_reg_opmask_intel ($r), $$types{$name_reg_opmask}, "'$r' is a valid Intel-syntax opmask register" )
+			if defined $$types{$name_reg_opmask};
+		is ( is_addressable32_intel ($r), $$types{$name_reg_add32}, "'$r' is a valid Intel-syntax 32-bit register which can be used for 32-bit addressing" )
+			if defined $$types{$name_reg_add32};
+		is ( is_r32_in64_intel ($r), $$types{$name_reg32_64}, "'$r' is a valid Intel-syntax 32-in-64-bit register" )
+			if defined $$types{$name_reg32_64};
 
-is ( is_reg_intel   ("cs"), 1, "cs is a register" );
-is ( is_reg8_intel  ("ds"), 0, "ds is an 8-bit register" );
-is ( is_reg16_intel ("Es"), 1, "Es is a 16-bit register" );
-is ( is_reg32_intel ("ss"), 0, "ss is a 32-bit register" );
-is ( is_reg64_intel ("fS"), 0, "fS is a 64-bit register" );
-is ( is_reg_mm_intel("gs"), 0, "gs is a multimedia register" );
-is ( is_segreg_intel("cs"), 1, "cs is a segment register" );
-is ( is_reg_fpu_intel("ds"), 0, "ds is an FPU register" );
-is ( is_reg_opmask_intel("ds"), 0, "ds is an opmask register" );
+		# always invalid in AT&T syntax:
+		is ( is_reg_att ($r), 0, "'$r' is a valid AT&T-syntax register" );
+		is ( is_reg8_att ($r), 0, "'$r' is a valid AT&T-syntax 8-bit register" );
+		is ( is_reg16_att ($r), 0, "'$r' is a valid AT&T-syntax 16-bit register" );
+		is ( is_reg32_att ($r), 0, "'$r' is a valid AT&T-syntax 32-bit register" );
+		is ( is_reg64_att ($r), 0, "'$r' is a valid AT&T-syntax 64-bit register" );
+		is ( is_reg_mm_att ($r), 0, "'$r' is a valid AT&T-syntax multimedia register" );
+		is ( is_segreg_att ($r), 0, "'$r' is a valid AT&T-syntax segment register" );
+		is ( is_reg_fpu_att ($r), 0, "'$r' is a valid AT&T-syntax FPU register" );
+		is ( is_reg_opmask_att ($r), 0, "'$r' is a valid AT&T-syntax opmask register" );
+		is ( is_addressable32_att ($r), 0, "'$r' is a valid AT&T-syntax 32-bit register which can be used for 32-bit addressing" );
+		is ( is_r32_in64_att ($r), 0, "'$r' is a valid AT&T-syntax 32-in-64-bit register" );
 
-is ( is_segreg_intel("cs"), 1, "cs is a segment register" );
-is ( is_segreg_intel("ds"), 1, "ds is a segment register" );
-is ( is_segreg_intel("Es"), 1, "Es is a segment register" );
-is ( is_segreg_intel("ss"), 1, "ss is a segment register" );
-is ( is_segreg_intel("fS"), 1, "fS is a segment register" );
-is ( is_segreg_intel("gs"), 1, "gs is a segment register" );
+		is ( is_reg ($r), $$types{$name_reg}, "'$r' is a valid register" ) if defined $$types{$name_reg};
+		is ( is_reg8 ($r), $$types{$name_reg8}, "'$r' is a valid 8-bit register" ) if defined $$types{$name_reg8};
+		is ( is_reg16 ($r), $$types{$name_reg16}, "'$r' is a valid 16-bit register" ) if defined $$types{$name_reg16};
+		is ( is_reg32 ($r), $$types{$name_reg32}, "'$r' is a valid 32-bit register" ) if defined $$types{$name_reg32};
+		is ( is_reg64 ($r), $$types{$name_reg64}, "'$r' is a valid 64-bit register" ) if defined $$types{$name_reg64};
+		is ( is_reg_mm ($r), $$types{$name_reg_mm}, "'$r' is a valid multimedia register" ) if defined $$types{$name_reg_mm};
+		is ( is_segreg ($r), $$types{$name_reg_seg}, "'$r' is a valid segment register" ) if defined $$types{$name_reg_seg};
+		is ( is_reg_fpu ($r), $$types{$name_reg_fpu}, "'$r' is a valid FPU register" ) if defined $$types{$name_reg_fpu};
+		is ( is_reg_opmask ($r), $$types{$name_reg_opmask}, "'$r' is a valid opmask register" ) if defined $$types{$name_reg_opmask};
+		is ( is_addressable32 ($r), $$types{$name_reg_add32}, "'$r' is a valid 32-bit register which can be used for 32-bit addressing" )
+			if defined $$types{$name_reg_add32};
+		is ( is_r32_in64 ($r), $$types{$name_reg32_64}, "'$r' is a valid 32-in-64-bit register" ) if defined $$types{$name_reg32_64};
+	}
+}
 
-is ( is_reg_intel   ("ymm0"), 1, "ymm0 is a register" );
-is ( is_reg8_intel  ("ymm0"), 0, "ymm0 is an 8-bit register" );
-is ( is_reg16_intel ("ymm0"), 0, "ymm0 is a 16-bit register" );
-is ( is_reg32_intel ("ymm0"), 0, "ymm0 is a 32-bit register" );
-is ( is_reg64_intel ("ymm0"), 0, "ymm0 is a 64-bit register" );
-is ( is_reg_mm_intel("ymm0"), 1, "ymm0 is a multimedia register" );
-is ( is_segreg_intel("ymm0"), 0, "ymm0 is a segment register" );
-is ( is_reg_fpu_intel("ymm0"), 0, "ymm0 is an FPU register" );
-is ( is_reg_opmask_intel("ymm0"), 0, "ymm0 is an opmask register" );
+my %reg_tests = ();
 
-is ( is_reg_intel   ("zmm0"), 1, "zmm0 is a register" );
-is ( is_reg8_intel  ("zmm0"), 0, "zmm0 is an 8-bit register" );
-is ( is_reg16_intel ("zmm0"), 0, "zmm0 is a 16-bit register" );
-is ( is_reg32_intel ("zmm0"), 0, "zmm0 is a 32-bit register" );
-is ( is_reg64_intel ("zmm0"), 0, "zmm0 is a 64-bit register" );
-is ( is_reg_mm_intel("zmm0"), 1, "zmm0 is a multimedia register" );
-is ( is_segreg_intel("zmm0"), 0, "zmm0 is a segment register" );
-is ( is_reg_fpu_intel("zmm0"), 0, "zmm0 is an FPU register" );
-is ( is_reg_opmask_intel("zmm0"), 0, "zmm0 is an opmask register" );
+# NOTE: we add some default example register to (almost) each group
+# to avoid the case when something bad happens to the exported array.
 
-is ( is_reg_intel   ("k1"), 1, "k1 is a register" );
-is ( is_reg8_intel  ("k1"), 0, "k1 is an 8-bit register" );
-is ( is_reg16_intel ("k1"), 0, "k1 is a 16-bit register" );
-is ( is_reg32_intel ("k1"), 0, "k1 is a 32-bit register" );
-is ( is_reg64_intel ("k1"), 0, "k1 is a 64-bit register" );
-is ( is_reg_mm_intel("k1"), 0, "k1 is a multimedia register" );
-is ( is_segreg_intel("k1"), 0, "k1 is a segment register" );
-is ( is_reg_fpu_intel("k1"), 0, "k1 is an FPU register" );
-is ( is_reg_opmask_intel("k1"), 1, "k1 is an opmask register" );
+$reg_tests{$name_reg} = 1;
+$reg_tests{$name_reg8} = 1;
+$reg_tests{$name_reg16} = 0;
+$reg_tests{$name_reg32} = 0;
+$reg_tests{$name_reg64} = 0;
+$reg_tests{$name_reg_mm} = 0;
+$reg_tests{$name_reg_seg} = 0;
+$reg_tests{$name_reg_fpu} = 0;
+$reg_tests{$name_reg_opmask} = 0;
+$reg_tests{$name_reg_add32} = 0;
+$reg_tests{$name_reg32_64} = 0;
 
-is ( is_reg_intel   ("axmm6"), 0, "axmm6 is a register" );
-is ( is_reg_intel   ("cax"), 0, "cax is a register" );
-is ( is_reg_intel   ("abx"), 0, "abx is a register" );
-is ( is_reg_intel   ("dal"), 0, "dal is a register" );
-is ( is_reg_intel   ("ald"), 0, "ald is a register" );
-is ( is_reg_intel   ("rsid"), 0, "rsid is a register" );
-is ( is_reg_intel   ("eabx"), 0, "eabx is a register" );
-is ( is_reg_intel   ("ceax"), 0, "ceax is a register" );
-is ( is_reg_intel   ("ebxc"), 0, "ebxc is a register" );
-is ( is_reg_intel   ("amm1"), 0, "amm1 is a register" );
-is ( is_reg_intel   ("mm30"), 0, "mm30 is a register" );
-is ( is_reg_intel   ("r15db"), 0, "r15db is a register" );
-is ( is_reg_intel   ("ar15d"), 0, "ar15d is a register" );
-is ( is_segreg_intel("ads"), 0, "ads is a segment register" );
-is ( is_segreg_intel("esx"), 0, "esx is a segment register" );
-is ( is_reg_fpu_intel("ast0"), 0, "ast0 is an FPU register" );
-is ( is_reg_fpu_intel("st5b"), 0, "st5b is an FPU register" );
-is ( is_reg_intel   ("ads"), 0, "ads is a register" );
-is ( is_reg_intel   ("esx"), 0, "esx is a register" );
-is ( is_reg_intel   ("ast0"), 0, "ast0 is a register" );
-is ( is_reg_intel   ("st5b"), 0, "st5b is a register" );
-is ( is_reg_intel   ("k02"), 0, "k02 is a register" );
+check_reg_intel ([@regs8_intel, 'al'], \%reg_tests);
 
-is ( is_addressable32_intel ("al"), 0, "AL can be used for addressing" );
-is ( is_addressable32_intel ("ax"), 0, "AX can be used for addressing" );
-is ( is_addressable32_intel ("eax"), 1, "EAX can be used for addressing" );
-is ( is_addressable32_intel ("mm0"), 0, "MM0 can be used for addressing" );
-is ( is_addressable32_intel ("xmm0"), 0, "XMM0 can be used for addressing" );
-is ( is_addressable32_intel ("ymm0"), 0, "YMM0 can be used for addressing" );
-is ( is_addressable32_intel ("zmm0"), 0, "ZMM0 can be used for addressing" );
-is ( is_addressable32_intel ("k2"), 0, "K2 can be used for addressing" );
+$reg_tests{$name_reg} = 1;
+$reg_tests{$name_reg8} = 0;
+$reg_tests{$name_reg16} = 1;
+$reg_tests{$name_reg32} = 0;
+$reg_tests{$name_reg64} = 0;
+$reg_tests{$name_reg_mm} = 0;
+# NOTE: some 16-bit registers are segment registers
+$reg_tests{$name_reg_seg} = undef;
+$reg_tests{$name_reg_fpu} = 0;
+$reg_tests{$name_reg_opmask} = 0;
+$reg_tests{$name_reg_add32} = 0;
+$reg_tests{$name_reg32_64} = 0;
 
-is ( is_addressable32_intel ("cal"), 0, "CAL can be used for addressing" );
-is ( is_addressable32_intel ("dax"), 0, "DAX can be used for addressing" );
-is ( is_addressable32_intel ("reax"), 0, "REAX can be used for addressing" );
-is ( is_addressable32_intel ("amm0"), 0, "AMM0 can be used for addressing" );
-is ( is_addressable32_intel ("xmm"), 0, "XMM can be used for addressing" );
-is ( is_addressable32_intel ("ymm"), 0, "YMM can be used for addressing" );
-is ( is_addressable32_intel ("zmm"), 0, "ZMM can be used for addressing" );
-is ( is_addressable32_intel ("k12"), 0, "K2 can be used for addressing" );
+check_reg_intel ([@regs16_intel, 'ax'], \%reg_tests);
 
-is ( is_r32_in64_intel ("al"), 0, "AL can be used for 32-in-64 addressing" );
-is ( is_r32_in64_intel ("ax"), 0, "AX can be used for 32-in-64 addressing" );
-is ( is_r32_in64_intel ("eax"), 0, "EAX can be used for 32-in-64 addressing" );
-is ( is_r32_in64_intel ("r10d"), 1, "R10D can be used for 32-in-64 addressing" );
-is ( is_r32_in64_intel ("mm0"), 0, "MM0 can be used for 32-in-64 addressing" );
-is ( is_r32_in64_intel ("xmm0"), 0, "XMM0 can be used for 32-in-64 addressing" );
-is ( is_r32_in64_intel ("ymm0"), 0, "YMM0 can be used for 32-in-64 addressing" );
-is ( is_r32_in64_intel ("zmm0"), 0, "ZMM0 can be used for 32-in-64 addressing" );
-is ( is_r32_in64_intel ("k2"), 0, "K2 can be used for 32-in-64 addressing" );
+$reg_tests{$name_reg_seg} = 1;
 
-is ( is_r32_in64_intel ("ald"), 0, "ALD can be used for 32-in-64 addressing" );
-is ( is_r32_in64_intel ("axh"), 0, "AXH can be used for 32-in-64 addressing" );
-is ( is_r32_in64_intel ("eaxl"), 0, "EAXL can be used for 32-in-64 addressing" );
-is ( is_r32_in64_intel ("r10ld"), 0, "R10LD can be used for 32-in-64 addressing" );
-is ( is_r32_in64_intel ("mm0l"), 0, "MM0L can be used for 32-in-64 addressing" );
-is ( is_r32_in64_intel ("xmm0d"), 0, "XMM0D can be used for 32-in-64 addressing" );
-is ( is_r32_in64_intel ("ymm0l"), 0, "YMM0L can be used for 32-in-64 addressing" );
-is ( is_r32_in64_intel ("zmm0d"), 0, "ZMM0D can be used for 32-in-64 addressing" );
-is ( is_r32_in64_intel ("k3l"), 0, "K3L can be used for 32-in-64 addressing" );
+check_reg_intel (['cs'], \%reg_tests);
+
+$reg_tests{$name_reg} = 1;
+$reg_tests{$name_reg8} = 0;
+$reg_tests{$name_reg16} = 0;
+$reg_tests{$name_reg32} = 1;
+$reg_tests{$name_reg64} = 0;
+$reg_tests{$name_reg_mm} = 0;
+$reg_tests{$name_reg_seg} = 0;
+$reg_tests{$name_reg_fpu} = 0;
+$reg_tests{$name_reg_opmask} = 0;
+# NOTE: most 32-bit general-purpose registers can be used for addressing
+# NOTE: some 32-bit registers are parts of 64-bit registers
+$reg_tests{$name_reg_add32} = undef;
+$reg_tests{$name_reg32_64} = undef;
+
+check_reg_intel ([@regs32_intel, 'eax'], \%reg_tests);
+
+$reg_tests{$name_reg_add32} = 1;
+
+check_reg_intel (['ebx'], \%reg_tests);
+
+$reg_tests{$name_reg_add32} = undef;
+$reg_tests{$name_reg32_64} = 1;
+
+check_reg_intel (['r9d'], \%reg_tests);
+
+$reg_tests{$name_reg} = 1;
+$reg_tests{$name_reg8} = 0;
+$reg_tests{$name_reg16} = 0;
+$reg_tests{$name_reg32} = 0;
+$reg_tests{$name_reg64} = 1;
+$reg_tests{$name_reg_mm} = 0;
+$reg_tests{$name_reg_seg} = 0;
+$reg_tests{$name_reg_fpu} = 0;
+$reg_tests{$name_reg_opmask} = 0;
+$reg_tests{$name_reg_add32} = 0;
+$reg_tests{$name_reg32_64} = 0;
+
+check_reg_intel ([@regs64_intel, 'rax'], \%reg_tests);
+
+$reg_tests{$name_reg} = 1;
+$reg_tests{$name_reg8} = 0;
+$reg_tests{$name_reg16} = 0;
+$reg_tests{$name_reg32} = 0;
+$reg_tests{$name_reg64} = 0;
+$reg_tests{$name_reg_mm} = 1;
+$reg_tests{$name_reg_seg} = 0;
+$reg_tests{$name_reg_fpu} = 0;
+$reg_tests{$name_reg_opmask} = 0;
+$reg_tests{$name_reg_add32} = 0;
+$reg_tests{$name_reg32_64} = 0;
+
+check_reg_intel ([@regs_mm_intel, 'mm0', 'xmm0', 'ymm0', 'zmm0'], \%reg_tests);
+
+$reg_tests{$name_reg} = 1;
+$reg_tests{$name_reg8} = 0;
+$reg_tests{$name_reg16} = 0;
+$reg_tests{$name_reg32} = 0;
+$reg_tests{$name_reg64} = 0;
+$reg_tests{$name_reg_mm} = 0;
+$reg_tests{$name_reg_seg} = 0;
+$reg_tests{$name_reg_fpu} = 1;
+$reg_tests{$name_reg_opmask} = 0;
+$reg_tests{$name_reg_add32} = 0;
+$reg_tests{$name_reg32_64} = 0;
+
+check_reg_intel ([@regs_fpu_intel, 'st0'], \%reg_tests);
+
+$reg_tests{$name_reg} = 1;
+$reg_tests{$name_reg8} = 0;
+$reg_tests{$name_reg16} = 1;
+$reg_tests{$name_reg32} = 0;
+$reg_tests{$name_reg64} = 0;
+$reg_tests{$name_reg_mm} = 0;
+$reg_tests{$name_reg_seg} = 1;
+$reg_tests{$name_reg_fpu} = 0;
+$reg_tests{$name_reg_opmask} = 0;
+$reg_tests{$name_reg_add32} = 0;
+$reg_tests{$name_reg32_64} = 0;
+
+check_reg_intel ([@segregs_intel, 'cs'], \%reg_tests);
+
+$reg_tests{$name_reg} = 1;
+$reg_tests{$name_reg8} = 0;
+$reg_tests{$name_reg16} = 0;
+$reg_tests{$name_reg32} = 0;
+$reg_tests{$name_reg64} = 0;
+$reg_tests{$name_reg_mm} = 0;
+$reg_tests{$name_reg_seg} = 0;
+$reg_tests{$name_reg_fpu} = 0;
+$reg_tests{$name_reg_opmask} = 1;
+$reg_tests{$name_reg_add32} = 0;
+$reg_tests{$name_reg32_64} = 0;
+
+check_reg_intel ([@regs_opmask_intel, 'k0'], \%reg_tests);
+
+$reg_tests{$name_reg} = 1;
+$reg_tests{$name_reg8} = 0;
+$reg_tests{$name_reg16} = 0;
+$reg_tests{$name_reg32} = 1;
+$reg_tests{$name_reg64} = 0;
+$reg_tests{$name_reg_mm} = 0;
+$reg_tests{$name_reg_seg} = 0;
+$reg_tests{$name_reg_fpu} = 0;
+$reg_tests{$name_reg_opmask} = 0;
+$reg_tests{$name_reg_add32} = 1;
+$reg_tests{$name_reg32_64} = 0;
+
+check_reg_intel (\@addressable32, \%reg_tests);
+
+$reg_tests{$name_reg} = 1;
+$reg_tests{$name_reg8} = 0;
+$reg_tests{$name_reg16} = 0;
+$reg_tests{$name_reg32} = 1;
+$reg_tests{$name_reg64} = 0;
+$reg_tests{$name_reg_mm} = 0;
+$reg_tests{$name_reg_seg} = 0;
+$reg_tests{$name_reg_fpu} = 0;
+$reg_tests{$name_reg_opmask} = 0;
+$reg_tests{$name_reg_add32} = 0;
+$reg_tests{$name_reg32_64} = 1;
+
+check_reg_intel ([@r32_in64, 'r10d'], \%reg_tests);
+
+$reg_tests{$name_reg} = 0;
+$reg_tests{$name_reg8} = 0;
+$reg_tests{$name_reg16} = 0;
+$reg_tests{$name_reg32} = 0;
+$reg_tests{$name_reg64} = 0;
+$reg_tests{$name_reg_mm} = 0;
+$reg_tests{$name_reg_seg} = 0;
+$reg_tests{$name_reg_fpu} = 0;
+$reg_tests{$name_reg_opmask} = 0;
+$reg_tests{$name_reg_add32} = 0;
+$reg_tests{$name_reg32_64} = 0;
+
+check_reg_intel (\@invalid_regs, \%reg_tests);

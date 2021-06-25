@@ -3,30 +3,41 @@ package Archive::Libarchive::Peek;
 use strict;
 use warnings;
 use Archive::Libarchive 0.03 qw( ARCHIVE_OK ARCHIVE_WARN ARCHIVE_EOF );
-use Ref::Util qw( is_plain_coderef is_plain_arrayref );
+use Ref::Util qw( is_plain_coderef is_plain_arrayref is_plain_scalarref is_ref );
 use Carp ();
 use Path::Tiny ();
 use 5.022;
-use experimental qw( signatures refaliasing );
+use experimental qw( signatures refaliasing postderef );
 
 # ABSTRACT: Peek into archives without extracting them
-our $VERSION = '0.02'; # VERSION
+our $VERSION = '0.03'; # VERSION
 
 
 sub new ($class, %options)
 {
-  Carp::croak("Required option: filename")
-    unless defined $options{filename};
+  Carp::croak("Required option: one of filename or memory")
+    unless defined $options{filename} || defined $options{memory};
 
-  foreach my $filename (@{ is_plain_arrayref($options{filename}) ? $options{filename} : [$options{filename}] })
+  Carp::croak("Exactly one of filename or memory is required")
+    if defined $options{filename} && defined $options{memory};
+
+  if(defined $options{filename})
   {
-    Carp::croak("Missing or unreadable: $filename")
-      unless -r $filename;
+    foreach my $filename (@{ is_plain_arrayref($options{filename}) ? $options{filename} : [$options{filename}] })
+    {
+      Carp::croak("Missing or unreadable: $filename")
+        unless -r $filename;
+    }
+  }
+  elsif(!(is_plain_scalarref $options{memory} && defined $options{memory}->$* && !is_ref $options{memory}->$*))
+  {
+    Carp::croak("Option memory must be a scalar reference to a plain non-reference scalar");
   }
 
   my $self = bless {
     filename   => delete $options{filename},
     passphrase => delete $options{passphrase},
+    memory     => delete $options{memory},
   }, $class;
 
   Carp::croak("Illegal options: @{[ sort keys %options ]}")
@@ -62,7 +73,16 @@ sub _archive ($self)
     }
   }
 
-  my $ret = is_plain_arrayref($self->filename) ? $r->open_filenames($self->filename, 10240) : $r->open_filename($self->filename, 10240);
+  my $ret;
+
+  if(defined $self->{filename})
+  {
+    $ret = is_plain_arrayref($self->filename) ? $r->open_filenames($self->filename, 10240) : $r->open_filename($self->filename, 10240);
+  }
+  else
+  {
+    $ret = $r->open_memory($self->{memory});
+  }
 
   if($ret == ARCHIVE_WARN)
   {
@@ -233,7 +253,7 @@ Archive::Libarchive::Peek - Peek into archives without extracting them
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 
@@ -271,7 +291,8 @@ representing a single multi-file archive.
 
  my $peek = Archive::Libarchive::Peek->new(%options);
 
-This creates a new instance of the Peek object.
+This creates a new instance of the Peek object.  One of the L</filename> or
+L</memory> option
 
 =over 4
 
@@ -279,7 +300,16 @@ This creates a new instance of the Peek object.
 
  my $peek = Archive::Libarchive::Peek->new( filename => $filename );
 
-This option is required, and is the filename of the archive.
+The filename of the archive to read from.
+
+=item memory
+
+[version 0.03]
+
+ my $peek = Archive::Libarchive::Peek->new( memory => \$content );
+
+A reference to the memory region containing the archive.  Passing in a plain
+scalar will throw an exception.
 
 =item passphrase
 
@@ -298,7 +328,7 @@ callback which will return the passphrase.
 
 =head2 filename
 
-This is the archive filename for the Peek object.
+This is the archive filename for the Peek object.  This will be C<undef> for in-memory archives.
 
 =head1 METHODS
 
@@ -341,6 +371,8 @@ file, like the permissions, timestamps and file type.
 =back
 
 =head2 as_hash
+
+[version 0.02]
 
  my $hashref = $peek->as_hash;
 

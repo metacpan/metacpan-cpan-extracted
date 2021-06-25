@@ -1,7 +1,7 @@
 package File::Serialize;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: DWIM file serialization/deserialization
-$File::Serialize::VERSION = '1.5.0';
+$File::Serialize::VERSION = '1.5.1';
 use v5.16.0;
 
 use feature 'current_sub';
@@ -186,7 +186,7 @@ File::Serialize - DWIM file serialization/deserialization
 
 =head1 VERSION
 
-version 1.5.0
+version 1.5.1
 
 =head1 SYNOPSIS
 

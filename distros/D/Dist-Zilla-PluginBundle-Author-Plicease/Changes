@@ -1,5 +1,12 @@
 Revision history for Dist-Zilla-PluginBundle-Author-Plicease
 
+2.66      2021-06-23 16:26:36 -0600
+  - Put static testing in separate workflow for CI
+
+2.65      2021-06-15 07:16:52 -0600
+  - Bump required Test2::V0 default
+  - Fixup generated cygwin CI
+
 2.64      2021-06-01 05:31:07 -0600
   - Bump CI in generated dist to use Perl 5.34/5.35
 

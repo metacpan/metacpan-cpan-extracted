@@ -33,7 +33,13 @@ my $GAF  = $CLASS->new(conf_path => $path);
 {
     is($GAF->_clean(undef), undef, 'clean - undef');
     is($GAF->_clean(0),     "0\n", 'clean - zero');
-    my $rh_tests = {'  , abc , def ,, ghi , ' => "abc, def, ghi\n",};
+    my $rh_tests = {
+        '  , abc , def ,, ghi , '  => "abc, def, ghi\n",
+        'St Mary&#39;s Almshouses' => "St Mary's Almshouses\n",
+        'St Mary\'s Almshouses'    => "St Mary's Almshouses\n",
+        "St Mary's Almshouses"     => "St Mary's Almshouses\n",        
+  
+    };
 
     while (my ($source, $expected) = each(%$rh_tests)) {
         is($GAF->_clean($source), $expected, 'clean - ' . $source);
@@ -282,6 +288,42 @@ my $GAF  = $CLASS->new(conf_path => $path);
         'correctly used override_template'
     );
 }
+
+
+# actually do some formatting
+{
+    my $af_path   = dirname(__FILE__) . '/../../address-formatting';
+    my $conf_path = $af_path . '/conf/';
+    my $GAF       = $CLASS->new(conf_path => $conf_path, debug => 0);
+
+    my $rh_components = {
+          'city' => 'London',
+          'city_district' => 'London Borough of Southwark',
+          'continent' => 'Europe',
+          'country' => 'United Kingdom',
+          'country_code' => 'gb',
+          'postcode' => 'SE1 9TG',
+          'quarter' => 'Bankside',
+          'state' => 'England',
+          'state_district' => 'Greater London',
+          'suburb' => 'Southwark'        
+    };
+
+    my $override_template =
+        '{{{neighbourhood}}}, {{{city}}}, {{{county}}}, {{{state}}}, {{{country}}}';
+    my $rh_options = {
+        'address_template' => $override_template,
+    };
+    my $formatted = $GAF->format_address($rh_components, $rh_options);
+    $formatted =~ s/\n$//g;  # remove from end
+    $formatted =~ s/\n/, /g; # turn into commas
+
+    is( $formatted,
+        'Southwark, London, England, United Kingdom',
+        'correctly used override_template'
+    );
+}
+
 
 done_testing();
 

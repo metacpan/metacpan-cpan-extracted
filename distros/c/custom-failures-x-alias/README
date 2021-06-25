@@ -1,0 +1,58 @@
+custom::failures::x::alias
+
+This package creates importable alias subroutines for failure classes
+created by custom::failures.
+
+Typically, you use custom::failures like this:
+
+  package MyApp::failure;
+  use custom::failures qw/io::flie io::network/;
+
+and later
+
+  package MyApp;
+  use MyApp::failure;
+
+  # somewhere deep in your code
+  MyApp::failure::io::flie->throw();
+
+"custom::failures::x::alias" creates shortened aliases so that you don't
+have to type so much:
+
+  package MyApp::failure;
+  use custom::failures::x::alias qw/io::flie io::network/;
+
+and later,
+
+  package MyApp;
+  use MyApp::failure ':all'
+
+  # somewhere deep in your code
+  io_flie->throw;
+  io_network->throw;
+
+INSTALLATION
+
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
+
+  perl Build.PL
+  ./Build
+  ./Build test
+  ./Build install
+
+COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2021 by Smithsonian Astrophysical
+Observatory.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007

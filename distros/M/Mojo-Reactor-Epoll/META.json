@@ -4,7 +4,7 @@
       "Dan Book <dbook@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.014, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -62,7 +62,7 @@
    "provides" : {
       "Mojo::Reactor::Epoll" : {
          "file" : "lib/Mojo/Reactor/Epoll.pm",
-         "version" : "0.010"
+         "version" : "0.011"
       }
    },
    "release_status" : "stable",
@@ -76,16 +76,16 @@
          "url" : "https://github.com/Grinnz/Mojo-Reactor-Epoll.git",
          "web" : "https://github.com/Grinnz/Mojo-Reactor-Epoll"
       },
-      "x_IRC" : "irc://irc.freenode.net/#mojo"
+      "x_IRC" : "ircs://irc.libera.chat/#mojo"
    },
-   "version" : "0.010",
+   "version" : "0.011",
    "x_contributors" : [
       "Dan Book <grinnz@gmail.com>",
       "Dan Book <grinnz@grinnz.com>",
       "Paul \"LeoNerd\" Evans <leonerd@leonerd.org.uk>"
    ],
-   "x_generated_by_perl" : "v5.30.2",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
+   "x_generated_by_perl" : "v5.34.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.26",
    "x_spdx_expression" : "Artistic-2.0"
 }
 

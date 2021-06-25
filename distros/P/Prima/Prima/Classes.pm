@@ -18,17 +18,26 @@ sub new
 	my ($class, $letter, $buf) = @_;
 	die "bad array type" if $letter !~ /^[idSs]$/;
 	my @tie;
+	my @push;
 	my $size = length pack $letter, 0;
 	if ( defined $buf ) {
-		croak "Bad length ". length($buf). ", must be mod $size" if length($buf) % $size;
+		if ( ref $buf ) {
+			croak "$buf is not an array" unless ref $buf eq 'ARRAY';
+			@push = @$buf;
+			$buf = '';
+		} else {
+			croak "Bad length ". length($buf). ", must be mod $size" if length($buf) % $size;
+		}
 	} else {
 		$buf = '';
 	}
 	tie @tie, $class, $buf, $size, $letter;
+	push @tie, @push if @push;
 	return \@tie;
 }
 
-sub new_short  { shift->new('S', @_) }
+sub new_short  { shift->new('s', @_) }
+sub new_ushort { shift->new('S', @_) }
 sub new_int    { shift->new('i', @_) }
 sub new_double { shift->new('d', @_) }
 
@@ -80,12 +89,86 @@ sub FETCH     { unpack( $_[0]->[PACK], CORE::substr( $_[0]->[REF], $_[1] * $_[0]
 sub STORE     { CORE::substr( $_[0]->[REF], $_[1] * $_[0]->[SIZE], $_[0]->[SIZE], pack( $_[0]->[PACK], $_[2] )) }
 sub FETCHSIZE { length( $_[0]->[REF] ) / $_[0]->[SIZE] }
 sub EXISTS    { $_[1] < FETCHSIZE($_[0]) }
+sub EXTEND    { $_[0]->[REF] .= "\x0" x ($_[1] * $_[0]->[SIZE] - length $_[0]->[REF]) }
 sub STORESIZE {
 	( $_[1] > FETCHSIZE($_[0]) ) ?
 		(STORE($_[0], $_[1] - 1, 0)) :
 		(CORE::substr( $_[0]->[REF], $_[1] * $_[0]->[SIZE] ) = '' )
 }
 sub DELETE    { warn "This array does not implement delete functionality" }
+
+package Prima::rect;
+
+sub new       { bless [$#_ ? (($#_ == 4) ? @_[1..$#_] : (0,0,@_[1,2])) : (0,0,0,0)], $_[0] }
+sub new_box   { bless [@_[1,2], $_[1] + $_[3] + 1, $_[2] + $_[4] + 1], $_[0] }
+sub clone     { bless [@{$_[0]}], ref $_[0] }
+sub is_empty  { $_[0]->[0] == $_[0]->[2] && $_[0]->[1] == $_[0]->[3] }
+sub origin    { $_[0]->[0], $_[0]->[1] }
+sub size      { $_[0]->[2] - $_[0]->[0] - 1, $_[0]->[3] - $_[0]->[1] - 1 }
+sub box       { $_[0]->[0], $_[0]->[1], $_[0]->[2] - $_[0]->[0] - 1, $_[0]->[3] - $_[0]->[1] - 1 }
+sub inclusive { $_[0]->[0], $_[0]->[1], $_[0]->[2] - 1, $_[0]->[3] - 1 }
+
+sub is_equal
+{
+	my ( $x, $y ) = @_;
+	if ( $x-> is_empty ) {
+		return $y->is_empty;
+	} elsif ( $y-> is_empty ) {
+		return 0;
+	} else {
+		return
+			$x->[0] == $y->[0] &&
+			$x->[1] == $y->[1] &&
+			$x->[2] == $y->[2] &&
+			$x->[3] == $y->[3];
+	}
+}
+
+sub union
+{
+	my ( $x, $y ) = @_;
+	return $y->clone if $x->is_empty;
+	return $x->clone if $y->is_empty;
+
+	$x = $x->clone;
+	$x->[0] = $y->[0] if $x->[0] > $y->[0];
+	$x->[1] = $y->[1] if $x->[1] > $y->[1];
+	$x->[2] = $y->[2] if $x->[2] < $y->[2];
+	$x->[3] = $y->[3] if $x->[3] < $y->[3];
+	return $x;
+}
+
+sub intersect
+{
+	my ( $x, $y ) = @_;
+	return ref($x)->new if
+		$x->is_empty or
+		$y->is_empty or
+		$x->[0] > $y->[2] or
+		$x->[2] < $y->[0] or
+		$x->[1] > $y->[3] or
+		$x->[3] < $y->[1]
+		;
+
+	$x = $x->clone;
+	$x->[0] = $y->[0] if $x->[0] > $y->[0];
+	$x->[1] = $y->[1] if $x->[1] > $y->[1];
+	$x->[2] = $y->[2] if $x->[2] < $y->[2];
+	$x->[3] = $y->[3] if $x->[3] < $y->[3];
+	return $x;
+}
+
+sub enlarge
+{
+	my ( $x, $d ) = @_;
+	return ref($x)->new if $x->is_empty;
+	$x = $x->clone;
+	$x->[$_] -= $d     for 0,1;
+	$x->[$_] += 2 * $d for 2,3;
+	return $x;
+}
+
+sub shrink { $_[0]->enlarge( -$_[1] ) }
 
 # class Object; base class of all Prima classes
 package Prima::Object;
@@ -929,6 +1012,17 @@ sub notification_types { return \%RNT; }
 	y_centered        => 0,
 );
 
+my $_markup_loaded;
+sub _markup($)
+{
+	unless ( $_markup_loaded ) {
+		eval "use Prima::Drawable::Markup;";
+		die $@ if $@;
+		$_markup_loaded++;
+	}
+	return Prima::Drawable::Markup::M( ${ $_[0] } );
+}
+
 sub profile_default
 {
 	my $def = $_[ 0]-> SUPER::profile_default;
@@ -960,6 +1054,10 @@ sub profile_check_in
 	my $owner = exists $p-> { owner} ? $p-> { owner} : $default-> { owner};
 	$self-> SUPER::profile_check_in( $p, $default);
 	delete $p-> { font} unless defined $orgFont;
+
+	for my $tx ( qw(text hint)) {
+		$p->{$tx} = _markup $p->{$tx} if defined $p->{$tx} && (ref($p->{$tx}) // '') eq 'SCALAR';
+	}
 
 	my $name = defined $p-> {name} ? $p-> {name} : $default-> {name};
 	$p-> {text} = $name
@@ -1165,6 +1263,18 @@ sub popupLight3DColor     { return shift-> popupColorIndex( ci::Light3DColor, @_
 sub x_centered       {($#_)?$_[0]-> set_centered(1,0)      :$_[0]-> raise_wo("x_centered"); }
 sub y_centered       {($#_)?$_[0]-> set_centered(0,1)      :$_[0]-> raise_wo("y_centered"); }
 
+sub hint
+{
+	return $_[0]->get_hint unless $#_;
+	$_[0]->set_hint( (( ref($_[1]) // '') eq 'SCALAR') ? _markup $_[1] : $_[1] );
+}
+
+sub text
+{
+	return $_[0]->get_text unless $#_;
+	$_[0]->set_text( (( ref($_[1]) // '') eq 'SCALAR') ? _markup $_[1] : $_[1] );
+}
+
 sub insert
 {
 	my $self = shift;
@@ -1302,7 +1412,6 @@ sub rect_bevel
 
 	return $canvas-> rect3d( $x, $y, $x1, $y1, $width, @c3d, $fill)
 		if $width < 2;
-	my $back  = (defined($fill) && !ref($fill)) ? $fill : $self-> backColor;
 
 	# 0 - upper left under 2 -- inner square
 	# 1 - lower right over 3
@@ -1871,11 +1980,10 @@ sub on_paint
 	}
 }
 
-sub text
+sub set_text
 {
-	return $_[0]-> SUPER::text unless $#_;
 	my $self = $_[0];
-	$self-> SUPER::text( $_[1]);
+	$self-> SUPER::set_text( $_[1]);
 	$self-> notify( 'Change');
 	$self-> repaint;
 }

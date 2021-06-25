@@ -1,13 +1,16 @@
-package Pod::Weaver::Section::GenerateSection;
+package Pod::Weaver::Section::GenerateSection 4.018;
 # ABSTRACT: add pod section from an interpolated piece of text
-$Pod::Weaver::Section::GenerateSection::VERSION = '4.017';
-use strict;
-use warnings;
-use utf8;
 
 use Moose;
-
 with 'Pod::Weaver::Role::Section';
+
+# BEGIN BOILERPLATE
+use v5.20.0;
+use warnings;
+use utf8;
+no feature 'switch';
+use experimental qw(postderef postderef_qq); # This experiment gets mainlined.
+# END BOILERPLATE
 
 use Pod::Elemental::Element::Nested;
 use Pod::Elemental::Element::Pod5::Ordinary;
@@ -145,7 +148,7 @@ sub weave_section {
     return if $input->{zilla}->main_module->name ne $input->{filename};
   }
 
-  my $text = join ("\n", @{ $self->text });
+  my $text = join ("\n", $self->text->@*);
 
   if ($self->is_template) {
     my %stash;
@@ -179,7 +182,7 @@ sub weave_section {
     });
   }
 
-  push @{ $document->children }, $element;
+  push $document->children->@*, $element;
 }
 
 # BEGIN CODE IMPORTED FROM Dist::Zilla::Role::TextTemplate
@@ -240,7 +243,7 @@ Pod::Weaver::Section::GenerateSection - add pod section from an interpolated pie
 
 =head1 VERSION
 
-version 4.017
+version 4.018
 
 =head1 SYNOPSIS
 
@@ -278,6 +281,17 @@ example:
   head = 2
   text = Also, come check out our other projects at
   text = {{$homepage}}
+
+=head1 PERL VERSION SUPPORT
+
+This module has the same support period as perl itself:  it supports the two
+most recent versions of perl.  (That is, if the most recently released version
+is v5.40, then this module should work on both v5.40 and v5.38.)
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
 
 =head1 ATTRIBUTES
 
@@ -352,7 +366,7 @@ C<< $bugtracker_email >>
 
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@cpan.org>
+Ricardo SIGNES <rjbs@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

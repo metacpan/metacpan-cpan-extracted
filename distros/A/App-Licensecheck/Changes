@@ -7,6 +7,45 @@ Home page:    <https://metacpan.org/release/App-Licensecheck>
 Bug tracker:  <https://bugs.debian.org/cgi-bin/pkgreport.cgi?pkg=licensecheck>
 Maintainer:   Jonas Smedegaard (JONASS) <jonass@cpan.org>
 
+v3.2.0	2021-06-22
+
+ [ Bug Fixes ]
+ - stepwise: fix omit version for singleversion objects
+   Sandro Mani++
+ - tighten custom BSD detection to avoid SSLeay false positive
+ - use Getopt::Long and Pod::Usage (not Getopt::Long::Descriptive)
+   David Bremner++
+
+ [ Documentation ]
+ - add pod section ENVIRONMENT (replacing and expanding section DEBUGGING)
+ - colorize output of --help option, and auto-enable color more reliably
+ - document that options --check and --ignore apply only when multiple
+   PATHs are provided
+ - improve markup of pod section OPTIONS
+ - rephrase description for option --skipped
+ - restore POD section OPTIONS (gone since v3.0.2)
+ - split pod section OPTIONS into subsections
+ - stop bogusly annotate v3.1.0 bugfix as security-related
+ - update TODOs
+
+ [ Test Suite ]
+ - update author tests
+ - update detection of SISSL since Regexp::Pattern::License v3.5.0
+ - update to match capitalized name of Libtool exception, corrected since
+   Regexp::Pattern::License v3.5.0
+
+ [ Packaging ]
+ - tighten to require more recent Regexp::Pattern::License
+
+ [ Other ]
+ - Added: add option --list-licenses
+ - Added: add option --list-naming-schemes
+ - Added: add option --shortname-schemes, replacing option --deb-fmt (kept
+   for now, documented as deprecated)
+ - logging: fix resolve identifier in trace of exception and flaw detection
+ - resolve license patterns only when used, speeding up --help
+ - use IO::Interactive
+
 v3.1.1	2020-05-21
 
  [ Test Suite ]
@@ -14,8 +53,8 @@ v3.1.1	2020-05-21
 
 v3.1.0	2020-05-21
 
- [ SECURITY ]
- - Fix: avoid uninitialized value in local Apache-and-BSD pattern
+ [ Bug Fixes ]
+ - avoid uninitialized value in local Apache-and-BSD pattern
    Sandro Mani++
 
  [ Test Suite ]

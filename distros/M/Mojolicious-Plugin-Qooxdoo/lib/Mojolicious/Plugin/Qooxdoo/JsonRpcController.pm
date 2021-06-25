@@ -13,7 +13,7 @@ use Encode;
 
 has toUTF8 => sub { find_encoding('utf8') };
 
-our $VERSION = '1.0.11';
+our $VERSION = '1.0.13';
 
 has 'service';
 
@@ -256,6 +256,14 @@ sub finalizeJsonRpcReply {
     # the json stuf
     $self->render(text => $self->toUTF8->decode($reply));
 }
+
+sub DESTROY {
+    local($., $@, $!, $^E, $?);
+    return if ${^GLOBAL_PHASE} eq 'DESTRUCT';
+    my $self = shift;
+    $self->log->debug("Destroying ".__PACKAGE__);
+}
+
 
 1;
 

@@ -21,6 +21,9 @@
 
 #include <CoreFoundation/CFBase.h>
 
+#define ASCII_ENCODING kCFStringEncodingASCII
+#define UTF8_ENCODING kCFStringEncodingUTF8
+
 /* this could also credibly be "public.plain-text", but in point
  * of fact the text programs I could bring easily to bear (pbpaste,
  * AppleWorks, vim, and PasteboardPeeker) could not see this.

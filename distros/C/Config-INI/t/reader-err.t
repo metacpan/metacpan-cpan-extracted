@@ -27,7 +27,7 @@ like($@, qr/no filename specified/i, 'read_file without args');
   my $filename = 'lib';
 
   eval { Config::INI::Reader->read_file($filename); };
-  like($@, qr/not a plain file/i, 'read_file on non-plain-file');
+  like($@, qr/not readable/i, 'read_file on non-readable thing');
 }
 
 SKIP: {
@@ -48,7 +48,7 @@ SKIP: {
   }
 
   eval { Config::INI::Reader->read_file($fn); };
-  like($@, qr/(?:couldn't|can't) read/, "can't read an unreadable file");
+  like($@, qr/not readable/, "can't read an unreadable file");
 
   chmod 0666, $fh;
 }

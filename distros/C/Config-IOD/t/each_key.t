@@ -20,7 +20,17 @@ v2=2
 _
     my $ciod = Config::IOD->new;
     my $doc = $ciod->read_string($iod);
-    ok 1; # TODO
+
+    my %k;
+    $doc->each_key(sub { my ($self, %args) = @_; $k{ "$args{section}_$args{key}" } = $args{raw_value} });
+    is_deeply(\%k, {s1_v=>1, s2_v=>2, s1_v2=>2}) or diag explain \%k;
+
+    subtest "opt:early_exit=1" => sub {
+        my %k;
+        my $n = 0;
+        $doc->each_key({early_exit=>1}, sub { my ($self, %args) = @_; $k{ "$args{section}_$args{key}" } = $args{raw_value}; $n++ >= 1 ? 0:1 });
+        is_deeply(\%k, {s1_v=>1, s2_v=>2}) or diag explain \%k;
+    };
 };
 
 DONE_TESTING:

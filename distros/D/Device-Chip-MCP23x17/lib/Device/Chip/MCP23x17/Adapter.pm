@@ -1,12 +1,12 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2015-2020 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2015-2021 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.19;
+use Object::Pad 0.41;
 
-package Device::Chip::MCP23x17::Adapter 0.03;
+package Device::Chip::MCP23x17::Adapter 0.04;
 class Device::Chip::MCP23x17::Adapter;
 # can't 'extends Device::Chip::Adapter' because that doesn't provide a SUPER::new
 use base qw( Device::Chip::Adapter );
@@ -45,12 +45,7 @@ L<Device::Chip::MCP23x17/as_adapter>.
 
 =cut
 
-has $_mcp;
-
-BUILD ( $mcp )
-{
-   $_mcp = $mcp;
-}
+has $_chip :param;
 
 # Only supports GPIO
 method make_protocol_GPIO () { $self }
@@ -79,7 +74,7 @@ async method write_gpios ( $gpios )
 
    $mask or return;
 
-   await $_mcp->write_gpio( $val, $mask );
+   await $_chip->write_gpio( $val, $mask );
 }
 
 async method read_gpios ( $gpios )
@@ -94,7 +89,7 @@ async method read_gpios ( $gpios )
 
    $mask or return {};
 
-   my $bits = await $_mcp->read_gpio( $mask );
+   my $bits = await $_chip->read_gpio( $mask );
 
    my %ret;
 

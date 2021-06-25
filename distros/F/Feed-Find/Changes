@@ -1,5 +1,8 @@
 Revision history for Feed::Find
 
+0.11  2021.06.14
+    - Add test for "file://" URLs (RT 12242)
+
 0.10  2021.06.11
     - Switch to using Test::LWP::UserAgent so we don't require
       an internet connection for the tests.

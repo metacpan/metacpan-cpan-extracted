@@ -20,9 +20,18 @@ v2=2
 _
     my $ciod = Config::IOD->new;
     my $doc = $ciod->read_string($iod);
-    ok 1; # TODO, currently we test via list_sections()
-    #is_deeply([$doc->each_sections], [qw/s1 s2 s1 s3/]);
-    #is_deeply([$doc->each_sections({unique=>1})], [qw/s1 s2 s3/]);
+
+    my %k;
+    my $n = 0;
+    $doc->each_section(sub { my ($self, %args) = @_; $k{ "$args{section}" } = $n++ });
+    is_deeply(\%k, {s1=>2, s2=>1, s3=>3}) or diag explain \%k;
+
+    subtest "opt:early_exit=1" => sub {
+        my %k;
+        my $n = 0;
+        $doc->each_section({early_exit=>1}, sub { my ($self, %args) = @_; $k{ "$args{section}" } = $n; $n++ >= 1 ? 0:1 });
+        is_deeply(\%k, {s1=>0, s2=>1}) or diag explain \%k;
+    };
 };
 
 DONE_TESTING:

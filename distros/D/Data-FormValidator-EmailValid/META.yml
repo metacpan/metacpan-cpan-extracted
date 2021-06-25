@@ -23,8 +23,6 @@ no_index:
   directory:
     - t
     - xt
-recommends:
-  Net::DNS: '0'
 requires:
   Data::FormValidator: '4.0'
   Email::Valid: '0'
@@ -33,8 +31,8 @@ resources:
   bugtracker: https://github.com/bleargh45/Data-FormValidator-EmailValid/issues
   homepage: http://metacpan.org/release/Data-FormValidator-EmailValid/
   repository: git://github.com/bleargh45/Data-FormValidator-EmailValid.git
-version: '0.08'
-x_generated_by_perl: v5.32.0
+version: '0.09'
+x_generated_by_perl: v5.32.1
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
 x_static_install: 1

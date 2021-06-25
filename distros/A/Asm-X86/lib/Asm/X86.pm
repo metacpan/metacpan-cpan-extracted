@@ -44,11 +44,11 @@ Asm::X86 - List of instructions and registers of x86-compatible processors, vali
 
 =head1 VERSION
 
-Version 0.40
+Version 0.61
 
 =cut
 
-our $VERSION = '0.40';
+our $VERSION = '0.61';
 
 =head1 DESCRIPTION
 
@@ -69,37 +69,104 @@ between AT&T and Intel syntaxes.
  Nothing is exported by default.
 
  The following functions are exported on request:
-	is_reg_intel is_reg8_intel is_reg16_intel is_reg32_intel
-		is_reg64_intel is_reg_mm_intel is_segreg_intel is_reg_fpu_intel
-		is_reg_opmask_intel
-	is_reg_att is_reg8_att is_reg16_att is_reg32_att
-		is_reg64_att is_reg_mm_att is_segreg_att is_reg_fpu_att
-		is_reg_opmask_att
-	is_reg is_reg8 is_reg16 is_reg32 is_reg64 is_reg_mm is_segreg is_reg_fpu
-		is_reg_opmask
-	is_instr_intel is_instr_att is_instr
-	is_valid_16bit_addr_intel is_valid_32bit_addr_intel is_valid_64bit_addr_intel is_valid_addr_intel
-	is_valid_16bit_addr_att is_valid_32bit_addr_att is_valid_64bit_addr_att is_valid_addr_att
-	is_valid_16bit_addr is_valid_32bit_addr is_valid_64bit_addr is_valid_addr
-	conv_att_addr_to_intel conv_intel_addr_to_att
-	conv_att_instr_to_intel conv_intel_instr_to_att
-	is_addressable32_intel is_addressable32_att is_addressable32
-	is_r32_in64_intel is_r32_in64_att is_r32_in64
-	is_att_suffixed_instr is_att_suffixed_instr_fpu add_att_suffix_instr
+	is_reg_intel
+	is_reg8_intel
+	is_reg16_intel
+	is_reg32_intel
+	is_reg64_intel
+	is_reg_mm_intel
+	is_segreg_intel
+	is_reg_fpu_intel
+	is_reg_opmask_intel
+	is_addressable32_intel
+	is_r32_in64_intel
+
+	is_reg_att
+	is_reg8_att
+	is_reg16_att
+	is_reg32_att
+	is_reg64_att
+	is_reg_mm_att
+	is_segreg_att
+	is_reg_fpu_att
+	is_reg_opmask_att
+	is_addressable32_att
+	is_r32_in64_att
+
+	is_reg
+	is_reg8
+	is_reg16
+	is_reg32
+	is_reg64
+	is_reg_mm
+	is_segreg
+	is_reg_fpu
+	is_reg_opmask
+	is_addressable32
+	is_r32_in64
+
+	is_instr_intel
+	is_instr_att
+	is_instr
+
+	is_valid_16bit_addr_intel
+	is_valid_32bit_addr_intel
+	is_valid_64bit_addr_intel
+	is_valid_addr_intel
+
+	is_valid_16bit_addr_att
+	is_valid_32bit_addr_att
+	is_valid_64bit_addr_att
+	is_valid_addr_att
+
+	is_valid_16bit_addr
+	is_valid_32bit_addr
+	is_valid_64bit_addr
+	is_valid_addr
+
+	conv_att_addr_to_intel
+	conv_att_instr_to_intel
+	conv_intel_addr_to_att
+	conv_intel_instr_to_att
+
+	is_att_suffixed_instr
+	is_att_suffixed_instr_fpu
+	add_att_suffix_instr
 
  These check if the given string parameter belongs to the specified
  class of registers or instructions or is a vaild addressing mode.
- The "convert*" functions can be used to convert the given instruction (including the
-  operands)/addressing mode between AT&T and Intel syntaxes.
- The "_intel" and "_att" suffixes mean the Intel and AT&T syntaxes, respectively.
+ The "convert*" functions can be used to convert the given instruction
+  (including the operands)/addressing mode between AT&T and Intel syntaxes.
+ The "_intel" and "_att" suffixes mean the Intel and AT&T syntaxes,
+  respectively.
  No suffix means either Intel or AT&T.
+ All subroutines work best given input after any pre-processing, i.e. after
+  all macros, constants, etc. have been replaced by the real values.
 
  The following arrays are exported on request:
-	@regs8_intel @regs16_intel @segregs_intel @regs32_intel @regs64_intel @regs_mm_intel
-	@regs_intel @regs_fpu_intel @regs_opmask_intel
-	@regs8_att @regs16_att @segregs_att @regs32_att @regs64_att @regs_mm_att
-	@regs_att @regs_fpu_att @regs_opmask_att
-	@instr_intel @instr_att @instr
+	@regs8_intel
+	@regs16_intel
+	@segregs_intel
+	@regs32_intel
+	@regs64_intel
+	@regs_mm_intel
+	@regs_fpu_intel
+	@regs_opmask_intel
+	@regs_intel
+
+	@regs8_att
+	@regs16_att
+	@segregs_att
+	@regs32_att
+	@regs64_att
+	@regs_mm_att
+	@regs_fpu_att
+	@regs_opmask_att
+	@regs_att
+
+	@instr_intel
+	@instr_att
+	@instr
 
  These contain all register and instruction mnemonic names as lower-case strings.
  The "_intel" and "_att" suffixes mean the Intel and AT&T syntaxes, respectively.
@@ -109,10 +176,100 @@ between AT&T and Intel syntaxes.
 
 =cut
 
-sub add_percent ( @ );
-sub add_att_suffix_instr ( @ );
-sub remove_duplicates ( @ );
+# =head2 _add_percent
+# 
+#  PRIVATE SUBROUTINE.
+#  Add a percent character ('%') in front of each element in the array given as a parameter.
+#  Returns the new array.
+# 
+# =cut
 
+sub _add_percent(@) {
+
+	my @result = ();
+	foreach (@_) {
+		push @result, "%$_";
+	}
+	return @result;
+}
+
+# =head2 _remove_duplicates
+# 
+#  PRIVATE SUBROUTINE.
+#  Returns an array of the provided arguments with duplicate entries removed.
+# 
+# =cut
+# 
+sub _remove_duplicates(@) {
+
+	# Use a hash to remove the duplicates:
+	my %new_hash;
+	foreach (@_) {
+		$new_hash{$_} = 1;
+	}
+	return keys %new_hash;
+}
+
+# =head2 _nopluses
+# 
+#  PRIVATE SUBROUTINE.
+#  Removes unnecessary '+' characters from the beginning of the given string.
+#  Returns the resulting string (or '+' if it was empty).
+# 
+# =cut
+# 
+sub _nopluses($) {
+
+	my $elem = shift;
+	$elem =~ s/^\s*\++//o;
+	$elem = '+' if $elem eq '';
+	return $elem;
+}
+
+# =head2 _is_in_array
+#
+#  PRIVATE SUBROUTINE.
+#  Checks if the given element (1st parameter) is a simple word and is present
+#	in the array (passed by reference as the 2nd parameter),
+#	case-insensitive.
+#  Returns 1 if yes.
+#
+# =cut
+#
+sub _is_in_array($@) {
+
+	my $elem = shift;
+	my $arr = shift;
+	return 0 unless $elem =~ /^\w+$/o;
+	foreach (@$arr) {
+		return 1 if /^$elem$/i;
+	}
+	return 0;
+}
+
+# =head2 _is_in_array_att
+#
+#  PRIVATE SUBROUTINE.
+#  Checks if the given element (1st parameter) is a simple word beginning
+#	with '%' and is present in the array (passed by reference as the 2nd
+#	parameter), case-insensitive.
+#  Returns 1 if yes.
+#
+# =cut
+#
+sub _is_in_array_att($@) {
+
+	my $elem = shift;
+	my $arr = shift;
+	return 0 unless $elem =~ /^\%\w+$/o;
+	foreach (@$arr) {
+		return 1 if /^$elem$/i;
+	}
+	return 0;
+}
+
+
+sub add_att_suffix_instr(@);
 
 =head2 @regs8_intel
 
@@ -132,7 +289,7 @@ our @regs8_intel = (
 
 =cut
 
-our @regs8_att = add_percent @regs8_intel;
+our @regs8_att = _add_percent @regs8_intel;
 
 =head2 @segregs_intel
 
@@ -148,7 +305,7 @@ our @segregs_intel = ( 'cs', 'ds', 'es', 'fs', 'gs', 'ss' );
 
 =cut
 
-our @segregs_att = add_percent @segregs_intel;
+our @segregs_att = _add_percent @segregs_intel;
 
 =head2 @regs16_intel
 
@@ -168,16 +325,18 @@ our @regs16_intel = (
 
 =cut
 
-our @regs16_att = add_percent @regs16_intel;
+our @regs16_att = _add_percent @regs16_intel;
 
-my @addressable32 = (
-		'eax',	'ebx', 'ecx', 'edx', 'esi', 'edi', 'esp', 'ebp',
-		);
+my @addressable32 = ('eax', 'ebx', 'ecx', 'edx', 'esi', 'edi', 'esp', 'ebp');
+
+my @addressable32_att = _add_percent @addressable32;
 
 my @r32_in64 = (
 		'r8d', 'r8l', 'r9d', 'r9l', 'r10d', 'r10l', 'r11d', 'r11l',
 		'r12d', 'r12l', 'r13d', 'r13l', 'r14d', 'r14l', 'r15d', 'r15l',
 		);
+
+my @r32_in64_att = _add_percent @r32_in64;
 
 =head2 @regs32_intel
 
@@ -198,7 +357,7 @@ our @regs32_intel = (
 
 =cut
 
-our @regs32_att = add_percent @regs32_intel;
+our @regs32_att = _add_percent @regs32_intel;
 
 =head2 @regs_fpu_intel
 
@@ -206,9 +365,7 @@ our @regs32_att = add_percent @regs32_intel;
 
 =cut
 
-our @regs_fpu_intel = (
-		'st0', 'st1', 'st2', 'st3', 'st4', 'st5', 'st6', 'st7',
-		);
+our @regs_fpu_intel = ('st0', 'st1', 'st2', 'st3', 'st4', 'st5', 'st6', 'st7');
 
 =head2 @regs_fpu_att
 
@@ -216,7 +373,7 @@ our @regs_fpu_intel = (
 
 =cut
 
-our @regs_fpu_att = add_percent @regs_fpu_intel;
+our @regs_fpu_att = _add_percent @regs_fpu_intel;
 
 =head2 @regs64_intel
 
@@ -235,7 +392,7 @@ our @regs64_intel = (
 
 =cut
 
-our @regs64_att = add_percent @regs64_intel;
+our @regs64_att = _add_percent @regs64_intel;
 
 =head2 @regs_mm_intel
 
@@ -266,7 +423,7 @@ our @regs_mm_intel = (
 
 =cut
 
-our @regs_mm_att = add_percent @regs_mm_intel;
+our @regs_mm_att = _add_percent @regs_mm_intel;
 
 =head2 @regs_opmask_intel
 
@@ -274,9 +431,7 @@ our @regs_mm_att = add_percent @regs_mm_intel;
 
 =cut
 
-our @regs_opmask_intel = (
-		'k0', 'k1', 'k2', 'k3', 'k4', 'k5', 'k6', 'k7',
-		);
+our @regs_opmask_intel = ('k0', 'k1', 'k2', 'k3', 'k4', 'k5', 'k6', 'k7');
 
 
 =head2 @regs_opmask_att
@@ -285,7 +440,7 @@ our @regs_opmask_intel = (
 
 =cut
 
-our @regs_opmask_att = add_percent @regs_opmask_intel;
+our @regs_opmask_att = _add_percent @regs_opmask_intel;
 
 =head2 @regs_intel
 
@@ -697,7 +852,7 @@ our @instr_att = add_att_suffix_instr @instr_intel;
 =cut
 
 # concatenating the lists can create unnecessary duplicate entries, so remove them
-our @instr = remove_duplicates ( @instr_intel, @instr_att );
+our @instr = _remove_duplicates (@instr_intel, @instr_att);
 
 =head1 FUNCTIONS
 
@@ -708,13 +863,8 @@ our @instr = remove_duplicates ( @instr_intel, @instr_att );
 
 =cut
 
-sub is_reg_intel ( $ ) {
-
-	my $elem = shift;
-	foreach (@regs_intel) {
-		return 1 if /^$elem$/i;
-	}
-	return 0;
+sub is_reg_intel($) {
+	return _is_in_array (shift, \@regs_intel);
 }
 
 =head2 is_reg_att
@@ -724,13 +874,8 @@ sub is_reg_intel ( $ ) {
 
 =cut
 
-sub is_reg_att ( $ ) {
-
-	my $elem = shift;
-	foreach (@regs_att) {
-		return 1 if /^$elem$/i;
-	}
-	return 0;
+sub is_reg_att($) {
+	return _is_in_array_att (shift, \@regs_att);
 }
 
 =head2 is_reg
@@ -740,8 +885,7 @@ sub is_reg_att ( $ ) {
 
 =cut
 
-sub is_reg ( $ ) {
-
+sub is_reg($) {
 	my $elem = shift;
 	return is_reg_intel ($elem) | is_reg_att ($elem);
 }
@@ -753,13 +897,8 @@ sub is_reg ( $ ) {
 
 =cut
 
-sub is_reg8_intel ( $ ) {
-
-	my $elem = shift;
-	foreach (@regs8_intel) {
-		return 1 if /^$elem$/i;
-	}
-	return 0;
+sub is_reg8_intel($) {
+	return _is_in_array (shift, \@regs8_intel);
 }
 
 =head2 is_reg8_att
@@ -769,13 +908,8 @@ sub is_reg8_intel ( $ ) {
 
 =cut
 
-sub is_reg8_att ( $ ) {
-
-	my $elem = shift;
-	foreach (@regs8_att) {
-		return 1 if /^$elem$/i;
-	}
-	return 0;
+sub is_reg8_att($) {
+	return _is_in_array_att (shift, \@regs8_att);
 }
 
 =head2 is_reg8
@@ -785,8 +919,7 @@ sub is_reg8_att ( $ ) {
 
 =cut
 
-sub is_reg8 ( $ ) {
-
+sub is_reg8($) {
 	my $elem = shift;
 	return is_reg8_intel ($elem) | is_reg8_att ($elem);
 }
@@ -798,13 +931,8 @@ sub is_reg8 ( $ ) {
 
 =cut
 
-sub is_reg16_intel ( $ ) {
-
-	my $elem = shift;
-	foreach (@regs16_intel) {
-		return 1 if /^$elem$/i;
-	}
-	return 0;
+sub is_reg16_intel($) {
+	return _is_in_array (shift, \@regs16_intel);
 }
 
 =head2 is_reg16_att
@@ -814,13 +942,8 @@ sub is_reg16_intel ( $ ) {
 
 =cut
 
-sub is_reg16_att ( $ ) {
-
-	my $elem = shift;
-	foreach (@regs16_att) {
-		return 1 if /^$elem$/i;
-	}
-	return 0;
+sub is_reg16_att($) {
+	return _is_in_array_att (shift, \@regs16_att);
 }
 
 =head2 is_reg16
@@ -830,8 +953,7 @@ sub is_reg16_att ( $ ) {
 
 =cut
 
-sub is_reg16 ( $ ) {
-
+sub is_reg16($) {
 	my $elem = shift;
 	return is_reg16_intel ($elem) | is_reg16_att ($elem);
 }
@@ -843,13 +965,8 @@ sub is_reg16 ( $ ) {
 
 =cut
 
-sub is_segreg_intel ( $ ) {
-
-	my $elem = shift;
-	foreach (@segregs_intel) {
-		return 1 if /^$elem$/i;
-	}
-	return 0;
+sub is_segreg_intel($) {
+	return _is_in_array (shift, \@segregs_intel);
 }
 
 =head2 is_segreg_att
@@ -859,13 +976,8 @@ sub is_segreg_intel ( $ ) {
 
 =cut
 
-sub is_segreg_att ( $ ) {
-
-	my $elem = shift;
-	foreach (@segregs_att) {
-		return 1 if /^$elem$/i;
-	}
-	return 0;
+sub is_segreg_att($) {
+	return _is_in_array_att (shift, \@segregs_att);
 }
 
 =head2 is_segreg
@@ -875,8 +987,7 @@ sub is_segreg_att ( $ ) {
 
 =cut
 
-sub is_segreg ( $ ) {
-
+sub is_segreg($) {
 	my $elem = shift;
 	return is_segreg_intel ($elem) | is_segreg_att ($elem);
 }
@@ -888,13 +999,8 @@ sub is_segreg ( $ ) {
 
 =cut
 
-sub is_reg32_intel ( $ ) {
-
-	my $elem = shift;
-	foreach (@regs32_intel) {
-		return 1 if /^$elem$/i;
-	}
-	return 0;
+sub is_reg32_intel($) {
+	return _is_in_array (shift, \@regs32_intel);
 }
 
 =head2 is_reg32_att
@@ -904,13 +1010,8 @@ sub is_reg32_intel ( $ ) {
 
 =cut
 
-sub is_reg32_att ( $ ) {
-
-	my $elem = shift;
-	foreach (@regs32_att) {
-		return 1 if /^$elem$/i;
-	}
-	return 0;
+sub is_reg32_att($) {
+	return _is_in_array_att (shift, \@regs32_att);
 }
 
 =head2 is_reg32
@@ -920,8 +1021,7 @@ sub is_reg32_att ( $ ) {
 
 =cut
 
-sub is_reg32 ( $ ) {
-
+sub is_reg32($) {
 	my $elem = shift;
 	return is_reg32_intel ($elem) | is_reg32_att ($elem);
 }
@@ -934,13 +1034,8 @@ sub is_reg32 ( $ ) {
 
 =cut
 
-sub is_addressable32_intel ( $ ) {
-
-	my $elem = shift;
-	foreach (@addressable32) {
-		return 1 if /^$elem$/i;
-	}
-	return 0;
+sub is_addressable32_intel($) {
+	return _is_in_array (shift, \@addressable32);
 }
 
 =head2 is_addressable32_att
@@ -951,13 +1046,8 @@ sub is_addressable32_intel ( $ ) {
 
 =cut
 
-sub is_addressable32_att ( $ ) {
-
-	my $elem = shift;
-	foreach (@addressable32) {
-		return 1 if "\%$_" =~ /^$elem$/i;
-	}
-	return 0;
+sub is_addressable32_att($) {
+	return _is_in_array_att (shift, \@addressable32_att);
 }
 
 =head2 is_addressable32
@@ -968,8 +1058,7 @@ sub is_addressable32_att ( $ ) {
 
 =cut
 
-sub is_addressable32 ( $ ) {
-
+sub is_addressable32($) {
 	my $elem = shift;
 	return is_addressable32_intel ($elem) | is_addressable32_att ($elem);
 }
@@ -983,13 +1072,8 @@ sub is_addressable32 ( $ ) {
 
 =cut
 
-sub is_r32_in64_intel ( $ ) {
-
-	my $elem = shift;
-	foreach (@r32_in64) {
-		return 1 if /^$elem$/i;
-	}
-	return 0;
+sub is_r32_in64_intel($) {
+	return _is_in_array (shift, \@r32_in64);
 }
 
 =head2 is_r32_in64_att
@@ -1001,13 +1085,8 @@ sub is_r32_in64_intel ( $ ) {
 
 =cut
 
-sub is_r32_in64_att ( $ ) {
-
-	my $elem = shift;
-	foreach (@r32_in64) {
-		return 1 if "\%$_" =~ /^$elem$/i;
-	}
-	return 0;
+sub is_r32_in64_att($) {
+	return _is_in_array_att (shift, \@r32_in64_att);
 }
 
 =head2 is_r32_in64
@@ -1019,8 +1098,7 @@ sub is_r32_in64_att ( $ ) {
 
 =cut
 
-sub is_r32_in64 ( $ ) {
-
+sub is_r32_in64($) {
 	my $elem = shift;
 	return is_r32_in64_intel ($elem) | is_r32_in64_att ($elem);
 }
@@ -1032,13 +1110,8 @@ sub is_r32_in64 ( $ ) {
 
 =cut
 
-sub is_reg64_intel ( $ ) {
-
-	my $elem = shift;
-	foreach (@regs64_intel) {
-		return 1 if /^$elem$/i;
-	}
-	return 0;
+sub is_reg64_intel($) {
+	return _is_in_array (shift, \@regs64_intel);
 }
 
 =head2 is_reg64_att
@@ -1048,13 +1121,8 @@ sub is_reg64_intel ( $ ) {
 
 =cut
 
-sub is_reg64_att ( $ ) {
-
-	my $elem = shift;
-	foreach (@regs64_att) {
-		return 1 if /^$elem$/i;
-	}
-	return 0;
+sub is_reg64_att($) {
+	return _is_in_array_att (shift, \@regs64_att);
 }
 
 =head2 is_reg64
@@ -1064,8 +1132,7 @@ sub is_reg64_att ( $ ) {
 
 =cut
 
-sub is_reg64 ( $ ) {
-
+sub is_reg64($) {
 	my $elem = shift;
 	return is_reg64_intel ($elem) | is_reg64_att ($elem);
 }
@@ -1078,13 +1145,8 @@ sub is_reg64 ( $ ) {
 
 =cut
 
-sub is_reg_mm_intel ( $ ) {
-
-	my $elem = shift;
-	foreach (@regs_mm_intel) {
-		return 1 if /^$elem$/i;
-	}
-	return 0;
+sub is_reg_mm_intel($) {
+	return _is_in_array (shift, \@regs_mm_intel);
 }
 
 =head2 is_reg_mm_att
@@ -1095,13 +1157,8 @@ sub is_reg_mm_intel ( $ ) {
 
 =cut
 
-sub is_reg_mm_att ( $ ) {
-
-	my $elem = shift;
-	foreach (@regs_mm_att) {
-		return 1 if /^$elem$/i;
-	}
-	return 0;
+sub is_reg_mm_att($) {
+	return _is_in_array_att (shift, \@regs_mm_att);
 }
 
 =head2 is_reg_mm
@@ -1111,8 +1168,7 @@ sub is_reg_mm_att ( $ ) {
 
 =cut
 
-sub is_reg_mm ( $ ) {
-
+sub is_reg_mm($) {
 	my $elem = shift;
 	return is_reg_mm_intel ($elem) | is_reg_mm_att ($elem);
 }
@@ -1124,13 +1180,8 @@ sub is_reg_mm ( $ ) {
 
 =cut
 
-sub is_reg_fpu_intel ( $ ) {
-
-	my $elem = shift;
-	foreach (@regs_fpu_intel) {
-		return 1 if /^$elem$/i;
-	}
-	return 0;
+sub is_reg_fpu_intel($) {
+	return _is_in_array (shift, \@regs_fpu_intel);
 }
 
 =head2 is_reg_fpu_att
@@ -1140,13 +1191,8 @@ sub is_reg_fpu_intel ( $ ) {
 
 =cut
 
-sub is_reg_fpu_att ( $ ) {
-
-	my $elem = shift;
-	foreach (@regs_fpu_att) {
-		return 1 if /^$elem$/i;
-	}
-	return 0;
+sub is_reg_fpu_att($) {
+	return _is_in_array_att (shift, \@regs_fpu_att);
 }
 
 =head2 is_reg_fpu
@@ -1156,8 +1202,7 @@ sub is_reg_fpu_att ( $ ) {
 
 =cut
 
-sub is_reg_fpu ( $ ) {
-
+sub is_reg_fpu($) {
 	my $elem = shift;
 	return is_reg_fpu_intel ($elem) | is_reg_fpu_att ($elem);
 }
@@ -1169,13 +1214,8 @@ sub is_reg_fpu ( $ ) {
 
 =cut
 
-sub is_reg_opmask_intel ( $ ) {
-
-	my $elem = shift;
-	foreach (@regs_opmask_intel) {
-		return 1 if /^$elem$/i;
-	}
-	return 0;
+sub is_reg_opmask_intel($) {
+	return _is_in_array (shift, \@regs_opmask_intel);
 }
 
 =head2 is_reg_opmask_att
@@ -1185,13 +1225,8 @@ sub is_reg_opmask_intel ( $ ) {
 
 =cut
 
-sub is_reg_opmask_att ( $ ) {
-
-	my $elem = shift;
-	foreach (@regs_opmask_att) {
-		return 1 if /^$elem$/i;
-	}
-	return 0;
+sub is_reg_opmask_att($) {
+	return _is_in_array_att (shift, \@regs_opmask_att);
 }
 
 =head2 is_reg_opmask
@@ -1201,8 +1236,7 @@ sub is_reg_opmask_att ( $ ) {
 
 =cut
 
-sub is_reg_opmask ( $ ) {
-
+sub is_reg_opmask($) {
 	my $elem = shift;
 	return is_reg_opmask_intel ($elem) | is_reg_opmask_att ($elem);
 }
@@ -1214,13 +1248,8 @@ sub is_reg_opmask ( $ ) {
 
 =cut
 
-sub is_instr_intel ( $ ) {
-
-	my $elem = shift;
-	foreach (@instr_intel) {
-		return 1 if /^$elem$/i;
-	}
-	return 0;
+sub is_instr_intel($) {
+	return _is_in_array (shift, \@instr_intel);
 }
 
 =head2 is_instr_att
@@ -1230,13 +1259,8 @@ sub is_instr_intel ( $ ) {
 
 =cut
 
-sub is_instr_att ( $ ) {
-
-	my $elem = shift;
-	foreach (@instr_att) {
-		return 1 if /^$elem$/i;
-	}
-	return 0;
+sub is_instr_att($) {
+	return _is_in_array (shift, \@instr_att);
 }
 
 =head2 is_instr
@@ -1246,534 +1270,367 @@ sub is_instr_att ( $ ) {
 
 =cut
 
-sub is_instr ( $ ) {
-
+sub is_instr($) {
 	my $elem = shift;
 	return is_instr_intel ($elem) | is_instr_att ($elem);
 }
 
 ##############################################################################
 
+# =head2 _is_valid_16bit_addr_reg_intel
+#
+#  PRIVATE SUBROUTINE.
+#  Checks if the given register can be used in x86 16-bit addressing
+#   mode in Intel syntax.
+#  Returns 1 if yes.
+#
+# =cut
+#
+sub _is_valid_16bit_addr_reg_intel($) {
+
+	my $reg = shift;
+	return 1 if $reg =~ /^bx$/io || $reg =~ /^bp$/io
+		||  $reg =~ /^si$/io || $reg =~ /^di$/io;
+	return 0;
+}
+
+# =head2 _is_same_type_16bit_addr_reg_intel
+#
+#  PRIVATE SUBROUTINE.
+#  Checks if the 2 given registers cannot be used in x86 16-bit addressing
+#   mode in Intel syntax at the same time because they're of the same type.
+#  Returns 1 if yes.
+#
+# =cut
+#
+sub _is_same_type_16bit_addr_reg_intel($$) {
+
+	my $reg1 = shift;
+	my $reg2 = shift;
+	return 1 if ($reg1 =~ /^b.$/io && $reg2 =~ /^b.$/io)
+		||  ($reg1 =~ /^.i$/io && $reg2 =~ /^.i$/io);
+	return 0;
+}
+
+# =head2 _validate_16bit_addr_parts_intel
+#
+#  PRIVATE SUBROUTINE.
+#  Checks if the given address components give a valid x86 32-bit addressing
+#   mode in Intel syntax.
+#  Returns 1 if yes.
+#
+# =cut
+#
+sub _validate_16bit_addr_parts_intel($$$$$$$) {
+
+	my $segreg = shift;
+	my $reg1_sign = shift;
+	my $reg1 = shift;
+	my $reg2_sign = shift;
+	my $reg2 = shift;
+	my $disp_sign = shift;
+	my $disp = shift;
+
+	return 0 if defined $segreg && ! is_segreg_intel($segreg);
+	return 0 if defined $reg1 && is_reg_intel($reg1)
+		&& (! _is_valid_16bit_addr_reg_intel ($reg1));
+	return 0 if defined $reg2 && is_reg_intel($reg2)
+		&& (! _is_valid_16bit_addr_reg_intel ($reg2));
+	return 0 if defined $disp && is_reg_intel($disp)
+		&& (! _is_valid_16bit_addr_reg_intel ($disp));
+
+	return 0 if defined $reg1 && defined $reg1_sign
+		&& is_reg_intel($reg1) && $reg1_sign =~ /-/o;
+	return 0 if defined $reg2 && defined $reg2_sign
+		&& is_reg_intel($reg2) && $reg2_sign =~ /-/o;
+	return 0 if defined $disp && defined $disp_sign
+		&& is_reg_intel($disp) && $disp_sign =~ /-/o;
+	return 0 if defined $reg1 && defined $reg2 && defined $disp
+		&& is_reg_intel($reg1) && is_reg_intel($reg2) && is_reg_intel($disp);
+
+	if ( defined $reg1 && is_reg16_intel($reg1) ) {
+
+		return 0 if defined $reg1_sign && $reg1_sign =~ /-/o;
+		# must be one of predefined registers
+		if ( _is_valid_16bit_addr_reg_intel ($reg1) ) {
+
+			if ( defined $reg2 && is_reg16_intel($reg2) ) {
+
+				return 0 if _is_same_type_16bit_addr_reg_intel ($reg1, $reg2);
+				return 0 if defined $reg2_sign && $reg2_sign =~ /-/o;
+				return 0 if defined $disp && is_reg_intel($disp);
+
+				# must be one of predefined registers
+				return 1 if _is_valid_16bit_addr_reg_intel ($reg2)
+					#&& $reg2 !~ /\b$reg1\b/i	# already checked
+					;
+				return 0;
+
+			} elsif ( defined $disp && is_reg16_intel($disp) ) {
+
+				return 0 if _is_same_type_16bit_addr_reg_intel ($reg1, $disp);
+				return 0 if defined $disp_sign && $disp_sign =~ /-/o;
+
+				# must be one of predefined registers
+				return 1 if _is_valid_16bit_addr_reg_intel ($disp)
+					#&& $disp !~ /\b$reg1\b/i	# already checked
+					#&& ! is_reg_intel($reg2)	# already checked
+					;
+				return 0;
+			} else {
+				# variable/number/constant is OK
+				return 1;
+			}
+		}
+		return 0;
+	} else {
+		if ( defined $reg2 && is_reg16_intel($reg2) ) {
+
+			return 0 if defined $reg2_sign && $reg2_sign =~ /-/o;
+			# must be one of predefined registers
+			if ( _is_valid_16bit_addr_reg_intel ($reg2) )
+			{
+				if ( defined $disp && is_reg16_intel($disp) ) {
+
+					return 0 if _is_same_type_16bit_addr_reg_intel ($disp, $reg2);
+					return 0 if defined $disp_sign && $disp_sign =~ /-/o;
+
+					# must be one of predefined registers
+					return 1 if _is_valid_16bit_addr_reg_intel ($disp)
+						#&& $disp !~ /\b$reg2\b/i	# already checked
+						;
+					return 0;
+				} else {
+					# variable/number/constant is OK
+					return 1;
+				}
+			}
+			return 0;
+		} else {
+			return 0 if defined $disp && defined $disp_sign
+				&& is_reg16_intel($disp) && $disp_sign =~ /-/o;
+			# variable/number/constant is OK
+			return 1;
+		}
+	}
+}
+
 =head2 is_valid_16bit_addr_intel
 
  Checks if the given string parameter (must contain the square braces)
   is a valid x86 16-bit addressing mode in Intel syntax.
+ Works best after any pre-processing of the input, i.e. after all macros,
+  constants, etc. have been replaced by the real values.
  Returns 1 if yes.
 
 =cut
 
-sub is_valid_16bit_addr_intel ( $ ) {
+sub is_valid_16bit_addr_intel($) {
 
 	my $elem = shift;
 	if ( $elem =~ /^(\w+):\s*\[\s*([\+\-]*)\s*(\w+)\s*\]$/o
 		|| $elem =~ /^\[\s*(\w+)\s*:\s*([\+\-]*)\s*(\w+)\s*\]$/o ) {
 
-		my ($r1, $r2, $sign) = ($1, $3, $2);
-
-		return 0 if ( is_segreg_intel($r2) || ! is_segreg_intel($r1) );
-		return 0 if ( (! is_reg16_intel($r2)) && (is_reg8_intel($r2) || is_segreg_intel($r2)
-			|| is_reg32_intel($r2) || is_reg64_intel($r2) || is_reg_mm_intel($r2)) );
-
-		if ( is_reg16_intel($r2) ) {
-
-			return 0 if $sign =~ /-/o;
-			# must be one of predefined registers
-			if ( $r2 =~ /^bx$/io || $r2 =~ /^bp$/io
-				|| $r2 =~ /^si$/io  || $r2 =~ /^di$/io )
-			{
-				return 1;
-			}
-			return 0;
-		} else {
-			# variable/number/constant is OK
-			return 1;
-		}
+		return _validate_16bit_addr_parts_intel ($1, $2, $3, undef, undef, undef, undef);
 	}
 	elsif ( $elem =~ /^(\w+):\s*\[\s*([\+\-]*)\s*(\w+)\s*([\+\-]+)\s*(\w+)\s*\]$/o
 		|| $elem =~ /^\[\s*(\w+)\s*:\s*([\+\-]*)\s*(\w+)\s*([\+\-]+)\s*(\w+)\s*\]$/o ) {
 
-		my ($r1, $r2, $r3, $r4, $sign) = ($1, $3, $4, $5, $2);
-
-		return 0 if ( is_segreg_intel($r2) || is_segreg_intel($r4) || ! is_segreg_intel($r1) );
-		return 0 if ( (! is_reg16_intel($r2)) && (is_reg8_intel($r2) || is_segreg_intel($r2)
-			|| is_reg32_intel($r2) || is_reg64_intel($r2) || is_reg_mm_intel($r2)) );
-		return 0 if ( (! is_reg16_intel($r4)) && (is_reg8_intel($r4) || is_segreg_intel($r4)
-			|| is_reg32_intel($r4) || is_reg64_intel($r4) || is_reg_mm_intel($r4)) );
-
-		if ( is_reg16_intel($r2) ) {
-
-			return 0 if $sign =~ /-/o;
-			# must be one of predefined registers
-			if ( $r2 =~ /^bx$/io || $r2 =~ /^bp$/io
-				|| $r2 =~ /^si$/io  || $r2 =~ /^di$/io )
-			{
-				if ( is_reg16_intel($r4) ) {
-
-					return 0 if (($r2 =~ /^b.$/io && $r4 =~ /^b.$/io)
-						|| ($r2 =~ /^.i$/io && $r4 =~ /^.i$/io));
-
-					# must be one of predefined registers
-					if ( ($r4 =~ /^bx$/io || $r4 =~ /^bp$/io
-						|| $r4 =~ /^si$/io  || $r4 =~ /^di$/io)
-						#&& $r4 !~ /\b$r2\b/i	# already checked
-						&& $r3 !~ /-/o
-						)
-					{
-						return 1;
-					}
-					return 0;
-				} else {
-					# variable/number/constant is OK
-					return 1;
-				}
-			}
-			return 0;
-		} else {
-			# variable/number/constant is OK
-			if ( is_reg16_intel($r4) ) {
-
-				# must be one of predefined registers
-				if ( ($r4 =~ /^bx$/io || $r4 =~ /^bp$/io
-					|| $r4 =~ /^si$/io  || $r4 =~ /^di$/io)
-					&& $r3 !~ /-/o
-				)
-				{
-					return 1;
-				}
-				return 0;
-			} else {
-				# variable/number/constant is OK
-				return 1;
-			}
-		}
+		return _validate_16bit_addr_parts_intel ($1, $2, $3, $4, $5, undef, undef);
 	}
 	elsif ( $elem =~ /^(\w+):\s*\[\s*([\+\-]*)\s*(\w+)\s*([\+\-]+)\s*(\w+)\s*([\+\-]+)\s*(\w+)\s*\]$/o
 		|| $elem =~ /^\[\s*(\w+)\s*:\s*([\+\-]*)\s*(\w+)\s*([\+\-]+)\s*(\w+)\s*([\+\-]+)\s*(\w+)\s*\]$/o ) {
 
-		my ($r1, $r2, $r3, $r4, $r5, $r6, $sign) = ($1, $3, $4, $5, $6, $7, $2);
-
-		return 0 if ( is_segreg_intel($r2) || is_segreg_intel($r4) || is_segreg_intel($r6) || ! is_segreg_intel($r1) );
-		return 0 if ( (! is_reg16_intel($r2)) && (is_reg8_intel($r2) || is_segreg_intel($r2)
-			|| is_reg32_intel($r2) || is_reg64_intel($r2) || is_reg_mm_intel($r2)) );
-		return 0 if ( (! is_reg16_intel($r4)) && (is_reg8_intel($r4) || is_segreg_intel($r4)
-			|| is_reg32_intel($r4) || is_reg64_intel($r4) || is_reg_mm_intel($r4)) );
-		return 0 if ( (! is_reg16_intel($r6)) && (is_reg8_intel($r6) || is_segreg_intel($r6)
-			|| is_reg32_intel($r6) || is_reg64_intel($r6) || is_reg_mm_intel($r6)) );
-
-		if ( is_reg16_intel($r2) ) {
-
-			return 0 if $sign =~ /-/o;
-			# must be one of predefined registers
-			if ( $r2 =~ /^bx$/io || $r2 =~ /^bp$/io
-				|| $r2 =~ /^si$/io  || $r2 =~ /^di$/io )
-			{
-				if ( is_reg16_intel($r4) ) {
-
-					return 0 if (($r2 =~ /^b.$/io && $r4 =~ /^b.$/io)
-						|| ($r2 =~ /^.i$/io && $r4 =~ /^.i$/io));
-
-					# must be one of predefined registers
-					if ( ($r4 =~ /^bx$/io || $r4 =~ /^bp$/io
-						|| $r4 =~ /^si$/io  || $r4 =~ /^di$/io)
-						#&& $r4 !~ /\b$r2\b/i	# already checked
-						&& $r3 !~ /-/o
-						&& ! is_reg_intel($r6)
-						)
-					{
-						return 1;
-					}
-					return 0;
-
-				} elsif ( is_reg16_intel($r6) ) {
-
-					return 0 if (($r2 =~ /^b.$/io && $r6 =~ /^b.$/io)
-						|| ($r2 =~ /^.i$/io && $r6 =~ /^.i$/io));
-
-					# must be one of predefined registers
-					if ( ($r6 =~ /^bx$/io || $r6 =~ /^bp$/io
-						|| $r6 =~ /^si$/io  || $r6 =~ /^di$/io)
-						#&& $r6 !~ /\b$r2\b/i	# already checked
-						&& $r5 !~ /-/o
-						#&& ! is_reg_intel($r4)	# already checked
-						)
-					{
-						return 1;
-					}
-					return 0;
-				} else {
-					# variable/number/constant is OK
-					return 1;
-				}
-			}
-			return 0;
-		} else {
-			# variable/number/constant is OK
-			if ( is_reg16_intel($r4) ) {
-
-				# must be one of predefined registers
-				if ( $r4 =~ /^bx$/io || $r4 =~ /^bp$/io
-					|| $r4 =~ /^si$/io  || $r4 =~ /^di$/io )
-				{
-					if ( is_reg16_intel($r6) ) {
-
-						return 0 if (($r6 =~ /^b.$/io && $r4 =~ /^b.$/io)
-							|| ($r6 =~ /^.i$/io && $r4 =~ /^.i$/io));
-
-						# must be one of predefined registers
-						if ( ($r6 =~ /^bx$/io || $r6 =~ /^bp$/io
-							|| $r6 =~ /^si$/io  || $r6 =~ /^di$/io)
-							#&& $r6 !~ /\b$r4\b/i	# already checked
-							&& $r5 !~ /-/o
-							)
-						{
-							return 1;
-						}
-						return 0;
-					} else {
-						# variable/number/constant is OK
-						return 1;
-					}
-				}
-				return 0;
-			} else {
-				# variable/number/constant is OK
-				return 1;
-			}
-		}
+		return _validate_16bit_addr_parts_intel ($1, $2, $3, $4, $5, $6, $7);
 	}
 	elsif ( $elem =~ /^\[\s*([\+\-]*)\s*(\w+)\s*\]$/o ) {
 
-		my ($r1, $sign) = ($2, $1);
-
-		return 0 if ( is_segreg_intel($r1) );
-		return 0 if ( (! is_reg16_intel($r1)) && (is_reg8_intel($r1) || is_segreg_intel($r1)
-			|| is_reg32_intel($r1) || is_reg64_intel($r1) || is_reg_mm_intel($r1)) );
-
-		if ( is_reg16_intel($r1) ) {
-
-			return 0 if $sign =~ /-/o;
-			# must be one of predefined registers
-			if ( $r1 =~ /^bx$/io || $r1 =~ /^bp$/io
-				|| $r1 =~ /^si$/io  || $r1 =~ /^di$/io )
-			{
-				return 1;
-			}
-			return 0;
-		} else {
-			# variable/number/constant is OK
-			return 1;
-		}
+		return _validate_16bit_addr_parts_intel (undef, $1, $2, undef, undef, undef, undef);
 	}
 	elsif ( $elem =~ /^\[\s*([\+\-]*)\s*(\w+)\s*([\+\-]+)\s*(\w+)\s*\]$/o ) {
 
-		my ($r2, $r3, $r4, $sign) = ($2, $3, $4, $1);
-
-		return 0 if ( is_segreg_intel($r2) || is_segreg_intel($r4) );
-		return 0 if ( (! is_reg16_intel($r2)) && (is_reg8_intel($r2) || is_segreg_intel($r2)
-			|| is_reg32_intel($r2) || is_reg64_intel($r2) || is_reg_mm_intel($r2)) );
-		return 0 if ( (! is_reg16_intel($r4)) && (is_reg8_intel($r4) || is_segreg_intel($r4)
-			|| is_reg32_intel($r4) || is_reg64_intel($r4) || is_reg_mm_intel($r4)) );
-
-		if ( is_reg16_intel($r2) ) {
-
-			return 0 if $sign =~ /-/o;
-			# must be one of predefined registers
-			if ( $r2 =~ /^bx$/io || $r2 =~ /^bp$/io
-				|| $r2 =~ /^si$/io  || $r2 =~ /^di$/io )
-			{
-				if ( is_reg16_intel($r4) ) {
-
-					return 0 if (($r2 =~ /^b.$/io && $r4 =~ /^b.$/io)
-						|| ($r2 =~ /^.i$/io && $r4 =~ /^.i$/io));
-
-					# must be one of predefined registers
-					if ( ($r4 =~ /^bx$/io || $r4 =~ /^bp$/io
-						|| $r4 =~ /^si$/io  || $r4 =~ /^di$/io)
-						#&& $r4 !~ /\b$r2\b/i	# already checked
-						&& $r3 !~ /-/o
-						)
-					{
-						return 1;
-					}
-					return 0;
-				} else {
-					# variable/number/constant is OK
-					return 1;
-				}
-			}
-			return 0;
-		} else {
-			# variable/number/constant is OK
-			if ( is_reg16_intel($r4) ) {
-
-				# must be one of predefined registers
-				if ( ($r4 =~ /^bx$/io || $r4 =~ /^bp$/io
-					|| $r4 =~ /^si$/io  || $r4 =~ /^di$/io)
-					&& $r3 !~ /-/o
-				)
-				{
-					return 1;
-				}
-				return 0;
-			} else {
-				# variable/number/constant is OK
-				return 1;
-			}
-		}
+		return _validate_16bit_addr_parts_intel (undef, $1, $2, $3, $4, undef, undef);
 	}
-	elsif ( $elem =~ /^\[\s*([\+\-]*)\s*(\w+)\s*([\+\-])\s*(\w+)\s*([\+\-]+)\s*(\w+)\s*\]$/o ) {
+	elsif ( $elem =~ /^\[\s*([\+\-]*)\s*(\w+)\s*([\+\-]+)\s*(\w+)\s*([\+\-]+)\s*(\w+)\s*\]$/o ) {
 
-		my ($r2, $r3, $r4, $r5, $r6, $sign) = ($2, $3, $4, $5, $6, $1);
-
-		return 0 if ( is_segreg_intel($r2) || is_segreg_intel($r4) || is_segreg_intel($r6) );
-		return 0 if ( (! is_reg16_intel($r2)) && (is_reg8_intel($r2) || is_segreg_intel($r2)
-			|| is_reg32_intel($r2) || is_reg64_intel($r2) || is_reg_mm_intel($r2)) );
-		return 0 if ( (! is_reg16_intel($r4)) && (is_reg8_intel($r4) || is_segreg_intel($r4)
-			|| is_reg32_intel($r4) || is_reg64_intel($r4) || is_reg_mm_intel($r4)) );
-		return 0 if ( (! is_reg16_intel($r6)) && (is_reg8_intel($r6) || is_segreg_intel($r6)
-			|| is_reg32_intel($r6) || is_reg64_intel($r6) || is_reg_mm_intel($r6)) );
-
-		if ( is_reg16_intel($r2) ) {
-
-			return 0 if $sign =~ /-/o;
-			# must be one of predefined registers
-			if ( $r2 =~ /^bx$/io || $r2 =~ /^bp$/io
-				|| $r2 =~ /^si$/io  || $r2 =~ /^di$/io )
-			{
-				if ( is_reg16_intel($r4) ) {
-
-					return 0 if (($r2 =~ /^b.$/io && $r4 =~ /^b.$/io)
-						|| ($r2 =~ /^.i$/io && $r4 =~ /^.i$/io));
-
-					# must be one of predefined registers
-					if ( ($r4 =~ /^bx$/io || $r4 =~ /^bp$/io
-						|| $r4 =~ /^si$/io  || $r4 =~ /^di$/io)
-						#&& $r4 !~ /\b$r2\b/i	# already checked
-						&& $r3 !~ /-/o
-						&& ! is_reg_intel($r6)
-						)
-					{
-						return 1;
-					}
-					return 0;
-
-				} elsif ( is_reg16_intel($r6) ) {
-
-					return 0 if (($r2 =~ /^b.$/io && $r6 =~ /^b.$/io)
-						|| ($r2 =~ /^.i$/io && $r6 =~ /^.i$/io));
-
-					# must be one of predefined registers
-					if ( ($r6 =~ /^bx$/io || $r6 =~ /^bp$/io
-						|| $r6 =~ /^si$/io  || $r6 =~ /^di$/io)
-						#&& $r6 !~ /\b$r2\b/i	# already checked
-						&& $r5 !~ /-/o
-						#&& ! is_reg_intel($r4)	# already checked
-						)
-					{
-						return 1;
-					}
-					return 0;
-				} else {
-					# variable/number/constant is OK
-					return 1;
-				}
-			}
-			return 0;
-		} else {
-			return 0 if $r3 =~ /-/o;
-			# variable/number/constant is OK
-			if ( is_reg16_intel($r4) ) {
-
-				# must be one of predefined registers
-				if ( $r4 =~ /^bx$/io || $r4 =~ /^bp$/io
-					|| $r4 =~ /^si$/io  || $r4 =~ /^di$/io )
-				{
-					if ( is_reg16_intel($r6) ) {
-
-						return 0 if (($r6 =~ /^b.$/io && $r4 =~ /^b.$/io)
-							|| ($r6 =~ /^.i$/io && $r4 =~ /^.i$/io));
-
-						# must be one of predefined registers
-						if ( ($r6 =~ /^bx$/io || $r6 =~ /^bp$/io
-							|| $r6 =~ /^si$/io  || $r6 =~ /^di$/io)
-							#&& $r6 !~ /\b$r4\b/i	# already checked
-							&& $r5 !~ /-/o
-							)
-						{
-							return 1;
-						}
-						return 0;
-					} else {
-						# variable/number/constant is OK
-						return 1;
-					}
-				}
-				return 0;
-			} else {
-				# variable/number/constant is OK
-				return 1;
-			}
-		}
+		return _validate_16bit_addr_parts_intel (undef, $1, $2, $3, $4, $5, $6);
 	}
 	return 0;
+}
+
+# =head2 _is_valid_16bit_addr_reg_att
+#
+#  PRIVATE SUBROUTINE.
+#  Checks if the given register can be used in x86 16-bit addressing
+#   mode in AT&T syntax.
+#  Returns 1 if yes.
+#
+# =cut
+#
+sub _is_valid_16bit_addr_reg_att($) {
+
+	my $reg = shift;
+	return 1 if $reg =~ /^%bx$/io || $reg =~ /^%bp$/io
+		||  $reg =~ /^%si$/io || $reg =~ /^%di$/io;
+	return 0;
+}
+
+# =head2 _is_same_type_16bit_addr_reg_att
+#
+#  PRIVATE SUBROUTINE.
+#  Checks if the 2 given registers cannot be used in x86 16-bit addressing
+#   mode in AT&T syntax at the same time because they're of the same type.
+#  Returns 1 if yes.
+#
+# =cut
+#
+sub _is_same_type_16bit_addr_reg_att($$) {
+
+	my $reg1 = shift;
+	my $reg2 = shift;
+	return 1 if ($reg1 =~ /^%b.$/io && $reg2 =~ /^%b.$/io)
+		||  ($reg1 =~ /^%.i$/io && $reg2 =~ /^%.i$/io);
+	return 0;
+}
+
+# =head2 _validate_16bit_addr_parts_att
+#
+#  PRIVATE SUBROUTINE.
+#  Checks if the given address components give a valid x86 32-bit addressing
+#   mode in AT&T syntax.
+#  Returns 1 if yes.
+#
+# =cut
+#
+sub _validate_16bit_addr_parts_att($$$$$$$$) {
+
+	my $segreg = shift;
+	my $basereg_sign = shift;
+	my $basereg = shift;
+	my $indexreg_sign = shift;
+	my $indexreg = shift;
+	my $scale = shift;
+	my $disp_sign = shift;
+	my $disp = shift;
+
+	return 0 if defined $segreg && ! is_segreg_att($segreg);
+	if ( defined $basereg ) {
+		return 0 if $basereg =~ /%/o && ! is_reg16_att($basereg);
+		return 0 if is_reg_att($basereg) && ! _is_valid_16bit_addr_reg_att ($basereg);
+		return 0 if defined $disp && ! is_reg_att($basereg); # disallow 'var(var)'
+	}
+	if ( defined $indexreg ) {
+		return 0 if $indexreg =~ /%/o && ! is_reg16_att($indexreg);
+		return 0 if is_reg_att($indexreg) && ! _is_valid_16bit_addr_reg_att ($indexreg);
+		if ( ! defined $basereg && ! defined $scale ) {
+			# just one value inside - check for "(,1)
+			return 0 if $indexreg ne '1' || is_reg_att($disp);
+		}
+	}
+	return 0 if defined $disp && is_reg_att($disp);
+	return 0 if defined $scale && $scale ne '1';
+	if ( defined $basereg && defined $indexreg ) {
+
+		return 0 if ! _is_valid_16bit_addr_reg_att($basereg)
+			|| ! _is_valid_16bit_addr_reg_att($indexreg);
+		return 0 if _is_same_type_16bit_addr_reg_att ($basereg, $indexreg);
+	}
+	return 0 if defined $basereg && defined $basereg_sign
+		&& is_reg_att($basereg) && $basereg_sign =~ /-/o;
+	return 0 if defined $indexreg && defined $indexreg_sign
+		&& is_reg_att($indexreg) && $indexreg_sign =~ /-/o;
+
+	return 1;
 }
 
 =head2 is_valid_16bit_addr_att
 
  Checks if the given string parameter (must contain the parentheses)
   is a valid x86 16-bit addressing mode in AT&T syntax.
+ Works best after any pre-processing of the input, i.e. after all macros,
+  constants, etc. have been replaced by the real values.
  Returns 1 if yes.
 
 =cut
 
-sub is_valid_16bit_addr_att ( $ ) {
+sub is_valid_16bit_addr_att($) {
 
 	my $elem = shift;
-	if ( $elem =~ /^([%\w]+):\s*\(\s*([+-]*)\s*([%\w]+)\s*\)$/o ) {
+	if ( $elem =~ /^([%\w]+):\s*\(\s*([%\w]+)\s*\)$/o ) {
 
-		my ($r1, $r2, $sign) = ($1, $3, $2);
-		return 0 if (! is_segreg_att ($r1)) || is_segreg_att ($r2);
-		return 0 if is_reg16_att($r2) && $r2 !~ /^%b.$/io && $r2 !~ /^%.i$/io;
-		return 0 if is_reg16_att($r2) && $sign =~ /-/o;
-		return 0 if is_reg_att($r2) && ! is_reg16_att($r2);
-		return 1;
+		return _validate_16bit_addr_parts_att ($1, undef, $2, undef, undef, undef, undef, undef);
 	}
 	elsif ( $elem =~ /^([%\w]+):\s*\(\s*([%\w]+)\s*,\s*([%\w]+)\s*\)$/ ) {
 
-		my ($r1, $r2, $r3) = ($1, $2, $3);
-		return 0 if (! is_segreg_att ($r1)) || is_segreg_att ($r2) || is_segreg_att ($r3);
-		return 0 if (! is_reg16_att($r2)) || (! is_reg16_att($r3));
-		return 0 if $r2 !~ /^%b.$/io && $r2 !~ /^%.i$/io;
-		return 0 if $r3 !~ /^%b.$/io && $r3 !~ /^%.i$/io;
-		return 0 if (
-			   $r2 !~ /^%b.$/io && $r3 !~ /^%b.$/io
-			|| $r2 !~ /^%.i$/io && $r3 !~ /^%.i$/io
-			);
-		return 1;
+		return _validate_16bit_addr_parts_att ($1, undef, $2, undef, $3, undef, undef, undef);
 	}
 	elsif ( $elem =~ /^([%\w]+):\s*\(\s*([%\w]+)\s*,\s*([%\w]+)\s*,\s*(\d+)\s*\)$/o ) {
 
-		# 'base, index, scale' not in 16-bit addresses
-		return 0;
+		return _validate_16bit_addr_parts_att ($1, undef, $2, undef, $3, $4, undef, undef);
 	}
 	elsif ( $elem =~ /^([%\w]+):\s*\(\s*,\s*([%\w]+)\s*,\s*(\d+)\s*\)$/o ) {
 
-		# 'index, scale' not in 16-bit addresses
+		# '(, index, scale)' not in 16-bit addresses
 		return 0;
 	}
-	elsif ( $elem =~ /^([%\w]+):\s*[+-]*\s*([%\w]+)\s*\(\s*([+-]*)\s*([%\w]+)\s*\)$/o ) {
+	elsif ( $elem =~ /^([%\w]+):\s*([+-]*)\s*([%\w]+)\s*\(\s*([%\w]+)\s*\)$/o ) {
 
-		my ($r1, $r2, $var, $sign) = ($1, $4, $2, $3);
-		return 0 if (! is_segreg_att ($r1)) || is_segreg_att ($r2);
-		return 0 if is_reg16_att($r2) && $r2 !~ /^%b.$/io && $r2 !~ /^%.i$/io;
-		return 0 if is_reg16_att($r2) && $sign =~ /-/o;
-		return 0 if is_reg_att($r2) && ! is_reg16_att($r2);
-		return 0 if is_reg_att($var);
-		return 1;
+		return _validate_16bit_addr_parts_att ($1, undef, $4, undef, undef, undef, $2, $3);
 	}
-	elsif ( $elem =~ /^([%\w]+):\s*[+-]*\s*([%\w]+)\s*\(\s*([%\w]+)\s*,\s*([%\w]+)\s*\)$/o ) {
+	elsif ( $elem =~ /^([%\w]+):\s*([+-]*)\s*([%\w]+)\s*\(\s*([%\w]+)\s*,\s*([%\w]+)\s*\)$/o ) {
 
-		my ($r1, $r2, $r3, $var) = ($1, $3, $4, $2);
-		return 0 if (! is_segreg_att ($r1)) || is_segreg_att ($r2) || is_segreg_att ($r3);
-		return 0 if (! is_reg16_att($r2)) || (! is_reg16_att($r3));
-		return 0 if $r2 !~ /^%b.$/io && $r2 !~ /^%.i$/io;
-		return 0 if $r3 !~ /^%b.$/io && $r3 !~ /^%.i$/io;
-		return 0 if (
-			   $r2 !~ /^%b.$/io && $r3 !~ /^%b.$/io
-			|| $r2 !~ /^%.i$/io && $r3 !~ /^%.i$/io
-			);
-		return 0 if is_reg_att($var);
-		return 1;
+		return _validate_16bit_addr_parts_att ($1, undef, $4, undef, $5, undef, $2, $3);
 	}
-	elsif ( $elem =~ /^([%\w]+):\s*[+-]*\s*([%\w]+)\s*\(\s*([%\w]+)\s*,\s*([%\w]+)\s*,\s*(\d+)\s*\)$/o ) {
+	elsif ( $elem =~ /^([%\w]+):\s*([+-]*)\s*([%\w]+)\s*\(\s*([%\w]+)\s*,\s*([%\w]+)\s*,\s*(\d+)\s*\)$/o ) {
 
-		# 'base, index, scale' not in 16-bit addresses
+		return _validate_16bit_addr_parts_att ($1, undef, $4, undef, $5, $6, $2, $3);
+	}
+	elsif ( $elem =~ /^([%\w]+):\s*([+-]*)\s*([%\w]+)\s*\(\s*,\s*([%\w]+)\s*,\s*(\d+)\s*\)$/o ) {
+
+		# 'disp(, index, scale)' not in 16-bit addresses
 		return 0;
 	}
-	elsif ( $elem =~ /^([%\w]+):\s*[+-]*\s*([%\w]+)\s*\(\s*,\s*([%\w]+)\s*,\s*(\d+)\s*\)$/o ) {
+	elsif ( $elem =~ /^([%\w]+):\s*([+-]*)\s*([%\w]+)\s*\(\s*,\s*([%\w]+)\s*\)$/o ) {
 
-		# 'index, scale' not in 16-bit addresses
-		return 0;
+		return _validate_16bit_addr_parts_att ($1, undef, undef, undef, $4, undef, $2, $3);
 	}
-	elsif ( $elem =~ /^([%\w]+):\s*[+-]*\s*([%\w]+)\s*\(\s*,\s*1\s*\)$/o ) {
+	elsif ( $elem =~ /^\(\s*([%\w]+)\s*\)$/o ) {
 
-		# special form: varname(1,)
-		my ($r1, $var) = ($1, $2);
-		return 0 if is_reg_att($var) || ! is_segreg_att ($r1);
-		return 1;
-	}
-	elsif ( $elem =~ /^\(\s*([+-]*)\s*([%\w]+)\s*\)$/o ) {
-
-		my ($r2, $sign) = ($2, $1);
-		return 0 if is_segreg_att ($r2);
-		return 0 if is_reg16_att($r2) && $r2 !~ /^%b.$/io && $r2 !~ /^%.i$/io;
-		return 0 if is_reg_att($r2) && ! is_reg16_att($r2);
-		return 0 if is_reg16_att($r2) && $sign =~ /-/o;
-		return 1;
+		return _validate_16bit_addr_parts_att (undef, undef, $1, undef, undef, undef, undef, undef);
 	}
 	elsif ( $elem =~ /^\(\s*([%\w]+)\s*,\s*([%\w]+)\s*\)$/o ) {
 
-		my ($r2, $r3) = ($1, $2);
-		return 0 if is_segreg_att ($r2) || is_segreg_att ($r3);
-		return 0 if (! is_reg16_att($r2)) || (! is_reg16_att($r3));
-		return 0 if $r2 !~ /^%b.$/io && $r2 !~ /^%.i$/io;
-		return 0 if $r3 !~ /^%b.$/io && $r3 !~ /^%.i$/io;
-		return 0 if (
-			   $r2 !~ /^%b.$/io && $r3 !~ /^%b.$/io
-			|| $r2 !~ /^%.i$/io && $r3 !~ /^%.i$/io
-			);
-		return 1;
+		return _validate_16bit_addr_parts_att (undef, undef, $1, undef, $2, undef, undef, undef);
 	}
 	elsif ( $elem =~ /^\(\s*([%\w]+)\s*,\s*([%\w]+)\s*,\s*(\d+)\s*\)$/o ) {
 
-		# 'base, index, scale' not in 16-bit addresses
-		return 0;
+		return _validate_16bit_addr_parts_att (undef, undef, $1, undef, $2, $3, undef, undef);
 	}
 	elsif ( $elem =~ /^\(\s*,\s*([%\w]+)\s*,\s*(\d+)\s*\)$/o ) {
 
-		# 'index, scale' not in 16-bit addresses
+		# '(, index, scale)' not in 16-bit addresses
 		return 0;
 	}
-	elsif ( $elem =~ /^[+-]*\s*([%\w]+)\s*\(\s*([+-]*)\s*([%\w]+)\s*\)$/o ) {
+	elsif ( $elem =~ /^([+-]*)\s*([%\w]+)\s*\(\s*([%\w]+)\s*\)$/o ) {
 
-		my ($r2, $var, $sign) = ($3, $1, $2);
-		return 0 if is_segreg_att ($r2);
-		return 0 if ! is_reg16_att($r2);
-		return 0 if $r2 !~ /^%b.$/io && $r2 !~ /^%.i$/io;
-		return 0 if $sign =~ /-/o;
-		return 0 if is_reg_att($var);
-		return 1;
+		return _validate_16bit_addr_parts_att (undef, undef, $3, undef, undef, undef, $1, $2);
 	}
-	elsif ( $elem =~ /^[+-]*\s*([%\w]+)\s*\(\s*([%\w]+)\s*,\s*([%\w]+)\s*\)$/o ) {
+	elsif ( $elem =~ /^([+-]*)\s*([%\w]+)\s*\(\s*([%\w]+)\s*,\s*([%\w]+)\s*\)$/o ) {
 
-		my ($r2, $r3, $var) = ($2, $3, $1);
-		return 0 if is_segreg_att ($r2) || is_segreg_att ($r3);
-		return 0 if (! is_reg16_att($r2)) || (! is_reg16_att($r3));
-		return 0 if $r2 !~ /^%b.$/io && $r2 !~ /^%.i$/io;
-		return 0 if $r3 !~ /^%b.$/io && $r3 !~ /^%.i$/io;
-		return 0 if (
-			   $r2 !~ /^%b.$/io && $r3 !~ /^%b.$/io
-			|| $r2 !~ /^%.i$/io && $r3 !~ /^%.i$/io
-			);
-		return 0 if is_reg_att($var);
-		return 1;
+		return _validate_16bit_addr_parts_att (undef, undef, $3, undef, $4, undef, $1, $2);
 	}
-	elsif ( $elem =~ /^[+-]*\s*([%\w]+)\s*\(\s*([%\w]+)\s*,\s*([%\w]+)\s*,\s*(\d+)\s*\)$/o ) {
+	elsif ( $elem =~ /^([+-]*)\s*([%\w]+)\s*\(\s*([%\w]+)\s*,\s*([%\w]+)\s*,\s*(\d+)\s*\)$/o ) {
 
-		# 'base, index, scale' not in 16-bit addresses
+		return _validate_16bit_addr_parts_att (undef, undef, $3, undef, $4, $5, $1, $2);
+	}
+	elsif ( $elem =~ /^([+-]*)\s*([%\w]+)\s*\(\s*,\s*([%\w]+)\s*,\s*(\d+)\s*\)$/o ) {
+
+		# 'disp(, index, scale)' not in 16-bit addresses
 		return 0;
 	}
-	elsif ( $elem =~ /^[+-]*\s*([%\w]+)\s*\(\s*,\s*([%\w]+)\s*,\s*(\d+)\s*\)$/o ) {
+	elsif ( $elem =~ /^([+-]*)\s*([%\w]+)\s*\(\s*,\s*([%\w]+)\s*\)$/o ) {
 
-		# 'index, scale' not in 16-bit addresses
-		return 0;
-	}
-	elsif ( $elem =~ /^[+-]*\s*([%\w]+)\s*\(\s*,\s*1\s*\)$/o ) {
-
-		# special form: varname(1,)
-		my $var = $1;
-		return 0 if is_reg_att($var);
-		return 1;
+		return _validate_16bit_addr_parts_att (undef, undef, undef, undef, $3, undef, $1, $2);
 	}
 	return 0;
 }
@@ -1782,670 +1639,305 @@ sub is_valid_16bit_addr_att ( $ ) {
 
  Checks if the given string parameter (must contain the parentheses)
   is a valid x86 16-bit addressing mode in AT&T or Intel syntax.
+ Works best after any pre-processing of the input, i.e. after all macros,
+  constants, etc. have been replaced by the real values.
  Returns 1 if yes.
 
 =cut
 
-sub is_valid_16bit_addr ( $ ) {
+sub is_valid_16bit_addr($) {
 
 	my $elem = shift;
 	return    is_valid_16bit_addr_intel ($elem)
 		| is_valid_16bit_addr_att ($elem);
 }
 
+# =head2 _validate_32bit_addr_parts_intel
+# 
+#  PRIVATE SUBROUTINE.
+#  Checks if the given address components give a valid x86 32-bit addressing
+#   mode in Intel syntax.
+#  Returns 1 if yes.
+# 
+# =cut
+sub _validate_32bit_addr_parts_intel($$$$$$$$) {
+
+	my $segreg = shift;
+	my $base_reg_sign = shift;
+	my $base_reg = shift;
+	my $index_reg_sign = shift;
+	my $index_reg = shift;
+	my $scale = shift;
+	my $disp_sign = shift;
+	my $disp = shift;
+
+	return 0 if defined $segreg && ! is_segreg_intel($segreg);
+	return 0 if defined $base_reg && is_reg_intel($base_reg) && ! is_addressable32_intel($base_reg);
+	return 0 if defined $index_reg && is_reg_intel($index_reg) && ! is_addressable32_intel($index_reg);
+	return 0 if defined $scale && is_reg_intel($scale) && ! is_addressable32_intel($scale);
+	return 0 if defined $disp && is_reg_intel($disp) && ! is_addressable32_intel($disp);
+
+	return 0 if defined $index_reg && defined $scale
+		&& is_reg_intel($index_reg) && is_reg_intel($scale);
+	return 0 if defined $base_reg && defined $base_reg_sign
+		&& is_reg_intel($base_reg) && $base_reg_sign =~ /-/o;
+	return 0 if defined $index_reg && defined $index_reg_sign
+		&& is_reg_intel($index_reg) && $index_reg_sign =~ /-/o;
+	return 0 if defined $scale && defined $index_reg_sign
+		&& is_reg_intel($scale) && $index_reg_sign =~ /-/o;
+	return 0 if defined $disp && defined $disp_sign
+		&& is_reg_intel($disp) && $disp_sign =~ /-/o;
+
+	if ( defined $index_reg && defined $scale ) {
+
+		return 0 if $index_reg =~ /\besp\b/io && $scale =~ /\b\d+\b/o && $scale != 1;
+		return 0 if $scale =~ /\besp\b/io && $index_reg =~ /\b\d+\b/o && $index_reg != 1;
+		return 0 if is_reg_intel($index_reg) && $scale =~ /\b\d+\b/o && $scale != 1
+			&& $scale != 2 && $scale != 4 && $scale != 8;
+		return 0 if is_reg_intel($scale) && $index_reg =~ /\b\d+\b/o && $index_reg != 1
+			&& $index_reg != 2 && $index_reg != 4 && $index_reg != 8;
+	}
+	return 0 if defined $base_reg && defined $index_reg && defined $disp
+		&& is_reg_intel($base_reg) && is_reg_intel($index_reg) && is_reg_intel($disp);
+	return 0 if defined $base_reg && defined $scale && defined $disp
+		&& is_reg_intel($base_reg) && is_reg_intel($scale) && is_reg_intel($disp);
+
+	return 1;
+}
+
 =head2 is_valid_32bit_addr_intel
 
  Checks if the given string parameter (must contain the square braces)
   is a valid x86 32-bit addressing mode in Intel syntax.
+ Works best after any pre-processing of the input, i.e. after all macros,
+  constants, etc. have been replaced by the real values.
  Returns 1 if yes.
 
 =cut
 
-sub is_valid_32bit_addr_intel ( $ ) {
+sub is_valid_32bit_addr_intel($) {
 
 	my $elem = shift;
 	# [seg:base+index*scale+disp]
 	if (	$elem =~ /^\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]$/o
 		|| $elem =~ /^(\w+)\s*:\s*\[\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]$/o) {
 
-		my ($r1, $r2, $r3, $r4, $r5, $r6, $r7, $r8) = ($1, $2, $3, $4, $5, $6, $7, $8);
-
-		return 0 if ( is_segreg_intel($r3) || is_segreg_intel($r6) || is_segreg_intel($r5)
-			|| is_segreg_intel($r8) || ! is_segreg_intel($r1) );
-		return 0 if ( (! is_addressable32_intel($r3)) && (is_reg8_intel($r3) || is_segreg_intel($r3)
-			|| is_reg16_intel($r3) || is_reg64_intel($r3) || is_reg32_intel($r3)
-			|| is_reg_mm_intel($r3) || is_reg_fpu_intel($r3)) );
-		return 0 if ( (! is_addressable32_intel($r6)) && (is_reg8_intel($r6) || is_segreg_intel($r6)
-			|| is_reg16_intel($r6) || is_reg64_intel($r6) || is_reg32_intel($r6)
-			|| is_reg_mm_intel($r6) || is_reg_fpu_intel($r6)) );
-		return 0 if ( (! is_addressable32_intel($r5)) && (is_reg8_intel($r5) || is_segreg_intel($r5)
-			|| is_reg16_intel($r5) || is_reg64_intel($r5) || is_reg32_intel($r5)
-			|| is_reg_mm_intel($r5) || is_reg_fpu_intel($r5)) );
-		return 0 if ( (! is_addressable32_intel($r8)) && (is_reg8_intel($r8) || is_segreg_intel($r8)
-			|| is_reg16_intel($r8) || is_reg64_intel($r8) || is_reg32_intel($r8)
-			|| is_reg_mm_intel($r8) || is_reg_fpu_intel($r8)) );
-		return 0 if ( is_reg_intel($r6) && is_reg_intel($r5) );
-		return 0 if ( is_reg_intel($r3) && $r2 =~ /-/o );
-		return 0 if ( (is_reg_intel($r5) || is_reg_intel($r6)) && $r4 =~ /-/o );
-		return 0 if ( is_reg_intel($r8) && $r7 =~ /-/o );
-		return 0 if ( $r5 =~ /\besp\b/io && $r6 =~ /\b\d+\b/o && $r6 != 1 );
-		return 0 if ( $r6 =~ /\besp\b/io && $r5 =~ /\b\d+\b/o && $r5 != 1 );
-		return 0 if ( is_reg_intel($r5) && $r6 =~ /\b\d+\b/o && $r6 != 1
-			&& $r6 != 2 && $r6 != 4 && $r6 != 8);
-		return 0 if ( is_reg_intel($r6) && $r5 =~ /\b\d+\b/o && $r5 != 1
-			&& $r5 != 2 && $r5 != 4 && $r5 != 8);
-		return 0 if ( is_reg_intel($r3) && (is_reg_intel($r5) || is_reg_intel($r6)) && is_reg_intel($r8) );
-
-		return 1;
+		return _validate_32bit_addr_parts_intel ($1, $2, $3, $4, $5, $6, $7, $8);
 	}
 	elsif (	$elem =~ /^\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*\*\s*(\w+)\s*(\)*)\s*\]$/o
 		|| $elem =~ /^(\w+)\s*:\s*\[\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*\*\s*(\w+)\s*(\)*)\s*\]$/o) {
 
-		my ($r1, $r2, $r3, $r7, $r8, $r4, $r5, $r6) = ($1, $2, $3, $4, $5, $6, $7, $8);
-
-		return 0 if ( is_segreg_intel($r3) || is_segreg_intel($r6) || is_segreg_intel($r5)
-			|| is_segreg_intel($r8) || ! is_segreg_intel($r1) );
-		return 0 if ( (! is_addressable32_intel($r3)) && (is_reg8_intel($r3) || is_segreg_intel($r3)
-			|| is_reg16_intel($r3) || is_reg64_intel($r3) || is_reg32_intel($r3)
-			|| is_reg_mm_intel($r3) || is_reg_fpu_intel($r3)) );
-		return 0 if ( (! is_addressable32_intel($r6)) && (is_reg8_intel($r6) || is_segreg_intel($r6)
-			|| is_reg16_intel($r6) || is_reg64_intel($r6) || is_reg32_intel($r6)
-			|| is_reg_mm_intel($r6) || is_reg_fpu_intel($r6)) );
-		return 0 if ( (! is_addressable32_intel($r5)) && (is_reg8_intel($r5) || is_segreg_intel($r5)
-			|| is_reg16_intel($r5) || is_reg64_intel($r5) || is_reg32_intel($r5)
-			|| is_reg_mm_intel($r5) || is_reg_fpu_intel($r5)) );
-		return 0 if ( (! is_addressable32_intel($r8)) && (is_reg8_intel($r8) || is_segreg_intel($r8)
-			|| is_reg16_intel($r8) || is_reg64_intel($r8) || is_reg32_intel($r8)
-			|| is_reg_mm_intel($r8) || is_reg_fpu_intel($r8)) );
-		return 0 if ( is_reg_intel($r6) && is_reg_intel($r5) );
-		return 0 if ( is_reg_intel($r3) && $r2 =~ /-/o );
-		return 0 if ( (is_reg_intel($r5) || is_reg_intel($r6)) && $r4 =~ /-/o );
-		return 0 if ( is_reg_intel($r8) && $r7 =~ /-/o );
-		return 0 if ( $r5 =~ /\besp\b/io && $r6 =~ /\b\d+\b/o && $r6 != 1 );
-		return 0 if ( $r6 =~ /\besp\b/io && $r5 =~ /\b\d+\b/o && $r5 != 1 );
-		return 0 if ( is_reg_intel($r5) && $r6 =~ /\b\d+\b/o && $r6 != 1
-			&& $r6 != 2 && $r6 != 4 && $r6 != 8);
-		return 0 if ( is_reg_intel($r6) && $r5 =~ /\b\d+\b/o && $r5 != 1
-			&& $r5 != 2 && $r5 != 4 && $r5 != 8);
-		return 0 if ( is_reg_intel($r3) && (is_reg_intel($r5) || is_reg_intel($r6)) && is_reg_intel($r8) );
-
-		return 1;
+		return _validate_32bit_addr_parts_intel ($1, $2, $3, $6, $7, $8, $4, $5);
 	}
 	elsif (	$elem =~ /^\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]$/o
 		|| $elem =~ /^(\w+)\s*:\s*\[\s*([\+\-\(\)]*)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]$/o) {
 
-		my ($r1, $r4, $r5, $r6, $r2, $r3, $r7, $r8) = ($1, $2, $3, $4, $5, $6, $7, $8);
-
-		return 0 if ( is_segreg_intel($r3) || is_segreg_intel($r6) || is_segreg_intel($r5)
-			|| is_segreg_intel($r8) || ! is_segreg_intel($r1) );
-		return 0 if ( (! is_addressable32_intel($r3)) && (is_reg8_intel($r3) || is_segreg_intel($r3)
-			|| is_reg16_intel($r3) || is_reg64_intel($r3) || is_reg32_intel($r3)
-			|| is_reg_mm_intel($r3) || is_reg_fpu_intel($r3)) );
-		return 0 if ( (! is_addressable32_intel($r6)) && (is_reg8_intel($r6) || is_segreg_intel($r6)
-			|| is_reg16_intel($r6) || is_reg64_intel($r6) || is_reg32_intel($r6)
-			|| is_reg_mm_intel($r6) || is_reg_fpu_intel($r6)) );
-		return 0 if ( (! is_addressable32_intel($r5)) && (is_reg8_intel($r5) || is_segreg_intel($r5)
-			|| is_reg16_intel($r5) || is_reg64_intel($r5) || is_reg32_intel($r5)
-			|| is_reg_mm_intel($r5) || is_reg_fpu_intel($r5)) );
-		return 0 if ( (! is_addressable32_intel($r8)) && (is_reg8_intel($r8) || is_segreg_intel($r8)
-			|| is_reg16_intel($r8) || is_reg64_intel($r8) || is_reg32_intel($r8)
-			|| is_reg_mm_intel($r8) || is_reg_fpu_intel($r8)) );
-		return 0 if ( is_reg_intel($r6) && is_reg_intel($r5) );
-		return 0 if ( is_reg_intel($r3) && $r2 =~ /-/o );
-		return 0 if ( (is_reg_intel($r5) || is_reg_intel($r6)) && $r4 =~ /-/o );
-		return 0 if ( is_reg_intel($r8) && $r7 =~ /-/o );
-		return 0 if ( $r5 =~ /\besp\b/io && $r6 =~ /\b\d+\b/o && $r6 != 1 );
-		return 0 if ( $r6 =~ /\besp\b/io && $r5 =~ /\b\d+\b/o && $r5 != 1 );
-		return 0 if ( is_reg_intel($r5) && $r6 =~ /\b\d+\b/o && $r6 != 1
-			&& $r6 != 2 && $r6 != 4 && $r6 != 8);
-		return 0 if ( is_reg_intel($r6) && $r5 =~ /\b\d+\b/o && $r5 != 1
-			&& $r5 != 2 && $r5 != 4 && $r5 != 8);
-		return 0 if ( is_reg_intel($r3) && (is_reg_intel($r5) || is_reg_intel($r6)) && is_reg_intel($r8) );
-
-		return 1;
+		return _validate_32bit_addr_parts_intel ($1, $5, $6, $2, $3, $4, $7, $8);
 	}
 	elsif (	$elem =~ /^\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]$/o
 		|| $elem =~ /^(\w+)\s*:\s*\[\s*([\+\-\(\)]*)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]$/o) {
 
-		my ($r1, $r4, $r5, $r6, $r2, $r3) = ($1, $2, $3, $4, $5, $6);
-
-		return 0 if ( is_segreg_intel($r3) || is_segreg_intel($r6) || is_segreg_intel($r5)
-			|| ! is_segreg_intel($r1) );
-		return 0 if ( (! is_addressable32_intel($r3)) && (is_reg8_intel($r3) || is_segreg_intel($r3)
-			|| is_reg16_intel($r3) || is_reg64_intel($r3) || is_reg32_intel($r3)
-			|| is_reg_mm_intel($r3) || is_reg_fpu_intel($r3)) );
-		return 0 if ( (! is_addressable32_intel($r6)) && (is_reg8_intel($r6) || is_segreg_intel($r6)
-			|| is_reg16_intel($r6) || is_reg64_intel($r6) || is_reg32_intel($r6)
-			|| is_reg_mm_intel($r6) || is_reg_fpu_intel($r6)) );
-		return 0 if ( (! is_addressable32_intel($r5)) && (is_reg8_intel($r5) || is_segreg_intel($r5)
-			|| is_reg16_intel($r5) || is_reg64_intel($r5) || is_reg32_intel($r5)
-			|| is_reg_mm_intel($r5) || is_reg_fpu_intel($r5)) );
-		return 0 if ( is_reg_intel($r6) && is_reg_intel($r5) );
-		return 0 if ( is_reg_intel($r3) && $r2 =~ /-/o );
-		return 0 if ( (is_reg_intel($r5) || is_reg_intel($r6)) && $r4 =~ /-/o );
-		return 0 if ( $r5 =~ /\besp\b/io && $r6 =~ /\b\d+\b/o && $r6 != 1 );
-		return 0 if ( $r6 =~ /\besp\b/io && $r5 =~ /\b\d+\b/o && $r5 != 1 );
-		return 0 if ( is_reg_intel($r5) && $r6 =~ /\b\d+\b/o && $r6 != 1
-			&& $r6 != 2 && $r6 != 4 && $r6 != 8);
-		return 0 if ( is_reg_intel($r6) && $r5 =~ /\b\d+\b/o && $r5 != 1
-			&& $r5 != 2 && $r5 != 4 && $r5 != 8);
-
-		return 1;
+		return _validate_32bit_addr_parts_intel ($1, undef, undef, $2, $3, $4, $5, $6);
 	}
 	elsif (	$elem =~ /^\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]$/o
 		|| $elem =~ /^(\w+)\s*:\s*\[\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]$/o) {
 
-		my ($r1, $r2, $r3, $r4, $r5, $r7, $r8) = ($1, $2, $3, $4, $5, $6, $7);
-
-		return 0 if ( is_segreg_intel($r3) || is_segreg_intel($r5)
-			|| is_segreg_intel($r8) || ! is_segreg_intel($r1) );
-		return 0 if ( (! is_addressable32_intel($r3)) && (is_reg8_intel($r3) || is_segreg_intel($r3)
-			|| is_reg16_intel($r3) || is_reg64_intel($r3) || is_reg32_intel($r3)
-			|| is_reg_mm_intel($r3) || is_reg_fpu_intel($r3)) );
-		return 0 if ( (! is_addressable32_intel($r5)) && (is_reg8_intel($r5) || is_segreg_intel($r5)
-			|| is_reg16_intel($r5) || is_reg64_intel($r5) || is_reg32_intel($r5)
-			|| is_reg_mm_intel($r5) || is_reg_fpu_intel($r5)) );
-		return 0 if ( (! is_addressable32_intel($r8)) && (is_reg8_intel($r8) || is_segreg_intel($r8)
-			|| is_reg16_intel($r8) || is_reg64_intel($r8) || is_reg32_intel($r8)
-			|| is_reg_mm_intel($r8) || is_reg_fpu_intel($r8)) );
-		return 0 if ( is_reg_intel($r3) && $r2 =~ /-/o );
-		return 0 if ( is_reg_intel($r5) && $r4 =~ /-/o );
-		return 0 if ( is_reg_intel($r8) && $r7 =~ /-/o );
-		return 0 if ( is_reg_intel($r3) && is_reg_intel($r5) && is_reg_intel($r8) );
-
-		return 1;
+		return _validate_32bit_addr_parts_intel ($1, $2, $3, $4, $5, undef, $6, $7);
 	}
 	elsif (	$elem =~ /^\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*\*\s*(\w+)\s*(\)*)\s*\]$/o
 		|| $elem =~ /^(\w+)\s*:\s*\[\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*\*\s*(\w+)\s*(\)*)\s*\]$/o) {
 
-		my ($r1, $r2, $r3, $r4, $r5, $r6) = ($1, $2, $3, $4, $5, $6);
-
-		return 0 if ( is_segreg_intel($r3) || is_segreg_intel($r6) || is_segreg_intel($r5)
-			|| ! is_segreg_intel($r1) );
-		return 0 if ( (! is_addressable32_intel($r3)) && (is_reg8_intel($r3) || is_segreg_intel($r3)
-			|| is_reg16_intel($r3) || is_reg64_intel($r3) || is_reg32_intel($r3)
-			|| is_reg_mm_intel($r3) || is_reg_fpu_intel($r3)) );
-		return 0 if ( (! is_addressable32_intel($r6)) && (is_reg8_intel($r6) || is_segreg_intel($r6)
-			|| is_reg16_intel($r6) || is_reg64_intel($r6) || is_reg32_intel($r6)
-			|| is_reg_mm_intel($r6) || is_reg_fpu_intel($r6)) );
-		return 0 if ( (! is_addressable32_intel($r5)) && (is_reg8_intel($r5) || is_segreg_intel($r5)
-			|| is_reg16_intel($r5) || is_reg64_intel($r5) || is_reg32_intel($r5)
-			|| is_reg_mm_intel($r5) || is_reg_fpu_intel($r5)) );
-		return 0 if ( is_reg_intel($r6) && is_reg_intel($r5) );
-		return 0 if ( is_reg_intel($r3) && $r2 =~ /-/o );
-		return 0 if ( (is_reg_intel($r5) || is_reg_intel($r6)) && $r4 =~ /-/o );
-		return 0 if ( $r5 =~ /\besp\b/io && $r6 =~ /\b\d+\b/o && $r6 != 1 );
-		return 0 if ( $r6 =~ /\besp\b/io && $r5 =~ /\b\d+\b/o && $r5 != 1 );
-		return 0 if ( is_reg_intel($r5) && $r6 =~ /\b\d+\b/o && $r6 != 1
-			&& $r6 != 2 && $r6 != 4 && $r6 != 8);
-		return 0 if ( is_reg_intel($r6) && $r5 =~ /\b\d+\b/o && $r5 != 1
-			&& $r5 != 2 && $r5 != 4 && $r5 != 8);
-
-		return 1;
+		return _validate_32bit_addr_parts_intel ($1, $2, $3, $4, $5, $6, undef, undef);
 	}
 	elsif (	$elem =~ /^\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*\]$/o
 		|| $elem =~ /^(\w+)\s*:\s*\[\s*([\+\-\(\)]*)\s*(\w+)\s*\]$/o) {
 
-		my ($r1, $r2, $r3) = ($1, $2, $3);
-
-		return 0 if ( is_segreg_intel($r3) || ! is_segreg_intel($r1) );
-		return 0 if ( (! is_addressable32_intel($r3)) && (is_reg8_intel($r3) || is_segreg_intel($r3)
-			|| is_reg16_intel($r3) || is_reg64_intel($r3) || is_reg32_intel($r3)
-			|| is_reg_mm_intel($r3) || is_reg_fpu_intel($r3)) );
-		return 0 if ( is_reg_intel($r3) && $r2 =~ /-/o );
-
-		return 1;
+		return _validate_32bit_addr_parts_intel ($1, $2, $3, undef, undef, undef, undef, undef);
 	}
 	elsif (	$elem =~ /^\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*\*\s*(\w+)\s*(\)*)\s*\]$/o
 		|| $elem =~ /^(\w+)\s*:\s*\[\s*([\+\-\(\)]*)\s*(\w+)\s*\*\s*(\w+)\s*(\)*)\s*\]$/o) {
 
-		my ($r1, $r2, $r3, $r4) = ($1, $2, $3, $4);
-
-		return 0 if ( is_segreg_intel($r3) || is_segreg_intel($r4) || ! is_segreg_intel($r1) );
-		return 0 if ( (! is_addressable32_intel($r3)) && (is_reg8_intel($r3) || is_segreg_intel($r3)
-			|| is_reg16_intel($r3) || is_reg64_intel($r3) || is_reg32_intel($r3)
-			|| is_reg_mm_intel($r3) || is_reg_fpu_intel($r3)) );
-		return 0 if ( (! is_addressable32_intel($r4)) && (is_reg8_intel($r4) || is_segreg_intel($r4)
-			|| is_reg16_intel($r4) || is_reg64_intel($r4) || is_reg32_intel($r4)
-			|| is_reg_mm_intel($r4) || is_reg_fpu_intel($r4)) );
-		return 0 if ( is_reg_intel($r3) && is_reg_intel($r4) );
-		return 0 if ( is_reg_intel($r3) && $r2 =~ /-/o );
-		return 0 if ( (is_reg_intel($r3) || is_reg_intel($r4)) && $r2 =~ /-/o );
-		return 0 if ( $r3 =~ /\besp\b/io && $r4 =~ /\b\d+\b/o && $r4 != 1 );
-		return 0 if ( $r4 =~ /\besp\b/io && $r3 =~ /\b\d+\b/o && $r3 != 1 );
-		return 0 if ( is_reg_intel($r3) && $r4 =~ /\b\d+\b/o && $r4 != 1
-			&& $r4 != 2 && $r4 != 4 && $r4 != 8);
-		return 0 if ( is_reg_intel($r4) && $r3 =~ /\b\d+\b/o && $r3 != 1
-			&& $r3 != 2 && $r3 != 4 && $r3 != 8);
-
-		return 1;
+		return _validate_32bit_addr_parts_intel ($1, undef, undef, $2, $3, $4, undef, undef);
 	}
 	elsif (	$elem =~ /^\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]*)\s*(\w+)\s*\]$/o
 		|| $elem =~ /^(\w+)\s*:\s*\[\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]*)\s*(\w+)\s*\]$/o) {
 
-		my ($r1, $r2, $r3, $r4, $r5) = ($1, $2, $3, $4, $5);
-
-		return 0 if ( is_segreg_intel($r3) || is_segreg_intel($r5) || ! is_segreg_intel($r1) );
-		return 0 if ( (! is_addressable32_intel($r3)) && (is_reg8_intel($r3) || is_segreg_intel($r3)
-			|| is_reg16_intel($r3) || is_reg64_intel($r3) || is_reg32_intel($r3)
-			|| is_reg_mm_intel($r3) || is_reg_fpu_intel($r3)) );
-		return 0 if ( (! is_addressable32_intel($r5)) && (is_reg8_intel($r5) || is_segreg_intel($r5)
-			|| is_reg16_intel($r5) || is_reg64_intel($r5) || is_reg32_intel($r5)
-			|| is_reg_mm_intel($r5) || is_reg_fpu_intel($r5)) );
-		return 0 if ( is_reg_intel($r3) && $r2 =~ /-/o );
-		return 0 if ( is_reg_intel($r5) && $r4 =~ /-/o );
-
-		return 1;
+		return _validate_32bit_addr_parts_intel ($1, $2, $3, undef, undef, undef, $4, $5);
 	}
 	elsif (	$elem =~ /^\[\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]$/o ) {
 
-		my ($r2, $r3, $r4, $r5, $r6, $r7, $r8) = ($1, $2, $3, $4, $5, $6, $7);
-
-		return 0 if ( is_segreg_intel($r3) || is_segreg_intel($r6) || is_segreg_intel($r5)
-			|| is_segreg_intel($r8) );
-		return 0 if ( (! is_addressable32_intel($r3)) && (is_reg8_intel($r3) || is_segreg_intel($r3)
-			|| is_reg16_intel($r3) || is_reg64_intel($r3) || is_reg32_intel($r3)
-			|| is_reg_mm_intel($r3) || is_reg_fpu_intel($r3)) );
-		return 0 if ( (! is_addressable32_intel($r6)) && (is_reg8_intel($r6) || is_segreg_intel($r6)
-			|| is_reg16_intel($r6) || is_reg64_intel($r6) || is_reg32_intel($r6)
-			|| is_reg_mm_intel($r6) || is_reg_fpu_intel($r6)) );
-		return 0 if ( (! is_addressable32_intel($r5)) && (is_reg8_intel($r5) || is_segreg_intel($r5)
-			|| is_reg16_intel($r5) || is_reg64_intel($r5) || is_reg32_intel($r5)
-			|| is_reg_mm_intel($r5) || is_reg_fpu_intel($r5)) );
-		return 0 if ( (! is_addressable32_intel($r8)) && (is_reg8_intel($r8) || is_segreg_intel($r8)
-			|| is_reg16_intel($r8) || is_reg64_intel($r8) || is_reg32_intel($r8)
-			|| is_reg_mm_intel($r8) || is_reg_fpu_intel($r8)) );
-		return 0 if ( is_reg_intel($r6) && is_reg_intel($r5) );
-		return 0 if ( is_reg_intel($r3) && $r2 =~ /-/o );
-		return 0 if ( (is_reg_intel($r5) || is_reg_intel($r6)) && $r4 =~ /-/o );
-		return 0 if ( is_reg_intel($r8) && $r7 =~ /-/o );
-		return 0 if ( $r5 =~ /\besp\b/io && $r6 =~ /\b\d+\b/o && $r6 != 1 );
-		return 0 if ( $r6 =~ /\besp\b/io && $r5 =~ /\b\d+\b/o && $r5 != 1 );
-		return 0 if ( is_reg_intel($r5) && $r6 =~ /\b\d+\b/o && $r6 != 1
-			&& $r6 != 2 && $r6 != 4 && $r6 != 8);
-		return 0 if ( is_reg_intel($r6) && $r5 =~ /\b\d+\b/o && $r5 != 1
-			&& $r5 != 2 && $r5 != 4 && $r5 != 8);
-		return 0 if ( is_reg_intel($r3) && (is_reg_intel($r5) || is_reg_intel($r6)) && is_reg_intel($r8) );
-
-		return 1;
+		return _validate_32bit_addr_parts_intel (undef, $1, $2, $3, $4, $5, $6, $7);
 	}
 	elsif (	$elem =~ /^\[\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*\*\s*(\w+)\s*(\)*)\s*\]$/o ) {
 
-		my ($r2, $r3, $r7, $r8, $r4, $r5, $r6) = ($1, $2, $3, $4, $5, $6, $7);
-
-		return 0 if ( is_segreg_intel($r3) || is_segreg_intel($r6) || is_segreg_intel($r5)
-			|| is_segreg_intel($r8) );
-		return 0 if ( (! is_addressable32_intel($r3)) && (is_reg8_intel($r3) || is_segreg_intel($r3)
-			|| is_reg16_intel($r3) || is_reg64_intel($r3) || is_reg32_intel($r3)
-			|| is_reg_mm_intel($r3) || is_reg_fpu_intel($r3)) );
-		return 0 if ( (! is_addressable32_intel($r6)) && (is_reg8_intel($r6) || is_segreg_intel($r6)
-			|| is_reg16_intel($r6) || is_reg64_intel($r6) || is_reg32_intel($r6)
-			|| is_reg_mm_intel($r6) || is_reg_fpu_intel($r6)) );
-		return 0 if ( (! is_addressable32_intel($r5)) && (is_reg8_intel($r5) || is_segreg_intel($r5)
-			|| is_reg16_intel($r5) || is_reg64_intel($r5) || is_reg32_intel($r5)
-			|| is_reg_mm_intel($r5) || is_reg_fpu_intel($r5)) );
-		return 0 if ( (! is_addressable32_intel($r8)) && (is_reg8_intel($r8) || is_segreg_intel($r8)
-			|| is_reg16_intel($r8) || is_reg64_intel($r8) || is_reg32_intel($r8)
-			|| is_reg_mm_intel($r8) || is_reg_fpu_intel($r8)) );
-		return 0 if ( is_reg_intel($r6) && is_reg_intel($r5) );
-		return 0 if ( is_reg_intel($r3) && $r2 =~ /-/o );
-		return 0 if ( (is_reg_intel($r5) || is_reg_intel($r6)) && $r4 =~ /-/o );
-		return 0 if ( is_reg_intel($r8) && $r7 =~ /-/o );
-		return 0 if ( $r5 =~ /\besp\b/io && $r6 =~ /\b\d+\b/o && $r6 != 1 );
-		return 0 if ( $r6 =~ /\besp\b/io && $r5 =~ /\b\d+\b/o && $r5 != 1 );
-		return 0 if ( is_reg_intel($r5) && $r6 =~ /\b\d+\b/o && $r6 != 1
-			&& $r6 != 2 && $r6 != 4 && $r6 != 8);
-		return 0 if ( is_reg_intel($r6) && $r5 =~ /\b\d+\b/o && $r5 != 1
-			&& $r5 != 2 && $r5 != 4 && $r5 != 8);
-		return 0 if ( is_reg_intel($r3) && (is_reg_intel($r5) || is_reg_intel($r6)) && is_reg_intel($r8) );
-
-		return 1;
+		return _validate_32bit_addr_parts_intel (undef, $1, $2, $5, $6, $7, $3, $4);
 	}
 	elsif (	$elem =~ /^\[\s*([\+\-\(\)]*)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]$/o ) {
 
-		my ($r4, $r5, $r6, $r2, $r3, $r7, $r8) = ($1, $2, $3, $4, $5, $6, $7);
-
-		return 0 if ( is_segreg_intel($r3) || is_segreg_intel($r6) || is_segreg_intel($r5)
-			|| is_segreg_intel($r8) );
-		return 0 if ( (! is_addressable32_intel($r3)) && (is_reg8_intel($r3) || is_segreg_intel($r3)
-			|| is_reg16_intel($r3) || is_reg64_intel($r3) || is_reg32_intel($r3)
-			|| is_reg_mm_intel($r3) || is_reg_fpu_intel($r3)) );
-		return 0 if ( (! is_addressable32_intel($r6)) && (is_reg8_intel($r6) || is_segreg_intel($r6)
-			|| is_reg16_intel($r6) || is_reg64_intel($r6) || is_reg32_intel($r6)
-			|| is_reg_mm_intel($r6) || is_reg_fpu_intel($r6)) );
-		return 0 if ( (! is_addressable32_intel($r5)) && (is_reg8_intel($r5) || is_segreg_intel($r5)
-			|| is_reg16_intel($r5) || is_reg64_intel($r5) || is_reg32_intel($r5)
-			|| is_reg_mm_intel($r5) || is_reg_fpu_intel($r5)) );
-		return 0 if ( (! is_addressable32_intel($r8)) && (is_reg8_intel($r8) || is_segreg_intel($r8)
-			|| is_reg16_intel($r8) || is_reg64_intel($r8) || is_reg32_intel($r8)
-			|| is_reg_mm_intel($r8) || is_reg_fpu_intel($r8)) );
-		return 0 if ( is_reg_intel($r6) && is_reg_intel($r5) );
-		return 0 if ( is_reg_intel($r3) && $r2 =~ /-/o );
-		return 0 if ( (is_reg_intel($r5) || is_reg_intel($r6)) && $r4 =~ /-/o );
-		return 0 if ( is_reg_intel($r8) && $r7 =~ /-/o );
-		return 0 if ( $r5 =~ /\besp\b/io && $r6 =~ /\b\d+\b/o && $r6 != 1 );
-		return 0 if ( $r6 =~ /\besp\b/io && $r5 =~ /\b\d+\b/o && $r5 != 1 );
-		return 0 if ( is_reg_intel($r5) && $r6 =~ /\b\d+\b/o && $r6 != 1
-			&& $r6 != 2 && $r6 != 4 && $r6 != 8);
-		return 0 if ( is_reg_intel($r6) && $r5 =~ /\b\d+\b/o && $r5 != 1
-			&& $r5 != 2 && $r5 != 4 && $r5 != 8);
-		return 0 if ( is_reg_intel($r3) && (is_reg_intel($r5) || is_reg_intel($r6)) && is_reg_intel($r8) );
-
-		return 1;
+		return _validate_32bit_addr_parts_intel (undef, $4, $5, $1, $2, $3, $6, $7);
 	}
 	elsif (	$elem =~ /^\[\s*([\+\-\(\)]*)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]$/o ) {
 
-		my ($r4, $r5, $r6, $r2, $r3) = ($1, $2, $3, $4, $5, $6);
-
-		return 0 if ( is_segreg_intel($r3) || is_segreg_intel($r6) || is_segreg_intel($r5) );
-		return 0 if ( (! is_addressable32_intel($r3)) && (is_reg8_intel($r3) || is_segreg_intel($r3)
-			|| is_reg16_intel($r3) || is_reg64_intel($r3) || is_reg32_intel($r3)
-			|| is_reg_mm_intel($r3) || is_reg_fpu_intel($r3)) );
-		return 0 if ( (! is_addressable32_intel($r6)) && (is_reg8_intel($r6) || is_segreg_intel($r6)
-			|| is_reg16_intel($r6) || is_reg64_intel($r6) || is_reg32_intel($r6)
-			|| is_reg_mm_intel($r6) || is_reg_fpu_intel($r6)) );
-		return 0 if ( (! is_addressable32_intel($r5)) && (is_reg8_intel($r5) || is_segreg_intel($r5)
-			|| is_reg16_intel($r5) || is_reg64_intel($r5) || is_reg32_intel($r5)
-			|| is_reg_mm_intel($r5) || is_reg_fpu_intel($r5)) );
-		return 0 if ( is_reg_intel($r6) && is_reg_intel($r5) );
-		return 0 if ( is_reg_intel($r3) && $r2 =~ /-/o );
-		return 0 if ( (is_reg_intel($r5) || is_reg_intel($r6)) && $r4 =~ /-/o );
-		return 0 if ( $r5 =~ /\besp\b/io && $r6 =~ /\b\d+\b/o && $r6 != 1 );
-		return 0 if ( $r6 =~ /\besp\b/io && $r5 =~ /\b\d+\b/o && $r5 != 1 );
-		return 0 if ( is_reg_intel($r5) && $r6 =~ /\b\d+\b/o && $r6 != 1
-			&& $r6 != 2 && $r6 != 4 && $r6 != 8);
-		return 0 if ( is_reg_intel($r6) && $r5 =~ /\b\d+\b/o && $r5 != 1
-			&& $r5 != 2 && $r5 != 4 && $r5 != 8);
-
-		return 1;
+		return _validate_32bit_addr_parts_intel (undef, undef, undef, $1, $2, $3, $4, $5);
 	}
 	elsif (	$elem =~ /^\[\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]$/o ) {
 
-		my ($r2, $r3, $r4, $r5, $r7, $r8) = ($1, $2, $3, $4, $5, $6);
-
-		return 0 if ( is_segreg_intel($r3) || is_segreg_intel($r5) || is_segreg_intel($r8) );
-		return 0 if ( (! is_addressable32_intel($r3)) && (is_reg8_intel($r3) || is_segreg_intel($r3)
-			|| is_reg16_intel($r3) || is_reg64_intel($r3) || is_reg32_intel($r3)
-			|| is_reg_mm_intel($r3) || is_reg_fpu_intel($r3)) );
-		return 0 if ( (! is_addressable32_intel($r5)) && (is_reg8_intel($r5) || is_segreg_intel($r5)
-			|| is_reg16_intel($r5) || is_reg64_intel($r5) || is_reg32_intel($r5)
-			|| is_reg_mm_intel($r5) || is_reg_fpu_intel($r5)) );
-		return 0 if ( (! is_addressable32_intel($r8)) && (is_reg8_intel($r8) || is_segreg_intel($r8)
-			|| is_reg16_intel($r8) || is_reg64_intel($r8) || is_reg32_intel($r8)
-			|| is_reg_mm_intel($r8) || is_reg_fpu_intel($r8)) );
-		return 0 if ( is_reg_intel($r3) && $r2 =~ /-/o );
-		return 0 if ( is_reg_intel($r5) && $r4 =~ /-/o );
-		return 0 if ( is_reg_intel($r8) && $r7 =~ /-/o );
-		return 0 if ( is_reg_intel($r3) && is_reg_intel($r5) && is_reg_intel($r8) );
-
-		return 1;
+		return _validate_32bit_addr_parts_intel (undef, $1, $2, $3, $4, undef, $5, $6);
 	}
 	elsif (	$elem =~ /^\[\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*\*\s*(\w+)\s*(\)*)\s*\]$/o ) {
 
-		my ($r2, $r3, $r4, $r5, $r6) = ($1, $2, $3, $4, $5);
-
-		return 0 if ( is_segreg_intel($r3) || is_segreg_intel($r6) || is_segreg_intel($r5) );
-		return 0 if ( (! is_addressable32_intel($r3)) && (is_reg8_intel($r3) || is_segreg_intel($r3)
-			|| is_reg16_intel($r3) || is_reg64_intel($r3) || is_reg32_intel($r3)
-			|| is_reg_mm_intel($r3) || is_reg_fpu_intel($r3)) );
-		return 0 if ( (! is_addressable32_intel($r6)) && (is_reg8_intel($r6) || is_segreg_intel($r6)
-			|| is_reg16_intel($r6) || is_reg64_intel($r6) || is_reg32_intel($r6)
-			|| is_reg_mm_intel($r6) || is_reg_fpu_intel($r6)) );
-		return 0 if ( (! is_addressable32_intel($r5)) && (is_reg8_intel($r5) || is_segreg_intel($r5)
-			|| is_reg16_intel($r5) || is_reg64_intel($r5) || is_reg32_intel($r5)
-			|| is_reg_mm_intel($r5) || is_reg_fpu_intel($r5)) );
-		return 0 if ( is_reg_intel($r6) && is_reg_intel($r5) );
-		return 0 if ( is_reg_intel($r3) && $r2 =~ /-/o );
-		return 0 if ( (is_reg_intel($r5) || is_reg_intel($r6)) && $r4 =~ /-/o );
-		return 0 if ( $r5 =~ /\besp\b/io && $r6 =~ /\b\d+\b/o && $r6 != 1 );
-		return 0 if ( $r6 =~ /\besp\b/io && $r5 =~ /\b\d+\b/o && $r5 != 1 );
-		return 0 if ( is_reg_intel($r5) && $r6 =~ /\b\d+\b/o && $r6 != 1
-			&& $r6 != 2 && $r6 != 4 && $r6 != 8);
-		return 0 if ( is_reg_intel($r6) && $r5 =~ /\b\d+\b/o && $r5 != 1
-			&& $r5 != 2 && $r5 != 4 && $r5 != 8);
-
-		return 1;
+		return _validate_32bit_addr_parts_intel (undef, $1, $2, $3, $4, $5, undef, undef);
 	}
 	elsif (	$elem =~ /^\[\s*([\+\-\(\)]*)\s*(\w+)\s*\]$/o ) {
 
-		my ($r2, $r3) = ($1, $2);
-
-		#return 0 if ( is_segreg_intel($r3) ); # checked below
-		return 0 if ( (! is_addressable32_intel($r3)) && (is_reg8_intel($r3) || is_segreg_intel($r3)
-			|| is_reg16_intel($r3) || is_reg64_intel($r3) || is_reg32_intel($r3)
-			|| is_reg_mm_intel($r3) || is_reg_fpu_intel($r3)) );
-		return 0 if ( is_reg_intel($r3) && $r2 =~ /-/o );
-
-		return 1;
+		return _validate_32bit_addr_parts_intel (undef, $1, $2, undef, undef, undef, undef, undef);
 	}
 	elsif (	$elem =~ /^\[\s*([\+\-\(\)]*)\s*(\w+)\s*\*\s*(\w+)\s*(\)*)\s*\]$/o ) {
 
-		my ($r2, $r3, $r4) = ($1, $2, $3);
-
-		return 0 if ( is_segreg_intel($r3) || is_segreg_intel($r4) );
-		return 0 if ( (! is_addressable32_intel($r3)) && (is_reg8_intel($r3) || is_segreg_intel($r3)
-			|| is_reg16_intel($r3) || is_reg64_intel($r3) || is_reg32_intel($r3)
-			|| is_reg_mm_intel($r3) || is_reg_fpu_intel($r3)) );
-		return 0 if ( (! is_addressable32_intel($r4)) && (is_reg8_intel($r4) || is_segreg_intel($r4)
-			|| is_reg16_intel($r4) || is_reg64_intel($r4) || is_reg32_intel($r4)
-			|| is_reg_mm_intel($r4) || is_reg_fpu_intel($r4)) );
-		return 0 if ( is_reg_intel($r3) && is_reg_intel($r4) );
-		return 0 if ( is_reg_intel($r3) && $r2 =~ /-/o );
-		return 0 if ( (is_reg_intel($r3) || is_reg_intel($r4)) && $r2 =~ /-/o );
-		return 0 if ( $r3 =~ /\besp\b/io && $r4 =~ /\b\d+\b/o && $r4 != 1 );
-		return 0 if ( $r4 =~ /\besp\b/io && $r3 =~ /\b\d+\b/o && $r3 != 1 );
-		return 0 if ( is_reg_intel($r3) && $r4 =~ /\b\d+\b/o && $r4 != 1
-			&& $r4 != 2 && $r4 != 4 && $r4 != 8);
-		return 0 if ( is_reg_intel($r4) && $r3 =~ /\b\d+\b/o && $r3 != 1
-			&& $r3 != 2 && $r3 != 4 && $r3 != 8);
-
-		return 1;
+		return _validate_32bit_addr_parts_intel (undef, undef, undef, $1, $2, $3, undef, undef);
 	}
 	elsif (	$elem =~ /^\[\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]*)\s*(\w+)\s*\]$/o ) {
 
-		my ($r2, $r3, $r4, $r5) = ($1, $2, $3, $4);
-
-		return 0 if ( is_segreg_intel($r3) || is_segreg_intel($r5) );
-		return 0 if ( (! is_addressable32_intel($r3)) && (is_reg8_intel($r3) || is_segreg_intel($r3)
-			|| is_reg16_intel($r3) || is_reg64_intel($r3) || is_reg32_intel($r3)
-			|| is_reg_mm_intel($r3) || is_reg_fpu_intel($r3)) );
-		return 0 if ( (! is_addressable32_intel($r5)) && (is_reg8_intel($r5) || is_segreg_intel($r5)
-			|| is_reg16_intel($r5) || is_reg64_intel($r5) || is_reg32_intel($r5)
-			|| is_reg_mm_intel($r5) || is_reg_fpu_intel($r5)) );
-		return 0 if ( is_reg_intel($r3) && $r2 =~ /-/o );
-		return 0 if ( is_reg_intel($r5) && $r4 =~ /-/o );
-
-		return 1;
+		return _validate_32bit_addr_parts_intel (undef, $1, $2, undef, undef, undef, $3, $4);
 	}
 	return 0;
+}
+
+# =head2 _validate_32bit_addr_parts_att
+# 
+#  PRIVATE SUBROUTINE.
+#  Checks if the given address components give a valid x86 32-bit addressing
+#   mode in AT&T syntax.
+#  Returns 1 if yes.
+# 
+# =cut
+sub _validate_32bit_addr_parts_att($$$$$$$$) {
+
+	my $segreg = shift;
+	my $base_reg_sign = shift;
+	my $base_reg = shift;
+	my $index_reg_sign = shift;
+	my $index_reg = shift;
+	my $scale = shift;
+	my $disp_sign = shift;
+	my $disp = shift;
+
+	return 0 if defined $segreg && ! is_segreg_att ($segreg);
+	if ( defined $index_reg && ! defined $base_reg && ! defined $scale ) {
+		# just one value inside - check for "(,1)
+		return 1 if $index_reg eq '1' && ! is_reg_att($disp);
+	}
+	return 0 if defined $index_reg && (! is_reg_att($index_reg)
+		|| ! is_addressable32_att($index_reg) || $index_reg =~ /^%esp$/io);
+	return 0 if defined $scale && ! is_reg_att($scale) && $scale != 1
+		&& $scale != 2 && $scale != 4 && $scale != 8;
+	return 0 if defined $disp && is_reg_att($disp);
+	if ( defined $base_reg && ! defined $index_reg && ! defined $scale ) {
+		# just one value inside - allow '(var)' and 'var(%reg)', disallow 'var(var)'
+		return 0 if ( (defined $disp || $base_reg =~ /%/o)
+			&& ! is_addressable32_att($base_reg)
+			&& $base_reg !~ /^%bx$/io && $base_reg !~ /^%bp$/io
+			&& $base_reg !~ /^%si$/io && $base_reg !~ /^%di$/io)
+			|| (defined $base_reg_sign && $base_reg_sign =~ /-/o);
+	} else {
+		# more than one part - must be a 32-bit register
+		return 0 if defined $base_reg && ! is_addressable32_att($base_reg);
+	}
+	return 1;
 }
 
 =head2 is_valid_32bit_addr_att
 
  Checks if the given string parameter (must contain the parentheses)
   is a valid x86 32-bit addressing mode in AT&T syntax.
+ Works best after any pre-processing of the input, i.e. after all macros,
+  constants, etc. have been replaced by the real values.
  Returns 1 if yes.
 
 =cut
 
-sub is_valid_32bit_addr_att ( $ ) {
+sub is_valid_32bit_addr_att($) {
 
 	my $elem = shift;
-	if ( $elem =~ /^([%\w]+):\s*\(\s*([+-]*)\s*([%\w]+)\s*\)$/o ) {
+	if ( $elem =~ /^([%\w]+):\s*\(\s*([%\w]+)\s*\)$/o ) {
 
-		my ($r1, $r2, $sign) = ($1, $3, $2);
-		return 0 if (! is_segreg_att ($r1)) || is_segreg_att ($r2);
-		return 0 if is_reg_att($r2) && ! is_addressable32_att ($r2);
-		return 0 if is_reg32_att($r2) && $sign =~ /-/o;
-		return 1;
+		return _validate_32bit_addr_parts_att ($1, undef, $2, undef, undef, undef, undef, undef);
 	}
 	elsif ( $elem =~ /^([%\w]+):\s*\(\s*([%\w]+)\s*,\s*([%\w]+)\s*\)$/o ) {
 
-		my ($r1, $r2, $r3) = ($1, $2, $3);
-		return 0 if (! is_segreg_att ($r1)) || is_segreg_att ($r2) || is_segreg_att ($r3);
-		return 0 if (! is_reg_att($r2)) || (! is_reg_att($r3));
-		return 0 if ! is_addressable32_att ($r2);
-		return 0 if ! is_addressable32_att ($r3);
-		return 1;
+		return _validate_32bit_addr_parts_att ($1, undef, $2, undef, $3, undef, undef, undef);
 	}
 	elsif ( $elem =~ /^([%\w]+):\s*\(\s*([%\w]+)\s*,\s*([%\w]+)\s*,\s*(\d+)\s*\)$/o ) {
 
-		my ($r1, $r2, $r3, $scale) = ($1, $2, $3, $4);
-		return 0 if (! is_segreg_att ($r1)) || is_segreg_att ($r2) || is_segreg_att ($r3);
-		return 0 if (! is_reg_att($r2)) || (! is_reg_att($r3));
-		return 0 if ! is_addressable32_att ($r2);
-		return 0 if ! is_addressable32_att ($r3);
-		return 0 if $r3 =~ /^%esp$/io;
-		return 0 if $scale != 1 && $scale != 2 && $scale != 4 && $scale != 8;
-		return 1;
+		return _validate_32bit_addr_parts_att ($1, undef, $2, undef, $3, $4, undef, undef);
 	}
 	elsif ( $elem =~ /^([%\w]+):\s*\(\s*,\s*([%\w]+)\s*,\s*(\d+)\s*\)$/o ) {
 
-		my ($r1, $r3, $scale) = ($1, $2, $3);
-		return 0 if (! is_segreg_att ($r1)) || is_segreg_att ($r3);
-		return 0 if ! is_reg_att($r3);
-		return 0 if ! is_addressable32_att ($r3);
-		return 0 if $r3 =~ /^%esp$/io;
-		return 0 if $scale != 1 && $scale != 2 && $scale != 4 && $scale != 8;
-		return 1;
+		return _validate_32bit_addr_parts_att ($1, undef, undef, undef, $2, $3, undef, undef);
 	}
-	elsif ( $elem =~ /^([%\w]+):\s*[+-]*\s*([%\w]+)\s*\(\s*([+-]*)\s*([%\w]+)\s*\)$/o ) {
+	elsif ( $elem =~ /^([%\w]+):\s*\(\s*,\s*([%\w]+)\s*\)$/o ) {
 
-		my ($r1, $r2, $var, $sign) = ($1, $4, $2, $3);
-		return 0 if (! is_segreg_att ($r1)) || is_segreg_att ($r2);
-		return 0 if ! is_reg32_att($r2);
-		return 0 if ! is_addressable32_att ($r2);
-		return 0 if $sign =~ /-/o;
-		return 0 if is_reg_att($var);
-		return 1;
+		return _validate_32bit_addr_parts_att ($1, undef, undef, undef, $2, undef, undef, undef);
 	}
-	elsif ( $elem =~ /^([%\w]+):\s*[+-]*\s*([%\w]+)\s*\(\s*([%\w]+)\s*,\s*([%\w]+)\s*\)$/o ) {
+	elsif ( $elem =~ /^([%\w]+):\s*([+-]*)\s*([%\w]+)\s*\(\s*([%\w]+)\s*\)$/o ) {
 
-		my ($r1, $r2, $r3, $var) = ($1, $3, $4, $2);
-		return 0 if (! is_segreg_att ($r1)) || is_segreg_att ($r2) || is_segreg_att ($r3);
-		return 0 if (! is_reg32_att($r2)) || (! is_reg32_att($r3));
-		return 0 if ! is_addressable32_att ($r2);
-		return 0 if ! is_addressable32_att ($r3);
-		return 0 if is_reg_att($var);
-		return 1;
+		return _validate_32bit_addr_parts_att ($1, undef, $4, undef, undef, undef, $2, $3);
 	}
-	elsif ( $elem =~ /^([%\w]+):\s*[+-]*\s*([%\w]+)\s*\(\s*([%\w]+)\s*,\s*([%\w]+)\s*,\s*(\d+)\s*\)$/o ) {
+	elsif ( $elem =~ /^([%\w]+):\s*([+-]*)\s*([%\w]+)\s*\(\s*([%\w]+)\s*,\s*([%\w]+)\s*\)$/o ) {
 
-		my ($r1, $r2, $r3, $var, $scale) = ($1, $3, $4, $2, $5);
-		return 0 if (! is_segreg_att ($r1)) || is_segreg_att ($r2) || is_segreg_att ($r3);
-		return 0 if (! is_reg32_att($r2)) || (! is_reg32_att($r3));
-		return 0 if ! is_addressable32_att ($r2);
-		return 0 if ! is_addressable32_att ($r3);
-		return 0 if is_reg_att($var);
-		return 0 if $r3 =~ /^%esp$/io;
-		return 0 if $scale != 1 && $scale != 2 && $scale != 4 && $scale != 8;
-		return 1;
+		return _validate_32bit_addr_parts_att ($1, undef, $4, undef, $5, undef, $2, $3);
 	}
-	elsif ( $elem =~ /^([%\w]+):\s*[+-]*\s*([%\w]+)\s*\(\s*,\s*([%\w]+)\s*,\s*(\d+)\s*\)$/o ) {
+	elsif ( $elem =~ /^([%\w]+):\s*([+-]*)\s*([%\w]+)\s*\(\s*([%\w]+)\s*,\s*([%\w]+)\s*,\s*(\d+)\s*\)$/o ) {
 
-		my ($r1, $r3, $var, $scale) = ($1, $3, $2, $4);
-		return 0 if (! is_segreg_att ($r1)) || is_segreg_att ($r3);
-		return 0 if ! is_reg32_att($r3);
-		return 0 if ! is_addressable32_att ($r3);
-		return 0 if is_reg_att($var);
-		return 0 if $r3 =~ /^%esp$/io;
-		return 0 if $scale != 1 && $scale != 2 && $scale != 4 && $scale != 8;
-		return 1;
+		return _validate_32bit_addr_parts_att ($1, undef, $4, undef, $5, $6, $2, $3);
 	}
-	elsif ( $elem =~ /^([%\w]+):\s*[+-]*\s*([%\w]+)\s*\(\s*,\s*1\s*\)$/o ) {
+	elsif ( $elem =~ /^([%\w]+):\s*([+-]*)\s*([%\w]+)\s*\(\s*,\s*([%\w]+)\s*,\s*(\d+)\s*\)$/o ) {
 
-		# special form: varname(1,)
-		my ($r1, $var) = ($1, $2);
-		return 0 if is_reg_att($var) || ! is_segreg_att ($r1);
-		return 1;
+		return _validate_32bit_addr_parts_att ($1, undef, undef, undef, $4, $5, $2, $3);
 	}
-	elsif ( $elem =~ /^\(\s*([+-]*)\s*([%\w]+)\s*\)$/o ) {
+	elsif ( $elem =~ /^([%\w]+):\s*([+-]*)\s*([%\w]+)\s*\(\s*,\s*([%\w]+)\s*\)$/o ) {
 
-		my ($r2, $sign) = ($2, $1);
-		return 0 if is_segreg_att ($r2);
-		return 0 if is_reg_att($r2) && ! is_addressable32_att ($r2);
-		return 0 if is_reg32_att($r2) && $sign =~ /-/o;
-		return 1;
+		return _validate_32bit_addr_parts_att ($1, undef, undef, undef, $4, undef, $2, $3);
+	}
+	elsif ( $elem =~ /^\(\s*([%\w]+)\s*\)$/o ) {
+
+		return _validate_32bit_addr_parts_att (undef, undef, $1, undef, undef, undef, undef, undef);
 	}
 	elsif ( $elem =~ /^\(\s*([%\w]+)\s*,\s*([%\w]+)\s*\)$/o ) {
 
-		my ($r2, $r3) = ($1, $2);
-		return 0 if is_segreg_att ($r2) || is_segreg_att ($r3);
-		return 0 if is_reg_att($r2) && ! is_addressable32_att ($r2);
-		return 0 if is_reg_att($r3) && ! is_addressable32_att ($r3);
-		return 0 if (! is_reg_att($r2)) || (! is_reg32_att($r3));
-		return 1;
+		return _validate_32bit_addr_parts_att (undef, undef, $1, undef, $2, undef, undef, undef);
 	}
 	elsif ( $elem =~ /^\(\s*([%\w]+)\s*,\s*([%\w]+)\s*,\s*(\d+)\s*\)$/o ) {
 
-		my ($r2, $r3, $scale) = ($1, $2, $3);
-		return 0 if is_segreg_att ($r2) || is_segreg_att ($r3);
-		return 0 if (! is_reg32_att($r2)) || (! is_reg32_att($r3));
-		return 0 if ! is_addressable32_att ($r2);
-		return 0 if ! is_addressable32_att ($r3);
-		return 0 if $r3 =~ /^%esp$/io;
-		return 0 if $scale != 1 && $scale != 2 && $scale != 4 && $scale != 8;
-		return 1;
+		return _validate_32bit_addr_parts_att (undef, undef, $1, undef, $2, $3, undef, undef);
 	}
 	elsif ( $elem =~ /^\(\s*,\s*([%\w]+)\s*,\s*(\d+)\s*\)$/o ) {
 
-		my ($r3, $scale) = ($1, $2);
-		return 0 if is_segreg_att ($r3);
-		return 0 if ! is_reg32_att($r3);
-		return 0 if ! is_addressable32_att ($r3);
-		return 0 if $r3 =~ /^%esp$/io;
-		return 0 if $scale != 1 && $scale != 2 && $scale != 4 && $scale != 8;
-		return 1;
+		return _validate_32bit_addr_parts_att (undef, undef, undef, undef, $1, $2, undef, undef);
 	}
-	elsif ( $elem =~ /^[+-]*\s*([%\w]+)\s*\(\s*([+-]*)\s*([%\w]+)\s*\)$/o ) {
+	elsif ( $elem =~ /^\(\s*,\s*([%\w]+)\s*\)$/o ) {
 
-		my ($r2, $var, $sign) = ($3, $1, $2);
-		return 0 if is_segreg_att ($r2);
-		return 0 if ! is_reg_att($r2);
-		return 0 if ! is_addressable32_att ($r2);
-		return 0 if $sign =~ /-/o;
-		return 0 if is_reg_att($var);
-		return 1;
+		return _validate_32bit_addr_parts_att (undef, undef, undef, undef, $1, undef, undef, undef);
 	}
-	elsif ( $elem =~ /^[+-]*\s*([%\w]+)\s*\(\s*([%\w]+)\s*,\s*([%\w]+)\s*\)$/o ) {
+	elsif ( $elem =~ /^([+-]*)\s*([%\w]+)\s*\(\s*([%\w]+)\s*\)$/o ) {
 
-		my ($r2, $r3, $var) = ($2, $3, $1);
-		return 0 if is_segreg_att ($r2) || is_segreg_att ($r3);
-		return 0 if (! is_reg_att($r2)) || (! is_reg32_att($r3));
-		return 0 if ! is_addressable32_att ($r2);
-		return 0 if ! is_addressable32_att ($r3);
-		return 0 if is_reg_att($var);
-		return 1;
+		return _validate_32bit_addr_parts_att (undef, undef, $3, undef, undef, undef, $1, $2);
 	}
-	elsif ( $elem =~ /^[+-]*\s*([%\w]+)\s*\(\s*([%\w]+)\s*,\s*([%\w]+)\s*,\s*(\d+)\s*\)$/o ) {
+	elsif ( $elem =~ /^([+-]*)\s*([%\w]+)\s*\(\s*([%\w]+)\s*,\s*([%\w]+)\s*\)$/o ) {
 
-		my ($r2, $r3, $scale, $var) = ($2, $3, $4, $1);
-		return 0 if is_segreg_att ($r2) || is_segreg_att ($r3);
-		return 0 if (! is_reg32_att($r2)) || (! is_reg32_att($r3));
-		return 0 if ! is_addressable32_att ($r2);
-		return 0 if ! is_addressable32_att ($r3);
-		return 0 if $r3 =~ /^%esp$/io;
-		return 0 if $scale != 1 && $scale != 2 && $scale != 4 && $scale != 8;
-		return 0 if is_reg_att($var);
-		return 1;
+		return _validate_32bit_addr_parts_att (undef, undef, $3, undef, $4, undef, $1, $2);
 	}
-	elsif ( $elem =~ /^[+-]*\s*([%\w]+)\s*\(\s*,\s*([%\w]+)\s*,\s*(\d+)\s*\)$/o ) {
+	elsif ( $elem =~ /^([+-]*)\s*([%\w]+)\s*\(\s*([%\w]+)\s*,\s*([%\w]+)\s*,\s*(\d+)\s*\)$/o ) {
 
-		my ($r3, $scale, $var) = ($2, $3, $1);
-		return 0 if is_segreg_att ($r3);
-		return 0 if ! is_reg32_att($r3);
-		return 0 if ! is_addressable32_att ($r3);
-		return 0 if $r3 =~ /^%esp$/io;
-		return 0 if $scale != 1 && $scale != 2 && $scale != 4 && $scale != 8;
-		return 0 if is_reg_att($var);
-		return 1;
+		return _validate_32bit_addr_parts_att (undef, undef, $3, undef, $4, $5, $1, $2);
 	}
-	elsif ( $elem =~ /^[+-]*\s*([%\w]+)\s*\(\s*,\s*1\s*\)$/o ) {
+	elsif ( $elem =~ /^([+-]*)\s*([%\w]+)\s*\(\s*,\s*([%\w]+)\s*,\s*(\d+)\s*\)$/o ) {
 
-		# special form: varname(1,)
-		my $var = $1;
-		return 0 if is_reg_att($var);
-		return 1;
+		return _validate_32bit_addr_parts_att (undef, undef, undef, undef, $3, $4, $1, $2);
+	}
+	elsif ( $elem =~ /^([+-]*)\s*([%\w]+)\s*\(\s*,\s*([%\w]+)\s*\)$/o ) {
+
+		return _validate_32bit_addr_parts_att (undef, undef, undef, undef, $3, undef, $1, $2);
 	}
 	return 0;
 }
@@ -2454,832 +1946,387 @@ sub is_valid_32bit_addr_att ( $ ) {
 
  Checks if the given string parameter (must contain the parentheses)
   is a valid x86 32-bit addressing mode in AT&T or Intel syntax.
+ Works best after any pre-processing of the input, i.e. after all macros,
+  constants, etc. have been replaced by the real values.
  Returns 1 if yes.
 
 =cut
 
-sub is_valid_32bit_addr ( $ ) {
+sub is_valid_32bit_addr($) {
 
 	my $elem = shift;
 	return    is_valid_32bit_addr_intel ($elem)
 		| is_valid_32bit_addr_att ($elem);
 }
 
+# =head2 _is_valid_64bit_addr_reg_att
+#
+#  PRIVATE SUBROUTINE.
+#  Checks if the given register can be used in x86 64-bit addressing
+#   mode in Intel syntax.
+#  Returns 1 if yes.
+#
+# =cut
+#
+sub _is_valid_64bit_addr_reg_intel($) {
+
+	my $reg = shift;
+	return 1 if is_reg64_intel($reg) || is_r32_in64_intel($reg) || is_addressable32_intel($reg);
+	return 0;
+}
+
+# =head2 _validate_64bit_addr_parts_intel
+# 
+#  PRIVATE SUBROUTINE.
+#  Checks if the given address components give a valid x86 64-bit addressing
+#   mode in Intel syntax.
+#  Returns 1 if yes.
+# 
+# =cut
+sub _validate_64bit_addr_parts_intel($$$$$$$$) {
+
+	my $segreg = shift;
+	my $base_reg_sign = shift;
+	my $base_reg = shift;
+	my $index_reg_sign = shift;
+	my $index_reg = shift;
+	my $scale = shift;
+	my $disp_sign = shift;
+	my $disp = shift;
+	my $was64 = 0;
+	my $nregs = 0;
+
+	return 0 if defined $segreg && ! is_segreg_intel($segreg);
+	if ( defined $base_reg && is_reg_intel($base_reg) ) {
+
+		return 0 if ! _is_valid_64bit_addr_reg_intel($base_reg);
+		$nregs++;
+		$was64++ if is_reg64_intel($base_reg);
+	}
+	if ( defined $index_reg && is_reg_intel($index_reg) ) {
+
+		return 0 if ! _is_valid_64bit_addr_reg_intel($index_reg);
+		$nregs++;
+		$was64++ if is_reg64_intel($index_reg);
+	}
+	if ( defined $scale && is_reg_intel($scale) ) {
+
+		return 0 if ! _is_valid_64bit_addr_reg_intel($scale);
+		$nregs++;
+		$was64++ if is_reg64_intel($scale);
+	}
+	if ( defined $disp && is_reg_intel($disp) ) {
+
+		return 0 if ! _is_valid_64bit_addr_reg_intel($disp);
+		$nregs++;
+		$was64++ if is_reg64_intel($disp);
+	}
+	return 0 if $was64 != 0 && $was64 != $nregs;
+
+	return 0 if defined $index_reg && defined $scale
+		&& is_reg_intel($index_reg) && is_reg_intel($scale);
+	return 0 if defined $base_reg && defined $base_reg_sign
+		&& is_reg_intel($base_reg) && $base_reg_sign =~ /-/o;
+	return 0 if defined $index_reg && defined $index_reg_sign
+		&& is_reg_intel($index_reg) && $index_reg_sign =~ /-/o;
+	return 0 if defined $scale && defined $index_reg_sign
+		&& is_reg_intel($scale) && $index_reg_sign =~ /-/o;
+	return 0 if defined $disp && defined $disp_sign
+		&& is_reg_intel($disp) && $disp_sign =~ /-/o;
+	if ( defined $index_reg && defined $scale ) {
+		return 0 if ( $index_reg =~ /\brsp\b/io || $index_reg =~ /\brip\b/io )
+			&& $scale =~ /\b\d+\b/o && $scale != 1;
+		return 0 if ( $scale     =~ /\brsp\b/io || $scale     =~ /\brip\b/io )
+			&& $index_reg =~ /\b\d+\b/o && $index_reg != 1;
+		return 0 if is_reg_intel($index_reg) && $scale =~ /\b\d+\b/o && $scale != 1
+			&& $scale != 2 && $scale != 4 && $scale != 8;
+		return 0 if is_reg_intel($scale) && $index_reg =~ /\b\d+\b/o && $index_reg != 1
+			&& $index_reg != 2 && $index_reg != 4 && $index_reg != 8;
+	}
+	return 0 if defined $base_reg && defined $index_reg && defined $disp
+		&& is_reg_intel($base_reg) && is_reg_intel($index_reg) && is_reg_intel($disp);
+	return 0 if defined $base_reg && defined $scale && defined $disp
+		&& is_reg_intel($base_reg) && is_reg_intel($scale) && is_reg_intel($disp);
+
+	return 1;
+}
+
 =head2 is_valid_64bit_addr_intel
 
  Checks if the given string parameter (must contain the square braces)
   is a valid x86 64-bit addressing mode in Intel syntax.
+ Works best after any pre-processing of the input, i.e. after all macros,
+  constants, etc. have been replaced by the real values.
  Returns 1 if yes.
 
 =cut
 
-sub is_valid_64bit_addr_intel ( $ ) {
+sub is_valid_64bit_addr_intel($) {
 
 	my $elem = shift;
 	# [seg:base+index*scale+disp]
 	if (	$elem =~ /^\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]$/o
 		|| $elem =~ /^(\w+)\s*:\s*\[\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]$/o) {
 
-		my ($r1, $r2, $r3, $r4, $r5, $r6, $r7, $r8) = ($1, $2, $3, $4, $5, $6, $7, $8);
-
-		return 0 if ( is_segreg_intel($r3) || is_segreg_intel($r6) || is_segreg_intel($r5)
-			|| is_segreg_intel($r8) || ! is_segreg_intel($r1) );
-		return 0 if ( (! is_reg64_intel($r3) && ! is_r32_in64_intel($r3) && ! is_addressable32_intel($r3))
-			&& (is_reg8_intel($r3) || is_segreg_intel($r3)
-			|| is_reg16_intel($r3) || is_reg32_intel($r3)
-			|| is_reg_mm_intel($r3) || is_reg_fpu_intel($r3)) );
-		return 0 if ( (! is_reg64_intel($r6) && ! is_r32_in64_intel($r6) && ! is_addressable32_intel($r6))
-			&& (is_reg8_intel($r6) || is_segreg_intel($r6)
-			|| is_reg16_intel($r6) || is_reg32_intel($r6)
-			|| is_reg_mm_intel($r6) || is_reg_fpu_intel($r6)) );
-		return 0 if ( (! is_reg64_intel($r5) && ! is_r32_in64_intel($r5) && ! is_addressable32_intel($r5))
-			&& (is_reg8_intel($r5) || is_segreg_intel($r5)
-			|| is_reg16_intel($r5) || is_reg32_intel($r5)
-			|| is_reg_mm_intel($r5) || is_reg_fpu_intel($r5)) );
-		return 0 if ( (! is_reg64_intel($r8) && ! is_r32_in64_intel($r8) && ! is_addressable32_intel($r8))
-			&& (is_reg8_intel($r8) || is_segreg_intel($r8)
-			|| is_reg16_intel($r8) || is_reg32_intel($r8)
-			|| is_reg_mm_intel($r8) || is_reg_fpu_intel($r8)) );
-		my $was64 = is_reg64_intel($r3) + is_reg64_intel($r5) + is_reg64_intel($r6) + is_reg64_intel($r8);
-		my $nregs = is_reg_intel($r3) + is_reg_intel($r5) + is_reg_intel($r6) + is_reg_intel($r8);
-		return 0 if ( $was64 != 0 && $was64 != $nregs );
-		return 0 if ( is_reg_intel($r6) && is_reg_intel($r5) );
-		return 0 if ( is_reg_intel($r3) && $r2 =~ /-/o );
-		return 0 if ( (is_reg_intel($r5) || is_reg_intel($r6)) && $r4 =~ /-/o );
-		return 0 if ( is_reg_intel($r8) && $r7 =~ /-/o );
-		return 0 if ( ($r5 =~ /\brsp\b/io || $r5 =~ /\brip\b/io) && $r6 =~ /\b\d+\b/o && $r6 != 1 );
-		return 0 if ( ($r6 =~ /\brsp\b/io || $r6 =~ /\brip\b/io) && $r5 =~ /\b\d+\b/o && $r5 != 1 );
-		return 0 if ( is_reg_intel($r5) && $r6 =~ /\b\d+\b/o && $r6 != 1
-			&& $r6 != 2 && $r6 != 4 && $r6 != 8);
-		return 0 if ( is_reg_intel($r6) && $r5 =~ /\b\d+\b/o && $r5 != 1
-			&& $r5 != 2 && $r5 != 4 && $r5 != 8);
-		return 0 if ( is_reg_intel($r3) && (is_reg_intel($r5) || is_reg_intel($r6)) && is_reg_intel($r8) );
-
-		return 1;
+		return _validate_64bit_addr_parts_intel ($1, $2, $3, $4, $5, $6, $7, $8);
 	}
 	elsif (	$elem =~ /^\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*\*\s*(\w+)\s*(\)*)\s*\]$/o
 		|| $elem =~ /^(\w+)\s*:\s*\[\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*\*\s*(\w+)\s*(\)*)\s*\]$/o) {
 
-		my ($r1, $r2, $r3, $r7, $r8, $r4, $r5, $r6) = ($1, $2, $3, $4, $5, $6, $7, $8);
-
-		return 0 if ( is_segreg_intel($r3) || is_segreg_intel($r6) || is_segreg_intel($r5)
-			|| is_segreg_intel($r8) || ! is_segreg_intel($r1) );
-		return 0 if ( (! is_reg64_intel($r3) && ! is_r32_in64_intel($r3) && ! is_addressable32_intel($r3))
-			&& (is_reg8_intel($r3) || is_segreg_intel($r3)
-			|| is_reg16_intel($r3) || is_reg32_intel($r3)
-			|| is_reg_mm_intel($r3) || is_reg_fpu_intel($r3)) );
-		return 0 if ( (! is_reg64_intel($r6) && ! is_r32_in64_intel($r6) && ! is_addressable32_intel($r6))
-			&& (is_reg8_intel($r6) || is_segreg_intel($r6)
-			|| is_reg16_intel($r6) || is_reg32_intel($r6)
-			|| is_reg_mm_intel($r6) || is_reg_fpu_intel($r6)) );
-		return 0 if ( (! is_reg64_intel($r5) && ! is_r32_in64_intel($r5) && ! is_addressable32_intel($r5))
-			&& (is_reg8_intel($r5) || is_segreg_intel($r5)
-			|| is_reg16_intel($r5) || is_reg32_intel($r5)
-			|| is_reg_mm_intel($r5) || is_reg_fpu_intel($r5)) );
-		return 0 if ( (! is_reg64_intel($r8) && ! is_r32_in64_intel($r8) && ! is_addressable32_intel($r8))
-			&& (is_reg8_intel($r8) || is_segreg_intel($r8)
-			|| is_reg16_intel($r8) || is_reg32_intel($r8)
-			|| is_reg_mm_intel($r8) || is_reg_fpu_intel($r8)) );
-		my $was64 = is_reg64_intel($r3) + is_reg64_intel($r5) + is_reg64_intel($r6) + is_reg64_intel($r8);
-		my $nregs = is_reg_intel($r3) + is_reg_intel($r5) + is_reg_intel($r6) + is_reg_intel($r8);
-		return 0 if ( $was64 != 0 && $was64 != $nregs );
-		return 0 if ( is_reg_intel($r6) && is_reg_intel($r5) );
-		return 0 if ( is_reg_intel($r3) && $r2 =~ /-/o );
-		return 0 if ( (is_reg_intel($r5) || is_reg_intel($r6)) && $r4 =~ /-/o );
-		return 0 if ( is_reg_intel($r8) && $r7 =~ /-/o );
-		return 0 if ( ($r5 =~ /\brsp\b/io || $r5 =~ /\brip\b/io) && $r6 =~ /\b\d+\b/o && $r6 != 1 );
-		return 0 if ( ($r6 =~ /\brsp\b/io || $r6 =~ /\brip\b/io) && $r5 =~ /\b\d+\b/o && $r5 != 1 );
-		return 0 if ( is_reg_intel($r5) && $r6 =~ /\b\d+\b/o && $r6 != 1
-			&& $r6 != 2 && $r6 != 4 && $r6 != 8);
-		return 0 if ( is_reg_intel($r6) && $r5 =~ /\b\d+\b/o && $r5 != 1
-			&& $r5 != 2 && $r5 != 4 && $r5 != 8);
-		return 0 if ( is_reg_intel($r3) && (is_reg_intel($r5) || is_reg_intel($r6)) && is_reg_intel($r8) );
-
-		return 1;
+		return _validate_64bit_addr_parts_intel ($1, $2, $3, $6, $7, $8, $4, $5);
 	}
 	elsif (	$elem =~ /^\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]$/o
 		|| $elem =~ /^(\w+)\s*:\s*\[\s*([\+\-\(\)]*)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]$/o) {
 
-		my ($r1, $r4, $r5, $r6, $r2, $r3, $r7, $r8) = ($1, $2, $3, $4, $5, $6, $7, $8);
-
-		return 0 if ( is_segreg_intel($r3) || is_segreg_intel($r6) || is_segreg_intel($r5)
-			|| is_segreg_intel($r8) || ! is_segreg_intel($r1) );
-		return 0 if ( (! is_reg64_intel($r3) && ! is_r32_in64_intel($r3) && ! is_addressable32_intel($r3))
-			&& (is_reg8_intel($r3) || is_segreg_intel($r3)
-			|| is_reg16_intel($r3) || is_reg32_intel($r3)
-			|| is_reg_mm_intel($r3) || is_reg_fpu_intel($r3)) );
-		return 0 if ( (! is_reg64_intel($r6) && ! is_r32_in64_intel($r6) && ! is_addressable32_intel($r6))
-			&& (is_reg8_intel($r6) || is_segreg_intel($r6)
-			|| is_reg16_intel($r6) || is_reg32_intel($r6)
-			|| is_reg_mm_intel($r6) || is_reg_fpu_intel($r6)) );
-		return 0 if ( (! is_reg64_intel($r5) && ! is_r32_in64_intel($r5) && ! is_addressable32_intel($r5))
-			&& (is_reg8_intel($r5) || is_segreg_intel($r5)
-			|| is_reg16_intel($r5) || is_reg32_intel($r5)
-			|| is_reg_mm_intel($r5) || is_reg_fpu_intel($r5)) );
-		return 0 if ( (! is_reg64_intel($r8) && ! is_r32_in64_intel($r8) && ! is_addressable32_intel($r8))
-			&& (is_reg8_intel($r8) || is_segreg_intel($r8)
-			|| is_reg16_intel($r8) || is_reg32_intel($r8)
-			|| is_reg_mm_intel($r8) || is_reg_fpu_intel($r8)) );
-		my $was64 = is_reg64_intel($r3) + is_reg64_intel($r5) + is_reg64_intel($r6) + is_reg64_intel($r8);
-		my $nregs = is_reg_intel($r3) + is_reg_intel($r5) + is_reg_intel($r6) + is_reg_intel($r8);
-		return 0 if ( $was64 != 0 && $was64 != $nregs );
-		return 0 if ( is_reg_intel($r6) && is_reg_intel($r5) );
-		return 0 if ( is_reg_intel($r3) && $r2 =~ /-/o );
-		return 0 if ( (is_reg_intel($r5) || is_reg_intel($r6)) && $r4 =~ /-/o );
-		return 0 if ( is_reg_intel($r8) && $r7 =~ /-/o );
-		return 0 if ( ($r5 =~ /\brsp\b/io || $r5 =~ /\brip\b/io) && $r6 =~ /\b\d+\b/o && $r6 != 1 );
-		return 0 if ( ($r6 =~ /\brsp\b/io || $r6 =~ /\brip\b/io) && $r5 =~ /\b\d+\b/o && $r5 != 1 );
-		return 0 if ( is_reg_intel($r5) && $r6 =~ /\b\d+\b/o && $r6 != 1
-			&& $r6 != 2 && $r6 != 4 && $r6 != 8);
-		return 0 if ( is_reg_intel($r6) && $r5 =~ /\b\d+\b/o && $r5 != 1
-			&& $r5 != 2 && $r5 != 4 && $r5 != 8);
-		return 0 if ( is_reg_intel($r3) && (is_reg_intel($r5) || is_reg_intel($r6)) && is_reg_intel($r8) );
-
-		return 1;
+		return _validate_64bit_addr_parts_intel ($1, $5, $6, $2, $3, $4, $7, $8);
 	}
 	elsif (	$elem =~ /^\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]$/o
 		|| $elem =~ /^(\w+)\s*:\s*\[\s*([\+\-\(\)]*)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]$/o) {
 
-		my ($r1, $r4, $r5, $r6, $r2, $r3) = ($1, $2, $3, $4, $5, $6);
-
-		return 0 if ( is_segreg_intel($r3) || is_segreg_intel($r6) || is_segreg_intel($r5)
-			|| ! is_segreg_intel($r1) );
-		return 0 if ( (! is_reg64_intel($r3) && ! is_r32_in64_intel($r3) && ! is_addressable32_intel($r3))
-			&& (is_reg8_intel($r3) || is_segreg_intel($r3)
-			|| is_reg16_intel($r3) || is_reg32_intel($r3)
-			|| is_reg_mm_intel($r3) || is_reg_fpu_intel($r3)) );
-		return 0 if ( (! is_reg64_intel($r6) && ! is_r32_in64_intel($r6) && ! is_addressable32_intel($r6))
-			&& (is_reg8_intel($r6) || is_segreg_intel($r6)
-			|| is_reg16_intel($r6) || is_reg32_intel($r6)
-			|| is_reg_mm_intel($r6) || is_reg_fpu_intel($r6)) );
-		return 0 if ( (! is_reg64_intel($r5) && ! is_r32_in64_intel($r5) && ! is_addressable32_intel($r5))
-			&& (is_reg8_intel($r5) || is_segreg_intel($r5)
-			|| is_reg16_intel($r5) || is_reg32_intel($r5)
-			|| is_reg_mm_intel($r5) || is_reg_fpu_intel($r5)) );
-		my $was64 = is_reg64_intel($r3) + is_reg64_intel($r5) + is_reg64_intel($r6);
-		my $nregs = is_reg_intel($r3) + is_reg_intel($r5) + is_reg_intel($r6);
-		return 0 if ( $was64 != 0 && $was64 != $nregs );
-		return 0 if ( is_reg_intel($r6) && is_reg_intel($r5) );
-		return 0 if ( is_reg_intel($r3) && $r2 =~ /-/o );
-		return 0 if ( (is_reg_intel($r5) || is_reg_intel($r6)) && $r4 =~ /-/o );
-		return 0 if ( ($r5 =~ /\brsp\b/io || $r5 =~ /\brip\b/io) && $r6 =~ /\b\d+\b/o && $r6 != 1 );
-		return 0 if ( ($r6 =~ /\brsp\b/io || $r6 =~ /\brip\b/io) && $r5 =~ /\b\d+\b/o && $r5 != 1 );
-		return 0 if ( is_reg_intel($r5) && $r6 =~ /\b\d+\b/o && $r6 != 1
-			&& $r6 != 2 && $r6 != 4 && $r6 != 8);
-		return 0 if ( is_reg_intel($r6) && $r5 =~ /\b\d+\b/o && $r5 != 1
-			&& $r5 != 2 && $r5 != 4 && $r5 != 8);
-
-		return 1;
+		return _validate_64bit_addr_parts_intel ($1, undef, undef, $2, $3, $4, $5, $6);
 	}
 	elsif (	$elem =~ /^\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]$/o
 		|| $elem =~ /^(\w+)\s*:\s*\[\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]$/o) {
 
-		my ($r1, $r2, $r3, $r4, $r5, $r7, $r8) = ($1, $2, $3, $4, $5, $6, $7);
-
-		return 0 if ( is_segreg_intel($r3) || is_segreg_intel($r5)
-			|| is_segreg_intel($r8) || ! is_segreg_intel($r1) );
-		return 0 if ( (! is_reg64_intel($r3) && ! is_r32_in64_intel($r3) && ! is_addressable32_intel($r3))
-			&& (is_reg8_intel($r3) || is_segreg_intel($r3)
-			|| is_reg16_intel($r3) || is_reg32_intel($r3)
-			|| is_reg_mm_intel($r3) || is_reg_fpu_intel($r3)) );
-		return 0 if ( (! is_reg64_intel($r5) && ! is_r32_in64_intel($r5) && ! is_addressable32_intel($r5))
-			&& (is_reg8_intel($r5) || is_segreg_intel($r5)
-			|| is_reg16_intel($r5) || is_reg32_intel($r5)
-			|| is_reg_mm_intel($r5) || is_reg_fpu_intel($r5)) );
-		return 0 if ( (! is_reg64_intel($r8) && ! is_r32_in64_intel($r8) && ! is_addressable32_intel($r8))
-			&& (is_reg8_intel($r8) || is_segreg_intel($r8)
-			|| is_reg16_intel($r8) || is_reg32_intel($r8)
-			|| is_reg_mm_intel($r8) || is_reg_fpu_intel($r8)) );
-		my $was64 = is_reg64_intel($r3) + is_reg64_intel($r5) + is_reg64_intel($r8);
-		my $nregs = is_reg_intel($r3) + is_reg_intel($r5) + is_reg_intel($r8);
-		return 0 if ( $was64 != 0 && $was64 != $nregs );
-		return 0 if ( is_reg_intel($r3) && $r2 =~ /-/o );
-		return 0 if ( is_reg_intel($r5) && $r4 =~ /-/o );
-		return 0 if ( is_reg_intel($r8) && $r7 =~ /-/o );
-		return 0 if ( is_reg_intel($r3) && is_reg_intel($r5) && is_reg_intel($r8) );
-
-		return 1;
+		return _validate_64bit_addr_parts_intel ($1, $2, $3, $4, $5, undef, $6, $7);
 	}
 	elsif (	$elem =~ /^\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*\*\s*(\w+)\s*(\)*)\s*\]$/o
 		|| $elem =~ /^(\w+)\s*:\s*\[\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*\*\s*(\w+)\s*(\)*)\s*\]$/o) {
 
-		my ($r1, $r2, $r3, $r4, $r5, $r6) = ($1, $2, $3, $4, $5, $6);
-
-		return 0 if ( is_segreg_intel($r3) || is_segreg_intel($r6) || is_segreg_intel($r5)
-			|| ! is_segreg_intel($r1) );
-		return 0 if ( (! is_reg64_intel($r3) && ! is_r32_in64_intel($r3) && ! is_addressable32_intel($r3))
-			&& (is_reg8_intel($r3) || is_segreg_intel($r3)
-			|| is_reg16_intel($r3) || is_reg32_intel($r3)
-			|| is_reg_mm_intel($r3) || is_reg_fpu_intel($r3)) );
-		return 0 if ( (! is_reg64_intel($r6) && ! is_r32_in64_intel($r6) && ! is_addressable32_intel($r6))
-			&& (is_reg8_intel($r6) || is_segreg_intel($r6)
-			|| is_reg16_intel($r6) || is_reg32_intel($r6)
-			|| is_reg_mm_intel($r6) || is_reg_fpu_intel($r6)) );
-		return 0 if ( (! is_reg64_intel($r5) && ! is_r32_in64_intel($r5) && ! is_addressable32_intel($r5))
-			&& (is_reg8_intel($r5) || is_segreg_intel($r5)
-			|| is_reg16_intel($r5) || is_reg32_intel($r5)
-			|| is_reg_mm_intel($r5) || is_reg_fpu_intel($r5)) );
-		my $was64 = is_reg64_intel($r3) + is_reg64_intel($r5) + is_reg64_intel($r6);
-		my $nregs = is_reg_intel($r3) + is_reg_intel($r5) + is_reg_intel($r6);
-		return 0 if ( $was64 != 0 && $was64 != $nregs );
-		return 0 if ( is_reg_intel($r6) && is_reg_intel($r5) );
-		return 0 if ( is_reg_intel($r3) && $r2 =~ /-/o );
-		return 0 if ( (is_reg_intel($r5) || is_reg_intel($r6)) && $r4 =~ /-/o );
-		return 0 if ( ($r5 =~ /\brsp\b/io || $r5 =~ /\brip\b/io) && $r6 =~ /\b\d+\b/o && $r6 != 1 );
-		return 0 if ( ($r6 =~ /\brsp\b/io || $r6 =~ /\brip\b/io) && $r5 =~ /\b\d+\b/o && $r5 != 1 );
-		return 0 if ( is_reg_intel($r5) && $r6 =~ /\b\d+\b/o && $r6 != 1
-			&& $r6 != 2 && $r6 != 4 && $r6 != 8);
-		return 0 if ( is_reg_intel($r6) && $r5 =~ /\b\d+\b/o && $r5 != 1
-			&& $r5 != 2 && $r5 != 4 && $r5 != 8);
-
-		return 1;
+		return _validate_64bit_addr_parts_intel ($1, $2, $3, $4, $5, $6, undef, undef);
 	}
 	elsif (	$elem =~ /^\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*\]$/o
 		|| $elem =~ /^(\w+)\s*:\s*\[\s*([\+\-\(\)]*)\s*(\w+)\s*\]$/o) {
 
-		my ($r1, $r2, $r3) = ($1, $2, $3);
-
-		return 0 if ( is_segreg_intel($r3) || ! is_segreg_intel($r1) );
-		return 0 if ( (! is_reg64_intel($r3) && ! is_r32_in64_intel($r3))
-			&& (is_reg8_intel($r3) || is_segreg_intel($r3)
-			|| is_reg16_intel($r3) || (is_reg32_intel($r3) && ! is_addressable32_intel($r3))
-			|| is_reg_mm_intel($r3) || is_reg_fpu_intel($r3)) );
-		return 0 if ( is_reg_intel($r3) && $r2 =~ /-/o );
-
-		return 1;
+		return _validate_64bit_addr_parts_intel ($1, $2, $3, undef, undef, undef, undef, undef);
 	}
 	elsif (	$elem =~ /^\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*\*\s*(\w+)\s*(\)*)\s*\]$/o
 		|| $elem =~ /^(\w+)\s*:\s*\[\s*([\+\-\(\)]*)\s*(\w+)\s*\*\s*(\w+)\s*(\)*)\s*\]$/o) {
 
-		my ($r1, $r2, $r3, $r4) = ($1, $2, $3, $4);
-
-		return 0 if ( is_segreg_intel($r3) || is_segreg_intel($r4) || ! is_segreg_intel($r1) );
-		return 0 if ( (! is_reg64_intel($r3) && ! is_r32_in64_intel($r3) && ! is_addressable32_intel($r3))
-			&& (is_reg8_intel($r3) || is_segreg_intel($r3)
-			|| is_reg16_intel($r3) || is_reg32_intel($r3)
-			|| is_reg_mm_intel($r3) || is_reg_fpu_intel($r3)) );
-		return 0 if ( (! is_reg64_intel($r4) && ! is_r32_in64_intel($r4) && ! is_addressable32_intel($r4))
-			&& (is_reg8_intel($r4) || is_segreg_intel($r4)
-			|| is_reg16_intel($r4) || is_reg32_intel($r4)
-			|| is_reg_mm_intel($r4) || is_reg_fpu_intel($r4)) );
-		my $was64 = is_reg64_intel($r3) + is_reg64_intel($r4);
-		my $nregs = is_reg_intel($r3) + is_reg_intel($r4);
-		return 0 if ( $was64 != 0 && $was64 != $nregs );
-		return 0 if ( is_reg_intel($r3) && is_reg_intel($r4) );
-		return 0 if ( is_reg_intel($r3) && $r2 =~ /-/o );
-		return 0 if ( (is_reg_intel($r3) || is_reg_intel($r4)) && $r2 =~ /-/o );
-		return 0 if ( ($r3 =~ /\brsp\b/io || $r3 =~ /\brip\b/io) && $r4 =~ /\b\d+\b/o && $r4 != 1 );
-		return 0 if ( ($r4 =~ /\brsp\b/io || $r4 =~ /\brip\b/io) && $r3 =~ /\b\d+\b/o && $r3 != 1 );
-		return 0 if ( is_reg_intel($r3) && $r4 =~ /\b\d+\b/o && $r4 != 1
-			&& $r4 != 2 && $r4 != 4 && $r4 != 8);
-		return 0 if ( is_reg_intel($r4) && $r3 =~ /\b\d+\b/o && $r3 != 1
-			&& $r3 != 2 && $r3 != 4 && $r3 != 8);
-
-		return 1;
+		return _validate_64bit_addr_parts_intel ($1, undef, undef, $2, $3, $4, undef, undef);
 	}
 	elsif (	$elem =~ /^\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]*)\s*(\w+)\s*\]$/o
 		|| $elem =~ /^(\w+)\s*:\s*\[\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]*)\s*(\w+)\s*\]$/o) {
 
-		my ($r1, $r2, $r3, $r4, $r5) = ($1, $2, $3, $4, $5);
-
-		return 0 if ( is_segreg_intel($r3) || is_segreg_intel($r5) || ! is_segreg_intel($r1) );
-		return 0 if ( (! is_reg64_intel($r3) && ! is_r32_in64_intel($r3) && ! is_addressable32_intel($r3))
-			&& (is_reg8_intel($r3) || is_segreg_intel($r3)
-			|| is_reg16_intel($r3) || is_reg32_intel($r3)
-			|| is_reg_mm_intel($r3) || is_reg_fpu_intel($r3)) );
-		return 0 if ( (! is_reg64_intel($r5) && ! is_r32_in64_intel($r5) && ! is_addressable32_intel($r5))
-			&& (is_reg8_intel($r5) || is_segreg_intel($r5)
-			|| is_reg16_intel($r5) || is_reg32_intel($r5)
-			|| is_reg_mm_intel($r5) || is_reg_fpu_intel($r5)) );
-		my $was64 = is_reg64_intel($r3) + is_reg64_intel($r5);
-		my $nregs = is_reg_intel($r3) + is_reg_intel($r5);
-		return 0 if ( $was64 != 0 && $was64 != $nregs );
-		return 0 if ( is_reg_intel($r3) && $r2 =~ /-/o );
-		return 0 if ( is_reg_intel($r5) && $r4 =~ /-/o );
-
-		return 1;
+		return _validate_64bit_addr_parts_intel ($1, $2, $3, undef, undef, undef, $4, $5);
 	}
 	elsif (	$elem =~ /^\[\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]$/o ) {
 
-		my ($r2, $r3, $r4, $r5, $r6, $r7, $r8) = ($1, $2, $3, $4, $5, $6, $7);
-
-		return 0 if ( is_segreg_intel($r3) || is_segreg_intel($r6) || is_segreg_intel($r5)
-			|| is_segreg_intel($r8) );
-		return 0 if ( (! is_reg64_intel($r3) && ! is_r32_in64_intel($r3) && ! is_addressable32_intel($r3))
-			&& (is_reg8_intel($r3) || is_segreg_intel($r3)
-			|| is_reg16_intel($r3) || is_reg32_intel($r3)
-			|| is_reg_mm_intel($r3) || is_reg_fpu_intel($r3)) );
-		return 0 if ( (! is_reg64_intel($r6) && ! is_r32_in64_intel($r6) && ! is_addressable32_intel($r6))
-			&& (is_reg8_intel($r6) || is_segreg_intel($r6)
-			|| is_reg16_intel($r6) || is_reg32_intel($r6)
-			|| is_reg_mm_intel($r6) || is_reg_fpu_intel($r6)) );
-		return 0 if ( (! is_reg64_intel($r5) && ! is_r32_in64_intel($r5) && ! is_addressable32_intel($r5))
-			&& (is_reg8_intel($r5) || is_segreg_intel($r5)
-			|| is_reg16_intel($r5) || is_reg32_intel($r5)
-			|| is_reg_mm_intel($r5) || is_reg_fpu_intel($r5)) );
-		return 0 if ( (! is_reg64_intel($r8) && ! is_r32_in64_intel($r8) && ! is_addressable32_intel($r8))
-			&& (is_reg8_intel($r8) || is_segreg_intel($r8)
-			|| is_reg16_intel($r8) || is_reg32_intel($r8)
-			|| is_reg_mm_intel($r8) || is_reg_fpu_intel($r8)) );
-		my $was64 = is_reg64_intel($r3) + is_reg64_intel($r5) + is_reg64_intel($r6) + is_reg64_intel($r8);
-		my $nregs = is_reg_intel($r3) + is_reg_intel($r5) + is_reg_intel($r6) + is_reg_intel($r8);
-		return 0 if ( $was64 != 0 && $was64 != $nregs );
-		return 0 if ( is_reg_intel($r6) && is_reg_intel($r5) );
-		return 0 if ( is_reg_intel($r3) && $r2 =~ /-/o );
-		return 0 if ( (is_reg_intel($r5) || is_reg_intel($r6)) && $r4 =~ /-/o );
-		return 0 if ( is_reg_intel($r8) && $r7 =~ /-/o );
-		return 0 if ( ($r5 =~ /\brsp\b/io || $r5 =~ /\brip\b/io) && $r6 =~ /\b\d+\b/o && $r6 != 1 );
-		return 0 if ( ($r6 =~ /\brsp\b/io || $r6 =~ /\brip\b/io) && $r5 =~ /\b\d+\b/o && $r5 != 1 );
-		return 0 if ( is_reg_intel($r5) && $r6 =~ /\b\d+\b/o && $r6 != 1
-			&& $r6 != 2 && $r6 != 4 && $r6 != 8);
-		return 0 if ( is_reg_intel($r6) && $r5 =~ /\b\d+\b/o && $r5 != 1
-			&& $r5 != 2 && $r5 != 4 && $r5 != 8);
-		return 0 if ( is_reg_intel($r3) && (is_reg_intel($r5) || is_reg_intel($r6)) && is_reg_intel($r8) );
-
-		return 1;
+		return _validate_64bit_addr_parts_intel (undef, $1, $2, $3, $4, $5, $6, $7);
 	}
 	elsif (	$elem =~ /^\[\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*\*\s*(\w+)\s*(\)*)\s*\]$/o ) {
 
-		my ($r2, $r3, $r7, $r8, $r4, $r5, $r6) = ($1, $2, $3, $4, $5, $6, $7);
-
-		return 0 if ( is_segreg_intel($r3) || is_segreg_intel($r6) || is_segreg_intel($r5)
-			|| is_segreg_intel($r8) );
-		return 0 if ( (! is_reg64_intel($r3) && ! is_r32_in64_intel($r3) && ! is_addressable32_intel($r3))
-			&& (is_reg8_intel($r3) || is_segreg_intel($r3)
-			|| is_reg16_intel($r3) || is_reg32_intel($r3)
-			|| is_reg_mm_intel($r3) || is_reg_fpu_intel($r3)) );
-		return 0 if ( (! is_reg64_intel($r6) && ! is_r32_in64_intel($r6) && ! is_addressable32_intel($r6))
-			&& (is_reg8_intel($r6) || is_segreg_intel($r6)
-			|| is_reg16_intel($r6) || is_reg32_intel($r6)
-			|| is_reg_mm_intel($r6) || is_reg_fpu_intel($r6)) );
-		return 0 if ( (! is_reg64_intel($r5) && ! is_r32_in64_intel($r5) && ! is_addressable32_intel($r5))
-			&& (is_reg8_intel($r5) || is_segreg_intel($r5)
-			|| is_reg16_intel($r5) || is_reg32_intel($r5)
-			|| is_reg_mm_intel($r5) || is_reg_fpu_intel($r5)) );
-		return 0 if ( (! is_reg64_intel($r8) && ! is_r32_in64_intel($r8) && ! is_addressable32_intel($r8))
-			&& (is_reg8_intel($r8) || is_segreg_intel($r8)
-			|| is_reg16_intel($r8) || is_reg32_intel($r8)
-			|| is_reg_mm_intel($r8) || is_reg_fpu_intel($r8)) );
-		my $was64 = is_reg64_intel($r3) + is_reg64_intel($r5) + is_reg64_intel($r6) + is_reg64_intel($r8);
-		my $nregs = is_reg_intel($r3) + is_reg_intel($r5) + is_reg_intel($r6) + is_reg_intel($r8);
-		return 0 if ( $was64 != 0 && $was64 != $nregs );
-		return 0 if ( is_reg_intel($r6) && is_reg_intel($r5) );
-		return 0 if ( is_reg_intel($r3) && $r2 =~ /-/o );
-		return 0 if ( (is_reg_intel($r5) || is_reg_intel($r6)) && $r4 =~ /-/o );
-		return 0 if ( is_reg_intel($r8) && $r7 =~ /-/o );
-		return 0 if ( ($r5 =~ /\brsp\b/io || $r5 =~ /\brip\b/io) && $r6 =~ /\b\d+\b/o && $r6 != 1 );
-		return 0 if ( ($r6 =~ /\brsp\b/io || $r6 =~ /\brip\b/io) && $r5 =~ /\b\d+\b/o && $r5 != 1 );
-		return 0 if ( is_reg_intel($r5) && $r6 =~ /\b\d+\b/o && $r6 != 1
-			&& $r6 != 2 && $r6 != 4 && $r6 != 8);
-		return 0 if ( is_reg_intel($r6) && $r5 =~ /\b\d+\b/o && $r5 != 1
-			&& $r5 != 2 && $r5 != 4 && $r5 != 8);
-		return 0 if ( is_reg_intel($r3) && (is_reg_intel($r5) || is_reg_intel($r6)) && is_reg_intel($r8) );
-
-		return 1;
+		return _validate_64bit_addr_parts_intel (undef, $1, $2, $5, $6, $7, $3, $4);
 	}
 	elsif (	$elem =~ /^\[\s*([\+\-\(\)]*)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]$/o ) {
 
-		my ($r4, $r5, $r6, $r2, $r3, $r7, $r8) = ($1, $2, $3, $4, $5, $6, $7);
-
-		return 0 if ( is_segreg_intel($r3) || is_segreg_intel($r6) || is_segreg_intel($r5)
-			|| is_segreg_intel($r8) );
-		return 0 if ( (! is_reg64_intel($r3) && ! is_r32_in64_intel($r3) && ! is_addressable32_intel($r3))
-			&& (is_reg8_intel($r3) || is_segreg_intel($r3)
-			|| is_reg16_intel($r3) || is_reg32_intel($r3)
-			|| is_reg_mm_intel($r3) || is_reg_fpu_intel($r3)) );
-		return 0 if ( (! is_reg64_intel($r6) && ! is_r32_in64_intel($r6) && ! is_addressable32_intel($r6))
-			&& (is_reg8_intel($r6) || is_segreg_intel($r6)
-			|| is_reg16_intel($r6) || is_reg32_intel($r6)
-			|| is_reg_mm_intel($r6) || is_reg_fpu_intel($r6)) );
-		return 0 if ( (! is_reg64_intel($r5) && ! is_r32_in64_intel($r5) && ! is_addressable32_intel($r5))
-			&& (is_reg8_intel($r5) || is_segreg_intel($r5)
-			|| is_reg16_intel($r5) || is_reg32_intel($r5)
-			|| is_reg_mm_intel($r5) || is_reg_fpu_intel($r5)) );
-		return 0 if ( (! is_reg64_intel($r8) && ! is_r32_in64_intel($r8) && ! is_addressable32_intel($r8))
-			&& (is_reg8_intel($r8) || is_segreg_intel($r8)
-			|| is_reg16_intel($r8) || is_reg32_intel($r8)
-			|| is_reg_mm_intel($r8) || is_reg_fpu_intel($r8)) );
-		my $was64 = is_reg64_intel($r3) + is_reg64_intel($r5) + is_reg64_intel($r6) + is_reg64_intel($r8);
-		my $nregs = is_reg_intel($r3) + is_reg_intel($r5) + is_reg_intel($r6) + is_reg_intel($r8);
-		return 0 if ( $was64 != 0 && $was64 != $nregs );
-		return 0 if ( is_reg_intel($r6) && is_reg_intel($r5) );
-		return 0 if ( is_reg_intel($r3) && $r2 =~ /-/o );
-		return 0 if ( (is_reg_intel($r5) || is_reg_intel($r6)) && $r4 =~ /-/o );
-		return 0 if ( is_reg_intel($r8) && $r7 =~ /-/o );
-		return 0 if ( ($r5 =~ /\brsp\b/io || $r5 =~ /\brip\b/io) && $r6 =~ /\b\d+\b/o && $r6 != 1 );
-		return 0 if ( ($r6 =~ /\brsp\b/io || $r6 =~ /\brip\b/io) && $r5 =~ /\b\d+\b/o && $r5 != 1 );
-		return 0 if ( is_reg_intel($r5) && $r6 =~ /\b\d+\b/o && $r6 != 1
-			&& $r6 != 2 && $r6 != 4 && $r6 != 8);
-		return 0 if ( is_reg_intel($r6) && $r5 =~ /\b\d+\b/o && $r5 != 1
-			&& $r5 != 2 && $r5 != 4 && $r5 != 8);
-		return 0 if ( is_reg_intel($r3) && (is_reg_intel($r5) || is_reg_intel($r6)) && is_reg_intel($r8) );
-
-		return 1;
+		return _validate_64bit_addr_parts_intel (undef, $4, $5, $1, $2, $3, $6, $7);
 	}
 	elsif (	$elem =~ /^\[\s*([\+\-\(\)]*)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]$/o ) {
 
-		my ($r4, $r5, $r6, $r2, $r3) = ($1, $2, $3, $4, $5, $6);
-
-		return 0 if ( is_segreg_intel($r3) || is_segreg_intel($r6) || is_segreg_intel($r5) );
-		return 0 if ( (! is_reg64_intel($r3) && ! is_r32_in64_intel($r3) && ! is_addressable32_intel($r3))
-			&& (is_reg8_intel($r3) || is_segreg_intel($r3)
-			|| is_reg16_intel($r3) || is_reg32_intel($r3)
-			|| is_reg_mm_intel($r3) || is_reg_fpu_intel($r3)) );
-		return 0 if ( (! is_reg64_intel($r6) && ! is_r32_in64_intel($r6) && ! is_addressable32_intel($r6))
-			&& (is_reg8_intel($r6) || is_segreg_intel($r6)
-			|| is_reg16_intel($r6) || is_reg32_intel($r6)
-			|| is_reg_mm_intel($r6) || is_reg_fpu_intel($r6)) );
-		return 0 if ( (! is_reg64_intel($r5) && ! is_r32_in64_intel($r5) && ! is_addressable32_intel($r5))
-			&& (is_reg8_intel($r5) || is_segreg_intel($r5)
-			|| is_reg16_intel($r5) || is_reg32_intel($r5)
-			|| is_reg_mm_intel($r5) || is_reg_fpu_intel($r5)) );
-		my $was64 = is_reg64_intel($r3) + is_reg64_intel($r5) + is_reg64_intel($r6);
-		my $nregs = is_reg_intel($r3) + is_reg_intel($r5) + is_reg_intel($r6);
-		return 0 if ( $was64 != 0 && $was64 != $nregs );
-		return 0 if ( is_reg_intel($r6) && is_reg_intel($r5) );
-		return 0 if ( is_reg_intel($r3) && $r2 =~ /-/o );
-		return 0 if ( (is_reg_intel($r5) || is_reg_intel($r6)) && $r4 =~ /-/o );
-		return 0 if ( ($r5 =~ /\brsp\b/io || $r5 =~ /\brip\b/io) && $r6 =~ /\b\d+\b/o && $r6 != 1 );
-		return 0 if ( ($r6 =~ /\brsp\b/io || $r6 =~ /\brip\b/io) && $r5 =~ /\b\d+\b/o && $r5 != 1 );
-		return 0 if ( is_reg_intel($r5) && $r6 =~ /\b\d+\b/o && $r6 != 1
-			&& $r6 != 2 && $r6 != 4 && $r6 != 8);
-		return 0 if ( is_reg_intel($r6) && $r5 =~ /\b\d+\b/o && $r5 != 1
-			&& $r5 != 2 && $r5 != 4 && $r5 != 8);
-
-		return 1;
+		return _validate_64bit_addr_parts_intel (undef, undef, undef, $1, $2, $3, $4, $5);
 	}
 	elsif (	$elem =~ /^\[\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]$/o ) {
 
-		my ($r2, $r3, $r4, $r5, $r7, $r8) = ($1, $2, $3, $4, $5, $6);
-
-		return 0 if ( is_segreg_intel($r3) || is_segreg_intel($r5) || is_segreg_intel($r8) );
-		return 0 if ( (! is_reg64_intel($r3) && ! is_r32_in64_intel($r3) && ! is_addressable32_intel($r3))
-			&& (is_reg8_intel($r3) || is_segreg_intel($r3)
-			|| is_reg16_intel($r3) || is_reg32_intel($r3)
-			|| is_reg_mm_intel($r3) || is_reg_fpu_intel($r3)) );
-		return 0 if ( (! is_reg64_intel($r5) && ! is_r32_in64_intel($r5) && ! is_addressable32_intel($r5))
-			&& (is_reg8_intel($r5) || is_segreg_intel($r5)
-			|| is_reg16_intel($r5) || is_reg32_intel($r5)
-			|| is_reg_mm_intel($r5) || is_reg_fpu_intel($r5)) );
-		return 0 if ( (! is_reg64_intel($r8) && ! is_r32_in64_intel($r8) && ! is_addressable32_intel($r8))
-			&& (is_reg8_intel($r8) || is_segreg_intel($r8)
-			|| is_reg16_intel($r8) || is_reg32_intel($r8)
-			|| is_reg_mm_intel($r8) || is_reg_fpu_intel($r8)) );
-		my $was64 = is_reg64_intel($r3) + is_reg64_intel($r5) + is_reg64_intel($r8);
-		my $nregs = is_reg_intel($r3) + is_reg_intel($r5) + is_reg_intel($r8);
-		return 0 if ( $was64 != 0 && $was64 != $nregs );
-		return 0 if ( is_reg_intel($r3) && $r2 =~ /-/o );
-		return 0 if ( is_reg_intel($r5) && $r4 =~ /-/o );
-		return 0 if ( is_reg_intel($r8) && $r7 =~ /-/o );
-		return 0 if ( is_reg_intel($r3) && is_reg_intel($r5) && is_reg_intel($r8) );
-
-		return 1;
+		return _validate_64bit_addr_parts_intel (undef, $1, $2, $3, $4, undef, $5, $6);
 	}
 	elsif (	$elem =~ /^\[\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*\*\s*(\w+)\s*(\)*)\s*\]$/o ) {
 
-		my ($r2, $r3, $r4, $r5, $r6) = ($1, $2, $3, $4, $5);
-
-		return 0 if ( is_segreg_intel($r3) || is_segreg_intel($r6) || is_segreg_intel($r5) );
-		return 0 if ( (! is_reg64_intel($r3) && ! is_r32_in64_intel($r3) && ! is_addressable32_intel($r3))
-			&& (is_reg8_intel($r3) || is_segreg_intel($r3)
-			|| is_reg16_intel($r3) || is_reg32_intel($r3)
-			|| is_reg_mm_intel($r3) || is_reg_fpu_intel($r3)) );
-		return 0 if ( (! is_reg64_intel($r6) && ! is_r32_in64_intel($r6) && ! is_addressable32_intel($r6))
-			&& (is_reg8_intel($r6) || is_segreg_intel($r6)
-			|| is_reg16_intel($r6) || is_reg32_intel($r6)
-			|| is_reg_mm_intel($r6) || is_reg_fpu_intel($r6)) );
-		return 0 if ( (! is_reg64_intel($r5) && ! is_r32_in64_intel($r5) && ! is_addressable32_intel($r5))
-			&& (is_reg8_intel($r5) || is_segreg_intel($r5)
-			|| is_reg16_intel($r5) || is_reg32_intel($r5)
-			|| is_reg_mm_intel($r5) || is_reg_fpu_intel($r5)) );
-		my $was64 = is_reg64_intel($r3) + is_reg64_intel($r5) + is_reg64_intel($r6);
-		my $nregs = is_reg_intel($r3) + is_reg_intel($r5) + is_reg_intel($r6);
-		return 0 if ( $was64 != 0 && $was64 != $nregs );
-		return 0 if ( is_reg_intel($r6) && is_reg_intel($r5) );
-		return 0 if ( is_reg_intel($r3) && $r2 =~ /-/o );
-		return 0 if ( (is_reg_intel($r5) || is_reg_intel($r6)) && $r4 =~ /-/o );
-		return 0 if ( ($r5 =~ /\brsp\b/io || $r5 =~ /\brip\b/io) && $r6 =~ /\b\d+\b/o && $r6 != 1 );
-		return 0 if ( ($r6 =~ /\brsp\b/io || $r6 =~ /\brip\b/io) && $r5 =~ /\b\d+\b/o && $r5 != 1 );
-		return 0 if ( is_reg_intel($r5) && $r6 =~ /\b\d+\b/o && $r6 != 1
-			&& $r6 != 2 && $r6 != 4 && $r6 != 8);
-		return 0 if ( is_reg_intel($r6) && $r5 =~ /\b\d+\b/o && $r5 != 1
-			&& $r5 != 2 && $r5 != 4 && $r5 != 8);
-
-		return 1;
+		return _validate_64bit_addr_parts_intel (undef, $1, $2, $3, $4, $5, undef, undef);
 	}
 	elsif (	$elem =~ /^\[\s*([\+\-\(\)]*)\s*(\w+)\s*\]/o ) {
 
-		my ($r2, $r3) = ($1, $2);
-
-		return 0 if ( is_segreg_intel($r3) );
-		return 0 if ( (! is_reg64_intel($r3) && ! is_r32_in64_intel($r3))
-			&& (is_reg8_intel($r3) || is_segreg_intel($r3)
-			|| is_reg16_intel($r3) || (is_reg32_intel($r3) && ! is_addressable32_intel($r3))
-			|| is_reg_mm_intel($r3) || is_reg_fpu_intel($r3)) );
-		return 0 if ( is_reg_intel($r3) && $r2 =~ /-/o );
-
-		return 1;
+		return _validate_64bit_addr_parts_intel (undef, $1, $2, undef, undef, undef, undef, undef);
 	}
 	elsif (	$elem =~ /^\[\s*([\+\-\(\)]*)\s*(\w+)\s*\*\s*(\w+)\s*(\)*)\s*\]$/o ) {
 
-		my ($r2, $r3, $r4) = ($1, $2, $3);
-
-		return 0 if ( is_segreg_intel($r3) || is_segreg_intel($r4) );
-		return 0 if ( (! is_reg64_intel($r3) && ! is_r32_in64_intel($r3) && ! is_addressable32_intel($r3))
-			&& (is_reg8_intel($r3) || is_segreg_intel($r3)
-			|| is_reg16_intel($r3) || is_reg32_intel($r3)
-			|| is_reg_mm_intel($r3) || is_reg_fpu_intel($r3)) );
-		return 0 if ( (! is_reg64_intel($r4) && ! is_r32_in64_intel($r4) && ! is_addressable32_intel($r4))
-			&& (is_reg8_intel($r4) || is_segreg_intel($r4)
-			|| is_reg16_intel($r4) || is_reg32_intel($r4)
-			|| is_reg_mm_intel($r4) || is_reg_fpu_intel($r4)) );
-		my $was64 = is_reg64_intel($r3) + is_reg64_intel($r4);
-		my $nregs = is_reg_intel($r3) + is_reg_intel($r4);
-		return 0 if ( $was64 != 0 && $was64 != $nregs );
-		return 0 if ( is_reg_intel($r3) && is_reg_intel($r4) );
-		return 0 if ( is_reg_intel($r3) && $r2 =~ /-/o );
-		return 0 if ( (is_reg_intel($r3) || is_reg_intel($r4)) && $r2 =~ /-/o );
-		return 0 if ( ($r3 =~ /\brsp\b/io || $r3 =~ /\brip\b/io) && $r4 =~ /\b\d+\b/o && $r4 != 1 );
-		return 0 if ( ($r4 =~ /\brsp\b/io || $r4 =~ /\brip\b/io) && $r3 =~ /\b\d+\b/o && $r3 != 1 );
-		return 0 if ( is_reg_intel($r3) && $r4 =~ /\b\d+\b/o && $r4 != 1
-			&& $r4 != 2 && $r4 != 4 && $r4 != 8);
-		return 0 if ( is_reg_intel($r4) && $r3 =~ /\b\d+\b/o && $r3 != 1
-			&& $r3 != 2 && $r3 != 4 && $r3 != 8);
-
-		return 1;
+		return _validate_64bit_addr_parts_intel (undef, undef, undef, $1, $2, $3, undef, undef);
 	}
 	elsif (	$elem =~ /^\[\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]*)\s*(\w+)\s*\]$/o ) {
 
-		my ($r2, $r3, $r4, $r5) = ($1, $2, $3, $4);
-
-		return 0 if ( is_segreg_intel($r3) || is_segreg_intel($r5) );
-		return 0 if ( (! is_reg64_intel($r3) && ! is_r32_in64_intel($r3) && ! is_addressable32_intel($r3))
-			&& (is_reg8_intel($r3) || is_segreg_intel($r3)
-			|| is_reg16_intel($r3) || is_reg32_intel($r3)
-			|| is_reg_mm_intel($r3) || is_reg_fpu_intel($r3)) );
-		return 0 if ( (! is_reg64_intel($r5) && ! is_r32_in64_intel($r5) && ! is_addressable32_intel($r5))
-			&& (is_reg8_intel($r5) || is_segreg_intel($r5)
-			|| is_reg16_intel($r5) || is_reg32_intel($r5)
-			|| is_reg_mm_intel($r5) || is_reg_fpu_intel($r5)) );
-		my $was64 = is_reg64_intel($r3) + is_reg64_intel($r5);
-		my $nregs = is_reg_intel($r3) + is_reg_intel($r5);
-		return 0 if ( $was64 != 0 && $was64 != $nregs );
-		return 0 if ( is_reg_intel($r3) && $r2 =~ /-/o );
-		return 0 if ( is_reg_intel($r5) && $r4 =~ /-/o );
-
-		return 1;
+		return _validate_64bit_addr_parts_intel (undef, $1, $2, undef, undef, undef, $3, $4);
 	}
 	return 0;
+}
+
+# =head2 _is_valid_64bit_addr_reg_att
+#
+#  PRIVATE SUBROUTINE.
+#  Checks if the given register can be used in x86 64-bit addressing
+#   mode in AT&T syntax.
+#  Returns 1 if yes.
+#
+# =cut
+#
+sub _is_valid_64bit_addr_reg_att($) {
+
+	my $reg = shift;
+	return 1 if is_reg64_att($reg) || is_r32_in64_att($reg) || is_addressable32_att($reg);
+	return 0;
+}
+
+# =head2 _validate_64bit_addr_parts_att
+# 
+#  PRIVATE SUBROUTINE.
+#  Checks if the given address components give a valid x86 64-bit addressing
+#   mode in AT&T syntax.
+#  Returns 1 if yes.
+# 
+# =cut
+sub _validate_64bit_addr_parts_att($$$$$$$$) {
+
+	my $segreg = shift;
+	my $base_reg_sign = shift;
+	my $base_reg = shift;
+	my $index_reg_sign = shift;
+	my $index_reg = shift;
+	my $scale = shift;
+	my $disp_sign = shift;
+	my $disp = shift;
+	my $was64 = 0;
+	my $nregs = 0;
+
+	return 0 if defined $segreg && ! is_segreg_att($segreg);
+	if ( defined $base_reg ) {
+
+		if ( ! defined $index_reg && ! defined $scale ) {
+			# just one value inside - allow '(var)',
+			# disallow 'var(var)', allow 'var(%reg)'
+			return 0 if ( (defined $disp || $base_reg =~ /%/o)
+				&& (! _is_valid_64bit_addr_reg_att($base_reg) || $base_reg =~ /^%rip$/io))
+				|| (defined $base_reg_sign && $base_reg_sign =~ /-/o);
+		}
+		return 0 if is_reg_att($base_reg)
+			&& (! _is_valid_64bit_addr_reg_att($base_reg) || $base_reg =~ /^%rip$/io);
+		$nregs++;
+		$was64++ if is_reg64_att($base_reg);
+	}
+	if ( defined $index_reg ) {
+
+		if ( ! defined $base_reg && ! defined $scale ) {
+			# just one value inside - check for "(,1)
+			return 1 if $index_reg eq '1' && ! is_reg_att($disp);
+		}
+		return 0 if ! _is_valid_64bit_addr_reg_att($index_reg);
+		return 0 if $index_reg =~ /^%rsp$/io || $index_reg =~ /^%rip$/io;
+		$nregs++;
+		$was64++ if is_reg64_att($index_reg);
+	}
+	return 0 if defined $disp && is_reg_att($disp);
+	return 0 if $was64 != 0 && $was64 != $nregs;
+
+	return 0 if defined $index_reg && defined $scale
+		&& is_reg_att($index_reg) && is_reg_att($scale);
+	return 0 if defined $base_reg && defined $base_reg_sign
+		&& is_reg_att($base_reg) && $base_reg_sign =~ /-/o;
+	return 0 if defined $index_reg && defined $index_reg_sign
+		&& is_reg_att($index_reg) && $index_reg_sign =~ /-/o;
+	return 0 if defined $scale && defined $index_reg_sign
+		&& is_reg_att($scale) && $index_reg_sign =~ /-/o;
+	return 0 if defined $disp && defined $disp_sign
+		&& is_reg_att($disp) && $disp_sign =~ /-/o;
+	return 0 if defined $scale && (is_reg_att($scale)
+		|| ($scale != 1 && $scale != 2 && $scale != 4 && $scale != 8));
+	return 0 if defined $base_reg && defined $index_reg && defined $disp
+		&& is_reg_att($base_reg) && is_reg_att($index_reg) && is_reg_att($disp);
+	return 0 if defined $base_reg && defined $scale && defined $disp
+		&& is_reg_att($base_reg) && is_reg_att($scale) && is_reg_att($disp);
+
+	return 1;
 }
 
 =head2 is_valid_64bit_addr_att
 
  Checks if the given string parameter (must contain the parentheses)
   is a valid x86 64-bit addressing mode in AT&T syntax.
+ Works best after any pre-processing of the input, i.e. after all macros,
+  constants, etc. have been replaced by the real values.
  Returns 1 if yes.
 
 =cut
 
-sub is_valid_64bit_addr_att ( $ ) {
+sub is_valid_64bit_addr_att($) {
 
 	my $elem = shift;
-	if ( $elem =~ /^([%\w]+):\s*\(\s*([+-]*)\s*([%\w]+)\s*\)$/o ) {
+	if ( $elem =~ /^([%\w]+):\s*\(\s*([%\w]+)\s*\)$/o ) {
 
-		my ($r1, $r2, $sign) = ($1, $3, $2);
-		return 0 if (! is_segreg_att ($r1)) || is_segreg_att ($r2);
-		return 0 if is_reg_att($r2) && (! is_r32_in64_att($r2))
-			&& (!is_addressable32_att($r2)) && (! is_reg64_att($r2));
-		return 0 if is_reg64_att($r2) && $sign =~ /-/o;
-		return 1;
+		return _validate_64bit_addr_parts_att ($1, undef, $2, undef, undef, undef, undef, undef);
 	}
 	elsif ( $elem =~ /^([%\w]+):\s*\(\s*([%\w]+)\s*,\s*([%\w]+)\s*\)$/o ) {
 
-		my ($r1, $r2, $r3) = ($1, $2, $3);
-		return 0 if (! is_segreg_att ($r1)) || is_segreg_att ($r2) || is_segreg_att ($r3);
-		return 0 if (! is_reg_att($r2)) || (! is_reg_att($r3));
-		return 0 if (! is_r32_in64_att($r2))
-			&& (!is_addressable32_att($r2)) && (! is_reg64_att($r2));
-		return 0 if (! is_r32_in64_att($r3))
-			&& (!is_addressable32_att($r3)) && (! is_reg64_att($r3));
-		my $was64 = is_reg64_att($r2) + is_reg64_att($r3);
-		my $nregs = is_reg_att($r2) + is_reg_att($r3);
-		return 0 if ( $was64 != 0 && $was64 != $nregs );
-		return 1;
+		return _validate_64bit_addr_parts_att ($1, undef, $2, undef, $3, undef, undef, undef);
 	}
 	elsif ( $elem =~ /^([%\w]+):\s*\(\s*([%\w]+)\s*,\s*([%\w]+)\s*,\s*(\d+)\s*\)$/o ) {
 
-		my ($r1, $r2, $r3, $scale) = ($1, $2, $3, $4);
-		return 0 if (! is_segreg_att ($r1)) || is_segreg_att ($r2) || is_segreg_att ($r3);
-		return 0 if (! is_reg_att($r2)) || (! is_reg_att($r3));
-		return 0 if (! is_r32_in64_att($r2))
-			&& (!is_addressable32_att($r2)) && (! is_reg64_att($r2));
-		return 0 if (! is_r32_in64_att($r3))
-			&& (!is_addressable32_att($r3)) && (! is_reg64_att($r3));
-		return 0 if $r3 =~ /^%rsp$/io || $r3 =~ /^%rip$/io;
-		return 0 if $r2 =~ /^%rip$/io;
-		return 0 if $scale != 1 && $scale != 2 && $scale != 4 && $scale != 8;
-		my $was64 = is_reg64_att($r2) + is_reg64_att($r3);
-		my $nregs = is_reg_att($r2) + is_reg_att($r3);
-		return 0 if ( $was64 != 0 && $was64 != $nregs );
-		return 1;
+		return _validate_64bit_addr_parts_att ($1, undef, $2, undef, $3, $4, undef, undef);
 	}
 	elsif ( $elem =~ /^([%\w]+):\s*\(\s*,\s*([%\w]+)\s*,\s*(\d+)\s*\)$/o ) {
 
-		my ($r1, $r3, $scale) = ($1, $2, $3);
-		return 0 if (! is_segreg_att ($r1)) || is_segreg_att ($r3);
-		return 0 if ! is_reg_att($r3);
-		return 0 if (! is_r32_in64_att($r3))
-			&& (!is_addressable32_att($r3)) && (! is_reg64_att($r3));
-		return 0 if $r3 =~ /^%rsp$/io || $r3 =~ /^%rip$/io;
-		return 0 if $scale != 1 && $scale != 2 && $scale != 4 && $scale != 8;
-		return 1;
+		return _validate_64bit_addr_parts_att ($1, undef, undef, undef, $2, $3, undef, undef);
 	}
-	elsif ( $elem =~ /^([%\w]+):\s*[+-]*\s*([%\w]+)\s*\(\s*([+-]*)\s*([%\w]+)\s*\)$/o ) {
+	elsif ( $elem =~ /^([%\w]+):\s*\(\s*,\s*([%\w]+)\s*\)$/o ) {
 
-		my ($r1, $r2, $var, $sign) = ($1, $4, $2, $3);
-		return 0 if (! is_segreg_att ($r1)) || is_segreg_att ($r2);
-		return 0 if ! is_reg_att($r2);
-		return 0 if (! is_r32_in64_att($r2))
-			&& (!is_addressable32_att($r2)) && (! is_reg64_att($r2));
-		return 0 if is_reg64_att($r2) && $sign =~ /-/o;
-		return 0 if is_reg_att($var);
-		return 1;
+		return _validate_64bit_addr_parts_att ($1, undef, undef, undef, $2, undef, undef, undef);
 	}
-	elsif ( $elem =~ /^([%\w]+):\s*[+-]*\s*([%\w]+)\s*\(\s*([%\w]+)\s*,\s*([%\w]+)\s*\)$/o ) {
+	elsif ( $elem =~ /^([%\w]+):\s*([+-]*)\s*([%\w]+)\s*\(\s*([%\w]+)\s*\)$/o ) {
 
-		my ($r1, $r2, $r3, $var) = ($1, $3, $4, $2);
-		return 0 if (! is_segreg_att ($r1)) || is_segreg_att ($r2) || is_segreg_att ($r3);
-		#return 0 if (! is_reg64_att($r2)) || (! is_reg64_att($r3));
-		return 0 if (! is_reg_att($r2)) || (! is_reg_att($r3));
-		return 0 if (! is_r32_in64_att($r2))
-			&& (!is_addressable32_att($r2)) && (! is_reg64_att($r2));
-		return 0 if (! is_r32_in64_att($r3))
-			&& (!is_addressable32_att($r3)) && (! is_reg64_att($r3));
-		return 0 if is_reg_att($var);
-		my $was64 = is_reg64_att($r2) + is_reg64_att($r3);
-		my $nregs = is_reg_att($r2) + is_reg_att($r3);
-		return 0 if ( $was64 != 0 && $was64 != $nregs );
-		return 1;
+		return _validate_64bit_addr_parts_att ($1, undef, $4, undef, undef, undef, $2, $3);
 	}
-	elsif ( $elem =~ /^([%\w]+):\s*[+-]*\s*([%\w]+)\s*\(\s*([%\w]+)\s*,\s*([%\w]+)\s*,\s*(\d+)\s*\)$/o ) {
+	elsif ( $elem =~ /^([%\w]+):\s*([+-]*)\s*([%\w]+)\s*\(\s*([%\w]+)\s*,\s*([%\w]+)\s*\)$/o ) {
 
-		my ($r1, $r2, $r3, $var, $scale) = ($1, $3, $4, $2, $5);
-		return 0 if (! is_segreg_att ($r1)) || is_segreg_att ($r2) || is_segreg_att ($r3);
-		#return 0 if (! is_reg64_att($r2)) || (! is_reg64_att($r3));
-		return 0 if (! is_reg_att($r2)) || (! is_reg_att($r3));
-		return 0 if (! is_r32_in64_att($r2))
-			&& (!is_addressable32_att($r2)) && (! is_reg64_att($r2));
-		return 0 if (! is_r32_in64_att($r3))
-			&& (!is_addressable32_att($r3)) && (! is_reg64_att($r3));
-		return 0 if is_reg_att($var);
-		return 0 if $r3 =~ /^%rsp$/io || $r3 =~ /^%rip$/io;
-		return 0 if $r2 =~ /^%rip$/io;
-		return 0 if $scale != 1 && $scale != 2 && $scale != 4 && $scale != 8;
-		my $was64 = is_reg64_att($r2) + is_reg64_att($r3);
-		my $nregs = is_reg_att($r2) + is_reg_att($r3);
-		return 0 if ( $was64 != 0 && $was64 != $nregs );
-		return 1;
+		return _validate_64bit_addr_parts_att ($1, undef, $4, undef, $5, undef, $2, $3);
 	}
-	elsif ( $elem =~ /^([%\w]+):\s*[+-]*\s*([%\w]+)\s*\(\s*,\s*([%\w]+)\s*,\s*(\d+)\s*\)$/o ) {
+	elsif ( $elem =~ /^([%\w]+):\s*([+-]*)\s*([%\w]+)\s*\(\s*([%\w]+)\s*,\s*([%\w]+)\s*,\s*(\d+)\s*\)$/o ) {
 
-		my ($r1, $r3, $var, $scale) = ($1, $3, $2, $4);
-		return 0 if (! is_segreg_att ($r1)) || is_segreg_att ($r3);
-		#return 0 if ! is_reg64_att($r3);
-		return 0 if ! is_reg_att($r3);
-		return 0 if (! is_r32_in64_att($r3))
-			&& (!is_addressable32_att($r3)) && (! is_reg64_att($r3));
-		return 0 if is_reg_att($var);
-		return 0 if $r3 =~ /^%rsp$/io || $r3 =~ /^%rip$/io;
-		return 0 if $scale != 1 && $scale != 2 && $scale != 4 && $scale != 8;
-		return 1;
+		return _validate_64bit_addr_parts_att ($1, undef, $4, undef, $5, $6, $2, $3);
 	}
-	elsif ( $elem =~ /^([%\w]+):\s*[+-]*\s*([%\w]+)\s*\(\s*,\s*1\s*\)$/o ) {
+	elsif ( $elem =~ /^([%\w]+):\s*([+-]*)\s*([%\w]+)\s*\(\s*,\s*([%\w]+)\s*,\s*(\d+)\s*\)$/o ) {
 
-		# special form: varname(1,)
-		my ($r1, $var) = ($1, $2);
-		return 0 if is_reg_att($var) || ! is_segreg_att ($r1);
-		return 1;
+		return _validate_64bit_addr_parts_att ($1, undef, undef, undef, $4, $5, $2, $3);
 	}
-	elsif ( $elem =~ /^\(\s*([+-]*)\s*([%\w]+)\s*\)$/o ) {
+	elsif ( $elem =~ /^([%\w]+):\s*([+-]*)\s*([%\w]+)\s*\(\s*,\s*([%\w]+)\s*\)$/o ) {
 
-		my ($r2, $sign) = ($2, $1);
-		return 0 if is_segreg_att ($r2);
-		return 0 if is_reg_att($r2) && (! is_r32_in64_att($r2))
-			&& (!is_addressable32_att($r2)) && (! is_reg64_att($r2));
-		return 0 if is_reg64_att($r2) && $sign =~ /-/o;
-		return 1;
+		return _validate_64bit_addr_parts_att ($1, undef, undef, undef, $4, undef, $2, $3);
+	}
+	elsif ( $elem =~ /^\(\s*([%\w]+)\s*\)$/o ) {
+
+		return _validate_64bit_addr_parts_att (undef, undef, $1, undef, undef, undef, undef, undef);
 	}
 	elsif ( $elem =~ /^\(\s*([%\w]+)\s*,\s*([%\w]+)\s*\)$/o ) {
 
-		my ($r2, $r3) = ($1, $2);
-		return 0 if is_segreg_att ($r2) || is_segreg_att ($r3);
-		#return 0 if (! is_reg64_att($r2)) || (! is_reg64_att($r3));
-		return 0 if (! is_reg_att($r2)) || (! is_reg_att($r3));
-		return 0 if (! is_r32_in64_att($r2))
-			&& (!is_addressable32_att($r2)) && (! is_reg64_att($r2));
-		return 0 if (! is_r32_in64_att($r3))
-			&& (!is_addressable32_att($r3)) && (! is_reg64_att($r3));
-		#return 0 if (! is_reg_att($r2)) || (! is_reg64_att($r3));
-		my $was64 = is_reg64_att($r2) + is_reg64_att($r3);
-		my $nregs = is_reg_att($r2) + is_reg_att($r3);
-		return 0 if ( $was64 != 0 && $was64 != $nregs );
-		return 1;
+		return _validate_64bit_addr_parts_att (undef, undef, $1, undef, $2, undef, undef, undef);
 	}
 	elsif ( $elem =~ /^\(\s*([%\w]+)\s*,\s*([%\w]+)\s*,\s*(\d+)\s*\)$/o ) {
 
-		my ($r2, $r3, $scale) = ($1, $2, $3);
-		return 0 if is_segreg_att ($r2) || is_segreg_att ($r3);
-		#return 0 if (! is_reg64_att($r2)) || (! is_reg64_att($r3));
-		return 0 if (! is_reg_att($r2)) || (! is_reg_att($r3));
-		return 0 if (! is_r32_in64_att($r2))
-			&& (!is_addressable32_att($r2)) && (! is_reg64_att($r2));
-		return 0 if (! is_r32_in64_att($r3))
-			&& (!is_addressable32_att($r3)) && (! is_reg64_att($r3));
-		return 0 if $r3 =~ /^%rsp$/io || $r3 =~ /^%rip$/io;
-		return 0 if $r2 =~ /^%rip$/io;
-		return 0 if $scale != 1 && $scale != 2 && $scale != 4 && $scale != 8;
-		my $was64 = is_reg64_att($r2) + is_reg64_att($r3);
-		my $nregs = is_reg_att($r2) + is_reg_att($r3);
-		return 0 if ( $was64 != 0 && $was64 != $nregs );
-		return 1;
+		return _validate_64bit_addr_parts_att (undef, undef, $1, undef, $2, $3, undef, undef);
 	}
 	elsif ( $elem =~ /^\(\s*,\s*([%\w]+)\s*,\s*(\d+)\s*\)$/o ) {
 
-		my ($r3, $scale) = ($1, $2);
-		return 0 if is_segreg_att ($r3);
-		#return 0 if ! is_reg64_att($r3);
-		return 0 if ! is_reg_att($r3);
-		return 0 if (! is_r32_in64_att($r3))
-			&& (!is_addressable32_att($r3)) && (! is_reg64_att($r3));
-		return 0 if $r3 =~ /^%rsp$/io || $r3 =~ /^%rip$/io;
-		return 0 if $scale != 1 && $scale != 2 && $scale != 4 && $scale != 8;
-		return 1;
+		return _validate_64bit_addr_parts_att (undef, undef, undef, undef, $1, $2, undef, undef);
 	}
-	elsif ( $elem =~ /^[+-]*\s*([%\w]+)\s*\(\s*([+-]*)\s*([%\w]+)\s*\)$/o ) {
+	elsif ( $elem =~ /^\(\s*,\s*([%\w]+)\s*\)$/o ) {
 
-		my ($r2, $var, $sign) = ($3, $1, $2);
-		return 0 if is_segreg_att ($r2);
-		return 0 if ! is_reg_att($r2);
-		return 0 if (! is_r32_in64_att($r2))
-			&& (!is_addressable32_att($r2)) && (! is_reg64_att($r2));
-		return 0 if is_reg64_att($r2) && $sign =~ /-/o;
-		return 0 if is_reg_att($var);
-		return 1;
+		return _validate_64bit_addr_parts_att (undef, undef, undef, undef, $1, undef, undef, undef);
 	}
-	elsif ( $elem =~ /^[+-]*\s*([%\w]+)\s*\(\s*([%\w]+)\s*,\s*([%\w]+)\s*\)$/o ) {
+	elsif ( $elem =~ /^([+-]*)\s*([%\w]+)\s*\(\s*([%\w]+)\s*\)$/o ) {
 
-		my ($r2, $r3, $var) = ($2, $3, $1);
-		return 0 if is_segreg_att ($r2) || is_segreg_att ($r3);
-		#return 0 if (! is_reg_att($r2)) || (! is_reg64_att($r3));
-		return 0 if (! is_reg_att($r2)) || (! is_reg_att($r3));
-		return 0 if (! is_r32_in64_att($r2))
-			&& (!is_addressable32_att($r2)) && (! is_reg64_att($r2));
-		return 0 if (! is_r32_in64_att($r3))
-			&& (!is_addressable32_att($r3)) && (! is_reg64_att($r3));
-		return 0 if is_reg_att($var);
-		my $was64 = is_reg64_att($r2) + is_reg64_att($r3);
-		my $nregs = is_reg_att($r2) + is_reg_att($r3);
-		return 0 if ( $was64 != 0 && $was64 != $nregs );
-		return 1;
+		return _validate_64bit_addr_parts_att (undef, undef, $3, undef, undef, undef, $1, $2);
 	}
-	elsif ( $elem =~ /^[+-]*\s*([%\w]+)\s*\(\s*([%\w]+)\s*,\s*([%\w]+)\s*,\s*(\d+)\s*\)$/o ) {
+	elsif ( $elem =~ /^([+-]*)\s*([%\w]+)\s*\(\s*([%\w]+)\s*,\s*([%\w]+)\s*\)$/o ) {
 
-		my ($r2, $r3, $scale, $var) = ($2, $3, $4, $1);
-		return 0 if is_segreg_att ($r2) || is_segreg_att ($r3);
-		#return 0 if (! is_reg64_att($r2)) || (! is_reg64_att($r3));
-		return 0 if (! is_reg_att($r2)) || (! is_reg_att($r3));
-		return 0 if (! is_r32_in64_att($r2))
-			&& (!is_addressable32_att($r2)) && (! is_reg64_att($r2));
-		return 0 if (! is_r32_in64_att($r3))
-			&& (!is_addressable32_att($r3)) && (! is_reg64_att($r3));
-		return 0 if $r3 =~ /^%rsp$/io || $r3 =~ /^%rip$/io;
-		return 0 if $r2 =~ /^%rip$/io;
-		return 0 if $scale != 1 && $scale != 2 && $scale != 4 && $scale != 8;
-		return 0 if is_reg_att($var);
-		my $was64 = is_reg64_att($r2) + is_reg64_att($r3);
-		my $nregs = is_reg_att($r2) + is_reg_att($r3);
-		return 0 if ( $was64 != 0 && $was64 != $nregs );
-		return 1;
+		return _validate_64bit_addr_parts_att (undef, undef, $3, undef, $4, undef, $1, $2);
 	}
-	elsif ( $elem =~ /^[+-]*\s*([%\w]+)\s*\(\s*,\s*([%\w]+)\s*,\s*(\d+)\s*\)$/o ) {
+	elsif ( $elem =~ /^([+-]*)\s*([%\w]+)\s*\(\s*([%\w]+)\s*,\s*([%\w]+)\s*,\s*(\d+)\s*\)$/o ) {
 
-		my ($r3, $scale, $var) = ($2, $3, $1);
-		return 0 if is_segreg_att ($r3);
-		#return 0 if ! is_reg64_att($r3);
-		return 0 if ! is_reg_att($r3);
-		return 0 if (! is_r32_in64_att($r3))
-			&& (!is_addressable32_att($r3)) && (! is_reg64_att($r3));
-		return 0 if $r3 =~ /^%rsp$/io || $r3 =~ /^%rip$/io;
-		return 0 if $scale != 1 && $scale != 2 && $scale != 4 && $scale != 8;
-		return 0 if is_reg_att($var);
-		return 1;
+		return _validate_64bit_addr_parts_att (undef, undef, $3, undef, $4, $5, $1, $2);
 	}
-	elsif ( $elem =~ /^[+-]*\s*([%\w]+)\s*\(\s*,\s*1\s*\)$/o ) {
+	elsif ( $elem =~ /^([+-]*)\s*([%\w]+)\s*\(\s*,\s*([%\w]+)\s*,\s*(\d+)\s*\)$/o ) {
 
-		# special form: varname(1,)
-		my $var = $1;
-		return 0 if is_reg_att($var);
-		return 1;
+		return _validate_64bit_addr_parts_att (undef, undef, undef, undef, $3, $4, $1, $2);
+	}
+	elsif ( $elem =~ /^([+-]*)\s*([%\w]+)\s*\(\s*,\s*([%\w]+)\s*\)$/o ) {
+
+		return _validate_64bit_addr_parts_att (undef, undef, undef, undef, $3, undef, $1, $2);
 	}
 	return 0;
 }
@@ -3288,11 +2335,13 @@ sub is_valid_64bit_addr_att ( $ ) {
 
  Checks if the given string parameter (must contain the parentheses)
   is a valid x86 64-bit addressing mode in AT&T or Intel syntax.
+ Works best after any pre-processing of the input, i.e. after all macros,
+  constants, etc. have been replaced by the real values.
  Returns 1 if yes.
 
 =cut
 
-sub is_valid_64bit_addr ( $ ) {
+sub is_valid_64bit_addr($) {
 
 	my $elem = shift;
 	return    is_valid_64bit_addr_intel ($elem)
@@ -3303,11 +2352,13 @@ sub is_valid_64bit_addr ( $ ) {
 
  Checks if the given string parameter (must contain the square braces)
   is a valid x86 addressing mode in Intel syntax.
+ Works best after any pre-processing of the input, i.e. after all macros,
+  constants, etc. have been replaced by the real values.
  Returns 1 if yes.
 
 =cut
 
-sub is_valid_addr_intel ( $ ) {
+sub is_valid_addr_intel($) {
 
 	my $elem = shift;
 	return    is_valid_16bit_addr_intel ($elem)
@@ -3319,6 +2370,8 @@ sub is_valid_addr_intel ( $ ) {
 
  Checks if the given string parameter (must contain the braces)
   is a valid x86 addressing mode in AT&T syntax.
+ Works best after any pre-processing of the input, i.e. after all macros,
+  constants, etc. have been replaced by the real values.
  Returns 1 if yes.
 
 =cut
@@ -3335,6 +2388,8 @@ sub is_valid_addr_att($) {
 
  Checks if the given string parameter (must contain the square braces)
   is a valid x86 addressing mode (Intel or AT&T syntax).
+ Works best after any pre-processing of the input, i.e. after all macros,
+  constants, etc. have been replaced by the real values.
  Returns 1 if yes.
 
 =cut
@@ -3346,37 +2401,16 @@ sub is_valid_addr($) {
 		| is_valid_addr_att($elem);
 }
 
-=head2 add_percent
-
- PRIVATE SUBROUTINE.
- Add a percent character ('%') in front of each element in the array given as a parameter.
- Returns the new array.
-
-=cut
-
-sub add_percent ( @ ) {
-
-	my @result = ();
-	foreach (@_) {
-		push @result, "%$_";
-	}
-	return @result;
-}
-
 =head2 is_att_suffixed_instr
 
  Tells if the given instruction is suffixed in AT&T syntax.
- Returns 1 if yes
+ Returns 1 if yes.
 
 =cut
 
-sub is_att_suffixed_instr ( $ ) {
+sub is_att_suffixed_instr($) {
 
-	my $elem = shift;
-	foreach (@att_suff_instr) {
-		return 1 if /^$elem$/i;
-	}
-	return 0;
+	return _is_in_array (shift, \@att_suff_instr);
 }
 
 =head2 is_att_suffixed_instr_fpu
@@ -3386,13 +2420,9 @@ sub is_att_suffixed_instr ( $ ) {
 
 =cut
 
-sub is_att_suffixed_instr_fpu ( $ ) {
+sub is_att_suffixed_instr_fpu($) {
 
-	my $elem = shift;
-	foreach (@att_suff_instr_fpu) {
-		return 1 if /^$elem$/i;
-	}
-	return 0;
+	return _is_in_array (shift, \@att_suff_instr_fpu);
 }
 
 =head2 add_att_suffix_instr
@@ -3402,7 +2432,7 @@ sub is_att_suffixed_instr_fpu ( $ ) {
 
 =cut
 
-sub add_att_suffix_instr ( @ ) {
+sub add_att_suffix_instr(@) {
 
 	my @result = ();
 	foreach (@_) {
@@ -3413,23 +2443,22 @@ sub add_att_suffix_instr ( @ ) {
 			push @result, $_.'l';
 			push @result, $_.'q';
 		}
-		else
-		{
+		else {
 			# FPU instructions
-			if ( /^fi(\w+)/io )
-			{
+			if ( /^fi(\w+)/io ) {
+
 				push @result, $_.'s';
 				push @result, $_.'l';
 				push @result, $_.'q';
 			}
-			elsif ( is_att_suffixed_instr_fpu ($_) )
-			{
+			elsif ( is_att_suffixed_instr_fpu ($_) ) {
+
 				push @result, $_.'s';
 				push @result, $_.'l';
 				push @result, $_.'t';
 			}
-			elsif ( /^\s*(mov[sz])x\s+([^,]+)\s*,\s*([^,]+)(.*)/io )
-			{
+			elsif ( /^\s*(mov[sz])x\s+([^,]+)\s*,\s*([^,]+)(.*)/io ) {
+
 				# add suffixes to MOVSX/MOVZX instructions
 				my ($inst, $arg1, $arg2, $rest, $z1, $z2);
 				$inst = $1;
@@ -3451,8 +2480,8 @@ sub add_att_suffix_instr ( @ ) {
 				}
 				push @result, "$_";
 			}
-			elsif ( /^\s*(mov[sz])x/io )
-			{
+			elsif ( /^\s*(mov[sz])x/io ) {
+
 				# add suffixes to MOVSX/MOVZX instructions
 				push @result, "$1bl";
 				push @result, "$1bw";
@@ -3461,76 +2490,41 @@ sub add_att_suffix_instr ( @ ) {
 				push @result, "$1wq";
 				push @result, "$_";
 			}
-			elsif ( /^\s*cbw\b/io )
-			{
+			elsif ( /^\s*cbw\b/io ) {
+
 				push @result, 'cbtw';
 			}
-			elsif ( /^\s*cwde\b/io )
-			{
+			elsif ( /^\s*cwde\b/io ) {
+
 				push @result, 'cwtl';
 			}
-			elsif ( /^\s*cwd\b/io )
-			{
+			elsif ( /^\s*cwd\b/io ) {
+
 				push @result, 'cwtd';
 			}
-			elsif ( /^\s*cdq\b/io )
-			{
+			elsif ( /^\s*cdq\b/io ) {
+
 				push @result, 'cltd';
 			}
-			else
-			{
+			else {
 				push @result, "$_";
 			}
 		}
 	}
 	# adding AT&T suffixes can create duplicate entries. Remove them here:
-	return remove_duplicates (@result);
+	return _remove_duplicates (@result);
 }
-
-=head2 remove_duplicates
-
- PRIVATE SUBROUTINE.
- Returns an array of the provided arguments with duplicate entries removed.
-
-=cut
-
-sub remove_duplicates ( @ ) {
-
-	my @result = ();
-	# Use a hash to remove the duplicates:
-	my %new_hash;
-	foreach (@_)
-	{
-		$new_hash{$_} = 1;
-	}
-	return keys %new_hash;
-}
-
-=head2 nopluses
-
- PRIVATE SUBROUTINE.
- Removes unnecessary '+' characters from the beginning of the given string.
- Returns the resulting string (or '+' if it was empty).
-
-=cut
-
-sub nopluses ( $ ) {
-
-	my $elem = shift;
-	$elem =~ s/^\s*\++//o;
-	if ( $elem eq "" ) { $elem = "+"; }
-	return $elem;
-}
-
 
 =head2 conv_att_addr_to_intel
 
  Converts the given string representing a valid AT&T addressing mode to Intel syntax.
+ Works best after any pre-processing of the input, i.e. after all macros,
+  constants, etc. have been replaced by the real values.
  Returns the resulting string.
 
 =cut
 
-sub conv_att_addr_to_intel ( $ ) {
+sub conv_att_addr_to_intel($) {
 
 	my $par = shift;
 	$par =~ s/%([a-zA-Z]+)/$1/go;
@@ -3571,11 +2565,13 @@ sub conv_att_addr_to_intel ( $ ) {
 =head2 conv_intel_addr_to_att
 
  Converts the given string representing a valid Intel addressing mode to AT&T syntax.
+ Works best after any pre-processing of the input, i.e. after all macros,
+  constants, etc. have been replaced by the real values.
  Returns the resulting string.
 
 =cut
 
-sub conv_intel_addr_to_att ( $ ) {
+sub conv_intel_addr_to_att($) {
 
 	my $par = shift;
 	my ($a1, $a2, $a3, $z1, $z2, $z3);
@@ -3586,9 +2582,9 @@ sub conv_intel_addr_to_att ( $ ) {
 		$a1 = $2;
 		$a2 = $4;
 		$a3 = $7;
-		$z1 = nopluses($a1);
-		$z2 = nopluses($a2);
-		$z3 = nopluses($a3);
+		$z1 = _nopluses($a1);
+		$z2 = _nopluses($a2);
+		$z3 = _nopluses($a3);
 		if ( is_reg($3) && is_reg($5) ) {
 			$par =~ s/\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/$1:($z3$8)$9($3,$5,$6)/o;
 		} elsif ( is_reg($3) && is_reg($6) ) {
@@ -3616,9 +2612,9 @@ sub conv_intel_addr_to_att ( $ ) {
 		$a1 = $2;
 		$a2 = $4;
 		$a3 = $6;
-		$z1 = nopluses($a1);
-		$z2 = nopluses($a2);
-		$z3 = nopluses($a3);
+		$z1 = _nopluses($a1);
+		$z2 = _nopluses($a2);
+		$z3 = _nopluses($a3);
 		if ( is_reg($3) && is_reg($5) ) {
 			$par =~ s/\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*\*\s*(\w+)\s*(\)*)\s*\]/$1:($z3$7*$8)$9($3,$5)/o;
 		} elsif ( is_reg($5) && is_reg($7) ) {
@@ -3646,9 +2642,9 @@ sub conv_intel_addr_to_att ( $ ) {
 		$a1 = $2;
 		$a2 = $5;
 		$a3 = $7;
-		$z1 = nopluses($a1);
-		$z2 = nopluses($a2);
-		$z3 = nopluses($a3);
+		$z1 = _nopluses($a1);
+		$z2 = _nopluses($a2);
+		$z3 = _nopluses($a3);
 		if ( is_reg($3) && is_reg($6) ) {
 			$par =~ s/\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/$1:($z3$8)$9($6,$3,$4)/o;
 		} elsif ( is_reg($4) && is_reg($6) ) {
@@ -3676,9 +2672,9 @@ sub conv_intel_addr_to_att ( $ ) {
 		$a1 = $2;
 		$a2 = $4;
 		$a3 = $6;
-		$z1 = nopluses($a1);
-		$z2 = nopluses($a2);
-		$z3 = nopluses($a3);
+		$z1 = _nopluses($a1);
+		$z2 = _nopluses($a2);
+		$z3 = _nopluses($a3);
 		if ( is_reg($3) && is_reg($5) ) {
 			$par =~ s/\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/$1:($z3$7)$8($3,$5,)/o;
 		} elsif ( is_reg($3) && is_reg($7) ) {
@@ -3699,8 +2695,8 @@ sub conv_intel_addr_to_att ( $ ) {
 
 		$a1 = $2;
 		$a2 = $4;
-		$z1 = nopluses($a1);
-		$z2 = nopluses($a2);
+		$z1 = _nopluses($a1);
+		$z2 = _nopluses($a2);
 		if ( is_reg($3) && is_reg($5) ) {
 			$par =~ s/\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*\*\s*(\w+)\s*(\)*)\s*\]/$1:($3,$5,$6)/o;
 		} elsif ( is_reg($3) && is_reg($6) ) {
@@ -3719,8 +2715,8 @@ sub conv_intel_addr_to_att ( $ ) {
 
 		$a1 = $2;
 		$a2 = $4;
-		$z1 = nopluses($a1);
-		$z2 = nopluses($a2);
+		$z1 = _nopluses($a1);
+		$z2 = _nopluses($a2);
 		if ( is_reg($3) && is_reg($5) ) {
 			$par =~ s/\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/$1:($3,$5,)/o;
 		} elsif ( is_reg($3) ) {
@@ -3743,8 +2739,8 @@ sub conv_intel_addr_to_att ( $ ) {
 
 		$a1 = $2;
 		$a2 = $5;
-		$z1 = nopluses($a1);
-		$z2 = nopluses($a2);
+		$z1 = _nopluses($a1);
+		$z2 = _nopluses($a2);
 		if ( is_reg($3) && is_reg($6) ) {
 			$par =~ s/\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/$1:($6,$3,$4)/o;
 		} elsif ( is_reg($4) && is_reg($6) ) {
@@ -3765,9 +2761,9 @@ sub conv_intel_addr_to_att ( $ ) {
 		$a1 = $1;
 		$a2 = $3;
 		$a3 = $6;
-		$z1 = nopluses($a1);
-		$z2 = nopluses($a2);
-		$z3 = nopluses($a3);
+		$z1 = _nopluses($a1);
+		$z2 = _nopluses($a2);
+		$z3 = _nopluses($a3);
 		if ( is_reg($2) && is_reg($4) ) {
 			$par =~ s/\[\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/($z3$7)$8($2,$4,$5)/o;
 		} elsif ( is_reg($2) && is_reg($5) ) {
@@ -3794,9 +2790,9 @@ sub conv_intel_addr_to_att ( $ ) {
 		$a1 = $1;
 		$a2 = $4;
 		$a3 = $6;
-		$z1 = nopluses($a1);
-		$z2 = nopluses($a2);
-		$z3 = nopluses($a3);
+		$z1 = _nopluses($a1);
+		$z2 = _nopluses($a2);
+		$z3 = _nopluses($a3);
 		if ( is_reg($2) && is_reg($5) ) {
 			$par =~ s/\[\s*([\+\-\(\)]*)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/($z3$7)$8($5,$2,$3)/o;
 		} elsif ( is_reg($3) && is_reg($5) ) {
@@ -3823,9 +2819,9 @@ sub conv_intel_addr_to_att ( $ ) {
 		$a1 = $1;
 		$a2 = $3;
 		$a3 = $5;
-		$z1 = nopluses($a1);
-		$z2 = nopluses($a2);
-		$z3 = nopluses($a3);
+		$z1 = _nopluses($a1);
+		$z2 = _nopluses($a2);
+		$z3 = _nopluses($a3);
 		if ( is_reg($2) && is_reg($4) ) {
 			$par =~ s/\[\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*\*\s*(\w+)\s*(\)*)\s*\]/($z3$6*$7)$8($2,$4)/o;
 		} elsif ( is_reg($2) && is_reg($6) ) {
@@ -3852,9 +2848,9 @@ sub conv_intel_addr_to_att ( $ ) {
 		$a1 = $1;
 		$a2 = $3;
 		$a3 = $5;
-		$z1 = nopluses($a1);
-		$z2 = nopluses($a2);
-		$z3 = nopluses($a3);
+		$z1 = _nopluses($a1);
+		$z2 = _nopluses($a2);
+		$z3 = _nopluses($a3);
 		if ( is_reg($2) && is_reg($4) ) {
 			$par =~ s/\[\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/($z3$6)$7($2,$4)/o;
 		} elsif ( is_reg($2) && is_reg($6) ) {
@@ -3874,8 +2870,8 @@ sub conv_intel_addr_to_att ( $ ) {
 	elsif ( $par =~  /\[\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*\*\s*(\w+)\s*(\)*)\s*\]/o ) {
 		$a1 = $1;
 		$a2 = $3;
-		$z1 = nopluses($a1);
-		$z2 = nopluses($a2);
+		$z1 = _nopluses($a1);
+		$z2 = _nopluses($a2);
 		if ( is_reg($2) && is_reg($4) ) {
 			$par =~ s/\[\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*\*\s*(\w+)\s*(\)*)\s*\]/($2,$4,$5)/o;
 		} elsif ( is_reg($2) && is_reg($5) ) {
@@ -3893,8 +2889,8 @@ sub conv_intel_addr_to_att ( $ ) {
 	elsif ( $par =~  /\[\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/o ) {
 		$a1 = $1;
 		$a2 = $3;
-		$z1 = nopluses($a1);
-		$z2 = nopluses($a2);
+		$z1 = _nopluses($a1);
+		$z2 = _nopluses($a2);
 		if ( is_reg($2) && is_reg($4) ) {
 			$par =~ s/\[\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/($2,$4)/o;
 		} elsif ( is_reg($2) ) {
@@ -3916,8 +2912,8 @@ sub conv_intel_addr_to_att ( $ ) {
 	elsif ( $par =~  /\[\s*([\+\-\(\)]*)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/o ) {
 		$a1 = $1;
 		$a2 = $4;
-		$z1 = nopluses($a1);
-		$z2 = nopluses($a2);
+		$z1 = _nopluses($a1);
+		$z2 = _nopluses($a2);
 		if ( is_reg($2) && is_reg($5) ) {
 			$par =~ s/\[\s*([\+\-\(\)]*)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/($5,$2,$3)/o;
 		} elsif ( is_reg($3) && is_reg($5) ) {
@@ -3946,11 +2942,13 @@ sub conv_intel_addr_to_att ( $ ) {
 =head2 conv_att_instr_to_intel
 
  Converts the given string representing a valid AT&T instruction to Intel syntax.
+ Works best after any pre-processing of the input, i.e. after all macros,
+  constants, etc. have been replaced by the real values.
  Returns the resulting string.
 
 =cut
 
-sub conv_att_instr_to_intel ( $ ) {
+sub conv_att_instr_to_intel($) {
 
 	my $par = shift;
 	# (changing "xxx" to "[xxx]", if there's no '$' or '%')
@@ -4105,11 +3103,13 @@ sub conv_att_instr_to_intel ( $ ) {
 =head2 conv_intel_instr_to_att
 
  Converts the given string representing a valid Intel instruction to AT&T syntax.
+ Works best after any pre-processing of the input, i.e. after all macros,
+  constants, etc. have been replaced by the real values.
  Returns the resulting string.
 
 =cut
 
-sub conv_intel_instr_to_att ( $ ) {
+sub conv_intel_instr_to_att($) {
 
 	my $par = shift;
 	my ($a1, $a2, $a3, $a4);
@@ -4362,7 +3362,6 @@ sub conv_intel_instr_to_att ( $ ) {
 
 		if ( $par =~ /^\s*(\w+)\s+([^,]+)\s*,\s*([^,]+)\s*,\s*([^,]+)\s*/gio ) {
 
-
 			$a1 = $1;
 			$a2 = $2;
 			$a3 = $3;
@@ -4435,7 +3434,6 @@ sub conv_intel_instr_to_att ( $ ) {
 
 	# (changing "stN" to "st(N)")
 	$par =~ s/\bst(\d)\b/\%st($1)/go;
-
 
 	# (adding percent chars)
 	foreach my $r (@regs_intel) {

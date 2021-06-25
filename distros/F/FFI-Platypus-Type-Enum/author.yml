@@ -7,6 +7,9 @@ pod_spelling_system:
   # intentionally
   stopwords:
     - dualvar
+    - JJATRIA
+    - Joaqu
+    - Jos
 
 pod_coverage:
   skip: 0

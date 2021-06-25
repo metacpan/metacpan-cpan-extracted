@@ -1,0 +1,9 @@
+Pod::PseudoPod::DOM
+
+This distribution provides a document object model for PseudoPod documents and
+allows the transliteration of these documents into other formats, such as XHTML
+or LaTeX.
+
+This code is available under the same license as Perl 5.14.
+
+More documentation shall appear soon.

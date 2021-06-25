@@ -1,7 +1,8 @@
 package Bio::MUST::Apps::TwoScalp::Seqs2Profile;
 # ABSTRACT: internal class for two-scalp tool
 # CONTRIBUTOR: Amandine BERTRAND <amandine.bertrand@doct.uliege.be>
-$Bio::MUST::Apps::TwoScalp::Seqs2Profile::VERSION = '0.201810';
+# CONTRIBUTOR: Valerian LUPO <valerian.lupo@doct.uliege.be>
+$Bio::MUST::Apps::TwoScalp::Seqs2Profile::VERSION = '0.211710';
 use Moose;
 use namespace::autoclean;
 
@@ -21,7 +22,6 @@ use aliased 'Bio::MUST::Core::Seq';
 use aliased 'Bio::MUST::Core::SeqId';
 use aliased 'Bio::MUST::Core::SeqMask';
 use aliased 'Bio::MUST::Drivers::Blast::Database::Temporary';
-#use aliased 'Bio::MUST::Drivers::Blast::Query';
 use aliased 'Bio::MUST::Drivers::Mafft';
 use aliased 'Bio::MUST::Drivers::ClustalO';
 use aliased 'Bio::MUST::Apps::SlaveAligner::Local';
@@ -42,7 +42,6 @@ has 'file2' => (
     coerce   => 1,
 );
 
-
 has 'ali' => (
     is       => 'ro',
     isa      => 'Bio::MUST::Core::Ali',
@@ -51,11 +50,20 @@ has 'ali' => (
     handles  => qr{.*}xms,
 );
 
+has 'options' => (
+    traits   => ['Hash'],
+    is       => 'ro',
+    isa      => 'HashRef',
+    default  => sub { {} },
+);
+
+
 sub BUILD {
     my $self = shift;
 
     my $ali1 = $self->file1;
     my $ali2 = $self->file2;
+    my $opt  = $self->options;
 
     my ($filename1, $id_mapper1) = $ali1->temp_fasta( {id_prefix => 'file1-'} );
     my ($filename2, $id_mapper2) = $ali2->temp_fasta( {id_prefix => 'file2-'} );
@@ -63,9 +71,8 @@ sub BUILD {
     my %mapper = ( ali1 => $id_mapper1, ali2 => $id_mapper2 );
 
     my $mafft = Mafft->new( file => $filename1 );       # add an option to use clustalo if wanted ?
-    my $ali_out = $mafft->seqs2profile($filename2);
+    my $ali_out = $mafft->seqs2profile($filename2, $opt);
 
-    $ali_out->dont_guess;
     $ali_out->restore_ids($mapper{ali1});
     $ali_out->restore_ids($mapper{ali2});
 
@@ -86,7 +93,7 @@ Bio::MUST::Apps::TwoScalp::Seqs2Profile - internal class for two-scalp tool
 
 =head1 VERSION
 
-version 0.201810
+version 0.211710
 
 =head1 SYNOPSIS
 
@@ -100,11 +107,21 @@ version 0.201810
 
 Denis BAURAIN <denis.baurain@uliege.be>
 
-=head1 CONTRIBUTOR
+=head1 CONTRIBUTORS
 
-=for stopwords Amandine BERTRAND
+=for stopwords Amandine BERTRAND Valerian LUPO
+
+=over 4
+
+=item *
 
 Amandine BERTRAND <amandine.bertrand@doct.uliege.be>
+
+=item *
+
+Valerian LUPO <valerian.lupo@doct.uliege.be>
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 

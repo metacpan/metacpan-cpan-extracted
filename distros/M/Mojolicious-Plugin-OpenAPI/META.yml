@@ -18,13 +18,13 @@ no_index:
     - t
     - inc
 requires:
-  JSON::Validator: '4.17'
+  JSON::Validator: '4.18'
   Mojolicious: '9.00'
 resources:
   bugtracker: https://github.com/jhthorsen/mojolicious-plugin-openapi/issues
   homepage: https://github.com/jhthorsen/mojolicious-plugin-openapi
   repository: https://github.com/jhthorsen/mojolicious-plugin-openapi.git
-version: '4.03'
+version: '4.04'
 x_contributors:
   - 'Henrik Andersen'
   - 'Ilya Rassadin'

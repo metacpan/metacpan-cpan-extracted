@@ -1,5 +1,14 @@
 Revision history for Device-Chip-AnalogConverters
 
+0.12    2021-06-21
+        [CHANGES]
+         * Use `:param` slot attribute from Object::Pad 0.41
+
+0.11    2020-12-06
+        [CHANGES]
+         * Use `await` expression documentation syntax
+         * Use toplevel `await` syntax from Future::AsyncAwait 0.47
+
 0.10    2020-11-13
         [CHANGES]
          * Add drivers for ADC121Sx, MAX1166x, DAC7513

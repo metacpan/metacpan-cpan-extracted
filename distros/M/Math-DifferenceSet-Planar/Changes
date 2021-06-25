@@ -1,5 +1,14 @@
 Revision history for Perl extension Math::DifferenceSet::Planar.
 
+0.014   Sat, 19 Jun 2021 07:59:59 +0200
+        - added persistent rotator space data
+        - new methods:
+          - available_min_order
+          - known_space
+          - known_space_count
+          - known_space_min_order
+          - known_space_max_order
+
 0.013   Sun, 21 Mar 2021 17:06:11 +0100
         - moved issue tracker to github
         - zipped large data files

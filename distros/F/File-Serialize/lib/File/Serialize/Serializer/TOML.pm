@@ -1,7 +1,7 @@
 package File::Serialize::Serializer::TOML;
 our $AUTHORITY = 'cpan:YANICK';
 #ABSTRACT: TOML serializer for File::Serialize
-$File::Serialize::Serializer::TOML::VERSION = '1.5.0';
+$File::Serialize::Serializer::TOML::VERSION = '1.5.1';
 use strict;
 use warnings;
 
@@ -35,7 +35,7 @@ File::Serialize::Serializer::TOML - TOML serializer for File::Serialize
 
 =head1 VERSION
 
-version 1.5.0
+version 1.5.1
 
 =head1 DESCRIPTION
 

@@ -1,0 +1,345 @@
+
+=head1 NAME
+
+Hustle::Table - Fast dynamic dispatching to subroutines
+
+=head1 SYNOPSIS
+
+  use Hustle::Table;
+
+  #1. Create a new object
+  my $table=Hustle::Table->new;
+
+  #2. Add entries which contain:
+  # matcher:		required. The matcher  (ie regex, string, number) to test with
+  # sub:		required. The sub to call when matcher is 'true' when testing input
+  # label:		optional. For identification
+  # count:		optional. Used as priority when adding (larger number=> higher priority)
+  # Can either be a array ref or hash ref
+
+  $table->add(
+  	#entry as a hash ref
+  	{ matcher => qr/regex (match)/, sub => sub{ #can access regex capture }}, 
+
+	#entry as array ref, with label and priority values set
+	[qr/another/, sub{}, "my label", 10],			
+	
+	#undef matcher is default match all. Must be array ref format
+	[undef,sub {},"default",undef]				
+  );
+
+  #3. Prepare a dispatcher:
+  # A dispatcher is sub reference, which is called directly with input to match
+
+  my $dispatch = $table->prepare_dispatcher(
+	type => "online",		#either "online" (default="online") or "offline" 
+	cache => {},		#the hash to use as a cache
+	reorder => 1,		#reorder (default=1) table before building dispatcher	
+	reset => 0		#Reset (default=undef) entry counts
+ );
+
+
+  #4. Dispatch input
+  $dispatch->("thing to match","optional", "arguments");	# any number of arguments passsed to sub
+
+
+  #5. Offline optimisation is also possible
+  
+
+=head1 DESCRIPTION
+
+This module provides a small class to construct a dispatch table and build a
+dispatcher for it. All interactions are done via the object/class methods so no
+exports are defined.
+
+It supports straightforward optimisation of the dispatch table and also utilises
+a optional cache to squeeze even more performance out.
+
+Notable features include:
+
+ 
+=over 
+
+=item *
+
+Non exact (regexp) and exact (string) matching in the same table
+
+=item *
+
+Uses built-in Perl features  (regex, given/when, smart-match)
+
+=item *
+
+Captures in regex are available in dispatched subs
+
+=item *
+
+Arguments supplied to dispatcher are available to executed vector
+
+=item *
+
+Cached pre-matching (optional)
+
+=item *
+
+Basic hit count and optimising (optional)
+
+=item *
+
+Fall through/catch all matching
+
+=back
+
+
+The dispatch table is essentially a list of at least one entry which maps a
+matcher to a subroutine to call on a successfully match of the input.
+
+Conceptually the list is looped over, applying the matchers sequentially to the input until a
+match is found. In practice it isn't a loop, but generated code reference with 
+optimised ordering of the entries.
+
+In the case of no successful match, a default catch all dispatch vector is called.
+ 
+Matching performance is optionally boosted by using a hash as a cache. Hash
+lookup is much quicker than repeated conditional testing. Controlling which
+inputs are removed from the cached is dictated by the return value of the
+dispatch vector/sub
+
+=head1 CREATING A TABLE
+
+Simply calling the class constructor returns a new Table. There are no arguments to the constructor.
+
+	my $table=Hustle::Table->new;
+
+A default catch all entry (an empty sub) is added automatically
+
+The table is a blessed array reference and can be manipulated as such. It's not
+recommended to access the table directly other than dumping the contents to
+storage.
+
+=head1 ENTRIES MANAGEMENT
+
+=head2 STRUCTURE
+
+An entry contains the following fields
+
+=over 
+
+=item matcher
+
+C<matcher> can be anything that smart-matching can handle. However the focus on
+this module is on strings and regular expressions
+
+ "match exaclty this stirng"
+ qr|match and capture (this|that)|
+
+When C<matcher> is a regex, any capturing is accessible in the target C<sub>.
+
+=item sub
+
+The C<sub> has access to any capture groups used in the matcher (if
+applicable). It is also passed all arguments, including the input, unmodified,
+used to call the dispatcher.
+
+ $dispatcher->("my input","optional", "arguments", "to", "dispatched", "sub");
+
+The return value of the sub indicates if the input just matched is to be
+removed from the cache. 
+
+=item label
+
+C<label> is a user defined item to allow identification of the entry. This is
+useful for saving/loading from configuration files etc.
+
+=item count
+
+C<count> This is a dual purpose attributes. When adding entries to the list,
+it is used as a priority. Higher numeric values are a higher priority. The list
+is sorted in descending order of priority, meaning the highest priority is the
+first element in the list.
+
+During running of the dispatch, this is a tally recording how many times,the
+entry has been matched. This information can be then used as a priority
+later to reorder the list.
+
+=back
+
+
+=head2 ADDING
+
+Entries are added in either anonymous hash or array format, using the C<add>
+method.  Array entries must contain four elements, in the order of:
+	
+	[$matcher,$sub,$label,$count]
+
+Hashes only need to specify the matcher and sub pairs
+
+	{matcher=>$matcher, sub=>$sub, label=>$label, count=>$count}
+
+In either case, C<$sub> is the only field/item that must be defined. It must
+also be a CODE reference. 
+
+If a label is not specified, one will be generated automatically. All the
+labels used in a call to C<add> are returned in the same order as the input
+arguments.
+
+Note the auto generated labels are only unique in the lifetime of a single
+table. If permanent/globally unique labels are need, the user will need to
+generate them.
+
+=head2 REMOVING
+
+Removal of entries is via the C<remove> method. It takes a list of labels to remove
+
+	$table->remove("label1", "funky-name");
+
+It returns a list of all entries removed.
+
+=head2 DUMPING 
+
+The table contents be accessed can like a normal array reference
+
+	$table->@*;
+	@$table;
+
+It is not recommended to manipulate the entires directly
+
+
+=head2 THE DEFAULT MATCHER
+
+Each list has a default matcher that will unconditionally match the input. This
+entry is specified by using C<undef> as the matcher when adding an entry. When
+set this way only the array format can be used.
+
+To make it more explicit, the it can also be changed via the C<set_default>
+method. 
+
+The default subroutine of the 'default' entry does nothing.
+
+=head1 PREPARING A DISPATCHER
+
+Once all the entries required are added to the table, the dispatcher can be constructed by calling
+C<prepare_dispatcher>:
+
+	my $dispatcher=$table->prepare_dispatcher(%args);
+
+Arguments to this method include:
+
+=over 
+
+=item type
+
+The type of dispatcher. Either "online" or "offline". If not specified, or an invalid value is supplied, an "online" dispatcher is created
+
+
+=over
+
+=item online
+
+Dispatcher which calls the dispatch vector, increases count statistics. This is what you normally would want to use in your code. Online mode.
+
+=item offline
+
+Dispatcher which only updates the count statistics. DOES NOT call dispatch vector. Useful for running a input data set through to obtain priority levels. Offline training mode.
+
+=back 
+
+=back
+
+=head1 USING A DISPATCHER
+
+The dispatcher is simply a sub. Any arguments passed to it are passed to the dispatch vector as is.
+
+	$dispatcher->("input", "argument1",2);
+
+
+
+
+=head1 PERFORMANCE
+
+=head2 CACHING AND CACHE CONTROL
+
+
+The return code of the dispatched sub is used to control if a successful match
+should be removed from the cache, or not be  removed;
+
+Any 'true' value returned will means the input, as a key to the cache, is to be
+removed from the cache.
+
+Any 'false' value indicates the input is to remain in the cache or be added if
+it doesn't exist.
+
+	{matcher => qr/r(.)gexp/, sub => sub { return }};	#Returns undef so not removed from cache.
+	{matcher => qr/re(.)gxp/, sub => sub { return 1}};	#Returns 'true' so removed from cache
+	{matcher => qr/reg(.)xp/, sub => sub { say $1;}};	#Returns true. Last statement is say and returns 1 
+
+
+=head2 OPTIMISATION
+
+The concept is to perform less searching to find the dispatch vector. However
+the type of input does play an important role in determining the best way
+perform the search.
+
+For example a uniformly distributed input will not gain benefits from
+reordering the entries in the list.
+
+On the other hand when the distributing becomes 'centred', the reordering of
+the table can greatly improve the search time.
+
+On my laptop, the simple benchmark script, (with 6 dispatch entries) (regex and
+string) shows around 1.2M dispatches/s for non cached and over 2M dispatches/s
+for cached dispatcher. Your results may vary.
+
+
+
+
+=head1 COMPARISON TO OTHER MODULES
+
+There a couple of other dispatching modules on CPAN.  Notably
+L<Smart::Dispatch> has a nice syntax, probably more flexibility and the ability
+to return values instead of just executing a sub.
+
+This module is smaller/(much)faster in my basic tests and also supports direct
+access to the regex capture groups and dispatch arguments.
+
+=head1 BUGS
+
+Probably.
+
+Please report via github
+
+=head1 TODO
+
+=over
+
+=item *
+
+Override array STORE and FETCH interface to ensure default is preserved
+
+=item *
+
+Add a more concrete performance discussion
+
+=item *
+
+Document how to run offline dispatcher for optimising
+
+=back
+
+=head1 AUTHOR
+
+Ruben Westerberg, E<lt>drclaw@mac.comE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2021 by Ruben Westerberg
+
+Licensed under MIT and GNU
+
+=head1 DISCLAIMER OF WARRANTIES
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES,
+INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+FITNESS FOR A PARTICULAR PURPOSE.
+
+=cut

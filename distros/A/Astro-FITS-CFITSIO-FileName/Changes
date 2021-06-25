@@ -1,0 +1,27 @@
+Revision history for Astro-FITS-CFITSIO-FileName
+
+0.03      2021-06-21 15:46:03-04:00 America/New_York
+
+  [ENHANCEMENT]
+
+    * add render_XXX methods for each attribute.
+    * stringification is now overloaded to produce the constructed filename
+
+    * document that row filters aren't really parsed so other illegal constructs may
+      be recorded as a row filter.
+
+  [BUG FIX]
+
+    * actually croak on error
+    * don't allow colons in extension names
+
+0.02      2021-06-17 10:22:37-04:00 America/New_York (TRIAL RELEASE)
+
+  [BUILD]
+
+    * require Exporter::Tiny 1.002
+
+
+0.01      2021-06-17 10:22:37-04:00 America/New_York (TRIAL RELEASE)
+
+* First release upon an unsuspecting world.

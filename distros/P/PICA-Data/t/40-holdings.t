@@ -1,13 +1,10 @@
 use strict;
 use warnings;
 use Test::More;
-use Scalar::Util qw(blessed);
 use PICA::Data ':all';
 
 my $record = pica_parser('plain', "t/files/bgb.example")->next;
-ok !blessed(pica_items($record)->[0]), 'not blessed';
 
-bless $record, 'PICA::Data';
 my $items = $record->items;
 is scalar @$items, 353, 'items';
 isa_ok $items->[0], 'PICA::Data';

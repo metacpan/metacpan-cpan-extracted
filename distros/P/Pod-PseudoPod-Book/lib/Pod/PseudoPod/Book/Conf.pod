@@ -1,0 +1,183 @@
+package Pod::PseudoPod::Book::Conf;
+# ABSTRACT: configuration options for Pod::PseudoPod::Books
+
+1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Pod::PseudoPod::Book::Conf - configuration options for Pod::PseudoPod::Books
+
+=head1 VERSION
+
+version 1.20210620.2051
+
+=head1 SYNOPSIS
+
+    # example configuration for the Modern Perl book
+    [book]
+    author_name=chromatic
+    copyright_year=2012
+    cover_image=
+    language=en
+    title=Modern Perl
+    subtitle=2011-2012 edition
+    filename_template=modern_perl
+    build_index=1
+    build_credits=1
+    ISBN10=0-9779201-7-8
+    ISBN13=978-0-9779201-7-4
+
+=head1 DESCRIPTION
+
+While C<Pod::PseudoPod::Book> tries to do the right thing by default for all
+materials, it needs some help for things it can't guess. It also lets you
+configure some options where the defaults aren't quite right.
+
+When you create a book with the command C<ppbook create>, you'll get a file
+named F<book.conf>. Edit that and change the values as appropriate for your
+project. The file is deliberately simple and uses the INI format as understood
+by L<Config::Tiny>; for more details of the syntax, see that module.
+
+=head2 The Book Section
+
+The section marked C<[book]> contains several pieces of information about your
+work:
+
+=over 4
+
+=item * C<title> is the title of the book.
+
+=item * C<subtitle> is the subtitle of the book. Leave this blank if you have
+no subtitle.
+
+=item * C<language> is the IETF language tag which best represents the book's
+contents. If you're reading this, likely you're fine using C<en>. See RFC 3066
+or RFC 4646 for copious detail.
+
+=item * C<cover_image> is the path to the image used for the book's cover.
+
+=item * C<author_name> is your name. Congratulations!
+
+=item * C<copyright_year> is the effective copyright year. If it takes you a
+while to write the book, feel free to increment this value when you publish.
+
+=item * C<filename_prefix> is the filename prefix used to manage multiple bok
+files for various editions, sizes, or layouts. This makes more sense in the
+LaTeX world, where the Modern Perl book uses a prefix of C<modern_perl> and has
+F<modern_perl_letter.tex>, F<modern_perl_a4.tex>, and F<modern_perl_6x9.tex>
+with the appropriate paper sizes and margins. The default value of C<book> is
+usually sufficient.
+
+=item * C<ISBN10> is the 10-digit (legacy) ISBN for the work. If you haven't
+registered an ISBN, ignore this. (If you I<have> registered an ISBN, you should
+get an 10-digit ISBN for free when you registered your 13-digit ISBN.)
+
+=item * C<ISBN13> is the 13-digit (modern) ISBN for the work. If you haven't
+registered an ISBN, ignore this.
+
+=item * C<build_index> is a boolean flag which controls whether to build and
+include an index, when possible. This is great for technical and non-fiction
+works, but works of fiction don't get much value from it.
+
+=item * C<build_credits> is a boolean flag which controls whether to turn a
+F<CREDITS> file in the top-level directory into a F<credits.pod> file woven
+into the built chapters. Modern Perl does this. You may not need it.
+
+=item * C<build_chapters> is a boolean flag which enables the weaving of
+chapters. If this flag is true, the C<buildchapters> command will use the
+C<layout> options of your configuration file to build partial chapters into
+full POD chapters in the appropriate F<build/> subdirectory. See
+C<chapter_build_dir>.
+
+=back
+
+=head2 The Layout Section
+
+The section marked C<[layout]> contains several pieces of information about the
+directory structure used to manage the work. Note that if you change these
+after creating your book with the C<create> command, you may have to create new
+directories by hand--or at least symlink them. The current configuration
+options are:
+
+=over 4
+
+=item * C<subchapter_directory> is the directory beneath which you store
+chapters and their pieces. As C<ppbook> processes chapter files and weaves in
+subchapters, it must find them somehow. Here's where. The default value of
+C<sections> is usually fine, but for other uses sometimes a different name is
+more semantically relevant.
+
+=item * C<chapter_name_prefix> is the prefix of all top-level chapter names in
+C<subchapter_directory>. These files may contain links to other POD files in
+that directory; when the C<build_chapters> option is true, the C<buildchapters>
+stage weaves them together and writes the results into the chapter build
+directory. The default of C<chapter> means that you will create chapters as
+F<chapter_01.pod>, F<chapter_02.pod>, and so on.
+
+=item * C<chapter_build_directory> is the directory under F<build/> into which
+the C<buildchapters> command will write all built chapters. The default of
+F<pod/> is almost always correct.
+
+=back
+
+=head2 The Chapter Order Section
+
+The section marked C<[chapter_order]> is optional. If present, it allows you to
+specify the order in which individual files should appear in the table of
+contents of HTML and ePub versions. This is relevant in the case where you have
+files of different names which do not sort lexigraphically in your preferred
+order. Due to quirks of how L<Config::Tiny> manages keys and values, you must
+use sequential numeric keys, with leading zeroes preferred. For example:
+
+    [chapter_order]
+    01=endorsements
+    02=dedication
+    03=acknowledgements
+    04=foreword
+    05=part_01
+    06=chapter_01
+    07=chapter_02
+    08=chapter_03
+    09=chapter_04
+    10=chapter_05
+    11=part_02
+    12=chapter_06
+    13=chapter_07
+    14=chapter_08
+    15=chapter_09
+    16=chapter_10
+    17=appendix_a
+    18=appendix_b
+    19=appendix_c
+    20=appendix_d
+
+Note the lack of file suffixes.
+
+This feature I<may> change slightly in the future, but it will be present in
+one form or another.
+
+=head1 COPYRIGHT
+
+Copyright 2011-2012 chromatic.
+
+This program is free software. You can redistribute it and/or modify it under
+the same terms as Perl 5.14 itself.
+
+=head1 AUTHOR
+
+chromatic <chromatic@wgz.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2011 by chromatic.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

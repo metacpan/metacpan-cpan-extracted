@@ -1,5 +1,32 @@
 Revision history for Perl module Module::Generic
 
+0.15.1 2021-06-20T10:19:58+0900
+    - Resubmission due to bundling error
+
+0.15.0 2021-04-18T12:05:35+0900
+    - Corrected a minor bug in Module::Generic::Dynamic, ignoring now fields that do not contain any valid chracter to become a method
+    - Added method as_array(), offset() and merge() in Module::Generic::Array
+    - Added method empty() in Module::Generic::Array as an alias to reset()
+    - Added methods as_array(), as_number(), join() and prepend() in Module::Generic::Scalar
+    - Added method as_array(), as_scalar() in Module::Generic::Number
+    - Added method as_array() and as_scalar() in Module::Generic::Boolean
+    - Added support for changing the offset position in a for loop in Module::Generic::Array by returning a scalar reference of an integer
+    - Added the return method in Module::Generic::Array to end embedded loops.
+    - Added methods even, odd, remove and unique (based on List::Util::uniq) in Module::Generic::Array
+    - Added TO_JSON to Module::Generic::Array, Module::Generic::Hash and Module::Generic::Scalar to allow its object to be encoded with JSON. You still need to set the convert_blessed JSON property to true though: my $j = JSON->new->convert_blessed;
+    - In Module::Generic::Array, the following methods have been changed to return a Module::Generic::Scalar object in object context and if the value retrieved from the array is not a reference of any sort: first, get, index, last, pop, shift. The splice method has been modified to return a new Module::Generic::Array object in object context when only an offset and length, or just an offset was provided.
+    - Added support method _is_class_loadable in Module::Generic to check if a module can be loaded without loading it
+    - Added support method _get_args_as_array in Module::Generic
+    - Corrected an obscure bug in clone() when using Want.
+    - Added method new_null in Module::Generic
+    - Added modules Module::Generic::File and Module::Generic::Finfo to deal with files
+    - Added inline class Module::Generic::Scalar::IO that inherits from IO::Scalar and enables to print to scalar
+    - Added module Module::Generic::SharedMem for easy-to-use shared memory interface
+
+0.14.2 2021-04-03T17:22:00+0900
+    - Corrected a bug in _set_get_scalar_as_object to accept overloaded objects that implement stringification
+    - Corrected a bug in _set_get_hash
+
 0.14.1 2021-03-31T14:50:43+0900
     - Correcting a test unit in datetime and upgrading version numbers for sub modules
 

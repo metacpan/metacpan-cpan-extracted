@@ -31,7 +31,7 @@ do { my $x = {
                                       'HTTP::Tiny' => '0',
                                       'Moose' => '0',
                                       'namespace::clean' => '0',
-                                      'perl' => '5.014'
+                                      'perl' => '5.020'
                                     }
                     },
        'test' => {

@@ -1,47 +1,54 @@
+#!/usr/bin/perl -w
+
 use strict;
 use warnings;
 use ExtUtils::MakeMaker;
 
 my $mod_file = 'lib/Asm/X86.pm';
+my $mod_name = 'Asm::X86';
 
-# Dynamic configuration is a workaround for some Linux systems where BSD tar
+# Dynamic configuration is a workaround for systems where BSD tar
 # is installed instead of GNU tar
-sub conf
-{
+sub conf {
+
 	my $r = `tar --version`;
 	my %cfg = (
-		dist => {
-			COMPRESS => 'gzip -9f',
-			SUFFIX => 'gz'
+		'dist' => {
+			'COMPRESS' => 'gzip -9f',
+			'SUFFIX' => 'gz'
 		}
 	);
-	if ( $r =~ /bsdtar/io or $r =~ /BSD/io or $r =~ /libarchive/io )
-	{
+	if ( $r =~ /BSD/io or $r =~ /libarchive/io ) {
+
 		# TARFLAGS '--format gnutar' is a workaround for some Linux
 		# systems where BSD tar is installed instead of GNU tar
-		$cfg{dist}{TARFLAGS} = '--format gnutar -cvf';
-		#return {dist => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', TARFLAGS => '--format gnutar -cvf' }};
+		$cfg{'dist'}{'TARFLAGS'} = '--format gnutar -cvf';
+		#return {'dist' => { 'COMPRESS' => 'gzip -9f', 'SUFFIX' => 'gz', 'TARFLAGS' => '--format gnutar -cvf' }};
 	}
 	return \%cfg;
 }
 
 WriteMakefile(
-	NAME			=> 'Asm::X86',
+	NAME			=> $mod_name,
 	AUTHOR			=> 'Bogdan Drozdowski <bogdro@cpan.org>',
 	VERSION_FROM		=> $mod_file,
 	ABSTRACT_FROM		=> $mod_file,
 	PREREQ_PM => {
 		'Test::More'	=> 0,
 	},
-	# Dynamic configuration is a workaround for new systems where BSD tar
+	# Dynamic configuration is a workaround for systems where BSD tar
 	# is installed instead of GNU tar
 	#dist			=> { COMPRESS => 'gzip -9f', SUFFIX => 'gz', TARFLAGS => '--format gnutar -cvf' },
 	CONFIGURE		=> \&conf,
-	clean			=> { FILES => 'Asm-X86-*' },
+	clean			=> { 'FILES' => 'Asm-X86-*' },
 	LICENSE			=> 'perl_5',
 	SIGN			=> '1',
 	MIN_PERL_VERSION	=> '5.006',	# just because of 'Exporter'
-	META_ADD		=> { provides => { 'Asm::X86' => { file => $mod_file, version => '0.40' } } },
+	META_ADD		=> { provides => { $mod_name => {
+					file => $mod_file,
+					version => '0.61'
+					}
+				} },
 
 	# When setting 'vendor', the module cannot be installed in local Perl
 	#  installations.

@@ -4,7 +4,7 @@
       "Diab Jerius <djerius@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.020, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "gpl_3"
    ],
@@ -33,7 +33,6 @@
          "requires" : {
             "Dist::Zilla" : "5",
             "Dist::Zilla::Plugin::BumpVersionAfterRelease" : "0",
-            "Dist::Zilla::Plugin::CPANFile" : "0",
             "Dist::Zilla::Plugin::CheckMetaResources" : "0",
             "Dist::Zilla::Plugin::CopyFilesFromRelease" : "0",
             "Dist::Zilla::Plugin::EnsureChangesHasContent" : "0",
@@ -111,7 +110,7 @@
    "provides" : {
       "Hash::Wrap" : {
          "file" : "lib/Hash/Wrap.pm",
-         "version" : "0.13"
+         "version" : "0.14"
       }
    },
    "release_status" : "stable",
@@ -124,7 +123,7 @@
          "web" : "https://gitlab.com/djerius/hash-wrap"
       }
    },
-   "version" : "0.13",
+   "version" : "0.14",
    "x_generated_by_perl" : "v5.28.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.12",
    "x_spdx_expression" : "GPL-3.0-only"

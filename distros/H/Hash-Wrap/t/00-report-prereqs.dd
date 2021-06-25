@@ -8,7 +8,6 @@ do { my $x = {
                       'requires' => {
                                       'Dist::Zilla' => '5',
                                       'Dist::Zilla::Plugin::BumpVersionAfterRelease' => '0',
-                                      'Dist::Zilla::Plugin::CPANFile' => '0',
                                       'Dist::Zilla::Plugin::CheckMetaResources' => '0',
                                       'Dist::Zilla::Plugin::CopyFilesFromRelease' => '0',
                                       'Dist::Zilla::Plugin::EnsureChangesHasContent' => '0',

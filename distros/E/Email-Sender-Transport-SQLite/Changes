@@ -1,5 +1,12 @@
 Revision history for Email-Sender-Transport-SQLite
 
+1.500     2021-06-20 20:31:52-04:00 America/New_York
+        - update version number for bookkeeping reasons
+
+0.092004  2021-06-20 17:22:56-04:00 America/New_York
+        - update author contact info
+        - add perl support section to docs
+
 0.092003  2016-08-10 11:15:47-04:00 America/New_York
           add retrieve_deliveries method to get deliveries back out of db
 

@@ -11,13 +11,25 @@ role ARole {
    has $one :reader = 1;
 }
 
-class AClass implements ARole {
+class AClass does ARole {
 }
 
 # RT136507
 {
    my $obj = AClass->new;
    is( $obj->one, 1, '$obj->one is visible' );
+}
+
+role BRole {
+   has $data :reader :param;
+}
+
+class BClass does BRole {
+}
+
+{
+   my $obj = BClass->new( data => 123 );
+   is( $obj->data, 123, 'BClass constructor takes role params' );
 }
 
 done_testing;

@@ -3,7 +3,7 @@ package Firefox::Marionette::Certificate;
 use strict;
 use warnings;
 
-our $VERSION = '1.06';
+our $VERSION = '1.08';
 
 sub _NUMBER_OF_MICROSECOND_DIGITS { return -6 }
 
@@ -102,8 +102,8 @@ sub issuer_organization_unit {
 }
 
 sub _convert_time_to_seconds {
-    my ( $self, $milliseconds ) = @_;
-    my $seconds = substr $milliseconds, 0, _NUMBER_OF_MICROSECOND_DIGITS();
+    my ( $self, $microseconds ) = @_;
+    my $seconds = substr $microseconds, 0, _NUMBER_OF_MICROSECOND_DIGITS();
     return $seconds + 0;
 }
 
@@ -166,7 +166,7 @@ Firefox::Marionette::Certificate - Represents a x509 Certificate from Firefox
 
 =head1 VERSION
 
-Version 1.06
+Version 1.08
 
 =head1 SYNOPSIS
 

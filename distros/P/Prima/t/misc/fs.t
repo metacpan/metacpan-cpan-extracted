@@ -3,7 +3,7 @@ use warnings;
 
 use Test::More;
 use Cwd ();
-use Prima::Test qw(noX11);
+use Prima::sys::Test qw(noX11);
 use Prima::Utils;
 use Prima::sys::FS;
 use Fcntl qw(:DEFAULT S_IFREG S_IFDIR);
@@ -57,6 +57,7 @@ sub check
 
 	my $d;
 	ok( opendir($d, '.'), "opendir");
+	my $start = telldir($d);
 	@l = readdir($d);
 	($found_file, $found_dir) = (0,0);
 	for (my $i = 0; $i < @l; $i++ ) {
@@ -65,7 +66,7 @@ sub check
 	}
 	ok( $found_file, "$id: readdir file");
 	ok( $found_dir , "$id: readdir dir");
-	rewinddir($d);
+	seekdir($d, $start);
 	@l = readdir($d);
 	($found_file, $found_dir) = (0,0);
 	for (my $i = 0; $i < @l; $i++ ) {
@@ -74,10 +75,10 @@ sub check
 	}
 	ok( $found_file, "$id: rewind/readdir file");
 	ok( $found_dir , "$id: rewind/readdir dir");
-	rewinddir($d);
+	seekdir($d, $start);
 	scalar readdir($d);
 	my $pos = telldir $d;
-	rewinddir($d);
+	seekdir($d, $start);
 	seekdir $d, $pos;
 	is($pos, telldir $d, "telldir");
 	my @r = readdir $d;

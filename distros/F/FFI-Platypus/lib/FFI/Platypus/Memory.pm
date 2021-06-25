@@ -4,10 +4,10 @@ use strict;
 use warnings;
 use 5.008004;
 use FFI::Platypus;
-use base qw( Exporter );
+use Exporter qw( import );
 
 # ABSTRACT: Memory functions for FFI
-our $VERSION = '1.43'; # VERSION
+our $VERSION = '1.46'; # VERSION
 
 
 our @EXPORT = qw( malloc free calloc realloc memcpy memset strdup strndup strcpy );
@@ -80,7 +80,7 @@ FFI::Platypus::Memory - Memory functions for FFI
 
 =head1 VERSION
 
-version 1.43
+version 1.46
 
 =head1 SYNOPSIS
 
@@ -225,6 +225,8 @@ Diab Jerius (DJERIUS)
 Eric Brine (IKEGAMI)
 
 szTheory
+
+José Joaquín Atria (JJATRIA)
 
 =head1 COPYRIGHT AND LICENSE
 

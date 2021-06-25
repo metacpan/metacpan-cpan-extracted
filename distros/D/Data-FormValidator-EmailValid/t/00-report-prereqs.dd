@@ -26,9 +26,6 @@ do { my $x = {
                                     }
                     },
        'runtime' => {
-                      'recommends' => {
-                                        'Net::DNS' => '0'
-                                      },
                       'requires' => {
                                       'Data::FormValidator' => '4.0',
                                       'Email::Valid' => '0',

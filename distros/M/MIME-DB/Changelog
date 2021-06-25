@@ -1,8 +1,11 @@
+1.48.0  2021-06-17
+    - mime-db v1.48.0: https://github.com/jshttp/mime-db/releases/tag/v1.48.0
+
 1.47.0  2021-04-06
     - mime-db v1.47.0: https://github.com/jshttp/mime-db/releases/tag/v1.47.0
     - version() method to get mime-db version (might be different from module
       version in the future)
-    - improved POD covering
+    - improved POD coverage
 
 1.46.0  2021-03-17
     - first version

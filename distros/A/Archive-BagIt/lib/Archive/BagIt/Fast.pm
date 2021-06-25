@@ -1,13 +1,13 @@
 package Archive::BagIt::Fast;
 use strict;
 use warnings;
-use IO::AIO;
-use Carp;
-use Time::HiRes qw(time);
+use IO::AIO ();
+use Carp qw( croak );
+use Time::HiRes qw( time );
 use Moo;
 extends "Archive::BagIt";
 
-our $VERSION = '0.074'; # VERSION
+our $VERSION = '0.075'; # VERSION
 
 # ABSTRACT: A module to use IO::AIO to het better performance
 
@@ -72,7 +72,7 @@ Archive::BagIt::Fast - A module to use IO::AIO to het better performance
 
 =head1 VERSION
 
-version 0.074
+version 0.075
 
 =head1 NAME
 

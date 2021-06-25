@@ -47,5 +47,6 @@ subqueries
 Subqueries
 subquery
 substatement
+substatements
 Substatements
 Tabwidth

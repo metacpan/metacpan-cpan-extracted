@@ -2,8 +2,8 @@ NAME
     Data::Dump::Color - Like Data::Dump, but with color
 
 VERSION
-    This document describes version 0.245 of Data::Dump::Color (from Perl
-    distribution Data-Dump-Color), released on 2021-06-05.
+    This document describes version 0.248 of Data::Dump::Color (from Perl
+    distribution Data-Dump-Color), released on 2021-06-24.
 
 SYNOPSIS
     Use it like you would Data::Dump, e.g.:
@@ -11,6 +11,8 @@ SYNOPSIS
      use Data::Dump::Color; dd localtime;
 
 DESCRIPTION
+    Sample screenshot:
+
     This module aims to be a drop-in replacement for Data::Dump. It adds
     colors to dumps. It also adds various visual aids in the comments, e.g.
     array/hash index, depth indicator, and so on.

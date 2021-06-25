@@ -4,7 +4,7 @@ use Future::Mojo;
 use Scalar::Util;
 use Role::Tiny;
 
-our $VERSION = 'v1.0.0';
+our $VERSION = 'v1.0.1';
 
 requires qw(ioloop then);
 

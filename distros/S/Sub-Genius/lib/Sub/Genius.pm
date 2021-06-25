@@ -8,7 +8,7 @@ use Digest::MD5 ();
 use Storable    ();
 use Cwd         ();
 
-our $VERSION = q{0.12};
+our $VERSION = q{0.314002};
 
 # constructor
 sub new {
@@ -101,7 +101,7 @@ sub _balkanize {
     foreach my $line ( split /\n/, $self->{preplan} ) {
 
         # supports strings with namespace delim, '::'
-        $line =~ s/([a-zA-Z:_]+)/\[$1\]/g;
+        $line =~ s/([a-zA-Z:_\d]+)/\[$1\]/g;
         push @pre, $line;
     }
     $self->preplan( join qq{\n}, @pre );
@@ -201,7 +201,7 @@ sub convert_pregex_to_dfa {
     }
 
     if ( not $self->dfa or defined $opts{reset} ) {
-        $self->dfa( $self->pregex->as_pfa->as_nfa->as_dfa->trim_sinks );
+        $self->dfa( $self->pregex->as_pfa->as_nfa->as_dfa->as_min_dfa->trim_sinks );
 
         # save to cache
         if ( $self->do_cache ) {
@@ -339,6 +339,12 @@ memory programming to the uniprocess environment that is C<perl>.
 
 After all, if we're going to I<fake the funk out of coroutines> [4],
 let's do it correctly. C<:)>
+
+[6], an exposition of L<sequential consistency> in the I<Chapel> programming
+language also provides quite an interesting read. Chapel itself is
+interested, as are the other I<high productivity> high performance
+computing languages that came out during the first decade of this century
+(X10, Fortress, etc).
 
 =head1 SYNOPSIS
 
@@ -1239,6 +1245,8 @@ Executes Multiprocess Programs", IEEE Trans. Comput. C-28,9 (Sept. 1979), 690-69
 
 =item * 5. Introduction to Automata Theory, Languages, and Computation; Hopcroft, Motwani,
 Ullman. Any year.
+
+=item * 6. L<https://chapel-lang.org/docs/language/spec/memory-consistency-model.html#sequential-consistency-for-data-race-free-programs>
 
 =back
 

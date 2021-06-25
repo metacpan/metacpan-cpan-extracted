@@ -1,26 +1,41 @@
 package Getopt::EX::Numbers;
-use version; our $VERSION = version->declare("v1.23.2");
+use version; our $VERSION = version->declare("v1.23.3");
 
 use v5.14;
 use warnings;
 
 use Carp;
 use List::Util qw();
+use Hash::Util qw(lock_keys);
 use Data::Dumper;
 $Data::Dumper::Sortkeys = 1;
 
 use Exporter qw(import);
 our @EXPORT_OK = qw();
 
-use Moo;
+sub _default {
+    return {
+	min    => 0,
+	max    => undef,
+	start  => '',
+	end    => '',
+	step   => '',
+	length => '',
+	_spec  => undef,
+    };
+}
 
-has [ qw(min max start end step length _spec) ] => ( is => 'rw' ) ;
-
-has [ qw(+start +end +step +length) ] => ( default => '' ) ;
-
-has '+min' => ( default => 0 ) ;
-
-no Moo;
+sub new {
+    my $class = shift;
+    my $obj = bless _default(), $class;
+    lock_keys %{$obj};
+    @_ % 2 and croak "invalid number of parameters";
+    while (my($key, $value) = splice(@_, 0, 2)) {
+	croak "$key: invalid parameter" if not exists $obj->{$key};
+	$obj->{$key} = $value;
+    }
+    $obj;
+}
 
 sub parse {
     my $obj = shift;
@@ -39,28 +54,28 @@ sub parse {
 	)?
 	$
 	}x) {
-	$obj->start  ($+{start});
-	$obj->end    ($+{end});
-	$obj->step   ($+{step});
-	$obj->length ($+{length});
+	$obj->{start}  = $+{start};
+	$obj->{end}    = $+{end};
+	$obj->{step}   = $+{step};
+	$obj->{length} = $+{length};
     }
     else {
 	carp "$_: format error";
 	return undef;
     }
-    $obj->_spec($_);
+    $obj->{_spec} = $_;
     $obj;
 }
 
 sub range {
     my $obj = shift;
-    my $max = $obj->max;
-    my $min = $obj->min;
+    my $max = $obj->{max};
+    my $min = $obj->{min};
 
-    my $start  = $obj->start;
-    my $end    = $obj->end;
-    my $step   = $obj->step;
-    my $length = $obj->length;
+    my $start  = $obj->{start};
+    my $end    = $obj->{end};
+    my $step   = $obj->{step};
+    my $length = $obj->{length};
 
     if (not defined $max) {
 	if ($start =~ /^-\d+$/ or

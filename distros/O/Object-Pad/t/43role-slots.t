@@ -12,7 +12,7 @@ role ARole {
    method one { $one }
 }
 
-class AClass implements ARole {
+class AClass does ARole {
    has $two = 2;
    method two { $two }
 }
@@ -25,7 +25,7 @@ class AClass implements ARole {
    is( $obj->two, 2, 'AClass has a ->two method' );
 }
 
-class BClass extends AClass {
+class BClass isa AClass {
    has $three = 3;
    method three { $three }
 }

@@ -13,7 +13,7 @@ use Crypt::OpenToken::Serializer;
 use Crypt::OpenToken::Token;
 use namespace::autoclean;
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 our $DEBUG   = 0;
 
 # shared encryption password

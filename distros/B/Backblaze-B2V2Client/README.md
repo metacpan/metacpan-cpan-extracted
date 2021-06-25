@@ -8,7 +8,7 @@ Backblaze::B2V2Client - Client library for the Backblaze B2 Cloud Storage Servic
 
         # create an API client object
 
-        $b2client = Backblaze::B2V2Client->new(
+        my $b2client = Backblaze::B2V2Client->new(
                 $application_key_id, $application_key
         );
 
@@ -17,13 +17,13 @@ Backblaze::B2V2Client - Client library for the Backblaze B2 Cloud Storage Servic
         # let's say we have a B2 bucket called 'GingerAnna' and a JPG called 'ginger_was_perfect.jpg'.
 
         # upload a file from your file system
-        $b2client->b2_upload_file(
+        my $operation_status = $b2client->b2_upload_file(
                 'bucket_name' => 'GingerAnna',
                 'file_location' => '/path/to/ginger_was_perfect.jpg'
         );
 
         # upload a file you have in a scalar
-        $b2client->b2_upload_file(
+        my $operation_status = $b2client->b2_upload_file(
                 'bucket_name' => 'GingerAnna',
                 'new_file_name' => 'ginger_was_perfect.jpg',
                 'file_contents' => $file_contents
@@ -32,13 +32,16 @@ Backblaze::B2V2Client - Client library for the Backblaze B2 Cloud Storage Servic
         # Best to load $file_contents via Path::Tiny's slurp_raw() method
 
         # download that file to /opt/majestica/tmp
-        $b2client->b2_download_file_by_name('GingerAnna','ginger_was_perfect.jpg','/opt/majestica/tmp');
+        my $operation_status = $b2client->b2_download_file_by_name('GingerAnna','ginger_was_perfect.jpg','/opt/majestica/tmp');
 
         # if you would rather download with the 84-character GUID
-        $b2client->b2_download_file_by_id('X-Bz-File-Id GUID from above','/opt/majestica/tmp');
+        my $operation_status = $b2client->b2_download_file_by_id('X-Bz-File-Id GUID from above','/opt/majestica/tmp');
 
         # you can leave off the directory to just have the file contents into
         # $b2client->{b2_response}{file_contents}
+
+        # $operation_status is now 'OK' or 'Error', and is
+        # also stashed in $b2client->{current_status}
 
         # check the status of the last operation
         use Data::Dumper; # hello old friend
@@ -76,9 +79,9 @@ Key again, so copy it immediately.
 Please store the Application Key pair in a secure way, preferably encrypted
 when not in use by your software.
 
-## New: b2\_client Command Line Utility
+## b2\_client Command Line Utility
 
-Backblaze::B2V2Client now includes the 'b2\_client' command line utility to
+Backblaze::B2V2Client includes the 'b2\_client' command line utility to
 easily download or upload files from B2.  Please execute 'b2\_client help'
 for more details, and here are a few examples:
 
@@ -90,6 +93,11 @@ for more details, and here are a few examples:
         
         # upload a file to B2
         b2_client put MyPictures /home/ginger/photos/AnotherFamilyPhoto.jpg
+
+There is also an official command line utility from Backblaze that does a
+whole lot more: 
+
+        https://www.backblaze.com/b2/docs/quick_command_line.html
 
 ## BackBlaze B2 also has a S3-compatible API
 
@@ -118,6 +126,9 @@ The GUID for a file is displayed when you click on that file's name
 in the 'Browse Files' section of the B2 UI.
 
 # METHODS
+
+For all the below, when they return $operation\_status, that will
+be 'OK' or 'Error'.  If you get 'Error,' check out $b2client->{errors}\[-1\] .
 
 ## new
 
@@ -164,14 +175,14 @@ and assign the loaded scalar into 'file\_contents'.
 
 Example 1: Uploading from a file on disk:
 
-        $b2client->b2_upload_file(
+        my $operation_status = $b2client->b2_upload_file(
                 'bucket_name' => 'GingerAnna',
                 'file_location' => '/opt/majestica/tmp/ginger_was_perfect.jpg',
         );
 
 Example 2: Uploading when the file is loaded into a scalar:
 
-        $b2client->b2_upload_file(
+        my $operation_status = $b2client->b2_upload_file(
                 'bucket_name' => 'GingerAnna',
                 'new_file_name' => 'ginger_was_perfect.jpg',
                 'file_contents' => $file_contents
@@ -198,15 +209,40 @@ and the complete file path of the file in 'file\_location'.
 
 Example:
 
-        $b2client->b2_upload_large_file(
+        my $operation_status = $b2client->b2_upload_large_file(
                 'bucket_name' => 'GingerAnna',
                 'file_location' => '/opt/majestica/tmp/gingers_whole_life_story.mp4',
         );
 
 ## b2\_list\_file\_names
 
+Required input is `$bucket_name` as the first parameter (required) and
+an optional key-value hash of parameters.  These parameters can include:
+
+- `prefix`
+
+    Allows one to specify a filename prefix or directory path, useful for buckets
+    with a large number of files or many subdirectories. Default is undefined.
+
+- `delimiter`
+
+    Allows one to specify what is considered the delimiter for the file `path` in
+    the bucket. Default is undefined.
+
+- `startFileName`
+
+    Allows one to select where in the file list to start the results, since the max
+    results for each call is 1000 files. This allows one to define the `start` for
+    emulating pagination of the results.
+
+- `maxFileCount`
+
+    The default is 1000, the ultimate maximum per the specification. The module
+    default may be accessed via the package variable, `$B2_MAX_FILE_COUNT`.
+
 Retrieves an array of file information hashes for a given bucket name.
-That array is added to @{ $b2client->{buckets}{$bucket\_name}{files} }.
+That array is added to @{ $b2client->{buckets}{$bucket\_name}{files} } and
+returned as an array reference to the list of file objects.
 
 See https://www.backblaze.com/b2/docs/b2\_list\_file\_names.html ,
 especially the section for 'Response' to see what is included for those
@@ -216,9 +252,37 @@ Note that B2 limits this response to 1000 entries, so if you have a very
 large bucket, you can call this method several times and check the
 value in $b2client->{buckets}{$bucket\_name}{next\_file\_name} after each call.
 
-Example:
+Example 1: Basic call:
 
-        $b2client->b2_list_file_names('MyBucketName');
+        my $files_ref = $b2client->b2_list_file_names('MyBucketName');
+
+Example 2: Basic call and capturing file list:
+
+        my $files_ref = $b2client->b2_list_file_names('MyBucketName');
+
+Example 3: Avoid initial API call to get `bucket_id`:
+
+        # In order to avoid the initial API call to determine the BucketId, which is
+        # actually what B2 wants, one may set this directly if known ahead of time:
+
+        $b2client->{buckets}{q/MyBucketName/}->{bucket_id} = q{b9d516ba733afb62719c4};
+        my $files_ref = $b2client->b2_list_file_names('MyBucketName');
+
+Example 4: Using optional parameters to control results (Note: only `$bucket_name` is required):
+
+        my $bucket_name = q{MyBucketName};
+        my %args = (
+                'prefix' => q{path/to/sub/directory/},
+                'delimter' => undef,
+                'startFileName' => undef,
+                'maxFileCount' => $b2client::B2_MAX_FILE_COUNT
+        );
+
+        # $bucket_id look up hack
+        $b2client->{buckets}{$bucket_name}->{bucket_id} = q{b9d516ba733afb62719c4};
+
+        # actual call - parameter order matters
+        my $files_ref = $b2client->b2_list_file_names($bucket_name, %args);
 
 ## b2\_get\_file\_info
 
@@ -230,22 +294,33 @@ particularly the section for 'Response' to see what is provided.
 
 Example:
 
-        $b2client->b2_get_file_info('AN84_CHAR_GUID_FROM_B2');
+        my $operation_status = $b2client->b2_get_file_info('AN84_CHAR_GUID_FROM_B2');
 
 ## b2\_bucket\_maker
 
 Creates a new bucket in your B2 account, given the name for the new
-bucket.  The bucket type will be set to 'allPrivate'.
+bucket.  The bucket type will be set to 'allPrivate',
 
-Will retrieve the new bucket's ID into:
+Will place the new bucket's ID into:
 
-        $b2client->{buckets}{$bucket_name}{bucket_id}
+        my $operation_status = $b2client->{buckets}{$bucket_name}{bucket_id}
 
 See: https://www.backblaze.com/b2/docs/b2\_create\_bucket.html
 
 Example:
 
-        $b2client->b2_bucket_maker('NewBucketName');
+        my $operation_status = $b2client->b2_bucket_maker('NewBucketName');
+
+By default the new bucket will be set to use the 'Server-Side 
+Encryption with Backblaze-Managed Keys (SSE-B2)' option 
+described here: https://www.backblaze.com/b2/docs/server\_side\_encryption.html
+You can send a second param to disable that (not recommended):
+
+        my $operation_status = $b2client->b2_bucket_maker('UnEncryptedBucketName', 1);
+        
+
+Also, if your app key does not have the 'writeBucketEncryption' then 
+encryption will be disabled.
 
 ## b2\_delete\_bucket
 
@@ -256,7 +331,7 @@ See: https://www.backblaze.com/b2/docs/b2\_delete\_bucket.html
 
 Example:
 
-        $b2client->b2_delete_bucket('DeletingBucketName');
+        my $operation_status = $b2client->b2_delete_bucket('DeletingBucketName');
 
 ## b2\_delete\_file\_version
 
@@ -269,7 +344,7 @@ The required arguments are the file name and the file ID.
 
 Example:
 
-        $b2client->b2_delete_file_version('SomeFileName.ext','AN84_CHAR_GUID_FROM_B2');
+        my $operation_status = $b2client->b2_delete_file_version('SomeFileName.ext','AN84_CHAR_GUID_FROM_B2');
 
 ## b2\_talker / b2\_get\_upload\_url  / b2\_list\_buckets
 
@@ -293,14 +368,14 @@ $list\_buckets\_url = $b2client->{api\_url}.'/b2api/v2/b2\_list\_buckets';
 
 Example of a GET API request:
 
-        $b2client->b2_talker(
+        my $operation_status = $b2client->b2_talker(
                 'url' => 'https://SomeB2.API.URL?with=GETparams',
                 'authorization' => $b2client->{account_authorization_token},
         );
 
 Example of a POST API request:
 
-        $b2client->b2_talker(
+        my $operation_status = $b2client->b2_talker(
                 'url' => 'https://SomeB2.API.URL',
                 'authorization' => $b2client->{account_authorization_token},
                 'post_params' => {
@@ -317,11 +392,11 @@ with the bucket name as an argument.
 
 Example:
 
-        $b2client->b2_get_upload_url('MyBucketName');
+        my $operation_status = $b2client->b2_get_upload_url('MyBucketName');
 
 This populates:
 
-        $b2client->{bucket_info}{'MyBucketName'} = {
+        my $operation_status = $b2client->{bucket_info}{'MyBucketName'} = {
                 'upload_url' => $b2client->{b2_response}{uploadUrl},
                 'authorization_token' => $b2client->{b2_response}{authorizationToken},
         };
@@ -339,7 +414,7 @@ account.
 
 Example:
 
-        $b2client->b2_list_buckets('MyBucketName');
+        my $operation_status = $b2client->b2_list_buckets('MyBucketName');
 
 You now have $b2client->{buckets}{'MyBucketName'}{bucket\_id}
 
@@ -357,7 +432,7 @@ This module requires:
         WWW::Mechanize
         LWP::Protocol::https
 
-In order to get this to work properly on Ubuntu 18.04, I installed these
+In order to get this to work properly on Ubuntu 18.04 and 20.04, I installed these
 system packages:
 
         build-essential
@@ -376,17 +451,16 @@ Paws::S3 - If using Backblaze's S3-compatible API.
 
 # AUTHOR / BUGS
 
-Eric Chernoff <eric@weaverstreet.net>
+Eric Chernoff <ericschernoff@gmail.com> - Please send me a note with any bugs or suggestions.
 
-Please send me a note with any bugs or suggestions.
-
-Thanks to ESTRABD for submitting a bugfix when using the 'file\_contents' option in the b2\_upload\_file() method.
+ESTRABD <estrabd@cpan.org> - Enhanced b2\_list\_file\_names() to fully use options and a great bugfix 
+when using the 'file\_contents' option in the b2\_upload\_file() method.
 
 # LICENSE
 
 MIT License
 
-Copyright (c) 2020 Eric Chernoff
+Copyright (c) 2021 Eric Chernoff
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 

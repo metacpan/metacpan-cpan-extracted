@@ -49,6 +49,7 @@ do { my $x = {
                                     },
                       'suggests' => {
                                       'JSON::SL' => 'v1.0.6',
+                                      'Sentinel' => '0.06',
                                       'XML::LibXML::SAX::ChunkParser' => '0.00008'
                                     }
                     },

@@ -42,13 +42,13 @@ sub __search_and_replace {
     my @bu;
 
     MENU: while ( 1 ) {
-        my @info = ( $filter_str );
+        my @tmp_info = ( '', $filter_str );
         for my $sr_group ( @$all_sr_groups ) {
             for my $sr_single ( @$sr_group ) {
-                push @info, '  s/' . join( '/', @$sr_single ) . ';';
+                push @tmp_info, '  s/' . join( '/', @$sr_single ) . ';';
             }
         }
-        push @info, '';
+        push @tmp_info, '';
         my ( $hidden, $select_cols, $add, $restore_header ) = ( 'Choose:', '  SELECT COLUMNS', '  ADD s///;', '  RESTORE header row' );
         my @pre = ( $hidden, undef, $add );
         if ( @$all_sr_groups ) {
@@ -64,19 +64,20 @@ sub __search_and_replace {
             }
         }
         my $menu = [ @pre, map( '- ' . $_, @$available ) ];
-        my $count_static_rows = @info + @$menu; # @info and @$menu
-        $cf->__print_filter_info( $sql, $count_static_rows, undef );
+        my $count_static_rows = @tmp_info;
+        my $info = $cf->__get_filter_info( $sql, $count_static_rows, undef, $menu, 1 ) . join( "\n", @tmp_info );
         # Choose
         my $idx = $tc->choose(
             $menu,
-            { %{$sf->{i}{lyt_v}}, info => join( "\n", @info ), prompt => '', default => 1, index => 1, undef => '  <=' }
+            { %{$sf->{i}{lyt_v}}, info => $info, prompt => '', default => 1, index => 1, undef => '  <=',
+              keep => $sf->{i}{keep} }
         );
         if ( ! defined $idx || ! defined $menu->[$idx] ) {
             if ( @bu ) {
                 ( $used_names, $available, $all_sr_groups ) = @{pop @bu};
                 next;
             }
-            return;
+            return; ## no s/// => 2 x
         }
         my $choice = $menu->[$idx];
         if ( $choice eq $hidden ) {
@@ -88,7 +89,7 @@ sub __search_and_replace {
             if ( ! @$all_sr_groups ) {
                 return;
             }
-            my $ok = $sf->__apply_to_cols( $sql, \@info, $header, $all_sr_groups );
+            my $ok = $sf->__apply_to_cols( $sql, \@tmp_info, $header, $all_sr_groups );
             for my $i ( 0 .. $#$header ) {
                 if ( $header->[$i] ne $sql->{insert_into_args}[0][$i] ) {
                     $header_changed = 1;
@@ -119,14 +120,15 @@ sub __search_and_replace {
                     [ $nr . ' Replacement', ],
                     [ $nr . ' Modifiers',   ];
             }
-            my $count_static_rows = @info + 3 + @$fields; # info, prompt, back, confirm and fields
+            my $count_static_rows = @tmp_info + 1; # tmp_info, prompt
+            my $pre_count = 2; # back, confirm
 
             SUBSTITUTION: while ( 1 ) {
-                $cf->__print_filter_info( $sql, $count_static_rows, undef );
+                my $info = $cf->__get_filter_info( $sql, $count_static_rows, [ ( ' ' ) x $pre_count ], $fields, 1 ) . join( "\n", @tmp_info );
                 # Fill_form
                 my $form = $tf->fill_form(
                     $fields,
-                    { info => join( "\n", @info ), prompt => $prompt, auto_up => 2, confirm => '  ' . $sf->{i}{confirm},
+                    { info => $info, prompt => $prompt, auto_up => 2, confirm => '  ' . $sf->{i}{confirm}, keep => $sf->{i}{keep},
                     back => '  ' . $sf->{i}{back} . '   ', section_separators => [ grep { ! ( $_ % 4 ) } 0 .. $#$fields ] }
                 );
                 if ( ! defined $form ) {
@@ -166,12 +168,12 @@ sub __filter_modifiers {
 
 
 sub __apply_to_cols {
-    my ( $sf, $sql, $info, $header, $all_sr_groups ) = @_;
+    my ( $sf, $sql, $tmp_info, $header, $all_sr_groups ) = @_;
     my $tu = Term::Choose::Util->new( $sf->{i}{tcu_default} );
     my $cf = App::DBBrowser::GetContent::Filter->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $aoa = $sql->{insert_into_args};
-    my $count_static_rows = @$info + 1; # info_count and cs_label
-    $cf->__print_filter_info( $sql, $count_static_rows, [ '<<', $sf->{i}{ok}, @$header ] );
+    my $count_static_rows = @$tmp_info + 1; # info_count and cs_label
+    $cf->__print_filter_info( $sql, $count_static_rows, [ '<<', $sf->{i}{ok} ], $header, undef );
     my $key_1 = 'search&replace';
     my $key_2;
     for my $sr_group ( @$all_sr_groups ) {
@@ -188,17 +190,18 @@ sub __apply_to_cols {
         }
         $mark = undef if @$mark != @$prev_chosen;
     }
+    my $info = $cf->__get_filter_info( $sql, $count_static_rows, [ '<<', $sf->{i}{ok} ], $header, undef ) . join( "\n", @$tmp_info );
     # Choose
     my $col_idxs = $tu->choose_a_subset(
         $header,
-        { cs_label => 'Columns: ', info => join( "\n", @$info ), layout => 0, all_by_default => 1, index => 1,
+        { cs_label => 'Columns: ', info => $info, layout => 0, all_by_default => 1, index => 1, keep => $sf->{i}{keep},
         confirm => $sf->{i}{ok}, back => '<<', busy_string => $sf->{i}{working}, mark => $mark }
     );
     if ( ! defined $col_idxs ) {
         return;
     }
     $sf->{i}{prev_chosen_cols}{$key_1}{$key_2} = [ @{$header}[@$col_idxs] ];
-    $cf->__print_filter_info( $sql, $count_static_rows, [ '<<', $sf->{i}{ok}, @$header ] ); #
+    $cf->__print_filter_info( $sql, $count_static_rows, [ '<<', $sf->{i}{ok} ], $header, undef ); #
     $sf->__execute_substitutions( $aoa, $col_idxs, $all_sr_groups );
     $sql->{insert_into_args} = $aoa;
     return 1;
@@ -481,7 +484,11 @@ sub __get_entry_name {
     my $count = 1;
 
     NAME: while ( 1 ) {
-        my $new_name = $tf->readline( $prompt, { info => $info, default => $name_default } );
+        # Readline
+        my $new_name = $tf->readline(
+            $prompt,
+            { info => $info, default => $name_default }
+        );
         if ( ! defined $new_name || ! length $new_name ) {
             return;
         }

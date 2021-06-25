@@ -1,11 +1,9 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
 use Test::More;
-
-my $irc = TestIRC->new;
 
 my %isupport = (
    MAXCHANNELS => "10",
@@ -21,6 +19,16 @@ my %isupport = (
    CHANTYPES   => "#&",
       channame_re => qr/^[#&]/,
 );
+
+package TestIRC {
+   use base qw( Protocol::IRC );
+
+   sub new { return bless [], shift }
+
+   sub isupport { return $isupport{$_[1]} }
+}
+
+my $irc = TestIRC->new;
 
 is( $irc->isupport( "MAXCHANNELS" ), "10", 'ISUPPORT MAXCHANNELS is 10' );
 
@@ -69,10 +77,3 @@ is( $irc->classify_name( "#somewhere" ), "channel", 'classify_name #somewhere' )
 is_deeply( $irc->isupport( "chanmodes_list" ), [qw( beI k l imnpsta )], 'ISUPPORT chanmodes_list is [qw( beI k l imnpsta )]' );
 
 done_testing;
-
-package TestIRC;
-use base qw( Protocol::IRC );
-
-sub new { return bless [], shift }
-
-sub isupport { return $isupport{$_[1]} }

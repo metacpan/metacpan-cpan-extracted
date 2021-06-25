@@ -1,6 +1,6 @@
 package Geo::Coder::OpenCage;
 # ABSTRACT: Geocode coordinates and addresses with the OpenCage Geocoder
-$Geo::Coder::OpenCage::VERSION = '0.30';
+$Geo::Coder::OpenCage::VERSION = '0.33';
 use strict;
 use warnings;
 
@@ -9,7 +9,7 @@ use HTTP::Tiny;
 use JSON::MaybeXS;
 use URI;
 # FIXME - must be a way to get this from dist.ini?
-my $version = 0.30;
+my $version = 0.33;
 my $ua_string;
 
 sub new {
@@ -27,7 +27,7 @@ sub new {
         api_key => $params{api_key},
         ua      => $ua,
         json    => JSON::MaybeXS->new(utf8 => 1),
-        url     => URI->new('https://api.opencagedata.com/geocode/v1/json/'),
+        url     => URI->new('https://api.opencagedata.com/geocode/v1/json'),
     };
 
     return bless $self, $class;
@@ -85,22 +85,39 @@ sub geocode {
         }
     }
 
-    my $URL = $self->{url}->clone();
-    $URL->query_form(
-        key => $self->{api_key},
-        %params,
-    );
-
+    $params{key} = $self->{api_key};
+    
+    # sort the params for better cachability
+    my @final_params;
+    foreach my $k (sort keys %params){
+        push(@final_params, $k => $params{$k})
+        
+    }
+    my $URL = $self->{url}->clone();    
+    $URL->query_form(\@final_params);
+    #print STDERR 'url: ' . $URL->as_string . "\n";
     my $response = $self->{ua}->get($URL);
 
     if (!$response) {
-        warn "failed to fetch '$URL': ", $response->{reason};
+        my $reason = (ref($response) eq 'HTTP::Response')
+                    ? $response->status_line() # <code> <message>
+                    : $response->{reason};
+        warn "failed to fetch '$URL': ", $reason;
         return undef;
     }
 
-    my $rh_content = $self->{json}->decode($response->{content});
+    # Support HTTP::Tiny and LWP:: CPAN packages
+    my $content = (ref($response) eq 'HTTP::Response')
+                    ? $response->decoded_content()
+                    : $response->{content};
+    my $is_success = (ref($response) eq 'HTTP::Response')
+                       ? $response->is_success()
+                       : $response->{success};
 
-    if (!$response->{success}) {
+    my $rh_content = $self->{json}->decode($content);
+
+
+    if (!$is_success) {
         warn "response when requesting '$URL': " . $rh_content->{status}{code} . ', ' . $rh_content->{status}{message};
         return undef;
     }
@@ -136,7 +153,7 @@ Geo::Coder::OpenCage - Geocode coordinates and addresses with the OpenCage Geoco
 
 =head1 VERSION
 
-version 0.30
+version 0.33
 
 =head1 SYNOPSIS
 

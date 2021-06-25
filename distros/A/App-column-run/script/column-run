@@ -1,22 +1,24 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/column/run/column_run
-# and generated automatically using Perinci::CmdLine::Gen version 0.496
+# and generated automatically using Perinci::CmdLine::Gen version 0.499
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-06'; # DATE
+our $DATE = '2021-06-25'; # DATE
 our $DIST = 'App-column-run'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
+use Log::ger;
 
 use Perinci::CmdLine::Any;
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/column/run/column_run",
     program_name => "column-run",
+    log => 1,
     read_config => 0,
     read_env => 0,
 );
@@ -38,35 +40,56 @@ column-run - Run several commands and show their output in multiple columns
 
 =head1 VERSION
 
-This document describes version 0.002 of column-run (from Perl distribution App-column-run), released on 2020-06-06.
+This document describes version 0.004 of column-run (from Perl distribution App-column-run), released on 2021-06-25.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % column-run [--arg=s+] [--args-json=s] [--command=s+] [--commands-json=s]
-     [--linum-width=s] [--no-show-linum] [--noshow-linum]
-     [--on-long-line=s] [--page-result[=program]] [--separator=s]
-     [--show-linum] [--view-result[=program]] [--wrap] <command> ...
+ % column-run [--args-arrays-json=s] [--args-arrays=s] [--command=s+]
+     [--commands-json=s] [--common-arg=s+] [--common-args-json=s]
+     [--common-env key=s] [--common-envs-json=s] [--debug]
+     [--envs-arrays-json=s] [--envs-arrays=s] [--linum-width=s]
+     [--log-level=level] [--no-show-linum] [--noshow-linum]
+     [--on-long-line=s] [--page-result[=program]] [--quiet] [--separator=s]
+     [--show-linum] [--trace] [--verbose] [--view-result[=program]]
+     [--wrap] <command> ...
+
+Examples:
+
+Compare JSON vs Perl Data::Dump vs YAML dump, side by side:
+
+ % cat ~/samples/bookstore.json | COLOR=1 column-run pp-json json2dd json2yaml
+
+Compare different color themes:
+
+ % cat ~/samples/bookstore.json | COLOR=1 column-run --envs-arrays-json '[{"DATA_DUMP_COLOR_THEME":"Default256"},{"DATA_DUMP_COLOR_THEME":"Default16"}]' 'json2dd --dumper=Data::Dump::Color' 'json2dd --dumper=Data::Dump::Color'
 
 =head1 DESCRIPTION
 
 This utility is similar to using the Unix utility L<pr> to columnate output,
 something like (in bash):
 
- % pr -t -m -w $COLUMNS -l 99999 <(command1 args...) <(command2 args...)
+ % pr -T -m -w $COLUMNS <(command1 args...) <(command2 args...)
 
-except with the following features:
+except with the following differences:
 
 =over
 
-=item * ANSI color and wide character handling
+=item * commands are run in sequence, not in parallel (although parallel execution is
+a TODO list item);
 
-=item * passing adjusted COLUMNS environment to commands so they can adjust output
+=item * all output are collected first, then displayed (although streaming output is a
+TODO list item);
 
-=item * Passing common arguments to all commands
+=item * multiplexing STDIN to all commands;
 
-=item * Multiplexing STDIN to all commands
+=item * ANSI color and wide character handling;
+
+=item * passing adjusted COLUMNS environment to commands so they can adjust output;
+
+=item * passing common arguments and environment variables to all commands (as well as
+allowing each command to have its unique arguments or environment variables).
 
 =back
 
@@ -78,25 +101,69 @@ C<*> marks required options.
 
 =over
 
-=item B<--arg>=I<s@>
+=item B<--args-arrays-json>=I<s>
 
-Common arguments to pass to each program.
+Arguments to give to each command (an array of arrays of strings) (JSON-encoded).
 
-Can be specified multiple times.
+See C<--args-arrays>.
 
-=item B<--args-json>=I<s>
+=item B<--args-arrays>=I<s>
 
-Common arguments to pass to each program (JSON-encoded).
+Arguments to give to each command (an array of arrays of strings).
 
-See C<--arg>.
+If `--common-args` is also set, then the common arguments will be added first,
+then the per-command arguments.
+
 
 =item B<--command>=I<s@>*
+
+Can also be specified as the 1st command-line argument and onwards.
 
 Can be specified multiple times.
 
 =item B<--commands-json>=I<s>
 
 See C<--command>.
+
+Can also be specified as the 1st command-line argument and onwards.
+
+=item B<--common-arg>=I<s@>
+
+Common arguments to pass to each command.
+
+If `--args-arrays` is also set, then the common arguments will be added first,
+then the per-command arguments.
+
+
+Can be specified multiple times.
+
+=item B<--common-args-json>=I<s>
+
+Common arguments to pass to each command (JSON-encoded).
+
+See C<--common-arg>.
+
+=item B<--common-env>=I<s>%
+
+Common environment variables to pass to each command.
+
+Each value is a name-value pair, use I<key=value> syntax. Can be specified multiple times.
+
+=item B<--common-envs-json>=I<s>
+
+Common environment variables to pass to each command (JSON-encoded).
+
+See C<--common-env>.
+
+=item B<--envs-arrays-json>=I<s>
+
+Environment variables to give to each command (an array of hashes of strings) (JSON-encoded).
+
+See C<--envs-arrays>.
+
+=item B<--envs-arrays>=I<s>
+
+Environment variables to give to each command (an array of hashes of strings).
 
 =item B<--linum-width>=I<s>
 
@@ -131,6 +198,32 @@ Show line number.
 Shortcut for --on-long-line=wrap.
 
 See C<--on-long-line>.
+
+=back
+
+=head2 Logging options
+
+=over
+
+=item B<--debug>
+
+Shortcut for --log-level=debug.
+
+=item B<--log-level>=I<s>
+
+Set log level.
+
+=item B<--quiet>
+
+Shortcut for --log-level=error.
+
+=item B<--trace>
+
+Shortcut for --log-level=trace.
+
+=item B<--verbose>
+
+Shortcut for --log-level=info.
 
 =back
 
@@ -226,7 +319,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

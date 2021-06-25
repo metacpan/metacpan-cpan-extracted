@@ -1,5 +1,14 @@
 Revision history for Perl module Date::QuarterOfYear
 
+0.05 2021-06-19 NEILB
+    - Can now handle YYYY-M-D (single dates for days and months).
+      Addresses GF#1 from Tore Aursand.
+    - Handle situation where input is the wrong format entirely.
+
+0.04 2021-06-14 NEILB
+    - Added tests for all the error checking on params
+    - Switched to github issues for bug tracker
+
 0.03 2015-10-27 NEILB
     - Updated github repo URL after changing my github username
     - Include a META.json in releases, and tag & push to github on release

@@ -1,8 +1,8 @@
 use strict;
 use warnings;
-package Acme::ProgressBar;
+package Acme::ProgressBar 1.129;
 # ABSTRACT: a simple progress bar for the patient
-$Acme::ProgressBar::VERSION = '1.128';
+
 use Time::HiRes ();
 
 #pod =head1 SYNOPSIS
@@ -99,7 +99,7 @@ Acme::ProgressBar - a simple progress bar for the patient
 
 =head1 VERSION
 
-version 1.128
+version 1.129
 
 =head1 SYNOPSIS
 
@@ -112,6 +112,14 @@ Acme::ProgressBar provides a simple solution designed to provide accurate
 countdowns.  No progress bar object needs to be created, and all the
 calculation of progress through total time required is handled by the module
 itself.
+
+=head1 PERL VERSION SUPPORT
+
+This module is shipped with no promise about what version of perl it will
+require in the future.  In practice, this tends to mean "you need a perl from
+the last three years," but you can't rely on that.  If a new version of perl
+ship, this software B<may> begin to require it for any reason, and there is no
+promise that patches will be accepted to lower the minimum required perl.
 
 =head1 FUNCTIONS
 
@@ -143,23 +151,13 @@ L<Progress::Any::Output::TermProgressBarColor>, L<Smart::Comments>
 
 =head1 AUTHOR
 
-Ricardo Signes <rjbs@cpan.org>
+Ricardo Signes <rjbs@semiotic.systems>
 
-=head1 CONTRIBUTORS
+=head1 CONTRIBUTOR
 
-=for stopwords Ricardo SIGNES Sean Zellmer
-
-=over 4
-
-=item *
-
-Ricardo SIGNES <rjbs@codesimply.com>
-
-=item *
+=for stopwords Sean Zellmer
 
 Sean Zellmer <sean@lejeunerenard.com>
-
-=back
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -27,8 +27,8 @@ typedef HANDLE SOCKETHANDLE;
 #endif
 
 #define DEFAULT_SYSTEM_FONT              "System"
-#define DEFAULT_WIDGET_FONT              "MS Shell Dlg"
-#define DEFAULT_WIDGET_FONT_SIZE         8
+#define DEFAULT_WIDGET_FONT              (((DWORD)(LOBYTE(LOWORD(guts.version)))>5)?"Segoe UI":"MS Shell Dlg")
+#define DEFAULT_WIDGET_FONT_SIZE         (((DWORD)(LOBYTE(LOWORD(guts.version)))>5)?9:8)
 #define COLOR_TOLERANCE                  4
 #define HASMATE_MAGIC                    0xDEAF0CE1
 #define MENU_ID_AUTOSTART                100
@@ -58,6 +58,7 @@ typedef HANDLE SOCKETHANDLE;
 #define WM_CROAK                          ( WM_USER + 20)
 #define WM_REPAINT_LAYERED                ( WM_USER + 21)
 #define WM_DRAG_RESPONSE                  ( WM_USER + 22)
+#define WM_XMOUSECLICK                    ( WM_USER + 23)
 #define WM_TERMINATE                      ( WM_USER + 99)
 #define WM_FIRST_USER_MESSAGE             ( WM_USER +100)
 #define WM_LAST_USER_MESSAGE              ( WM_USER +900)
@@ -93,9 +94,9 @@ typedef HANDLE SOCKETHANDLE;
 #define apcWarn \
 	if (debug) \
 		warn( "win32 error 0x%x: '%s' at line %d in %s\n", (unsigned int)rc, \
-			err_msg( rc, nil), __LINE__, __FILE__);   \
+			err_msg( rc, NULL), __LINE__, __FILE__);   \
 	else \
-		err_msg( rc, nil)
+		err_msg( rc, NULL)
 
 #define apcErr( err) apcError = err
 #define apiErr {           \
@@ -581,6 +582,7 @@ extern PItemRegRec  timeDefs;
 extern PHash        menuBitmapMan;
 extern HBITMAP      uncheckedBitmap;
 extern PHash        scriptCacheMan;
+extern HCURSOR      arrowCursor;
 
 LRESULT CALLBACK    generic_app_handler      ( HWND win, UINT  msg, WPARAM mp1, LPARAM mp2);
 LRESULT CALLBACK    generic_frame_handler    ( HWND win, UINT  msg, WPARAM mp1, LPARAM mp2);

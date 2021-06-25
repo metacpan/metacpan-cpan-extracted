@@ -4,7 +4,7 @@ Plack::Middleware::Statsd - send statistics to statsd
 
 # VERSION
 
-version v0.4.7
+version v0.5.0
 
 # SYNOPSIS
 
@@ -100,6 +100,44 @@ method.  You do not need to set this unless you want to override it.
 It takes as arguments the Plack environment and the arguments to pass
 to the client method, and calls that method.  If there are errors then
 it attempts to log them.
+
+## catch\_errors
+
+If this is set to "1", then any fatal errors in the PSGI application
+will be caught and logged, and metrics will continue to be logged.
+
+Alternatively, you may specify a subroutine that handles the errors
+and returns a valid response, for example.
+
+```perl
+sub handle_errors {
+  my ( $env, $error ) = @_;
+
+  if ( my $logger = $env->{'psgix.logger'} ) {
+      $logger->( { level => 'error', message => $error } );
+  }
+  else {
+      $env->{'psgi.errors'}->print($error);
+  }
+
+  return [
+    503,
+    [
+       'Content-Type'   => 'text/plain',
+       'Content-Length' => 11,
+    ],
+    [ 'Unavailable' ]
+  ];
+}
+
+...
+
+enable "Statsd",
+   catch_errors => \&handle_errors;
+```
+
+This is disable by default, which means that no metrics will be logged
+if there is a fatal error.
 
 # METRICS
 

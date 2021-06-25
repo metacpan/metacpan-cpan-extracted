@@ -1,28 +1,32 @@
 Revision history for Perl module Crypt::RandPasswd
 
-0.06 2014-05-28
+0.07 2021-06-18 JANITOR
+    - Switched to Dist::Zilla
+    - Added some more modules to SEE ALSO
+
+0.06 2014-05-28 NEILB
     - Fixed typo in code comment (thanks dsteinbrunner)
     - Added github repo to pod
     - Added intro paragraph to doc and beefed up SEE ALSO section
 
-0.05 2014-02-03
+0.05 2014-02-03 NEILB
     - Replaced old testsuite (test.pl) with tests in t/
     - Added "use warnings"
     - Specified min version of perl 5.6.0
     - Fixed pod errors
     - Changed doc for internal funcs from pod to comments
 
-0.04 2013-10-28
+0.04 2013-10-28 NEILB
     - github repo and license type (perl) now specified in Makefile.PL
       so it will appear in the dist's metadata.
 
-0.03 2013-04-10
+0.03 2013-04-10 NEILB
     - Fixed bug where word() would sometimes go into an infinite loop
     - Reformatted according to CPAN::Changes::Spec
 
-0.02 2000-07-21
+0.02 2000-07-21 JDPORTER
     - Added README file.
 
-0.01 2000-07-20
+0.01 2000-07-20 JDPORTER
     - original version; created by h2xs 1.19
 

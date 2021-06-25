@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use 5.008001;
 use base qw( Exporter );
-use FFI::Platypus;
+use FFI::Platypus 1.00;
 use FFI::CheckLib 0.11 ();
 use File::Basename ();
 use Cwd ();
@@ -13,9 +13,9 @@ use Test2::API qw( context );
 use Test2::EventFacet::Trace;
 
 # ABSTRACT: Tools for testing FFI
-our $VERSION = '0.05'; # VERSION
+our $VERSION = '0.06'; # VERSION
 
-our @EXPORT = qw( ffi );
+our @EXPORT = qw( ffi ffi_options );
 
 
 {
@@ -29,6 +29,28 @@ our @EXPORT = qw( ffi );
     }
 
     $singleton;
+  }
+
+
+  sub ffi_options
+  {
+    my(%options) = @_;
+    Carp::croak("Please call ffi_options before calling ffi")
+      if defined $singleton;
+
+    my $ffi = ffi();
+
+    my @new_args;
+
+    if(my $api = delete $options{api})
+    {
+      push @new_args, api => $api;
+    }
+
+    $ffi->{new_args} = \@new_args;
+
+    Carp::croak("Unknown option or options: @{[ sort keys %options ]}")
+      if %options;
   }
 }
 
@@ -92,9 +114,9 @@ sub _diag
 
 {
   local $ENV{FFI_PLATYPUS_DLERROR} = 1;
-  our $ffi = FFI::Platypus->new;
+  our $ffi = FFI::Platypus->new( api => 1 );
   our @closures = map { $ffi->closure($_) } \&_note, \&_diag, \&_pass, \&_fail;
-  $ffi->package;
+  $ffi->bundle;
   $ffi->type('(string,string,string,int,string)->void' => 'message_cb_t');
   $ffi
     ->function(t2t_simple_init => ['message_cb_t','message_cb_t','message_cb_t','message_cb_t'] => 'void')
@@ -109,7 +131,7 @@ sub runtime
   my($self) = @_;
 
   $self->{runtime} ||= (sub {
-    my $ffi = Test2::Tools::FFI::Platypus->new;
+    my $ffi = Test2::Tools::FFI::Platypus->new( @{ $self->{new_args} } );
 
     my @dll = File::Glob::bsd_glob("blib/lib/auto/share/dist/*/lib/*");
     if(@dll)
@@ -129,12 +151,46 @@ sub runtime
 }
 
 
+sub _build_test
+{
+  if(-d "t/ffi")
+  {
+    require FFI::Build::MM;
+    require Capture::Tiny;
+
+    my($output, $error) = Capture::Tiny::capture_merged(sub {
+      local $@ = '';
+      eval {
+        my $fbmm = FFI::Build::MM->new( save => 0 );
+        $fbmm->mm_args( DISTNAME => "My-Test" );  # the DISTNAME isn't used for building the test anyway.
+        $fbmm->test->build;
+      };
+      $@;
+    });
+    if($error)
+    {
+      my $ctx = Test2::API::context();
+      $ctx->diag($error);
+      $ctx->diag($output);
+      $ctx->release;
+      die $error;
+    }
+    else
+    {
+      my $ctx = Test2::API::context();
+      $ctx->note($output);
+      $ctx->release;
+    }
+  }
+}
+
 sub test
 {
   my($self) = @_;
 
   $self->{test} ||= do {
-    my $ffi = Test2::Tools::FFI::Platypus->new;
+    _build_test();
+    my $ffi = Test2::Tools::FFI::Platypus->new( @{ $self->{new_args} } );
     my @lib = FFI::CheckLib::find_lib(
       lib => '*',
       libpath => 't/ffi/_build',
@@ -153,9 +209,10 @@ sub combined
   my($self) = @_;
 
   $self->{combined} ||= do {
+    _build_test();
     my $rt = $self->runtime;
     my $t  = $self->test;
-    my $ffi = Test2::Tools::FFI::Platypus->new;
+    my $ffi = Test2::Tools::FFI::Platypus->new( @{ $self->{new_args} } );
     $ffi->lib($rt->lib, $t->lib);
     $ffi;
   };
@@ -198,7 +255,7 @@ Test2::Tools::FFI - Tools for testing FFI
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 
@@ -227,6 +284,21 @@ In your t/mytest.t:
 This Test2 Tools module provide some basic tools for testing FFI modules.
 
 =head1 FUNCTIONS
+
+=head2 ffi_options
+
+ ffi_options %options;
+
+This must be run before any C<< ffi-> >> functions.  Options available:
+
+=over 4
+
+=item api
+
+The L<FFI::Platypus> api level.  Zero (0) by default for backward compat,
+but it is recommended that you use One (1).
+
+=back
 
 =head2 ffi->runtime
 

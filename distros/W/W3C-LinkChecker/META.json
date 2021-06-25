@@ -1,0 +1,85 @@
+{
+   "abstract" : "W3C Link Checker",
+   "author" : [
+      "W3C QA-dev Team <public-qa-dev@w3.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "open_source"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "W3C-LinkChecker",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CGI" : "0",
+            "CGI::Carp" : "0",
+            "CGI::Cookie" : "0",
+            "CSS::DOM" : "0.09",
+            "CSS::DOM::Constants" : "0",
+            "CSS::DOM::Style" : "0",
+            "CSS::DOM::Util" : "0",
+            "Config::General" : "2.06",
+            "Encode" : "0",
+            "Encode::Locale" : "0",
+            "File::Spec" : "0",
+            "Getopt::Long" : "2.17",
+            "HTML::Entities" : "0",
+            "HTML::Parser" : "3.40",
+            "HTTP::Cookies" : "0",
+            "HTTP::Headers::Util" : "0",
+            "HTTP::Message" : "5.827",
+            "HTTP::Request" : "0",
+            "HTTP::Response" : "1.50",
+            "LWP::RobotUA" : "1.19",
+            "LWP::UserAgent" : "0",
+            "Locale::Country" : "0",
+            "Locale::Language" : "0",
+            "Net::HTTP::Methods" : "5.833",
+            "Net::IP" : "0",
+            "Net::hostent" : "0",
+            "Socket" : "0",
+            "Term::ReadKey" : "2",
+            "Test::More" : "0",
+            "Text::Wrap" : "0",
+            "Time::HiRes" : "0",
+            "URI" : "1.53",
+            "URI::Escape" : "0",
+            "URI::file" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/w3c/link-checker/issues/"
+      },
+      "homepage" : "https://validator.w3.org/checklink",
+      "repository" : {
+         "url" : "https://github.com/w3/link-checker/"
+      },
+      "x_MailingList" : "https://lists.w3.org/Archives/Public/www-validator/"
+   },
+   "version" : "v5.0.0",
+   "x_serialization_backend" : "JSON::PP version 4.02"
+}

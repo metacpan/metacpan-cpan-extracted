@@ -4,7 +4,7 @@
       "Jan Henning Thorsen <jhthorsen@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -30,7 +30,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Mojolicious" : "8.00",
+            "Mojolicious" : "9.11",
             "Text::CSV" : "1.30"
          }
       },
@@ -52,9 +52,9 @@
          "web" : "https://github.com/jhthorsen/app-mojopaste"
       }
    },
-   "version" : "1.04",
+   "version" : "1.05",
    "x_contributors" : [
       "Jan Henning Thorsen <jhthorsen@cpan.org>"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

@@ -76,12 +76,17 @@
          "web" : "https://github.com/perlancar/perl-Data-Dump-Color"
       }
    },
-   "version" : "0.245",
+   "version" : "0.248",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"
       },
       "plugins" : [
+         {
+            "class" : "Dist::Zilla::Plugin::InsertDistImage",
+            "name" : "InsertDistImage",
+            "version" : "0.005"
+         },
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::CheckPendingRelease",
             "name" : "@Author::PERLANCAR/PERLANCAR::CheckPendingRelease",

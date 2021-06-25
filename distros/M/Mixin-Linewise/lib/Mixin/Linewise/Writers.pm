@@ -1,8 +1,8 @@
 use strict;
 use warnings;
-package Mixin::Linewise::Writers;
+package Mixin::Linewise::Writers 0.110;
 # ABSTRACT: get linewise writers for strings and filenames
-$Mixin::Linewise::Writers::VERSION = '0.108';
+
 use 5.008001; # PerlIO
 use Carp ();
 use IO::File;
@@ -153,7 +153,7 @@ Mixin::Linewise::Writers - get linewise writers for strings and filenames
 
 =head1 VERSION
 
-version 0.108
+version 0.110
 
 =head1 SYNOPSIS
 
@@ -175,6 +175,17 @@ Then:
   Your::Pkg->write_string($data, $string);
 
   Your::Pkg->write_handle($data, $fh);
+
+=head1 PERL VERSION SUPPORT
+
+This module has the same support period as perl itself:  it supports the two
+most recent versions of perl.  (That is, if the most recently released version
+is v5.40, then this module should work on both v5.40 and v5.38.)
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
 
 =head1 EXPORTS
 
@@ -224,7 +235,7 @@ argument: C<binmode>.
 
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@cpan.org>
+Ricardo SIGNES <rjbs@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

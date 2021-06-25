@@ -1,0 +1,18 @@
+use alienfile;
+
+probe sub { $_[0]->runtime_prop->{ffi_name} = 'wslay' };
+plugin qw'Probe::CBuilder libs -lwslay';
+
+share {
+    start_url 'https://github.com/tatsuhiro-t/wslay/releases';
+    plugin 'Download' => (filter => qr/wslay-(?:[0-9\.]+)\.tar\.gz$/, version => qr/([0-9\.]+)/);
+    plugin qw'Extract tar.gz';
+    plugin 'Build::Autoconf';
+    build ['%{configure}', '%{make}', '%{make} install'];
+    plugin 'Gather::IsolateDynamic';
+    gather sub {
+        my ($build) = @_;
+        my $prefix = $build->runtime_prop->{prefix};
+        $build->runtime_prop->{cflags} = "-I$prefix/include ";
+        $build->runtime_prop->{libs} = "-L$prefix/lib -lwslay "; }
+};

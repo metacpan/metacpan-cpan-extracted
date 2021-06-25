@@ -5,18 +5,25 @@ use Test::More;
 
 use List::Util qw(sum);
 use EventStore::Tiny::Event;
+use EventStore::Tiny::TransformationStore;
 
 use_ok 'EventStore::Tiny::EventStream';
 
 my @test_numbers = (17, 25, 42);
 
-# Prepare events that add 17 or 25 or 42 to a state's "key" entry:
+# Prepare transformations that add 17 or 25 or 42 to a state's "key" entry:
+my $ts = EventStore::Tiny::TransformationStore->new;
+for my $i (@test_numbers) {
+    $ts->set("Trans$i" => sub {$_[0]->{key} += $i});
+}
+
+# Prepare events according to these transformations
 sub _test_events {
     return [map {
-        my $add = $_;
-        EventStore::Tiny::Event->new(name => 't', transformation => sub {
-            $_[0]->{key} += $add;
-        })
+        EventStore::Tiny::Event->new(
+            name        => "Trans$_",
+            trans_store => $ts,
+        );
     } @test_numbers];
 }
 

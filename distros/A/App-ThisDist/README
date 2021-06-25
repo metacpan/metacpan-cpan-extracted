@@ -3,8 +3,8 @@ NAME
     with current directory
 
 VERSION
-    This document describes version 0.009 of App::ThisDist (from Perl
-    distribution App-ThisDist), released on 2021-04-02.
+    This document describes version 0.011 of App::ThisDist (from Perl
+    distribution App-ThisDist), released on 2021-06-22.
 
 DESCRIPTION
     See included scripts:
@@ -12,6 +12,9 @@ DESCRIPTION
     *   this-dist
 
     *   this-mod
+
+CONTRIBUTOR
+    perlancar (on netbook-dell-xps13) <perlancar@gmail.com>
 
 FUNCTIONS
   this_dist
@@ -23,6 +26,10 @@ FUNCTIONS
     $extract_version is set to true, will also try to extract distribution
     version and will return "?" for version when version cannot be found.
 
+  this_mod
+    A thin wrapper for "this_dist". It just converts "-" in the result to
+    "::", so "Foo-Bar" becomes "Foo::Bar".
+
 HOMEPAGE
     Please visit the project's homepage at
     <https://metacpan.org/release/App-ThisDist>.
@@ -33,7 +40,7 @@ SOURCE
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website
-    <https://github.com/perlancar/perl-App-ThisDist/issues>
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-ThisDist>
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.

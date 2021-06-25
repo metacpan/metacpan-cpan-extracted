@@ -282,6 +282,31 @@ our $DEBUG = 0;
     is( $should_reach, 1, 'error caught with where clause' );
 }
 
+# Bug report 2021-06-18
+{
+    {
+      package MyException;
+      use overload '""' => 'message';
+      sub message { $_[0]->{message} }
+      sub new { my $class = shift; bless { @_ }, $class }
+      sub throw { my $class = shift; die $class->new(message => shift) }
+    }
+
+    my $check;
+    try {
+      MyException->throw("hi\n");
+    }
+    catch (MyException $e) {
+      # warn "working catch: $e";
+      $check = 1;
+    }
+    catch ($e) {
+      # warn "broken catch: $e";
+      $check = 2;
+    }
+    is( $check, 1, 'overloaded exception' );
+}
+
 done_testing;
 
 package Exception;

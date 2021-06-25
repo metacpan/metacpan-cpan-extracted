@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/Dynamic.pm
-## Version v1.0.0
+## Version v1.0.1
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/20
-## Modified 2021/03/20
+## Modified 2021/04/18
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -14,11 +14,12 @@ package Module::Generic::Dynamic;
 BEGIN
 {
     use strict;
+    use warnings;
     use parent qw( Module::Generic );
     use warnings::register;
     use Scalar::Util ();
     # use Class::ISA;
-    our( $VERSION ) = 'v1.0.0';
+    our( $VERSION ) = 'v1.0.1';
 };
 
 sub new
@@ -84,6 +85,7 @@ EOT
             $clean_field =~ s/\_{2,}/_/g;
             $clean_field =~ s/[^a-zA-Z0-9\_]+//g;
             $clean_field =~ s/^\d+//g;
+            next unless( length( $clean_field ) );
 #             my( $new_class, $clean_field ) = $make_class->( $k );
             # print( STDERR __PACKAGE__, "::new(): Is hash looping? ", ( $hash->{ $k }->{_looping} ? 'yes' : 'no' ), " (", ref( $hash->{ $k }->{_looping} ), ")\n" );
 #             my $o = $hash->{ $k }->{_looping} ? $hash->{ $k }->{_looping} : $new_class->new( $hash->{ $k } );
@@ -126,6 +128,8 @@ EOT
             $clean_field =~ s/\_{2,}/_/g;
             $clean_field =~ s/[^a-zA-Z0-9\_]+//g;
             $clean_field =~ s/^\d+//g;
+            # Possibly there is no acceptable characters to make a field out of it
+            next unless( length( $clean_field ) );
             eval( "sub ${new_class}::${clean_field} { return( shift->_set_get_scalar_as_object( '$clean_field', \@_ ) ); }" );
             $self->$clean_field( $hash->{ $k } );
         }
@@ -135,6 +139,15 @@ EOT
         }
     }
     return( $self );
+}
+
+sub TO_JSON
+{
+    my $self = shift( @_ );
+    my $ref  = { %$self };
+    CORE::delete( $ref->{_data} );
+    CORE::delete( $ref->{_data_repo} );
+    return( $ref );
 }
 
 AUTOLOAD

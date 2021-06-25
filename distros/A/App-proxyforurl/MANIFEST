@@ -1,3 +1,4 @@
+.perltidyrc
 .ship.conf
 .travis.yml
 Changes
@@ -6,7 +7,7 @@ Dockerfile
 lib/App/proxyforurl.pm
 Makefile.PL
 MANIFEST			This list of files
-README
+README.md
 script/proxyforurl
 t/00-basic.t
 t/app.t

@@ -1,6 +1,6 @@
-package Pod::Weaver::Config;
+package Pod::Weaver::Config 4.018;
 # ABSTRACT: stored configuration loader role
-$Pod::Weaver::Config::VERSION = '4.017';
+
 use Moose::Role;
 
 use Config::MVP 2;
@@ -47,12 +47,23 @@ Pod::Weaver::Config - stored configuration loader role
 
 =head1 VERSION
 
-version 4.017
+version 4.018
 
 =head1 DESCRIPTION
 
 The config role provides some helpers for writing a configuration loader using
 the L<Config::MVP|Config::MVP> system to load and validate its configuration.
+
+=head1 PERL VERSION SUPPORT
+
+This module has the same support period as perl itself:  it supports the two
+most recent versions of perl.  (That is, if the most recently released version
+is v5.40, then this module should work on both v5.40 and v5.38.)
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
 
 =head1 ATTRIBUTES
 
@@ -64,7 +75,7 @@ will be pre-loaded with a starting section for root configuration.
 
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@cpan.org>
+Ricardo SIGNES <rjbs@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -101,8 +101,11 @@ t/00-check-deps.t
 t/00-compile.t
 t/00-report-prereqs.dd
 t/00-report-prereqs.t
+t/RPC/full-cycle.t
+t/RPC/memory.t
 t/RPC/message.t
-t/RPC/perl.t
+t/RPC/multiple-rpcs.t
+t/batch.t
 t/bootstrap.t
 t/class.t
 t/commands.t
@@ -118,7 +121,6 @@ t/storage.t
 t/subscription.t
 t/syntax.t
 t/transport/memory.t
-t/transport/redis.t
 t/util/secret.t
 xt/author/distmeta.t
 xt/author/eol.t

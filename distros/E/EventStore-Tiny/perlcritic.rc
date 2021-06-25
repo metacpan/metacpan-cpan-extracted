@@ -4,5 +4,12 @@ verbose  = [%p] %m at line %l near '%r' in %F (Severity %s)\n
 [Variables::ProhibitPackageVars]
 packages = Storable
 
+[TestingAndDebugging::ProhibitNoWarnings]
+allow = experimental::signatures
+
 [-RegularExpressions::RequireExtendedFormatting]
 [-BuiltinFunctions::ProhibitComplexMappings]
+[-NamingConventions::ProhibitAmbiguousNames]
+[-Subroutines::RequireFinalReturn]
+[-ErrorHandling::RequireCarping]
+[-Subroutines::ProhibitSubroutinePrototypes]

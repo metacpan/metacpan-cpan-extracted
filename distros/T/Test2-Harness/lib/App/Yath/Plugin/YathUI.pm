@@ -2,7 +2,7 @@ package App::Yath::Plugin::YathUI;
 use strict;
 use warnings;
 
-our $VERSION = '1.000057';
+our $VERSION = '1.000058';
 
 use File::Spec;
 use Test2::Harness::Util qw/read_file mod2file/;
@@ -77,6 +77,13 @@ option_group {prefix => 'yathui', category => "YathUI Options"} => sub {
         default => 0,
         applicable => \&can_finder,
     );
+
+#    TODO
+#    option median_durations => (
+#        type => 'b',
+#        description => "Get median duration data",
+#        default => 0,
+#    );
 
     option medium_duration => (
         type => 's',

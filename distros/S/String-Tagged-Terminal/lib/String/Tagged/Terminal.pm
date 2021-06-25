@@ -1,20 +1,17 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2017-2018 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2017-2021 -- leonerd@leonerd.org.uk
 
-package String::Tagged::Terminal;
+package String::Tagged::Terminal 0.05;
 
-use strict;
+use v5.14;
 use warnings;
-use 5.010; # //
 
 use base qw( String::Tagged );
 
 use constant HAVE_MSWIN32 => $^O eq "MSWin32";
 HAVE_MSWIN32 and require String::Tagged::Terminal::Win32Console;
-
-our $VERSION = '0.04';
 
 require IO::Handle;
 
@@ -60,6 +57,12 @@ colour, or xterm 256 palette mode attributes, depending on the value.
 
 The ECMA-48-corrected string encoding form of C<CSI 38:5:nnn m> is used to set
 the 256 palette values.
+
+Values will be rounded down to the nearest integer by calling C<int()>. This
+convenience allows things like the C<rand> function for generating random
+colours:
+
+   $st->append_tagged( "text", fgindex => 1 + rand 6 );
 
 =cut
 
@@ -188,17 +191,18 @@ sub build_terminal
          [ bgindex => 40 ],
       ) {
          my ( $tag, $base ) = @$_;
+         my $val = $tags{$tag};
+         $val = int $val if defined $val;
 
-         if( defined $pen{$tag} and !defined $tags{$tag} ) {
+         if( defined $pen{$tag} and !defined $val ) {
             # Turn it off
             push @sgr, $base + 9;
             delete $pen{$tag};
          }
-         elsif( defined $pen{$tag} and defined $tags{$tag} and $pen{$tag} == $tags{$tag} ) {
+         elsif( defined $pen{$tag} and defined $val and $pen{$tag} == $val ) {
             # Leave it
          }
-         elsif( defined $tags{$tag} ) {
-            my $val = $tags{$tag};
+         elsif( defined $val ) {
             if( $val < 8 ) {
                # VGA 8
                push @sgr, $base + $val;

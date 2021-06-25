@@ -3,7 +3,7 @@ package Beekeeper::Client;
 use strict;
 use warnings;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 use Beekeeper::MQTT;
 use Beekeeper::JSONRPC;
@@ -14,6 +14,10 @@ use Sys::Hostname;
 use Time::HiRes;
 use Digest::SHA 'sha256_hex';
 use Carp;
+
+# Prefer AnyEvent perl backend as it is fast enough and it
+# does not ignore exceptions thrown from within callbacks
+$ENV{'PERL_ANYEVENT_MODEL'} ||= 'Perl' unless $AnyEvent::MODEL;
 
 use constant QUEUE_LANES => 2;
 use constant REQ_TIMEOUT => 60;
@@ -48,13 +52,14 @@ sub new {
     };
 
     $self->{_CLIENT} = {
-        forward_to     => $args{'forward_to'},
+        forward_to     => undef,
         response_topic => undef,
         in_progress    => undef,
         curr_request   => undef,
         caller_id      => undef,
         caller_addr    => undef,
         auth_data      => undef,
+        auth_salt      => undef,
         async_cv       => undef,
         correlation_id => 1,
         callbacks      => {},
@@ -88,6 +93,9 @@ sub new {
             }
         }
     }
+
+    $self->{_CLIENT}->{forward_to} = delete $args{'forward_to'};
+    $self->{_CLIENT}->{auth_salt}  = delete $args{'auth_salt'};
 
     # Start a fresh new MQTT session on connect
     $args{'clean_start'} = 1;
@@ -138,7 +146,7 @@ sub send_notification {
 
     $fq_meth =~ m/^     ( [\w-]+ (?:\.[\w-]+)* )
                      \. ( [\w-]+ ) 
-                 (?: \@ ( [\w-]+ ) (\.[\w-]+)* )? $/x or croak "Invalid method $fq_meth";
+                 (?: \@ ( [\w-]+ ) (\.[\w-]+)* )? $/x or croak "Invalid method '$fq_meth'";
 
     my ($service, $method, $remote_bus, $addr) = ($1, $2, $3, $4);
 
@@ -182,22 +190,25 @@ sub send_notification {
 sub accept_notifications {
     my ($self, %args) = @_;
 
+    my ($file, $line) = (caller)[1,2];
+    my $at = "at $file line $line\n";
+
     my $callbacks = $self->{_CLIENT}->{callbacks};
 
     foreach my $fq_meth (keys %args) {
 
         $fq_meth =~ m/^  ( [\w-]+ (?: \.[\w-]+ )* ) 
-                      \. ( [\w-]+ | \* ) $/x or croak "Invalid notification method $fq_meth";
+                      \. ( [\w-]+ | \* ) $/x or croak "Invalid notification method '$fq_meth'";
 
         my ($service, $method) = ($1, $2);
 
         my $callback = $args{$fq_meth};
 
         unless (ref $callback eq 'CODE') {
-            croak "Invalid callback for '$method'";
+            croak "Invalid callback for '$fq_meth'";
         }
 
-        croak "Already accepting notifications $fq_meth" if exists $callbacks->{"msg.$fq_meth"};
+        croak "Already accepting notifications '$fq_meth'" if exists $callbacks->{"msg.$fq_meth"};
         $callbacks->{"msg.$fq_meth"} = $callback;
 
         #TODO: Allow to accept private notifications without subscribing
@@ -210,23 +221,23 @@ sub accept_notifications {
         $self->{_BUS}->subscribe(
             topic      => $topic,
             on_publish => sub {
-                my ($body_ref, $msg_headers) = @_;
+                my ($payload_ref, $mqtt_properties) = @_;
 
                 local $@;
-                my $request = eval { decode_json($$body_ref) };
+                my $request = eval { decode_json($$payload_ref) };
 
                 unless (ref $request eq 'HASH' && $request->{jsonrpc} eq '2.0') {
-                    warn "Received invalid JSON-RPC 2.0 notification";
+                    warn "Received invalid JSON-RPC 2.0 notification $at";
                     return;
                 }
 
                 bless $request, 'Beekeeper::JSONRPC::Notification';
-                $request->{_headers} = $msg_headers;
+                $request->{_mqtt_prop} = $mqtt_properties;
 
                 my $method = $request->{method};
 
                 unless (defined $method && $method =~ m/^([\.\w-]+)\.([\w-]+)$/) {
-                    warn "Received notification with invalid method $method";
+                    warn "Received notification with invalid method '$method' $at";
                     return;
                 }
 
@@ -234,7 +245,7 @@ sub accept_notifications {
                          $callbacks->{"msg.$1.*"};
 
                 unless ($cb) {
-                    warn "No callback found for received notification $method";
+                    warn "No callback found for received notification '$method' $at";
                     return;
                 }
 
@@ -242,7 +253,7 @@ sub accept_notifications {
             },
             on_suback => sub {
                 my ($success, $prop) = @_;
-                croak "Could not subscribe to $topic" unless $success;
+                die "Could not subscribe to topic '$topic' $at" unless $success;
             }
         );
     }
@@ -252,17 +263,20 @@ sub accept_notifications {
 sub stop_accepting_notifications {
     my ($self, @methods) = @_;
 
+    my ($file, $line) = (caller)[1,2];
+    my $at = "at $file line $line\n";
+
     croak "No method specified" unless @methods;
 
     foreach my $fq_meth (@methods) {
 
         $fq_meth =~ m/^  ( [\w-]+ (?: \.[\w-]+ )* ) 
-                      \. ( [\w-]+ | \* ) $/x or croak "Invalid method $fq_meth";
+                      \. ( [\w-]+ | \* ) $/x or croak "Invalid method '$fq_meth'";
 
         my ($service, $method) = ($1, $2);
 
         unless (defined $self->{_CLIENT}->{callbacks}->{"msg.$fq_meth"}) {
-            carp "Not previously accepting notifications $fq_meth";
+            carp "Not previously accepting notifications '$fq_meth'";
             next;
         }
 
@@ -274,20 +288,11 @@ sub stop_accepting_notifications {
         $self->{_BUS}->unsubscribe(
             topic       => $topic,
             on_unsuback => sub {
+                my ($success, $prop) = @_;
+
+                die "Could not unsubscribe from topic '$topic' $at" unless $success; 
 
                 delete $self->{_CLIENT}->{callbacks}->{"msg.$fq_meth"};
-
-                # Discard notifications already queued
-                my $job_queue = $self->{_WORKER}->{job_queue_high};
-
-                @$job_queue = grep {
-                    my $task = $_;
-                    my ($body_ref, $msg_headers) = @$task;
-                    my $request = decode_json($$body_ref);
-                    my $req_method = $request->{method};
-                    $req_method =~ m/^([\.\w-]+)\.([\w-]+)$/;
-                    not ($service eq $1 && ($method eq '*' || $method eq $2));
-                } @$job_queue;
             },
         );
     }
@@ -303,7 +308,7 @@ sub call_remote {
 
     # Make AnyEvent allow one level of recursive condvar blocking, as we may
     # block both in $worker->__work_forever and in $client->__do_rpc_request
-    $AE_WAITING && croak "Recursive condvar blocking wait attempted";
+    $AE_WAITING && Carp::confess "Recursive condvar blocking wait attempted";
     local $AE_WAITING = 1;
     local $AnyEvent::CondVar::Base::WAITING = 0;
 
@@ -331,8 +336,8 @@ sub call_remote_async {
 sub fire_remote {
     my $self = shift;
 
-    # Send job to a worker, but do not wait for result
-    $self->__do_rpc_request( @_, req_type => 'BACKGROUND' );
+    # Send request to a worker, but do not wait for response
+    $self->__do_rpc_request( @_, req_type => 'FIRE_FORGET' );
 
     return;
 }
@@ -349,7 +354,7 @@ sub __do_rpc_request {
 
     $fq_meth =~ m/^     ( [\w-]+ (?:\.[\w-]+)* )
                      \. ( [\w-]+ ) 
-                 (?: \@ ( [\w-]+ ) (\.[\w-]+)* )? $/x or croak "Invalid method $fq_meth";
+                 (?: \@ ( [\w-]+ ) (\.[\w-]+)* )? $/x or croak "Invalid method '$fq_meth'";
 
     my ($service, $method, $remote_bus, $addr) = ($1, $2, $3, $4);
 
@@ -379,7 +384,7 @@ sub __do_rpc_request {
     $send_args{'auth'} = $client->{auth_data} if defined $client->{auth_data};
     $send_args{'clid'} = $client->{caller_id} if defined $client->{caller_id};
 
-    my $BACKGROUND  = $args{req_type} eq 'BACKGROUND';
+    my $FIRE_FORGET = $args{req_type} eq 'FIRE_FORGET';
     my $SYNCHRONOUS = $args{req_type} eq 'SYNCHRONOUS';
     my $raise_error = $args{'raise_error'};
     my $req_id;
@@ -395,7 +400,7 @@ sub __do_rpc_request {
     $send_args{'response_topic'} = $client->{response_topic} ||
                                    $self->__create_response_topic;
 
-    unless ($BACKGROUND) {
+    unless ($FIRE_FORGET) {
         # Assign an unique request id (unique only for this client)
         $req_id = $client->{correlation_id}++;
         $req->{'id'} = $req_id;
@@ -414,7 +419,7 @@ sub __do_rpc_request {
         %send_args,
     );
 
-    if ($BACKGROUND) {
+    if ($FIRE_FORGET) {
          # Nothing else to do
          return;
     }
@@ -469,6 +474,9 @@ sub __create_response_topic {
     my $self = shift;
     my $client = $self->{_CLIENT};
 
+    my ($file, $line) = (caller(2))[1,2];
+    my $at = "at $file line $line\n";
+
     # Subscribe to an exclusive topic for receiving RPC responses
 
     my $response_topic = 'priv/' . $self->{_BUS}->{client_id};
@@ -478,13 +486,13 @@ sub __create_response_topic {
         topic       => $response_topic,
         maximum_qos => 0,
         on_publish  => sub {
-            my ($body_ref, $msg_headers) = @_;
+            my ($payload_ref, $mqtt_properties) = @_;
 
             local $@;
-            my $resp = eval { decode_json($$body_ref) };
+            my $resp = eval { decode_json($$payload_ref) };
 
             unless (ref $resp eq 'HASH' && $resp->{jsonrpc} eq '2.0') {
-                warn "Received invalid JSON-RPC 2.0 message";
+                warn "Received invalid JSON-RPC 2.0 message $at";
                 return;
             }
 
@@ -519,12 +527,12 @@ sub __create_response_topic {
                 # Unicasted notification
 
                 bless $resp, 'Beekeeper::JSONRPC::Notification';
-                $resp->{_headers} = $msg_headers;
+                $resp->{_headers} = $mqtt_properties;
 
                 my $method = $resp->{method};
 
                 unless (defined $method && $method =~ m/^([\.\w-]+)\.([\w-]+)$/) {
-                    warn "Received notification with invalid method $method";
+                    warn "Received notification with invalid method '$method' $at";
                     return;
                 }
 
@@ -532,7 +540,7 @@ sub __create_response_topic {
                          $client->{callbacks}->{"msg.$1.*"};
 
                 unless ($cb) {
-                    warn "No callback found for received notification $method";
+                    warn "No callback found for received notification '$method' $at";
                     return;
                 }
 
@@ -541,7 +549,7 @@ sub __create_response_topic {
         },
         on_suback => sub {
             my ($success, $prop) = @_;
-            croak "Could not subscribe to $response_topic" unless $success;
+            die "Could not subscribe to response topic '$response_topic' $at" unless $success;
         }
     );
 
@@ -557,7 +565,7 @@ sub wait_async_calls {
 
     # Make AnyEvent to allow one level of recursive condvar blocking, as we may
     # block both in $worker->__work_forever and here
-    $AE_WAITING && croak "Recursive condvar blocking wait attempted";
+    $AE_WAITING && Carp::confess "Recursive condvar blocking wait attempted";
     local $AE_WAITING = 1;
     local $AnyEvent::CondVar::Base::WAITING = 0;
 
@@ -580,21 +588,25 @@ sub set_authentication_data {
 sub __use_authorization_token {
     my ($self, $token) = @_;
 
-    my $secret = 'salt'; #TODO: read from config file
+    # Using a hashing function makes harder to access the wrong worker pool by mistake,
+    # but it is not an effective access restriction: anyone with access to the backend
+    # bus credentials can easily inspect and clone auth data tokens
+
+    my $salt = $self->{_CLIENT}->{auth_salt} || '';
 
     my $adata_ref = \$self->{_CLIENT}->{auth_data};
 
     my $guard = Beekeeper::Client::Guard->new( $adata_ref );
 
-    $$adata_ref = sha256_hex($token . $secret);
+    $$adata_ref = sha256_hex($token . $salt);
 
     return $guard;
 }
 
 1;
 
-package    # hide from PAUSE 
-    Beekeeper::Client::Guard;
+package
+    Beekeeper::Client::Guard;   # hide from PAUSE
 
 sub new {
     my ($class, $ref) = @_;
@@ -621,7 +633,7 @@ Beekeeper::Client - Make RPC calls through message bus
 
 =head1 VERSION
  
-Version 0.05
+Version 0.06
 
 =head1 SYNOPSIS
 
@@ -679,8 +691,8 @@ All methods in this module are exported by default to C<Beekeeper::Worker>.
 
 Connects to the message broker and returns a singleton instance.
 
-Unless explicit connection parameters to the broker are provided tries 
-to connect using the configuration from config file C<bus.config.json>.
+Unless explicit connection parameters to the broker are provided it tries 
+to connect using the parameters defined in config file C<bus.config.json>.
 
 =head1 METHODS
 
@@ -688,8 +700,9 @@ to connect using the configuration from config file C<bus.config.json>.
 
 Broadcast a notification to the message bus.
 
-All clients and workers listening for C<method> will receive it. If no one is listening
-the notification is lost.
+All clients and workers listening for given method will receive it. 
+
+If no one is listening for it the notification will be discarded.
 
 =over 4
 
@@ -720,7 +733,7 @@ C<$callback> is a coderef that will be called when a notification is received.
 When executed, the callback will receive a parameter C<$params> which contains
 the notification value or data structure sent.
 
-Note that callbacks will not be executed timely if AnyEvent loop is not running.
+Please note that callbacks will not be executed timely if AnyEvent loop is not running.
 
 =head3 stop_accepting_notifications ( $method, ... )
 
@@ -739,7 +752,7 @@ C<$method> must be one of the strings used previously in C<accept_notifications>
 Makes a synchronous RPC call to a service worker through the message bus.
 
 It will wait (in the event loop) until a response is received, wich will be either
-an C<Beekeeper::JSONRPC::Response> object or a C<Beekeeper::JSONRPC::Error>.
+a L<Beekeeper::JSONRPC::Response> object or a L<Beekeeper::JSONRPC::Error>.
 
 On error it will die unless C<raise_error> option is set to false.
 
@@ -769,9 +782,9 @@ request takes too long but otherwise was executed successfully the response will
 eventually arrive but it will be ignored.
 
 =item raise_error
- 
+
 If set to true (the default) dies with the received error message when a call returns
-an error response. If set to false returns a C<Beekeeper::JSONRPC::Error> instead.
+an error response. If set to false returns a L<Beekeeper::JSONRPC::Error> instead.
 
 =back
 
@@ -779,7 +792,7 @@ an error response. If set to false returns a C<Beekeeper::JSONRPC::Error> instea
 
 Makes an asynchronous RPC call to a service worker through the message bus.
 
-It returns immediately a C<Beekeeper::JSONRPC::Request> object which, once completed,
+It returns immediately a L<Beekeeper::JSONRPC::Request> object which, once completed,
 will have a defined C<response>.
 
 This method  accepts parameters C<method>, C<params>, C<address> and C<timeout> 
@@ -790,21 +803,20 @@ the same as C<call_remote>. Additionally two callbacks can be specified:
 =item on_success
 
 Callback which will be executed after receiving a successful response with a
-C<Beekeeper::JSONRPC::Response> object as parameter. Must be a coderef.
+L<Beekeeper::JSONRPC::Response> object as parameter. Must be a coderef.
 
 =item on_error
 
 Callback which will be executed after receiving an error response with a
-C<Beekeeper::JSONRPC::Error> object as parameter. Must be a coderef.
+L<Beekeeper::JSONRPC::Error> object as parameter. Must be a coderef.
 
 =back
 
 =head3 fire_remote ( %args )
 
-Fire and forget an asynchronous RPC call to a service worker through the message bus.
+Fire and forget an RPC call to a service worker through the message bus.
 
-It returns undef immediately, there is no way to know if the call was executed
-successfully or not.
+It returns undef immediately. The worker receiving the call will not send back a response.
 
 This method accepts parameters C<method>, C<params> and C<address> the same as C<call_remote>.
 
@@ -830,7 +842,7 @@ Gets the current authentication data blob.
 
 =head1 SEE ALSO
  
-L<Beekeeper::MQTT>, L<Beekeeper::Worker>.
+L<Beekeeper::Worker>, L<Beekeeper::MQTT>.
 
 =head1 AUTHOR
 

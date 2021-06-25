@@ -100,6 +100,24 @@ subtest 'fail on non-200' => sub {
     is($ok_http_fail, 1, 'future fail() on non-200 status');
 };
 
+subtest 'fail on wrong content-type' => sub {
+    my $ok_http_fail;
+    my $ft =
+        Web::PageMeta->new(url => 'https://www.meon.eu/static/img/picture1.jpg',)->fetch_page_meta_ft;
+    $ft->on_fail(
+        sub {
+            $ok_http_fail = 1;
+        }
+    );
+    $ft->on_done(
+        sub {
+            $ok_http_fail = 0;
+        }
+    );
+    $ft->await;
+    is($ok_http_fail, 1, 'future fail() on non text/html content');
+};
+
 done_testing();
 
 package Test::Mock::Future::HTTP;
@@ -108,7 +126,7 @@ use Moose;
 use AnyEvent::Future;
 
 sub http_get {
-    my ($self, $url) = @_;
+    my ($self, $url, %options) = @_;
 
     return Future->fail('unsupported url "' . $url . '"')
         if ($url !~ m{^/?(\d+)([.]jpg)?$});
@@ -129,6 +147,10 @@ sub http_get {
         after => ($delay / 1000),
         cb    => sub {
             $w = undef;
+            if (my $body_cb = $options{on_body}) {
+                $body_cb->($body) or die 'on_body failed';
+                $body = '';
+            }
             $ft->done($body, {Status => 200});
         }
     );

@@ -223,7 +223,7 @@ img_put(
 	int asrcW, asrcH;
 	Bool newObject = false;
 
-	if ( dest == nilHandle || src == nilHandle) return false;
+	if ( dest == NULL_HANDLE || src == NULL_HANDLE) return false;
 	if ( rop == ropNoOper) return false;
 
 	if ( kind_of( src, CIcon)) {
@@ -435,7 +435,7 @@ NOSCALE:
 			int sz;
 			Byte *dj, *di;
 			Byte colorref[256];
-			j-> self-> reset( b8, imbpp8, nil, 0);
+			j-> self-> reset( b8, imbpp8, NULL, 0);
 			sz = j-> dataSize;
 			dj = j-> data;
 			/* change 0/1 to 0x000/0xfff for correct masking */
@@ -458,9 +458,9 @@ NOSCALE:
 		} else {
 			int conv = i-> conversion;
 			i-> conversion = PImage( src)-> conversion;
-			i-> self-> reset( dest, imbpp8, nil, 0);
+			i-> self-> reset( dest, imbpp8, NULL, 0);
 			img_put( dest, src, dstX, dstY, 0, 0, dstW, dstH, PImage(src)-> w, PImage(src)-> h, rop, region, color);
-			i-> self-> reset( dest, type, nil, 0);
+			i-> self-> reset( dest, type, NULL, 0);
 			i-> conversion = conv;
 		}
 		goto EXIT;
@@ -475,7 +475,7 @@ NOSCALE:
 			if ( !src) goto EXIT;
 			newObject = true;
 		}
-		CImage( src)-> reset( src, PImage( dest)-> type, nil, 0);
+		CImage( src)-> reset( src, PImage( dest)-> type, NULL, 0);
 		if ( type < 8 && rop != ropCopyPut) {
 			/* change 0/1 to 0x000/0xfff for correct masking */
 			int sz   = PImage( src)-> dataSize;
@@ -570,7 +570,7 @@ typedef struct {
 } ImgBarCallbackRec;
 
 #define FILL_PATTERN_SIZE 8
-#define BLT_BUFSIZE ((MAX_SIZEOF_PIXEL * FILL_PATTERN_SIZE * (FILL_PATTERN_SIZE / 8) * 2 * 4))
+#define BLT_BUFSIZE ((MAX_SIZEOF_PIXEL * FILL_PATTERN_SIZE * FILL_PATTERN_SIZE) * 2)
 
 static Bool
 img_bar_single( int x, int y, int w, int h, ImgBarCallbackRec * ptr)
@@ -603,7 +603,7 @@ img_bar_single( int x, int y, int w, int h, ImgBarCallbackRec * ptr)
 		offset = x * ptr->count;
 	}
 
-	blt_step = (blt_bytes > ptr->step) ? ptr->step : blt_bytes;
+	blt_step = ptr->step;
 	if (!ptr->solid && (( ptr-> pat_x_offset % FILL_PATTERN_SIZE ) != (x % FILL_PATTERN_SIZE))) {
 		int dx = (x % FILL_PATTERN_SIZE) - ( ptr-> pat_x_offset % FILL_PATTERN_SIZE );
 		if ( dx < 0 ) dx += FILL_PATTERN_SIZE;
@@ -615,20 +615,24 @@ img_bar_single( int x, int y, int w, int h, ImgBarCallbackRec * ptr)
 		case 4:
 			if ( dx > 1 ) {
 				pat_ptr = ptr->buf + dx / 2;
-				if ( blt_step + FILL_PATTERN_SIZE / 2 > BLT_BUFSIZE )
+				if ( dx > 0 || blt_step + FILL_PATTERN_SIZE / 2 > BLT_BUFSIZE )
 					blt_step -= FILL_PATTERN_SIZE / 2;
 			} else
 				pat_ptr = ptr->buf;
 			break;
 		default:
 			pat_ptr = ptr->buf + dx * ptr->bpp / 8;
-			if ( blt_step + FILL_PATTERN_SIZE * ptr->count > BLT_BUFSIZE )
+			if ( dx > 0 || blt_step + FILL_PATTERN_SIZE * ptr->count > BLT_BUFSIZE )
 				blt_step -= FILL_PATTERN_SIZE * ptr->count;
 		}
-	} else
+	} else {
 		pat_ptr = ptr->buf;
+	}
+
+	if (blt_bytes < blt_step) blt_step = blt_bytes;
 
 	data = ptr->data + ptr->ls * y + offset;
+
 	for ( j = 0; j < h; j++) {
 		int bytes = blt_bytes;
 		Byte lsave = *data, rsave = data[blt_bytes - 1], *p = data;

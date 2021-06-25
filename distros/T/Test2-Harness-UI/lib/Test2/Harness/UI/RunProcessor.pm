@@ -2,7 +2,7 @@ package Test2::Harness::UI::RunProcessor;
 use strict;
 use warnings;
 
-our $VERSION = '0.000065';
+our $VERSION = '0.000068';
 
 use DateTime;
 use Data::GUID;
@@ -106,7 +106,7 @@ sub flush_all {
     my $all = $self->{+JOBS};
     for my $jobs (values %$all) {
         for my $job (values %$jobs) {
-            $job->{done} = 1;
+            $job->{done} = 'end';
             $self->flush(job => $job);
         }
     }
@@ -147,11 +147,15 @@ sub flush {
 
     $self->flush_events();
 
-    if ($job->{done}) {
+    if (my $done = $job->{done}) {
         # Last time we need to write this, so clear it.
         delete $self->{+JOBS}->{$job->{job_id}}->{$job->{job_try}};
 
-        $res->status($self->{+SIGNAL} ? 'canceled' : 'broken') unless $res->status eq 'complete';
+        unless ($res->status eq 'complete') {
+            my $status = $self->{+SIGNAL} ? 'canceled' : 'broken';
+            $status = 'canceled' if $done eq 'end';
+            $res->status($status)
+        }
 
         # Normalize the fail/pass
         my $fail = $res->fail ? 1 : 0;
@@ -181,8 +185,18 @@ sub flush_coverage {
 
     my $ca = $self->{+COVERAGE} or return;
     my $run = $self->run;
+    my $uuid = gen_uuid();
 
-    eval { $run->update({coverage => encode_json($ca->coverage)}); 1 } or warn "Failed to update coverage for run: $@";
+    eval {
+        $self->schema->resultset('Coverage')->create({
+            coverage_id => $uuid,
+            coverage    => encode_json($ca->coverage),
+        });
+
+        $run->update({coverage_id => $uuid});
+
+        1;
+    } or warn "Failed to update coverage for run: $@";
 }
 
 my $total = 0;

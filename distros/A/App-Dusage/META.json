@@ -41,11 +41,11 @@
    "provides" : {
       "App::Dusage" : {
          "file" : "lib/App/Dusage.pm",
-         "version" : "2.01"
+         "version" : "2.02"
       },
       "dusage" : {
          "file" : "script/dusage",
-         "version" : "2.01"
+         "version" : "2.02"
       }
    },
    "release_status" : "stable",
@@ -54,6 +54,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "2.01",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "2.02",
+   "x_serialization_backend" : "JSON::PP version 4.05"
 }

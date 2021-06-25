@@ -22,7 +22,7 @@ sub profile_default
 		autoHeight     => 1,
 		autoSelect     => 1,
 		autoTab        => 0,
-		borderWidth    => 1,
+		borderWidth    => 2,
 		charOffset     => 0,
 		cursorVisible  => 1,
 		cursorSize     => [ Prima::Application-> get_default_cursor_width, $font-> { height}],
@@ -116,17 +116,20 @@ sub on_paint
 	my @clr;
 	my @selClr;
 	@clr = $self-> enabled ?
-		($self-> color, $self-> backColor) :
+		($self-> color,
+			$self->{prelight} ?
+				$self-> prelight_color($self-> backColor) :
+				$self-> backColor
+		) :
 		($self-> disabledColor, $self-> disabledBackColor);
 	@selClr = ($self-> hiliteColor, $self-> hiliteBackColor);
 
 	my $border = $self-> {borderWidth};
-	if ( $self-> {borderWidth} == 0) {
-		$canvas-> color( $clr[1]);
-		$canvas-> bar(0,0,@size);
-	} else {
-		$canvas-> rect3d( 0, 0, $size[0]-1, $size[1]-1, $border, $self-> dark3DColor, $self-> light3DColor, $clr[1]);
-	}
+	$self-> rect_bevel( $canvas, Prima::rect->new(@size)->inclusive,
+		width  => $self-> {borderWidth},
+		panel  => 1,
+		fill   => $clr[1],
+	);
 
 	return if $size[0] <= $border * 2 + 2;
 	my $cap = $self-> {glyphs} or return;
@@ -149,11 +152,13 @@ sub on_paint
 
 	my ( $x, $y) = ( $self-> {atDrawX}, $self-> {atDrawY});
 	if ( $useSel && @{ $self->{selChunks} // [] }) {
-		$self->{glyphs}->selection_walk(
+		my $g = $self->{glyphs};
+		$g->selection_walk(
 			$self->{selChunks}, $self->{firstChar}, $self->{n_clusters}, sub {
 			my ( $offset, $length, $selected ) = @_;
-			my $text = substr( $cap, $offset, $length );
-			my $dx = $self->{glyphs}->get_sub_width( $self, $self->{firstChar} + $offset, $length);
+			($offset, $length) = $g->cluster2glyph($self->{firstChar} + $offset, $length);
+
+			my $dx = $canvas->get_text_width( $g, 0, $offset, $length);
 			if ( $selected ) {
 				$canvas-> color( $self-> hiliteBackColor);
 				$canvas-> bar( $x, 0, $x + $dx - 1, $size[1] - 1);
@@ -161,7 +166,7 @@ sub on_paint
 			} else {
 				$canvas-> color( $clr[0]);
 			}
-			$canvas->text_out($self->{glyphs}, $x, $y, $self->{firstChar} + $offset, $length );
+			$canvas->text_out($g, $x, $y, $offset, $length);
 			$x += $dx;
 		});
 	} else {
@@ -233,15 +238,14 @@ sub reset
 	$self-> cursorPos( $x, $border + 1);
 }
 
-sub text
+sub set_text
 {
-	return $_[0]-> SUPER::text unless $#_;
 	my ( $self, $cap) = @_;
 	$cap = '' unless defined $cap;
 	$cap = substr( $cap, 0, $self-> {maxLen})
 		if $self-> {maxLen} >= 0 and length($cap) > $self-> {maxLen};
 
-	$self-> SUPER::text($cap);
+	$self-> SUPER::set_text($cap);
 
 	$cap = $self-> {passwordChar} x length $cap if $self-> {writeOnly};
 	if ( length($cap)) {
@@ -792,6 +796,22 @@ sub on_mouseup
 
 	my ( $start, $end) = $self-> selection_strpos;
 	$cp-> text(substr( $self-> text, $start, $end - $start)) if $start != $end;
+}
+
+sub on_mouseenter
+{
+	my $self = shift;
+	$self->{prelight} = 1;
+	return unless $self->enabled;
+	$self->repaint;
+}
+
+sub on_mouseleave
+{
+	my $self = shift;
+	delete $self->{prelight};
+	return unless $self->enabled;
+	$self->repaint;
 }
 
 sub on_size

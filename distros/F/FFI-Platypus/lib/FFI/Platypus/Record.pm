@@ -5,13 +5,13 @@ use warnings;
 use 5.008004;
 use Carp qw( croak );
 use FFI::Platypus;
-use base qw( Exporter );
+use Exporter qw( import );
 use constant 1.32 ();
 
 our @EXPORT = qw( record_layout record_layout_1 );
 
 # ABSTRACT: FFI support for structured records data
-our $VERSION = '1.43'; # VERSION
+our $VERSION = '1.46'; # VERSION
 
 
 sub record_layout_1
@@ -204,7 +204,7 @@ FFI::Platypus::Record - FFI support for structured records data
 
 =head1 VERSION
 
-version 1.43
+version 1.46
 
 =head1 SYNOPSIS
 
@@ -554,6 +554,8 @@ Diab Jerius (DJERIUS)
 Eric Brine (IKEGAMI)
 
 szTheory
+
+José Joaquín Atria (JJATRIA)
 
 =head1 COPYRIGHT AND LICENSE
 

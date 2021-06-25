@@ -3,7 +3,7 @@ package CSS::Struct;
 use strict;
 use warnings;
 
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 1;
 
@@ -73,6 +73,8 @@ L<CSS::Struct::Output>.
          $css = CSS::Struct::Output::Raw->new(%params);
  }
 
+ $css->put(['c', 'comment']);
+ $css->put(['a', '@charset', 'utf-8']);
  $css->put(['s', 'selector#id']);
  $css->put(['s', 'div div']);
  $css->put(['s', '.class']);
@@ -88,9 +90,11 @@ L<CSS::Struct::Output>.
  # Usage: __SCRIPT__ indent
 
  # Output with argument 0:
- # selector#id,div div,.class{weight:100px;font-size:10em;}
+ # /*comment*/@charset "utf-8";selector#id,div div,.class{weight:100px;font-size:10em;}
 
+ # /* comment */
  # Output with argument 1:
+ # @charset "utf-8";
  # selector#id, div div, .class {
  #         weight: 100px;
  #         font-size: 10em;
@@ -104,13 +108,17 @@ L<CSS::Struct::Output>.
 
 Base class for CSS::Struct::Output::*.
 
+=item L<CSS::Struct::Output::Indent>
+
+Indent printing 'CSS::Struct' structure to CSS code.
+
 =item L<CSS::Struct::Output::Raw>
 
 Raw printing 'CSS::Struct' structure to CSS code.
 
-=item L<CSS::Struct::Output::Indent>
+=item L<CSS::Struct::Output::Structure>
 
-Indent printing 'CSS::Struct' structure to CSS code.
+Structure class for 'CSS::Struct' output.
 
 =back
 
@@ -128,6 +136,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.04
+0.05
 
 =cut

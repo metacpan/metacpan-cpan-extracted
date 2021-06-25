@@ -33,10 +33,10 @@ sub test_01_load_balance_async : Test(6) {
     my $tasks = 500;
     my $workers = 5;
     my $expected = int($tasks / $workers);
-    my @jobs;
+    my @requests;
 
     for (1..$tasks) {
-        push @jobs, $cli->call_remote_async(
+        push @requests, $cli->call_remote_async(
             method  => 'cache.bal',
             params  => { dset =>'A' },
         );
@@ -120,13 +120,13 @@ sub test_03_slow_consumer_async : Test(7) {
     my $expected_fast = int(($tasks - $slow) / ($workers - $slow));
     my $expected_slow = $slow;
 
-    my @jobs;
+    my @requests;
 
-    # Send a few jobs that take a lot to complete. The workers that
-    # process these slower jobs should get less requests than the others
+    # Send a few requests that take a lot to complete. The workers that process
+    # these slower requests should get less total requests than the others
 
     for (1..$slow) {
-        push @jobs, $cli->call_remote_async(
+        push @requests, $cli->call_remote_async(
             method  => 'cache.bal',
             params  => { dset => 'C', sleep => 3 },
         );
@@ -134,7 +134,7 @@ sub test_03_slow_consumer_async : Test(7) {
 
     for (my $i = $slow; $i < $tasks; $i++) {
 
-        push @jobs, $cli->call_remote_async(
+        push @requests, $cli->call_remote_async(
             method  => 'cache.bal',
             params  => { dset => 'C' },
         );

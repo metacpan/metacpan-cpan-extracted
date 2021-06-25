@@ -3,7 +3,7 @@ package Beekeeper::JSONRPC::Error;
 use strict;
 use warnings;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 
 use overload '""' => sub { $_[0]->{error}->{message} };
@@ -134,7 +134,7 @@ Beekeeper::JSONRPC::Error - Representation of a JSON-RPC error.
  
 =head1 VERSION
  
-Version 0.05
+Version 0.06
 
 =head1 SYNOPSIS
 
@@ -155,7 +155,7 @@ Version 0.05
 Objects of this class represents a JSON-RPC error (see L<http://www.jsonrpc.org/specification>).
 
 When a RPC call could not be executed successfully the worker replies with a 
-Beekeeper::JSONRPC::Error object. These objects may be returned also due to  
+L<Beekeeper::JSONRPC::Error> object. These objects may be returned also due to  
 client side errors, like network disconnections or timeouts.
 
 Method C<Beekeeper::Client-\>call_remote> returns objects of this class on failure.

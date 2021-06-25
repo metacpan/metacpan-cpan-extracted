@@ -1,0 +1,56 @@
+{
+   "abstract" : "Perl FFI binding to H3 library functions",
+   "author" : [
+      "Michael R. Davis (mrdvt@cpan.org)"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.52, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Geo-H3-FFI",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0",
+            "Test::Number::Delta" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "FFI::C" : "0",
+            "FFI::CheckLib" : "0",
+            "FFI::Platypus" : "0",
+            "Package::New" : "0",
+            "perl" : "5.008"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/mrdvt92/perl-Geo-H3-FFI/issues"
+      },
+      "homepage" : "https://github.com/mrdvt92/perl-Geo-H3-FFI",
+      "repository" : {
+         "type" : "git",
+         "web" : "https://github.com/mrdvt92/perl-Geo-H3-FFI.git"
+      }
+   },
+   "version" : "0.06"
+}

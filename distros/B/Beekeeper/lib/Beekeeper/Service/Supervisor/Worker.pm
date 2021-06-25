@@ -3,9 +3,8 @@ package Beekeeper::Service::Supervisor::Worker;
 use strict;
 use warnings;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
-use AnyEvent::Impl::Perl;
 use Beekeeper::Worker ':log';
 use base 'Beekeeper::Worker';
 
@@ -412,7 +411,7 @@ Beekeeper::Service::Supervisor::Worker - Worker pool supervisor.
 
 =head1 VERSION
 
-Version 0.05
+Version 0.06
 
 =head1 DESCRIPTION
 

@@ -7,12 +7,8 @@ SYNOPSIS
        use Object::Pad;
     
        class Point {
-          has $x = 0;
-          has $y = 0;
-    
-          BUILD {
-            ($x, $y) = @_;
-          }
+          has $x :param = 0;
+          has $y :param = 0;
     
           method move ($dX, $dY) {
              $x += $dX;
@@ -24,7 +20,7 @@ SYNOPSIS
           }
        }
     
-       Point->new(5,10)->describe;
+       Point->new(x => 5, y => 10)->describe;
 
 DESCRIPTION
 
@@ -63,6 +59,17 @@ DESCRIPTION
 
        @args = $class->BUILDARGS( @_ )
 
+    If any slot in the class has the :param attribute, then the constructor
+    will expect to receive its argmuents in an even-sized list of
+    name/value pairs. This applies even to slots inherited from the parent
+    class or applied roles. It is therefore a good idea to shape the
+    parameters to the constructor in this way in roles, and in classes if
+    you intend your class to be extended.
+
+    The constructor will also check for required parameters (these are all
+    the parameters for slots that do not have default initialisation
+    expressions). If any of these are missing an exception is thrown.
+
 KEYWORDS
 
  class
@@ -89,15 +96,20 @@ KEYWORDS
     
        class Name VERSION;
 
-    A single superclass is supported by the keyword extends
+    A single superclass is supported by the keyword isa
 
-       class Name extends BASECLASS {
+    Since version 0.41.
+
+       class Name isa BASECLASS {
           ...
        }
     
-       class Name extends BASECLASS BASEVER {
+       class Name isa BASECLASS BASEVER {
           ...
        }
+
+    (prior to version 0.41 this was called extends, which is currently
+    recognised as a compatibility synonym).
 
     If a package providing the superclass does not exist, an attempt is
     made to load it by code equivalent to
@@ -116,12 +128,16 @@ KEYWORDS
 
        BaseClass->VERSION( $ver )
 
-    One or more roles can be composed into the class by the keyword
-    implements
+    One or more roles can be composed into the class by the keyword does
 
-       class Name implements ROLE, ROLE,... {
+    Since version 0.41.
+
+       class Name does ROLE, ROLE,... {
           ...
        }
+
+    (prior to version 0.41 this was called implements, which is currently
+    recognised as a compatibility synonym).
 
     An optional list of attributes may be supplied in similar syntax as for
     subs or lexical variables. (These are annotations about the class
@@ -342,6 +358,24 @@ KEYWORDS
     ensure the correct number of arguments are passed - usually zero, but
     exactly one in the case of a :writer method.
 
+  :param, :param(NAME)
+
+    Since version 0.41.
+
+    Sets this slot to be initialised automatically in the generated
+    constructor. This is only permitted on scalar slots. If no name is
+    given, the name of the slot is used. A single prefix character _ will
+    be removed if present.
+
+    Any slot that has :param but does not have a default initialisation
+    expression becomes a required argument to the constructor. Attempting
+    to invoke the constructor without a named argument for this will throw
+    an exception. In order to make a parameter optional, make sure to give
+    it a default expression - even if that expression is undef:
+
+       has $x :param;          # this is required
+       has $z :param = undef;  # this is optional
+
  method
 
        method NAME {
@@ -418,10 +452,9 @@ KEYWORDS
     unpacking its arguments. A build block is not a subroutine and thus is
     not permitted to use subroutine attributes (for example :lvalue).
 
-    Currently attempts to create a method named BUILD (i.e. with syntax
-    method BUILD {...}) will create a builder block instead. As of version
-    0.31 such attempts will print a warning at compiletime, and a later
-    version may remove this altogether.
+    Note that a BUILD block is a named phaser block and not a method.
+    Attempts to create a method named BUILD (i.e. with syntax method BUILD
+    {...}) will fail with a compiletime error, to avoid this confusion.
 
  requires
 
@@ -497,7 +530,7 @@ SUBCLASSING CLASSIC PERL CLASSES
           sub get_value { return "A" }
        }
     
-       class DerivedClass extends ClassicPerlBaseClass {
+       class DerivedClass isa ClassicPerlBaseClass {
           has $_value = "B";
           BUILD {
              $_value = "C";

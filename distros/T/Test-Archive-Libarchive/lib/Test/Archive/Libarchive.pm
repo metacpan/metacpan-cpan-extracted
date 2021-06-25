@@ -11,7 +11,7 @@ use experimental qw( signatures );
 use parent qw( Exporter );
 
 # ABSTRACT: Testing tools for Archive::Libarchive
-our $VERSION = '0.01'; # VERSION
+our $VERSION = '0.02'; # VERSION
 
 
 our @EXPORT = qw( la_ok la_eof la_warn la_failed la_fatal la_read_data_ok );
@@ -186,7 +186,7 @@ Test::Archive::Libarchive - Testing tools for Archive::Libarchive
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 

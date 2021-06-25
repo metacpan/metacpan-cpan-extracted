@@ -7,6 +7,11 @@ use warnings;
 
 use Carp;
 use Exporter;
+use Scalar::Util ();
+
+BEGIN {
+    *__tainted = \&Scalar::Util::tainted;
+}
 
 our @ISA = qw{ Exporter };
 
@@ -61,7 +66,7 @@ use constant CODE_REF	=> ref sub {};
     our @EXPORT = @funcs;	## no critic (ProhibitAutomaticExportation)
 }
 
-our $VERSION = '0.015';
+our $VERSION = '0.100';
 our $XS_VERSION = $VERSION;
 our $ALPHA_VERSION = $VERSION;
 $VERSION =~ s/_//g;
@@ -75,7 +80,6 @@ our $USE_PBCOPY = $ENV{MAC_PASTEBOARD_USE_PBCOPY};
 
 BEGIN {
     eval {
-	require Scalar::Util;
 	Scalar::Util->import (qw{dualvar});
 	1;
     } or do {
@@ -123,7 +127,11 @@ my %static = (
 sub new {
     my ( $class, @arg ) = @_;
     my $name = @arg % 2 ? shift @arg : kPasteboardClipboard();
+    # We have to force this because undef is the Perl representation of
+    # kPasteboardUniqueName.
     defined $name or $name = kPasteboardClipboard();
+    __tainted( $name )
+	and croak 'Pasteboard name is tainted';
     $ENV{DEVELOPER_DEBUG}
 	and warn __PACKAGE__, "->new() creating $name";
     my $self = bless {
@@ -136,7 +144,7 @@ sub new {
 	requested_name	=> $name,
     }, ref $class || $class;
     @arg and $self->set( @arg );
-    my ($status, $pbref, $created_name) = xs_pbl_create ($self->{name});
+    my ($status, $pbref, $created_name) = xs_pbl_create( $self->{name} );
     __PACKAGE__->_check ($status) and return;
     $created_name and $self->{name} = $created_name;
     $self->{pbref} = $pbref;
@@ -483,9 +491,18 @@ sub _pbpaste {
     return _pbobj( $name )->paste( @args );
 }
 
+# NOTE WELL -- this method/subroutine is UNSUPPORTED and may be changed
+# or deleted without notice.
+# Actually, I just created it to give ready access to whether we were
+# still using the pbl.c code, for troubleshooting purposes. When -p goes
+# away, so will this.
+sub __variant {
+    return xs_pbl_variant();
+}
+
 sub DESTROY {
     my ($self) = @_;
-    $self->{pbref} and xs_pbl_release ($self->{pbref});
+    $self->{pbref} and xs_pbl_release( delete $self->{pbref} );
     return;
 }
 
@@ -516,6 +533,12 @@ or equivalently, using the object-oriented interface,
 
 =head1 CAVEATS
 
+B<Note> that release [%% next_release %%] is an attempt to properly
+encode/decode everything going to and from the pasteboard. But this
+turned into a complete refactor. An approximation of the old factoring
+(with less chance of getting character encoding/decoding correct) can be
+had by specifying the C<-p> option to F<Makefile.PL> or F<Build.PL>.
+
 Beginning with Mac OS 10.6 Snow Leopard, pasteboards could contain
 multiple items. Until I upgrade, this package can only access the first
 item. If your interest is in writing a droplet (that is, an application
@@ -532,7 +555,7 @@ fact, a valid JPEG image.
 
 On the other hand, it is (or at least may be) convenient to get the text
 types encoded and decoded properly off the pasteboard. This is what the
-L<encode|/encode (boolean)> attribute is for. It is false by default
+L<encode|/encode> attribute is for. It is false by default
 because it appears not to work as one would hope under older versions of
 Mac OS. It also does not cover C<com.apple.traditional-mac-plain-text>
 because the encoding of this appears to change, and I have been unable
@@ -542,6 +565,12 @@ expect.  B<Caveat user>.
 Any functionality that involves any character set other than the
 system's native character set is disabled on versions of Perl before
 5.8.4.
+
+B<Some> taint support was added in version C<0.015_01>. Specifically, if
+you are running with taint support turned on, data off the pasteboard
+will be tainted, and an attempt to create a pasteboard with a tainted
+name will result in an exception. More such will be added if it seems
+warranted.
 
 =head1 DESCRIPTION
 
@@ -570,7 +599,7 @@ taken if new() is called without arguments.
 Data items are identified by an item id which is provided by the creator
 of the item, and which (the documentation says) should only be
 interpreted by the creator. Item flavors may be duplicated between items
-but not within items. The item L<id|/id (integer)> is an attribute of
+but not within items. The item L<id|/id> is an attribute of
 the Mac::Pasteboard object, with the default chosen so that you should
 not need to worry about it unless you explicitly want more than one item
 on a pasteboard.
@@ -602,33 +631,38 @@ produced by the Mac::Error 'macerror' script. Errors other than the
 documented pasteboard error will be described as 'Unknown error' unless
 Mac::Error is installed and the error is known to that module.
 
-Note, however, that by default the L<fatal|/fatal (boolean)> attribute
+Note, however, that by default the L<fatal|/fatal> attribute
 is true, which means an error will result in an exception. If
-L<fatal|/fatal (boolean)> is false, the status will be false for success
+L<fatal|/fatal> is false, the status will be false for success
 and true for failure.
 
 The following methods are provided:
 
-=head2 $pb = Mac::Pasteboard->new ($name)
+=head2 new
+
+ $pb = Mac::Pasteboard->new( $name )
 
 This method creates a new pasteboard object, connected to the pasteboard
 of the given name, creating the pasteboard if necessary. If called with
 no argument, you get the system clipboard, a.k.a.
-L</kPasteboardClipboard>, a.k.a.  'com.apple.pasteboard.clipboard'.
+L</kPasteboardClipboard>, a.k.a.  C<'com.apple.pasteboard.clipboard'>.
 Passing undef to new() is B<not> equivalent to calling it with no
 arguments at all, since undef is the encoding for
 L</kPasteboardUniqueName>.
 
+If running with taint checking enabled, a tainted pasteboard name will
+cause an exception.
+
 Note that an error in creating a new pasteboard B<will> cause an
-exception, since the L<fatal|/fatal (boolean)> attribute defaults to 1.
+exception, since the L<fatal|/fatal> attribute defaults to 1.
 If you want to get a status back, you will need to call
 
- Mac::Pasteboard->set (fatal => 0);
+ Mac::Pasteboard->set( fatal => 0 );
 
 If the attempt to instantiate an object fails, the status is available
 from
 
- Mac::Pasteboard->get ('status');
+ Mac::Pasteboard->get( 'status' );
 
 Starting with version C<0.012_01> you can pass desired attributes as
 arguments -- the same name/value pairs that get passed to C<set()>.
@@ -637,16 +671,22 @@ specify an explicit C<undef> if you want to default the name but specify
 attributes; C<new()> will figure it out based on whether the number of
 arguments is odd or even.
 
-=head2 $status = $pb->clear ()
+=head2 clear
+
+ $status = $pb->clear()
 
 This method clears the pasteboard. You must clear the pasteboard before
 adding data to it.
 
-=head2 $clone = $pb->clone ()
+=head2 clone
+
+ $clone = $pb->clone ()
 
 This method clones the pasteboard object.
 
-=head2 $status = $pb->copy ($data, $flavor, $flags)
+=head2 copy
+
+ $status = $pb->copy( $data, $flavor, $flags )
 
 This method puts the given data on the pasteboard, identifying it as
 being of the given flavor, and assigning the given pasteboard flags,
@@ -659,12 +699,14 @@ flavor|/defaultFlavor> is used.
 The pasteboard is B<not> cleared prior to this operation; any other data
 of other flavors remain on the pasteboard.
 
-If the L<id|/id (integer)> attribute is undef, the data are placed in
+If the L<id|/id> attribute is undef, the data are placed in
 the item whose id is 1. Otherwise, the data are placed in the item with
 the given id.  It is an error to attempt to place a given flavor in a
 given item more than once.
 
-=head2 $encoding = $pb->flavor_encoding( $flavor );
+=head2 flavor_encoding
+
+ $encoding = $pb->flavor_encoding( $flavor );
 
 This method returns the Unicode encoding of the given flavor, or the
 default flavor if no flavor is given. If the encoding is unknown, it
@@ -673,10 +715,12 @@ returns C<undef>.
 You can actually call this as a static method, but if you do so you
 B<must> provide a defined and non-empty value for C<$flavor>.
 
-In fact, this is driven by a table of flavors for which the flavors are
-known. This table is given under L<encode|/encode (boolean)>, below.
+In fact, this is driven by a table of flavors for which the encoding is
+known. This table is given under L<encode|/encode>, below.
 
-=head2 @names = $pb->flavor_flag_names ($flags)
+=head2 flavor_flag_names
+
+ @names = $pb->flavor_flag_names( $flags )
 
 This method (or subroutine) interprets its last argument as flavor
 flags, and returns the names of the flags set. If no recognized flags
@@ -685,7 +729,9 @@ are set, you get an empty list.
 If called in scalar context you get back the names joined with ', ', or
 'kPasteboardFlavorNoFlags' if there are none.
 
-=head2 %tags = $pb->flavor_tags ($flavor)
+=head2 flavor_tags
+
+ %tags = $pb->flavor_tags( $flavor )
 
 This method (or subroutine) interprets its last argument as a flavor
 name, and returns the preferred tags associated with the flavor in a
@@ -698,16 +744,18 @@ hash. The hash will have zero or more of the following keys:
 
 If called in scalar context, you get back a reference to the hash.
 
-=head2 @flavors = $pb->flavors ($conforms_to)
+=head2 flavors
+
+ @flavors = $pb->flavors( $conforms_to )
 
 This method returns the list of data flavors conforming to the given
-flavor currently on the pasteboard. If $conforms_to is omitted or undef,
-you get all flavors. If the L<id|/id (integer)> attribute is defined,
-you get only flavors from the corresponding pasteboard item; otherwise
-you get all conforming flavors. If you turn off the L<fatal|/fatal
-(boolean)> attribute, you will get an empty list if an error occurs, and
-you will need to check the L<status|/status (dualvar)> attribute so see
-if the operation actually succeeded.
+flavor currently on the pasteboard. If C<$conforms_to> is omitted or
+C<undef>, you get all flavors. If the L<id|/id> attribute is
+defined, you get only flavors from the corresponding pasteboard item;
+otherwise you get all conforming flavors. If you turn off the
+L<fatal|/fatal> attribute, you will get an empty list if an error
+occurs, and you will need to check the L<status|/status> attribute so
+see if the operation actually succeeded.
 
 The return is a list of anonymous hashes, each containing the following
 keys:
@@ -721,38 +769,46 @@ If called in scalar context, you get a reference to the list.
 The L</SEE ALSO> section has a link to the I<Uniform Type Identifiers
 Overview>, which deals with the notion of type conformance.
 
-=head2 $value = $pb->get ($name)
+=head2 get
+
+ $value = $pb->get( $name )
 
 This method returns the value of the given L<attribute|/ATTRIBUTES>. An
 exception is thrown if the attribute does not exist.
 
 This method can also be called statically (that is, as
-Mac::Pasteboard->get ($name)), in which case it returns the static value
-of the attribute, if any.
+C<< Mac::Pasteboard->get( $name ) >>), in which case it returns the
+static value of the attribute, if any.
 
-=head2 ($data, $flags) = $pb->paste ($flavor)
+=head2 paste
 
-If the L<id|/id (integer)> attribute is defined, this method returns the
+ ( $data, $flags ) = $pb->paste( $flavor )
+
+If the L<id|/id> attribute is defined, this method returns the
 data of the given flavor from that pasteboard id, and the associated
 L<flavor flags|/Flavor flags>; otherwise it returns the data from the
 last instance of that flavor found, and the associated flavor flags. If
 no such flavor data is found, an exception is thrown if the
-L<missing_ok|/missing_ok (boolean)> attribute is false, or undef is
-returned for $data if L<missing_ok|/missing_ok (boolean)> is true.
+L<missing_ok|/missing_ok> attribute is false, or C<undef> is
+returned for $data if L<missing_ok|/missing_ok> is true.
 
-You test the $flags value for individual flags by using the bitwise
-'and' operator ('&'). For example:
+If running with taint checking enabled, C<$data> will be tainted.
+
+You test the C<$flags> value for individual flags by using the bitwise
+'and' operator (C<'&'>). For example:
 
  $flags & kPasteboardFlavorSystemTranslated
    and print "This data provided by Translation Services\n";
 
-If called in scalar context, you get $data.
+If called in scalar context, you get C<$data>.
 
-=head2 @data = $pb->paste_all ($conforms_to)
+=head2 paste_all
+
+ @data = $pb->paste_all( $conforms_to )
 
 This method returns all flavors of data on the pasteboard which conform
-to the given flavor. If $conforms_to is omitted or undef, all flavors of
-data are returned. If the L<id|/id (integer)> attribute is defined, only
+to the given flavor. If C<$conforms_to> is omitted or undef, all flavors of
+data are returned. If the L<id|/id> attribute is defined, only
 data from that pasteboard item are returned; otherwise everything
 accessible is returned.
 
@@ -766,104 +822,121 @@ keys:
 
 If called in scalar context, you get a reference to the list.
 
+If running with taint checking enabled, the C<{data}> value will be
+tainted.
+
 The L</SEE ALSO> section has a link to the I<Uniform Type Identifiers
 Overview>, which deals with the notion of type conformance.
 
-=head2 pbcopy ($data, $flavor, $flags)
+=head2 pbcopy
+
+ pbcopy( $data, $flavor, $flags )
 
 This convenience subroutine (B<not> method) clears the system clipboard
 and then copies the given data to it. All three arguments are optional
-(the prototype being (;$$$). If $data is undef, the value of $_ is used.
-If $flavor is undef, the L<default flavor|/defaultFlavor> is used. If
-$flags is undef, L<kPasteboardFlavorNoFlags|/kPasteboardFlavorNoFlags>
-is used.
+(the prototype being C<(;$$$)>. If C<$data> is undef, the value of C<$_>
+is used.  If C<$flavor> is C<undef>, the L<default
+flavor|/defaultFlavor> is used. If C<$flags> is C<undef>,
+L<kPasteboardFlavorNoFlags|/kPasteboardFlavorNoFlags> is used.
 
 In other words, this subroutine is more-or-less equivalent to the
-'pbcopy' executable.
+C<pbcopy> executable.
 
-=head2 pbcopy_find ($data, $flavor, $flags)
+=head2 pbcopy_find
+
+ pbcopy_find( $data, $flavor, $flags )
 
 This convenience subroutine (B<not> method) clears the 'find' pasteboard
-and then copies the given data to it. All three arguments are optional
-(the prototype being (;$$$). If $data is undef, the value of $_ is used.
-If $flavor is undef, the L<default flavor|/defaultFlavor> is used. If
-$flags is undef, L<kPasteboardFlavorNoFlags|/kPasteboardFlavorNoFlags>
-is used.
+and then copies the given data to it.  All three arguments are optional
+(the prototype being C<(;$$$)>. If C<$data> is undef, the value of C<$_>
+is used.  If C<$flavor> is C<undef>, the L<default
+flavor|/defaultFlavor> is used. If C<$flags> is C<undef>,
+L<kPasteboardFlavorNoFlags|/kPasteboardFlavorNoFlags> is used.
 
 In other words, this subroutine is more-or-less equivalent to
 
  $ pbcopy -pboard find
 
-=head2 $encode = pbencode ();
+=head2 pbencode
 
-=head2 $old_encode = pbencode ( $new_encode );
+ $encode = pbencode();
+ $old_encode = pbencode( $new_encode );
 
-this convenience subroutine (b<not> method) returns the encode setting
-for the system pasteboard. if the argument is defined and not c<''>, the
+This convenience subroutine (B<not> method) returns the encode setting
+for the system pasteboard. If the argument is defined and not C<''>, the
 argument becomes the new encode setting and the old encode setting is
 returned.
 
-=head2 $encode = pbencode_find ();
+=head2 pbencode_find
 
-=head2 $old_encode = pbencode_find ( $new_encode );
+ $encode = pbencode_find ();
+ $old_encode = pbencode_find( $new_encode );
 
-this convenience subroutine (b<not> method) returns the encode setting
-for the 'find' pasteboard. if the argument is defined and not c<''>, the
+This convenience subroutine (B<not> method) returns the encode setting
+for the 'find' pasteboard. if the argument is defined and not C<''>, the
 argument becomes the new encode setting and the old encode setting is
 returned.
 
-=head2 $default_flavor = pbflavor ();
+=head2 pbflavor
 
-=head2 $old_default_flavor = pbflavor ( $new_default_flavor );
+ $default_flavor = pbflavor();
+ $old_default_flavor = pbflavor( $new_default_flavor );
 
-this convenience subroutine (b<not> method) returns the default data
-flavor for the system pasteboard. if the argument is defined and not
-c<''>, the argument becomes the new default flavor and the old default
+This convenience subroutine (B<not> method) returns the default data
+flavor for the system pasteboard. If the argument is defined and not
+C<''>, the argument becomes the new default flavor and the old default
 flavor is returned.
 
-=head2 $default_flavor = pbflavor_find ();
+=head2 pbflavor_find
 
-=head2 $old_default_flavor = pbflavor_find ( $new_default_flavor );
+ $default_flavor = pbflavor_find();
+ $old_default_flavor = pbflavor_find( $new_default_flavor );
 
-this convenience subroutine (b<not> method) returns the default data
+This convenience subroutine (B<not> method) returns the default data
 flavor for the 'find' pasteboard. if the argument is defined and not
-c<''>, the argument becomes the new default flavor and the old default
+C<''>, the argument becomes the new default flavor and the old default
 flavor is returned.
 
-=head2 ($data, $flags) = pbpaste ($flavor)
+=head2 pbpaste
+
+ ( $data, $flags ) = pbpaste( $flavor )
 
 This convenience subroutine (B<not> method) retrieves the given flavor
 of data from the system clipboard, and its associated flavor flags. The
-flavor is optional, the default being the L<default
-flavor|/defaultFlavor>. If the given flavor is not found undef is
-returned for $data.
+flavor is optional, the default being the
+L<default flavor|/defaultFlavor>. If the given flavor is not found
+C<undef> is returned for C<$data>.
 
-The functionality is equivalent to calling paste() on an object whose
-L<id|/id (integer)> attribute is undef.
+The functionality is equivalent to calling C<paste()> on an object whose
+L<id|/id> attribute is C<undef>.
 
-If called in scalar context, you get $data.
+If called in scalar context, you get C<$data>.
 
 In other words, this subroutine is more-or-less equivalent to the
 'pbpaste' executable.
 
-=head2 ($data, $flags) = pbpaste_find ($flavor)
+=head2 pbpaste_find
+
+ ( $data, $flags ) = pbpaste_find( $flavor )
 
 This convenience subroutine (B<not> method) retrieves the given flavor
 of data from the 'find' pasteboard, and its associated flavor flags. The
-flavor is optional, the default being the L<default
-flavor|/defaultFlavor>. If the given flavor is not found undef is
-returned for $data.
+flavor is optional, the default being the
+L<default flavor|/defaultFlavor>. If the given flavor is not found
+C<undef> is returned for C<$data>.
 
 The functionality is equivalent to calling paste() on an object whose
-L<id|/id (integer)> attribute is undef.
+L<id|/id> attribute is undef.
 
-If called in scalar context, you get $data.
+If called in scalar context, you get C<$data>.
 
 In other words, this subroutine is more-or-less equivalent to
 
  $ pbpaste -pboard find
 
-=head2 $pb = $pb->set ($name => $value ...)
+=head2 set
+
+ $pb = $pb->set( $name => $value ...)
 
 This method sets the values of the given L<attributes|/ATTRIBUTES>. More
 than one attribute can be set at a time. An exception is thrown if the
@@ -878,7 +951,9 @@ sense that the author makes no representation what will happen if you do
 set them, and does not promise that whatever happens when you do this
 will not change in the future.
 
-=head2 $flags = $pb->synch ()
+=head2 synch
+
+ $flags = $pb->synch()
 
 This method synchronizes the local copy of the pasteboard with the
 global pasteboard, and returns the L<synchronization
@@ -887,19 +962,21 @@ when needed, but it is exposed because one of the flags returned says
 whether the calling process owns the pasteboard.  For example:
 
  $pb->synch & kPasteboardClientIsOwner
-     or $pb->clear ();
+     or $pb->clear();
 
 to take ownership of the pasteboard (by clearing it) if it is not
 already owned by the process. Note that
 L<kPasteboardClientIsOwner|/kPasteboardClientIsOwner> is not imported by
 default.
 
-=head2 @names = $pb->synch_flag_names ($flags)
+=head2 synch_flag_names
+
+ @names = $pb->synch_flag_names( $flags )
 
 This method (or subroutine) interprets its last argument as
-synchronization flags (i.e. as the return from the synch() method), and
-returns the names of the flags set. If none are set, you get an empty
-list.
+synchronization flags (i.e. as the return from the L<synch()|/synch>
+method), and returns the names of the flags set. If none are set, you
+get an empty list.
 
 If called in scalar context you get back the names joined with ', ', or
 an empty string if there are none, since there is no manifest constant
@@ -908,17 +985,16 @@ for synchronization flags that corresponds to
 
 =head1 ATTRIBUTES
 
-The types of the attributes are specified in parentheses after their
-names. Boolean attributes are interpreted in the Perl sense - that is,
+Boolean attributes are interpreted in the Perl sense - that is,
 C<undef>, C<0> and C<''> are false, and anything else is true.
 
 This class supports the following attributes:
 
-=head2 encode (boolean)
+=head2 encode
 
-This attribute specifies whether or not certain flavors are to be
-encoded into and decoded from the pasteboard. Supported flavors and the
-encodings used are:
+This Boolean attribute specifies whether or not certain flavors are to
+be encoded into and decoded from the pasteboard. Supported flavors and
+the encodings used are:
 
     public.utf8-plain-text           UTF-8
     public.utf16-plain-text          UTF-16LE
@@ -932,53 +1008,54 @@ UTF-16LE, but how to tell when this is done is also undocumented.
 
 The default value of this attribute is L<defaultEncode|/defaultEncode>.
 
-=head2 default_flavor (string)
+=head2 default_flavor
 
-This attribute stores the name of the default flavor to use if a flavor
-is not specified in the C<copy()> or C<paste()> call. The default value
-of this attribute is C<defaultFlavor()>.
+This string attribute stores the name of the default flavor to use if a
+flavor is not specified in the L<copy()|/copy> or L<paste()|/paste>
+call. The default value of this attribute is C<defaultFlavor()>.
 
-=head2 fatal (boolean)
+=head2 fatal
 
-If this attribute is true, any pasteboard error throws an exception. If
-false, error codes are returned to the caller.
+If this Boolean attribute is true, any pasteboard error throws an
+exception. If false, error codes are returned to the caller.
 
 This attribute can be set statically, in which case it controls whether
 static methods throw an exception on a pasteboard error. Currently, only
-new() is affected by this; pbcopy() and friends are subroutines, not
-static methods.
+L<new()|/new> is affected by this; L<pbcopy()|/pbcopy> and friends are
+subroutines, not static methods.
 
 Setting this statically does B<not> affect the default value of this
 attribute in an instantiated object.
 
 The default is 1 (i.e. true).
 
-=head2 id (integer)
+=head2 id
 
-This attribute supplies the id for data to be copied to or pasted from
-the pasteboard. In addition to a non-negative integer, it can be set to
-undef. See copy() and paste() for the effects of this attribute on their
-action.  In most cases you will not need to change this.
+This integer attribute supplies the id for data to be copied to or
+pasted from the pasteboard. In addition to a non-negative integer, it
+can be set to C<undef>. See L<copy()|/copy> and L<paste()|/paste> for
+the effects of this attribute on their action.  In most cases you will
+not need to change this.
 
-The default is undef.
+The default is C<undef>.
 
-=head2 missing_ok (boolean)
+=head2 missing_ok
 
-If this attribute is true, paste() returns undef if the required flavor
-is missing, rather than throwing an exception if 'fatal' is true. The
-pbpaste() subroutine sets this true for the object it manufactures to
-satisfy its request.
+If this Boolean attribute is true, L<paste()|/paste> returns undef if
+the required flavor is missing, rather than throwing an exception if
+L<fatal|/fatal> is true. The L<pbpaste()|/pbpaste> subroutine sets this
+true for the object it manufactures to satisfy its request.
 
 The default is 0 (i.e. false).
 
-=head2 name (string, readonly)
+=head2 name
 
-This attribute reports the actual name assigned to the pasteboard. Under
-Panther (Mac OS 10.3) it is the name passed to new (), or the name of
-the system pasteboard if no name was passed in. Under Tiger (Mac OS
-10.4) and above, the actual name is retrieved once the pasteboard is
-created. If this name cannot be retrieved you get the same result as
-under Panther.
+This read-only string attribute reports the actual name assigned to the
+pasteboard. Under Panther (Mac OS 10.3) or earlier it is the name passed
+to L<new()|/new>, or the name of the system pasteboard if no name was
+passed in. Under Tiger (Mac OS 10.4) and above, the actual name is
+retrieved once the pasteboard is created. If this name cannot be
+retrieved you get the same result as under Panther.
 
 This name may not be the name you used to create the
 pasteboard, even if you used one of the built-in names. But unless you
@@ -991,17 +1068,18 @@ be equivalent. That is,
 
 gives two handles to the same clipboard.
 
-=head2 requested_name (string, readonly)
+=head2 requested_name
 
-This attribute reports the name passed to C<new()>.
+This read-only string attribute reports the name passed to C<new()>.
 
-=head2 status (dualvar)
+=head2 status
 
-This attribute contains the status of the last operation. You can set
-this with an integer; the dualvar will be generated.
+This dualvar attribute contains the status of the last operation. You
+can set this with an integer; the dualvar will be generated.
 
 The static attribute contains the status of the last static method to
-operate on a pasteboard. Currently, this means the last call to new().
+operate on a pasteboard. Currently, this means the last call to
+L<new()|/new>.
 
 =head1 EXPORT
 
@@ -1064,18 +1142,18 @@ the number of the error, which is -4960.
 
 =head3 noPasteboardPromiseKeeperErr
 
-This constant represents the error returned when the user tries place
+This constant represents the error returned when the user tries to place
 promised data on the pasteboard without first registering a promise
-keeper callback. This package does not support promised data.
-This constant is not a dualvar -- it just represents the number of the
-error, which is -25136.
+keeper callback. This package does not support promised data.  This
+constant is not a dualvar -- it just represents the number of the error,
+which is -25136.
 
 =head3 notPasteboardOwnerErr
 
-This constant represents the error returned when the user tries place
+This constant represents the error returned when the user tries to place
 data on the pasteboard without first becoming its owner by clearing it.
-It is not a dualvar -- it just represents the number of the
-error, which is -25135.
+It is not a dualvar -- it just represents the number of the error, which
+is -25135.
 
 =head2 Flavor flags
 
@@ -1126,29 +1204,31 @@ files.
 
 =head3 defaultFlavor
 
-This constant represents the name of the default flavor,
-'com.apple.traditional-mac-plain-text'.
+This constant represents the name of the default flavor, either
+C<'com.apple.traditional-mac-plain-text'> or
+C<'public.utf8-plain-text'>, depending on what version of macOS you are
+running and how this module was installed.
 
 =head3 kPasteboardClipboard
 
 This constant represents the name of the system clipboard,
-'com.apple.pasteboard.clipboard'.
+C<'com.apple.pasteboard.clipboard'>.
 
 =head3 kPasteboardFind
 
 This constant represents the name of the find pasteboard,
-'com.apple.pasteboard.find'.
+C<'com.apple.pasteboard.find'>.
 
 =head3 kPasteboardUniqueName
 
 This constant specifies that a unique name be generated for the
 pasteboard. Under Mac OS 10.4 (Tiger) or above, the generated name will
-be available in the L<name|/name (string, readonly)> attribute; under
+be available in the L<name|/name> attribute; under
 Mac OS 10.3 (Panther), the generated name is unavailable, and the
-L<name|/name (string, readonly)> attribute will be undef.
+L<name|/name> attribute will be C<undef>.
 
-The value of this constant is documented as (CFStringRef) NULL, so it is
-represented in Perl by undef.
+The value of this constant is documented as C<(CFStringRef) NULL>, so it
+is represented in Perl by C<undef>.
 
 =head2 Synchronization flags
 
@@ -1181,19 +1261,19 @@ the author.
 =head1 SEE ALSO
 
 The B<Clipboard> module by Ryan King will access text on the clipboard
-under most operating systems. Under Mac OS X, it shells out to the
-I<pbpaste> and I<pbcopy> executables.
+under most operating systems. Under macOS. recent versions use this
+module; older ones shell out to the I<pbpaste> and I<pbcopy> executables.
 
 The I<pbpaste> and I<pbcopy> executables themselves are available, and
 described by their respective man pages.
 
 The I<Pasteboard Manager Reference> is available online at
-L<http://developer.apple.com/documentation/Carbon/Reference/Pasteboard_Reference/Reference/reference.html>.
+L<https://web.archive.org/web/20090718011220/http://developer.apple.com/documentation/Carbon/Reference/Pasteboard_Reference/Reference/reference.html>.
 See also the I<Pasteboard Manager Programming Guide> at
-L<http://developer.apple.com/documentation/Carbon/Conceptual/Pasteboard_Prog_Guide/>.
+L<https://web.archive.org/web/20090718063745/http://developer.apple.com/documentation/Carbon/Conceptual/Pasteboard_Prog_Guide/paste_intro/paste_intro.html>.
 
 The I<Uniform Type Identifiers Overview> is available online at
-L<http://developer.apple.com/documentation/Carbon/Conceptual/understanding_utis/>.
+L<https://developer.apple.com/library/archive/documentation/FileManagement/Conceptual/understanding_utis/understand_utis_intro/understand_utis_intro.html>
 
 =head1 AUTHOR
 

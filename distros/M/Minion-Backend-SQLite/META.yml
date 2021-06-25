@@ -26,7 +26,7 @@ no_index:
 provides:
   Minion::Backend::SQLite:
     file: lib/Minion/Backend/SQLite.pm
-    version: v5.0.4
+    version: v5.0.5
 requires:
   List::Util: '0'
   Minion: '10.13'
@@ -36,15 +36,15 @@ requires:
   Time::HiRes: '0'
   perl: '5.010001'
 resources:
-  IRC: irc://irc.freenode.net/#mojo
+  IRC: ircs://irc.libera.chat/#mojo
   bugtracker: https://github.com/Grinnz/Minion-Backend-SQLite/issues
   homepage: https://github.com/Grinnz/Minion-Backend-SQLite
   repository: https://github.com/Grinnz/Minion-Backend-SQLite.git
-version: v5.0.4
+version: v5.0.5
 x_contributors:
   - 'Dan Book <grinnz@grinnz.com>'
   - 'Stefan Adams <s1037989@gmail.com>'
   - 'yrjustice <43676784+yrjustice@users.noreply.github.com>'
-x_generated_by_perl: v5.32.0
+x_generated_by_perl: v5.34.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: Artistic-2.0

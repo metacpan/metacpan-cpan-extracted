@@ -1,0 +1,321 @@
+NAME
+    SQLite::KeyValueStore::Simple - A simple key-value store using SQLite
+
+VERSION
+    This document describes version 0.002 of SQLite::KeyValueStore::Simple
+    (from Perl distribution SQLite-KeyValueStore-Simple), released on
+    2021-06-18.
+
+SYNOPSIS
+    From Perl:
+
+     use SQLite::KeyValueStore::Simple qw(
+         dump_sqlite_kvstore
+         list_sqlite_kvstore_keys
+         get_sqlite_kvstore_value
+         set_sqlite_kvstore_value
+         check_sqlite_kvstore_key_exists
+     );
+
+     # list existing keys in the store
+     my $res;
+     $res = list_sqlite_kvstore_keys(); # => [200, "OK", []]
+
+     # set value of a key (automatically create key), returns old value
+     $res = set_sqlite_kvstore_value(key=>"foo", value=>"bar"); # => [200, "OK", undef]
+     $res = set_sqlite_kvstore_value(key=>"foo", value=>"baz"); # => [200, "OK", "bar"]
+
+     # get value of a key (returns 404 if key does not exist)
+     $res = get_sqlite_kvstore_value(key=>"foo"); # => [200, "OK", "baz"]
+     $res = get_sqlite_kvstore_value(key=>"qux"); # => [404, "Key does not exist"]
+
+     # check the existence of a key
+     $res = check_sqlite_kvstore_key_exists(key=>"foo"); # => [200, "OK", 1]
+     $res = check_sqlite_kvstore_key_exists(key=>"qux"); # => [200, "OK", 0]
+
+     # customize the database path
+     $res = check_sqlite_kvstore_key_exists(key=>"foo", path=>"/home/ujang/myapp.db"); # => [200, "OK", 0]
+
+    From command-line (install App::SQLiteKeyValueStoreSimpeUtils):
+
+     # list existing keys in the store
+     % list-sqlite-kvstore-keys
+
+     # set value of a key (returns the old value)
+     % set-sqlite-kvstore-value foo bar
+     % set-sqlite-kvstore-value foo baz
+     bar
+
+     # get value of a key
+     % get-sqlite-kvstore-value foo
+     baz
+
+     # check existence of a key
+     % check-sqlite-kvstore-key-exists foo
+
+DESCRIPTION
+    This module provides simple key-value store using SQLite as the backend.
+    The logic is simple; this module just stores the key-value pairs as rows
+    in the database table. You can implement a SQLite-based key-value
+    yourself, but this module provides the convenience of getting/setting
+    via a single function call or a single CLI script invocation.
+
+FUNCTIONS
+  check_sqlite_kvstore_key_exists
+    Usage:
+
+     check_sqlite_kvstore_key_exists(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Check whether a key exists.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   key* => *str*
+
+        Key name.
+
+    *   path => *filename*
+
+        Database path.
+
+        If not specified, will default to $HOME/kvstore.db. If file does not
+        exist, will be created by DBD::SQLite.
+
+        If you want an in-memory database (that will be destroyed after your
+        process exits), use ":memory:".
+
+    *   quiet => *bool*
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
+  dump_sqlite_kvstore
+    Usage:
+
+     dump_sqlite_kvstore(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Dump content of key-value store as hash.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   path => *filename*
+
+        Database path.
+
+        If not specified, will default to $HOME/kvstore.db. If file does not
+        exist, will be created by DBD::SQLite.
+
+        If you want an in-memory database (that will be destroyed after your
+        process exits), use ":memory:".
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
+  get_sqlite_kvstore_value
+    Usage:
+
+     get_sqlite_kvstore_value(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Get the current value of a key, will return undef if key does not exist.
+
+    CLI will exit non-zero (1) when key does not exist.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   key* => *str*
+
+        Key name.
+
+    *   output_encoding => *str*
+
+        Output encoding.
+
+        Possible values are "r" (raw/binary), "j" (JSON), "h" (hexdigits),
+        "b" (base64). Note that a data structure or undef value must be
+        encoded to JSON. The default output encoding is "r" (or "j").
+
+    *   path => *filename*
+
+        Database path.
+
+        If not specified, will default to $HOME/kvstore.db. If file does not
+        exist, will be created by DBD::SQLite.
+
+        If you want an in-memory database (that will be destroyed after your
+        process exits), use ":memory:".
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
+  list_sqlite_kvstore_keys
+    Usage:
+
+     list_sqlite_kvstore_keys(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    List existing keys in the key-value store.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   path => *filename*
+
+        Database path.
+
+        If not specified, will default to $HOME/kvstore.db. If file does not
+        exist, will be created by DBD::SQLite.
+
+        If you want an in-memory database (that will be destroyed after your
+        process exits), use ":memory:".
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
+  set_sqlite_kvstore_value
+    Usage:
+
+     set_sqlite_kvstore_value(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Set the value of a key.
+
+    Will automatically create the key if not already exists.
+
+    Will return the old value (or "undef" if key previously did not exist).
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   input_encoding => *str* (default: "r")
+
+        Input encoding.
+
+        Possible values are "r" (raw/binary), "j" (JSON), "h" (hexdigits),
+        "b" (base64). Note that in the database table, value will be stored
+        as raw or JSON. So "b" and "h" will be converted to raw first.
+
+    *   key* => *str*
+
+        Key name.
+
+    *   output_encoding => *str*
+
+        Output encoding.
+
+        Possible values are "r" (raw/binary), "j" (JSON), "h" (hexdigits),
+        "b" (base64). Note that a data structure or undef value must be
+        encoded to JSON. The default output encoding is "r" (or "j").
+
+    *   path => *filename*
+
+        Database path.
+
+        If not specified, will default to $HOME/kvstore.db. If file does not
+        exist, will be created by DBD::SQLite.
+
+        If you want an in-memory database (that will be destroyed after your
+        process exits), use ":memory:".
+
+    *   quiet => *bool*
+
+    *   value* => *str*
+
+        Value.
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/SQLite-KeyValueStore-Simple>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-SQLite-KeyValueStore-Simple>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=SQLite-KeyValueStore-
+    Simple>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    SQLite::Counter::Simple
+
+    Some other key-value stores: the various "DBM::*" (see GDBM_File or
+    AnyDBM_File), Riak (see Data::Riak), Redis (see Redis or Mojo::Redis).
+
+    Some other key-value store frameworks: CHI.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2021 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

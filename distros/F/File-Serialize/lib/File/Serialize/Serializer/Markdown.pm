@@ -1,9 +1,12 @@
 package File::Serialize::Serializer::Markdown;
 our $AUTHORITY = 'cpan:YANICK';
+$File::Serialize::Serializer::Markdown::VERSION = '1.5.1';
 #ABSTRACT: Markdown (with frontmatter) serializer for File::Serialize
-$File::Serialize::Serializer::Markdown::VERSION = '1.5.0';
+
 use strict;
 use warnings;
+
+use Module::Runtime qw/ use_module /;
 
 use File::Serialize qw/ deserialize_file serialize_file /;
 use Moo;
@@ -11,10 +14,16 @@ with 'File::Serialize::Serializer';
 
 sub required_modules { return qw//; }
 
-sub extensions { qw/ md markdown / };
+sub extensions { qw/ md markdown / }
+
+sub is_operative {
+    return !!grep {
+        use_module("File::Serialize::Serializer::YAML::$_")->is_operative
+    } qw/ XS /;
+}
 
 sub serialize {
-    my( $self, $data, $options ) = @_;
+    my ( $self, $data, $options ) = @_;
 
     my $content = delete $data->{_content};
 
@@ -24,20 +33,18 @@ sub serialize {
 
     serialize_file \$yaml, $data, { format => 'yaml' };
 
-    return join "---\n", $yaml, $content//'';
+    return join "---\n", $yaml, $content // '';
 }
 
-
 sub deserialize {
-    my( $self, $data, $options ) = @_;
+    my ( $self, $data, $options ) = @_;
 
     # remote the potential leading `---`
     $data =~ s/^---\n//;
 
-
     return { _content => $data } if $data !~ /^---\n?$/m;
 
-    my( $frontmatter, $content ) = split /^---\n?$/m, $data, 2;
+    my ( $frontmatter, $content ) = split /^---\n?$/m, $data, 2;
 
     my $struct = deserialize_file( \$frontmatter, { format => 'yml' } );
 
@@ -60,7 +67,7 @@ File::Serialize::Serializer::Markdown - Markdown (with frontmatter) serializer f
 
 =head1 VERSION
 
-version 1.5.0
+version 1.5.1
 
 =head1 DESCRIPTION
 

@@ -29,8 +29,13 @@
          "requires" : {
             "ExtUtils::MakeMaker" : "0"
          }
+      },
+      "runtime" : {
+         "requires" : {
+            "Text::CSV" : "0"
+         }
       }
    },
    "release_status" : "stable",
-   "version" : "0.58"
+   "version" : "0.581"
 }

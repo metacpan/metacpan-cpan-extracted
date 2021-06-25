@@ -1,7 +1,7 @@
 package Dist::Zilla::Plugin::InsertBlock::FromModule;
 
-our $DATE = '2020-02-07'; # DATE
-our $VERSION = '0.100'; # VERSION
+our $DATE = '2021-02-21'; # DATE
+our $VERSION = '0.101'; # VERSION
 
 use 5.010001;
 use strict;
@@ -49,7 +49,7 @@ Dist::Zilla::Plugin::InsertBlock::FromModule - Insert a block of text from anoth
 
 =head1 VERSION
 
-This document describes version 0.100 of Dist::Zilla::Plugin::InsertBlock::FromModule (from Perl distribution Dist-Zilla-Plugin-InsertBlock), released on 2020-02-07.
+This document describes version 0.101 of Dist::Zilla::Plugin::InsertBlock::FromModule (from Perl distribution Dist-Zilla-Plugin-InsertBlock), released on 2021-02-21.
 
 =head1 SYNOPSIS
 
@@ -118,7 +118,7 @@ Source repository is at L<https://github.com/perlancar/perl-Dist-Zilla-Plugin-In
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-InsertBlock>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Dist-Zilla-Plugin-InsertBlock/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -134,7 +134,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

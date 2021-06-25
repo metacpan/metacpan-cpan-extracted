@@ -5,7 +5,7 @@ use warnings;
 
 use 5.010;
 
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.008'; # VERSION
 our $AUTHORITY = 'cpan:DERIV'; # AUTHORITY
 
 =encoding utf8
@@ -241,9 +241,23 @@ sub boot {
         }
     }
 
-
     my $active = 1;
     my $watched_modules = {};
+
+    # Make sure filewatcher is alive before forking
+    my $attempts = 3;
+    while ($attempts > 0) {
+        if(waitpid $children_pids[0], $constant{WNOHANG}) {
+            say "$$ - filewatcher process isn't running";
+            $active = 0;
+            $attempts = 0;
+        } else {
+            sleep 1;
+            $attempts--;
+        }
+    }
+
+    say "$$ - filewatcher look stable" if $active;
 
     MAIN:
     while($active) {
@@ -277,6 +291,10 @@ sub boot {
                 kill QUIT => $pid;
             };
 
+            # To avoide terminating the program
+            # with bad exit code when the file watcher is terminated
+            local $SIG{PIPE} = 'IGNORE';
+
             print $child_pipe "Parent active$CRLF";
             my $active = 1;
             ACTIVE:
@@ -292,18 +310,20 @@ sub boot {
                 $active = 0 unless check_messages_in_pipe($child_pipe, sub {
                     my $module = shift;
                     if (!$watched_modules->{$module}) {
-                        print $inotify_child_pipe "${module}${CRLF}";
-                        $watched_modules->{$module} = 1;
+                        if(print $inotify_child_pipe "${module}${CRLF}") {
+                            $watched_modules->{$module} = 1;
+                        } else {
+                            $active = 0;
+                            say "$$ - Broken pipe to the file watcher";
+                        }
                     }
                 });
 
-                for my $child_pid (@children_pids) {
-                    if(my $exit = waitpid $pid, $constant{WNOHANG}) {
-                        say "$$ Exit was $exit";
-                        # stop the other processes
-                        kill QUIT => $_ for grep {$_ eq $child_pid} @children_pids;
-                        last MAIN;
-                    }
+                if(my $exit = waitpid -1, $constant{WNOHANG}) {
+                    say "$$ Exit was $exit";
+                    # stop the other processes
+                    kill QUIT => $_ for grep {$_ ne $exit} @children_pids;
+                    last MAIN;
                 }
             }
             say "$$ - Done";

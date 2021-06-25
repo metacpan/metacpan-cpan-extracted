@@ -17,7 +17,7 @@ SKIP: {
 }
 
 local $INPUT_RECORD_SEPARATOR = undef;
-my $file = 'lib/Graphics/TIFF.pm';
+my $file = $INC{'Graphics/TIFF.pm'};
 open my $fh, '<:encoding(UTF8)', $file
   or die "Error: cannot open $file\n";
 my $text = <$fh>;

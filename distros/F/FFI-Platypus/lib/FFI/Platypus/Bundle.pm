@@ -6,7 +6,7 @@ use 5.008004;
 use Carp ();
 
 # ABSTRACT: Bundle foreign code with your Perl module
-our $VERSION = '1.43'; # VERSION
+our $VERSION = '1.46'; # VERSION
 
 
 package FFI::Platypus;
@@ -150,7 +150,7 @@ FFI::Platypus::Bundle - Bundle foreign code with your Perl module
 
 =head1 VERSION
 
-version 1.43
+version 1.46
 
 =head1 SYNOPSIS
 
@@ -223,7 +223,7 @@ C<lib/Foo.pm>:
 
 C<t/foo.t>
 
- use Test::More;
+ use Test2::V0;
  use Foo;
  
  my $foo = Foo->new("platypus", 10);
@@ -376,9 +376,7 @@ the mangler.  If we hadn't done that then we could instead attach with the full 
 
 You're done!  You can now use this class.  Lets write a test to make sure it works,
 
- use strict;
- use warnings;
- use Test::More;
+ use Test2::V0;
  use Foo;
  
  my $foo = Foo->new("platypus", 10);
@@ -620,7 +618,7 @@ C<lib/Answer.pm>:
  use strict;
  use warnings;
  use FFI::Platypus 1.00;
- use base qw( Exporter );
+ use Exporter qw( import );
  
  our @EXPORT = qw( answer );
  
@@ -788,6 +786,8 @@ Diab Jerius (DJERIUS)
 Eric Brine (IKEGAMI)
 
 szTheory
+
+José Joaquín Atria (JJATRIA)
 
 =head1 COPYRIGHT AND LICENSE
 

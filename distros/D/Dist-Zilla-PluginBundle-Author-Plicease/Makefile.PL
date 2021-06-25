@@ -106,10 +106,10 @@ my %WriteMakefileArgs = (
     "namespace::autoclean"                    => 0
   },
   "TEST_REQUIRES" => {
-    "Test2::V0"    => "0.000060",
+    "Test2::V0"    => "0.000121",
     "Test::Script" => "1.10"
   },
-  "VERSION" => "2.64",
+  "VERSION" => "2.66",
   "test"    => {
     "TESTS" => "t/*.t"
   }

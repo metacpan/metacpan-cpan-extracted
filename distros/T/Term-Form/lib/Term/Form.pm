@@ -4,16 +4,17 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '0.532';
+our $VERSION = '0.534';
 use Exporter 'import';
 our @EXPORT_OK = qw( fill_form read_line );
 
+use Carp       qw( croak );
 use List::Util qw( any );
 
 use Term::Choose::LineFold        qw( line_fold print_columns cut_to_printwidth );
-use Term::Choose::Constants       qw( :keys );
+use Term::Choose::Constants       qw( :all );
 use Term::Choose::Screen          qw( :all );
-use Term::Choose::Util            qw( unicode_sprintf );
+use Term::Choose::Util            qw( unicode_sprintf get_term_size get_term_width get_term_height );
 use Term::Choose::ValidateOptions qw( validate_options );
 
 my $Plugin;
@@ -36,11 +37,11 @@ sub ReadLine { 'Term::Form' }
 
 sub new {
     my $class = shift;
-    die "new: called with " . @_ . " arguments - 0 or 1 arguments expected." if @_ > 1;
+    croak "new: called with " . @_ . " arguments - 0 or 1 arguments expected." if @_ > 1;
     my ( $opt ) = @_;
     my $instance_defaults = _defaults();
     if ( defined $opt ) {
-        die "new: The (optional) argument is not a HASH reference." if ref $opt ne 'HASH';
+        croak "new: The (optional) argument is not a HASH reference." if ref $opt ne 'HASH';
         validate_options( _valid_options( 'new' ), $opt );
         for my $key ( keys %$opt ) {
             $instance_defaults->{$key} = $opt->{$key} if defined $opt->{$key};
@@ -57,13 +58,15 @@ sub _valid_options {
     my ( $caller ) = @_;
     if ( $caller eq 'new' ) {
         return {
-            clear_screen       => '[ 0 1 2 ]',
             codepage_mapping   => '[ 0 1 ]',
             show_context       => '[ 0 1 ]',
             auto_up            => '[ 0 1 2 ]',
-            color              => '[ 0 1 2 ]',     # hide_cursor == 2 # documentation
-            hide_cursor        => '[ 0 1 2 ]',
+            clear_screen       => '[ 0 1 2 ]',
+            color              => '[ 0 1 2 ]',
+            hide_cursor        => '[ 0 1 2 ]', # hide_cursor == 2 # documentation
             no_echo            => '[ 0 1 2 ]',
+            page               => '[ 0 1 2 ]', # undocumented
+            keep               => '[ 1-9 ][ 0-9 ]*', # undocumented
             read_only          => 'Array_Int',
             section_separators => 'Array_Int', # experimental
                                                # uses only the key, a passed value is ignored
@@ -71,33 +74,39 @@ sub _valid_options {
             back               => 'Str',
             confirm            => 'Str',
             default            => 'Str',
+            footer             => 'Str', # undocumented
             info               => 'Str',
             prompt             => 'Str',
         };
     }
     if ( $caller eq 'readline' ) {
         return {
-            clear_screen     => '[ 0 1 2 ]',
             codepage_mapping => '[ 0 1 ]',
             show_context     => '[ 0 1 ]',
+            clear_screen     => '[ 0 1 2 ]',
             color            => '[ 0 1 2 ]',
             hide_cursor      => '[ 0 1 2 ]',
             no_echo          => '[ 0 1 2 ]',
+            page             => '[ 0 1 2 ]',
             default          => 'Str',
+            footer           => 'Str',
             info             => 'Str',
         };
     }
     if ( $caller eq 'fill_form' ) {
         return {
-            clear_screen       => '[ 0 1 2 ]',
             codepage_mapping   => '[ 0 1 ]',
             auto_up            => '[ 0 1 2 ]',
+            clear_screen       => '[ 0 1 2 ]',
             color              => '[ 0 1 2 ]',
             hide_cursor        => '[ 0 1 2 ]',
+            page               => '[ 0 1 2 ]',
+            keep               => '[ 1-9 ][ 0-9 ]*',
             read_only          => 'Array_Int',
             section_separators => 'Array_Int',
             back               => 'Str',
             confirm            => 'Str',
+            footer             => 'Str',
             info               => 'Str',
             prompt             => 'Str',
         };
@@ -114,9 +123,12 @@ sub _defaults {
         color              => 0,
         confirm            => 'CONFIRM',
         default            => '',
+        footer             => '',
         hide_cursor        => 1,
         info               => '',
+        keep               => 5,
         no_echo            => 0,
+        page               => 1,
         prompt             => '',
         read_only          => [],
         section_separators => [],
@@ -210,9 +222,6 @@ sub __calculate_threshold {
 sub __before_readline {
     my ( $self, $m ) = @_;
     my @pre_text_array;
-    if ( length $self->{info} ) {
-        @pre_text_array = line_fold( $self->{info}, $self->{i}{term_w}, { color => $self->{color}, join => 0 } );
-    }
     if ( $self->{show_context} ) {
         my @before_lines;
         if ( $m->{diff} ) {
@@ -311,11 +320,63 @@ sub __after_readline {
 }
 
 
+sub __print_footer {
+    my ( $self ) = @_;
+    my $used_rows = (
+          $self->{i}{info_row_count}
+        + $self->{i}{pre_text_row_count}
+        + 1     #readline
+        + $self->{i}{post_text_row_count}
+    );
+    my $empty = get_term_height() - $used_rows;
+    my $footer_line = sprintf $self->{i}{footer_fmt}, 1;
+    if ( $empty > 0 ) {
+        print "\n" x $empty;
+        print $footer_line;
+        print up( $empty );
+    }
+    else {
+        if ( get_term_height >= 2 ) { ##
+            print "\n";
+            print $footer_line;
+            print up( 1 );
+        }
+    }
+}
+
+
+sub __modify_readline_options {
+    my ( $self ) = @_;
+    if ( $self->{clear_screen} == 2 && $self->{show_context} ) {
+        $self->{clear_screen} = 0;
+    }
+    if ( length $self->{footer} && $self->{page} != 2 ) {
+        $self->{page} = 2;
+    }
+    if ( $self->{page} == 2 && $self->{clear_screen} != 1 ) {
+        $self->{clear_screen} = 1;
+    }
+}
+
+
 sub __init_readline {
     my ( $self, $term_w, $prompt ) = @_;
     $self->{i}{term_w} = $term_w;
+    if ( $self->{clear_screen} == 1 ) {
+        print clear_screen();
+    }
+    if ( length $self->{info} ) {
+        my @info = line_fold( $self->{info}, $self->{i}{term_w}, { color => $self->{color}, join => 0 } );
+        $self->{i}{info_row_count} = @info;
+        print join( "\n", @info ), "\n";
+    }
+    else {
+        $self->{i}{info_row_count} = 0;
+    }
     $self->{i}{seps}[0] = ''; # in __readline
     $self->{i}{curr_row} = 0; # in __readlline and __string_and_pos
+    $self->{i}{pre_text_row_count} = 0;
+    $self->{i}{post_text_row_count} = 0;
     if ( $self->{color} ) {
         my @color;
         $prompt =~ s/\x{feff}//g;
@@ -346,6 +407,14 @@ sub __init_readline {
     }
     $self->{i}{th} = int( $self->{i}{avail_w} / 5 );
     $self->{i}{th} = 40 if $self->{i}{th} > 40;
+    if ( $self->{page} == 2 ) {
+        $self->{i}{page_count} = 1;
+        $self->{i}{print_footer} = 1;
+        $self->__prepare_footer_fmt();
+    }
+    else {
+        $self->{i}{print_footer} = 0;
+    }
     my $list = [ [ $prompt, $self->{default} ] ];
     my $m = $self->__string_and_pos( $list );
     return $m;
@@ -354,7 +423,7 @@ sub __init_readline {
 
 sub read_line {
     if ( ref $_[0] eq __PACKAGE__ ) {
-        die "\"read_line\" is a function. The method is called \"readline\"";
+        croak "\"read_line\" is a function. The method is called \"readline\"";
     }
     my $ob = __PACKAGE__->new();
     delete $ob->{backup_instance_defaults};
@@ -365,13 +434,13 @@ sub read_line {
 sub readline {
     my ( $self, $prompt, $opt ) = @_;
     $prompt = ''                                         if ! defined $prompt;
-    die "readline: a reference is not a valid prompt." if ref $prompt;
+    croak "readline: a reference is not a valid prompt." if ref $prompt;
     $opt = {}                                            if ! defined $opt;
     if ( ! ref $opt ) {
         $opt = { default => $opt };
     }
     elsif ( ref $opt ne 'HASH' ) {
-        die "readline: the (optional) second argument must be a string or a HASH reference";
+        croak "readline: the (optional) second argument must be a string or a HASH reference";
     }
     if ( %$opt ) {
         validate_options( _valid_options( 'readline' ), $opt );
@@ -379,9 +448,7 @@ sub readline {
             $self->{$key} = $opt->{$key} if defined $opt->{$key};
         }
     }
-    if ( $self->{clear_screen} == 2 && $self->{show_context} ) {
-        $self->{clear_screen} = 0;
-    }
+    $self->__modify_readline_options();
     if ( $^O eq "MSWin32" ) {
         print $self->{codepage_mapping} ? "\e(K" : "\e(U";
     }
@@ -392,23 +459,29 @@ sub readline {
         exit;
     };
     $self->__init_term();
-    my $term_w = ( get_term_size() )[0];
+    my $term_w = get_term_width();
     my $m = $self->__init_readline( $term_w, $prompt );
     my $big_step = 10;
     my $up_before = 0;
-    if ( $self->{clear_screen} == 1 ) {
-        print clear_screen();
-    }
 
     CHAR: while ( 1 ) {
         if ( $self->{i}{beep} ) {
             print bell();
             $self->{i}{beep} = 0;
         }
-        my $tmp_term_w = ( get_term_size() )[0];
+        my $tmp_term_w = get_term_width();
         if ( $tmp_term_w != $term_w ) {
             $term_w = $tmp_term_w;
+            $self->{default} = join( '', map { $_->[0] } @{$m->{str}} );
             $m = $self->__init_readline( $term_w, $prompt );
+        }
+        if ( $self->{show_context} ) {
+            if ( ( $self->{i}{pre_text_row_count} + 2 + $self->{i}{post_text_row_count} ) >= get_term_height() ) { ##
+                $self->{show_context} = 0;
+                $up_before = 0;
+                $self->{default} = join( '', map { $_->[0] } @{$m->{str}} );
+                $m = $self->__init_readline( $term_w, $prompt );
+            }
         }
         if ( $up_before ) {
             print up( $up_before );
@@ -424,9 +497,16 @@ sub readline {
         if ( length $self->{i}{pre_text} ) {
             print $self->{i}{pre_text}, "\n";
         }
+
         $self->__after_readline( $m );
         if ( length $self->{i}{post_text} ) {
             print "\n" . $self->{i}{post_text};
+        }
+        if ( $self->{i}{print_footer} ) {
+            $self->__print_footer();
+        }
+        if ( $self->{i}{post_text_row_count} ) {
+            # after __print_footer()
             print up( $self->{i}{post_text_row_count} );
         }
         $self->__print_readline( $m );
@@ -832,9 +912,9 @@ sub __prepare_hight {
         $self->{i}{pre_text_row_count} = $self->{i}{pre_text} =~ tr/\n//;
         $self->{i}{pre_text_row_count} += 1;
         $self->{i}{avail_h} -= $self->{i}{pre_text_row_count};
-        my $min_avail_h = 5;
+        my $min_avail_h = $self->{keep};
         if (  $term_h < $min_avail_h ) {
-            $min_avail_h =  $term_h;
+            $min_avail_h = $term_h;
         }
         if ( $self->{i}{avail_h} < $min_avail_h ) {
             $self->{i}{avail_h} = $min_avail_h;
@@ -844,14 +924,20 @@ sub __prepare_hight {
         $self->{i}{pre_text_row_count} = 0;
     }
     if ( @$list > $self->{i}{avail_h} ) {
-        $self->{i}{pages} = int @$list / ( $self->{i}{avail_h} - 1 );
+        $self->{i}{page_count} = int @$list / ( $self->{i}{avail_h} - 1 );
         if ( @$list % ( $self->{i}{avail_h} - 1 ) ) {
-            $self->{i}{pages}++;
+            $self->{i}{page_count}++;
         }
+    }
+    else {
+        $self->{i}{page_count} = 1;
+    }
+    if ( $self->{page} == 2 || ( $self->{page} == 1 && $self->{i}{page_count} > 1) ) {
+        $self->{i}{print_footer} = 1;
         $self->{i}{avail_h}--;
     }
     else {
-        $self->{i}{pages} = 1;
+        $self->{i}{print_footer} = 0;
     }
     return;
 }
@@ -943,24 +1029,39 @@ sub __write_screen {
         push @rows, $self->__get_row( $list, $idx );
     }
     print join "\n", @rows;
-    if ( $self->{i}{pages} > 1 ) {
+    $self->{i}{curr_page} = int( $self->{i}{end_row} / $self->{i}{avail_h} ) + 1;
+    if ( $self->{i}{print_footer} ) {
         if ( $self->{i}{avail_h} - ( $self->{i}{end_row} + 1 - $self->{i}{begin_row} ) ) {
             print "\n" x ( $self->{i}{avail_h} - ( $self->{i}{end_row} - $self->{i}{begin_row} ) - 1 );
         }
-        $self->{i}{page} = int( $self->{i}{end_row} / $self->{i}{avail_h} ) + 1;
-        my $page_number = sprintf '- Page %d/%d -', $self->{i}{page}, $self->{i}{pages};
-        if ( length $page_number > $self->{i}{term_w} ) {
-            $page_number = substr sprintf( '%d/%d', $self->{i}{page}, $self->{i}{pages} ), 0, $self->{i}{term_w};
+        print "\n", sprintf $self->{i}{footer_fmt}, $self->{i}{curr_page};
+    }
+    my $up = $self->{i}{avail_h} - ( $self->{i}{curr_row} - $self->{i}{begin_row} );
+    print up( $up ) if $up;
+}
+
+
+sub __prepare_footer_fmt {
+    my ( $self ) = @_;
+    if ( ! $self->{i}{print_footer} ) {
+        return;
+    }
+    my $width_p_count = length $self->{i}{page_count};
+    my $p_count = $self->{i}{page_count};
+    my $footer_fmt = '--- %0' . $width_p_count . 'd/' . $p_count . ' ---';
+    if ( $self->{footer} ) {
+        $footer_fmt .= $self->{footer};
+    }
+    if ( print_columns( sprintf $footer_fmt, $p_count ) > $self->{i}{term_w} ) { # color
+        $footer_fmt = '%0' . $width_p_count . 'd/' . $p_count;
+        if ( length( sprintf $footer_fmt, $p_count ) > $self->{i}{term_w} ) {
+            if ( $width_p_count > $self->{i}{term_w} ) {
+                $width_p_count = $self->{i}{term_w};
+            }
+            $footer_fmt = '%0' . $width_p_count . '.' . $width_p_count . 's';
         }
-        print "\n", $page_number;
-        my $up = $self->{i}{avail_h} - ( $self->{i}{curr_row} - $self->{i}{begin_row} );
-        print up( $up ) if $up;
     }
-    else {
-        $self->{i}{page} = 1;
-        my $up = $self->{i}{end_row} - $self->{i}{curr_row};
-        print up( $up ) if $up;
-    }
+    $self->{i}{footer_fmt} = $footer_fmt;
 }
 
 
@@ -1020,6 +1121,20 @@ sub __prepare_meta_menu_elements {
 }
 
 
+sub __modify_fill_form_options {
+    my ( $self ) = @_;
+    if ( $self->{clear_screen} == 2 ) {
+        $self->{clear_screen} = 0;
+    }
+    if ( length $self->{footer} && $self->{page} != 2 ) {
+        $self->{page} = 2;
+    }
+    if ( $self->{page} == 2 && ! $self->{clear_screen} ) {
+        $self->{clear_screen} = 1;
+    }
+}
+
+
 sub fill_form {
     if ( ref $_[0] ne __PACKAGE__ ) {
         my $ob = __PACKAGE__->new();
@@ -1027,10 +1142,10 @@ sub fill_form {
         return $ob->fill_form( @_ );
     }
     my ( $self, $orig_list, $opt ) = @_;
-    die "'fill_form' called with no argument." if ! defined $orig_list;
-    die "'fill_form' requires an ARRAY reference as its argument." if ref $orig_list ne 'ARRAY';
+    croak "'fill_form' called with no argument." if ! defined $orig_list;
+    croak "'fill_form' requires an ARRAY reference as its argument." if ref $orig_list ne 'ARRAY';
     $opt = {} if ! defined $opt;
-    die "'fill_form': the (optional) second argument must be a HASH reference" if ref $opt ne 'HASH';
+    croak "'fill_form': the (optional) second argument must be a HASH reference" if ref $opt ne 'HASH';
     return [] if ! @$orig_list; ##
     if ( %$opt ) {
         validate_options( _valid_options( 'fill_form' ), $opt );
@@ -1038,15 +1153,17 @@ sub fill_form {
             $self->{$key} = $opt->{$key} if defined $opt->{$key};
         }
     }
-    if ( $self->{clear_screen} == 2 ) {
-        $self->{clear_screen} = 0;
-    }
+    $self->__modify_fill_form_options();
     if ( $^O eq "MSWin32" ) {
         print $self->{codepage_mapping} ? "\e(K" : "\e(U";
     }
     my @tmp;
-    push @tmp, $self->{info}   if length $self->{info};
-    push @tmp, $self->{prompt} if length $self->{prompt};
+    if ( length $self->{info} ) {
+        push @tmp, $self->{info};
+    }
+    if ( length $self->{prompt} ) {
+        push @tmp, $self->{prompt};
+    }
     $self->{i}{pre_text} = join "\n", @tmp;
     $self->{i}{sep}    = ': ';
     $self->{i}{sep_ro} = '| ';
@@ -1101,6 +1218,7 @@ sub fill_form {
     $self->__length_longest_key( $list );
     $self->__prepare_width( $term_w );
     $self->__prepare_hight( $list, $term_w, $term_h );
+    $self->__prepare_footer_fmt();
     $self->__write_first_screen( $list, $back_row, $auto_up );
     my $m = $self->__string_and_pos( $list );
     my $k = 0;
@@ -1149,6 +1267,7 @@ sub fill_form {
             $self->__length_longest_key( $list );
             $self->__prepare_width( $term_w );
             $self->__prepare_hight( $list, $term_w, $term_h );
+            $self->__prepare_footer_fmt();
             $self->__write_first_screen( $list, $back_row, $auto_up );
             $m = $self->__string_and_pos( $list );
         }
@@ -1239,7 +1358,7 @@ sub fill_form {
         }
         elsif ( $char == VK_PAGE_UP || $char == CONTROL_B ) {
             $k = 1;
-            if ( $self->{i}{page} == 1 ) {
+            if ( $self->{i}{curr_page} == 1 ) {
                 if ( $self->{i}{curr_row} == 0 ) {
                     $self->{i}{beep} = 1;
                 }
@@ -1260,7 +1379,7 @@ sub fill_form {
         }
         elsif ( $char == VK_PAGE_DOWN || $char == CONTROL_F ) {
             $k = 1;
-            if ( $self->{i}{page} == $self->{i}{pages} ) {
+            if ( $self->{i}{curr_page} == $self->{i}{page_count} ) {
                 if ( $self->{i}{curr_row} == $#$list ) {
                     $self->{i}{beep} = 1;
                 }
@@ -1419,7 +1538,7 @@ Term::Form - Read lines from STDIN.
 
 =head1 VERSION
 
-Version 0.532
+Version 0.534
 
 =cut
 
@@ -1505,7 +1624,7 @@ To set the different options it can be passed a reference to a hash as an option
 
 C<readline> reads a line from STDIN.
 
-    $line = $new->readline( $prompt, [ \%options ] );
+    $line = $new->readline( $prompt, \%options );
 
 The fist argument is the prompt string.
 

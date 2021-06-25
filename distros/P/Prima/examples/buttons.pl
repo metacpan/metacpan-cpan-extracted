@@ -16,7 +16,7 @@ A customized button creation with subclassing is exemplified
 use strict;
 use warnings;
 
-use Prima 'Buttons', 'Application';
+use Prima qw(Buttons Application Drawable::Metafile);
 
 package UserButton;
 use vars qw(@ISA);
@@ -99,8 +99,51 @@ my $w = Prima::MainWindow-> create(
 	width     => 400,
 	designScale => [7, 16],
 );
-$w->insert( "Button"     , origin => [  50,180], pressed => 1);
+$w->insert( "Button",
+	origin => [  50,180], 
+	pressed => 1, 
+	onClick => sub {
+		$w->Meta->enabled(!$w->Meta->enabled);
+	}
+);
 my $l = $w->insert( "UserButton" , origin => [ 250,180], autoRepeat => 1);
+
 $w->insert( "Radio"      , origin => [  50,140]);
+
+my $metafile = Prima::Drawable::Metafile->new( size => [70, 70] );
+$metafile->begin_paint;
+$metafile->lineJoin(lj::Miter);
+$metafile->lineWidth(5);
+my $c = 3.14159 * 2 / 7;
+my @pts = map { 35 + int(25 * $_ + .5) } (
+	1,0,
+	cos(3*$c), sin(-3*$c),
+	cos($c), sin($c), 
+	cos(2*$c), sin(-2*$c),
+	cos(2*$c), sin(2*$c),
+	cos($c), -sin($c),
+	cos(3*$c), sin(3*$c),
+	1,0,
+);
+
+$metafile->polyline(\@pts);
+$metafile->end_paint;
+
+my $metafile2 = Prima::Drawable::Metafile->new( size => [25, 25] );
+$metafile2->begin_paint;
+$metafile2->color(cl::Green);
+$metafile2->fillWinding(fm::Winding);
+$metafile2->fillpoly(\@pts);
+$metafile2->end_paint;
+
+$w->insert(
+	"Button"     ,
+	origin => [ 50,50],
+	size => [80,80],
+	image => $metafile,
+	text => '',
+	name => 'Meta',
+	hiliteGlyph => $metafile2,
+);
 
 run Prima;

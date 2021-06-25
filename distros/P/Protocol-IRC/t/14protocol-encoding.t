@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 use utf8;
 
@@ -13,6 +13,34 @@ my $CRLF = "\x0d\x0a"; # because \r\n isn't portable
 my @textmessages;
 my @quitmessages;
 my $serverstream;
+
+package TestIRC {
+   use base qw( Protocol::IRC );
+
+   sub new { return bless [], shift }
+
+   sub write { $serverstream .= $_[1] }
+
+   use constant encoder => Encode::find_encoding("UTF-8");
+
+   my %isupport = (
+      CHANTYPES   => "#&",
+         channame_re => qr/^[#&]/,
+      PREFIX      => "(ohv)@%+",
+         prefix_modes => 'ohv',
+         prefix_flags => '@%+',
+         prefixflag_re => qr/^[@%+]/,
+         prefix_map_m2f => { 'o' => '@', 'h' => '%', 'v' => '+' },
+         prefix_map_f2m => { '@' => 'o', '%' => 'h', '+' => 'v' },
+   );
+
+   sub isupport { return $isupport{$_[1]} }
+
+   sub nick { return "MyNick" }
+
+   sub on_message_text { push @textmessages, [ $_[1], $_[2] ] }
+   sub on_message_QUIT { push @quitmessages, [ $_[1], $_[2] ] }
+}
 
 my $irc = TestIRC->new;
 sub write_irc
@@ -65,32 +93,3 @@ is( $msg->command, "QUIT", '$msg->command for QUIT with encoding' );
 is( $hints->{text}, "مرحبا العالم", '$hints->{text} for QUIT with encoding' );
 
 done_testing;
-
-package TestIRC;
-use base qw( Protocol::IRC );
-
-sub new { return bless [], shift }
-
-sub write { $serverstream .= $_[1] }
-
-use constant encoder => Encode::find_encoding("UTF-8");
-
-my %isupport;
-BEGIN {
-   %isupport = (
-      CHANTYPES   => "#&",
-         channame_re => qr/^[#&]/,
-      PREFIX      => "(ohv)@%+",
-         prefix_modes => 'ohv',
-         prefix_flags => '@%+',
-         prefixflag_re => qr/^[@%+]/,
-         prefix_map_m2f => { 'o' => '@', 'h' => '%', 'v' => '+' },
-         prefix_map_f2m => { '@' => 'o', '%' => 'h', '+' => 'v' },
-   );
-}
-sub isupport { return $isupport{$_[1]} }
-
-sub nick { return "MyNick" }
-
-sub on_message_text { push @textmessages, [ $_[1], $_[2] ] }
-sub on_message_QUIT { push @quitmessages, [ $_[1], $_[2] ] }

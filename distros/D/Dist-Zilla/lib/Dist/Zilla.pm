@@ -1,8 +1,16 @@
-package Dist::Zilla 6.017;
+package Dist::Zilla 6.020;
 # ABSTRACT: distribution builder; installer not included!
 
 use Moose 0.92; # role composition fixes
 with 'Dist::Zilla::Role::ConfigDumper';
+
+# BEGIN BOILERPLATE
+use v5.20.0;
+use warnings;
+use utf8;
+no feature 'switch';
+use experimental qw(postderef postderef_qq); # This experiment gets mainlined.
+# END BOILERPLATE
 
 # This comment has fün̈n̈ÿ characters.
 
@@ -750,7 +758,7 @@ sub _write_out_file {
 #pod =attr logger
 #pod
 #pod This attribute stores a L<Log::Dispatchouli::Proxy> object, used to log
-#pod messages.  By default, a proxy to the dist's L<Chrome|Dist::Zilla::Chrome> is
+#pod messages.  By default, a proxy to the dist's L<Chrome|Dist::Zilla::Role::Chrome> is
 #pod taken.
 #pod
 #pod The following methods are delegated from the Dist::Zilla object to the logger:
@@ -897,7 +905,7 @@ Dist::Zilla - distribution builder; installer not included!
 
 =head1 VERSION
 
-version 6.017
+version 6.020
 
 =head1 DESCRIPTION
 
@@ -912,6 +920,17 @@ make much more ludicrous demands in terms of prerequisites.
 If you have access to the web, you can learn more and find an interactive
 tutorial at B<L<dzil.org|http://dzil.org/>>.  If not, try
 L<Dist::Zilla::Tutorial>.
+
+=head1 PERL VERSION SUPPORT
+
+This module has the same support period as perl itself:  it supports the two
+most recent versions of perl.  (That is, if the most recently released version
+is v5.40, then this module should work on both v5.40 and v5.38.)
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
 
 =head1 ATTRIBUTES
 
@@ -1034,7 +1053,7 @@ L<CPAN::Meta::Prereqs>, and describes the distribution's prerequisites.
 =head2 logger
 
 This attribute stores a L<Log::Dispatchouli::Proxy> object, used to log
-messages.  By default, a proxy to the dist's L<Chrome|Dist::Zilla::Chrome> is
+messages.  By default, a proxy to the dist's L<Chrome|Dist::Zilla::Role::Chrome> is
 taken.
 
 The following methods are delegated from the Dist::Zilla object to the logger:
@@ -1165,11 +1184,11 @@ Search for plugin bundles: L<https://metacpan.org/search?q=Dist::Zilla::PluginBu
 
 =head1 AUTHOR
 
-Ricardo SIGNES 😏 <rjbs@cpan.org>
+Ricardo SIGNES 😏 <rjbs@semiotic.systems>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Ævar Arnfjörð Bjarmason Alastair McGowan-Douglas Alceu Rodrigues de Freitas Junior Alexei Znamensky Alex Vandiver ambs Andrew Rodland Andy Jack Apocalypse ben hengst Bernardo Rechea Brian Fraser Caleb Cushing Chase Whitener Chisel Christian Walde Christopher Bottoms J. Madsen Chris Weyl Cory G Watson csjewell Curtis Brandt Dagfinn Ilmari Mannsåker Damien KRotkine Dan Book Daniel Böhmer Danijel Tasov Dave Lambley O'Neill Rolsky David E. Wheeler Golden H. Adler Steinbrunner Zurborg Davor Cubranic Dimitar Petrov Doug Bell Erik Carlsson Fayland Lam Felix Ostmann Florian Ragwitz Fred Moyer fREW Schmidt gardnerm Gianni Ceccarelli Graham Barr Knop Ollis Grzegorz Rożniecki Håkon Hægland Hans Dieter Pearcey Hunter McMillen Ivan Bessarabov Jakob Voss jantore Jérôme Quelin Jesse Luehrs Vincent JJ Merelo John Napiorkowski jonasbn Jonathan C. Otsuka Rockway Scott Duff Yu Karen Etheridge Kent Fredric Leon Timmermans Lucas Theisen Luc St-Louis Marcel Gruenauer Martin McGrath Mary Ehlers Mateu X Matthew Horsfall mauke Michael Conrad G. Schwern Jemmeson Mickey Nasriachi Mike Doherty Mohammad S Anwar Moritz Onken Neil Bowers Nickolay Platonov Nick Tonkin nperez Olivier Mengué Paul Cochrane Pedro Melo perlancar (@pc-office) Philippe Bruhat (BooK) Randy Stauner Ricardo Signes robertkrimen Rob Hoelz Robin Smidsrød Roy Ivy III Shawn M Moore Shlomi Fish Smylers Steffen Schwigon Steven Haryanto Tatsuhiko Miyagawa Upasana Shukla Vyacheslav Matjukhin Yanick Champoux Yuval Kogman
+=for stopwords Ævar Arnfjörð Bjarmason Alastair McGowan-Douglas Alceu Rodrigues de Freitas Junior Alexei Znamensky Alex Vandiver ambs Andrew Rodland Andy Jack Apocalypse ben hengst Bernardo Rechea Brian Fraser Caleb Cushing Chase Whitener Chisel Christian Walde Christopher Bottoms J. Madsen Chris Weyl Cory G Watson csjewell Curtis Brandt Dagfinn Ilmari Mannsåker Damien KRotkine Dan Book Daniel Böhmer Danijel Tasov Dave Lambley O'Neill Rolsky David E. Wheeler Golden H. Adler Steinbrunner Zurborg Davor Cubranic Dimitar Petrov Doug Bell Erik Carlsson Fayland Lam Felix Ostmann Florian Ragwitz Fred Moyer fREW Schmidt gardnerm Gianni Ceccarelli Graham Barr Knop Ollis Grzegorz Rożniecki Håkon Hægland Hans Dieter Pearcey Hunter McMillen Ivan Bessarabov Jakob Voss jantore Jérôme Quelin Jesse Luehrs Vincent JJ Merelo John Napiorkowski jonasbn Jonathan C. Otsuka Rockway Scott Duff Yu Karen Etheridge Kent Fredric Leon Timmermans Lucas Theisen Luc St-Louis Marcel Gruenauer Martin McGrath Mary Ehlers Mateu X Matthew Horsfall mauke Michael Conrad G. Schwern Jemmeson Mickey Nasriachi Mike Doherty Mohammad S Anwar Moritz Onken Neil Bowers Nickolay Platonov Nick Tonkin nperez Olivier Mengué Paul Cochrane Pedro Melo perlancar (@pc-office) Philippe Bruhat (BooK) raf Randy Stauner Ricardo Signes robertkrimen Rob Hoelz Robin Smidsrød Roy Ivy III Shawn M Moore Shlomi Fish Smylers Steffen Schwigon Steven Haryanto Tatsuhiko Miyagawa Upasana Shukla Vyacheslav Matjukhin Yanick Champoux Yuval Kogman
 
 =over 4
 
@@ -1559,11 +1578,15 @@ Philippe Bruhat (BooK) <book@cpan.org>
 
 =item *
 
+raf <68724930+rafork@users.noreply.github.com>
+
+=item *
+
 Randy Stauner <rwstauner@cpan.org>
 
 =item *
 
-Ricardo Signes <rjbs@semiotic.systems>
+Ricardo Signes <rjbs@cpan.org>
 
 =item *
 
@@ -1625,7 +1648,7 @@ Yuval Kogman <nothingmuch@woobling.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Ricardo SIGNES.
+This software is copyright (c) 2021 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -70,7 +70,7 @@ sub pairwise_cmp
   }
 
   # Printing
-  say join "\t", "*", (map {"file$_"} 1 .. $N) ; # , $optv0 ? () :  ('strmin','strmax') ; 
+  say join "\t", "*", (map {"file$_"} 1 .. $N) ; # , $optv0 ? () :  ('minstr','maxstr') ; 
   #my @out ; 
   #push @out , scalar keys %fqA ; 
   say join "\t" , 'freq' , map { sum0 values %{$fqE[$_]} }  0 .. $N-1 ;

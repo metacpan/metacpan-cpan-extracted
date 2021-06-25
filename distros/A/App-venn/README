@@ -15,7 +15,7 @@ $ function y(){ echo -n $* | perl -pe's/./$&\n/g' } # ← Defined a shell functi
 
 $ venn <(y ABCCCC) <(y AABDEF) <(y ABBDEF) <(y DEEEF) # Each <(...) means the process substitution. Each is treated as a file as the result of the contained command. Out follows next 4 lines:
 
-  cardi. file1  file2  file3  file4  strmin strmax
+  cardi. file1  file2  file3  file4  minstr maxstr
   2.     2      3      3      0      'A'    'B'
   1.     4      0      0      0      'C'
   3.     0      3      3      5      'D'    'F'

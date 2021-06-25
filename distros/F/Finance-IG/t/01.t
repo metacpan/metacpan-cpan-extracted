@@ -7,6 +7,7 @@ use Test::Simple tests=>5;
 
 my $tester=$FindBin::RealBin."/../Testing/test.pl"; 
 
+# $^X is current version of perl , path to. 
 open(F,"$^X $tester -h  |") or die "unable to run $^X ".$FindBin::RealBin. "/../Testing/test.pl"; 
 my $lc=0; 
 while (<F>)
@@ -21,17 +22,21 @@ $lc=0;
 open(F,"$^X $tester |") or die "unable to run $^X".$FindBin::RealBin. "/../Testing/test.pl"; 
 my $md5=Digest::MD5->new;
 while (<F>)
-{ 
+{
+   s/\s+/ /g; # remove all multiple spaces 
    $lc++; 
-   $md5->add($_);  
+   chomp; 
    if ($lc==1) 
    { 
-      chomp; 
-      ok($_ eq '66 Positions', "First summary line is correct"); 
+      s/ +$//; 
+      ok($_ eq '66 Positions', "First summary line is correct ($_)"); 
    } 
-   
+   $md5->add($_);  
 }  
 close F;
-ok($md5->hexdigest() eq '2c26fac8eddd5e1f904510668e803450', "md5 of output agrees"); 
+my $h=$md5->hexdigest(); 
+#my $expected='2c26fac8eddd5e1f904510668e803450'; 
+my $expected='c6a5bf718740ff06ca4314909783eae5'; 
+ok($h eq $expected, "md5 of output agrees". ($expected eq $h? '':sprintf("(is %s)",$h)).'.'); 
 ok($lc==70, "Output line count is correct"); 
  

@@ -28,7 +28,7 @@ BEGIN {
     require Exporter;
 
     # set the version for version checking
-    our $VERSION = '2.05';
+    our $VERSION = '2.07';
 
     # Inherit from Exporter to export functions and variables
     our @ISA = qw(Exporter);
@@ -38,7 +38,7 @@ BEGIN {
 
     # Functions and variables which can be optionally exported
     our @EXPORT_OK = qw(@Levels);
-} ## end BEGIN
+}
 
 # This can be optionally exported for whatever
 our @Levels = qw( ERR WARN NOTICE INFO VERBOSE DEBUG DEBUGMAX );
@@ -74,7 +74,8 @@ The following is a list, in order of level, of the logging methods:
              Logging headings.  Very useful for verbose modes in your
              scripts.
  DEBUG     = Level 1 Debugging messages
- DEBUGMAX  = Level 2 Debugging messages (typically more terse)
+ DEBUGMAX  = Level 2 Debugging messages (typically more terse like dumping
+               variables)
 
 The parameter is either a string or a reference to an array of strings to output as multiple lines.
 
@@ -82,11 +83,14 @@ Each string can contain newlines, which will also be split into a separate line 
 
  $debug->ERR(        ['Error message']);
  $debug->ERROR(      ['Error message']);
+
  $debug->WARN(       ['Warning message']);
  $debug->WARNING(    ['Warning message']);
+
  $debug->NOTICE(     ['Notice message']);
  $debug->INFO(       ['Information and VERBOSE mode message']);
  $debug->INFORMATION(['Information and VERBOSE mode message']);
+
  $debug->DEBUG(      ['Level 1 Debug message']);
  $debug->DEBUGMAX(   ['Level 2 (terse) Debug message']);
 
@@ -97,7 +101,7 @@ Each string can contain newlines, which will also be split into a separate line 
     \%hash_reference
  );
 
- $debug->INFO(\@messages);
+ $debug->INFO([\@messages]);
 
 =head1 DESCRIPTION
 
@@ -308,9 +312,6 @@ B<%D>
 =cut
 
 sub new {
-    # This module uses the Log::Fast library heavily.  Many of the
-    # Log::Fast variables and features can work here.  See the perldocs
-    # for Log::Fast for specifics.
     my $class = shift;
     my ($filename, $dir, $suffix) = fileparse($0);
     my $self = {
@@ -365,7 +366,7 @@ sub new {
         } elsif ($Key eq 'LOGLEVEL') {    # Make loglevels case insensitive
             $self->{$upper} = uc($self->{$upper});
         }
-    } ## end foreach my $Key (@Keys)
+    }
     { # This makes sure the user overrides actually override
         my %params = (@_);
         foreach my $Key (keys %params) {
@@ -404,7 +405,7 @@ sub new {
 
     bless($self, $class);
     return ($self);
-} ## end sub new
+}
 
 =head2 debug
 
@@ -447,7 +448,7 @@ sub debug {
         @messages = @{$msgs};
     } else {
         push(@messages,Dumper($msgs));
-    } ## end else [ if (ref($msgs) eq 'SCALAR'...)]
+    }
     my ($sname, $cline, $nested, $subroutine, $thisBench, $thisBench2, $sline, $short) = ('', '', '', '', '', '', '', '');
 
     # Figure out the proper caller tree and line number ladder
@@ -474,9 +475,9 @@ sub debug {
                     $sline = $array[2];
                 }
                 $nest++;
-            } ## end if ($array[3] !~ /Debug::Easy/)
+            }
             $count++;
-        } ## end while (my @array = caller...)
+        }
         if ($package ne '') {
             $sname = $package . '::' . $sname;
             $nested = ' ' x $nest if ($nest);
@@ -490,7 +491,7 @@ sub debug {
             $sname = 'main';
             $sline = $cline;
             $short = $sname;
-        } ## end else [ if ($package ne '') ]
+        }
         $subroutine = ($sname ne '') ? $sname : 'main';
         $self->{'PADDING'}            = 0 - length($subroutine) if (length($subroutine) > abs($self->{'PADDING'}));
         $self->{'LINES-PADDING'}      = 0 - length($cline)      if (length($cline) > abs($self->{'LINES-PADDING'}));
@@ -500,7 +501,7 @@ sub debug {
         $subroutine = colored(['bold cyan'], sprintf('%' . $self->{'PADDING'} . 's', $subroutine));
         $sline = sprintf('%' . $self->{'LINE-PADDING'} . 's', $sline);
         $short = colored(['bold cyan'], sprintf('%' . $self->{'SUBROUTINE-PADDING'} . 's', $short));
-    } ## end if ($self->{'PREFIX'} ...)
+    }
 
     # Figure out the benchmarks, but only if it is in the prefix
     if ($self->{'PREFIX'} =~ /\%Benchmark\%/) {
@@ -508,12 +509,12 @@ sub debug {
         #        $thisBench  = sprintf('%7s', sprintf(' %.02f', time - $self->{$level . '_LASTSTAMP'}));
         $thisBench = sprintf('%7s', sprintf(' %.02f', time - $self->{'ANY_LASTSTAMP'}));
         $thisBench2 = ' ' x length($thisBench);
-    } ## end if ($self->{'PREFIX'} ...)
+    }
     my $first = TRUE;    # Set the first line flag.
     foreach my $msg (@messages) {    # Loop through each line of output and format accordingly.
         if (ref($msg) ne '') {
             $msg = Dumper($msg);
-        } ## end if (ref($msg) ne '')
+        }
         if ($msg =~ /\n/s) {         # If the line contains newlines, then it too must be split into multiple lines.
             my @message = split(/\n/, $msg);
             foreach my $line (@message) {    # Loop through the split lines and format accordingly.
@@ -524,10 +525,10 @@ sub debug {
             $self->_send_to_logger($level, $nested, $msg, $first, $thisBench, $thisBench2, $subroutine, $cline, $sline, $short);
         }
         $first = FALSE;    # Clear the first line flag.
-    } ## end foreach my $msg (@messages)
+    }
     $self->{'ANY_LASTSTAMP'} = time;
     $self->{$level . '_LASTSTAMP'} = time;
-} ## end sub debug
+}
 
 sub _send_to_logger {      # This actually simplifies the previous method ... seriously
     my $self       = shift;
@@ -581,17 +582,14 @@ sub _send_to_logger {      # This actually simplifies the previous method ... se
     my $fh = $self->{'FILEHANDLE'};
     if ($level eq 'INFO' && $self->{'LOGLEVEL'} eq 'VERBOSE') {    # Trap verbose flag and temporarily drop the prefix.
         print $fh "$msg\n";
-#        $self->{'LOG'}->INFO($msg);
     } elsif ($level eq 'DEBUGMAX') {                               # Special version of DEBUG.  Outputs as DEBUG in Log::Fast
         if ($self->{'LOGLEVEL'} eq 'DEBUGMAX') {
             print $fh "$prefix$padding$msg\n";
-#            $self->{'LOG'}->DEBUG($prefix . $padding . $msg);
         }
     } else {
         print $fh "$prefix$padding$msg\n";
-#        $self->{'LOG'}->$level($prefix . $padding . $msg);
     }
-} ## end sub _send_to_logger
+}
 
 =head2 B<ERR> or B<ERROR>
 
@@ -735,13 +733,6 @@ The "less" pager is the best for viewing log files generated by this module.  It
 
 To install this module, run the following commands:
 
- perl Build.PL
- ./Build
- ./Build test
- ./Build install
-
-OR you can use the old ExtUtils::MakeMaker method:
-
  perl Makefile.PL
  make
  make test
@@ -755,11 +746,7 @@ This program is free software; you can redistribute it and/or modify it under th
 
 =head1 B<VERSION>
 
-Version 2.05    (April 5, 2021)
-
-=head1 B<BUGS>
-
-Please report any bugs or feature requests to C<bug-easydebug at rt.cpan.org>, or through the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=EasyDebug>.  I will be notified, and then you'll automatically be notified of progress on your bug as I make changes.
+Version 2.07    (June 24, 2021)
 
 =head1 B<SUPPORT>
 
@@ -773,35 +760,9 @@ C<man Debug::Easy>
 
 You can also look for information at:
 
-=over 4
-
-=item * RT: CPAN's request tracker (report bugs here)
-
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Debug-Easy>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Debug-Easy>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/Debug-Easy>
-
-Not exactly a reliable and fair means of rating modules.  Modules are updated and improved over time, and what may have been a poor or mediocre review at version 0,04, may not remotely apply to current or later versions.  It applies ratings in an arbitrary manner with no ability for the author to add their own rebuttals or comments to the review, especially should the review be malicious or inapplicable.
-
-More importantly, issues brought up in a mediocre review may have been addressed and improved in later versions, or completely changed to allieviate that issue.
-
-So, check the reviews AND the version number when that review was written.
-
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/Debug-Easy/>
-
-=back
-
 =head1 B<AUTHOR COMMENTS>
 
-I coded this module because it filled a gap when I was working for a major chip manufacturing company.  It gave the necessary output the other coders asked for, and fulfilled a need.  It has grown far beyond those days, and I use it every day in my coding work.
+I coded this module because it filled a gap when I was working for a major chip manufacturing company (which I coded at home on my own time).  It gave the necessary output the other coders asked for, and fulfilled a need.  It has grown far beyond those days, and I use it every day in my coding work.
 
 If you have any features you wish added, or functionality improved or changed, then I welcome them, and will very likely incorporate them sooner than you think.
 

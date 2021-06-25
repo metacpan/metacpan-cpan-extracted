@@ -1,7 +1,7 @@
 package File::Serialize::Serializer::JSON5;
 our $AUTHORITY = 'cpan:YANICK';
 #ABSTRACT: JSON5 serializer for File::Serialize
-$File::Serialize::Serializer::JSON5::VERSION = '1.5.0';
+$File::Serialize::Serializer::JSON5::VERSION = '1.5.1';
 use strict;
 use warnings;
 
@@ -36,7 +36,7 @@ File::Serialize::Serializer::JSON5 - JSON5 serializer for File::Serialize
 
 =head1 VERSION
 
-version 1.5.0
+version 1.5.1
 
 =head1 DESCRIPTION
 

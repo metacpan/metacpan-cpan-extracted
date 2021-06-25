@@ -1,5 +1,9 @@
 Revision history for App-Addex-AddressBook-AppleScript
 
+0.009     2021-06-19 13:45:03-04:00 America/New_York
+        - update author contact info
+        - add perl support section
+
 0.008     2014-10-02 10:41:50-04:00 America/New_York
         - allow "--" as line leader for comments in notes section
 

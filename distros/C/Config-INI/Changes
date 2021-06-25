@@ -1,5 +1,11 @@
 Changelog for Config-INI
 
+0.027     2021-06-22 22:27:53-04:00 America/New_York
+        - require Mixin::Linewise v0.110 to cope with new error message
+
+0.026     2021-06-20 17:14:32-04:00 America/New_York
+        - update author contact info
+
 0.025     2014-11-16 14:29:37-05:00 America/New_York
         - run preprocess_line before can_ignore
         - bump up required Mixin::Linewise to help out Win32 users

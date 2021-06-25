@@ -50,7 +50,7 @@ sub get_content {
                 # Choose
                 my $idx = $tc->choose(
                     $menu,
-                    { %{$sf->{i}{lyt_v_clear}}, prompt => 'Choose type of data source:', index => 1,
+                    { %{$sf->{i}{lyt_v}}, prompt => 'Choose type of data source:', index => 1,
                       default => $old_idx, undef => '  <=' }
                 );
                 if ( ! defined $idx || ! defined $menu->[$idx] ) {

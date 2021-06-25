@@ -6,7 +6,7 @@
 use v5.26;
 use Object::Pad 0.19;
 
-package Device::Chip::MCP23S17 0.03;
+package Device::Chip::MCP23S17 0.04;
 class Device::Chip::MCP23S17
    extends Device::Chip::MCP23x17;
 

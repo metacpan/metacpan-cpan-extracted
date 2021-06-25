@@ -12,7 +12,7 @@ require XSLoader;
 our @ISA = qw(Exporter);
 our @EXPORT_OK = qw(minify);
 
-our $VERSION = 'v0.4.1';
+our $VERSION = 'v0.4.2';
 
 XSLoader::load( "Text::Minify::XS", $VERSION );
 
@@ -30,7 +30,7 @@ Text::Minify::XS - Simple text minification
 
 =head1 VERSION
 
-version v0.4.1
+version v0.4.2
 
 =head1 SYNOPSIS
 
@@ -89,11 +89,61 @@ UTF-8.
 
 =head1 SEE ALSO
 
-L<String::Strip>
+There are many string trimming and specialised
+whitespace/comment-removal modules on CPAN.  Some of them are:
 
-L<String::Util>
+=head2 CSS
 
-L<Text::Trim>
+=over
+
+=item L<CSS::Minifier>
+
+=item L<CSS::Minifier::XS>
+
+=item L<CSS::Packer>
+
+=back
+
+=head2 HTML
+
+=over
+
+=item L<HTML::Packer>
+
+=back
+
+=head2 JavaScript
+
+=over
+
+=item L<JavaScript::Minifier>
+
+=item L<JavaScript::Minifier::XS>
+
+=item L<JavaScript::Packer>
+
+=back
+
+=head2 Plain Text
+
+=over
+
+=item L<String::Strip>
+
+=item L<String::Trim>
+
+=item String::Trim::Regex
+
+=item L<String::Trim::NonRegex>
+
+=item L<String::Util>
+
+=item L<Text::Trim>
+
+=back
+
+This list does not include specialised template filters or plugins to
+web frameworks.
 
 =head1 SOURCE
 

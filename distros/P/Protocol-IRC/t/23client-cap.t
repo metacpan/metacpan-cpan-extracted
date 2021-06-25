@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
 use Test::More;
@@ -8,6 +8,19 @@ use Test::More;
 my $CRLF = "\x0d\x0a"; # because \r\n isn't portable
 
 my @messages;
+
+package TestIRC {
+   use base qw( Protocol::IRC::Client );
+
+   sub new { return bless {}, shift }
+
+   sub on_message_cap
+   {
+      my $self = shift;
+      my ( $verb, $message, $hints ) = @_;
+      push @messages, [ $verb, $message, $hints ];
+   }
+}
 
 my $irc = TestIRC->new;
 sub write_irc
@@ -32,15 +45,3 @@ is_deeply( $hints->{caps},
            '$hints->{caps}' );
 
 done_testing;
-
-package TestIRC;
-use base qw( Protocol::IRC::Client );
-
-sub new { return bless {}, shift }
-
-sub on_message_cap
-{
-   my $self = shift;
-   my ( $verb, $message, $hints ) = @_;
-   push @messages, [ $verb, $message, $hints ];
-}

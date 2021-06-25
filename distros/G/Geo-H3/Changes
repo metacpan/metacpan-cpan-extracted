@@ -1,0 +1,37 @@
+Revision history for Perl extension Geo::H3.
+
+0.06 2021-06-21
+  - Updated lib/Geo/H3/Index.pm
+    - Dropped struct method as disused
+  - Updated scripts/perl-Geo-H3-geo-to-googleearth.pl
+    - Added output parameter
+    - Updated documentation
+  - Updated MANIFEST and Makefile.PL to support CPAN testers
+  - Updated all modules documentation
+  - Added t/003_index_pentagon.t - Additional Pentagon tests
+
+0.05 2021-06-20
+  - Updated Makefile.PL to support CPAN testers
+
+0.04 2021-06-19
+  - Updated tests to require h3 lib to exists
+  - Updated Packages - Gave up on snake case morphing and moving to camel case to match the base API - NOT BACKWARDS COMPATABLE
+  - Updated lib/Geo/H3/Geo.pm
+    - Updated methods lat and lon to be read only after construction
+    - Dropped methods pointDistKm and pointDistRads
+    - Renamed method pointDistM to distance - NOT BACKWARDS COMPATABLE
+  - Updated lib/Geo/H3/Index.pm
+    - Added methods baseCell, centerChild, line, distance, etc...
+    - Renamed method geo_boundary to geoBoundary - NOT BACKWARDS COMPATABLE
+
+0.03 2021-06-13
+  - Updated lib/Geo/H3/Index.pm
+    - Added Methods: parent, children and hex_ring
+  - Added scripts/perl-Geo-H3-geo-to-googleearth.pl
+    - Requires: Path::Class, Geo::GoogleEarth::Pluggable, Geo::GoogleEarth::Pluggable::Plugin::Styles
+
+0.02 2021-06-03
+  - Rewrite on top of Geo::H3::FFI
+
+0.01 2020-12-30
+  - original version; created by h2xs 1.23

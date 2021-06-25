@@ -1,5 +1,9 @@
 Revision history for Data-InputMonster
 
+0.011     2021-06-20 20:35:29-04:00 America/New_York
+        - update author contact info
+        - mark as no longer supported by the author
+
 0.010     2013-12-13 08:26:13 America/New_York
           fix bugtracker and repo metadata
 

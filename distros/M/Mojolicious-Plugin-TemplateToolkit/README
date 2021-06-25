@@ -40,10 +40,16 @@ DESCRIPTION
 
     Mojolicious stash values will be exposed directly as variables in the
     templates, and the current controller object will be available as c or
-    self, similar to Mojolicious::Plugin::EPRenderer. Helper methods can be
-    called on the controller object or a more efficient proxy object
-    available as h. See Mojolicious::Plugin::DefaultHelpers and
-    Mojolicious::Plugin::TagHelpers for a list of all built-in helpers.
+    self, similar to Mojolicious::Plugin::EPRenderer.
+
+    Helper methods can be called on the controller object as normal, as
+    well as on a proxy object available as h. The proxy object was
+    previously needed for efficiency as the controller object used AUTOLOAD
+    to call helper methods, but since Mojolicious 8.04 the controller
+    object uses a more efficient mechanism and the proxy object is no
+    longer needed. See Mojolicious::Plugin::DefaultHelpers and
+    Mojolicious::Plugin::TagHelpers for a list of all built-in helper
+    methods.
 
     Accessing helper methods directly as variables, rather than via the
     controller or proxy object, is deprecated and may be removed in a
@@ -56,7 +62,7 @@ DESCRIPTION
        [% engine %] is a [% description %].
      [% END %]
      
-     [% h.link_to('Template Toolkit', 'http://www.template-toolkit.org') %]
+     [% c.link_to('Template Toolkit', 'http://www.template-toolkit.org') %]
      
      [% c.param('foo') %]
 

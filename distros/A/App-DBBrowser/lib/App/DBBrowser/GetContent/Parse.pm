@@ -13,7 +13,8 @@ use Encode::Locale    qw();
 #use Text::CSV         qw();                # required
 
 use Term::Choose       qw();
-use Term::Choose::Util qw( get_term_size unicode_sprintf insert_sep );
+use Term::Choose::LineFold qw( line_fold );
+use Term::Choose::Util qw( get_term_size get_term_width unicode_sprintf insert_sep );
 use Term::Form         qw();
 
 
@@ -56,13 +57,13 @@ sub __parse_with_Text_CSV {
             Text::CSV->SetDiag (0);
         }
         else {
-            my $error_inpunt = $csv->error_input();
-            my $message =  "Text::CSV:\n";
-            $message .= "Input: $error_inpunt" if defined $error_inpunt;
-            $message .= "$code $str - pos:$pos rec:$rec fld:$fld";
+            my $error_input = $csv->error_input() // 'No Error Input defined.';
+            my $info = "Close with ENTER\nText::CSV\n$code $str\nposition:$pos record:$rec field:$fld\n";
+            my $prompt = "Error Input:";
+            $error_input =~ s/\R/ /g;
             $tc->choose(
-                [ 'Press ENTER' ],
-                { prompt => $message }
+                [ line_fold( $error_input, get_term_width() ) ],
+                { info => $info, prompt => $prompt  }
             );
             return;
         }

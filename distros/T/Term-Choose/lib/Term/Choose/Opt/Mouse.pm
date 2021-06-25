@@ -4,9 +4,9 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.731';
+our $VERSION = '1.733';
 
-use Term::Choose::Constants qw( :keys :index );
+use Term::Choose::Constants qw( :all );
 
 
 sub __mouse_info_to_key {
@@ -31,7 +31,7 @@ sub __mouse_info_to_key {
         my $begin_next_col;
         if ( $self->{current_layout} == -1 ) {
             my $idx = $self->{rc2idx}[$row][$col];
-            $begin_next_col = $begin_this_col + $self->{length}[$idx] + $self->{pad};
+            $begin_next_col = $begin_this_col + $self->{width_elements}[$idx] + $self->{pad};
         }
         else {
             $begin_next_col = $begin_this_col + $self->{col_width_plus};

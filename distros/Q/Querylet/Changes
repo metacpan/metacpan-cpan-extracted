@@ -1,5 +1,9 @@
 Revision history for Querylet
 
+0.402     2021-06-20 21:33:48-04:00 America/New_York
+        - update author information
+        - add note about support level to docs
+
 0.401     2013-10-30 22:34:45 America/New_York
         - fix spelling of repo!  oops
 

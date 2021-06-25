@@ -77,7 +77,9 @@ static bool probe_piece(pTHX_ SV *argsv, size_t *argidx, const struct XSParseKey
 
 #define THISARG ((XSParseKeywordPiece *)SvPVX(argsv))[argi]
 
-  switch(piece->type) {
+  U32 type = piece->type & 0xFFFF;
+
+  switch(type) {
     case XS_PARSE_KEYWORD_LITERALCHAR:
       if(lex_peek_unichar(0) != piece->u.c)
         return FALSE;
@@ -101,11 +103,11 @@ static bool probe_piece(pTHX_ SV *argsv, size_t *argidx, const struct XSParseKey
       croak("%s", piece->u.str);
       NOT_REACHED;
 
-    case XS_PARSE_KEYWORD_SEQUENCE:
-      if(!probe_piece(aTHX_ argsv, argidx, piece->u.pieces + 0))
+    case XS_PARSE_KEYWORD_BLOCK:
+      if(lex_peek_unichar(0) != '{')
         return FALSE;
 
-      parse_pieces(aTHX_ argsv, argidx, piece->u.pieces + 1);
+      parse_piece(aTHX_ argsv, argidx, piece);
       return TRUE;
 
     case XS_PARSE_KEYWORD_VSTRING:
@@ -115,6 +117,42 @@ static bool probe_piece(pTHX_ SV *argsv, size_t *argidx, const struct XSParseKey
 
       (*argidx)++;
       return TRUE;
+
+    case XS_PARSE_KEYWORD_SEQUENCE:
+      if(!probe_piece(aTHX_ argsv, argidx, piece->u.pieces + 0))
+        return FALSE;
+
+      parse_pieces(aTHX_ argsv, argidx, piece->u.pieces + 1);
+      return TRUE;
+
+    case XS_PARSE_KEYWORD_CHOICE:
+    {
+      const struct XSParseKeywordPieceType *choices = piece->u.pieces;
+      THISARG.i = 0;
+      while(choices->type) {
+        if(probe_piece(aTHX_ argsv, argidx, choices + 0)) {
+          (*argidx)++;
+          return TRUE;
+        }
+        choices++;
+        THISARG.i++;
+      }
+      return FALSE;
+    }
+
+    case XS_PARSE_KEYWORD_TAGGEDCHOICE:
+    {
+      const struct XSParseKeywordPieceType *choices = piece->u.pieces;
+      while(choices->type) {
+        if(probe_piece(aTHX_ argsv, argidx, choices + 0)) {
+          THISARG.i = choices[1].type;
+          (*argidx)++;
+          return TRUE;
+        }
+        choices += 2;
+      }
+      return FALSE;
+    }
 
     case XS_PARSE_KEYWORD_PARENSCOPE:
       if(lex_peek_unichar(0) != '(')
@@ -145,7 +183,7 @@ static bool probe_piece(pTHX_ SV *argsv, size_t *argidx, const struct XSParseKey
       return TRUE;
   }
 
-  croak("TODO: probe_piece on type=%d\n", piece->type);
+  croak("TODO: probe_piece on type=%d\n", type);
 }
 
 static void parse_piece(pTHX_ SV *argsv, size_t *argidx, const struct XSParseKeywordPieceType *piece)
@@ -383,35 +421,12 @@ static void parse_piece(pTHX_ SV *argsv, size_t *argidx, const struct XSParseKey
       return;
 
     case XS_PARSE_KEYWORD_CHOICE:
-    {
-      const struct XSParseKeywordPieceType *choices = piece->u.pieces;
-      THISARG.i = 0;
-      (*argidx)++;
-      while(choices->type) {
-        if(probe_piece(aTHX_ argsv, argidx, choices + 0))
-          return;
-        choices++;
-        THISARG.i++;
-      }
-      THISARG.i = -1;
-      return;
-    }
-
     case XS_PARSE_KEYWORD_TAGGEDCHOICE:
-    {
-      const struct XSParseKeywordPieceType *choices = piece->u.pieces;
-      THISARG.i = 0;
-      (*argidx)++;
-      while(choices->type) {
-        if(probe_piece(aTHX_ argsv, argidx, choices + 0)) {
-          THISARG.i = choices[1].type;
-          return;
-        }
-        choices += 2;
+      if(!probe_piece(aTHX_ argsv, argidx, piece)) {
+        THISARG.i = -1;
+        (*argidx)++;
       }
-      THISARG.i = -1;
       return;
-    }
 
     case XS_PARSE_KEYWORD_SEPARATEDLIST:
     {

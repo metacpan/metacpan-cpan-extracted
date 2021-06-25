@@ -16,3 +16,5 @@ pod2htm*.tmp
 pm_to_blib
 Finance-IG-*
 Finance-IG-*.tar.gz
+Finance-IG-0.05.tar.gz
+Finance-IG-0.06.tar.gz

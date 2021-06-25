@@ -28,7 +28,7 @@ if ( $@ ) {
 }
 
 
-use Term::Choose::Constants qw( :keys );
+use Term::Choose::Constants qw( :all );
 
 
 my $script = catfile $RealBin, 'get_key_linux.pl';

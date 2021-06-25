@@ -1,0 +1,64 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.87.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 ae7dc6a26810795880466cf277b967c7ba0b7a8e79a1e7fc819bf57127b99088 CONCEPT
+SHA256 2e58f29dd0a3a337edda156b4573dd90538effe601a57a1372445540892b70f3 Changes
+SHA256 3d8aa7a1fd6fcaa5ffa6aa05c58d97639061d0ba5450bc73add5c0dd50136450 LICENSE
+SHA256 7e90cf585572f147410fe7c484e6fd8c5b9ca82bc5e22faf1fff2fcda3185c19 MANIFEST
+SHA256 ee5eb4fe8df43c934256381150c1449e0aa27940b61c2788c047a164a9bfc004 META.yml
+SHA256 34d229ba644508448d86faa542ee1228d70e60f8d43c218351e00074ee1a7540 Makefile.PL
+SHA256 70d0428df764018270f11ceb25ed4fbe0d57bbf41bc1e5734d0e0298d6428625 README
+SHA256 51f7c209a2b12e8c6ab00f33ee02c81deb2a370d2f67dab4e5ff8181c4df6088 Structure.pm
+SHA256 e0b51943f6641f9d3846ae5bb280bea2b2c47ce4ed63e37e7c6ff572bc420157 examples/ex1.pl
+SHA256 dc870a75755db9ab7a823e3b7ce0e9413eef2bc1276e0f46f298b25d075fc2e7 examples/ex2.pl
+SHA256 67d139199c03b8bf8447a5a62f0d0b6dc1bd5bf6dbe04de6d21998c577823ed6 inc/Module/Install.pm
+SHA256 8bd506c33fb78f10f6451413e931ca23541fcc4eebe05fcb7c7c9577341223c4 inc/Module/Install/AuthorRequires.pm
+SHA256 1b5430a46a35142ef8914d8c745196fca825defc9dfa7e389299bf294613825e inc/Module/Install/AuthorTests.pm
+SHA256 6ebcc53a161dd5dc0aae69e4704575f2b00181901d768a82e26722a309cfdbe4 inc/Module/Install/Base.pm
+SHA256 d3f8c839d03fd21c197d05362dbb277cd7cadb15da6390d124b61e851f15146e inc/Module/Install/Can.pm
+SHA256 e9e72e18921c10c87bc4ea4c20af83e52015b9f5775d00ac64073042403717ca inc/Module/Install/Fetch.pm
+SHA256 a7a681bf2c9eee58a372cb642ffe42b0301d1200432ba8de9f7791cd1ecc9827 inc/Module/Install/Makefile.pm
+SHA256 aa887fa65a5eb6bbd1805706ce298b3f3cd55b353ecfd37aa7d35ae419331a49 inc/Module/Install/Metadata.pm
+SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Module/Install/ReadmeFromPod.pm
+SHA256 26b166ff62aacdb55317d1659f160aa4935097eea9810ea980e6d747206b5dc0 inc/Module/Install/Win32.pm
+SHA256 5f73a6851a91ea44e65b924f918743ad6e860620ad7a38a39d0295e0c5652a9f inc/Module/Install/WriteAll.pm
+SHA256 a772c8fe2995a9f4f0bf0cba390d075420350f8f5d0f23378bd8431b6cbf245c t/CSS-Struct-Output-Structure/01-use.t
+SHA256 c5d07ffbce8abf630559e217a25df3a2ea1417450c18072507be386b5e549732 t/CSS-Struct-Output-Structure/02-version.t
+SHA256 1119989cb28d40285c3fe2300ea78b0f3e6cb3112945f8937f4596eafde572b7 t/CSS-Struct-Output-Structure/03-new.t
+SHA256 72ae626e62bb6b10e5c9081b757f80458d6168f9ecda3c5335b7bce48af2137b t/CSS-Struct-Output-Structure/04-flush.t
+SHA256 45db9558adad66386434ae2b02ea5600fbdd0caf3f318ba7b28f6389316b4328 t/CSS-Struct-Output-Structure/05-put-at_rule.t
+SHA256 bd92d13181622785d517e746bdad17f17bd9a6e85f66fbd0520b5e032e5acf4e t/CSS-Struct-Output-Structure/06-put-comment.t
+SHA256 712c1488f98eb29117111a7b8e0e755a1e6330b3afdfbb120f7b86db158d8018 t/CSS-Struct-Output-Structure/07-put-definition.t
+SHA256 ba3562631a3933e26f879a01f7beca9f6bfd19fca3243f652e328c48f679a0c1 t/CSS-Struct-Output-Structure/08-put-end_of_selector.t
+SHA256 e0e38746339719029156ab1e52f60afae895d5835da96132d7838acfa5b0bb2c t/CSS-Struct-Output-Structure/09-put-instruction.t
+SHA256 cd7f9d2df6447b5a436e94c6de54d174749931edd99abaf80476f58ecc7ec6c2 t/CSS-Struct-Output-Structure/10-put-raw.t
+SHA256 f9841903c9e9806b898241baa686d33481abe7de3413d29065e45e446c93775f t/CSS-Struct-Output-Structure/11-put-selector.t
+SHA256 ed7c48e505daa3ecc604085abd7f612443ef7f5794a9e733ff343ac1d05fc184 xt/CSS-Struct-Output-Structure/01-pod_coverage.t
+SHA256 33273f5d67e4b354d02a3b4c381586984090719c98394926c6cf4b18bc692930 xt/CSS-Struct-Output-Structure/02-pod.t
+-----BEGIN PGP SIGNATURE-----
+
+iQGzBAEBAwAdFiEERTLc1QTxqWhVvPeegmqNLzlXaRcFAmDPVIAACgkQgmqNLzlX
+aReb0AwAxyM52SbQHbH7bK7BwQr6kZWJJUcAAJzOfx5rGWywo0Cn3eW5YTEdk7R4
+tV69vdP9OJqMZm/z+zDoAxUETIE+njcg7DkHuchsjZM9pWFmsmWZTZsFg+VzGD8G
+g/BZvC0syctazKTygpT/xrSxkRBEyxhRSgJ/Uk6Fd5cYZ/fufUdvSicB6gfRelMK
+T+BBxS2mc8O94Q8akeoVgTT7trT2HNysxQGt2RrqlChb4Mkvu3laNqIzt7c7rzv+
+KHVihnMU5CejzYTJZREsaSGiPsKiNbgq7xB6VDIxV3z7Kc+4avrXfVm+xXAMnI5C
+7ds3f2AvzGL0VjxZu1DkuGOOZ9vvRKKW1Cyz/STR3Yqf59xaAW13wLtpZDsx7vPY
+L4Il0kEjWNAMV2sa1A3kDGMWc7L8Dfbf/ArEMpOr+k4tjLr3zgou2zcGa+xnohMf
+OhXOfnhbL8+wiaD/pFUVi0WmMmeQas8mYGtgDS5lgHoMZreDRmwr1qBRxjzKXtS1
+cW30FJgZ
+=edrk
+-----END PGP SIGNATURE-----

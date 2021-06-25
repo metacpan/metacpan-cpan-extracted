@@ -7,47 +7,56 @@ extern "C" {
 #define var (( PImage) self)
 #define my  ((( PImage) self)-> self)
 
-#define BS_BYTEIMPACT( type)                                                        \
-void bs_##type##_in( type * srcData, type * dstData, int w, int x, int absx, long step)  \
-{                                                                                   \
-	Fixed count = {0};                                                               \
-	int   last = 0;                                                                  \
-	int   i;                                                                         \
-	int   j    = ( x == absx) ? 0 : ( absx - 1);                                     \
-	int   inc  = ( x == absx) ? 1 : -1;                                              \
-	dstData[j] = srcData[0];                                                         \
-	j += inc;                                                                        \
-	for ( i = 0; i < w; i++)                                                         \
-	{                                                                                \
-		if ( count.i.i > last)                                                        \
-		{                                                                             \
-			dstData[j] = srcData[i];                                                   \
-			j += inc;                                                                  \
-			last = count. i. i;                                                        \
-		}                                                                             \
-		count. l += step;                                                             \
-	}                                                                                \
+#define BS_BYTEIMPACT_ROP(type,op,expr)               \
+void bs_##type##_##op(                                \
+	type * src_data, type * dst_data,             \
+	int w, int x, int absx, long step             \
+){                                                    \
+	Fixed count = {0};                            \
+	int   last = 0;                               \
+	int   i, k;                                   \
+	int   j    = ( x == absx) ? 0 : ( absx - 1);  \
+	int   inc  = ( x == absx) ? 1 : -1;           \
+	dst_data[k=j] = src_data[0];                  \
+	j += inc;                                     \
+	for ( i = 0; i < w; i++) {                    \
+		if ( count.i.i > last) {              \
+			dst_data[k=j] = src_data[i];  \
+			j += inc;                     \
+			last = count.i.i;             \
+		}                                     \
+		count.l += step;                      \
+		expr;                                 \
+	}                                             \
 }
 
-#define BS_BYTEEXPAND( type)                                                        \
-void bs_##type##_out( type * srcData, type * dstData, int w, int x, int absx, long step) \
-{                                                                                   \
-	Fixed count = {0};                                                               \
-	int   i;                                                                         \
-	int   j    = ( x == absx) ? 0 : ( absx - 1);                                     \
-	int   inc  = ( x == absx) ? 1 : -1;                                              \
-	int   last = 0;                                                                  \
-	for ( i = 0; i < absx; i++)                                                      \
-	{                                                                                \
-		if ( count. i. i > last)                                                      \
-		{                                                                             \
-			last = count. i. i;                                                        \
-			srcData++;                                                                 \
-		}                                                                             \
-		count. l += step;                                                             \
-		dstData[j] = *srcData;                                                        \
-		j += inc;                                                                     \
-	}                                                                                \
+#define BS_BYTEIMPACT(type)                           \
+	BS_BYTEIMPACT_ROP(type,in,)
+
+#define BS_BYTEIMPACT_INT(type)                       \
+	BS_BYTEIMPACT_ROP(type,in,)                   \
+	BS_BYTEIMPACT_ROP(type,and,dst_data[k]&=src_data[i]) \
+	BS_BYTEIMPACT_ROP(type,or,dst_data[k]|=src_data[i])
+
+#define BS_BYTEEXPAND( type)                          \
+void bs_##type##_out(                                 \
+	type * src_data, type * dst_data,             \
+	int w, int x, int absx, long step             \
+){                                                    \
+	Fixed count = {0};                            \
+	int   i;                                      \
+	int   j    = ( x == absx) ? 0 : ( absx - 1);  \
+	int   inc  = ( x == absx) ? 1 : -1;           \
+	int   last = 0;                               \
+	for ( i = 0; i < absx; i++) {                 \
+		if ( count.i.i > last) {              \
+			last = count.i.i;             \
+			src_data++;                   \
+		}                                     \
+		count.l += step;                      \
+		dst_data[j] = *src_data;              \
+		j += inc;                             \
+	}                                             \
 }
 
 BS_BYTEEXPAND( uint8_t)
@@ -59,10 +68,12 @@ BS_BYTEEXPAND( double)
 BS_BYTEEXPAND( Complex)
 BS_BYTEEXPAND( DComplex)
 
-BS_BYTEIMPACT( uint8_t)
-BS_BYTEIMPACT( int16_t)
+BS_BYTEIMPACT_INT( uint8_t)
+BS_BYTEIMPACT_INT( int16_t)
+BS_BYTEIMPACT_INT( int32_t)
 BS_BYTEIMPACT( RGBColor)
-BS_BYTEIMPACT( int32_t)
+BS_BYTEIMPACT_ROP(RGBColor,and,dst_data[k].r&=src_data[i].r;dst_data[k].g&=src_data[i].g;dst_data[k].b&=src_data[i].b)
+BS_BYTEIMPACT_ROP(RGBColor,or, dst_data[k].r|=src_data[i].r;dst_data[k].g|=src_data[i].g;dst_data[k].b|=src_data[i].b)
 BS_BYTEIMPACT( float)
 BS_BYTEIMPACT( double)
 BS_BYTEIMPACT( Complex)
@@ -70,327 +81,484 @@ BS_BYTEIMPACT( DComplex)
 
 
 void
-bs_mono_in( uint8_t * srcData, uint8_t * dstData, int w, int x, int absx, long step)
+bs_mono_in( uint8_t * src_data, uint8_t * dst_data, int w, int x, int absx, long step)
 {
 	Fixed count = {0};
 	int   last   = 0;
 	register int i, j;
 	register U16 xd, xs;
 
-	if ( x == absx)
-	{
-		xd = (( xs = srcData[0]) >> 7) & 1;
+	if ( x == absx) {
+		xd = (( xs = src_data[0]) >> 7) & 1;
 		j = 1;
-		for ( i = 0; i < w; i++)
-		{
-			if (( i & 7) == 0) xs = srcData[ i >> 3];
+		for ( i = 0; i < w; i++) {
+			if (( i & 7) == 0) xs = src_data[ i >> 3];
 			xs <<= 1;
-			if ( count.i.i > last)
-			{
-				if (( j & 7) == 0) dstData[ ( j - 1) >> 3] = xd;
+			if ( count.i.i > last) {
+				if (( j & 7) == 0) dst_data[ ( j - 1) >> 3] = xd;
 				xd <<= 1;
 				xd |= ( xs >> 8) & 1;
 				j++;
-				last = count. i. i;
+				last = count.i.i;
 			}
-			count. l += step;
+			count.l += step;
 		}
 		i = j & 7;
-		dstData[( j - 1) >> 3] = xd << ( i ? ( 8 - i) : 0);
+		dst_data[( j - 1) >> 3] = xd << ( i ? ( 8 - i) : 0);
 	} else {
 		j = absx - 1;
-		xd = ( xs = srcData[ j >> 3]) & 0x80;
-		for ( i = 0; i < w; i++)
-		{
-			if (( i & 7) == 0) xs = srcData[ i >> 3];
+		xd = ( xs = src_data[ j >> 3]) & 0x80;
+		for ( i = 0; i < w; i++) {
+			if (( i & 7) == 0) xs = src_data[ i >> 3];
 			xs <<= 1;
-			if ( count.i.i > last)
-			{
-				if (( j & 7) == 0) dstData[ ( j + 1) >> 3] = xd;
+			if ( count.i.i > last) {
+				if (( j & 7) == 0) dst_data[ ( j + 1) >> 3] = xd;
 				xd >>= 1;
 				xd |= ( xs >> 1) & 0x80;
 				j--;
-				last = count. i. i;
+				last = count.i.i;
 			}
-			count. l += step;
+			count.l += step;
 		}
-		dstData[( j + 1) >> 3] = xd;
+		dst_data[( j + 1) >> 3] = xd;
+	}
+}
+
+#define BIT(x) (1 << (7 - (x & 7)))
+
+void
+bs_mono_and( uint8_t * src_data, uint8_t * dst_data, int w, int x, int absx, long step)
+{
+	Fixed count = {0};
+	int   last = 0;
+	int   i, k;
+	int   j    = (x == absx) ? 0 : (absx - 1);
+	int   inc  = (x == absx) ? 1 : -1;
+	k = j;
+	dst_data[j >> 3] = src_data[0] & 0x80;
+	j += inc;
+	for ( i = 0; i < w; i++) {
+		if ( count.i.i > last) {
+			k = j;
+			if ( src_data[i >> 3] & BIT(i))
+				dst_data[j >> 3] |= BIT(j);
+			else
+				dst_data[j >> 3] &= ~BIT(j);
+			j += inc;
+			last = count.i.i;
+		} else if (( src_data[i >> 3] & BIT(i)) == 0)
+			dst_data[k >> 3] &= ~BIT(k);
+		count.l += step;
 	}
 }
 
 void
-bs_mono_out( uint8_t * srcData, uint8_t * dstData, int w, int x, int absx, long step)
+bs_mono_or( uint8_t * src_data, uint8_t * dst_data, int w, int x, int absx, long step)
+{
+	Fixed count = {0};
+	int   last = 0;
+	int   i, k;
+	int   j    = (x == absx) ? 0 : (absx - 1);
+	int   inc  = (x == absx) ? 1 : -1;
+	k = j;
+	dst_data[j >> 3] = src_data[0] & 0x80;
+	j += inc;
+	for ( i = 0; i < w; i++) {
+		if ( count.i.i > last) {
+			k = j;
+			if ( src_data[i >> 3] & BIT(i))
+				dst_data[j >> 3] |= BIT(j);
+			else
+				dst_data[j >> 3] &= ~BIT(j);
+			j += inc;
+			last = count.i.i;
+		} else if ( src_data[i >> 3] & BIT(i))
+			dst_data[k >> 3] |= BIT(k);
+		count.l += step;
+	}
+}
+
+#undef BIT
+
+void
+bs_mono_out( uint8_t * src_data, uint8_t * dst_data, int w, int x, int absx, long step)
 {
 	Fixed    count = {step/2};
 	register int i, j = 0;
 	register U16 xd = 0, xs;
 	int last = 0;
 
-	if ( x == absx)
-	{
-		xs = srcData[0];
-		for ( i = 0; i < absx; i++)
-		{
-			if ( count. i. i > last)
-			{
+	if ( x == absx) {
+		xs = src_data[0];
+		for ( i = 0; i < absx; i++) {
+			if ( count.i.i > last) {
 				last = count.i.i;
 				xs <<= 1;
 				j++;
-				if (( j & 7) == 0) xs = srcData[ j >> 3];
+				if (( j & 7) == 0) xs = src_data[ j >> 3];
 			}
 			count.l += step;
 			xd <<= 1;
 			xd |= ( xs >> 7) & 1;
-			if ((( i + 1) & 7) == 0) dstData[ i >> 3] = xd;
+			if ((( i + 1) & 7) == 0) dst_data[ i >> 3] = xd;
 		}
-		if ( i & 7) dstData[ i >> 3] = xd << ( 8 - ( i & 7));
-		/* dstData[ i >> 3] = xd << (( i & 7) ? ( 8 - ( i & 7)) : 0); */
+		if ( i & 7) dst_data[ i >> 3] = xd << ( 8 - ( i & 7));
+		/* dst_data[ i >> 3] = xd << (( i & 7) ? ( 8 - ( i & 7)) : 0); */
 	} else {
 		register int k = absx;
-		xs = srcData[ j >> 3];
-		for ( i = 0; i < absx; i++)
-		{
-			if ( count. i. i > last)
-			{
+		xs = src_data[ j >> 3];
+		for ( i = 0; i < absx; i++) {
+			if ( count.i.i > last) {
 				last = count.i.i;
 				xs <<= 1;
 				j++;
-				if (( j & 7) == 0) xs = srcData[ j >> 3];
+				if (( j & 7) == 0) xs = src_data[ j >> 3];
 			}
 			count.l += step;
 			xd >>= 1;
 			xd |= xs & 0x80;
 			k--;
-			if (( k & 7) == 0) dstData[( k + 1) >> 3] = xd;
+			if (( k & 7) == 0) dst_data[( k + 1) >> 3] = xd;
 		}
-		dstData[( k + 0) >> 3] = xd;
+		dst_data[( k + 0) >> 3] = xd;
 	}
 }
 
-/* nibble stretching functions are requiring *dstData filled with zeros */
+/* nibble stretching functions are requiring *dst_data filled with zeros */
 
-void bs_nibble_in( uint8_t * srcData, uint8_t * dstData, int w, int x, int absx, long step)
+void bs_nibble_in( uint8_t * src_data, uint8_t * dst_data, int w, int x, int absx, long step)
 {
 	Fixed count = {0};
 	int   last = 0;
 	int   i;
-	int   j    = ( x == absx) ? 0 : ( absx - 1);
-	int   inc  = ( x == absx) ? 1 : -1;
-	dstData[ j >> 1] |= ( j & 1) ? ( srcData[ 0] >> 4) : ( srcData[ 0] & 0xF0);
+	int   j    = (x == absx) ? 0 : ( absx - 1);
+	int   inc  = (x == absx) ? 1 : -1;
+	dst_data[ j >> 1] |= ( j & 1) ? ( src_data[ 0] >> 4) : ( src_data[ 0] & 0xF0);
 	j += inc;
-	for ( i = 0; i < w; i++)
-	{
-		if ( count.i.i > last)
-		{
+	for ( i = 0; i < w; i++) {
+		if ( count.i.i > last) {
 			if ( i & 1)
-				dstData[ j >> 1] |= ( j & 1) ? ( srcData[ i >> 1] & 0x0F) : ( srcData[ i >> 1] << 4);
+				dst_data[ j >> 1] |= ( j & 1) ? ( src_data[ i >> 1] & 0x0F) : ( src_data[ i >> 1] << 4);
 			else
-				dstData[ j >> 1] |= ( j & 1) ? ( srcData[ i >> 1] >> 4) : ( srcData[ i >> 1] & 0xF0);
+				dst_data[ j >> 1] |= ( j & 1) ? ( src_data[ i >> 1] >> 4) : ( src_data[ i >> 1] & 0xF0);
 			j += inc;
-			last = count. i. i;
+			last = count.i.i;
 		}
-		count. l += step;
+		count.l += step;
 	}
 }
 
-void bs_nibble_out( uint8_t * srcData, uint8_t * dstData, int w, int x, int absx, long step)
+void bs_nibble_and( uint8_t * src_data, uint8_t * dst_data, int w, int x, int absx, long step)
+{
+	Fixed count = {0};
+	int   last = 0;
+	int   i, k;
+	int   j    = (x == absx) ? 0 : ( absx - 1);
+	int   inc  = (x == absx) ? 1 : -1;
+	k = j;
+	dst_data[ j >> 1] |= ( j & 1) ? ( src_data[ 0] >> 4) : ( src_data[ 0] & 0xF0);
+	j += inc;
+	for ( i = 0; i < w; i++) {
+		if ( count.i.i > last) {
+			k = j;
+			if ( i & 1)
+				dst_data[ j >> 1] |= ( j & 1) ? ( src_data[ i >> 1] & 0x0F) : ( src_data[ i >> 1] << 4);
+			else
+				dst_data[ j >> 1] |= ( j & 1) ? ( src_data[ i >> 1] >> 4) : ( src_data[ i >> 1] & 0xF0);
+			j += inc;
+			last = count.i.i;
+		} else {
+			if ( i & 1)
+				dst_data[ k >> 1] &= ( k & 1) ? ((src_data[ i >> 1] & 0x0F) | 0xF0) : ((src_data[ i >> 1] << 4) | 0x0F);
+			else
+				dst_data[ k >> 1] &= ( k & 1) ? ((src_data[ i >> 1] >> 4) | 0xF0) : (( src_data[ i >> 1] & 0xF0) | 0x0F);
+		}
+		count.l += step;
+	}
+}
+
+void bs_nibble_or( uint8_t * src_data, uint8_t * dst_data, int w, int x, int absx, long step)
+{
+	Fixed count = {0};
+	int   last = 0;
+	int   i, k;
+	int   j    = (x == absx) ? 0 : ( absx - 1);
+	int   inc  = (x == absx) ? 1 : -1;
+	k = j;
+	dst_data[ j >> 1] |= ( j & 1) ? ( src_data[ 0] >> 4) : ( src_data[ 0] & 0xF0);
+	j += inc;
+	for ( i = 0; i < w; i++) {
+		if ( count.i.i > last) {
+			k = j;
+			if ( i & 1)
+				dst_data[ j >> 1] |= ( j & 1) ? ( src_data[ i >> 1] & 0x0F) : ( src_data[ i >> 1] << 4);
+			else
+				dst_data[ j >> 1] |= ( j & 1) ? ( src_data[ i >> 1] >> 4) : ( src_data[ i >> 1] & 0xF0);
+			j += inc;
+			last = count.i.i;
+		} else {
+			if ( i & 1)
+				dst_data[ k >> 1] |= ( k & 1) ? ( src_data[ i >> 1] & 0x0F) : ( src_data[ i >> 1] << 4);
+			else
+				dst_data[ k >> 1] |= ( k & 1) ? ( src_data[ i >> 1] >> 4) : ( src_data[ i >> 1] & 0xF0);
+		}
+		count.l += step;
+	}
+}
+
+void bs_nibble_out( uint8_t * src_data, uint8_t * dst_data, int w, int x, int absx, long step)
 {
 	Fixed count = {0};
 	int   i, k = 0;
-	int   j    = ( x == absx) ? 0 : ( absx - 1);
-	int   inc  = ( x == absx) ? 1 : -1;
+	int   j    = (x == absx) ? 0 : ( absx - 1);
+	int   inc  = (x == absx) ? 1 : -1;
 	int   last = 0;
-	for ( i = 0; i < absx; i++)
-	{
-		if ( count. i. i > last)
-		{
-			if (( k & 1) == 1) srcData++;
+	for ( i = 0; i < absx; i++) {
+		if ( count.i.i > last) {
+			if (( k & 1) == 1) src_data++;
 			k++;
-			last = count. i. i;
+			last = count.i.i;
 		}
-		count. l += step;
+		count.l += step;
 		if ( k & 1)
-			dstData[ j >> 1] |= ( j & 1) ? ( *srcData & 0x0F) : ( *srcData << 4);
+			dst_data[ j >> 1] |= ( j & 1) ? ( *src_data & 0x0F) : ( *src_data << 4);
 		else
-			dstData[ j >> 1] |= ( j & 1) ? ( *srcData >> 4) : ( *srcData & 0xF0);
+			dst_data[ j >> 1] |= ( j & 1) ? ( *src_data >> 4) : ( *src_data & 0xF0);
 		j += inc;
 	}
 }
 
 #define STEP(x) ((double)x * (double)(UINT16_PRECISION))
 
-void
-ic_stretch_box( int type, Byte * srcData, int srcW, int srcH, Byte * dstData, int w, int h, Bool xStretch, Bool yStretch)
+typedef struct {
+	int type;
+	PStretchProc in, and, or, out;
+} stretch_t;
+
+static stretch_t stretch_procs[] = {
+#define SDECL(a,b) ((PStretchProc)bs_##a##_##b)
+#define STRETCH_STD(type) SDECL(type,in),SDECL(type,in), SDECL(type,in),SDECL(type,out)
+#define STRETCH_INT(type) SDECL(type,in),SDECL(type,and),SDECL(type,or),SDECL(type,out)
+	{imMono,               STRETCH_INT(mono)     },
+	{imBW,                 STRETCH_INT(mono)     },
+	{imNibble,             STRETCH_INT(nibble)   },
+	{imNibble|imGrayScale, STRETCH_INT(nibble)   },
+	{imByte,               STRETCH_INT(uint8_t)  },
+	{im256,                STRETCH_INT(uint8_t)  },
+	{imRGB,                STRETCH_INT(RGBColor) },
+	{imRGB|imGrayScale,    STRETCH_INT(RGBColor) },
+	{imShort,              STRETCH_INT(int16_t)  },
+	{imLong,               STRETCH_INT(int32_t)  },
+	{imFloat,              STRETCH_STD(float)    },
+	{imDouble,             STRETCH_STD(double)   },
+	{imComplex,            STRETCH_STD(Complex)  },
+	{imDComplex,           STRETCH_STD(DComplex) },
+	{imTrigComplex,        STRETCH_STD(Complex)  },
+	{imTrigDComplex,       STRETCH_STD(DComplex) }
+#undef STRETCH_STD
+#undef STRETCH_INT
+#undef SDECL
+};
+
+typedef void BitBltProc( Byte * src, Byte * dst, int count);
+typedef BitBltProc *PBitBltProc;
+
+static void
+bitblt_or( Byte * src, Byte * dst, int count)
 {
-	int  absh = h < 0 ? -h : h;
-	int  absw = w < 0 ? -w : w;
-	int  srcLine = LINE_SIZE(srcW, type);
-	int  dstLine = LINE_SIZE(absw, type);
+	while ( count--) *(dst++) |= *(src++);
+}
+
+static void
+bitblt_and( Byte * src, Byte * dst, int count)
+{
+	while ( count--) *(dst++) &= *(src++);
+}
+
+Bool
+ic_stretch_box( int type, Byte * src_data, int src_w, int src_h, Byte * dst_data, int w, int h, int scaling, char * error)
+{
+	int  abs_h = h < 0 ? -h : h;
+	int  abs_w = w < 0 ? -w : w;
+	int  src_line = LINE_SIZE(src_w, type);
+	int  dst_line = LINE_SIZE(abs_w, type);
+	Bool x_stretch, y_stretch;
 
 	Fixed xstep, ystep, count;
 	int last = 0;
 	int i;
-	int yMin = ( srcH > absh) ? absh : srcH;
-	PStretchProc proc = ( PStretchProc) nil;
-	Byte *srcLast = nil;
+	int y_min = ( src_h > abs_h) ? abs_h : src_h;
+	PStretchProc xproc = NULL;
+	PBitBltProc yproc = NULL;
+	Byte *src_last = NULL, impl_buf[1024];
+	semistatic_t pimpl_buf;
 
-	if ( w == srcW) xStretch = false;
-	if ( h == srcH) yStretch = false;
-/* transfer case */
-	if ( !xStretch && !yStretch && ( w > 0))
-	{
+	if ( scaling < istAND ) {
+		x_stretch = scaling & istBoxX;
+		y_stretch = scaling & istBoxY;
+	} else
+		x_stretch = y_stretch = 1;
+	if ( w == src_w) x_stretch = false;
+	if ( h == src_h) y_stretch = false;
+
+	/* transfer */
+	if ( !x_stretch && !y_stretch && ( w > 0)) {
 		int y;
-		int xMin = (( type & imBPP) < 8) ?
-						( srcLine > dstLine) ? dstLine : srcLine :
-						(((( srcW > absw) ? absw : srcW) * ( type & imBPP)) / 8);
-		if ( srcW < w || srcH < absh) memset( dstData, 0, dstLine * absh);
+		int x_min = (( type & imBPP) < 8) ?
+			( src_line > dst_line) ? dst_line : src_line :
+			(((( src_w > abs_w) ? abs_w : src_w) * ( type & imBPP)) / 8);
+		if ( src_w < w || src_h < abs_h) memset( dst_data, 0, dst_line * abs_h);
 		if ( h < 0)
 		{
-			dstData += dstLine * ( yMin - 1);
-			dstLine = -dstLine;
+			dst_data += dst_line * ( y_min - 1);
+			dst_line = -dst_line;
 		}
-		for ( y = 0; y < yMin; y++, srcData += srcLine, dstData += dstLine)
-			memcpy( dstData, srcData, xMin);
-		return;
+		for ( y = 0; y < y_min; y++, src_data += src_line, dst_data += dst_line)
+			memcpy( dst_data, src_data, x_min);
+		return true;
 	}
 
+	/* define processors */
+	if ( y_stretch && abs_h < src_h && (scaling == istAND || scaling == istOR))
+		yproc = (scaling == istAND) ? bitblt_and : bitblt_or;
+	for ( i = 0; i < sizeof(stretch_procs)/sizeof(stretch_t); i++) {
+		if ( stretch_procs[i].type != type ) continue;
+		if ( src_w > abs_w) {
+			if ( scaling == istAND )
+				xproc = stretch_procs[i].and;
+			else if ( scaling == istOR )
+				xproc = stretch_procs[i].or;
+			else
+				xproc = stretch_procs[i].in;
+			if ( xproc == stretch_procs[i].in )
+				yproc = NULL;
+		} else
+			xproc = stretch_procs[i].out;
+		break;
+	}
+	if ( xproc == NULL ) {
+		strncpy(error, "Cannot stretch this image type", 255);
+		return false;
+	}
+
+
 /* y-only stretch case */
-	if ( !xStretch && yStretch && ( w > 0))
-	{
-		int xMin = (( type & imBPP) < 8) ?
-			( srcLine > dstLine) ? dstLine : srcLine :
-			(((( srcW > absw) ? absw : srcW) * ( type & imBPP)) / 8);
-		count. l = 0;
-		if ( srcW < w) memset( dstData, 0, dstLine * absh);
-		if ( h < 0)
-		{
-			dstData += dstLine * ( absh - 1);
-			dstLine = -dstLine;
+	if ( !x_stretch && y_stretch && ( w > 0)) {
+		int x_min = (( type & imBPP) < 8) ?
+			( src_line > dst_line) ? dst_line : src_line :
+			(((( src_w > abs_w) ? abs_w : src_w) * ( type & imBPP)) / 8);
+		Byte *last_dst_data;
+		count.l = 0;
+		if ( src_w < w) memset( dst_data, 0, dst_line * abs_h);
+		if ( h < 0) {
+			dst_data += dst_line * ( abs_h - 1);
+			dst_line = -dst_line;
 		}
-		if ( absh < srcH)
-		{
-			ystep. l = STEP( absh / srcH );
-			memcpy( dstData, srcData, xMin);
-			dstData += dstLine;
-			for ( i = 0; i < srcH; i++)
-			{
-				if ( count. i.i > last)
-				{
-					memcpy( dstData, srcData, xMin);
-					dstData += dstLine;
+		if ( abs_h < src_h) {
+			ystep.l = STEP( abs_h / src_h );
+			memcpy( last_dst_data = dst_data, src_data, x_min);
+			dst_data += dst_line;
+			for ( i = 0; i < src_h; i++) {
+				if ( count.i.i > last) {
+					memcpy( last_dst_data = dst_data, src_data, x_min);
+					dst_data += dst_line;
 					last = count.i.i;
-				}
-				count. l += ystep. l;
-				srcData += srcLine;
+				} else if ( yproc && i > 0 )
+					yproc( src_data, last_dst_data, x_min );
+				count.l += ystep.l;
+				src_data += src_line;
 			}
 		} else {
-			ystep. l = STEP( srcH / absh);
-			for ( i = 0; i < absh; i++)
-			{
-				if ( count.i.i > last)
-				{
-					srcData += srcLine;
+			ystep.l = STEP( src_h / abs_h);
+			for ( i = 0; i < abs_h; i++) {
+				if ( count.i.i > last) {
+					src_data += src_line;
 					last = count.i.i;
 				}
-				count. l += ystep. l;
-				memcpy( dstData, srcData, xMin);
-				dstData  += dstLine;
+				count.l += ystep.l;
+				memcpy( dst_data, src_data, x_min);
+				dst_data  += dst_line;
 			}
 		}
-		return;
+		return true;
 	}
 
 /* general actions for x-scaling */
-	count. l = 0;
-	if ( srcW < absw || srcH < absh || ( type & imBPP) == imNibble)
-		memset( dstData, 0, dstLine * absh);
-	if ( absw < srcW)
-		xstep. l = STEP( absw / srcW);
+	count.l = 0;
+	if ( src_w < abs_w || src_h < abs_h || ( type & imBPP) == imNibble)
+		memset( dst_data, 0, dst_line * abs_h);
+	if ( abs_w < src_w)
+		xstep. l = STEP( abs_w / src_w);
 	else
-		xstep. l = STEP( srcW / absw);
-	switch( type)
-	{
-		case imMono:     case imBW:
-			proc = ( PStretchProc)(( srcW > absw) ? bs_mono_in : bs_mono_out);  break;
-		case imNibble:   case imNibble|imGrayScale:
-			proc = ( PStretchProc)(( srcW > absw) ? bs_nibble_in : bs_nibble_out);     break;
-		case imByte:     case im256:
-			proc = ( PStretchProc)(( srcW > absw) ? bs_uint8_t_in : bs_uint8_t_out);   break;
-		case imRGB:      case imRGB|imGrayScale:
-			proc = ( PStretchProc)(( srcW > absw) ? bs_RGBColor_in : bs_RGBColor_out); break;
-		case imShort:
-			proc = ( PStretchProc)(( srcW > absw) ? bs_int16_t_in : bs_int16_t_out);   break;
-		case imLong:
-			proc = ( PStretchProc)(( srcW > absw) ? bs_int32_t_in : bs_int32_t_out);   break;
-		case imFloat:
-			proc = ( PStretchProc)(( srcW > absw) ? bs_float_in : bs_float_out);       break;
-		case imDouble:
-			proc = ( PStretchProc)(( srcW > absw) ? bs_double_in : bs_double_out);     break;
-		case imComplex:  case imTrigComplex:
-			proc = ( PStretchProc)(( srcW > absw) ? bs_Complex_in : bs_Complex_out);   break;
-		case imDComplex: case imTrigDComplex:
-			proc = ( PStretchProc)(( srcW > absw) ? bs_DComplex_in : bs_DComplex_out); break;
-		default:
-			return;
-	}
+		xstep. l = STEP( src_w / abs_w);
 
 /* no vertical stretch case */
-	if ( !yStretch || ( srcH == -h))
-	{
-		if ( h < 0)
-		{
-			dstData += dstLine * ( yMin - 1);
-			dstLine = -dstLine;
+	if ( !y_stretch || ( src_h == -h)) {
+		if ( h < 0) {
+			dst_data += dst_line * ( y_min - 1);
+			dst_line = -dst_line;
 		}
-		for ( i = 0; i < yMin; i++, srcData += srcLine, dstData += dstLine)
-			proc( srcData, dstData, srcW, w, absw, xstep.l);
-		return;
+		for ( i = 0; i < y_min; i++, src_data += src_line, dst_data += dst_line)
+			xproc( src_data, dst_data, src_w, w, abs_w, xstep.l);
+		return true;
 	}
 
 /* general case */
-	if ( h < 0)
-	{
-		dstData += dstLine * ( absh - 1);
-		dstLine = -dstLine;
+	if ( yproc ) {
+		semistatic_init(&pimpl_buf, &impl_buf, 1, 1024);
+		if ( !semistatic_expand(&pimpl_buf, dst_line)) {
+			strncpy(error, "Not enough memory", 255);
+			return false;
+		}
 	}
-	if ( absh < srcH)
-	{
+
+	if ( h < 0) {
+		dst_data += dst_line * ( abs_h - 1);
+		dst_line = -dst_line;
+	}
+	if ( abs_h < src_h) {
 		int j = 0;
-		ystep. l = STEP( absh / srcH);
-		proc( srcData, dstData, srcW, w, absw, xstep.l);
-		dstData += dstLine;
+		Byte * last_dst_data;
+		ystep.l = STEP( abs_h / src_h);
+		xproc( src_data, last_dst_data = dst_data, src_w, w, abs_w, xstep.l);
+		dst_data += dst_line;
 		j++;
-		for ( i = 0; i < srcH; i++)
-		{
-			if ( count. i.i > last)
-			{
-				proc( srcData, dstData, srcW, w, absw, xstep.l);
-				dstData += dstLine;
+		for ( i = 0; i < src_h; i++) {
+			if ( count.i.i > last) {
+				xproc( src_data, last_dst_data = dst_data, src_w, w, abs_w, xstep.l);
+				dst_data += dst_line;
 				last = count.i.i;
 				j++;
+			} else if ( yproc && i > 0 ) {
+				bzero(pimpl_buf.heap, dst_line);
+				xproc( src_data , pimpl_buf.heap, src_w, w, abs_w, xstep.l);
+				yproc( pimpl_buf.heap, last_dst_data, dst_line);
 			}
-			count. l += ystep. l;
-			srcData += srcLine;
+			count.l += ystep.l;
+			src_data += src_line;
 		}
 	} else {
-		ystep. l = STEP( srcH / absh);
-		for ( i = 0; i < absh; i++)
-		{
-			if ( count.i.i > last)
-			{
-				srcData += srcLine;
+		ystep.l = STEP( src_h / abs_h);
+		for ( i = 0; i < abs_h; i++) {
+			if ( count.i.i > last) {
+				src_data += src_line;
 				last = count.i.i;
 			}
-			count. l += ystep. l;
-			if ( srcLast == srcData) {
-				memcpy( dstData, dstData - dstLine, dstLine < 0 ? -dstLine : dstLine);
+			count.l += ystep.l;
+			if ( src_last == src_data) {
+				memcpy( dst_data, dst_data - dst_line, dst_line < 0 ? -dst_line : dst_line);
 			} else {
-				proc( srcData, dstData, srcW, w, absw, xstep.l);
-				srcLast = srcData;
+				xproc( src_data, dst_data, src_w, w, abs_w, xstep.l);
+				src_last = src_data;
 			}
-			dstData += dstLine;
+			dst_data += dst_line;
 		}
 	}
+
+	if ( yproc )
+		semistatic_done(&pimpl_buf);
+
+	return true;
 }
 
 /* Resizing with filters - stolen from ImageMagick MagickCore/resize.c */
@@ -727,7 +895,7 @@ STRETCH_VERTICAL_LOOP(double,register double pixel = 0,pixel,0,contributions[j],
 STRETCH_VERTICAL_CLOSE(double)
 
 static Bool
-stretch_filtered( int type, Byte * oldData, int oldW, int oldH, Byte * newData, int w, int h, int scaling, char * error )
+stretch_filtered( int type, Byte * old_data, int old_w, int old_h, Byte * new_data, int w, int h, int scaling, char * error )
 {
 	int channels, fw, fh, flw, i, support_size;
 	double factor_x, factor_y, scale_x, scale_y, *contributions, support_x, support_y ;
@@ -778,22 +946,22 @@ stretch_filtered( int type, Byte * oldData, int oldW, int oldH, Byte * newData, 
 	if ( type == imRGB ) {
 		type = imByte;
 		w *= 3;
-		oldW *= 3;
+		old_w *= 3;
 	}
 	if ( channels == 2 ) {
 		w *= 2;
-		oldW *= 2;
+		old_w *= 2;
 		type = (( type & imBPP ) / 2) | imGrayScale | imRealNumber;
 	}
 
 	/* allocate space for semi-filtered and target data */
-	factor_x = (double) w / (double) oldW;
-	factor_y = (double) h / (double) oldH;
+	factor_x = (double) w / (double) old_w;
+	factor_y = (double) h / (double) old_h;
 	if (factor_x > factor_y) {
 		fw = w;
-		fh = oldH;
+		fh = old_h;
 	} else {
-		fw = oldW;
+		fw = old_w;
 		fh = h;
 	}
 	flw = LINE_SIZE( fw, type);
@@ -826,10 +994,10 @@ stretch_filtered( int type, Byte * oldData, int oldW, int oldH, Byte * newData, 
 	if (factor_x > factor_y) {
 #define HORIZONTAL(type) stretch_horizontal_##type( \
 		filter, scale_x, contributions, support_x, channels, \
-		oldData, oldW / channels, oldH, filter_data, fw / channels, fh, factor_x, support_size)
+		old_data, old_w / channels, old_h, filter_data, fw / channels, fh, factor_x, support_size)
 #define VERTICAL(type)   stretch_vertical_##type  ( \
 		filter, scale_y, contributions, support_y, \
-		filter_data, fw, fh, newData, w, h, factor_y, support_size )
+		filter_data, fw, fh, new_data, w, h, factor_y, support_size )
 #define HANDLE_TYPE(type,name) \
 		case name: \
 			HORIZONTAL(type);\
@@ -850,10 +1018,10 @@ stretch_filtered( int type, Byte * oldData, int oldW, int oldH, Byte * newData, 
 	} else {
 #define VERTICAL(type)   stretch_vertical_##type  ( \
 		filter, scale_y, contributions, support_y, \
-		oldData, oldW, oldH, filter_data, fw, fh, factor_y, support_size)
+		old_data, old_w, old_h, filter_data, fw, fh, factor_y, support_size)
 #define HORIZONTAL(type) stretch_horizontal_##type( \
 		filter, scale_x, contributions, support_x, channels, \
-		filter_data, fw / channels, fh, newData, w / channels, h, factor_x, support_size)
+		filter_data, fw / channels, fh, new_data, w / channels, h, factor_x, support_size)
 #define HANDLE_TYPE(type,name) \
 		case name: \
 			VERTICAL(type);\
@@ -878,31 +1046,31 @@ stretch_filtered( int type, Byte * oldData, int oldW, int oldH, Byte * newData, 
 }
 
 Bool
-ic_stretch_filtered( int type, Byte * oldData, int oldW, int oldH, Byte * newData, int w, int h, int scaling, char * error )
+ic_stretch_filtered( int type, Byte * old_data, int old_w, int old_h, Byte * new_data, int w, int h, int scaling, char * error )
 {
-	int absw, absh;
+	int abs_w, abs_h;
 	Bool mirror_x, mirror_y;
 
-	absw = abs(w);
-	absh = abs(h);
+	abs_w = abs(w);
+	abs_h = abs(h);
 	mirror_x = w < 0;
 	mirror_y = h < 0;
 
 	/* if it's cheaper to mirror before the conversion, do it */
-	if ( mirror_y && oldH < absh ) {
-		img_mirror_raw( type, oldW, oldH, oldData, 1 );
+	if ( mirror_y && old_h < abs_h ) {
+		img_mirror_raw( type, old_w, old_h, old_data, 1 );
 		mirror_y = 0;
 	}
-	if ( mirror_x && oldW < absw) {
-		img_mirror_raw( type, oldW, oldH, oldData, 0 );
+	if ( mirror_x && old_w < abs_w) {
+		img_mirror_raw( type, old_w, old_h, old_data, 0 );
 		mirror_x = 0;
 	}
 
-	if ( !stretch_filtered( type, oldData, oldW, oldH, newData, w, h, scaling, error ))
+	if ( !stretch_filtered( type, old_data, old_w, old_h, new_data, w, h, scaling, error ))
 		return false;
 
-	if ( mirror_x ) img_mirror_raw( type, w, h, newData, 0 );
-	if ( mirror_y ) img_mirror_raw( type, w, h, newData, 1 );
+	if ( mirror_x ) img_mirror_raw( type, w, h, new_data, 0 );
+	if ( mirror_y ) img_mirror_raw( type, w, h, new_data, 1 );
 
 	return true;
 }
@@ -910,7 +1078,8 @@ ic_stretch_filtered( int type, Byte * oldData, int oldW, int oldH, Byte * newDat
 int
 ic_stretch_suggest_type( int type, int scaling )
 {
-	if ( scaling <= istBox ) return type;
+	if ( scaling <= istOR )
+		return type;
 
 	switch (type) {
 	case imMono:
@@ -929,14 +1098,11 @@ ic_stretch_suggest_type( int type, int scaling )
 }
 
 Bool
-ic_stretch( int type, Byte * srcData, int srcW, int srcH, Byte * dstData, int w, int h, int scaling, char * error)
+ic_stretch( int type, Byte * src_data, int src_w, int src_h, Byte * dst_data, int w, int h, int scaling, char * error)
 {
-	if ( scaling <= istBox ) {
-		ic_stretch_box( type, srcData, srcW, srcH, dstData, w, h, scaling & istBoxX, scaling & istBoxY);
-		return true;
-	} else {
-		return ic_stretch_filtered( type, srcData, srcW, srcH, dstData, w, h, scaling, error );
-	}
+	return ( scaling <= istOR ) ?
+		ic_stretch_box( type, src_data, src_w, src_h, dst_data, w, h, scaling, error):
+		ic_stretch_filtered( type, src_data, src_w, src_h, dst_data, w, h, scaling, error );
 }
 
 #ifdef __cplusplus

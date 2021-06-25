@@ -112,7 +112,7 @@ sub font_dialog
 sub accelItems
 {
 	return [
-		['openitem' => '~Open' => 'Ctrl+O' => '^O' => sub { $VB::main-> open;}],
+		['openitem' => '~Open' => 'Ctrl+O' => '^O' => sub { $VB::main-> open_file;}],
 		['-saveitem1' => '~Save' => 'Ctrl+S' => '^S' => sub {$VB::main-> save;}],
 		['Exit' => 'Ctrl+Q' => '^Q' => sub{ $VB::main-> close;}],
 		['Object Inspector' => 'F11' => 'F11' => sub { $VB::main-> bring_inspector; }],
@@ -1189,6 +1189,7 @@ data =>
 "\x07\x00\x00\x00\x02\x00\x00\x00\x02\x00\x00\x00".
 ''),
 		size => [ 29, 130],
+		flat    => 1,
 		onClick => sub {
 			my $i  = $d-> Items;
 			my $fi = $i-> focusedItem;
@@ -1208,6 +1209,7 @@ data =>
 "\x7f\xf0\x00\x00\x7f\xf0\x00\x00\xff\xf8\x00\x00".
 ''),
 		size => [ 29, 130],
+		flat => 1,
 		onClick => sub {
 			my $i   = $d-> Items;
 			my $fi  = $i-> focusedItem;
@@ -1254,6 +1256,7 @@ package Prima::VB::MainPanel;
 use strict;
 use vars qw(@ISA *do_layer);
 @ISA = qw(Prima::Window);
+use Prima::sys::FS;
 
 sub profile_default
 {
@@ -1272,7 +1275,7 @@ sub profile_default
 		menuItems      => [
 			['~File' => [
 				['newitem' => '~New' => 'Ctrl+N' => '^N' =>     sub {$_[0]-> new;}],
-				['openitem' => '~Open' => 'Ctrl+O' => '^O' =>   sub {$_[0]-> open;}],
+				['openitem' => '~Open' => 'Ctrl+O' => '^O' =>   sub {$_[0]-> open_file;}],
 				['-saveitem1' => '~Save' => 'Ctrl+S' => '^S' => sub {$_[0]-> save;}],
 				['-saveitem2' =>'Save ~as...' =>                sub {$_[0]-> saveas;}],
 				['closeitem' =>'~Close' => 'Ctrl+W' => '^W' =>  sub { $VB::form-> close if $VB::form}],
@@ -1370,6 +1373,7 @@ sub init
 		hint      => 'New',
 		image     => $images[0],
 		glyphs    => 2,
+		flat      => 1,
 		onClick   => sub { $VB::main-> new; } ,
 	);
 
@@ -1379,7 +1383,8 @@ sub init
 		hint      => 'Open',
 		image     => $images[1],
 		glyphs    => 2,
-		onClick   => sub { $VB::main-> open; } ,
+		flat      => 1,
+		onClick   => sub { $VB::main-> open_file; } ,
 	);
 
 	$self-> {savebutton} = $self-> insert( SpeedButton =>
@@ -1388,6 +1393,7 @@ sub init
 		hint      => 'Save',
 		image     => $images[2],
 		glyphs    => 2,
+		flat      => 1,
 		onClick   => sub { $VB::main-> save; } ,
 	);
 
@@ -1397,6 +1403,7 @@ sub init
 		hint      => 'Run',
 		image     => $images[3],
 		glyphs    => 2,
+		flat      => 1,
 		onClick   => sub { $VB::main-> form_run} ,
 	);
 
@@ -1430,17 +1437,7 @@ sub init
 		origin     => [$s*12,1],
 		size       => [$self-> {nb}-> width-$s*24,36*$s+8],
 		growMode   => gm::Floor,
-		backColor  => cl::Gray,
 		name       => 'NBPanel',
-		onPaint    => sub {
-			my ( $self, $canvas) = @_;
-			my @sz = $self-> size;
-			$canvas-> rect3d(0,0,$sz[0]-1,$sz[1]-1,
-				1,cl::Black,cl::Black,$self-> backColor);
-			my $i = 0;
-			my $sz = $s * 36;
-			$canvas-> rectangle($i-$sz-2,2,$i,$sz+4) while (($i+=$sz+4)<($sz[0]+$sz));
-		},
 	);
 
 	$self-> {leftScroll} = $self-> {nb}-> insert( SpeedButton =>
@@ -1448,11 +1445,12 @@ sub init
 		size    => [map { $s * $_ } 11,36],
 		name    => 'LeftScroll',
 		autoRepeat => 1,
+		flat    => 1,
 		onPaint => sub {
 			$_[0]-> on_paint( $_[1]);
 			$_[1]-> color( $_[0]-> enabled ? cl::Black : cl::Gray);
 			$_[1]-> fillpoly([map { $s * $_ } 7,4,7,32,3,17]);
-		},
+		}, 
 		delegations => [ $self, qw(Click)],
 	);
 
@@ -1462,6 +1460,7 @@ sub init
 		name    => 'RightScroll',
 		growMode => gm::Right,
 		autoRepeat => 1,
+		flat    => 1,
 		onPaint => sub {
 			$_[0]-> on_paint( $_[1]);
 			$_[1]-> color( $_[0]-> enabled ? cl::Black : cl::Gray);
@@ -1589,6 +1588,7 @@ sub reset_tabs
 			hint   => $class,
 			name   => 'ClassSelector',
 			image  => $i,
+			flat   => 1,
 			origin => [ $offsets{$info{page}}, 4],
 			size   => [ map { $s * $_ } 36, 36],
 			delegations => [$self, qw(Click)],
@@ -1710,7 +1710,7 @@ sub inspect_load_data
 
 	my $fn = ( $asFile ? $data : "input data");
 	if ( $asFile) {
-		unless (Prima::Utils::open( F, "<", $data)) {
+		unless (open F, "<", $data) {
 			Prima::MsgBox::message( "Error loading " . $data);
 			return;
 		}
@@ -1913,7 +1913,7 @@ sub load_file
 	$_-> notify(q(Load)) for $VB::form-> widgets;
 }
 
-sub open
+sub open_file
 {
 	my $self = $_[0];
 
@@ -2212,7 +2212,7 @@ sub save
 
 	return $self-> saveas unless defined $self-> {fmName};
 
-	if ( Prima::Utils::open( F, ">", $self-> {fmName})) {
+	if ( open F, ">", $self-> {fmName}) {
 		local $/;
 		$VB::main-> wait;
 		my $c = $asPL ? $self-> write_PL : $self-> write_form;

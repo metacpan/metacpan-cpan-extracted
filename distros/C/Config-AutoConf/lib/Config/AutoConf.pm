@@ -92,7 +92,7 @@ Config::AutoConf - A module to implement some of AutoConf macros in pure perl.
 
 =cut
 
-our $VERSION = '0.319';
+our $VERSION = '0.320';
 $VERSION = eval $VERSION;
 
 =head1 ABSTRACT
@@ -272,7 +272,7 @@ sub check_prog
         for my $e (@exe_exts)
         {
             my $cmd           = $self->_sanitize_prog(File::Spec->catfile($p, $ac_prog . $e));
-            my $is_executable = -x $cmd and -f $cmd;
+            my $is_executable = -x $cmd && -f $cmd;
                   $is_executable
               and $options->{action_on_true}
               and ref $options->{action_on_true} eq "CODE"

@@ -1,3 +1,11 @@
+0.72    2021-06-25
+    - BREAKING CHANGE: lift minimum perl version to 5.20 by using signatures
+    - Use Carp::croak instead of die to get errors out of caller's perspective
+
+0.6     2018-11-26
+    - BREAKING CHANGE: Serialization API has changed and uses YAML instead of Storable
+    - Transparent refactoring of internal event registration and handling
+
 0.51    2018-08-24
     - No relevant changes, but a version bump was neccessary because I broke my MANIFEST file. Sorry! :-)
 

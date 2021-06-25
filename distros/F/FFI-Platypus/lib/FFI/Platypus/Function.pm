@@ -6,7 +6,7 @@ use 5.008004;
 use FFI::Platypus;
 
 # ABSTRACT: An FFI function object
-our $VERSION = '1.43'; # VERSION
+our $VERSION = '1.46'; # VERSION
 
 
 use overload '&{}' => sub {
@@ -19,7 +19,7 @@ use overload '&{}' => sub {
 
 package FFI::Platypus::Function::Function;
 
-use base qw( FFI::Platypus::Function );
+use parent qw( FFI::Platypus::Function );
 
 sub attach
 {
@@ -55,7 +55,7 @@ sub sub_ref
 
 package FFI::Platypus::Function::Wrapper;
 
-use base qw( FFI::Platypus::Function );
+use parent qw( FFI::Platypus::Function );
 
 sub new
 {
@@ -127,7 +127,7 @@ FFI::Platypus::Function - An FFI function object
 
 =head1 VERSION
 
-version 1.43
+version 1.46
 
 =head1 SYNOPSIS
 
@@ -212,6 +212,8 @@ Diab Jerius (DJERIUS)
 Eric Brine (IKEGAMI)
 
 szTheory
+
+José Joaquín Atria (JJATRIA)
 
 =head1 COPYRIGHT AND LICENSE
 

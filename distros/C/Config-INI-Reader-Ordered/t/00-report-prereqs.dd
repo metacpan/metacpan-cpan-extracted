@@ -1,17 +1,21 @@
 do { my $x = {
        'configure' => {
                         'requires' => {
-                                        'ExtUtils::MakeMaker' => '0'
+                                        'ExtUtils::MakeMaker' => '6.78'
                                       }
                       },
        'develop' => {
                       'requires' => {
-                                      'Test::Pod' => '1.41'
+                                      'Encode' => '0',
+                                      'Test::More' => '0',
+                                      'Test::Pod' => '1.41',
+                                      'warnings' => '0'
                                     }
                     },
        'runtime' => {
                       'requires' => {
                                       'Config::INI::Reader' => '0',
+                                      'perl' => '5.012',
                                       'strict' => '0',
                                       'vars' => '0'
                                     }

@@ -2,7 +2,7 @@ package Myriad::RPC::Client::Implementation::Redis;
 
 use Myriad::Class extends => qw(IO::Async::Notifier);
 
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.008'; # VERSION
 our $AUTHORITY = 'cpan:DERIV'; # AUTHORITY
 
 =encoding utf8
@@ -95,7 +95,7 @@ async method call_rpc($service, $method, %args) {
         # The subscription loop will parse the message for us
         my $message = await Future->wait_any($self->loop->timeout_future(after => $timeout), $pending);
 
-        return $message->response;
+        return $message->response->{response};
     } catch ($e) {
         $log->tracef('RPC request failed due: %s', $e);
         if ($e =~ /Timeout/) {

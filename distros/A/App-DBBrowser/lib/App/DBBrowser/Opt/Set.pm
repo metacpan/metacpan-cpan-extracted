@@ -66,9 +66,7 @@ sub _options {
         ],
         group_behavior => [
             { name => '_menu_memory',  text => "- Menu memory",       section => 'G'     },
-            { name => '_keep_header',  text => "- Keep header",       section => 'table' },
             { name => '_table_expand', text => "- Expand table",      section => 'table' },
-            { name => '_info_expand',  text => "- Expand info-table", section => 'G'     },
             { name => '_f3',           text => "- F3 filter",         section => 'table' },
             { name => '_mouse',        text => "- Mouse mode",        section => 'table' },
         ],
@@ -94,17 +92,16 @@ sub _options {
             { name => 'min_col_width',       text => "- Col width",       section => 'table' },
             { name => 'progress_bar',        text => "- Progress bar",    section => 'table' },
             { name => 'tab_width',           text => "- Tab width",       section => 'table' },
-            { name => '_grid',               text => "- Grid",            section => 'table' },
             { name => '_color',              text => "- Color",           section => 'table' },
             { name => '_binary_filter',      text => "- Binary filter",   section => 'table' },
             { name => '_squash_spaces',      text => "- Squash spaces",   section => 'table' },
-            { name => '_show_table_name',    text => "- Show table name", section => 'G'     },
             { name => '_base_indent',        text => "- Indentation",     section => 'G'     },
             { name => '_dots',               text => "- Truncated rows",  section => 'G'     },
             { name => '_set_string',         text => "- Set string",      section => 'table' },
             { name => '_file_find_warnings', text => "- Warnings",        section => 'G'     },
         ],
         group_insert => [
+            { name => '_data_source_type',  text => "- Source type of input data",     section => 'insert' },
             { name => '_parse_file',        text => "- Parse tool for 'file'",         section => 'insert' },
             { name => '_parse_copy',        text => "- Parse tool for 'copy & paste'", section => 'insert' },
             { name => '_csv_char',          text => "- csv settings-a",                section => 'csv'    },
@@ -113,7 +110,6 @@ sub _options {
             { name => '_input_filter',      text => "- Enable input filter",           section => 'insert' },
             { name => '_empty_to_null',     text => "- Empty to NULL",                 section => 'insert' },
             { name => '_file_encoding',     text => "- File encoding",                 section => 'insert' },
-            { name => '_data_source_type',  text => "- Source type of input data",     section => 'insert' },
             { name => 'history_dirs',       text => "- Directory history",             section => 'insert' },
             { name => '_file_filter',       text => "- File filter",                   section => 'insert' },
             { name => '_show_hidden_files', text => "- Show hidden files",             section => 'insert' },
@@ -395,13 +391,6 @@ sub set_options {
                 ];
                 $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
             }
-            elsif ( $opt eq '_grid' ) {
-                my $prompt = '"Grid"';
-                my $sub_menu = [
-                    [ 'grid', "- Grid", [ $no, $yes ] ]
-                ];
-                $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
-            }
             elsif ( $opt eq '_dots' ) {
                 my $prompt = '"How to mark truncated lines"';
                 my $sub_menu = [
@@ -430,15 +419,8 @@ sub set_options {
                 ];
                 $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
             }
-            elsif ( $opt eq '_show_table_name' ) {
-                my $prompt = 'Show the table name in the bottom left corner';
-                my $sub_menu = [
-                    [ 'show_table_name', "- Show the table name", [ $no, $yes ] ]
-                ];
-                $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
-            }
             elsif ( $opt eq '_base_indent' ) {
-                my $prompt = 'Set the indentation width';
+                my $prompt = 'Set the indentation width for SQL substatements';
                 my $sub_menu = [
                     [ 'base_indent', "- Indentation", [ 0, 1, 2, 3, 4 ] ]
                 ];
@@ -476,26 +458,10 @@ sub set_options {
                 ];
                 $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
             }
-            elsif ( $opt eq '_keep_header' ) {
-                my $prompt = '"Header each Page"';
-                my $sub_menu = [
-                    [ 'keep_header', "- Keep header", [ $no, $yes ] ]
-                ];
-                $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
-            }
             elsif ( $opt eq '_table_expand' ) {
                 my $prompt = 'Choose: ';
                 my $sub_menu = [
                     [ 'table_expand', "- Expand table rows",   [ $no, $yes ] ],
-                ];
-                $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
-            }
-            elsif ( $opt eq '_info_expand' ) {
-                my $prompt = "Info-tables show the affected rows in 'DROP table', 'DROP view', ";
-                $prompt .= "\n'UPDATE table ...' and 'DELETE FROM table ...'";
-                $prompt .= "\n\n" . 'Choose: ';
-                my $sub_menu = [
-                    [ 'info_expand', "- Expand info-table rows",   [ $no, $yes . ' - fast back', $yes ] ],
                 ];
                 $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
             }

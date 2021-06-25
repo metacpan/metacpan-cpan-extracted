@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## A real Try Catch Block Implementation Using Perl Filter - ~/lib/Nice/Try.pm
-## Version v1.1.1
+## Version v1.1.2
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2020/05/17
-## Modified 2021/06/08
+## Modified 2021/06/18
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -24,7 +24,7 @@ BEGIN
     use Scalar::Util ();
     use List::Util ();
     use Want ();
-    our $VERSION = 'v1.1.1';
+    our $VERSION = 'v1.1.2';
     our $ERROR;
     our( $CATCH, $DIED, $EXCEPTION, $FINALLY, $HAS_CATCH, @RETVAL, $SENTINEL, $TRY, $WANTARRAY );
 }
@@ -40,6 +40,7 @@ sub import
     $hash->{debug} = 0 if( !CORE::exists( $hash->{debug} ) );
     $hash->{no_filter} = 0 if( !CORE::exists( $hash->{no_filter} ) );
     $hash->{debug_code} = 0 if( !CORE::exists( $hash->{debug_code} ) );
+    $hash->{debug_dump} = 0 if( !CORE::exists( $hash->{debug_dump} ) );
     $hash->{dont_want} = 0 if( !CORE::exists( $hash->{dont_want} ) );
     # We check if we are running under tie and if so we cannot use Want features, 
     # because they would trigger a segmentation fault.
@@ -113,6 +114,7 @@ sub filter
         # Make sure there is at least a space at the beginning
         $code = ' ' . $code;
         my $doc = PPI::Document->new( \$code, readonly => 1 ) || die( "Unable to parse: ", PPI::Document->errstr, "\n$code\n" );
+        $self->_browse( $doc ) if( $self->{debug_dump} );
         if( $doc = $self->_parse( $doc ) )
         {
             $_ = $doc->serialize;
@@ -785,7 +787,7 @@ EOT
         }
     };
     \$Nice::Try::DIED = CORE::length( \$\@ ) ? 1 : 0;
-    \$\@ =~ s/[\\015\\012]+\$//g;
+    \$\@ =~ s/[\\015\\012]+\$//g unless( Scalar::Util::blessed( \$\@ ) );
     \$Nice::Try::EXCEPTION = \$\@;
 };
 
@@ -1667,7 +1669,7 @@ When run, this would produce, as one would expect:
     Cleaning up
     Ok, then
 
-Also since version 1.0.0, L<Nice::Try> is context aware:
+Also since version 1.0.0, L<Nice::Try> is B<extended> context aware:
 
     use Want; # an awesome module which extends wantarray
     sub info
@@ -1737,6 +1739,8 @@ And you also have granual power in the catch block to filter which exception to 
     {
         die( Exception->new( "Arghhh" => 401 ) );
     }
+    # can also write this as:
+    # catch( Exception $oopsie where { $_->message =~ /Arghhh/ && $_->code == 500 } )
     catch( $oopsie isa Exception where { $_->message =~ /Arghhh/ && $_->code == 500 } )
     {
         # Do something to deal with some server error
@@ -1761,7 +1765,7 @@ And you also have granual power in the catch block to filter which exception to 
 
 =head1 VERSION
 
-    v1.1.1
+    v1.1.2
 
 =head1 DESCRIPTION
 
@@ -2229,7 +2233,7 @@ Since, try-catch block can be nested, the following would work too:
 
 As mentioned above, you can use class when raising exceptions and you can filter them in a variety of way when you catch them.
 
-Here are your options:
+Here are your options (replace C<Exception::Class> with your favorite exception class):
 
 =over 4
 
@@ -2243,7 +2247,7 @@ Here C<$condition> could be anything that fits in a legitimate perl block, such 
     {
         die( Exception->new( "Oh no!", { code => 401 } ) );
     }
-    catch( Exception $oopsie where { $_->code >= 400 && $_->code < 499 })
+    catch( Exception $oopsie where { $_->code >= 400 && $_->code <= 499 })
     {
         # some more handling here
     }

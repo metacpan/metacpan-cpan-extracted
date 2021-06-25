@@ -1,8 +1,8 @@
 Changes
-DB_File.pm          
-DB_File.xs          
+DB_File.pm
+DB_File.xs
 MANIFEST
-Makefile.PL         
+Makefile.PL
 README
 config.in
 dbinfo
@@ -32,7 +32,7 @@ t/db-hash.t
 t/db-recno.t
 t/db-threads.t
 t/pod.t
-t/meta-json.t 
+t/meta-json.t
 t/meta-yaml.t
 typemap
 version.c

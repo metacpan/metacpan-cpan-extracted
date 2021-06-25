@@ -3,7 +3,7 @@ package Beekeeper::Worker;
 use strict;
 use warnings;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 use Beekeeper::Client ':worker';
 use Beekeeper::Logger ':log_levels';
@@ -15,8 +15,6 @@ use Sys::Hostname;
 use Digest::SHA 'sha256_hex';
 use Scalar::Util 'blessed';
 use Carp;
-
-#TODO: our @CARP_NOT = ('AnyEvent', 'Beekeeper::MQTT');
 
 use constant COMPILE_ERROR_EXIT_CODE => 99;
 use constant REPORT_STATUS_PERIOD    => 5;
@@ -89,8 +87,8 @@ sub new {
         hostname        => hostname(),
         stop_cv         => undef,
         callbacks       => {},
-        job_queue_high  => [],
-        job_queue_low   => [],
+        task_queue_high => [],
+        task_queue_low  => [],
         queued_tasks    => 0,
         last_report     => 0,
         calls_count     => 0,
@@ -141,11 +139,15 @@ sub new {
 sub __init_auth_tokens {
     my ($self) = @_;
 
-    my $secret = 'salt'; #TODO: read from config file
+    # Using a hashing function makes harder to access the wrong worker pool by mistake,
+    # but it is not an effective access restriction: anyone with access to the backend
+    # bus credentials can easily inspect and clone auth data tokens
 
-    $AUTH_TOKENS{'BKPR_SYSTEM'} = sha256_hex('BKPR_SYSTEM'. $secret);
-    $AUTH_TOKENS{'BKPR_ADMIN'}  = sha256_hex('BKPR_ADMIN' . $secret);
-    $AUTH_TOKENS{'BKPR_ROUTER'} = sha256_hex('BKPR_ROUTER'. $secret);
+    my $salt = $self->{_CLIENT}->{auth_salt} || '';
+
+    $AUTH_TOKENS{'BKPR_SYSTEM'} = sha256_hex('BKPR_SYSTEM'. $salt);
+    $AUTH_TOKENS{'BKPR_ADMIN'}  = sha256_hex('BKPR_ADMIN' . $salt);
+    $AUTH_TOKENS{'BKPR_ROUTER'} = sha256_hex('BKPR_ROUTER'. $salt);
 }
 
 sub __has_authorization_token {
@@ -232,7 +234,7 @@ sub __init_worker {
 sub on_startup {
     # Placeholder, intended to be overrided
     my $class = ref $_[0];
-    warn "Worker class $class doesn't define on_startup() method";
+    log_warn "Worker class $class doesn't define on_startup() method";
 }
 
 sub on_shutdown {
@@ -242,8 +244,8 @@ sub on_shutdown {
 sub authorize_request {
     # Placeholder, must to be overrided
     my $class = ref $_[0];
-    warn "Worker class $class doesn't define authorize_request() method";
-    return undef; # do NOT authorize
+    log_error "Worker class $class doesn't define authorize_request() method";
+    return undef; # do not authorize
 }
 
 
@@ -253,17 +255,19 @@ sub accept_notifications {
     my $worker    = $self->{_WORKER};
     my $callbacks = $worker->{callbacks};
 
+    my ($file, $line) = (caller)[1,2];
+    my $at = "at $file line $line\n";
+
     foreach my $fq_meth (keys %args) {
 
         $fq_meth =~ m/^  ( [\w-]+ (?: \.[\w-]+ )* ) 
-                      \. ( [\w-]+ | \* ) $/x or croak "Invalid notification method $fq_meth";
+                      \. ( [\w-]+ | \* ) $/x or die "Invalid notification method '$fq_meth' $at";
 
         my ($service, $method) = ($1, $2);
 
         my $callback = $self->__get_cb_coderef($fq_meth, $args{$fq_meth});
 
-        #TODO: croak does not report correct caller
-        croak "Already accepting notifications $fq_meth" if exists $callbacks->{"msg.$fq_meth"};
+        die "Already accepting notifications '$fq_meth' $at" if exists $callbacks->{"msg.$fq_meth"};
         $callbacks->{"msg.$fq_meth"} = $callback;
 
         my $local_bus = $self->{_BUS}->{bus_role};
@@ -277,7 +281,7 @@ sub accept_notifications {
                 # ($payload_ref, $properties) = @_;
 
                 # Enqueue notification
-                push @{$worker->{job_queue_high}}, [ @_ ];
+                push @{$worker->{task_queue_high}}, [ @_ ];
 
                 unless ($worker->{queued_tasks}) {
                     $worker->{queued_tasks} = 1;
@@ -286,7 +290,7 @@ sub accept_notifications {
             },
             on_suback => sub {
                 my ($success, $prop) = @_;
-                croak "Could not subscribe to $topic" unless $success;
+                die "Could not subscribe to topic '$topic' $at" unless $success;
             }
         );
     }
@@ -306,7 +310,9 @@ sub __get_cb_coderef {
         return \&{"${class}::${callback}"};
     }
     else {
-        croak "Invalid callback '$callback' for '$method'";
+        my ($file, $line) = (caller(1))[1,2];
+        my $at = "at $file line $line\n";
+        die "Invalid callback '$callback' for '$method' $at";
     }
 }
 
@@ -318,39 +324,41 @@ sub accept_remote_calls {
     my $callbacks = $worker->{callbacks};
     my %subscribed_to;
 
+    my ($file, $line) = (caller)[1,2];
+    my $at = "at $file line $line\n";
+
     foreach my $fq_meth (keys %args) {
 
         $fq_meth =~ m/^  ( [\w-]+ (?: \.[\w-]+ )* ) 
-                      \. ( [\w-]+ | \* ) $/x or croak "Invalid job method $fq_meth";
+                      \. ( [\w-]+ | \* ) $/x or die "Invalid remote call method '$fq_meth' $at";
 
         my ($service, $method) = ($1, $2);
 
         my $callback = $self->__get_cb_coderef($fq_meth, $args{$fq_meth});
 
-        #TODO: croak does not report correct caller
-        croak "Already accepting jobs $fq_meth" if exists $callbacks->{"req.$fq_meth"};
+        die "Already accepting remote calls '$fq_meth' $at" if exists $callbacks->{"req.$fq_meth"};
         $callbacks->{"req.$fq_meth"} = $callback;
 
         next if $subscribed_to{$service};
         $subscribed_to{$service} = 1;
 
-        if (keys %subscribed_to > 1) {
-            carp "Running multiple services within a single worker hurts load balancing (don't do that)";
+        if (keys %subscribed_to == 2) {
+            log_warn "Running multiple services within a single worker hurts load balancing $at";
         }
 
         my $local_bus = $self->{_BUS}->{bus_role};
 
-        my $queue = "\$share/BKPR/req/$local_bus/$service";
-        $queue =~ tr|.*|/#|;
+        my $topic = "\$share/BKPR/req/$local_bus/$service";
+        $topic =~ tr|.*|/#|;
 
         $self->{_BUS}->subscribe(
-            topic       => $queue,
+            topic       => $topic,
             maximum_qos => 1,
             on_publish  => sub {
-                # ($body_ref, $msg_headers) = @_;
+                # ($payload_ref, $mqtt_properties) = @_;
 
-                # Enqueue job
-                push @{$worker->{job_queue_low}}, [ @_ ];
+                # Enqueue request
+                push @{$worker->{task_queue_low}}, [ @_ ];
 
                 unless ($worker->{queued_tasks}) {
                     $worker->{queued_tasks} = 1;
@@ -359,7 +367,7 @@ sub accept_remote_calls {
             },
             on_suback => sub {
                 my ($success, $prop) = @_;
-                croak "Could not subscribe to $queue" unless $success;
+                die "Could not subscribe to topic '$topic' $at" unless $success;
             }
         );
     }
@@ -371,7 +379,7 @@ sub __drain_task_queue {
     my $self = shift;
 
     # Ensure that draining does not recurse
-    die "Unexpected task queue processing recursion" if $_TASK_QUEUE_DEPTH;
+    Carp::confess "Unexpected task queue processing recursion" if $_TASK_QUEUE_DEPTH;
     $_TASK_QUEUE_DEPTH++;
 
     my $timing_tasks;
@@ -386,7 +394,7 @@ sub __drain_task_queue {
     my $client = $self->{_CLIENT};
     my $task;
 
-    # When jobs or notifications are received they are not executed immediately
+    # When requests or notifications are received these are not executed immediately
     # because that could happen in the middle of the process of another request,
     # so these tasks get queued until the worker is ready to process the next one.
     #
@@ -397,47 +405,47 @@ sub __drain_task_queue {
 
     DRAIN: {
 
-        while ($task = shift @{$worker->{job_queue_high}}) {
+        while ($task = shift @{$worker->{task_queue_high}}) {
 
             ## Notification
 
-            my ($body_ref, $msg_headers) = @$task;
+            my ($payload_ref, $mqtt_properties) = @$task;
 
             $worker->{notif_count}++;
 
             eval {
 
-                my $request = decode_json($$body_ref);
+                my $request = decode_json($$payload_ref);
 
                 unless (ref $request eq 'HASH' && $request->{jsonrpc} eq '2.0') {
-                    log_warn "Received invalid JSON-RPC 2.0 notification";
+                    log_error "Received invalid JSON-RPC 2.0 notification";
                     return;
                 }
 
                 bless $request, 'Beekeeper::JSONRPC::Notification';
-                $request->{_mqtt_prop} = $msg_headers;
+                $request->{_mqtt_prop} = $mqtt_properties;
 
                 my $method = $request->{method};
 
                 unless (defined $method && $method =~ m/^([\.\w-]+)\.([\w-]+)$/) {
-                    log_warn "Received notification with invalid method $method";
+                    log_error "Received notification with invalid method '$method'";
                     return;
                 }
 
                 my $cb = $worker->{callbacks}->{"msg.$1.$2"} || 
                          $worker->{callbacks}->{"msg.$1.*"};
 
-                local $client->{caller_id}   = $msg_headers->{'clid'};
-                local $client->{caller_addr} = $msg_headers->{'addr'};
-                local $client->{auth_data}   = $msg_headers->{'auth'};
+                local $client->{caller_id}   = $mqtt_properties->{'clid'};
+                local $client->{caller_addr} = $mqtt_properties->{'addr'};
+                local $client->{auth_data}   = $mqtt_properties->{'auth'};
 
                 unless (($self->authorize_request($request) || "") eq BKPR_REQUEST_AUTHORIZED) {
-                    log_warn "Notification $method was not authorized";
+                    log_error "Notification '$method' was not authorized";
                     return;
                 }
 
                 unless ($cb) {
-                    log_warn "No callback found for received notification $method";
+                    log_error "No callback found for received notification '$method'";
                     return;
                 }
 
@@ -450,21 +458,21 @@ sub __drain_task_queue {
             }
         }
 
-        if ($task = shift @{$worker->{job_queue_low}}) {
+        if ($task = shift @{$worker->{task_queue_low}}) {
 
             ## RPC Call
 
-            my ($body_ref, $msg_headers) = @$task;
+            my ($payload_ref, $mqtt_properties) = @$task;
 
             $worker->{calls_count}++;
             my ($request, $request_id, $result, $response);
 
             $result = eval {
 
-                $request = decode_json($$body_ref);
+                $request = decode_json($$payload_ref);
 
                 unless (ref $request eq 'HASH' && $request->{jsonrpc} eq '2.0') {
-                    log_warn "Received invalid JSON-RPC 2.0 request";
+                    log_error "Received invalid JSON-RPC 2.0 request";
                     die Beekeeper::JSONRPC::Error->invalid_request;
                 }
 
@@ -472,36 +480,36 @@ sub __drain_task_queue {
                 my $method  = $request->{method};
 
                 bless $request, 'Beekeeper::JSONRPC::Request';
-                $request->{_mqtt_prop} = $msg_headers;
+                $request->{_mqtt_prop} = $mqtt_properties;
 
                 unless (defined $method && $method =~ m/^([\.\w-]+)\.([\w-]+)$/) {
-                    log_warn "Received request with invalid method $method";
+                    log_error "Received request with invalid method '$method'";
                     die Beekeeper::JSONRPC::Error->method_not_found;
                 }
 
                 my $cb = $worker->{callbacks}->{"req.$1.$2"} || 
                          $worker->{callbacks}->{"req.$1.*"};
 
-                local $client->{caller_id}   = $msg_headers->{'clid'};
-                local $client->{caller_addr} = $msg_headers->{'addr'};
-                local $client->{auth_data}   = $msg_headers->{'auth'};
+                local $client->{caller_id}   = $mqtt_properties->{'clid'};
+                local $client->{caller_addr} = $mqtt_properties->{'addr'};
+                local $client->{auth_data}   = $mqtt_properties->{'auth'};
 
                 unless (($self->authorize_request($request) || "") eq BKPR_REQUEST_AUTHORIZED) {
-                    log_warn "Request $method was not authorized";
+                    log_error "Request '$method' was not authorized";
                     die Beekeeper::JSONRPC::Error->request_not_authorized;
                 }
 
                 unless ($cb) {
-                    log_warn "No callback found for received request $method";
+                    log_error "No callback found for received request '$method'";
                     die Beekeeper::JSONRPC::Error->method_not_found;
                 }
 
-                # Execute job
+                # Execute method callback
                 $cb->($self, $request->{params}, $request);
             };
 
             if ($@) {
-                # Got an exception while executing job
+                # Got an exception while executing method callback
                 if (blessed($@) && $@->isa('Beekeeper::JSONRPC::Error')) {
                     # Handled exception
                     $response = $@;
@@ -548,39 +556,39 @@ sub __drain_task_queue {
                 # processing it may cause unprocessed requests or undelivered responses)
 
                 $self->{_BUS}->publish(
-                    topic     => $msg_headers->{'response_topic'},
-                    addr      => $msg_headers->{'addr'},
+                    topic     => $mqtt_properties->{'response_topic'},
+                    addr      => $mqtt_properties->{'addr'},
                     payload   => \$json,
                     buffer_id => 'response',
                 );
 
-                if (exists $msg_headers->{'packet_id'}) {
+                if (exists $mqtt_properties->{'packet_id'}) {
 
                     $self->{_BUS}->puback(
-                        packet_id => $msg_headers->{'packet_id'},
+                        packet_id => $mqtt_properties->{'packet_id'},
                         buffer_id => 'response',
                     );
                 }
                 else {
                     # Should not happen (clients must publish with QoS 1)
-                    log_warn "Request published with QoS 0 to " . $msg_headers->{'topic'};
+                    log_warn "Request published with QoS 0 to topic " . $mqtt_properties->{'topic'};
                 }
 
                 $self->{_BUS}->flush_buffer( buffer_id => 'response' );
             }
             else {
 
-                # Background jobs doesn't expect responses
+                # Fire and forget calls doesn't expect responses
 
                 $self->{_BUS}->puback(
-                    packet_id => $msg_headers->{'packet_id'},
+                    packet_id => $mqtt_properties->{'packet_id'},
                 );
             }
         }
 
-        redo DRAIN if (@{$worker->{job_queue_high}} || @{$worker->{job_queue_low}});
+        redo DRAIN if (@{$worker->{task_queue_high}} || @{$worker->{task_queue_low}});
 
-        # Execute tasks postponed until job queue is empty
+        # Execute tasks postponed until task queue is empty
         if (exists $worker->{postponed}) {
             $_->() foreach @{$worker->{postponed}};
             delete $worker->{postponed};
@@ -601,19 +609,22 @@ sub __drain_task_queue {
 sub stop_accepting_notifications {
     my ($self, @methods) = @_;
 
-    croak "No method specified" unless @methods;
+    my ($file, $line) = (caller)[1,2];
+    my $at = "at $file line $line\n";
+
+    die "No method specified $at" unless @methods;
 
     foreach my $fq_meth (@methods) {
 
         $fq_meth =~ m/^  ( [\w-]+ (?: \.[\w-]+ )* ) 
-                      \. ( [\w-]+ | \* ) $/x or croak "Invalid method $fq_meth";
+                      \. ( [\w-]+ | \* ) $/x or die "Invalid method '$fq_meth' $at";
 
         my ($service, $method) = ($1, $2);
 
         my $worker = $self->{_WORKER};
 
         unless (defined $worker->{callbacks}->{"msg.$fq_meth"}) {
-            carp "Not previously accepting notifications $fq_meth";
+            log_warn "Not previously accepting notifications '$fq_meth' $at";
             next;
         }
 
@@ -642,8 +653,7 @@ sub stop_accepting_notifications {
             on_unsuback => sub {
                 my ($success, $prop) = @_;
 
-                #TODO: Report caller of stop_accepting_notifications method
-                warn "Could not unsubscribe from $topic" unless $success; 
+                log_error "Could not unsubscribe from topic '$topic' $at" unless $success; 
 
                 my $postponed = $worker->{postponed} ||= [];
                 push @$postponed, $postpone;
@@ -658,12 +668,15 @@ sub stop_accepting_notifications {
 sub stop_accepting_calls {
     my ($self, @methods) = @_;
 
-    croak "No method specified" unless @methods;
+    my ($file, $line) = (caller)[1,2];
+    my $at = "at $file line $line\n";
+
+    die "No method specified $at" unless @methods;
 
     foreach my $fq_meth (@methods) {
 
         $fq_meth =~ m/^  ( [\w-]+ (?: \.[\w-]+ )* ) 
-                      \. ( [\w-]+ | \* ) $/x or croak "Invalid method $fq_meth";
+                      \. ( [\w-]+ | \* ) $/x or die "Invalid remote call method '$fq_meth' $at";
 
         my ($service, $method) = ($1, $2);
 
@@ -672,7 +685,7 @@ sub stop_accepting_calls {
             # through a single MQTT subscription (in order to load balance them), it is 
             # not possible to reject a single method. A workaround is to use a different
             # class for each method that need to be individually rejected.
-            croak "Cannot cancel individual job subscription to $fq_meth";
+            die "Cannot stop accepting individual methods, only '$service.*' is allowed $at";
         }
 
         my $worker    = $self->{_WORKER};
@@ -681,8 +694,7 @@ sub stop_accepting_calls {
         my @cb_keys = grep { $_ =~ m/^req.\Q$service\E\b/ } keys %$callbacks;
 
         unless (@cb_keys) {
-            #TODO: BUG: carp reports caller as Beekeeper/WorkerPool.pm line 440
-            carp "Not previously accepting jobs $fq_meth";
+            log_warn "Not previously accepting remote calls '$fq_meth' $at";
             next;
         }
 
@@ -691,10 +703,10 @@ sub stop_accepting_calls {
         my $topic = "\$share/BKPR/req/$local_bus/$service";
         $topic =~ tr|.*|/#|;
 
-        # Cannot remove callbacks right now, as new jobs could be in flight or be already 
-        # queued. We must wait for unsubscription completion, and then until the job queue 
-        # is empty to ensure that all received jobs were processed. And even then wait a
-        # bit more, as some brokers may send jobs *after* unsubscription.
+        # Cannot remove callbacks right now, as new requests could be in flight or be already 
+        # queued. We must wait for unsubscription completion, and then until the task queue 
+        # is empty to ensure that all received requests were processed. And even then wait a
+        # bit more, as some brokers may send requests *after* unsubscription.
         my $postpone = sub {
 
             $worker->{_timers}->{"unsub-$topic"} = AnyEvent->timer( 
@@ -715,8 +727,7 @@ sub stop_accepting_calls {
             on_unsuback  => sub {
                 my ($success, $prop) = @_;
 
-                #TODO: Report caller of stop_accepting_calls method
-                warn "Could not unsubscribe from $topic" unless $success; 
+                log_error "Could not unsubscribe from topic '$topic' $at" unless $success; 
 
                 my $postponed = $worker->{postponed} ||= [];
                 push @$postponed, $postpone;
@@ -783,8 +794,8 @@ sub stop_working {
 
     $worker->{shutting_down} = 1;
 
-    # Cannot exit right now, as some jobs could be in flight or already queued.
-    # So tell the broker to stop sending jobs, and exit after the job queue is empty
+    # Cannot exit right now, as some requests could be in flight or already queued.
+    # So tell the broker to stop sending requests, and exit after the task queue is empty
     foreach my $service (keys %services) {
 
         $worker->{stop_cv}->begin;
@@ -881,7 +892,7 @@ Beekeeper::Worker - Base class for creating services
 
 =head1 VERSION
 
-Version 0.05
+Version 0.06
 
 =head1 SYNOPSIS
 
@@ -928,7 +939,7 @@ Base class for creating services.
 
 =head1 CONSTRUCTOR
 
-C<Beekeeper::Worker> objects are created automatically by C<Beekeeper::WorkerPool>
+L<Beekeeper::Worker> objects are created automatically by L<Beekeeper::WorkerPool>
 after spawning new processes.
 
 =head1 METHODS
@@ -938,10 +949,10 @@ after spawning new processes.
 This method is executed on a fresh worker process immediately after it was spawned,
 after connecting to the broker and initializing the logger.
 
-It is placeholder intended to be overrided in subclasses, which in their implementation
-perform startup tasks and declare which job methods and notifications will be handled.
+The default implementation is just a placeholder, intended to be overrided in subclasses.
 
-This is the place to initialize, for example, persistent database or cache connections.
+This is the place to perform startup tasks (like creating database or cache connections)
+and declare which calls and notifications the worker will accept.
 
 After this method returns the worker will wait for incoming events to handle.
 
@@ -953,44 +964,47 @@ It can be overrided as needed, the default implementation does nothing.
 
 =head3 authorize_request( $req )
 
-This method MUST be overrided in your worker classes, as the default behavior is
+This method MUST be overrided in worker classes, as the default behavior is
 to deny the execution of any request.
 
 When a request is received this method is called before executing the corresponding
-callback, and it must return the exported constant C<BKPR_REQUEST_AUTHORIZED> in order to
-authorize it. Returning any other value will result in the request being ignored. 
+callback, and it must return the exported constant C<BKPR_REQUEST_AUTHORIZED> in order
+to authorize it. Returning any other value will result in the request being ignored. 
 
 This is the place to handle application authentication and authorization.
 
+Parameter C<$req> is either a L<Beekeeper::JSONRPC::Notification> or a 
+L<Beekeeper::JSONRPC::Request> object.
+
 =head3 log_handler
 
-By default, all workers use a C<Beekeeper::Logger> logger which logs errors and
+By default, all workers use a L<Beekeeper::Logger> logger which logs errors and
 warnings to files and also to a topic on the message bus. The command line tool
-C<bkpr-log> allows to inspect in real time the logs from the message bus. 
+L<bkpr-log> allows to inspect in real time the logs from the message bus. 
 
-To replace this default log mechanism for another one of your choice, you must 
-override the class C<log_handler> method and make that return an object implementing
-a C<log> method.
+This method can be overrided in worker classes in order to replace the default log 
+mechanism for another one. To do so, the new implementation must return an object 
+implementing a C<log> method (see C<Beekeeper::Logger::log> for reference).
 
 For convenience you can import the ':log' symbols and expose to your class the
 functions C<log_fatal>, C<log_alert>, C<log_critical>, C<log_error>, C<log_warn>, 
 C<log_warning>, C<log_notice>, C<log_info>, C<log_debug> and C<log_trace>.
 
-These will call the underlying C<log> method of your logger class, if the severity
-is equal or higher than C<$Beekeeper::Worker::LogLevel>, which is set to allow 
-warnings by default. You can increase the log level to include debug info with 
-the --debug option of C<bkpr>, or from class config in file pool.config.json.
+These will call the underlying C<log> method of the logger class if the severity
+is equal or higher than C<$Beekeeper::Worker::LogLevel>, which is set to C<LOG_INFO>
+by default. The log level can be set to C<LOG_DEBUG> with the --debug option of L<bkpr>, 
+or setting a "debug" option to a true value in config file pool.config.json.
 
 Using these functions makes very easy to switch logging backends at a later date.
 
 All warnings and errors generated by the execution of the worker code are
-logged, unless you specifically catch and ignore them (or raise the log level).
+logged (unless their severity is below the current log level).
 
 =head3 RPC call methods
 
 In order to make RPC calls to another services, methods C<send_notification>, 
 C<call_remote>, C<call_remote_async>, C<fire_remote> and C<wait_async_calls> are 
-automatically imported from C<Beekeeper::Client>.
+automatically imported from L<Beekeeper::Client>.
 
 =head3 accept_notifications ( $method => $callback, ... )
 
@@ -1002,14 +1016,14 @@ or fallback handler can be specified using a wildcard as "{service_class}.*".
 C<$callback> is a method name or a coderef that will be called when a notification
 is received. When executed, the callback will receive two parameters C<$params> 
 (which contains the notification data itself) and C<$req> which is a
-C<Beekeeper::JSONRPC::Notification> object (usually redundant unless you need to
-inspect the request MQTT properties).
+L<Beekeeper::JSONRPC::Notification> object (usually redundant unless it is necessary
+to inspect the MQTT properties of the request).
 
-Notifications are not expected to return a value, any value returned from its
-callback is ignored.
+Notifications are not expected to return a value. Any value returned from notification
+callbacks will be ignored.
 
-The callback is executed within an eval block, if it dies the error will be logged
-but otherwise the worker will continue running.
+The callback is executed within an eval block. If it dies the error will be logged
+but the worker will continue running.
 
 Example:
 
@@ -1048,15 +1062,15 @@ or fallback handler can be specified using a wildcard as "{service_class}.*".
 C<$callback> is a method name or a coderef that will be called when a request
 is received. When executed, the callback will receive two parameters C<$params> 
 (which contains the notification data itself) and C<$req> which is a
-C<Beekeeper::JSONRPC::Request> object (usually redundant unless you need to
-inspect the request MQTT properties).
+L<Beekeeper::JSONRPC::Request> object (usually redundant unless it is necessary
+to inspect the MQTT properties of the request).
 
-The value or data ref returned by the callback will be sent back to the caller
+The value or reference returned by the callback will be sent back to the caller
 as response.
 
-The callback is executed within an eval block, if it dies the error will be 
-logged but otherwise the worker will continue running, and the caller will 
-receive a generic error response.
+The callback is executed within an eval block. If it dies the error will be
+logged and the caller will receive a generic error response, but the worker will
+continue running.
 
 Example:
 

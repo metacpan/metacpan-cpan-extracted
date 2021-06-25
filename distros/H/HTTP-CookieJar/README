@@ -2,7 +2,7 @@ NAME
     HTTP::CookieJar - A minimalist HTTP user agent cookie jar
 
 VERSION
-    version 0.010
+    version 0.012
 
 SYNOPSIS
       use HTTP::CookieJar;
@@ -165,6 +165,20 @@ SEE ALSO
     *   HTTP::Cookies
 
     *   Mojo::UserAgent::CookieJar
+
+SUPPORT
+  Bugs / Feature Requests
+    Please report any bugs or feature requests through the issue tracker at
+    <https://github.com/dagolden/HTTP-CookieJar/issues>. You will be
+    notified automatically of any progress on your issue.
+
+  Source Code
+    This is open source software. The code repository is available for
+    public review and contribution under the terms of the license.
+
+    <https://github.com/dagolden/HTTP-CookieJar>
+
+      git clone https://github.com/dagolden/HTTP-CookieJar.git
 
 AUTHOR
     David Golden <dagolden@cpan.org>

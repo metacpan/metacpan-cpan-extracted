@@ -63,7 +63,12 @@ $options{parser} = sub {
     $reader->readDocument(
         XML::LibXML::Reader->new(string => $_[0]->{recordData}->toString));
 };
+
+like $importer->url, qr{http://example\.org/\?version=}, 'url';
+$options{base} = "http://example.org/?foo=bar";
 $importer = Catmandu::Importer::SRU->new(%options);
+like $importer->url, qr{http://example\.org/\?foo=bar&version=}, 'base url with parameters';
+
 $importer->next;
 $rec = $importer->next;
 my $expected = [dc => [['title' => ['Another Title']]]];

@@ -4,7 +4,7 @@ use Mojo::Base -role;
 use Mojo::Util qw(encode sha1_sum);
 use Struct::Dumb 'readonly_struct';
 
-our $VERSION = 'v0.1.0';
+our $VERSION = 'v0.1.1';
 
 requires qw(array arrays columns);
 

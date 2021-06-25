@@ -1,5 +1,8 @@
 Revision history for Perl extension Mojo::SMTP::Client
 
+0.19  Tue Jun 22 15:26:45 +07 2021
+    - Fix compatibility with Mojolicious 9 (#rt134650 #rt136679 #gh10)
+
 0.18  Mon Apr 29 14:23:44 +07 2019
     - Fix compatibility with Mojolicious 8.15, where promises behaviour was changed again (#rt129355)
 

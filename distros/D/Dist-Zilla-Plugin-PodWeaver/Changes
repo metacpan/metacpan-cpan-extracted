@@ -1,5 +1,9 @@
 Revision history for Dist-Zilla-Plugin-PodWeaver
 
+4.009     2021-06-19 11:05:36-04:00 America/New_York
+        - update author contact info
+        - add perl support section to docs
+
 4.008     2016-04-24 09:48:22+01:00 Europe/London
         - remove an unneeded dependency on List::MoreUtils
 

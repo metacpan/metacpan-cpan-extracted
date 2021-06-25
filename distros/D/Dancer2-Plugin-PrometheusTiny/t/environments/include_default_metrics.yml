@@ -1,0 +1,3 @@
+plugins:
+    PrometheusTiny:
+        include_default_metrics: 0

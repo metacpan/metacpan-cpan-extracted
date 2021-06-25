@@ -53,6 +53,6 @@
          "url" : "git://github.com/davorg/Feed-Find.git"
       }
    },
-   "version" : "0.10",
+   "version" : "0.11",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

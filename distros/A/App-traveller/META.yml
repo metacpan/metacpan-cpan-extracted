@@ -1,0 +1,28 @@
+---
+abstract: 'a webserver that serves Traveller RPG maps'
+author:
+  - 'Alex Schroeder'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::Memory::Cycle: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-traveller
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Modern::Perl: '1.20180701'
+  Mojolicious: '9'
+  perl: '5.026000'
+resources:
+  repository: https://alexschroeder.ch/cgit/traveller
+version: 1
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

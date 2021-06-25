@@ -3,11 +3,11 @@
 #
 #  (C) Paul Evans, 2017-2020 -- leonerd@leonerd.org.uk
 
-use Object::Pad 0.27;
+use Object::Pad 0.41;
 
-package Device::Chip::MAX11200 0.11;
+package Device::Chip::MAX11200 0.12;
 class Device::Chip::MAX11200
-   extends Device::Chip;
+   isa Device::Chip;
 
 use Carp;
 use Future::AsyncAwait;
@@ -422,14 +422,13 @@ allowing access to the four GPIO pins via the standard adapter API.
 
 method as_gpio_adapter
 {
-   return Device::Chip::MAX11200::_GPIOAdapter->new( $self );
+   return Device::Chip::MAX11200::_GPIOAdapter->new( chip => $self );
 }
 
 class Device::Chip::MAX11200::_GPIOAdapter {
    use Carp;
 
-   has $_chip;
-   BUILD { ( $_chip ) = @_; }
+   has $_chip :param;
 
    async method make_protocol ( $pname )
    {

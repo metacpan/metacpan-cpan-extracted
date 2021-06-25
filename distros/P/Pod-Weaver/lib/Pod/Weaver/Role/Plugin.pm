@@ -1,7 +1,15 @@
-package Pod::Weaver::Role::Plugin;
+package Pod::Weaver::Role::Plugin 4.018;
 # ABSTRACT: a Pod::Weaver plugin
-$Pod::Weaver::Role::Plugin::VERSION = '4.017';
+
 use Moose::Role;
+
+# BEGIN BOILERPLATE
+use v5.20.0;
+use warnings;
+use utf8;
+no feature 'switch';
+use experimental qw(postderef postderef_qq); # This experiment gets mainlined.
+# END BOILERPLATE
 
 use Params::Util qw(_HASHLIKE);
 
@@ -63,7 +71,18 @@ Pod::Weaver::Role::Plugin - a Pod::Weaver plugin
 
 =head1 VERSION
 
-version 4.017
+version 4.018
+
+=head1 PERL VERSION SUPPORT
+
+This module has the same support period as perl itself:  it supports the two
+most recent versions of perl.  (That is, if the most recently released version
+is v5.40, then this module should work on both v5.40 and v5.38.)
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
 
 =head1 ATTRIBUTES
 
@@ -83,7 +102,7 @@ This is the most basic role that all plugins must perform.
 
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@cpan.org>
+Ricardo SIGNES <rjbs@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

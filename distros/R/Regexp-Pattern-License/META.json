@@ -56,11 +56,11 @@
    "provides" : {
       "Regexp::Pattern::License" : {
          "file" : "lib/Regexp/Pattern/License.pm",
-         "version" : "v3.4.0"
+         "version" : "v3.5.1"
       },
       "Regexp::Pattern::License::Parts" : {
          "file" : "lib/Regexp/Pattern/License/Parts.pm",
-         "version" : "v3.4.0"
+         "version" : "v3.5.1"
       }
    },
    "release_status" : "stable",
@@ -78,11 +78,11 @@
       },
       "x_identifier" : "http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/project"
    },
-   "version" : "v3.4.0",
+   "version" : "v3.5.1",
    "x_help_wanted" : [
-      "tester",
-      "documenter"
+      "documenter",
+      "tester"
    ],
-   "x_serialization_backend" : "JSON::PP version 4.02",
+   "x_serialization_backend" : "JSON::PP version 4.04",
    "x_static_install" : 1
 }

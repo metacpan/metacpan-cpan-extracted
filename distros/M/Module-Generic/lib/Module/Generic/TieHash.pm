@@ -15,6 +15,7 @@ BEGIN
 {
     use strict;
     use warnings::register;
+    use warnings;
     use parent qw( Module::Generic );
     use Scalar::Util ();
     our( $VERSION ) = 'v1.0.0';

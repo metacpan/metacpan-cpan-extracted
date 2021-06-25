@@ -17,12 +17,12 @@ use parent qw/ Plack::Middleware /;
 use List::Util qw/ first /;
 use Plack::Util;
 use Plack::Util::Accessor
-    qw/ client sample_rate histogram increment set_add /;
+    qw/ client sample_rate histogram increment set_add catch_errors /;
 use Ref::Util qw/ is_coderef /;
 use Time::HiRes;
 use Try::Tiny;
 
-our $VERSION = 'v0.4.7';
+our $VERSION = 'v0.5.0';
 
 # Note: You may be able to omit the client if there is a client
 # defined in the environment hash at C<psgix.monitor.statsd>, and the
@@ -69,6 +69,27 @@ sub prepare_app {
         die "$attr is not a coderef";
     }
 
+    if ( my $catch = $self->catch_errors ) {
+
+        unless ( is_coderef($catch) ) {
+
+            $self->catch_errors(
+                sub {
+                    my ( $env, $error ) = @_;
+                    if ( my $logger = $env->{'psgix.logger'} ) {
+                        $logger->( { level => 'error', message => $error } );
+                    }
+                    else {
+                        $env->{'psgi.errors'}->print($error);
+                    }
+                    my $message = 'Internal Error';
+                    return [ 500, [ 'Content-Type' => 'text/plain', 'Content-Length' => length($message) ], [$message] ];
+                }
+            );
+
+        }
+
+    }
 }
 
 sub call {
@@ -77,7 +98,20 @@ sub call {
     my $client = ( $env->{'psgix.monitor.statsd'} //= $self->client );
 
     my $start = [Time::HiRes::gettimeofday];
-    my $res   = $self->app->($env);
+    my $catch = $self->catch_errors;
+    my $res;
+
+    if ($catch) {
+        $res = try {
+            $self->app->($env);
+        }
+        catch {
+            $catch->( $env, $_ );;
+        };
+    }
+    else {
+        $res = $self->app->($env);
+    }
 
     return Plack::Util::response_cb(
         $res,
@@ -178,7 +212,7 @@ Plack::Middleware::Statsd - send statistics to statsd
 
 =head1 VERSION
 
-version v0.4.7
+version v0.5.0
 
 =head1 SYNOPSIS
 
@@ -284,6 +318,42 @@ method.  You do not need to set this unless you want to override it.
 It takes as arguments the Plack environment and the arguments to pass
 to the client method, and calls that method.  If there are errors then
 it attempts to log them.
+
+=head2 catch_errors
+
+If this is set to "1", then any fatal errors in the PSGI application
+will be caught and logged, and metrics will continue to be logged.
+
+Alternatively, you may specify a subroutine that handles the errors
+and returns a valid response, for example.
+
+  sub handle_errors {
+    my ( $env, $error ) = @_;
+
+    if ( my $logger = $env->{'psgix.logger'} ) {
+        $logger->( { level => 'error', message => $error } );
+    }
+    else {
+        $env->{'psgi.errors'}->print($error);
+    }
+
+    return [
+      503,
+      [
+         'Content-Type'   => 'text/plain',
+         'Content-Length' => 11,
+      ],
+      [ 'Unavailable' ]
+    ];
+  }
+
+  ...
+
+  enable "Statsd",
+     catch_errors => \&handle_errors;
+
+This is disable by default, which means that no metrics will be logged
+if there is a fatal error.
 
 =head1 METRICS
 

@@ -1,7 +1,7 @@
 package PICA::Writer::Base;
 use v5.14.1;
 
-our $VERSION = '1.24';
+our $VERSION = '1.27';
 
 use Scalar::Util qw(blessed openhandle reftype);
 use PICA::Schema qw(clean_pica);
@@ -62,7 +62,12 @@ sub write_identifier {
 
 sub write_record {
     my ($self, $record) = @_;
-    $record = clean_pica($record, allow_empty_subfields => 1,) or return;
+    $record = clean_pica(
+        $record,
+        allow_empty_subfields => 1,
+        ignore_empty_records  => 1
+    ) or return;
+    return unless @$record;
 
     my $fh = $self->{fh};
     $self->write_field($_) for @$record;

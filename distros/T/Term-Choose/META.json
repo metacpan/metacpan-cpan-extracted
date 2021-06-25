@@ -36,6 +36,7 @@
       },
       "runtime" : {
          "requires" : {
+            "Carp" : "0",
             "Exporter" : "0",
             "constant" : "0",
             "perl" : "5.008003",
@@ -55,6 +56,6 @@
          "web" : "https://github.com/kuerbis/Term-Choose"
       }
    },
-   "version" : "1.731",
+   "version" : "1.733",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

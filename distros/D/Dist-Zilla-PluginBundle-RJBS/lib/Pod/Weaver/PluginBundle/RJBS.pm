@@ -1,8 +1,8 @@
 use v5.20.0;
 use warnings;
-package Pod::Weaver::PluginBundle::RJBS;
+package Pod::Weaver::PluginBundle::RJBS 5.018;
 # ABSTRACT: RJBS's default Pod::Weaver config
-$Pod::Weaver::PluginBundle::RJBS::VERSION = '5.015';
+
 #pod =head1 OVERVIEW
 #pod
 #pod I<Roughly> equivalent to:
@@ -84,7 +84,7 @@ not require a version of perl released fewer than ten years ago.
 $STOCK
 END
 
-$SUPPORT{longterm} = <<"END";
+$SUPPORT{'long-term'} = <<"END";
 This module has a long-term perl support period.  That means it will not
 require a version of perl released fewer than five years ago.
 
@@ -139,7 +139,7 @@ Pod::Weaver::PluginBundle::RJBS - RJBS's default Pod::Weaver config
 
 =head1 VERSION
 
-version 5.015
+version 5.018
 
 =head1 OVERVIEW
 

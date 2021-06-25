@@ -1,5 +1,9 @@
 Revision history for App-Whiff
 
+0.006     2021-06-18 22:26:45-04:00 America/New_York
+        - update author contact info
+        - add perl support docs
+
 0.005     2014-05-28 11:34:38-04:00 America/New_York
         - if one of the args to whiff is an absolute path, it will be tested
           for (-x) and returned verbatim if it exists and is executable

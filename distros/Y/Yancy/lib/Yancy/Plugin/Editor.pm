@@ -1,5 +1,5 @@
 package Yancy::Plugin::Editor;
-our $VERSION = '1.073';
+our $VERSION = '1.074';
 # ABSTRACT: Yancy content editor, admin, and management application
 
 #pod =head1 SYNOPSIS
@@ -697,7 +697,7 @@ Yancy::Plugin::Editor - Yancy content editor, admin, and management application
 
 =head1 VERSION
 
-version 1.073
+version 1.074
 
 =head1 SYNOPSIS
 

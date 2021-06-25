@@ -27,7 +27,13 @@ sub abstract {
 }
 
 sub add_to_cleanup {
-    return [ qw{ cover_db *.gcov *.gcda *.gcno xt/author/optionals } ];
+    return [
+	qw{ pbl cover_db *.gcov *.gcda *.gcno xt/author/optionals },
+	map { "lib/Mac/$_" }
+	    qw{ Pasteboard.xs constant-c.inc constant-h.inc
+	    constant-xs.inc pbl.c pbl.h ppport.h },
+
+    ];
 }
 
 sub author {
@@ -54,6 +60,9 @@ sub ccflags {
 
     my @ccflags;
 
+    CAN_USE_UNICODE
+	and push @ccflags, '-DPERL_CAN_USE_UNICODE';
+
     my ( $darwin_version ) = split qr{ [.] }smx, ( uname() )[2];
     $darwin_version >= 8
 	and push @ccflags, '-DTIGER';
@@ -65,6 +74,9 @@ sub ccflags {
     } elsif ( $opt->{u} || $darwin_version >= 15 ) {
 	push @ccflags, '-DUTF_8_PLAIN_TEXT';
     }
+
+    $opt->{p}
+	and push @ccflags, qw{ -DUSE_PBL_BACKEND };
 
     system "$Config{cc} -fsyntax-only inc/trytypes.c 2>/dev/null";
     $?
@@ -81,8 +93,8 @@ sub ccflags {
 sub configure_requires {
     return +{
 	'Config'		=> 0,
-	'File::Basename'	=> 0,
 	'Getopt::Std'		=> 0,
+	'Scalar::Util'		=> 0,
 	'lib'		=> 0,
 	'strict'	=> 0,
 	'warnings'	=> 0,

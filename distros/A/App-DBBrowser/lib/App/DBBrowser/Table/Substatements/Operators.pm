@@ -43,11 +43,11 @@ sub build_having_col {
         my $tc = Term::Choose->new( $sf->{i}{tc_default} );
         my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
         my @pre = ( undef );
-        $ax->print_sql( $sql );
+        my $info = $ax->get_sql_info( $sql );
         # Choose
         my $quote_col = $tc->choose(
             [ @pre, @{$sql->{cols}} ],
-            { %{$sf->{i}{lyt_h}} }
+            { %{$sf->{i}{lyt_h}}, info => $info }
         );
         if ( ! defined $quote_col ) {
             return;
@@ -91,11 +91,11 @@ sub choose_and_add_operator {
         }
         else {
             my @pre = ( undef );
-            $ax->print_sql( $sql );
+            my $info = $ax->get_sql_info( $sql );
             # Choose
             $op = $tc->choose(
                 [ @pre, @operators_default ],
-                { %{$sf->{i}{lyt_h}} }
+                { %{$sf->{i}{lyt_h}}, info => $info }
             );
             if ( ! defined $op ) {
                 return;
@@ -107,11 +107,11 @@ sub choose_and_add_operator {
             }
             else {
                 my @pre = ( undef );
-                $ax->print_sql( $sql );
+                my $info = $ax->get_sql_info( $sql );
                 # Choose
                 $op = $tc->choose(
                     [ @pre, @operators_limited ],
-                    { %{$sf->{i}{lyt_h}}, prompt => 'First select the operator:' }
+                    { %{$sf->{i}{lyt_h}}, info => $info, prompt => 'First select the operator:' }
                 );
                 if ( ! defined $op ) {
                     next OPERATOR;
@@ -145,7 +145,7 @@ sub __add_operator {
         $op = $1;
         my $arg = $2;
         $sql->{$stmt} .= ' ' . $op;
-        $ax->print_sql( $sql );
+        my $info = $ax->get_sql_info( $sql );
         my $quote_col;
         if ( $stmt eq 'having_stmt' ) {
             my @pre = ( undef, $sf->{i}{ok} );
@@ -153,7 +153,7 @@ sub __add_operator {
             # Choose
             my $aggr = $tc->choose(
                 [ @pre, @choices ],
-                { %{$sf->{i}{lyt_h}} }
+                { %{$sf->{i}{lyt_h}}, info => $info }
             );
             if ( ! defined $aggr ) {
                 return;
@@ -168,7 +168,7 @@ sub __add_operator {
             # Choose
             $quote_col = $tc->choose(
                 $sql->{cols},
-                { %{$sf->{i}{lyt_h}}, prompt => 'Col:' }
+                { %{$sf->{i}{lyt_h}}, info => $info, prompt => 'Col:' }
             );
         }
         if ( ! defined $quote_col ) {
@@ -192,7 +192,7 @@ sub __add_operator {
         }
     }
     elsif ( $op =~ /REGEXP(_i)?\z/ ) {
-        $ax->print_sql( $sql );
+        $ax->print_sql_info( $sql );
         $sql->{$stmt} =~ s/ (?: (?<=\() | \s ) \Q$quote_col\E \z //x;
         my $do_not_match_regexp = $op =~ /^NOT/       ? 1 : 0;
         my $case_sensitive      = $op =~ /REGEXP_i\z/ ? 0 : 1;
@@ -211,7 +211,7 @@ sub __add_operator {
     else {
         $sql->{$stmt} .= ' ' . $op;
     }
-    $ax->print_sql( $sql );
+    $ax->print_sql_info( $sql );
     return 1;
 }
 
@@ -254,9 +254,12 @@ sub read_and_add_value {
             $sql->{$stmt} .= '(';
 
             IN: while ( 1 ) {
-                $ax->print_sql( $sql );
+                my $info = $ax->get_sql_info( $sql );
                 # Readline
-                my $value = $tf->readline( 'Value: ' );
+                my $value = $tf->readline(
+                    'Value: ',
+                    { info => $info }
+                );
                 if ( ! defined $value ) {
                     return;
                 }
@@ -273,17 +276,23 @@ sub read_and_add_value {
             }
         }
         elsif ( $op =~ /^(?:NOT\s)?BETWEEN\z/ ) {
-            $ax->print_sql( $sql );
+            my $info_1 = $ax->get_sql_info( $sql );
             # Readline
-            my $value_1 = $tf->readline( 'Value 1: ' );
+            my $value_1 = $tf->readline(
+                'Value 1: ',
+                { info => $info_1 }
+            );
             if ( ! defined $value_1 ) {
                 return;
             }
             $sql->{$stmt} .= ' ' . '?' . ' AND';
             push @{$sql->{$args}}, $value_1;
-            $ax->print_sql( $sql );
+            my $info_2 = $ax->get_sql_info( $sql );
             # Readline
-            my $value_2 = $tf->readline( 'Value 2: ' );
+            my $value_2 = $tf->readline(
+                'Value 2: ',
+                { info => $info_2 }
+            );
             if ( ! defined $value_2 ) {
                 return;
             }
@@ -293,9 +302,12 @@ sub read_and_add_value {
         }
         elsif ( $op =~ /REGEXP(_i)?\z/ ) {
             push @{$sql->{$args}}, '...';
-            $ax->print_sql( $sql );
+            my $info = $ax->get_sql_info( $sql );
             # Readline
-            my $value = $tf->readline( 'Pattern: ' );
+            my $value = $tf->readline(
+                'Pattern: ',
+                { info => $info }
+            );
             if ( ! defined $value ) {
                 return;
             }
@@ -305,10 +317,13 @@ sub read_and_add_value {
             return 1;
         }
         else {
-            $ax->print_sql( $sql );
+            my $info = $ax->get_sql_info( $sql );
             my $prompt = $op =~ /^(?:NOT\s)?LIKE\z/ ? 'Pattern: ' : 'Value: '; #
             # Readline
-            my $value = $tf->readline( $prompt );
+            my $value = $tf->readline(
+                $prompt,
+                { info => $info }
+            );
             if ( ! defined $value ) {
                 return;
             }

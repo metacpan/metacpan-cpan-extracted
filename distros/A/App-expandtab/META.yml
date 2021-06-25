@@ -17,4 +17,6 @@ no_index:
   directory:
     - t
     - inc
-version: '0.010'
+requires:
+  Text::VisualWidth: '0.02'
+version: '0.020'

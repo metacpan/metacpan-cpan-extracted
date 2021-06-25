@@ -4,7 +4,7 @@ Toadfarm - One Mojolicious app to rule them all
 
 # VERSION
 
-0.82
+0.83
 
 # DESCRIPTION
 
@@ -14,14 +14,14 @@ or just use it as a init script.
 
 Core features:
 
-- Wrapper around [hypnotoad](https://metacpan.org/pod/Mojo::Server::Hypnotoad) that makes your
+- Wrapper around [hypnotoad](https://metacpan.org/pod/Mojo%3A%3AServer%3A%3AHypnotoad) that makes your
 application [Sys-V](https://www.debian-administration.org/article/28/Making_scripts_run_at_boot_time_with_Debian)
 compatible.
 - Advanced routing and virtual host configuration. Also support routing
 from behind another web server, such as [nginx](http://nginx.com/).
-This feature is very much like [Mojolicious::Plugin::Mount](https://metacpan.org/pod/Mojolicious::Plugin::Mount) on steroids.
+This feature is very much like [Mojolicious::Plugin::Mount](https://metacpan.org/pod/Mojolicious%3A%3APlugin%3A%3AMount) on steroids.
 - Hijacking log messages to a common log file. There's also plugin,
-[Toadfarm::Plugin::AccessLog](https://metacpan.org/pod/Toadfarm::Plugin::AccessLog), that allows you to log the requests sent
+[Toadfarm::Plugin::AccessLog](https://metacpan.org/pod/Toadfarm%3A%3APlugin%3A%3AAccessLog), that allows you to log the requests sent
 to your server.
 
 # SYNOPSIS
@@ -31,7 +31,7 @@ to your server.
 Here is an example script that sets up logging and mounts some applications
 under different domains, as well as loading in some custom plugins.
 
-See [Toadfarm::Manual::DSL](https://metacpan.org/pod/Toadfarm::Manual::DSL) for more information about the different functions.
+See [Toadfarm::Manual::DSL](https://metacpan.org/pod/Toadfarm%3A%3AManual%3A%3ADSL) for more information about the different functions.
 
     #!/usr/bin/perl
     use Toadfarm -init;
@@ -69,7 +69,7 @@ start/stop actions.
     $ /etc/init.d/your-script start
     $ /etc/init.d/your-script stop
 
-See also ["Init script" in Toadfarm::Manual::RunningToadfarm](https://metacpan.org/pod/Toadfarm::Manual::RunningToadfarm#Init-script) for more details.
+See also ["Init script" in Toadfarm::Manual::RunningToadfarm](https://metacpan.org/pod/Toadfarm%3A%3AManual%3A%3ARunningToadfarm#Init-script) for more details.
 
 You can also start the application with normal [Mojolicious](https://metacpan.org/pod/Mojolicious) commands:
 
@@ -78,27 +78,27 @@ You can also start the application with normal [Mojolicious](https://metacpan.or
 
 # DOCUMENTATION INDEX
 
-- [Toadfarm::Manual::Intro](https://metacpan.org/pod/Toadfarm::Manual::Intro) - Introduction.
-- [Toadfarm::Manual::DSL](https://metacpan.org/pod/Toadfarm::Manual::DSL) - Domain specific language for Toadfarm.
-- [Toadfarm::Manual::Config](https://metacpan.org/pod/Toadfarm::Manual::Config) - Config file format.
-- [Toadfarm::Manual::RunningToadfarm](https://metacpan.org/pod/Toadfarm::Manual::RunningToadfarm) - Command line options.
-- [Toadfarm::Manual::BehindReverseProxy](https://metacpan.org/pod/Toadfarm::Manual::BehindReverseProxy) - Toadfarm behind nginx.
-- [Toadfarm::Manual::VirtualHost](https://metacpan.org/pod/Toadfarm::Manual::VirtualHost) - Virtual host setup.
+- [Toadfarm::Manual::Intro](https://metacpan.org/pod/Toadfarm%3A%3AManual%3A%3AIntro) - Introduction.
+- [Toadfarm::Manual::DSL](https://metacpan.org/pod/Toadfarm%3A%3AManual%3A%3ADSL) - Domain specific language for Toadfarm.
+- [Toadfarm::Manual::Config](https://metacpan.org/pod/Toadfarm%3A%3AManual%3A%3AConfig) - Config file format.
+- [Toadfarm::Manual::RunningToadfarm](https://metacpan.org/pod/Toadfarm%3A%3AManual%3A%3ARunningToadfarm) - Command line options.
+- [Toadfarm::Manual::BehindReverseProxy](https://metacpan.org/pod/Toadfarm%3A%3AManual%3A%3ABehindReverseProxy) - Toadfarm behind nginx.
+- [Toadfarm::Manual::VirtualHost](https://metacpan.org/pod/Toadfarm%3A%3AManual%3A%3AVirtualHost) - Virtual host setup.
 
 # PLUGINS
 
-- [Toadfarm::Plugin::AccessLog](https://metacpan.org/pod/Toadfarm::Plugin::AccessLog)
+- [Toadfarm::Plugin::AccessLog](https://metacpan.org/pod/Toadfarm%3A%3APlugin%3A%3AAccessLog)
 
     Log each request that hit your application.
 
-- [Mojolicious::Plugin::SizeLimit](https://metacpan.org/pod/Mojolicious::Plugin::SizeLimit)
+- [Mojolicious::Plugin::SizeLimit](https://metacpan.org/pod/Mojolicious%3A%3APlugin%3A%3ASizeLimit)
 
     Kill Hypnotoad workers if they grow too large.
 
-- [Mojolicious::Plugin::SetUserGroup](https://metacpan.org/pod/Mojolicious::Plugin::SetUserGroup)
+- [Mojolicious::Plugin::SetUserGroup](https://metacpan.org/pod/Mojolicious%3A%3APlugin%3A%3ASetUserGroup)
 
     Start as root, run workers as less user. See also
-    ["Listen to standard HTTP ports" in Toadfarm::Manual::RunningToadfarm](https://metacpan.org/pod/Toadfarm::Manual::RunningToadfarm#Listen-to-standard-HTTP-ports).
+    ["Listen to standard HTTP ports" in Toadfarm::Manual::RunningToadfarm](https://metacpan.org/pod/Toadfarm%3A%3AManual%3A%3ARunningToadfarm#Listen-to-standard-HTTP-ports).
 
 # PREVIOUS VERSIONS
 
@@ -115,7 +115,7 @@ if you decide to still use any `MOJO_CONFIG`, it should be for the
 applications loaded from inside `Toadfarm` and not the startup script.
 
 Note that the old solution still works, but a warning tells you to change
-to the new [DSL](https://metacpan.org/pod/Toadfarm::Manual::DSL) based API.
+to the new [DSL](https://metacpan.org/pod/Toadfarm%3A%3AManual%3A%3ADSL) based API.
 
 # COPYRIGHT AND LICENSE
 

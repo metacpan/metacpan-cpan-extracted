@@ -1,3 +1,19 @@
+0.100		2021-06-18	T. R. Wyant
+    Make all(?) string arguments encoding-aware. This was triggered by
+    Felipe Gasper's blog entry "Perl's SvPV Menace" at
+    https://dev.to/fgasper/perl-s-svpv-menace-5515, but ended up being a
+    complete refactor. You can get back the old factoring (with
+    worse encoding support) by running Makefile.PL or Build.PL with the
+    -p argument.
+
+    Add taint support. Any data that come from the outside are now
+    tainted. Pasteboard names (to new()) may not be tainted.
+
+    Fix broken POD links, and add xt/author/pod_links.t to ensure that
+    they stay fixed.
+
+    Clean up prerequisites.
+
 0.015		2021-05-30	T. R. Wyant
     Use utf8 plain text in 10.11 El Capitan and later, and provide -t
     (traditional) and -u (utf-8) options to Makefile.PL and Build.PL.

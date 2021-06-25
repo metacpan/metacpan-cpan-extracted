@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2020 -- leonerd@leonerd.org.uk
 
-package Object::Pad::MOP::Slot 0.40;
+package Object::Pad::MOP::Slot 0.41;
 
 use v5.14;
 use warnings;

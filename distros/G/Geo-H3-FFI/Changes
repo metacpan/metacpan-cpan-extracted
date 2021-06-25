@@ -1,0 +1,29 @@
+Revision history for Perl extension Geo::H3::FFI.
+
+0.06 2021-06-21
+  - Updated lib/Geo/H3/FFI.pm
+    - Dropped unused C struct objects Geo::H3::FFI::Struct::H3Index and Geo::H3::FFI::Array::H3Index
+  - Updated MANIFEST
+    - Dropped pod tests from distribution - Slaven Rezić - issue #2
+
+0.05 2021-06-21
+  - Updated lib/Geo/H3/FFI.pm
+    - Added uncompactWrapper
+    - Fixed uncompact and maxUncompactSize
+    - Updated hexRingWrapper pentagonal distortion returns
+  - Updated Makefile.PL for CPANTS - Slaven Rezić - issue #1
+  - Updated MANIFEST for CPANTS
+  - Updated t/007_hierarchical_grid_functions.t
+    - Added uncompactWrapper tests
+
+0.04 2021-06-20
+  - Updated Makefile.PL to support CPAN testers
+
+0.03 2021-06-19
+  - Updated tests to skip unless libh3 is installed
+
+0.02 2021-06-11
+  - Minimum viable product
+
+0.01 2020-12-30
+  - original version; created by h2xs 1.23

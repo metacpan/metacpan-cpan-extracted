@@ -1,9 +1,17 @@
-package Dist::Zilla::Role::PluginBundle::Easy 6.017;
+package Dist::Zilla::Role::PluginBundle::Easy 6.020;
 # ABSTRACT: something that bundles a bunch of plugins easily
 # This plugin was originally contributed by Christopher J. Madsen
 
 use Moose::Role;
 with 'Dist::Zilla::Role::PluginBundle';
+
+# BEGIN BOILERPLATE
+use v5.20.0;
+use warnings;
+use utf8;
+no feature 'switch';
+use experimental qw(postderef postderef_qq); # This experiment gets mainlined.
+# END BOILERPLATE
 
 use Module::Runtime 'use_module';
 use namespace::autoclean;
@@ -100,7 +108,7 @@ sub bundle_config {
 
   $self->configure;
 
-  return @{ $self->plugins };
+  return $self->plugins->@*;
 }
 
 #pod =method add_plugins
@@ -171,7 +179,7 @@ sub add_bundle {
 
   $bundle = "\@$bundle" unless $bundle =~ /^@/;
 
-  push @{ $self->plugins },
+  push $self->plugins->@*,
     $package->bundle_config({
       name    => $self->name . '/' . $bundle,
       package => $package,
@@ -228,7 +236,7 @@ Dist::Zilla::Role::PluginBundle::Easy - something that bundles a bunch of plugin
 
 =head1 VERSION
 
-version 6.017
+version 6.020
 
 =head1 SYNOPSIS
 
@@ -250,6 +258,17 @@ grunt work out of creating a bundle.  It supplies the C<bundle_config> method
 for you.  In exchange, you must supply a C<configure> method, which will store
 the bundle's configuration in the C<plugins> attribute by calling
 C<add_plugins> and/or C<add_bundle>.
+
+=head1 PERL VERSION SUPPORT
+
+This module has the same support period as perl itself:  it supports the two
+most recent versions of perl.  (That is, if the most recently released version
+is v5.40, then this module should work on both v5.40 and v5.38.)
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
 
 =head1 ATTRIBUTES
 
@@ -318,11 +337,11 @@ key does not exist in C<payload>, then it is omitted from the result.
 
 =head1 AUTHOR
 
-Ricardo SIGNES 😏 <rjbs@cpan.org>
+Ricardo SIGNES 😏 <rjbs@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Ricardo SIGNES.
+This software is copyright (c) 2021 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

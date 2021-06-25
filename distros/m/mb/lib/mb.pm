@@ -11,7 +11,7 @@ package mb;
 use 5.00503;    # Universal Consensus 1998 for primetools
 # use 5.008001; # Lancaster Consensus 2013 for toolchains
 
-$VERSION = '0.28';
+$VERSION = '0.29';
 $VERSION = $VERSION;
 
 # internal use
@@ -23,6 +23,9 @@ BEGIN { $INC{'warnings.pm'} = '' if $] < 5.006 } use warnings; local $^W=1;
 
 # set OSNAME
 my $OSNAME = $^O;
+
+# encoding name of operating system
+my $system_encoding = undef;
 
 # encoding name of MBCS script
 my $script_encoding = undef;
@@ -78,6 +81,9 @@ sub import {
         shift @_;
     }
 
+    # set system encoding
+    $system_encoding = detect_system_encoding();
+
     # set script encoding
     if (defined $_[0]) {
         my $encoding = $_[0];
@@ -89,7 +95,7 @@ sub import {
         }
     }
     else {
-        set_script_encoding(detect_system_encoding());
+        set_script_encoding($system_encoding);
     }
 
     # $^X($EXECUTABLE_NAME) for execute MBCS Perl script
@@ -124,6 +130,9 @@ perl mb.pm -e wtf8      MBCS_Perl_script.pl
 END
     }
 
+    # set system encoding
+    $system_encoding = detect_system_encoding();
+
     # set script encoding from command line
     my $encoding = '';
     if (($encoding) = $ARGV[0] =~ /\A -e ( .+ ) \z/xms) {
@@ -147,7 +156,7 @@ END
         }
     }
     else {
-        set_script_encoding(detect_system_encoding());
+        set_script_encoding($system_encoding);
     }
 
     # poor "make"
@@ -2943,6 +2952,7 @@ sub parse_expr {
     elsif (/\G (
         (?: printf | print | say )
         (?: \s+ | [#] .* )*
+        (?! [a-z]+ ) # lowercase is considered to be function
         (?: \b [A-Za-z_][A-Za-z_0-9]*(?: :: [A-Za-z_][A-Za-z_0-9]*)* |
             \$ [A-Za-z_][A-Za-z_0-9]*(?: :: [A-Za-z_][A-Za-z_0-9]*)*
         )
@@ -5360,28 +5370,32 @@ To install this software without make, type the following:
   chr                chr                bytes::chr         chr
   getc               getc               ---                getc
   index              ---                bytes::index       index
-  lc                 lc                 ---                lc (by internal mb::lc)
-  lcfirst            lcfirst            ---                lcfirst (by internal mb::lcfirst)
+  lc                 ---                ---                CORE::lc
+  lcfirst            ---                ---                CORE::lcfirst
   length             length             bytes::length      length
   ord                ord                bytes::ord         ord
   reverse            reverse            ---                reverse
   rindex             ---                bytes::rindex      rindex
   substr             substr             bytes::substr      substr
-  uc                 uc                 ---                uc (by internal mb::uc)
-  ucfirst            ucfirst            ---                ucfirst (by internal mb::ucfirst)
+  uc                 ---                ---                CORE::uc
+  ucfirst            ---                ---                CORE::ucfirst
   ---                chop               chop               mb::chop
   ---                ---                chr                mb::chr
   ---                ---                getc               mb::getc
   ---                index              ---                mb::index_byte
   ---                ---                index              mb::index
-  ---                ---                lc                 ---
-  ---                ---                lcfirst            ---
+  ---                lc                 ---                lc (by internal mb::lc)
+  ---                lcfirst            ---                lcfirst (by internal mb::lcfirst)
   ---                ---                length             mb::length
   ---                ---                ord                mb::ord
   ---                ---                reverse            mb::reverse
   ---                rindex             ---                mb::rindex_byte
   ---                ---                rindex             mb::rindex
   ---                ---                substr             mb::substr
+  ---                uc                 ---                uc (by internal mb::uc)
+  ---                ucfirst            ---                ucfirst (by internal mb::ucfirst)
+  ---                ---                lc                 ---
+  ---                ---                lcfirst            ---
   ---                ---                uc                 ---
   ---                ---                ucfirst            ---
   ---------------------------------------------------------------------------------
@@ -5460,8 +5474,8 @@ To install this software without make, type the following:
   eval 'string'             eval 'string'
   getc                      getc
   index                     index
-  lc                        lc
-  lcfirst                   lcfirst
+  lc                        CORE::lc
+  lcfirst                   CORE::lcfirst
   length                    length
   no Module                 no Module
   no Module qw(ARGUMENTS)   no Module qw(ARGUMENTS)
@@ -5470,8 +5484,8 @@ To install this software without make, type the following:
   reverse                   reverse
   rindex                    rindex
   substr                    substr
-  uc                        uc
-  ucfirst                   ucfirst
+  uc                        CORE::uc
+  ucfirst                   CORE::ucfirst
   use Module                use Module
   use Module qw(ARGUMENTS)  use Module qw(ARGUMENTS)
   use Module ()             use Module ()
@@ -5487,10 +5501,14 @@ To install this software without make, type the following:
   do 'file'                 mb::do 'file'
   eval 'string'             mb::eval 'string'
   index                     mb::index_byte
+  lc                        mb::lc (also lc)
+  lcfirst                   mb::lcfirst (also lcfirst)
   no Module                 mb::no Module
   no Module qw(ARGUMENTS)   mb::no Module qw(ARGUMENTS)
   require 'file'            mb::require 'file'
   rindex                    mb::rindex_byte
+  uc                        mb::uc (also uc)
+  ucfirst                   mb::ucfirst (also ucfirst)
   use Module                mb::use Module
   use Module qw(ARGUMENTS)  mb::use Module qw(ARGUMENTS)
   use Module ()             mb::use Module ()
@@ -6610,6 +6628,70 @@ programming environment like at that time.
   silently do the right thing, which is what Perl ends up doing.
   --- Advanced Perl Programming, 2nd Edition
 
+=head1 mb.pm modulino and UTF8::R2 module
+
+  The following is a description of all the situations in which mb.pm modulino and UTF8::R2 module are used in Japan.
+  +-------------+--------------+---------------------------------------------------------------------+
+  | OS encoding | I/O encoding |                           script encoding                           |
+  |             |              |----------------------------------+----------------------------------+
+  |             |              |              CP932               |              UTF-8               |
+  +-------------+--------------+----------------------------------+----------------------------------+
+  |             |              |  > perl mb.pm script.pl          |  > perl mb.pm -e utf8 script.pl  |
+  |             |    CP932     |                                  |  use IOas::CP932; # I/O          |
+  |             |              |                                  |  use mb::Encode;  # file-path    |
+  |    CP932    +--------------+----------------------------------+----------------------------------+
+  |             |              |  > perl mb.pm script.pl          |  > perl mb.pm -e utf8 script.pl  |
+  |             |    UTF-8     |  use IOas::CP932; # I/O          |                                  |
+  |             |              |                                  |  use mb::Encode;  # file-path    |
+  +-------------+--------------+----------------------------------+----------------------------------+
+  |             |              |  $ perl mb.pm -e sjis script.pl  |  $ perl mb.pm script.pl          |
+  |             |    CP932     |                                  |  use IOas::CP932; # I/O          |
+  |             |              |  use mb::Encode; # file-path     |                                  |
+  |    UTF-8    +--------------+----------------------------------+----------------------------------+
+  |             |              |  $ perl mb.pm -e sjis script.pl  |  $ perl mb.pm script.pl          |
+  |             |    UTF-8     |  use IOas::UTF8; # I/O           |                                  |
+  |             |              |  use mb::Encode; # file-path     |                                  |
+  +-------------+--------------+----------------------------------+----------------------------------+
+  
+  Some of the above are useful combinations:
+  +-------------+--------------+---------------------------------------------------------------------+
+  | OS encoding | I/O encoding |                           script encoding                           |
+  |             |              |----------------------------------+----------------------------------+
+  |             |              |              CP932               |              UTF-8               |
+  +-------------+--------------+----------------------------------+----------------------------------+
+  |             |              |  > perl mb.pm script.pl          |                                  |
+  |             |    CP932     |                                  |                                  |
+  |             |              |                                  |                                  |
+  |    CP932    +--------------+----------------------------------+----------------------------------+
+  |             |              |                                  |  > perl mb.pm -e utf8 script.pl  |
+  |             |    UTF-8     |                                  |                                  |
+  |             |              |                                  |  use mb::Encode;  # file-path    |
+  +-------------+--------------+----------------------------------+----------------------------------+
+  |             |              |  $ perl mb.pm -e sjis script.pl  |                                  |
+  |             |    CP932     |                                  |                                  |
+  |             |              |  use mb::Encode; # file-path     |                                  |
+  |    UTF-8    +--------------+----------------------------------+----------------------------------+
+  |             |              |                                  |  $ perl mb.pm script.pl          |
+  |             |    UTF-8     |                                  |                                  |
+  |             |              |                                  |                                  |
+  +-------------+--------------+----------------------------------+----------------------------------+
+
+  
+  Description of combinations:
+  -------------------------------------------------------------------------
+  encoding
+  O-I-S     description
+  -------------------------------------------------------------------------
+  C-C-C     Practical combination
+  C-C-U     
+  C-U-C     
+  C-U-U     Practical combination, required file-path encoding conversion
+  U-C-C     Practical combination, required file-path encoding conversion
+  U-C-U     
+  U-U-C     
+  U-U-U     Practical combination
+  -------------------------------------------------------------------------
+
 =head1 AUTHOR
 
 INABA Hitoshi E<lt>ina@cpan.orgE<gt>
@@ -6921,6 +7003,24 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
  A vision for Perl 7 and beyond
  https://web.archive.org/web/20200927044106/https://xdg.me/archive/2020-a-vision-for-perl-7-and-beyond/
+
+ Sys::Binmode - A fix for Perl's system call character encoding
+ https://metacpan.org/pod/Sys::Binmode
+
+ File::Glob::Windows - glob routine for Windows environment.
+ https://metacpan.org/pod/File::Glob::Windows
+
+ winja - dirty patch for handling pathname on MSWin32::Ja_JP.cp932
+ https://metacpan.org/release/winja
+
+ Win32::Symlink - Symlink support on Windows
+ https://metacpan.org/pod/Win32::Symlink
+
+ Win32::NTFS::Symlink - Support for NTFS symlinks and junctions on Microsoft Windows
+ https://metacpan.org/pod/Win32::NTFS::Symlink
+
+ Win32::Symlinks - A maintained, working implementation of Perl symlink built in features for Windows.
+ https://metacpan.org/pod/Win32::Symlinks
 
  TANABATA - The Star Festival - common legend of east asia
  https://ja.wikipedia.org/wiki/%E4%B8%83%E5%A4%95

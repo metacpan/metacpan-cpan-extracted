@@ -1,8 +1,16 @@
-package Pod::Weaver::Section::Region;
+package Pod::Weaver::Section::Region 4.018;
 # ABSTRACT: find a region and put its contents in place where desired
-$Pod::Weaver::Section::Region::VERSION = '4.017';
+
 use Moose;
 with 'Pod::Weaver::Role::Section';
+
+# BEGIN BOILERPLATE
+use v5.20.0;
+use warnings;
+use utf8;
+no feature 'switch';
+use experimental qw(postderef postderef_qq); # This experiment gets mainlined.
+# END BOILERPLATE
 
 #pod =head1 OVERVIEW
 #pod
@@ -126,7 +134,7 @@ sub weave_section {
     next if     !$self->allow_nonpod and !$para->is_pod;
 
     if ( $self->flatten ) {
-      push @to_insert, @{ $para->children };
+      push @to_insert, $para->children->@*;
     } else {
       push @to_insert, $para;
     }
@@ -141,7 +149,7 @@ sub weave_section {
 
   my $verb = $self->flatten ? 'flattening' : 'inserting';
   $self->log_debug($verb . q{ } . $self->region_name . ' into pod');
-  push @{ $document->children }, @to_insert;
+  push $document->children->@*, @to_insert;
 }
 
 __PACKAGE__->meta->make_immutable;
@@ -159,7 +167,7 @@ Pod::Weaver::Section::Region - find a region and put its contents in place where
 
 =head1 VERSION
 
-version 4.017
+version 4.018
 
 =head1 OVERVIEW
 
@@ -189,6 +197,17 @@ configuration above could be specified just as:
 
 If the C<required> attribute is given, and true, then an exception will be
 raised if this region can't be found.
+
+=head1 PERL VERSION SUPPORT
+
+This module has the same support period as perl itself:  it supports the two
+most recent versions of perl.  (That is, if the most recently released version
+is v5.40, then this module should work on both v5.40 and v5.38.)
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
 
 =head1 ATTRIBUTES
 
@@ -234,7 +253,7 @@ A boolean value specifying whether the region's contents should be flattened or 
 
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@cpan.org>
+Ricardo SIGNES <rjbs@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

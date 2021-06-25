@@ -1,7 +1,7 @@
 use strict;
 use warnings;
-package Acme::Lingua::EN::Inflect::Modern;
-$Acme::Lingua::EN::Inflect::Modern::VERSION = '0.006';
+package Acme::Lingua::EN::Inflect::Modern 0.007;
+
 use parent qw(Exporter);
 # ABSTRACT: modernize Lingua::EN::Inflect rule's
 
@@ -12,16 +12,16 @@ BEGIN { our %EXPORT_TAGS = %Lingua::EN::Inflect::EXPORT_TAGS };
 
 Exporter::export_ok_tags(qw( ALL ));
 
-# =head1 SYNOPSIS
-#
-# Lingua::EN::Inflect is great for converting singular word's to plural's, but
-# does not always match modern usage.  This module corrects the most common
-# case's.
-#
-# See L<Lingua::EN::Inflect> for information on using this module, which has an
-# identical interface.
-#
-# =cut
+#pod =head1 SYNOPSIS
+#pod
+#pod Lingua::EN::Inflect is great for converting singular word's to plural's, but
+#pod does not always match modern usage.  This module corrects the most common
+#pod case's.
+#pod
+#pod See L<Lingua::EN::Inflect> for information on using this module, which has an
+#pod identical interface.
+#pod
+#pod =cut
 
 my %todo = map { map { $_ => 1 } @$_ }
            values %Lingua::EN::Inflect::EXPORT_TAGS;
@@ -59,14 +59,14 @@ sub _PL_noun {
   return $plural;
 }
 
-# =head1 BUG'S
-#
-# Please report any bug's or feature request's via the GitHub issue tracker at
-# L<https://github.com/rjbs/Acme-Lingua-EN-Inflect-Modern/issues>.  I will be
-# notified, and then you'll automatically be notified of progress on
-# your bug as I make change's.
-#
-# =cut
+#pod =head1 BUG'S
+#pod
+#pod Please report any bug's or feature request's via the GitHub issue tracker at
+#pod L<https://github.com/rjbs/Acme-Lingua-EN-Inflect-Modern/issues>.  I will be
+#pod notified, and then you'll automatically be notified of progress on
+#pod your bug as I make change's.
+#pod
+#pod =cut
 
 1;
 
@@ -82,7 +82,7 @@ Acme::Lingua::EN::Inflect::Modern - modernize Lingua::EN::Inflect rule's
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 
@@ -93,6 +93,14 @@ case's.
 See L<Lingua::EN::Inflect> for information on using this module, which has an
 identical interface.
 
+=head1 PERL VERSION SUPPORT
+
+This module is shipped with no promise about what version of perl it will
+require in the future.  In practice, this tends to mean "you need a perl from
+the last three years," but you can't rely on that.  If a new version of perl
+ship, this software B<may> begin to require it for any reason, and there is no
+promise that patches will be accepted to lower the minimum required perl.
+
 =head1 BUG'S
 
 Please report any bug's or feature request's via the GitHub issue tracker at
@@ -102,7 +110,7 @@ your bug as I make change's.
 
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@cpan.org>
+Ricardo SIGNES <rjbs@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

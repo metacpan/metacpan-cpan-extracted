@@ -1,9 +1,9 @@
 #!perl
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-04-02'; # DATE
+our $DATE = '2021-06-22'; # DATE
 our $DIST = 'App-ThisDist'; # DIST
-our $VERSION = '0.009'; # VERSION
+our $VERSION = '0.011'; # VERSION
 
 use 5.010001;
 use strict;
@@ -32,11 +32,9 @@ this-mod - Return name of Perl module associated with the current directory
 
 =head1 VERSION
 
-This document describes version 0.009 of this-mod (from Perl distribution App-ThisDist), released on 2021-04-02.
+This document describes version 0.011 of this-mod (from Perl distribution App-ThisDist), released on 2021-06-22.
 
 =head1 SYNOPSIS
-
-Use like you would L<this-dist>:
 
  % pwd
  /home/budi/perl-Foo-Bar
@@ -44,20 +42,17 @@ Use like you would L<this-dist>:
  % this-mod
  Foo::Bar
 
-=head2 Some recipes
+Some common usage:
 
-Show L<MetaCPAN|https://metacpan.org> module documentation page in browser
-(requires L<lcpan> from L<App::lcpan>). (But note that for this particular task,
-I have also written L<this-mod-on-metacpan>.)
+ # read documentation about the current module
+ % man `this-mod`
 
- % lcpan metacpan-mod `this-mod`
+ # open documentation abut the current module on MetaCPAN (but see this-mod-on-metacpan script)
+ % firefox metacpan.org/pod/`this-mod`
 
-Same thing, but without using any other script:
+Some other examples:
 
- % firefox https://metacpan.org/pod/`this-mod`
-
-(Re)install this module using L<cpanminus|App::cpanminus>:
-
+ # (Re)install this module using L<cpanminus|App::cpanminus>:
  % cpanm -n --reinstall `this-mod`
 
 =head1 DESCRIPTION
@@ -75,7 +70,7 @@ Source repository is at L<https://github.com/perlancar/perl-App-ThisDist>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-App-ThisDist/issues>
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-ThisDist>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

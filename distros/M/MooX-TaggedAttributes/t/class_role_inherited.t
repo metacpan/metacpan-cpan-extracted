@@ -4,8 +4,6 @@ use Test2::V0;
 use Test::Lib;
 use My::Test;
 
-use Data::Dump qw[ pp ];
-
 my %map = (
     R1  => 'T1',
     R2  => 'T2',

@@ -1,5 +1,11 @@
 Revision history for Protocol-IRC
 
+0.13    2021-06-14
+        [CHANGES]
+         * Perl 5.14 style fixes
+         * Recognise numerics relating to IRCv3.1's SASL AUTHENTICATE
+         * Various small docs fixes
+
 0.12    [CHANGES]
          * Add WATCH-related server numerics
          * Add RPL_WHOISSECURE as most networks use it now

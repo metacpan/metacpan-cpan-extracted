@@ -3,12 +3,10 @@
 #
 #  (C) Paul Evans, 2010-2017 -- leonerd@leonerd.org.uk
 
-package Protocol::IRC;
+package Protocol::IRC 0.13;
 
-use strict;
+use v5.14;
 use warnings;
-
-our $VERSION = '0.12';
 
 use Carp;
 use Scalar::Util qw( blessed );
@@ -394,9 +392,9 @@ sub send_ctcp
    $self->send_message( "PRIVMSG", undef, $target, "\001$verb $argstr\001" );
 }
 
-=head2 send_ctcprely
+=head2 send_ctcpreply
 
-   $irc->send_ctcprely( $prefix, $target, $verb, $argstr )
+   $irc->send_ctcpreply( $prefix, $target, $verb, $argstr )
 
 Shortcut to sending a CTCP reply. As C<send_ctcp> but using a NOTICE instead.
 

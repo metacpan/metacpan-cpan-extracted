@@ -1,0 +1,69 @@
+NAME
+
+    Alien::Build::Plugin::Extract::Libarchive - Alien::Build plugin to
+    extract a tarball using libarchive
+
+VERSION
+
+    version 0.01
+
+SYNOPSIS
+
+     use alienfile;
+    
+     share {
+       ...
+       plugin 'Extract::Libarchive';
+       ...
+     };
+
+DESCRIPTION
+
+    This is a Alien::Build extract plugin that uses libarchive via
+    Archive::Libarchive::Extract and Archive::Libarchive. Its main
+    advantage is that it supports a wider array of archive formats than
+    existing plugins, and doesn't require that you specify a format.
+    (libarchive is typically smart enough to be able to detect the format).
+
+    Its main disadvantage is extended build time, due to the number of
+    formats it supports it has a number of dependencies (both Perl and
+    external). It should however, build on most modern systems using Alien
+    technology if the system does not provide its own libarchive.
+
+SEE ALSO
+
+    Alien
+
+      The Alien concept.
+
+    Alien::Build
+
+      The Alien::Build system.
+
+    alienfile
+
+      The recipe format for Alien::Build.
+
+    Alien::Build::Plugin::Extract
+
+      Overview of Alien::Build extract plugins.
+
+    Archive::Libarchive
+
+      Low level Perl interface to libarchive for reading and writing.
+
+    Archive::Libarchive::Extract
+
+      Higher level interface to extract from archives using libarchive.
+
+AUTHOR
+
+    Graham Ollis <plicease@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2021 by Graham Ollis.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

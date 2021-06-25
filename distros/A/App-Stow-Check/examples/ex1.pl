@@ -14,4 +14,8 @@ use App::Stow::Check;
 exit App::Stow::Check->new->run;
 
 # Output:
-# TODO
+# Usage: ./ex1.pl [-d stow_dir] [-h] [--version] command
+#         -d stow_dir     Stow directory (default value is '/usr/local/stow').
+#         -h              Help.
+#         --version       Print version.
+#         command         Command for which is stow dist looking.

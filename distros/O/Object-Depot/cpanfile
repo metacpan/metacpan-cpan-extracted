@@ -6,6 +6,7 @@ requires 'Sub::Name' => '0.21';
 requires 'Types::Common::String' => '1.002001';
 requires 'Types::Standard' => '1.002001';
 requires 'namespace::clean' => '0.27';
+requires 'perl' => '5.008001';
 requires 'strictures' => '2.000003';
 
 requires 'Carp';

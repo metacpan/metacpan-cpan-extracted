@@ -13,7 +13,7 @@ role ARole {
   BUILD { push @BUILD, "ARole" }
 }
 
-class AClass implements ARole {
+class AClass does ARole {
   BUILD { push @BUILD, "AClass" }
 }
 
@@ -26,7 +26,7 @@ class AClass implements ARole {
       'Roles are built before their implementing classes' );
 }
 
-class BClass extends AClass implements ARole {
+class BClass isa AClass does ARole {
   BUILD { push @BUILD, "BClass" }
 }
 

@@ -152,7 +152,8 @@ sub __func_Concat {
         return;
     }
     my $info = "\n" . 'Concat( ' . join( ',', @$subset ) . ' )';
-    my $sep = $tf->readline( 'Separator: ',
+    my $sep = $tf->readline(
+        'Separator: ',
         { info => $info }
     );
     if ( ! defined $sep ) {

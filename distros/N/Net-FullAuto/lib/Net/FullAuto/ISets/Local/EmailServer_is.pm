@@ -103,7 +103,8 @@ my $configure_emailserver=sub {
    my $handle=$localhost;my $connect_error='';
    my $sudo=($^O eq 'cygwin')?'':
          'sudo env "LD_LIBRARY_PATH='.
-         '/usr/local/lib64:$LD_LIBRARY_PATH" "PATH=$PATH" ';
+         '/usr/local/lib64:$LD_LIBRARY_PATH" '.
+         '"PATH=/usr/local/mysql/scripts:$PATH" ';
    ($stdout,$stderr)=$handle->cmd($sudo.
       "hostnamectl set-hostname mail.$domain_url");
    ($stdout,$stderr)=setup_aws_security(
@@ -197,7 +198,7 @@ my $configure_emailserver=sub {
       ($stdout,$stderr)=$handle->cmd($sudo.
          "yum -y groupinstall 'Development tools'",'__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
-         'yum -y install icu cyrus-sasl openssl-devel '.
+         'yum -y install icu cyrus-sasl openssl-devel'.
          ' cyrus-sasl-devel libtool-ltdl-devel libjpeg-turbo-devel'.
          ' freetype-devel libpng-devel java-1.7.0-openjdk-devel'.
          ' unixODBC unixODBC-devel libtool-ltdl libtool-ltdl-devel'.
@@ -387,12 +388,11 @@ if ($do==1) {
          'https://dl.fedoraproject.org/pub/epel/'.
          'epel-release-latest-7.noarch.rpm','__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.'yum -y install uuid-devel '.
-         'pkgconfig libtool gcc-c++ gmp-devel '.
+         'pkgconfig libtool gmp-devel '.
          'mpfr-devel libmpc-devel','__display__');
    }
 
-   test_for_amazon_ec2();
-   if ($main::amazon) {
+   if (ref $main::aws eq 'HASH') {
       my $n=$main::aws->{fullauto}->
             {SecurityGroups}->[0]->{GroupName}||'';
       my $c='aws ec2 describe-security-groups '.
@@ -690,6 +690,40 @@ if ($do==1) {
    ($stdout,$stderr)=$handle->cmd($sudo.'make','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.'make install','__display__');
    ($stdout,$stderr)=$handle->cwd('/opt/source');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'git clone --recursive https://github.com/openssl/openssl.git',
+      '__display__');
+   ($stdout,$stderr)=$handle->cwd('openssl');
+   # https://www.thegeekstuff.com/2015/02/rpm-build-package-example/
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'wget --random-wait --progress=dot '.
+      'https://git.sailfishos.org/mer-core/'.
+      'openssl/raw/master/rpm/openssl.spec',
+      '__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.'git -P tag -l');
+   $stdout=~s/^.*(OpenSSL_1_1_1.)\n.*$/$1/s;
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "git checkout $stdout",'__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      './config  LDFLAGS="-Wl,-rpath /usr/local/lib -Wl,'.
+      '-rpath /usr/local/lib64"','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'make install','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'cp -Pv /etc/ssl/certs/* /usr/local/ssl/certs',
+      '__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'cp -v *.pc /usr/local/lib/pkgconfig',
+      '__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'ldconfig -v','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'ln -s /usr/local/lib64/libssl.so.1.1 '.
+      '/usr/lib64/libssl.so.1.1');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'ln -s /usr/local/lib64/libcrypto.so.1.1 '.
+      '/usr/lib64/libcrypto.so.1.1');
+   ($stdout,$stderr)=$handle->cwd('/opt/source');
    ($stdout,$stderr)=$handle->cmd('wget --version');
    $stdout=~s/^.*?\d[.](\d+).*$/$1/s;
    if ($stdout<18 && !(-e '/usr/local/bin/wget')) {
@@ -702,32 +736,18 @@ if ($do==1) {
       ($stdout,$stderr)=$handle->cwd("wget-*");
       ($stdout,$stderr)=$handle->cmd($sudo.
          './configure --prefix=/usr/local '.
-         '--sysconfdir=/etc --with-ssl=openssl',
+         '--sysconfdir=/etc --with-ssl=openssl '.
+         '--with-libssl-prefix=/usr/local ',
          '__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
          'make','__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
          'make install','__display__');
+      $ad='ca-certificate = /usr/local/ssl/certs/ca-bundle.crt';
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         "sed -i \'/remoteencoding/a$ad\' /etc/wgetrc");
    }
 }
-($stdout,$stderr)=$handle->cwd('/opt/source');
-($stdout,$stderr)=$handle->cmd($sudo.
-   'git clone --recursive https://github.com/openssl/openssl.git',
-   '__display__');
-($stdout,$stderr)=$handle->cwd('openssl');
-($stdout,$stderr)=$handle->cmd($sudo.'git -P tag -l');
-$stdout=~s/^.*(OpenSSL_1_1_1.)\n.*$/$1/s;
-($stdout,$stderr)=$handle->cmd($sudo.
-   "git checkout $stdout",'__display__');
-($stdout,$stderr)=$handle->cmd($sudo.
-   './config','__display__');
-($stdout,$stderr)=$handle->cmd($sudo.
-   'make install','__display__');
-($stdout,$stderr)=$handle->cmd($sudo.
-   'cp -v *.pc /usr/local/lib/pkgconfig',
-   '__display__');
-($stdout,$stderr)=$handle->cmd($sudo.
-   'ldconfig -v','__display__');
 $do=1;
 if ($do==1) { # INSTALL LATEST VERSION OF PYTHON
    ($stdout,$stderr)=$handle->cwd('/opt/source');
@@ -740,7 +760,7 @@ if ($do==1) { # INSTALL LATEST VERSION OF PYTHON
    unless ($stdout=~/Exists/) {
       ($stdout,$stderr)=$handle->cmd($sudo.
          'wget --random-wait --progress=dot '.
-         "http://python.org/ftp/python/$version/Python-$version.tar.xz",
+         "https://python.org/ftp/python/$version/Python-$version.tar.xz",
          '__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
          "tar xvf Python-$version.tar.xz",
@@ -748,14 +768,24 @@ if ($do==1) { # INSTALL LATEST VERSION OF PYTHON
       ($stdout,$stderr)=$handle->cwd("Python-$version");
       # sudo is cleared of env vars to use system gcc
       # gcc-10 built python hangs during testing 2/20/2021
-      ($stdout,$stderr)=$handle->cmd('sudo '.
+      # https://stackoverflow.com/questions/53543477/building-python-3-7-1-ssl-module-failed
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'sed -i "s/#SSL=/SSL=/" Modules/Setup');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'sed -i "s/\/ssl/\/include\/openssl/" Modules/Setup');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'sed -i "s/#_ssl/_ssl/" Modules/Setup');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'sed -i "s/#[ \t]*-DUSE_SSL/$(printf \'\t\')-DUSE_SSL/" Modules/Setup');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'sed -i "s/#[ \t]*-L\$/$(printf \'\t\')-L\$/" Modules/Setup');
+      ($stdout,$stderr)=$handle->cmd($sudo.
          './configure --prefix=/usr/local --exec-prefix=/usr/local '.
-         '--enable-shared --enable-optimizations '.
-         'LDFLAGS="-Wl,-rpath /usr/local/lib"',
-         '__display__');
-      ($stdout,$stderr)=$handle->cmd('sudo '.
+         '--enable-optimizations LDFLAGS="-Wl,-rpath /usr/local/lib" '.
+         '--with-openssl=/usr/local','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
          'make','7200','__display__');
-      ($stdout,$stderr)=$handle->cmd('sudo '.
+      ($stdout,$stderr)=$handle->cmd($sudo.
          'make altinstall','__display__');
       $version=~s/^(\d+\.\d+).*$/$1/;
       ($stdout,$stderr)=$handle->cmd($sudo.
@@ -832,7 +862,8 @@ if ($do==1) { # INSTALL LATEST VERSION OF NGINX
    ($stdout,$stderr)=$handle->cwd($nginx);
    ($stdout,$stderr)=$handle->cmd($sudo."mkdir -vp objs/lib",'__display__');
    ($stdout,$stderr)=$handle->cwd("objs/lib");
-   ($stdout,$stderr)=$handle->cmd("wget -qO- https://ftp.pcre.org/pub/pcre/");
+   ($stdout,$stderr)=$handle->cmd(
+      "wget --no-check-certificate -qO- https://ftp.pcre.org/pub/pcre/");
    my %pcre=();
    my %conv=(
       Jan => 0, Feb => 1, Mar => 2, Apr => 3, May => 4, Jun => 5, Jul => 6,
@@ -1181,37 +1212,8 @@ END
       ($stdout,$stderr)=$handle->cmd($sudo.
          'service nginx status -l','__display__');
       ($stdout,$stderr)=$handle->cwd("$nginx_path/nginx");
-      test_for_amazon_ec2();
-      if ($main::amazon) {
-         ($stdout,$stderr)=$handle->cmd('wget https://dl.eff.org/certbot-auto');
-         ($stdout,$stderr)=$handle->cmd('chmod -v a+x certbot-auto','__display__');
-         my $ad='%SP%%SP%}%NL%'.
-            '  BOOTSTRAP_VERSION="BootstrapRpmCommon $BOOTSTRAP_RPM_COMMON_VERSION"%NL%'.
-            'elif grep -i "Amazon Linux" /etc/issue > /dev/null 2>&1 || \%NL%'.
-            '     grep %SQ%cpe:.*:amazon_linux:2%SQ% /etc/os-release > /dev/null 2>&1; then%NL%'.
-            '  Bootstrap() {%NL%'.
-            '    ExperimentalBootstrap "Amazon Linux" BootstrapRpmCommon%NL%'.
-            '  }%NL%'.
-            '  BOOTSTRAP_VERSION="BootstrapRpmCommon $BOOTSTRAP_RPM_COMMON_VERSION"';
-         ($stdout,$stderr)=$handle->cmd(
-            "sed -i -e '/Amazon Linux. BootstrapRpmCommon/{n;N;d}' certbot-auto");
-         ($stdout,$stderr)=$handle->cmd(
-            "${sudo}sed -i \'/Amazon Linux. BootstrapRpmCommon/a$ad\' certbot-auto");
-         ($stdout,$stderr)=$handle->cmd(
-            "${sudo}sed -i \'s/%NL%/\'\"`echo \\\\\\n`/g\" ".
-            'certbot-auto');
-         ($stdout,$stderr)=$handle->cmd(
-            "${sudo}sed -i \'s/%SP%/ /g\' ".
-            'certbot-auto');
-         ($stdout,$stderr)=$handle->cmd("${sudo}sed -i \"s/%SQ%/\'/g\" ".
-            'certbot-auto');
-         ($stdout,$stderr)=$handle->cmd($sudo.
-            "certbot --debug --nginx -d mail.$domain_url",
-            '__display__');
-      } else {
-         ($stdout,$stderr)=$handle->cmd($sudo.
-            'yum -y install certbot-nginx','__display__');
-      }
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'yum -y install certbot-nginx','__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
          'certbot certonly -n --nginx --debug --agree-tos --email '.
          "$email_address -d mail.$domain_url",
@@ -1254,10 +1256,10 @@ END
           8 8   `8 `YooP'   8 .P     8 8oooo 8oooo 8 8   `8 `YooP8
           ........................................................
           :::::::::::::::::::::::::::::::::'        ':::::::::::::
-          (Oracle® is **NOT** a sponsor       (`*..,
-          of the FullAuto© Project.)           \  , `.
+          (MariaDB Foundation is **NOT** a    (`*..,
+          sponsor of the FullAuto© Project.)   \  , `.
                                                 \     \
-          http://www.mysql.com                   \     \
+          https://mariadb.org/                   \     \
                                                  /      \.
           Powered by                            ( /\      `*,
            ___    ___            ______   _____  V _      ~-~
@@ -1273,7 +1275,7 @@ END
    ($stdout,$stderr)=$handle->cwd('/opt/source');
    ($stdout,$stderr)=$handle->cmd($sudo.
       'ls -1 /opt/source/mariadb');
-   if ($stdout=~/[Mm]aria[Dd][Bb].*rpm/) {
+   if ($stdout=~/libmariadb/) {
       ($stdout,$stderr)=$handle->cmd($sudo.
          'mkdir -vp /opt/mariadb','__display__');
       ($stdout,$stderr)=$handle->cwd('/opt/source/mariadb');
@@ -1291,73 +1293,6 @@ END
          'service mysql status -l','__display__');
    }
    if ($mysql_version<15.1 || $mysql_status!~/SUCCESS/) {
-      # https://docs.couchbase.com/server/6.0/install/thp-disable.html
-      my $do_thp=1;
-      ($stdout,$stderr)=$handle->cmd($sudo.
-         'cat /sys/kernel/mm/transparent_hugepage/enabled');
-      if ($stdout!~/never/) {
-         ($stdout,$stderr)=$handle->cmd($sudo.
-            'cat /sys/kernel/mm/redhat_transparent_hugepage/enabled');
-         if ($stdout!~/never/ || $stdout=~/\[never\]/) {
-            $do_thp=0;
-         }
-      } elsif ($stdout=~/\[never\]/) {
-         $do_thp=0;
-      }
-      if ($do_thp==1) {
-         #
-         # echo-ing/streaming files over ssh can be tricky. Use echo -e
-         #          and replace these characters with thier HEX
-         #          equivalents (use an external editor for quick
-         #          search and replace - and paste back results.
-         #          use copy/paste or cat file and copy/paste results.):
-         #
-         #          !  -   \\x21     `  -  \\x60   * - \\x2A
-         #          "  -   \\x22     \  -  \\x5C
-         #          $  -   \\x24     %  -  \\x25
-         #
-         my $thp=<<END;
-#\\x21/bin/bash
-### BEGIN INIT INFO
-# Provides:          disable-thp
-# Required-Start:    \\x24local_fs
-# Required-Stop:
-# X-Start-Before:    mysql
-# Default-Start:     2 3 4 5
-# Default-Stop:      0 1 6
-# Short-Description: Disable THP
-# Description:       disables Transparent Huge Pages (THP) on boot
-### END INIT INFO
-
-case \\x241 in
-start)
-  if [ -d /sys/kernel/mm/transparent_hugepage ]; then
-    echo 'never' > /sys/kernel/mm/transparent_hugepage/enabled
-    echo 'never' > /sys/kernel/mm/transparent_hugepage/defrag
-  elif [ -d /sys/kernel/mm/redhat_transparent_hugepage ]; then
-    echo 'never' > /sys/kernel/mm/redhat_transparent_hugepage/enabled
-    echo 'never' > /sys/kernel/mm/redhat_transparent_hugepage/defrag
-  else
-    return 0
-  fi
-;;
-esac
-END
-         ($stdout,$stderr)=$handle->cmd($sudo.
-            "echo -e \"$thp\" > disable-thp");
-         ($stdout,$stderr)=$handle->cmd($sudo.
-            'mv -fv disable-thp /etc/init.d/disable-thp',
-            '__display__');
-         ($stdout,$stderr)=$handle->cmd($sudo.
-            'chmod -v 755 /etc/init.d/disable-thp',
-            '__display__');
-         ($stdout,$stderr)=$handle->cmd($sudo.
-            'service disable-thp start','__display__');
-         ($stdout,$stderr)=$handle->cmd($sudo.
-            'service disable-thp status -l','__display__');
-         ($stdout,$stderr)=$handle->cmd($sudo.
-            'sudo chkconfig disable-thp on','__display__');
-      }
       ($stdout,$stderr)=$handle->cmd($sudo.
          'systemctl stop mysql','__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
@@ -1371,38 +1306,33 @@ END
          ($stdout,$stderr)=$handle->cmd($sudo.
             "yum -y erase $pkg",'__display__');
       }
-      # https://zapier.com/engineering/celery-python-jemalloc/
-      ($stdout,$stderr)=$handle->cmd($sudo.
-         'git clone --branch master '.
-         'https://github.com/jemalloc/jemalloc.git',
-         '__display__');
-      ($stdout,$stderr)=$handle->cwd('jemalloc');
-      ($stdout,$stderr)=$handle->cmd($sudo.
-         './autogen.sh','__display__');
-      ($stdout,$stderr)=$handle->cmd($sudo.
-         './configure','__display__');
-      ($stdout,$stderr)=$handle->cmd($sudo.
-         'make install','__display__');
       ($stdout,$stderr)=$handle->cwd('/opt/source');
       ($stdout,$stderr)=$handle->cmd($sudo.
          'ls -1 /opt','__display__');
       if ($stdout!~/mariadb/i) {
          ($stdout,$stderr)=$handle->cmd($sudo.
-            'mkdir -vp mariadb','__display__');
+            'git clone https://github.com/MariaDB/server.git '.
+            'mariadb','__display__');
          ($stdout,$stderr)=$handle->cwd('mariadb');
-         ($stdout,$stderr)=$handle->cmd($sudo.
-            'git clone https://github.com/MariaDB/server.git',
-            '__display__');
          ($stdout,$stderr)=$handle->cmd($sudo.
             'yum-builddep -y mariadb-server',
             '__display__');
+         # https://www.linuxfromscratch.org/blfs/view/cvs/server/mariadb.html
          ($stdout,$stderr)=$handle->cmd($sudo.
-            '/bin/cmake -DRPM=centos7 server/','3600',
-            '__display__');
+            '/bin/cmake -DWITH_SSL=yes '.
+            '-DSKIP_TESTS=ON '.
+            '-DMYSQL_DATADIR=/var/lib/mysql '.
+            '-DCMAKE_INSTALL_PREFIX=/usr/local/mysql '.
+            '-DMYSQL_UNIX_ADDR=/run/mysqld/mysqld.sock '.
+            '-DWITH_EXTRA_CHARSETS=complex '.
+            '-DINSTALL_SYSTEMD_UNITDIR=/etc/systemd/system '.
+            '-DOPENSSL_INCLUDE_DIR=/usr/local/include/openssl '.
+            '-DOPENSSL_SSL_LIBRARY=/usr/local/lib64/libssl.so '.
+            '-DOPENSSL_CRYPTO_LIBRARY='.
+            '/usr/local/lib64/libcrypto.so',
+            '3600','__display__');
          ($stdout,$stderr)=$handle->cmd($sudo.
             'make install','3600','__display__');
-         ($stdout,$stderr)=$handle->cmd($sudo.
-            'make package','3600','__display__');
       } else {
          ($stdout,$stderr)=$handle->cmd($sudo.
             'mv -fv /opt/mariadb /opt/source/mariadb',
@@ -1410,117 +1340,122 @@ END
          ($stdout,$stderr)=$handle->cwd('mariadb');
       }
       ($stdout,$stderr)=$handle->cmd($sudo.
-         'useradd mysql --system -s /usr/bin/nologin '.
-         '--user-group --no-create-home');
+         'groupadd mysql');
       ($stdout,$stderr)=$handle->cmd($sudo.
-         'ls -1 /opt/source/mariadb/_CPack_Packages/Linux/RPM/*rpm',
+         'useradd -r -g mysql mysql');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'mkdir -vp /run/mysqld','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'chown -Rv mysql:root /var/run/mysqld',
          '__display__');
-      my @rpm_files=split "\n", $stdout;
-      foreach my $rpm (@rpm_files) {
-         next if $rpm!~/64-common/;
-         ($stdout,$stderr)=$handle->cmd($sudo.
-            "rpm -ivh $rpm",'__display__');
-         last;
-      }
-      foreach my $rpm (@rpm_files) {
-         next if $rpm!~/64-client/;
-         ($stdout,$stderr)=$handle->cmd($sudo.
-            "rpm -ivh $rpm",'__display__');
-         last;
-      }
       ($stdout,$stderr)=$handle->cmd($sudo.
          'yum -y install galera perl-DBI','__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
          'service mysql stop','__display__');
-      ($stdout,$stderr)=$handle->cmd($sudo.
-         'chmod -v 1777 /tmp','__display__');
+      #($stdout,$stderr)=$handle->cmd($sudo.
+      #   'chmod -v 1777 /tmp','__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
          'rm -rvf /var/lib/mysql','__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
          'mkdir -vp /var/lib/mysql','__display__');
-      # https://dba.stackexchange.com/questions/49446/mysql-failures-after-changing-innodb-flush-method-to-o-direct-and-innodb-log-fil
-      foreach my $rpm (@rpm_files) {
-         next if $rpm!~/64-server/;
-         ($stdout,$stderr)=$handle->cmd($sudo.
-            "rpm -ivh $rpm",'__display__');
-         last;
-      }
-      # To see mysql log locations:
-      # mysql -se "SHOW VARIABLES" | grep -e log_error
-      # -e general_log -e slow_query_log
-      foreach my $rpm (@rpm_files) {
-         next if $rpm!~/64-backup/;
-         ($stdout,$stderr)=$handle->cmd($sudo.
-            "rpm -ivh $rpm",'__display__');
-         last;
-      }
-      foreach my $rpm (@rpm_files) {
-         next if $rpm!~/64-connect/;
-         ($stdout,$stderr)=$handle->cmd($sudo.
-            "rpm -ivh $rpm",'__display__');
-         last;
-      }
-      foreach my $rpm (@rpm_files) {
-         next if $rpm!~/64-rocksdb/;
-         ($stdout,$stderr)=$handle->cmd($sudo.
-            "rpm -ivh $rpm",'__display__');
-         last;
-      }
-      foreach my $rpm (@rpm_files) {
-         next if $rpm!~/64-toku/;
-         ($stdout,$stderr)=$handle->cmd($sudo.
-            "rpm -ivh $rpm",'__display__');
-         last;
-      }
-      foreach my $rpm (@rpm_files) {
-         next if $rpm!~/64-shared/;
-         ($stdout,$stderr)=$handle->cmd($sudo.
-            "rpm -ivh $rpm",'__display__');
-         last;
-      }
-      foreach my $rpm (@rpm_files) {
-         next if $rpm!~/64-test/;
-         ($stdout,$stderr)=$handle->cmd($sudo.
-            "rpm -ivh $rpm",'__display__');
-         last;
-      }
-      #foreach my $rpm (@rpm_files) {
-      #   next if $rpm!~/-gssapi/;
-      #   ($stdout,$stderr)=$handle->cmd($sudo.
-      #      "rpm -ivh $rpm",'__display__');
-      #   last;
-      #}
       ($stdout,$stderr)=$handle->cmd($sudo.
-         'service mysql stop','__display__');
+         'chown -v mysql:root /var/lib/mysql','__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
-         'rm -rvf /var/lib/mysql','__display__');
+         'chmod -v 700 /var/lib/mysql','__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
-         'mysql_install_db --user=mysql --basedir=/usr '.
+         'scripts/mysql_install_db --user=mysql '.
          '--datadir=/var/lib/mysql','__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
-         'chmod 755 /var/lib/mysql','__display__');
+         'ln -s /usr/local/mysql/bin/mariadb /bin/mysql');
       ($stdout,$stderr)=$handle->cmd($sudo.
-         'chgrp mysql /var/lib/mysql','__display__');
-      ($stdout,$stderr)=$handle->cmd($sudo.
-         'chgrp -v mysql /var/lib/mysql/mysql','__display__');
-      ($stdout,$stderr)=$handle->cmd($sudo.
-         'mkdir -vp /etc/my.cnf.d','__display__');
-      # to make tokudb the default storage engine,
-      # you have to start mysqld with: --default-storage-engine=tokudb
-      my $toku_cnf=<<END;
-[mariadb]
-# See https://mariadb.com/kb/en/tokudb-differences/ for differences
-# between TokuDB in MariaDB and TokuDB from http://www.tokutek.com/
+         'mkdir -vp /etc/mysql/my.cnf.d','__display__');
+      #
+      # echo-ing/streaming files over ssh can be tricky. Use echo -e
+      #          and replace these characters with thier HEX
+      #          equivalents (use an external editor for quick
+      #          search and replace - and paste back results.
+      #          use copy/paste or cat file and copy/paste results.):
+      #
+      #          !  -   \\x21     `  -  \\x60   * - \\x2A
+      #          "  -   \\x22     \  -  \\x5C
+      #          $  -   \\x24     %  -  \\x25
+      #
+      my $my_cnf=<<END;
+# Begin /etc/mysql/my.cnf
 
-plugin-load-add=ha_tokudb.so
+# The following options will be passed to all MySQL clients
+[client]
+#password       = your_password
+port            = 3306
+socket          = /run/mysqld/mysqld.sock
 
-[mysqld_safe]
-malloc-lib=/usr/local/lib/libjemalloc.so.2
+# The MySQL server
+[mysqld]
+port            = 3306
+socket          = /run/mysqld/mysqld.sock
+datadir         = /var/lib/mysql
+skip-external-locking
+key_buffer_size = 16M
+max_allowed_packet = 1M
+sort_buffer_size = 512K
+net_buffer_length = 16K
+myisam_sort_buffer_size = 8M
+
+# Don't listen on a TCP/IP port at all.
+skip-networking
+
+# required unique id between 1 and 2^32 - 1
+server-id       = 1
+
+# Uncomment the following if you are using BDB tables
+#bdb_cache_size = 4M
+#bdb_max_lock = 10000
+
+# InnoDB tables are now used by default
+innodb_data_home_dir = /var/lib/mysql
+innodb_log_group_home_dir = /var/lib/mysql
+# All the innodb_xxx values below are the default ones:
+innodb_data_file_path = ibdata1:12M:autoextend
+# You can set .._buffer_pool_size up to 50 - 80 %
+# of RAM but beware of setting memory usage too high
+innodb_buffer_pool_size = 128M
+innodb_log_file_size = 48M
+innodb_log_buffer_size = 16M
+innodb_flush_log_at_trx_commit = 1
+innodb_lock_wait_timeout = 50
+
+[mysqldump]
+quick
+max_allowed_packet = 16M
+
+[mysql]
+no-auto-rehash
+# Remove the next comment character if you are not familiar with SQL
+#safe-updates
+
+[isamchk]
+key_buffer = 20M
+sort_buffer_size = 20M
+read_buffer = 2M
+write_buffer = 2M
+
+[myisamchk]
+key_buffer_size = 20M
+sort_buffer_size = 20M
+read_buffer = 2M
+write_buffer = 2M
+
+[mysqlhotcopy]
+interactive-timeout
+
+\\x21includedir /etc/mysql/my.cnf.d
+
+# End /etc/mysql/my.cnf
 END
       ($stdout,$stderr)=$handle->cmd(
-         "echo -e \"$toku_cnf\" > ~/tokudb.cnf");
+         "echo -e \"$my_cnf\" > ~/my.cnf");
       ($stdout,$stderr)=$handle->cmd($sudo.
-         'mv -v ~/tokudb.cnf /etc/my.cnf.d/tokudb.cnf',
+         'mv -v ~/my.cnf /etc/mysql/my.cnf',
          '__display__');
       # https://github.com/arslancb/clipbucket/issues/429
       my $sql_mode_cnf=<<END;
@@ -1530,26 +1465,17 @@ END
       ($stdout,$stderr)=$handle->cmd(
          "echo -e \"$sql_mode_cnf\" > ~/sql_mode.cnf");
       ($stdout,$stderr)=$handle->cmd($sudo.
-         'mv -v ~/sql_mode.cnf /etc/my.cnf.d/sql_mode.cnf',
+         'mv -v ~/sql_mode.cnf /etc/mysql/my.cnf.d/sql_mode.cnf',
          '__display__');
-      ($stdout,$stderr)=$handle->cmd($sudo.
-         'systemctl enable mysql.service','__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
          'service mysql start','__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
          'service mysql status -l','__display__');
-      ($stdout,$stderr)=$handle->cmd($sudo.
-         'chmod 711 /var/lib/mysql/mysql','__display__');
       print "MYSQL START STDOUT=$stdout and STDERR=$stderr<==\n";sleep 5;
       print "\n\n\n\n\n\n\nWE SHOULD HAVE INSTALLED MARIADB=$stdout<==\n\n\n\n\n\n\n";
       sleep 5;
    }
-   # HOW TO CHECK MYSQL FOR ERRORS
-   # mkdir /var/run/mysqld/
-   # chown mysql: /var/run/mysqld/
-   # mysqld --basedir=/usr --datadir=/var/lib/mysql
-   # --user=mysql --socket=/var/run/mysqld/mysqld.sock
-   $handle->print($sudo.'mysql_secure_installation');
+   $handle->print($sudo.'/usr/local/mysql/bin/mariadb-secure-installation');
    $prompt=$handle->prompt();
    while (1) {
       my $output=fetch($handle);
@@ -1815,7 +1741,9 @@ END
             '__display__');
          ($stdout,$stderr)=$handle->cwd('CMake');
          ($stdout,$stderr)=$handle->cmd($sudo.
-            './configure','__display__');
+            './bootstrap --system-curl -- '.
+            '-DCMAKE_INSTALL_RPATH="/usr/local/lib64"',
+            '__display__');
          ($stdout,$stderr)=$handle->cmd($sudo.
             'make','3600','__display__');
          ($stdout,$stderr)=$handle->cmd($sudo.
@@ -1827,15 +1755,23 @@ END
          '__display__');
       ($stdout,$stderr)=$handle->cwd('libzip');
       ($stdout,$stderr)=$handle->cmd($sudo.
-         'git tag -l','__display__');
-      $stdout=~s/^.*\n(.*)$/$1/s;
+         'git -P tag -l','__display__');
+      $stdout=~s/^.*\n(rel-\d-\d-\d).*$/$1/s;
+ $stdout='rel-1-6-1';
       ($stdout,$stderr)=$handle->cmd($sudo.
          "git checkout $stdout",'__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
          'mkdir -vp build','__display__');
       ($stdout,$stderr)=$handle->cwd('build');
       ($stdout,$stderr)=$handle->cmd($sudo.
-         '/usr/local/bin/cmake ..','__display__');
+         '/usr/local/bin/cmake .. '.
+         '-DCMAKE_SHARED_LINKER_FLAGS="-L/usr/local/lib64" '.
+         '-DCMAKE_INSTALL_RPATH="/usr/local/lib64" '.
+         '-DOPENSSL_INCLUDE_DIR=/usr/local/include/openssl '.
+         '-DOPENSSL_SSL_LIBRARY=/usr/local/lib64/libssl.so '.
+         '-DOPENSSL_CRYPTO_LIBRARY='.
+         '/usr/local/lib64/libcrypto.so',
+         '__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
          'make','__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
@@ -2054,6 +1990,11 @@ END
          }
       }
       ($stdout,$stderr)=$handle->cmd($sudo.
+         'wget --random-wait --progress=dot '.
+         'http://curl.haxx.se/ca/cacert.pem '.
+         '--output-document /usr/local/ssl/cert.pem',
+         '__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
          '/usr/local/php'.$vn.'/bin/pecl channel-update pecl.php.net',
          '__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
@@ -2079,12 +2020,12 @@ END
       ($stdout,$stderr)=$handle->cmd($sudo.
          './configure --with-modules','__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
-         'make install','__display__');
+         'make install','3600','__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
          'ldconfig -v /usr/local/lib','__display__');
       ($stdout,$stderr)=$handle->cwd('/opt/source');
       ($stdout,$stderr)=$handle->cmd($sudo.
-         'wget -qO- https://pecl.php.net/package/imagick');
+         'wget -qO- https://pecl.php.net/package/imagick','300');
       $stdout=~s/^.*?get\/(imagick-.*?).tgz.*$/$1/s;
       $version=$stdout;
       $handle->print($sudo.
@@ -2163,9 +2104,10 @@ END
    ($stdout,$stderr)=$handle->cwd($gtarfile);
    ($stdout,$stderr)=$handle->cmd($sudo.
       'make makefiles CCARGS="-DUSE_TLS -DHAS_MYSQL -DUSE_SASL_AUTH '.
-      '-DUSE_CYRUS_SASL -I/usr/include/sasl" AUXLIBS="-L/usr/lib '.
-      '-lsasl2 -lssl -lcrypto" AUXLIBS_MYSQL="L/usr/lib64/mysql '.
-      '-lmysqlclient -lz -lm"','__display__');
+      '-DUSE_CYRUS_SASL -I/usr/include/sasl -I/usr/local/mysql/include/mysql" '.
+      'AUXLIBS="-L/usr/lib -lsasl2 -lssl -lcrypto -Wl,-rpath /usr/local/mysql/lib" '.
+      'AUXLIBS_MYSQL="-L/usr/local/mysql/lib -lmysqlclient -lz -lm"',
+      '__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
       'make','__display__');
    $handle->print($sudo.'make install');
@@ -2281,6 +2223,19 @@ END
    ($stdout,$stderr)=$handle->cmd($sudo.
       "mv -v ${home_dir}mysql_virtual_alias_domain_maps.cf /etc/postfix/sql",
       '__display__');
+   my $mysql_virtual_alias_domain_mailbox_maps=<<END;
+user = postfixadmin
+password = $service_and_cert_password
+dbname = postfixadmin
+query = SELECT maildir FROM mailbox,alias_domain WHERE alias_domain.alias_domain = '\\x25d' and mailbox.username = CONCAT('\\x25u', '\@', alias_domain.target_domain) AND mailbox.active = 1 AND alias_domain.active='1'
+hosts = 127.0.0.1
+END
+   ($stdout,$stderr)=$handle->cmd(
+      "echo -e \"$mysql_virtual_alias_domain_mailbox_maps\" > ".
+      "${home_dir}mysql_virtual_alias_domain_mailbox_maps.cf");
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "mv -v ${home_dir}mysql_virtual_alias_domain_mailbox_maps.cf ".
+      "/etc/postfix/sql",'__display__');
    my $mysql_virtual_alias_domain_catchall_maps=<<END;
 # handles catch-all settings of target-domain
 user = postfixadmin
@@ -2414,7 +2369,7 @@ END
    ($stdout,$stderr)=$handle->cmd($sudo.
       'chown -R root:root /etc/postfix/main.cf',
       '__display__');
-   if ($main::amazon) {
+   if (ref $main::aws eq 'HASH') {
       ($stdout,$stderr)=$handle->cmd($sudo.
           'postconf -e '.
           '\'relayhost = [email-smtp.us-west-2.amazonaws.com]:587\' ',
@@ -3276,7 +3231,22 @@ END
    ($stdout,$stderr)=$handle->cmd($sudo.
       "git status",'__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      "make BUILD_TLS=yes USE_SYSTEMD=yes",'__display__');
+      'make CFLAGS="-I/usr/local/include/openssl" '.
+      'LDFLAGS="-L/usr/local/lib64" '.
+      'BUILD_TLS=yes USE_SYSTEMD=yes','__display__');
+   ($stdout,$stderr)=$handle->cwd('src');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'cc -pedantic -DREDIS_STATIC= -std=c11 -Wall -W '.
+      '-Wno-missing-field-initializers -O2 -g -ggdb '.
+      '-I../deps/lua/src -I../deps/hiredis '.
+      '-I/usr/local/include/openssl -MMD -o '.
+      'sentinel.o -c sentinel.c',
+      '__display__');
+   ($stdout,$stderr)=$handle->cwd('/opt/source/redis');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'make CFLAGS="-I/usr/local/include/openssl" '.
+      'LDFLAGS="-L/usr/local/lib64" '.
+      'BUILD_TLS=yes USE_SYSTEMD=yes','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
       "make install",'__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
@@ -3396,8 +3366,9 @@ END
       'systemctl daemon-reload');
    ($stdout,$stderr)=$handle->cmd($sudo.
       'systemctl enable redis.service','__display__');
+   sleep 2;
    ($stdout,$stderr)=$handle->cmd($sudo.
-      'service redis restart','__display__');
+      'service redis start','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
       'service redis status -l','__display__');
 
@@ -3450,7 +3421,8 @@ END
       'mkdir -v unbound.build','__display__');
    ($stdout,$stderr)=$handle->cwd('unbound.build');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      '../configure','__display__');
+      '../configure  LDFLAGS="-Wl,-rpath /usr/local/lib -Wl,'.
+      '-rpath /usr/local/lib64"','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
       'make','3600','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
@@ -3458,6 +3430,8 @@ END
    ($stdout,$stderr)=$handle->cmd($sudo.
       'cp -v ./contrib/libunbound.pc /usr/local/lib/pkgconfig',
       '__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'ldconfig -v','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
       'cp -v ./contrib/unbound.service /etc/systemd/system',
       '__display__');
@@ -4152,66 +4126,6 @@ sub exit_on_error {
    };alarm(0);
    print "\n\n";
    cleanup;
-
-}
-
-sub test_for_amazon_ec2 {
-
-   if ($^O eq 'linux' || $^O eq 'freebsd') {
-      if ((-e "/etc/system-release-cpe") &&
-            ((-1<index `cat /etc/system-release-cpe`,'amazon:linux') ||
-            (-1<index `cat /etc/system-release-cpe`,'amazon_linux'))) {
-         $main::amazon{'ami'}='';
-         $main::system_type='ami';
-      } elsif ((-e "/etc/os-release") &&
-            (-1<index `cat /etc/os-release`,'ubuntu')) {
-         if (-e "/usr/bin/ec2metadata") {
-            $main::amazon{'ubuntu'}='';
-         }
-         $main::system_type='ubuntu';
-      } elsif ($^O eq 'freebsd') {
-         if ((-e "/usr/local/bin/aws") &&
-               (-1<index `cat /usr/local/bin/aws`,'aws.amazon')) {
-            $main::amazon{'freebsd'}='';
-         }
-         $main::system_type='freebsd';
-      } elsif (-e "/etc/SuSE-release") {
-         if (-e "/etc/profile.d/amazonEC2.sh") {
-            $main::amazon{'suse'}='';
-         }
-         $main::system_type='suse';
-      } elsif ((-e "/etc/system-release-cpe") &&
-            (-1<index `cat /etc/system-release-cpe`,
-            'fedoraproject')) {
-         if (-e "/etc/yum/pluginconf.d/amazon-id.conf") {
-            $main::amazon{'fedora'}='';
-         }
-         $main::system_type='fedora';
-      } elsif ((-e "/etc/system-release-cpe") &&
-            (-1<index `cat /etc/system-release-cpe`,
-            'redhat:enterprise_linux')) {
-         if (-e "/etc/yum/pluginconf.d/amazon-id.conf") {
-            $main::amazon{'rhel'}='';
-         }
-         $main::system_type='rhel';
-      } elsif ((-e "/etc/system-release-cpe") &&
-            (-1<index `cat /etc/system-release-cpe`,
-            'centos:linux')) {
-         if ((-e "/sys/hypervisor/compilation/compiled_by") &&
-               (-1<index `cat /sys/hypervisor/compilation/compiled_by`,
-               'amazon')) {
-            $main::amazon{'centos'}='';
-         }
-         $main::system_type='centos';
-      } elsif (-e "/etc/gentoo-release") {
-         if ((-e "/sys/hypervisor/compilation/compiled_by") &&
-               (-1<index `cat /sys/hypervisor/compilation/compiled_by`,
-               'amazon')) {
-            $main::amazon{'gentoo'}='';
-         }
-         $main::system_type='gentoo';
-      }
-   } else { $main::system_type=$^O }
 
 }
 

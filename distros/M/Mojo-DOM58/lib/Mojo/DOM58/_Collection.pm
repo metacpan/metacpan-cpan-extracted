@@ -18,7 +18,7 @@ use constant HAS_IS_REGEXP => !!($] >= 5.010000);
 use constant ROLES =>
   !!(eval { require Role::Tiny; Role::Tiny->VERSION('2.000001'); 1 });
 
-our $VERSION = '3.000';
+our $VERSION = '3.001';
 
 sub new {
   my $class = shift;

@@ -11,6 +11,12 @@
 #8 lpxl.lpxl3
 #9 lpxl.lpxl4
 #10 lpxl.lpxl5
+#11 git63.def
+#12 align35.def
+#13 rt136417.def
+#14 rt136417.rt136417
+#15 numbers.def
+#16 code_skipping.def
 
 # To locate test #13 you can search for its name or the string '#13'
 
@@ -42,12 +48,47 @@ BEGIN {
         'lpxl5' => <<'----------',
 -lp -lpxl='{ [ F(2'
 ----------
+        'rt136417' => "-vtc=3",
     };
 
     ############################
     # BEGIN SECTION 2: Sources #
     ############################
     $rsources = {
+
+        'align35' => <<'----------',
+# different module names, do not align commas (fixes rt136416)
+use File::Spec::Functions 'catfile', 'catdir';
+use Mojo::Base 'Mojolicious', '-signatures';
+
+# same module names, align fat commas
+use constant PI => 4 * atan2 1, 1;
+use constant TWOPI => 2 * PI;
+use constant FOURPI => 4 * PI;
+
+# same module names, align commas
+use TestCounter '3rd-party', 0, '3rd-party no longer visible';
+use TestCounter 'replace', 1, 'replacement now visible';
+use TestCounter 'root';
+
+# same module name, align fat commas but not commas
+use constant COUNTDOWN => scalar reverse 1, 2, 3, 4, 5;
+use constant COUNTUP => reverse 1, 2, 3, 4, 5;
+use constant COUNTDOWN => scalar reverse 1, 2, 3, 4, 5;
+----------
+
+        'code_skipping' => <<'----------',
+%Hdr=%U2E=%E2U=%Fallback=();
+$in_charmap=$nerror=$nwarning=0;
+$.=0;
+#<<V  code skipping: perltidy will pass this verbatim without error checking
+
+    }}} {{{
+
+#>>V
+my $self=shift;
+my $cloning=shift;
+----------
 
         'fpva' => <<'----------',
 log_something_with_long_function( 'This is a log message.', 2 );
@@ -113,6 +154,11 @@ my $list =
     ) ;
 ----------
 
+        'git63' => <<'----------',
+my $fragment = $parser-> #parse_html_string
+  parse_balanced_chunk($I);
+----------
+
         'lpxl' => <<'----------',
 # simple function call
 my $loanlength = getLoanLength(
@@ -174,6 +220,43 @@ $behaviour = {
               dog   => {prowl  => "growl", pool => "drool"},
               mouse => {nibble => "kibble"},
              };
+----------
+
+        'numbers' => <<'----------',
+# valid numbers
+my @vals = (
+
+    12345,
+    12345.67,
+    .23E-10,
+    3.14_15_92,
+    4_294_967_296,
+    0xff,
+    0xdead_beef,
+    0377,
+    0b011011,
+    0x1.999ap-4,
+    1e34,
+    1e+34,
+    1e+034,
+    -1e+034,
+    0.00000000000000000000000000000000000000000000000000000000000000000001,
+    0Xabcdef,
+    0B1101,
+    0o12_345,  # optional 'o' and 'O' added in perl v5.33.5
+    0O12_345,
+);
+----------
+
+        'rt136417' => <<'----------',
+function(
+  #
+  a, b, c);
+
+%hash = (
+  a => b,
+  c => d,
+);
 ----------
     };
 
@@ -668,6 +751,118 @@ $behaviour = {
     mouse => { nibble => "kibble" },
 };
 #10...........
+        },
+
+        'git63.def' => {
+            source => "git63",
+            params => "def",
+            expect => <<'#11...........',
+my $fragment = $parser->    #parse_html_string
+  parse_balanced_chunk($I);
+#11...........
+        },
+
+        'align35.def' => {
+            source => "align35",
+            params => "def",
+            expect => <<'#12...........',
+# different module names, do not align commas (fixes rt136416)
+use File::Spec::Functions 'catfile', 'catdir';
+use Mojo::Base 'Mojolicious', '-signatures';
+
+# same module names, align fat commas
+use constant PI     => 4 * atan2 1, 1;
+use constant TWOPI  => 2 * PI;
+use constant FOURPI => 4 * PI;
+
+# same module names, align commas
+use TestCounter '3rd-party', 0, '3rd-party no longer visible';
+use TestCounter 'replace',   1, 'replacement now visible';
+use TestCounter 'root';
+
+# same module name, align fat commas but not commas
+use constant COUNTDOWN => scalar reverse 1, 2, 3, 4, 5;
+use constant COUNTUP   => reverse 1, 2, 3, 4, 5;
+use constant COUNTDOWN => scalar reverse 1, 2, 3, 4, 5;
+#12...........
+        },
+
+        'rt136417.def' => {
+            source => "rt136417",
+            params => "def",
+            expect => <<'#13...........',
+function(
+    #
+    a, b, c
+);
+
+%hash = (
+    a => b,
+    c => d,
+);
+#13...........
+        },
+
+        'rt136417.rt136417' => {
+            source => "rt136417",
+            params => "rt136417",
+            expect => <<'#14...........',
+function(
+    #
+    a, b, c );
+
+%hash = (
+    a => b,
+    c => d,
+);
+#14...........
+        },
+
+        'numbers.def' => {
+            source => "numbers",
+            params => "def",
+            expect => <<'#15...........',
+# valid numbers
+my @vals = (
+
+    12345,
+    12345.67,
+    .23E-10,
+    3.14_15_92,
+    4_294_967_296,
+    0xff,
+    0xdead_beef,
+    0377,
+    0b011011,
+    0x1.999ap-4,
+    1e34,
+    1e+34,
+    1e+034,
+    -1e+034,
+    0.00000000000000000000000000000000000000000000000000000000000000000001,
+    0Xabcdef,
+    0B1101,
+    0o12_345,    # optional 'o' and 'O' added in perl v5.33.5
+    0O12_345,
+);
+#15...........
+        },
+
+        'code_skipping.def' => {
+            source => "code_skipping",
+            params => "def",
+            expect => <<'#16...........',
+%Hdr        = %U2E    = %E2U      = %Fallback = ();
+$in_charmap = $nerror = $nwarning = 0;
+$.          = 0;
+#<<V  code skipping: perltidy will pass this verbatim without error checking
+
+    }}} {{{
+
+#>>V
+my $self    = shift;
+my $cloning = shift;
+#16...........
         },
     };
 

@@ -5,30 +5,31 @@ use Test::More;
 
 use EventStore::Tiny;
 use File::Temp qw(tmpnam);
-use Storable;
 
-# Prepare a test event store
-my $es = EventStore::Tiny->new(logger => undef);
+# Prepare event registration
+sub register_events {
+    my $es = shift;
 
-# Prepare events
-$es->register_event(FooTested => sub {
-    my ($state, $data) = @_;
-    $state->{$data->{name}} = 17;
-});
-$es->store_event(FooTested => {name => 'test_field'});
-$es->register_event(BarTested => sub {
-    my ($state, $data) = @_;
-    $state->{$data->{name}} += 25;
-});
-$es->store_event(BarTested => {name => 'test_field'});
-$es->register_event(BazTested => sub {
-    my ($state, $data) = @_;
-    $state->{quux} = $data->{quux};
-});
-$es->store_event(BazTested => {quux => 666});
+    $es->register_event(FooTested => sub {
+        my ($state, $data) = @_;
+        $state->{$data->{name}} = 17;
+    });
+    $es->store_event(FooTested => {name => 'test_field'});
+    $es->register_event(BarTested => sub {
+        my ($state, $data) = @_;
+        $state->{$data->{name}} += 25;
+    });
+    $es->store_event(BarTested => {name => 'test_field'});
+    $es->register_event(BazTested => sub {
+        my ($state, $data) = @_;
+        $state->{quux} = $data->{quux};
+    });
+    $es->store_event(BazTested => {quux => 666});
+}
 
+# Prepare event tests
 sub test_events {
-    my ($name, $store) = @_;
+    my ($name, $es) = @_;
     subtest "$name events" => sub {
 
     # Test resulting events
@@ -53,14 +54,19 @@ sub test_events {
     }, 'Correct state data after event application';
 }}
 
+# Prepare a test event store
+my $es = EventStore::Tiny->new(logger => undef);
+register_events($es);
+
 # Test prepared events
 test_events(Prepared => $es);
 
 # Store and load roundtrip
 my $tmp_fn = tmpnam;
-$es->store_to_file($tmp_fn);
-my $nes = EventStore::Tiny->new_from_file($tmp_fn);
-isa_ok $nes => 'EventStore::Tiny';
+$es->export_events($tmp_fn);
+my $nes = EventStore::Tiny->new(logger => undef);
+register_events($nes);
+$nes->import_events($tmp_fn);
 
 # Test loaded events
 test_events(Loaded => $nes);

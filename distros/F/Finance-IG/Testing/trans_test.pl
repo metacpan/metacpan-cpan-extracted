@@ -1,20 +1,26 @@
 #!/usr/bin/perl 
+###############################################################
 use FindBin;
 use lib $FindBin::RealBin;        # for special REST::Client 
 use lib $FindBin::RealBin."/../lib"; # for IG 
+#use lib "$FindBin::RealBin/../lib/Finance/IG";
 #use lib $FindBin::RealBin."/Record"; # for other special REST::Client that records. 
 use Time::Piece; 
 
-use Finance::IG; 
-use JSON; 
 
 #$INC{'REST/Client.pm'} =~m#Testing/REST/Client.pm# or 
 #$INC{'REST/Client.pm'} =~m#Testing/Record/REST/Client.pm# or 
 #   die "Using wrong REST::Client ".$INC{'REST/Client.pm'}; 
 
+use Package::Alias
+    'REST::Client'=>'Finance::IG::REST::Client'
+;
+
+use Finance::IG; 
+use JSON; 
 my $ig; 
 
-# with Testing::Record::REST;;Client need correct data 
+# with Testing::Record::REST::Client need correct data 
 $ig=Finance::IG->new(
                 username=> "igusername",
                 password=> "ig_correct_password",

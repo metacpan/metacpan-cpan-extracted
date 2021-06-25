@@ -1,8 +1,8 @@
 use strict;
 use warnings;
-package Data::Hive::Store::Param;
+package Data::Hive::Store::Param 1.014;
 # ABSTRACT: CGI::param-like store for Data::Hive
-$Data::Hive::Store::Param::VERSION = '1.013';
+
 use parent 'Data::Hive::Store';
 
 #pod =head1 DESCRIPTION
@@ -178,7 +178,7 @@ Data::Hive::Store::Param - CGI::param-like store for Data::Hive
 
 =head1 VERSION
 
-version 1.013
+version 1.014
 
 =head1 DESCRIPTION
 
@@ -186,6 +186,16 @@ This hive store will soon be overhauled.
 
 Basically, it expects to access a hive in an object with CGI's C<param> method,
 or the numerous other things with that interface.
+
+=head1 PERL VERSION SUPPORT
+
+This module has a long-term perl support period.  That means it will not
+require a version of perl released fewer than five years ago.
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
 
 =head1 METHODS
 
@@ -268,7 +278,7 @@ Hans Dieter Pearcey <hdp@cpan.org>
 
 =item *
 
-Ricardo Signes <rjbs@cpan.org>
+Ricardo Signes <rjbs@semiotic.systems>
 
 =back
 

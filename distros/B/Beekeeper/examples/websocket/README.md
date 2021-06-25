@@ -39,6 +39,7 @@ just because topics do not clash (see ![Brokers.md](../../doc/Brokers.md) for a 
 Create `/etc/mosquitto/conf.d/beekeeper.conf`
 ```
 per_listener_settings true
+set_tcp_nodelay true
 
 # Backend
 listener 1883 0.0.0.0

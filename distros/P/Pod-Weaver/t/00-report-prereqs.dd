@@ -47,6 +47,7 @@ do { my $x = {
                                       'Text::Template' => '0',
                                       'Text::Wrap' => '0',
                                       'experimental' => '0',
+                                      'feature' => '0',
                                       'namespace::autoclean' => '0',
                                       'perl' => 'v5.20.0',
                                       'strict' => '0',

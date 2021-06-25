@@ -18,6 +18,12 @@ extern "C" {
 #define gpENTER(fail)     if ( !inPaint) if ( !my-> begin_paint_info( self)) return (fail)
 #define gpLEAVE           if ( !inPaint) my-> end_paint_info( self)
 
+#define CHECK_GP(ret) \
+	if ( !is_opt(optSystemDrawable)) { \
+		warn("This method is not available because %s is not a system Drawable object. You need to implement your own (ref:%d)", my->className, __LINE__);\
+		return ret; \
+	}
+
 void
 Drawable_init( Handle self, HV * profile)
 {
@@ -201,9 +207,9 @@ Font *
 Drawable_font_match( char * dummy, Font * source, Font * dest, Bool pick)
 {
 	if ( pick)
-		apc_font_pick( nilHandle, source, dest);
+		apc_font_pick( NULL_HANDLE, source, dest);
 	else
-		Drawable_font_add( nilHandle, source, dest);
+		Drawable_font_add( NULL_HANDLE, source, dest);
 	return dest;
 }
 
@@ -295,6 +301,7 @@ Drawable_get_bpp( Handle self)
 {
 	gpARGS;
 	int ret;
+	CHECK_GP(0);
 	gpENTER(0);
 	ret = apc_gp_get_bpp( self);
 	gpLEAVE;
@@ -314,13 +321,14 @@ Drawable_linePattern( Handle self, Bool set, SV * pattern)
 		int len = apc_gp_get_line_pattern( self, ret);
 		return newSVpvn((char*) ret, len);
 	}
-	return nilSV;
+	return NULL_SV;
 }
 
 Color
 Drawable_get_nearest_color( Handle self, Color color)
 {
 	gpARGS;
+	CHECK_GP(0);
 	gpENTER(clInvalid);
 	color = apc_gp_get_nearest_color( self, color);
 	gpLEAVE;
@@ -330,6 +338,7 @@ Drawable_get_nearest_color( Handle self, Color color)
 Point
 Drawable_resolution( Handle self, Bool set, Point resolution)
 {
+	CHECK_GP(resolution);
 	if ( set)
 		croak("Attempt to write read-only property %s", "Drawable::resolution");
 	return apc_gp_get_resolution( self);
@@ -343,6 +352,7 @@ Drawable_get_physical_palette( Handle self)
 	AV * av = newAV();
 	PRGBColor r;
 
+	CHECK_GP(NULL_SV);
 	gpENTER(newRV_noinc(( SV *) av));
 	r = apc_gp_get_physical_palette( self, &nCol);
 	gpLEAVE;
@@ -397,12 +407,14 @@ Drawable_get_font_abcdef( Handle self, int first, int last, int flags, PFontABC 
 SV *
 Drawable_get_font_abc( Handle self, int first, int last, int flags)
 {
+	CHECK_GP(NULL_SV);
 	return Drawable_get_font_abcdef( self, first, last, flags, apc_gp_get_font_abc);
 }
 
 SV *
 Drawable_get_font_def( Handle self, int first, int last, int flags)
 {
+	CHECK_GP(NULL_SV);
 	return Drawable_get_font_abcdef( self, first, last, flags, apc_gp_get_font_def);
 }
 
@@ -413,6 +425,7 @@ Drawable_get_font_languages( Handle self)
 	AV * av = newAV();
 	gpARGS;
 
+	CHECK_GP(NULL_SV);
 	gpENTER( newRV_noinc(( SV *) av));
 	p = buf = apc_gp_get_font_languages( self);
 	gpLEAVE;
@@ -426,6 +439,7 @@ Drawable_get_font_languages( Handle self)
 	}
 	return newRV_noinc(( SV *) av);
 }
+
 SV *
 Drawable_get_font_ranges( Handle self)
 {
@@ -434,6 +448,7 @@ Drawable_get_font_ranges( Handle self)
 	AV * av = newAV();
 	gpARGS;
 
+	CHECK_GP(NULL_SV);
 	gpENTER( newRV_noinc(( SV *) av));
 	ret = apc_gp_get_font_ranges( self, &count);
 	gpLEAVE;
@@ -451,6 +466,7 @@ SV *
 Drawable_get_handle( Handle self)
 {
 	char buf[ 256];
+	CHECK_GP(NULL_SV);
 	snprintf( buf, 256, PR_HANDLE_FMT, apc_gp_get_handle( self));
 	return newSVpv( buf, 0);
 }
@@ -491,7 +507,12 @@ Bool
 Drawable_put_image_indirect( Handle self, Handle image, int x, int y, int xFrom, int yFrom, int xDestLen, int yDestLen, int xLen, int yLen, int rop)
 {
 	Bool ok;
-	if ( image == nilHandle) return false;
+	CHECK_GP(false);
+	if ( image == NULL_HANDLE) return false;
+	if ( !(PObject(image)-> options.optSystemDrawable)) {
+		warn("This method is not available on this class because it is not a system Drawable object. You need to implement your own");
+		return false;
+	}
 	if ( xLen == xDestLen && yLen == yDestLen)
 		ok = apc_gp_put_image( self, image, x, y, xFrom, yFrom, xLen, yLen, rop);
 	else
@@ -518,6 +539,7 @@ read_polypoints( Handle self, SV * points, char * procName, int min, Bool (*proc
 #define DEF_LINE_PROCESSOR(name,func) Bool \
 Drawable_##name( Handle self, SV * points)\
 {\
+	CHECK_GP(false);\
 	return read_polypoints( self, points, "Drawable::" #name, 2, func);\
 }
 
@@ -531,6 +553,7 @@ Drawable_bars( Handle self, SV * rects)
 	int count;
 	Rect * p;
 	Bool ret = false, do_free;
+	CHECK_GP(false);
 	if (( p = prima_read_array( rects, "Drawable::bars", 'i', 4, 0, -1, &count, &do_free)) != NULL) {
 		ret = apc_gp_bars( self, count, p);
 		if ( !ret) perl_error();
@@ -546,7 +569,8 @@ Drawable_render_glyph( Handle self, int index, HV * profile)
 	SV * ret;
 	dPROFILE;
 	gpARGS;
-	gpENTER(nilSV);
+	CHECK_GP(NULL_SV);
+	gpENTER(NULL_SV);
 
 	flags = ggoUseHints;
 	if ( pexist(glyph)   && pget_B(glyph))   flags |= ggoGlyphIndex;
@@ -556,7 +580,7 @@ Drawable_render_glyph( Handle self, int index, HV * profile)
 	hv_clear(profile); /* old gencls bork */
 	gpLEAVE;
 
-	if ( count < 0 ) return nilSV;
+	if ( count < 0 ) return NULL_SV;
 	ret = prima_array_new(sizeof(int) * count);
 	memcpy( prima_array_get_storage(ret), buffer, sizeof(int) * count);
 	if ( buffer ) free( buffer );
@@ -886,6 +910,100 @@ EXIT:
 	}
 }
 
+SV *
+Drawable_render_polyline( SV * obj, SV * points, HV * profile)
+{
+	dPROFILE;
+	int count;
+	Bool free_input = false, free_buffer = false, as_integer = false;
+	double *input = NULL, *buffer = NULL, box[4];
+	SV * ret;
+	void * storage;
+
+	if (( input = (double*) prima_read_array( points, "render_polyline", 'd', 2, 1, -1, &count, &free_input)) == NULL)
+		goto FAIL;
+
+	if ( pexist(matrix) ) {
+		int i;
+		double *src, *dst, *cmatrix;
+		if (( cmatrix = (double*) prima_read_array(
+			pget_sv(matrix),
+			"render_polyline.matrix", 'd', 1, 6, 6, NULL, NULL)
+		) == NULL) 
+			goto FAIL;
+		if ( !( buffer = malloc(sizeof(double) * 2 * count))) {
+			free(cmatrix);
+			warn("Not enough memory");
+			goto FAIL;
+		}
+		free_buffer = true;
+
+		for ( i = 0, src = input, dst = buffer; i < count; i++) {
+			double x,y;
+			x = *(src++);
+			y = *(src++);
+			*(dst++) = cmatrix[0] * x + cmatrix[2] * y + cmatrix[4];
+			*(dst++) = cmatrix[1] * x + cmatrix[3] * y + cmatrix[5];
+		}
+		free(cmatrix);
+	} else {
+		buffer = input;
+		free_buffer = false;
+	}
+
+	if ( pexist(box) && pget_B(box)) {
+		int i;
+		double *src;
+		box[0] = box[2] = buffer[0];
+		box[1] = box[3] = buffer[1];
+		for ( i = 1, src = buffer + 2; i < count; i++) {
+			double x,y;
+			x = *(src++);
+			y = *(src++);
+			if ( box[0] > x ) box[0] = x;
+			if ( box[1] > y ) box[1] = y;
+			if ( box[2] < x ) box[2] = x;
+			if ( box[3] < y ) box[3] = y;
+		}
+		box[2] -= box[0] - 1;
+		box[3] -= box[1] - 1;
+		if ( free_buffer ) free(buffer);
+		free_buffer = false;
+		buffer = box;
+		count  = 2;
+	}
+
+	if ( pexist(integer)) as_integer = pget_B(integer);
+	ret = prima_array_new(count * 2 * (as_integer ? sizeof(int) : sizeof(double)));
+	storage = prima_array_get_storage(ret);
+	if ( as_integer ) {
+		int i, *dst;
+		double *src;
+		for ( i = 0, src = buffer, dst = (int*)storage; i < count; i++) {
+			register double x;
+			x = *(src++);
+			*(dst++) = x + ((x < 0) ? -.5 : +.5);
+			x = *(src++);
+			*(dst++) = x + ((x < 0) ? -.5 : +.5);
+		}
+	} else
+		memcpy(storage, buffer, count * 2 * sizeof(double));
+
+	if ( free_buffer ) free( buffer );
+	if ( free_input ) free(input);
+	hv_clear(profile); /* old gencls bork */
+
+	return prima_array_tie( ret,
+		as_integer ? sizeof(int) : sizeof(double),
+		as_integer ? "i" : "d");
+
+FAIL:
+	if ( free_buffer ) free( buffer );
+	if ( free_input ) free(input);
+	hv_clear(profile); /* old gencls bork */
+	return NULL_SV;
+}
+
 PRGBColor
 prima_read_palette( int * palSize, SV * palette)
 {
@@ -986,12 +1104,12 @@ SV *
 Drawable_palette( Handle self, Bool set, SV * palette)
 {
 	int colors;
-	if ( var-> stage > csFrozen) return nilSV;
+	if ( var-> stage > csFrozen) return NULL_SV;
 	colors = var-> palSize;
 	if ( set) {
 		free( var-> palette);
 		var-> palette = prima_read_palette( &var-> palSize, palette);
-		if ( colors == 0 && var-> palSize == 0) return nilSV; /* do not bother apc */
+		if ( colors == 0 && var-> palSize == 0) return NULL_SV; /* do not bother apc */
 		apc_gp_set_palette( self);
 	} else {
 		AV * av = newAV();
@@ -1000,32 +1118,35 @@ Drawable_palette( Handle self, Bool set, SV * palette)
 		for ( i = 0; i < colors * 3; i++) av_push( av, newSViv( pal[ i]));
 		return newRV_noinc(( SV *) av);
 	}
-	return nilSV;
+	return NULL_SV;
 }
 
 SV *
 Drawable_pixel( Handle self, Bool set, int x, int y, SV * color)
 {
+	CHECK_GP(0);
 	if (!set)
 		return newSViv( apc_gp_get_pixel( self, x, y));
 	apc_gp_set_pixel( self, x, y, SvIV( color));
-	return nilSV;
+	return NULL_SV;
 }
 
 Handle
 Drawable_region( Handle self, Bool set, Handle mask)
 {
-	if ( var-> stage > csFrozen) return nilHandle;
+	if ( var-> stage > csFrozen) return NULL_HANDLE;
+	if ( !is_opt(optSystemDrawable))
+		return NULL_HANDLE;
 
 	if ( set) {
 		if ( mask && kind_of( mask, CRegion)) {
 			apc_gp_set_region( self, mask);
-			return nilHandle;
+			return NULL_HANDLE;
 		}
 
 		if ( mask && !kind_of( mask, CImage)) {
 			warn("Illegal object reference passed to Drawable::region");
-			return nilHandle;
+			return NULL_HANDLE;
 		}
 
 		if ( mask ) {
@@ -1040,9 +1161,9 @@ Drawable_region( Handle self, Bool set, Handle mask)
 			Object_destroy(region);
 
 		} else
-			apc_gp_set_region(self, nilHandle);
+			apc_gp_set_region(self, NULL_HANDLE);
 
-	} else if ( apc_gp_get_region( self, nilHandle)) {
+	} else if ( apc_gp_get_region( self, NULL_HANDLE)) {
 		HV * profile = newHV();
 		Handle i = Object_create( "Prima::Region", profile);
 		sv_free(( SV *) profile);
@@ -1051,7 +1172,7 @@ Drawable_region( Handle self, Bool set, Handle mask)
 		return i;
 	}
 
-	return nilHandle;
+	return NULL_HANDLE;
 }
 
 int
@@ -1101,7 +1222,7 @@ Drawable_fillPattern( Handle self, Bool set, SV * svpattern)
 	if ( !set) {
 		AV * av;
 		FillPattern * fp = apc_gp_get_fill_pattern( self);
-		if ( !fp) return nilSV;
+		if ( !fp) return NULL_SV;
 		av = newAV();
 		for ( i = 0; i < 8; i++) av_push( av, newSViv(( int) (*fp)[i]));
 		return newRV_noinc(( SV *) av);
@@ -1111,13 +1232,13 @@ Drawable_fillPattern( Handle self, Bool set, SV * svpattern)
 			AV * av = ( AV *) SvRV( svpattern);
 			if ( av_len( av) != 7) {
 				warn("Illegal fillPattern passed to Drawable::fillPattern");
-				return nilSV;
+				return NULL_SV;
 			}
 			for ( i = 0; i < 8; i++) {
 				SV ** holder = av_fetch( av, i, 0);
 				if ( !holder) {
 					warn("Array panic on Drawable::fillPattern");
-					return nilSV;
+					return NULL_SV;
 				}
 				fp[ i] = SvIV( *holder);
 			}
@@ -1126,12 +1247,12 @@ Drawable_fillPattern( Handle self, Bool set, SV * svpattern)
 			int id = SvIV( svpattern);
 			if (( id < 0) || ( id > fpMaxId)) {
 				warn("fillPattern index out of range passed to Drawable::fillPattern");
-				return nilSV;
+				return NULL_SV;
 			}
 			apc_gp_set_fill_pattern( self, fillPatterns[ id]);
 		}
 	}
-	return nilSV;
+	return NULL_SV;
 }
 
 Point

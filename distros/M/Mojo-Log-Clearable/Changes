@@ -1,3 +1,6 @@
+1.001     2021-06-16 00:03:24 EDT
+  - Update IRC metadata to libera.chat
+
 1.000     2017-11-06 21:27:23 EST
   - Add Mojo::Log::Role::Clearable, and move the implementation to there.
   - Mojo::Log::Clearable is now a simple Mojo::Log subclass that has the new

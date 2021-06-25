@@ -268,4 +268,6 @@ PLUS
       "123A \$xy\n\n", "ignore annotation";
 }
 
+is pica_string([]), '', 'empty record';
+
 done_testing;

@@ -407,13 +407,6 @@ sub setPreDestroyAction {
     $self->{preDestroyActions}{$key} = $cb;
 }
 
-sub DESTROY {
-    my $self = shift;
-    eval { $self->helper->log->debug('Destroying RpcService controller'); };
-}
-
-
-
 =head2 handleUpload
 
 Process incoming upload request. This is getting called via a route and NOT

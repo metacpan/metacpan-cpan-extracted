@@ -30,7 +30,7 @@ use strict;
 use warnings;
 use Carp qw{ carp croak };
 
-our $VERSION = 0.43;
+our $VERSION = 0.46;
 
 use Webservice::OVH::Order::Cart::Item;
 
@@ -517,7 +517,6 @@ sub add_dns {
 }
 
 
-
 =head2 offers_domain_transfer
 
 Returns an Array of hashes with offers.
@@ -775,6 +774,35 @@ sub clear {
         $item->delete;
     }
 }
+
+=head2 assign
+
+Assign a shopping cart to an loggedin client
+
+=over
+
+=item * Synopsis: $cart->assign;
+
+=back
+
+=cut
+
+sub assign {
+
+    my ($self) = @_;
+
+    return unless $self->_is_valid;
+
+    my $api      = $self->{_api_wrapper};
+    my $cart_id  = $self->id;
+    my $response = $api->rawCall( method => 'post', path => "/order/cart/$cart_id/assign", noSignature => 0 );
+    croak $response->error if $response->error;
+}
+
+
+
+
+
 
 1;
 

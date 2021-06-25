@@ -1,0 +1,54 @@
+{
+   "abstract" : "ckeys keyword",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4231",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Syntax-Keyword-Combine-Keys",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::CBuilder" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4004",
+            "XS::Parse::Keyword::Builder" : "0.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "XS::Parse::Keyword" : "0.08",
+            "perl" : "5.014"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "provides" : {
+      "Syntax::Keyword::Combine::Keys" : {
+         "file" : "lib/Syntax/Keyword/Combine/Keys.pm",
+         "version" : "0.09"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.09",
+   "x_serialization_backend" : "JSON::PP version 4.06"
+}

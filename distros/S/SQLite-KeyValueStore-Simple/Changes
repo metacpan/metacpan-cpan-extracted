@@ -1,0 +1,14 @@
+0.002   2021-06-18  Released-By: PERLANCAR; Urgency: high
+
+	- [bugfix] Fix JSON storing.
+
+        - [bugfix] We didn't export.
+
+	- [ux] Add option 'quiet' to set_sqlite_kvstore_value().
+
+	- Add function: dump_sqlite_kvstore.
+
+
+0.001   2021-06-18  Released-By: PERLANCAR
+
+        - First release.

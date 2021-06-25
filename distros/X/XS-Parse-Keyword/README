@@ -181,41 +181,31 @@ PIECES AND PIECE TYPES
     must support "probing". This ability is also noted below.
 
     The type of each piece should be one of the following macro values.
-    Some macros additionally take a set of typeflags; taken from the
-    following list:
-
-      * XPK_TYPEFLAG_SCOPED
-
-      On XPK_BLOCK_flags, this will wrap the returned optree in its own
-      lexical scope, by calling op_scope().
-
-      * XPK_TYPEFLAG_G_VOID, XPK_TYPEFLAG_G_SCALAR, XPK_TYPEFLAG_G_LIST
-
-      On optree-returning types, will contextualize the returned optree to
-      put it in the given context, by calling op_contextualize().
-
-    Where both a plain and a _flags-suffixed version of the macro exists,
-    the flags version will take the flags in an additional argument, and
-    the non-flags version will pass zero extra flags.
 
  XPK_BLOCK
 
-    atomic, emits op.
+    atomic, can probe, emits op.
 
        XPK_BLOCK
-    
-       XPK_BLOCK_flags(flags)
 
     A brace-delimited block of code is expected, passed as an optree in the
     op field. This will be parsed as a block within the current function
     scope.
 
-    Permits the flags XPK_TYPEFLAG_SCOPED and XPK_TYPEFLAG_G_*.
+    This can be probed by checking for the presence of an open-brace ({)
+    character.
 
- XPK_BLOCK_SCALARCTX, XPK_BLOCK_LISTCTX
+    Be careful defining grammars with this because an open-brace is also a
+    valid character to start a term expression, for example. Given a choice
+    between XPK_BLOCK and XPK_TERMEXPR, either of them could try to consume
+    such code as
 
-    Shortcuts for XPK_BLOCK_flags() which wrap a scalar or list-context
-    scope around the block.
+       { 123, 456 }
+
+ XPK_BLOCK_VOIDCTX, XPK_BLOCK_SCALARCTX, XPK_BLOCK_LISTCTX
+
+    Variants of XPK_BLOCK which wrap a void, scalar or list-context scope
+    around the block.
 
  XPK_PREFIXED_BLOCK
 
@@ -249,17 +239,13 @@ PIECES AND PIECE TYPES
     atomic, emits op.
 
        XPK_TERMEXPR
-    
-       XPK_TERMEXPR_flags(flags)
 
     A term expression is expected, parsed using parse_termexpr(), and
     passed as an optree in the op field.
 
-    Permits the flags XPK_TYPEFLAG_G_*
+ XPK_TERMEXPR_VOIDCTX, XPK_TERMEXPR_SCALARCTX
 
- XPK_TERMEXPR_SCALARCTX
-
-    A shortcut for XPK_TERMEXPR_flags() which puts the expression in scalar
+    Variants of XPK_TERMEXPR which puts the expression in void or scalar
     context.
 
  XPK_LISTEXPR
@@ -267,18 +253,13 @@ PIECES AND PIECE TYPES
     atomic, emits op.
 
        XPK_LISTEXPR
-    
-       XPK_LISTEXPR_flags(flags)
 
     A list expression is expected, parsed using parse_listexpr(), and
     passed as an optree in the op field.
 
-    Permits the flags XPK_TYPEFLAG_G_*
-
  XPK_LISTEXPR_LISTCTX
 
-    A shortcut for XPK_LISTEXPR_flags() which puts the expression in list
-    context.
+    Variant of XPK_LISTEXPR which puts the expression in list context.
 
  XPK_IDENT
 
@@ -417,7 +398,7 @@ PIECES AND PIECE TYPES
 
  XPK_CHOICE
 
-    structural, emits i.
+    structural, can probe, emits i.
 
        XPK_CHOICE(options ...)
 
@@ -442,7 +423,7 @@ PIECES AND PIECE TYPES
 
  XPK_TAGGEDCHOICE
 
-    structural, emits i.
+    structural, can probe, emits i.
 
        XPK_TAGGEDCHOICE(choice, tag, ...)
 

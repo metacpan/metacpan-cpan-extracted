@@ -22,6 +22,7 @@ my @files = (
     't/02-logging.t',
     't/03-warnings.t',
     't/04-fatal.t',
+    't/05-fatal.t',
     't/author-critic.t',
     't/author-eof.t',
     't/author-eol.t',

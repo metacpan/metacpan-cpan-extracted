@@ -6,8 +6,8 @@ on 'test', sub {
   requires 'Test::XML' , '0.08';
 };
 
-requires 'perl', '5.12.0';
+requires 'perl', '5.14.1';
 requires 'Catmandu', '1.20';
-requires 'PICA::Data', '1.20';
+requires 'PICA::Data', '1.27';
 requires 'Moo', '1.0';
 requires 'Catmandu::SRU', '0.427';

@@ -221,8 +221,6 @@ sub execute
 	my $dir = $self->{directory};
 	$dir =~ s/\//\\/g;
 
-	$dir = "c:/1/1/\x{76ee}/\x{5f55}";
-
 	_set( directory   => $dir);
 	_set( defext      => $self->{defaultExt});
 	_set( title       => $self->{text} // 'NULL');
@@ -231,7 +229,8 @@ sub execute
 		$self-> cancel;
 		return wantarray ? () : undef;
 	}
-	$self-> {directory} = _get('directory');
+	$self-> {directory} = $ret;
+	$self-> {directory} =~ s/(\\|\/)[^\\\/]+$//;
 	$self-> {directory} =~ s/\\/\//g;
 	$self-> {directory} =~ s/\s+$//;
 	$self-> {directory} .= '/' unless $self-> {directory} =~ /\/$/;

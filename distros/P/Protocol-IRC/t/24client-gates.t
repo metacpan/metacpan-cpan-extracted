@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
 use Test::More;
@@ -9,6 +9,34 @@ my $CRLF = "\x0d\x0a"; # because \r\n isn't portable
 
 my @gates;
 my @messages;
+
+package TestIRC {
+   use base qw( Protocol::IRC::Client );
+
+   use Future;
+
+   sub new { return bless {}, shift }
+
+   sub new_future { return Future->new }
+
+   sub nick { "MyNick" }
+
+   sub on_message
+   {
+      my $self = shift;
+      my ( $command, $message, $hints ) = @_;
+      die "$command MESSAGE UNSYNTHESIZED BUT UNHANLDED" if !$hints->{synthesized} and !$hints->{handled};
+      return 0 unless $hints->{synthesized};
+      push @messages, [ $command, $message, $hints ];
+      return 1;
+   }
+
+   sub on_gate
+   {
+      my $self = shift;
+      push @gates, [ @_ ];
+   }
+}
 
 my $irc = TestIRC->new;
 sub write_irc
@@ -176,30 +204,3 @@ sub write_irc
 }
 
 done_testing;
-
-package TestIRC;
-use base qw( Protocol::IRC::Client );
-
-use Future;
-
-sub new { return bless {}, shift }
-
-sub new_future { return Future->new }
-
-sub nick { "MyNick" }
-
-sub on_message
-{
-   my $self = shift;
-   my ( $command, $message, $hints ) = @_;
-   die "$command MESSAGE UNSYNTHESIZED BUT UNHANLDED" if !$hints->{synthesized} and !$hints->{handled};
-   return 0 unless $hints->{synthesized};
-   push @messages, [ $command, $message, $hints ];
-   return 1;
-}
-
-sub on_gate
-{
-   my $self = shift;
-   push @gates, [ @_ ];
-}

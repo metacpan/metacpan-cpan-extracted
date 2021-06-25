@@ -21,7 +21,7 @@
 
 use strict ;
 
-use version ; our $VERSION = "1.96" ;
+use version ; our $VERSION = "1.97" ;
 
 package uHTMLnode;
 
@@ -621,12 +621,20 @@ sub _close( $$ )
   return $p ;
 }
 
+sub ParamCount
+{
+  my $self = shift ;
+
+  return( ref $self->{PCount} eq 'ARRAY' ? $self->{PCount}->[-1] : '' ) ;
+}
+
 sub _callwrap
 {
   my( $Func,$Node,$AttrName,$Params ) = @_ ;
   my @FParams = ($Params =~ m/([^,'"](?:\\,|[^,])*|'(?:\\'|[^'])*'|"(?:\\"|[^"])*"|)\s*,?/sg) ;
 
   s/^\s*['"]?//s + s/['"]?\s*$//s foreach @FParams ;
+  push @{$Node->{PCount}},scalar( @FParams ) ;
   return $uHTML::uAttr{$Func}( $Node,$AttrName,$Func,map((m/(?<!\\)\$(?=[a-zA-Z_])/s?codeAttr($Node,$AttrName,$_):$_),@FParams) ) if $uHTML::uAttr{$Func} ;
   errorMsg( 0,"unknown variable $Func.") ;
   return "\\\$$Func" ;
@@ -650,6 +658,7 @@ sub codeAttr
 
     ( $func,$par,$tail ) = ($sub  =~ m/([a-zA-Z_][0-9a-zA-Z_]*)(?:\(\s*('(?:\\'|[^'])*'|"(?:\\"|[^"])*"|(?:\\.|[^()])*(?:\s*,(?:'(?:\\'|[^'])*'|"(?:\\"|[^"])*"|(?:\\.|[^()])))*)\s*\))?(.*)$/s) ;
     $sub = _callwrap( $func,$Node,$Attr,$par ) . $tail ;
+    pop @{$Node->{PCount}} ;
 
     $subs[$#subs] .= $sub ;
   }

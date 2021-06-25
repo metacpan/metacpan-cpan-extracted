@@ -1,7 +1,22 @@
-package Dist::Zilla::Chrome::Term 6.017;
+package Dist::Zilla::Chrome::Term 6.020;
 # ABSTRACT: chrome used for terminal-based interaction
 
 use Moose;
+
+# BEGIN BOILERPLATE
+use v5.20.0;
+use warnings;
+use utf8;
+no feature 'switch';
+use experimental qw(postderef postderef_qq); # This experiment gets mainlined.
+# END BOILERPLATE
+
+use Digest::MD5 qw(md5);
+use Dist::Zilla::Types qw(OneZero);
+use Encode ();
+use Log::Dispatchouli 1.102220;
+
+use namespace::autoclean;
 
 #pod =head1 OVERVIEW
 #pod
@@ -10,11 +25,33 @@ use Moose;
 #pod
 #pod =cut
 
-use Dist::Zilla::Types qw(OneZero);
-use Encode ();
-use Log::Dispatchouli 1.102220;
+sub _str_color {
+  my ($str) = @_;
 
-use namespace::autoclean;
+  state %color_for;
+
+  # I know, I know, this is ludicrous, but guess what?  It's my Sunday and I
+  # can spend it how I want.
+  state $max = ($ENV{COLORTERM}//'') eq 'truecolor' ? 255 : 5;
+  state $min = $max == 255 ? 384 : 5;
+  state $inc = $max == 255 ?  16 : 1;
+  state $fmt = $max == 255 ? 'r%ug%ub%u' : 'rgb%u%u%u';
+
+  return $color_for{$str} //= do {
+    my @rgb = map { $_ % $max } unpack 'CCC', md5($str);
+
+    my $i = ($rgb[0] + $rgb[1] + $rgb[2]) % 3;
+    while (1) {
+      last if $rgb[0] + $rgb[1] + $rgb[2] >= $min;
+
+      my $next = $i++ % 3;
+
+      $rgb[$next] = abs($max - $rgb[$next]);
+    }
+
+    sprintf $fmt, @rgb;
+  }
+}
 
 has logger => (
   is  => 'ro',
@@ -35,13 +72,29 @@ sub _build_logger {
     binmode( STDERR, $layer );
   }
 
-  return Log::Dispatchouli->new({
+  my $logger = Log::Dispatchouli->new({
     ident     => 'Dist::Zilla',
     to_stdout => 1,
     log_pid   => 0,
     to_self   => ($ENV{DZIL_TESTING} ? 1 : 0),
     quiet_fatal => 'stdout',
   });
+
+  if (-t *STDOUT || $ENV{DZIL_COLOR}) {
+    my $stdout = $logger->{dispatcher}->output('stdout');
+
+    $stdout->add_callback(sub {
+      require Term::ANSIColor;
+      my $message = {@_}->{message};
+      return $message unless $message =~ s/\A\[([^\]]+)] //;
+      my $prefix = $1;
+      return sprintf "[%s] %s",
+        Term::ANSIColor::colored([ _str_color($prefix) ], $prefix),
+        $message;
+    });
+  }
+
+  return $logger;
 }
 
 has term_ui => (
@@ -168,20 +221,31 @@ Dist::Zilla::Chrome::Term - chrome used for terminal-based interaction
 
 =head1 VERSION
 
-version 6.017
+version 6.020
 
 =head1 OVERVIEW
 
 This class provides a L<Dist::Zilla::Chrome> implementation for use in a
 terminal environment.  It's the default chrome used by L<Dist::Zilla::App>.
 
+=head1 PERL VERSION SUPPORT
+
+This module has the same support period as perl itself:  it supports the two
+most recent versions of perl.  (That is, if the most recently released version
+is v5.40, then this module should work on both v5.40 and v5.38.)
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
+
 =head1 AUTHOR
 
-Ricardo SIGNES 😏 <rjbs@cpan.org>
+Ricardo SIGNES 😏 <rjbs@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Ricardo SIGNES.
+This software is copyright (c) 2021 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,0 +1,76 @@
+NAME
+    Syntax::Keyword::Combine::Keys - ckeys keyword
+
+VERSION
+    Version 0.09
+
+SYNOPSIS
+            use Syntax::Keyword::Combine::Keys;
+
+            my %hash = ckeys {
+                    $_ => $HASH{$_}->{value};
+            } %{$hash1}, %hash2, e => { value => 500 };
+
+DESCRIPTION
+    This ia an experimental module written for learning purposes. The module
+    provides a single keyword - ckeys, most simply put it is a modification
+    of map being passed the sorted keys of a hash. To demonstrate further
+    the following is the "pure" perl equivalent of the synopsis.
+
+            my %HASH = (%{$hash1}, %hash2, e => { value => 500 };
+            my %hash = map {
+                    $_ => $HASH{$_}->{value};
+            } sort keys %HASH;
+
+KEYWORDS
+  ckeys
+            my @keys = ckeys {
+                    uc $_;
+            } %hash1, %hash2, %hash3
+
+    Repeatedly calls the block of code, with $_ locally set to each key from
+    the given list. It Returns the processed values from the block. ckeys
+    also exposes a variable called %HASH which contains the merged list that
+    is passed to the block.
+
+            %HASH = ( %hash1, %hash2, $hash3 );
+
+AUTHOR
+    LNATION, "<email at lnation.org>"
+
+BUGS
+    Please report any bugs or feature requests to
+    "bug-syntax-keyword-combine-keys at rt.cpan.org", or through the web
+    interface at
+    <https://rt.cpan.org/NoAuth/ReportBug.html?Queue=Syntax-Keyword-Combine-
+    Keys>. I will be notified, and then you'll automatically be notified of
+    progress on your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Syntax::Keyword::Combine::Keys
+
+    You can also look for information at:
+
+    *   RT: CPAN's request tracker (report bugs here)
+
+        <https://rt.cpan.org/NoAuth/Bugs.html?Dist=Syntax-Keyword-Combine-Ke
+        ys>
+
+    *   CPAN Ratings
+
+        <https://cpanratings.perl.org/d/Syntax-Keyword-Combine-Keys>
+
+    *   Search CPAN
+
+        <https://metacpan.org/release/Syntax-Keyword-Combine-Keys>
+
+ACKNOWLEDGEMENTS
+LICENSE AND COPYRIGHT
+    This software is Copyright (c) 2021 by LNATION.
+
+    This is free software, licensed under:
+
+      The Artistic License 2.0 (GPL Compatible)
+

@@ -36,7 +36,8 @@ sub get_login {
         my $prompt = ucfirst( $key ) . ': ';
         my $tf = Term::Form->new( $sf->{i}{tf_default} );
         # Readline
-        my $new = $tf->readline( $prompt,
+        my $new = $tf->readline(
+            $prompt,
             { info => $show_sofar, no_echo => $no_echo }
         );
         return $new;

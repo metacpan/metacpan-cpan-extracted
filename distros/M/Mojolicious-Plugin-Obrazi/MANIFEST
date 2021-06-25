@@ -1,6 +1,8 @@
 .perltidyrc
+Changes
 lib/Mojolicious/Command/Author/generate/obrazi.pm
 lib/Mojolicious/Plugin/Obrazi.pm
+LICENSE
 Makefile.PL
 MANIFEST			This list of files
 t/basic.t
@@ -12,6 +14,7 @@ t/data/from/index.csv
 t/data/from/loga/loga11.png
 t/data/from/loga/loga16.png
 t/data/from/loga/loga4.png
+t/data/from/obrazi_custom.html.ep
 t/data/from/some.txt
 t/data/from/изображение.png
 t/data/from/мозайки/1.jpg

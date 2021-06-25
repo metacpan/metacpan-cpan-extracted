@@ -1,7 +1,7 @@
 package Acme::CPANModulesBundle::Import::MJGARDNER;
 
 our $DATE = '2021-05-19'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 1;
 # ABSTRACT: Acme::CPANModules::* created from MJGARDNER's posts
@@ -18,7 +18,7 @@ Acme::CPANModulesBundle::Import::MJGARDNER - Acme::CPANModules::* created from M
 
 =head1 VERSION
 
-This document describes version 0.001 of Acme::CPANModulesBundle::Import::MJGARDNER (from Perl distribution Acme-CPANModulesBundle-Import-MJGARDNER), released on 2021-05-19.
+This document describes version 0.002 of Acme::CPANModulesBundle::Import::MJGARDNER (from Perl distribution Acme-CPANModulesBundle-Import-MJGARDNER), released on 2021-05-19.
 
 =head1 DESCRIPTION
 

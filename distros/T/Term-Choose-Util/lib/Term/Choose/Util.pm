@@ -4,11 +4,12 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '0.123';
+our $VERSION = '0.124';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose_a_directory choose_a_file choose_directories choose_a_number choose_a_subset settings_menu
                      insert_sep get_term_size get_term_width get_term_height unicode_sprintf );
 
+use Carp                  qw( croak );
 use Cwd                   qw( realpath );
 use Encode                qw( decode encode );
 use File::Basename        qw( basename dirname );
@@ -28,7 +29,7 @@ sub new {
     my ( $opt ) = @_;
     my $instance_defaults = _defaults();
     if ( defined $opt ) {
-        die "Options have to be passed as a HASH reference." if ref $opt ne 'HASH';
+        croak "Options have to be passed as a HASH reference." if ref $opt ne 'HASH';
         validate_options( _valid_options( 'new' ), $opt );
         for my $key ( keys %$opt ) {
             $instance_defaults->{$key} = $opt->{$key} if defined $opt->{$key};
@@ -64,7 +65,7 @@ sub __prepare_opt {
     if ( ! defined $opt ) {
         $opt = {};
     }
-    die "Options have to be passed as a HASH reference." if ref $opt ne 'HASH';
+    croak "Options have to be passed as a HASH reference." if ref $opt ne 'HASH';
     if ( %$opt ) {
         my $sub =  ( caller( 1 ) )[3];
         $sub =~ s/^.+::(?:__)?([^:]+)\z/$1/;
@@ -98,10 +99,12 @@ sub _valid_options {
         small_first         => '[ 0 1 ]',
         alignment           => '[ 0 1 2 ]',
         color               => '[ 0 1 2 ]',
+        page                => '[ 0 1 2 ]',       # undocumented
         layout              => '[ 0 1 2 3 ]',
+        keep                => '[ 1-9 ][ 0-9 ]*', # undocumented
         default_number      => '[ 0-9 ]+',
         mark                => 'Array_Int',
-        solo                => 'Array_Int',     # experimental
+        solo                => 'Array_Int',       # experimental
         tabs_info           => 'Array_Int',
         tabs_prompt         => 'Array_Int',
         busy_string         => 'Str',
@@ -110,6 +113,7 @@ sub _valid_options {
         add_dirs            => 'Str',
         back                => 'Str',
         filter              => 'Str',
+        footer              => 'Str',             # undocumented
         show_files          => 'Str',
         confirm             => 'Str',
         parent_dir          => 'Str',
@@ -148,6 +152,8 @@ sub _defaults {
         #info          => undef,
         #init_dir      => undef,
         #filter        => undef,
+        #footer        => undef,
+        #keep          => undef,
         keep_chosen    => 0,
         layout         => 1,
         #tabs_info     => undef,
@@ -160,6 +166,7 @@ sub _defaults {
         #mark          => undef,
         mouse          => 0,
         order          => 1,
+        #page          => undef,
         prefix         => '',
         #prompt        => undef,
         reset          => 'reset',
@@ -177,7 +184,7 @@ sub _defaults {
 
 sub _routine_options {
     my ( $caller ) = @_;
-    my @every = ( qw( info prompt clear_screen mouse hide_cursor confirm back color tabs_info tabs_prompt cs_label ) );
+    my @every = ( qw( info prompt clear_screen mouse hide_cursor confirm back color tabs_info tabs_prompt cs_label page footer keep ) ); # sort
     my $options;
     if ( $caller eq 'choose_directories' ) {
         $options = [ @every, qw( init_dir layout order alignment enchanted show_hidden parent_dir decoded add_dirs ) ];
@@ -214,9 +221,11 @@ sub __prepare_path {
         my $prompt = 'Could not find the directory "';
         $prompt .= decode 'locale_fs', $init_dir_fs;
         $prompt .= '". Falling back to the home directory.';
+        # Choose
         choose(
             [ 'Press ENTER to continue' ],
-            { prompt => $prompt, hide_cursor => $self->{hide_cursor}, mouse => $self->{mouse} }
+            { prompt => $prompt, hide_cursor => $self->{hide_cursor}, mouse => $self->{mouse}, page => $self->{page},
+              footer => $self->{footer}, keep => $self->{keep} }
         );
         $init_dir_fs = File::HomeDir->my_home();
     }
@@ -224,7 +233,7 @@ sub __prepare_path {
         $init_dir_fs = File::HomeDir->my_home();
     }
     if ( ! -d $init_dir_fs ) {
-        die "Could not find the home directory.";
+        croak "Could not find the home directory.";
     }
     return $init_dir_fs;
 }
@@ -234,13 +243,15 @@ sub __available_dirs {
     my ( $self, $dir_fs ) = @_;
     my $dh;
     if ( ! eval {
-        opendir( $dh, $dir_fs ) or die $!;
+        opendir( $dh, $dir_fs ) or croak $!;
         1 }
     ) {
         print "$@";
+        # Choose
         choose(
             [ 'Press Enter:' ],
-            { prompt => '', hide_cursor => $self->{hide_cursor}, mouse => $self->{mouse} }
+            { prompt => '', hide_cursor => $self->{hide_cursor}, mouse => $self->{mouse}, page => $self->{page},
+              footer => $self->{footer}, keep => $self->{keep} }
         );
         $dir_fs = dirname $dir_fs;
         next;
@@ -320,10 +331,8 @@ sub choose_directories {
             }
             my $idxs = $self->choose_a_subset(
                 [ sort map { decode 'locale_fs', $_ } @$avail_dirs_fs ],
-                {   info => $info, prompt => $prompt, back => '<<', confirm => 'OK',
-                    cs_begin => '+ ', cs_label => undef,
-                    index => 1
-                }
+                { info => $info, prompt => $prompt, back => '<<', confirm => 'OK', cs_begin => '+ ', cs_label => undef,
+                  page => $self->{page}, footer => $self->{footer}, keep => $self->{keep}, index => 1 }
             );
             for my $o ( @used_options ) {
                 $self->{$o} = $bu_opt->{$o};
@@ -399,13 +408,15 @@ sub __choose_a_path {
     while ( 1 ) {
         my ( $dh, @dirs );
         if ( ! eval {
-            opendir( $dh, $dir_fs ) or die $!;
+            opendir( $dh, $dir_fs ) or croak $!;
             1 }
         ) {
             print "$@";
+            # Choose
             choose(
                 [ 'Press Enter:' ],
-                { prompt => '', hide_cursor => $self->{hide_cursor}, mouse => $self->{mouse} }
+                { prompt => '', hide_cursor => $self->{hide_cursor}, mouse => $self->{mouse}, page => $self->{page},
+                  footer => $self->{footer}, keep => $self->{keep} }
             );
             $dir_fs = dirname $dir_fs;
             next;
@@ -442,7 +453,7 @@ sub __choose_a_path {
               layout => $self->{layout}, order => $self->{order}, mouse => $self->{mouse},
               clear_screen => $self->{clear_screen}, hide_cursor => $self->{hide_cursor},
               color => $self->{color}, tabs_info => $self->{tabs_info}, tabs_prompt => $self->{tabs_prompt},
-              undef => $self->{back} }
+              page => $self->{page}, footer => $self->{footer}, keep => $self->{keep}, undef => $self->{back} }
         );
         if ( ! defined $choice ) {
             return;
@@ -489,16 +500,18 @@ sub __a_file {
                 @files_fs = map { basename $_} grep { -e $_ } glob( catfile( $dir_fs, $self->{filter} ) );
             }
             else {
-                opendir( my $dh, $dir_fs ) or die $!;
+                opendir( my $dh, $dir_fs ) or croak $!;
                 @files_fs = readdir $dh;
                 closedir $dh;
             }
         1 }
         ) {
             print "$@";
+            # Choose
             choose(
                 [ 'Press Enter:' ],
-                { prompt => '', hide_cursor => $self->{hide_cursor}, mouse => $self->{mouse} }
+                { prompt => '', hide_cursor => $self->{hide_cursor}, mouse => $self->{mouse}, page => $self->{page},
+                  footer => $self->{footer}, keep => $self->{keep} }
             );
             return;
         }
@@ -526,10 +539,12 @@ sub __a_file {
             else {
                 $prompt = 'No files.';
             }
+            # Choose
             choose(
                 [ ' < ' ],
                 { info => $self->{info}, prompt => "$lines\n$prompt", hide_cursor => $self->{hide_cursor},
-                  mouse => $self->{mouse}, color => $self->{color} }
+                  mouse => $self->{mouse}, color => $self->{color}, page => $self->{page}, footer => $self->{footer},
+                  keep => $self->{keep} }
             );
             return;
         }
@@ -540,11 +555,11 @@ sub __a_file {
         # Choose
         $chosen_file = choose(
             [ @pre, sort( @files ) ],
-            { info => $self->{info}, prompt => $lines, alignment => $self->{alignment},
-              layout => $self->{layout}, order => $self->{order}, mouse => $self->{mouse},
-              clear_screen => $self->{clear_screen}, hide_cursor => $self->{hide_cursor},
-              color => $self->{color}, tabs_info => $self->{tabs_info}, tabs_prompt => $self->{tabs_prompt},
-              undef => $self->{back} }
+            { info => $self->{info}, prompt => $lines, alignment => $self->{alignment}, layout => $self->{layout},
+              order => $self->{order}, mouse => $self->{mouse}, clear_screen => $self->{clear_screen},
+              hide_cursor => $self->{hide_cursor}, color => $self->{color}, tabs_info => $self->{tabs_info},
+              tabs_prompt => $self->{tabs_prompt}, page => $self->{page}, footer => $self->{footer},
+              keep => $self->{keep}, undef => $self->{back} }
         );
         if ( ! length $chosen_file ) {
             if ( length $prev_dir_fs ) {
@@ -643,7 +658,8 @@ sub choose_a_number {
             $self->{small_first} ? [ @pre, reverse @ranges ] : [ @pre, @ranges ],
             { info => $self->{info}, prompt => $lines, layout => 3, alignment => 1, mouse => $self->{mouse},
               clear_screen => $self->{clear_screen}, hide_cursor => $self->{hide_cursor}, color => $self->{color},
-              tabs_info => $self->{tabs_info}, tabs_prompt => $self->{tabs_prompt}, undef => $back_tmp }
+              tabs_info => $self->{tabs_info}, tabs_prompt => $self->{tabs_prompt}, page => $self->{page},
+              footer => $self->{footer}, keep => $self->{keep}, undef => $back_tmp }
         );
         if ( ! defined $range ) {
             if ( defined $result ) {
@@ -672,7 +688,7 @@ sub choose_a_number {
             { info => $self->{info}, prompt => $lines, layout => 1, alignment => 2, order => 0,
               mouse => $self->{mouse}, clear_screen => $self->{clear_screen}, hide_cursor => $self->{hide_cursor},
               color => $self->{color}, tabs_info => $self->{tabs_info}, tabs_prompt => $self->{tabs_prompt},
-              undef => '<<' }
+              page => $self->{page}, footer => $self->{footer}, keep => $self->{keep}, undef => '<<' }
         );
         next if ! defined $number;
         if ( $number eq $self->{reset} ) {
@@ -754,7 +770,8 @@ sub choose_a_subset {
               meta_items => $meta_items, mark => $mark, include_highlighted => 2,
               clear_screen => $self->{clear_screen}, hide_cursor => $self->{hide_cursor},
               color => $self->{color}, tabs_info => $self->{tabs_info}, tabs_prompt => $self->{tabs_prompt},
-              undef => $self->{back}, busy_string => $self->{busy_string} }
+              page => $self->{page}, footer => $self->{footer}, keep => $self->{keep}, undef => $self->{back},
+              busy_string => $self->{busy_string} }
         );
         $self->{mark} = $mark = undef;
         if ( ! defined $idx[0] || $idx[0] == 0 ) {
@@ -864,7 +881,7 @@ sub settings_menu {
             { info => $self->{info}, prompt => $lines, index => 1, default => $default, layout => 3, alignment => 0,
               mouse => $self->{mouse}, clear_screen => $self->{clear_screen}, hide_cursor => $self->{hide_cursor},
               color => $self->{color}, tabs_info => $self->{tabs_info}, tabs_prompt => $self->{tabs_prompt},
-              undef => $self->{back} }
+              page => $self->{page}, footer => $self->{footer}, keep => $self->{keep}, undef => $self->{back} }
         );
         if ( ! $idx ) {
             $self->__restore_defaults();
@@ -1002,7 +1019,7 @@ Term::Choose::Util - TUI-related functions for selecting directories, files, num
 
 =head1 VERSION
 
-Version 0.123
+Version 0.124
 
 =cut
 

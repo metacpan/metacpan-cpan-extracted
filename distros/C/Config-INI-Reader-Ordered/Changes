@@ -1,5 +1,8 @@
 Revision history for Config-INI-Reader-Ordered
 
+0.021     2021-06-20 17:18:35-04:00 America/New_York
+          add perl-support to docs
+
 0.020     2015-05-27 10:34:19-04:00 America/New_York
           fix descending version number because of tagging change
 

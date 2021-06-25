@@ -1,5 +1,30 @@
 Revision history for CORBA-IDLtree
 
+2.05  2021/06/13
+      * Increase minimum required perl version to 5.8 due to
+        addition of "use utf8".
+      * Add handling of Windows CP-1252 character encoding in
+        input file:
+        - Add `use utf8`.
+        - Require module Encode::Guess.
+        - In sub get_items:
+          - On encountering a non printable character call
+            Encode::Guess->guess.
+          - If the call returns a ref then a decoder was found
+            and no special action is required.
+          - If the call returns "No appropriate encodings found"
+            then assign $l from Encode::decode("cp-1252", $l).
+          - If the call returns none of the above then print a
+            warning "Unsupported character encoding" and replace
+            the non printable characters in $l by space.
+        - In sub Parse_File_i case $file case $emucpp call to
+          `open $in`, the encoding directive for UTF-8 is no
+          longer needed due to use of Encode::Guess (see above).
+      * In sub skip_input fix handling of preprocessor directives
+        where the "#" is not placed in column 1 but is preceded by
+        whitespace.
+      * Fix sub scoped_name in case of chained module reopenings.
+
 2.04    2020/06/20
         * In sub Parse_File_i case $file case $emucpp open $in
           with encoding(UTF-8) to ensure that IDL files are parsed

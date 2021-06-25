@@ -1,0 +1,10 @@
+8.pm
+App-Bin4TSV-8-0.100/META.json
+App-Bin4TSV-8-0.100/META.yml
+Changes
+INSTALL
+Makefile.PL
+MANIFEST			This list of files
+README
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

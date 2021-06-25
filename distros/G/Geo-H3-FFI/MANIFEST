@@ -1,0 +1,22 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+LICENSE
+t/001_load.t
+t/002_GeoCoord.t
+t/003_h3ToGeo.t
+t/003_h3ToString.t
+t/003_stringToH3.t
+t/004_GeoBoundary.t
+t/005_wrappers.t
+t/006_index_inspection_functions.t
+t/007_hierarchical_grid_functions.t
+t/008_areas_and_lengths.t
+t/009_unidirectional.t
+t/010_grid_traversal_functions.t
+t/changes.t
+lib/Geo/H3/FFI.pm
+perl-Geo-H3-FFI.spec
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

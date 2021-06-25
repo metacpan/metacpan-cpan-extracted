@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use v5.10.1;
 
-our $VERSION = '0.005';
+our $VERSION = '0.006';
 
 $VERSION = eval $VERSION;
 
@@ -347,6 +347,8 @@ Peter Mottram (SysPete) <peter@sysnix.com>
 =head1 CONTRIBUTORS
 
 Curtis "Ovid" Poe
+
+Graham Christensen <graham@grahamc.com>
 
 =head1 COPYRIGHT
 

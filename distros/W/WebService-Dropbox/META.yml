@@ -8,7 +8,7 @@ configure_requires:
   Module::Build: '0'
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.0.2, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Minilla/v3.1.12, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,7 +27,7 @@ no_index:
 provides:
   WebService::Dropbox:
     file: lib/WebService/Dropbox.pm
-    version: '2.07'
+    version: '2.09'
   WebService::Dropbox::Auth:
     file: lib/WebService/Dropbox/Auth.pm
   WebService::Dropbox::Files:
@@ -38,6 +38,8 @@ provides:
     file: lib/WebService/Dropbox/Files/ListFolder.pm
   WebService::Dropbox::Files::UploadSession:
     file: lib/WebService/Dropbox/Files/UploadSession.pm
+  WebService::Dropbox::Sharing:
+    file: lib/WebService/Dropbox/Sharing.pm
   WebService::Dropbox::TokenFromOAuth1:
     file: lib/WebService/Dropbox/TokenFromOAuth1.pm
   WebService::Dropbox::Users:
@@ -58,12 +60,15 @@ resources:
   bugtracker: https://github.com/s-aska/p5-WebService-Dropbox/issues
   homepage: https://github.com/s-aska/p5-WebService-Dropbox
   repository: git://github.com/s-aska/p5-WebService-Dropbox.git
-version: '2.07'
+version: '2.09'
 x_authority: cpan:ASKADNA
 x_contributors:
-  - 'Fuji, Goro <g.psy.va@gmail.com>'
-  - 'Rostislav Georgiev <pisaro@mail.bg>'
-  - 'aska <aska@linecorp.com>'
   - 'Dondi Michael Stroma <dstroma@gmail.com>'
+  - 'Fuji, Goro <g.psy.va@gmail.com>'
+  - 'Greg Youngblood <47649208+softwrx@users.noreply.github.com>'
+  - 'Rostislav Georgiev <pisaro@mail.bg>'
   - 'Shinichiro Aska <s.aska.org@gmail.com>'
+  - 'aska <aska@linecorp.com>'
+  - 'aska <aska@nl-plus.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

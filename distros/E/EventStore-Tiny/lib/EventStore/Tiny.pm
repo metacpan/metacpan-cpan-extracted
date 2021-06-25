@@ -2,87 +2,110 @@ package EventStore::Tiny;
 
 use strict;
 use warnings;
+use feature 'signatures';
+no warnings 'experimental::signatures';
+use Carp;
 
 use EventStore::Tiny::Logger;
 use EventStore::Tiny::Event;
-use EventStore::Tiny::DataEvent;
+use EventStore::Tiny::TransformationStore;
 use EventStore::Tiny::EventStream;
 use EventStore::Tiny::Snapshot;
 
 use Clone qw(clone);
-use Storable;
-use Data::Compare; # Exports Compare()
+use IO::File;
+use YAML::Syck;     # Exports Dump(), Load()
+use Data::Compare;  # Exports Compare()
 
-# Enable handling of CODE refs (as event actions are code refs)
-$Storable::Deparse  = 1;
-$Storable::Eval     = 1;
-
-our $VERSION = '0.51';
+our $VERSION = '0.72';
 
 use Class::Tiny {
-    registry        => sub {{}},
     events          => sub {EventStore::Tiny::EventStream->new(
                              logger => shift->logger)},
+    trans_store     => sub {EventStore::Tiny::TransformationStore->new},
     init_data       => sub {{}},
     logger          => sub {EventStore::Tiny::Logger->log_cb},
     slack           => 0, # Default: strict mode
     cache_distance  => 0, # Default: store snapshot each time. no caching: undef
 }, '_cached_snapshot';
 
-# Class method to construct
-sub new_from_file {
-    my (undef, $fn) = @_;
-    return retrieve($fn);
+sub import_events ($self, $fn) {
+
+    # Rerieve
+    my $file    = IO::File->new($fn, 'r');
+    my $yaml    = do {local $/ = undef; <$file>};
+    my $events  = Load $yaml;
+    $file->close;
+
+    # Create
+    my $stream  = EventStore::Tiny::EventStream->new;
+    for my $data (@$events) {
+        $stream->add_event(EventStore::Tiny::Event->new(
+            uuid        => $data->{uuid},
+            timestamp   => $data->{timestamp},
+            name        => $data->{name},
+            trans_store => $self->trans_store,
+            data        => $data->{data},
+        ));
+    }
+
+    # Done
+    $self->events($stream);
 }
 
-sub store_to_file {
-    my ($self, $fn) = @_;
-    return store($self, $fn);
+sub export_events ($self, $fn) {
+
+    # Simplify
+    my @events = ();
+    for my $event (@{$self->events->events}) {
+        push @events, {
+            uuid        => $event->uuid,
+            timestamp   => $event->timestamp,
+            name        => $event->name,
+            data        => $event->data,
+         };
+    }
+
+    # Export
+    my $file = IO::File->new($fn, 'w');
+    print $file Dump(\@events);
+    $file->close;
 }
 
-sub register_event {
-    my ($self, $name, $transformation) = @_;
+sub register_event ($self, $name, $transformation) {
 
-    return $self->registry->{$name} = EventStore::Tiny::Event->new(
-        name            => $name,
-        transformation  => $transformation,
-        logger          => $self->logger,
-    );
+    # Register transformation
+    $self->trans_store->set($name => $transformation);
 }
 
-sub event_names {
-    my $self = shift;
-    return [sort keys %{$self->registry}];
+sub event_names ($self) {
+    return [$self->trans_store->names];
 }
 
-sub store_event {
-    my ($self, $name, $data) = @_;
+sub store_event ($self, $name, $data = undef) {
 
-    # Lookup template event
-    my $template = $self->registry->{$name};
-    die "Unknown event: $name!\n" unless defined $template;
+    # Lookup event type
+    croak "Unknown event: $name!\n"
+        unless defined $self->trans_store->get($name);
 
-    # Specialize event with new data
-    my $event = EventStore::Tiny::DataEvent->new_from_template(
-        $template, $data
+    # Create event
+    my $event = EventStore::Tiny::Event->new(
+        name        => $name,
+        trans_store => $self->trans_store,
+        data        => $data,
     );
 
     # Done
     return $self->events->add_event($event);
 }
 
-sub init_state {
-    my $self = shift;
+sub init_state ($self) {
 
     # Clone init data
     return clone($self->init_data);
 }
 
-sub snapshot {
-    my ($self, $timestamp) = @_;
-
-    # Work on latest timestamp if not specified
-    $timestamp //= $self->events->last_timestamp;
+sub snapshot ($self, $timestamp = $self->events->last_timestamp) {
     my $es = $self->events->before($timestamp);
 
     # Check if the cached snapshot can be used
@@ -127,8 +150,7 @@ sub snapshot {
     return $snapshot;
 }
 
-sub is_correct_snapshot {
-    my ($self, $snapshot) = @_;
+sub is_correct_snapshot ($self, $snapshot) {
 
     # Replay events before snapshot time
     my $our_sn = $self->snapshot($snapshot->timestamp);
@@ -151,27 +173,25 @@ EventStore::Tiny - A minimal event sourcing framework.
 
 <p>
 
-<a href="https://badge.fury.io/pl/EventStore-Tiny">
-    <img alt="CPAN version" src="https://badge.fury.io/pl/EventStore-Tiny.svg"></a>
-<a href="https://travis-ci.org/memowe/EventStore-Tiny">
-    <img alt="Travis CI tests" src="https://travis-ci.org/memowe/EventStore-Tiny.svg?branch=master"></a>
-<a href="https://codecov.io/gh/memowe/EventStore-Tiny">
-    <img alt="Codecov test coverage" src="https://codecov.io/gh/memowe/EventStore-Tiny/branch/master/graph/badge.svg"></a>
-<a href="https://coveralls.io/github/memowe/EventStore-Tiny?branch=master">
-    <img alt="Coveralls test coverage" src="https://coveralls.io/repos/github/memowe/EventStore-Tiny/badge.svg?branch=master"></a>
-<a href="http://cpants.cpanauthors.org/dist/EventStore-Tiny">
-    <img alt="CPANTS kwalitee score" src="https://cpants.cpanauthors.org/dist/EventStore-Tiny.png"></a>
-
-<br><br>
-
-<a href="http://www.cpantesters.org/distro/E/EventStore-Tiny.html?distmat=1">
-    <img alt="CPAN testers reports" src="https://img.shields.io/badge/testers-reports-blue.svg"></a>
-<a href="http://matrix.cpantesters.org/?dist=EventStore-Tiny">
-    <img alt="CPAN testers matrix" src="https://img.shields.io/badge/testers-matrix-blue.svg"></a>
 <a href="https://github.com/memowe/EventStore-Tiny">
     <img alt="GitHub repository" src="https://img.shields.io/badge/github-code-blue.svg"></a>
 <a href="https://github.com/memowe/EventStore-Tiny/issues">
     <img alt="GitHub issue tracker" src="https://img.shields.io/badge/github-issues-blue.svg"></a>
+<a href="https://badge.fury.io/pl/EventStore-Tiny">
+    <img alt="CPAN version" src="https://badge.fury.io/pl/EventStore-Tiny.svg"></a>
+<a href="http://www.cpantesters.org/distro/E/EventStore-Tiny.html?distmat=1">
+    <img alt="CPAN testers reports" src="https://img.shields.io/badge/testers-reports-blue.svg"></a>
+<a href="http://matrix.cpantesters.org/?dist=EventStore-Tiny">
+    <img alt="CPAN testers matrix" src="https://img.shields.io/badge/testers-matrix-blue.svg"></a>
+
+<br><br>
+
+<a href="https://github.com/memowe/EventStore-Tiny/actions/workflows/linux-tests.yml">
+    <img alt="Linux tests" src="https://github.com/memowe/EventStore-Tiny/actions/workflows/linux-tests.yml/badge.svg?branch=main"></a>
+<a href="https://github.com/memowe/EventStore-Tiny/actions/workflows/mac-tests.yml">
+    <img alt="Mac OS tests" src="https://github.com/memowe/EventStore-Tiny/actions/workflows/mac-tests.yml/badge.svg?branch=main"></a>
+<a href="https://github.com/memowe/EventStore-Tiny/actions/workflows/windows-tests.yml">
+    <img alt="Windows tests" src="https://github.com/memowe/EventStore-Tiny/actions/workflows/windows-tests.yml/badge.svg?branch=main"></a>
 
 </p>
 
@@ -184,8 +204,7 @@ EventStore::Tiny - A minimal event sourcing framework.
     my $store = EventStore::Tiny->new;
 
     # Register event type
-    $store->register_event(UserAdded => sub {
-        my ($state, $data) = @_;
+    $store->register_event(UserAdded => sub ($state, $data) {
 
         # Use $data to inject the new user into the given $state
         $state->{users}{$data->{id}} = {
@@ -261,24 +280,23 @@ A subref (callback) which will be called each time an event is applied to the st
 
 =back
 
-=head3 new_from_file
+=head3 import_events
 
-    my $store = EventStore::Tiny->new_from_file($filename);
+    $store->import_events($filename);
 
-Deserializes an existing store object which was L</store_to_file>d before.
+Loads events from a file which was written by L</export_events> before. It replaces an existing event stream in C<$store>. Note: before using the resulting events, the event types need to be registered as the transformations are only referenced.
 
-=head3 store_to_file
+=head3 export_events
 
-    $store->store_to_file($filename);
+    $store->export_events($filename);
 
-Serializes the store object to the file system. It can be deserialized via L</new_from_file> later.
+Serializes the event stream to the file system. It can be imported back via L</import_events> later.
 
 =head2 EVENT SOURCING WORKFLOW
 
 =head3 register_event
 
-    $store->register_event(ConnectionRemoved => sub {
-        my ($state, $data) = @_;
+    $store->register_event(ConnectionRemoved => sub ($state, $data) {
         # Change $state depending on $data (by side-effect)
     });
 
@@ -306,25 +324,25 @@ Returns a L<EventStore::Tiny::Snapshot> object which basically consists of the c
 
     my $types = $store->event_names;
 
-Returns an arrayref containing all event type names of registered events, sorted by name. These names are the values of L</registry>.
-
-=head3 registry
-
-    my $user_added = $store->registry->{UserAdded};
-
-Returns a hashref with event type names as keys and event types as values, which are L<EventStore::Tiny::Event> instances. Should be manipulated by L</register_event> only.
+Returns an arrayref containing all event type names of registered events, sorted by name.
 
 =head3 events
 
     my $event_stream = $store->events;
 
-Returns the internal L<EventStore::Tiny::EventStream> object that stores all concrete events (L<EventStore::Tiny::DataEvent> instances). Should be manipulated by L</store_event> only. Events should never be changed or removed.
+Returns the internal L<EventStore::Tiny::EventStream> object that stores all concrete events (L<EventStore::Tiny::Event> instances). Should be manipulated by L</store_event> only. Events should never be changed or removed.
+
+=head3 trans_store
+
+    my $transformation_store = $store->trans_store
+
+Returns the internal L<EventStore::Tiny::TransformationStore> object that stores all transformation subroutines that events refer to. Should be manipulated by L</register_event> only. The transformation store should never be changed or removed.
 
 =head3 init_state
 
     my $state = $store->init_state;
 
-Returns a cloned copy of the ininitial state all events are applied on, which was defined by L</init_data> as a hashref.
+Returns a cloned copy of the initial state all events are applied on, which was defined by L</init_data> as a hashref.
 
 =head2 SLACK MODE
 
@@ -346,7 +364,7 @@ EventStore::Tiny's source repository is hosted on L<GitHub|https://github.com/me
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2018 L<Mirko Westermeier|http://mirko.westermeier.de> (L<@memowe|https://github.com/memowe>, L<mirko@westermeier.de|mailto:mirko@westermeier.de>)
+Copyright (c) 2018-2021 L<Mirko Westermeier|http://mirko.westermeier.de> (L<@memowe|https://github.com/memowe>, L<mirko@westermeier.de|mailto:mirko@westermeier.de>)
 
 Released under the MIT License (see LICENSE.txt for details).
 

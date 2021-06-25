@@ -71,3 +71,5 @@ isa_ok( $first->parent, 'Module::Generic::Iterator', 'Element parent object clas
 is( $first->pos, 0, "First element position" );
 
 is( $last->pos, 4, "Last element position" );
+
+done_testing();

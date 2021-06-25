@@ -1,9 +1,10 @@
 NAME
-    Text::Table::ASV - Generate TSV
+    Text::Table::ASV - Generate ASV (ASCII separated value a.k.a. DEL a.ka.
+    delimited ASCII)
 
 VERSION
-    This document describes version 0.001 of Text::Table::ASV (from Perl
-    distribution Text-Table-ASV), released on 2018-07-23.
+    This document describes version 0.002 of Text::Table::ASV (from Perl
+    distribution Text-Table-ASV), released on 2021-02-20.
 
 SYNOPSIS
      use Text::Table::ASV;
@@ -59,7 +60,7 @@ SOURCE
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website
-    <https://rt.cpan.org/Public/Dist/Display.html?Name=Text-Table-ASV>
+    <https://github.com/perlancar/perl-Text-Table-ASV/issues>
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.
@@ -77,7 +78,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2018 by perlancar@cpan.org.
+    This software is copyright (c) 2021, 2018 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

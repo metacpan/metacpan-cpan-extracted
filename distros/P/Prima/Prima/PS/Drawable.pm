@@ -45,6 +45,7 @@ sub init
 	my %profile = $self-> SUPER::init(@_);
 	$self-> $_( $profile{$_}) for qw( grayscale rotate reversed );
 	$self-> $_( @{$profile{$_}}) for qw( pageSize pageMargins resolution scale );
+	$self->{fpType} = 'F';
 	return %profile;
 }
 
@@ -57,6 +58,7 @@ sub save_state
 		color backColor fillPattern lineEnd linePattern lineWidth miterLimit
 		rop rop2 textOpaque textOutBaseline font lineJoin fillMode
 	);
+	$self->{save_state}->{fpType} = $self->{fpType};
 	$self-> {save_state}-> {$_} = [$self-> $_()] for qw(
 		translate clipRect
 	);
@@ -69,6 +71,7 @@ sub restore_state
 			rop rop2 textOpaque textOutBaseline font lineJoin fillMode)) {
 		$self-> $_( $self-> {save_state}-> {$_});
 	}
+	$self->{fpType} = $self->{save_state}->{fpType};
 	for ( qw( translate clipRect)) {
 		$self-> $_( @{$self-> {save_state}-> {$_}});
 	}
@@ -386,6 +389,7 @@ sub get_nearest_color    { return $_[1] }
 sub get_physical_palette { return $_[0]-> {grayscale} ? [map { $_, $_, $_ } 0..255] : 0 }
 sub get_handle           { return 0 }
 sub alpha                { 0 }
+sub can_draw_alpha       { 0 }
 
 sub fonts
 {
@@ -505,7 +509,7 @@ sub get_font_abc
 	$last = $first if !defined ($last) || $last < $first;
 	my $canvas = $self-> glyph_canvas;
 	my $scale  = $self->{font_scale} * $self->{font_x_scale};
-	return [ map { $_ * $scale } @{ $canvas->get_font_abc($first, $last, $flags) } ];
+	return [ map { $_ * $scale } @{ $canvas->get_font_abc($first, $last, $flags // 0) } ];
 }
 
 sub get_font_def
@@ -515,7 +519,7 @@ sub get_font_def
 	$last = $first if !defined ($last) || $last < $first;
 	my $canvas = $self-> glyph_canvas;
 	my $scale  = $self->{font_scale};
-	return [ map { $_ * $scale } @{ $canvas->get_font_def($first, $last, $flags) } ];
+	return [ map { $_ * $scale } @{ $canvas->get_font_def($first, $last, $flags // 0) } ];
 }
 
 sub get_font_ranges    { shift->glyph_canvas->get_font_ranges    }
@@ -592,6 +596,30 @@ sub get_text_box
 	}
 
 	return \@ret;
+}
+
+sub text_wrap
+{
+	my ( $self, $text, $width, @rest ) = @_;
+	my $res;
+	my $gc = $self->glyph_canvas;
+	my $x  = $self->{font_scale};
+	if ( $rest[-1] && ((ref($rest[-1]) // '') eq 'Prima::Drawable::Glyphs') && $rest[-1]->advances ) {
+		my $s = $rest[-1];
+		my @save  = ($s->advances, $s->positions);
+		my @clone = map { Prima::array::clone($_) } @save;
+		for my $v ( @clone ) {
+			$_ /= $x for @$v;
+		}
+		$s->[ Prima::Drawable::Glyphs::ADVANCES()  ] = $clone[0];
+		$s->[ Prima::Drawable::Glyphs::POSITIONS() ] = $clone[1];
+		$res = $gc->text_wrap($text, $width / $x, @rest);
+		$s->[ Prima::Drawable::Glyphs::ADVANCES()  ] = $save[0];
+		$s->[ Prima::Drawable::Glyphs::POSITIONS() ] = $save[1];
+	} else {
+		$res = $gc->text_wrap($text, $width / $x, @rest);
+	}
+	return $res;
 }
 
 sub text_shape
@@ -700,7 +728,9 @@ sub _spline
 sub _arc
 {
 	my ( $self, $from, $to, $rel ) = @_;
-	my $cubics = $self->canvas->arc2cubics( 0, 0, 1, 1, $from, $to);
+	my $cubics = $self->canvas->arc2cubics(
+		0, 0, 2, 2,
+		$from, $to);
 
 	if ( $rel ) {
 		my ($lx,$ly) = $self->last_point;
@@ -711,6 +741,7 @@ sub _arc
 		$m->[5] += $ly - $s[1];
 	}
 	my @p = map { $self-> matrix_apply( $_ ) } @$cubics;
+	$_ = [$self-> canvas-> pixel2point(@$_)] for @p;
 	$self-> set_current_point( @{$p[0]}[0,1] );
 	my $cmd = $self->dict->{curveto};
 	$self-> emit( @{$_}[2..7], $cmd) for @p;

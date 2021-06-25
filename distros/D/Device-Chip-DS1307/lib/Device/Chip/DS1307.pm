@@ -4,9 +4,9 @@
 #  (C) Paul Evans, 2015-2020 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.19;
+use Object::Pad 0.41;
 
-package Device::Chip::DS1307 0.04;
+package Device::Chip::DS1307 0.05;
 class Device::Chip::DS1307
    extends Device::Chip::Base::RegisteredI2C;
 
@@ -31,12 +31,7 @@ F<Maxim Integrated> F<DS1307> chip attached to a computer via an I²C adapter.
 
 =cut
 
-has $_address;
-
-BUILD ( %params )
-{
-   $_address = $params{address} // DEFAULT_ADDR;
-}
+has $_address :param = DEFAULT_ADDR;
 
 method I2C_options
 {

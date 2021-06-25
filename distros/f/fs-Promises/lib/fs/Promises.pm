@@ -11,6 +11,8 @@ no warnings qw/
 # Core
 use File::Spec           ();
 
+use Scalar::Util         ();
+
 use AnyEvent::XSPromises ();
 use POSIX::AtFork        ();
 POSIX::AtFork->add_to_child(sub {
@@ -21,11 +23,17 @@ POSIX::AtFork->add_to_child(sub {
 use Ref::Util             ();
 use Hash::Util::FieldHash ();
 
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 
 my sub deferred { AnyEvent::XSPromises::deferred() }
 my sub resolved { AnyEvent::XSPromises::resolved(@_) }
 my sub rejected { AnyEvent::XSPromises::rejected(@_) }
+
+my sub errno {
+    my $e_num = 0 + $!;
+    my $e_str = "$!";
+    return Scalar::Util::dualvar( $e_num, $e_str );
+}
 
 use Exporter 'import';
 our @EXPORT_OK = qw(
@@ -104,7 +112,7 @@ sub open {
     my $deferred = deferred();
     IO::AIO::aio_open($abs_file, $mode, 0, sub ($fh=undef) {
         if ( !$fh ) {
-            $deferred->reject($!);
+            $deferred->reject(errno());
             return;
         }
         $deferred->resolve($fh);
@@ -116,7 +124,7 @@ my sub _arg_is_fh {
     &_drop_self;
     my $cb                   = shift;
     my $deferred             = deferred();
-    $cb->(@_, sub { $deferred->resolve(@_) });
+    $cb->(@_, sub { $_[0] < 0 ? $deferred->reject(errno()) : $deferred->resolve(@_) });
     return $deferred->promise;
 }
 
@@ -146,14 +154,38 @@ my sub _arg_is_fh_or_file {
     my $fh_or_maybe_rel_path = shift;
     my $fh_or_abs_path       = _ensure_globref_or_absolute_path($fh_or_maybe_rel_path);
     my $deferred             = deferred();
-    push @_, sub { $deferred->resolve(@_) };
+    push @_, sub { $_[0] < 0 ? $deferred->reject(errno()) : $deferred->resolve(@_) };
+    $cb->($fh_or_abs_path, @_);
+    return $deferred->promise;
+}
+
+my sub _wrap_stat_and_lstat {
+    &_drop_self;
+    my $cb                   = shift;
+    my $fh_or_maybe_rel_path = shift;
+    my $fh_or_abs_path       = _ensure_globref_or_absolute_path($fh_or_maybe_rel_path);
+    my $deferred             = deferred();
+    push @_, sub {
+        my $stat_status  = shift;
+        if ( $stat_status ) {
+            # non-zero status for stat; the call failed, so the pseudo-handle _ will hold nothing
+            # of interest
+            $deferred->reject(errno());
+            return;
+        }
+
+        # Get the cached (l)stat results (calling stat or lstat here doesn't matter, since
+        # it just gets whatever is cached in _):
+        my $stat_results = [ stat(_) ];
+        $deferred->resolve($stat_results);
+    };
     $cb->($fh_or_abs_path, @_);
     return $deferred->promise;
 }
 
 
-sub stat     { lazily_require_aio(); _arg_is_fh_or_file(\&IO::AIO::aio_stat,     @_) }
-sub lstat    { lazily_require_aio(); _arg_is_fh_or_file(\&IO::AIO::aio_lstat,    @_) }
+sub stat     { lazily_require_aio(); _wrap_stat_and_lstat(\&IO::AIO::aio_stat,     @_) }
+sub lstat    { lazily_require_aio(); _wrap_stat_and_lstat(\&IO::AIO::aio_lstat,    @_) }
 sub utime    { lazily_require_aio(); _arg_is_fh_or_file(\&IO::AIO::aio_utime,    @_) }
 sub chown    { lazily_require_aio(); _arg_is_fh_or_file(\&IO::AIO::aio_chown,    @_) }
 sub truncate { lazily_require_aio(); _arg_is_fh_or_file(\&IO::AIO::aio_truncate, @_) }
@@ -165,7 +197,9 @@ my sub _arg_is_two_paths {
     my $cb                         = shift;
     my ($first_path, $second_path) = map File::Spec->rel2abs($_), shift, shift;
     my $deferred                   = deferred();
-    $cb->($first_path, $second_path, @_, sub { $deferred->resolve(@_) });
+    $cb->($first_path, $second_path, @_, sub {
+        $_[0] < 0 ? $deferred->reject(errno()) : $deferred->resolve(@_)
+    });
     return $deferred->promise;
 }
 
@@ -181,7 +215,9 @@ my sub _arg_is_single_path {
     my $cb         = shift;
     my $first_path = File::Spec->rel2abs(shift);
     my $deferred   = deferred();
-    $cb->($first_path, @_, sub { $deferred->resolve(@_) });
+    $cb->($first_path, @_, sub {
+        $_[0] < 0 ? $deferred->reject(errno()) : $deferred->resolve(@_)
+    });
     return $deferred->promise;
 }
 sub readlink { _arg_is_single_path(\&IO::AIO::aio_readlink, @_) }
@@ -196,8 +232,8 @@ sub slurp {
     my $deferred  = deferred();
     my $buffer    = '';
     IO::AIO::aio_slurp($file, 0, 0, $buffer, sub {
-        if ( $_[0] <= 0 ) {
-            $deferred->reject($!);
+        if ( $_[0] < 0 ) { # will be 0 if the file was empty
+            $deferred->reject(errno());
             return;
         }
         $deferred->resolve($buffer);
@@ -347,6 +383,39 @@ fs::Promises - Promises interface to nonblocking file system operations
 C<fs::Promises> is a promises layer around L<AnyEvent::AIO>.  If your code
 is using promises, then you can use this module to do fs-based stuff in
 an asynchronous way.
+
+=head1 DEALING WITH ERRORS
+
+In standard Perl land, syscalls like the ones exposed here generally have
+this interface:
+
+    foo() or die "$!"
+
+That is, you invoke the sycall, and it returns false if the underlaying
+operation failed, setting C<$ERRNO / $!> in the process.
+
+C<$!> doesn't quite cut it for promises, because by the time your callback
+is invoked, it is entirely possible for something else to have run, which
+has now wiped C<$!>.
+
+So instead, all the interfaces here follow the same rough pattern:
+
+    foo()->then(sub ($success_result) { ... })
+         ->catch(sub ($errno)         { ... })
+
+The real example:
+
+    stat_promise($file)->then(
+        sub ($stat_results) {
+            # $stat_results has the same 13-element list as 'stat()'
+        },
+        sub ($errno) {
+            my $e_num = 0 + $errno;
+            my $e_str = "$errno";
+            warn "stat($file) failed: '$e_str' ($e_num)";
+            return;
+        }
+    );
 
 =cut
 

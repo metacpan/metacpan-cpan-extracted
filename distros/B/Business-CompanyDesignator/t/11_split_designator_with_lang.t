@@ -6,6 +6,7 @@ use utf8;
 use open qw(:std :utf8);
 use Test::More;
 use YAML qw(LoadFile);
+use Encode qw(decode);
 use Data::Dump qw(dd pp dump);
 
 use FindBin qw($Bin);
@@ -17,7 +18,14 @@ my $data = LoadFile("$Bin/t10/data.yml");
 my ($bcd, $bcd_data, $records);
 
 # Allow running just a single set of tests
-my $only = @ARGV ? $ARGV[0] : undef;
+my ($only, $match);
+if (@ARGV) {
+  if ($ARGV[0] =~ /^\d+$/) {
+    $only = $ARGV[0];
+  } else {
+    $match = join ' ', map { decode('UTF-8', $_, Encode::FB_CROAK) } @ARGV;
+  }
+}
 
 ok($bcd = Business::CompanyDesignator->new, 'constructor ok');
 ok($bcd_data = $bcd->data, 'data method ok');
@@ -26,6 +34,7 @@ my $i = 3;
 for my $t (@$data) {
   die "Entry has no 'lang' attribute: " . dump($t) if ! $t->{lang};
   next if $t->{skip};
+  next if $match && $t->{name} !~ /$match/o;
 
   my $exp_before    = $t->{before}  // '';
   my $exp_des       = $t->{des}     // '';

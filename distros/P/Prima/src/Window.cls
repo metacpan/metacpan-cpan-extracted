@@ -27,7 +27,6 @@ object Prima::Window( Prima::Widget)
 	property Bool     selected;
 	property Point    size;
 	property Bool     taskListed;
-	property SV *     text;
 	property Bool     transparent;
 	property int      windowState;
 
@@ -36,8 +35,8 @@ object Prima::Window( Prima::Widget)
 	method   void     cleanup();
 	method   void     done();
 	method   void     end_modal();
-	method   int      execute( Handle insertBefore = nilHandle);
-	method   Bool     execute_shared( Handle insertBefore = nilHandle);
+	method   int      execute( Handle insertBefore = NULL_HANDLE);
+	method   Bool     execute_shared( Handle insertBefore = NULL_HANDLE);
 	method   SV   *   get_client_handle();
 	static   Font     get_default_menu_font( char * dummy = "");
 	method   Handle   get_horizon();
@@ -52,6 +51,7 @@ object Prima::Window( Prima::Widget)
 	import   SV *     profile_default ();
 	method   void     set( HV * profile);
 	method   void     set_menu_font( Font font);
+	method   void     set_text( SV * text);
 	c_only   void     update_sys_handle( HV * profile);
 	c_only   Bool     validate_owner( Handle * newOwner, HV * profile);
 #	private

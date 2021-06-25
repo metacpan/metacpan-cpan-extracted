@@ -5,8 +5,10 @@ use warnings;
 use Carp qw(croak);
 use Math::DifferenceSet::Planar::Data;
 use Math::BigInt try => 'GMP';
-use Math::Prime::Util
-    qw(is_power is_prime_power euler_phi factor_exp gcd mulmod addmod);
+use Math::Prime::Util qw(
+    is_power is_prime_power euler_phi factor gcd
+    mulmod addmod invmod powmod
+);
 
 # Math::DifferenceSet::Planar=ARRAY(...)
 # ........... index ...........     # ........... value ...........
@@ -22,12 +24,13 @@ use constant _F_PEAK      =>  8;    # peak elements arrayref, initially undef
 use constant _F_ETA       =>  9;    # "eta" value, initially undef
 use constant _NFIELDS     => 10;
 
-our $VERSION = '0.013';
+our $VERSION = '0.014';
 
 our $_LOG_MAX_ORDER  = 22.1807;         # limit for integer exponentiation
 our $_MAX_ENUM_COUNT = 32768;           # limit for stored rotator set size
 our $_MAX_MEMO_COUNT = 4096;            # limit for memoized values
 our $_DEFAULT_DEPTH  = 1024;            # default check_elements() depth
+our $_USE_SPACES_DB  = 1;               # enable looking up rotators
 
 my $current_data = undef;               # current M::D::P::Data object
 
@@ -50,40 +53,91 @@ sub _multipliers {
     return @mult;
 }
 
-# return complete rotator base if small enough, otherwise undef
+# return complete rotator base if known or small enough, otherwise undef
+#
+# If structure is known:
+#
+# rotators -> +-----------+
+#             | radices ----------------------------> +-------+
+#             +-----------+                           |  r_1  |
+#             | depths  -----------------> +-------+  +-------+
+#             +-----------+                |  d_1  |  |  r_2  |
+#             | inverses -----> +-------+  +-------+  +-------+
+#             +-----------+     |  i_1  |  |  d_2  |  |  ...  |
+#                               +-------+  +-------+  +-------+
+#                               |  i_2  |  |  ...  |  |  r_n  |
+#                               +-------+  +-------+  +-------+
+#                               |  ...  |  |  d_n  |
+#                               +-------+  +-------+
+#                               |  i_n  |
+#                               +-------+
+#
+#                         n
+#                        ___      j
+#   R               _    | |   r   k             0  <  j   <  d
+#    j j ...j       =    | |    k      (mod M),     =   k      k
+#     1 2    n
+#                       k = 1
+#
+#         d  - 1   _
+#   i  r   k       =   1  (mod M),   d   >  d   >  ...  >  d   >  2
+#    k  k                             1  =   2  =       =   n  =
+#
+#
+# Otherwise, if number of rotators is small:
+#
+# rotators -> +-------+-------+--   --+-------+
+#             |  R_1  |  R_2  |  ...  |  R_N  |
+#             +-------+-------+--   --+-------+
+#
 sub _rotators {
     my ($this) = @_;
-    my (           $base,   $exponent,   $modulus,   $rotators) =
-        @{$this}[_F_BASE, _F_EXPONENT, _F_MODULUS, _F_ROTATORS];
+    my (           $base,   $exponent,   $order,   $modulus,   $rotators) =
+        @{$this}[_F_BASE, _F_EXPONENT, _F_ORDER, _F_MODULUS, _F_ROTATORS];
     return $rotators if @{$rotators};
+    my $space = $_USE_SPACES_DB && $this->_data->get_space($order);
+    if ($space) {
+        my ($radices, $depths) = $space->rotator_space;
+        my $inverses = [
+            map {
+                invmod(
+                    powmod($radices->[$_], $depths->[$_] - 1, $modulus),
+                    $modulus
+                )
+            } 0 .. $#{$radices}
+        ];
+        $rotators = $this->[_F_ROTATORS] = [$radices, $depths, $inverses];
+        return $rotators;
+    }
     return undef if $this->[_F_N_PLANES] > $_MAX_ENUM_COUNT;
     my @mult = _multipliers($base, $exponent, $modulus);
-    my @sieve = (1) x $modulus;
-    @sieve[@mult] = ();
+    my $sieve = '1' x $modulus;
+    substr($sieve, $_, 1) = '0' for @mult;
     @{$rotators} = (1);
     for (my $x = 2; $x < $modulus ; ++$x) {
-        if ($sieve[$x]) {
+        if (substr $sieve, $x, 1) {
             if (0 == $modulus % $x) {
                 for (my $i = $x; $i < $modulus; $i += $x) {
-                    undef $sieve[$i];
+                    substr($sieve, $i, 1) = '0';
                 }
                 next;
             }
-            @sieve[ map { mulmod($_, $x, $modulus) } @mult ] = ();
+            substr($sieve, $_, 1) = '0'
+                for map { mulmod($_, $x, $modulus) } @mult;
             push @{$rotators}, $x;
         }
     }
     return $rotators;
 }
 
-# iterative rotator base generator
+# iterative rotator base generator, slow, but memory efficient
 sub _sequential_rotators {
     my ($this) = @_;
-    my (          $base,  $exponent,  $modulus,  $n_planes) =
+    my (           $base,   $exponent,   $modulus,   $n_planes) =
         @{$this}[_F_BASE, _F_EXPONENT, _F_MODULUS, _F_N_PLANES];
     my @mult = _multipliers($base, $exponent, $modulus);
     shift @mult;
-    my @pf = map { $_->[0] } factor_exp($modulus);
+    my @pf = factor($modulus);
     pop @pf if $pf[-1] == $modulus;
     my $mx = 0;
     my $x  = 0;
@@ -101,6 +155,33 @@ sub _sequential_rotators {
             ++$mx;
             return $x;
         }
+    };
+}
+
+# structured rotator base iterator, time and space efficient
+sub _structured_rotators {
+    my ($this) = @_;
+    my $modulus = $this->[_F_MODULUS];
+    my ($radices, $depths, $inverses) = @{ $this->[_F_ROTATORS] };
+    my @index = (0) x @{$radices};
+    my $next = 1;
+    return sub {
+        return 0 if !$next;
+        my $element = $next;
+        my $i = 0;
+        while ($i < @index) {
+            if (++$index[$i] < $depths->[$i]) {
+                $next = mulmod($next, $radices->[$i], $modulus);
+                return $element;
+            }
+        }
+        continue {
+            $index[$i] = 0;
+            $next = mulmod($next, $inverses->[$i], $modulus);
+            ++$i;
+        }
+        $next = 0;
+        return $element;
     };
 }
 
@@ -138,10 +219,11 @@ sub _sort_elements {
 }
 
 #      0  1  2  3  4  5  6  7
-#     28 29 31 41  3  7 14 25 
+#     28 29 31 41  3  7 14 25
 #      L        X           H
 #                  L  X     H
 #                 LX  H
+# get index of smallest element (using bisection)
 sub _index_min {
     my ($elements) = @_;
     my ($lx, $hx) = (0, $#$elements);
@@ -190,6 +272,14 @@ sub available {
     return !!$pds && (!defined($exponent) || $base == $pds->base);
 }
 
+# print "ok" if Math::DifferenceSet::Planar->known_space(9);
+sub known_space {
+    my ($class, $order) = @_;
+    return undef if $order <= 0 || $order > $class->_data->sp_max_order;
+    my $spc = $class->_data->get_space($order);
+    return !!$spc;
+}
+
 # $ds = Math::DifferenceSet::Planar->new(9);
 # $ds = Math::DifferenceSet::Planar->new(3, 2);
 sub new {
@@ -221,7 +311,7 @@ sub from_elements {
     my ($base, $exponent);
     $exponent    = is_prime_power($order, \$base)
         or croak "this implementation cannot handle order $order";
-    my $modulus  = $order * ($order + 1) + 1;
+    my $modulus  = ($order + 1) * $order + 1;
     if (grep { $_ < 0 || $modulus <= $_ } @_) {
         my $max = $modulus - 1;
         croak "element values inside range 0..$max expected";
@@ -256,7 +346,7 @@ sub verify_elements {
     my ($class, @elements) = @_;
     my $order   = $#elements;
     return undef if $order <= 1;
-    my $modulus = $order * ($order + 1) + 1;
+    my $modulus = ($order + 1) * $order + 1;
     my $median  = ($modulus - 1) / 2;
     my $seen    = '0' x $median;
     foreach my $r1 (@elements) {
@@ -278,7 +368,7 @@ sub check_elements {
     my ($class, $elem_listref, $depth, $factor) = @_;
     my $order        = $#{$elem_listref};
     return undef if $order <= 1;
-    my $modulus      = $order * ($order + 1) + 1;
+    my $modulus      = ($order + 1) * $order + 1;
     my $median       = ($modulus - 1) / 2;
     $depth           = $median <= $_DEFAULT_DEPTH? $median: $_DEFAULT_DEPTH
         if !$depth;
@@ -359,11 +449,23 @@ sub iterate_available_sets {
     };
 }
 
-# $om = Math::DifferenceSet::Planar->available_max_order;
-sub available_max_order { __PACKAGE__->_data->max_order }
+# $min = Math::DifferenceSet::Planar->available_min_order;
+sub available_min_order   { $_[0]->_data->min_order }
 
-# $om = Math::DifferenceSet::Planar->available_count;
-sub available_count { __PACKAGE__->_data->count }
+# $max = Math::DifferenceSet::Planar->available_max_order;
+sub available_max_order   { $_[0]->_data->max_order }
+
+# $count = Math::DifferenceSet::Planar->available_count;
+sub available_count       { $_[0]->_data->count }
+
+# $min = Math::DifferenceSet::Planar->known_space_min_order;
+sub known_space_min_order { $_[0]->_data->sp_min_order }
+
+# $max = Math::DifferenceSet::Planar->known_space_max_order;
+sub known_space_max_order { $_[0]->_data->sp_max_order }
+
+# $count = Math::DifferenceSet::Planar->known_space_count;
+sub known_space_count     { $_[0]->_data->sp_count }
 
 # ----- object methods -----
 
@@ -418,6 +520,7 @@ sub iterate_rotators {
     my ($this) = @_;
     my $rotators = $this->_rotators;
     return $this->_sequential_rotators if !$rotators;
+    return $this->_structured_rotators if 'ARRAY' eq ref $rotators->[0];
     my $mx = 0;
     return sub { $mx < @{$rotators}? $rotators->[$mx++]: 0 };
 }
@@ -546,7 +649,7 @@ Math::DifferenceSet::Planar - object class for planar difference sets
 
 =head1 VERSION
 
-This documentation refers to version 0.013 of Math::DifferenceSet::Planar.
+This documentation refers to version 0.014 of Math::DifferenceSet::Planar.
 
 =head1 SYNOPSIS
 
@@ -610,8 +713,9 @@ This documentation refers to version 0.013 of Math::DifferenceSet::Planar.
     $m = $ds->modulus;
     print "$o\t$m\n";
   }
-  $om = Math::DifferenceSet::Planar->available_max_order;
-  $ns = Math::DifferenceSet::Planar->available_count;
+  $min   = Math::DifferenceSet::Planar->available_min_order;
+  $max   = Math::DifferenceSet::Planar->available_max_order;
+  $count = Math::DifferenceSet::Planar->available_count;
 
 =head1 DESCRIPTION
 
@@ -770,15 +874,15 @@ provide only uniqe differences and thus pass the test.
 
 The return value is 2 if the set is proven to be correct, 1 if it is
 probably correct, a false but defined value if it is proven to be not
-correct and undef if it is not even a set of non-negative integers of
-appropriate size.
+correct and undef if it is not even a set of distinct non-negative
+integers of appropriate size.
 
 An optional third argument I<$factor> controls the check whether the given
-factor is a multiplier.  For planar difference sets this module
-generates, I<order_base> is indeed a multiplier.  Thus this combined
-check should give a good heuristic whether a given set is actually
-representing a planar difference set related to a finite field like the
-ones generated by this module.
+factor is a multiplier.  For planar difference sets this module generates,
+I<order_base> is indeed a multiplier.  Thus this combined check should
+give a good heuristic whether a given set is actually representing a
+planar difference set related to a finite field like the ones generated
+by this module.
 
 If the factor is not specified, the check will be performed with a
 suitable multiplier, i.e. the smallest base the order is a power of.
@@ -824,6 +928,12 @@ it is taken as zero.  If C<$hi> is omitted or not defined, it is taken
 as plus infinity.  If C<$lo> is greater than C<$hi>, they are swapped
 and the sequence is reversed, so that it is ordered by descending size.
 
+=item I<available_min_order>
+
+The class method C<Math::DifferenceSet::Planar-E<gt>available_min_order>
+returns the order of the smallest sample planar difference set currently
+known to the module.
+
 =item I<available_max_order>
 
 The class method C<Math::DifferenceSet::Planar-E<gt>available_max_order>
@@ -835,6 +945,37 @@ known to the module.
 The class method C<Math::DifferenceSet::Planar-E<gt>available_count>
 returns the number of sample planar difference sets currently known to
 the module.
+
+=item I<known_space>
+
+The class method C<Math::DifferenceSet::Planar-E<gt>known_space($order)>
+returns a positive integer if pre-computed rotator space information for
+order C<$order> is available to the module, otherwise zero.  Currently,
+in case of availability, the integer number is the number of radices
+used for difference set plane enumeration.  For sets with known space,
+I<iterate_planes> and I<iterate_rotators> will be more efficient than
+otherwise.
+
+The precise meaning of non-zero values returned by I<known_space> is
+implementation specific and should not be relied upon.
+
+=item I<known_space_min_order>
+
+The class method C<Math::DifferenceSet::Planar-E<gt>known_space_min_order>
+returns the smallest order of pre-computed rotator space information
+available to the module, if any, otherwise C<undef>.
+
+=item I<known_space_max_order>
+
+The class method C<Math::DifferenceSet::Planar-E<gt>known_space_max_order>
+returns the maximum order of pre-computed rotator space information
+available to the module, if any, otherwise zero.
+
+=item I<known_space_count>
+
+The class method C<Math::DifferenceSet::Planar-E<gt>known_space_count>
+returns the number of records of pre-computed rotator space information
+available to the module, for statistics.
 
 =item I<set_database>
 
@@ -896,6 +1037,13 @@ If C<$ds> is a planar difference set object, C<$ds-E<gt>iterate_planes>
 returns a code reference that, repeatedly called, returns all canonized
 planar difference sets of the same size, generated using a rotator base,
 one by one.  The iterator returns a false value when it is exhausted.
+
+The succession of sets returned by I<iterate_planes> may come in any
+implementation-specific order.  If I<iterate_planes> is repeatedly called
+within one program run, the same difference set will always yield the
+same sequence of planes, however.  Multiple iterators will each have an
+individual state and run independently, even if generated from the same
+sample difference set.
 
 =back
 
@@ -994,7 +1142,7 @@ C<($e1, $e2) = $ds-E<gt>find_delta( ($ds-E<gt>modulus - 1) / 2 )>
 =item I<eta>
 
 The prime power conjecture of planar difference sets states that any
-such set has prime power order.  This is would also be implied by the
+such set has prime power order.  This would also be implied by the
 stronger conjecture that all finite projective planes have prime power
 order.  Another conjecture asserts that the prime number is a multiplier
 of the set.  Thus multiplying the set by the prime is equivalent to
@@ -1002,10 +1150,10 @@ a translation.  The translation amount is called I<eta> here and the
 method I<eta> returns its value.
 
 Technically, C<$ds-E<gt>eta> is equivalent to
-C<$ds-E<gt>multiply($ds-E<gt>order_base)-E<gt>element(0) >
-C<- $ds-E<gt>element(0)>, wich would still be defined if one of the
-conjectures was proven wrong, though not quite meaningful if the
-multiplication result was on a different plane.
+C<$ds-E<gt>multiply($ds-E<gt>order_base)-E<gt>element(0)-$ds-E<gt>element(0)>,
+wich would still be defined if one of the conjectures was proven wrong,
+though not quite meaningful if the multiplication result was on a
+different plane.
 
 =item I<contains>
 

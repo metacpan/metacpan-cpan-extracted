@@ -17,7 +17,7 @@ use HTTP::Date;
 use HTTP::Status qw/ :constants /;
 use JSON::MaybeXS 1.004000;
 
-our $VERSION = 'v0.2.0';
+our $VERSION = 'v0.2.1';
 
 
 sub prepare_app {
@@ -113,11 +113,11 @@ Plack::Middleware::TrafficAdvice - handle requests for /.well-known/traffic-advi
 
 =head1 VERSION
 
-version v0.2.0
+version v0.2.1
 
 =head1 SYNOPSIS
 
-  use JSON::MaybeXS;
+  use JSON::MaybeXS 1.004000;
   use Plack::Builder;
 
   builder {
@@ -139,7 +139,7 @@ version v0.2.0
 This middle provides a handler for requests for C</.well-known/traffic-advice>.
 
 You must specify either a L</file> or L</data> containing the traffic
-advice information.
+advice information. (There is no default value.)
 
 =head1 ATTRIBUTES
 

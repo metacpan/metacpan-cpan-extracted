@@ -4,13 +4,13 @@
       "Oleg G <oleg@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Mojo-SMTP-Client",
    "no_index" : {
@@ -32,7 +32,8 @@
       },
       "runtime" : {
          "requires" : {
-            "Mojolicious" : "7.53"
+            "Mojo::IOLoop::Delay" : "0",
+            "Mojolicious" : "9"
          }
       }
    },
@@ -42,6 +43,6 @@
          "url" : "https://github.com/olegwtf/p5-Mojo-SMTP-Client"
       }
    },
-   "version" : "0.18",
-   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+   "version" : "0.19",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

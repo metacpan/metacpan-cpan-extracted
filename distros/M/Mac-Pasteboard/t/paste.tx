@@ -62,6 +62,27 @@ foreach my $args (
 
     # NON-ASCII BELOW HERE
 
+    note <<'EOD';
+
+The following tests with LATIN SMALL LETTER E WITH ACUTE were added as
+a result of reading Felipe Gasper's blog entry "Perl's SvPV Menace" at
+https://dev.to/fgasper/perl-s-svpv-menace-5515
+EOD
+
+    $data = chr 0xC3;	# LATIN SMALL LETTER E WITH ACUTE
+
+    $pb->clear();
+    utf8::downgrade( $data );
+    $pb->copy( $data );
+    test_paste scalar $pb->paste(), $data,
+	"Retrieve downgraded LATIN SMALL LETTER E WITH ACUTE from $where with copy.";
+
+    $pb->clear();
+    utf8::upgrade( $data );
+    $pb->copy( $data );
+    test_paste scalar $pb->paste(), $data,
+	"Retrieve upgraded LATIN SMALL LETTER E WITH ACUTE from $where with copy.";
+
     $pb->clear();
     $data = chr 0x3a3;	# GREEK CAPITAL LETTER SIGMA
     $pb->copy ($data);

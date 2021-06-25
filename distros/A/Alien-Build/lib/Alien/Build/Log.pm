@@ -6,7 +6,7 @@ use 5.008004;
 use Carp ();
 
 # ABSTRACT: Alien::Build logging
-our $VERSION = '2.40'; # VERSION
+our $VERSION = '2.41'; # VERSION
 
 
 my $log_class;
@@ -63,7 +63,7 @@ Alien::Build::Log - Alien::Build logging
 
 =head1 VERSION
 
-version 2.40
+version 2.41
 
 =head1 SYNOPSIS
 
@@ -71,7 +71,7 @@ Create your custom log class:
 
  package Alien::Build::Log::MyLog;
  
- use base qw( Alien::Build::Log );
+ use parent qw( Alien::Build::Log );
  
  sub log
  {
@@ -200,6 +200,8 @@ Shawn Laffan (SLAFFAN)
 Paul Evans (leonerd, PEVANS)
 
 Håkon Hægland (hakonhagland, HAKONH)
+
+nick nauwelaerts (INPHOBIA)
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -1,24 +1,30 @@
 ---
-abstract: unknown
+abstract: 'random password generator based on FIPS-181'
 author:
-  - unknown
+  - 'John Porter <jdporter@cpan.org>'
 build_requires:
-  ExtUtils::MakeMaker: '0'
+  Test::More: '0.88'
 configure_requires:
   ExtUtils::MakeMaker: '0'
-dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.141170'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Crypt-RandPasswd
-no_index:
-  directory:
-    - t
-    - inc
 requires:
+  Getopt::Long: '0'
+  constant: '0'
   perl: '5.006'
+  strict: '0'
+  vars: '0'
+  warnings: '0'
 resources:
-  repository: git://github.com/neilbowers/Crypt-RandPasswd.git
-version: '0.06'
+  bugtracker: https://github.com/cpan-janitor/Crypt-RandPasswd/issues
+  homepage: https://github.com/cpan-janitor/Crypt-RandPasswd
+  repository: https://github.com/cpan-janitor/Crypt-RandPasswd.git
+version: '0.07'
+x_generated_by_perl: v5.28.2
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

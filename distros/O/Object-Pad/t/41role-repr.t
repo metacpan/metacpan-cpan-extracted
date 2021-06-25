@@ -15,7 +15,7 @@ package Base::HASH {
    sub new { bless {}, shift }
 }
 
-class Derived::HASH extends Base::HASH implements ARole {
+class Derived::HASH isa Base::HASH does ARole {
 }
 
 {
@@ -28,7 +28,7 @@ package Base::ARRAY {
    sub new { bless [], shift }
 }
 
-class Derived::ARRAY extends Base::ARRAY implements ARole {
+class Derived::ARRAY isa Base::ARRAY does ARole {
 }
 
 {

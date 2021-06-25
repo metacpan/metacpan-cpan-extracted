@@ -2,8 +2,8 @@ NAME
     Config::IOD::Reader - Read IOD/INI configuration files
 
 VERSION
-    This document describes version 0.342 of Config::IOD::Reader (from Perl
-    distribution Config-IOD-Reader), released on 2019-01-17.
+    This document describes version 0.343 of Config::IOD::Reader (from Perl
+    distribution Config-IOD-Reader), released on 2021-06-23.
 
 SYNOPSIS
      use Config::IOD::Reader;
@@ -86,6 +86,9 @@ EXPRESSION
     Code will be compiled using Perl's "eval()" in the
     "Config::IOD::Expr::_Compiled" namespace, with "no strict", "no
     warnings".
+
+CONTRIBUTOR
+    Steven Haryanto <sharyanto@cpan.org>
 
 ATTRIBUTES
   default_section => str (default: "GLOBAL")
@@ -181,7 +184,7 @@ ATTRIBUTES
     encoding, you'll also need to set "enable_expr" to 1.
 
   enable_expr => bool (default: 0)
-    Whether to enable "expr" encoding. By default this is turned on, for
+    Whether to enable "expr" encoding. By default this is turned off, for
     safety. Please see "EXPRESSION" for more details.
 
   allow_directives => array
@@ -303,8 +306,8 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019, 2018, 2017, 2016, 2015, 2014 by
-    perlancar@cpan.org.
+    This software is copyright (c) 2021, 2019, 2018, 2017, 2016, 2015, 2014
+    by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

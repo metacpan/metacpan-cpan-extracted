@@ -1,0 +1,28 @@
+---
+abstract: 'ckeys keyword'
+author:
+  - unknown
+build_requires:
+  ExtUtils::CBuilder: '0'
+  Test::More: '0.88'
+configure_requires:
+  Module::Build: '0.4004'
+  XS::Parse::Keyword::Builder: '0.08'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Syntax-Keyword-Combine-Keys
+provides:
+  Syntax::Keyword::Combine::Keys:
+    file: lib/Syntax/Keyword/Combine/Keys.pm
+    version: '0.09'
+requires:
+  XS::Parse::Keyword: '0.08'
+  perl: '5.014'
+resources:
+  license: http://dev.perl.org/licenses/
+version: '0.09'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

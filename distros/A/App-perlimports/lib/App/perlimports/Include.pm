@@ -2,7 +2,7 @@ package App::perlimports::Include;
 
 use Moo;
 
-our $VERSION = '0.000009';
+our $VERSION = '0.000012';
 
 use App::perlimports::ExportInspector ();
 use Class::Inspector                  ();
@@ -669,7 +669,7 @@ App::perlimports::Include - Encapsulate one use statement in a document
 
 =head1 VERSION
 
-version 0.000009
+version 0.000012
 
 =head1 METHODS
 

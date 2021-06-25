@@ -1,0 +1,31 @@
+2.000000 - 2021-06-17
+
+  * rework Alien::SNMP::MAXTC in Alien::SNMP::MIBDEV
+  * move to net::snmp 5.8 as base
+  * drop MAXTC patching
+  * patch MAX_IMPORTS to 512
+  * general cleanup
+
+1.001000 - 2020-05-01
+
+  * Fix Alien dependencies spec (thibaultduponchelle)
+
+1.000001 - 2017-08-12
+
+  * Merged master
+
+1.000000 - 2017-08-12
+
+  * CPAN release
+
+0.030000 - 2017-04-14
+
+  * Move net-snmp upstream to another repo
+
+0.020000 - 2017-03-06
+
+  * Create Alien::SNMP::MAXTC
+
+0.010000 - 2015-10-16
+
+  * First version, initial release

@@ -9,7 +9,7 @@ use Scalar::Util qw( dualvar );
 use Carp qw( croak );
 
 # ABSTRACT: Custom platypus type for dealing with C enumerated types
-our $VERSION = '0.05'; # VERSION
+our $VERSION = '0.06'; # VERSION
 
 
 our @CARP_NOT = qw( FFI::Platypus );
@@ -27,6 +27,9 @@ sub ffi_custom_type_api_1
   my $prefix = defined $config{prefix} ? $config{prefix} : '';
   $config{rev} ||= 'str';
   ($config{rev} =~ /^(int|str|dualvar)$/) or croak("rev must be either 'int', 'str', or 'dualvar'");
+
+  $config{casing} ||= 'upper';
+  ($config{casing} =~ /^(upper|keep)$/) or croak("casing must be either 'upper' or 'keep'");
 
   foreach my $value (@values)
   {
@@ -67,7 +70,7 @@ sub ffi_custom_type_api_1
       {
         foreach my $name ($name,@aliases)
         {
-          my $full = join '::', $package, $prefix . uc($name);
+          my $full = join '::', $package, $prefix . ( $config{casing} eq 'upper' ? uc($name) : $name );
           constant->import($full, $index);
         }
       }
@@ -139,7 +142,7 @@ FFI::Platypus::Type::Enum - Custom platypus type for dealing with C enumerated t
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 
@@ -306,8 +309,9 @@ and native type for the enum.
  $ffi->load_custom_type('::Enum', $name, { package => \@package }, ... );  # version 0.05
 
 This option specifies the Perl package where constants will be defined.
-If not specified, then not constants will be generated.  As per the usual
-convention, the constants will be the upper case of the value names.
+If not specified, then no constants will be generated.  Unless otherwise
+specified (see 'casing' below), the constants will be the upper case of
+the value names as per the usual convention.
 
 [version 0.05]
 
@@ -374,8 +378,21 @@ Perl:
    'better',
    [best => 12],
  );
- 
+
  $ffi->attach( f => [ 'foo_t' ] => 'void' );
+
+=item casing
+
+[version 0.06]
+
+ $ffi->load_custom_type('::Enum', $name, { casing => 'upper' }, ... );
+ $ffi->load_custom_type('::Enum', $name, { casing => 'keep'  }, ... );
+
+When in constant mode, all constant names are by default generated in
+uppercase as is conventional.  However, some libraries will on occasion
+define constant names in mixed case.  For these cases, the C<casing> option,
+added in version 0.06, can be set to C<keep> to prevent the names from being
+modified.  The only other allowed value is C<upper>, which is the default.
 
 =back
 
@@ -391,7 +408,11 @@ Perl:
 
 =head1 AUTHOR
 
-Graham Ollis <plicease@cpan.org>
+Author: Graham Ollis E<lt>plicease@cpan.orgE<gt>
+
+Contributors:
+
+José Joaquín Atria (JJATRIA)
 
 =head1 COPYRIGHT AND LICENSE
 

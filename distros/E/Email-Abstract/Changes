@@ -1,5 +1,10 @@
 Revision history for Email-Abstract.
 
+3.009     2021-06-20 16:54:40-04:00 America/New_York
+        - MIME::Entity 5.508 is required for operation
+        - update author information
+        - add a perl support section to docs
+
 3.008     2014-12-27 18:36:19-05:00 America/New_York
         - make results of get_body be the same on Email::{Simple,MIME}
         - ...but this method is a mess, so maybe avoid using Abstract for body

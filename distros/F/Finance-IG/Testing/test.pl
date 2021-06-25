@@ -1,31 +1,22 @@
 #!/usr/bin/perl 
 #######################################################################################
-# This is the test suite for IG.pm. It uses a special version of 
-# REST::CLient, 2 special versions actually. 
-# The standard test version creates an md5 of all parameters to be sent as a request
-# and loads a file with a response in that is keyed from that md5. There is thus no 
-# communication via the internet with the IG site and no account is used in IG for testing
-# This version of REST::Cliennt can be found in the Testing sub directory
-# Another version Record::REST::Client creates these files. To use this, and 
-# so create new test data files in Testing/Data 3 things are needed in this file. 
-# 1) change the use lib line from 
-#   use lib $FindBin::RealBin;
-# to 
-#   use lib $FindBin::RealBin."/Record";
-# 
-# 2) Use real account data to login to a real IG account
-# 3) Run the test program, it should run logging into the actual IG site
-#    and creating a data cache in Testing/Data, its as well to remove all 
-#    files in here before you start as unused files will otherwise remain. 
-# 4) Reverse steps 1, 2) and re-run the this file, program should run 
-#    pulling data from the cache. 
-#######################################################################################
 use FindBin;
 use lib $FindBin::RealBin;
 use lib $FindBin::RealBin."/../lib";
-#use lib $FindBin::RealBin."/Record";
+##use lib $FindBin::RealBin."/Record";
+#die  "$FindBin::RealBin/../lib";
+#BEGIN { push(@INC,"$FindBin::Realbin/../lib/Finance/IG") ; } 
+#use lib "$FindBin::RealBin/../lib/Finance/IG"; 
 
-# die "@INC"; 
+#$"="\n"; die "@INC\n"; 
+#use REST::Client; 
+#print "REST::Client from ".$INC{'REST/Client.pm'}."\n"; 
+#die REST::Client->whoami(); 
+#die; 
+use Package::Alias
+    'REST::Client'=>'Finance::IG::REST::Client' 
+; 
+
 use Finance::IG; 
 use Getopt::Std; 
 use Time::Piece; 
@@ -35,6 +26,9 @@ use warnings;
 
 my $ig; 
 # with Testing::Record::REST;;Client need correct data 
+
+
+# die "inc=".$INC{'REST/Client.pm'};  
 
 $ig=Finance::IG->new(
                 username=> "igusername", 

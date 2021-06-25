@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::Author::Plicease::Init2 2.64 {
+package Dist::Zilla::Plugin::Author::Plicease::Init2 2.66 {
 
   use 5.020;
   use Moose;
@@ -74,7 +74,7 @@ package Dist::Zilla::Plugin::Author::Plicease::Init2 2.64 {
       my $self = shift;
       my @workflow;
 
-      foreach my $workflow (qw( linux windows macos cygwin msys2-mingw ))
+      foreach my $workflow (qw( static linux windows macos cygwin msys2-mingw ))
       {
         push @workflow, $workflow if $self->chrome->prompt_yn("workflow $workflow?");
       }
@@ -111,7 +111,7 @@ package Dist::Zilla::Plugin::Author::Plicease::Init2 2.64 {
       {
         if($self->type_dzil)
         {
-          return '5.014';
+          return '5.020';
         }
         else
         {
@@ -385,7 +385,7 @@ Dist::Zilla::Plugin::Author::Plicease::Init2 - Dist::Zilla initialization tasks 
 
 =head1 VERSION
 
-version 2.64
+version 2.66
 
 =head1 DESCRIPTION
 
@@ -611,7 +611,8 @@ use base qw( Alien::Base );
 __[ template/Dzil.pm ]__
 use strict;
 use warnings;
-use {{ $perl_version }}
+use {{ $perl_version }};
+use experimental qw( postderef );
 
 package {{ $name =~ s/-/::/gr }} {
 
@@ -652,6 +653,36 @@ package {{ $name =~ s/-/::/gr }} {
 
 1;
 
+__[ dist/.github/workflows/static.yml ]__
+name: static
+
+on:
+  push:
+    branches:
+      - '*'
+    tags-ignore:
+      - '*'
+  pull_request:
+
+jobs:
+  perl:
+
+    runs-on: ubuntu-latest
+
+    env:
+      CIP_TAG: static
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Bootstrap CIP
+        run: |
+          curl -L https://raw.githubusercontent.com/uperl/cip/main/bin/github-bootstrap | bash
+
+      - name: Build + Test
+        run: |
+          cip script
+
 
 __[ dist/.github/workflows/linux.yml ]__
 name: linux
@@ -673,7 +704,6 @@ jobs:
       fail-fast: false
       matrix:
         cip_tag:
-          - static
           - "5.35"
           - "5.34"
           - "5.32"
@@ -887,7 +917,7 @@ on:
   pull_request:
 
 env:
-  PERL5LIB: /cygdrive/c/cx/lib/perl5:/cygdrive/c/cx/lib/perl5/MSWin32-x64-multi-thread
+  PERL5LIB: /cygdrive/c/cx/lib/perl5
   PERL_LOCAL_LIB_ROOT: /cygdrive/cx
   PERL_MB_OPT: --install_base /cygdrive/c/cx
   PERL_MM_OPT: INSTALL_BASE=/cygdrive/c/cx

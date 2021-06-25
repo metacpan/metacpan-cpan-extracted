@@ -47,7 +47,7 @@ resources:
   bugtracker: https://github.com/perlancar/perl-App-CPANModulesUtils/issues
   homepage: https://metacpan.org/release/App-CPANModulesUtils
   repository: git://github.com/perlancar/perl-App-CPANModulesUtils.git
-version: '0.005'
+version: '0.006'
 x_Dist_Zilla:
   perl:
     version: '5.030000'

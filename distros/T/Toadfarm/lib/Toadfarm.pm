@@ -11,7 +11,7 @@ use Mojo::Util qw(class_to_path monkey_patch);
 
 use constant DEBUG => $ENV{TOADFARM_DEBUG} ? 1 : 0;
 
-our $VERSION = '0.82';
+our $VERSION = '0.83';
 
 BEGIN {
   $ENV{TOADFARM_ACTION} //= (@ARGV and $ARGV[0] =~ /^(reload|start|stop)$/) ? $1 : 'load';
@@ -35,7 +35,7 @@ sub import {
     change_root => \&_change_root,
     logging     => sub { $tf->{logging}++; $app->_setup_log(@_) },
     mount       => sub { push @{$app->config->{apps}}, @_ == 2 ? @_ : ($_[0], {}); $app },
-    plugin      => sub { push @{$app->config->{plugins}}, @_ == 2 ? @_ : ($_[0], {}); $app },
+    plugin      => sub { push @{$app->config->{tf_plugins}}, @_ == 2 ? @_ : ($_[0], {}); $app },
     run_as      => \&_run_as,
     secrets     => sub { $tf->{secrets}++; $app->secrets([@_]) },
     start       => sub {
@@ -69,7 +69,7 @@ sub startup {
   $self->secrets([$config->{secret}])              if $config->{secret};
   $self->secrets($config->{secrets})               if $config->{secrets};
   $self->_mount_apps(@{$config->{apps}})           if $config->{apps};
-  $self->_load_plugins(@{$config->{plugins}})      if $config->{plugins};
+  $self->_load_plugins(@{$config->{tf_plugins}})   if $config->{tf_plugins};
   $self->_mount_root_app(delete $self->{root_app}) if $self->{root_app};
 }
 
@@ -93,7 +93,7 @@ sub _change_root {
 sub _die_on_insecure {
   my ($class, $app) = @_;
   my $config  = $app->config;
-  my $plugins = $config->{plugins} || [];
+  my $plugins = $config->{tf_plugins} || [];
 
   die "Cannot change user without TOADFARM_INSECURE=1"  if $config->{hypnotoad}{user};
   die "Cannot change group without TOADFARM_INSECURE=1" if $config->{hypnotoad}{group};
@@ -182,10 +182,10 @@ sub _mount_apps {
       push @over, "\$_[1]->req->url->base(Mojo::URL->new(\$1 || '$request_base'));" if $request_base;
       push @over, "return 1; }";
       $routes->add_condition("toadfarm_condition_$self->{mounted}", => eval "@over" || die "@over: $@");
-      $routes->route($mount_point || '/')->detour(app => $app)->over("toadfarm_condition_$self->{mounted}");
+      $routes->any($mount_point || '/')->requires("toadfarm_condition_$self->{mounted}")->partial(1)->to(app => $app);
     }
     elsif ($mount_point) {
-      $routes->route($mount_point)->detour(app => $app);
+      $routes->any($mount_point)->partial(1)->to(app => $app);
     }
     else {
       $self->{root_app} = $app;
@@ -200,7 +200,7 @@ sub _mount_apps {
 sub _mount_root_app {
   my ($self, $app) = @_;
   $self->log->info("Mounting @{[$app->moniker]} without conditions.");
-  $self->routes->route('/')->detour(app => $app);
+  $self->routes->any('/')->partial(1)->to(app => $app);
 }
 
 sub _paths {
@@ -251,12 +251,12 @@ sub _setup_app {
   my $config = $app->config;
 
   $app->secrets([Mojo::Util::md5_sum($$ . $0 . time . rand)]) unless $config->{tf}{secrets};
-  $app->_mount_apps(@{$config->{apps}})      if $config->{apps};
-  $app->_load_plugins(@{$config->{plugins}}) if $config->{plugins};
+  $app->_mount_apps(@{$config->{apps}})         if $config->{apps};
+  $app->_load_plugins(@{$config->{tf_plugins}}) if $config->{tf_plugins};
 
   if (my $root_app = delete $app->{root_app}) {
     if (@{$config->{apps} || []} == 2) {
-      my $plugins = $config->{plugins} || [];
+      my $plugins = $config->{tf_plugins} || [];
       $root_app->config(hypnotoad => $config->{hypnotoad}) if $config->{hypnotoad};
       $root_app->log($app->log) if $config->{tf}{logging};
       $root_app->plugin(shift(@$plugins), shift(@$plugins)) for @$plugins;
@@ -308,7 +308,7 @@ Toadfarm - One Mojolicious app to rule them all
 
 =head1 VERSION
 
-0.82
+0.83
 
 =head1 DESCRIPTION
 

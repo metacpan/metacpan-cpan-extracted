@@ -1,5 +1,8 @@
 Revision history for Catmandu-SRU
 
+0.430  2021-06-22 21:15:58 CEST
+  - allow query parameters in base URL
+
 0.429  2020-07-08 14:52:17 CEST
   - add total option to constrain the result set
 

@@ -3,7 +3,7 @@ package Beekeeper::WorkerPool;
 use strict;
 use warnings;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 use base 'Beekeeper::WorkerPool::Daemon';
 use POSIX ":sys_wait_h";
@@ -144,10 +144,10 @@ sub main {
     # Install signal handlers to control this daemon and forked workers.
     # The supported signals and related actions are:
     #
-    # TERM  tell workers to quit after finishing their current jobs, then quit
-    # INT   tell workers to quit immediately (even in the middle of a job), then quit
+    # TERM  tell workers to quit after finishing their current tasks, then quit
+    # INT   tell workers to quit immediately (even in the middle of a task), then quit
     # PWR   received when system is being shut down, it is handled the same as TERM
-    # HUP   restart workers after finishing their current jobs
+    # HUP   restart workers after finishing their current tasks
 
     my $mode = '';
 
@@ -361,7 +361,7 @@ Beekeeper::WorkerPool - Manage worker pools
 
 =head1 VERSION
  
-Version 0.05
+Version 0.06
 
 =head1 SYNOPSIS
 
@@ -383,12 +383,12 @@ Version 0.05
 
 =head1 DESCRIPTION
 
-This module contains the core of the command line tool C<bkpr> which is used
+This module contains the core of the command line tool L<bkpr> which is used
 to manage worker pools: it start, stop and monitor pools of persistent
-C<Beekeeper::Worker> processes which receive RPC requests from message bus.
+L<Beekeeper::Worker> processes which receive RPC requests from message bus.
 
 When started it daemonize itself (unless C<--foreground> option is passed) and
-fork all worker processes, then monitor those forked processes and B<immediately>
+fork all worker processes, then monitor those forked processes and immediately
 respawn defunct ones.
 
 =head1 CONFIGURATION
@@ -450,7 +450,6 @@ The following example defines the logical bus "backend":
       "host"   : "10.0.0.1",
       "user"   : "username",
       "pass"   : "password",
-      "vhost"  : "/backend",
   }]
 
 =head1 AUTHOR

@@ -6,7 +6,20 @@ use strictures;
 use autodie;
 
 use version;
-use Getopt::Long::Descriptive;
+use Getopt::Long 2.24 qw(:config gnu_getopt);
+use IO::Interactive qw(is_interactive);
+
+my $USE_COLOR;
+
+BEGIN {
+	$USE_COLOR = !(
+		   exists $ENV{NO_COLOR}
+		or ( $ENV{COLOR} and !$ENV{COLOR} )
+		or !is_interactive
+	);
+	$Pod::Usage::Formatter = 'Pod::Text::Color' if $USE_COLOR;
+}
+use Pod::Usage;
 my $COPYRIGHT;
 use Pod::Constants
 	-trim => 1,
@@ -17,7 +30,7 @@ use String::Escape qw(unbackslash);
 use List::SomeUtils qw(uniq);
 use Sort::Key::Multi 1.25 qw(rs_keysort rus_keysort);
 use Log::Any::Adapter;
-Log::Any::Adapter->set('Screen');
+Log::Any::Adapter->set( 'Screen', use_color => $USE_COLOR );
 
 use App::Licensecheck;
 
@@ -27,117 +40,292 @@ licensecheck - simple license checker for source files
 
 =head1 VERSION
 
-Version v3.1.1
+Version v3.2.0
 
 =cut
 
-our $VERSION = version->declare('v3.1.1');
+our $VERSION = version->declare('v3.2.0');
 
 my $progname = path($0)->basename;
+
+our %OPT = ();
+my @OPT = ();
 
 =head1 SYNOPSIS
 
 B<licensecheck> B<--help>|B<--version>
 
-B<licensecheck> [B<options>...] F<path> [F<path>...]
+B<licensecheck> B<--list-licenses>|B<--list-naming-schemes>
+
+B<licensecheck> [B<options>...] I<F<PATH> [F<PATH>...]>
 
 =head1 DESCRIPTION
 
-B<licensecheck> attempts to determine the license that applies to each file
-passed to it, by searching the start of the file for text belonging to
-various licenses.
+B<licensecheck> attempts to determine the license
+that applies to each file passed to it,
+by searching the start of the file
+for text belonging to various licenses.
 
-If any of the arguments passed are directories, B<licensecheck> will add
-the files contained within to the list of files to process.
+If any of the arguments passed are directories,
+B<licensecheck> will add the files contained within
+to the list of files to process.
+
+When multiple F<PATH>s are provided,
+only files matching B<--check> and not B<--ignore> are checked.
+
+=head1 OPTIONS
+
+=head2 Resolving patterns
+
+=over 16
+
+=item B<--shortname-scheme>
+
+comma-separated priority list of license naming schemes
+to use for license identifiers
+S<(default value: unset (use verbose description))>
+
+=item B<--list-licenses>
+
+list identifiers for all detectable licenses and exit
+
+=item B<--list-naming-schemes>
+
+list all available license naming schemes and exit
+
+=back
 
 =cut
 
-my ( $opt, $usage ) = describe_options(
-	'%c %o path [path...]',
-	[],
-	[   'check|c=s', 'regular expression of files to include',
-		{ default => 'common source files' }
-	],
-	[   'ignore|i=s', 'regular expression of files to skip',
-		{ default => 'some backup and VCS files' }
-	],
-	[ 'recursive|r', 'traverse directories recursively' ],
-	[],
-	[   'lines|l=i',
-		'number of lines to parse from top of each file; implies optimistic search including only first cluster of detected copyrights/licenses; set to 0 to parse the whole file (and ignore --tail)',
-		{ default => 60 }
-	],
-	[   'tail=i',
-		'number of bytes to parse from bottom of each file; set to 0 to avoid parsing from end of file',
-		{ default => 5000 }
-	],
-	[   'encoding|e=s',
-		'try decode source files as specified codec, with iso-8859-1 as fallback; by default no decoding is done'
-	],
-	[],
-	[ 'verbose!',  'add header of each file to license information' ],
-	[ 'copyright', 'add copyright statements to license information' ],
-	[   'skipped|s',
-		'print skipped files to STDERR, i.e. files matching --check option but not --ignore option.'
-	],
-	[ 'deb-fmt!', 'use Debian license shortnames (based on SPDX keywords)' ],
-	[   'machine|m',
-		'print license information as TAB-separated fields, for processing with line-oriented tools like awk and sort (NB! the --verbose option will kill the readability)'
-	],
-	[   'deb-machine!',
-		'print license information like a Debian copyright file; implies --copyright and --deb-fmt'
-	],
-	[   'list-delimiter=s',
-		'printf-string used between multiple plain list items in Debian copyright file',
-		{ default => '\n ' }
-	],
-	[   'rfc822-delimiter=s',
-		'printf-string used between multiple RFC822-style items in Debian copyright file',
-		{ default => '\n  ' }
-	],
-	[   'copyright-delimiter=s',
-		'printf-string used between years and owners in Debian copyright file',
-		{ default => ', ' }
-	],
-	[   'merge-licenses!',
-		'merge same-licensed files in Debian copyright file'
-	],
-	[ 'text|t',         '', { hidden => 1 } ],
-	[ 'noconf|no-conf', '', { hidden => 1 } ],
-	[],
-	[ 'help|h', 'print help message and exit', { shortcircuit => 1 } ],
-	[   'version|v', 'print version and copyright information and exit',
-		{ shortcircuit => 1 }
-	],
-	{   getopt_conf   => [qw(gnu_getopt)],
-		show_defaults => 1,
-	},
+push @OPT, qw(
+	shortname-scheme=s
+	list-licenses
+	list-naming-schemes
 );
 
-print( $usage->text ), exit if $opt->help;
-if ( $opt->version ) { version(); exit 0; }
+=head2 Selecting files
 
-if ( $opt->text ) {
+=over 16
+
+=item B<-c> I<REGEX>, B<--check>=I<REGEX>
+
+regular expression of files to include
+when more than one F<PATH> is provided
+S<(default value: common source files)>
+
+=item B<-i> I<REGEX>, B<--ignore>=I<REGEX>
+
+regular expression of files to skip
+when more than one F<PATH> is provided
+S<(default value: some backup and VCS files)>
+
+=item B<-r>, B<--recursive>
+
+traverse directories recursively
+
+=back
+
+=cut
+
+push @OPT, qw(
+	check|c=s
+	ignore|i=s
+	recursive|r
+);
+$OPT{check}  = 'common source files';
+$OPT{ignore} = 'some backup and VCS files';
+
+=head2 Parsing contents
+
+=over 16
+
+=item B<-l> I<N>, B<--lines>=I<N>
+
+number of lines to parse from top of each file;
+implies optimistic search
+including only first cluster of detected copyrights or licenses;
+set to 0 to parse the whole file
+(and ignore B<--tail>)
+S<(default value: I<60>)>
+
+=item B<--tail>=I<N>
+
+number of bytes to parse from bottom of each file;
+set to 0 to avoid parsing from end of file
+S<(default value: 5000 (roughly 60 lines))>
+
+=item B<-e> I<CODEC>, B<--encoding>=I<CODEC>
+
+try decode source files from the specified codec,
+with C<iso-8859-1> as fallback
+S<(default value: unset (no decoding))>
+
+=back
+
+=cut
+
+push @OPT, qw(
+	lines|l=i
+	tail=i
+	encoding|e=s
+);
+$OPT{lines} = 60;
+$OPT{tail}  = 5000;
+
+=head2 Reporting results
+
+=over 16
+
+=item B<--verbose>
+
+add header of each file to license information
+
+=item B<--copyright>
+
+add copyright statements to license information
+
+=item B<-s>, B<--skipped>
+
+print to STDERR files in F<PATH>s
+matching neither B<--check> nor B<--ignore>
+
+=item B<-m>, B<--machine>
+
+print license information as C<TAB>-separated fields,
+for processing with line-oriented tools like C<awk> and C<sort>
+S<(NB! B<--verbose> will kill readability)>
+
+=item B<--[no-]deb-machine>
+
+print license information like a Debian copyright file;
+implies B<--copyright> and B<--shortname-scheme>=I<debian,spdx>
+
+=item B<--list-delimiter>=I<PRINTF>
+
+printf-string used between multiple plain list items
+in Debian copyright file
+S<(default value: I<'\n '> (NEWLINE SPACE))
+
+=item B<--rfc822-delimiter>=I<PRINTF>
+
+printf-string used between multiple RFC822-style items
+in Debian copyright file
+S<(default value: I<'\n  '> (NEWLINE SPACE SPACE))
+
+=item B<--copyright-delimiter>=I<PRINTF>
+
+printf-string used between years and owners
+in Debian copyright file
+S<(default value: I<', '> (COMMA SPACE))
+
+=item B<--[no-]merge-licenses>
+
+merge same-licensed files in Debian copyright file
+
+=back
+
+=cut
+
+push @OPT, qw(
+	verbose!
+	copyright
+	skipped|s
+	machine|m
+	deb-machine!
+	list-delimiter=s
+	rfc822-delimiter=s
+	copyright-delimiter=s
+	merge-licenses!
+);
+$OPT{'list-delimiter'}      = '\n ';
+$OPT{'rfc822-delimiter'}    = '\n  ';
+$OPT{'copyright-delimiter'} = ', ';
+
+=head2 General
+
+=over 16
+
+=item B<-h>, B<--help>
+
+print help message and exit
+
+=item B<-v>, B<--version>
+
+print version and copyright information and exit
+
+=back
+
+=cut
+
+push @OPT, qw(
+	help|h
+	version|v
+);
+
+# deprecated
+push @OPT, qw(
+	deb-fmt!
+);
+
+# obsolete
+push @OPT, qw(
+	text|t
+	noconf|no-conf
+);
+
+GetOptions( \%OPT, @OPT ) or pod2usage(2);
+
+pod2usage(1) if ( $OPT{help} );
+if ( $OPT{'version'} ) { version(); exit 0; }
+
+my %LIB_OPTS = (
+
+	# resolve patterns
+	shortname_scheme => $OPT{'shortname-scheme'}
+		// ( $OPT{'deb-machine'} || $OPT{'deb-fmt'} ) ? 'debian,spdx' : undef,
+);
+
+if ( $OPT{'list-licenses'} ) {
+	my $app = App::Licensecheck->new(%LIB_OPTS);
+
+	$app->list_licenses;
+	exit 0;
+}
+
+if ( $OPT{'list-naming-schemes'} ) {
+	my $app = App::Licensecheck->new(%LIB_OPTS);
+
+	$app->list_naming_schemes;
+	exit 0;
+}
+
+if ( $OPT{text} ) {
 	warn "$0 warning: option -text is deprecated\n";   # remove -text end 2015
 }
-if ( $opt->noconf ) {
+if ( $OPT{noconf} ) {
 	warn "$0 warning: option --no-conf is deprecated\n";    # No-op
 }
 
-print( "$progname: No paths provided.\n", $usage->leader_text, "\n" ), exit 2
+pod2usage("$progname: No paths provided.")
 	unless @ARGV;
 
 my $app = App::Licensecheck->new(
-	check_regex  => $opt->check,
-	ignore_regex => $opt->ignore,
-	recursive    => $opt->recursive,
-	lines        => $opt->lines,
-	tail         => $opt->tail,
-	encoding     => $opt->encoding,
-	verbose      => $opt->verbose,
-	skipped      => $opt->skipped,
-	deb_fmt      => $opt->deb_fmt // $opt->deb_machine,
-	deb_machine  => $opt->deb_machine,
+	%LIB_OPTS,
+
+	# select
+	check_regex  => $OPT{check},
+	ignore_regex => $OPT{ignore},
+	recursive    => $OPT{recursive},
+
+	# parse
+	lines    => $OPT{lines},
+	tail     => $OPT{tail},
+	encoding => $OPT{encoding},
+
+	# report
+	verbose     => $OPT{verbose},
+	skipped     => $OPT{skipped},
+	deb_machine => $OPT{'deb-machine'},
 );
 
 my %patternfiles;
@@ -151,7 +339,7 @@ foreach my $file ( $app->find(@ARGV) ) {
 	my @copyrights = uniq rs_keysort {$_} split /^/, $copyright;
 	chomp @copyrights;
 
-	if ( $opt->deb_machine ) {
+	if ( $OPT{deb_machine} ) {
 		my @ownerlines_clean        = ();
 		my %owneryears              = ();
 		my $owneryears_seem_correct = 1;
@@ -161,22 +349,22 @@ foreach my $file ( $app->find(@ARGV) ) {
 			$owneryears_seem_correct = 0 unless ($owneryear);
 			$owner =~ s/,?\s+All Rights Reserved\.?//gi if ($owner);
 			push @ownerlines_clean,
-				join unbackslash( $opt->copyright_delimiter, ),
+				join unbackslash( $OPT{copyright_delimiter}, ),
 				$owneryear || (), $owner || ();
 			push @{ $owneryears{ $owner || '' } }, $owneryear;
 		}
 		my @owners = sort keys %owneryears;
 		@owners = ()
-			if ( $opt->merge_licenses and $owneryears_seem_correct );
+			if ( $OPT{'merge-licenses'} and $owneryears_seem_correct );
 		my $pattern = join( "\n", $license, @owners );
 		push @{ $patternfiles{"$pattern"} },      $file;
 		push @{ $patternownerlines{"$pattern"} }, @ownerlines_clean;
 		$patternlicense{"$pattern"} = $license;
 	}
-	elsif ( $opt->machine ) {
+	elsif ( $OPT{'machine'} ) {
 		print "$file\t$license";
 		print "\t" . ( join( " / ", @copyrights ) or '*No copyright*' )
-			if $opt->copyright;
+			if $OPT{'copyright'};
 		print "\n";
 	}
 	else {
@@ -184,12 +372,12 @@ foreach my $file ( $app->find(@ARGV) ) {
 		print '*No copyright* ' unless @copyrights;
 		print $license . "\n";
 		print '  [Copyright: ' . join( ' / ', @copyrights ) . "]\n"
-			if @copyrights and $opt->copyright;
-		print "\n" if $opt->copyright;
+			if @copyrights and $OPT{copyright};
+		print "\n" if $OPT{copyright};
 	}
 }
 
-if ( $opt->deb_machine ) {
+if ( $OPT{deb_machine} ) {
 	print <<'HEADER';
 Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Upstream-Name: FIXME
@@ -207,13 +395,13 @@ HEADER
 		@ownerlines_unique = ('NONE') unless (@ownerlines_unique);
 		print 'Files: ',
 			join(
-			unbackslash( $opt->list_delimiter, ),
+			unbackslash( $OPT{'list-delimiter'}, ),
 			sort @{ $patternfiles{$pattern} }
 			),
 			"\n";
 		print 'Copyright: ',
 			join(
-			unbackslash( $opt->rfc822_delimiter, ),
+			unbackslash( $OPT{'rfc822-delimiter'}, ),
 			@ownerlines_unique
 			),
 			"\n";
@@ -221,10 +409,47 @@ HEADER
 	}
 }
 
-=head1 DEBUGGING
+=head1 ENVIRONMENT
 
-If either of environment variables INFO, DEBUG or TRACE is set to true,
-varying details about discoveries are emitted to STDERR.
+=over 6
+
+=item NO_COLOR
+
+If defined, will disable color.
+Consulted before COLOR.
+
+=item COLOR
+
+Can be set to 0 to explicitly disable colors.
+The default is to use color when connected to a terminal.
+
+=item LOG_LEVEL
+=item QUIET
+=item VERBOSE
+=item DEBUG
+=item TRACE
+
+Used to emit varying details about discoveries to STDERR.
+See L<Log::Any::Adapter::Screen> for more details.
+
+=item LOG_PREFIX
+
+The default formatter groks these variables.
+See B<formatter> in L<Log::Any::Adapter::Screen> for more details.
+
+=back
+
+=head1 CAVEATS
+
+The exact output may change between releases,
+due to the inherently fragile scanning of unstructured data,
+and the ongoing improvements to detection patterns.
+For some level of stability,
+use one of the machine-readable output formats
+and define a B<--shortname-scheme>.
+
+Option B<--deb-fmt> was deprecated since v3.2.
+Please use option B<--shortname-scheme>=I<debian,spdx> instead.
 
 =cut
 

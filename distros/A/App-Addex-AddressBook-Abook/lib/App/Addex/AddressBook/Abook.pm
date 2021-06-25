@@ -2,10 +2,7 @@
 use strict;
 use warnings;
 
-package App::Addex::AddressBook::Abook;
-{
-  $App::Addex::AddressBook::Abook::VERSION = '0.008';
-}
+package App::Addex::AddressBook::Abook 0.009;
 use base qw(App::Addex::AddressBook);
 # ABSTRACT: use the "abook" program as the addex source
 
@@ -31,6 +28,20 @@ use File::Spec;
   }
 }
 
+#pod =head1 SYNOPSIS
+#pod
+#pod This module implements the L<App::Addex::AddressBook> interface for the
+#pod Mutt-friendly "abook" program.
+#pod
+#pod =head1 CONFIGURATION
+#pod
+#pod The following configuration options are valid:
+#pod
+#pod  filename  - the address book file to read; defaults to ~/.abook/addressbook
+#pod  sig_field - the address book entry property that stores the "sig" field
+#pod  folder_field - the address book entry property that stores the "sig" field
+#pod
+#pod =cut
 
 sub new {
   my ($class, $arg) = @_;
@@ -86,18 +97,31 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 App::Addex::AddressBook::Abook - use the "abook" program as the addex source
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 SYNOPSIS
 
 This module implements the L<App::Addex::AddressBook> interface for the
 Mutt-friendly "abook" program.
+
+=head1 PERL VERSION SUPPORT
+
+This module has the same support period as perl itself:  it supports the two
+most recent versions of perl.  (That is, if the most recently released version
+is v5.40, then this module should work on both v5.40 and v5.38.)
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
 
 =head1 CONFIGURATION
 
@@ -109,7 +133,7 @@ The following configuration options are valid:
 
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@cpan.org>
+Ricardo SIGNES <rjbs@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

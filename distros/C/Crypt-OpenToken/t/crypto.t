@@ -2,8 +2,9 @@
 
 use strict;
 use warnings;
-use if $ENV{AUTOMATED_TESTING}, 'Test::DiagINC'; use Test::More tests => 1;
-use Test::Exception;
+use if $ENV{AUTOMATED_TESTING}, 'Test::DiagINC'; use Test2::V0;
+use Test2::Tools::Exception;
+
 use Crypt::OpenToken;
 
 ###############################################################################
@@ -12,6 +13,8 @@ invalid_cipher: {
     my $password = 'dummy password';
     my $data     = { 'foo' => 'bar' };
     my $factory = Crypt::OpenToken->new(password => $password);
-    throws_ok { $factory->create(9999, $data) }
-        qr/unsupported OTK cipher; '9999'/;
+    like dies { $factory->create(9999, $data) }, qr/unsupported OTK cipher; '9999'/;
 }
+
+###############################################################################
+done_testing();

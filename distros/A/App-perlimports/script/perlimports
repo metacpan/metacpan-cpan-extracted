@@ -482,7 +482,7 @@ perlimports - A command line utility for cleaning up imports in your Perl code
 
 =head1 VERSION
 
-version 0.000009
+version 0.000012
 
 =head1 SYNOPSIS
 
@@ -540,6 +540,23 @@ to ignore. (See above for behaviour). The pattern is one module name per line.
 
     Foo
     Foo::Bar
+
+=head2 --ignore-modules-pattern
+
+A regular expression to match module names which should be ignored by this
+script. Any modules matched by this regular expression remain unchanged after
+processing.
+
+    --ignore-modules '^(Foo|Foo::Bar)'
+
+=head2 --ignore-modules-pattern-filename
+
+The absolute or relative path to a file which contains a list of regular
+expression that matches modules that should be ignored. (See above for behaviour).
+The pattern is one regular expression per line.
+
+    ^Foo
+    ^Foo::Bar
 
 =head2 --never-export-modules
 

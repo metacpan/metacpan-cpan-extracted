@@ -45,7 +45,7 @@ sub database_setting {
                 # Choose
                 my $idx_sec = $tc->choose(
                     $menu,
-                    { %{$sf->{i}{lyt_v_clear}}, index => 1, default => $old_idx_sec, undef => '  <=' }
+                    { %{$sf->{i}{lyt_v}}, index => 1, default => $old_idx_sec, undef => '  <=' }
                 );
                 if ( ! defined $idx_sec || ! defined $menu->[$idx_sec] ) {
                     return;
@@ -112,7 +112,7 @@ sub database_setting {
             # Choose
             my $idx_group = $tc->choose(
                 $menu,
-                { %{$sf->{i}{lyt_v_clear}}, prompt => $prompt, index => 1, default => $old_idx_group, undef => '  <=' }
+                { %{$sf->{i}{lyt_v}}, prompt => $prompt, index => 1, default => $old_idx_group, undef => '  <=' }
             );
             if ( ! defined $idx_group || ! defined $menu->[$idx_group] ) {
                 if ( $sf->{write_config} ) {

@@ -1,6 +1,16 @@
 Revision history for Term::TablePrint
 
 
+0.138   2021-06-22
+        - use Carp again.
+        - Adapt the code to the updated Term::Choose.
+
+0.137   2021-06-17
+        - F3: use env var TC_POS_AT_F3 to keep table position.
+
+0.136   2021-06-11
+        - Removed options 'grid' and 'keep_header'.
+
 0.135   2021-06-10
         - Bugfix option 'grid'.
 

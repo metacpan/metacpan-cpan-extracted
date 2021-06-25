@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Yancy;
-our $VERSION = '1.073';
+our $VERSION = '1.074';
 # ABSTRACT: Embed a simple admin CMS into your Mojolicious application
 
 #pod =head1 SYNOPSIS
@@ -883,30 +883,26 @@ sub _helper_create {
 
 sub _helper_validate {
     my ( $c, $schema_name, $input_item, %opt ) = @_;
-    state $validator = {};
     my $schema = $c->yancy->schema( $schema_name );
-    my $v = $validator->{ $schema } ||= json_validator()->schema( $schema );
+    my $v = json_validator();
 
-    my @args;
     if ( $opt{ properties } ) {
         # Only validate these properties
-        @args = (
-            {
-                type => 'object',
-                required => [
-                    grep { my $f = $_; grep { $_ eq $f } @{ $schema->{required} || [] } }
-                    @{ $opt{ properties } }
-                ],
-                properties => {
-                    map { $_ => $schema->{properties}{$_} }
-                    grep { exists $schema->{properties}{$_} }
-                    @{ $opt{ properties } }
-                },
-                additionalProperties => 0, # Disallow any other properties
-            }
-        );
-        $schema = $args[0];
+        $schema = {
+            type => 'object',
+            required => [
+                grep { my $f = $_; grep { $_ eq $f } @{ $schema->{required} || [] } }
+                @{ $opt{ properties } }
+            ],
+            properties => {
+                map { $_ => $schema->{properties}{$_} }
+                grep { exists $schema->{properties}{$_} }
+                @{ $opt{ properties } }
+            },
+            additionalProperties => 0, # Disallow any other properties
+        };
     }
+    $v->schema( $schema );
 
     my @errors;
     my %check_item = %$input_item;
@@ -957,7 +953,7 @@ sub _helper_validate {
         }
     }
 
-    push @errors, $v->validate( \%check_item, @args );
+    push @errors, $v->validate( \%check_item );
     return @errors;
 }
 
@@ -1054,7 +1050,7 @@ Mojolicious::Plugin::Yancy - Embed a simple admin CMS into your Mojolicious appl
 
 =head1 VERSION
 
-version 1.073
+version 1.074
 
 =head1 SYNOPSIS
 

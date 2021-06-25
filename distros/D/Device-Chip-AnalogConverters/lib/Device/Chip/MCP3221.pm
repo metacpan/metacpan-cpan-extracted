@@ -6,7 +6,7 @@
 use 5.026;
 use Object::Pad 0.19;
 
-package Device::Chip::MCP3221 0.11;
+package Device::Chip::MCP3221 0.12;
 class Device::Chip::MCP3221
    extends Device::Chip;
 

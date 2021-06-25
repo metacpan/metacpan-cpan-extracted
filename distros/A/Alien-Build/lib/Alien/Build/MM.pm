@@ -9,7 +9,7 @@ use Capture::Tiny qw( capture );
 use Carp ();
 
 # ABSTRACT: Alien::Build installer code for ExtUtils::MakeMaker
-our $VERSION = '2.40'; # VERSION
+our $VERSION = '2.41'; # VERSION
 
 
 sub new
@@ -414,7 +414,7 @@ Alien::Build::MM - Alien::Build installer code for ExtUtils::MakeMaker
 
 =head1 VERSION
 
-version 2.40
+version 2.41
 
 =head1 SYNOPSIS
 
@@ -444,7 +444,7 @@ In your C<Makefile.PL>:
 In your C<lib/Alien/Libfoo.pm>:
 
  package Alien::Libfoo;
- use base qw( Alien::Base );
+ use parent qw( Alien::Base );
  1;
 
 In your alienfile (needs to be named C<alienfile> and should be in the root of your dist):
@@ -640,6 +640,8 @@ Shawn Laffan (SLAFFAN)
 Paul Evans (leonerd, PEVANS)
 
 Håkon Hægland (hakonhagland, HAKONH)
+
+nick nauwelaerts (INPHOBIA)
 
 =head1 COPYRIGHT AND LICENSE
 

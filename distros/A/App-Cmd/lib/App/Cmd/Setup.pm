@@ -5,8 +5,8 @@ use 5.020;
 use warnings;
 use experimental qw(postderef postderef_qq);
 
-package App::Cmd::Setup;
-$App::Cmd::Setup::VERSION = '0.333';
+package App::Cmd::Setup 0.334;
+
 # ABSTRACT: helper for setting up App::Cmd classes
 
 #pod =head1 OVERVIEW
@@ -219,7 +219,7 @@ App::Cmd::Setup - helper for setting up App::Cmd classes
 
 =head1 VERSION
 
-version 0.333
+version 0.334
 
 =head1 OVERVIEW
 
@@ -284,9 +284,19 @@ L<App::Cmd::Plugin>.
 
 =back
 
+=head1 PERL VERSION SUPPORT
+
+This module has a long-term perl support period.  That means it will not
+require a version of perl released fewer than five years ago.
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
+
 =head1 AUTHOR
 
-Ricardo Signes <rjbs@cpan.org>
+Ricardo Signes <rjbs@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

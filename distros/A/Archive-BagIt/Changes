@@ -1,10 +1,32 @@
 ==================================================
-Changes from 2020-04-28 00:00:00 +0000 to present.
+Changes from 2020-06-16 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.074 at 2021-04-28 19:05:19 +0000
+version 0.075 at 2021-06-16 15:30:17 +0000
 ------------------------------------------
+
+  Change: 7d9d585b241ee8973784b48a65de98226f0049de
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2021-06-16 17:29:06 +0000
+
+    - optimized import of modules 
+
+  Change: 05b7d41b144c8c8cc7e195dc3545011a34245863
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2021-06-16 17:16:27 +0000
+
+    - added single line parse check 
+
+------------------------------------------
+version 0.074 at 2021-04-28 19:05:48 +0000
+------------------------------------------
+
+  Change: 49387f19402ddb958d8ada027dec60e6d403063b
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2021-04-28 21:05:48 +0000
+
+    Released 0.074 
 
   Change: b6cccc674e598f0167d21ef5730b922a5bc210d8
   Author: Andreas Romeyke <art1@andreas-romeyke.de>
@@ -1348,5 +1370,5 @@ version 0.056 at 2020-06-24 11:09:30 +0000
     Comment out debugging statement. 
 
 =================================================
-Plus 10 releases after 2020-04-28 00:00:00 +0000.
+Plus 10 releases after 2020-06-16 00:00:00 +0000.
 =================================================

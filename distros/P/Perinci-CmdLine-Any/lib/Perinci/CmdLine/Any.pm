@@ -1,7 +1,7 @@
 package Perinci::CmdLine::Any;
 
-our $DATE = '2019-06-20'; # DATE
-our $VERSION = '0.151'; # VERSION
+our $DATE = '2021-06-23'; # DATE
+our $VERSION = '0.152'; # VERSION
 
 # IFUNBUILT
 # use strict;
@@ -71,7 +71,7 @@ Perinci::CmdLine::Any - Choose Perinci::CmdLine implementation (::Lite or ::Clas
 
 =head1 VERSION
 
-This document describes version 0.151 of Perinci::CmdLine::Any (from Perl distribution Perinci-CmdLine-Any), released on 2019-06-20.
+This document describes version 0.152 of Perinci::CmdLine::Any (from Perl distribution Perinci-CmdLine-Any), released on 2021-06-23.
 
 =head1 SYNOPSIS
 
@@ -106,6 +106,12 @@ to override using C<PERINCI_CMDLINE_ANY>):
  use Perinci::CmdLine::Any -prefer_lite => 0;
 
 =for Pod::Coverage ^(new)$
+
+=head1 CONTRIBUTOR
+
+=for stopwords Steven Haryanto
+
+Steven Haryanto <sharyanto@cpan.org>
 
 =head1 ENVIRONMENT
 
@@ -142,7 +148,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2019, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

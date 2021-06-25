@@ -1,9 +1,9 @@
 #!perl
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-04-02'; # DATE
+our $DATE = '2021-06-22'; # DATE
 our $DIST = 'App-ThisDist'; # DIST
-our $VERSION = '0.009'; # VERSION
+our $VERSION = '0.011'; # VERSION
 
 use 5.010001;
 use strict;
@@ -49,7 +49,7 @@ this-dist - Return name of Perl distribution associated with the current directo
 
 =head1 VERSION
 
-This document describes version 0.009 of this-dist (from Perl distribution App-ThisDist), released on 2021-04-02.
+This document describes version 0.011 of this-dist (from Perl distribution App-ThisDist), released on 2021-06-22.
 
 =head1 SYNOPSIS
 
@@ -77,17 +77,10 @@ This document describes version 0.009 of this-dist (from Perl distribution App-T
  % this-dist -V
  Foo-Bar 1.23
 
-=head2 Some recipes
+Some other examples:
 
-Show L<MetaCPAN|https://metacpan.org> distribution page in browser (requires
-L<lcpan> from L<App::lcpan>). (But note that for this particular task, I have
-also written L<this-dist-on-metacpan>.)
-
- % lcpan metacpan-dist `this-dist`
-
-Same thing, but without using any other script:
-
- % firefox https://metacpan.org/release/`this-dist`
+ # Show MetaCPAN distribution page in browser (but see this-dist-on-metacpan script)
+ % firefox metacpan.org/release/`this-dist`
 
 =head1 DESCRIPTION
 
@@ -118,7 +111,7 @@ Source repository is at L<https://github.com/perlancar/perl-App-ThisDist>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-App-ThisDist/issues>
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-ThisDist>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

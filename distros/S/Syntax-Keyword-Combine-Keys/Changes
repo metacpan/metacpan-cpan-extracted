@@ -1,0 +1,10 @@
+Revision history for Syntax-Keyword-Combine-Keys
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+
+0.07    17/06/2021
+	Fix so ckeys works with use strict; use warnings;
+
+0.09    18/06/2021
+	Require latest XS::Parse::Keyword.

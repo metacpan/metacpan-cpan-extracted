@@ -52,6 +52,17 @@ ACCESSORS
 
     HTTP url to fetch data from.
 
+ timeout
+
+    In addition to AnyEvent::HTTP timeout will also check time during
+    download as the data are being downloaded and dies when over the limit.
+    Default 5 minutes.
+
+ max_size
+
+    Will die when the document or image size is greater than this limit.
+    Default 100MB.
+
  user_agent
 
     User-Agent header to use for http requests. Default is one from Chrome
@@ -108,6 +119,8 @@ ACCESSORS
 
     Returns array ref with page [$body,$headers]. Can be useful for
     post-processing or special/additional data extractions.
+
+    Only text/html content-type is accepted for fetching.
 
  fetch_page_meta_ft
 

@@ -1,8 +1,8 @@
 use 5.20.0;
 use strict;
 use warnings;
-package App::Addex::AddressBook::AppleScript;
-$App::Addex::AddressBook::AppleScript::VERSION = '0.008';
+package App::Addex::AddressBook::AppleScript 0.009;
+
 use parent qw(App::Addex::AddressBook);
 use experimental 'postderef';
 # ABSTRACT: Mac::Glue-less Addex adapter for Apple Address Book and Addex
@@ -241,7 +241,7 @@ App::Addex::AddressBook::AppleScript - Mac::Glue-less Addex adapter for Apple Ad
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 SYNOPSIS
 
@@ -258,9 +258,20 @@ The AppleScript adapter builds an AppleScript program that prints out a dump of
 relevant address book entries, then runs it, then parses its output.  The
 format of the intermediate form may change for all kinds of crazy reasons.
 
+=head1 PERL VERSION SUPPORT
+
+This module has the same support period as perl itself:  it supports the two
+most recent versions of perl.  (That is, if the most recently released version
+is v5.40, then this module should work on both v5.40 and v5.38.)
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
+
 =head1 AUTHOR
 
-Ricardo Signes <rjbs@cpan.org>
+Ricardo Signes <rjbs@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

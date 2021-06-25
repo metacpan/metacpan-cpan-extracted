@@ -15,7 +15,7 @@ is( $meta->name, "Example", '$meta->name' );
 ok(  $meta->is_role, '$meta->is_role true' );
 ok( !$meta->is_class, '$meta->is_class false' );
 
-class Implementor implements Example {}
+class Implementor does Example {}
 
 is_deeply( [ Object::Pad::MOP::Class->for_class( "Implementor" )->roles ],
    [ $meta ],

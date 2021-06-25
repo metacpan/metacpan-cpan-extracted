@@ -1,5 +1,8 @@
 Revision history for Alien-m4
 
+0.21      2021-06-22 14:58:27 -0600
+  - Handle version numbers with funny characters (gh#18, gh#19)
+
 0.20      2021-05-28 18:28:27 -0600
   - Remove patch for linux that is no longer needed
   - black list 1.4.19 on Windows and macOS where m4 no longer

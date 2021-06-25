@@ -5,9 +5,9 @@ use warnings;
 # supporting this module on ancient perls -- rjbs, 2007-12-17
 use 5.008;
 
-package App::Addex;
+package App::Addex 0.027;
 # ABSTRACT: generate mail tool configuration from an address book
-$App::Addex::VERSION = '0.026';
+
 use Carp ();
 
 #pod =head1 DESCRIPTION
@@ -173,7 +173,7 @@ App::Addex - generate mail tool configuration from an address book
 
 =head1 VERSION
 
-version 0.026
+version 0.027
 
 =head1 DESCRIPTION
 
@@ -187,6 +187,17 @@ output plugins.
 
 It is meant to be run with the F<addex> command, which is bundled as part of
 this software distribution.
+
+=head1 PERL VERSION SUPPORT
+
+This module has the same support period as perl itself:  it supports the two
+most recent versions of perl.  (That is, if the most recently released version
+is v5.40, then this module should work on both v5.40 and v5.38.)
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
 
 =head1 METHODS
 
@@ -233,7 +244,13 @@ entries, invoking the output plugins for each one.
 
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@cpan.org>
+Ricardo SIGNES <rjbs@semiotic.systems>
+
+=head1 CONTRIBUTOR
+
+=for stopwords Reini Urban
+
+Reini Urban <rurban@x-ray.at>
 
 =head1 COPYRIGHT AND LICENSE
 

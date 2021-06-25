@@ -10,7 +10,7 @@ use Capture::Tiny 0.17 qw/capture_stdout/;
 use Text::ParseWords qw/shellwords/;
 
 # ABSTRACT: Base classes for Alien:: modules
-our $VERSION = '2.40'; # VERSION
+our $VERSION = '2.41'; # VERSION
 
 
 sub import {
@@ -626,7 +626,7 @@ Alien::Base - Base classes for Alien:: modules
 
 =head1 VERSION
 
-version 2.40
+version 2.41
 
 =head1 SYNOPSIS
 
@@ -1021,7 +1021,7 @@ Then in your base class:
 
  package Alien::MyLibrary;
  
- use base qw( Alien::Base );
+ use parent qw( Alien::Base );
  use Role::Tiny::With qw( with );
  
  with 'Alien::Role::Alt';
@@ -1191,6 +1191,8 @@ Shawn Laffan (SLAFFAN)
 Paul Evans (leonerd, PEVANS)
 
 Håkon Hægland (hakonhagland, HAKONH)
+
+nick nauwelaerts (INPHOBIA)
 
 =head1 COPYRIGHT AND LICENSE
 

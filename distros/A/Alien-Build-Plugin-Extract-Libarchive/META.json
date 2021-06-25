@@ -1,0 +1,79 @@
+{
+   "abstract" : "Alien::Build plugin to extract a tarball using libarchive",
+   "author" : [
+      "Graham Ollis <plicease@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.019, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Alien-Build-Plugin-Extract-Libarchive",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.020"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "FindBin" : "0",
+            "Perl::Critic" : "0",
+            "Test2::Require::Module" : "0.000121",
+            "Test2::Tools::PerlCritic" : "0",
+            "Test2::V0" : "0.000121",
+            "Test::CPAN::Changes" : "0",
+            "Test::EOL" : "0",
+            "Test::Fixme" : "0.07",
+            "Test::More" : "0.98",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "0",
+            "Test::Pod::Coverage" : "0",
+            "Test::Pod::Spelling::CommonMistakes" : "0",
+            "Test::Spelling" : "0",
+            "Test::Strict" : "0",
+            "YAML" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Alien::Build::Plugin" : "0",
+            "Archive::Libarchive::Extract" : "0",
+            "perl" : "5.020"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Path::Tiny" : "0",
+            "Test2::V0" : "0.000121",
+            "Test::Alien::Build" : "0",
+            "perl" : "5.020"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/PerlAlien/Alien-Build-Plugin-Extract-Libarchive/issues"
+      },
+      "homepage" : "https://metacpan.org/pod/Alien::Build::Plugin::Extract::Libarchive",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/PerlAlien/Alien-Build-Plugin-Extract-Libarchive.git",
+         "web" : "https://github.com/PerlAlien/Alien-Build-Plugin-Extract-Libarchive"
+      },
+      "x_IRC" : "irc://irc.perl.org/#native"
+   },
+   "version" : "0.01",
+   "x_generated_by_perl" : "v5.34.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.26",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
+   "x_use_unsafe_inc" : 0
+}
+

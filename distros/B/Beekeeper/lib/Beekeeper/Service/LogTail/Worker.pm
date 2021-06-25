@@ -3,9 +3,8 @@ package Beekeeper::Service::LogTail::Worker;
 use strict;
 use warnings;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
-use AnyEvent::Impl::Perl;
 use Beekeeper::Worker ':log';
 use base 'Beekeeper::Worker';
 
@@ -89,9 +88,9 @@ sub _collect_log {
     $bus->subscribe(
         topic      => "log/#",
         on_publish => sub {
-            my ($body_ref, $msg_headers) = @_;
+            my ($payload_ref, $mqtt_properties) = @_;
 
-            my $req = decode_json($$body_ref);
+            my $req = decode_json($$payload_ref);
 
             $req->{params}->{type} = $req->{method};
 
@@ -177,21 +176,20 @@ Beekeeper::Service::LogTail::Worker - Buffer log entries
 
 =head1 VERSION
 
-Version 0.05
+Version 0.06
 
 =head1 SYNOPSIS
 
 =head1 DESCRIPTION
 
-By default all workers use a C<Beekeeper::Logger> logger which logs errors and
+By default all workers use a L<Beekeeper::Logger> logger which logs errors and
 warnings both to files and to a topic C<log/{level}/{service}> on the message bus.
 
 This worker keeps an in-memory buffer of every log entry sent to that topic in
 every broker in a logical message bus.
 
 Please note that receiving all log traffic on a single process does not scale
-at all, so a better strategy will be needed for inspecting logs of big real world
-applications.
+at all, so a better strategy will be needed for inspecting logs of big applications.
 
 =head1 METHODS
 

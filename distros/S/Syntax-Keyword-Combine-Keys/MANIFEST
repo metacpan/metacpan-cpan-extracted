@@ -1,0 +1,15 @@
+Build.PL
+Changes
+hax/perl-backcompat.c.inc
+lib/Syntax/Keyword/Combine/Keys.pm
+lib/Syntax/Keyword/Combine/Keys.xs
+MANIFEST			This list of files
+README
+t/00-load.t
+t/01-test.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+LICENSE
+META.yml
+META.json

@@ -8,7 +8,7 @@ use Mojo::Util 'steady_time';
 use Sys::Hostname 'hostname';
 use Time::HiRes 'usleep';
 
-our $VERSION = 'v5.0.4';
+our $VERSION = 'v5.0.5';
 
 has dequeue_interval => 0.5;
 has 'sqlite';
@@ -416,10 +416,10 @@ sub _try {
            when 'failed' then not j.lax
            when 'inactive' then (parent.expires is null or parent.expires > datetime('now'))
          end
-       )) and queue in ($queues_in) and state = 'inactive' and task in ($tasks_in)
-       and (expires is null or expires > datetime('now'))
+       )) and priority >= coalesce(?, priority) and queue in ($queues_in) and state = 'inactive'
+       and task in ($tasks_in) and (expires is null or expires > datetime('now'))
        order by priority desc, id
-       limit 1}, $options->{id}, @$queues, @$tasks
+       limit 1}, $options->{id}, $options->{min_priority}, @$queues, @$tasks
   );
   my $job_id = ($res->arrays->first // [])->[0] // return undef;
   $db->query(
@@ -546,6 +546,12 @@ These options are currently available:
   id => '10023'
 
 Dequeue a specific job.
+
+=item min_priority
+
+  min_priority => 3
+
+Do not dequeue jobs with a lower priority.
 
 =item queues
 

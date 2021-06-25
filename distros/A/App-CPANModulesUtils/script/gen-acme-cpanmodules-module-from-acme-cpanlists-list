@@ -6,7 +6,7 @@
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2021-05-19'; # DATE
 our $DIST = 'App-CPANModulesUtils'; # DIST
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 use 5.010001;
 use strict;
@@ -40,7 +40,7 @@ gen-acme-cpanmodules-module-from-acme-cpanlists-list - Generate an Acme::CPANMod
 
 =head1 VERSION
 
-This document describes version 0.005 of gen-acme-cpanmodules-module-from-acme-cpanlists-list (from Perl distribution App-CPANModulesUtils), released on 2021-05-19.
+This document describes version 0.006 of gen-acme-cpanmodules-module-from-acme-cpanlists-list (from Perl distribution App-CPANModulesUtils), released on 2021-05-19.
 
 =head1 SYNOPSIS
 

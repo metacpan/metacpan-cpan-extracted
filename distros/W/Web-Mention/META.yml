@@ -30,7 +30,7 @@ no_index:
 provides:
   Web::Mention:
     file: lib/Web/Mention.pm
-    version: '0.720'
+    version: '0.721'
   Web::Mention::Author:
     file: lib/Web/Mention/Author.pm
 requires:
@@ -61,10 +61,11 @@ resources:
   bugtracker: https://github.com/jmacdotorg/webmention-perl/issues
   homepage: https://github.com/jmacdotorg/webmention-perl
   repository: git://github.com/jmacdotorg/webmention-perl.git
-version: '0.720'
+version: '0.721'
 x_contributors:
   - 'Jason McIntosh <jmac@jmac.org>'
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
   - 'Tomaz Solc <tomaz.solc@tablix.org>'
+  - 'Yanick Champoux <yanick@babyl.dyndns.org>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

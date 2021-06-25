@@ -5,7 +5,7 @@
 
 use Object::Pad 0.19;
 
-package Device::Chip::LTC2400 0.11;
+package Device::Chip::LTC2400 0.12;
 class Device::Chip::LTC2400
    extends Device::Chip;
 

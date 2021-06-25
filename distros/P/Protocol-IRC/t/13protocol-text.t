@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
 use Test::More;
@@ -11,6 +11,37 @@ my $CRLF = "\x0d\x0a"; # because \r\n isn't portable
 # get one of each type at once. Hash them
 my %messages;
 my $serverstream;
+
+package TestIRC {
+   use base qw( Protocol::IRC );
+
+   sub new { return bless [], shift }
+
+   sub write { $serverstream .= $_[1] }
+
+   my %isupport = (
+      CHANTYPES   => "#&",
+         channame_re => qr/^[#&]/,
+      PREFIX      => "(ohv)@%+",
+         prefix_modes => 'ohv',
+         prefix_flags => '@%+',
+         prefixflag_re => qr/^[@%+]/,
+         prefix_map_m2f => { 'o' => '@', 'h' => '%', 'v' => '+' },
+         prefix_map_f2m => { '@' => 'o', '%' => 'h', '+' => 'v' },
+   );
+
+   sub isupport { return $isupport{$_[1]} }
+
+   sub nick { return "MyNick" }
+
+   sub on_message
+   {
+      my $self = shift;
+      my ( $command, $message, $hints ) = @_;
+      $messages{$command} = [ $message, $hints ];
+      return 1;
+   }
+}
 
 my $irc = TestIRC->new;
 sub write_irc
@@ -322,35 +353,3 @@ $irc->send_ctcpreply( undef, "target", "ACTION", "replies" );
 is( $serverstream, "NOTICE target :\001ACTION replies\001$CRLF", 'server stream after send_ctcp' );
 
 done_testing;
-
-package TestIRC;
-use base qw( Protocol::IRC );
-
-sub new { return bless [], shift }
-
-sub write { $serverstream .= $_[1] }
-
-my %isupport;
-BEGIN {
-   %isupport = (
-      CHANTYPES   => "#&",
-         channame_re => qr/^[#&]/,
-      PREFIX      => "(ohv)@%+",
-         prefix_modes => 'ohv',
-         prefix_flags => '@%+',
-         prefixflag_re => qr/^[@%+]/,
-         prefix_map_m2f => { 'o' => '@', 'h' => '%', 'v' => '+' },
-         prefix_map_f2m => { '@' => 'o', '%' => 'h', '+' => 'v' },
-   );
-}
-sub isupport { return $isupport{$_[1]} }
-
-sub nick { return "MyNick" }
-
-sub on_message
-{
-   my $self = shift;
-   my ( $command, $message, $hints ) = @_;
-   $messages{$command} = [ $message, $hints ];
-   return 1;
-}

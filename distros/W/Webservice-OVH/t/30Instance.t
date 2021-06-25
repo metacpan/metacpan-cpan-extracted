@@ -17,7 +17,7 @@ my $api = Webservice::OVH->new_from_json($json_dir);
 ok( $api, "module ok" );
 
 my $project = $api->cloud->projects->[0];
-
+=head2
 SKIP: {
 
     skip "No project exists for given account" unless $project;
@@ -38,5 +38,5 @@ SKIP: {
     ok( $project->instance->groups && ref $project->instance->groups eq 'ARRAY', 'groups ok' );
 
 }
-
+=cut
 done_testing();

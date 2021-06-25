@@ -1,7 +1,11 @@
 Revision history for Perl extension Graphics::TIFF.
 
+16  Thu, 24 Jun 2021 00:00 +0000
+        - The *_t types seem only to be missing from msvcrt, so altered the
+          guards appropriately.
+
 15  Thu, 03 Jun 2021 00:00 +0000
-        - + *_t types for those pre C99 compilers that do not have them.
+        - + *_t types for those versions of libc that do not have them.
           Closes GH #5 (GT 14 will not install on Strawberry Perl 5.22)
 
 14  Mon, 31 May 2021 00:00 +0000

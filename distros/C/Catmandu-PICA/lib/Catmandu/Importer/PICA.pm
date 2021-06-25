@@ -2,7 +2,7 @@ package Catmandu::Importer::PICA;
 use strict;
 use warnings;
 
-our $VERSION = '1.04';
+our $VERSION = '1.05';
 
 use Catmandu::Sane;
 use PICA::Data qw(pica_parser);
@@ -37,7 +37,8 @@ sub generator {
     my ($self) = @_;
 
     sub {
-        return $self->parser->next();
+        my $next = $self->parser->next;
+        return $next ? {%$next} : undef;
     };
 }
 

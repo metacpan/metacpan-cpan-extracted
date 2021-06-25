@@ -1,4 +1,4 @@
-/* this file was auto-generated at 2021-04-21 18:25:29 */
+/* this file was auto-generated at 2021-06-19 11:53:04 */
 
 #include <stdio.h> /* NULL */
 #include "include/eav/auto_tld.h"
@@ -659,7 +659,7 @@ const tld_t tld_list[] = {
     { "it", 3, TLD_TYPE_COUNTRY_CODE },
     { "itau", 5, TLD_TYPE_GENERIC },
     { "itv", 4, TLD_TYPE_GENERIC },
-    { "iveco", 6, TLD_TYPE_GENERIC },
+    { "iveco", 6, TLD_TYPE_NOT_ASSIGNED },
     { "iwc", 4, TLD_TYPE_NOT_ASSIGNED },
     { "jaguar", 7, TLD_TYPE_GENERIC },
     { "java", 5, TLD_TYPE_GENERIC },
@@ -1188,7 +1188,7 @@ const tld_t tld_list[] = {
     { "spiegel", 8, TLD_TYPE_NOT_ASSIGNED },
     { "sport", 6, TLD_TYPE_GENERIC },
     { "spot", 5, TLD_TYPE_GENERIC },
-    { "spreadbetting", 14, TLD_TYPE_GENERIC },
+    { "spreadbetting", 14, TLD_TYPE_NOT_ASSIGNED },
     { "sr", 3, TLD_TYPE_COUNTRY_CODE },
     { "srl", 4, TLD_TYPE_GENERIC },
     { "srt", 4, TLD_TYPE_NOT_ASSIGNED },

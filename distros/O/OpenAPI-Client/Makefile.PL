@@ -16,8 +16,8 @@ my %WriteMakefileArgs = (
 }
 ,
   PREREQ_PM      => {
-  'JSON::Validator' => '4.14',
-  'Mojolicious::Plugin::OpenAPI' => '2.14'
+  'JSON::Validator' => '4.19',
+  'Mojolicious::Plugin::OpenAPI' => '4.04'
 }
 ,
   META_MERGE     => {

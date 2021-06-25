@@ -30,6 +30,11 @@ DESCRIPTION
     original requests can pass anything as the initial value of the header,
     and thus spoof additional proxy levels.
 
+    Since Mojolicious 8.72, you can configure "trusted_proxies" in
+    Mojo::Server::Hypnotoad as a more reliable alternative to the baseline
+    reverse proxy configuration, affecting "remote_address" in
+    Mojo::Transaction directly without need of this plugin.
+
 HELPERS
 
     Mojolicious::Plugin::ForwardedFor implements the following helpers.

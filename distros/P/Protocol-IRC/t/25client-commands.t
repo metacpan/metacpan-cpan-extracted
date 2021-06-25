@@ -1,11 +1,20 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
 use Test::More;
 
 my @written;
+
+package TestIRC {
+   use base qw( Protocol::IRC::Client );
+
+   sub new { return bless {}, shift }
+
+   sub write { $_[1] =~ s/\x0d\x0a$//; push @written, $_[1] }
+}
+
 my $irc = TestIRC->new;
 
 # PRIVMSG
@@ -33,10 +42,3 @@ my $irc = TestIRC->new;
 }
 
 done_testing;
-
-package TestIRC;
-use base qw( Protocol::IRC::Client );
-
-sub new { return bless {}, shift }
-
-sub write { $_[1] =~ s/\x0d\x0a$//; push @written, $_[1] }

@@ -28,6 +28,7 @@ sub new
 		canvas          => $canvas,
 		commands        => [],
 		precision       => undef,
+		antialias       => 0,
 		%opt
 	}, $class;
 }
@@ -73,6 +74,7 @@ sub moveto           { shift->cmd('moveto', shift, shift, 0) }
 sub rmoveto          { shift->cmd('moveto', shift, shift, 1) }
 sub restore          { shift->cmd('restore') } # no checks for underflow here, to allow append paths
 sub precision        { shift->cmd(set => precision => shift) }
+sub antialias        { $#_ ? $_[0]->{antialias} = $_[1] : $_[0]->{antialias} }
 
 sub matrix_multiply
 {
@@ -301,6 +303,43 @@ sub sector
 		restore;
 }
 
+sub round_rect
+{
+	my ( $self, $x, $y, $x1, $y1, $maxd) = @_;
+	( $x1, $x) = ( $x, $x1) if $x > $x1;
+	( $y1, $y) = ( $y, $y1) if $y > $y1;
+	my ( $dx, $dy) = ( $x1 - $x, $y1 - $y);
+	$dx = $maxd if $dx > $maxd;
+	$dy = $maxd if $dy > $maxd;
+	my $d = ( $dx < $dy ) ? $dx : $dy;
+	my $r = int($d/2);
+#  plots roundrect:
+# A'        B'
+#  /------\
+#  |A    B|
+#  |      |  arcs cannot have diameter larger than $maxd
+#  |C    D|
+#  \------/
+# C'        D'
+	my @r = (
+		# coordinates of C and B, so A=r[0,3],B=r[2,3],C=r[0,1],D=[2,1]
+		$x + $r, $y + $r,
+		$x1 - $r, $y1 - $r,
+		# coordinates of C' and B'
+		$x, $y,
+		$x1, $y1,
+	);
+	$self-> line( @r[2,7,0,7]) if $r[0] < $r[2];
+	$self-> arc( @r[0,3], $d, $d, 90, 180);
+	$self-> line( @r[4,3,4,1]) if $r[1] < $r[3];
+	$self-> arc( @r[0,1], $d, $d, 180, 270);
+	$self-> line( @r[0,5,2,5]) if $r[0] < $r[2];
+	$self-> arc( @r[2,1], $d, $d, 270, 360);
+	$self-> line( @r[6,1,6,3]) if $r[1] < $r[3];
+	$self-> arc( @r[2,3], $d, $d, 0, 90);
+	return $self;
+}
+
 sub points
 {
 	my ($self, $for_fill) = @_;
@@ -358,16 +397,8 @@ sub matrix_apply
 {
 	my $self   = shift;
 	my ($ref, $points) = $#_ ? (0, [@_]) : (1, $_[0]);
-	my $m  = $self->{curr}->{matrix};
-	my @ret;
-	for ( my $i = 0; $i < @$points; $i += 2 ) {
-		my ( $x, $y ) = @{$points}[$i,$i+1];
-		push @ret,
-			$$m[A] * $x + $$m[C] * $y + $$m[X],
-			$$m[B] * $x + $$m[D] * $y + $$m[Y]
-			;
-	}
-	return $ref ? \@ret : @ret;
+	my $ret = Prima::Drawable->render_polyline( $points, matrix => $self->{curr}->{matrix} );
+	return $ref ? $ret : @$ret;
 }
 
 sub _save
@@ -537,7 +568,11 @@ sub _arc
 sub stroke {
 	return 0 unless $_[0]->{canvas};
 	for ( map { @$_ } @{ $_[0]->points }) {
-		return 0 unless $_[0]->{canvas}->polyline($_);
+		if ( $_[0]->{antialias} ) {
+			return 0 unless $_[0]->{canvas}->new_aa_surface->polyline($_);
+		} else {
+			return 0 unless $_[0]->{canvas}->polyline($_);
+		}
 	}
 	return 1;
 }
@@ -553,9 +588,25 @@ sub fill {
 		$c->fillMode($fillMode);
 	}
 	for ( @p ) {
-		last unless $ok &= $c->fillpoly($_);
+		if ( $self->{antialias} ) {
+			last unless $ok &= $c->new_aa_surface->fillpoly($_);
+		} else {
+			last unless $ok &= $c->fillpoly($_);
+		}
 	}
 	$c->fillMode($save) if defined $save;
+	return $ok;
+}
+
+sub fill_stroke
+{
+	my ( $self, $fillMode ) = @_;
+	return 0 unless my $c = $self->{canvas};
+	my $color = $c->color;
+	$c->color( $c-> backColor);
+	my $ok = $self->fill($fillMode);
+	$c->color( $color );
+	$ok &= $self->stroke;
 	return $ok;
 }
 
@@ -1116,6 +1167,10 @@ point of the previous primitive, or (0,0) if there's none.
 
 Adds rectangle to the path. Is there only for compatibility with C<Prima::Drawable>.
 
+=item round_rect X1, Y1, X2, Y2, MAX_DIAMETER
+
+Adds round rectangle to the path.
+
 =item sector CENTER_X, CENTER_Y, DIAMETER_X, DIAMETER_Y, ANGLE_START, ANGLE_END
 
 Adds sector to the path. Is there only for compatibility with C<Prima::Drawable>.
@@ -1174,6 +1229,12 @@ and when applied to 2D coordinates, is calculated as
 
 Selects current precision for splines and arcs. See L<Prima::Drawable/spline>, C<precision> entry.
 
+=item antialias BOOLEAN
+
+Turns on and off slow but more visually pleasant antialiased drawing mode.
+
+Default: false
+
 =item restore
 
 Pops the stack entry and replaces the current matrix and graphic properties with it.
@@ -1229,6 +1290,11 @@ Return CTM resulted after running all commands
 
 Paints a filled shape over the path. If C<fillMode> is set, it is used instead of the one
 selected on the canvas.
+
+=item fill_stroke fillMode=undef
+
+Paints a filled shape over the path with back color. If C<fillMode> is set, it is used instead of the one
+selected on the canvas. Thereafter, draws a polyline over the path.
 
 =item flatten PRESCALE 
 

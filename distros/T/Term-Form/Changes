@@ -1,6 +1,15 @@
 Revision history for Term::Form
 
 
+0.534   2021-06-22
+        - Use Carp again.
+        - New options 'footer', 'keep' and 'page'.
+        - readline: print info string only once.
+        - readline: retain entered string if term size changes.
+
+0.533   2021-06-17
+        - Adapt the code to the updated Term::Choose.
+
 0.532   2021-04-25
         - Replace 'croak' with 'die' and 'carp' with 'warn'.
 

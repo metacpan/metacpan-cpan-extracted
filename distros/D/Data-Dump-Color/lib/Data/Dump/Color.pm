@@ -5,9 +5,9 @@
 package Data::Dump::Color;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-06-05'; # DATE
+our $DATE = '2021-06-24'; # DATE
 our $DIST = 'Data-Dump-Color'; # DIST
-our $VERSION = '0.245'; # VERSION
+our $VERSION = '0.248'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -49,6 +49,15 @@ $COLOR_THEME = $ENV{DATA_DUMP_COLOR_THEME} //
     (($ENV{TERM} // "") =~ /256/ ? 'Default256' : 'Default16');
 our $ct_obj;
 
+# from List::Util::PP
+sub max {
+    return undef unless @_;
+    my $max = shift;
+    $_ > $max and $max = $_
+        foreach @_;
+    return $max;
+}
+
 sub _col {
     require ColorThemeUtil::ANSI;
     my ($item, $str) = @_;
@@ -81,7 +90,7 @@ sub dump
         {ns_prefixes=>['ColorTheme::Data::Dump::Color','ColorTheme','']}, $COLOR_THEME);
     require Data::Dump::FilterContext if @FILTERS;
 
-    my $name = "a";
+    my $name = "var";
     my @dump;
     my @cdump;
 
@@ -258,9 +267,10 @@ sub _dump
                 "do{my \$fix}",
                 _col(keyword=>"do")."{"._col(keyword=>"my")." "._col(symbol=>"\$fix")."}",
             ) if @$idx && $idx->[-1] eq '$';
-	    return (
-                "'fix'",
-                _col(string => "'fix'"),
+	    my $str = squote($sref);
+            return (
+                $str,
+                _col(string => $str),
             );
 	}
 	$seen{$id} = [$name, $idx];
@@ -509,7 +519,7 @@ sub _dump
 	    my $pad_len = ($klen_pad - length($key));
 	    if ($pad_len < 0) { $pad_len = 0; }
 	    $key .= " " x $pad_len if $nl;
-            my $cpad = " " x ($maxkvlen - ($vmultiline ? -6+length($vpad) : length($key)) - $lenvlastline);
+            my $cpad = " " x max(0, $maxkvlen - ($vmultiline ? -6+length($vpad) : length($key)) - $lenvlastline);
             #say "DEBUG: key=<$key>, vpad=<$vpad>, val=<$val>, lenvlastline=<$lenvlastline>, cpad=<$cpad>" if $DEBUG;
             my $visaid = "";
             $visaid .= sprintf("%s{%${idxwidth}i}", "." x @$idx, $i) if $INDEX;
@@ -594,8 +604,8 @@ sub fullname
 	    $cname .= $i->[1];
 	    $last_was_index++;
 	} else {
-	    $name  .= "->" unless $last_was_index++;
-	    $cname .= "->" unless $last_was_index++;
+	    $name  .= "->";
+	    $cname .= "->";
 	    $name  .= $i->[0];
 	    $cname .= $i->[1];
 	}
@@ -666,10 +676,10 @@ sub format_list
         my $idxwidth = length(~~@elem);
         for my $i (0..$#elem) {
             my ($vlastline) = $elem[$i] =~ /(.*)\z/;
-            my $cpad = " " x ($maxvlen - length($vlastline));
+            my $cpad = " " x max(0, $maxvlen - length($vlastline));
             my $visaid = "";
             $visaid .= sprintf("%s[%${idxwidth}i]", "." x $extra->[0], $i) if $INDEX;
-            $visaid .= " len=".length($orig[$i]) if length($orig[$i]) >= $LENTHRESHOLD;
+            $visaid .= " len=".length($orig[$i]) if defined $orig[$i] && length($orig[$i]) >= $LENTHRESHOLD;
             push @res , $elem[ $i], ",", (length($visaid) ? " $cpad# $visaid" : ""), "\n";
             push @cres, $celem[$i], ",", (length($visaid) ? " $cpad"._col(comment => "# $visaid") : ""), "\n";
         }
@@ -752,6 +762,13 @@ sub quote {
   return qq("$_");
 }
 
+# put a string value in single quotes
+sub squote {
+    local($_) = $_[0];
+    s/([\\'])/\\$1/g;
+    return qq('$_');
+}
+
 1;
 # ABSTRACT: Like Data::Dump, but with color
 
@@ -767,7 +784,7 @@ Data::Dump::Color - Like Data::Dump, but with color
 
 =head1 VERSION
 
-This document describes version 0.245 of Data::Dump::Color (from Perl distribution Data-Dump-Color), released on 2021-06-05.
+This document describes version 0.248 of Data::Dump::Color (from Perl distribution Data-Dump-Color), released on 2021-06-24.
 
 =head1 SYNOPSIS
 
@@ -777,14 +794,20 @@ Use it like you would Data::Dump, e.g.:
 
 =head1 DESCRIPTION
 
+Sample screenshot:
+
+=for Pod::Coverage ^(dumpf|pp|quote|squote|tied_str|fullname|format_list|str|looks_like_number|max)$
+
+=for html <img src="https://st.aticpan.org/source/PERLANCAR/Data-Dump-Color-0.248/share/images/Screenshot_20210624_071713.png" />
+
+=for html <img src="https://st.aticpan.org/source/PERLANCAR/Data-Dump-Color-0.248/share/images/Screenshot_20210624_071341.png" />
+
 This module aims to be a drop-in replacement for L<Data::Dump>. It adds colors
 to dumps. It also adds various visual aids in the comments, e.g. array/hash
 index, depth indicator, and so on.
 
 For more information, see Data::Dump. This documentation explains what's
 different between this module and Data::Dump.
-
-=for Pod::Coverage ^(dumpf|pp|quote|tied_str|fullname|format_list|str|looks_like_number)$
 
 =head1 RESULTS
 

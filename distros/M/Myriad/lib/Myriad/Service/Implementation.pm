@@ -3,7 +3,7 @@ package Myriad::Service::Implementation;
 use strict;
 use warnings;
 
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.008'; # VERSION
 our $AUTHORITY = 'cpan:DERIV'; # AUTHORITY
 
 use utf8;
@@ -216,6 +216,8 @@ async method process_batch($k, $code, $src) {
             $log->warnf("Batch iteration for %s failed - %s", $k, $e);
         }
 
+        die 'Batch should return an arrayref' unless ref $data eq 'ARRAY';
+
         if ($data->@*) {
             $backoff = 0;
             $src->emit($_) for $data->@*;
@@ -333,6 +335,9 @@ async method load () {
                     });
                     await $self->rpc->reply_success($service_name, $message, $response);
                 } catch ($e) {
+                    unless (blessed $e and $e->isa('Myriad::Error')) {
+                        $e = Myriad::Exception::InternalError->new(reason => $e);
+                    }
                     await $self->rpc->reply_error($service_name, $message, $e);
                 }
             }))->resolve->completed;

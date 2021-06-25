@@ -79,7 +79,7 @@ check-domain: t-dash-domains.bin t-retired.bin
 check-lpart: t-822-localpart.bin t-5321-localpart.bin
 check-lpart: t-5322-localpart.bin t-6531-localpart.bin
 	# === localpart tests
-	./t-822-localpart.bin 24 19 ../data/localpart-ascii.txt
+	./t-822-localpart.bin 23 20 ../data/localpart-ascii.txt
 	./t-5321-localpart.bin 21 22 ../data/localpart-ascii.txt
 	./t-5322-localpart.bin 23 20 ../data/localpart-ascii.txt
 ifeq ($(RFC6531_FOLLOW_RFC5322),ON)
@@ -124,7 +124,7 @@ check-email: check-email-5322 check-email-6531
 
 check-email-822: t-822-email.bin
 	# === RFC 822 email address tests
-	./t-822-email.bin 46 0 ../data/pass-email-ascii.txt
+	./t-822-email.bin 45 1 ../data/pass-email-ascii.txt
 	./t-822-email.bin 0 44 ../data/fail-email-ascii.txt
 
 
@@ -276,7 +276,7 @@ else
 	./t-eav.bin 4 20 ../data/email-utf8.txt
 endif
 	./t-eav.bin 7 1 ../data/email-reg.ru.txt
-	./t-eav-all-modes.bin 216 14 ../data/pass-email-ascii.txt
+	./t-eav-all-modes.bin 215 15 ../data/pass-email-ascii.txt
 	./t-eav-all-modes.bin 0 220 ../data/fail-email-ascii.txt
 else
 	#
@@ -288,7 +288,7 @@ else
 	./t-eav.bin 8 16 ../data/email-utf8.txt
 endif
 	./t-eav.bin 7 1 ../data/email-reg.ru.txt
-	./t-eav-all-modes.bin 218 12 ../data/pass-email-ascii.txt
+	./t-eav-all-modes.bin 217 13 ../data/pass-email-ascii.txt
 	./t-eav-all-modes.bin 0 220 ../data/fail-email-ascii.txt
 endif
 else
@@ -302,7 +302,7 @@ else
 	./t-eav.bin 4 20 ../data/email-utf8.txt
 endif
 	./t-eav.bin 7 1 ../data/email-reg.ru.txt
-	./t-eav-all-modes.bin 208 22 ../data/pass-email-ascii.txt
+	./t-eav-all-modes.bin 207 23 ../data/pass-email-ascii.txt
 	./t-eav-all-modes.bin 0 220 ../data/fail-email-ascii.txt
 else
 	#
@@ -314,7 +314,7 @@ else
 	./t-eav.bin 8 16 ../data/email-utf8.txt
 endif
 	./t-eav.bin 7 1 ../data/email-reg.ru.txt
-	./t-eav-all-modes.bin 210 20 ../data/pass-email-ascii.txt
+	./t-eav-all-modes.bin 209 21 ../data/pass-email-ascii.txt
 	./t-eav-all-modes.bin 0 220 ../data/fail-email-ascii.txt
 endif
 endif

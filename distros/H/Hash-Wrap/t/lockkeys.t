@@ -93,4 +93,17 @@ subtest 'extra attrs' => sub {
     };
 };
 
+subtest 'api' => sub {
+
+    like (
+          dies {
+              Hash::Wrap->import ( { -lockkeys => [ '-a' ] } );
+          },
+          qr/not a valid Perl identifier/,
+          'invalid identifier'
+          );
+
+};
+
+
 done_testing();

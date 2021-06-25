@@ -3,7 +3,7 @@ package Beekeeper::JSONRPC::Request;
 use strict;
 use warnings;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 
 sub new {
@@ -26,12 +26,12 @@ sub response {
 }
 
 sub result {
-    # Shortcut for $job->response->result
+    # Shortcut for $req->response->result
     return ($_[0]->{_response}) ? $_[0]->{_response}->{result} : undef;
 }
 
 sub success {
-    # Shortcut for $job->response->success
+    # Shortcut for $req->response->success
     return ($_[0]->{_response}) ? $_[0]->{_response}->success : undef;
 }
 
@@ -53,7 +53,7 @@ Beekeeper::JSONRPC::Request - Representation of a JSON-RPC request.
  
 =head1 VERSION
  
-Version 0.05
+Version 0.06
 
 =head1 SYNOPSIS
 

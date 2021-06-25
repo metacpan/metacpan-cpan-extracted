@@ -1,9 +1,9 @@
 package App::idxdb;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-01-22'; # DATE
+our $DATE = '2021-06-21'; # DATE
 our $DIST = 'App-idxdb'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 use 5.010001;
 use strict;
@@ -11,8 +11,13 @@ use warnings;
 use Log::ger;
 
 #use Data::Clone qw(clone);
-use DateTime;
 use File::chdir;
+#use List::Util qw(min max);
+use Time::Local::More qw(time_startofday_local time_startofyear_local);
+
+my $now = time();
+my $today = time_startofday_local($now);
+my $startofyear = time_startofyear_local($now);
 
 sub _set_args_default {
     my $args = shift;
@@ -51,8 +56,6 @@ sub _init {
     }
     $App::idxdb::state;
 }
-
-my $today = DateTime->today;
 
 our %SPEC;
 
@@ -156,26 +159,28 @@ our %argsopt_filter_date = (
     date_start => {
         schema => ['date*', 'x.perl.coerce_to' => 'DateTime', 'x.perl.coerce_rules'=>['From_str::natural']],
         tags => ['category:filtering'],
-        default => $today->clone->subtract(days=>30)->epoch,
+        default => ($today - 30*86400),
         cmdline_aliases => {
-            'week'   => {is_flag=>1, code=>sub {$_[0]{date_start} = $today->clone->subtract(days=>     7); $_[0]{date_end} = $today}},
-            '1week'  => {is_flag=>1, code=>sub {$_[0]{date_start} = $today->clone->subtract(days=>     7); $_[0]{date_end} = $today}},
-            'month'  => {is_flag=>1, code=>sub {$_[0]{date_start} = $today->clone->subtract(days=>    30); $_[0]{date_end} = $today}},
-            '1month' => {is_flag=>1, code=>sub {$_[0]{date_start} = $today->clone->subtract(days=>    30); $_[0]{date_end} = $today}},
-            '3month' => {is_flag=>1, code=>sub {$_[0]{date_start} = $today->clone->subtract(days=>    90); $_[0]{date_end} = $today}},
-            '6month' => {is_flag=>1, code=>sub {$_[0]{date_start} = $today->clone->subtract(days=>   180); $_[0]{date_end} = $today}},
-            'ytd'    => {is_flag=>1, code=>sub {$_[0]{date_start} = $today->clone->set(month=>1, day=>1);  $_[0]{date_end} = $today}},
-            'year'   => {is_flag=>1, code=>sub {$_[0]{date_start} = $today->clone->subtract(days=>   365); $_[0]{date_end} = $today}},
-            '1year'  => {is_flag=>1, code=>sub {$_[0]{date_start} = $today->clone->subtract(days=>   365); $_[0]{date_end} = $today}},
-            '3year'  => {is_flag=>1, code=>sub {$_[0]{date_start} = $today->clone->subtract(days=> 3*365); $_[0]{date_end} = $today}},
-            '5year'  => {is_flag=>1, code=>sub {$_[0]{date_start} = $today->clone->subtract(days=> 5*365); $_[0]{date_end} = $today}},
-            '10year' => {is_flag=>1, code=>sub {$_[0]{date_start} = $today->clone->subtract(days=>10*365); $_[0]{date_end} = $today}},
+            'week'   => {is_flag=>1, code=>sub {$_[0]{date_start} = $today-     7*86400; $_[0]{date_end} = $today}},
+            '1week'  => {is_flag=>1, code=>sub {$_[0]{date_start} = $today-     7*86400; $_[0]{date_end} = $today}},
+            'month'  => {is_flag=>1, code=>sub {$_[0]{date_start} = $today-    30*86400; $_[0]{date_end} = $today}},
+            '1month' => {is_flag=>1, code=>sub {$_[0]{date_start} = $today-    30*86400; $_[0]{date_end} = $today}},
+            '2month' => {is_flag=>1, code=>sub {$_[0]{date_start} = $today-    60*86400; $_[0]{date_end} = $today}},
+            '3month' => {is_flag=>1, code=>sub {$_[0]{date_start} = $today-    90*86400; $_[0]{date_end} = $today}},
+            '6month' => {is_flag=>1, code=>sub {$_[0]{date_start} = $today-   180*86400; $_[0]{date_end} = $today}},
+            'ytd'    => {is_flag=>1, code=>sub {$_[0]{date_start} = $startofyear;        $_[0]{date_end} = $today}},
+            'year'   => {is_flag=>1, code=>sub {$_[0]{date_start} = $today-   365*86400; $_[0]{date_end} = $today}},
+            '1year'  => {is_flag=>1, code=>sub {$_[0]{date_start} = $today-   365*86400; $_[0]{date_end} = $today}},
+            '2year'  => {is_flag=>1, code=>sub {$_[0]{date_start} = $today- 2*365*86400; $_[0]{date_end} = $today}},
+            '3year'  => {is_flag=>1, code=>sub {$_[0]{date_start} = $today- 3*365*86400; $_[0]{date_end} = $today}},
+            '5year'  => {is_flag=>1, code=>sub {$_[0]{date_start} = $today- 5*365*86400; $_[0]{date_end} = $today}},
+            '10year' => {is_flag=>1, code=>sub {$_[0]{date_start} = $today-10*365*86400; $_[0]{date_end} = $today}},
         },
     },
     date_end => {
         schema => ['date*', 'x.perl.coerce_to' => 'DateTime', 'x.perl.coerce_rules'=>['From_str::natural']],
         tags => ['category:filtering'],
-        default => $today->epoch,
+        default => $today,
     },
 );
 
@@ -222,9 +227,10 @@ our %argopt_fields_daily = (
         tags => ['category:field_selection'],
         default => ['Volume','Value','ForeignNetBuy'],
         cmdline_aliases => {
-            fields_all         => {is_flag=>1, code=>sub { $_[0]{fields} = \@daily_fields }},
-            fields_price       => {is_flag=>1, code=>sub { $_[0]{fields} = [qw/FirstTrade OpenPrice High Low Close/] }},
-            fields_price_close => {is_flag=>1, code=>sub { $_[0]{fields} = [qw/Close/] }},
+            fields_all            => {is_flag=>1, summary=>'Display all fields', code=>sub { $_[0]{fields} = \@daily_fields }},
+            fields_price_all      => {is_flag=>1, summary=>'Display all prices', code=>sub { $_[0]{fields} = [qw/FirstTrade OpenPrice High Low Close/] }},
+            fields_price_close    => {is_flag=>1, summary=>'Short for --field Close', code=>sub { $_[0]{fields} = [qw/Close/] }},
+            fields_price_and_afnb => {is_flag=>1, summary=>'Short for --field Close --field AccumForeignNetBuy', code=>sub { $_[0]{fields} = [qw/Close AccumForeignNetBuy/] }},
         },
     },
 );
@@ -234,6 +240,7 @@ our %argopt_graph = (
         summary => 'Show graph instead of table',
         schema => 'bool*',
         tags => ['category:action'],
+        cmdline_aliases => {g=>{}},
     },
 );
 
@@ -318,7 +325,7 @@ sub update {
         }
         local $CWD = "$gd_path/table/idx_daily_trading_summary/raw";
       YEAR:
-        for my $year (reverse glob("*")) {
+        for my $year (reverse grep {-d} glob("*")) {
             local $CWD = $year;
           FILENAME:
             for my $filename (reverse glob("*.json.gz")) {
@@ -650,10 +657,17 @@ sub daily {
             output   => $tempfilename,
             title    => join(",", @$fields)." of ".join(",",@$stocks)." from $mindate to $maxdate",
             xlabel   => 'date',
-            ylabel   => "\%",
+            ylabel   => $fields->[0],
+            (@$fields > 1 ? (y2label  =>
+                                 $fields->[1] .
+                                 (@$fields > 2 ? ", $fields->[2]" : "") .
+                                 (@$fields > 3 ? ", ...":"")) : ()),
             timeaxis => 'x',
             xtics    => {labelfmt=>'%Y-%m-%d', rotate=>"30 right"},
-            #yrange   => [0, 100],
+            #yrange   => [0, 5000],
+            #y2range  => [-0, 1000_000_000],
+            ytics    => {mirror=>'off'}, # no effect?
+            y2tics   => {mirror=>'off'}, # no effect?
         );
         my $i = -1;
         my @datasets;
@@ -669,6 +683,7 @@ sub daily {
                     title   => "$stock.$field",
                     color   => $colors[$i],
                     style   => 'lines',
+                    ($i ? (axes => "x1y2") : ()),
                 );
             }
         }
@@ -725,6 +740,42 @@ sub daily {
     }];
 }
 
+$SPEC{stocks_by_foreign_ownership} = {
+    v => 1.1,
+    summary => 'Rank stocks from highest foreign ownership',
+    args => {
+        %args_common,
+        # XXX date?
+    },
+};
+sub stocks_by_foreign_ownership {
+    my %args = @_;
+    my $state = _init(\%args, 'ro');
+    my $dbh = $state->{dbh};
+
+    my $sth = $dbh->prepare("
+SELECT
+  Code,
+  -- ForeignTotal,
+  -- LocalTotal,
+  ForeignTotal*100.0/(ForeignTotal+LocalTotal) AS PctForeignTotal
+FROM stock_ownership
+WHERE
+  (ForeignTotal+LocalTotal)>0 AND
+  date=(SELECT MAX(date) FROM stock_ownership)
+ORDER BY PctForeignTotal DESC,Code ASC");
+    $sth->execute;
+
+    my @rows;
+    while (my $row = $sth->fetchrow_hashref) {
+        $row->{PctForeignTotal} = sprintf "%.02f", $row->{PctForeignTotal};
+        push @rows, $row;
+    }
+
+    my $resmeta = {'table.fields' => [qw/Code ForeignTotal/]};
+    [200, "OK", \@rows, $resmeta];
+}
+
 1;
 # ABSTRACT: Import data for stocks on the IDX (Indonesian Stock Exchange) and perform queries on them
 
@@ -740,13 +791,19 @@ App::idxdb - Import data for stocks on the IDX (Indonesian Stock Exchange) and p
 
 =head1 VERSION
 
-This document describes version 0.004 of App::idxdb (from Perl distribution App-idxdb), released on 2021-01-22.
+This document describes version 0.008 of App::idxdb (from Perl distribution App-idxdb), released on 2021-06-21.
 
 =head1 SYNOPSIS
 
 See the included CLI script L<idxdb>.
 
 =head1 DESCRIPTION
+
+=head1 CONTRIBUTOR
+
+=for stopwords perlancar (on netbook-dell-xps13)
+
+perlancar (on netbook-dell-xps13) <perlancar@gmail.com>
 
 =head1 FUNCTIONS
 
@@ -755,7 +812,7 @@ See the included CLI script L<idxdb>.
 
 Usage:
 
- daily(%args) -> [status, msg, payload, meta]
+ daily(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Show data from daily stockE<sol>trading summary.
 
@@ -765,9 +822,9 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
-=item * B<date_end> => I<date> (default: 1611273600)
+=item * B<date_end> => I<date> (default: 1624208400)
 
-=item * B<date_start> => I<date> (default: 1608681600)
+=item * B<date_start> => I<date> (default: 1621616400)
 
 =item * B<fields> => I<array[str]> (default: ["Volume","Value","ForeignNetBuy"])
 
@@ -784,12 +841,12 @@ Show graph instead of table.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -799,7 +856,7 @@ Return value:  (any)
 
 Usage:
 
- ownership(%args) -> [status, msg, payload, meta]
+ ownership(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Show ownership of some stock through time.
 
@@ -819,9 +876,9 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
-=item * B<date_end> => I<date> (default: 1611273600)
+=item * B<date_end> => I<date> (default: 1624208400)
 
-=item * B<date_start> => I<date> (default: 1608681600)
+=item * B<date_start> => I<date> (default: 1621616400)
 
 =item * B<fields> => I<array[str]> (default: ["LocalTotal","ForeignTotal"])
 
@@ -840,12 +897,48 @@ Show legend of ownership instead (e.g. ForeignIB = foreign bank, etc).
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
+
+Return value:  (any)
+
+
+
+=head2 stocks_by_foreign_ownership
+
+Usage:
+
+ stocks_by_foreign_ownership(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+Rank stocks from highest foreign ownership.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<dbpath> => I<str>
+
+Path for SQLite database.
+
+If not specified, will default to C<~/idxdb.db>.
+
+
+=back
+
+Returns an enveloped result (an array).
+
+First element ($status_code) is an integer containing HTTP-like status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -855,7 +948,7 @@ Return value:  (any)
 
 Usage:
 
- update(%args) -> [status, msg, payload, meta]
+ update(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Update data.
 
@@ -882,12 +975,12 @@ If not specified, will default to C<~/idxdb.db>.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -901,7 +994,7 @@ Source repository is at L<https://github.com/perlancar/perl-App-idxdb>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-App-idxdb/issues>
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-idxdb>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

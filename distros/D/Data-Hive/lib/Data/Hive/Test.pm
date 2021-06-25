@@ -1,8 +1,8 @@
 use strict;
 use warnings;
-package Data::Hive::Test;
+package Data::Hive::Test 1.014;
 # ABSTRACT: a bundle of tests for Data::Hive stores
-$Data::Hive::Test::VERSION = '1.013';
+
 use Data::Hive;
 use Data::Hive::Store::Hash;
 
@@ -297,7 +297,7 @@ Data::Hive::Test - a bundle of tests for Data::Hive stores
 
 =head1 VERSION
 
-version 1.013
+version 1.014
 
 =head1 SYNOPSIS
 
@@ -318,6 +318,16 @@ Data::Hive::Test is a library of tests that should be passable for any
 conformant L<Data::Hive::Store> implementation.  It provides a method for
 running a suite of tests -- which may expand or change -- that check the
 behavior of a hive store by building a hive around it and testing its behavior.
+
+=head1 PERL VERSION SUPPORT
+
+This module has a long-term perl support period.  That means it will not
+require a version of perl released fewer than five years ago.
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
 
 =head1 METHODS
 
@@ -351,7 +361,7 @@ Hans Dieter Pearcey <hdp@cpan.org>
 
 =item *
 
-Ricardo Signes <rjbs@cpan.org>
+Ricardo Signes <rjbs@semiotic.systems>
 
 =back
 

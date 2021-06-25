@@ -1,0 +1,15 @@
+has 'next_document',     is => 'rw';
+has 'prev_document',     is => 'rw';
+
+my $prev;
+
+        # link documents in traversal order
+        my $doc = $parser->get_document;
+        if ($prev)
+        {
+            $prev->next_document( $doc );
+            $doc->prev_document( $prev );
+        }
+
+        $prev = $doc;
+        push @docs, $doc;

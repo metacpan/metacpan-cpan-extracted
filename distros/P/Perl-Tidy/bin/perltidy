@@ -500,7 +500,7 @@ This flag causes one leading tab character to be inserted for each level
 of indentation.  Certain other features are incompatible with this
 option, and if these options are also given, then a warning message will
 be issued and this flag will be unset.  One example is the B<-lp>
-option. This flag is retained for backwards compatability, but
+option. This flag is retained for backwards compatibility, but
 if you use tabs, the B<-et=n> flag is recommended.
 
 =item B<-dt=n>,   B<--default-tabsize=n>
@@ -517,41 +517,6 @@ indentation spaces as for the output stream (any other assumption would lead to
 unstable editing).
 
 =back
-
-=item B<-syn>,   B<--check-syntax>      
-
-This flag is now ignored for safety, but the following documentation
-has been retained for reference.
-
-This flag causes perltidy to run C<perl -c -T> to check syntax of input
-and output.  (To change the flags passed to perl, see the next
-item, B<-pscf>).  The results are written to the F<.LOG> file, which
-will be saved if an error is detected in the output script.  The output
-script is not checked if the input script has a syntax error.  Perltidy
-does its own checking, but this option employs perl to get a "second
-opinion".
-
-If perl reports errors in the input file, they will not be reported in
-the error output unless the B<--warning-output> flag is given. 
-
-The default is B<NOT> to do this type of syntax checking (although
-perltidy will still do as much self-checking as possible).  The reason
-is that it causes all code in BEGIN blocks to be executed, for all
-modules being used, and this opens the door to security issues and
-infinite loops when running perltidy.
-
-=item B<-pscf=s>, B<-perl-syntax-check-flags=s>
-
-When perl is invoked to check syntax, the normal flags are C<-c -T>.  In
-addition, if the B<-x> flag is given to perltidy, then perl will also be
-passed a B<-x> flag.  It should not normally be necessary to change
-these flags, but it can be done with the B<-pscf=s> flag.  For example,
-if the taint flag, C<-T>, is not wanted, the flag could be set to be just
-B<-pscf=-c>.  
-
-Perltidy will pass your string to perl with the exception that it will
-add a B<-c> and B<-x> if appropriate.  The F<.LOG> file will show
-exactly what flags were passed to perl.
 
 =item B<-xs>,   B<--extended-syntax>      
 
@@ -574,6 +539,7 @@ This flag is enabled by default but it can be deactivated with B<-nxs>.
 Probably the only reason to deactivate this flag is to generate more diagnostic
 messages when debugging a script.
 
+For another method of handling extended syntax see the section L<Skipping Selected Sections of Code>.
 
 =item B<-io>,   B<--indent-only>       
 
@@ -687,6 +653,17 @@ input comes from a filename (rather than stdin, for example).  If
 perltidy has trouble determining the input file line ending, it will
 revert to the default behavior of using the line ending of the host system.
 
+=item B<-atnl>,  B<--add-terminal-newline>
+
+This flag, which is enabled by default, allows perltidy to terminate the last
+line of the output stream with a newline character, regardless of whether or
+not the input stream was terminated with a newline character.  If this flag is
+negated, with B<-natnl>, then perltidy will add a terminal newline to the the
+output stream only if the input stream is terminated with a newline.
+
+Negating this flag may be useful for manipulating one-line scripts intended for
+use on a command line.
+
 =item B<-it=n>,   B<--iterations=n>
 
 This flag causes perltidy to do B<n> complete iterations.  The reason for this
@@ -749,7 +726,7 @@ number of spaces assigned to a full indentation level on the B<-i=n> command, or
 This flag allows perltidy to use some improvements which have been made to its
 indentation model. One of the things it does is "extend" continuation
 indentation deeper into structures, hence the name.  The improved indentation
-is particularly noticable when the flags B<-ci=n> and B<-i=n> use the same value of
+is particularly noticeable when the flags B<-ci=n> and B<-i=n> use the same value of
 B<n>. There are no significant disadvantages to using this flag, but to avoid
 disturbing existing formatting the default is not to use it, B<-nxci>.
 
@@ -827,13 +804,12 @@ space, perltidy will use less.   For alternate placement of the
 closing paren, see the next section.
 
 This option has no effect on code BLOCKS, such as if/then/else blocks,
-which always use whatever is specified with B<-i=n>.  Also, the
-existence of line breaks and/or block comments between the opening and
-closing parens may cause perltidy to temporarily revert to its default
-method.
+which always use whatever is specified with B<-i=n>.
 
-Note: The B<-lp> option may not be used together with the B<-t> tabs option.
-It may, however, be used with the B<-et=n> tab method.
+In situations where perltidy does not have complete freedom to choose line
+breaks it may temporarily revert to its default indentation method.  This can
+occur for example if there are blank lines, block comments, multi-line quotes,
+or side comments between the opening and closing parens, braces, or brackets.
 
 In addition, any parameter which significantly restricts the ability of
 perltidy to choose newlines will conflict with B<-lp> and will cause
@@ -841,6 +817,10 @@ B<-lp> to be deactivated.  These include B<-io>, B<-fnl>, B<-nanl>, and
 B<-ndnl>.  The reason is that the B<-lp> indentation style can require
 the careful coordination of an arbitrary number of break points in
 hierarchical lists, and these flags may prevent that.
+
+The B<-lp> option may not be used together with the B<-t> tabs option.
+It may, however, be used with the B<-et=n> tab method.
+
 
 =item B<-lpxl=s>,  B<--line-up-parentheses-exclusion-list>
 
@@ -865,7 +845,7 @@ The only required piece of information is a container type, which is one of
   -lpxl='[ {'
 
 means do B<NOT> include use -lp formatting within square-bracets or braces.  The only unspecified
-container is '(', so this string means that only the contens within parens will use -lp indentation.
+container is '(', so this string means that only the contents within parens will use -lp indentation.
 
 An optional numeric code may follow any of the container types to further refine the selection based
 on container contents.  The numeric codes are:
@@ -1301,7 +1281,7 @@ which shows that B<system> is type B<k> (keyword) and $foo is type B<Z>.
 
 Despite these precautions, it is still possible to introduce syntax errors with
 some asymmetric whitespace rules, particularly when call parameters are not
-placed in containg parens or braces.  For example, the following two lines will
+placed in containing parens or braces.  For example, the following two lines will
 be parsed by perl without a syntax error:
 
   # original programming, syntax ok
@@ -1971,33 +1951,26 @@ expression to be formed.
 
 =back
 
-
 =back
 
 =head2 Skipping Selected Sections of Code
 
 Selected lines of code may be passed verbatim to the output without any
-formatting.  This feature is enabled by default but can be disabled with
-the B<--noformat-skipping> or B<-nfs> flag.  It should be used sparingly to
-avoid littering code with markers, but it might be helpful for working
-around occasional problems.  For example it might be useful for keeping
-the indentation of old commented code unchanged, keeping indentation of
-long blocks of aligned comments unchanged, keeping certain list
-formatting unchanged, or working around a glitch in perltidy.
+formatting by marking the starting and ending lines with special comments.
+There are two options for doing this.  The first option is called
+B<--format-skipping> or B<-fs>, and the second option is called
+B<--code-skipping> or B<-cs>.
 
-=over 4
+In both cases the lines of code will be output without any changes.
+The difference is that in B<--format-skipping>
+perltidy will still parse the marked lines of code and check for errors,
+whereas in B<--code-skipping> perltidy will simply pass the lines to the output without any checking.
 
-=item B<-fs>,  B<--format-skipping>
+Both of these features are enabled by default and are invoked with special
+comment markers.  B<--format-skipping> uses starting and ending markers '#<<<'
+and '#>>>', like this:
 
-This flag, which is enabled by default, causes any code between
-special beginning and ending comment markers to be passed to the
-output without formatting.  The default beginning marker is #<<<
-and the default ending marker is #>>> but they
-may be changed (see next items below).  Additional text may appear on
-these special comment lines provided that it is separated from the
-marker by at least one space.  For example
-
- #<<<  do not let perltidy touch this
+ #<<<  format skipping: do not let perltidy change my nice formatting
     my @list = (1,
                 1, 1,
                 1, 2, 1,
@@ -2005,19 +1978,68 @@ marker by at least one space.  For example
                 1, 4, 6, 4, 1,);
  #>>>
 
-Format skipping begins when a format skipping comment is seen and continues
-until either a format-skipping end pattern is found or until the end of file. 
+B<--code-skipping> uses starting and ending markers '#<<V' and '#>>V', like
+this:
 
-The comment markers may be placed at any location that a block comment may
-appear.  If they do not appear to be working, use the -log flag and examine the
-F<.LOG> file.  Use B<-nfs> to disable this feature.  
+ #<<V  code skipping: perltidy will pass this verbatim without error checking
 
-This method works for any code. For the specific case of a comma-separated list
-of values, as in this example, another possibility is to insert a blank or
-comment somewhere between the opening and closing parens.  See the section
-L<Controlling List Formatting>.
+    token ident_digit {
+        [ [ <?word> | _ | <?digit> ] <?ident_digit>
+        |   <''>
+        ]
+    };
+
+ #>>V
+
+Additional text may appear on the special comment lines provided that it
+is separated from the marker by at least one space, as in the above examples.
+
+It is recommended to use B<--code-skipping> only if you need to hide a block of
+an extended syntax which would produce errors if parsed by perltidy, and use
+B<--format-skipping> otherwise.  This is because the B<--format-skipping>
+option provides the benefits of error checking, and there are essentially no
+limitations on which lines to which it can be applied.  The B<--code-skipping>
+option, on the other hand, does not do error checking and its use is more
+restrictive because the code which remains, after skipping the marked lines,
+must be syntactically correct code with balanced containers.
+
+These features should be used sparingly to avoid littering code with markers,
+but they can be helpful for working around occasional problems.
+
+Note that it may be possible to avoid the use of B<--format-skipping> for the
+specific case of a comma-separated list of values, as in the above example, by
+simply inserting a blank or comment somewhere between the opening and closing
+parens.  See the section L<Controlling List Formatting>.
+
+The following sections describe the available controls for these options.  They
+should not normally be needed.
+
+=over 4
+
+=item B<-fs>,  B<--format-skipping>
+
+As explained above, this flag, which is enabled by default, causes any code
+between special beginning and ending comment markers to be passed to the output
+without formatting.  The code between the comments is still checked for errors
+however.  The default beginning marker is #<<< and the default ending marker is
+#>>>.
+
+Format skipping begins when a format skipping beginning comment is seen and
+continues until a format-skipping ending comment is found.
+
+This feature can be disabled with B<-nfs>.   This should not normally be necessary.
 
 =item B<-fsb=string>,  B<--format-skipping-begin=string>
+
+This and the next parameter allow the special beginning and ending comments to
+be changed.  However, it is recommended that they only be changed if there is a
+conflict between the default values and some other use.  If they are used, it
+is recommended that they only be entered in a B<.perltidyrc> file, rather than
+on a command line.  This is because properly escaping these parameters on a
+command line can be difficult.
+
+If changed comment markers do not appear to be working, use the B<-log> flag and
+examine the F<.LOG> file to see if and where they are being detected.
 
 The B<-fsb=string> parameter may be used to change the beginning marker for
 format skipping.  The default is equivalent to -fsb='#<<<'.  The string that
@@ -2040,6 +2062,27 @@ ending marker for format skipping.  The default is equivalent to
 
 The beginning and ending strings may be the same, but it is preferable
 to make them different for clarity.
+
+=item B<-cs>,  B<--code-skipping>
+
+As explained above, this flag, which is enabled by default, causes any code
+between special beginning and ending comment markers to be directly passed to
+the output without any error checking or formatting.  Essentially, perltidy
+treats it as if it were a block of arbitrary text.  The default beginning
+marker is #<<V and the default ending marker is #>>V.
+
+This feature can be disabled with B<-ncs>.   This should not normally be
+necessary.
+
+=item B<-csb=string>,  B<--code-skipping-begin=string>
+
+This may be used to change the beginning comment for a B<--code-skipping> section, and its use is similar to the B<-fsb=string>.
+The default is equivalent to -csb='#<<V'.
+
+=item B<-cse=string>,  B<--code-skipping-end=string>
+
+This may be used to change the ending comment for a B<--code-skipping> section, and its use is similar to the B<-fse=string>.
+The default is equivalent to -cse='#>>V'.
 
 =back
 
@@ -2654,10 +2697,12 @@ Here are some additional example strings and their meanings:
 
     '^('   - the weld must not start with a paren
     '.('   - the second and later tokens may not be parens
+    '.w('  - the second and later tokens may not keyword or function call parens
     '('    - no parens in a weld
     '^K('  - exclude a leading paren preceded by a non-keyword
     '.k('  - exclude a secondary paren preceded by a keyword
     '[ {'  - exclude all brackets and braces
+    '[ ( ^K{' - exclude everything except nested structures like do {{  ... }}
 
 =item B<Vertical tightness> of non-block curly braces, parentheses, and square brackets.
 
@@ -2691,9 +2736,11 @@ B<--vertical-tightness-closing=n>, where
         by a semicolon or another closing token, and is not in 
         a list environment.
  -vtc=2 never break before a closing token.
+ -vtc=3 Like -vtc=1 except always break before a closing token
+        if the corresponding opening token follows an = or =>.
 
-The rules for B<-vtc=1> are designed to maintain a reasonable balance
-between tightness and readability in complex lists.
+The rules for B<-vtc=1> and B<-vtc=3> are designed to maintain a reasonable
+balance between tightness and readability in complex lists.
 
 =item *
 
@@ -2734,6 +2781,24 @@ Here are some examples:
                        three => 'III',
                        four  => 'IV', );
 
+    # perltidy -vtc=3
+    my_function(
+        one   => 'I',
+        two   => 'II',
+        three => 'III',
+        four  => 'IV', );
+
+    # perltidy -vtc=3
+    %romanNumerals = (
+        one   => 'I',
+        two   => 'II',
+        three => 'III',
+        four  => 'IV',
+    );
+
+In the last example for B<-vtc=3>, the opening paren is preceded by an equals
+so the closing paren is placed on a new line.
+
 The difference between B<-vt=1> and B<-vt=2> is shown here:
 
     # perltidy -lp -vt=1 
@@ -2773,20 +2838,20 @@ token.  If desired, vertical tightness controls can be applied
 independently to each of the closing container token types.
 
 The parameters for controlling parentheses are B<-pvt=n> or
-B<--paren-vertical-tightness=n>, and B<-pcvt=n> or
+B<--paren-vertical-tightness=n>, and B<-pvtc=n> or
 B<--paren-vertical-tightness-closing=n>.
 
 Likewise, the parameters for square brackets are B<-sbvt=n> or
-B<--square-bracket-vertical-tightness=n>, and B<-sbcvt=n> or
+B<--square-bracket-vertical-tightness=n>, and B<-sbvtc=n> or
 B<--square-bracket-vertical-tightness-closing=n>.
 
 Finally, the parameters for controlling non-code block braces are
-B<-bvt=n> or B<--brace-vertical-tightness=n>, and B<-bcvt=n> or
+B<-bvt=n> or B<--brace-vertical-tightness=n>, and B<-bvtc=n> or
 B<--brace-vertical-tightness-closing=n>.
 
 In fact, the parameter B<-vt=n> is actually just an abbreviation for
 B<-pvt=n -bvt=n sbvt=n>, and likewise B<-vtc=n> is an abbreviation
-for B<-pvtc=n -bvtc=n sbvtc=n>.
+for B<-pvtc=n -bvtc=n -sbvtc=n>.
 
 =item B<-bbvt=n> or B<--block-brace-vertical-tightness=n>
 
@@ -3237,6 +3302,7 @@ This flag will also look for and keep a 'cuddled' style of calls,
 in which lines begin with a closing paren followed by a call arrow, 
 as in this example:
 
+  # perltidy -bom -wn
   my $q = $rs->related_resultset(
       'CDs'
   )->related_resultset(
@@ -3516,7 +3582,7 @@ this using
   perltidy -blao=2 -blbc=2 -blaol='*' -blbcl='*' filename
 
 Now suppose the script continues to be developed, but at some later date we
-decide we don't want these spaces after all. we might expect that running with
+decide we don't want these spaces after all. We might expect that running with
 the flags B<-blao=0> and B<-blbc=0> will undo them.  However, by default
 perltidy retains single blank lines, so the blank lines remain.  
 
@@ -4124,16 +4190,24 @@ where B<newword> is the abbreviation, and B<opt1>, etc, are existing parameters
 I<or other abbreviations>.  The main syntax requirement is that the new
 abbreviation along with its opening curly brace must begin on a new line.
 Space before and after the curly braces is optional.
-For a
-specific example, the following line
 
-	airy {-bl -pt=0 -bt=0 -sbt=0}
+For a specific example, the following line
 
-could be placed in a F<.perltidyrc> file, and then invoked at will with
+        oneliner { --maximum-line-length=0 --noadd-newlines --noadd-terminal-newline}
 
-	perltidy -airy somefile.pl
+or equivalently with abbreviations
 
-(Either C<-airy> or C<--airy> may be used).
+	oneliner { -l=0 -nanl -natnl }
+
+could be placed in a F<.perltidyrc> file to temporarily override the maximum
+line length with a large value, to temporarily prevent new line breaks from
+being added, and to prevent an extra newline character from being added the
+file.  All other settings in the F<.perltidyrc> file still apply.  Thus it
+provides a way to format a long 'one liner' when perltidy is invoked with
+
+	perltidy --oneliner ...
+
+(Either C<-oneliner> or C<--oneliner> may be used).   
 
 =item Skipping leading non-perl commands with B<-x> or B<--look-for-hash-bang>
 
@@ -4587,23 +4661,23 @@ dot is added, and the backup file will be F<somefile.pl~>  .
 The following list shows all short parameter names which allow a prefix
 'n' to produce the negated form:
 
- D      anl    asbl   asc    ast    asu    aws    b      baa    baao   
- bar    bbao   bbb    bbc    bbs    bl     bli    boa    boc    bok    
- bol    bom    bos    bot    cblx   ce     conv   csc    cscb   cscw   
- dac    dbc    dcbl   dcsc   ddf    dln    dnl    dop    dp     dpro   
- dsc    dsm    dsn    dtt    dwls   dwrs   dws    f      fll    frm    
- fs     fso    gcs    hbc    hbcm   hbco   hbh    hbhh   hbi    hbj    
- hbk    hbm    hbn    hbp    hbpd   hbpu   hbq    hbs    hbsc   hbv    
- hbw    hent   hic    hicm   hico   hih    hihh   hii    hij    hik    
- him    hin    hip    hipd   hipu   hiq    his    hisc   hiv    hiw    
- hsc    html   ibc    icb    icp    iob    isbc   iscl   kgb    kgbd   
- kgbi   kis    lal    log    lop    lp     lsl    mem    nib    ohbr   
- okw    ola    olc    oll    olq    opr    opt    osbc   osbr   otr    
- ple    pod    pvl    q      sac    sbc    sbl    scbb   schb   scp    
- scsb   sct    se     sfp    sfs    skp    sob    sobb   sohb   sop    
- sosb   sot    ssc    st     sts    t      tac    tbc    toc    tp     
- tqw    trp    ts     tsc    tso    vmll   w      wn     x      xci    
- xs     
+ D      anl    asbl   asc    ast    asu    atnl   aws    b      baa
+ baao   bar    bbao   bbb    bbc    bbs    bl     bli    boa    boc
+ bok    bol    bom    bos    bot    cblx   ce     conv   cs     csc
+ cscb   cscw   dac    dbc    dcbl   dcsc   ddf    dln    dnl    dop
+ dp     dpro   dsc    dsm    dsn    dtt    dwls   dwrs   dws    f
+ fll    fpva   frm    fs     fso    gcs    hbc    hbcm   hbco   hbh
+ hbhh   hbi    hbj    hbk    hbm    hbn    hbp    hbpd   hbpu   hbq
+ hbs    hbsc   hbv    hbw    hent   hic    hicm   hico   hih    hihh
+ hii    hij    hik    him    hin    hip    hipd   hipu   hiq    his
+ hisc   hiv    hiw    hsc    html   ibc    icb    icp    iob    isbc
+ iscl   kgb    kgbd   kgbi   kis    lal    log    lop    lp     lsl
+ mem    nib    ohbr   okw    ola    olc    oll    olq    opr    opt
+ osbc   osbr   otr    ple    pod    pvl    q      sac    sbc    sbl
+ scbb   schb   scp    scsb   sct    se     sfp    sfs    skp    sob
+ sobb   sohb   sop    sosb   sot    ssc    st     sts    t      tac
+ tbc    toc    tp     tqw    trp    ts     tsc    tso    vmll   w
+ wn     x      xci    xs
 
 Equivalently, the prefix 'no' or 'no-' on the corresponding long names may be
 used.
@@ -4702,7 +4776,7 @@ The perltidy binary uses the Perl::Tidy module and is installed when that module
 
 =head1 VERSION
 
-This man page documents perltidy version 20210402
+This man page documents perltidy version 20210625
 
 =head1 BUG REPORTS
 

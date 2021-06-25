@@ -1,0 +1,43 @@
+---
+abstract: 'Build and install Net-SNMP'
+author:
+  - 'Nick Nauwelaerts <inphobia AT cpan DOT org>'
+build_requires:
+  Alien::Base: '0.020'
+  IO::Socket::SSL: '1.56'
+  Net::SSLeay: '1.49'
+  Test::Alien: '0'
+  Test::Manifest: '0.9'
+  Test::More: '0.94'
+  perl: '5.010001'
+configure_requires:
+  Alien::Base::ModuleBuild: '0'
+  File::ShareDir: '1.03'
+  Module::Build: '0.42'
+  PkgConfig: '0.14026'
+  Test2::Suite: '0.000067'
+  perl: '5.010001'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Alien-SNMP-MIBDEV
+provides:
+  Alien::SNMP::MIBDEV:
+    file: lib/Alien/SNMP/MIBDEV.pm
+    version: '2.000000'
+requires:
+  Alien::Base: '0.020'
+  File::ShareDir: '1.03'
+  parent: '0'
+  perl: '5.010001'
+resources:
+  IRC: irc://irc.libera.chat/#netdisco
+  MailingList: https://lists.sourceforge.net/lists/listinfo/snmp-info-users
+  bugtracker: https://github.com/inphobia/Alien-SNMP-MIBDEV/issues
+  license: http://opensource.org/licenses/bsd-license.php
+  repository: https://github.com/inphobia/Alien-SNMP-MIBDEV
+version: '2.000000'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

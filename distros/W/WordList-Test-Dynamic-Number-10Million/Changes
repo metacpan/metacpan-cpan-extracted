@@ -1,3 +1,8 @@
+0.004   2021-02-23  Released-By: PERLANCAR; Urgency: medium
+
+	- Update to latest WordList (object is now hashref not arrayref).
+
+
 0.003   2020-05-04  Released-By: PERLANCAR; Urgency: medium
 
 	- Implement with first_word() and next_word() to allow immediate

@@ -1,7 +1,5 @@
 #!/usr/bin/perl
 
-# t/05.scalar.t - check scalar manipulation object
-
 use Test::More qw( no_plan );
 use strict;
 use warnings;
@@ -91,3 +89,4 @@ $dbt1 -= 2;
 $dbt1 += 4;
 # diag( "After addition assignment: $dbt1" );
 
+done_testing;

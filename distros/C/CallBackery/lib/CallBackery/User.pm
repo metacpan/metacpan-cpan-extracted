@@ -95,7 +95,7 @@ has db => sub {
 returns a pointer to one of the Database object of a Mojo::Pg instance.
 =cut
 
-has mojoSqlDb => sub {
+sub mojoSqlDb {
     shift->db->mojoSqlDb;
 };
 
@@ -278,7 +278,12 @@ sub makeSessionCookie {
     return $conf.':'.$check;
 }
 
-
+sub DESTROY {
+    local($., $@, $!, $^E, $?);
+    return if ${^GLOBAL_PHASE} eq 'DESTRUCT';
+    my $self = shift;
+    $self->log->debug("Destroying ".__PACKAGE__);
+}
 
 1;
 __END__

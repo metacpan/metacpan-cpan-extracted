@@ -2,8 +2,9 @@
 
 use strict;
 use warnings;
-use if $ENV{AUTOMATED_TESTING}, 'Test::DiagINC'; use Test::More tests => 1;
-use MIME::Base64;
+use if $ENV{AUTOMATED_TESTING}, 'Test::DiagINC'; use MIME::Base64;
+use Test2::V0;
+
 use Crypt::OpenToken::KeyGenerator;
 
 ###############################################################################
@@ -25,3 +26,6 @@ generate_key: {
     is $generated_base64, $expected_base64,
         'Generated key matches other implementations';
 }
+
+###############################################################################
+done_testing();

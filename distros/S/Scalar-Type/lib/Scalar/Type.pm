@@ -5,7 +5,7 @@ use warnings;
 
 use Carp qw(croak);
 
-our $VERSION = '0.1.1';
+our $VERSION = '0.1.2';
 
 require XSLoader;
 XSLoader::load(__PACKAGE__, $VERSION);
@@ -141,6 +141,10 @@ for our purposes are:
 
 an integer value
 
+=item UV
+
+an unsigned integer value, only used for ints > MAXINT / 2.
+
 =item NV
 
 a numeric value (ie a float)
@@ -266,6 +270,11 @@ logic, looking also at C<POK>, and returning either C<NUMBER> or C<SCALAR>,
 being careful about strings like C<"007.5">.
 
 If neither C<IOK> nor C<NOK> is set then we return C<SCALAR>.
+
+And what about C<UV>s? They are treated exactly the same as C<IV>s, and a
+variable with a valid C<UV> slot will have the B<C<IOK>> flag set. It will
+also have the C<IsUV> flag set, which we use to determine how to stringify
+the number.
 
 =head1 SEE ALSO
 

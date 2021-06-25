@@ -7,7 +7,7 @@ use Carp qw( croak );
 require FFI::Platypus;
 
 # ABSTRACT: Defining types for FFI::Platypus
-our $VERSION = '1.43'; # VERSION
+our $VERSION = '1.46'; # VERSION
 
 # The TypeParser and Type classes are used internally ONLY and
 # are not to be exposed to the user.  External users should
@@ -58,7 +58,7 @@ FFI::Platypus::Type - Defining types for FFI::Platypus
 
 =head1 VERSION
 
-version 1.43
+version 1.46
 
 =head1 SYNOPSIS
 
@@ -705,7 +705,7 @@ The easiest way to mange records with Platypus is by using
 L<FFI::Platypus::Record> to define a record layout for a record class.
 Here is a brief example:
 
- package My::UnixTime;
+ package Unix::TimeStruct;
  
  use FFI::Platypus 1.00;
  use FFI::Platypus::Record;
@@ -726,8 +726,8 @@ Here is a brief example:
  
  my $ffi = FFI::Platypus->new( api => 1 );
  $ffi->lib(undef);
- # define a record class My::UnixTime and alias it to "tm"
- $ffi->type("record(My::UnixTime)*" => 'tm');
+ # define a record class Unix::TimeStruct and alias it to "tm"
+ $ffi->type("record(Unix::TimeStruct)*" => 'tm');
  
  # attach the C localtime function as a constructor
  $ffi->attach( localtime => ['time_t*'] => 'tm', sub {
@@ -738,8 +738,8 @@ Here is a brief example:
  
  package main;
  
- # now we can actually use our My::UnixTime class
- my $time = My::UnixTime->localtime;
+ # now we can actually use our Unix::TimeStruct class
+ my $time = Unix::TimeStruct->localtime;
  printf "time is %d:%d:%d %s\n",
    $time->tm_hour,
    $time->tm_min,
@@ -840,7 +840,7 @@ size of the record in bytes.
 
 Here is a longer practical example, once again using the tm struct:
 
- package My::UnixTime;
+ package Unix::TimeStruct;
  
  use FFI::Platypus 1.00;
  use FFI::TinyCC;
@@ -874,7 +874,7 @@ Here is a longer practical example, once again using the tm struct:
    }
  };
  
- # To use My::UnixTime as a record class, we need to
+ # To use Unix::TimeStruct as a record class, we need to
  # specify a size for the record, a function called
  # either ffi_record_size or _ffi_record_size should
  # return the size in bytes.  This function has to
@@ -883,9 +883,9 @@ Here is a longer practical example, once again using the tm struct:
  
  my $ffi = FFI::Platypus->new( api => 1 );
  $ffi->lib(undef);
- # define a record class My::UnixTime and alias it
+ # define a record class Unix::TimeStruct and alias it
  # to "tm"
- $ffi->type("record(My::UnixTime)*" => 'tm');
+ $ffi->type("record(Unix::TimeStruct)*" => 'tm');
  
  # attach the C localtime function as a constructor
  $ffi->attach( [ localtime => '_new' ] => ['time_t*'] => 'tm' );
@@ -923,8 +923,8 @@ Here is a longer practical example, once again using the tm struct:
  
  package main;
  
- # now we can actually use our My::UnixTime class
- my $time = My::UnixTime->new;
+ # now we can actually use our Unix::TimeStruct class
+ my $time = Unix::TimeStruct->new;
  printf "time is %d:%d:%d\n", $time->get_hour, $time->get_min, $time->get_sec;
 
 Contrast a record type which is stored as a scalar string of bytes in
@@ -1211,7 +1211,7 @@ constants in your Perl module, like this:
  package Foo;
  
  use FFI::Platypus 1.00;
- use base qw( Exporter );
+ use Exporter qw( import );
  
  our @EXPORT_OK = qw( FOO_STATIC FOO_DYNAMIC FOO_OTHER foo get_foo );
  
@@ -1401,6 +1401,8 @@ Diab Jerius (DJERIUS)
 Eric Brine (IKEGAMI)
 
 szTheory
+
+José Joaquín Atria (JJATRIA)
 
 =head1 COPYRIGHT AND LICENSE
 

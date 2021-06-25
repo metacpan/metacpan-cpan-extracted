@@ -1,5 +1,6 @@
 package Object::Depot;
-our $VERSION = '0.03';
+our $VERSION = '0.04';
+use 5.008001;
 use strictures 2;
 
 =encoding utf8
@@ -11,22 +12,22 @@ Object::Depot - Decouple object instantiation from usage.
 =head1 SYNOPSIS
 
     use Object::Depot;
-    
+
     my $depot = Object::Depot->new(
         class => 'CHI',
         # CHI->new returns a CHI::Driver object.
         type => InstanceOf[ 'CHI::Driver' ],
     );
-    
+
     $depot->add_key(
         sessions => {
             driver => 'Memory',
             global => 1,
         },
     );
-    
+
     $depot->store( ip2geo => CHI->new(...) );
-    
+
     my $sessions = $depot->fetch('sessions');
     my $ip2geo = $depot->fetch('ip2geo');
 
@@ -49,10 +50,12 @@ use Scalar::Util qw( blessed );
 use Sub::Name qw( subname );
 use Types::Common::String qw( NonEmptySimpleStr );
 use Types::Standard qw( Bool CodeRef HashRef Object InstanceOf );
+use Try::Tiny;
 
 sub croak {
     local $Carp::Internal{'Object::Depot'} = 1;
-    goto &Carp::croak;
+    local $Carp::Internal{'Object::Depot::Role'} = 1;
+    return Carp::croak( @_ );
 }
 
 sub croakf {
@@ -193,7 +196,7 @@ has constructor => (
     isa => CodeRef,
 );
 
-my $undef_constructor = sub{ undef };
+my $undef_constructor = subname 'undef_constructor', sub{ undef };
 
 sub _build_constructor {
     my ($self) = @_;
@@ -205,7 +208,19 @@ sub _build_constructor {
 
 sub _build_class_constructor {
     my ($class) = @_;
-    return sub{ $class->new( @_ ) };
+
+    return subname 'class_constructor', sub {
+       my @args = @_;
+       return try {
+          $class->new( @args );
+       } catch {
+          croakf(
+             'Error creating object %s: %s',
+             $class,
+             $_,
+          );
+       };
+    };
 }
 
 =head2 type
@@ -402,6 +417,22 @@ has always_export => (
 );
 
 =head1 METHODS
+
+=head2 active_objects
+
+    my @objects = $depot->active_objects();
+
+Return an array containing all active objects the depot created via calls to $depot->create().
+
+If per_process is set, returns only active objects created by the current process/thread.
+
+=cut
+
+sub active_objects {
+  my $self = shift;
+
+  return values %{$self->_objects};
+}
 
 =head2 fetch
 
@@ -752,38 +783,23 @@ __END__
 
 =head1 SUPPORT
 
-Please submit bugs and feature requests to the
-Object-Depot GitHub issue tracker:
+Please submit bugs and feature requests to the Object-Depot GitHub issue tracker:
 
 L<https://github.com/bluefeet/Object-Depot/issues>
 
 =head1 ACKNOWLEDGEMENTS
 
-Thanks to L<ZipRecruiter|https://www.ziprecruiter.com/> for
-encouraging their employees to contribute back to the open source
-ecosystem. Without their dedication to quality software development
-this distribution would not exist.
+Thanks to L<ZipRecruiter|https://www.ziprecruiter.com/> for encouraging their employees to
+contribute back to the open source ecosystem.  Without their dedication to quality software
+development this distribution would not exist.
 
-=head1 AUTHOR
+=head1 AUTHORS
 
     Aran Clary Deltac <bluefeet@gmail.com>
 
-=head1 COPYRIGHT AND LICENSE
+=head1 LICENSE
 
-Copyright (C) 2020 Aran Clary Deltac
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program. If not, see L<http://www.gnu.org/licenses/>.
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut
-

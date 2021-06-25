@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.02
+    version 0.03
 
 SYNOPSIS
 
@@ -41,13 +41,23 @@ CONSTRUCTOR
 
      my $peek = Archive::Libarchive::Peek->new(%options);
 
-    This creates a new instance of the Peek object.
+    This creates a new instance of the Peek object. One of the "filename"
+    or "memory" option
 
     filename
 
        my $peek = Archive::Libarchive::Peek->new( filename => $filename );
 
-      This option is required, and is the filename of the archive.
+      The filename of the archive to read from.
+
+    memory
+
+      [version 0.03]
+
+       my $peek = Archive::Libarchive::Peek->new( memory => \$content );
+
+      A reference to the memory region containing the archive. Passing in a
+      plain scalar will throw an exception.
 
     passphrase
 
@@ -64,7 +74,8 @@ PROPERTIES
 
  filename
 
-    This is the archive filename for the Peek object.
+    This is the archive filename for the Peek object. This will be undef
+    for in-memory archives.
 
 METHODS
 
@@ -103,6 +114,8 @@ METHODS
       about the file, like the permissions, timestamps and file type.
 
  as_hash
+
+    [version 0.02]
 
      my $hashref = $peek->as_hash;
 

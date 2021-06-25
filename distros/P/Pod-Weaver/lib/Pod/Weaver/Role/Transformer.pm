@@ -1,6 +1,6 @@
-package Pod::Weaver::Role::Transformer;
+package Pod::Weaver::Role::Transformer 4.018;
 # ABSTRACT: something that restructures a Pod5 document
-$Pod::Weaver::Role::Transformer::VERSION = '4.017';
+
 use Moose::Role;
 with 'Pod::Weaver::Role::Plugin';
 
@@ -31,7 +31,18 @@ Pod::Weaver::Role::Transformer - something that restructures a Pod5 document
 
 =head1 VERSION
 
-version 4.017
+version 4.018
+
+=head1 PERL VERSION SUPPORT
+
+This module has the same support period as perl itself:  it supports the two
+most recent versions of perl.  (That is, if the most recently released version
+is v5.40, then this module should work on both v5.40 and v5.38.)
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
 
 =head1 IMPLEMENTING
 
@@ -42,7 +53,7 @@ It is expected to modify the input in place.
 
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@cpan.org>
+Ricardo SIGNES <rjbs@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

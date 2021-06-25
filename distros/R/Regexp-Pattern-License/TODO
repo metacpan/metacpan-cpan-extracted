@@ -11,6 +11,12 @@ Options:
     + canonical - for the variation of a (sub)pattern preferred upstream
     + popular - skip obscure variations
   * Add pattern no-compile option, when compiling later e.g. with re::engine::RE2.
+  * Add pattern parno option
+    to support PARNO syntax:
+    <https://metacpan.org/pod/perlre#(?PARNO)-(?-PARNO)-(?+PARNO)-(?R)-(?0)>
+    or maybe instead add pattern options balanced and delimited
+    similar to <https://metacpan.org/pod/Regexp::Common::balanced>
+    and <https://metacpan.org/pod/Regexp::Common::delimited>
 
 Patterns:
   * tighten trait object version_number to not capture trailing zero segments
@@ -19,6 +25,7 @@ Patterns:
   * Cover license directories:
     + FSF: https://directory.fsf.org/wiki/Category:License
     + CC (retired): https://creativecommons.org/retiredlicenses/
+    + CC (redirected): https://github.com/creativecommons/sre-salt-prime/blob/HEAD/states/apache2/files/ccengine.conf#L74
     + GNU: https://www.gnu.org/licenses/license-list.html
     + Fedora: https://fedoraproject.org/wiki/Licensing#SoftwareLicenses
     + SUSE: https://github.com/openSUSE/spec-cleaner
@@ -29,6 +36,7 @@ Patterns:
     + W3C: https://www.w3.org/Consortium/Legal/2002/ipr-notice-20021231
     + PyPA/PyPI trove classifiers: https://pypi.org/classifiers/
     + http://www.linfo.org/main_index.html
+    + https://github.com/LeChasseur/ifrOSS/blob/master/Lizenzcenter.md
   * Cover traits:
     + Comment styles (most possible):
       https://en.wikipedia.org/wiki/Comparison_of_programming_languages_(syntax)#Comments
@@ -80,6 +88,8 @@ Misc.
     + Maybe use Regexp::Assemble at build-time (but then optionally disable to support deterministic builds)
     + Install as YAML (and JSON?) below /usr/share/misc, for reuse by non-Perl tools.
   * Turn most possible into seed patterns.
+  * Reference origin of MIT:
+    <https://ieeexplore.ieee.org/document/9263265>
 
 Document new features:
   * Add SYNOPSIS
@@ -88,3 +98,4 @@ Document new features:
     + capture
   * Add note about "re" use...:
     adaptable by passing option C<subject> to L<Regexp::Pattern::re>.
+  * Maybe reference https://rightsstatements.org/

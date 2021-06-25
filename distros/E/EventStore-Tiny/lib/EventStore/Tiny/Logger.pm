@@ -2,25 +2,25 @@ package EventStore::Tiny::Logger;
 
 use strict;
 use warnings;
+use feature 'signatures';
+no warnings 'experimental::signatures';
 
 use Class::Tiny {
     print_target => sub {select}, # Selected output file handle
 };
 
-sub log_event {
-    my ($self, $event) = @_;
+sub log_event ($self, $event) {
 
     # Stringify
     use Data::Dump 'dump';
-    my $data    = $event->can('data') ? dump $event->data : 'NO DATA';
+    my $data    = keys(%{$event->data}) ? dump $event->data : 'NO DATA';
     my $output  = $event->name . ": $data";
 
     # Print to given print handle
     return $self->print_target->print("$output\n");
 }
 
-sub log_cb {
-    my ($self, @args) = @_;
+sub log_cb ($self, @args) {
 
     # Create a new logger if called as a package procedure
     $self = EventStore::Tiny::Logger->new(@args) unless ref $self;
@@ -71,7 +71,7 @@ L<EventStore::Tiny>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2018 Mirko Westermeier (mail: mirko@westermeier.de)
+Copyright (c) 2018-2021 Mirko Westermeier (mail: mirko@westermeier.de)
 
 Released under the MIT License (see LICENSE.txt for details).
 

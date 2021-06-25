@@ -1,3 +1,16 @@
+0.38.9 2021-06-24 14:57:11 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - fix db handler leak for user object
+ - add destruction tracking to user object
+
+0.38.8 2021-06-24 14:36:33 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - mode DESTROY handler to Qooxdoo plugin and update dependency
+
+0.38.7 2021-06-24 08:11:49 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - make sure to set the the foreign key pragma before internal migrations
+
 0.38.6 2021-06-02 22:15:24 +0200 Tobias Oetiker <tobi@oetiker.ch>
 
  - fix access checker promise blocker

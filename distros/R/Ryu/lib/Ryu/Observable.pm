@@ -5,7 +5,7 @@ use warnings;
 
 use utf8;
 
-our $VERSION = '3.000'; # VERSION
+our $VERSION = '3.001'; # VERSION
 our $AUTHORITY = 'cpan:TEAM'; # AUTHORITY
 
 =encoding utf8
@@ -44,6 +44,21 @@ use List::UtilsBy;
 
 use Ryu::Source;
 
+# Slightly odd way of applying this - we don't want to require Sentinel,
+# but the usual tricks of ->import or using *Sentinel::sentinel directly
+# only work for the pure-perl version. So, we try to load it, making the
+# syntax available, and we then use sentinel() as if it were a function...
+# providing a fallback *sentinel only when the load failed.
+BEGIN {
+    eval {
+        require Sentinel;
+        Sentinel->import;
+        1
+    } or do {
+        *sentinel = sub { die 'This requires the Sentinel module to be installed' };
+    }
+}
+
 =head1 METHODS
 
 Public API, such as it is.
@@ -58,11 +73,17 @@ sub as_string { '' . shift->{value} }
 
 =head2 as_number
 
+=head2 as_numeric
+
 Returns the numeric representation of this value.
+
+(this method is available as C<as_number> or C<as_numeric>, both operate the same way)
 
 =cut
 
 sub as_number { 0 + shift->{value} }
+
+*as_numeric = *as_number;
 
 =head2 new
 
@@ -124,10 +145,14 @@ sub value { shift->{value} }
 
 =head2 set_numeric
 
+=head2 set_number
+
 Applies a new numeric value, and notifies subscribers if the value is numerically
 different to the previous one (or if we had no previous value).
 
 Returns C<$self>.
+
+(this method is available as C<set_number> or C<set_numeric>, both operate the same way)
 
 =cut
 
@@ -138,6 +163,8 @@ sub set_numeric {
     $self->{value} = $v;
     $self->notify_all
 }
+
+*set_number = *set_numeric;
 
 =head2 set_string
 
@@ -173,6 +200,60 @@ sub source {
         });
         $src;
     };
+}
+
+=head1 LVALUE METHODS
+
+B<< These require L<Sentinel> to be installed >>.
+
+=head2 lvalue_str
+
+Returns a L<Sentinel> lvalue accessor for the string value.
+
+This can be used with refaliasing or C<foreach> loops to reduce typing:
+
+    for($observable->lvalue_str) {
+      chomp;
+      s/_/-/g;
+    }
+
+Any attempt to retrieve or set the value will be redirected to L</as_string>
+or L</set_string> as appropriate.
+
+=cut
+
+sub lvalue_str : lvalue {
+    my ($self) = @_;
+    sentinel(get => sub {
+        return $self->as_string(shift);
+    }, set => sub {
+        return $self->set_string(shift);
+    });
+}
+
+=head2 lvalue_num
+
+Returns a L<Sentinel> lvalue accessor for the numeric value.
+
+This can be used with refaliasing or C<foreach> loops to reduce typing:
+
+    for($observable->lvalue_num) {
+     ++$_;
+     $_ *= 3;
+    }
+
+Any attempt to retrieve or set the value will be redirected to L</as_number>
+or L</set_number> as appropriate.
+
+=cut
+
+sub lvalue_num : lvalue {
+    my ($self) = @_;
+    sentinel(get => sub {
+        return $self->as_number(shift);
+    }, set => sub {
+        return $self->set_number(shift);
+    });
 }
 
 =head1 METHODS - Internal
@@ -211,7 +292,7 @@ __END__
 
 =head1 AUTHOR
 
-Tom Molesworth <TEAM@cpan.org>
+Tom Molesworth C<< <TEAM@cpan.org> >>.
 
 =head1 LICENSE
 

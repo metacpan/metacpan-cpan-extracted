@@ -32,7 +32,7 @@ Module::Generic::Boolean - Boolean Representation Class
 
 =head1 VERSION
 
-    v1.0.1
+    v1.0.2
 
 =head1 DESCRIPTION
 
@@ -41,6 +41,26 @@ This a class/package to represent boolean value and make sure they are recognise
 The code is taken and adapted from part of L<JSON> module.
 
 =head1 METHODS
+
+=head2 as_array
+
+Returns an L<Module::Generic::Array> object with the current boolean value as its only entry.
+
+    my $true = Module::Generic::Boolean->true;
+    my $a = $true->as_array;
+    say $a->[0]; # 1
+
+=head2 as_number
+
+Returns the current boolean value (1 or 0) as a L<Module::Generic::Number> object.
+
+=head2 as_scalar
+
+Returns the current boolean value (1 or 0) as a L<Module::Generic::Scalar> object.
+
+=head2 defined
+
+Returns true.
 
 =head2 true
 

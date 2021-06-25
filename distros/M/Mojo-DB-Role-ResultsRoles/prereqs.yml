@@ -1,0 +1,13 @@
+runtime:
+  requires:
+    perl: '5.010001'
+    Mojolicious: '7.55'
+    Role::Tiny: '2.000001'
+    Class::Method::Modifiers: 0
+test:
+  requires:
+    Test::More: '0.88'
+    Test::Needs: 0
+develop:
+  requires:
+    Mojo::SQLite: '1.000'

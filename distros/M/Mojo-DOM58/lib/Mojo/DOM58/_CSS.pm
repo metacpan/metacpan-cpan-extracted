@@ -11,7 +11,7 @@ use Data::Dumper ();
 
 use constant DEBUG => $ENV{MOJO_DOM58_CSS_DEBUG} || 0;
 
-our $VERSION = '3.000';
+our $VERSION = '3.001';
 
 my $ESCAPE_RE = qr/\\[^0-9a-fA-F]|\\[0-9a-fA-F]{1,6}/;
 my $ATTR_RE   = qr/

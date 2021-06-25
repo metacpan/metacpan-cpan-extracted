@@ -1,6 +1,20 @@
 Revision history for Term::Choose
 
 
+1.733   2021-06-22
+    - Modified footer line.
+    - New option 'max_cols'.
+    - Updates option' skip_items': expects a regex quoted with the 'qr' operator.
+    - Update option 'page': additional mode.
+    - Use Carp again.
+    - Update function 'line_fold'.
+
+1.732   2021-06-17
+    - Bugfix page count.
+    - Update 'page' and 'footer'.
+    - Added environment variable TC_POS_AT_F3.
+    - Constants.pm and Screen.pm: refactoring export.
+
 1.731   2021-04-25
     - Replace 'croak' with 'die' and 'carp' with 'warn'.
     - Code refactoring.

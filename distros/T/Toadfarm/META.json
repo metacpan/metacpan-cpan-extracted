@@ -4,7 +4,7 @@
       "Jan Henning Thorsen <jhthorsen@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -31,7 +31,7 @@
       "runtime" : {
          "requires" : {
             "File::Which" : "1.00",
-            "Mojolicious" : "8.00"
+            "Mojolicious" : "9.11"
          }
       },
       "test" : {
@@ -52,9 +52,9 @@
          "web" : "https://github.com/jhthorsen/toadfarm"
       }
    },
-   "version" : "0.82",
+   "version" : "0.83",
    "x_contributors" : [
       "Jan Henning Thorsen <jhthorsen@cpan.org>"
    ],
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

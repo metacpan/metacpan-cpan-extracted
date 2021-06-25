@@ -1,4 +1,4 @@
-/* vi: set ft=c inde=: */
+/* vi: set ft=c */
 
 /* Perls before 5.18 lack isIDCONT_uni, but baring minor differences of weird
  * Unicode characters, isALNUM_uni is close enough
@@ -77,7 +77,7 @@ static bool MY_lex_scan_attrval_into(pTHX_ SV *name, SV *val)
   /* TODO: really want  lex_scan_ident_into() */
   SV *n = lex_scan_ident();
   if(!n)
-    return false;
+    return FALSE;
 
   sv_setsv(name, n);
   SvREFCNT_dec(n);
@@ -88,7 +88,7 @@ static bool MY_lex_scan_attrval_into(pTHX_ SV *name, SV *val)
   /* Do not read space here as space is not allowed between NAME(ARGS) */
 
   if(lex_peek_unichar(0) != '(')
-    return true;
+    return TRUE;
 
   lex_read_unichar(0);
   if(name == val)
@@ -122,9 +122,9 @@ static bool MY_lex_scan_attrval_into(pTHX_ SV *name, SV *val)
   }
 
   if(c == -1)
-    return false;
+    return FALSE;
 
-  return true;
+  return TRUE;
 
 unterminated:
   croak("Unterminated attribute parameter in attribute list");
@@ -239,16 +239,28 @@ static SV *MY_lex_scan_parenthesized(pTHX)
 #define lex_scan_version(flags)  MY_lex_scan_version(aTHX_ flags)
 static SV *MY_lex_scan_version(pTHX_ int flags)
 {
-  const char *err = NULL;
-  const char *endp = prescan_version(PL_parser->bufptr, FALSE, &err, NULL, NULL, NULL, NULL);
+  I32 c;
+  SV *tmpsv = sv_2mortal(newSVpvs(""));
 
-  if(endp == PL_parser->bufptr && (flags & PARSE_OPTIONAL))
+  /* scan_version() expects a version to end in linefeed, semicolon or
+   * openbrace; gets confused if other keywords are fine. We'll have to
+   * extract it first.
+   *   https://rt.cpan.org/Ticket/Display.html?id=132903
+   */
+
+  while((c = lex_peek_unichar(0))) {
+    /* Allow a single leading v before accepting only digits, dot, underscore */
+    if((!SvCUR(tmpsv) && (c == 'v')) || strchr("0123456789._", c))
+      sv_cat_c(tmpsv, lex_read_unichar(0));
+    else
+      break;
+  }
+
+  if(!SvCUR(tmpsv) && (flags & PARSE_OPTIONAL))
     return NULL;
 
   SV *ret = newSV(0);
-  endp = scan_version(PL_parser->bufptr, ret, FALSE);
-
-  lex_read_to((char *)endp);
+  scan_version(SvPVX(tmpsv), ret, FALSE);
 
   return ret;
 }
@@ -274,4 +286,13 @@ static PADOFFSET MY_parse_lexvar(pTHX)
     croak("Can't use global $_ in \"my\"");
 
   return pad_add_name_pvn(lexname, PL_parser->bufptr - lexname, 0, NULL, NULL);
+}
+
+#define parse_scoped_block(flags)  MY_parse_scoped_block(aTHX_ flags)
+static OP *MY_parse_scoped_block(pTHX_ int flags)
+{
+  OP *ret;
+  I32 save_ix = block_start(TRUE);
+  ret = parse_block(flags);
+  return block_end(save_ix, ret);
 }

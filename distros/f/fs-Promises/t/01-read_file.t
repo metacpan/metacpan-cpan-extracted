@@ -6,6 +6,8 @@ use fs::Promises::Utils qw(await p_while);
 use Test::More;
 use Test::Exception;
 
+use File::Temp;
+
 my $does_not_exist = './does_not_exist_for_test';
 
 throws_ok {
@@ -65,6 +67,19 @@ subtest 'readline with $/=undef' => sub {
 subtest 'slurp' => sub {
     my $async_content = await slurp_promise($file_to_read);
     is(length($sync_content), length($async_content), "slurp_promise() works like \$/=undef; <>");
+};
+
+subtest 'slurp missing file' => sub {
+    throws_ok {
+        await slurp_promise($file_to_read . '_does_not_exist');
+    } qr/No such file or directory/, "slurp_promise dies when given a missing file"
+};
+
+subtest 'slurp empty file' => sub {
+    my $tempfile = File::Temp->new(UNLINK => 1);
+    lives_ok {
+        await slurp_promise($tempfile->filename);
+    } "slurp_promise lives when given an empty file";
 };
 
 done_testing;

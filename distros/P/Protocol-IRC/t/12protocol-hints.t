@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
 use Test::More;
@@ -8,6 +8,40 @@ use Test::More;
 my $CRLF = "\x0d\x0a"; # because \r\n isn't portable
 
 my @messages;
+
+package TestIRC {
+   use base qw( Protocol::IRC );
+
+   sub new { return bless [], shift }
+
+   my %isupport = (
+      CHANTYPES   => "#&",
+         channame_re => qr/^[#&]/,
+      PREFIX      => "(ohv)@%+",
+         prefix_modes => 'ohv',
+         prefix_flags => '@%+',
+         prefixflag_re => qr/^[@%+]/,
+         prefix_map_m2f => { 'o' => '@', 'h' => '%', 'v' => '+' },
+         prefix_map_f2m => { '@' => 'o', '%' => 'h', '+' => 'v' },
+   );
+
+   sub isupport { return $isupport{$_[1]} }
+
+   sub nick { return "MyNick" }
+
+   sub on_message
+   {
+      my $self = shift;
+      my ( $command, $message, $hints ) = @_;
+      # Only care about real events, not synthesized ones
+      return 0 if $hints->{synthesized};
+      # Ignore numerics
+      return 0 if $command =~ m/^\d\d\d$/;
+
+      push @messages, [ $command, $message, $hints ];
+      return $command ne "NOTICE";
+   }
+}
 
 my $irc = TestIRC->new;
 sub write_irc
@@ -196,38 +230,3 @@ sub write_irc
 }
 
 done_testing;
-
-package TestIRC;
-use base qw( Protocol::IRC );
-
-sub new { return bless [], shift }
-
-my %isupport;
-BEGIN {
-   %isupport = (
-      CHANTYPES   => "#&",
-         channame_re => qr/^[#&]/,
-      PREFIX      => "(ohv)@%+",
-         prefix_modes => 'ohv',
-         prefix_flags => '@%+',
-         prefixflag_re => qr/^[@%+]/,
-         prefix_map_m2f => { 'o' => '@', 'h' => '%', 'v' => '+' },
-         prefix_map_f2m => { '@' => 'o', '%' => 'h', '+' => 'v' },
-   );
-}
-sub isupport { return $isupport{$_[1]} }
-
-sub nick { return "MyNick" }
-
-sub on_message
-{
-   my $self = shift;
-   my ( $command, $message, $hints ) = @_;
-   # Only care about real events, not synthesized ones
-   return 0 if $hints->{synthesized};
-   # Ignore numerics
-   return 0 if $command =~ m/^\d\d\d$/;
-
-   push @messages, [ $command, $message, $hints ];
-   return $command ne "NOTICE";
-}

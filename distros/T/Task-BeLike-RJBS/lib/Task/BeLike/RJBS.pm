@@ -1,8 +1,8 @@
-use 5.14.0;
+use 5.20.0;
 use warnings;
-package Task::BeLike::RJBS;
+package Task::BeLike::RJBS 20210619.000;
 # ABSTRACT: be more like RJBS -- use the modules he likes!
-$Task::BeLike::RJBS::VERSION = '20210316.000';
+
 
 1;
 
@@ -18,15 +18,15 @@ Task::BeLike::RJBS - be more like RJBS -- use the modules he likes!
 
 =head1 VERSION
 
-version 20210316.000
+version 20210619.000
 
 =head1 TASK CONTENTS
 
 =head2 Perl for Perl's Sake
 
-=head3 L<perl> 5.014
+=head3 L<perl> 5.020
 
-Version 5.014 required because: gotta have my "package NAME BLOCK"
+Version 5.020 required because: postfix dereference and much more
 
 =head3 L<App::grindperl>
 
@@ -53,6 +53,8 @@ paste the character and look funny on IRC.
 =head3 L<File::Rename>
 
 This lets me rename a bunch of files by apply a C<s///> expression, or more.
+
+=head3 L<Net::Dict>
 
 =head3 L<Unicode::Tussle>
 
@@ -84,6 +86,8 @@ if two versions are installed in different parts of C<@INC>.
 
 It's like C<perldoc>, but for stuff you haven't installed (yet?).
 
+=head3 L<Test2::Harness>
+
 =head2 Tools for Building CPAN Distributions
 
 =head3 L<Dist::Zilla> 5
@@ -112,10 +116,6 @@ App::Cmd also gets us Getopt::Long::Descriptive.
 
 =head2 Email-Handling Libraries
 
-=head3 L<Email::Filter> 1.02
-
-Version 1.02 required because: I still use it, for lack of something better
-
 =head3 L<Email::MIME> 1.905
 
 Version 1.905 required because: merged in Creator and Modifier modules; bug fixes
@@ -126,15 +126,31 @@ Version 1.905 required because: merged in Creator and Modifier modules; bug fixe
 
 =head2 Other Libraries I Use
 
+=head3 L<Archive::Tar::Wrapper>
+
+Largely to suppress "it could be faster!" warnings from Dist::Zilla.
+
+=head3 L<Authen::OATH>
+
+I need this for TOTP.
+
+=head3 L<Authen::SASL>
+
 =head3 L<Carp::Always>
 
 =head3 L<Config::INI> 0.011
+
+=head3 L<Convert::Base32>
+
+I need this for TOTP.
 
 =head3 L<DBD::SQLite>
 
 =head3 L<Data::GUID> 0.044
 
 Version 0.044 required because: requires a new enough Data::UUID to work around Debian
+
+=head3 L<Data::Printer>
 
 =head3 L<DateTime> 0.51
 
@@ -147,6 +163,8 @@ Version 0.51 required because: provides CLDR support with fewest known bugs
 =head3 L<HTML::Element> 3.22
 
 Version 3.22 required because: has proper XML escaping
+
+=head3 L<IO::Async>
 
 =head3 L<JSON::MaybeXS>
 
@@ -165,6 +183,8 @@ Version 1.19 required because: it has assert_coerce
 All constructors must be strict!
 
 =head3 L<namespace::autoclean>
+
+=head3 L<Net::Async::HTTP>
 
 =head3 L<PPI> 1.212
 
@@ -196,6 +216,12 @@ Version 0.102080 required because: StackTrace::Auto factored out
 
 =head3 L<Throwable::X>
 
+=head3 L<Time::Duration>
+
+=head3 L<Time::Duration::Parse>
+
+=head3 L<TOML::Parser>
+
 =head3 L<Try::Tiny> 0.007
 
 Version 0.007 required because: exception passed to C<finally>
@@ -214,7 +240,7 @@ These are just here to make sure other things work properly.
 
 =head1 AUTHOR
 
-Ricardo Signes <rjbs@cpan.org>
+Ricardo Signes <rjbs@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

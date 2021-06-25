@@ -39,6 +39,8 @@ libeav/Makefile
 libeav/Makefile.bsd
 libeav/Makefile.openbsd
 libeav/Makefile.windows-gmake
+libeav/misc/checkall.sh
+libeav/misc/clean-gcov.sh
 libeav/partial/idn/eav.c
 libeav/partial/idn/is_6531_email.c
 libeav/partial/idn/is_utf8_domain.c

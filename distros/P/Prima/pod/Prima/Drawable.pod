@@ -433,7 +433,7 @@ Negative if the ascent line is below the internal leading line.
 Number of pixels between ascent and external leading lines.
 Negative if the ascent line is above the external leading line.
 
-=for podview <img src="leadings.gif" cut=1>
+=for podview <img src="leadings.gif" cut=1 title="Horizontal font measurements">
 
 =for html <p><img src="https://raw.githubusercontent.com/dk/Prima/master/pod/Prima/leadings.gif"><!--
 
@@ -514,7 +514,7 @@ Besides these characteristics, every font glyph has an ABC-metric,
 the three integer values that describe horizontal extents of a
 glyph's black part relative to the glyph extent:
 
-=for podview <img src="fontabc.gif" cut=1 >
+=for podview <img src="fontabc.gif" cut=1 title="Vertical glyph measurements">
 
 =for html <p><img src="https://raw.githubusercontent.com/dk/Prima/master/pod/Prima/fontabc.gif"><!--
 
@@ -561,7 +561,7 @@ with the foreground color drawing, and C<::rop2> with the background.
 
 The toolkit defines the following operations:
 
-=for podview <img src="rop1.gif" cut=1 >
+=for podview <img src="rop1.gif" cut=1 title="Classic raster operations">
 
 =for html <p><img src="https://raw.githubusercontent.com/dk/Prima/master/pod/Prima/rop1.gif"><!--
 
@@ -611,8 +611,8 @@ begin_paint/end_paint brackets. It supports the following 12 Porter-Duff
 operators and some selected Photoshop blend operators:
 
 =for podview 
- <img src="rop2.gif" cut=1>
- <img src="rop3.png" cut=1>
+ <img src="rop2.gif" cut=1 title="Porter-Duff operators">
+ <img src="rop3.png" cut=1 title="Photoshop operators">
 
 =for html <p>
 <img src="https://raw.githubusercontent.com/dk/Prima/master/pod/Prima/rop2.gif">
@@ -741,7 +741,7 @@ Set-call discards the previous C<::region> value.
 
 Note: C<::clipRect> can not be used while the object is in the paint-disabled state,
 its context is neither recorded nor used as a template
-( see L<"Graphic context and canvas">).
+( see L<"Graphic context and canvas">) -- except on images.
 
 =item fillMode INTEGER
 
@@ -1265,6 +1265,10 @@ Context used: color, backColor, linePattern, lineWidth, rop, rop2
 
 Returns success flag; if failed, C<$@> contains the error.
 
+=item new_aa_surface
+
+Returns a new antialiasing surface object. See L<Prima::Drawable::Antialias> for usage and details.
+
 =item new_gradient
 
 Returns a new gradient object. See L<Prima::Drawable::Gradient> for usage and details.
@@ -1469,10 +1473,12 @@ When set, shaping process can take in the account the language of the text.
 F.ex. text C<"ae"> might be shaped as a single glyph I<E<aelig>> for the Latin
 language, but never for the English.
 
-=item level INTEGER = ts:XXX
+=item level INTEGER = ts::Full
 
 Selects the shaping (i.e. text to glyph conversion) level, how the system should treat the input text
-and how deep the shaping should go. One of the following C<ts::XXX> options:
+and how deep the shaping should go. 
+
+One of the following C<ts::XXX> options:
 
 =over
 
@@ -1609,6 +1615,17 @@ The object information state is same as enabled state ( see C<begin_paint>),
 except painting and drawing methods do not change the object canvas.
 
 See also: C<end_paint_info>, C<begin_paint>, L<"Graphic context and canvas">
+
+=item can_draw_alpha
+
+Returns whether using alpha bits operation on the drawable will have any effect
+or not.  Note that the drawable might not necessarily have an alpha channel,
+for example a normal RGB image is capable to be painted on wil alpha while not
+having any alpha on its own.  On unix, all non-1 bit drawables return true if
+Prima was compiled with XRender support and if that extension is present on the
+X server.  On windows, all non-1 bit drawables return true unconditionally.
+
+See also: C<has_alpha_layer>
 
 =item end_paint
 
@@ -1804,6 +1821,15 @@ Context used: font, textOutBaseline
 
 =for html -->
 
+=item has_alpha_layer
+
+Returns true if the drawable has an alpha channel. If the drawable is treated as a source,
+it means its alpha content will be respected when drawing on another surface. If the drawable is
+treated as a destination, it means that its alpha content will be updated if drawing on it uses
+alpha bits.
+
+See also: C<can_draw_alpha>.
+
 =item render_glyph INDEX, %OPTIONS
 
 Returns glyph representation as an outline. The outline is an integer array,
@@ -1837,6 +1863,35 @@ The C<ggo::> commands are:
 	ggo::Conic - plot 2-degree spline
 	ggo::Cubic - plot 3-degree spline
 
+=item render_polyline \@POLYLINE, %OPTIONS
+
+Performs calculations on POLYLINE, defined by OPTIONS. The following options are recognized:
+
+=over
+
+=item matrix A,B,C,D,U,V
+
+If supplied, performs matrix transformation on each polyline vertex:
+
+	X' = AX + CY + U
+	Y' = BX + DY + V
+
+and returns the new polyline
+
+=item box BOOLEAN
+
+If set, instead of polyline vertices, calculates the box extents of the polyline
+(either original or after the matrix transform, depending on whether C<matrix> option was supplied or not),
+and returns 4 numerics for left,bottom,width,and height of the box enclosure.
+
+=item integer BOOLEAN
+
+By default the result is returned as a set of floating point numerics, however
+if integer results are needed, the results are transformed to integers using
+the I<< int = float + ((float < 0) ? -0.5 : 0.5) >> formula.
+
+=back
+
 =item render_spline \@VERTICES, %OPTIONS
 
 Renders B-spline curve from set of VERTICES to a polyline with given options.
@@ -1844,12 +1899,14 @@ Renders B-spline curve from set of VERTICES to a polyline with given options.
 The method is internally used by C<spline> and C<fill_spline>, and is provided
 for cases when these are insufficient. See description of options in L<spline>.
 
-=item text_wrap TEXT, WIDTH, OPTIONS, TAB_INDENT = 8
+=item text_wrap TEXT, WIDTH, OPTIONS, [TAB_INDENT = 8, FROM = 0, LENGTH = -1, GLYPHS]
 
-Breaks TEXT string in chunks that must fit into WIDTH pixels wide box. TEXT
-is either character string, or a C<Prima::Drawable::Glyphs> object returned
-from C<text_shape>, or C<< Prima::Drawable::Glyphs->glyphs >> strings of
-glyphs. In the glyph cases, some wrapping options are not applicable.
+Breaks TEXT string in chunks that must fit into WIDTH pixels wide box ( for
+WIDTH >= 0 ). TEXT is either character string, or a C<Prima::Drawable::Glyphs>
+object returned from C<text_shape>, or C<< Prima::Drawable::Glyphs->glyphs >>
+strings of glyphs. In the glyph cases, some wrapping options are not
+applicable.  It is possible to send both text as TEXT and its shaped
+representation as GLYPHS.
 
 The break algorithm and its result are governed by OPTIONS integer value
 which is a combination of C<tw::> constants:
@@ -1917,11 +1974,16 @@ where each is a text offset within TEXT and its length.
 
 If unset, the resulting array consists of text chunks.
 
+=item tw::ReturnGlyphs
+
+If GLYPHS are set (only together with TEXT), this option becomes available
+to get the resulting chunks as sub-sets of GLYPHS.
+
 =item tw::ReturnLines
 
 Equals to 0, is a mnemonic to an unset tw::ReturnChunks.
 
-Not applicable in glyph wrapping.
+In glyph wrapping means C<tw::ReturnGlyphs>.
 
 =item tw::WordBreak
 
@@ -1971,7 +2033,7 @@ The escaped character.
 
 Context used: font
 
-=item text_wrap_shape TEXT, WIDTH, %OPTIONS
+=item text_wrap_shape TEXT, WIDTH = -1, %OPTIONS
 
 Runs C<text_shape> over results from C<text_wrap> call, with C<TEXT>, C<WIDTH>,
 C<$OPTIONS{options}> and C<$OPTIONS{tabs}>. Other C<%OPTIONS> are used in
@@ -1980,6 +2042,13 @@ return glyphs objects or their positions instead.
 
 When called with C<tw::CalcMnemonic> options, recalculates the tilde position
 so it adapts to the glyph positions returned.
+
+If C<$OPTIONS{kashida}> is set, performs kashida justification on the last
+wrapped line, using optional C<$OPTIONS{min_kashida}> value ( see
+L<Prima::Drawable::Glyphs/arabic_justify> ).
+
+If C<$OPTIONS{letter}> or C<$OPTIONS{word}> is set, performs interspace
+justfication on all but the last wrapped line.
 
 =back
 

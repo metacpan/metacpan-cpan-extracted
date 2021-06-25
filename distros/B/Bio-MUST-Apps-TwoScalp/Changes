@@ -1,4 +1,21 @@
+0.211710  2021-06-20 15:52:12+02:00 Europe/Brussels
+    - Additions
+       - binaries: support for multithreading (--threads option)
+       - binaries: refined MAFFT usage (--keep-length and --linsi options)
+    - Changes
+       - binaries: changed default value for --out-suffix to '-ts'
+    - Fixes
+       - binaries: fixed bugs pertaining to output format and gap handling
+
 0.201810  2020-06-29 15:23:13+02:00 Europe/Brussels
+    - Additions
+       - binaries: new behaviors to two-scalp.pl
+       - lib: new classes AlignAll, Seqs2Profile and Profile2Profile
+       - lib: support for MAFFT and Clustal Omega
+       - lib: support for Bio::MUST::Core::SeqId families
+    - Changes
+       - binaries: massive overhaul of two-scalp.pl interface
+       - lib: removal of class Bio::MUST::Apps::SlaveAligner::Local
 
 0.181180  2018-04-28 14:11:53+02:00 Europe/Brussels
     - Fixes

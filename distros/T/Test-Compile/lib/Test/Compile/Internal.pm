@@ -3,7 +3,7 @@ package Test::Compile::Internal;
 use warnings;
 use strict;
 
-use version; our $VERSION = qv("v2.4.1");
+use version; our $VERSION = qv("v2.4.2");
 use File::Spec;
 use UNIVERSAL::require;
 use Test::Builder;
@@ -11,7 +11,7 @@ use IPC::Open3 ();
 
 =head1 NAME
 
-Test::Compile::Internal - Test whether your perl files compile.
+Test::Compile::Internal - Assert that your Perl files compile OK.
 
 =head1 SYNOPSIS
 
@@ -60,7 +60,10 @@ for details.
 sub all_files_ok {
     my ($self, @dirs) = @_;
 
-    if ( $self->all_pm_files_ok(@dirs) && $self->all_pl_files_ok(@dirs) ) {
+    my $pm_ok = $self->all_pm_files_ok(@dirs);
+    my $pl_ok = $self->all_pl_files_ok(@dirs);
+
+    if ( $pm_ok && $pl_ok ) {
         return 1;
     }
 }
@@ -70,7 +73,7 @@ sub all_files_ok {
 
 Checks all the perl module files it can find for compilation errors.
 
-If C<@dirs> is defined then it is taken as an array of directories to
+If C<@dirs> is defined then it is taken as an array of files or directories to
 be searched for perl files, otherwise it searches some default locations
 - see L</all_pm_files(@dirs)>.
 
@@ -434,7 +437,7 @@ Evan Giles, C<< <egiles@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2007-2020 by the authors.
+Copyright 2007-2021 by the authors.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

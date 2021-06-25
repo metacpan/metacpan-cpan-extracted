@@ -3,7 +3,7 @@ package Database::Async::Query;
 use strict;
 use warnings;
 
-our $VERSION = '0.013'; # VERSION
+our $VERSION = '0.014'; # VERSION
 
 =head1 NAME
 
@@ -346,8 +346,7 @@ sub row_data {
     $self->{row_data} //= do {
         my $row_data = $self->db->new_source;
         $self->completed->on_ready(sub {
-            my $f = $self->{row_data}->completed;
-            shift->on_ready($f) unless $f->is_ready;
+            $row_data->finish unless $row_data->is_ready;
         });
         $row_data->completed->on_ready(sub {
             my $f = $self->completed;
@@ -362,7 +361,9 @@ sub completed {
     my ($self) = @_;
     $self->{completed} //= do {
         my $f = $self->db->new_future;
-        $self->start;
+        $self->start->on_fail(sub {
+            $f->fail(@_) unless $f->is_ready;
+        });
         $f
     }
 }
@@ -453,5 +454,5 @@ Tom Molesworth C<< <TEAM@cpan.org> >>
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2011-2020. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth 2011-2021. Licensed under the same terms as Perl itself.
 

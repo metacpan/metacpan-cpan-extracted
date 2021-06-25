@@ -2,11 +2,10 @@
 # PODNAME: two-scalp.pl
 # ABSTRACT: Align or re-align sequences using various strategies
 # CONTRIBUTOR: Amandine BERTRAND <amandine.bertrand@doct.uliege.be>
+# CONTRIBUTOR: Valerian LUPO <valerian.lupo@doct.uliege.be>
 
 use Modern::Perl '2011';
-
 use Getopt::Euclid qw(:vars);
-use Smart::Comments '###';
 
 ## no critic (RequireLocalizedPunctuationVars)
 BEGIN{
@@ -17,13 +16,17 @@ BEGIN{
 }
 ## use critic
 
+use Smart::Comments -ENV;
+
 use Carp;
 use Const::Fast;
 use File::Basename;
 use List::AllUtils qw(part uniq count_by);
 use Path::Class qw(file);
+use Tie::IxHash;
 
 use Bio::MUST::Core;
+use Bio::MUST::Core::Utils qw(secure_outfile);
 use aliased 'Bio::MUST::Core::Ali';
 use aliased 'Bio::MUST::Core::IdList';
 
@@ -40,7 +43,14 @@ use aliased 'Bio::MUST::Apps::TwoScalp::Profile2Profile';
 
 const my $DEF_FAM => ':default';
 
-my ($basename, $dir) = fileparse( $ARGV_in_seqs[0], qr{\.[^.]*}xms );
+# set up mafft options
+my %opt;
+$opt{ '--keeplength' } = ()            if $ARGV_keep_length;
+$opt{ '--thread'     } = $ARGV_threads if $ARGV_threads > 1;
+if ($ARGV_linsi) {
+    $opt{ '--maxiterate' } = 1000;
+    $opt{ '--localpair'  } = undef;
+}
 
 my $master_profile;
 my $ref_prefix;
@@ -56,11 +66,10 @@ if ($ARGV_p_ref) {
         = $ref_profile->temp_fasta( {id_prefix => 'pref-'});
     $ref_prefix = Ali->load($temp_file);
     $master_profile = $ref_prefix;
-    #### $master_profile
 }
 
 my $len = @ARGV_in_seqs;
-#### $len
+#### number of specified files: $len
 
 my @ord_fams;
 my %seqs_for;
@@ -70,13 +79,11 @@ if ($len > 1) {
     @ord_fams = (1..$len);
     for my $fam (@ord_fams) {
         my $file = shift @ARGV_in_seqs;
-        #### $file
+        #### file: $file
         my $ali = Ali->load( $file );
         @{ $seqs_for{$fam} } = map { $_ } $ali->all_seqs;
     }
 }
-#### @ord_fams
-#### %seqs_for
 
 # TODO: check alternative here; too complex
 
@@ -84,13 +91,12 @@ if ($len > 1) {
 if (@ord_fams && @ARGV_fam) {
     warn <<'EOT';
 Warning: --fam option specified but there is more than one file.
---fam will be ignored and I will follow the order of files instead!"
+--fam option will be ignored and I will follow infile order instead!"
 EOT
 }
 
 elsif (@ARGV_fam) {
     @ord_fams = @ARGV_fam;
-    #### @ord_fams
     my %exist_for = map { $_ => 1 } @ord_fams;
     my $ali = Ali->load(@ARGV_in_seqs);
     for my $seq ($ali->all_seqs) {
@@ -107,8 +113,6 @@ elsif (@ARGV_fam) {
     }
     push @ord_fams, 'other' if $seqs_for{other};
 }
-#### @ord_fams
-#### %seqs_for
 
 unless (@ord_fams) {
     ### One file with no family specified
@@ -120,13 +124,12 @@ unless (@ord_fams) {
     $seqs_for{  aligned} =   $aligned_seqs if $aligned_seqs;
     $seqs_for{unaligned} = $unaligned_seqs if $unaligned_seqs;
 }
-#### @ord_fams
-#### %seqs_for
+#### fam: @ord_fams
+##### %seqs_for
 
 FAM:
 for my $fam (@ord_fams) {
     ### Check if seqs are aligned from part: $fam
-    #### test: $seqs_for{$fam}
 
     # TODO: fix this as it is very dangerous to have my depending on if
     # https://metacpan.org/pod/Perl::Critic::Policy::Variables::ProhibitConditionalDeclarations
@@ -200,9 +203,9 @@ if ($ARGV_p_ref) {
 }
 
 # add suffix
-my $outfile = file($dir, $basename . $ARGV_out_suffix . '.fasta');
+my $outfile = secure_outfile($ARGV_in_seqs[0], $ARGV_out_suffix);
 ### Store fasta outfile: $outfile
-$master_profile->store_fasta($outfile);
+$master_profile->store($outfile);
 
 
 sub align_on_profile {
@@ -211,8 +214,7 @@ sub align_on_profile {
     my $master_profile = shift;
     ## use critic
     my $other = shift;
-    #### $master_profile
-    #### $other
+    ##### profile sequences: $master_profile
 
     my $new_profile = $master_profile;
 
@@ -222,7 +224,7 @@ sub align_on_profile {
     }
 
     my $toalign = $other;
-    #### $toalign
+    ##### sequence to add: $toalign
 
     unless ($toalign->has_uniq_ids) {
         ### non uniq seq id p2
@@ -231,29 +233,35 @@ sub align_on_profile {
 
     my ($toalign_file, $toalign_mapper)
         = $toalign->temp_fasta( {id_prefix => 'toalign-'} );
-    ### $toalign_file
 
     my $profile = $new_profile;
     my ($profile_file, $profile_mapper)
         = $profile->temp_fasta( {id_prefix => 'profile-'} );
-    ### $profile_file
 
     my %mapper = ( profile => $profile_mapper, toalign => $toalign_mapper );
 
     my $type = $other->is_aligned ? 'prof' : 'seqs';
-    ### $type
+    ### type of sequence to add: $type
+
+    # set up new (expendable) hash to change used options
+    tie my %reduced_opt, 'Tie::IxHash';
+    %reduced_opt = %opt;
 
     if ($type eq 'prof') {
-        $new_profile = Profile2Profile->new( file1 => $toalign_file,
-                                             file2 => $profile_file );
+        delete $reduced_opt{ '--keeplength' };
+        $new_profile = Profile2Profile->new( file1   => $toalign_file,
+                                             file2   => $profile_file,
+                                             options => \%reduced_opt  );
     }
 
     elsif ($type eq 'seqs') {
-        $new_profile =    Seqs2Profile->new( file1 => $toalign_file,
-                                             file2 => $profile_file );
+        delete %reduced_opt{ qw( --maxiterate --localpair ) }
+            if $ARGV_keep_length;
+        $new_profile =    Seqs2Profile->new( file1   => $toalign_file,
+                                             file2   => $profile_file,
+                                             options => \%reduced_opt  );
     }
 
-    $new_profile->dont_guess;
     $new_profile->restore_ids( $mapper{profile} );
     $new_profile->restore_ids( $mapper{toalign} );
 
@@ -281,10 +289,14 @@ sub align_from_scratch {
     }
 
     my ($toalign_file, $toalign_mapper) = $toalign->temp_fasta;
-    ### $toalign_file
 
-    my $new_profile = AlignAll->new( file => $toalign_file );
-    $new_profile->dont_guess;
+    # set up new (expendable) hash to change used options
+    tie my %reduced_opt, 'Tie::IxHash';
+    %reduced_opt = %opt;
+    delete $reduced_opt{ '--keeplength' };
+
+    my $new_profile = AlignAll->new( file    => $toalign_file,
+                                     options => \%reduced_opt );
     $new_profile->restore_ids($toalign_mapper);
 
     return $new_profile;
@@ -300,7 +312,7 @@ sub uniq_ids {
 
     my %count_for = count_by { $_ } @ids;
     my @duplicates = grep { $count_for{ $_ } > 1 } @ids;
-    #### @duplicates
+    #### non uniq ids: @duplicates
 
     for my $dup ( uniq @duplicates ) {
         my @seqs = grep { $_->full_id eq $dup } $ali->all_seqs;
@@ -311,7 +323,7 @@ sub uniq_ids {
             unless ( $seqs[$i]->is_subseq_of($seqs[$i-1])
                 || ( $seqs[$i-1]->is_subseq_of($seqs[$i])
                 &&   $seqs[$i]->is_subseq_of($seqs[$i-1]) ) ) {
-                carp "Warning: duplicate ids and different sequences for $dup";
+                carp "Warning: duplicate ids but different sequences for: $dup";
             }
         }
     }
@@ -339,7 +351,7 @@ two-scalp.pl - Align or re-align sequences using various strategies
 
 =head1 VERSION
 
-version 0.201810
+version 0.211710
 
 =head1 USAGE
 
@@ -384,18 +396,38 @@ obtained after aligning the specified families.
 
 =for Euclid: family.type: string
 
+=item --keep-length
+
+Alignment length remains unchanged when adding sequences from the same family
+[default: no]. This is achieved by clipping sequence regions not fitting in the
+existing alignment.
+
+=item --linsi
+
+Run C<mafft-linsi> instead of the default C<mafft> executable for more accurate
+alignment [default: no]. If the C<--keep-length> option is specified, the
+default C<mafft> will still be run when aligning sequences from the same family.
+
+=item --threads=<n>
+
+Number of threads to allocate to the aligner [default: n.default]. Mostly useful
+when the C<--linsi> option is specified.
+
+=for Euclid: n.type: +int
+    n.default: 1
+
 =item --out[-suffix]=<suffix>
 
 Suffix to append to infile basename for deriving outfile name [default:
--aligned]. The infile giving the basename is the first given to --in-seqs.
+suffix.default]. The infile giving the basename is the first given to --in-seqs.
 
 =for Euclid: suffix.type: string
-    suffix.default: '-aligned'
+    suffix.default: '-ts'
 
 =item --verbosity=<level>
 
-Verbosity level for logging to STDERR [default: 0]. Available levels range
-from 0 to 6. Level 6 corresponds to debugging mode.
+Verbosity level for logging to STDERR [default: level.default]. Available levels
+range from 0 to 6. Level 6 corresponds to debugging mode.
 
 =for Euclid: level.type: int, level >= 0 && level <= 6
     level.default: 0
@@ -416,11 +448,21 @@ Print the usual program information
 
 Denis BAURAIN <denis.baurain@uliege.be>
 
-=head1 CONTRIBUTOR
+=head1 CONTRIBUTORS
 
-=for stopwords Amandine BERTRAND
+=for stopwords Amandine BERTRAND Valerian LUPO
+
+=over 4
+
+=item *
 
 Amandine BERTRAND <amandine.bertrand@doct.uliege.be>
+
+=item *
+
+Valerian LUPO <valerian.lupo@doct.uliege.be>
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 

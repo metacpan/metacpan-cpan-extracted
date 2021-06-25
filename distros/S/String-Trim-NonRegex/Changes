@@ -1,0 +1,12 @@
+0.002   2021-06-23  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Tweak Description.
+
+	- [doc] Mention Text::Minify::XS (RT#136835).
+
+
+0.001   2021-06-16  Released-By: PERLANCAR
+
+        - First release.

@@ -1,0 +1,68 @@
+#!/usr/bin/perl
+
+use v5.14;
+use warnings;
+
+use App::sdview;
+
+use Getopt::Long;
+
+GetOptions(
+   'format|f=s' => \my $FORMAT,
+) or exit 1;
+
+exit App::sdview->new->run(
+   shift @ARGV,
+   format => $FORMAT,
+);
+
+=head1 NAME
+
+F<sdview> - a terminal-based structured document viewer for POD and other formats
+
+=head1 SYNOPSIS
+
+   $ sdview my-document.pod
+
+   # Understands POD in .pm files
+   $ sdview lib/App/sdview.pm
+
+   # Search perldoc for page documentation
+   sdview Scalar::Util
+
+   $ Understands Markdown files
+   sdview README.md
+
+=head1 DESCRIPTION
+
+This script runs the L<App::sdview> program, which renders a structured
+document to a terminal output, via the F<less> pager.
+
+=head1 ARGUMENTS
+
+   $ sdview [FILE]
+
+=head2 FILE
+
+If a file path is given, the filename is used to determine if it should be
+parsed as POD (F<*.pm>, F<*.pl> or F<*.pod>), or Markdown (F<*.md>). (But see
+also the C<-f> option).
+
+If the name is not a file, C<perldoc -l> will be used to convert the name of
+a Perl module into a location for its documentation.
+
+=head1 OPTIONS
+
+=head2 -f, --format FORMAT
+
+Overrides detection of the file's format by inspecting the filename. Useful
+for viewing POD out of toplevel scripts whose filename does not indicate a
+language:
+
+   $ sdview -f POD bin/sdview
+
+=head1 AUTHOR
+
+Paul Evans <leonerd@leonerd.org.uk>
+
+=cut

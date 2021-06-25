@@ -7,8 +7,11 @@ use Cwd qw(realpath);
 use File::Spec::Functions qw(abs2rel splitdir);
 use File::Which qw(which);
 use Getopt::Std;
+use Readonly;
 
-our $VERSION = 0.01;
+Readonly::Scalar our $DEFAULT_STOW_DIR => '/usr/local/stow';
+
+our $VERSION = 0.02;
 
 # Constructor.
 sub new {
@@ -27,10 +30,12 @@ sub run {
 
 	# Process arguments.
 	$self->{'_opts'} = {
+		'd' => $DEFAULT_STOW_DIR,
 		'h' => 0,
 	};
-	if (! getopts('h', $self->{'_opts'}) || $self->{'_opts'}->{'h'} || @ARGV < 1) {
-		print STDERR "Usage: $0 [-h] [--version] command\n";
+	if (! getopts('d:h', $self->{'_opts'}) || $self->{'_opts'}->{'h'} || @ARGV < 1) {
+		print STDERR "Usage: $0 [-d stow_dir] [-h] [--version] command\n";
+		print STDERR "\t-d stow_dir\tStow directory (default value is '$DEFAULT_STOW_DIR').\n";
 		print STDERR "\t-h\t\tHelp.\n";
 		print STDERR "\t--version\tPrint version.\n";
 		print STDERR "\tcommand\t\tCommand for which is stow dist looking.\n";
@@ -58,9 +63,10 @@ sub _check {
 		return (1, "Command '$command' not found.");
 	}
 
-	# XXX Need to be flexible.
-	my $stow_dir = '/usr/local/stow';
-
+	my $stow_dir = $self->{'_opts'}->{'d'};
+	if (! -d $stow_dir) {
+		return (1, "Stow directory '$stow_dir' doesn't exist.");
+	}
 	my $rel_path = abs2rel(realpath($command_path), $stow_dir);
 	my @rel_path = splitdir($rel_path);
 	if ($rel_path[0] eq '..') {
@@ -112,6 +118,14 @@ Run method. Check if command is in stow directory and print error message
 
 Returns exit code.
 
+=head1 ERRORS
+
+ run():
+         Command '%s' doesn't use stow.
+         Command '%s' don't use 'bin/sbin' path.
+         Command '%s' not found.
+         Stow directory '%s' doesn't exist.
+
 =head1 EXAMPLE
 
  use strict;
@@ -128,7 +142,8 @@ Returns exit code.
  exit App::Stow::Check->new->run;
 
  # Output:
- # Usage: ./ex1.pl [-h] [--version] command
+ # Usage: ./ex1.pl [-d stow_dir] [-h] [--version] command
+ #         -d stow_dir     Stow directory (default value is '/usr/local/stow').
  #         -h              Help.
  #         --version       Print version.
  #         command         Command for which is stow dist looking.
@@ -138,7 +153,8 @@ Returns exit code.
 L<Cwd>,
 L<File::Spec::Functions>,
 L<File::Which>,
-L<Getopt::Std>.
+L<Getopt::Std>,
+L<Readonly>.
 
 =head1 REPOSITORY
 
@@ -158,6 +174,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.01
+0.02
 
 =cut

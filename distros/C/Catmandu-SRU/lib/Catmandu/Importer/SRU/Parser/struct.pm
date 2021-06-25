@@ -3,7 +3,7 @@ use strict;
 use Moo;
 use XML::Struct ();
 
-our $VERSION = '0.429';
+our $VERSION = '0.430';
 
 has _reader => (
     is      => 'ro',

@@ -6,8 +6,9 @@ use warnings;
 use Class::Utils qw(set_params);
 use Error::Pure qw(err);
 use List::MoreUtils qw(none);
+use Scalar::Util qw(openhandle);
 
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 # Constructor.
 sub new {
@@ -72,7 +73,7 @@ sub put {
 		# Split to type and main CSS structure.
 		my ($type, @css_struct) = @{$css_structure_ar};
 
-		# Attributes.
+		# At-rule.
 		if ($type eq 'a') {
 			$self->_check_arguments(\@css_struct, 1, 2);
 			$self->_put_at_rules(@css_struct);
@@ -191,7 +192,7 @@ sub _check_params {
 
 	# Check to output handler.
 	if (defined $self->{'output_handler'}
-		&& ref $self->{'output_handler'} ne 'GLOB') {
+		&& ! defined openhandle($self->{'output_handler'})) {
 
 		err 'Output handler is bad file handler.';
 	}
@@ -215,7 +216,7 @@ sub _check_params {
 
 # At-rules.
 sub _put_at_rules {
-	my ($self, $at_rule, $file) = @_;
+	my ($self, $at_rule, $value) = @_;
 	push @{$self->{'flush_code'}}, 'At-rule';
 	return;
 }
@@ -385,7 +386,8 @@ Returns undef.
 
 L<Class::Utils>,
 L<Error::Pure>,
-L<List::MoreUtils>.
+L<List::MoreUtils>,
+L<Scalar::Util>.
 
 =head1 SEE ALSO
 
@@ -419,6 +421,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.04
+0.05
 
 =cut

@@ -1,7 +1,7 @@
 use strict;
 use warnings;
-package App::Cmd::Tester::CaptureExternal;
-$App::Cmd::Tester::CaptureExternal::VERSION = '0.333';
+package App::Cmd::Tester::CaptureExternal 0.334;
+
 use parent 'App::Cmd::Tester';
 use Capture::Tiny 0.13 qw/capture/;
 
@@ -81,7 +81,7 @@ App::Cmd::Tester::CaptureExternal - Extends App::Cmd::Tester to capture from ext
 
 =head1 VERSION
 
-version 0.333
+version 0.334
 
 =head1 SYNOPSIS
 
@@ -116,9 +116,19 @@ You can still use C<output> for testing if there is any output at all or for
 testing if something appeared in either output stream, but you can't rely on
 the ordering being correct between lines to STDOUT and lines to STDERR.
 
+=head1 PERL VERSION SUPPORT
+
+This module has a long-term perl support period.  That means it will not
+require a version of perl released fewer than five years ago.
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
+
 =head1 AUTHOR
 
-Ricardo Signes <rjbs@cpan.org>
+Ricardo Signes <rjbs@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

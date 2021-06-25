@@ -1,0 +1,94 @@
+NAME
+    Dancer2::Plugin::PrometheusTiny - use Prometheus::Tiny with Dancer2
+
+SYNOPSIS
+DESCRIPTION
+    This plugin integrates Prometheus::Tiny::Shared with your Dancer2 app,
+    providing some default metrics for requests and responses, with the
+    ability to easily add further metrics to your app. A route is added
+    which makes the metrics available via the configured "endpoint".
+
+    See Prometheus::Tiny for more details of the kind of metrics supported.
+
+    The following metrics are included by default:
+
+        http_request_duration_seconds => {
+            help => 'Request durations in seconds',
+            type => 'histogram',
+        },
+        http_request_size_bytes => {
+            help    => 'Request sizes in bytes',
+            type    => 'histogram',
+            buckets => [ 1, 50, 100, 1_000, 50_000, 500_000, 1_000_000 ],
+        },
+        http_requests_total => {
+            help => 'Total number of http requests processed',
+            type => 'counter',
+        },
+        http_response_size_bytes => {
+            help    => 'Response sizes in bytes',
+            type    => 'histogram',
+            buckets => [ 1, 50, 100, 1_000, 50_000, 500_000, 1_000_000 ],
+        }
+
+KEYWORDS
+  prometheus
+        get '/some/route' => sub {
+            prometheus->inc(...);
+        }
+
+    Returns the "Prometheus::Tiny::Shared" instance.
+
+CONFIGURATION
+    Example:
+
+        plugins:
+          PrometheusTiny:
+            endpoint: /prometheus-metrics   # default: /metrics
+            filename: /run/d2prometheus     # default: (undef)
+            include_default_metrics: 0      # default: 1
+            metrics:                        # default: {}
+              http_request_count:
+                help: HTTP Request count
+                type: counter
+
+    See below for full details of each configuration setting.
+
+  endpoint
+    The endpoint from which metrics are served. Defaults to "/metrics".
+
+  filename
+    It is recommended that this is set to a directory on a memory-backed
+    filesystem. See "filename" in Prometheus::Tiny::Shared for details and
+    default value.
+
+  include_default_metrics
+    Defaults to true. If set to false, then the default metrics shown in
+    "DESCRIPTION" will not be added.
+
+  metrics
+    Declares extra metrics to be merged with those included with the plugin.
+    See See "declare" in Prometheus::Tiny for details.
+
+  prometheus_tiny_class
+    Defaults to Prometheus::Tiny::Shared.
+
+    WARNING: You shoulf only set this if you are running a single process
+    plack server such as Twiggy, and you don't want to use file-based store
+    for metrics. Setting this to Prometheus::Tiny will mean that metrics are
+    instead stored in memory.
+
+AUTHOR
+    Peter Mottram (SysPete) <peter@sysnix.com>
+
+CONTRIBUTORS
+    None yet.
+
+COPYRIGHT
+    Copyright (c) 2021 the Catalyst::Plugin::PrometheusTiny "AUTHOR" and
+    "CONTRIBUTORS" as listed above.
+
+LICENSE
+    This library is free software and may be distributed under the same
+    terms as Perl itself.
+

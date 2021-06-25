@@ -1,0 +1,19 @@
+0.003   2021-06-21  Released-By: PERLANCAR; Urgency: medium
+
+	- Add OO interface.
+
+	- Add function: dump_sqlite_counters().
+
+
+0.002   2021-06-18  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- Tweak schema for path (filename instead of str).
+
+	- [doc] Tweak blurb in Description.
+
+
+0.001   2021-06-18  Released-By: PERLANCAR
+
+        - First release.

@@ -48,11 +48,11 @@ sub on_table {
 
     CUSTOMIZE: while ( 1 ) {
         my $menu = [ @pre, @choices ];
-        $ax->print_sql( $sql );
+        my $info = $ax->get_sql_info( $sql );
         # Choose
         my $idx = $tc->choose(
             $menu,
-            { %{$sf->{i}{lyt_v}}, prompt => '', index => 1, default => $old_idx, undef => $sf->{i}{back} }
+            { %{$sf->{i}{lyt_v}}, info => $info, prompt => '', index => 1, default => $old_idx, undef => $sf->{i}{back} }
         );
         if ( ! defined $idx || ! defined $menu->[$idx] ) {
             last CUSTOMIZE;

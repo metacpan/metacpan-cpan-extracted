@@ -1,5 +1,17 @@
 Revision history for HTTP-CookieJar
 
+0.012     2021-06-16 05:34:31-04:00 America/New_York
+
+    - No changes from 0.011
+
+0.011     2021-06-15 19:29:51-04:00 America/New_York (TRIAL RELEASE)
+
+    [FIXED]
+
+    - Pushed test cookie expiration dates from 2021 to 2041.
+      If I'm still maintaining this module in 2041, I'll bump
+      them again then.
+
 0.010     2020-09-20 11:28:49-04:00 America/New_York
 
     - No changes from 0.009

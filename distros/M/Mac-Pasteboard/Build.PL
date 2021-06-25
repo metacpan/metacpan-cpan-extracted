@@ -13,13 +13,6 @@ use My::Module::Build;
 use My::Module::Meta;
 use Config;
 
-my @PL_files;
-foreach my $if (qw{Pasteboard.xs constant-c.inc constant-h.inc
-    constant-xs.inc pbl.c pbl.h ppport.h}) {
-    my $of = 'lib/Mac/' . $if;
-    push @PL_files, $of;
-}
-
 (my $mbv = Module::Build->VERSION) =~ s/_//g;
 
 my $meta = My::Module::Meta->new();
@@ -37,9 +30,6 @@ my %args = (
     dist_name	=> $meta->dist_name(),
     license	=> $meta->license(),
     module_name	=> $meta->module_name(),
-    PL_files	=> {
-	'MBCopy.PL' => \@PL_files,
-    },
     requires	=> $meta->requires(
 	perl	=> $meta->requires_perl(),
     ),
@@ -49,6 +39,7 @@ my %args = (
 $mbv >= 0.26
     and $args{get_options} = {
 	n	=> { type => '!' },
+	p	=> { type => '!' },
 	t	=> { type => '!' },
 	u	=> { type => '!' },
 	y	=> { type => '!' },
@@ -75,6 +66,12 @@ $meta->want_pbtool( \%opt, $bldr )
 $bldr->script_files( \@exe_files );
 
 $bldr->extra_compiler_flags( $meta->ccflags( \%opt ) );
+
+$bldr->my_pl_files(
+    $opt{p} ?
+    [ qw{ Pasteboard.xs constant-c.inc constant-h.inc constant-xs.inc pbl.c pbl.h ppport.h } ] :
+    [ qw{ Pasteboard.xs constant-xs.inc ppport.h } ],
+);
 
 $bldr->create_build_script ();
 

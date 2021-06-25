@@ -1,3 +1,16 @@
+0.005   2021-06-14  Released-By: PERLANCAR; Urgency: high
+
+        - Merge releases 0.004 and 0.004.1.
+
+
+0.004.1 2021-02-19  Released-By: PERLANCAR; Urgency: medium
+
+	- import(): Recognize -filter_subs argument to pass to
+	  add_logging_to_package().
+
+        - UPDATE 2021-06-14: rename release 0.004 to 0.004.1 due to conflict.
+
+
 0.004   2019-12-09  Released-By: PERLANCAR; Urgency: medium
 
 	- Update dependency Data::Clean::JSON -> Data::Clean::ForJSON.

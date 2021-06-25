@@ -1,5 +1,6 @@
 Changes
 CONTRIBUTING
+KEY
 lib/Asm/X86.pm
 Makefile.PL
 MANIFEST			This list of files
@@ -12,7 +13,6 @@ t/pod-coverage.t
 t/pod.t
 t/zz_addr_att.t
 t/zz_addr_intel.t
-t/zz_addr_mixed.t
 t/zz_conv.t
 t/zz_duplicates.t
 t/zz_instr_att.t
@@ -20,5 +20,4 @@ t/zz_instr_intel.t
 t/zz_instr_mixed.t
 t/zz_regs_att.t
 t/zz_regs_intel.t
-t/zz_regs_mixed.t
 SIGNATURE                                Public-key signature (added by MakeMaker)

@@ -4,12 +4,12 @@ Plack::Middleware::TrafficAdvice - handle requests for /.well-known/traffic-advi
 
 # VERSION
 
-version v0.2.0
+version v0.2.1
 
 # SYNOPSIS
 
 ```perl
-use JSON::MaybeXS;
+use JSON::MaybeXS 1.004000;
 use Plack::Builder;
 
 builder {
@@ -32,7 +32,7 @@ builder {
 This middle provides a handler for requests for `/.well-known/traffic-advice`.
 
 You must specify either a ["file"](#file) or ["data"](#data) containing the traffic
-advice information.
+advice information. (There is no default value.)
 
 # ATTRIBUTES
 

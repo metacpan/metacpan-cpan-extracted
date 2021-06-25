@@ -14,6 +14,8 @@ package Module::Generic::Tie;
 BEGIN
 {
     use Tie::Hash;
+    use strict;
+    use warnings;
     our( @ISA ) = qw( Tie::Hash );
     our( $VERSION ) = 'v1.0.0';
 };

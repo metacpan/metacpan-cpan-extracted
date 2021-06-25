@@ -6,7 +6,7 @@ use warnings;
 
 use lib 't/lib';
 
-use MyTest tests => 265;
+use MyTest tests => 298;
 
 license_covered(
 	'aal',
@@ -504,6 +504,14 @@ BitTorrent Open Source License
 Version 1.0
 
 This BitTorrent Open Source License (the "License") applies to the BitTorrent client and related software products as well as any updates or maintenance releases of that software ("BitTorrent Products") that are distributed by BitTorrent, Inc. ("Licensor").
+
+4. Your Obligations Regarding Distribution.
+
+a. Application of This License to Your Modifications.  As an express condition for your use of the Licensed Product, you hereby agree that any Modifications that you create or to which you contribute, and which you distribute, are governed by the terms of this License including, without limitation, Section 2.  Any Modifications that you create or to which you contribute may be distributed only under the terms of this License or a future version of this License released under Section 7.  You must include a copy of this License with every copy of the Modifications you distribute.  You agree not to offer or impose any terms on any Source Code or executable version of the Licensed Product or Modifications that alter or restrict the applicable version of this License or the recipients' rights hereunder. However, you may include an additional document offering the additional rights described in Section 4(d).
+
+b. Availability of Source Code.  You must make available, under the terms of this License, the Source Code of the Licensed Product and any Modifications that you distribute, either on the same media as you distribute any executable or other form of the Licensed Product, or via a mechanism generally accepted in the software development community for the electronic transfer of data (an "Electronic Distribution Mechanism").  The Source Code for any version of Licensed Product or Modifications that you distribute must remain available for at least twelve (12) months after the date it initially became available, or at least six (6) months after a subsequent version of said Licensed Product or Modifications has been made available.  You are responsible for ensuring that the Source Code version remains available even if the Electronic Distribution Mechanism is maintained by a third party.
+
+c. Intellectual Property Matters.
 EOF
 );
 
@@ -519,6 +527,14 @@ BitTorrent Open Source License
 Version 1.1
 
 This BitTorrent Open Source License (the "License") applies to the BitTorrent client and related software products as well as any updates or maintenance releases of that software ("BitTorrent Products") that are distributed by BitTorrent, Inc. ("Licensor").
+
+4. Your Obligations Regarding Distribution.
+
+a. Application of This License to Your Modifications. As an express condition for your use of the Licensed Product, you hereby agree that any Modifications that you create or to which you contribute, and which you distribute, are governed by the terms of this License including, without limitation, Section 2. Any Modifications that you create or to which you contribute may be distributed only under the terms of this License or a future version of this License released under Section 7. You must include a copy of this License with every copy of the Modifications you distribute. You agree not to offer or impose any terms on any Source Code or executable version of the Licensed Product or Modifications that alter or restrict the applicable version of this License or the recipients' rights hereunder. However, you may include an additional document offering the additional rights described in Section 4(d).
+
+b. Availability of Source Code. You must make available, without charge, under the terms of this License, the Source Code of the Licensed Product and any Modifications that you distribute, either on the same media as you distribute any executable or other form of the Licensed Product, or via a mechanism generally accepted in the software development community for the electronic transfer of data (an "Electronic Distribution Mechanism"). The Source Code for any version of Licensed Product or Modifications that you distribute must remain available for as long as any executable or other form of the Licensed Product is distributed by you. You are responsible for ensuring that the Source Code version remains available even if the Electronic Distribution Mechanism is maintained by a third party.
+
+c. Intellectual Property Matters.
 EOF
 );
 
@@ -527,6 +543,16 @@ license_covered(
 	name => 'Borceux license',
 	text => <<EOF,
 You may freely use, modify, and/or distribute each of the files in this package without limitation.
+EOF
+);
+
+license_covered(
+	'bsd_0_clause',
+	name => 'BSD (0 clause)',
+	text => <<EOF,
+Permission to use, copy, modify, and/or distribute this software for any purpose with or without fee is hereby granted.
+
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS.
 EOF
 );
 
@@ -632,6 +658,20 @@ license_covered(
 	name => 'bzip2 and libbzip2 License v1.0.6',
 	text => <<EOF,
 This program, "bzip2", the associated library "libbzip2", and all documentation, are copyright (C) 1996-2010 Julian R Seward. All rights reserved.
+EOF
+);
+
+license_covered(
+	'cal',
+	name => 'Cryptographic Autonomy License',
+	TODO => [qw(subject_license)]
+);
+
+license_covered(
+	'cal_1',
+	name => 'Cryptographic Autonomy License 1.0',
+	text => <<EOF,
+This Cryptographic Autonomy License (the “License”) applies to any Work whose owner has marked it with any of the following notices, or a similar demonstration of intent:
 EOF
 );
 
@@ -1393,6 +1433,14 @@ EOF
 );
 
 license_covered(
+	'cvw',
+	name => 'MITRE Collaborative Virtual Workspace License',
+	text => <<EOF,
+Redistribution of the CVW software or derived works must reproduce MITRE's copyright designation and this License in the documentation and/or other materials provided with the distribution.
+EOF
+);
+
+license_covered(
 	'dsdp',
 	name => 'DSDP License',
 	text => <<EOF,
@@ -1690,6 +1738,33 @@ EOF
 );
 
 license_covered(
+	'intel',
+	name => 'Intel Open Source License',
+	text => <<EOF,
+Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+
+• Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+
+• Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+
+• Neither the name of the Intel Corporation nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE INTEL OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+EXPORT LAWS: THIS LICENSE ADDS NO RESTRICTIONS TO THE EXPORT LAWS OF YOUR JURISDICTION.
+EOF
+	TODO => [qw(subject_iri)]
+);
+
+license_covered(
+	'jabberpl',
+	name => 'Jabber Open Source License',
+	text => <<EOF,
+This Jabber Open Source License (the "License") applies to Jabber Server and related software products as well as any updates or maintenance releases of that software ("Jabber Products") that are distributed by Jabber.Com, Inc. ("Licensor").
+EOF
+);
+
+license_covered(
 	'json',
 	text => 'The Software shall be used for Good, not Evil.',
 );
@@ -1957,6 +2032,29 @@ EOF
 );
 
 license_covered(
+	'motosoto',
+	name => 'Motosoto License',
+	iri  => 'https://opensource.org/licenses/Motosoto',
+	text => <<EOF,
+MOTOSOTO OPEN SOURCE LICENSE - Version 0.9.1
+
+This Motosoto Open Source License (the "License") applies to "Community Portal Server" and related software products as well as any updatesor maintenance releases of that software ("Motosoto Products") that are distributed by Motosoto.Com B.V. ("Licensor").
+Any Motosoto Product licensed pursuant to this License is a "Licensed Product." Licensed Product, in its entirety, is protected by Dutch copyright law.
+This License identifies the terms under which you may use, copy, distribute or modify Licensed Product and has been submitted to the Open Software Initiative (OSI) for approval.
+
+7. Versions of This License.
+
+a. Version.
+The Motosoto Open Source License is derived from the Jabber Open Source License.
+All changes are related to applicable law and the location of court.
+
+b. New Versions.
+Licensor may publish from time to time revised and/or new versions of the License.
+EOF
+	TODO => [qw(not_iri_name)]
+);
+
+license_covered(
 	'mpl',
 	name => 'Mozilla Public License',
 	iri  => 'https://www.mozilla.org/MPL',
@@ -2014,6 +2112,53 @@ license_covered(
 	name => 'Microsoft Reciprocal License',
 	iri =>
 		'https://en.wikipedia.org/wiki/Shared_source#Microsoft_Reciprocal_License_(Ms-RL)',
+);
+
+license_covered(
+	'mulan',
+	name => 'Mulan Permissive Software License',
+	TODO => [qw(subject_license)]
+);
+
+license_covered(
+	'mulan',
+	name => '木兰宽松许可证',
+	TODO => [qw(subject_license)]
+);
+
+license_covered(
+	'mulan_1',
+	name => 'Mulan Permissive Software License，Version 1',
+	iri  => 'https://license.coscl.org.cn/MulanPSL',
+	text => <<EOF,
+Your reproduction, use, modification and distribution of the Software shall be subject to Mulan PSL v1 (this License) with following terms and conditions
+EOF
+);
+
+license_covered(
+	'mulan_1',
+	name => '木兰宽松许可证， 第1版',
+	text => <<EOF,
+您对“软件”的复制、使用、修改及分发受木兰宽松许可证，第1版（“本许可证”）的如下条款的约束
+EOF
+	TODO => [qw(name_name)]
+);
+
+license_covered(
+	'mulan_2',
+	name => 'Mulan Permissive Software License，Version 2',
+	text => <<EOF,
+Your reproduction, use, modification and distribution of the Software shall be subject to Mulan PSL v2 (this License) with the following terms and conditions
+EOF
+);
+
+license_covered(
+	'mulan_2',
+	name => '木兰宽松许可证， 第2版',
+	text => <<EOF,
+您对“软件”的复制、使用、修改及分发受木兰宽松许可证，第2版（“本许可证”）的如下条款的约束
+EOF
+	TODO => [qw(name_name)]
 );
 
 license_covered(
@@ -2153,6 +2298,364 @@ license_covered(
 	name => 'Open Group Test Suite License',
 	text => <<EOF,
 rename any non-standard executables and testcases so the names do not conflict with standard executables and testcases,
+EOF
+);
+
+license_covered(
+	'oldap',
+	name => 'Open LDAP Public License',
+	TODO => [qw(subject_license)]
+);
+
+license_covered(
+	'oldap_1_1',
+	name => 'Open LDAP Public License v1.1',
+	text => <<EOF,
+The OpenLDAP Public License
+
+Version 1.1, 25 August 1998 Copyright 1998, The OpenLDAP Foundation.
+All Rights Reserved.
+Note: This license is derived from the "Artistic License" as distributed with the Perl Programming Language.
+Its terms are different from those of the "Artistic License."
+
+PREAMBLE
+
+7. C subroutines supplied by you and linked into this Package in order to emulate subroutines and variables of the language defined by this Package shall not be considered part of this Package, but are the equivalent of input as in Paragraph 6, provided these subroutines do not change the language in any way that would cause it to fail the regression tests for the language.
+
+8. The name of the Copyright Holder may not be used to endorse or promote products derived from this software without specific prior written permission.
+EOF
+);
+
+license_covered(
+	'oldap_1_2',
+	name => 'Open LDAP Public License v1.2',
+	text => <<EOF,
+The OpenLDAP Public License
+
+Version 1.2, 1 September 1998 Copyright 1998, The OpenLDAP Foundation.
+All Rights Reserved.
+Note: This license is derived from the "Artistic License" as distributed with the Perl Programming Language.
+As differences may exist, the complete license should be read.
+
+PREAMBLE
+
+7. C subroutines supplied by you and linked into this Package in order to emulate subroutines and variables of the language defined by this Package shall not be considered part of this Package, but are the equivalent of input as in Paragraph 6, provided these subroutines do not change the language in any way that would cause it to fail the regression tests for the language.
+
+8. The name of the Copyright Holder may not be used to endorse or promote products derived from this software without specific prior written permission.
+EOF
+);
+
+license_covered(
+	'oldap_1_3',
+	name => 'Open LDAP Public License v1.3',
+	text => <<EOF,
+The OpenLDAP Public License
+Version 1.3, 17 January 1999
+
+Copyright 1998-1999, The OpenLDAP Foundation. All Rights Reserved.
+
+Note: This license is derived from the "Artistic License" as distributed with the Perl Programming Language. As significant differences exist, the complete license should be read.
+
+PREAMBLE
+
+7. C subroutines supplied by you and linked into this Package in order to emulate subroutines and variables defined by this Package shall not be considered part of this Package, but are the equivalent of input as in Paragraph 6, provided these subroutines do not change the behavior of the Package in any way that would cause it to fail the regression tests for the Package.
+
+8. Software supplied by you and linked with this Package in order to use subroutines and variables defined by this Package shall not be considered part of this Package and do not automatically fall under the copyright of this Package, and the executables produced by linking your software with this Package may be used and redistributed without restriction and may be sold commercially.
+EOF
+);
+
+license_covered(
+	'oldap_1_4',
+	name => 'Open LDAP Public License v1.4',
+	text => <<EOF,
+The OpenLDAP Public License
+Version 1.4, 18 January 1999
+
+Copyright 1998-1999, The OpenLDAP Foundation. All Rights Reserved.
+
+Note: This license is derived from the "Artistic License" as distributed with the Perl Programming Language. As significant differences exist, the complete license should be read.
+
+PREAMBLE
+
+7. C subroutines supplied by you and linked into this Package in order to emulate subroutines and variables defined by this Package shall not be considered part of this Package, but are the equivalent of input as in Paragraph 6, provided these subroutines do not change the behavior of the Package in any way that would cause it to fail the regression tests for the Package.
+
+8. Software supplied by you and linked with this Package in order to use subroutines and variables defined by this Package shall not be considered part of this Package and do not automatically fall under the copyright of this Package. Executables produced by linking your software with this Package may be used and redistributed without restriction and may be sold commercially so long as the primary function of your software is different than the package itself.
+EOF
+);
+
+license_covered(
+	'oldap_2',
+	name => 'Open LDAP Public License v2.0',
+	text => <<EOF,
+The OpenLDAP Public License
+Version 2.0, 7 June 1999
+
+Copyright 1999, The OpenLDAP Foundation, Redwood City, California, USA. All Rights Reserved.
+
+Redistribution and use of this software and associated documentation ("Software"), with or without modification, are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain copyright statements and notices. Redistributions must also contain a copy of this document.
+
+2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+
+3. The name "OpenLDAP" must not be used to endorse or promote products derived from this Software without prior written permission of the OpenLDAP Foundation. For written permission, please contact foundation\@openldap.org.
+
+4. Products derived from this Software may not be called "OpenLDAP" nor may "OpenLDAP" appear in their names without prior written permission of the OpenLDAP Foundation. OpenLDAP is a registered trademark of the OpenLDAP Foundation.
+
+5. Due credit should be given to the OpenLDAP Project (http://www.openldap.org/).
+
+THIS SOFTWARE IS PROVIDED BY THE OPENLDAP FOUNDATION AND CONTRIBUTORS ``AS IS'' AND ANY EXPRESSED OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE OPENLDAP FOUNDATION OR ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+EOF
+);
+
+license_covered(
+	'oldap_2_0_1',
+	name => 'Open LDAP Public License v2.0.1',
+	text => <<EOF,
+The OpenLDAP Public License
+Version 2.0.1, 21 December 1999
+
+Copyright 1999, The OpenLDAP Foundation, Redwood City, California, USA. All Rights Reserved.
+
+Redistribution and use of this software and associated documentation ("Software"), with or without modification, are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain copyright statements and notices. Redistributions must also contain a copy of this document.
+
+2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+
+3. The name "OpenLDAP" must not be used to endorse or promote products derived from this Software without prior written permission of the OpenLDAP Foundation. For written permission, please contact foundation\@openldap.org.
+
+4. Products derived from this Software may not be called "OpenLDAP" nor may "OpenLDAP" appear in their names without prior written permission of the OpenLDAP Foundation. OpenLDAP is a trademark of the OpenLDAP Foundation.
+
+5. Due credit should be given to the OpenLDAP Project (http://www.openldap.org/).
+
+THIS SOFTWARE IS PROVIDED BY THE OPENLDAP FOUNDATION AND CONTRIBUTORS ``AS IS'' AND ANY EXPRESSED OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE OPENLDAP FOUNDATION OR ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+EOF
+);
+
+license_covered(
+	'oldap_2_1',
+	name => 'Open LDAP Public License v2.1',
+	text => <<EOF,
+The OpenLDAP Public License
+Version 2.1, 29 February 2000
+
+Copyright 1999-2000, The OpenLDAP Foundation, Redwood City, California, USA. All Rights Reserved.
+
+Redistribution and use of this software and associated documentation ("Software"), with or without modification, are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain copyright statements and notices. Redistributions must also contain a copy of this document.
+
+2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+
+3. The name "OpenLDAP" must not be used to endorse or promote products derived from this Software without prior written permission of the OpenLDAP Foundation. For written permission, please contact foundation\@openldap.org.
+
+4. Products derived from this Software may not be called "OpenLDAP" nor may "OpenLDAP" appear in their names without prior written permission of the OpenLDAP Foundation. OpenLDAP is a trademark of the OpenLDAP Foundation.
+
+5. Due credit should be given to the OpenLDAP Project (http://www.openldap.org/).
+
+6. The OpenLDAP Foundation may revise this license from time to time. Each revision is distinguished by a version number. You may use the Software under terms of this license revision or under the terms of any subsequent license revision.
+EOF
+);
+
+license_covered(
+	'oldap_2_2',
+	name => 'Open LDAP Public License v2.2',
+	text => <<EOF,
+The OpenLDAP Public License
+Version 2.2, 1 March 2000
+
+Redistribution and use of this software and associated documentation ("Software"), with or without modification, are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain copyright statements and notices. Redistributions must also contain a copy of this document.
+
+2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+
+3. The name "OpenLDAP" must not be used to endorse or promote products derived from this Software without prior written permission of the OpenLDAP Foundation.
+
+4. Products derived from this Software may not be called "OpenLDAP" nor may "OpenLDAP" appear in their names without prior written permission of the OpenLDAP Foundation.
+
+5. Due credit should be given to the OpenLDAP Project (http://www.openldap.org/).
+
+6. The OpenLDAP Foundation may revise this license from time to time. Each revision is distinguished by a version number. You may use the Software under terms of this license revision or under the terms of any subsequent the license.
+EOF
+);
+
+license_covered(
+	'oldap_2_2_1',
+	name => 'Open LDAP Public License v2.2.1',
+	text => <<EOF,
+The OpenLDAP Public License
+Version 2.2.1, 1 March 2000
+
+Redistribution and use of this software and associated documentation ("Software"), with or without modification, are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain copyright statements and notices. Redistributions must also contain a copy of this document.
+
+2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+
+3. The name "OpenLDAP" must not be used to endorse or promote products derived from this Software without prior written permission of the OpenLDAP Foundation.
+
+4. Products derived from this Software may not be called "OpenLDAP" nor may "OpenLDAP" appear in their names without prior written permission of the OpenLDAP Foundation.
+
+5. Due credit should be given to the OpenLDAP Project (http://www.openldap.org/).
+
+6. The OpenLDAP Foundation may revise this license from time to time. Each revision is distinguished by a version number. You may use the Software under terms of this license revision or under the terms of any subsequent revision of the license.
+EOF
+);
+
+license_covered(
+	'oldap_2_2_2',
+	name => 'Open LDAP Public License v2.2.2',
+	text => <<EOF,
+The OpenLDAP Public License
+Version 2.2.2, 28 July 2000
+
+Redistribution and use of this software and associated documentation ("Software"), with or without modification, are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain copyright statements and notices.
+
+2. Redistributions in binary form must reproduce applicable copyright statements and notices, this list of conditions, and the following disclaimer in the documentation and/or other materials provided with the distribution.
+
+3. Redistributions must contain a verbatim copy of this document.
+
+4. The name "OpenLDAP" must not be used to endorse or promote products derived from this Software without prior written permission of the OpenLDAP Foundation.
+
+5. Products derived from this Software may not be called "OpenLDAP" nor may "OpenLDAP" appear in their names without prior written permission of the OpenLDAP Foundation.
+
+6. Due credit should be given to the OpenLDAP Project (http://www.openldap.org/).
+
+7. The OpenLDAP Foundation may revise this license from time to time. Each revision is distinguished by a version number. You may use the Software under terms of this license revision or under the terms of any subsequent revision of the license.
+EOF
+);
+
+license_covered(
+	'oldap_2_3',
+	name => 'Open LDAP Public License v2.3',
+	text => <<EOF,
+The OpenLDAP Public License
+Version 2.3, 28 July 2000
+
+Redistribution and use of this software and associated documentation ("Software"), with or without modification, are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain copyright statements and notices.
+
+2. Redistributions in binary form must reproduce applicable copyright statements and notices, this list of conditions, and the following disclaimer in the documentation and/or other materials provided with the distribution.
+
+3. Redistributions must contain a verbatim copy of this document.
+
+4. The name "OpenLDAP" must not be used to endorse or promote products derived from this Software without prior written permission of the OpenLDAP Foundation.
+
+5. Products derived from this Software may not be called "OpenLDAP" nor may "OpenLDAP" appear in their names without prior written permission of the OpenLDAP Foundation.
+
+6. Due credit should be given to the OpenLDAP Project (http://www.openldap.org/).
+
+7. The OpenLDAP Foundation may revise this license from time to time. Each revision is distinguished by a version number. You may use the Software under terms of this license revision or under the terms of any subsequent revision of the license.
+EOF
+);
+
+license_covered(
+	'oldap_2_4',
+	name => 'Open LDAP Public License v2.4',
+	text => <<EOF,
+The OpenLDAP Public License
+Version 2.4, 8 December 2000
+
+Redistribution and use of this software and associated documentation ("Software"), with or without modification, are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain copyright statements and notices.
+
+2. Redistributions in binary form must reproduce applicable copyright statements and notices, this list of conditions, and the following disclaimer in the documentation and/or other materials provided with the distribution.
+
+3. Redistributions must contain a verbatim copy of this document.
+
+4. The names and trademarks of the authors and copyright holders must not be used in advertising or otherwise to promote the sale, use or other dealing in this Software without specific, written prior permission.
+
+5. Due credit should be given to the OpenLDAP Project.
+
+6. The OpenLDAP Foundation may revise this license from time to time. Each revision is distinguished by a version number. You may use the Software under terms of this license revision or under the terms of any subsequent revision of the license.
+EOF
+);
+
+license_covered(
+	'oldap_2_5',
+	name => 'Open LDAP Public License v2.5',
+	text => <<EOF,
+The OpenLDAP Public License
+Version 2.5, 11 May 2001
+
+Redistribution and use of this software and associated documentation ("Software"), with or without modification, are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain copyright statements and notices.
+
+2. Redistributions in binary form must reproduce applicable copyright statements and notices, this list of conditions, and the following disclaimer in the documentation and/or other materials provided with the distribution.
+
+3. Redistributions must contain a verbatim copy of this document.
+
+4. The names and trademarks of the authors and copyright holders must not be used in advertising or otherwise to promote the sale, use or other dealing in this Software without specific, written prior permission.
+
+5. Due credit should be given to the authors of the Software.
+
+6. The OpenLDAP Foundation may revise this license from time to time. Each revision is distinguished by a version number. You may use the Software under terms of this license revision or under the terms of any subsequent revision of the license.
+EOF
+);
+
+license_covered(
+	'oldap_2_6',
+	name => 'Open LDAP Public License v2.6',
+	text => <<EOF,
+The OpenLDAP Public License
+Version 2.6, 14 June 2001
+
+Redistribution and use of this software and associated documentation ("Software"), with or without modification, are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain copyright statements and notices.
+
+2. Redistributions in binary form must reproduce applicable copyright statements and notices, this list of conditions, and the following disclaimer in the documentation and/or other materials provided with the distribution.
+
+3. Redistributions must contain a verbatim copy of this document.
+
+4. The names and trademarks of the authors and copyright holders must not be used in advertising or otherwise to promote the sale, use or other dealing in this Software without specific, written prior permission.
+
+5. The OpenLDAP Foundation may revise this license from time to time. Each revision is distinguished by a version number. You may use the Software under terms of this license revision or under the terms of any subsequent revision of the license.
+EOF
+);
+
+license_covered(
+	'oldap_2_7',
+	name => 'Open LDAP Public License v2.7',
+	text => <<EOF,
+1. Redistributions in source form must retain copyright statements and notices,
+
+2. Redistributions in binary form must reproduce applicable copyright statements and notices, this list of conditions, and the following disclaimer in the documentation and/or other materials provided with the distribution, and
+
+3. Redistributions must contain a verbatim copy of this document.
+
+The OpenLDAP Foundation may revise this license from time to time. Each revision is distinguished by a version number. You may use this Software under terms of this license revision or under the terms of any subsequent revision of the license.
+
+THIS SOFTWARE IS PROVIDED BY THE OPENLDAP FOUNDATION AND ITS CONTRIBUTORS ``AS IS'' AND ANY EXPRESSED OR IMPLIED WARRANTIES,
+EOF
+);
+
+license_covered(
+	'oldap_2_8',
+	name => 'Open LDAP Public License v2.8',
+	text => <<EOF,
+The OpenLDAP Public License
+
+Version 2.8, 17 August 2003
+
+Redistribution and use of this software and associated documentation ("Software"), with or without modification, are permitted provided that the following conditions are met:
+
+1. Redistributions in source form must retain copyright statements and notices,
+
+2. Redistributions in binary form must reproduce applicable copyright statements and notices, this list of conditions, and the following disclaimer in the documentation and/or other materials provided with the distribution, and
+
+3. Redistributions must contain a verbatim copy of this document.
+
+The OpenLDAP Foundation may revise this license from time to time. Each revision is distinguished by a version number. You may use this Software under terms of this license revision or under the terms of any subsequent revision of the license.
+
+THIS SOFTWARE IS PROVIDED BY THE OPENLDAP FOUNDATION AND ITS CONTRIBUTORS ``AS IS'' AND ANY EXPRESSED OR IMPLIED WARRANTIES,
 EOF
 );
 
@@ -2366,6 +2869,35 @@ license_covered(
 	name => 'Ricoh Source Code Public License',
 	text => <<EOF,
 5.2. Endorsements. The names "Ricoh," "Ricoh Silicon Valley," and "RSV" must not be used
+EOF
+);
+
+license_covered(
+	'sissl',
+	name => 'Sun Industry Standards Source License',
+	TODO => [qw(subject_license subject_iri not_iri_name)]
+);
+
+license_covered(
+	'sissl_1_1',
+	name => 'Sun Industry Standards Source License - Version 1.1',
+	iri  => 'https://www.openoffice.org/licenses/sissl_license.html',
+	text => <<EOF,
+Sun Industry Standards Source License - Version 1.1
+
+1.0 DEFINITIONS
+EOF
+);
+
+license_covered(
+	'sissl_1_2',
+	name => 'SUN INDUSTRY STANDARDS SOURCE LICENSE Version 1.2',
+	iri =>
+		'http://gridscheduler.sourceforge.net/Gridengine_SISSL_license.html',
+	text => <<EOF,
+SUN INDUSTRY STANDARDS SOURCE LICENSE
+Version 1.2
+1.0 DEFINITIONS
 EOF
 );
 

@@ -47,7 +47,7 @@ sub create_view {
     SELECT_STMT: while ( 1 ) {
         $sql->{table} = '';
         $sql->{view_select_stmt} = '?';
-        $ax->print_sql( $sql );
+        $ax->print_sql_info( $sql );
         my $select_statment = $sq->choose_subquery( $sql );
         if ( ! defined $select_statment ) {
             return;
@@ -59,13 +59,16 @@ sub create_view {
             }
         }
         $sql->{view_select_stmt} = $select_statment;
-        $ax->print_sql( $sql );
+        $ax->print_sql_info( $sql );
 
         VIEW_NAME: while ( 1 ) {
             $sql->{table} = '?';
-            $ax->print_sql( $sql );
+            my $info = $ax->get_sql_info( $sql );
             # Readline
-            my $view = $tf->readline( 'View name: ' . $sf->{o}{create}{view_name_prefix} );
+            my $view = $tf->readline(
+                'View name: ' . $sf->{o}{create}{view_name_prefix},
+                { info => $info }
+            );
             if ( ! length $view ) {
                 next SELECT_STMT;
             }
@@ -81,11 +84,11 @@ sub create_view {
                 }
                 return 1;
             }
-            $ax->print_sql( $sql );
+            $info = $ax->get_sql_info( $sql );
             my $prompt = "$sql->{table} already exists.";
             my $chosen = $tc->choose(
                 [ undef, '  New name' ],
-                { %{$sf->{i}{lyt_v}}, prompt => $prompt }
+                { %{$sf->{i}{lyt_v}}, info => $info, prompt => $prompt }
             );
             if ( ! defined $chosen ) {
                 return;
@@ -192,19 +195,22 @@ sub __create {
     my ( $sf, $sql, $type ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
-    $sf->{i}{occupied_term_height} = 5;
-    $ax->print_sql( $sql );
+
     my ( $no, $yes ) = ( '- NO', '- YES' );
+    my $menu = [ undef, $yes, $no ];
     my $prompt = "Create $type $sql->{table}";
+    $sf->{i}{occupied_term_height} = @$menu + 2;  # + 2 for prompt and empty line
     if ( @{$sql->{insert_into_args}} ) {
         my $row_count = @{$sql->{insert_into_args}};
         $prompt .= "\nInsert " . insert_sep( $row_count, $sf->{o}{G}{thsd_sep} ) . " row";
         $prompt .= "s" if @{$sql->{insert_into_args}} > 1;
+        $sf->{i}{occupied_term_height} += 1; # second prompt line
     }
+    my $info = $ax->get_sql_info( $sql );
     # Choose
     my $create_table_ok = $tc->choose(
-        [ undef, $yes, $no ],
-        { %{$sf->{i}{lyt_v}}, prompt => $prompt, undef => '  <=' }
+        $menu,
+        { %{$sf->{i}{lyt_v}}, info => $info, prompt => $prompt, undef => '  <=', keep => scalar( @$menu ) }
     );
     if ( ! defined $create_table_ok ) {
         return;
@@ -235,7 +241,7 @@ sub __insert_data {
     }
     $sql->{insert_into_cols} = $ax->quote_simple_many( \@columns );
     $sf->{i}{occupied_term_height} = 1;
-    $ax->print_sql( $sql );
+    $ax->print_sql_info( $sql );
     require App::DBBrowser::Table::WriteAccess;
     my $tw = App::DBBrowser::Table::WriteAccess->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $commit_ok = $tw->commit_sql( $sql );
@@ -252,11 +258,11 @@ sub __set_table_name {
     my $c = 0;
 
     while ( 1 ) {
-        my $info;
+        my $file_info;
         if ( $sf->{i}{gc}{source_type} eq 'file' ) {
             my $file_fs = $sf->{i}{gc}{file_fs};
             my $file_name = basename decode( 'locale_fs', $file_fs );
-            $info = sprintf "File: '%s'", $file_name;
+            $file_info = sprintf "File: '%s'", $file_name;
             my $sheet_name = $sf->{i}{S_R}{$file_fs}{sheet_name};
             if ( defined $sheet_name && length $sheet_name ) {
                 if ( $sf->{i}{S_R}{$file_fs}{sheet_count} > 1 ) {
@@ -272,11 +278,12 @@ sub __set_table_name {
             }
             $sf->{i}{ct}{default_table_name} =~ s/ /_/g;
         }
-        $sf->{i}{occupied_term_height} = 1;
-        $sf->{i}{occupied_term_height} += 1 if $info;
-        $ax->print_sql( $sql );
+        $sf->{i}{occupied_term_height} = 2;
+        $sf->{i}{occupied_term_height} += 1 if $file_info;
+        my $info = $ax->get_sql_info( $sql ) . ( $file_info ? "\n" . $file_info : '' );
         # Readline
-        $table = $tf->readline( 'Table name: ',
+        $table = $tf->readline(
+            'Table name: ',
             { info => $info, default => $no_default_table_name ? undef : $sf->{i}{ct}{default_table_name} }
         );
         if ( ! length $table ) {
@@ -288,11 +295,11 @@ sub __set_table_name {
             return 1;
         }
         $sf->{i}{occupied_term_height} = 3;
-        $ax->print_sql( $sql );
+        my $info_2 = $ax->get_sql_info( $sql );
         my $prompt = "Table $sql->{table} already exists.";
         my $chosen = $tc->choose(
             [ undef, '  New name' ],
-            { %{$sf->{i}{lyt_v}}, prompt => $prompt }
+            { %{$sf->{i}{lyt_v}}, info => $info_2, prompt => $prompt }
         );
         if ( ! defined $chosen ) {
             return;
@@ -370,7 +377,7 @@ sub __set_columns {
         }
         last HEADER_ROW;
     }
-    $ax->print_sql( $sql );
+    $ax->print_sql_info( $sql );
     $sf->{i}{occupied_term_height} = undef;
     return 1;
 }
@@ -406,12 +413,13 @@ sub __header_row {
         }                                                                                                                   #
     }                                                                                                                       #
     my $header_row;
-    $sf->{i}{occupied_term_height} = 4;
-    $ax->print_sql( $sql );
+    $sf->{i}{occupied_term_height} = @$menu + 2; # + 2 for prompt and empty line
+    my $info = $ax->get_sql_info( $sql );
     # Choose
     my $chosen = $tc->choose(
         $menu,
-        { %{$sf->{i}{lyt_v}}, prompt => 'Use the first Data Row as the Table Header:', undef => '  <=' }
+        { %{$sf->{i}{lyt_v}}, info => $info, prompt => 'Use the first Data Row as the Table Header:', undef => '  <=',
+          keep => scalar( @$menu ) }
     );
     if ( ! defined $chosen ) {
         return;
@@ -446,12 +454,14 @@ sub __autoincrement_column {
     }
     if ( $sf->{col_auto} ) {
         my ( $no, $yes ) = ( '- NO ', '- YES' );
-        $sf->{i}{occupied_term_height} = 4;
-        $ax->print_sql( $sql );
+        my $menu = [ undef, $yes, $no  ];
+        $sf->{i}{occupied_term_height} = @$menu + 2; # + 2 for prompt and empty line
+        my $info = $ax->get_sql_info( $sql );
         # Choose
         my $chosen = $tc->choose(
-            [ undef, $yes, $no  ],
-            { %{$sf->{i}{lyt_v}}, prompt => 'Add an AUTO INCREMENT column:', undef => '  <='  }
+            $menu,
+            { %{$sf->{i}{lyt_v}}, info => $info, prompt => 'Add an AUTO INCREMENT column:', undef => '  <=',
+              keep => scalar( @$menu )  }
         );
         if ( ! defined $chosen ) {
             return;
@@ -474,11 +484,12 @@ sub __column_names {
     my $db = $sf->{d}{db};
     my $fields = [ map { [ ++$col_number, defined $_ ? "$_" : '' ] } @{$sql->{create_table_cols}} ];
     $sf->{i}{occupied_term_height} = 3 + @{$sql->{create_table_cols}};
-    $ax->print_sql( $sql );
+    my $info = $ax->get_sql_info( $sql );
     # Fill_form
     my $form = $tf->fill_form(
         $fields,
-        { prompt => 'Edit column names:', auto_up => 2, confirm => $sf->{i}{confirm}, back => $sf->{i}{back} . '   ' }
+        { info => $info, prompt => 'Edit column names:', auto_up => 2,
+          confirm => $sf->{i}{confirm}, back => $sf->{i}{back} . '   ' }
     );
     if ( ! defined $form ) {
         return;
@@ -536,7 +547,7 @@ sub __data_types {
     my $fields;
     if ( $sf->{o}{create}{data_type_guessing} ) {
         $sf->{i}{occupied_term_height} = 1;
-        $ax->print_sql( $sql, 'Guessing data types ... ' );
+        $ax->print_sql_info( $sql, 'Guessing data types ... ' );
         $data_types = $sf->__guess_data_type( $sql );
     }
     if ( defined $data_types ) {
@@ -551,12 +562,12 @@ sub __data_types {
         $read_only = [ 0 ];
     }
     $sf->{i}{occupied_term_height} = 3 + @$fields; # prompt, back, confirm and fiels
-    $ax->print_sql( $sql );
+    my $info = $ax->get_sql_info( $sql );
     # Fill_form
     my $col_name_and_type = $tf->fill_form(
         $fields,
-        { prompt => 'Column data types:', auto_up => 2, read_only => $read_only, confirm => $sf->{i}{confirm},
-        back => $sf->{i}{back} . '   ' }
+        { info => $info, prompt => 'Column data types:', auto_up => 2, read_only => $read_only,
+          confirm => $sf->{i}{confirm}, back => $sf->{i}{back} . '   ' }
     );
     if ( ! $col_name_and_type ) {
         return;

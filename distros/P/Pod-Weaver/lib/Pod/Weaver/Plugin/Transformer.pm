@@ -1,8 +1,16 @@
-package Pod::Weaver::Plugin::Transformer;
+package Pod::Weaver::Plugin::Transformer 4.018;
 # ABSTRACT: apply arbitrary transformers
-$Pod::Weaver::Plugin::Transformer::VERSION = '4.017';
+
 use Moose;
 with 'Pod::Weaver::Role::Dialect';
+
+# BEGIN BOILERPLATE
+use v5.20.0;
+use warnings;
+use utf8;
+no feature 'switch';
+use experimental qw(postderef postderef_qq); # This experiment gets mainlined.
+# END BOILERPLATE
 
 use namespace::autoclean;
 
@@ -34,12 +42,12 @@ has transformer => (is => 'ro', required => 1);
 
 sub BUILDARGS {
   my ($class, @arg) = @_;
-  my %copy = ref $arg[0] ? %{$arg[0]} : @arg;
+  my %copy = ref $arg[0] ? $arg[0]->%* : @arg;
 
   my @part = part { /\A\./ ? 0 : 1 } keys %copy;
 
-  my %class_args = map { s/\A\.//; $_ => $copy{ ".$_" } } @{ $part[0] };
-  my %xform_args = map {           $_ => $copy{ $_ }    } @{ $part[1] };
+  my %class_args = map { s/\A\.//; $_ => $copy{ ".$_" } } $part[0]->@*;
+  my %xform_args = map {           $_ => $copy{ $_ }    } $part[1]->@*;
 
   my $xform_class = String::RewritePrefix->rewrite(
     { '' => 'Pod::Elemental::Transformer::', '=' => '' },
@@ -83,7 +91,7 @@ Pod::Weaver::Plugin::Transformer - apply arbitrary transformers
 
 =head1 VERSION
 
-version 4.017
+version 4.018
 
 =head1 OVERVIEW
 
@@ -103,9 +111,20 @@ This will end up creating a transformer like this:
 
 and that transformer will then be handed the entire input Pod document.
 
+=head1 PERL VERSION SUPPORT
+
+This module has the same support period as perl itself:  it supports the two
+most recent versions of perl.  (That is, if the most recently released version
+is v5.40, then this module should work on both v5.40 and v5.38.)
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
+
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@cpan.org>
+Ricardo SIGNES <rjbs@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

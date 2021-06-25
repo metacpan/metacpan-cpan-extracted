@@ -1,9 +1,9 @@
 #!perl
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-01-22'; # DATE
+our $DATE = '2021-06-21'; # DATE
 our $DIST = 'App-idxdb'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 use 5.010001;
 use strict;
@@ -21,6 +21,8 @@ Perinci::CmdLine::Any->new(
         'update'     => {url => "${prefix}update"},
         'ownership'  => {url => "${prefix}ownership"},
         'daily'      => {url => "${prefix}daily"},
+        #'stocks-by-ownership' => {url => "${prefix}stock_by_ownership"},
+        'stocks-by-foreign-ownership' => {url => "${prefix}stocks_by_foreign_ownership"},
     },
     log => 1,
 )->run;
@@ -40,7 +42,7 @@ idxdb - Import data for stocks on the IDX (Indonesian Stock Exchange) and perfor
 
 =head1 VERSION
 
-This document describes version 0.004 of idxdb (from Perl distribution App-idxdb), released on 2021-01-22.
+This document describes version 0.008 of idxdb (from Perl distribution App-idxdb), released on 2021-06-21.
 
 =head1 SYNOPSIS
 
@@ -61,15 +63,15 @@ To see ownership (e.g. % foreign/local) of some stock through time:
 To graph ownership composition (% foreign bank, foreign total, local bank, etc)
 of some stock:
 
- % idxdb graph-ownership-composition BBRI
+ % idxdb ownership BBRI --graph
 
 To see a table of daily trading summary of some stock:
 
- % idxdb table-daily-trading-summary BBRI
+ % idxdb daily BBRI
 
-To graph accumulated foreign net buy of some stock in the last year:
+To graph closing price and accumulated foreign net buy of some stock in the last 2 year:
 
- % idxdb graph-daily-trading-summary --field AccumForeignNetBuy --year BBRI
+ % idxdb daily --field Close --field AccumForeignNetBuy --2year BBRI
 
 =head1 DESCRIPTION
 
@@ -90,6 +92,10 @@ Show data from daily stock/trading summary.
 =head2 B<ownership>
 
 Show ownership of some stock through time.
+
+=head2 B<stocks-by-foreign-ownership>
+
+Rank stocks from highest foreign ownership.
 
 =head2 B<update>
 
@@ -226,6 +232,18 @@ Alias for --date-start.
 
 See C<--date-start>.
 
+=item B<--2month>
+
+Alias for --date-start.
+
+See C<--date-start>.
+
+=item B<--2year>
+
+Alias for --date-start.
+
+See C<--date-start>.
+
 =item B<--3month>
 
 Alias for --date-start.
@@ -254,13 +272,13 @@ See C<--date-start>.
 
 Default value:
 
- 1611273600
+ 1624208400
 
 =item B<--date-start>=I<s>
 
 Default value:
 
- 1608681600
+ 1621616400
 
 =item B<--field>=I<s@>
 
@@ -272,7 +290,7 @@ Can be specified multiple times.
 
 =item B<--fields-all>
 
-Alias for --field.
+Display all fields.
 
 See C<--field>.
 
@@ -280,19 +298,25 @@ See C<--field>.
 
 See C<--field>.
 
-=item B<--fields-price>
+=item B<--fields-price-all>
 
-Alias for --field.
+Display all prices.
+
+See C<--field>.
+
+=item B<--fields-price-and-afnb>
+
+Short for --field Close --field AccumForeignNetBuy.
 
 See C<--field>.
 
 =item B<--fields-price-close>
 
-Alias for --field.
+Short for --field Close.
 
 See C<--field>.
 
-=item B<--graph>
+=item B<--graph>, B<-g>
 
 Show graph instead of table.
 
@@ -304,11 +328,15 @@ See C<--date-start>.
 
 =item B<--stock>=I<s@>*
 
+Can also be specified as the 1st command-line argument and onwards.
+
 Can be specified multiple times.
 
 =item B<--stocks-json>=I<s>
 
 See C<--stock>.
+
+Can also be specified as the 1st command-line argument and onwards.
 
 =item B<--total>
 
@@ -360,6 +388,18 @@ Alias for --date-start.
 
 See C<--date-start>.
 
+=item B<--2month>
+
+Alias for --date-start.
+
+See C<--date-start>.
+
+=item B<--2year>
+
+Alias for --date-start.
+
+See C<--date-start>.
+
 =item B<--3month>
 
 Alias for --date-start.
@@ -388,13 +428,13 @@ See C<--date-start>.
 
 Default value:
 
- 1611273600
+ 1624208400
 
 =item B<--date-start>=I<s>
 
 Default value:
 
- 1608681600
+ 1621616400
 
 =item B<--field>=I<s@>
 
@@ -432,7 +472,7 @@ Alias for --field.
 
 See C<--field>.
 
-=item B<--graph>
+=item B<--graph>, B<-g>
 
 Show graph instead of table.
 
@@ -447,6 +487,8 @@ Alias for --date-start.
 See C<--date-start>.
 
 =item B<--stock>=I<s>*
+
+Can also be specified as the 1st command-line argument.
 
 =item B<--week>
 
@@ -526,7 +568,7 @@ You can put multiple profiles in a single file by using section names like C<[pr
 
 You can also put configuration for multiple programs inside a single file, and use filter C<program=NAME> in section names, e.g. C<[program=NAME ...]> or C<[SOMESECTION program=NAME]>. The section will then only be used when the reading program matches.
 
-You can also filter a section by environment variable using the filter C<env=CONDITION> in section names. For example if you only want a section to be read if a certain environment variable is true: C<[env=SOMEVAR ...]> or C<[SOMESECTION env=SOMEVAR ...]>. If you only want a section to be read when the value of an environment variable has value equals something: C<[env=HOSTNAME=blink ...]> or C<[SOMESECTION env=HOSTNAME=blink ...]>. If you only want a section to be read when the value of an environment variable does not equal something: C<[env=HOSTNAME!=blink ...]> or C<[SOMESECTION env=HOSTNAME!=blink ...]>. If you only want a section to be read when an environment variable contains something: C<[env=HOSTNAME*=server ...]> or C<[SOMESECTION env=HOSTNAME*=server ...]>. Note that currently due to simplistic parsing, there must not be any whitespace in the value being compared because it marks the beginning of a new section filter or section name.
+You can also filter a section by environment variable using the filter C<env=CONDITION> in section names. For example if you only want a section to be read if a certain environment variable is true: C<[env=SOMEVAR ...]> or C<[SOMESECTION env=SOMEVAR ...]>. If you only want a section to be read when the value of an environment variable equals some string: C<[env=HOSTNAME=blink ...]> or C<[SOMESECTION env=HOSTNAME=blink ...]>. If you only want a section to be read when the value of an environment variable does not equal some string: C<[env=HOSTNAME!=blink ...]> or C<[SOMESECTION env=HOSTNAME!=blink ...]>. If you only want a section to be read when the value of an environment variable includes some string: C<[env=HOSTNAME*=server ...]> or C<[SOMESECTION env=HOSTNAME*=server ...]>. If you only want a section to be read when the value of an environment variable does not include some string: C<[env=HOSTNAME!*=server ...]> or C<[SOMESECTION env=HOSTNAME!*=server ...]>. Note that currently due to simplistic parsing, there must not be any whitespace in the value being compared because it marks the beginning of a new section filter or section name.
 
 To load and configure plugins, you can use either the C<-plugins> parameter (e.g. C<< -plugins=DumpArgs >> or C<< -plugins=DumpArgs@before_validate_args >>), or use the C<[plugin=NAME ...]> sections, for example:
 
@@ -569,6 +611,9 @@ List of available configuration parameters:
  legend (see --legend)
  stock (see --stock)
 
+=head2 Configuration for subcommand stocks-by-foreign-ownership
+
+
 =head2 Configuration for subcommand update
 
  gudangdata_path (see --gudangdata-path)
@@ -597,7 +642,7 @@ Source repository is at L<https://github.com/perlancar/perl-App-idxdb>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-App-idxdb/issues>
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-idxdb>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

@@ -1,5 +1,16 @@
 Revision history for Geo-Coder-OpenCage
 
+0.33    2021-06-23
+        - need LWP::Protocol::https for tests
+
+0.32    2021-06-21
+        - Support LWP user agents again PR #13
+
+0.31    2021-06-15
+        - remove perltidy stuff, too annoying
+        - remove trailing slash from API URL
+        - sort params for better caching
+        
 0.30    2021-03-14
         - rename perltidy conf files so Dist::Zilla bundles them
 

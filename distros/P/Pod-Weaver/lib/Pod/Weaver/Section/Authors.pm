@@ -1,8 +1,16 @@
-package Pod::Weaver::Section::Authors;
+package Pod::Weaver::Section::Authors 4.018;
 # ABSTRACT: a section listing authors
-$Pod::Weaver::Section::Authors::VERSION = '4.017';
+
 use Moose;
 with 'Pod::Weaver::Role::Section';
+
+# BEGIN BOILERPLATE
+use v5.20.0;
+use warnings;
+use utf8;
+no feature 'switch';
+use experimental qw(postderef postderef_qq); # This experiment gets mainlined.
+# END BOILERPLATE
 
 use Pod::Elemental::Element::Nested;
 use Pod::Elemental::Element::Pod5::Verbatim;
@@ -35,20 +43,20 @@ sub weave_section {
 
   return unless $input->{authors};
 
-  my $multiple_authors = @{ $input->{authors} } > 1;
+  my $multiple_authors = $input->{authors}->@* > 1;
 
   # I think I might like to have header be a callback or something, so that you
   # can get pluralization for your own custom header. -- rjbs, 2015-03-17
   my $name = $self->header || ($multiple_authors ? 'AUTHORS' : 'AUTHOR');
 
   $self->log_debug("adding $name section");
-  $self->log_debug("author = $_") for @{ $input->{authors} };
+  $self->log_debug("author = $_") for $input->{authors}->@*;
 
   my $authors = [ map {
     Pod::Elemental::Element::Pod5::Ordinary->new({
       content => $_,
     }),
-  } @{ $input->{authors} } ];
+  } $input->{authors}->@* ];
 
   $authors = [
     Pod::Elemental::Element::Pod5::Command->new({
@@ -65,7 +73,7 @@ sub weave_section {
     }),
   ] if $multiple_authors;
 
-  push @{$document->children },
+  push $document->children->@*,
     Pod::Elemental::Element::Nested->new({
       type     => 'command',
       command  => 'head1',
@@ -89,7 +97,7 @@ Pod::Weaver::Section::Authors - a section listing authors
 
 =head1 VERSION
 
-version 4.017
+version 4.018
 
 =head1 OVERVIEW
 
@@ -102,6 +110,17 @@ given, it will do nothing.  Otherwise, it produces a hunk like this:
     Author One <a1@example.com>
     Author Two <a2@example.com>
 
+=head1 PERL VERSION SUPPORT
+
+This module has the same support period as perl itself:  it supports the two
+most recent versions of perl.  (That is, if the most recently released version
+is v5.40, then this module should work on both v5.40 and v5.38.)
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
+
 =head1 ATTRIBUTES
 
 =head2 header
@@ -111,7 +130,7 @@ The title of the header to be added.
 
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@cpan.org>
+Ricardo SIGNES <rjbs@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

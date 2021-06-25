@@ -1,5 +1,13 @@
 Revision history for Convert-Color-XTerm
 
+0.06    2021-06-21
+        [CHANGES]
+         * Accept 'grey()' and 'rgb()' notations of extended colours for
+           convenience
+         * General style updates:
+            + use VERSION
+            + Docs to use barename =head2
+
 0.05    CHANGES:
          * Updated for Convert::Color 0.06 - allows palette search
 

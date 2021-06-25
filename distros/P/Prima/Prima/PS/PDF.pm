@@ -1,5 +1,3 @@
-# XXX todo
-# regions
 package Prima::PS::PDF;
 
 use strict;
@@ -96,7 +94,16 @@ sub change_transform
 
 	$self-> emit_content('Q') unless $gsave;
 	$self-> emit_content('q');
-	$self-> emit_content("@cr W n") if $doClip;
+
+	my ($ps, $pm) = @{ $self }{ qw(pageSize pageMargins) };
+	my @pm = (
+		@$pm[0,1],
+		$ps->[0] - $pm->[2] - $pm->[0],
+		$ps->[1] - $pm->[3] - $pm->[1]
+	);
+
+	$self-> emit_content("h @pm re W n");
+	$self-> emit_content("h @cr re W n") if $doClip;
 	$self-> emit_content("1 0 0 1 @tp cm") if $doTR;
 	$self-> emit_content($rg-> apply_offset . " n") if $rg && !$doClip;
 	$self-> emit_content("$sc[0] 0 0 $sc[1] 0 0 cm") if $doSC;
@@ -335,22 +342,8 @@ sub begin_doc
 		unless defined $docName;
 	$docName = Encode::encode('UTF-16', $docName)
 		if Encode::is_utf8($docName);
-	my $data = scalar localtime;
-	my @b2 = (
-		int($self-> {pageSize}-> [0] - $self-> {pageMargins}-> [2] + .5),
-		int($self-> {pageSize}-> [1] - $self-> {pageMargins}-> [3] + .5)
-	);
-
 	$self-> {fp_hash}  = {};
 	$self-> {xref} = [];
-
-	my ($x,$y) = (
-		$self-> {pageSize}-> [0] - $self-> {pageMargins}-> [0] - $self-> {pageMargins}-> [2],
-		$self-> {pageSize}-> [1] - $self-> {pageMargins}-> [1] - $self-> {pageMargins}-> [3]
-	);
-
-	my $extras = '';
-	my $setup = '';
 
 	my ($sec,$min,$hour,$mday,$mon,$year) = localtime;
 	my $date = sprintf("%04d%02d%02d%02d%02d%02d", $year + 1900, $mon, $mday, $hour, $min, $sec);
@@ -413,11 +406,12 @@ sub end_page
 
 	$self-> emit_content('Q');
 
+	my @ps = @{ $self->{pageSize} };
 	$self-> emit_new_object($self->{page_object}, <<PAGE);
 <<
 /Type /Page
 /Parent 3 0 R
-/MediaBox [ 0 0 @{$self->{pageSize}} ]
+/MediaBox [ 0 0 @ps ]
 /StructParents 0
 /Contents $self->{page_content} 0 R
 /ProcSet [ /PDF /Text /ImageB /ImageC /ImageI ]
@@ -738,7 +732,6 @@ sub compress
 sub arc
 {
 	my ( $self, $x, $y, $dx, $dy, $start, $end) = @_;
-
 	( $x, $y, $dx, $dy) = $self-> pixel2point( $x, $y, $dx, $dy);
 
 	my $cubics  = $self-> arc2cubics($x, $y, $dx, $dy, $start, $end);
@@ -750,7 +743,6 @@ sub arc
 sub chord
 {
 	my ( $self, $x, $y, $dx, $dy, $start, $end) = @_;
-
 	( $x, $y, $dx, $dy) = $self-> pixel2point( $x, $y, $dx, $dy);
 
 	my $cubics  = $self-> arc2cubics($x, $y, $dx, $dy, $start, $end);
@@ -773,7 +765,6 @@ sub ellipse
 sub fill_chord
 {
 	my ( $self, $x, $y, $dx, $dy, $start, $end) = @_;
-
 	( $x, $y, $dx, $dy) = $self-> pixel2point( $x, $y, $dx, $dy);
 
 	my $cubics  = $self-> arc2cubics($x, $y, $dx, $dy, $start, $end);
@@ -786,6 +777,8 @@ sub fill_chord
 sub fill_ellipse
 {
 	my ( $self, $x, $y, $dx, $dy) = @_;
+	( $x, $y, $dx, $dy) = $self-> pixel2point( $x, $y, $dx, $dy);
+
 	my $cubics  = $self-> arc2cubics($x, $y, $dx, $dy, 0, 360);
 	my $content = "@{ $cubics->[0] }[0,1] m\n";
 	$content   .= "@{$_}[2..7] c\n" for @$cubics;
@@ -950,7 +943,7 @@ sub text_out
 		$self-> textOutBaseline($bs) unless $bs;
 	}
 	if ( $self-> textOpaque) {
-		$self-> emit_content( uc $self-> cmd_rgb( $self-> backColor));
+		$self-> emit_content( lc $self-> cmd_rgb( $self-> backColor));
 		$self-> emit_content( "h @rb[0,1] m @rb[2,3] l @rb[6,7] l @rb[4,5] l f");
 	}
 

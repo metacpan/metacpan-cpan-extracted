@@ -1,8 +1,8 @@
 use strict;
 use warnings;
-package Data::Hive::PathPacker;
+package Data::Hive::PathPacker 1.014;
 # ABSTRACT: a thing that converts paths to strings and then back
-$Data::Hive::PathPacker::VERSION = '1.013';
+
 #pod =head1 DESCRIPTION
 #pod
 #pod Data::Hive::PathPacker classes are used by some L<Data::Hive::Store> classes to convert hive paths to strings so that deep hives can be stored in flat storage.
@@ -39,13 +39,23 @@ Data::Hive::PathPacker - a thing that converts paths to strings and then back
 
 =head1 VERSION
 
-version 1.013
+version 1.014
 
 =head1 DESCRIPTION
 
 Data::Hive::PathPacker classes are used by some L<Data::Hive::Store> classes to convert hive paths to strings so that deep hives can be stored in flat storage.
 
 Path packers must implement two methods:
+
+=head1 PERL VERSION SUPPORT
+
+This module has a long-term perl support period.  That means it will not
+require a version of perl released fewer than five years ago.
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
 
 =head1 METHODS
 
@@ -73,7 +83,7 @@ Hans Dieter Pearcey <hdp@cpan.org>
 
 =item *
 
-Ricardo Signes <rjbs@cpan.org>
+Ricardo Signes <rjbs@semiotic.systems>
 
 =back
 

@@ -1,9 +1,9 @@
 package Log::ger::For::Package;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2019-12-09'; # DATE
+our $DATE = '2021-06-14'; # DATE
 our $DIST = 'Log-ger-For-Class'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 use 5.010;
 use strict;
@@ -24,17 +24,25 @@ my $import_hook_installed;
 sub import {
     my $class = shift;
 
-    my $hook;
+    my $import_hook = 1;
+    my $filter_subs;
     while (@_) {
         my $arg = shift;
-        if ($arg eq '-hook') {
-            $hook = shift;
+        if ($arg eq '-import_hook') {
+            $import_hook = shift;
+        } elsif ($arg eq '-filter_subs') {
+            $filter_subs = shift;
+            $filter_subs = qr/$1/ if $filter_subs =~ m!\A/(.*)/\z!;
         } elsif ($arg eq 'add_logging_to_package') {
             no strict 'refs';
             my @c = caller(0);
             *{"$c[0]::$arg"} = \&$arg;
         } else {
-            add_logging_to_package(packages=>[$arg], import_hook=>1);
+            add_logging_to_package(
+                packages => [$arg],
+                import_hook => $import_hook,
+                ($filter_subs ? (filter_subs => $filter_subs) : ()),
+            );
         }
     }
 }
@@ -380,7 +388,7 @@ Log::ger::For::Package - Add logging to package
 
 =head1 VERSION
 
-This document describes version 0.004 of Log::ger::For::Package (from Perl distribution Log-ger-For-Class), released on 2019-12-09.
+This document describes version 0.005 of Log::ger::For::Package (from Perl distribution Log-ger-For-Class), released on 2021-06-14.
 
 =head1 SYNOPSIS
 
@@ -402,6 +410,10 @@ see the logs, use e.g. Log::ger::Output::Screen in command-line:
   <--- Bar::nested()
  <--- Foo::func() = 'result'
 
+To log only certain functions:
+
+ % TRACE=1 perl -MLog::ger::Output=Screen -MFoo -MBar -MLog::ger::For::Package=-filter_subs,'/sub1|sub3/',Foo,Bar ...
+
 Use C<add_logging_to_package()> which gives more options, e.g. to add log to
 multiple packages specified by regex:
 
@@ -416,10 +428,6 @@ logged:
 or, via import:
 
  % TRACE=1 perl -MLog::ger::Output=Screen -MLog::ger::For::Package=-hook,1,.* ...
-
-=head1 CREDITS
-
-Some code portion taken from L<Devel::TraceMethods>.
 
 =head1 FUNCTIONS
 
@@ -541,6 +549,7 @@ be supplied via environment C<LOG_SUB_ARGS>.
 Whether to display subroutine result when logging subroutine exit. The default
 can also be set via environment C<LOG_SUB_RESULT>.
 
+
 =back
 
 Return value:  (any)
@@ -587,13 +596,17 @@ L<Log::ger::For::Class>
 For some modules, use the appropriate Log::ger::For::*, for example:
 L<Log::ger::For::DBI>, L<Log::ger::For::LWP>.
 
+=head1 CREDITS
+
+Some code portion taken from L<Devel::TraceMethods>.
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2017 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2019, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

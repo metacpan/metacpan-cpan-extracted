@@ -9,7 +9,7 @@ use Readonly;
 # Constants.
 Readonly::Scalar my $EMPTY_STR => q{};
 
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 # Resets internal variables.
 sub reset {
@@ -44,8 +44,8 @@ sub _flush_tmp {
 
 # At-rules.
 sub _put_at_rules {
-	my ($self, $at_rule, $file) = @_;
-	$self->{'flush_code'} .= $at_rule.' "'.$file.'";';
+	my ($self, $at_rule, $value) = @_;
+	$self->{'flush_code'} .= $at_rule.' "'.$value.'";';
 	return;
 }
 
@@ -234,6 +234,8 @@ Returns undef.
          'output_handler' => \*STDOUT,
  );
 
+ $css->put(['c', 'comment']);
+ $css->put(['a', '@charset', 'utf-8']);
  $css->put(['s', 'selector#id']);
  $css->put(['s', 'div div']);
  $css->put(['s', '.class']);
@@ -244,7 +246,7 @@ Returns undef.
  $css->flush;
 
  # Output:
- # selector#id,div div,.class{weight:100px;font-size:10em;}
+ # /*comment*/@charset "utf-8";selector#id,div div,.class{weight:100px;font-size:10em;}
 
 =head1 DEPENDENCIES
 
@@ -283,6 +285,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.04
+0.05
 
 =cut

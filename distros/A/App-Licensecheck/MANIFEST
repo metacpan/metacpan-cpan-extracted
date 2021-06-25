@@ -284,3 +284,4 @@ t/lib/Test2/Licensecheck.pm
 t/lib/Test2/Licensecheck/ScanCode.pm
 t/lib/Test2/Require/TestCorpus.pm
 t/license.t
+t/options-resolve.t

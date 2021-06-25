@@ -1,7 +1,7 @@
 package File::Serialize::Serializer;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: Role for defining File::Serialize serializers
-$File::Serialize::Serializer::VERSION = '1.5.0';
+$File::Serialize::Serializer::VERSION = '1.5.1';
 
 use strict;
 use warnings;
@@ -83,7 +83,7 @@ File::Serialize::Serializer - Role for defining File::Serialize serializers
 
 =head1 VERSION
 
-version 1.5.0
+version 1.5.1
 
 =head1 SYNOPSIS
 

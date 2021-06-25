@@ -28,7 +28,7 @@ log - If set to a true value (true by default), the full log will be available v
 
 =item *
 
-command - The command to invoke to start the Mathematica interpreter. The default is C<math>.
+command - The command to invoke to start the Mathematica interpreter. The default is C<math> or the value of C<PERL_MATHEMATICA_EXECUTABLE> in your environment.
 
 =item *
 

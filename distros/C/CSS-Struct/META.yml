@@ -31,9 +31,10 @@ requires:
   Error::Pure: 0.11
   List::MoreUtils: 0
   Readonly: 0
+  Scalar::Util: 0
 resources:
   bugtracker: https://github.com/michal-josef-spacek/CSS-Struct/issues
   homepage: https://github.com/michal-josef-spacek/CSS-Struct
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/CSS-Struct
-version: '0.04'
+version: '0.05'

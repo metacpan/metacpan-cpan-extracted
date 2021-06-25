@@ -120,7 +120,7 @@ Utils_chmod( SV* path, int mode)
 }
 
 static PDirHandleRec
-get_dh(SV * sv)
+get_dh(const char * method, SV * sv)
 {
 	PDirHandleRec d;
 	if ( !SvROK(sv) || SvTYPE( SvRV( sv)) != SVt_PVMG)
@@ -135,7 +135,7 @@ get_dh(SV * sv)
 	return d;
 
 WARN:
-	warn("Prima::Utils::closedir: invalid dirhandle");
+	warn("Prima::Utils::%s: invalid dirhandle", method);
 	errno = EBADF;
 	return false;
 }
@@ -144,7 +144,7 @@ Bool
 Utils_closedir(SV * dh)
 {
 	PDirHandleRec d;
-	if (( d = get_dh(dh)) == NULL )
+	if (( d = get_dh("closedir", dh)) == NULL )
 		return false;
 	d-> is_active = false;
 	return apc_fs_closedir(d);
@@ -157,7 +157,7 @@ Utils_getcwd()
 	char *cwd;
 
 	if (( cwd = apc_fs_getcwd()) == NULL )
-		return nilSV;
+		return NULL_SV;
 	ret = newSVpv( cwd, 0 );
 	if ( is_valid_utf8((unsigned char*) cwd))
 		SvUTF8_on(ret);
@@ -174,7 +174,7 @@ Utils_getenv(SV * varname)
 
 	is_utf8 = prima_is_utf8_sv(varname);
 	if (( val = apc_fs_getenv(SvPV_nolen(varname), is_utf8, &do_free)) == NULL )
-		return nilSV;
+		return NULL_SV;
 	ret = newSVpv( val, 0 );
 	if ( is_valid_utf8((unsigned char*) val))
 		SvUTF8_on(ret);
@@ -185,7 +185,7 @@ Utils_getenv(SV * varname)
 SV *
 Utils_last_error()
 {
-	SV * ret = nilSV;
+	SV * ret = NULL_SV;
 	char * p = apc_last_error();
 	if ( p ) {
 		ret = newSVpv( p, 0);
@@ -215,7 +215,7 @@ Utils_local2sv(SV * text)
 	src = SvPV(text, xlen);
 	len = xlen;
 	if ( !( buf = apc_fs_from_local(src, &len)))
-		return nilSV;
+		return NULL_SV;
 	if ( buf == src ) {
 		ret = newSVsv( text );
 		if ( is_valid_utf8((unsigned char*) src))
@@ -241,23 +241,23 @@ Utils_mkdir( SV* path, int mode)
 SV *
 Utils_open_dir(SV * path)
 {
-	SV * ret = nilSV;
+	SV * ret = NULL_SV;
 	PDirHandleRec dh;
 	SV * dhsv;
 
 	if (( dhsv = prima_array_new(sizeof(DirHandleRec))) == NULL) {
 		errno = ENOMEM;
-		return nilSV;
+		return NULL_SV;
 	}
 	if (( dh = (PDirHandleRec) prima_array_get_storage(dhsv)) == NULL) {
 		errno = ENOMEM;
-		return nilSV;
+		return NULL_SV;
 	}
 	bzero(dh, sizeof(DirHandleRec));
 	dh-> is_utf8 = prima_is_utf8_sv(path);
 	if ( !apc_fs_opendir( SvPV_nolen(path), dh)) {
 		sv_free(dhsv);
-		return nilSV;
+		return NULL_SV;
 	}
 	dh-> is_active = true;
 
@@ -280,17 +280,17 @@ Utils_read_dir(SV * dh)
 	PDirHandleRec d;
 	char buf[PATH_MAX_UTF8];
 	SV * ret;
-	if (( d = get_dh(dh)) == NULL ) {
+	if (( d = get_dh("read_dir", dh)) == NULL ) {
 		errno = EBADF;
 		warn("Prima::Utils::read_dir: invalid dirhandle");
-		return nilSV;
+		return NULL_SV;
 	}
 	if (!d-> is_active) {
 		errno = EBADF;
-		return nilSV;
+		return NULL_SV;
 	}
 
-	if ( !apc_fs_readdir(d, buf)) return nilSV;
+	if ( !apc_fs_readdir(d, buf)) return NULL_SV;
 
 	ret = newSVpv(buf, 0);
 	if (is_valid_utf8((unsigned char*) buf))
@@ -312,7 +312,7 @@ Bool
 Utils_rewinddir( SV * dh )
 {
 	PDirHandleRec d;
-	if (( d = get_dh(dh)) == NULL )
+	if (( d = get_dh("rewinddir", dh)) == NULL )
 		return false;
 	return apc_fs_rewinddir(d);
 }
@@ -327,7 +327,7 @@ Bool
 Utils_seekdir( SV * dh, long position )
 {
 	PDirHandleRec d;
-	if (( d = get_dh(dh)) == NULL )
+	if (( d = get_dh("seekdir", dh)) == NULL )
 		return false;
 	return apc_fs_seekdir(d, position);
 }
@@ -396,7 +396,7 @@ long
 Utils_telldir( SV * dh )
 {
 	PDirHandleRec d;
-	if (( d = get_dh(dh)) == NULL )
+	if (( d = get_dh("telldir", dh)) == NULL )
 		return false;
 	return apc_fs_telldir(d);
 }
@@ -413,7 +413,7 @@ Utils_sv2local(SV * text, Bool fail_if_cannot)
 	src = SvPV(text, xlen);
 	len = utf8len( src, xlen );
 	if ( !( buf = apc_fs_to_local(src, fail_if_cannot, &len)))
-		return nilSV;
+		return NULL_SV;
 	if ( buf == src ) {
 		ret = newSVsv( text );
 		SvUTF8_off(ret);

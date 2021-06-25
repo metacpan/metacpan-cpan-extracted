@@ -3,9 +3,8 @@ package Beekeeper::Service::Router::Worker;
 use strict;
 use warnings;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
-use AnyEvent::Impl::Perl;
 use Beekeeper::Worker ':log';
 use base 'Beekeeper::Worker';
 
@@ -143,7 +142,7 @@ sub on_shutdown {
     my $tmr = AnyEvent->timer( after => 30, cb => sub { $cv->send });
     $cv->recv;
 
-    # 4. Just in case of pool stop, wait for workers to finish their current jobs
+    # 4. Just in case of pool full stop, wait for workers to finish their current tasks
     my $wait = AnyEvent->condvar;
     $tmr = AnyEvent->timer( after => SHUTDOWN_WAIT, cb => sub { $wait->send });
     $wait->recv;
@@ -206,7 +205,7 @@ sub pull_frontend_requests {
 
         my $src_queue = "\$share/BKPR/req/$backend_role-$lane";
 
-        my ($payload_ref, $msg_prop);
+        my ($payload_ref, $mqtt_properties);
         my ($dest_queue, $reply_to, $caller_id, $mqtt_session);
         my %pub_args;
 
@@ -214,16 +213,16 @@ sub pull_frontend_requests {
             topic       => $src_queue,
             maximum_qos => 0,
             on_publish  => sub {
-                ($payload_ref, $msg_prop) = @_;
+                ($payload_ref, $mqtt_properties) = @_;
 
                 # (!) UNTRUSTED REQUEST
 
                 # eg: req/backend/myapp/service
-                $dest_queue = $msg_prop->{'fwd_to'} || '';
+                $dest_queue = $mqtt_properties->{'fwd_to'} || '';
                 return unless $dest_queue =~ m|^req(/(?!_)[\w-]+)+$|;
 
                 # eg: priv/7nXDsxMDwgLUSedX
-                $reply_to = $msg_prop->{'response_topic'} || '';
+                $reply_to = $mqtt_properties->{'response_topic'} || '';
                 return unless $reply_to =~ m|^priv/(\w{16,23})$|;
                 $caller_id = $1;
 
@@ -276,15 +275,15 @@ sub pull_backend_responses {
 
         my $src_queue = "\$share/BKPR/res/$frontend_id-$lane";
 
-        my ($payload_ref, $msg_prop, $dest_queue);
+        my ($payload_ref, $mqtt_properties, $dest_queue);
 
         $backend_bus->subscribe(
             topic       => $src_queue,
             maximum_qos => 0,
             on_publish  => sub {
-                ($payload_ref, $msg_prop) = @_;
+                ($payload_ref, $mqtt_properties) = @_;
 
-                ($dest_queue) = split('@', $msg_prop->{'addr'}, 2);
+                ($dest_queue) = split('@', $mqtt_properties->{'addr'}, 2);
 
                 $frontend_bus->publish(
                     topic   => $dest_queue,
@@ -328,15 +327,15 @@ sub pull_backend_notifications {
 
         my $src_queue = "\$share/BKPR/msg/$frontend_role-$lane",
 
-        my ($payload_ref, $msg_prop, $destination, $address);
+        my ($payload_ref, $mqtt_properties, $destination, $address);
 
         $backend_bus->subscribe(
             topic       => $src_queue,
             maximum_qos => 0,
             on_publish  => sub {
-                ($payload_ref, $msg_prop) = @_;
+                ($payload_ref, $mqtt_properties) = @_;
 
-                ($destination, $address) = split('@', $msg_prop->{'fwd_to'}, 2);
+                ($destination, $address) = split('@', $mqtt_properties->{'fwd_to'}, 2);
 
                 if (defined $address) {
 
@@ -536,7 +535,7 @@ Beekeeper::Service::Router::Worker - Route messages between backend and frontend
 
 =head1 VERSION
  
-Version 0.05
+Version 0.06
 
 =head1 SYNOPSIS
 

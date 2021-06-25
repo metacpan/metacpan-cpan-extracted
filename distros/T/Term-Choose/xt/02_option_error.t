@@ -37,7 +37,7 @@ my $int = {
     layout       => '[ 0 1 2 3 ]',
     mouse        => '[ 0 1 2 3 4 ]',
     order        => '[ 0 1 ]',
-    page         => '[ 0 1 ]',
+    page         => '[ 0 1 2 ]',
     keep         => '[ 1-9 ][ 0-9 ]*',
     ll           => '[ 1-9 ][ 0-9 ]*',
     max_height   => '[ 1-9 ][ 0-9 ]*',
@@ -102,7 +102,7 @@ for my $opt ( sort keys %$no_spacebar ) {
 
 my $exception = exception { $d = choose( $choices, {
     beep  => -1, clear_screen => 2, hide_cursor => 3, index => 4, alignment => '@', layout => 5, mouse => {}, order => 1,
-    page => 0, keep => -1, ll => -1, max_height => 0, max_width => 0, default => [], pad => 'a', empty => [],
+    page => 3, keep => -1, ll => -1, max_height => 0, max_width => 0, default => [], pad => 'a', empty => [],
     prompt => {}, undef => [], tabs_prompt => 4, no_spacebar => 4 } ) };
 ok( $exception =~ $begin_errormessage );
 

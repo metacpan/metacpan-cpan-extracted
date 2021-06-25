@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::AlienBase::Doc 0.31 {
+package Dist::Zilla::Plugin::AlienBase::Doc 0.32 {
 
   use 5.014;
   use Moose;
@@ -42,6 +42,7 @@ package Dist::Zilla::Plugin::AlienBase::Doc 0.31 {
     isa     => 'ArrayRef[Str]',
     default => sub { [ 'library' ] },
   );
+
 
   has name => (
     is => 'ro',
@@ -205,7 +206,7 @@ Dist::Zilla::Plugin::AlienBase::Doc - Generate boilerplate documentation for Ali
 
 =head1 VERSION
 
-version 0.31
+version 0.32
 
 =head1 SYNOPSIS
 
@@ -263,6 +264,12 @@ Types of the L<Alien>.  This can be specified multiple times.  Valid types:
 =item ffi
 
 =back
+
+=head2 name
+
+[required]
+
+The name of the alienized project.  For example C<libarchive> or C<infozip>.
 
 =head2 see_also
 

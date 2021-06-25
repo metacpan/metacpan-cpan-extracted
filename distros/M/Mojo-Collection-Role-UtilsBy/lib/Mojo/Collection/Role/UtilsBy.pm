@@ -4,7 +4,7 @@ use Role::Tiny;
 use List::UtilsBy ();
 use Sub::Util ();
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 requires 'new';
 

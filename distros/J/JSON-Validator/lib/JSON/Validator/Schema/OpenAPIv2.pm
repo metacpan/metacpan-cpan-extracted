@@ -7,6 +7,9 @@ use Mojo::Collection;
 
 my $X_RE = qr{^x-};
 
+# Some of the keywords are OpenAPIv3 keywords
+my %SKIP_KEYWORDS_IN_PATH = map { ($_, 1) } qw(description parameters servers summary);
+
 has errors => sub {
   my $self      = shift;
   my $validator = $self->new(%$self, allow_invalid_ref => 0)->resolve($self->specification);
@@ -50,7 +53,9 @@ sub base_url {
   # Get
   unless ($url) {
     $url = Mojo::URL->new;
-    $url->host($spec->{host}) if $spec->{host};
+    my @host_port = split ':', ($spec->{host} // '');
+    $url->host($host_port[0]) if $host_port[0];
+    $url->port($host_port[1]) if $host_port[1];
     $url->path($spec->{basePath} || '/');
     $url->scheme($spec->{schemes} && $spec->{schemes}[0] || undef);
     $url->host('localhost') if $url->scheme and !$url->host;
@@ -149,7 +154,7 @@ sub routes {
   for my $path (@sorted_paths) {
     next unless my $methods = $self->get([paths => $path]);
     for my $method (sort keys %$methods) {
-      next if $method =~ $X_RE or $method eq 'parameters';
+      next if $method =~ $X_RE or $SKIP_KEYWORDS_IN_PATH{$method};
       push @operations, {method => $method, operation_id => $methods->{$method}{operationId}, path => $path};
     }
   }
@@ -310,16 +315,16 @@ sub _resolve_ref {
 
 sub _validate_body {
   my ($self, $direction, $val, $param) = @_;
-  $val->{content_type} = $param->{accepts}[0] if !$val->{content_type} and @{$param->{accepts}};
 
   if ($val->{accept}) {
     $val->{content_type} = negotiate_content_type($param->{accepts}, $val->{accept});
     $val->{valid}        = $val->{content_type} ? 1 : 0;
     return E "/header/Accept", [join(', ', @{$param->{accepts}}), type => $val->{accept}] unless $val->{valid};
   }
-  if (@{$param->{accepts}} and !$val->{content_type}) {
-    $val->{valid} = 0;
-    return E "/$param->{name}", [join(', ', @{$param->{accepts}}) => type => $val->{content_type}];
+  if (@{$param->{accepts}} and $val->{content_type}) {
+    my $negotiated = negotiate_content_type($param->{accepts}, $val->{content_type});
+    $val->{valid} = $negotiated ? 1 : 0;
+    return E "/$param->{name}", [join(', ', @{$param->{accepts}}) => type => $val->{content_type}] unless $negotiated;
   }
   if ($param->{required} and !$val->{exists}) {
     $val->{valid} = 0;
@@ -327,6 +332,7 @@ sub _validate_body {
   }
   if ($val->{exists}) {
     local $self->{"validate_$direction"} = 1;
+    $val->{content_type} //= $param->{accepts}[0];
     my @errors = map { $_->path(_prefix_error_path($param->{name}, $_->path)); $_ }
       $self->validate($val->{value}, $param->{schema});
     $val->{valid} = @errors ? 0 : 1;

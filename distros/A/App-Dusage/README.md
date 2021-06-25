@@ -1,6 +1,13 @@
 # dusage
 
-`dusage` is a utility to generate disk space usage reports.
+`dusage` is a utility to automate generating disk space usage reports.
+
+![](https://img.shields.io/badge/Written%20in-Perl-brightgreen)
+![](https://img.shields.io/badge/-Linux-red)
+![](https://img.shields.io/badge/-MacOS-red)
+![](https://img.shields.io/badge/License-Artistic%202.0-blue)
+
+------
 
 ## Overview
 
@@ -12,11 +19,15 @@ program, adding new features and options, including a manual page.
 
 Provided a list of paths, `dusage` filters the output of `du` to find
 the amount of disk space used for each of the paths, collecting the
-values in one `du` run. It adds the new value to the list, shifting old
-values up. It then generates a nice report of the amount of disk space
-occupied in each of the specified paths, together with the amount it
-grew (or shrank) since the previous run, and since seven runs ago.
-When run daily, `dusage` outputs daily and weekly reports.
+values in one `du` run.
+
+It adds the new value to the list, shifting old values up. It then
+generates a nice report of the amount of disk space occupied in each
+of the specified paths, together with the amount it grew (or shrank)
+since the previous run, and since seven runs ago.
+
+When run daily, such as from `cron`, `dusage` outputs daily and weekly
+reports.
 
 ## Warning
 
@@ -27,11 +38,12 @@ parts for Perl 5. As a result, the source is sometimes ugly.
 
 ### Source Code
 
+* [CPAN](https://metacpan.org/pod/App::Dusage)
 * [GitHub](https://github.com/sciurius/dusage)
 
 ## Issue Tracking
 
-* Please use the GitHub issue tracker.
+* Please use the [GitHub issue tracker](https://github.com/sciurius/dusage/issues).
 
 ## Requirements
 

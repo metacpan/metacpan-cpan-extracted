@@ -1,0 +1,72 @@
+NAME
+    Plack::App::Redirect - Plack application for redirect.
+
+SYNOPSIS
+     use Plack::App::Redirect;
+
+     my $obj = Plack::App::Redirect->new(%parameters);
+     my $psgi_ar = $obj->call($env);
+     my $app = $obj->to_app;
+
+METHODS
+  "new"
+     my $obj = Plack::App::Redirect->new(%parameters);
+
+    Constructor.
+
+    Returns instance of object.
+
+    *       "redirect_url"
+
+            Redirect URL.
+
+            If this URL isn't present, application returns error.
+
+  "call"
+     my $psgi_ar = $obj->call($env);
+
+    Implementation of redirect application.
+
+    Returns reference to array (PSGI structure).
+
+  "to_app"
+     my $app = $obj->to_app;
+
+    Creates Plack application.
+
+    Returns Plack::Component object.
+
+EXAMPLE1
+     use strict;
+     use warnings;
+
+     use Plack::App::Redirect;
+
+     # Run application.
+     Plack::App::Redirect->new->to_app;
+
+     # Output:
+     # HTTP::Server::PSGI: Accepting connections at http://0:5000/
+
+     # > curl http://localhost:5000/
+     # TODO
+
+DEPENDENCIES
+    Plack::Response, Plack::Util::Accessor.
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/Plack-App-Redirect>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2021 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+VERSION
+    0.01
+

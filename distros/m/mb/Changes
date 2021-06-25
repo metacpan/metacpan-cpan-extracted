@@ -1,5 +1,9 @@
 Revision history for this software.
 
+0.29  2021-06-16 00:00:00
+  - fix print lc $_;
+  - created by INABA Hitoshi
+
 0.28  2021-05-25 00:00:00
   - supports die <<HEREDOC, and more
   - add SEE ALSO of POD

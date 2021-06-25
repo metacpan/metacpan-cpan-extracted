@@ -1,5 +1,12 @@
 Revision history for String-Tagged-Terminal
 
+0.05    2021-06-18
+        [CHANGES]
+         * Style updates: use v5.14, package NAME VERSION;
+
+        [BUGFIXES]
+         * Round fgindex/bgindex values to nearest integer (RT136840)
+
 0.04    2018-11-29 14:17:27
         [CHANGES]
          * Experimental MSWin32 support, by Max Maischein

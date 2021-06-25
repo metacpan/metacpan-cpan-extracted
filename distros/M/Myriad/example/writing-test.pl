@@ -4,7 +4,7 @@ use warnings;
 use Future::AsyncAwait;
 
 use Test::More;
-use Test::Myriad qw(add_service);
+use Test::Myriad;
 
 my ($mocked_service, $developer_service);
 
@@ -36,6 +36,7 @@ BEGIN {
     $developer_service = Test::Myriad->add_service(service => 'Test::Service::Real');
 }
 
+await Test::Myriad->ready;
 
 subtest 'it should respond to RPC' => sub {
     (async sub {

@@ -1,3 +1,9 @@
+0.499   2021-06-23  Released-By: PERLANCAR; Urgency: medium
+
+	- Bump generated prereq versions: Perinci::CmdLine::Any -> 0.152,
+	  Perinci::CmdLine::Lite -> 1.905.
+
+
 0.498   2021-02-01  Released-By: PERLANCAR; Urgency: medium
 
 	- Update generated prereq version of Log::ger 0.037 -> 0.038.

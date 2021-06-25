@@ -27,7 +27,7 @@ do { my $x = {
                       'requires' => {
                                       'Dist::Zilla' => '0',
                                       'namespace::autoclean' => '0',
-                                      'perl' => '5.014'
+                                      'perl' => '5.020'
                                     }
                     },
        'test' => {

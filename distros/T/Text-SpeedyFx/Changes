@@ -1,6 +1,14 @@
 Changelog for Text-SpeedyFx
 
-0.012 2014-12-29T12:02:05
+0.013 2021-06-13T05:44:35
+ - Drop the dependency on List::MoreUtils (Stanislaw Pusep)
+ - Regenerated README.pod (Stanislaw Pusep)
+ - Bump copyright year (Stanislaw Pusep)
+ - Update nedtrie.h to the latest version (Stanislaw Pusep)
+ - Silence Test::Pod::LinkCheck (Stanislaw Pusep)
+ - Compatibility with Perl >= 5.32 (fix for issue #3) (Stanislaw Pusep)
+
+0.012 2014-12-29T12:01:18
  - Dist::Zilla maintenance (Stanislaw Pusep)
  - Fix for issue #2 (Stanislaw Pusep)
 
@@ -95,4 +103,3 @@ Changelog for Text-SpeedyFx
  - ++hash_fv (Stanislaw Pusep)
  - passes release tests (Stanislaw Pusep)
  - INIT (Stanislaw Pusep)
-

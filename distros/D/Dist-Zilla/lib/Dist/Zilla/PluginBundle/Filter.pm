@@ -1,8 +1,16 @@
-package Dist::Zilla::PluginBundle::Filter 6.017;
+package Dist::Zilla::PluginBundle::Filter 6.020;
 # ABSTRACT: use another bundle, with some plugins removed
 
 use Moose;
 with 'Dist::Zilla::Role::PluginBundle';
+
+# BEGIN BOILERPLATE
+use v5.20.0;
+use warnings;
+use utf8;
+no feature 'switch';
+use experimental qw(postderef postderef_qq); # This experiment gets mainlined.
+# END BOILERPLATE
 
 use namespace::autoclean;
 
@@ -105,7 +113,7 @@ Dist::Zilla::PluginBundle::Filter - use another bundle, with some plugins remove
 
 =head1 VERSION
 
-version 6.017
+version 6.020
 
 =head1 SYNOPSIS
 
@@ -132,6 +140,17 @@ Options not prefixed with C<-> will be passed to the bundle to be filtered.
 B<NOTE:> When you filter a bundle you B<SHOULD NOT> include it directly in
 your C<dist.ini> file. This plugin will take care of including it for you.
 
+=head1 PERL VERSION SUPPORT
+
+This module has the same support period as perl itself:  it supports the two
+most recent versions of perl.  (That is, if the most recently released version
+is v5.40, then this module should work on both v5.40 and v5.38.)
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
+
 =head1 SEE ALSO
 
 Core Dist::Zilla plugins: L<@Basic|Dist::Zilla::PluginBundle::Basic>.
@@ -140,11 +159,11 @@ Dist::Zilla roles: L<PluginBundle|Dist::Zilla::Role::PluginBundle>.
 
 =head1 AUTHOR
 
-Ricardo SIGNES 😏 <rjbs@cpan.org>
+Ricardo SIGNES 😏 <rjbs@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Ricardo SIGNES.
+This software is copyright (c) 2021 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

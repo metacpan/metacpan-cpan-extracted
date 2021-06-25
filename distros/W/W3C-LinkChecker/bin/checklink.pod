@@ -14,7 +14,7 @@ This manual page documents briefly the B<checklink> command, a.k.a. the
 W3C® Link Checker.
 
 B<checklink> is a program that reads an HTML or XHTML document,
-extracts a list of anchors and lists and checks that no anchor is
+extracts a list of anchors and links and checks that no anchor is
 defined twice and that all the links are dereferenceable, including
 the fragments. It warns about HTTP redirects, including directory
 redirects, and can check recursively a part of a web site.
@@ -44,7 +44,7 @@ Show result summary only.
 
 Show only the broken links, not the redirects.
 
-=item B<-e, --directory>
+=item B<-e, --dir-redirects>
 
 Hide directory redirects - e.g. L<http://www.w3.org/TR> ->
 L<http://www.w3.org/TR/>.

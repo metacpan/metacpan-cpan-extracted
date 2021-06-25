@@ -4,6 +4,7 @@ use warnings;
 use Test::More;
 use Test::Fatal;
 
+use Future::AsyncAwait;
 use Database::Async;
 use Database::Async::Engine::Empty;
 
@@ -30,12 +31,13 @@ is(exception {
     ok($f->is_ready, 'the engine is available immediately');
     is($f->get, $engine, 'requested engine matches ready one');
     my $requested = 0;
-    local $pool->{request_engine} = sub {
+    local $pool->{request_engine} = async sub {
         ++$requested;
     };
     isa_ok(my $next = $pool->next_engine, 'Future');
     is($requested, 1, 'asked for one engine');
-    ok(!$next->is_ready, 'still pending on second request');
+    ok(!$next->is_ready, 'still pending on second request') or note diag $next->state;
+    note explain [ $next->failure ] if $next->is_failed;
 }, undef, 'can request an engine');
 is($engine, undef, 'engine was released when no longer used');
 

@@ -25,15 +25,15 @@ my %WriteMakefileArgs = (
     "URI" => 0
   },
   "TEST_REQUIRES" => {
-    "Code::TidyAll" => "0.78",
+    "LWP::Protocol::https" => "6.10",
+    "LWP::UserAgent" => "6.55",
     "Net::Ping" => "2.73",
-    "Perl::Tidy" => 20210111,
     "Test::Exception" => "0.32",
     "Test::More" => "0.92",
     "Test::Pod" => "1.51",
     "Test::Warn" => 0
   },
-  "VERSION" => "0.30",
+  "VERSION" => "0.33",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -42,13 +42,13 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Carp" => 0,
-  "Code::TidyAll" => "0.78",
   "Cpanel::JSON::XS" => "4.21",
   "HTTP::Tiny" => 0,
   "IO::Socket::SSL" => "2.068",
   "JSON::MaybeXS" => "1.004003",
+  "LWP::Protocol::https" => "6.10",
+  "LWP::UserAgent" => "6.55",
   "Net::Ping" => "2.73",
-  "Perl::Tidy" => 20210111,
   "Pod::Perldoc" => "3.21",
   "Test::Exception" => "0.32",
   "Test::More" => "0.92",

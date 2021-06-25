@@ -3,18 +3,21 @@ NAME
     Exchange) and perform queries on them
 
 VERSION
-    This document describes version 0.004 of App::idxdb (from Perl
-    distribution App-idxdb), released on 2021-01-22.
+    This document describes version 0.008 of App::idxdb (from Perl
+    distribution App-idxdb), released on 2021-06-21.
 
 SYNOPSIS
     See the included CLI script idxdb.
 
 DESCRIPTION
+CONTRIBUTOR
+    perlancar (on netbook-dell-xps13) <perlancar@gmail.com>
+
 FUNCTIONS
   daily
     Usage:
 
-     daily(%args) -> [status, msg, payload, meta]
+     daily(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
     Show data from daily stock/trading summary.
 
@@ -22,9 +25,9 @@ FUNCTIONS
 
     Arguments ('*' denotes required arguments):
 
-    *   date_end => *date* (default: 1611273600)
+    *   date_end => *date* (default: 1624208400)
 
-    *   date_start => *date* (default: 1608681600)
+    *   date_start => *date* (default: 1621616400)
 
     *   fields => *array[str]* (default: ["Volume","Value","ForeignNetBuy"])
 
@@ -38,19 +41,22 @@ FUNCTIONS
 
     Returns an enveloped result (an array).
 
-    First element (status) is an integer containing HTTP status code (200
-    means OK, 4xx caller error, 5xx function error). Second element (msg) is
-    a string containing error message, or 'OK' if status is 200. Third
-    element (payload) is optional, the actual result. Fourth element (meta)
-    is called result metadata and is optional, a hash that contains extra
-    information.
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
 
     Return value: (any)
 
   ownership
     Usage:
 
-     ownership(%args) -> [status, msg, payload, meta]
+     ownership(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
     Show ownership of some stock through time.
 
@@ -64,9 +70,9 @@ FUNCTIONS
 
     Arguments ('*' denotes required arguments):
 
-    *   date_end => *date* (default: 1611273600)
+    *   date_end => *date* (default: 1624208400)
 
-    *   date_start => *date* (default: 1608681600)
+    *   date_start => *date* (default: 1621616400)
 
     *   fields => *array[str]* (default: ["LocalTotal","ForeignTotal"])
 
@@ -83,19 +89,53 @@ FUNCTIONS
 
     Returns an enveloped result (an array).
 
-    First element (status) is an integer containing HTTP status code (200
-    means OK, 4xx caller error, 5xx function error). Second element (msg) is
-    a string containing error message, or 'OK' if status is 200. Third
-    element (payload) is optional, the actual result. Fourth element (meta)
-    is called result metadata and is optional, a hash that contains extra
-    information.
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
+  stocks_by_foreign_ownership
+    Usage:
+
+     stocks_by_foreign_ownership(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Rank stocks from highest foreign ownership.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   dbpath => *str*
+
+        Path for SQLite database.
+
+        If not specified, will default to "~/idxdb.db".
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
 
     Return value: (any)
 
   update
     Usage:
 
-     update(%args) -> [status, msg, payload, meta]
+     update(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
     Update data.
 
@@ -118,12 +158,15 @@ FUNCTIONS
 
     Returns an enveloped result (an array).
 
-    First element (status) is an integer containing HTTP status code (200
-    means OK, 4xx caller error, 5xx function error). Second element (msg) is
-    a string containing error message, or 'OK' if status is 200. Third
-    element (payload) is optional, the actual result. Fourth element (meta)
-    is called result metadata and is optional, a hash that contains extra
-    information.
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
 
     Return value: (any)
 
@@ -136,7 +179,7 @@ SOURCE
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website
-    <https://github.com/perlancar/perl-App-idxdb/issues>
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-idxdb>
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.

@@ -1,0 +1,20 @@
+- 0.18
+	support perl 5.8
+
+- 0.17
+	support perl 5.8
+
+- 0.16
+	add README
+
+- 0.15
+	Fix deps
+
+- 0.14
+	Add META.yml
+
+- 0.13
+	Add cpanfile
+
+- 0.12
+	Fork from Net::WebSocket::EV. Switch to Alien::Wslay. Add rsv bit functionality.

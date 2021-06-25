@@ -2,14 +2,16 @@ package EventStore::Tiny::Snapshot;
 
 use strict;
 use warnings;
+use feature 'signatures';
+no warnings 'experimental::signatures';
+use Carp;
 
 use Class::Tiny {
-    state       => sub {die "state is required.\n"},
-    timestamp   => sub {die "timestamp is required.\n"},
+    state       => sub {croak "state is required.\n"},
+    timestamp   => sub {croak "timestamp is required.\n"},
 };
 
-sub BUILD {
-    my $self = shift;
+sub BUILD ($self, @) { # @ is neccessary for Class::Tiny
 
     # Check non-lazy
     $self->state;
@@ -51,7 +53,7 @@ L<EventStore::Tiny>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2018 Mirko Westermeier (mail: mirko@westermeier.de)
+Copyright (c) 2018-2021 Mirko Westermeier (mail: mirko@westermeier.de)
 
 Released under the MIT License (see LICENSE.txt for details).
 

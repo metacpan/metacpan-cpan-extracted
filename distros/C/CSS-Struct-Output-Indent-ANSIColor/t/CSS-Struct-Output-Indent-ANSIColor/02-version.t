@@ -6,4 +6,4 @@ use Test::More 'tests' => 2;
 use Test::NoWarnings;
 
 # Test.
-is($CSS::Struct::Output::Indent::ANSIColor::VERSION, 0.01, 'Version.');
+is($CSS::Struct::Output::Indent::ANSIColor::VERSION, 0.02, 'Version.');

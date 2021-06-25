@@ -1,9 +1,16 @@
 Revision history for dusage
 
+2.02	2021-06-15
+
+	Fix some undefined warnings when directories have disappeared.
+	Small changes and enhancements to README.md and other files,
+	mostly cosmetic and/or spelling fixes.
+	Thanks to Jeffrey H. Johnson for contributing.
+
 2.01	2021-01-04
 
 	Add missing test. Dusage now fails on windows. This is correct
-	since it is not supposed to.
+	since it is intended for *nix systems only.
 
 2.00	2021-01-03
 

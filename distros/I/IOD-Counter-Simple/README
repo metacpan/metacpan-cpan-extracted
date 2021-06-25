@@ -1,0 +1,326 @@
+NAME
+    IOD::Counter::Simple - A simple counter using IOD/INI file
+
+VERSION
+    This document describes version 0.002 of IOD::Counter::Simple (from Perl
+    distribution IOD-Counter-Simple), released on 2021-06-22.
+
+SYNOPSIS
+    From Perl:
+
+     use IOD::Counter::Simple qw(increment_iod_counter get_iod_counter);
+
+     # increment and get the dafault counter
+     my $res;
+     $res = increment_iod_counter(); # => [200, "OK", 1]
+     $res = increment_iod_counter(); # => [200, "OK", 2]
+
+     # the content of ~/counter.iod file after the above:
+     [counter]
+     default=2
+
+     # dry-run mode
+     $res = increment_iod_counter(-dry_run=>1); # => [200, "OK (dry-run)", 3]
+     $res = increment_iod_counter(-dry_run=>1); # => [200, "OK (dry-run)", 3]
+
+     # specify IOD file path and counter name, and also the increment
+     $res = increment_iod_counter(path=>"/home/ujang/myapp.iod", counter=>"counter1"); # => [200, "OK", 1]
+     $res = increment_iod_counter(path=>"/home/ujang/myapp.iod", counter=>"counter1", increment=>10); # => [200, "OK", 11]
+     $res = increment_iod_counter(path=>"/home/ujang/myapp.iod", counter=>"counter2"); # => [200, "OK", 1]
+
+     # the content of /home/ujang/myapp.iod file after the above:
+     [counter]
+     counter1=11
+     counter2=1
+
+     # get the current value of counter
+     $res = get_iod_counter();               # => [200, "OK", 3, {'cmdline.exit_code'=>0}]
+     $res = get_iod_counter(counter=>'foo'); # => [200, "OK", undef, {'cmdline.exit_code'=>1}]
+
+    From command-line (install App::IODCounterSimpeUtils):
+
+     # increment the dafault counter
+     % increment-iod-counter
+     1
+     % increment-iod-counter
+     2
+
+     # dry-run mode
+     % increment-iod-counter --dry-run
+     3
+     % increment-iod-counter --dry-run
+     3
+
+     # specify IOD file path and counter name, and also the increment
+     % increment-iod-counter ~/myapp.iod counter1
+     1
+     % increment-iod-counter ~/myapp.iod counter1 -i 10
+     11
+
+DESCRIPTION
+    This module provides simple counter using IOD/INI file as the storage.
+    You can increment or get the value of a counter using a single function
+    call or a single CLI script invocation.
+
+FUNCTIONS
+  dump_iod_counters
+    Usage:
+
+     dump_iod_counters(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Return all the counters in the IOD/INI file as a hash.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   path => *filename*
+
+        IOD/INI file.
+
+        If not specified, will default to $HOME/counter.iod. If file does
+        not exist, will be created.
+
+    *   section => *str* (default: "counter")
+
+        INI section name where the counters are put.
+
+        Counters are put as parameters in a specific section in the IOD/INI
+        file, e.g.:
+
+         [counter]
+         counter1=1
+         counter2=5
+
+        This argument customizes the section name.
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
+  get_iod_counter
+    Usage:
+
+     get_iod_counter(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Get the current value of a counter in an IOD/INI file.
+
+    Undef (exit code 1 in CLI) can be returned if counter does not exist.
+
+    This function is not exported.
+
+    This function supports dry-run operation.
+
+    Arguments ('*' denotes required arguments):
+
+    *   counter => *str*
+
+        Counter name, defaults to "default" if not specified.
+
+        Note that counter name must be valid IOD/INI parameter name.
+
+    *   path => *filename*
+
+        IOD/INI file.
+
+        If not specified, will default to $HOME/counter.iod. If file does
+        not exist, will be created.
+
+    *   section => *str* (default: "counter")
+
+        INI section name where the counters are put.
+
+        Counters are put as parameters in a specific section in the IOD/INI
+        file, e.g.:
+
+         [counter]
+         counter1=1
+         counter2=5
+
+        This argument customizes the section name.
+
+    Special arguments:
+
+    *   -dry_run => *bool*
+
+        Pass -dry_run=>1 to enable simulation mode.
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
+  increment_iod_counter
+    Usage:
+
+     increment_iod_counter(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Increment a counter in an IOD/INI file and return the new incremented
+    value.
+
+    The first time a counter is created, it will be set to 0 then
+    incremented to 1, and 1 will be returned. The next increment will
+    increment the counter to two and return it.
+
+    If dry-run mode is chosen, the value that is returned is the value had
+    the counter been incremented, but the counter will not be actually
+    incremented.
+
+    This function is not exported.
+
+    This function supports dry-run operation.
+
+    Arguments ('*' denotes required arguments):
+
+    *   counter => *str*
+
+        Counter name, defaults to "default" if not specified.
+
+        Note that counter name must be valid IOD/INI parameter name.
+
+    *   increment => *int* (default: 1)
+
+        Specify by how many should the counter be incremented.
+
+    *   path => *filename*
+
+        IOD/INI file.
+
+        If not specified, will default to $HOME/counter.iod. If file does
+        not exist, will be created.
+
+    *   section => *str* (default: "counter")
+
+        INI section name where the counters are put.
+
+        Counters are put as parameters in a specific section in the IOD/INI
+        file, e.g.:
+
+         [counter]
+         counter1=1
+         counter2=5
+
+        This argument customizes the section name.
+
+    Special arguments:
+
+    *   -dry_run => *bool*
+
+        Pass -dry_run=>1 to enable simulation mode.
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
+METHODS
+    Aside from the functional interface, this module also provides the OO
+    interface.
+
+  new
+    Constructor.
+
+    Usage:
+
+     my $counter = IOD::Counter::Simple->new(%args);
+
+    Known arguments ("*" marks required argument):
+
+    *   path
+
+        IOD file path, defaults to "$HOME/counter.iod".
+
+  increment
+    Increment counter.
+
+    Usage:
+
+     my $newval = $counter->increment(%args);
+
+    Arguments:
+
+    *   counter
+
+        Counter name, defaults to "default".
+
+    *   increment
+
+        Increment, defaults to 1.
+
+  get
+    Get current value of a counter.
+
+    Usage:
+
+     my $val = $counter->get(%args);
+
+    Arguments:
+
+    *   counter
+
+        Counter name, defaults to "default".
+
+  dump
+    Dump all counters as a hash.
+
+    Usage:
+
+     my $counters = $counter->dump(%args);
+
+    Arguments:
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/IOD-Counter-Simple>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-IOD-Counter-Simple>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=IOD-Counter-Simple>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    SQLite::Counter::Simple
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2021 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

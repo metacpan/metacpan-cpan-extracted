@@ -10,6 +10,7 @@ use Scalar::Util qw( looks_like_number );
 use JSON qw( decode_json );
 
 use Term::Choose            qw();
+use Term::Choose::Constants qw( WIDTH_CURSOR );
 use Term::Choose::LineFold  qw( line_fold print_columns );
 use Term::Choose::Screen    qw( clear_screen );
 use Term::Choose::Util      qw( insert_sep get_term_width get_term_height unicode_sprintf );
@@ -50,7 +51,9 @@ sub get_stmt {
     my $in = '';
     if ( $used_for eq 'print' ) {
         $term_w = get_term_width();
-        $term_w++ if $^O ne 'MSWin32' && $^O ne 'cygwin';
+        if ( $^O ne 'MSWin32' && $^O ne 'cygwin' ) {
+            $term_w += WIDTH_CURSOR;
+        }
         $in = ' ' x $sf->{o}{G}{base_indent};
         $indent0 = { init_tab => $in x 0, subseq_tab => $in x 1 };
         $indent1 = { init_tab => $in x 1, subseq_tab => $in x 2 };
@@ -139,13 +142,18 @@ sub get_stmt {
 }
 
 
-sub insert_into_args_info_format {
+sub insert_into_args_info_format { ## name
     my ( $sf, $sql, $indent ) = @_;
     my $term_h = get_term_height();
     my $term_w = get_term_width();
-    $term_w++ if $^O ne 'MSWin32' && $^O ne 'cygwin';
+    if ( $^O ne 'MSWin32' && $^O ne 'cygwin' ) {
+        $term_w += WIDTH_CURSOR;
+    }
     my $row_count = @{$sql->{insert_into_args}};
-    my $avail_h = $term_h - $sf->{i}{occupied_term_height}; # where {occupied_term_height} is used
+    my $avail_h = $term_h - $sf->{i}{occupied_term_height}; # <= where {occupied_term_height} is used
+    if ( $sf->{i}{always_footer} ) { ##
+        $avail_h--; # 1 for the footer line
+    }
     if ( $avail_h < 5) {
         $avail_h = 5;
     }
@@ -215,21 +223,22 @@ sub __select_cols {
 }
 
 
-sub print_sql {
+sub print_sql_info {
     my ( $sf, $sql, $waiting ) = @_;
+    my $stmt = $sf->get_sql_info( $sql );
+    print clear_screen();
+    print $stmt, "\n";
+    if ( defined $waiting ) {
+        print $waiting;
+    }
+}
+sub get_sql_info {
+    my ( $sf, $sql ) = @_;
     my $stmt = '';
     for my $stmt_type ( @{$sf->{i}{stmt_types}} ) {
          $stmt .= $sf->get_stmt( $sql, $stmt_type, 'print' );
     }
-    $stmt .= "\n";
-    if ( defined wantarray ) {
-        return $stmt;
-    }
-    print clear_screen();
-    print $stmt;
-    if ( defined $waiting ) {
-        print $waiting;
-    }
+    return $stmt;
 }
 
 
@@ -275,7 +284,8 @@ sub alias {
     if ( $sf->{o}{alias}{$type} ) {
         my $tf = Term::Form->new( $sf->{i}{tf_default} );
         # Readline
-        $alias = $tf->readline( $identifier,
+        $alias = $tf->readline(
+            $identifier,
             { info => $info }
         );
     }

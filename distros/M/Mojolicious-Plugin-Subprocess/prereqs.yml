@@ -1,0 +1,13 @@
+runtime:
+  requires:
+    perl: '5.010001'
+    Mojolicious: '7.62'
+  suggests:
+    Mojo::IOLoop::Subprocess::Role::Sereal: 0
+test:
+  requires:
+    Test::More: '0.88'
+    Test::Needs: 0
+develop:
+  requires:
+    Mojo::IOLoop::Subprocess::Role::Sereal: 0

@@ -15,19 +15,19 @@ name: Device-Chip-MCP23x17
 provides:
   Device::Chip::MCP23S17:
     file: lib/Device/Chip/MCP23S17.pm
-    version: '0.03'
+    version: '0.04'
   Device::Chip::MCP23x17:
     file: lib/Device/Chip/MCP23x17.pm
-    version: '0.03'
+    version: '0.04'
   Device::Chip::MCP23x17::Adapter:
     file: lib/Device/Chip/MCP23x17/Adapter.pm
-    version: '0.03'
+    version: '0.04'
 requires:
   Device::Chip: '0.03'
   Future::AsyncAwait: '0.47'
-  Object::Pad: '0.19'
+  Object::Pad: '0.41'
   perl: '5.026'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.03'
+version: '0.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

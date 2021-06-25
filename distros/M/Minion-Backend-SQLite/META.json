@@ -64,7 +64,7 @@
    "provides" : {
       "Minion::Backend::SQLite" : {
          "file" : "lib/Minion/Backend/SQLite.pm",
-         "version" : "v5.0.4"
+         "version" : "v5.0.5"
       }
    },
    "release_status" : "stable",
@@ -78,16 +78,16 @@
          "url" : "https://github.com/Grinnz/Minion-Backend-SQLite.git",
          "web" : "https://github.com/Grinnz/Minion-Backend-SQLite"
       },
-      "x_IRC" : "irc://irc.freenode.net/#mojo"
+      "x_IRC" : "ircs://irc.libera.chat/#mojo"
    },
-   "version" : "v5.0.4",
+   "version" : "v5.0.5",
    "x_contributors" : [
       "Dan Book <grinnz@grinnz.com>",
       "Stefan Adams <s1037989@gmail.com>",
       "yrjustice <43676784+yrjustice@users.noreply.github.com>"
    ],
-   "x_generated_by_perl" : "v5.32.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.25",
+   "x_generated_by_perl" : "v5.34.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.26",
    "x_spdx_expression" : "Artistic-2.0"
 }
 

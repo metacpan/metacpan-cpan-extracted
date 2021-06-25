@@ -6,7 +6,7 @@
 use 5.026;
 use Object::Pad 0.19;
 
-package Device::Chip::ADS1115 0.11;
+package Device::Chip::ADS1115 0.12;
 class Device::Chip::ADS1115
    extends Device::Chip::Base::RegisteredI2C;
 

@@ -3,7 +3,7 @@ package Database::Async::Engine::PostgreSQL::DDL;
 use strict;
 use warnings;
 
-our $VERSION = '0.010'; # VERSION
+our $VERSION = '0.011'; # VERSION
 
 =head1 NAME
 
@@ -361,5 +361,5 @@ Tom Molesworth C<< <TEAM@cpan.org> >>
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2019. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth 2019-2021. Licensed under the same terms as Perl itself.
 

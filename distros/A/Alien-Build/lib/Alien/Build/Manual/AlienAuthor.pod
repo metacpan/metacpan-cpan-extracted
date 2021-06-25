@@ -14,7 +14,7 @@ Alien::Build::Manual::AlienAuthor - Alien author documentation
 
 =head1 VERSION
 
-version 2.40
+version 2.41
 
 =head1 SYNOPSIS
 
@@ -501,7 +501,7 @@ The C<lib/Alien/Libfoo.pm> that goes along with it is very simple:
  
  use strict;
  use warnings;
- use base qw( Alien::Base );
+ use parent qw( Alien::Base );
  
  1;
 
@@ -539,7 +539,7 @@ then you can expose them in your L<Alien::Base> subclass:
  
  use strict;
  use warnings;
- use base qw( Alien::Base );
+ use parent qw( Alien::Base );
  
  sub bar_baz {
    my($self) = @_;
@@ -725,6 +725,8 @@ Shawn Laffan (SLAFFAN)
 Paul Evans (leonerd, PEVANS)
 
 Håkon Hægland (hakonhagland, HAKONH)
+
+nick nauwelaerts (INPHOBIA)
 
 =head1 COPYRIGHT AND LICENSE
 

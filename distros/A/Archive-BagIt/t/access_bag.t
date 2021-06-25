@@ -4,7 +4,7 @@ BEGIN { chdir 't' if -d 't' }
 use warnings;
 use utf8;
 use open ':std', ':encoding(UTF-8)';
-use Test::More tests => 26;
+use Test::More tests => 27;
 use Test::Exception;
 use strict;
 
@@ -54,6 +54,16 @@ my $bag = $Class->new({bag_path=>$SRC_BAG});
 
 
 is($bag->bag_version(), "0.96", "has expected bag version");
+
+{
+  my $input ="Foo:Bar";
+  my @expected = (
+      { "Foo", "Bar" },
+  );
+  my $got = $bag->_parse_bag_info( $input );
+  is_deeply( $got, \@expected, "bag-info parsing, single line");
+}
+
 {
   my $input =<<BAGINFO;
 Foo: Bar

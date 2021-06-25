@@ -1,0 +1,16 @@
+AUTHORS
+CHANGES
+COPYRIGHT
+examples/lib/Fancy/Module.pm
+examples/my_program.pl
+examples/runit.sh
+examples/t/number_test.t
+lib/Devel/Deanonymize.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+Readme.md
+VERSION
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

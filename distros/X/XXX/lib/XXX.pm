@@ -1,9 +1,9 @@
 use strict; use warnings;
 package XXX;
-our $VERSION = '0.35';
+our $VERSION = '0.38';
 use base 'Exporter';
 
-our @EXPORT = qw( WWW XXX YYY ZZZ );
+our @EXPORT = qw( WWW XXX YYY ZZZ DDD );
 
 our $DumpModule = 'YAML::PP';
 
@@ -24,6 +24,18 @@ sub import {
             next;
         }
         last;
+    }
+    if (grep /^-?global$/, @args) {
+        *main::WWW = \&WWW;
+        *main::XXX = \&XXX;
+        *main::YYY = \&YYY;
+        *main::ZZZ = \&ZZZ;
+        *main::DDD = \&DDD;
+        $main::WWW = \&WWW;
+        $main::XXX = \&XXX;
+        $main::YYY = \&YYY;
+        $main::ZZZ = \&ZZZ;
+        $main::DDD = \&DDD;
     }
     @_ = ($package);
     goto &Exporter::import;
@@ -125,6 +137,14 @@ sub YYY {
 sub ZZZ {
     require Carp;
     Carp::confess(_xxx_dump(@_));
+}
+
+sub DDD {
+    require Enbugger;
+    my $debugger = $ENV{PERL_XXX_DEBUGGER} || 'perl5db';
+    Enbugger->load_debugger($debugger);
+    @_ = 'Enbugger';
+    goto Enbugger->can('stop');
 }
 
 1;

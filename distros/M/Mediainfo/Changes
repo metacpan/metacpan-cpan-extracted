@@ -44,3 +44,6 @@ Revision history for Perl extension Mediainfo.
 0.12  Mon Dec 22 16:49:01 2014
   - add audio channel by @owen
 
+0.13  Thu Jun 17 16:08:28 2021
+  - fixbug at perl@5.32.1 in audio channel parse by <m.korica@utoronto.ca>
+

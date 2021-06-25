@@ -497,9 +497,6 @@ sub test_06_utf8 : Test(11) {
     my $binary_blob = $utf8_string;
     utf8::encode($binary_blob);
 
-    ok( utf8::is_utf8($utf8_string), 'String is utf8' );
-    ok(!utf8::is_utf8($binary_blob), 'Blob is not utf8' );
-
     is( length($utf8_string), 1, 'String length is 1 char' );
     is( length($binary_blob), 3, 'Blob length is 3 bytes' );
 
@@ -529,11 +526,14 @@ sub test_06_utf8 : Test(11) {
 
     is( scalar(@received), 4, "Received 4 messages from topic");
 
-    ok( utf8::is_utf8($received[0]->{payload}), 'Received string is utf8' );
-    ok(!utf8::is_utf8($received[1]->{payload}), 'Received blob is not utf8' );
+    ok( $received[0]->{payload}, 'Received string' );
+    ok( $received[1]->{payload}, 'Received blob' );
 
-    is( $received[0]->{payload}, $utf8_string, "Got utf8 string");
-    is( $received[1]->{payload}, $binary_blob, "Got binary blob");
+    is( length($received[0]->{payload}), 1, 'Received string length is 1 char' );
+    is( length($received[1]->{payload}), 3, 'Received blob length is 3 bytes' );
+
+    is( $received[0]->{payload}, $utf8_string, "Got correct utf8 string");
+    is( $received[1]->{payload}, $binary_blob, "Got correct binary blob");
 
     is( $received[2]->{properties}->{'utf8_value'}, $utf8_string, "Got utf8 property value");
     is( $received[3]->{properties}->{$utf8_string}, 'utf8_key',   "Got utf8 property key");
@@ -582,7 +582,7 @@ sub test_07_big_message : Test(4) {
         payload    => \$data,
     );
 
-    $self->async_wait( 0.2 );
+    $self->async_wait( 1 );
 
     is( scalar(@received), 2, "Received 1 message from topic");
     is( length( $received[1]->{payload} ), 10485760, "Got a 10 MiB message");

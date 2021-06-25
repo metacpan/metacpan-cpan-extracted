@@ -4,9 +4,9 @@
 #  (C) Paul Evans, 2019-2020 -- leonerd@leonerd.org.uk
 
 use v5.26; # postfix-deref, signatures
-use Object::Pad 0.27;
+use Object::Pad 0.41; # :param
 
-package Device::Chip::CC1101 0.05;
+package Device::Chip::CC1101 0.06;
 class Device::Chip::CC1101
    extends Device::Chip;
 
@@ -64,14 +64,8 @@ Interval in seconds to poll the chip status after transmitting. A default of
 
 =cut
 
-has $_fosc;
-has $_poll_interval;
-
-BUILD ( %opts )
-{
-   $_fosc          = $opts{fosc} // 26E6; # presets presume 26MHz XTAL
-   $_poll_interval = $opts{poll_interval} // 0.05;
-}
+has $_fosc          :param = 26E6; # presets presume 26MHz XTAL
+has $_poll_interval :param = 0.05;
 
 method SPI_options
 {

@@ -54,6 +54,7 @@ for my $opt ( sort keys %$int ) {
 my $one_or_greater = {
     keep       => '[ 1-9 ][ 0-9 ]*',
     ll         => '[ 1-9 ][ 0-9 ]*',
+    max_cols   => '[ 1-9 ][ 0-9 ]*',
     max_height => '[ 1-9 ][ 0-9 ]*',
     max_width  => '[ 1-9 ][ 0-9 ]*',
 };
@@ -80,13 +81,12 @@ for my $opt ( sort keys %$zero_or_greater ) {
 
 
 my $string = {
-    empty               => '',
-    footer              => '',
-    info                => '',
-    prompt              => '',
-    skip_items          => '',
-    undef               => '',
-    busy_string         => '',
+    empty       => '',
+    footer      => '',
+    info        => '',
+    prompt      => '',
+    undef       => '',
+    busy_string => '',
 };
 my @val_string = ( 0, 'Hello' x 50, '', ' ', '☻☮☺', "\x{263a}\x{263b}", '한글', undef, 'æða' );
 my $fail;
@@ -111,9 +111,9 @@ for my $opt ( sort keys %$tabs ) {
 
 
 my $list_opt = {
-    mark                => 'Array_Int',
-    meta_items          => 'Array_Int',
-    no_spacebar         => 'Array_Int',
+    mark        => 'Array_Int',
+    meta_items  => 'Array_Int',
+    no_spacebar => 'Array_Int',
 
 };
 my @val_list_opt = ( [ 0, 1, 2, 100, 999999 ], [ 1 ], undef );
@@ -125,14 +125,28 @@ for my $opt ( sort keys %$list_opt ) {
 }
 
 
+my $regex_opt = {
+    skip_items => 'Regexp',
+};
+my @val_regex_opt = ( qr/^\s+\z/, qr/abc/ );
+
+for my $opt ( sort keys %$regex_opt ) {
+    for my $val ( @val_regex_opt ) {
+        ok( ! defined( exception { $d = choose( $choices, { $opt => $val } ) } ) );
+    }
+}
+
+
+
+
 ok( ! defined( exception {  $d = choose( $choices, {
     beep  => 0, clear_screen => undef, hide_cursor => 1, index => 0, alignment => 0, layout => 0, mouse => 0,
-    order => 1, page => 0, keep => 1, ll => 1, max_height => 19, max_width => 19, default => 9,
+    order => 1, page => 0, keep => 1, ll => 1, max_height => 19, max_width => 19, default => 9, skip_items => qr/^\d+\z/,
     pad => 3, empty => '', prompt => '', undef => '', tabs_prompt => [ 1 ], no_spacebar => [ 0 ], info => 'hello' } ) } ) );
 
 ok( ! defined( exception {  $d = choose( [ 'aaa' .. 'zzz' ], {
     no_spacebar => [ 11, 0, 8 ], tabs_prompt => [ 1, 1 ], undef => '', prompt => 'prompt_line', empty => '', pad => 3,
-    default => 9, max_width => 19, max_height => 119, ll => 15, keep => 1, page => 1, order => 1,
+    default => 9, max_width => 19, max_height => 119, ll => 15, keep => 1, page => 1, order => 1, skip_items => qr/^\d+\z/,
     mouse => 0, layout => 3, alignment => 0, index => 0, hide_cursor => 1,  clear_screen => undef, beep  => 0 } ) } ) );
 
 

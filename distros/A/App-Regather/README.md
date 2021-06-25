@@ -1,6 +1,6 @@
 # ![UMI](https://github.com/z-eos/regather/raw/master/regather-logo.png) **REGATHER**
 
-**regather** is a syncrepl consumer to generate ( *re gather* ) files on LDAP synrepl events.
+**regather** is a syncrepl consumer to generate ( *re gather* ) files on LDAP syncrepl events.
 
 It uses Net::LDAP(3) to do all LDAP related stuff and Template(3) to generate files. Config file is processed with Config::Parser(3) (it's format described in Regather::Config(3)
 

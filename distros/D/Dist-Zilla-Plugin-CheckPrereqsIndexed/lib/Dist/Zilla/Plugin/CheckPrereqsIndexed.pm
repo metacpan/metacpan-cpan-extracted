@@ -1,8 +1,16 @@
-package Dist::Zilla::Plugin::CheckPrereqsIndexed;
+package Dist::Zilla::Plugin::CheckPrereqsIndexed 0.021;
 # ABSTRACT: prevent a release if you have prereqs not found on CPAN
-$Dist::Zilla::Plugin::CheckPrereqsIndexed::VERSION = '0.020';
-use 5.10.0; # //
+
 use Moose;
+with 'Dist::Zilla::Role::BeforeRelease';
+
+# BEGIN BOILERPLATE
+use v5.20.0;
+use warnings;
+use utf8;
+no feature 'switch';
+use experimental qw(postderef postderef_qq); # This experiment gets mainlined.
+# END BOILERPLATE
 
 #pod =head1 OVERVIEW
 #pod
@@ -14,14 +22,12 @@ use Moose;
 #pod
 #pod If any are unknown, it will prompt the user to continue or abort.
 #pod
-#pod Previously, CheckPrereqsIndexed queried CPANIDX, but it now queries 
+#pod Previously, CheckPrereqsIndexed queried CPANIDX, but it now queries
 #pod cpanmetadb. This behavior may change again in the future, or it may become
 #pod pluggable.  In the meantime, this makes releasing while offline impossible...
 #pod but it was anyway, right?
 #pod
 #pod =cut
-
-with 'Dist::Zilla::Role::BeforeRelease';
 
 use List::Util 1.33 qw(any);
 
@@ -32,17 +38,18 @@ sub mvp_aliases { return { skip => 'skips' } }
 
 #pod =attr skips
 #pod
-#pod This is an arrayref of regular expressions.  Any module names matching
-#pod any of these regex will not be checked.  This should only be necessary
-#pod if you have a prerequisite that is not available on CPAN (because it's
-#pod distributed in some other way).
+#pod This is an array of regular expressions.  Any module names matching any of
+#pod these regex will not be checked.  This should only be necessary if you have a
+#pod prerequisite that is not available on CPAN (because it's distributed in some
+#pod other way).
 #pod
 #pod =cut
 
 has skips => (
-  is      => 'ro',
   isa     => 'ArrayRef[Str]',
   default => sub { [] },
+  traits  => [ 'Array' ],
+  handles => { skips => 'elements' },
 );
 
 my %NOT_INDEXED = map {; $_ => 1 }
@@ -55,7 +62,7 @@ sub before_release {
 
   require version;
 
-  my @skips = map {; qr/$_/ } @{ $self->skips };
+  my @skips = map {; qr/$_/ } $self->skips;
 
   my $requirements = CPAN::Meta::Requirements->new;
 
@@ -71,11 +78,11 @@ sub before_release {
 
   for my $prereqs_hash (
     $self->zilla->prereqs->as_string_hash,
-    (map { $_->{prereqs} } values %{ $self->zilla->distmeta->{optional_features} // {} }),
+    (map { $_->{prereqs} } values(($self->zilla->distmeta->{optional_features} // {})->%*)),
   ) {
     for my $phase (keys %$prereqs_hash) {
-      for my $type (keys %{$prereqs_hash->{$phase}}) {
-        REQ_PKG: for my $pkg (keys %{$prereqs_hash->{$phase}{$type}}) {
+      for my $type (keys $prereqs_hash->{$phase}->%*) {
+        REQ_PKG: for my $pkg (keys $prereqs_hash->{$phase}{$type}->%*) {
           if ($NOT_INDEXED{ $pkg }) {
             $self->log_debug([ 'skipping unindexed module %s', $pkg ]);
             next;
@@ -88,8 +95,13 @@ sub before_release {
 
           my $ver = $prereqs_hash->{$phase}{$type}{$pkg};
 
-          # skip packages contained in the distribution we are releasing, from develop prereqs only
-          if ($phase eq 'develop' and exists $self_modules{$pkg} and $self_modules{$pkg} >= $ver) {
+          # skip packages contained in the distribution we are releasing, from
+          # develop prereqs only
+          if (
+            $phase eq 'develop'
+            and exists $self_modules{$pkg}
+            and version->parse($self_modules{$pkg}) >= version->parse($ver)
+          ) {
             $self->log_debug([ 'skipping develop prereq on ourself (%s => %s)', $pkg, $ver ]);
             next;
           }
@@ -181,7 +193,7 @@ Dist::Zilla::Plugin::CheckPrereqsIndexed - prevent a release if you have prereqs
 
 =head1 VERSION
 
-version 0.020
+version 0.021
 
 =head1 OVERVIEW
 
@@ -193,23 +205,34 @@ index to ensure that they're all real, installable packages.
 
 If any are unknown, it will prompt the user to continue or abort.
 
-Previously, CheckPrereqsIndexed queried CPANIDX, but it now queries 
+Previously, CheckPrereqsIndexed queried CPANIDX, but it now queries
 cpanmetadb. This behavior may change again in the future, or it may become
 pluggable.  In the meantime, this makes releasing while offline impossible...
 but it was anyway, right?
+
+=head1 PERL VERSION SUPPORT
+
+This module has the same support period as perl itself:  it supports the two
+most recent versions of perl.  (That is, if the most recently released version
+is v5.40, then this module should work on both v5.40 and v5.38.)
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
 
 =head1 ATTRIBUTES
 
 =head2 skips
 
-This is an arrayref of regular expressions.  Any module names matching
-any of these regex will not be checked.  This should only be necessary
-if you have a prerequisite that is not available on CPAN (because it's
-distributed in some other way).
+This is an array of regular expressions.  Any module names matching any of
+these regex will not be checked.  This should only be necessary if you have a
+prerequisite that is not available on CPAN (because it's distributed in some
+other way).
 
 =head1 AUTHOR
 
-Ricardo Signes <rjbs@cpan.org>
+Ricardo Signes <rjbs@semiotic.systems>
 
 =head1 CONTRIBUTORS
 

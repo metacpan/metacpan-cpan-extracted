@@ -1,7 +1,7 @@
 package Test::Config::IOD;
 
-our $DATE = '2019-01-17'; # DATE
-our $VERSION = '0.350'; # VERSION
+our $DATE = '2021-06-23'; # DATE
+our $VERSION = '0.352'; # VERSION
 
 ## no critic (Modules::ProhibitAutomaticExportation)
 
@@ -56,7 +56,7 @@ Test::Config::IOD - Testing routines for Config::IOD
 
 =head1 VERSION
 
-This document describes version 0.350 of Test::Config::IOD (from Perl distribution Config-IOD), released on 2019-01-17.
+This document describes version 0.352 of Test::Config::IOD (from Perl distribution Config-IOD), released on 2021-06-23.
 
 =head1 FUNCTIONS
 
@@ -88,7 +88,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2017, 2016, 2015, 2011 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2019, 2017, 2016, 2015, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -5,7 +5,7 @@ package Acme::CPANModules::Import::MJGARDNER::ListProcessing;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2021-05-19'; # DATE
 our $DIST = 'Acme-CPANModulesBundle-Import-MJGARDNER'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 our $LIST = {
   entries => [
@@ -42,7 +42,7 @@ Acme::CPANModules::Import::MJGARDNER::ListProcessing - List of modules mentioned
 
 =head1 VERSION
 
-This document describes version 0.001 of Acme::CPANModules::Import::MJGARDNER::ListProcessing (from Perl distribution Acme-CPANModulesBundle-Import-MJGARDNER), released on 2021-05-19.
+This document describes version 0.002 of Acme::CPANModules::Import::MJGARDNER::ListProcessing (from Perl distribution Acme-CPANModulesBundle-Import-MJGARDNER), released on 2021-05-19.
 
 =head1 DESCRIPTION
 

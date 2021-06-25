@@ -4,13 +4,13 @@
       "Mirko Westermeier <mirko@westermeier.de>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "mit"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "EventStore-Tiny",
    "no_index" : {
@@ -37,7 +37,8 @@
             "Data::Compare" : "1.25",
             "Data::Dump" : "1.23",
             "UUID::Tiny" : "1.04",
-            "perl" : "5.014000"
+            "YAML::Syck" : "1.31",
+            "perl" : "5.020000"
          }
       },
       "test" : {
@@ -56,6 +57,6 @@
          "url" : "http://github.com/memowe/EventStore-Tiny"
       }
    },
-   "version" : "0.51",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "0.72",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

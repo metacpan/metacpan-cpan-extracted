@@ -1,3 +1,6 @@
+1.002     2021-06-15 23:59:14 EDT
+  - Update IRC metadata to libera.chat
+
 1.001     2021-02-16 17:19:49 EST
   - Use Mojo::Promise in tests instead of the deprecated and decored Mojo::IOLoop::Delay.
 

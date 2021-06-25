@@ -1,0 +1,73 @@
+NAME
+    App::PMVersionsUtils - CLI utilities related to PMVersions
+
+VERSION
+    This document describes version 0.001 of App::PMVersionsUtils (from Perl
+    distribution App-PMVersionsUtils), released on 2021-06-22.
+
+SYNOPSIS
+    This distribution provides the following command-line utilities related
+    to PMVersions:
+
+    *   version-from-pmversions
+
+FUNCTIONS
+  version_from_pmversions
+    Usage:
+
+     version_from_pmversions(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Get minimum Perl module version from pmversions.ini.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   module => *perl::modname*
+
+        Module name, if unspecified will use `this-mod` to get the current
+        module.
+
+    *   pmversions_path => *filename*
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-PMVersionsUtils>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-PMVersionsUtils>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-PMVersionsUtils>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    PMVersions::Util
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2021 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

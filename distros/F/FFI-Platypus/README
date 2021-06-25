@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 1.43
+    version 1.46
 
 SYNOPSIS
 
@@ -799,7 +799,7 @@ EXAMPLES
        });
      }
      
-     # now we can actually use our My::UnixTime class
+     # now we can actually use our Unix::TimeStruct class
      my $time = Unix::TimeStruct->localtime;
      printf "time is %d:%d:%d %s\n",
        $time->tm_hour,
@@ -1876,6 +1876,8 @@ AUTHOR
     Eric Brine (IKEGAMI)
 
     szTheory
+
+    José Joaquín Atria (JJATRIA)
 
 COPYRIGHT AND LICENSE
 

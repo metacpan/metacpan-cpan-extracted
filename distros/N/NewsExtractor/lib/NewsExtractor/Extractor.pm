@@ -53,6 +53,7 @@ use NewsExtractor::SiteSpecificExtractor::www_nownews_com;
 use NewsExtractor::SiteSpecificExtractor::www_penghutimes_com;
 use NewsExtractor::SiteSpecificExtractor::www_aljazeera_com;
 use NewsExtractor::SiteSpecificExtractor::www_bbc_com;
+use NewsExtractor::SiteSpecificExtractor::yimedia_com_tw;
 use NewsExtractor::SiteSpecificExtractor::UDN;
 use NewsExtractor::SiteSpecificExtractor::ETtoday;
 use NewsExtractor::SiteSpecificExtractor::ChinaTimes;
@@ -126,6 +127,7 @@ use constant {
         'www.digitimes.com.tw' => 'NewsExtractor::SiteSpecificExtractor::www_digitimes_com_tw',
         'www.mdnkids.com' => 'NewsExtractor::SiteSpecificExtractor::www_mdnkids_com',
         'www.nownews.com' => 'NewsExtractor::SiteSpecificExtractor::www_nownews_com',
+        'yimedia.com.tw' => 'NewsExtractor::SiteSpecificExtractor::yimedia_com_tw',
     },
     CSSRuleSetByHost => {
         'www.eventsinfocus.org' => {

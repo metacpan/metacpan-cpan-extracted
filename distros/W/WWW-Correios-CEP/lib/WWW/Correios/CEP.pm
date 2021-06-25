@@ -26,7 +26,7 @@ sub new {
 
         _post_content => defined $params->{post_content}
         ? $params->{post_content}
-        : '?pagina=%2Fapp%2Fendereco%2Findex.php&cepaux=&mensagem_alerta=&tipoCEP=LOG&endereco='
+        : 'pagina=%2Fapp%2Fendereco%2Findex.php&cepaux=&mensagem_alerta=&tipoCEP=ALL&endereco='
     };
 
     $this->{_lwp_options}{timeout} = $params->{timeout}
@@ -65,8 +65,17 @@ sub _extractAddress {
         }
         my $ua = $this->{_lwp_ua};
 
-        my $url = $this->{_post_url} . $this->{_post_content} . $cep;
-        my $req = HTTP::Request->new( GET => $url );
+        my $url = $this->{_post_url};
+        my $req = HTTP::Request->new(
+            POST => $url,
+            [
+                'Content-Type' => 'application/x-www-form-urlencoded',
+                'Origin'       => 'https://buscacepinter.correios.com.br',
+                'Referer'      =>
+'https://buscacepinter.correios.com.br/app/endereco/index.php?t',
+            ],
+            $this->{_post_content} . $cep
+        );
 
         eval {
             local $SIG{ALRM} =

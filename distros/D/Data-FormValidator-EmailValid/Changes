@@ -1,5 +1,9 @@
 Revision history for Perl extension Data::FormValidator::EmailValid:
 
+0.09      2021-06-21 12:03:00-07:00 America/Vancouver
+    - Remove Net::DNS as a recommended dependency; it is a hard dependency
+      for Email::Valid, which we already depend on.
+
 0.08      2021-01-12 10:55:39-08:00 America/Vancouver
     - Bump minimum required Perl to 5.10; the minimum required for
       Regexp::Common, which is a dependency of Data::FormValidator

@@ -178,6 +178,12 @@ Return a string version of the hash as produced by L<Data::Dumper>
     "last_name" => "Doe"
     }
 
+=head2 chomp
+
+Performs a L<perlfunc/chomp> on the entire hash values and returns the current object it was called with.
+
+Qyoting from L<perlfunc>: "If variable is a hash, it chomps the hash's values, but not its keys".
+
 =head2 clone
 
 Produce a deep clone of the hash and return a new object. This uses L<Clone/"clone"> to achieve that.

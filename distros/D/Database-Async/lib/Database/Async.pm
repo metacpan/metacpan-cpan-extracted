@@ -3,7 +3,7 @@ package Database::Async;
 use strict;
 use warnings;
 
-our $VERSION = '0.013';
+our $VERSION = '0.014';
 
 use parent qw(Database::Async::DB IO::Async::Notifier);
 
@@ -30,7 +30,7 @@ Database::Async - provides a database abstraction layer for L<IO::Async>
 
  # Simple query
  $db->query(q{select id, some_data from some_table})
-    ->rows_hashref
+    ->row_hashrefs
     ->each(sub {
         printf "ID %d, data %s\n", $_->{id}, $_->{some_data};
     })
@@ -136,7 +136,7 @@ In L<Database::Async>:
    q{select * from something where id = ?},
    bind => [
     $id
-   ])->rows_hashref
+   ])->row_hashrefs
      ->as_arrayref
      ->@*
 
@@ -159,7 +159,7 @@ In L<Database::Async>:
   $sth->bind(0, $id, 'bigint')
    ->then(sub { $sth->execute })
    ->then(sub {
-    $sth->rows_hashref
+    $sth->row_hashrefs
      ->each(sub {
       print $_->{name} . "\n";
      })->completed
@@ -310,12 +310,26 @@ Supports the following named parameters:
 
 =item * C<pool> - parameters for setting up the pool, or a L<Database::Async::Pool> instance
 
+=item * C<encoding> - default encoding to apply to parameters, queries and results, defaults to C<binary>
+
 =back
 
 =cut
 
+my %encoding_map = (
+    'utf8'    => 'UTF-8',
+    'utf-8'   => 'UTF-8',
+    'UTF8'    => 'UTF-8',
+    'unicode' => 'UTF-8',
+);
+
 sub configure {
     my ($self, %args) = @_;
+
+    if(my $encoding = delete $args{encoding}) {
+        $self->{encoding} = $encoding_map{$encoding} // $encoding;
+    }
+
     if(my $uri = delete $args{uri}) {
         # This could be any type of object. We make
         # the assumption here that it safely serialises
@@ -342,6 +356,8 @@ sub configure {
     }
     $self->next::method(%args);
 }
+
+sub encoding { shift->{encoding} }
 
 =head2 ryu
 
@@ -395,11 +411,12 @@ L<Database::Async::Engine> instance when ready to use.
 
 =cut
 
-sub request_engine {
+async sub request_engine {
     my ($self) = @_;
     $log->tracef('Requesting new engine');
     my $engine = $self->engine_instance;
-    $engine->connect->retain
+    $log->tracef('Connecting');
+    return await $engine->connect->retain;
 }
 
 =head2 engine_instance
@@ -416,12 +433,24 @@ sub engine_instance {
         unless my $engine_class = $Database::Async::Engine::ENGINE_MAP{$type};
     Module::Load::load($engine_class) unless $engine_class->can('new');
     $log->tracef('Instantiating new %s', $engine_class);
+    my %param = (
+        %{$self->{engine_parameters} || {}},
+        (defined($uri) ? (uri => $uri) : ()),
+        db => $self,
+    );
+
+    # Only recent engine versions support this parameter
+    if(my $encoding = $self->encoding) {
+        if($engine_class->can('encoding')) {
+            $param{encoding} = $self->encoding;
+        } else {
+            # If we're given this parameter, let's not ignore it silently
+            die 'Database engine ' . $engine_class . ' does not support encoding parameter, try upgrading that module from CPAN or remove the encoding configuration in Database::Async';
+        }
+    }
+
     $self->add_child(
-        my $engine = $engine_class->new(
-            %{$self->{engine_parameters} || {}},
-            db => $self,
-            (defined($uri) ? (uri => $uri) : ())
-        )
+        my $engine = $engine_class->new(%param)
     );
     $engine;
 }
@@ -598,5 +627,5 @@ Tom Molesworth C<< <TEAM@cpan.org> >>
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2011-2020. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth 2011-2021. Licensed under the same terms as Perl itself.
 

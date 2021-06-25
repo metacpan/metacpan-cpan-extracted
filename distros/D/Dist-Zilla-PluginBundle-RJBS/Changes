@@ -1,5 +1,21 @@
 Revision history for Dist-Zilla-PluginBundle-RJBS
 
+5.018     2021-06-18 22:28:44-04:00 America/New_York
+        - add x_rjbs_perl_support to metadata (for use in my code review)
+        - warn when perl-support is not set
+        - when package-name-version is true, it means v5.12 perl is required
+
+5.017     2021-06-13 08:42:19-04:00 America/New_York
+        - catch late-stage mistakes: old email address, toolchain support using
+          v5.12-ism
+
+5.016     2021-06-12 21:39:01-04:00 America/New_York
+        - default to using "package NAME VERSION" syntax, because v5.12.0
+          is well below my usual supported version; this will surely lead to
+          some mistakes in future releases, but those will get fixed as they
+          appear...
+        - add more x-y aliases for x_y
+
 5.015     2021-04-03 21:03:38-04:00 America/New_York
         - allow "perl-support" as a config alias for perl_support
           (because LOW LINE is the worst!)

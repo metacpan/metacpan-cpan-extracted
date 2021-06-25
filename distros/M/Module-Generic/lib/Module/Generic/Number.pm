@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/Number.pm
-## Version v1.0.0
+## Version v1.0.1
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/20
-## Modified 2021/03/20
+## Modified 2021/04/21
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -13,16 +13,19 @@
 package Module::Generic::Number;
 BEGIN
 {
+    use v5.26.1;
     use strict;
+    use warnings;
     use parent qw( Module::Generic );
     use warnings::register;
+    use Module::Generic::Array;
     use Module::Generic::Boolean;
     use Module::Generic::Scalar;
     use Number::Format;
     use Nice::Try;
     use Regexp::Common qw( number );
     use POSIX ();
-    our( $VERSION ) = 'v1.0.0';
+    our( $VERSION ) = 'v1.0.1';
 };
 
 use overload (
@@ -465,6 +468,8 @@ sub init
 {
     my $self = shift( @_ );
     my $num  = shift( @_ );
+    # Trigger overloading to string operation
+    $num = "$num";
     return( $self->error( "No number was provided." ) ) if( !CORE::length( $num ) );
     return( Module::Generic::Infinity->new( $num ) ) if( POSIX::isinf( $num ) );
     return( Module::Generic::Nan->new( $num ) ) if( POSIX::isnan( $num ) );
@@ -699,7 +704,11 @@ sub atan { return( shift->_func( 'atan', { posix => 1 } ) ); }
 
 sub atan2 { return( shift->_func( 'atan2', @_ ) ); }
 
+sub as_array { return( Module::Generic::Array->new( [ shift->{_number} ] ) ); }
+
 sub as_boolean { return( Module::Generic::Boolean->new( shift->{_number} ? 1 : 0 ) ); }
+
+sub as_scalar { return( Module::Generic::Scalar->new( shift->{_number} ) ); }
 
 sub as_string { return( shift->{_number} ) }
 
@@ -715,11 +724,14 @@ sub clone
     my $num  = @_ ? shift( @_ ) : $self->{_number};
     return( Module::Generic::Infinity->new( $num ) ) if( POSIX::isinf( $num ) );
     return( Module::Generic::Nan->new( $num ) ) if( POSIX::isnan( $num ) );
-    my @keys = keys( %$map );
-    push( @keys, qw( lang debug ) );
-    my $hash = {};
-    @$hash{ @keys } = @$self{ @keys };
-    return( $self->new( $num, $hash ) );
+#     my @keys = keys( %$map );
+#     push( @keys, qw( lang debug ) );
+#     my $hash = {};
+#     @$hash{ @keys } = @$self{ @keys };
+#     return( $self->new( $num, $hash ) );
+    my $new = $self->SUPER::clone;
+    $new->{_number} = $num;
+    return( $new );
 }
 
 sub compute
@@ -1168,6 +1180,7 @@ AUTOLOAD
     return;
 };
 
+# XXX package Module::Generic::NumberSpecial
 package Module::Generic::NumberSpecial;
 BEGIN
 {
@@ -1267,6 +1280,7 @@ AUTOLOAD
 
 DESTROY {};
 
+# XXX package Module::Generic::Infinity
 ## Purpose is to allow chaining of methods when infinity is returned
 ## At the end of the chain, Inf or -Inf is returned
 package Module::Generic::Infinity;
@@ -1280,6 +1294,7 @@ BEGIN
 
 sub is_infinite { return( 1 ); }
 
+# XXX package Module::Generic::Nan
 package Module::Generic::Nan;
 BEGIN
 {

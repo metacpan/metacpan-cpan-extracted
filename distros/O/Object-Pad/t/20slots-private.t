@@ -16,7 +16,7 @@ class Base::Class {
    }
 }
 
-class Derived::Class extends Base::Class {
+class Derived::Class isa Base::Class {
    has $data;
    method data { $data }
 

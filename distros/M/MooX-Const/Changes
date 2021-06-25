@@ -1,5 +1,11 @@
 Revision history for MooX-Const:
 
+v0.5.1    2021-06-21 16:47:46+01:00 Europe/London
+  [Documentation]
+  - Bumped copyright year.
+
+  - Updated SEE ALSO.
+
 v0.5.0    2020-12-30 16:54:53+00:00 Europe/London
   [Enhancements]
   - Added "once" as alternative to "wo" attributes. "wo" is now an

@@ -21,7 +21,7 @@
 package Perl::Tidy::Tokenizer;
 use strict;
 use warnings;
-our $VERSION = '20210402';
+our $VERSION = '20210625';
 
 use Perl::Tidy::LineBuffer;
 use Carp;
@@ -100,7 +100,18 @@ use vars qw{
   %is_package
   %is_comma_question_colon
   %other_line_endings
+  $code_skipping_pattern_begin
+  $code_skipping_pattern_end
 };
+
+# GLOBAL VARIABLES which are constant after being configured by user-supplied
+# parameters.  They remain constant as a file is being processed.
+my (
+
+    $rOpts_code_skipping,
+    $code_skipping_pattern_begin,
+    $code_skipping_pattern_end,
+);
 
 # possible values of operator_expected()
 use constant TERM     => -1;
@@ -129,6 +140,7 @@ BEGIN {
         _in_format_                          => $i++,
         _in_error_                           => $i++,
         _in_pod_                             => $i++,
+        _in_skipped_                         => $i++,
         _in_attribute_list_                  => $i++,
         _in_quote_                           => $i++,
         _quote_target_                       => $i++,
@@ -211,6 +223,39 @@ EOM
     exit 1;
 }
 
+sub Die {
+    my ($msg) = @_;
+    Perl::Tidy::Die($msg);
+    croak "unexpected return from Perl::Tidy::Die";
+}
+
+sub bad_pattern {
+
+    # See if a pattern will compile. We have to use a string eval here,
+    # but it should be safe because the pattern has been constructed
+    # by this program.
+    my ($pattern) = @_;
+    eval "'##'=~/$pattern/";
+    return $@;
+}
+
+sub make_code_skipping_pattern {
+    my ( $rOpts, $opt_name, $default ) = @_;
+    my $param = $rOpts->{$opt_name};
+    unless ($param) { $param = $default }
+    $param =~ s/^\s*//;    # allow leading spaces to be like format-skipping
+    if ( $param !~ /^#/ ) {
+        Die("ERROR: the $opt_name parameter '$param' must begin with '#'\n");
+    }
+    my $pattern = '^\s*' . $param . '\b';
+    if ( bad_pattern($pattern) ) {
+        Die(
+"ERROR: the $opt_name parameter '$param' causes the invalid regex '$pattern'\n"
+        );
+    }
+    return $pattern;
+}
+
 sub check_options {
 
     # Check Tokenizer parameters
@@ -230,6 +275,12 @@ sub check_options {
             $is_sub{$word} = 1;
         }
     }
+
+    $rOpts_code_skipping = $rOpts->{'code-skipping'};
+    $code_skipping_pattern_begin =
+      make_code_skipping_pattern( $rOpts, 'code-skipping-begin', '#<<V' );
+    $code_skipping_pattern_end =
+      make_code_skipping_pattern( $rOpts, 'code-skipping-end', '#>>V' );
     return;
 }
 
@@ -273,6 +324,7 @@ sub new {
     # _line_start_quote_     line where we started looking for a long quote
     # _in_here_doc_          flag indicating if we are in a here-doc
     # _in_pod_               flag set if we are in pod documentation
+    # _in_skipped_           flag set if we are in a skipped section
     # _in_error_             flag set if we saw severe error (binary in script)
     # _in_data_              flag set if we are in __DATA__ section
     # _in_end_               flag set if we are in __END__ section
@@ -296,6 +348,7 @@ sub new {
     $self->[_in_format_]                = 0;
     $self->[_in_error_]                 = 0;
     $self->[_in_pod_]                   = 0;
+    $self->[_in_skipped_]               = 0;
     $self->[_in_attribute_list_]        = 0;
     $self->[_in_quote_]                 = 0;
     $self->[_quote_target_]             = "";
@@ -513,6 +566,10 @@ EOM
         warning("hit EOF while in format description\n");
     }
 
+    if ( $tokenizer_self->[_in_skipped_] ) {
+        warning("hit EOF while in lines skipped with --code-skipping\n");
+    }
+
     if ( $tokenizer_self->[_in_pod_] ) {
 
         # Just write log entry if this is after __END__ or __DATA__
@@ -653,6 +710,11 @@ sub get_line {
 
     my $input_line_number = ++$tokenizer_self->[_last_line_number_];
 
+    my $write_logfile_entry = sub {
+        my ($msg) = @_;
+        write_logfile_entry("Line $input_line_number: $msg");
+    };
+
     # Find and remove what characters terminate this line, including any
     # control r
     my $input_line_separator = "";
@@ -739,7 +801,7 @@ sub get_line {
         if ( $candidate_target eq $here_doc_target ) {
             $tokenizer_self->[_nearly_matched_here_target_at_] = undef;
             $line_of_tokens->{_line_type} = 'HERE_END';
-            write_logfile_entry("Exiting HERE document $here_doc_target\n");
+            $write_logfile_entry->("Exiting HERE document $here_doc_target\n");
 
             my $rhere_target_list = $tokenizer_self->[_rhere_target_list_];
             if ( @{$rhere_target_list} ) {  # there can be multiple here targets
@@ -748,7 +810,7 @@ sub get_line {
                 $tokenizer_self->[_here_doc_target_] = $here_doc_target;
                 $tokenizer_self->[_here_quote_character_] =
                   $here_quote_character;
-                write_logfile_entry(
+                $write_logfile_entry->(
                     "Entering HERE document $here_doc_target\n");
                 $tokenizer_self->[_nearly_matched_here_target_at_] = undef;
                 $tokenizer_self->[_started_looking_for_here_target_at_] =
@@ -774,16 +836,28 @@ sub get_line {
         return $line_of_tokens;
     }
 
-    # must print line unchanged if we are in a format section
+    # Print line unchanged if we are in a format section
     elsif ( $tokenizer_self->[_in_format_] ) {
 
         if ( $input_line =~ /^\.[\s#]*$/ ) {
-            write_logfile_entry("Exiting format section\n");
-            $tokenizer_self->[_in_format_] = 0;
-            $line_of_tokens->{_line_type} = 'FORMAT_END';
+
+            # Decrement format depth count at a '.' after a 'format'
+            $tokenizer_self->[_in_format_]--;
+
+            # This is the end when count reaches 0
+            if ( !$tokenizer_self->[_in_format_] ) {
+                $write_logfile_entry->("Exiting format section\n");
+                $line_of_tokens->{_line_type} = 'FORMAT_END';
+            }
         }
         else {
             $line_of_tokens->{_line_type} = 'FORMAT';
+            if ( $input_line =~ /^\s*format\s+\w+/ ) {
+
+                # Increment format depth count at a 'format' within a 'format'
+                # This is a simple way to handle nested formats (issue c019).
+                $tokenizer_self->[_in_format_]++;
+            }
         }
         return $line_of_tokens;
     }
@@ -794,7 +868,7 @@ sub get_line {
         $line_of_tokens->{_line_type} = 'POD';
         if ( $input_line =~ /^=cut/ ) {
             $line_of_tokens->{_line_type} = 'POD_END';
-            write_logfile_entry("Exiting POD section\n");
+            $write_logfile_entry->("Exiting POD section\n");
             $tokenizer_self->[_in_pod_] = 0;
         }
         if ( $input_line =~ /^\#\!.*perl\b/ && !$tokenizer_self->[_in_end_] ) {
@@ -803,6 +877,18 @@ sub get_line {
             );
         }
 
+        return $line_of_tokens;
+    }
+
+    # print line unchanged if in skipped section
+    elsif ( $tokenizer_self->[_in_skipped_] ) {
+
+        # NOTE: marked as the existing type 'FORMAT' to keep html working
+        $line_of_tokens->{_line_type} = 'FORMAT';
+        if ( $input_line =~ /$code_skipping_pattern_end/ ) {
+            $write_logfile_entry->("Exiting code-skipping section\n");
+            $tokenizer_self->[_in_skipped_] = 0;
+        }
         return $line_of_tokens;
     }
 
@@ -824,7 +910,7 @@ sub get_line {
         # end of a pod section
         if ( $input_line =~ /^=(\w+)\b/ && $1 ne 'cut' ) {
             $line_of_tokens->{_line_type} = 'POD_START';
-            write_logfile_entry("Entering POD section\n");
+            $write_logfile_entry->("Entering POD section\n");
             $tokenizer_self->[_in_pod_] = 1;
             return $line_of_tokens;
         }
@@ -843,7 +929,7 @@ sub get_line {
         # end of a pod section
         if ( $input_line =~ /^=(\w+)\b/ && $1 ne 'cut' ) {
             $line_of_tokens->{_line_type} = 'POD_START';
-            write_logfile_entry("Entering POD section\n");
+            $write_logfile_entry->("Entering POD section\n");
             $tokenizer_self->[_in_pod_] = 1;
             return $line_of_tokens;
         }
@@ -933,13 +1019,14 @@ sub get_line {
 
     # now we know that it is ok to tokenize the line...
     # the line tokenizer will modify any of these private variables:
-    #        _rhere_target_list
-    #        _in_data
-    #        _in_end
-    #        _in_format
-    #        _in_error
-    #        _in_pod
-    #        _in_quote
+    #        _rhere_target_list_
+    #        _in_data_
+    #        _in_end_
+    #        _in_format_
+    #        _in_error_
+    #        _in_skipped_
+    #        _in_pod_
+    #        _in_quote_
     my $ending_in_quote_last = $tokenizer_self->[_in_quote_];
     tokenize_this_line($line_of_tokens);
 
@@ -974,15 +1061,24 @@ sub get_line {
                 warning(
 "=cut starts a pod section .. this can fool pod utilities.\n"
                 );
-                write_logfile_entry("Entering POD section\n");
+                $write_logfile_entry->("Entering POD section\n");
             }
         }
 
         else {
             $line_of_tokens->{_line_type} = 'POD_START';
-            write_logfile_entry("Entering POD section\n");
+            $write_logfile_entry->("Entering POD section\n");
         }
 
+        return $line_of_tokens;
+    }
+
+    # handle start of skipped section
+    if ( $tokenizer_self->[_in_skipped_] ) {
+
+        # NOTE: marked as the existing type 'FORMAT' to keep html working
+        $line_of_tokens->{_line_type} = 'FORMAT';
+        $write_logfile_entry->("Entering code-skipping section\n");
         return $line_of_tokens;
     }
 
@@ -1005,7 +1101,7 @@ sub get_line {
         $tokenizer_self->[_in_here_doc_]          = 1;
         $tokenizer_self->[_here_doc_target_]      = $here_doc_target;
         $tokenizer_self->[_here_quote_character_] = $here_quote_character;
-        write_logfile_entry("Entering HERE document $here_doc_target\n");
+        $write_logfile_entry->("Entering HERE document $here_doc_target\n");
         $tokenizer_self->[_started_looking_for_here_target_at_] =
           $input_line_number;
     }
@@ -1015,13 +1111,13 @@ sub get_line {
     # which are not tokenized (and cannot be read with <DATA> either!).
     if ( $tokenizer_self->[_in_data_] ) {
         $line_of_tokens->{_line_type} = 'DATA_START';
-        write_logfile_entry("Starting __DATA__ section\n");
+        $write_logfile_entry->("Starting __DATA__ section\n");
         $tokenizer_self->[_saw_data_] = 1;
 
         # keep parsing after __DATA__ if use SelfLoader was seen
         if ( $tokenizer_self->[_saw_selfloader_] ) {
             $tokenizer_self->[_in_data_] = 0;
-            write_logfile_entry(
+            $write_logfile_entry->(
                 "SelfLoader seen, continuing; -nlsl deactivates\n");
         }
 
@@ -1030,13 +1126,13 @@ sub get_line {
 
     elsif ( $tokenizer_self->[_in_end_] ) {
         $line_of_tokens->{_line_type} = 'END_START';
-        write_logfile_entry("Starting __END__ section\n");
+        $write_logfile_entry->("Starting __END__ section\n");
         $tokenizer_self->[_saw_end_] = 1;
 
         # keep parsing after __END__ if use AutoLoader was seen
         if ( $tokenizer_self->[_saw_autoloader_] ) {
             $tokenizer_self->[_in_end_] = 0;
-            write_logfile_entry(
+            $write_logfile_entry->(
                 "AutoLoader seen, continuing; -nlal deactivates\n");
         }
         return $line_of_tokens;
@@ -1061,7 +1157,7 @@ sub get_line {
     # Note: if keyword 'format' occurs in this line code, it is still CODE
     # (keyword 'format' need not start a line)
     if ( $tokenizer_self->[_in_format_] ) {
-        write_logfile_entry("Entering format section\n");
+        $write_logfile_entry->("Entering format section\n");
     }
 
     if ( $tokenizer_self->[_in_quote_]
@@ -1073,7 +1169,7 @@ sub get_line {
             /^\s*$/ )
         {
             $tokenizer_self->[_line_start_quote_] = $input_line_number;
-            write_logfile_entry(
+            $write_logfile_entry->(
                 "Start multi-line quote or pattern ending in $quote_target\n");
         }
     }
@@ -1081,7 +1177,7 @@ sub get_line {
         && !$tokenizer_self->[_in_quote_] )
     {
         $tokenizer_self->[_line_start_quote_] = -1;
-        write_logfile_entry("End of multi-line quote or pattern\n");
+        $write_logfile_entry->("End of multi-line quote or pattern\n");
     }
 
     # we are returning a line of CODE
@@ -1998,12 +2094,13 @@ EOM
                 if (
                     $expecting == OPERATOR
 
-                    # be sure this is not a method call of the form
+                    # Be sure this is not a method call of the form
                     # &method(...), $method->(..), &{method}(...),
                     # $ref[2](list) is ok & short for $ref[2]->(list)
                     # NOTE: at present, braces in something like &{ xxx }
-                    # are not marked as a block, we might have a method call
-                    && $last_nonblank_token !~ /^([\]\}\&]|\-\>)/
+                    # are not marked as a block, we might have a method call.
+                    # Added ')' to fix case c017, something like ()()()
+                    && $last_nonblank_token !~ /^([\]\}\)\&]|\-\>)/
 
                   )
                 {
@@ -2025,10 +2122,6 @@ EOM
                         if ( $next_nonblank_token ne ')' ) {
                             my $hint;
 
-                            # FIXME: this gives an error parsing something like
-                            #       $subsubs[0]()(0);
-                            # which is a valid syntax (see subsub.t).  We may
-                            # need to revise this coding.
                             error_if_expecting_OPERATOR('(');
 
                             if ( $last_nonblank_type eq 'C' ) {
@@ -2132,12 +2225,16 @@ EOM
                 complain("Repeated ','s \n");
             }
 
+            # Note that we have to check both token and type here because a
+            # comma following a qw list can have last token='(' but type = 'q'
+            elsif ( $last_nonblank_token eq '(' && $last_nonblank_type eq '{' )
+            {
+                warning("Unexpected leading ',' after a '('\n");
+            }
+
             # patch for operator_expected: note if we are in the list (use.t)
             if ( $statement_type eq 'use' ) { $statement_type = '_use' }
-##                FIXME: need to move this elsewhere, perhaps check after a '('
-##                elsif ($last_nonblank_token eq '(') {
-##                    warning("Leading ','s illegal in some versions of perl\n");
-##                }
+
         },
         ';' => sub {
             $context        = UNKNOWN_CONTEXT;
@@ -2241,8 +2338,7 @@ EOM
 
             # ATTRS: for a '{' following an attribute list, reset
             # things to look like we just saw the sub name
-            # FIXME: need to end with \b here??
-            if ( $statement_type =~ /^sub/ ) {
+            if ( $statement_type =~ /^sub\b/ ) {
                 $last_nonblank_token = $statement_type;
                 $last_nonblank_type  = 'i';
                 $statement_type      = "";
@@ -2478,6 +2574,11 @@ EOM
         },
         '*' => sub {    # typeglob, or multiply?
 
+            if ( $expecting == UNKNOWN && $last_nonblank_type eq 'Z' ) {
+                if ( $next_type ne 'b' && $next_type ne '(' ) {
+                    $expecting = TERM;
+                }
+            }
             if ( $expecting == TERM ) {
                 scan_identifier_fast();
             }
@@ -2527,7 +2628,7 @@ EOM
                 $in_attribute_list = 1;
             }
 
-            # Withing a signature, unless we are in a ternary.  For example,
+            # Within a signature, unless we are in a ternary.  For example,
             # from 't/filter_example.t':
             #    method foo4 ( $class: $bar ) { $class->bar($bar) }
             elsif ( $paren_type[$paren_depth] =~ /^sub\b/
@@ -2594,9 +2695,11 @@ EOM
         },
         '%' => sub {    # hash or modulo?
 
-            # first guess is hash if no following blank
+            # first guess is hash if no following blank or paren
             if ( $expecting == UNKNOWN ) {
-                if ( $next_type ne 'b' ) { $expecting = TERM }
+                if ( $next_type ne 'b' && $next_type ne '(' ) {
+                    $expecting = TERM;
+                }
             }
             if ( $expecting == TERM ) {
                 scan_identifier_fast();
@@ -2837,12 +2940,12 @@ EOM
 
         '&&' => sub {
             error_if_expecting_TERM()
-              if ( $expecting == TERM );
+              if ( $expecting == TERM && $last_nonblank_token ne ',' );    #c015
         },
 
         '||' => sub {
             error_if_expecting_TERM()
-              if ( $expecting == TERM );
+              if ( $expecting == TERM && $last_nonblank_token ne ',' );    #c015
         },
 
         '//' => sub {
@@ -3114,9 +3217,17 @@ EOM
         # stage 1 is a very simple pre-tokenization
         my $max_tokens_wanted = 0; # this signals pre_tokenize to get all tokens
 
-        # a little optimization for a full-line comment
+        # optimize for a full-line comment
         if ( !$in_quote && substr( $input_line, 0, 1 ) eq '#' ) {
-            $max_tokens_wanted = 1    # no use tokenizing a comment
+            $max_tokens_wanted = 1;    # no use tokenizing a comment
+
+            # and check for skipped section
+            if (   $rOpts_code_skipping
+                && $input_line =~ /$code_skipping_pattern_begin/ )
+            {
+                $tokenizer_self->[_in_skipped_] = 1;
+                return;
+            }
         }
 
         # start by breaking the line into pre-tokens
@@ -3612,7 +3723,7 @@ EOM
                         }
                     }
 
-                    # FIXME: Patch: mark something like x4 as an integer for now
+                    # NOTE: mark something like x4 as an integer for now
                     # It gets fixed downstream.  This is easier than
                     # splitting the pretoken.
                     else {
@@ -3699,8 +3810,6 @@ EOM
                             }
                         }
 
-                        # FIXME: could check for error in which next token is
-                        # not a word (number, punctuation, ..)
                         else {
                             $is_constant{$current_package}{$next_nonblank_token}
                               = 1;
@@ -3943,6 +4052,14 @@ EOM
 
                             }
 
+                            # Fix part 1 for git #63 in which a comment falls
+                            # between an -> and the following word.  An
+                            # alternate fix would be to change operator_expected
+                            # to return an UNKNOWN for this type.
+                            elsif ( $last_nonblank_type eq '->' ) {
+
+                            }
+
                             # don't complain about possible indirect object
                             # notation.
                             # For example:
@@ -3970,7 +4087,10 @@ EOM
                         # functions
                         $next_tok = $rtokens->[ $i + 1 ];
                         if ( $next_tok eq '(' ) {
-                            $type = 'U';
+
+                            # Fix part 2 for git #63.  Leave type as 'w' to keep
+                            # the type the same as if the -> were not separated
+                            $type = 'U' unless ( $last_nonblank_type eq '->' );
                         }
 
                         # underscore after file test operator is file handle
@@ -4737,6 +4857,9 @@ EOM
 # hash lookup table of operator expected values
 my %op_expected_table;
 
+# exceptions to perl's weird parsing rules after type 'Z'
+my %is_weird_parsing_rule_exception;
+
 BEGIN {
 
     # Always expecting TERM following these types:
@@ -4763,7 +4886,13 @@ BEGIN {
     push @q, ')';
     @{op_expected_table}{@q} = (OPERATOR) x scalar(@q);
 
+    # Fix for git #62: added '*' and '%'
+    @q = qw( < ? * % );
+    @{is_weird_parsing_rule_exception}{@q} = (OPERATOR) x scalar(@q);
+
 }
+
+use constant DEBUG_OPERATOR_EXPECTED => 0;
 
 sub operator_expected {
 
@@ -4989,7 +5118,7 @@ sub operator_expected {
         # The 'weird parsing rules' of next section do not work for '<' and '?'
         # It is best to mark them as unknown.  Test case:
         #  print $fh <DATA>;
-        elsif ( $tok =~ /^[\<\?]$/ ) {
+        elsif ( $is_weird_parsing_rule_exception{$tok} ) {
             $op_expected = UNKNOWN;
         }
 
@@ -5032,11 +5161,9 @@ sub operator_expected {
 
   RETURN:
 
-    # debug and diagnostics can go here..
-
-    0 && do {
+    DEBUG_OPERATOR_EXPECTED && do {
         print STDOUT
-"EXPECT: returns $op_expected for last type $last_nonblank_type token $last_nonblank_token\n";
+"OPERATOR_EXPECTED: returns $op_expected for last type $last_nonblank_type token $last_nonblank_token\n";
     };
 
     return $op_expected;
@@ -5351,6 +5478,15 @@ sub decide_if_code_block {
             {
                 $code_block_type = "";
             }
+        }
+
+        if ($code_block_type) {
+
+            # Patch for cases b1085 b1128: It is uncertain if this is a block.
+            # If this brace follows a bareword, then append a space as a signal
+            # to the formatter that this may not be a block brace.  To find the
+            # corresponding code in Formatter.pm search for 'b1085'.
+            $code_block_type .= " " if ( $code_block_type =~ /^\w/ );
         }
     }
 
@@ -5738,8 +5874,6 @@ sub guess_if_pattern_or_conditional {
     #   $is_pattern = 0 if probably not pattern,  =1 if probably a pattern
     #   msg = a warning or diagnostic message
     # USES GLOBAL VARIABLES: $last_nonblank_token
-
-    # FIXME: this needs to be rewritten
 
     my ( $i, $rtokens, $rtoken_map, $max_token_index ) = @_;
     my $is_pattern = 0;
@@ -7083,6 +7217,15 @@ sub scan_identifier_do {
 
 {    ## closure for sub do_scan_sub
 
+    my %warn_if_lexical;
+
+    BEGIN {
+
+        # lexical subs with these names can cause parsing errors in this version
+        my @q = qw( m q qq qr qw qx s tr y );
+        @{warn_if_lexical}{@q} = (1) x scalar(@q);
+    }
+
     # saved package and subnames in case prototype is on separate line
     my ( $package_saved, $subname_saved );
 
@@ -7153,6 +7296,8 @@ sub scan_identifier_do {
         my $id_scan_state   = $rinput_hash->{id_scan_state};
         my $max_token_index = $rinput_hash->{max_token_index};
 
+        my $i_entry = $i;
+
         # Determine the CALL TYPE
         # 1=sub
         # 2=(
@@ -7184,10 +7329,33 @@ sub scan_identifier_do {
             $match   = 1;
             $subname = $2;
 
-            $package = ( defined($1) && $1 ) ? $1 : $current_package;
-            $package =~ s/\'/::/g;
-            if ( $package =~ /^\:/ ) { $package = 'main' . $package }
-            $package =~ s/::$//;
+            my $is_lexical_sub =
+              $last_nonblank_type eq 'k' && $last_nonblank_token eq 'my';
+            if ( $is_lexical_sub && $1 ) {
+                warning("'my' sub $subname cannot be in package '$1'\n");
+                $is_lexical_sub = 0;
+            }
+
+            if ($is_lexical_sub) {
+
+                # lexical subs use the block sequence number as a package name
+                my $seqno =
+                  $current_sequence_number[BRACE][ $current_depth[BRACE] ];
+                $seqno   = 1 unless ( defined($seqno) );
+                $package = $seqno;
+                if ( $warn_if_lexical{$subname} ) {
+                    warning(
+"'my' sub '$subname' matches a builtin name and may not be handled correctly in this perltidy version.\n"
+                    );
+                }
+            }
+            else {
+                $package = ( defined($1) && $1 ) ? $1 : $current_package;
+                $package =~ s/\'/::/g;
+                if ( $package =~ /^\:/ ) { $package = 'main' . $package }
+                $package =~ s/::$//;
+            }
+
             my $pos  = pos($input_line);
             my $numc = $pos - $pos_beg;
             $tok  = 'sub ' . substr( $input_line, $pos_beg, $numc );
@@ -7226,9 +7394,9 @@ sub scan_identifier_do {
             $proto = $1;
             $attrs = $2;
 
-       # Append the prototype to the starting token if it is 'sub' or
-       # 'prototype'.  This is not necessary but for compatibility with previous
-       # versions when the -csc flag is used:
+            # Append the prototype to the starting token if it is 'sub' or
+            # 'prototype'.  This is not necessary but for compatibility with
+            # previous versions when the -csc flag is used:
             if ( $proto && ( $match || $call_type == PROTOTYPE_CALL ) ) {
                 $tok .= $proto;
             }
@@ -7241,7 +7409,12 @@ sub scan_identifier_do {
             }
 
             $match ||= 1;
+
+            # Patch part #1 to fixes cases b994 and b1053:
+            # Mark an anonymous sub keyword without prototype as type 'k', i.e.
+            #    'sub : lvalue { ...'
             $type = 'i';
+            if ( $tok eq 'sub' && !$proto ) { $type = 'k' }
         }
 
         if ($match) {
@@ -7271,6 +7444,19 @@ sub scan_identifier_do {
                     $max_token_index );
                 if ($error) { warning("Possibly invalid sub\n") }
 
+            # Patch part #2 to fixes cases b994 and b1053:
+            # Do not let spaces be part of the token of an anonymous sub keyword
+            # which we marked as type 'k' above...i.e. for something like:
+            #    'sub : lvalue { ...'
+            # Back up and let it be parsed as a blank
+                if (   $type eq 'k'
+                    && $attrs
+                    && $i > $i_entry
+                    && substr( $rtokens->[$i], 0, 1 ) eq ' ' )
+                {
+                    $i--;
+                }
+
                 # check for multiple definitions of a sub
                 ( $next_nonblank_token, my $i_next ) =
                   find_next_nonblank_token_on_this_line( $i, $rtokens,
@@ -7296,15 +7482,23 @@ sub scan_identifier_do {
                     # Check for multiple definitions of a sub, but
                     # it is ok to have multiple sub BEGIN, etc,
                     # so we do not complain if name is all caps
-                    if (   $saw_function_definition{$package}{$subname}
+                    if (   $saw_function_definition{$subname}{$package}
                         && $subname !~ /^[A-Z]+$/ )
                     {
-                        my $lno = $saw_function_definition{$package}{$subname};
-                        warning(
+                        my $lno = $saw_function_definition{$subname}{$package};
+                        if ( $package =~ /^\d/ ) {
+                            warning(
+"already saw definition of lexical 'sub $subname' at line $lno\n"
+                            );
+
+                        }
+                        else {
+                            warning(
 "already saw definition of 'sub $subname' in package '$package' at line $lno\n"
-                        );
+                            );
+                        }
                     }
-                    $saw_function_definition{$package}{$subname} =
+                    $saw_function_definition{$subname}{$package} =
                       $tokenizer_self->[_last_line_number_];
                 }
             }
@@ -7318,7 +7512,10 @@ sub scan_identifier_do {
             # Setting 'statement_type' causes any ':'s to introduce
             # attributes.
             elsif ( $next_nonblank_token eq ':' ) {
-                $statement_type = $tok if ( $call_type == SUB_CALL );
+                if ( $call_type == SUB_CALL ) {
+                    $statement_type =
+                      substr( $tok, 0, 3 ) eq 'sub' ? $tok : 'sub';
+                }
             }
 
             # if we stopped before an open paren ...
@@ -7333,9 +7530,12 @@ sub scan_identifier_do {
                 if ( !$saw_opening_paren ) {
                     $id_scan_state = 'sub';    # we must come back to get proto
                 }
-                $statement_type = $tok if ( $call_type == SUB_CALL );
+                if ( $call_type == SUB_CALL ) {
+                    $statement_type =
+                      substr( $tok, 0, 3 ) eq 'sub' ? $tok : 'sub';
+                }
             }
-            elsif ($next_nonblank_token) {     # EOF technically ok
+            elsif ($next_nonblank_token) {    # EOF technically ok
                 $subname = "" unless defined($subname);
                 warning(
 "expecting ':' or ';' or '{' after definition or declaration of sub '$subname' but saw '$next_nonblank_token'\n"
@@ -7662,9 +7862,10 @@ sub scan_number_do {
 
     # handle v-string without leading 'v' character ('Two Dot' rule)
     # (vstring.t)
-    # TODO: v-strings may contain underscores
+    # Here is the format prior to including underscores:
+    ## if ( $input_line =~ /\G((\d+)?\.\d+(\.\d+)+)/g ) {
     pos($input_line) = $pos_beg;
-    if ( $input_line =~ /\G((\d+)?\.\d+(\.\d+)+)/g ) {
+    if ( $input_line =~ /\G((\d[_\d]*)?\.[\d_]+(\.[\d_]+)+)/g ) {
         $pos = pos($input_line);
         my $numc = $pos - $pos_beg;
         $number = substr( $input_line, $pos_beg, $numc );
@@ -7695,13 +7896,13 @@ sub scan_number_do {
            |([xX][0-9a-fA-F_]+)        
 
 	   # or octal fraction
-           |([0-7_]+               # string of octal digits 
+           |([oO]?[0-7_]+          # string of octal digits
            (\.([0-7][0-7_]*)?)?    # optional decimal and fraction
            [Pp][+-]?[0-7]          # REQUIRED exponent, no underscore
-           [0-7_]*)                # Additonal exponent digits, with underscores
+           [0-7_]*)                # Additional exponent digits with underscores
 
            # or octal integer
-           |([0-7_]+)               # string of octal digits 
+           |([oO]?[0-7_]+)         # string of octal digits
 
            # or a binary float
            |([bB][01_]*            # 'b' with string of binary digits 

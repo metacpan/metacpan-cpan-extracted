@@ -22,6 +22,9 @@
     * parse settings from env variables LICENSECHECK LICENSECHECK_GREP
       (treated as fallback for --licensecheck-* options without prefix)
     * by default output verbatim text, with filename prefixed if multiple
+  * maybe implement licensegreple
+    * like licensegrep, but with syntax matching greple
+      <https://metacpan.org/pod/greple>
   * implement licensediff
     * parse options and arguments like diff (or git diff?)
     * fail on any option supported by diff but unsupported here
@@ -103,6 +106,7 @@
       e.g. using Progress::Any or Time::Progress (see SeeAlso of Time::Progress).
   * Detect non-commercial license.
     (?i:(?:\w{4}|\W(?:[^oO]\w|\w[^rR]|[^aA]\w\w|\w[^nN]\w|\w\w[^dD])) non[-_ ]commercial)
+  * Detect bugroff license <http://tunes.org/legalese/bugroff.html>
   * Compare against competitors
     + ripper
     + https://salsa.debian.org/stuart/package-license-checker
@@ -115,6 +119,7 @@
     + http://voag.linkedmodel.org/2.0/doc/2015/REFDATA_voag-licenses-v2.0.html
     + https://github.com/hierynomus/license-gradle-plugin
     + ruby-licensee - http://ben.balter.com/licensee/
+    + flict - https://github.com/vinland-technology/flict
   * Warn about licensing conflicts
     + See adequate
   * Sort Files sections to list common over exotic:

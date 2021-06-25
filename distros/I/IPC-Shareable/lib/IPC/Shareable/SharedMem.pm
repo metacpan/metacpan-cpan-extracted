@@ -6,7 +6,7 @@ use strict;
 use Carp qw(carp croak confess);
 use IPC::SysV qw(IPC_RMID);
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 use constant DEBUGGING => ($ENV{SHM_DEBUG} or 0);
 

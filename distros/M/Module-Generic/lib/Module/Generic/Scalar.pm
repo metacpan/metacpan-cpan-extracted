@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/Scalar.pm
-## Version v1.0.0
+## Version v1.0.1
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/20
-## Modified 2021/03/20
+## Modified 2021/04/21
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -78,7 +78,7 @@ BEGIN
         },
         fallback => 1,
     );
-    our( $VERSION ) = 'v1.0.0';
+    our( $VERSION ) = 'v1.0.1';
 };
 
 ## sub new { return( shift->_new( @_ ) ); }
@@ -112,7 +112,11 @@ sub new
 
 sub append { ${$_[0]} .= $_[1]; return( $_[0] ); }
 
+sub as_array { return( Module::Generic::Array->new( [ ${$_[0]} ] ) ); }
+
 sub as_boolean { return( Module::Generic::Boolean->new( ${$_[0]} ? 1 : 0 ) ); }
+
+sub as_number { return( $_[0]->_number( ${$_[0]} ) ); }
 
 ## sub as_string { CORE::defined( ${$_[0]} ) ? return( ${$_[0]} ) : return; }
 
@@ -232,6 +236,8 @@ sub is_numeric { return( Scalar::Util::looks_like_number( ${$_[0]} ) ); }
 
 sub is_upper { return( ${$_[0]} =~ /^[[:upper:]]+$/ ); }
 
+sub join { return( __PACKAGE__->new( CORE::join( CORE::splice( @_, 1, 1 ), ${ shift( @_ ) }, @_ ) ) ); }
+
 sub lc { return( __PACKAGE__->_new( CORE::lc( ${$_[0]} ) ) ); }
 
 sub lcfirst { return( __PACKAGE__->_new( CORE::lcfirst( ${$_[0]} ) ) ); }
@@ -276,6 +282,14 @@ sub match
     return( $$self =~ /$re/ );
 }
 
+sub open
+{
+    my $self = shift( @_ );
+    my $io = Module::Generic::Scalar::IO->new( $self ) ||
+    return( $self->pass_error( Module::Generic::Scalar::IO->error ) );
+    return( $io );
+}
+
 sub ord { return( $_[0]->_number( CORE::ord( ${$_[0]} ) ) ); }
 
 sub pad
@@ -304,6 +318,8 @@ sub pad
 }
 
 sub pos { return( $_[0]->_number( @_ > 1 ? ( CORE::pos( ${$_[0]} ) = $_[1] ) : CORE::pos( ${$_[0]} ) ) ); }
+
+sub prepend { return( shift->substr( 0, 0, shift( @_ ) ) ); }
 
 sub quotemeta { return( __PACKAGE__->_new( CORE::quotemeta( ${$_[0]} ) ) ); }
 
@@ -410,6 +426,8 @@ sub substr
     return( __PACKAGE__->_new( CORE::substr( ${$self}, $offset ) ) );
 }
 
+sub TO_JSON { CORE::return( ${$_[0]} ); }
+
 ## The 3 dash here are just so my editor does not get confused with colouring
 sub tr ###
 {
@@ -460,6 +478,105 @@ sub _number
 sub _new { return( shift->Module::Generic::Scalar::new( @_ ) ); }
 
 sub _warnings_is_enabled { return( warnings::enabled( ref( $_[0] ) || $_[0] ) ); }
+
+# XXX Module::Generic::Scalar::IO class
+{
+    package
+        Module::Generic::Scalar::IO;
+    use parent qw( IO::Scalar );
+    use Module::Generic::Exception ();
+    use Scalar::Util ();
+    use overload (
+        '""' => sub{ ${ *{$_[0]}->{SR} } },
+        # '""' => 'as_string',
+        fallback => 1,
+    );
+    our $ERROR = '';
+    our $VERSION = 'v0.1.0';
+
+#     sub as_string
+#     {
+#         my $self = shift( @_ );
+#         print( STDERR __PACKAGE__, "::as_string: Scalar ref object is: ", overload::StrVal( *$self->{SR} ), "\n" );
+#         return( ${ *$self->{SR} } );
+#     }
+    
+    sub close
+    {
+        my $self = CORE::shift( @_ );
+        untie( *$self );
+        return( 1 );
+    }
+    
+    sub error
+    {
+        my $self = shift( @_ );
+        if( @_ )
+        {
+            my $opts = {};
+            if( ref( $_[0] ) eq 'HASH' )
+            {
+                $opts = shift( @_ );
+            }
+            else
+            {
+                $opts->{message} = join( '', map( ref( $_ ) eq 'CODE' ? $_->() : $_, @_ ) );
+                # http server error
+                $opts->{code} = 500;
+            }
+            $opts->{skip_frames} = 1;
+            *$self->{error} = $ERROR = Module::Generic::Exception->new( $opts );
+            return;
+        }
+        else
+        {
+            return( ref( $self ) ? *$self->{error} : $ERROR );
+        }
+    }
+
+    sub length
+    {
+        my $self = CORE::shift( @_ );
+        return( CORE::length( ${ *$self->{SR} } ) );
+    }
+    
+    sub object { return( *{ $_[0] }->{SR} ) }
+
+    sub open
+    {
+        my( $self, $ref ) = @_;
+        # print( STDERR __PACKAGE__, "::open: scalar ref provded is: ", overload::StrVal( $ref ), " (", defined( $$sref ) ? 'undefined' : $$sref, ")\n" );
+        unless( Scalar::Util::blessed( $ref ) && $ref->isa( 'Module::Generic::Scalar' ) )
+        {
+            return( $self->error( "Value provided for ", ref( $self ), " is not an Module::Generic::Scalar object." ) );
+        }
+
+        # Setup:
+        *$self->{Pos} = 0;          # seek position
+        *$self->{SR}  = $ref;      # scalar reference
+        # print( STDERR __PACKAGE__, "::open: Scalar ref object is: ", overload::StrVal( *$self->{SR} ), "\n" );
+        return( $self );
+    }
+    
+    sub opened { return( tied( *{$_[0]} ) ); }
+    
+    sub print
+    {
+        my $self = CORE::shift( @_ );
+        my $len  = CORE::length( ${*$self->{SR}} );
+        substr( ${*$self->{SR}}, *$self->{Pos}, 0, CORE::join( '', @_ ) . (CORE::defined( $\ ) ? $\ : "" ) );
+        *$self->{Pos} += ( CORE::length( ${*$self->{SR}} ) - $len );
+        # print( STDERR __PACKAGE__, "::print: Position is ", *$self->{Pos}, " and length is: ", length( ${*$self->{SR}} ), "\n" );
+        1;
+    }
+    
+    sub truncate
+    {
+        my $self = CORE::shift( @_ );
+        my $removed = CORE::substr( ${*$self->{SR}}, *$self->{Pos}, CORE::length( ${*$self->{SR}} ) - *$self->{Pos}, '' );
+        return( CORE::length( $removed ) );
+    }
+}
 
 1;
 

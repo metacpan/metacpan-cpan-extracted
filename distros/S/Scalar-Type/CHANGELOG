@@ -1,3 +1,7 @@
+0.1.2    2021-06-22
+
+- bugfix: pay attention to the IsUV flag for numified strings
+
 0.1.1    2021-06-03
 
 - bugfix: all functions require an argument; to not supply one is a fatal error.

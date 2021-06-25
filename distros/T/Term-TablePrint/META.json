@@ -32,13 +32,14 @@
       },
       "runtime" : {
          "requires" : {
+            "Carp" : "0",
             "Data::Dumper" : "0",
             "Exporter" : "0",
             "List::Util" : "1.33",
             "Scalar::Util" : "0",
-            "Term::Choose" : "1.731",
-            "Term::Choose::Util" : "0.123",
-            "Term::Form" : "0.532",
+            "Term::Choose" : "1.733",
+            "Term::Choose::Util" : "0.124",
+            "Term::Form" : "0.534",
             "constant" : "0",
             "perl" : "5.008003",
             "strict" : "0",
@@ -57,6 +58,6 @@
          "web" : "https://github.com/kuerbis/Term-TablePrint"
       }
    },
-   "version" : "0.135",
+   "version" : "0.138",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

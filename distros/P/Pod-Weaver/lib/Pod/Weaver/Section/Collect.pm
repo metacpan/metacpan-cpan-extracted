@@ -1,9 +1,17 @@
-package Pod::Weaver::Section::Collect;
+package Pod::Weaver::Section::Collect 4.018;
 # ABSTRACT: a section that gathers up specific commands
-$Pod::Weaver::Section::Collect::VERSION = '4.017';
+
 use Moose;
-with 'Pod::Weaver::Role::Section';
-with 'Pod::Weaver::Role::Transformer';
+with 'Pod::Weaver::Role::Section',
+     'Pod::Weaver::Role::Transformer';
+
+# BEGIN BOILERPLATE
+use v5.20.0;
+use warnings;
+use utf8;
+no feature 'switch';
+use experimental qw(postderef postderef_qq); # This experiment gets mainlined.
+# END BOILERPLATE
 
 #pod =head1 OVERVIEW
 #pod
@@ -109,7 +117,7 @@ sub transform_document {
   } 0 .. $#$children;
 
   my $container = $container_id
-    ? splice @{ $children }, $container_id, 1 # excise host
+    ? splice @$children, $container_id, 1 # excise host
     : Pod::Elemental::Element::Nested->new({ # synthesize new host
         command => $self->header_command,
         content => $self->header,
@@ -123,12 +131,12 @@ sub transform_document {
   });
 
   $nester->transform_node($document);
-  my @children = @{$container->children}; # rescue children
+  my @children = $container->children->@*; # rescue children
   $gatherer->transform_node($document); # insert host at position of first adopt-child and inject it with adopt-children
-  foreach my $child (@{ $container->children }) {
+  foreach my $child ($container->children->@*) {
     $child->command( $self->new_command ) if $child->command eq $command;
   }
-  unshift @{$container->children}, @children; # give original children back to host
+  unshift $container->children->@*, @children; # give original children back to host
 }
 
 sub weave_section {
@@ -141,10 +149,10 @@ sub weave_section {
   my @found = grep {
     my ($i, $para) = ($_, $in_node->[$_]);
     ($para == $self->__used_container)
-      && @{ $self->__used_container->children };
+      && $self->__used_container->children->@*;
   } (0 .. $#$in_node);
 
-  push @{ $document->children }, map { splice @$in_node, $_, 1 } reverse @found;
+  push $document->children->@*, map { splice @$in_node, $_, 1 } reverse @found;
 }
 
 __PACKAGE__->meta->make_immutable;
@@ -162,7 +170,7 @@ Pod::Weaver::Section::Collect - a section that gathers up specific commands
 
 =head1 VERSION
 
-version 4.017
+version 4.018
 
 =head1 OVERVIEW
 
@@ -176,6 +184,17 @@ found in the C<pod_document>.  Those commands, along with their nestable
 content, will be collected under a C<=head1 METHODS> header and placed in the
 correct location in the output stream.  Their order will be preserved as it was
 in the source document.
+
+=head1 PERL VERSION SUPPORT
+
+This module has the same support period as perl itself:  it supports the two
+most recent versions of perl.  (That is, if the most recently released version
+is v5.40, then this module should work on both v5.40 and v5.38.)
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
 
 =head1 ATTRIBUTES
 
@@ -201,7 +220,7 @@ The title of the section to be added.
 
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@cpan.org>
+Ricardo SIGNES <rjbs@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

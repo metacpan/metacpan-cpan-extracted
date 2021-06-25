@@ -1,5 +1,8 @@
 Revision history for Perl extension Dist::Zilla::Plugin::GitHub::RequireGreenBuild
 
+0.03      2021-06-21 10:19:12-07:00 America/Vancouver
+    - Bump minimum Perl version to v5.20 (matching upstream DZil minimum)
+
 0.02      2021-01-10 23:40:59-08:00 America/Vancouver
     - show successful status when running "dzil release" without "--verbose"
     - list "Moose" as an explicit dependency, instead of having it implied

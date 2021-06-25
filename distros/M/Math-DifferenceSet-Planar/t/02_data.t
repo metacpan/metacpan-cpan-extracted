@@ -12,7 +12,7 @@ use warnings;
 use File::Spec;
 use FindBin;
 
-use Test::More tests => 42;
+use Test::More tests => 61;
 BEGIN { use_ok('Math::DifferenceSet::Planar::Data') };
 
 #########################
@@ -20,10 +20,18 @@ BEGIN { use_ok('Math::DifferenceSet::Planar::Data') };
 local $Math::DifferenceSet::Planar::Data::DATABASE_DIR =
     File::Spec->catfile($FindBin::Bin, 'db');
 
+my $TYPE_PREFIX = 'Math::DifferenceSet::Planar::Schema::Result::';
+
 my $data = Math::DifferenceSet::Planar::Data->new;
 isa_ok($data, 'Math::DifferenceSet::Planar::Data');
+is($data->min_order, 2);
 is($data->max_order, 149);
 is($data->count, 48);
+is($data->sp_count, 0);
+is($data->sp_min_order, undef);
+is($data->sp_max_order, 0);
+ok(!$data->iterate_spaces->());
+ok(!$data->get_space(8));
 
 my @dbs = Math::DifferenceSet::Planar::Data->list_databases;
 is("@dbs", 'pds_48.db pds.db extra.db');
@@ -31,17 +39,19 @@ is("@dbs", 'pds_48.db pds.db extra.db');
 my $extra_path = File::Spec->catfile($FindBin::Bin, 'db', 'extra.db');
 $data = Math::DifferenceSet::Planar::Data->new($extra_path);
 isa_ok($data, 'Math::DifferenceSet::Planar::Data');
+is($data->min_order, 11);
 is($data->max_order, 11);
 is($data->count, 1);
 is($data->path, $extra_path);
 
 $data = Math::DifferenceSet::Planar::Data->new('pds.db');
 isa_ok($data, 'Math::DifferenceSet::Planar::Data');
+is($data->min_order, 2);
 is($data->max_order, 9);
 is($data->count, 7);
 
 my $rec = $data->get(9);
-isa_ok($rec, 'Math::DifferenceSet::Planar::Schema::Result::DifferenceSet');
+isa_ok($rec, $TYPE_PREFIX . 'DifferenceSet');
 is($rec->order, 9);
 is($rec->base, 3);
 is($rec->exponent, 2);
@@ -129,4 +139,24 @@ while (my $r = $it->()) {
 }
 is("@ords", '8 7');
 ok(!$has_deltas);
+
+my $space = $data->get_space(9);
+isa_ok($space, $TYPE_PREFIX . 'DifferenceSetSpace');
+is($space->mul_radix, 3);
+is($space->mul_depth, 6);
+my ($radices, $depths) = $space->rotator_space;
+is(ref($radices), 'ARRAY');
+is(0+@{$radices}, 1);
+is(ref($depths), 'ARRAY');
+is("@{$depths}", '12');
+
+$it = $data->iterate_spaces;
+@ords = ();
+while (my $r = $it->()) {
+    push @ords, $r->order;
+}
+is("@ords", '2 3 4 5 7 8 9');
+is($data->sp_count, 7);
+is($data->sp_min_order, 2);
+is($data->sp_max_order, 9);
 

@@ -10,7 +10,7 @@ use Alien::Build::Temp;
 use File::Copy qw( move );
 use Text::ParseWords qw( shellwords );
 use Test2::API qw( context run_subtest );
-use base qw( Exporter );
+use Exporter qw( import );
 use Path::Tiny qw( path );
 use Alien::Build::Util qw( _dump );
 use Config;
@@ -18,7 +18,7 @@ use Config;
 our @EXPORT = qw( alien_ok run_ok xs_ok ffi_ok with_subtest synthetic helper_ok interpolate_template_is );
 
 # ABSTRACT: Testing tools for Alien modules
-our $VERSION = '2.40'; # VERSION
+our $VERSION = '2.41'; # VERSION
 
 
 our @aliens;
@@ -669,7 +669,7 @@ Test::Alien - Testing tools for Alien modules
 
 =head1 VERSION
 
-version 2.40
+version 2.41
 
 =head1 SYNOPSIS
 
@@ -1073,6 +1073,8 @@ Shawn Laffan (SLAFFAN)
 Paul Evans (leonerd, PEVANS)
 
 Håkon Hægland (hakonhagland, HAKONH)
+
+nick nauwelaerts (INPHOBIA)
 
 =head1 COPYRIGHT AND LICENSE
 

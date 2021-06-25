@@ -1,0 +1,51 @@
+NAME
+    App::SQLiteKeyValueStoreSimpleUtils - CLI utilities for
+    SQLite::KeyValueStore::Simple
+
+VERSION
+    This document describes version 0.001 of
+    App::SQLiteKeyValueStoreSimpleUtils (from Perl distribution
+    App-SQLiteKeyValueStoreSimpleUtils), released on 2021-06-18.
+
+DESCRIPTION
+    This distribution provides the following command-line utilities:
+
+    *   check-sqlite-kvstore-key-exists
+
+    *   get-sqlite-kvstore-value
+
+    *   list-sqlite-kvstore-keys
+
+    *   set-sqlite-kvstore-value
+
+    which are basically CLI front-end for the functions in
+    SQLite::KeyValueStore::Simple.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-SQLiteKeyValueStoreSimpleUtils>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-SQLiteKeyValueStoreSimpleUtils>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-SQLiteKeyValueSto
+    reSimpleUtils>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    SQLite::KeyValueStore::Simple.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2021 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

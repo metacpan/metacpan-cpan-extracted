@@ -177,13 +177,13 @@ The framework includes these command line tools to manage worker pools:
 Beekeeper is pretty lightweight for being pure Perl, but the performance depends mostly on *the broker*
 performance, particularly on the broker introduced latency. These are ballpark performance estimations:
 
-- A `call_remote` synchronous call involves 4 MQTT messages. A broker adds around 3 ms of latency 
-  processing these 4 messages, so this limits a single client to make a maximum of 350 synchronous 
+- A `call_remote` synchronous call involves 4 MQTT messages. A broker adds around 2.5 ms of latency 
+  processing these 4 messages, so this limits a single client to make a maximum of 400 synchronous 
   calls per second. The cpu load will be very low (less than 1%), as the client spends most of the
   time waiting for messages.
 
-- A `call_remote_async` asynchronous call to a remote method takes 0.3 ms. This implies a maximum of
-  3500 asynchronous calls per second (just the call, then it must wait for responses).
+- A `call_remote_async` asynchronous call to a remote method takes 0.12 ms. This implies a maximum of
+  8000 asynchronous calls per second (that is just for calls, then it must wait for responses).
 
 - Launching a remote task with `fire_remote` involves 1 MQTT message and takes 0.1 ms. This implies
   a maximum of 10000 calls per second.
@@ -199,7 +199,7 @@ performance, particularly on the broker introduced latency. These are ballpark p
   code to do useful work the memory usage will of course increase. As a lot of workers will be required
   to handle a substantial number of requests, there will be some memory pressure. 
 
-- A single router can handle around 3000 requests per second.
+- A single router can handle around 4000 requests per second.
 
 - Routers add 2 ms to frontend requests roundtrip.
 

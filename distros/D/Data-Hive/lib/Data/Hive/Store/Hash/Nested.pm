@@ -1,8 +1,8 @@
 use strict;
 use warnings;
-package Data::Hive::Store::Hash::Nested;
+package Data::Hive::Store::Hash::Nested 1.014;
 # ABSTRACT: store a hive in nested hashrefs
-$Data::Hive::Store::Hash::Nested::VERSION = '1.013';
+
 use parent 'Data::Hive::Store';
 
 #pod =head1 DESCRIPTION
@@ -247,7 +247,7 @@ Data::Hive::Store::Hash::Nested - store a hive in nested hashrefs
 
 =head1 VERSION
 
-version 1.013
+version 1.014
 
 =head1 DESCRIPTION
 
@@ -288,6 +288,16 @@ although fairly unlikely, that this format will change again.  The Hash store
 should generally be used for testing things that use a hive, as opposed for
 building hashes that will be used for anything else.
 
+=head1 PERL VERSION SUPPORT
+
+This module has a long-term perl support period.  That means it will not
+require a version of perl released fewer than five years ago.
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
+
 =head1 METHODS
 
 =head2 new
@@ -324,7 +334,7 @@ Hans Dieter Pearcey <hdp@cpan.org>
 
 =item *
 
-Ricardo Signes <rjbs@cpan.org>
+Ricardo Signes <rjbs@semiotic.systems>
 
 =back
 

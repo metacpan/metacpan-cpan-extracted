@@ -10,6 +10,8 @@ pod_spelling_system:
     - libt
     - cflags
     - libs
+    - api
+    - compat
 
 pod_coverage:
   skip: 0

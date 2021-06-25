@@ -19,7 +19,7 @@ use Types::Standard qw( Value Object Ref );
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.5.0';
+our $VERSION = 'v0.5.1';
 
 
 sub import {
@@ -125,7 +125,7 @@ MooX::Const - Syntactic sugar for constant and write-once Moo attributes
 
 =head1 VERSION
 
-version v0.5.0
+version v0.5.1
 
 =head1 SYNOPSIS
 
@@ -225,6 +225,8 @@ L<Devel::StrictMode>
 
 L<Moo>
 
+L<MooseX::SetOnce>
+
 L<Types::Const>
 
 L<Type::Tiny>
@@ -258,7 +260,7 @@ Kang-min Liu 劉康民 <gugod@gugod.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018-2020 by Robert Rothenberg.
+This software is Copyright (c) 2018-2021 by Robert Rothenberg.
 
 This is free software, licensed under:
 

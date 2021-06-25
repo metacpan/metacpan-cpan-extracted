@@ -8,7 +8,19 @@ use experimental qw( signatures );
 
 is(
   dies { Archive::Libarchive::Extract->new },
-  match qr/^Required option: filename at t\/archive_libarchiv/,
+  match qr/^Required option: one of filename or memory at t\/archive_libarchiv/,
+  'undef filename',
+);
+
+is(
+  dies { Archive::Libarchive::Extract->new( filename => 'xxx', memory => 'yyy' ) },
+  match qr/^Exactly one of filename or memory is required at t\/archive_libarchiv/,
+  'undef filename',
+);
+
+is(
+  dies { Archive::Libarchive::Extract->new( memory => 'yyy' ) },
+  match qr/^Option memory must be a scalar reference to a plain non-reference scalar at t\/archive_libarchiv/,
   'undef filename',
 );
 
@@ -29,53 +41,61 @@ subtest 'extract' => sub {
   foreach my $to (undef, tempdir( CLEANUP => 1 ))
   {
 
-    subtest "to => @{[ $to // 'undef' ]}" => sub {
+    foreach my $from ('memory','disk') {
 
-      my $tarball;
+      subtest "from <= $from, to => @{[ $to // 'undef' ]}" => sub {
 
-      local $CWD = $CWD;
+        my $tarball;
 
-      if(defined $to)
-      {
-        $tarball = path('corpus/archive.tar');
-        note "extracting to non-cwd $to";
-        note "archive: $tarball";
-      }
-      else
-      {
-        $tarball = path('corpus/archive.tar')->absolute;
-        $CWD = tempdir( CLEANUP => 1 );
-        note "extracting to cwd $CWD";
-        note "archive: $tarball";
-      }
+        local $CWD = $CWD;
 
-      my $extract = Archive::Libarchive::Extract->new( filename => "$tarball" );
-      isa_ok $extract, 'Archive::Libarchive::Extract';
+        if(defined $to)
+        {
+          $tarball = path('corpus/archive.tar');
+          note "extracting to non-cwd $to";
+          note "archive: $tarball";
+        }
+        else
+        {
+          $tarball = path('corpus/archive.tar')->absolute;
+          $CWD = tempdir( CLEANUP => 1 );
+          note "extracting to cwd $CWD";
+          note "archive: $tarball";
+        }
 
-      ok(! do { no warnings; -d $extract->to } );
+        my $extract = Archive::Libarchive::Extract->new(
+          $from eq 'memory'
+            ? (memory   => \path("$tarball")->slurp_raw)
+            : (filename => "$tarball")
+        );
+        isa_ok $extract, 'Archive::Libarchive::Extract';
 
-      try_ok { $extract->extract( to => $to ) };
+        ok(! do { no warnings; -d $extract->to } );
 
-      is(
-        path($to // $CWD),
-        object {
-          call [child => 'archive/foo.txt'] => object {
-            call slurp_utf8 => "hello\n";
-          };
-          call [child => 'archive/bar.txt'] => object {
-            call slurp_utf8 => "there\n";
-          };
-        },
-        'files',
-      );
+        try_ok { $extract->extract( to => $to ) };
 
-      is(
-        [$extract->entry_list],
-        ['archive/','archive/bar.txt','archive/foo.txt'],
-        'entry_list'
-      );
+        is(
+          path($to // $CWD),
+          object {
+            call [child => 'archive/foo.txt'] => object {
+              call slurp_utf8 => "hello\n";
+            };
+            call [child => 'archive/bar.txt'] => object {
+              call slurp_utf8 => "there\n";
+            };
+          },
+          'files',
+        );
 
-      ok(-d $extract->to);
+        is(
+          [$extract->entry_list],
+          ['archive/','archive/bar.txt','archive/foo.txt'],
+          'entry_list'
+        );
+
+        ok(-d $extract->to);
+
+      };
 
     };
 

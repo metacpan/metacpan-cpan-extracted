@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 2.40
+    version 2.41
 
 SYNOPSIS
 
@@ -969,6 +969,8 @@ AUTHOR
     Paul Evans (leonerd, PEVANS)
 
     Håkon Hægland (hakonhagland, HAKONH)
+
+    nick nauwelaerts (INPHOBIA)
 
 COPYRIGHT AND LICENSE
 

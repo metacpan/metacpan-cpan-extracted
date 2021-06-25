@@ -190,10 +190,10 @@ sub prelight_color
 		$coeff = 1/$coeff;
 	}
 	$coeff = ($coeff - 1) * 256;
-	my @channels = map { $_ & 0xff } cl::to_rgb($color);
+	my @channels = cl::to_rgb($color);
 	for (@channels) {
 		my $amp = ( 256 - $_ ) / 8;
-		$amp -= $amp if $coeff < 0;
+		$amp = -$amp if $coeff < 0;
 		$_ += $coeff + $amp;
 		$_ = 255 if $_ > 255;
 		$_ = 0   if $_ < 0;
@@ -205,7 +205,7 @@ sub text_split_lines
 {
 	my ($self, $text) = @_;
 	return ref($text) ?
-		@{ $self-> text_wrap( $text, 2_000_000_000, tw::NewLineBreak ) } :
+		@{ $self-> text_wrap( $text, 0, tw::NewLineBreak ) } :
 		split "\n", $text;
 }
 
@@ -221,6 +221,11 @@ sub new_gradient
 	return Prima::Drawable::Gradient->new(@_);
 }
 
+sub new_aa_surface
+{
+	require Prima::Drawable::Antialias;
+	return Prima::Drawable::Antialias->new(@_);
+}
 
 sub new_glyph_obj
 {
@@ -333,67 +338,46 @@ sub text_wrap_shape
 {
 	my ( $self, $text, $width, %opt) = @_;
 
-	$width = 1_000_000 unless defined $width;
+	my $opt    = delete($opt{options}) // tw::Default;
+	my $shaped = $self-> text_shape( $text, %opt );
+	return $self->text_wrap( $text, $width // -1, $opt, delete($opt{tabs}) // 8) unless $shaped;
+	my $ret    = $self-> text_wrap( $text, $width // -1, $opt, delete($opt{tabs}) // 8, 0, -1, $shaped);
 
-	my $opt = delete($opt{options}) // tw::Default;
-
-	my $wrapped = $self-> text_wrap( $text, $width, $opt, delete($opt{tabs}) // 8);
-	return $wrapped if $opt & tw::ReturnChunks;
-
-	my $tilde;
-	$tilde = pop @$wrapped if $opt & (tw::CalcMnemonic | tw::CollapseTilde);
-
-	my @shaped;
-	for my $chunk ( @$wrapped ) {
-		my $shaped = $self-> text_shape( $chunk, %opt );
-		unless (defined $shaped) {
-			push @$wrapped, $tilde if $tilde;
-			return $wrapped;
+	if (( my $justify = delete $opt{justify} ) && $ret && @$ret ) {
+		if (
+			$justify->{kashida} &&
+			!($opt & tw::ReturnChunks) &&
+			$text =~ /[\x{600}-\x{6ff}]/
+		) {
+			my $last = @$ret - ($opt & (tw::CalcMnemonic | tw::CollapseTilde)) ? -2 : -1;
+			for ( my $i = 0; $i < $last; $i++) {
+				if ( $opt & tw::ReturnGlyphs ) {
+					$$ret[$i]->justify_arabic($self, $text, $width, %opt, %$justify);
+				} elsif ( my $tx = $self->text_shape( $$ret[$i], %opt)) {
+					my $text = $tx->justify_arabic($self, $$ret[$i], $width, %opt, %$justify, as_text => 1);
+					$$ret[$i] = $text if defined $text;
+				}
+			}
 		}
-		$shaped = $chunk unless $shaped;
-		push @shaped, $shaped;
+
+		if (
+			($justify->{letter} || $justify->{word}) &&
+			!($opt & tw::ReturnChunks)
+		) {
+			# do not justify last (or the only) line
+			my $last = @$ret - ($opt & (tw::CalcMnemonic | tw::CollapseTilde)) ? -3 : -2;
+			for ( my $i = 0; $i < $last; $i++) {
+				if ( $opt & tw::ReturnGlyphs ) {
+					$$ret[$i]->justify_interspace($self, $text, $width, %opt, %$justify);
+				} elsif ( my $tx = $self->text_shape( $$ret[$i], %opt)) {
+					my $text = $tx->justify_interspace($self, $$ret[$i], $width, %opt, %$justify, as_text => 1);
+					$$ret[$i] = $text if defined $text;
+				}
+			}
+		}
 	}
 
-	if ( $tilde && defined($tilde->{tildeLine}) && ref(my $glyphs = $shaped[$tilde->{tildeLine}])) {
-		my $pos = $tilde->{tildePos};
-		my $index = -1;
-		my $found = -1;
-		my $indexes;
-		my $ligature;
-
-AGAIN:
-		$indexes = $glyphs-> indexes;
-		for my $c ( @$indexes ) {
-			$index++;
-			$c &= ~to::RTL;
-			$found = $index, last if $c == $pos; # same glyph
-			$found = $index if $c < $pos && $c > $found; # same cluster?
-		}
-
-		# check for ligature: "f~l" situation where "fl" is a single glyph
-		# (also, ligatures won't work without the advances array)
-		if ( $indexes->[$found+1] > $indexes->[$found] + 1 && !$ligature && $glyphs->advances ) {
-			my $text = $wrapped->[$tilde->{tildeLine}];
-			substr( $text, $pos++, 0, "\x{200c}");
-			substr( $text, $pos + 1, 0, "\x{200c}");
-			$glyphs = $self-> text_shape( $text, %opt );
-			$ligature++;
-			$index = $found = -1;
-			goto AGAIN;
-		}
-
-		my ($A,$B,$C) = $glyphs-> abc($self, $found);
-		my ($A0) = $glyphs-> abc($self, 0);
-		my $x = $glyphs->get_sub_width( $self, 0, $found ) - (($A0 < 0) ? $A0 : 0);
-		$tilde->{tildeStart}  = $x;
-		$tilde->{tildeStart} += $A if $A < 0;
-		$tilde->{tildeEnd}    = $x + $B;
-		$tilde->{tildeEnd}   -= $C if $C < 0;
-	}
-
-	push @shaped, $tilde if $tilde;
-
-	return \@shaped;
+	return $ret;
 }
 
 1;

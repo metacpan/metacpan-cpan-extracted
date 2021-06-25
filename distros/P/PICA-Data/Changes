@@ -1,5 +1,17 @@
 Revision history for PICA::Data
 
+1.27 2021-06-23T07:23:14Z
+    - Add accessor: empty. Fixes counting.
+    - Remove parser option 'bless', always return blessed record (#107, BREAKING CHANGE)
+
+1.26 2021-06-19T16:51:01Z
+    - Support diff/patch in CLI
+    - Support option --unknown in build/fields/explain 
+
+1.25 2021-06-16T14:18:46Z
+    - Implement occurrence ranges (#96) 
+    - Add option position_as_occurrence (see #66)
+
 1.24 2021-06-07T08:51:52Z
     - Add method to split record
     - Make path optional in pica_fields

@@ -5,7 +5,7 @@
       "Joel Berger <joel.a.berger@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.020, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -40,9 +40,9 @@
          "requires" : {
             "FindBin" : "0",
             "Perl::Critic" : "0",
-            "Test2::Require::Module" : "0.000060",
+            "Test2::Require::Module" : "0.000121",
             "Test2::Tools::PerlCritic" : "0",
-            "Test2::V0" : "0.000060",
+            "Test2::V0" : "0.000121",
             "Test::CPAN::Changes" : "0",
             "Test::EOL" : "0",
             "Test::Fixme" : "0.07",
@@ -68,6 +68,7 @@
             "Path::Tiny" : "0.077",
             "Test2::API" : "1.302096",
             "Text::ParseWords" : "3.26",
+            "parent" : "0",
             "perl" : "5.008004"
          },
          "suggests" : {
@@ -77,7 +78,7 @@
       "test" : {
          "requires" : {
             "Test2::API" : "1.302096",
-            "Test2::V0" : "0.000060",
+            "Test2::V0" : "0.000121",
             "perl" : "5.008004"
          },
          "suggests" : {
@@ -98,7 +99,7 @@
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "2.40",
+   "version" : "2.41",
    "x_contributors" : [
       "Graham Ollis <plicease@cpan.org>",
       "Diab Jerius (DJERIUS)",
@@ -127,9 +128,10 @@
       "Shoichi Kaji (SKAJI)",
       "Shawn Laffan (SLAFFAN)",
       "Paul Evans (leonerd, PEVANS)",
-      "H\u00e5kon H\u00e6gland (hakonhagland, HAKONH)"
+      "H\u00e5kon H\u00e6gland (hakonhagland, HAKONH)",
+      "nick nauwelaerts (INPHOBIA)"
    ],
-   "x_generated_by_perl" : "v5.33.9",
+   "x_generated_by_perl" : "v5.34.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.26",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
    "x_use_unsafe_inc" : 0

@@ -15,7 +15,7 @@ sub do_http {
 	$headers{"user-agent"} = $$opt{agent}   if $$opt{agent};
 	$headers{"referer"}    = $$opt{referer} if $$opt{referer};
 
-	if ($$opt{gzip}) {
+	if ($$opt{compressed} or $$opt{gzip}) {
 		$headers{'Accept-Encoding'} = 'gzip, deflate';
 		require Compress::Raw::Zlib;
 	}
@@ -70,7 +70,7 @@ sub do_http {
 			$headers_got              = 1;
 			my ($is_success, $status, $h, $redirects) = headers($headers);
 			$content_encoding = $$h{'content-encoding'};
-			if ($$opt{gzip} and $content_encoding) {
+			if (($$opt{compressed} or $$opt{gzip}) and $content_encoding) {
 				if ($content_encoding eq 'deflate') {
 					$inflate = Compress::Raw::Zlib::Inflate->new();
 				} elsif ($content_encoding eq 'gzip') {
@@ -136,7 +136,7 @@ sub do_http {
 			$$h{Protocol} = "HTTP/" . $$h{HTTPVersion};
 
 			my $content_encoding = $$h{'content-encoding'};
-			if ($body and $$opt{gzip} and $content_encoding) {
+			if ($body and ($$opt{compressed} or $$opt{gzip}) and $content_encoding) {
 				if ($content_encoding eq 'deflate' or $content_encoding eq 'gzip') {
 					my $inflate = Compress::Raw::Zlib::Inflate->new($content_encoding eq 'gzip' ? (-WindowBits => Compress::Raw::Zlib::WANT_GZIP()) : ());
 					my $status = $inflate->inflate($body, my $output);

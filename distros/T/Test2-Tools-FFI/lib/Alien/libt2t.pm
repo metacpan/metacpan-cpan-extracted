@@ -6,7 +6,7 @@ use 5.008001;
 use File::ShareDir::Dist ();
 
 # ABSTRACT: Alien::libt2t
-our $VERSION = '0.05'; # VERSION
+our $VERSION = '0.06'; # VERSION
 
 
 sub new
@@ -53,7 +53,7 @@ Alien::libt2t - Alien::libt2t
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 

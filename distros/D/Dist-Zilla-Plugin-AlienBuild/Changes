@@ -1,5 +1,8 @@
 Revision history for Dist-Zilla-Plugin-AlienBuild
 
+0.32      2021-06-22 10:39:23 -0600
+  - Document required (!) name property for [AlienBase::Doc] (gh#10)
+
 0.31      2020-05-15 06:55:50 -0600
   - Remove reference to Kafka::Librd from synopsis
 

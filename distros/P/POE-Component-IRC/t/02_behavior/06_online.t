@@ -6,7 +6,7 @@ use Socket qw(AF_INET inet_ntoa SOCK_STREAM unpack_sockaddr_in);
 use Test::More tests => 5;
 
 my $bot = POE::Component::IRC->spawn();
-my $server = 'irc.freenode.net';
+my $server = 'irc.libera.chat';
 my $nick = "PoCoIRC" . $$;
 
 POE::Session->create(

@@ -7,7 +7,7 @@ build_requires:
   IO::Handle: '0'
   IPC::Open3: '0'
   Test::More: '0.98'
-  Test::Perinci::CmdLine: '1.47'
+  Test::Perinci::CmdLine: '1.480'
   YAML::Old: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -55,6 +55,7 @@ requires:
   Perinci::Result::Format::Lite: '0.277'
   Perinci::Sub::Complete: '0.935'
   Perinci::Sub::GetArgs::Argv: '0.845'
+  PerlIO::locale: '0'
   Progress::Any::Output: '0'
   Progress::Any::Output::TermProgressBarColor: '0.17'
   Scalar::Util: '0'
@@ -66,7 +67,7 @@ resources:
   bugtracker: https://github.com/perlancar/perl-Perinci-CmdLine-Lite/issues
   homepage: https://metacpan.org/release/Perinci-CmdLine-Lite
   repository: git://github.com/perlancar/perl-Perinci-CmdLine-Lite.git
-version: '1.904'
+version: '1.905'
 x_Dist_Zilla:
   perl:
     version: '5.030000'

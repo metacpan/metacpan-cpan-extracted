@@ -1,0 +1,16 @@
+runtime:
+  requires:
+    perl: '5.008001'
+    Role::Tiny: '2.000001'
+    List::UtilsBy: '0.10'
+    Sub::Util: '1.40'
+  suggests:
+    Mojolicious: '7.43'
+test:
+  requires:
+    Test::More: '0.88'
+    Scalar::Util: 0
+    Exporter: '5.57'
+develop:
+  requires:
+    Mojolicious: '7.43'

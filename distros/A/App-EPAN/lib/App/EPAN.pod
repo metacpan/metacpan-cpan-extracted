@@ -1,0 +1,150 @@
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+App::EPAN - Exclusive Perl Archive Nook
+
+=head1 VERSION
+
+This document describes App::EPAN version 0.002.
+
+=head1 SYNOPSIS
+
+   use App::EPAN;
+   App::EPAN->run(@ARGV);
+
+=head1 DESCRIPTION
+
+This library is the actual backend/workhorse for the C<epan> program.
+
+=head2 Action Methods
+
+All action methods associated to the actions that can be triggered from the
+main program.
+
+=over
+
+=item C<< action_add >>
+
+=item C<< action_create >>
+
+=item C<< action_index >>
+
+=begin hide-this
+
+=item C<< action_idx >>
+
+=end hide-this
+
+=item C<< action_inject >>
+
+=item C<< action_install >>
+
+=item C<< action_list_actions >>
+
+=item C<< action_list_obsoletes >>
+
+=item C<< action_purge_obsoletes >>
+
+=item C<< action_update >>
+
+Normally used as:
+
+   $instance->action_...;
+
+=back
+
+The main entry point for these methods is:
+
+=over
+
+=item C<< run >>
+
+   $instance->run(@ARGV);
+
+Runs the program with the provided arguments list.
+
+=back
+
+=head2 Configuration methods
+
+The following methods relate to configuration handling:
+
+=over
+
+=item C<< args >>
+
+   my @args = $instance->args;
+
+Get arguments after configuration parsing, usually this is a list of modules.
+
+=item C<< config >>
+
+   my $single = $instance->config($cnf_name);
+   my @multiple = $instance->config(@cnf_names);
+
+Get one or more configurations.
+
+=item C<< execute_tests >>
+
+   my $boolean = $instance->execute_tests;
+
+Check if tests should be executed when invoking C<cpanm>.
+
+=item C<< get_options >>
+
+   $instance->get_options(@ARGS);
+
+Parse input options.
+
+=item C<< target_dir >>
+
+   my $path = $instance->target_dir;
+
+Get target directory for the I<EPAN>. Defaults to C<epan>.
+
+=back
+
+=head2 Listing methods
+
+These methods provide list from the distributions collected along the way:
+
+=over
+
+=item C<< last_distlist >>
+
+   my @list = $instance->last_distlist;
+
+List of distributions (last updated).
+
+=item C<< last_modlist >>
+
+   my @list = $instance->last_modlist;
+
+List of modules (last updated).
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2011-2021 by Flavio Poletti <polettix@cpan.org>
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+=over
+
+L<http://www.apache.org/licenses/LICENSE-2.0>
+
+=back
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+=cut

@@ -62,6 +62,35 @@ subtest 'www.meon.eu/base-test2' => sub {
     is($wmeta->image, 'https://www.meon.at/static/img/testing-base2.jpg', 'image()');
 };
 
+subtest 'content_type check' => sub {
+    my $wmeta = Web::PageMeta->new(
+        url => 'https://www.meon.eu/static/img/picture1.jpg',
+        _ua => Test::Mock::Future::HTTP->new,
+    );
+    throws_ok( sub { $wmeta->title },
+        qr/on_header/, 'dies with incorrect content type' );
+};
+
+subtest 'max_size' => sub {
+    my $wmeta = Web::PageMeta->new(
+        url => 'https://www.meon.eu/base-test2',
+        _ua => Test::Mock::Future::HTTP->new,
+        max_size => 1,
+    );
+    throws_ok( sub { $wmeta->title },
+        qr/on_body/, 'dies when max_size reached' );
+};
+
+subtest 'timeout' => sub {
+    my $wmeta = Web::PageMeta->new(
+        url => 'https://www.meon.eu/base-test2',
+        _ua => Test::Mock::Future::HTTP->new,
+        timeout => -1,
+    );
+    throws_ok( sub { $wmeta->title },
+        qr/on_body/, 'dies when timeout reached' );
+};
+
 subtest 'www.meon.eu/Web-PageMeta-notfound' => sub {
     my $wmeta = Web::PageMeta->new(
         url => 'https://www.meon.eu/Web-PageMeta-notfound',
@@ -96,7 +125,7 @@ use URI::Escape qw(uri_escape);
 use Path::Class qw(file dir);
 
 sub http_get {
-    my ($self, $url) = @_;
+    my ($self, $url, %options) = @_;
 
     my $sites_data_body = file($Bin, 'site_data', uri_escape($url));
     return Future->fail(
@@ -110,6 +139,13 @@ sub http_get {
     my $body = $sites_data_body->slurp(iomode => '<:raw');
     my $dumper = 'my ' . $sites_data_hdr->slurp(iomode => '<:raw');
     my $headers = eval $dumper;
+    if (my $hdr_cb = $options{on_header}) {
+        $hdr_cb->($headers) or die 'on_header failed';
+    }
+    if (my $body_cb = $options{on_body}) {
+        $body_cb->($body) or die 'on_body failed';
+        $body = '';
+    }
     return Future->done($body, $headers);
 }
 

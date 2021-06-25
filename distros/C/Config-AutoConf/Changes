@@ -1,5 +1,9 @@
 Revision history for Config-AutoConf
 
+0.320   2021-06-25
+	- fix check_prog to not find directories (RT#132993), thanks
+	  RJBS for reporting it again!
+    
 0.319	2020-09-29
 	- add optional extra_link_flags to search_libs
 	- fix check_prog to not find directories (RT#132993), thanks

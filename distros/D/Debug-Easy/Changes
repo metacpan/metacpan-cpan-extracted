@@ -300,3 +300,19 @@ Revision history for Debug-Easy
 
         Apparently the procedure field is blank on some main calls.  This fix
         should take care of that.
+
+2.04    September 3, 2019
+
+2.05    April 5, 2021
+
+        Added Data::Dumper debug variable "Deparse"
+
+2.06    June 24, 2021
+
+        Updated the documentation and removed some outdated information.
+
+        Also removed the Build.PL script as that is depreciated.
+
+2.07    June 24, 2021
+
+        Documentation changes missed in README files.  That has been corrected.

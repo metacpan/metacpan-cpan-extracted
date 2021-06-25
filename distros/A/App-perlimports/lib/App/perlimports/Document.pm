@@ -3,7 +3,7 @@ package App::perlimports::Document;
 use Moo;
 use utf8;
 
-our $VERSION = '0.000009';
+our $VERSION = '0.000012';
 
 use App::perlimports::Annotations ();
 use App::perlimports::Include     ();
@@ -227,25 +227,26 @@ around BUILDARGS => sub {
 };
 
 my %default_ignore = (
-    'Data::Printer'                                       => 1,
-    'DDP'                                                 => 1,
-    'Devel::Confess'                                      => 1,
-    'Encode::Guess'                                       => 1,
-    'Exception::Class'                                    => 1,
-    'Exporter'                                            => 1,
-    'Exporter::Lite'                                      => 1,
-    'Feature::Compat::Try'                                => 1,
-    'Mojo::Base'                                          => 1,
-    'Mojolicious::Lite'                                   => 1,
-    'Moo'                                                 => 1,
-    'Moo::Role'                                           => 1,
-    'Moose'                                               => 1,
-    'Moose::Exporter'                                     => 1,
-    'Moose::Role'                                         => 1,
-    'MooseX::NonMoose'                                    => 1,
-    'MooseX::Role::Parameterized'                         => 1,
-    'MooseX::SemiAffordanceAccessor'                      => 1,
-    'MooseX::StrictConstructor'                           => 1,
+    'Data::Printer'                  => 1,
+    'DDP'                            => 1,
+    'Devel::Confess'                 => 1,
+    'Encode::Guess'                  => 1,
+    'Exception::Class'               => 1,
+    'Exporter'                       => 1,
+    'Exporter::Lite'                 => 1,
+    'Feature::Compat::Try'           => 1,
+    'HTTP::Message::PSGI'            => 1,    # HTTP::Request::(to|from)_psgi
+    'Mojo::Base'                     => 1,
+    'Mojolicious::Lite'              => 1,
+    'Moo'                            => 1,
+    'Moo::Role'                      => 1,
+    'Moose'                          => 1,
+    'Moose::Exporter'                => 1,
+    'Moose::Role'                    => 1,
+    'MooseX::NonMoose'               => 1,
+    'MooseX::Role::Parameterized'    => 1,
+    'MooseX::SemiAffordanceAccessor' => 1,
+    'MooseX::StrictConstructor'      => 1,
     'MooseX::TraitFor::Meta::Class::BetterAnonClassNames' => 1,
     'MooseX::Types'                                       => 1,
     'MooX::StrictConstructor'                             => 1,
@@ -438,7 +439,6 @@ sub _build_sub_exporter_export_list {
                 && $_[1]->module eq 'Sub::Exporter';
         }
     ) || [];
-    $self->logger->error( $sub_ex->[0] ) if defined $sub_ex->[0];
     return [] unless @{$sub_ex};
 
     my @found;
@@ -648,7 +648,7 @@ sub _is_used_fully_qualified {
 
     # We could tighten this up and check that the word following "::" is a sub
     # which exists in that package.
-    return !!$self->ppi_document->find(
+    return 1 if $self->ppi_document->find(
         sub {
             (
                 $_[1]->isa('PPI::Token::Word')
@@ -662,6 +662,11 @@ sub _is_used_fully_qualified {
                 && $_[1] =~ m{\A[*\$\@\%]+${module_name}::[a-zA-Z_]} );
         }
     );
+
+    for my $key ( keys %{ $self->interpolated_symbols } ) {
+        return 1 if $key =~ m{\A[*\$\@\%]+${module_name}::[a-zA-Z_]+\z};
+    }
+    return 0;
 }
 
 sub _is_ignored {
@@ -900,7 +905,7 @@ App::perlimports::Document - Make implicit imports explicit
 
 =head1 VERSION
 
-version 0.000009
+version 0.000012
 
 =head2 inspector_for( $module_name )
 

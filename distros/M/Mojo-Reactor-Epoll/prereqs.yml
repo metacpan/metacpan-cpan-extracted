@@ -1,0 +1,13 @@
+runtime:
+  requires:
+    perl:         '5.010001'
+    Carp:         0
+    Linux::Epoll: '0.013'
+    List::Util:   0
+    Mojolicious:  '7.37'
+    Scalar::Util: 0
+    Time::HiRes:  0
+test:
+  requires:
+    IO::Socket::INET: 0
+    Test::More: '0.88'

@@ -16,9 +16,10 @@ use My::Module::Meta;
 # the contents of the Makefile that is written.
 
 my %opt;
-getopts ('ntuy', \%opt) or die <<'EOD';
+getopts ('nptuy', \%opt) or die <<'EOD';
 The only legal options are
   -n = answer all questions 'no';
+  -p = use pbl back end (old implementation);
   -t = use traditional Mac default text flavor;
   -u = use UTF-8 as default text flavor;
   -y = answer all questions 'yes'.
@@ -35,8 +36,6 @@ my @clean_files;
 $meta->want_pbtool( \%opt )
     and push @exe_files, 'script/pbtool';
 
-push @clean_files, 'pbl';	# Just in case we built it.
-
 (my $mmv = ExtUtils::MakeMaker->VERSION) =~ s/_//g;
 
 my @ccflags = $meta->ccflags( \%opt );
@@ -44,7 +43,10 @@ my @ccflags = $meta->ccflags( \%opt );
 my %args = (
     ABSTRACT	=> $meta->abstract(),
     AUTHOR	=> $meta->author(),
-    (@ccflags ? (CCFLAGS => join ' ', @ccflags) : ()),
+    C		=> $opt{p} ?
+		    [ qw{ Pasteboard.c pbl.c } ] :
+		    [ qw{ Pasteboard.c } ],
+    (@ccflags ? (CCFLAGS => join ' ', @ccflags, $Config{ccflags}) : ()),
     DISTNAME	=> $meta->dist_name(),
     EXE_FILES	=> \@exe_files,
     INC		=> '-I.', # e.g., '-I. -I/usr/include/other'
@@ -113,21 +115,17 @@ authortest :: pure_all
 
 testcover :: pure_all
 	cover -test -ignore_re=inc/ -ignore_re=/System
+
+pbl : pbl.c pbl.h constant-c.inc constant-h.inc
+	\$(CC) -o pbl -DTEST -DDEBUG_PBL \$(CCFLAGS) \$(CCCDLFLAGS) pbl.c -framework ApplicationServices
+
+Pasteboard.c : Pasteboard.xs constant-xs.inc @{[ $opt{p} ? 'pbl.h constant-h.inc' : '' ]}
+	\$(XSUBPPRUN) \$(XSPROTOARG) \$(XSUBPPARGS) \$(XSUBPP_EXTRA_ARGS) \$*.xs > \$*.xsc
+	\$(MV) \$*.xsc \$*.c
+
+constant-c.inc constant-h.inc constant-xs.inc : Constant.PL
+	\$(PERLRUN) Constant.PL
 EOD
 }
-
-=begin comment
-
-sub MY::postamble {
-    <<'eod';
-
-pbl : pbl.c
-	$(CC) -o pbl -DTEST $(PBL_FLAGS) pbl.c -framework ApplicationServices
-eod
-}
-
-=end comment
-
-=cut
 
 # ex: set textwidth=72 :

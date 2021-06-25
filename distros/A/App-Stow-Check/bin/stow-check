@@ -5,7 +5,7 @@ use warnings;
 
 use App::Stow::Check;
 
-our $VERSION = 0.01;
+our $VERSION = 0.02;
 
 # Run.
 exit App::Stow::Check->new->run;
@@ -28,14 +28,14 @@ stow-check - Tool to check for which stow dist command is.
 
 =head1 SYNOPSIS
 
- stow-check [-h] [--version] command
+ stow-check [-d stow_dir] [-h] [--version] command
 
 =head1 DESCRIPTION
 
 Tool is checking:
 
  If command stands in /usr/local/bin
- If links to /usr/local/stow/__DIST__/[s]bin/__COMMAND__
+ If links to __STOW_DIR__/__DIST__/[s]bin/__COMMAND__
 
 If yes, returns __DIST__ name and exit code 0.
 If no, returns error message to STDERR and exit code 1.
@@ -43,6 +43,12 @@ If no, returns error message to STDERR and exit code 1.
 =head1 ARGUMENTS
 
 =over 8
+
+=item * C<-d stow_dir>
+
+Stow directory.
+
+Default value is '/usr/local/stow'.
 
 =item * C<-h>
 
@@ -57,6 +63,13 @@ Print version of script.
 Command name (e.g. openssl).
 
 =back
+
+=head1 ERRORS
+
+ Command '%s' doesn't use stow.
+ Command '%s' don't use 'bin/sbin' path.
+ Command '%s' not found.
+ Stow directory '%s' doesn't exist.
 
 =head1 EXAMPLE1
 
@@ -84,6 +97,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.01
+0.02
 
 =cut

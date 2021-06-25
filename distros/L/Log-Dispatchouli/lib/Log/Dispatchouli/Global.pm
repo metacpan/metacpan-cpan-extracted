@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package Log::Dispatchouli::Global;
 # ABSTRACT: a system for sharing a global, dynamically-scoped logger
-$Log::Dispatchouli::Global::VERSION = '2.022';
+$Log::Dispatchouli::Global::VERSION = '2.023';
 use Carp ();
 use Log::Dispatchouli;
 use Scalar::Util ();
@@ -280,7 +280,7 @@ Log::Dispatchouli::Global - a system for sharing a global, dynamically-scoped lo
 
 =head1 VERSION
 
-version 2.022
+version 2.023
 
 =head1 DESCRIPTION
 
@@ -328,6 +328,16 @@ will only be shared amongst your application's classes.
 Log::Dispatchouli::Global is meant to be subclassed and shared only within
 controlled systems.  Remember, I<sharing your state with code you don't
 control is dangerous>.
+
+=head1 PERL VERSION SUPPORT
+
+This module has a long-term perl support period.  That means it will not
+require a version of perl released fewer than five years ago.
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
 
 =head1 USING
 
@@ -436,11 +446,11 @@ else attempts to initialize the logger to something else.
 
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@cpan.org>
+Ricardo SIGNES <rjbs@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Ricardo SIGNES.
+This software is copyright (c) 2021 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

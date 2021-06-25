@@ -1,2 +1,9 @@
+0.02 2021-06-21T19:35:49+02:00
+ - Add CSS::Struct::Output::Structure to SEE ALSO section in doc.
+ - Add test for constructor.
+ - Fix name of module in META.yml and others.
+ - Fix test dependencies.
+ - Rename variable name to better name (sync with CSS::Struct::Output).
+
 0.01 2021-01-29T01:20:58+01:00
  - First version.

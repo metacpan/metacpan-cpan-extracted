@@ -1,8 +1,8 @@
 use strict;
 use warnings;
 
-package App::Cmd::Simple;
-$App::Cmd::Simple::VERSION = '0.333';
+package App::Cmd::Simple 0.334;
+
 use App::Cmd::Command;
 BEGIN { our @ISA = 'App::Cmd::Command' }
 
@@ -74,7 +74,7 @@ use Sub::Install;
 #pod should be given in the format used for the C<$usage_desc> parameter to
 #pod C<describe_options> in Getopt::Long::Descriptive.
 #pod
-#pod If not overriden, it returns something that prints out like:
+#pod If not overridden, it returns something that prints out like:
 #pod
 #pod   yourapp [-?h] [long options...]
 #pod
@@ -224,7 +224,7 @@ App::Cmd::Simple - a helper for building one-command App::Cmd applications
 
 =head1 VERSION
 
-version 0.333
+version 0.334
 
 =head1 SYNOPSIS
 
@@ -268,6 +268,16 @@ and, finally, at the command line:
 
   All blorts successful.
 
+=head1 PERL VERSION SUPPORT
+
+This module has a long-term perl support period.  That means it will not
+require a version of perl released fewer than five years ago.
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
+
 =head1 SUBCLASSING
 
 When writing a subclass of App::Cmd:Simple, there are only a few methods that
@@ -289,7 +299,7 @@ It's a one-line summary of how the command is to be invoked, and
 should be given in the format used for the C<$usage_desc> parameter to
 C<describe_options> in Getopt::Long::Descriptive.
 
-If not overriden, it returns something that prints out like:
+If not overridden, it returns something that prints out like:
 
   yourapp [-?h] [long options...]
 
@@ -331,7 +341,7 @@ That's how things work.  You can just do this:
 
 =head1 AUTHOR
 
-Ricardo Signes <rjbs@cpan.org>
+Ricardo Signes <rjbs@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

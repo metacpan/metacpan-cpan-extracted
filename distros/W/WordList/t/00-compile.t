@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 10 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 11 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'WordList.pm',
@@ -17,6 +17,7 @@ my @module_files = (
     'WordListBase.pm',
     'WordListRole/EachFromFirstNextReset.pm',
     'WordListRole/FirstNextResetFromEach.pm',
+    'WordListRole/FromArray.pm',
     'WordListRole/Test.pm',
     'WordListRole/WordList.pm'
 );

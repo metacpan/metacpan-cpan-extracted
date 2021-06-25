@@ -15,7 +15,7 @@ use Webservice::OVH;
 
 my $api = Webservice::OVH->new_from_json($json_dir);
 ok( $api, "module ok" );
-
+=head2
 # Get first project
 my $project = $api->cloud->projects->[0];
 
@@ -40,5 +40,5 @@ SKIP: {
     ok( $project->network->project && ref $project->network->project eq 'Webservice::OVH::Cloud::Project', 'project ok');
     
 }
-
+=cut
 done_testing();
