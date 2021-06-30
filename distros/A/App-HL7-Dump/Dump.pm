@@ -10,7 +10,7 @@ use Getopt::Std;
 use Net::HL7::Message;
 use Perl6::Slurp qw(slurp);
 
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 # Constructor.
 sub new {
@@ -38,6 +38,10 @@ sub new {
 	}
 	$self->{'_hl7_file'} = $ARGV[0];
 
+	if ($ENV{'COLOR'}) {
+		$self->{'_opts'}->{'c'} = 1;
+	}
+
 	# Load Term::ANSIColor.
 	if ($self->{'_opts'}->{'c'}) {
 		eval "require Term::ANSIColor;";
@@ -62,6 +66,7 @@ sub run {
 	my $msg = Net::HL7::Message->new($hl7);
 	if (! $msg) {
 		err 'Cannot parse HL7 file.', 'File', $self->{'_hl7_file'};
+		return 1;
 	}
 
 	# Segment name: size
@@ -89,7 +94,7 @@ sub run {
 		}
 	}
 
-	return;
+	return 0;
 }
 
 1;
@@ -108,23 +113,27 @@ App::HL7::Dump - Base class for hl7dump script.
 =head1 SYNOPSIS
 
  use App::HL7::Dump;
+
  my $app = App::HL7::Dump->new;
- $app->run;
+ my $exit_code = $app->run;
 
 =head1 METHODS
 
-=over 8
+=head2 C<new>
 
-=item C<new()>
+ my $app = App::HL7::Dump->new;
 
- Constructor.
+Constructor.
 
-=item C<run()>
+Returns instance of object.
 
- Run method.
- Returns undef.
+=head2 C<run>
 
-=back
+ my $exit_code = $app->run;
+
+Run method.
+
+Returns exit code (0 as success, > 0 as error).
 
 =head1 ERRORS
 
@@ -138,7 +147,7 @@ App::HL7::Dump - Base class for hl7dump script.
          Cannot parse HL7 file.
                  File: %s
 
-=head1 EXAMPLE
+=head1 EXAMPLE1
 
  use strict;
  use warnings;
@@ -198,6 +207,67 @@ App::HL7::Dump - Base class for hl7dump script.
  # OBR-4:003038^Urinalysis^L
  # OBR-7:20160403211012
 
+=head1 EXAMPLE2
+
+ use strict;
+ use warnings;
+
+ use App::HL7::Dump;
+ use File::Temp qw(tempfile);
+ use IO::Barf qw(barf);
+
+ # Test data.
+ my $hl7 = <<'END';
+ MSH|^~\&|FROM|Facility #1|TO|Facility #2|20160403211012||ORM^O01|MSGID20160403211012|P|1.0
+ PID|||11111||Novak^Jan^^^Ing.||19680821|M|||Olomoucká^^Brno^^61300^Czech Republic|||||||
+ PV1||O|OP^PAREG^||||1234^Clark^Bob|||OP|||||||||2|||||||||||||||||||||||||20160403211012|
+ ORC|NW|20160403211012
+ OBR|1|20160403211012||003038^Urinalysis^L|||20160403211012
+ END
+
+ # Barf to temp file.
+ my (undef, $file) = tempfile();
+ barf($file, $hl7);
+
+ # Arguments.
+ @ARGV = (
+         '-c',
+         $file,
+ );
+
+ # Run.
+ App::HL7::Dump->new->run;
+
+ # Output (colored keys):
+ # MSH-1:|
+ # MSH-2:^~\&
+ # MSH-3:FROM
+ # MSH-4:Facility #1
+ # MSH-5:TO
+ # MSH-6:Facility #2
+ # MSH-7:20160403211012
+ # MSH-9:ORM^O01
+ # MSH-10:MSGID20160403211012
+ # MSH-11:P
+ # MSH-12:1.0
+ # PID-3:11111
+ # PID-5:Novak^Jan^^^Ing.
+ # PID-7:19680821
+ # PID-8:M
+ # PID-11:Olomoucká^^Brno^^61300^Czech Republic
+ # PV1-2:O
+ # PV1-3:OP^PAREG
+ # PV1-7:1234^Clark^Bob
+ # PV1-10:OP
+ # PV1-19:2
+ # PV1-44:20160403211012
+ # ORC-1:NW
+ # ORC-2:20160403211012
+ # OBR-1:1
+ # OBR-2:20160403211012
+ # OBR-4:003038^Urinalysis^L
+ # OBR-7:20160403211012
+
 =head1 DEPENDENCIES
 
 L<Class::Utils>,
@@ -221,11 +291,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2016-2018 Michal Josef Špaček
- BSD 2-Clause License
+© 2016-2021 Michal Josef Špaček
+
+BSD 2-Clause License
 
 =head1 VERSION
 
-0.03
+0.04
 
 =cut

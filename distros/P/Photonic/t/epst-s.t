@@ -32,7 +32,6 @@ use strict;
 use warnings;
 use PDL;
 use PDL::NiceSlice;
-use PDL::Complex;
 use Photonic::Geometry::FromEpsilon;
 use Photonic::LE::S::EpsTensor;
 
@@ -59,7 +58,7 @@ my $gt=Photonic::Geometry::FromEpsilon->new(epsilon=>$epsilont); #trans
 my $eto=Photonic::LE::S::EpsTensor->new(geometry=>$gt, nh=>10);
 my $etv=$eto->epsTensor;
 my $etx=(1-$f)*$ea+$f*$eb;
-my $etenx=pdl([$etx, r2C(0)],[r2C(0), $elx])->complex;
+my $etenx=pdl([$etx, r2C(0)],[r2C(0), $elx]);
 ok(Cagree($etv, $etenx), "1D trans epsilon");
 is($eto->converged,1, "Converged");
 #Extend 1D superlattice into 4D (why not?)
@@ -73,7 +72,7 @@ my $etenx4=pdl([
     [r2C(0),  $etx,  r2C(0), r2C(0)],
     [r2C(0), r2C(0), $etx,   r2C(0)],
     [r2C(0), r2C(0), r2C(0), $etx  ]
-    ])->complex;
+    ]);
 ok(Cagree($etv4, $etenx4), "4D trans epsilon");
 is($eto4->converged,1, "Converged");
 
@@ -95,9 +94,9 @@ my $ekko=Photonic::LE::S::EpsTensor->new(
     geometry=>$gkk, nh=>1000, reorthogonalize=>1, use_mask=>1);
 my $etvb=$eko->epsTensor;
 my $etvr=zeroes(2,2)->r2C;
-$etvr->(:,(0),(0)).= $etvb->(:,(1),(1));
-$etvr->(:,(0),(1)).=-$etvb->(:,(1),(0));
-$etvr->(:,(1),(0)).=-$etvb->(:,(0),(1));
-$etvr->(:,(1),(1)).= $etvb->(:,(0),(0));
-my $etvar=($etva->(:,*1,:,:)*$etvr->(:,:,:,*1))->mv(2,1)->sumover;
+$etvr->((0),(0)).= $etvb->((1),(1));
+$etvr->((0),(1)).=-$etvb->((1),(0));
+$etvr->((1),(0)).=-$etvb->((0),(1));
+$etvr->((1),(1)).= $etvb->((0),(0));
+my $etvar=($etva->(*1)*$etvr->(:,:,*1))->mv(2,1)->sumover;
 ok(Cagree($etvar,$ea*$eb*identity(2), 1e-3), "Keller");

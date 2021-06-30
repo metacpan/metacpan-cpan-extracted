@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 
 package App::ReportPrereqs;
 
@@ -15,7 +15,7 @@ use HTTP::Tiny 0.014 ();
 use List::Util qw(max);
 use Module::CPANfile ();
 use Module::Path qw(module_path);
-use version 0.81 ();
+use version 0.77 ();
 
 if ( !caller ) {
     my $rc = _main();
@@ -86,7 +86,14 @@ sub _main {
 
                 if ( defined $mod_path ) {
                     my $have = MM->parse_version($mod_path);    ## no critic (Modules::RequireExplicitInclusion)
-                    if ( !defined $have ) {
+
+                    # This validation was added in EUMM 7.47_01 in ExtUtils::MM_Unix
+                    # We use the same validation to make the file testable - otherwise the
+                    # result depends on the version of EUMM used.
+                    if (   ( !defined $have )
+                        or ( $have !~ m{ ^ v? [0-9_\.\-]+ $ }xsm )
+                        or ( !eval { version->parse($have) } ) )
+                    {
                         $have = 'undef';
                     }
 
@@ -96,11 +103,6 @@ sub _main {
 
                     if ( $have eq 'undef' ) {
                         push @dep_errors, "$module version unknown ($req_string)";
-                        next MODULE;
-                    }
-
-                    if ( !version::is_lax($have) ) {
-                        push @dep_errors, "$module version '$have' cannot be parsed ($req_string)";
                         next MODULE;
                     }
 
@@ -169,7 +171,7 @@ report-prereqs - report prerequisite versions
 
 =head1 VERSION
 
-Version 0.004
+Version 0.005
 
 =head1 SYNOPSIS
 
@@ -305,7 +307,7 @@ Stephan Sachse <ste.sachse@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018-2019 by Sven Kirmess.
+This software is Copyright (c) 2018-2021 by Sven Kirmess.
 
 This is free software, licensed under:
 

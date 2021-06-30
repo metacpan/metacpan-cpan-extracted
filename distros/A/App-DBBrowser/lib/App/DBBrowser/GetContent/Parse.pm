@@ -12,10 +12,10 @@ use Encode::Locale    qw();
 #use String::Unescape  qw( unescape );      # required
 #use Text::CSV         qw();                # required
 
-use Term::Choose       qw();
+use Term::Choose           qw();
 use Term::Choose::LineFold qw( line_fold );
-use Term::Choose::Util qw( get_term_size get_term_width unicode_sprintf insert_sep );
-use Term::Form         qw();
+use Term::Choose::Util     qw( get_term_size get_term_width unicode_sprintf insert_sep );
+use Term::Form             qw();
 
 
 sub new {
@@ -26,6 +26,14 @@ sub new {
         d => $data,
     };
     bless $sf, $class;
+}
+
+use Term::Choose::Screen qw( clear_screen );
+
+sub __print_waiting_str {
+    my ( $sf ) = @_;
+    print clear_screen;
+    print 'Parsing file ... ' . "\r";
 }
 
 
@@ -42,9 +50,9 @@ sub __parse_plain {
 
 sub __parse_with_Text_CSV {
     my ( $sf, $sql, $fh ) = @_;
-    my $waiting = 'Parsing file ... ';
+    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
-    say $waiting . "\r";
+    $sf->__print_waiting_str;
     seek $fh, 0, 0;
     my $rows_of_cols = [];
     require String::Unescape;
@@ -58,13 +66,14 @@ sub __parse_with_Text_CSV {
         }
         else {
             my $error_input = $csv->error_input() // 'No Error Input defined.';
-            my $info = "Close with ENTER\nText::CSV\n$code $str\nposition:$pos record:$rec field:$fld\n";
             my $prompt = "Error Input:";
             $error_input =~ s/\R/ /g;
+            my $info = "Close with ENTER\nText::CSV\n$code $str\nposition:$pos record:$rec field:$fld\n";
             $tc->choose(
                 [ line_fold( $error_input, get_term_width() ) ],
                 { info => $info, prompt => $prompt  }
             );
+            $ax->print_sql_info( $info );
             return;
         }
     } );
@@ -78,8 +87,7 @@ sub __parse_with_Text_CSV {
 
 sub __parse_with_split {
     my ( $sf, $sql, $fh ) = @_;
-    my $waiting = 'Parsing file ... ';
-    say $waiting . "\r";
+    $sf->__print_waiting_str;
     my $rows_of_cols = [];
     local $/;
     seek $fh, 0, 0;
@@ -111,7 +119,7 @@ sub __print_template_info {
     $ruler .= substr( $tapeline, 0, ( $term_w % 10 ) );
     my $info = $ruler;
     my $avail_h = $term_h - $occupied_term_h;
-    if ( $avail_h < 5 ) {
+    if ( $avail_h < 5 ) { ##
         $avail_h = 5;
     }
     my $first_part_end = int( $avail_h / 1.5 );
@@ -143,23 +151,25 @@ sub __print_template_info {
 
 sub __parse_with_template {
     my ( $sf, $sql, $fh ) = @_;
+    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $tf = Term::Form->new( $sf->{i}{tf_default} );
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my $tu = Term::Choose::Util->new( $sf->{i}{tcu_default} );
     my $old_idx = 0;
 
     IRS: while ( 1 ) {
-        my $info = "Parse mode: Template\n";
         my $prompt = 'Choose the Input record separator:';
         my @irs = ( "\\n", "\\r", "\\r\\n" );
         my $reparse = '  Reparse';
         my @pre = ( undef );
         my $menu = [ @pre, map( '  "' . $_ . '"', @irs ), $reparse ];
+        my $info = "Parse mode: Template\n";
         # Choose
         my $idx = $tc->choose(
             $menu,
             { prompt => $prompt, index => 1, default => $old_idx, layout => 3, undef => '  <=', clear_screen => 1, info => $info }
         );
+        $ax->print_sql_info( $info );
         if ( ! $idx ) {
             return;
         }
@@ -180,7 +190,7 @@ sub __parse_with_template {
         }
         require String::Unescape;
         $/ = String::Unescape::unescape( $irs[$idx-@pre] );
-        my $waiting = 'Parsing file ... ';
+        $sf->__print_waiting_str;
         seek $fh, 0, 0;
         my @rows = grep { ! /^\s+\z/ } <$fh>;
         chomp @rows;
@@ -192,6 +202,7 @@ sub __parse_with_template {
                 { clear_screen => 1, info => $info, cs_label => 'Number of columns: ',
                   small_first => 1, confirm => 'Confirm', back => 'Back' }
             );
+            $ax->print_sql_info( $info );
             if ( ! $col_count ) {
                 next IRS;
             }
@@ -206,6 +217,7 @@ sub __parse_with_template {
                     { info => $info, prompt => 'Col widths:', auto_up => 2,
                     confirm => $sf->{i}{_confirm}, back => $sf->{i}{_back} . '   ' }
                 );
+                $ax->print_sql_info( $info );
                 if ( ! $form ) {
                     next COL_COUNT;
                 }
@@ -225,20 +237,21 @@ sub __parse_with_template {
                             [ 'Press ENTER' ],
                             { info => $info, prompt => $prompt, info => $info }
                         );
+                        $ax->print_sql_info( $info );
                         @$fields = @$form;
                         next COL_WIDTHS;
                     }
                     push @values, $field_value;
                 }
-
                 my $prompt = 'Remove leading Spaces?';
+                my ( $no, $yes ) = ( '- NO', '- YES' );
                 $info = $sf->__print_template_info( \@rows, 8 );
                 # Choose
-                my ( $no, $yes ) = ( '- NO', '- YES' );
                 my $remove_leading_spaces = $tc->choose(
                     [ undef, $no, $yes ],
                     { info => $info, prompt => $prompt, undef => '  ' . $sf->{i}{back}, layout => 3 }
                 );
+                $ax->print_sql_info( $info );
                 if ( ! defined $remove_leading_spaces ) {
                     next COL_WIDTHS;
                 }
@@ -266,8 +279,7 @@ sub __parse_with_template {
 sub __parse_with_Spreadsheet_Read {
     my ( $sf, $sql, $file_fs ) = @_;
     my $tc = Term::Choose->new( { %{$sf->{i}{tc_default}}, clear_screen => 1 } );
-    my $waiting = 'Parsing file ... ';
-    say $waiting . "\r";
+    $sf->__print_waiting_str;
     require Spreadsheet::Read;
     my $book = $sf->{i}{S_R}{$file_fs}{book};
     if ( ! defined $book ) {

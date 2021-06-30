@@ -2,8 +2,8 @@ NAME
     Tree::FSMethods - Perform filesystem-like operations on object tree(s)
 
 VERSION
-    This document describes version 0.002 of Tree::FSMethods (from Perl
-    distribution Tree-FSMethods), released on 2020-02-23.
+    This document describes version 0.003 of Tree::FSMethods (from Perl
+    distribution Tree-FSMethods), released on 2021-06-27.
 
 SYNOPSIS
      use Tree::FSMethods;
@@ -193,7 +193,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2020 by perlancar@cpan.org.
+    This software is copyright (c) 2021, 2020 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

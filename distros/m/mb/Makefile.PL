@@ -4,7 +4,7 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile(
     'NAME'      => q{mb},
-    'VERSION'   => q{0.29},
+    'VERSION'   => q{0.30},
     'ABSTRACT'  => q{run Perl script in MBCS encoding (not only CJK ;-)},
     'PREREQ_PM' => {
         'Cwd' => '0',
@@ -15,7 +15,7 @@ WriteMakefile(
         'FindBin' => '1.42',
         'Socket' => '0',
         'lib' => '0',
-        'perl' => '5.005_03',
+        'perl' => '5.00503',
         'strict' => '1.01',
         'vars' => '0',
     },

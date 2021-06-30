@@ -1,5 +1,5 @@
 package Photonic::LE::S::Field;
-$Photonic::LE::S::Field::VERSION = '0.016';
+$Photonic::LE::S::Field::VERSION = '0.017';
 
 =encoding UTF-8
 
@@ -9,7 +9,7 @@ Photonic::LE::S::Field
 
 =head1 VERSION
 
-version 0.016
+version 0.017
 
 =head1 COPYRIGHT NOTICE
 
@@ -135,10 +135,8 @@ evaluation of the field
 use namespace::autoclean;
 use PDL::Lite;
 use PDL::NiceSlice;
-use PDL::Complex;
-use PDL::FFTW3;
 use Photonic::LE::S::AllH;
-use Photonic::Utils qw(cgtsv);
+use Photonic::Utils qw(cgtsv GtoR);
 use Photonic::Types;
 use Photonic::Iterator;
 use Moose;
@@ -185,9 +183,9 @@ sub evaluate {
     # calculate using lapack for tridiag system
     # solve \epsilon^LL \vec E^L=D^L.
     # At first take D=|0>
-    my $diag=PDL->pdl($as)->(:,0:$nh-1)->complex;
+    my $diag=$as->(0:$nh-1);
     # rotate complex zero from first to last element.
-    my $subdiag=PDL->pdl($bs)->(:,0:$nh-1)->mv(0,-1)->rotate(-1)->mv(-1,0)->complex;
+    my $subdiag=$bs->(0:$nh-1)->rotate(-1);
     my $supradiag=$subdiag;
     my $rhs=PDL->zeroes($nh);
     $rhs->((0)).=1;
@@ -195,37 +193,33 @@ sub evaluate {
     my $result = cgtsv($subdiag, $diag, $supradiag, $rhs);
     # Obtain longitudinal macroscopic response from result
     # Add spinor normalization.
-    $self->_epsL(my $epsL=sqrt(2)/$result->(:,(0)));
+    $self->_epsL(my $epsL=sqrt(2)/$result->((0)));
     # Normalize result so macroscopic field is 1.
     my $Es = $result*$epsL;
-    #states are ri,nx,ny...
-    #field is ri,xy,pm,nx,ny...
+    #states are nx,ny...
+    #field is xy,pm,nx,ny...
     my @dims=$self->nr->B->dims; # actual dims of space
     my $ndims=@dims; # num. of dims of space
     my $field_G=PDL->zeroes($ndims, 2, @dims)->r2C;
     for(my $n=0; $n<$nh; ++$n){
-	#state is ri,pm,nx,ny...
+	#state is pm,nx,ny...
 	#pmGnorm is xy,pm,nx,ny...
-	#$Gpsi_G is ri,xy,pm,nx,ny
+	#$Gpsi_G is xy,pm,nx,ny
 	my $GPsi_G=($self->nr->pmGNorm->mv(0,-1)*$stateit->nextval)
-	    ->mv(-1,1); #^G|psi_n>
-	my $EnGPsi_G=$Es->(:,$n)*$GPsi_G; #En ^G|psi_n>
-	$field_G+=$EnGPsi_G; #ri,xy,pm,nx,ny...
+	    ->mv(-1,0); #^G|psi_n>
+	my $EnGPsi_G=$Es->($n)*$GPsi_G; #En ^G|psi_n>
+	$field_G+=$EnGPsi_G; #xy,pm,nx,ny...
     }
     #Choose +k
-    my $Esp=$field_G->(:,:,(0)); #ri,xy,nx,ny
-    #filter RandI for each cartesian
-    $Esp *= $self->filter->(*1) if $self->has_filter;
+    my $Esp=$field_G->(:,(0)); #xy,nx,ny
+    $Esp *= $self->filter if $self->has_filter;
     #get cartesian out of the way, fourier transform, put cartesian.
-    my $field_R=ifftn($Esp->mv(1,-1), $ndims)->mv(-1,1);
+    my $field_R=GtoR($Esp, $ndims, 1);
     $field_R*=$self->nr->B->nelem; #scale to have unit macroscopic field
-    #result is ri,xy,nx,ny,...
+    #result is xy,nx,ny,...
     $self->_field($field_R);
-    #my $EM=$field_R->mv(0,-1)->mv(0,-1)->clump(-3)->mv(-2,0)->sumover->mv(-1,1)/$self->nr->B->nelem;
-    #print "EM=$EM\n";
     return $field_R;
 }
-
 
 __PACKAGE__->meta->make_immutable;
 

@@ -4,9 +4,9 @@ use warnings;
 use lib qw(./lib t/lib);
 
 my $driver;
-use Neo4j::Test;
+use Neo4j_Test;
 BEGIN {
-	unless ($driver = Neo4j::Test->driver) {
+	unless ( $driver = Neo4j_Test->driver() ) {
 		print qq{1..0 # SKIP no connection to Neo4j server\n};
 		exit;
 	}
@@ -29,7 +29,7 @@ subtest 'ServerInfo' => sub {
 	lives_ok { $session = $driver->session(database => 'system') } 'get session';
 	lives_ok { $server = $session->server } 'get ServerInfo';
 	isa_ok $server, 'Neo4j::Driver::ServerInfo', 'isa ServerInfo';
-	lives_and { my $a = Neo4j::Test->server_address; like($server->address, qr/$a$/) } 'server address';
+	lives_and { my $a = Neo4j_Test->server_address(); like($server->address(), qr/$a$/) } 'server address';
 	my ($vinfo, $protocol, $result) = ("") x 3;
 	lives_and { ok $vinfo = $server->version } 'server version';
 	like $vinfo, qr(^Neo4j/\d+\.\d+\.\d), 'server version syntax';
@@ -51,7 +51,7 @@ subtest 'ServerInfo' => sub {
 
 
 subtest 'database selection (HTTP)' => sub {
-	plan skip_all => "(currently testing Bolt)" if $Neo4j::Test::bolt;
+	plan skip_all => "(currently testing Bolt)" if $Neo4j_Test::bolt;
 	plan tests => 9;
 	my ($version, $db);
 	# no database option (or undefined)
@@ -103,12 +103,12 @@ subtest 'error handling' => sub {
 	
 	# this really just tests Neo4j::Driver
 	throws_ok {
-		Neo4j::Test->driver_no_connect->session->run('');
+		Neo4j_Test->driver_no_connect->session->run('');
 	} qr/\bConnection refused\b|\bCan't connect\b|\bUnknown host\b/i, 'no connection';
-	return if $Neo4j::Test::bolt;  # next test segfaults with Neo4j::Bolt 0.40 / Neo4j::Client 0.44
-	return unless $Neo4j::Test::sim || $ENV{TEST_NEO4J_PASSWORD};  # next test requires a real or simulated server with auth enabled
+	return if $Neo4j_Test::bolt;  # next test segfaults with Neo4j::Bolt 0.40 / Neo4j::Client 0.44
+	return unless $Neo4j_Test::sim || $ENV{TEST_NEO4J_PASSWORD};  # next test requires a real or simulated server with auth enabled
 	throws_ok {
-		Neo4j::Test->driver_no_auth->session->run('');
+		Neo4j_Test->driver_no_auth->session->run('');
 	} qr/\bUnauthorized\b|\bpassword is invalid\b/, 'Unauthorized';
 };
 

@@ -79,6 +79,7 @@ do { my $x = {
                                       'Exporter::Shiny' => '1.002000',
                                       'Moo' => '0',
                                       'Ref::Util' => '0',
+                                      'Text::Balanced' => '0',
                                       'Types::Common::Numeric' => '0',
                                       'Types::Standard' => '0',
                                       'experimental' => '0',

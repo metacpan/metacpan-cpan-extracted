@@ -1,4 +1,4 @@
-package Dist::Zilla::Prereqs 6.020;
+package Dist::Zilla::Prereqs 6.022;
 # ABSTRACT: the prerequisites of a Dist::Zilla distribution
 
 use Moose;
@@ -151,7 +151,7 @@ Dist::Zilla::Prereqs - the prerequisites of a Dist::Zilla distribution
 
 =head1 VERSION
 
-version 6.020
+version 6.022
 
 =head1 DESCRIPTION
 

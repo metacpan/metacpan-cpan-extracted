@@ -45,7 +45,7 @@ srs_read.pl - Read out SR830 lock-in amplifier
 
 =head1 VERSION
 
-version 3.751
+version 3.760
 
 =head1 srs_read.pl
 
@@ -61,8 +61,8 @@ is the GPIB address.
 
 This software is copyright (c) 2021 by the Lab::Measurement team; in detail:
 
-  Copyright 2011       Andreas K. Huettel
-            2018       Andreas K. Huettel
+  Copyright 2011       Andreas K. HÃ¼ttel
+            2018       Andreas K. HÃ¼ttel
 
 
 This is free software; you can redistribute it and/or modify it under

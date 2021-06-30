@@ -4,9 +4,9 @@ use warnings;
 use lib qw(./lib t/lib);
 
 my $driver;
-use Neo4j::Test;
+use Neo4j_Test;
 BEGIN {
-	unless ($driver = Neo4j::Test->driver) {
+	unless ( $driver = Neo4j_Test->driver() ) {
 		print qq{1..0 # SKIP no connection to Neo4j server\n};
 		exit;
 	}

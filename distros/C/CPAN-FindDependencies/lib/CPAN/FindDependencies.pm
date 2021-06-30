@@ -21,7 +21,7 @@ require Exporter;
 @ISA = qw(Exporter);
 @EXPORT_OK = qw(finddeps);
 
-$VERSION = '3.05';
+$VERSION = '3.06';
 
 use constant MAXINT => ~0;
 
@@ -193,6 +193,13 @@ by paying attention to the depth of each object.
 
 The ordering of any particular module's immediate 'children' can be
 assumed to be random - it's actually hash key order.
+
+=head1 TREE PRUNING
+
+The dependency tree is pruned to remove duplicates. This means that even though
+C<Test::More>, for example, is a dependency of almost everything on the CPAN,
+it will only be listed once.
+
 
 =head1 SECURITY
 

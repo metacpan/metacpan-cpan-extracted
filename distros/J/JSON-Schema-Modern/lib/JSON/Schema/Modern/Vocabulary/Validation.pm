@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary::Validation;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Validation vocabulary
 
-our $VERSION = '0.512';
+our $VERSION = '0.513';
 
 use 5.016;
 no if "$]" >= 5.031009, feature => 'indirect';
@@ -19,15 +19,24 @@ use namespace::clean;
 
 with 'JSON::Schema::Modern::Vocabulary';
 
-sub vocabulary { 'https://json-schema.org/draft/2019-09/vocab/validation' }
+sub vocabulary {
+  my ($self, $spec_version) = @_;
+  return
+      $spec_version eq 'draft2019-09' ? 'https://json-schema.org/draft/2019-09/vocab/validation'
+    : undef;
+}
 
 sub keywords {
-  qw(type enum const
-    multipleOf maximum exclusiveMaximum minimum exclusiveMinimum
-    maxLength minLength pattern
-    maxItems minItems uniqueItems
-    maxContains minContains
-    maxProperties minProperties required dependentRequired);
+  my ($self, $spec_version) = @_;
+  return (
+    qw(type enum const
+      multipleOf maximum exclusiveMaximum minimum exclusiveMinimum
+      maxLength minLength pattern
+      maxItems minItems uniqueItems),
+    $spec_version ne 'draft7' ? qw(maxContains minContains) : (),
+    qw(maxProperties minProperties required),
+    $spec_version ne 'draft7' ? 'dependentRequired' : (),
+  );
 }
 
 sub _traverse_keyword_type {
@@ -347,7 +356,7 @@ JSON::Schema::Modern::Vocabulary::Validation - Implementation of the JSON Schema
 
 =head1 VERSION
 
-version 0.512
+version 0.513
 
 =head1 DESCRIPTION
 

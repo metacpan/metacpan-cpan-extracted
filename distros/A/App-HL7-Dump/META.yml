@@ -3,11 +3,11 @@ abstract: 'Distribution for hl7dump script.'
 author:
   - 'Michal Josef Spacek <skim@cpan.org>'
 build_requires:
-  ExtUtils::MakeMaker: 6.36
+  ExtUtils::MakeMaker: 6.59
   Test::More: 0
   Test::NoWarnings: 0
 configure_requires:
-  ExtUtils::MakeMaker: 6.36
+  ExtUtils::MakeMaker: 6.59
 distribution_type: module
 dynamic_config: 1
 generated_by: 'Module::Install version 1.19'
@@ -23,7 +23,7 @@ no_index:
     - t
     - xt
 recommends:
-  Term::ANSIColor: 0
+  Term::ANSIColor: 5.01
 requires:
   Class::Utils: 0.03
   English: 0
@@ -33,8 +33,8 @@ requires:
   Perl6::Slurp: 0
   perl: 5.6.0
 resources:
-  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-HL7-Dump
+  bugtracker: https://github.com/tupinek/App-HL7-Dump/issues
   homepage: https://github.com/tupinek/App-HL7-Dump
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/tupinek/App-HL7-Dump
-version: '0.03'
+version: '0.04'

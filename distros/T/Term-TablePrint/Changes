@@ -1,6 +1,11 @@
 Revision history for Term::TablePrint
 
 
+0.139   2021-06-30
+        - New options 'info', 'page' and 'keep'.
+        _ Renamed 'table_name' to 'footer'.
+        - Adapted the code to the updated Term::Form.
+
 0.138   2021-06-22
         - use Carp again.
         - Adapt the code to the updated Term::Choose.

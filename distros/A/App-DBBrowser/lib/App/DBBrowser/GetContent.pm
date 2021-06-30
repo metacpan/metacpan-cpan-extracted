@@ -30,6 +30,7 @@ sub new {
 
 sub get_content {
     my ( $sf, $sql, $skip_to ) = @_;
+    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $cr = App::DBBrowser::GetContent::Read->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $cp = App::DBBrowser::GetContent::Parse->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $cf = App::DBBrowser::GetContent::Filter->new( $sf->{i}, $sf->{o}, $sf->{d} );
@@ -37,7 +38,7 @@ sub get_content {
     my @choices = (
         [ 'plain', '- Plain' ],
         [ 'copy',  '- Copy & Paste' ],
-        [ 'file',  '- From File' ],
+        [ 'file',  '- File' ],
     );
     my $old_idx = 0;
     my $data_source_choice = $sf->{o}{insert}{'data_source_' . $sf->{i}{stmt_types}[0]};
@@ -45,13 +46,14 @@ sub get_content {
     MENU: while ( 1 ) {
         if ( ! $skip_to ) {
             if ( $data_source_choice == 3 ) {
+                my $prompt = 'Type of data source:';
                 my @pre = ( undef );
                 my $menu = [ @pre, map( $_->[1], @choices ) ];
                 # Choose
                 my $idx = $tc->choose(
                     $menu,
-                    { %{$sf->{i}{lyt_v}}, prompt => 'Choose type of data source:', index => 1,
-                      default => $old_idx, undef => '  <=' }
+                    { %{$sf->{i}{lyt_v}}, prompt => $prompt, index => 1, default => $old_idx,
+                      undef => '  <=' }
                 );
                 if ( ! defined $idx || ! defined $menu->[$idx] ) {
                     return;
@@ -160,7 +162,6 @@ sub get_content {
                             last SHEET;
                         }
                     }
-                    $sf->{i}{gc}{bu_insert_into_args} = [ map { [ @$_ ] } @{$sql->{insert_into_args}} ];
                 }
                 $skip_to = '';
                 if ( ! $sf->{o}{insert}{enable_input_filter} ) {

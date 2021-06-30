@@ -1,7 +1,49 @@
 package Lab::Bus::USBtmc;
 #ABSTRACT: USBtmc (Test & Measurement) Linux kernel driver bus
-$Lab::Bus::USBtmc::VERSION = '3.751';
+$Lab::Bus::USBtmc::VERSION = '3.760';
 use v5.20;
+use Config;
+
+# the ioctl includes need to have 'sizeof' definitions, which
+# h2ph *does*not*provide*  So we roll our own
+our (%sizeof);
+
+{
+    # sizes needed for ioctl calls
+
+    no warnings qw(redefine misc);
+
+    %sizeof = (
+	'char' => (1 * 1),
+	'double' => ($Config{doublesize} * 1),
+	'int' => ($Config{intsize} * 1),
+	'long' => ($Config{longsize} * 1),
+	'short' => ($Config{shortsize} * 1),
+	'long double' => ($Config{longdblsize} * 1),
+	'long long' => ($Config{longlongsize} * 1),
+	'ptr' => ($Config{ptrsize} * 1),
+	'__uint8_t' => (1 * 1),
+	'__uint16_t' => (2 * 1),
+	'__uint32_t' => (4 * 1),
+	'__uint64_t' => (8 * 1),
+	'int8_t' => (1 * 1),
+	'int16_t' => (2 * 1),
+	'int32_t' => (4 * 1),
+	'int64_t' => (8 * 1),
+	'pid_t' => (4 * 1),
+	'caddr_t' => (4 * 1),
+	'sa_family_t' => (1 * 1),
+	'void' => (1 * 1),
+	);
+    
+    %sizeof = (
+	(%sizeof),
+	'unsigned int' => $sizeof{int},
+	'unsigned char' => $sizeof{char},
+	'unsigned long' => $sizeof{long},
+	'unsigned short' => $sizeof{short},
+	);
+}
 
 # "sys/ioctl.ph" throws a warning about FORTIFY_SOURCE, but
 # this alternate is (perhaps?) not present on all systems,
@@ -9,22 +51,9 @@ use v5.20;
 if ( !defined( eval('require "linux/ioctl.ph";') ) ) {
     require "sys/ioctl.ph";
 }
+require "linux/usb/tmc.ph";
 
-# Created using h2ph
-eval 'sub USBTMC_IOC_NR () {91;}' unless defined(&USBTMC_IOC_NR);
-eval 'sub USBTMC_IOCTL_INDICATOR_PULSE () { &_IO( &USBTMC_IOC_NR, 1);}'
-    unless defined(&USBTMC_IOCTL_INDICATOR_PULSE);
-eval 'sub USBTMC_IOCTL_CLEAR () { &_IO( &USBTMC_IOC_NR, 2);}'
-    unless defined(&USBTMC_IOCTL_CLEAR);
-eval 'sub USBTMC_IOCTL_ABORT_BULK_OUT () { &_IO( &USBTMC_IOC_NR, 3);}'
-    unless defined(&USBTMC_IOCTL_ABORT_BULK_OUT);
-eval 'sub USBTMC_IOCTL_ABORT_BULK_IN () { &_IO( &USBTMC_IOC_NR, 4);}'
-    unless defined(&USBTMC_IOCTL_ABORT_BULK_IN);
-eval 'sub USBTMC_IOCTL_CLEAR_OUT_HALT () { &_IO( &USBTMC_IOC_NR, 6);}'
-    unless defined(&USBTMC_IOCTL_CLEAR_OUT_HALT);
-eval 'sub USBTMC_IOCTL_CLEAR_IN_HALT () { &_IO( &USBTMC_IOC_NR, 7);}'
-    unless defined(&USBTMC_IOCTL_CLEAR_IN_HALT);
-
+#  
 # please note: with the usbtmc kernel module on Linux
 # kernel 4.7.4 (and some prior versions) the module has a
 # built-in unchangable timeout of 5 seconds. So the only
@@ -39,23 +68,74 @@ eval 'sub USBTMC_IOCTL_CLEAR_IN_HALT () { &_IO( &USBTMC_IOC_NR, 7);}'
 # timeout is rounded to 5 second interval, to give the number of reads
 # that are tried
 
+# kernel <4.20 the default buffer size was 2048; later
+# kernel versions have a default buffer size of 4096, but
+# for some reason, tests with a TDS2024B show that the
+# buffering is 1024. It might be at the 'device' end. 
+
+# the reason this matters is in how one determines that a usbtmc
+# 'read' is complete, because many of the queries do not return
+# a completely deterministic number of bytes; so you have to request
+# with a larger number, and you get less. Is that because the read
+# is split up in multiple buffers (with more remaining to be read),
+# or did you reach the end? Reading data that isn't there will give
+# a timeout error, or hang the interface.
+
+# there are four hints for 'reached the end':
+#   the bytes returned is less than a full buffer
+#   the last byte of the returned buffer is '\n' (LF)
+#   the EOM bit is set in bmTransferAttributes (bit 0) (4.20+ only)
+#   the device has MAV bit set in STB when 'more data available'. 
+#
+
+# the STB can be read by ioctl USBTMC488_IOCTL_READ_STB  (>=4.6)
+# but it's only really useful if there is a USB 'interrupt'
+# endpoint for retrieving STB in a side-channel from the main
+# BULK-in data channel, otherwise it just gets queued to the end
+# of the other data. (>=4.6 has this)
+
+# all of this stuff is relevant when binary data is read from the
+# device, because you can't really trust that a \n at the end of
+# a block of data means that it's the end, or just an unfortunate
+# coincidence.
+
+# the EOM bit is faster to deal with, no extra USB i/o is
+# requred, but it does need the requested buffer to be >=
+# the internal buffer, to make sure that that one is getting
+# the full buffer for which the EOM bit applies (instead of the
+# first part of a buffer that is being transfered to user in
+# smaller parts).
+
+# so, going to ignore the user read_length for performing
+# the usb i/o, and only apply it when deciding what to
+# store for transfer to user. 
+
+# going with the ioctl "*STB?" version for now, since it
+# seems more likely to work without weird failure modes.
+
 use strict;
 use Scalar::Util qw(weaken);
 use Carp;
 use Lab::Bus;
 use Data::Dumper;
+use File::Which qw(which);
 
 our @ISA = ("Lab::Bus");
+
+our $DRIVER_TIMEOUT = 5;       # sec, built into module
+our $DRIVER_BUFFER = 4096;     # module default? but devices may have smaller buffer
 
 our %fields = (
     type        => 'USBtmc',
     brutal      => 0,          # ignore read timeout
-    read_length => 1000,       # bytes
+    read_length => -1,       # bytes  (if <= 0, no limit on returned size string)
     wait_query  => 10e-6,      # ignored
     timeout     => 10,         # sec,
+    read_buffer => $DRIVER_BUFFER,
+    no_LF       => 0,          # true if no \n at end of data
+    debug       => 0,          # debug print
 );
 
-our $DRIVER_TIMEOUT = 5;       # sec, built into module
 
 sub new {
     my $proto = shift;
@@ -136,6 +216,10 @@ sub connection_new {         # { tmc_address => primary address }
                 . "::connection_new()\n", );
     }
 
+    $self->{debug} = $self->{config}->{debug} || $self->{ins_debug};
+    $Data::Dumper::Useqq = 1 if $self->{debug};
+    $self->{read_buffer} = $self->{config}->{read_buffer};
+    
     # try to find device
     # options: lsusb, /proc/bus/usb/ /sys/kernel/debug/usb/devices
     # select matching serial; if usb_serial = '*' select first match.
@@ -164,7 +248,7 @@ sub connection_new {         # { tmc_address => primary address }
         }
 
         if (   !$got
-            && -x "usb-devices"
+            && which("usb-devices")
             && open( LSUSB_HANDLE, "usb-devices |" ) ) {
             my $okdev = 0;
             while (<LSUSB_HANDLE>) {
@@ -175,11 +259,11 @@ sub connection_new {         # { tmc_address => primary address }
                 if (/SerialNumber=([^\s]+)/i) {
                     $got = 1 if $usb_serial eq '*' || $usb_serial eq $1;
                     $self->{config}->{usb_serial} = $1;
-                    next;
                 }
                 next unless $got;
-                if (/\If#=\s*(\d+)/i) {
-                    $fn = "/dev/usbtmc$1";
+                if (/\sIf#=\s*(\d+|0x[\da-f]+)/i) {
+		    my $devnum = $1 + 0;
+                    $fn = "/dev/usbtmc$devnum";
                     last;
                 }
             }
@@ -202,10 +286,9 @@ sub connection_new {         # { tmc_address => primary address }
                 if (/SerialNumber=([^\s]+)/i) {
                     $got = 1 if $usb_serial eq '*' || $usb_serial eq $1;
                     $self->{config}->{usb_serial} = $1;
-                    next;
                 }
                 next unless $got;
-                if (/\If#=\s*(\d+)/i) {
+                if (/\sIf#=\s*(\d+)/i) {
                     $fn = "/dev/usbtmc$1";
                     last;
                 }
@@ -226,6 +309,26 @@ sub connection_new {         # { tmc_address => primary address }
         );
     }
 
+    # get some driver info, if it is available
+    # this is sysfs, not sure about older varieties,
+    # but you wouldn't have an up-to-date module for them, would you?
+
+    if (open(TMCMOD,"</sys/module/usbtmc/parameters/io_buffer_size")) {
+	my $nbuf = <TMCMOD>;
+	$nbuf =~ s/\s$//g;
+	$DRIVER_BUFFER = $nbuf;
+	close(TMCMOD);
+	print STDERR "driver buf $nbuf\n" if $self->debug;
+    }
+
+    if (open(TMCMOD,"</sys/module/usbtmc/parameters/usb_timeout")) {
+	my $timeout = <TMCMOD>;
+	$timeout =~ s/\s$//g;
+	$DRIVER_TIMEOUT = $timeout/1000;   # module value in ms
+	close(TMCMOD);
+	print STDERR "driver timeout $timeout ms\n" if $self->debug;
+    }
+    
     my $connection_handle = undef;
     my $tmc_handle        = undef;
 
@@ -242,6 +345,9 @@ sub connection_new {         # { tmc_address => primary address }
 
 # if read returns 'undef', that's an EOF/error/Timeout, see $!
 # return a zero length string if brutal=1 and timeout
+# READ_BUFFER is the max read buffer size, instrument/driver defines
+# no_LF if we don't expect a \n at end of returned data.
+
 sub connection_read
 {    # @_ = ( $connection_handle, $args = { read_length, brutal }
     my $self              = shift;
@@ -255,15 +361,18 @@ sub connection_read
     my $brutal      = $args->{'brutal'}      || $self->brutal();
     my $read_length = $args->{'read_length'} || $self->read_length();
     my $timeout     = $args->{'timeout'}     || $self->{'timeout'};
+    my $read_buffer = $args->{'read_buffer'} || $self->{'read_buffer'};
+    my $no_LF       = $args->{'no_LF'}       || $self->{'no_LF'};
 
-    my $result = undef;
+    my $result = '';
 
     my $tmc_handle = $connection_handle->{'tmc_handle'};
     my $iss;
     my $tries = 0;
 
     while (1) {
-        $iss = sysread( $tmc_handle, $result, $read_length );
+	my $buf;
+        $iss = sysread( $tmc_handle, $buf, $read_buffer );
         if ( !defined($iss) ) {
             if ( $! =~ /timed?\s*out/i ) {
                 $tries++;
@@ -283,13 +392,63 @@ sub connection_read
                 );
             }
         }
-        last;
+	print STDERR "read: ",Dumper($buf),"\n" if $self->{debug};
+
+
+	if ($read_length > 0) {
+	    my $totlength = length($result)+length($buf);
+	    $totlength-- unless $no_LF;
+	    	
+	    $result .= substr($buf,0,$read_length-length($result))
+		if length($result) < $read_length;
+
+	    if ($totlength > $read_length) {
+		Lab::Exception::DriverError->throw(
+		    error => "USBtmc data returned ($totlength) > read_length ($read_length)",
+		);
+	    }
+	} else {
+	    $result .= $buf;
+	}
+	if ($iss < $read_buffer ||
+	    $no_LF || substr($buf,-1,1) eq "\n" ) {
+	    last unless $self->get_stb($connection_handle,0x10);
+	}
     }
 
-    # strip spaces and null byte
-    $result =~ s/[\n\r\x00]*$//;
+    # strip \n at end
+    $result =~ s/\n$// unless $no_LF;
     return $result;
 }
+
+
+
+# read the status register via ioctl/usb interrupt endpoint
+
+# can select a single bit for true/false return:
+# ex: get_stb($conn, STB_MAV);
+#
+sub get_stb {
+    my $self = shift;
+    my $connection_handle = shift;
+    my $tmc_handle = $connection_handle->{'tmc_handle'};
+    my $bitmask = shift;
+    
+    my $stb = ' ';
+    my $iss = ioctl($tmc_handle,USBTMC488_IOCTL_READ_STB(), $stb);
+    if (!$iss) {
+	Lab::Exception::DriverError->throw(
+            error => "USBtmc read_stb ioctl error $!\n",
+	    );
+        return 0;
+    }
+    $stb = unpack('C',$stb);
+    printf STDERR ("STB=0b%08b\n",$stb) if $self->debug;
+    return ($stb & $bitmask) != 0 if defined $bitmask;
+    return $stb;
+}
+
+
 
 # write then read
 sub connection_query
@@ -306,8 +465,8 @@ sub connection_query
     # just use regular 'timeout' for the wait time
     my $result = undef;
 
-    $self->connection_write($args);
-    $result = $self->connection_read($args);
+    $self->connection_write($connection_handle, $args);
+    $result = $self->connection_read($connection_handle, $args);
     return $result;
 }
 
@@ -435,7 +594,11 @@ sub timeout {
 }
 
 sub ParseIbstatus
-{    # Ibstatus http://linux-gpib.sourceforge.net/doc_html/r634.html
+{    # Ibstatus
+    # https://linux-gpib.sourceforge.io/doc_html/reference-globals-ibsta.html
+    my $self = shift;
+    my $ibstatus = shift;  # stb byte from device
+    
     carp("ParseIbstatus not supported");
 }
 
@@ -477,7 +640,7 @@ Lab::Bus::USBtmc - USBtmc (Test & Measurement) Linux kernel driver bus
 
 =head1 VERSION
 
-version 3.751
+version 3.760
 
 =head1 SYNOPSIS
 
@@ -577,15 +740,16 @@ See C<Lab::Instrument::Read()>.
 
 =head2 connection_write
 
-  $tmc->connection_write( $InstrumentHandle, { Cmd => $Command } );
+  $tmc->connection_write( $InstrumentHandle, { command => $Command } );
 
 Sends $Command to the instrument specified by the handle.
 
 =head2 connection_read
 
-  $tmc->connection_read( $InstrumentHandle, { ReadLength => $readlength } );
+  $tmc->connection_read( $InstrumentHandle, { read_length => $readlength } );
 
-Reads back a maximum of $readlength bytes. 
+Reads back a maximum of $readlength bytes.  If $readlength <= 0 (which is the default)
+there is no limit.
 
 Setting C<Brutal> to a true value will result in timeouts being ignored, and the gathered data returned without error.
 
@@ -614,6 +778,15 @@ Without arguments, returns a reference to the complete $self->config aka @_ of t
  $config = $bus->config();
  $tmc_serial = $bus->config()->{'usb_serial'};
 
+=head2 get_stb
+
+    $statusbyte = $tmc->get_stb($connection_handle, [$stbmask]);
+
+reads the STB register, using ioctl/USB interrupt endpoint, so it does not disturb the
+command/data queues.  If a stbmask is provided, it is "anded" with the status byte
+and returns 'true' if any bits are set.  $stbmask = 0x10 is the MAV bit for
+'more data available'.
+
 =head1 CAVEATS/BUGS
 
 Lots, I'm sure.
@@ -638,8 +811,9 @@ This software is copyright (c) 2021 by the Lab::Measurement team; in detail:
 
   Copyright 2012       Hermann Kraus
             2016       Charles Lane, Simon Reinhardt
-            2017       Andreas K. Huettel
-            2020       Andreas K. Huettel
+            2017       Andreas K. HÃ¼ttel
+            2020       Andreas K. HÃ¼ttel
+            2021       Charles Lane
 
 
 This is free software; you can redistribute it and/or modify it under

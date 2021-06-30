@@ -40,6 +40,9 @@ use constant TEST_DIR => catdir(dirname(__FILE__), 'test-data');
     is_deeply($obj->eq_ids,    {}, 'eq_ids()');
     ok(!$obj->prespec, "prespec() still returns false");
 
+    isnt($obj->elem_ids, $obj->tab_elems,
+         "elem_ids() and tab_elems() do not reference the same hash");
+
     is_deeply($obj->matrix_named, {}, 'matrix_named()');
     my $matrix_named = $obj->matrix_named(bless => 1);
     is_deeply($matrix_named, {}, 'matrix_named()');

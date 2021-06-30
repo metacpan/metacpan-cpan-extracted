@@ -1,0 +1,52 @@
+NAME
+    Module::Features::Dummy - Dummy feature set, for testing
+
+VERSION
+    This document describes version 0.004 of Module::Features::Dummy (from
+    Perl distribution Module-Features-Dummy), released on 2021-02-26.
+
+DESCRIPTION
+DEFINED FEATURES
+    Features defined by this module:
+
+    *   feature1
+
+        Optional. Type: bool. First feature, a bool.
+
+    *   feature2
+
+        Required. Type: bool. Second feature, a bool, required.
+
+    *   feature3
+
+        Optional. Type: str. Second feature, a string.
+
+    For more details on module features, see Module::Features.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Module-Features-Dummy>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Module-Features-Dummy>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://github.com/perlancar/perl-Module-Features-Dummy/issues>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Module::Features
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2021 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

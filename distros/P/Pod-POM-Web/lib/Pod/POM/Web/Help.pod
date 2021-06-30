@@ -10,12 +10,6 @@ on your local machine. Since pages are dynamically
 generated, they are always in sync with code actually
 installed.
 
-This application makes heavy use of dynamic HTML techniques
-like Ajax calls, autocompletion of search fields, etc., so
-it requires a modern browser. It has been tested on Firefox 3.5.6
-and MSIE 8, but should also work more or less correctly in other browsers
-like Safari, Konqueror or Google Chrome.
-
 =head2 Searching
 
 Users can type search criteria in the single search input field

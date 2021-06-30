@@ -3,9 +3,9 @@ NAME
     structure convenient for producing CLI documentation (help/usage/POD)
 
 VERSION
-    This document describes version 0.294 of Perinci::Sub::To::CLIDocData
+    This document describes version 0.295 of Perinci::Sub::To::CLIDocData
     (from Perl distribution Perinci-Sub-To-CLIDocData), released on
-    2020-04-27.
+    2021-06-27.
 
 SYNOPSIS
      use Perinci::Sub::To::CLIDocData qw(gen_cli_doc_data_from_meta);
@@ -43,7 +43,6 @@ SYNOPSIS
        summary => "Function summary",
        v => 1.1,
      }
-
     Sample result:
 
      do {
@@ -137,7 +136,7 @@ SYNOPSIS
                tags        => 'fix',
              },
            },
-           usage_line => "[[prog]] [--bool1] [-f] [--flag1] [--no-bool1] [--nobool1] [-z] <str1>",
+           usage_line => "[[prog]] [--bool1] [-f] [--flag1] [--no-bool1] [--nobool1] [-z] -- <str1>",
          },
        ];
        $a->[2]{opts}{"--bool1"}{tags} = $a->[2]{opts}{"--bool1"}{arg_spec}{tags};
@@ -147,9 +146,8 @@ SYNOPSIS
        $a->[2]{opts}{"-z"}{tags} = $a->[2]{opts}{"--bool1"}{arg_spec}{tags};
        $a;
      }
-
-    For a more complete sample, see function metadata for "demo_cli_opts" in
-    Perinci::Examples::CLI.
+    For a more complete sample, see function metadata for C<demo_cli_opts> in
+    L<Perinci::Examples::CLI>.
 
 RINCI
     Observed function argument attribute: "x.cli.opt_value_label",
@@ -159,7 +157,7 @@ FUNCTIONS
   gen_cli_doc_data_from_meta
     Usage:
 
-     gen_cli_doc_data_from_meta(%args) -> [status, msg, payload, meta]
+     gen_cli_doc_data_from_meta(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
     From Rinci function metadata, generate structure convenient for
     producing CLI documentation (help/usage/POD).
@@ -210,12 +208,15 @@ FUNCTIONS
 
     Returns an enveloped result (an array).
 
-    First element (status) is an integer containing HTTP status code (200
-    means OK, 4xx caller error, 5xx function error). Second element (msg) is
-    a string containing error message, or 'OK' if status is 200. Third
-    element (payload) is optional, the actual result. Fourth element (meta)
-    is called result metadata and is optional, a hash that contains extra
-    information.
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
 
     Return value: (hash)
 
@@ -244,7 +245,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2020, 2019, 2016, 2015, 2014 by
+    This software is copyright (c) 2021, 2020, 2019, 2016, 2015, 2014 by
     perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under

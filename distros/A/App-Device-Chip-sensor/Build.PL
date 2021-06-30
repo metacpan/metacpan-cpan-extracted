@@ -13,9 +13,11 @@ my $build = Module::Build->new(
 
       'Device::Chip::Adapter' => 0,
       'Future::IO' => '0.08',
+      'Future::IO::Impl::IOAsync' => 0,
    },
    test_requires => {
       'Test::More' => '0.88', # done_testing
+      'Test::Deep' => 0,
    },
    configure_requires => {
       'Module::Build' => '0.4004', # test_requires

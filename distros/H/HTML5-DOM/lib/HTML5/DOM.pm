@@ -17,7 +17,7 @@ use HTML5::DOM::Collection;
 use HTML5::DOM::CSS;
 use HTML5::DOM::TokenList;
 
-our $VERSION = '1.18';
+our $VERSION = '1.23';
 require XSLoader;
 
 # https://developer.mozilla.org/pl/docs/Web/API/Element/nodeType

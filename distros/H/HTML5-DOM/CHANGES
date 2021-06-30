@@ -27,3 +27,12 @@
 2020-04-29  1.16    - fix random trash in innerText in some cases
 2020-12-12  1.17    - fix docs
 2020-12-12  1.18    - fix docs
+2021-06-26  1.19    - fix infinite loop when calling replace method with a fragment
+                    - fix bugtracker url
+                    - new collection methods: uniq, grep, head, tail, slice, shuffle, reverse
+                    - added regexp/callback support to $collection->first
+                    - update modest
+2021-06-26  1.20    - fix link to issues
+2021-06-26  1.21    - fix link to issues
+2021-06-29  1.22    - replace re::is_regexp to ref() check for older perl versions
+2021-06-29  1.23    - fix "Search pattern not terminated"

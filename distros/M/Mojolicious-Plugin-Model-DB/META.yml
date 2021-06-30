@@ -3,11 +3,16 @@ abstract: 'It is an extension of the module Mojolicious::Plugin::Model'
 author:
   - 'Lucas Tiago de Moraes <lucastiagodemoraes@gmail.com>'
 build_requires:
+  Class::Method::Modifiers: '0'
   ExtUtils::MakeMaker: '0'
+  Mojo::SQLite: '2.000'
+  Mojolicious::Plugin::Model: '7.13'
+  Storable: '0'
+  Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -19,14 +24,12 @@ no_index:
     - inc
 requires:
   Class::Method::Modifiers: '0'
-  Mojo::Base: '0'
-  Mojo::Util: '0'
-  Mojolicious::Plugin::Model: '0.10'
+  Mojolicious::Plugin::Model: '0.11'
   Storable: '0'
   perl: '5.010001'
 resources:
   bugtracker: https://github.com/lucas1/Mojolicious-Plugin-Model-DB/issues
   homepage: https://github.com/lucas1/Mojolicious-Plugin-Model-DB
   repository: https://github.com/lucas1/Mojolicious-Plugin-Model-DB
-version: '0.10'
+version: '1.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

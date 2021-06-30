@@ -1,5 +1,5 @@
 package Photonic::WE::S::Field;
-$Photonic::WE::S::Field::VERSION = '0.016';
+$Photonic::WE::S::Field::VERSION = '0.017';
 
 =encoding UTF-8
 
@@ -9,7 +9,7 @@ Photonic::WE::S::Field
 
 =head1 VERSION
 
-version 0.016
+version 0.017
 
 =head1 COPYRIGHT NOTICE
 
@@ -137,10 +137,8 @@ evaluation of the field
 use namespace::autoclean;
 use PDL::Lite;
 use PDL::NiceSlice;
-use PDL::Complex;
-use PDL::FFTW3;
 use Photonic::WE::S::AllH;
-use Photonic::Utils qw(cgtsv);
+use Photonic::Utils qw(cgtsv GtoR);
 use Photonic::Types;
 use Photonic::Iterator;
 use Moose;
@@ -182,49 +180,43 @@ sub evaluate {
     #don't go beyond available values.
     $nh=$self->nr->iteration if $nh>$self->nr->iteration;
     # calculate using lapack for tridiag system
-    my $diag = 1-PDL->pdl($as)->(:,0:$nh-1)->complex;
+    my $diag = 1-$as->(0:$nh-1);
     # rotate complex zero from first to last element.
-    my $subdiag = -PDL->pdl($bs)->(:,0:$nh-1)
-	->mv(0,-1)->rotate(-1)->mv(-1,0)
-	->complex;
-    my $supradiag =-PDL->pdl($cs)->(:,0:$nh-1)
-	->mv(0,-1)->rotate(-1)->mv(-1,0)
-	->complex;
+    my $subdiag = -$bs->(0:$nh-1)->rotate(-1);
+    my $supradiag =-$cs->(0:$nh-1)->rotate(-1);
     my $rhs=PDL->zeroes($nh); #build a nh pdl
     $rhs->slice((0)).=1;
     $rhs=$rhs->r2C;
     #coefficients of g^{-1}E
     my $giEs= cgtsv($subdiag, $diag, $supradiag, $rhs);
-    #states are ri,xy,pm,nx,ny...
+    #states are xy,pm,nx,ny...
     my @dims=$self->nr->B->dims; # actual dims of space
     my $ndims=@dims; # num. of dims of space
-    #field is ri,xy,pm,nx,ny...
+    #field is xy,pm,nx,ny...
     my $field_G=PDL->zeroes($ndims, 2, @dims)->r2C;
     #print $field_G->info, "\n";
-    #field is ri,xy,pm,nx,ny...
+    #field is xy,pm,nx,ny...
     for(my $n=0; $n<$nh; ++$n){
-	my $giE_G=$giEs->(:,$n)*$stateit->nextval; #En ^G|psi_n>
+	my $giE_G=$giEs->($n)*$stateit->nextval; #En ^G|psi_n>
 	$field_G+=$giE_G;
     }
     #
     my $Es=$self->nr->applyMetric($field_G);
     #Comment as normalization below makes it useless
-    #$Es*=$bs->(:,(0))/$self->nr->metric->epsilon;
-    my $Esp=$Es(:,:,(0)); # choose +k spinor component.
-    my $e_0=1/($Esp->slice(":,:" . ",(0)" x $ndims)
-	       *$self->nr->polarization->Cconj)->sumover;
+    #$Es*=$bs->((0))/$self->nr->metric->epsilon;
+    my $Esp=$Es(:,(0)); # choose +k spinor component.
+    my $e_0=1/($Esp->slice(":" . ",(0)" x $ndims)
+	       *$self->nr->polarization->conj)->sumover;
     # Normalize result so macroscopic field is 1.
     $Esp*=$e_0;
-    ##filter RandI for each cartesian
-    $Esp *= $self->filter->(*1) if $self->has_filter;
+    $Esp *= $self->filter if $self->has_filter;
     ##get cartesian out of the way, fourier transform, put cartesian.
-    my $field_R=ifftn($Esp->mv(1,-1), $ndims)->mv(-1,1);
+    my $field_R=GtoR($Esp, $ndims, 1);
     $field_R*=$self->nr->B->nelem; #scale to have unit macroscopic field
-    #result is ri,xy,nx,ny...
+    #result is xy,nx,ny...
     $self->_field($field_R);
     return $field_R;
 }
-
 
 __PACKAGE__->meta->make_immutable;
 

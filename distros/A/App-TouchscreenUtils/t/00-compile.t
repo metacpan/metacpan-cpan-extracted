@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 5 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 7 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/TouchscreenUtils.pm'
@@ -16,7 +16,9 @@ my @scripts = (
     'script/disable-touchscreen',
     'script/enable-touchscreen',
     'script/has-touchscreen',
-    'script/touchscreen-is-enabled'
+    'script/touchscreen-is-enabled',
+    'script/tsoff',
+    'script/tson'
 );
 
 # no fake home requested

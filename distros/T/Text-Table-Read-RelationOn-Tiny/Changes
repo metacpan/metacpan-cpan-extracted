@@ -1,5 +1,11 @@
 Revision history for Text-Table-Read-RelationOn-Tiny
 
+v2.1.0     2021/06/28
+           Added constructor options 'ext' and 'elem_id' allowing to use external data
+
+v2.0.1     2021/06/27
+           Fixed minor bug and completed description of constructor arguments 'inc' amd 'noinc'.
+
 v2.0.0     2021/06/25
            Completely reworked code.
            Removed methods 'x_elem_ids', 'n_elems' and 'bless_matrix'.

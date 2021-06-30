@@ -38,7 +38,7 @@ subtest 'test success' => sub {
     $ua->map_response(
         'example.com',
         HTTP::Response->new(
-            '200', 'OK',
+            '200',                             'OK',
             [ 'Content-Type' => 'text/html' ], q{}
         )
     );
@@ -73,7 +73,7 @@ subtest 'test error with no retries' => sub {
     $ua->map_response(
         'example.com',
         HTTP::Response->new(
-            '500', 'Internal Server Error',
+            '500',                             'Internal Server Error',
             [ 'Content-Type' => 'text/html' ], q{}
         )
     );
@@ -110,7 +110,7 @@ subtest 'test error then success' => sub {
                 );
             }
             return HTTP::Response->new(
-                '200', 'OK',
+                '200',                             'OK',
                 [ 'Content-Type' => 'text/html' ], q{}
             );
         }
@@ -141,7 +141,7 @@ subtest 'test 4xx error' => sub {
     $ua->map_response(
         'example.com',
         HTTP::Response->new(
-            '404', 'Not Found',
+            '404',                             'Not Found',
             [ 'Content-Type' => 'text/html' ], q{}
         )
     );

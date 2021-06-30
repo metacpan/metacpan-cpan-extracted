@@ -5,7 +5,7 @@ lib/Data/Dump/Filtered.pm
 lib/Data/Dump/FilterContext.pm
 Makefile.PL
 MANIFEST
-README
+README.md
 t/dd.t
 t/dollar-one.t
 t/dump.t

@@ -4,7 +4,7 @@ Dist::Zilla::PluginBundle::MAXMIND - MAXMIND's plugin bundle
 
 # VERSION
 
-version 0.83
+version 0.84
 
 # SYNOPSIS
 
@@ -42,12 +42,12 @@ version 0.83
 
 # DESCRIPTION
 
-This is the [Dist::Zilla](https://metacpan.org/pod/Dist::Zilla) plugin bundle I use for my distributions. Don't use
+This is the [Dist::Zilla](https://metacpan.org/pod/Dist%3A%3AZilla) plugin bundle I use for my distributions. Don't use
 this directly for your own distributions, but you may find it useful as a
 source of ideas for building your own bundle.
 
-This bundle uses [Dist::Zilla::Role::PluginBundle::PluginRemover](https://metacpan.org/pod/Dist::Zilla::Role::PluginBundle::PluginRemover) and
-[Dist::Zilla::Role::PluginBundle::Config::Slicer](https://metacpan.org/pod/Dist::Zilla::Role::PluginBundle::Config::Slicer) so I can remove or
+This bundle uses [Dist::Zilla::Role::PluginBundle::PluginRemover](https://metacpan.org/pod/Dist%3A%3AZilla%3A%3ARole%3A%3APluginBundle%3A%3APluginRemover) and
+[Dist::Zilla::Role::PluginBundle::Config::Slicer](https://metacpan.org/pod/Dist%3A%3AZilla%3A%3ARole%3A%3APluginBundle%3A%3AConfig%3A%3ASlicer) so I can remove or
 configure any plugin as needed.
 
 This is more or less equivalent to the following `dist.ini`:
@@ -154,7 +154,6 @@ This is more or less equivalent to the following `dist.ini`:
     check_authordeps  = 1
     skip = Dist::Zilla::Plugin::MAXMIND::CheckChangesHasContent
     skip = Dist::Zilla::Plugin::MAXMIND::Contributors
-    skip = Dist::Zilla::Plugin::MAXMIND::Git::CheckFor::CorrectBranch
     skip = Dist::Zilla::Plugin::MAXMIND::License
     skip = Dist::Zilla::Plugin::MAXMIND::TidyAll
     skip = Dist::Zilla::Plugin::MAXMIND::VersionProvider
@@ -240,11 +239,6 @@ This is more or less equivalent to the following `dist.ini`:
     ; CPAN::Changes to parse the Changes file.
     [MAXMIND::CheckChangesHasContent]
 
-    ; Just like Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch except that
-    ; it allows releases from any branch for TRIAL
-    ; releases. https://github.com/RsrchBoy/dist-zilla-pluginbundle-git-checkfor/issues/24
-    [MAXMIND::Git::CheckFor::CorrectBranch]
-
     [Git::CheckFor::MergeConflicts]
 
     ; Generates/updates tidyall.ini, perlcriticrc, and perltidyrc
@@ -289,15 +283,17 @@ Dave Rolsky <autarch@urth.org>
 # CONTRIBUTORS
 
 - Dave Rolsky <drolsky@maxmind.com>
+- Florian Ragwitz <rafl@debian.org>
 - Greg Oschwald <goschwald@maxmind.com>
 - Mark Fowler <mark@twoshortplanks.com>
 - Olaf Alders <oalders@maxmind.com>
 - Patrick Cronin <PatrickCronin@users.noreply.github.com>
 - Patrick Cronin <pcronin@maxmind.com>
+- Will Storey <wstorey@maxmind.com>
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Dave Rolsky and MaxMind, Inc.
+This software is Copyright (c) 2021 by Dave Rolsky and MaxMind, Inc.
 
 This is free software, licensed under:
 

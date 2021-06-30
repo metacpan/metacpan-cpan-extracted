@@ -4,7 +4,7 @@
       "Graham Ollis <plicease@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Dist::Zilla version 6.020, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.019, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -93,7 +93,7 @@
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "1.46",
+   "version" : "1.50",
    "x_contributors" : [
       "Graham Ollis <plicease@cpan.org>",
       "Bakkiaraj Murugesan (bakkiaraj)",

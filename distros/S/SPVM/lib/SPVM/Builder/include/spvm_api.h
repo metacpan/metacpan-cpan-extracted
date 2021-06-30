@@ -63,7 +63,7 @@ int32_t SPVM_API_has_callback(SPVM_ENV* env, SPVM_OBJECT* object, int32_t callba
 
 SPVM_METHOD* SPVM_API_method(SPVM_ENV* env, SPVM_PACKAGE* package, const char* method_name);
 
-SPVM_BASIC_TYPE* SPVM_API_basic_type(SPVM_ENV* env,  const char* basic_type_name);
+SPVM_BASIC_TYPE* SPVM_API_get_basic_type(SPVM_ENV* env,  const char* basic_type_name);
 SPVM_PACKAGE_VAR* SPVM_API_package_var(SPVM_ENV* env, SPVM_PACKAGE* package, const char* package_var_name);
 
 // Get
@@ -260,5 +260,8 @@ const char* SPVM_API_get_field_string_chars_by_name(SPVM_ENV* env, SPVM_OBJECT* 
 SPVM_OBJECT* SPVM_API_dump_raw(SPVM_ENV* env, SPVM_OBJECT* object);
 SPVM_OBJECT* SPVM_API_dump(SPVM_ENV* env, SPVM_OBJECT* object);
 void SPVM_API_dump_recursive(SPVM_ENV* env, SPVM_OBJECT* object, int32_t* depth, SPVM_STRING_BUFFER* string_buffer, SPVM_HASH* address_symtable);
+
+SPVM_PACKAGE_VAR* SPVM_API_get_package_var(SPVM_ENV* env, SPVM_PACKAGE* package, const char* package_var_name);
+SPVM_METHOD* SPVM_API_get_method(SPVM_ENV* env, SPVM_PACKAGE* package, const char* method_name);
 
 #endif

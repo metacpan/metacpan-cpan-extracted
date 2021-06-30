@@ -1,5 +1,5 @@
 package Lab::Measurement;
-$Lab::Measurement::VERSION = '3.751';
+$Lab::Measurement::VERSION = '3.760';
 #ABSTRACT: Log, describe and plot data on the fly
 
 use v5.20;
@@ -32,7 +32,7 @@ Lab::Measurement - Log, describe and plot data on the fly
 
 =head1 VERSION
 
-version 3.751
+version 3.760
 
 =head1 SYNOPSIS
 
@@ -74,15 +74,15 @@ API; its documentation can be found on the Lab::Measurement homepage.
 
 This software is copyright (c) 2021 by the Lab::Measurement team; in detail:
 
-  Copyright 2005-2006  Daniel Schroeer
-            2011       Andreas K. Huettel
-            2012       Alois Dirnaichner, Andreas K. Huettel, David Kalok, Hermann Kraus
-            2013       Andreas K. Huettel
+  Copyright 2005-2006  Daniel SchrÃ¶er
+            2011       Andreas K. HÃ¼ttel
+            2012       Alois Dirnaichner, Andreas K. HÃ¼ttel, David Kalok, Hermann Kraus
+            2013       Andreas K. HÃ¼ttel
             2014       Christian Butschkow
-            2016       Andreas K. Huettel, Simon Reinhardt
-            2017-2018  Andreas K. Huettel
+            2016       Andreas K. HÃ¼ttel, Simon Reinhardt
+            2017-2018  Andreas K. HÃ¼ttel
             2019       Simon Reinhardt
-            2020       Andreas K. Huettel
+            2020       Andreas K. HÃ¼ttel
 
 
 This is free software; you can redistribute it and/or modify it under

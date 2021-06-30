@@ -5,7 +5,10 @@ use utf8;
 
 package Neo4j::Driver::Net::HTTP;
 # ABSTRACT: Networking delegate for Neo4j HTTP
-$Neo4j::Driver::Net::HTTP::VERSION = '0.23';
+$Neo4j::Driver::Net::HTTP::VERSION = '0.25';
+
+# This package is not part of the public Neo4j::Driver API.
+
 
 use Carp qw(croak);
 our @CARP_NOT = qw(Neo4j::Driver::Transaction Neo4j::Driver::Transaction::HTTP);
@@ -217,38 +220,4 @@ sub _is_active_tx {
 }
 
 
-
 1;
-
-__END__
-
-=pod
-
-=encoding UTF-8
-
-=head1 NAME
-
-Neo4j::Driver::Net::HTTP - Networking delegate for Neo4j HTTP
-
-=head1 VERSION
-
-version 0.23
-
-=head1 DESCRIPTION
-
-The L<Neo4j::Driver::Net::HTTP> package is not part of the
-public L<Neo4j::Driver> API.
-
-=head1 AUTHOR
-
-Arne Johannessen <ajnn@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is Copyright (c) 2016-2021 by Arne Johannessen.
-
-This is free software, licensed under:
-
-  The Artistic License 2.0 (GPL Compatible)
-
-=cut

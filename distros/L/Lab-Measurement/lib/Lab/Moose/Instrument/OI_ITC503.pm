@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::OI_ITC503;
-$Lab::Moose::Instrument::OI_ITC503::VERSION = '3.751';
+$Lab::Moose::Instrument::OI_ITC503::VERSION = '3.760';
 #ABSTRACT: Oxford Instruments ITC503 Intelligent Temperature Control
 
 use v5.20;
@@ -463,7 +463,7 @@ Lab::Moose::Instrument::OI_ITC503 - Oxford Instruments ITC503 Intelligent Temper
 
 =head1 VERSION
 
-version 3.751
+version 3.760
 
 =head1 SYNOPSIS
 
@@ -613,7 +613,7 @@ This driver consumes the following roles:
 This software is copyright (c) 2021 by the Lab::Measurement team; in detail:
 
   Copyright 2019       Simon Reinhardt
-            2020       Andreas K. Huettel
+            2020       Andreas K. HÃ¼ttel
 
 
 This is free software; you can redistribute it and/or modify it under

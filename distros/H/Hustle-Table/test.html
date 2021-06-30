@@ -1,0 +1,380 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Hustle::Table - Pattern dispatching to subroutines</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:root@osx355.sd.apple.com" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#CREATING-A-TABLE">CREATING A TABLE</a></li>
+  <li><a href="#ENTRIES-MANAGEMENT">ENTRIES MANAGEMENT</a>
+    <ul>
+      <li><a href="#STRUCTURE">STRUCTURE</a></li>
+      <li><a href="#ADDING">ADDING</a></li>
+      <li><a href="#REMOVING">REMOVING</a></li>
+      <li><a href="#DUMPING">DUMPING</a></li>
+      <li><a href="#THE-DEFAULT-MATCHER">THE DEFAULT MATCHER</a></li>
+    </ul>
+  </li>
+  <li><a href="#PREPARING-A-DISPATCHER">PREPARING A DISPATCHER</a></li>
+  <li><a href="#USING-A-DISPATCHER">USING A DISPATCHER</a></li>
+  <li><a href="#PERFORMANCE">PERFORMANCE</a>
+    <ul>
+      <li><a href="#CACHING-AND-CACHE-CONTROL">CACHING AND CACHE CONTROL</a></li>
+      <li><a href="#OPTIMISATION">OPTIMISATION</a></li>
+    </ul>
+  </li>
+  <li><a href="#COMPARISON-TO-OTHER-MODULES">COMPARISON TO OTHER MODULES</a></li>
+  <li><a href="#BUGS">BUGS</a></li>
+  <li><a href="#TODO">TODO</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</a></li>
+  <li><a href="#DISCLAIMER-OF-WARRANTIES">DISCLAIMER OF WARRANTIES</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Hustle::Table - Pattern dispatching to subroutines</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>  use Hustle::Table;
+
+  #1. Create a new object
+  my $table=Hustle::Table-&gt;new;
+
+  #2. Add entries which contain:
+  # matcher:            required. The matcher  (ie regex, string, number) to test with
+  # sub:                required. The sub to call when matcher is &#39;true&#39; when testing input
+  # label:              optional. For identification
+  # count:              optional. Used as priority when adding (larger number=&gt; higher priority)
+  # Can either be a array ref or hash ref
+
+  $table-&gt;add(
+        #entry as a hash ref
+        { matcher =&gt; qr/regex (match)/, sub =&gt; sub{ #can access regex capture }}, 
+
+        #entry as array ref, with label and priority values set
+        [qr/another/, sub{}, &quot;my label&quot;, 10],                   
+        
+        #undef matcher is default match all. Must be array ref format
+        [undef,sub {},&quot;default&quot;,undef]                          
+  );
+
+  #3. Prepare a dispatcher:
+  # A dispatcher is sub reference, which is called directly with input to match
+
+  my $dispatch = $table-&gt;prepare_dispatcher(
+        type =&gt; &quot;online&quot;,               #either &quot;online&quot; (default=&quot;online&quot;) or &quot;offline&quot; 
+        cache =&gt; {},            #the hash to use as a cache
+        reorder =&gt; 1,           #reorder (default=1) table before building dispatcher   
+        reset =&gt; 0              #Reset (default=undef) entry counts
+ );
+
+
+  #4. Dispatch input
+  $dispatch-&gt;(&quot;thing to match&quot;,&quot;optional&quot;, &quot;arguments&quot;);        # any number of arguments passsed to sub
+
+
+  #5. Offline optimisation is also possible
+  </code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This module provides a small class to construct a dispatch table and build a dispatcher for it. All interactions are done via the object/class methods so no exports are defined.</p>
+
+<p>It supports straightforward optimisation of the dispatch table and also utilises a optional cache to squeeze even more performance out.</p>
+
+<p>Notable features include:</p>
+
+<ul>
+
+<li><p>Non exact (regexp) and exact (string) matching in the same table</p>
+
+</li>
+<li><p>Uses built-in Perl features (regex, given/when, smart-match)</p>
+
+</li>
+<li><p>Captures in regex are available in dispatched subs</p>
+
+</li>
+<li><p>Arguments supplied to dispatcher are available to executed vector</p>
+
+</li>
+<li><p>Cached pre-matching (optional)</p>
+
+</li>
+<li><p>Basic hit count and optimising (optional)</p>
+
+</li>
+<li><p>Fall through/catch all matching</p>
+
+</li>
+</ul>
+
+<p>The dispatch table is essentially a list of at least one entry which maps a matcher to a subroutine to call on a successfully match of the input.</p>
+
+<p>Conceptually the list is looped over, applying the matchers sequentially to the input until a match is found. In practice it isn&#39;t a loop, but generated code reference with optimised ordering of the entries.</p>
+
+<p>In the case of no successful match, a default catch all dispatch vector is called.</p>
+
+<p>Matching performance is optionally boosted by using a hash as a cache. Hash lookup is much quicker than repeated conditional testing. Controlling which inputs are removed from the cached is dictated by the return value of the dispatch vector/sub</p>
+
+<h1 id="CREATING-A-TABLE">CREATING A TABLE</h1>
+
+<p>Simply calling the class constructor returns a new Table. There are no arguments to the constructor.</p>
+
+<pre><code>        my $table=Hustle::Table-&gt;new;</code></pre>
+
+<p>A default catch all entry (an empty sub) is added automatically</p>
+
+<p>The table is a blessed array reference and can be manipulated as such. It&#39;s not recommended to access the table directly other than dumping the contents to storage.</p>
+
+<h1 id="ENTRIES-MANAGEMENT">ENTRIES MANAGEMENT</h1>
+
+<h2 id="STRUCTURE">STRUCTURE</h2>
+
+<p>An entry contains the following fields</p>
+
+<dl>
+
+<dt id="matcher">matcher</dt>
+<dd>
+
+<p><code>matcher</code> can be anything that smart-matching can handle. However the focus on this module is on strings and regular expressions</p>
+
+<pre><code> &quot;match exaclty this stirng&quot;
+ qr|match and capture (this|that)|</code></pre>
+
+<p>When <code>matcher</code> is a regex, any capturing is accessible in the target <code>sub</code>.</p>
+
+</dd>
+<dt id="sub">sub</dt>
+<dd>
+
+<p>The <code>sub</code> has access to any capture groups used in the matcher (if applicable). It is also passed all arguments, including the input, unmodified, used to call the dispatcher.</p>
+
+<pre><code> $dispatcher-&gt;(&quot;my input&quot;,&quot;optional&quot;, &quot;arguments&quot;, &quot;to&quot;, &quot;dispatched&quot;, &quot;sub&quot;);</code></pre>
+
+<p>The return value of the sub indicates if the input just matched is to be removed from the cache.</p>
+
+</dd>
+<dt id="label">label</dt>
+<dd>
+
+<p><code>label</code> is a user defined item to allow identification of the entry. This is useful for saving/loading from configuration files etc.</p>
+
+</dd>
+<dt id="count">count</dt>
+<dd>
+
+<p><code>count</code> This is a dual purpose attributes. When adding entries to the list, it is used as a priority. Higher numeric values are a higher priority. The list is sorted in descending order of priority, meaning the highest priority is the first element in the list.</p>
+
+<p>During running of the dispatch, this is a tally recording how many times,the entry has been matched. This information can be then used as a priority later to reorder the list.</p>
+
+</dd>
+</dl>
+
+<h2 id="ADDING">ADDING</h2>
+
+<p>Entries are added in anonymous hash, anonymous array or flattened format, using the <code>add</code> method.</p>
+
+<p>Array entries must contain four elements, in the order of:</p>
+
+<pre><code>        add([$matcher,$sub,$label,$count]);</code></pre>
+
+<p>Hashes ref format only need to specify the matcher and sub pairs</p>
+
+<pre><code>        add({matcher=&gt;$matcher, sub=&gt;$sub, label=&gt;$label, count=&gt;$count});</code></pre>
+
+<p>Single flattened format takes a list directly</p>
+
+<pre><code>        add(matcher=&gt;$matcher, sub =&gt; $sub);</code></pre>
+
+<p>Or add using formats together</p>
+
+<pre><code>        add(
+                [$matcher, $sub, $label, $count],
+                {matcher=&gt; $matcher, sub=&gt;$sub},
+                matcher=&gt;$matcher, sub=&gt;$sub
+        );</code></pre>
+
+<p>In any case,<code>$matcher</code> and <code>$sub</code> are the only items which must be defined. It <code>$sub</code> must also be a CODE reference.</p>
+
+<p>If a label is not specified, one will be generated automatically. All the labels used in a call to <code>add</code> are returned in the same order as the input arguments.</p>
+
+<p>Note the auto generated labels are only unique in the lifetime of a single table. If permanent/globally unique labels are need, the user will need to generate them.</p>
+
+<h2 id="REMOVING">REMOVING</h2>
+
+<p>Removal of entries is via the <code>remove</code> method. It takes a list of labels to remove</p>
+
+<pre><code>        $table-&gt;remove(&quot;label1&quot;, &quot;funky-name&quot;);</code></pre>
+
+<p>It returns a list of all entries removed.</p>
+
+<h2 id="DUMPING">DUMPING</h2>
+
+<p>The table contents be accessed can like a normal array reference</p>
+
+<pre><code>        $table-&gt;@*;
+        @$table;</code></pre>
+
+<p>It is not recommended to manipulate the entires directly</p>
+
+<h2 id="THE-DEFAULT-MATCHER">THE DEFAULT MATCHER</h2>
+
+<p>Each list has a default matcher that will unconditionally match the input. This entry is specified by using <code>undef</code> as the matcher when adding an entry. When set this way only the array format can be used.</p>
+
+<p>To make it more explicit, the it can also be changed via the <code>set_default</code> method.</p>
+
+<p>The default subroutine of the &#39;default&#39; entry does nothing.</p>
+
+<h1 id="PREPARING-A-DISPATCHER">PREPARING A DISPATCHER</h1>
+
+<p>Once all the entries required are added to the table, the dispatcher can be constructed by calling <code>prepare_dispatcher</code>:</p>
+
+<pre><code>        my $dispatcher=$table-&gt;prepare_dispatcher(%args);</code></pre>
+
+<p>Arguments to this method include:</p>
+
+<dl>
+
+<dt id="type">type</dt>
+<dd>
+
+<p>The type of dispatcher. Either &quot;online&quot; or &quot;offline&quot;. If not specified, or an invalid value is supplied, an &quot;online&quot; dispatcher is created</p>
+
+<dl>
+
+<dt id="online">online</dt>
+<dd>
+
+<p>Dispatcher which calls the dispatch vector, increases count statistics. This is what you normally would want to use in your code. Online mode.</p>
+
+</dd>
+<dt id="offline">offline</dt>
+<dd>
+
+<p>Dispatcher which only updates the count statistics. DOES NOT call dispatch vector. Useful for running a input data set through to obtain priority levels. Offline training mode.</p>
+
+</dd>
+</dl>
+
+</dd>
+<dt id="cache">cache</dt>
+<dd>
+
+<p>The hash ref to use as the dispatchers cache</p>
+
+</dd>
+<dt id="reorder">reorder</dt>
+<dd>
+
+<p>Flag indicating the table should be reorderd/optimisted before building the disptacher.</p>
+
+</dd>
+<dt id="reset">reset</dt>
+<dd>
+
+<p>Flag specifying if counter statistics should be reset before building a dispatcher</p>
+
+</dd>
+</dl>
+
+<p>If no arguments are provided, the dispatcher will be created with the following defaults:</p>
+
+<pre><code>        my $dispatcher=$table-&gt;prepare_dispatcher(type=&gt;&quot;online&quot;, cache=&gt;undef, reset=&gt;undef, reorder=&gt;1);</code></pre>
+
+<h1 id="USING-A-DISPATCHER">USING A DISPATCHER</h1>
+
+<p>The dispatcher is simply a sub. Any arguments passed to it are passed to the dispatch vector as is.</p>
+
+<pre><code>        $dispatcher-&gt;(&quot;input&quot;, &quot;argument1&quot;,2);</code></pre>
+
+<h1 id="PERFORMANCE">PERFORMANCE</h1>
+
+<h2 id="CACHING-AND-CACHE-CONTROL">CACHING AND CACHE CONTROL</h2>
+
+<p>The return code of the dispatched sub is used to control if a successful match should be removed from the cache, or not be removed;</p>
+
+<p>Any &#39;true&#39; value returned will means the input, as a key to the cache, is to be removed from the cache.</p>
+
+<p>Any &#39;false&#39; value indicates the input is to remain in the cache or be added if it doesn&#39;t exist.</p>
+
+<pre><code>        {matcher =&gt; qr/r(.)gexp/, sub =&gt; sub { return }};       #Returns undef so not removed from cache.
+        {matcher =&gt; qr/re(.)gxp/, sub =&gt; sub { return 1}};      #Returns &#39;true&#39; so removed from cache
+        {matcher =&gt; qr/reg(.)xp/, sub =&gt; sub { say $1;}};       #Returns true. Last statement is say and returns 1 </code></pre>
+
+<h2 id="OPTIMISATION">OPTIMISATION</h2>
+
+<p>The concept is to perform less searching to find the dispatch vector. However the type of input does play an important role in determining the best way perform the search.</p>
+
+<p>For example a uniformly distributed input will not gain benefits from reordering the entries in the list.</p>
+
+<p>On the other hand when the distributing becomes &#39;centred&#39;, the reordering of the table can greatly improve the search time.</p>
+
+<p>On my laptop, the simple benchmark script, (with 6 dispatch entries) (regex and string) shows around 1.2M dispatches/s for non cached and over 2M dispatches/s for cached dispatcher. Your results may vary.</p>
+
+<h1 id="COMPARISON-TO-OTHER-MODULES">COMPARISON TO OTHER MODULES</h1>
+
+<p>There a couple of other dispatching modules on CPAN. Notably <a>Smart::Dispatch</a> has a nice syntax, probably more flexibility and the ability to return values instead of just executing a sub.</p>
+
+<p>This module is smaller/(much)faster in my basic tests and also supports direct access to the regex capture groups and dispatch arguments.</p>
+
+<h1 id="BUGS">BUGS</h1>
+
+<p>Probably.</p>
+
+<p>Please report via github</p>
+
+<h1 id="TODO">TODO</h1>
+
+<ul>
+
+<li><p>Write tests for removing entries</p>
+
+</li>
+<li><p>Write tests for offline dispatcher</p>
+
+</li>
+<li><p>Override array STORE and FETCH interface to ensure default is preserved</p>
+
+</li>
+<li><p>Add a more concrete performance discussion</p>
+
+</li>
+<li><p>Document how to run offline dispatcher for optimising</p>
+
+</li>
+</ul>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Ruben Westerberg, &lt;drclaw@mac.com&gt;</p>
+
+<h1 id="COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</h1>
+
+<p>Copyright (C) 2021 by Ruben Westerberg</p>
+
+<p>Licensed under MIT and GNU</p>
+
+<h1 id="DISCLAIMER-OF-WARRANTIES">DISCLAIMER OF WARRANTIES</h1>
+
+<p>THIS PACKAGE IS PROVIDED &quot;AS IS&quot; AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.</p>
+
+
+</body>
+
+</html>
+
+

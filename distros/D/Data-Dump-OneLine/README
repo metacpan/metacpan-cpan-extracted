@@ -1,18 +1,50 @@
-SYNOPSIS
+NAME
+    Data::Dump::OneLine - Dump data structures as single-line strings
 
+VERSION
+    This document describes version 0.080 of Data::Dump::OneLine (from Perl
+    distribution Data-Dump-OneLine), released on 2021-06-27.
+
+SYNOPSIS
      use Data::Dump::OneLine; # exports dd and dmp
      $str = dd(@list);
 
 DESCRIPTION
-
     It now uses Data::Dmp. You should use Data::Dmp directly.
 
-SEE ALSO
+CONTRIBUTOR
+    Steven Haryanto <sharyanto@cpan.org>
 
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Data-Dump-OneLine>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Data-Dump-OneLine>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Dump-OneLine>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
     JSON should also encode to a single-line string, but some data
     structures (cyclical, contains globs or other special Perl data) cannot
     be encoded out of the box to JSON.
 
     Data::Dumper::OneLine strives to do the same for Data::Dumper, but last
     time I tried it (at v0.05) it's still buggy.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2021, 2015, 2014, 2013, 2010 by
+    perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

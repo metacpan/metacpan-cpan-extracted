@@ -173,6 +173,13 @@ requirements. That option no longer exists as of version 3.00, it will always
 report on configure, build, test, and run-time requirements.
 
 
+=head1 TREE PRUNING
+
+The dependency tree is pruned to remove duplicates. This means that even though
+C<Test::More>, for example, is a dependency of almost everything on the CPAN,
+it will only be listed once.
+
+
 =head1 WARNINGS, BUGS and FEEDBACK
 
 This script has not been thoroughly tested.

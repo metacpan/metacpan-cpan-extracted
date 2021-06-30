@@ -4,7 +4,7 @@ use Moo;
 
 use namespace::autoclean;
 
-our $VERSION = '0.000026';
+our $VERSION = '0.000027';
 
 use Const::Fast qw( const );
 use List::AllUtils qw( any );
@@ -82,13 +82,15 @@ sub _build_ip_address_is_verified {
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 WebService::PayPal::PaymentsAdvanced::Response::FromSilentPOST - Response object generated via Silent POST params
 
 =head1 VERSION
 
-version 0.000026
+version 0.000027
 
 =head1 DESCRIPTION
 
@@ -126,13 +128,17 @@ This module will throw a
 L<WebService::PayPal::PaymentsAdvanced::Error::IPVerification> exception if
 the provided IP address cannot be validated.
 
+=head1 SUPPORT
+
+Bugs may be submitted through L<https://github.com/maxmind/webservice-paypal-paymentsadvanced/issues>.
+
 =head1 AUTHOR
 
 Olaf Alders <olaf@wundercounter.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by MaxMind, Inc.
+This software is copyright (c) 2021 by MaxMind, Inc.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

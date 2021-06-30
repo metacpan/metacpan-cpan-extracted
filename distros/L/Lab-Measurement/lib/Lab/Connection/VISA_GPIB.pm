@@ -1,6 +1,6 @@
 package Lab::Connection::VISA_GPIB;
 #ABSTRACT: GPIB-type connection class which uses NI VISA (L<Lab::VISA>) as backend
-$Lab::Connection::VISA_GPIB::VERSION = '3.751';
+$Lab::Connection::VISA_GPIB::VERSION = '3.760';
 use v5.20;
 
 use strict;
@@ -173,7 +173,7 @@ Lab::Connection::VISA_GPIB - GPIB-type connection class which uses NI VISA (L<La
 
 =head1 VERSION
 
-version 3.751
+version 3.760
 
 =head1 SYNOPSIS
 
@@ -253,12 +253,12 @@ Probably few. Mostly because there's not a lot to be done here. Please report.
 
 This software is copyright (c) 2021 by the Lab::Measurement team; in detail:
 
-  Copyright 2011       Andreas K. Huettel, David Kalok, Florian Olbrich
+  Copyright 2011       Andreas K. HÃ¼ttel, David Kalok, Florian Olbrich
             2012       Florian Olbrich, Stefan Geissler
-            2013       Andreas K. Huettel
+            2013       Andreas K. HÃ¼ttel
             2016       Simon Reinhardt
-            2017       Andreas K. Huettel
-            2020       Andreas K. Huettel
+            2017       Andreas K. HÃ¼ttel
+            2020       Andreas K. HÃ¼ttel
 
 
 This is free software; you can redistribute it and/or modify it under

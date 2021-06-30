@@ -71,13 +71,6 @@ PROVIDED METHODS
     This uses "OPTSPEC" to collect the defined arguments, whose references
     should handle the results.
 
- adapter
-
-       $adapter = $app->adapter;
-
-    A memoized lazy accessor for the application's configured
-    Device::Chip::Adapter instance, taken from the --adapter option.
-
  chips
 
        @chips = await $app->chips;
@@ -180,13 +173,4 @@ OVERRIDABLE METHODS
 AUTHOR
 
     Paul Evans <leonerd@leonerd.org.uk>
-
-POD ERRORS
-
-    Hey! The above document had some coding errors, which are explained
-    below:
-
-    Around line 57:
-
-      You forgot a '=back' before '=head1'
 

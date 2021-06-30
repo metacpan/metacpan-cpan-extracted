@@ -1,3 +1,9 @@
+0.002   2021-02-23  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux] Add shortcut CLIs: tsoff for disable-touchscreen, tson for
+	  enable-touchscreen.
+
+
 0.001   2019-12-01  Released-By: PERLANCAR
 
         - First release.

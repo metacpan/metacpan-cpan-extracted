@@ -1,4 +1,4 @@
-package Dist::Zilla::App::Command::setup 6.020;
+package Dist::Zilla::App::Command::setup 6.022;
 # ABSTRACT: set up a basic global config file
 
 # BEGIN BOILERPLATE
@@ -176,7 +176,7 @@ Dist::Zilla::App::Command::setup - set up a basic global config file
 
 =head1 VERSION
 
-version 6.020
+version 6.022
 
 =head1 SYNOPSIS
 

@@ -7,6 +7,15 @@ Home page:    <https://metacpan.org/release/App-Licensecheck>
 Bug tracker:  <https://bugs.debian.org/cgi-bin/pkgreport.cgi?pkg=licensecheck>
 Maintainer:   Jonas Smedegaard (JONASS) <jonass@cpan.org>
 
+v3.2.1	2021-06-29
+
+ [ Bug Fixes ]
+ - fix option --deb-machine (broken since v3.2.0)
+
+ [ Test Suite ]
+ - fix include missing test files
+ - stop use strictures in tests (unneeded with Tests2::V0)
+
 v3.2.0	2021-06-22
 
  [ Bug Fixes ]

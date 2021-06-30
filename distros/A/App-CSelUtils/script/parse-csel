@@ -1,12 +1,12 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/CSelUtils/parse_csel
-# and generated automatically using Perinci::CmdLine::Gen version 0.498
+# and generated automatically using Perinci::CmdLine::Gen version 0.499
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-02-19'; # DATE
+our $DATE = '2021-06-27'; # DATE
 our $DIST = 'App-CSelUtils'; # DIST
-our $VERSION = '0.087'; # VERSION
+our $VERSION = '0.088'; # VERSION
 
 use 5.010001;
 use strict;
@@ -38,7 +38,7 @@ parse-csel - Parse CSel expression
 
 =head1 VERSION
 
-This document describes version 0.087 of parse-csel (from Perl distribution App-CSelUtils), released on 2021-02-19.
+This document describes version 0.088 of parse-csel (from Perl distribution App-CSelUtils), released on 2021-06-27.
 
 =head1 SYNOPSIS
 
@@ -56,6 +56,8 @@ C<*> marks required options.
 =over
 
 =item B<--expr>=I<s>*
+
+Can also be specified as the 1st command-line argument.
 
 =back
 
@@ -164,7 +166,7 @@ Source repository is at L<https://github.com/perlancar/perl-App-CSelUtils>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-App-CSelUtils/issues>
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-CSelUtils>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

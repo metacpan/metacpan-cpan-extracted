@@ -5,10 +5,10 @@ use warnings;
 
 use App::HL7::Dump;
 
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 # Run.
-App::HL7::Dump->new->run;
+exit App::HL7::Dump->new->run;
 
 # Print version.
 sub VERSION_MESSAGE {
@@ -37,6 +37,9 @@ hl7dump - Script to dump hl7 file message.
 =item * C<-c>
 
  Color mode.
+ Color mode is controlled by ENV variables:
+ - COLOR=1 - set color without -c argument.
+ - NO_COLOR=1 - unset color with -c argument.
 
 =item * C<-h>
 
@@ -68,11 +71,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2016-2018 Michal Josef Špaček
- BSD 2-Clause License
+© 2016-2021 Michal Josef Špaček
+
+BSD 2-Clause License
 
 =head1 VERSION
 
-0.03
+0.04
 
 =cut

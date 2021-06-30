@@ -13,6 +13,10 @@ WriteMakefile(
 	'warnings' => 0,
 	    'List::Util' => 1.56,
     },
+    TEST_REQUIRES =>
+    {
+	'Test::Simple'	=> 1.302185,
+    },
     (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
 	'meta-spec' => { version => 2 },
 	    resources => {

@@ -104,6 +104,7 @@
             "Exporter::Shiny" : "1.002000",
             "Moo" : "0",
             "Ref::Util" : "0",
+            "Text::Balanced" : "0",
             "Types::Common::Numeric" : "0",
             "Types::Standard" : "0",
             "experimental" : "0",
@@ -133,11 +134,11 @@
    "provides" : {
       "Astro::FITS::CFITSIO::FileName" : {
          "file" : "lib/Astro/FITS/CFITSIO/FileName.pm",
-         "version" : "0.03"
+         "version" : "0.05"
       },
       "Astro::FITS::CFITSIO::FileName::Regexp" : {
          "file" : "lib/Astro/FITS/CFITSIO/FileName/Regexp.pm",
-         "version" : "0.03"
+         "version" : "0.05"
       }
    },
    "release_status" : "stable",
@@ -152,7 +153,7 @@
          "web" : "https://gitlab.com/djerius/astro-fits-cfitsio-filename"
       }
    },
-   "version" : "0.03",
+   "version" : "0.05",
    "x_generated_by_perl" : "v5.28.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.12",
    "x_spdx_expression" : "GPL-3.0-only"

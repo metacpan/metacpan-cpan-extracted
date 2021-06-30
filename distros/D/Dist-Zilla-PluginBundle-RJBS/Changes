@@ -1,5 +1,9 @@
 Revision history for Dist-Zilla-PluginBundle-RJBS
 
+5.019     2021-06-27 22:10:32-04:00 America/New_York
+        - add "none" value for perl-support
+        - add [Git::Remote::Check]
+
 5.018     2021-06-18 22:28:44-04:00 America/New_York
         - add x_rjbs_perl_support to metadata (for use in my code review)
         - warn when perl-support is not set

@@ -1,0 +1,46 @@
+#!/usr/bin/perl
+
+# set group permissions on usbtmc devices in the /dev/bus/ structure
+
+# need this to do ioctl to usbtmc devices when checking status
+# asynchronously from data transfer. 
+
+my $GROUP = 'daq';
+
+# put this script in /etc/udev/
+# and make sure /etc/udev/rules.d/70-usbtmc.rules points to it
+
+# need the 'usb-devices' program from 'usbutils' package to
+# make this work. 
+
+if (!open(U,"/usr/bin/usb-devices 2>/dev/null |")) {
+    system("/usr/bin/logger $0 unable to run usb-devices");
+    exit 0;
+}
+
+my ($tline,$bus,$dev);
+while (<U>) {
+    if (/^T:\s/) {
+        $tline = $_;
+    } elsif (/^I:\s/ && /\sDriver\s*=\s*usbtmc/i) {
+        if (!defined($tline)) {
+            system("/usr/bin/logger $0 parse error on $tline");
+            exit 0;
+        }
+
+        
+        if ($tline =~ /\sBus=\s*(\d+)/i) {
+            $bus = sprintf("%03.3d",$1);
+        }
+        if ($tline =~ /\sDev#=\s*(\d+)/i) {
+            $dev = sprintf("%03.3d",$1);
+        }
+        last;
+    }
+}
+close(U);
+exit 0 unless defined($bus) && defined($dev);
+
+system("/usr/bin/chgrp $GROUP /dev/bus/usb/$bus/$dev");
+exit 0;
+

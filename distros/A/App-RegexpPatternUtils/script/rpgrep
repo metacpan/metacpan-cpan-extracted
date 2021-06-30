@@ -3,9 +3,9 @@
 ## no critic: InputOutput::RequireBriefOpen
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-01-03'; # DATE
+our $DATE = '2021-06-27'; # DATE
 our $DIST = 'App-RegexpPatternUtils'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 use 5.010001;
 use strict;
@@ -113,13 +113,21 @@ rpgrep - Print lines matching a Regexp::Pattern pattern
 
 =head1 VERSION
 
-This document describes version 0.004 of rpgrep (from Perl distribution App-RegexpPatternUtils), released on 2020-01-03.
+This document describes version 0.006 of rpgrep (from Perl distribution App-RegexpPatternUtils), released on 2021-06-27.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % rpgrep [options] <pattern> [file] ...
+ % rpgrep [-A key=s] [--all] [--anchor] [-c] [--color=s] [--count]
+     [--dash-prefix-inverts] [--file=s+] [--files-json=s] [--format=name]
+     [--gen-arg key=s] [--gen-args-json=s] [-i] [--ignore-case]
+     [--invert-match] [--json] [--line-number] [-n] [--(no)naked-res]
+     [--no-anchor] [--no-dash-prefix-inverts] [--no-ignore-case]
+     [--no-invert-match] [--noanchor] [--nodash-prefix-inverts]
+     [--noignore-case] [--noinvert-match] [--page-result[=program]] [-q]
+     [--quiet] [--silent] [-v] [--view-result[=program]] -- <pattern>
+     [file] ...
 
 =head1 DESCRIPTION
 
@@ -137,11 +145,15 @@ Generate an anchored version of the pattern.
 
 =item B<--file>=I<s@>
 
+Can also be specified as the 2nd command-line argument and onwards.
+
 Can be specified multiple times.
 
 =item B<--files-json>=I<s>
 
 See C<--file>.
+
+Can also be specified as the 2nd command-line argument and onwards.
 
 =item B<--gen-arg>=I<s>%, B<-A>
 
@@ -163,6 +175,8 @@ See C<--gen-arg>.
 
 Name of pattern, with module prefix but without the 'Regexp::Pattern'.
 
+Can also be specified as the 1st command-line argument.
+
 =back
 
 =head2 General output control options
@@ -170,6 +184,10 @@ Name of pattern, with module prefix but without the 'Regexp::Pattern'.
 =over
 
 =item B<--color>=I<s>
+
+Default value:
+
+ "auto"
 
 Valid values:
 
@@ -190,6 +208,16 @@ Supress normal output, return a count of matching lines.
 =item B<--all>
 
 Require all patterns to match, instead of just one.
+
+=item B<--dash-prefix-inverts>
+
+When given pattern that starts with dash "-FOO", make it to mean "^(?!.*FOO)".
+
+This is a convenient way to search for lines that do not match a pattern.
+Instead of using `-v` to invert the meaning of all patterns, this option allows
+you to invert individual pattern using the dash prefix, which is also used by
+Google search and a few other search engines.
+
 
 =item B<--ignore-case>, B<-i>
 
@@ -243,6 +271,14 @@ you want to pipe the result for more post-processing. In this case you can use
 
     [1,2,3]
 
+
+=item B<--page-result>
+
+Filter output through a pager.
+
+=item B<--view-result>
+
+View output using a viewer.
 
 =back
 
@@ -316,7 +352,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2018, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2018, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -12,16 +12,18 @@ use Safe::Isa;
 use Feature::Compat::Try;
 use Path::Tiny;
 
-use if $ENV{AUTHOR_TESTING}, 'Test::Warnings' => ':fail_on_warning';
-use Test::JSON::Schema::Acceptance 1.008;
+use if $ENV{AUTHOR_TESTING}, 'Test::Warnings' => ':fail_on_warning'; # hooks into done_testing unless overridden
+use Test::JSON::Schema::Acceptance 1.011;
 use Test::Memory::Cycle;
 use Test::File::ShareDir -share => { -dist => { 'JSON-Schema-Modern' => 'share' } };
 use JSON::Schema::Modern;
 
-foreach my $env (qw(AUTHOR_TESTING AUTOMATED_TESTING EXTENDED_TESTING NO_TODO TEST_DIR NO_SHORT_CIRCUIT)) {
-  note $env.': '.($ENV{$env} // '');
+BEGIN {
+  foreach my $env (qw(AUTHOR_TESTING AUTOMATED_TESTING EXTENDED_TESTING NO_TODO TEST_DIR NO_SHORT_CIRCUIT)) {
+    note $env.': '.($ENV{$env} // '');
+  }
+  note '';
 }
-note '';
 
 sub acceptance_tests {
   my (%options) = @_;
@@ -47,6 +49,10 @@ sub acceptance_tests {
   my $add_resource = sub {
     my ($uri, $schema) = @_;
     try {
+      # suppress warnings from parsing remotes/* intended for draft <= 7 with 'definitions'
+      local $SIG{__WARN__} = sub {
+        warn @_ if $_[0] !~ /^no-longer-supported "definitions" keyword present/;
+      };
       $js->add_schema($uri => $schema);
       $js_short_circuit->add_schema($uri => $schema);
     }

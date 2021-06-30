@@ -48,7 +48,6 @@ do { my $x = {
                                       'Dist::Zilla::Plugin::CopyFilesFromBuild' => '0',
                                       'Dist::Zilla::Plugin::GenerateFile::FromShareDir' => '0.013',
                                       'Dist::Zilla::Plugin::Git::Check' => '0',
-                                      'Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch' => '0',
                                       'Dist::Zilla::Plugin::Git::CheckFor::MergeConflicts' => '0',
                                       'Dist::Zilla::Plugin::Git::Commit' => '0',
                                       'Dist::Zilla::Plugin::Git::Contributors' => '0',

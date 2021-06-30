@@ -63,7 +63,7 @@
          "mailto" : "bug-pod-simple@rt.cpan.org",
          "web" : "https://github.com/perl-pod/pod-simple/issues"
       },
-      "homepage" : "http://search.cpan.org/dist/Pod-Simple/",
+      "homepage" : "https://metacpan.org/pod/Pod::Simple",
       "license" : [
          "http://dev.perl.org/licenses/"
       ],
@@ -74,6 +74,6 @@
       },
       "x_MailingList" : "https://lists.perl.org/list/pod-people.html"
    },
-   "version" : "3.42",
+   "version" : "3.43",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

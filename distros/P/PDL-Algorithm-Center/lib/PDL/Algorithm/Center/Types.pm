@@ -7,7 +7,7 @@ use latest;
 use strict;
 use warnings;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 use Types::Standard -types;
 use Types::PDL -types;
@@ -129,22 +129,31 @@ __END__
 
 =pod
 
+=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory
+
 =head1 NAME
 
 PDL::Algorithm::Center::Types - Type::Tiny types for PDL::Algorithm::Center
 
 =head1 VERSION
 
-version 0.10
+version 0.11
 
-=head1 BUGS
+=head1 SUPPORT
 
-Please report any bugs or feature requests on the bugtracker website
-L<https://rt.cpan.org/Public/Dist/Display.html?Name=PDL-Algorithm-Center>
+=head2 Bugs
 
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
+Please report any bugs or feature requests to bug-pdl-algorithm-center@rt.cpan.org  or through the web interface at: https://rt.cpan.org/Public/Dist/Display.html?Name=PDL-Algorithm-Center
+
+=head2 Source
+
+Source is available at
+
+  https://gitlab.com/djerius/pdl-algorithm-center
+
+and may be cloned from
+
+  https://gitlab.com/djerius/pdl-algorithm-center.git
 
 =head1 SEE ALSO
 

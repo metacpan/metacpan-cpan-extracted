@@ -64,6 +64,8 @@ examples/Sweeps/gate-trace.pl
 examples/Sweeps/manual-T-IV-freq.pl
 examples/Sweeps/manual.pl
 examples/Sweeps/voltage-sweep.pl
+examples/dualchannel_sweep.pl
+examples/singlechannel_sweep.pl
 lib/Lab/Bus.pm
 lib/Lab/Bus/DEBUG.pm
 lib/Lab/Bus/IsoBus.pm
@@ -206,6 +208,7 @@ lib/Lab/Moose/Instrument/Keithley2400.pm
 lib/Lab/Moose/Instrument/Keithley2450.pm
 lib/Lab/Moose/Instrument/Keysight34470A.pm
 lib/Lab/Moose/Instrument/KeysightB2901A.pm
+lib/Lab/Moose/Instrument/KeysightDSOS604A.pm
 lib/Lab/Moose/Instrument/KeysightE3633E.pm
 lib/Lab/Moose/Instrument/Lakeshore340.pm
 lib/Lab/Moose/Instrument/LinearStepSweep.pm
@@ -304,7 +307,7 @@ lib/Lab/XPRESS/Sweep/Voltage.pm
 lib/Lab/XPRESS/Utilities/Utilities.pm
 lib/Lab/XPRESS/hub.pm
 perltidyrc
-rpm/perl-Lab-Measurement.spec
+rpm/MakeRPM
 t/00-load.t
 t/Analysis/DataAnalysis.t
 t/Analysis/TDS2024TraceData.dat
@@ -382,6 +385,7 @@ t/update-ids.pl
 'utilities/labview/LV Socket Com.txt'
 'utilities/labview/LV Socket Com.vi'
 utilities/udev-rules/70-usbtmc.rules
+utilities/udev-rules/usbtmc_protfix
 xt/critic/lib.t
 xt/critic/moose.t
 xt/critic/tests.t

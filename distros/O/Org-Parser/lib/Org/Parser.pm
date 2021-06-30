@@ -1,9 +1,9 @@
 package Org::Parser;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-12-30'; # DATE
+our $DATE = '2021-06-27'; # DATE
 our $DIST = 'Org-Parser'; # DIST
-our $VERSION = '0.554'; # VERSION
+our $VERSION = '0.555'; # VERSION
 
 use 5.010001;
 use Moo;
@@ -110,7 +110,7 @@ Org::Parser - Parse Org documents
 
 =head1 VERSION
 
-This document describes version 0.554 of Org::Parser (from Perl distribution Org-Parser), released on 2020-12-30.
+This document describes version 0.555 of Org::Parser (from Perl distribution Org-Parser), released on 2021-06-27.
 
 =head1 SYNOPSIS
 
@@ -267,7 +267,7 @@ Source repository is at L<https://github.com/perlancar/perl-Org-Parser>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Org-Parser/issues>
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Org-Parser>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -281,9 +281,41 @@ L<Org::Document>
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTORS
+
+=for stopwords Alex White Karl Williamson Steven Haryanto Tekki Trent Fisher Wong Meng Weng
+
+=over 4
+
+=item *
+
+Alex White <VVu@geekfarm.org>
+
+=item *
+
+Karl Williamson <khw@cpan.org>
+
+=item *
+
+Steven Haryanto <sharyanto@cpan.org>
+
+=item *
+
+Tekki <tekki@tekki.ch>
+
+=item *
+
+Trent Fisher <trent@cs.pdx.edu>
+
+=item *
+
+Wong Meng Weng <mengwong@pobox.com>
+
+=back
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

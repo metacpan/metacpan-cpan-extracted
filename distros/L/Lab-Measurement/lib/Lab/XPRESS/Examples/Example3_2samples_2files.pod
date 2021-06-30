@@ -13,7 +13,7 @@ Lab::XPRESS::Examples::Example3_2samples_2files - XPRESS for DUMMIES - Example 3
 
 =head1 VERSION
 
-version 3.751
+version 3.760
 
 =head1 Abstract
 

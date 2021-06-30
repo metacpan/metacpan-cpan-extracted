@@ -5,41 +5,13 @@ package PDL::Algorithm::Center::Failure;
 use strict;
 use warnings;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
-use custom::failures();
-
-use Package::Stash;
-
-use Exporter 'import';
-
-our @EXPORT_OK;
-our %EXPORT_TAGS = ( all => \@EXPORT_OK );
-
-BEGIN {
-
-    my @failures = qw<
-      parameter
-      iteration::limit_reached
-      iteration::empty
-    >;
-
-    custom::failures->import( __PACKAGE__, @failures );
-
-    my $stash = Package::Stash->new( __PACKAGE__ );
-
-    for my $failure ( @failures ) {
-
-        ( my $name = $failure ) =~ s/::/_/g;
-
-        $name = "${name}_failure";
-
-        $stash->add_symbol( "&$name", sub () { __PACKAGE__ . "::$failure" } );
-
-        push @EXPORT_OK, $name;
-    }
-
-}
+use custom::failures::x::alias -suffix => '_failure', qw[
+  parameter
+  iteration::limit_reached
+  iteration::empty
+];
 
 1;
 
@@ -47,22 +19,31 @@ __END__
 
 =pod
 
+=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory
+
 =head1 NAME
 
 PDL::Algorithm::Center::Failure - Exception classes for PDL::Algorithm::Center
 
 =head1 VERSION
 
-version 0.10
+version 0.11
 
-=head1 BUGS
+=head1 SUPPORT
 
-Please report any bugs or feature requests on the bugtracker website
-L<https://rt.cpan.org/Public/Dist/Display.html?Name=PDL-Algorithm-Center>
+=head2 Bugs
 
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
+Please report any bugs or feature requests to bug-pdl-algorithm-center@rt.cpan.org  or through the web interface at: https://rt.cpan.org/Public/Dist/Display.html?Name=PDL-Algorithm-Center
+
+=head2 Source
+
+Source is available at
+
+  https://gitlab.com/djerius/pdl-algorithm-center
+
+and may be cloned from
+
+  https://gitlab.com/djerius/pdl-algorithm-center.git
 
 =head1 SEE ALSO
 

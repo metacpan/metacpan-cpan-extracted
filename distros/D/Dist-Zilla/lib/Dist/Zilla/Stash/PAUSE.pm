@@ -1,4 +1,4 @@
-package Dist::Zilla::Stash::PAUSE 6.020;
+package Dist::Zilla::Stash::PAUSE 6.022;
 # ABSTRACT: a stash of your PAUSE credentials
 
 use Moose;
@@ -52,7 +52,7 @@ Dist::Zilla::Stash::PAUSE - a stash of your PAUSE credentials
 
 =head1 VERSION
 
-version 6.020
+version 6.022
 
 =head1 OVERVIEW
 

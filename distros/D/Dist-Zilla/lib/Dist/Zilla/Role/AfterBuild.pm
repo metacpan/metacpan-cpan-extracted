@@ -1,4 +1,4 @@
-package Dist::Zilla::Role::AfterBuild 6.020;
+package Dist::Zilla::Role::AfterBuild 6.022;
 # ABSTRACT: something that runs after building is mostly complete
 
 use Moose::Role;
@@ -40,7 +40,7 @@ Dist::Zilla::Role::AfterBuild - something that runs after building is mostly com
 
 =head1 VERSION
 
-version 6.020
+version 6.022
 
 =head1 DESCRIPTION
 

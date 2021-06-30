@@ -31,7 +31,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA  02110-1301 USA
 use strict;
 use warnings;
 use PDL;
-use PDL::Complex;
 use Photonic::WE::S::AllH;
 use Photonic::WE::S::Metric;
 use Photonic::WE::S::Field;
@@ -58,7 +57,7 @@ my $fla=1/$ea;
 my $flb=1/$eb;
 my $fproml=$fla*(1-$gl->f)+$flb*($gl->f);
 ($fla, $flb)=map {$_/$fproml} ($fla, $flb);
-my $flx=pdl([$fla*(1-$B)+$flb*$B])->complex->mv(1,-1);
+my $flx=($fla*(1-$B)+$flb*$B)->transpose;
 ok(Cagree($flv, $flx), "1D long field");
 
 #View 2D from 1D superlattice. Long wavelength transverse case
@@ -72,5 +71,5 @@ my $nt=Photonic::WE::S::AllH->new(
    epsilon=>$epsilont);
 my $fto=Photonic::WE::S::Field->new(nr=>$nt, nh=>10);
 my $ftv=$fto->evaluate();
-my $ftx=pdl(r2C(1), r2C(0))->complex;
+my $ftx=r2C(pdl [1, 0]);
 ok(Cagree($ftv, $ftx), "1D trans field");

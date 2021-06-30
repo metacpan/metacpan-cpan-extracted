@@ -1,5 +1,5 @@
 package Photonic::LE::NP::OneH;
-$Photonic::LE::NP::OneH::VERSION = '0.016';
+$Photonic::LE::NP::OneH::VERSION = '0.017';
 
 =encoding UTF-8
 
@@ -39,7 +39,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA  02110-1301 USA
 
 =head1 VERSION
 
-version 0.016
+version 0.017
 
 =head1 SYNOPSIS
 
@@ -158,7 +158,6 @@ Returns the first state.
 
 use namespace::autoclean;
 use PDL::Lite;
-use PDL::Complex;
 use Carp;
 use Photonic::Types;
 use Photonic::Utils qw(EProd any_complex apply_longitudinal_projection);
@@ -182,8 +181,8 @@ has '+nextState' =>(init_arg=>undef);
 
 sub _firstState { #\delta_{G0}
     my $self=shift;
-    my $v=PDL->zeroes(@{$self->dims})->r2C; #RorI, nx, ny...
-    my $arg=join ',', ("(0)") x ($self->B->ndims+1); #(0),(0),... ndims+1 times
+    my $v=PDL->zeroes(@{$self->dims})->r2C; #nx, ny...
+    my $arg=join ',', ("(0)") x ($self->B->ndims); #(0),(0),... ndims+1 times
     $v->slice($arg).=1; #i*delta_{G0}
     return $v;
 }
@@ -206,7 +205,7 @@ sub innerProduct {
     # The trick works, but is not robust and if non orthogonal states
     # are generated may give TROUBLE. Better use spinor methods,
     # though they take longer.
-    $p=-$p unless PDL::all($left->slice(':,(0),(0)')->re == 1); #unless initial state
+    $p=-$p unless PDL::all($left->slice('(0),(0)')->re == 1); #unless initial state
     return $p;
 }
 

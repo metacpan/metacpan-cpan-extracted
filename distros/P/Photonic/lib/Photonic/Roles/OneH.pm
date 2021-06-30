@@ -1,5 +1,5 @@
 package Photonic::Roles::OneH;
-$Photonic::Roles::OneH::VERSION = '0.016';
+$Photonic::Roles::OneH::VERSION = '0.017';
 
 =encoding UTF-8
 
@@ -9,7 +9,7 @@ Photonic::Roles::OneH
 
 =head1 VERSION
 
-version 0.016
+version 0.017
 
 =head1 COPYRIGHT NOTICE
 
@@ -56,7 +56,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA  02110-1301 USA
 =item (for developers)
 
     package Photonic::LE::NR2::OneH.pm;
-    $Photonic::LE::NR2::OneH::VERSION= '0.016';
+    $Photonic::LE::NR2::OneH::VERSION= '0.017';
     use namespace::autoclean;
     use Moose;
     has...
@@ -136,7 +136,6 @@ next_b2, next_state, shifting the current values where necessary. Returns
 use Moose::Role;
 
 use PDL::Lite;
-use PDL::Complex;
 use Photonic::Types;
 use Moose::Util::TypeConstraints;
 
@@ -179,7 +178,7 @@ has 'smallH'=>(is=>'ro', isa=>'Num', required=>1, default=>1e-7,
 
 sub _cero {
     my $self=shift;
-    return r2C(0) if $self->complexCoeffs;
+    return PDL::r2C(0) if $self->complexCoeffs;
     return 0;
 }
 

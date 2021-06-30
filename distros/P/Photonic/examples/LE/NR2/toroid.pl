@@ -17,8 +17,7 @@ use strict;
 use warnings;
 use v5.12;
 use Getopt::Long;
-use Exporter::Renaming;
-use List::Util Renaming=>[all=>'luall'];
+BEGIN { require List::Util; *luall = \&List::Util::all }
 use PDL;
 use PDL::NiceSlice;
 use PDL::Constants qw(PI);

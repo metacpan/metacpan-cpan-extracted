@@ -6,11 +6,12 @@ use warnings;
 
 use Test2::V0;
 use Test2::Tools::Compare qw[ object call ];
-use Number::Tolerant;
 
 use PDL::Algorithm::Center qw[ sigma_clip ];
 
-use PDL;
+use PDL::Lite;
+use PDL::Core qw( pdl zeroes );
+use PDL::Ufunc qw( dsum dsumover );
 use PDL::GSL::RNG;
 
 use Data::Dump 'pp';
@@ -267,13 +268,11 @@ sub _generate_sample {
     $attr{inside} = $attr{coords}->xchg( 0, 1 )->whereND( $attr{mask} )->xchg( 0, 1 );
 
     $attr{ninside} = $attr{inside}->dim( 1 );
-    $attr{sigma} = tolerance( sqrt( dsum( ( $attr{inside} - $attr{initial_center} )**2 ) / $attr{ninside} ), plus_or_minus => .00000001 );
+    $attr{sigma} = sqrt( dsum( ( $attr{inside} - $attr{initial_center} )**2 ) / $attr{ninside} );
 
-    $attr{center} = [ tolerance( 0.0126755884280886, plus_or_minus => 0.001 ),
-                   tolerance( 0.0337090322699186, plus_or_minus => 0.001 ),
-                   ];
+    $attr{center} = [ 0.0126755884280886, 0.0337090322699186,];
 
-    $attr{dist} = tolerance( 0, plus_or_minus => 0.001 );
+    $attr{dist} = 0;
 
     return wrap_hash( \%attr );
 }
@@ -296,17 +295,17 @@ subtest 'coords, no clip, no initial center' => sub {
     # make sure iteration 0 agrees with the above calculations
     # Test2::V0 can't handle objects which overload &&.
     my $iter0 = $results->iterations->[0];
-    my @exp_center = @{ $sample->average_center };
     $iter0->center( $iter0->center->unpdl );
-    $iter0->{center_0} = $iter0->center->[0];
-    $iter0->{center_1} = $iter0->center->[1];
     is(
         $iter0,
         object {
             call nelem => $sample->nelem;
             call total_weight => $sample->nelem;
-            call center_0 => validator( '==', $exp_center[0] => sub { $_ ==  $exp_center[0] } );
-            call center_1 => validator( '==', $exp_center[1] => sub { $_ ==  $exp_center[1] } );
+            call center => array {
+                item float( $sample->average_center->[0] );
+                item float( $sample->average_center->[1] );
+                end;
+            };
             end();
         },
         "iteration 0",
@@ -317,18 +316,19 @@ subtest 'coords, no clip, no initial center' => sub {
 
     # Test2::V0 can't handle objects which overload &&.
     $results->center( $results->center->unpdl );
-    $results->{center_0} = $results->center->[0];
-    $results->{center_1} = $results->center->[1];
     #<<< notidy
     is(
         $results,
         object {
             call iter => 70;
-            call dist => validator( '==', $sample->dist => sub { $_ == $sample->dist } );
+            call dist => float( $sample->dist );
             call nelem => 43597;
             call total_weight => 43597;
-            call center_0 => validator( '==', $sample->center->[0] => sub { $_ ==  $sample->center->[0] } );
-            call center_1 => validator( '==', $sample->center->[1] => sub { $_ ==  $sample->center->[1] } );
+            call center => array {
+                item float( $sample->center->[0] );
+                item float( $sample->center->[1] );
+                end;
+            };
             end(),
         },
         "iteration -1",
@@ -355,17 +355,17 @@ subtest 'coords, no clip, initial center = [X,Y]' => sub {
     # make sure iteration 0 agrees with the above calculations
     # Test2::V0 can't handle objects which overload &&.
     my $iter0 = $results->iterations->[0];
-    my @exp_center =$sample->initial_center->list;
     $iter0->center( $iter0->center->unpdl );
-    $iter0->{center_0} = $iter0->center->[0];
-    $iter0->{center_1} = $iter0->center->[1];
     is(
         $iter0,
         object {
             call nelem => $sample->nelem;
             call total_weight => $sample->nelem;
-            call center_0 => validator( '==', $exp_center[0] => sub { $_ ==  $exp_center[0] } );
-            call center_1 => validator( '==', $exp_center[1] => sub { $_ ==  $exp_center[1] } );
+            call center => array {
+                item float( $sample->initial_center->at(0) );
+                item float( $sample->initial_center->at(1) );
+                end;
+            };
             end();
         },
         "iteration 0",
@@ -376,18 +376,19 @@ subtest 'coords, no clip, initial center = [X,Y]' => sub {
 
     # Test2::V0 can't handle objects which overload &&.
     $results->center( $results->center->unpdl );
-    $results->{center_0} = $results->center->[0];
-    $results->{center_1} = $results->center->[1];
     #<<< notidy
     is(
         $results,
         object {
             call iter => 70;
-            call dist => validator( '==', $sample->dist => sub { $_ == $sample->dist } );
+            call dist => float( $sample->dist );
             call nelem => 43597;
             call total_weight => 43597;
-            call center_0 => validator( '==', $sample->center->[0] => sub { $_ ==  $sample->center->[0] } );
-            call center_1 => validator( '==', $sample->center->[1] => sub { $_ ==  $sample->center->[1] } );
+            call center => array {
+                item float( $sample->center->[0] );
+                item float( $sample->center->[1] );
+                end;
+            };
             end(),
         },
         "iteration -1",
@@ -413,17 +414,17 @@ subtest 'coords, no clip, initial center = [ X, undef]' => sub {
     # make sure iteration 0 agrees with the above calculations
     # Test2::V0 can't handle objects which overload &&.
     my $iter0 = $results->iterations->[0];
-    my @exp_center =( $sample->initial_center->at(0), $sample->average_center->[1] );
     $iter0->center( $iter0->center->unpdl );
-    $iter0->{center_0} = $iter0->center->[0];
-    $iter0->{center_1} = $iter0->center->[1];
     is(
         $iter0,
         object {
             call nelem => $sample->nelem;
             call total_weight => $sample->nelem;
-            call center_0 => validator( '==', $exp_center[0] => sub { $_ ==  $exp_center[0] } );
-            call center_1 => validator( '==', $exp_center[1] => sub { $_ ==  $exp_center[1] } );
+            call center => array {
+                item float( $sample->initial_center->at(0) );
+                item float( $sample->average_center->[1] );
+                end;
+            };
             end();
         },
         "iteration 0",
@@ -434,18 +435,19 @@ subtest 'coords, no clip, initial center = [ X, undef]' => sub {
 
     # Test2::V0 can't handle objects which overload &&.
     $results->center( $results->center->unpdl );
-    $results->{center_0} = $results->center->[0];
-    $results->{center_1} = $results->center->[1];
     #<<< notidy
     is(
         $results,
         object {
             call iter => 70;
-            call dist => validator( '==', $sample->dist => sub { $_ == $sample->dist } );
+            call dist => float( $sample->dist );
             call nelem => 43597;
             call total_weight => 43597;
-            call center_0 => validator( '==', $sample->center->[0] => sub { $_ ==  $sample->center->[0] } );
-            call center_1 => validator( '==', $sample->center->[1] => sub { $_ ==  $sample->center->[1] } );
+            call center => array {
+                item float( $sample->center->[0] );
+                item float( $sample->center->[1] );
+                end;
+            };
             end(),
         },
         "iteration -1",
@@ -471,17 +473,17 @@ subtest 'coords, no clip, initial center => [undef,Y]' => sub {
     # make sure iteration 0 agrees with the above calculations
     # Test2::V0 can't handle objects which overload &&.
     my $iter0 = $results->iterations->[0];
-    my @exp_center =( $sample->average_center->[0], $sample->initial_center->at(1) );
     $iter0->center( $iter0->center->unpdl );
-    $iter0->{center_0} = $iter0->center->[0];
-    $iter0->{center_1} = $iter0->center->[1];
     is(
         $iter0,
         object {
             call nelem => $sample->nelem;
             call total_weight => $sample->nelem;
-            call center_0 => validator( '==', $exp_center[0] => sub { $_ ==  $exp_center[0] } );
-            call center_1 => validator( '==', $exp_center[1] => sub { $_ ==  $exp_center[1] } );
+            call center => array {
+                item float( $sample->average_center->[0] );
+                item float( $sample->initial_center->at(1) );
+                end;
+            };
             end();
         },
         "iteration 0",
@@ -492,18 +494,19 @@ subtest 'coords, no clip, initial center => [undef,Y]' => sub {
 
     # Test2::V0 can't handle objects which overload &&.
     $results->center( $results->center->unpdl );
-    $results->{center_0} = $results->center->[0];
-    $results->{center_1} = $results->center->[1];
     #<<< notidy
     is(
         $results,
         object {
             call iter => 70;
-            call dist => validator( '==', $sample->dist => sub { $_ == $sample->dist } );
+            call dist => float( $sample->dist );
             call nelem => 43597;
             call total_weight => 43597;
-            call center_0 => validator( '==', $sample->center->[0] => sub { $_ ==  $sample->center->[0] } );
-            call center_1 => validator( '==', $sample->center->[1] => sub { $_ ==  $sample->center->[1] } );
+            call center => array {
+                item float( $sample->center->[0] );
+                item float( $sample->center->[1] );
+                end;
+            };
             end(),
         },
         "iteration -1",
@@ -529,17 +532,17 @@ subtest 'coords, no clip, initial center => [undef, undef]' => sub {
     # make sure iteration 0 agrees with the above calculations
     # Test2::V0 can't handle objects which overload &&.
     my $iter0 = $results->iterations->[0];
-    my @exp_center =@{ $sample->average_center };
     $iter0->center( $iter0->center->unpdl );
-    $iter0->{center_0} = $iter0->center->[0];
-    $iter0->{center_1} = $iter0->center->[1];
     is(
         $iter0,
         object {
             call nelem => $sample->nelem;
             call total_weight => $sample->nelem;
-            call center_0 => validator( '==', $exp_center[0] => sub { $_ ==  $exp_center[0] } );
-            call center_1 => validator( '==', $exp_center[1] => sub { $_ ==  $exp_center[1] } );
+            call center => array {
+                item float( $sample->average_center->[0] );
+                item float( $sample->average_center->[1] );
+                end;
+            };
             end();
         },
         "iteration 0",
@@ -550,18 +553,19 @@ subtest 'coords, no clip, initial center => [undef, undef]' => sub {
 
     # Test2::V0 can't handle objects which overload &&.
     $results->center( $results->center->unpdl );
-    $results->{center_0} = $results->center->[0];
-    $results->{center_1} = $results->center->[1];
     #<<< notidy
     is(
         $results,
         object {
             call iter => 70;
-            call dist => validator( '==', $sample->dist => sub { $_ == $sample->dist } );
+            call dist => float( $sample->dist );
             call nelem => 43597;
             call total_weight => 43597;
-            call center_0 => validator( '==', $sample->center->[0] => sub { $_ ==  $sample->center->[0] } );
-            call center_1 => validator( '==', $sample->center->[1] => sub { $_ ==  $sample->center->[1] } );
+            call center => array {
+                item float( $sample->center->[0] );
+                item float( $sample->center->[1] );
+                end;
+            };
             end(),
         },
         "iteration -1",
@@ -590,7 +594,7 @@ subtest 'coords + clip results' => sub {
     is(
         $results->iterations->[0],
         object {
-            call sigma => validator( '==', $sample->sigma, sub { $_ == $sample->sigma } );
+            call sigma => float( $sample->sigma );
             call nelem => $sample->ninside;
             call total_weight => $sample->ninside;
             end();
@@ -603,18 +607,19 @@ subtest 'coords + clip results' => sub {
 
     # Test2::V0 can't handle objects which overload &&.
     $results->center( $results->center->unpdl );
-    $results->{center_0} = $results->center->[0];
-    $results->{center_1} = $results->center->[1];
     #<<< notidy
     is(
         $results,
         object {
             call iter => 56;
-            call dist => validator( '==', $sample->dist => sub { $_ == $sample->dist } );
+            call dist => float( $sample->dist );
             call nelem => 43597;
             call total_weight => 43597;
-            call center_0 => validator( '==', $sample->center->[0] => sub { $_ ==  $sample->center->[0] } );
-            call center_1 => validator( '==', $sample->center->[1] => sub { $_ ==  $sample->center->[1] } );
+            call center => array {
+                item float( $sample->center->[0] );
+                item float( $sample->center->[1] );
+                end;
+            };
             end(),
         },
         "iteration -1",
@@ -645,7 +650,7 @@ subtest 'coords + mask results' => sub {
     is(
        $results->{iterations}[0],
        object {
-           call sigma  => validator( '==', $sample->sigma, sub { $_ == $sample->sigma } );
+           call sigma  => float( $sample->sigma );
            call nelem => $sample->ninside;
            call total_weight => $sample->ninside;
        },
@@ -654,18 +659,19 @@ subtest 'coords + mask results' => sub {
 
     # Test2::V0 can't handle objects which overload &&.
     $results->center( $results->center->unpdl );
-    $results->{center_0} = $results->center->[0];
-    $results->{center_1} = $results->center->[1];
     #<<< notidy
     is(
         $results,
         object {
             call iter => 56;
-            call dist => validator( '==', $sample->dist => sub { $_ == $sample->dist } );
+            call dist => float( $sample->dist );
             call nelem => 43597;
             call total_weight => 43597;
-            call center_0 => validator( '==', $sample->center->[0] => sub { $_ ==  $sample->center->[0] } );
-            call center_1 => validator( '==', $sample->center->[1] => sub { $_ ==  $sample->center->[1] } );
+            call center => array {
+                item float( $sample->center->[0] );
+                item float( $sample->center->[1] );
+                end;
+            };
             end(),
         },
         "iteration -1",
@@ -700,7 +706,7 @@ subtest 'coords + clip + weight results' => sub {
     is(
        $results->{iterations}[0],
        object {
-           call sigma  => validator( '==', $sample->sigma, sub { $_ == $sample->sigma } );
+           call sigma  => float( $sample->sigma );
            call nelem => $sample->ninside;
            call total_weight => $inside_weight_sum;
        },
@@ -710,18 +716,19 @@ subtest 'coords + clip + weight results' => sub {
 
     # Test2::V0 can't handle objects which overload &&.
     $results->center( $results->center->unpdl );
-    $results->{center_0} = $results->center->[0];
-    $results->{center_1} = $results->center->[1];
     #<<< notidy
     is(
         $results,
         object {
             call iter => 56;
-            call dist => validator( '==', $sample->dist => sub { $_ == $sample->dist } );
+            call dist => float( $sample->dist );
             call nelem => 43597;
             call total_weight => 43597 * 2;
-            call center_0 => validator( '==', $sample->center->[0] => sub { $_ ==  $sample->center->[0] } );
-            call center_1 => validator( '==', $sample->center->[1] => sub { $_ ==  $sample->center->[1] } );
+            call center => array {
+                item float( $sample->center->[0] );
+                item float( $sample->center->[1] );
+                end;
+            };
             end(),
         },
         "iteration -1",

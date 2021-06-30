@@ -1,11 +1,11 @@
 ## -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic.pm
-## Version v0.15.1
+## Version v0.15.3
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/08/24
-## Modified 2021/06/20
+## Modified 2021/06/26
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -67,7 +67,7 @@ BEGIN
     @EXPORT      = qw( );
     @EXPORT_OK   = qw( subclasses );
     %EXPORT_TAGS = ();
-    $VERSION     = 'v0.15.1';
+    $VERSION     = 'v0.15.3';
     $VERBOSE     = 0;
     $DEBUG       = 0;
     $SILENT_AUTOLOAD      = 1;
@@ -1828,6 +1828,12 @@ sub new_array
 {
     my $self = shift( @_ );
     return( Module::Generic::Array->new( @_ ) );
+}
+
+sub new_file
+{
+    my $self = shift( @_ );
+    return( Module::Generic::File->new( @_ ) );
 }
 
 sub new_hash
@@ -3842,6 +3848,7 @@ DESTROY
 
 1;
 
+# XXX POD
 __END__
 
 =encoding utf8
@@ -3856,27 +3863,66 @@ Module::Generic - Generic Module to inherit from
     BEGIN
     {
         use strict;
-        use Module::Generic;
-        our( @ISA ) = qw( Module::Generic );
+        use warnings;
+        use parent qw( Module::Generic );
     };
+
+    sub init
+    {
+        my $self = shift( @_ );
+        # Requires parameters provided to have their equivalent method
+        $self->{_init_strict_use_sub} = 1;
+        # Smartly accepts key-value pairs as list or hash reference
+        $self->SUPER::init( @_ );
+        # This won't be affected by parameters provided during instantiation
+        $self->{_private_param} = 'some value';
+        return( $self );
+    }
+    
+    sub active { return( shift->_set_get_boolean( 'active', @_ ) ); }
+    sub address { return( shift->_set_get_object( 'address', 'My::Address', @_ ) ); }
+    sub age { return( shift->_set_get_number( 'age', @_ ) ); }
+    sub name { return( shift->_set_get_scalar( 'name', @_ ) ); }
+    sub discount
+    {
+        return( shift->_set_get_class_array( 'discount',
+        {
+        amount      => { type => 'number' },
+        discount    => { type => 'object', class => 'My::Discount' },
+        }, @_ ) );
+    }
+    sub settings 
+    {
+        return( shift->_set_get_class( 'settings',
+        {
+        # Will create a Module::Generic::Array array object of objects of class MY::Item
+        items => { type => 'object_array_object', class => 'My::Item' },
+        notify => { type => 'boolean' },
+        resumes_at => { type => 'datetime' },
+        timeout => { type => 'integer' },
+        customer => {
+                definition => {
+                    billing_address => { package => "My::Address", type => "object" },
+                    email => { type => "scalar" },
+                    name => { type => "scalar" },
+                    shipping_address => { package => "My::Address", type => "object" },
+                },
+                type => "class",
+            },
+        }, @_ ) );
+    }
 
 =head1 VERSION
 
-    v0.15.1
+    v0.15.3
 
 =head1 DESCRIPTION
 
 L<Module::Generic> as its name says it all, is a generic module to inherit from.
 It is designed to provide a useful framework and speed up coding and debugging.
-It contains standard and support methods that may be superseded by your the module using 
-L<Module::Generic>.
+It contains standard and support methods that may be superseded by your module.
 
-As an added benefit, it also contains a powerfull AUTOLOAD transforming any hash 
-object key into dynamic methods and also recognize the dynamic routine a la AutoLoader
-from which I have shamelessly copied in the AUTOLOAD code. The reason is that while
-C<AutoLoader> provides the user with a convenient AUTOLOAD, I wanted a way to also
-keep the functionnality of L<Module::Generic> AUTOLOAD that were not included in
-C<AutoLoader>. So the only solution was a merger.
+It also contains an AUTOLOAD transforming any hash object key into dynamic methods and also recognize the dynamic routine a la AutoLoader. The reason is that while C<AutoLoader> provides the user with a convenient AUTOLOAD, I wanted a way to also keep the functionnality of L<Module::Generic> AUTOLOAD that were not included in C<AutoLoader>. So the only solution was a merger.
 
 =head1 METHODS
 
@@ -4055,6 +4101,10 @@ Same as L</"dump_print"> above that is an alias of this method.
 
 Same as L</"dumpto_printer"> above, but using L<Data::Dumper>
 
+=head2 errno
+
+Sets or gets an error number.
+
 =head2 error
 
 Set the current error issuing a L<Module::Generic::Exception> object, call L<perlfunc/"warn">, or C<$r->warn> under Apache2 modperl, and returns undef() or an empty list in list context:
@@ -4105,6 +4155,10 @@ Last, but not least since L</"error"> returns undef in scalar context or an empt
     my $total $o->get_customer(10)->products->total || die( $o->error, "\n" );
 
 Assuming this method here C<get_customer> returns an error, the chaining will continue, but produce nothing and ultimately returns undef.
+
+=head2 error_handler
+
+Sets or gets a code reference that will be called to handle errors that have been triggered when calling L</error>
 
 =head2 errors
 
@@ -4325,6 +4379,10 @@ It returns the current log file handle, if any.
 
 Instantiate a new L<Module::Generic::Array> object. If any arguments are provided, it will pass it to L<Module::Generic::Array/new> and return the object.
 
+=head2 new_file
+
+Instantiate a new L<Module::Generic::File> object. If any arguments are provided, it will pass it to L<Module::Generic::File/new> and return the object.
+
 =head2 new_hash
 
 Instantiate a new L<Module::Generic::Hash> object. If any arguments are provided, it will pass it to L<Module::Generic::Hash/new> and return the object.
@@ -4408,6 +4466,14 @@ Instantiate a new L<Module::Generic::Number> object. If any arguments are provid
 =head2 new_scalar
 
 Instantiate a new L<Module::Generic::Scalar> object. If any arguments are provided, it will pass it to L<Module::Generic::Scalar/new> and return the object.
+
+=head2 new_tempdir
+
+Returns a new temporary directory by calling L<Module::Generic::File/tempdir>
+
+=head2 new_tempfile
+
+Returns a new temporary directory by calling L<Module::Generic::File/tempfile>
 
 =head2 noexec
 
@@ -4958,6 +5024,10 @@ You can also provide an existing object of the given class. L</"_set_get_object"
 
 It returns the object currently set, if any.
 
+=head2 _set_get_object_without_init
+
+Sets or gets an object, but countrary to L</_set_get_object> this method will not try to instantiate the object.
+
 =head2 _set_get_object_array2
 
 Provided with an object property name, a class/package name and some array reference itself containing array references each containing hash references or objects, and this will create an array of array of objects.
@@ -5024,6 +5094,10 @@ Provided with arguments or not, and this will return a L<Module::Generic::Array>
     my $array = $self->_to_array_object( qw( Hello world ) ); # Becomes an array object of 'Hello' and 'world'
     my $array = $self->_to_array_object( [qw( Hello world )] ); # Becomes an array object of 'Hello' and 'world'
 
+=head2 _warnings_is_enabled
+
+Returns true of warnings are enabled, false otherwise.
+
 =head2 __dbh
 
 if your module has the global variables C<DB_DSN>, this will create a database handler using L<DBI>
@@ -5044,7 +5118,7 @@ Return the value of your global variable I<VERBOSE>, if any.
 
 =head1 SEE ALSO
 
-L<Module::Generic::Exception>, L<Module::Generic::Array>, L<Module::Generic::Scalar>, L<Module::Generic::Boolean>, L<Module::Generic::Number>, L<Module::Generic::Null>, L<Module::Generic::Dynamic> and L<Module::Generic::Tie>
+L<Module::Generic::Exception>, L<Module::Generic::Array>, L<Module::Generic::Scalar>, L<Module::Generic::Boolean>, L<Module::Generic::Number>, L<Module::Generic::Null>, L<Module::Generic::Dynamic> and L<Module::Generic::Tie>, L<Module::Generic::File>, L<Module::Generic::Finfo>, L<Module::Generic::SharedMem>, L<Module::Generic::Scalar::IO>
 
 L<Number::Format>, L<Class::Load>, L<Scalar::Util>
 

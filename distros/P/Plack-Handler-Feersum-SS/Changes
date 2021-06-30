@@ -1,3 +1,7 @@
+0.03
+
+     make Plack::Runner aware of host/port via server_ready cb
+
 0.02
 
     fix pod

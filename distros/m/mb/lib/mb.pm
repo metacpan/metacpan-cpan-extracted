@@ -11,7 +11,7 @@ package mb;
 use 5.00503;    # Universal Consensus 1998 for primetools
 # use 5.008001; # Lancaster Consensus 2013 for toolchains
 
-$VERSION = '0.29';
+$VERSION = '0.30';
 $VERSION = $VERSION;
 
 # internal use
@@ -6628,9 +6628,9 @@ programming environment like at that time.
   silently do the right thing, which is what Perl ends up doing.
   --- Advanced Perl Programming, 2nd Edition
 
-=head1 mb.pm modulino and UTF8::R2 module
+=head1 Combinations of mb.pm Modulino and Other Modules
 
-  The following is a description of all the situations in which mb.pm modulino and UTF8::R2 module are used in Japan.
+  The following is a description of all the situations in mb.pm modulino is used in Japan.
   +-------------+--------------+---------------------------------------------------------------------+
   | OS encoding | I/O encoding |                           script encoding                           |
   |             |              |----------------------------------+----------------------------------+
@@ -6641,7 +6641,7 @@ programming environment like at that time.
   |             |              |                                  |  use mb::Encode;  # file-path    |
   |    CP932    +--------------+----------------------------------+----------------------------------+
   |             |              |  > perl mb.pm script.pl          |  > perl mb.pm -e utf8 script.pl  |
-  |             |    UTF-8     |  use IOas::CP932; # I/O          |                                  |
+  |             |    UTF-8     |  use IOas::UTF8; # I/O           |                                  |
   |             |              |                                  |  use mb::Encode;  # file-path    |
   +-------------+--------------+----------------------------------+----------------------------------+
   |             |              |  $ perl mb.pm -e sjis script.pl  |  $ perl mb.pm script.pl          |
@@ -6675,22 +6675,23 @@ programming environment like at that time.
   |             |    UTF-8     |                                  |                                  |
   |             |              |                                  |                                  |
   +-------------+--------------+----------------------------------+----------------------------------+
-
   
   Description of combinations:
-  -------------------------------------------------------------------------
+  ----------------------------------------------------------------------
   encoding
   O-I-S     description
-  -------------------------------------------------------------------------
-  C-C-C     Practical combination
+  ----------------------------------------------------------------------
+  C-C-C     Best choice when I/O is CP932 encoding
   C-C-U     
   C-U-C     
-  C-U-U     Practical combination, required file-path encoding conversion
-  U-C-C     Practical combination, required file-path encoding conversion
+  C-U-U     Better choice when I/O is UTF-8 encoding, since not so slow
+  U-C-C     Better choice when I/O is CP932 encoding, since not so slow
   U-C-U     
   U-U-C     
-  U-U-U     Practical combination
-  -------------------------------------------------------------------------
+  U-U-U     Best choice when I/O is UTF-8 encoding
+  ----------------------------------------------------------------------
+  see also: 7 superstitions about character encoding I encountered
+  https://qiita.com/tonluqclml/items/d4f8274e0292df393b04
 
 =head1 AUTHOR
 

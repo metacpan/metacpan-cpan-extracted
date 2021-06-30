@@ -1,5 +1,5 @@
 package Photonic::LE::NR2::EpsTensor;
-$Photonic::LE::NR2::EpsTensor::VERSION = '0.016';
+$Photonic::LE::NR2::EpsTensor::VERSION = '0.017';
 
 =encoding UTF-8
 
@@ -9,7 +9,7 @@ Photonic::LE::NR2::EpsTensor
 
 =head1 VERSION
 
-version 0.016
+version 0.017
 
 =head1 COPYRIGHT NOTICE
 
@@ -129,7 +129,6 @@ don't check.
 
 use namespace::autoclean;
 use PDL::Lite;
-use PDL::Complex;
 use Photonic::Utils qw(tensor make_haydock);
 use List::Util qw(all);
 use Photonic::LE::NR2::AllH;
@@ -174,14 +173,14 @@ sub evaluate {
     $self->_epsA(my $epsA=shift);
     $self->_epsB(my $epsB=shift);
     $self->_u(my $u=1/(1-$epsB/$epsA));
-    my $epsTensor=tensor(pdl([map $_->evaluate($epsA, $epsB), @{$self->epsL}])->complex, $self->geometry->unitDyadsLU, $self->geometry->B->ndims, 2);
+    my $epsTensor=tensor(pdl([map $_->evaluate($epsA, $epsB), @{$self->epsL}]), $self->geometry->unitDyadsLU, $self->geometry->B->ndims, 2);
     $self->_converged(all { $_->converged } @{$self->epsL});
     return $epsTensor;
 }
 
 sub _build_nr { # One Haydock coefficients calculator per direction0
     my $self=shift;
-    make_haydock($self, 'Photonic::LE::NR2::AllH', 1);
+    make_haydock($self, 'Photonic::LE::NR2::AllH', $self->geometry->unitPairs, 1, qw(reorthogonalize use_mask mask));
 }
 
 sub _build_epsL {

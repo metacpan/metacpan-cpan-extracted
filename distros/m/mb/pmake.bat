@@ -20,10 +20,10 @@ exit
 #
 # pmake - make of Perl Poor Tools
 #
-# Copyright (c) 2008, 2009, 2010, 2018, 2019, 2020 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2008, 2009, 2010, 2018, 2019, 2020, 2021 INABA Hitoshi <ina@cpan.org> in a CPAN
 ######################################################################
 
-$VERSIONE = '0.23';
+$VERSIONE = '0.27';
 $VERSIONE = $VERSIONE;
 use strict;
 BEGIN { $INC{'warnings.pm'} = '' if $] < 5.006 }; use warnings; local $^W=1;
@@ -224,7 +224,10 @@ for my $target (@ARGV) {
             if (open FILE, $file) {
                 while (<FILE>) {
                     chomp;
-                    if (/^use\s+([A-Za-z][^;\s]*).*;/) {
+                    if (/^use\s+([0-9]+(\.[0-9]*)?)/) {
+                        $requires{'perl'} = $1;
+                    }
+                    elsif (/^use\s+([A-Za-z][^;\s]*).*;/) {
                         $requires{$1} = ($requires_version{$1} || '0');
                     }
                     elsif (/^package\s+([A-Za-z][^;\s]*).*;/) {
@@ -974,13 +977,13 @@ TO_CONTRIBUTE
 #
 # ptar - tar of Perl Poor Tools
 #
-# Copyright (c) 2008, 2009, 2010, 2011, 2018, 2019, 2020 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2008, 2009, 2010, 2011, 2018, 2019, 2020, 2021 INABA Hitoshi <ina@cpan.org> in a CPAN
 ######################################################################
 
 use strict;
 BEGIN { $INC{'warnings.pm'} = '' if $] < 5.006 }; use warnings; local $^W=1;
 
-if ($ARGV[0] ne 'xzvf') {
+if (scalar(@ARGV) == 0) {
     die <<END;
 
 usage: ptar xzvf file1.tar.gz file2.tar.gz ...
@@ -993,6 +996,10 @@ e(x)tract
 (f)ile
 
 END
+}
+
+if ($ARGV[0] eq 'xzvf') {
+    () = shift @ARGV;
 }
 
 for my $gzfile (grep m/\.tar\.gz$/xmsi, @ARGV) {
@@ -1114,7 +1121,7 @@ END
 #
 # pwget - wget of Perl Poor Tools
 #
-# Copyright (c) 2011, 2018, 2019, 2020 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2011, 2018, 2019, 2020, 2021 INABA Hitoshi <ina@cpan.org> in a CPAN
 ######################################################################
 
 use Socket;
@@ -1254,32 +1261,32 @@ sub _runtests {
     my $scriptno = 0;
     for my $script (@script) {
         next if not -e $script;
-        my @result = qx{$^X $script};
-        my($tests) = shift(@result) =~ /^1..([0-9]+)/;
 
         my $testno = 1;
         my $ok = 0;
         my $not_ok = 0;
-        for my $result (@result) {
-            if ($result =~ /^ok /) {
-                $ok++;
+        if (my @result = qx{$^X $script}) {
+            if (my($tests) = shift(@result) =~ /^1..([0-9]+)/) {
+                for my $result (@result) {
+                    if ($result =~ /^ok /) {
+                        $ok++;
+                    }
+                    elsif ($result =~ /^not ok /) {
+                        push @{$fail_testno[$scriptno]}, $testno;
+                        $not_ok++;
+                    }
+                    $testno++;
+                }
+                if ($ok == $tests) {
+                    printf("$script ok\n");
+                    $ok_script++;
+                }
+                else {
+                    printf("$script Failed %d/%d subtests\n", $not_ok, $ok+$not_ok);
+                    $not_ok_script++;
+                }
             }
-            elsif ($result =~ /^not ok /) {
-                push @{$fail_testno[$scriptno]}, $testno;
-                $not_ok++;
-            }
-            $testno++;
         }
-
-        if ($ok == $tests) {
-            printf("$script ok\n");
-            $ok_script++;
-        }
-        else {
-            printf("$script Failed %d/%d subtests\n", $not_ok, $ok+$not_ok);
-            $not_ok_script++;
-        }
-
         $total_ok += $ok;
         $total_not_ok += $not_ok;
         $scriptno++;

@@ -1,4 +1,4 @@
-package Dist::Zilla::Role::InstallTool 6.020;
+package Dist::Zilla::Role::InstallTool 6.022;
 # ABSTRACT: something that creates an install program for a dist
 
 use Moose::Role;
@@ -44,7 +44,7 @@ Dist::Zilla::Role::InstallTool - something that creates an install program for a
 
 =head1 VERSION
 
-version 6.020
+version 6.022
 
 =head1 DESCRIPTION
 

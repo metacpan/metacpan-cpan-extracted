@@ -32,13 +32,12 @@ use strict;
 use warnings;
 use PDL;
 use PDL::NiceSlice;
-use PDL::Complex;
 use Photonic::WE::R2::Metric;
 use Photonic::WE::R2::AllH;
 use Photonic::WE::R2::EpsilonP;
 use Photonic::WE::R2::EpsilonTensor;
 
-use Test::More tests => 9;
+use Test::More;
 use lib 't/lib';
 use TestUtils;
 
@@ -54,24 +53,24 @@ my $m=Photonic::WE::R2::Metric->new(
     wavevector=>pdl([1,0])*2.1e-5);
 my $et=Photonic::WE::R2::EpsilonTensor->new(nh=>10, metric=>$m);
 my $etv=$et->evaluate($eb);
-ok(Cagree($etv->(:,(0),(0)), 1/((1-$f)/$ea+$f/$eb)),
+ok(Cagree($etv->((0),(0)), 1/((1-$f)/$ea+$f/$eb)),
 			     "Long. perp. non retarded");
-ok(Cagree($etv->(:,(1),(1)), (1-$f)*$ea+$f*$eb),
+ok(Cagree($etv->((1),(1)), (1-$f)*$ea+$f*$eb),
 			     "Trans. parallel non retarded");
-ok(Cagree($etv->(:,(0),(1)), 0), "xy k perp");
-ok(Cagree($etv->(:,(1),(0)), 0), "yx k perp");
+ok(Cagree($etv->((0),(1)), 0), "xy k perp");
+ok(Cagree($etv->((1),(0)), 0), "yx k perp");
 
 $m=Photonic::WE::R2::Metric->new(
     geometry=>$g, epsilon=>$ea, wavenumber=>pdl(2e-5),
     wavevector=>pdl([0,1])*2.1e-5);
 $et=Photonic::WE::R2::EpsilonTensor->new(nh=>10, metric=>$m);
 $etv=$et->evaluate($eb);
-ok(Cagree($etv->(:,(0),(0)), 1/((1-$f)/$ea+$f/$eb)),
+ok(Cagree($etv->((0),(0)), 1/((1-$f)/$ea+$f/$eb)),
 			     "Trans. perp. non retarded");
-ok(Cagree($etv->(:,(1),(1)), (1-$f)*$ea+$f*$eb),
+ok(Cagree($etv->((1),(1)), (1-$f)*$ea+$f*$eb),
 			     "Long. parallel non retarded");
-ok(Cagree($etv->(:,(0),(1)), 0), "xy k parallel");
-ok(Cagree($etv->(:,(1),(0)), 0), "yx k parallel");
+ok(Cagree($etv->((0),(1)), 0), "xy k parallel");
+ok(Cagree($etv->((1),(0)), 0), "yx k parallel");
 
 #Compare to epsilon from transfer matrix.
 #Construct normal incidence transfer matrix
@@ -80,11 +79,11 @@ $g=Photonic::Geometry::FromB->new(B=>$B, L=>pdl(1,1));
 my ($na, $nb)=map {sqrt($_)} ($ea, $eb);
 my $q=1.2;
 my ($ka,$kb)=map {$q*$_} ((1-$f)*$na, $f*$nb); #Multiply by length also
-my $ma=pdl([cos($ka), -sin($ka)/$na],[$na*sin($ka), cos($ka)])->complex;
-my $mb=pdl([cos($kb), -sin($kb)/$nb],[$nb*sin($kb), cos($kb)])->complex;
-my $mt=($ma->(:,:,*1,:)*$mb->mv(2,1)->(:,:,:,*1))->sumover;
+my $ma=pdl([cos($ka), -sin($ka)/$na],[$na*sin($ka), cos($ka)]);
+my $mb=pdl([cos($kb), -sin($kb)/$nb],[$nb*sin($kb), cos($kb)]);
+my $mt=($ma->(:,*1)*$mb->transpose->(:,:,*1))->sumover;
 #Solve exact dispersion relation
-my $cospd=($mt->(:,(0),(0))+$mt->(:,(1),(1)))/2;
+my $cospd=($mt->((0),(0))+$mt->((1),(1)))/2;
 my $sinpd=sqrt(1-$cospd**2);
 my $pd=log($cospd+i()*$sinpd)/i;
 warn "Bloch vector not real, $pd" unless $pd->im->abs < 1e-7;
@@ -97,5 +96,7 @@ $m=Photonic::WE::R2::Metric->new(
     wavevector=>pdl([$pd,0]));
 $et=Photonic::WE::R2::EpsilonTensor->new(nh=>1000, metric=>$m,
 						  reorthogonalize=>1);
-$etv=$et->evaluate($eb)->(:,(1),(1));
+$etv=$et->evaluate($eb)->((1),(1));
 ok(Cagree($epstm, $etv), "Epsilon agrees with transfer matrix");
+
+done_testing;

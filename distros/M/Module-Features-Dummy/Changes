@@ -1,0 +1,23 @@
+0.004   2021-02-26  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [build] Rebuild with Dist::Zilla plugin [Module::Features].
+
+
+0.003   2021-02-25  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [build] Rebuild with Pod::Weaver plugin [Module::Features] to render
+          information into POD pages.
+
+
+0.002   2021-02-25  Released-By: PERLANCAR; Urgency: medium
+
+	- Bump feature set v to 2 for testing.
+
+
+0.001   2021-02-21  Released-By: PERLANCAR
+
+        - First release.

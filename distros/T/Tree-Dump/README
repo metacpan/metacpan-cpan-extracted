@@ -2,8 +2,8 @@ NAME
     Tree::Dump - Dump a tree object
 
 VERSION
-    This document describes version 0.060 of Tree::Dump (from Perl
-    distribution Tree-Dump), released on 2020-02-06.
+    This document describes version 0.061 of Tree::Dump (from Perl
+    distribution Tree-Dump), released on 2021-06-27.
 
 SYNOPSIS
      use Tree::Dump; # exports td() and tdmp()
@@ -102,7 +102,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2020, 2016 by perlancar@cpan.org.
+    This software is copyright (c) 2021, 2020, 2016 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

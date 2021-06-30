@@ -17,16 +17,18 @@ my %WriteMakefileArgs = (
     "script/disable-touchscreen",
     "script/enable-touchscreen",
     "script/has-touchscreen",
-    "script/touchscreen-is-enabled"
+    "script/touchscreen-is-enabled",
+    "script/tsoff",
+    "script/tson"
   ],
   "LICENSE" => "perl",
   "NAME" => "App::TouchscreenUtils",
   "PREREQ_PM" => {
     "Data::Sah::Compiler::perl::TH::bool" => 0,
     "Data::Sah::Compiler::perl::TH::str" => 0,
-    "Log::ger" => "0.027",
+    "Log::ger" => "0.038",
     "Perinci::CmdLine::Any" => 0,
-    "Perinci::CmdLine::Lite" => "1.820",
+    "Perinci::CmdLine::Lite" => "1.827",
     "Sah::Schema::true" => 0,
     "Touchscreen::Any" => 0
   },
@@ -36,7 +38,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.002",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -49,9 +51,9 @@ my %FallbackPrereqs = (
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
-  "Log::ger" => "0.027",
+  "Log::ger" => "0.038",
   "Perinci::CmdLine::Any" => 0,
-  "Perinci::CmdLine::Lite" => "1.820",
+  "Perinci::CmdLine::Lite" => "1.827",
   "Sah::Schema::true" => 0,
   "Test::More" => 0,
   "Touchscreen::Any" => 0

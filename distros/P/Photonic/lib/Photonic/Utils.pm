@@ -1,5 +1,5 @@
 package Photonic::Utils;
-$Photonic::Utils::VERSION = '0.016';
+$Photonic::Utils::VERSION = '0.017';
 
 =encoding UTF-8
 
@@ -41,12 +41,11 @@ require Exporter;
     HProd MHProd EProd VSProd SProd
     linearCombineIt lentzCF any_complex tensor
     make_haydock make_greenp
-    wave_operator apply_longitudinal_projection
+    wave_operator apply_longitudinal_projection make_dyads
     cgtsv lu_decomp lu_solve
 );
 use PDL::LiteF;
 use PDL::FFTW3;
-use PDL::Complex;
 require PDL::MatrixOps;
 use Photonic::Iterator qw(nextval);
 use Carp;
@@ -64,13 +63,13 @@ sub linearCombineIt { #complex linear combination of states from iterator
     foreach(0..$numCoeff-1){
 	my $s=nextval($stateit);
 	croak "More coefficients than states in basis" unless defined $s;
-	$result = $result + $coefficients->slice(":,$_")*$s;
+	$result = $result + $coefficients->slice($_)*$s;
     }
     return $result;
 }
 
 sub any_complex {
-    grep ref $_ && (ref $_ eq 'PDL::Complex' or !$_->type->real), @_;
+    grep ref $_ && !$_->type->real, @_;
 }
 
 sub wave_operator {
@@ -84,10 +83,10 @@ sub tensor {
     $backsub = $after_cb->($backsub) if $after_cb;
     my $tensor = PDL->zeroes(($nd) x $dims)->r2C;
     my $n = 0;
-    my $slice_prefix = ':,' x ($dims-1);
+    my $slice_prefix = ':,' x ($dims-2);
     for my $i(0..$nd-1){
         for my $j($i..$nd-1){
-            my $bslice = $backsub->slice(":,($n)");
+            my $bslice = $backsub->slice("($n)");
             $tensor->slice("$slice_prefix($i),($j)") .= $bslice;
             $tensor->slice("$slice_prefix($j),($i)") .= $bslice;
             ++$n;
@@ -97,15 +96,15 @@ sub tensor {
 }
 
 my @HAYDOCK_PARAMS = qw(
-  nh keepStates smallH reorthogonalize use_mask mask
+  nh keepStates smallH
 );
 sub make_haydock {
-  my ($self, $class, $add_geom, @extra_attributes) = @_;
+  my ($self, $class, $pairs, $add_geom, @extra_attributes) = @_;
   # This must change if G is not symmetric
   [ map $class->new(
       _haydock_extra($self, $_, $add_geom),
       map +($_ => $self->$_), @HAYDOCK_PARAMS, @extra_attributes
-    ), @{$self->geometry->unitPairs}
+    ), $pairs->dog
   ];
 }
 
@@ -132,10 +131,10 @@ sub HProd { #Hermitean product between two fields. skip first 'skip' dims
     my $ndims=$first->ndims;
     confess "Dimensions should be equal, instead: first=", $first->info, " second=", $second->info
 	unless $ndims == $second->ndims;
-    my $prod=$first->Cconj*$second;
-    # clump all except skip dimensions, protecto RorI index and sum.
-    my $result=$prod->reorder($skip+1..$ndims-1,1..$skip,0)->clump(-1-$skip-1)
-	->mv(-1,0)->sumover;
+    my $prod=$first->conj*$second;
+    # clump all except skip dimensions, protecto index and sum.
+    my $result=$prod->reorder($skip..$ndims-1,0..$skip-1)->clump(-$skip-1)
+	->sumover;
     return $result;
 }
 
@@ -150,11 +149,12 @@ sub MHProd { #Hermitean product between two fields with metric. skip
     die "Dimensions should be equal" unless $ndims == $second->ndims;
     carp "We don't trust the skip argument in MHProd yet" if $skip;
     # I'm not sure about the skiped dimensions in the next line. Is it right?
-    my $mprod=($metric*$second->dummy(2))->sumover;
+    my $sliced = $second->dummy(1);
+    my $mprod=($metric*$sliced)->sumover;
     die "Dimensions should be equal" unless $ndims == $mprod->ndims;
-    my $prod=$first->Cconj*$mprod;
-    my $result=$prod->reorder($skip+1..$ndims-1,1..$skip,0)->clump(-1-$skip-1)
-	->mv(-1,0)->sumover;
+    my $prod=$first->conj*$mprod;
+    my $result=$prod->reorder($skip..$ndims-1,0..$skip-1)->clump(-$skip-1)
+	->sumover;
     return $result;
 }
 
@@ -168,21 +168,19 @@ sub EProd { #Euclidean product between two fields in reciprocal
     die "Dimensions should be equal" unless $ndims == $second->ndims;
     #First reverse all reciprocal dimensions
     my $sl=join ',',
-	":", #slice to skip complex dimension
 	((":") x $skip), #skip dimensions
-	(("-1:0") x ($ndims-1-$skip)); #and reverse the rest
+	(("-1:0") x ($ndims-$skip)); #and reverse the rest
     my $first_mG=$first->slice($sl);
     #Then rotate psi_{G=0} to opposite corner with coords. (0,0,...)
-    foreach($skip+1..$ndims-1){
+    foreach($skip..$ndims-1){
 	$first_mG=$first_mG->mv($_,0)->rotate(1)->mv(0,$_);
     }
     my $prod=$first_mG*$second;
-    # clump all except skip dimensions, protecto RorI index and sum.
-    my $result=$prod #ri:s1:s2:nx:ny
-	->reorder($skip+1..$ndims-1,1..$skip,0) #nx:ny:s1:s2:ri
-	->clump(-1-$skip-1) #nx*ny:s1:s2:ri
-	->mv(-1,0) #ri:nx*ny,s1,s2
-	->sumover; #ri:s1:s2
+    # clump all except skip dimensions, protecto index and sum.
+    my $result=$prod #s1:s2:nx:ny
+	->reorder($skip..$ndims-1,0..$skip-1) #nx:ny:s1:s2
+	->clump(-$skip-1) #nx*ny:s1:s2
+	->sumover; #s1:s2
     return $result;
 }
 
@@ -194,52 +192,49 @@ sub SProd { #Spinor product between two fields in reciprocal
     my $skip=shift//0;
     my $ndims=$first->ndims;
     die "Dimensions should be equal" unless $ndims == $second->ndims;
-    #dimensions are like rori, pmk, s1,s2, nx,ny
+    #dimensions are like pmk, s1,s2, nx,ny
     #First reverse all reciprocal dimensions
     my $sl=join ',',
-	":", #slice to keep complex dimension
 	"-1:0", #interchange spinor components +- to -+
 	((":") x $skip), #keep skip dimensions
-	(("-1:0") x ($ndims-1-1-$skip)); #and reverse G indices
-    my $first_mG=$first->slice($sl); #rori,pmk,s1,s2,nx,ny
+	(("-1:0") x ($ndims-1-$skip)); #and reverse G indices
+    my $first_mG=$first->slice($sl); #pmk,s1,s2,nx,ny
     #Then rotate psi_{G=0} to opposite corner with coords. (0,0,...)
-    foreach($skip+2..$ndims-1){
+    foreach($skip+1..$ndims-1){
 	$first_mG=$first_mG->mv($_,0)->rotate(1)->mv(0,$_);
     }
-    my $prod=$first_mG*$second; #rori,pmk,s1,s2,nx,ny
-    # clump all except skip dimensions, protect RorI index and sum.
+    my $prod=$first_mG*$second; #pmk,s1,s2,nx,ny
+    # clump all except skip dimensions, protect sum.
     my $result=$prod #rori,pmk, s1,s2,nx,ny
-	->reorder($skip+2..$ndims-1,1..$skip+1,0) #nx,ny,pmk,s1,s2,rori
-	->clump(-1-$skip-1)  #nx*ny*pmk, s1, s2, rori
-	->mv(-1,0) #rori,nx*ny*pmk, s1,s2
-	->sumover; #rori, s1, s2
+	->reorder($skip+1..$ndims-1,0..$skip) #nx,ny,pmk,s1,s2
+	->clump(-$skip-1)  #nx*ny*pmk, s1, s2
+	->sumover; #s1, s2
     return $result;
 }
 
 sub VSProd { #Vector-Spinor product between two vector fields in reciprocal
-             #space. Indices are ri:xy:pm:nx:ny...
+             #space. Indices are xy:pm:nx:ny...
     my $first=shift;
     my $second=shift;
     my $ndims=$first->ndims;
     die "Dimensions should be equal" unless $ndims == $second->ndims;
-    #dimensions are like ri:xy:pm:nx:ny
+    #dimensions are like xy:pm:nx:ny
     #First reverse all reciprocal dimensions
     my $sl=join ',',
-	(":",":"), #slice to keep complex and vector dimension
+	(":"), #slice to keep vector dimension
 	"-1:0", #interchange spinor components +- to -+
-	(("-1:0") x ($ndims-3)); #and reverse G indices
-    my $first_mG=$first->slice($sl); #ri:xy:pm:nx:ny
+	(("-1:0") x ($ndims-2)); #and reverse G indices
+    my $first_mG=$first->slice($sl); #xy:pm:nx:ny
     #Then rotate psi_{G=0} to opposite corner with coords. (0,0,...)
-    foreach(3..$ndims-1){ # G indices start after ri:xy:pm
+    foreach(2..$ndims-1){ # G indices start after xy:pm
 	$first_mG=$first_mG->mv($_,0)->rotate(1)->mv(0,$_);
     }
-    my $prod=$first_mG*$second; #ri:xy:pm:nx:ny
-    # clump all except ri:xy.
-    my $result=$prod #ri:xy:pm::nx:ny
-	->reorder(3..$ndims-1,1,2,0) #nx:ny:xy:pm:ri
-	->clump(-2)  #nx*ny*xy*pm:ri
-	->mv(-1,0) #ri:nx*ny*xy*pm
-	->sumover; #ri
+    my $prod=$first_mG*$second; #xy:pm:nx:ny
+    # clump all except xy.
+    my $result=$prod #xy:pm::nx:ny
+	->reorder(2..$ndims-1,0,1) #nx:ny:xy:pm
+	->clump(-1)  #nx*ny*xy*pm
+	->sumover;
     return $result;
 }
 
@@ -249,10 +244,10 @@ sub RtoG { #transform a 'complex' scalar, vector or tensorial field
     my $ndims=shift; #number of dimensions to transform
     my $skip=shift; #dimensions to skip
     my $moved=$field;
-    $moved=$moved->mv(1,-1) foreach(0..$skip-1);
+    $moved=$moved->mv(0,-1) foreach(0..$skip-1);
     my $transformed=fftn($moved, $ndims);
     my $result=$transformed;
-    $result=$result->mv(-1,1) foreach(0..$skip-1);
+    $result=$result->mv(-1,0) foreach(0..$skip-1);
     return $result;
 }
 
@@ -262,10 +257,10 @@ sub GtoR { #transform a 'complex' scalar, vector or tensorial field from
     my $ndims=shift; #number of dimensions to transform
     my $skip=shift; #dimensions to skip
     my $moved=$field;
-    $moved=$moved->mv(1,-1) foreach(0..$skip-1);
+    $moved=$moved->mv(0,-1) foreach(0..$skip-1);
     my $transformed=ifftn($moved, $ndims);
     my $result=$transformed;
-    $result=$result->mv(-1,1) foreach(0..$skip-1);
+    $result=$result->mv(-1,0) foreach(0..$skip-1);
     return $result;
 }
 
@@ -280,16 +275,16 @@ sub lentzCF {
     my $small=shift;
     my $tiny=r2C(1.e-30);
     my $converged=0;
-    my $fn=$as->slice(":,0");
+    my $fn=$as->slice(0);
     $fn=$tiny if all($fn==0);
     my $n=1;
     my ($fnm1, $Cnm1, $Dnm1)=($fn, $fn, r2C(0)); #previous coeffs.
     my ($Cn, $Dn); #current coeffs.
     my $Deltan;
     while($n<$max){
-	$Dn=$as->slice(":,$n")+$bs->slice(":,$n")*$Dnm1;
+	$Dn=$as->slice($n)+$bs->slice($n)*$Dnm1;
 	$Dn=$tiny if all($Dn==0);
-	$Cn=$as->slice(":,$n")+$bs->slice(":,$n")/$Cnm1;
+	$Cn=$as->slice($n)+$bs->slice($n)/$Cnm1;
 	$Cn=$tiny if all($Cn==0);
 	$Dn=1/$Dn;
 	$Deltan=$Cn*$Dn;
@@ -300,7 +295,7 @@ sub lentzCF {
 	$Cnm1=$Cn;
 	$n++;
     }
-    $fn = $fn->slice(":,(0)");
+    $fn = $fn->slice("(0)");
     return wantarray? ($fn, $n): $fn;
 }
 
@@ -334,7 +329,7 @@ sub cgtsv {
     }
     PDL::LinearAlgebra::Complex::cgtsv($c, $d, $e, $b, $i);
     confess "Error solving tridiag system" unless $i == 0;
-    $b->isa("PDL::Complex") ? $b->complex : $b;
+    $b;
 }
 
 sub lu_decomp {
@@ -365,28 +360,47 @@ sub lu_solve {
 
 sub apply_longitudinal_projection {
     my ($psi_G, $gnorm, $ndims, $coeff) = @_;
-    #state is ri:nx:ny... gnorm=i:nx:ny...
+    #state is nx:ny... gnorm=i:nx:ny...
     #Multiply by vector ^G.
     #Have to get cartesian out of the way, thread over it and iterate
     #over the rest
-    my $Gpsi_G=$psi_G->dummy(1)*$gnorm; #^G |psi>
-    #the result is complex ri:i=cartesian:nx:ny...
-    #Take inverse Fourier transform over all space dimensions,
-    #move cartesian indices, thread, move back
-    my $Gpsi_R=ifftn($Gpsi_G->mv(1,-1), $ndims)->mv(-1,1);
-    # $Gpsi_R is ri:i:nx:ny:...
+    my $Gpsi_G=$psi_G->dummy(0)*$gnorm; #^G |psi>
+    #the result is complex i=cartesian:nx:ny...
+    my $Gpsi_R=GtoR($Gpsi_G, $ndims, 1);
+    # $Gpsi_R is i:nx:ny:...
     # Multiply by the coefficient in Real Space.
-    my $eGpsi_R=$coeff->dummy(1)*$Gpsi_R;
-    # $eGpsi_R is ri:i:nx:ny...
-    #Transform to reciprocal space
-    #move cartesian indices, thread, move back
-    my $eGpsi_G=fftn($eGpsi_R->mv(1,-1), $ndims)->mv(-1,1);
-    # $eGpsi_G is ri:i:nx:ny:...
+    my $eGpsi_R=$coeff->dummy(0)*$Gpsi_R;
+    # $eGpsi_R is i:nx:ny...
+    my $eGpsi_G=RtoG($eGpsi_R, $ndims, 1);
+    # $eGpsi_G is i:nx:ny:...
     #Scalar product with Gnorm
     ($eGpsi_G*$gnorm) #^Ge^G|psi>
-	# ri:i:nx:ny:...
+	# i:nx:ny:...
 	->sumover; #^G.epsilon^G|psi>
     #Result is ^G.epsilon^G|psi>, ri:nx:ny...
+}
+
+sub make_dyads {
+    my ($nd, $unitPairs) = @_;
+    my $ne = $nd*($nd+1)/2; #number of symmetric matrix elements
+    my $matrix = PDL->zeroes($ne, $ne);
+    my $n = 0; #run over vector pairs
+    for my $i (0..$nd-1) {
+        for my $j ($i..$nd-1) {
+            my $m = 0; #run over components of dyads
+            for my $k (0..$nd-1) {
+                for my $l ($k..$nd-1) {
+                    my $factor = $k == $l?1:2;
+                    $matrix->slice("($m),($n)") .= #pdl order!
+                        $factor*$unitPairs->slice("($k),($n)") *
+                        $unitPairs->slice("($l),($n)");
+                    ++$m;
+                }
+            }
+            ++$n;
+        }
+    }
+    return $matrix;
 }
 
 1;
@@ -400,7 +414,7 @@ Photonic::Utils
 
 =head1 VERSION
 
-version 0.016
+version 0.017
 
 =head1 SYNOPSIS
 
@@ -534,5 +548,12 @@ Given a C<psi_G> state, a C<GNorm>, the number of dimensions, and a
 real-space coefficient, transforms the C<psi_G> field from reciprocal to
 real space, multiplies by the coefficient, transforms back to reciprocal
 space.
+
+=item * make_dyads
+
+Given a number of dimensions, and an array-ref of "unit pair" ndarrays,
+returns a matrix of dyads of unit vector pairs
+B<d>^{ij}_{kl}=B<u>^{i}_{kl}B<u>^{j}_{kl} as 2d matrix, adjusted for
+symmetry.
 
 =back

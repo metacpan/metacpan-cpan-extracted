@@ -1,6 +1,6 @@
 package Business::CompanyDesignator::Record;
 
-use Mouse;
+use Moose;
 use utf8;
 use warnings qw(FATAL utf8);
 use Carp;

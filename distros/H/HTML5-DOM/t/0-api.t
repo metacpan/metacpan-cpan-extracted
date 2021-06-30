@@ -10,7 +10,7 @@ require_ok('HTML5::DOM');
 can_ok('HTML5::DOM', qw(new));
 can_ok('HTML5::DOM::Collection', qw(new));
 can_ok('HTML5::DOM::Encoding', qw(
-	id2name name2id detectAuto detect detectRussian detectUnicode
+	id2name name2id detectAuto detect detectCyrillic detectUkrainian detectRussian detectUnicode
 	detectByPrescanStream detectByCharset detectBomAndCut
 ));
 can_ok('HTML5::DOM::CSS', qw(new));
@@ -924,6 +924,121 @@ for my $test (@$test_manipulations) {
 	}
 }
 
+# DOM node insertion manipulations with fragment
+my $test_manipulations_with_fragment = [
+	{
+		method       => 'append',
+		on_parent    => 1,
+		return       => 'self',
+		check_offset => 5,
+	},
+	{
+		method       => 'appendChild',
+		on_parent    => 1,
+		return       => 'added',
+		check_offset => 5,
+	},
+	{
+		method       => 'prepend',
+		on_parent    => 1,
+		return       => 'self',
+		check_offset => 0,
+	},
+	{
+		method       => 'prependChild',
+		on_parent    => 1,
+		return       => 'added',
+		check_offset => 0,
+	},
+	{
+		method       => 'replace',
+		return       => 'self',
+		check_offset => 2,
+		replace      => 1,
+	},
+	{
+		method       => 'replaceChild',
+		on_parent    => 1,
+		with_child   => 1,
+		return       => 'removed',
+		check_offset => 2,
+		replace      => 1,
+	},
+	{
+		method       => 'before',
+		return       => 'self',
+		check_offset => 2,
+	},
+	{
+		method       => 'insertBefore',
+		on_parent    => 1,
+		with_child   => 1,
+		return       => 'added',
+		check_offset => 2,
+	},
+	{
+		method       => 'after',
+		return       => 'self',
+		check_offset => 3,
+	},
+	{
+		method       => 'insertAfter',
+		on_parent    => 1,
+		with_child   => 1,
+		return       => 'added',
+		check_offset => 3,
+	},
+];
+
+for my $test (@$test_manipulations_with_fragment) {
+	my $tree = HTML5::DOM->new->parse('
+		<ul>
+			<li>UNIX</li>
+			<li>Linux</li>
+			<li id="child">OSX</li>
+			<li>Windows</li>
+			<li>FreeBSD</li>
+		</ul>
+	');
+
+	my $arg = $tree->parseFragment('
+		<li>NetBSD</li>
+		<li>OpenBSD</li>
+	', 'ul');
+	my $arg_child1 = $arg->firstElementChild;
+	my $arg_child2 = $arg->lastElementChild;
+
+	my $method = $test->{method};
+	my $child = $tree->at('#child');
+	my $parent = $child->parent;
+	my $test_el = $test->{on_parent} ? $parent : $child;
+
+	my $result;
+	if ($test->{with_child}) {
+		$result = $test_el->$method($arg, $child);
+	} else {
+		$result = $test_el->$method($arg);
+	}
+
+	if ($test->{return} eq 'self') {
+		ok($result == $test_el, "$method with fragment: check return (self)");
+	} elsif ($test->{return} eq 'added') {
+		ok($result == $arg, "$method with fragment: check return (added)");
+	} elsif ($test->{return} eq 'removed') {
+		ok($result == $child, "$method with fragment: check return (removed)");
+	}
+
+	my $check_offset1 = $test->{check_offset};
+	my $check_offset2 = $check_offset1 + 1;
+	my $child_count = $test->{replace} ? 6 : 7;
+	my $children = $parent->children;
+	ok($children->item($check_offset1) == $arg_child1, "$method with fragment: check position 1");
+	ok($children->item($check_offset2) == $arg_child2, "$method with fragment: check position 2");
+	ok($children->length == $child_count, "$method with fragment: check child count");
+
+	ok($arg->childNodes->length == 0, "$method with fragment: check child count of arg");
+}
+
 #####################################
 # HTML5::DOM::DocType
 #####################################
@@ -1483,26 +1598,69 @@ ok($collection->length == 5, 'colection: length');
 ok(scalar(@{$collection}) == 5, 'colection: scalar length');
 ok(scalar(@{$collection->array}) == 5, 'colection->array: length');
 ok($collection->item(1) == $collection->[1], 'colection->item check');
-ok($collection->first == $collection->[0], 'colection->first check');
-ok($collection->last == $collection->[-1], 'colection->last check');
 ok($collection->html eq "<li>UNIX</li><li>Linux</li><li>OSX</li><li>Windows</li><li>FreeBSD</li>", 'colection->html check');
 ok($collection->text eq "UNIXLinuxOSXWindowsFreeBSD", 'colection->text check');
+ok($collection->reverse->text eq "FreeBSDWindowsOSXLinuxUNIX", 'colection reverse check');
+ok(length($collection->shuffle->text) == 26, 'colection shuffle check');
 
+ok(join('', @{$collection->grep(qr/X/i)->map('text')}) eq 'UNIXLinuxOSX', 'colection grep regexp');
+ok(join('', @{$collection->grep(sub { $_->text =~ $_[1] }, qr/X/i)->map('text')}) eq 'UNIXLinuxOSX', 'colection grep callback');
+
+ok($collection->head(2)->text eq 'UNIXLinux', 'colection head');
+ok($collection->head(-2)->text eq 'UNIXLinuxOSX', 'colection head negative');
+ok($collection->head(343344334)->text eq 'UNIXLinuxOSXWindowsFreeBSD', 'colection head large offset');
+ok($collection->head(-343344334)->text eq '', 'colection head invalid 2');
+
+ok($collection->tail(2)->text eq 'WindowsFreeBSD', 'colection tail');
+ok($collection->tail(-2)->text eq 'OSXWindowsFreeBSD', 'colection tail negative');
+ok($collection->tail(343344334)->text eq '', 'colection tail invalid');
+ok($collection->tail(-343344334)->text eq '', 'colection tail invalid 2');
+
+ok($collection->slice(1)->text eq 'LinuxOSXWindowsFreeBSD', 'colection slice(1)');
+ok($collection->slice(1, 2)->text eq 'LinuxOSX', 'colection slice(1, 2)');
+ok($collection->slice(-2)->text eq 'WindowsFreeBSD', 'colection slice(-2)');
+ok($collection->slice(-2, 1)->text eq 'Windows', 'colection slice(-2, 1)');
+ok($collection->slice(-3, -1)->text eq 'OSXWindows', 'colection slice(-3, -1)');
+ok($collection->slice(-33232, -134343443)->text eq '', 'colection slice invalid');
+ok($collection->slice(555534, 34433443)->text eq '', 'colection slice invalid 2');
+ok($collection->slice(-33232, 134343443)->text eq '', 'colection slice invalid 3');
+ok($collection->slice(555534, -34433443)->text eq '', 'colection slice invalid 4');
+
+my $uniq_map = {
+	UNIX		=> 1,
+	OSX			=> 1,
+	FreeBSD		=> 1,
+	Windows		=> 2
+};
+
+ok($collection->uniq()->text eq 'UNIXLinuxOSXWindowsFreeBSD', 'collection uniq');
+ok($collection->uniq(sub { $uniq_map->{$_->text} })->text eq 'UNIXLinuxWindows', 'collection uniq callback');
+
+ok($collection->first == $collection->[0], 'colection->first check');
+ok($collection->last == $collection->[-1], 'colection->last check');
+ok($collection->first(qr/W/i)->text eq 'Windows', 'colection first like grep regexp');
+ok($collection->first(sub { $_->text =~ $_[1] }, qr/W/i)->text eq 'Windows', 'colection first like grep callback');
+
+my $check_index = 0;
 $collection->each(sub {
-	my ($node, $index) = @_;
-	ok($node == $collection->[$index], 'collection each ['.$index.']');
-});
+	my ($node, $index, $additional) = @_;
+	ok($additional == 42 && $index == $check_index && $node == $collection->[$check_index], 'collection each ['.$check_index.']');
+	$check_index++;
+}, 42);
 
+$check_index = 0;
 my $result = $collection->map(sub {
-	my ($node, $index) = @_;
-	ok($node == $collection->[$index], 'collection map ['.$index.']');
+	my ($node, $index, $additional) = @_;
+	ok($additional == 42 && $index == $check_index && $node == $collection->[$check_index], 'collection map ['.$check_index.']');
+	$check_index++;
 	return $node->text;
-});
+}, 42);
 
 ok(join('', @$result) eq "UNIXLinuxOSXWindowsFreeBSD", 'colection map result join');
 ok(join('', @{$collection->map('text')}) eq "UNIXLinuxOSXWindowsFreeBSD", 'colection map result join 2');
+
 $collection->map('text', 1);
-ok(join('', @{$collection->map('text')}) eq "11111", 'colection map result join 3');
+ok(join('', @{$collection->map('text')}) eq "11111", 'colection map bulk call');
 
 ######################################################################################
 # HTML5::DOM::CSS + HTML5::DOM::CSS::Selector + HTML5::DOM::CSS::Selector::Entry
@@ -1604,7 +1762,13 @@ ok($encoding_id == HTML5::DOM::Encoding->UTF_16LE, 'detectUnicode');
 $encoding_id = HTML5::DOM::Encoding::detect($utf16);
 ok($encoding_id == HTML5::DOM::Encoding->UTF_16LE, 'detect (pass utf-16)');
 
-# detectRussian
+# detectCyrillic
+$encoding_id = HTML5::DOM::Encoding::detectCyrillic($cp1251);
+ok($encoding_id == HTML5::DOM::Encoding->WINDOWS_1251, 'detectCyrillic');
+
+$encoding_id = HTML5::DOM::Encoding::detectUkrainian($cp1251);
+ok($encoding_id == HTML5::DOM::Encoding->WINDOWS_1251, 'detectUkrainian');
+
 $encoding_id = HTML5::DOM::Encoding::detectRussian($cp1251);
 ok($encoding_id == HTML5::DOM::Encoding->WINDOWS_1251, 'detectRussian');
 

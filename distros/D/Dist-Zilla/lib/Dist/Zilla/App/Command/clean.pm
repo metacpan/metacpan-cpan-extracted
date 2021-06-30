@@ -1,4 +1,4 @@
-package Dist::Zilla::App::Command::clean 6.020;
+package Dist::Zilla::App::Command::clean 6.022;
 # ABSTRACT: clean up after build, test, or install
 
 # BEGIN BOILERPLATE
@@ -56,7 +56,7 @@ Dist::Zilla::App::Command::clean - clean up after build, test, or install
 
 =head1 VERSION
 
-version 6.020
+version 6.022
 
 =head1 SYNOPSIS
 

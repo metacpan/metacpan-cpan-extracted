@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver;
 # ABSTRACT: Neo4j community graph database driver for Bolt and HTTP
-$Neo4j::Driver::VERSION = '0.23';
+$Neo4j::Driver::VERSION = '0.25';
 
 use Carp qw(croak);
 
@@ -45,7 +45,6 @@ my %DEFAULTS = (
 		temporal => 'Neo4j::Driver::Type::Temporal',
 	},
 	die_on_error => 1,
-	jolt => 0,
 );
 
 
@@ -129,6 +128,8 @@ sub _parse_options {
 	croak "Odd number of elements in $context options hash" if @options & 1;
 	my %options = @options;
 	
+	warnings::warnif deprecated => "Config option cypher_types is deprecated" if $options{cypher_types};
+	
 	my @unsupported = ();
 	foreach my $key (keys %options) {
 		push @unsupported, $key unless grep m/^$key$/, @$supported;
@@ -169,7 +170,7 @@ Neo4j::Driver - Neo4j community graph database driver for Bolt and HTTP
 
 =head1 VERSION
 
-version 0.23
+version 0.25
 
 =head1 SYNOPSIS
 
@@ -336,31 +337,22 @@ These are subject to unannounced modification or removal in future
 versions. Expect your code to break if you depend upon these
 features.
 
-=head2 Bolt version 3 and 4
+=head2 Disable or enforce Jolt
 
-There is now experimental support for Bolt protocol versions newer
-S<than 1> using L<Neo4j::Bolt> S<version 0.40> or newer. This allows
-connecting to S<Neo4j 4> using Bolt.
-
-This feature is currently undergoing testing. Until it becomes
-stable, please continue to use HTTP with S<Neo4j 4> in production
-environments.
-
-=head2 Jolt
-
- $d->config(jolt => undef);  # let the server decide
- $d->config(jolt => 0);      # accept only JSON (the default)
+ $d->config(jolt => undef);  # prefer Jolt (the default)
+ $d->config(jolt => 0);      # accept only JSON
  $d->config(jolt => 1);      # accept only Jolt
 
-There is experimental support for Neo4j HTTP responses that use the
-L<Jolt|https://neo4j.com/docs/http-api/4.2/actions/result-format/#_jolt>
-format (JSON Bolt). This new response format will soon become this
-driver's default for HTTP connections. For now, you'll have to
-request it explicitly using the C<jolt> config option.
+The L<Jolt|https://neo4j.com/docs/http-api/4.3/actions/result-format/#_jolt>
+response format (JSON Bolt) is preferred for HTTP connections
+because the older JSON response format has several known issues
+and is much slower than Jolt.
 
-If you use the scalars C<'sparse'> or C<'strict'> instead of just
-C<1>, the driver will request that particular Jolt mode from the
-server. However, there is no advantage to manually selecting one
+The Jolt format can be enforced or disabled as shown above.
+If you use the scalars C<'sparse'>, C<'strict'> or C<'ndjson'>
+instead of just C<1>, the driver will request that particular
+Jolt mode from the server. However, there is generally no
+advantage to enforcing Jolt or to manually selecting one
 of these modes. This feature is for testing purposes only.
 
 =head2 Custom networking modules
@@ -394,50 +386,6 @@ When this option is set, the driver automatically uses a regular
 expression to convert the old Cypher parameter syntax C<{param}>
 supported by Neo4j S<versions 2 and 3> to the new syntax C<$param>
 supported by Neo4j S<versions 3 and 4>.
-
-=head2 Type system customisation
-
- $driver->config(cypher_types => {
-   node => 'Local::Node',
-   relationship => 'Local::Relationship',
-   path => 'Local::Path',
-   point => 'Local::Point',
-   temporal => 'Local::Temporal',
-   init => sub { my $object = shift; ... },
- });
-
-The package names used for C<bless>ing objects in query results can be
-modified. This allows clients to add their own methods to such objects.
-
-Clients must make sure their custom type packages are subtypes of the
-base type packages that this module provides (S<e. g.> using C<@ISA>):
-
-=over
-
-=item * L<Neo4j::Driver::Type::Node>
-
-=item * L<Neo4j::Driver::Type::Relationship>
-
-=item * L<Neo4j::Driver::Type::Path>
-
-=item * L<Neo4j::Driver::Type::Point>
-
-=item * L<Neo4j::Driver::Type::Temporal>
-
-=back
-
-Clients may only use the documented API to access the data in the base
-type. As an exception, clients may store private data by calling the
-C<_private()> method, which returns a hashref. Within that hashref,
-clients may make free use of any hash keys that begin with two
-underscores (C<__>). All other hash keys are reserved for use by
-Neo4j::Driver. Reading or modifying their values is unsupported
-and discouraged because it makes your code prone to fail when any
-internals change in the implementation of Neo4j::Driver.
-
-The C<cypher_types> config option will soon be deprecated and
-eventually be removed. The C<net_module> option offers the same
-functionality and more (albeit somewhat less conveniently).
 
 =head1 CONFIGURATION OPTIONS
 

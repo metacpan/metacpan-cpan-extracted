@@ -1,5 +1,5 @@
 package Photonic::Roles::EpsL;
-$Photonic::Roles::EpsL::VERSION = '0.016';
+$Photonic::Roles::EpsL::VERSION = '0.017';
 
 =encoding UTF-8
 
@@ -9,7 +9,7 @@ Photonic::Roles::EpsL
 
 =head1 VERSION
 
-version 0.016
+version 0.017
 
 =head1 COPYRIGHT NOTICE
 
@@ -52,7 +52,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA  02110-1301 USA
 =item (for developers)
 
     package Photonic::LE::NR2::EpsL;
-    $Photonic::LE::NR2::EpsL::VERSION= '0.016';
+    $Photonic::LE::NR2::EpsL::VERSION= '0.017';
     use namespace::autoclean;
     use Moose;
     with 'Photonic::Roles::EpsL';

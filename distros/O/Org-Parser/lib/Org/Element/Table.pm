@@ -1,7 +1,9 @@
 package Org::Element::Table;
 
-our $DATE = '2020-12-30'; # DATE
-our $VERSION = '0.554'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-06-27'; # DATE
+our $DIST = 'Org-Parser'; # DIST
+our $VERSION = '0.555'; # VERSION
 
 use 5.010;
 use locale;
@@ -15,7 +17,7 @@ has _dummy => (is => 'rw'); # workaround Moo bug
 
 sub BUILD {
     require Org::Element::TableRow;
-    require Org::Element::TableVLine;
+    require Org::Element::TableHLine;
     require Org::Element::TableCell;
     my ($self, $args) = @_;
     my $pass = $args->{pass} // 1;
@@ -36,7 +38,7 @@ sub BUILD {
             next unless $row0 =~ /\S/;
             my $row;
             if ($row0 =~ /^\s*\|--+(?:\+--+)*\|?\s*$/) {
-                $row = Org::Element::TableVLine->new(parent => $self);
+                $row = Org::Element::TableHLine->new(parent => $self);
             } elsif ($row0 =~ /^\s*\|\s*(.+?)\s*\|?\s*$/) {
                 my $s = $1;
                 $row = Org::Element::TableRow->new(
@@ -123,12 +125,12 @@ Org::Element::Table - Represent Org table
 
 =head1 VERSION
 
-This document describes version 0.554 of Org::Element::Table (from Perl distribution Org-Parser), released on 2020-12-30.
+This document describes version 0.555 of Org::Element::Table (from Perl distribution Org-Parser), released on 2021-06-27.
 
 =head1 DESCRIPTION
 
 Derived from L<Org::Element>. Must have L<Org::Element::TableRow> or
-L<Org::Element::TableVLine> instances as its children.
+L<Org::Element::TableHLine> instances as its children.
 
 =for Pod::Coverage BUILD
 
@@ -143,7 +145,7 @@ Return the rows of the table.
 =head2 $table->as_aoa() => ARRAY
 
 Return the rows of the table, each row already an arrayref of cells produced
-using as_array() method. Vertical lines will be skipped/ignored.
+using as_array() method. Horizontal lines will be skipped/ignored.
 
 =head2 $table->row_count() => INT
 
@@ -164,7 +166,7 @@ Source repository is at L<https://github.com/perlancar/perl-Org-Parser>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Org-Parser/issues>
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Org-Parser>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -176,7 +178,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

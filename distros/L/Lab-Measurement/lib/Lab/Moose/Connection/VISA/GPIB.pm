@@ -1,5 +1,5 @@
 package Lab::Moose::Connection::VISA::GPIB;
-$Lab::Moose::Connection::VISA::GPIB::VERSION = '3.751';
+$Lab::Moose::Connection::VISA::GPIB::VERSION = '3.760';
 #ABSTRACT: GPIB frontend to National Instruments' VISA library.
 
 use v5.20;
@@ -78,7 +78,7 @@ Lab::Moose::Connection::VISA::GPIB - GPIB frontend to National Instruments' VISA
 
 =head1 VERSION
 
-version 3.751
+version 3.760
 
 =head1 SYNOPSIS
 
@@ -99,7 +99,7 @@ gpib_address (or pad), sad (secondary address), board_index (defaults to 0).
 This software is copyright (c) 2021 by the Lab::Measurement team; in detail:
 
   Copyright 2017-2018  Simon Reinhardt
-            2020       Andreas K. Huettel
+            2020       Andreas K. HÃ¼ttel
 
 
 This is free software; you can redistribute it and/or modify it under

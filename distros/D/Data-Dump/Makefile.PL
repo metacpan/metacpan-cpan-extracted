@@ -13,7 +13,9 @@ WriteMakefile(
    },
    META_MERGE => {
        resources => {
-	   repository => 'http://github.com/gisle/data-dump',
+           repository  => 'http://github.com/garu/data-dump',
+           license     => 'http://dev.perl.org/licenses/',
+           bugtracker  => 'https://github.com/garu/data-dump/issues/',
        },
        recommends => {
 	   'MIME::Base64' => 0,

@@ -31,10 +31,6 @@ See also L<#7|https://github.com/johannessen/neo4j-driver-perl/issues/7>.
 =item * L<Neo4j::Driver/"Parameter syntax conversion">: make stable and move
 filter implementation to C<Transaction> in preparation of Bolt v3 support
 
-=item * L<Neo4j::Driver/"Type system customisation">: make illegal, but
-create a new config option that continues to provide C<init> functionality
-(same flexibility, simpler API)
-
 =item * L<Neo4j::Driver::Session/"Calling in list context">: make illegal
 
 =item * L<Neo4j::Driver::Session/"Concurrent transactions">: make illegal
@@ -59,6 +55,11 @@ L<in Result|Neo4j::Driver::Result/"Calling in scalar context">, and
 L<in ResultSummary|Neo4j::Driver::ResultSummary/"Calling in scalar context">)
 should probably generally behave the same way using a list in scalar
 context would: It should return the number of items in the list.
+
+=item * Jolt: The C<jolt> config option will be deprecated once
+Jolt implementation is fully complete. Those who use a modern Neo4j
+version and still want to get plain old JSON responses can easily
+write their own net module overriding the C<Accept> header.
 
 =back
 
@@ -198,15 +199,6 @@ this item might mean investing time in developing an optimisation
 feature that is almost never used. Since the server is often run on localhost
 anyway where latency is very close to zero, this item should not have high
 priority.
-
-=item * The current API to
-L<Neo4j::Driver::Transaction/"Execute multiple statements at once">
-seems a bit too complicated, especially for something that is probably
-hardly ever actually used in practice. It might make sense to provide a
-dedicated method (e. g. C<_run_multiple()>) for just that purpose. This
-would eventually free up the C<run()> implementation from unneeded baggage.
-The dedicated method may be private as long as the plan still is to provide
-this functionality by running statements lazily.
 
 =back
 

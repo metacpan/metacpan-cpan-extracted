@@ -1,5 +1,11 @@
 Revision history for WebService-PayPal-PaymentsAdvanced
 
+0.000027 2021-06-28
+
+  - The transaction_time method on responses will now return undef if
+    the TRANSTIME parameter is missing or undefined. Previously an
+    exception would be thrown.
+
 0.000026 2020-04-29
 
    - You may now use a user or password object that stringifies to the

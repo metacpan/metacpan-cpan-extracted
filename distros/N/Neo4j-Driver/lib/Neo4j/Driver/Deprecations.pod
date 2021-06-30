@@ -1,0 +1,385 @@
+# PODNAME: Neo4j::Driver::Deprecations
+# ABSTRACT: Explains features that have been deprecated, but not yet removed
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Neo4j::Driver::Deprecations - Explains features that have been deprecated, but not yet removed
+
+=head1 VERSION
+
+version 0.25
+
+=head1 OVERVIEW
+
+Deprecated features are removed from the pod documentation of
+the individual modules in this distribution in an attempt to
+keep those short and clear. This document describes all features
+that are deprecated, but still working for completeness' sake,
+briefly explains the reason for their deprecation, and suggests
+alternatives where possible.
+
+The intention is that most deprecated features will be removed with
+the next major update to L<Neo4j::Driver>. There is no schedule for
+the release of that update S<(version 1.00),> but there is a decent
+chance that it will happen in the year 2021.
+
+=head1 Neo4j::Driver
+
+=head2 close()
+
+I<Deprecated in version 0.14 and to be removed in 1.00.
+Originally added in 0.02 as an experimental feature.>
+
+ $driver->close;  # no-op
+
+All resources opened by this driver are closed automatically once
+they are no longer required. Explicit calls to C<close()> are neither
+required nor useful.
+
+=head2 Mutable auth credentials
+
+I<Deprecated in version 0.15 and to be removed in 1.00.
+Originally added in 0.01 as an experimental feature.>
+
+ $session1 = $driver->basic_auth('user1', 'password')->session;
+ $session2 = $driver->basic_auth('user2', 'password')->session;
+
+Early versions allowed modifying the driver object after session
+creation. This is not very useful in practice. The official Neo4j
+drivers are explicitly designed to be immutable.
+
+=head2 Suppress exceptions
+
+I<Deprecated in version 0.14 and to be removed in 1.00.
+Originally added in 0.01 as an experimental feature.>
+
+ $driver = Neo4j::Driver->new;
+ $driver->{die_on_error} = 0;
+ $result = $driver->session->run('...');
+
+The default value of the C<die_on_error> attribute is C<1>. Setting
+this to C<0> causes the driver to no longer die on I<server> errors.
+
+This is much less useful than it sounds. Not only is the
+L<Result|Neo4j::Driver::Result> structure not
+well-defined for such situations, but also the internal state of the
+L<Transaction|Neo4j::Driver::Transaction> object may be corrupted.
+For example, when a minor server error occurs on the first request
+(which would normally establish the connection), the expected
+C<Location> header may be missing from the error message and the
+transaction may therefore be marked as closed, even though it still
+is open. The next request would then fail anyway, but with a
+misleading error message.
+
+Additionally, I<client> errors (such as trying to call C<single()> on
+a result with multiple result records) have always caused the driver
+to die in spite of C<die_on_error = 0>.
+
+Such inconsistent behaviour makes bugs harder to find and has no
+clear advantages. It is not present in the official drivers.
+
+To suppress errors, wrap your calls in
+L<< C<try>/C<catch> blocks|perlsyn/"Try Catch Exception Handling" >>:
+
+ use Feature::Compat::Try;
+ my $result;
+ try {
+   $result = $session->run('MATCH (n:Test) RETURN m');
+   $result->has_next;  # Wait for statement execution
+ }
+ catch ($e) { warn "Got a Neo4j error: $e" }
+
+=head2 Type system customisation
+
+I<Deprecated in version 0.25 and to be removed in 1.00.
+Originally added in 0.14 as an experimental feature.>
+
+ $driver->config(cypher_types => {
+   node => 'Local::Node',
+   relationship => 'Local::Relationship',
+   path => 'Local::Path',
+   point => 'Local::Point',
+   temporal => 'Local::Temporal',
+   init => sub { my $object = shift; ... },
+ });
+
+The package names used for C<bless>ing objects in query results
+can be modified. This allows clients to add their own methods to
+such objects.
+
+Clients must make sure their custom type packages are subtypes
+of the base type packages that this module provides (S<e. g.>
+with L<parent>):
+
+=over
+
+=item * L<Neo4j::Driver::Type::Node>
+
+=item * L<Neo4j::Driver::Type::Relationship>
+
+=item * L<Neo4j::Driver::Type::Path>
+
+=item * L<Neo4j::Driver::Type::Point>
+
+=item * L<Neo4j::Driver::Type::Temporal>
+
+=back
+
+Clients may only use the documented API to access the data in the
+base type. As an exception, clients may store private data by calling
+the C<_private()> method, which returns a hashref. Within that
+hashref, clients may make free use of any hash keys that begin with
+two underscores (C<__>). All other hash keys are reserved for use
+by Neo4j::Driver.
+
+The implementation of the custom type packages continues to be
+defined by the driver. In particular, it is the driver's choice
+what I<kind> of reference to bless E<ndash> hash, array, or scalar.
+This severely limits the freedom of the custom type packages.
+
+Instead of the C<cypher_types> option, users should consider a
+custom networking module that provides a custom result handler.
+This approach offers even more flexibility (albeit at the cost
+of some degree of convenience).
+See L<Neo4j::Driver::Net/"Custom result handlers"> for details.
+
+=head1 Neo4j::Driver::Record
+
+=head2 Cypher type system
+
+I<Direct access deprecated in version 0.13 and currently
+planned to be removed in 1.00. Originally added in 0.01.>
+
+ $result = $session->run('MATCH (n:Person) RETURN (n)');
+ foreach my $node ( map { $_->get } $result->list ) {
+   my $properties = $node;
+   say $properties->{birthday};
+ }
+
+Early versions of this driver returned nodes and relationships as
+unblessed hash references of their properties. Neo4j paths were
+returned as unblessed array references. This was a bug because
+this driver's goal always was to implement the Neo4j Driver API,
+which doesn't work this way. This bug made it impossible to
+distinguish between structural types and simple maps / lists.
+It also made it difficult to access metadata. See GitHub issues
+L<#2|https://github.com/johannessen/neo4j-driver-perl/issues/2> and L<#8|https://github.com/johannessen/neo4j-driver-perl/issues/8>.
+
+Proper blessed types for L<nodes|Neo4j::Driver::Type::Node>,
+L<relationships|Neo4j::Driver::Type::Relationship> and
+L<paths|Neo4j::Driver::Type::Path> were added in S<version 0.13,>
+and directly accessing their elements and properties using
+C<< ->[] >> or C<< ->{} >> was deprecated at the same time.
+A deprecation warning was added in version 0.18.
+The current plan is to remove direct access in version 1.00.
+
+To obtain a hash reference of all properties of a
+L<node|Neo4j::Types::Node/"properties"> or
+L<relationship|Neo4j::Types::Relationship/"properties">,
+use the C<properties()> method:
+
+ $result = $session->run('MATCH (n) RETURN (n)');
+ foreach my $node ( map { $_->get } $result->list ) {
+   my $properties = $node->properties;
+   say $properties->{birthday};
+ }
+
+To obtain all nodes and relationships in a path as an alternating
+array, use the L<< C<elements()>|Neo4j::Types::Path/"elements" >>
+method:
+
+ $result = $session->run('MATCH p=(:Person)-[]->() RETURN (p)');
+ foreach my $path ( map { $_->get } $result->list ) {
+   my $array = [ $path->elements ];
+   ...
+ }
+
+=head2 get_bool()
+
+I<Deprecated in version 0.07 and to be removed in 1.00.
+Originally added in 0.02 as an experimental feature.>
+
+ $bool  = $session->run('RETURN false')->single->get_bool;
+ $ref   = ref $bool;        # ''
+ $undef = ! defined $bool;  # 1
+
+Get a boolean value from this record. Behaves exactly like
+L<C<get()>|Neo4j::Driver::Record/"get">, except that non-truthy
+boolean values are returned as C<undef>.
+
+In Perl, which doesn't have a native boolean type, JSON booleans are
+represented as a blessed scalar that uses L<overload> to evaluate
+truthy or non-truthy as appropriate in Perl expressions. This almost
+always works perfectly fine. However, some conditions may not expect
+a non-truthy value to be blessed, which can result in wrong
+interpretation of query results. The C<get_bool()> method was meant
+to ensure boolean results would evaluate correctly in such cases.
+
+If you do need an unblessed Perl scalar to express a boolean value,
+simply use C<!!> to force evaluation in a boolean context.
+
+ $val  = $session->run('RETURN false')->single->get;
+ $ref  = ref $val;  # 'JSON::PP::Boolean'
+ $bool = !! $val;
+
+=head2 Raw meta data access
+
+I<Deprecated in version 0.18 and to be removed in 1.00.
+Originally added in 0.01 as an experimental feature.>
+
+ $meta = $record->{meta};
+
+Allows accessing the entity meta data that some versions of
+the Neo4j server provide. This meta data is not available
+reliably due to a known bug in the Neo4j server
+(L<#12306|https://github.com/neo4j/neo4j/issues/12306>).
+If it I<is> available, it can since S<version 0.13> be
+accessed via object methods. This raw access shouldn't be
+needed anymore and should no longer be relied upon.
+
+=head2 stats()
+
+I<Deprecated in version 0.07 and to be removed in 1.00.
+Originally added in 0.02 as an experimental feature.>
+
+Shortcut for L<"stats()" in Neo4j::Driver::Result|/"stats()1">
+(only for records obtained via L<Neo4j::Driver::Result/"single">).
+
+=head2 Virtual columns
+
+I<Deprecated in version 0.18 and to be removed in 1.00.
+Originally added in 0.01 as an experimental feature.>
+
+ $size = $record->{column_keys}->count;
+ $record->{column_keys}->add('new_field_key');
+
+Access to the internal C<{column_keys}> data structure allows
+adding new 'virtual' columns to the record's field key / index
+resolution used by the C<get()> method. The virtual columns
+can then be accessed just like regular columns.
+
+Rather than manipulating the driver's Neo4j statement result,
+users should make an in-memory copy of the results in a data
+structure under their own control.
+
+=head1 Neo4j::Driver::Result
+
+=head2 stats()
+
+I<Deprecated in version 0.07 and to be removed in 1.00.
+Originally added in 0.02 as an experimental feature.>
+
+ $tx = $session->begin_transaction;
+ $tx->{return_stats} = 1;
+ $stats = $tx->run('...')->stats;
+
+Return a hash ref. The hash ref contains query statistics if these
+were requested in advance. The hash ref may or may not be blessed.
+
+In the Neo4j Driver API, query statistics are available from the
+L<Neo4j::Driver::ResultSummary> instead, which is obtained using
+L<C<summary()>|Neo4j::Driver::Result/"summary">.
+
+ $stats = $session->run('...')->summary->counters;
+
+=head1 Neo4j::Driver::Session
+
+=head2 close()
+
+I<Deprecated in version 0.14 and to be removed in 1.00.
+Originally added in 0.02 as an experimental feature.>
+
+ $session->close;  # no-op
+
+All resources opened by this driver are closed automatically once
+they are no longer required. Explicit calls to C<close()> are neither
+required nor useful.
+
+=head1 Neo4j::Driver::StatementResult
+
+I<Deprecated in version 0.19 and to be removed in 1.00.
+Originally added in 0.01.>
+
+ $result = $session->run('...');
+ warn 'Unexpected type'
+   unless $result->isa('Neo4j::Driver::StatementResult');
+
+With version 4 of the official Neo4j drivers, C<StatementResult>
+was renamed C<Result>.
+
+This driver deprecated any use of the
+L<Neo4j::Driver::StatementResult> module name in version 0.19.
+Use L<Neo4j::Driver::Result> instead.
+
+=head1 Neo4j::Driver::Transaction
+
+=head2 Call run() with an array of multiple statements
+
+I<Deprecated in version 0.25 and to be removed in 1.00.
+Originally added in 0.01 as an experimental feature.>
+
+ $statements = [
+   [ 'RETURN 42' ],
+   [ 'RETURN {value}', value => 'forty-two' ],
+ ];
+ $results = $transaction->run($statements);
+ foreach $result ( @$results ) {
+   say $result->single->get;
+ }
+
+The Neo4j HTTP API supports executing multiple statements within a
+single HTTP request. This driver exposes this feature to the client
+by allowing a multi-dimensional array to be passed to C<run()>.
+Unfortunately, the resulting API is confusing to use and implement
+and is therefore bug-prone.
+
+If you need this feature, you should consider using the
+private C<_run_multiple()> method instead; see
+L<Neo4j::Driver::Transaction/"Execute multiple statements at once">.
+
+=head1 Neo4j::Driver::Type::Path
+
+=head2 path()
+
+I<Deprecated in version 0.18 and to be removed in 1.00.
+Originally added in 0.13 as an experimental feature.>
+
+ $array = $path->path;
+ $start_node = $array->[0];
+
+Return the path as an array reference, alternating between nodes
+and relationships in path sequence order.
+
+The word C<path()> is singular, implying the return of a reference.
+The alternative methods L<C<nodes()>|Neo4j::Types::Path/"nodes">
+and L<C<relationships()>|Neo4j::Types::Path/"relationships"> are
+plural, implying the return of a list. This was inconsistent.
+Additionally, the C<path()> method led to awkward expressions such
+as C<< $path->path >>, which are needlessly difficult to comprehend.
+
+This experimental feature was added in version 0.13 and
+deprecated in 0.18. It will be removed in 1.00.
+
+Use L<C<elements()>|Neo4j::Types::Path/"elements"> instead.
+
+ $array = [ $path->elements ];
+
+=head1 AUTHOR
+
+Arne Johannessen <ajnn@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2016-2021 by Arne Johannessen.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+
+=cut

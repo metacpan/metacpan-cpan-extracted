@@ -1,0 +1,20 @@
+Revision history for Devel-ebug-HTTP
+
+0.33      2021-06-28 13:43:22 -0600
+  - Switch from Catalyst::Plugin::Static to Catalyst::Plugin::Static::Simple
+    (rt#29964, rt#50619, gh#1, gh#3, gh#6)
+  - Upgraded to more recent Module::Install (rt#40599, gh#3, gh#6)
+  - Work around in test for possible bug in Proc::Background (rt#31960, gh#5, gh#7)
+  - Fix buttons that were using HTML "value" attribute which is not allowed (gh#17)
+
+0.32 Thu Oct 16 20:15:56 BST 2008
+     - add human-readable license to the documentation
+
+0.31 Mon Mar  6 20:49:33 GMT 2006
+     - update to work around Module::Install breakage
+
+0.30 Mon Mar  6 20:49:33 GMT 2006
+     - update to work with recent Catalyst
+
+0.29 Fri Sep  2 15:01:42 BST 2005
+     - moved ebug_http into its own distribution (patch by Jesse Vincent)

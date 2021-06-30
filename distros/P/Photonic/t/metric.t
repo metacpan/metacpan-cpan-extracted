@@ -32,7 +32,6 @@ use strict;
 use warnings;
 use PDL;
 use PDL::NiceSlice;
-use PDL::Complex;
 use Photonic::Geometry::FromB;
 use Photonic::WE::R2::Metric;
 use Photonic::WE::S::Metric;

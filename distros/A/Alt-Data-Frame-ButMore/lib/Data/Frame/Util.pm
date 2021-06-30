@@ -181,7 +181,7 @@ Data::Frame::Util - Utility functions
 
 =head1 VERSION
 
-version 0.0056
+version 0.0058
 
 =head1 DESCRIPTION
 
@@ -265,7 +265,7 @@ Stephan Loyd <sloyd@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014, 2019-2020 by Zakariyya Mughal, Stephan Loyd.
+This software is copyright (c) 2014, 2019-2021 by Zakariyya Mughal, Stephan Loyd.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

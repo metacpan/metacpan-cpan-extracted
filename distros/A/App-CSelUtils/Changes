@@ -1,3 +1,8 @@
+0.088   2021-06-27  Released-By: PERLANCAR; Urgency: medium
+
+	- Update prereq (renamed module Tree::{To,To::}TextLines).
+
+
 0.087   2021-02-19  Released-By: PERLANCAR; Urgency: low
 
 	- No functional changes.

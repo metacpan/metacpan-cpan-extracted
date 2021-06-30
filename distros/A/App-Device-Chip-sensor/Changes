@@ -1,4 +1,9 @@
 Revision history for App-Device-Chip-sensor
 
+0.02    2021-06-26
+        [CHANGES]
+         * Support chip arguments supplying chip params
+         * Support multiple adapters per running instance
+
 0.01    2021-01-21
         First version, released on an unsuspecting world.

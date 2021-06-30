@@ -1,4 +1,4 @@
-package Dist::Zilla::App::Command::smoke 6.020;
+package Dist::Zilla::App::Command::smoke 6.022;
 # ABSTRACT: smoke your dist
 
 # BEGIN BOILERPLATE
@@ -84,7 +84,7 @@ Dist::Zilla::App::Command::smoke - smoke your dist
 
 =head1 VERSION
 
-version 6.020
+version 6.022
 
 =head1 SYNOPSIS
 

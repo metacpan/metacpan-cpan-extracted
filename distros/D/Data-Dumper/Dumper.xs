@@ -22,7 +22,7 @@
  * calling this .xs file for releases where they aren't defined */
 
 #ifndef ESC_NATIVE          /* \e */
-#   define ESC_NATIVE 27
+#   define ESC_NATIVE LATIN1_TO_NATIVE(27)
 #endif
 
 /* SvPVCLEAR only from perl 5.25.6 */
@@ -254,13 +254,10 @@ esc_q_utf8(pTHX_ SV* sv, const char *src, STRLEN slen, I32 do_utf8, I32 useqq)
                 normal++;
             }
         }
-        else if (! isASCII(k) && k > ' ') {
-            /* High ordinal non-printable code point.  (The test that k is
-             * above SPACE should be optimized out by the compiler on
-             * non-EBCDIC platforms; otherwise we could put an #ifdef around
-             * it, but it's better to have just a single code path when
-             * possible.  All but one of the non-ASCII EBCDIC controls are low
-             * ordinal; that one is the only one above SPACE.)
+        else if (! UTF8_IS_INVARIANT(k)) {
+            /* We treat as low ordinal any code point whose representation is
+             * the same under UTF-8 as not.  Thus, this is a high ordinal code
+             * point.
              *
              * If UTF-8, output as hex, regardless of useqq.  This means there
              * is an overhead of 4 chars '\x{}'.  Then count the number of hex
@@ -272,13 +269,11 @@ esc_q_utf8(pTHX_ SV* sv, const char *src, STRLEN slen, I32 do_utf8, I32 useqq)
                 * first byte */
                 increment = (k == 0 && *s != '\0') ? 1 : UTF8SKIP(s);
 
-                grow += 4 + (k <= 0xFF ? 2 : k <= 0xFFF ? 3 : k <= 0xFFFF ? 4 :
-#if UVSIZE == 4
-                    8 /* We may allocate a bit more than the minimum here.  */
-#else
-                    k <= 0xFFFFFFFF ? 8 : UVSIZE * 4
-#endif
-                    );
+                grow += 6;  /* Smallest we do is "\x{FF}" */
+                k >>= 4;
+                while ((k >>= 4) != 0) {   /* Add space for each nibble */
+                    grow++;
+                }
             }
             else if (useqq) {   /* Not utf8, must be <= 0xFF, hence 2 hex
                                  * digits. */
@@ -301,9 +296,7 @@ esc_q_utf8(pTHX_ SV* sv, const char *src, STRLEN slen, I32 do_utf8, I32 useqq)
             }
             else /* The other low ordinals are output as an octal escape
                   * sequence */
-                 if (s + 1 >= send || (   *(U8*)(s+1) >= '0'
-                                       && *(U8*)(s+1) <= '9'))
-            {
+                 if (s + 1 >= send || isDIGIT(*(s+1))) {
                 /* When the following character is a digit, use 3 octal digits
                  * plus backslash, as using fewer digits would concatenate the
                  * following char into this one */
@@ -333,18 +326,10 @@ esc_q_utf8(pTHX_ SV* sv, const char *src, STRLEN slen, I32 do_utf8, I32 useqq)
             U8 c0 = *(U8 *)s;
             UV k;
 
-            if (do_utf8
-                && ! isASCII(c0)
-                    /* Exclude non-ASCII low ordinal controls.  This should be
-                     * optimized out by the compiler on ASCII platforms; if not
-                     * could wrap it in a #ifdef EBCDIC, but better to avoid
-                     * #if's if possible */
-                && c0 > ' '
-            ) {
+            if (do_utf8 && ! UTF8_IS_INVARIANT(c0)) {
 
-                /* When in UTF-8, we output all non-ascii chars as \x{}
-                 * reqardless of useqq, except for the low ordinal controls on
-                 * EBCDIC platforms */
+                /* In UTF-8, we output as \x{} all chars that require more than
+                 * a single byte in UTF-8 to represent. */
                 k = utf8_to_uvchr_buf((U8*)s, (U8*) send, NULL);
 
                 /* treat invalid utf8 byte by byte.  This loop iteration gets the
@@ -393,9 +378,7 @@ esc_q_utf8(pTHX_ SV* sv, const char *src, STRLEN slen, I32 do_utf8, I32 useqq)
 		     * since we only encode characters \377 and under, or
 		     * \x177 and under for a unicode string
 		     */
-                    next_is_digit = (s + 1 >= send )
-                                    ? FALSE
-                                    : (*(U8*)(s+1) >= '0' && *(U8*)(s+1) <= '9');
+                    next_is_digit = (s + 1 < send && isDIGIT(*(s+1)));
 
 		    /* faster than
 		     * r = r + my_sprintf(r, "%o", k);
@@ -608,7 +591,9 @@ dump_regexp(pTHX_ SV *retval, SV *val)
             k = *p;
         }
 
-        if ((k == '/' && !saw_backslash) || (do_utf8 && ! isASCII(k) && k > ' ')) {
+        if ((k == '/' && !saw_backslash) || (     do_utf8
+                                             && ! UTF8_IS_INVARIANT(k)))
+        {
             STRLEN to_copy = p - (U8 *) rval;
             if (to_copy) {
                 /* If saw_backslash is true, this will copy the \ for us too. */
@@ -620,7 +605,10 @@ dump_regexp(pTHX_ SV *retval, SV *val)
             }
             else {
                 /* If there was a \, we have copied it already, so all that is
-                 * left to do here is the \x{...} escaping. */
+                 * left to do here is the \x{...} escaping.
+                 *
+                 * Since this is a pattern, presumably created by perl, we can
+                 * assume it is well-formed */
                 k = utf8_to_uvchr_buf(p, rend, NULL);
                 sv_catpvf(retval, "\\x{%" UVxf "}", k);
                 p += UTF8SKIP(p);

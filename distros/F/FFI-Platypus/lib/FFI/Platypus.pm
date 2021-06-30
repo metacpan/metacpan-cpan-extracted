@@ -8,7 +8,7 @@ use FFI::Platypus::Function;
 use FFI::Platypus::Type;
 
 # ABSTRACT: Write Perl bindings to non-Perl libraries with FFI. No XS required.
-our $VERSION = '1.46'; # VERSION
+our $VERSION = '1.50'; # VERSION
 
 # Platypus-Man,
 # Platypus-Man,
@@ -303,10 +303,18 @@ sub function
     $fixed_args = [];
   }
 
-  my $args = [@$fixed_args, @{ $var_args || [] } ];
   my $fixed_arg_count = defined $var_args ? scalar(@$fixed_args) : -1;
 
-  my @args = map { $self->{tp}->parse($_) || croak "unknown type: $_" } @$args;
+  my @args = map { $self->{tp}->parse($_) || croak "unknown type: $_" } @$fixed_args;
+  if($var_args)
+  {
+    push @args, map {
+      my $type = $self->{tp}->parse($_);
+      # https://github.com/PerlFFI/FFI-Platypus/issues/323
+      $type->type_code == 67 ? $self->{tp}->parse('double') : $type
+    } @$var_args;
+  }
+
   $ret = $self->{tp}->parse($ret) || croak "unknown type: $ret";
   my $address = $name =~ /^-?[0-9]+$/ ? $name : $self->find_symbol($name);
   croak "unable to find $name" unless defined $address || $self->ignore_not_found;
@@ -585,7 +593,7 @@ FFI::Platypus - Write Perl bindings to non-Perl libraries with FFI. No XS requir
 
 =head1 VERSION
 
-version 1.46
+version 1.50
 
 =head1 SYNOPSIS
 
@@ -717,6 +725,8 @@ the L<lib|/lib> attribute.
 
 =item api
 
+[version 0.91]
+
 Sets the API level.  Legal values are
 
 =over
@@ -734,6 +744,27 @@ version 1.00 will trigger a (noisy) warning.
 
 All new code should be written with this set to 1!  The Platypus documentation
 assumes this api level is set.
+
+=item C<2>
+
+Enable version 2 API, which is currently experimental.  Using API level 2 prior
+to Platypus version 2.00 will trigger a (noisy) warning.
+
+API version 2 is identical to version 1, except:
+
+=over 4
+
+=item Pointer functions that return C<NULL> will return C<undef> instead of empty list
+
+This fixes a long standing design bug in Platypus.
+
+=item Array references may be passed to pointer argument types
+
+This replicates the behavior of array argument types with no size.  So the types C<sint8*> and C<sint8[]>
+behave identically when an array reference is passed in.  They differ in that, as before, you can
+pass a scalar reference into type C<sint8*>.
+
+=back
 
 =back
 

@@ -24,7 +24,7 @@ require './script/traveller';
 my $subsector = Traveller::Subsector->new()->init(32, 40, 'mgp', 0.5);
 my $uwp = $subsector->str;
 
-like($uwp, qr/^\w+\s+\d+\s+[A-EX][0-9A-F]{6}-(\d|1\d)\s+/, "UWP");
+like($uwp, qr/^\w+\s+\d+\s+[A-EX][0-9A-F]{5}[0-9A-K]-(\d|1\d)\s+/, "UWP");
 
 memory_cycle_ok($subsector, "No circular memory references");
 

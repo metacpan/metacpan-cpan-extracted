@@ -14,7 +14,7 @@ Lab::Measurement::Installation - Installation guide for Lab::Measurement
 
 =head1 VERSION
 
-version 3.751
+version 3.760
 
 =head1 Introduction
 
@@ -95,9 +95,9 @@ You can upgrade your Lab::Measurement installation by running cpanm again:
 
 This software is copyright (c) 2021 by the Lab::Measurement team; in detail:
 
-  Copyright 2011-2012  Andreas K. Huettel
+  Copyright 2011-2012  Andreas K. HÃ¼ttel
             2016       Simon Reinhardt
-            2017       Andreas K. Huettel, Simon Reinhardt
+            2017       Andreas K. HÃ¼ttel, Simon Reinhardt
             2020       Simon Reinhardt
 
 

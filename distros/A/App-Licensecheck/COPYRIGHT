@@ -277,19 +277,14 @@ Files: Changes
  t/devscripts.t
  t/encoding.t
  t/exception.t
+ t/fedora.t
  t/flaws.t
  t/grant.t
  t/lib/Test2/Licensecheck.pm
  t/lib/Test2/Licensecheck/ScanCode.pm
+ t/license.t
  t/options-resolve.t
 Copyright: Copyright 2021 Jonas Smedegaard.
-License: AGPL_3
-
-Files: dist.ini
- t/fedora.t
- t/lib/Test2/Require/TestCorpus.pm
- t/license.t
-Copyright: Copyright 2020 Jonas Smedegaard.
 License: AGPL_3
 
 Files: COPYRIGHT
@@ -297,6 +292,11 @@ Files: COPYRIGHT
  SIGNATURE
 Copyright: None
 License: public-domain
+
+Files: dist.ini
+ t/lib/Test2/Require/TestCorpus.pm
+Copyright: Copyright 2020 Jonas Smedegaard.
+License: AGPL_3
 
 Files: t/grant/LGPL/Model.pm
 Copyright: Copyright 2016 Jonas Smedegaard.

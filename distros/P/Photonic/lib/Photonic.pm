@@ -12,12 +12,12 @@ Photonic - A perl package for calculations on photonics and metamaterials.
 
 =head1 VERSION
 
-Version 0.016
+Version 0.017
 
 =cut
 
 
-$Photonic::VERSION = '0.016';
+$Photonic::VERSION = '0.017';
 
 =head1 COPYRIGHT NOTICE
 

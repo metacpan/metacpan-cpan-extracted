@@ -7,7 +7,7 @@ use v5.26;
 
 use Object::Pad 0.41;
 
-package App::sdview::Parser::Markdown 0.01;
+package App::sdview::Parser::Markdown 0.02;
 class App::sdview::Parser::Markdown
    does App::sdview::Parser;
 

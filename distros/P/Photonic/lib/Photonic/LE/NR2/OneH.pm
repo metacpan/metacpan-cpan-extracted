@@ -1,5 +1,5 @@
 package Photonic::LE::NR2::OneH;
-$Photonic::LE::NR2::OneH::VERSION = '0.016';
+$Photonic::LE::NR2::OneH::VERSION = '0.017';
 
 =encoding UTF-8
 
@@ -9,7 +9,7 @@ Photonic::LE::NR2::OneH;
 
 =head1 VERSION
 
-version 0.016
+version 0.017
 
 =head1 COPYRIGHT NOTICE
 
@@ -151,7 +151,6 @@ Returns the first state $v.
 
 use namespace::autoclean;
 use PDL::Lite;
-use PDL::Complex;
 use Carp;
 use Photonic::Types;
 use Photonic::Utils qw(HProd apply_longitudinal_projection);
@@ -167,7 +166,7 @@ with 'Photonic::Roles::OneH', 'Photonic::Roles::UseMask';
 sub _firstState { #\delta_{G0}
     my $self=shift;
     my $v=PDL->zeroes(@{$self->dims})->r2C; #RorI, nx, ny...
-    my $arg=join ',', ("(0)") x ($self->ndims+1); #(0),(0),... ndims+1 times
+    my $arg=join ',', ("(0)") x ($self->ndims); #(0),(0),... ndims times
     $v->slice($arg).=1; #delta_{G0}
     return $v;
 }
@@ -186,7 +185,7 @@ sub innerProduct {
 }
 
 sub magnitude { #magnitude of a state
-    return  sqrt($_[1]->Cabs2->sum);
+    return  sqrt($_[1]->abs2->sum);
     #could be innerProduct($_[1], $_[1]);
 }
 

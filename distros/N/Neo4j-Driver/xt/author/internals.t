@@ -4,9 +4,9 @@ use warnings;
 use lib qw(./lib t/lib);
 
 my $driver;
-use Neo4j::Test;
+use Neo4j_Test;
 BEGIN {
-	unless ($driver = Neo4j::Test->driver) {
+	unless ( $driver = Neo4j_Test->driver() ) {
 		print qq{1..0 # SKIP no connection to Neo4j server\n};
 		exit;
 	}
@@ -48,7 +48,7 @@ END
 subtest 'experimental: die_on_error = 0 for REST 404' => sub {
 	# die_on_error only ever affected upstream errors via HTTP, 
 	# never any errors issued via Bolt or by this driver itself.
-	plan skip_all => "(test requires live REST)" if $Neo4j::Test::sim || $Neo4j::Test::bolt;
+	plan skip_all => "(test requires live REST)" if $Neo4j_Test::sim || $Neo4j_Test::bolt;
 	plan tests => 1;
 	my $t = $driver->session->begin_transaction;
 	$t->{net}->{die_on_error} = 0;
@@ -100,7 +100,7 @@ subtest 'summary: repeated invocation' => sub {
 
 
 subtest 'transaction: REST 404 error handling' => sub {
-	plan skip_all => "(test requires live REST)" if $Neo4j::Test::sim || $Neo4j::Test::bolt;
+	plan skip_all => "(test requires live REST)" if $Neo4j_Test::sim || $Neo4j_Test::bolt;
 	plan tests => 1;
 	my $t = $driver->session->begin_transaction;
 	$t->{transaction_endpoint} = '/qwertyasdfghzxcvbn';

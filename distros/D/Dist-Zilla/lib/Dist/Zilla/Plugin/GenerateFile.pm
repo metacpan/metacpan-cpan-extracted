@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::GenerateFile 6.020;
+package Dist::Zilla::Plugin::GenerateFile 6.022;
 # ABSTRACT: build a custom file from only the plugin configuration
 
 use Moose;
@@ -175,7 +175,7 @@ Dist::Zilla::Plugin::GenerateFile - build a custom file from only the plugin con
 
 =head1 VERSION
 
-version 6.020
+version 6.022
 
 =head1 SYNOPSIS
 

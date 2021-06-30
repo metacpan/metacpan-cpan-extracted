@@ -12,6 +12,8 @@ script/disable-touchscreen
 script/enable-touchscreen
 script/has-touchscreen
 script/touchscreen-is-enabled
+script/tsoff
+script/tson
 t/00-compile.t
 t/author-critic.t
 t/author-pod-coverage.t

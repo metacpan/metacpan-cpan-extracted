@@ -4,7 +4,7 @@
       "Matthaeus Kiem <cuer2s@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.46, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -39,7 +39,7 @@
             "Exporter" : "0",
             "List::Util" : "1.33",
             "Term::Choose" : "1.733",
-            "Term::Choose::Util" : "0.124",
+            "Term::Choose::Util" : "0.125",
             "parent" : "0",
             "perl" : "5.008003",
             "strict" : "0",
@@ -58,6 +58,6 @@
          "web" : "https://github.com/kuerbis/Term-Form"
       }
    },
-   "version" : "0.534",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "0.535",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

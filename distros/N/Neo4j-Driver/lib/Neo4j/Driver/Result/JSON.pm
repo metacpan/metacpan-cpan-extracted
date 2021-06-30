@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Result::JSON;
 # ABSTRACT: JSON/REST result handler
-$Neo4j::Driver::Result::JSON::VERSION = '0.23';
+$Neo4j::Driver::Result::JSON::VERSION = '0.25';
 
 use parent 'Neo4j::Driver::Result';
 
@@ -13,16 +13,20 @@ use Carp qw(carp croak);
 our @CARP_NOT = qw(Neo4j::Driver::Net::HTTP);
 use Try::Tiny;
 
-use JSON::MaybeXS 1.003003 ();
 use URI 1.31;
 
 
-our $MEDIA_TYPE = "application/json";
-our $ACCEPT_HEADER = "$MEDIA_TYPE";
+my ($TRUE, $FALSE);
+
+my $MEDIA_TYPE = "application/json";
+my $ACCEPT_HEADER = "$MEDIA_TYPE";
+my $ACCEPT_HEADER_POST = "$MEDIA_TYPE;q=0.5";
 
 
 sub new {
 	my ($class, $params) = @_;
+	
+	($TRUE, $FALSE) = @{ $params->{http_agent}->json_coder->decode('[true,false]') } unless $TRUE;
 	
 	my $json = $class->_parse_json($params);
 	
@@ -223,7 +227,7 @@ sub _deep_bless {
 	if (ref $data eq '' && ref $rest eq '') {  # scalar
 		return $data;
 	}
-	if ( JSON::MaybeXS::is_bool($data) && JSON::MaybeXS::is_bool($rest) ) {  # boolean
+	if ( $data == $TRUE && $rest == $TRUE || $data == $FALSE && $rest == $FALSE ) {  # boolean
 		return $data;
 	}
 	
@@ -234,9 +238,12 @@ sub _deep_bless {
 # Return a list of the media types this module can handle, fit for
 # use in an HTTP Accept header field.
 sub _accept_header {
-	my (undef, $want_jolt, $http_method) = @_;
+	my (undef, $want_jolt, $method) = @_;
 	
+	# Note: Neo4j < 4.2 doesn't fail gracefully if Jolt is the only acceptable response type.
 	return if $want_jolt;
+	
+	return ($ACCEPT_HEADER_POST) if $method eq 'POST';
 	return ($ACCEPT_HEADER);
 }
 
@@ -263,7 +270,7 @@ Neo4j::Driver::Result::JSON - JSON/REST result handler
 
 =head1 VERSION
 
-version 0.23
+version 0.25
 
 =head1 DESCRIPTION
 

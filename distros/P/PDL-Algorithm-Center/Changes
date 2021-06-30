@@ -1,11 +1,21 @@
 Revision history for PDL-Algorithm-Center
 
+0.11      2021-06-25 19:23:20-04:00 America/New_York
+
+  [BUG FIX]
+
+    * result object wasn't setting sigma properly upon error
+
+    * result object error field is set to undef instead of '' if there
+      is no error.
+
 0.10      2019-09-25 15:21:33-04:00 America/New_York
 
   [BUG FIX]
 
     * work around for Types::Standard::Bool, version 1.003_003, which
       now coerces any value into a boolean.
+
     * require Hash::Wrap 0.10, to avoid broken can() in 0.09
 
 0.09      2018-03-22 15:05:52-04:00 America/New_York

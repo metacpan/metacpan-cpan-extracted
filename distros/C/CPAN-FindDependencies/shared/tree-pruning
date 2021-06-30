@@ -1,0 +1,5 @@
+=head1 TREE PRUNING
+
+The dependency tree is pruned to remove duplicates. This means that even though
+C<Test::More>, for example, is a dependency of almost everything on the CPAN,
+it will only be listed once.

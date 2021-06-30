@@ -7,10 +7,11 @@ use 5.010001;
 
 use Term::Choose         qw();
 use Term::Choose::Screen qw( hide_cursor clear_screen );
+use Term::TablePrint     qw();
 
 use App::DBBrowser::Auxil;
 use App::DBBrowser::Table::Substatements;
-#use App::DBBrowser::Table::WriteAccess;  # required
+#use App::DBBrowser::Table::InsertUpdateDelete;  # required
 
 
 sub new {
@@ -23,7 +24,43 @@ sub new {
 }
 
 
-sub on_table {
+
+sub browse_the_table {
+    my ( $sf, $qt_table, $qt_columns ) = @_;
+    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
+    my $sql = {};
+    $ax->reset_sql( $sql );
+    $sql->{table} = $qt_table;
+    $sql->{cols} = $qt_columns;
+    $sf->{i}{stmt_types} = [ 'Select' ];
+    $ax->print_sql_info( $ax->get_sql_info( $sql ) );
+
+    PRINT_TABLE: while ( 1 ) {
+        my $all_arrayref;
+        if ( ! eval {
+            ( $all_arrayref, $sql ) = $sf->__on_table( $sql );
+            1 }
+        ) {
+            $ax->print_error_message( $@ );
+            last PRINT_TABLE;
+        }
+        if ( ! defined $all_arrayref ) {
+            last PRINT_TABLE;
+        }
+
+        my $tp = Term::TablePrint->new( $sf->{o}{table} );
+        $tp->print_table(
+            $all_arrayref,
+            { table_name => "     '" . $sf->{d}{table} . "'     " }
+        );
+
+        delete $sf->{o}{table}{max_rows}   if exists $sf->{o}{table}{max_rows};
+        delete $sf->{o}{table}{table_name} if exists $sf->{o}{table}{table_name};
+    }
+}
+
+
+sub __on_table {
     my ( $sf, $sql ) = @_;
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
@@ -54,6 +91,7 @@ sub on_table {
             $menu,
             { %{$sf->{i}{lyt_v}}, info => $info, prompt => '', index => 1, default => $old_idx, undef => $sf->{i}{back} }
         );
+        $ax->print_sql_info( $info );
         if ( ! defined $idx || ! defined $menu->[$idx] ) {
             last CUSTOMIZE;
         }
@@ -119,8 +157,8 @@ sub on_table {
             }
         }
         elsif ( $chosen eq $hidden ) {
-            require App::DBBrowser::Table::WriteAccess;
-            my $write = App::DBBrowser::Table::WriteAccess->new( $sf->{i}, $sf->{o}, $sf->{d} );
+            require App::DBBrowser::Table::InsertUpdateDelete;
+            my $write = App::DBBrowser::Table::InsertUpdateDelete->new( $sf->{i}, $sf->{o}, $sf->{d} );
             $write->table_write_access( $sql );
             $sf->{i}{stmt_types} = [ 'Select' ];
             $old_idx = 1;

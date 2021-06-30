@@ -64,6 +64,7 @@ sub select {
             { %{$sf->{i}{lyt_h}}, info => $info, meta_items => [ 0 .. $#pre - 1 ], no_spacebar => [ $#pre ],
               include_highlighted => 2, index => 1 }
         );
+        $ax->print_sql_info( $info );
         if ( ! $idx[0] ) {
             if ( @bu ) {
                 ( $sql->{select_cols}, $sql->{alias} ) = @{pop @bu};
@@ -108,6 +109,7 @@ sub distinct {
             $menu,
             { %{$sf->{i}{lyt_h}}, info => $info }
         );
+        $ax->print_sql_info( $info );
         if ( ! defined $select_distinct ) {
             if ( $sql->{distinct_stmt} ) {
                 $sql->{distinct_stmt} = '';
@@ -156,6 +158,7 @@ sub __add_aggregate_substmt {
         [ @pre, @{$sf->{aggregate}} ],
         { %{$sf->{i}{lyt_h}}, info => $info }
     );
+    $ax->print_sql_info( $info );
     if ( ! defined $aggr ) {
         return;
     }
@@ -175,6 +178,7 @@ sub __add_aggregate_substmt {
                 [ undef, $sf->{all}, $sf->{distinct} ],
                 { %{$sf->{i}{lyt_h}}, info => $info }
             );
+            $ax->print_sql_info( $info );
             if ( ! defined $all_or_distinct ) {
                 return;
             }
@@ -188,6 +192,7 @@ sub __add_aggregate_substmt {
             [ undef, @{$sql->{cols}} ],
             { %{$sf->{i}{lyt_h}}, info => $info }
         );
+        $ax->print_sql_info( $info );
         if ( ! defined $f_col ) {
             return;
         }
@@ -199,7 +204,7 @@ sub __add_aggregate_substmt {
             $sql->{aggr_cols}[$i] .= ' ' . $f_col . " )";
         }
     }
-    my $alias = $ax->alias( 'aggregate', $sql->{aggr_cols}[$i] );
+    my $alias = $ax->alias( $sql, 'aggregate', $sql->{aggr_cols}[$i] );
     if ( defined $alias && length $alias ) {
         $sql->{alias}{$sql->{aggr_cols}[$i]} = $ax->quote_col_qualified( [ $alias ] );
     }
@@ -226,6 +231,7 @@ sub set {
             [ @pre, @{$sql->{cols}} ],
             { %{$sf->{i}{lyt_h}}, info => $info }
         );
+        $ax->print_sql_info( $info );
         if ( ! defined $quote_col ) {
             if ( @bu_col ) {
                 ( $sql->{set_stmt}, $sql->{set_args}, $col_sep ) = @{pop @bu_col};
@@ -293,6 +299,7 @@ sub where {
             [ @pre, @choices ],
             { %{$sf->{i}{lyt_h}}, info => $info }
         );
+        $ax->print_sql_info( $info );
         if ( ! defined $quote_col ) {
             if ( @bu_col ) {
                 ( $sql->{where_stmt}, $sql->{where_args}, $AND_OR, $unclosed, $count ) = @{pop @bu_col};
@@ -334,6 +341,7 @@ sub where {
                 [ undef, $sf->{and}, $sf->{or} ],
                 { %{$sf->{i}{lyt_h}}, info => $info }
             );
+            $ax->print_sql_info( $info );
             if ( ! defined $AND_OR ) {
                 next COL;
             }
@@ -394,6 +402,7 @@ sub group_by {
             { %{$sf->{i}{lyt_h}}, info => $info, meta_items => [ 0 .. $#pre - 1 ], no_spacebar => [ $#pre ],
               include_highlighted => 2, index => 1 }
         );
+        $ax->print_sql_info( $info );
         if ( ! $idx[0] ) {
             if ( @{$sql->{group_by_cols}} ) {
                 pop @{$sql->{group_by_cols}};
@@ -454,6 +463,7 @@ sub having {
             [ @pre, @choices ],
             { %{$sf->{i}{lyt_h}}, info => $info }
         );
+        $ax->print_sql_info( $info );
         if ( ! defined $aggr ) {
             if ( @bu_col ) {
                 ( $sql->{having_stmt}, $sql->{having_args}, $AND_OR, $unclosed, $count ) = @{pop @bu_col};
@@ -484,6 +494,7 @@ sub having {
                 [ undef, $sf->{and}, $sf->{or} ],
                 { %{$sf->{i}{lyt_h}}, info => $info }
             );
+            $ax->print_sql_info( $info );
             if ( ! defined $AND_OR ) {
                 next COL;
             }
@@ -553,6 +564,7 @@ sub order_by {
             [ @pre, @cols ],
             { %{$sf->{i}{lyt_h}}, info => $info }
         );
+        $ax->print_sql_info( $info );
         if ( ! defined $col ) {
             if ( @bu ) {
                 ( $sql->{order_by_stmt}, $col_sep ) = @{pop @bu};
@@ -585,6 +597,7 @@ sub order_by {
             [ undef, $sf->{asc}, $sf->{desc} ],
             { %{$sf->{i}{lyt_h}}, info => $info }
         );
+        $ax->print_sql_info( $info );
         if ( ! defined $direction ){
             ( $sql->{order_by_stmt}, $col_sep ) = @{pop @bu};
             next ORDER_BY;
@@ -613,6 +626,7 @@ sub limit_offset {
             [ @pre, $limit, $offset ],
             { %{$sf->{i}{lyt_h}}, info => $info }
         );
+        $ax->print_sql_info( $info );
         if ( ! defined $choice ) {
             if ( @bu ) {
                 ( $sql->{limit_stmt}, $sql->{offset_stmt} )  = @{pop @bu};
@@ -633,6 +647,7 @@ sub limit_offset {
             my $limit = $tu->choose_a_number( $digits,
                 { info => $info, cs_label => 'LIMIT: ' }
             );
+            $ax->print_sql_info( $info );
             if ( ! defined $limit ) {
                 ( $sql->{limit_stmt}, $sql->{offset_stmt} ) = @{pop @bu};
                 next LIMIT;
@@ -651,6 +666,7 @@ sub limit_offset {
             my $offset = $tu->choose_a_number( $digits,
                 { info => $info, cs_label => 'OFFSET: ' }
             );
+            $ax->print_sql_info( $info );
             if ( ! defined $offset ) {
                 ( $sql->{limit_stmt}, $sql->{offset_stmt} ) = @{pop @bu};
                 next LIMIT;

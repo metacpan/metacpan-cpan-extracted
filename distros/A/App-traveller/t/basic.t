@@ -29,7 +29,7 @@ my $t = Test::Mojo->new();
 $t->get_ok('/')->status_is(302)->header_is(Location => '/edit');
 $t->get_ok('/edit')->status_is(200)->text_is('h1' => 'Traveller Subsector Generator');
 
-my $location = $t->get_ok('/random/sector')->status_is(302)->tx->res->headers->location;
-$t->get_ok($location)->status_is(200)->text_like('h1' => qr/Traveller Sector UWP List Generator \(\d+\)/);
+my $location = $t->get_ok('/random/subsector')->status_is(302)->tx->res->headers->location;
+$t->get_ok($location)->status_is(200)->text_like('h1' => qr/Traveller Subsector UWP List Generator \(\d+\)/);
 
 done_testing;

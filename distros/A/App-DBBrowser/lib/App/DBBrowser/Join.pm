@@ -48,18 +48,19 @@ sub join_tables {
         $join->{stmt} = "SELECT * FROM";
         $join->{used_tables}  = [];
         $join->{aliases}      = [];
-        my $join_info = '  INFO'; ## name
+        my $join_info = '  INFO';
         my $from_subquery = '  Derived';
         my @choices = map { "- $_" } @$tables;
         push @choices, $from_subquery if $sf->{o}{enable}{j_derived};
         push @choices, $join_info;
-        my $info = $ax->get_sql_info( $join );
         my @pre = ( undef );
+        my $info = $ax->get_sql_info( $join );
         # Choose
         my $master = $tc->choose(
             [ @pre, @choices ],
             { %{$sf->{i}{lyt_v}}, info => $info, prompt => 'Choose MAIN table:' }
         );
+        $ax->print_sql_info( $info );
         if ( ! defined $master ) {
             return;
         }
@@ -84,9 +85,8 @@ sub join_tables {
         }
         push @{$join->{used_tables}}, $master;
         $join->{default_alias} = 'A';
-        $ax->print_sql_info( $join );
-        # Readline
-        my $master_alias = $ax->alias( 'join', $qt_master, $join->{default_alias} );
+        # Alias
+        my $master_alias = $ax->alias( $join, 'join', $qt_master, $join->{default_alias} );
         push @{$join->{aliases}}, [ $master, $master_alias ];
         $join->{stmt} .= " " . $qt_master;
         $join->{stmt} .= " AS " . $ax->quote_col_qualified( [ $master_alias ] );
@@ -98,14 +98,15 @@ sub join_tables {
         my @bu;
 
         JOIN: while ( 1 ) {
-            my $info = $ax->get_sql_info( $join );
             my $enough_tables = '  Enough TABLES';
             my @pre = ( undef, $enough_tables );
+            my $info = $ax->get_sql_info( $join );
             # Choose
             my $join_type = $tc->choose(
                 [ @pre, map( "- $_", @{$sf->{join_types}} ) ],
                 { %{$sf->{i}{lyt_v}}, info => $info, prompt => 'Choose Join Type:' }
             );
+            $ax->print_sql_info( $info );
             if ( ! defined $join_type ) {
                 if ( @bu ) {
                     ( $join->{stmt}, $join->{default_alias}, $join->{aliases}, $join->{used_tables} ) = @{pop @bu};
@@ -178,6 +179,7 @@ sub __add_slave_with_join_condition {
             [ @pre, @choices ],
             { %{$sf->{i}{lyt_v}}, info => $info, prompt => 'Add table:', undef => $sf->{i}{_reset} }
         );
+        $ax->print_sql_info( $info );
         if ( ! defined $slave ) {
             if ( @bu ) {
                 ( $join->{stmt}, $join->{default_alias}, $join->{aliases}, $join->{used_tables} ) = @{pop @bu};
@@ -207,13 +209,11 @@ sub __add_slave_with_join_condition {
         }
         push @bu, [ $join->{stmt}, $join->{default_alias}, [ @{$join->{aliases}} ], [ @{$join->{used_tables}} ] ];
         push @{$join->{used_tables}}, $slave;
-        $ax->print_sql_info( $join );
-        # Readline
-        my $slave_alias = $ax->alias( 'join', $qt_slave, ++$join->{default_alias} );
+        # Alias
+        my $slave_alias = $ax->alias( $join, 'join', $qt_slave, ++$join->{default_alias} );
         $join->{stmt} .= " " . $qt_slave;
         $join->{stmt} .= " AS " . $ax->quote_col_qualified( [ $slave_alias ] );
         push @{$join->{aliases}}, [ $slave, $slave_alias ];
-        $ax->print_sql_info( $join );
         if ( $slave eq $qt_slave ) {
             my $sth = $sf->{d}{dbh}->prepare( "SELECT * FROM " . $qt_slave . " AS " . $slave_alias . " LIMIT 0" );
             $sth->execute() if $sf->{i}{driver} ne 'SQLite';
@@ -227,7 +227,7 @@ sub __add_slave_with_join_condition {
             }
         }
         push @{$join->{used_tables}}, $slave;
-        $ax->print_sql_info( $join );
+        $ax->print_sql_info( $ax->get_sql_info( $join ) );
         return 1;
     }
 }
@@ -273,6 +273,7 @@ sub __add_join_condition {
                 ],
                 { %{$sf->{i}{lyt_v}}, info => $info, prompt => 'Choose PRIMARY KEY column:' }
             );
+            $ax->print_sql_info( $info );
             if ( ! defined $pk_col ) {
                 if ( @bu ) {
                     ( $join->{stmt}, $AND ) = @{pop @bu};
@@ -293,6 +294,7 @@ sub __add_join_condition {
                     'Edit: ',
                     { info => $info, default => $condition, show_context => 1 }
                 );
+                $ax->print_sql_info( $info );
                 if ( ! defined $condition ) {
                     return;
                 }
@@ -316,6 +318,7 @@ sub __add_join_condition {
                 [ undef, map( "- $_", sort keys %avail_fk_cols ) ],
                 { %{$sf->{i}{lyt_v}}, info => $info, prompt => 'Choose FOREIGN KEY column:' }
             );
+            $ax->print_sql_info( $info );
             if ( ! defined $fk_col ) {
                 ( $join->{stmt}, $AND ) = @{pop @bu};
                 next JOIN_PREDICATE;
@@ -352,7 +355,7 @@ sub __print_join_info {
         $r++;
     }
     my $tp = Term::TablePrint->new( $sf->{o}{table} );
-    $tp->print_table( $aref, { tab_width => 3 } );
+    $tp->print_table( $aref, { tab_width => 3 } ); # info
 }
 
 
@@ -360,7 +363,7 @@ sub __get_join_info {
     my ( $sf ) = @_;
     return if $sf->{d}{pk_info};
     my $td = $sf->{d}{tables_info};
-    my $tables = $sf->{d}{user_tables}; ###
+    my $tables = $sf->{d}{user_tables};
     my $pk = {};
     for my $table ( @$tables ) {
         my $sth = $sf->{d}{dbh}->primary_key_info( @{$td->{$table}} );

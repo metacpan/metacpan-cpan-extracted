@@ -23,6 +23,18 @@ use SPVM::Builder::Util;
     die "OS unsupported\n";
   }
 
+  # SVPM support only 64bit System
+  if ($Config{uname} =~ /\b(i386|i686|IA-32)\b/i) {
+    warn "SPVM support only 64bit System";
+    die "OS unsupported\n";
+  }
+  
+  # SVPM support only Windows 10+
+  if ($Config{osname} eq 'MSWin32' && $Config{osvers} < 10) {
+    warn "SPVM support only Windows 10+";
+    die "OS unsupported\n";
+  }
+
   # SPVM only support NetBSD 7+
   if ($Config{osname} eq 'netbsd' && $Config{osvers} < 7) {
     warn "SPVM don't support NetBSD 6, 5, 4, 3, 2, 1";
@@ -42,8 +54,23 @@ use SPVM::Builder::Util;
   }
 
   # old OpenBSD don't support some C99 complex functions
+  # SPVM drop support solaris because I can't fix OpenBDS bugs by myself
   if ($Config{osname} eq 'openbsd' && $Config{osvers} < 6.8) {
     warn "SPVM don't support OpenBSD before version 6.8";
+    die "OS unsupported\n";
+  }
+
+  # SPVM don't support OpenBSD because I can't fix OpenBSD bugs by myself
+  # http://matrix.cpantesters.org/?dist=SPVM%200.9006
+  if ($Config{osname} eq 'openbsd') {
+    warn "SPVM don't support OpenBSD before version 6.8";
+    die "OS unsupported\n";
+  }
+
+  # SPVM don't support solaris because I can't fix make error by myself
+  # http://www.cpantesters.org/cpan/report/6b54513a-c10b-11eb-bc66-57723b537541
+  if ($Config{osname} eq 'solaris') {
+    warn "SPVM don't support solaris";
     die "OS unsupported\n";
   }
 }

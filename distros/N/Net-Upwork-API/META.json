@@ -4,7 +4,7 @@
       "Maksym Novozhylov <mnovozhilov@upwork.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4229",
+   "generated_by" : "Module::Build version 0.4231",
    "keywords" : [
       "upwork",
       "oauth2"
@@ -40,7 +40,7 @@
    "provides" : {
       "Net::Upwork::API" : {
          "file" : "lib/Net/Upwork/API.pm",
-         "version" : "v2.1.2"
+         "version" : "v2.1.3"
       },
       "Net::Upwork::API::Client" : {
          "file" : "lib/Net/Upwork/API/Client.pm"
@@ -152,6 +152,6 @@
          "url" : "https://github.com/upwork/perl-upwork-oauth2.git"
       }
    },
-   "version" : "v2.1.2",
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "version" : "v2.1.3",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

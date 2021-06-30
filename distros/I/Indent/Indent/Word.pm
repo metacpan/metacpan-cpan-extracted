@@ -13,7 +13,7 @@ use Readonly;
 Readonly::Scalar my $EMPTY_STR => q{};
 Readonly::Scalar my $LINE_SIZE => 79;
 
-our $VERSION = 0.07;
+our $VERSION = 0.08;
 
 # Constructor.
 sub new {
@@ -21,7 +21,7 @@ sub new {
 	my $self = bless {}, $class;
 
 	# Use with ANSI sequences.
-	$self->{'ansi'} = 0;
+	$self->{'ansi'} = undef;
 
 	# Options.
 	$self->{'line_size'} = $LINE_SIZE;
@@ -35,6 +35,16 @@ sub new {
 
 	# 'line_size' check.
 	line_size_check($self);
+
+	if (! defined $self->{'ansi'}) {
+		if (exists $ENV{'NO_COLOR'}) {
+			$self->{'ansi'} = 0;
+		} elsif (defined $ENV{'COLOR'}) {
+			$self->{'ansi'} = 1;
+		} else {
+			$self->{'ansi'} = 0;
+		}
+	}
 
 	# Check rutine for removing ANSI sequences.
 	if ($self->{'ansi'}) {
@@ -188,7 +198,10 @@ Returns instance of object.
 =item * C<ansi>
 
  Use with ANSI sequences.
- Default value is 0.
+ Default value is:
+ - 1 if COLOR env variable is set
+ - 0 if NO_COLOR env variable is set
+ - 0 otherwise
 
 =item * C<line_size>
 
@@ -221,6 +234,11 @@ Indent text by words to line_size block size.
  $non_indent - Is flag for non indenting. Default is 0.
 
 Returns string or array with data to print.
+
+=head1 ENVIRONMENT
+
+Output is controlled by env variables C<NO_COLOR> and C<COLOR>.
+See L<https://no-color.org/>.
 
 =head1 ERRORS
 
@@ -325,12 +343,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2005-2020 Michal Josef Špaček
+© 2005-2021 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.07
+0.08
 
 =cut

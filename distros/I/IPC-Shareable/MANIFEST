@@ -11,9 +11,9 @@ lib/IPC/Shareable/SharedMem.pm
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
-nest.pl
 README
 t/00-base.t
+t/02-create.t
 t/05-sv.t
 t/10-av.t
 t/15-hv.t
@@ -34,6 +34,8 @@ t/65-seg_size.t
 t/71-unspawn.t
 t/72-unspawn_destroy.t
 t/75-graceful.t
+t/76-singleton.t
+t/77-singleton_warn.t
 t/80-exceptions.t
 t/90-pod_coverage.t
 t/91-pod_linkcheck.t

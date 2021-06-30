@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Record;
 # ABSTRACT: Container for Cypher result values
-$Neo4j::Driver::Record::VERSION = '0.23';
+$Neo4j::Driver::Record::VERSION = '0.25';
 
 use Carp qw(croak);
 use JSON::MaybeXS 1.003003 qw(is_bool);
@@ -110,7 +110,7 @@ Neo4j::Driver::Record - Container for Cypher result values
 
 =head1 VERSION
 
-version 0.23
+version 0.25
 
 =head1 SYNOPSIS
 
@@ -214,6 +214,7 @@ these features.
 Allows accessing the graph response the Neo4j server can deliver via
 HTTP. Requires the C<return_graph> field to be set on the
 L<Transaction|Neo4j::Driver::Transaction>
+and Jolt to be disabled (which is not recommended)
 before the statement is executed.
 
 =head1 SEE ALSO

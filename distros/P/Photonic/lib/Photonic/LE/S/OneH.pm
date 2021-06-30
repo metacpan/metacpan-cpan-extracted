@@ -1,5 +1,5 @@
 package Photonic::LE::S::OneH;
-$Photonic::LE::S::OneH::VERSION = '0.016';
+$Photonic::LE::S::OneH::VERSION = '0.017';
 
 =encoding UTF-8
 
@@ -9,7 +9,7 @@ Photonic::LE::S::OneH
 
 =head1 VERSION
 
-version 0.016
+version 0.017
 
 =head1 COPYRIGHT NOTICE
 
@@ -126,7 +126,7 @@ next_b2, next_b, shifting the current values where necessary. Returns
 =item * applyOperator($psi_G)
 
 Apply the Hamiltonian operator to state in reciprocal space. State is
-ri:pm:nx:ny... The operator is the longitudinal dielectric response in
+pm:nx:ny... The operator is the longitudinal dielectric response in
 reciprocal-spinor space.
 
 =item * innerProduct($left, $right)
@@ -160,11 +160,9 @@ Returns the first state.
 use namespace::autoclean;
 use PDL::Lite;
 use PDL::NiceSlice;
-use PDL::FFTW3;
-use PDL::Complex;
 use Carp;
 use Photonic::Types;
-use Photonic::Utils qw(SProd any_complex);
+use Photonic::Utils qw(SProd any_complex GtoR RtoG);
 use Moose;
 use MooseX::StrictConstructor;
 
@@ -179,8 +177,8 @@ with 'Photonic::Roles::OneH', 'Photonic::Roles::UseMask', 'Photonic::Roles::EpsF
 
 sub _firstState { #\delta_{G0}
     my $self=shift;
-    my $v=PDL->zeroes(2,@{$self->dims})->r2C; #ri:pm:nx:ny
-    my $arg=join ',', "(0)", ':', ("(0)") x $self->ndims; #(0),(0),... ndims+1 times
+    my $v=PDL->zeroes(2,@{$self->dims})->r2C; #pm:nx:ny
+    my $arg=join ',', ':', ("(0)") x $self->ndims; #(0),(0),... ndims+1 times
     $v->slice($arg).=1/sqrt(2);
     return $v;
 }
@@ -192,35 +190,34 @@ sub applyOperator {
     confess "State should be complex" unless any_complex($psi_G);
     #Each state is a spinor with two wavefunctions \psi_{k,G} and
     #\psi_{-k,G}, thus the index plus or minus k, pm.
-    #Notation ri=real or imaginary, pm=+ or - k, xy=cartesian
-    #state is ri:pmk:nx:ny... pmGnorm=xy:pmk:nx:ny...
+    #Notation pm=+ or - k, xy=cartesian
+    #state is pmk:nx:ny... pmGnorm=xy:pmk:nx:ny...
     #Multiply by vectors ^G and ^(-G).
     #Have to get cartesian out of the way, thread over it and iterate
     #over the rest
-    my $Gpsi_G=($psi_G*$self->pmGNorm->mv(0,-1))->mv(1,-1); #^G |psi>
-    #the result is complex ri:nx:ny...i:pmk
+    my $Gpsi_G=($psi_G*$self->pmGNorm->mv(0,-1))->mv(0,-1); #^G |psi>
+    #the result is complex nx:ny...i:pmk
     # Notice that I actually multiply by unit(k-G) instead of
     # unit(-k+G) when I use pmGNorm; as I do it two times, the result
     # is the same.
     #Take inverse Fourier transform over all space dimensions,
     #thread over cartesian and pmk indices
     #real space ^G|psi>
-    my $Gpsi_R=ifftn($Gpsi_G, $self->ndims);
-    # $Gpsi_R is ri:nx:ny...i:pmk
-    # $self->epsilon is ri:nx:ny...
+    my $Gpsi_R=GtoR($Gpsi_G, $self->ndims, 0); # $Gpsi_R is nx:ny...i:pmk
+    # $self->epsilon is nx:ny...
     #Multiply by the dielectric function in Real Space. Thread
     #cartesian and pm indices
     my $eGpsi_R=$self->epsilon*$Gpsi_R; #Epsilon could be tensorial!
-    #$eGpsi_R is ri:nx:ny,...i:pmk
+    #$eGpsi_R is nx:ny,...i:pmk
     #Transform to reciprocal space
-    my $eGpsi_G=fftn($eGpsi_R, $self->ndims)->mv(-1,1);
-    #$eGpsi_G is ri:pmk:nx:ny...:i
+    my $eGpsi_G=RtoG($eGpsi_R, $self->ndims, 0)->mv(-1,0);
+    #$eGpsi_G is pmk:nx:ny...:i
     #Scalar product with pmGnorm: i:pm:nx:ny...
     my $GeGpsi_G=($eGpsi_G*$self->pmGNorm->mv(0,-1)) #^Ge^G|psi>
-	# ri:pmk:nx:ny...:i
+	# pmk:nx:ny...:i
 	# Move cartesian to front and sum over
-	->mv(-1,1)->sumover; #^G.epsilon^G|psi>
-    # $GeGpsi_G is ri:pm:nx:ny. $mask=nx:ny
+	->mv(-1,0)->sumover; #^G.epsilon^G|psi>
+    # $GeGpsi_G is pm:nx:ny. $mask=nx:ny
     $GeGpsi_G=$GeGpsi_G*$mask->(*1) if defined $mask;
     return $GeGpsi_G;
 }

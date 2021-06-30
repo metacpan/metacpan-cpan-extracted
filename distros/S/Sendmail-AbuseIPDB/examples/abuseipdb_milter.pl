@@ -11,7 +11,7 @@
 # NOTE: Change $portno below as appropriate and change above config to match,
 # but I put a real number in because some people won't even read this far.
 
-my $APIkey = '1234567890123456789012345678901234567890';
+my $v2APIkey = '1234567890123456789012345678901234567890';
 my $portno = 8978;              # Port to listen on localhost
 my $name   = 'milterabusedb';   # For sendmail config of milters
 my $debug  = 1;
@@ -38,22 +38,18 @@ $cbs{connect} = sub {
 
 $cbs{eom} = sub {
     my $ctx = shift;
-    my $db = Sendmail::AbuseIPDB->new( Key => $APIkey, Debug => $debug );
-    my @all_data = $db->get( $from_ip );
-    if( scalar( $db->filter( 'Email Spam', @all_data )) > 2 )
+    my $db = Sendmail::AbuseIPDB->new( v2Key => $v2APIkey, Debug => $debug );
+    my $result = $db->get( $from_ip );
+    if( defined( $result->{data} ) && $result->{data}{abuseConfidenceScore} >= 75 )
     {
         die( "SMTP user ${from_addr}[${from_ip}] seems like a spammer" );
-    }
-    if( scalar( @all_data ) > 4 )
-    {
-        die( "SMTP user ${from_addr}[${from_ip}] seems like a bad guy" );
     }
     if( $debug ) { print "NO PROBLEM:   ${from_addr}[${from_ip}]\n"; }
 
     SMFIS_CONTINUE;
 };     
 
-if( $APIkey eq '1234567890123456789012345678901234567890' ) { die( "https://www.abuseipdb.com/register" ); }
+if( $v2APIkey eq '1234567890123456789012345678901234567890' ) { die( "https://www.abuseipdb.com/register" ); }
 
 my $milter = new Sendmail::PMilter;
 my $at = '@';

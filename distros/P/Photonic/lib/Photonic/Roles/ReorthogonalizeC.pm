@@ -1,5 +1,5 @@
 package Photonic::Roles::ReorthogonalizeC;
-$Photonic::Roles::ReorthogonalizeC::VERSION = '0.016';
+$Photonic::Roles::ReorthogonalizeC::VERSION = '0.017';
 
 =encoding UTF-8
 
@@ -9,7 +9,7 @@ Photonic::Roles::ReorthogonalizeC
 
 =head1 VERSION
 
-version 0.016
+version 0.017
 
 =head1 COPYRIGHT NOTICE
 
@@ -51,9 +51,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA  02110-1301 USA
 =head1 DESCRIPTION
 
 Roles consumed by AllH objects to be used in a Photonic
-calculation. Estimates orthogonlization errors and makes a full
-reorthogoalization of Haydock states when required. This version works
-for non Hermitian operators with complex Hayock coefficients.
+calculation. Estimates orthogonalization errors and makes a full
+reorthogonalization of Haydock states when required. This version works
+for non Hermitian operators with complex Haydock coefficients.
 
 =head1 ATTRIBUTES
 
@@ -117,18 +117,17 @@ Flags a recent orthogonalization.
 use Photonic::Iterator;
 use Machine::Epsilon;
 use PDL::Lite;
-use PDL::Complex;
 use PDL::NiceSlice;
 use Moose::Role;
 
 has 'previous_W' =>(is=>'ro',
      writer=>'_previous_W', lazy=>1, init_arg=>undef,
-     default=>sub{r2C(0)->(:,*1)},
+     default=>sub{PDL::r2C(0)->(*1)},
      documentation=>"Row of error matrix"
 );
 has 'current_W' =>(is=>'ro',
      writer=>'_current_W', lazy=>1, init_arg=>undef,
-     default=>sub{r2C(0)->(:,*1)},
+     default=>sub{PDL::r2C(0)->(*1)},
      documentation=>"Row of error matrix"
 );
 has 'next_W' =>(is=>'ro',
@@ -154,10 +153,8 @@ has '_justorthogonalized'=>(
 
 sub _build_next_W {
     my $self=shift;
-#    my $g_np1=$self->next_g;
-#    return r2C($g_np1)->(:,*1);
     my $g_n=$self->current_g;
-    return r2C($g_n)->(:,*1);
+    return PDL::r2C($g_n)->(*1);
 }
 
 around '_fullorthogonalize_indeed' => sub {
@@ -182,15 +179,15 @@ sub _checkorthogonalize {
     return unless $self->reorthogonalize;
     return if $self->fullorthogonalize_N; #already orthogonalizing
     my $n=$self->iteration;
-    my $a=PDL->pdl($self->as)->complex;
-    my $b=PDL->pdl($self->bs)->complex;
-    my $c=PDL->pdl($self->cs)->complex;
+    my $a=$self->as;
+    my $b=$self->bs;
+    my $c=$self->cs;
     if($self->_justorthogonalized){
 	$self->_write_justorthogonalized(0);
-	my $current_W=PDL->ones($n)*r2C($self->noise);
-	my $next_W=PDL->ones($n+1)*r2C($self->noise);
-	$current_W->(:,-1).=r2C($self->current_g);
-	$next_W->(:,-1).=r2C($self->next_g);
+	my $current_W=PDL->ones($n)*PDL::r2C($self->noise);
+	my $next_W=PDL->ones($n+1)*PDL::r2C($self->noise);
+	$current_W->(-1).=PDL::r2C($self->current_g);
+	$next_W->(-1).=PDL::r2C($self->next_g);
 	$self->_current_W($current_W);
 	$self->_next_W($next_W);
 	return;
@@ -199,22 +196,20 @@ sub _checkorthogonalize {
     $self->_current_W(my $current_W=$self->next_W);
     my $next_W;
     if($n>=2){
-	$next_W= $b->(:,1:-1)*$current_W->(:,1:-1)
-	    + ($a->(:,0:-2)-$a->(:,($n-1)))*$current_W->(:,0:-2)
-	    - $c->(:,($n-1))*$previous_W;
-	$next_W->(:,1:-1).=$next_W->(:,1:-1)+
-	    $c->(:,1:-2)*$current_W->(:,0:-3) if ($n>=3);
+	$next_W= $b->(1:-1)*$current_W->(1:-1)
+	    + ($a->(0:-2)-$a->(($n-1)))*$current_W->(0:-2)
+	    - $c->(($n-1))*$previous_W;
+	$next_W->(1:-1).=$next_W->(1:-1)+
+	    $c->(1:-2)*$current_W->(0:-3) if ($n>=3);
 	$next_W=$next_W+_arg($next_W)*2*$self->normOp*$self->noise;
 	$next_W=$next_W/$self->next_b;
     }
-    $next_W=r2C($self->noise)->(:,*1) if $n==1;
-    $next_W=$next_W->transpose->append([[$self->noise],[0]])
-	->transpose->complex if $n>=2;
-    $next_W=$next_W->transpose->append(r2C($self->next_g)->transpose)
-	->transpose->complex;
+    $next_W=PDL::r2C($self->noise)->(*1) if $n==1;
+    $next_W=$next_W->append($self->noise) if $n>=2;
+    $next_W=$next_W->append(PDL::r2C($self->next_g));
     $self->_next_W($next_W);
     return unless $n>=2;
-    my $max=$next_W->(:,0:-2)->Cabs->maximum;
+    my $max=$next_W->(0:-2)->abs->maximum;
     if($max > sqrt($self->accuracy)){
 	#recalculate the last two states with full reorthogonalization
 	my $orthos=1; #number of reorthogonalizations
@@ -232,7 +227,7 @@ sub _checkorthogonalize {
 
 sub _arg {
     my $s=shift->copy;
-    my $a=$s->Cabs;
+    my $a=$s->abs;
     $s->re->where($a==0).=1;
     $a->where($a==0).=1;
     my $arg=$s/$a;

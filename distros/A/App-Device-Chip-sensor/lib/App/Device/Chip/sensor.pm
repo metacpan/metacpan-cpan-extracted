@@ -6,8 +6,10 @@
 use v5.26;
 use Object::Pad 0.19;
 
-package App::Device::Chip::sensor 0.01;
+package App::Device::Chip::sensor 0.02;
 class App::Device::Chip::sensor;
+
+use Carp;
 
 use Future::AsyncAwait;
 
@@ -73,10 +75,13 @@ Adapter configuration string to pass to L<Device::Chip::Adapter/new_from_descrip
 to construct the chip adapter used for communication with the actual chip
 hardware.
 
+=back
+
 =cut
 
-has $_ADAPTERDESC;
-has @_CHIPTYPES;
+has @_CHIPCONFIGS;
+method _chipconfigs { @_CHIPCONFIGS }  # for unit testing
+
 has $_interval :reader = 10;
 
 method OPTSPEC
@@ -85,7 +90,6 @@ method OPTSPEC
       'b|blib' => sub { require blib; blib->import; },
 
       'i|interval=i' => \$_interval,
-      'adapter|A=s'  => \$_ADAPTERDESC,
    );
 }
 
@@ -113,30 +117,39 @@ method parse_argv ( $argv = \@ARGV )
 {
    my %optspec = $self->OPTSPEC;
 
-   GetOptionsFromArray( $argv, %optspec ) or exit 1;
+   @_CHIPCONFIGS = ();
 
-   while( @$argv ) {
-      my $chiptype = shift @$argv;
-      # TODO: parse chip constructor args/mount options
-      push @_CHIPTYPES, $chiptype;
-   }
+   my $ADAPTERDESC; my $adapter;
+
+   GetOptionsFromArray( $argv, %optspec,
+      'adapter|A=s' => sub {
+         $ADAPTERDESC = $_[1];
+         undef $adapter;
+      },
+      '<>' => sub {
+         my ( $chiptype, $opts ) = split m/:/, $_[0], 2;
+
+         $adapter //= Device::Chip::Adapter->new_from_description( $ADAPTERDESC );
+
+         my $config = {
+            type    => $chiptype,
+            adapter => $adapter,
+         };
+
+         while( length $opts ) {
+            if( $opts =~ s/^-C:(.*?)=(.*)(?:$|,)// ) {
+               $config->{config}{$1} = $2;
+            }
+            else {
+               croak "Unable to parse chip configuration options '$opts' for $chiptype'";
+            }
+         }
+
+         push @_CHIPCONFIGS, $config;
+      },
+   ) or exit 1;
 
    return $self;
-}
-
-=head2 adapter
-
-   $adapter = $app->adapter;
-
-A memoized lazy accessor for the application's configured
-L<Device::Chip::Adapter> instance, taken from the C<--adapter> option.
-
-=cut
-
-has $_adapter;
-method adapter
-{
-   return $_adapter //= Device::Chip::Adapter->new_from_description( $_ADAPTERDESC );
 }
 
 =head2 chips
@@ -154,15 +167,20 @@ async method chips
 {
    return @$_chips if $_chips;
 
-   my $adapter = $self->adapter;
+   foreach my $chipconfig ( @_CHIPCONFIGS ) {
+      my $chiptype = $chipconfig->{type};
+      my $adapter  = $chipconfig->{adapter};
 
-   foreach my $chiptype ( @_CHIPTYPES ) {
       my $class = "Device::Chip::$chiptype";
 
       require ( "$class.pm" ) =~ s(::)(/)gr;
 
       my $chip = $class->new;
       await $chip->mount( $adapter );
+
+      if( $chipconfig->{config} ) {
+         await $chip->change_config( $chipconfig->{config}->%* );
+      }
 
       await $chip->protocol->power(1);
 

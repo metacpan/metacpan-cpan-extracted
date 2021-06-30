@@ -1,5 +1,5 @@
 package Photonic::WE::S::EpsilonTensor;
-$Photonic::WE::S::EpsilonTensor::VERSION = '0.016';
+$Photonic::WE::S::EpsilonTensor::VERSION = '0.017';
 
 =encoding UTF-8
 
@@ -9,7 +9,7 @@ Photonic::WE::S::EpsilonTensor
 
 =head1 VERSION
 
-version 0.016
+version 0.017
 
 =head1 COPYRIGHT NOTICE
 
@@ -97,7 +97,6 @@ The macroscopic dielectric tensor of the last operation
 use namespace::autoclean;
 use PDL::Lite;
 use PDL::NiceSlice;
-use PDL::Complex;
 use PDL::MatrixOps;
 use Photonic::Types;
 use Photonic::Utils qw(any_complex);
@@ -119,9 +118,9 @@ sub _build_epsilonTensor {
     my ($k2, $kk);
     if(any_complex($q, $k)){
 	#Make both complex
-	$_ = $_->isa('PDL::Complex') ? $_ : r2C($_) for $q, $k;
+	$_ = PDL::r2C($_) for $q, $k;
 	$k2=($k*$k)->sumover; #inner
-	$kk=$k->(:,:,*1)*$k->(:,*1,:); #outer
+	$kk=$k->(:,*1)*$k->(*1); #outer
     } else {
 	$k2=$k->inner($k);
 	$kk=$k->outer($k);

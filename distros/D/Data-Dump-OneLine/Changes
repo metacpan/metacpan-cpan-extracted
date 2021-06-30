@@ -1,6 +1,9 @@
-Revision history for Data-Dump-OneLine
+0.080   2021-06-27  Released-By: PERLANCAR; Urgency: medium
 
-0.07    2015-03-25 (PERLANCAR)
+	- Adjust to Data::Dmp 0.241 (RT#136979).
+
+
+0.07    2015-03-25  Released-By: PERLANCAR
 
 	- Update test and prereq version to newer Data::Dmp (0.09+) which
 	  produces more compact output.
@@ -8,37 +11,37 @@ Revision history for Data-Dump-OneLine
 	- Add note about using Data::Dmp directly.
 
 
-0.06     2014-11-14 (PERLANCAR)
+0.06     2014-11-14  Released-By: PERLANCAR
 
          - Provide 'dump1' and 'dump_one_line' (again) for backward
            compatibility now as alias to 'dmp'. Breaking this for the sake of
            breaking was foolish.
 
 
-0.05     2014-11-14 (PERLANCAR)
+0.05     2014-11-14  Released-By: PERLANCAR
 
          [INCOMPATIBLE CHANGES]
 
          - Switch to Data::Dmp. Now only exports 'dd' and 'dmp'.
 
 
-0.04     2014-10-03 (PERLANCAR)
+0.04     2014-10-03  Released-By: PERLANCAR
 
          - Replace with a modified Data::Dump 1.22 to minimize whitespaces,
            including padding of hash keys which looks silly.
 
 
-0.03     2013-09-09 (SHARYANTO)
+0.03     2013-09-09  Released-By: SHARYANTO
 
          - No functional changes. Rebuild with MakeMaker instead of
            Module::Build because the latter is deprecated from core in 5.19.
 
 
-0.02     2010-10-25 (SHARYANTO)
+0.02     2010-10-25  Released-By: SHARYANTO
 
          - Change dump_oneline -> dump_one_line.
 
 
-0.01     2010-10-18 (SHARYANTO)
+0.01     2010-10-18  Released-By: SHARYANTO
 
          - First release.

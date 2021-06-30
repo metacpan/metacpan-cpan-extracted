@@ -1,0 +1,111 @@
+#!/usr/bin/perl
+
+# usage:  MakeRPM [release#]
+
+# if release is not given, defaults to "1" (or whatever is in
+# the rpm/perl-Lab-Measurement.spec template file)
+# automatically default to suffixing with "linux distribution" if set
+# in the rpmbuild defaults
+use File::Spec;
+
+my $release = shift;  # modify release, if defined in script argument
+
+# check on installed rpms first, because the whole point of this
+# thing is to install Perl modules as rpms, so that should be
+# the default
+
+# but if rpms not found, check if perl module present in perl
+
+open(R,"rpm -qa --qf '%{NAME}\\n' |") || die "unable to run rpm -qa to check rpms needed";
+my (%zgot);
+while(<R>) {
+    chomp;
+    $zgot{$_} = 1;
+}
+close(R);
+
+my $iss;
+my $missing = 0;
+foreach my $p (qw(perl-Dist-Zilla 
+                  perl-Dist-Zilla-Plugin-Git
+                  perl-Dist-Zilla-Plugin-RPM 
+                  perl-Dist-Zilla-Plugin-SurgicalPodWeaver
+                  perl-Dist-Zilla-Plugin-AuthorsFromGit
+                  perl-Perl-PrereqScanner
+                  perl-PDL
+               )) {
+    next if exists $zgot{$p};
+
+    my $mod = $p;
+    $mod =~ s/^perl\-//;
+    $mod =~ s/\-/::/g;
+
+    $iss = eval("require '$mod';");
+    next if $iss == 1;
+
+    $missing = 1;
+    print STDERR "Need to install rpm $p or cpanp -i $mod\n";
+}
+die("missing modules, aborting") if $missing;
+
+# find the parent directory of where this script lives
+# more complicated to be non-Unix compatable; not sure
+# why I bother, maybe to stay in practice?
+
+my $pwd = `pwd`;
+chomp($pwd);
+my $me = File::Spec->catfile($pwd, $0);
+my ($vol,$dir,$file) = File::Spec->splitpath($me);
+my (@dirs) = File::Spec->splitdir($dir);
+my $here = File::Spec->catdir($vol,@dirs);
+my $j = 100;
+while ($j-- > 0) {
+    my $pd = pop(@dirs);
+    last if $pd ne '';
+}
+my $parent = File::Spec->catdir($vol,@dirs);
+
+chdir($parent);
+
+print "dzil clean\n";
+my $iss = system("dzil clean");
+$iss = 'undef' unless defined $iss;
+die "status $iss error $@\n" if $iss ne '0';
+
+print "dzil mkrpmspec\n";
+$iss = system("dzil mkrpmspec perl-Lab-Measurement.spec");
+$iss = 'undef' unless defined $iss;
+die "status $iss error $@\n" if $iss ne '0';
+
+# change release# if given as an argument to this script
+if (defined($release)) {
+    $iss = system("sed -e '/^Release: /c\\\nRelease: $release%{?dist}' -i perl-Lab-Measurement.spec");
+    $iss = 'undef' unless defined $iss;
+    die "status $iss error $@\n" if $iss ne '0';
+}
+
+print "dzil build\n";
+$iss = system("dzil build");
+$iss = 'undef' unless defined $iss;
+die "status $iss error $@\n" if $iss ne '0';
+
+my $sline = `grep '^Source:' perl-Lab-Measurement.spec 2>/dev/null`;
+chomp($sline);
+die "error, missing perl-Lab-Measurement.spec?" if $sline =~ /^\s*$/;
+my ($dum,$tgzfile) = split(/\s+/,$sline);
+
+print "rpmbuild -ta $tgzfile\n";
+$iss = system("rpmbuild -ta $tgzfile");
+$iss = 'undef' unless defined $iss;
+die "status $iss error $@\n" if $iss ne '0';
+
+print "cleanup dzil files\n";
+my $iss = system("dzil clean");
+$iss = 'undef' unless defined $iss;
+die "status $iss error $@\n" if $iss ne '0';
+
+unlink('perl-Lab-Measurement.spec');
+
+print "DONE!\n";
+exit 0;
+

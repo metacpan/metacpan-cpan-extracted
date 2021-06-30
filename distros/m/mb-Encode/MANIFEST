@@ -1,0 +1,13 @@
+lib/mb/Encode.pm
+README
+Changes
+META.yml
+META.json
+Makefile.PL
+pmake.bat
+MANIFEST
+LICENSE
+CONTRIBUTING
+t/1001_fullname.t
+t/1002_shortname.t
+t/9001_podtest.t

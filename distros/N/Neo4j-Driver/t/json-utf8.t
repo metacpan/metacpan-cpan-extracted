@@ -5,9 +5,9 @@ use lib qw(./lib t/lib);
 use utf8;  # required to parse UTF-8 bytes in this file as characters
 
 my $driver;
-use Neo4j::Test;
+use Neo4j_Test;
 BEGIN {
-	unless ($driver = Neo4j::Test->driver) {
+	unless ( $driver = Neo4j_Test->driver() ) {
 		print qq{1..0 # SKIP no connection to Neo4j server\n};
 		exit;
 	}
@@ -98,7 +98,7 @@ subtest 'read full property list' => sub {
 
 subtest 'no utf8' => sub {
 	plan tests => 3;
-	TODO: { local $TODO = 'no utf8 unsupported by Neo4j::Bolt 0.4201 (perlbolt#38)' if $Neo4j::Test::bolt;
+	TODO: { local $TODO = 'no utf8 unsupported by Neo4j::Bolt 0.4201 (perlbolt#38)' if $Neo4j_Test::bolt;
 	no utf8;
 	my $smp = "😀";  # 0xf09f9880 = LATIN SMALL LETTER ETH + APPLICATION PROGRAM COMMAND + START OF STRING + PADDING CHARACTER (Latin-1)
 	lives_ok {

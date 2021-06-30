@@ -3,7 +3,7 @@ package Business::CompanyDesignator;
 # Require perl 5.010 because the 'track' functionality of Regexp::Assemble
 # is unsafe for earlier versions.
 use 5.010001;
-use Mouse;
+use Moose;
 use utf8;
 use warnings qw(FATAL utf8);
 use FindBin qw($Bin);
@@ -17,7 +17,7 @@ use Carp;
 use Business::CompanyDesignator::Record;
 use Business::CompanyDesignator::SplitResult;
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 has 'datafile' => ( is => 'ro', default => sub {
   # Development/test version

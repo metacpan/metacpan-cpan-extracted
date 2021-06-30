@@ -1,5 +1,18 @@
 Revision history for Astro-FITS-CFITSIO-FileName
 
+0.05      2021-06-30 00:52:09-04:00 America/New_York
+
+  [BUG FIX]
+
+    * Perl v5.26 complained about deleting a key/value hash slice. RT#137073. ++SREZIC
+
+0.04      2021-06-30 00:52:09-04:00 America/New_York
+
+  [BUG FIX]
+
+    * parsing of column and row filters didn't handle quoted strings with brackets in them
+
+
 0.03      2021-06-21 15:46:03-04:00 America/New_York
 
   [ENHANCEMENT]

@@ -4,6 +4,15 @@ History for the Lab-Measurement Perl distribution
 This document is work in progress (in the sense of adding
 historical information).
 
+3.760 2021-06-28
+  * Additions for producing RPM of Lab::Measurement with Dist::Zilla
+  * USBtmc: use interrupt i/o to check if transfer is complete
+  * TDS2024B.pm: add get_datetime/set_datetime functions
+  * 70-usbtmc.rules: use 'daq' group
+  * usbtmc_protfix: script to apply permission changes in /dev/bus/usb
+  * New driver for Keysight DSOS604A oscilloscope
+  * Extensions to Rigol_DG5000 AWG driver
+
 3.751 2021-06-01
   * Move IRC channel to Libera Chat
   * OI_IPS: add get_switch_heater

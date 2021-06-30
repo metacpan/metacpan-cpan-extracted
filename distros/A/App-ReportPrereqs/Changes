@@ -1,5 +1,9 @@
 Revision history for App-ReportPrereqs
 
+0.005  2021-06-29 17:08:18 UTC
+
+  - Fixed a test change with ExtUtils::MakeMaker > 7.46
+
 0.004  2019-08-26 20:19:23 UTC
 
   - No longer use a temp file for cpanfile downloaded from the net

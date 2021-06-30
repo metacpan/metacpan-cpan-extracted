@@ -19,6 +19,7 @@ do { my $x = {
                                       'Dist::Zilla::Plugin::CheckExtraTests' => '0',
                                       'Dist::Zilla::Plugin::CheckPrereqsIndexed' => '0',
                                       'Dist::Zilla::Plugin::Git::Contributors' => '0',
+                                      'Dist::Zilla::Plugin::Git::Remote::Check' => '0',
                                       'Dist::Zilla::Plugin::GithubMeta' => '0.12',
                                       'Dist::Zilla::Plugin::PodWeaver' => '4',
                                       'Dist::Zilla::Plugin::PromptIfStale' => '0',

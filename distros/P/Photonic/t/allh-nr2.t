@@ -32,7 +32,7 @@ use strict;
 use warnings;
 use PDL;
 
-use Test::More tests => 12;
+use Test::More;
 use lib 't/lib';
 use TestUtils;
 
@@ -48,11 +48,9 @@ my $as=$a->as;
 my $bs=$a->bs;
 my $b2s=$a->b2s;
 ok(agree(pdl($a->iteration), 2), "Number of iterations 1D longitudinal");
-ok(agree(pdl($b2s->[0]), 1), "1D L b_0^2");
-ok(agree(pdl($b2s->[1]), $g->f*(1-$g->f)), "1D L b_1^2");
-ok(agree(pdl($as->[0]), $g->f), "1D L a_0");
-ok(agree(pdl($as->[1]), 1-$g->f), "1D L a_1");
-ok(agree(pdl($b2s), pdl($bs)**2), "1D L b2==b^2");
+ok(agree($b2s, pdl([1, $g->f*(1-$g->f)])), "1D L b^2");
+ok(agree($as, pdl([$g->f, 1-$g->f])), "1D L a");
+ok(agree($b2s, $bs**2), "1D L b2==b^2");
 
 #View 1D system as 2D. Transverse direction
 my $Bt=zeroes(1,11)->yvals<5; #2D flat system
@@ -63,9 +61,9 @@ my $ast=$a->as;
 my $bst=$a->bs;
 my $b2st=$a->b2s;
 ok(agree(pdl($at->iteration), 1), "Number of iterations 1D trans");
-ok(agree(pdl($b2st->[0]), 1), "1D T b_0^2");
-ok(agree(pdl($ast->[0]), $g->f), "1D T a_0");
-ok(agree(pdl($b2st), pdl($bst)**2), "1D T b2==b^2");
+ok(agree($b2st->slice("(0)"), 1), "1D T b_0^2");
+ok(agree($ast->slice("(0)"), $g->f), "1D T a_0");
+ok(agree($b2st, $bst**2), "1D T b2==b^2");
 
 {
     #check reorthogonalize with square array
@@ -95,3 +93,5 @@ ok(agree(pdl($b2st), pdl($bst)**2), "1D T b2==b^2");
     diag("Actual iterations: " . $als->iteration
 	 . " Actual orthogonalizations: ", $als->orthogonalizations);
 }
+
+done_testing;

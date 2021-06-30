@@ -1,4 +1,4 @@
-package Dist::Zilla::MVP::RootSection 6.020;
+package Dist::Zilla::MVP::RootSection 6.022;
 # ABSTRACT: a standard section in Dist::Zilla's configuration sequence
 
 use Moose;
@@ -85,7 +85,7 @@ Dist::Zilla::MVP::RootSection - a standard section in Dist::Zilla's configuratio
 
 =head1 VERSION
 
-version 6.020
+version 6.022
 
 =head1 DESCRIPTION
 

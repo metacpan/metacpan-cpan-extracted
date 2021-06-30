@@ -1,4 +1,4 @@
-package Dist::Zilla::Role::PluginBundle 6.020;
+package Dist::Zilla::Role::PluginBundle 6.022;
 # ABSTRACT: something that bundles a bunch of plugins
 
 use Moose::Role;
@@ -44,7 +44,7 @@ Dist::Zilla::Role::PluginBundle - something that bundles a bunch of plugins
 
 =head1 VERSION
 
-version 6.020
+version 6.022
 
 =head1 DESCRIPTION
 

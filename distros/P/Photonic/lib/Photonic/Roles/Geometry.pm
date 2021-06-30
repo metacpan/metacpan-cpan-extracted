@@ -1,5 +1,5 @@
 package Photonic::Roles::Geometry;
-$Photonic::Roles::Geometry::VERSION = '0.016';
+$Photonic::Roles::Geometry::VERSION = '0.017';
 
 =encoding UTF-8
 
@@ -38,9 +38,9 @@ use Moose::Role;
 
 use PDL::Lite;
 use PDL::NiceSlice;
-use PDL::Complex;
 use Photonic::Types;
-use Photonic::Utils qw(any_complex lu_decomp);
+use Photonic::Utils qw(any_complex lu_decomp make_dyads);
+use PDL::MatrixOps qw();
 use Carp;
 use constant PI=>4*atan2(1,1);
 
@@ -48,7 +48,7 @@ requires 'B'; #characteristic function
 
 has 'L' =>(is=>'ro', isa => 'PDL', lazy=>1, builder=>'_build_L',
 	   documentation=>'array of unit cell size');
-has 'units'=>(is=>'ro', isa=>'ArrayRef[PDL]', lazy=>1,
+has 'units'=>(is=>'ro', isa=>'PDL', lazy=>1,
      builder=>'_build_units',
      documentation=>'Basis of unit vectors');
 has 'primitive'=>(is=>'ro', isa=>'PDL', required=>1, lazy=>1,
@@ -90,10 +90,10 @@ has 'pmGNorm' =>(is=>'ro', isa=>'PDL', init_arg=>undef, lazy=>1,
        'array of spinors of +- unit norm reciprocal vectors xy,pm,nx,ny');
 has 'f'=>(is=>'ro', init_arg=>undef, lazy=>1, builder=>'_build_f',
      documentation=>'filling fraction of B region');
-has 'unitPairs'=>(is=>'ro', isa=>'ArrayRef[PDL]', init_arg=>undef, lazy=>1,
+has 'unitPairs'=>(is=>'ro', isa=>'PDL', init_arg=>undef, lazy=>1,
      builder=>'_build_unitPairs',
      documentation=>'Normalized sum of pairs of basis vectors');
-has 'cUnitPairs'=>(is=>'ro', isa=>'ArrayRef[PDL]', init_arg=>undef, lazy=>1,
+has 'cUnitPairs'=>(is=>'ro', isa=>'PDL', init_arg=>undef, lazy=>1,
      builder=>'_build_cUnitPairs',
      documentation=>'Normalized complex sum of pairs of basis vectors');
 has 'unitDyads'=>(is=>'ro', isa=>'PDL', init_arg=>undef, lazy=>1,
@@ -113,19 +113,12 @@ sub _build_L {
 
 sub _build_units {
     my $self=shift;
-    my @units; # unit vectors
-    my $nd=$self->ndims;
-    foreach(0..$nd-1){ #build unit vectors
-	my $e=PDL->zeroes($nd);
-	$e->(($_)).=1;
-	push @units, $e;
-    }
-    return [@units];
+    PDL::MatrixOps::identity($self->ndims); # unit vectors
 }
 
 sub _build_primitive {
     my $self=shift;
-    return PDL->pdl($self->units); #xy:n
+    $self->units->copy; #xy:n
 }
 
 sub _build_primitiveNorm {
@@ -189,7 +182,7 @@ sub _build_G {
 
 sub _build_GNorm { #origin set to zero here.
     my $self=shift;
-    croak "Can't normalize reciprocal lattice unless Direction0 is set"
+    confess "Can't normalize reciprocal lattice unless Direction0 is set"
 	unless $self->has_Direction0;
     return $self->G->norm;
 }
@@ -208,61 +201,44 @@ sub _build_pmGNorm { #normalized +- reciprocal lattice. Leave
 
 sub _build_f { #calculate filling fraction
     my $self=shift;
-    return $self->B->sum/$self->B->nelem;
+    return $self->B->avg;
 }
 
 sub _build_unitPairs {
     my $self=shift;
     my $nd=$self->ndims;
     my $units=$self->units;
-    my @pairs;
+    my $pairs = PDL->zeroes($nd, $nd * ($nd + 1) / 2);
+    my $n = 0;
     for my $i(0..$nd-1){ #build pairs of vectors
 	for my $j($i..$nd-1){
-	    my $v=($units->[$i]+$units->[$j])->norm;
-	    push @pairs, $v;
+	    $pairs->(:,($n)) .= ($units->(($i))+$units->(($j)))->norm;
+	    $n++;
 	}
     }
-    return [@pairs];
+    $pairs;
 }
 
 sub _build_cUnitPairs {
     my $self=shift;
     my $nd=$self->ndims;
     my $units=$self->units;
-    my @cpairs;
+    my $cpairs = PDL->zeroes($nd, $nd * ($nd - 1) / 2)->r2C;
+    my $n = 0;
     for my $i(0..$nd-1){ #build pairs of vectors
 	for my $j($i+1..$nd-1){
-	    my $vc=($units->[$i]+i()*$units->[$j]);
-	    my $vcn=sqrt($vc->Cabs2->sumover);
-	    my $vp=$vc*(1/$vcn);
-	    push @cpairs, $vp;
+	    my $vc=PDL::czip($units->(($i)), $units->(($j)));
+	    my $vcn=sqrt($vc->abs2->sumover);
+	    $cpairs->(:,($n)) .= $vc*(1/$vcn);
+	    $n++;
 	}
     }
-    return [@cpairs];
+    $cpairs;
 }
 
 sub _build_unitDyads {
     my $self=shift;
-    my $nd=$self->ndims; #Number of dimensions
-    my $ne=$nd*($nd+1)/2; #number of symetric matrix elements
-    my $matrix=PDL->zeroes($ne,$ne);
-    my $n=0; #run over vector pairs
-    for my $i(0..$nd-1){
-	for my $j($i..$nd-1){
-	    my $m=0; #run over components of dyads
-	    for my $k(0..$nd-1){
-		for my $l($k..$nd-1){
-		    my $factor=$k==$l?1:2;
-		    $matrix->(($m),($n)) .= #pdl order!
-			$factor*$self->unitPairs->[$n]->(($k)) *
-			$self->unitPairs->[$n]->(($l));
-		    ++$m;
-		}
-	    }
-	    ++$n;
-	}
-    }
-    return $matrix;
+    make_dyads($self->ndims, $self->unitPairs);
 }
 
 sub _build_unitDyadsLU {
@@ -273,9 +249,9 @@ sub _build_unitDyadsLU {
 sub _G0 {
     my $self=shift;
     my $value=shift;
-    croak "Direction0 must be ".$self->ndims."-dimensional vector" unless
+    confess "Direction0 must be ".$self->ndims."-dimensional vector" unless
 	$value->dim(0)==$self->ndims and $value->ndims==1;
-    croak "Direction must be non-null" unless $value->inner($value)>0;
+    confess "Direction must be non-null" unless $value->inner($value)>0;
     my $arg=":". (",(0)" x $self->ndims); #:,(0),... dimension of space times
     $value=$value->norm; #normalize
     #Set element 0,0 for normalized arrays.
@@ -288,7 +264,7 @@ sub Vec2LC_G { #longitudinal component of 'complex' vector field in
                #reciprocal space
     my $self=shift;
     my $field=shift; # vector field to project
-    croak "Can't project unless Direction0 is set" unless
+    confess "Can't project unless Direction0 is set" unless
 	$self->has_Direction0;
     my $gnorm=$self->GNorm;
     ($field * $gnorm->r2C)->sumover;
@@ -298,13 +274,13 @@ sub LC2Vec_G { #longitudinal vector field from its longitudinal
 	       #components in reciprocal space
     my $self=shift;
     my $field=shift; # scalar field of longitudinal components
-    croak "Can't project unless Direction0 is set" unless
+    confess "Can't project unless Direction0 is set" unless
 	$self->has_Direction0;
     my $gnorm=$self->GNorm;
     #$gnorm is XorY nx, ny...
-    #$field is RoI nx ny nz
-    #$result RoI XoY nx ny nz
-    $field->(,*1)*$gnorm;
+    #$field is nx ny nz
+    #$result XoY nx ny nz
+    $field->(*1)*$gnorm;
 }
 
 no Moose::Role;
@@ -318,7 +294,7 @@ Photonic::Roles::Geometry
 
 =head1 VERSION
 
-version 0.016
+version 0.017
 
 =head1 SYNOPSIS
 
@@ -332,7 +308,7 @@ version 0.016
 =item (for developers)
 
     package Photonic::Geometry::FromB;
-    $Photonic::Geometry::Geometry::VERSION = '0.016';
+    $Photonic::Geometry::Geometry::VERSION = '0.017';
     use namespace::autoclean;
     use Moose;
     has 'B' =>(is=>'ro', isa=>'PDL', required=>1,

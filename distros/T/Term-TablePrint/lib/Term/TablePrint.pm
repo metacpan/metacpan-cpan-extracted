@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '0.138';
+our $VERSION = '0.139';
 use Exporter 'import';
 our @EXPORT_OK = qw( print_table );
 
@@ -49,24 +49,28 @@ sub new {
 
 
 sub _valid_options {
-    return { # info
+    return {
+        binary_filter     => '[ 0 1 ]',
+        choose_columns    => '[ 0 1 ]', # removed 04.06.2021
+        codepage_mapping  => '[ 0 1 ]',
+        hide_cursor       => '[ 0 1 ]', # documentation
+        keep_header       => '[ 0 1 ]', # removed 04.06.2021
+        mouse             => '[ 0 1 ]',
+        squash_spaces     => '[ 0 1 ]',
+        color             => '[ 0 1 2 ]',
+        f3                => '[ 0 1 2 ]',
+        page              => '[ 0 1 2 ]', # undocumented
+        grid              => '[ 0 1 2 ]', # removed 04.06.2021
+        table_expand      => '[ 0 1 2 ]', # '[ 0 1 ]',  04.06.2021
+        keep              => '[ 1-9 ][ 0-9 ]*', # undocumented
         max_rows          => '[ 0-9 ]+',
         min_col_width     => '[ 0-9 ]+',
         progress_bar      => '[ 0-9 ]+',
         tab_width         => '[ 0-9 ]+',
-        choose_columns    => '[ 0 1 ]', # removed 04.06.2021
-        binary_filter     => '[ 0 1 ]',
-        codepage_mapping  => '[ 0 1 ]',
-        hide_cursor       => '[ 0 1 ]', # documentation
-        keep_header       => '[ 0 1 ]', # removed 04.06.2021
-        squash_spaces     => '[ 0 1 ]',
-        color             => '[ 0 1 2 ]',
-        grid              => '[ 0 1 2 ]', # removed 04.06.2021
-        f3                => '[ 0 1 2 ]',
-        table_expand      => '[ 0 1 2 ]', # '[ 0 1 ]',  04.06.2021
-        mouse             => '[ 0 1 2 3 4 ]',
         binary_string     => 'Str',
         decimal_separator => 'Str',
+        footer            => 'Str',
+        info              => 'Str',
         prompt            => 'Str',
         table_name        => 'Str',
         undef             => 'Str',
@@ -84,15 +88,19 @@ sub _defaults {
         color             => 0,
         decimal_separator => '.',
         f3                => 1,
+        footer            => undef,
         grid              => 1, # removed 04.06.2021
         hide_cursor       => 1,
+        info              => undef,
+        keep              => undef,
         keep_header       => 1, # removed 04.06.2021
-        squash_spaces     => 0,
         max_rows          => 200000,
         min_col_width     => 30,
         mouse             => 0,
+        page              => 2, ##
         progress_bar      => 40000,
         prompt            => '',
+        squash_spaces     => 0,
         tab_width         => 2,
         table_expand      => 1,
         table_name        => undef,
@@ -166,6 +174,15 @@ sub print_table {
         print "\n";
         exit;
     };
+    if ( defined $self->{table_name} && ! defined $self->{footer} ) { # 24.06.2021
+        $self->{footer} = $self->{table_name};
+    }
+    if ( print_columns( $self->{decimal_separator} ) != 1 ) {
+        $self->{decimal_separator} = '.';
+    }
+    if ( $self->{decimal_separator} ne '.' ) {
+        $self->{thsd_sep} = '_';
+    }
     if ( $self->{hide_cursor} ) {
         print hide_cursor();
     }
@@ -176,12 +193,6 @@ sub print_table {
         );
         $self->__reset();
         return;
-    }
-    if ( print_columns( $self->{decimal_separator} ) != 1 ) {
-        $self->{decimal_separator} = '.';
-    }
-    if ( $self->{decimal_separator} ne '.' ) {
-        $self->{thsd_sep} = '_';
     }
     my $data_row_count = @$tbl_orig - 1;
     my $info_row = '';
@@ -313,8 +324,8 @@ sub __write_table {
     }
     my $prompt = join( "\n", @{$vw->{header}} );
     my $footer;
-    if ( $self->{table_name} ) {
-        $footer = $self->{table_name};
+    if ( $self->{footer} ) {
+        $footer = $self->{footer};
         if ( $vs->{filter} ) {
             $footer .= '/' . $vs->{filter} . '/';
         }
@@ -333,9 +344,10 @@ sub __write_table {
         $ENV{TC_RESET_AUTO_UP} = 0;
         my $row = choose(
             @idxs_tbl_print ? [ @{$vw->{tbl_print}}[@idxs_tbl_print] ] : $vw->{tbl_print},
-            { prompt => $prompt, index => 1, default => $old_row, ll => $vw->{table_w}, layout => 3,
-              clear_screen => 1, mouse => $self->{mouse}, hide_cursor => 0, footer => $footer,
-              color => $self->{color}, codepage_mapping => $self->{codepage_mapping}, f3 => $self->{f3} }
+            { info => $self->{info}, prompt => $prompt, index => 1, default => $old_row, ll => $vw->{table_w},
+              layout => 3, clear_screen => 1, mouse => $self->{mouse}, hide_cursor => 0, footer => $footer,
+              color => $self->{color}, codepage_mapping => $self->{codepage_mapping}, f3 => $self->{f3},
+              keep => $self->{keep}, page => $self->{page} }
         );
         if ( ! defined $row ) {
             return $return;
@@ -697,7 +709,7 @@ sub __print_single_row {
     choose(
         $row_data,
         { prompt => '', layout => 3, clear_screen => 1, mouse => $self->{mouse}, hide_cursor => 0, f3 => $self->{f3},
-          skip_items => $regex, footer => $footer }
+          skip_items => $regex, footer => $footer, page => $self->{page} }
     );
 }
 
@@ -827,7 +839,7 @@ Term::TablePrint - Print a table to the terminal and browse it interactively.
 
 =head1 VERSION
 
-Version 0.138
+Version 0.139
 
 =cut
 
@@ -964,10 +976,6 @@ least one column matches the entered pattern. See option L</f3>.
 
 =head2 OPTIONS
 
-=head3 prompt
-
-String displayed above the table.
-
 =head3 binary_filter
 
 If I<binary_filter> is set to 1, "BNRY" is printed instead of arbitrary binary data.
@@ -977,16 +985,6 @@ If the data matches the repexp C</[\x00-\x08\x0B-\x0C\x0E-\x1F]/>, it is conside
 Printing arbitrary binary data could break the output.
 
 Default: 0
-
-=head3 decimal_separator
-
-Set the decimal separator. Numbers with a decimal separator are formatted as number if this option is set to the right
-value.
-
-Allowed values: a character with a print width of C<1>. If an invalid values is passed, I<decimal_separator> falls back
-to the default value.
-
-Default: . (dot)
 
 =head3 codepage_mapping
 
@@ -1011,6 +1009,16 @@ selected element. If set to C<2>, also for the current selected element the colo
 
 Default: 0
 
+=head3 decimal_separator
+
+Set the decimal separator. Numbers with a decimal separator are formatted as number if this option is set to the right
+value.
+
+Allowed values: a character with a print width of C<1>. If an invalid values is passed, I<decimal_separator> falls back
+to the default value.
+
+Default: . (dot)
+
 =head3 f3
 
 Set the behavior of the C<F3> key.
@@ -1021,14 +1029,24 @@ Set the behavior of the C<F3> key.
 
 2 - case-sensitive search
 
+When C<F3> is pressed and a regexp is entered, the regexp is appended to the end of the footer.
+
 Default: 1
 
-=head3 squash_spaces
+=head3 footer
 
-If I<squash_spaces> is enabled, consecutive spaces are squashed to one space and leading and trailing spaces are
-removed.
+If set (string), I<footer> is added in the bottom line to the page number. It is up to the user to add leading and
+trailing separators.
 
-Default: 0
+If a footer string is passed with this option, the option I<page> is automatically set to C<2>.
+
+Default: undef
+
+=head3 info
+
+Expects as its value a string. The info text is printed above the prompt string.
+
+Default: undef
 
 =head3 max_rows
 
@@ -1061,6 +1079,17 @@ shown while preparing the data for the output.
 
 Default: 40_000
 
+=head3 prompt
+
+String displayed above the table.
+
+=head3 squash_spaces
+
+If I<squash_spaces> is enabled, consecutive spaces are squashed to one space and leading and trailing spaces are
+removed.
+
+Default: 0
+
 =head3 tab_width
 
 Set the number of spaces between columns.
@@ -1080,11 +1109,10 @@ If I<table_expand> is set to 0, the cursor jumps to the to first row (if not alr
 
 Default: 1
 
-=head3 table_name
+=head3 table_name RENAMDED
 
-If set (string), I<table_name> is added in the bottom line.
-
-It is up to the user to add separators.
+The option I<table_name> has been renamed to I<footer>. Use I<footer> instead of I<table_name>. The I<table_name> will
+be removed.
 
 =head3 undef
 

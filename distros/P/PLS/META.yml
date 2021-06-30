@@ -1,0 +1,34 @@
+---
+abstract: 'Perl Language Server'
+author:
+  - unknown
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: PLS
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  IO::Async: '0.78'
+  PPI: '1.264'
+  PPR: '0.000028'
+  Path::Tiny: '0.114'
+  Perl::Critic: '1.138'
+  Perl::Tidy: '20210402'
+  Pod::Find: '1.63'
+  Pod::Markdown: '3.2'
+  URI: '1.76'
+  perl: '5.032'
+resources:
+  repository: https://github.com/FractalBoy/perl-language-server.git
+version: '0.8'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,4 +1,4 @@
-package Dist::Zilla::Stash::Mint 6.020;
+package Dist::Zilla::Stash::Mint 6.022;
 # ABSTRACT: a stash of your default minting provider/profile
 
 use Moose;
@@ -43,7 +43,7 @@ Dist::Zilla::Stash::Mint - a stash of your default minting provider/profile
 
 =head1 VERSION
 
-version 6.020
+version 6.022
 
 =head1 PERL VERSION SUPPORT
 

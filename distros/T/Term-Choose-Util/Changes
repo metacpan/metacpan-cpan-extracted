@@ -1,6 +1,9 @@
 Revision history for Term::Choose::Util
 
 
+0.125   2021-06-30
+        - Update 'choose_a_subset'.
+
 0.124   2021-06-22
         - use Carp again.
         - New options 'page', 'keep' and 'footer'.

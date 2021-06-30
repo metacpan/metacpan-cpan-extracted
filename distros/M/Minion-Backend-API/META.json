@@ -58,6 +58,6 @@
          "web" : "https://github.com/lucas1/Minion-Backend-API"
       }
    },
-   "version" : 0.06,
+   "version" : 1.00,
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

@@ -159,7 +159,10 @@ subtest 'bolt error' => sub {
 	lives_and { ok $f = new_session('Local::Bolt::Failure') } 'new failure';
 	throws_ok { $f->run('dummy') } qr/Bolt error -22: Statement evaluation failed/i, 'run failure';
 	dies_ok { $f->begin_transaction } 'no begin';
-	throws_ok { $f->run([['A'],['B']]) } qr/\bmultiple statements\b/i, 'no multiple';
+	throws_ok {
+		no warnings 'deprecated';
+		$f->run([['A'],['B']]);
+	} qr/\bmultiple statements\b/i, 'no multiple';
 	throws_ok { new_session('Local::Bolt::CxnFailure') } qr/Bolt error -13: all wrong/i, 'new cxn failure';
 };
 
@@ -179,7 +182,7 @@ subtest 'bolt live' => sub {
 	plan tests => 1;
 	throws_ok {
 		Neo4j::Driver->new('bolt://localhost:14')->session();
-	} qr/^Bolt error |\brequires Neo4j::Bolt\b/i, 'bolt connect';
+	} qr/^Bolt error |\bNeo4j::Bolt not installed\b/i, 'bolt connect';
 };
 
 

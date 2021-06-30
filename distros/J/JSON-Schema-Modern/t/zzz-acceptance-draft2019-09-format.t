@@ -28,10 +28,10 @@ acceptance_tests(
     test_subdir => 'optional/format',
   },
   evaluator => {
-    specification_version => 'draft2019-09',
+    specification_version => $version,
     validate_formats => 1,
   },
-  output_file => $version.'-format.txt',
+  output_file => $version.'-acceptance-format.txt',
   test => {
     $ENV{NO_TODO} ? () : ( todo_tests => [
       { file => [

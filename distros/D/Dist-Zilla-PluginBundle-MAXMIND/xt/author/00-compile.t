@@ -2,16 +2,15 @@ use 5.006;
 use strict;
 use warnings;
 
-# this test was generated with Dist::Zilla::Plugin::Test::Compile 2.057
+# this test was generated with Dist::Zilla::Plugin::Test::Compile 2.058
 
 use Test::More;
 
-plan tests => 10;
+plan tests => 9;
 
 my @module_files = (
     'Dist/Zilla/Plugin/MAXMIND/CheckChangesHasContent.pm',
     'Dist/Zilla/Plugin/MAXMIND/Contributors.pm',
-    'Dist/Zilla/Plugin/MAXMIND/Git/CheckFor/CorrectBranch.pm',
     'Dist/Zilla/Plugin/MAXMIND/License.pm',
     'Dist/Zilla/Plugin/MAXMIND/TidyAll.pm',
     'Dist/Zilla/Plugin/MAXMIND/VersionProvider.pm',

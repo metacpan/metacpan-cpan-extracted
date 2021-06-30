@@ -1,8 +1,13 @@
 Revision history for Perl extension Search::Indexer.
 
-0.79 30.05.2018 
-  - fixed bug on full text search
-  
+1.0  29.06.2021
+  - new algorithm (Okapi bm25) for relevancy scores, like ElasticSearch or SQLite FTS5
+  - default tokenizer now relies on unicode \p{Word}
+  - use BerkeleyDB "partials" for more efficient indexing
+  - general revision of the source code and documentation
+  - upgrade tests to use Test2::V0
+  INDEXES ARE NOT COMPATIBLE WITH PREVIOUS VERSION, you need to reindex your docs.
+
 0.78 11.02.2016
   - suppress spurious warnings in Indexer.pm
 

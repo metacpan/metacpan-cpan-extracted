@@ -1,0 +1,28 @@
+NAME
+
+    Dist::Zilla::PluginBundle::Author::VNEALV - yet another plugin bundle
+    for Dist::Zilla
+
+DESCRIPTION
+
+    See https://metacpan.org/author/VNEALV for modules which may possibly
+    use this.
+
+AUTHOR
+
+    Nael Alolwani <VNEALV@cpan.org>, but structure mostly taken from other
+    plugin bundles such as:
+
+      * Dist::Zilla::PluginBundle::Author::TEAM
+
+      * Dist::Zilla::PluginBundle::Author::OALDERS
+
+      * Dist::Zilla::PluginBundle::Author::ETHER
+
+      * Dist::Zilla::Plugin::Author::Plicease
+
+LICENSE
+
+    Copyright Nael Alolwani 2021. Licensed under the same terms as Perl
+    itself.
+

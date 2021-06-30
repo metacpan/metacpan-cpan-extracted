@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '0.124';
+our $VERSION = '0.125';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose_a_directory choose_a_file choose_directories choose_a_number choose_a_subset settings_menu
                      insert_sep get_term_size get_term_width get_term_height unicode_sprintf );
@@ -764,7 +764,7 @@ sub choose_a_subset {
         my $lines = join "\n", @tmp;
         # Choose
         my @idx = choose(
-            [ @pre, map { $self->{prefix} . ( defined $_ ? $_ : '' ) } @$curr_avail ],
+            [ @pre, length( $self->{prefix} ) ? map { $self->{prefix} . ( defined $_ ? $_ : '' ) } @$curr_avail : @$curr_avail ],
             { info => $self->{info}, prompt => $lines, layout => $self->{layout}, index => 1,
               alignment => $self->{alignment}, order => $self->{order}, mouse => $self->{mouse},
               meta_items => $meta_items, mark => $mark, include_highlighted => 2,
@@ -1019,7 +1019,7 @@ Term::Choose::Util - TUI-related functions for selecting directories, files, num
 
 =head1 VERSION
 
-Version 0.124
+Version 0.125
 
 =cut
 

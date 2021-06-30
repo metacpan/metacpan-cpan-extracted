@@ -189,7 +189,7 @@ Make sure your pod is correct and can also be parsed by the pod-modules in
 the lowest version of perl you support (or mention that you need at least
 version whatever to read the pod as intended).
 
-The web is dynamic and some (external) references might seize to exist not
+The web is dynamic and some (external) references might cease to exist not
 telling you, so checking links used in your documentation once in a while
 might hint you to updated sites.
 
@@ -587,7 +587,7 @@ you could use to improve your code. If the changes they made are already taken
 into your own code, or your code offers a (better) alternative to their change
 you could comment on their commits with additional information.
 
-Likewise if you use [RT](https://rt.perl.org) as bug tracker.
+Likewise if you use [RT](https://rt.cpan.org) as bug tracker.
 
 If any ticket is entered as a vulnerability issue, be sure to make clear in
 the feedback to that issue that it is indeed a security issue and how you
@@ -626,7 +626,7 @@ Of course it is impossible to cover every possible situation here. The DarkPAN
 
 # LICENSE
 
-Copyright (C) 2015-2020 H.Merijn Brand.  All rights reserved.
+Copyright (C) 2015-2021 H.Merijn Brand.  All rights reserved.
 
 This library is free software;  you can redistribute and/or modify it under
 the same terms as Perl itself.

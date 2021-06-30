@@ -5,20 +5,21 @@ use utf8;
 
 package Neo4j::Driver::Result::Jolt;
 # ABSTRACT: Jolt result handler
-$Neo4j::Driver::Result::Jolt::VERSION = '0.23';
+$Neo4j::Driver::Result::Jolt::VERSION = '0.25';
 
 use parent 'Neo4j::Driver::Result';
 
 use Carp qw(carp croak);
 our @CARP_NOT = qw(Neo4j::Driver::Net::HTTP Neo4j::Driver::Result);
 
-use JSON::MaybeXS 1.003003 ();
 
+my ($TRUE, $FALSE);
 
-our $MEDIA_TYPE = "application/vnd.neo4j.jolt+json-seq";
-our $ACCEPT_HEADER = "$MEDIA_TYPE";
-our $ACCEPT_HEADER_STRICT = "$MEDIA_TYPE;strict=true";
-our $ACCEPT_HEADER_SPARSE = "$MEDIA_TYPE;strict=false";
+my $MEDIA_TYPE = "application/vnd.neo4j.jolt";
+my $ACCEPT_HEADER = "$MEDIA_TYPE+json-seq";
+my $ACCEPT_HEADER_STRICT = "$MEDIA_TYPE+json-seq;strict=true";
+my $ACCEPT_HEADER_SPARSE = "$MEDIA_TYPE+json-seq;strict=false";
+my $ACCEPT_HEADER_NDJSON = "$MEDIA_TYPE";
 
 
 our $gather_results = 1;  # 1: detach from the stream immediately (yields JSON-style result; used for testing)
@@ -37,6 +38,8 @@ sub new {
 		cypher_types => $params->{cypher_types},
 	};
 	bless $self, $class;
+	
+	($TRUE, $FALSE) = @{ $self->{json_coder}->decode('[true,false]') } unless $TRUE;
 	
 	return $self->_gather_results($params) if $gather_results;
 	
@@ -194,10 +197,10 @@ sub _deep_bless {
 		$data->[$_] = $self->_deep_bless($data->[$_]) for 0 .. $#{$data};
 		return $data;
 	}
-	if (ref $data eq '') {  # Integer (sparse) or String (sparse)
+	if (ref $data eq '') {  # Null or Integer (sparse) or String (sparse)
 		return $data;
 	}
-	if (JSON::MaybeXS::is_bool $data) {  # Boolean (sparse)
+	if ($data == $TRUE || $data == $FALSE) {  # Boolean (sparse)
 		return $data;
 	}
 	
@@ -207,9 +210,8 @@ sub _deep_bless {
 	my $value = $data->{$sigil};
 	
 	if ($sigil eq '?') {  # Boolean (strict)
-		# TODO: check if this is supported by early JSON::MaybeXS versions with all backends
-		return $self->{json_coder}->true if $value eq 'true';
-		return $self->{json_coder}->false if $value eq 'false';
+		return $TRUE  if $value eq 'true';
+		return $FALSE if $value eq 'false';
 		die "Assertion failed: unexpected bool value: " . $value;
 	}
 	if ($sigil eq 'Z') {  # Integer (strict)
@@ -295,21 +297,22 @@ sub _deep_bless {
 
 
 sub _accept_header {
-	my ($class, $request_jolt, $method) = @_;
+	my (undef, $want_jolt, $method) = @_;
 	
 	return unless $method eq 'POST';  # work around Neo4j HTTP Content Negotiation bug #12644
 	
-	if (defined $request_jolt) {
-		return if ! $request_jolt;
-		return ($ACCEPT_HEADER_STRICT) if $request_jolt eq 'strict';
-		return ($ACCEPT_HEADER_SPARSE) if $request_jolt eq 'sparse';
+	if (defined $want_jolt) {
+		return if ! $want_jolt;
+		return ($ACCEPT_HEADER_STRICT) if $want_jolt eq 'strict';
+		return ($ACCEPT_HEADER_SPARSE) if $want_jolt eq 'sparse';
+		return ($ACCEPT_HEADER_NDJSON) if $want_jolt eq 'ndjson';
 	}
 	return ($ACCEPT_HEADER);
 }
 
 
 sub _acceptable {
-	my ($class, $content_type) = @_;
+	my (undef, $content_type) = @_;
 	
 	return $content_type =~ m/^\Q$MEDIA_TYPE\E\b/i;
 }
@@ -329,7 +332,7 @@ Neo4j::Driver::Result::Jolt - Jolt result handler
 
 =head1 VERSION
 
-version 0.23
+version 0.25
 
 =head1 DESCRIPTION
 

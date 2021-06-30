@@ -1,0 +1,44 @@
+#+TODO: TODO PARTIAL INPROGRESS WAITING PENDING | DONE OLD CANCELLED RETIRED DELEGATED FAILED DUPE
+#+TODO: BUG | NOTBUG FIXED CANTREPRO WONTFIX CANTFIX
+#+TODO: IDEA WISHLIST | CANCELLED REJECTED
+#+TODO: POTENTIAL | CANTUSE
+
+* proj > perl [0/1]
+** TODO [2021-06-26 Sat] SQLite::KeyValueStore::Simple: add delete function
+** BUG [2021-06-21 Mon] Perinci::CmdLine: unwanted removal of quotes?
+example:
+
+: ... | csv-map -H --eval '"FOO"'
+
+when $args{eval} is received by the function, if becomes ~FOO~ and not ~"FOO"~.
+in other words, the extra quote is stripped.
+** BUG [2021-06-21 Mon] Config::IOD: set_value() eats comments
+- log ::
+  + [2021-06-22] this is because currently "raw value" is set, not "value".
+  + [2021-06-21] entry
+** WISHLIST [2021-06-18 Fri] Acme::CPANModules: category
+we can already do this with Rinci, using 'category:' tags. we just need the
+figure out how to encode category when we are writing module name in markdown
+description ("<pm:Foo::Bar>").
+** IDEA [2021-06-17 Thu] [#C] perl module: Software::Catalog::SW::rakudo::moar
+note: we need at least rakudo, perl6, and zef to install to /usr/local/bin.
+* proj > perl > csvutils [0/2]
+** TODO [2020-05-26 Tue] create a more generic version of csv-grep or csv-map
+allow perl code specified in cli to modify or filter table rows. able to operate
+on homs (hash of maybe-strings) or aoms (array of maybe-strings).
+
+this can be applied for other cli like firefox-mua-delete-containers or
+firefox-mua-modify-containers, example:
+
+to change all colors to 'red' dan all icons to 'fingerprint':
+
+: % firefox-mua-modify-containers -e '$_->{color} = "red"; $_->{icon} = "fingerprint"'; # of course there will be a --dry-run option
+
+to delete all containers containing /test/ in their name:
+
+: % firefox-mua-delete-containers -e '$_->{name} =~ /test/'; # of course there will be a --dry-run option
+
+- log ::
+  + [2020-06-03 Wed] done on firefox-mua-modify-containers (can delete items as
+    well by the code returning false/undef)
+** TODO [2020-05-29 Fri] [#C] csvutils: make csv-grep-fields, a more flexible form of csv-select-fields

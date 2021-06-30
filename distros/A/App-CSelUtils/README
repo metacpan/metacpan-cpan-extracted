@@ -2,8 +2,8 @@ NAME
     App::CSelUtils - Utilities related to Data::CSel
 
 VERSION
-    This document describes version 0.087 of App::CSelUtils (from Perl
-    distribution App-CSelUtils), released on 2021-02-19.
+    This document describes version 0.088 of App::CSelUtils (from Perl
+    distribution App-CSelUtils), released on 2021-06-27.
 
 DESCRIPTION
     This distribution contains the following utilities:
@@ -16,7 +16,7 @@ FUNCTIONS
   ddsel
     Usage:
 
-     ddsel(%args) -> [status, msg, payload, meta]
+     ddsel(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
     Select Perl data structure elements using CSel (CSS-selector-like)
     syntax.
@@ -108,19 +108,22 @@ FUNCTIONS
 
     Returns an enveloped result (an array).
 
-    First element (status) is an integer containing HTTP status code (200
-    means OK, 4xx caller error, 5xx function error). Second element (msg) is
-    a string containing error message, or 'OK' if status is 200. Third
-    element (payload) is optional, the actual result. Fourth element (meta)
-    is called result metadata and is optional, a hash that contains extra
-    information.
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
 
     Return value: (any)
 
   parse_csel
     Usage:
 
-     parse_csel(%args) -> [status, msg, payload, meta]
+     parse_csel(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
     Parse CSel expression.
 
@@ -132,12 +135,15 @@ FUNCTIONS
 
     Returns an enveloped result (an array).
 
-    First element (status) is an integer containing HTTP status code (200
-    means OK, 4xx caller error, 5xx function error). Second element (msg) is
-    a string containing error message, or 'OK' if status is 200. Third
-    element (payload) is optional, the actual result. Fourth element (meta)
-    is called result metadata and is optional, a hash that contains extra
-    information.
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
 
     Return value: (any)
 
@@ -151,7 +157,7 @@ SOURCE
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website
-    <https://github.com/perlancar/perl-App-CSelUtils/issues>
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-CSelUtils>
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.

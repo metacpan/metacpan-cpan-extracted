@@ -1,7 +1,7 @@
-
+ok 
 =head1 NAME
 
-Hustle::Table - Fast dynamic dispatching to subroutines
+Hustle::Table - Pattern dispatching to subroutines
 
 =head1 SYNOPSIS
 
@@ -167,23 +167,37 @@ later to reorder the list.
 
 =head2 ADDING
 
-Entries are added in either anonymous hash or array format, using the C<add>
-method.  Array entries must contain four elements, in the order of:
+Entries are added in anonymous hash, anonymous array or flattened format, using
+the C<add> method.
+
+Array entries must contain four elements, in the order of:
 	
-	[$matcher,$sub,$label,$count]
+	$table->add([$matcher,$sub,$label,$count]);
 
-Hashes only need to specify the matcher and sub pairs
+Hashes ref format only need to specify the matcher and sub pairs
 
-	{matcher=>$matcher, sub=>$sub, label=>$label, count=>$count}
+	$table->add({matcher=>$matcher, sub=>$sub, label=>$label, count=>$count});
 
-In either case, C<$sub> is the only field/item that must be defined. It must
-also be a CODE reference. 
+Single flattened format takes a list directly
+
+	$table->add(matcher=>$matcher, sub => $sub);
+
+Or add at once using mixed formats together
+
+	$table->add(
+		[$matcher, $sub, $label, $count],
+		{matcher=> $matcher, sub=>$sub},
+		matcher=>$matcher, sub=>$sub
+	);
+
+In any case,C<$matcher> and C<$sub> are the only items which must be defined.
+C<$sub> must also be a CODE reference. 
 
 If a label is not specified, one will be generated automatically. All the
 labels used in a call to C<add> are returned in the same order as the input
 arguments.
 
-Note the auto generated labels are only unique in the lifetime of a single
+Auto generated labels are only unique in the lifetime of a single
 table. If permanent/globally unique labels are need, the user will need to
 generate them.
 
@@ -244,7 +258,23 @@ Dispatcher which only updates the count statistics. DOES NOT call dispatch vecto
 
 =back 
 
+=item cache
+
+The hash ref to use as the dispatchers cache
+
+=item reorder
+
+Flag indicating the table should be reorderd/optimisted before building the disptacher.
+
+=item reset
+
+Flag specifying if counter statistics should be reset before building a dispatcher
+
 =back
+
+If no arguments are provided, the dispatcher will be created with the following defaults:
+
+	my $dispatcher=$table->prepare_dispatcher(type=>"online", cache=>undef, reset=>undef, reorder=>1);
 
 =head1 USING A DISPATCHER
 
@@ -311,6 +341,14 @@ Please report via github
 =head1 TODO
 
 =over
+
+=item *
+
+Write tests for removing entries
+
+=item *
+
+Write tests for offline dispatcher
 
 =item *
 

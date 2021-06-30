@@ -9,7 +9,7 @@ use warnings;
 
 use v5.26;
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 use Types::Standard qw[ Str ArrayRef StrMatch Enum Bool Optional Dict ];
 use Types::Common::Numeric qw[ PositiveOrZeroInt PositiveInt ];
@@ -564,16 +564,19 @@ sub BUILD ( $self, $ ) {
 
 
 
-sub parse_filename ($, $filename) {
+sub parse_filename ( $, $filename ) {
 
     _croak( "can't parse filename: @{[ $filename // '<undef>' ]}" )
       unless defined $filename && $filename =~ $FileName;
 
     my %match = %+;
+
     if ( exists $match{col_bin_row} ) {
         # * didn't match [image_section][pix filter]
         # * found a bunch of things.
-        for my $spec ( $match{col_bin_row} =~ /( \[ [^\]]* \] )/xg ) {
+        for my $spec (
+            $match{col_bin_row} =~ /( \[ $PossiblyQuotedStringInSpec \] )/xg )
+        {
 
             if ( $spec =~ $binSpec ) {
                 push(
@@ -592,7 +595,11 @@ sub parse_filename ($, $filename) {
                 );
             }
             elsif ( $spec =~ $colFilter ) {
-                push( ( $match{col_filter} //= [] )->@*, $+{col_filter} );
+
+                push(
+                    ( $match{col_filter} //= [] )->@*,
+                    $+{col_filter} =~ m/$PossiblyQuotedStringInList/g
+                );
             }
             elsif ( $spec =~ $rowFilter ) {
                 push( ( $match{row_filter} //= [] )->@*, $+{row_filter} );
@@ -634,6 +641,9 @@ sub parse_filename ($, $filename) {
         };
         delete $match{pix_filter_discard_hdus};
     }
+
+    # remove undefined entries
+    delete @match { grep ! defined $match{$_}, keys %match };
 
     \%match;
 }
@@ -741,7 +751,7 @@ sub render_pix_filter ( $self ) {
 
 sub render_col_filter ( $self ) {
     return $self->has_col_filter
-      ? join('', map { "[col $_]" } $self->col_filter->@* )
+      ? '[col ' . join(';', $self->col_filter->@* ) . ']'
       : '';
 }
 
@@ -846,7 +856,7 @@ Astro::FITS::CFITSIO::FileName - parse and generate CFITSIO extended file names.
 
 =head1 VERSION
 
-version 0.03
+version 0.05
 
 =head1 SYNOPSIS
 

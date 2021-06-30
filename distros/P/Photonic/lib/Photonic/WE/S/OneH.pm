@@ -1,5 +1,5 @@
 package Photonic::WE::S::OneH;
-$Photonic::WE::S::OneH::VERSION = '0.016';
+$Photonic::WE::S::OneH::VERSION = '0.017';
 
 =encoding UTF-8
 
@@ -9,7 +9,7 @@ Photonic::WE::S::OneH
 
 =head1 VERSION
 
-version 0.016
+version 0.017
 
 =head1 SYNOPSIS
 
@@ -173,11 +173,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA  02110-1301 USA
 use namespace::autoclean;
 use PDL::Lite;
 use PDL::NiceSlice;
-use PDL::FFTW3;
-use PDL::Complex;
 use Carp;
 use Photonic::Types;
-use Photonic::Utils qw(VSProd any_complex);
+use Photonic::Utils qw(VSProd any_complex GtoR RtoG);
 use Moose;
 use MooseX::StrictConstructor;
 
@@ -201,15 +199,14 @@ sub applyOperator {
     $mask=$self->mask if $self->use_mask;
     my $gpsi=$self->applyMetric($psi);
     # gpsi is ri:xy:pm:nx:ny. Get cartesian and pm out of the way and
-    # transform to real space. Note FFFTW3 wants real PDL's[2,...]
-    my $gpsi_r=ifftn($gpsi->mv(1,-1)->mv(1,-1), $self->ndims);
-    #ri:nx:ny:xy:pm
+    my $gpsi_r=GtoR($gpsi, $self->ndims, 2)->mv(0,-1)->mv(0,-1);
+    #nx:ny:xy:pm
     my $H=($self->epsilonR-$self->epsilon)/$self->epsilonR;
-    my $Hgpsi_r=$H*$gpsi_r; #ri:nx:ny:xy:pm
+    my $Hgpsi_r=$H*$gpsi_r; #nx:ny:xy:pm
     #Transform to reciprocal space, move xy and pm back and make complex,
-    my $psi_G=fftn($Hgpsi_r, $self->ndims)->mv(-1,1)->mv(-1,1);
+    my $psi_G=RtoG($Hgpsi_r->mv(-1,0)->mv(-1,0), $self->ndims, 2);
     #Apply mask
-    #psi_G is ri:xy:pm:nx:ny mask is nx:ny
+    #psi_G is xy:pm:nx:ny mask is nx:ny
     $psi_G=$psi_G*$mask->(*1,*1) if defined $mask; #use dummies for xy:pm
     return $psi_G;
 }
@@ -217,12 +214,12 @@ sub applyOperator {
 sub applyMetric {
     my $self=shift;
     my $psi=shift;
-    #psi is ri:xy:pm:nx:ny
+    #psi is xy:pm:nx:ny
     my $g=$self->metric->value;
-    #$g is xy:xy:pm:nx:ny  or ri:xy:xy:pm:nx:ny
+    #$g is xy:xy:pm:nx:ny
     #real or complex matrix times complex vector
-    my $gpsi=($g*$psi(:,:,*1)) #ri:xy:xy:pm:nx:ny
-	->sumover; #ri:xy:pm:nx:ny
+    my $gpsi=($g*$psi(*1)) #xy:xy:pm:nx:ny
+	->sumover; #xy:pm:nx:ny
     return $gpsi;
 }
 
@@ -246,24 +243,23 @@ sub changesign { #don't change sign
 
 sub _firstState { #\delta_{G0}
     my $self=shift;
-    my $v=PDL->zeroes(2,@{$self->dims})->r2C; #ri:pm:nx:ny...
-    my $arg=join ',', "(0)", ':', ("(0)") x $self->ndims; #(0),(0),... ndims+1 times
+    my $v=PDL->zeroes(2,@{$self->dims})->r2C; #pm:nx:ny...
+    my $arg=join ',', ':', ("(0)") x $self->ndims; #(0),(0),... ndims+1 times
     $v->slice($arg).=1/sqrt(2);
-    my $e=$self->polarization; #ri:xy
-    my $d=$e->dim(1);
-    croak "Polarization has wrong dimensions. " .
-	  " Should be $d-dimensional complex vector."
-	unless any_complex($e) && $e->ndims==2 &&
-	$e->dim(0)==2 && $e->dim(1)==$d;
-    my $modulus2=$e->Cabs2->sumover;
-    croak "Polarization should be non null" unless
+    my $e=$self->polarization; #xy
+    my $d=$e->dim(0);
+    confess "Polarization has wrong dimensions. " .
+	  " Should be $d-dimensional complex vector, got ($e)."
+	unless any_complex($e) && $e->dim(0)==$d;
+    my $modulus2=$e->abs2->sumover;
+    confess "Polarization should be non null" unless
 	$modulus2 > 0;
     $e=$e/sqrt($modulus2);
     $self->_normalizedPolarization($e);
     #I'm using the same polarization for k and for -k. Could be
     #different (for chiral systems, for example
-    my $phi=$e*$v(,*1); #initial state ordinarily normalized
-                       # ri:xy:pm:nx:ny
+    my $phi=$e*$v(*1); #initial state ordinarily normalized
+                       # xy:pm:nx:ny
     return $phi;
 }
 

@@ -17,34 +17,34 @@ name: Release-Checklist
 provides:
   Release::Checklist:
     file: Checklist.pm
-    version: 0.12
+    version: 0.13
 recommends:
   CPAN::Meta::Converter: 2.150010
   CPAN::Meta::Validator: 2.150010
   Devel::Cover: 1.36
   Devel::PPPort: 3.62
-  JSON::PP: 4.05
+  JSON::PP: 4.06
   Module::CPANTS::Analyse: 1.01
-  Module::Release: 2.125
+  Module::Release: 2.128
   Parse::CPAN::Meta: 2.150010
-  Perl::Critic: 1.138
-  Perl::Critic::TooMuchCode: 0.14
-  Perl::MinimumVersion: 1.38
-  Perl::Tidy: 20201207
+  Perl::Critic: 1.140
+  Perl::Critic::TooMuchCode: 0.15
+  Perl::MinimumVersion: 1.40
+  Perl::Tidy: 20210625
   Pod::Escapes: 1.07
   Pod::Parser: 1.63
   Pod::Spell: 1.20
   Pod::Spell::CommonMistakes: 1.002
-  Test2::Harness: 1.000042
+  Test2::Harness: 1.000058
   Test::CPAN::Changes: 0.400002
   Test::CPAN::Meta::YAML: 0.25
   Test::Kwalitee: 1.28
-  Test::Manifest: 2.021
+  Test::Manifest: 2.022
   Test::MinimumVersion: 0.101082
   Test::MinimumVersion::Fast: 0.04
-  Test::More: 1.302183
+  Test::More: 1.302185
   Test::Perl::Critic: 1.04
-  Test::Perl::Critic::Policy: 1.138
+  Test::Perl::Critic::Policy: 1.140
   Test::Pod: 1.52
   Test::Pod::Coverage: 1.10
   Test::Version: 2.09
@@ -60,4 +60,4 @@ resources:
   bugtracker: https://github.com/Tux/Release-Checklist/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/Tux/Release-Checklist
-version: 0.12
+version: 0.13

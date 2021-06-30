@@ -1,4 +1,4 @@
-package Dist::Zilla::Role::PrereqSource 6.020;
+package Dist::Zilla::Role::PrereqSource 6.022;
 # ABSTRACT: something that registers prerequisites
 
 use Moose::Role;
@@ -37,7 +37,7 @@ Dist::Zilla::Role::PrereqSource - something that registers prerequisites
 
 =head1 VERSION
 
-version 6.020
+version 6.022
 
 =head1 DESCRIPTION
 

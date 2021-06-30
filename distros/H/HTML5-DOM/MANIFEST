@@ -6,8 +6,8 @@ examples/html5lib_tests.pl
 examples/simple.pl
 gen/modest_errors.c
 gen/tags_ua_style.c
-HTML5-DOM-1.17/META.json
-HTML5-DOM-1.17/META.yml
+HTML5-DOM-1.23/META.json
+HTML5-DOM-1.23/META.yml
 leaks.pl
 lib/HTML5/DOM.pm
 lib/HTML5/DOM.pod
@@ -41,6 +41,7 @@ modest_myport.c
 modest_myurl.c
 port/openbsd/mcsync.c
 ppport.h
+README
 README.pod
 scripts/gen.pl
 scripts/tags.txt
@@ -48,6 +49,7 @@ t/0-api.t
 t/1-api-use-utf8.t
 t/2-encodings.t
 third_party/modest/.travis.yml
+third_party/modest/CMakeLists.txt
 third_party/modest/debian/changelog
 third_party/modest/debian/compat
 third_party/modest/debian/control
@@ -161,6 +163,7 @@ third_party/modest/include/mycss/selectors/value.h
 third_party/modest/include/mycss/selectors/value_resource.h
 third_party/modest/include/mycss/stack.h
 third_party/modest/include/mycss/stylesheet.h
+third_party/modest/include/mycss/syntax_ending.h
 third_party/modest/include/mycss/tokenizer.h
 third_party/modest/include/mycss/tokenizer_end.h
 third_party/modest/include/mycss/tokenizer_global.h
@@ -235,6 +238,7 @@ third_party/modest/include/myurl/url.h
 third_party/modest/include/myurl/utils.h
 third_party/modest/LICENSE
 third_party/modest/modest.pc.in
+third_party/modest/modestConfig.cmake.in
 third_party/modest/source/modest/declaration.c
 third_party/modest/source/modest/declaration.h
 third_party/modest/source/modest/finder/finder.c

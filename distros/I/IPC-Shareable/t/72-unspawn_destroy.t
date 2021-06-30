@@ -1,13 +1,14 @@
 use warnings;
 use strict;
 
-unless ( $ENV{RELEASE_TESTING} ) {
-#    plan( skip_all => "Author test: RELEASE_TESTING not set" );
-}
-
+use Config;
 use Data::Dumper;
 use IPC::Shareable;
 use Test::More;
+
+if ($Config{nvsize} != 8) {
+    plan skip_all => "Storable not compatible with long doubles";
+}
 
 tie my %h, 'IPC::Shareable', {
     key       => 'aaaa',

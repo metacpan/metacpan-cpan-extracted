@@ -1,5 +1,5 @@
 package Photonic::WE::S::Metric;
-$Photonic::WE::S::Metric::VERSION = '0.016';
+$Photonic::WE::S::Metric::VERSION = '0.017';
 
 =encoding UTF-8
 
@@ -9,7 +9,7 @@ Photonic::WE::S::Metric
 
 =head1 VERSION
 
-version 0.016
+version 0.017
 
 =head1 COPYRIGHT NOTICE
 
@@ -85,7 +85,6 @@ use namespace::autoclean;
 use PDL::Lite;
 use PDL::MatrixOps;
 use PDL::NiceSlice;
-use PDL::Complex;
 use Carp;
 use Photonic::Types;
 use Photonic::Utils qw(any_complex);
@@ -109,22 +108,22 @@ sub _value {
     my $k=$self->wavevector;
     if(any_complex($eps, $k, $q)) { #complex metric
 	#Make all complex
-	$_ = $_->isa('PDL::Complex') ? $_ : r2C($_) for $q, $k, $eps;
+	$_ = PDL::r2C($_) for $q, $k, $eps;
 	croak "Wave vector must be ".$self->ndims."-dimensional vector" unless
-	    $k->dim(1)==$self->ndims and $k->ndims==2;
-	my ($kPG, $kMG) = ($k+$G, $k-$G); #ri:xy:nx:ny
+	    $k->dim(0)==$self->ndims;
+	my ($kPG, $kMG) = ($k+$G, $k-$G); #xy:nx:ny
 	# (k+G)(k+G) diad
-	my ($kPGkPG, $kMGkMG) = map {$_->(:,:,*1)*$_->(:,*1,:)}
-	   ($kPG, $kMG); #ri:xy:xy:nx:ny
+	my ($kPGkPG, $kMGkMG) = map $_->(:,*1)*$_->(*1),
+	   $kPG, $kMG; #xy:xy:nx:ny
 	# interior product
-	my ($kPG2,$kMG2) = map {($_*$_)->sumover}  ($kPG, $kMG); #ri:nx:ny;
+	my ($kPG2,$kMG2) = map +($_*$_)->sumover, $kPG, $kMG; #nx:ny;
 	my $id=identity($self->ndims);
-	my $k02=$eps*$q*$q; # squared wavenumber in 'host' ri
+	my $k02=$eps*$q*$q; # squared wavenumber in 'host'
 	#xyz xyz nx ny nz
 	#cartesian matrix for each wavevector.
-	my $gPGG=($k02*$id-$kPGkPG)/(($k02-$kPG2)->(:,*1,*1)); #ri:xy:xy:nx:ny
-	my $gMGG=($k02*$id-$kMGkMG)/(($k02-$kMG2)->(:,*1,*1)); #ri:xy:xy:nx:ny
-	my $gGG=PDL->pdl($gPGG, $gMGG)->mv(-1,3)->complex; #ri:xy:xy:pm:nx:ny
+	my $gPGG=($k02*$id-$kPGkPG)/(($k02-$kPG2)->(*1,*1)); #xy:xy:nx:ny
+	my $gMGG=($k02*$id-$kMGkMG)/(($k02-$kMG2)->(*1,*1)); #xy:xy:nx:ny
+	my $gGG=PDL->pdl($gPGG, $gMGG)->mv(-1,2); #xy:xy:pm:nx:ny
 	return $gGG;
     }
     croak "Wave vector must be ".$self->ndims."-dimensional vector" unless
@@ -132,9 +131,9 @@ sub _value {
     #might generalize to complex k
     my ($kPG, $kMG) = ($k+$G, $k-$G); #xy:nx:ny
     # (k+G)(k+G) diad
-    my ($kPGkPG, $kMGkMG) = map {$_->outer($_)} ($kPG, $kMG); #xy:xy:nx:ny
+    my ($kPGkPG, $kMGkMG) = map $_->outer($_), $kPG, $kMG; #xy:xy:nx:ny
     # interior product
-    my ($kPG2,$kMG2) = map {$_->inner($_)}  ($kPG, $kMG); #nx:ny;
+    my ($kPG2,$kMG2) = map $_->inner($_), $kPG, $kMG; #nx:ny;
     my $id=identity($self->ndims);
     my $k02=$eps*$q*$q; # squared wavenumber in 'host'
     #xyz xyz nx ny nz
@@ -144,6 +143,5 @@ sub _value {
     my $gGG=PDL->pdl($gPGG, $gMGG)->mv(-1,2); #xy:xy:pm:nx:ny
     return $gGG;
 }
-
 
 1;

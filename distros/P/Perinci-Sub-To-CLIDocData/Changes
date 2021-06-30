@@ -1,3 +1,9 @@
+0.295   2021-06-27  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux] In usage line, separate options and arguments with '--' for
+	  clarity (suggested by JONASS).
+
+
 0.294   2020-04-27  Released-By: PERLANCAR; Urgency: medium
 
 	- Observe's common option's 'value_label' key.

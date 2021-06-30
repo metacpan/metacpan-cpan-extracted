@@ -1,0 +1,26 @@
+version=0.011
+
+name=App-orgsel
+
+[InsertExample]
+
+[InsertCommandOutput]
+
+[@Author::PERLANCAR]
+:version=0.604
+
+[Prereqs / TestRequires]
+;Test::More=0.98
+
+[Prereqs]
+perl=5.010001
+strict=0
+warnings=0
+App::CSelUtils=0.084
+Org::Parser=0.53
+Perinci::CmdLine::Any=0
+
+[Prereqs / DevelopX_spec]
+-phase=develop
+-relationship=x_spec
+Rinci=1.1.90

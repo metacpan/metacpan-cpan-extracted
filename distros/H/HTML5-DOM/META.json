@@ -4,7 +4,7 @@
       "Kirill Zhumarin <kirill.zhumarin@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "mit"
    ],
@@ -33,12 +33,15 @@
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Azq2/perl-html5-dom/issues"
+      },
       "repository" : {
          "type" : "git",
          "url" : "https://github.com/Azq2/perl-html5-dom.git",
          "web" : "https://github.com/Azq2/perl-html5-dom"
       }
    },
-   "version" : "1.18",
+   "version" : "1.23",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

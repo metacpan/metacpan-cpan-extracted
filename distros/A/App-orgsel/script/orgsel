@@ -1,7 +1,9 @@
 #!perl
 
-our $DATE = '2020-04-29'; # DATE
-our $VERSION = '0.011'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-06-27'; # DATE
+our $DIST = 'App-orgsel'; # DIST
+our $VERSION = '0.012'; # VERSION
 
 use 5.010001;
 use strict;
@@ -30,11 +32,243 @@ orgsel - Select Org document elements using CSel (CSS-selector-like) syntax
 
 =head1 VERSION
 
-This document describes version 0.011 of orgsel (from Perl distribution App-orgsel), released on 2020-04-29.
+This document describes version 0.012 of orgsel (from Perl distribution App-orgsel), released on 2021-06-27.
 
 =head1 SYNOPSIS
 
- % orgsel ~/o/todo.org "Headline[level=2]:first-child"
+Example document F<todo.org> (you can get this from the distribution shared
+file):
+
+ #+TODO: TODO PARTIAL INPROGRESS WAITING PENDING | DONE OLD CANCELLED RETIRED DELEGATED FAILED DUPE
+ #+TODO: BUG | NOTBUG FIXED CANTREPRO WONTFIX CANTFIX
+ #+TODO: IDEA WISHLIST | CANCELLED REJECTED
+ #+TODO: POTENTIAL | CANTUSE
+ 
+ * proj > perl [0/1]
+ ** TODO [2021-06-26 Sat] SQLite::KeyValueStore::Simple: add delete function
+ ** BUG [2021-06-21 Mon] Perinci::CmdLine: unwanted removal of quotes?
+ example:
+ 
+ : ... | csv-map -H --eval '"FOO"'
+ 
+ when $args{eval} is received by the function, if becomes ~FOO~ and not ~"FOO"~.
+ in other words, the extra quote is stripped.
+ ** BUG [2021-06-21 Mon] Config::IOD: set_value() eats comments
+ - log ::
+   + [2021-06-22] this is because currently "raw value" is set, not "value".
+   + [2021-06-21] entry
+ ** WISHLIST [2021-06-18 Fri] Acme::CPANModules: category
+ we can already do this with Rinci, using 'category:' tags. we just need the
+ figure out how to encode category when we are writing module name in markdown
+ description ("<pm:Foo::Bar>").
+ ** IDEA [2021-06-17 Thu] [#C] perl module: Software::Catalog::SW::rakudo::moar
+ note: we need at least rakudo, perl6, and zef to install to /usr/local/bin.
+ * proj > perl > csvutils [0/2]
+ ** TODO [2020-05-26 Tue] create a more generic version of csv-grep or csv-map
+ allow perl code specified in cli to modify or filter table rows. able to operate
+ on homs (hash of maybe-strings) or aoms (array of maybe-strings).
+ 
+ this can be applied for other cli like firefox-mua-delete-containers or
+ firefox-mua-modify-containers, example:
+ 
+ to change all colors to 'red' dan all icons to 'fingerprint':
+ 
+ : % firefox-mua-modify-containers -e '$_->{color} = "red"; $_->{icon} = "fingerprint"'; # of course there will be a --dry-run option
+ 
+ to delete all containers containing /test/ in their name:
+ 
+ : % firefox-mua-delete-containers -e '$_->{name} =~ /test/'; # of course there will be a --dry-run option
+ 
+ - log ::
+   + [2020-06-03 Wed] done on firefox-mua-modify-containers (can delete items as
+     well by the code returning false/undef)
+ ** TODO [2020-05-29 Fri] [#C] csvutils: make csv-grep-fields, a more flexible form of csv-select-fields
+
+Example document F<addressbook.org> (you can get this from the distribution
+shared file):
+
+ #+TODO: TODO | OLD
+ 
+ * business > tax consultants
+ * business > veterinarian
+ ** budi chandra                                                         :vet:
+ - born :: 1981?
+ - notes ::
+   + moslem
+   + has two kids, the older is 10yo @2012
+ - address :: jl anggrek no 123, bandung
+ - opening hours :: every day 07-21, also on call 24h
+ - phone :: 0855 555 1234
+ - log ::
+   + [2012-07-30 ] dr went to our house to vaccinate bonnie
+   + [2010-04-21 ] went to his clinic, bought worm tablets
+ ** deni setiawan                                                        :vet:
+ - notes ::
+   + day-care for dogs etc at his house, but there is concern about ticks
+ - address :: jl mawar 456, bandung
+ - phone :: 022 5551235
+ - log ::
+   + [2013-09-18 Rab] entry
+ * family tree > dad's side
+ ** budi roland                                                     :deceased:
+ ** grace shanti
+ - notes ::
+   + father's first aunt
+   + 85 yo @2021
+ - log ::
+   + [2021-06-26] entry
+ * family tree > mom's side
+ * zzz > old
+ ** OLD rudi sanusi
+ - phone/whatsapp :: 0855 555 9739
+ - log ::
+   + [2021-06-27 Sun] mark as old
+ * zzz > unorganized
+ ** agus (lisa's husband)
+ ** agus putra
+ ** susan muliawati
+ ** susi
+ ** susi (ron's friend)                                                  :vet:
+ - log ::
+   + [2021-04-03] met her again (the 3rd time i guess?) at ron's birthday party.
+     she's married now.
+   + [2019-01-02] entry
+
+To get a picture of the structure, you can use L<dump-org-structure>, for
+example C<dump-org-structure todo.org> will give:
+
+ Document:
+   Setting: "#+TODO: TODO PARTIAL INPROGRESS WAITING PENDING..."
+   Setting: "#+TODO: BUG | NOTBUG FIXED CANTREPRO WONTFIX..."
+   Setting: "#+TODO: IDEA WISHLIST | CANCELLED REJECTED\n"
+   Setting: "#+TODO: POTENTIAL | CANTUSE\n"
+   Text: "\n"
+   Headline: l=1 prog=0/1
+     (title)
+     Text: "proj > perl "
+     (children)
+     Headline: l=2 todo=TODO "** TODO [2021-06-26 Sat] SQLite::KeyValueStore:..."
+       (title)
+       Text:
+         Timestamp: 2021-06-26T00:00:00F "[2021-06-26 Sat]"
+         Text: " SQLite::KeyValueStore::Simple: add delete..."
+     Headline: l=2 todo=BUG
+       (title)
+       Text:
+         Timestamp: 2021-06-21T00:00:00F "[2021-06-21 Mon]"
+         Text: " Perinci::CmdLine: unwanted removal of quotes?"
+       (children)
+       Text: "example:\n\n"
+       FixedWidthSection: ": ... | csv-map -H --eval '\"FOO\"'\n"
+       Text: "\nwhen $args{eval} is received by the function, ..."
+       Text: V "~FOO~"
+       Text: " and not "
+       Text: V "~\"FOO\"~"
+       Text: ".\nin other words, the extra quote is stripped.\n"
+     Headline: l=2 todo=BUG
+       (title)
+       Text:
+         Timestamp: 2021-06-21T00:00:00F "[2021-06-21 Mon]"
+         Text: " Config::IOD: set_value() eats comments"
+       (children)
+       List: D(-) indent=0
+         ListItem: -
+           (description term)
+           Text: "log"
+           (children)
+           Text: "\n"
+         List: U(+) indent=2
+           ListItem: +
+             (children)
+             Timestamp: 2021-06-22T00:00:00F "[2021-06-22]"
+             Text: " this is because currently \"raw value\" is set,..."
+           ListItem: +
+             (children)
+             Timestamp: 2021-06-21T00:00:00F "[2021-06-21]"
+             Text: " entry\n"
+     Headline: l=2 todo=WISHLIST
+       (title)
+       Text:
+         Timestamp: 2021-06-18T00:00:00F "[2021-06-18 Fri]"
+         Text: " Acme::CPANModules: category"
+       (children)
+       Text: "we can already do this with Rinci, using..."
+     Headline: l=2 todo=IDEA prio=C
+       (title)
+       Text:
+         Timestamp: 2021-06-17T00:00:00F "[2021-06-17 Thu]"
+         Text: " perl module: Software::Catalog::SW::rakudo::moar"
+       (children)
+       Text: "note: we need at least rakudo, perl6, and zef..."
+   Headline: l=1 prog=0/2
+     (title)
+     Text: "proj > perl > csvutils "
+     (children)
+     Headline: l=2 todo=TODO
+       (title)
+       Text:
+         Timestamp: 2020-05-26T00:00:00F "[2020-05-26 Tue]"
+         Text: " create a more generic version of csv-grep or..."
+       (children)
+       Text: "allow perl code specified in cli to modify or..."
+       FixedWidthSection: ": % firefox-mua-modify-containers -e '$_->{colo..."
+       Text: "\nto delete all containers containing "
+       Text: I "/test/"
+       Text: " in their name:\n\n"
+       FixedWidthSection: ": % firefox-mua-delete-containers -e '$_->{name..."
+       Text: "\n"
+       List: D(-) indent=0
+         ListItem: -
+           (description term)
+           Text: "log"
+           (children)
+           Text: "\n"
+         List: U(+) indent=2
+           ListItem: +
+             (children)
+             Timestamp: 2020-06-03T00:00:00F "[2020-06-03 Wed]"
+             Text: " done on firefox-mua-modify-containers (can..."
+     Headline: l=2 todo=TODO prio=C "** TODO [2020-05-29 Fri] [#C] csvutils: make..."
+       (title)
+       Text:
+         Timestamp: 2020-05-29T00:00:00F "[2020-05-29 Fri]"
+         Text: " csvutils: make csv-grep-fields, a more..."
+
+Now for some selecting examples:
+
+ # select the second-level headlines where we store the todo items (title-only)
+ % orgsel todo.org 'Headline[level=2]' --node-action eval:'print $_->title->as_string,"\n"'
+ [2021-06-26 Sat] SQLite::KeyValueStore::Simple: add delete function
+ [2021-06-21 Mon] Perinci::CmdLine: unwanted removal of quotes?
+ [2021-06-21 Mon] Config::IOD: set_value() eats comments
+ [2021-06-18 Fri] Acme::CPANModules: category
+ [2021-06-17 Thu] perl module: Software::Catalog::SW::rakudo::moar
+ [2020-05-26 Tue] create a more generic version of csv-grep or csv-map
+ [2020-05-29 Fri] csvutils: make csv-grep-fields, a more flexible form of csv-select-fields
+
+ # when was a specific todo list last updated? (we look at log entries)
+ % orgsel todo.org 'Headline[level=2][title.as_string =~ /set_value/] Timestamp:first'
+ [2021-06-22]
+
+ # TODO: more examples coming
+
+=head1 DESCRIPTION
+
+This utility allows you to select nodes from Org document on the command-line
+using CSel selector syntax.
+
+Org is a plain-text document format for keeping notes, maintaining to-do lists,
+planning projects, authoring documents, and more. The specification and official
+documentation is at L<https://orgmode.org>.
+
+CSel is a pattern syntax to select various elements from a tree. It is modeled
+after CSS selector. The specification is at L<Data::CSel>.
+
+In B<orgsel>, Org document is first parsed into a document tree using
+L<Org::Parser> then selected with the given CSel expression. Types are
+C<Org::Element::*> classes (without the prefix).
+
+See examples in the Synopsis to get an idea on how to use B<orgsel>.
 
 =head1 OPTIONS
 
@@ -66,11 +300,15 @@ Can be specified multiple times.
 
 =item B<--expr>=I<s>
 
+Can also be specified as the 2nd command-line argument.
+
 =item B<--file>=I<s>
 
 Default value:
 
  "-"
+
+Can also be specified as the 1st command-line argument.
 
 =item B<--node-action>=I<s@>
 
@@ -232,6 +470,10 @@ you want to pipe the result for more post-processing. In this case you can use
 
 Filter output through a pager.
 
+=item B<--view-result>
+
+View output using a viewer.
+
 =back
 
 =head2 Other options
@@ -300,13 +542,15 @@ feature.
 
 =head1 SEE ALSO
 
-L<Org::Parser>
+If you want to select Org node elements from Perl, use L<Org::Parser> and
+L<Data::CSel> directly.
 
-L<Data::CSel>, L<CSel::Examples>
+More examples of CSel in general in L<CSel::Examples>.
 
 L<App::OrgUtils> for other Org-related utilities.
 
-L<htmlsel>, L<jsonsel>, L<yamlsel>, L<ddsel>, L<podsel>, L<ppisel>
+L<htmlsel>, L<jsonsel>, L<yamlsel>, L<ddsel>, L<podsel>, L<ppisel> apply CSel to
+other types of documents.
 
 =head1 AUTHOR
 
@@ -314,7 +558,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

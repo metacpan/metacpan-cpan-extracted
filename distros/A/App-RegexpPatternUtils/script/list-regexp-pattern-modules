@@ -1,11 +1,12 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/RegexpPatternUtils/list_regexp_pattern_modules
-# and generated automatically using Perinci::CmdLine::Gen version 0.491
+# and generated automatically using Perinci::CmdLine::Gen version 0.499
 
-our $DATE = '2020-01-03'; # DATE
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-06-27'; # DATE
 our $DIST = 'App-RegexpPatternUtils'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 use 5.010001;
 use strict;
@@ -37,13 +38,14 @@ list-regexp-pattern-modules - List all installed Regexp::Pattern::* modules
 
 =head1 VERSION
 
-This document describes version 0.004 of list-regexp-pattern-modules (from Perl distribution App-RegexpPatternUtils), released on 2020-01-03.
+This document describes version 0.006 of list-regexp-pattern-modules (from Perl distribution App-RegexpPatternUtils), released on 2021-06-27.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % list-regexp-pattern-modules [options]
+ % list-regexp-pattern-modules [--format=name] [--json] [--(no)naked-res]
+     [--page-result[=program]] [--view-result[=program]]
 
 =head1 OPTIONS
 
@@ -85,6 +87,14 @@ you want to pipe the result for more post-processing. In this case you can use
 
     [1,2,3]
 
+
+=item B<--page-result>
+
+Filter output through a pager.
+
+=item B<--view-result>
+
+View output using a viewer.
 
 =back
 
@@ -158,7 +168,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2018, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2018, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

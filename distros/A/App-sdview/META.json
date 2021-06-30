@@ -43,19 +43,19 @@
    "provides" : {
       "App::sdview" : {
          "file" : "lib/App/sdview.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       },
       "App::sdview::Parser" : {
          "file" : "lib/App/sdview/Parser.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       },
       "App::sdview::Parser::Markdown" : {
          "file" : "lib/App/sdview/Parser/Markdown.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       },
       "App::sdview::Parser::Pod" : {
          "file" : "lib/App/sdview/Parser/Pod.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       }
    },
    "release_status" : "stable",
@@ -64,6 +64,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

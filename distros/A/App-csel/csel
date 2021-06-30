@@ -1,5 +1,5 @@
 #!/usr/bin/perl -T
-use 5.008 ; use strict ; use warnings ; # 5.011
+use 5.014 ; use strict ; use warnings ; # 5.011
 use Getopt::Std ; getopts '~=!R:d:0:h:i:np:rt:' , \my %o ; 
 use List::Util qw [ max ] ;
 use Encode qw/decode_utf8/ ; 

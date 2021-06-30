@@ -4,6 +4,7 @@ use v5.26;
 use warnings;
 
 use Test::More;
+use Test::Deep;
 
 use Object::Pad 0.19;
 
@@ -19,6 +20,11 @@ class TestApp extends App::Device::Chip::sensor
    }
 }
 
+BEGIN {
+   $INC{"Device/Chip/Adapter/_ATestAdapter.pm"} = __FILE__;
+   $ENV{DEVICE_CHIP_ADAPTER} = "_ATestAdapter";
+}
+
 my $app = TestApp->new;
 
 # defaults
@@ -31,6 +37,23 @@ my $app = TestApp->new;
    $app->parse_argv( [ "--interval", 20, "ACHIP" ] );
 
    is( $app->interval, 20, 'interval after --interval argument' );
+
+   cmp_deeply( [ $app->_chipconfigs ],
+      [ { type => "ACHIP", adapter => Test::Deep::isa( "Device::Chip::Adapter::_ATestAdapter" ) } ],
+      'chip configs'
+   );
+}
+
+# chip args
+{
+   $app->parse_argv( [ "--interval", 20, "ACHIP", "BCHIP:-C:arg=value" ] );
+
+   cmp_deeply( [ $app->_chipconfigs ],
+      [ { type => "ACHIP", adapter => Test::Deep::isa( "Device::Chip::Adapter::_ATestAdapter" ) },
+        { type => "BCHIP", adapter => Test::Deep::isa( "Device::Chip::Adapter::_ATestAdapter" ),
+           config => { arg => "value" } } ],
+      'chip configs'
+   );
 }
 
 # --custom
@@ -56,8 +79,6 @@ $INC{"Device/Chip/Adapter/_ATestAdapter.pm"} = __FILE__;
 {
    $app->parse_argv( [ "--adapter", "_ATestAdapter:arg=value", "ACHIP" ] );
 
-   my $adapter = $app->adapter;
-   isa_ok( $adapter, "Device::Chip::Adapter::_ATestAdapter", '$adapter' );
    is_deeply( \%adapterargs, { arg => "value" }, 'adapter constructor args' );
 }
 

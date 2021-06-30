@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/File.pm
-## Version v0.1.0
+## Version v0.1.2
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/05/20
-## Modified 2021/05/24
+## Modified 2021/06/26
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -39,7 +39,7 @@ BEGIN
         bool     => sub () { 1 },
         fallback => 1,
     );
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.1.2';
     ## https://en.wikipedia.org/wiki/Path_(computing)
     ## perlport
     our $OS2SEP  =
@@ -504,6 +504,8 @@ sub chmod
     return( $self );
 }
 
+sub cleanup { return( shift->_set_get_boolean( 'auto_remove', @_ ) ); }
+
 sub close
 {
     my $self = shift( @_ );
@@ -759,6 +761,7 @@ sub delete
             CORE::unlink( $file ) || return( $self->error( "Unable to remove file \"${file}\": $!" ) );
         }
         $self->code( 410 ); # Gone
+        $self->finfo->reset;
         return( $self );
     }
     catch( $e )
@@ -1098,7 +1101,6 @@ sub is_absolute { return( File::Spec->file_name_is_absolute( shift->filepath ) )
 
 sub is_dir { return( shift->finfo->is_dir ); }
 
-# TODO is_empty
 sub is_empty
 {
     my $self = shift( @_ );
@@ -1246,8 +1248,12 @@ sub load
     $binmode =~ s/^\://g;
     try
     {
-        my $fh = IO::File->new( "<$file" ) ||
-        return( $self->error( "Unable to open file \"$file\" in read mode: $!" ) );
+        my $fh = $self->opened;
+        unless( $fh )
+        {
+            $fh = IO::File->new( "<$file" ) ||
+            return( $self->error( "Unable to open file \"$file\" in read mode: $!" ) );
+        }
         $fh->binmode( ":${binmode}" ) if( CORE::length( $binmode ) );
         my $size;
         if( $binmode eq ':unix' && ( $size = -s( $fh ) ) )
@@ -1344,7 +1350,7 @@ sub max_recursion { return( shift->_set_get_number( 'max_recursion', @_ ) ); }
 sub mkpath
 {
     my $self = shift( @_ );
-    my $cb;
+    my $cb   = sub{1};
     $cb = pop( @_ ) if( ref( $_[-1] ) eq 'CODE' );
     my @args = @_;
     if( !scalar( @args ) )
@@ -1374,7 +1380,7 @@ sub mkpath
         # my @fragments = File::Spec->splitdir( $dirs );
         my $vol = [File::Spec->splitpath( $path )]->[0];
         my @fragments = File::Spec->splitdir( $path );
-        my $curr = $self->new_path;
+        my $curr = $self->new_array;
         my $parent_path  = '';
         foreach my $dir ( @fragments )
         {
@@ -1389,7 +1395,7 @@ sub mkpath
                 {
                     $cb->({
                         dir    => $dir,
-                        parent => $current_path,
+                        path   => $current_path,
                         parent => $parent_path,
                         volume => $vol,
                     }) || return;
@@ -1661,6 +1667,23 @@ sub relative
     return( File::Spec->abs2rel( $self->filepath, $self->base_dir ) );
 }
 
+sub rmdir
+{
+    my $self = shift( @_ );
+    return( $self ) if( !$self->is_dir );
+    try
+    {
+        my $dir = $self->filename;
+        CORE::rmdir( $dir ) ||
+            return( $self->error( "Unable to remove directory \"$dir\": $e. Is it empty?" ) );
+        return( $self );
+    }
+    catch( $e )
+    {
+        return( $self->error( "An error occurred while trying to remove the directory \"$dir\": $e" ) );
+    }
+}
+
 sub remove { return( shift->delete( @_ ) ); }
 
 sub resolve
@@ -1741,6 +1764,7 @@ sub rmtree
     }
     $self->_load_class( 'File::Find' ) || return( $self->pass_error );
     $opts->{max_files} //= 0;
+    $opts->{keep_root} //= 0;
     my $p = +{ map( ( CORE::exists( $opts->{ $_ } ) ? ( $_ => $opts->{ $_ } ) : () ), qw( bydepth dangling_symlinks follow follow_fast follow_skip no_chdir postprocess preprocess untaint untaint_pattern untaint_skip ) ) };
     my $files = $self->new_array;
     $p->{wanted} = sub
@@ -1871,7 +1895,7 @@ sub rmtree
             try
             {
                 $self->message( 4, "${prefix} Actually removing directory \"${d}\"" );
-                rmdir( $d ) || do
+                CORE::rmdir( $d ) || do
                 {
                     $self->message( 4, "${prefix} Unable to remove directory \"${d}\": $!" );
                     $error_files->push( $d );
@@ -1887,6 +1911,13 @@ sub rmtree
         return(1);
     });
     $self->messagef( 3, "${prefix} %d files and directories removed and %d issues found.", ( $total - $error_files->length ), $error_files->length );
+    unless( $opts->{keep_root} )
+    {
+        CORE::rmdir( $dir ) || do
+        {
+            warnings::warn( "Unable to remove the directory \"$dir\": $!\n" ) if( warnings::enabled() );
+        };
+    }
     $self->message( 4, "Files with issues:" );
     $error_files->foreach(sub
     {
@@ -1996,6 +2027,15 @@ sub tempfile
     # print( STDERR __PACKAGE__, "::tempfile: \$self is '$self' and args are '", join( "', '", @_ ), "'\n" );
     my $opts = $self->_get_args_as_hash( @_ );
     $opts->{tmpdir} //= 0;
+    if( CORE::exists( $opts->{unlink} ) )
+    {
+        $opts->{auto_remove} = CORE::delete( $opts->{unlink} );
+    }
+    elsif( CORE::exists( $opts->{cleanup} ) )
+    {
+        $opts->{auto_remove} = CORE::delete( $opts->{cleanup} );
+    }
+    $opts->{auto_remove} = 0 unless( CORE::exists( $opts->{auto_remove} ) );
     my $uuid = Data::UUID->new;
     my $fname = $uuid->create_str;
     $fname .= $opts->{suffix} if( CORE::defined( $opts->{suffix} ) && CORE::length( $opts->{suffix} ) && $opts->{suffix} =~ /^\.[\w\-]+$/ );
@@ -2023,7 +2063,11 @@ sub tempfile
     }
     elsif( $opts->{tmpdir} )
     {
-        $dir = File::Spec->catpath( $base_vol, $sys_tmpdir, $uuid->create_str );
+        # $dir = File::Spec->catpath( $base_vol, $sys_tmpdir, $uuid->create_str );
+        $dir = $self->tmpdir(
+            cleanup => $opts->{auto_remove},
+            tmpdir  => 1,
+        );
         return( $self->error( "Found an existing directory with the name just generated: \"$dir\". This should never happen." ) ) if( -e( $dir ) );
         mkdir( $dir ) || return( $self->error( "Unable to create temporary directory \"$dir\": $!" ) );
     }
@@ -2036,19 +2080,11 @@ sub tempfile
     $opts->{open} //= 0;
     my $open = CORE::delete( $opts->{open} );
     $opts->{resolved} = 1;
-    if( CORE::exists( $opts->{unlink} ) )
-    {
-        $opts->{auto_remove} = CORE::delete( $opts->{unlink} );
-    }
-    elsif( CORE::exists( $opts->{cleanup} ) )
-    {
-        $opts->{auto_remove} = CORE::delete( $opts->{cleanup} );
-    }
-    $opts->{auto_remove} = 0 unless( CORE::exists( $opts->{auto_remove} ) );
     my( $parent, $me );
     ( $base_vol, $parent, $me ) = File::Spec->splitpath( $dir );
     $dir = File::Spec->catdir( $parent, $me );
-    my $new = $self->new( File::Spec->catpath( $base_vol, $dir, $fname ), $opts ) || return( $self->pass_error );
+    CORE::delete( @$opts{ qw( tmpdir tempdir ) } );
+    my $new = $self->new( File::Spec->catpath( $base_vol, $dir, $fname ), %$opts ) || return( $self->pass_error );
     # $self->message( 3, "So far dir is '$dir' with path '$new'" );
     if( $open )
     {
@@ -2288,14 +2324,27 @@ sub DESTROY
     
     # Could use also O_TEMPORARY provided by Fcntl to instruct the system to automatically
     # remove the file, but it is not supported on all platforms.
+    my $orig = $self->{_orig};
     if( $self->auto_remove )
     {
-        my $orig = $self->{_orig};
         my @info = caller();
         my $sub = [caller(1)]->[3];
         $self->message( 3, "Removing file '", $self->filepath, "' that was created in file $orig->[1], at line $orig->[2]. Called from file $info[1] at line $info[2] in sub $sub" );
-        $self->delete;
+        if( $self->is_dir )
+        {
+            $self->rmtree;
+        }
+        else
+        {
+            $self->delete;
+        }
     }
+#     else
+#     {
+#         my @info = caller();
+#         $self->debug(3);
+#         $self->message( 3, "File '", $self->filepath, "' is NOT going to be removed. Created in file $orig->[1], at line $orig->[2]. Called from file $info[1] at line $info[2]" );
+#     }
 };
 
 sub FREEZE { return( shift->filepath ) }
@@ -2574,4 +2623,1051 @@ sub _prev_cwd { return( shift->_set_get_scalar( '_prev_cwd', @_ ) ); }
 
 1;
 
+# XXX POD
 __END__
+
+=encoding utf-8
+
+=head1 NAME
+
+Module::Generic::File - File Object Abstraction Class
+
+=head1 SYNOPSIS
+
+    use Module::Generic::File qw( cwd file rootdir tempfile tempdir sys_tmpdir );
+    my $f = Module::Generic::File->new( '/some/file' );
+    $f->append( "some data" );
+    $f->open && $f->write( "some data" );
+    my $d = file( "/my/directory/somewhere" );
+    $d->makepath;
+    $d->chdir;
+    $d->contains( $f );
+    my $d = file( $tmpdir )->mkpath->first;
+    $f->is_part_of( $d );
+    $f->touchpath;
+    my $f = $d->child( "file.txt" )->touch;
+    $f->code == 201 && say "Created!";
+    say "File is empty" if( $f->is_empty );
+    
+    my $file = tempfile();
+    my $dir  = tempdir();
+    
+    my $tmpname = $f->tmpname( suffix => '.txt' );
+    my $f2 = $f->abs( $tmpname );
+    my $sys_tmpdir = $f->sys_tmpdir;
+    my $f3 = $f2->move( $sys_tmpdir )->touch;
+    my $io = $f->open;
+    say "Can read" if( $f->can_read );
+    say "Can write" if( $f->can_write );
+    $f->close if( $f->opened );
+    say "File is ", $f->length, " bytes big.";
+    
+    my $f = tempfile({ suffix => '.txt', auto_remove => 0 })->move( sys_tmpdir() );
+    $f->open( '+>', { binmode => 'utf8' } );
+    $f->seek(0,0);
+    $f->truncate($f->tell);
+    $f->append( <<EOT );
+    Mignonne, allons voir si la rose
+    Qui ce matin avoit desclose
+    Sa robe de pourpre au Soleil,
+    A point perdu cette vesprée
+    Les plis de sa robe pourprée,
+    Et son teint au vostre pareil.
+    EOT
+    my $digest = $f->digest( 'sha256' );
+    $f->close;
+    say $f->extension->length; # 3
+    # Enable cleanup, auto removing temporary file during perl cleanup phase
+
+=head1 VERSION
+
+    v0.1.2
+
+=head1 DESCRIPTION
+
+This packages serves to resolve files whether inside Apache scope with mod_perl or outside, providing a unified api.
+
+=head1 METHODS
+
+=head2 new
+
+Takes a file as its first parameter, whether the file actually exists or not is ok.
+This will instantiate an object that is used to access other key methods. It takes the following optional parameters:
+
+=over 4
+
+=item I<autoflush>
+
+Enables or disables autoflush. Takes a boolean value and defaults to true.
+
+=item I<auto_remove>
+
+Takes a boolean value. Automatically removes the temporary directory or file when the objects is cleaned up by perl.
+
+=item I<base_dir>
+
+Sets the base directory for this file.
+
+=item I<base_file>
+
+Sets the base file for this file, i.e. the reference file frm which the base directory will be derived, if not already specified.
+
+=item I<collapse>
+
+Enables or disables the collapsing of dots in the file path.
+
+This will attempt to resolve and remove the dots to provide an absolute file path without dots. For example:
+
+C</../a/b/../c/./d.html> would become C</a/c/d.html>
+
+=item I<max_recursion>
+
+Sets the maximum recursion allowed. Defaults to 12.
+
+Its value is used in L</mkpath> and L</resolve>
+
+=item I<resolved>
+
+A boolean flag which states whether this file has been resolved already or not.
+
+=item I<type>
+
+The type of file this is. Either a file or a directory.
+
+=back
+
+=head2 abs
+
+If no argument is provided, this return the current object, since the underlying file is already changed into absolute file path.
+
+If a file path is provided, then it will change it into an absolute one and return a new L<Module::Generic::File> object.
+
+=head2 append
+
+Provided with some data as its first argument, and assuming the underlying file is a file and not a directory, this will open it if it is not already opened and append the data provided.
+
+If the file was already opened, whatever position you were in the file, will be restored after having appended the data.
+
+It returns the curent file object upon success for chaining or undef and sets an error object if an error occurred.
+
+=head2 auto_remove
+
+This takes a boolean value and enables or disables the auto remove of temporary file or directory created by this module upon perl cleanup phase.
+
+=head2 autoflush
+
+This takes a boolean value and enables or disables the auto flush.
+
+=head2 base_dir
+
+This sets the base directory of reference for this file object.
+
+=head2 base_file
+
+This sets the base file of reference for this file object.
+
+=head2 baseinfo
+
+This returns a list containing:
+
+=over 4
+
+=item 1. the file base name
+
+=item 2. the file directory path
+
+=item 3. the file suffix if the file is a file or an empty string if this is a directory
+
+=back
+
+In scalar context, it returns the file base name as a L<Module::Generic::Scalar> object.
+
+This methods accepts as an optional parameter a list or an array reference of possible extensions.
+
+=head2 basename
+
+This returns the file base name as a L<Module::Generic::Scalar> object.
+
+You can provide optionally a list or array reference of possible extensions.
+
+=head2 binmode
+
+Sets or get the file binmode.
+
+=head2 can_append
+
+Returns true if the file or directory are writable, and data can be added to it. False otherwise.
+
+If an error occurred, undef will be returned an an exception will be set.
+
+=head2 can_read
+
+Returns true if the file or directory are readable. False otherwise.
+
+If an error occurred, undef will be returned an an exception will be set.
+
+=head2 can_write
+
+Returns true if the file or directory are writable. False otherwise.
+
+If an error occurred, undef will be returned an an exception will be set.
+
+=head2 canonpath
+
+Takes an optional parameter representing the name of the operating system for which to canonise this file path. If no operating system name is provided, this will revert to C<$^O>. See L<perlvar> for more information about this variable.
+
+Returns the canon path of the file object based on the operating system specified.
+
+=head2 changed
+
+Returns true if the file was changed, false otherwise.
+
+=head2 chdir
+
+If the file object is a directory, this will attempt to L<perlfunc/chdir> to it.
+
+It returns the current file object upon success, or undef and sets an exception object if an error occurred.
+
+=head2 child
+
+This should be called using a directory object.
+
+Provided with a file name (not a full path), and this will return a new file object based on the combination of the directory path and the file specified.
+
+=head2 chmod
+
+Provided with an octal value or a human file mode such as C<a+rw> and this will attempt to set the file or directory mode accordingly.
+
+It returns the current object upon success or undef and sets an exception object upon error.
+
+=head2 cleanup
+
+This is an alias for L</auto_remove>. It enables or disables the auto cleanup of temporary file or directory upon perl cleanup phase.
+
+    $tmp->cleanup(1); # Enable it
+    my $bool = $tmp->cleanup;
+
+=head2 close
+
+Close the underlying file or directory.
+
+=head2 code
+
+Sets or gets the http-equivalent 3-digits code describing the status of the underlying directory or file.
+
+If a value is provided, it will set the code, but if no value is provided it will guess the code based on the file readability, existence, etc.
+
+=head2 collapse_dots
+
+In line with section 5.2.4 of the rfc 33986, this will flaten (i.e. remove) any dots there may be in the element file path.
+
+It takes an optional list or hash reference of parameters, including I<separator> which is used a directory separator. If not provided, it will revert to the default value for the current system.
+
+=head2 contains
+
+This can only be called using a directory object and is provided with a file or file object.
+
+It returns true if the file is contained within the directory.
+
+=head2 content
+
+This method returns the content of the directory or file as a L<Module::Generic::Array>
+
+If this is a directory, it returns an L<Module::Generic::Array> object with all the files within that directory, but excluding C<.> and C<..> and only within that directory, so this is not recurring.
+
+If this is a regular file, it returns its content as an L<Module::Generic::Array> object.
+
+If an error occurred, it returns undef and set an exception object.
+
+=head2 copy
+
+Takes a dstination, and attempt to copy itself to the destination.
+
+If the object represents a directory and the destination exists and is also a directory, it will copy the directory below the destination.
+
+    my $d = Module::Generic::File->new( "my/other_directory" );
+    my $new = $d->copy( "./another/directory" );
+    # $new now represents ./another/directory/other_directory
+
+Of course if the destination is a regular file, undef is returned and an exception is set.
+
+If the object represents a file and the destination exists, it will copy the file under the target directory if if the destination is a directory or replace the target regular file if the destination is a regular file.
+
+If the object file/directory does not actually exist, this merely changes virtually its file path.
+
+This method, just like L</move> relies on L<File::Copy>, which means you can use a C<GLOB> as the destination if you want. See L<File::Copy> documentation for more details on this.
+
+It returns a new L<Module::Generic::File> object representing the new file path.
+
+Note that you can also use the shortcut C<cp> instead of C<copy>
+
+=head2 cwd
+
+Returns a new L<Module::Generic::File> object representing the current working directory.
+
+=head2 delete
+
+This will attempt to remove the underlying directory or file and returns the current object upon success or undef and set the exception object if an error occurred.
+
+=head2 digest
+
+This takes a given algorithm and returns its cryptographic digest upon success or undef and sets an error object if an error occurred.
+
+This method can only be used if you have installed the module L<Digest>
+
+The supported algorithms the same ones mentionned on the documentation for L<Digest>, which are, for example: C<MD5>, C<SHA-1>, C<SHA-256>, C<SHA-384>, C<SHA-512>
+
+It does not actually matter the case or whether there is or not an hyphen, so, for example, you could very well use C<sha256> instead of C<SHA-256>
+
+=head2 dirname
+
+Returns the current element parent directory as an object.
+
+=head2 empty
+
+This will remove the element's content.
+
+If the element is a directory, it will remove all element within using L</rmtree> and if the element is a regular file, it will empty its content by truncating it if it is already opened, or by opening it in write mode and immediately close it.
+
+It returns the current object upon success or undef and sets an exception object if an error occurred.
+
+=head2 exists
+
+Returns true if the underlying directory or file exists, false otherwise.
+
+This uses L<Module::Generic::Finfo/exists>
+
+=head2 extension
+
+Returns the current file extension as a L<Module::Generic::Scalar> object if it is a regular file, or an empty string if it is a directory.
+
+Extension is simply defined with the regular expression C<\.(\w+)$>
+
+=head2 filehandle
+
+Returns the current file handle for the file/directory object by calling L</handle>
+
+If the file/directory is not opened yet, L</handle> will try to open the element and return the file handle.
+
+=head2 filename
+
+Returns the full absolute file path to the file/directory.
+
+If a parameter is provided, it replaces the previous value.
+
+See also L</filepath> for an alias.
+
+=head2 fileno
+
+Returns the element file descriptor by calling L<perlfunc/fileno>
+
+=head2 filepath
+
+This is an alias for L</filename>
+
+=head2 find
+
+Assuming the current object represents an existing directory, this takes one parameter which must be a code reference. This is used as a callback with the module L<File::Find/find>
+
+It returns whatever L<File::Find/find> returns or undef and sets an exception object if an error occurred.
+
+=head2 finfo
+
+Returns the current L<Module::Generic::Finfo> object for the current element.
+
+If a value is provided, it will replace the current L<Module::Generic::Finfo> object.
+
+=head2 flags
+
+Returns the bitwise flags for the current element.
+
+If the element is a directory, it will return 0.
+
+This uses L<perlfunc/fcntl> and C<F_GETFL> from L<Fcntl> to achieve the result.
+
+It returns undef and sets an exception object if an error occurred.
+
+=head2 flatten
+
+This will resolve the file/directory path and remove the possible dots in its path.
+
+It will return a new object, or undef and set an exception object if an error occurred.
+
+=head2 gobble
+
+Assuming this is object represents a regular file, this will return its content as a regular string.
+
+If the object represents a directory, it will return undef.
+
+See also L</load>
+
+=head2 gush
+
+This does thd countrary of L</gobble>. It will outpour the data provided into the underlying file element.
+
+This only works on file object and if a directory object is used, this will do nothing and merely return the current object used.
+
+See also L</unload>
+
+=head2 handle
+
+Returns the current file/directory handle if it is already opened, or attempts to open it.
+
+It will return undef and set an exception object if an error occurred.
+
+=head2 is_absolute
+
+Returns true if the element is an absolute path or false otherwise.
+
+=head2 is_dir
+
+Returns true if the element is a directory or false otherwise.
+
+=head2 is_empty
+
+Returns true if the element is empty or false otherwise.
+
+If the element is a directory C<empty> means there is no file or directory within.
+
+If the element is a regular file, C<empty> means it is zero byte big.
+
+=head2 is_file
+
+Returns true if the element is regular file or false otherwise.
+
+=head2 is_link
+
+Returns true if the element is symbolic link or false otherwise.
+
+=head2 is_part_of
+
+Provided with a directory path or a L<Module::Generic::File> object representing a directory and this returns true if the current element is part of the provided directory path, or false otherwise.
+
+It returns undef and set an exception object if an error occurred.
+
+=head2 is_relative
+
+Returns true if the current element path is relative or false otherwise.
+
+=head2 is_rootdir
+
+Returns true if the current element represents the system root directory, such as C</> under Linux system or, for example, C<C:\\> under windows or false otherwise.
+
+=head2 iterator
+
+Assuming the current element is a directory, this method takes a code reference as a callback whicih will be called for every element found inside the directory.
+
+It takes a list or an hash reference of optional parameters:
+
+=over 4
+
+=item I<recurse>
+
+If true, this method will traverse the directories within recursively.
+
+=item I<follow_link>
+
+If true, the symbolic link will be resolved and followed.
+
+=back
+
+The returned value from the callback is ignored.
+
+=head2 length
+
+This returns the size of the element as a L<Module::Generic::Number> object.
+
+if the element does not yet exist, L<Module::Generic::Number> object representing the value 0 is returned.
+
+This uses L<Module::Generic::Finfo/size>
+
+=head2 lines
+
+Assuming this is a regular file , this methods returns its content as an array object (L<Module::Generic::Array>) of lines.
+
+If a directory object is called, or the element does not exist or the file element is not readable, this still returns the array object, but empty.
+
+If an error occurred, C<undef> is returned and an exception is set.
+
+=head2 load
+
+Assuming this element is an existing file, this will load its content and return it as a regular string.
+
+If the C<binmode> used on the file is C<:unix>, then this will call L<perlfunc/read> to load the file content, otherwise it localises the input record separator C<$/> and read the entire content in one go. See L<perlvar/$INPUT_RECORD_SEPARATOR>
+
+If this method is called on a directory object, it will return undef.
+
+=head2 load_utf8
+
+This does the same as L</load>, but ensure the binmode used is C<:utf8> before proceeding.
+
+=head2 lock
+
+This method locks the file.
+
+It takes either a numeric argument representing the flag bitwise, or a list or hash reference of optional parameters, such as:
+
+=over 4
+
+=item I<exclusive>
+
+This will add the bit of C<Fcntl::LOCK_EX>
+
+=item I<shared>
+
+This will add the bit of C<Fcntl::LOCK_SH>
+
+=item I<non_blocking> or I<nb>
+
+This will add the bit of C<Fcntl::LOCK_NB>
+
+=item I<unlock>
+
+This will add the bit of C<Fcntl::LOCK_UN>
+
+=item I<timeout>
+
+Takes an integer used to set an alarm for the lock. If a lock cannot be obtained before the timeout, an error is returned.
+
+=back
+
+This returns the current object upon success or undef and set an exception object if an error occurred.
+
+=head2 locked
+
+Returns true if the file is locked. More specifically, this returns the value of the flags originally used to lock the file.
+
+=head2 max_recursion
+
+Sets or gets the maximum recursion limit.
+
+=head2 mkpath
+
+This takes a code reference that is used as a callback.
+
+It will create the path corresponding to the element, or to the list of path fragments provided as optional arguments.
+
+For each path fragments, this will call the callback and provided it with an hash reference containing the following keys:
+
+=over 4
+
+=item I<dir>
+
+The current path fragment as a regular string
+
+=item I<parent>
+
+The current parent full path as a string
+
+=item I<path>
+
+The current full path as a regular string
+
+=item I<volume>
+
+On Windows, this would contain the volume name as a string.
+
+=back
+
+For example:
+
+    my $f = Module::Generic::File->new( "/my/directory/file.txt" );
+    # Assuming the directories in this example do not exist at all
+    $f->mkpath(sub
+    {
+        my $ref = shift( @_ );
+        # $ref->{dir} would contain 'my'
+        # $ref->{path} would contain '/my'
+        # $ref->{parent} would contain '/'
+        # $ref->{volume} would be empty
+    });
+
+It returns an array object (L<Module::Generic::Array>) of all the path fragments.
+
+If an error occurred, this returns undef and set an exception object.
+
+=head2 move
+
+This behaves exactly like L</copy> except it moves the element instead of copying it.
+
+Note that you can use C<mv> as a method shortcut instead.
+
+=head2 open
+
+This takes an optional mode or defaults to E<lt>
+
+Other valid mode can be >, +>, >>, +<, w, w+, r+, a, a+, < and r or an integer representing a bitwise value such as O_APPEND, O_ASYNC, O_CREAT, O_DEFER, O_EXCL, O_NDELAY, O_NONBLOCK, O_SYNC, O_TRUNC, O_RDONLY, O_WRONLY, O_RDWR. For example: C<O_WRONLY|O_APPEND> For that see L<Fcntl>
+
+Provided with an optional list or hash reference of parameters and this will open the underlying element.
+
+Possible options are:
+
+=over 4
+
+=item I<autoflush>
+
+Takes a boolean value
+
+=item I<binmode>
+
+The binmode value, with or without the semi colon before, such as C<utf8> or C<binary>
+
+=item I<lock>
+
+If true, this will set a lock based on the mode in which to open the file.
+
+For example, opening the file in write or append mode, will lead to an exclusive lock while opening the file in read mode will lead to a shared lock.
+
+=item I<truncate>
+
+If true, this will truncate the file after opening it.
+
+=back
+
+=head2 open_bin
+
+This opens the file using binmode value of C<:raw>
+
+=head2 open_utf8
+
+This opens the file using binmode value of C<:utf8>
+
+=head2 opened
+
+Returns the current element file handle if it is opened or a smart null value using L<Module::Generic/new_null>
+
+L<Module::Generic/new_null> will return a sensitive null based on the caller's expectations. Thus if the caller expects an hash reference, L<Module::Generic/new_null> would return an empty hash reference.
+
+=head2 parent
+
+Returns the parent element of the current object.
+
+=head2 print
+
+Calls L<perlfunc/print> on the file handle and pass it whatever arguments is provided.
+
+=head2 printf
+
+Calls L<perlfunc/printf> on the file handle and pass it whatever arguments is provided.
+
+=head2 println
+
+Calls L<perlfunc/say> on the file handle and pass it whatever arguments is provided.
+
+=head2 read
+
+If the element is a directory, this will call L<IO::Dir/read> and return the value received.
+
+If the element is a regular file, then it takes the same arguments as L<perlfunc/read>, meaning:
+
+    $io->read( $buff, $size, $offset );
+    # or
+    $io->read( $buff, $size );
+    # or
+    $io->read( $buff );
+
+If an error occurred, this returns undef and set an exception object.
+
+=head2 readlink
+
+This calls L<perlfunc/readlink> and returns a new L<Module::Generic::File> object, but this does nothing and merely return the current object if the current operating system is one of Win32, VMS, RISC OS, or if the underlying file does not actually exist or of course if the element is actually not a symbolic link.
+
+If an error occurred, this returns undef and set an exception object.
+
+=head2 relative
+
+Returns a relative path representation of the current element.
+
+=head2 remove
+
+This is an alias for L</delete>
+
+=head2 resolve
+
+Provided with a path and a list or hash reference of optional parameters and this will attempt at resolving the file path.
+
+It returns a new L<Module::Generic::File> object or undef and sets an exception object if an error occurred.
+
+The only parameter supported is:
+
+=over 4
+
+=item I<recurse>
+
+If true, this will have resolve perform recursively.
+
+=back
+
+=head2 resolved
+
+Returns true if the file object has been resolved or false otherwise.
+
+=head2 rewind
+
+This will call L<perlfunc/rewind> on the file handle.
+
+=head2 rewinddir
+
+This will call L<IO::Dir/rewinddir> on the directory file handle.
+
+=head2 root_dir
+
+This returns an object representation of the system root directory.
+
+=head2 rootdir
+
+This is an alias for L</root_dir>
+
+This is also a class function that can be imported.
+
+=head2 say
+
+This will call L<perlfunc/say> on the file handle.
+
+=head2 seek
+
+This will call L<perlfunc/seek> on the file handle.
+
+=head2 size
+
+Provided with an optional list or hash reference of parameters and this returns the size of the underlying element.
+
+Option parameters are:
+
+=over 4
+
+=item I<follow_link>
+
+If true, links will be followed in calculating the size of a directory. This defaults to false.
+
+=back
+
+Besides the above parameters, you can use the same parameters than the ones used in L<File::Find>, namely: bydepth, dangling_symlinks, follow, follow_fast, follow_skip, no_chdir, postprocess, preprocess, untaint, untaint_pattern and untaint_skip.
+
+For more information see L<File::Find/%options>
+
+This method returns a new L<Module::Generic::Number> object representing the total size, or undef and set an exception object if an error occurred.
+
+=head2 slurp
+
+This is an alias for L</load> It is there, because the name as a method is somewhat popular.
+
+=head2 slurp_utf8
+
+This is an alias for L</load_utf8>
+
+=head2 spew
+
+This is an alias for L</unload>
+
+=head2 spew_utf8
+
+This is an alias for L</unload_utf8>
+
+=head2 stat
+
+Returns the value from L</finfo>
+
+=head2 symlink
+
+Provided with a file path or an L<Module::Generic::File> object, and this will call L<perlfunc/symlink> to create a symbolic link.
+
+On the following operating system not supported by perl, this will merely return the current object itself: Win32 and RISC OS
+
+This returns the current object upon success and undef and sets an exception object if an error occurred.
+
+=head2 tell
+
+Calls L<perlfunc/tell> on the current element file handle, passing it whatever information was provided.
+
+=head2 tmpdir
+
+This method returns a temporary directory object.
+
+It takes an optional list or hash reference of parameters:
+
+=over 4
+
+=item I<cleanup>
+
+Takes a boolean value.
+
+If true, this will enable the auto-remove feature of the directory object. See L</auto_remove>
+
+See also I<unlink>
+
+=item I<dir>
+
+Takes a string representing an existing directory.
+
+If provided, this will instruct this method to create the temporary directory below this directory.
+
+=item I<tmpdir>
+
+Takes a boolean value.
+
+If true, the temporary directory will be created below the system wide temporary directory. This system temporary directory is taken from L<File::Spec/tmpdir>
+
+=item I<unlink>
+
+Takes a boolean value.
+
+If true, this will enable the auto-remove feature of the directory object. See L</auto_remove>
+
+See also I<cleanup>
+
+=back
+
+Upon success, this returns a new L<Module::Generic::File> object representing the new temporary directory, or if an error occurred, it returns undedf and sets an exception object.
+
+=head2 tmpnam
+
+This is an alias for L</tmpname>
+
+=head2 tmpname
+
+This returns the basename of a new temporary directory object.
+
+=head2 touch
+
+This method mirrors the command line utility of the same name and is to be used for a file object.
+
+It creates the file with no content if it does not already exist. If the file exists, it merely update its modification time.
+
+It returns the current object upon success, or undef and sets an exception object if an error occurred.
+
+=head2 touchpath
+
+This is a variation from L</touch> in that it will create the path leading to the underlying file object, and then L</touch> the file to create it.
+
+It returns the current object upon success, or undef and sets an exception object if an error occurred.
+
+=head2 truncate
+
+This will call L</truncate> on the file handle of the underlying file object.
+
+=head2 type
+
+Returns the type of element this object represents. It can be either C<file> or C<directory>.
+
+If there is no value set, this will try to guess it.
+
+=head2 unlink
+
+This will attempt to remove the underlying file.
+
+It will return undef and set an exception object if this method is called on a directory object.
+
+It returns the current object upon success, or undef and sets an exception object if an error occurred.
+
+=head2 unload
+
+Provided with some data in the first parameter, and a list or hash reference of optional parameters and this will add this data to the underlying file element.
+
+The available options are:
+
+=over 4
+
+=item I<append>
+
+If true and assuming the file is not already opened, the file will be opened using >> otherwise > will be used.
+
+=back
+
+Other options are the same as the ones used in L</open>
+
+It returns the current object upon success, or undef and sets an exception object if an error occurred.
+
+=head2 unload_utf8
+
+Just like L</unload>, this takes some data and some options passed as a list or as an hash reference and will open the file using C<:utf8> for L<perlfunc/binmode>
+
+=head2 unlock
+
+This will unlock the underlying file if it was locked.
+
+It returns the current object upon success, or undef and sets an exception object if an error occurred.
+
+=head2 volume
+
+Sets or gets the volume of the underlying file or directory. This is only applicable under windows.
+
+=head2 write
+
+Provided with some data and this will add them to the underlying file element.
+
+It will merely return the current object if this is a directory element, and it will return undef and set an exception object if the file is not opened.
+
+It returns the current object upon success, or undef and sets an exception object if an error occurred.
+
+For example:
+
+    $f->open;
+    $f->write( $data );
+    $f->write( @list_of_data );
+    # or
+    $f->open->write( $data );
+
+=head1 CLASS FUNCTIONS
+
+=head2 cwd
+
+Returns the current working directory by calling L<URI::file/cwd>
+
+=head2 file
+
+Takes a string, an optional hash reference of parameters and returns an L<Module::Generic::File> object.
+
+It can be called the following ways:
+
+    file( $file_obj );
+    file( $file_obj, $options_hash_ref );
+    file( $file_obj, %options );
+
+    $obj->file( $file_obj );
+    $obj->file( $file_obj, $options_hash_ref );
+    $obj->file( $file_obj, %options );
+
+    $obj->file( '/some/file' );
+    $obj->file( '/some/file', $options_hash_ref );
+    $obj->file( '/some/file', %options );
+    $obj->file( $stringifyable_object );
+    $obj->file( $stringifyable_object, $options_hash_ref );
+    $obj->file( $stringifyable_object, %options );
+
+    file( "/some/file.txt" );
+    file( "./my/directory" );
+
+=head2 rmtree
+
+This takes a path, or an L<Module::Generic::File> object and some optional parameters as a list or as an hash reference and removes the underlying path, whether it contains elements within or not. So this is a recursive removal of all element within the given directory path. Thus, it must be called on a directory object.
+
+It takes the following optional parameters:
+
+=over 4
+
+=item I<dry_run>
+
+If true, this will only pretend to remove the files recursively. This is useful for testing without actually removing anything.
+
+=item I<keep_root>
+
+If true, then L</rmtree> will keep the directory and remove all of its content. If false, it will also remove the directory itself on top of its content. Defaults to false.
+
+=item I<max_files>
+
+Set the maximum numberof file beyond which this function will refuse to perform.
+
+This is useful, if you know you expect only a certain number of files within a directory and you do not want the program to hang, or possibly you do not want it to removethe directory because too many files within would be a sign of an error, etc.
+
+=back
+
+You can also pass other parameters such as the one used by L<File::Find>, namely: bydepth, dangling_symlinks, follow, follow_fast, follow_skip, no_chdir, postprocess, preprocess, untaint, untaint_pattern and untaint_skip
+
+See L<File::Find/%options> for more information.
+
+Example of usage:
+
+    $obj->rmtree( $some_dir_path );
+    $obj->rmtree( $some_dir_path, $options_hashref );
+    Module::Generic::File->rmtree( $some_dir_path );
+    Module::Generic::File->rmtree( $some_dir_path, $options_hashref );
+    rmtree( $some_dir_path );
+    rmtree( $some_dir_path, $options_hashref );
+    file( $some_dir_path )->rmtree;
+
+Upon success it returns the current object. If it was called as a class function, an object is created, and it will be returned upon success too.
+
+It returns undef and set an exception object if this is called on a file object.
+
+=head2 rootdir
+
+This returns an object representation of the system root directory.
+
+=head2 sys_tmpdir
+
+Returns a new L<Module::Generic::File> object representing the path to the system temporary directory as returned by L<File::Spec/tmpdir>
+
+=head2 tempdir
+
+Returns a new L<Module::Generic::File> object representing a unique temporary directory.
+
+=head2 tempfile
+
+Returns a new L<Module::Generic::File> object representing a unique temporary file.
+
+It takes the following optional parameters:
+
+=over 4
+
+=item I<cleanup>
+
+If true, this will enable the auto-remove option of the object. See L</auto_remove>
+
+See also I<unlink> which is an alias.
+
+=item I<dir>
+
+A directory path to be used to create the temporary file within.
+
+This parameter takes precedence over I<tmpdir>
+
+=item I<mode>
+
+This is the mode used to open this temporary file. It is used as arguement to L</open>
+
+=item I<open>
+
+If true, the temporary file will be opened. It defaults to false.
+
+=item I<suffix>
+
+A suffix to add to the temporary file including leading dot, such as C<.txt>
+
+=item I<tmpdir>
+
+The path or object of a directory within which to create the temporary file.
+
+See also I<dir>
+
+=item I<unlink>
+
+If true, this will enable the auto-remove option of the object. See L</auto_remove>
+
+See also I<cleanup> which is an alias.
+
+=back
+
+=head1 EXCEPTION
+
+This module does not C<croak> or die (at least not intentionally) as a design under the belief that it is up to the main code of the script to control the flow and any interruptions.
+
+When an error occurrs, the methods under this package will return undef and set an L<Module::Generic::Exception> object that can be retrieved using the inherited L<Module::Generic/error> method.
+
+For example:
+
+    my $f = Module::Generic::File->new( "/my/file.txt" );
+    $f->open || die( $f->error );
+
+However, L<Module::Generic/error> used to return undef, is smart and knows in a granular way (thanks to L<Want>) the context of the caller. Thus, if the method is chained, L<Module::Generic/error> will instead return a L<Module::Generic::Null> object to allow the chaining to continue and avoid the perl error that would have otherwise occurred: "method called on an undefined value"
+
+=head1 OVERLOADING
+
+Objects of this package are overloaded and their stringification will call L</filename>
+
+=head1 AUTHOR
+
+Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
+
+=head1 SEE ALSO
+
+L<Module::Generic::Finfo>, L<Module::Generic>, L<Module::Generic::Exception>, L<Module::Generic::Number>, L<Module::Generic::Scalar>, L<Module::Generic::Array>, L<Module::Generic::Null>, L<Module::Generic::Boolean>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright (c) 2021 DEGUEST Pte. Ltd.
+
+You can use, copy, modify and redistribute this package and associated
+files under the same terms as Perl itself.
+
+=cut

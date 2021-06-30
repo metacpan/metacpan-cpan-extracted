@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::LinearStepSweep;
-$Lab::Moose::Instrument::LinearStepSweep::VERSION = '3.751';
+$Lab::Moose::Instrument::LinearStepSweep::VERSION = '3.760';
 #ABSTRACT: Role for linear step sweeps used by voltage/current sources.
 
 use v5.20;
@@ -128,7 +128,7 @@ Lab::Moose::Instrument::LinearStepSweep - Role for linear step sweeps used by vo
 
 =head1 VERSION
 
-version 3.751
+version 3.760
 
 =head1 METHODS
 
@@ -150,7 +150,7 @@ source_level, cached_source_level, source_level_timestamp >
 This software is copyright (c) 2021 by the Lab::Measurement team; in detail:
 
   Copyright 2017-2018  Simon Reinhardt
-            2020       Andreas K. Huettel
+            2020       Andreas K. HÃ¼ttel
 
 
 This is free software; you can redistribute it and/or modify it under

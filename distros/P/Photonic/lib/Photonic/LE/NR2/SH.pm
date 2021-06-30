@@ -1,5 +1,5 @@
 package Photonic::LE::NR2::SH;
-$Photonic::LE::NR2::SH::VERSION = '0.016';
+$Photonic::LE::NR2::SH::VERSION = '0.017';
 
 =encoding UTF-8
 
@@ -9,7 +9,7 @@ Photonic::LE::NR2::SH
 
 =head1 VERSION
 
-version 0.016
+version 0.017
 
 =head1 COPYRIGHT NOTICE
 
@@ -193,11 +193,8 @@ polarization using the field (nrf) filter.
 use namespace::autoclean;
 use PDL::Lite;
 use PDL::NiceSlice;
-use PDL::Complex;
-use PDL::FFTW3;
 use Photonic::LE::NR2::AllH;
-use Photonic::Utils qw(RtoG GtoR HProd linearCombineIt any_complex);
-use Photonic::Utils qw(cgtsv);
+use Photonic::Utils qw(RtoG GtoR HProd linearCombineIt any_complex cgtsv);
 use Photonic::Iterator;
 use Photonic::Types;
 use PDL::Constants qw(PI);
@@ -324,7 +321,7 @@ sub _alpha {
     my $self=shift;
     my $epsA1=shift;
     my $epsB1=shift;
-    my $alphaA1=my $alphaB1=r2C(0);
+    my $alphaA1=my $alphaB1=PDL::r2C(0);
     $alphaA1=($epsA1-1)/(4*$self->densityA*PI) unless
 	$self->densityA==0;
     $alphaB1=($epsB1-1)/(4*$self->densityB*PI) unless
@@ -363,23 +360,16 @@ sub _build_dipolar {
     die "Expected complex \$field" unless any_complex($field);
     my $ndims=$self->ndims;
     #E^2 Square each complex component and sum over components
-    #result is RorI, nx, ny...
-    my $Esquare_R=($field*$field)->sumover;
+    my $Esquare_R=($field*$field)->sumover; #result is RorI, nx, ny...
     #Fourier transform
-    # RorI nx ny...
-    my $Esquare_G=fftn($Esquare_R, $ndims);
-    #cartesian, nx, ny...
-    my $G=$self->nrf->nr->G;
-    #RorI cartesian nx ny
-    my $iG=i2C $G;
-    #RorI cartesian nx ny...
-    my $iGE2=$iG*$Esquare_G->(,*1);
+    my $Esquare_G=RtoG($Esquare_R, $ndims, 0); # nx ny...
+    my $G=$self->nrf->nr->G; #cartesian, nx, ny...
+    my $iG=i2C $G; #cartesian nx ny
+    my $iGE2=$iG*$Esquare_G->(*1); #cartesian nx ny...
     #back to real space. Get cartesian out of the way and then back
-    #RorI, cartesian, nx, ny...
-    my $nablaE2=ifftn($iGE2->mv(1,-1), $ndims)->mv(-1,1);
-    my $factor=-$self->density*$self->alpha1*$self->alpha2/2;
-       #RorI, nx, ny...
-    my $P=$factor->(,*1)*$nablaE2;
+    my $nablaE2=GtoR($iGE2, $ndims, 1); #cartesian, nx, ny...
+    my $factor=-$self->density*$self->alpha1*$self->alpha2/2; #nx, ny...
+    my $P=$factor->(*1)*$nablaE2;
     #Should I filter in Fourier space before returning?
     return $P;
 }
@@ -389,31 +379,16 @@ sub _build_quadrupolar {
     my $field=$self->field1;
     my $ndims=$self->ndims; #dims of space
     #E E tensor
-    #result is RorI, cartesian, cartesian, nx, ny...
-    my $EE_R=$field->(,*1)*$field->(,,*1); #use dummies for external product
-    #RorI nx, ny...
-    my $naa=$self->density*$self->alpha1*$self->alpha1/2;
-    #RorI cartesian cartesian nx ny...
-    my $naaEE_R=$naa->(,*1,*1)*$EE_R;
-    #Fourier transform
-    # RorI cartesian cartesian nx ny... Get cartesians out of the way
-    # and thread
-    my $naaEE_G=fftn($naaEE_R->mv(1,-1)->mv(1,-1),
-			$ndims)->mv(-1,1)->mv(-1,1);
-    #cartesian, nx, ny...
-    my $G=$self->nrf->nr->G;
-    #RorI cartesian nx ny...
-    my $iG=i2C $G;
-    #RorI cartesian nx ny...
-    #Note: sumover knows how to sum complex values.
-    my $iGnaaEE_G=($iG->(,,*1)*$naaEE_G)->sumover; #dot
-    #Filter. nx ny...
-    #Note: System knows how to multiply complex by real.
-    $iGnaaEE_G = $iGnaaEE_G*$self->nrf->filter->(*1) if $self->nrf->has_filter;
+    my $EE_R=$field->(*1)*$field->(,*1); #result is cartesian, cartesian, nx, ny... - use dummies for external product
+    my $naa=$self->density*$self->alpha1*$self->alpha1/2; #nx, ny...
+    my $naaEE_R=$naa->(*1,*1)*$EE_R; #cartesian cartesian nx ny...
+    my $naaEE_G=RtoG($naaEE_R, $ndims, 2); # cartesian cartesian nx ny...
+    my $G=$self->nrf->nr->G; #cartesian, nx, ny...
+    my $iG=i2C $G; #cartesian nx ny...
+    my $iGnaaEE_G=($iG->(,*1)*$naaEE_G)->sumover; #dot - cartesian nx ny...
+    $iGnaaEE_G *= $self->nrf->filter if $self->nrf->has_filter; # nx ny...
     #back to real space. Get cartesian out of the way and then back
-    #RorI, cartesian, nx, ny...
-    my $P=
-	ifftn($iGnaaEE_G->mv(1,-1), $ndims)->mv(-1,1);
+    my $P= GtoR($iGnaaEE_G, $ndims, 1); #cartesian, nx, ny...
     return $P;
 }
 
@@ -426,8 +401,7 @@ sub _build_external_G {
     my $self=shift;
     my $filterflag=$self->filterflag;
     $self->filterflag(0);
-    # RoI cartesian nx ny...
-    my $result=RtoG($self->external, $self->ndims, 1);
+    my $result=RtoG($self->external, $self->ndims, 1); # RoI cartesian nx ny...
     $self->filterflag($filterflag);
     $result=$self->_filter($result,1) if $filterflag;
     return $result;
@@ -435,10 +409,9 @@ sub _build_external_G {
 
 sub _build_externalL_G {
     my $self=shift;
-    # RoI cartesian nx ny...
     my $filterflag=$self->filterflag;
     $self->filterflag(0);
-    my $result=$self->nrf->nr->geometry->Vec2LC_G($self->external_G);
+    my $result=$self->nrf->nr->geometry->Vec2LC_G($self->external_G); # RoI cartesian nx ny...
     $self->filterflag($filterflag);
     $result=$self->_filter($result,0) if $filterflag;
     return $result;
@@ -461,7 +434,7 @@ sub _build_externalVecL {
 sub _build_HP { #build haydock states for P2
     my $self=shift;
     my $ext=$self->externalL_G;
-    my $normext=sqrt(Cabs2($ext)->sum);
+    my $normext=sqrt(PDL::abs2($ext)->sum);
     my $extnorm=$ext/$normext;
     my $hp=Photonic::LE::NR2::AllH->new(nh=>$self->nrf->nh,
 	geometry=>$self->nrf->nr->geometry, smallH=>$self->nrf->nr->smallH,
@@ -476,12 +449,9 @@ sub _build_externalL_n {
     my $stateit=$self->HP->state_iterator;
     my $nh=$self->HP->iteration;
     # innecesario: \propto \delta_{n0}
-    #my @Pn=map HProd($states->[$_],$pol), 0..$nh-1;
-    my @Pn=map {r2C(0)} 0..$nh-1;
-    #$Pn[0]=$pol->(:,(0),(0));
-    $Pn[0]=HProd($stateit->nextval,$pol);
-    #print join " Pn ", @Pn[0..3], "\n";
-    return PDL->pdl([@Pn])->complex;
+    my $Pn=PDL::r2C(PDL->zeroes($nh));
+    $Pn->((0)).=HProd($stateit->nextval,$pol);
+    $Pn;
 }
 
 sub _build_selfConsistentL_n {
@@ -491,9 +461,9 @@ sub _build_selfConsistentL_n {
     my $as=$self->HP->as;
     my $bs=$self->HP->bs;
     my $u2=$self->u2;
-    my $diag=$u2 - PDL->pdl($as)->(0:$nh-1);
+    my $diag=$u2 - $as->(0:$nh-1);
     # rotate complex zero from first to last element.
-    my $subdiag=-PDL->pdl(@$bs)->(0:$nh-1)->rotate(-1)->r2C;
+    my $subdiag=-$bs->(0:$nh-1)->rotate(-1)->r2C;
     my $supradiag=$subdiag;
     my $result = cgtsv($subdiag, $diag, $supradiag, $external);
     $result *= $u2/$self->epsA2;
@@ -532,14 +502,14 @@ sub _build_P2 {
     my $alpha2=$self->alpha2;
     my $PL=$self->selfConsistentVecL;
     my $Pext=$self->external;
-    my $P2=-4*PI*($alpha2*$density)->(,*1)*$PL+$Pext;
+    my $P2=-4*PI*($alpha2*$density)->(*1)*$PL+$Pext;
     return $P2;
 }
 
 sub _build_P2LMCalt {
     my $self=shift;
     my $PexL_G=$self->externalL_G; #external long 2w polarization
-    my $PexM=$self->external_G->(:,:,(0),(0)); #macroscopic external.
+    my $PexM=$self->external_G->(:,(0),(0)); #macroscopic external.
     my $nrf=$self->nrf;
     my $nr=$nrf->nr;
     my $geom=$nr->geometry;
@@ -556,10 +526,10 @@ sub _build_P2LMCalt {
     $nh=$nr->iteration if $nh>=$nr->iteration;
     # calculate using lapack for tridiag system
     # solve \epsilon^LL \vec E^L=|0>.
-    my $diag=$self->u2->Cconj - PDL->pdl([@$as])->(0:$nh-1);
+    my $diag=$self->u2->conj - $as->(0:$nh-1);
     # rotate complex zero from first to last element.
-    my $subdiag=-PDL->pdl(@$bs)->(0:$nh-1)->rotate(-1)->r2C;
-    my $supradiag=$subdiag->mv(0,-1)->rotate(-1)->mv(-1,0);
+    my $subdiag=-$bs->(0:$nh-1)->rotate(-1)->r2C;
+    my $supradiag=$subdiag->rotate(-1);
     my $rhs=PDL->zeroes($nh);
     $rhs->((0)).=1;
     $rhs=$rhs->r2C;
@@ -569,25 +539,20 @@ sub _build_P2LMCalt {
     my $Pphi=$k*(1-$epsA2)*$u2/$epsA2*HProd($phi_G, $PexL_G);
 
     my $beta_G=RtoG($B*GtoR($nr->firstState,$ndims,0), $ndims,0);
-    #my $beta_G=RtoG(GtoR($nr->firstState,$ndims,0), $ndims,0);
-    my $betaV_G=$beta_G->(,*1)*$geom->GNorm;
-    #my $betaV_G=$beta_G->(,*1)*$k;
+    my $betaV_G=$beta_G->(*1)*$geom->GNorm;
     $states=$nr->state_iterator;
     my $betaV_n=PDL->pdl(
-	[map {HProd($betaV_G,$states->nextval->(,*1), 1)} (0..$nh-1)]
-	)->complex;
-    my @Ppsi;
+	[map {HProd($betaV_G,$states->nextval->(*1), 1)} (0..$nh-1)]
+	);
+    my $Ppsi = PDL->zeroes($ndims)->r2C;
     foreach(0..$ndims-1){
-	my $psi_n = cgtsv($subdiag, $diag, $supradiag, $betaV_n->(:,($_),:));
-	# RorI nx ny .... cartesian
+	my $psi_n = cgtsv($subdiag, $diag, $supradiag, $betaV_n->(($_))); # nx ny .... cartesian
 	$states=$nr->state_iterator;
 	my $psi_G=linearCombineIt($psi_n, $states);
-	my $Ppsi=HProd($psi_G, $PexL_G);
-	push @Ppsi, $Ppsi;
+	$Ppsi->(($_)) .= HProd($psi_G, $PexL_G);
     }
-    my $Ppsi=PDL->pdl(@Ppsi)->complex;
     my $P2M=$Pphi+$Ppsi+$PexM*$nelem; # Unnormalize Pex !!
-    return $P2M->(,,*1,*1);
+    return $P2M->(,*1,*1);
 }
 
 sub _build_u1 {

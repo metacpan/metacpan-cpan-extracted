@@ -1,0 +1,70 @@
+#!perl
+BEGIN { 
+    $ENV{CATALYST_ENGINE} ||= 'HTTP';
+    $ENV{CATALYST_SCRIPT_GEN} = 40;
+}  
+
+use strict;
+use warnings;
+#use lib::findbin '../lib'; # dev-only
+use Devel::ebug;
+use Devel::ebug::HTTP;
+
+# PODNAME: ebug_http
+# ABSTRACT: A simple, extensible web Perl debugger
+our $VERSION = '0.33'; # VERSION
+
+my $filename = shift;
+die "Usage: ebug_http filename\n" unless $filename;
+
+my $ebug = Devel::ebug->new();
+$ebug->program($filename);
+$ebug->load;
+$Devel::ebug::HTTP::ebug = $ebug;
+
+use Catalyst::ScriptRunner;
+Catalyst::ScriptRunner->run('Devel::ebug::HTTP', 'Server');
+
+1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+ebug_http - A simple, extensible web Perl debugger
+
+=head1 VERSION
+
+version 0.33
+
+=head1 SYNOPSIS
+
+  % ebug_http calc.pl
+
+=head1 DESCRIPTION
+
+ebug is a web-based front end to L<Devel::ebug>. It is a simple Perl
+debugger. When run, it will report back how to contact its front page.
+
+=head1 SEE ALSO
+
+L<Devel::ebug>
+
+=head1 AUTHOR
+
+Original author: Leon Brocard E<lt>acme@astray.comE<gt>
+
+Current maintainer: Graham Ollis E<lt>plicease@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2005-2021 by Leon Brocard.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

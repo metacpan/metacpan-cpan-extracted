@@ -1,4 +1,4 @@
-package Dist::Zilla::Tutorial 6.020;
+package Dist::Zilla::Tutorial 6.022;
 # ABSTRACT: how to use this "Dist::Zilla" thing
 
 # BEGIN BOILERPLATE
@@ -154,7 +154,7 @@ Dist::Zilla::Tutorial - how to use this "Dist::Zilla" thing
 
 =head1 VERSION
 
-version 6.020
+version 6.022
 
 =head1 SYNOPSIS
 

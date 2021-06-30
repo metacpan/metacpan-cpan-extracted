@@ -31,7 +31,9 @@ sub eachFile ( $ ) ;
 
 ## 全体で使う変数
 my $optu0 = exists $o{u} && $o{u} eq 0 ; 
-* decode = ! $optu0 ? * decode_utf8 : sub ($){ $_[0] } ; #* encode = $o{u} ? * encode_utf8 : sub ($){ $_[0] } ; 
+* decode = * decode_utf8 ; 
+* decode = sub ( $ ) { $_[0] } if $optu0 ; 
+#* decode = (! $optu0) ? * decode_utf8 : sub ($){ $_[0] } ; #* encode = $o{u} ? * encode_utf8 : sub ($){ $_[0] } ; 
 my $optR0 = defined $o{R} && $o{R} eq 0 ;
 * R0proc = $optR0 ? sub {} : sub { s/\r$// } ;  # -R0 が指定された時の処理
 binmode *STDOUT , ':utf8' unless $optu0 ; # これだけ全体で使う変数とは言いがたいかもしれないが、オプションの処理はこの節の前半にあるので。
@@ -46,8 +48,12 @@ my $sec = $o{'@'} // 15 ; # 何秒ごとにレポートを表示させるか
 my $nc = 0 ; # 計数対象としなかったセルの数をカウント。
 my $rl ; # 各ファイルの読んだ行数を格納。
 my %fOut = (
-j =>  [ map {UNDERLINE decode($_)} qw[列番号 値の異なり 数値化平均 列名 値の範囲 最頻値 最頻値の度数 $o{r}テールの度数(重なり) 桁数範囲 ] ] ,
+j => [map{UNDERLINE decode($_)}map{eval"\"$_\""}qw[列番 異なる値 数値化平均 列名 値の範囲 最頻値 最頻値 $o{r}最稀値の度数(重複) 桁数範囲]],
 e =>  [ map {UNDERLINE $_ } qw[ cpos diff ave. name range frequent frequency ] , "$o{r}lower(multi)",  "digits" ] ) ; 
+
+my $col = undef ; # 0オリジンのカラム番号 ## sub ColFreq 内で使う。
+* negcell = defined $o{'#'} ? sub { if (m/$o{'#'}/ ) { $col ++ ; $nc ++ ; goto EACH_CELL } }  : sub {} ; # o{'0'} をやめた
+
 
 ## シグナルに対する設定
 my ${ INT1 } = sub {
@@ -68,7 +74,8 @@ exit 0 ;
 
 ## 1個ずつファイルを読み取る。
 sub eachFile ( $ ) {
-  my $FH = do { my $t = *STDIN if $_[0] eq '-' ; open $t, '<', $_[0] if!$t ; binmode $t , ':gzip(gzip)' if $o{z} ; $t } ; # ファイルハンドルの取得
+  #my $FH = do { my $t = *STDIN if $_[0] eq '-' ; open $t, '<', $_[0] if!$t ; binmode $t , ':gzip(gzip)' if $o{z} ; $t } ; # ファイルハンドルの取得
+  my $FH = do{my$t;if($_[0]eq'-'){$t=*STDIN}else{open$t,'<',$_[0]} ; binmode $t , ':gzip(gzip)' if $o{z} ; $t } ; # ファイルハンドルの取得
   $rl = 0 ; # 各ファイルの読み取った行数
   # 1. 最初の列名の並びを読み取り: 
   my @colnames =  colnames $FH if $o{'='} ; 
@@ -110,10 +117,10 @@ sub filePinfo {
 sub ColFreq ( $$ ) { # 第１変数はファイルハンドル 第２変数は参照
   #my %zstr ; # 除外された文字列の出現頻度。(点検用でもある。)     #my $intflg ; #$SIG{INT} = sub { $intflg = 1 } ; 
   my $maxCols = 0 ;
-  my $col = undef ; # 0オリジンのカラム番号
+  #my $col = undef ; # 0オリジンのカラム番号
   ## * lenlim = defined $o{v} ? sub { grep { $_ = substr $_, 0, $o{v} } @_ } : sub {} ; # -v で長さ制限 ## -v の制限は別の所で。
   * tailspacetrim = defined $o{s} ? sub { grep { s/\s+$// } @_ } : sub {} ; 
-  * negcell = defined $o{'#'} ? sub { if (m/$o{'#'}/ ) { $col ++ ; $nc ++ ; goto EACH_CELL } }  : sub {} ; # o{'0'} をやめた
+  #* negcell = defined $o{'#'} ? sub { if (m/$o{'#'}/ ) { $col ++ ; $nc ++ ; goto EACH_CELL } }  : sub {} ; # o{'0'} をやめた
   for ( my $FH = $_[0] ; <$FH> ; $rl ++ ) {  # <-- - よくこんなコードを書いたと自分で思っている(2021-06-08)
     chomp ; 
     & R0proc ; 
@@ -145,7 +152,10 @@ sub ColStat ( $$ ) {
   sub minmaxstr ( $ ) ; # 配列参照から、最小値最大値を取り出す 
   my %thash = %{ $_[0] } ; #$colvals -> [$_] } ;  # 各列について、値の度数のハッシュをここで格納。
   my @vals  = keys %thash ;  # その列で1回以上出現した具体的なデータ値を可能。
-  my $last = join $o{c} , minmaxstr( \@{[map { length decode ($_) } @vals ]}  ) ; # 桁数範囲
+
+  # my $digitRg = join $o{c} , minmaxstr( \@{[map { length decode ($_) } @vals ]}  ) ; # 桁数範囲 # decodeでエラーが発生した模様
+  # ↑ このコメントアウトした行を使うと「Wide character at $0 line 151」になった。Perl 5.18.4で問題無かったが、Perl 5.32.1でこのエラーで停止。
+  my $digitRg = join $o{c} , minmaxstr( \@{ [ map { length ( $_ ) } @vals ] } ) ; # 桁数範囲 
   push my @out, $_ + 1, scalar @vals, aveft ( \%thash , \@vals ) ; # 列番号,濃度, 平均値, 列名(//列番号)
   push @out , $_[1] // ( $_ +1 ) ; # if $o{'='} ; # , $_[1]//($_+1)
   my @skeys = splice @{[ sort{ $thash{$b} <=> $thash{$a} } @vals ]} , 0, $o{g} ; #高速化の対象か? 
@@ -155,10 +165,10 @@ sub ColStat ( $$ ) {
   my @kcct1 = splice @kcct , 0,  min(  $o{g} ,$#kcct+1 ) ; # <- tricky! 
   my @kcct2 = splice @kcct , - min(  $o{g} ,$#kcct+1 ) ; # <- tricky! 
   push @out , join $o{c}, minmaxstr \@vals ; # 出現値の範囲
-  push @out , join$o{c}, @skeys ; # 最頻値いくつか
+  push @out , join $o{c}, @skeys ; # 最頻値いくつか
   push @out , join $o{c}, MultSpec \@kcct1, \%cct ; # 頻度の高い方
   push @out , (@kcct2? @kcct? $o{r} : $o{c} : '' ) . (join $o{c} , MultSpec \@kcct2, \%cct)  ; # 頻度の低い方
-  push @out , $last ; # 桁数範囲
+  push @out , $digitRg ; # 桁数範囲
   AlignOut @out; # <-- 元の入力の1列の情報が、出力1行に相当する。
   return ;
 }
@@ -171,7 +181,7 @@ sub AlignOut ( @ ) {
   push @P , GREEN BOLD $p[1] ; ## (2) 何通りの値が出現したかを表示 
   push @P , BRIGHT_BLUE $p[2] if ($o{m}//'') ne 0 ; ## (3) 平均値の表示 (加算と減算の関係を把握する目的があるので、値が無いところは0と見なす)
   push @P , BRIGHT_YELLOW $p[3] if $o{'='} ;## (4) 列の名前(列名)を表示
-  push @P , BRIGHT_WHITE $p[4] ; ## (5) 値の最大と最小を取り出す。
+  push @P , BOLD BRIGHT_WHITE $p[4] ; ## (5) 値の最大と最小を取り出す。
   push @P , $p[5] ;## (6)  具体的な値の表示 (出現度数の多い順に $o{g} 個 ) 
   push @P , BRIGHT_GREEN $p[6] . GREEN $p[7] ;## ## (7) 最頻度数の分布## (7) 中点(なかてん)の処理 (7) テール度数の分布
   push @P , BRIGHT_BLUE $p[8] ;  ## (8) 値の文字列長の範囲の表示
@@ -208,11 +218,12 @@ sub  MultSpec ( $$ ) {
 
 # 配列参照から、最小値最大値を取り出す 
 sub minmaxstr ( $ ) {
+  * uniq = sub (@) {my %hh ;map { $hh{$_}++ != 0 ? () : $_ } @_ } ; 
   sub part ( &@ ) ; 
   sub RangeStr ( $$ ) ;
   my @gps = part {/^0*$/ ? 0 : looks_like_number $_ ? 1 : 2}  @{ $_[0] } ; 
   my @ostr ; 
-  push @ostr, join $o{r}, @{$gps[0]} if $gps[0] ;  # 空文字列があるときの処理  
+  push @ostr, join $o{r}, sort  & uniq ( @{$gps[0]} ) if $gps[0] ;  # 空文字列があるときの処理  
   push @ostr, RangeStr( min(@{$gps[1]}), max(@{$gps[1]}) ) if $gps[1] ;  # 数に見える値があるときの処理 
   push @ostr, RangeStr( minstr(@{$gps[2]}), maxstr(@{$gps[2]}) ) if $gps[2] ; # 数に見えない値があるときの処理 
   return @ostr; 

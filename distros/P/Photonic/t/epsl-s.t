@@ -32,12 +32,11 @@ use strict;
 use warnings;
 use PDL;
 use PDL::NiceSlice;
-use PDL::Complex;
 use Photonic::Geometry::FromEpsilon;
 use Photonic::LE::S::AllH;
 use Photonic::LE::S::EpsL;
 
-use Test::More tests => 10;
+use Test::More;
 use lib 't/lib';
 use TestUtils;
 
@@ -87,8 +86,8 @@ ok(Cagree($ecv, $ecx, 1e-4), "Chess board");
 #diag($ecx);
 #diag($ac->iteration);
 #diag($ac->orthogonalizations);
-#diag(pdl($ac->as)->complex);
-#diag(pdl($ac->bs)->complex);
+#diag($ac->as);
+#diag($ac->bs);
 is($eco->converged,1, "Converged");
 
 #Test mortola. By Guille.
@@ -102,20 +101,15 @@ is($eco->converged,1, "Converged");
     my $epsD=4+4.5*i;
     my $eimpar=FourPhasesImpar($N,$epsA,$epsB,$epsC,$epsD);
     my $epar=FourPhasesPar($N,$epsA,$epsB,$epsC,$epsD);
-
+    my $v = $epsA*$epsB*$epsC*$epsD * (1/$epsA + 1/$epsB + 1/$epsC + 1/$epsD);
+    my $v_sum = $epsA + $epsB + $epsC + $epsD;
     my %epsM=(
-	xx=>sqrt($epsA*$epsB*$epsC*$epsD
-		 * (1/$epsA + 1/$epsB +
-		    1/$epsC+1/$epsD)*($epsA+$epsB)*($epsC+$epsD) /
-		 (($epsA + $epsB + $epsC + $epsD) * ($epsA + $epsD) *
-		  ($epsC+$epsB))),
-	yy=>sqrt($epsA*$epsB*$epsC*$epsD
-		 * (1/$epsA + 1/$epsB + 1/$epsC + 1/$epsD)
-		 * ($epsA+$epsD) * ($epsC+$epsB)
-		 / (($epsA + $epsB + $epsC + $epsD) * ($epsA+$epsB) *
-		    ($epsC+$epsD)))
-	);
-    my ($g,$allh,$nr)=(PDL->null,PDL->null,PDL->null);
+	xx=>sqrt($v * ($epsA+$epsB) * ($epsC+$epsD)
+		 / ($v_sum * ($epsA+$epsD) * ($epsC+$epsB))),
+	yy=>sqrt($v * ($epsA+$epsD) * ($epsC+$epsB)
+		 / ($v_sum * ($epsA+$epsB) * ($epsC+$epsD)))
+    );
+    my ($g,$allh,$nr)=map PDL->null, 1..3;
     my %dir=(xx=>pdl(1,0),yy=>pdl(0,1));
     my %e=(neven => $epar,nodd =>$eimpar);
     foreach my $np (qw(neven nodd)){
@@ -129,34 +123,27 @@ is($eco->converged,1, "Converged");
 	       "Mortola -dir: $dir, -N: $np");
 	}
     }
-    sub FourPhasesImpar { #checkerboard
-	my $N=shift;
-	my $eA=shift;
-	my $eB=shift;
-	my $eC=shift;
-	my $eD=shift;
-	$eB=($eB*ones($N,$N))->mv(0,-1);
-	my $z=$eB->glue(1,($eA*ones($N,$N+1))->mv(0,-1));
-	$eC=($eC*ones($N+1,$N))->mv(0,-1);
-	$z=$z->glue(0,($eC->glue(1,($eD*ones($N+1,$N+1))->mv(0,-1))));
-	$z=$z->mv(-1,0);
-	$z(,,$N).=($z(,,$N+1)+$z(,,$N-1))/2;
-	$z(,$N,).=($z(,$N+1,)+$z(,$N-1,))/2;
-	return $z;
-    }
-    sub FourPhasesPar { #checkerboard
-	my $N=shift;
-	my $eA=shift;
-	my $eB=shift;
-	my $eC=shift;
-	my $eD=shift;
-	$eB=($eB*ones($N,$N))->mv(0,-1);
-	my $z=$eB->glue(1,($eA*ones($N,$N))->mv(0,-1));
-	$eC=($eC*ones($N,$N))->mv(0,-1);
-	$z=$z->glue(0,($eC->glue(1,($eD*ones($N,$N))->mv(0,-1))));
-	$z=$z->mv(-1,0);
-	$z(,,$N).=($z(,,$N)+$z(,,$N-1))/2;
-	$z(,$N,).=($z(,$N,)+$z(,$N-1,))/2;
-	return $z;
-    }
+}
+
+done_testing;
+
+sub checkerboard {
+    my ($N, $N1, $eA, $eB, $eC, $eD) = @_;
+    $eB=($eB*ones($N,$N));
+    my $z=$eB->glue(1,($eA*ones($N,$N1)));
+    $eC=($eC*ones($N1,$N));
+    $z=$z->glue(0,($eC->glue(1,($eD*ones($N1,$N1)))));
+    $z(,$N).=($z(,$N1)+$z(,$N-1))/2;
+    $z($N,).=($z($N1,)+$z($N-1,))/2;
+    return $z;
+}
+
+sub FourPhasesImpar { #checkerboard
+    my ($N, $eA, $eB, $eC, $eD) = @_;
+    checkerboard($N, $N+1, $eA, $eB, $eC, $eD);
+}
+
+sub FourPhasesPar { #checkerboard
+    my ($N, $eA, $eB, $eC, $eD) = @_;
+    checkerboard($N, $N, $eA, $eB, $eC, $eD);
 }

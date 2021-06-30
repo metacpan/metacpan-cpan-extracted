@@ -1,3 +1,6 @@
+## 2.1.3
+* Fixed HR::get_list
+
 ## 2.1.1
 * Add Room Messages API
 

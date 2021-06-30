@@ -64,6 +64,6 @@
          "url" : "https://github.com/DrHyde/perl-modules-CPAN-FindDependencies"
       }
    },
-   "version" : "3.05",
+   "version" : "3.06",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

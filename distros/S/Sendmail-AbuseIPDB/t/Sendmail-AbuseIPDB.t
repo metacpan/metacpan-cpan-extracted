@@ -41,6 +41,8 @@ is( $url, 'test://check/192.168.0.3/json?key=123456&days=30', 'Check URL paramet
 is( $db->catg( 14 ), 'Port Scan', 'Category conversion' );
 
 # ====== Magic URL check reporting ======
-my $url = $db->report( '192.168.0.3', 'Test Only', 'Port Scan', 'Exploited Host' );
+$url = $db->report( '192.168.0.3', 'Test Only', 'Port Scan', 'Exploited Host' );
 
 is( $url, 'test://report/json?key=123456&category=14%2C20&comment=Test+Only&ip=192.168.0.3', 'Check URL parameters for report()' );
+
+

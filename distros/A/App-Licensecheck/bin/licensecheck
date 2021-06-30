@@ -40,11 +40,11 @@ licensecheck - simple license checker for source files
 
 =head1 VERSION
 
-Version v3.2.0
+Version v3.2.1
 
 =cut
 
-our $VERSION = version->declare('v3.2.0');
+our $VERSION = version->declare('v3.2.1');
 
 my $progname = path($0)->basename;
 
@@ -276,7 +276,7 @@ push @OPT, qw(
 GetOptions( \%OPT, @OPT ) or pod2usage(2);
 
 pod2usage(1) if ( $OPT{help} );
-if ( $OPT{'version'} ) { version(); exit 0; }
+if ( $OPT{version} ) { version(); exit 0; }
 
 my %LIB_OPTS = (
 
@@ -339,7 +339,7 @@ foreach my $file ( $app->find(@ARGV) ) {
 	my @copyrights = uniq rs_keysort {$_} split /^/, $copyright;
 	chomp @copyrights;
 
-	if ( $OPT{deb_machine} ) {
+	if ( $OPT{'deb-machine'} ) {
 		my @ownerlines_clean        = ();
 		my %owneryears              = ();
 		my $owneryears_seem_correct = 1;
@@ -361,10 +361,10 @@ foreach my $file ( $app->find(@ARGV) ) {
 		push @{ $patternownerlines{"$pattern"} }, @ownerlines_clean;
 		$patternlicense{"$pattern"} = $license;
 	}
-	elsif ( $OPT{'machine'} ) {
+	elsif ( $OPT{machine} ) {
 		print "$file\t$license";
 		print "\t" . ( join( " / ", @copyrights ) or '*No copyright*' )
-			if $OPT{'copyright'};
+			if $OPT{copyright};
 		print "\n";
 	}
 	else {
@@ -377,7 +377,7 @@ foreach my $file ( $app->find(@ARGV) ) {
 	}
 }
 
-if ( $OPT{deb_machine} ) {
+if ( $OPT{'deb-machine'} ) {
 	print <<'HEADER';
 Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Upstream-Name: FIXME

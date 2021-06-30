@@ -1,5 +1,5 @@
 package Photonic::WE::R2::GreenP;
-$Photonic::WE::R2::GreenP::VERSION = '0.016';
+$Photonic::WE::R2::GreenP::VERSION = '0.017';
 
 =encoding UTF-8
 
@@ -9,7 +9,7 @@ Photonic::WE::R2::GreenP
 
 =head1 VERSION
 
-version 0.016
+version 0.017
 
 =head1 COPYRIGHT NOTICE
 
@@ -123,7 +123,6 @@ Criteria of convergence. 0 means don't check.
 use namespace::autoclean;
 use PDL::Lite;
 use PDL::NiceSlice;
-use PDL::Complex;
 use Photonic::WE::R2::AllH;
 use Photonic::Types;
 use Photonic::Utils qw(lentzCF);
@@ -160,8 +159,8 @@ sub evaluate {
     $self->_epsA(my $epsA=$self->haydock->epsilon->r2C);
     $self->_epsB(my $epsB=shift);
     $self->_u(my $u=1/(1-$epsB/$epsA));
-    my $as=pdl(map r2C($_), @{$self->haydock->as})->cplx;
-    my $bcs=pdl(map r2C($_), @{$self->haydock->bcs})->cplx;
+    my $as=PDL::r2C($self->haydock->as);
+    my $bcs=PDL::r2C($self->haydock->bcs);
     my $min= min($self->nh, $self->haydock->iteration);
     #    b0+a1/b1+a2/...
     #   lo debo convertir a
@@ -172,7 +171,7 @@ sub evaluate {
     #of them were used, there is no remaining work to do, so, converged
     $self->_converged($n<$min || $self->haydock->iteration<=$self->nh);
     $self->_nhActual($n);
-    my $g0b02=$self->haydock->gs->[0]*$self->haydock->b2s->[0];
+    my $g0b02=$self->haydock->gs->[0]*$self->haydock->b2s->slice("(0)");
     $self->_Gpp($u*$g0b02/($epsA*$fn));
     return $self->Gpp;
 }

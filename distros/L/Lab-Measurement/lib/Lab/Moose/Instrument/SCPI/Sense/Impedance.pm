@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::SCPI::Sense::Impedance;
-$Lab::Moose::Instrument::SCPI::Sense::Impedance::VERSION = '3.751';
+$Lab::Moose::Instrument::SCPI::Sense::Impedance::VERSION = '3.760';
 #ABSTRACT: Role for the HP/Agilent/Keysight SCPI SENSe:$function:IMPedance subsystem
 
 use v5.20;
@@ -56,7 +56,7 @@ Lab::Moose::Instrument::SCPI::Sense::Impedance - Role for the HP/Agilent/Keysigh
 
 =head1 VERSION
 
-version 3.751
+version 3.760
 
 =head1 METHODS
 
@@ -73,7 +73,7 @@ Query/Set input impedance mode. Allowed values: '0' or '1'.
 This software is copyright (c) 2021 by the Lab::Measurement team; in detail:
 
   Copyright 2018       Simon Reinhardt
-            2020       Andreas K. Huettel
+            2020       Andreas K. HÃ¼ttel
 
 
 This is free software; you can redistribute it and/or modify it under

@@ -25,7 +25,7 @@ eval { local $@; require Scalar::Util::Clone };
 
 use Clone(); # This is the backup clone method
 
-our $VERSION = '0.799';
+our $VERSION = '0.820';
 
 our $Debug = 0;
 
@@ -4191,7 +4191,7 @@ sub _clear_column_generated_values
   $self->{'nonlazy_column_mutator_method_names'}  = undef;
   $self->{'nonlazy_column_db_value_hash_keys'}    = undef;
   $self->{'primary_key_column_db_value_hash_keys'}= undef;
-  $self->{'primary_key_column_names_or_aliases'}  = undef
+  $self->{'primary_key_column_names_or_aliases'}  = undef;
   $self->{'column_db_value_hash_keys'}            = undef;
   $self->{'select_nonlazy_columns_string_sql'}    = undef;
   $self->{'select_columns_string_sql'}            = undef;

@@ -1,5 +1,9 @@
 Revision history of Alt-Data-Frame-ButMore
 
+0.0058      2021-06-30
+    - Monkey-patch for a PDL vs PDL::DateTime compatibility issue.
+      https://github.com/kmx/pdl-datetime/issues/3
+
 0.0056      2021-04-17
     - Fix a call to List::AllUtils::zip(). See also
       https://github.com/houseabsolute/List-AllUtils/issues/12

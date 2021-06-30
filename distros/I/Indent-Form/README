@@ -5,54 +5,70 @@ SYNOPSIS
      use Indent::Form;
 
      my $indent = Indent::Form->new(%parametes);
-     $indent->indent($data_ar, $actual_indent, $non_indent_flag);
+     my $string = $indent->indent($data_ar, $actual_indent, $non_indent_flag);
+     my @string = $indent->indent($data_ar, $actual_indent, $non_indent_flag);
 
 METHODS
-    "new(%params)"
-             Constructor.
+  "new"
+     my $indent = Indent::Form->new(%parametes);
 
-            *       "ansi"
+    Constructor.
 
-                     Use with ANSI sequences.
-                     Default value is 0.
+    Returns instance of object.
 
-            *       "align"
+    *       "ansi"
 
-                     Align of left side of form.
-                     Default value is 'right'.
+             Use with ANSI sequences.
+             Default value is 0.
 
-            *       "fill_character"
+    *       "align"
 
-                     Fill character for left side of form.
-                     Default value is ' '.
+             Align of left side of form.
+             Default value is 'right'.
 
-            *       "form_separator"
+    *       "fill_character"
 
-                     Form separator.
-                     Default value of 'form_separator' is ': '.
+             Fill character for left side of form.
+             Default value is ' '.
 
-            *       "line_size"
+    *       "form_separator"
 
-                     Line size.
-                     Default value of 'line_size' is 79 chars.
+             Form separator.
+             Default value of 'form_separator' is ': '.
 
-            *       "next_indent"
+    *       "line_size"
 
-                     Next indent.
-                     Default value of 'next_indent' isn't define.
+             Line size.
+             Default value of 'line_size' is 79 chars.
 
-            *       "output_separator"
+    *       "next_indent"
 
-                     Output separator.
-                     Default value of 'output_separator' is new line (\n).
+             Next indent.
+             Default value of 'next_indent' isn't define.
 
-    "indent($data_ar[, $actual_indent, $non_indent_flag])"
-             Indent data. Returns string.
+    *       "output_separator"
 
-             Arguments:
-             $data_ar - Reference to data array ([['key' => 'value'], [..]]);
-             $actual_indent - String to actual indent.
-             $non_indent_flag - Flag, than says no-indent.
+             Output separator.
+             Default value of 'output_separator' is new line (\n).
+
+  "indent"
+     my $string = $indent->indent($data_ar, $actual_indent, $non_indent_flag);
+     my @string = $indent->indent($data_ar, $actual_indent, $non_indent_flag);
+
+    Indent data. Scalar output is controlled by 'output_separator'
+    parameter.
+
+     Arguments:
+     $data_ar - Reference to data array ([['key' => 'value'], [..]]);
+     $actual_indent - String to actual indent.
+     $non_indent_flag - Flag, than says no-indent.
+
+    Returns string or array of strings in array context.
+
+ENVIRONMENT
+    Output is controlled by env variable "NO_COLOR" via Term::ANSIColor Perl
+    module. If we set 'ansi' parameter to 1 and env variable "NO_COLOR" will
+    be 1, output will be without ANSI colors. See <https://no-color.org/>.
 
 ERRORS
      new():
@@ -247,10 +263,12 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-     © 2011-2020 Michal Josef Špaček
-     Artistic License
-     BSD 2-Clause License
+    © 2011-2021 Michal Josef Špaček
+
+    Artistic License
+
+    BSD 2-Clause License
 
 VERSION
-    0.06
+    0.07
 

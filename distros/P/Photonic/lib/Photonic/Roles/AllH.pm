@@ -1,5 +1,5 @@
 package Photonic::Roles::AllH;
-$Photonic::Roles::AllH::VERSION = '0.016';
+$Photonic::Roles::AllH::VERSION = '0.017';
 
 =encoding UTF-8
 
@@ -9,7 +9,7 @@ Photonic::Roles::AllH
 
 =head1 VERSION
 
-version 0.016
+version 0.017
 
 =head1 COPYRIGHT NOTICE
 
@@ -54,7 +54,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA  02110-1301 USA
 =item (for developers)
 
     package Photonic::LE::NR2::AllH;
-    $Photonic::LE::NR2::AllH::VERSION= '0.016';
+    $Photonic::LE::NR2::AllH::VERSION= '0.017';
     use namespace::autoclean;
     use Moose;
     has...
@@ -118,15 +118,15 @@ Array of Haydock states
 
 =item * as
 
-Array of Haydock a coefficients
+ndarray of Haydock a coefficients
 
 =item * bs
 
-Array of Haydock b coefficients.
+ndarray of Haydock b coefficients.
 
 =item * b2s
 
-Array of Haydock b coefficients squared
+ndarray of Haydock b coefficients squared
 
 =item * All the Photonic::...::OneH methods
 
@@ -152,23 +152,24 @@ use Moose::Role;
 
 has nh=>(is=>'ro', required=>1,
          documentation=>'Maximum number of desired Haydock coefficients');
-# Moved to Role below
-#has 'keepStates'=>(is=>'ro', required=>1, default=>0, writer=> '_keepStates',
-#         documentation=>'flag to keep Haydock states');
 has _states=>(is=>'ro', isa=>'ArrayRef[Photonic::Types::PDLComplex]',
          default=>sub{[]}, init_arg=>undef,
          documentation=>'Saved states');
-# why not pdl?
-has as=>(is=>'ro', default=>sub{[]}, init_arg=>undef, writer=>'_as',
+has as=>(is=>'ro', default=>sub{PDL->null}, init_arg=>undef, writer=>'_as',
+         isa=>'PDL',
          documentation=>'Saved a coefficients');
-has bs=>(is=>'ro', default=>sub{[]}, init_arg=>undef,  writer=>'_bs',
+has bs=>(is=>'ro', default=>sub{PDL->null}, init_arg=>undef,  writer=>'_bs',
+         isa=>'PDL',
          documentation=>'Saved b coefficients');
-has b2s=>(is=>'ro', default=>sub{[]}, init_arg=>undef,  writer=>'_b2s',
+has b2s=>(is=>'ro', default=>sub{PDL->null}, init_arg=>undef,  writer=>'_b2s',
+         isa=>'PDL',
          documentation=>'Saved b^2 coefficients');
-has cs=>(is=>'ro', default=>sub{[]},
+has cs=>(is=>'ro', default=>sub{PDL->null},
+         isa=>'PDL',
 	 init_arg=>undef,  writer=>'_cs',
          documentation=>'Saved c coefficients');
-has bcs=>(is=>'ro', default=>sub{[]},
+has bcs=>(is=>'ro', default=>sub{PDL->null},
+         isa=>'PDL',
 	  init_arg=>undef, writer=>'_bcs',
          documentation=>'Saved b*c coefficients');
 has gs=>(is=>'ro', isa=>'ArrayRef[Num]', default=>sub{[]},
@@ -241,16 +242,16 @@ sub _build_stateFD {
 
 before '_iterate_indeed' => sub {
     my $self=shift;
-    $self->_save_b;
-    $self->_save_b2;
-    $self->_save_bc;
-    $self->_save_c;
+    $self->_save_val('b', 'next');
+    $self->_save_val('b2', 'next');
+    $self->_save_val('bc', 'next');
+    $self->_save_val('c', 'next');
     $self->_save_g;
     $self->_save_state;
 };
 after '_iterate_indeed' => sub {
     my $self=shift;
-    $self->_save_a;
+    $self->_save_val('a', 'current');
     $self->_checkorthogonalize;
 };
 
@@ -294,29 +295,36 @@ sub storeall {
     }
 }
 
-sub _save_a {
-    my $self=shift;
-    push @{$self->as}, $self->current_a;
+sub _save_val {
+    my ($self, $valname, $method) = @_;
+    my $valnames = $valname.'s';
+    my $writer = "_$valnames";
+    my $value = "${method}_$valname";
+    my $pdl = $self->$valnames;
+    my $the_value = $self->$value;
+    $the_value = pdl($the_value) if !UNIVERSAL::isa($the_value, 'PDL');
+    return $self->$writer($the_value->dummy(-1)) if $pdl->isnull;
+    $self->$writer($pdl->glue($pdl->getndims-1, $the_value));
 }
 
-sub _save_b {
-    my $self=shift;
-    push @{$self->bs}, $self->next_b;
-}
-
-sub _save_b2 {
-    my $self=shift;
-    push @{$self->b2s}, $self->next_b2;
-}
-
-sub _save_bc {
-    my $self=shift;
-    push @{$self->bcs}, $self->next_bc;
-}
-
-sub _save_c {
-    my $self=shift;
-    push @{$self->cs}, $self->next_c;
+sub _pop_val {
+    my ($self, $valname, $pop_dest, $last_dest) = @_;
+    my $valnames = $valname.'s';
+    my $writer = "_$valnames";
+    my $pdl = $self->$valnames;
+    confess "popped empty" if $pdl->isnull;
+    my @dims = $pdl->dims;
+    my $slice_arg = join ',', (map ':', 0..$#dims-1), -1;
+    my $lastval = $pdl->slice($slice_arg)->copy;
+    my $store = "_${pop_dest}_$valname";
+    $self->$store($lastval);
+    $dims[-1]--; # shrink
+    my $copy = PDL->null;
+    ($copy = $pdl->copy)->setdims(\@dims) if $dims[-1];
+    $self->$writer($copy);
+    return if !$last_dest;
+    my $last = "_${last_dest}_$valname";
+    $self->$last($copy->slice($slice_arg)->copy);
 }
 
 sub _save_g {
@@ -363,14 +371,11 @@ sub _pop { # undo the changes done after, in and before iteration, for
 	   # reorthogonalization, in reverse order
     my $self=shift;
     $self->_pop_state;
-    $self->_current_a(pop @{$self->as});
-    $self->_next_b2(pop @{$self->b2s});
-    $self->_current_b2($self->b2s->[-1]);
-    $self->_next_b(pop @{$self->bs});
-    $self->_current_b($self->bs->[-1]);
-    $self->_next_c(pop @{$self->cs});
-    $self->_current_c($self->cs->[-1]);
-    $self->_next_bc(pop @{$self->bcs});
+    $self->_pop_val('a', 'current');
+    $self->_pop_val('b2', 'next', 'current');
+    $self->_pop_val('b', 'next', 'current');
+    $self->_pop_val('c', 'next', 'current');
+    $self->_pop_val('bc', 'next');
     $self->_next_g(pop @{$self->gs});
     $self->_current_g($self->gs->[-1]);
     $self->_previous_g($self->gs->[-2]);

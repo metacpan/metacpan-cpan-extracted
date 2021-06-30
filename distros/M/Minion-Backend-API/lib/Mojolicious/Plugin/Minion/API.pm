@@ -3,7 +3,7 @@ use Mojo::Base 'Mojolicious::Plugin';
 use List::Util qw/first/;
 use Carp 'croak';
 
-our $VERSION = 0.06;
+our $VERSION = 1.00;
 
 sub register {
     my ($self, $app, $config) = @_;
@@ -58,6 +58,15 @@ sub register {
     $pattern = '/' . $pattern unless $pattern =~ /^\//;
     my $api = $app->routes->under($pattern => sub {
         my $c = shift;
+
+        # check authentication
+        if ($config->{authentication}) {
+            return 1 if $c->req->url->to_abs->userinfo eq $config->{authentication};
+
+            $c->res->headers->www_authenticate('Basic');
+            $c->render(text => 'Authentication required!', status => 401);
+            return;
+        }
 
         # valid ips enabled
         if ($config->{ips_enabled}) {
@@ -295,7 +304,13 @@ Mojolicious::Plugin::Minion::API - Plugin to receive requests from Minion::Backe
     use Minion;
 
     plugin 'Minion::API' => {
-        minion => Minion->new(Pg => 'postgresql://postgres@/test')
+        minion         => Minion->new(Pg => 'postgresql://postgres@/test'),
+        authentication => 'user:pass',
+        ips_enabled    => [
+            '127.0.0.1',
+            '172.16.0.1',
+            '192.168.0.1'
+        ]
     };
 
     app->start;
@@ -330,6 +345,15 @@ L<Minion> object to handle backend, this option is mandatory.
     };
 
 This option is to set pattern in url, see more L<Mojolicious::Routes::Route#under>
+
+=head2 authentication
+
+    # Mojolicious::Lite
+    plugin 'Minion::API' => {
+        authentication => 'user:pass'
+    };
+
+This options is to the security of your application, adding a basic authentication.
 
 =head2 ips_enabled
 

@@ -29,10 +29,10 @@ acceptance_tests(
     skip_dir => 'optional/format',
   },
   evaluator => {
-    specification_version => 'draft2019-09',
+    specification_version => $version,
     validate_formats => 0,
   },
-  output_file => $version.'.txt',
+  output_file => $version.'-acceptance.txt',
   test => {
     $ENV{NO_TODO} ? () : ( todo_tests => [
       { file => [
@@ -46,7 +46,7 @@ acceptance_tests(
           group_description => 'float and integers are equal up to 64-bit representation limits',
           test_description => 'float is valid' }
         : (),
-      $Config{nvsize} >= 16 ? # see https://github.com/json-schema-org/JSON-Schema-Test-Suite/pull/438#issuecomment-714670854
+      $Config{nvsize} >= 12 ? # see https://github.com/json-schema-org/JSON-Schema-Test-Suite/pull/438#issuecomment-714670854
         { file => 'multipleOf.json',
           group_description => 'invalid instance should not raise error when float division = inf',
           test_description => 'always invalid, but naive implementations may raise an overflow error' }
@@ -69,4 +69,4 @@ DIAG
 
 done_testing;
 __END__
-see t/results/draft2019-09.txt for test results
+see t/results/draft2019-09-acceptance.txt for test results

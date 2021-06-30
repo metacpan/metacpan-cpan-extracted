@@ -1,7 +1,9 @@
 package App::RegexpPatternUtils;
 
-our $DATE = '2020-01-03'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-06-27'; # DATE
+our $DIST = 'App-RegexpPatternUtils'; # DIST
+our $VERSION = '0.006'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -178,7 +180,7 @@ App::RegexpPatternUtils - CLI utilities related to Regexp::Pattern
 
 =head1 VERSION
 
-This document describes version 0.004 of App::RegexpPatternUtils (from Perl distribution App-RegexpPatternUtils), released on 2020-01-03.
+This document describes version 0.006 of App::RegexpPatternUtils (from Perl distribution App-RegexpPatternUtils), released on 2021-06-27.
 
 =head1 SYNOPSIS
 
@@ -209,7 +211,7 @@ This distribution includes several utilities related to L<Regexp::Pattern>:
 
 Usage:
 
- get_regexp_pattern_pattern(%args) -> [status, msg, payload, meta]
+ get_regexp_pattern_pattern(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Get a Regexp::Pattern::* pattern.
 
@@ -219,19 +221,23 @@ Examples:
 
 =item * Example #1:
 
- get_regexp_pattern_pattern(pattern => "YouTube/video_id"); # -> "(?^:[A-Za-z0-9_-]{11})"
+ get_regexp_pattern_pattern(pattern => "YouTube/video_id"); # -> [200, "OK", "(?^:[A-Za-z0-9_-]{11})", {}]
 
 =item * Generate variant A of Example::re3:
 
- get_regexp_pattern_pattern( pattern => "Example::re3", gen_args => { variant => "A" }); # -> "(?^:\\d{3}-\\d{3})"
-
-=item * Generate variant B of Example::re3:
-
- get_regexp_pattern_pattern( pattern => "Example::re3", gen_args => { variant => "B" });
+ get_regexp_pattern_pattern(pattern => "Example::re3", gen_args => { variant => "A" });
 
 Result:
 
- "(?^:\\d{3}-\\d{2}-\\d{5})"
+ [200, "OK", "(?^:\\d{3}-\\d{3})", {}]
+
+=item * Generate variant B of Example::re3:
+
+ get_regexp_pattern_pattern(pattern => "Example::re3", gen_args => { variant => "B" });
+
+Result:
+
+ [200, "OK", "(?^:\\d{3}-\\d{2}-\\d{5})", {}]
 
 =back
 
@@ -252,16 +258,17 @@ some arguments, you can supply them here.
 
 Name of pattern, with module prefix but without the 'Regexp::Pattern'.
 
+
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -271,7 +278,7 @@ Return value:  (any)
 
 Usage:
 
- list_regexp_pattern_modules() -> [status, msg, payload, meta]
+ list_regexp_pattern_modules() -> [$status_code, $reason, $payload, \%result_meta]
 
 List all installed Regexp::Pattern::* modules.
 
@@ -281,12 +288,12 @@ No arguments.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -296,7 +303,7 @@ Return value:  (any)
 
 Usage:
 
- match_with_regexp_pattern(%args) -> [status, msg, payload, meta]
+ match_with_regexp_pattern(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Match a string against a Regexp::Pattern pattern.
 
@@ -310,7 +317,12 @@ Examples:
 
 Result:
 
- "String DOES NOT match regexp pattern YouTube::video_id"
+ [
+   200,
+   "OK",
+   "String DOES NOT match regexp pattern YouTube::video_id",
+   { "cmdline.exit_code" => 1 },
+ ]
 
 =item * A match:
 
@@ -318,7 +330,12 @@ Result:
 
 Result:
 
- "String matches regexp pattern YouTube::video_id"
+ [
+   200,
+   "OK",
+   "String matches regexp pattern YouTube::video_id",
+   { "cmdline.exit_code" => 0 },
+ ]
 
 =back
 
@@ -351,16 +368,17 @@ Name of pattern, with module prefix but without the 'Regexp::Pattern'.
 
 =item * B<string>* => I<str>
 
+
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -380,20 +398,13 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
-=head1 SEE ALSO
-
-
-L<get-regexp-pattern-pattern>.
-
-L<rpgrep>.
-
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2018, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2018, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

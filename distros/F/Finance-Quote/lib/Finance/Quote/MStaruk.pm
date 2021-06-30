@@ -21,8 +21,8 @@
 #
 #    You should have received a copy of the GNU General Public License
 #    along with this program; if not, write to the Free Software
-#    Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
-#    02111-1307, USA
+#    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+#    02110-1301, USA
 #
 
 
@@ -40,7 +40,7 @@ use LWP::UserAgent;
 use HTTP::Request::Common;
 use HTTP::Cookies;
 
-our $VERSION = '1.49'; # VERSION
+our $VERSION = '1.50'; # VERSION
 
 $MSTARUK_MAIN_URL   =   "http://www.morningstar.co.uk";
 $MSTARUK_LOOK_UP    =   "http://www.morningstar.co.uk/uk/funds/SecuritySearchResults.aspx?search=";
@@ -157,7 +157,7 @@ sub mstaruk_fund  {
 
 		my ($currency, $date, $price, $pchange);
 		if ($webdoc =~
-		m[<td class="line heading">NAV<span class="heading"><br />([0-9]{2}/[0-9]{2}/[0-9]{4})</span>.*([A-Z]{3}).([0-9\.]+).*>([0-9\.\-]+)] )
+		m[<td class="line heading">NAV<span class="heading"><br />([0-9]{2}/[0-9]{2}/[0-9]{4})</span>.*([A-Z]{3}).([0-9\.]+).*Day Change[^%]*>([0-9\.\-]+)] )
         {
 
             $date = $1;
@@ -266,7 +266,7 @@ process.
 Funds are identified by their ISIN code.
 
 This module is loaded by default on a Finance::Quote object. It's
-also possible to load it explicity by placing "mstaruk" in the argument
+also possible to load it explicitly by placing "mstaruk" in the argument
 list to Finance::Quote->new().
 
 Information obtained by this module may be covered by funds.ft.com

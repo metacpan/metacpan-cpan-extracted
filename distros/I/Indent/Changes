@@ -1,3 +1,10 @@
+0.08 2021-06-28T14:44:11+02:00
+ [Common]
+ - Update copyright years.
+
+ [Indent::Word]
+ - Add support for NO_COLOR and COLOR env variables.
+
 0.07 2020-10-30T14:09:06+01:00
  [Common]
  - Fix minimal version of Text::ANSI::Util.

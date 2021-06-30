@@ -1,7 +1,7 @@
 package AppIP;
 use Mojo::Base 'Mojolicious';
 
-our $VERSION = 0.05;
+our $VERSION = 1.00;
 
 sub startup {
     my $self = shift;

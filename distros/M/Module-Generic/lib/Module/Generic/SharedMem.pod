@@ -103,7 +103,7 @@ Module::Generic::SharedMem - Shared Memory Manipulation
 
 =head1 VERSION
 
-    v0.1.0
+    v0.1.1
 
 =head1 DESCRIPTION
 
@@ -160,6 +160,10 @@ Thus, one can deactive auto removal of the shared memory block, but enable auto 
 
 A boolean value to set the shared memory as exclusive. This will affect the flags set by L</flags> which are used by L</open>.
 
+=item I<json>
+
+Provided with a value (true or false does not matter), and this will set L<JSON> as the data packing mechanism when storing data to memory.
+
 =item I<key>
 
 The shared memory key identifier to use. It defaults to C<IPC::SysV::IPC_PRIVATE>
@@ -185,6 +189,10 @@ If you do not want to share it with any other user than yourself, setting mode t
 The size in byte of the shared memory.
 
 This is set once it is created. You can create again the shared memory segment with a smaller size, but not a bigger one. If you want to increase the size, you would need to remove it first.
+
+=item I<storable>
+
+Provided with a value (true or false does not matter), and this will set L<Storable> as the data packing mechanism when storing data to memory.
 
 =back
 
@@ -258,6 +266,10 @@ Returns the id of the shared memory once it has been opened with L</open>
 
     my $s = $shmem->open || die( $shmem->error );
     my $id = $s->id;
+
+=head2 json
+
+When called, this will set L<JSON> as the data packing mechanism when storing data to memory.
 
 =head2 key
 
@@ -333,7 +345,7 @@ Get a random key to be used as identifier to create a shared memory.
 
 =head2 read
 
-Read the content of the shared memory and decode the data read using L<Storable/thaw>
+Read the content of the shared memory and decode the data read using L<JSON> or L<Storable/thaw> depending on your choice upon either object instantiation or upon using the methods L</json> or L</storable>
 
 You can optionally provide a buffer, and a maximum length and it will read that much length and put the shared memory content decoded in that buffer, if it were provided.
 
@@ -406,6 +418,10 @@ It performs:
 
 If no parameter is provided it returns a L<Module::Generic::SemStat> object in scalar context or an array of value in list context.
 
+=head2 storable
+
+When called, this will set L<Storable> as the data packing mechanism when storing data to memory.
+
 =head2 supported
 
 Returns true if IPC shared memory segments are supported by the system, and false otherwise.
@@ -418,7 +434,9 @@ Remove the lock, if any. The shared memory must first be opened.
 
 =head2 write
 
-Write the data provided to the shared memory, after having encoded it using L<Storable/freeze>.
+Write the data provided to the shared memory, after having encoded it using L<JSON> or L<Storable/freeze> depending on your choice. See L</json> and L</storable>
+
+You can only store in shared memory reference, such as scalar reference, array or hash reference. You could also store module objects, but L<JSON> only supports encoding objects that are based on array or hash. As the L<JSON> documentation states "other blessed references will be converted into null"
 
 It returns the current object for chaining, or under if there was an error, which can then be retrieved with L<Module::Generic/error>
 

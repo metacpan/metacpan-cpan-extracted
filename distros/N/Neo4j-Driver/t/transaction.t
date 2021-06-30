@@ -4,9 +4,9 @@ use warnings;
 use lib qw(./lib t/lib);
 
 my $driver;
-use Neo4j::Test;
+use Neo4j_Test;
 BEGIN {
-	unless ($driver = Neo4j::Test->driver) {
+	unless ( $driver = Neo4j_Test->driver() ) {
 		print qq{1..0 # SKIP no connection to Neo4j server\n};
 		exit;
 	}
@@ -63,14 +63,14 @@ subtest 'query error handling' => sub {
 	my $q = 'RETURN 42';
 	throws_ok { $s->run(\$q) } qr/\bunblessed reference\b/, 'bogus reference query';
 	SKIP: {
-		skip 'for sim', 1 if $Neo4j::Test::sim;
+		skip 'for sim', 1 if $Neo4j_Test::sim;
 		throws_ok { $s->run( bless \$q, 'Neo4j::Test' ); } qr/syntax/i, 'bogus blessed query';
 	}
 };
 
 
 subtest 'transaction status on error (HTTP)' => sub {
-	plan skip_all => '(currently testing Bolt)' if $Neo4j::Test::bolt;
+	plan skip_all => '(currently testing Bolt)' if $Neo4j_Test::bolt;
 	plan skip_all => 'requires REST::Client with AND without Sim';  # TODO
 	plan tests => 5;
 	my $session = $driver->session; 
@@ -78,13 +78,13 @@ subtest 'transaction status on error (HTTP)' => sub {
 	my $bad_uri = URI->new($good_uri);
 	$bad_uri->userinfo("no\tuser:no\tpass");
 	my $t = $session->begin_transaction;
-	$session->{net}->{http_agent}->{client}->setHost("$bad_uri") unless $Neo4j::Test::sim;
-	$session->{net}->{http_agent}->{client}->{auth} = 0 if $Neo4j::Test::sim;
+	$session->{net}->{http_agent}->{client}->setHost("$bad_uri") unless $Neo4j_Test::sim;
+	$session->{net}->{http_agent}->{client}->{auth} = 0 if $Neo4j_Test::sim;
 	throws_ok { $t->run('RETURN "Ugly"') } qr/Unauthorized/i, 'HTTP network error';
 	ok $t->is_open, 'network error keeps open';  # see neo4j #12651
 	ok $t->{unused}, 'network error keeps unused';
-	$session->{net}->{http_agent}->{client}->setHost("$good_uri") unless $Neo4j::Test::sim;
-	$session->{net}->{http_agent}->{client}->{auth} = 1 if $Neo4j::Test::sim;
+	$session->{net}->{http_agent}->{client}->setHost("$good_uri") unless $Neo4j_Test::sim;
+	$session->{net}->{http_agent}->{client}->{auth} = 1 if $Neo4j_Test::sim;
 	throws_ok { $t->run('praise be to the dartmakers.') } qr/syntax/i, 'Neo4j server error';
 	ok ! $t->is_open, 'server error closes';
 };
@@ -122,7 +122,7 @@ subtest 'commit/rollback: modify database' => sub {
 CREATE (n {entropy: {entropy}}) RETURN id(n) AS node_id
 END
 	lives_and { ok $r = $t->run( $q, entropy => $entropy )->single } 'create node';
-	is !! $t->{unused}, !! $Neo4j::Test::bolt, 'http transaction status from active_tx';
+	is !! $t->{unused}, !! $Neo4j_Test::bolt, 'http transaction status from active_tx';
 	my $node_id = $r->get('node_id');
 	$q = <<END;
 MATCH (n) WHERE id(n) = {node_id} RETURN n.entropy, 0

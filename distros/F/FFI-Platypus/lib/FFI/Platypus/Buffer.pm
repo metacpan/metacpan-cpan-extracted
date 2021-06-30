@@ -10,7 +10,7 @@ our @EXPORT = qw( scalar_to_buffer buffer_to_scalar );
 our @EXPORT_OK = qw ( scalar_to_pointer grow set_used_length window );
 
 # ABSTRACT: Convert scalars to C buffers
-our $VERSION = '1.46'; # VERSION
+our $VERSION = '1.50'; # VERSION
 
 
 use constant _incantation =>
@@ -50,7 +50,7 @@ FFI::Platypus::Buffer - Convert scalars to C buffers
 
 =head1 VERSION
 
-version 1.46
+version 1.50
 
 =head1 SYNOPSIS
 
@@ -106,7 +106,7 @@ copying the buffer instead.  For example:
  use FFI::Platypus::Memory qw( malloc memcpy free )
  
  my($ptr, $size) = scalar_to_buffer $string;
- c_function_thaat_does_not_keep_ptr( $ptr, $size); # okay
+ c_function_that_does_not_keep_ptr( $ptr, $size); # okay
  
  my($ptr, $size) = scalar_to_buffer $string;
  my $ptr_copy = malloc($size);

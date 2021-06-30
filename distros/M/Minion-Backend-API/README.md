@@ -16,6 +16,11 @@
     my $ua = Mojo::UserAgent->new;
     my $backend = Minion::Backend::API->new('https://my-api.com', $ua);
 
+    # using authentication
+    my $backend = Minion::Backend::API->new('https://my-api.com', 'user:pass');
+    my $backend = Minion::Backend::API->new('https://my-api.com', 'user:pass', $ua);
+    my $backend = Minion::Backend::API->new('https://my-api.com', $ua, 'user:pass');    
+
 # DESCRIPTION
 
 [Minion::Backend::API](https://metacpan.org/pod/Minion::Backend::API) is a backend for [Minion](https://metacpan.org/pod/Minion)
@@ -36,6 +41,13 @@ based on [Mojo::UserAgent](https://metacpan.org/pod/Mojo::UserAgent). This modul
 
     my $ua   = $backend->ua;
     $backend = $backend->ua(Mojo::UserAgent->new);
+
+## authentication
+
+    my $authentication = $backend->authentication;
+    $backend->authentication('user:pass');
+
+It makes basic authentication.
 
 ## slow
 

@@ -1,5 +1,5 @@
 package Hustle::Table;
-use version; our $VERSION=version->declare("v0.2.1");
+use version; our $VERSION=version->declare("v0.2.2");
 
 use strict;
 use warnings;
@@ -16,7 +16,6 @@ use constant DEBUG=>0;
 
 #constants for entry feilds
 use enum (qw<matcher_ sub_ label_ count_>);
-use enum(qw<LOOP CACHED_LOOP DYNAMIC CACHED_DYNAMIC>);
 
 #TODO:
 # It's assumed that all matchers take the same amount of time to match. Clearly
@@ -38,6 +37,7 @@ sub add {
 	my $entry;
 	state $id=0;
 	my @ids;
+	my $rem;
 	for my $item (@list){
 		given(ref $item){
 			when("ARRAY"){
@@ -49,13 +49,16 @@ sub add {
 				$entry=[$item->@{qw<matcher sub label count>}];
 			}
 			default {
-				croak "Unkown data format";
+				my %item=@list;
+				$entry=[@item{qw<matcher sub label count>}];
+				$rem =1;
 			}
 
 		}
 		$entry->[label_]=$id++ unless defined $entry->[label_];
 		$entry->[count_]= 0 unless defined $entry->[count_];
 		croak "target is not a sub refernce" unless ref $entry->[sub_] eq "CODE";
+		croak "matcher not specified" unless defined $entry->[matcher_];
 		#Append the item to the of the list (minus defaut)
 		if(defined $entry->[matcher_]){
 			splice @$self, @$self-1,0, $entry;
@@ -64,6 +67,7 @@ sub add {
 		else {
 			$self->[$self->@*-1]=$entry;
 		}
+		last if $rem;
 
 	}
 
@@ -153,6 +157,7 @@ sub prepare_dispatcher{
 	if(defined $options{reset} and $options{reset}){
 		$self->reset_counters;
 	}
+	carp("Cache not used. Cache must be undef or a hash ref") and return undef if defined $options{cache} and ref($options{cache}) ne "HASH";
 
 	do {
 		given($options{type}){
@@ -160,8 +165,13 @@ sub prepare_dispatcher{
 			$self->_prepare_online_cached($options{cache}) when /^online/i and ref $options{cache} eq "HASH";
 			$self->_prepare_online when /^online/i;
 
+			$self->_prepare_online_cached($options{cache}) when undef; 
+
+			
 			default {
-				$self->_prepare_online($options{cache});
+				#$self->_prepare_online($options{cache});
+				carp "Invalid dispatcher type";
+				undef;
 			}
 		}
 	}
@@ -193,12 +203,56 @@ sub _prepare_online {
                 $d.="}\n";
         }
         $d.="default {\n";
-        $d.='&{$table[$#table][sub_]};'."\n";
         $d.='$table[$#table][count_]++;'."\n";
+        $d.='&{$table[$#table][sub_]};'."\n";
         $d.="}\n";
         $d.="}\n}\n";
         eval($d);
 }
+
+sub _prepare_goto_online {
+        \my @table=shift; #self
+        my $d="sub {\n";
+        #$d.='my ($dut)=@_;'."\n";
+        $d.=' given ($_[0]) {'."\n";
+        for (0..@table-2) {
+                my $pre='$table['.$_.']';
+
+                $d.='when ('.$pre."[matcher_]){\n";
+                $d.=$pre."[count_]++;\n";
+                $d.='goto '.$pre.'[sub_];'."\n";
+                $d.="}\n";
+        }
+        $d.="default {\n";
+        $d.='$table[$#table][count_]++;'."\n";
+        $d.='goto $table[$#table][sub_];'."\n";
+        $d.="}\n";
+        $d.="}\n}\n";
+        eval($d);
+}
+
+sub _prepare_online_2 {
+        \my @table=shift; #self
+        my $d="sub {\n";
+        #$d.='my ($dut)=@_;'."\n";
+	$d.= 'my $tmp;'."\n";
+        $d.=' given ($_[0]) {'."\n";
+        for (0..@table-2) {
+                my $pre='$table['.$_.']';
+		$d.='$tmp='.$pre.";\n";
+                $d.='when ($tmp->[matcher_]){'."\n";
+                $d.='$tmp->[count_]++;'."\n";
+                $d.='&{$tmp->[sub_]};'."\n";
+                $d.="}\n";
+        }
+        $d.="default {\n";
+        $d.='$table[$#table][count_]++;'."\n";
+        $d.='&{$table[$#table][sub_]};'."\n";
+        $d.="}\n";
+        $d.="}\n}\n";
+        eval($d);
+}
+
 sub _prepare_online_cached {
 	\my @table=shift; #self
 	my $cache=shift;

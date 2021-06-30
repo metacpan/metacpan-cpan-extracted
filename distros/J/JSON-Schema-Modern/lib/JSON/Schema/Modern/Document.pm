@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Document;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: One JSON Schema document
 
-our $VERSION = '0.512';
+our $VERSION = '0.513';
 
 use 5.016;
 no if "$]" >= 5.031009, feature => 'indirect';
@@ -18,7 +18,7 @@ use Safe::Isa;
 use Moo;
 use MooX::TypeTiny;
 use MooX::HandlesVia;
-use Types::Standard qw(InstanceOf HashRef Str Dict ArrayRef);
+use Types::Standard qw(InstanceOf HashRef Str Dict ArrayRef Enum);
 use namespace::clean;
 
 extends 'Mojo::JSON::Pointer', 'Moo::Object';
@@ -35,6 +35,11 @@ has canonical_uri => (
   default => sub { Mojo::URL->new },
   coerce => sub { $_[0]->$_isa('Mojo::URL') ? $_[0] : Mojo::URL->new($_[0]) },
   clearer => '_clear_canonical_uri',
+);
+
+has specification_version => (
+  is => 'rwp',
+  isa => Enum([qw(draft7 draft2019-09)]),
 );
 
 has resource_index => (
@@ -149,6 +154,10 @@ sub BUILD {
   # if the schema identified a canonical uri for itself, it overrides the initial value
   $self->_set_canonical_uri($state->{initial_schema_uri});
 
+  # TODO: in the future, this will be a dialect object, which describes the vocabularies in effect
+  # as well as draft specification version
+  $self->_set_specification_version($state->{spec_version});
+
   if (@{$state->{errors}}) {
     $self->_set_errors($state->{errors});
     return;
@@ -181,7 +190,7 @@ JSON::Schema::Modern::Document - One JSON Schema document
 
 =head1 VERSION
 
-version 0.512
+version 0.513
 
 =head1 SYNOPSIS
 
@@ -209,6 +218,11 @@ The actual raw data representing the schema.
 When passed in during construction, this represents the initial URI by which the document should
 be known. It is overwritten with the root schema's C<$id> property when one exists, and as such
 can be considered the canonical URI for the document as a whole.
+
+=head2 specification_version
+
+Indicates which version of the JSON Schema specification is used during evaluation of this schema
+document. Is normally determined automatically at construction time.
 
 =head2 resource_index
 

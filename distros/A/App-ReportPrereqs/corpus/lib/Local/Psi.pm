@@ -1,4 +1,4 @@
-package Local::Zeta;
+package Local::Psi;
 
 use 5.006;
 use strict;

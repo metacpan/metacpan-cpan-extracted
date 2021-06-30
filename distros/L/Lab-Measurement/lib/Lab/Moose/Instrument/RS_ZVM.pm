@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::RS_ZVM;
-$Lab::Moose::Instrument::RS_ZVM::VERSION = '3.751';
+$Lab::Moose::Instrument::RS_ZVM::VERSION = '3.760';
 #ABSTRACT: Rohde & Schwarz ZVM Vector Network Analyzer
 
 use v5.20;
@@ -97,7 +97,7 @@ Lab::Moose::Instrument::RS_ZVM - Rohde & Schwarz ZVM Vector Network Analyzer
 
 =head1 VERSION
 
-version 3.751
+version 3.760
 
 =head1 SYNOPSIS
 
@@ -114,8 +114,8 @@ C<sparam_catalog> methods.
 This software is copyright (c) 2021 by the Lab::Measurement team; in detail:
 
   Copyright 2016       Simon Reinhardt
-            2017       Andreas K. Huettel, Simon Reinhardt
-            2020       Andreas K. Huettel
+            2017       Andreas K. HÃ¼ttel, Simon Reinhardt
+            2020       Andreas K. HÃ¼ttel
 
 
 This is free software; you can redistribute it and/or modify it under

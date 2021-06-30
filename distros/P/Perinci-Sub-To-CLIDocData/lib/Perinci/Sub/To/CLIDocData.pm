@@ -1,9 +1,9 @@
 package Perinci::Sub::To::CLIDocData;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-04-27'; # DATE
+our $DATE = '2021-06-27'; # DATE
 our $DIST = 'Perinci-Sub-To-CLIDocData'; # DIST
-our $VERSION = '0.294'; # VERSION
+our $VERSION = '0.295'; # VERSION
 
 use 5.010001;
 use strict;
@@ -454,7 +454,7 @@ sub gen_cli_doc_data_from_meta {
             (keys(%args_prop) || keys(%$common_opts) ? " [options]" : ""). # XXX translatable?
             (@args ? " ".join(" ", @args) : "");
         $clidocdata->{usage_line} = "[[prog]]".
-            (@opts+@args ? " ".join(" ", @opts, @args) : "");
+            (@opts+@args ? " ".join(" ", @opts, (@opts && @args ? ("--") : ()), @args) : "");
     } # GEN_USAGE_LINE
 
     # filter and format examples
@@ -524,7 +524,7 @@ Perinci::Sub::To::CLIDocData - From Rinci function metadata, generate structure 
 
 =head1 VERSION
 
-This document describes version 0.294 of Perinci::Sub::To::CLIDocData (from Perl distribution Perinci-Sub-To-CLIDocData), released on 2020-04-27.
+This document describes version 0.295 of Perinci::Sub::To::CLIDocData (from Perl distribution Perinci-Sub-To-CLIDocData), released on 2021-06-27.
 
 =head1 SYNOPSIS
 
@@ -563,7 +563,6 @@ Sample function metadata (C<$meta>):
    summary => "Function summary",
    v => 1.1,
  }
-
 Sample result:
 
  do {
@@ -657,7 +656,7 @@ Sample result:
            tags        => 'fix',
          },
        },
-       usage_line => "[[prog]] [--bool1] [-f] [--flag1] [--no-bool1] [--nobool1] [-z] <str1>",
+       usage_line => "[[prog]] [--bool1] [-f] [--flag1] [--no-bool1] [--nobool1] [-z] -- <str1>",
      },
    ];
    $a->[2]{opts}{"--bool1"}{tags} = $a->[2]{opts}{"--bool1"}{arg_spec}{tags};
@@ -667,7 +666,6 @@ Sample result:
    $a->[2]{opts}{"-z"}{tags} = $a->[2]{opts}{"--bool1"}{arg_spec}{tags};
    $a;
  }
-
 For a more complete sample, see function metadata for C<demo_cli_opts> in
 L<Perinci::Examples::CLI>.
 
@@ -682,7 +680,7 @@ Observed function argument attribute: C<x.cli.opt_value_label>, C<caption>, C<>.
 
 Usage:
 
- gen_cli_doc_data_from_meta(%args) -> [status, msg, payload, meta]
+ gen_cli_doc_data_from_meta(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 From Rinci function metadata, generate structure convenient for producing CLI documentation (helpE<sol>usageE<sol>POD).
 
@@ -734,12 +732,12 @@ Pass per_arg_json=1 to Perinci::Sub::GetArgs::Argv.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (hash)
 
@@ -771,7 +769,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2016, 2015, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2016, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -25,7 +25,7 @@ our
     ($VERSION, %FUNCS, %GLOBALS, %MIBS, %MUNGE, $AUTOLOAD, $INIT, $DEBUG, %SPEED_MAP,
      $NOSUCH, $BIGINT, $REPEATERS);
 
-$VERSION = '3.71';
+$VERSION = '3.73';
 
 =head1 NAME
 
@@ -33,7 +33,7 @@ SNMP::Info - OO Interface to Network devices and MIBs through SNMP
 
 =head1 VERSION
 
-SNMP::Info - Version 3.71
+SNMP::Info - Version 3.73
 
 =head1 AUTHOR
 
@@ -265,18 +265,18 @@ support.
 
 See documentation in L<SNMP::Info::Bridge> for details.
 
-=item SNMP::Info::CiscoAgg
-
-SNMP Interface to Cisco Aggregated Links
-
-See documentation in L<SNMP::Info::CiscoAgg> for details.
-
 =item SNMP::Info::CDP
 
 F<CISCO-CDP-MIB>.  Cisco Discovery Protocol (CDP) Support.  Inherited by
 Cisco, Enterasys, and HP devices.
 
 See documentation in L<SNMP::Info::CDP> for details.
+
+=item SNMP::Info::CiscoAgg
+
+SNMP Interface to Cisco Aggregated Links
+
+See documentation in L<SNMP::Info::CiscoAgg> for details.
 
 =item SNMP::Info::CiscoConfig
 
@@ -317,12 +317,6 @@ F<CISCO-STACK-MIB>.
 
 See documentation in L<SNMP::Info::CiscoStack> for details.
 
-=item SNMP::Info::CiscoStpExtensions
-
-F<CISCO-STP-EXTENSIONS-MIB>
-
-See documentation in L<SNMP::Info::CiscoStpExtensions> for details.
-
 =item SNMP::Info::CiscoStats
 
 F<OLD-CISCO-CPU-MIB>, F<CISCO-PROCESS-MIB>, and F<CISCO-MEMORY-POOL-MIB>.
@@ -331,6 +325,12 @@ devices.
 
 See documentation in L<SNMP::Info::CiscoStats> for details.
 
+=item SNMP::Info::CiscoStpExtensions
+
+F<CISCO-STP-EXTENSIONS-MIB>
+
+See documentation in L<SNMP::Info::CiscoStpExtensions> for details.
+
 =item SNMP::Info::CiscoVTP
 
 F<CISCO-VTP-MIB>, F<CISCO-VLAN-MEMBERSHIP-MIB>,
@@ -338,17 +338,17 @@ F<CISCO-VLAN-IFTABLE-RELATIONSHIP-MIB>
 
 See documentation in L<SNMP::Info::CiscoVTP> for details.
 
-=item SNMP::Info::DocsisHE
-
-SNMP Interface for DOCSIS CMTS
-
-See documentation in L<SNMP::Info::DocsisHE> for details.
-
 =item SNMP::Info::DocsisCM
 
 SNMP Interface for DOCSIS Cable Modems
 
 See documentation in L<SNMP::Info::DocsisCM> for details.
+
+=item SNMP::Info::DocsisHE
+
+SNMP Interface for DOCSIS CMTS
+
+See documentation in L<SNMP::Info::DocsisHE> for details.
 
 =item SNMP::Info::EDP
 
@@ -374,6 +374,12 @@ See documentation in L<SNMP::Info::EtherLike> for details.
 Foundry (Brocade) Discovery Protocol.  F<FOUNDRY-SN-SWITCH-GROUP-MIB>
 
 See documentation in L<SNMP::Info::FDP> for details.
+
+=item SNMP::Info::IEEE802_Bridge
+
+SNMP Interface to data available through the F<IEEE8021-Q-BRIDGE-MIB>
+
+See documentation in L<SNMP::Info::IEEE802_Bridge> for details.
 
 =item SNMP::Info::IEEE802dot11
 
@@ -522,7 +528,7 @@ See documentation in L<SNMP::Info::Layer2::Adtran> for details.
 
 =item SNMP::Info::Layer2::Aerohive
 
-Subclass for Aerohive Access Points.
+Subclass for Aerohive / Extreme access points.
 
 See documentation in L<SNMP::Info::Layer2::Aerohive> for details.
 
@@ -750,7 +756,7 @@ See documentation in L<SNMP::Info::Layer3::BayRS> for details.
 
 =item SNMP::Info::Layer3::BlueCoatSG
 
-Subclass for Blue Coat SG series proxy devices.
+Subclass for BlueCoat SG series proxy devices.
 
 See documentation in L<SNMP::Info::Layer3::BlueCoatSG> for details.
 
@@ -822,12 +828,6 @@ Subclass for Cumulus Networks Routers.
 
 See documentation in L<SNMP::Info::Layer3::Cumulus> for details.
 
-=item SNMP::Info::Layer3::DLink
-
-Subclass for DLink devices.
-
-See documentation in L<SNMP::Info::Layer3::DLink> for details.
-
 =item SNMP::Info::Layer3::Dell
 
 Subclass for Dell PowerConnect switches. The IBM BladeCenter
@@ -835,6 +835,12 @@ Gigabit Ethernet Switch Module and some Linksys switches
 also use this module based upon MIB support.
 
 See documentation in L<SNMP::Info::Layer3::Dell> for details.
+
+=item SNMP::Info::Layer3::DLink
+
+Subclass for DLink devices.
+
+See documentation in L<SNMP::Info::Layer3::DLink> for details.
 
 =item SNMP::Info::Layer3::Enterasys
 
@@ -1729,6 +1735,7 @@ sub device_type {
         40310 => 'SNMP::Info::Layer3::Cumulus',
         41112 => 'SNMP::Info::Layer2::Ubiquiti',
         44641 => 'SNMP::Info::Layer3::VyOS',
+        47196 => 'SNMP::Info::Layer3::ArubaCX',
         48690 => 'SNMP::Info::Layer3::Teltonika',
     );
 
@@ -1767,6 +1774,7 @@ sub device_type {
         21091 => 'SNMP::Info::Layer2::Exinda',
         26543 => 'SNMP::Info::Layer3::IBMGbTor',
         26928 => 'SNMP::Info::Layer2::Aerohive',
+        47196 => 'SNMP::Info::Layer3::ArubaCX',
         48690 => 'SNMP::Info::Layer3::Teltonika',
     );
 
@@ -1930,6 +1938,10 @@ sub device_type {
         # it would flip/flop between those
         $objtype = 'SNMP::Info::Layer3::Scalance'
 	    if ( $soid =~ /\.1\.3\.6\.1\.4\.1\.4329\.6\.1\.2/i );
+
+        # Aruba wireless switches (issue #403)
+        $objtype = 'SNMP::Info::Layer3::Aruba'
+            if ( $desc =~ /ArubaOS/ );
 
         # Teltonika RUT9xx Series
         $objtype = 'SNMP::Info::Layer3::Teltonika'
@@ -2852,17 +2864,17 @@ For protocol specific information and implementation:
 
 =over
 
-=item LLDP: See L<SNMP::Info::LLDP> for details.
+=item AMAP: See L<SNMP::Info::AMAP> for details.
 
 =item CDP: See L<SNMP::Info::CDP> for details.
 
-=item SONMP: See L<SNMP::Info::SONMP> for details.
+=item EDP: See L<SNMP::Info::EDP> for details.
 
 =item FDP: See L<SNMP::Info::FDP> for details.
 
-=item EDP: See L<SNMP::Info::EDP> for details.
+=item LLDP: See L<SNMP::Info::LLDP> for details.
 
-=item AMAP: See L<SNMP::Info::AMAP> for details.
+=item SONMP: See L<SNMP::Info::SONMP> for details.
 
 =back
 
@@ -3638,7 +3650,7 @@ Makes human friendly speed ratings using C<%SPEED_MAP>.
  %SPEED_MAP = (
                 '56000'      => '56 kbps',
                 '64000'      => '64 kbps',
-                '115000'     => '115 kpbs',
+                '115000'     => '115 kbps',
                 '1500000'    => '1.5 Mbps',
                 '1536000'    => 'T1',
                 '1544000'    => 'T1',
@@ -3649,9 +3661,9 @@ Makes human friendly speed ratings using C<%SPEED_MAP>.
                 '4000000'    => '4.0 Mbps',
                 '10000000'   => '10 Mbps',
                 '11000000'   => '11 Mbps',
-                '20000000'   => '20 Mbps',
                 '16000000'   => '16 Mbps',
                 '16777216'   => '16 Mbps',
+                '20000000'   => '20 Mbps',
                 '44210000'   => 'T3',
                 '44736000'   => 'T3',
                 '45000000'   => '45 Mbps',
@@ -3661,11 +3673,11 @@ Makes human friendly speed ratings using C<%SPEED_MAP>.
                 '54000000'   => '54 Mbps',
                 '64000000'   => '64 Mbps',
                 '100000000'  => '100 Mbps',
-                '200000000'  => '200 Mbps',
                 '149760000'  => 'ATM on OC-3',
                 '155000000'  => 'OC-3',
                 '155519000'  => 'OC-3',
                 '155520000'  => 'OC-3',
+                '200000000'  => '200 Mbps',
                 '400000000'  => '400 Mbps',
                 '599040000'  => 'ATM on OC-12',
                 '622000000'  => 'OC-12',
@@ -3685,7 +3697,7 @@ munge_highspeed(). SNMP::Info can return speeds up to terabit levels this way.
 %SPEED_MAP = (
     '56000'      => '56 kbps',
     '64000'      => '64 kbps',
-    '115000'     => '115 kpbs',
+    '115000'     => '115 kbps',
     '1500000'    => '1.5 Mbps',
     '1536000'    => 'T1',
     '1544000'    => 'T1',
@@ -3696,9 +3708,9 @@ munge_highspeed(). SNMP::Info can return speeds up to terabit levels this way.
     '4000000'    => '4.0 Mbps',
     '10000000'   => '10 Mbps',
     '11000000'   => '11 Mbps',
-    '20000000'   => '20 Mbps',
     '16000000'   => '16 Mbps',
     '16777216'   => '16 Mbps',
+    '20000000'   => '20 Mbps',
     '44210000'   => 'T3',
     '44736000'   => 'T3',
     '45000000'   => '45 Mbps',
@@ -3708,11 +3720,11 @@ munge_highspeed(). SNMP::Info can return speeds up to terabit levels this way.
     '54000000'   => '54 Mbps',
     '64000000'   => '64 Mbps',
     '100000000'  => '100 Mbps',
-    '200000000'  => '200 Mbps',
     '149760000'  => 'ATM on OC-3',
     '155000000'  => 'OC-3',
     '155519000'  => 'OC-3',
     '155520000'  => 'OC-3',
+    '200000000'  => '200 Mbps',
     '400000000'  => '400 Mbps',
     '599040000'  => 'ATM on OC-12',
     '622000000'  => 'OC-12',

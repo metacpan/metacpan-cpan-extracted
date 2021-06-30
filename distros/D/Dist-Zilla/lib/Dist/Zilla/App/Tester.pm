@@ -1,4 +1,4 @@
-package Dist::Zilla::App::Tester 6.020;
+package Dist::Zilla::App::Tester 6.022;
 # ABSTRACT: testing library for Dist::Zilla::App
 
 # BEGIN BOILERPLATE
@@ -51,7 +51,7 @@ sub test_dzil {
 }
 
 {
-  package Dist::Zilla::App::Tester::Result 6.020;
+  package Dist::Zilla::App::Tester::Result 6.022;
 
   BEGIN { our @ISA = qw(App::Cmd::Tester::Result); }
 
@@ -134,7 +134,7 @@ Dist::Zilla::App::Tester - testing library for Dist::Zilla::App
 
 =head1 VERSION
 
-version 6.020
+version 6.022
 
 =head1 DESCRIPTION
 

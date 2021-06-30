@@ -4,14 +4,14 @@ use Moo;
 
 use namespace::autoclean;
 
-our $VERSION = '0.000026';
+our $VERSION = '0.000027';
 
 use Types::Common::String qw( NonEmptyStr );
 use Types::Standard qw( InstanceOf );
 use WebService::PayPal::PaymentsAdvanced::Mocker::Helper;
 
 has _helper => (
-    is => 'lazy',
+    is  => 'lazy',
     isa =>
         InstanceOf ['WebService::PayPal::PaymentsAdvanced::Mocker::Helper'],
     default =>
@@ -153,7 +153,7 @@ sub credit_card_duplicate_invoice_id {
             TRANSTIME     => 'XXX',
             TRXTYPE       => 'A',
             TYPE          => 'A',
-            RESPMSG =>
+            RESPMSG       =>
                 'Duplicate trans:  10536-The transaction was refused as a result of a duplicate invoice ID supplied.  Attempt with a new invoice ID',
         },
         \%args
@@ -189,7 +189,7 @@ sub credit_card_auth_verification_success {
             PPREF         => 'XXX',
             PROCAVS       => 'X',
             PROCCVV2      => 'M',
-            RESPMSG =>
+            RESPMSG       =>
                 'Verified =>  10574-This card authorization verification is not a payment transaction.',
             SECURETOKEN   => 'XXX',
             RESULT        => 0,
@@ -249,13 +249,15 @@ sub _set_defaults {
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 WebService::PayPal::PaymentsAdvanced::Mocker::SilentPOST - Easily mock Silent POST transactions
 
 =head1 VERSION
 
-version 0.000026
+version 0.000027
 
 =head1 SYNOPSIS
 
@@ -301,13 +303,17 @@ validation enabled you'll either need to spoof the originating IP of the
 request or disable the IP validation in test mode.  I'd encourage you to do
 the former, if at all possible.
 
+=head1 SUPPORT
+
+Bugs may be submitted through L<https://github.com/maxmind/webservice-paypal-paymentsadvanced/issues>.
+
 =head1 AUTHOR
 
 Olaf Alders <olaf@wundercounter.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by MaxMind, Inc.
+This software is copyright (c) 2021 by MaxMind, Inc.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

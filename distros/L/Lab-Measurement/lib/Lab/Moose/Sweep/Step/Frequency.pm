@@ -1,5 +1,5 @@
 package Lab::Moose::Sweep::Step::Frequency;
-$Lab::Moose::Sweep::Step::Frequency::VERSION = '3.751';
+$Lab::Moose::Sweep::Step::Frequency::VERSION = '3.760';
 #ABSTRACT: Frequency sweep.
 
 use v5.20;
@@ -42,7 +42,7 @@ Lab::Moose::Sweep::Step::Frequency - Frequency sweep.
 
 =head1 VERSION
 
-version 3.751
+version 3.760
 
 =head1 Description
 
@@ -65,7 +65,7 @@ Default filename extension: C<'Frequency='>
 This software is copyright (c) 2021 by the Lab::Measurement team; in detail:
 
   Copyright 2018       Simon Reinhardt
-            2020       Andreas K. Huettel
+            2020       Andreas K. HÃ¼ttel
 
 
 This is free software; you can redistribute it and/or modify it under

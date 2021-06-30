@@ -18,6 +18,7 @@ my %WriteMakefileArgs = (
   "NAME" => "Amce::CNA",
   "PREREQ_PM" => {
     "Sub::Exporter" => 0,
+    "if" => 0,
     "mro" => 0,
     "strict" => 0,
     "vars" => 0,
@@ -28,7 +29,7 @@ my %WriteMakefileArgs = (
     "File::Spec" => 0,
     "Test::More" => "0.96"
   },
-  "VERSION" => "0.067",
+  "VERSION" => "0.068",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -40,6 +41,7 @@ my %FallbackPrereqs = (
   "File::Spec" => 0,
   "Sub::Exporter" => 0,
   "Test::More" => "0.96",
+  "if" => 0,
   "mro" => 0,
   "strict" => 0,
   "vars" => 0,

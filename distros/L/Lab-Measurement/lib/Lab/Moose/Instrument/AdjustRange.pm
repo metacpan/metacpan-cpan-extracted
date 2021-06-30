@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::AdjustRange;
-$Lab::Moose::Instrument::AdjustRange::VERSION = '3.751';
+$Lab::Moose::Instrument::AdjustRange::VERSION = '3.760';
 #ABSTRACT: Role for automatic adjustment of measurement ranges.
 
 use v5.20;
@@ -76,7 +76,7 @@ Lab::Moose::Instrument::AdjustRange - Role for automatic adjustment of measureme
 
 =head1 VERSION
 
-version 3.751
+version 3.760
 
 =head1 DESCRIPTION
 
@@ -134,7 +134,7 @@ Get current range from cache.
 This software is copyright (c) 2021 by the Lab::Measurement team; in detail:
 
   Copyright 2018       Simon Reinhardt
-            2020       Andreas K. Huettel
+            2020       Andreas K. HÃ¼ttel
 
 
 This is free software; you can redistribute it and/or modify it under

@@ -1,0 +1,657 @@
+{
+   "abstract" : "Interaction with spotify.com API",
+   "author" : [
+      "Nael Alolwani <VNEALV@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.020, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Net-Async-Spotify",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "share",
+         "shares",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Dist::Zilla" : "6.015",
+            "Dist::Zilla::PluginBundle::Author::VNEALV" : "0",
+            "Software::License::Perl_5" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Zilla" : "5",
+            "Dist::Zilla::PluginBundle::Author::VNEALV" : "0",
+            "Software::License::Perl_5" : "0",
+            "Test::CPAN::Changes" : "0.19",
+            "Test::CPAN::Meta" : "0",
+            "Test::EOL" : "0",
+            "Test::MinimumVersion" : "0",
+            "Test::Mojibake" : "0",
+            "Test::More" : "0.88",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Portability::Files" : "0",
+            "Test::Version" : "1"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : "0",
+            "Future" : "0.46",
+            "Future::AsyncAwait" : "0.51",
+            "Getopt::Long" : "0",
+            "IO::Async::Loop" : "0.78",
+            "IO::Async::Notifier" : "0.78",
+            "IO::Async::SSL" : "0.22",
+            "IO::Async::Timer::Periodic" : "0.78",
+            "JSON::MaybeUTF8" : "2.000",
+            "Log::Any" : "1.709",
+            "Log::Any::Adapter" : "1.709",
+            "MIME::Base64" : "0",
+            "Math::Random::Secure" : "0",
+            "Module::Path" : "0",
+            "Module::Runtime" : "0",
+            "Net::Async::HTTP" : "0.48",
+            "Net::Async::HTTP::Server" : "0.13",
+            "Path::Tiny" : "0",
+            "Pod::Simple::Text" : "0",
+            "Pod::Usage" : "0",
+            "Scalar::Util" : "0",
+            "Syntax::Keyword::Try" : "0.25",
+            "Time::Moment" : "0.44",
+            "URI" : "5.09",
+            "Unicode::UTF8" : "0",
+            "curry" : "1.001",
+            "mro" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::CheckDeps" : "0.010",
+            "Test::More" : "0.98",
+            "Test::NoTabs" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Net::Async::Spotify" : {
+         "file" : "lib/Net/Async/Spotify.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::API" : {
+         "file" : "lib/Net/Async/Spotify/API.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::API::Albums" : {
+         "file" : "lib/Net/Async/Spotify/API/Albums.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::API::Artists" : {
+         "file" : "lib/Net/Async/Spotify/API/Artists.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::API::Base" : {
+         "file" : "lib/Net/Async/Spotify/API/Base.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::API::Browse" : {
+         "file" : "lib/Net/Async/Spotify/API/Browse.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::API::Episodes" : {
+         "file" : "lib/Net/Async/Spotify/API/Episodes.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::API::Follow" : {
+         "file" : "lib/Net/Async/Spotify/API/Follow.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::API::Generated::Albums" : {
+         "file" : "lib/Net/Async/Spotify/API/Generated/Albums.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::API::Generated::Artists" : {
+         "file" : "lib/Net/Async/Spotify/API/Generated/Artists.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::API::Generated::Browse" : {
+         "file" : "lib/Net/Async/Spotify/API/Generated/Browse.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::API::Generated::Episodes" : {
+         "file" : "lib/Net/Async/Spotify/API/Generated/Episodes.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::API::Generated::Follow" : {
+         "file" : "lib/Net/Async/Spotify/API/Generated/Follow.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::API::Generated::Library" : {
+         "file" : "lib/Net/Async/Spotify/API/Generated/Library.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::API::Generated::Markets" : {
+         "file" : "lib/Net/Async/Spotify/API/Generated/Markets.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::API::Generated::Personalization" : {
+         "file" : "lib/Net/Async/Spotify/API/Generated/Personalization.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::API::Generated::Player" : {
+         "file" : "lib/Net/Async/Spotify/API/Generated/Player.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::API::Generated::Playlists" : {
+         "file" : "lib/Net/Async/Spotify/API/Generated/Playlists.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::API::Generated::Search" : {
+         "file" : "lib/Net/Async/Spotify/API/Generated/Search.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::API::Generated::Shows" : {
+         "file" : "lib/Net/Async/Spotify/API/Generated/Shows.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::API::Generated::Tracks" : {
+         "file" : "lib/Net/Async/Spotify/API/Generated/Tracks.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::API::Generated::Users" : {
+         "file" : "lib/Net/Async/Spotify/API/Generated/Users.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::API::Library" : {
+         "file" : "lib/Net/Async/Spotify/API/Library.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::API::Markets" : {
+         "file" : "lib/Net/Async/Spotify/API/Markets.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::API::Personalization" : {
+         "file" : "lib/Net/Async/Spotify/API/Personalization.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::API::Player" : {
+         "file" : "lib/Net/Async/Spotify/API/Player.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::API::Playlists" : {
+         "file" : "lib/Net/Async/Spotify/API/Playlists.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::API::Search" : {
+         "file" : "lib/Net/Async/Spotify/API/Search.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::API::Shows" : {
+         "file" : "lib/Net/Async/Spotify/API/Shows.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::API::Tracks" : {
+         "file" : "lib/Net/Async/Spotify/API/Tracks.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::API::Users" : {
+         "file" : "lib/Net/Async/Spotify/API/Users.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::Object" : {
+         "file" : "lib/Net/Async/Spotify/Object.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::Object::Album" : {
+         "file" : "lib/Net/Async/Spotify/Object/Album.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::Object::AlbumRestriction" : {
+         "file" : "lib/Net/Async/Spotify/Object/AlbumRestriction.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::Object::Artist" : {
+         "file" : "lib/Net/Async/Spotify/Object/Artist.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::Object::AudioFeatures" : {
+         "file" : "lib/Net/Async/Spotify/Object/AudioFeatures.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::Object::Base" : {
+         "file" : "lib/Net/Async/Spotify/Object/Base.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::Object::Category" : {
+         "file" : "lib/Net/Async/Spotify/Object/Category.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::Object::Context" : {
+         "file" : "lib/Net/Async/Spotify/Object/Context.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::Object::Copyright" : {
+         "file" : "lib/Net/Async/Spotify/Object/Copyright.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::Object::CurrentlyPlaying" : {
+         "file" : "lib/Net/Async/Spotify/Object/CurrentlyPlaying.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::Object::CurrentlyPlayingContext" : {
+         "file" : "lib/Net/Async/Spotify/Object/CurrentlyPlayingContext.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::Object::Cursor" : {
+         "file" : "lib/Net/Async/Spotify/Object/Cursor.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::Object::CursorPaging" : {
+         "file" : "lib/Net/Async/Spotify/Object/CursorPaging.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::Object::Device" : {
+         "file" : "lib/Net/Async/Spotify/Object/Device.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::Object::Devices" : {
+         "file" : "lib/Net/Async/Spotify/Object/Devices.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::Object::Disallows" : {
+         "file" : "lib/Net/Async/Spotify/Object/Disallows.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::Object::Episode" : {
+         "file" : "lib/Net/Async/Spotify/Object/Episode.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::Object::EpisodeRestriction" : {
+         "file" : "lib/Net/Async/Spotify/Object/EpisodeRestriction.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::Object::Error" : {
+         "file" : "lib/Net/Async/Spotify/Object/Error.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::Object::ExplicitContentSettings" : {
+         "file" : "lib/Net/Async/Spotify/Object/ExplicitContentSettings.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::Object::ExternalId" : {
+         "file" : "lib/Net/Async/Spotify/Object/ExternalId.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::Object::ExternalUrl" : {
+         "file" : "lib/Net/Async/Spotify/Object/ExternalUrl.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::Object::Followers" : {
+         "file" : "lib/Net/Async/Spotify/Object/Followers.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::Object::General" : {
+         "file" : "lib/Net/Async/Spotify/Object/General.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::Object::Generated::Album" : {
+         "file" : "lib/Net/Async/Spotify/Object/Generated/Album.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::Object::Generated::AlbumRestriction" : {
+         "file" : "lib/Net/Async/Spotify/Object/Generated/AlbumRestriction.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::Object::Generated::Artist" : {
+         "file" : "lib/Net/Async/Spotify/Object/Generated/Artist.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::Object::Generated::AudioFeatures" : {
+         "file" : "lib/Net/Async/Spotify/Object/Generated/AudioFeatures.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::Object::Generated::Category" : {
+         "file" : "lib/Net/Async/Spotify/Object/Generated/Category.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::Object::Generated::Context" : {
+         "file" : "lib/Net/Async/Spotify/Object/Generated/Context.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::Object::Generated::Copyright" : {
+         "file" : "lib/Net/Async/Spotify/Object/Generated/Copyright.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::Object::Generated::CurrentlyPlaying" : {
+         "file" : "lib/Net/Async/Spotify/Object/Generated/CurrentlyPlaying.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::Object::Generated::CurrentlyPlayingContext" : {
+         "file" : "lib/Net/Async/Spotify/Object/Generated/CurrentlyPlayingContext.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::Object::Generated::Cursor" : {
+         "file" : "lib/Net/Async/Spotify/Object/Generated/Cursor.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::Object::Generated::CursorPaging" : {
+         "file" : "lib/Net/Async/Spotify/Object/Generated/CursorPaging.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::Object::Generated::Device" : {
+         "file" : "lib/Net/Async/Spotify/Object/Generated/Device.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::Object::Generated::Devices" : {
+         "file" : "lib/Net/Async/Spotify/Object/Generated/Devices.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::Object::Generated::Disallows" : {
+         "file" : "lib/Net/Async/Spotify/Object/Generated/Disallows.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::Object::Generated::Episode" : {
+         "file" : "lib/Net/Async/Spotify/Object/Generated/Episode.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::Object::Generated::EpisodeRestriction" : {
+         "file" : "lib/Net/Async/Spotify/Object/Generated/EpisodeRestriction.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::Object::Generated::Error" : {
+         "file" : "lib/Net/Async/Spotify/Object/Generated/Error.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::Object::Generated::ExplicitContentSettings" : {
+         "file" : "lib/Net/Async/Spotify/Object/Generated/ExplicitContentSettings.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::Object::Generated::ExternalId" : {
+         "file" : "lib/Net/Async/Spotify/Object/Generated/ExternalId.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::Object::Generated::ExternalUrl" : {
+         "file" : "lib/Net/Async/Spotify/Object/Generated/ExternalUrl.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::Object::Generated::Followers" : {
+         "file" : "lib/Net/Async/Spotify/Object/Generated/Followers.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::Object::Generated::Image" : {
+         "file" : "lib/Net/Async/Spotify/Object/Generated/Image.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::Object::Generated::LinkedTrack" : {
+         "file" : "lib/Net/Async/Spotify/Object/Generated/LinkedTrack.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::Object::Generated::Paging" : {
+         "file" : "lib/Net/Async/Spotify/Object/Generated/Paging.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::Object::Generated::PlayHistory" : {
+         "file" : "lib/Net/Async/Spotify/Object/Generated/PlayHistory.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::Object::Generated::PlayerError" : {
+         "file" : "lib/Net/Async/Spotify/Object/Generated/PlayerError.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::Object::Generated::Playlist" : {
+         "file" : "lib/Net/Async/Spotify/Object/Generated/Playlist.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::Object::Generated::PlaylistTrack" : {
+         "file" : "lib/Net/Async/Spotify/Object/Generated/PlaylistTrack.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::Object::Generated::PlaylistTracksRef" : {
+         "file" : "lib/Net/Async/Spotify/Object/Generated/PlaylistTracksRef.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::Object::Generated::PrivateUser" : {
+         "file" : "lib/Net/Async/Spotify/Object/Generated/PrivateUser.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::Object::Generated::PublicUser" : {
+         "file" : "lib/Net/Async/Spotify/Object/Generated/PublicUser.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::Object::Generated::RecommendationSeed" : {
+         "file" : "lib/Net/Async/Spotify/Object/Generated/RecommendationSeed.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::Object::Generated::Recommendations" : {
+         "file" : "lib/Net/Async/Spotify/Object/Generated/Recommendations.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::Object::Generated::ResumePoint" : {
+         "file" : "lib/Net/Async/Spotify/Object/Generated/ResumePoint.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::Object::Generated::SavedAlbum" : {
+         "file" : "lib/Net/Async/Spotify/Object/Generated/SavedAlbum.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::Object::Generated::SavedEpisode" : {
+         "file" : "lib/Net/Async/Spotify/Object/Generated/SavedEpisode.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::Object::Generated::SavedShow" : {
+         "file" : "lib/Net/Async/Spotify/Object/Generated/SavedShow.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::Object::Generated::SavedTrack" : {
+         "file" : "lib/Net/Async/Spotify/Object/Generated/SavedTrack.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::Object::Generated::Show" : {
+         "file" : "lib/Net/Async/Spotify/Object/Generated/Show.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::Object::Generated::SimplifiedAlbum" : {
+         "file" : "lib/Net/Async/Spotify/Object/Generated/SimplifiedAlbum.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::Object::Generated::SimplifiedArtist" : {
+         "file" : "lib/Net/Async/Spotify/Object/Generated/SimplifiedArtist.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::Object::Generated::SimplifiedEpisode" : {
+         "file" : "lib/Net/Async/Spotify/Object/Generated/SimplifiedEpisode.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::Object::Generated::SimplifiedPlaylist" : {
+         "file" : "lib/Net/Async/Spotify/Object/Generated/SimplifiedPlaylist.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::Object::Generated::SimplifiedShow" : {
+         "file" : "lib/Net/Async/Spotify/Object/Generated/SimplifiedShow.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::Object::Generated::SimplifiedTrack" : {
+         "file" : "lib/Net/Async/Spotify/Object/Generated/SimplifiedTrack.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::Object::Generated::Track" : {
+         "file" : "lib/Net/Async/Spotify/Object/Generated/Track.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::Object::Generated::TrackRestriction" : {
+         "file" : "lib/Net/Async/Spotify/Object/Generated/TrackRestriction.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::Object::Generated::TuneableTrack" : {
+         "file" : "lib/Net/Async/Spotify/Object/Generated/TuneableTrack.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::Object::Image" : {
+         "file" : "lib/Net/Async/Spotify/Object/Image.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::Object::LinkedTrack" : {
+         "file" : "lib/Net/Async/Spotify/Object/LinkedTrack.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::Object::Paging" : {
+         "file" : "lib/Net/Async/Spotify/Object/Paging.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::Object::PlayHistory" : {
+         "file" : "lib/Net/Async/Spotify/Object/PlayHistory.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::Object::PlayerError" : {
+         "file" : "lib/Net/Async/Spotify/Object/PlayerError.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::Object::Playlist" : {
+         "file" : "lib/Net/Async/Spotify/Object/Playlist.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::Object::PlaylistTrack" : {
+         "file" : "lib/Net/Async/Spotify/Object/PlaylistTrack.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::Object::PlaylistTracksRef" : {
+         "file" : "lib/Net/Async/Spotify/Object/PlaylistTracksRef.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::Object::PrivateUser" : {
+         "file" : "lib/Net/Async/Spotify/Object/PrivateUser.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::Object::PublicUser" : {
+         "file" : "lib/Net/Async/Spotify/Object/PublicUser.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::Object::RecommendationSeed" : {
+         "file" : "lib/Net/Async/Spotify/Object/RecommendationSeed.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::Object::Recommendations" : {
+         "file" : "lib/Net/Async/Spotify/Object/Recommendations.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::Object::ResumePoint" : {
+         "file" : "lib/Net/Async/Spotify/Object/ResumePoint.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::Object::SavedAlbum" : {
+         "file" : "lib/Net/Async/Spotify/Object/SavedAlbum.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::Object::SavedEpisode" : {
+         "file" : "lib/Net/Async/Spotify/Object/SavedEpisode.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::Object::SavedShow" : {
+         "file" : "lib/Net/Async/Spotify/Object/SavedShow.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::Object::SavedTrack" : {
+         "file" : "lib/Net/Async/Spotify/Object/SavedTrack.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::Object::Show" : {
+         "file" : "lib/Net/Async/Spotify/Object/Show.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::Object::SimplifiedAlbum" : {
+         "file" : "lib/Net/Async/Spotify/Object/SimplifiedAlbum.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::Object::SimplifiedArtist" : {
+         "file" : "lib/Net/Async/Spotify/Object/SimplifiedArtist.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::Object::SimplifiedEpisode" : {
+         "file" : "lib/Net/Async/Spotify/Object/SimplifiedEpisode.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::Object::SimplifiedPlaylist" : {
+         "file" : "lib/Net/Async/Spotify/Object/SimplifiedPlaylist.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::Object::SimplifiedShow" : {
+         "file" : "lib/Net/Async/Spotify/Object/SimplifiedShow.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::Object::SimplifiedTrack" : {
+         "file" : "lib/Net/Async/Spotify/Object/SimplifiedTrack.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::Object::Track" : {
+         "file" : "lib/Net/Async/Spotify/Object/Track.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::Object::TrackRestriction" : {
+         "file" : "lib/Net/Async/Spotify/Object/TrackRestriction.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::Object::TuneableTrack" : {
+         "file" : "lib/Net/Async/Spotify/Object/TuneableTrack.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::Scope" : {
+         "file" : "lib/Net/Async/Spotify/Scope.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::Token" : {
+         "file" : "lib/Net/Async/Spotify/Token.pm",
+         "version" : "0.001"
+      },
+      "Net::Async::Spotify::Util" : {
+         "file" : "lib/Net/Async/Spotify/Util.pm",
+         "version" : "0.001"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/vnealv/Net-Async-Spotify/issues"
+      },
+      "homepage" : "https://github.com/vnealv/Net-Async-Spotify",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/vnealv/Net-Async-Spotify.git",
+         "web" : "https://github.com/vnealv/Net-Async-Spotify"
+      }
+   },
+   "version" : "0.001",
+   "x_authority" : "cpan:VNEALV",
+   "x_contributors" : [
+      "Nael Alolwani <naelalolwani@gmail.com>",
+      "vnealv <neal.alwani@gmail.com>"
+   ],
+   "x_generated_by_perl" : "v5.26.3",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.26",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
+}
+

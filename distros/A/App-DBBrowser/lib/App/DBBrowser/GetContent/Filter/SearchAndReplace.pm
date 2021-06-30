@@ -38,10 +38,11 @@ sub __search_and_replace {
     my $saved = $ax->read_json( $sf->{i}{f_search_and_replace} ) // {};
     my $all_sr_groups = [];
     my $used_names = [];
-    my $header_changed = 0;
-    my @bu;
 
-    MENU: while ( 1 ) {
+    my @bu;
+    my ( $hidden, $add ) = ( 'Choose:', '  ADD search & replace' );
+
+    ADD_SEARCH_AND_REPLACE: while ( 1 ) {
         my @tmp_info = ( '', $filter_str );
         for my $sr_group ( @$all_sr_groups ) {
             for my $sr_single ( @$sr_group ) {
@@ -49,94 +50,114 @@ sub __search_and_replace {
             }
         }
         push @tmp_info, '';
-        my ( $hidden, $select_cols, $add, $restore_header ) = ( 'Choose:', '  SELECT COLUMNS', '  ADD s///;', '  RESTORE header row' );
-        my @pre = ( $hidden, undef, $add );
-        if ( @$all_sr_groups ) {
-            splice @pre, 2, 0, $select_cols;
-        }
-        elsif ( $header_changed ) {
-            splice @pre, 2, 0, $restore_header;
-        }
+        my @pre = ( $hidden, undef, $sf->{i}{_confirm}, $add );
         my $available = [];
         for my $name ( sort { $a cmp $b } keys %$saved ) {
             if ( none { $name eq $_ } @$used_names ) {
                 push @$available, $name;
             }
         }
-        my $menu = [ @pre, map( '- ' . $_, @$available ) ];
+        my $prefixed_available = [ map { '- ' . $_ } @$available ];
+        my $menu = [ @pre, @$prefixed_available ];
         my $count_static_rows = @tmp_info;
-        my $info = $cf->__get_filter_info( $sql, $count_static_rows, undef, $menu, 1 ) . join( "\n", @tmp_info );
+        my $info = $cf->__get_filter_info( $sql, $count_static_rows, [ $hidden, $sf->{i}{_back}, $sf->{i}{_confirm}, $add ], $prefixed_available, 1 ) . join( "\n", @tmp_info );
         # Choose
         my $idx = $tc->choose(
             $menu,
-            { %{$sf->{i}{lyt_v}}, info => $info, prompt => '', default => 1, index => 1, undef => '  <=',
-              keep => $sf->{i}{keep} }
+            { %{$sf->{i}{lyt_v}}, info => $info, prompt => '', default => 1, index => 1, undef => $sf->{i}{_back},
+              keep => $sf->{i}{fi}{keep} }
         );
+        $cf->__print_busy_string();
         if ( ! defined $idx || ! defined $menu->[$idx] ) {
             if ( @bu ) {
-                ( $used_names, $available, $all_sr_groups ) = @{pop @bu};
-                next;
+                ( $used_names, $all_sr_groups ) = @{pop @bu};
+                next ADD_SEARCH_AND_REPLACE;
             }
-            return; ## no s/// => 2 x
+            $sql->{insert_into_args} = [ map { [ @$_ ] } @{$sf->{i}{fi}{bu_insert_into_args}} ];
+            return;
         }
         my $choice = $menu->[$idx];
         if ( $choice eq $hidden ) {
             $sf->__history( $sql );
             $saved = $ax->read_json( $sf->{i}{f_search_and_replace} ) // {};
-            next MENU;
+            next ADD_SEARCH_AND_REPLACE;
         }
-        elsif ( $choice eq $select_cols ) {
+        elsif ( $choice eq $sf->{i}{_confirm} ) {
             if ( ! @$all_sr_groups ) {
                 return;
             }
-            my $ok = $sf->__apply_to_cols( $sql, \@tmp_info, $header, $all_sr_groups );
-            for my $i ( 0 .. $#$header ) {
-                if ( $header->[$i] ne $sql->{insert_into_args}[0][$i] ) {
-                    $header_changed = 1;
-                    last;
+
+            APPLY_TO_COS: while ( 1 ) {
+                my $ok = $sf->__apply_to_cols( $sql, \@tmp_info, $header, $all_sr_groups );
+                if ( ! $ok ) {
+                    $sql->{insert_into_args} = [ map { [ @$_ ] } @{$sf->{i}{fi}{bu_insert_into_args}} ];
+                    next ADD_SEARCH_AND_REPLACE;
                 }
+                my $header_changed = 0;
+                for my $i ( 0 .. $#$header ) {
+                    if ( $header->[$i] ne $sql->{insert_into_args}[0][$i] ) {
+                        $header_changed = 1;
+                        last;
+                    }
+                }
+                if ( $header_changed ) {
+                    my ( $yes, $no ) = ( 'Yes', 'No' );
+                    my $menu = [ undef, $yes, $no ];
+                    my @tmp_info_addition = ( 'Header: ' . join( ', ', @{$sql->{insert_into_args}[0]} ), ' ' );
+                    push @tmp_info, @tmp_info_addition;
+                    my $count_static_rows = @tmp_info;
+                    my $info = $cf->__get_filter_info( $sql, $count_static_rows, [ $sf->{i}{fi}{back} ], [ $yes, $no ], 1 ) . join( "\n", @tmp_info );
+                    # Choose
+                    my $idx = $tc->choose(
+                        $menu,
+                        { %{$sf->{i}{lyt_v}}, info => $info, prompt => 'Restore header?', default => 0, index => 1, undef => $sf->{i}{fi}{back},
+                        keep => $sf->{i}{fi}{keep} }
+                    );
+                    $cf->__print_busy_string();
+                    if ( ! defined $idx || ! defined $menu->[$idx] ) {
+                        my $pop_count = @tmp_info_addition;
+                        splice @tmp_info, -$pop_count;
+                        $sql->{insert_into_args} = [ map { [ @$_ ] } @{$sf->{i}{fi}{bu_insert_into_args}} ];
+                        next APPLY_TO_COS;
+                    }
+                    my $choice = $menu->[$idx];
+                    if ( $choice eq $yes ) {
+                        $sql->{insert_into_args}[0] = $header;
+                    }
+                }
+                return 1;
             }
-            if ( $ok ) {
-                $all_sr_groups = [];
-                $used_names = [];
-                @bu = ();
-            }
-            next MENU;
         }
-        elsif ( $choice eq $restore_header ) {
-            $sql->{insert_into_args}[0] = $header;
-            $header_changed = 0;
-            next MENU;
-        }
-        push @bu, [ [ @$used_names ], [ @$available ], [ @$all_sr_groups ] ];
-        my $sr_group;
-        if ( $choice eq $add ) {
+        elsif ( $choice eq $add ) {
             my $prompt = 'Build s///;';
+            my $separator_key = ' ';
+            my $skip_regex = qr/^\Q${separator_key}\E\z/;
             my $fields = [];
-            for my $nr ( 1 .. 9 ) {
+            for my $nr ( 1 .. 7 ) {
                 push @$fields,
-                    [ ' ',                  ],
+                    [ $separator_key,       ],
                     [ $nr . ' Pattern',     ],
                     [ $nr . ' Replacement', ],
                     [ $nr . ' Modifiers',   ];
             }
             my $count_static_rows = @tmp_info + 1; # tmp_info, prompt
-            my $pre_count = 2; # back, confirm
+            my $back = $sf->{i}{back} . '   ';
 
             SUBSTITUTION: while ( 1 ) {
-                my $info = $cf->__get_filter_info( $sql, $count_static_rows, [ ( ' ' ) x $pre_count ], $fields, 1 ) . join( "\n", @tmp_info );
+                my $info = $cf->__get_filter_info( $sql, $count_static_rows, [ $back, $sf->{i}{confirm} ], $fields, 1 ) . join( "\n", @tmp_info );
                 # Fill_form
                 my $form = $tf->fill_form(
                     $fields,
-                    { info => $info, prompt => $prompt, auto_up => 2, confirm => '  ' . $sf->{i}{confirm}, keep => $sf->{i}{keep},
-                    back => '  ' . $sf->{i}{back} . '   ', section_separators => [ grep { ! ( $_ % 4 ) } 0 .. $#$fields ] }
+                    { info => $info, prompt => $prompt, auto_up => 2, confirm => $sf->{i}{confirm}, keep => $sf->{i}{fi}{keep},
+                      back => $back, skip_items => $skip_regex }
                 );
+                $cf->__print_busy_string();
                 if ( ! defined $form ) {
-                    next MENU;
+                    next ADD_SEARCH_AND_REPLACE;
                 }
-                $sr_group = [ $sf->__from_form_to_sr_group_data( $form ) ];
+                my $sr_group = [ $sf->__from_form_to_sr_group_data( $form ) ];
                 if ( ! @$sr_group ) {
-                    next MENU;
+                    next ADD_SEARCH_AND_REPLACE;
                 }
                 if ( ! eval {
                     $sf->__execute_substitutions( [ [ 'test_string' ] ], [ 0 ], [ $sr_group ] );
@@ -146,15 +167,18 @@ sub __search_and_replace {
                     $fields = $form;
                     next SUBSTITUTION;
                 }
+                push @bu, [ [ @$used_names ], [ @$all_sr_groups ] ];
+                push @$all_sr_groups, $sr_group;
                 last SUBSTITUTION;
             }
         }
         else {
             my $name = $available->[$idx-@pre];
-            $sr_group = $saved->{$name};
+            my $sr_group = $saved->{$name};
+            push @bu, [ [ @$used_names ], [ @$all_sr_groups ] ];
             push @$used_names, $name;
+            push @$all_sr_groups, $sr_group;
         }
-        push @$all_sr_groups, $sr_group;
     }
 }
 
@@ -173,7 +197,6 @@ sub __apply_to_cols {
     my $cf = App::DBBrowser::GetContent::Filter->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $aoa = $sql->{insert_into_args};
     my $count_static_rows = @$tmp_info + 1; # info_count and cs_label
-    $cf->__print_filter_info( $sql, $count_static_rows, [ '<<', $sf->{i}{ok} ], $header, undef );
     my $key_1 = 'search&replace';
     my $key_2;
     for my $sr_group ( @$all_sr_groups ) {
@@ -181,27 +204,29 @@ sub __apply_to_cols {
             $key_2 .= join( '', @$sr );
         }
     }
-    my $prev_chosen = $sf->{i}{prev_chosen_cols}{$key_1}{$key_2} // [];
+    my $prev_chosen = $sf->{i}{fi}{prev_chosen_cols}{$key_1}{$key_2} // [];
     my $mark;
     if ( @$prev_chosen && @$prev_chosen < @$header ) {
         $mark = [];
         for my $i ( 0 .. $#{$header} ) {
-            push @$mark, $i if any { $_ eq $header->[$i] } @$prev_chosen;
+            if ( any { $_ eq $header->[$i] } @$prev_chosen ) {
+                push @$mark, $i;
+            }
         }
         $mark = undef if @$mark != @$prev_chosen;
     }
-    my $info = $cf->__get_filter_info( $sql, $count_static_rows, [ '<<', $sf->{i}{ok} ], $header, undef ) . join( "\n", @$tmp_info );
+    my $info = $cf->__get_filter_info( $sql, $count_static_rows, [ $sf->{i}{fi}{back}, $sf->{i}{ok} ], $header, undef ) . join( "\n", @$tmp_info );
     # Choose
     my $col_idxs = $tu->choose_a_subset(
         $header,
-        { cs_label => 'Columns: ', info => $info, layout => 0, all_by_default => 1, index => 1, keep => $sf->{i}{keep},
-        confirm => $sf->{i}{ok}, back => '<<', busy_string => $sf->{i}{working}, mark => $mark }
+        { cs_label => 'Columns: ', info => $info, layout => 0, all_by_default => 1, index => 1, keep => $sf->{i}{fi}{keep},
+        confirm => $sf->{i}{ok}, back => $sf->{i}{fi}{back}, busy_string => $sf->{i}{fi}{working}, mark => $mark }
     );
+    $cf->__print_busy_string();
     if ( ! defined $col_idxs ) {
         return;
     }
-    $sf->{i}{prev_chosen_cols}{$key_1}{$key_2} = [ @{$header}[@$col_idxs] ];
-    $cf->__print_filter_info( $sql, $count_static_rows, [ '<<', $sf->{i}{ok} ], $header, undef ); #
+    $sf->{i}{fi}{prev_chosen_cols}{$key_1}{$key_2} = [ @{$header}[@$col_idxs] ];
     $sf->__execute_substitutions( $aoa, $col_idxs, $all_sr_groups );
     $sql->{insert_into_args} = $aoa;
     return 1;
@@ -274,6 +299,7 @@ sub __history {
             { %{$sf->{i}{lyt_v}}, clear_screen => 1, info => $top, undef => '  <=', index => 1,
               default => $old_idx_history }
         );
+        $cf->__print_filter_info( $top );
         if ( ! defined $idx || ! defined $menu->[$idx] ) {
             return;
         }
@@ -296,7 +322,6 @@ sub __history {
             }
 
             ADD_CODE: while ( 1 ) {
-
                 # Fill_form
                 my $form = $tf->fill_form(
                     $fields,
@@ -304,6 +329,7 @@ sub __history {
                       section_separators => [ grep { ! ( $_ % 4 ) } 0 .. $#$fields ],
                       confirm => '  ' . $sf->{i}{confirm}, back => '  ' . $sf->{i}{back} . '   ' }
                 );
+                $cf->__print_filter_info( $top );
                 if ( ! defined $form ) {
                     next HISTORY;
                 }
@@ -349,6 +375,7 @@ sub __history {
                     { %{$sf->{i}{lyt_v}}, clear_screen => 1, prompt => 'Edit item:', index => 1,
                         undef => '  <=', default => $old_idx_choose_entry, info => $top }
                 );
+                $cf->__print_filter_info( $top );
                 if ( ! defined $idx || ! defined $menu->[$idx] ) {
                     next HISTORY;
                 }
@@ -381,13 +408,15 @@ sub __history {
                     my $old_code_str = join "\n" . ( ' ' x 6 ),  _stringified_code( $sr_group );
                     my $info_add_fmt = "\n\nName: \"%s\"\nCode: %s\n";
                     my $info_add = sprintf $info_add_fmt, $name, $old_code_str;
+                    my $info = $top . $info_add;
                     # Fill_form
                     my $form = $tf->fill_form(
                         $fields,
-                        { prompt => "Edit \"$name\":", auto_up => 2, clear_screen => 1, info => $top . $info_add,
+                        { prompt => "Edit \"$name\":", auto_up => 2, clear_screen => 1, info => $info,
                           section_separators => [ grep { ! ( $_ % 4 ) } 0 .. $#$fields ],
                           confirm => '  ' . $sf->{i}{confirm}, back => '  ' . $sf->{i}{back} . '   ' }
                     );
+                    $cf->__print_busy_string();
                     if ( ! defined $form ) {
                         $saved->{$name} = [ @$sr_group ];
                         next CHOOSE_ENTRY;
@@ -402,8 +431,8 @@ sub __history {
                     if ( $name eq $old_code_str && $old_code_str ne $code_str) {
                         $name = $code_str;
                     }
-                    $info_add = sprintf $info_add_fmt, $name, $code_str;
-                    my $new_name = $sf->__get_entry_name( $top . $info_add, 'Edit name: ', $saved, $new_sr_group, $name );
+                    $info = sprintf $info_add_fmt, $name, $code_str;
+                    my $new_name = $sf->__get_entry_name( $top . $info, 'Edit name: ', $saved, $new_sr_group, $name );
                     if ( ! length $new_name ) {
                         next EDIT_ENTRY;
                     }
@@ -419,13 +448,15 @@ sub __history {
         }
         elsif ( $choice eq $remove ) {
             my $list = [ sort { $a cmp $b } keys %$saved ];
+            my $info = 'Saved s_&_r';
             # Choose
             my $idxs = $tu->choose_a_subset(
                 $list,
-                { prefix => '- ', info => 'Saved s_&_r', cs_label => 'Chosen items:' . "\n  ", cs_separator => "\n  ", cs_end => "\n",
+                { prefix => '- ', info => $info, cs_label => 'Chosen items:' . "\n  ", cs_separator => "\n  ", cs_end => "\n",
                   layout => 3, all_by_default => 0, index => 1, confirm => $sf->{i}{_confirm}, back => $sf->{i}{_back},
-                  busy_string => $sf->{i}{working}, clear_screen => 1, prompt => 'Choose items to remove:' }
+                  busy_string => $sf->{i}{fi}{working}, clear_screen => 1, prompt => 'Choose items to remove:' }
             );
+            $cf->__print_busy_string();
             if ( ! defined $idxs ) {
                 next HISTORY;
             }
@@ -437,12 +468,14 @@ sub __history {
                 my $info_add = sprintf $info_add_fmt, $name, $code_str;
                 my ( $no, $yes ) = ( '- NO', '- YES' );
                 my $menu = [ undef, $no, $yes ];
+                my $info = $top . $info_add;
                 # Choose
                 my $idx = $tc->choose(
                     $menu,
                     { %{$sf->{i}{lyt_v}}, clear_screen => 1, prompt => "Remove \"$name\"?", index => 1,
-                        undef => '  <=', info => $top . $info_add }
+                        undef => '  <=', info => $info }
                 );
+                $cf->__print_busy_string();
                 if ( ! defined $idx || ! defined $menu->[$idx] ) {
                     next HISTORY;
                 }
@@ -477,6 +510,7 @@ sub __get_entry_name {
     my ( $sf, $info, $prompt, $saved, $sr_group, $name ) = @_;
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my $tf = Term::Form->new( $sf->{i}{tf_default} );
+    my $cf = App::DBBrowser::GetContent::Filter->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $name_default = $name;
     if ( ! length $name && @$sr_group < 3 ) {
         $name_default = join ' ', _stringified_code( $sr_group );
@@ -489,6 +523,7 @@ sub __get_entry_name {
             $prompt,
             { info => $info, default => $name_default }
         );
+        $cf->__print_busy_string();
         if ( ! defined $new_name || ! length $new_name ) {
             return;
         }
@@ -498,6 +533,7 @@ sub __get_entry_name {
                 [ undef, '  New name' ],
                 { %{$sf->{i}{lyt_v}}, prompt => $prompt, info => $info }
             );
+            $cf->__print_busy_string();
             if ( ! defined $choice ) {
                 return;
             }

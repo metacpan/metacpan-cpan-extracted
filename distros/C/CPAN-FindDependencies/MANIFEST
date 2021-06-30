@@ -52,5 +52,6 @@ t/mirrors/privatemirror/authors/id/F/FR/FRUITCO/Brewery-1.0.tar.gz
 t/mirrors/privatemirror/authors/id/F/FR/FRUITCO/Fruit-1.0.tar.bz2
 t/mirrors/privatemirror/authors/id/F/FR/FRUITCO/Fruit-Role-Fermentable-1.0.zip
 bin/cpandeps-diff
+shared/tree-pruning
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,3 +1,10 @@
+0.07 2021-06-28T16:49:11+02:00
+ - Add doc about NO_COLOR env variable.
+ - Improve LICENSE AND COPYRIGHT section in doc.
+ - Rewrite doc to use =head2 and improve doc.
+ - Update bugtracker to Github.
+ - Update copyright years.
+
 0.06 2020-04-20T00:45:41+02:00
  - Add example to doc with ansi output.
 

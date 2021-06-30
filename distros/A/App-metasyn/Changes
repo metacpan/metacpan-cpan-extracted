@@ -1,3 +1,25 @@
+0.008   2021-06-26  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+	- [doc] Mention App::ShellCompleter::meta.
+
+	- [doc] Fix grammar and formatting in examples.
+
+
+0.007   2021-03-03  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux] Add -R as shortcut alias for --shuffle.
+
+        - Add option --random-theme (-T).
+
+        - [ux] Give default 'foo' to theme if unspecified, like in official CLI.
+
+	- [doc] Tweak description.
+
+        - [doc] Show equivalent 'meta' CLI invocation in some examples.
+
+
 0.006   2021-02-21  Released-By: PERLANCAR; Urgency: medium
 
 	- Add option: --number (-n).

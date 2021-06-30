@@ -42,7 +42,7 @@ use SNMP::Info;
 
 our ($VERSION, $DEBUG, %MIBS, %FUNCS, %GLOBALS, %MUNGE, $INIT);
 
-$VERSION = '3.71';
+$VERSION = '3.73';
 
 %MIBS = (
     'BRIDGE-MIB'   => 'dot1dBaseBridgeAddress',
@@ -105,7 +105,7 @@ $VERSION = '3.71';
     'stp_p_bridge'   => 'dot1dStpPortDesignatedBridge',
     'stp_p_port'     => 'dot1dStpPortDesignatedPort',
 
-    # Rapid Spanning Tree Protocol Table : dot1dStpExtPortEntry
+    # Rapid Spanning Tree Protocol Table : dot1dStpExtPortEntry
     'is_edgeport_admin' => 'dot1dStpPortAdminEdgePort',
     'is_edgeport_oper'  => 'dot1dStpPortOperEdgePort',
 
@@ -429,7 +429,7 @@ sub _vlan_hoa {
         my $vlan;
 
         # Strip TimeFilter if we're using VlanCurrentTable
-        ( $vlan = $idx ) =~ s/^\d+\.//;
+        ($vlan = $idx) =~ s/^(\d+\.)*//g;
 
         # Convert portlist bit array to bp_index array
         for ( my $i = 0; $i <= $#$portlist; $i++ ) {

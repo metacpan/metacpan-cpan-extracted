@@ -6366,22 +6366,11 @@ int32_t SPVM_API_get_field_offset(SPVM_ENV* env, int32_t field_id) {
   return field->offset;
 }
 
-SPVM_FIELD* SPVM_API_field(SPVM_ENV* env, SPVM_PACKAGE* package, const char* field_name) {
+SPVM_FIELD* SPVM_API_get_field(SPVM_ENV* env, SPVM_PACKAGE* package, const char* field_name) {
   // Runtime
   SPVM_COMPILER* compiler = env->compiler;
 
-  // Find field
-  int32_t fields_length = package->fields->length;
-  SPVM_FIELD* field = NULL;
-  for (int32_t i = 0; i < fields_length; i++) {
-    SPVM_FIELD* exists_field = SPVM_LIST_fetch(package->fields, i);
-    const char* exists_field_name = exists_field->name;
-    
-    if (strcmp(field_name, exists_field_name) == 0) {
-      field = exists_field;
-      break;
-    }
-  }
+  SPVM_FIELD* field = SPVM_HASH_fetch(package->field_symtable, field_name, strlen(field_name));
   
   return field;
 }
@@ -6390,7 +6379,7 @@ int32_t SPVM_API_get_field_id(SPVM_ENV* env, const char* package_name, const cha
   (void)env;
   
   // Basic type
-  SPVM_BASIC_TYPE* basic_type = SPVM_API_basic_type(env, package_name);
+  SPVM_BASIC_TYPE* basic_type = SPVM_API_get_basic_type(env, package_name);
   if (!basic_type) {
     return -1;
   }
@@ -6403,7 +6392,7 @@ int32_t SPVM_API_get_field_id(SPVM_ENV* env, const char* package_name, const cha
   SPVM_PACKAGE* package = basic_type->package;
   
   // Field
-  SPVM_FIELD* field = SPVM_API_field(env, package, field_name);
+  SPVM_FIELD* field = SPVM_API_get_field(env, package, field_name);
   if (!field) {
     return -1;
   }
@@ -6422,7 +6411,7 @@ int32_t SPVM_API_get_package_var_id(SPVM_ENV* env, const char* package_name, con
   (void)env;
   
   // Basic type
-  SPVM_BASIC_TYPE* basic_type = SPVM_API_basic_type(env, package_name);
+  SPVM_BASIC_TYPE* basic_type = SPVM_API_get_basic_type(env, package_name);
   
   // Package name
   SPVM_PACKAGE* package;
@@ -6437,7 +6426,7 @@ int32_t SPVM_API_get_package_var_id(SPVM_ENV* env, const char* package_name, con
   }
 
   // Package variable name
-  SPVM_PACKAGE_VAR* package_var = SPVM_API_package_var(env, package, package_var_name);
+  SPVM_PACKAGE_VAR* package_var = SPVM_API_get_package_var(env, package, package_var_name);
   if (!package_var) {
     return -1;
   }
@@ -6450,19 +6439,9 @@ int32_t SPVM_API_get_package_var_id(SPVM_ENV* env, const char* package_name, con
   return package_var->id;
 }
 
-SPVM_METHOD* SPVM_API_method(SPVM_ENV* env, SPVM_PACKAGE* package, const char* method_name) {
-  // Find sub
-  int32_t methods_length = package->methods->length;
-  SPVM_METHOD* method = NULL;
-  for (int32_t i = 0; i < methods_length; i++) {
-    SPVM_METHOD* exists_method = SPVM_LIST_fetch(package->methods, i);
-    const char* exists_method_name = exists_method->name;
-    
-    if (strcmp(method_name, exists_method_name) == 0) {
-      method = exists_method;
-      break;
-    }
-  }
+SPVM_METHOD* SPVM_API_get_method(SPVM_ENV* env, SPVM_PACKAGE* package, const char* method_name) {
+
+  SPVM_METHOD* method = SPVM_HASH_fetch(package->method_symtable, method_name, strlen(method_name));
   
   return method;
 }
@@ -6474,7 +6453,7 @@ int32_t SPVM_API_get_method_id(SPVM_ENV* env, const char* package_name, const ch
   int32_t method_id;
   
   // Basic type
-  SPVM_BASIC_TYPE* basic_type = SPVM_API_basic_type(env, package_name);
+  SPVM_BASIC_TYPE* basic_type = SPVM_API_get_basic_type(env, package_name);
   
   // Package name
   SPVM_PACKAGE* package;
@@ -6496,7 +6475,7 @@ int32_t SPVM_API_get_method_id(SPVM_ENV* env, const char* package_name, const ch
     }
     else {
       // Method
-      SPVM_METHOD* method = SPVM_API_method(env, package, method_name);
+      SPVM_METHOD* method = SPVM_API_get_method(env, package, method_name);
       if (method == NULL) {
         method_id = -1;
       }
@@ -6558,22 +6537,11 @@ int32_t SPVM_API_get_method_id_by_object(SPVM_ENV* env, SPVM_OBJECT* object, con
   return method_id;
 }
 
-SPVM_BASIC_TYPE* SPVM_API_basic_type(SPVM_ENV* env,  const char* basic_type_name) {
+SPVM_BASIC_TYPE* SPVM_API_get_basic_type(SPVM_ENV* env,  const char* basic_type_name) {
   // Runtime
   SPVM_COMPILER* compiler = env->compiler;
 
-  // Find basic_type
-  int32_t basic_types_length = compiler->basic_types->length;
-  SPVM_BASIC_TYPE* basic_type = NULL;
-  for (int32_t i = 0; i < basic_types_length; i++) {
-    SPVM_BASIC_TYPE* exists_basic_type = SPVM_LIST_fetch(compiler->basic_types, i);
-    const char* exists_basic_type_name = exists_basic_type->name;
-    
-    if (strcmp(basic_type_name, exists_basic_type_name) == 0) {
-      basic_type = exists_basic_type;
-      break;
-    }
-  }
+  SPVM_BASIC_TYPE* basic_type = (SPVM_BASIC_TYPE*)SPVM_HASH_fetch(compiler->basic_type_symtable, basic_type_name, strlen(basic_type_name));
   
   return basic_type;
 }
@@ -6585,7 +6553,7 @@ int32_t SPVM_API_get_basic_type_id(SPVM_ENV* env, const char* basic_type_name) {
     return -1;
   }
   
-  SPVM_BASIC_TYPE* basic_type = SPVM_API_basic_type(env, basic_type_name);
+  SPVM_BASIC_TYPE* basic_type = SPVM_API_get_basic_type(env, basic_type_name);
   if (basic_type) {
     int32_t basic_type_id = basic_type->id;
     return basic_type_id;
@@ -6922,20 +6890,9 @@ void SPVM_API_set_package_var_object(SPVM_ENV* env, int32_t packagke_var_id, SPV
 
 
 // Private API
-SPVM_PACKAGE_VAR* SPVM_API_package_var(SPVM_ENV* env, SPVM_PACKAGE* package, const char* package_var_name) {
-  // Find package_var
-  int32_t package_vars_length = package->package_vars->length;
-  SPVM_PACKAGE_VAR* package_var = NULL;
-  for (int32_t i = 0; i < package_vars_length; i++) {
-    SPVM_PACKAGE_VAR* exists_package_var = SPVM_LIST_fetch(package->package_vars, i);
-    const char* exists_package_var_name = exists_package_var->name;
-    
-    if (strcmp(package_var_name, exists_package_var_name) == 0) {
-      package_var = exists_package_var;
-      break;
-    }
-  }
+SPVM_PACKAGE_VAR* SPVM_API_get_package_var(SPVM_ENV* env, SPVM_PACKAGE* package, const char* package_var_name) {
+
+  SPVM_PACKAGE_VAR* package_var = SPVM_HASH_fetch(package->package_var_symtable, package_var_name, strlen(package_var_name));
   
   return package_var;
 }
-

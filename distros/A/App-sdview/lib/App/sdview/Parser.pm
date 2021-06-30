@@ -8,7 +8,7 @@ use utf8;
 
 use Object::Pad 0.41;
 
-package App::sdview::Parser 0.01;
+package App::sdview::Parser 0.02;
 role App::sdview::Parser;
 
 use String::Tagged;

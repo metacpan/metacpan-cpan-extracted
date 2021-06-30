@@ -99,7 +99,7 @@ if (defined $ENV{BIOPERLEMAIL}) {
     sleep(3);
 
     ok $n = $db->get_Taxonomy_Node('1760');
-    is $n->scientific_name, 'Actinobacteria';
+    is $n->scientific_name, 'Actinomycetia';
 
     sleep(3);
 

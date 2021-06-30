@@ -128,7 +128,7 @@ my %WriteMakefileArgs = (
     "Test::Deep::UnorderedPairs" => 0,
     "Test::Fatal" => 0,
     "Test::File::ShareDir" => 0,
-    "Test::JSON::Schema::Acceptance" => "1.008",
+    "Test::JSON::Schema::Acceptance" => "1.011",
     "Test::Memory::Cycle" => 0,
     "Test::More" => "0.96",
     "Test::Warnings" => 0,
@@ -136,7 +136,7 @@ my %WriteMakefileArgs = (
     "open" => 0,
     "utf8" => 0
   },
-  "VERSION" => "0.512",
+  "VERSION" => "0.513",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -171,7 +171,7 @@ my %FallbackPrereqs = (
   "Test::Deep::UnorderedPairs" => 0,
   "Test::Fatal" => 0,
   "Test::File::ShareDir" => 0,
-  "Test::JSON::Schema::Acceptance" => "1.008",
+  "Test::JSON::Schema::Acceptance" => "1.011",
   "Test::Memory::Cycle" => 0,
   "Test::More" => "0.96",
   "Test::Warnings" => 0,

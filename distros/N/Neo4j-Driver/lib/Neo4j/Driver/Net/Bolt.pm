@@ -5,7 +5,10 @@ use utf8;
 
 package Neo4j::Driver::Net::Bolt;
 # ABSTRACT: Networking delegate for Neo4j Bolt
-$Neo4j::Driver::Net::Bolt::VERSION = '0.23';
+$Neo4j::Driver::Net::Bolt::VERSION = '0.25';
+
+# This package is not part of the public Neo4j::Driver API.
+
 
 use Carp qw(croak);
 our @CARP_NOT = qw(Neo4j::Driver::Transaction Neo4j::Driver::Transaction::Bolt);
@@ -43,7 +46,8 @@ sub new {
 	my $protocol = "Bolt";
 	my $net_module = $driver->{net_module} || 'Neo4j::Bolt';
 	if ($net_module eq 'Neo4j::Bolt') {
-		croak $@ . "URI scheme 'bolt' requires Neo4j::Bolt"
+		croak "Protocol scheme 'bolt' is not supported (Neo4j::Bolt not installed)\n"
+			. "Neo4j::Driver will support 'bolt' URLs if the Neo4j::Bolt module is installed.\n"
 			unless eval { require Neo4j::Bolt; 1 };
 		$protocol = "Bolt/1.0" if $Neo4j::Bolt::VERSION le "0.20";
 	}
@@ -175,36 +179,3 @@ sub _new_tx {
 
 
 1;
-
-__END__
-
-=pod
-
-=encoding UTF-8
-
-=head1 NAME
-
-Neo4j::Driver::Net::Bolt - Networking delegate for Neo4j Bolt
-
-=head1 VERSION
-
-version 0.23
-
-=head1 DESCRIPTION
-
-The L<Neo4j::Driver::Net::Bolt> package is not part of the
-public L<Neo4j::Driver> API.
-
-=head1 AUTHOR
-
-Arne Johannessen <ajnn@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is Copyright (c) 2016-2021 by Arne Johannessen.
-
-This is free software, licensed under:
-
-  The Artistic License 2.0 (GPL Compatible)
-
-=cut

@@ -1,6 +1,6 @@
 {
     "name" : "mb",
-    "version" : "0.29",
+    "version" : "0.30",
     "abstract" : "run Perl script in MBCS encoding (not only CJK ;-)",
     "author" : [
         "ina <ina@cpan.org>"
@@ -34,7 +34,7 @@
                 "FindBin" : "1.42",
                 "Socket" : "0",
                 "lib" : "0",
-                "perl" : "5.005_03",
+                "perl" : "5.00503",
                 "strict" : "1.01",
                 "vars" : "0"
             }
@@ -49,7 +49,7 @@
                 "FindBin" : "1.42",
                 "Socket" : "0",
                 "lib" : "0",
-                "perl" : "5.005_03",
+                "perl" : "5.00503",
                 "strict" : "1.01",
                 "vars" : "0"
             }
@@ -64,7 +64,7 @@
                 "FindBin" : "1.42",
                 "Socket" : "0",
                 "lib" : "0",
-                "perl" : "5.005_03",
+                "perl" : "5.00503",
                 "strict" : "1.01",
                 "vars" : "0"
             }

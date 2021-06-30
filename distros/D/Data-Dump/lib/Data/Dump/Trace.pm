@@ -401,11 +401,4 @@ traced.
 
 L<Data::Dump>
 
-=head1 AUTHOR
-
-Copyright 2009 Gisle Aas.
-
-This library is free software; you can redistribute it and/or
-modify it under the same terms as Perl itself.
-
 =cut

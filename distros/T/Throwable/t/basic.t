@@ -16,6 +16,16 @@ BEGIN {
     use $class;
     extends 'Throwable::Error';
 
+    package MyError1;
+    use $class;
+    extends 'Throwable::Error';
+    around stack_trace_args => sub {
+      my (\$orig, \$self, \@args) = \@_;
+      my \$args = \$self->\$orig;
+      push \@\$args, (message => 'Munged.');
+      return \$args;
+    };
+
     package MyError2;
     use $class;
     extends 'Throwable::Error';
@@ -37,31 +47,53 @@ BEGIN {
 }
 
 sub throw_x {
-  MyError->throw({ message => 'foo bar baz' });
+  $_[0]->throw({ message => 'foo bar baz' });
 }
 
 sub call_throw_x {
-  throw_x;
+  throw_x($_[0]);
 }
 
-eval { call_throw_x; };
+for my $class (qw(MyError MyError1)) {
+  eval { call_throw_x($class); };
 
-my $error = $@;
+  my $error = $@;
 
-isa_ok($error, 'MyError',          'the error');
-isa_ok($error, 'Throwable::Error', 'the error');
-is($error->message, q{foo bar baz}, "error message is correct");
+  isa_ok($error, $class,             'the error');
+  isa_ok($error, 'Throwable::Error', 'the error');
+  is($error->message, q{foo bar baz}, "error message is correct");
 
-my $trace = $error->stack_trace;
+  my $trace = $error->stack_trace;
 
-isa_ok($trace, 'Devel::StackTrace', 'the trace');
+  isa_ok($trace, 'Devel::StackTrace', 'the trace');
 
-my @frames = $trace->frames;
-is(@frames, 4 + $extra_frames, "we have four frames in our trace");
-is($frames[0]->subroutine, q{Throwable::throw},   'correct frame 0');
-is($frames[1]->subroutine, q{main::throw_x},      'correct frame 1');
-is($frames[2]->subroutine, q{main::call_throw_x}, 'correct frame 2');
-is($frames[3]->subroutine, q{(eval)},             'correct frame 3');
+  if ($class eq 'MyError1') {
+    like($trace->as_string, qr/Munged/, "trace message munged");
+    unlike($trace->as_string, qr/Trace begun/, "trace message munged");
+  } else {
+    unlike($trace->as_string, qr/Munged/, "trace message not munged");
+    like($trace->as_string, qr/Trace begun/, "trace message not munged");
+  }
+
+  my @frames = $trace->frames;
+  is(@frames, 4 + $extra_frames, "we have four frames in our trace");
+  is($frames[0]->subroutine, q{Throwable::throw},   'correct frame 0');
+  is($frames[1]->subroutine, q{main::throw_x},      'correct frame 1');
+  is($frames[2]->subroutine, q{main::call_throw_x}, 'correct frame 2');
+  is($frames[3]->subroutine, q{(eval)},             'correct frame 3');
+
+  {
+     eval { sub { sub { die MyError->new_with_previous('a') }->() }->() };
+
+     my $error = $@;
+     is($error->message, q{a}, "error message is correct");
+     my $trace = $error->stack_trace;
+     my @frames = $trace->frames;
+     is(@frames, 4 + $extra_frames, "we have four frames in our trace");
+     is($frames[0]->subroutine, q{Throwable::new_with_previous}, 'correct frame 0');
+     is($frames[3]->subroutine, q{(eval)}, 'correct frame 3');
+  }
+}
 
 {
    eval { MyError->throw('shucks howdy'); };
@@ -120,6 +152,21 @@ for my $i (1..10) {
     eval {
         $@ = 'foo';
         MyError->throw( { message => 'argh!' } );
+    };
+
+    my $second_error = $@;
+    is( $second_error->previous_exception, 'foo',
+        'found previous exception foo' );
+}
+
+{
+    eval { die MyError->new_with_previous( { message => 'yikes!' } ); };
+    my $first_error = $@;
+    is( $first_error->previous_exception, q{}, 'no previous exception' );
+
+    eval {
+        $@ = 'foo';
+        die MyError->new_with_previous( { message => 'argh!' } );
     };
 
     my $second_error = $@;

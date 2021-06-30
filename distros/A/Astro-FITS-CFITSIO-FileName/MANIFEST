@@ -12,6 +12,7 @@ dist.ini
 lib/Astro/FITS/CFITSIO/FileName.pm
 lib/Astro/FITS/CFITSIO/FileName/Regexp.pm
 perlcritic.rc
+startup.pl
 t/00-compile.t
 t/00-report-prereqs.dd
 t/00-report-prereqs.t

@@ -4,7 +4,7 @@
       "Sven Kirmess <sven.kirmess@kzone.ch>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.022, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "freebsd"
    ],
@@ -38,7 +38,7 @@
             "Module::Path" : "0",
             "perl" : "5.006",
             "strict" : "0",
-            "version" : "0.81",
+            "version" : "0.77",
             "warnings" : "0"
          }
       },
@@ -57,7 +57,7 @@
    "provides" : {
       "App::ReportPrereqs" : {
          "file" : "bin/report-prereqs",
-         "version" : "0.004"
+         "version" : "0.005"
       }
    },
    "release_status" : "stable",
@@ -72,11 +72,12 @@
          "web" : "https://github.com/skirmess/App-ReportPrereqs"
       }
    },
-   "version" : "0.004",
+   "version" : "0.005",
    "x_contributors" : [
       "Stephan Sachse <ste.sachse@gmail.com>"
    ],
    "x_generated_by_perl" : "v5.24.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0231"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0231",
+   "x_spdx_expression" : "BSD-2-Clause-FreeBSD"
 }
 

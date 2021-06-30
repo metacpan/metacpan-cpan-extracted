@@ -2,21 +2,21 @@
 
 ### begin code_after_shebang
 # Note: This script is a CLI for Riap function /App/metasyn/metasyn
-# and generated automatically using Perinci::CmdLine::Gen version 0.498
+# and generated automatically using Perinci::CmdLine::Gen version 0.499
 
 ### end code_after_shebang
-# PERICMD_INLINE_SCRIPT: {"code_after_shebang":"...","config_dirs":null,"config_filename":"metasyn.conf","env_name":"METASYN_OPT","include":null,"log":null,"pack_deps":1,"pod":0,"read_config":1,"read_env":1,"script_name":"metasyn","script_summary":null,"script_version":"0.006","shebang":"perl","skip_format":0,"subcommands":null,"url":"/App/metasyn/metasyn","use_cleanser":1,"validate_args":1}
+# PERICMD_INLINE_SCRIPT: {"code_after_shebang":"...","config_dirs":null,"config_filename":"metasyn.conf","env_name":"METASYN_OPT","include":null,"log":null,"pack_deps":1,"pod":0,"read_config":1,"read_env":1,"script_name":"metasyn","script_summary":null,"script_version":"0.008","shebang":"perl","skip_format":0,"subcommands":null,"url":"/App/metasyn/metasyn","use_cleanser":1,"validate_args":1}
 
-my $_pci_metas = {""=>{args=>{action=>{cmdline_aliases=>{l=>{code=>sub{"DUMMY"},is_flag=>1,summary=>"List installed themes"}},default=>"list-names",schema=>["str",{in=>["list-themes","list-names"],req=>1},{}]},categories=>{cmdline_aliases=>{c=>{}},schema=>["bool",{is=>1,req=>1},{}]},number=>{cmdline_aliases=>{n=>{}},schema=>["posint",{req=>1},{}],summary=>"Limit only return this number of results"},shuffle=>{schema=>["bool",{is=>1,req=>1},{}]},theme=>{completion=>sub{"DUMMY"},pos=>0,schema=>["str",{req=>1},{}]}},description=>"\nThis script is an alternative front-end to <pm:Acme::MetaSyntactic>. Compared to\nthe official CLI <prog:meta>, this CLI is more oriented towards listing names\ninstead of giving you one or several random names.\n\n",examples=>[{argv=>["-l"],summary=>"List all installed themes","x.doc.max_result_lines"=>10},{argv=>["-l","-n3","--shuffle"],summary=>"List 3 random themes"},{argv=>["-l","-c"],summary=>"List all installed themes, along with all their categories","x.doc.max_result_lines"=>10},{argv=>["foo"],summary=>"List all names from a theme","x.doc.max_result_lines"=>10},{argv=>["christmas/elf","-n3","--shuffle"],summary=>"List all names from a theme in random order, return only 3","x.doc.max_result_lines"=>10},{argv=>["christmas","-c"],summary=>"List all categories from a theme","x.doc.max_result_lines"=>10}],links=>[{url=>"prog:meta"}],result=>{},summary=>"Alternative front-end to Acme::MetaSyntactic",v=>1.1}};
+my $_pci_metas = {""=>{args=>{action=>{cmdline_aliases=>{l=>{code=>sub{"DUMMY"},is_flag=>1,summary=>"List installed themes"}},default=>"list-names",schema=>["str",{in=>["list-themes","list-names"],req=>1},{}]},categories=>{cmdline_aliases=>{c=>{}},schema=>["true",{req=>1},{}]},number=>{cmdline_aliases=>{n=>{}},schema=>["posint",{req=>1},{}],summary=>"Limit only return this number of results"},random_theme=>{cmdline_aliases=>{T=>{}},schema=>["true",{req=>1},{}]},shuffle=>{cmdline_aliases=>{R=>{}},schema=>["true",{req=>1},{}]},theme=>{completion=>sub{"DUMMY"},pos=>0,schema=>["str",{req=>1},{}]}},description=>"\nThis script is an alternative front-end for <pm:Acme::MetaSyntactic>. Compared\nto the official CLI <prog:meta>, this CLI currently does not retrieve\nthemes/names remotely but:\n\n* provides shell completion (but see <pm:App::ShellCompleter::meta> to add tab\n  completion for the official CLI);\n* provides an option to shuffle list of themes/categories/names returned;\n* makes it easy to print all names in a theme;\n* makes it easy to print all (or some) categories in a theme.\n\nThis CLI is more geared towards listing all themes/names/categories instead of\npicking random ones.\n\n",examples=>[{argv=>[],summary=>"List all names from the default theme, foo","x.doc.max_result_lines"=>10},{argv=>["-n1","-R"],summary=>"Return a single random name from the default theme (equivalent to: \"meta\")"},{argv=>["christmas"],summary=>"List all names from a theme","x.doc.max_result_lines"=>10},{argv=>["christmas/elf","-n3","-R"],summary=>"List all names from a category of a theme in random order, return only 3 (equivalent to: \"meta christmas/elf 3\")"},{argv=>["christmas","-n1","-R"],summary=>"Return a single random name from a theme (equivalent to: \"meta christmas\")"},{argv=>["-T","-n1","-R"],summary=>"Return a single random name from a random theme"},{argv=>["-l"],summary=>"List all installed themes (equivalent to: \"meta --themes\")","x.doc.max_result_lines"=>10},{argv=>["-l","-n3","-R"],summary=>"List 3 random themes (equivalent to: \"meta --themes | shuf | head -n3\")"},{argv=>["-l","-c"],summary=>"List all installed themes, along with all their categories","x.doc.max_result_lines"=>10},{argv=>["christmas","-c"],summary=>"List all categories from a theme","x.doc.max_result_lines"=>10},{argv=>["christmas","-c","-n2","-R"],summary=>"List 2 categories from a theme, in random order","x.doc.max_result_lines"=>10}],links=>[{url=>"prog:meta"}],result=>{},summary=>"Alternative front-end to Acme::MetaSyntactic",v=>1.1}};
 
-# This script is generated by Perinci::CmdLine::Inline version 0.550 on Sun Feb 21 07:49:08 2021.
+# This script is generated by Perinci::CmdLine::Inline version 0.551 on Sat Jun 26 09:40:35 2021.
 
 # Rinci metadata taken from these modules: App::metasyn (no version)
 
 # You probably should not manually edit this file.
 
-our $DATE = '2021-02-21'; # DATE
-our $VERSION = '0.006'; # VERSION
+our $DATE = '2021-06-26'; # DATE
+our $VERSION = '0.008'; # VERSION
 # PODNAME: metasyn
 # ABSTRACT: Alternative front-end to Acme::MetaSyntactic
 
@@ -134,16 +134,20 @@ my $go_spec1 = {
     'config-path=s@' => sub { $_pci_r->{config_paths} //= []; push @{ $_pci_r->{config_paths} }, $_[1]; },
     'config-profile=s' => sub { $_pci_r->{config_profile} = $_[1]; },
     'format=s' => sub { $_pci_r->{format} = $_[1]; },
-    'help|h|?' => sub { print "metasyn - Alternative front-end to Acme::MetaSyntactic\n\nUsage:\n  metasyn --help (or -h, -?)\n  metasyn --version (or -v)\n  metasyn [--action=s] [-c] [--categories] [--config-path=path+]\n    [--config-profile=profile] [--format=name] [--json] [-l] [-n=s]\n    [--naked-res] [--no-config] [--no-env] [--no-naked-res | --nonaked-res]\n    [--number=s] [--page-result[=program]] [--shuffle] [theme]\n\nExamples:\n  List all installed themes:\n  % metasyn -l\n\n  List 3 random themes:\n  % metasyn -l -n3 --shuffle\n\n  List all installed themes, along with all their categories:\n  % metasyn -l -c\n\n  List all names from a theme:\n  % metasyn foo\n\n  List all names from a theme in random order, return only 3:\n  % metasyn christmas/elf -n3 --shuffle\n\n  List all categories from a theme:\n  % metasyn christmas -c\n\nThis script is an alternative front-end to <pm:Acme::MetaSyntactic>. Compared to\nthe official CLI <prog:meta>, this CLI is more oriented towards listing names\ninstead of giving you one or several random names.\n\nMain options:\n  --action=s         [\"list-names\"]\n  --categories, -c  \n  --number=s, -n    Limit only return this number of results\n  --shuffle         \n  --theme=s          (=arg[0])\n  -l                List installed themes\n\nConfiguration options:\n  --config-path=s     Set path to configuration file\n  --config-profile=s  Set configuration profile to use\n  --no-config         Do not use any configuration file\n\nEnvironment options:\n  --no-env  Do not read environment for default options\n\nOutput options:\n  --format=s     Choose output format, e.g. json, text\n  --json         Set output format to json\n  --page-result  Filter output through a pager\n\nOther options:\n  --help, -h, -?                 Display help message and exit\n  --naked-res                    When outputing as JSON, strip result envelope\n  --no-naked-res, --nonaked-res  When outputing as JSON, don't strip result envelope\n  --version, -v                  Display program's version and exit\n"; exit 0; },
+    'help|h|?' => sub { print "metasyn - Alternative front-end to Acme::MetaSyntactic\n\nUsage:\n  metasyn --help (or -h, -?)\n  metasyn --version (or -v)\n  metasyn [-R] [-T] [--action=s] [-c] [--categories] [--config-path=path+]\n    [--config-profile=profile] [--format=name] [--json] [-l] [-n=s]\n    [--naked-res] [--no-config] [--no-env] [--no-naked-res | --nonaked-res]\n    [--number=s] [--page-result[=program]] [--random-theme] [--shuffle] [theme]\n\nExamples:\n  List all names from the default theme, foo:\n  % metasyn\n\n  Return a single random name from the default theme (equivalent to: \"meta\"):\n  % metasyn -n1 -R\n\n  List all names from a theme:\n  % metasyn christmas\n\n  List all names from a category of a theme in random order, return only 3 (equivalent to: \"meta christmas/elf 3\"):\n  % metasyn christmas/elf -n3 -R\n\n  Return a single random name from a theme (equivalent to: \"meta christmas\"):\n  % metasyn christmas -n1 -R\n\n  Return a single random name from a random theme:\n  % metasyn -T -n1 -R\n\n  List all installed themes (equivalent to: \"meta --themes\"):\n  % metasyn -l\n\n  List 3 random themes (equivalent to: \"meta --themes | shuf | head -n3\"):\n  % metasyn -l -n3 -R\n\n  List all installed themes, along with all their categories:\n  % metasyn -l -c\n\n  List all categories from a theme:\n  % metasyn christmas -c\n\n  List 2 categories from a theme, in random order:\n  % metasyn christmas -c -n2 -R\n\nThis script is an alternative front-end for <pm:Acme::MetaSyntactic>. Compared\nto the official CLI <prog:meta>, this CLI currently does not retrieve\nthemes/names remotely but:\n\n* provides shell completion (but see <pm:App::ShellCompleter::meta> to add tab\n  completion for the official CLI);\n* provides an option to shuffle list of themes/categories/names returned;\n* makes it easy to print all names in a theme;\n* makes it easy to print all (or some) categories in a theme.\n\nThis CLI is more geared towards listing all themes/names/categories instead of\npicking random ones.\n\nMain options:\n  --action=s           [\"list-names\"]\n  --categories, -c    \n  --number=s, -n      Limit only return this number of results\n  --random-theme, -T  \n  --shuffle, -R       \n  --theme=s            (=arg[0])\n  -l                  List installed themes\n\nConfiguration options:\n  --config-path=s     Set path to configuration file\n  --config-profile=s  Set configuration profile to use\n  --no-config         Do not use any configuration file\n\nEnvironment options:\n  --no-env  Do not read environment for default options\n\nOutput options:\n  --format=s     Choose output format, e.g. json, text\n  --json         Set output format to json\n  --page-result  Filter output through a pager\n\nOther options:\n  --help, -h, -?                 Display help message and exit\n  --naked-res                    When outputing as JSON, strip result envelope\n  --no-naked-res, --nonaked-res  When outputing as JSON, don't strip result envelope\n  --version, -v                  Display program's version and exit\n"; exit 0; },
     'json' => sub { $_pci_r->{format} = (-t STDOUT) ? "json-pretty" : "json"; },
     'naked-res' => sub { $_pci_r->{naked_res} = 1; },
     'no-config' => sub { $_pci_r->{read_config} = 0; },
     'no-env' => sub { $_pci_r->{read_env} = 0; },
     'no-naked-res|nonaked-res' => sub { $_pci_r->{naked_res} = 0; },
     'page-result:s' => sub { $_pci_r->{page_result} = 1; },
-    'version|v' => sub { no warnings 'once'; require App::metasyn; print "metasyn version ", "0.006", ($App::metasyn::DATE ? " ($App::metasyn::DATE)" : ''), "\n"; print "  Generated by Perinci::CmdLine::Inline version 0.550 (2020-05-02)\n"; exit 0 },
+    'version|v' => sub { no warnings 'once'; require App::metasyn; print "metasyn version ", "0.008", ($App::metasyn::DATE ? " ($App::metasyn::DATE)" : ''), "\n"; print "  Generated by Perinci::CmdLine::Inline version 0.551 (2020-05-18)\n"; exit 0 },
 };
 my $go_spec2 = {
+    'R' => sub {         $_pci_args{'shuffle'} = $_[1];
+ },
+    'T' => sub {         $_pci_args{'random_theme'} = $_[1];
+ },
     'action=s' => sub {         $_pci_args{'action'} = $_[1];
  },
     'c' => sub {         $_pci_args{'categories'} = $_[1];
@@ -166,6 +170,8 @@ my $go_spec2 = {
     'number=s' => sub {         $_pci_args{'number'} = $_[1];
  },
     'page-result:s' => sub {  },
+    'random-theme' => sub {         $_pci_args{'random_theme'} = $_[1];
+ },
     'shuffle' => sub {         $_pci_args{'shuffle'} = $_[1];
  },
     'theme=s' => sub {         $_pci_args{'theme'} = $_[1];
@@ -234,7 +240,7 @@ if ($sc_name eq "") {
     $_pci_meta_result_type = "";
     require App::metasyn;
     eval { $_pci_r->{res} = App::metasyn::metasyn(%_pci_args) };
-    if ($@) { $_pci_r->{res} = [500, "Function died: $@"] }
+    if ($@) { die if $ENV{PERINCI_CMDLINE_INLINE_DEBUG_DIE}; $_pci_r->{res} = [500, "Function died: $@"] }
 }
 }
 
@@ -284,58 +290,23 @@ metasyn - Alternative front-end to Acme::MetaSyntactic
 
 =head1 VERSION
 
-This document describes version 0.006 of main (from Perl distribution App-metasyn), released on 2021-02-21.
+This document describes version 0.008 of main (from Perl distribution App-metasyn), released on 2021-06-26.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % metasyn [--action=s] [-c] [--categories] [--config-path=path+]
+ % metasyn [-R] [-T] [--action=s] [-c] [--categories] [--config-path=path+]
      [--config-profile=profile] [--format=name] [--json] [-l] [-n=s]
      [--(no)naked-res] [--no-config] [--no-env] [--number=s]
-     [--page-result[=program]] [--shuffle] [--view-result[=program]]
-     [theme]
+     [--page-result[=program]] [--random-theme] [--shuffle]
+     [--view-result[=program]] [theme]
 
 Examples:
 
-List all installed themes:
+List all names from the default theme, foo:
 
- % metasyn -l
- abba
- afke
- alice
- alphabet
- amber
- ... 137 more lines ...
- wales_towns
- weekdays
- yapc
- zodiac
-
-List 3 random themes:
-
- % metasyn -l -n3 --shuffle
- currency
- doctor_who
- sql
-
-List all installed themes, along with all their categories:
-
- % metasyn -l -c
- abba
- afke
- alice
- alphabet/en
- alphabet/gr
- ... 2209 more lines ...
- zodiac/Vedic
- zodiac/Western
- zodiac/Western/Real
- zodiac/Western/Traditional
-
-List all names from a theme:
-
- % metasyn foo
+ % metasyn
  foo
  bar
  baz
@@ -347,12 +318,76 @@ List all names from a theme:
  duif
  schapen
 
-List all names from a theme in random order, return only 3:
+Return a single random name from the default theme (equivalent to: "meta"):
 
- % metasyn christmas/elf -n3 --shuffle
- sugarplum
- minstix
- opneslae
+ % metasyn -n1 -R
+ xyzzy
+
+List all names from a theme:
+
+ % metasyn christmas
+ bushy
+ evergreen
+ shinny
+ upatree
+ wunorse
+ ... 59 more lines ...
+ mcicicles
+ mcblizzard
+ mcsparkles
+ mcsnowflakes
+
+List all names from a category of a theme in random order, return only 3 (equivalent to: "meta christmas/elf 3"):
+
+ % metasyn christmas/elf -n3 -R
+ alabaster
+ shinny
+ wunorse
+
+Return a single random name from a theme (equivalent to: "meta christmas"):
+
+ % metasyn christmas -n1 -R
+ upatree
+
+Return a single random name from a random theme:
+
+ % metasyn -T -n1 -R
+ XFER
+
+List all installed themes (equivalent to: "meta --themes"):
+
+ % metasyn -l
+ abba
+ afke
+ alice
+ alphabet
+ amber
+ ... 136 more lines ...
+ wales_towns
+ weekdays
+ yapc
+ zodiac
+
+List 3 random themes (equivalent to: "meta --themes | shuf | head -n3"):
+
+ % metasyn -l -n3 -R
+ barbarella
+ constellations
+ icao
+
+List all installed themes, along with all their categories:
+
+ % metasyn -l -c
+ abba
+ afke
+ alice
+ alphabet/en
+ alphabet/gr
+ ... 2221 more lines ...
+ zodiac/Vedic
+ zodiac/Western
+ zodiac/Western/Real
+ zodiac/Western/Traditional
 
 List all categories from a theme:
 
@@ -362,11 +397,33 @@ List all categories from a theme:
  santa
  snowman
 
+List 2 categories from a theme, in random order:
+
+ % metasyn christmas -c -n2 -R
+ snowman
+ santa
+
 =head1 DESCRIPTION
 
-This script is an alternative front-end to L<Acme::MetaSyntactic>. Compared to
-the official CLI L<meta>, this CLI is more oriented towards listing names
-instead of giving you one or several random names.
+This script is an alternative front-end for L<Acme::MetaSyntactic>. Compared
+to the official CLI L<meta>, this CLI currently does not retrieve
+themes/names remotely but:
+
+=over
+
+=item * provides shell completion (but see L<App::ShellCompleter::meta> to add tab
+completion for the official CLI);
+
+=item * provides an option to shuffle list of themes/categories/names returned;
+
+=item * makes it easy to print all names in a theme;
+
+=item * makes it easy to print all (or some) categories in a theme.
+
+=back
+
+This CLI is more geared towards listing all themes/names/categories instead of
+picking random ones.
 
 =head1 OPTIONS
 
@@ -392,9 +449,13 @@ Valid values:
 
 Limit only return this number of results.
 
-=item B<--shuffle>
+=item B<--random-theme>, B<-T>
+
+=item B<--shuffle>, B<-R>
 
 =item B<--theme>=I<s>
+
+Can also be specified as the 1st command-line argument.
 
 =item B<-l>
 
@@ -543,7 +604,7 @@ You can put multiple profiles in a single file by using section names like C<[pr
 
 You can also put configuration for multiple programs inside a single file, and use filter C<program=NAME> in section names, e.g. C<[program=NAME ...]> or C<[SOMESECTION program=NAME]>. The section will then only be used when the reading program matches.
 
-You can also filter a section by environment variable using the filter C<env=CONDITION> in section names. For example if you only want a section to be read if a certain environment variable is true: C<[env=SOMEVAR ...]> or C<[SOMESECTION env=SOMEVAR ...]>. If you only want a section to be read when the value of an environment variable has value equals something: C<[env=HOSTNAME=blink ...]> or C<[SOMESECTION env=HOSTNAME=blink ...]>. If you only want a section to be read when the value of an environment variable does not equal something: C<[env=HOSTNAME!=blink ...]> or C<[SOMESECTION env=HOSTNAME!=blink ...]>. If you only want a section to be read when an environment variable contains something: C<[env=HOSTNAME*=server ...]> or C<[SOMESECTION env=HOSTNAME*=server ...]>. Note that currently due to simplistic parsing, there must not be any whitespace in the value being compared because it marks the beginning of a new section filter or section name.
+You can also filter a section by environment variable using the filter C<env=CONDITION> in section names. For example if you only want a section to be read if a certain environment variable is true: C<[env=SOMEVAR ...]> or C<[SOMESECTION env=SOMEVAR ...]>. If you only want a section to be read when the value of an environment variable equals some string: C<[env=HOSTNAME=blink ...]> or C<[SOMESECTION env=HOSTNAME=blink ...]>. If you only want a section to be read when the value of an environment variable does not equal some string: C<[env=HOSTNAME!=blink ...]> or C<[SOMESECTION env=HOSTNAME!=blink ...]>. If you only want a section to be read when the value of an environment variable includes some string: C<[env=HOSTNAME*=server ...]> or C<[SOMESECTION env=HOSTNAME*=server ...]>. If you only want a section to be read when the value of an environment variable does not include some string: C<[env=HOSTNAME!*=server ...]> or C<[SOMESECTION env=HOSTNAME!*=server ...]>. Note that currently due to simplistic parsing, there must not be any whitespace in the value being compared because it marks the beginning of a new section filter or section name.
 
 To load and configure plugins, you can use either the C<-plugins> parameter (e.g. C<< -plugins=DumpArgs >> or C<< -plugins=DumpArgs@before_validate_args >>), or use the C<[plugin=NAME ...]> sections, for example:
 
@@ -567,6 +628,7 @@ List of available configuration parameters:
  format (see --format)
  naked_res (see --naked-res)
  number (see --number)
+ random_theme (see --random-theme)
  shuffle (see --shuffle)
  theme (see --theme)
 
@@ -594,7 +656,7 @@ Source repository is at L<https://github.com/perlancar/perl-App-metasyn>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-App-metasyn/issues>
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-metasyn>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -621,20 +683,20 @@ __DATA__
 Data::Section::Seekable v1
 Clone/PP.pm,20,6331,0;0
 Complete/Bash.pm,6376,39632,1;193
-Config/IOD/Base.pm,46035,23603,2;1432
-Config/IOD/Reader.pm,69667,17366,3;2242
-Data/Check/Structure.pm,87065,9787,4;2801
-Data/Sah/Normalize.pm,96882,9038,5;3157
-Getopt/Long/EvenLess.pm,105952,11364,6;3431
-Local/_pci_check_args.pm,117349,4764,7;3813
-Local/_pci_clean_json.pm,122146,4414,8;3917
-Log/ger.pm,126579,11284,9;3979
-Perinci/CmdLine/Util/Config.pm,137902,18532,10;4324
-Perinci/Result/Format/Lite.pm,156472,23132,11;4925
-Perinci/Sub/Normalize.pm,179637,7303,12;5532
-Sah/Schema/rinci/function_meta.pm,186982,7198,13;5767
-Scalar/Util/Numeric/PP.pm,194214,3106,14;6035
-Text/Table/Tiny.pm,197347,14816,15;6176
+Config/IOD/Base.pm,46035,23610,2;1432
+Config/IOD/Reader.pm,69674,17469,3;2242
+Data/Check/Structure.pm,87175,9787,4;2807
+Data/Sah/Normalize.pm,96992,9038,5;3163
+Getopt/Long/EvenLess.pm,106062,11364,6;3437
+Local/_pci_check_args.pm,117459,5681,7;3819
+Local/_pci_clean_json.pm,123173,4414,8;3940
+Log/ger.pm,127606,11284,9;4002
+Perinci/CmdLine/Util/Config.pm,138929,18532,10;4347
+Perinci/Result/Format/Lite.pm,157499,23138,11;4948
+Perinci/Sub/Normalize.pm,180670,7303,12;5555
+Sah/Schema/rinci/function_meta.pm,188015,7198,13;5790
+Scalar/Util/Numeric/PP.pm,195247,3106,14;6058
+Text/Table/Tiny.pm,198380,15445,15;6199
 
 ### Clone/PP.pm ###
 #package Clone::PP;
@@ -645,7 +707,7 @@ Text/Table/Tiny.pm,197347,14816,15;6176
 #use vars qw($VERSION @EXPORT_OK);
 #use Exporter;
 #
-#$VERSION = 1.07;
+#$VERSION = 1.08;
 #
 #@EXPORT_OK = qw( clone );
 #sub import { goto &Exporter::import } # lazy Exporter
@@ -2073,8 +2135,8 @@ Text/Table/Tiny.pm,197347,14816,15;6176
 ### Config/IOD/Base.pm ###
 #package Config::IOD::Base;
 #
-#our $DATE = '2019-01-17'; # DATE
-#our $VERSION = '0.342'; # VERSION
+#our $DATE = '2021-06-23'; # DATE
+#our $VERSION = '0.343'; # VERSION
 #
 #use 5.010001;
 #use strict;
@@ -2616,7 +2678,7 @@ Text/Table/Tiny.pm,197347,14816,15;6176
 #
 #=head1 VERSION
 #
-#This document describes version 0.342 of Config::IOD::Base (from Perl distribution Config-IOD-Reader), released on 2019-01-17.
+#This document describes version 0.343 of Config::IOD::Base (from Perl distribution Config-IOD-Reader), released on 2021-06-23.
 #
 #=head1 EXPRESSION
 #
@@ -2778,7 +2840,7 @@ Text/Table/Tiny.pm,197347,14816,15;6176
 #
 #=head2 enable_expr => bool (default: 0)
 #
-#Whether to enable C<expr> encoding. By default this is turned on, for safety.
+#Whether to enable C<expr> encoding. By default this is turned off, for safety.
 #Please see L</"EXPRESSION"> for more details.
 #
 #=head2 allow_directives => array
@@ -2875,7 +2937,7 @@ Text/Table/Tiny.pm,197347,14816,15;6176
 #
 #=head1 COPYRIGHT AND LICENSE
 #
-#This software is copyright (c) 2019, 2018, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
+#This software is copyright (c) 2021, 2019, 2018, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
 #
 #This is free software; you can redistribute it and/or modify it under
 #the same terms as the Perl 5 programming language system itself.
@@ -2884,8 +2946,8 @@ Text/Table/Tiny.pm,197347,14816,15;6176
 ### Config/IOD/Reader.pm ###
 #package Config::IOD::Reader;
 #
-#our $DATE = '2019-01-17'; # DATE
-#our $VERSION = '0.342'; # VERSION
+#our $DATE = '2021-06-23'; # DATE
+#our $VERSION = '0.343'; # VERSION
 #
 #use 5.010001;
 #use strict;
@@ -3114,7 +3176,7 @@ Text/Table/Tiny.pm,197347,14816,15;6176
 #
 #=head1 VERSION
 #
-#This document describes version 0.342 of Config::IOD::Reader (from Perl distribution Config-IOD-Reader), released on 2019-01-17.
+#This document describes version 0.343 of Config::IOD::Reader (from Perl distribution Config-IOD-Reader), released on 2021-06-23.
 #
 #=head1 SYNOPSIS
 #
@@ -3199,6 +3261,12 @@ Text/Table/Tiny.pm,197347,14816,15;6176
 #
 #Code will be compiled using Perl's C<eval()> in the
 #C<Config::IOD::Expr::_Compiled> namespace, with C<no strict>, C<no warnings>.
+#
+#=head1 CONTRIBUTOR
+#
+#=for stopwords Steven Haryanto
+#
+#Steven Haryanto <sharyanto@cpan.org>
 #
 #=head1 ATTRIBUTES
 #
@@ -3300,7 +3368,7 @@ Text/Table/Tiny.pm,197347,14816,15;6176
 #
 #=head2 enable_expr => bool (default: 0)
 #
-#Whether to enable C<expr> encoding. By default this is turned on, for safety.
+#Whether to enable C<expr> encoding. By default this is turned off, for safety.
 #Please see L</"EXPRESSION"> for more details.
 #
 #=head2 allow_directives => array
@@ -3435,7 +3503,7 @@ Text/Table/Tiny.pm,197347,14816,15;6176
 #
 #=head1 COPYRIGHT AND LICENSE
 #
-#This software is copyright (c) 2019, 2018, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
+#This software is copyright (c) 2021, 2019, 2018, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
 #
 #This is free software; you can redistribute it and/or modify it under
 #the same terms as the Perl 5 programming language system itself.
@@ -4492,7 +4560,7 @@ Text/Table/Tiny.pm,197347,14816,15;6176
 #        } # if date arg exists
 #        if (exists $args->{"categories"}) {
 #            $_sahv_dpath = [];
-#            # req #0
+#            # req #1
 #            ((defined($args->{"categories"})) ? 1 : (($_sahv_err //= "Required but not specified"),0))
 #            
 #            &&
@@ -4502,8 +4570,8 @@ Text/Table/Tiny.pm,197347,14816,15;6176
 #            
 #            &&
 #            
-#            (# clause: is
-#            (($args->{"categories"} ? 1:0) == (1 ? 1:0) ? 1 : (($_sahv_err //= "Must have the value 1"),0)))
+#            (# clause: is_true
+#            (((1) ? $args->{"categories"} : !defined(1) ? 1 : !$args->{"categories"}) ? 1 : (($_sahv_err //= "Must be true"),0)))
 #             ; if ($_sahv_err) { return [400, "Argument validation failed: $_sahv_err"] }
 #        } # if date arg exists
 #        if (exists $args->{"number"}) {
@@ -4522,9 +4590,25 @@ Text/Table/Tiny.pm,197347,14816,15;6176
 #            (($args->{"number"} >= 1) ? 1 : (($_sahv_err //= "Must be at least 1"),0)))
 #             ; if ($_sahv_err) { return [400, "Argument validation failed: $_sahv_err"] }
 #        } # if date arg exists
+#        if (exists $args->{"random_theme"}) {
+#            $_sahv_dpath = [];
+#            # req #1
+#            ((defined($args->{"random_theme"})) ? 1 : (($_sahv_err //= "Required but not specified"),0))
+#            
+#            &&
+#            
+#            # check type 'bool'
+#            ((!ref($args->{"random_theme"})) ? 1 : (($_sahv_err //= "Not of type boolean value"),0))
+#            
+#            &&
+#            
+#            (# clause: is_true
+#            (((1) ? $args->{"random_theme"} : !defined(1) ? 1 : !$args->{"random_theme"}) ? 1 : (($_sahv_err //= "Must be true"),0)))
+#             ; if ($_sahv_err) { return [400, "Argument validation failed: $_sahv_err"] }
+#        } # if date arg exists
 #        if (exists $args->{"shuffle"}) {
 #            $_sahv_dpath = [];
-#            # req #0
+#            # req #1
 #            ((defined($args->{"shuffle"})) ? 1 : (($_sahv_err //= "Required but not specified"),0))
 #            
 #            &&
@@ -4534,8 +4618,8 @@ Text/Table/Tiny.pm,197347,14816,15;6176
 #            
 #            &&
 #            
-#            (# clause: is
-#            (($args->{"shuffle"} ? 1:0) == (1 ? 1:0) ? 1 : (($_sahv_err //= "Must have the value 1"),0)))
+#            (# clause: is_true
+#            (((1) ? $args->{"shuffle"} : !defined(1) ? 1 : !$args->{"shuffle"}) ? 1 : (($_sahv_err //= "Must be true"),0)))
 #             ; if ($_sahv_err) { return [400, "Argument validation failed: $_sahv_err"] }
 #        } # if date arg exists
 #        if (exists $args->{"theme"}) {
@@ -4554,6 +4638,7 @@ Text/Table/Tiny.pm,197347,14816,15;6176
 #        return [400, "Missing required value for argument: action"] if exists($args->{"action"}) && !defined($args->{"action"});
 #        return [400, "Missing required value for argument: categories"] if exists($args->{"categories"}) && !defined($args->{"categories"});
 #        return [400, "Missing required value for argument: number"] if exists($args->{"number"}) && !defined($args->{"number"});
+#        return [400, "Missing required value for argument: random_theme"] if exists($args->{"random_theme"}) && !defined($args->{"random_theme"});
 #        return [400, "Missing required value for argument: shuffle"] if exists($args->{"shuffle"}) && !defined($args->{"shuffle"});
 #        return [400, "Missing required value for argument: theme"] if exists($args->{"theme"}) && !defined($args->{"theme"});
 #        _pci_err([500, "Extraneous command-line argument(s): ".join(", ", @check_argv)]) if @check_argv;
@@ -4562,7 +4647,7 @@ Text/Table/Tiny.pm,197347,14816,15;6176
 #}
 #1;
 ### Local/_pci_clean_json.pm ###
-#sub _pci_clean_json { require Clone::PP; require Scalar::Util;  use feature 'state'; state $cleanser = sub {
+#sub _pci_clean_json { require Scalar::Util; require Clone::PP;  use feature 'state'; state $cleanser = sub {
 #my $data = shift;
 #state %refs;
 #state $ctr_circ;
@@ -5575,8 +5660,8 @@ Text/Table/Tiny.pm,197347,14816,15;6176
 ### Perinci/Result/Format/Lite.pm ###
 #package Perinci::Result::Format::Lite;
 #
-#our $DATE = '2020-11-12'; # DATE
-#our $VERSION = '0.278'; # VERSION
+#our $DATE = '2021-03-08'; # DATE
+#our $VERSION = '0.279'; # VERSION
 #
 #use 5.010001;
 ##IFUNBUILT
@@ -5924,8 +6009,8 @@ Text/Table/Tiny.pm,197347,14816,15;6176
 #            require Text::Table::Any;
 #            $fres = Text::Table::Any::table(rows=>$data, header_row=>$header_row, backend=>$backend);
 #        } else {
-#            require Text::Table::Tiny;
-#            $fres = Text::Table::Tiny::table(rows=>$data, header_row=>$header_row);
+#            require Text::Table::Sprintf;
+#            $fres = Text::Table::Sprintf::table(rows=>$data, header_row=>$header_row);
 #        }
 #        $fres .= "\n" unless $fres =~ /\R\z/ || !length($fres);
 #        $fres;
@@ -6110,7 +6195,7 @@ Text/Table/Tiny.pm,197347,14816,15;6176
 #
 #=head1 VERSION
 #
-#This document describes version 0.278 of Perinci::Result::Format::Lite (from Perl distribution Perinci-Result-Format-Lite), released on 2020-11-12.
+#This document describes version 0.279 of Perinci::Result::Format::Lite (from Perl distribution Perinci-Result-Format-Lite), released on 2021-03-08.
 #
 #=head1 SYNOPSIS
 #
@@ -6128,7 +6213,7 @@ Text/Table/Tiny.pm,197347,14816,15;6176
 #
 #If this is set, will render text table using L<Text::Table::Any> (with
 #C<backend> set to the value of this environment variable) instead of the default
-#L<Text::Table::Tiny>. This is useful if you want to output text table in a
+#L<Text::Table::Sprintf>. This is useful if you want to output text table in a
 #different format, for example to generate Org tables (make sure
 #L<Text::Table::Org> backend is already installed):
 #
@@ -6156,7 +6241,7 @@ Text/Table/Tiny.pm,197347,14816,15;6176
 #
 #=head1 BUGS
 #
-#Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-Result-Format-Lite>
+#Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Perinci-Result-Format-Lite/issues>
 #
 #When submitting a bug or request, please include a test-file or a
 #patch to an existing test-file that illustrates the bug or desired
@@ -6174,7 +6259,7 @@ Text/Table/Tiny.pm,197347,14816,15;6176
 #
 #=head1 COPYRIGHT AND LICENSE
 #
-#This software is copyright (c) 2020, 2018, 2017, 2016, 2015 by perlancar@cpan.org.
+#This software is copyright (c) 2021, 2020, 2018, 2017, 2016, 2015 by perlancar@cpan.org.
 #
 #This is free software; you can redistribute it and/or modify it under
 #the same terms as the Perl 5 programming language system itself.
@@ -6829,14 +6914,16 @@ Text/Table/Tiny.pm,197347,14816,15;6176
 #=cut
 ### Text/Table/Tiny.pm ###
 #package Text::Table::Tiny;
-#$Text::Table::Tiny::VERSION = '1.00';
+#$Text::Table::Tiny::VERSION = '1.02';
 #use 5.010;
 #use strict;
 #use warnings;
 #use utf8;
 #use parent 'Exporter';
-#use Carp         qw/ croak /;
-#use Ref::Util    qw/ is_arrayref is_ref /;
+#use Carp                    qw/ croak /;
+#use Ref::Util         0.202 qw/ is_arrayref /;
+#use String::TtyLength 0.02  qw/ tty_width /;
+#
 #our @EXPORT_OK = qw/ generate_table /;
 #
 ## Legacy package globals, that can be used to customise the look.
@@ -6848,6 +6935,17 @@ Text/Table/Tiny.pm,197347,14816,15;6176
 #our $HEADER_ROW_SEPARATOR = '=';
 #our $HEADER_CORNER_MARKER = 'O';
 #
+#my %arguments = (
+#    rows => "the rows, including a possible header row, of the table",
+#    header_row => "if true, indicates that the first row is a header row",
+#    separate_rows => "if true, a separate rule will be drawn between each row",
+#    top_and_tail => "if true, miss out top and bottom edges of table",
+#    align => "either single alignment, or an array per of alignments per col",
+#    style => "styling of table, one of classic, boxrule, or norule",
+#    indent => "indent every row of the table a certain number of spaces",
+#    compact => "narrow columns (no space either side of content)",
+#);
+#
 #my %charsets = (
 #    classic => { TLC => '+', TT => '+', TRC => '+', HR => '-', VR => '|', FHR => '=', LT => '+', RT => '+', FLT => 'O', FRT => 'O', HC => '+', FHC => 'O', BLC => '+', BT => '+', BRC => '+' },
 #    boxrule => { TLC => 'â', TT => 'â¬', TRC => 'â', HR => 'â', VR => 'â', FHR => 'â', LT => 'â', RT => 'â¤', FLT => 'â', FRT => 'â¡', HC => 'â¼', FHC => 'âª', BLC => 'â', BT => 'â´', BRC => 'â' },
@@ -6857,6 +6955,11 @@ Text/Table/Tiny.pm,197347,14816,15;6176
 #sub generate_table
 #{
 #    my %param   = @_;
+#
+#    foreach my $arg (keys %param) {
+#        croak "unknown argument '$arg'" if not exists $arguments{$arg};
+#    }
+#
 #    my $rows    = $param{rows} or croak "you must pass the 'rows' argument!";
 #    my @rows    = @$rows;
 #    my @widths  = _calculate_widths($rows);
@@ -6908,16 +7011,6 @@ Text/Table/Tiny.pm,197347,14816,15;6176
 #
 #    return '' if $param->{top_and_tail};
 #    return _rule_row($param, $widths, $char->{TLC}, $char->{HR}, $char->{TT}, $char->{TRC});
-#
-#    return '' if $param->{top_and_tail};
-#    my $pad = $param->{compact} ? '' : $char->{HR};
-#
-#    return $param->{indent}
-#           .$char->{TLC}
-#           .join($char->{TT}, map { $pad.($char->{HR} x $_).$pad } @$widths)
-#           .$char->{TRC}
-#           ."\n"
-#           ;
 #}
 #
 #sub _bottom_border
@@ -6987,17 +7080,17 @@ Text/Table/Tiny.pm,197347,14816,15;6176
 #    my $pad = $param->{compact} ? '' : ' ';
 #
 #    if ($align eq 'r' || $align eq 'right') {
-#        return $pad.' ' x ($width - tty_length($text)).$text.$pad;
+#        return $pad.' ' x ($width - tty_width($text)).$text.$pad;
 #    }
 #    elsif ($align eq 'c' || $align eq 'center' || $align eq 'centre') {
-#        my $total_spaces = $width - tty_length($text);
+#        my $total_spaces = $width - tty_width($text);
 #        my $left_spaces  = int($total_spaces / 2);
 #        my $right_spaces = $left_spaces;
 #        $right_spaces++ if $total_spaces % 2 == 1;
 #        return $pad.(' ' x $left_spaces).$text.(' ' x $right_spaces).$pad;
 #    }
 #    else {
-#        return $pad.$text.' ' x ($width - tty_length($text)).$pad;
+#        return $pad.$text.' ' x ($width - tty_width($text)).$pad;
 #    }
 #}
 #
@@ -7009,18 +7102,14 @@ Text/Table/Tiny.pm,197347,14816,15;6176
 #        my @columns = @$row;
 #        for (my $i = 0; $i < @columns; $i++) {
 #            next unless defined($columns[$i]);
-#            $widths[$i] = tty_length($columns[$i]) if !defined($widths[$i])
-#                                                   || tty_length($columns[$i]) > $widths[$i];
+#
+#            my $width = tty_width($columns[$i]);
+#
+#            $widths[$i] = $width if !defined($widths[$i])
+#                                 || $width > $widths[$i];
 #        }
 #    }
 #    return @widths;
-#}
-#
-#sub tty_length
-#{
-#    my $string = shift;
-#    $string =~ s/\e\[[0-9]+(;[0-9]+)?[ABCDEFGHJKSTfmin]//msg;
-#    return length($string);
 #}
 #
 ## Back-compat: 'table' is an alias for 'generate_table', but isn't exported
@@ -7040,7 +7129,7 @@ Text/Table/Tiny.pm,197347,14816,15;6176
 #
 #=head1 SYNOPSIS
 #
-# use Text::Table::Tiny 1.00 qw/ generate_table /;
+# use Text::Table::Tiny 1.02 qw/ generate_table /;
 #
 # my $rows = [
 #   [qw/ Pokemon     Type     Count /],
@@ -7056,6 +7145,8 @@ Text/Table/Tiny.pm,197347,14816,15;6176
 #
 #This module provides a single function, C<generate_table>, which formats
 #a two-dimensional array of data as a text table.
+#It handles text that includes ANSI escape codes and wide Unicode characters.
+#
 #There are a number of options for adjusting the output format,
 #but the intention is that the default option is good enough for most uses.
 #
@@ -7069,14 +7160,17 @@ Text/Table/Tiny.pm,197347,14816,15;6176
 # | Feraligatr | Water   | 5678  |
 # +------------+---------+-------+
 #
-#B<NOTE>: the interface changed with version 0.04, so if you
-#use the C<generate_table()> function illustrated above,
-#then you need to require at least version 0.04 of this module,
-#as shown in the SYNOPSIS.
-#
-#B<NOTE 2>: some of the options described below were added in version 1.00,
-#so your best bet is to require version 1.00,
+#Support for wide characters was added in 1.02,
+#so if you need that,
+#you should specify that as your minimum required version,
 #as per the SYNOPSIS.
+#
+#The interface changed with version 0.04,
+#so if you use the C<generate_table()> function illustrated above,
+#then you need to require at least version 0.04 of this module.
+#
+#Some of the options described below were added in version 1.00,
+#so your best bet is to require at least version 1.00.
 #
 #
 #=head2 generate_table()
@@ -7086,6 +7180,9 @@ Text/Table/Tiny.pm,197347,14816,15;6176
 #The only required argument is B<rows>.
 #Where arguments were not supported in the original release,
 #the first supporting version is noted.
+#
+#If you pass an unknown argument,
+#C<generate_table> will die with an error message.
 #
 #=over 4
 #

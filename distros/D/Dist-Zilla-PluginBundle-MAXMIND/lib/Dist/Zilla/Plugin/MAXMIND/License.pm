@@ -7,7 +7,7 @@ use warnings;
 use autodie;
 use namespace::autoclean;
 
-our $VERSION = '0.83';
+our $VERSION = '0.84';
 
 use Module::Runtime qw( use_module );
 use String::RewritePrefix;
@@ -38,7 +38,7 @@ sub provide_license {
     return $license_class->new(
         {
             holder => $args->{copyright_holder} || 'MaxMind, Inc.',
-            year => $years,
+            year   => $years,
         },
     );
 }
@@ -61,7 +61,7 @@ Dist::Zilla::Plugin::MAXMIND::License - Sets up default license and copyright ho
 
 =head1 VERSION
 
-version 0.83
+version 0.84
 
 =for Pod::Coverage .*
 
@@ -75,7 +75,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Dave Rolsky and MaxMind, Inc.
+This software is Copyright (c) 2021 by Dave Rolsky and MaxMind, Inc.
 
 This is free software, licensed under:
 

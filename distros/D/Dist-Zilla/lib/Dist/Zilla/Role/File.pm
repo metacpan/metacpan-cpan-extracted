@@ -1,4 +1,4 @@
-package Dist::Zilla::Role::File 6.020;
+package Dist::Zilla::Role::File 6.022;
 # ABSTRACT: something that can act like a file
 
 use Moose::Role;
@@ -193,7 +193,7 @@ Dist::Zilla::Role::File - something that can act like a file
 
 =head1 VERSION
 
-version 6.020
+version 6.022
 
 =head1 DESCRIPTION
 

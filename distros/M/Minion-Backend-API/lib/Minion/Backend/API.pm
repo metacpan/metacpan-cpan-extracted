@@ -1,19 +1,22 @@
 package Minion::Backend::API;
 use Mojo::Base 'Minion::Backend';
+use Mojo::URL;
 use Mojo::UserAgent;
 use Carp 'croak';
 
-our $VERSION = 0.06;
+our $VERSION = 1.00;
 
 has 'ua';
 has 'url';
+has 'authentication';
 has 'slow' => 0.5;
+has '_url_authentication';
 
 sub broadcast {
     my ($self, $command, $args, $ids) = (shift, shift, shift || [], shift || []);
 
     my $res = $self->ua->put(
-        $self->url . '/broadcast'
+        $self->_url . '/broadcast'
         => json => {
             command => $command,
             args    => $args,
@@ -31,7 +34,7 @@ sub dequeue {
     select(undef, undef, undef, $self->slow);
 
     my $res = $self->ua->post(
-        $self->url . '/dequeue'
+        $self->_url . '/dequeue'
         => json => {
             id      => $id,
             wait    => $wait,
@@ -47,7 +50,7 @@ sub enqueue {
     my ($self, $task, $args, $options) = (shift, shift, shift || [], shift || {});
 
     my $res = $self->ua->post(
-        $self->url . '/enqueue'
+        $self->_url . '/enqueue'
         => json => {
             task    => $task,
             args    => $args,
@@ -62,7 +65,7 @@ sub fail_job {
     my ($self, $id, $retries, $result) = @_;
 
     my $res = $self->ua->patch(
-        $self->url . '/fail-job'
+        $self->_url . '/fail-job'
         => json => {
             id      => $id,
             retries => $retries,
@@ -77,7 +80,7 @@ sub finish_job {
     my ($self, $id, $retries, $result) = @_;
 
     my $res = $self->ua->patch(
-        $self->url . '/finish-job'
+        $self->_url . '/finish-job'
         => json => {
             id      => $id,
             retries => $retries,
@@ -91,7 +94,7 @@ sub finish_job {
 sub history {
     my $self = shift;
 
-    my $res = $self->ua->get($self->url . '/history');
+    my $res = $self->ua->get($self->_url . '/history');
 
     $self->_result($res);
 }
@@ -100,7 +103,7 @@ sub list_jobs {
     my ($self, $offset, $limit, $options) = @_;
 
     my $res = $self->ua->get(
-        $self->url . '/list-jobs'
+        $self->_url . '/list-jobs'
         => json => {
             offset  => $offset,
             limit   => $limit,
@@ -115,7 +118,7 @@ sub list_locks {
     my ($self, $offset, $limit, $options) = @_;
 
     my $res = $self->ua->get(
-        $self->url . '/list-locks'
+        $self->_url . '/list-locks'
         => json => {
             offset  => $offset,
             limit   => $limit,
@@ -130,7 +133,7 @@ sub list_workers {
     my ($self, $offset, $limit, $options) = @_;
 
     my $res = $self->ua->get(
-        $self->url . '/list-workers'
+        $self->_url . '/list-workers'
         => json => {
             offset  => $offset,
             limit   => $limit,
@@ -145,7 +148,7 @@ sub lock {
     my ($self, $name, $duration, $options) = (shift, shift, shift, shift // {});
 
     my $res = $self->ua->get(
-        $self->url . '/lock'
+        $self->_url . '/lock'
         => json => {
             name     => $name,
             duration => $duration,
@@ -159,21 +162,32 @@ sub lock {
 sub new {
     my ($self, @args) = @_;
 
-    my $ua = $args[1] && $args[1]->isa('Mojo::UserAgent')
-           ? $args[1]
-           : Mojo::UserAgent->new;
+    my $ua = Mojo::UserAgent->new;
+    my $authentication;
+    my $total = scalar(@args);
+
+    if ($total > 1) {
+        for (my $i = 1; $i < $total; $i++) {
+            $authentication = $args[$i], next if $args[$i] =~ /^[^:]+:[^:]+$/;
+            $ua             = $args[$i] if $args[$i]->isa('Mojo::UserAgent');
+        }
+    }
 
     my $url = $args[0];
     $url    =~ s/\/$//;
 
-    return $self->SUPER::new(ua => $ua, url => $url);
+    return $self->SUPER::new(
+        ua             => $ua,
+        url            => $url,
+        authentication => $authentication
+    );
 }
 
 sub note {
     my ($self, $id, $merge) = @_;
 
     my $res = $self->ua->patch(
-        $self->url . '/note'
+        $self->_url . '/note'
         => json => {
             id    => $id,
             merge => $merge
@@ -187,7 +201,7 @@ sub receive {
     my ($self, $id) = @_;
 
     my $res = $self->ua->patch(
-        $self->url . '/receive'
+        $self->_url . '/receive'
         => json => {
             id => $id
         }
@@ -200,7 +214,7 @@ sub register_worker {
     my ($self, $id, $options) = (shift, shift, shift || {});
 
     my $res = $self->ua->post(
-        $self->url . '/register-worker'
+        $self->_url . '/register-worker'
         => json => {
             id      => $id,
             options => $options
@@ -214,7 +228,7 @@ sub remove_job {
     my ($self, $id) = @_;
 
     my $res = $self->ua->delete(
-        $self->url . '/remove-job'
+        $self->_url . '/remove-job'
         => json => {
             id => $id
         }
@@ -227,7 +241,7 @@ sub repair {
     my $self = shift;
 
     my $res = $self->ua->post(
-        $self->url . '/repair'
+        $self->_url . '/repair'
     );
 
     $self->_result($res);
@@ -237,7 +251,7 @@ sub reset {
     my ($self, $options) = (shift, shift // {});
 
     my $res = $self->ua->post(
-        $self->url . '/reset'
+        $self->_url . '/reset'
         => json => {
             options => $options
         }
@@ -250,7 +264,7 @@ sub retry_job {
     my ($self, $id, $retries, $options) = (shift, shift, shift, shift || {});
 
     my $res = $self->ua->put(
-        $self->url . '/retry-job'
+        $self->_url . '/retry-job'
         => json => {
             id      => $id,
             retries => $retries,
@@ -264,7 +278,7 @@ sub retry_job {
 sub stats {
     my $self = shift;
 
-    my $res = $self->ua->get($self->url . '/stats');
+    my $res = $self->ua->get($self->_url . '/stats');
 
     $self->_result($res);
 }
@@ -273,7 +287,7 @@ sub unlock {
     my ($self, $name) = @_;
 
     my $res = $self->ua->delete(
-        $self->url . '/unlock'
+        $self->_url . '/unlock'
         => json => {
             name => $name
         }
@@ -286,13 +300,27 @@ sub unregister_worker {
     my ($self, $id) = @_;
 
     my $res = $self->ua->delete(
-        $self->url . '/unregister-worker'
+        $self->_url . '/unregister-worker'
         => json => {
             id => $id
         }
     );
 
     $self->_result($res);
+}
+
+sub _url {
+    my $self = shift;
+
+    return $self->url unless $self->authentication;
+
+    # set userinfo if not setted
+    unless ($self->_url_authentication->isa('Mojo::URL')) {
+        my $url = Mojo::URL->new($self->url)->userinfo($self->authentication);
+        $self->_url_authentication($url);
+    }
+
+    return $self->_url_authentication;
 }
 
 sub _result {
@@ -333,6 +361,11 @@ Minion::Backend::API - API Rest backend
     my $ua = Mojo::UserAgent->new;
     my $backend = Minion::Backend::API->new('https://my-api.com', $ua);
 
+    # using authentication
+    my $backend = Minion::Backend::API->new('https://my-api.com', 'user:pass');
+    my $backend = Minion::Backend::API->new('https://my-api.com', 'user:pass', $ua);
+    my $backend = Minion::Backend::API->new('https://my-api.com', $ua, 'user:pass');
+
 =head1 DESCRIPTION
 
 L<Minion::Backend::API> is a backend for L<Minion> based on L<Mojo::UserAgent>.
@@ -346,17 +379,24 @@ implements the following new ones.
 
 =head2 url
 
-  my $url  = $backend->url;
-  $backend = $backend->url('https://my-api.com');
+    my $url = $backend->url;
+    $backend->url('https://my-api.com');
 
 =head2 ua
 
-  my $ua   = $backend->ua;
-  $backend = $backend->ua(Mojo::UserAgent->new);
+    my $ua = $backend->ua;
+    $backend->ua(Mojo::UserAgent->new);
+
+=head2 authentication
+
+    my $authentication = $backend->authentication;
+    $backend->authentication('user:pass');
+
+It makes basic authentication.
 
 =head2 slow
 
-  $backend->slow(0.2);
+    $backend->slow(0.2);
 
 Slows down each request of dequeue. Default is 0.5 (half a second).
 

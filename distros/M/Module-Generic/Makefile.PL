@@ -36,7 +36,7 @@ WriteMakefile(
         'IO::File'      => '1.41',
         'IO::Scalar'    => '2.113',
         'IPC::SysV'     => '2.09',
-        'JSON'          => '4.02',
+        'JSON'          => '4.03',
         'List::Util'    => '1.56',
         'Module::Metadata' => '1.000037',
         'Number::Format' => '1.75',

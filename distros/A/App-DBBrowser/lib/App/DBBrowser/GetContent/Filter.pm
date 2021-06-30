@@ -5,7 +5,7 @@ use warnings;
 use strict;
 use 5.010001;
 
-use List::MoreUtils qw( any );
+use List::MoreUtils qw( any minmax );
 
 use Term::Choose           qw();
 use Term::Choose::LineFold qw( line_fold print_columns );
@@ -49,7 +49,13 @@ sub input_filter {
     my $append_col    = 'Append_Columns';
     my $cols_to_rows  = 'Columns_to_Rows';
     my $s_and_replace = 'Search_&_Replace';
-    $sf->{empty_to_null} = $sf->{o}{insert}{'empty_to_null_' . $sf->{i}{gc}{source_type}};
+    my $field_count = @{$sql->{insert_into_args}} * @{$sql->{insert_into_args}[0]};
+    $sf->{i}{fi}{back} = '<<';
+    $sf->{i}{fi}{bu_insert_into_args} = [ map { [ @$_ ] } @{$sql->{insert_into_args}} ]; # copy the entire data
+    $sf->{i}{fi}{empty_to_null} = $sf->{o}{insert}{'empty_to_null_' . $sf->{i}{gc}{source_type}};
+   #$sf->{i}{fi}{keep} = 5;
+   #$sf->{i}{fi}{prev_chosen_cols} = [];
+    $sf->{i}{fi}{working} = $field_count > 1_000_000 ? 'Working ... ' : undef;
     my $old_idx = 0;
 
     FILTER: while ( 1 ) {
@@ -70,11 +76,13 @@ sub input_filter {
         my $idx = $tc->choose(
             $menu,
             { info => $info, prompt => 'Filter:', layout => 0, order => 0, max_cols => $max_cols, index => 1,
-              default => $old_idx, undef => $back, skip_items => $regex, busy_string => $sf->{i}{working},
-              keep => $sf->{i}{keep} }
+              default => $old_idx, undef => $back, skip_items => $regex, busy_string => $sf->{i}{fi}{working},
+              keep => $sf->{i}{fi}{keep} }
         );
+        $sf->__print_busy_string();
         if ( ! $idx ) {
-            $sql->{insert_into_args} = []; #
+            $sql->{insert_into_args} = [];
+            delete $sf->{i}{fi};
             return;
         }
         if ( $sf->{o}{G}{menu_memory} ) {
@@ -87,15 +95,13 @@ sub input_filter {
         my $filter = $menu->[$idx];
         my $filter_str = sprintf( "Filter: %s", $filter );
         if ( $filter eq $reset ) {
-            $sf->__print_filter_info( $sql, $count_static_rows, undef, $menu, $max_cols ); #
-            $sql->{insert_into_args} = [ map { [ @$_ ] } @{$sf->{i}{gc}{bu_insert_into_args}} ];
-            $sf->{empty_to_null} = $sf->{o}{insert}{'empty_to_null_' . $sf->{i}{gc}{source_type}};
-            delete $sf->{i}{prev_chosen_cols};
+            $sql->{insert_into_args} = [ map { [ @$_ ] } @{$sf->{i}{fi}{bu_insert_into_args}} ];
+            $sf->{i}{fi}{empty_to_null} = $sf->{o}{insert}{'empty_to_null_' . $sf->{i}{gc}{source_type}};
+            delete $sf->{i}{fi}{prev_chosen_cols};
             next FILTER
         }
         elsif ( $filter eq $confirm ) {
-            if ( $sf->{empty_to_null} ) {
-                $sf->__print_filter_info( $sql, $count_static_rows, undef, $menu, $max_cols );
+            if ( $sf->{i}{fi}{empty_to_null} ) {
                 no warnings 'uninitialized';
                 $sql->{insert_into_args} = [ map { [ map { length ? $_ : undef } @$_ ] } @{$sql->{insert_into_args}} ];
             }
@@ -156,13 +162,12 @@ sub input_filter {
 }
 
 
-sub __print_filter_info {
-    my ( $sf, $sql, $count_static_rows, $pre, $choices, $max_cols ) = @_;
-    my $info = $sf->__get_filter_info( $sql, $count_static_rows, $pre, $choices, $max_cols );
-    print clear_screen();
-    say $info;
-    say "";
-    print $sf->{i}{working} . "\r";
+sub __print_busy_string {
+    my ( $sf ) = @_;
+    if ( $sf->{i}{fi}{working} ) {
+        print clear_screen();
+        print $sf->{i}{fi}{working} . "\r";
+    }
 }
 
 
@@ -170,27 +175,27 @@ sub __get_filter_info {
     my ( $sf, $sql, $count_static_rows, $pre, $choices, $max_cols ) = @_;
     # $count_static_rows not realy static count - some could be line-folded if too long
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    print $sf->{i}{working} . "\r";
     $sf->{i}{occupied_term_height}  = 1; # "DATA:" prompt
     # ...                                # insert_into_args rows
     $sf->{i}{occupied_term_height} += 1; # empty row
     $sf->{i}{occupied_term_height} += $count_static_rows;
-    my $row_count_menu = 0;
-    if ( @{$choices//[]} ) {
+    my $count_menu_rows = 0;
+    my $pad = 2; # 2 == Term::Choose option 'pad' default value
+    if ( @{$pre//[]} + @{$choices//[]} ) {
         if ( ! $max_cols ) {
             my $term_w = get_term_width();
             my $longest = 0;
-            my @tmp_cols = map{ ! length $_ ? '--' : $_ } @{$pre//[]}, @$choices;
+            my @tmp_cols = map{ ! length $_ ? '--' : $_ } @{$pre//[]}, @{$choices//[]};
             for my $col ( @tmp_cols ) {
                 my $col_w = print_columns( $col );
                 $longest = $col_w if $col_w > $longest;
             }
-            my $r = print_columns( join( ' ' x 2, @tmp_cols ) ) / $term_w; ## pad 2
+            my $r = print_columns( join( ' ' x $pad, @tmp_cols ) ) / $term_w;
             if ( $r <= 1 ) {
-                $row_count_menu = 1;
+                $count_menu_rows = 1;
             }
-            elsif ( $longest * 2 + 2 > $term_w ) { ## pad 2
-                $row_count_menu = @tmp_cols;
+            elsif ( $longest * 2 + $pad > $term_w ) {
+                $count_menu_rows = @tmp_cols;
             }
             else {
                 my $joined_cols = $longest;
@@ -199,31 +204,29 @@ sub __get_filter_info {
                     $joined_cols += 2 + $longest;
                     ++$cols_in_a_row;
                 }
-                $row_count_menu = int( @tmp_cols / $cols_in_a_row );
+                $count_menu_rows = int( @tmp_cols / $cols_in_a_row );
                 if ( @tmp_cols % $cols_in_a_row ) {
-                    $row_count_menu++;
+                    $count_menu_rows++;
                 }
             }
         }
         elsif ( $max_cols == 1 ) {
-            $row_count_menu = @{$pre//[]} + @$choices;
+            $count_menu_rows = @{$pre//[]} + @{$choices//[]};
         }
         else {
-            my $count_items = @{$pre//[]} + @$choices;
-            $row_count_menu = int( $count_items / $max_cols );
+            my $count_items = @{$pre//[]} + @{$choices//[]};
+            $count_menu_rows = int( $count_items / $max_cols );
             if ( $count_items % $max_cols ) {
-                $row_count_menu += 1;
+                $count_menu_rows += 1;
             }
         }
     }
-    $sf->{i}{occupied_term_height} += $row_count_menu;
-#    if ( $sf->{i}{occupied_term_height} + 1 < get_term_height()  ) {
-        $sf->{i}{keep} = 1; ##;
-#    }
+    $sf->{i}{occupied_term_height} += $count_menu_rows;
+    $sf->{i}{fi}{keep} = ( minmax( $count_menu_rows, 25, int( get_term_height() / 2 ) ) )[0];
     my $indent = '';
     my $bu_stmt_types = [ @{$sf->{i}{stmt_types}} ];
     $sf->{i}{stmt_types} = [];
-    my $rows = $ax->insert_into_args_info_format( $sql, $indent );
+    my $rows = $ax->info_format_insert_args( $sql, $indent );
     $sf->{i}{stmt_types} = $bu_stmt_types;
     return join( "\n", 'DATA:', @$rows ) . "\n"; # "\n" == empty line after insert_args
 }
@@ -236,7 +239,6 @@ sub __choose_columns {
     my $empty_cells_of_col_count = $sf->__count_empty_cells_of_cols( $aoa );
     my $header = $sf->__prepare_header( $aoa, $empty_cells_of_col_count );
     my $count_static_rows = 3; # filter_str + cs_label + trailing empty line
-    $sf->__print_filter_info( $sql, $count_static_rows, [ '<<', $sf->{i}{ok} ], $header, undef );
     my $row_count = @$aoa;
     my $col_count = @{$aoa->[0]};
     my $mark = [];
@@ -248,7 +250,7 @@ sub __choose_columns {
     if ( @$mark == $col_count ) {
         $mark = undef; # no preselect if all cols have entries
     }
-    my $prev_chosen = $sf->{i}{prev_chosen_cols}{db}{ $sf->{d}{db} } // [];
+    my $prev_chosen = $sf->{i}{fi}{prev_chosen_cols}{db}{ $sf->{d}{db} } // [];
     if ( @$prev_chosen && @$prev_chosen < @$header ) {
         my $mark2 = [];
         for my $i ( 0 .. $#{$header} ) {
@@ -256,19 +258,19 @@ sub __choose_columns {
         }
         $mark = $mark2 if @$mark2 == @$prev_chosen;
     }
-    my $back = '<<';
-    my $info = $sf->__get_filter_info( $sql, $count_static_rows, [ $back, $sf->{i}{ok} ], $header, undef ) . "\n" . $filter_str;
+    my $info = $sf->__get_filter_info( $sql, $count_static_rows, [ $sf->{i}{fi}{back}, $sf->{i}{ok} ], $header, undef ) . "\n" . $filter_str;
     # Choose
     my $col_idx = $tu->choose_a_subset(
         $header,
         { cs_label => 'Cols: ', layout => 0, order => 0, mark => $mark, all_by_default => 1, index => 1,
-          confirm => $sf->{i}{ok}, back => $back, info => $info, keep => $sf->{i}{keep},
-          busy_string => $sf->{i}{working} }
+          confirm => $sf->{i}{ok}, back => $sf->{i}{fi}{back}, info => $info, keep => $sf->{i}{fi}{keep},
+          busy_string => $sf->{i}{fi}{working} }
     );
+    $sf->__print_busy_string();
     if ( ! defined $col_idx ) {
         return;
     }
-    $sf->{i}{prev_chosen_cols}{db}{ $sf->{d}{db} } = [ @{$header}[@$col_idx] ];
+    $sf->{i}{fi}{prev_chosen_cols}{db}{ $sf->{d}{db} } = [ @{$header}[@$col_idx] ];
     $sql->{insert_into_args} = [ map { [ @{$_}[@$col_idx] ] } @$aoa ];
     return 1;
 }
@@ -281,7 +283,6 @@ sub __choose_rows {
     my $aoa = $sql->{insert_into_args};
     my $count_static_rows = 3; # filter_str, prompt, trailing empty line
     my @pre = ( undef, $sf->{i}{ok} ); # back, confirm
-    $sf->__print_filter_info( $sql, $count_static_rows, [ ( ' ' ) x @pre ], [ ( ' ' ) x @$aoa ], 1 ); ##
     my $stringified_rows = [];
     my $mark;
     {
@@ -298,14 +299,14 @@ sub __choose_rows {
     $sql->{insert_into_args} = []; # $sql->{insert_into_args} refers to a new empty array - this doesn't delete $aoa
 
     while ( 1 ) {
-        my $info = $sf->__get_filter_info( $sql, $count_static_rows, [ ( ' ' ) x @pre ], [ ( ' ' ) x @$aoa ], 1 ) . "\n" . $filter_str;
+        my $info = $sf->__get_filter_info( $sql, $count_static_rows, [ $sf->{i}{fi}{back}, $sf->{i}{ok} ], $aoa, 1 ) . "\n" . $filter_str;
         # Choose
         my @idx = $tc->choose(
             [ @pre, @$stringified_rows ],
-            { %{$sf->{i}{lyt_v}}, prompt => $prompt, info => $info, meta_items => [ 0 .. $#pre ],
-              include_highlighted => 2, index => 1, undef => '<<', busy_string => $sf->{i}{working}, mark => $mark }
+            { %{$sf->{i}{lyt_v}}, prompt => $prompt, info => $info, meta_items => [ 0 .. $#pre ], keep => $sf->{i}{fi}{keep},
+              include_highlighted => 2, index => 1, undef => $sf->{i}{fi}{back}, busy_string => $sf->{i}{fi}{working}, mark => $mark }
         );
-        $sf->__print_filter_info( $sql, $count_static_rows, undef );
+        $sf->__print_busy_string();
         if ( ! $idx[0] ) {
             $sql->{insert_into_args} = $aoa;
             return;
@@ -328,30 +329,29 @@ sub __choose_rows {
     }
 }
 
+
 sub __range_of_rows {
     my ( $sf, $sql, $filter_str ) = @_;
     my $aoa = $sql->{insert_into_args};
     my $count_static_rows = 3; # filter_str, prompt, trailing empty line
-    my $pre_count = 1; # back
     $sql->{insert_into_args} = []; # temporarily: because the rows are the choices
-    my $info = $sf->__get_filter_info( $sql, $count_static_rows,  [ ( ' ' ) x $pre_count ], [ ( ' ' ) x @$aoa ], 1 ) . "\n" . $filter_str;
     my $prompt = "Choose first row:";
-    # Choose
-    my $idx_first_row = $sf->__choose_a_row_idx( $aoa, $info, $prompt );
+    my $info = $sf->__get_filter_info( $sql, $count_static_rows,  [ $sf->{i}{fi}{back} ], $aoa, 1 ) . "\n" . $filter_str;
+    # Stop
+    my $idx_first_row = $sf->__choose_a_row_idx( $aoa, $info, $prompt, $sf->{i}{fi}{back} );
     if ( ! defined $idx_first_row ) {
         $sql->{insert_into_args} = $aoa;
         return;
     }
     $sql->{insert_into_args} = [ $aoa->[$idx_first_row] ]; # temporarily for the info output
-    $info = $sf->__get_filter_info( $sql, $count_static_rows,  [ ( ' ' ) x $pre_count ], [ ( ' ' ) x @$aoa ], 1 ) . "\n" . $filter_str;
     $prompt = "Choose last row:";
-    # Choose
-    my $idx_last_row = $sf->__choose_a_row_idx( [ @{$aoa}[$idx_first_row .. $#$aoa] ], $info, $prompt );
+    $info = $sf->__get_filter_info( $sql, $count_static_rows,  [ $sf->{i}{fi}{back} ], $aoa, 1 ) . "\n" . $filter_str;
+    # Stop
+    my $idx_last_row = $sf->__choose_a_row_idx( [ @{$aoa}[$idx_first_row .. $#$aoa] ], $info, $prompt, $sf->{i}{fi}{back} );
     if ( ! defined $idx_last_row ) {
         $sql->{insert_into_args} = $aoa;
         return;
     }
-    $sf->__print_filter_info( $sql, $count_static_rows,  [ ( ' ' ) x $pre_count ], [ ( ' ' ) x @$aoa ], 1 ); #
     $idx_last_row += $idx_first_row;
     $sql->{insert_into_args} = [ @{$aoa}[$idx_first_row .. $idx_last_row] ];
     return 1;
@@ -380,17 +380,16 @@ sub __row_groups {
             $col_count, $col_str;
     }
     my $count_static_rows = 6; # filter_str, prompt, 2 x cs_label, cs_end, trailing empty line
-    my $pre_count = 2; # back and confirm
-    my $info = $sf->__get_filter_info( $sql, $count_static_rows,  [ ( ' ' ) x $pre_count ], [ ( ' ' ) x @choices_groups ], 1 ) . "\n" . $filter_str;
     my $prompt = 'Choose group:';
+    my $info = $sf->__get_filter_info( $sql, $count_static_rows,  [ $sf->{i}{fi}{back}, $sf->{i}{ok} ], \@choices_groups, 1 ) . "\n" . $filter_str;
     # Choose
     my $idxs = $tu->choose_a_subset(
         \@choices_groups,
         { info => $info, prompt => $prompt, layout => 3, index => 1, confirm => $sf->{i}{ok},
-          back => '<<', all_by_default => 1, cs_label => "Chosen groups:\n", cs_separator => "\n",
-          cs_end => "\n", busy_string => $sf->{i}{working}, keep => $sf->{i}{keep} }
+          back => $sf->{i}{fi}{back}, all_by_default => 1, cs_label => "Chosen groups:\n", cs_separator => "\n",
+          cs_end => "\n", busy_string => $sf->{i}{fi}{working}, keep => $sf->{i}{fi}{keep} }
     );
-    $sf->__print_filter_info( $sql, $count_static_rows,  [ ( ' ' ) x $pre_count ], [ ( ' ' ) x @choices_groups ], 1 ); #
+    $sf->__print_busy_string();
     if ( ! defined $idxs ) {
         return;
     }
@@ -411,18 +410,18 @@ sub __remove_cell {
     my $aoa = $sql->{insert_into_args};
 
     while ( 1 ) {
-        my $info = $filter_str;
         my $prompt = "Choose row:";
-        # Choose
-        my $row_idx = $sf->__choose_a_row_idx( $aoa, $info, $prompt );
+        my $info = $filter_str;
+        # Stop
+        my $row_idx = $sf->__choose_a_row_idx( $aoa, $info, $prompt, $sf->{i}{fi}{back} );
         if ( ! defined $row_idx ) {
             return;
         }
         my $count_static_rows = 3; # filter_str and prompt, trailing empty line
-        $info = $sf->__get_filter_info( $sql, $count_static_rows, [ '<<' ], $aoa->[$row_idx], undef ) . "\n" . $filter_str;
         $prompt = "Choose cell:";
-        # Choose
-        my $col_idx = $sf->__choose_a_column_idx( [ @{$aoa->[$row_idx]} ], $info, $prompt );
+        $info = $sf->__get_filter_info( $sql, $count_static_rows, [ $sf->{i}{fi}{back} ], $aoa->[$row_idx], undef ) . "\n" . $filter_str;
+        # Stop
+        my $col_idx = $sf->__choose_a_column_idx( [ @{$aoa->[$row_idx]} ], $info, $prompt, $sf->{i}{fi}{back} );
         if ( ! defined $col_idx ) {
             next;
         }
@@ -447,19 +446,19 @@ sub __insert_cell {
     my $aoa = $sql->{insert_into_args};
 
     while ( 1 ) {
-        my $info = $filter_str;
         my $prompt = "Choose row:";
-        # Choose
-        my $row_idx = $sf->__choose_a_row_idx( $aoa, $info, $prompt );
+        my $info = $filter_str;
+        # Stop
+        my $row_idx = $sf->__choose_a_row_idx( $aoa, $info, $prompt, $sf->{i}{fi}{back} );
         if ( ! defined $row_idx ) {
             return;
         }
         my $cols = [ @{$aoa->[$row_idx]}, 'END_of_Row' ];
         my $count_static_rows = 3; # prompt, filter_str, trailing empty line
-        $info = $sf->__get_filter_info( $sql, $count_static_rows, [ '<<' ], $cols, undef ) . "\n" . $filter_str;
         $prompt = "Insert cell before:";
-        # Choose
-        my $col_idx = $sf->__choose_a_column_idx( $cols, $info, $prompt );
+        $info = $sf->__get_filter_info( $sql, $count_static_rows, [ $sf->{i}{fi}{back} ], $cols, undef ) . "\n" . $filter_str;
+        # Stop
+        my $col_idx = $sf->__choose_a_column_idx( $cols, $info, $prompt, $sf->{i}{fi}{back} );
         if ( ! defined $col_idx ) {
             next;
         }
@@ -475,13 +474,14 @@ sub __insert_cell {
             { subseq_tab => ' ' x length $label, join => 0 }
         );
         $count_static_rows = @tmp_info + 2; # tmp_info, readline, trailing empty line
-        $info = $sf->__get_filter_info( $sql, $count_static_rows, undef, undef, 1 ). "\n" . join( "\n", @tmp_info );
         $prompt = "<*>: ";
+        $info = $sf->__get_filter_info( $sql, $count_static_rows, undef, undef, 1 ). "\n" . join( "\n", @tmp_info );
         # Readline
         my $cell = $tf->readline(
             $prompt,
             { info => $info }
         );
+        $sf->__print_busy_string();
         splice( @{$aoa->[$row_idx]}, $col_idx, 0, $cell );
         $sql->{insert_into_args} = $aoa;
         return;
@@ -495,13 +495,14 @@ sub __fill_up_rows {
     my $aoa = $sql->{insert_into_args};
     my $count_static_rows = 3; # filter_str, prompt, trailing empty line
     my $menu = [ undef, '- YES' ]; # back, confirm
-    my $info = $sf->__get_filter_info( $sql, $count_static_rows,  undef, [ ( ' ' ) x @$menu ], 1 ) . "\n" . $filter_str;
     my $prompt = 'Fill up shorter rows?';
+    my $info = $sf->__get_filter_info( $sql, $count_static_rows,  undef, $menu, 1 ) . "\n" . $filter_str;
+    # Choose
     my $ok = $tc->choose(
         $menu,
-        { info => $info, prompt => $prompt, index => 1, undef => '- NO', layout => 3, keep => $sf->{i}{keep} }
+        { info => $info, prompt => $prompt, index => 1, undef => '- NO', layout => 3, keep => $sf->{i}{fi}{keep} }
     );
-    $sf->__print_filter_info( $sql, $count_static_rows, undef, [ ( ' ' ) x @$menu ], 1 ); #
+    $sf->__print_busy_string();
     if ( ! $ok ) {
         return;
     }
@@ -527,13 +528,14 @@ sub __append_col {
     my $aoa = $sql->{insert_into_args};
     my $count_static_rows = 3; # filter_str, prompt, trailing empty line
     my $menu = [ undef, '- YES' ]; # back, confirm
-    my $info = $sf->__get_filter_info( $sql, $count_static_rows, undef, [ ( ' ' ) x @$menu ], 1 ) . "\n" . $filter_str;
     my $prompt = 'Append an empty column?';
+    my $info = $sf->__get_filter_info( $sql, $count_static_rows, undef, $menu, 1 ) . "\n" . $filter_str;
+    # Choose
     my $ok = $tc->choose(
         $menu,
-        { info => $info, prompt => $prompt, index => 1, undef => '- NO', layout => 3, keep => $sf->{i}{keep} }
+        { info => $info, prompt => $prompt, index => 1, undef => '- NO', layout => 3, keep => $sf->{i}{fi}{keep} }
     );
-    $sf->__print_filter_info( $sql, $count_static_rows,  undef, [ ( ' ' ) x @$menu ], 1 ); #
+    $sf->__print_busy_string();
     if ( $ok ) {
         my $new_last_idx = $#{$aoa->[0]} + 1;
         for my $row ( @$aoa ) {
@@ -552,10 +554,10 @@ sub __split_column {
     my $empty_cells_of_col_count =  $sf->__count_empty_cells_of_cols( $aoa );
     my $header = $sf->__prepare_header( $aoa, $empty_cells_of_col_count );
     my $count_static_rows = 3; # filter_str, prompt, trailing empty line
-    my $info = $sf->__get_filter_info( $sql, $count_static_rows, [ '<<' ], $header, undef ) . "\n" . $filter_str;
     my $prompt = 'Choose column:';
-    # Choose
-    my $idx = $sf->__choose_a_column_idx( $header, $info, $prompt );
+    my $info = $sf->__get_filter_info( $sql, $count_static_rows, [ $sf->{i}{fi}{back} ], $header, undef ) . "\n" . $filter_str;
+    # Stop
+    my $idx = $sf->__choose_a_column_idx( $header, $info, $prompt, $sf->{i}{fi}{back} );
     if ( ! defined $idx ) {
         return;
     }
@@ -566,20 +568,20 @@ sub __split_column {
         [ 'Right trim', '\s+' ]
     ];
     $count_static_rows = 3; # filter_str, prompt, trailing empty line
-    my $pre_count = 2; # back, confirm
-    $info = $sf->__get_filter_info( $sql, $count_static_rows, [ ( ' ' ) x $pre_count ], [ ( ' ' ) x @$fields ], 1 ) . "\n" . $filter_str;
+    my $back = $sf->{i}{back} . ' ' x 3;
     $prompt = "Split column \"$header->[$idx]\"";
+    $info = $sf->__get_filter_info( $sql, $count_static_rows, [ $back, $sf->{i}{confirm} ], $fields, 1 ) . "\n" . $filter_str;
     my $c;
     # Fill_form
     my $form = $tf->fill_form(
         $fields,
-        { info => $info, prompt => $prompt, auto_up => 2, confirm => $sf->{i}{confirm}, back => $sf->{i}{back} . '   ',
-          keep => $sf->{i}{keep} }
+        { info => $info, prompt => $prompt, auto_up => 2, confirm => $sf->{i}{confirm}, back => $back,
+          keep => $sf->{i}{fi}{keep} }
     );
+    $sf->__print_busy_string();
     if ( ! $form ) {
         return;
     }
-    $sf->__print_filter_info( $sql, $count_static_rows, undef ); #
     my ( $pattern, $limit, $left_trim, $right_trim ) = map { $_->[1] } @$form;
     $pattern //= '';
 
@@ -610,34 +612,44 @@ sub __split_table {
     my $digits = length( scalar @{$aoa->[0]} );
     my $count_static_rows = 3; # filter_str, prompt, trailing empty line
     my $pre_count = 2; # back confirm
-    my $info = $sf->__get_filter_info( $sql, $count_static_rows, [ ( ' ' ) x $pre_count ], [ ( ' ' ) x $digits ], 1 ) . "\n" . $filter_str;
-    # Choose
-    my $col_count = $tu->choose_a_number(
-        $digits,
-        { info => $info, cs_label => 'Number columns new table: ', small_first => 1, keep => $sf->{i}{keep} }
-    );
-    if ( ! defined $col_count ) {
-        return;
-    }
-    $sf->__print_filter_info( $sql, $count_static_rows, [ ( ' ' ) x $pre_count ], [ ( ' ' ) x $digits ], 1 );
-    if ( @{$aoa->[0]} < $col_count ) {
-        my $info = $sf->__get_filter_info( $sql, $count_static_rows, [ ( ' ' ) x $pre_count ], [ ( ' ' ) x $digits ], 1 ) . "\n" . $filter_str; ##
-        $tc->choose(
-            [ 'Chosen number bigger than the available columns!' ],
-            { info => $info, prompt => 'Close with ENTER', keep => $sf->{i}{keep} }
+    my $col_count;
+
+    CHOOSE_A_NUMBER: while( 1 ) {
+        # get_filter_info: if $max_cols == 1, only the element count of the array-references matters, so ( ' ' ) x $digits is ok
+        my $info = $sf->__get_filter_info( $sql, $count_static_rows, [ ( ' ' ) x $pre_count ], [ ( ' ' ) x $digits ], 1 ) . "\n" . $filter_str;
+        # Choose
+        $col_count = $tu->choose_a_number(
+            $digits,
+            { info => $info, cs_label => 'Number columns new table: ', small_first => 1, keep => $sf->{i}{fi}{keep} }
         );
-        return;
-    }
-    if ( @{$aoa->[0]} % $col_count ) {
-        my $info = $sf->__get_filter_info( $sql, $count_static_rows, [ ( ' ' ) x $pre_count ], [ ( ' ' ) x $digits ], 1 ) . "\n" . $filter_str; ##
-        $tc->choose(
-            [ 'The number of available columns cannot be divided by the chosen number without rest!' ],
-            { info => $info, prompt => 'Close with ENTER', keep => $sf->{i}{keep} }
-        );
-        return;
+        $sf->__print_busy_string();
+        if ( ! $col_count ) {
+            return;
+        }
+        if ( @{$aoa->[0]} < $col_count ) {
+            my $prompt = sprintf 'Chosen number(%d) bigger than the available columns(%d)!', $col_count, scalar( @{$aoa->[0]} );
+            my $info = $sf->__get_filter_info( $sql, $count_static_rows, [ ( ' ' ) x $pre_count ], [ ( ' ' ) x $digits ], 1 ) . "\n" . $filter_str;
+            $tc->choose(
+                [ 'Continue with ENTER' ],
+                { info => $info, prompt => $prompt, keep => $sf->{i}{fi}{keep} }
+            );
+            $sf->__print_busy_string();
+            next CHOOSE_A_NUMBER;
+        }
+        if ( @{$aoa->[0]} % $col_count ) {
+            my $prompt = sprintf 'The number of available columns(%d) cannot be divided by the selected number(%d) without remainder!', scalar( @{$aoa->[0]} ), $col_count;
+            my $info = $sf->__get_filter_info( $sql, $count_static_rows, [ ( ' ' ) x $pre_count ], [ ( ' ' ) x $digits ], 1 ) . "\n" . $filter_str;
+            $tc->choose(
+                [ 'Continue with ENTER' ],
+                { info => $info, prompt => $prompt, keep => $sf->{i}{fi}{keep} }
+            );
+            $sf->__print_busy_string();
+            next CHOOSE_A_NUMBER;
+        }
+        last CHOOSE_A_NUMBER;
     }
     my $begin = 0;
-    my $end   = $col_count - 1;
+    my $end = $col_count - 1;
     my $tmp = [];
 
     while ( 1 ) {
@@ -659,14 +671,11 @@ sub __merge_rows {
     my $tu = Term::Choose::Util->new( $sf->{i}{tcu_default} );
     my $tf = Term::Form->new( $sf->{i}{tf_default} );
     my $aoa = $sql->{insert_into_args};
-
-    my $info = $filter_str;
-    print "\r$info"; ##
     my $term_w = get_term_width();
-    my @stringified_rows;
+    my $stringified_rows;
     {
         no warnings 'uninitialized';
-        @stringified_rows = map {
+        @$stringified_rows = map {
             my $str_row = join( ',', @$_ );
             if ( print_columns( $str_row ) > $term_w ) {
                 unicode_sprintf( $str_row, $term_w, { mark_if_trundated => $sf->{i}{dots}[ $sf->{o}{G}{dots} ] } );
@@ -677,19 +686,19 @@ sub __merge_rows {
         } @$aoa;
     }
     my $prompt = 'Choose rows:';
+    my $info = $filter_str;
     # Choose
     my $chosen_idxs = $tu->choose_a_subset(
-        \@stringified_rows,
+        $stringified_rows,
         { cs_separator => "\n", cs_end => "\n", layout => 3, order => 0, all_by_default => 0, prompt => $prompt,
-          index => 1, confirm => $sf->{i}{ok}, back => '<<', info => $info, keep => $sf->{i}{keep},
-          busy_string => $sf->{i}{working} }
+          index => 1, confirm => $sf->{i}{ok}, back => $sf->{i}{fi}{back}, info => $info, keep => $sf->{i}{fi}{keep},
+          busy_string => $sf->{i}{fi}{working} }
     );
+    $sf->__print_busy_string();
     if ( ! defined $chosen_idxs || ! @$chosen_idxs ) {
         return;
     }
     my $count_static_rows = 3; # filter_str, prompt, trailing empty line
-    my $pre_count = 2; # back, confirm
-    $sf->__print_filter_info( $sql, $count_static_rows, [ ( ' ' ) x $pre_count ], [ ( ' ' ) x @{$aoa->[$chosen_idxs->[0]]} ], 1 );
     my $merged = [];
     for my $col ( 0 .. $#{$aoa->[$chosen_idxs->[0]]} ) {
         my @tmp;
@@ -703,17 +712,17 @@ sub __merge_rows {
     }
     my $col_number = 0;
     my $fields = [ map { [ ++$col_number, defined $_ ? "$_" : '' ] } @$merged ];
-    $info = $sf->__get_filter_info( $sql, $count_static_rows, [ ( ' ' ) x $pre_count ], [ ( ' ' ) x @{$fields} ], 1 ) . "\n" . $filter_str;
+    $info = $sf->__get_filter_info( $sql, $count_static_rows, [ $sf->{i}{fi}{back}, $sf->{i}{ok} ], $fields, 1 ) . "\n" . $filter_str;
     # Fill_form
     my $form = $tf->fill_form(
         $fields,
-        { info => $info, prompt => 'Edit cells of merged rows:', keep => $sf->{i}{keep},
+        { info => $info, prompt => 'Edit cells of merged rows:', keep => $sf->{i}{fi}{keep},
           auto_up => 2, confirm => $sf->{i}{_confirm}, back => $sf->{i}{_back} . '   ' }
     );
+    $sf->__print_busy_string();
     if ( ! $form ) {
         return;
     }
-    $sf->__print_filter_info( $sql, $count_static_rows, [ ( ' ' ) x $pre_count ], [ ( ' ' ) x @{$fields} ], 1 ); #
     $merged = [ map { $_->[1] } @$form ];
     my $first_idx = shift @$chosen_idxs;
     $aoa->[$first_idx] = $merged; # modifies $aoa
@@ -733,13 +742,14 @@ sub __join_columns {
     my $empty_cells_of_col_count =  $sf->__count_empty_cells_of_cols( $aoa );
     my $header = $sf->__prepare_header( $aoa, $empty_cells_of_col_count );
     my $count_static_rows = 3; # filter_str, cs_label, trailing empty line
-    my $info = $sf->__get_filter_info( $sql, $count_static_rows, [ '<<', $sf->{i}{ok} ], $header, undef ) . "\n" . $filter_str;
+    my $info = $sf->__get_filter_info( $sql, $count_static_rows, [ $sf->{i}{fi}{back}, $sf->{i}{ok} ], $header, undef ) . "\n" . $filter_str;
     # Choose
     my $chosen_idxs = $tu->choose_a_subset(
         $header,
-        { cs_label => 'Cols: ', layout => 0, order => 0, index => 1, confirm => $sf->{i}{ok}, keep => $sf->{i}{keep},
-          back => '<<', info => $info, busy_string => $sf->{i}{working} }
+        { cs_label => 'Cols: ', layout => 0, order => 0, index => 1, confirm => $sf->{i}{ok}, keep => $sf->{i}{fi}{keep},
+          back => $sf->{i}{fi}{back}, info => $info, busy_string => $sf->{i}{fi}{working} }
     );
+    $sf->__print_busy_string();
     if ( ! defined $chosen_idxs || ! @$chosen_idxs ) {
         return;
     }
@@ -756,12 +766,11 @@ sub __join_columns {
         'Join-string: ',
         { info => $info }
     );
+    $sf->__print_busy_string();
     if ( ! defined $join_char ) {
         return;
     }
     $count_static_rows = 3; # filter_str, prompt, trailing empty line
-    my $pre_count = 2; # back, confirm
-    $sf->__print_filter_info( $sql, $count_static_rows, [ ( ' ' ) x $pre_count ], [ ( ' ' ) x @{$aoa} ], 1 );
     my $merged = [];
     for my $row ( 0 .. $#{$aoa} ) {
         my @tmp;
@@ -775,17 +784,17 @@ sub __join_columns {
     }
     my $col_number = 0;
     my $fields = [ map { [ ++$col_number, defined $_ ? "$_" : '' ] } @$merged ];
-    $info = $sf->__get_filter_info( $sql, $count_static_rows, [ ( ' ' ) x $pre_count ], [ ( ' ' ) x @{$fields} ], 1 ) . "\n" . $filter_str;
+    $info = $sf->__get_filter_info( $sql, $count_static_rows, [ $sf->{i}{_back}, $sf->{i}{_confirm} ], $fields, 1 ) . "\n" . $filter_str;
     # Fill_form
     my $form = $tf->fill_form(
         $fields,
-        { info => $info, prompt => 'Edit cells of joined cols:', auto_up => 2, keep => $sf->{i}{keep},
+        { info => $info, prompt => 'Edit cells of joined cols:', auto_up => 2, keep => $sf->{i}{fi}{keep},
           confirm => $sf->{i}{_confirm}, back => $sf->{i}{_back} . '   ' }
     );
+    $sf->__print_busy_string();
     if ( ! $form ) {
         return;
     }
-    $sf->__print_filter_info( $sql, $count_static_rows, [ ( ' ' ) x $pre_count ], [ ( ' ' ) x @{$fields} ], 1 ); #
     $merged = [ map { $_->[1] } @$form ];
     my $first_idx = shift @$chosen_idxs;
     for my $row ( 0 .. $#{$aoa} ) { # modifies $aoa
@@ -805,14 +814,14 @@ sub __transpose_rows_to_cols {
     my $aoa = $sql->{insert_into_args};
     my $menu = [ undef, '- YES' ];
     my $count_static_rows = 3; # filter_str, prompt, trailing empty line
-    my $info = $sf->__get_filter_info( $sql, $count_static_rows, undef, [ ( ' ' ) x @$menu ], 1 ) . "\n" . $filter_str;
     my $prompt = 'Transpose columns to rows?';
+    my $info = $sf->__get_filter_info( $sql, $count_static_rows, undef, $menu, 1 ) . "\n" . $filter_str;
     my $ok = $tc->choose(
         $menu,
-        { info => $info, prompt => $prompt, index => 1, undef => '- NO', layout => 3, busy_string => $sf->{i}{working},
-          keep => $sf->{i}{keep} }
+        { info => $info, prompt => $prompt, index => 1, undef => '- NO', layout => 3, busy_string => $sf->{i}{fi}{working},
+          keep => $sf->{i}{fi}{keep} }
     );
-    $sf->__print_filter_info( $sql, $count_static_rows, undef, [ ( ' ' ) x @$menu ], 1 ); #
+    $sf->__print_busy_string();
     if ( $ok ) {
         my $tmp_aoa = [];
         for my $row ( 0 .. $#$aoa ) {
@@ -832,15 +841,14 @@ sub __empty_to_null {
         [ 'empty_to_null', "  Empty fields to NULL", [ 'NO', 'YES' ] ]
     ];
     my $count_static_rows = 2; # prompt, trailing empty line
-    my $pre_count = 2; # back, confirm
-    my $info = $sf->__get_filter_info( $sql, $count_static_rows, [ ( ' ' ) x $pre_count ], [ ( ' ' ) x @$menu_elements ], 1 );
-    my $tmp = { empty_to_null => $sf->{empty_to_null} };
+    my $tmp = { empty_to_null => $sf->{i}{fi}{empty_to_null} };
+    my $info = $sf->__get_filter_info( $sql, $count_static_rows, [ $sf->{i}{_back}, $sf->{i}{_confirm} ], $menu_elements, 1 );
     $tu->settings_menu(
         $menu_elements,
         $tmp,
-        { info => $info, back => $sf->{i}{_back}, confirm => $sf->{i}{_confirm}, keep => $sf->{i}{keep} }
+        { info => $info, back => $sf->{i}{_back}, confirm => $sf->{i}{_confirm}, keep => $sf->{i}{fi}{keep} }
     );
-    $sf->{empty_to_null} = $tmp->{empty_to_null};
+    $sf->{i}{fi}{empty_to_null} = $tmp->{empty_to_null};
 }
 
 
@@ -883,15 +891,16 @@ sub __prepare_header {
 }
 
 sub __choose_a_column_idx {
-    my ( $sf, $columns, $info, $prompt ) = @_;
+    my ( $sf, $columns, $info, $prompt, $back ) = @_;
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my @pre = ( undef );
     # Choose
     my $col_idx = $tc->choose(
         [ @pre, map( defined $_ ? $_ : '', @$columns ) ],
-        { layout => 0, order => 0, index => 1, undef => '<<', info => $info, prompt => $prompt, empty => '--',
-          keep => $sf->{i}{keep}, busy_string => $sf->{i}{working} } #
+        { layout => 0, order => 0, index => 1, undef => $back // '<<', info => $info, prompt => $prompt, empty => '--',
+          keep => $sf->{i}{fi}{keep}, busy_string => $sf->{i}{fi}{working} } #
     );
+    $sf->__print_busy_string();
     if ( ! $col_idx ) {
         return;
     }
@@ -899,7 +908,7 @@ sub __choose_a_column_idx {
 }
 
 sub __choose_a_row_idx {
-    my ( $sf, $aoa, $info, $prompt ) = @_;
+    my ( $sf, $aoa, $info, $prompt, $back ) = @_;
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my @stringified_rows;
     {
@@ -910,9 +919,10 @@ sub __choose_a_row_idx {
     # Choose
     my $row_idx = $tc->choose(
         [ @pre, @stringified_rows ],
-        { layout => 3, index => 1, undef => '<<', info => $info, prompt => $prompt, ## keep => $sf->{i}{keep},
-          busy_string => $sf->{i}{working} }
+        { layout => 3, index => 1, undef => $back // '<<', info => $info, prompt => $prompt, keep => $sf->{i}{fi}{keep},
+          busy_string => $sf->{i}{fi}{working} }
     );
+    $sf->__print_busy_string();
     if ( ! $row_idx ) {
         return;
     }

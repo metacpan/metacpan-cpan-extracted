@@ -1,5 +1,5 @@
 package Photonic::WE::S::Green;
-$Photonic::WE::S::Green::VERSION = '0.016';
+$Photonic::WE::S::Green::VERSION = '0.017';
 
 =encoding UTF-8
 
@@ -9,7 +9,7 @@ Photonic::WE::S::Green
 
 =head1 VERSION
 
-version 0.016
+version 0.017
 
 =head1 COPYRIGHT NOTICE
 
@@ -170,11 +170,12 @@ with 'Photonic::Roles::KeepStates', 'Photonic::Roles::UseMask';
 sub _build_greenTensor {
     my $self=shift;
     $self->_converged(all { $_->converged } @{$self->greenP});
-    tensor(pdl([map $_->Gpp, @{$self->greenP}])->complex, $self->geometry->unitDyadsLU, $self->geometry->ndims, 2);
+    tensor(pdl([map $_->Gpp, @{$self->greenP}]), $self->geometry->unitDyadsLU, $self->geometry->ndims, 2);
 }
 
 sub _build_haydock { # One Haydock coefficients calculator per direction0
-    make_haydock(shift, 'Photonic::WE::S::AllH');
+    my ($self) = @_;
+    make_haydock($self, 'Photonic::WE::S::AllH', $self->geometry->unitPairs, 0, qw(reorthogonalize use_mask mask));
 }
 
 sub _build_greenP {

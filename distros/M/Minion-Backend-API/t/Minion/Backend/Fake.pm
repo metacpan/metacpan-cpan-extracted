@@ -1,7 +1,7 @@
 package Minion::Backend::Fake;
 use Mojo::Base 'Minion::Backend';
 
-our $VERSION = 0.05;
+our $VERSION = 1.00;
 
 sub new {
     return shift->SUPER::new;

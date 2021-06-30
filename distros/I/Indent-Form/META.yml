@@ -35,8 +35,8 @@ requires:
   Readonly: 0
   perl: 5.6.2
 resources:
-  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Indent-Form
+  bugtracker: https://github.com/michal-josef-spacek/Indent-Form/issues
   homepage: https://github.com/michal-josef-spacek/Indent-Form
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Indent-Form
-version: '0.06'
+version: '0.07'

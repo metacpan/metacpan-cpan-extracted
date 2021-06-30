@@ -13,7 +13,7 @@ Lab::XPRESS::Examples::Example1_Simple_IV - XPRESS for DUMMIES - Example 1
 
 =head1 VERSION
 
-version 3.751
+version 3.760
 
 =head1 Abstract
 
@@ -275,7 +275,7 @@ This software is copyright (c) 2021 by the Lab::Measurement team; in detail:
   Copyright 2013       Christian Butschkow, Stefan Geissler
             2014       Christian Butschkow
             2017       Simon Reinhardt
-            2018       Andreas K. Huettel, Simon Reinhardt
+            2018       Andreas K. HÃ¼ttel, Simon Reinhardt
 
 
 This is free software; you can redistribute it and/or modify it under

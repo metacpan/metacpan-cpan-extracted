@@ -5,14 +5,21 @@ Procedure for a CPAN release
 ** finalize dev branch merges
 ** check for debug code in modules
 ** Modify Changelog
+** Add missing authors to dist.ini (use git shortlog -s -n -e and select everyone with at least 2 commits)
 ** push all commits up to github
-** go to tmp
-** clone from github server
-*** git clone git@github.com:finance-quote/finance-quote.git
 ** dzil build - build a new release
 ** dzil test - test it out
 * RELEASE
 ** dzil release - upload to cpan, tweet and mail :)
 ** Update the website ! update htdocs/index.html file
-** upload to sourceforge @ https://sourceforge.net/projects/finance-quote/files/finance-quote/
-sftp ecocode,finance-quote@web.sourceforge.net
+** upload module tarball to sourceforge @ https://sourceforge.net/projects/finance-quote/files/finance-quote/
+*** Through Web interface
+*** Or sftp <SourceForge ID>@frs.sourceforge.net
+**** cd /home/frs/project/finance-quote/finance-quote
+**** put Finance-Quote-N.NN.tar.gz
+**** bye
+** Upload index.html for http://finance-quote.sourceforge.net/index.html
+*** sftp <SourceForge ID>,finance-quote@web.sourceforge.net
+**** cd /home/project-web/finance-quote/htdocs
+**** put index.html
+**** bye

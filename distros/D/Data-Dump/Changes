@@ -1,3 +1,23 @@
+2021-06-26  Breno G. de Oliveira <garu@cpan.org>
+
+   Release 1.25
+
+   New option $Data::Dump::LINEWIDTH controls when to perform a
+   linebreak (default is 60). Many thanks to Jonas Kramer, Rob Kinyon,
+   cybernicus and Lady Aleena for submitting reports and pull requests.
+
+
+
+2021-06-25  Breno G. de Oliveira <garu@cpan.org>
+
+   Release 1.24
+
+   Strings like "NaN" are still strings
+
+   Update maintainer and repository information
+
+
+
 2015-06-09  Gisle Aas <gisle@ActiveState.com>
 
    Release 1.23

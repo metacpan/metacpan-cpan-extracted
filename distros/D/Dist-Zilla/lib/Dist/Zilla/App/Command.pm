@@ -1,4 +1,4 @@
-package Dist::Zilla::App::Command 6.020;
+package Dist::Zilla::App::Command 6.022;
 # ABSTRACT: base class for dzil commands
 
 # BEGIN BOILERPLATE
@@ -48,7 +48,7 @@ Dist::Zilla::App::Command - base class for dzil commands
 
 =head1 VERSION
 
-version 6.020
+version 6.022
 
 =head1 PERL VERSION SUPPORT
 

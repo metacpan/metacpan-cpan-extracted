@@ -4,7 +4,7 @@ use Moo;
 
 use namespace::autoclean;
 
-our $VERSION = '0.000026';
+our $VERSION = '0.000027';
 
 use feature qw( say state );
 
@@ -448,13 +448,15 @@ sub _pseudo_encode_args {
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 WebService::PayPal::PaymentsAdvanced - A simple wrapper around the PayPal Payments Advanced web service
 
 =head1 VERSION
 
-version 0.000026
+version 0.000027
 
 =head1 SYNOPSIS
 
@@ -796,6 +798,10 @@ Returns a response object.
 The official L<Payflow Gateway Developer Guide and
 Reference|https://developer.paypal.com/docs/classic/payflow/integration-guide/>
 
+=head1 SUPPORT
+
+Bugs may be submitted through L<https://github.com/maxmind/webservice-paypal-paymentsadvanced/issues>.
+
 =head1 AUTHOR
 
 Olaf Alders <olaf@wundercounter.com>
@@ -842,7 +848,7 @@ William Storey <wstorey@maxmind.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by MaxMind, Inc.
+This software is copyright (c) 2021 by MaxMind, Inc.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

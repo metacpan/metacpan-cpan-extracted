@@ -2,8 +2,8 @@ NAME
     App::metasyn - Alternative front-end to Acme::MetaSyntactic
 
 VERSION
-    This document describes version 0.006 of App::metasyn (from Perl
-    distribution App-metasyn), released on 2021-02-21.
+    This document describes version 0.008 of App::metasyn (from Perl
+    distribution App-metasyn), released on 2021-06-26.
 
 SYNOPSIS
     Use the included script metasyn.
@@ -12,76 +12,15 @@ FUNCTIONS
   metasyn
     Usage:
 
-     metasyn(%args) -> [status, msg, payload, meta]
+     metasyn(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
     Alternative front-end to Acme::MetaSyntactic.
 
     Examples:
 
-    *   List all installed themes:
+    *   List all names from the default theme, foo:
 
-         metasyn( action => "list-themes");
-
-        Result:
-
-         [
-           200,
-           "OK",
-           [
-             "abba",
-             "afke",
-             "alice",
-             "alphabet",
-         # ...snipped 137 lines for brevity...
-             "viclones",
-             "wales_towns",
-             "weekdays",
-             "yapc",
-             "zodiac",
-           ],
-           {},
-         ]
-
-    *   List 3 random themes:
-
-         metasyn( action => "list-themes", number => 3, shuffle => 1);
-
-        Result:
-
-         [
-           200,
-           "OK",
-           ["display_resolution", "loremipsum", "jabberwocky"],
-           {},
-         ]
-
-    *   List all installed themes, along with all their categories:
-
-         metasyn( action => "list-themes", categories => 1);
-
-        Result:
-
-         [
-           200,
-           "OK",
-           [
-             "abba",
-             "afke",
-             "alice",
-             "alphabet/en",
-         # ...snipped 2209 lines for brevity...
-             "zodiac/Chinese",
-             "zodiac/Vedic",
-             "zodiac/Western",
-             "zodiac/Western/Real",
-             "zodiac/Western/Traditional",
-           ],
-           {},
-         ]
-
-    *   List all names from a theme:
-
-         metasyn( theme => "foo");
+         metasyn();
 
         Result:
 
@@ -103,25 +42,142 @@ FUNCTIONS
            {},
          ]
 
-    *   List all names from a theme in random order, return only 3:
+    *   Return a single random name from the default theme (equivalent to:
+        "meta"):
 
-         metasyn( theme => "christmas/elf", number => 3, shuffle => 1);
+         metasyn(number => 1, shuffle => 1); # -> [200, "OK", ["mies"], {}]
+
+    *   List all names from a theme:
+
+         metasyn(theme => "christmas");
 
         Result:
 
-         [200, "OK", ["opneslae", "minstix", "snowball"], {}]
+         [
+           200,
+           "OK",
+           [
+             "bushy",
+             "evergreen",
+             "shinny",
+             "upatree",
+         # ...snipped 59 lines for brevity...
+             "mcsnowballs",
+             "mcicicles",
+             "mcblizzard",
+             "mcsparkles",
+             "mcsnowflakes",
+           ],
+           {},
+         ]
+
+    *   List all names from a category of a theme in random order, return
+        only 3 (equivalent to: "meta christmas/elf 3"):
+
+         metasyn(theme => "christmas/elf", number => 3, shuffle => 1);
+
+        Result:
+
+         [200, "OK", ["bushy", "pepper", "sugarplum"], {}]
+
+    *   Return a single random name from a theme (equivalent to: "meta
+        christmas"):
+
+         metasyn(theme => "christmas", number => 1, shuffle => 1); # -> [200, "OK", ["twinkle"], {}]
+
+    *   Return a single random name from a random theme:
+
+         metasyn(number => 1, random_theme => 1, shuffle => 1); # -> [200, "OK", ["sxga"], {}]
+
+    *   List all installed themes (equivalent to: "meta --themes"):
+
+         metasyn(action => "list-themes");
+
+        Result:
+
+         [
+           200,
+           "OK",
+           [
+             "abba",
+             "afke",
+             "alice",
+             "alphabet",
+         # ...snipped 136 lines for brevity...
+             "viclones",
+             "wales_towns",
+             "weekdays",
+             "yapc",
+             "zodiac",
+           ],
+           {},
+         ]
+
+    *   List 3 random themes (equivalent to: "meta --themes | shuf | head
+        -n3"):
+
+         metasyn(action => "list-themes", number => 3, shuffle => 1);
+
+        Result:
+
+         [200, "OK", ["foo", "christmas", "simpsons"], {}]
+
+    *   List all installed themes, along with all their categories:
+
+         metasyn(action => "list-themes", categories => 1);
+
+        Result:
+
+         [
+           200,
+           "OK",
+           [
+             "abba",
+             "afke",
+             "alice",
+             "alphabet/en",
+         # ...snipped 2221 lines for brevity...
+             "zodiac/Chinese",
+             "zodiac/Vedic",
+             "zodiac/Western",
+             "zodiac/Western/Real",
+             "zodiac/Western/Traditional",
+           ],
+           {},
+         ]
 
     *   List all categories from a theme:
 
-         metasyn( theme => "christmas", categories => 1);
+         metasyn(theme => "christmas", categories => 1);
 
         Result:
 
          [200, "OK", ["elf", "reindeer", "santa", "snowman"], {}]
 
-    This script is an alternative front-end to Acme::MetaSyntactic. Compared
-    to the official CLI meta, this CLI is more oriented towards listing
-    names instead of giving you one or several random names.
+    *   List 2 categories from a theme, in random order:
+
+         metasyn(theme => "christmas", categories => 1, number => 2, shuffle => 1);
+
+        Result:
+
+         [200, "OK", ["reindeer", "snowman"], {}]
+
+    This script is an alternative front-end for Acme::MetaSyntactic.
+    Compared to the official CLI meta, this CLI currently does not retrieve
+    themes/names remotely but:
+
+    *   provides shell completion (but see App::ShellCompleter::meta to add
+        tab completion for the official CLI);
+
+    *   provides an option to shuffle list of themes/categories/names
+        returned;
+
+    *   makes it easy to print all names in a theme;
+
+    *   makes it easy to print all (or some) categories in a theme.
+
+    This CLI is more geared towards listing all themes/names/categories
+    instead of picking random ones.
 
     This function is not exported.
 
@@ -129,24 +185,29 @@ FUNCTIONS
 
     *   action => *str* (default: "list-names")
 
-    *   categories => *bool*
+    *   categories => *true*
 
     *   number => *posint*
 
         Limit only return this number of results.
 
-    *   shuffle => *bool*
+    *   random_theme => *true*
+
+    *   shuffle => *true*
 
     *   theme => *str*
 
     Returns an enveloped result (an array).
 
-    First element (status) is an integer containing HTTP status code (200
-    means OK, 4xx caller error, 5xx function error). Second element (msg) is
-    a string containing error message, or 'OK' if status is 200. Third
-    element (payload) is optional, the actual result. Fourth element (meta)
-    is called result metadata and is optional, a hash that contains extra
-    information.
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
 
     Return value: (any)
 
@@ -159,7 +220,7 @@ SOURCE
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website
-    <https://github.com/perlancar/perl-App-metasyn/issues>
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-metasyn>
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.

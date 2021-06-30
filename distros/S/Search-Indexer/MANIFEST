@@ -1,9 +1,14 @@
 Changes
 Makefile.PL
 MANIFEST
+META.yml                                 Module meta-data (added by MakeMaker)
 README
-t/base.t
-t/stress.t
+lib/Search/Indexer.pm
+t/01-base.t
+t/02-readonly.t
+t/03-no_positions.t
+t/09-stress.t
+t/data/base_texts_and_tests.pl
 t/data/book1
 t/data/book10
 t/data/book11
@@ -29,6 +34,5 @@ t/data/book7
 t/data/book8
 t/data/book9
 t/data/preface
-lib/Search/Indexer.pm
-META.yml                                 Module meta-data (added by MakeMaker)
+
 META.json                                Module JSON meta-data (added by MakeMaker)

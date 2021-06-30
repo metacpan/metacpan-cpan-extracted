@@ -12,8 +12,10 @@ t/backend_api.t
 t/fake.t
 t/minion_api.t
 t/minion_api_ip.t
+t/minion_api_authentication.t
 t/MyApp.pm
 t/AppIP.pm
+t/AppAuthentication.pm
 lib/Minion/Backend/API.pm
 lib/Mojolicious/Plugin/Minion/API.pm
 cpanfile

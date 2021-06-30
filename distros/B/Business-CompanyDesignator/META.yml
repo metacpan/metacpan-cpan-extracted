@@ -29,8 +29,7 @@ requires:
   File::ShareDir: 0
   FindBin: 0
   List::MoreUtils: 0
-  Mouse: 0
-  MouseX::NativeTraits: 0
+  Moose: 0
   Regexp::Assemble: 0
   Unicode::Normalize: 0
   YAML: 0.71
@@ -40,4 +39,4 @@ resources:
   homepage: https://github.com/gavincarr/Business-CompanyDesignator
   license: http://dev.perl.org/licenses/
   repository: https://github.com/gavincarr/Business-CompanyDesignator
-version: '0.14'
+version: '0.15'

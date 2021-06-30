@@ -1,7 +1,7 @@
 package Data::Dump::OneLine;
 
-our $DATE = '2015-03-25'; # DATE
-our $VERSION = '0.07'; # VERSION
+our $DATE = '2021-06-27'; # DATE
+our $VERSION = '0.080'; # VERSION
 
 use 5.010001;
 use strict;
@@ -30,7 +30,7 @@ Data::Dump::OneLine - Dump data structures as single-line strings
 
 =head1 VERSION
 
-This document describes version 0.07 of Data::Dump::OneLine (from Perl distribution Data-Dump-OneLine), released on 2015-03-25.
+This document describes version 0.080 of Data::Dump::OneLine (from Perl distribution Data-Dump-OneLine), released on 2021-06-27.
 
 =head1 SYNOPSIS
 
@@ -43,14 +43,11 @@ It now uses L<Data::Dmp>. You should use Data::Dmp directly.
 
 =for Pod::Coverage ^(.+)$
 
-=head1 SEE ALSO
+=head1 CONTRIBUTOR
 
-L<JSON> should also encode to a single-line string, but some data structures
-(cyclical, contains globs or other special Perl data) cannot be encoded out of
-the box to JSON.
+=for stopwords Steven Haryanto
 
-L<Data::Dumper::OneLine> strives to do the same for L<Data::Dumper>, but last
-time I tried it (at v0.05) it's still buggy.
+Steven Haryanto <sharyanto@cpan.org>
 
 =head1 HOMEPAGE
 
@@ -68,13 +65,22 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+=head1 SEE ALSO
+
+L<JSON> should also encode to a single-line string, but some data structures
+(cyclical, contains globs or other special Perl data) cannot be encoded out of
+the box to JSON.
+
+L<Data::Dumper::OneLine> strives to do the same for L<Data::Dumper>, but last
+time I tried it (at v0.05) it's still buggy.
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2015, 2014, 2013, 2010 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

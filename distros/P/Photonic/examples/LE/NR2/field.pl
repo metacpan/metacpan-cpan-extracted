@@ -36,7 +36,6 @@ use feature qw(say);
 
 use PDL;
 use PDL::NiceSlice;
-use PDL::Complex;
 use PDL::Graphics::Gnuplot;
 
 use Photonic::Geometry::FromB;
@@ -52,7 +51,7 @@ my $small=1e-05;
 my $epsA=r2C(1.0);
 my $epsBreal=-2;
 my $titulo=$epsBreal;
-my $epsB=r2C($epsBreal)+i*0.01;
+my $epsB=r2C($epsBreal)+0.01*i;
 
 my $pdir=pdl([0,1]);
 my $l=10;
@@ -70,8 +69,8 @@ plotfield($titulo, $field);
 sub plotfield {
     my $titulo=shift;
     my $field=shift;
-    my $fieldt=tile($field->mv(0,-1)->mv(0,-1),	3,3)->mv(-1,0)->mv(-1,0);
-    my $fieldabs=$fieldt->Cabs2->sumover->sqrt;
+    my $fieldt=tile($field->mv(0,-1), 3,3)->mv(-1,0);
+    my $fieldabs=$fieldt->abs2->sumover->sqrt;
     my $fieldR=$fieldt->re->norm; #real part normalized
     my $fieldI=$fieldt->im->norm; #imaginary part normalized
     $wf->plot(

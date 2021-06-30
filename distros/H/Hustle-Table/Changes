@@ -1,18 +1,24 @@
 Revision history for Perl extension Hustle::Table
+0.2.2 
+	- Fix error in existing test script
+	- Added more comprehensive tests
+	- Check for valid cache (hash ref) when adding entry
+	- Check for defined matcher when adding entry
+	- Allow adding a 'flattened' entry (4 element)
 
-0.02.1	Wed 23 Jun 2021 15:42:57 AEST
+0.2.1	Wed 23 Jun 2021 15:42:57 AEST
 	- Attempting to fix Tester errors.
 	- Updated min perl version => 5.24
 	- Added missing dep common::sense
 
-0.02	Tue 22 Jun 2021 21:32:35 AEST
+0.2	Tue 22 Jun 2021 21:32:35 AEST
 	- Spelling correction
-	- Documentation formating and fixes
+	- Documentation formatting and fixes
 	- Removal of unused exporting code
 	- Adding missing dependencies on enum in Makefile.PL
 	- Added MYMETA to distribution
 
-0.01 	Tue 22 Jun 2021 13:13:05 AEST
+0.1 	Tue 22 Jun 2021 13:13:05 AEST
 	- First release almost ready for CPAN
 
 

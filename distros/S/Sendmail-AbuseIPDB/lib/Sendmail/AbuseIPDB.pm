@@ -14,7 +14,7 @@ our @ISA = qw(Exporter);
 
 our @EXPORT_OK = ();
 our @EXPORT = ();
-our $VERSION = '0.10';
+our $VERSION = '0.21';
 
 my @categories = (
               '',                     '',             '', 'Fraud Orders',  'DDoS Attack', #   0  ...   4
@@ -33,6 +33,7 @@ my %defaults = (
     'Days'      =>                           30,
     'Debug'     =>                            0,
     'Key'       =>                           '',
+    'v2Key'     =>                           '',
 );
 
 
@@ -40,7 +41,19 @@ sub new( $@ )
 {
     my $this = bless { %defaults }, shift;
     my %args = @_;
-    unless( defined( $args{Key})) { croak( 'Key argument is mandatory, get your API key by creating an account' ); }
+    unless( defined( $args{Key})
+        or defined( $args{v2Key})) { croak( 'Key argument is mandatory, get your API key by creating an account' ); }
+    if( defined( $args{v2Key}))
+    {
+        # Insist on hex keys
+        if( $args{v2Key} =~ m{([0-9a-fA-F]+)})
+        {
+            if( $1 ne $args{v2Key})
+            {
+                croak( "V2 Key must be hex" );
+            }
+        }
+    }
     foreach my $k ( keys( %$this ))
     {
         if( defined( $args{ $k } )) { $this->{ $k } = $args{ $k }; }
@@ -56,10 +69,69 @@ sub new( $@ )
 }
 
 
+sub v2get( $$ )
+{
+    my $this = shift;
+    my $ip = shift;
+
+    my $url = URI->new( "$this->{BaseURL}api/v2/check" );
+    $url->query_form( ipAddress => $ip, maxAgeInDays => $this->{Days});
+
+    if( $this->{BaseURL} eq 'test://' )
+    {
+        if(      $ip eq '192.168.0.1' ) {   return( %categories );      }
+        elsif(   $ip eq '192.168.0.3' ) {   return( $url->as_string );  }
+    }
+
+    my $fh;
+    my $cmd = "/usr/bin/curl -H 'Accept: application/json' -H 'Key: $this->{v2Key}' -s '$url'";
+    if( $this->{Debug})
+    {
+        print STDERR "CMD:   $cmd\n";
+    }
+    open( $fh, '-|', $cmd );
+    unless( $fh ) { croak( "Cannout pipe from curl" ); }
+    my $json = '';
+    while( <$fh> )
+    {
+        $json .= $_;
+    }
+    if ($this->{Debug})
+    {
+        print STDERR "JSON:  $json\n";
+    }
+
+    my $result = from_json( $json );
+    if( $this->{Debug})
+    {
+        require Data::Dumper;
+        print STDERR "RESULT:" . Dumper( $result );
+    }
+
+    if( ref($result) eq 'HASH' )
+    {
+        return( $result );
+    }
+
+    if( ref($result) eq 'ARRAY' )
+    {
+        return( @$result );
+    }
+
+    return();
+}
+
+
 sub get( $$ )
 {
     my $this = shift;
     my $ip = shift;
+
+    if( defined( $this->{v2Key}) and length( $this->{v2Key}) > 2 )
+    {
+        # Use v2 API by preference
+        return( $this->v2get( $ip ));
+    }
 
     my $url = URI->new( "$this->{BaseURL}check/$ip/json" );
     $url->query_form( key => $this->{Key}, days => $this->{Days});
@@ -213,6 +285,56 @@ sub report( $$$@ )
 }
 
 
+sub blacklist( $$ )
+{
+    my $this = shift;
+    my $confidence = shift;
+    if( defined( $confidence ))
+    {
+        $confidence = int( $confidence );                  # Just in case
+    }
+    else
+    {
+        $confidence = 100;                                 # By default, the worst of the worst
+    }
+
+    my $url = URI->new( "$this->{BaseURL}api/v2/blacklist" );
+    $url->query_form( confidenceMinimum => $confidence );
+
+    if( $this->{BaseURL} eq 'test://' )
+    {
+        die( "NOT IMPLEMENTED" );
+    }
+
+    my $fh;
+    my $cmd = "/usr/bin/curl -H 'Accept: application/json' -H 'Key: $this->{v2Key}' -s '$url'";
+    if( $this->{Debug})
+    {
+        print STDERR "CMD:   $cmd\n";
+    }
+    open( $fh, '-|', $cmd );
+    unless( $fh ) { croak( "Cannout pipe from curl" ); }
+    my $json = '';
+    while( <$fh> )
+    {
+        $json .= $_;
+    }
+    if ($this->{Debug})
+    {
+        print STDERR "JSON:  $json\n";
+    }
+
+    my $result = from_json( $json );
+    if( $this->{Debug})
+    {
+        require Data::Dumper;
+        print STDERR "RESULT:" . Dumper( $result );
+    }
+
+    return $result;    
+}
+
+
 1;
 __END__
 
@@ -224,56 +346,62 @@ Sendmail::AbuseIPDB - API access for IP address abuse database
 
     use Sendmail::AbuseIPDB;
 
-    my $db = Sendmail::AbuseIPDB->new(Key => '** your API key here **');
+    # CURRENT: For v2 API like this:
+    my $db = Sendmail::AbuseIPDB->new( v2Key => '** your v2 API key here **' );
 
-    my $ip = '31.210.35.146';                       # IP of sender
-    my @all_data = $db->get( $ip );
+    # OBSOLETE: For v1 API like this:
+    my $db = Sendmail::AbuseIPDB->new( Key => '** your API key here **' );
 
-    foreach my $d ( @all_data )
+    my $ip = '190.180.154.131';                       # IP of sender
+    my $result = $db->get( $ip );
+
+    if( defined( $result->{data} ))
     {
-        foreach my $c ( @{$d->{category}} )
-        {
-            print "DATE:$d->{created}   CATEGORY:" . $db->catg( $c ) . "\n";
-        }
+        print "Abuse confidence of $ip is $result->{data}{abuseConfidenceScore}\n";
     }
+    else
+    {
+        warn( "Failed to get result for $ip" );
+    }
+
 
 =head1 DESCRIPTION
 
-    Convenient toolbox for API access to https://www.abuseipdb.com/
+    Convenient toolbox for Version-2 API access to https://www.abuseipdb.com/
 
     Potentially for other sites with compatible API if you want to change the BaseURL.
 
 =head1 METHODS
 
-=head2 new( Key => $key, ... )
+=head2 new( v2Key => $key, ... )
 
     Additional parameters are: BaseURL, Days, Debug
 
+    Old parameter was Key which is for v1 API calls, supported for compatibility,
+    but most of the old v1 API has been shut down by the provider.
+
+
 =head2 get( $ip )
 
-    Do a query to check an IP address. Returns array of hash references, looking similar to this:
+    Do a query to check an IP address. Returns single reference, looking similar to this:
 
-        {
-            'created' => 'Sun, 17 Sep 2017 04:53:45 +0000',
-            'country' => 'Turkey',
-            'isoCode' => 'TR',
-            'ip' => '31.210.35.146',
-            'category' => [
-                            14
-                          ]
-        }
-
-
-=head2 catg( $number )
-
-    Convert the category from integer to printable string.
-
-
-=head2 filter( $category, @data )
-
-    Return an array of those members in @data that match the given category.
-    The format of @data is same as the return array from get() so see above.
-    The $category can be either a number, or a printable string.
+       {
+           'data' => {
+               'isp' => 'Cicomsa S.A.',
+               'lastReportedAt' => '2021-06-25T04:24:08+00:00',
+               'domain' => 'mshquil.com.ar',
+               'numDistinctUsers' => 8,
+               'ipVersion' => 4,
+               'abuseConfidenceScore' => 67,
+               'isWhitelisted' => 0,
+               'hostnames' => [],
+               'countryCode' => 'AR',
+               'totalReports' => 50,
+               'usageType' => 'Fixed Line ISP',
+               'isPublic' => 1,
+               'ipAddress' => '190.180.154.131'
+            }
+       }
 
 
 =head2 report( $ip, $comment, @category_list )
@@ -284,18 +412,60 @@ Sendmail::AbuseIPDB - API access for IP address abuse database
     One or more categories must be included, these can be numbers or printable
     string categories. e.g. :
 
-    $db->report( '111.119.210.10', 'Very annoying IP address', 'Brute-Force', 'Port Scan' );
+    $db->report( '142.93.218.225', 'Very annoying IP address', 'Brute-Force', 'Port Scan' );
+
+=head3 Warning copied from provider documentation.
+
+    STRIP ANY PERSONALLY IDENTIFIABLE INFORMATION (PPI);
+    WE ARE NOT RESPONSIBLE FOR PPI YOU REVEAL.
+
+
+=head2 blacklist( $confidence )
+
+    Get a list of IP addresses where $confidence is the minimum confidence score
+    (percentage) that this IP address is likely to be abusive.
+    Depending on your account the server might force your $confidence value upwards
+    (in the case of free accounts only 100% confidence results are provided).
+
+    Result format is like this:
+
+        {
+            'data' => [
+                {
+                    'ipAddress' => '60.29.254.252',
+                    'abuseConfidenceScore' => '100',
+                    'totalReports' => 4723
+                },
+                {
+                    'ipAddress' => '118.24.214.107',
+                    'abuseConfidenceScore' => '100',
+                    'totalReports' => 4712
+                },
+                # ... many others ...
+            ],
+            'meta' => {
+                'generatedAt' => '2019-01-01T01:01:01+00:00'
+            }
+        }
+
+    It requires apallingly bad behaviour to achieve 100% confidence of abuse,
+    so the worst offender IP addresses should be filtered without remorse.
+    When using the "ipset" Linux kernel feature, set a reasonable timeout so that
+    old IP addresses will automatically be removed from the list once they are
+    no longer abusive. Hopefully most compromised systems do get cleaned up.
 
 
 =head1 SEE ALSO
 
-    https://www.abuseipdb.com/api.html
+    https://docs.abuseipdb.com/#check-endpoint
 
     https://www.abuseipdb.com/categories
 
     Sendmail::PMilter
 
     Example program abuseipdb_milter.pl for a simple way to block suspicious senders.
+
+    Example program abuseipdb_blacklist_ipset.pl to feed into "ipset restore".
 
 =head1 AUTHOR
 

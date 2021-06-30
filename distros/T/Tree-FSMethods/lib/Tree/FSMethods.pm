@@ -1,9 +1,9 @@
 package Tree::FSMethods;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-02-23'; # DATE
+our $DATE = '2021-06-27'; # DATE
 our $DIST = 'Tree-FSMethods'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
@@ -262,8 +262,8 @@ sub _showtree {
         $tree = $self->_showtree0($starting_path, $node);
     }
 
-    require Tree::ToTextLines;
-    Tree::ToTextLines::render_tree_as_text({
+    require Tree::To::TextLines;
+    Tree::To::TextLines::render_tree_as_text({
         show_guideline => 1,
         on_show_node => sub {
             my ($node, $level, $seniority, $is_last_child, $opts) = @_;
@@ -471,7 +471,7 @@ Tree::FSMethods - Perform filesystem-like operations on object tree(s)
 
 =head1 VERSION
 
-This document describes version 0.002 of Tree::FSMethods (from Perl distribution Tree-FSMethods), released on 2020-02-23.
+This document describes version 0.003 of Tree::FSMethods (from Perl distribution Tree-FSMethods), released on 2021-06-27.
 
 =head1 SYNOPSIS
 
@@ -687,7 +687,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

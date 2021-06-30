@@ -32,7 +32,6 @@ use strict;
 use warnings;
 use PDL;
 use PDL::NiceSlice;
-use PDL::Complex;
 use Photonic::Geometry::FromEpsilon;
 use Photonic::WE::S::Metric;
 use Photonic::WE::S::AllH;
@@ -54,14 +53,14 @@ my $m=Photonic::WE::S::Metric->new(
 my $gr=Photonic::WE::S::Green->new(nh=>10, metric=>$m);
 my $grv=$gr->greenTensor;
 my $expected = $f/$eb+(1-$f)/$ea;
-ok(Cagree($grv->(:,(0),(0)), $expected),
+ok(Cagree($grv->((0),(0)), $expected),
 			     "1D long non retarded")
-                             or diag "got: ", $grv->(:,(0),(0)), ", \nexpected: $expected";
+                             or diag "got: ", $grv->((0),(0)), ", \nexpected: $expected";
 $expected = 1/($f*$eb+(1-$f)*$ea);
-ok(Cagree($grv->(:,(1),(1)), $expected),
+ok(Cagree($grv->((1),(1)), $expected),
 			     "1D transverse non retarded")
-                             or diag "got: ", $grv->(:,(1),(1)), "\nexpected: ", $expected;
-ok(Cagree($grv->(:,(0),(1)), 0),
+                             or diag "got: ", $grv->((1),(1)), "\nexpected: ", $expected;
+ok(Cagree($grv->((0),(1)), 0),
 			     "1D l-t non retarded");
-ok(Cagree($grv->(:,(1),(0)), 0),
+ok(Cagree($grv->((1),(0)), 0),
 			     "1D t-l non retarded");

@@ -4,9 +4,9 @@ use warnings;
 use lib qw(./lib t/lib);
 
 my $driver;
-use Neo4j::Test;
+use Neo4j_Test;
 BEGIN {
-	unless ($driver = Neo4j::Test->driver) {
+	unless ( $driver = Neo4j_Test->driver() ) {
 		print qq{1..0 # SKIP no connection to Neo4j server\n};
 		exit;
 	}
@@ -18,7 +18,7 @@ my $s = $driver->session;
 # functionality. If the behaviour of such functionality changes, we
 # want it to be a conscious decision, hence we test for it.
 
-use Test::More 0.96 tests => 7 + 3;
+use Test::More 0.96 tests => 9 + 3;
 use Test::Exception;
 use Test::Warnings qw(warning warnings);
 my $transaction = $driver->session->begin_transaction;
@@ -87,7 +87,7 @@ subtest 'die_on_error = 0' => sub {
 	# never any errors issued via Bolt/Jolt or by this driver itself.
 	plan tests => 7;
 	# init
-	my $d = Neo4j::Test->driver;
+	my $d = Neo4j_Test->driver();
 	$d->{die_on_error} = 0;
 	my $t;
 	@w = ();
@@ -106,9 +106,9 @@ subtest 'die_on_error = 0' => sub {
 
 
 subtest 'driver mutability (config/auth)' => sub {
-	plan skip_all => "(test requires HTTP)" if $Neo4j::Test::bolt;
+	plan skip_all => "(test requires HTTP)" if $Neo4j_Test::bolt;
 	plan tests => 5;
-	lives_ok { $d = 0; $d = Neo4j::Test->driver_maybe; } 'get driver';
+	lives_ok { $d = 0; $d = Neo4j_Test->driver_maybe(); } 'get driver';
 	lives_ok { $r = 0; $r = $d->session; } 'get auth session';  # basic_auth used by driver_maybe
 	my @credentials = ('unlikely user/password combo', '');
 	lives_ok { $w = warning { $d->basic_auth(@credentials) }; } 'auth mutable lives';
@@ -118,7 +118,7 @@ subtest 'driver mutability (config/auth)' => sub {
 
 
 subtest 'stats' => sub {
-	plan skip_all => "(test requires HTTP)" if $Neo4j::Test::bolt;
+	plan skip_all => "(test requires HTTP)" if $Neo4j_Test::bolt;
 	plan tests => 9;
 	my $t = $driver->session->begin_transaction;
 	$t->{return_stats} = 0;
@@ -150,9 +150,83 @@ subtest 'support for get_person in LOMS plugin' => sub {
 };
 
 
+subtest 'multiple statements via run([])' => sub {
+	plan skip_all => "(test requires HTTP)" if $Neo4j_Test::bolt;
+	plan tests => 5 + 3;
+	my (@q, @a);
+	@q = (
+		['RETURN 17'],
+		['RETURN {n}', n => 19],
+		['RETURN {n}', {n => 53}],
+	);
+	lives_ok { $w = ''; $w = warning { $r = $s->run([@q]) }; } 'run three statements at once';
+	like $w, qr/\bmultiple statements\b.*\bdeprecated\b/i, 'multiple statements deprecated'
+		or diag 'got warning(s): ', explain $w;
+	lives_and { is $r->[0]->single->get, 17 } 'retrieve 1st value';
+	lives_and { is $r->[1]->single->get, 19 } 'retrieve 2nd value';
+	lives_and { is $r->[2]->single->get, 53 } 'retrieve 3rd value';
+	
+	# wantarray
+	@q = (
+		['RETURN 7'],
+		['RETURN 11'],
+	);
+	lives_ok { $w = ''; $w = warning { @a = $s->run([@q]) }; } 'wantarray two statements at once';
+	like $w, qr/\bmultiple statements\b.*\bdeprecated\b/i, 'wantarray multiple statements deprecated'
+		or diag 'got warning(s): ', explain $w;
+	lives_and { is $a[0]->single->get * $a[1]->single->get, 7 * 11 } 'wantarray values';
+};
+
+
+subtest 'custom cypher types' => sub {
+	plan tests => 5 + 5;
+	# fully test nodes
+	my $e_exact = exp(1);
+	my $d = Neo4j_Test->driver_maybe();
+	lives_ok {
+		no warnings 'deprecated';
+		$d->config(cypher_types => {
+			node => 'Local::Node',
+			init => sub {
+				my $self = shift;
+				$self->{e_approx} = $e_exact;
+			},
+		});
+	} 'cypher types config';
+	$r = 0;
+	lives_ok {
+		my $t = $d->session->begin_transaction;
+		$r = $t->run('CREATE (a {e_approx:3}) RETURN a')->single->get('a');
+	} 'cypher types query';
+	is ref($r), 'Local::Node', 'cypher type ref';
+	is $r->get('e_approx'), $e_exact, 'cypher type init';
+	lives_and { is ref($r->_private->{_meta}), 'HASH' } 'node _private access';
+	# test _private access for other types
+	lives_ok {
+		my $tx = $driver->session->begin_transaction;
+		$tx->{return_stats} = 0;  # optimise sim
+		$q = <<END;
+CREATE p=(a:Test:Want:Array)-[:TEST]->(c)
+RETURN p, a
+END
+		$r = $tx->run($q)->single;
+		$tx->rollback;
+	} 'more types query';
+	ok my $e = ($r->get('p')->relationships)[0], 'get rel';
+	lives_and { is ref($e->_private->{_meta}), 'HASH' } 'rel _private access';
+	lives_ok { $r->get('p')->_private->{__foo} = 42; } 'path _private set';
+	lives_and { is $r->get('p')->_private->{__foo}, 42 } 'path _private get';
+};
+
+
 CLEANUP: {
 	lives_ok { $transaction->rollback } 'rollback';
 }
 
 
 done_testing;
+
+
+# for 'custom cypher types' test
+package Local::Node;
+BEGIN { our @ISA = qw(Neo4j::Driver::Type::Node) };

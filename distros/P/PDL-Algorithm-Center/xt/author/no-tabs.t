@@ -11,7 +11,6 @@ my @files = (
     'lib/PDL/Algorithm/Center/Failure.pm',
     'lib/PDL/Algorithm/Center/Types.pm',
     't/00-compile.t',
-    't/00-load.t',
     't/00-report-prereqs.dd',
     't/00-report-prereqs.t',
     't/sigma_clip.t',

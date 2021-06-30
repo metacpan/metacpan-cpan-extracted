@@ -1,4 +1,4 @@
-package Dist::Zilla::PluginBundle::RJBS 5.018;
+package Dist::Zilla::PluginBundle::RJBS 5.019;
 # ABSTRACT: BeLike::RJBS when you build your dists
 
 use Moose;
@@ -65,7 +65,7 @@ use Dist::Zilla::PluginBundle::Basic;
 use Dist::Zilla::PluginBundle::Filter;
 use Dist::Zilla::PluginBundle::Git;
 
-package Dist::Zilla::Plugin::RJBSMisc 5.018 {
+package Dist::Zilla::Plugin::RJBSMisc 5.019 {
   use Moose;
   with 'Dist::Zilla::Role::BeforeBuild',
        'Dist::Zilla::Role::AfterBuild',
@@ -165,6 +165,7 @@ sub mvp_aliases {
     'dont-compile'  => 'dont_compile',
     'weaver-config' => 'weaver_config',
     'manual-version'       => 'manual_version',
+    'primary-branch'       => 'primary_branch',
     'package-name-version' => 'package_name_version',
   }
 }
@@ -205,6 +206,17 @@ has perl_support => (
     # important one, and this comment is here to remind me what happened if I
     # ever hear this on some other library.
     $_[0]->payload->{perl_support} // $_[0]->payload->{'perl-support'}
+  },
+);
+
+has primary_branch => (
+  is      => 'ro',
+  lazy    => 1,
+  default => sub {
+    # XXX: Fix this better.  See matching comment in perl_support attr.
+    return $_[0]->payload->{primary_branch}
+        // $_[0]->payload->{'primary-branch'}
+        // 'main'
   },
 );
 
@@ -285,6 +297,17 @@ sub configure {
   );
 
   $self->add_plugins(
+    [
+      'Git::Remote::Check' => {
+        remote_name   => 'github',
+        remote_branch => $self->primary_branch,
+        branch        => $self->primary_branch,
+        do_update     => 1,
+      },
+    ],
+  );
+
+  $self->add_plugins(
     [ Prereqs => 'TestMoreWithSubtests' => {
       -phase => 'test',
       -type  => 'requires',
@@ -348,7 +371,7 @@ Dist::Zilla::PluginBundle::RJBS - BeLike::RJBS when you build your dists
 
 =head1 VERSION
 
-version 5.018
+version 5.019
 
 =head1 DESCRIPTION
 

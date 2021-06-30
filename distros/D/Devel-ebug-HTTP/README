@@ -1,11 +1,18 @@
 NAME
+
     Devel::ebug::HTTP - A web front end to a simple, extensible Perl
     debugger
 
+VERSION
+
+    version 0.33
+
 SYNOPSIS
+
       ebug_http calc.pl
 
 DESCRIPTION
+
     A debugger is a computer program that is used to debug other programs.
     Devel::ebug is a simple, extensible Perl debugger with a clean API.
     Devel::ebug::HTTP is a web-based frontend to Devel::ebug which presents
@@ -14,15 +21,19 @@ DESCRIPTION
     point a web browser to.
 
 SEE ALSO
+
     Devel::ebug, ebug_http
 
 AUTHOR
-    Leon Brocard, "<acme@astray.com>"
 
-COPYRIGHT
-    Copyright (C) 2005, Leon Brocard
+    Original author: Leon Brocard <acme@astray.com>
 
-LICENSE
-    This module is free software; you can redistribute it or modify it under
-    the same terms as Perl itself.
+    Current maintainer: Graham Ollis <plicease@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2005-2021 by Leon Brocard.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

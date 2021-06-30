@@ -14,7 +14,7 @@ Lab::Measurement::Developer::Testing - Using mock instruments for testing
 
 =head1 VERSION
 
-version 3.751
+version 3.760
 
 =head1 Using mock instruments for testing.
 
@@ -109,7 +109,7 @@ the provided log file.
 This software is copyright (c) 2021 by the Lab::Measurement team; in detail:
 
   Copyright 2016       Simon Reinhardt
-            2017       Andreas K. Huettel
+            2017       Andreas K. HÃ¼ttel
             2018       Simon Reinhardt
 
 

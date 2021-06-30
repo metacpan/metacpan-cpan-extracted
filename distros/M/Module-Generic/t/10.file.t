@@ -35,6 +35,7 @@ ok( $rv, 'chmod' );
 is( $tmpdir->finfo->mode, 0700, 'chmod' );
 ok( $tmpdir->is_empty, 'is_empty' );
 is( $tmpdir->code, 200, 'code' );
+$tmpdir->cleanup(1);
 
 # Theoretical move since the file does not yet exist
 diag( "Moving file $f to $tmpdir" ) if( $DEBUG );
@@ -67,6 +68,20 @@ if( $expected_location eq "$f2" )
     is( $files->first, "$f2", 'directory content as absolute files path' );
     ok( $tmpdir->contains( $f2 ), 'contains' );
 }
+
+my $mydir = tempdir({debug => $DEBUG, cleanup => 1});
+my $dircopy = $mydir;
+diag( "Temporary directory is '$mydir'" ) if( $DEBUG );
+for( 1..3 )
+{
+    $mydir = $mydir->child( $_ );
+}
+diag( "New path is '$mydir'" ) if( $DEBUG );
+is( "$mydir", File::Spec->catpath( $mydir->volume, File::Spec->catdir( $dircopy, 1, 2, 3 ) ), "combined path" );
+my $frags = $mydir->mkpath;
+diag( "mkpath error: ", $mydir->error ) if( $DEBUG && !defined( $frags ) );
+isa_ok( $frags, 'Module::Generic::Array', 'mkpath returned object' );
+ok( -d( "$mydir" ), "$mydir has been created" );
 
 subtest 'basename' => sub
 {
@@ -119,7 +134,7 @@ subtest 'basename' => sub
 
 subtest 'children' => sub
 {
-    my $tmpdir = tempdir();
+    my $tmpdir = tempdir({cleanup => 1});
     diag( "Temporary directory is set to '$tmpdir'" ) if( $DEBUG );;
     diag( "Creating object for \"$tmpdir\" with debug set to $DEBUG" ) if( $DEBUG );
     my $d = file( $tmpdir, debug => $DEBUG )->mkpath->first;
@@ -247,7 +262,7 @@ A point perdu cette vesprée
 Les plis de sa robe pourprée,
 Et son teint au vostre pareil.
 EOT
-my $f5 = tempfile({ suffix => '.txt', auto_remove => 0 })->move( File::Spec->tmpdir );
+my $f5 = tempfile({ suffix => '.txt', auto_remove => 1 })->move( File::Spec->tmpdir );
 if( $f5 )
 {
     SKIP:
@@ -340,7 +355,7 @@ if( $f5 )
 
 my $f6 = tempfile({ suffix => '.txt' });
 diag( "Temporary file is $f6" ) if( $DEBUG );
-$f6->auto_remove(0);
+$f6->auto_remove(1);
 $f6->open( 'w+', { binmode => 'utf8' } );
 ok( $f6, 'file opened with w+' );
 my $rv = $f6->write( $data );
@@ -356,7 +371,7 @@ $f6->append( "\nPierre de Ronsard\n" );
 my $new_text = $f6->load_utf8;
 is( $new_text, "${data}\nPierre de Ronsard\n", 'append' );
 
-my $tmpfile2 = Module::Generic::File->tempfile;
+my $tmpfile2 = Module::Generic::File->tempfile( cleanup => 1 );
 isa_ok( $tmpfile2, 'Module::Generic::File', 'tempfile accessed using Module::Generic::File->tempfile' );
 diag( "Temporary file created is: $tmpfile2" ) if( $DEBUG );
 is( $tmpfile2->extension->length, 0, 'no extension' );
@@ -373,7 +388,7 @@ diag( "Temporary file created is: $tmpfile4" ) if( $DEBUG );
 is( $tmpfile4->extension->length, 3, 'extension length' );
 is( $tmpfile4->extension->scalar, 'txt', 'extension -> txt' );
 
-my $tmpfile5 = Module::Generic::File::tempfile;
+my $tmpfile5 = Module::Generic::File::tempfile( cleanup => 1 );
 isa_ok( $tmpfile5, 'Module::Generic::File', 'tempfile accessed using Module::Generic::File::tempfile' );
 diag( "Temporary file created is: $tmpfile5" ) if( $DEBUG );
 is( $tmpfile5->extension->length, 0, 'no extension' );
@@ -390,7 +405,7 @@ diag( "Temporary file created is: $tmpfile7" ) if( $DEBUG );
 is( $tmpfile7->extension->length, 3, 'extension length' );
 is( $tmpfile7->extension->scalar, 'txt', 'extension -> txt' );
 
-my $tmpfile8 = $tmpfile7->tempfile;
+my $tmpfile8 = $tmpfile7->tempfile( cleanup => 1 );
 isa_ok( $tmpfile8, 'Module::Generic::File', 'tempfile accessed using $obj->tempfile' );
 diag( "Temporary file created is: $tmpfile8" ) if( $DEBUG );
 is( $tmpfile8->extension->length, 0, 'no extension' );
@@ -408,7 +423,7 @@ is( $tmpfile10->extension->length, 3, 'extension length' );
 is( $tmpfile10->extension->scalar, 'txt', 'extension -> txt' );
 
 
-my $tmpdir1 = Module::Generic::File->tempdir;
+my $tmpdir1 = Module::Generic::File->tempdir( cleanup => 1 );
 isa_ok( $tmpdir1, 'Module::Generic::File', 'tempdir accessed using Module::Generic::File->tempdir' );
 diag( "Temporary directory created is: $tmpdir1" ) if( $DEBUG );
 
@@ -420,7 +435,7 @@ my $tmpdir3 = Module::Generic::File->tempdir({ cleanup => 1 });
 isa_ok( $tmpdir3, 'Module::Generic::File', 'tempdir accessed using Module::Generic::File->tempdir( \%options )' );
 diag( "Temporary directory created is: $tmpdir3" ) if( $DEBUG );
 
-my $tmpdir4 = Module::Generic::File::tempdir;
+my $tmpdir4 = Module::Generic::File::tempdir( cleanup => 1 );
 isa_ok( $tmpdir4, 'Module::Generic::File', 'tempdir accessed using Module::Generic::File::tempdir' );
 diag( "Temporary directory created is: $tmpdir4" ) if( $DEBUG );
 
@@ -432,7 +447,7 @@ my $tmpdir6 = Module::Generic::File::tempdir({ cleanup => 1 });
 isa_ok( $tmpdir6, 'Module::Generic::File', 'tempdir accessed using Module::Generic::File::tempdir( \%options )' );
 diag( "Temporary directory created is: $tmpdir6" ) if( $DEBUG );
 
-my $tmpdir7 = $tmpdir1->tempdir;
+my $tmpdir7 = $tmpdir1->tempdir( cleanup => 1 );
 isa_ok( $tmpdir7, 'Module::Generic::File', 'tempdir accessed using $object->tempdir' );
 diag( "Temporary directory created is: $tmpdir7" ) if( $DEBUG );
 

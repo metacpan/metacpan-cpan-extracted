@@ -2024,33 +2024,50 @@ Creates new collection from C<$nodes> (reference to array with L<HTML5::DOM::Nod
 
 =head3 each
 
- my $collection = $collection->each(sub {
+ $collection->each(sub {...});
+ $collection->each(sub {...}, @additional_args);
+
+Foreach all nodes in collection. Returns self.
+
+Example:
+
+ $collection->each(sub {
     my ($node, $index) = @_;
-    print "node[$index] is a '$node'\n";
+    print "FOUND: node[$index] is a '$node'\n";
  });
 
-Forach all nodes in collection.
+ # Also can bypass additional arguments
+ $collection->each(sub {
+    my ($node, $index, $title) = @_;
+    print $title."node[$index] is a '$node'\n";
+ }, "FOUND: ");
 
 =head3 map
 
- my $result = $collection->map(sub {
+ my $new_collection = $collection->map(sub {
     my ($token, $index) = @_;
-    return $node->tag." => $index";
+    return "FOUND: ".$node->tag." => $index";
  });
+
+ # Also can bypass additional arguments
+ my $new_collection = $collection->map(sub {
+    my ($token, $index, $title) = @_;
+    return $title.$node->tag." => $index";
+ }, "FOUND: ");
 
 Apply callback for each node in collection. Returns new array from results.
 
- my $result = $collection->map($method, @args);
+ my $new_collection = $collection->map($method, @args);
 
 Call method for each node in collection. Returns new L<HTML5::DOM::Collection|/HTML5::DOM::Collection> from results.
 
 Example:
 
  # set text 'test!' for all nodes
- my $result = $collection->map('text', 'test!');
+ $collection->map('text', 'test!');
 
  # get all tag names as array
- my $result = $collection->map('tag');
+ my $new_collection = $collection->map('tag');
 
  # remove all nodes in collection
  $collection->map('remove');
@@ -2078,14 +2095,91 @@ Items count in collection.
  my $collection = $tree->find('ul li');
  print $collection->length; # 3
 
+=head3 grep
+
+ my $new_collection = $collection->grep(qr/regexp/);
+
+Evaluates regexp for html code of each element in collection and creates new collection with all matched elements.
+
+ my $new_collection = $collection->grep(sub {...});
+ my $new_collection = $collection->grep(sub {...}, @args);
+
+Evaluates callback foreach element in collection and creates new collection with all elements for which callback returned true.
+
+Example for regexp:
+
+ my $tree = HTML5::DOM->new->parse('
+    <ul>
+        <li>Linux</li>
+        <!-- comment -->
+        <li>OSX (not supported)</li>
+        <li>Windows (not supported)</li>
+    </ul>
+ ');
+ my $collection = $tree->find('ul li')->grep(qr/not supported/);
+ print $collection->length; # 2
+
+Example for callback:
+
+ my $tree = HTML5::DOM->new->parse('
+    <ul>
+        <li>Linux</li>
+        <!-- comment -->
+        <li>OSX (not supported)</li>
+        <li>Windows (not supported)</li>
+    </ul>
+ ');
+ my $collection = $tree->find('ul li')->grep(sub { $_->html =~ /not supported/ });
+ print $collection->length; # 2
+
 =head3 first
+
+ my $node = $collection->first;
+
+Get first item in collection.
+
+ my $node = $collection->first(qr/regexp/);
+
+Get first element in collection which html code matches regexp.
+
+ my $node = $collection->first(sub {...});
+ my $node = $collection->first(sub {...}, @args);
+
+Get first element in collection which where callback returned true.
+
+Example for regexp:
+
+ my $tree = HTML5::DOM->new->parse('
+    <ul>
+        <li>Linux</li>
+        <!-- comment -->
+        <li>OSX (not supported)</li>
+        <li>Windows (not supported)</li>
+    </ul>
+ ');
+ my $collection = $tree->find('ul li');
+ print $collection->first->html; # <li>Linux</li>
+ print $collection->first(qr/not supported/)->html; # <li>OSX (not supported)</li>
+
+Example for callback:
+
+ my $tree = HTML5::DOM->new->parse('
+    <ul>
+        <li>Linux</li>
+        <!-- comment -->
+        <li>OSX (not supported)</li>
+        <li>Windows (not supported)</li>
+    </ul>
+ ');
+ my $collection = $tree->find('ul li');
+ print $collection->first->html; # <li>Linux</li>
+ print $collection->first(sub { $_->html =~ /not supported })->html; # <li>OSX (not supported)</li>
 
 =head3 last
 
- my $node = $collection->first;
  my $node = $collection->last;
 
-Get first or last item in collection.
+Get last item in collection.
 
  my $tree = HTML5::DOM->new->parse('
     <ul>
@@ -2096,8 +2190,7 @@ Get first or last item in collection.
     </ul>
  ');
  my $collection = $tree->find('ul li');
- print $collection->first->html;        #  <li>Linux</li>
- print $collection->last->html;         #  <li>Windows</li>
+ print $collection->last->html; # <li>Windows</li>
 
 =head3 item
 
@@ -2117,6 +2210,142 @@ Get item by C<$index> in collection.
  my $collection = $tree->find('ul li');
  print $collection->item(1)->html;      # <li>OSX</li>
  print $collection->[1]->html;          # <li>OSX</li>
+
+=head3 reverse
+
+ my $reversed_collection = $collection->reverse;
+
+Returns copy of collection in reverse order.
+
+ my $tree = HTML5::DOM->new->parse('
+    <ul>
+        <li>Linux</li>
+        <!-- comment -->
+        <li>OSX</li>
+        <li>Windows</li>
+    </ul>
+ ');
+ my $collection = $tree->find('ul li');
+ print join(', ', @{$collection->map('text')};            # Linux, OSX, Windows
+ print join(', ', @{$collection->reverse()->map('text')}; # Windows, OSX, Linux
+
+=head3 shuffle
+
+ my $shuffled_collection = $collection->shuffle;
+
+Returns copy of collection in random order.
+
+ my $tree = HTML5::DOM->new->parse('
+    <ul>
+        <li>Linux</li>
+        <!-- comment -->
+        <li>OSX</li>
+        <li>Windows</li>
+    </ul>
+ ');
+ my $collection = $tree->find('ul li');
+ print join(', ', @{$collection->shuffle()->map('text')}; # Windows, Linux, OSX
+ print join(', ', @{$collection->shuffle()->map('text')}; # Windows, OSX, Linux
+ print join(', ', @{$collection->shuffle()->map('text')}; # OSX, Windows, Linux
+
+=head3 head
+
+ my $new_collection = $collection->head($length);
+
+Returns copy of collection with only first C<$length> items.
+
+ my $tree = HTML5::DOM->new->parse('
+    <ul>
+        <li>Linux</li>
+        <!-- comment -->
+        <li>OSX</li>
+        <li>Windows</li>
+    </ul>
+ ');
+ my $collection = $tree->find('ul li');
+ print join(', ', @{$collection->head(2)->map('text')}; # Linux, OSX
+
+=head3 tail
+
+ my $new_collection = $collection->tail($length);
+
+Returns copy of collection with only last C<$length> items.
+
+ my $tree = HTML5::DOM->new->parse('
+    <ul>
+        <li>Linux</li>
+        <!-- comment -->
+        <li>OSX</li>
+        <li>Windows</li>
+    </ul>
+ ');
+ my $collection = $tree->find('ul li');
+ print join(', ', @{$collection->tail(2)->map('text')}; # OSX, Windows
+
+=head3 slice
+
+ my $new_collection = $collection->slice($offset);
+
+Returns new collection with sequence by specified C<$offset>.
+
+If C<$offset> is positive, the sequence will start at that C<$offset> in the C<$collection>.
+If C<$offset> is negative, the sequence will start that far from the end of the C<$collection>.
+
+ my $new_collection = $collection->slice($offset, $length);
+
+Returns new collection with sequence by specified C<$offset> and C<$length>.
+
+If C<$offset> is positive, the sequence will start at that C<$offset> in the C<$collection>.
+
+If C<$offset> is negative, the sequence will start that far from the end of the C<$collection>.
+
+
+If C<$length> is positive, then the sequence will have up to that many elements in it.
+
+If the C<$collection> is shorter than the C<$length>, then only the available C<$collection> elements will be present.
+
+If C<$length> is negative then the sequence will stop that many elements from the end of the C<$collection>.
+
+ my $tree = HTML5::DOM->new->parse('
+    <ul>
+        <li>Linux</li>
+        <!-- comment -->
+        <li>NetBSD</li>
+        <li>OSX</li>
+        <li>Windows</li>
+    </ul>
+ ');
+ my $collection = $tree->find('ul li');
+ print join(', ', @{$collection->slice(1)->map('text')};      # NetBSD, OSX, Windows
+ print join(', ', @{$collection->slice(1, 2)->map('text')};   # NetBSD, OSX
+ print join(', ', @{$collection->slice(-2)->map('text')};     # OSX, Windows
+ print join(', ', @{$collection->slice(-2, 1)->map('text')};  # OSX
+ print join(', ', @{$collection->slice(-3, -1)->map('text')}; # NetBSD, OSX
+
+=head3 uniq
+
+ my $new_collection = $collection->uniq();
+
+Returns copy of collection with only uniq nodes.
+
+ my $new_collection = $collection->uniq(sub {...});
+
+Returns copy of collection with only unique nodes which unique identifier of each node returned by callback.
+
+Example:
+
+ my $tree = HTML5::DOM->new->parse('
+    <ul>
+        <li data-kernel="linux">Ubuntu</li>
+        <li data-kernel="linux">Arch Linux</li>
+        <!-- comment -->
+        <li data-kernel="darwin">OSX</li>
+        <li data-kernel="nt">Windows</li>
+    </ul>
+ ');
+ my $collection = $tree->find('ul li');
+ print join(', ', @{$collection->uniq->map('text')};                                   # Ubuntu, Arch Linux, OSX, Windows
+ print join(', ', @{$collection->uniq(sub { $_->attr("data-kernel") })->map('text')};  # Ubuntu, OSX, Windows
 
 =head3 array
 
@@ -2551,7 +2780,7 @@ If fail, then encoding id equal HTML5::DOM::Encoding->NOT_DETERMINED.
 
  my $encoding_id = HTML5::DOM::Encoding::detect($text, $max_length = 0);
 
-Detect text encoding. Single method for both L<detectRussian|/detectRussian> and L<detectUnicode|/detectUnicode>.
+Detect text encoding. Single method for both L<detectCyrillic|/detectCyrillic> and L<detectUnicode|/detectUnicode>.
 
 Returns encoding id, if success. And returns HTML5::DOM::Encoding->NOT_DETERMINED if fail.
 
@@ -2559,17 +2788,19 @@ Returns encoding id, if success. And returns HTML5::DOM::Encoding->NOT_DETERMINE
  my $encoding = HTML5::DOM::Encoding::id2name($encoding_id);
  print $encoding; # UTF-8
 
-=head3 detectRussian
+=head3 detectCyrillic
 
- my $encoding_id = HTML5::DOM::Encoding::detectRussian($text, $max_length = 0);
+ my $encoding_id = HTML5::DOM::Encoding::detectCyrillic($text, $max_length = 0);
 
-Detect russian text encoding (using lowercase B<trigrams>), such as C<windows-1251>, C<koi8-r>, C<iso-8859-5>, C<x-mac-cyrillic>, C<ibm866>.
+Detect cyrillic text encoding (using lowercase B<trigrams>), such as C<windows-1251>, C<koi8-r>, C<iso-8859-5>, C<x-mac-cyrillic>, C<ibm866>.
 
 Returns encoding id, if success. And returns HTML5::DOM::Encoding->NOT_DETERMINED if fail.
 
+This method also have aliases for compatibility reasons: C<detectUkrainian>, C<detectRussian>
+
 =head3 detectUnicode
 
- my $encoding_id = HTML5::DOM::Encoding::detectRussian($text, $max_length = 0);
+ my $encoding_id = HTML5::DOM::Encoding::detectUnicode($text, $max_length = 0);
 
 Detect unicode family text encoding, such as C<UTF-8>, C<UTF-16LE>, C<UTF-16BE>.
 
@@ -3086,62 +3317,64 @@ If C<"auto">, then utf8 flag detected by input string. Automaticaly enables C<ut
 
 =head1 HTML5 SUPPORT
 
-Tested with L<html5lib-tests|https://github.com/html5lib/html5lib-tests>
+Tested with L<html5lib-tests|https://github.com/html5lib/html5lib-tests> (at 2021-06-26)
 
+ -------------------------------------------------------------
  test                        total    ok      fail    skip
  -------------------------------------------------------------
+ foreign-fragment.dat        66       54      12      0
+ tests26.dat                 19       16      3       0
  menuitem-element.dat        19       16      3       0
  tests11.dat                 12       11      1       0
- math.dat                    7        7       0       0
+ tests1.dat                  112      112     0       0
+ tests4.dat                  6        6       0       0
+ tests6.dat                  51       51      0       0
+ ruby.dat                    20       20      0       0
+ adoption01.dat              17       17      0       0
+ tests14.dat                 6        6       0       0
+ tests19.dat                 104      104     0       0
+ tests7.dat                  30       30      0       0
+ noscript01.dat              17       17      0       0
+ tests17.dat                 12       12      0       0
+ tests23.dat                 4        4       0       0
+ pending-spec-changes.dat    2        2       0       0
+ tables01.dat                16       16      0       0
+ entities02.dat              25       25      0       0
+ tests22.dat                 4        4       0       0
+ tests10.dat                 53       53      0       0
+ tests15.dat                 13       13      0       0
+ inbody01.dat                3        3       0       0
+ template.dat                107      107     0       0
  plain-text-unsafe.dat       32       32      0       0
- webkit01.dat                48       48      0       0
+ comments01.dat              15       15      0       0
+ scriptdata01.dat            26       26      0       0
+ svg.dat                     7        7       0       0
+ tests25.dat                 25       25      0       0
+ tests3.dat                  23       23      0       0
+ tests20.dat                 43       43      0       0
+ tests12.dat                 1        1       0       0
+ tests21.dat                 24       24      0       0
+ math.dat                    7        7       0       0
+ webkit01.dat                49       49      0       0
+ main-element.dat            2        2       0       0
+ adoption02.dat              1        1       0       0
+ domjs-unsafe.dat            48       48      0       0
+ tests16.dat                 196      196     0       0
+ blocks.dat                  47       47      0       0
+ tests5.dat                  16       16      0       0
+ tests8.dat                  9        9       0       0
+ tricky01.dat                8        8       0       0
+ tests18.dat                 35       35      0       0
+ webkit02.dat                20       20      0       0
+ tests24.dat                 7        7       0       0
+ html5test-com.dat           23       23      0       0
+ isindex.dat                 3        3       0       0
+ doctype01.dat               36       36      0       0
+ entities01.dat              74       74      0       0
+ tests2.dat                  61       61      0       0
  tests9.dat                  26       26      0       0
  tests_innerHTML_1.dat       84       84      0       0
- scriptdata01.dat            26       26      0       0
- tests4.dat                  6        6       0       0
- noscript01.dat              17       17      0       0
- entities01.dat              74       74      0       0
- tests14.dat                 6        6       0       0
- domjs-unsafe.dat            48       48      0       0
- tests10.dat                 53       53      0       0
- ruby.dat                    20       20      0       0
- tests12.dat                 1        1       0       0
- comments01.dat              13       13      0       0
- main-element.dat            2        2       0       0
- entities02.dat              25       25      0       0
- template.dat                107      107     0       0
- tables01.dat                16       16      0       0
- tests15.dat                 13       13      0       0
- tests16.dat                 196      196     0       0
- tests25.dat                 25       25      0       0
- pending-spec-changes.dat    2        2       0       0
- tests23.dat                 4        4       0       0
- tricky01.dat                8        8       0       0
- tests1.dat                  112      112     0       0
- html5test-com.dat           23       23      0       0
- tests22.dat                 4        4       0       0
- tests26.dat                 15       15      0       0
- tests6.dat                  51       51      0       0
- tests5.dat                  16       16      0       0
- isindex.dat                 3        3       0       0
- tests20.dat                 43       43      0       0
- doctype01.dat               36       36      0       0
- tests21.dat                 24       24      0       0
- foreign-fragment.dat        57       57      0       0
- tests18.dat                 35       35      0       0
- tests8.dat                  9        9       0       0
- inbody01.dat                3        3       0       0
- tests7.dat                  30       30      0       0
- tests24.dat                 7        7       0       0
- tests2.dat                  61       61      0       0
- tests17.dat                 12       12      0       0
- webkit02.dat                20       20      0       0
- tests19.dat                 104      104     0       0
- adoption01.dat              17       17      0       0
- tests3.dat                  23       23      0       0
- blocks.dat                  47       47      0       0
- adoption02.dat              1        1       0       0
- summary                     1643     1639    4       0
+ summary                     1666     1647    19      0
 
 Tested with C<examples/html5lib_tests.pl>
 

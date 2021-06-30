@@ -48,6 +48,7 @@ sub complex_unit {
             [ undef, @types ],
             { %{$sf->{i}{lyt_h}}, info => $info }
         );
+        $ax->print_sql_info( $info );
         if ( ! defined $type ) {
             return;
         }
@@ -79,7 +80,7 @@ sub complex_unit {
     #if ( $clause !~ /^(?:set|where|having|group_by|order_by)\z/i ) {
     if ( $clause eq 'select' ) {
         my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-        my $alias = $ax->alias( $alias_type, $complex_unit );
+        my $alias = $ax->alias( $sql, $alias_type, $complex_unit );
         if ( defined $alias && length $alias ) {
             $sql->{alias}{$complex_unit} = $ax->quote_col_qualified( [ $alias ] );
         }

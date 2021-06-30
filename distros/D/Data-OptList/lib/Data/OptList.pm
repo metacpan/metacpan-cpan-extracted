@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package Data::OptList;
 # ABSTRACT: parse and validate simple name/value option pairs
-$Data::OptList::VERSION = '0.110';
+$Data::OptList::VERSION = '0.112';
 use List::Util ();
 use Params::Util ();
 use Sub::Install 0.921 ();
@@ -152,8 +152,8 @@ sub mkopt {
       $must_be = [ $must_be ] unless ref $must_be;
       my @checks = map {
           my $class = $_;
-          $test_for{$_}
-          || sub { $_[1] = $class; goto \&Params::Util::_INSTANCE }
+          $test_for{$class}
+          || sub { Params::Util::_INSTANCE($_[0], $class) }
       } @$must_be;
 
       $is_a = (@checks == 1)
@@ -249,7 +249,7 @@ Data::OptList - parse and validate simple name/value option pairs
 
 =head1 VERSION
 
-version 0.110
+version 0.112
 
 =head1 SYNOPSIS
 
@@ -312,6 +312,16 @@ With Data::OptList, you can do this instead:
 
 This works by assuming that any defined scalar is a name and any reference
 following a name is its value.
+
+=head1 PERL VERSION SUPPORT
+
+This module has a long-term perl support period.  That means it will not
+require a version of perl released fewer than five years ago.
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
 
 =head1 FUNCTIONS
 
@@ -378,23 +388,13 @@ Both C<mkopt> and C<mkopt_hash> may be exported on request.
 
 =head1 AUTHOR
 
-Ricardo Signes <rjbs@cpan.org>
+Ricardo Signes <rjbs@semiotic.systems>
 
-=head1 CONTRIBUTORS
+=head1 CONTRIBUTOR
 
-=for stopwords Olivier Mengué Ricardo SIGNES
-
-=over 4
-
-=item *
+=for stopwords Olivier Mengué
 
 Olivier Mengué <dolmen@cpan.org>
-
-=item *
-
-Ricardo SIGNES <rjbs@codesimply.com>
-
-=back
 
 =head1 COPYRIGHT AND LICENSE
 

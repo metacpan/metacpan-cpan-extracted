@@ -66,7 +66,7 @@ sub get_list {
     my $self = shift;
     my %params = @_;
 
-    return $self->client()->get("/hr/v2jobs", %params);
+    return $self->client()->get("/hr/v2/jobs", %params);
 }
 
 =item get_specific
@@ -112,7 +112,7 @@ sub post_job {
     my $self = shift;
     my %params = @_;
 
-    return $self->client()->post("/hr/v2jobs", %params);
+    return $self->client()->post("/hr/v2/jobs", %params);
 }
 
 =item edit_job
@@ -140,7 +140,7 @@ sub edit_job {
     my $key = shift;
     my %params = @_;
 
-    return $self->client()->put("/hr/v2jobs/" . $key, %params);
+    return $self->client()->put("/hr/v2/jobs/" . $key, %params);
 }
 
 =item delete_job
@@ -168,7 +168,7 @@ sub delete_job {
     my $key = shift;
     my %params = @_;
 
-    return $self->client()->delete("/hr/v2jobs/" . $key, %params);
+    return $self->client()->delete("/hr/v2/jobs/" . $key, %params);
 }
 
 =back

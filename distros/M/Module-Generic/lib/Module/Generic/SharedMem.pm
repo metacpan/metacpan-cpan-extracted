@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/SharedMem.pm
-## Version v0.1.0
+## Version v0.1.1
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/01/18
-## Modified 2021/01/23
+## Modified 2021/06/29
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -21,6 +21,7 @@ BEGIN
     use File::Spec ();
     use Nice::Try;
     use Scalar::Util ();
+    use JSON qw( -convert_blessed_universally );
     use Storable ();
     use constant SHM_BUFSIZ     =>  65536;
     use constant SEM_LOCKER     =>  0;
@@ -101,7 +102,7 @@ EOT
     # be removed in that order
     our $SHEM_REPO = [];
     our $ID2OBJ    = {};
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.1.1';
 };
 
 sub init
@@ -120,6 +121,7 @@ sub init
     # SHM_BUFSIZ
     $self->{size}       = SHM_BUFSIZ;
     $self->{_init_strict_use_sub} = 1;
+    $self->{_packing_method} = 'json';
     $self->SUPER::init( @_ ) || return( $self->pass_error );
     $self->{addr}       = undef();
     $self->{id}         = undef();
@@ -270,6 +272,8 @@ sub id
     return( $self->{id} );
 }
 
+sub json { return( shift->_packing_method( 'json' ) ); }
+
 sub key
 {
     my $self = shift( @_ );
@@ -307,7 +311,7 @@ sub lock
 #         $self->debug(3);
 #         $self->message( 3, "Semaphore arguments are: ", sub{ $self->dump( $SEMOP_ARGS ) } );
 #         $self->debug($v);
-        alarm( 0 );
+        alarm(0);
         if( $rc )
         {
             $self->locked( $type );
@@ -522,16 +526,26 @@ sub read
             return( $self->error( "Unable to read data from shared memory id \"$id\": $!" ) );
     }
     # Get rid of nulls end padded
-    # $buffer = unpack( "A*", $buffer );
+    $buffer = unpack( "A*", $buffer );
+    my $j;
+    my $packing = $self->_packing_method;
+    $j = JSON->new->utf8->relaxed->allow_nonref if( $packing eq 'json' );
     my $data;
     try
     {
-        $data = Storable::thaw( $buffer );
+        if( $packing eq 'json' )
+        {
+            $data = $j->decode( $buffer );
+        }
+        else
+        {
+            $data = Storable::thaw( $buffer );
+        }
         $self->message( 4, "Decoded data '$buffer' -> '$data': ", sub{ $self->dump( $data ) });
     }
     catch( $e )
     {
-        return( $self->error( "An error occured while decoding data using Storable::thaw: $e", ( length( $buffer ) <= 1024 ? "\nData is: '$buffer'" : '' ) ) );
+        return( $self->error( "An error occured while decoding data using $packing: $e", ( length( $buffer ) <= 1024 ? "\nData is: '$buffer'" : '' ) ) );
     }
     
     if( scalar( @_ ) > 1 )
@@ -687,6 +701,8 @@ sub stat
     }
 }
 
+sub storable { return( shift->_packing_method( 'storable' ) ); }
+
 sub supported { return( $SYSV_SUPPORTED ); }
 
 sub unlock
@@ -722,16 +738,24 @@ sub write
     # my @callinfo = caller;
     # $self->message( 3, "Called from file $callinfo[1] at line $callinfo[2]" );
     # $self->message( 3, "Size limit set to '$size'" );
-    # my $j = JSON->new->utf8->relaxed->allow_nonref->convert_blessed;
+    my $j;
+    my $packing = $self->_packing_method;
+    $j = JSON->new->utf8->relaxed->allow_nonref->convert_blessed if( $packing eq 'json' );
     my $encoded;
     try
     {
-        # $encoded = $j->encode( $data );
-        $encoded = Storable::freeze( $data );
+        if( $packing eq 'json' )
+        {
+            $encoded = $j->encode( $data );
+        }
+        else
+        {
+            $encoded = Storable::freeze( $data );
+        }
     }
     catch( $e )
     {
-        return( $self->error( "An error occured encoding data provided using Storable::freeze: $e. Data was: '$data'" ) );
+        return( $self->error( "An error occured encoding data provided using $packing: $e. Data was: '$data'" ) );
     }
     
     if( length( $encoded ) > $size )
@@ -756,6 +780,8 @@ sub write
     # $self->message( 3, "Successfully wrote ", length( $encoded ), " bytes of data to memory." );
     return( $self );
 }
+
+sub _packing_method { return( shift->_set_get_scalar( '_packing_method', @_ ) ); }
 
 sub _str2key
 {
@@ -938,4 +964,3 @@ END
 1;
 
 __END__
-

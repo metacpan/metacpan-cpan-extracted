@@ -1,4 +1,4 @@
-package Dist::Zilla::PluginBundle::Filter 6.020;
+package Dist::Zilla::PluginBundle::Filter 6.022;
 # ABSTRACT: use another bundle, with some plugins removed
 
 use Moose;
@@ -35,7 +35,7 @@ use Dist::Zilla::Util;
 #pod includes all the configuration for the bundle named in the C<-bundle> attribute,
 #pod but removes all the entries whose package is given in the C<-remove> attributes.
 #pod
-#pod A minimum required version of the bundle can be specified with the C<-version> 
+#pod A minimum required version of the bundle can be specified with the C<-version>
 #pod attribute.
 #pod
 #pod Options not prefixed with C<-> will be passed to the bundle to be filtered.
@@ -113,7 +113,7 @@ Dist::Zilla::PluginBundle::Filter - use another bundle, with some plugins remove
 
 =head1 VERSION
 
-version 6.020
+version 6.022
 
 =head1 SYNOPSIS
 
@@ -132,7 +132,7 @@ This plugin bundle actually wraps and modifies another plugin bundle.  It
 includes all the configuration for the bundle named in the C<-bundle> attribute,
 but removes all the entries whose package is given in the C<-remove> attributes.
 
-A minimum required version of the bundle can be specified with the C<-version> 
+A minimum required version of the bundle can be specified with the C<-version>
 attribute.
 
 Options not prefixed with C<-> will be passed to the bundle to be filtered.

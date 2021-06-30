@@ -8,7 +8,7 @@ use utf8;
 
 use Object::Pad;
 
-package App::sdview 0.01;
+package App::sdview 0.02;
 class App::sdview;
 
 use List::Keywords qw( first );
@@ -88,7 +88,7 @@ method run ( $file, %opts )
    my @paragraphs = $parser_class->new->parse_file( $file );
 
    # Unless -n switch
-   open my $outh, "|-", "less", "+R";
+   open my $outh, "|-", "less", "-R";
    $outh->binmode( ":encoding(UTF-8)" );
    select $outh;
 

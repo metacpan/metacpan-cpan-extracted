@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Result;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Contains the result of a JSON Schema evaluation
 
-our $VERSION = '0.512';
+our $VERSION = '0.513';
 
 use 5.016;
 no if "$]" >= 5.031009, feature => 'indirect';
@@ -168,7 +168,7 @@ JSON::Schema::Modern::Result - Contains the result of a JSON Schema evaluation
 
 =head1 VERSION
 
-version 0.512
+version 0.513
 
 =head1 SYNOPSIS
 

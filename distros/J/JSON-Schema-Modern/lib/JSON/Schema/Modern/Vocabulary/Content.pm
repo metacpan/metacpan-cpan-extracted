@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary::Content;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Content vocabulary
 
-our $VERSION = '0.512';
+our $VERSION = '0.513';
 
 use 5.016;
 no if "$]" >= 5.031009, feature => 'indirect';
@@ -18,10 +18,19 @@ use namespace::clean;
 
 with 'JSON::Schema::Modern::Vocabulary';
 
-sub vocabulary { 'https://json-schema.org/draft/2019-09/vocab/content' }
+sub vocabulary {
+  my ($self, $spec_version) = @_;
+  return
+      $spec_version eq 'draft2019-09' ? 'https://json-schema.org/draft/2019-09/vocab/content'
+    : undef;
+}
 
 sub keywords {
-  qw(contentEncoding contentMediaType contentSchema);
+  my ($self, $spec_version) = @_;
+  return (
+    qw(contentEncoding contentMediaType),
+    $spec_version ne 'draft7' ? 'contentSchema' : (),
+  );
 }
 
 sub _traverse_keyword_contentEncoding {
@@ -73,7 +82,7 @@ JSON::Schema::Modern::Vocabulary::Content - Implementation of the JSON Schema Co
 
 =head1 VERSION
 
-version 0.512
+version 0.513
 
 =head1 DESCRIPTION
 

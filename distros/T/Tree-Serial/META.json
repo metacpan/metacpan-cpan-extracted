@@ -36,6 +36,11 @@
             "perl" : "5.012000",
             "warnings" : "0"
          }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Simple" : "1.302185"
+         }
       }
    },
    "release_status" : "stable",
@@ -46,6 +51,6 @@
          "web" : "https://github.com/stuart-little/tree-serial"
       }
    },
-   "version" : 0.1,
+   "version" : 0.2,
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

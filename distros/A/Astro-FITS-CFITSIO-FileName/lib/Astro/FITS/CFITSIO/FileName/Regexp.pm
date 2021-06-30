@@ -5,9 +5,17 @@ package Astro::FITS::CFITSIO::FileName::Regexp;
 use strict;
 use warnings;
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
-use Exporter::Shiny 1.00200 qw( $FileName $colFilter $rowFilter $binSpec $PixelRange );
+use Exporter::Shiny 1.00200 qw(
+  $FileName
+  $colFilter
+  $rowFilter
+  $binSpec
+  $PixelRange
+  $PossiblyQuotedStringInSpec
+  $PossiblyQuotedStringInList
+);
 
 # all thanks to PPR, Damian's masterpiece
 our $ATOMS = qr{
@@ -92,9 +100,16 @@ our $pixFilter = qr {
     \s* \]
 }x;
 
+use Text::Balanced;
+our $QUOTED_STRING = Text::Balanced::gen_delimited_pat( q{'"} );
+
+our $PossiblyQuotedStringInSpec = qr/(?: $QUOTED_STRING | [^'"\]]+) +/x;
+
+our $PossiblyQuotedStringInList = qr/\s*( (?:$QUOTED_STRING | [^'",;]+)+ )/x;
+
 our $rowFilter = qr {
   \[ \s*
-     (?<row_filter> [^\]]+)
+     (?<row_filter> $PossiblyQuotedStringInSpec )
    \s* \]
 }x;
 
@@ -109,7 +124,7 @@ our $binSpec = qr{
 
 our $colFilter = qr{
   \[ \s*
-    col\s+ (?<col_filter>[^\]]+)
+    col\s+ (?<col_filter> $PossiblyQuotedStringInSpec )
     \s* \]
 }x;
 
@@ -165,7 +180,7 @@ our $FileName = qr{
                   (?: $ImageSection)?
                   (?: $pixFilter)?
                |
-                   (?<col_bin_row> (?:\[ [^\]]* \])+ )
+                   (?<col_bin_row> (?:\[\s* $PossiblyQuotedStringInSpec \s* \])+ )
                    # this is split out later in parse_filename
                    # (?:
                    #    (?&colFilter)|($binSpec)|(?&rowFilter)
@@ -176,7 +191,6 @@ our $FileName = qr{
    \z
    $ATOMS
 }x;
-
 
 1;
 
@@ -192,7 +206,7 @@ Astro::FITS::CFITSIO::FileName::Regexp - Regular expressions to match parts of C
 
 =head1 VERSION
 
-version 0.03
+version 0.05
 
 =head1 SUPPORT
 

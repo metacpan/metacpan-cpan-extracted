@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package JSON::Schema::Modern; # git description: v0.028-8-gddb09e8
+package JSON::Schema::Modern; # git description: v0.512-18-g325e2e3
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate data against a schema
 # KEYWORDS: JSON Schema data validation structure specification
 
-our $VERSION = '0.512';
+our $VERSION = '0.513';
 
 use 5.016;  # for fc, unicode_strings features
 no if "$]" >= 5.031009, feature => 'indirect';
@@ -35,9 +35,11 @@ use namespace::clean;
 
 our @CARP_NOT = qw(JSON::Schema::Modern::Document);
 
+use constant SPECIFICATION_VERSION_DEFAULT => 'draft2019-09';
+
 has specification_version => (
   is => 'ro',
-  isa => Enum(['draft2019-09']),
+  isa => Enum([qw(draft7 draft2019-09)]),
 );
 
 has output_format => (
@@ -184,10 +186,11 @@ sub traverse {
   my $state = {
     depth => 0,
     data_path => '',                    # this never changes since we don't have an instance yet
-    traversed_schema_path => '',        # the accumulated traversal path up to the last $ref traversal
-    initial_schema_uri => $base_uri,    # the canonical URI as of the start or the last traversed $ref
-    schema_path => '',                  # the rest of the path, since the start or the last traversed $ref
+    traversed_schema_path => '',        # the accumulated traversal path as of the start, or last $id
+    initial_schema_uri => $base_uri,    # the canonical URI as of the start, or last $id
+    schema_path => '',                  # the rest of the path, since the last $id
     errors => [],
+    spec_version => $self->specification_version//SPECIFICATION_VERSION_DEFAULT, # can change, iff nothing explicitly requested
     # for now, this is hardcoded, but in the future we will wrap this in a dialect that starts off
     # just with the Core vocabulary and then determine the actual vocabularies from the '$schema'
     # keyword in the schema and the '$vocabulary' keyword in the metaschema.
@@ -202,7 +205,7 @@ sub traverse {
   };
 
   try {
-    $self->_traverse($schema_reference, $state);
+    $self->_traverse_subschema($schema_reference, $state);
   }
   catch ($e) {
     if ($e->$_isa('JSON::Schema::Modern::Error')) {
@@ -226,9 +229,9 @@ sub evaluate {
 
   my $state = {
     data_path => '',
-    traversed_schema_path => '',        # the accumulated traversal path up to the last $ref traversal
-    initial_schema_uri => $base_uri,    # the canonical URI as of the start or the last traversed $ref
-    schema_path => '',                  # the rest of the path, since the start or the last traversed $ref
+    traversed_schema_path => '',        # the accumulated traversal path as of the start, or last $id, or up to the last traversed $ref
+    initial_schema_uri => $base_uri,    # the canonical URI as of the start or last $id, or the last traversed $ref
+    schema_path => '',                  # the rest of the path, since the last $id or the last traversed $ref
   };
 
   my $valid;
@@ -252,12 +255,13 @@ sub evaluate {
     $state = +{
       %$state,
       depth => 0,
-      initial_schema_uri => $canonical_uri,   # the canonical URI as of the start or the last traversed $ref
-      document => $document,                  # the ::Document object containing this schema
-      document_path => $document_path,        # the *initial* path within the document of this schema
+      initial_schema_uri => $canonical_uri, # the canonical URI as of the start or last $id, or the last traversed $ref
+      document => $document,                # the ::Document object containing this schema
+      document_path => $document_path,      # the path within the document of this schema, since the last $id or $ref traversal
       errors => [],
       annotations => [],
       seen => {},
+      spec_version => $document->specification_version,
       # for now, this is hardcoded, but in the future the dialect will be determined by the
       # traverse() pass on the schema and examination of the referenced metaschema.
       vocabularies => [
@@ -272,7 +276,7 @@ sub evaluate {
       } qw(short_circuit collect_annotations validate_formats annotate_unknown_keywords)),
     };
 
-    $valid = $self->_eval($data, $schema, $state);
+    $valid = $self->_eval_subschema($data, $schema, $state);
     warn 'result is false but there are no errors' if not $valid and not @{$state->{errors}};
   }
   catch ($e) {
@@ -311,7 +315,19 @@ sub get {
 
 ######## NO PUBLIC INTERFACES FOLLOW THIS POINT ########
 
-sub _traverse {
+# current spec version => { keyword => undef, or arrayref of alternatives }
+my %removed_keywords = (
+  'draft7' => {
+    id => [ '$id' ],
+  },
+  'draft2019-09' => {
+    id => [ '$id' ],
+    definitions => [ '$defs' ],
+    dependencies => [ qw(dependentSchemas dependentRequired) ],
+  },
+);
+
+sub _traverse_subschema {
   croak 'insufficient arguments' if @_ < 3;
   my ($self, $schema, $state) = @_;
 
@@ -326,8 +342,11 @@ sub _traverse {
   return E($state, 'invalid schema type: %s', $schema_type) if $schema_type ne 'object';
 
   foreach my $vocabulary (@{$state->{vocabularies}}) {
-    foreach my $keyword ($vocabulary->keywords) {
+    foreach my $keyword ($vocabulary->keywords($state->{spec_version})) {
       next if not exists $schema->{$keyword};
+
+      # keywords adjacent to $ref are not evaluated before draft2019-09
+      next if $keyword ne '$ref' and exists $schema->{'$ref'} and $state->{spec_version} eq 'draft7';
 
       $state->{keyword} = $keyword;
       my $method = '_traverse_keyword_'.($keyword =~ s/^\$//r);
@@ -339,16 +358,24 @@ sub _traverse {
       }
     }
   }
+
+  # check for previously-supported but now removed keywords
+  foreach my $keyword (sort keys %{$removed_keywords{$state->{spec_version}}}) {
+    next if not exists $schema->{$keyword};
+    my $message ='no-longer-supported "'.$keyword.'" keyword present (at location "'
+      .canonical_schema_uri($state).'")';
+    if (my $alternates = $removed_keywords{$state->{spec_version}}->{$keyword}) {
+      my @list = map '"'.$_.'"', @$alternates;
+      @list = ((map $_.',', @list[0..$#list-1]), $list[-1]) if @list > 2;
+      splice(@list, -1, 0, 'or') if @list > 1;
+      $message .= ': this should be rewritten as '.join(' ', @list);
+    }
+    carp $message;
+  }
 }
 
-# keyword => undef, or arrayref of alternatives
-my %removed_keywords = (
-  definitions => [ '$defs' ],
-  dependencies => [ qw(dependentSchemas dependentRequired) ],
-);
-
-sub _eval {
-  croak '_eval called in void context' if not defined wantarray;
+sub _eval_subschema {
+  croak '_eval_subschema called in void context' if not defined wantarray;
   croak 'insufficient arguments' if @_ < 4;
   my ($self, $data, $schema, $state) = @_;
 
@@ -383,8 +410,11 @@ sub _eval {
 
   ALL_KEYWORDS:
   foreach my $vocabulary (@{$state->{vocabularies}}) {
-    foreach my $keyword ($vocabulary->keywords) {
+    foreach my $keyword ($vocabulary->keywords($state->{spec_version})) {
       next if not exists $schema->{$keyword};
+
+      # keywords adjacent to $ref are not evaluated before draft2019-09
+      next if $keyword ne '$ref' and exists $schema->{'$ref'} and $state->{spec_version} eq 'draft7';
 
       delete $unknown_keywords{$keyword};
 
@@ -403,20 +433,6 @@ sub _eval {
 
       push @new_annotations, @{$state->{annotations}}[$#new_annotations+1 .. $#{$state->{annotations}}];
     }
-  }
-
-  # check for previously-supported but now removed keywords
-  foreach my $keyword (sort keys %removed_keywords) {
-    next if not exists $schema->{$keyword};
-    my $message ='no-longer-supported "'.$keyword.'" keyword present (at location "'
-      .canonical_schema_uri($state).'")';
-    if ($removed_keywords{$keyword}) {
-      my @list = map '"'.$_.'"', @{$removed_keywords{$keyword}};
-      @list = ((map $_.',', @list[0..$#list-1]), $list[-1]) if @list > 2;
-      splice(@list, -1, 0, 'or') if @list > 1;
-      $message .= ': this should be rewritten as '.join(' ', @list);
-    }
-    carp $message;
   }
 
   $state->{annotations} = $orig_annotations;
@@ -494,6 +510,9 @@ use constant CACHED_METASCHEMAS => {
   'https://json-schema.org/draft/2019-09/output/hyper-schema' => 'draft2019-09/output/hyper-schema.json',
   'https://json-schema.org/draft/2019-09/output/schema'       => 'draft2019-09/output/schema.json',
   'https://json-schema.org/draft/2019-09/schema'              => 'draft2019-09/schema.json',
+
+  # trailing # is omitted because we always cache documents by its canonical (fragmentless) URI
+  'http://json-schema.org/draft-07/schema' => 'draft7/schema.json',
 };
 
 # returns the same as _get_resource
@@ -593,7 +612,7 @@ JSON::Schema::Modern - Validate data against a schema
 
 =head1 VERSION
 
-version 0.512
+version 0.513
 
 =head1 SYNOPSIS
 
@@ -618,18 +637,22 @@ version of the specification.
 
 Indicates which version of the JSON Schema specification is used during evaluation. When not set,
 this value is derived from the C<$schema> keyword in the schema used in evaluation, or defaults to
-the latest (supported) version.
+the latest (supported) version (draft2010-09). When left unset, the use of C<$schema> keywords in
+the schema is permitted, to switch between draft versions.
 
 May be one of:
 
 =over 4
 
+=item *
 
+L<C<draft2019-09>|https://json-schema.org/specification-links.html#2019-09-formerly-known-as-draft-8>, corresponding to metaschema C<https://json-schema.org/draft/2019-09/schema>.
+
+=item *
+
+L<C<draft7>|https://json-schema.org/specification-links.html#draft-7>, corresponding to metaschema C<http://json-schema.org/draft-07/schema#>
 
 =back
-
-* L<C<draft2019-09>|https://json-schema.org/specification-links.html#2019-09-formerly-known-as-draft-8>,
-  corresponding to metaschema C<https://json-schema.org/draft/2019-09/schema>.
 
 =head2 output_format
 
@@ -680,8 +703,6 @@ in order for this to have any effect.
 Defaults to false (for now).
 
 =head1 METHODS
-
-=for Pod::Coverage keywords
 
 =head2 evaluate_json_string
 
@@ -951,7 +972,11 @@ additional output formats beyond C<flag>, C<basic>, C<strict_basic>, and C<terse
 
 =item *
 
-examination of the C<$schema> keyword for deviation from the standard metaschema, including changes to vocabulary behaviour
+examination of the C<$schema> keyword for deviation from the standard draft metaschemas, including changes to vocabulary behaviour
+
+=item *
+
+changing the draft specification version semantics after construction time
 
 =back
 

@@ -1,5 +1,3 @@
-use strictures;
-
 use Test2::V0;
 
 use lib 't/lib';

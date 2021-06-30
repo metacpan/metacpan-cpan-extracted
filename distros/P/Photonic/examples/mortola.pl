@@ -46,7 +46,6 @@ use Photonic::LE::S::AllH;
 use Photonic::LE::S::EpsL;
 use PDL;
 use PDL::NiceSlice;
-use PDL::Complex;
 
 set_autopthread_targ(4);;
 set_autopthread_size(4);;

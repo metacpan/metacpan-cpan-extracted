@@ -1,6 +1,6 @@
 # ABSTRACT: Server::Starter adapter for Feersum Plack handler
 package Plack::Handler::Feersum::SS;
-$Plack::Handler::Feersum::SS::VERSION = '0.02';
+$Plack::Handler::Feersum::SS::VERSION = '0.03';
 use strict;
 use warnings;
 use base 'Plack::Handler::Feersum';
@@ -22,12 +22,14 @@ sub _prepare {
     fcntl($sock, F_SETFL, $flags | O_NONBLOCK) || croak $!;
     print "Feersum [$$] listening on $port fd=$fd\n" unless $self->{quiet};
     $self->{sock} = $sock;
+    $self->{listen} = [$port];
     my $f = $self->{endjinn} = Feersum->endjinn;
     $f->use_socket($sock);
-    if ($self->{options}) {
-        $self->{pre_fork} = delete $self->{options}{pre_fork};
-    }
-    $self->{server_ready}->($self) if $self->{server_ready};
+    $self->{pre_fork} = delete $self->{options}{pre_fork} if $self->{options};
+    $self->{server_ready}->({
+        qw'server_software Feersum',
+        $port =~ m/^(?:(.+?):|)([0-9]+)$/ ? (host => $1//0, port => $2) : (host => 'unix/', port => $port)
+    }) if $self->{server_ready};
     return;
 }
 

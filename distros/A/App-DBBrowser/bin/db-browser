@@ -3,7 +3,7 @@ use warnings;
 use strict;
 use 5.010001;
 
-our $VERSION = '2.268';
+our $VERSION = '2.269';
 
 use Term::Choose::Screen qw( hide_cursor show_cursor clear_to_end_of_screen );
 
@@ -53,7 +53,7 @@ C<db-browser> - Browse C<SQLite>/C<MySQL>/C<PostgreSQL> databases and their tabl
 
 =head1 VERSION
 
-Version 2.268
+Version 2.269
 
 =head1 SYNOPSIS
 
@@ -427,7 +427,7 @@ Insert the data cell by cell.
 
 Reads from STDIN until the end of input.
 
-=item From File
+=item File
 
 The data is read from a chosen file.
 
@@ -1216,6 +1216,8 @@ Expects a regex pattern. If set, removes trailing characters matching regexp fro
 =head3 Enable input filter
 
 Enable the input filter menu.
+
+Enabling I<input filter> will cause a second copy of the data to be kept in memory.
 
 =head3 Empty to Null
 

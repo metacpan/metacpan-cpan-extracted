@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Type::Point;
 # ABSTRACT: Represents a Neo4j spatial point value
-$Neo4j::Driver::Type::Point::VERSION = '0.23';
+$Neo4j::Driver::Type::Point::VERSION = '0.25';
 
 # may not be supported by Bolt
 
@@ -23,7 +23,7 @@ Neo4j::Driver::Type::Point - Represents a Neo4j spatial point value
 
 =head1 VERSION
 
-version 0.23
+version 0.25
 
 =head1 DESCRIPTION
 

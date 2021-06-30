@@ -1,5 +1,5 @@
 package Photonic::LE::NR2::EpsL;
-$Photonic::LE::NR2::EpsL::VERSION = '0.016';
+$Photonic::LE::NR2::EpsL::VERSION = '0.017';
 
 =encoding UTF-8
 
@@ -9,7 +9,7 @@ Photonic::LE::NR2::EpsL
 
 =head1 VERSION
 
-version 0.016
+version 0.017
 
 =head1 COPYRIGHT NOTICE
 
@@ -126,7 +126,6 @@ check.
 use namespace::autoclean;
 use PDL::Lite;
 use PDL::NiceSlice;
-use PDL::Complex;
 use Photonic::LE::NR2::AllH;
 use Photonic::Types;
 use Photonic::Utils qw(lentzCF);
@@ -149,8 +148,8 @@ sub evaluate {
     $self->_epsA(my $epsA=shift);
     $self->_epsB(my $epsB=shift);
     $self->_u(my $u=1/(1-$epsB/$epsA));
-    my $as=pdl(map r2C($_), @{$self->nr->as})->cplx;
-    my $b2s=pdl(map r2C($_), @{$self->nr->b2s})->cplx;
+    my $as=PDL::r2C($self->nr->as);
+    my $b2s=PDL::r2C($self->nr->b2s);
     my $min= min($self->nh, $self->nr->iteration);
     my ($fn, $n)=lentzCF($u-$as, -$b2s, $min, $self->smallE);
     # Check this logic:

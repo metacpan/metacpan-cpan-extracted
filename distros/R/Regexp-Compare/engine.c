@@ -8,25 +8,16 @@
 #if PERL_API_REVISION != 5
 #error This module is only for Perl 5
 #else
-#if PERL_API_VERSION == 28
-/* nothing special */
-#else
 #if PERL_API_VERSION == 30
-#define RC_NANYOFM
 #define RC_EXACT_ONLY8
-#define RC_UNCOND_CHARCLASS
-#define RC_ANYOF_OFFSET
-#define RC_SHORT_BITMAP
-#define RC_UNSIGNED_COUNT
 #else
 #if PERL_API_VERSION == 32
-#define RC_NANYOFM
 #define RC_EXACT_REQ8
 #define RC_ANYOFR
-#define RC_UNCOND_CHARCLASS
-#define RC_ANYOF_OFFSET
-#define RC_SHORT_BITMAP
-#define RC_UNSIGNED_COUNT
+#else
+#if PERL_API_VERSION == 34
+#define RC_EXACT_REQ8
+#define RC_ANYOFR
 #else
 #error Unsupported PERL_API_VERSION
 #endif
@@ -40,11 +31,7 @@
 
 #define LETTER_COUNT ('z' - 'a' + 1)
 
-#ifndef RC_UNSIGNED_COUNT
-#define INFINITE_COUNT 32767
-#else
 #define INFINITE_COUNT 0xffff
-#endif
 
 #define ALNUM_BLOCK 0x0001
 #define SPACE_BLOCK 0x0002
@@ -90,11 +77,7 @@ typedef struct
 
 #define GET_OFFSET(rn) ((rn)->next_off ? (rn)->next_off : get_synth_offset(rn))
 
-#ifndef RC_UNSIGNED_COUNT
-typedef I16 CurlyCount;
-#else
 typedef U16 CurlyCount;
-#endif
 
 /* Most functions below have this signature. The first parameter is a
    flag set after the comparison actually matched something, second
@@ -476,26 +459,12 @@ static int convert_invlist_to_map(SV *invlist, int invert, U32 *map)
        below.
     */
     static UV perl_space_invlist[] = { 128,
-#if PERL_API_VERSION == 28
-#include "XPerlSpace.28"
-#else
-#if PERL_API_VERSION == 30
 #include "XPerlSpace.30"
-#else
-#if PERL_API_VERSION == 32
-#include "XPerlSpace.30"
-#else
-#error unexpected PERL_API_VERSION
-#endif
-#endif
-#endif
     };
 
-#ifdef RC_UNCOND_CHARCLASS
     static UV perl_space_short_invlist[] = { 256,
 #include "XPerlSpace.30a"
     };
-#endif
 
     static UV horizontal_space_invlist[] = { 128, 160, 161, 5760, 5761,
         6158, 6159, 8192, 8203, 8239, 8240, 8287, 8288, 12288, 12289 };
@@ -507,13 +476,13 @@ static int convert_invlist_to_map(SV *invlist, int invert, U32 *map)
     };
 
     static UV xposix_alnum_invlist[] = { 128,
-#if PERL_API_VERSION == 28
-#include "XPosixAlnum.28"
-#else
 #if PERL_API_VERSION == 30
 #include "XPosixAlnum.30"
 #else
 #if PERL_API_VERSION == 32
+#include "XPosixAlnum.32"
+#else
+#if PERL_API_VERSION == 34
 #include "XPosixAlnum.32"
 #else
 #error unexpected PERL_API_VERSION
@@ -523,19 +492,7 @@ static int convert_invlist_to_map(SV *invlist, int invert, U32 *map)
     };
 
     static UV xposix_alpha_invlist[] = { 128,
-#if PERL_API_VERSION == 28
 #include "XPosixAlpha.28"
-#else
-#if PERL_API_VERSION == 30
-#include "XPosixAlpha.28"
-#else
-#if PERL_API_VERSION == 32
-#include "XPosixAlpha.28"
-#else
-#error unexpected PERL_API_VERSION
-#endif
-#endif
-#endif
     };
 
     static UV xposix_word_invlist[] = { 128,
@@ -589,7 +546,6 @@ static int convert_invlist_to_map(SV *invlist, int invert, U32 *map)
 
         break;
 
-#ifdef RC_UNCOND_CHARCLASS
     case SIZEOF_ARRAY(perl_space_short_invlist):
         if (!memcmp(ila, perl_space_short_invlist, sizeof(perl_space_short_invlist)))
         {
@@ -600,7 +556,6 @@ static int convert_invlist_to_map(SV *invlist, int invert, U32 *map)
         }
 
         break;
-#endif
 
     case SIZEOF_ARRAY(horizontal_space_invlist):
         if (!memcmp(ila, horizontal_space_invlist, sizeof(horizontal_space_invlist)))
@@ -820,7 +775,6 @@ static int convert_regclass_map(Arrow *a, U32 *map)
         SV **ary = AvARRAY(av);
         SV *si = *ary;
 
-#ifdef RC_UNCOND_CHARCLASS
         /* from get_regclass_nonbitmap_data of perl 5.30.0: invlist is
            in ary[0] */
         if (si) /* not so unconditional in Perl 5.32 */
@@ -834,40 +788,6 @@ static int convert_regclass_map(Arrow *a, U32 *map)
             /* fprintf(stderr, "invlist not found\n"); */
             return 0;
         }
-#else
-        if (si && (si != &PL_sv_undef))
-        {
-            /* From regcomp.c:regclass: the 0th element stores the
-               character class description in its textual form. It isn't
-               very clear what exactly the textual form is, but we hope
-               it's 0-terminated. */
-          return convert_desc_to_map(SvPV_nolen(*ary),
-              !!(a->rn->flags & ANYOF_INVERT),
-              map);
-        }
-/* FIXME: in perl 5.18, crashes for inverted classes */
-        else
-        {
-            /* in perl 5.16, the textual form doesn't necessarily exist... */
-            if (av_len(av) >= 3)
-            {
-                SV *invlist = ary[3];
-
-                if (SvUV(ary[4])) /* invlist_has_user_defined_property */
-                {
-                    /* fprintf(stderr, "invlist has user defined property\n"); */
-                    return 0;
-                }
-
-                return convert_invlist_to_map(invlist,
-                    !!(a->rn->flags & ANYOF_INVERT),
-                    map);
-            }
-
-            /* fprintf(stderr, "regclass invlist not found\n"); */
-            return 0;
-        }
-#endif
     }
 
     rc_error = "regclass not found";
@@ -892,14 +812,7 @@ static SV *get_invlist_sv(Arrow *a)
             AV * const av = MUTABLE_AV(SvRV(rv));
             SV **const ary = AvARRAY(av);
 
-#ifdef RC_UNCOND_CHARCLASS
             return *ary;
-#else
-            if (av_tindex(av) >= 3)
-            {
-                return ary[3];
-            }
-#endif
         }
     }
 
@@ -915,11 +828,7 @@ static int convert_map(Arrow *a, U32 *map)
     assert((a->rn->type == ANYOF) || (a->rn->type == ANYOFD));
     assert(map);
 
-    if (ANYOF_FLAGS(a->rn) & (ANYOF_SHARED_d_UPPER_LATIN1_UTF8_STRING_MATCHES_non_d_RUNTIME_USER_PROP
-#ifdef RC_UNCOND_CHARCLASS
-            | ANYOF_INVERT
-#endif
-            ))
+    if (ANYOF_FLAGS(a->rn) & (ANYOF_SHARED_d_UPPER_LATIN1_UTF8_STRING_MATCHES_non_d_RUNTIME_USER_PROP | ANYOF_INVERT))
     {
         return convert_regclass_map(a, map);
     }
@@ -1085,11 +994,7 @@ static int get_synth_offset(regnode *p)
             return -1;
         }
 
-#ifndef RC_ANYOF_OFFSET
-        return 11;
-#else
         return 10;
-#endif
     }
 #ifdef RC_ANYOFR
     else if (p->type == ANYOFR)
@@ -1101,12 +1006,10 @@ static int get_synth_offset(regnode *p)
     {
         return 2;
     }
-#ifdef RC_NANYOFM
     else if (p->type == NANYOFM)
     {
         return 2;
     }
-#endif
     else if ((p->type == IFMATCH) || (p->type == UNLESSM) ||
         (p->type == SUSPEND))
     {
@@ -1815,7 +1718,6 @@ static unsigned char get_bitmap_byte(regnode *p, int i)
     assert((p->type == ANYOF) || (p->type == ANYOFD));
 
     bitmap = (unsigned char *)(p + 2);
-#ifdef RC_SHORT_BITMAP
     if ((i >= 16) && (p->type == ANYOFD) &&
         (p->flags & ANYOF_SHARED_d_MATCHES_ALL_NON_UTF8_NON_ASCII_non_d_WARN_SUPER))
     {
@@ -1825,9 +1727,7 @@ static unsigned char get_bitmap_byte(regnode *p, int i)
     {
         loc = bitmap[i];
     }
-#else
-    loc = bitmap[i];
-#endif
+
     if (p->flags & ANYOF_INVERT)
     {
         loc = ~loc;
@@ -1863,7 +1763,6 @@ static int compare_bitmaps(int anchored, Arrow *a1, Arrow *a2,
     return compare_tails(anchored, a1, a2);
 }
 
-#ifdef RC_NANYOFM
 static int compare_negative_bitmaps(int anchored, Arrow *a1, Arrow *a2,
     unsigned char *b1, unsigned char *b2)
 {
@@ -1883,7 +1782,6 @@ static int compare_negative_bitmaps(int anchored, Arrow *a1, Arrow *a2,
 
     return compare_tails(anchored, a1, a2);
 }
-#endif
 
 static int compare_anyof_multiline(int anchored, Arrow *a1, Arrow *a2)
 {
@@ -2011,7 +1909,6 @@ static int compare_anyofm_multiline(int anchored, Arrow *a1, Arrow *a2)
     return compare(1, &tail1, &tail2);
 }
 
-#ifdef RC_NANYOFM
 static int compare_nanyofm_multiline(int anchored, Arrow *a1, Arrow *a2)
 {
     unsigned char req;
@@ -2057,7 +1954,6 @@ static int compare_nanyofm_multiline(int anchored, Arrow *a1, Arrow *a2)
 
     return compare(1, &tail1, &tail2);
 }
-#endif
 
 static int compare_anyof_anyof(int anchored, Arrow *a1, Arrow *a2)
 {
@@ -2297,7 +2193,6 @@ static int compare_anyofm_anyofm(int anchored, Arrow *a1, Arrow *a2)
     return compare_bitmaps(anchored, a1, a2, left, right);
 }
 
-#ifdef RC_NANYOFM
 static int compare_anyof_nanyofm(int anchored, Arrow *a1, Arrow *a2)
 {
     int i;
@@ -2406,7 +2301,6 @@ static int compare_nanyofm_nanyofm(int anchored, Arrow *a1, Arrow *a2)
 
     return compare_negative_bitmaps(anchored, a1, a2, left, right);
 }
-#endif
 
 /* compare_bitmaps could replace this method, but when a class
    contains just a few characters, it seems more natural to compare
@@ -2626,14 +2520,6 @@ static int compare_posix_anyof(int anchored, Arrow *a1, Arrow *a2)
     {
         U32 right_map;
 
-#ifndef RC_UNCOND_CHARCLASS
-        /* apparently a special case... */
-        if (a2->rn->flags & ANYOF_INVERT)
-        {
-            return compare_mismatch(anchored, a1, a2);
-        }
-#endif
-
         int cr = convert_map(a2, &right_map);
         if (cr == -1)
         {
@@ -2688,26 +2574,16 @@ static int compare_negative_posix_anyof(int anchored, Arrow *a1, Arrow *a2)
     {
         U32 right_map;
 
-#ifndef RC_UNCOND_CHARCLASS
-        /* analogically with compare_posix_anyof but untested */
-        if (a2->rn->flags & ANYOF_INVERT)
-        {
-            return compare_mismatch(anchored, a1, a2);
-        }
-#endif
-
         int cr = convert_map(a2, &right_map);
         if (cr == -1)
         {
             return -1;
         }
 
-#ifdef RC_UNCOND_CHARCLASS
         if (a2->rn->flags & ANYOF_INVERT)
         {
             right_map = EVERY_BLOCK & ~right_map;
         }
-#endif
 
         /* fprintf(stderr, "right map = 0x%x\n", (unsigned)right_map); */
 
@@ -2901,7 +2777,6 @@ static int compare_exactf_anyofm(int anchored, Arrow *a1, Arrow *a2)
     return compare_tails(anchored, a1, a2);
 }
 
-#ifdef RC_NANYOFM
 static int compare_exact_nanyofm(int anchored, Arrow *a1, Arrow *a2)
 {
     char *seq;
@@ -3026,7 +2901,6 @@ static int compare_negative_posix_nanyofm(int anchored, Arrow *a1, Arrow *a2)
 
     return compare_negative_bitmaps(anchored, a1, a2, b, right);
 }
-#endif
 
 static int compare_exact_lnbreak(int anchored, Arrow *a1, Arrow *a2)
 {
@@ -3146,7 +3020,6 @@ static int compare_anyofm_reg_any(int anchored, Arrow *a1, Arrow *a2)
     return compare_bitmaps(anchored, a1, a2, left, ndot.nbitmap);
 }
 
-#ifdef RC_NANYOFM
 static int compare_nanyofm_reg_any(int anchored, Arrow *a1, Arrow *a2)
 {
     unsigned char left[ANYOF_BITMAP_SIZE];
@@ -3161,7 +3034,6 @@ static int compare_nanyofm_reg_any(int anchored, Arrow *a1, Arrow *a2)
 
     return compare_negative_bitmaps(anchored, a1, a2, left, ndot.bitmap);
 }
-#endif
 
 static int compare_anyof_lnbreak(int anchored, Arrow *a1, Arrow *a2)
 {
@@ -3254,7 +3126,6 @@ static int compare_anyofm_posix(int anchored, Arrow *a1, Arrow *a2)
     return compare_bitmaps(anchored, a1, a2, left, b);
 }
 
-#ifdef RC_NANYOFM
 static int compare_nanyofm_posix(int anchored, Arrow *a1, Arrow *a2)
 {
     unsigned char *b;
@@ -3276,7 +3147,6 @@ static int compare_nanyofm_posix(int anchored, Arrow *a1, Arrow *a2)
 
     return compare_negative_bitmaps(anchored, a1, a2, left, b);
 }
-#endif
 
 static int compare_anyof_posixa(int anchored, Arrow *a1, Arrow *a2)
 {
@@ -3400,7 +3270,6 @@ static int compare_anyofm_negative_posix(int anchored, Arrow *a1, Arrow *a2)
     return compare_bitmaps(anchored, a1, a2, anyof_bitmap, posix_bitmap);
 }
 
-#ifdef RC_NANYOFM
 static int compare_nanyofm_negative_posix(int anchored, Arrow *a1, Arrow *a2)
 {
     unsigned char *posix_bitmap;
@@ -3428,7 +3297,6 @@ static int compare_nanyofm_negative_posix(int anchored, Arrow *a1, Arrow *a2)
 
     return compare_negative_bitmaps(anchored, a1, a2, anyof_bitmap, posix_bitmap);
 }
-#endif
 
 static int compare_posix_reg_any(int anchored, Arrow *a1, Arrow *a2)
 {
@@ -4176,22 +4044,10 @@ static int compare_right_curly_from_zero(int anchored, Arrow *a1, Arrow *a2)
 {
     regnode *p2, *alt;
     CurlyCount *cnt;
-#ifndef RC_UNSIGNED_COUNT
-    CurlyCount n;
-#endif
     Arrow left, right;
     int sz, rv, offs;
 
     p2 = a2->rn;
-
-#ifndef RC_UNSIGNED_COUNT
-    n = ((CurlyCount *)(p2 + 1))[1];
-    if (n <= 0)
-    {
-        rc_error = "Curly must have positive maximum";
-        return -1;
-    }
-#endif
 
     sz = get_size(p2);
     if (sz < 0)
@@ -4423,13 +4279,6 @@ static int compare_curly_plus(int anchored, Arrow *a1, Arrow *a2)
     assert(p2->type == PLUS);
 
     cnt = (CurlyCount *)(p1 + 1);
-#ifndef RC_UNSIGNED_COUNT
-    if (cnt[0] < 0)
-    {
-        rc_error = "Left curly has negative minimum";
-        return -1;
-    }
-#endif
 
     if (!cnt[0])
     {
@@ -4495,13 +4344,6 @@ static int compare_plus_curly(int anchored, Arrow *a1, Arrow *a2)
            (p2->type == CURLYX));
 
     cnt = (CurlyCount *)(p2 + 1);
-#ifndef RC_UNSIGNED_COUNT
-    if (cnt[0] < 0)
-    {
-        rc_error = "Negative minimum for curly";
-        return -1;
-    }
-#endif
 
     if (cnt[0] > 1) /* FIXME: fails '(?:aa)+' => 'a{2,}' */
     {
@@ -4686,13 +4528,6 @@ static int compare_right_curly(int anchored, Arrow *a1, Arrow *a2)
     p2 = a2->rn;
 
     cnt = (CurlyCount *)(p2 + 1);
-#ifndef RC_UNSIGNED_COUNT
-    if (cnt[0] < 0)
-    {
-        rc_error = "Curly has negative minimum";
-        return -1;
-    }
-#endif
 
     /* fprintf(stderr, "compare_right_curly: minimal repeat count = %d\n", cnt[0]); */
 
@@ -4844,24 +4679,8 @@ static int compare_curly_curly(int anchored, Arrow *a1, Arrow *a2)
            (p2->type == CURLYX));
 
     cnt1 = (CurlyCount *)(p1 + 1);
-#ifndef RC_UNSIGNED_COUNT
-    /* fprintf(stderr, "*cnt1 = %d\n", cnt1[0]); */
-    if (cnt1[0] < 0)
-    {
-        rc_error = "Negative minimum for left curly";
-        return -1;
-    }
-#endif
 
     cnt2 = (CurlyCount *)(p2 + 1);
-#ifndef RC_UNSIGNED_COUNT
-    /* fprintf(stderr, "*cnt2 = %d\n", cnt2[0]); */
-    if (cnt2[0] < 0)
-    {
-        rc_error = "Negative minimum for right curly";
-        return -1;
-    }
-#endif
 
     if (cnt2[0] > cnt1[0]) /* FIXME: fails '(?:aa){1,}' => 'a{2,}' */
     {
@@ -5515,9 +5334,7 @@ void rc_init()
     dispatch[ANYOFR][MBOL] = compare_anyofr_multiline;
 #endif
     dispatch[ANYOFM][MBOL] = compare_anyofm_multiline;
-#ifdef RC_NANYOFM
     dispatch[NANYOFM][MBOL] = compare_nanyofm_multiline;
-#endif
     dispatch[POSIXD][MBOL] = compare_mismatch;
     dispatch[POSIXU][MBOL] = compare_mismatch;
     dispatch[POSIXA][MBOL] = compare_mismatch;
@@ -5676,9 +5493,7 @@ void rc_init()
     dispatch[ANYOFR][BOUND] = compare_anyofr_bound;
 #endif
     dispatch[ANYOFM][BOUND] = compare_anyofm_bound;
-#ifdef RC_NANYOFM
     dispatch[NANYOFM][BOUND] = compare_mismatch;
-#endif
     dispatch[POSIXD][BOUND] = compare_posix_bound;
     dispatch[POSIXU][BOUND] = compare_posix_bound;
     dispatch[POSIXA][BOUND] = compare_posix_bound;
@@ -5716,9 +5531,7 @@ void rc_init()
     dispatch[ANYOFR][NBOUND] = compare_anyofr_nbound;
 #endif
     dispatch[ANYOFM][NBOUND] = compare_anyofm_nbound;
-#ifdef RC_NANYOFM
     dispatch[NANYOFM][NBOUND] = compare_mismatch;
-#endif
     dispatch[POSIXD][NBOUND] = compare_posix_nbound;
     dispatch[POSIXU][NBOUND] = compare_posix_nbound;
     dispatch[POSIXA][NBOUND] = compare_posix_nbound;
@@ -5756,9 +5569,7 @@ void rc_init()
     dispatch[ANYOFR][REG_ANY] = compare_anyofr_reg_any;
 #endif
     dispatch[ANYOFM][REG_ANY] = compare_anyofm_reg_any;
-#ifdef RC_NANYOFM
     dispatch[NANYOFM][REG_ANY] = compare_nanyofm_reg_any;
-#endif
     dispatch[POSIXD][REG_ANY] = compare_posix_reg_any;
     dispatch[POSIXU][REG_ANY] = compare_posix_reg_any;
     dispatch[POSIXA][REG_ANY] = compare_posix_reg_any;
@@ -5798,9 +5609,7 @@ void rc_init()
     dispatch[ANYOFR][SANY] = compare_tails;
 #endif
     dispatch[ANYOFM][SANY] = compare_tails;
-#ifdef RC_NANYOFM
     dispatch[NANYOFM][SANY] = compare_tails;
-#endif
     dispatch[POSIXD][SANY] = compare_tails;
     dispatch[POSIXU][SANY] = compare_tails;
     dispatch[POSIXA][SANY] = compare_tails;
@@ -5840,9 +5649,7 @@ void rc_init()
     dispatch[ANYOFR][ANYOF] = compare_anyofr_anyof;
 #endif
     dispatch[ANYOFM][ANYOF] = compare_anyofm_anyof;
-#ifdef RC_NANYOFM
     dispatch[NANYOFM][ANYOF] = compare_mismatch;
-#endif
     dispatch[POSIXD][ANYOF] = compare_posix_anyof;
     dispatch[POSIXU][ANYOF] = compare_posix_anyof;
     dispatch[POSIXA][ANYOF] = compare_posix_anyof;
@@ -5882,9 +5689,7 @@ void rc_init()
     dispatch[ANYOFR][ANYOFD] = compare_anyofr_anyof;
 #endif
     dispatch[ANYOFM][ANYOFD] = compare_anyofm_anyof;
-#ifdef RC_NANYOFM
     dispatch[NANYOFM][ANYOFD] = compare_mismatch;
-#endif
     dispatch[POSIXD][ANYOFD] = compare_posix_anyof;
     dispatch[POSIXU][ANYOFD] = compare_posix_anyof;
     dispatch[POSIXA][ANYOFD] = compare_posix_anyof;
@@ -5920,9 +5725,7 @@ void rc_init()
     dispatch[ANYOF][ANYOFR] = compare_anyof_anyofr;
     dispatch[ANYOFR][ANYOFR] = compare_anyofr_anyofr;
     dispatch[ANYOFM][ANYOFR] = compare_anyofm_anyofr;
-#ifdef RC_NANYOFM
     dispatch[NANYOFM][ANYOFR] = compare_mismatch;
-#endif
     dispatch[POSIXD][ANYOFR] = compare_mismatch;
     dispatch[POSIXU][ANYOFR] = compare_mismatch;
     dispatch[POSIXA][ANYOFR] = compare_mismatch;
@@ -5962,9 +5765,7 @@ void rc_init()
     dispatch[ANYOFR][ANYOFM] = compare_anyofr_anyofm;
 #endif
     dispatch[ANYOFM][ANYOFM] = compare_anyofm_anyofm;
-#ifdef RC_NANYOFM
     dispatch[NANYOFM][ANYOFM] = compare_mismatch;
-#endif
     dispatch[POSIXD][ANYOFM] = compare_mismatch;
     dispatch[POSIXU][ANYOFM] = compare_mismatch;
     dispatch[POSIXA][ANYOFM] = compare_mismatch;
@@ -5990,7 +5791,6 @@ void rc_init()
     dispatch[LNBREAK][ANYOFM] = compare_mismatch;
     dispatch[OPTIMIZED][ANYOFM] = compare_left_tail;
 
-#ifdef RC_NANYOFM
     dispatch[SUCCEED][NANYOFM] = compare_left_tail;
     dispatch[MBOL][NANYOFM] = compare_bol;
     dispatch[SBOL][NANYOFM] = compare_bol;
@@ -6029,7 +5829,6 @@ void rc_init()
     dispatch[MINMOD][NANYOFM] = compare_left_tail;
     dispatch[LNBREAK][NANYOFM] = compare_mismatch;
     dispatch[OPTIMIZED][NANYOFM] = compare_left_tail;
-#endif
 
     dispatch[SUCCEED][POSIXD] = compare_left_tail;
     dispatch[MBOL][POSIXD] = compare_bol;
@@ -6044,9 +5843,7 @@ void rc_init()
     dispatch[ANYOFR][POSIXD] = compare_anyofr_posix;
 #endif
     dispatch[ANYOFM][POSIXD] = compare_anyofm_posix;
-#ifdef RC_NANYOFM
     dispatch[NANYOFM][POSIXD] = compare_nanyofm_posix;
-#endif
     dispatch[POSIXD][POSIXD] = compare_posix_posix;
     dispatch[POSIXU][POSIXD] = compare_posix_posix;
     dispatch[POSIXA][POSIXD] = compare_posix_posix;
@@ -6084,9 +5881,7 @@ void rc_init()
     dispatch[ANYOFR][POSIXU] = compare_anyofr_posix;
 #endif
     dispatch[ANYOFM][POSIXU] = compare_anyofm_posix;
-#ifdef RC_NANYOFM
     dispatch[NANYOFM][POSIXU] = compare_nanyofm_posix;
-#endif
     dispatch[POSIXD][POSIXU] = compare_posix_posix;
     dispatch[POSIXA][POSIXU] = compare_posix_posix;
     dispatch[POSIXU][POSIXU] = compare_posix_posix;
@@ -6125,9 +5920,7 @@ void rc_init()
     dispatch[ANYOFR][POSIXA] = compare_anyofr_posix;
 #endif
     dispatch[ANYOFM][POSIXA] = compare_anyofm_posix;
-#ifdef RC_NANYOFM
     dispatch[NANYOFM][POSIXA] = compare_nanyofm_posix;
-#endif
     dispatch[POSIXD][POSIXA] = compare_mismatch;
     dispatch[POSIXU][POSIXA] = compare_mismatch;
     dispatch[POSIXA][POSIXA] = compare_posix_posix;
@@ -6165,9 +5958,7 @@ void rc_init()
     dispatch[ANYOFR][NPOSIXD] = compare_anyofr_negative_posix;
 #endif
     dispatch[ANYOFM][NPOSIXD] = compare_anyofm_negative_posix;
-#ifdef RC_NANYOFM
     dispatch[NANYOFM][NPOSIXD] = compare_nanyofm_negative_posix;
-#endif
     dispatch[POSIXD][NPOSIXD] = compare_posix_negative_posix;
     dispatch[POSIXU][NPOSIXD] = compare_posix_negative_posix;
     dispatch[POSIXA][NPOSIXD] = compare_posix_negative_posix;
@@ -6205,9 +5996,7 @@ void rc_init()
     dispatch[ANYOFR][NPOSIXU] = compare_anyofr_negative_posix;
 #endif
     dispatch[ANYOFM][NPOSIXU] = compare_anyofm_negative_posix;
-#ifdef RC_NANYOFM
     dispatch[NANYOFM][NPOSIXU] = compare_nanyofm_negative_posix;
-#endif
     dispatch[POSIXD][NPOSIXU] = compare_posix_negative_posix;
     dispatch[POSIXU][NPOSIXU] = compare_posix_negative_posix;
     dispatch[POSIXA][NPOSIXU] = compare_posix_negative_posix;
@@ -6245,9 +6034,7 @@ void rc_init()
     dispatch[ANYOFR][NPOSIXA] = compare_anyofr_negative_posix;
 #endif
     dispatch[ANYOFM][NPOSIXA] = compare_anyofm_negative_posix;
-#ifdef RC_NANYOFM
     dispatch[NANYOFM][NPOSIXA] = compare_nanyofm_negative_posix;
-#endif
     dispatch[POSIXD][NPOSIXA] = compare_posix_negative_posix;
     dispatch[POSIXU][NPOSIXA] = compare_posix_negative_posix;
     dispatch[POSIXA][NPOSIXA] = compare_posix_negative_posix;
@@ -6308,9 +6095,7 @@ void rc_init()
     dispatch[ANYOFR][EXACT] = compare_anyofr_exact;
 #endif
     dispatch[ANYOFM][EXACT] = compare_anyofm_exact;
-#ifdef RC_NANYOFM
     dispatch[NANYOFM][EXACT] = compare_mismatch;
-#endif
     dispatch[POSIXD][EXACT] = compare_mismatch;
     dispatch[POSIXU][EXACT] = compare_mismatch;
     dispatch[POSIXA][EXACT] = compare_mismatch;
@@ -6350,9 +6135,7 @@ void rc_init()
     dispatch[ANYOFR][EXACTF] = compare_anyofr_exactf;
 #endif
     dispatch[ANYOFM][EXACTF] = compare_anyofm_exactf;
-#ifdef RC_NANYOFM
     dispatch[NANYOFM][EXACTF] = compare_mismatch;
-#endif
     dispatch[POSIXD][EXACTF] = compare_mismatch;
     dispatch[POSIXU][EXACTF] = compare_mismatch;
     dispatch[POSIXA][EXACTF] = compare_mismatch;
@@ -6391,9 +6174,7 @@ void rc_init()
     dispatch[ANYOFR][EXACTFU] = compare_anyofr_exactf;
 #endif
     dispatch[ANYOFM][EXACTFU] = compare_anyofm_exactf;
-#ifdef RC_NANYOFM
     dispatch[NANYOFM][EXACTFU] = compare_mismatch;
-#endif
     dispatch[POSIXD][EXACTFU] = compare_mismatch;
     dispatch[POSIXU][EXACTFU] = compare_mismatch;
     dispatch[POSIXA][EXACTFU] = compare_mismatch;
@@ -6605,9 +6386,7 @@ void rc_init()
     dispatch[ANYOFR][IFMATCH] = compare_mismatch;
 #endif
     dispatch[ANYOFM][IFMATCH] = compare_mismatch;
-#ifdef RC_NANYOFM
     dispatch[NANYOFM][IFMATCH] = compare_mismatch;
-#endif
     dispatch[POSIXD][IFMATCH] = compare_mismatch;
     dispatch[POSIXU][IFMATCH] = compare_mismatch;
     dispatch[POSIXA][IFMATCH] = compare_mismatch;
@@ -6647,9 +6426,7 @@ void rc_init()
     dispatch[ANYOFR][UNLESSM] = compare_mismatch;
 #endif
     dispatch[ANYOFM][UNLESSM] = compare_mismatch;
-#ifdef RC_NANYOFM
     dispatch[NANYOFM][UNLESSM] = compare_mismatch;
-#endif
     dispatch[POSIXD][UNLESSM] = compare_mismatch;
     dispatch[POSIXU][UNLESSM] = compare_mismatch;
     dispatch[POSIXA][UNLESSM] = compare_mismatch;
@@ -6704,9 +6481,7 @@ void rc_init()
     dispatch[ANYOFR][LNBREAK] = compare_mismatch;
 #endif
     dispatch[ANYOFM][LNBREAK] = compare_mismatch;
-#ifdef RC_NANYOFM
     dispatch[NANYOFM][LNBREAK] = compare_mismatch;
-#endif
     dispatch[POSIXD][LNBREAK] = compare_posix_lnbreak;
     dispatch[POSIXU][LNBREAK] = compare_posix_lnbreak;
     dispatch[POSIXA][LNBREAK] = compare_posix_lnbreak;

@@ -1,5 +1,3 @@
-use strictures;
-
 use Test2::V0;
 use Test2::Require::Module 'Software::LicenseUtils' => '0.103014';
 

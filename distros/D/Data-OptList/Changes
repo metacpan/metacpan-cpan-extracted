@@ -1,5 +1,14 @@
 Revision history for Sub-Exporter
 
+0.112     2021-06-26 11:01:31-04:00 America/New_York
+        - no changes since last trial release (0.111)
+
+0.111     2021-06-20 20:55:10-04:00 America/New_York (TRIAL RELEASE)
+        - update author contact info
+        - add perl version support to docs
+        - replace a "goto" deep in the guts with a sub call, for speed (thanks,
+          Olivier Mengué and Graham Knop)
+
 0.110     2016-03-24 21:20:54-04:00 America/New_York
         - major optimization to mkopt (thanks, Olivier Mengué)
 

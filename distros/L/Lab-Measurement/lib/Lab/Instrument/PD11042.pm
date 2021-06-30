@@ -1,5 +1,5 @@
 package Lab::Instrument::PD11042;
-$Lab::Instrument::PD11042::VERSION = '3.751';
+$Lab::Instrument::PD11042::VERSION = '3.760';
 #ABSTRACT: Trinamic PD-110-42 low-cost 42mm stepper motor
 
 use v5.20;
@@ -772,7 +772,7 @@ Lab::Instrument::PD11042 - Trinamic PD-110-42 low-cost 42mm stepper motor
 
 =head1 VERSION
 
-version 3.751
+version 3.760
 
 =head1 SYNOPSIS
 
@@ -818,12 +818,12 @@ Itemid=355>
 
 This software is copyright (c) 2021 by the Lab::Measurement team; in detail:
 
-  Copyright 2012       Andreas K. Huettel
-            2013       Andreas K. Huettel, Christian Butschkow
+  Copyright 2012       Andreas K. HÃ¼ttel
+            2013       Andreas K. HÃ¼ttel, Christian Butschkow
             2014       Christian Butschkow
             2016       Simon Reinhardt
-            2017       Andreas K. Huettel
-            2020       Andreas K. Huettel, Simon Reinhardt
+            2017       Andreas K. HÃ¼ttel
+            2020       Andreas K. HÃ¼ttel, Simon Reinhardt
 
 
 This is free software; you can redistribute it and/or modify it under

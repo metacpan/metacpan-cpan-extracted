@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '0.534';
+our $VERSION = '0.535';
 use Exporter 'import';
 our @EXPORT_OK = qw( fill_form read_line );
 
@@ -63,18 +63,19 @@ sub _valid_options {
             auto_up            => '[ 0 1 2 ]',
             clear_screen       => '[ 0 1 2 ]',
             color              => '[ 0 1 2 ]',
-            hide_cursor        => '[ 0 1 2 ]', # hide_cursor == 2 # documentation
+            hide_cursor        => '[ 0 1 2 ]',       # hide_cursor == 2 # documentation
             no_echo            => '[ 0 1 2 ]',
-            page               => '[ 0 1 2 ]', # undocumented
+            page               => '[ 0 1 2 ]',       # undocumented
             keep               => '[ 1-9 ][ 0-9 ]*', # undocumented
             read_only          => 'Array_Int',
-            section_separators => 'Array_Int', # experimental
-                                               # uses only the key, a passed value is ignored
-                                               # it's up to the user to remove the section separators from the returned array
+            section_separators => 'Array_Int',       # 24.06.2021 removed
+            skip_items         => 'Regexp',          # experimental
+                                                     # only keys are checked, passed values are ignored
+                                                     # it's up to the user to remove the skipped items from the returned array
             back               => 'Str',
             confirm            => 'Str',
             default            => 'Str',
-            footer             => 'Str', # undocumented
+            footer             => 'Str',             # undocumented
             info               => 'Str',
             prompt             => 'Str',
         };
@@ -103,7 +104,8 @@ sub _valid_options {
             page               => '[ 0 1 2 ]',
             keep               => '[ 1-9 ][ 0-9 ]*',
             read_only          => 'Array_Int',
-            section_separators => 'Array_Int',
+            section_separators => 'Array_Int', # 24.06.2021 removed
+            skip_items         => 'Regexp',
             back               => 'Str',
             confirm            => 'Str',
             footer             => 'Str',
@@ -131,7 +133,8 @@ sub _defaults {
         page               => 1,
         prompt             => '',
         read_only          => [],
-        section_separators => [],
+        section_separators => [],           # 24.06.2021 removed
+        skip_items         => undef,
         show_context       => 0,
     };
 }
@@ -408,7 +411,7 @@ sub __init_readline {
     $self->{i}{th} = int( $self->{i}{avail_w} / 5 );
     $self->{i}{th} = 40 if $self->{i}{th} > 40;
     if ( $self->{page} == 2 ) {
-        $self->{i}{page_count} = 1;
+        $self->{i}{page_count} = 1; ##
         $self->{i}{print_footer} = 1;
         $self->__prepare_footer_fmt();
     }
@@ -878,7 +881,7 @@ sub __length_longest_key {
         if ( $i < @{$self->{i}{pre}} ) {
             next;
         }
-        if ( any { $_ == $i } @{$self->{i}{section_separators}} ) {
+        if ( any { $_ == $i } @{$self->{i}{keys_to_skip}} ) {
             next;
         }
         my $len = print_columns( $list->[$i][0] );
@@ -990,8 +993,8 @@ sub __get_row {
     if ( $idx < @{$self->{i}{pre}} ) {
         return $list->[$idx][0];
     }
-    if ( any { $_ == $idx } @{$self->{i}{section_separators}} ) {
-        return $self->__get_row_section_separator( $list, $idx );
+    if ( any { $_ == $idx } @{$self->{i}{keys_to_skip}} ) {
+        return $self->__get_row_section_separator( $list, $idx ); ## name
     }
     if ( ! defined $self->{i}{keys}[$idx] ) {
         my $key = $list->[$idx][0];
@@ -1186,8 +1189,21 @@ sub fill_form {
     if ( @{$self->{read_only}} ) {
         $self->{i}{read_only} = [ map { $_ + @{$self->{i}{pre}} } @{$self->{read_only}} ];
     }
-    $self->{i}{section_separators} = [];
-    if ( @{$self->{section_separators}} ) {
+
+    $self->{i}{keys_to_skip} = [];
+    if ( defined $self->{skip_items} ) {
+        for my $i ( 0 .. $#$orig_list ) {
+            if ( $orig_list->[$i][0] =~ $self->{skip_items} ) {
+                push @{$self->{i}{keys_to_skip}}, $i + @{$self->{i}{pre}};
+            }
+            else {
+                $self->{i}{end_down} = $i;
+            }
+        }
+        $self->{i}{end_down} += @{$self->{i}{pre}};
+    }
+    #########################################################################################  24.06.2021  ####  App::DBBrowser < 2.269 use 'section_separators'
+    elsif ( @{$self->{section_separators}||[]} ) {
         $self->{i}{end_down} = $#$orig_list;
         my $id = -1;
         if ( $self->{section_separators}[$id] == $#$orig_list ) {
@@ -1195,7 +1211,12 @@ sub fill_form {
                 --$self->{i}{end_down};
             }
         }
-        $self->{i}{section_separators} = [ map { $_ + @{$self->{i}{pre}} } @{$self->{section_separators}} ];
+        $self->{i}{keys_to_skip} = [ map { $_ + @{$self->{i}{pre}} } @{$self->{section_separators}} ];
+        $self->{i}{end_down} += @{$self->{i}{pre}};
+    }
+    ############################################################################################################
+    else {
+        $self->{i}{end_down} = $#$orig_list + @{$self->{i}{pre}};
     }
     my $list;
     if ( $self->{color} ) {
@@ -1239,7 +1260,7 @@ sub fill_form {
             $self->__print_current_row( $list, $m );
         }
         my $char;
-        if ( any { $_ == $self->{i}{curr_row} } @{$self->{i}{section_separators}} ) {
+        if ( any { $_ == $self->{i}{curr_row} } @{$self->{i}{keys_to_skip}} ) {
             if ( $self->{i}{direction} eq 'up' || $self->{i}{curr_row} >= $self->{i}{end_down} ) {
                 $char = VK_UP;
             }
@@ -1435,9 +1456,16 @@ sub fill_form {
                 return;
             }
             elsif ( $list->[$self->{i}{curr_row}][0] eq $self->{confirm} ) {                                        # if ENTER on {confirm/1}: leave and return result
-                splice @$list, 0, @{$self->{i}{pre}};
-                $self->__reset_term( $up );
-                return [ map { [ $orig_list->[$_][0], $list->[$_][1] ] } 0 .. $#{$list} ];
+                #if ( @{$self->{i}{valid_keys}} ) { ##
+                #    my $valid_keys = $self->{i}{valid_keys};
+                #    my $pre_count = @{$self->{i}{pre}};
+                #    $self->__reset_term( $up );
+                #    return [ map { [ $orig_list->[$_-$pre_count][0], $list->[$_][1] ] } @$valid_keys ];
+                #else {
+                    splice @$list, 0, @{$self->{i}{pre}};
+                    $self->__reset_term( $up );
+                    return [ map { [ $orig_list->[$_][0], $list->[$_][1] ] } 0 .. $#{$list} ];
+                #}
             }
             if ( $auto_up == 2 ) {                                                                                  # if ENTER && "auto_up" == 2 && any row: jumps {back/0}
                 print up( $up );
@@ -1538,7 +1566,7 @@ Term::Form - Read lines from STDIN.
 
 =head1 VERSION
 
-Version 0.534
+Version 0.535
 
 =cut
 
@@ -1631,11 +1659,7 @@ The fist argument is the prompt string.
 The optional second argument is the default string (see option I<default>) if it is not a reference. If the second
 argument is a hash-reference, the hash is used to set the different options. The keys/options are
 
-=over
-
-=item
-
-clear_screen
+=head3 clear_screen
 
 If enabled, the screen is cleared before the output.
 
@@ -1648,57 +1672,7 @@ I<clear_screen> where set to 0.
 
 default: C<0>
 
-=item
-
-color
-
-Enables the support for color and text formatting escape sequences for the prompt string and the I<info> text.
-
-0 - off
-
-1 - on
-
-default: C<0>
-
-=item
-
-info
-
-Expects as is value a string. If set, the string is printed on top of the output of C<readline>.
-
-=item
-
-default
-
-Set a initial value of input.
-
-=item
-
-no_echo
-
-- if set to C<0>, the input is echoed on the screen.
-
-- if set to C<1>, "C<*>" are displayed instead of the characters.
-
-- if set to C<2>, no output is shown apart from the prompt string.
-
-default: C<0>
-
-=item
-
-show_context
-
-Display the input that does not fit into the "readline" before or after the "readline".
-
-0 - disable I<show_context>
-
-1 - enable I<show_context>
-
-default: C<0>
-
-=item
-
-codepage_mapping
+=head3 codepage_mapping
 
 This option has only meaning if the operating system is MSWin32.
 
@@ -1714,9 +1688,21 @@ Setting this option to C<1> enables the codepage mapping offered by L<Win32::Con
 
 default: C<0>
 
-=item
+=head3 color
 
-hide_cursor
+Enables the support for color and text formatting escape sequences for the prompt string and the I<info> text.
+
+0 - off
+
+1 - on
+
+default: C<0>
+
+=head3 default
+
+Set a initial value of input.
+
+=head3 hide_cursor
 
 0 - disabled
 
@@ -1724,7 +1710,29 @@ hide_cursor
 
 default: C<1>
 
-=back
+=head3 info
+
+Expects as is value a string. If set, the string is printed on top of the output of C<readline>.
+
+=head3 no_echo
+
+- if set to C<0>, the input is echoed on the screen.
+
+- if set to C<1>, "C<*>" are displayed instead of the characters.
+
+- if set to C<2>, no output is shown apart from the prompt string.
+
+default: C<0>
+
+=head3 show_context
+
+Display the input that does not fit into the "readline" before or after the "readline".
+
+0 - disable I<show_context>
+
+1 - enable I<show_context>
+
+default: C<0>
 
 =head2 fill_form
 
@@ -1738,50 +1746,7 @@ as the default value for the "readline" (initial value of input).
 
 The optional second argument is a hash-reference. The keys/options are
 
-=over
-
-=item
-
-clear_screen
-
-If enabled, the screen is cleared before the output.
-
-0 - off
-
-1 - on
-
-default: C<0>
-
-=item
-
-color
-
-Enables the support for color and text formatting escape sequences for the form-keys, the "back"-string, the
-"confirm"-string, the I<info> text and the I<prompt> text.
-
-0 - off
-
-1 - on
-
-default: C<0>
-
-=item
-
-info
-
-Expects as is value a string. If set, the string is printed on top of the output of C<fill_form>.
-
-=item
-
-prompt
-
-If I<prompt> is set, a main prompt string is shown on top of the output.
-
-default: undefined
-
-=item
-
-auto_up
+=head3 auto_up
 
 With I<auto_up> set to C<0> or C<1> pressing C<ENTER> moves the cursor to the next line (if the cursor is not on the
 "back" or "confirm" row). If the last row is reached, the cursor jumps to the first data row if C<ENTER> is pressed.
@@ -1797,35 +1762,7 @@ initially cursor position is on the first menu entry ("back").
 
 default: C<1>
 
-=item
-
-clear_screen
-
-If enabled, the screen is cleared before the output.
-
-default: disabled
-
-=item
-
-read_only
-
-Set a form-row to read only.
-
-Expected value: a reference to an array with the indexes of the rows which should be read only.
-
-default: empty array
-
-=item
-
-confirm
-
-Set the name of the "confirm" menu entry.
-
-default: C<Confirm>
-
-=item
-
-back
+=head3 back
 
 Set the name of the "back" menu entry.
 
@@ -1833,9 +1770,17 @@ The "back" menu entry can be disabled by setting I<back> to an empty string.
 
 default: C<Back>
 
-=item
+=head3 clear_screen
 
-codepage_mapping
+If enabled, the screen is cleared before the output.
+
+0 - off
+
+1 - on
+
+default: C<0>
+
+=head3 codepage_mapping
 
 This option has only meaning if the operating system is MSWin32.
 
@@ -1851,9 +1796,24 @@ Setting this option to C<1> enables the codepage mapping offered by L<Win32::Con
 
 default: C<0>
 
-=item
+=head3 color
 
-hide_cursor
+Enables the support for color and text formatting escape sequences for the form-keys, the "back"-string, the
+"confirm"-string, the I<info> text and the I<prompt> text.
+
+0 - off
+
+1 - on
+
+default: C<0>
+
+=head3 confirm
+
+Set the name of the "confirm" menu entry.
+
+default: C<Confirm>
+
+=head3 hide_cursor
 
 0 - disabled
 
@@ -1861,7 +1821,23 @@ hide_cursor
 
 default: C<1>
 
-=back
+=head3 info
+
+Expects as is value a string. If set, the string is printed on top of the output of C<fill_form>.
+
+=head3 prompt
+
+If I<prompt> is set, a main prompt string is shown on top of the output.
+
+default: undefined
+
+=head3 read_only
+
+Set a form-row to read only.
+
+Expected value: a reference to an array with the indexes of the rows which should be read only.
+
+default: empty array
 
 To close the form and get the modified list (reference to an array or arrays) as the return value select the
 "confirm" menu entry. If the "back" menu entry is chosen to close the form, C<fill_form> returns nothing.

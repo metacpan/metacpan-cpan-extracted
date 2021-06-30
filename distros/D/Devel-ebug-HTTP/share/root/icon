@@ -1,0 +1,20 @@
+<td>
+  <table border=0>
+    <tr>
+      <td>
+        <div id="icon_graphic">
+          <form name="myform" method="post" action="[% url %]#top">
+            <input type="hidden" name="sequence" value="[% sequence %]"/>
+            <input type="hidden" name="myaction" value="[% text %]"/>
+            <input type="image" src="/[% image %]">
+          </form>
+        </div>
+      </tr>
+    </td>
+    <tr>
+      <td>
+        <div id="icon_text">[% text %]</div>
+      </td>
+    </tr>
+  </table>
+</td>

@@ -1,6 +1,6 @@
 use v5.20.0;
 use warnings;
-package Pod::Weaver::PluginBundle::RJBS 5.018;
+package Pod::Weaver::PluginBundle::RJBS 5.019;
 # ABSTRACT: RJBS's default Pod::Weaver config
 
 #pod =head1 OVERVIEW
@@ -68,6 +68,13 @@ perl than v5.8.1.  This version may change by agreement of the Toolchain Gang,
 but for now is governed by the L<Lancaster
 Consensus|https://github.com/Perl-Toolchain-Gang/toolchain-site/blob/master/lancaster-consensus.md>
 of 2013.
+END
+
+$SUPPORT{none} = <<'END';
+This code is effectively abandonware.  Although releases will sometimes be made
+to update contact info or to fix packaging flaws, bug reports will mostly be
+ignored.  Feature requests are even more likely to be ignored.  (If someone
+takes up maintenance of this code, they will presumably remove this notice.)
 END
 
 my $STOCK = <<'END';
@@ -139,7 +146,7 @@ Pod::Weaver::PluginBundle::RJBS - RJBS's default Pod::Weaver config
 
 =head1 VERSION
 
-version 5.018
+version 5.019
 
 =head1 OVERVIEW
 

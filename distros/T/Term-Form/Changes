@@ -1,6 +1,10 @@
 Revision history for Term::Form
 
 
+0.535   2021-06-30
+        - Replaced the option 'section_separators' with the option 'skip_items'.
+        - Update documentation.
+
 0.534   2021-06-22
         - Use Carp again.
         - New options 'footer', 'keep' and 'page'.

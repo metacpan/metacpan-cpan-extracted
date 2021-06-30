@@ -1,3 +1,8 @@
+0.003   2021-06-27  Released-By: PERLANCAR; Urgency: medium
+
+	- Update prereq (renamed module Tree::{To,To::}TextLines).
+
+
 0.002   2020-02-23  Released-By: PERLANCAR; Urgency: medium
 
 	- Add methods: cd2, cwd2, ls2, mkdir2, rm2, showtree2 to manipulate

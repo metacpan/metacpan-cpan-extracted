@@ -1,4 +1,4 @@
-package Dist::Zilla::Types 6.020;
+package Dist::Zilla::Types 6.022;
 # ABSTRACT: dzil-specific type library
 
 # BEGIN BOILERPLATE
@@ -69,7 +69,7 @@ Dist::Zilla::Types - dzil-specific type library
 
 =head1 VERSION
 
-version 6.020
+version 6.022
 
 =head1 OVERVIEW
 

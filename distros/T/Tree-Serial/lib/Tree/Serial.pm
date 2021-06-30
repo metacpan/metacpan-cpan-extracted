@@ -5,7 +5,7 @@ use v5.12;
 
 use List::Util qw(min reduce sum zip);
 
-our $VERSION=0.1;
+our $VERSION=0.20;
 
 sub new {
     my ($class,$data) = @_;
@@ -24,9 +24,7 @@ sub _init {
 	(defined $data) ? (%{$data}) : (),
 	);
     (exists $data{showMissing}) && do {$self->{showMissing} = $data{showMissing}};
-    $self->{separator} = $data{separator};
-    $self->{degree} = $data{degree};
-    $self->{traversal} = $data{traversal};
+    @{$self}{qw(separator degree traversal)} = @data{qw(separator degree traversal)};    
 }
 
 sub _eatWhileNot {

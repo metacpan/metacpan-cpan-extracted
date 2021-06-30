@@ -3,9 +3,9 @@
 package Tree::Dump;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-02-06'; # DATE
+our $DATE = '2021-06-27'; # DATE
 our $DIST = 'Tree-Dump'; # DIST
-our $VERSION = '0.060'; # VERSION
+our $VERSION = '0.061'; # VERSION
 
 use 5.010001;
 use strict;
@@ -13,7 +13,7 @@ use warnings;
 
 use Data::Dmp;
 use Scalar::Util qw(blessed reftype);
-use Tree::ToTextLines qw(render_tree_as_text);
+use Tree::To::TextLines qw(render_tree_as_text);
 
 use Exporter qw(import);
 our @EXPORT = qw(td tdmp);
@@ -67,7 +67,7 @@ Tree::Dump - Dump a tree object
 
 =head1 VERSION
 
-This document describes version 0.060 of Tree::Dump (from Perl distribution Tree-Dump), released on 2020-02-06.
+This document describes version 0.061 of Tree::Dump (from Perl distribution Tree-Dump), released on 2021-06-27.
 
 =head1 SYNOPSIS
 
@@ -178,7 +178,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

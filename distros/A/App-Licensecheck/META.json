@@ -74,15 +74,14 @@
             "Encode::Locale" : "0",
             "File::Basename" : "0",
             "Test2::V0" : "0.000060",
-            "Test::Command::Simple" : "0",
-            "strictures" : "0"
+            "Test::Command::Simple" : "0"
          }
       }
    },
    "provides" : {
       "App::Licensecheck" : {
          "file" : "lib/App/Licensecheck.pm",
-         "version" : "v3.2.0"
+         "version" : "v3.2.1"
       }
    },
    "release_status" : "stable",
@@ -100,7 +99,7 @@
       },
       "x_identifier" : "http://purl.org/NET/cpan-uri/dist/App-Licensecheck/project"
    },
-   "version" : "v3.2.0",
+   "version" : "v3.2.1",
    "x_contributors" : [
       "Paul Wise <pabs@debian.org>"
    ],

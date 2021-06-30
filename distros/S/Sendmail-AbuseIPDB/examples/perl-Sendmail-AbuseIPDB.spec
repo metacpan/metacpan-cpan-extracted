@@ -1,6 +1,6 @@
 Summary: Sendmail-AbuseIPDB Perl module
 Name: perl-Sendmail-AbuseIPDB
-Version: 0.10
+Version: 0.21
 Release: 1
 License: GPL or Artistic
 Group: Development/Libraries
@@ -13,7 +13,7 @@ Requires: curl
 Requires: perl(URI) >= 1.4
 Requires: perl(JSON) >= 2.15
 Requires: perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
-Source0: Sendmail-AbuseIPDB-0.10.tar.gz
+Source0: Sendmail-AbuseIPDB-0.21.tar.gz
 
 %description
 %{summary}.
@@ -29,6 +29,7 @@ make %{?_smp_mflags} OPTIMIZE="$RPM_OPT_FLAGS"
 rm -rf $RPM_BUILD_ROOT
 
 make pure_install PERL_INSTALL_ROOT=$RPM_BUILD_ROOT
+find $RPM_BUILD_ROOT -name .packlist -exec /bin/rm "{}" ";"
 
 
 %clean
@@ -40,10 +41,17 @@ rm -rf $RPM_BUILD_ROOT
 %doc Changes README
 %{perl_vendorlib}/Sendmail/AbuseIPDB.pm
 %{_mandir}/man3/Sendmail::AbuseIPDB.3pm.gz
-%exclude /usr/lib/perl5/vendor_perl/auto/Sendmail/AbuseIPDB/.packlist
-
 
 %changelog
+* Fri Jun 25 2021 <ttndy@cpan.org> - 0.21-1
+- Clean up documentation and better examples.
+
+* Sat Jun 19 2021 <ttndy@cpan.org> - 0.20-2
+- Build OK on Centos 8 (64 bit).
+
+* Sun Oct 11 2020 <ttndy@cpan.org> - 0.20-1
+- Support for API v2 and blacklist download.
+
 * Fri Sep 29 2017 <ttndy@cpan.org> - 0.10-1
 - Might have finally got the thing to install in the correct directory (documentation is kind of unhelpful).
 

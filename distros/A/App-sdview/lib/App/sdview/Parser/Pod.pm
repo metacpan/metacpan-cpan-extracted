@@ -7,7 +7,7 @@ use v5.26;
 
 use Object::Pad 0.41;
 
-package App::sdview::Parser::Pod 0.01;
+package App::sdview::Parser::Pod 0.02;
 class App::sdview::Parser::Pod
    isa Pod::Simple
    does App::sdview::Parser;

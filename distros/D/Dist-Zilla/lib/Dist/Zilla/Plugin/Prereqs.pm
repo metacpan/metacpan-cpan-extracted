@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::Prereqs 6.020;
+package Dist::Zilla::Plugin::Prereqs 6.022;
 # ABSTRACT: list simple prerequisites
 
 use Moose;
@@ -224,7 +224,7 @@ Dist::Zilla::Plugin::Prereqs - list simple prerequisites
 
 =head1 VERSION
 
-version 6.020
+version 6.022
 
 =head1 SYNOPSIS
 

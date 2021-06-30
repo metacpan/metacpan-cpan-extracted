@@ -2111,13 +2111,10 @@ CODE:
 	if (html5_dom_is_fragment(new_node)) {
 		myhtml_tree_node_t *fragment_child = myhtml_node_child(new_node);
 		while (fragment_child) {
-			myhtml_tree_node_t *fragment_child = myhtml_node_child(new_node);
-			while (fragment_child) {
-				myhtml_tree_node_t *next = myhtml_node_next(fragment_child);
-				myhtml_tree_node_remove(fragment_child);
-				myhtml_tree_node_insert_before(old_node, fragment_child);
-				fragment_child = next;
-			}
+			myhtml_tree_node_t *next = myhtml_node_next(fragment_child);
+			myhtml_tree_node_remove(fragment_child);
+			myhtml_tree_node_insert_before(old_node, fragment_child);
+			fragment_child = next;
 		}
 	} else {
 		myhtml_tree_node_remove(new_node);
@@ -2957,7 +2954,9 @@ int
 detect(SV *text, long max_len = 0)
 ALIAS:
 	detectByPrescanStream	= 1
-	detectRussian			= 2
+	detectCyrillic			= 2
+	detectUkrainian			= 21
+	detectRussian			= 22
 	detectUnicode			= 3
 	detectBom				= 4
 	detectByCharset			= 5
@@ -2981,6 +2980,8 @@ CODE:
 			encoding = myencoding_prescan_stream_to_determine_encoding(text_str, text_len);
 		break;
 		case 2:
+		case 21:
+		case 22:
 			if (!myencoding_detect_russian(text_str, text_len, &encoding))
 				encoding = MyENCODING_NOT_DETERMINED;
 		break;

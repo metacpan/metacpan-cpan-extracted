@@ -1,5 +1,5 @@
 package Photonic::LE::S::EpsTensor;
-$Photonic::LE::S::EpsTensor::VERSION = '0.016';
+$Photonic::LE::S::EpsTensor::VERSION = '0.017';
 
 =encoding UTF-8
 
@@ -9,7 +9,7 @@ Photonic::LE::S::EpsTensor
 
 =head1 VERSION
 
-version 0.016
+version 0.017
 
 =head1 COPYRIGHT NOTICE
 
@@ -165,12 +165,12 @@ with 'Photonic::Roles::KeepStates', 'Photonic::Roles::UseMask', 'Photonic::Roles
 sub _build_epsTensor {
     my $self=shift;
     $self->_converged(all { $_->converged } @{$self->epsL});
-    tensor(pdl([map $_->epsL, @{$self->epsL}])->complex, $self->geometry->unitDyadsLU, $self->geometry->B->ndims, 2);
+    tensor(pdl([map $_->epsL, @{$self->epsL}]), $self->geometry->unitDyadsLU, $self->geometry->B->ndims, 2);
 }
 
 sub _build_nr { # One Haydock coefficients calculator per direction0
     my $self=shift;
-    make_haydock($self, 'Photonic::LE::S::AllH', 1);
+    make_haydock($self, 'Photonic::LE::S::AllH', $self->geometry->unitPairs, 1, qw(reorthogonalize use_mask mask));
 }
 
 sub _build_epsL {

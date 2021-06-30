@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument;
-$Lab::Moose::Instrument::VERSION = '3.751';
+$Lab::Moose::Instrument::VERSION = '3.760';
 #ABSTRACT: Base class for instrument drivers
 
 use v5.20;
@@ -274,7 +274,7 @@ Lab::Moose::Instrument - Base class for instrument drivers
 
 =head1 VERSION
 
-version 3.751
+version 3.760
 
 =head1 SYNOPSIS
 
@@ -425,9 +425,9 @@ Analog to C<validated_channel_getter>.
 This software is copyright (c) 2021 by the Lab::Measurement team; in detail:
 
   Copyright 2016       Simon Reinhardt
-            2017       Andreas K. Huettel, Simon Reinhardt
+            2017       Andreas K. HÃ¼ttel, Simon Reinhardt
             2018       Simon Reinhardt
-            2020       Andreas K. Huettel, Sam Bingner
+            2020       Andreas K. HÃ¼ttel, Sam Bingner
 
 
 This is free software; you can redistribute it and/or modify it under

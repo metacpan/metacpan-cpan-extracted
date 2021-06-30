@@ -63,6 +63,7 @@ sub union_tables {
             $menu,
             { %{$sf->{i}{lyt_v}}, info => $info, prompt => $prompt, index => 1 }
         );
+        $ax->print_sql_info( $info );
         if ( ! defined $idx_tbl || ! defined $menu->[$idx_tbl] ) {
             if ( @bu ) {
                 ( $union->{used_tables}, $union->{subselect_data}, $union->{saved_cols} ) = @{pop @bu};
@@ -93,7 +94,7 @@ sub union_tables {
                 next UNION_TABLE;
             }
             my $default_alias = 'U_TBL_' . $unique_char++;
-            my $alias = $ax->alias( 'union', $union_table, $default_alias );
+            my $alias = $ax->alias( $union, 'union', $union_table, $default_alias );
             $qt_union_table = $union_table . " AS " . $ax->quote_col_qualified( [ $alias ] );
             my $sth = $sf->{d}{dbh}->prepare( "SELECT * FROM " . $qt_union_table . " LIMIT 0" );
             $sth->execute() if $sf->{i}{driver} ne 'SQLite';
@@ -106,17 +107,15 @@ sub union_tables {
         }
         push @bu, [ [ @{$union->{used_tables}} ], [ @{$union->{subselect_data}} ], [ @{$union->{saved_cols}} ] ];
         push @{$union->{used_tables}}, $union_table;
-        $ax->print_sql_info( $union );
         my $ok = $sf->__union_table_columns( $union, $union_table, $qt_union_table );
         if ( ! $ok ) {
             ( $union->{used_tables}, $union->{subselect_data}, $union->{saved_cols} ) = @{pop @bu};
             next UNION_TABLE;
         }
     }
-    $ax->print_sql_info( $union );
     my $qt_table = $ax->get_stmt( $union, 'Union', 'prepare' );
     # alias: required if mysql, Pg, ...
-    my $alias = $ax->alias( 'union', '', "TABLES_UNION" );
+    my $alias = $ax->alias( $union, 'union', '', "TABLES_UNION" );
     $qt_table .= " AS " . $ax->quote_col_qualified( [ $alias ] );
     # column names in the result-set of a UNION are taken from the first query.
     my $qt_columns = $union->{subselect_data}[0][1];
@@ -142,6 +141,7 @@ sub __union_table_columns {
             { %{$sf->{i}{lyt_h}}, info => $info, prompt => 'Choose Column:',
               meta_items => [ 0 .. $#pre ], include_highlighted => 2 }
         );
+        $ax->print_sql_info( $info );
         if ( ! defined $chosen[0] ) {
             if ( @bu_cols ) {
                 $table_cols = pop @bu_cols;
@@ -198,6 +198,7 @@ sub __union_all_tables {
             $menu,
             { %{$sf->{i}{lyt_v}}, info => $info, prompt => 'One UNION table for cols:', index => 1 }
         );
+        $ax->print_sql_info( $info );
         if ( ! defined $idx_tbl || ! defined $menu->[$idx_tbl] ) {
             $union->{subselect_data} = [];
             return;
@@ -214,7 +215,6 @@ sub __union_all_tables {
     for my $union_table ( @tables_union_auto ) {
         push @{$union->{subselect_data}}, [ $ax->quote_table( $sf->{d}{tables_info}{$union_table} ), $qt_used_cols ];
     }
-    $ax->print_sql_info( $union );
     return 1;
 }
 

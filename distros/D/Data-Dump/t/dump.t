@@ -2,7 +2,7 @@
 
 use strict;
 use Test qw(plan ok);
-plan tests => 34;
+plan tests => 38;
 
 use Data::Dump qw(dump);
 
@@ -19,6 +19,10 @@ ok(dump(0.333), "0.333");
 ok(dump(1/3), qr/^0\.3+\z/);
 ok(dump(-33), "-33");
 ok(dump(-1.5), "-1.5");
+ok(dump("Inf"), qq("Inf"));
+ok(dump("-Inf"), qq("-Inf"));
+ok(dump("nan"), qq("nan"));
+ok(dump("NaN"), qq("NaN"));
 ok(dump("0123"), qq("0123"));
 ok(dump(1..2), "(1, 2)");
 ok(dump(1..3), "(1, 2, 3)");

@@ -4,9 +4,9 @@ use warnings;
 use lib qw(./lib t/lib);
 
 my $driver;
-use Neo4j::Test;
+use Neo4j_Test;
 BEGIN {
-	unless ($driver = Neo4j::Test->driver) {
+	unless ( $driver = Neo4j_Test->driver() ) {
 		print qq{1..0 # SKIP no connection to Neo4j server\n};
 		exit;
 	}
@@ -46,7 +46,7 @@ END
 	lives_ok { $r = $s->run($q)->summary; } 'get summary with plan';
 	lives_and { is_deeply $r->statement->{parameters}, {} } 'no params';
 	my ($plan, @notifications);
-	TODO: { local $TODO = 'plan/notifications not yet implemented for Bolt' if $Neo4j::Test::bolt;
+	TODO: { local $TODO = 'plan/notifications not yet implemented for Bolt' if $Neo4j_Test::bolt;
 	lives_and { ok $plan = $r->plan; } 'get plan';
 	lives_and { ok @notifications = $r->notifications; } 'get notifications';
 	# NB: the server is a bit unreliable in providing notifications; if there are problems with this test, restarting the server usually helps

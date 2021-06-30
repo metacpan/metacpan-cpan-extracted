@@ -1,11 +1,12 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/RegexpPatternUtils/match_with_regexp_pattern
-# and generated automatically using Perinci::CmdLine::Gen version 0.491
+# and generated automatically using Perinci::CmdLine::Gen version 0.499
 
-our $DATE = '2020-01-03'; # DATE
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-06-27'; # DATE
 our $DIST = 'App-RegexpPatternUtils'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 use 5.010001;
 use strict;
@@ -38,13 +39,17 @@ match-with-regexp-pattern - Match a string against a Regexp::Pattern pattern
 
 =head1 VERSION
 
-This document describes version 0.004 of match-with-regexp-pattern (from Perl distribution App-RegexpPatternUtils), released on 2020-01-03.
+This document describes version 0.006 of match-with-regexp-pattern (from Perl distribution App-RegexpPatternUtils), released on 2021-06-27.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % match-with-regexp-pattern [options] <pattern> <string>
+ % match-with-regexp-pattern [-A key=s] [--anchor] [--captures]
+     [--format=name] [--gen-arg key=s] [--gen-args-json=s] [--json]
+     [--(no)naked-res] [--no-anchor] [--no-captures] [--no-quiet]
+     [--noanchor] [--nocaptures] [--noquiet] [--page-result[=program]] [-q]
+     [--quiet] [--view-result[=program]] -- <pattern> <string>
 
 Examples:
 
@@ -94,9 +99,13 @@ See C<--gen-arg>.
 
 Name of pattern, with module prefix but without the 'Regexp::Pattern'.
 
+Can also be specified as the 1st command-line argument.
+
 =item B<--quiet>, B<-q>
 
 =item B<--string>=I<s>*
+
+Can also be specified as the 2nd command-line argument.
 
 =back
 
@@ -136,6 +145,14 @@ you want to pipe the result for more post-processing. In this case you can use
 
     [1,2,3]
 
+
+=item B<--page-result>
+
+Filter output through a pager.
+
+=item B<--view-result>
+
+View output using a viewer.
 
 =back
 
@@ -215,7 +232,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2018, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2018, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

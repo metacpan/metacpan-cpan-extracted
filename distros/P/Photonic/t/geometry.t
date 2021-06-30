@@ -32,7 +32,6 @@ use strict;
 use warnings;
 use PDL;
 use PDL::NiceSlice;
-use PDL::Complex;
 use Photonic::Geometry::FromB;
 use Photonic::Geometry::FromImage2D;
 use Photonic::Geometry::FromEpsilon;
@@ -51,8 +50,7 @@ ok($g->L->ndims==1, "L is a vector");
 ok(($g->L->dims)[0]==2, "L is a 2D vector");
 ok(($g->L->dims)[0]==2, "L is a 2D vector");
 ok(agree(pdl($g->L),pdl(11,11)), "correct L values");
-ok(agree(($g->units)->[0], pdl(1,0)) && agree(($g->units)->[1], pdl(0,1)),
-   "units");
+ok(agree($g->units, identity(2)), "units");
 ok($g->npoints==11*11, "npoints");
 ok(agree($g->scale,pdl(1,1)), "Default scale");
 ok(agree($gl->scale, pdl(1/11,1/11)), "Scale");
@@ -81,15 +79,14 @@ ok(agree($g->GNorm->(:,(5),(5)), $g->pmGNorm->(:,(0),(5),(5)))
     && agree($g->mGNorm->(:,(5),(5)), $g->pmGNorm->(:,(1),(5),(5))),
     "spinor normalized G at center");
 ok($g->f==$B->sum/(11*11), "filling fraction");
-ok(agree($g->unitPairs->[0], pdl(1,0))
-   && agree($g->unitPairs->[1], pdl(1,1)/sqrt(2))
-   && agree($g->unitPairs->[2], pdl(0,1)), "unitpairs");
-ok(agree($g->cUnitPairs->[0]->re, pdl(1,0)/sqrt(2))
-   && agree($g->cUnitPairs->[0]->im, pdl(0,1)/sqrt(2)),
-   "cunitpairs");
+ok(agree($g->unitPairs, pdl([1,0], pdl(1,1)/sqrt(2), [0,1])), "unitpairs");
+my $got = $g->cUnitPairs;
+my $expected = czip(identity(2)->dog)/sqrt(2);
+ok(Cagree($got, $expected), "cunitpairs")
+  or diag "got:$got\nexpected:$expected";
 ok(agree($g->unitDyads, pdl([1,0,0],[.5,1,.5],[0,0,1])), "unitDyads");
 
-my $got = lu_solve($g->unitDyadsLU, $g->unitDyads->transpose->r2C);
+$got = lu_solve($g->unitDyadsLU, $g->unitDyads->transpose->r2C);
 ok(Cagree($got, identity(3)), "unitDyadsLU");
 
 ok(agree($g->Vec2LC_G(zeroes(11,11)->ndcoords->r2C)->re,

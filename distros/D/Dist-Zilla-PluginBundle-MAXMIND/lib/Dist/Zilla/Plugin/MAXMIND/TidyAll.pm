@@ -7,7 +7,7 @@ use warnings;
 use autodie;
 use namespace::autoclean;
 
-our $VERSION = '0.83';
+our $VERSION = '0.84';
 
 use Code::TidyAll::Config::INI::Reader 0.44;
 use List::Util 1.45 qw( uniqstr );
@@ -42,7 +42,7 @@ my $perlcriticrc = <<'EOF';
 severity = 3
 verbose = 11
 
-theme = core + pbp + bugs + maintenance + cosmetic + complexity + security + tests + moose
+theme = (core && (pbp || bugs || maintenance || cosmetic || complexity || security || tests)) || moose
 
 program-extensions = pl psgi t
 
@@ -256,7 +256,7 @@ sub _config_to_ini {
                 sort ref $tidyall->{$section}{$key}
                 ? @{ $tidyall->{$section}{$key} }
                 : $tidyall->{$section}{$key}
-                ) {
+            ) {
 
                 $ini .= "$key = $val\n";
             }
@@ -300,7 +300,7 @@ Dist::Zilla::Plugin::MAXMIND::TidyAll - Creates default tidyall.ini, perltidyrc,
 
 =head1 VERSION
 
-version 0.83
+version 0.84
 
 =for Pod::Coverage .*
 
@@ -314,7 +314,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Dave Rolsky and MaxMind, Inc.
+This software is Copyright (c) 2021 by Dave Rolsky and MaxMind, Inc.
 
 This is free software, licensed under:
 

@@ -11,11 +11,11 @@ BEGIN {
 use strict;
 use warnings;
 
-# this test was generated with Dist::Zilla::Plugin::Test::Perl::Critic::Subset 3.001.003
+# this test was generated with Dist::Zilla::Plugin::Test::Perl::Critic::Subset 3.001.005
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/App/TouchscreenUtils.pm','script/disable-touchscreen','script/enable-touchscreen','script/has-touchscreen','script/touchscreen-is-enabled'];
+my $filenames = ['lib/App/TouchscreenUtils.pm','script/disable-touchscreen','script/enable-touchscreen','script/has-touchscreen','script/touchscreen-is-enabled','script/tsoff','script/tson'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

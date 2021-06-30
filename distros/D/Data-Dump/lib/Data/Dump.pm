@@ -9,14 +9,15 @@ require Exporter;
 @EXPORT = qw(dd ddx);
 @EXPORT_OK = qw(dump pp dumpf quote);
 
-$VERSION = "1.23";
+$VERSION = "1.25";
 $DEBUG = 0;
 
 use overload ();
-use vars qw(%seen %refcnt @dump @fixup %require $TRY_BASE64 @FILTERS $INDENT);
+use vars qw(%seen %refcnt @dump @fixup %require $TRY_BASE64 @FILTERS $INDENT $LINEWIDTH);
 
 $TRY_BASE64 = 50 unless defined $TRY_BASE64;
 $INDENT = "  " unless defined $INDENT;
+$LINEWIDTH = 60 unless defined $LINEWIDTH;
 
 sub dump
 {
@@ -229,6 +230,9 @@ sub _dump
 	    if (!defined $$rval) {
 		$out = "undef";
 	    }
+	    elsif ($$rval =~ /^-?(?:nan|inf)/i) {
+		$out = str($$rval);
+	    }
 	    elsif (do {no warnings 'numeric'; $$rval + 0 eq $$rval}) {
 		$out = $$rval;
 	    }
@@ -326,7 +330,7 @@ sub _dump
 	my $nl = "";
 	my $klen_pad = 0;
 	my $tmp = "@keys @vals";
-	if (length($tmp) > 60 || $tmp =~ /\n/ || $tied) {
+	if (length($tmp) > $LINEWIDTH || $tmp =~ /\n/ || $tied) {
 	    $nl = "\n";
 
 	    # Determine what padding to add
@@ -466,7 +470,7 @@ sub format_list
 	}
     }
     my $tmp = "@_";
-    if ($comment || (@_ > $indent_lim && (length($tmp) > 60 || $tmp =~ /\n/))) {
+    if ($comment || (@_ > $indent_lim && (length($tmp) > $LINEWIDTH || $tmp =~ /\n/))) {
 	my @elem = @_;
 	for (@elem) { s/^/$INDENT/gm; }
 	return "\n" . ($comment ? "$INDENT# $comment\n" : "") .
@@ -569,10 +573,9 @@ Data::Dump - Pretty printing of data structures
 
 =head1 DESCRIPTION
 
-This module provide a few functions that traverse their
-argument and produces a string as its result.  The string contains
-Perl code that, when C<eval>ed, produces a deep copy of the original
-arguments.
+This module provides a few functions that traverse their
+argument list and return a string containing Perl code that,
+when C<eval>ed, produces a deep copy of the original arguments.
 
 The main feature of the module is that it strives to produce output
 that is easy to read.  Example:
@@ -673,6 +676,11 @@ be valid Perl.
 How long must a binary string be before we try to use the base64 encoding
 for the dump output.  The default is 50.  Set it to 0 to disable base64 dumps.
 
+=item $Data::Dump::LINEWIDTH
+
+This controls how wide the string should before we add a line break.  The
+default is 60.
+
 =back
 
 
@@ -713,6 +721,8 @@ on C<Data::Dumper> by Gurusamy Sarathy <gsar@umich.edu>.
 
  Copyright 1998-2010 Gisle Aas.
  Copyright 1996-1998 Gurusamy Sarathy.
+
+This distribution is currenly maintained by Breno G. de Oliveira.
 
 This library is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.

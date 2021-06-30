@@ -2,9 +2,13 @@ use v5.20.0;
 use warnings;
 # ABSTRACT: a moer tolernat verison of mehtod location
 
-package Amce::CNA 0.067;
+package Amce::CNA 0.068;
 
 use mro ();
+
+# This experiment lands in 5.24 so it is safe to use from v5.20 onward.
+# -- rjbs, 2021-06-24
+use if $] < 5.024, experimental => 'postderef';
 
 use Sub::Exporter -setup => {
   exports => [
@@ -144,7 +148,7 @@ Amce::CNA - a moer tolernat verison of mehtod location
 
 =head1 VERSION
 
-version 0.067
+version 0.068
 
 =head1 SYNOPSIS
 

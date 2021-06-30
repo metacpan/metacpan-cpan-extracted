@@ -476,16 +476,16 @@ sub main {
             q{},
             q{=== Runtime Requires ===},
             q{},
-            q{    Module     Want                  Have},
-            q{    ---------- ---- ---------------------},
-            q{    Local::Psi  any this_is_not_a_version},
+            q{    Module     Want  Have},
+            q{    ---------- ---- -----},
+            q{    Local::Psi  any undef},
             q{},
             q{},
             q{*** WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING ***},
             q{},
             q{The following REQUIRED prerequisites were not satisfied:},
             q{},
-            q{Local::Psi version 'this_is_not_a_version' cannot be parsed (any version required)},
+            q{Local::Psi version unknown (any version required)},
         );
         is_deeply( [ split /\n/, $stdout ], [@expected], '... prints correct report to STDOUT' );
 

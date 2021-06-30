@@ -1,0 +1,16 @@
+Revision history for Acme-ELLEDNERA-Utils
+
+0.04    30 JUNE 2021
+        * Fourth version, corrected all errors
+        * Rearranged the POD
+
+0.03    28 JUNE 2021
+        * Fixed the documentation
+        * Purposely broke the "sum" subroutine to see what happens after uploading :)
+
+0.02    28 JUNE 2021
+        * Second version, added Tie::Cycle to see what happens :)
+
+0.01    27 JUNE 2021
+        * First version, released on an unsuspecting world.
+

@@ -1,3 +1,14 @@
+0.04 2021-06-28T15:16:30+02:00
+ - Add exit code do run() method.
+ - Add second example with color output.
+ - Add support for COLOR and NO_COLOR env variables.
+ - Fix minimal version of Perl.
+ - Improve LICENSE AND COPYRIGHT secion in doc.
+ - Improve SYNOPSIS secion in doc.
+ - Rewrite doc to use =head2.
+ - Update bugtracker to Github.
+ - Update copyright years.
+
 0.03 2018-02-07T08:06:09+01:00
  - Fix Makefile.PL for new version of Perl and no default »use lib '.'«.
  - Update Module::Install to 1.19 version.

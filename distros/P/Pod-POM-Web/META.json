@@ -14,13 +14,6 @@
    },
    "name" : "Pod-POM-Web",
    "prereqs" : {
-      "build" : {
-         "requires" : {
-            "HTTP::Request" : "0",
-            "HTTP::Response" : "0",
-            "Test::More" : "0"
-         }
-      },
       "configure" : {
          "requires" : {
             "Module::Build" : "0.42"
@@ -28,39 +21,53 @@
       },
       "runtime" : {
          "recommends" : {
-            "PPI::HTML" : "0",
-            "Search::Indexer" : "0.75"
+            "PPI::HTML" : "0"
          },
          "requires" : {
             "Alien::GvaScript" : "1.021",
+            "CPAN::Common::Index" : "0",
+            "CPAN::Common::Index::Mux::Ordered" : "0",
             "Config" : "0",
             "Encode" : "0",
-            "Encode::Detect" : "0",
-            "HTTP::Daemon" : "0",
             "List::MoreUtils" : "0",
             "List::Util" : "0",
             "MIME::Types" : "0",
             "Module::CoreList" : "0",
             "Module::Metadata" : "1.000033",
             "POSIX" : "0",
+            "Path::Tiny" : "0",
+            "Plack::Request" : "0",
+            "Plack::Response" : "0",
+            "Plack::Util" : "0",
             "Pod::POM" : "0.25",
             "Pod::POM::View::HTML" : "0",
+            "Search::Indexer" : "1",
             "Time::HiRes" : "0",
             "URI" : "0",
             "URI::QueryParam" : "0",
             "parent" : "0",
-            "perl" : "5.008"
+            "perl" : "5.01"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "HTTP::Request::Common" : "0",
+            "Plack::Test" : "0",
+            "Test::More" : "0"
          }
       }
    },
    "provides" : {
       "Pod::POM::Web" : {
          "file" : "lib/Pod/POM/Web.pm",
-         "version" : "1.24"
+         "version" : "1.25"
       },
       "Pod::POM::Web::Indexer" : {
          "file" : "lib/Pod/POM/Web/Indexer.pm",
          "version" : "1.23"
+      },
+      "Pod::POM::Web::Util" : {
+         "file" : "lib/Pod/POM/Web/Util.pm"
       }
    },
    "release_status" : "stable",
@@ -72,6 +79,6 @@
          "url" : "https://github.com/damil/Pod-POM-Web"
       }
    },
-   "version" : "1.24",
+   "version" : "1.25",
    "x_serialization_backend" : "JSON::PP version 4.05"
 }

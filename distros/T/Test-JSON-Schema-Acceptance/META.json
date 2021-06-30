@@ -194,7 +194,7 @@
    "provides" : {
       "Test::JSON::Schema::Acceptance" : {
          "file" : "lib/Test/JSON/Schema/Acceptance.pm",
-         "version" : "1.010"
+         "version" : "1.011"
       }
    },
    "release_status" : "stable",
@@ -209,7 +209,7 @@
          "web" : "https://github.com/karenetheridge/Test-JSON-Schema-Acceptance"
       }
    },
-   "version" : "1.010",
+   "version" : "1.011",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"
@@ -1121,7 +1121,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v1.010",
+                  "tag" : "v1.011",
                   "tag_format" : "v%V",
                   "tag_message" : "v%v%t"
                },

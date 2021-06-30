@@ -38,9 +38,9 @@ use Util;
             debug_ua($ua);
 
             my $payments = WebService::PayPal::PaymentsAdvanced->new(
-                password => $test->{secret_cb}->('seekrit'),
-                ua       => $ua,
-                user     => $test->{secret_cb}->('someuser'),
+                password                 => $test->{secret_cb}->('seekrit'),
+                ua                       => $ua,
+                user                     => $test->{secret_cb}->('someuser'),
                 validate_hosted_form_uri => 0,       # requires network access
                 vendor                   => 'PayPal',
             );
@@ -253,7 +253,7 @@ sub get_mocked_payments {
     $ua->map_response(
         'pilot-payflowlink.paypal.com',
         HTTP::Response->new(
-            '200', 'OK',
+            '200',                             'OK',
             [ 'Content-Type' => 'text/html' ], path("t/$file")->slurp
         )
     );

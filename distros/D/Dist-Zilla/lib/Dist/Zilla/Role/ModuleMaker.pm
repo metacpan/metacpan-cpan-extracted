@@ -1,4 +1,4 @@
-package Dist::Zilla::Role::ModuleMaker 6.020;
+package Dist::Zilla::Role::ModuleMaker 6.022;
 # ABSTRACT: something that injects module files into the dist
 
 use Moose::Role;
@@ -47,7 +47,7 @@ Dist::Zilla::Role::ModuleMaker - something that injects module files into the di
 
 =head1 VERSION
 
-version 6.020
+version 6.022
 
 =head1 DESCRIPTION
 

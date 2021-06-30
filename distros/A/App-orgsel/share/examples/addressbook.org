@@ -1,0 +1,46 @@
+#+TODO: TODO | OLD
+
+* business > tax consultants
+* business > veterinarian
+** budi chandra                                                         :vet:
+- born :: 1981?
+- notes ::
+  + moslem
+  + has two kids, the older is 10yo @2012
+- address :: jl anggrek no 123, bandung
+- opening hours :: every day 07-21, also on call 24h
+- phone :: 0855 555 1234
+- log ::
+  + [2012-07-30 ] dr went to our house to vaccinate bonnie
+  + [2010-04-21 ] went to his clinic, bought worm tablets
+** deni setiawan                                                        :vet:
+- notes ::
+  + day-care for dogs etc at his house, but there is concern about ticks
+- address :: jl mawar 456, bandung
+- phone :: 022 5551235
+- log ::
+  + [2013-09-18 Rab] entry
+* family tree > dad's side
+** budi roland                                                     :deceased:
+** grace shanti
+- notes ::
+  + father's first aunt
+  + 85 yo @2021
+- log ::
+  + [2021-06-26] entry
+* family tree > mom's side
+* zzz > old
+** OLD rudi sanusi
+- phone/whatsapp :: 0855 555 9739
+- log ::
+  + [2021-06-27 Sun] mark as old
+* zzz > unorganized
+** agus (lisa's husband)
+** agus putra
+** susan muliawati
+** susi
+** susi (ron's friend)                                                  :vet:
+- log ::
+  + [2021-04-03] met her again (the 3rd time i guess?) at ron's birthday party.
+    she's married now.
+  + [2019-01-02] entry

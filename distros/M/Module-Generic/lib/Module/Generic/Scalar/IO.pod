@@ -61,7 +61,7 @@ It takes an L<Module::Generic::Scalar> object and calls L</open>. It returns a b
 
 This is a no-ope; it does not do anything.
 
-=head binmode
+=head2 binmode
 
 This is a no-ope; it does not do anything.
 
@@ -79,7 +79,7 @@ This method overrides the one from L<IO::Scalar> that would otherwise destroy ou
 
 Returns true if we are positioned at the end of the string, false otherwise.
 
-=item fileno
+=head2 fileno
 
 This is a no-op that does not do anything.
 

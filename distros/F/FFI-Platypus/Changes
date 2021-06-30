@@ -1,5 +1,20 @@
 Revision history for FFI-Platypus
 
+1.50      2021-06-30 08:34:17 -0600
+  - Production release identical to 1.49_01
+
+1.49_01   2021-06-22 17:07:44 -0600
+  - float gets promoted to double when used as a varadic argument
+    (gh#323, gh#338)
+
+1.48_01   2021-06-22 00:32:02 -0600
+  - Test forks in CI (gh#333, #334, #335)
+  - Internal refactor of pointer and array input arguments to reduce
+    duplication (gh#336)
+
+1.47_01   2021-06-21 22:24:40 -0600
+  - Restore experimental code from 1.45_01
+
 1.46      2021-06-21 22:20:12 -0600
   - Hotfix due to testing bug in 1.44 (gh#333)
   - This version does not include experimental code from 1.45_01.

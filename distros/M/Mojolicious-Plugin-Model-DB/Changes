@@ -1,3 +1,19 @@
+1.03 2021-06-27T00:50:00Z
+    - Solved error in file test.
+
+1.02 2021-06-27T00:26:00Z
+    - Solved formatting of the pod.
+
+1.01 2021-06-27T00:11:00Z
+    - Added version minimal to Mojo::SQLite.
+    - Added more information in doc.
+    - Solved error in tests with Windows.
+
+1.00 2021-06-25T21:11:00Z
+    - Added Mojo::Pg, Mojo::mysql, Mojo::SQLite and Mojo::Redis in database options,
+      auto instantiate modules and inject reference in Model::DB.
+    - Solved big problem of camelize moniker.
+
 0.10 2019-08-14T02:00:00Z
     - Added prerequisite minimum version 0.10 of module Mojolicious::Plugin::Model.
 

@@ -1,4 +1,4 @@
-package Dist::Zilla::App::Command::run 6.020;
+package Dist::Zilla::App::Command::run 6.022;
 # ABSTRACT: run stuff in a dir where your dist is built
 
 # BEGIN BOILERPLATE
@@ -89,7 +89,7 @@ Dist::Zilla::App::Command::run - run stuff in a dir where your dist is built
 
 =head1 VERSION
 
-version 6.020
+version 6.022
 
 =head1 SYNOPSIS
 

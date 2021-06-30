@@ -1,5 +1,5 @@
 package Lab::Connection;
-$Lab::Connection::VERSION = '3.751';
+$Lab::Connection::VERSION = '3.760';
 #ABSTRACT: Connection base class
 
 use v5.20;
@@ -341,7 +341,7 @@ Lab::Connection - Connection base class
 
 =head1 VERSION
 
-version 3.751
+version 3.760
 
 =head1 SYNOPSIS
 
@@ -479,14 +479,14 @@ Probably few. Mostly because there's not a lot to be done here. Please report.
 
 This software is copyright (c) 2021 by the Lab::Measurement team; in detail:
 
-  Copyright 2010-2011  Andreas K. Huettel, Florian Olbrich
+  Copyright 2010-2011  Andreas K. HÃ¼ttel, Florian Olbrich
             2012       Florian Olbrich, Hermann Kraus, Stefan Geissler
             2013       Alois Dirnaichner, Christian Butschkow, Stefan Geissler
             2014       Alexei Iankilevitch
             2016       Simon Reinhardt
-            2017       Andreas K. Huettel
+            2017       Andreas K. HÃ¼ttel
             2019       Simon Reinhardt
-            2020       Andreas K. Huettel
+            2020       Andreas K. HÃ¼ttel
 
 
 This is free software; you can redistribute it and/or modify it under

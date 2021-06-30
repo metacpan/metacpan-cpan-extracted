@@ -3,7 +3,7 @@ NAME
     files
 
 VERSION
-    Version v3.2.0
+    Version v3.2.1
 
 SYNOPSIS
         use App::Licensecheck;

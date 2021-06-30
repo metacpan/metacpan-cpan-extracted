@@ -1,3 +1,8 @@
+0.061   2021-06-27  Released-By: PERLANCAR; Urgency: medium
+
+	- Update prereq (renamed module Tree::{To,To::}TextLines).
+
+
 0.060   2020-02-06  Released-By: PERLANCAR; Urgency: medium
 
 	- [ux] Die when undef is given.

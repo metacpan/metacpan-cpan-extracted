@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::MetaResources 6.020;
+package Dist::Zilla::Plugin::MetaResources 6.022;
 # ABSTRACT: provide arbitrary "resources" for distribution metadata
 
 use Moose;
@@ -101,7 +101,7 @@ Dist::Zilla::Plugin::MetaResources - provide arbitrary "resources" for distribut
 
 =head1 VERSION
 
-version 6.020
+version 6.022
 
 =head1 DESCRIPTION
 

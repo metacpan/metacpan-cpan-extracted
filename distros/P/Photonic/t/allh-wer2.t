@@ -31,11 +31,10 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA  02110-1301 USA
 use strict;
 use warnings;
 use PDL;
-use PDL::Complex;
 use Photonic::WE::R2::Metric;
 use Photonic::WE::R2::AllH;
 
-use Test::More tests => 10;
+use Test::More;
 use lib 't/lib';
 use TestUtils;
 
@@ -54,11 +53,9 @@ my $as=$a->as;
 my $bs=$a->bs;
 my $b2s=$a->b2s;
 ok(agree(pdl($a->iteration), 2), "Number of iterations 1D longitudinal");
-ok(agree(pdl($b2s->[0]), 1), "1D L b_0^2");
-ok(agree(pdl($b2s->[1]), $g->f*(1-$g->f)), "1D L b_1^2");
-ok(agree(pdl($as->[0]), $g->f), "1D L a_0");
-ok(agree(pdl($as->[1]), 1-$g->f), "1D L a_1");
-ok(agree(pdl($b2s), pdl($bs)**2), "1D L b2==b^2");
+ok(agree($b2s, pdl([1, $g->f*(1-$g->f)])), "1D L b^2");
+ok(agree($as, pdl([$g->f, 1-$g->f])), "1D L a");
+ok(agree($b2s, $bs**2), "1D L b2==b^2");
 
 {
     #check reorthogonalize with square array
@@ -130,3 +127,5 @@ ok(agree(pdl($b2s), pdl($bs)**2), "1D L b2==b^2");
     diag("Actual iterations: " . $al2s->iteration
 	 . " Actual orthogonalizations: ", $al2s->orthogonalizations);
 }
+
+done_testing;

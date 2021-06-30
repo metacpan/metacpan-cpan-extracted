@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::ExecDir 6.020;
+package Dist::Zilla::Plugin::ExecDir 6.022;
 # ABSTRACT: install a directory's contents as executables
 
 use Moose;
@@ -46,7 +46,7 @@ Dist::Zilla::Plugin::ExecDir - install a directory's contents as executables
 
 =head1 VERSION
 
-version 6.020
+version 6.022
 
 =head1 SYNOPSIS
 

@@ -28,15 +28,15 @@ if ($^O =~ /openbsd|netbsd|freebsd/i) {
 }
 
 my $sources = [
-	"DOM.o", 
-	"utils.o", 
-	"modest_modest.o", 
-	"modest_mycore.o", 
-	"modest_mycss.o", 
-	"modest_myencoding.o", 
-	"modest_myfont.o", 
-	"modest_myhtml.o", 
-	"modest_myport.o", 
+	"DOM.o",
+	"utils.o",
+	"modest_modest.o",
+	"modest_mycore.o",
+	"modest_mycss.o",
+	"modest_myencoding.o",
+	"modest_myfont.o",
+	"modest_myhtml.o",
+	"modest_myport.o",
 	"modest_myurl.o"
 ];
 
@@ -53,20 +53,23 @@ WriteMakefile(
 	LICENSE			=> 'MIT',
 	LINKTYPE		=> 'dynamic',
 	LIBS			=> $libs,
-	DEFINE			=> $defines, 
+	DEFINE			=> $defines,
 	CCFLAGS			=> " -std=c99 ".$Config{ccflags},
 	INC				=> "-I$source_dir",
-	OBJECT			=> join(" ", @$sources), 
-	test			=> {TESTS => 't/*.t t/*/*.t'}, 
+	OBJECT			=> join(" ",@$sources),
+	test			=> {TESTS => 't/*.t t/*/*.t'},
 	
 	(eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
 		'meta-spec' => { version => 2 },
 		resources => {
 			repository => {
-				type	=> 'git',
-				url		=> 'https://github.com/Azq2/perl-html5-dom.git',
-				web		=> 'https://github.com/Azq2/perl-html5-dom',
+				type		=> 'git',
+				url			=> 'https://github.com/Azq2/perl-html5-dom.git',
+				web			=> 'https://github.com/Azq2/perl-html5-dom'
 			},
+			bugtracker => {
+				'web'	=> 'https://github.com/Azq2/perl-html5-dom/issues'
+			}
 		}}) : ()
 	),
 );

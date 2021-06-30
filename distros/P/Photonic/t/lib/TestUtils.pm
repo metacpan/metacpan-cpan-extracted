@@ -44,7 +44,9 @@ sub Cagree {
     my $a=shift;
     my $b=shift//0;
     my $prec=shift//1e-7;
-    return (($a-$b)->Cabs2)->sum<=$prec;
+    my $ret = (($a-$b)->abs2)->sum<=$prec;
+    Test::More::diag("different a=$a, b=$b") if !$ret;
+    $ret;
 }
 
 1;

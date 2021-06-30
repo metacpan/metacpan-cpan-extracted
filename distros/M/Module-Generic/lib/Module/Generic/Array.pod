@@ -62,9 +62,7 @@ Example:
 
 =head2 chomp
 
-Performs a L<perlfunc/chomp> on the entire array and returns the current object it was called with.
-
-For example, assuming a file whose lines were read onto an array, and each being terminated by C<\n>, the following will remove each line's new lines characters.
+ For example, assuming a file whose lines were read onto an array, and each being terminated by C<\n>, the following will remove each line's new lines characters.
 
     my $lines = Module::Generic::Array->new( \@lines );
     $lines->chomp;

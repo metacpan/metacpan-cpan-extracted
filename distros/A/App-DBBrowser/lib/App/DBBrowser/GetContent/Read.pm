@@ -40,7 +40,7 @@ sub new {
 sub __get_read_info {
     my ( $sf, $aoa ) = @_;
     my $term_w = get_term_width();
-    my @tmp = ( 'Table Data:' );
+    my @tmp = ( 'DATA:' );
     for my $row ( @$aoa ) {
         push @tmp, line_fold( join( ', ', @$row ), $term_w, { subseq_tab => ' ' x 4, join => 0 } );
     }
@@ -50,33 +50,42 @@ sub __get_read_info {
 
 sub from_col_by_col {
     my ( $sf, $sql ) = @_;
+    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $tf = Term::Form->new( $sf->{i}{tf_default} );
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my $tu = Term::Choose::Util->new( $sf->{i}{tcu_default} );
     my $aoa = [];
     my $col_names;
     if ( $sf->{i}{stmt_types}[0] eq 'Create_table' ) {
-        my $info = $sf->__get_read_info( $aoa );
-        # Choose a number
-        my $col_count = $tu->choose_a_number( 2,
-            { info => $info, cs_label => 'Number of columns: ', small_first => 1, confirm => 'Confirm', back => 'Back' }
-        );
-        if ( ! $col_count ) {
-            return;
+        my $col_count;
+
+        COL_COUNT: while ( 1 ) {
+            my $info = 'DATA:';
+            # Choose a number
+            $col_count = $tu->choose_a_number( 2,
+                { info => $info, cs_label => 'Number of columns: ', small_first => 1, confirm => 'Confirm',
+                  default_number => $col_count, back => 'Back' }
+            );
+            $ax->print_sql_info( $info );
+            if ( ! $col_count ) {
+                return;
+            }
+            $col_names = [ map { 'c' . $_ } 1 .. $col_count ];
+            my $col_number = 0;
+            my $fields = [ map { [ ++$col_number, defined $_ ? "$_" : '' ] } @$col_names ];
+            # Fill_form
+            my $form = $tf->fill_form(
+                $fields,
+                { info => $info, prompt => 'Col names:', auto_up => 2, confirm => $sf->{i}{_confirm}, back => $sf->{i}{_back} . '   ' }
+            );
+            $ax->print_sql_info( $info );
+            if ( ! $form ) {
+                next COL_COUNT;
+            }
+            $col_names = [ map { $_->[1] } @$form ]; # not quoted
+            unshift @$aoa, $col_names;
+            last COL_COUNT;
         }
-        $col_names = [ map { 'c' . $_ } 1 .. $col_count ];
-        my $col_number = 0;
-        my $fields = [ map { [ ++$col_number, defined $_ ? "$_" : '' ] } @$col_names ];
-        # Fill_form
-        my $form = $tf->fill_form(
-            $fields,
-            { info => $info, prompt => 'Col names:', auto_up => 2, confirm => $sf->{i}{_confirm}, back => $sf->{i}{_back} . '   ' }
-        );
-        if ( ! $form ) { ## number of cols
-            return;
-        }
-        $col_names = [ map { $_->[1] } @$form ]; # not quoted
-        unshift @$aoa, $col_names;
     }
     else {
         $col_names = $sql->{insert_into_cols};
@@ -92,6 +101,7 @@ sub from_col_by_col {
                 $col_name . ': ',
                 { info => $info }
             );
+            $ax->print_sql_info( $info );
             push @{$aoa->[$row_idxs]}, $col;
         }
         my $default = 0;
@@ -100,15 +110,16 @@ sub from_col_by_col {
         }
 
         ASK: while ( 1 ) {
-            my $info = $sf->__get_read_info( $aoa );
             my ( $add, $del ) = ( 'Add', 'Del' );
             my @pre = ( undef, $sf->{i}{ok} );
             my $menu = [ @pre, $add, $del ];
+            my $info = $sf->__get_read_info( $aoa );
             # Choose
             my $add_row = $tc->choose(
                 $menu,
                 { %{$sf->{i}{lyt_h}}, info => $info, prompt => '', default => $default }
             );
+            $ax->print_sql_info( $info );
             if ( ! defined $add_row ) {
                 if ( @$aoa ) {
                     $aoa = [];
@@ -171,29 +182,33 @@ sub from_copy_and_paste {
 
 sub from_file {
     my ( $sf, $sql ) = @_;
+    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
 
     DIR: while ( 1 ) {
-        my $dir_fs = $sf->__directory();
-        if ( ! defined $dir_fs ) {
-            return;
+        if ( ! @{$sf->{i}{gc}{files_fs_in_chosen_dir}//[]} ) {
+            my $dir_fs = $sf->__directory( $sql );
+            if ( ! defined $dir_fs ) {
+                return;
+            }
+            my @tmp_files;
+            if ( length $sf->{o}{insert}{file_filter} ) {
+                @tmp_files = map { basename $_} grep { -e $_ } glob( catfile( $dir_fs, $sf->{o}{insert}{file_filter} ) );
+            }
+            else {
+                opendir( my $dh, $dir_fs ) or die $!;
+                @tmp_files = readdir $dh;
+                closedir $dh;
+            }
+            my @files_fs;
+            for my $file ( sort @tmp_files ) {
+                next if $file =~ /^\./ && ! $sf->{o}{insert}{show_hidden_files};
+                next if -d catdir $dir_fs, $file;
+                push @files_fs, catfile( $dir_fs, $file );
+            }
+            $sf->{i}{gc}{files_fs_in_chosen_dir} = \@files_fs;
         }
-        my @tmp_files;
-        if ( length $sf->{o}{insert}{file_filter} ) {
-            @tmp_files = map { basename $_} grep { -e $_ } glob( catfile( $dir_fs, $sf->{o}{insert}{file_filter} ) );
-        }
-        else {
-            opendir( my $dh, $dir_fs ) or die $!;
-            @tmp_files = readdir $dh;
-            closedir $dh;
-        }
-        my @files_fs;
-        for my $file ( sort @tmp_files ) {
-            next if $file =~ /^\./ && ! $sf->{o}{insert}{show_hidden_files};
-            next if -d catdir $dir_fs, $file;
-            push @files_fs, catfile( $dir_fs, $file );
-        }
-        my @files = map { '  ' . decode( 'locale_fs', basename $_ ) } @files_fs;
+        my @files = map { '  ' . decode( 'locale_fs', basename $_ ) } @{$sf->{i}{gc}{files_fs_in_chosen_dir}};
         $sf->{i}{gc}{old_file_idx} //= 1;
 
         FILE: while ( 1 ) {
@@ -203,10 +218,14 @@ sub from_file {
             # Choose
             my $idx = $tc->choose(
                 $menu,
-                { %{$sf->{i}{lyt_v}}, prompt => '', index => 1, default => $sf->{i}{gc}{old_file_idx}, undef => '  <=' }
+                { %{$sf->{i}{lyt_v}}, prompt => '', index => 1, default => $sf->{i}{gc}{old_file_idx},
+                  undef => '  <=' }
             );
             if ( ! defined $idx || ! defined $menu->[$idx] ) {
-                return if $sf->{o}{insert}{history_dirs} == 1;
+                delete $sf->{i}{gc}{files_fs_in_chosen_dir};
+                if ( $sf->{o}{insert}{history_dirs} == 1 ) {
+                    return;
+                }
                 next DIR;
             }
             if ( $sf->{o}{G}{menu_memory} ) {
@@ -223,7 +242,7 @@ sub from_file {
                 $opt_set->set_options( $sf->__file_setting_menu_entries() );
                 next DIR;
             }
-            my $file_fs = $files_fs[$idx-@pre];
+            my $file_fs = $sf->{i}{gc}{files_fs_in_chosen_dir}[$idx-@pre];
             return 1, $file_fs;
         }
     }
@@ -231,7 +250,7 @@ sub from_file {
 
 
 sub __directory {
-    my ( $sf ) = @_;
+    my ( $sf, $sql ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     if ( ! $sf->{o}{insert}{history_dirs} ) {
@@ -259,14 +278,15 @@ sub __directory {
     DIR: while ( 1 ) {
         my $h_ref = $ax->read_json( $sf->{i}{f_dir_history} ) // {};
         my @dirs = sort @{$h_ref->{dirs}//[]};
+        my $prompt = 'Choose a dir:';
         my $new_search = '  NEW search';
         my @pre = ( undef, $new_search );
         my $menu = [ @pre, map( '- ' . $_, @dirs ) ];
         # Choose
         my $idx = $tc->choose(
             $menu,
-            { %{$sf->{i}{lyt_v}}, prompt => 'Choose a dir:', index => 1,
-              default => $sf->{i}{gc}{old_dir_idx}, undef => '  <=' }
+            { %{$sf->{i}{lyt_v}}, prompt => $prompt, index => 1, default => $sf->{i}{gc}{old_dir_idx},
+              undef => '  <=' }
         );
         if ( ! defined $idx || ! defined $menu->[$idx] ) {
             return;
@@ -284,7 +304,6 @@ sub __directory {
             my $opt_set = App::DBBrowser::Opt::Set->new( $sf->{i}, $sf->{o} );
             $opt_set->__new_dir_search();
             $dir_fs = delete $sf->{o}{insert}{add_file_dir};
-            # Choose
             if ( ! defined $dir_fs || ! length $dir_fs ) {
                 next DIR;
             }

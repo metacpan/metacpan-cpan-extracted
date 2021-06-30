@@ -4,9 +4,9 @@ use warnings;
 use lib qw(./lib t/lib);
 
 my $driver;
-use Neo4j::Test;
+use Neo4j_Test;
 BEGIN {
-	unless ($driver = Neo4j::Test->driver) {
+	unless ( $driver = Neo4j_Test->driver() ) {
 		print qq{1..0 # SKIP no connection to Neo4j server\n};
 		exit;
 	}
@@ -60,7 +60,7 @@ subtest 'Property types: spatial type semantics' => sub {
 	# may fail on old Neo4j versions and over Bolt
 	plan skip_all => "(spatial types unavailable in server $ver)" if $ver lt 'Neo4j/3.4';
 	plan tests => 1 + 1 unless $ver lt 'Neo4j/3.4';
-	TODO: { local $TODO = 'Spatial not supported by libneo4j-client 2.2.0' if $Neo4j::Test::bolt;
+	TODO: { local $TODO = 'Spatial not supported by libneo4j-client 2.2.0' if $Neo4j_Test::bolt;
 	$q = <<END;
 RETURN point({ x:3, y:0 })
 END
@@ -80,7 +80,7 @@ subtest 'Property types: temporal type semantics' => sub {
 	# may fail on old Neo4j versions and over Bolt
 	plan skip_all => "(temporal types unavailable in server $ver)" if $ver lt 'Neo4j/3.4';
 	plan tests => 1 + 1 unless $ver lt 'Neo4j/3.4';
-	TODO: { local $TODO = 'Temporal not supported by libneo4j-client 2.2.0' if $Neo4j::Test::bolt;
+	TODO: { local $TODO = 'Temporal not supported by libneo4j-client 2.2.0' if $Neo4j_Test::bolt;
 	$q = <<END;
 RETURN
 duration.between(date('1984-10-11'), date('2015-06-24'))

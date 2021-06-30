@@ -18,17 +18,20 @@ $table->add(@list);
 $table->set_default(sub {});
 
 
-my $cold=$table->prepare_dispatcher(type=>"online",cache=>undef);
+my $cold=$table->prepare_dispatcher(type=>"online",cache=>undef, reset=>1,reorder=>0);
 timethis 200, sub {
 	for my $sample (@$samples){
 		#say $sample;
 		$cold->($sample);
 	}
 };
+
 say "Cold table";
 say Dumper $table;
 
-my $hot=$table->prepare_dispatcher(type=>"online",reset=>1, cache=>{}, reorder=>1);
+
+
+my $hot=$table->prepare_dispatcher(type=>"online",reset=>1, cache=>undef, reorder=>1);
 timethis 200, sub {
 	for my $sample (@$samples){
 		#say $sample;

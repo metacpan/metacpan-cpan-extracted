@@ -1,5 +1,15 @@
 Revision history for Perl module Module::Generic
 
+0.15.3 2021-06-26T14:31:27+0900
+    - Improvement for Module::Generic::File for method load
+    - Switched Module::Generic::SharedMem to use json xs module by default as data packing mechanism, but with the choice left to the user between JSON and Storable
+    - Corrected a bug in Module::Generic::File in method tmpfile that, due to errors in parameters, inadvertently, was creating also temporary directories
+    - Corrected a bug in rmtree whereby the directory itself was not removed. Added the option "keep_root" to decide whether to keep it or not.
+
+0.15.2 2021-06-26T06:06:16+0900
+    - Added missing documentation for Module::Generic::File
+    - Improved documentation for Module::Generic
+
 0.15.1 2021-06-20T10:19:58+0900
     - Resubmission due to bundling error
 

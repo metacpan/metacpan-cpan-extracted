@@ -1,6 +1,6 @@
 package Lab::Instrument::TemperatureControl::TLK43;
 #ABSTRACT: Electronic process controller TLKA41/42/43 (SIKA GmbH) with RS485 MODBUS-RTU interface
-$Lab::Instrument::TemperatureControl::TLK43::VERSION = '3.751';
+$Lab::Instrument::TemperatureControl::TLK43::VERSION = '3.760';
 use v5.20;
 
 use strict;
@@ -473,7 +473,7 @@ Lab::Instrument::TemperatureControl::TLK43 - Electronic process controller TLKA4
 
 =head1 VERSION
 
-version 3.751
+version 3.760
 
 =head1 SYNOPSIS
 
@@ -601,10 +601,10 @@ probably many
 
 This software is copyright (c) 2021 by the Lab::Measurement team; in detail:
 
-  Copyright 2011       Andreas K. Huettel, Florian Olbrich
+  Copyright 2011       Andreas K. HÃ¼ttel, Florian Olbrich
             2016       Simon Reinhardt
-            2017       Andreas K. Huettel
-            2020       Andreas K. Huettel
+            2017       Andreas K. HÃ¼ttel
+            2020       Andreas K. HÃ¼ttel
 
 
 This is free software; you can redistribute it and/or modify it under

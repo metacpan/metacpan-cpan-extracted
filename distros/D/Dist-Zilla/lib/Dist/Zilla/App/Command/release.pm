@@ -1,4 +1,4 @@
-package Dist::Zilla::App::Command::release 6.020;
+package Dist::Zilla::App::Command::release 6.022;
 # ABSTRACT: release your dist to the CPAN
 
 # BEGIN BOILERPLATE
@@ -81,7 +81,7 @@ Dist::Zilla::App::Command::release - release your dist to the CPAN
 
 =head1 VERSION
 
-version 6.020
+version 6.022
 
 =head1 SYNOPSIS
 

@@ -7,7 +7,7 @@ use warnings;
 use autodie;
 use namespace::autoclean;
 
-our $VERSION = '0.83';
+our $VERSION = '0.84';
 
 use Moose;
 
@@ -37,7 +37,7 @@ Dist::Zilla::Plugin::MAXMIND::WeaverConfig - A plugin that exists solely to hold
 
 =head1 VERSION
 
-version 0.83
+version 0.84
 
 =for Pod::Coverage .*
 
@@ -51,7 +51,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Dave Rolsky and MaxMind, Inc.
+This software is Copyright (c) 2021 by Dave Rolsky and MaxMind, Inc.
 
 This is free software, licensed under:
 

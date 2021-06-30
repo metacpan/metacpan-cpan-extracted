@@ -1,4 +1,4 @@
-package Dist::Zilla::App::Command::build 6.020;
+package Dist::Zilla::App::Command::build 6.022;
 # ABSTRACT: build your dist
 
 # BEGIN BOILERPLATE
@@ -130,7 +130,7 @@ Dist::Zilla::App::Command::build - build your dist
 
 =head1 VERSION
 
-version 6.020
+version 6.022
 
 =head1 SYNOPSIS
 

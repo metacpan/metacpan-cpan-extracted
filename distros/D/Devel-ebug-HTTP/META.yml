@@ -1,30 +1,48 @@
 ---
-name: Devel-ebug-HTTP
-version: 0.29
-author:
-  - 'Leon Brocard, C<< <acme@astray.com> >>'
 abstract: 'A web front end to a simple, extensible Perl debugger'
+author:
+  - 'Graham Ollis <plicease@cpan.org>'
+  - 'Leon Brocard <acme@astray.com>'
+build_requires:
+  HTTP::Request::Common: '0'
+  Test::More: '0.98'
+  Test::WWW::Mechanize::Catalyst: '0'
+  perl: '5.010001'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  File::ShareDir::Install: '0.06'
+  perl: '5.010001'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.019, CPAN::Meta::Converter version 2.150010'
 license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Devel-ebug-HTTP
 requires:
-  Catalyst: 5.10
-  Catalyst::Plugin::Static: 0.07
-  Catalyst::View::TT: 0.11
-  Devel::ebug: 0.45
-  HTML::Prototype: 0
-  List::Util: 0
-  PPI: 1.003
-  PPI::HTML: 0
-  PPI::Lexer: 0
-  Path::Class: 0
-  Storable: 0
-  Template: 0
-  Test::Expect: 0
-  Test::More: 0
-  Test::WWW::Mechanize::Catalyst: 0.31
-provides:
-  Devel::ebug::HTTP:
-    file: lib/Devel/ebug/HTTP.pm
-    version: 0.29
-  Devel::ebug::HTTP::View::TT:
-    file: lib/Devel/ebug/HTTP/TT.pm
-generated_by: Module::Build version 0.2611
+  Catalyst: '0'
+  Catalyst::ScriptRunner: '0'
+  Catalyst::View::TT: '0'
+  Cwd: '0'
+  Devel::ebug: '0'
+  File::ShareDir::Dist: '0'
+  HTML::Prototype: '0'
+  List::Util: '0'
+  PPI: '0'
+  PPI::HTML: '0'
+  Path::Class: '0.26'
+  Storable: '0'
+  base: '0'
+  perl: '5.010001'
+resources:
+  bugtracker: https://github.com/uperl/Devel-ebug-HTTP/issues
+  homepage: https://metacpan.org/pod/Devel::ebug::HTTP
+  repository: git://github.com/uperl/Devel-ebug-HTTP.git
+version: '0.33'
+x_contributors:
+  - 'Leon Brocard <acme@astray.com>'
+  - 'Graham Ollis <plicease@cpan.org>'
+x_generated_by_perl: v5.34.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
+x_use_unsafe_inc: 0

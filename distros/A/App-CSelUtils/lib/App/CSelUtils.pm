@@ -1,9 +1,9 @@
 package App::CSelUtils;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-02-19'; # DATE
+our $DATE = '2021-06-27'; # DATE
 our $DIST = 'App-CSelUtils'; # DIST
-our $VERSION = '0.087'; # VERSION
+our $VERSION = '0.088'; # VERSION
 
 use 5.010001;
 use strict;
@@ -257,11 +257,11 @@ sub foosel {
                     $cols;
                 } // 80;
 
-                require Tree::ToTextLines;
+                require Tree::To::TextLines;
                 my @attrs = split /\./, $1;
                 @attrs = ('id') unless @attrs;
                 push @{ $res->[2] }, map {
-                    Tree::ToTextLines::render_tree_as_text({
+                    Tree::To::TextLines::render_tree_as_text({
                         show_guideline  => 1,
                         on_show_node    => sub {
                             my ($node, $level, $seniority, $is_last_child, $opts) = @_;
@@ -430,7 +430,7 @@ App::CSelUtils - Utilities related to Data::CSel
 
 =head1 VERSION
 
-This document describes version 0.087 of App::CSelUtils (from Perl distribution App-CSelUtils), released on 2021-02-19.
+This document describes version 0.088 of App::CSelUtils (from Perl distribution App-CSelUtils), released on 2021-06-27.
 
 =head1 DESCRIPTION
 
@@ -451,7 +451,7 @@ This distribution contains the following utilities:
 
 Usage:
 
- ddsel(%args) -> [status, msg, payload, meta]
+ ddsel(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Select Perl data structure elements using CSel (CSS-selector-like) syntax.
 
@@ -550,12 +550,12 @@ C<root> will return a single node which is the root node.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -565,7 +565,7 @@ Return value:  (any)
 
 Usage:
 
- parse_csel(%args) -> [status, msg, payload, meta]
+ parse_csel(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Parse CSel expression.
 
@@ -582,12 +582,12 @@ Arguments ('*' denotes required arguments):
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -603,7 +603,7 @@ Source repository is at L<https://github.com/perlancar/perl-App-CSelUtils>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-App-CSelUtils/issues>
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-CSelUtils>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

@@ -4,7 +4,7 @@ WebService::PayPal::PaymentsAdvanced - A simple wrapper around the PayPal Paymen
 
 # VERSION
 
-version 0.000026
+version 0.000027
 
 # SYNOPSIS
 
@@ -127,7 +127,7 @@ real transactions.  Defaults to `false`.
 
 ### ua
 
-You may provide your own UserAgent, but it must be of the [LWP::UserAgent](https://metacpan.org/pod/LWP::UserAgent)
+You may provide your own UserAgent, but it must be of the [LWP::UserAgent](https://metacpan.org/pod/LWP%3A%3AUserAgent)
 family.  If you do provide a UserAgent, be sure to set a sensible timeout
 value. Requests to the web service frequently run 20-30 seconds.
 
@@ -147,7 +147,7 @@ about the network calls which are being made.
     # Now fire up a console and watch your network activity.
 
 Check the tests which accompany this distribution for an example of how to mock
-API calls using [Test::LWP::UserAgent](https://metacpan.org/pod/Test::LWP::UserAgent).
+API calls using [Test::LWP::UserAgent](https://metacpan.org/pod/Test%3A%3ALWP%3A%3AUserAgent).
 
 ### validate\_hosted\_form\_uri
 
@@ -168,11 +168,11 @@ to `true`.
 ### create\_secure\_token
 
 Create a secure token which you can use to create a hosted form uri.  Returns a
-[WebService::PayPal::PaymentsAdvanced::Response::SecureToken](https://metacpan.org/pod/WebService::PayPal::PaymentsAdvanced::Response::SecureToken) object.
+[WebService::PayPal::PaymentsAdvanced::Response::SecureToken](https://metacpan.org/pod/WebService%3A%3APayPal%3A%3APaymentsAdvanced%3A%3AResponse%3A%3ASecureToken) object.
 
 The first parameter holds the key/value parameters for the request. The second
 parameter is optional and holds parameters to the underlying
-[WebService::PayPal::PaymentsAdvanced::Response::SecureToken](https://metacpan.org/pod/WebService::PayPal::PaymentsAdvanced::Response::SecureToken) object, which is
+[WebService::PayPal::PaymentsAdvanced::Response::SecureToken](https://metacpan.org/pod/WebService%3A%3APayPal%3A%3APaymentsAdvanced%3A%3AResponse%3A%3ASecureToken) object, which is
 useful to set attributes such as `retry_attempts` and `retry_callback`.
 
     use WebService::PayPal::PaymentsAdvanced;
@@ -197,8 +197,8 @@ useful to set attributes such as `retry_attempts` and `retry_callback`.
 
 This method can be used to parse responses from PayPal to your return URL.
 It's essentially a wrapper around
-[WebService::PayPal::PaymentsAdvanced::Response::FromRedirect](https://metacpan.org/pod/WebService::PayPal::PaymentsAdvanced::Response::FromRedirect).  Returns a
-[WebService::PayPal::PaymentsAdvanced::Response](https://metacpan.org/pod/WebService::PayPal::PaymentsAdvanced::Response) object.
+[WebService::PayPal::PaymentsAdvanced::Response::FromRedirect](https://metacpan.org/pod/WebService%3A%3APayPal%3A%3APaymentsAdvanced%3A%3AResponse%3A%3AFromRedirect).  Returns a
+[WebService::PayPal::PaymentsAdvanced::Response](https://metacpan.org/pod/WebService%3A%3APayPal%3A%3APaymentsAdvanced%3A%3AResponse) object.
 
     my $response = $payments->get_response_from_redirect(
         params     => $params,
@@ -211,13 +211,13 @@ This method can be used to validate responses from PayPal to your silent POST
 url.  If you provide an ip\_address parameter, it will be validated against a
 list of known IPs which PayPal provides.  You're encouraged to provide an IP
 address in order to prevent spoofing of payment responses.  See
-[WebService::PayPal::PaymentsAdvanced::Response::FromSilentPOST](https://metacpan.org/pod/WebService::PayPal::PaymentsAdvanced::Response::FromSilentPOST) for more
+[WebService::PayPal::PaymentsAdvanced::Response::FromSilentPOST](https://metacpan.org/pod/WebService%3A%3APayPal%3A%3APaymentsAdvanced%3A%3AResponse%3A%3AFromSilentPOST) for more
 information on this behaviour.
 
 This method returns a
-[WebService::PayPal::PaymentsAdvanced::Response::FromSilentPost::PayPal](https://metacpan.org/pod/WebService::PayPal::PaymentsAdvanced::Response::FromSilentPost::PayPal)
+[WebService::PayPal::PaymentsAdvanced::Response::FromSilentPost::PayPal](https://metacpan.org/pod/WebService%3A%3APayPal%3A%3APaymentsAdvanced%3A%3AResponse%3A%3AFromSilentPost%3A%3APayPal)
 object for PayPal transactions.  It returns a
-[WebService::PayPal::PaymentsAdvanced::Response::FromSilentPost::CreditCard](https://metacpan.org/pod/WebService::PayPal::PaymentsAdvanced::Response::FromSilentPost::CreditCard)
+[WebService::PayPal::PaymentsAdvanced::Response::FromSilentPost::CreditCard](https://metacpan.org/pod/WebService%3A%3APayPal%3A%3APaymentsAdvanced%3A%3AResponse%3A%3AFromSilentPost%3A%3ACreditCard)
 object for credit card transactions.  You can either inspect the class returned
 to you or use the `is_credit_card_transaction` or `is_paypal_transaction`
 methods to learn which method the customer paid with.  Both methods return a
@@ -235,11 +235,11 @@ methods to learn which method the customer paid with.  Both methods return a
 ### post
 
 Generic method to post arbitrary params to PayPal.  Requires a `HashRef` of
-parameters and returns a [WebService::PayPal::PaymentsAdvanced::Response](https://metacpan.org/pod/WebService::PayPal::PaymentsAdvanced::Response)
+parameters and returns a [WebService::PayPal::PaymentsAdvanced::Response](https://metacpan.org/pod/WebService%3A%3APayPal%3A%3APaymentsAdvanced%3A%3AResponse)
 object.  Any lower case keys will be converted to upper case before this
 response is sent. The second parameter is an optional `HashRef`. If provided,
 it defines attributes to pass to the
-[WebService::PayPal::PaymentsAdvanced::Response::SecureToken](https://metacpan.org/pod/WebService::PayPal::PaymentsAdvanced::Response::SecureToken) object.
+[WebService::PayPal::PaymentsAdvanced::Response::SecureToken](https://metacpan.org/pod/WebService%3A%3APayPal%3A%3APaymentsAdvanced%3A%3AResponse%3A%3ASecureToken) object.
 
     use WebService::PayPal::PaymentsAdvanced;
     my $payments = WebService::PayPal::PaymentsAdvanced->new(...);
@@ -346,6 +346,10 @@ Returns a response object.
 The official [Payflow Gateway Developer Guide and
 Reference](https://developer.paypal.com/docs/classic/payflow/integration-guide/)
 
+# SUPPORT
+
+Bugs may be submitted through [https://github.com/maxmind/webservice-paypal-paymentsadvanced/issues](https://github.com/maxmind/webservice-paypal-paymentsadvanced/issues).
+
 # AUTHOR
 
 Olaf Alders <olaf@wundercounter.com>
@@ -363,7 +367,7 @@ Olaf Alders <olaf@wundercounter.com>
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by MaxMind, Inc.
+This software is copyright (c) 2021 by MaxMind, Inc.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

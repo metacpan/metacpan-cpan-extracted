@@ -1,11 +1,11 @@
 #!/usr/bin/perl
 
-# Copyright (c) 2015-2020 H.Merijn Brand
+# Copyright (c) 2015-2021 H.Merijn Brand
 
 require 5.006;
 use strict;
 
-our $VERSION = "0.12";
+our $VERSION = "0.13";
 
 use ExtUtils::MakeMaker;
 

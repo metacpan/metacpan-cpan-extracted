@@ -6,10 +6,8 @@ Makefile.PL
 MANIFEST
 ppport.h
 README
-XPerlSpace.28
 XPerlSpace.30
 XPerlSpace.30a
-XPosixAlnum.28
 XPosixAlnum.30
 XPosixAlnum.32
 XPosixAlpha.28

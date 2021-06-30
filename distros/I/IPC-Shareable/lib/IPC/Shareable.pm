@@ -18,7 +18,7 @@ use IPC::SysV qw(
 use Storable 0.6 qw(freeze thaw);
 use Scalar::Util;
 
-our $VERSION = '1.01';
+our $VERSION = '1.04';
 
 $SIG{CHLD} = 'IGNORE';
 
@@ -85,6 +85,7 @@ my %default_options = (
     exclusive => 0,
     destroy   => 0,
     graceful  => 0,
+    warn      => 0,
     mode      => 0666,
     size      => SHM_BUFSIZ,
 );
@@ -509,6 +510,26 @@ sub sem {
     my ($knot) = @_;
     return $knot->{_sem} if defined $knot->{_sem};
 }
+sub singleton {
+    my ($class, $glue, $warn) = @_;
+
+    if (! defined $glue) {
+        croak "singleton() requires a GLUE parameter";
+    }
+
+    $warn = 0 if ! defined $warn;
+
+    tie my $lock, 'IPC::Shareable', {
+        key         => $glue,
+        create      => 1,
+        exclusive   => 1,
+        graceful    => 1,
+        destroy     => 1,
+        warn        => $warn
+    };
+
+    return $$;
+}
 
 END {
     for my $s (values %process_register) {
@@ -564,10 +585,17 @@ sub _tie {
     my $seg;
 
     if ($opts->{graceful}) {
-        exit if ! eval {
+        my $exclusive = eval {
             $seg = IPC::Shareable::SharedMem->new($key, $shm_size, $flags);
             1;
         };
+
+        if (! defined $exclusive) {
+            if ($opts->{warn}) {
+                warn "Process ID $$ exited due to exclusive shared memory collision\n";
+            }
+            exit(0);
+        }
     }
     else {
         $seg = IPC::Shareable::SharedMem->new($key, $shm_size, $flags);
@@ -846,6 +874,10 @@ IPC::Shareable - Use shared memory backed variables across processes
     IPC::Shareable->clean_up;
     IPC::Shareable->clean_up_all;
 
+    # Ensure only one instance of a script can be run at any time
+
+    IPC::Shareable->singleton('GLUE');
+
 =head1 DESCRIPTION
 
 IPC::Shareable allows you to tie a variable to shared memory making it
@@ -906,16 +938,16 @@ L<IPC::Shareable> will create a new binding associated with GLUE as
 needed.  If B<create> is false, C<IPC::Shareable> will not attempt to
 create a new shared memory segment associated with GLUE.  In this
 case, a shared memory segment associated with GLUE must already exist
-or the call to C<tie()> will fail and return undef.
+or we'll C<croak()>.
 
-Default: B<false>
+Defult: B<false>
 
 =head2 exclusive
 
-If B<exclusive> field is set to a true value, calls to C<tie()> will fail
-(returning C<undef>) if a data binding associated with GLUE already
-exists.  If set to a false value, calls to C<tie()> will succeed even if
-a shared memory segment associated with GLUE already exists.
+If B<exclusive> field is set to a true value, we will C<croak()> if the data
+binding associated with GLUE already exists.  If set to a false value, calls to
+C<tie()> will succeed even if a shared memory segment associated with GLUE
+already exists.
 
 See L</graceful> for a silent, non-exception exit if a second process
 attempts to obtain an in-use C<exclusive> segment.
@@ -971,11 +1003,31 @@ Default values for options are:
      key       => IPC_PRIVATE,
      create    => 0,
      exclusive => 0,
+     graceful  => 0,
+     warn      => 0,
      destroy   => 0,
      mode      => 0,
      size      => IPC::Shareable::SHM_BUFSIZ(),
 
 =head1 METHODS
+
+=head2 singleton($glue, $warn)
+
+Class method that ensures that only a single instance of a script can be run
+at any given time.
+
+Parameters:
+
+    $glue
+
+Mandatory, String: The key/glue that identifies the shared memory segment.
+
+    $warn
+
+Bool, Optional: Send in a true value to have subsequent processes throw a
+warning that there's been a shared memory violation and that it will exit.
+
+Default: B<false>
 
 =head2 spawn(%opts)
 

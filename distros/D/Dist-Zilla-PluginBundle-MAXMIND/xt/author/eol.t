@@ -9,7 +9,6 @@ use Test::EOL;
 my @files = (
     'lib/Dist/Zilla/Plugin/MAXMIND/CheckChangesHasContent.pm',
     'lib/Dist/Zilla/Plugin/MAXMIND/Contributors.pm',
-    'lib/Dist/Zilla/Plugin/MAXMIND/Git/CheckFor/CorrectBranch.pm',
     'lib/Dist/Zilla/Plugin/MAXMIND/License.pm',
     'lib/Dist/Zilla/Plugin/MAXMIND/TidyAll.pm',
     'lib/Dist/Zilla/Plugin/MAXMIND/VersionProvider.pm',

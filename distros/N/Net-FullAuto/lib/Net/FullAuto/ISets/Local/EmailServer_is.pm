@@ -2082,6 +2082,8 @@ END
    ($stdout,$stderr)=$handle->cmd($sudo.
       'useradd postfix --system --uid 4098 -s /usr/bin/nologin '.
       '--user-group --no-create-home');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'groupadd postdrop','__display__');
    ($stdout,$stderr)=$handle->cwd('/opt/source');
    print $install_postfix;
    sleep 5;
@@ -2090,7 +2092,8 @@ END
    # https://astroman.org/blog/2017/04/e-mail-server-hosting-on-amazon-ec2/
    # https://noknow.info/it/os/install_dovecot_from_source?lang=en
    ($stdout,$stderr)=$handle->cmd($sudo.
-      'wget -qO- http://ftp.porcupine.org/mirrors/postfix-release/index.html');
+      'wget -qO- http://ftp.porcupine.org/mirrors/postfix-release/index.html',
+      '3600');
    $stdout=~s/^.*?href=["]([^"]+)?["][>]Source code.*$/$1/s;
    my $gtarfile=$stdout;
    ($stdout,$stderr)=$handle->cmd($sudo.
@@ -2253,6 +2256,8 @@ END
    ($stdout,$stderr)=$handle->cmd($sudo.
       'chmod -v 0640 /etc/postfix/sql/*','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
+      'chown -v root:root /etc/postfix/sql/*','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
       'setfacl -R -m u:postfix:rx /etc/postfix/sql/','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
       'useradd dovenull --system --uid 4099 -s /usr/bin/nologin '.
@@ -2361,13 +2366,23 @@ virtual_alias_maps =
    proxy:mysql:/etc/postfix/sql/mysql_virtual_alias_domain_catchall_maps.cf
 virtual_transport = lmtp:unix:private/dovecot-lmtp
 END
-   ($stdout,$stderr)=$handle->cmd("echo -e \"$ad\" >> ".
-      "~/main_cf");
    ($stdout,$stderr)=$handle->cmd($sudo.
-      'mv -fv ~/main_cf /etc/postfix/main.cf',
+      'cp -v /etc/postfix/main.cf ~',
       '__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      'chown -R root:root /etc/postfix/main.cf',
+      'chmod -v 777 ~/main.cf','__display__');
+   ($stdout,$stderr)=$handle->cmd("echo -e \"$ad\" >> ".
+      "~/main.cf");
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'sed -i \'$d\' ~/main.cf');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'mv -fv ~/main.cf /etc/postfix/main.cf',
+      '__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'chown -v root:root /etc/postfix/main.cf',
+      '__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'chmod -v 644 /etc/postfix/main.cf',
       '__display__');
    if (ref $main::aws eq 'HASH') {
       ($stdout,$stderr)=$handle->cmd($sudo.
@@ -2410,8 +2425,8 @@ END
       $c="aws iam create-access-key --user-name ses_postfix_email";
       ($hash,$output,$error)=run_aws_cmd($c);
       $hash||={};
-      my $access_id=$hash->{AccessKey}->{AccessKeyId};
-      my $secret_access_key=$hash->{AccessKey}->{SecretAccessKey};
+      my $access_id=$hash->{AccessKey}{AccessKeyId};
+      my $secret_access_key=$hash->{AccessKey}{SecretAccessKey};
       my $python_smtp_generator=<<END;
 #\\x21/usr/bin/env python3
 
@@ -2480,7 +2495,8 @@ if __name__ == '__main__':
     main()
 END
       ($stdout,$stderr)=$handle->cmd(
-         "echo -e \"$python_smtp_generator\" > smtp_credentials_generate.py");
+         "echo -e \"$python_smtp_generator\" > ~/smtp_credentials_generate.py");
+      ($stdout,$stderr)=$handle->cwd('~');
       my $smtppass='';
       ($smtppass,$stderr)=$handle->cmd(
          "python smtp_credentials_generate.py $secret_access_key us-west-2");

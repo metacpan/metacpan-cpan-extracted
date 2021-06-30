@@ -1,6 +1,0 @@
-<td>
-<table border=0>
-<tr><td><div id="icon_graphic"><input type="image" src="/[% image %]" name="myaction" value="[% text %]"></span></tr></td>
-<tr><td><div id="icon_text">[% text %]</span></td></tr>
-</table>
-</td>

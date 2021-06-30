@@ -1,5 +1,5 @@
 package Photonic::WE::R2::GreenS;
-$Photonic::WE::R2::GreenS::VERSION = '0.016';
+$Photonic::WE::R2::GreenS::VERSION = '0.017';
 
 =encoding UTF-8
 
@@ -9,7 +9,7 @@ Photonic::WE::R2::GreenS
 
 =head1 VERSION
 
-version 0.016
+version 0.017
 
 =head1 COPYRIGHT NOTICE
 
@@ -180,13 +180,14 @@ sub evaluate {
     $self->_epsB(my $epsB=shift);
     $self->_u(my $u=1/(1-$epsB/$epsA));
     $self->_converged(all { $_->converged } @{$self->greenP});
-    my $greenTensor = tensor(pdl([map $_->evaluate($epsB), @{$self->greenP}])->complex, $self->geometry->unitDyadsLU, $self->geometry->ndims, 2);
+    my $greenTensor = tensor(pdl([map $_->evaluate($epsB), @{$self->greenP}]), $self->geometry->unitDyadsLU, $self->geometry->ndims, 2);
     $self->_greenTensor($greenTensor);
     $greenTensor;
 }
 
 sub _build_haydock { # One Haydock coefficients calculator per direction0
-    make_haydock(shift, 'Photonic::WE::R2::AllH');
+    my ($self) = @_;
+    make_haydock($self, 'Photonic::WE::R2::AllH', $self->geometry->unitPairs, 0, qw(reorthogonalize use_mask mask));
 }
 
 sub _build_greenP {

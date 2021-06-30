@@ -1,6 +1,9 @@
 #ifndef engine_h
 #define engine_h
 
+/* necessary to include regcomp.h in perl-5.34 */
+#define PERL_EXT_RE_BUILD
+
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"

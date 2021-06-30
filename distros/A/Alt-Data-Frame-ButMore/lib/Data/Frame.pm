@@ -22,6 +22,24 @@ use List::AllUtils qw(
   each_arrayref pairgrep pairkeys pairmap pairwise reduce
 );
 use List::MoreUtils 0.423;
+
+use PDL::DateTime  ();
+# FIXME: remove this once the issue is fixed in PDL::DateTime
+# https://github.com/kmx/pdl-datetime/issues/3
+BEGIN {
+    use PDL::Core ();
+    use Scalar::Util ();
+    no strict 'refs';
+    no warnings 'redefine';
+    *{"PDL::DateTime::dt_at"} = sub {
+          my $self = shift;
+          my $fmt = Scalar::Util::looks_like_number($_[-1]) ? 'auto' : pop;
+          my $v = PDL::Core::at_bad_c($self, [@_]);
+          $fmt = $self->_autodetect_strftime_format if !$fmt || $fmt eq 'auto';
+          return PDL::DateTime::_jumboepoch_to_datetime($v, $fmt);
+    };
+}
+
 use PDL::Primitive ();
 use PDL::Factor    ();
 use PDL::SV        ();
@@ -1092,7 +1110,7 @@ Data::Frame - data frame implementation
 
 =head1 VERSION
 
-version 0.0056
+version 0.0058
 
 =head1 STATUS
 
@@ -1717,7 +1735,7 @@ Stephan Loyd <sloyd@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014, 2019-2020 by Zakariyya Mughal, Stephan Loyd.
+This software is copyright (c) 2014, 2019-2021 by Zakariyya Mughal, Stephan Loyd.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

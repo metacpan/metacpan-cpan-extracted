@@ -1,5 +1,24 @@
 Revision history for Perl extension IPC::Shareable.
 
+1.04    2021-06-28
+    - Skip unspawn tests for perls with -Duselongdouble, as Storable is not
+      compatible storing/retrieving such numbers (closes #5)
+
+1.03    2021-06-25
+    - Add newline to singleton() warn so that it doesn't print out trace info
+
+1.02    2021-06-25
+    - Remove erroneous listing from MANIFEST
+    - Work around issue in t/65-seg_size.t where MacOS and FreeBSD don't have
+      the -i flag to ipcs (thanks for the PR, Roland Walker!)
+    - Added singleton(), ensures that only a single instance of a script can
+      run at any given time
+    - Added tests to ensure we croak() if create is not set and the segment
+      doesn't yet exist
+    - Fix POD issue where we stated exclusive returns undef instead of croaking
+      (fixes #10)
+    - Change 'perl' shell call to $^X in t/71-unspawn.t (fixes #6)
+
 1.01    2021-06-24
     - Added 'graceful' flag option. With exclusive, if a second process
       attempts to tie an exclusive segment, we exit gracefully instead of

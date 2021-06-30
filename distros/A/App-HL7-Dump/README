@@ -8,6 +8,9 @@ ARGUMENTS
     *       "-c"
 
              Color mode.
+             Color mode is controlled by ENV variables:
+             - COLOR=1 - set color without -c argument.
+             - NO_COLOR=1 - unset color with -c argument.
 
     *       "-h"
 
@@ -33,9 +36,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-     © 2016-2018 Michal Josef Špaček
-     BSD 2-Clause License
+    © 2016-2021 Michal Josef Špaček
+
+    BSD 2-Clause License
 
 VERSION
-    0.03
+    0.04
 

@@ -1,5 +1,5 @@
 package Photonic::LE::NP::EpsTensor;
-$Photonic::LE::NP::EpsTensor::VERSION = '0.016';
+$Photonic::LE::NP::EpsTensor::VERSION = '0.017';
 
 =encoding UTF-8
 
@@ -39,7 +39,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA  02110-1301 USA
 
 =head1 VERSION
 
-version 0.016
+version 0.017
 
 =head1 SYNOPSIS
 
@@ -159,7 +159,7 @@ sub _build_epsTensor {
 
 sub _build_nr { # One Haydock coefficients calculator per direction0
     my $self=shift;
-    make_haydock($self, 'Photonic::LE::NP::AllH', 1, 'epsilon');
+    make_haydock($self, 'Photonic::LE::NP::AllH', $self->geometry->unitPairs, 1, qw(epsilon reorthogonalize use_mask mask));
 }
 
 sub _build_epsL {

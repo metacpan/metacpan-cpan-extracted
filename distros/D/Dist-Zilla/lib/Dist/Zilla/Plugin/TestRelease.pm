@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::TestRelease 6.020;
+package Dist::Zilla::Plugin::TestRelease 6.022;
 # ABSTRACT: extract archive and run tests before releasing the dist
 
 use Moose;
@@ -81,7 +81,7 @@ Dist::Zilla::Plugin::TestRelease - extract archive and run tests before releasin
 
 =head1 VERSION
 
-version 6.020
+version 6.022
 
 =head1 DESCRIPTION
 

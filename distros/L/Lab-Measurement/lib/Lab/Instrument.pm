@@ -1,5 +1,5 @@
 package Lab::Instrument;
-$Lab::Instrument::VERSION = '3.751';
+$Lab::Instrument::VERSION = '3.760';
 #ABSTRACT: Instrument base class
 
 use v5.20;
@@ -1321,7 +1321,7 @@ Lab::Instrument - Instrument base class
 
 =head1 VERSION
 
-version 3.751
+version 3.760
 
 =head1 SYNOPSIS
 
@@ -1543,17 +1543,17 @@ Probably many, with all the porting. This will get better.
 
 This software is copyright (c) 2021 by the Lab::Measurement team; in detail:
 
-  Copyright 2005-2006  Daniel Schroeer
-            2009       Andreas K. Huettel
-            2010       Andreas K. Huettel, Daniel Schroeer, Florian Olbrich, Matthias Voelker
-            2011       Andreas K. Huettel, Florian Olbrich
-            2012       Alois Dirnaichner, Andreas K. Huettel, Christian Butschkow, Florian Olbrich, Stefan Geissler
-            2013       Alois Dirnaichner, Andreas K. Huettel, Christian Butschkow, Stefan Geissler
+  Copyright 2005-2006  Daniel SchrÃ¶er
+            2009       Andreas K. HÃ¼ttel
+            2010       Andreas K. HÃ¼ttel, Daniel SchrÃ¶er, Florian Olbrich, Matthias Voelker
+            2011       Andreas K. HÃ¼ttel, Florian Olbrich
+            2012       Alois Dirnaichner, Andreas K. HÃ¼ttel, Christian Butschkow, Florian Olbrich, Stefan Geissler
+            2013       Alois Dirnaichner, Andreas K. HÃ¼ttel, Christian Butschkow, Stefan Geissler
             2014       Alexei Iankilevitch, Christian Butschkow
             2016       Charles Lane, Simon Reinhardt
-            2017       Andreas K. Huettel
+            2017       Andreas K. HÃ¼ttel
             2019       Simon Reinhardt
-            2020       Andreas K. Huettel
+            2020       Andreas K. HÃ¼ttel
 
 
 This is free software; you can redistribute it and/or modify it under

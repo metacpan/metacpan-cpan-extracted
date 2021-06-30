@@ -39,7 +39,7 @@ no_index:
 provides:
   Test::JSON::Schema::Acceptance:
     file: lib/Test/JSON/Schema/Acceptance.pm
-    version: '1.010'
+    version: '1.011'
 requires:
   Feature::Compat::Try: '0'
   File::ShareDir: '0'
@@ -65,7 +65,7 @@ resources:
   bugtracker: https://github.com/karenetheridge/Test-JSON-Schema-Acceptance/issues
   homepage: https://github.com/karenetheridge/Test-JSON-Schema-Acceptance
   repository: https://github.com/karenetheridge/Test-JSON-Schema-Acceptance.git
-version: '1.010'
+version: '1.011'
 x_Dist_Zilla:
   perl:
     version: '5.034000'
@@ -761,7 +761,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v1.010
+          tag: v1.011
           tag_format: v%V
           tag_message: v%v%t
         Dist::Zilla::Role::Git::Repo:

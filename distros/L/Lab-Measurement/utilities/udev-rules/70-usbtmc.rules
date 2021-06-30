@@ -1,2 +1,18 @@
-ACTION=="add", SUBSYSTEM=="usb", KERNEL=="usbtmc[0-9]", GROUP="plugdev", MODE="0660" 
+# give group 'daq' access to usbtmc devices
+#
+# NOTE: group "daq" should be defined in /etc/groups
+#   otherwise can get bootup problems when usbtmc devices are connected
+#   at boot.
+#
+# also there are files in the /dev/bus/usb/* structure that will need to
+# have permissions adjusted, that the tmc_protfix script handles. There
+# might be a more elegant way of doing this, but this does work on
+# Fedora 31 and Centos8, and probably others, and is easier to edit
+# to deal with kernel configuration changes.
+#
+KERNEL=="usbtmc/*", MODE="0660", GROUP="daq"
+KERNEL=="usbtmc[0-9]*", SUBSYSTEMS=="usb", MODE="0660", GROUP="daq", RUN+="/etc/udev/usbtmc_protfix"
+
+# older version, just setting mode for group daq
+#SUBSYSTEM=="usb", ATTRS{idVendor}=="0699", MODE="0664", GROUP="daq"
 

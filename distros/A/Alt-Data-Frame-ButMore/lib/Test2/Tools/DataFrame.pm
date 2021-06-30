@@ -6,7 +6,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.0056'; # VERSION
+our $VERSION = '0.0058'; # VERSION
 
 use Safe::Isa;
 use Test2::API qw/context/;
@@ -108,7 +108,7 @@ Test2::Tools::DataFrame - Tools for verifying Data::Frame data frames
 
 =head1 VERSION
 
-version 0.0056
+version 0.0058
 
 =head1 SYNOPSIS
 
@@ -158,7 +158,7 @@ Stephan Loyd <sloyd@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014, 2019-2020 by Zakariyya Mughal, Stephan Loyd.
+This software is copyright (c) 2014, 2019-2021 by Zakariyya Mughal, Stephan Loyd.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

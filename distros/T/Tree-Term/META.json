@@ -1,0 +1,53 @@
+{
+   "abstract" : "Create a parse tree from an array of terms representing an expression.",
+   "author" : [
+      "philiprbrenan@gmail.com"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4231",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Tree-Term",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4224"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Data::Dump" : "0",
+            "Data::Table::Text" : "20200101",
+            "Test2::API" : "0",
+            "Test::Most" : "0",
+            "feature" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Tree::Term" : {
+         "file" : "lib/Tree/Term.pm",
+         "version" : "20210631"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/philiprbrenan/TreeTerm/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/philiprbrenan/TreeTerm"
+      }
+   },
+   "version" : "20210631",
+   "x_serialization_backend" : "JSON::PP version 4.02"
+}

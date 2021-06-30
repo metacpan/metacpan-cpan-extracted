@@ -54,15 +54,14 @@
             "Moose::Role" : "0",
             "Moose::Util::TypeConstraints" : "0",
             "MooseX::StrictConstructor" : "0",
-            "PDL" : "2.045",
-            "PDL::Complex" : "2.009",
+            "PDL" : "2.049",
             "PDL::Constants" : "0",
             "PDL::Core" : "0",
             "PDL::Core::Dev" : "0",
-            "PDL::FFTW3" : "0.12",
+            "PDL::FFTW3" : "0.15",
             "PDL::IO::Pic" : "0",
             "PDL::IO::Storable" : "0",
-            "PDL::LinearAlgebra" : "0.15",
+            "PDL::LinearAlgebra" : "0.20",
             "PDL::Lite" : "0",
             "PDL::MatrixOps" : "0",
             "PDL::NiceSlice" : "0",
@@ -84,6 +83,6 @@
          "web" : "https://github.com/wlmb/Photonic"
       }
    },
-   "version" : "0.016",
+   "version" : "0.017",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

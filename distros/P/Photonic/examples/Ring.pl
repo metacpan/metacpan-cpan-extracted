@@ -45,7 +45,6 @@ use Photonic::WE::R2::AllH;
 use Photonic::WE::R2::EpsilonP;
 use PDL;
 use PDL::NiceSlice;
-use PDL::Complex;
 
 set_autopthread_targ(4);
 set_autopthread_size(4);
@@ -83,7 +82,7 @@ my $k=0.01; # wave vector component used below in xx direction
 # Units of $k are nm^{-1}. In de middle of VIS-NIR range it is approx
 # 2*PI/\lambda
 my $c=197.32; # it is \h c in q=\hbar\omega/\hbar c
-my $elem=$epsBall->dim(1); # how many frequencies for calculation
+my $elem=$epsBall->dim(0); # how many frequencies for calculation
 
 # If you have not Gnuplot and Gnuplot pdl module intalled, the lines below
 # commnented with ## would be useful for writing output data to a file named $filename
@@ -129,7 +128,7 @@ my @out=(); # list for the output results
 # for each frequency
 #------------------------------------------------------------
 for(my $j=0;$j<$elem;$j++){
-    my $epsB=$epsBall(,($j),(0));
+    my $epsB=$epsBall(($j),(0));
     my $hnu=$hnu_all(($j),(0));
     my $q=$hnu/$c;
 #----------------------------------------------------------------------------------
@@ -184,15 +183,15 @@ sub ring {
 
 sub eps{
     my $epsi=shift;
-    my @eps=();
     die "This example is prepared only for epsB=au (gold)" unless $epsi eq "au";
+    my (@h_nu, @re, @im);
     while(<main::DATA>){
-	(my $h_nu,my $eps_re,my $eps_im) = split;
-	my $linea=pdl($h_nu,$eps_re,$eps_im);
-	push @eps, $linea;
+	my ($h_nu, $eps_re, $eps_im) = split;
+        push @h_nu, $h_nu;
+        push @re, $eps_re;
+        push @im, $eps_im;
     }
-    my $eps=pdl(@eps)->mv(-1,0)->(,1)+i*pdl(@eps)->mv(-1,0)->(,2);
-    return (pdl(@eps)->mv(-1,0)->(,0), $eps);
+    (pdl(\@h_nu), pdl(\@re) + pdl(\@im) * i);
 }
 
 __END__

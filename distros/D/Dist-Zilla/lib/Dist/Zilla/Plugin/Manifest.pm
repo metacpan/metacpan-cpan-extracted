@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::Manifest 6.020;
+package Dist::Zilla::Plugin::Manifest 6.022;
 # ABSTRACT: build a MANIFEST file
 
 use Moose;
@@ -78,7 +78,7 @@ Dist::Zilla::Plugin::Manifest - build a MANIFEST file
 
 =head1 VERSION
 
-version 6.020
+version 6.022
 
 =head1 DESCRIPTION
 

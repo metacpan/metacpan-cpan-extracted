@@ -4,7 +4,7 @@
       "John Siracusa <siracusa@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.60, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -66,6 +66,6 @@
       },
       "x_MailingList" : "http://groups.google.com/group/rose-db-object"
    },
-   "version" : "0.819",
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "version" : "0.820",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

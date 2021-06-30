@@ -1,0 +1,9 @@
+#!perl
+
+use strict;
+use warnings;
+
+use PLS::Server;
+
+my $server = PLS::Server->new();
+$server->run;

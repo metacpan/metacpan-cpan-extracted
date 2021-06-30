@@ -1,3 +1,10 @@
+0.84     2021-06-28
+
+- Drop CorrectBranch plugin as we don't allow pushing to the main
+  branch and want even release commits reviewed.
+- Update perlcriticrc theme to only include core and moose policies.
+
+
 0.83     2017-10-10
 
 - Added missing Path::Tiny import.

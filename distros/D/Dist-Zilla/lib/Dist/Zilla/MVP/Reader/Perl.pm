@@ -1,4 +1,4 @@
-package Dist::Zilla::MVP::Reader::Perl 6.020;
+package Dist::Zilla::MVP::Reader::Perl 6.022;
 # ABSTRACT: the reader for dist.pl files
 
 use Moose;
@@ -71,7 +71,7 @@ Dist::Zilla::MVP::Reader::Perl - the reader for dist.pl files
 
 =head1 VERSION
 
-version 6.020
+version 6.022
 
 =head1 DESCRIPTION
 
