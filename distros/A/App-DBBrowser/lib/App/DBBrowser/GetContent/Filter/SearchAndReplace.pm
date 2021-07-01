@@ -26,7 +26,7 @@ sub new {
 }
 
 
-sub __search_and_replace {
+sub search_and_replace {
     my ( $sf, $sql, $filter_str ) = @_;
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my $tf = Term::Form->new( $sf->{i}{tf_default} );
@@ -67,7 +67,6 @@ sub __search_and_replace {
             { %{$sf->{i}{lyt_v}}, info => $info, prompt => '', default => 1, index => 1, undef => $sf->{i}{_back},
               keep => $sf->{i}{fi}{keep} }
         );
-        $cf->__print_busy_string();
         if ( ! defined $idx || ! defined $menu->[$idx] ) {
             if ( @bu ) {
                 ( $used_names, $all_sr_groups ) = @{pop @bu};
@@ -113,7 +112,6 @@ sub __search_and_replace {
                         { %{$sf->{i}{lyt_v}}, info => $info, prompt => 'Restore header?', default => 0, index => 1, undef => $sf->{i}{fi}{back},
                         keep => $sf->{i}{fi}{keep} }
                     );
-                    $cf->__print_busy_string();
                     if ( ! defined $idx || ! defined $menu->[$idx] ) {
                         my $pop_count = @tmp_info_addition;
                         splice @tmp_info, -$pop_count;
@@ -151,7 +149,6 @@ sub __search_and_replace {
                     { info => $info, prompt => $prompt, auto_up => 2, confirm => $sf->{i}{confirm}, keep => $sf->{i}{fi}{keep},
                       back => $back, skip_items => $skip_regex }
                 );
-                $cf->__print_busy_string();
                 if ( ! defined $form ) {
                     next ADD_SEARCH_AND_REPLACE;
                 }
@@ -219,8 +216,8 @@ sub __apply_to_cols {
     # Choose
     my $col_idxs = $tu->choose_a_subset(
         $header,
-        { cs_label => 'Columns: ', info => $info, layout => 0, all_by_default => 1, index => 1, keep => $sf->{i}{fi}{keep},
-        confirm => $sf->{i}{ok}, back => $sf->{i}{fi}{back}, busy_string => $sf->{i}{fi}{working}, mark => $mark }
+        { cs_label => 'Apply to: ', info => $info, layout => 0, all_by_default => 1, index => 1, keep => $sf->{i}{fi}{keep},
+        confirm => $sf->{i}{ok}, back => $sf->{i}{fi}{back}, mark => $mark }
     );
     $cf->__print_busy_string();
     if ( ! defined $col_idxs ) {
@@ -285,7 +282,6 @@ sub __history {
     my $tf = Term::Form->new( $sf->{i}{tf_default} );
     my $tu = Term::Choose::Util->new( $sf->{i}{tcu_default} );
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $cf = App::DBBrowser::GetContent::Filter->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $old_idx_history = 0;
 
     HISTORY: while ( 1 ) {
@@ -299,7 +295,6 @@ sub __history {
             { %{$sf->{i}{lyt_v}}, clear_screen => 1, info => $top, undef => '  <=', index => 1,
               default => $old_idx_history }
         );
-        $cf->__print_filter_info( $top );
         if ( ! defined $idx || ! defined $menu->[$idx] ) {
             return;
         }
@@ -329,7 +324,6 @@ sub __history {
                       section_separators => [ grep { ! ( $_ % 4 ) } 0 .. $#$fields ],
                       confirm => '  ' . $sf->{i}{confirm}, back => '  ' . $sf->{i}{back} . '   ' }
                 );
-                $cf->__print_filter_info( $top );
                 if ( ! defined $form ) {
                     next HISTORY;
                 }
@@ -375,7 +369,6 @@ sub __history {
                     { %{$sf->{i}{lyt_v}}, clear_screen => 1, prompt => 'Edit item:', index => 1,
                         undef => '  <=', default => $old_idx_choose_entry, info => $top }
                 );
-                $cf->__print_filter_info( $top );
                 if ( ! defined $idx || ! defined $menu->[$idx] ) {
                     next HISTORY;
                 }
@@ -416,7 +409,6 @@ sub __history {
                           section_separators => [ grep { ! ( $_ % 4 ) } 0 .. $#$fields ],
                           confirm => '  ' . $sf->{i}{confirm}, back => '  ' . $sf->{i}{back} . '   ' }
                     );
-                    $cf->__print_busy_string();
                     if ( ! defined $form ) {
                         $saved->{$name} = [ @$sr_group ];
                         next CHOOSE_ENTRY;
@@ -454,9 +446,8 @@ sub __history {
                 $list,
                 { prefix => '- ', info => $info, cs_label => 'Chosen items:' . "\n  ", cs_separator => "\n  ", cs_end => "\n",
                   layout => 3, all_by_default => 0, index => 1, confirm => $sf->{i}{_confirm}, back => $sf->{i}{_back},
-                  busy_string => $sf->{i}{fi}{working}, clear_screen => 1, prompt => 'Choose items to remove:' }
+                  clear_screen => 1, prompt => 'Choose items to remove:' }
             );
-            $cf->__print_busy_string();
             if ( ! defined $idxs ) {
                 next HISTORY;
             }
@@ -475,7 +466,6 @@ sub __history {
                     { %{$sf->{i}{lyt_v}}, clear_screen => 1, prompt => "Remove \"$name\"?", index => 1,
                         undef => '  <=', info => $info }
                 );
-                $cf->__print_busy_string();
                 if ( ! defined $idx || ! defined $menu->[$idx] ) {
                     next HISTORY;
                 }
@@ -510,7 +500,6 @@ sub __get_entry_name {
     my ( $sf, $info, $prompt, $saved, $sr_group, $name ) = @_;
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my $tf = Term::Form->new( $sf->{i}{tf_default} );
-    my $cf = App::DBBrowser::GetContent::Filter->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $name_default = $name;
     if ( ! length $name && @$sr_group < 3 ) {
         $name_default = join ' ', _stringified_code( $sr_group );
@@ -523,7 +512,6 @@ sub __get_entry_name {
             $prompt,
             { info => $info, default => $name_default }
         );
-        $cf->__print_busy_string();
         if ( ! defined $new_name || ! length $new_name ) {
             return;
         }
@@ -533,7 +521,6 @@ sub __get_entry_name {
                 [ undef, '  New name' ],
                 { %{$sf->{i}{lyt_v}}, prompt => $prompt, info => $info }
             );
-            $cf->__print_busy_string();
             if ( ! defined $choice ) {
                 return;
             }

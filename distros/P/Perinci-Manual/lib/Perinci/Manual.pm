@@ -1,9 +1,9 @@
 package Perinci::Manual;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-01-16'; # DATE
+our $DATE = '2021-07-01'; # DATE
 our $DIST = 'Perinci-Manual'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 1;
 # ABSTRACT: Extra documentation for Perinci
@@ -20,7 +20,7 @@ Perinci::Manual - Extra documentation for Perinci
 
 =head1 VERSION
 
-This document describes version 0.001 of Perinci::Manual (from Perl distribution Perinci-Manual), released on 2021-01-16.
+This document describes version 0.002 of Perinci::Manual (from Perl distribution Perinci-Manual), released on 2021-07-01.
 
 =head1 DESCRIPTION
 
@@ -41,7 +41,7 @@ Source repository is at L<https://github.com/perlancar/perl-Perinci-Manual>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Perinci-Manual/issues>
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-Manual>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

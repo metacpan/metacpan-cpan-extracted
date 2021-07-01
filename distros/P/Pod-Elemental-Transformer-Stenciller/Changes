@@ -1,5 +1,75 @@
 Revision history for Pod-Elemental-Transformer-Stenciller
 
+0.0301 2021-06-30 18:24:25 UTC
+ [Other Changes]
+ - Explicit $VERSION
+ - Replace Travis CI with Github Actions
+
+ [Stats & Dependency Changes]
+ - 3 files changed, 63 insertions(+), 1 deletion(-)
+ - (run req) ~ Carp (any) --> 1.38
+ - (run req) ~ Module::Load (any) --> 0.22
+ - (run req) ~ Path::Tiny (any) --> 0.072
+ - (run req) ~ Types::Path::Tiny (any) --> 0.005
+ - (dev req) + Badge::Depot 0.0103
+ - (dev req) + Badge::Depot::Plugin::Coverage (any)
+ - (dev req) + Badge::Depot::Plugin::Githubactions (any)
+ - (dev req) + Badge::Depot::Plugin::Perl (any)
+ - (dev req) + Dist::Zilla 6.015
+ - (dev req) +
+   Dist::Zilla::Plugin::Author::CSSON::GithubActions::Workflow::TestWithMakefile
+   0.0106
+ - (dev req) + Dist::Zilla::Plugin::Authority 1.009
+ - (dev req) + Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional
+   0.009
+ - (dev req) + Dist::Zilla::Plugin::ChangeStats::Dependencies::Git 0.0200
+ - (dev req) + Dist::Zilla::Plugin::Git 2.046
+ - (dev req) + Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch 0.014
+ - (dev req) + Dist::Zilla::Plugin::Git::Commit (any)
+ - (dev req) + Dist::Zilla::Plugin::MetaConfig (any)
+ - (dev req) + Dist::Zilla::Plugin::NextRelease::Grouped 0.0200
+ - (dev req) + Dist::Zilla::Plugin::PromptIfStale 0.057
+ - (dev req) + Dist::Zilla::Plugin::RewriteVersion::Transitional 0.007
+ - (dev req) + Pod::Weaver::Section::GenerateSection 1.01
+ - (dev req) + Test::EOF (any)
+ - (dev req) + Test::Version 1
+ - (dev req) ~ Dist::Zilla::Plugin::CheckChangesHasContent (any) --> 0.011
+ - (dev req) ~ Dist::Zilla::Plugin::Clean (any) --> 0.07
+ - (dev req) ~ Dist::Zilla::Plugin::CopyFilesFromBuild (any) --> 0.170880
+ - (dev req) ~ Dist::Zilla::Plugin::Git::Contributors (any) --> 0.035
+ - (dev req) ~ Dist::Zilla::Plugin::GithubMeta (any) --> 0.54
+ - (dev req) ~ Dist::Zilla::Plugin::InstallRelease (any) --> 0.008
+ - (dev req) ~ Dist::Zilla::Plugin::MetaProvides::Package (any) -->
+   2.004003
+ - (dev req) ~ Dist::Zilla::Plugin::PodWeaver (any) --> 4.006
+ - (dev req) ~ Dist::Zilla::Plugin::ReadmeAnyFromPod (any) --> 0.163250
+ - (dev req) ~ Dist::Zilla::Plugin::RunExtraTests (any) --> 0.029
+ - (dev req) ~ Dist::Zilla::Plugin::Test::Compile (any) --> 2.058
+ - (dev req) ~ Dist::Zilla::Plugin::Test::EOF (any) --> 0.0501
+ - (dev req) ~ Dist::Zilla::Plugin::Test::EOL (any) --> 0.18
+ - (dev req) ~ Dist::Zilla::Plugin::Test::NoTabs (any) --> 0.15
+ - (dev req) ~ Dist::Zilla::Plugin::Test::ReportPrereqs (any) --> 0.027
+ - (dev req) ~ Dist::Zilla::Plugin::Test::Version (any) --> 1.09
+ - (dev req) ~ Pod::Elemental::Transformer::Splint (any) --> 0.1201
+ - (dev req) ~ Pod::Weaver::Section::Badges (any) --> 0.0401
+ - (dev req) ~ Test::NoTabs (any) --> 1.4
+ - (dev req) ~ Test::Warnings (any) --> 0.026
+ - (dev req) - Dist::Iller::Config::Author::CSSON
+ - (dev req) - Dist::Zilla::Plugin::MetaProvides::Class
+ - (dev req) - Dist::Zilla::Plugin::NextRelease
+ - (dev req) - Dist::Zilla::Plugin::NextVersion::Semantic
+ - (dev req) - Dist::Zilla::Plugin::OurPkgVersion
+ - (dev req) - Dist::Zilla::Plugin::PodnameFromClassname
+ - (dev req) - Dist::Zilla::Plugin::Prereqs::Plugins
+ - (dev req) - Dist::Zilla::Plugin::PreviousVersion::Changelog
+ - (dev req) - Dist::Zilla::Plugin::ReversionOnRelease
+ - (dev req) - Dist::Zilla::Plugin::Test::Kwalitee::Extra
+ - (dev req) - Dist::Zilla::Plugin::TravisYML
+ - (dev req) - Pod::Weaver::Section::Homepage::DefaultCPAN
+ - (dev req) - Pod::Weaver::Section::Source::DefaultGitHub
+ - (dev sug) + Dist::Iller 0.1411
+ - (dev sug) + Dist::Iller::Config::Author::CSSON 0.0328
+
 0.0300 2016-02-02T15:05:04Z UTC
  [Requirements]
  - Removed Kavorka/Moops dependency, so will work on 5.10+ (once Stenciller
@@ -8,29 +78,28 @@ Revision history for Pod-Elemental-Transformer-Stenciller
    directly).
 
 0.0200 2015-11-23T00:10:51Z UTC
- [Documentation]
- - Minor documentation improvements
-
  [Meta]
  - Added .travis.yml.
 
  [Requirements]
  - Bump Stenciller requirement to 0.1300.
 
-0.0101 2015-02-13T01:04:10Z CET
  [Documentation]
- - Added documentation regarding the option hashes in pod and stencil.
- - Corrected package name in Changes
+ - Minor documentation improvements
+
+0.0101 2015-02-13T01:04:10Z CET
+ [Meta]
+ - Removed cpanfile (now prereqs are set in dist.ini).
 
  [Enhancements]
  - Added check for 'to_pod' key in stencil hash.
 
- [Meta]
- - Removed cpanfile (now prereqs are set in dist.ini).
-
  [Requirements]
  - Bump Stenciller prereq to 0.1212.
 
+ [Documentation]
+ - Added documentation regarding the option hashes in pod and stencil.
+ - Corrected package name in Changes
+
 0.0100 2015-02-07T15:45:56Z CET
  - Initial release
-

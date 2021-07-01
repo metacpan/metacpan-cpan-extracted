@@ -3,6 +3,11 @@ Revision history for Perl module Mail::Run::Crypt
 This project began life as a monolithic Perl script. It does much the
 same thing now but it's refactored out into an application and a module.
 
+0.12 2021-07-01
+
+ - Update URLs in Makefile.PL
+ - Specify minimum Perl version correctly in Makefile.PL
+
 0.11 2018-02-21
 
  - Remove unneeded File::Stat dependency

@@ -34,7 +34,9 @@ association sans but lucratif:
 'Акционерное общество':
   abbr:
     - "АО"
+    - "AO"
   lang: ru
+  lead: 1
 Berhad:
   abbr: Bhd.
   lang: ms
@@ -51,6 +53,10 @@ Besloten vennootschap:
 Chartered:
   abbr: Chtd.
   lang: en
+Closed Joint Stock Company:
+  abbr: CJSC
+  lang: en
+  lead: 1
 Commanditaire vennootschap:
   abbr: C.V.
   lang: nl
@@ -108,11 +114,18 @@ Empresa Social del Estado:
   abbr: E.S.E.
   lang: es
   lead: 1
+'gemeinnützige GmbH':
+  abbr: gGmbH
+  lang: de
 'Gesellschaft mit beschränkter Haftung':
+  abbr_std: GmbH
   abbr:
     - GmbH
+    - m.b.H.
     - Ges.m.b.H.
-    - mbH
+    - Gesellschaft m.b.H.
+    - '& Co. GmbH'
+    - und Co. GmbH
   lang: de
 'Gesellschaft bürgerlichen Rechts':
   abbr: GbR
@@ -237,10 +250,15 @@ Limited Partnership:
     - Company L.P.
   lang: en
 Limited Liability Company:
+  abbr_std: LLC
   abbr:
     - L.L.C.
     - ASC L.L.C.
+    - Co. L.L.C.
+    - '& Co. L.L.C.'
+    - and Co. L.L.C.
   lang: en
+  lead: 1
 Limited Liability Partnership:
   abbr: L.L.P.
   lang: en
@@ -258,6 +276,8 @@ Naamloze vennootschap:
   abbr:
     - N.V.
     - N.V. Nv
+    - S.A./N.V.
+    - SA/NV
   lang: nl
   lead: 1
 National Association:
@@ -285,6 +305,12 @@ offene Handelsgesellschaft:
     - 'GmbH & Co OHG'
     - 'GmbH und Co OHG'
   lang: de
+Open Joint Stock Company:
+  abbr_std: OJSC
+  abbr:
+    - OJSC
+    - Co. OJSC
+  lang: en
 'opinbert hlutafélag':
   abbr: ohf.
   lang: is
@@ -295,6 +321,7 @@ offene Handelsgesellschaft:
   abbr:
     - ОАО
     - OAO
+    - OJSC
   lang: ru
   lead: 1
 Partnerschaftsgesellschaft:
@@ -333,6 +360,12 @@ Proprietary Limited:
 'Przedsiębiorstwo Państwowe':
   abbr: P.P.
   lang: pl
+Public Joint Stock Company:
+  abbr_std: PJSC
+  abbr:
+    - PJSC
+    - Co. PJSC
+  lang: en
 Public Limited Company:
   abbr:
     - plc
@@ -341,7 +374,9 @@ Public Limited Company:
 'Публичное акционерное общество':
   abbr:
     - "ПАО"
+    - "PJSC"
   lang: ru
+  lead: 1
 'Публичное общество':
   abbr:
     - "ПО"
@@ -390,6 +425,9 @@ Single Member Private Limited Company:
   abbr:
     - S.A.P.I.
     - S.A.P.I. de C.V.
+  lang: es
+'Sociedad Anónima Unipersonal':
+  abbr: S.A.U.
   lang: es
 Sociedad Colectiva:
   abbr:
@@ -593,7 +631,8 @@ Vennootschap onder firma:
 '股份有限公司':
   doc: Company limited by shares
   lang: zh
-'合伙企业':
+'合伙企业有限合伙':
+  abbr: '合伙企业'
   doc: Partnership enterprise
   lang: zh
 '有限合伙企业':
@@ -664,14 +703,15 @@ Vennootschap onder firma:
   abbr:
     - '株式會社'
     - Jusik Hoesa
-  doc: ~plc (UK)
+  doc: ~plc (UK) (found no instances in leading position?)
   lang: ko
 '유한회사':
   abbr:
     - '有限會社'
     - Yuhan Hoesa
-  doc: ~Ltd (UK)
+  doc: ~Ltd (UK) (found one instance in leading position, but non-continuous)
   lang: ko
+  lead: 1
 '합자회사':
   abbr:
     - '合資會社'
@@ -684,3 +724,7 @@ Vennootschap onder firma:
     - Hapmyoung Hoesa
   doc: general partnership corporation
   lang: ko
+'شركة':
+  doc: Company
+  lang: ar
+  lead: 1

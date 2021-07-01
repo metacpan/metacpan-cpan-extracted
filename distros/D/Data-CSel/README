@@ -2,8 +2,8 @@ NAME
     Data::CSel - Select tree node objects using CSS Selector-like syntax
 
 VERSION
-    This document describes version 0.123 of Data::CSel (from Perl
-    distribution Data-CSel), released on 2020-04-09.
+    This document describes version 0.125 of Data::CSel (from Perl
+    distribution Data-CSel), released on 2021-07-01.
 
 SYNOPSIS
      use Data::CSel qw(csel csel_each);
@@ -517,9 +517,27 @@ EXPRESSION SYNTAX
 
         Select only root node(s).
 
+    *   ":has-min-children(m)"
+
+        Select only objects that have at least *m* direct children.
+
+    *   ":has-max-children(n)"
+
+        Select only objects that have at most *n* direct children.
+
+    *   ":has-children-between(m,n)"
+
+        Select only objects that have between *m* and *n* direct children.
+
+    *   ":parent"
+
+        Select the node's parent.
+
     *   ":empty"
 
         Select only leaf node(s).
+
+        See also ":has".
 
     *   :not(S)
 
@@ -545,6 +563,8 @@ EXPRESSION SYNTAX
 
         will select all objects that have a descendant of type "T".
 
+        See also: ":parent".
+
   Differences with CSS selector
    Type selector can contain double colon ("::")
     Since Perl package names are separated by "::", CSel allows it in type
@@ -563,6 +583,8 @@ EXPRESSION SYNTAX
    Different pseudo-classes supported
     Some CSS pseudo-classes only make sense for a DOM or a visual browser,
     e.g. ":link", ":visited", ":hover", so they are not supported.
+
+    CSS selector does not sport ":parent".
 
    There is no concept of CSS namespaces
     CSS namespaces are used when there are foreign elements (e.g. SVG in
@@ -765,7 +787,8 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2020, 2019, 2016 by perlancar@cpan.org.
+    This software is copyright (c) 2021, 2020, 2019, 2016 by
+    perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

@@ -6,6 +6,18 @@ documented here anyway for comprehensiveness' sake. Entries with "No
 important changes" are likely to be trivial things like documentation
 fixes or Perl::Tidy runs.
 
+0.26 2021-07-01
+
+ - Correct Changes file from previous release
+
+0.25 2021-07-01
+
+ - Correct Changes file from previous release
+
+0.24 2021-07-01
+
+ - Update URLs in Makefile.PL
+
 0.23 2021-01-02
 
  - Internal refactoring for code quality

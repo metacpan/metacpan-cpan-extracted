@@ -13,7 +13,7 @@ use Carp;
 use English '-no_match_vars';
 
 # Declare package version
-our $VERSION = '0.15';
+our $VERSION = '0.17';
 
 # Patterns to match elements of the LRC file; these are somewhat tolerant
 our %RE = (
@@ -272,7 +272,7 @@ Music::Lyrics::LRC - Manipulate LRC karaoke timed lyrics files
 
 =head1 VERSION
 
-Version 0.15
+Version 0.17
 
 =head1 DESCRIPTION
 

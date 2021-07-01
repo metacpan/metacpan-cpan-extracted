@@ -13,7 +13,7 @@ use File::Copy ();
 use ExtUtils::MakeMaker 7.12;
 
 # ABSTRACT: FFI::Build installer code for ExtUtils::MakeMaker
-our $VERSION = '1.50'; # VERSION
+our $VERSION = '1.52'; # VERSION
 
 
 sub new
@@ -308,7 +308,7 @@ FFI::Build::MM - FFI::Build installer code for ExtUtils::MakeMaker
 
 =head1 VERSION
 
-version 1.50
+version 1.52
 
 =head1 SYNOPSIS
 
@@ -420,7 +420,7 @@ Damyan Ivanov
 
 Ilya Pavlov (Ilya33)
 
-Petr Pisar (ppisar)
+Petr Písař (ppisar)
 
 Mohammad S Anwar (MANWAR)
 

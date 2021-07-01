@@ -1,3 +1,9 @@
+0.009   2021-07-01  Released-By: PERLANCAR; Urgency: medium
+
+	- Observe _filter_code and _highlight_regexp arguments, to accommodate
+          grep-url.
+
+
 0.008   2021-06-09  Released-By: PERLANCAR; Urgency: medium
 
 	- Use ColorTheme.

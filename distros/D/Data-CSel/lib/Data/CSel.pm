@@ -1,9 +1,9 @@
 package Data::CSel;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-04-09'; # DATE
+our $DATE = '2021-07-01'; # DATE
 our $DIST = 'Data-CSel'; # DIST
-our $VERSION = '0.123'; # VERSION
+our $VERSION = '0.125'; # VERSION
 
 use 5.020000;
 use strict;
@@ -618,7 +618,13 @@ sub _simpsel {
             } elsif ($pc eq 'nth-last-of-type') {
                 @res = grep { Code::Includable::Tree::NodeMethods::is_nth_last_child_of_type($_, $f->{args}[0]) } @res;
             } elsif ($pc eq 'root') {
-                @res = grep { !$_->parent } @res;
+                @res = grep { Code::Includable::Tree::NodeMethods::is_root($_) } @res;
+            } elsif ($pc eq 'has-min-children') {
+                @res = grep { Code::Includable::Tree::NodeMethods::has_min_children($_, $f->{args}[0]) } @res;
+            } elsif ($pc eq 'has-max-children') {
+                @res = grep { Code::Includable::Tree::NodeMethods::has_max_children($_, $f->{args}[0]) } @res;
+            } elsif ($pc eq 'has-children-between') {
+                @res = grep { Code::Includable::Tree::NodeMethods::has_children_between($_, $f->{args}[0], $f->{args}[1]) } @res;
             } elsif ($pc eq 'empty') {
                 @res = grep { my @c = Code::Includable::Tree::NodeMethods::_children_as_list($_); !@c } @res;
             } elsif ($pc eq 'has') {
@@ -633,6 +639,8 @@ sub _simpsel {
                 my %matches_refaddrs;
                 for (@matches) { $matches_refaddrs{refaddr($_)}++ }
                 @res = grep { !$matches_refaddrs{refaddr($_)} } @res;
+            } elsif ($pc eq 'parent') {
+                @res = _uniq_objects(map { Code::Includable::Tree::NodeMethods::retrieve_parent($_) } @res);
             } else {
                 die "Unsupported pseudo-class '$pc'";
             }
@@ -734,7 +742,7 @@ Data::CSel - Select tree node objects using CSS Selector-like syntax
 
 =head1 VERSION
 
-This document describes version 0.123 of Data::CSel (from Perl distribution Data-CSel), released on 2020-04-09.
+This document describes version 0.125 of Data::CSel (from Perl distribution Data-CSel), released on 2021-07-01.
 
 =head1 SYNOPSIS
 
@@ -1253,9 +1261,27 @@ type.
 
 Select only root node(s).
 
+=item * C<:has-min-children(m)>
+
+Select only objects that have at least I<m> direct children.
+
+=item * C<:has-max-children(n)>
+
+Select only objects that have at most I<n> direct children.
+
+=item * C<:has-children-between(m,n)>
+
+Select only objects that have between I<m> and I<n> direct children.
+
+=item * C<:parent>
+
+Select the node's parent.
+
 =item * C<:empty>
 
 Select only leaf node(s).
+
+See also C<:has>.
 
 =item * C<:not(S)>
 
@@ -1281,6 +1307,8 @@ Example:
 
 will select all objects that have a descendant of type C<T>.
 
+See also: C<:parent>.
+
 =back
 
 =head2 Differences with CSS selector
@@ -1304,6 +1332,8 @@ C<[attr =~ /re/]>.
 
 Some CSS pseudo-classes only make sense for a DOM or a visual browser, e.g.
 C<:link>, C<:visited>, C<:hover>, so they are not supported.
+
+CSS selector does not sport C<:parent>.
 
 =head3 There is no concept of CSS namespaces
 
@@ -1527,7 +1557,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

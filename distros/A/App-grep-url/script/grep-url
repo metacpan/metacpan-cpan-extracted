@@ -1,0 +1,386 @@
+#!perl
+
+# Note: This script is a CLI for Riap function /App/grep/url/grep_url
+# and generated automatically using Perinci::CmdLine::Gen version 0.499
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-07-01'; # DATE
+our $DIST = 'App-grep-url'; # DIST
+our $VERSION = '0.001'; # VERSION
+
+use 5.010001;
+use strict;
+use warnings;
+use Log::ger;
+
+use Perinci::CmdLine::Any;
+
+my $cmdline = Perinci::CmdLine::Any->new(
+    url => "/App/grep/url/grep_url",
+    program_name => "grep-url",
+    log => 1,
+    read_config => 0,
+    read_env => 0,
+);
+
+$cmdline->{common_opts}{version}{getopt} = "version|V";
+
+$cmdline->run;
+
+# ABSTRACT: Print lines having URL(s) (optionally of certain criteria) in them
+# PODNAME: grep-url
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+grep-url - Print lines having URL(s) (optionally of certain criteria) in them
+
+=head1 VERSION
+
+This document describes version 0.001 of grep-url (from Perl distribution App-grep-url), released on 2021-07-01.
+
+=head1 SYNOPSIS
+
+Usage:
+
+ % grep-url [--all] [-c] [--color=s] [--count] [--dash-prefix-inverts]
+     [--debug] [--file=s+] [--files-json=s] [--format=name]
+     [--host-contains=s] [--host-matches=s] [--host-not-contains=s]
+     [--invert-match] [--json] [--line-number] [--log-level=level]
+     [--max-urls=s] [--min-urls=s] [-n] [--(no)naked-res]
+     [--no-dash-prefix-inverts] [--no-invert-match]
+     [--nodash-prefix-inverts] [--noinvert-match] [--page-result[=program]]
+     [--path-contains=s] [--path-matches=s] [--path-not-contains=s] [-q]
+     [--query-param-contains-json=s] [--query-param-contains key=s]
+     [--query-param-matches-json=s] [--query-param-matches key=s]
+     [--query-param-not-contains-json=s] [--query-param-not-contains key=s]
+     [--quiet] [--quiet-arg] [--scheme-contains=s] [--scheme-matches=s]
+     [--scheme-not-contains=s] [--scheme=s+] [--schemes-json=s] [--silent]
+     [--trace] [-v] [--verbose] [--view-result[=program]] -- [file] ...
+
+Examples:
+
+Show lines that contain at least 2 URLs:
+
+ % grep-url --min-urls 2 file.txt
+
+Show lines that contain URLs from google:
+
+ % grep-url --host-contains google file.txt
+
+Show lines that contain search URLs from google where query contains the keyword "mortal":
+
+ % grep-url --host-contains google --query-param-contains q=mortal file.txt
+
+=head1 DESCRIPTION
+
+This is a grep-like utility that greps for URLs of certain criteria.
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Main options
+
+=over
+
+=item B<--file>=I<s@>
+
+Can also be specified as the 1st command-line argument and onwards.
+
+Can be specified multiple times.
+
+=item B<--files-json>=I<s>
+
+See C<--file>.
+
+Can also be specified as the 1st command-line argument and onwards.
+
+=back
+
+=head2 Filtering options
+
+=over
+
+=item B<--max-urls>=I<s>
+
+Default value:
+
+ -1
+
+=item B<--min-urls>=I<s>
+
+Default value:
+
+ 1
+
+=back
+
+=head2 General output control options
+
+=over
+
+=item B<--color>=I<s>
+
+Default value:
+
+ "auto"
+
+Valid values:
+
+ ["never","always","auto"]
+
+=item B<--count>, B<-c>
+
+Supress normal output, return a count of matching lines.
+
+=item B<--quiet-arg>, B<--silent>, B<-q>
+
+=back
+
+=head2 Logging options
+
+=over
+
+=item B<--debug>
+
+Shortcut for --log-level=debug.
+
+=item B<--log-level>=I<s>
+
+Set log level.
+
+=item B<--quiet>
+
+Shortcut for --log-level=error.
+
+=item B<--trace>
+
+Shortcut for --log-level=trace.
+
+=item B<--verbose>
+
+Shortcut for --log-level=info.
+
+=back
+
+=head2 Matching control options
+
+=over
+
+=item B<--all>
+
+Require all patterns to match, instead of just one.
+
+=item B<--dash-prefix-inverts>
+
+When given pattern that starts with dash "-FOO", make it to mean "^(?!.*FOO)".
+
+This is a convenient way to search for lines that do not match a pattern.
+Instead of using `-v` to invert the meaning of all patterns, this option allows
+you to invert individual pattern using the dash prefix, which is also used by
+Google search and a few other search engines.
+
+
+=item B<--invert-match>, B<-v>
+
+Invert the sense of matching.
+
+=back
+
+=head2 Output line prefix control options
+
+=over
+
+=item B<--line-number>, B<-n>
+
+=back
+
+=head2 Output options
+
+=over
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--naked-res>
+
+When outputing as JSON, strip result envelope.
+
+Default value:
+
+ 0
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+    [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+`--naked-res` so you just get:
+
+    [1,2,3]
+
+
+=item B<--page-result>
+
+Filter output through a pager.
+
+=item B<--view-result>
+
+View output using a viewer.
+
+=back
+
+=head2 Url criteria options
+
+=over
+
+=item B<--host-contains>=I<s>
+
+=item B<--host-matches>=I<s>
+
+=item B<--host-not-contains>=I<s>
+
+=item B<--path-contains>=I<s>
+
+=item B<--path-matches>=I<s>
+
+=item B<--path-not-contains>=I<s>
+
+=item B<--query-param-contains-json>=I<s>
+
+See C<--query-param-contains>.
+
+=item B<--query-param-contains>=I<s>%
+
+Each value is a name-value pair, use I<key=value> syntax. Can be specified multiple times.
+
+=item B<--query-param-matches-json>=I<s>
+
+See C<--query-param-matches>.
+
+=item B<--query-param-matches>=I<s>%
+
+Each value is a name-value pair, use I<key=value> syntax. Can be specified multiple times.
+
+=item B<--query-param-not-contains-json>=I<s>
+
+See C<--query-param-not-contains>.
+
+=item B<--query-param-not-contains>=I<s>%
+
+Each value is a name-value pair, use I<key=value> syntax. Can be specified multiple times.
+
+=item B<--scheme-contains>=I<s>
+
+=item B<--scheme-matches>=I<s>
+
+=item B<--scheme-not-contains>=I<s>
+
+=item B<--scheme>=I<s@>
+
+Default value:
+
+ ["http","file"]
+
+Can be specified multiple times.
+
+=item B<--schemes-json>=I<s>
+
+See C<--scheme>.
+
+=back
+
+=head2 Other options
+
+=over
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--version>, B<-V>
+
+Display program's version and exit.
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C grep-url grep-url
+
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete grep-url 'p/*/`grep-url`/'
+
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install L<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install L<shcompgen> as described above.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-grep-url>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-grep-url>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-grep-url>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2021 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

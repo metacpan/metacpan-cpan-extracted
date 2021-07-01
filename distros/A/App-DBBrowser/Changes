@@ -1,6 +1,9 @@
 Revision history for App-DBBrowser
 
 
+2.270    2021-06-30
+        - Bugfix in search_and_replace history.
+
 2.269    2021-06-30
         - Code refactoring.
         - Update UI input filter.

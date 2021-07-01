@@ -1,0 +1,120 @@
+NAME
+    Regexp::Pattern::URI - Regexp patterns related to URI
+
+VERSION
+    This document describes version 0.001 of Regexp::Pattern::URI (from Perl
+    distribution Regexp-Pattern-URI), released on 2021-07-01.
+
+SYNOPSIS
+     use Regexp::Pattern; # exports re()
+     my $re = re("URI::file");
+
+DESCRIPTION
+    This is currently a repackaging (lower startup-overhead version) of some
+    of the regexes in Regexp::Common::URI.
+
+REGEXP PATTERNS
+    *   file
+
+        Match a file:// URL.
+
+        Examples:
+
+        Example #1.
+
+         "file://foo/bar.txt" =~ re("URI::file");  # matches
+
+        Example #2.
+
+         "ftp://www.example.org/foo" =~ re("URI::file");  # DOESN'T MATCH
+
+        Example #3.
+
+         "foo/bar.txt" =~ re("URI::file");  # DOESN'T MATCH
+
+    *   ftp
+
+        Match an ftp:// URL.
+
+        Examples:
+
+        Example #1.
+
+         "ftp://www.example.org/foo" =~ re("URI::ftp");  # matches
+
+        Example #2.
+
+         "http://www.example.org/foo" =~ re("URI::ftp");  # DOESN'T MATCH
+
+        Example #3.
+
+         "foo/bar.txt" =~ re("URI::ftp");  # DOESN'T MATCH
+
+    *   http
+
+        Match an http/https URL.
+
+        Examples:
+
+        Example #1.
+
+         "http://www.example.org/foo" =~ re("URI::http");  # matches
+
+        Example #2.
+
+         "ftp://www.example.org/foo" =~ re("URI::http");  # DOESN'T MATCH
+
+        Example #3.
+
+         "foo\@example.org" =~ re("URI::http");  # DOESN'T MATCH
+
+    *   ssh
+
+        Match an ssh:// URL.
+
+        Examples:
+
+        Example #1.
+
+         "ssh://user:pass\@example.org:/foo/bar.git" =~ re("URI::ssh");  # matches
+
+        Example #2.
+
+         "http://www.example.org/foo" =~ re("URI::ssh");  # DOESN'T MATCH
+
+        Example #3.
+
+         "foo/bar.txt" =~ re("URI::ssh");  # DOESN'T MATCH
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Regexp-Pattern-URI>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Regexp-Pattern-URI>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Regexp-Pattern-URI>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Regexp::Common, particularly Regexp::Common::URI
+
+    Regexp::Pattern
+
+    Some utilities related to Regexp::Pattern: App::RegexpPatternUtils,
+    rpgrep from App::rpgrep.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2021 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -38,15 +38,15 @@ sub attach_db {
     ATTACH: while ( 1 ) {
 
         DB: while ( 1 ) {
-            my @info = ( $sf->{d}{db_string} );
+            my @tmp_info = ( $sf->{d}{db_string} );
             for my $ref ( @$cur_attached, @$new_attached ) {
-                push @info, sprintf "ATTACH DATABASE %s AS %s", @$ref;
+                push @tmp_info, sprintf "ATTACH DATABASE %s AS %s", @$ref;
             }
-            push @info, '';
+            push @tmp_info, '';
             my @pre = ( undef );
             my @choices = ( @{$sf->{d}{user_dbs}}, @{$sf->{d}{sys_dbs}} );
             my $menu = [ @pre, @choices ];
-            my $info = join( "\n", @info );
+            my $info = join( "\n", @tmp_info );
             # Choose
             my $idx = $tc->choose(
                 $menu,
@@ -70,10 +70,10 @@ sub attach_db {
             }
             my $db = $menu->[$idx];
             my $tf = Term::Form->new( $sf->{i}{tf_default} );
-            push @info, "ATTACH DATABASE $db AS";
+            push @tmp_info, "ATTACH DATABASE $db AS";
 
             ALIAS: while ( 1 ) {
-                my $info = join( "\n", @info );
+                my $info = join( "\n", @tmp_info );
                 # Readline
                 my $alias = $tf->readline( ##
                     'alias: ',
@@ -85,7 +85,7 @@ sub attach_db {
                 }
                 elsif ( any { $_->[1] eq $alias } @$cur_attached, @$new_attached ) {
                     my $prompt = "alias '$alias' already used:";
-                    my $info = join( "\n", @info );
+                    my $info = join( "\n", @tmp_info );
                     # Choose
                     my $retry = $tc->choose(
                         [ undef, 'New alias' ],
@@ -102,11 +102,11 @@ sub attach_db {
             }
 
             POP_ATTACHED: while ( 1 ) {
-                my @info = ( $sf->{d}{db_string} );
-                push @info, map { "ATTACH DATABASE $_->[0] AS $_->[1]" } @$cur_attached, @$new_attached;
-                push @info, '';
+                my @tmp_info = ( $sf->{d}{db_string} );
+                push @tmp_info, map { "ATTACH DATABASE $_->[0] AS $_->[1]" } @$cur_attached, @$new_attached;
+                push @tmp_info, '';
                 my ( $ok, $more ) = ( 'OK', '++' );
-                my $info = join( "\n", @info );
+                my $info = join( "\n", @tmp_info );
                 # Choose
                 my $choice = $tc->choose(
                     [ undef, $ok, $more ],

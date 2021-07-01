@@ -7,7 +7,7 @@ use Carp qw( croak );
 use parent qw( FFI::Platypus::TypeParser );
 
 # ABSTRACT: FFI Type Parser Version One
-our $VERSION = '1.50'; # VERSION
+our $VERSION = '1.52'; # VERSION
 
 
 our @CARP_NOT = qw( FFI::Platypus FFI::Platypus::TypeParser );
@@ -292,7 +292,7 @@ FFI::Platypus::TypeParser::Version1 - FFI Type Parser Version One
 
 =head1 VERSION
 
-version 1.50
+version 1.52
 
 =head1 SYNOPSIS
 
@@ -352,7 +352,7 @@ Damyan Ivanov
 
 Ilya Pavlov (Ilya33)
 
-Petr Pisar (ppisar)
+Petr Písař (ppisar)
 
 Mohammad S Anwar (MANWAR)
 

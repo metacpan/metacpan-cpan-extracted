@@ -16,7 +16,7 @@ use base qw(Exporter);    ## no critic (ProhibitUseBase)
 our @EXPORT_OK = qw(breakdown);
 
 # Specify package version
-our $VERSION = '0.23';
+our $VERSION = '0.26';
 
 # Dispatch table of functions to handle different ref types for the spec
 # hashref's values
@@ -103,7 +103,7 @@ List::Breakdown - Build sublist structures matching conditions
 
 =head1 VERSION
 
-Version 0.23
+Version 0.26
 
 =head1 SYNOPSIS
 

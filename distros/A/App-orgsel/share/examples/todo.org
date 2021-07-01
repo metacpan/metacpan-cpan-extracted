@@ -42,3 +42,6 @@ to delete all containers containing /test/ in their name:
   + [2020-06-03 Wed] done on firefox-mua-modify-containers (can delete items as
     well by the code returning false/undef)
 ** TODO [2020-05-29 Fri] [#C] csvutils: make csv-grep-fields, a more flexible form of csv-select-fields
+** DONE [2020-05-29 Fri] csvutils: make csv-transpose (like 'td transpose')
+- log ::
+  + [2020-08-16 Sun] done

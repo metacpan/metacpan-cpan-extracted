@@ -59,7 +59,7 @@ sub BUILD {
 
 =head1 SEE ALSO
 
-L<http://www.fixflo.com/Tech/API/V2/DTO#Envelope-T>
+L<https://api-docs.fixflo.com/#resources-envelope>
 
 =head1 AUTHOR
 

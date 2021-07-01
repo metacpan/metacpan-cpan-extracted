@@ -6,8 +6,8 @@ This module provides a Unix-like command `digitdemog'.
 
 想定している使い方 (digitdemog) : 
 
-  1. 何桁目にどんな文字が現れたのかを解読する
-  2. -L により、各行の桁数ごとに、どんな値が現れたか、例を取り出す。
+  1. 各行の何桁目にどんな文字が現れたのかを解読する
+  2. -L2 により、各行の桁数ごとに、どんな値が現れたか、例を取り出す。
   
 =head1 SEE ALSO
 

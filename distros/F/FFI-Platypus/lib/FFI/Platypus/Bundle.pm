@@ -6,7 +6,7 @@ use 5.008004;
 use Carp ();
 
 # ABSTRACT: Bundle foreign code with your Perl module
-our $VERSION = '1.50'; # VERSION
+our $VERSION = '1.52'; # VERSION
 
 
 package FFI::Platypus;
@@ -150,7 +150,7 @@ FFI::Platypus::Bundle - Bundle foreign code with your Perl module
 
 =head1 VERSION
 
-version 1.50
+version 1.52
 
 =head1 SYNOPSIS
 
@@ -773,7 +773,7 @@ Damyan Ivanov
 
 Ilya Pavlov (Ilya33)
 
-Petr Pisar (ppisar)
+Petr Písař (ppisar)
 
 Mohammad S Anwar (MANWAR)
 

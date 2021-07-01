@@ -9,7 +9,7 @@ my $dict = Data::Radius::Dictionary->load_file('./radius/dictionary');
 ok($dict, 'dictionary loaded');
 
 my $warns = 0;
-$SIG{__WARN__} = sub { $warns++ };
+$SIG{__WARN__} = sub { $warns++, note(@_) };
 
 is(encode({type => 'integer'}, 535), "\x00\x00\x02\x17", 'int');
 is(encode({type => 'integer', name => 'TestAttr'}, -1), undef, 'integer - out of range');

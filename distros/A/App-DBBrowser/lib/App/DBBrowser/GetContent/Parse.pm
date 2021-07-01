@@ -37,7 +37,7 @@ sub __print_waiting_str {
 }
 
 
-sub __parse_plain {
+sub parse_plain {
     my ( $sf, $sql, $fh ) = @_;
     my $rows_of_cols = [];
     my $file_fs = $sf->{i}{f_plain};
@@ -48,7 +48,7 @@ sub __parse_plain {
 }
 
 
-sub __parse_with_Text_CSV {
+sub parse_with_Text_CSV {
     my ( $sf, $sql, $fh ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
@@ -85,7 +85,7 @@ sub __parse_with_Text_CSV {
 }
 
 
-sub __parse_with_split {
+sub parse_with_split {
     my ( $sf, $sql, $fh ) = @_;
     $sf->__print_waiting_str;
     my $rows_of_cols = [];
@@ -149,7 +149,7 @@ sub __print_template_info {
 }
 
 
-sub __parse_with_template {
+sub parse_with_template {
     my ( $sf, $sql, $fh ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $tf = Term::Form->new( $sf->{i}{tf_default} );
@@ -276,7 +276,7 @@ sub __parse_with_template {
 }
 
 
-sub __parse_with_Spreadsheet_Read {
+sub parse_with_Spreadsheet_Read {
     my ( $sf, $sql, $file_fs ) = @_;
     my $tc = Term::Choose->new( { %{$sf->{i}{tc_default}}, clear_screen => 1 } );
     $sf->__print_waiting_str;

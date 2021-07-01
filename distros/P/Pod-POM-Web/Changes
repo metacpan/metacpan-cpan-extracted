@@ -1,5 +1,8 @@
 Revision history for Pod-POM-Web
 
+1.26 01.07.2021
+  - fix directories where to find basic Perl docs
+
 1.25 20.06.2021
   - migrated to Plack architecture
   - generate fulltext index from within the application

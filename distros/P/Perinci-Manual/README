@@ -2,8 +2,8 @@ NAME
     Perinci::Manual - Extra documentation for Perinci
 
 VERSION
-    This document describes version 0.001 of Perinci::Manual (from Perl
-    distribution Perinci-Manual), released on 2021-01-16.
+    This document describes version 0.002 of Perinci::Manual (from Perl
+    distribution Perinci-Manual), released on 2021-07-01.
 
 DESCRIPTION
     The "Perinci" namespace contains several separate frameworks (for
@@ -24,7 +24,7 @@ SOURCE
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website
-    <https://github.com/perlancar/perl-Perinci-Manual/issues>
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-Manual>
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.

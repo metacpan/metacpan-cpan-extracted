@@ -4,7 +4,7 @@
       "Graham Ollis <plicease@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Dist::Zilla version 6.019, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.022, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -93,7 +93,7 @@
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "1.50",
+   "version" : "1.52",
    "x_contributors" : [
       "Graham Ollis <plicease@cpan.org>",
       "Bakkiaraj Murugesan (bakkiaraj)",
@@ -106,7 +106,7 @@
       "Shlomi Fish (shlomif)",
       "Damyan Ivanov",
       "Ilya Pavlov (Ilya33)",
-      "Petr Pisar (ppisar)",
+      "Petr P\u00edsa\u0159 (ppisar)",
       "Mohammad S Anwar (MANWAR)",
       "H\u00e5kon H\u00e6gland (hakonhagland, HAKONH)",
       "Meredith (merrilymeredith, MHOWARD)",

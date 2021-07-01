@@ -23,7 +23,8 @@ my %WriteMakefileArgs = (
     "Digest::MD5" => 0,
     "FLAT" => "1.0.4",
     "Parse::RecDescent" => 0,
-    "Storable" => 0
+    "Storable" => 0,
+    "Util::H2O" => 0
   },
   "TEST_REQUIRES" => {
     "Digest::MD5" => 0,
@@ -31,7 +32,7 @@ my %WriteMakefileArgs = (
     "Test::Exception" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.314002",
+  "VERSION" => "0.314004",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -45,7 +46,8 @@ my %FallbackPrereqs = (
   "Parse::RecDescent" => 0,
   "Storable" => 0,
   "Test::Exception" => 0,
-  "Test::More" => 0
+  "Test::More" => 0,
+  "Util::H2O" => 0
 );
 
 

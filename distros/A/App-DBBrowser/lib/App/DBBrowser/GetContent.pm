@@ -119,16 +119,16 @@ sub get_content {
                         open my $fh, $open_mode, $file_fs or die $!;
                         my $parse_ok;
                         if ( $parse_mode_idx == -1 ) {
-                            $parse_ok = $cp->__parse_plain( $sql, $fh );
+                            $parse_ok = $cp->parse_plain( $sql, $fh );
                         }
                         elsif ( $parse_mode_idx == 0 ) {
-                            $parse_ok = $cp->__parse_with_Text_CSV( $sql, $fh );
+                            $parse_ok = $cp->parse_with_Text_CSV( $sql, $fh );
                         }
                         elsif ( $parse_mode_idx == 1 ) {
-                            $parse_ok = $cp->__parse_with_split( $sql, $fh );
+                            $parse_ok = $cp->parse_with_split( $sql, $fh );
                         }
                         elsif ( $parse_mode_idx == 2 ) {
-                            $parse_ok = $cp->__parse_with_template( $sql, $fh );
+                            $parse_ok = $cp->parse_with_template( $sql, $fh );
                             if ( $parse_ok && $parse_ok == -1 ) {
                                 next PARSE;
                             }
@@ -149,7 +149,7 @@ sub get_content {
                     }
                     else {
                         SHEET: while ( 1 ) {
-                            my $ok = $cp->__parse_with_Spreadsheet_Read( $sql, $file_fs );
+                            my $ok = $cp->parse_with_Spreadsheet_Read( $sql, $file_fs );
                             if ( ! $ok ) {
                                 $skip_to = '';
                                 next GET_DATA;

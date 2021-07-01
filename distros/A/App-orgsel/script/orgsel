@@ -1,9 +1,9 @@
 #!perl
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-06-27'; # DATE
+our $DATE = '2021-07-01'; # DATE
 our $DIST = 'App-orgsel'; # DIST
-our $VERSION = '0.012'; # VERSION
+our $VERSION = '0.013'; # VERSION
 
 use 5.010001;
 use strict;
@@ -32,7 +32,7 @@ orgsel - Select Org document elements using CSel (CSS-selector-like) syntax
 
 =head1 VERSION
 
-This document describes version 0.012 of orgsel (from Perl distribution App-orgsel), released on 2021-06-27.
+This document describes version 0.013 of orgsel (from Perl distribution App-orgsel), released on 2021-07-01.
 
 =head1 SYNOPSIS
 
@@ -83,6 +83,9 @@ file):
    + [2020-06-03 Wed] done on firefox-mua-modify-containers (can delete items as
      well by the code returning false/undef)
  ** TODO [2020-05-29 Fri] [#C] csvutils: make csv-grep-fields, a more flexible form of csv-select-fields
+ ** DONE [2020-05-29 Fri] csvutils: make csv-transpose (like 'td transpose')
+ - log ::
+   + [2020-08-16 Sun] done
 
 Example document F<addressbook.org> (you can get this from the distribution
 shared file):
@@ -233,6 +236,23 @@ example C<dump-org-structure todo.org> will give:
        Text:
          Timestamp: 2020-05-29T00:00:00F "[2020-05-29 Fri]"
          Text: " csvutils: make csv-grep-fields, a more..."
+     Headline: l=2 todo=DONE
+       (title)
+       Text:
+         Timestamp: 2020-05-29T00:00:00F "[2020-05-29 Fri]"
+         Text: " csvutils: make csv-transpose (like 'td..."
+       (children)
+       List: D(-) indent=0
+         ListItem: -
+           (description term)
+           Text: "log"
+           (children)
+           Text: "\n"
+         List: U(+) indent=2
+           ListItem: +
+             (children)
+             Timestamp: 2020-08-16T00:00:00F "[2020-08-16 Sun]"
+             Text: " done\n"
 
 Now for some selecting examples:
 
@@ -250,7 +270,27 @@ Now for some selecting examples:
  % orgsel todo.org 'Headline[level=2][title.as_string =~ /set_value/] Timestamp:first'
  [2021-06-22]
 
- # TODO: more examples coming
+ # how many bugs do we have?
+ % orgsel todo.org 'Headline[level=2][todo_state="BUG"]' --count
+
+ # how many bugs and other undone todo items?
+ % orgsel todo.org 'Headline[level=2][is_todo is true][is_done is false]' --count
+
+ # how many undone todo items for csvutils project?
+ % orgsel todo.org 'Headline[level=1][title.as_string =~ /csvutils/] > Headline[level=2][is_todo is true][is_done is false]' --count
+
+ # dump a particular todo item (helps visualize structure to select further)
+ % orgsel todo.org 'Headline[level=2][title.as_string =~ /eats comments/]' | dump-org-structure
+
+ # show the update log of the todo item (with the "- log ::"):
+ % orgsel todo.org 'Headline[level=2][title.as_string =~ /eats comments/] > List > ListItem[desc_term.text = "log"]:parent'
+
+ # show the update log of the todo item (without the "- log ::"):
+ % orgsel todo.org 'Headline[level=2][title.as_string =~ /eats comments/] > List > ListItem[desc_term.text = "log"] + *'
+
+ # select todo items which have been updated at least twice (by looking at
+ # number of list items under "log")
+ % orgsel todo.org 'Headline[level=2] > List > ListItem[desc_term.text = "log"] + *:has-min-children(2):parent:parent'
 
 =head1 DESCRIPTION
 

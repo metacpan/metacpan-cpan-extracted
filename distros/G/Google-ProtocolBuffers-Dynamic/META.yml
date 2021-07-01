@@ -26,6 +26,6 @@ requires:
 resources:
   homepage: https://github.com/mbarbon/google-protobuf-dynamic
   repository: https://github.com/mbarbon/google-protobuf-dynamic.git
-version: '0.31'
+version: '0.32'
 x_generated_by_perl: v5.24.4
 x_serialization_backend: 'YAML::Tiny version 1.73'

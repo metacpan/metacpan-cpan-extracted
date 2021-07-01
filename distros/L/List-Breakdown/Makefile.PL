@@ -26,16 +26,16 @@ WriteMakefile(
         'meta-spec' => { version => 2 },
         provides => {
             'List::Breakdown' => {
-                version => '0.23',
+                version => '0.26',
                 file => 'lib/List/Breakdown.pm',
             },
         },
         resources => {
-            homepage => 'https://sanctum.geek.nz/cgit/List-Breakdown.git/',
+            homepage => 'https://dev.sanctum.geek.nz/cgit/List-Breakdown.git/',
             repository => {
                 type => 'git',
-                url => 'https://sanctum.geek.nz/code/List-Breakdown.git/',
-                web => 'https://sanctum.geek.nz/cgit/List-Breakdown.git/',
+                url => 'https://dev.sanctum.geek.nz/code/List-Breakdown.git/',
+                web => 'https://dev.sanctum.geek.nz/cgit/List-Breakdown.git/',
             },
         },
     },

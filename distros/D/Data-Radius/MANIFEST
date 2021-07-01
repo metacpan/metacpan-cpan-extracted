@@ -17,8 +17,10 @@ t/enum.t
 t/decode.t
 t/dict.t
 t/encode.t
+t/pod.t
 t/pwd.t
 t/packet.t
+t/tag.t
 radius/alcatel-lucent
 radius/quintum
 radius/dictionary

@@ -118,11 +118,11 @@ sub __func_Bit_Length {
     if ( ! defined $chosen_cols ) {
         return;
     }
-    my @tmp;
+    my @items;
     for my $qt_col ( @$chosen_cols ) {
-        push @tmp, $plui->bit_length( $qt_col );
+        push @items, $plui->bit_length( $qt_col );
     }
-    my $quote_f = join ', ', @tmp;
+    my $quote_f = join ', ', @items;
     return $quote_f;
 }
 
@@ -134,11 +134,11 @@ sub __func_Char_Length {
     if ( ! defined $chosen_cols ) {
         return;
     }
-    my @tmp;
+    my @items;
     for my $qt_col ( @$chosen_cols ) {
-        push @tmp, $plui->char_length( $qt_col );
+        push @items, $plui->char_length( $qt_col );
     }
-    my $quote_f = join ', ', @tmp;
+    my $quote_f = join ', ', @items;
     return $quote_f;
 }
 
@@ -176,7 +176,7 @@ sub __func_Replace {
     if ( ! defined $chosen_cols ) {
         return;
     }
-    my @tmp;
+    my @items;
     COL: for my $qt_col ( @$chosen_cols ) {
         my $info = $func . '(' . $qt_col . ', from_str, to_str)';
         my $form = $tf->fill_form(
@@ -192,13 +192,13 @@ sub __func_Replace {
         #}
         my $string_to_replace =  $sf->{d}{dbh}->quote( $form->[0][1] );
         my $replacement_string = $sf->{d}{dbh}->quote( $form->[1][1] );
-        push @tmp, $plui->replace( $qt_col, $string_to_replace, $replacement_string );
+        push @items, $plui->replace( $qt_col, $string_to_replace, $replacement_string );
         $fields = $form;
     }
-    if ( ! @tmp ) {
+    if ( ! @items ) {
         return;
     }
-    my $quote_f = join ', ', @tmp;
+    my $quote_f = join ', ', @items;
     return $quote_f;
 }
 
@@ -212,7 +212,7 @@ sub __func_Round {
     if ( ! defined $chosen_cols ) {
         return;
     }
-    my @tmp;
+    my @items;
     my $default_number = 2;
 
     COL: for my $qt_col ( @$chosen_cols ) {
@@ -242,12 +242,12 @@ sub __func_Round {
         else {
             $default_sign = 1;
         }
-        push @tmp, $plui->round( $qt_col, $precision );
+        push @items, $plui->round( $qt_col, $precision );
     }
-    if ( ! @tmp ) {
+    if ( ! @items ) {
         return;
     }
-    my $quote_f = join ', ', @tmp;
+    my $quote_f = join ', ', @items;
     return $quote_f;
 }
 
@@ -260,7 +260,7 @@ sub __func_Truncate {
     if ( ! defined $chosen_cols ) {
         return;
     }
-    my @tmp;
+    my @items;
     my $default_number = 2;
 
     COL: for my $qt_col ( @$chosen_cols ) {
@@ -273,12 +273,12 @@ sub __func_Truncate {
             next COL;
         }
         $default_number = $precision;
-        push @tmp, $plui->truncate( $qt_col, $precision );
+        push @items, $plui->truncate( $qt_col, $precision );
     }
-    if ( ! @tmp ) {
+    if ( ! @items ) {
         return;
     }
-    my $quote_f = join ', ', @tmp;
+    my $quote_f = join ', ', @items;
     return $quote_f;
 }
 
@@ -328,30 +328,32 @@ sub __func_Date_Time {
     }
     my $info_dates = 10;
     if ( all { exists $auto_interval->{$_} } @$chosen_cols ) {
-        my @tmp;
-        my @info = ( 'Converted columns:' );
+        my @items;
+        my @tmp_info = ( 'Converted columns:' );
         for my $qt_col ( @$chosen_cols ) {
             my ( $converted_epoch, $first_dates ) = $sf->__interval_to_converted_epoch( $sql, $func, $maxrows, $qt_col, $auto_interval->{$qt_col} );
-            push @tmp, $converted_epoch;
-            push @info,
+            push @items, $converted_epoch;
+            push @tmp_info,
                     unicode_sprintf( $qt_col, $longest_key, { right_justify => 0 } )
                 . ': '
                 . join( ', ', @{$first_dates}[0 .. $info_dates - 1] )
                 . ( @{$first_dates} > $info_dates ? ', ...' : '' );
         }
+        my $info = join( "\n", @tmp_info );
+        # Choose
         my $choice = $tc->choose(
             [ undef, $sf->{i}{_confirm} ],
-            { %{$sf->{i}{lyt_v}}, info => join( "\n", @info ), tabs_info => [ 0, $longest_key ], layout => 3, prompt => 'Choose:' }
+            { %{$sf->{i}{lyt_v}}, info => $info, tabs_info => [ 0, $longest_key ], layout => 3, prompt => 'Choose:' }
         );
         if ( ! $choice ) {
             $auto_interval = {};
         }
         elsif ( $choice eq $sf->{i}{_confirm} ) {
-            my $quote_f = join ', ', @tmp;
+            my $quote_f = join ', ', @items;
             return $quote_f;
         }
     }
-    my @tmp;
+    my @items;
 
     COL: for my $qt_col ( @$chosen_cols ) {
         my $info_rows = 20;
@@ -368,16 +370,17 @@ sub __func_Date_Time {
                     { Columns=>[1], MaxRows => $maxrows },
                     '\S'
                 );
-                my @info = ( 'Choose interval.', $qt_col . " epochs." );
-                push @info, @{$first_epochs}[0 .. $info_rows - 1];
+                my @tmp_info = ( 'Choose interval.', $qt_col . " epochs." );
+                push @tmp_info, @{$first_epochs}[0 .. $info_rows - 1];
                 if ( @$first_epochs > $info_rows ) {
-                    push @info, '...';
+                    push @tmp_info, '...';
                 }
                 my $menu = [ undef, map( '*********|' . ( '*' x $_ ), reverse( 0 .. 6 ) ) ];
+                my $info = join( "\n", @tmp_info );
                 # Choose
                 $interval = $tc->choose( # menu-memory
                     $menu,
-                    { %{$sf->{i}{lyt_v}}, prompt => '', info => join( "\n", @info ), keep => 7, layout => 3, undef => '<<' }
+                    { %{$sf->{i}{lyt_v}}, prompt => '', info => $info, keep => 7, layout => 3, undef => '<<' }
                 );
                 if ( ! defined $interval ) {
                     next COL;
@@ -385,14 +388,16 @@ sub __func_Date_Time {
             }
             my $div = 10 ** ( length( $interval ) - 10 );
             my ( $converted_epoch, $first_dates ) = $sf->__interval_to_converted_epoch( $sql, $func, $maxrows, $qt_col, $interval );
-            my @info = ( $qt_col . " dates:" );
-            push @info, @{$first_dates}[0 .. $info_rows - 1];
+            my @tmp_info = ( $qt_col . " dates:" );
+            push @tmp_info, @{$first_dates}[0 .. $info_rows - 1];
             if ( @$first_dates > $info_rows ) {
-                push @info, '...';
+                push @tmp_info, '...';
             }
+            my $info = join( "\n", @tmp_info );
+            # Choose
             my $choice = $tc->choose(
                 [ undef, $sf->{i}{_confirm} ],
-                { %{$sf->{i}{lyt_v}}, info => join( "\n", @info ), layout => 3 }
+                { %{$sf->{i}{lyt_v}}, info => $info, layout => 3 }
             );
             if ( ! $choice ) {
                 if ( exists $auto_interval->{$qt_col} ) {
@@ -401,15 +406,15 @@ sub __func_Date_Time {
                 redo GET_DIV;
             }
             elsif ( $choice eq $sf->{i}{_confirm} ) {
-                push @tmp, $converted_epoch;
+                push @items, $converted_epoch;
                 next COL;
             }
         }
     }
-    if ( ! @tmp ) {
+    if ( ! @items ) {
         return;
     }
-    my $quote_f = join ', ', @tmp;
+    my $quote_f = join ', ', @items;
     return $quote_f;
 }
 

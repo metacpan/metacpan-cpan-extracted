@@ -11,7 +11,7 @@ WriteMakefile(
     ABSTRACT_FROM    => 'lib/Mail/Run/Crypt.pm',
     LICENSE          => 'artistic_2',
     PL_FILES         => {},
-    MIN_PERL_VERSION => '5.008_001',
+    MIN_PERL_VERSION => '5.008001',
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => '0',
     },
@@ -31,16 +31,16 @@ WriteMakefile(
         'meta-spec' => { version => 2 },
         provides => {
             'Mail::Run::Crypt' => {
-                version => '0.11',
+                version => '0.12',
                 file => 'lib/Mail/Run/Crypt.pm',
             },
         },
         resources => {
-            homepage => 'https://sanctum.geek.nz/cgit/Mail-Run-Crypt.git/',
+            homepage => 'https://dev.sanctum.geek.nz/cgit/Mail-Run-Crypt.git/',
             repository => {
                 type => 'git',
                 url => 'https://sanctum.geek.nz/code/Mail-Run-Crypt.git/',
-                web => 'https://sanctum.geek.nz/cgit/Mail-Run-Crypt.git/',
+                web => 'https://dev.sanctum.geek.nz/cgit/Mail-Run-Crypt.git/',
             },
         },
     },

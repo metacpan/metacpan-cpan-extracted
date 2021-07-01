@@ -1,5 +1,9 @@
 Revision history for Perl extension API::INSEE::Sirene.
 
+4.04
+        - Handle xml response when the API is down
+        - Fixed typing errors
+
 4.03
         - Removed unused import
         - Updated README
@@ -18,8 +22,8 @@ Revision history for Perl extension API::INSEE::Sirene.
 4.00
         - Major internal restructuration
         - The module version number is no longer depending on the INSEE's API version number
-        - The module is now using POO
-        - This module will now send requests using POST method when possible.
+        - The module is now using OOP
+        - The module will now send requests using POST method when possible.
             This is allowed by the INSEE's API since version 3.6.0 in order to avoid too long requests in the URL.
         - The API returns HTTP_NOT_FOUND code when no results have been found, even if the request was correct.
             The module now handles this case correctly and returns the json body instead of dumping the request.

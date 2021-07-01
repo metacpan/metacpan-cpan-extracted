@@ -9,7 +9,7 @@ use Exporter qw( import );
 our @EXPORT = grep /^arguments_/, keys %FFI::Platypus::API::;
 
 # ABSTRACT: Platypus arguments and return value API for custom types
-our $VERSION = '1.50'; # VERSION
+our $VERSION = '1.52'; # VERSION
 
 
 1;
@@ -26,7 +26,7 @@ FFI::Platypus::API - Platypus arguments and return value API for custom types
 
 =head1 VERSION
 
-version 1.50
+version 1.52
 
 =head1 SYNOPSIS
 
@@ -263,7 +263,7 @@ Damyan Ivanov
 
 Ilya Pavlov (Ilya33)
 
-Petr Pisar (ppisar)
+Petr Písař (ppisar)
 
 Mohammad S Anwar (MANWAR)
 

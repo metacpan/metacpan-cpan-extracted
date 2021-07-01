@@ -1,4 +1,8 @@
 ---
+doctype: global
+
+distribution_name: Pod-Elemental-Transformer-Stenciller
+---
 doctype: dist
 
 header:
@@ -40,3 +44,11 @@ doctype: weaver
 plugins:
  - +config: Author::CSSON
    splint: 1
+
+---
+doctype: cpanfile
+
+---
+doctype: gitignore
+
+config: Author::CSSON

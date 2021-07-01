@@ -1,9 +1,9 @@
 package AppBase::Grep;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-06-09'; # DATE
+our $DATE = '2021-07-01'; # DATE
 our $DIST = 'AppBase-Grep'; # DIST
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 use 5.010001;
 use strict;
@@ -59,7 +59,7 @@ _
             cmdline_aliases => {v=>{}},
             tags => ['category:matching-control'],
         },
-        dash_prefix_inverts => {
+        dash_prefix_inverts => { # not in grep
             summary => 'When given pattern that starts with dash "-FOO", make it to mean "^(?!.*FOO)"',
             schema => 'bool*',
             description => <<'_',
@@ -105,6 +105,20 @@ _
         # --after-context (-A)
         # --before-context (-B)
         # --context (-C)
+
+        _source => {
+            schema => 'code*',
+            tags => ['hidden'],
+        },
+        _highlight_regexp => {
+            schema => 're*',
+            tags => ['hidden'],
+        },
+        _filter_code => {
+            schema => 'code*',
+            tags => ['hidden'],
+        },
+
     },
 };
 sub grep {
@@ -133,9 +147,10 @@ sub grep {
         push @str_patterns, $p;
         push @re_patterns , $opt_ci ? qr/$p/i : qr/$p/;
     }
-    return [400, "Please specify at least one pattern"] unless @re_patterns;
-    my $re_pat = join('|', @str_patterns);
-    $re_pat = $opt_ci ? qr/$re_pat/i : qr/$re_pat/;
+    return [400, "Please specify at least one pattern"] unless $args{_filter_code} || @re_patterns;
+
+    my $re_highlight = $args{_highlight_regexp} // join('|', @str_patterns);
+    $re_highlight = $opt_ci ? qr/$re_highlight/i : qr/$re_highlight/;
 
     my $color = $args{color} // 'auto';
     my $use_color =
@@ -171,7 +186,7 @@ sub grep {
         }
 
         if ($use_color) {
-            $line =~ s/($re_pat)/$ansi_highlight$1\e[0m/g;
+            $line =~ s/($re_highlight)/$ansi_highlight$1\e[0m/g;
             print $line;
         } else {
             print $line;
@@ -203,7 +218,9 @@ sub grep {
         }
 
         my $is_match;
-        if ($logic eq 'or') {
+        if ($args{_filter_code}) {
+            $is_match = $args{_filter_code}->($line, \%args);
+        } elsif ($logic eq 'or') {
             $is_match = 0;
             for my $re (@re_patterns) {
                 if ($line =~ $re) {
@@ -261,13 +278,7 @@ AppBase::Grep - A base for grep-like CLI utilities
 
 =head1 VERSION
 
-This document describes version 0.008 of AppBase::Grep (from Perl distribution AppBase-Grep), released on 2021-06-09.
-
-=head1 CONTRIBUTOR
-
-=for stopwords perlancar (on pc-office)
-
-perlancar (on pc-office) <perlancar@gmail.com>
+This document describes version 0.009 of AppBase::Grep (from Perl distribution AppBase-Grep), released on 2021-07-01.
 
 =head1 FUNCTIONS
 

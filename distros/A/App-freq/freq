@@ -15,7 +15,7 @@ sub reading ( ) ; # 1. 読む
 sub output ( ) ; # 2. 出力する
 
 $o{q} //= '' ; 
-* dd3 = exists $o{','} && $o{','} eq 0 ? sub{$_[0]} : sub { $_[0] =~ s/(?<=\d)(?=(\d\d\d)+($|\D))/,/gr } ;
+* d3 = exists $o{','} && $o{','} eq 0 ? sub{$_[0]} : sub { $_[0] =~ s/(?<=\d)(?=(\d\d\d)+($|\D))/,/gr } ;
 my $time0 = time ; 
 my %strcnt ; # 数える対象の文字列(各行から最後の改行文字列を取り除いたもの) に対して、数えた数を入れる。
 my %cntX1X2 ; # $cntX1X2 {$_}{$tail} で度数を表す。「X」で切断を意味する。
@@ -144,9 +144,9 @@ sub output ( ) {
     push @out, & lineRange if exists $o{':'} ; # -: オプションにより、どの行番号で現れたのかを出力。(LinRange)
     $cumsum += $strcnt {$_} if $o{a} ; 
     push @out, sprintf '%5.2f%%', 100.0 * $cumsum / $totalSum  if $o{a} && $o{'%'} ; 
-    push @out, dd3( $cumsum ) if $o{a} ; 
+    push @out, d3( $cumsum ) if $o{a} ; 
     push @out, sprintf '%5.2f%%', 100.0 * $strcnt{$_} / $totalSum if $o{'%'} ;  #(Ratio%)
-    push @out, dd3($strcnt{$_} ) unless $o{1}  ; # -1オプションがあれば個数を表示しない。
+    push @out, d3($strcnt{$_} ) unless $o{1}  ; # -1オプションがあれば個数を表示しない。
     push @out, "$o{q}$_$o{q}" ; # 元の文字列 (LinStr)
     push @out, tailx() if defined $hTake ; 
     say join $osep, @out ;
@@ -157,7 +157,7 @@ sub output ( ) {
   $readLines //= $. ; # Ctrl+Cの連打で必要となる処理。
 
   return if ($o{2}//'') eq 0 ; 
-  * d3 = sub { $_[0] =~ s/(?<=\d)(?=(\d\d\d)+($|\D))/,/gr } ;
+  #* d3 = exists $o{','} && $o{','} eq 0 ? sub{$_[0]} : sub { $_[0] =~ s/(?<=\d)(?=(\d\d\d)+($|\D))/,/gr } ;
   print STDERR BOLD ITALIC DARK CYAN & d3 ( $readLines ) . " lines processed. " ; 
   print STDERR BOLD ITALIC DARK CYAN & d3 ( $totalSum ) . " lines are counted. " ; 
   print STDERR BOLD ITALIC DARK CYAN & d3 ( $shownLines ) . " lines output. " ; 

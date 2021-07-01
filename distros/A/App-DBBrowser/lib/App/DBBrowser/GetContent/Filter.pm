@@ -137,7 +137,7 @@ sub input_filter {
         elsif ( $filter eq $s_and_replace ) {
             require App::DBBrowser::GetContent::Filter::SearchAndReplace;
             my $sr = App::DBBrowser::GetContent::Filter::SearchAndReplace->new( $sf->{i}, $sf->{o}, $sf->{d} );
-            $sr->__search_and_replace( $sql, $filter_str );
+            $sr->search_and_replace( $sql, $filter_str );
         }
         elsif ( $filter eq $split_table ) {
             $sf->__split_table( $sql, $filter_str );

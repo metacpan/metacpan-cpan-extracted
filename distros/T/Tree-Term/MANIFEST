@@ -2,7 +2,6 @@ Build.PL
 CHANGES
 CONTRIBUTING
 lib/Tree/Term.pm
-lib/Tree/Term222.pm
 MANIFEST
 README
 README.md

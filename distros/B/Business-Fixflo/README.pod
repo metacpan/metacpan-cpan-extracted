@@ -5,19 +5,15 @@ package Business::Fixflo;
 Business::Fixflo - Perl library for interacting with the Fixflo API
 (https://www.fixflo.com)
 
-=for html
-<a href='https://travis-ci.org/Humanstate/business-fixflo?branch=master'><img src='https://travis-ci.org/Humanstate/business-fixflo.svg?branch=master' alt='Build Status' /></a>
-<a href='https://coveralls.io/r/Humanstate/business-fixflo?branch=master'><img src='https://coveralls.io/repos/Humanstate/business-fixflo/badge.png?branch=master' alt='Coverage Status' /></a>
-
 =head1 VERSION
 
-0.42
+0.43
 
 =head1 DESCRIPTION
 
 Business::Fixflo is a library for easy interface to the fixflo property
 repair service, it implements all of the functionality currently found
-in the service's API documentation: http://www.fixflo.com/Tech/WebAPI
+in the service's API documentation: https://api-docs.fixflo.com/
 
 B<You should refer to the official fixflo API documentation in conjunction>
 B<with this perldoc>, as the official API documentation explains in more depth
@@ -107,7 +103,7 @@ use warnings;
 use Moo;
 with 'Business::Fixflo::Version';
 
-$Business::Fixflo::VERSION = '0.42';
+$Business::Fixflo::VERSION = '0.43';
 
 use Carp qw/ confess /;
 
@@ -358,7 +354,7 @@ L<Business::Fixflo::PropertyAddress>
 
 L<Business::Fixflo::QuickViewPanel>
 
-L<http://www.fixflo.com/Tech/Api/V2/Urls>
+L<https://api-docs.fixflo.com/>
 
 =head1 AUTHOR
 

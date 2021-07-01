@@ -50,7 +50,12 @@ sub generate {
         local $Pad = '    ';
         local $Sortkeys = 1;
         join "", map {
-            (my $dump = Dumper($_)) =~ s{$}{,}; $dump
+            my $dump = Dumper($_);
+            $dump =~ s{$}{,};
+            # the '+' is to make sure Perl::Critic does not consider
+            # this an anonymous subroutine
+            $dump =~ s[^(\s+)\s({)][\1+\2]mg;
+            $dump
         } @{$args{mappings}};
     };
     my @descriptors = @{$args{descriptors} || []};
@@ -209,7 +214,7 @@ Google::ProtocolBuffers::Dynamic::MakeModule
 
 =head1 VERSION
 
-version 0.31
+version 0.32
 
 =head1 AUTHOR
 

@@ -89,3 +89,10 @@ Changes for Sub::Genius
              - documentation-only change
              - added a noteworthy addition to the POD, after finding Chapel's page
                describing its memory consistency model - worth the read!
+
+0.314003     2021-06-29 14:30:52-03:14 America/New_York
+             - internal change to bin/stubby - using Util::H2O to create accessors
+               for options processed via Getopt::Long 
+
+0.314004     2021-06-29 14:30:52-03:14 America/New_York
+             - fixed dist.ini for working meta, Makefile.PL

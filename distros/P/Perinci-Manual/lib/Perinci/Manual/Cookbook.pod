@@ -20,9 +20,29 @@ Perinci::Manual::Cookbook - Perinci cookbook
 
 =head1 VERSION
 
-This document describes version 0.001 of Perinci::Manual::Cookbook (from Perl distribution Perinci-Manual), released on 2021-01-16.
+This document describes version 0.002 of Perinci::Manual::Cookbook (from Perl distribution Perinci-Manual), released on 2021-07-01.
 
 =head1 FUNCTION METADATA RECIPES
+
+=head2 Hiding argument
+
+To make an argument "hidden", you can add either a C<hidden>, C<hidden-cli>, or
+C<hidden-mod> to the C<tags> property. This will have the following effects:
+
+=over
+
+=item * L<Perinci::To::POD> (as well as its sisters like L<Perinci::To::Text>, L<Perinci::To::HTML>) will not list the argument in the generated documentation
+
+This is for C<hidden> or C<hidden-mod> tag.
+
+=item * L<Perinci::Sub::To::CLIDocData> (which is used by L<Perinci::CmdLine>) will not list the arguments in the CLI documentation as well as --help message
+
+This is for C<hidden> or C<hidden-cli> tag.
+
+=back
+
+So with C<hidden-cli> or C<hidden-mod> you can hide arguments from CLI-only or
+module POD only.
 
 =head2 Hiding function
 
@@ -56,7 +76,7 @@ Source repository is at L<https://github.com/perlancar/perl-Perinci-Manual>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Perinci-Manual/issues>
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-Manual>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

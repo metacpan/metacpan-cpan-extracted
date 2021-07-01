@@ -5,7 +5,7 @@ use warnings;
 use 5.008004;
 
 # ABSTRACT: Legacy Platypus interfaces
-our $VERSION = '1.50'; # VERSION
+our $VERSION = '1.52'; # VERSION
 
 
 package FFI::Platypus;
@@ -78,7 +78,7 @@ FFI::Platypus::Legacy - Legacy Platypus interfaces
 
 =head1 VERSION
 
-version 1.50
+version 1.52
 
 =head1 DESCRIPTION
 
@@ -110,7 +110,7 @@ Damyan Ivanov
 
 Ilya Pavlov (Ilya33)
 
-Petr Pisar (ppisar)
+Petr Písař (ppisar)
 
 Mohammad S Anwar (MANWAR)
 

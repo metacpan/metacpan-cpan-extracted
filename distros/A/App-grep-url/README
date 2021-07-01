@@ -1,0 +1,121 @@
+NAME
+    App::grep::url - Print lines having URL(s) (optionally of certain
+    criteria) in them
+
+VERSION
+    This document describes version 0.001 of App::grep::url (from Perl
+    distribution App-grep-url), released on 2021-07-01.
+
+FUNCTIONS
+  grep_url
+    Usage:
+
+     grep_url(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Print lines having URL(s) (optionally of certain criteria) in them.
+
+    This is a grep-like utility that greps for URLs of certain criteria.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   all => *true*
+
+        Require all patterns to match, instead of just one.
+
+    *   color => *str* (default: "auto")
+
+    *   count => *true*
+
+        Supress normal output, return a count of matching lines.
+
+    *   dash_prefix_inverts => *bool*
+
+        When given pattern that starts with dash "-FOO", make it to mean
+        "^(?!.*FOO)".
+
+        This is a convenient way to search for lines that do not match a
+        pattern. Instead of using "-v" to invert the meaning of all
+        patterns, this option allows you to invert individual pattern using
+        the dash prefix, which is also used by Google search and a few other
+        search engines.
+
+    *   files => *array[filename]*
+
+    *   host_contains => *str*
+
+    *   host_matches => *re*
+
+    *   host_not_contains => *str*
+
+    *   invert_match => *bool*
+
+        Invert the sense of matching.
+
+    *   line_number => *true*
+
+    *   max_urls => *int* (default: -1)
+
+    *   min_urls => *uint* (default: 1)
+
+    *   path_contains => *str*
+
+    *   path_matches => *re*
+
+    *   path_not_contains => *str*
+
+    *   query_param_contains => *hash*
+
+    *   query_param_matches => *hash*
+
+    *   query_param_not_contains => *hash*
+
+    *   quiet => *true*
+
+    *   scheme_contains => *str*
+
+    *   scheme_matches => *re*
+
+    *   scheme_not_contains => *str*
+
+    *   schemes => *array[str]* (default: ["http","file"])
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-grep-url>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-grep-url>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-grep-url>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2021 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

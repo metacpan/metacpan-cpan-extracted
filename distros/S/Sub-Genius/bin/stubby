@@ -4,8 +4,9 @@ use strict;
 use warnings;
 use Sub::Genius::Util ();
 use Getopt::Long      ();
+use Util::H2O qw/h2o/;
 
-my $VERSION = 1.0;
+my $VERSION = 1.1;
 
 use constant {
     EXIT_SUCCESS => 0,
@@ -69,7 +70,7 @@ sub usage_init {
 }
 
 sub usage_list {
-    return qq{stubby list [-f path/to/preplan.preplan] | [-p|--preplan "p&r&e&plan"]}
+    return qq{stubby list [-f path/to/preplan.preplan] | [-p|--preplan "p&r&e&plan"]};
 }
 
 sub usage_precache {
@@ -87,65 +88,68 @@ sub run_helf {
 
 sub run_export {
     my $argv = shift;
-    my %opts = ();
+    my $opts = { a => undef, f => undef, p => undef, s => undef };
     my $gol  = Getopt::Long::GetOptionsFromArray(
         $argv,
-        \%opts,             # container for all processed options
-	q/a|as=s/,            # specify export kind (e.g., "dot" dumps PRE in graphviz "dot" format)
-        q/f|prefile=s/,     # specify file containing PRE
-        q/p|preplan=s/,     # define PRE (required if -f is not specified
-	q/s|stage=s/,       # default is "min-dfa" because that's what is used internally and available most easily
-	                    #  other options are: pfa, nfa, dfa.
+        $opts,             # container for all processed options
+        q/a|as=s/,         # specify export kind (e.g., "dot" dumps PRE in graphviz "dot" format)
+        q/f|prefile=s/,    # specify file containing PRE
+        q/p|preplan=s/,    # define PRE (required if -f is not specified
+        q/s|stage=s/,      # default is "min-dfa" because that's what is used internally and available most easily
+                           #  other options are: pfa, nfa, dfa.
     );
-    my $sq = Sub::Genius::Util->export_as(as => $opts{a}, preplan  => $opts{p}, prefile  => $opts{f}, stage => $opts{s});
+    h2o $opts;
+    my $sq = Sub::Genius::Util->export_as( as => $opts->a, preplan => $opts->p, prefile => $opts->f, stage => $opts->s );
     return EXIT_SUCCESS;
 }
 
 sub run_init {
     my $argv = shift;
-    my %opts = ( x => q{once} );                    # default is 'once', as in C<Sub::Genius::run_once>
+    my $opts = { f => undef, p => undef, x => q{once} }; 
     my $gol  = Getopt::Long::GetOptionsFromArray(
         $argv,
-        \%opts,             # container for all processed options
-        q/f|prefile=s/,     # specify file containing PRE
-        q/p|preplan=s/,     # define PRE (currently for -x nodeps, only)
-        q/x|run=s/,         # specify invocation method: once, any, all, once
+        $opts,                                      # container for all processed options
+        q/f|prefile=s/,                             # specify file containing PRE
+        q/p|preplan=s/,                             # define PRE (currently for -x nodeps, only)
+        q/x|run=s/,                                 # specify invocation method: once, any, all, once
     );
+    h2o $opts;
 
     # no %opts checking here, relying on exceptions from Sub::Genius::Util
-    if ( grep { /$opts{x}/ } (qw/once any all/) ) {
-        print Sub::Genius::Util->subs2perl( q{preplan} => $opts{p}, q{prefile} => $opts{f}, q{with-run} => $opts{x} );
+    if ( grep { /$opts->x}/ } (qw/once any all/) ) {
+        print Sub::Genius::Util->subs2perl( q{preplan} => $opts->p, q{prefile} => $opts->f, q{with-run} => $opts->x );
     }
-    elsif ( grep { /$opts{x}/ } (qw/nodeps/) ) {
+    elsif ( grep { /$opts->x/ } (qw/nodeps/) ) {
 
         # options validation is done in S::G::Util
         # this method unrolls the preplan into series of sequentially
         # consistent subroutine calls, eliminating the need for Sub::Genius
         # as a dependency in the final code
-        print Sub::Genius::Util->plan2nodeps( preplan => $opts{p}, prefile => $opts{f}, cachedir => $opts{d} );
+        print Sub::Genius::Util->plan2nodeps( preplan => $opts->p, prefile => $opts->f, cachedir => $opts->d );
     }
     return EXIT_SUCCESS;
 }
 
 sub run_list {
     my $argv = shift;
-    my %opts = ();
+    my $opts = { f => undef, p => undef };
     my $gol  = Getopt::Long::GetOptionsFromArray(
         $argv,
-        \%opts,             # container for all processed options
-        q/f|prefile=s/,     # specify file containing PRE
-        q/p|preplan=s/,     # define PRE (required if -f is not specified
+        $opts,             # container for all processed options
+        q/f|prefile=s/,    # specify file containing PRE
+        q/p|preplan=s/,    # define PRE (required if -f is not specified
     );
-    my $sq = Sub::Genius::Util->list(preplan  => $opts{p}, prefile  => $opts{f});
+    h2o $opts;
+    my $sq = Sub::Genius::Util->list( preplan => $opts->p, prefile => $opts->f );
     return EXIT_SUCCESS;
 }
 
 sub run_precache {
     my $argv = shift;
-    my %opts = ( d => undef );
+    my $opts = { d => undef };
     my $gol  = Getopt::Long::GetOptionsFromArray(
         $argv,
-        \%opts,             # container for all processed options
+        $opts,              # container for all processed options
         q/d|cachedir=s/,    # specify cachedir, defaults to Sub:Genius' default
         q/f|prefile=s/,     # specify file containing PRE
         q/force/,           # forces re-caching (sends 'reset=>1' to 'init_plan')
@@ -154,16 +158,16 @@ sub run_precache {
     );
 
     # be kind, create cachedir but let user know
-    if ( defined $opts{d} and not -d $opts{d} ) {
-        mkdir $opts{d}, 0700
-          and print qq{(info) Created '$opts{d}\n};
+    if ( defined $opts->d and not -d $opts->d ) {
+        mkdir $opts->d, 0700
+          and print qq{(info) Created '$opts->d\n};
     }
 
     my $sq = Sub::Genius::Util->precache(
-        preplan  => $opts{p},
-        cachedir => $opts{d},
-        prefile  => $opts{f},
-        reset    => $opts{force},
+        preplan  => $opts->p,
+        cachedir => $opts->d,
+        prefile  => $opts->f,
+        reset    => $opts->force,
     );
     print $sq->cachefile . qq{\n};
     return EXIT_SUCCESS;

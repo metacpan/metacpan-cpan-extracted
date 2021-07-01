@@ -8,7 +8,7 @@ use constant default_encoding => ':raw';
 use Carp ();
 
 # ABSTRACT: Class to track object file in FFI::Build
-our $VERSION = '1.50'; # VERSION
+our $VERSION = '1.52'; # VERSION
 
 
 sub default_suffix
@@ -40,7 +40,7 @@ FFI::Build::File::Object - Class to track object file in FFI::Build
 
 =head1 VERSION
 
-version 1.50
+version 1.52
 
 =head1 SYNOPSIS
 
@@ -78,7 +78,7 @@ Damyan Ivanov
 
 Ilya Pavlov (Ilya33)
 
-Petr Pisar (ppisar)
+Petr Písař (ppisar)
 
 Mohammad S Anwar (MANWAR)
 

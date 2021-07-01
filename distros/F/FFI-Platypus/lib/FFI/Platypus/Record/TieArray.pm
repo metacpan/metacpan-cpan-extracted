@@ -6,7 +6,7 @@ use 5.008004;
 use Carp qw( croak );
 
 # ABSTRACT: Tied array interface for record array members
-our $VERSION = '1.50'; # VERSION
+our $VERSION = '1.52'; # VERSION
 
 
 sub TIEARRAY
@@ -63,7 +63,7 @@ FFI::Platypus::Record::TieArray - Tied array interface for record array members
 
 =head1 VERSION
 
-version 1.50
+version 1.52
 
 =head1 SYNOPSIS
 
@@ -144,7 +144,7 @@ Damyan Ivanov
 
 Ilya Pavlov (Ilya33)
 
-Petr Pisar (ppisar)
+Petr Písař (ppisar)
 
 Mohammad S Anwar (MANWAR)
 

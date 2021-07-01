@@ -31,7 +31,7 @@ use Pod::POM::Web::Util qw/slurp_native_or_utf8 parse_version extract_POM_items/
 # GLOBAL VARIABLES
 #---------------------------------------------------------------------
 
-our $VERSION = '1.25';
+our $VERSION = '1.26';
 
 # directories for modules -- filter @INC (we don't want '.', nor server_root added by mod_perl)
 my $server_root = eval {Apache2::ServerUtil::server_root()} || "";
@@ -528,9 +528,9 @@ sub toc_perldocs {
 
   my %perldocs;
 
-  # Old versions of perl had basic docs under "Pod". More recent have it under "pods".
+  # Perl basic docs are found under "pod" or "pods", depending on the installations.
   # "perllocal.pod" is in the root dir.
-  for my $subdir (qw/Pod pods/, "") {
+  for my $subdir (qw/pod pods/, "") {
     my $entries = $self->find_entries_for($subdir);
 
     # just keep the perl* entries, without subdir prefix

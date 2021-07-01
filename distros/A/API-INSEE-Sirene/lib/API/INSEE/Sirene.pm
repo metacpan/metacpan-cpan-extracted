@@ -12,7 +12,7 @@ use LWP::UserAgent;
 use POSIX 'strftime';
 use Switch;
 
-our $VERSION = 4.03;
+our $VERSION = 4.04;
 
 use constant {
     API_AUTH_URL        => 'https://api.insee.fr/token',
@@ -20,9 +20,9 @@ use constant {
     DEFAULT_MAX_RESULTS => 20, # from documentation
     DEFAULT_TIMEOUT     => 20,
     HARD_MAX_RESULTS    => 1_000, # from documentation
-    MAX_SIREN_LENGHT    => 9,
-    MAX_SIRET_LENGHT    => 14,
-    MIN_LENGHT          => 3,
+    MAX_SIREN_LENGTH    => 9,
+    MAX_SIRET_LENGTH    => 14,
+    MIN_LENGTH          => 3,
 };
 
 my $EMPTY = q//;
@@ -178,7 +178,14 @@ sub _getToken {
         Content       => [ grant_type => 'client_credentials' ];
 
     my $response = $self->{'user_agent'}->request($request);
-    my $json_obj = decode_json($response->content);
+    my $json_obj;
+
+    if ($response->content_type =~ m/^application\/json/) {
+        $json_obj = decode_json($response->content);
+    }
+    else {
+        return 1, $self->_dumpRequest($request, $response); # the API may return xml intead of json...
+    }
 
     switch ($response->code) {
         case HTTP_OK {
@@ -226,18 +233,17 @@ sub _sendRequest {
     my $response = $self->{'user_agent'}->request($request);
 
     switch ($response->code) {
-        case HTTP_OK
-          || HTTP_NOT_FOUND {
+        case [ HTTP_OK, HTTP_NOT_FOUND ] {
             return 0, $response->content;
         }
         case HTTP_MOVED_PERMANENTLY { # duplicated legal unit/ establishment
             return 1, sprintf "%s\n%s", $response->message, $response->header('Location');
         }
-        case HTTP_REQUEST_URI_TOO_LARGE
-          || HTTP_TOO_MANY_REQUESTS
-          || HTTP_UNAUTHORIZED
-          || HTTP_FORBIDDEN
-          || HTTP_SERVICE_UNAVAILABLE {
+        case [
+            HTTP_REQUEST_URI_TOO_LARGE, HTTP_TOO_MANY_REQUESTS,
+            HTTP_UNAUTHORIZED, HTTP_FORBIDDEN,
+            HTTP_SERVICE_UNAVAILABLE
+        ] {
 # There is no syntax error in request, the http message should be sufficient to understand the problem
             return 1, $response->message;
         }
@@ -351,8 +357,8 @@ sub searchByCustomCriteria {
 sub getLegalUnitBySIREN {
     my ($self, $siren_number, $desired_fields) = @_;
 
-    return 1, "Invalid SIREN $siren_number -> Must be a ${ \MAX_SIREN_LENGHT } digits number."
-        if $siren_number !~ m/^\d{${ \MAX_SIREN_LENGHT }}$/;
+    return 1, "Invalid SIREN $siren_number -> Must be a ${ \MAX_SIREN_LENGTH } digits number."
+        if $siren_number !~ m/^\d{${ \MAX_SIREN_LENGTH }}$/;
 
     $self->setCurrentEndpoint("siren/$siren_number");
     my $parameters = $self->_buildParameters($useful_fields_legal_unit, $desired_fields);
@@ -363,8 +369,8 @@ sub getLegalUnitBySIREN {
 sub searchLegalUnitBySIREN {
     my ($self, $siren_number, $desired_fields) = @_;
 
-    return 1, "Invalid SIREN $siren_number -> Must be a ${ \MIN_LENGHT } digits min and ${ \MAX_SIREN_LENGHT } digits number max."
-        if $siren_number !~ m/^\d{${ \MIN_LENGHT },${ \MAX_SIREN_LENGHT }}$/;
+    return 1, "Invalid SIREN $siren_number -> Must be a ${ \MIN_LENGTH } digits min and ${ \MAX_SIREN_LENGTH } digits number max."
+        if $siren_number !~ m/^\d{${ \MIN_LENGTH },${ \MAX_SIREN_LENGTH }}$/;
 
     $self->setCurrentEndpoint('siren');
     my $criteria = $self->getCustomCriteria('siren', $siren_number, 'begin');
@@ -375,8 +381,8 @@ sub searchLegalUnitBySIREN {
 sub getEstablishmentBySIRET {
     my ($self, $siret_number, $desired_fields) = @_;
 
-    return 1, "Invalid SIRET $siret_number -> Must be a ${ \MAX_SIRET_LENGHT } digits number."
-        if $siret_number !~ m/^\d{${ \MAX_SIRET_LENGHT }}$/;
+    return 1, "Invalid SIRET $siret_number -> Must be a ${ \MAX_SIRET_LENGTH } digits number."
+        if $siret_number !~ m/^\d{${ \MAX_SIRET_LENGTH }}$/;
 
     $self->setCurrentEndpoint("siret/$siret_number");
     my $parameters = $self->_buildParameters($useful_fields_establishment, $desired_fields);
@@ -387,8 +393,8 @@ sub getEstablishmentBySIRET {
 sub getEstablishmentsBySIREN {
     my ($self, $siren_number, $desired_fields) = @_;
 
-    return (1, "Invalid SIREN $siren_number -> Must be a ${ \MAX_SIREN_LENGHT } digits number.")
-        if $siren_number !~ m/^\d{${ \MAX_SIREN_LENGHT }}$/;
+    return (1, "Invalid SIREN $siren_number -> Must be a ${ \MAX_SIREN_LENGTH } digits number.")
+        if $siren_number !~ m/^\d{${ \MAX_SIREN_LENGTH }}$/;
 
     $self->setCurrentEndpoint('siret');
     my $criteria = $self->getCustomCriteria('siren', $siren_number);
@@ -399,8 +405,8 @@ sub getEstablishmentsBySIREN {
 sub searchEstablishmentBySIRET {
     my ($self, $siret_number, $desired_fields) = @_;
 
-    return 1, "Invalid SIRET $siret_number -> Must be a ${ \MIN_LENGHT } digits min and a ${ \MAX_SIRET_LENGHT } digits number max."
-        if $siret_number !~ m/^\d{${ \MIN_LENGHT },${ \MAX_SIRET_LENGHT }}$/;
+    return 1, "Invalid SIRET $siret_number -> Must be a ${ \MIN_LENGTH } digits min and a ${ \MAX_SIRET_LENGTH } digits number max."
+        if $siret_number !~ m/^\d{${ \MIN_LENGTH },${ \MAX_SIRET_LENGTH }}$/;
 
     $self->setCurrentEndpoint('siret');
     my $criteria = $self->getCustomCriteria('siret', $siret_number);
@@ -459,7 +465,7 @@ API::INSEE::Sirene - An interface for the Sirene API of INSEE
 
 =head1 VERSION
 
-Version 4.03
+Version 4.04
 
 =head1 SYNOPSIS
 
@@ -566,15 +572,15 @@ The maximum number of results that you can get. This value can't be increased (r
 
 This constant is set to 1000 results.
 
-=head2 MAX_SIREN_LENGHT
+=head2 MAX_SIREN_LENGTH
 
 A SIREN number has a maximum length of 9 digits.
 
-=head2 MAX_SIRET_LENGHT
+=head2 MAX_SIRET_LENGTH
 
 A SIREN number has a maximum length of 14 digits.
 
-=head2 MIN_LENGHT
+=head2 MIN_LENGTH
 
 In order to avoid useless requests with too short SIREN/SIRET numbers, the module requires at least 3 digits to allow you performing a search.
 

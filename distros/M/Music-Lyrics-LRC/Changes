@@ -1,5 +1,13 @@
 Revision history for Music-Lyrics-LRC
 
+0.17    2021-07-01
+
+ - Fix botched Changes file for previous release...
+
+0.16    2021-07-01
+
+ - Update URLs in Makefile.PL
+
 0.15    2018-03-05
 
  - Fix botched Changes file for previous release...

@@ -28,16 +28,16 @@ WriteMakefile(
         'meta-spec' => { version => 2 },
         provides => {
             'Music::Lyrics::LRC' => {
-                version => '0.15',
+                version => '0.17',
                 file => 'lib/Music/Lyrics/LRC.pm',
             },
         },
         resources => {
-            homepage => 'https://sanctum.geek.nz/cgit/Music-Lyrics-LRC.git/',
+            homepage => 'https://dev.sanctum.geek.nz/cgit/Music-Lyrics-LRC.git/',
             repository => {
                 type => 'git',
                 url => 'https://sanctum.geek.nz/code/Music-Lyrics-LRC.git/',
-                web => 'https://sanctum.geek.nz/cgit/Music-Lyrics-LRC.git/',
+                web => 'https://dev.sanctum.geek.nz/cgit/Music-Lyrics-LRC.git/',
             },
         },
     },

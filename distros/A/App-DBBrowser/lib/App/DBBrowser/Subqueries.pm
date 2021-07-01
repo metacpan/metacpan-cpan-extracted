@@ -154,12 +154,12 @@ sub __edit_sq_file {
         my $top_lines = [ 'Stored Subqueries:' ];
         my $h_ref = $ax->read_json( $sf->{i}{f_subqueries} ) // {};
         my $history_HD = $h_ref->{$driver}{$db}{substmt} // [];
-        my @info = (
+        my @tmp_info = (
             @$top_lines,
             map( line_fold( $_->[-1], get_term_width(), { init_tab => '  ', subseq_tab => '    ', join => 1 } ), @$history_HD ), #
             ' '
         );
-        my $info = join( "\n", @info );
+        my $info = join( "\n", @tmp_info );
         # Choose
         my $choice = $tc->choose(
             [ @pre, $add, $edit, $remove ],
@@ -206,16 +206,16 @@ sub __add_subqueries {
     my $added_sq = [];
 
     while ( 1 ) {
-        my @info = (
+        my @tmp_info = (
             @$top_lines,
             map( line_fold( $_->[1], get_term_width(), { init_tab => '  ', subseq_tab => '    ', join => 1 } ), @$history_HD ), #
         );
         if ( @$added_sq ) {
-            push @info, map( line_fold( $_->[1], get_term_width(), { init_tab => '| ', subseq_tab => '    ', join => 1 } ), @$added_sq ); #
+            push @tmp_info, map( line_fold( $_->[1], get_term_width(), { init_tab => '| ', subseq_tab => '    ', join => 1 } ), @$added_sq ); #
         }
-        push @info, ' ';
+        push @tmp_info, ' ';
         my $menu = [ @pre, map {  '- ' . $_->[1] } @$history_RAM ];
-        my $info = join( "\n", @info );
+        my $info = join( "\n", @tmp_info );
         # Choose
         my $idx = $tc->choose(
             $menu,
@@ -234,7 +234,7 @@ sub __add_subqueries {
             return 1;
         }
         elsif ( $menu->[$idx] eq $readline ) {
-            my $info = join( "\n", @info );
+            my $info = join( "\n", @tmp_info );
             # Readline
             my $stmt = $tf->readline(
                 'Stmt: ',
@@ -248,7 +248,7 @@ sub __add_subqueries {
                 $stmt = $1;
             }
             my $folded_stmt = "\n" . line_fold( 'Stmt: ' . $stmt, get_term_width(), { init_tab => '', subseq_tab => ' ' x length( 'Stmt: ' ), join => 1 } );
-            $info = join( "\n", @info ) . $folded_stmt;
+            $info = join( "\n", @tmp_info ) . $folded_stmt;
             # Readline
             my $name = $tf->readline(
                 'Name: ',
@@ -267,7 +267,7 @@ sub __add_subqueries {
             push @$used, splice @$history_RAM, $idx-@pre, 1;
             my $stmt = $used->[-1][0];
             my $folded_stmt = "\n" . line_fold( 'Stmt: ' . $stmt, get_term_width(), { init_tab => '', subseq_tab => ' ' x length( 'Stmt: ' ), join => 1 } );
-            my $info = join( "\n", @info ) . $folded_stmt;
+            my $info = join( "\n", @tmp_info ) . $folded_stmt;
             # Readline
             my $name = $tf->readline(
                 'Name: ',

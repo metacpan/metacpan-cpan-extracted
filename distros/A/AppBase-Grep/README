@@ -2,11 +2,8 @@ NAME
     AppBase::Grep - A base for grep-like CLI utilities
 
 VERSION
-    This document describes version 0.008 of AppBase::Grep (from Perl
-    distribution AppBase-Grep), released on 2021-06-09.
-
-CONTRIBUTOR
-    perlancar (on pc-office) <perlancar@gmail.com>
+    This document describes version 0.009 of AppBase::Grep (from Perl
+    distribution AppBase-Grep), released on 2021-07-01.
 
 FUNCTIONS
   grep

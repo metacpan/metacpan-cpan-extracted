@@ -16,7 +16,7 @@ my $p = Data::Radius::Packet->new(secret => 'top-secret', dict => $dict);
 ok($p, 'object');
 
 # cannot use random-generated during tests
-my $authenticator = pack('L4', 561138743, 3194401087, 2213483623, 4032919672);
+my $authenticator = pack('L<4', 561138743, 3194401087, 2213483623, 4032919672);
 
 my($auth_req, $req_id, $auth) = $p->build(
     type => ACCESS_REQUEST,

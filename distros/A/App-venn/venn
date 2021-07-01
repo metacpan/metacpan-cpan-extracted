@@ -115,7 +115,7 @@ sub usual_proc
   }
 
   # Printing
-  say join "\t", "cardi.", (map {"file$_"} 1 .. $N) , $optv0 ? () :  ('strmin','strmax') ; 
+  say join "\t", "cardi.", (map {"file$_"} 1 .. $N) , $optv0 ? () :  ('minstr','maxstr') ; 
   my @B = keys %BfqA ; 
   @B = sort { $BfqA1{$a} cmp $BfqA1{$b} } @B unless $optv0 ;
   for my $B ( @B ) { 

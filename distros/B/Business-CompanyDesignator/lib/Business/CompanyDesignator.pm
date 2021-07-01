@@ -17,7 +17,15 @@ use Carp;
 use Business::CompanyDesignator::Record;
 use Business::CompanyDesignator::SplitResult;
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
+
+# Hardcode the set of languages that we treat as 'continuous' i.e. their
+# designators don't require a word break before/after.
+our %LANG_CONTINUA = map { $_ => 1 } qw(
+  zh
+  ja
+  ko
+);
 
 has 'datafile' => ( is => 'ro', default => sub {
   # Development/test version
@@ -187,10 +195,15 @@ sub _add_to_assembler {
   }
 }
 
-# Assemble designator regex
+# Assemble designator regexes
 sub _build_regex {
   my $self = shift;
   my ($type, $lang) = @_;
+
+  state $types = { map { $_ => 1 } qw(end end_cont begin) };
+  if (! $types->{$type}) {
+    croak "invalid regex type '$type'";
+  }
 
   # RA constructor - case insensitive, with match tracking
   my $assembler = Regexp::Assemble->new->flags('i')->track(1);
@@ -205,10 +218,12 @@ sub _build_regex {
 
   my $count = 0;
   while (my ($long, $entry) = each %{ $self->data }) {
-    # If $type is begin, restrict to 'lead' entries
-    next if $type eq 'begin' && ! $entry->{lead};
     # If $lang is set, restrict to entries that include $lang
     next if $lang_re && $entry->{lang} !~ $lang_re;
+    # If $type is 'begin', restrict to 'lead' entries
+    next if $type eq 'begin' && ! $entry->{lead};
+    # if $type is 'end_cont', restrict to languages in %LANG_CONTINUA
+    next if $type eq 'end_cont' && ! $LANG_CONTINUA{$entry->{lang}};
 
     $count++;
     my $long_nfd = NFD($long);
@@ -269,6 +284,11 @@ sub _split_designator_result {
   my $self = shift;
   my ($lang, $before, $des, $after, $matched_pattern) = @_;
 
+  # $before can end in whitespace (that we don't want to consume in the RE
+  # for technical reasons around handling punctuation like '& Co' in designators)
+  # So trim here to handle that case.
+  $before =~ s/\s+$// if $before;
+
   my $des_std;
   if ($matched_pattern) {
     $des_std = $self->pattern_string_map_lang->{$lang}->{$matched_pattern} if $lang;
@@ -309,24 +329,50 @@ sub split_designator {
   my $company_name_match = NFD($company_name);
 
   # Handle older perls without XPosixPunct
-  state $punct_class = eval { '.' =~ m/\p{XPosixPunct}/ } ? '[\s\p{XPosixPunct}]' : '[\s[:punct:]]';
+  state $punct_class = eval { '.' =~ m/\p{XPosixPunct}/ } ?
+                       '[\s\p{XPosixPunct}]' :
+                       '[\s[:punct:]]';
 
-  my ($re, $assembler) = $self->regex('end', $lang);
-  my ($lead_re, $lead_assembler) = $self->regex('begin', $lang);
+  # Strip all brackets for continuous language matching
+  (my $company_name_match_cont_stripped = $company_name_match) =~ s/[()\x{ff08}\x{ff09}]//g;
 
-  if ($re) {
-    # Designators are usually final, so try that first
-    if ($company_name_match =~ m/^\s*(.*?)${punct_class}\s*($re)\s*$/) {
-      return $self->_split_designator_result($lang, $1, $2, undef, $assembler->source($^R));
+  my ($end_re, $end_asr, $end_cont_re, $end_cont_asr, $begin_re, $begin_asr);
+  if ($lang) {
+    if ($LANG_CONTINUA{$lang}) {
+      ($end_cont_re, $end_cont_asr) = $self->regex('end_cont', $lang);
+    } else {
+      ($end_re,      $end_asr)      = $self->regex('end',      $lang);
     }
-    # Not final - check for a lead designator instead (e.g. RU, NL, etc.)
-    elsif ($lead_re && $company_name_match =~ m/^\s*($lead_re)${punct_class}\s*(.*?)\s*$/) {
-      return $self->_split_designator_result($lang, undef, $1, $2, $lead_assembler->source($^R));
-    }
-    # Not final - check for an embedded designator with trailing content
-    elsif ($allow_embedded && $company_name_match =~ m/(.*?)${punct_class}\s*($re)(?:\s+(.*?))?$/) {
-      return $self->_split_designator_result($lang, $1, $2, $3, $assembler->source($^R));
-    }
+    ($begin_re,    $begin_asr)      = $self->regex('begin',    $lang);
+  } else {
+    ($end_re,      $end_asr)      = $self->regex('end');
+    ($end_cont_re, $end_cont_asr) = $self->regex('end_cont');
+    ($begin_re,    $begin_asr)    = $self->regex('begin');
+  }
+
+  # Designators are usually final, so try $end_re first
+  if ($end_re &&
+      $company_name_match =~ m/^\s*(.*?)${punct_class}\s*\(?($end_re)\)?\s*$/) {
+    return $self->_split_designator_result($lang, $1, $2, undef, $end_asr->source($^R));
+  }
+
+  # No final designator - retry without a word break for the subset of languages
+  # that use continuous scripts (see %LANG_CONTINUA above)
+  if ($end_cont_re &&
+      $company_name_match_cont_stripped =~ m/^\s*(.*?)\(?($end_cont_re)\)?\s*$/) {
+    return $self->_split_designator_result($lang, $1, $2, undef, $end_cont_asr->source($^R));
+  }
+
+  # No final designator - check for a lead designator instead (e.g. RU, NL, etc.)
+  if ($begin_re &&
+      $company_name_match =~ m/^\s*\(?($begin_re)\)?${punct_class}\s*(.*?)\s*$/) {
+    return $self->_split_designator_result($lang, undef, $1, $2, $begin_asr->source($^R));
+  }
+
+  # No final or initial - check for an embedded designator with trailing content
+  if ($end_re && $allow_embedded &&
+      $company_name_match =~ m/(.*?)${punct_class}\s*\(?($end_re)\)?(?:\s+(.*?))?$/) {
+    return $self->_split_designator_result($lang, $1, $2, $3, $end_asr->source($^R));
   }
 
   # No match - return $company_name unchanged
@@ -346,7 +392,7 @@ company designators appended to company names
 
 =head1 VERSION
 
-Version: 0.13.
+Version: 0.16.
 
 This module is considered a B<BETA> release. Interfaces may change and/or break
 without notice until the module reaches version 1.0.
@@ -411,6 +457,7 @@ for instance, looks like this:
       - Co.
       - '& Co.'
       - and Co.
+      - and Company
     lang: en
 
 Long designators are unique across the dataset, but abbreviations are not
@@ -562,7 +609,7 @@ Gavin Carr <gavin@profound.net>
 
 =head1 COPYRIGHT AND LICENCE
 
-Copyright (C) 2013-2016 Gavin Carr
+Copyright (C) 2013-2021 Gavin Carr
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

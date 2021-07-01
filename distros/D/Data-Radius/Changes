@@ -1,3 +1,9 @@
+1.2.7 2021-06-23
+
+ - fix tests on big-endian platform
+ - include all test files in MANIFEST
+ - support for PrintError/RaiseError options for packet encoding
+
 1.2.6 2020-12-18
 
  - Data::Radius::Dictionary can now load multiple dictionaries

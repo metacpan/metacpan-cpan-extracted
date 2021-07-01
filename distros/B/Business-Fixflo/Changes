@@ -1,5 +1,8 @@
 Revision history for Business-Fixflo
 
+0.43     2021-07-01
+        - Fix out of date URLs to Fixflo API docs (GH #3)
+
 0.42     2021-05-25
         - Support proxy on UA in Business::Fixflo::Client (GH #2, thanks to voidhaze)
         - Add Warrenties to Business::Fixflo::Property

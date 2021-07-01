@@ -18,7 +18,7 @@ package # hide from PAUSE indexer
 use strict;
 use 5.008; # scalar open
 
-our $VERSION = '1.10';
+our $VERSION = '1.11';
 
 use Getopt::Long;
 use List::Util qw(max);
@@ -1001,34 +1001,54 @@ $mw->protocol('WM_DELETE_WINDOW', sub {
 # so make sure we change into a non-removable directory.
 chdir '/';
 
-my @anyevent_notifiers;
+my @anyevent_notifiers; # for AnyEvent::Filesys::Notify
+my $inotify_w; # for Linux::Inotify2
 if ($use_anyevent) {
-    require AnyEvent::Filesys::Notify;
-    require File::Basename;
-    my %dirs_to_basenames;
-    for my $org_file (keys %org_files) {
-	my($dirname, $basename) = (File::Basename::dirname($org_file), File::Basename::basename($org_file));
-	push @{ $dirs_to_basenames{$dirname} }, $basename;
-    }
-    for my $dir (keys %dirs_to_basenames) {
-	my $all_basenames = "(^|/)(" . join("|", map { quotemeta $_ } @{ $dirs_to_basenames{$dir} }) . ')$';
-	$all_basenames = qr{$all_basenames};
-	my $notifier = AnyEvent::Filesys::Notify->new
-	    (
-	     dirs     => [ $dir ],
-	     # no need for interval, the Tk recheck_interval is still enabled
-	     filter   => sub { $_[0] =~ $all_basenames },
-	     cb       => sub {
-		 my (@events) = @_;
-		 if ($debug) {
-		     warn "AnyEvent::Filesys::Notify got events:\n";
-		     require Data::Dumper;
-		     print STDERR Data::Dumper->new([@events],[qw()])->Indent(1)->Useqq(1)->Sortkeys(1)->Terse(1)->Dump;
-		 }
-		 tk_do_one_iteration();
-	     },
-	    );
-	push @anyevent_notifiers, $notifier;
+    if ($^O eq 'linux') {
+	require AnyEvent;
+	require Linux::Inotify2;
+	my $inotify = Linux::Inotify2->new
+	    or die "Cannot create new inotify object: $!";
+	for my $org_file (keys %org_files) {
+	    $inotify->watch($org_file, &Linux::Inotify2::IN_CLOSE_WRITE, sub {
+				my $e = shift;
+				if ($debug) {
+				    warn "Linux::Inotify2 got an event:\n";
+				    require Data::Dumper;
+				    print STDERR Data::Dumper->new([$e],[qw()])->Indent(1)->Useqq(1)->Sortkeys(1)->Terse(1)->Dump;
+				}
+				tk_do_one_iteration();
+			    });
+	}
+	$inotify_w = AE::io($inotify->fileno, 0, sub { $inotify->poll });
+    } else {
+	require AnyEvent::Filesys::Notify;
+	require File::Basename;
+	my %dirs_to_basenames;
+	for my $org_file (keys %org_files) {
+	    my($dirname, $basename) = (File::Basename::dirname($org_file), File::Basename::basename($org_file));
+	    push @{ $dirs_to_basenames{$dirname} }, $basename;
+	}
+	for my $dir (keys %dirs_to_basenames) {
+	    my $all_basenames = "(^|/)(" . join("|", map { quotemeta $_ } @{ $dirs_to_basenames{$dir} }) . ')$';
+	    $all_basenames = qr{$all_basenames};
+	    my $notifier = AnyEvent::Filesys::Notify->new
+		(
+		 dirs     => [ $dir ],
+		 # no need for interval, the Tk recheck_interval is still enabled
+		 filter   => sub { $_[0] =~ $all_basenames },
+		 cb       => sub {
+		     my (@events) = @_;
+		     if ($debug) {
+			 warn "AnyEvent::Filesys::Notify got events:\n";
+			 require Data::Dumper;
+			 print STDERR Data::Dumper->new([@events],[qw()])->Indent(1)->Useqq(1)->Sortkeys(1)->Terse(1)->Dump;
+		     }
+		     tk_do_one_iteration();
+		 },
+		);
+	    push @anyevent_notifiers, $notifier;
+	}
     }
 }
 
@@ -1107,9 +1127,11 @@ quickly to the right screen border.
 
 =item --use-anyevent (EXPERIMENTAL!)
 
-Use L<AnyEvent::Filesys::Notify> for getting file modification events.
-Probably not useful on systems using kevent (*BSD).
-C<--recheck-interval> is still applied for periodic checks.
+Use either L<Linux::Inotify2> together with L<AnyEvent> (linux
+systems) or L<AnyEvent::Filesys::Notify> (non-linux systems) for
+getting file modification events. Probably not useful on systems using
+kevent (*BSD). C<--recheck-interval> is still applied for periodic
+checks.
 
 =back
 

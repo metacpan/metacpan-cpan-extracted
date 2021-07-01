@@ -1112,7 +1112,7 @@ END
    ($stdout,$stderr)=$handle->cmd($sudo.
        "sed -i \'/octet-stream/i$ad\' $nginx_path/nginx/nginx.conf");
    my $ngx="$nginx_path/nginx/nginx.conf";
-   $handle->cmd_raw(
+   $handle->cmd_raw($sudo.
        "sed -i 's/\\(^client_max_body_size 10M;$\\\)/    \\1/' $ngx");
    #($stdout,$stderr)=$handle->cmd($sudo.
    #    "sed -i \'s/^        listen       80/        listen       ".
@@ -1215,12 +1215,8 @@ END
       ($stdout,$stderr)=$handle->cmd($sudo.
          'yum -y install certbot-nginx','__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
-         'certbot certonly -n --nginx --debug --agree-tos --email '.
+         'certbot -n --nginx --debug --agree-tos --email '.
          "$email_address -d mail.$domain_url",
-         '__display__');
-      ($stdout,$stderr)=$handle->cmd($sudo.
-         'certbot certonly -n --nginx --debug --agree-tos --email '.
-         "$email_address -d postfixadmin.$domain_url",
          '__display__');
       # https://ssldecoder.org
       ($stdout,$stderr)=$handle->cmd($sudo.
@@ -1809,23 +1805,25 @@ END
          'git tag -l');
       #$stdout=~s/^.*(php-[\d.]+?)\s.*$/$1/s;
       # composer.phar does not work with php 8
-      $stdout=~s/^.*(php-7.[\d.]+?)\s.*$/$1/s;
+      $stdout=~s/^.*(php-8.[\d.]+?)\s.*$/$1/s;
       my $vn=$stdout;
       $vn=~s/^php-(\d).*$/$1/;
       ($stdout,$stderr)=$handle->cmd($sudo.
          "git checkout $stdout",'__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
          './buildconf --force','__display__');
+      my $pear=($vn eq 8)?'--with-pear ':'';
       ($stdout,$stderr)=$handle->cmd($sudo.
          './configure --prefix=/usr/local/php'.$vn.' '.
          '--with-config-file-path=/usr/local/php'.$vn.'/etc '.
          '--with-config-file-scan-dir=/usr/local/php'.$vn.'/etc/conf.d '.
-         '--with-fpm-systemd '.
          '--enable-bcmath '.
          '--with-bz2 '.
          '--with-curl '.
+         $pear.
          '--enable-filter '.
          '--enable-fpm '.
+         '--with-fpm-systemd '.
          '--enable-gd '.
          '--with-freetype '.
          '--with-imap '.
@@ -1860,8 +1858,6 @@ END
       ($stdout,$stderr)=$handle->cmd($sudo.
          'ln -s /usr/local/php'.$vn.'/bin/php /usr/bin/php');
       ($stdout,$stderr)=$handle->cmd($sudo.
-         'mkdir -vp /usr/local/php'.$vn.'/etc/conf.d','__display__');
-      ($stdout,$stderr)=$handle->cmd($sudo.
          'cp -v ./php.ini-production /usr/local/php'.$vn.'/etc/php.ini',
          '__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
@@ -1883,9 +1879,6 @@ END
          'sed -i \'s/;cgi.fix_pathinfo=1/cgi.fix_pathinfo=0/\' '.
          '/usr/local/php'.$vn.'/etc/php.ini');
       ($stdout,$stderr)=$handle->cmd($sudo.
-         'sed -i \'s/;date.timezone =/date.timezone = \"America/Chicago\"/\' '.
-         '/usr/local/php'.$vn.'/etc/php.ini');
-      ($stdout,$stderr)=$handle->cmd($sudo.
          'mkdir -vp /usr/local/php'.$vn.'/etc/conf.d','__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
          'mkdir -vp /usr/local/php'.$vn.'/etc/php-fpm.d','__display__');
@@ -1893,25 +1886,23 @@ END
          'cp -v ./sapi/fpm/www.conf /usr/local/php'.$vn.'/etc/php-fpm.d/www.conf',
          '__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
-         'cp -v ./sapi/fpm/php-fpm.conf /usr/local/php'.$vn.'/etc/php-fpm.conf',
+         'cp -v ./sapi/fpm/php-fpm.conf /usr/local/php'.$vn.'/etc',
          '__display__');
-      my $wcnf=<<"END";
-catch_workers_output = yes
-
-php_flag[display_errors] = on
-php_admin_value[error_log] = /usr/local/php$vn/var/log/fpm-php.www.log
-php_admin_flag[log_errors] = on
-END
-      ($stdout,$stderr)=$handle->cmd(
-         "echo -e \"$wcnf\" | ${sudo}tee -a ".
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'sed -i "s#;pid = run/php-fpm.pid#pid = /var/run/php-fpm.pid#" '.
+         '/usr/local/php'.$vn.'/etc/php-fpm.conf');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'mkdir -vp /var/run/php-fpm','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'mkdir -vp /var/log/php-fpm','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'sed -i "s#;error_log = log/php-fpm.log#'.
+         'error_log = /var/log/php-fpm/php-fpm.log#" '.
+         '/usr/local/php'.$vn.'/etc/php-fpm.conf');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'sed -i "s#;catch_workers_output = yes#'.
+         'catch_workers_output = yes#" '.
          '/usr/local/php'.$vn.'/etc/php-fpm.d/www.conf');
-      ($stdout,$stderr)=$handle->cmd($sudo.
-         'touch /var/log/fpm-php.www.log');
-      ($stdout,$stderr)=$handle->cmd($sudo.
-         'chmod -v 777 /var/log/fpm-php.www.log','__display__');
-      ($stdout,$stderr)=$handle->cmd($sudo.
-         'cp -v ./sapi/fpm/php-fpm.conf /usr/local/php'.$vn.'/etc/php-fpm.conf',
-         '__display__');
       my $zend=<<END;
 ; Zend OPcache
 extension=opcache.so
@@ -1919,10 +1910,14 @@ END
       ($stdout,$stderr)=$handle->cmd("echo -e \"$zend\" > ".
          '/usr/local/php'.$vn.'/etc/conf.d/modules.ini');
       ($stdout,$stderr)=$handle->cmd($sudo.
-         "sed -i 's/user = nobody/user = www-data/' ".
+         "sed -i 's#listen = 127.0.0.1:9000#".
+         "listen = /var/run/php-fpm/www.sock#' ".
          '/usr/local/php'.$vn.'/etc/php-fpm.d/www.conf');
       ($stdout,$stderr)=$handle->cmd($sudo.
-         "sed -i 's/group = nobody/group = www-data/' ".
+         "sed -i 's/^user = nobody/user = www-data/' ".
+         '/usr/local/php'.$vn.'/etc/php-fpm.d/www.conf');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         "sed -i 's/^group = nobody/group = www-data/' ".
          '/usr/local/php'.$vn.'/etc/php-fpm.d/www.conf');
       ($stdout,$stderr)=$handle->cmd($sudo.
          "sed -i 's/\;env.PATH./env[PATH]/' ".
@@ -1932,38 +1927,14 @@ END
          '/usr/local/php'.$vn.'/etc/php-fpm.d/www.conf');
       ($stdout,$stderr)=$handle->cmd($sudo.
          'ln -s /usr/local/php'.$vn.'/sbin/php-fpm /usr/sbin/php-fpm');
-      #
-      # echo-ing/streaming files over ssh can be tricky. Use echo -e
-      #          and replace these characters with thier HEX
-      #          equivalents (use an external editor for quick
-      #          search and replace - and paste back results.
-      #          use copy/paste or cat file and copy/paste results.):
-      #
-      #          !  -   \\x21     `  -  \\x60   * - \\x2A
-      #          "  -   \\x22     \  -  \\x5C
-      #          $  -   \\x24     %  -  \\x25
-      #
-      my $fpmsrv=<<"END";
-[Unit]
-Description=The PHP FastCGI Process Manager
-After=syslog.target network.target
-
-[Service]
-Type=simple
-PIDFile=/run/php-fpm/php-fpm.pid
-ExecStart=/usr/local/php$vn/sbin/php-fpm --nodaemonize --fpm-config /usr/local/php$vn/etc/php-fpm.conf
-ExecReload=/bin/kill -USR2 \\x24MAINPID
-
-[Install]
-WantedBy=multi-user.target
-END
-      ($stdout,$stderr)=$handle->cmd("echo -e \"$fpmsrv\" > ".
-         '~/php-fpm.service');
-      ($stdout,$stderr)=$handle->cmd($sudo.'mv -fv ~/php-fpm.service '.
-         '/usr/lib/systemd/system');
-      ($stdout,$stderr)=$handle->cwd("/opt/source");
-      ($stdout,$stderr)=$handle->cmd($sudo.'mkdir -vp /run/php-fpm',
-         '__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'cp -v /opt/source/php-src/sapi/fpm/php-fpm.service '.
+         '/etc/systemd/system','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'sed -i "s#PIDFile=/usr/local/php'.$vn.'"/#PIDFile=#" '.
+         '/etc/systemd/system/php-fpm.service');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'systemctl daemon-reload');
       ($stdout,$stderr)=$handle->cmd($sudo.
          'systemctl enable php-fpm.service','__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
@@ -2015,7 +1986,7 @@ END
          'ImageMagick/download/ImageMagick.zip',
          '__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
-         'unzip ImageMagick.zip','__display__');
+         'unzip -f ImageMagick.zip','__display__');
       ($stdout,$stderr)=$handle->cwd('ImageMag*');
       ($stdout,$stderr)=$handle->cmd($sudo.
          './configure --with-modules','__display__');
@@ -2510,6 +2481,8 @@ END
       ($stdout,$stderr)=$handle->cmd($sudo.
          'chown -v root:root /etc/postfix/sasl_passwd','__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
+         'rm -vf ~/smtp_credentials_generate.py','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
          'postmap hash:/etc/postfix/sasl_passwd');
       ($stdout,$stderr)=$handle->cmd($sudo.
          'chown -v root:root /etc/postfix/sasl_passwd.db','__display__');
@@ -2788,6 +2761,7 @@ END
    ($stdout,$stderr)=$handle->cmd(
       "cp -v /etc/nginx/nginx.conf ~/nginx.conf",
       '__display__');
+   ($stdout,$stderr)=$handle->cmd('cat ~/nginx.conf','__display__');
    ($stdout,$stderr)=$handle->cmd(
       'sed -i \'/}/,$!b;/}/{x;/./p;x;h};/}/!H;$!d;x;s/^}$//M\' ~/nginx.conf');
    ($stdout,$stderr)=$handle->cmd("echo -e \"$ad\" >> ".
@@ -2799,6 +2773,10 @@ END
       'service nginx restart','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
       'service nginx status -l','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'certbot -n --nginx --debug --agree-tos --email '.
+      "$email_address -d postfixadmin.$domain_url",
+      '__display__');
 
    my $install_dovecot=<<'END';
 
@@ -3577,7 +3555,7 @@ END
       '/usr/local/bin/cmake -DCMAKE_POSITION_INDEPENDENT_CODE=ON .',
       '__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      'make install','__display__');
+      'make install','3600','__display__');
    ($stdout,$stderr)=$handle->cwd('/opt/source');
    ($stdout,$stderr)=$handle->cmd($sudo.
       'git clone https://github.com/file/file.git '.
@@ -4067,6 +4045,9 @@ END
    Type or paste the domain url for the site:
 
    *** A properly registered domain url is necessary! ***
+
+   Check on Letsencrypt Availability (5 per week) at:
+   https://crt.sh/?Identity=mail.domain_url&iCAID=16418
 
    Make sure the DNS A/AAAA record(s) for this domain
    contain(s) this IP address --> $public_ip

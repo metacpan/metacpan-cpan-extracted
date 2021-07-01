@@ -2,6 +2,7 @@ package Data::Radius::Encode;
 
 use strict;
 use warnings;
+use Carp ();
 use bytes;
 use Socket qw(inet_pton AF_INET AF_INET6);
 
@@ -33,6 +34,15 @@ our @EXPORT_OK = qw(
 
 use Data::Radius::Util qw(is_enum_type);
 
+our ($PrintError, $RaiseError) = (1, 0);
+
+sub _error {
+    my $msg = shift;
+    Carp::croak($msg) if $RaiseError;
+    Carp::carp ($msg) if $PrintError;
+    return;
+}
+
 # type encoders
 #  $coderef->($value, $attr, $dictionary)
 my %encode_map = (
@@ -60,62 +70,81 @@ if (!defined inet_pton(AF_INET6, '::1')) {
     $encode_map{ipv6addr} = \&encode_ipv6addr_pp,
 }
 
-# value limits for numeric types
-my %limits_map = (
-    integer     => [0,      2**32 - 1],
-    integer_tag => [0,      2**24 - 1],
-    byte        => [0,      2**8  - 1],
-    short       => [0,      2**16 - 1],
-    signed      => [-2**31, 2**31 - 1],
-    # unix timestamp
-    date        => [0,      2**32 - 1],
-);
-
 sub encode_string {
     my ($value, $attr, $dict) = @_;
     my $max_size = ($attr && $attr->{vendor}) ? MAX_VSA_STRING_SIZE : MAX_STRING_SIZE;
-    if (length($value) > $max_size) {
-        warn "Too long value of ".$attr->{name};
-        return undef;
+    if ( length($value) > $max_size) {
+        _error( "Too long value for attribute '$attr->{name}'" );
+        $value = undef; # substr($value, $max_size); # forgiving option?
     }
     return $value;
 }
 
 sub encode_string_tag {
     my ($value, $attr, $dict, $tag) = @_;
-    my $max_size = ($attr && $attr->{vendor}) ? MAX_VSA_STRING_SIZE : MAX_STRING_SIZE;
 
-    if (defined $tag) {
-        if ($tag > 31) {
-            warn sprintf('Too big tag value %d for %s', $tag, $attr->{name});
-        }
-        $max_size--;
+    if (! defined $tag ) {
+        _error( "Undefined tag value for attribute '$attr->{name}'");
     }
-
-    if (length($value) > $max_size) {
-        warn "Too long value of ".$attr->{name};
-        return undef;
+    elsif ( $tag !~ /^\d+$/ ) {
+        _error( "Invalid tag value '$tag' for attribute '$attr->{name}'" );
     }
-
-    if (defined $tag) {
+    elsif ( $tag == 0 ) {
+        # it should be possible to correctly indicate to not to utilize tag
+    }
+    elsif ($tag < 1 || $tag > 31) {
+        _error( "Tag value $tag out of range 1..31 for attribute '$attr->{name}'" );
+    }
+    else {
         $value = pack('C', $tag) . $value;
+    }
+
+    my $max_size = ($attr && $attr->{vendor}) ? MAX_VSA_STRING_SIZE : MAX_STRING_SIZE;
+    if ( length($value) > $max_size) {
+        _error( "Too long value for attribute '$attr->{name}'" );
+        $value = undef; # substr($value, $max_size); # forgiving option?
     }
 
     return $value;
 }
 
-sub encode_int    { pack('N',  int($_[0])) }
-sub encode_byte   { pack('C',  int($_[0])) }
-sub encode_short  { pack('S>', int($_[0])) }
-sub encode_signed { pack('l>', int($_[0])) }
+sub check_numeric {
+    my ($value, $attr, $range) = @_;
+    if ($value !~ /^-?\d+$/) {
+        _error( "Invalid value for numeric attribute '$attr->{name}'" );
+        return;
+    }
+    if ($range) {
+        if ($value < $range->[0] || $value > $range->[1]) {
+            _error( "Value out of range for $attr->{type} attribute '$attr->{name}'" );
+            return undef;
+        }
+    }
+    return 1;
+}
+
+sub encode_int    { return check_numeric($_[0], $_[1], [0, 2**32 - 1]) ? pack('N',  int($_[0])) : undef }
+sub encode_byte   { return check_numeric($_[0], $_[1], [0, 2**8  - 1]) ? pack('C',  int($_[0])) : undef }
+sub encode_short  { return check_numeric($_[0], $_[1], [0, 2**16 - 1]) ? pack('S>', int($_[0])) : undef }
+sub encode_signed { return check_numeric($_[0], $_[1], [-2**31, 2**31 - 1]) ? pack('l>', int($_[0])) : undef }
 
 sub encode_int_tag {
     my ($value, $attr, $dict, $tag) = @_;
+    return undef if !check_numeric($value, $attr, [0, 2**24 - 1]);
     $value = pack('N', int($value));
-    if (defined $tag) {
-        if ($tag > 31) {
-            warn sprintf('Too big tag value %d for %s', $tag, $attr->{name});
-        }
+    if (! defined $tag ) {
+        _error( "Undefined tag value for attribute '$attr->{name}'");
+    }
+    elsif ( $tag !~ /^\d+$/ ) {
+        _error( "Invalid tag value '$tag' for attribute '$attr->{name}'" );
+    }
+    elsif ( $tag == 0 ) {
+        # it should be possible to correctly indicate to not to utilize tag
+    }
+    elsif ($tag < 1 || $tag > 31) {
+        _error( "Tag value $tag out of range 1..31 for attribute '$attr->{name}'" );
+    }
+    else {
         # tag added to 1st byte, not extending the value length
         substr($value, 0, 1, pack('C', $tag) );
     }
@@ -138,7 +167,7 @@ sub encode_octets {
     my ($value, $attr, $dict) = @_;
 
     if ($value !~ /^0x(?:[0-9A-Fa-f]{2})+$/) {
-        warn 'Invalid octet string for '.$attr->{name};
+        _error( "Invalid octet string value for attribute '$attr->{name}'" );
         return undef;
     }
 
@@ -168,7 +197,7 @@ sub encode_avpair {
     }
 
     if (length($value) > MAX_VSA_STRING_SIZE) {
-        warn "Too long value of ".$attr->{name};
+        _error( "Too long value for attribute '$attr->{name}'" );
         return undef;
     }
 
@@ -183,7 +212,7 @@ sub encode_tlv {
     foreach my $v (@{$value}) {
         my $attr = $dict->attribute($v->{Name});
         if (! $attr) {
-            warn "Unknown tlv-attribute ".$v->{Name};
+            _error( "Unknown tlv-attribute '$v->{Name}' for attribute '$parent->{name}'" );
             next;
         }
 
@@ -191,7 +220,7 @@ sub encode_tlv {
 
         # verify that corrent sub-attribute is used
         if ( ($attr->{parent} // '') ne $parent->{name}) {
-            warn "Attribute $v->{Name} cannot be used with $parent->{name}";
+            _error( "Attribute '$v->{Name}' is not a tlv of attribute '$parent->{name}'" );
             next;
         }
 
@@ -217,28 +246,27 @@ sub encode {
     my ($attr, $value, $dict, $tag) = @_;
 
     if (! defined $value) {
-        warn "Value is not defined for " . $attr->{name};
+        _error( "Undefined value for attribute '$attr->{name}'" );
         return undef;
     }
 
-    my $encoder = $attr->{type} . ($attr->{has_tag} ? '_tag' : '');
+    my ($encoder_type, $encoder_sub, $encoded);
 
-    my $limits = $limits_map{ $encoder };
-    if ($limits) {
-        # integer types
-        if ($value !~ /^-?\d+$/) {
-            warn "Value is not number for " . $attr->{name};
-            return undef;
-        }
-
-        my ($min, $max) = @$limits;
-        if ($value < $min || $value > $max) {
-            warn "Value out of range for " . $attr->{name};
-            return undef;
-        }
+    if ($attr->{has_tag}) {
+        $encoder_type .= $attr->{type}.'_tag';
+    }
+    else {
+        $encoder_type = $attr->{type};
+        _error( "Provided Tag for tagless attribute '$attr->{name}'") if defined $tag;
     }
 
-    my $encoded = $encode_map{ $encoder }->($value, $attr, $dict, $tag);
+    if ($encoder_sub = $encode_map{ $encoder_type }) {
+        $encoded = $encoder_sub->($value, $attr, $dict, $tag);
+    }
+    else {
+        _error( "Unsupported encoding type '$encoder_type' for attribute '$attr->{name}'" );
+    }
+
     return $encoded;
 }
 

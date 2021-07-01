@@ -4,6 +4,7 @@ package Data::Radius::Packet;
 use v5.10;
 use strict;
 use warnings;
+use Carp ();
 use Digest::MD5 ();
 use Digest::HMAC_MD5 ();
 use bytes;
@@ -58,8 +59,13 @@ sub new {
 #  with_msg_auth - boolean, to add Message-Authenticator.
 #                  This can be archieved by adding Message-Authenticator to av_list with undefined value
 #  request_id - allow to specify custom value (0..255), otherwise internal counter is used
+#  RaiseError - raise error from AV encoding/decoding - default is to print and forgive errors
+#  PrintError - print error from AV encoding/decoding - default on
 sub build {
     my ($self, %h) = @_;
+
+    $h{RaiseError} //= $Data::Radius::Encode::RaiseError;
+    $h{PrintError} //= $Data::Radius::Encode::PrintError;
 
     # RADIUS code
     my $type = $h{type};
@@ -71,13 +77,13 @@ sub build {
     if($h{secret}) {
         $self->secret($h{secret});
     }
-    die 'No secret value' if(! defined $self->secret);
+    Carp::croak('No secret value') if ! defined $self->secret;
     # enable adding Message-Authenticator attribute (RFC3579)
     # enable it by defaulf if Message-Authenticator is present in av_list with empty value
     my $with_msg_auth = $h{with_msg_auth};
 
     if ($self->is_reply($type) && ! $h{authenticator}) {
-        die "No authenticator value from request";
+        Carp::croak("No authenticator value from request");
     }
 
     # Authenticator required now to encode password field (if present)
@@ -97,9 +103,13 @@ sub build {
             next;
         }
 
-        my $bin = $self->pack_attribute($av, $authenticator);
-        next if(! $bin);
-        push @bin_av, $bin;
+        my $bin = eval { $self->pack_attribute($av, $authenticator) };
+        if ($@) {
+            my $msg = $@;
+            Carp::croak($msg) if $h{RaiseError};
+            Carp::carp ($msg) if $h{PrintError};
+        }
+        push (@bin_av, $bin) if $bin;
     }
 
     my $attributes = join('', @bin_av);
@@ -158,7 +168,7 @@ sub build {
     }
 
     # wtf?
-    die "No authenticator" if(! $authenticator);
+    Carp::croak("No authenticator") if ! $authenticator;
 
     my $packet = join('',
                         pack('C C n', $type, $req_id, $length),
@@ -183,10 +193,7 @@ sub pack_attribute {
     # attribute not present in dictionary must be passed as {Id, Type, Value, VendorId, Tag },
     # where VendorId and Tag are optional
     if ($av->{Id}) {
-        if (! $av->{Type}) {
-            warn "No attribute type for " . $av->{Id};
-            return undef;
-        }
+        die "No attribute type for $av->{Id}\n" if ! $av->{Type};
         $attr = {
             id => $av->{Id},
             name => $av->{Id},
@@ -196,52 +203,29 @@ sub pack_attribute {
         };
         $vendor_id = $av->{VendorId};
     }
-    else {
+    elsif (defined $av->{Name}) {
         # av: {Name, Value}
-
-        if (! $dict) {
-            warn 'No dictionary provided';
-            return undef;
-        }
+        die "No dictionary to encode attribute '$av->{Name}'\n" if ! $dict;
 
         # tagged attribute
         if ($av->{Name} =~ /^([\w-]+):(\d+)$/) {
             ($av->{Name}, $av->{Tag}) = ($1, $2);
         }
 
-        $attr = $dict->attribute($av->{Name});
-        if (! $attr) {
-            warn "Unknown attribute ".$av->{Name};
-            return undef;
-        }
-
-        if (defined $av->{Tag} && !$attr->{has_tag}) {
-            warn "Tag not required for attribute ".$av->{Name};
-            return undef;
-        }
-
-        if ($attr->{has_tag} && ! defined $av->{Tag}) {
-            warn "No Tag provided for attribute ".$av->{Name};
-            return undef;
-        }
+        $attr = $dict->attribute($av->{Name})
+            or die "Unknown attribute '$av->{Name}'\n";
 
         # TODO store vendor_id in dictionary parser
         $vendor_id = $dict->vendor_id($attr->{vendor});
     }
 
     if (defined $av->{Tag}) {
-        my $tag = $av->{Tag} // 0;
-        if ($tag < 1 || $tag > 31) {
-            warn "Tag value is out of range [1..31] for ".($av->{Name} // $av->{Id});
-            return undef;
-        }
+        die "Tag value $av->{Tag} is out of range [1..31] for attribute '$attr->{name}'\n"
+            if $av->{Tag} < 1 || $av->{Tag} > 31;
     }
 
     my $value = $av->{Value};
-    if (! defined $value) {
-        warn "Undefined value for " . $attr->{name};
-        return undef;
-    }
+    die "Undefined value for attribute '$attr->{name}'\n" unless defined $value;
 
     if ($attr->{id} == ATTR_PASSWORD && ! $vendor_id) {
         # need an authenticator - this attribute must be present only in ACCESS REQUEST
@@ -251,17 +235,12 @@ sub pack_attribute {
     if ($attr->{type} ne 'tlv' && is_enum_type($attr->{type}) && $dict) {
         # convert constant-like values to real value
         $value = $dict->value($attr->{name}, $value) // $value;
-    }
-    # else - for TVL type value is ARRAY-ref
+    } # else - for TVL type value is ARRAY-ref
 
-    my $encoded = encode($attr, $value, $self->dict, ($attr->{has_tag} ? $av->{Tag} : undef) );
-
-    if (! defined $encoded) {
-        warn "Unable to encode value for ".$av->{Name};
-        return undef;
-    }
-
-    my $len_encoded = length($encoded);
+    local ($Data::Radius::Encode::PrintError, $Data::Radius::Encode::RaiseError) = (0,1);
+    my $encoded = encode($attr, $value, $self->dict, $av->{Tag} );
+    my $len_encoded = length($encoded)
+        or die "Unable to encode value for attribute '$attr->{name}'\n";
 
     if (! $vendor_id) {
         # tag already included into value, if any

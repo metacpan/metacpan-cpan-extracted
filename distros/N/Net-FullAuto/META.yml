@@ -15,7 +15,7 @@ provides:
     file: lib/Net/FullAuto/FA_Core.pm
   Net::FullAuto:
     file: lib/Net/FullAuto.pm
-    version: 1.0000605
+    version: 1.0000607
   Net::FullAuto::FA_Core:
     file: lib/Net/FullAuto/FA_Core.pm
   Net::FullAuto::FA_DB:
@@ -36,4 +36,4 @@ provides:
     file: lib/Net/FullAuto/Distro/fa_menu.pm
 resources:
   license: http://www.gnu.org/licenses/agpl.html
-version: 1.0000605
+version: 1.0000607

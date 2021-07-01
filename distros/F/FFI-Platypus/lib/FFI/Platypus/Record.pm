@@ -11,7 +11,7 @@ use constant 1.32 ();
 our @EXPORT = qw( record_layout record_layout_1 );
 
 # ABSTRACT: FFI support for structured records data
-our $VERSION = '1.50'; # VERSION
+our $VERSION = '1.52'; # VERSION
 
 
 sub record_layout_1
@@ -204,7 +204,7 @@ FFI::Platypus::Record - FFI support for structured records data
 
 =head1 VERSION
 
-version 1.50
+version 1.52
 
 =head1 SYNOPSIS
 
@@ -541,7 +541,7 @@ Damyan Ivanov
 
 Ilya Pavlov (Ilya33)
 
-Petr Pisar (ppisar)
+Petr Písař (ppisar)
 
 Mohammad S Anwar (MANWAR)
 

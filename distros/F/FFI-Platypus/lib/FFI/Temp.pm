@@ -8,7 +8,7 @@ use File::Spec;
 use File::Temp qw( tempdir );
 
 # ABSTRACT: Temp Dir support for FFI::Platypus
-our $VERSION = '1.50'; # VERSION
+our $VERSION = '1.52'; # VERSION
 
 
 # problem with vanilla File::Temp is that is often uses
@@ -80,7 +80,7 @@ FFI::Temp - Temp Dir support for FFI::Platypus
 
 =head1 VERSION
 
-version 1.50
+version 1.52
 
 =head1 DESCRIPTION
 
@@ -112,7 +112,7 @@ Damyan Ivanov
 
 Ilya Pavlov (Ilya33)
 
-Petr Pisar (ppisar)
+Petr Písař (ppisar)
 
 Mohammad S Anwar (MANWAR)
 

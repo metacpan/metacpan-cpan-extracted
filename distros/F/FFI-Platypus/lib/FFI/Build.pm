@@ -12,7 +12,7 @@ use Capture::Tiny ();
 use File::Path ();
 
 # ABSTRACT: Build shared libraries for use with FFI
-our $VERSION = '1.50'; # VERSION
+our $VERSION = '1.52'; # VERSION
 
 # Platypus-Man,
 # Platypus-Man,
@@ -311,7 +311,7 @@ FFI::Build - Build shared libraries for use with FFI
 
 =head1 VERSION
 
-version 1.50
+version 1.52
 
 =head1 SYNOPSIS
 
@@ -546,7 +546,7 @@ Damyan Ivanov
 
 Ilya Pavlov (Ilya33)
 
-Petr Pisar (ppisar)
+Petr Písař (ppisar)
 
 Mohammad S Anwar (MANWAR)
 

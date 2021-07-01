@@ -10,7 +10,7 @@ use Encode qw( decode encode find_encoding );
 use Carp ();
 
 # ABSTRACT: Platypus custom type for Unicode "wide" strings
-our $VERSION = '1.50'; # VERSION
+our $VERSION = '1.52'; # VERSION
 
 
 my @stack;  # To keep buffer alive.
@@ -187,7 +187,7 @@ FFI::Platypus::Type::WideString - Platypus custom type for Unicode "wide" string
 
 =head1 VERSION
 
-version 1.50
+version 1.52
 
 =head1 SYNOPSIS
 
@@ -499,7 +499,7 @@ Damyan Ivanov
 
 Ilya Pavlov (Ilya33)
 
-Petr Pisar (ppisar)
+Petr Písař (ppisar)
 
 Mohammad S Anwar (MANWAR)
 

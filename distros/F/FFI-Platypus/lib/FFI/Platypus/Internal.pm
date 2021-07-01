@@ -12,7 +12,7 @@ _init();
 our @EXPORT = grep /^FFI_PL/, keys %FFI::Platypus::Internal::;
 
 # ABSTRACT: For internal use only
-our $VERSION = '1.50'; # VERSION
+our $VERSION = '1.52'; # VERSION
 
 
 1;
@@ -29,7 +29,7 @@ FFI::Platypus::Internal - For internal use only
 
 =head1 VERSION
 
-version 1.50
+version 1.52
 
 =head1 SYNOPSIS
 
@@ -66,7 +66,7 @@ Damyan Ivanov
 
 Ilya Pavlov (Ilya33)
 
-Petr Pisar (ppisar)
+Petr Písař (ppisar)
 
 Mohammad S Anwar (MANWAR)
 

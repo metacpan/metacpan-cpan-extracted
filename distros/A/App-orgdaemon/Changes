@@ -1,5 +1,9 @@
 Revision history for org-daemon.
 
+1.11	2021-06-30
+	- use Linux::Inotify2 and AnyEvent instead of
+	  AnyEvent::Filesys::Notify on linux
+
 1.10	2021-05-16
 	- fix: correctly parse dates at beginning of a line
 	- suppress overeager utf8 warnings
