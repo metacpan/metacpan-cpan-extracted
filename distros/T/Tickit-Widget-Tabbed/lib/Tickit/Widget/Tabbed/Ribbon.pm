@@ -1,12 +1,12 @@
 #  You may distribute under the terms of the Artistic License (the same terms
 #  as Perl itself)
 #
-#  (C) Paul Evans, 2011-2020 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2011-2021 -- leonerd@leonerd.org.uk
 
-use 5.026;
-use Object::Pad 0.27;
+use v5.26;
+use Object::Pad 0.43;  # ADJUST
 
-package Tickit::Widget::Tabbed::Ribbon 0.023;
+package Tickit::Widget::Tabbed::Ribbon 0.024;
 class Tickit::Widget::Tabbed::Ribbon
         extends Tickit::Widget;
 
@@ -110,25 +110,27 @@ sub new_for_orientation ( $class, $orientation, @args ) {
         };
 }
 
-has $_tabbed; method tabbed { $_tabbed }
+has $_tabbed :param;
+method tabbed { $_tabbed }
 
 has $_prev_more; method prev_more { $_prev_more }
 has $_next_more; method next_more { $_next_more }
 
-has $_active_tab_index;
+has $_active_tab_index :param = 0;
 
 has @_tabs;
 
 BUILD ( %args ) {
-        my ( $prev_more, $next_more ) = $args{tabbed}->get_style_values(qw( more_left more_right ));
+        push @_tabs, @{$args{tabs}} if $args{tabs};
+}
+
+ADJUST
+{
+        weaken( $_tabbed );
+
+        my ( $prev_more, $next_more ) = $_tabbed->get_style_values(qw( more_left more_right ));
         $_prev_more = MoreMarker( $prev_more, textwidth( $prev_more ), undef );
         $_next_more = MoreMarker( $next_more, textwidth( $next_more ), undef );
-
-        push @_tabs, @{$args{tabs}} if $args{tabs};
-
-        $_active_tab_index = $args{active_tab_index} || 0;
-
-        weaken( $_tabbed = $args{tabbed} );
 
         $self->scroll_to_visible( $_active_tab_index );
 }
@@ -300,11 +302,12 @@ use constant orientation => "horizontal";
 
 use List::Util qw( sum0 );
 
-has $_active_marker;
-has $_scroll_offset = 0;
+has $_active_marker :param = undef;
+has $_scroll_offset        = 0;
 
-BUILD ( %args ) {
-        $_active_marker = $args{active_marker} || [ "[", "]" ];
+ADJUST
+{
+        $_active_marker //= [ "[", "]" ];
 }
 
 method lines { 1 }
@@ -518,12 +521,8 @@ use constant orientation => "vertical";
 
 use List::Util qw( max );
 
-has $_tab_position;
-has $_scroll_offset = 0;
-
-BUILD ( %args ) {
-        $_tab_position = $args{tab_position};
-}
+has $_tab_position  :param;
+has $_scroll_offset        = 0;
 
 method lines {
         return scalar $self->tabs;

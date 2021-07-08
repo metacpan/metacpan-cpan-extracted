@@ -1,11 +1,11 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2011-2020 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2011-2021 -- leonerd@leonerd.org.uk
 
 use Object::Pad 0.27;
 
-package Tickit::Widget::Border 0.31;
+package Tickit::Widget::Border 0.32;
 class Tickit::Widget::Border
    extends Tickit::SingleChildWidget;
 
@@ -60,10 +60,10 @@ without the C<set_> prefix.
 
 =cut
 
-has $_top_border    = 0;
-has $_bottom_border = 0;
-has $_left_border   = 0;
-has $_right_border  = 0;
+has $_top_border    :reader = 0;
+has $_bottom_border :reader = 0;
+has $_left_border   :reader = 0;
+has $_right_border  :reader = 0;
 
 BUILD
 {
@@ -108,7 +108,7 @@ Return or set the number of lines of border at the top of the widget
 
 =cut
 
-method top_border { $_top_border }
+# generated accessor
 
 method set_top_border
 {
@@ -128,7 +128,7 @@ Return or set the number of lines of border at the bottom of the widget
 
 =cut
 
-method bottom_border { $_bottom_border }
+# generated accessor
 
 method set_bottom_border
 {
@@ -148,7 +148,7 @@ Return or set the number of cols of border at the left of the widget
 
 =cut
 
-method left_border { $_left_border }
+# generated accessor
 
 method set_left_border
 {
@@ -168,7 +168,7 @@ Return or set the number of cols of border at the right of the widget
 
 =cut
 
-method right_border { $_right_border }
+# generated accessor
 
 method set_right_border
 {

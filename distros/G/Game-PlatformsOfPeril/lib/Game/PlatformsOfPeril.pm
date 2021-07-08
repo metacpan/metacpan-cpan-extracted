@@ -28,7 +28,7 @@
 
 package Game::PlatformsOfPeril;
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 use 5.24.0;
 use warnings;
@@ -36,7 +36,6 @@ use File::Spec::Functions qw(catfile);
 use List::PriorityQueue ();
 use List::Util qw(first);
 use List::UtilsBy 0.06 qw(nsort_by rev_nsort_by);
-use Scalar::Util qw(weaken);
 use Term::ReadKey qw(GetTerminalSize ReadKey ReadMode);
 use Time::HiRes qw(sleep);
 use POSIX qw(STDIN_FILENO TCIFLUSH tcflush);
@@ -233,7 +232,7 @@ our %Interact_With = (
         if ($mover->[WHAT] == MONST) {
             my @cells = map { kill_animate($_, 1); $_->[LMC][WHERE] } $mover, $target;
             redraw_ref(\@cells);
-            explode($mover);
+            explode($target);
         }
     },
     GEM,
@@ -700,7 +699,6 @@ sub load_level {
                       [ $point, $Things{ FLOOR, }, undef, $Animates[HERO] ];
                     $Animates[HERO][LMC] = $LMap->[$rownum][-1];
                     $Hero = $point;
-                    weaken($Animates[HERO][LMC]);
                 } elsif ($c eq MONST) {
                     push $LMap->[$rownum]->@*, [ $point, $Things{ FLOOR, } ];
                     make_monster($point);
@@ -730,7 +728,6 @@ sub make_item {
     );
     push @Animates, $item;
     $LMap->[ $point->[PROW] ][ $point->[PCOL] ][ITEM] = $item;
-    weaken($item->[LMC]);
 }
 
 sub make_monster {
@@ -745,7 +742,6 @@ sub make_monster {
     );
     push @Animates, $monst;
     $LMap->[ $point->[PROW] ][ $point->[PCOL] ][ANI] = $monst;
-    weaken($monst->[LMC]);
 }
 
 sub move_animate {
@@ -901,7 +897,6 @@ sub relocate {
     $lmc->[ $ent->[TYPE] ] = $ent;
     undef $LMap->[ $src->[PROW] ][ $src->[PCOL] ][ $ent->[TYPE] ];
     $ent->[LMC] = $lmc;
-    weaken($ent->[LMC]);
 }
 
 sub restore_term {
@@ -1107,11 +1102,6 @@ L<https://github.com/thrig/Game-PlatformsOfPeril>
 
 The most glorious lack of tests, the unconvincing and ham-fisted attempt
 at documentation, etc.
-
-More B<weaken> calls may be necessary due to the cross linkages between
-the C<%Animates> (which need to know things about the level map) and the
-C<$LMap> (which needs to know things about the animates). In other
-words, this game may leak memory.
 
 Some may be desirous of non-hjkl movement keys and so forth. Fiddle with
 the code (C<our> variables can be clobbered from outside the module), or

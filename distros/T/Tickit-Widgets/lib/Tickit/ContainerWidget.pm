@@ -1,13 +1,13 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2009-2020 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2009-2021 -- leonerd@leonerd.org.uk
 
-package Tickit::ContainerWidget 0.52;
+use Object::Pad 0.27;
 
-use v5.14;
-use warnings;
-use base qw( Tickit::Widget );
+package Tickit::ContainerWidget 0.53;
+class Tickit::ContainerWidget
+   extends Tickit::Widget;
 
 use Carp;
 
@@ -56,20 +56,17 @@ section below.
 
 =cut
 
-sub new
+has %_child_opts;
+
+# This class should probably be a role
+BUILD
 {
-   my $class = shift;
+   my $class = ref $self;
 
    foreach my $method (qw( children )) {
       $class->can( $method ) or
          croak "$class cannot ->$method - do you subclass and implement it?";
    }
-
-   my $self = $class->SUPER::new( @_ );
-
-   $self->{child_opts} = {};
-
-   return $self;
 }
 
 =head1 METHODS
@@ -88,9 +85,8 @@ Returns the container C<$widget> itself, for easy chaining.
 
 =cut
 
-sub add
+method add
 {
-   my $self = shift;
    my ( $child, %opts ) = @_;
 
    $child and $child->isa( "Tickit::Widget" ) or
@@ -98,7 +94,7 @@ sub add
 
    $child->set_parent( $self );
 
-   $self->{child_opts}{refaddr $child} = \%opts;
+   $_child_opts{refaddr $child} = \%opts;
 
    $self->children_changed;
 
@@ -116,16 +112,15 @@ Returns the container C<$widget> itself, for easy chaining.
 
 =cut
 
-sub remove
+method remove
 {
-   my $self = shift;
    my ( $child ) = @_;
 
    $child->set_parent( undef );
    $child->window->close if $child->window;
    $child->set_window( undef );
 
-   delete $self->{child_opts}{refaddr $child};
+   delete $_child_opts{refaddr $child};
 
    $self->children_changed;
 
@@ -145,12 +140,11 @@ it will be preserved.
 
 =cut
 
-sub child_opts
+method child_opts
 {
-   my $self = shift;
    my ( $child ) = @_;
 
-   my $opts = $self->{child_opts}{refaddr $child};
+   my $opts = $_child_opts{refaddr $child};
    return $opts if !wantarray;
    return %$opts;
 }
@@ -164,12 +158,11 @@ C<undef> are deleted.
 
 =cut
 
-sub set_child_opts
+method set_child_opts
 {
-   my $self = shift;
    my ( $child, %newopts ) = @_;
 
-   my $opts = $self->{child_opts}{refaddr $child};
+   my $opts = $_child_opts{refaddr $child};
 
    foreach ( keys %newopts ) {
       defined $newopts{$_} ? ( $opts->{$_} = $newopts{$_} ) : ( delete $opts->{$_} );
@@ -178,33 +171,27 @@ sub set_child_opts
    $self->children_changed;
 }
 
-sub child_resized
+method child_resized
 {
-   my $self = shift;
    $self->reshape if $self->window;
    $self->resized;
 }
 
-sub children_changed
+method children_changed
 {
-   my $self = shift;
-
    $self->reshape if $self->window;
    $self->resized;
 }
 
-sub window_gained
+method window_gained
 {
-   my $self = shift;
    $self->SUPER::window_gained( @_ );
 
    $self->window->set_focus_child_notify( 1 );
 }
 
-sub window_lost
+method window_lost
 {
-   my $self = shift;
-
    foreach my $child ( $self->children ) {
       my $childwin = $child->window;
       $childwin and $childwin->close;
@@ -215,9 +202,8 @@ sub window_lost
    $self->SUPER::window_lost( @_ );
 }
 
-sub _on_win_focus
+method _on_win_focus
 {
-   my $self = shift;
    $self->SUPER::_on_win_focus( @_ );
 
    $self->set_style_tag( "focus-child" => $_[1] ) if $_[2];
@@ -265,9 +251,8 @@ that child should be included in the search.
 
 =cut
 
-sub find_child
+method find_child
 {
-   my $self = shift;
    my ( $how, $other, %args ) = @_;
 
    my $children = $args{children} // "children";
@@ -343,9 +328,8 @@ Usually this would be used via the widget itself:
 
 =cut
 
-sub focus_next
+method focus_next
 {
-   my $self = shift;
    my ( $how, $other ) = @_;
 
    # This tree search has the potential to loop infinitely, if there are no

@@ -26,8 +26,6 @@ foreach my $type (qw(Plain Plus JSON Binary XML PPXML)) {
     is ref($parser), "PICA::Parser::$type", "parser from file";
 
     my $record = $parser->next;
-    is ref($record), 'PICA::Data', 'blessed by default';
-
     is_deeply $record, $first;
 
     ok $parser->next()->{_id} eq '67890', 'next record';    
@@ -112,7 +110,7 @@ note 'error handling';
     dies_ok {pica_parser(plain => bless({}, 'MyFooBar'))} 'invalid handle';
 }
 
-is pica_parser(plain => \'012A/00 $xy', bless => 1)->next->string, 
+is pica_parser(plain => \'012A/00 $xy')->next->string, 
   "012A \$xy\n\n", 'occurrence zero';
 
 {
@@ -135,15 +133,15 @@ my $annotated = "";
     for my $annotated ("? 123A \$xy\n\n", "  123A \$xy\n\n") {
         my $plain = substr $annotated, 2;
 
-        my $parser = pica_parser(plain => \"$annotated$plain", bless => 1);
+        my $parser = pica_parser(plain => \"$annotated$plain");
         is $annotated, $parser->next->string, 'support annotation by default';
         is $plain, $parser->next->string, 'mixed with plain';
         
-        $parser = pica_parser(plain => \"$annotated$plain", bless => 1, annotate => 1);
+        $parser = pica_parser(plain => \"$annotated$plain", annotate => 1);
         is $annotated, $parser->next->string, 'annotation = 1';
         dies_ok{ $parser->next } 'require annotation';
 
-        $parser = pica_parser(plain => \"$plain$annotated", bless => 1, annotate => 0, strict => 1);         
+        $parser = pica_parser(plain => \"$plain$annotated", annotate => 0, strict => 1);         
         ok $parser->next;
         dies_ok { $parser->next } 'forbid annotation';
     }

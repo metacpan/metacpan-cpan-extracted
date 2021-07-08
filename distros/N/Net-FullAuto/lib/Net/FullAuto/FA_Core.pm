@@ -26832,7 +26832,8 @@ print $Net::FullAuto::FA_Core::LOG "WE ARE BACK FROM LOOKUP<==\n"
       $login_passwd=$Hosts{$hostlabel}->{'password'};
    } elsif (exists $Hosts{$hostlabel} &&
          exists $Hosts{$hostlabel}->{'label'} &&
-         ($Hosts{$hostlabel}->{'label'} eq 'Localhost Shell')) {
+         ($Hosts{$hostlabel}->{'label'} eq 'Localhost Shell')
+         || $_connect eq 'connect_shell') {
    } elsif ($hostlabel!~/__Master_${$}__/ && !$identityfile
          && !(exists $Hosts{$hostlabel}{'cyberark'})) {
       $determine_password->('',0,$hostlabel,$password);
@@ -30747,7 +30748,7 @@ print $Net::FullAuto::FA_Core::LOG "DOIN FULLERROR2222==>$line<==\n"
 print "WE HAVE LASTLINE CMDPROMPT AND ARE GOING TO EXIT and FO=$fulloutput and MS_CMD=$ms_cmd<==\n"
    if !$Net::FullAuto::FA_Core::cron && $Net::FullAuto::FA_Core::debug;
                         $stdout=$fulloutput;
-                        $stderr=$fullerror;
+                        $stderr=$fullerror if $fulloutput!~/^.*\n0$/s;
 		        chomp $stdout if $stdout;
                         chomp $stderr if $stderr;
                         last;

@@ -116,6 +116,25 @@ then only secure ("https://") streams will be returned.
 
 DEFAULT I<-secure> is 0 (false) - return all streams (http and https).
 
+Additional options:
+
+I<-log> => "I<logfile>"
+
+Specify path to a log file.  If a valid and writable file is specified, A line will be 
+appended to this file every time one or more streams is successfully fetched for a url.
+
+DEFAULT i<-none> (no logging).
+
+I<-logfmt> specifies a format string for lines written to the log file.
+
+DEFAULT "I<[time] [url] - [site]: [title] ([total])>".  
+
+The valid field I<[variables]> are:  [stream]: The url of the first/best stream found.  
+[site]:  The site name (SermonAudio).  [url]:  The url searched for streams.  
+[time]: Perl timestamp when the line was logged.  [title], [artist], [album], 
+[description], [year], [genre], [total], [albumartist]:  The corresponding field data 
+returned (or "-na", if no value).
+
 =item $podcast->B<get>()
 
 Returns an array of strings representing all stream URLs found.
@@ -326,10 +345,16 @@ sub new
 	(my $url2fetch = $url);
 	if ($url =~ /^https?\:/) {
 		$self->{'id'} = $1  if ($url2fetch =~ m#\?SID\=([\d]+)#);
+		unless ($self->{'id'}) {  #WE'RE ONE OF SERMONAUDIO'S ALTERNATE URLS:
+			$self->{'id'} = $1  if ($url2fetch =~ /sermonaudio/i && $url2fetch =~ m#([\d]+)\/?$#);
+			$url2fetch = 'https://www.sermonaudio.com/sermoninfo.asp?SID='.$self->{'id'};
+		}
 	} else {
 		$self->{'id'} = $url;
 		$url2fetch = "https://www.sermonaudio.com/sermoninfo.asp?SID=$url";
 	}
+	return undef  unless ($self->{'id'});
+
 	my $html = '';
 	print STDERR "-0(SermonAudio): FETCHING URL=$url2fetch= ID=".$self->{'id'}."=\n"  if ($DEBUG);
 	my $ua = LWP::UserAgent->new(@{$self->{'_userAgentOps'}});		
@@ -345,47 +370,64 @@ sub new
 	print STDERR "-1: html=$html=\n"  if ($DEBUG > 1);
 	return undef  unless ($html && $self->{'id'});  #STEP 1 FAILED, INVALID PODCAST URL, PUNT!
 
-	$self->{'genre'} = 'Podcast';
+	$self->{'genre'} = 'Sermon';
 	$self->{'albumartist'} = $url2fetch;
 	my %dups = ();
-	foreach my $tag ('og:audio:secure_url" content=', 'og:audio:url" content=', 'og:audio" content=') {
-		if ($html =~ s#\"$tag\"([^\"]+)\"##gso) {
-			my $audiourl = $1;
-			unless (defined($dups{$audiourl}) || ($self->{'secure'} && $audiourl !~ /^https/o)) {
-				push @{$self->{'streams'}}, $audiourl;
+	foreach my $tag ('og:video:secure_url', 'og:video:url', 'og:audio:secure_url', 'og:audio:url', 'og:audio') {
+		if ($html =~ s#\"$tag\"\s+content\=\"([^\"]+)\"##gso) {
+			my $mediaurl = $1;
+			unless (defined($dups{$mediaurl}) || ($self->{'secure'} && $mediaurl !~ /^https/o)) {
+				push @{$self->{'streams'}}, $mediaurl;
 				$self->{'cnt'}++;
-				$dups{$audiourl} = 1;
+				$dups{$mediaurl} = 1;
 			}
+		}
+	}
+	while ($html =~ s#\<a\s+rel\=\"nofollow\"\s+href\=\"(https?\:\/\/\S+?$self->{'id'}\.mp3)\"\>##s) {
+		my $audiourl = $1;
+		unless (defined($dups{$audiourl}) || ($self->{'secure'} && $audiourl !~ /^https/o)) {
+			push @{$self->{'streams'}}, $audiourl;
+			$self->{'cnt'}++;
+			$dups{$audiourl} = 1;
 		}
 	}
 	$self->{'total'} = $self->{'cnt'};
 	%dups = ();
 	return undef  unless ($self->{'cnt'} > 0);
-	$self->{'title'} = ($html =~ s#\<meta\s+name\=\"title\"\s+content\=\"([^\"]+)\"\s*\/\>##s) ? $1 : '';
+
+	$self->{'title'}   = $1  if ($html =~ s#\<meta\s+name\=\"title\"\s+content\=\"([^\"]+)\"\s*\/\>##s);
 	$self->{'title'} ||= $1  if ($html =~ s#\<TITLE\>\s*([^\|\<]+)##s);
-	$self->{'description'} = ($html =~ s#\<meta\s+name\=\"description\"\s+content\=\"([^\"]+)\"\s*\/\>##s) ? $1 : '';
+	$self->{'title'} ||= $1  if ($html =~ s#\<meta\s+property\=\"og\:title\"\s+content\=\"([^\"]+)##s);
+	$self->{'description'}   = $1  if ($html =~ s#\<font\s+style\=line\-height\:140\%\s+class\=ar5\>(.+?)\<\/font\>\<\/div\>##s);
+	$self->{'description'} ||= $1  if ($html =~ s#\<meta\s+name\=\"description\"\s+content\=\"([^\"]+)\"\s*\/\>##s);
 	$self->{'description'} ||= $1  if ($html =~ s#\<meta\s+property\=\"og\:description\"\s+content\=\"([^\"]+)\"\s*\/\>##s);
 	if ($html =~ s#\?DateOnly\=[^\>]+\>([^\<]+)##s) {
 		my $mmddyy = $1;
 		$self->{'year'} = $1  if ($mmddyy =~ /(\d\d\d\d)\s*$/);
 	}
 	$self->{'year'} ||= $1  if ($html =~ s#\d\, (\d\d\d\d)\<\/I\>\<\/font\>\<BR\>##s);
-	$self->{'title'} = HTML::Entities::decode_entities($self->{'title'});
-	$self->{'title'} = uri_unescape($self->{'title'});
-	$self->{'title'} =~ s/(?:\%|\\?u?00)([0-9A-Fa-f]{2})/chr(hex($1))/eg;
-	$self->{'description'} = HTML::Entities::decode_entities($self->{'description'});
-	$self->{'description'} = uri_unescape($self->{'description'});
-	$self->{'description'} =~ s/(?:\%|\\?u?00)([0-9A-Fa-f]{2})/chr(hex($1))/egs;
-	$self->{'iconurl'} = ($html =~ s#\<meta\s+property\=\"og\:image(?:\:secure\_url)?"\s+content\=\"([^\"]+)\"\s*\/\>##s) ? $1 : '';
+	foreach my $field (qw(title description)) {
+		$self->{$field} = HTML::Entities::decode_entities($self->{$field});
+		$self->{$field} = uri_unescape($self->{$field});
+		$self->{$field} =~ s/(?:\%|\\?u?00)([0-9A-Fa-f]{2})/chr(hex($1))/eg;
+	}
+	$self->{'iconurl'}   = $1  if ($html =~ s#\<meta\s+property\=\"og\:image\:secure\_url\"\s+content\=\"([^\"]+)\"\s*\/\>##s);
+	$self->{'iconurl'} ||= $1  if ($html =~ s#\<meta\s+property\=\"og\:image\"\s+content\=\"([^\"]+)\"\s*\/\>##s);
+	$self->{'iconurl'} ||= $1  if ($html =~ s#\<font\s+class\=ar3\>\<img\s+src\=\"([^\"]+)##s);
 	$self->{'imageurl'} = $self->{'iconurl'};
 	if ($html =~ s#Speaker\:\<\/font\>\<BR\>\<B\>\<a\s+class\=\S+\shref\=\"([^\"]+)\"\>([^\<]*)##s) {
 		$self->{'albumartist'} = $1;
 		$self->{'artist'} = $2;
 	}
+	if (!$self->{'artist'} && $html =~ m#\<meta\s+name\=\"description\"\s+content\=\"([^\"]+)"#s) {
+		($self->{'artist'} = $1) =~ s/\s+\|.*$//;
+	}
+	$self->{'albumartist'} ||= $1  if ($html =~ m#href\=\"([^\"]+)\"\>Web\<\/a\>#s);
 	$self->{'Url'} = ($self->{'total'} > 0) ? $self->{'streams'}->[0] : '';
 	print STDERR "-(all)count=".$self->{'cnt'}."= iconurl=".$self->{'iconurl'}."= TITLE=".$self->{'title'}."= DESC=".$self->{'description'}."= YEAR=".$self->{'year'}."=\n"  if ($DEBUG);
 	print STDERR "--SUCCESS: 1st stream=".$self->{'Url'}."= total=".$self->{'total'}."=\n"
 			if ($DEBUG && $self->{'cnt'} > 0);
+	$self->_log($url);
 
 	bless $self, $class;   #BLESS IT!
 

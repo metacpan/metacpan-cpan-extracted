@@ -1,11 +1,11 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2013-2020 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2013-2021 -- leonerd@leonerd.org.uk
 
-use Object::Pad 0.27;
+use Object::Pad 0.41;  # :param
 
-package Tickit::Widget::Spinner 0.31;
+package Tickit::Widget::Spinner 0.32;
 class Tickit::Widget::Spinner
    extends Tickit::Widget;
 
@@ -72,7 +72,7 @@ Optional. The time each string is displayed for. Defaults to 0.5.
 
 has @_chars;
 has $_state = 0;
-has $_interval;
+has $_interval :param = 0.5;
 has $_cols;
 
 BUILD
@@ -80,8 +80,6 @@ BUILD
    my %params = @_;
 
    @_chars = $params{chars} ? $params{chars}->@* : (qw( - \ | / ));
-
-   $_interval = $params{interval} // 0.5;
 
    $_cols = max map { textwidth $_ } @_chars;
 }

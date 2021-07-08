@@ -1,31 +1,32 @@
 ---
-abstract: unknown
+abstract: 'One-time use URLs for sensitive data'
 author:
-  - unknown
+  - 'Simon Cozens <simon@kasei.com>'
 build_requires:
-  ExtUtils::MakeMaker: '0'
   Test: '0'
 configure_requires:
-  ExtUtils::MakeMaker: '6.3'
-dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.02, CPAN::Meta::Converter version 2.150005'
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Apache-OneTimeURL
-no_index:
-  directory:
-    - t
-    - inc
 requires:
   Apache: '0'
-  DB_File: '0'
+  Apache::Constants: '0'
   Digest::MD5: '0'
   MLDBM: '0'
   Mail::Send: '0'
   perl: '5.006'
+  strict: '0'
+  warnings: '0'
 resources:
-  repository: git://github.com/neilb/Apache-OneTimeURL.git
-version: '1.34'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.016'
+  bugtracker: https://github.com/cpan-janitor/Apache-OneTimeURL/issues
+  homepage: https://github.com/cpan-janitor/Apache-OneTimeURL
+  repository: https://github.com/cpan-janitor/Apache-OneTimeURL.git
+version: '1.35'
+x_generated_by_perl: v5.28.2
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

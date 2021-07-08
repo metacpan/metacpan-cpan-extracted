@@ -1,9 +1,9 @@
 package Pod::From::Acme::CPANModules;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-02-18'; # DATE
+our $DATE = '2021-03-26'; # DATE
 our $DIST = 'Pod-From-Acme-CPANModules'; # DIST
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 use 5.010001;
 use strict;
@@ -108,7 +108,7 @@ sub gen_pod_from_acme_cpanmodules {
                 }
             }
             $pod .= "=back\n\n";
-            $res->{pod}{'ACME::MODULES ENTRIES'} .= $pod;
+            $res->{pod}{'ACME::CPANMODULES ENTRIES'} .= $pod;
         }
 
         {
@@ -138,7 +138,7 @@ Pod::From::Acme::CPANModules - Generate POD from an Acme::CPANModules::* module
 
 =head1 VERSION
 
-This document describes version 0.007 of Pod::From::Acme::CPANModules (from Perl distribution Pod-From-Acme-CPANModules), released on 2021-02-18.
+This document describes version 0.008 of Pod::From::Acme::CPANModules (from Perl distribution Pod-From-Acme-CPANModules), released on 2021-03-26.
 
 =head1 SYNOPSIS
 

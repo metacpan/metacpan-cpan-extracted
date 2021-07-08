@@ -17,10 +17,11 @@ use Carp;
 use Business::CompanyDesignator::Record;
 use Business::CompanyDesignator::SplitResult;
 
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 
-# Hardcode the set of languages that we treat as 'continuous' i.e. their
-# designators don't require a word break before/after.
+# Hardcode the set of languages that we treat as 'continuous'
+# i.e. their non-ascii designators don't require a word break
+# before/after.
 our %LANG_CONTINUA = map { $_ => 1 } qw(
   zh
   ja
@@ -233,6 +234,8 @@ sub _build_regex {
     if (my $abbr_list = $entry->{abbr}) {
       $abbr_list = [ $abbr_list ] if ! ref $abbr_list;
       for my $abbr (@$abbr_list) {
+        # Only treat non-ascii abbreviations as continuous
+        next if $type eq 'end_cont' && $abbr =~ /^\p{ASCII}+$/;
         my $abbr_nfd = NFD($abbr);
         my $abbr_std = NFD($entry->{abbr_std} || $abbr);
         $self->_add_to_assembler($assembler, $lang, $abbr_nfd, $abbr_std);
@@ -392,7 +395,7 @@ company designators appended to company names
 
 =head1 VERSION
 
-Version: 0.16.
+Version: 0.17.
 
 This module is considered a B<BETA> release. Interfaces may change and/or break
 without notice until the module reaches version 1.0.

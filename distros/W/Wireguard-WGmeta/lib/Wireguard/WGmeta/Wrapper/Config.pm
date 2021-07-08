@@ -11,7 +11,7 @@ WGmeta::Wrapper::Config - Class for interfacing the wireguard configuration
 
 =head1 DESCRIPTION
 
-This class provides wrapper-functions around a wireguard configuration parsed by L<Wireguard::WGmeta::Parser::Config> which
+This class provides wrapper-functions around a wireguard configuration parsed by L<Wireguard::WGmeta::Parser::Middleware> which
 allow to edit, add and remove interfaces and peers.
 
 =head1 CONCURRENCY
@@ -29,8 +29,8 @@ Please refer to L<Wireguard::WGmeta::Wrapper::ConfigT>
  # set an alias for a peer
  wg_meta->set('wg0', 'WG_0_PEER_A_PUBLIC_KEY', 'alias', 'some_fancy_alias');
 
- # disable peer (this comments out the peer in the configuration file
- wg_meta->disable_by_alias('wg0', 'some_fancy_alias');
+ # disable peer (this comments out the peer in the configuration file)
+ wg_meta->disable('wg0', 'some_fancy_alias');
 
  # write config (if parameter is set to True, the config is overwritten, if set to False the resulting file is suffixed with '.not_applied'
  wg_meta->commit(1);
@@ -45,11 +45,12 @@ use strict;
 use warnings;
 use experimental 'signatures';
 use Wireguard::WGmeta::Wrapper::Bridge;
-use Wireguard::WGmeta::Parser::Config;
+use Wireguard::WGmeta::Parser::Middleware;
 use Wireguard::WGmeta::ValidAttributes;
 use Wireguard::WGmeta::Utils;
+use Wireguard::WGmeta::Parser::Conf qw(INTERNAL_KEY_PREFIX);
 
-our $VERSION = "0.2.3"; # do not change manually, this variable is updated when calling make
+our $VERSION = "0.3.1"; # do not change manually, this variable is updated when calling make
 
 use constant FALSE => 0;
 use constant TRUE => 1;
@@ -87,12 +88,12 @@ C<[$custom_attributes]> A reference to a hash defining custom attributes. Expect
 
     {
         'attr_key'     => {
-            'in_config_name' => 'In config name',
             'validator'      => 'Ref to validation function'
         },
         'example'         => {
-            'in_config_name' => 'DNS',
-            'validator'      => \&accept_any
+            'validator'      => sub ($attr, $value) {
+                return ($attr eq 'example') ? 1 : 0;
+            }
         },
         ...
     }
@@ -110,12 +111,6 @@ sub new($class, $wireguard_home, $wg_meta_prefix = '#+', $wg_meta_disabled_prefi
         die '`$wg_meta_prefix` and `$wg_meta_disabled_prefix` have to be different';
     }
 
-    if (defined $custom_attributes) {
-        for my $attr_key (keys %{$custom_attributes}) {
-            register_custom_attribute($attr_key, $custom_attributes->{$attr_key});
-        }
-    }
-
     my $self = {
         'wireguard_home'          => $wireguard_home,
         'wg_meta_prefix'          => $wg_meta_prefix,
@@ -124,6 +119,7 @@ sub new($class, $wireguard_home, $wg_meta_prefix = '#+', $wg_meta_disabled_prefi
         'n_conf_files'            => {},
         'parsed_config'           => {},
         'reload_listeners'        => {},
+        'custom_attributes'       => defined $custom_attributes ? $custom_attributes : {}
     };
 
     _read_configs_from_folder2($self);
@@ -135,14 +131,13 @@ sub new($class, $wireguard_home, $wg_meta_prefix = '#+', $wg_meta_disabled_prefi
 sub _read_configs_from_folder2($self) {
     my ($all_dot_conf, $count) = get_all_conf_files($self->{wireguard_home});
     for my $possible_config_path (@{$all_dot_conf}) {
-        my $contents = read_file($possible_config_path);
         my $interface = $possible_config_path;
         $interface =~ s/^\/|\\|.*\/|.*\\|.conf$//g;
         may_reload_from_disk($self, $interface, TRUE, TRUE, TRUE);
     }
 }
 
-=head3 set($interface, $identifier, $attribute, $value [, $allow_non_meta, $forward_function])
+=head3 set($interface, $identifier, $attribute, $value [, $unknown_callback])
 
 Sets a value on a specific interface section. If C<attribute_value> == C<$value> this sub is essentially a No-Op.
 
@@ -156,112 +151,117 @@ C<$interface> Valid interface identifier (e.g 'wg0')
 
 =item *
 
-C<$identifier> If the target section is a peer, this is usually the public key of this peer. If target is an interface,
-its again the interface name.
+C<$identifier> Either an interface name, an alias or public-key of a peer
 
 =item *
 
-C<$attribute> Attribute name (Case does not not matter)
+C<$attribute> Attribute name (case does matter!)
 
 =item *
 
-C<[$allow_non_meta = FALSE]> If set to TRUE, non wg-meta attributes are not forwarded to C<$forward_function>.
+C<[$unknown_callback = undef]> A reference to a callback function which is fired when a previously unknown attribute is set.
+Expected signature:
 
-=item *
+    sub my_unknown_callback($attribute, $value) {
+        # Handling of this particular case
+        return $attribute, $value;
+    }
 
-C<[$forward_function = undef]> A reference to a callback function when C<$allow_non_meta = TRUE>. The following signature
-is expected: C<forward_fun($interface, $identifier, $attribute, $value)>
+If not defined, a warning is emitted
 
 =back
 
 B<Raises>
 
-Exception if either the interface or identifier is invalid.
+Exception if:
+
+=over 1
+
+=item *
+
+Value is not defined
+
+=item *
+
+Interface is invalid
+
+=item *
+
+Identifier is invalid (also if alias translation fails)
+
+=item *
+
+Attribute is not valid for target section (Interface, Peer)
+
+=item *
+
+Validation for the attribute value fails
+
+=back
 
 B<Returns>
 
 None
 
 =cut
-sub set($self, $interface, $identifier, $attribute, $value, $allow_non_meta = FALSE, $forward_function = undef) {
-    my $attr_type = decide_attr_type($attribute, TRUE);
-    unless (defined $value) {
-        warn "Undefined value for `$attribute` in interface `$interface` NOT SET";
+sub set($self, $interface, $identifier, $attribute, $value, $unknown_callback = undef) {
+    # Assertions
+    die "Undefined value for `$attribute` in interface `$interface` NOT SET" unless defined($value);
+    die "Invalid interface name `$interface`" unless $self->is_valid_interface($interface);
+    $identifier = $self->try_translate_alias($interface, $identifier);
+    die "Invalid identifier `$identifier` for interface `$interface`" unless $self->is_valid_identifier($interface, $identifier);
+    my $attr_type = get_attr_type($attribute);
+    if ($interface eq $identifier) {
+        # We have an interface
+        die "Attribute `$attribute` it not valid for the interface section" if $attr_type == ATTR_TYPE_IS_WG_ORIG_PEER;
+    }
+    else {
+        die "Attribute `$attribute` is not valid for an peer section" if $attr_type == ATTR_TYPE_IS_WG_ORIG_INTERFACE or $attr_type == ATTR_TYPE_IS_WG_QUICK;
+    }
+
+    # skip if same value
+    if (exists $self->{parsed_config}{$interface}{$identifier}{$attribute} && $self->{parsed_config}{$interface}{$identifier}{$attribute} eq $value) {
         return;
     }
-    if ($self->is_valid_interface($interface)) {
-        if ($self->is_valid_identifier($interface, $identifier)) {
 
-            # skip if same value
-            if (exists $self->{parsed_config}{$interface}{$identifier}{$attribute} && $self->{parsed_config}{$interface}{$identifier}{$attribute} eq $value) {
-                return;
+    # Call attribute validation function
+    die "Invalid attribute value `$value` for `$attribute`" unless $self->attr_value_is_valid($attribute, $value);
+
+    unless (exists $self->{parsed_config}{$interface}{$identifier}{$attribute}) {
+
+        if (not exists $self->{parsed_config}{$interface}{INTERNAL_KEY_PREFIX . 'observed_wg_meta_attrs'}{$attribute}) {
+            if (exists KNOWN_ATTRIBUTES->{$attribute}) {
+                # we have to first occurrence of a known but yet unseen wg-meta attribute
+                $self->{parsed_config}{$interface}{INTERNAL_KEY_PREFIX . 'observed_wg_meta_attrs'}{$attribute} = 1 if KNOWN_ATTRIBUTES->{$attribute}{type} == ATTR_TYPE_IS_WG_META;
             }
-            if ($attr_type == ATTR_TYPE_IS_WG_META || $attr_type == ATTR_TYPE_IS_WG_META_CUSTOM) {
-
-                unless (attr_value_is_valid($attribute, $value, get_attr_config($attr_type))) {
-                    die "Invalid attribute value `$value` for `$attribute`";
-                }
-                unless (exists $self->{parsed_config}{$interface}{$identifier}{$attribute}) {
-                    # the attribute does not (yet) exist in the configuration, lets add it to the list
-                    push @{$self->{parsed_config}{$interface}{$identifier}{order}}, $attribute;
-                }
-                if ($attribute eq 'alias') {
-                    $self->_update_alias_map($interface, $identifier, $value);
-                }
-                $self->{parsed_config}{$interface}{$identifier}{$attribute} = $value;
+            elsif (exists $self->{custom_attributes}{$attribute}) {
+                # we have a registered custom attribute
+                $self->{parsed_config}{$interface}{INTERNAL_KEY_PREFIX . 'observed_wg_meta_attrs'}{$attribute} = 1
             }
             else {
-                if ($allow_non_meta == TRUE) {
-                    if (_fits_wg_section($interface, $identifier, $attr_type)) {
-                        unless (attr_value_is_valid($attribute, $value, get_attr_config($attr_type))) {
-                            die "Invalid attribute value `$value` for `$attribute`";
-                        }
-                        unless (exists $self->{parsed_config}{$interface}{$identifier}{$attribute}) {
-                            # the attribute does not (yet) exist in the configuration, lets add it to the list
-                            push @{$self->{parsed_config}{$interface}{$identifier}{order}}, $attribute;
-                        }
-                        # the attribute does already exist and therefore we just set it to the new value
-                        $self->{parsed_config}{$interface}{$identifier}{$attribute} = $value;
-                    }
-                    else {
-                        die "The supplied attribute `$attribute` is not valid for this section type (this most likely means you've tried to set a peer attribute in the interface section or vice-versa)";
-                    }
+                # we have a completely new, unknown attribute
+                if (defined $unknown_callback) {
+                    ($attribute, $value) = &{$unknown_callback}($attribute, $value);
                 }
                 else {
-                    if (defined($forward_function)) {
-                        &{$forward_function}($interface, $identifier, $attribute, $value);
-                    }
-                    else {
-                        die 'No forward function defined';
-                    }
+                    warn "Attribute `$attribute` was previously not known on interface `$interface`";
                 }
+                $self->{parsed_config}{$interface}{INTERNAL_KEY_PREFIX . 'observed_wg_meta_attrs'}{$attribute} = 1;
             }
-            $self->_set_changed($interface);
         }
-        else {
-            die "Invalid identifier `$identifier` for interface `$interface`";
-        }
+        # the attribute does not (yet) exist in the configuration, lets add it to the list
+        push @{$self->{parsed_config}{$interface}{$identifier}{INTERNAL_KEY_PREFIX . 'order'}}, $attribute;
     }
-    else {
-        die "Invalid interface name `$interface`";
+    if ($attribute eq 'alias') {
+        $self->_update_alias_map($interface, $identifier, $value);
     }
-
-}
-
-# internal method to check if a non-meta attribute is valid for the target section
-sub _fits_wg_section($interface, $identifier, $attr_type) {
-    # if we have an interface
-    if ($interface eq $identifier) {
-        return $attr_type == ATTR_TYPE_IS_WG_ORIG_INTERFACE || $attr_type == ATTR_TYPE_IS_WG_QUICK
-    }
-    else {
-        return $attr_type == ATTR_TYPE_IS_WG_ORIG_PEER;
-    }
+    $self->{parsed_config}{$interface}{$identifier}{$attribute} = $value;
+    $self->_set_changed($interface);
 }
 
 =head3 attr_value_is_valid($attribute, $value, $ref_valid_attrs)
 
-Simply calls the C<validate()> function defined in L<Wireguard::WGmeta::Validator>
+Simply calls the C<validate()> function defined in L<Wireguard::WGmeta::Validator> or C<$custom_attributs>
 
 B<Parameters>
 
@@ -275,47 +275,32 @@ C<$attribute> Attribute name
 
 C<$value> Attribute value
 
-=item
-
-C<$ref_valid_attrs> Reference to the corresponding L<Wireguard::WGmeta::Validator> section.
-
 =back
 
 B<Returns>
 
-True if validation was successful, False if not
+True if validation was successful (or no validator function present), False if not.
 
 =cut
-sub attr_value_is_valid($attribute, $value, $ref_valid_attrs) {
-    return $ref_valid_attrs->{$attribute}{validator}($value);
+sub attr_value_is_valid($self, $attribute, $value) {
+    return &{KNOWN_ATTRIBUTES->{$attribute}{validator}}($value) if exists KNOWN_ATTRIBUTES->{$attribute};
+    return &{$self->{custom_attributes}{$attribute}{validator}}($value) if exists $self->{custom_attributes}{$attribute};
+    return 1;
 }
 
 sub _update_alias_map($self, $interface, $identifier, $alias) {
-    unless (exists $self->{parsed_config}{$interface}{alias_map}{$alias}) {
-        $self->{parsed_config}{$interface}{alias_map}{$alias} = $identifier;
+    unless (exists $self->{parsed_config}{$interface}{INTERNAL_KEY_PREFIX . 'alias_map'}{$alias}) {
+        $self->{parsed_config}{$interface}{INTERNAL_KEY_PREFIX . 'alias_map'}{$alias} = $identifier;
     }
     else {
         die "Alias `$alias` is already defined on interface `$interface`";
     }
 }
 
-=head3 set_by_alias($interface, $alias, $attribute, $value [, $allow_non_meta = FALSE, $forward_function = undef])
-
-Same as L</set($interface, $identifier, $attribute, $value [, $allow_non_meta, $forward_function])> - just with alias support.
-
-B<Raises>
-
-Exception if alias is invalid
-
-=cut
-sub set_by_alias($self, $interface, $alias, $attribute, $value, $allow_non_meta = FALSE, $forward_function = undef) {
-    my $identifier = $self->translate_alias($interface, $alias);
-    $self->set($interface, $identifier, $attribute, $value, $allow_non_meta, $forward_function);
-}
 
 =head3 disable($interface, $identifier)
 
-Disables an interface/peer (by prefixing C<$wg_meta_disabled_prefix>) and setting the wg-meta attribute `Disabled` to C<1>.
+Disables an interface/peer and setting the wg-meta attribute `Disabled` to C<1>.
 
 B<Parameters>
 
@@ -327,7 +312,7 @@ C<$interface> Valid interface name (e.g 'wg0').
 
 =item *
 
-C<$identifier> A valid identifier: If the target section is a peer, this is usually the public key of this peer. If target is an interface,
+C<$identifier> A valid identifier (or alias): If the target section is a peer, this is usually the public key of this peer. If target is an interface,
 its again the interface name.
 
 =back
@@ -350,40 +335,12 @@ sub enable($self, $interface, $identifier) {
     $self->_toggle($interface, $identifier, FALSE);
 }
 
-=head3 disable_by_alias($interface, $alias)
-
-Same as L</disable($interface, $identifier)> just with alias support
-
-B<Raises>
-
-Exception if alias is invalid
-
-=cut
-sub disable_by_alias($self, $interface, $alias,) {
-    $self->_toggle($interface, $self->translate_alias($interface, $alias), FALSE);
-}
-
-=head3 disable_by_alias($interface, $alias)
-
-Same as L</enable($interface, $identifier)>ust with alias support
-
-B<Raises>
-
-Exception if alias is invalid
-
-=cut
-sub enable_by_alias($self, $interface, $alias,) {
-    $self->_toggle($interface, $self->translate_alias($interface, $alias), TRUE);
-}
-
 # internal toggle method (DRY)
 sub _toggle($self, $interface, $identifier, $enable) {
-    if (exists $self->{parsed_config}{$interface}{$identifier}{Disabled}) {
-        if ($self->{parsed_config}{$interface}{$identifier}{Disabled} == "$enable") {
-            warn "Section `$identifier` in `$interface` is already $enable";
-        }
-    }
-    $self->set($interface, $identifier, 'disabled', $enable);
+    $identifier = $self->try_translate_alias($interface, $identifier);
+    # we can bypass an "expensive" set() here
+    $self->{parsed_config}{$interface}{$identifier}{'disabled'} = $enable;
+    $self->_set_changed($interface);
 }
 
 =head3 is_valid_interface($interface)
@@ -412,11 +369,11 @@ sub is_valid_interface($self, $interface) {
 
 =head3 is_valid_alias($interface, $alias)
 
-Simply checks if an alias is valid for spec
+Simply checks if an alias is valid for a given interface
 
 =cut
 sub is_valid_alias($self, $interface, $alias) {
-    return exists $self->{parsed_config}{$interface}{alias_map}{$alias}
+    return exists $self->{parsed_config}{$interface}{INTERNAL_KEY_PREFIX . 'alias_map'}{$alias}
 }
 
 =head3 is_valid_identifier($interface, $identifier)
@@ -446,46 +403,10 @@ sub is_valid_identifier($self, $interface, $identifier) {
     return (exists $self->{parsed_config}{$interface}{$identifier});
 }
 
-=head3 translate_alias($interface, $alias)
-
-Translates an alias to a valid identifier.
-
-B<Parameters>
-
-=over 1
-
-=item *
-
-C<$interface> A valid interface name (e.g 'wg0').
-
-=item *
-
-C<$alias> An alias to translate
-
-=back
-
-B<Raises>
-
-Exception if alias is invalid
-
-B<Returns>
-
-A valid identifier.
-
-=cut
-sub translate_alias($self, $interface, $alias) {
-    if (exists $self->{parsed_config}{$interface}{alias_map}{$alias}) {
-        return $self->{parsed_config}{$interface}{alias_map}{$alias};
-    }
-    else {
-        die "Invalid alias `$alias` on interface $interface";
-    }
-}
 =head3 try_translate_alias($interface, $may_alias)
 
 Tries to translate an identifier (which may be an alias).
-However, unlike L</translate_alias($interface, $alias)>, no
-exception is thrown on failure, instead the C<$may_alias> is returned.
+no exception is thrown on failure, instead the C<$may_alias> is returned.
 
 B<Parameters>
 
@@ -493,7 +414,7 @@ B<Parameters>
 
 =item
 
-C<$interface> A valid interface name (is not validated)
+C<$interface> A valid interface name
 
 =item
 
@@ -507,8 +428,8 @@ If the alias is valid for the specified interface, the corresponding identifier 
 
 =cut
 sub try_translate_alias($self, $interface, $may_alias) {
-    if (exists $self->{parsed_config}{$interface}{alias_map}{$may_alias}) {
-        return $self->{parsed_config}{$interface}{alias_map}{$may_alias};
+    if (exists $self->{parsed_config}{$interface}{INTERNAL_KEY_PREFIX . 'alias_map'}{$may_alias}) {
+        return $self->{parsed_config}{$interface}{INTERNAL_KEY_PREFIX . 'alias_map'}{$may_alias};
     }
     else {
         return $may_alias;
@@ -517,7 +438,7 @@ sub try_translate_alias($self, $interface, $may_alias) {
 
 =head3 get_all_conf_files($wireguard_home)
 
-Returns a list of all files in C<$wireguard_home> matching I<r/.*\.conf$/>.
+Returns a list of all files in C<$wireguard_home> matching I</.*\.conf$/>.
 
 B<Parameters>
 
@@ -544,7 +465,7 @@ sub get_all_conf_files($wireguard_home) {
 }
 
 
-=head3 commit([$is_hot_config = FALSE, $plain = FALSE])
+=head3 commit([$is_hot_config = FALSE, $no_checksum = FALSE])
 
 Writes down the parsed config to the wireguard configuration folder
 
@@ -559,7 +480,7 @@ the suffix '.not_applied' is appended to the filename
 
 =item
 
-C<[$plain = FALSE])> If set to TRUE, no header is generated
+C<[$no_checksum = FALSE])> If set to TRUE, no checksum is written
 
 =back
 
@@ -569,24 +490,23 @@ Exception if: Folder or file is not writeable
 
 B<Returns>
 
-
 None
 
 =cut
-sub commit($self, $is_hot_config = FALSE, $plain = FALSE) {
+sub commit($self, $is_hot_config = FALSE, $no_checksum = FALSE) {
     for my $interface (keys %{$self->{parsed_config}}) {
         if ($self->_has_changed($interface)) {
-            my $new_config = create_wg_config($self->{parsed_config}{$interface}, $self->{wg_meta_prefix}, $self->{wg_meta_disabled_prefix}, $plain);
+            my $new_config = create_wg_config2($self->{parsed_config}{$interface}, $self->{wg_meta_prefix}, $self->{wg_meta_disabled_prefix}, $no_checksum);
             my $fh;
             my $hot_path = $self->{wireguard_home} . $interface . '.conf';
             my $safe_path = $self->{wireguard_home} . $interface . $self->{not_applied_suffix};
             if ($is_hot_config == TRUE) {
                 open $fh, '>', $hot_path or die $!;
-                $self->{parsed_config}->{$interface}{is_hot_config} = 1;
+                $self->{parsed_config}->{$interface}{INTERNAL_KEY_PREFIX . 'is_hot_config'} = 1;
             }
             else {
                 open $fh, '>', $safe_path or die $!;
-                $self->{parsed_config}->{$interface}{is_hot_config} = 0;
+                $self->{parsed_config}->{$interface}{INTERNAL_KEY_PREFIX . 'is_hot_config'} = 0;
             }
             # write down to file
             print $fh $new_config;
@@ -641,6 +561,7 @@ A hash containing the requested section. If the requested section/interface is n
 
 =cut
 sub get_interface_section($self, $interface, $identifier) {
+    $identifier = $self->try_translate_alias($interface, $identifier);
     if (exists $self->{parsed_config}{$interface}{$identifier}) {
         my %r = %{$self->{parsed_config}{$interface}{$identifier}};
         return %r;
@@ -670,39 +591,11 @@ A list of all sections of an interface. If interface is not present, an empty li
 
 =cut
 sub get_section_list($self, $interface) {
-    if (exists $self->{parsed_config}{$interface}) {
-        return @{$self->{parsed_config}{$interface}{section_order}};
+    if ($self->is_valid_interface($interface)) {
+        return @{$self->{parsed_config}{$interface}{INTERNAL_KEY_PREFIX . 'section_order'}};
     }
     else {
         return ();
-    }
-}
-
-=head3 get_interface_fqdn($interface)
-
-Returns the FQDN for an interface (if available)
-
-B<Parameters>
-
-=over 1
-
-=item
-
-C<$interface> A valid interface name
-
-=back
-
-B<Returns>
-
-Value of C<fqdn> attribute or empty string if unavailable.
-
-=cut
-sub get_interface_fqdn($self, $interface) {
-    if ($self->is_valid_interface($interface) && exists $self->{parsed_config}{$interface}{fqdn}) {
-        return $self->{parsed_config}{$interface}{fqdn};
-    }
-    else {
-        return '';
     }
 }
 
@@ -756,23 +649,23 @@ sub add_interface($self, $interface_name, $ip_address, $listen_port, $private_ke
         die "Interface `$interface_name` already exists";
     }
     my %interface = (
-        'Address'    => $ip_address,
-        'ListenPort' => $listen_port,
-        'PrivateKey' => $private_key,
-        'type'       => 'Interface',
-        'order'      => [ 'Address', 'ListenPort', 'PrivateKey' ]
+        'address'                     => $ip_address,
+        'listen-port'                 => $listen_port,
+        'private-key'                 => $private_key,
+        INTERNAL_KEY_PREFIX . 'type'  => 'Interface',
+        INTERNAL_KEY_PREFIX . 'order' => [ 'address', 'listen-port', 'private-key' ]
     );
     $self->{parsed_config}{$interface_name}{$interface_name} = \%interface;
-    $self->{parsed_config}{$interface_name}{alias_map} = {};
-    $self->{parsed_config}{$interface_name}{section_order} = [ $interface_name ];
+    $self->{parsed_config}{$interface_name}{INTERNAL_KEY_PREFIX . 'alias_map'} = {};
+    $self->{parsed_config}{$interface_name}{INTERNAL_KEY_PREFIX . 'section_order'} = [ $interface_name ];
     $self->{parsed_config}{$interface_name}{checksum} = 'none';
-    $self->{parsed_config}{$interface_name}{mtime} = 0.0;
-    $self->{parsed_config}{$interface_name}{config_path} = $self->{wireguard_home} . $interface_name . '.conf';
+    $self->{parsed_config}{$interface_name}{INTERNAL_KEY_PREFIX . 'mtime'} = 0.0;
+    $self->{parsed_config}{$interface_name}{INTERNAL_KEY_PREFIX . 'config_path'} = $self->{wireguard_home} . $interface_name . '.conf';
     $self->{parsed_config}{$interface_name}{has_changed} = 1;
 
 }
 
-=head3 add_peer($interface, $name, $ip_address, $public_key [, $alias, $preshared_key])
+=head3 add_peer($interface, $ip_address, $public_key [, $alias, $preshared_key])
 
 Adds a peer to an exiting interface.
 
@@ -783,10 +676,6 @@ B<Parameters>
 =item *
 
 C<$interface> A valid interface.
-
-=item *
-
-C<$name> A name for this peer (wg-meta).
 
 =item *
 
@@ -816,7 +705,7 @@ B<Returns>
 A tuple consisting of the iface private-key and listen port
 
 =cut
-sub add_peer($self, $interface, $name, $ip_address, $public_key, $alias = undef, $preshared_key = undef) {
+sub add_peer($self, $interface, $ip_address, $public_key, $alias = undef, $preshared_key = undef) {
     # generate new key pair if not defined
     if ($self->is_valid_interface($interface)) {
         if ($self->is_valid_identifier($interface, $public_key)) {
@@ -825,20 +714,19 @@ sub add_peer($self, $interface, $name, $ip_address, $public_key, $alias = undef,
         # generate peer config
         my %peer = ();
         $self->{parsed_config}{$interface}{$public_key} = \%peer;
-        $self->set($interface, $public_key, 'name', $name);
-        $self->set($interface, $public_key, 'public-key', $public_key, 1);
-        $self->set($interface, $public_key, 'allowed-ips', $ip_address, 1);
+        $self->set($interface, $public_key, 'public-key', $public_key);
+        $self->set($interface, $public_key, 'allowed-ips', $ip_address);
         if (defined $alias) {
             $self->set($interface, $public_key, 'alias', $alias);
         }
         if (defined $preshared_key) {
             $self->set($interface, $public_key, 'preshared-key', $preshared_key);
         }
-
+        $self->enable($interface, $public_key);
         # set type to to Peer
-        $self->{parsed_config}{$interface}{$public_key}{type} = 'Peer';
+        $self->{parsed_config}{$interface}{$public_key}{INTERNAL_KEY_PREFIX . 'type'} = 'Peer';
         # add section to global section list
-        push @{$self->{parsed_config}{$interface}{section_order}}, $public_key;
+        push @{$self->{parsed_config}{$interface}{INTERNAL_KEY_PREFIX . 'section_order'}}, $public_key;
         return $self->{parsed_config}{$interface}{$interface}{'private-key'}, $self->{parsed_config}{$interface}{$interface}{'listen-port'};
     }
     else {
@@ -882,15 +770,15 @@ sub remove_peer($self, $interface, $identifier) {
             delete $self->{parsed_config}{$interface}{$identifier};
 
             # delete from section list
-            $self->{parsed_config}{$interface}{section_order} = [ grep {$_ ne $identifier} @{$self->{parsed_config}{$interface}{section_order}} ];
+            $self->{parsed_config}{$interface}{INTERNAL_KEY_PREFIX . 'section_order'} = [ grep {$_ ne $identifier} @{$self->{parsed_config}{$interface}{INTERNAL_KEY_PREFIX . 'section_order'}} ];
 
             # decrease peer count
-            $self->{parsed_config}{$interface}{n_peers}--;
+            $self->{parsed_config}{$interface}{INTERNAL_KEY_PREFIX . 'n_peers'}--;
 
             # delete alias (if exists)
-            while (my ($alias, $a_identifier) = each %{$self->{parsed_config}{$interface}{alias_map}}) {
+            while (my ($alias, $a_identifier) = each %{$self->{parsed_config}{$interface}{INTERNAL_KEY_PREFIX . 'alias_map'}}) {
                 if ($a_identifier eq $identifier) {
-                    delete $self->{parsed_config}{$interface}{alias_map}{$alias};
+                    delete $self->{parsed_config}{$interface}{INTERNAL_KEY_PREFIX . 'alias_map'}{$alias};
                 }
             }
             $self->_set_changed($interface);
@@ -931,7 +819,9 @@ sub remove_interface($self, $interface) {
     if ($self->is_valid_interface($interface)) {
         # delete interface
         delete $self->{parsed_config}{$interface};
-        unlink "$self->{wireguard_home}$interface.conf" or warn "Could not delete `$self->{wireguard_home}$interface.conf` do you have the needed permissions?";
+        if (-e "$self->{wireguard_home}$interface.conf") {
+            unlink "$self->{wireguard_home}$interface.conf" or warn "Could not delete `$self->{wireguard_home}$interface.conf` do you have the needed permissions?";
+        }
         $self->{n_conf_files}--;
     }
 }
@@ -940,7 +830,7 @@ sub remove_interface($self, $interface) {
 
 Returns the number of peers.
 
-B<Caveat:> Does return the count represented  in the current (parsed) configuration state.
+B<Caveat:> Does return the count represented in the current (parsed) configuration state.
 
 B<Parameters>
 
@@ -948,7 +838,7 @@ B<Parameters>
 
 =item
 
-C<[$interface = undef]> If defined, only return counts for this specific interface
+C<[$interface = undef]> If defined and valid, only return counts for this specific interface
 
 =back
 
@@ -959,12 +849,12 @@ Number of peers
 =cut
 sub get_peer_count($self, $interface = undef) {
     if (defined $interface && $self->is_valid_interface($interface)) {
-        return $self->{parsed_config}{$interface}{n_peers};
+        return $self->{parsed_config}{$interface}{INTERNAL_KEY_PREFIX . 'n_peers'};
     }
     else {
         my $count = 0;
         for ($self->get_interface_list()) {
-            $count += $self->{parsed_config}{$_}{n_peers};
+            $count += $self->{parsed_config}{$_}{INTERNAL_KEY_PREFIX . 'n_peers'};
         }
         return $count;
     }
@@ -972,8 +862,8 @@ sub get_peer_count($self, $interface = undef) {
 
 =head3 may_reload_from_disk($interface [, $new = FALSE])
 
-Method to reload an interface configuration from disk. Also useful to add an newly (externally) created
-interface on-the-fly. If a config file with a I<.not_applied> suffix is found (and its mtime is newer
+Method to reload an interface configuration from disk. Also useful to add an new (externally) created
+interface on-the-fly. If a config file with a I<.not_applied> suffix is present (and its mtime is newer
 than the original one), it is taken as source for reloading the configuration data.
 
 B<Parameters>
@@ -1019,16 +909,16 @@ sub may_reload_from_disk($self, $interface, $new = FALSE, $force = FALSE, $_init
             # There is however one exception: The local config is based on a not applied version and this file somehow
             # unexpectedly deleted (e.g by a sysadmin..)
             my $on_disk_mtime = get_mtime($config_path);
-            my $unexpected_delete = (exists $self->{parsed_config}{$interface}{is_hot_config}
-                && $self->{parsed_config}{$interface}{is_hot_config} == 0
-                && $self->{parsed_config}{$interface}{mtime} > $on_disk_mtime);
+            my $unexpected_delete = (exists $self->{parsed_config}{$interface}{INTERNAL_KEY_PREFIX . 'is_hot_config'}
+                && $self->{parsed_config}{$interface}{INTERNAL_KEY_PREFIX . 'is_hot_config'} == 0
+                && $self->{parsed_config}{$interface}{INTERNAL_KEY_PREFIX . 'mtime'} > $on_disk_mtime);
 
-            if ($force || $unexpected_delete || $self->{parsed_config}{$interface}{mtime} < $on_disk_mtime) {
+            if ($force || $unexpected_delete || $self->{parsed_config}{$interface}{INTERNAL_KEY_PREFIX . 'mtime'} < $on_disk_mtime) {
                 my $contents = read_file($config_path);
-                $self->{parsed_config}{$interface} = parse_wg_config($contents, $interface, $self->{wg_meta_prefix}, $self->{wg_meta_disabled_prefix}, FALSE);
-                $self->{parsed_config}{$interface}{config_path} = $config_path;
-                $self->{parsed_config}{$interface}{mtime} = get_mtime($config_path);
-                $self->{parsed_config}{$interface}{is_hot_config} = ($config_path =~ /$self->{not_applied_suffix}/) ? 0 : 1;
+                $self->{parsed_config}{$interface} = parse_wg_config2($contents, $interface, $self->{wg_meta_prefix}, $self->{wg_meta_disabled_prefix}, FALSE);
+                $self->{parsed_config}{$interface}{INTERNAL_KEY_PREFIX . 'config_path'} = $config_path;
+                $self->{parsed_config}{$interface}{INTERNAL_KEY_PREFIX . 'mtime'} = get_mtime($config_path);
+                $self->{parsed_config}{$interface}{INTERNAL_KEY_PREFIX . 'is_hot_config'} = ($config_path =~ /$self->{not_applied_suffix}/) ? 0 : 1;
                 $self->_call_reload_listeners($interface) if $_init == FALSE;
             }
         }
@@ -1040,13 +930,13 @@ sub may_reload_from_disk($self, $interface, $new = FALSE, $force = FALSE, $_init
     else {
         if (-e $config_path) {
             my $contents = read_file($config_path);
-            my $maybe_new_config = parse_wg_config($contents, $interface, $self->{wg_meta_prefix}, $self->{wg_meta_disabled_prefix}, FALSE);
+            my $maybe_new_config = parse_wg_config2($contents, $interface, $self->{wg_meta_prefix}, $self->{wg_meta_disabled_prefix}, FALSE);
             if (defined $maybe_new_config) {
                 $self->{n_conf_files}++;
                 $self->{parsed_config}{$interface} = $maybe_new_config;
-                $self->{parsed_config}{$interface}{config_path} = $config_path;
-                $self->{parsed_config}{$interface}{mtime} = get_mtime($config_path);
-                $self->{parsed_config}{$interface}{is_hot_config} = ($config_path =~ /$self->{not_applied_suffix}/) ? 0 : 1;
+                $self->{parsed_config}{$interface}{INTERNAL_KEY_PREFIX . 'config_path'} = $config_path;
+                $self->{parsed_config}{$interface}{INTERNAL_KEY_PREFIX . 'mtime'} = get_mtime($config_path);
+                $self->{parsed_config}{$interface}{INTERNAL_KEY_PREFIX . 'is_hot_config'} = ($config_path =~ /$self->{not_applied_suffix}/) ? 0 : 1;
                 $self->_call_reload_listeners($interface) if $_init == FALSE;;
             }
             else {
@@ -1061,20 +951,12 @@ sub may_reload_from_disk($self, $interface, $new = FALSE, $force = FALSE, $_init
 
 }
 
-# internal method to add to hash if value is defined
-sub _add_to_hash_if_defined($ref_hash, $key, $value) {
-    if (defined($value)) {
-        $ref_hash->{$key} = $value;
-    }
-    return $ref_hash;
-}
-
 # internal method to create a configuration file (this method exists primarily for testing purposes)
-sub _create_config($self, $interface, $plain = FALSE) {
-    return create_wg_config(
+sub create_config($self, $interface, $plain = FALSE) {
+    return create_wg_config2(
         $self->{parsed_config}{$interface},
         $self->{wg_meta_prefix},
-        $self->{disabled_prefix},
+        $self->{wg_meta_disabled_prefix},
         $plain = $plain)
 }
 

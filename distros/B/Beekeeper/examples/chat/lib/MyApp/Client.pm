@@ -52,7 +52,12 @@ sub run {
         print $msg{from} . ": " if $msg{from};
         print $msg{message} . "\n";
     });
- 
+
+    if ($ARGV[-1] eq '--test') { 
+        $self->run_tests; 
+        exit;
+    }
+
     $self->{hdl} = AnyEvent::Handle->new( fh => $self->{fh} );
 
     $self->{auth}->login( username => getpwuid($>), password => '123' );
@@ -118,6 +123,25 @@ sub process_cmd {
 
     unless ($resp->success) {
         print "ERR: " . $resp->message . "\n";
+    }
+}
+
+sub run_tests {
+    my $self = shift;
+
+    my @cmds = (
+        '/login Dave 123',
+        'Public message',
+        '/pm Dave Private message',
+        '/logout',
+        '/login Zoe 123',
+        'Hello',
+        '/ping',
+        '/kick Zoe',
+    );
+
+    foreach my $cmd (@cmds) {
+        $self->process_cmd("$cmd\n");
     }
 }
 

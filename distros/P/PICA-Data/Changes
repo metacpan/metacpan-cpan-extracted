@@ -1,5 +1,10 @@
 Revision history for PICA::Data
 
+1.28 2021-07-06T09:52:24Z
+    - Add method to get subfields as multihash (#98)
+    - picadata: fix option --number (#111)
+    - picadata: support parsing multiple formats (#112)
+
 1.27 2021-06-23T07:23:14Z
     - Add accessor: empty. Fixes counting.
     - Remove parser option 'bless', always return blessed record (#107, BREAKING CHANGE)

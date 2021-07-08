@@ -3,7 +3,7 @@ package Ryu::Exception;
 use strict;
 use warnings;
 
-our $VERSION = '3.001'; # VERSION
+our $VERSION = '3.002'; # VERSION
 our $AUTHORITY = 'cpan:TEAM'; # AUTHORITY
 
 =head1 NAME

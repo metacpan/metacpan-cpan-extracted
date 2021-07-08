@@ -17,9 +17,14 @@
 
 package Jupiter;
 
+use Encode::Locale;
+use Encode;
 use utf8;
+
 binmode(STDOUT, ":utf8");
 binmode(STDERR, ":utf8");
+
+=encoding UTF8
 
 =head1 NAME
 
@@ -27,7 +32,9 @@ jupiter - turn a list of feeds into a HTML page, a river of news
 
 =head1 SYNOPSIS
 
-B<jupiter update> I<feed.opml>
+To update the feeds from one or more OPML files:
+
+B<jupiter update> I<feed.opml> … [I</regex/> …]
 
 To generate F<index.html>:
 
@@ -82,6 +89,26 @@ owners.
 
 The OPML file must use the .opml extension. You can update the feeds for
 multiple OPML files in one go.
+
+=head2 Adding just one feed
+
+After a while, the list of feeds in your OPML starts getting unwieldy. When you
+add a new feed, you might not want to fetch all of them. In this case, provide a
+regular expression surrounded by slashes to the C<update> command:
+
+    jupiter update feed.opml /example/
+
+Assuming a feed with a URL or title that matches the regular expression is
+listed in your OPML file, only that feed is going to get updated.
+
+There is no need to escape slashes in the regular expression: C<//rss/> works
+just fine. Beware shell escaping, however. Most likely, you need to surround the
+regular expression with single quotes if it contains spaces:
+
+    jupiter update feed.opml '/Halberds & Helmets/'
+
+Notice how we assume that named entities such as C<&amp;> have already been
+parsed into the appropriate strings.
 
 =head2 Generate the HTML
 
@@ -142,8 +169,11 @@ and if a title is provided, it is stored in the JSON file and overrides the
 title in the OPML file.
 
 C<link> is the site's link for humans. When you generate the HTML, the feeds in
-the cache are parsed and if a title is provided, it is stored in the JSON file
-and overrides the link in the OPML file.
+the cache are parsed and if a link is provided, it is stored in the JSON file.
+If the OPML element contained a C<htmlURL> attribute, however, that takes
+precedence. The reasoning is that when a podcast is hosted on a platform which
+generates a link that you don't like and you know the link to the human-readable
+blog elsehwere, use the C<htmlURL> attribute in the OPML file to override this.
 
 C<last_modified> and C<etag> are two headers used for caching from the HTTP
 response that cannot be changed by data in the feed.
@@ -165,7 +195,7 @@ GNU Affero General Public License
 
 Using C<cpan>:
 
-    cpan App::phoebe
+    cpan App::jupiter
 
 Manual install:
 
@@ -180,13 +210,11 @@ To run Jupiter on Debian we need:
 C<libmodern-perl-perl> for L<Modern::Perl>
 
 C<libmojolicious-perl> for L<Mojo::Template>, L<Mojo::UserAgent>, L<Mojo::Log>,
-and L<Mojo::Util>
+L<Mojo::JSON>, and L<Mojo::Util>
 
 C<libxml-libxml-perl> for L<XML::LibXML>
 
 C<libfile-slurper-perl> for L<File::Slurper>
-
-C<libcpanel-json-xs-perl> for L<Cpanel::JSON::XS>
 
 C<libdatetime-perl> for L<DateTime>
 
@@ -258,7 +286,6 @@ using the cached entries matching the feeds in F<feed.opml>.
 
 =cut
 
-use Cpanel::JSON::XS;
 use DateTime;
 use DateTime::Format::Mail;
 use DateTime::Format::ISO8601;
@@ -267,6 +294,7 @@ use File::Slurper qw(read_binary write_binary read_text write_text);
 use List::Util qw(uniq min shuffle);
 use Modern::Perl;
 use Mojo::Log;
+use Mojo::JSON qw(decode_json encode_json);
 use Mojo::Template;
 use Mojo::UserAgent;
 use Pod::Simple::Text;
@@ -281,8 +309,16 @@ my $xpc = XML::LibXML::XPathContext->new;
 $xpc->registerNs('atom', 'http://www.w3.org/2005/Atom');
 $xpc->registerNs('html', 'http://www.w3.org/1999/xhtml');
 $xpc->registerNs('dc', 'http://purl.org/dc/elements/1.1/');
+$xpc->registerNs('itunes', 'http://www.itunes.com/dtds/podcast-1.0.dtd');
 
 my $undefined_date = DateTime->from_epoch( epoch => 0 );
+
+my (%wday, %month, $wday_re, $month_re);
+%wday = qw (lun. Mon mar. Tue mer. Wed jeu. Thu ven. Fri sam. Sat dim. Sun);
+%month = qw (janv. Jan févr. Feb mars Mar avr. Apr mai May juin Jun
+	     juil. Jul août Aug sept. Sep oct. Oct nov. Nov déc. Dec);
+$wday_re = join('|', map { quotemeta } keys %wday) unless $wday_re;
+$month_re = join('|', map { quotemeta } keys %month) unless $month_re;
 
 # Our tests don't want to call main
 __PACKAGE__->main unless caller;
@@ -369,10 +405,10 @@ sub load_feed_metadata {
     my $data = decode_json read_binary("$filename.json");
     for my $feed (@$feeds) {
       my $url = $feed->{url};
-      # don't overwrite title from OPML file
+      # don't overwrite title and htmlUrl from OPML file
       $feed->{title} = $data->{$url}->{title} if $data->{$url}->{title};
+      $feed->{link} ||= $data->{$url}->{link};
       # all the other metadata is loaded from the JSON file
-      $feed->{link} = $data->{$url}->{link};
       $feed->{message} = $data->{$url}->{message};
       $feed->{code} = $data->{$url}->{code};
       $feed->{last_modified} = $data->{$url}->{last_modified};
@@ -525,16 +561,20 @@ B<doc> is the L<XML::LibXML::Document>. Could be either Atom or RSS!
 # cache_dir and cache_file.
 sub read_opml {
   my (@feeds, @files);
-  for my $file (grep /\.opml/, @_) {
+  my @filters = map { decode(locale => substr($_, 1, -1)) } grep /^\/.*\/$/, @_;
+  for my $file (grep /\.opml$/, @_) {
     my $doc = XML::LibXML->load_xml(location => $file); # this better have no errors!
     my @nodes = $doc->findnodes('//outline[./@xmlUrl]');
     my ($name, $path) = fileparse($file, '.opml', '.xml');
     push @feeds, map {
       my $title = xml_escape $_->getAttribute('title');
       my $url = xml_escape $_->getAttribute('xmlUrl');
+      next if @filters > 0 and not grep { $url =~ /$_/ or $title =~ /$_/ } @filters;
+      my $link = xml_escape $_->getAttribute('htmlUrl');
       {
 	title => $title,    # title in the OPML file
 	url => $url,        # feed URL in the OPML file
+	link => $link,      # web URL in the OPML file
 	opml_file => $file,
 	cache_dir => "$path/$name",
 	cache_file => "$path/$name/" . slugify($url),
@@ -617,8 +657,16 @@ sub updated {
   my @nodes = $xpc->findnodes('pubDate | atom:updated', $node) or return;
   my $date = $nodes[0]->textContent;
   my $dt = eval { DateTime::Format::Mail->parse_datetime($date) }
-  || eval { DateTime::Format::ISO8601->parse_datetime($date) };
+  || eval { DateTime::Format::ISO8601->parse_datetime($date) }
+  || eval { DateTime::Format::Mail->parse_datetime(french($date)) };
   return $dt;
+}
+
+sub french {
+  my $date = shift;
+  $date =~ s/^($wday_re)/$wday{$1}/;
+  $date =~ s/\b($month_re)/$month{$1}/;
+  return $date;
 }
 
 sub id {
@@ -701,10 +749,13 @@ sub add_data {
   # if there's a chance we're going to print it again.
   for my $feed (@$feeds) {
     next unless $feed->{doc};
-    # data in the feed overrides defaults set in the OPML (XML already escaped)
+    # title and url in the feed overrides title and xmlUrl set in the OPML (XML already escaped)
     $feed->{title} = xml_escape($xpc->findvalue('/rss/channel/title | /atom:feed/atom:title', $feed->{doc})) || $feed->{title} || "";
     $feed->{url} = xml_escape($xpc->findvalue('/atom:feed/atom:link[@rel="self"]/@href', $feed->{doc})) || $feed->{url} || "";
-    $feed->{link} = xml_escape($xpc->findvalue('/rss/channel/link | /atom:feed/atom:link[@rel="alternate"][@type="text/html"]/@href', $feed->{doc})) || $feed->{link} || "";
+    # link in the feed does not override htmlUrl in the OPML (XML already escaped)
+    $feed->{link} = $feed->{link} || xml_escape($xpc->findvalue('/rss/channel/link | /atom:feed/atom:link[@rel="alternate"][@type="text/html"]/@href', $feed->{doc})) || "";
+    # if they just pasted a domain "foo" then "//foo" is a valid URL
+    $feed->{link} = "//" . $feed->{link} unless $feed->{link} =~ /\/\//;
   }
   for my $entry (@$entries) {
     # copy from the feed (XML is already escaped)
@@ -736,8 +787,8 @@ sub add_data {
     $entry->{categories} = @categories ? \@categories : undef; # key must exist in the hash
     $entry->{excerpt} = '';
     $entry->{content} = '';
-    my @nodes = $xpc->findnodes('description | atom:content', $element);
-    @nodes = $xpc->findnodes('summary | atom:summary', $element) unless @nodes;
+    my @nodes = $xpc->findnodes('description[text()!=""] | atom:content[text()!=""]', $element);
+    @nodes = $xpc->findnodes('summary[text()!=""] | atom:summary[text()!=""] | itunes:summary[text()!=""]', $element) unless @nodes;
     my $content = shift(@nodes);
     # The default is that the content is either plain text or escaped HTML,
     # which is what we want for RSS. For Atom feeds, type="xhtml" means that the

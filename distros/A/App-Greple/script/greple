@@ -12,7 +12,7 @@ use File::stat;
 use IO::Handle;
 use Pod::Usage;
 use Text::ParseWords qw(shellwords);
-use List::Util qw(min max first sum uniq shuffle);
+use List::Util qw(min max first sum uniq shuffle notall pairmap);
 use Cwd qw(getcwd abs_path);
 use Carp;
 
@@ -33,7 +33,7 @@ use Data::Dumper;
 ##
 BEGIN {
     if (my $lib = abs_path($0) =~ s{/(?:script/|bin/)?\w+$}{/lib}r) {
-	push @INC, $lib if -d "$lib/App/Greple";
+	unshift @INC, $lib if -d "$lib/App/Greple";
     }
 }
 
@@ -60,7 +60,7 @@ greple - extensible grep with lexical expression and region control
 =head1 VERSION
 
 
-Version 8.4401
+Version 8.4601
 
 
 =head1 SYNOPSIS
@@ -70,12 +70,13 @@ B<greple> [B<-M>I<module>] [ B<-options> ] pattern [ file... ]
 
   PATTERN
     pattern              'and +must -not ?alternative &function'
-    -e pattern           pattern match across line boundary
-    -r pattern           pattern cannot be compromised
-    -v pattern           pattern not to be matched
-    --le pattern         lexical expression (same as bare pattern)
-    --re pattern         regular expression
-    --fe pattern         fixed expression
+    -x, --le   pattern   lexical expression (same as bare pattern)
+    -e, --and  pattern   pattern match across line boundary
+    -r, --must pattern   pattern cannot be compromised
+    -v, --not  pattern   pattern not to be matched
+        --or   pattern   alternative pattern group
+        --re   pattern   regular expression
+        --fe   pattern   fixed expression
     -f, --file file      file contains search pattern
     --select index       select indexed pattern from -f file
   MATCH
@@ -89,7 +90,7 @@ B<greple> [B<-M>I<module>] [ B<-options> ] pattern [ file... ]
     -n                   print line number
     -H, -h               do or do not display filenames
     -o                   print only the matching part
-    -m n[,m]             max count of blocks to be shown
+    -m, --max=n[,m]      max count of blocks to be shown
     -A,-B,-C [n]         after/before/both match context
     --join               delete newline in the matched part
     --joinby=string      replace newline in the matched text by string
@@ -115,7 +116,7 @@ B<greple> [B<-M>I<module>] [ B<-options> ] pattern [ file... ]
     --random             use random color each time
     --face               set/unset visual effects
   BLOCK
-    -p                   paragraph mode
+    -p, --paragraph      paragraph mode
     --all                print whole data
     --border=pattern     specify the border pattern
     --block=pattern      specify the block of records
@@ -148,8 +149,9 @@ B<greple> [B<-M>I<module>] [ B<-options> ] pattern [ file... ]
     --man                display command or module manual page
     --show               display module file
     --require=file       include perl program
-    --conceal=type       conceal run time errors
-    --persist            continue even after encoding error
+    --persist            same as --error=retry
+    --error=action       action after read error
+    --warn=type          run time error control
     --alert [name=#]     set alert parameter (size/time)
     -d flags             display info (f:file d:dir c:color m:misc s:stat)
 
@@ -214,10 +216,10 @@ my @opt_print;
 my $opt_continue;
 my $opt_filestyle = 'line';
 my $opt_linestyle = 'line';
-my %opt_conceal = (read => 1, skip => 0);
-my $opt_persist = 0;
+my %opt_warn = (read => 0, skip => 1, retry => 0, begin => 0);
 my %opt_format = (LINE => '%d:', FILE => '%s:');
 my %opt_alert = (size => 512 * 1024, time => 2);
+my $opt_error = 'skip';
 my $opt_usage;
 my $opt_exit;
 
@@ -243,7 +245,7 @@ my @optargs = (
     'r|must=s'           => \@opt_r,
     'v|not=s'            => \@opt_v,
     'or=s'               => \@opt_or,
-    'le=s'               => \@opt_le,
+    'x|le=s'             => \@opt_le,
     're=s'               => \@opt_re,
     'fe=s'               => \@opt_fe,
     'need=s'             => \@opt_need,
@@ -315,10 +317,23 @@ my @optargs = (
     'regioncolor|rc!'    => \$opt_regioncolor,
     'print=s'            => \@opt_print,
     'continue!'          => \$opt_continue,
-    'conceal=i'          => \%opt_conceal,
-    'persist!'           => \$opt_persist,
+    'w|warn:1%'          => sub {
+	map { $opt_warn{$_} = $_[2] }
+	map { $_ eq 'all' ? keys %opt_warn : $_ }
+	$_[1] =~ /\w+/g;
+    },
+    'conceal:1%'         => sub {
+	warn "Option --conceal will be deprecated.  Use --warn.\n";
+	map { $opt_warn{$_} = $_[2] ? 0 : 1 }
+	map { $_ eq 'all' ? keys %opt_warn : $_ }
+	$_[1] =~ /\w+/g;
+    },
+    'persist!'           => sub {
+	$opt_error = $_[1] ? 'retry' : 'skip';
+    },
     'format=s'           => \%opt_format,
     'alert=i'            => \%opt_alert,
+    'error=s'            => \$opt_error,
     'usage:s'            => \$opt_usage,
     'exit=i'             => \$opt_exit,
     'M:s'                => sub {
@@ -412,22 +427,23 @@ if ($opt_d{o}) {
     warn "\@ARGV = ", join(' ', shellquote(@SAVEDARGV)), "\n";
 }
 
-if (exists $opt_conceal{all}) {
-    $opt_conceal{$_} = $opt_conceal{all} for keys %opt_conceal;
-}
-
 ## -m option
-my $splicer = do {
-    my($offset, $length);
-    if (not defined $opt_m) {
-	undef;
-    } elsif (($offset) = $opt_m =~ /^(-?\d+)$/) {
-	sub { splice @{+shift}, $offset }
-    } elsif (($offset, $length) = $opt_m =~ /^(-?\d+),(-?\d+)?$/) {
-	sub { splice @{+shift}, $offset, $length }
-    } else {
+my @splicer = (not defined $opt_m) ? () : do {
+    my @param = split /,/, $opt_m, -1;
+    if (notall { /^(-?\d+)?$/ } @param) {
 	die "$opt_m: option format error.\n";
     }
+    pairmap {
+	do { # this block is necessary to escape pairmap bug
+	    my($offset, $length) = ($a, $b);
+	    if ($length ne '') {
+		sub { splice @{+shift}, $offset || 0, $length }
+	    } else {
+		sub { splice @{+shift}, $offset || 0 }
+	    }
+	};
+    }
+    (@param, @param % 2 ? '' : ());
 };
 
 my $file_code;
@@ -724,7 +740,7 @@ if ($opt_d{c}) {
 }
 
 for (values %opt_format) {
-    s{\\(.)}{ { t => "\t" }->{$1} // $1 }egx;
+    s{\\(.)}{ { t => "\t", n => "\n" }->{$1} // $1 }egx;
 }
 
 my($_file, $_line, $_text, $_blockend) = do {
@@ -792,7 +808,7 @@ my %stat = (
     match_positive => 0,
     match_negative => 0,
     match_block => 0,
-    persist => 0,
+    read_retry => 0,
     time_start => [],
     time_end => [],
     );
@@ -882,6 +898,42 @@ sub close_stdout {
 }
 
 sub read_stdin { <SAVESTDIN> }
+
+my $slurp = do {
+    ##
+    ## Setting utf8 warnings fatal makes it easy to find code conversion
+    ## error, so you can choose appropriate file code or automatic code
+    ## recognition, but loose a chance to find string in unrelated area.
+    ##
+    if ($opt_error =~ /^(?: fatal | skip | retry )$/x) {
+	if ($opt_warn{read}) {
+	    sub {
+		use warnings FATAL => 'utf8';
+		my $stdin = eval { local $/; <STDIN> };
+		warn $@ if $@;
+		$stdin;
+	    }
+	} else {
+	    sub {
+		use warnings FATAL => 'utf8';
+		eval { local $/; <STDIN> };
+	    }
+	}
+    } elsif ($opt_error eq 'ignore') {
+	if ($opt_warn{read}) {
+	    sub { local $/; <STDIN> };
+	} else {
+	    sub {
+		close STDERR;
+		my $stdin = do { local $/; <STDIN> };
+		recover_stderr;
+		$stdin;
+	    }
+	}
+    } else {
+	die "$opt_error: invalid action.\n";
+    }
+};
 
 use Getopt::EX::Colormap qw(ansi_code);
 use constant {
@@ -977,25 +1029,16 @@ exit($opt_exit // ($stat{match_effective} == 0));
 
 ######################################################################
 
-sub stdin {
-    ##
-    ## Setting utf8 warnings fatal makes it easy to find code conversion
-    ## error, so you can choose appropriate file code or automatic code
-    ## recognition, but loose a chance to find string in unrelated area.
-    ##
-    use warnings FATAL => 'utf8';
-    local $/;
-    <STDIN>;
-}
-
 sub grep_files {
   FILE:
     while (defined($current_file = open_nextfile())) {
-	my $content = eval { stdin };
+	my $content = $slurp->();
 	if (not defined $content) {
-	    warn $@ if $@ and !$opt_conceal{read};
-	    if (not $opt_persist) {
-		warn "SKIP $current_file\n" if !$opt_conceal{skip};
+	    if ($opt_error eq 'fatal') {
+		die "ABORT on $current_file\n";
+	    }
+	    if ($opt_error ne 'retry') {
+		warn "SKIP $current_file\n" if $opt_warn{skip};
 		next FILE;
 	    }
 
@@ -1003,21 +1046,21 @@ sub grep_files {
 	    binmode STDIN, ':raw';
 	    seek STDIN, 0, 0 or do {
 		warn "SKIP $current_file (not seekable)\n"
-		    if !$opt_conceal{skip};
+		    if $opt_warn{skip};
 		next FILE;
 	    };
-	    $content = eval { stdin };
+	    $content = $slurp->();
 	    if (not defined $content) {
-		warn "SKIP* $current_file\n" if !$opt_conceal{skip};
+		warn "SKIP* $current_file\n" if $opt_warn{skip};
 		next FILE;
 	    }
-	    $stat{persist}++;
+	    warn "RETRY $current_file\n" if $opt_warn{retry};
+	    $stat{read_retry}++;
 	    binmode STDOUT, ':raw';
 	}
 
 	my $matched = grep_data(\$content);
 
-	no warnings 'uninitialized'; # why ?
 	$stat{match_effective} += $matched;
 	$stat{files}++;
     } continue {
@@ -1107,7 +1150,15 @@ sub grep_data {
     ## --begin
     ##
     for my $f (@opt_begin) {
-	$f->call(&FILELABEL => $current_file);
+	eval { $f->call(&FILELABEL => $current_file) };
+	if (my $msg = $@) {
+	    if ($msg =~ /^SKIP/i) {
+		warn $@ if $opt_warn{begin};
+		return 0;
+	    } else {
+		die $msg;
+	    }
+	}
     }
 
     my $grep = App::Greple::Grep->new(
@@ -1134,7 +1185,9 @@ sub grep_data {
 	)->run;
     my $matched = $grep->matched;
 
-    $splicer->($grep->result_ref) if $splicer;
+    for my $splice (@splicer) {
+	$splice->($grep->result_ref);
+    }
 
     if ($opt_l) {
 	if ($matched) {
@@ -1501,6 +1554,53 @@ but this command is finally translated into following option list.
         -print -- pattern
 
 
+=head2 INCLUDED MODUES
+
+This release include some sample modules.  Read document in each
+modules for detail.  You can read the document by B<--man> option.
+
+    greple -Mdig --man
+
+When it does not work, use C<perldoc App::Greple::dig>.
+
+=over 7
+
+=item B<colors>
+
+Color variation module.
+See L<App::Greple::colors>.
+
+=item B<find>
+
+Module to use L<find(1)> command to help recursive search.
+See L<App::Greple::find>.
+
+=item B<dig>
+
+Module for recursive search using B<find> module.
+See L<App::Greple::dig>.
+
+=item B<pgp>
+
+Module to search B<pgp> files.
+See L<App::Greple::pgp>.
+
+=item B<select>
+
+Module to select files.
+See L<App::Greple::select>.
+
+=item B<perl>
+
+Sample module to search from perl source files.
+See L<App::Greple::perl>.
+
+=back
+
+Other modules are available at CPAN, or git repository
+L<https://github.com/kaz-utashiro/>.
+
+
 =head1 OPTIONS
 
 
@@ -1525,7 +1625,7 @@ or S<C<(?E<lt>cE<gt>\w)\g{c}>>.
 
 =over 7
 
-=item B<--le>=I<pattern>
+=item B<-x> I<pattern>, B<--le>=I<pattern>
 
 Treat the string as a collection of tokens separated by spaces.  Each
 token is interpreted by the first character.  Token start with `-'
@@ -1547,7 +1647,7 @@ This is the summary of start character for B<--le> option:
     ?  Alternative pattern
     &  Function call (see next section)
 
-=item B<--le>=[B<+->]B<&>I<function>
+=item B<-x>=[B<+->]B<&>I<function>, B<--le>=[B<+->]B<&>I<function>
 
 If the pattern start with ampersand (`&'), it is treated as a
 function, and the function is called instead of searching pattern.
@@ -1605,6 +1705,24 @@ pattern argument, you can narrow down the search result like this.
     greple foo file
     greple foo file -v bar
     greple foo file -v bar -v baz
+
+=item B<--or>=I<pattern>
+
+Specify logical-or match token group.  Same as C<?> marked token in
+B<--le> option.  Next commands are all equivalent.
+
+    greple --le 'foo bar ?yabba ?dabba'
+    greple --and foo --and bar --or yabba --or dabba
+    greple -e foo -e bar -e 'yabba|dabba'
+
+Option B<--or> group and each B<--le> pattern makes individual
+pattern.  So
+
+    greple --le '?foo ?yabba' --le '?bar ?dabba' --or baz --or doo
+
+is same as:
+
+    greple -e 'foo|yabba' -e 'bar|dabba' -e 'baz|doo'
 
 =item B<--re>=I<pattern>
 
@@ -1746,6 +1864,20 @@ Note that B<grep> command also has same option, but it's behavior is
 different when invoked to multiple files.  B<greple> produces given
 number of output for each files, while B<grep> takes it as a total
 number of output.
+
+=item B<-m> I<*>, B<--max-count>=I<*>
+
+In fact, I<n> and I<m> can repeat as many as possible.  Next example
+removes first 10 blocks, then get first 10 blocks from the result.
+Consequently, get 10 blocks from 10th (10-19).
+
+    greple -m 0,10,10
+
+Next command get first 20 and get last 10, producing same result.
+Empty string behaves like absence for I<length> and zero for
+I<offset>.
+
+    greple -m 20,,,-10
 
 =item B<-A>[I<n>], B<--after-context>[=I<n>]
 
@@ -2449,6 +2581,29 @@ each file processing.  This I<function> have to be called from B<main>
 package.  So if you define the function in the module package, use the
 full package name or export properly.
 
+If the function dies with a message starting with a word "SKIP"
+(C</^SKIP/i>), that file is simply skipped.  So you can control if the
+file is to be processed using the file name or content.  To see the
+message, use B<--warn begin=1> option.
+
+For example, using next function, only perl related files will be
+processed.
+
+    sub is_perl {
+        my %arg = @_;
+        my $name = delete $arg{&FILELABEL} or die;
+        $name =~ /\.(?:pm|pl|PL|pod)$/ or /\A#!.*\bperl/
+	    or die "skip $name\n";
+    }
+
+1;
+
+__DATA__
+
+option default --filestyle=once --format FILE='\n%s:\n'
+
+autoload -Mdig --dig
+option --perl $<move> --begin &__PACKAGE__::is_perl --dig .
 =item B<--end>=I<function>(I<...>)
 
 =item B<--end>=I<function>=I<...>
@@ -2586,40 +2741,90 @@ information can be display by giving appropriate flag to -d option.
 
 =item B<--conceal> I<type>=I<val>
 
-Conceal runtime errors.  Repeatable.  Types are:
+Use following B<--warn> option in reverse context.  This option
+remains for backward compatibility and will be deprecated in the near
+future.
+
+=item B<--persist>
+
+Same as B<--error=retry>.  It may be deprecated in the future.
+
+=item B<--error>=I<action>
+
+As B<greple> tries to read data as a character string, sometimes fails
+to convert them into internal representation, and the file is skipped
+without processing by default.  This works fine to skip binary
+data. (B<skip>)
+
+Also sometimes encounters code mapping error due to character
+encoding.  In this case, reading the file as a binary data helps to
+produce meaningful output. (B<retry>)
+
+This option specifies the action when data read error occurred.
+
+=over 4
+
+=item B<skip>
+
+Skip the file.  Default.
+
+=item B<retry>
+
+Retry reading the file as a binary data.
+
+=item B<fatal>
+
+Abort the operation.
+
+=item B<ignore>
+
+Ignore error and continue to read anyway.
+
+=back
+
+You may occasionally want to find text in binary data.  Next command
+will work like L<string(1)> command.
+
+    greple -o --re '(?a)\w{4,}' --error=retry --uc /bin/*
+
+If you want read all files as binary data, use B<--icode=binary>
+instead.
+
+=item B<-w>, B<--warn> I<type>=[I<0>,I<1>]
+
+Control runtime message mainly about file operation related to
+B<--error> option.  Repeatable.  Value is optional and 1 is assumed
+when omitted.  So B<-wall> option enables all messages and B<-wall=0>
+disables them.
+
+Types are:
 
 =over 4
 
 =item B<read>
 
-(Default 1) Errors occurred during file read.  Mainly unicode related
+(Default 0) Errors occurred during file read.  Mainly unicode related
 errors when reading binary or ambiguous text file.
 
 =item B<skip>
 
-(Default 0) File skip warnings produced when fatal error was occurred
-during file read.  Occurs when reading binary files with automatic
-character code recognition.
+(Default 1) File skip message.
+
+=item B<retry>
+
+(Default 0) File retry message.
+
+=item B<begin>
+
+(Default 0) When B<--begin> function died with "SKIP" message, the
+file is skipped without any notice.  Enables this to see the dying
+message.
 
 =item B<all>
 
 Set same value for all types.
 
 =back
-
-=item B<--persist>
-
-As B<greple> tries to read data as a character string, sometimes fails
-to convert them into internal representation, and the file is skipped
-without processing.  When option B<--persist> is specified, command
-does not give up the file, and tries to read as binary data.
-
-Next command will show strings in binary file.
-
-    greple -o --re '(?a)\w{4,}' --persist --uc /bin/*
-
-If you want read all files as binary data, use B<--icode=binary>
-instead.
 
 =item B<--alert> [ I<size>=# | I<time>=# ]
 
@@ -2638,7 +2843,6 @@ To disable this alert, set I<size> to 0:
 =item B<-Mdebug>, B<-d>I<x>
 
 Debug option is described in L<App::Greple::debug> module.
-
 
 =back
 

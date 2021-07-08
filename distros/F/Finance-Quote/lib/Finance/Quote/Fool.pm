@@ -34,7 +34,7 @@ use HTML::TreeBuilder;
 use Text::Template;
 use Encode qw(decode);
 
-our $VERSION = '1.50'; # VERSION
+our $VERSION = '1.51'; # VERSION
 
 my $URL = Text::Template->new(TYPE => 'STRING', SOURCE => 'http://caps.fool.com/Ticker/{$symbol}.aspx');
 

@@ -1,7 +1,7 @@
 ## no critic
 package Bencher::ScenarioR::Perl::5200Perf_return;
 
-our $VERSION = "0.050"; # VERSION
+our $VERSION = 0.051; # VERSION
 
 our $results = [];
 

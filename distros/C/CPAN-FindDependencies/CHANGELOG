@@ -1,3 +1,11 @@
+3.08    2021-07-08
+
+- Work around another bug in perl on Windows
+
+3.07    2021-07-05
+
+- Work around bug in perl 5.20 and below on Windows when dealing with bzipped archives
+
 3.06    2021-06-29
 
 - Add documentation about tree pruning

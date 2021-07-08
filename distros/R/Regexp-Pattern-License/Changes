@@ -7,6 +7,69 @@ Home page:    <https://metacpan.org/release/Regexp-Pattern-License>
 Bug tracker:  <https://bugs.debian.org/libregexp-pattern-license-perl>
 Maintainer:   Jonas Smedegaard (JONASS) <jonass@cpan.org>
 
+v3.6.1	2021-07-07
+
+ [ Test Suite ]
+ - fix coverage-perl tests
+
+ [ Other ]
+ - add names and captions for https://tldrlegal.com/ website)
+
+v3.6.0	2021-07-04
+
+ [ Bug Fixes ]
+ - fix set trove metadata for gfdl mpl_1 mpl_1_1 mpl_2
+
+ [ Documentation ]
+ - add sections SYNOPSIS and EXAMPLES
+ - document origin of bsd_0_clause
+ - use _simpified_ chinese language code for mulan chinese strings
+
+ [ Test Suite ]
+ - add coverage for license ipl_1
+ - use Test2::V0 (not Test::Exception or Test::Requires)
+
+ [ Packaging ]
+ - stop declare dependency on strictures (unneeded since v3.0.31)
+
+ [ Other ]
+
+ - Added: add exception trait wxwindows
+ - Added: add family cc
+ - Added: add license ipa
+ - Added: add license xnet
+ - Added: add licenses bsd_1_clause bsd_2_clause_freebsd
+   bsd_2_clause_netbsd bsd_2_clause_patent
+ - Added: add licenses bsd_3_clause_attribution bsd_3_clause_clear
+   bsd_3_clause_lbnl bsd_3_clause_no_military_license
+   bsd_3_clause_no_nuclear_license bsd_3_clause_no_nuclear_license_2014
+   bsd_3_clause_no_nuclear_warranty naumen; improve patterns for zpl_2
+   zpl_2_1
+ - Added: add licenses efl efl_1 efl_2 entessa frameworx frameworx_1 lpl
+   lpl_1 lpl_1_02 ncsa nokia opl opl_1 oset_pl oset_pl_2_1 php php_3
+   php_3_01 simpl simpl_2 simple_w3c simple_w3c_1_1 upl upl_1 vsl vsl_1
+   x11; update metadata for mpl_1 openssl
+ - Added: add licenses eudatagrid fair
+ - Added: add licenses hpnd hpnd_sell mit_open_group, and combo net_snmp
+ - Added: add licenses liliq_p liliq_p_1_1 liliq_r liliq_r_1_1 liliq_r_plus
+   liliq_r_plus_1_1
+ - Added: add licenses miros mit_0
+ - Added: add licenses multics nasa nasa_1_3
+ - Added: add licenses nposl nposl_3 ucl ucl_1; tighten patterns for
+   licenses afl_3 osl_3
+ - Added: add licenses ogc ogc_1 w3c w3c_19980519 w3c_19980720 w3c_20021231
+   w3c_20150513
+ - Added: add licenses sleepycat tosl
+ - Added: add licenses unicode_dfs_2015 unicode_dfs_2016
+ - Added: add trait except_ecos_2, and licenses ecos_1_1 ecos_2
+ - add names and captions for OSI
+ - annotate "as-is" as [as is]
+ - improve annotations, and tighten to only use Latin-1 characters (now
+   only mulan* patterns contain non-Latin-1 characters)
+ - improve metadata for ipl ipl_1
+ - optimize DefHash creation slightly
+ - stop use List::Util
+
 v3.5.1	2021-06-02
 
  [ Bug Fixes ]

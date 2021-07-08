@@ -34,6 +34,8 @@ Module::Build->new(
     },
     test_requires => {
         'strict'            => 0,
+        'Data::Dumper'      => 0,
+        'List::Util'        => 0,
         'Scalar::Util'      => 0,
         'Statistics::Lite'  => 0,
         'Test::More'        => '0.88',    # done_testing

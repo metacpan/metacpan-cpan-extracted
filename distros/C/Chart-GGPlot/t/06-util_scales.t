@@ -153,8 +153,18 @@ subtest gradient_n_pal => sub {
         gradient_n_pal( PDL::SV->new( [qw(black white)] ) )
           ->( pdl( 0, 0.5, 1 ) ),
         PDL::SV->new( [qw(#000000 #7f7f7f #ffffff)] ),
-        "gradient_n_pal()"
+        'gradient_n_pal($colors)'
     );
+    my $colors =
+      gradient_n_pal( PDL::SV->new( [qw(red green blue)] ), [ 1, 2, 4 ] )
+      ->( pdl( 1, 2, 4 ) );
+
+    # NOTE: This gets different result from R so we check only the end
+    # colors for now. Probably Perl Math::Gradient::multi_gradient is
+    # different from R's algorithm..
+    diag( sprintf( q{gradient_n_pal($colors, $values) : %s}, $colors ) );
+    ok( $colors->at(0) eq '#ff0000' and $colors->at(2) eq '#0000ff',
+        'gradient_n_pal($colors, $values)' );
 };
 
 subtest 'pretty' => sub {

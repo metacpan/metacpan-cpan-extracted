@@ -2,8 +2,8 @@ NAME
     App::hr - Print horizontal bar on the terminal
 
 VERSION
-    This document describes version 0.262 of App::hr (from Perl distribution
-    App-hr), released on 2020-04-27.
+    This document describes version 0.264 of App::hr (from Perl distribution
+    App-hr), released on 2021-07-08.
 
 SYNOPSIS
      use App::hr qw(hr hr_r);
@@ -29,6 +29,9 @@ SYNOPSIS
 
 NO_COLOR
   COLOR
+CONTRIBUTOR
+    Steven Haryanto <sharyanto@cpan.org>
+
 FUNCTIONS
   hr([ $pattern [, $color ] ]) => optional STR
     Print (under void context) or return (under scalar/array context) a
@@ -50,10 +53,14 @@ FUNCTIONS
   hr_r => optional STR
     Like "hr", but will set random pattern and random color.
 
+  hr_Br => optional STR
+    Like "hr", but will set random pattern and random color and return a
+    blinking bar.
+
   hr_app
     Usage:
 
-     hr_app(%args) -> [status, msg, payload, meta]
+     hr_app(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
     Print horizontal bar on the terminal.
 
@@ -93,6 +100,8 @@ FUNCTIONS
  
      % hr -r  ;# shortcut for --random-pattern --random-color
  
+     % hr -Br ;# a BLINKING random pattern, random color bar
+ 
      % hr --help
 
     If you use Perl, you can also use the "hr" function in App::hr module.
@@ -100,6 +109,10 @@ FUNCTIONS
     This function is not exported.
 
     Arguments ('*' denotes required arguments):
+
+    *   blink => *bool*
+
+        Return a blinking bar.
 
     *   color => *str*
 
@@ -127,12 +140,15 @@ FUNCTIONS
 
     Returns an enveloped result (an array).
 
-    First element (status) is an integer containing HTTP status code (200
-    means OK, 4xx caller error, 5xx function error). Second element (msg) is
-    a string containing error message, or 'OK' if status is 200. Third
-    element (payload) is optional, the actual result. Fourth element (meta)
-    is called result metadata and is optional, a hash that contains extra
-    information.
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
 
     Return value: (any)
 
@@ -158,7 +174,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2020, 2018, 2016, 2015, 2014 by
+    This software is copyright (c) 2021, 2020, 2018, 2016, 2015, 2014 by
     perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under

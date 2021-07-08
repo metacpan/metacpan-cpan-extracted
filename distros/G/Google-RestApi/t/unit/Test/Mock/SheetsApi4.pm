@@ -3,7 +3,7 @@ package Test::Mock::SheetsApi4;
 use strict;
 use warnings;
 
-use 5.010_000;
+use feature 'state';
 
 use FindBin;
 use Type::Params qw(compile_named);
@@ -192,7 +192,7 @@ sub _value_range {
     my ($worksheet, $row) = $range =~ /^(.+)!(\d+)/;
     my $col = 1;
     foreach (@{ $values->[0] }) {
-      $spreadsheet->{ "$worksheet!${col}${row}" } = $values->[0]->[ $col-1 ];
+      $spreadsheet->{ "$worksheet!${col}${row}" } = $values->[0]->[ $col-1 ]->[0];
       ++$col;
     }
     return;

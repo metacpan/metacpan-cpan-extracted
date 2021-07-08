@@ -32,30 +32,35 @@ commands:
     make test
     make install
 
-SUPPORT AND DOCUMENTATION
+SUPPORT
 
-After installing, you can find documentation for these modules with the
+After installing, you can find documentation for this module with the
 perldoc command.
 
     perldoc Math::BigInt::FastCalc
 
 You can also look for information at:
 
-    RT, CPAN's request tracker
-        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Math-BigInt-FastCalc
+    GitHub
+        https://github.com/pjacklam/p5-Math-BigInt-FastCalc
 
-    AnnoCPAN, Annotated CPAN documentation
-        http://annocpan.org/dist/Math-BigInt-FastCalc
+    RT: CPAN's request tracker
+        https://rt.cpan.org/Dist/Display.html?Name=Math-BigInt-FastCalc
+
+    MetaCPAN
+        https://metacpan.org/release/Math-BigInt-FastCalc
+
+    CPAN Testers Matrix
+        http://matrix.cpantesters.org/?dist=Math-BigInt-FastCalc
 
     CPAN Ratings
-        http://cpanratings.perl.org/d/Math-BigInt-FastCalc
-
-    Search CPAN
-        http://search.cpan.org/dist/Math-BigInt-FastCalc
+        https://cpanratings.perl.org/dist/Math-BigInt-FastCalc
 
 COPYRIGHT AND LICENCE
 
-Copyright 2007-2010 Peter John Acklam <pjacklam@online.no>
+Tels http://bloodgate.com/, 2000-2007
+
+Copyright 2010-2021 Peter John Acklam pjacklam@gmail.com
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

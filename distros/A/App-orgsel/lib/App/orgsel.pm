@@ -1,9 +1,9 @@
 package App::orgsel;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-07-01'; # DATE
+our $DATE = '2021-07-03'; # DATE
 our $DIST = 'App-orgsel'; # DIST
-our $VERSION = '0.013'; # VERSION
+our $VERSION = '0.014'; # VERSION
 
 use 5.010001;
 use strict;
@@ -68,7 +68,7 @@ App::orgsel - Select Org document elements using CSel (CSS-selector-like) syntax
 
 =head1 VERSION
 
-This document describes version 0.013 of App::orgsel (from Perl distribution App-orgsel), released on 2021-07-01.
+This document describes version 0.014 of App::orgsel (from Perl distribution App-orgsel), released on 2021-07-03.
 
 =head1 SYNOPSIS
 

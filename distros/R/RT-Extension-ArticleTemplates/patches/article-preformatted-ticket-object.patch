@@ -1,0 +1,26 @@
+commit 01b601a53c68b9d46f722124f154a28bee9e4ce1
+Author: Jim Brandt <jbrandt@bestpractical.com>
+Date:   Thu Nov 12 08:40:46 2020 -0500
+
+    Restore Ticket object to arguments passed to Preformatted
+    
+    f2124f372 removed the ticket object passed as an argument to
+    Preformatted because it was no longer needed in RT. However,
+    RT::Extension::ArticleTemplates still needs the ticket object,
+    so restore it to that call.
+
+diff --git a/share/html/Articles/Elements/IncludeArticle b/share/html/Articles/Elements/IncludeArticle
+index a64684c86..ce75ffb21 100644
+--- a/share/html/Articles/Elements/IncludeArticle
++++ b/share/html/Articles/Elements/IncludeArticle
+@@ -78,8 +78,9 @@ if ( $ret && $article->Id ){
+         return;
+     }
+ 
++    # $Ticket below is used by RT::Extension::ArticleTemplates
+     my $formatted_article = $m->scomp('/Articles/Article/Elements/Preformatted',
+-        Article => $article
++        Article => $article, Ticket => $Ticket
+     );
+ 
+     $m->callback( Article => $article, Ticket => $Ticket, formatted_article => \$formatted_article, ARGSRef => \%ARGS );

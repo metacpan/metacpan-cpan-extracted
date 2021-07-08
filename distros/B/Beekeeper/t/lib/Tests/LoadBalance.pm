@@ -8,7 +8,7 @@ use base 'Tests::Service::Base';
 use Test::More;
 use Time::HiRes 'sleep';
 
-use constant DEBUG => 0;
+my $VERBOSE = $ENV{'HARNESS_IS_VERBOSE'};
 
 
 sub start_test_workers : Test(startup => 1) {
@@ -20,7 +20,7 @@ sub start_test_workers : Test(startup => 1) {
         $self->SKIP_ALL("Load balance tests are not deterministic");
     }
 
-    my $running = $self->start_workers('Tests::Service::Cache', workers_count => 5);
+    my $running = $self->start_workers('Tests::Service::Cache', worker_count => 5);
     is( $running, 5, "Spawned 5 workers");
 };
 
@@ -58,7 +58,7 @@ sub test_01_load_balance_async : Test(6) {
         my $dev = abs( $offs / $expected * 100 );
         $total += $got;
 
-        DEBUG && diag "$pid: $got  $offs  $dev %";
+        $VERBOSE && diag "$pid: $got  $offs  $dev %";
 
         cmp_ok($dev,'<', 60, "expected average $expected async runs, got $got");
     }
@@ -99,7 +99,7 @@ sub test_02_load_balance_background : Test(6) {
         my $dev = abs( $offs / $expected * 100 );
         $total += $got;
 
-        DEBUG && diag "$pid: $got  $offs  $dev %";
+        $VERBOSE && diag "$pid: $got  $offs  $dev %";
 
         cmp_ok($dev,'<', 60, "expected average $expected background runs, got $got");
     }
@@ -150,18 +150,18 @@ sub test_03_slow_consumer_async : Test(7) {
     my $runs = $resp->result;
 
     my %slowed_workers;
-    my $slowed_workers_count = 0;
+    my $slowed_worker_count = 0;
 
     foreach my $pid (sort keys %$runs) {
         my $got = $runs->{$pid};
         next unless ($got < $expected_fast * 0.20);
         $slowed_workers{$pid} = 1;
-        $slowed_workers_count++;
+        $slowed_worker_count++;
     }
 
     TODO: {
         local $TODO = "ToyBroker does simple round robin, ignoring backlog";
-        is($slowed_workers_count, $expected_slow, "expected $expected_slow slowed workers, got $slowed_workers_count");
+        is($slowed_worker_count, $expected_slow, "expected $expected_slow slowed workers, got $slowed_worker_count");
     }
 
     my $total = 0;
@@ -178,7 +178,7 @@ sub test_03_slow_consumer_async : Test(7) {
             my $offs = $got - $expected_fast;
             my $dev = abs( $offs / $expected_fast * 100 );
 
-            DEBUG && diag "$pid: $got  $offs  $dev %";
+            $VERBOSE && diag "$pid: $got  $offs  $dev %";
 
             cmp_ok($dev,'<', 60, "expected average $expected_fast fast runs, got $got");
         }

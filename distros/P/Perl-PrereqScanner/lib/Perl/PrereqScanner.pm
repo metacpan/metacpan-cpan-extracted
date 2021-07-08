@@ -2,9 +2,9 @@ use 5.008;
 use strict;
 use warnings;
 
-package Perl::PrereqScanner;
+package Perl::PrereqScanner 1.024;
 # ABSTRACT: a tool to scan your Perl code for its prerequisites
-$Perl::PrereqScanner::VERSION = '1.023';
+
 use Moose;
 
 use List::Util qw(max);
@@ -150,7 +150,7 @@ Perl::PrereqScanner - a tool to scan your Perl code for its prerequisites
 
 =head1 VERSION
 
-version 1.023
+version 1.024
 
 =head1 SYNOPSIS
 
@@ -205,6 +205,16 @@ constructing your PrereqScanner:
 
   # Use any stock scanners, plus Example:
   my $scanner = Perl::PrereqScanner->new({ extra_scanners => [ qw(Example) ] });
+
+=head1 PERL VERSION
+
+This library should run on perls released even a long time ago.  It should work
+on any version of perl released in the last five years.
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
 
 =head1 METHODS
 
@@ -261,13 +271,13 @@ Jerome Quelin
 
 =item *
 
-Ricardo Signes <rjbs@cpan.org>
+Ricardo Signes <rjbs@semiotic.systems>
 
 =back
 
 =head1 CONTRIBUTORS
 
-=for stopwords bowtie celogeek Christopher J. Madsen David Golden Steinbrunner Ed J Florian Ragwitz Jakob Voss Jerome Quelin Jérôme John SJ Anderson Karen Etheridge Mark Gardner Neil Bowers Randy Stauner Tina Mueller Vyacheslav Matjukhin
+=for stopwords bowtie celogeek Christopher J. Madsen David Golden Steinbrunner Ed J Florian Ragwitz Jakob Voss Jérôme Quelin John SJ Anderson Karen Etheridge Mark Gardner Neil Bowers Randy Stauner Tina Mueller Vyacheslav Matjukhin
 
 =over 4
 
@@ -302,10 +312,6 @@ Florian Ragwitz <rafl@debian.org>
 =item *
 
 Jakob Voss <voss@gbv.de>
-
-=item *
-
-Jerome Quelin <jquelin@gmail.com>
 
 =item *
 

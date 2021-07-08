@@ -12,6 +12,7 @@ all_pod_files_spelling_ok( qw( examples lib script t xt ) );
 __DATA__
 Alders
 Andrew
+Anwar
 Book
 Chris
 Dan
@@ -23,6 +24,8 @@ Kensho
 Lapworth
 Leir
 Leo
+Mohammad
+Müller
 Nehren
 Olaf
 Prather
@@ -32,14 +35,17 @@ Rick
 Shawn
 Sorichetti
 Task
+Tina
 Whatson
 apeiron
 chris
+cpan2
 ether
 grinnz
 irc
 leo
 lib
+mohammad
 olaf
 rafl
 rkellyalso

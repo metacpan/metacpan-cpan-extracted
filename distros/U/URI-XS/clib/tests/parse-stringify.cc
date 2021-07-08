@@ -176,10 +176,10 @@ TEST("leading authority euristics") {
 }
 
 TEST("allow extended chars") {
-    URI uri("http://jopa.com?\"key\"=\"val\"&param={\"key\",\"val\"}", URI::Flags::allow_extended_chars);
-    CHECK(uri.query_string() == "%22key%22=%22val%22&param=%7B%22key%22%2C%22val%22%7D");
-    CHECK(uri.to_string() == "http://jopa.com?%22key%22=%22val%22&param=%7B%22key%22%2C%22val%22%7D");
-    CHECK(uri.query() == Query({{"\"key\"", "\"val\""}, {"param", "{\"key\",\"val\"}"}}));
+    URI uri("http://jopa.com?param={\"key\",\"val|hi\"}", URI::Flags::allow_extended_chars);
+    CHECK(uri.query_string() == "param=%7B%22key%22%2C%22val%7Chi%22%7D");
+    CHECK(uri.to_string() == "http://jopa.com?param=%7B%22key%22%2C%22val%7Chi%22%7D");
+    CHECK(uri.query() == Query({{"param", "{\"key\",\"val|hi\"}"}}));
 }
 
 TEST("secure") {

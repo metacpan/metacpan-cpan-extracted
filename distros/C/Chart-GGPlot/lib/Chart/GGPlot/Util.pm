@@ -4,7 +4,7 @@ package Chart::GGPlot::Util;
 
 use Chart::GGPlot::Setup qw(:base :pdl);
 
-our $VERSION = '0.0011'; # VERSION
+our $VERSION = '0.0016'; # VERSION
 
 use Data::Dumper::Concise ();
 
@@ -20,6 +20,7 @@ use List::AllUtils qw(min);
 use Module::Load;
 use PDL::Primitive qw(which);
 use Package::Stash;
+use POSIX qw(floor);
 use Types::PDL qw(Piddle1D PiddleFromAny);
 use Types::Standard qw(ArrayRef);
 
@@ -47,6 +48,8 @@ my @export_all = (
       find_line_formula spiral_arc_length
       has_groups
       collect_functions_from_package
+      arraylike
+      mm_to_pt mm_to_px
       ),
 );
 
@@ -299,6 +302,25 @@ sub collect_functions_from_package {
     return @func_names;
 }
 
+
+sub arraylike {
+    my ($x) = @_;
+    return (Piddle1D->check($x) or ArrayRef->check($x));
+}
+
+
+sub mm_to_pt {
+    my $result = 72 / 25.4 * $_[0];
+    $result->$_call_if_can('rint') // floor($result + 0.5);
+}
+
+sub mm_to_px {
+    my ( $x, $dpi ) = @_;
+    $dpi //= 96;
+    my $result = $x / 25.4 * $dpi;
+    $result->$_call_if_can('rint') // floor($result + 0.5);
+}
+
 1;
 
 __END__
@@ -313,7 +335,7 @@ Chart::GGPlot::Util - Utility functions
 
 =head1 VERSION
 
-version 0.0011
+version 0.0016
 
 =head1 FUNCTIONS
 
@@ -398,13 +420,27 @@ statistic.
 
 Note that this function has same name as Perl's CORE C<stat> function.
 
+=head2 arraylike
+
+    my $bool = arraylike($x);
+
+Returns true if argument is arrayref or 1D piddle.
+
+=head2 mm_to_pt
+
+Convert mm to pt. Result is round to int.
+
+=head2 mm_to_px
+
+Convert mm to px. Result is round to int.
+
 =head1 AUTHOR
 
 Stephan Loyd <sloyd@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019-2020 by Stephan Loyd.
+This software is copyright (c) 2019-2021 by Stephan Loyd.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

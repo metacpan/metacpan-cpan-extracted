@@ -1,4 +1,6 @@
-1.5.2    xx.xx.2021
+1.5.3    02.07.2021
+            - improve platform-dependent code, remove clang warnings
+1.5.2    14.05.2021
             - change default order of adding callbacks in callback dispatcher to "BACK"
 1.5.1    19.04.2021
             - change MANIFEST.SKIP

@@ -10,7 +10,7 @@ namespace panda { namespace uri {
     
     action ext_chars { ext_chars = true; }
     
-    query        = (pchar | "/" | "?" | ("\"" | "{" | "}") %ext_chars)* >mark %query;
+    query        = (pchar | "/" | "?" | ("\"" | "{" | "}" | "|") %ext_chars)* >mark %query;
     absolute_uri = scheme ":" hier_part ("?" query)? ("#" fragment)?;
     relative_ref = relative_part ("?" query)? ("#" fragment)?;
     

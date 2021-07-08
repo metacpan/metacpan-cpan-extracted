@@ -31,7 +31,7 @@ use HTTP::Request::Common;
 use HTML::TableExtract;
 use Encode qw(decode);
 
-our $VERSION = '1.50'; # VERSION
+our $VERSION = '1.51'; # VERSION
 
 @EXPORT_OK = qw( known_currencies fetch_live_currencies );
 

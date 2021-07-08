@@ -1,0 +1,6 @@
+if (NOT TARGET panda-lib)
+    find_package(panda-protocol-http REQUIRED)
+    find_package(unievent REQUIRED)
+    find_package(unievent-socks REQUIRED)
+    include("${CMAKE_CURRENT_LIST_DIR}/unievent-http-targets.cmake")
+endif()

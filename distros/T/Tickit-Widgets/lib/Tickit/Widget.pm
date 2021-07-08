@@ -1,12 +1,12 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2009-2020 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2009-2021 -- leonerd@leonerd.org.uk
 
-package Tickit::Widget 0.53;
+use Object::Pad 0.32;
 
-use v5.14;
-use warnings;
+package Tickit::Widget 0.54;
+class Tickit::Widget :repr(HASH);
 
 use Carp;
 use Scalar::Util qw( blessed weaken );
@@ -114,34 +114,42 @@ values.
 
 =cut
 
-sub new
+has @_style_classes;
+has $_style_direct;
+has %_style_tag;
+
+BUILD
 {
-   my $class = shift;
    my %args = @_;
 
+   my $class = ref $self;
    foreach my $method (qw( lines cols render_to_rb )) {
       $class->can( $method ) or
          croak "$class cannot ->$method - do you subclass and implement it?";
    }
 
-   my $self = bless {
-      classes => delete $args{classes} // [ delete $args{class} ],
-   }, $class;
+   @_style_classes = @{ delete $args{classes} // [ delete $args{class} ] };
 
    # Legacy direct-applied-style argument support
    $args{$_} and $args{style}{$_} = delete $args{$_} for @Tickit::Pen::ALL_ATTRS;
 
    if( my $style = delete $args{style} ) {
-      my $tagset = $self->{style_direct} = Tickit::Style::_Tagset->new;
+      my $tagset = $_style_direct = Tickit::Style::_Tagset->new;
       foreach my $key ( keys %$style ) {
          $tagset->add( $key, $style->{$key} );
       }
    }
 
    $self->_update_pen( $self->get_style_pen );
-
-   return $self;
 }
+
+has $_parent :reader;
+has $_window :reader;
+has $_pen    :reader;
+
+has $_focus_pending;
+
+has %_event_ids;
 
 =head1 METHODS
 
@@ -155,10 +163,9 @@ Returns a list of the style class names this Widget has.
 
 =cut
 
-sub style_classes
+method style_classes
 {
-   my $self = shift;
-   return @{ $self->{classes} };
+   return @_style_classes;
 }
 
 =head2 set_style_tag
@@ -179,19 +186,18 @@ changes and decide for itself.
 my %KEYS_BY_TYPE_CLASS_TAG;
 Tickit::Style::on_style_load( sub { undef %KEYS_BY_TYPE_CLASS_TAG } );
 
-sub set_style_tag
+method set_style_tag
 {
-   my $self = shift;
    my ( $tag, $value ) = @_;
 
    # Early-return on no change
-   return if !$self->{style_tag}{$tag} == !$value;
+   return if !$_style_tag{$tag} == !$value;
 
    # Work out what style keys might depend on this tag
    my %values;
 
-   if( $self->{style_direct} ) {
-      KEYSET: foreach my $keyset ( $self->{style_direct}->keysets ) {
+   if( $_style_direct ) {
+      KEYSET: foreach my $keyset ( $_style_direct->keysets ) {
          $keyset->tags->{$tag} or next KEYSET;
 
          $values{$_} ||= [] for keys %{ $keyset->style };
@@ -221,16 +227,14 @@ sub set_style_tag
    my @old_values = $self->get_style_values( @keys );
    $values{$keys[$_]}[0] = $old_values[$_] for 0 .. $#keys;
 
-   $self->{style_tag}{$tag} = !!$value;
+   $_style_tag{$tag} = !!$value;
 
    $self->_style_changed_values( \%values );
 }
 
-sub _style_tags
+method _style_tags
 {
-   my $self = shift;
-   my $tags = $self->{style_tag};
-   return join "|", sort grep { $tags->{$_} } keys %$tags;
+   return join "|", sort grep { $_style_tag{$_} } keys %_style_tag;
 }
 
 =head2 get_style_values
@@ -245,9 +249,10 @@ in scalar context.
 
 =cut
 
-sub get_style_values
+has %_style_cache;
+
+method get_style_values
 {
-   my $self = shift;
    my @keys = @_;
 
    my $type = $self->_widget_style_type;
@@ -255,8 +260,7 @@ sub get_style_values
    my @set = ( 0 ) x @keys;
    my @values = ( undef ) x @keys;
 
-   my $tags = $self->{style_tag};
-   my $cache = $self->{style_cache}{$self->_style_tags} ||= {};
+   my $cache = $_style_cache{$self->_style_tags} ||= {};
 
    foreach my $i ( 0 .. $#keys ) {
       next unless exists $cache->{$keys[$i]};
@@ -266,7 +270,7 @@ sub get_style_values
    }
 
    my @classes = ( $self->style_classes, undef );
-   my $tagset = $self->{style_direct};
+   my $tagset = $_style_direct;
 
    while( !all { $_ } @set and @classes ) {
       # First time around this uses the direct style, if set. Thereafter uses
@@ -274,7 +278,7 @@ sub get_style_values
       defined $tagset or $tagset = Tickit::Style::_ref_tagset( $type, shift @classes );
 
       KEYSET: foreach my $keyset ( $tagset->keysets ) {
-         $tags->{$_} or next KEYSET for keys %{ $keyset->tags };
+         $_style_tag{$_} or next KEYSET for keys %{ $keyset->tags };
 
          my $style = $keyset->style;
 
@@ -318,13 +322,14 @@ returned pen instance is immutable, and may be cached.
 
 =cut
 
-sub get_style_pen
+has %_style_pen_cache;
+
+method get_style_pen
 {
-   my $self = shift;
    my $class = ref $self;
    my ( $prefix ) = @_;
 
-   return $self->{style_pen_cache}{$self->_style_tags}{$prefix//""} ||= do {
+   return $_style_pen_cache{$self->_style_tags}{$prefix//""} ||= do {
       my @keys = map { defined $prefix ? "${prefix}_$_" : $_ } @Tickit::Pen::ALL_ATTRS;
 
       my %attrs;
@@ -342,9 +347,8 @@ A shortcut to calling C<get_style_values> for a single key called C<"text">.
 
 =cut
 
-sub get_style_text
+method get_style_text
 {
-   my $self = shift;
    my $class = ref $self;
 
    return $self->get_style_values( "text" ) // croak "$class style does not define text";
@@ -369,9 +373,8 @@ applied style tags does not invalidate the caches.
 
 =cut
 
-sub set_style
+method set_style
 {
-   my $self = shift;
    my %defs = @_;
 
    my $new = Tickit::Style::_Tagset->new;
@@ -387,25 +390,24 @@ sub set_style
    my @old_values = $self->get_style_values( @keys );
    $values{$keys[$_]}[0] = $old_values[$_] for 0 .. $#keys;
 
-   if( $self->{style_direct} ) {
-      $self->{style_direct}->merge( $new );
+   if( $_style_direct ) {
+      $_style_direct->merge( $new );
    }
    else {
-      $self->{style_direct} = $new;
+      $_style_direct = $new;
    }
 
    $self->_style_changed_values( \%values, 1 );
 }
 
-sub _style_changed_values
+method _style_changed_values
 {
-   my $self = shift;
    my ( $values, $invalidate_caches ) = @_;
 
    my @keys = keys %$values;
 
    if( $invalidate_caches ) {
-      foreach my $keyset ( values %{ $self->{style_cache} } ) {
+      foreach my $keyset ( values %_style_cache ) {
          delete $keyset->{$_} for @keys;
       }
    }
@@ -434,7 +436,7 @@ sub _style_changed_values
    }
 
    if( $invalidate_caches ) {
-      foreach my $penset ( values %{ $self->{style_pen_cache} } ) {
+      foreach my $penset ( values %_style_pen_cache ) {
          delete $penset->{$_} for keys %changed_pens;
       }
    }
@@ -498,28 +500,27 @@ This method may invoke the C<window_gained> and C<window_lost> methods.
 
 =cut
 
-sub set_window
+method set_window
 {
-   my $self = shift;
    my ( $window ) = @_;
 
    # Early out if no change
-   return if !$window and !$self->window;
-   return if $window and $self->window and $self->window == $window;
+   return if !$window and !$_window;
+   return if $window and $_window and $_window == $window;
 
-   if( $self->{window} and !$window ) {
-      $self->{window}->set_pen( undef );
-      $self->window_lost( $self->{window} );
+   if( $_window and !$window ) {
+      $_window->set_pen( undef );
+      $self->window_lost( $_window );
    }
 
-   $self->{window} = $window;
+   $_window = $window;
 
    if( $window ) {
-      $window->set_pen( $self->{pen} );
+      $window->set_pen( $_pen );
 
-      $self->window_gained( $self->{window} );
+      $self->window_gained( $_window );
 
-      $window->take_focus if delete $self->{focus_pending};
+      $window->take_focus, undef $_focus_pending if $_focus_pending;
 
       $self->reshape;
 
@@ -527,37 +528,34 @@ sub set_window
    }
 }
 
-sub window_gained
+method window_gained
 {
-   my $self = shift;
-
    my $window = $self->window;
 
    weaken $self;
 
-   my $event_ids = $self->{event_ids} //= {};
-
-   $event_ids->{geomchange} = $window->bind_event( geomchange => sub {
+   $_event_ids{geomchange} = $window->bind_event( geomchange => sub {
       $self->reshape;
       $self->redraw if !$self->parent;
    } );
 
-   $event_ids->{expose} = $window->bind_event( expose => sub {
+   $_event_ids{expose} = $window->bind_event( expose => sub {
       my ( $win, undef, $info ) = @_;
-      $win->is_visible or return;
+      $win->is_visible or return 1;
 
-      $info->rb->setpen( $self->{pen} );
+      $info->rb->setpen( $_pen );
 
       $self->render_to_rb( $info->rb, $info->rect );
+      return 1;
    });
 
-   $event_ids->{focus} = $window->bind_event( focus => sub {
+   $_event_ids{focus} = $window->bind_event( focus => sub {
       my ( $win, undef, $info ) = @_;
       $self->_on_win_focus( $win, $info->type, $info->win );
    } ) if $self->can( "_widget_style_type" );
 
    if( $self->can( "on_key" ) or $self->KEYPRESSES_FROM_STYLE ) {
-      $event_ids->{key} = $window->bind_event( key => sub {
+      $_event_ids{key} = $window->bind_event( key => sub {
          my ( $win, undef, $info ) = @_;
 
          {
@@ -579,42 +577,37 @@ sub window_gained
       } );
    }
 
-   $event_ids->{mouse} = $window->bind_event( mouse => sub {
+   $_event_ids{mouse} = $window->bind_event( mouse => sub {
       my ( $win, undef, $info ) = @_;
       $self->take_focus if $self->CAN_FOCUS and $info->type eq "press" and $info->button == 1;
       $self->on_mouse( $info ) if $self->can( "on_mouse" );
    } );
 }
 
-sub _on_win_focus
+method _on_win_focus
 {
-   my $self = shift;
    my ( $win, $focus ) = @_;
 
    $self->set_style_tag( focus => $focus eq "in" );
 }
 
-sub key_focus_next_after
+method key_focus_next_after
 {
-   my $self = shift;
    $self->parent and $self->parent->focus_next( after => $self );
    return 1;
 }
 
-sub key_focus_next_before
+method key_focus_next_before
 {
-   my $self = shift;
    $self->parent and $self->parent->focus_next( before => $self );
    return 1;
 }
 
-sub window_lost
+method window_lost
 {
-   my $self = shift;
-
    my $window = $self->window;
 
-   $window->unbind_event_id( $_ ) for values %{ $self->{event_ids} };
+   $window->unbind_event_id( $_ ) for values %_event_ids;
 }
 
 =head2 window
@@ -626,11 +619,7 @@ C<set_window>.
 
 =cut
 
-sub window
-{
-   my $self = shift;
-   return $self->{window};
-}
+# generated
 
 =head2 set_parent
 
@@ -642,14 +631,13 @@ C<$parent>, if defined, must be a subclass of L<Tickit::ContainerWidget>.
 
 =cut
 
-sub set_parent
+method set_parent
 {
-   my $self = shift;
    my ( $parent ) = @_;
 
    !$parent or $parent->isa( "Tickit::ContainerWidget" ) or croak "Parent must be a ContainerWidget";
 
-   weaken( $self->{parent} = $parent );
+   weaken( $_parent = $parent );
 }
 
 =head2 parent
@@ -660,11 +648,7 @@ Returns the current container widget
 
 =cut
 
-sub parent
-{
-   my $self = shift;
-   return $self->{parent};
-}
+# generated accessor
 
 =head2 resized
 
@@ -676,9 +660,8 @@ again, then calls C<set_requested_size>.
 
 =cut
 
-sub resized
+method resized
 {
-   my $self = shift;
    # 'scalar' just in case of odd behaviour in subclasses
    $self->set_requested_size( scalar $self->lines, scalar $self->cols );
 }
@@ -693,16 +676,18 @@ window if the dimensions are now different to last time.
 
 =cut
 
-sub set_requested_size
+has $_req_lines;
+has $_req_cols;
+
+method set_requested_size
 {
-   my $self = shift;
    my ( $new_lines, $new_cols ) = @_;
 
-   return if defined $self->{req_lines} and $self->{req_lines} == $new_lines and
-             defined $self->{req_cols}  and $self->{req_cols}  == $new_cols;
+   return if defined $_req_lines and $_req_lines == $new_lines and
+             defined $_req_cols  and $_req_cols  == $new_cols;
 
-   $self->{req_lines} = $new_lines;
-   $self->{req_cols}  = $new_cols;
+   $_req_lines = $new_lines;
+   $_req_cols  = $new_cols;
 
    if( $self->parent ) {
       $self->parent->child_resized( $self );
@@ -736,16 +721,14 @@ container widgets during the transition to the new sizing model.
 
 =cut
 
-sub requested_size
+method requested_size
 {
-   my $self = shift;
-
-   return ( $self->{req_lines} //= $self->lines,
-            $self->{req_cols}  //= $self->cols );
+   return ( $_req_lines //= $self->lines,
+            $_req_cols  //= $self->cols );
 }
 
-sub requested_lines { ( shift->requested_size )[0] }
-sub requested_cols  { ( shift->requested_size )[1] }
+method requested_lines { ( $self->requested_size )[0] }
+method requested_cols  { ( $self->requested_size )[1] }
 
 =head2 redraw
 
@@ -762,10 +745,8 @@ requirement to redraw, and have them all flushed in a fairly efficient manner.
 
 =cut
 
-sub redraw
+method redraw
 {
-   my $self = shift;
-
    $self->window or return;
    $self->window->expose;
 }
@@ -778,21 +759,15 @@ Returns the widget's L<Tickit::Pen>.
 
 =cut
 
-sub pen
-{
-   my $self = shift;
+# generated accessor
 
-   return $self->{pen};
-}
-
-sub _update_pen
+method _update_pen
 {
-   my $self = shift;
    my ( $newpen ) = @_;
 
-   return if $self->{pen} and $self->{pen} == $newpen;
+   return if $_pen and $_pen == $newpen;
 
-   $self->{pen} = $newpen;
+   $_pen = $newpen;
 
    if( $self->window ) {
       $self->window->set_pen( $newpen );
@@ -801,7 +776,7 @@ sub _update_pen
 }
 
 # Default empty implementation
-sub reshape { }
+method reshape { }
 
 =head2 take_focus
 
@@ -815,17 +790,15 @@ true value.
 
 =cut
 
-sub take_focus
+method take_focus
 {
-   my $self = shift;
-
    croak ref($self) . " cannot ->take_focus" unless $self->CAN_FOCUS;
 
    if( my $win = $self->window ) {
       $win->take_focus if $win->is_visible;
    }
    else {
-      $self->{focus_pending} = 1;
+      $_focus_pending = 1;
    }
 }
 

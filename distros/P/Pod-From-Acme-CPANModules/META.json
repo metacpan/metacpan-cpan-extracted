@@ -63,7 +63,7 @@
          "web" : "https://github.com/perlancar/perl-Pod-From-Acme-CPANModules"
       }
    },
-   "version" : "0.007",
+   "version" : "0.008",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"

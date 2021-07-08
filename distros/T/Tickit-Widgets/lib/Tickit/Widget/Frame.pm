@@ -1,11 +1,11 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2011-2020 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2011-2021 -- leonerd@leonerd.org.uk
 
-use Object::Pad 0.27;
+use Object::Pad 0.41;  # :param
 
-package Tickit::Widget::Frame 0.33;
+package Tickit::Widget::Frame 0.34;
 class Tickit::Widget::Frame
    extends Tickit::SingleChildWidget;
 
@@ -131,14 +131,13 @@ For more details see the accessors below.
 
 =cut
 
-has $_title;
+has $_title    :reader :param = undef;
 has %_has_edge;
 
 BUILD
 {
    my %args = @_;
 
-   $self->set_title( $args{title} ) if defined $args{title};
    $self->set_title_align( $args{title_align} || 0 );
 
    # Prepopulate has_* caches
@@ -216,10 +215,7 @@ my %LINESTYLES = (
 
 =cut
 
-method title
-{
-   return $_title;
-}
+# generated accessor
 
 =head2 set_title
 

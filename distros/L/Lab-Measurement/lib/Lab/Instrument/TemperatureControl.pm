@@ -1,6 +1,6 @@
 package Lab::Instrument::TemperatureControl;
 #ABSTRACT: Generic temperature control instrument base class
-$Lab::Instrument::TemperatureControl::VERSION = '3.760';
+$Lab::Instrument::TemperatureControl::VERSION = '3.762';
 use v5.20;
 
 use strict;
@@ -73,19 +73,19 @@ Lab::Instrument::TemperatureControl - Generic temperature control instrument bas
 
 =head1 VERSION
 
-version 3.760
+version 3.762
 
 =head1 COPYRIGHT AND LICENSE
 
 This software is copyright (c) 2021 by the Lab::Measurement team; in detail:
 
-  Copyright 2009       Andreas K. HÃ¼ttel
-            2010       Andreas K. HÃ¼ttel, Daniel SchrÃ¶er
-            2011       Andreas K. HÃ¼ttel, Florian Olbrich
-            2012       Andreas K. HÃ¼ttel
+  Copyright 2009       Andreas K. Huettel
+            2010       Andreas K. Huettel, Daniel Schroeer
+            2011       Andreas K. Huettel, Florian Olbrich
+            2012       Andreas K. Huettel
             2016       Simon Reinhardt
-            2017       Andreas K. HÃ¼ttel
-            2020       Andreas K. HÃ¼ttel
+            2017       Andreas K. Huettel
+            2020       Andreas K. Huettel
 
 
 This is free software; you can redistribute it and/or modify it under

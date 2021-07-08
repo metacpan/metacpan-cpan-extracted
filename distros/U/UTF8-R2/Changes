@@ -1,5 +1,15 @@
 Revision history for this software.
 
+0.20  2021-07-05 00:00:00
+  - supports UTF8::R2::do
+  - supports UTF8::R2::eval
+  - supports UTF8::R2::index_byte
+  - supports UTF8::R2::require
+  - supports UTF8::R2::rindex_byte
+  - supports $UTF8::R2::PERL
+  - supports $UTF8::R2::ORIG_PROGRAM_NAME
+  - created by INABA Hitoshi
+
 0.19  2021-06-10 00:00:00
   - UTF8::R2::tr() supports '\-'
   - created by INABA Hitoshi

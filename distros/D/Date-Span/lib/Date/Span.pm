@@ -1,10 +1,7 @@
 use strict;
 use warnings;
 
-package Date::Span;
-{
-  $Date::Span::VERSION = '1.127';
-}
+package Date::Span 1.128;
 # ABSTRACT: deal with date/time ranges than span multiple dates
 
 use Exporter;
@@ -12,6 +9,48 @@ BEGIN { our @ISA = 'Exporter' }
 
 our @EXPORT = qw(range_expand range_durations range_from_unit); ## no critic
 
+#pod =head1 SYNOPSIS
+#pod
+#pod  use Date::Span;
+#pod
+#pod  @spanned = range_expand($start, $end);
+#pod
+#pod  print "from $_->[0] to $_->[1]\n" for (@spanned);
+#pod
+#pod =head1 DESCRIPTION
+#pod
+#pod This module provides code for dealing with datetime ranges that span multiple
+#pod calendar days.  This is useful for computing, for example, the amount of
+#pod seconds spent performing a task on each day.  Given the following table:
+#pod
+#pod   event   | begun            | ended
+#pod  ---------+------------------+------------------
+#pod   loading | 2004-01-01 00:00 | 2004-01-01 12:45
+#pod   venting | 2004-01-01 12:45 | 2004-01-02 21:15
+#pod   running | 2004-01-02 21:15 | 2004-01-03 00:00
+#pod
+#pod We may want to gather the following data:
+#pod
+#pod   date       | event   | time spent
+#pod  ------------+---------+----------------
+#pod   2004-01-01 | loading | 12.75 hours
+#pod   2004-01-01 | venting | 11.25 hours
+#pod   2004-01-02 | venting | 21.25 hours
+#pod   2004-01-02 | running |  2.75 hours
+#pod
+#pod Date::Span takes a data like the first and produces data more like the second.
+#pod (Details on exact interface are below.)
+#pod
+#pod =func range_durations
+#pod
+#pod   my @durations = range_durations($start, $end)
+#pod
+#pod Given C<$start> and C<$end> as timestamps (in epoch seconds),
+#pod C<range_durations> returns a list of arrayrefs.  Each arrayref is a date
+#pod (expressed as epoch seconds at midnight) and the number of seconds for which
+#pod the given range intersects with the date.
+#pod
+#pod =cut
 
 sub _date_time {
   my $date = $_[0] - (my $time = $_[0] % 86400);
@@ -40,6 +79,16 @@ sub range_durations {
 	return @results;
 }
 
+#pod =func range_expand
+#pod
+#pod   my @endpoint_pairs = range_expand($start, $end);
+#pod
+#pod Given C<$start> and C<$end> as timestamps (in epoch seconds),
+#pod C<range_durations> returns a list of arrayrefs.  Each arrayref is a start and
+#pod end timestamp.  No pair of start and end times will cross a date boundary, and
+#pod the set of ranges as a whole will be identical to the passed start and end.
+#pod
+#pod =cut
 
 sub range_expand {
 	my ($start, $end) = @_;
@@ -62,6 +111,23 @@ sub range_expand {
 	return @results;
 }
 
+#pod =func range_from_unit
+#pod
+#pod   my ($start, $end) = range_from_unit(@date_unit)
+#pod
+#pod C<@date_unit> is a specification of a unit of time, in the form:
+#pod
+#pod  @date_unit = ($year, $month, $day, $hour, $minute);
+#pod
+#pod Only C<$year> is mandatory; other arguments may be added, in order.  Month is
+#pod given in the range (0 .. 11).  This function will return the first and last
+#pod second of the given unit.
+#pod
+#pod A code reference may be passed as the last object.  It will be used to convert
+#pod the date specification to a starting time.  If no coderef is passed, a simple
+#pod one using Time::Local (and C<timegm>) will be used.
+#pod
+#pod =cut
 
 my @monthdays = ( 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 );
 
@@ -100,6 +166,13 @@ sub range_from_unit {
 	return ($begin_secs, $begin_secs + $length - 1);
 }
 
+#pod =head1 TODO
+#pod
+#pod This code was just yanked out of a general purpose set of utility functions
+#pod I've compiled over the years.  It should be refactored (internally) and
+#pod further tested.  The interface should stay pretty stable, though.
+#pod
+#pod =cut
 
 1;
 
@@ -107,13 +180,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Date::Span - deal with date/time ranges than span multiple dates
 
 =head1 VERSION
 
-version 1.127
+version 1.128
 
 =head1 SYNOPSIS
 
@@ -146,6 +221,16 @@ We may want to gather the following data:
 
 Date::Span takes a data like the first and produces data more like the second.
 (Details on exact interface are below.)
+
+=head1 PERL VERSION
+
+This library should run on perls released even a long time ago.  It should work
+on any version of perl released in the last five years.
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
 
 =head1 FUNCTIONS
 
@@ -191,7 +276,7 @@ further tested.  The interface should stay pretty stable, though.
 
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@cpan.org>
+Ricardo SIGNES <rjbs@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -2,9 +2,9 @@ use strict;
 use warnings;
 use 5.008;
 
-package DBIx::Locker;
+package DBIx::Locker 1.102;
 # ABSTRACT: locks for db resources that might not be totally insane
-$DBIx::Locker::VERSION = '0.100120';
+
 use Carp ();
 use DBI;
 use Data::GUID ();
@@ -261,7 +261,7 @@ DBIx::Locker - locks for db resources that might not be totally insane
 
 =head1 VERSION
 
-version 0.100120
+version 1.102
 
 =head1 DESCRIPTION
 
@@ -282,6 +282,16 @@ This is the I<entire> mechanism.  This is quick and dirty and quite effective,
 but it's not highly efficient.  If you need high speed locks with multiple
 levels of resolution, or anything other than a quick and brutal solution,
 I<keep looking>.
+
+=head1 PERL VERSION
+
+This library should run on perls released even a long time ago.  It should work
+on any version of perl released in the last five years.
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
 
 =head1 METHODS
 
@@ -354,11 +364,11 @@ See the C<sql> directory included in this dist for DDL for your database.
 
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@cpan.org>
+Ricardo SIGNES <rjbs@semiotic.systems>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Arthur Axel 'fREW' Schmidt Chris Nehren Hans Dieter Pearcey Rob N ★ Sergiy Borodych
+=for stopwords Arthur Axel 'fREW' Schmidt Chris Nehren Hans Dieter Pearcey Matthew Horsfall Rob N ★ Sergiy Borodych
 
 =over 4
 
@@ -376,6 +386,10 @@ Hans Dieter Pearcey <hdp@cpan.org>
 
 =item *
 
+Matthew Horsfall <wolfsage@gmail.com>
+
+=item *
+
 Rob N ★ <robn@robn.io>
 
 =item *
@@ -386,7 +400,7 @@ Sergiy Borodych <sergiy.borodych@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Ricardo SIGNES.
+This software is copyright (c) 2021 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

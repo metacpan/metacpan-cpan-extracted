@@ -4,6 +4,10 @@ use FindBin;
 use Storable qw(dclone);
 use Test::Most;
 
+use Utils qw(:all);
+
+use aliased 'Google::RestApi';
+
 use parent 'Test::Class';
 
 sub class { 'Google::RestApi' }
@@ -29,12 +33,12 @@ sub constructor : Tests(9) {
   );
 
   my $api;
-  lives_ok sub { $api = $class->new(%{ dclone(\%auth) }) }, 'Constructor with bad token file should succeed';
+  isa_ok $api = $class->new(%{ dclone(\%auth) }), RestApi, 'Constructor with bad token file';
   throws_ok sub { $api->auth()->token_file() }, qr/not found or is not readable/, 'Bad token file should fail';
 
   $auth{auth}->{token_file} = token_file();
   $api = $class->new(%{ dclone(\%auth) });
-  lives_ok sub { $api->auth()->token_file() }, 'Proper token file should be found';
+  like $api->auth()->token_file(), qr/token$/, 'Proper token file should be found';
 
   throws_ok sub { $class->new(config_file => 'x'); },
     qr/Unable to load/, 'Bad config file should fail';
@@ -51,7 +55,7 @@ sub constructor : Tests(9) {
     },
   );
 
-  lives_ok sub { $api = $class->new(%{ dclone(\%auth) }) }, 'Constructor with bad account file should succeed';
+  isa_ok $api = $class->new(%{ dclone(\%auth) }), RestApi, 'Constructor with bad account file';
   throws_ok sub { $api->auth()->account_file() }, qr/not found or is not readable/, 'Bad account file should fail';
 
   return;

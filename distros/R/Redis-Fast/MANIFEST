@@ -17,6 +17,7 @@ src/Redis__Fast.xs
 t/01-basic.t
 t/02-responses.t
 t/03-pubsub.t
+t/04-pipeline-issue117.t
 t/04-pipeline.t
 t/05-nonblock.t
 t/06-on-connect.t

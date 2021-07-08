@@ -1,3 +1,17 @@
+0.264   2020-07-08 Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [build] Rebuild with newer Perinci::Sub::To::CLIDocData (0.296) to
+          render a more readable usage line (group options with their
+          aliases/negations).
+
+
+0.263   2021-07-08  Released-By: PERLANCAR; Urgency: medium
+
+	- Add option --blink (-B).
+
+
 0.262   2020-04-27 Released-By: PERLANCAR; Urgency: low
 
         - No functional changes.

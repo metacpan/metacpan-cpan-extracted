@@ -370,33 +370,43 @@ gallery generator command
 
 L<Mojolicious::Command::Author::generate::obrazi> generates a gallery from a
 directory structure, containing images. The produced gallery is a static html
-file which content can be easily taken, modified, and embedded into any page.
+file which content can be easily taken, modified, and embedded into a page in
+any site.
 
 In addition the command generates a csv file describing the images. This file
 can be edited. Titles and descriptions can be added for each image and then the
 command can be run again to regenerate the gallery with the new titles and
-descriptions.
+descriptions. This file can be further used by a helper —
+L<Mojolicious::Plugin::Obrazi/obrazi> to produce and embed the HTML for the
+galery into a L<Mojolicious> application. Please note that the helper is not
+yet implemented.
 
 The word B<обраꙁъ>(singular) means L<face, image, picture, symbol, example,
 template, etc.|https://histdict.uni-sofia.bg/dictionary/show/d_05616>
-in OCS/Old BG language. The name of the plugin is the plural variant in
+in OCS/OS/OBG language. The name of the plugin is the plural variant in
 nominative case (обраꙁи).
 
 =head1 WORKFLOW
 
-    1. Images' owner and producer gives the direcory (probably zipped) to the
-        command runner.
-    2. The runner runs the command as shown in the SYNOPSIS.
-    3. The runner gives the produced csv file to the images producer. Fixes
-        problems with ICC profiles etc. Notifies the producer for eventual
-        naming convetions, possible problems. The producer fills in the
-        description and titles in the comfort of LibreOffice Calc or MS Excel
-        and gives back the file to the command-runner. This may take some time.
-    4. The runner runs again the command with the new csv file, reviews the
-        produced file. Takes the HTML and puts it in a page on the Web.
-    5. The images' owner/producer enjois the gallery, prise him/herself with it
-        or goes back to the runner to report problems.
-    6. DONE or go to some of the previous steps.
+1. Images' owner and producer gives the direcory (probably zipped) to the
+command runner (a human yet).
+
+2. The runner runs the command as shown in the SYNOPSIS.
+
+3. The runner gives back the produced csv file to the images' producer. Fixes
+problems with ICC profiles etc. Notifies the producer for eventual naming
+convetions, possible problems. The producer fills in the description and titles
+in the comfort of L<LibreOffice
+Calc|https://www.libreoffice.org/discover/calc/> or MS Excel and returns the
+file to the command-runner. This may take some time.
+
+4. The runner runs again the command with the new csv file, reviews the
+produced file. Takes the HTML and puts it in a page on the Web.
+
+5. The images' owner/producer enjoys the gallery, prise him/herself with it or
+goes back to the runner to report problems.
+
+6. DONE or go to some of the previous steps.
 
 =head1 FEATURES
 
@@ -457,7 +467,7 @@ the remainder — usually smaller than the previous chunks.
 
 =head2 from_dir
 
-    $self = $обраꙁи->from_dir('./');
+    $self = $обраꙁи->from_dir(path('./'));
     my $root_folder_abs_path = $обраꙁи->from_dir;
 
 Holds a L<Mojo::File> instance - absolute path to the directory from which the
@@ -540,23 +550,24 @@ command-line via C<--template>.
 
 =head2 thumbs
 
-    my $thumbs_sizes = $self->thumbs; #{width => 1000, height => 1000}
-    $self = $self->thumbs(width => 1000, height => 1000);
+    my $thumbs_sizes = $self->thumbs; #{width => 100, height => 100}
+    $self = $self->thumbs(width => 100, height => 100);
     $self = $self->thumbs('1000x1000');
 
 A hash reference with keys C<width> and C<height>. Defaults to C<{width =>
-1000, height => 1000}>. Can be changed via the command line argument
+100, height => 100}>. Can be changed via the command line argument
 C<--thumbs>.
 
 =head2 to_dir
 
-    $self->to_dir # $app/public
-    $self = $self->to_dir('/some/folder')
+    $self->to_dir # path($app/public)
+    $self = $self->to_dir(path('/some/folder'));
 
-A L<Mojo::File> instance. Directory where the folder with the processed images
+A L<Mojo::File> instance. Directory, where the folder with the processed images
 will be put. Defaults to the C<public> forlder of the current application.
-Can be changed via the command line argument C<--to_dir>.
-
+Can be changed via the command line argument C<--to_dir>. It is recommended to
+pass this value unless all your images are into one root folder. The L</to_dir>
+directory is the root of your images' galery.
 
 =head2 usage
 
@@ -576,7 +587,7 @@ L<Mojolicious::Command> and implements the following new ones.
     my ($img_filename, $thumb_filename) = $self->calculate_max_and_thumbs($decoded_path, $raw_path);
 
 Calculates the resized image dimensions according to the C<$self-E<gt>max>
-and C<$self-E<gt>thumbs> gallery contraints. Accepts the utf8 decoded path
+and C<$self-E<gt>thumbs> gallery constraints. Accepts the utf8 decoded path
 and the raw path to the file to be worked on. Returns two empty strings if
 there is error reading the image and warns about the error. Returns filenames
 for the resized image and the thumbnail image. See also
@@ -593,6 +604,14 @@ Run this command.
 L<Mojolicious::Command::Author::generate::obrazi> contains an embedded template
 C<obrazi.html.ep>. TODO: Make the template inflatable.
 
+=head1 DEMOS
+
+Here is a hopefully growing list of URLs of galleries produced with this
+software.
+
+L<Творби на Марио Беров|https://слово.бг/хѫдожьство/mario_berov.bg.html> — a
+gallery, presenting works of the Bulgarian Orthodox icon painter Mario Berov.
+
 =head1 SEE ALSO
 
 L<Imager>, L<Text::CSV_XS>
@@ -607,7 +626,6 @@ L<Chota (A micro (~3kb) CSS framework) – also used for the example implementat
 __DATA__
 
 @@ obrazi.html
-% use Mojo::Base -signatures;
 % use Mojo::File qw(path);
 <!DOCTYPE html>
 <html>
@@ -652,40 +670,47 @@ __DATA__
             section .card .image h4 {
                 margin-left: 0;
             }
+            section .card .image h3.category {
+                position: absolute;
+                top: 0;
+                right:0;
+                padding: 1em;
+            }
             section .card .image .meta {
                 position: absolute;
                 bottom: 0;
                 left:0;
                 padding: 1em;
             }
-            .prev-next {
-                position: absolute;
-                top: 50%;
-                margin-top: -4rem;
-                width: 100%;
-                height:6rem;
-            }
             .image .prev, .image .next {
+		position: relative;
+		top: 0;
+		padding-top: calc(100vh / 2 - 6rem / 2);
                 font-size: 6rem;
-                padding-left: 3rem !important;
-                padding-right: 3rem !important;
-                height: 6rem;
-                cursor: pointer;
+		width: 10vw;
+		height: 100%;
+		border-radius: 10px;
+		cursor:pointer;
+		transition: background-color .5s;
             }
-            section[class^=level] {
+	    .image .prev:hover, .image .next:hover {
+                background-color: rgba(55, 55, 55, 0.9);
+	    }
+            section[class^="idx"] {
                 display: none;
             }
             h2, section.level2 {
-                margin-left:5rem;
+                margin-left:2rem;
             }
             h3, section.level3 {
-                margin-left:10rem;
+                margin-left:4rem;
             }
             h4, section.level4 {
-                margin-left:10rem;
+                margin-left:6rem;
             }
-            h2, h3, h4 {
-                cursor: pointer;
+            h2.button, h3.button, h4.button {
+                display: block;
+                text-align: left;
             }
         </style>
     </head>
@@ -696,27 +721,27 @@ __DATA__
 % my $idx     = 0;
 % my $img_idx = 1;
 % for my $cat(['','',''], @$categories) {
-%    my $images  = $processed->map(sub($img) { $cat->[0] eq $img->[0] ? $img : (); });
+%    my $images  = $processed->map(sub {my $img = shift; $cat->[0] eq $img->[0] ? $img : (); });
 %    next unless @$images;
 %    my $level = $cat->[1] =~ m|(/)|g;
-%    $level += 2; $idx++;
+%    $level += 1; $idx++;
 % if($cat->[2]) {
-        <h<%= $level %> data-index="<%= $idx %>"><%= $cat->[2] %></h<%= $level %>>
+        <h<%= $level %> class="primary button" data-index="<%= $idx %>"><%= $cat->[2] %></h<%= $level %>>
 % }
 <section tabindex="<%= $idx %>" class="idx<%= $idx %> level<%= $level %>">
+<%= $app->t('p', $cat->[3]) if $cat->[3] %>
 %    while(my @row = splice @$images, 0, $cols) {
     <div class="row">
     %   for my $img(@row) { $img_idx++;
         <div class="col card"
             data-index="<%= $img_idx %>"
             title="<%= $img->[2] %>"
-            style="background-image :url('<%= path($cat->[1]||(), $img->[-1])%>')">
+            style="background-image :url('<%= path($img->[1])->dirname->child($img->[-1])%>')">
             <div class="image" id="<%= $img_idx %>"
-                style="background-image: url('<%= path($cat->[1]||(), $img->[-2]) %>')">
-                <div class="prev-next">
+                style="background-image: url('<%= path($img->[1])->dirname->child($img->[-2]) %>')">
                     <div data-index="<%= $img_idx %>" class="prev pull-left text-left text-light">⏴</div>
                     <div data-index="<%= $img_idx %>" class="next pull-right text-right text-light">⏵</div>
-                </div>
+		<h3 class="category text-right text-light"><%= $cat->[2] %></h3>
                 <div class="meta">
                     <h4><%= $img->[2] %></h4>
                     <p><%= $img->[3] %></p>
@@ -732,14 +757,14 @@ __DATA__
 <script>
 
 // Clicking on a category title shows/hides the category's <section> element.
-$('h2,h2,h3').click(function(e) {
+$('h1,h2,h3').click(function(e) {
     e.stopPropagation();
     let idx = $(e.target).data('index');
     $('section.idx' + idx).toggle('slow');
 })
 
 /*
-    Clicking on a thumbnail opens a full-sized image in a 100%x100% scren-sized
+    Clicking on a thumbnail opens a full-sized image in a 100%x100% screen-sized
     overlay box. Sets a more visible border on the thumbnail to remind the user
     where he/she was.
 */
@@ -754,7 +779,7 @@ $('section .card').click(function(e){
 
 /*
     Clicking anywhere on the full-sized image box toggles the visibility of the
-    box. Effecrively hiding it.
+    box. Effectively hiding it.
 */
 $('section .card .image').click(function(e) {
     e.stopPropagation();
@@ -763,9 +788,9 @@ $('section .card .image').click(function(e) {
 
 /*
     To be bound to the keydown event, the sections need to have the attribute
-    tabindex set in a meaningful sequence.
+    tabindex, set to a meaningful sequence.
     This event is handled for every <section>. It handles the right/left and
-    up/down keypresses. When the corresponding key is pressed the image box is
+    up/down keypresses. When the corresponding key is pressed, the image box is
     replaced with the respectively previous or next image.
 */
 $('section.obrazi,section[class^="level"]').keydown(function(e) {
@@ -798,11 +823,10 @@ $('section.obrazi,section[class^="level"]').keydown(function(e) {
     Pressing the right and left buttons in the image closes the image and opens the
     previous and next image.
 */
-
 $('.image .prev, .image .next').click(function(e) {
     e.stopPropagation();
     let self = $(e.target);
-    let img = self.parent().parent();
+    let img = self.parent();
     let id = img.attr('id');
     if(self.hasClass('next')) {
         id++;

@@ -1,5 +1,10 @@
 Revision history for Pod-Eventual
 
+0.094002  2021-07-03 13:16:26-04:00 America/New_York
+        - fix typo (thanks, BooK!)
+        - update author contact info
+        - document perl version policy
+
 0.094001  2013-11-05 22:09:53 America/New_York
           require Mixin-Linewise 0.102 to avoid busted 0.101
 

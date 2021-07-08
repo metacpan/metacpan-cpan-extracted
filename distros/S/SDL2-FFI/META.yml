@@ -1,0 +1,262 @@
+---
+abstract: 'FFI Wrapper for SDL (Simple DirectMedia Layer) Development Library'
+author:
+  - 'Sanko Robinson <sanko@cpan.org>'
+build_requires:
+  Test2::V0: '0'
+  Test::More: '0.98'
+configure_requires:
+  Devel::CheckBin: '0'
+  Module::Build::Tiny: '0.039'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.12, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: SDL2-FFI
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  SDL2::AssertData:
+    file: lib/SDL2/FFI.pm
+  SDL2::AudioCVT:
+    file: lib/SDL2/FFI.pm
+  SDL2::AudioDeviceEvent:
+    file: lib/SDL2/FFI.pm
+  SDL2::AudioDeviceID:
+    file: lib/SDL2/FFI.pm
+  SDL2::AudioSpec:
+    file: lib/SDL2/FFI.pm
+  SDL2::AudioStatus:
+    file: lib/SDL2/FFI.pm
+  SDL2::AudioStream:
+    file: lib/SDL2/FFI.pm
+  SDL2::Color:
+    file: lib/SDL2/FFI.pm
+  SDL2::CommonEvent:
+    file: lib/SDL2/FFI.pm
+  SDL2::Cond:
+    file: lib/SDL2/FFI.pm
+  SDL2::ControllerAxisEvent:
+    file: lib/SDL2/FFI.pm
+  SDL2::ControllerButtonEvent:
+    file: lib/SDL2/FFI.pm
+  SDL2::ControllerDeviceEvent:
+    file: lib/SDL2/FFI.pm
+  SDL2::ControllerTouchpadEvent:
+    file: lib/SDL2/FFI.pm
+  SDL2::Cursor:
+    file: lib/SDL2/FFI.pm
+  SDL2::DisplayEvent:
+    file: lib/SDL2/FFI.pm
+  SDL2::DisplayMode:
+    file: lib/SDL2/DisplayMode.pm
+  SDL2::DollarGestureEvent:
+    file: lib/SDL2/FFI.pm
+  SDL2::DropEvent:
+    file: lib/SDL2/FFI.pm
+  SDL2::Event:
+    file: lib/SDL2/FFI.pm
+  SDL2::FFI:
+    file: lib/SDL2/FFI.pm
+    version: '0.03'
+  SDL2::FPoint:
+    file: lib/SDL2/FPoint.pm
+  SDL2::FRect:
+    file: lib/SDL2/FRect.pm
+  SDL2::Finger:
+    file: lib/SDL2/FFI.pm
+  SDL2::GLContext:
+    file: lib/SDL2/FFI.pm
+  SDL2::GameControllerButtonBind:
+    file: lib/SDL2/FFI.pm
+  SDL2::GameCrontroller:
+    file: lib/SDL2/FFI.pm
+  SDL2::Haptic:
+    file: lib/SDL2/FFI.pm
+  SDL2::HapticCondition:
+    file: lib/SDL2/FFI.pm
+  SDL2::HapticConstant:
+    file: lib/SDL2/FFI.pm
+  SDL2::HapticCustom:
+    file: lib/SDL2/FFI.pm
+  SDL2::HapticDirection:
+    file: lib/SDL2/FFI.pm
+  SDL2::HapticEffect:
+    file: lib/SDL2/FFI.pm
+  SDL2::HapticLeftRight:
+    file: lib/SDL2/FFI.pm
+  SDL2::HapticPeriodic:
+    file: lib/SDL2/FFI.pm
+  SDL2::HapticRamp:
+    file: lib/SDL2/FFI.pm
+  SDL2::Image:
+    file: lib/SDL2/FFI.pm
+  SDL2::JoyAxisEvent:
+    file: lib/SDL2/FFI.pm
+  SDL2::JoyBallEvent:
+    file: lib/SDL2/FFI.pm
+  SDL2::JoyButtonEvent:
+    file: lib/SDL2/FFI.pm
+  SDL2::JoyDeviceEvent:
+    file: lib/SDL2/FFI.pm
+  SDL2::JoyHatEvent:
+    file: lib/SDL2/FFI.pm
+  SDL2::Joystick:
+    file: lib/SDL2/FFI.pm
+  SDL2::JoystickGUID:
+    file: lib/SDL2/FFI.pm
+  SDL2::JoystickID:
+    file: lib/SDL2/FFI.pm
+  SDL2::KeyboardEvent:
+    file: lib/SDL2/FFI.pm
+  SDL2::Keysym:
+    file: lib/SDL2/FFI.pm
+  SDL2::Locale:
+    file: lib/SDL2/FFI.pm
+  SDL2::MessageBoxButtonData:
+    file: lib/SDL2/FFI.pm
+  SDL2::MessageBoxColor:
+    file: lib/SDL2/FFI.pm
+  SDL2::MessageBoxColorScheme:
+    file: lib/SDL2/FFI.pm
+  SDL2::MessageBoxData:
+    file: lib/SDL2/FFI.pm
+  SDL2::Mixer:
+    file: lib/SDL2/FFI.pm
+  SDL2::Mixer::Chunk:
+    file: lib/SDL2/FFI.pm
+  SDL2::Mixer::Fading:
+    file: lib/SDL2/FFI.pm
+  SDL2::Mixer::Mix::Chunk:
+    file: lib/SDL2/FFI.pm
+  SDL2::Mixer::Mix::Fading:
+    file: lib/SDL2/FFI.pm
+  SDL2::Mixer::Mix::Music:
+    file: lib/SDL2/FFI.pm
+  SDL2::Mixer::Mix::MusicType:
+    file: lib/SDL2/FFI.pm
+  SDL2::Mixer::Music:
+    file: lib/SDL2/FFI.pm
+  SDL2::Mixer::MusicType:
+    file: lib/SDL2/FFI.pm
+  SDL2::MouseButtonEvent:
+    file: lib/SDL2/FFI.pm
+  SDL2::MouseMotionEvent:
+    file: lib/SDL2/FFI.pm
+  SDL2::MouseWheelEvent:
+    file: lib/SDL2/FFI.pm
+  SDL2::MultiGestureEvent:
+    file: lib/SDL2/FFI.pm
+  SDL2::Mutex:
+    file: lib/SDL2/FFI.pm
+  SDL2::Net:
+    file: lib/SDL2/FFI.pm
+  SDL2::OSEvent:
+    file: lib/SDL2/FFI.pm
+  SDL2::Palette:
+    file: lib/SDL2/FFI.pm
+  SDL2::PixelFormat:
+    file: lib/SDL2/FFI.pm
+  SDL2::Point:
+    file: lib/SDL2/Point.pm
+  SDL2::QuitEvent:
+    file: lib/SDL2/FFI.pm
+  SDL2::RTF:
+    file: lib/SDL2/FFI.pm
+  SDL2::RTF::Context:
+    file: lib/SDL2/FFI.pm
+  SDL2::RTF::FontEngine:
+    file: lib/SDL2/FFI.pm
+  SDL2::RWops:
+    file: lib/SDL2/FFI.pm
+  SDL2::Rect:
+    file: lib/SDL2/Rect.pm
+  SDL2::Renderer:
+    file: lib/SDL2/FFI.pm
+  SDL2::RendererInfo:
+    file: lib/SDL2/FFI.pm
+  SDL2::Sem:
+    file: lib/SDL2/FFI.pm
+  SDL2::Semaphore:
+    file: lib/SDL2/FFI.pm
+  SDL2::Sensor:
+    file: lib/SDL2/FFI.pm
+  SDL2::SensorEvent:
+    file: lib/SDL2/FFI.pm
+  SDL2::SensorID:
+    file: lib/SDL2/FFI.pm
+  SDL2::Surface:
+    file: lib/SDL2/Surface.pm
+  SDL2::SysWMEvent:
+    file: lib/SDL2/FFI.pm
+  SDL2::SysWMinfo:
+    file: lib/SDL2/FFI.pm
+  SDL2::SysWMmsg:
+    file: lib/SDL2/FFI.pm
+  SDL2::TTF:
+    file: lib/SDL2/FFI.pm
+  SDL2::TTF::Font:
+    file: lib/SDL2/FFI.pm
+  SDL2::TTF::Image:
+    file: lib/SDL2/FFI.pm
+  SDL2::TTF::PosBuf:
+    file: lib/SDL2/FFI.pm
+  SDL2::TextEditingEvent:
+    file: lib/SDL2/FFI.pm
+  SDL2::TextInputEvent:
+    file: lib/SDL2/FFI.pm
+  SDL2::Texture:
+    file: lib/SDL2/FFI.pm
+  SDL2::Thread:
+    file: lib/SDL2/FFI.pm
+  SDL2::TouchFingerEvent:
+    file: lib/SDL2/FFI.pm
+  SDL2::UserEvent:
+    file: lib/SDL2/FFI.pm
+  SDL2::Utils:
+    file: lib/SDL2/Utils.pm
+  SDL2::Window:
+    file: lib/SDL2/Window.pm
+  SDL2::WindowEvent:
+    file: lib/SDL2/FFI.pm
+  SDL2::WindowShapeMode:
+    file: lib/SDL2/FFI.pm
+  SDL2::WindowShapeParams:
+    file: lib/SDL2/FFI.pm
+  SDL2::assert_data:
+    file: lib/SDL2/FFI.pm
+  SDL2::atomic_t:
+    file: lib/SDL2/FFI.pm
+  SDL2::iconv_t:
+    file: lib/SDL2/FFI.pm
+  SDL2::version:
+    file: lib/SDL2/version.pm
+    version: '0.01'
+requires:
+  Alien::libsdl2: '1.02'
+  Data::Dump: '0'
+  Exporter::Tiny: '0'
+  FFI::C: '0'
+  FFI::Platypus: '1.46'
+  File::ShareDir: '0'
+  File::Spec::Functions: '0'
+  perl: '5.02000'
+  strictures: '2'
+resources:
+  bugtracker: https://github.com/sanko/SDL2.pm/issues
+  homepage: https://github.com/sanko/SDL2.pm
+  repository: git://github.com/sanko/SDL2.pm.git
+version: '0.03'
+x_authority: cpan:SANKO
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

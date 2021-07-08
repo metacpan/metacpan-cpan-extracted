@@ -152,6 +152,8 @@ Date - extremely fast Date framework with timezones, microseconds, relative date
         $d += "1X"; # throws
     }
 
+    # like strptime(3)
+    $date4 = Date::strptime('2019-02-03 04:05:06 Europe/Moscow', '%Y-%m-%d %H:%M:%S %Z');
 
 
 =head1 DESCRIPTION
@@ -882,7 +884,9 @@ Like C<timelocal()> but runs calculations in timezone C<$timezone> instead of lo
 
 =head4 timeanyn($sec, $min, $hour, $day, $mon, $year, [$isdst], [$timezone])
 
+=head4 strptime($string, $format)
 
+Parses date in C<$string> by the pattern defined in C<$format>. Works similar to strptime(3).
 
 =head1 CONSTANTS
 

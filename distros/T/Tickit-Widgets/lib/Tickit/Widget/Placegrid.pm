@@ -1,12 +1,12 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2013 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2013-2021 -- leonerd@leonerd.org.uk
 #  Original render code by Tom Molesworth
 
-use Object::Pad 0.27;
+use Object::Pad 0.41;  # :param
 
-package Tickit::Widget::Placegrid 0.31;
+package Tickit::Widget::Placegrid 0.32;
 class Tickit::Widget::Placegrid
    extends Tickit::Widget;
 
@@ -69,14 +69,7 @@ dimensions in the centre of the grid.
 
 =cut
 
-has $_title;
-
-BUILD
-{
-   my %params = @_;
-
-   $_title = $params{title};
-}
+has $_title :param = undef;
 
 method lines { 1 }
 method cols  { 1 }

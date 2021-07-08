@@ -1,3 +1,6 @@
+1.4.3  xx.xx.2021
+           - callback dispatcher: support already weakened closured in add_weak()
+           - fix compiler warnings
 1.4.2  23.05.2021
            - add SVAPI for simple and advanced determining of sub call context
 1.4.1  15.05.2021

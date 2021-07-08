@@ -1,5 +1,8 @@
 Revision history for Pod-POM-Web
 
+1.27 02.07.2021
+  - fix various failures reported by cpantesters
+
 1.26 01.07.2021
   - fix directories where to find basic Perl docs
 

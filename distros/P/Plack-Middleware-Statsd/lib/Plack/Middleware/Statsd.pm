@@ -22,7 +22,7 @@ use Ref::Util qw/ is_coderef /;
 use Time::HiRes;
 use Try::Tiny;
 
-our $VERSION = 'v0.5.0';
+our $VERSION = 'v0.5.1';
 
 # Note: You may be able to omit the client if there is a client
 # defined in the environment hash at C<psgix.monitor.statsd>, and the
@@ -212,7 +212,7 @@ Plack::Middleware::Statsd - send statistics to statsd
 
 =head1 VERSION
 
-version v0.5.0
+version v0.5.1
 
 =head1 SYNOPSIS
 
@@ -354,6 +354,8 @@ and returns a valid response, for example.
 
 This is disable by default, which means that no metrics will be logged
 if there is a fatal error.
+
+Added in v0.5.0.
 
 =head1 METRICS
 

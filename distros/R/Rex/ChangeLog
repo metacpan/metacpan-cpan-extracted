@@ -1,5 +1,26 @@
 Revision history for Rex
 
+1.13.4 2021-07-05 Ferenc Erki <erkiferenc@gmail.com>
+ [DOCUMENTATION]
+ - Add section about Rex core vs extending Rex
+ - Add common scenarios to contributing guide
+ - Clarify documentation of run command
+ - Clarify documentation of can_run command
+ - Fix Rex::Task synopsis
+ - Clarify documentation of rex script
+
+1.13.3.2-TRIAL 2021-07-03 Ferenc Erki <erkiferenc@gmail.com>
+ [BUG FIXES]
+ - Fix local file copy on Windows
+
+1.13.3.1-TRIAL 2021-07-02 Ferenc Erki <erkiferenc@gmail.com>
+ [BUG FIXES]
+ - Remove unused tasks array
+ - Fix file hooks when source option is used
+
+ [DOCUMENTATION]
+ - Update support channels
+
 1.13.3 2021-03-05 Ferenc Erki <erkiferenc@gmail.com>
  [BUG FIXES]
  - Fix parsing debconf values containing colons

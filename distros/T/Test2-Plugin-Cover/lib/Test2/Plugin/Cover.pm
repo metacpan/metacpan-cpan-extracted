@@ -9,7 +9,7 @@ use File::Spec();
 
 my $SEP = File::Spec->catfile('', '');
 
-our $VERSION = '0.000022';
+our $VERSION = '0.000023';
 
 # Directly modifying this is a bad idea, but for the XS to work it needs to be
 # a package var, not a lexical.
@@ -212,10 +212,6 @@ sub report {
         },
 
         info => [{tag => 'COVERAGE', details => $details, debug => $params{verbose}}],
-
-        harness_job_fields => [
-            {name => "files_covered", details => $details, data => $data},
-        ],
     );
     $ctx->release unless $params{ctx};
 

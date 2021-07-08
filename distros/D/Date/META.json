@@ -4,7 +4,7 @@
       "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.60, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
@@ -27,19 +27,19 @@
          "requires" : {
             "Export::XS" : "v3.0.5",
             "Test::Catch" : "v1.0.16",
-            "XS::Framework" : "v1.4.2",
+            "XS::Framework" : "v1.4.3",
             "XS::Install" : "v1.3.3",
             "XS::libcatch" : "v2.13.4.2",
-            "XS::libpanda" : "v1.5.2",
+            "XS::libpanda" : "v1.5.3",
             "next::XS" : "v1.0.7"
          }
       },
       "runtime" : {
          "requires" : {
             "Export::XS" : "v3.0.5",
-            "XS::Framework" : "v1.4.2",
+            "XS::Framework" : "v1.4.3",
             "XS::Install" : "v1.3.3",
-            "XS::libpanda" : "v1.5.2",
+            "XS::libpanda" : "v1.5.3",
             "next::XS" : "v1.0.7"
          }
       },
@@ -51,14 +51,14 @@
             "Test::Exception" : "0",
             "Test::More" : "0",
             "Test::Simple" : "0.96",
-            "XS::Framework" : "v1.4.2",
+            "XS::Framework" : "v1.4.3",
             "XS::libcatch" : "v2.13.4.2",
-            "XS::libpanda" : "v1.5.2",
+            "XS::libpanda" : "v1.5.3",
             "next::XS" : "v1.0.7"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "v5.2.6",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "v5.2.7",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

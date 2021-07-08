@@ -6,7 +6,7 @@
 use v5.26;
 use Object::Pad 0.35;
 
-package Device::Chip::Adapter 0.18;
+package Device::Chip::Adapter 0.19;
 role Device::Chip::Adapter :repr(HASH) :compat(invokable);
 
 use utf8;

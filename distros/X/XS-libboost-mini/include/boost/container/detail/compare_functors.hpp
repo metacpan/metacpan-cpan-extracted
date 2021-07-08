@@ -20,14 +20,15 @@
 #endif
 
 #include <boost/intrusive/detail/ebo_functor_holder.hpp>
+#include <boost/container/detail/workaround.hpp>
 
 namespace boost {
 namespace container {
 
-template<class Allocator>
+template<class ValueType>
 class equal_to_value
 {
-   typedef typename Allocator::value_type value_type;
+   typedef ValueType value_type;
    const value_type &t_;
 
    public:

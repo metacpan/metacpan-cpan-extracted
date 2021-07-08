@@ -11,7 +11,7 @@ use strict;
 use warnings;
 use Symbol;
 
-our $VERSION = '1.13.3'; # VERSION
+our $VERSION = '1.13.4'; # VERSION
 
 use Data::Dumper;
 

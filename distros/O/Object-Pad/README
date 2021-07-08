@@ -27,11 +27,11 @@ DESCRIPTION
     This module provides a simple syntax for creating object classes, which
     uses private variables that look like lexicals as object member fields.
 
-    WARNING This module is still very experimental. The parts that
-    currently exist do seem to work reliably but much of the design is
-    still evolving, and many features and have yet to be implemented. I
-    don't yet guarantee I won't have to change existing details in order to
-    continue its development. Feel free to try it out in experimental or
+    WARNING This module is still experimental. The parts that currently
+    exist do seem to work reliably but much of the design is still
+    evolving, and many features and have yet to be implemented. I don't yet
+    guarantee I won't have to change existing details in order to continue
+    its development. Feel free to try it out in experimental or
     newly-developed code, but don't complain if a later version is
     incompatible with your current code and you'll have to change it.
 
@@ -44,13 +44,12 @@ DESCRIPTION
  Automatic Construction
 
     Classes are automatically provided with a constructor method, called
-    new, which helps create the object instances.
+    new, which helps create the object instances. This may respond to
+    passed arguments, automatically assigning values of slots, and invoking
+    other blocks of code provided by the class. It proceeds in the
+    following stages:
 
-    As part of the construction process, the BUILD block of every component
-    class will be invoked, passing in the list of arguments the constructor
-    was invoked with. Each class should perform its required setup
-    behaviour, but does not need to chain to the SUPER class first; this is
-    handled automatically.
+  BUILDARGS
 
     If the class provides a BUILDARGS class method, that is used to mangle
     the list of arguments before the BUILD blocks are called. Note this
@@ -58,6 +57,8 @@ DESCRIPTION
     sub). It should perform any SUPER chaining as may be required.
 
        @args = $class->BUILDARGS( @_ )
+
+  Slot assignment
 
     If any slot in the class has the :param attribute, then the constructor
     will expect to receive its argmuents in an even-sized list of
@@ -69,6 +70,21 @@ DESCRIPTION
     The constructor will also check for required parameters (these are all
     the parameters for slots that do not have default initialisation
     expressions). If any of these are missing an exception is thrown.
+
+  BUILD
+
+    As part of the construction process, the BUILD block of every component
+    class will be invoked, passing in the list of arguments the constructor
+    was invoked with. Each class should perform its required setup
+    behaviour, but does not need to chain to the SUPER class first; this is
+    handled automatically.
+
+  ADJUST
+
+    Finally, before the new object is returned from the constructor, the
+    ADJUST block of every component class is invoked. This happens after
+    the slots are assigned their initial values and the BUILD blocks have
+    been run.
 
 KEYWORDS
 
@@ -196,6 +212,26 @@ KEYWORDS
     common forms of hash reference to be inspected by Data::Dumper, etc.
     This is the default representation type, and does not have to be
     specifically requested.
+
+  :strict(params)
+
+    Since version 0.43.
+
+    Can only be applied to classes that contain no BUILD blocks. If set,
+    then the constructor will complain about any unrecognised named
+    arguments passed to it (i.e. names that do not correspond to the :param
+    of any defined slot).
+
+    Since BUILD blocks can inspect the arguments arbitrarily, the presence
+    of any such block means the constructor cannot determine which named
+    arguments are not recognised.
+
+    This attribute is a temporary stepping-stone for compatibility with
+    existing code. It is recommended to enable this whenever possible, as a
+    later version of this module will likely perform this behaviour
+    unconditionally whenever no BUILD blocks are present. How to handle
+    other named arguments that are not simply assigned to slots remains an
+    unanswered design question.
 
  role
 
@@ -376,6 +412,9 @@ KEYWORDS
        has $x :param;          # this is required
        has $z :param = undef;  # this is optional
 
+    Values for slots are assigned by the constructor before any BUILD
+    blocks are invoked.
+
  method
 
        method NAME {
@@ -455,6 +494,24 @@ KEYWORDS
     Note that a BUILD block is a named phaser block and not a method.
     Attempts to create a method named BUILD (i.e. with syntax method BUILD
     {...}) will fail with a compiletime error, to avoid this confusion.
+
+ ADJUST
+
+       ADJUST {
+          ...
+       }
+
+    Since version 0.43.
+
+    Declares an adjust block for this component class. This block of code
+    runs within the constructor, after any BUILD blocks and automatic slot
+    value assignment. It can make any final adjustments to the instance
+    (such as initialising slots from calculated values). No additional
+    parameters are passed.
+
+    An adjust block is not a subroutine and thus is not permitted to use
+    subroutine attributes. Note that an ADJUST block is a named phaser
+    block and not a method; it does not use the sub or method keyword.
 
  requires
 
@@ -722,6 +779,16 @@ FEEDBACK
       https://rt.cpan.org/Dist/Display.html?Name=Object-Pad.
 
       * The #cor IRC channel on irc.perl.org.
+
+SPONSORS
+
+    With thanks to the following sponsors, who have helped me be able to
+    spend time working on this module and other perl features.
+
+      * Oetiker+Partner AG https://www.oetiker.ch/en/
+
+    Additional details may be found at
+    https://github.com/Ovid/Cor/wiki/Sponsors.
 
 AUTHOR
 

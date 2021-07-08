@@ -1,6 +1,6 @@
 package Lab::Moose::Instrument::SCPI::Sense::Sweep;
 #ABSTRACT: Role for the SCPI SENSe:SWEep subsystem
-$Lab::Moose::Instrument::SCPI::Sense::Sweep::VERSION = '3.760';
+$Lab::Moose::Instrument::SCPI::Sense::Sweep::VERSION = '3.762';
 use v5.20;
 
 use Moose::Role;
@@ -75,7 +75,7 @@ Lab::Moose::Instrument::SCPI::Sense::Sweep - Role for the SCPI SENSe:SWEep subsy
 
 =head1 VERSION
 
-version 3.760
+version 3.762
 
 =head1 METHODS
 
@@ -102,9 +102,9 @@ Query/Set the sweep time in which the spectrum analyzer sweeps the required freq
 This software is copyright (c) 2021 by the Lab::Measurement team; in detail:
 
   Copyright 2016       Simon Reinhardt
-            2017       Andreas K. HÃ¼ttel, Simon Reinhardt
+            2017       Andreas K. Huettel, Simon Reinhardt
             2018       Eugeniy E. Mikhailov
-            2020       Andreas K. HÃ¼ttel
+            2020       Andreas K. Huettel
 
 
 This is free software; you can redistribute it and/or modify it under

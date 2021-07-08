@@ -1,0 +1,55 @@
+{
+   "abstract" : "perform exit processing for a program or object",
+   "author" : [
+      "Brad Appleton <brad@bradapp.net>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_1"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "AtExit",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : "0",
+            "perl" : "5.002",
+            "strict" : "0",
+            "vars" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Capture::Tiny" : "0",
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/cpan-janitor/AtExit/issues"
+      },
+      "homepage" : "https://github.com/cpan-janitor/AtExit",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/cpan-janitor/AtExit.git",
+         "web" : "https://github.com/cpan-janitor/AtExit"
+      }
+   },
+   "version" : "2.05",
+   "x_generated_by_perl" : "v5.28.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.24",
+   "x_spdx_expression" : "Artistic-1.0"
+}
+

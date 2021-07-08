@@ -1,5 +1,18 @@
 Revision history for Tickit-Widgets
 
+0.32    2021-07-03
+        [CHANGES]
+         * Use Object::Pad to implement even the base Tickit::Widget class
+         * Updates for Object::Pad 0.43:
+            + Use :param on slots where possible
+            + Use ADJUST blocks instead of BUILD blocks where possible
+         * No longer support construction-time `child`-like arguments
+         * Removed no longer needed Tickit::OneLineWidget
+
+        [BUGFIXES]
+         * Make sure that window `expose` event handler always returns an
+           integer, thus avoiding "... isn't numeric" warnings in unit tests
+
 0.31    2020-11-02
         [CHANGES]
          * Use Object::Pad to implement the individual Tickit::Widget::*

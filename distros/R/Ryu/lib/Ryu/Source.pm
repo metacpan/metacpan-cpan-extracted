@@ -5,7 +5,7 @@ use warnings;
 
 use parent qw(Ryu::Node);
 
-our $VERSION = '3.001'; # VERSION
+our $VERSION = '3.002'; # VERSION
 our $AUTHORITY = 'cpan:TEAM'; # AUTHORITY
 
 =head1 NAME
@@ -539,6 +539,8 @@ This also means you can "merge" items from a series of sources.
 Note that this is not recursive - an arrayref of arrayrefs will be expanded out
 into the child arrayrefs, but no further.
 
+Failure on any input source will cause this source to be marked as failed as well.
+
 =cut
 
 sub flat_map {
@@ -554,17 +556,27 @@ sub flat_map {
     my $src = $self->chained(label => (caller 0)[3] =~ /::([^:]+)$/);
 
     Scalar::Util::weaken(my $weak_sauce = $src);
-    my $add = sub  {
+    my $add = sub {
         my $v = shift;
         my $src = $weak_sauce or return;
 
         my $k = "$v";
-        $log->tracef("Adding %s which will bring our count to %d", $k, 0 + keys %{$src->{waiting}});
         $src->{waiting}{$k} = $v->on_ready(sub {
+            my ($f) = @_;
             return unless my $src = $weak_sauce;
+
+            # Any failed input source should propagate failure immediately
+            if($f->is_failed) {
+                # Clear out our waitlist, since we don't want to hold those references any more
+                delete $src->{waiting};
+                $src->fail($f->failure) unless $src->is_ready;
+                return;
+            }
+
             delete $src->{waiting}{$k};
             $src->finish unless %{$src->{waiting}};
-        })
+        });
+        $log->tracef("Added %s which will bring our count to %d", $k, 0 + keys %{$src->{waiting}});
     };
 
     $add->($self->_completed);

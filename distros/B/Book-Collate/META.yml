@@ -1,0 +1,35 @@
+---
+abstract: 'Tools to Collate and Report Text Documents'
+author:
+  - 'Leam Hall <leamhall@gmail.com>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0.4004'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Book-Collate
+provides:
+  Book::Collate:
+    file: lib/Book/Collate.pm
+    version: v0.0.1
+  Book::Collate::Book:
+    file: lib/Book/Collate/Book.pm
+    version: v0.0.1
+  Book::Collate::Report:
+    file: lib/Book/Collate/Report.pm
+    version: v0.0.1
+  Book::Collate::Section:
+    file: lib/Book/Collate/Section.pm
+    version: v0.0.1
+  Book::Collate::Writer::Report:
+    file: lib/Book/Collate/Writer/Report.pm
+    version: v0.0.1
+resources:
+  license: http://www.perlfoundation.org/artistic_license_2_0
+version: v0.0.1
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,20 +1,8 @@
 package Google::RestApi::SheetsApi4::Range::Iterator;
 
-use strict;
-use warnings;
+our $VERSION = '0.7';
 
-our $VERSION = '0.4';
-
-use 5.010_000;
-
-use autodie;
-use Type::Params qw(compile_named);
-use Types::Standard qw(StrMatch Int HasMethods);
-use YAML::Any qw(Dump);
-
-no autovivification;
-
-do 'Google/RestApi/logger_init.pl';
+use Google::RestApi::Setup;
 
 sub new {
   my $class = shift;

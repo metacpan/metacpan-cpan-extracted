@@ -16,6 +16,7 @@
 
     <pingtimeout>600</pingtimeout>
     <interclackspingtimeout>10</interclackspingtimeout>
+    <persistancefile>clackspersistance.dat</persistancefile>
     <ssl>
         <cert>exampleserver.crt</cert>
         <key>exampleserver.key</key>
@@ -23,7 +24,7 @@
     <username>exampleuser</username>
     <password>unsafepassword</password>
     <throttle>
-        <maxsleep>500</maxsleep>
+        <maxsleep>100</maxsleep>
         <step>5</step>
     </throttle>
     <hosts>

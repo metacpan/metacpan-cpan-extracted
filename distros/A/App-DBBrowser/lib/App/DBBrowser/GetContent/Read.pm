@@ -209,7 +209,7 @@ sub from_file {
             $sf->{i}{gc}{files_fs_in_chosen_dir} = \@files_fs;
         }
         my @files = map { '  ' . decode( 'locale_fs', basename $_ ) } @{$sf->{i}{gc}{files_fs_in_chosen_dir}};
-        $sf->{i}{gc}{old_file_idx} //= 1;
+        $sf->{i}{gc}{old_idx_file} //= 1;
 
         FILE: while ( 1 ) {
             my $hidden = 'Choose File:';
@@ -218,7 +218,7 @@ sub from_file {
             # Choose
             my $idx = $tc->choose(
                 $menu,
-                { %{$sf->{i}{lyt_v}}, prompt => '', index => 1, default => $sf->{i}{gc}{old_file_idx},
+                { %{$sf->{i}{lyt_v}}, prompt => '', index => 1, default => $sf->{i}{gc}{old_idx_file},
                   undef => '  <=' }
             );
             if ( ! defined $idx || ! defined $menu->[$idx] ) {
@@ -229,11 +229,11 @@ sub from_file {
                 next DIR;
             }
             if ( $sf->{o}{G}{menu_memory} ) {
-                if ( $sf->{i}{gc}{old_file_idx} == $idx && ! $ENV{TC_RESET_AUTO_UP} ) {
-                    $sf->{i}{gc}{old_file_idx} = 1;
+                if ( $sf->{i}{gc}{old_idx_file} == $idx && ! $ENV{TC_RESET_AUTO_UP} ) {
+                    $sf->{i}{gc}{old_idx_file} = 1;
                     next FILE;
                 }
-                $sf->{i}{gc}{old_file_idx} = $idx;
+                $sf->{i}{gc}{old_idx_file} = $idx;
             }
             if ( $menu->[$idx] eq $hidden ) {
                 require App::DBBrowser::Opt::Set;
@@ -273,7 +273,7 @@ sub __directory {
             return realpath encode 'locale_fs', $h_ref->{dirs}[0];
         }
     }
-    $sf->{i}{gc}{old_dir_idx} //= 0;
+    $sf->{i}{gc}{old_idx_dir} //= 0;
 
     DIR: while ( 1 ) {
         my $h_ref = $ax->read_json( $sf->{i}{f_dir_history} ) // {};
@@ -285,18 +285,18 @@ sub __directory {
         # Choose
         my $idx = $tc->choose(
             $menu,
-            { %{$sf->{i}{lyt_v}}, prompt => $prompt, index => 1, default => $sf->{i}{gc}{old_dir_idx},
+            { %{$sf->{i}{lyt_v}}, prompt => $prompt, index => 1, default => $sf->{i}{gc}{old_idx_dir},
               undef => '  <=' }
         );
         if ( ! defined $idx || ! defined $menu->[$idx] ) {
             return;
         }
         if ( $sf->{o}{G}{menu_memory} ) {
-            if ( $sf->{i}{gc}{old_dir_idx} == $idx && ! $ENV{TC_RESET_AUTO_UP} ) {
-                $sf->{i}{gc}{old_dir_idx} = 0;
+            if ( $sf->{i}{gc}{old_idx_dir} == $idx && ! $ENV{TC_RESET_AUTO_UP} ) {
+                $sf->{i}{gc}{old_idx_dir} = 0;
                 next DIR;
             }
-            $sf->{i}{gc}{old_dir_idx} = $idx;
+            $sf->{i}{gc}{old_idx_dir} = $idx;
         }
         my $dir_fs;
         if ( $menu->[$idx] eq $new_search ) {

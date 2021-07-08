@@ -4,7 +4,7 @@
       "Rene Schickbauer <cavac@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.46, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
@@ -36,6 +36,7 @@
             "Carp" : "0",
             "English" : "0",
             "Errno" : "0",
+            "File::Copy" : "0",
             "IO::Select" : "0",
             "IO::Socket::IP" : "0",
             "IO::Socket::SSL" : "0",
@@ -48,6 +49,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : 17,
-   "x_serialization_backend" : "JSON::PP version 4.05"
+   "version" : 18,
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

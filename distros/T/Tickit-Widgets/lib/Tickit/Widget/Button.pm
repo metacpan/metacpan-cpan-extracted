@@ -1,11 +1,11 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2012-2020 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2012-2021 -- leonerd@leonerd.org.uk
 
-use Object::Pad 0.27;
+use Object::Pad 0.41;  # :param
 
-package Tickit::Widget::Button 0.31;
+package Tickit::Widget::Button 0.32;
 class Tickit::Widget::Button
    extends Tickit::Widget;
 
@@ -133,15 +133,15 @@ Optional. Callback function to invoke when the button is clicked.
 
 =cut
 
-has $_label;
-has $_on_click;
+has $_label    :reader         :param = undef;
+has $_on_click :reader :writer :param = undef;
+
+has $_active;
+has $_dragging_on_self;
 
 BUILD
 {
    my %params = @_;
-
-   $_label = $params{label} if defined $params{label};
-   $_on_click = $params{on_click} if $params{on_click};
 
    $self->set_align ( $params{align}  // 0.5 );
    $self->set_valign( $params{valign} // 0.5 );
@@ -168,7 +168,7 @@ method cols
 
 =cut
 
-method label { $_label }
+# generated accessor
 
 =head2 set_label
 
@@ -190,7 +190,7 @@ method set_label
 
 =cut
 
-method on_click { $_on_click }
+# generated accessor
 
 =head2 set_on_click
 
@@ -202,10 +202,7 @@ Return or set the CODE reference to be called when the button area is clicked.
 
 =cut
 
-method set_on_click
-{
-   ( $_on_click ) = @_;
-}
+# generated accessor
 
 =head2 click
 
@@ -237,7 +234,7 @@ method key_click
 method _activate
 {
    my ( $active ) = @_;
-   $self->{active} = $active;
+   $_active = $active;
    $self->set_style_tag( active => $active );
 }
 
@@ -265,6 +262,10 @@ the button area. See also L<Tickit::WidgetRole::Alignable>.
 use Tickit::WidgetRole::Alignable name => "align",  style => "h";
 use Tickit::WidgetRole::Alignable name => "valign", style => "v";
 
+has $_label_line;
+has $_label_col;
+has $_label_end;
+
 method reshape
 {
    my $win = $self->window or return;
@@ -278,11 +279,11 @@ method reshape
    my ( $lines_before, undef, $lines_after ) = $self->_valign_allocation( 1, $lines - (2 * $has_border) );
    my ( $cols_before, undef, $cols_after ) = $self->_align_allocation( $width + 2, $cols - 2 );
 
-   $self->{label_line} = $lines_before + $has_border;
-   $self->{label_col}  = $cols_before + 2;
-   $self->{label_end}  = $cols_before + $width + 2;
+   $_label_line = $lines_before + $has_border;
+   $_label_col  = $cols_before + 2;
+   $_label_end  = $cols_before + $width + 2;
 
-   $win->cursor_at( $self->{label_line}, $self->{label_col} );
+   $win->cursor_at( $_label_line, $_label_col );
 }
 
 method render_to_rb
@@ -315,14 +316,14 @@ method render_to_rb
       foreach my $line ( $rect->linerange( 0, $lines-1 ) ) {
          $rb->erase_at( $line, 0, $cols );
       }
-      $rb->text_at( $self->{label_line}, 0,       "[" );
-      $rb->text_at( $self->{label_line}, $cols-1, "]" );
+      $rb->text_at( $_label_line, 0,       "[" );
+      $rb->text_at( $_label_line, $cols-1, "]" );
    }
 
-   $rb->text_at( $self->{label_line}, $self->{label_col} - 2, $marker_left );
-   $rb->text_at( $self->{label_line}, $self->{label_end}, $marker_right );
+   $rb->text_at( $_label_line, $_label_col - 2, $marker_left );
+   $rb->text_at( $_label_line, $_label_end, $marker_right );
 
-   $rb->text_at( $self->{label_line}, $self->{label_col}, $self->label );
+   $rb->text_at( $_label_line, $_label_col, $self->label );
 }
 
 method on_mouse
@@ -338,20 +339,20 @@ method on_mouse
       $self->_activate( 1 );
    }
    elsif( $type eq "drag_start" ) {
-      $self->{dragging_on_self} = 1;
+      $_dragging_on_self = 1;
    }
    elsif( $type eq "drag_stop" ) {
-      $self->{dragging_on_self} = 0;
+      $_dragging_on_self = 0;
    }
    elsif( $type eq "drag" ) {
       # TODO: This could be neater with an $arg->srcwin
-      $self->_activate( 1 ) if $self->{dragging_on_self} and !$self->{active};
+      $self->_activate( 1 ) if $_dragging_on_self and !$_active;
    }
    elsif( $type eq "drag_outside" ) {
-      $self->_activate( 0 ) if $self->{active};
+      $self->_activate( 0 ) if $_active;
    }
    elsif( $type eq "release" ) {
-      if( $self->{active} ) {
+      if( $_active ) {
          $self->_activate( 0 );
          $self->click;
       }

@@ -1,3 +1,9 @@
+0.002   2021-02-22  Released-By: PERLANCAR; Urgency: medium
+
+	- Add module: Acme::PERLANCAR::Dummy::ModuleFeatures::User1 for
+	  testing Module::Features & Module::Features::Dummy.
+
+
 0.001   2021-02-21  Released-By: PERLANCAR
 
         - First release.

@@ -31,11 +31,14 @@ Two strings: private-key and public-key
 
 =cut
 sub gen_keypair() {
-    my (@out_priv, undef) = run_external('wg genkey');
-    my (@out_pub, undef) = run_external('wg pubkey', $out_priv[0]);
-    chomp @out_priv;
-    chomp @out_pub;
-    return $out_priv[0], $out_pub[0];
+    unless (defined $ENV{WGmeta_NO_WG}){
+        my (@out_priv, undef) = run_external('wg genkey');
+        my (@out_pub, undef) = run_external('wg pubkey', $out_priv[0]);
+        chomp @out_priv;
+        chomp @out_pub;
+        return $out_priv[0], $out_pub[0];
+    }
+    return 'dummy_private_key', 'dummy_public_key';
 }
 =head2 get_pub_key($priv_key)
 
@@ -57,9 +60,13 @@ A string containing the derived publickey.
 
 =cut
 sub get_pub_key($priv_key){
-    my (@out, undef) = run_external('wg pubkey', $priv_key);
-    chomp @out;
-    return $out[0];
+    unless (defined $ENV{WGmeta_NO_WG}){
+        my (@out, undef) = run_external('wg pubkey', $priv_key);
+        chomp @out;
+        return $out[0];
+    }
+    return 'dummy_pubkey_from_privkey';
+
 }
 
 =head2 get_wg_show()
@@ -76,10 +83,14 @@ First array of STD_OUT
 
 =cut
 sub get_wg_show() {
-    my $cmd = 'wg show all dump';
-    my (@out, undef) = run_external($cmd);
-    chomp @out;
-    return @out;
+    unless (defined $ENV{WGmeta_NO_WG}){
+        my $cmd = 'wg show all dump';
+        my (@out, undef) = run_external($cmd);
+        chomp @out;
+        return @out;
+    }
+
+
 }
 
 =head2 run_external($command_line [, $input, $soft_fail])

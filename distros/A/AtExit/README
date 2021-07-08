@@ -1,27 +1,33 @@
+AtExit - a Perl module for exit processing
 
-    AtExit Perl 5 module
+This is "AtExit", a Perl module which exports a function name "atexit()"
+to perform ANSI-C style exit processing for Perl5 programs; and a class
+named "AtExit" to register clean-up functions for any variable-scope in
+which the AtExit object is defined.
 
- WHAT IS THIS?
- =============
- This is "AtExit", a Perl5 module which exports a function name "atexit()"
- to perform ANSI-C style exit processing for Perl5 programs; and a class
- named "AtExit" to register clean-up functions for any variable-scope in
- which the AtExit object is defined.
+You can read a nicely formatted version of the documentation for
+this module online:
+
+    https://metacpan.org/pod/AtExit
 
 
- AUTHORS/CONTRIBUTORS
- ====================
- Andrew Langmead <aml@world.std.com> (initial draft).
+You should be able to install this using your usual method for installing
+modules from CPAN. If you don't have a usual method, have a look at:
 
- Brad Appleton <bradapp@enteract.com> (Version 1.02 and 2.00).
+    http://www.cpan.org/modules/INSTALL.html
 
- Michael A. Chase <mchase@ix.netcom.com> (Version 2.00).
 
- Currently being maintained by Neil Bowers <neilb@cpan.org>.
+This software is copyright (C) 1996 Andrew Langmead. All rights reserved.
 
- COPY/REUSE POLICY
- =================
- Copyright (C) 1996 Andrew Langmead. All rights reserved.
+
+AUTHORS/CONTRIBUTORS
+  - Andrew Langmead <aml@world.std.com> (initial draft).
+  - Brad Appleton <bradapp@enteract.com> (Version 1.02 and 2.00).
+  - Michael A. Chase <mchase@ix.netcom.com> (Version 2.00).
+  - Currently maintained Neil Bowers <neilb@cpan.org>.
+
+
+COPY/REUSE POLICY
 
  AtExit is free software; you can redistribute it and/or modify it
  under the terms of the Artistic License distributed with Perl version
@@ -44,8 +50,8 @@
       http://www.perl.com/CPAN/src/latest.tar.gz
 
 
- DISCLAIMER
- ===========
+DISCLAIMER
+
  This software is distributed in the hope that it will be useful, but
  is provided "AS IS" WITHOUT WARRANTY OF ANY KIND, either expressed or
  implied, INCLUDING, without limitation, the implied warranties of

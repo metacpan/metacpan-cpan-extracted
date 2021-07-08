@@ -40,3 +40,21 @@ TEST("some border cases") {
         REQUIRE(date.year == 2147483647);
     }
 }
+
+TEST("tzget_abbr") {
+    SECTION("MSK") {
+        auto tz = tzget_abbr("MSK");
+        CHECK(tz->name == "<+03:00>-03:00");
+        CHECK(tz->future.outer.gmt_offset == 3 * 3600);
+    }
+    SECTION("EEST") {
+        auto tz = tzget_abbr("EEST");
+        CHECK(tz->name == "<+02:00>-02:00");
+        CHECK(tz->future.outer.gmt_offset == 2 * 3600);
+    }
+    SECTION("non-existing tz") {
+        auto tz = tzget_abbr("zzzzz");
+        CHECK(tz->name == "GMT0");
+        CHECK(tz->future.outer.offset >= 0);
+    }
+}

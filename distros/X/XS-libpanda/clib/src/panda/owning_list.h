@@ -182,6 +182,12 @@ struct owning_list {
         return *this;
     }
 
+    owning_list& operator= (const owning_list& oth) {
+        clear();
+        for (auto node = oth.first.get(); node; node = node->next.get()) push_back(node->value);
+        return *this;
+    }
+
 private:
     size_t _size = 0;
     node_sp first;

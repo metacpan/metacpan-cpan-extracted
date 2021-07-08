@@ -3,7 +3,7 @@ package Test::Dirs;
 use warnings;
 use strict;
 
-our $VERSION = '0.05';
+our $VERSION = '0.07';
 
 use base 'Exporter';
 our @EXPORT = qw(
@@ -48,6 +48,9 @@ sub is_dir {
 	my $ignore_ref = shift || [];
 	my $verbose = shift;
 
+	$verbose = $ENV{TEST_VERBOSE}
+		unless defined($verbose);
+
 	if ( $ENV{FIXIT} ) {
 		dircopy( $dir1, $dir2 )
 			or die 'failed to copy '
@@ -56,6 +59,13 @@ sub is_dir {
 			. $dir2 . ' '
 			. $!;
 		$test->ok( 1, 'FIXIT: ' . $message );
+		return;
+	}
+
+	my $have_two_folders = -d $dir1 && -d $dir2;
+	unless ($have_two_folders) {
+		$test->ok( -d $dir2, 'expected-param "' . $dir2 . '" is directory' );
+		$test->ok( -d $dir1, 'is-param "' . $dir1 . '" is directory' );
 		return;
 	}
 
@@ -168,7 +178,7 @@ Test::Dirs - easily copy and compare folders inside tests
 		is_dir($src_dir, $tmp_dir, 'fails without @ignore_files');
 	};
 	
-	# be verbose, print out the diff if doesn't match
+	# force verbose, print out the diff if doesn't match
 	is_dir($src_dir, $tmp_dir, 'test with verbose on', \@ignore_files, 'verbose');
 	
 =head1 DESCRIPTION
@@ -216,6 +226,7 @@ content into C<$expected_dir>. Usefull for bootstraping test results or for
 acnkowledging results after code update.
 
 C<$message>, C<\@ignore_files>, C<$verbose> are optional.
+Default verbose value is C<$ENV{TEST_VERBOSE}>.
 
 =head2 dir_cleanup_ok($filename, $message)
 

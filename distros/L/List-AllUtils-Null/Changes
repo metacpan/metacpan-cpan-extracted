@@ -1,3 +1,21 @@
+0.004   2021-07-05  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Add keyword 'monadic zero' in description (GH#1).
+
+
+0.003   2021-07-05  Released-By: PERLANCAR; Urgency: medium
+
+	- Add module: List::AllUtils::ContainsNull (and alias
+	  List::Util::ContainsNull).
+
+
+0.002   2021-04-01  Released-By: PERLANCAR; Urgency: low
+
+	- Add test for List::Util::Null.
+
+
 0.001   2021-04-01  Released-By: PERLANCAR
 
         - First version.

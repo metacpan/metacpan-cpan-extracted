@@ -7,7 +7,7 @@ my $build = Module::Build->new(
    module_name => 'Tickit::Widget::Scroller',
    requires => {
       'perl' => '5.026', # signatures
-      'Object::Pad' => '0.27',
+      'Object::Pad' => '0.41',
 
       'String::Tagged' => 0,
       'Tickit::RenderBuffer' => '0.43', # flush_to_term

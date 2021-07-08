@@ -132,7 +132,7 @@ brighteon.com (L<StreamFinder::Brighteon>), castbox.fm (L<StreamFinder::Castbox>
 podcasts.google.com (L<StreamFinder::Google>), 
 iheartradio.com (L<StreamFinder::IHeartRadio>), 
 radio.net (L<StreamFinder::RadioNet>), 
-reciva.com (L<StreamFinder::Reciva>), rumble.com (L<StreamFinder::Rumble>),
+rumble.com (L<StreamFinder::Rumble>),
 sermonaudio.com (L<StreamFinder::SermonAudio>), 
 spreaker.com podcasts (L<StreamFinder::Spreaker>), 
 tunein.com (L<StreamFinder::Tunein>), vimeo.com (L<StreamFinder::Vimeo>), 
@@ -140,9 +140,7 @@ tunein.com (L<StreamFinder::Tunein>), vimeo.com (L<StreamFinder::Vimeo>),
 (L<StreamFinder::Youtube>), and L<StreamFinder::Anystream> - search any (other) 
 webpage URL (not supported by any of the other submodules) for streams.  
 
-NOTE:  StreamFinder::Reciva will likely be removed next release sometime 
-after April 30, 2021 due to that site's announcement that they're going 
-offline after that date, though as of this release, Reciva.com is still active!
+NOTE:  StreamFinder::Reciva has been removed, as that site has now closed down.
 
 NOTE:  Facebook (Streamfinder::Facebook) has been removed because 
 logging into Facebook via the call to youtube-dl is now interpreted by 
@@ -218,7 +216,7 @@ specific submodules which are currently installed.  For example, to
 NOT handle Youtube videos nor use the fallback "Anystream" module, 
 specify:  I<-omit> => I<"Youtube,Anystream">, which will cause 
 StreamFinder::Anystream and StreamFinder::Youtube to not be used 
-for the stream search.  Default is for all installed summodules to be 
+for the stream search.  Default is for all installed submodules to be 
 considered.
 
 Another global option (applicable to all submodules) is the I<-secure> 
@@ -237,6 +235,25 @@ different options and ignore ones they do not recognize.  Valid values
 for some options can also vary across different submodules.  A better 
 way to change default options for one or more submodules is to set up 
 submodule configuration files for the ones you wish to change.
+
+Additional options:
+
+I<-log> => "I<logfile>"
+
+Specify path to a log file.  If a valid and writable file is specified, A line will be 
+appended to this file every time one or more streams is successfully fetched for a url.
+
+DEFAULT i<-none> (no logging).
+
+I<-logfmt> specifies a format string for lines written to the log file.
+
+DEFAULT "I<[time] [url] - [site]: [title] ([total])>".  
+
+The valid field I<[variables]> are:  [stream]: The url of the first/best stream found.  
+[site]:  The site (submodule) name matching the webpage url.  [url]:  The url 
+searched for streams.  [time]: Perl timestamp when the line was logged.  [title], 
+[artist], [album], [description], [year], [genre], [total], [albumartist]:  The 
+corresponding field data returned (or "-na", if no value).
 
 =item $station->B<get>(['playlist'])
 
@@ -276,7 +293,7 @@ call-letters ("fccid") for applicable sites and stations.
 
 =item $station->B<getTitle>(['desc'])
 
-Returns the station's title, or (long description).  
+Returns the station's title, (or long description, if "desc" specified).  
 
 NOTE:  Some sights do not support a separate long description field, 
 so if none found, the standard title field will always be returned.
@@ -313,7 +330,7 @@ the "icon image" data, if any, will be returned.
 
 Returns the station / podcast / video's type (I<submodule-name>).  
 (one of:  "Anystream", "Apple", "BitChute", "Blogger", "Brighteon", 
-"Castbox", "Google", "IHeartRadio", "RadioNet", "Reciva", "Rumble", 
+"Castbox", "Google", "IHeartRadio", "RadioNet", "Rumble", 
 "SermonAudio", "Spreaker", "Tunein", "Youtube" or "Vimeo" - 
 depending on the sight that matched the URL).
 
@@ -458,7 +475,7 @@ use strict;
 use warnings;
 use vars qw(@ISA @EXPORT $VERSION);
 
-our $VERSION = '1.50';
+our $VERSION = '1.51';
 our $DEBUG = 0;
 
 require Exporter;
@@ -466,7 +483,7 @@ require Exporter;
 @ISA = qw(Exporter);
 @EXPORT = qw();
 my @supported_mods = (qw(Anystream Apple Bitchute Blogger Brighteon Castbox Google IHeartRadio
-		RadioNet Reciva Rumble SermonAudio Spreaker Tunein Vimeo Youtube));
+		RadioNet Rumble SermonAudio Spreaker Tunein Vimeo Youtube));
 
 my %haveit;
 
@@ -489,7 +506,7 @@ sub new
 	while (@_) {
 		$arg = shift(@_);
 		if ($arg =~ /^\-?omit$/o) {   #ALLOW USER TO OMIT SPECIFIC INSTALLED SUBMODULE(S):
-			my @omitModules = split(/\,/, shift(@_));
+			my @omitModules = split(/\,\s*/, shift(@_));
 			foreach my $omit (@omitModules)
 			{
 				$haveit{$omit} = 0  if (defined($haveit{$omit}) && $haveit{$omit});
@@ -506,8 +523,6 @@ sub new
 		return new StreamFinder::Tunein($url, @args);
 	} elsif ($haveit{'RadioNet'} && $url =~ m#\bradio\.net\/#) {
 		return new StreamFinder::RadioNet($url, @args);
-	} elsif ($haveit{'Reciva'} && $url =~ m#\breciva\.com\/#) {
-		return new StreamFinder::Reciva($url, @args);
 	} elsif ($haveit{'Brighteon'} && $url =~ m#\bbrighteon\.com\/#) {  #NOTE:ALSO USES youtube-dl!
 		return new StreamFinder::Brighteon($url, @args);
 	} elsif ($haveit{'Vimeo'} && $url =~ m#\bvimeo\.#) {  #NOTE:ALSO USES youtube-dl!

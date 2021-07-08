@@ -1,5 +1,9 @@
 Revision history for Data-Rx-TypeBundle-Perl
 
+0.010     2021-07-03 13:02:38-04:00 America/New_York
+        - update author contact info
+        - add perl version policy
+
 0.009     2013-12-22 22:05:12-0500 America/New_York
           fix dist name
 

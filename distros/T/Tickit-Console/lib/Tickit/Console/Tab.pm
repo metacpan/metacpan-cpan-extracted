@@ -3,14 +3,15 @@
 #
 #  (C) Paul Evans, 2014-2020 -- leonerd@leonerd.org.uk
 
-use 5.026; # signatures
-use Object::Pad 0.27;
+use v5.26; # signatures
+use Object::Pad 0.43;  # ADJUST
 
-use Tickit::Widget::Tabbed;
+use Tickit::Widget::Tabbed 0.024;
 
-package Tickit::Console::Tab 0.09;
+package Tickit::Console::Tab 0.10;
 class Tickit::Console::Tab
-   extends Tickit::Widget::Tabbed::Tab;
+   extends Tickit::Widget::Tabbed::Tab
+   :strict(params);
 
 use Tickit::Widget::Scroller::Item::Text;
 use Tickit::Widget::Scroller::Item::RichText;
@@ -64,25 +65,17 @@ to generate timestamps in UTC instead of using the local timezone.
 
 =cut
 
-has $_scroller;
-has $_console;
-has $_on_line;
+has $_scroller :param;
+has $_console  :param;
+has $_on_line  :param = undef;
 
-has $_timestamp_format;
-has $_datestamp_format;
-has $_localtime;
+has $_timestamp_format :param;
+has $_datestamp_format :param;
+has $_localtime        :param = sub ( $time ) { localtime $time };
 
-BUILD ( $tabbed, %args )
+ADJUST
 {
-   $_scroller = $args{scroller};
-   weaken( $_console = $args{console} );
-
-   $_on_line = $args{on_line};
-
-   $_timestamp_format = $args{timestamp_format};
-   $_datestamp_format = $args{datestamp_format};
-
-   $_localtime = $args{localtime} // sub ( $time ) { localtime $time };
+   weaken( $_console );
 }
 
 =head1 METHODS

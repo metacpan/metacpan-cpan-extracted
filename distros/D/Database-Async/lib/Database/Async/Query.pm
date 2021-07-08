@@ -3,7 +3,7 @@ package Database::Async::Query;
 use strict;
 use warnings;
 
-our $VERSION = '0.014'; # VERSION
+our $VERSION = '0.015'; # VERSION
 
 =head1 NAME
 
@@ -346,7 +346,11 @@ sub row_data {
     $self->{row_data} //= do {
         my $row_data = $self->db->new_source;
         $self->completed->on_ready(sub {
-            $row_data->finish unless $row_data->is_ready;
+            my ($f) = @_;
+            return if $row_data->is_ready;
+            return $row_data->finish if $f->is_done;
+            return if $f->is_cancelled;
+            return $row_data->fail($f->failure);
         });
         $row_data->completed->on_ready(sub {
             my $f = $self->completed;

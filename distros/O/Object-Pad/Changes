@@ -1,5 +1,29 @@
 Revision history for Object-Pad
 
+0.43    2021-07-03
+        [CHANGES]
+         * Initial implementation of `ADJUST` blocks, without params
+         * Better docs about ordering of stages of constructor
+         * Initial attempt at (temporary) `:struct(params)` class attribute
+         * Add O:P:MOP::Class and ::Slot support for slot params
+
+        Development time for this release was sponsored by Oetiker+Partner AG
+
+0.42    2021-07-01
+        [CHANGES]
+         * Expose `$slotmeta->has_param` API
+         * Clarify in docs that `:param` happens before `BUILD`
+         * Remove the word "very" from "very experimental" in introduction
+           docs paragraph
+         * Add `$classmeta->slots`
+
+        [BUGFIXES]
+         * Make sure to embed params from roles correctly (RT136869)
+         * Use `XS_INTERNAL()` rather than `static XS()` to (maybe?) keep
+           cygwin happy
+
+        Development time for this release was sponsored by Oetiker+Partner AG
+
 0.41    2021-06-21
         [CHANGES]
          * Recognise `:param` on slots, assign automatically from constructor,
@@ -10,6 +34,8 @@ Revision history for Object-Pad
 
         [BUGFIXES]
          * Complain about a lack of NAME for `class` (related to RT136798)
+
+        Development time for this release was sponsored by Oetiker+Partner AG
 
 0.40    2021-06-02
         [CHANGES]

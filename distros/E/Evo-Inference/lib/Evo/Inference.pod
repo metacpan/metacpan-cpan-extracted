@@ -1,0 +1,32 @@
+=head1 NAME
+
+Evo::Inference - Perl extension for an Inference engine for Evolutionary Algorithms
+
+=head1 SYNOPSIS
+
+  use Evo::Inference;
+
+=head1 DESCRIPTION
+
+=head2 EXPORT
+
+None by default.
+
+
+
+=head1 SEE ALSO
+
+=head1 AUTHOR
+
+koboldwiz, E<lt>koboldwiz@yahoo.comE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2021 by koboldwiz
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.28.2 or,
+at your option, any later version of Perl 5 you may have available.
+
+
+=end

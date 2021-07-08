@@ -2,7 +2,7 @@ package App::Yath::Command::run;
 use strict;
 use warnings;
 
-our $VERSION = '1.000058';
+our $VERSION = '1.000062';
 
 use App::Yath::Options;
 
@@ -833,6 +833,19 @@ Specify an API endpoint for slack webhook integrations
 =item --no-notify-text
 
 Add a custom text snippet to email/slack notifications
+
+
+=item --notify-text-module ARG
+
+=item --notify-text-module=ARG
+
+=item --message_module ARG
+
+=item --message_module=ARG
+
+=item --no-notify-text-module
+
+Use the specified module to generate messages for emails and/or slack.
 
 
 =back

@@ -1,7 +1,7 @@
 #!/usr/bin/perl
-package Perl::PrereqScanner::App;
+package Perl::PrereqScanner::App 1.024;
 # ABSTRACT: scan your working dir for likely prereqs
-$Perl::PrereqScanner::App::VERSION = '1.023';
+
 use strict;
 use warnings;
 
@@ -80,7 +80,7 @@ Perl::PrereqScanner::App - scan your working dir for likely prereqs
 
 =head1 VERSION
 
-version 1.023
+version 1.024
 
 =head1 SYNOPSIS
 
@@ -89,6 +89,16 @@ version 1.023
 Directories are traversed with L<File::Find> to collect all C<.pl>, C<.pm>,
 C<.psgi> and C<.t> files. If no directories or files are specified, the current
 working directory is scanned.
+
+=head1 PERL VERSION
+
+This library should run on perls released even a long time ago.  It should work
+on any version of perl released in the last five years.
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
 
 =head1 AUTHORS
 
@@ -100,7 +110,7 @@ Jerome Quelin
 
 =item *
 
-Ricardo Signes <rjbs@cpan.org>
+Ricardo Signes <rjbs@semiotic.systems>
 
 =back
 

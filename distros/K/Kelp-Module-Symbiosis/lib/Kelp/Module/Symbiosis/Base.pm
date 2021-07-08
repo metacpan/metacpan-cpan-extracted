@@ -1,11 +1,11 @@
 package Kelp::Module::Symbiosis::Base;
 
-our $VERSION = '1.11';
+our $VERSION = '1.12';
 
 use Kelp::Base qw(Kelp::Module);
-use Plack::Util;
+use Kelp::Module::Symbiosis::_Util;
 
-attr "-middleware" => sub { [] };
+attr -middleware => sub { [] };
 
 # should likely be overriden for a more suitable name
 # won't break backcompat though
@@ -16,16 +16,7 @@ sub run
 	my ($self) = shift;
 
 	my $app = $self->psgi(@_);
-	for (@{$self->middleware}) {
-		my ($class, $args) = @$_;
-
-		# Same middleware loading procedure as Kelp
-		next if $self->{_loaded_middleware}->{$class}++ && !$ENV{KELP_TESTING};
-
-		my $mw = Plack::Util::load_class($class, "Plack::Middleware");
-		$app = $mw->wrap($app, %{$args // {}});
-	}
-	return $app;
+	return Kelp::Module::Symbiosis::_Util::wrap($self, $app);
 }
 
 sub psgi
@@ -40,11 +31,7 @@ sub build
 	die 'Kelp::Module::Symbiosis needs to be loaded before ' . ref $self
 		unless $self->app->can('symbiosis');
 
-	my $middleware = $self->middleware;
-	foreach my $mw (@{$args{middleware}}) {
-		my $config = $args{middleware_init}{$mw};
-		push @$middleware, [$mw, $config];
-	}
+	Kelp::Module::Symbiosis::_Util::load_middleware($self, %args);
 
 	$self->app->symbiosis->_link($self->name, $self, $args{mount});
 	return;

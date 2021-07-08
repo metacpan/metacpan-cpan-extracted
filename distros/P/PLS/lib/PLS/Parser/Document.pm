@@ -150,7 +150,12 @@ sub find_current_list
     my $find     = PPI::Find->new(sub { $_[0]->isa('PPI::Structure::List') });
 
     # Find the nearest list structure that completely surrounds the column.
-    return first { $_->lsp_column_number < $column_number < $_->lsp_column_number + length($_->content) }
+    return first
+    {
+        $_->lsp_column_number < $column_number
+          and $column_number < $_->lsp_column_number +
+          length($_->content)
+    }
     sort  { abs($column_number - $a->lsp_column_number) - abs($column_number - $b->lsp_column_number) }
       map { PLS::Parser::Element->new(element => $_, document => $self->{document}, file => $self->{path}) }
       map { $find->in($_->element) } @elements;
@@ -312,7 +317,7 @@ sub pod_link
             my $end   = $+[1];
             my $link  = $1;
 
-            next unless ($start <= $column_number <= $end);
+            next if ($start > $column_number or $column_number > $end);
 
             # Get just the name - remove the text and section parts
             $link =~ s/^[^<]*\|//;
@@ -838,7 +843,7 @@ sub get_full_text
 {
     my ($self) = @_;
 
-    return _text_from_uri($self->{uri});
+    return text_from_uri($self->{uri});
 }
 
 =head2 get_variables_fast
@@ -957,8 +962,7 @@ sub format_range
 
     $args{formatting_options} = {} unless (ref $args{formatting_options} eq 'HASH');
     my $range = $args{range};
-
-    my $text = _text_from_uri($args{uri});
+    my $text  = $args{text};
 
     if (ref $text ne 'SCALAR')
     {
@@ -1011,7 +1015,7 @@ sub format_range
         $argv .= $args{formatting_options}{insertSpaces} ? ' -i=' : ' -et=';
         $argv .= $args{formatting_options}{tabSize};
     }
-    my ($perltidyrc) = glob $PLS::Server::State::CONFIG->{perltidyrc};
+    my ($perltidyrc) = glob $args{perltidyrc};
     undef $perltidyrc if (not length $perltidyrc or not -f $perltidyrc or not -r $perltidyrc);
     my $error = Perl::Tidy::perltidy(source => \$selection, destination => \$formatted, stderr => \$stderr, perltidyrc => $perltidyrc, argv => $argv);
 
@@ -1076,7 +1080,7 @@ sub format
 {
     my ($class, %args) = @_;
 
-    return $class->format_range(formatting_options => $args{formatting_options}, uri => $args{uri});
+    return $class->format_range(formatting_options => $args{formatting_options}, text => $args{text}, perltidyrc => $args{perltidyrc});
 }
 
 =head2 _ppi_location
@@ -1092,13 +1096,13 @@ sub _ppi_location
     return ++$line_number, ++$column_number;
 }
 
-=head2 _text_from_uri
+=head2 text_from_uri
 
 This returns a SCALAR reference to the text of a particular URI.
 
 =cut
 
-sub _text_from_uri
+sub text_from_uri
 {
     my ($uri) = @_;
 
@@ -1113,7 +1117,7 @@ sub _text_from_uri
         my $text = do { local $/; <$fh> };
         return \$text;
     } ## end else [ if (ref $FILES{$uri} eq...)]
-} ## end sub _text_from_uri
+} ## end sub text_from_uri
 
 =head2 _get_ppi_document
 
@@ -1248,7 +1252,19 @@ sub find_word_under_cursor
     @elements = grep { $_->lsp_column_number < $character } @elements;
     my $element          = first { $_->type eq 'PPI::Token::Word' or $_->type eq 'PPI::Token::Label' or $_->type eq 'PPI::Token::Symbol' } @elements;
     my $closest_operator = first { $_->type eq 'PPI::Token::Operator' } @elements;
-    return if (not blessed($element) or not $element->isa('PLS::Parser::Element'));
+
+    if (not blessed($element) or not $element->isa('PLS::Parser::Element'))
+    {
+        my $cast = first { $_->type eq 'PPI::Token::Cast' } @elements;
+
+        # A cast probably means only a sigil was typed.
+        if (blessed($cast) and $cast->isa('PLS::Parser::Element'))
+        {
+            return $cast->range, 0, '', $cast->name;
+        }
+
+        return;
+    } ## end if (not blessed($element...))
 
     # Short-circuit if this is a HASH reference subscript.
     my $parent = $element->parent;
@@ -1313,9 +1329,7 @@ sub find_word_under_cursor
         $element = $element->previous_sibling;
     } ## end if ($element->name eq ...)
 
-    # modify the range so we don't overwrite anything after the cursor.
     my $range = $element->range;
-    $range->{end}{character} = $character;
 
     # look at labels as well, because a label looks like a package name before the second colon.
     my $package = '';

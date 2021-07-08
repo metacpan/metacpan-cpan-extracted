@@ -1,11 +1,12 @@
 package PICA::Data;
 use v5.14.1;
 
-our $VERSION = '1.27';
+our $VERSION = '1.28';
 
 use Exporter 'import';
 our @EXPORT_OK = qw(pica_parser pica_writer pica_path pica_xml_struct
-    pica_match pica_values pica_value pica_fields pica_title pica_holdings pica_items
+    pica_match pica_values pica_value pica_fields pica_subfields
+    pica_title pica_holdings pica_items
     pica_split pica_annotation pica_sort pica_guess clean_pica pica_string pica_id
     pica_diff pica_patch pica_empty);
 our %EXPORT_TAGS = (all => [@EXPORT_OK]);
@@ -19,6 +20,7 @@ use Encode qw(decode);
 use List::Util qw(first any);
 use IO::Handle;
 use PICA::Path;
+use Hash::MultiValue;
 
 use sort 'stable';
 
@@ -56,6 +58,15 @@ sub pica_fields {
             any {$_->match_field($cur)} @pathes
         } @$record
     ];
+}
+
+sub pica_subfields {
+    my @sf;
+    for (@{pica_fields(@_)}) {
+        my $l = @$_ % 2 ? $#$_ - 1 : $#$_;
+        push @sf, @{$_}[2 .. $l];
+    }
+    return Hash::MultiValue->new(@sf);
 }
 
 sub pica_value {
@@ -246,20 +257,21 @@ sub pica_annotation {
     }
 }
 
-*fields   = *pica_fields;
-*title    = *pica_title;
-*holdings = *pica_holdings;
-*items    = *pica_items;
-*sort     = *pica_sort;
-*split    = *pica_split;
-*match    = *pica_match;
-*value    = *pica_value;
-*values   = *pica_values;
-*string   = *pica_string;
-*id       = *pica_id;
-*empty    = *pica_empty;
-*diff     = *pica_diff = *PICA::Patch::pica_diff;
-*patch    = *pica_patch = *PICA::Patch::pica_patch;
+*fields    = *pica_fields;
+*subfields = *pica_subfields;
+*title     = *pica_title;
+*holdings  = *pica_holdings;
+*items     = *pica_items;
+*sort      = *pica_sort;
+*split     = *pica_split;
+*match     = *pica_match;
+*value     = *pica_value;
+*values    = *pica_values;
+*string    = *pica_string;
+*id        = *pica_id;
+*empty     = *pica_empty;
+*diff      = *pica_diff = *PICA::Patch::pica_diff;
+*patch     = *pica_patch = *PICA::Patch::pica_patch;
 
 use PICA::Patch;
 use PICA::Parser::XML;
@@ -412,6 +424,7 @@ PICA::Data - PICA record processing
         # object accessors
         my $ppn      = $record->id;
         my $ppn      = $record->value('003@0');
+        my $ppn      = $record->subfields('003@')->{0};
         my $ddc      = $record->match('045Ue', split => 1, nested_array => 1);
         my $holdings = $record->holdings;
         my $items    = $record->items;
@@ -588,12 +601,19 @@ expression. The following are virtually equivalent:
 
 =head2 pica_fields( $record[, $path...] )
 
-Returns a PICA record (or empty array reference) limited to fields specified in
-one ore more PICA path expression. The following are virtually equivalent:
+Returns a PICA record (or empty array reference) limited to fields optionally
+specified by PICA path expressions. The following are virtually equivalent:
 
     pica_fields($record, $path);
     $path->record_fields($record);
     $record->fields($path);
+
+=head2 pica_subfields( $record[, $path...] )
+
+Returns a L<Hash::MultiValue> of all subfields of fields optionally specified
+by PICA path expressions. Also available as accessor C<subfields>.
+
+=head2 pica_
 
 =head2 pica_title( $record )
 
@@ -657,6 +677,11 @@ Same as C<values> but only returns the first value.
 
 Returns a PICA record limited to fields specified in a L<PICA::Path>
 expression.  Always returns an array reference.
+
+=head2 subfields( [$path...] )
+
+Returns a L<Hash::MultiValue> of all subfields of fields optionally specified
+by PICA path expressions.
 
 =head2 holdings
 

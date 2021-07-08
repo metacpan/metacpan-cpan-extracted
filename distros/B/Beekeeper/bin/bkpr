@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 $ENV{PATH} = '/bin'; # untaint
 
@@ -28,11 +28,11 @@ __END__
 
 =head1 NAME
 
-bkpr - Manage worker pools
+bkpr - Start, restart or stop worker pools
 
 =head1 VERSION
 
-Version 0.06
+Version 0.07
 
 =head1 SYNOPSIS
 
@@ -50,17 +50,16 @@ Version 0.06
    --group      str  Run as specified group
    --config-dir str  Path to directory containing config files
    --debug           Turn on workers debug flag
-   --help            Shows this message
+   --help            Display this help and exit
 
 =head1 DESCRIPTION
 
-This command line tool is used to manage worker pools: it start, stop and monitor 
-pools of persistent C<Beekeeper::Worker> processes which receive RPC requests from 
-message bus.
+This command line tool is used to start, restart or stop worker pools of persistent
+L<Beekeeper::Worker> processes which receive RPC requests from the message bus.
 
-When started it daemonize itself (unless C<--foreground> option is passed) and
-fork all worker processes, then monitor those forked processes and B<immediately>
-respawn defunct ones.
+When started it daemonizes itself (unless C<--foreground> option is passed) and forks
+all worker processes, then keeps monitoring those forked processes and immediately
+respawns defunct ones.
 
 Beekeeper applications use config files C<pool.config.json> and C<bus.config.json> to
 define how clients, workers and brokers connect to each other. These files are looked

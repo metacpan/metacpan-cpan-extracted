@@ -388,15 +388,16 @@ case 176:
 		case 37: goto tr188;
 		case 61: goto tr185;
 		case 95: goto tr185;
-		case 123: goto tr186;
-		case 125: goto tr186;
 		case 126: goto tr185;
 	}
 	if ( (*p) < 63 ) {
 		if ( 33 <= (*p) && (*p) <= 59 )
 			goto tr185;
 	} else if ( (*p) > 90 ) {
-		if ( 97 <= (*p) && (*p) <= 122 )
+		if ( (*p) > 122 ) {
+			if ( 123 <= (*p) && (*p) <= 125 )
+				goto tr186;
+		} else if ( (*p) >= 97 )
 			goto tr185;
 	} else
 		goto tr185;
@@ -415,22 +416,23 @@ st177:
 	if ( ++p == pe )
 		goto _test_eof177;
 case 177:
-#line 419 "src/panda/uri/parser_ext.cc"
+#line 420 "src/panda/uri/parser_ext.cc"
 	switch( (*p) ) {
 		case 34: goto st178;
 		case 35: goto tr190;
 		case 37: goto st7;
 		case 61: goto st177;
 		case 95: goto st177;
-		case 123: goto st178;
-		case 125: goto st178;
 		case 126: goto st177;
 	}
 	if ( (*p) < 63 ) {
 		if ( 33 <= (*p) && (*p) <= 59 )
 			goto st177;
 	} else if ( (*p) > 90 ) {
-		if ( 97 <= (*p) && (*p) <= 122 )
+		if ( (*p) > 122 ) {
+			if ( 123 <= (*p) && (*p) <= 125 )
+				goto st178;
+		} else if ( (*p) >= 97 )
 			goto st177;
 	} else
 		goto st177;
@@ -449,22 +451,23 @@ st178:
 	if ( ++p == pe )
 		goto _test_eof178;
 case 178:
-#line 453 "src/panda/uri/parser_ext.cc"
+#line 455 "src/panda/uri/parser_ext.cc"
 	switch( (*p) ) {
 		case 34: goto tr193;
 		case 35: goto tr194;
 		case 37: goto tr195;
 		case 61: goto tr192;
 		case 95: goto tr192;
-		case 123: goto tr193;
-		case 125: goto tr193;
 		case 126: goto tr192;
 	}
 	if ( (*p) < 63 ) {
 		if ( 33 <= (*p) && (*p) <= 59 )
 			goto tr192;
 	} else if ( (*p) > 90 ) {
-		if ( 97 <= (*p) && (*p) <= 122 )
+		if ( (*p) > 122 ) {
+			if ( 123 <= (*p) && (*p) <= 125 )
+				goto tr193;
+		} else if ( (*p) >= 97 )
 			goto tr192;
 	} else
 		goto tr192;
@@ -483,7 +486,7 @@ st7:
 	if ( ++p == pe )
 		goto _test_eof7;
 case 7:
-#line 487 "src/panda/uri/parser_ext.cc"
+#line 490 "src/panda/uri/parser_ext.cc"
 	if ( (*p) < 65 ) {
 		if ( 48 <= (*p) && (*p) <= 57 )
 			goto st8;
@@ -516,7 +519,7 @@ st179:
 	if ( ++p == pe )
 		goto _test_eof179;
 case 179:
-#line 520 "src/panda/uri/parser_ext.cc"
+#line 523 "src/panda/uri/parser_ext.cc"
 	switch( (*p) ) {
 		case 33: goto st175;
 		case 35: goto tr178;
@@ -572,7 +575,7 @@ st181:
 	if ( ++p == pe )
 		goto _test_eof181;
 case 181:
-#line 576 "src/panda/uri/parser_ext.cc"
+#line 579 "src/panda/uri/parser_ext.cc"
 	switch( (*p) ) {
 		case 33: goto st181;
 		case 35: goto tr205;
@@ -610,7 +613,7 @@ st9:
 	if ( ++p == pe )
 		goto _test_eof9;
 case 9:
-#line 614 "src/panda/uri/parser_ext.cc"
+#line 617 "src/panda/uri/parser_ext.cc"
 	if ( (*p) < 65 ) {
 		if ( 48 <= (*p) && (*p) <= 57 )
 			goto st10;
@@ -656,7 +659,7 @@ st182:
 	if ( ++p == pe )
 		goto _test_eof182;
 case 182:
-#line 660 "src/panda/uri/parser_ext.cc"
+#line 663 "src/panda/uri/parser_ext.cc"
 	switch( (*p) ) {
 		case 33: goto st11;
 		case 35: goto tr210;
@@ -715,7 +718,7 @@ st12:
 	if ( ++p == pe )
 		goto _test_eof12;
 case 12:
-#line 719 "src/panda/uri/parser_ext.cc"
+#line 722 "src/panda/uri/parser_ext.cc"
 	if ( (*p) < 65 ) {
 		if ( 48 <= (*p) && (*p) <= 57 )
 			goto st13;
@@ -754,7 +757,7 @@ st183:
 	if ( ++p == pe )
 		goto _test_eof183;
 case 183:
-#line 758 "src/panda/uri/parser_ext.cc"
+#line 761 "src/panda/uri/parser_ext.cc"
 	switch( (*p) ) {
 		case 33: goto tr214;
 		case 35: goto tr198;
@@ -786,7 +789,7 @@ st184:
 	if ( ++p == pe )
 		goto _test_eof184;
 case 184:
-#line 790 "src/panda/uri/parser_ext.cc"
+#line 793 "src/panda/uri/parser_ext.cc"
 	switch( (*p) ) {
 		case 33: goto st184;
 		case 35: goto tr205;
@@ -823,7 +826,7 @@ st14:
 	if ( ++p == pe )
 		goto _test_eof14;
 case 14:
-#line 827 "src/panda/uri/parser_ext.cc"
+#line 830 "src/panda/uri/parser_ext.cc"
 	if ( (*p) < 65 ) {
 		if ( 48 <= (*p) && (*p) <= 57 )
 			goto st15;
@@ -869,7 +872,7 @@ st185:
 	if ( ++p == pe )
 		goto _test_eof185;
 case 185:
-#line 873 "src/panda/uri/parser_ext.cc"
+#line 876 "src/panda/uri/parser_ext.cc"
 	switch( (*p) ) {
 		case 35: goto tr210;
 		case 47: goto tr211;
@@ -888,7 +891,7 @@ st16:
 	if ( ++p == pe )
 		goto _test_eof16;
 case 16:
-#line 892 "src/panda/uri/parser_ext.cc"
+#line 895 "src/panda/uri/parser_ext.cc"
 	switch( (*p) ) {
 		case 58: goto st152;
 		case 118: goto st167;
@@ -3344,7 +3347,7 @@ st187:
 	if ( ++p == pe )
 		goto _test_eof187;
 case 187:
-#line 3348 "src/panda/uri/parser_ext.cc"
+#line 3351 "src/panda/uri/parser_ext.cc"
 	switch( (*p) ) {
 		case 33: goto st172;
 		case 35: goto tr178;
@@ -3379,7 +3382,7 @@ st188:
 	if ( ++p == pe )
 		goto _test_eof188;
 case 188:
-#line 3383 "src/panda/uri/parser_ext.cc"
+#line 3386 "src/panda/uri/parser_ext.cc"
 	switch( (*p) ) {
 		case 33: goto tr222;
 		case 35: goto st173;
@@ -3663,7 +3666,7 @@ case 188:
 #line 23 "src/panda/uri/parser.rl"
 	{ SAVE(_path); }
 	break;
-#line 3667 "src/panda/uri/parser_ext.cc"
+#line 3670 "src/panda/uri/parser_ext.cc"
 	}
 	}
 

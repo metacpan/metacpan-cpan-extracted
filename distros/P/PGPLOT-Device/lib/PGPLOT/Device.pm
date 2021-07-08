@@ -5,7 +5,7 @@ package PGPLOT::Device;
 use strict;
 use warnings;
 
-our $VERSION = '0.09';
+our $VERSION = '0.11';
 
 
 our %Default = (
@@ -18,76 +18,76 @@ our %PGDevice;
 our %DevMap;
 
 
-#pod =method new
-#pod
-#pod   $dev = PGPLOT::Device->new( $spec, \%opts );
-#pod
-#pod This constructs a new object.  B<$spec> is the PGPLOT device
-#pod specification, with the following allowed representations:
-#pod
-#pod =over
-#pod
-#pod =item I</device>
-#pod
-#pod This results in the default PGPLOT behavior for the device.
-#pod
-#pod =item I<N/device>
-#pod
-#pod N is an integer.  This resolves to a constant output device. Usually
-#pod I<device> is C</xw> or C</xs>.
-#pod
-#pod =item I<+N/device>
-#pod
-#pod N is an integer.  This will create a device which
-#pod autoincrements. Usually I<device> is C</xw> or C</xs>.
-#pod
-#pod =item I<filename/device>
-#pod
-#pod I<filename> is an output file name.  Its format is as described in
-#pod L</Hardcopy devices>.  An extension will be automatically added, if
-#pod required.
-#pod
-#pod =back
-#pod
-#pod The C<%opts> hash is available to pass other options to the
-#pod constructor.  These are:
-#pod
-#pod =over
-#pod
-#pod =item vars
-#pod
-#pod This is a hashref containing values to be interpolated into filenames.
-#pod B<PGPLOT::Device> dereferences the hashref at interpolation time, so
-#pod will track any changes made by the application.   For example:
-#pod
-#pod   my %vars;
-#pod   $dev = PGPLOT::Device->new( "foo${a}${b}/ps",
-#pod                               { vars => \%vars } );
-#pod
-#pod   $vars{a} = 3;
-#pod   $vars{b} = 4;
-#pod
-#pod   print $dev->next, "\n";
-#pod
-#pod will result in C<foo34.ps>.  Additionally, if the values are scalar
-#pod references, they will be dereferenced.  This way the application is
-#pod not forced to use a hash for its internal use:
-#pod
-#pod   my ( $a, $b );
-#pod   my %vars = ( a => \$a, b => \$b )
-#pod
-#pod   $dev = PGPLOT::Device->new( "foo${a}${b}/ps",
-#pod                                { vars => \%vars } );
-#pod
-#pod   $a = 3;
-#pod   $b = 4;
-#pod   print $dev->next, "\n";
-#pod
-#pod will also result in C<foo34.ps>.
-#pod
-#pod =back
-#pod
-#pod =cut
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 sub new
 {
@@ -178,21 +178,21 @@ sub _initialize
   $self;
 }
 
-#pod =method override
-#pod
-#pod   $dev->override( $filename, \%opts );
-#pod
-#pod This method is used to override the initial values of C<$filename>
-#pod passed to the B<new()> method for non-interactive devices.  This
-#pod allows the user control over the interactive device, but gives
-#pod the application more control over hardcopy destinations.
-#pod
-#pod Note that B<$filename> may include a PGPLOT device specification,
-#pod which will override any specified earlier, but this is frowned upon.
-#pod
-#pod It takes the same options as does the B<new()> method.
-#pod
-#pod =cut
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 sub override
 {
@@ -206,15 +206,15 @@ sub override
   $self;
 }
 
-#pod =method devn
-#pod
-#pod   $devn = $dev->devn;
-#pod   $dev->devn( $new_value);
-#pod
-#pod This is an accessor which retrieves and/or sets the device number for
-#pod interactive devices.
-#pod
-#pod =cut
+
+
+
+
+
+
+
+
+
 
 sub devn
 {
@@ -225,16 +225,16 @@ sub devn
   $old;
 }
 
-#pod =method ask
-#pod
-#pod   if ( $device->ask ) { .. }
-#pod
-#pod This is true if the device is interactive and constant, so that
-#pod new plots erase old plots.  This can be used with the B<pgask()>
-#pod PGPLOT subroutine to ensure that the user will see all of the plots.
-#pod See L</EXAMPLES>.
-#pod
-#pod =cut
+
+
+
+
+
+
+
+
+
+
 
 sub ask { $_[0]->{ask} };
 
@@ -326,16 +326,16 @@ sub _parse_spec
   %spec;
 }
 
-#pod =method next
-#pod
-#pod   $dev_str = $dev->next;
-#pod
-#pod This method is the basis for the automatic updating of the device
-#pod specification when the object is used as a string.  If desired it may
-#pod  be used directly.  It will return the next device specification. It
-#pod increments the device number.
-#pod
-#pod =cut
+
+
+
+
+
+
+
+
+
+
 
 sub next
 {
@@ -346,14 +346,14 @@ sub next
   $self->{last};
 }
 
-#pod =method current
-#pod
-#pod   $dev_str = $dev->current;
-#pod
-#pod This returns the device string which would be generated in the current
-#pod environment.  It does not alter the environment.
-#pod
-#pod =cut
+
+
+
+
+
+
+
+
 
 sub current
 {
@@ -362,14 +362,14 @@ sub current
   $self->_stringify;
 }
 
-#pod =method last
-#pod
-#pod   $dev_str = $dev->current;
-#pod
-#pod This returns the last generated device string.  It does not alter the
-#pod environment.
-#pod
-#pod =cut
+
+
+
+
+
+
+
+
 
 sub last
 {
@@ -384,14 +384,14 @@ sub _compare
   $reverse ?  $other cmp $self->_stringify :  $self->_stringify cmp $other;
 }
 
-#pod =method is_const
-#pod
-#pod   if ( $dev->is_const ) { ... }
-#pod
-#pod This method returns true if the device specification does not
-#pod interpolate any variables or device numbers.
-#pod
-#pod =cut
+
+
+
+
+
+
+
+
 
 sub is_const
 {
@@ -400,17 +400,17 @@ sub is_const
     ($self->_stringify eq $self->{prefix} . '/' . $self->{device}) : 1;
 }
 
-#pod =method would_change
-#pod
-#pod   if ( $dev->would_change ) { ... }
-#pod
-#pod This method returns true if the last generated device specification
-#pod would differ from one generated with the current environment. It
-#pod returns true if no device specification has yet been generated.
-#pod
-#pod It does not change the current environment.
-#pod
-#pod =cut
+
+
+
+
+
+
+
+
+
+
+
 
 sub would_change
 {
@@ -419,13 +419,13 @@ sub would_change
   return defined $self->{last} ? $self->_stringify ne $self->{last} : 1;
 }
 
-#pod =method is_interactive
-#pod
-#pod   if ( $dev->is_interactive ) { ... }
-#pod
-#pod This method returns true if the device is an interactive device.
-#pod
-#pod =cut
+
+
+
+
+
+
+
 
 sub is_interactive
 {
@@ -434,14 +434,14 @@ sub is_interactive
   $self->{devinfo}{inter};
 }
 
-#pod =method is_ephemeral
-#pod
-#pod   if ( $dev->is_ephemeral ) { ... }
-#pod
-#pod This method returns true if the plot display will disappear if the
-#pod device is closed (e.g., the C</xw> device ).
-#pod
-#pod =cut
+
+
+
+
+
+
+
+
 
 sub is_ephemeral
 {
@@ -505,7 +505,11 @@ sub _stringify
 #   The GNU General Public License, Version 3, June 2007
 #
 
+__END__
+
 =pod
+
+=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory
 
 =head1 NAME
 
@@ -513,7 +517,7 @@ PGPLOT::Device - autogenerate PGPLOT device names
 
 =head1 VERSION
 
-version 0.09
+version 0.11
 
 =head1 SYNOPSIS
 
@@ -529,6 +533,10 @@ version 0.09
   $win = PDL::Graphics::PGPLOT::Window->new({ Device => $device} );
 
 =head1 DESCRIPTION
+
+B<Note!>  It's much easier to use L<PGPLOT::Device::PGWin>
+instead of using PGPLOT::Device directly. It handles much of the
+complexity of dealing with interactive devices.
 
 It is sometimes surprisingly difficult to create an appropriate PGPLOT
 device.  Coding for both interactive and hardcopy devices can lead to
@@ -855,21 +863,21 @@ are generated within loops:
 
 =back
 
-=head1 BUGS
+=head1 SUPPORT
 
-Please report any bugs or feature requests on the bugtracker website
-L<https://rt.cpan.org/Public/Dist/Display.html?Name=PGPLOT-Device> or by
-email to
-L<bug-PGPLOT-Device@rt.cpan.org|mailto:bug-PGPLOT-Device@rt.cpan.org>.
+=head2 Bugs
 
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
+Please report any bugs or feature requests to bug-pgplot-device@rt.cpan.org  or through the web interface at: https://rt.cpan.org/Public/Dist/Display.html?Name=PGPLOT-Device
 
-=head1 SOURCE
+=head2 Source
 
-The development version is on github at L<https://github.com/djerius/pgplot-device>
-and may be cloned from L<git://github.com/djerius/pgplot-device.git>
+Source is available at
+
+  https://gitlab.com/djerius/pgplot-device
+
+and may be cloned from
+
+  https://gitlab.com/djerius/pgplot-device.git
 
 =head1 SEE ALSO
 
@@ -904,203 +912,3 @@ This is free software, licensed under:
   The GNU General Public License, Version 3, June 2007
 
 =cut
-
-__END__
-
-
-#pod =head1 SYNOPSIS
-#pod
-#pod   use PGPLOT::Device;
-#pod
-#pod   $device = PGPLOT::Device->new( $spec );
-#pod   $device = PGPLOT::Device->new( \%specs );
-#pod
-#pod   # straight PGPLOT
-#pod   pgbegin( 0, $device, 1, 1);
-#pod
-#pod   # PDL
-#pod   $win = PDL::Graphics::PGPLOT::Window->new({ Device => $device} );
-#pod
-#pod
-#pod =head1 DESCRIPTION
-#pod
-#pod It is sometimes surprisingly difficult to create an appropriate PGPLOT
-#pod device.  Coding for both interactive and hardcopy devices can lead to
-#pod code which repeatedly has to check the device type to generate the
-#pod correct device name.  If an application outputs multiple plots, it
-#pod needs to meld unique names (usually based upon the output format) to
-#pod the user's choice of output device.  The user should be given some
-#pod flexibility in specifying a device or hardcopy filename output
-#pod specification without making life difficult for the developer.
-#pod
-#pod This module tries to help reduce the agony.  It does this by creating
-#pod an object which will resolve to a legal PGPLOT device specification.
-#pod The object can handle auto-incrementing of interactive window ids,
-#pod interpolation of variables into file names, automatic generation of
-#pod output suffices for hardcopy devices, etc.
-#pod
-#pod Here's the general scheme:
-#pod
-#pod =over
-#pod
-#pod =item *
-#pod
-#pod The application creates the object, using the user's PGPLOT device
-#pod specification to initialize it.
-#pod
-#pod =item *
-#pod
-#pod Before creating a new plot, the application specifies the output
-#pod filename it would like to have.  The filename may use interpolated
-#pod variables.  This is ignored if the device is interactive, as it is
-#pod meaningless in that context
-#pod
-#pod =item *
-#pod
-#pod Each time that the object value is retrieved using the C<next()>
-#pod method, the internal window id is incremented, any variables in the
-#pod filename are interpolated, and the result is returned.
-#pod
-#pod =back
-#pod
-#pod
-#pod =head2 Interactive devices
-#pod
-#pod Currently, the C</xs> and C</xw> devices are recognized as being
-#pod interactive.  PGPLOT allows more than one such window to be displayed;
-#pod this is accomplished by preceding the device name with an integer id,
-#pod e.g. C<2/xs>.  If a program generates several independent plots, it can
-#pod either prompt between overwriting plots in a single window, or it may
-#pod choose to use multiple plotting windows.  This module assists in the
-#pod latter case by implementing auto-increment of the window id.  The
-#pod device specification syntax is extended to C<+N/xs> where C<N> is an
-#pod integer indicating the initial window id.
-#pod
-#pod =head2 Hardcopy devices
-#pod
-#pod Hardcopy device specifications (i.e. not C</xs> or C</xw>) are
-#pod specified as C<filename/device>.  The filename is optional, and will
-#pod automatically be given the extension appropriate to the output file
-#pod format.  If a filename is specified in the specification passed to the
-#pod B<new> method, it cannot be overridden.  This allows the user to
-#pod specify a single output file for all hardcopy plots.  This works well
-#pod for PostScript, which can handle multiple pages per file, but for the
-#pod PNG device, this results in multiple output files with numbered
-#pod suffices.  It's not pretty!  This module needs to be extended so it
-#pod knows if a single output file can handle more than one page.
-#pod
-#pod Variables may be interpolated into the filenames using the
-#pod C<${variable}> syntax (curly brackets are required).  Note that only
-#pod simple scalars may be interpolated (not hash or array elements). The
-#pod values may be formatted using B<sprintf> by appending the format, i.e.
-#pod C<${variable:format}>.  Variables which are available to be
-#pod interpolated are either those declared using B<our>, or those passed
-#pod into the class constructor.
-#pod
-#pod The  internal counter which tracks the number of times the device object has
-#pod been used is available as C<${devn}>.
-#pod
-#pod
-#pod =head1 EXAMPLES
-#pod
-#pod =over
-#pod
-#pod =item *
-#pod
-#pod Here's the prototypical example.  The application outputs multiple
-#pod plots and the user is allowed to specify an output device.  The device
-#pod is initialized directly from the user's input:
-#pod
-#pod   $device = PGPLOT::Device->new( $user_device_spec );
-#pod
-#pod Before each call to C<pgbegin> or C<PDL::G::P::Window->new>, indicate
-#pod via the B<override> method the new hardcopy filename, without any
-#pod suffix.  The filename will be ignored if the user has specified an
-#pod interactive device:
-#pod
-#pod   $device->override( 'out_${theta:%05.2f}' );
-#pod
-#pod Use B<next()> to retrieve the value:
-#pod
-#pod   pgbegin( 0, $device->next, 1, );
-#pod   $win = PDL::Graphics::PGPLOT::Window->new({ Device => $device->next} );
-#pod
-#pod
-#pod =item *
-#pod
-#pod The application outputs multiple plots, and the user should be able to
-#pod decide whether a single interactive device window should be used, or
-#pod whether multiple ones should be used.  In the first instance, the user
-#pod specifies the device as C</xs>, in the second C<+/xs> or C<+1/xs>:
-#pod
-#pod   $device = PGPLOT::Device->new( $user_device_spec );
-#pod
-#pod   $device->override( 'hardcopy-${vara}-${varb}' );
-#pod
-#pod   $win = PDL::Graphics::PGPLOT::Window->new({ Device => $device->next} );
-#pod
-#pod   [... generate plot 1 ... ]
-#pod
-#pod   # do this after generating the plot, because Window
-#pod   # be constant, and that'll confuse is_const()
-#pod   pgask( $device->ask );
-#pod
-#pod   # next plot.
-#pod
-#pod   if ( $device->would_change )
-#pod   {
-#pod     $win->close;
-#pod     $win = PDL::Graphics::PGPLOT::Window->new({ Device => $device->next} );
-#pod   }
-#pod
-#pod   # etc.
-#pod
-#pod   # make sure that the user is prompted before the device is closed
-#pod   # if the device will disappear.
-#pod   pgask( 1 ) if $device->ephemeral;
-#pod   $win->close;
-#pod
-#pod Note that B<would_change()> will return true if no specification has
-#pod yet been generated.  This allows one to simplify coding if plots
-#pod are generated within loops:
-#pod
-#pod   my $win;
-#pod
-#pod   my %vars;
-#pod   my $device = PGPLOT::Device->new( $user_device_spec );
-#pod   $device->override( 'file-${a}-${b}', { vars => \%vars } );
-#pod   my $not_first = 0;
-#pod   for my $plot ( @plots )
-#pod   {
-#pod     $vars{a} = $plot->{a};
-#pod     $vars{b} = $plot->{b};
-#pod
-#pod     # prompt user before displaying second and subsequent plots if
-#pod     # a new plot will erase the previous one
-#pod     pgask( $param{device}->ask ) if $not_first++;
-#pod
-#pod     if ( $device->would_change )
-#pod     {
-#pod       $win->close if defined $win;
-#pod       $win = PDL::Graphics::PGPLOT::Window->new({ Device => $device->next} );
-#pod     }
-#pod
-#pod     [... plot stuff ...]
-#pod   }
-#pod
-#pod   if ( defined $win )
-#pod   {
-#pod    # make sure that the plot stays up until the user is done with it
-#pod    pgask(1) if $device->ephemeral;
-#pod    $win->close;
-#pod   }
-#pod
-#pod =back
-#pod
-#pod =head1 SEE ALSO
-#pod
-#pod L<PGPLOT>
-#pod L<PDL>
-#pod L<PDL::Graphics::PGPLOT::Window>
-#pod
-#pod =cut

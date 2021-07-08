@@ -3,6 +3,6 @@ use lib 't/lib';
 use MyTest;
 use Test::More;
 
-catch_run('[ssl]');
+test_catch('[ssl]');
 
 done_testing();

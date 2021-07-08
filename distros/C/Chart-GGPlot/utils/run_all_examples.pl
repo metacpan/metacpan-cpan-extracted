@@ -25,5 +25,5 @@ for my $script (@scripts) {
 
     say join(' ', @cmd);
     my $rslt = system(@cmd);
-    die if ($rslt);
+    die "failed last command" if ($rslt);
 }

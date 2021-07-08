@@ -6,12 +6,12 @@ use vars qw($VERSION);
 use Data::Dumper;
 
 use base 'Error';
-use overload ( '""' => 'stringify' );
+use overload ( q{""} => 'stringify' );
 
-$VERSION = '2.09';
+$VERSION = '2.12';
 
 sub new {
-    my ($self, $time) = @_;
+    my ( $self, $time ) = @_;
 
     local $Error::Depth = $Error::Depth + 1;
 
@@ -26,13 +26,20 @@ __END__
 
 =pod
 
+=begin stopwords
+
+Veri Ivanova jonasbn
+
+=end stopwords
+
+
 =head1 NAME
 
 Test::Timer::TimeoutException - exception class for Test::Timer
 
 =head1 VERSION
 
-This documentation describes 2.09 of Test::Timer::TimeoutException
+This documentation describes 2.12 of Test::Timer::TimeoutException
 
 =head1 SYNOPSIS
 

@@ -4,6 +4,7 @@ cpanfile
 dump.pl
 lib/Pg/Explain.pm
 lib/Pg/Explain/Analyzer.pm
+lib/Pg/Explain/Buffers.pm
 lib/Pg/Explain/From.pm
 lib/Pg/Explain/FromJSON.pm
 lib/Pg/Explain/FromText.pm
@@ -384,6 +385,17 @@ t/63-rows-removed-by.d/plan-4.yaml
 t/63-rows-removed-by.t
 t/64-total-rows.t
 t/65-total-rows-removed.t
+t/66-buffers-directly.t
+t/67-buffers-from-plans.d/json.plan
+t/67-buffers-from-plans.d/json.struct
+t/67-buffers-from-plans.d/text.plan
+t/67-buffers-from-plans.d/text.struct
+t/67-buffers-from-plans.d/xml.plan
+t/67-buffers-from-plans.d/xml.struct
+t/67-buffers-from-plans.d/yaml.plan
+t/67-buffers-from-plans.d/yaml.struct
+t/67-buffers-from-plans.t
+t/68-buffers-math.t
 t/99-manifest.t
 t/perlcriticrc
 t/perltidyrc

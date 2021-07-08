@@ -19,6 +19,24 @@ This document is formatted according to the principles of [Keep A CHANGELOG](htt
 
 ### Fixed
 
+## [20.0.0] - 2021-07-08
+
+### Changed
+
+* Update messages to v17.0.0
+* Update `rule` polish translation
+  ([#1579](https://github.com/cucumber/common/pull/1579) [l310][jakzal])
+* Add US Texan translations.
+  ([#1625](https://github.com/cucumber/common/pull/1625) [willmac321])
+* [Go] Move module paths to point to monorepo
+  ([#1550](https://github.com/cucumber/common/issues/1550))
+* [Ruby] Usage of Message DTOs instead of plain ruby hashes
+  ([#1603](https://github.com/cucumber/common/pull/1603))
+
+### Fixed
+* [Ruby] Rules weren't inheriting the relevant tags during the Gherkin Query stage (Where it caches the NodeID)
+  ([#1593](https://github.com/cucumber/cucumber/pull/1593) [luke-hill])
+
 ## [19.0.3] - 2021-05-24
 
 ### Fixed
@@ -55,7 +73,7 @@ This document is formatted according to the principles of [Keep A CHANGELOG](htt
 
 * [DotNet] Replaced Utf8Json with source-embedded TinyJson.
   ([#511](https://github.com/cucumber/cucumber/pull/1511)
-   [gasparnagy])   
+   [gasparnagy])
 
 * Update Dutch translation of the "Rule" keyword.
   ([#1513](https://github.com/cucumber/common/pull/1513)
@@ -86,7 +104,7 @@ This document is formatted according to the principles of [Keep A CHANGELOG](htt
 
 * [DotNet] Fixed .NET Gherkin compatibility with other Gherkin implementations.
   ([#511](https://github.com/cucumber/cucumber/pull/1511)
-   [gasparnagy])   
+   [gasparnagy])
 
 ## [18.1.1] - 2021-04-22
 
@@ -173,7 +191,7 @@ This document is formatted according to the principles of [Keep A CHANGELOG](htt
 ### Removed
 * [JavaScript] remove `IGherkinOptions#createReadStream`. This function was introduced in `9.1.0`
   in order to decouple this lib from the Node.js `fs` library. This decoupling was improved in
-  [#1333](https://github.com/cucumber/cucumber/pull/1333) which made it obsolete.  
+  [#1333](https://github.com/cucumber/cucumber/pull/1333) which made it obsolete.
   (Fixes [#1284](https://github.com/cucumber/cucumber/issues/1284)
 
 ### Fixed
@@ -1002,7 +1020,8 @@ to Gherkin 2.
 * First release
 
 <!-- Releases -->
-[Unreleased]: https://github.com/cucumber/cucumber/compare/gherkin/v19.0.3...master
+[Unreleased]: https://github.com/cucumber/cucumber/compare/gherkin/v20.0.0...main
+[20.0.0]:     https://github.com/cucumber/cucumber/compare/gherkin/v19.0.3...gherkin/v20.0.0
 [19.0.3]:     https://github.com/cucumber/cucumber/compare/gherkin/v19.0.2...gherkin/v19.0.3
 [19.0.2]:     https://github.com/cucumber/cucumber/compare/gherkin/v19.0.1...gherkin/v19.0.2
 [19.0.1]:     https://github.com/cucumber/cucumber/compare/gherkin/v19.0.0...gherkin/v19.0.1
@@ -1078,14 +1097,17 @@ to Gherkin 2.
 [gasparnagy]:        https://github.com/gasparnagy
 [Haukinger]:         https://github.com/Haukinger
 [hkosova]:           https://github.com/hkosova
+[jakzal]:            https://github.com/jakzal
 [jargalan]:          https://github.com/jargalan
 [jmezach]:           https://github.com/jmezach
 [joscha]:            https://github.com/joscha
 [johnknoop]:         https://github.com/johnknoop
 [koterpillar]:       https://github.com/koterpillar
 [KniveX]:            https://github.com/KniveX
+[l310]:              https://github.com/l3l0/
 [l3pp4rd]:           https://github.com/l3pp4rd
 [LiohAu]:            https://github.com/LiohAu
+[luke-hill]:         https://github.com/luke-hill
 [mattwynne]:         https://github.com/mattwynne
 [mauriciotogneri]:   https://github.com/mauriciotogneri
 [maximeg]:           https://github.com/maximeg
@@ -1118,3 +1140,4 @@ to Gherkin 2.
 [zbmott]:            https://github.com/zbmott
 [Zearin]:            https://github.com/Zearin
 [WannesFransen1994]: https://github.com/WannesFransen1994
+[willmac321]:        https://github.com/willmac321

@@ -20,7 +20,7 @@ use Time::Piece;
 use Template;
 
 my  @PROGARG = ($0, @ARGV);
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 sub new {
   my $class = shift;
@@ -43,6 +43,7 @@ sub new {
 					  scheduler => 1,
 					 },
 			  re          =>  {
+					   default   => '^(?:docker-base-layer|develop|release|master|v[0-9]+\.[0-9]+\.[0-9]+)$',
 					   alpine    => '^(?:docker-base-layer|develop|release|master|v[0-9]+\.[0-9]+\.[0-9]+)$',
 					   api       => '^(?:docker-base-layer|develop|release|master|v[0-9]+\.[0-9]+\.[0-9]+)$',
 					   app       => '^(?:docker-base-layer|develop|qa|release|master|v[0-9]+\.[0-9]+\.[0-9]+)$',
@@ -58,6 +59,7 @@ sub new {
 	      'T|token=s'           => \$self->{_option}{token},
 	      'R|repository=s'      => \$self->{_option}{repo},
 	      'P|package=s'         => \$self->{_option}{package},
+	      'package-regex=s'     => \$self->{_option}{package_regex},
 	      'n|dry-run'           => \$self->{_option}{dry_run},
 	      'N|rows-number=i'     => \$self->{_option}{rows_number},
 	      'versions-to-hold=i'  => \$self->{_option}{versions_to_hold},
@@ -88,8 +90,8 @@ sub new {
   pod2usage(-exitval => 2, -verbose => 2, -msg => "\nERROR: package name not provided, option -P\n\n")
     if ! $self->{_option}{package};
 
-  pod2usage(-exitval => 2, -verbose => 2, -msg => "\nERROR: not supported package\n\n")
-    if $self->{_option}{package} && ! exists $self->{_option}{pkg}{$self->{_option}{package}};
+  # pod2usage(-exitval => 2, -verbose => 2, -msg => "\nERROR: not supported package\n\n")
+  #   if $self->{_option}{package} && ! exists $self->{_option}{pkg}{$self->{_option}{package}};
 
   pod2usage(-exitval => 2, -verbose => 2, -msg => "\nERROR: requested rows number should be 1..100\n\n")
     if $self->{_option}{rows_number} && ( $self->{_option}{rows_number} < 1 || $self->{_option}{rows_number} > 100 );
@@ -141,10 +143,18 @@ sub run {
     my $t_now = localtime;
     my $t_ver;
     # my $i = 0;
-    my $re = $self->option('re')->{$self->option('package')};
+    my $re;
+    if ( $self->option('package_regex') ) {
+      $re = $self->option('package_regex');
+    } elsif ( exists $self->option('re')->{$self->option('package')} ) {
+      $re = $self->option('re')->{$self->option('package')}
+    } else {
+      $re = $self->option('re')->{default};
+    }
+    
     foreach ( @{$versions} ) {
       next if $_->{version} =~ /$re/;
-      p ($_, caller_message => "VERSION DOES NOT MATCH REGEX: __FILENAME__:__LINE__ ") if $self->option('d') > 2;
+      p ($_, caller_message => "VERSION DOES NOT MATCH REGEX ($re) AND IS BEEN PROCESSED: __FILENAME__:__LINE__ ") if $self->option('d') > 2;
 
       if ( defined $_->{files}->{nodes}->[0]->{updatedAt} ) {
 	$t_ver = Time::Piece->strptime( $_->{files}->{nodes}->[0]->{updatedAt},
@@ -163,6 +173,8 @@ sub run {
     $to_delete->{ $self->option('v') } = { version => 'STUB VERSION',
 					   ts      => 'STUB TS' };
   }
+
+  p ($to_delete, caller_message => "VERSIONS TO DELETE: __FILENAME__:__LINE__ ") if $self->option('d') > 2;
 
   if ( $self->option('delete') && defined $to_delete &&
        scalar(keys(%{$to_delete})) gt $self->option('versions_to_hold') ) {
@@ -184,7 +196,7 @@ sub run {
 	      $_->{id}
 	     )
     } @{$versions};
-    print join('', @vers_arr);
+    print "Versions of package \"", $self->option('package'), "\":\n\n", join('', @vers_arr);
   }
 }
 
@@ -194,6 +206,8 @@ sub del_versions {
   my $arg  = {
 	      del => $args->{del} // [],  # array of IDs to delete
 	     };
+
+  p ($arg->{del}, caller_message => "VERSIONS TO DELETE: __FILENAME__:__LINE__ ") if $self->option('d') > 2;
 
   $self->option('req')->header(Accept => 'application/vnd.github.package-deletes-preview+json');
 
@@ -300,6 +314,9 @@ sub get_versions {
     unshift @{$reply->{errors}}, "--- ERROR ---";
     p ( $reply->{errors}, colored => $self->option('colored') );
     exit 1;
+  } elsif ( $reply->{data}->{repository}->{packages}->{nodes} ) {
+    print "WARNING: not hardcoded package name \"", $self->option('package'), "\"\n"
+      if $self->option('d') > 1;
   }
 
   push @{$arg->{res}}, @{$reply->{data}->{repository}->{packages}->{nodes}->[0]->{versions}->{nodes}};

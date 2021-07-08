@@ -13,10 +13,6 @@ clib/src/panda/error.h
 clib/src/panda/excepted.h
 clib/src/panda/exception.cc
 clib/src/panda/exception.h
-clib/src/panda/exception/unix.icc
-clib/src/panda/exception/win.icc
-clib/src/panda/exception/win_debug.cc
-clib/src/panda/exception/win_debug.h
 clib/src/panda/expected.h
 clib/src/panda/from_chars.cc
 clib/src/panda/from_chars.h
@@ -50,9 +46,13 @@ clib/src/panda/string_view/defs.h
 clib/src/panda/string_view/hash.h
 clib/src/panda/test/catch.h
 clib/src/panda/traits.h
+clib/src/panda/unix/exception.cc
 clib/src/panda/unordered_string_map.h
 clib/src/panda/unordered_string_set.h
 clib/src/panda/varint.h
+clib/src/panda/win/exception.cc
+clib/src/panda/win/exception_debug.cc
+clib/src/panda/win/exception_debug.h
 clib/tests/bench.cc
 clib/tests/dispatcher.cc
 clib/tests/endian.cc

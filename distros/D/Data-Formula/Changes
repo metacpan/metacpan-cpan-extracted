@@ -1,2 +1,6 @@
+0.02    1 July 2021
+    - add division operator (thanks domm)
+    - strict constructor
+
 0.01 Thu 28 May 09:19:08 CEST 2015
     - initial release

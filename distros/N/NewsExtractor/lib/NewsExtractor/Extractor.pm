@@ -133,8 +133,8 @@ use constant {
         'www.eventsinfocus.org' => {
             headline => 'h1.title > span',
             dateline => 'div.content time.datetime',
-            journalist => '.block-field-blocknodenewsbody div.content > div:nth-child(1) > p:nth-child(1)',
-            content_text => '.block-field-blocknodenewsbody div.content > div:nth-child(1)',
+            journalist => 'div.content div.node__content div.clearfix.text-formatted > p:nth-child(1)',
+            content_text => 'div.content article div.clearfix.text-formatted',
         },
         'www.5ch.com.tw' => {
             headline => 'h3.m-ti',

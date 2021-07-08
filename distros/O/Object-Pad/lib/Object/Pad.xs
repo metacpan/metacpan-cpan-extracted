@@ -283,6 +283,12 @@ static bool MY_lex_consume_unichar(pTHX_ U32 c)
 /* A SLOTOFFSET is an offset within the AV of an object instance */
 typedef IV SLOTOFFSET;
 
+typedef struct ParamMeta {
+  SV *name;
+  SLOTOFFSET slotix;
+  unsigned int is_required : 1;
+} ParamMeta;
+
 typedef struct ClassMeta ClassMeta;
 
 typedef struct SlotMeta {
@@ -290,8 +296,7 @@ typedef struct SlotMeta {
   ClassMeta *class;
   SV *defaultsv;
   SLOTOFFSET slotix;
-  unsigned int has_param : 1;
-  unsigned int is_required : 1;
+  ParamMeta *param;
 } SlotMeta;
 
 typedef struct MethodMeta {
@@ -321,6 +326,7 @@ struct ClassMeta {
 
   unsigned int sealed : 1;
   unsigned int role_is_invokable : 1;
+  unsigned int strict_params : 1;
 
   SLOTOFFSET start_slotix; /* first slot index of this partial within its instance */
   SLOTOFFSET next_slotix;  /* 1 + final slot index of this partial within its instance; includes slots in roles */
@@ -332,13 +338,14 @@ struct ClassMeta {
   AV *roles;           /* each elem is a raw pointer directly to a RoleEmbedding whose type == METATYPE_ROLE */
   AV *slots;           /* each elem is a raw pointer directly to a SlotMeta */
   AV *methods;         /* each elem is a raw pointer directly to a MethodMeta */
-  HV *parammap;        /* NULL, or each elem is a raw pointer directly at a SlotMeta */
+  HV *parammap;        /* NULL, or each elem is a raw pointer directly at a ParamMeta */
   SV *requireslots;    /* NULL, or the PV is a bitmap of which slots are required params */
   AV *requiremethods;  /* each elem is an SVt_PV giving a name */
   CV *foreign_new;     /* superclass is not Object::Pad, here is the constructor */
   CV *foreign_does;    /* superclass is not Object::Pad, here is SUPER::DOES (which could be UNIVERSAL::DOES) */
   CV *initslots;       /* the INITSLOTS method body */
   AV *buildblocks;     /* the BUILD {} phaser blocks; each elem is a CV* directly */
+  AV *adjustblocks;    /* the ADJUST {} phaser blocks; each elem is a CV* directly */
 
   COP *tmpcop;         /* a COP to use during generated constructor */
   CV *methodscope;     /* a temporary CV used just during compilation of a `method` */
@@ -777,7 +784,7 @@ static void S_generate_initslots_method(pTHX_ ClassMeta *meta)
       switch(sigil) {
         case '$':
           /* push ..., $defaultsv */
-          op = newSVOP_CUSTOM(&pp_sv, 0, slotmeta->defaultsv);
+          op = newSVOP_CUSTOM(&pp_sv, 0, slotmeta->defaultsv ? slotmeta->defaultsv : &PL_sv_undef);
           break;
         case '@':
           /* push ..., [] */
@@ -881,8 +888,8 @@ static void S_compclassmeta_set(pTHX_ ClassMeta *meta)
   sv_setiv(sv, (IV)meta);
 }
 
-static XS(injected_constructor);
-static XS(injected_constructor)
+XS_INTERNAL(injected_constructor);
+XS_INTERNAL(injected_constructor)
 {
   dXSARGS;
   const ClassMeta *meta = XSANY.any_ptr;
@@ -1072,12 +1079,16 @@ static XS(injected_constructor)
       SV *value = argsv[idx+1];
 
       HE *he = hv_fetch_ent(parammap, name, 0, 0);
-      if(!he)
-        /* TODO: If no BUILD blocks, implement 'strict' mode where this complains */
+      if(!he && meta->strict_params) {
+        PL_curcop = prevcop;
+        croak("Unrecognised parameter '%" SVf "' for %" SVf " constructor",
+          SVfARG(name), SVfARG(meta->name));
+      }
+      else if(!he)
         continue;
 
-      SlotMeta *slotmeta = (SlotMeta *)HeVAL(he);
-      SLOTOFFSET slotix = slotmeta->slotix;
+      ParamMeta *parammeta = (ParamMeta *)HeVAL(he);
+      SLOTOFFSET slotix = parammeta->slotix;
 
       sv_setsv(slotsv[slotix], value);
       missingvec[slotix / 8] &= ~(1 << (slotix % 8));
@@ -1097,7 +1108,7 @@ static XS(injected_constructor)
 
       HE *iter;
       while((iter = hv_iternext(meta->parammap))) {
-        SLOTOFFSET slotix = ((SlotMeta *)HeVAL(iter))->slotix;
+        SLOTOFFSET slotix = ((ParamMeta *)HeVAL(iter))->slotix;
 
         if(!(missingvec[slotix / 8] & (1 << (slotix % 8))))
           continue;
@@ -1110,34 +1121,14 @@ static XS(injected_constructor)
     }
   }
 
-  {
+  if(meta->buildblocks) {
     CopLINE_set(PL_curcop, __LINE__);
-    ENTER;
-    SAVETMPS;
-    SPAGAIN;
 
-    /* TODO: This list will be constant for any given class so we should
-     * cache it in the classmeta
-     */
-    AV *all_buildblocks = newAV();
-    SAVEFREESV(all_buildblocks);
-
-    const ClassMeta *m;
-    for(m = meta; m; m = m->supermeta) {
-      int i;
-      if(!m->buildblocks)
-        continue;
-      SV **elems = AvARRAY(m->buildblocks);
-
-      /* These need to be pushed in reverse order */
-      for(i = AvFILL(m->buildblocks); i >= 0; i--)
-        av_push(all_buildblocks, SvREFCNT_inc(elems[i]));
-    }
-
+    AV *buildblocks = meta->buildblocks;
     SV **argsvs = AvARRAY(args);
     int i;
-    for(i = AvFILL(all_buildblocks); i >= 0; i--) {
-      CV *buildblock = (CV *)AvARRAY(all_buildblocks)[i];
+    for(i = 0; i < av_count(buildblocks); i++) {
+      CV *buildblock = (CV *)AvARRAY(buildblocks)[i];
 
       ENTER;
       SAVETMPS;
@@ -1160,9 +1151,34 @@ static XS(injected_constructor)
       FREETMPS;
       LEAVE;
     }
+  }
 
-    FREETMPS;
-    LEAVE;
+  if(meta->adjustblocks) {
+    CopLINE_set(PL_curcop, __LINE__);
+
+    AV *adjustblocks = meta->adjustblocks;
+    U32 i;
+    for(i = 0; i < av_count(adjustblocks); i++) {
+      CV *adjustblock = (CV *)AvARRAY(adjustblocks)[i];
+
+      ENTER;
+      SAVETMPS;
+      SPAGAIN;
+
+      /* No args */
+
+      EXTEND(SP, 1);
+
+      PUSHMARK(SP);
+      PUSHs(self);
+      PUTBACK;
+
+      assert(adjustblock);
+      call_sv((SV *)adjustblock, G_VOID);
+
+      FREETMPS;
+      LEAVE;
+    }
   }
 
   PL_curcop = prevcop;
@@ -1170,7 +1186,7 @@ static XS(injected_constructor)
   XSRETURN(1);
 }
 
-static XS(injected_DOES)
+XS_INTERNAL(injected_DOES)
 {
   dXSARGS;
   const ClassMeta *meta = XSANY.any_ptr;
@@ -1253,6 +1269,7 @@ static ClassMeta *S_mop_create_class(pTHX_ enum MetaType type, SV *name, SV *sup
 
   meta->sealed = false;
   meta->role_is_invokable = false;
+  meta->strict_params = false;
   meta->start_slotix = 0;
   meta->slots   = newAV();
   meta->methods = newAV();
@@ -1266,6 +1283,7 @@ static ClassMeta *S_mop_create_class(pTHX_ enum MetaType type, SV *name, SV *sup
   meta->pending_submeta = NULL;
   meta->roles = newAV();
   meta->buildblocks = NULL;
+  meta->adjustblocks = NULL;
   meta->initslots = NULL;
 
   if(!PL_parser) {
@@ -1314,6 +1332,28 @@ static ClassMeta *S_mop_create_class(pTHX_ enum MetaType type, SV *name, SV *sup
       meta->repr = supermeta->repr;
       meta->foreign_new = supermeta->foreign_new;
 
+      if(supermeta->buildblocks) {
+        AV *superbuildblocks = supermeta->buildblocks;
+        U32 i;
+
+        if(!meta->buildblocks)
+          meta->buildblocks = newAV();
+
+        for(i = 0; i < av_count(superbuildblocks); i++)
+          av_push(meta->buildblocks, /* no inc */ AvARRAY(superbuildblocks)[i]);
+      }
+
+      if(supermeta->adjustblocks) {
+        AV *superadjustblocks = supermeta->adjustblocks;
+        U32 i;
+
+        if(!meta->adjustblocks)
+          meta->adjustblocks = newAV();
+
+        for(i = 0; i < av_count(superadjustblocks); i++)
+          av_push(meta->adjustblocks, /* no inc */ AvARRAY(superadjustblocks)[i]);
+      }
+
       if(supermeta->parammap) {
         HV *old = supermeta->parammap;
         HV *new = meta->parammap = newHV();
@@ -1324,6 +1364,9 @@ static ClassMeta *S_mop_create_class(pTHX_ enum MetaType type, SV *name, SV *sup
         while((iter = hv_iternext(old))) {
           STRLEN klen = HeKLEN(iter);
           /* Don't SvREFCNT_inc() the values because they aren't really SV *s */
+          /* Subclasses *DIRECTLY SHARE* their param metas because the
+           * information in them is directly compatible
+           */
           if(klen < 0)
             hv_store_ent(new, HeSVKEY(iter), HeVAL(iter), HeHASH(iter));
           else
@@ -1423,9 +1466,18 @@ static void S_set_class_compat(pTHX_ ClassMeta *meta, const char *val, void *_)
     croak("Unrecognised class compatibility argument %s", val);
 }
 
+static void S_set_class_strict(pTHX_ ClassMeta *meta, const char *val, void *_)
+{
+  if(strEQ(val, "params"))
+    meta->strict_params = TRUE;
+  else
+    croak("Unrecognised class strictness type %s", val);
+}
+
 static struct AttributeDefinition class_attributes[] = {
   { "repr", (AttributeHandler *)&S_set_class_repr, NULL },
   { "compat", (AttributeHandler *)&S_set_class_compat, NULL },
+  { "strict", (AttributeHandler *)&S_set_class_strict, NULL },
   { 0 },
 };
 
@@ -1501,9 +1553,8 @@ static SlotMeta *S_mop_class_add_slot(pTHX_ ClassMeta *meta, SV *slotname)
   slotmeta->name = SvREFCNT_inc(slotname);
   slotmeta->class = meta;
   slotmeta->slotix = meta->next_slotix;
-  slotmeta->defaultsv = newSV(0);
-  slotmeta->has_param = 0;
-  slotmeta->is_required = 0;
+  slotmeta->defaultsv = NULL;
+  slotmeta->param = NULL;
 
   av_push(slots, (SV *)slotmeta);
   meta->next_slotix++;
@@ -1514,10 +1565,22 @@ static SlotMeta *S_mop_class_add_slot(pTHX_ ClassMeta *meta, SV *slotname)
 #define mop_class_add_BUILD(class, cv)  S_mop_class_add_BUILD(aTHX_ class, cv)
 static void S_mop_class_add_BUILD(pTHX_ ClassMeta *meta, CV *cv)
 {
+  if(meta->strict_params)
+    croak("Cannot add a BUILD block to a class with :strict(params)");
+
   if(!meta->buildblocks)
     meta->buildblocks = newAV();
 
   av_push(meta->buildblocks, (SV *)cv);
+}
+
+#define mop_class_add_ADJUST(class, cv)  S_mop_class_add_ADJUST(aTHX_ class, cv)
+static void S_mop_class_add_ADJUST(pTHX_ ClassMeta *meta, CV *cv)
+{
+  if(!meta->adjustblocks)
+    meta->adjustblocks = newAV();
+
+  av_push(meta->adjustblocks, (SV *)cv);
 }
 
 static bool mop_class_implements_role(ClassMeta *classmeta, ClassMeta *rolemeta)
@@ -1572,32 +1635,16 @@ static void S_mop_class_compose_role(pTHX_ ClassMeta *classmeta, ClassMeta *role
     av_push(classmeta->buildblocks, (SV *)embedded_buildblock);
   }
 
-  if(rolemeta->parammap) {
-    HV *src = rolemeta->parammap;
+  U32 nadjusts = rolemeta->adjustblocks ? av_count(rolemeta->adjustblocks) : 0;
+  for(i = 0; i < nadjusts; i++) {
+    CV *adjustblock = (CV *)AvARRAY(rolemeta->adjustblocks)[i];
 
-    if(!classmeta->parammap)
-      classmeta->parammap = newHV();
+    CV *embedded_adjustblock = embed_cv(adjustblock, embedding);
 
-    HV *dst = classmeta->parammap;
+    if(!classmeta->adjustblocks)
+      classmeta->adjustblocks = newAV();
 
-    hv_iterinit(src);
-
-    HE *iter;
-    while((iter = hv_iternext(src))) {
-      STRLEN klen = HeKLEN(iter);
-      void *key = HeKEY(iter);
-
-      if(klen < 0 ? hv_exists_ent(dst, (SV *)key, HeHASH(iter))
-                  : hv_exists(dst, (char *)key, klen))
-        croak("Named parameter '%" SVf "' clashes with the one provided by role %" SVf,
-          SVfARG(HeSVKEY_force(iter)), SVfARG(rolemeta->name));
-
-      /* Don't SvREFCNT_inc() the values because they aren't really SV *s */
-      if(klen < 0)
-        hv_store_ent(dst, HeSVKEY(iter), HeVAL(iter), HeHASH(iter));
-      else
-        hv_store(dst, HeKEY(iter), klen, HeVAL(iter), HeHASH(iter));
-    }
+    av_push(classmeta->adjustblocks, (SV *)embedded_adjustblock);
   }
 
   U32 nmethods = av_count(rolemeta->methods);
@@ -1646,6 +1693,40 @@ static void S_mop_class_apply_role(pTHX_ RoleEmbedding *embedding)
     croak("Can only apply a role to a class");
 
   embedding->offset = classmeta->next_slotix;
+
+  if(rolemeta->parammap) {
+    HV *src = rolemeta->parammap;
+
+    if(!classmeta->parammap)
+      classmeta->parammap = newHV();
+
+    HV *dst = classmeta->parammap;
+
+    hv_iterinit(src);
+
+    HE *iter;
+    while((iter = hv_iternext(src))) {
+      STRLEN klen = HeKLEN(iter);
+      void *key = HeKEY(iter);
+
+      if(klen < 0 ? hv_exists_ent(dst, (SV *)key, HeHASH(iter))
+                  : hv_exists(dst, (char *)key, klen))
+        croak("Named parameter '%" SVf "' clashes with the one provided by role %" SVf,
+          SVfARG(HeSVKEY_force(iter)), SVfARG(rolemeta->name));
+
+      ParamMeta *roleparammeta = (ParamMeta *)HeVAL(iter);
+      ParamMeta *classparammeta;
+      Newx(classparammeta, 1, struct ParamMeta);
+
+      classparammeta->slotix = roleparammeta->slotix + embedding->offset;
+      classparammeta->is_required = roleparammeta->is_required;
+
+      if(klen < 0)
+        hv_store_ent(dst, HeSVKEY(iter), (SV *)classparammeta, HeHASH(iter));
+      else
+        hv_store(dst, HeKEY(iter), klen, (SV *)classparammeta, HeHASH(iter));
+    }
+  }
 
   classmeta->next_slotix += av_count(rolemeta->slots);
 
@@ -1707,14 +1788,18 @@ static void S_mop_class_seal(pTHX_ ClassMeta *meta)
 
     HE *iter;
     while((iter = hv_iternext(parammap))) {
-      SlotMeta *slotmeta = (SlotMeta *)HeVAL(iter);
-      if(!slotmeta->is_required)
+      ParamMeta *parammeta = (ParamMeta *)HeVAL(iter);
+      if(!parammeta->is_required)
         continue;
 
-      SLOTOFFSET slotix = slotmeta->slotix;
+      SLOTOFFSET slotix = parammeta->slotix;
       SvPVX(requireslots)[slotix / 8] |= (1 << (slotix % 8));
     }
   }
+
+  if(meta->strict_params && meta->buildblocks)
+    croak("Class %" SVf " cannot be :strict(params) because it has BUILD blocks",
+      SVfARG(meta->name));
 
   S_generate_initslots_method(aTHX_ meta);
 
@@ -1735,7 +1820,7 @@ static void S_mop_class_seal(pTHX_ ClassMeta *meta)
   }
 }
 
-static XS(xsub_mop_class_seal)
+XS_INTERNAL(xsub_mop_class_seal)
 {
   dXSARGS;
   ClassMeta *meta = XSANY.any_ptr;
@@ -1757,6 +1842,43 @@ static XS(xsub_mop_class_seal)
   }
 
   mop_class_seal(meta);
+}
+
+#define mop_slot_set_param(slotmeta, paramname)  S_mop_slot_set_param(aTHX_ slotmeta, paramname)
+void S_mop_slot_set_param(pTHX_ SlotMeta *slotmeta, const char *paramname)
+{
+  ClassMeta *classmeta = slotmeta->class;
+
+  if(!classmeta->parammap)
+    classmeta->parammap = newHV();
+
+  HV *parammap = classmeta->parammap;
+
+  I32 klen = strlen(paramname);
+  SV **svp;
+  if((svp = hv_fetch(parammap, paramname, klen, 0))) {
+    SlotMeta *colliding_slotmeta = *((SlotMeta **)svp);
+    if(colliding_slotmeta->class != classmeta)
+      croak("Already have a named constructor parameter called '%s' inherited from %" SVf,
+        paramname, SVfARG(colliding_slotmeta->class->name));
+    else
+      croak("Already have a named constructor parameter called '%s'", paramname);
+  }
+
+  ParamMeta *parammeta;
+  Newx(parammeta, 1, struct ParamMeta);
+
+  parammeta->name = newSVpvn(paramname, klen);
+  parammeta->slotix = slotmeta->slotix;
+  parammeta->is_required = 1; /* for now; might clear it when we have a default expr */
+
+  if(slotmeta->defaultsv)
+    /* Impossible from pureperl syntax, but possible via MOP::Class->add_slot */
+    parammeta->is_required = 0;
+
+  hv_store(parammap, paramname, klen, (SV *)parammeta, 0);
+
+  slotmeta->param = parammeta;
 }
 
 static bool is_valid_ident_utf8(const U8 *s)
@@ -1893,28 +2015,7 @@ static void S_set_slot_param(pTHX_ SlotMeta *slotmeta, const char *paramname, vo
       paramname++;
   }
 
-  ClassMeta *classmeta = slotmeta->class;
-
-  if(!classmeta->parammap)
-    classmeta->parammap = newHV();
-
-  HV *parammap = classmeta->parammap;
-
-  I32 klen = strlen(paramname);
-  SV **svp;
-  if((svp = hv_fetch(parammap, paramname, klen, 0))) {
-    SlotMeta *colliding_slotmeta = *((SlotMeta **)svp);
-    if(colliding_slotmeta->class != classmeta)
-      croak("Already have a named constructor parameter called '%s' inherited from %" SVf,
-        paramname, SVfARG(colliding_slotmeta->class->name));
-    else
-      croak("Already have a named constructor parameter called '%s'", paramname);
-  }
-
-  hv_store(parammap, paramname, klen, (SV *)slotmeta, 0);
-
-  slotmeta->has_param = 1;
-  slotmeta->is_required = 1; /* for now; might clear it when we have a default expr */
+  mop_slot_set_param(slotmeta, paramname);
 }
 
 static struct AttributeDefinition slot_attributes[] = {
@@ -2228,11 +2329,14 @@ done:
       return 0;
     }
 
+    slotmeta->defaultsv = newSV(0);
+
     *out = newBINOP(OP_SASSIGN, 0,
       op,
       newSVOP_CUSTOM(&pp_sv, 0, SvREFCNT_inc(slotmeta->defaultsv)));
 
-    slotmeta->is_required = 0;
+    if(slotmeta->param)
+      slotmeta->param->is_required = 0;
   }
 
   return KEYWORD_PLUGIN_STMT;
@@ -2264,6 +2368,12 @@ static const struct XSParseKeywordHooks kwhooks_has = {
 enum PhaserType {
   PHASER_NONE, /* A normal `method`; i.e. not a phaser */
   PHASER_BUILD,
+  PHASER_ADJUST,
+};
+
+const char *phasertypename[] = {
+  [PHASER_BUILD]  = "BUILD",
+  [PHASER_ADJUST] = "ADJUST",
 };
 
 static bool parse_permit(pTHX_ void *hookdata)
@@ -2293,6 +2403,7 @@ static void parse_pre_subparse(pTHX_ struct XSParseSublikeContext *ctx, void *ho
       break;
 
     case PHASER_BUILD:
+    case PHASER_ADJUST:
       break;
   }
 
@@ -2533,7 +2644,11 @@ static void parse_post_newcv(pTHX_ struct XSParseSublikeContext *ctx, void *hook
       break;
 
     case PHASER_BUILD:
-      mop_class_add_BUILD(compclassmeta, ctx->cv); /* steal */
+      mop_class_add_BUILD(compclassmeta, ctx->cv); /* steal CV */
+      break;
+
+    case PHASER_ADJUST:
+      mop_class_add_ADJUST(compclassmeta, ctx->cv); /* steal CV */
       break;
   }
 
@@ -2556,7 +2671,7 @@ static struct XSParseSublikeHooks parse_method_hooks = {
   .post_newcv      = parse_post_newcv,
 };
 
-static struct XSParseSublikeHooks parse_BUILD_hooks = {
+static struct XSParseSublikeHooks parse_phaser_hooks = {
   .skip_parts = XS_PARSE_SUBLIKE_PART_NAME|XS_PARSE_SUBLIKE_PART_ATTRS,
   /* no permit */
   .pre_subparse    = parse_pre_subparse,
@@ -2565,22 +2680,19 @@ static struct XSParseSublikeHooks parse_BUILD_hooks = {
   .post_newcv      = parse_post_newcv,
 };
 
-static int parse_BUILD(pTHX_ OP **out, void *hookdata)
+static int parse_phaser(pTHX_ OP **out, void *hookdata)
 {
-  /* For now, `BUILD { ... }` just means the same as `method BUILD { ... }`
-   */
   if(!have_compclassmeta)
-    croak("Cannot 'BUILD' outside of 'class'");
+    croak("Cannot '%s' outside of 'class'", phasertypename[PTR2UV(hookdata)]);
 
   lex_read_space(0);
 
-  return xs_parse_sublike(&parse_BUILD_hooks, (void *)PHASER_BUILD,
-    out);
+  return xs_parse_sublike(&parse_phaser_hooks, hookdata, out);
 }
 
-static const struct XSParseKeywordHooks kwhooks_BUILD = {
+static const struct XSParseKeywordHooks kwhooks_phaser = {
   .permit_hintkey = "Object::Pad/method",
-  .parse = &parse_BUILD,
+  .parse = &parse_phaser,
 };
 
 static void check_requires(pTHX_ void *hookdata)
@@ -2658,6 +2770,8 @@ static int dumppackage_class(pTHX_ const SV *sv)
   ret += DMD_ANNOTATE_SV(sv, (SV *)meta->initslots, "the Object::Pad initslots CV");
 
   ret += DMD_ANNOTATE_SV(sv, (SV *)meta->buildblocks, "the Object::Pad BUILD blocks AV");
+
+  ret += DMD_ANNOTATE_SV(sv, (SV *)meta->adjustblocks, "the Object::Pad ADJUST blocks AV");
 
   ret += DMD_ANNOTATE_SV(sv, (SV *)meta->methodscope, "the Object::Pad temporary method scope");
 
@@ -2873,14 +2987,37 @@ get_own_method(self, methodname)
   }
 
 SV *
-add_slot(self, slotname)
+add_slot(self, slotname, ...)
     SV *self
     SV *slotname
   CODE:
   {
+    dKWARG(2);
+
     ClassMeta *meta = NUM2PTR(ClassMeta *, SvUV(SvRV(self)));
 
     SlotMeta *slotmeta = mop_class_add_slot(meta, sv_mortalcopy(slotname));
+
+    static const char *args[] = {
+      "default",
+      "param",
+      NULL,
+    };
+    while(KWARG_NEXT(args)) {
+      switch(kwarg) {
+        case 0: /* default */
+          if(slotmeta->defaultsv)
+            SvREFCNT_dec(slotmeta->defaultsv);
+          slotmeta->defaultsv = newSVsv(kwval);
+          if(slotmeta->param)
+            slotmeta->param->is_required = 0;
+          break;
+
+        case 1: /* param */
+          mop_slot_set_param(slotmeta, SvPV_nolen(kwval));
+          break;
+      }
+    }
 
     RETVAL = newSV(0);
     sv_setref_uv(RETVAL, "Object::Pad::MOP::Slot", PTR2UV(slotmeta));
@@ -2915,6 +3052,26 @@ get_slot(self, slotname)
       meta->name, slotname);
   }
 
+void
+slots(self)
+    SV *self
+  PPCODE:
+    ClassMeta *meta = NUM2PTR(ClassMeta *, SvUV(SvRV(self)));
+
+    AV *slots = meta->slots;
+    U32 nslots = av_count(slots);
+
+    EXTEND(SP, nslots);
+
+    SLOTOFFSET i;
+    for(i = 0; i < nslots; i++) {
+      SlotMeta *slotmeta = (SlotMeta *)AvARRAY(slots)[i];
+
+      ST(i) = sv_newmortal();
+      sv_setref_iv(ST(i), "Object::Pad::MOP::Slot", PTR2UV(slotmeta));
+    }
+    XSRETURN(nslots);
+
 MODULE = Object::Pad    PACKAGE = Object::Pad::MOP::Method
 
 SV *
@@ -2947,14 +3104,24 @@ name(self)
   ALIAS:
     name  = 0
     class = 1
+    param_name = 2
+    has_param = 3
   CODE:
   {
     SlotMeta *meta = NUM2PTR(SlotMeta *, SvUV(SvRV(self)));
     switch(ix) {
-      case 0: RETVAL = SvREFCNT_inc(meta->name); break;
+      case 0:
+        RETVAL = SvREFCNT_inc(meta->name);
+        break;
       case 1:
         RETVAL = newSV(0);
         sv_setref_uv(RETVAL, "Object::Pad::MOP::Class", PTR2UV(meta->class));
+        break;
+      case 2: RETVAL = meta->param ? SvREFCNT_inc(meta->param->name)
+                                   : &PL_sv_undef;
+        break;
+      case 3:
+        RETVAL = boolSV(meta->param);
         break;
 
       default: RETVAL = NULL;
@@ -3027,7 +3194,8 @@ BOOT:
 
   register_xs_parse_keyword("has", &kwhooks_has, NULL);
 
-  register_xs_parse_keyword("BUILD", &kwhooks_BUILD, NULL);
+  register_xs_parse_keyword("BUILD", &kwhooks_phaser, (void *)PHASER_BUILD);
+  register_xs_parse_keyword("ADJUST", &kwhooks_phaser, (void *)PHASER_ADJUST);
 
   register_xs_parse_keyword("requires", &kwhooks_requires, NULL);
 

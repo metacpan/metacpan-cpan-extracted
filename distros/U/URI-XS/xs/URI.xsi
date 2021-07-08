@@ -210,9 +210,10 @@ void URI::path_segments (...) {
     for (auto it = list.begin(); it != list.end(); ++it) mPUSHp(it->data(), it->length());
 }
 
+bool URI::empty ()
+
 bool URI::to_bool (...) {
-    RETVAL = THIS->scheme().length() || THIS->host().length() || THIS->path().length() || THIS->query_string().length() ||
-             THIS->fragment().length();
+    RETVAL = !THIS->empty();
 }
 
 string URI::user (SV* newval = NULL) {

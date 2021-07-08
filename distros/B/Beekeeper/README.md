@@ -134,7 +134,7 @@ should be used and which services it will run. For example:
     "pool_id" : "myapp",
     "bus_id"  : "backend",
     "workers" : {
-        "MyApp::Worker" : { "workers_count" : 4 },
+        "MyApp::Worker" : { "worker_count" : 4 },
     },
 }]
 ```
@@ -174,32 +174,33 @@ The framework includes these command line tools to manage worker pools:
 
 ## Performance
 
-Beekeeper is pretty lightweight for being pure Perl, but the performance depends mostly on *the broker*
-performance, particularly on the broker introduced latency. These are ballpark performance estimations:
+Beekeeper is pretty lightweight for being pure Perl, but the performance depends mostly on the broker
+performance, particularly on the broker introduced latency. The following are conservative performance
+estimations:
 
-- A `call_remote` synchronous call involves 4 MQTT messages. A broker adds around 2.5 ms of latency 
-  processing these 4 messages, so this limits a single client to make a maximum of 400 synchronous 
-  calls per second. The cpu load will be very low (less than 1%), as the client spends most of the
-  time waiting for messages.
+- A `call_remote` synchronous call to a remote method involves 4 MQTT messages and takes 0.7 ms.
+  This limits a client to make a maximum of 1400 synchronous calls per second. The CPU load will be
+  very low, as the client spends most of the time just waiting for the response.
 
-- A `call_remote_async` asynchronous call to a remote method takes 0.12 ms. This implies a maximum of
-  8000 asynchronous calls per second (that is just for calls, then it must wait for responses).
+- A `call_remote_async` asynchronous call to a remote method also involves 4 MQTT messages, but it
+  can sustain a rate of 8000 calls per second because it does not block waiting for responses.
 
 - Launching a remote task with `fire_remote` involves 1 MQTT message and takes 0.1 ms. This implies
   a maximum of 10000 calls per second.
 
 - Sending a notification with `send_notification` involves 1 MQTT message and takes 0.1 ms. A worker
-  can emit more than 10000 notifications per second, even 15000 if these are smaller than 1 KB.
+  can emit more than 10000 notifications per second, up to 15000 if these are smaller than 1 KiB.
 
-- A worker processing remote calls has around 1.5 ms of latency introduced by the 2 MQTT messages
-  involved. So a single worker can handle a maximum of 650 requests per second. The cpu load will
-  be low for simple tasks, as the worker will spend a significant chunk of time waiting for messages.
+- A worker processing remote calls can handle a maximum of 4000 requests per second. It will be I/O
+  bound, the CPU load will be low for simple tasks, as the worker will spend a significant chunk of
+  time waiting for messages.
 
-- A worker uses 10 MB of resident memory from perl and the few required modules. After adding actual
-  code to do useful work the memory usage will of course increase. As a lot of workers will be required
-  to handle a substantial number of requests, there will be some memory pressure. 
+- A worker can receive a maximum of 15000 notifications per second. It will be CPU bound.
 
-- A single router can handle around 4000 requests per second.
+- An empty worker uses 10 MiB of resident memory for the perl interpreter and the few required modules.
+  After adding actual code to do useful work the memory usage will of course increase.
+
+- A single router can handle around 5000 messages per second.
 
 - Routers add 2 ms to frontend requests roundtrip.
 
@@ -212,6 +213,8 @@ This distribution includes some examples that can be run out of the box using an
 [examples/basic](./examples/basic) is a barebones example of the usage of Beekeper.
 
 [examples/flood](./examples/flood) allows to estimate the performance of a Beekeper setup.
+
+[examples/scraper](./examples/scraper) demonstrates asynchronous workers and clients.
 
 [examples/websocket](./examples/websocket) uses a service from a browser using WebSockets.
 

@@ -18,6 +18,7 @@ if ( grep /\P{ASCII}/ => @ARGV ) {
 # UTF8 boilerplace, per http://stackoverflow.com/questions/6162484/why-does-modern-perl-avoid-utf-8-by-default/
 
 use Pg::Explain::Node;
+use Pg::Explain::Buffers;
 use Carp;
 
 =head1 NAME
@@ -26,11 +27,11 @@ Pg::Explain::From - Base class for parsers of non-text explain formats.
 
 =head1 VERSION
 
-Version 1.10
+Version 1.11
 
 =cut
 
-our $VERSION = '1.10';
+our $VERSION = '1.11';
 
 =head1 SYNOPSIS
 
@@ -254,19 +255,8 @@ sub make_node_from {
     }
     $new_node->add_extra_info( 'Heap Blocks: ' . join( ' ', @heap_blocks_info ) ) if 0 < scalar @heap_blocks_info;
 
-    my @buf_info = ();
-    for my $buf_block ( qw(Shared Local Temp) ) {
-        my @buf_block_info = ();
-        for my $buf_read ( qw(Hit Read Dirtied Written) ) {
-            my $key = "$buf_block $buf_read Blocks";                                  # Shared Hit Blocks
-            push @buf_block_info, sprintf '%s=%d', lc $buf_read, $struct->{ $key }    # hit=12345
-                if defined $struct->{ $key }
-                and $struct->{ $key } =~ m{\A\d+\z}
-                and $struct->{ $key } > 0;
-        }
-        push @buf_info, join ' ', lc $buf_block, @buf_block_info if @buf_block_info;
-    }
-    $new_node->add_extra_info( 'Buffers: ' . join ', ', @buf_info ) if @buf_info;
+    my $buffers = Pg::Explain::Buffers->new( $struct );
+    $new_node->buffers( $buffers ) if $buffers;
 
     if ( $struct->{ 'Conflict Resolution' } ) {
         $new_node->add_extra_info( 'Conflict Resolution: ' . $struct->{ 'Conflict Resolution' } );

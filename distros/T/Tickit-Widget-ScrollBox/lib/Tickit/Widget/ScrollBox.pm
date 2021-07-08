@@ -1,12 +1,12 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2013-2020 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2013-2021 -- leonerd@leonerd.org.uk
 
-use 5.026; # signatures
+use v5.26; # signatures
 use Object::Pad 0.27;
 
-package Tickit::Widget::ScrollBox 0.09;
+package Tickit::Widget::ScrollBox 0.10;
 class Tickit::Widget::ScrollBox
    extends Tickit::SingleChildWidget 0.53;
 
@@ -186,8 +186,17 @@ BUILD ( %args )
    my $vertical   = $args{vertical} // 1;
    my $horizontal = $args{horizontal};
 
-   $_vextent = Tickit::Widget::ScrollBox::Extent->new( $self, "v" ) if $vertical;
-   $_hextent = Tickit::Widget::ScrollBox::Extent->new( $self, "h" ) if $horizontal;
+   $vertical and
+      $_vextent = Tickit::Widget::ScrollBox::Extent->new(
+         scrollbox => $self,
+         id        => "v",
+      );
+
+   $horizontal and
+      $_hextent = Tickit::Widget::ScrollBox::Extent->new(
+         scrollbox => $self,
+         id        => "h",
+      );
 
    $_v_on_demand = $vertical  ||'' eq "on_demand";
    $_h_on_demand = $horizontal||'' eq "on_demand";

@@ -1,6 +1,6 @@
 package Lab::Instrument::YokogawaGS200;
 #ABSTRACT: Yokogawa GS200 DC source
-$Lab::Instrument::YokogawaGS200::VERSION = '3.760';
+$Lab::Instrument::YokogawaGS200::VERSION = '3.762';
 use v5.20;
 
 use strict;
@@ -548,7 +548,7 @@ Lab::Instrument::YokogawaGS200 - Yokogawa GS200 DC source
 
 =head1 VERSION
 
-version 3.760
+version 3.762
 
 =head1 SYNOPSIS
 
@@ -744,17 +744,17 @@ The YokogawaGP200 class is a Source (L<Lab::Instrument::Source>)
 
 This software is copyright (c) 2021 by the Lab::Measurement team; in detail:
 
-  Copyright 2005-2006  Daniel SchrÃ¶er
-            2009       Andreas K. HÃ¼ttel, Daniela Taubert
-            2010       Andreas K. HÃ¼ttel, Daniel SchrÃ¶er
-            2011       Andreas K. HÃ¼ttel, David Kalok, Florian Olbrich
-            2012       Alois Dirnaichner, Andreas K. HÃ¼ttel, Florian Olbrich
-            2013       Andreas K. HÃ¼ttel, Christian Butschkow
+  Copyright 2005-2006  Daniel Schroeer
+            2009       Andreas K. Huettel, Daniela Taubert
+            2010       Andreas K. Huettel, Daniel Schroeer
+            2011       Andreas K. Huettel, David Kalok, Florian Olbrich
+            2012       Alois Dirnaichner, Andreas K. Huettel, Florian Olbrich
+            2013       Andreas K. Huettel, Christian Butschkow
             2014       Alois Dirnaichner, Christian Butschkow
             2015       Alois Dirnaichner
             2016       Simon Reinhardt
-            2017       Andreas K. HÃ¼ttel
-            2020       Andreas K. HÃ¼ttel
+            2017       Andreas K. Huettel
+            2020       Andreas K. Huettel
 
 
 This is free software; you can redistribute it and/or modify it under

@@ -3,7 +3,9 @@ abstract: 'a game featuring @ versus the Xarci Bedo'
 author:
   - 'Jeremy Mates <jeremy.mates@gmail.com>'
 build_requires:
+  Data::Dumper: '0'
   ExtUtils::CBuilder: '0'
+  List::Util: '0'
   Scalar::Util: '0'
   Statistics::Lite: '0'
   Test::More: '0.88'
@@ -23,7 +25,7 @@ name: Game-Xomb
 provides:
   Game::Xomb:
     file: lib/Game/Xomb.pm
-    version: '1.02'
+    version: '1.03'
 requires:
   List::Util: '0'
   List::UtilsBy: '0'
@@ -37,5 +39,5 @@ requires:
 resources:
   license: http://opensource.org/licenses/BSD-3-Clause
   repository: https://github.com/thrig/Game-Xomb
-version: '1.02'
+version: '1.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

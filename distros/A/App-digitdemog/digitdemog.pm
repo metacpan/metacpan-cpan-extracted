@@ -1,6 +1,6 @@
 package App::digitdemog ; 
-our $VERSION = '0.060' ; 
-our $DATE = '2021-07-01T19:27+09:00' ; 
+our $VERSION = '0.062' ; 
+our $DATE = '2021-07-03T22:09+09:00' ; 
 
 =encoding utf8
 
@@ -17,7 +17,7 @@ This module provides a Unix-like command `digitdemog'.
 想定している使い方 (digitdemog) : 
 
   1. 何桁目にどんな文字が現れたのかを解読する
-  2. -L2 により、各行の桁数ごとに、どんな値が現れたか、例を取り出す。
+  2. -L2 により、各行の桁数ごとに、どんな値が現れたか、例を取り出す。(-L4も可能。)
  
 =head1 SEE ALSO
 

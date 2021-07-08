@@ -1,3 +1,7 @@
+5.2.7    xx.xx.2021
+           - add Date::strptime
+           - More correctly parse dates in ISO8601 YYYY-Www format
+           - fix compilation warnings
 5.2.6    24.05.2021
            - skip setenv test for buggy freebsd versions
 5.2.5    13.05.2021

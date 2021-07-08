@@ -4,14 +4,14 @@ package Chart::GGPlot::Backend::Plotly::Geom::Path;
 
 use Chart::GGPlot::Class qw(:pdl);
 
-our $VERSION = '0.0011'; # VERSION
+our $VERSION = '0.0016'; # VERSION
 
 with qw(Chart::GGPlot::Backend::Plotly::Geom);
 
 use Module::Load;
 
 use Chart::GGPlot::Backend::Plotly::Util qw(
-  cex_to_px to_rgb group_to_NA pdl_to_plotly
+  to_px to_rgb group_to_NA pdl_to_plotly
 );
 use Chart::GGPlot::Util qw(ifelse);
 
@@ -39,7 +39,7 @@ classmethod scatter_line ($df, $params, $plot) {
     #  See https://github.com/plotly/plotly.js/issues/581
 
     my $color = to_rgb( $df->at('color'), $df->at('alpha') )->at(0);
-    my $size  = cex_to_px( $df->at('size')->slice( pdl(0) ) );
+    my $size  = to_px( $df->at('size')->slice( pdl(0) ) );
     $size->where($size < 2) .= 2;
 
     # plotly supports solid, dashdot, dash, dot
@@ -109,7 +109,7 @@ Chart::GGPlot::Backend::Plotly::Geom::Path - Chart::GGPlot's Plotly implementati
 
 =head1 VERSION
 
-version 0.0011
+version 0.0016
 
 =head1 SEE ALSO
 
@@ -122,7 +122,7 @@ Stephan Loyd <sloyd@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019-2020 by Stephan Loyd.
+This software is copyright (c) 2019-2021 by Stephan Loyd.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

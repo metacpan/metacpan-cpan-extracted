@@ -1,0 +1,8 @@
+Revision history for Catalyst-Plugin-Session-Store-Redis-Fast
+
+1.000   06-Jul-2021
+        First version Catalyst::Plugin::Session::Store::Redis::Fast
+        Catlyst plugin to to use Redis::Fast module
+
+1.001   06-Jul-2021
+        internal makefile change

@@ -74,8 +74,18 @@ sub new($class, @input_arguments) {
     else {
         $self->{wireguard_home} = WIREGUARD_HOME;
     }
+    $self->{wg_meta} = undef;
     bless $self, $class;
     return $self;
+}
+
+#@returns Wireguard::WGmeta::Wrapper::Config
+sub wg_meta($self) {
+    # (sort of) singleton
+    unless (defined $self->{wg_meta}){
+        $self->{wg_meta} = Wireguard::WGmeta::Wrapper::Config->new($self->{wireguard_home});
+    }
+    return $self->{wg_meta};
 }
 
 =head2 entry_point()
@@ -109,13 +119,19 @@ Exception if the user has insufficient privileges .
 sub check_privileges($self) {
     if (not -w $self->{wireguard_home}) {
         my $username = getpwuid($<);
-        die "Insufficient privileges - `$username` has rw no permissions to `$self->{wireguard_home}`. You probably forgot `sudo`";
+        die "Insufficient privileges - `$username` has no rw permissions to `$self->{wireguard_home}`. You probably forgot `sudo`";
     }
 }
 
 sub _retrieve_or_die($self, $ref_array, $idx) {
     my @arr = @{$ref_array};
     eval {return $arr[$idx]} or $self->cmd_help();
+}
+
+sub _unknown_attr_handler($attribute, $value) {
+    my $prefix = substr $attribute, 0, 1;
+    die "`$attribute` is unknown, please add `+` as prefix to add it" unless $prefix eq '+';
+    return (substr $attribute, 1), $value;
 }
 
 1;

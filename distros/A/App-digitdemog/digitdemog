@@ -1,7 +1,6 @@
 #!/usr/bin/perl
 use 5.014 ; use strict ; use warnings ;  # the functions requires 5.10 for "state", 5.14 for srand. 
-use Getopt::Std ; getopts '.12$:=p:q:u:L:R:S', \my%o ;  
-use Math::Trig qw/pi/ ; # 5.4から
+use Getopt::Std ; getopts '.12$:=jp:q:u:L:R:S', \my%o ;  
 use Scalar::Util qw/looks_like_number/ ; # 5.7.3から
 use Term::ANSIColor qw/:constants color/ ;  $Term::ANSIColor::AUTORESET = 1 ;
 use Time::HiRes qw/sleep usleep gettimeofday tv_interval/ ; # 5.7.3から
@@ -66,8 +65,11 @@ sub bylen ( ) {
     $M{$len}[3] = $_ ;
 
   }
-  #for(keys %freq){ say "$_, $freq{$_}"} ; exit 0 ;
-  print join ( "\t", map {UNDERLINE $_} qw[length freq minstr maxstr] , $oL4 ? qw[first_str last_str ]:() ) , "\n" ;
+  use utf8 ;
+  my @oth = $o{j} ? qw[ 文字列長 頻度 辞書順先頭 辞書順末尾 出現順先頭 出現順末尾 ] : qw[ length freq minstr maxstr first_str last_str ] ; 
+  no utf8 ; 
+  #print join ( "\t", map {UNDERLINE $_} qw[length freq minstr maxstr] , $oL4 ? qw[first_str last_str ]:() ) , "\n" ;
+  print join ( "\t", map {UNDERLINE $_} @oth[0..3] , $oL4 ? @oth[4..5] : () ) , "\n" ;
   for ( sort { $a <=> $b } keys %M ) {  # 数値 (文字列の長さを表す)でソート 
     my @str = @{ $M{$_} } ;
     my @prt = $optq0 ? @str : map { defined $_ ? qq['$_'] : undef } @str ;
@@ -173,6 +175,7 @@ sub HELP_MESSAGE {
   オプション: 
    -=     : 先頭行を読み飛ばす
    -1     : データで全く同じ行が2回以上来たら、読み飛ばす。(-L2と-L4と-.の指定時は適用されない。)
+   -j     : 出力表の表頭を英語から日本語にする。
    -u 0   : バイナリで処理する(通常は UTF-8で処理をする)
    -p str : 正規表現によるパターンの指定。 '^(....)(...)(.)$' 等を指定する。
    -q 0   : 出力で文字をシングルクォーテーションで囲まない。# 廃止 --> (-L2と-L4指定時に適用。)   
@@ -181,7 +184,6 @@ sub HELP_MESSAGE {
    -.     : 出力表の値で "同じ数." と表示された値は、同じ入力の(改行文字で区切られた)文字列に由来することを表す。
    -L2    ; 文字列長毎に、文字列の最小値と最大値を取り出す。両者が一致する場合は、後者を空文字列にする。
    -L4    ; 文字列長毎に、文字列の最小値と最大値の他に、最初に現れたもの、最後に現れたものも表示する。
-   #-2     ; -L の指定がある場合に、最初に出現した文字列と、最後に出現した文字列を取り出しているが、それを止める。
    -R 0   ; Windows形式の改行文字が来ても通常s/\r$//しているが、その動作を解除する。
    -S     ; 空白文字を分類して数える。(長音文字も対応したい。少画数の文字も集計したい。) 
 

@@ -1,4 +1,4 @@
-package Dist::Zilla::Role::PluginBundle 6.022;
+package Dist::Zilla::Role::PluginBundle 6.023;
 # ABSTRACT: something that bundles a bunch of plugins
 
 use Moose::Role;
@@ -44,7 +44,7 @@ Dist::Zilla::Role::PluginBundle - something that bundles a bunch of plugins
 
 =head1 VERSION
 
-version 6.022
+version 6.023
 
 =head1 DESCRIPTION
 
@@ -53,11 +53,12 @@ will replace its place in the plugin list with the result of calling its
 C<bundle_config> method, which will be passed a Config::MVP::Section to
 configure the bundle.
 
-=head1 PERL VERSION SUPPORT
+=head1 PERL VERSION
 
-This module has the same support period as perl itself:  it supports the two
-most recent versions of perl.  (That is, if the most recently released version
-is v5.40, then this module should work on both v5.40 and v5.38.)
+This module should work on any version of perl still receiving updates from
+the Perl 5 Porters.  This means it should work on any version of perl released
+in the last two to three years.  (That is, if the most recently released
+version is v5.40, then this module should work on both v5.40 and v5.38.)
 
 Although it may work on older versions of perl, no guarantee is made that the
 minimum required version will not be increased.  The version may be increased

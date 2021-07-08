@@ -23,7 +23,7 @@ exit
 # Copyright (c) 2008, 2009, 2010, 2018, 2019, 2020, 2021 INABA Hitoshi <ina@cpan.org> in a CPAN
 ######################################################################
 
-$VERSIONE = '0.25';
+$VERSIONE = '0.27';
 $VERSIONE = $VERSIONE;
 use strict;
 BEGIN { $INC{'warnings.pm'} = '' if $] < 5.006 }; use warnings; local $^W=1;
@@ -224,7 +224,10 @@ for my $target (@ARGV) {
             if (open FILE, $file) {
                 while (<FILE>) {
                     chomp;
-                    if (/^use\s+([A-Za-z][^;\s]*).*;/) {
+                    if (/^use\s+([0-9]+(\.[0-9]*)?)/) {
+                        $requires{'perl'} = $1;
+                    }
+                    elsif (/^use\s+([A-Za-z][^;\s]*).*;/) {
                         $requires{$1} = ($requires_version{$1} || '0');
                     }
                     elsif (/^package\s+([A-Za-z][^;\s]*).*;/) {
@@ -980,7 +983,7 @@ TO_CONTRIBUTE
 use strict;
 BEGIN { $INC{'warnings.pm'} = '' if $] < 5.006 }; use warnings; local $^W=1;
 
-if ($ARGV[0] ne 'xzvf') {
+if (scalar(@ARGV) == 0) {
     die <<END;
 
 usage: ptar xzvf file1.tar.gz file2.tar.gz ...
@@ -993,6 +996,10 @@ e(x)tract
 (f)ile
 
 END
+}
+
+if ($ARGV[0] eq 'xzvf') {
+    () = shift @ARGV;
 }
 
 for my $gzfile (grep m/\.tar\.gz$/xmsi, @ARGV) {

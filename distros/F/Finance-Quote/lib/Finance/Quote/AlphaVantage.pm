@@ -26,7 +26,7 @@ use strict;
 use JSON qw( decode_json );
 use HTTP::Request::Common;
 
-our $VERSION = '1.50'; # VERSION
+our $VERSION = '1.51'; # VERSION
 
 # Alpha Vantage recommends that API call frequency does not extend far
 # beyond ~1 call per second so that they can continue to deliver

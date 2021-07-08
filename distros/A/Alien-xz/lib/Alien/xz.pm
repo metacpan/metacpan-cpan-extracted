@@ -5,7 +5,7 @@ use warnings;
 use base qw( Alien::Base );
 
 # ABSTRACT: Find or build xz
-our $VERSION = '0.07'; # VERSION
+our $VERSION = '0.08'; # VERSION
 
 
 
@@ -34,48 +34,45 @@ Alien::xz - Find or build xz
 
 =head1 VERSION
 
-version 0.07
+version 0.08
 
 =head1 SYNOPSIS
+
+In your Makefile.PL:
+
+ use ExtUtils::MakeMaker;
+ use Alien::Base::Wrapper ();
+
+ WriteMakefile(
+   Alien::Base::Wrapper->new('Alien::xz')->mm_args2(
+     # MakeMaker args
+     NAME => 'My::XS',
+     ...
+   ),
+ );
 
 In your Build.PL:
 
  use Module::Build;
- use Alien::xz;
+ use Alien::Base::Wrapper qw( Alien::xz !export );
+
  my $builder = Module::Build->new(
    ...
    configure_requires => {
      'Alien::xz' => '0',
      ...
    },
-   extra_compiler_flags => Alien::xz->cflags,
-   extra_linker_flags   => Alien::xz->libs,
+   Alien::Base::Wrapper->mb_args,
    ...
  );
- 
+
  $build->create_build_script;
-
-In your Makefile.PL:
-
- use ExtUtils::MakeMaker;
- use Config;
- use Alien::xz;
- 
- WriteMakefile(
-   ...
-   CONFIGURE_REQUIRES => {
-     'Alien::xz' => '0',
-   },
-   CCFLAGS => Alien::xz->cflags . " $Config{ccflags}",
-   LIBS    => [ Alien::xz->libs ],
-   ...
- );
 
 In your script or module:
 
  use Alien::xz;
  use Env qw( @PATH );
- 
+
  unshift @PATH, Alien::xz->bin_dir;
 
 =head1 DESCRIPTION

@@ -9,16 +9,17 @@
 #include <panda/string.h>
 #include <panda/unordered_string_map.h>
 #include "os.icc"
+#include "time.h"
 
 namespace panda { namespace time {
 
 using Timezones = panda::unordered_string_map<string, TimezoneSP>;
 
-static constexpr const char GMT_FALLBACK[] = "GMT0";
-
 static string _tzdir;
 static string _tzsysdir = __PTIME_TZDIR;
 static string _tzembededdir = PANDA_DATE_ZONEINFO_DIR;
+
+enum class CacheKey { name, abbr };
 
 struct Data {
     uint64_t   rev = 0;
@@ -65,7 +66,8 @@ static inline Data& get_synced_data () {
     return data;
 }
 
-static TimezoneSP _tzget (const string_view& zname);
+static TimezoneSP _tzget      (const string_view& zname);
+static TimezoneSP _tzget_abbr (const string_view& zabbr);
 
 static bool _virtual_zone     (const string_view& zonename, Timezone* zone);
 static void _virtual_fallback (Timezone* zone);
@@ -76,6 +78,7 @@ const TimezoneSP& tzlocal () {
     return data.localzone;
 }
 
+template<CacheKey key>
 static Timezones& get_tzcache () {
     if (std::this_thread::get_id() == get_glob().mt_id) {
         static Timezones tzcache;
@@ -90,16 +93,30 @@ static Timezones& get_tzcache () {
     }
 }
 
-TimezoneSP tzget (const string_view& zonename) {
-    if (!zonename.length()) return tzlocal();
+template<typename FnCache, typename FnImpl>
+static inline TimezoneSP generic_get(const string_view& key, FnCache&& get_cache, FnImpl&& get_impl) noexcept {
+    if (!key.length()) return tzlocal();
 
-    auto& tzcache = get_tzcache();
-    auto it = tzcache.find(zonename);
-    if (it != tzcache.cend()) return it->second;
-    auto strname = string(zonename);
-    auto zone = _tzget(strname);
-    tzcache.emplace(strname, zone);
+    auto& cache = get_cache();
+    auto it = cache.find(key);
+    if (it != cache.cend()) return it->second;
+    auto zone = get_impl(key);
+    cache.emplace(key, zone);
     return zone;
+}
+
+TimezoneSP tzget (const string_view& zonename) {
+    return generic_get(zonename,
+                       []()          -> Timezones& { return get_tzcache<CacheKey::name>(); },
+                       [](auto& str) -> TimezoneSP { return _tzget(str);                   }
+    );
+}
+
+TimezoneSP tzget_abbr (const string_view& zoneabbr) {
+    return generic_get(zoneabbr,
+                       []()          -> Timezones& { return get_tzcache<CacheKey::abbr>(); },
+                       [](auto& str) -> TimezoneSP { return _tzget_abbr(str);              }
+    );
 }
 
 void tzset (const TimezoneSP& _zone) {
@@ -143,7 +160,7 @@ static string get_localzone_name () {
 
 static TimezoneSP _tzget (const string_view& zname) {
     auto zonename = string(zname);
-    //printf("ptime: tzget for zone %s\n", zonename);
+    // printf("ptime: tzget for zone %s\n", zonename.c_str());
     auto zone = new Timezone();
     TimezoneSP ret = zone;
     zone->is_local = false;
@@ -197,6 +214,56 @@ static TimezoneSP _tzget (const string_view& zname) {
     }
     
     return ret;
+}
+
+static TimezoneSP _tzget_abbr (const string_view& target_abbr) {
+    TimezoneSP target_zone;
+
+    for(auto& zone_name: available_timezones()) {
+        auto zone = _tzget(zone_name);
+        auto& future = zone->future;
+        if (target_abbr == future.outer.abbrev) {
+            target_zone = zone;
+            break;
+        } else if (future.hasdst && target_abbr == future.inner.abbrev){
+            target_zone = zone;
+            break;
+        }
+    }
+
+    if (!target_zone) {
+        for(auto& zone_name: available_timezones()) {
+            auto zone = _tzget(zone_name);
+            for(size_t i = 0; i < zone->trans_cnt; ++i) {
+                auto trans = zone->trans[i];
+                if (target_abbr == trans.abbrev) {
+                    target_zone = zone;
+                    break;
+                }
+            }
+        }
+    }
+
+    if (target_zone) {
+        auto offset = target_zone->future.outer.gmt_offset;
+        auto sign = offset >= 0 ? '+' : '-';
+        auto rev_sign = sign == '+' ? '-' : '+';
+        if (sign == '-') offset *= -1;
+        auto h = offset / 3600;
+        auto m = (offset % 3600) / 60;
+        char buff[64];
+
+        auto count = sprintf(buff, "<%c%02d:%02d>%c%02d:%02d", sign,h,m,rev_sign, h, m);
+        return _tzget(string_view(buff, count));
+    }
+
+
+    auto z = new Timezone();
+    TimezoneSP vzone = z;
+    z->is_local = true;
+    z->name = target_abbr;
+    _virtual_fallback(z);
+    return vzone;
 }
 
 static void _virtual_fallback (Timezone* zone) {

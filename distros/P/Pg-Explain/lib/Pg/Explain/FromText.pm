@@ -10,6 +10,7 @@ use open qw( :std :utf8 );
 use Unicode::Normalize qw( NFC );
 use Unicode::Collate;
 use Encode qw( decode );
+use English qw( -no_match_vars );
 
 if ( grep /\P{ASCII}/ => @ARGV ) {
     @ARGV = map { decode( 'UTF-8', $_ ) } @ARGV;
@@ -19,6 +20,7 @@ if ( grep /\P{ASCII}/ => @ARGV ) {
 
 use Carp;
 use Pg::Explain::Node;
+use Pg::Explain::Buffers;
 use Pg::Explain::JIT;
 
 =head1 NAME
@@ -27,11 +29,11 @@ Pg::Explain::FromText - Parser for text based explains
 
 =head1 VERSION
 
-Version 1.10
+Version 1.11
 
 =cut
 
-our $VERSION = '1.10';
+our $VERSION = '1.11';
 
 =head1 SYNOPSIS
 
@@ -84,7 +86,7 @@ sub split_into_lines {
         if ( $l =~ m{ \A Trigger \s+ }xms ) {
             push @out, $l;
         }
-        elsif ( $l =~ m{ \A (?: Total \s+ runtime | Planning \s+ time | Execution \s+ time | Time | Filter | Output | JIT ): }xmsi ) {
+        elsif ( $l =~ m{ \A (?: Total \s+ runtime | Planning \s+ time | Execution \s+ time | Time | Filter | Output | JIT | Planning ): }xmsi ) {
             push @out, $l;
         }
         elsif ( $l =~ m{\A\S} ) {
@@ -119,6 +121,10 @@ sub parse_source {
     # Store jit text info, and flag whether we're in JIT parsing phase
     my $jit    = undef;
     my $in_jit = undef;
+
+    # Store information about planning buffers
+    my $planning_buffers = undef;
+    my $in_planning      = undef;
 
     my $top_node         = undef;
     my %element_at_depth = ();      # element is hashref, contains 2 keys: node (Pg::Explain::Node) and subelement-type, which can be: subnode, initplan or subplan.
@@ -287,6 +293,9 @@ sub parse_source {
             $in_jit = 1;
             $jit    = [ $line ];
         }
+        elsif ( $line =~ m{ \A (\s*) Planning: \s* \z }xmsi ) {
+            $in_planning = 1;
+        }
         elsif ( $line =~ m{ \A \s* Query \s+ Text: \s+ ( .* ) \z }xms ) {
             $query        = $1;
             $plan_started = 0;
@@ -304,14 +313,42 @@ sub parse_source {
             next LINE unless defined $maximal_depth;
             my $previous_element = $element_at_depth{ $maximal_depth };
             next LINE unless $previous_element;
-            $previous_element->{ 'node' }->add_extra_info( $info );
+            my $node = $previous_element->{ 'node' };
             if ( $info =~ m{ \A Workers \s+ Launched: \s+ ( \d+ ) \z }xmsi ) {
-                $previous_element->{ 'node' }->workers_launched( $1 );
+                $node->workers_launched( $1 );
+                $node->add_extra_info( $info );
+            }
+            elsif ( $info =~ m{ \A Buffers: \s }xms ) {
+                eval {
+                    my $buffers = Pg::Explain::Buffers->new( $info );
+                    if ( $in_planning ) {
+                        $planning_buffers = $buffers;
+                    }
+                    else {
+                        $node->buffers( $buffers );
+                    }
+                };
+                $node->add_extra_info( $info ) if $EVAL_ERROR;
+            }
+            elsif ( $info =~ m{ \A I/O \s Timings: \s }xms ) {
+                eval {
+                    if ( $in_planning ) {
+                        $planning_buffers->add_timing( $info ) if $planning_buffers;
+                    }
+                    else {
+                        $node->buffers->add_timing( $info ) if $node->buffers;
+                    }
+                };
+                $node->add_extra_info( $info ) if $EVAL_ERROR;
+            }
+            else {
+                $node->add_extra_info( $info );
             }
         }
     }
     $self->explain->jit( Pg::Explain::JIT->new( 'lines' => $jit ) ) if defined $jit;
     $self->explain->query( $query )                                 if $query;
+    $self->explain->planning_buffers( $planning_buffers )           if $planning_buffers;
     return $top_node;
 }
 

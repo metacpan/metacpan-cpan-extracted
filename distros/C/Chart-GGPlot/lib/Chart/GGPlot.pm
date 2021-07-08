@@ -4,7 +4,7 @@ package Chart::GGPlot;
 
 use Chart::GGPlot::Setup qw(:base :pdl);
 
-our $VERSION = '0.0011'; # VERSION
+our $VERSION = '0.0016'; # VERSION
 
 use Data::Munge qw(elem);
 use Data::Frame::Types qw(DataFrame);
@@ -134,7 +134,7 @@ Chart::GGPlot - ggplot2 port in Perl
 
 =head1 VERSION
 
-version 0.0011
+version 0.0016
 
 =head1 STATUS
 
@@ -183,6 +183,8 @@ Example exported image files:
 <img src="https://raw.githubusercontent.com/stphnlyd/perl5-Chart-GGPlot/master/examples/scale_viridis_02_01.png" alt="viridis color scale" width="40%">
 <img src="https://raw.githubusercontent.com/stphnlyd/perl5-Chart-GGPlot/master/examples/geom_polygon_01_01.png" alt="polygon" width="40%">
 <img src="https://raw.githubusercontent.com/stphnlyd/perl5-Chart-GGPlot/master/examples/geom_raster_02_01.png" alt="heatmap" width="40%">
+<img src="https://raw.githubusercontent.com/stphnlyd/perl5-Chart-GGPlot/master/examples/geom_text_01_05.png" alt="text" width="40%">
+<img src="https://raw.githubusercontent.com/stphnlyd/perl5-Chart-GGPlot/master/examples/geom_bar_01_05.png" alt="bar" width="40%">
 <img src="https://raw.githubusercontent.com/stphnlyd/perl5-Chart-GGPlot/master/examples/theme_01_06.png" alt="theme 'minimal'" width="40%">
 </p>
 
@@ -279,7 +281,7 @@ Stephan Loyd <sloyd@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019-2020 by Stephan Loyd.
+This software is copyright (c) 2019-2021 by Stephan Loyd.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

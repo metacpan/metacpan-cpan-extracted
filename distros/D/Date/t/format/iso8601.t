@@ -75,7 +75,7 @@ subtest 'parse' => sub {
         cmp_deeply([$d->year, $d->month, $d->day], [2017, 1, 2]);
         
         $d = date("2014-W01");
-        ok($d->error);
+        cmp_deeply([$d->year, $d->month, $d->day], [2013, 12, 29]);
     };
     
     subtest 'YYYY-Wnn-n' => sub {
@@ -92,7 +92,7 @@ subtest 'parse' => sub {
         cmp_deeply([$d->year, $d->month, $d->day], [2017, 1, 6]);
     
         $d = date("2014-W01-2");
-        ok($d->error);
+        cmp_deeply([$d->year, $d->month, $d->day], [2013, 12, 30]);
     };
     
     subtest 'loyality for wrong delimiters in offset' => sub {

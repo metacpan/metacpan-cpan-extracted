@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 BEGIN {
 
@@ -29,7 +29,7 @@ GetOptions(
 
 my $Help = "
 Usage: bkpr-restart [OPTIONS]
-Gracefully restart remote pool of workers.
+Gracefully restart pool of workers.
 
   -H, --Host  str  restart workers only of specified host
   -p, --pool  str  restart workers only of specified pool
@@ -99,16 +99,16 @@ __END__
 
 =head1 NAME
 
-bkpr-restart - Gracefully restart remote pool of workers
+bkpr-restart - Gracefully restart pool of workers
 
 =head1 VERSION
 
-Version 0.06
+Version 0.07
 
 =head1 SYNOPSIS
 
   Usage: bkpr-restart [OPTIONS]
-  Gracefully restart remote pool of workers.
+  Gracefully restart pool of workers.
   
     -H, --Host  str  restart workers only of specified host
     -p, --pool  str  restart workers only of specified pool
@@ -121,7 +121,7 @@ Version 0.06
 
 =head1 DESCRIPTION
 
-Signal remote workers to finish their current tasks and restart.
+Signal workers to finish their current tasks and restart.
 
 =head1 SEE ALSO
 

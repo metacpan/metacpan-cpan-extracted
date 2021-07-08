@@ -1,5 +1,31 @@
 Revision history for MooX-PDL-Role-Proxy
 
+0.06      2021-07-01 16:45:27-04:00 America/New_York
+
+
+  [BUG FIX]
+
+    * copy() duplicates PDL's behavior by returning the original object if inplace is set.
+
+    * sever() duplicates PDL's behavior by returning the original object
+
+  [ENHANCEMENTS]
+
+    * added qsort, qsort_on, clip_on, set_inplace
+
+    * hide all private attributes from namespace
+
+    * _piddles has clearer method so that it can be reset to defaults.
+
+    * inplace updates always used the object attribute accessors to
+      set the value.  This allows attribute triggers to be
+      called. This is not always appropriate, so inplace can now use
+      either the accessors or stores the results directly using the
+      '.=' operator.  inplace() now accepts an optional argument to
+      specify which approach to use.  There's also new methods
+      inplace_set and inplace_store, which, respectively, specify the
+      accessor and '.=' update approaches.
+
 0.05      2019-02-02 13:48:18-05:00 America/New_York
 
   [BUILD FIX]

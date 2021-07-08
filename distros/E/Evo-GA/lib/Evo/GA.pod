@@ -1,0 +1,28 @@
+=head1 NAME
+
+Evo::GA - Perl extension for genetic algorithms 
+
+=head1 SYNOPSIS
+
+  use Evo::GA;
+
+=head1 DESCRIPTION
+
+A genetic algorithms library
+
+=head2 EXPORT
+
+=head1 SEE ALSO
+
+=head1 AUTHOR
+
+koboldwiz, E<lt>koboldwiz@yahoo.comE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2021 by koboldwiz 
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.28.2 or,
+at your option, any later version of Perl 5 you may have available.
+

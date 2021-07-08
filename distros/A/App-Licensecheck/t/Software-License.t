@@ -1,5 +1,6 @@
 use Test2::V0;
-use Test2::Require::Module 'Software::LicenseUtils' => '0.103014';
+use Test2::Require::Module 'Software::LicenseUtils'   => '0.103014';
+use Test2::Require::Module 'Regexp::Pattern::License' => '3.6.0';
 
 use Test::Command::Simple;
 
@@ -39,7 +40,7 @@ my %LICENSES = (
 	'MPL-2.0'  => 'MPL-2.0',
 
 #	None                                    => 'UNKNOWN',
-	OpenSSL => 'Apache-1.0 and/or BSD-4-clause and/or OpenSSL',
+	OpenSSL => 'OpenSSL',
 	'Artistic-1.0-Perl OR GPL-1.0-or-later' =>
 		'Artistic or GPL-1+ and/or GPL-1',
 	PostgreSQL => 'PostgreSQL',

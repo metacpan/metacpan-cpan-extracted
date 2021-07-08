@@ -3,13 +3,14 @@ package MyApp::Service::Chat::Worker;
 use strict;
 use warnings;
 
+use MyApp::Service::Base;
 use base 'MyApp::Service::Base';
 
 
 sub on_startup {
     my $self = shift;
 
-    $self->setup_myapp_stuff;
+    $self->init_persistent_connections;
 
     $self->accept_remote_calls(
         'myapp.chat.message'  => 'send_message',
@@ -17,6 +18,8 @@ sub on_startup {
         'myapp.chat.notice'   => 'send_notice',
         'myapp.chat.ping'     => 'ping',
     );
+
+    log_info "Ready";
 }
 
 sub send_message {

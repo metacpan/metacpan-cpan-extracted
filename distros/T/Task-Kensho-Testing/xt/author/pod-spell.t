@@ -11,6 +11,7 @@ add_stopwords(<DATA>);
 all_pod_files_spelling_ok( qw( bin lib ) );
 __DATA__
 Alders
+Anwar
 Book
 Chris
 Dan
@@ -21,6 +22,8 @@ Kensho
 Lapworth
 Leir
 Leo
+Mohammad
+Müller
 Nehren
 Olaf
 Prather
@@ -30,13 +33,16 @@ Shawn
 Sorichetti
 Task
 Testing
+Tina
 apeiron
 chris
+cpan2
 ether
 grinnz
 irc
 leo
 lib
+mohammad
 olaf
 rkellyalso
 rleir

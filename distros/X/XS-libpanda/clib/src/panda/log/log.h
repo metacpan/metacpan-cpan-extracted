@@ -204,6 +204,7 @@ std::vector<Module*> get_modules ();
 
 namespace details {
     std::ostream& get_os ();
+    std::ostream& get_os_tmp ();
     bool          do_log (std::ostream&, Level, const Module*, const CodePoint&);
 
     template <char T> struct IsEval      : std::false_type {};
@@ -224,7 +225,26 @@ namespace details {
 
 struct escaped { string_view src; };
 
+struct prettify_json {
+    string_view src;
+    std::string str;
+    size_t unfold_limit;
+
+    explicit prettify_json (const string_view& sv, size_t unfold_limit = 1) : src(sv), unfold_limit(unfold_limit) {}
+
+    template <typename T, typename = std::enable_if_t<!std::is_same<std::decay_t<T>, string>::value && !std::is_same<std::decay_t<T>, string_view>::value, T>>
+    explicit prettify_json (T&& v, size_t unfold_limit = 1) : unfold_limit(unfold_limit) {
+        auto& os = details::get_os_tmp();
+        os << v;
+        set_from_os(os);
+    }
+
+private:
+    void set_from_os(std::ostream&);
+};
+
 std::ostream& operator<< (std::ostream&, const escaped&);
+std::ostream& operator<< (std::ostream&, const prettify_json&);
 
 }}
 

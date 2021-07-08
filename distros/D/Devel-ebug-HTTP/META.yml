@@ -13,7 +13,7 @@ configure_requires:
   File::ShareDir::Install: '0.06'
   perl: '5.010001'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.019, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.022, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -21,6 +21,7 @@ meta-spec:
 name: Devel-ebug-HTTP
 requires:
   Catalyst: '0'
+  Catalyst::Plugin::Static::Simple: '0'
   Catalyst::ScriptRunner: '0'
   Catalyst::View::TT: '0'
   Cwd: '0'
@@ -38,7 +39,7 @@ resources:
   bugtracker: https://github.com/uperl/Devel-ebug-HTTP/issues
   homepage: https://metacpan.org/pod/Devel::ebug::HTTP
   repository: git://github.com/uperl/Devel-ebug-HTTP.git
-version: '0.33'
+version: '0.34'
 x_contributors:
   - 'Leon Brocard <acme@astray.com>'
   - 'Graham Ollis <plicease@cpan.org>'

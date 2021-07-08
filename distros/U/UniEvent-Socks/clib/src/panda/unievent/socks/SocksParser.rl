@@ -1,3 +1,7 @@
+#include "SocksFilter.h"
+
+namespace panda { namespace unievent { namespace socks {
+
 %%{
     machine socks5_client_parser;
 
@@ -88,24 +92,55 @@
     connect_reply := (ver rep @rep rsv atyp dst_addr dst_port) @connect @!error;   
 }%%
 
-#if defined(MACHINE_DATA)
-#undef MACHINE_DATA
-%%{
-    write data;
-}%%
-#endif
+%%write data;
 
-#if defined(MACHINE_INIT)
-#undef MACHINE_INIT
-%%{
-    write init;
-}%%
-#endif
+void SocksFilter::handle_read (string& buf, const ErrorCode& err) {
+    panda_log_debug("handle_read, err: " << err << " state:" << state << ", " << buf.length() << " bytes");
+    if (state == State::terminal) return NextFilter::handle_read(buf, err);
+    if (err) return do_error(err);
 
-#if defined(MACHINE_EXEC)
-#undef MACHINE_EXEC
-%%{
-    write exec;
-}%%
-#endif
+    panda_log_verbose_debug(log::escaped{buf});
 
+    // pointer to current buffer
+    const char* buffer_ptr = buf.data();
+    // start parsing from the beginning pointer
+    const char* p = buffer_ptr;
+    // to the end pointer
+    const char* pe = buffer_ptr + buf.size();
+    const char* eof = pe;
+
+    // select reply parser by our state
+    switch (state) {
+        case State::handshake_reply:
+            cs = socks5_client_parser_en_negotiate_reply;
+            break;
+        case State::auth_reply:
+            cs = socks5_client_parser_en_auth_reply;
+            break;
+        case State::connect_reply:
+            cs = socks5_client_parser_en_connect_reply;
+            break;
+        case State::parsing:
+            // need more input
+            break;
+        case State::error:
+            panda_log_notice("error state, wont parse");
+            return;
+        default:
+            panda_log_notice("bad state, len: " << int(p - buffer_ptr));
+            do_error(errc::protocol_error);
+            return;
+    }
+
+    state = State::parsing;
+
+    %%write exec;
+
+    if (state == State::error) {
+        panda_log_notice("parser exiting in error state on pos: " << int(p - buffer_ptr));
+    } else if (state != State::parsing) {
+        panda_log_debug("parser finished");
+    }
+}
+
+}}}

@@ -1,20 +1,9 @@
 package Google::RestApi::SheetsApi4::Worksheet;
 
-use strict;
-use warnings;
+our $VERSION = '0.7';
 
-our $VERSION = '0.4';
+use Google::RestApi::Setup;
 
-use 5.010_000;
-
-use autodie;
-use Type::Params qw(compile compile_named multisig);
-use Types::Standard qw(Str StrMatch Int Bool HashRef ArrayRef HasMethods Maybe slurpy);
-use YAML::Any qw(Dump);
-
-no autovivification;
-
-use Google::RestApi::Utils qw(strip);
 use aliased 'Google::RestApi::SheetsApi4';
 use aliased 'Google::RestApi::SheetsApi4::Range';
 use aliased 'Google::RestApi::SheetsApi4::Range::Col';
@@ -25,8 +14,6 @@ use aliased 'Google::RestApi::SheetsApi4::RangeGroup::Tie';
 use aliased 'Google::RestApi::SheetsApi4::RangeGroup::Iterator';
 
 use parent "Google::RestApi::SheetsApi4::Request::Spreadsheet::Worksheet";
-
-do 'Google/RestApi/logger_init.pl';
 
 sub new {
   my $class = shift;
@@ -44,14 +31,14 @@ sub new {
 
   if ($self->{config_id}) {
     my $config = $self->spreadsheet_config($self->{config_id})
-      or die "Config '$self->{config_id}' is missing";
+      or LOGDIE "Config '$self->{config_id}' is missing";
     foreach (qw(id name uri)) {
       $self->{$_} = $config->{$_} if defined $config->{$_};
     }
     $self->{config} = $config;
   }
   defined $self->{id} || defined $self->{name} || $self->{uri}
-    or die "At least one of id, name, or uri must be specified";
+    or LOGDIE "At least one of id, name, or uri must be specified";
 
   return $self->spreadsheet()->_register_worksheet($self);
 }
@@ -62,11 +49,11 @@ sub worksheet_id {
     if ($self->{uri}) {
       my $qr_worksheet_uri = SheetsApi4->Worksheet_Uri;
       ($self->{id}) = $self->{uri} =~ m|$qr_worksheet_uri|;
-      die "Unable to extract a worksheet id from URI '$self->{uri}'" if !defined $self->{id};
+      LOGDIE "Unable to extract a worksheet id from URI '$self->{uri}'" if !defined $self->{id};
     } else {
       my $worksheets = $self->spreadsheet()->worksheet_properties('(title,sheetId)');  # potential recursion if $self->properties()
       my ($worksheet) = grep { $_->{title} eq $self->{name}; } @$worksheets;
-      $worksheet or die "Worksheet '$self->{name}' not found";
+      $worksheet or LOGDIE "Worksheet '$self->{name}' not found";
       $self->{id} = $worksheet->{sheetId};
     }
     DEBUG("Got worksheet id '$self->{id}'");
@@ -96,25 +83,23 @@ sub properties {
   my $id = $self->worksheet_id();
   my $worksheets = $self->spreadsheet()->worksheet_properties("($what,sheetId)");
   my ($worksheet) = grep { $_->{sheetId} eq $id; } @$worksheets;
-  $worksheet or die "Worksheet '$id' not found";
+  $worksheet or LOGDIE "Worksheet '$id' not found";
   return $worksheet;
 }
 
 # the following don't return ranges and don't use any batch, they are immediate.
 sub col {
   my $self = shift;
-  state $check = compile(Range->Col, ArrayRef, { optional => 1 });   # A or 1
+  state $check = compile(Range->Col, ArrayRef[Str], { optional => 1 });   # A or 1
   my ($col, $values) = $check->(@_);
   my $range = $self->range_col({ col => $col });
-  return $range->values(values => $values)
-    if defined $values;
-  return $range->values();
+  return $range->values(defined $values ? (values => $values) : ());
 }
 
 sub cols {
   my $self = shift;
 
-  state $check = compile(ArrayRef[Range->Col], ArrayRef, { optional => 1 });
+  state $check = compile(ArrayRef[Range->Col], ArrayRef[ArrayRef[Str]], { optional => 1 });
   my ($cols, $values) = $check->(@_);
 
   my @cols = map { $self->range_col($_); } @$cols;
@@ -122,27 +107,27 @@ sub cols {
   return $range_group->values(params => { majorDimension => 'COLUMNS' }) if !$values;
 
   my @ranges = $range_group->ranges();
-  $ranges[$_]->batch_values(
-    values => $values->[$_],
-  ) foreach (0..$#ranges);
+  foreach my $i (0..$#ranges) {
+    $ranges[$i]->batch_values(
+      values => $values->[$i],
+    );
+  }
 
   return $range_group->submit_values();
 }
 
 sub row {
   my $self = shift;
-  state $check = compile(Range->Row, ArrayRef, { optional => 1 });
+  state $check = compile(Range->Row, ArrayRef[Str], { optional => 1 });
   my ($row, $values) = $check->(@_);
   my $range = $self->range_row({row => $row});
-  return $range->values(values => $values)
-    if defined $values;
-  return $range->values();
+  return $range->values(defined $values ? (values => $values) : ());
 }
 
 sub rows {
   my $self = shift;
 
-  state $check = compile(ArrayRef[Range->Row], ArrayRef, { optional => 1 });
+  state $check = compile(ArrayRef[Range->Row], ArrayRef[ArrayRef[Str]], { optional => 1 });
   my ($rows, $values) = $check->(@_);
 
   my @rows = map { $self->range_row($_); } @$rows;
@@ -150,9 +135,11 @@ sub rows {
   return $range_group->values() if !$values;
 
   my @ranges = $range_group->ranges();
-  $ranges[$_]->batch_values(
-    values => $values->[$_],
-  ) foreach (0..$#ranges);
+  foreach my $i (0..$#ranges) {
+    $ranges[$i]->batch_values(
+      values => $values->[$i],
+    );
+  }
 
   return $range_group->submit_values();
 }
@@ -182,8 +169,7 @@ sub cell {
   }
   my $value = shift(@check);
 
-  return $range->values(values => $value) if defined $value;
-  return $range->values();
+  return $range->values(defined $value ? (values => $value) : ());
 }
 
 # call this before calling tie_rows or header_col. it's an
@@ -195,7 +181,7 @@ sub enable_header_col {
   } else {
     delete @{ %$self }{qw(header_col header_col_enabled)};
   }
-  return;
+  return 1;
 }
 
 sub header_col {
@@ -295,7 +281,8 @@ sub tie {
 
 sub submit_requests {
   my $self = shift;
-  return $self->spreadsheet()->submit_requests(requests => [ $self ], @_);
+  my @api = $self->spreadsheet()->submit_requests(requests => [ $self ], @_);
+  return wantarray ? @api : $api[0];
 }
 
 sub config {

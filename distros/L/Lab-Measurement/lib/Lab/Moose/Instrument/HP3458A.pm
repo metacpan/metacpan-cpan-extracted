@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::HP3458A;
-$Lab::Moose::Instrument::HP3458A::VERSION = '3.760';
+$Lab::Moose::Instrument::HP3458A::VERSION = '3.762';
 #ABSTRACT: HP 3458A digital multimeter
 
 use v5.20;
@@ -198,7 +198,7 @@ Lab::Moose::Instrument::HP3458A - HP 3458A digital multimeter
 
 =head1 VERSION
 
-version 3.760
+version 3.762
 
 =head1 SYNOPSIS
 
@@ -299,7 +299,7 @@ This driver consumes the following roles:
 This software is copyright (c) 2021 by the Lab::Measurement team; in detail:
 
   Copyright 2017       Simon Reinhardt
-            2020       Andreas K. HÃ¼ttel
+            2020       Andreas K. Huettel
             2021       Simon Reinhardt
 
 

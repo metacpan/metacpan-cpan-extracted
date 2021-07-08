@@ -1,11 +1,11 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2013-2020 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2013-2021 -- leonerd@leonerd.org.uk
 
 use Object::Pad 0.27;
 
-package Tickit::Widget::GridBox 0.31;
+package Tickit::Widget::GridBox 0.32;
 class Tickit::Widget::GridBox
    extends Tickit::ContainerWidget;
 
@@ -87,20 +87,6 @@ use constant WIDGET_PEN_FROM_STYLE => 1;
 
 Constructs a new C<Tickit::Widget::GridBox> object.
 
-Takes the following named arguments:
-
-=over 8
-
-=item children => ARRAY[ARRAY[Tickit::Widget]]
-
-Optional. If present, should be a 2D ARRAYref of ARRAYrefs containing the
-C<Tickit::Widget> children to display in the grid. They are all added with no
-additional options.
-
-This is now discouraged in favour of the L</append_row> method.
-
-=back
-
 =cut
 
 sub BUILDARGS {
@@ -119,14 +105,8 @@ BUILD
 {
    my %args = @_;
 
-   if( my $children = $args{children} ) {
-      Carp::carp( "The 'children' constructor argument to ${\ref $self} is discouraged; use ->append_row instead" );
-
-      foreach my $row ( 0 .. $#$children ) {
-         foreach my $col ( 0 .. $#{ $children->[$row] } ) {
-            $self->add( $row, $col, $children->[$row][$col] );
-         }
-      }
+   if( $args{children} ) {
+      croak "The 'children' constructor argument to ${\ref $self} is no longer recognised; use ->append_row instead";
    }
 }
 
@@ -413,9 +393,6 @@ suitable to use as a chaining mutator; e.g.
       ->append_row( [ Tickit::Widget::Static->new( ... ),
                       Tickit::Widget::Static->new( ... ) ] )
       ->append_row( ... );
-
-This should be preferred over using the C<children> constructor argument,
-which is now discouraged.
 
 =cut
 

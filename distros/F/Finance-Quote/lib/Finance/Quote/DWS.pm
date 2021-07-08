@@ -25,7 +25,7 @@ use Web::Scraper;
 use constant DEBUG => $ENV{DEBUG};
 use if DEBUG, 'Smart::Comments';
 
-our $VERSION = '1.50'; # VERSION
+our $VERSION = '1.51'; # VERSION
 
 our @labels = qw/name date isodate last name currency/;
 

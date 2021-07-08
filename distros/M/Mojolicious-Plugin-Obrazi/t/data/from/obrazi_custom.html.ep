@@ -1,4 +1,3 @@
-% use Mojo::Base -signatures;
 % use Mojo::File qw(path);
 <!DOCTYPE html>
 <html>
@@ -15,7 +14,7 @@
 % my $idx     = 0;
 % my $img_idx = 1;
 % for my $cat(['','',''], @$categories) {
-%    my $images  = $processed->map(sub($img) { $cat->[0] eq $img->[0] ? $img : (); });
+%    my $images  = $processed->map(sub {my $img = shift; $cat->[0] eq $img->[0] ? $img : (); });
 %    next unless @$images;
 %    my $level = $cat->[1] =~ m|(/)|g;
 %    $level += 2; $idx++;
@@ -29,9 +28,9 @@
         <div class="col card"
             data-index="<%= $img_idx %>"
             title="<%= $img->[2] %>"
-            style="background-image :url('<%= path($cat->[1]||(), $img->[-1])%>')">
+            style="background-image :url('<%= path($img->[1])->dirname->child($img->[-1])%>')">
             <div class="image" id="<%= $img_idx %>"
-                style="background-image: url('<%= path($cat->[1]||(), $img->[-2]) %>')">
+                style="background-image: url('<%= path($img->[1])->dirname->child($img->[-2]) %>')">
                 <div class="prev-next">
                     <div data-index="<%= $img_idx %>" class="prev pull-left text-left text-light">⏴</div>
                     <div data-index="<%= $img_idx %>" class="next pull-right text-right text-light">⏵</div>

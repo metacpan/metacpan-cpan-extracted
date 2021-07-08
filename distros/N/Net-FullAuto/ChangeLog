@@ -20,6 +20,67 @@
 #######################################################################
 
 
+2021-07-08  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000616 released
+
+        * Modified EmailServer_is.pm.
+
+2021-07-07  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000615 released
+
+        * Modified EmailServer_is.pm.
+
+2021-07-06  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000614 released
+
+        * Modified EmailServer_is.pm.
+          Added Test for Letsencrypt Cert.
+
+2021-07-05  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000613 released
+
+        * Modified EmailServer_is.pm.
+
+2021-07-05  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000612 released
+
+        * Changed unless fulloutput==0 to ending
+	  logic in FETCH in FA_Core.pm to
+	  $fulloutput!~/^.*\n0$/s.
+
+        * Modified EmailServer_is.pm.
+	  Added 2>&1 to all git clone commands.
+
+2021-07-04  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000611 released
+
+        * Added unless fulloutput==0 to ending
+	  logic in FETCH in FA_Core.pm.
+
+2021-07-04  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000610 released
+
+        * Modified EmailServer_is.pm.
+
+2021-07-03  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000609 released
+
+        * Modified EmailServer_is.pm.
+
+2021-07-02  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000608 released
+
+        * Modified EmailServer_is.pm.
+
 2021-07-01  Brian M. Kelly <Brian.Kelly@fullauto.com>
 
         * Version 1.0000607 released

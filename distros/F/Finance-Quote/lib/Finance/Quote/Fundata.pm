@@ -28,7 +28,7 @@ use HTTP::Request::Common;
 use HTTP::Request::Common;
 use HTML::TokeParser::Simple;
 
-our $VERSION = '1.50'; # VERSION
+our $VERSION = '1.51'; # VERSION
 
 my $DEBUG = 0;
 

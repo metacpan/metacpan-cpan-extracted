@@ -1,5 +1,9 @@
 Revision history for Data-TagHive
 
+0.004     2021-07-03 13:12:37-04:00 America/New_York
+        - update author info
+        - document perl version policy
+
 0.003     2013-12-16 22:07:56-0500 America/New_York
           update bugtracker and repo (again)
 

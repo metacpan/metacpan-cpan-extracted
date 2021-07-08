@@ -1,0 +1,11 @@
+Aggregate  (cost=2337.01..2337.02 rows=1 width=8) (actual time=23.173..23.174 rows=1 loops=1)
+  Buffers: shared read=2087
+  I/O Timings: read=16.319
+  ->  Seq Scan on part_0  (cost=0.00..2287.01 rows=20001 width=0) (actual time=0.028..21.262 rows=20001 loops=1)
+        Buffers: shared read=2087
+        I/O Timings: read=16.319
+Planning:
+  Buffers: shared hit=149 read=44
+  I/O Timings: read=0.888
+Planning Time: 2.765 ms
+Execution Time: 23.363 ms

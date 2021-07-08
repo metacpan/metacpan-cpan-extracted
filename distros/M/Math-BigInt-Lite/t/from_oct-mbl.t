@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 2554;
+use Test::More tests => 2558;
 
 my $class;
 
@@ -47,6 +47,11 @@ __END__
 NaN:NaN
 +inf:NaN
 -inf:NaN
+
+0o10:8
+0O10:8
+o10:NaN
+O10:NaN
 
 ###############################################################################
 # Absolute value is close to 2^1 = 2

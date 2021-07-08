@@ -1,7 +1,10 @@
 Revision history for Perl extension WWW::Correios::CEP
 
+1.044
+    - Fix our $VERSION (thanks garu)
+
 1.043
-    - Change method to POST and ajust headers
+    - Change method to POST and fix headers
 
 1.042
     - update correios URL again
@@ -41,13 +44,13 @@ Revision history for Perl extension WWW::Correios::CEP
     - changelog fix!
 
 0.032 2013-06-03
-    - revert some commited changes (but not in cpan) but now there is a retrocompatibilidad and working code on github!
+    - revert some commited changes (but not in cpan) but now there is a backward compatibility and working code on github!
 
 0.03 2011-10-28
     - timeout / bugs
 
 0.02 2011-02-08
-    - Changes on _parseHTML method (thxs gabiruh)
+    - Changes on _parseHTML method (thanks gabiruh)
     - Added support to multiple address to a unique CEP
     - so you can test with CEP number 69405-000
 

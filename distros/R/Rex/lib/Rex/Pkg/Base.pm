@@ -13,7 +13,7 @@ use Rex::Helper::Run;
 use Rex::Interface::Exec;
 use Net::OpenSSH::ShellQuoter;
 
-our $VERSION = '1.13.3'; # VERSION
+our $VERSION = '1.13.4'; # VERSION
 
 sub new {
   my $that  = shift;

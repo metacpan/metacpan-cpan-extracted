@@ -1,34 +1,48 @@
-{   'actual_rows' => '422016',
-	'extra_info'  => [
-		'Sort Key: string',
-		'Sort Method: external merge Disk: 10096kB',
-		'Buffers: shared hit=2372, temp read=1262 written=1269'
-	],
-	'actual_time_first' => '651.661',
-	'is_analyzed'       => 1,
-	'actual_time_last'  => '708.012',
-	'estimated_rows'    => '422016',
-	'sub_nodes'         => [
-		{   'actual_loops'           => '1',
-			'estimated_rows'         => '422016',
-			'type'                   => 'Seq Scan',
-			'estimated_total_cost'   => '6592.16',
-			'estimated_row_width'    => '14',
-			'estimated_startup_cost' => '0',
-			'actual_rows'            => '422016',
-			'extra_info'             => [ 'Buffers: shared hit=2372' ],
-			'is_analyzed'            => 1,
-			'actual_time_last'       => '33.805',
-			'actual_time_first'      => '0.022',
-			'scan_on'                => {
-				'table_alias' => 'strings',
-				'table_name'  => 'strings'
-			}
-		}
-	],
-	'actual_loops'           => '1',
-	'type'                   => 'Sort',
-	'estimated_total_cost'   => '54291.63',
-	'estimated_startup_cost' => '53236.59',
-	'estimated_row_width'    => '14'
+{
+    'actual_loops' => '1',
+    'actual_rows' => '422016',
+    'actual_time_first' => '651.661',
+    'actual_time_last' => '708.012',
+    'buffers' => {
+        'shared' => {
+            'hit' => 2372
+        },
+        'temp' => {
+            'read' => 1262,
+            'written' => 1269
+        }
+    },
+    'estimated_row_width' => '14',
+    'estimated_rows' => '422016',
+    'estimated_startup_cost' => '53236.59',
+    'estimated_total_cost' => '54291.63',
+    'extra_info' => [
+        'Sort Key: string',
+        'Sort Method: external merge Disk: 10096kB'
+    ],
+    'is_analyzed' => 1,
+    'sub_nodes' => [
+        {
+            'actual_loops' => '1',
+            'actual_rows' => '422016',
+            'actual_time_first' => '0.022',
+            'actual_time_last' => '33.805',
+            'buffers' => {
+                'shared' => {
+                    'hit' => 2372
+                }
+            },
+            'estimated_row_width' => '14',
+            'estimated_rows' => '422016',
+            'estimated_startup_cost' => '0',
+            'estimated_total_cost' => '6592.16',
+            'is_analyzed' => 1,
+            'scan_on' => {
+                'table_alias' => 'strings',
+                'table_name' => 'strings'
+            },
+            'type' => 'Seq Scan'
+        }
+    ],
+    'type' => 'Sort'
 }

@@ -1,3 +1,6 @@
+0.41      2021-07-03 13:39:11 EDT
+  - Follow Task::Kensho 0.41
+
 0.40      2019-06-11 17:50:25 EDT
   - Follow Task::Kensho 0.40
   - Add missing dependency on Task::Kensho itself

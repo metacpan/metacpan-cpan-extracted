@@ -295,7 +295,7 @@ NOTE: it is recommended to use C<min_load>/C<max_load> instead.
 =item max_load [0.7, if min_spare_servers is not set]
 
 Maximum average workers busy load, before spawning more workers (fractional, 1 = 100% load). This value is not a CPU load, it is somewhat more useful, see
-L<UniEvent>, C<track_load_average()> for details what this value means. If average busy load on workers becomes higher that configured value, manager
+L<UniEvent::Loop>, C<track_load_average()> for details what this value means. If average busy load on workers becomes higher that configured value, manager
 will start more workers until busy load gets lower than configured value.
 
 

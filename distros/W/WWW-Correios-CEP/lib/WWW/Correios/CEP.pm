@@ -5,7 +5,7 @@ use warnings;
 use LWP::UserAgent;
 use JSON;
 
-our $VERSION = 1.042;
+our $VERSION = 1.044;
 
 use Encode;
 use utf8;
@@ -71,7 +71,7 @@ sub _extractAddress {
             [
                 'Content-Type' => 'application/x-www-form-urlencoded',
                 'Origin'       => 'https://buscacepinter.correios.com.br',
-                'Referer'      =>
+                'Referer' =>
 'https://buscacepinter.correios.com.br/app/endereco/index.php?t',
             ],
             $this->{_post_content} . $cep

@@ -3,7 +3,7 @@ package MyApp::Service::Calculator;
 use strict;
 use warnings;
 
-use Beekeeper::Worker;
+use Beekeeper::Worker ':log';
 use base 'Beekeeper::Worker';
 
 
@@ -13,6 +13,8 @@ sub on_startup {
     $self->accept_remote_calls(
         'myapp.calculator.eval_expr' => 'eval_expr',
     );
+
+    log_info "Ready";
 }
 
 sub authorize_request {

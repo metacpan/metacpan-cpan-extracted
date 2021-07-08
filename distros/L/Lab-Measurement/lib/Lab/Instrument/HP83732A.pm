@@ -1,6 +1,6 @@
 package Lab::Instrument::HP83732A;
 #ABSTRACT: HP 83732A Series Synthesized Signal Generator
-$Lab::Instrument::HP83732A::VERSION = '3.760';
+$Lab::Instrument::HP83732A::VERSION = '3.762';
 use v5.20;
 
 use strict;
@@ -130,7 +130,7 @@ Lab::Instrument::HP83732A - HP 83732A Series Synthesized Signal Generator
 
 =head1 VERSION
 
-version 3.760
+version 3.762
 
 =head1 CAVEATS/BUGS
 
@@ -148,12 +148,12 @@ probably many
 
 This software is copyright (c) 2021 by the Lab::Measurement team; in detail:
 
-  Copyright 2011       Andreas K. HÃ¼ttel, Florian Olbrich
+  Copyright 2011       Andreas K. Huettel, Florian Olbrich
             2012       Hermann Kraus
-            2013       Alois Dirnaichner, Andreas K. HÃ¼ttel
+            2013       Alois Dirnaichner, Andreas K. Huettel
             2016       Simon Reinhardt
-            2017       Andreas K. HÃ¼ttel
-            2020       Andreas K. HÃ¼ttel
+            2017       Andreas K. Huettel
+            2020       Andreas K. Huettel
 
 
 This is free software; you can redistribute it and/or modify it under

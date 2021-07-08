@@ -1,5 +1,10 @@
 Revision history for Ryu
 
+3.002     2021-07-07 17:48:25+08:00 Asia/Kuala_Lumpur
+    [Bugs fixed]
+    - in ->flat_map, any failure in the original or added Ryu::Source instances
+    will now propagate as a failure for the ->flat_map source as well
+
 3.001     2021-06-21 08:19:28+08:00 Asia/Kuala_Lumpur
     [New features]
     - Ryu::Observable has aliases for ->as_numeric, ->as_number and ->set_numeric, ->set_number

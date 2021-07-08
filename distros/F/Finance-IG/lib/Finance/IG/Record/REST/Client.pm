@@ -43,7 +43,7 @@ entirely by manipulating %INC.
 
 =head1 VERSION 
 
-Version 0.092
+Version 0.093
 
 =head1 SYNOPSIS
 
@@ -51,7 +51,7 @@ See the included file Testing/test-record.pl
 
 =cut
  
-our $VERSION=0.092; 
+our $VERSION=0.093; 
 
 BEGIN { 
   my $rcpath; 

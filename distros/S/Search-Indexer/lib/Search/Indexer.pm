@@ -8,7 +8,7 @@ use List::Util                      qw/min sum/;
 use List::MoreUtils                 qw/all uniq/;
 use Text::Transliterator::Unaccent;
 
-our $VERSION = "1.00";
+our $VERSION = "1.01";
 
 #======================================================================
 # CONSTANTS AND GLOBAL VARS
@@ -31,11 +31,10 @@ use constant {
     writeMode => 0,
     positions => 1,
     wregex    => qr/\p{Word}+/,
-    wfilter   => sub { # default filter : foldcase or lowercase and no accents
-      my $word = $] >= 5.016 ? CORE::fc($_[0]) : lc($_[0]);
-      unaccenter->($word);
-      return $word;
-    },
+    wfilter   => (   # if possible ($] >= 5.016) : normalize through foldcase
+                     eval q{sub {my $word = CORE::fc($_[0]); unaccenter->($word); return $word}}
+                  || # otherwise : normalize through lowercase
+                     sub {my $word = lc($_[0]); unaccenter->($word); return $word}),
     fieldname => '',
 
     # default constants for generating excerpts

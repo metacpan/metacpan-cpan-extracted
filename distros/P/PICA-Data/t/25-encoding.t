@@ -31,7 +31,7 @@ is $rec->{record}[0][3], '12€', 'JSON from string reference';
 $rec = pica_parser('xml', $xml)->next;
 is $rec->{record}[0][3], '12€', 'XML from string';
 
-$rec = pica_parser('xml', \$xml, bless => 1)->next;
+$rec = pica_parser('xml', \$xml)->next;
 is $rec->{record}[0][3], '12€', 'XML from string reference';
 
 is $rec->string('plain'), $plain, 'to PICA Plain string';

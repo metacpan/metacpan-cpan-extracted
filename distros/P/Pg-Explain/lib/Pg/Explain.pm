@@ -32,11 +32,11 @@ Pg::Explain - Object approach at reading explain analyze output
 
 =head1 VERSION
 
-Version 1.10
+Version 1.11
 
 =cut
 
-our $VERSION = '1.10';
+our $VERSION = '1.11';
 
 =head1 SYNOPSIS
 
@@ -64,6 +64,14 @@ What is the detected format of source plan. One of: TEXT, JSON, YAML, OR XML.
 =head2 planning_time
 
 How much time PostgreSQL spent planning the query. In milliseconds.
+
+=head2 total_buffers
+
+All buffers used by query - for planning and execution. Mathematically: sum of planning_buffers and top_level->buffers.
+
+=head2 planning_buffers
+
+How much buffers PostgreSQL used for planning. Either undef or object of Pg::Explain::Buffers class.
 
 =head2 execution_time
 
@@ -99,13 +107,24 @@ What query this explain is for. This is available only for auto-explain plans. I
 
 =cut
 
-sub source_format  { my $self = shift; $self->{ 'source_format' }  = $_[ 0 ] if 0 < scalar @_; return $self->{ 'source_format' }; }
-sub planning_time  { my $self = shift; $self->{ 'planning_time' }  = $_[ 0 ] if 0 < scalar @_; return $self->{ 'planning_time' }; }
-sub execution_time { my $self = shift; $self->{ 'execution_time' } = $_[ 0 ] if 0 < scalar @_; return $self->{ 'execution_time' }; }
-sub total_runtime  { my $self = shift; $self->{ 'total_runtime' }  = $_[ 0 ] if 0 < scalar @_; return $self->{ 'total_runtime' }; }
-sub trigger_times  { my $self = shift; $self->{ 'trigger_times' }  = $_[ 0 ] if 0 < scalar @_; return $self->{ 'trigger_times' }; }
-sub jit            { my $self = shift; $self->{ 'jit' }            = $_[ 0 ] if 0 < scalar @_; return $self->{ 'jit' }; }
-sub query          { my $self = shift; $self->{ 'query' }          = $_[ 0 ] if 0 < scalar @_; return $self->{ 'query' }; }
+sub source_format    { my $self = shift; $self->{ 'source_format' }    = $_[ 0 ] if 0 < scalar @_; return $self->{ 'source_format' }; }
+sub planning_time    { my $self = shift; $self->{ 'planning_time' }    = $_[ 0 ] if 0 < scalar @_; return $self->{ 'planning_time' }; }
+sub planning_buffers { my $self = shift; $self->{ 'planning_buffers' } = $_[ 0 ] if 0 < scalar @_; return $self->{ 'planning_buffers' }; }
+sub execution_time   { my $self = shift; $self->{ 'execution_time' }   = $_[ 0 ] if 0 < scalar @_; return $self->{ 'execution_time' }; }
+sub total_runtime    { my $self = shift; $self->{ 'total_runtime' }    = $_[ 0 ] if 0 < scalar @_; return $self->{ 'total_runtime' }; }
+sub trigger_times    { my $self = shift; $self->{ 'trigger_times' }    = $_[ 0 ] if 0 < scalar @_; return $self->{ 'trigger_times' }; }
+sub jit              { my $self = shift; $self->{ 'jit' }              = $_[ 0 ] if 0 < scalar @_; return $self->{ 'jit' }; }
+sub query            { my $self = shift; $self->{ 'query' }            = $_[ 0 ] if 0 < scalar @_; return $self->{ 'query' }; }
+
+sub total_buffers {
+    my $self = shift;
+    if ( $self->top_node->buffers ) {
+        return $self->top_node->buffers + $self->planning_buffers if $self->planning_buffers;
+        return $self->top_node->buffers;
+    }
+    return $self->planning_buffers if $self->planning_buffers;
+    return;
+}
 
 =head2 add_trigger_time
 
@@ -412,6 +431,13 @@ sub as_text {
 
     my $textual = $self->top_node->as_text();
 
+    if ( $self->planning_buffers ) {
+        $textual .= "Planning:\n";
+        my $buf_info = $self->planning_buffers->as_text;
+        $buf_info =~ s/^/  /gm;
+        $textual .= $buf_info . "\n";
+
+    }
     if ( $self->planning_time ) {
         $textual .= "Planning time: " . $self->planning_time . " ms\n";
     }
@@ -442,8 +468,9 @@ This can be used for debug purposes, or as a base to print information to user.
 Output looks like this:
 
  {
-     'top_node'               => {....},
+     'top_node'               => {...}
      'planning_time'          => '12.34',
+     'planning_buffers'       => {...},
      'execution_time'         => '12.34',
      'total_runtime'          => '12.34',
      'trigger_times'          => [
@@ -457,12 +484,13 @@ Output looks like this:
 sub get_struct {
     my $self  = shift;
     my $reply = {};
-    $reply->{ 'top_node' }       = $self->top_node->get_struct;
-    $reply->{ 'planning_time' }  = $self->planning_time          if $self->planning_time;
-    $reply->{ 'execution_time' } = $self->execution_time         if $self->execution_time;
-    $reply->{ 'total_runtime' }  = $self->total_runtime          if $self->total_runtime;
-    $reply->{ 'trigger_times' }  = clone( $self->trigger_times ) if $self->trigger_times;
-    $reply->{ 'query' }          = $self->query                  if $self->query;
+    $reply->{ 'top_node' }         = $self->top_node->get_struct;
+    $reply->{ 'planning_time' }    = $self->planning_time                if $self->planning_time;
+    $reply->{ 'planning_buffers' } = $self->planning_buffers->get_struct if $self->planning_buffers;
+    $reply->{ 'execution_time' }   = $self->execution_time               if $self->execution_time;
+    $reply->{ 'total_runtime' }    = $self->total_runtime                if $self->total_runtime;
+    $reply->{ 'trigger_times' }    = clone( $self->trigger_times )       if $self->trigger_times;
+    $reply->{ 'query' }            = $self->query                        if $self->query;
 
     if ( $self->jit ) {
         $reply->{ 'jit' }                  = {};

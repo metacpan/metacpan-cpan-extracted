@@ -100,6 +100,25 @@ then only secure ("https://") streams will be returned.
 
 DEFAULT I<-secure> is 0 (false) - return all streams (http and https).
 
+Additional options:
+
+I<-log> => "I<logfile>"
+
+Specify path to a log file.  If a valid and writable file is specified, A line will be 
+appended to this file every time one or more streams is successfully fetched for a url.
+
+DEFAULT i<-none> (no logging).
+
+I<-logfmt> specifies a format string for lines written to the log file.
+
+DEFAULT "I<[time] [url] - [site]: [title] ([total])>".  
+
+The valid field I<[variables]> are:  [stream]: The url of the first/best stream found.  
+[site]:  The site name (Anystream).  [url]:  The url searched for streams.  
+[time]: Perl timestamp when the line was logged.  [title], [artist], [album], 
+[description], [year], [genre], [total], [albumartist]:  The corresponding field data 
+returned (or "-na", if no value).
+
 =item $station->B<get>(['playlist'])
 
 Returns an array of strings representing all stream URLs found.
@@ -137,9 +156,11 @@ the website being searched.
 
 Returns the station's title, or (long description).
 NOTE:  Since this module only looks for any streams found on any 
-specifed website, this function always returns the base name of 
-the website being searched, or the full URL passed in with 
-"https?://" prepended if missing ('desc').
+specifed website, this function usually returns the base name of 
+the website being searched, or the full URL passed in, unless an 
+html <TITLE> tag is found, in which case that will be returned.  
+If 'I<desc>' is specified, then it will always be full URL of the 
+website being searched.
 
 =item $station->B<getIconURL>()
 
@@ -369,6 +390,7 @@ sub new
 	}
 	return undef  unless ($html);  #STEP 1 FAILED, INVALID STATION URL, PUNT!
 	$self->{'title'} = $self->{'id'} || $url;
+	$self->{'title'} = $1  if ($html =~ /\<TITLE>([^\<]+)/i);
 	$self->{'title'} = HTML::Entities::decode_entities($self->{'title'});
 	$self->{'title'} = uri_unescape($self->{'title'});
 	$self->{'description'} = $url2fetch;
@@ -425,6 +447,7 @@ sub new
 					. "\n" . ${$self->{'streams'}}[$i] . "\n";
 		}
 	}
+	$self->_log($url);
 
 	bless $self, $class;   #BLESS IT!
 

@@ -1,9 +1,9 @@
 package Perinci::Manual;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-07-01'; # DATE
+our $DATE = '2021-07-02'; # DATE
 our $DIST = 'Perinci-Manual'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 1;
 # ABSTRACT: Extra documentation for Perinci
@@ -20,7 +20,7 @@ Perinci::Manual - Extra documentation for Perinci
 
 =head1 VERSION
 
-This document describes version 0.002 of Perinci::Manual (from Perl distribution Perinci-Manual), released on 2021-07-01.
+This document describes version 0.003 of Perinci::Manual (from Perl distribution Perinci-Manual), released on 2021-07-02.
 
 =head1 DESCRIPTION
 
@@ -30,6 +30,12 @@ and L<Riap> specification, and each framework having its own documentation.
 
 This distribution contains additional, mostly cross-framework, and heavily
 task-oriented documentation.
+
+=head1 CONTRIBUTOR
+
+=for stopwords perlancar (on netbook-dell-xps13)
+
+perlancar (on netbook-dell-xps13) <perlancar@gmail.com>
 
 =head1 HOMEPAGE
 

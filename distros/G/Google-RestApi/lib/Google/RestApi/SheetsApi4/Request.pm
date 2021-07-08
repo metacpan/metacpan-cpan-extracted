@@ -1,25 +1,14 @@
 package Google::RestApi::SheetsApi4::Request;
 
-use strict;
-use warnings;
+our $VERSION = '0.7';
 
-our $VERSION = '0.4';
+use Google::RestApi::Setup;
 
-use 5.010_000;
-
-use autodie;
 use Hash::Merge;
 use List::MoreUtils qw(first_index);
 use Storable qw(dclone);
-use Type::Params qw(compile compile_named);
-use Types::Standard qw(ArrayRef HashRef);
-use YAML::Any qw(Dump);
 
-no autovivification;
-
-do 'Google/RestApi/logger_init.pl';
-
-sub submit_requests { die "Pure virtual function 'submit_requests' must be overridden"; }
+sub submit_requests { LOGDIE "Pure virtual function 'submit_requests' must be overridden"; }
 
 sub batch_requests {
   my $self = shift;
@@ -43,34 +32,61 @@ sub merge_request {
   state $check = compile(HashRef);
   my ($request) = $check->(@_);
 
-  keys %$request;   # reset each.
-  my ($key) = each(%$request);
-  return if !$self->_can_merge($key, $request->{$key});
-
   my $requests = $self->{requests} or return;
-  my $index = first_index {
-    keys %$_;
-    my ($other_key) = each(%$_);
-    $key eq $other_key;
+  my ($index) = first_index {
+    $self->_can_merge($request, $_);
   } @$requests;
   return if $index < 0;
 
-  my $fields = $request->{$key}->{fields};
   my $other_request = $requests->[$index];
+
+  my $key = (keys %$request)[0];
+  my $fields = $request->{$key}->{fields};
   my $other_fields = $other_request->{$key}->{fields};
 
   my %fields;
   %fields = map { $_ => 1 } split(',', $fields), split(',', $other_fields)
     if $fields && $other_fields;
-  $requests->[$index] = Hash::Merge::merge($request, $other_request);
-  $other_request = $requests->[$index];
+  $other_request = Hash::Merge::merge($request, $other_request);
   $other_request->{$key}->{fields} = join(',', sort keys %fields) if %fields;
+
+  $requests->[$index] = $other_request;
 
   return $other_request;
 }
 
-# this is not private to the class, it's private to the overall framework.
-sub requests_response {
+sub _can_merge {
+  my $self = shift;
+
+  my ($request, $other_request) = @_;
+  my $key = (keys %$request)[0];
+  my $other_key = (keys %$other_request)[0];
+
+  return if $key ne $other_key;
+  return if $key =~ /^(deleteProtected|deleteNamed|deleteEmbeded)/;
+
+  if ($key =~ /^updateProtected/) {
+    my $id = $request->{$key}->{protectedRangeId} or return;
+    my $other_id = $other_request->{$key}->{protectedRangeId} or return;
+    return $id == $other_id;
+  }
+
+  if ($key =~ /^updateNamedRange/) {
+    my $id = $request->{$key}->{namedRange}->{namedRangeId} or return;
+    my $other_id = $other_request->{$key}->{namedRange}->{namedRangeId} or return;
+    return $id == $other_id;
+  }
+
+  if ($key =~ /^updateEmbededObject/) {
+    my $id = $request->{$key}->{objectId} or return;
+    my $other_id = $other_request->{$key}->{objectId} or return;
+    return $id == $other_id;
+  }
+
+  return 1;
+}
+
+sub requests_response_from_api {
   my $self = shift;
 
   # we didn't ask for any requests, nothing more to do.
@@ -89,15 +105,6 @@ sub requests_response {
   delete $self->{requests};
 
   return $self->{requests_response};
-}
-
-# TODO: figure out what can be merged and what can't.
-# need a decent way to quickly analyze the request.
-sub _can_merge {
-  my $self = shift;
-  my ($key, $request) = @_;
-  return 1 if $key =~ /^(repeatCell|mergeCells|updateBorders)$/;
-  return;
 }
 
 1;

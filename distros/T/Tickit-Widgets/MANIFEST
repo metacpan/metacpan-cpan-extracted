@@ -18,7 +18,6 @@ examples/HelloWorldWidget-1.pm
 examples/HelloWorldWidget-2.pm
 examples/testonewidget.pl
 lib/Tickit/ContainerWidget.pm
-lib/Tickit/OneLineWidget.pm
 lib/Tickit/SingleChildWidget.pm
 lib/Tickit/Style.pm
 lib/Tickit/Style/Parser.pm
@@ -43,6 +42,7 @@ lib/Tickit/Widget/VBox.pm
 lib/Tickit/Widget/VSplit.pm
 lib/Tickit/WidgetRole.pm
 lib/Tickit/WidgetRole/Alignable.pm
+lib/Tickit/WidgetRole/SingleChildContainer.pm
 lib/Tickit/Widgets.pm
 LICENSE
 Makefile.PL

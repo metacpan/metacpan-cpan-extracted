@@ -4,7 +4,7 @@ package Chart::GGPlot::Types;
 
 use Chart::GGPlot::Setup qw(:base :pdl); 
 
-our $VERSION = '0.0011'; # VERSION
+our $VERSION = '0.0016'; # VERSION
 
 use Ref::Util qw(is_plain_arrayref);
 use Type::Library -base, -declare => qw(
@@ -12,6 +12,7 @@ use Type::Library -base, -declare => qw(
   ColorBrewerTypeEnum PositionEnum
   Theme Margin Labeller
   Coord Facet Scale
+  HJust VJust
 );
 
 use Type::Utils -all;
@@ -44,6 +45,35 @@ declare Scale, as ConsumerOf["Chart::GGPlot::Scale"];
 
 declare_coercion "ArrayRefFromAny", to_type ArrayRef, from Any, via { [$_] };
 
+declare HJust, as(
+    Num->where( sub { $_ > -1e-10 and $_ < 1.0 + 1e-10 } ) | Piddle0D |
+      Enum [qw(left right center middle)] | ( ConsumerOf ["PDL::SV"] )->where(
+        sub {
+            ( ( $_ == "left" ) | ( $_ == "right" ) | ( $_ == "center" ) |
+                  ( $_ == "middle" ) )->all;
+        }
+      ) | Piddle1D->where(
+        sub {
+            not $_->$_DOES('PDL::SV')
+              and ( ( $_ > -1e-10 ) & ( $_ < 1.0 + 1e-10 ) )->all;
+        }
+      )
+);
+declare VJust, as(
+    Num->where( sub { $_ > -1e-10 and $_ < 1.0 + 1e-10 } ) | Piddle0D |
+      Enum [qw(top bottom center middle)] | ( ConsumerOf ["PDL::SV"] )->where(
+        sub {
+            ( ( $_ == "top" ) | ( $_ == "bottom" ) | ( $_ == "center" ) |
+                  ( $_ == "middle" ) )->all;
+        }
+      ) | Piddle1D->where(
+        sub {
+            not $_->$_DOES('PDL::SV')
+              and ( ( $_ > -1e-10 ) & ( $_ < 1.0 + 1e-10 ) )->all;
+        }
+      )
+);
+
 1;
 
 __END__
@@ -58,7 +88,7 @@ Chart::GGPlot::Types - Custom types and coercions
 
 =head1 VERSION
 
-version 0.0011
+version 0.0016
 
 =head1 DESCRIPTION
 
@@ -79,7 +109,7 @@ Stephan Loyd <sloyd@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019-2020 by Stephan Loyd.
+This software is copyright (c) 2019-2021 by Stephan Loyd.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

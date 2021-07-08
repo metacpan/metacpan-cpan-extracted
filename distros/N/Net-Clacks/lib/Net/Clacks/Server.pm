@@ -7,7 +7,7 @@ use diagnostics;
 use mro 'c3';
 use English;
 use Carp;
-our $VERSION = 17;
+our $VERSION = 18;
 use autodie qw( close );
 use Array::Contains;
 use utf8;
@@ -23,7 +23,8 @@ use IO::Select;
 use IO::Socket::SSL;
 use YAML::Syck;
 use MIME::Base64;
-#use Data::Dumper;
+use File::Copy;
+use Data::Dumper;
 
 # For turning off SSL session cache
 use Readonly;
@@ -236,8 +237,85 @@ sub init {
     return;
 }
 
+sub loadPersistanceFile {
+    my ($self, $fname) = @_;
+
+    my %clackscache;
+    my %clackscachetime;
+
+    if(open(my $ifh, '<', $fname)) {
+        my $line = <$ifh>;
+        my $timestampline = <$ifh>;
+        my $endline = <$ifh>;
+        close $ifh;
+
+        if(!defined($endline)) {
+            $endline = '';
+        } else {
+            chomp $endline;
+        }
+
+        if(!defined($line) || !defined($timestampline) || $endline ne 'ENDBYTES') {
+            carp("Invalid persistance file " . $fname . "! File is incomplete!");
+            return; # Fail
+        }
+
+        chomp $line;
+        chomp $timestampline;
+        my $loadok = 0;
+
+        if($line ne '') {
+            eval {
+                $line = decode_base64($line);
+                $line = Load($line);
+                $loadok = 1;
+            };
+            if(!$loadok) {
+                carp("Invalid persistance file " . $fname . "! Failed to decode data line!");
+                return; # Fail
+            }
+        }
+        %clackscache = %{$line};
+
+        # Mark all data as current as a fallback
+        my $now = time;
+        foreach my $key (keys %clackscache) {
+            $clackscachetime{$key} = $now;
+        }
+
+        if($timestampline ne '') {
+            $loadok = 0;
+            eval {
+                $timestampline = decode_base64($timestampline);
+                $timestampline = Load($timestampline);
+                $loadok = 1;
+            };
+            if(!$loadok) {
+                carp("Invalid persistance file " . $fname . "! Failed to decode timestamp line, using current time!");
+                return; # Fail
+            } else {
+                my %clackstemp = %{$timestampline};
+                foreach my $key (keys %clackscache) {
+                    if(defined($clackstemp{$key})) {
+                        $clackscachetime{$key} = $clackstemp{$key};
+                    }
+                }
+            }
+        }
+    } else {
+        # Fail
+        return;
+    }
+
+    return \%clackscache, \%clackscachetime;
+}
+
+
 sub run { ## no critic (Subroutines::ProhibitExcessComplexity)
     my ($self) = @_;
+
+    my $savecache = 0;
+    my $lastsavecache = 0;
 
     # Let STDOUT/STDERR settle down first
     sleep(0.1);
@@ -264,65 +342,89 @@ sub run { ## no critic (Subroutines::ProhibitExcessComplexity)
     $SIG{TERM} = sub { $keepRunning = 0; };
 
     # Restore persistance file if required
-    if($self->{persistance} && -f $self->{config}->{persistancefile}) {
-        if(open(my $ifh, '<', $self->{config}->{persistancefile})) {
-            my $line = <$ifh>;
-            my $timestampline = <$ifh>;
-            close $ifh;
-            if(!defined($line) || $line eq '') {
-                croak("Invalid persistance file " . $self->{config}->{persistancefile});
-            }
-
-            chomp $line;
-            my $loadok = 0;
-            eval {
-                $line = decode_base64($line);
-                $line = Load($line);
+    my $previousfname = $self->{config}->{persistancefile} . '_bck';
+    my $tempfname = $self->{config}->{persistancefile} . '_';
+    if($self->{persistance}) {
+        my $loadok = 0;
+        if(-f $self->{config}->{persistancefile}) {
+            print "Trying to load persistance file ", $self->{config}->{persistancefile}, "\n";
+            my ($cc, $cct) = $self->loadPersistanceFile($self->{config}->{persistancefile});
+            if(defined($cc) && ref $cc eq 'HASH') {
+                %clackscache = %{$cc};
+                %clackscachetime = %{$cct};
+                $savecache = 1; # Force saving a new persistance file
                 $loadok = 1;
-            };
-            if(!$loadok) {
-                croak("Invalid persistance file " . $self->{config}->{persistancefile});
             }
-            %clackscache = %{$line};
+        }
 
-            # Mark all data as current
-            my $now = time;
-            foreach my $key (keys %clackscache) {
-                $clackscachetime{$key} = $now;
+        if(!$loadok && -f $previousfname) {
+            print "Trying to load backup (previous) persistance file ", $previousfname, "\n";
+            my ($cc, $cct) = $self->loadPersistanceFile($previousfname);
+            if(defined($cc) && ref $cc eq 'HASH') {
+                %clackscache = %{$cc};
+                %clackscachetime = %{$cct};
+                $savecache = 2; # Force saving a new persistance file plus a new backup
+                $loadok = 1;
             }
-            
-            # Do we have timestamp data? (need to check for upgrade compatibility
-            if(defined($timestampline) && length($timestampline) > 5) {
-                chomp $timestampline;
-                $loadok = 0;
-                eval {
-                    $timestampline = decode_base64($timestampline);
-                    $timestampline = Load($timestampline);
-                    $loadok = 1;
-                };
-                if(!$loadok) {
-                    croak("Invalid persistance file " . $self->{config}->{persistancefile});
-                }
-                my %clackstemp = %{$timestampline};
-                foreach my $key (keys %clackscache) {
-                    if(defined($clackstemp{$key})) {
-                        $clackscachetime{$key} = $clackstemp{$key};
-                    }
-                }
+        }
+        if(!$loadok && -f $tempfname) {
+            print "Oh no. As a final, desperate solution, trying to load a 'temporary file while saving' persistance file ", $tempfname, "\n";
+            my ($cc, $cct) = $self->loadPersistanceFile($tempfname);
+            if(defined($cc) && ref $cc eq 'HASH') {
+                %clackscache = %{$cc};
+                %clackscachetime = %{$cct};
+                $savecache = 2; # Force saving a new persistance file plus a new backup
+                $loadok = 1;
             }
+        }
 
+        if(!$loadok) {
+            print "Sorry, no valid persistance file found. Starting server 'blankety-blank'\n";
+            $savecache = 2;
+        } else {
+            print "Persistance file loaded\n";
         }
     }
 
     while($keepRunning) {
         my $workCount = 0;
-        my $savecache = 0;
-        my $lastsavecache = 0;
 
         # Check for shutdown time
         if($shutdowntime && $shutdowntime < time) {
             print STDERR "Shutdown time has arrived!\n";
             $keepRunning = 0;
+        }
+
+        if($savecache && time > ($lastsavecache + $self->{persistanceinterval})) {
+            print "Saving persistance file\n";
+            $lastsavecache = time;
+            if($self->{persistance}) {
+                my $line = Dump(\%clackscache);
+                $line = encode_base64($line, '');
+                my $timestampline = Dump(\%clackscachetime);
+                $timestampline = encode_base64($timestampline, '');
+
+                my $tempfname = $self->{config}->{persistancefile} . '_';
+                my $backfname = $self->{config}->{persistancefile} . '_bck';
+                if($savecache == 1) {
+                    # Normal savecache operation only
+                    copy($self->{config}->{persistancefile}, $backfname);
+                }
+
+                if(open(my $ofh, '>', $tempfname)) {
+                    print $ofh $line, "\n";
+                    print $ofh $timestampline, "\n";
+                    print $ofh "ENDBYTES\n";
+                    close $ofh;
+                }
+                move($tempfname, $self->{config}->{persistancefile});
+
+                if($savecache == 2) {
+                    # Need to make sure we have a valid backup file, since we had a general problem while loading
+                    copy($self->{config}->{persistancefile}, $backfname);
+                }
+            }
+            $savecache = 0;
         }
 
         # We are in client mode. We need to add an interclacks link
@@ -1057,23 +1159,6 @@ sub run { ## no critic (Subroutines::ProhibitExcessComplexity)
                 } else {
                     $clients{$cid}->{outbuffer} = substr($clients{$cid}->{outbuffer}, $written);
                 }   
-            }
-        }
-
-        if($savecache && time > ($lastsavecache + $self->{persistanceinterval})) {
-            $savecache = 0;
-            $lastsavecache = time;
-            if($self->{persistance}) {
-                my $line = Dump(\%clackscache);
-                $line = encode_base64($line, '');
-                my $timestampline = Dump(\%clackscachetime);
-                $timestampline = encode_base64($timestampline, '');
-
-                if(open(my $ofh, '>', $self->{config}->{persistancefile})) {
-                    print $ofh $line, "\n";
-                    print $ofh $timestampline, "\n";
-                    close $ofh;
-                }
             }
         }
 

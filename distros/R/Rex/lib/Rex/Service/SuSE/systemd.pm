@@ -10,7 +10,7 @@ use 5.010001;
 use strict;
 use warnings;
 
-our $VERSION = '1.13.3'; # VERSION
+our $VERSION = '1.13.4'; # VERSION
 
 use Rex::Service::Redhat::systemd;
 use base qw(Rex::Service::Redhat::systemd);

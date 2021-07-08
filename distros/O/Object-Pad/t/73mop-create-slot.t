@@ -16,7 +16,10 @@ class AClass {
       # sealed
       my $classmeta = Object::Pad::MOP::Class->for_caller;
 
-      my $slotmeta = $classmeta->add_slot( '$slot' );
+      my $slotmeta = $classmeta->add_slot( '$slot',
+         default => 100,
+         param   => "slot",
+      );
 
       is( $slotmeta->name, "\$slot", '$slotmeta->name' );
 
@@ -55,11 +58,19 @@ class AClass {
 
 {
    my $obj = AClass->new;
+   is( $obj->slot, 100, '->slot default value' );
+
    $obj->slot = 10;
    is( $obj->slot, 10, '->slot accessor works' );
 
    $obj->anonslot = 20;
    is( $obj->anonslot, 20, '->anonslot accessor works' );
+}
+
+# param name to constructor
+{
+   my $obj = AClass->new( slot => 50 );
+   is( $obj->slot, 50, 'slot was initialised from named param' );
 }
 
 done_testing;

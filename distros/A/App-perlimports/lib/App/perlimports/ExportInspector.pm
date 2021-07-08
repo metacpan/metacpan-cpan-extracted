@@ -4,7 +4,7 @@ use Moo;
 
 ## no critic (TestingAndDebugging::ProhibitNoStrict)
 
-our $VERSION = '0.000012';
+our $VERSION = '0.000014';
 
 use Class::Inspector ();
 use Class::Unload    ();
@@ -513,7 +513,7 @@ App::perlimports::ExportInspector - Inspect code for exportable symbols
 
 =head1 VERSION
 
-version 0.000012
+version 0.000014
 
 =head1 SYNOPSIS
 

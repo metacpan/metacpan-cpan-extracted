@@ -1,5 +1,9 @@
 Revision history for Getopt::EX -Mi18n module
 
+0.09 2021-07-04T07:37:16Z
+
+    - Stop to use Moo.
+
 0.08 2020-06-24T05:49:11Z
 
     - Change 'country' to 'territory' to conform with standard.

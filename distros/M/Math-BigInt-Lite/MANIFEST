@@ -7,6 +7,9 @@ MANIFEST			This list of files
 MANIFEST.SKIP
 NEW
 README
+README.md
+t/00sig.t
+t/01load.t
 t/alias.inc
 t/bigintpm.inc
 t/bigintpm.t
@@ -16,17 +19,18 @@ t/from_hex-mbl.t
 t/from_oct-mbl.t
 t/lite.t
 t/mbi_ali.t
-t/release-cpan-changes.t
-t/release-kwalitee.t
-t/release-pod-coverage.t
-t/release-pod.t
-t/release-portability.t
-t/release-synopsis.t
-t/release-test-version.t
-t/release-unused-vars.t
-t/release-whitespaces.t
+t/new-mbil.t
 t/with.t
 TODO
+xt/release/cpan-changes.t
+xt/release/kwalitee.t
+xt/release/pod-coverage.t
+xt/release/pod-syntax.t
+xt/release/portability.t
+xt/release/synopsis.t
+xt/release/test-version.t
+xt/release/unused-vars.t
+xt/release/whitespaces.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)
 SIGNATURE                                Public-key signature (added by MakeMaker)

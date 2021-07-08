@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package DNS::Oterica::RecordMaker::Diagnostic;
 # ABSTRACT: a collector of record generation requests, for testing
-$DNS::Oterica::RecordMaker::Diagnostic::VERSION = '0.311';
+$DNS::Oterica::RecordMaker::Diagnostic::VERSION = '0.312';
 use Sub::Install;
 
 #pod =head1 DESCRIPTION
@@ -54,7 +54,7 @@ DNS::Oterica::RecordMaker::Diagnostic - a collector of record generation request
 
 =head1 VERSION
 
-version 0.311
+version 0.312
 
 =head1 DESCRIPTION
 
@@ -63,13 +63,23 @@ This recordmaker returns hashrefs describing the requested record.
 At present, the returned data are very simple.  They will change and improve
 over time.
 
+=head1 PERL VERSION
+
+This library should run on perls released even a long time ago.  It should work
+on any version of perl released in the last five years.
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
+
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@cpan.org>
+Ricardo SIGNES <rjbs@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Ricardo SIGNES.
+This software is copyright (c) 2021 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

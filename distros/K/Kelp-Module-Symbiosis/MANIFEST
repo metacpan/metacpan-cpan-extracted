@@ -1,7 +1,7 @@
 Changes
 lib/Kelp/Module/Symbiosis.pm
+lib/Kelp/Module/Symbiosis/_Util.pm
 lib/Kelp/Module/Symbiosis/Base.pm
-lib/Kelp/Module/Symbiosis/Test.pm
 lib/KelpX/Symbiosis/Test.pm
 Makefile.PL
 MANIFEST			This list of files
@@ -12,11 +12,10 @@ t/03-plain-plack.t
 t/04-mount-from-loaded.t
 t/05-alias.t
 t/06-test-can.t
+t/07-global-middleware.t
 t/conf/json.pl
 t/conf/mostly_mounted.pl
 t/conf/none_mounted.pl
-t/deprecated/01-module-test.t
-t/deprecated/02-run-all.t
 t/lib/AnotherTestSymbiont.pm
 t/lib/CountingApp.pm
 t/lib/TestApp.pm

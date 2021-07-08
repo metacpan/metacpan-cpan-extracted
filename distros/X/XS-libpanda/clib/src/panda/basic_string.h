@@ -115,6 +115,12 @@ struct DefaultStaticAllocator {
     }
 };
 
+// GCC fails to determine maybe-uninitialized cases correctly for this code
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpragmas"
+#pragma GCC diagnostic ignored "-Wunknown-warning-option"
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+
 template <class CharT, class Traits = std::char_traits<CharT>, class Alloc = DefaultStaticAllocator<CharT>>
 struct basic_string {
     struct iterator;
@@ -396,8 +402,8 @@ public:
 
     constexpr size_type    length   () const { return _length; }
     constexpr size_type    size     () const { return _length; }
-    constexpr bool         empty    () const { return _length == 0; }
     constexpr const CharT* data     () const { return _str; }
+    constexpr bool         empty    () const { return _length == 0; }
     constexpr size_type    max_size () const { return MAX_SIZE; }
 
     CharT* buf        () { _detach(); return _str; }
@@ -1255,7 +1261,6 @@ private:
     void _move_from (basic_string<CharT, Traits, Alloc2>&& oth) {
         _length = oth._length;
         memcpy(__fill, oth.__fill, MAX_SSO_BYTES+1); // also sets _state
-        //#pragma GCC diagnostic pop
         if (oth._state == State::SSO) _str = _sso + (oth._str - oth._sso);
         else _str = oth._str;
         oth._state       = State::LITERAL;
@@ -1302,12 +1307,7 @@ private:
             case State::INTERNAL:
             case State::EXTERNAL:
                 // suppress false-positive uninitialized warning for "_storage.any" for GCC
-                #pragma GCC diagnostic push
-                #pragma GCC diagnostic ignored "-Wpragmas"
-                #pragma GCC diagnostic ignored "-Wunknown-warning-option"
-                #pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
                 if (_storage.any->refcnt > 1) _detach_cow(_length);
-                #pragma GCC diagnostic pop
                 break;
             case State::LITERAL:
                 _detach_str(_length);
@@ -1485,6 +1485,7 @@ private:
 
     // leaves object in invalid state
     void _release () {
+        // suppress false-positive GCC warning: ‘*((void*)&<anonymous> +16)’ may be used uninitialized in this function
         switch (_state) {
             case State::LITERAL  :
             case State::SSO      : break;
@@ -1516,6 +1517,8 @@ private:
     }
 
 };
+
+#pragma GCC diagnostic pop
 
 template <class C, class T, class A> const C basic_string<C,T,A>::TERMINAL = C();
 

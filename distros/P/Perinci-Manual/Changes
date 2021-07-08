@@ -1,6 +1,18 @@
-0.002   2021-07-01  Released-By: PERLANCAR; Urgency: medium
+0.003   2021-07-02  Released-By: PERLANCAR; Urgency: high
+
+        - Merge releases 0.002 and 0.002.1.
+
+
+0.002.1 2021-07-01  Released-By: PERLANCAR; Urgency: medium
 
 	- Add recipe: Hiding function argument.
+
+        - UPDATE 2021-07-02: Rename release 0.002 to 0.002.1 due to conflict.
+
+
+0.002   2021-04-24  Released-By: PERLANCAR; Urgency: medium
+
+	- [reorganize] Move ::Manual::Cookbook to ::Manual::HowTo::.
 
 
 0.001   2021-01-16  Released-By: PERLANCAR

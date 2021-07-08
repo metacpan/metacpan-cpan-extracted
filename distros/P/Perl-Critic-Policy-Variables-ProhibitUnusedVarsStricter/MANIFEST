@@ -33,5 +33,6 @@ xt/author/98_pod_syntax.t
 xt/author/99_pod_coverage.t
 xt/author/minimum_perl.t
 xt/author/pod_links.t
+xt/author/ppi_catch_var.t
 xt/author/prereq.t
 xt/author/require_wrapper.t

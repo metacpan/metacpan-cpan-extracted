@@ -1,32 +1,14 @@
 package Google::RestApi::SheetsApi4::Request::Spreadsheet::Worksheet::Range;
 
-use strict;
-use warnings;
+our $VERSION = '0.7';
 
-our $VERSION = '0.4';
+use Google::RestApi::Setup;
 
-use 5.010_000;
-
-use autodie;
 use Scalar::Util qw(looks_like_number);
-use Type::Params qw(compile_named);
-use Types::Standard qw(Str StrMatch Bool ArrayRef HashRef HasMethods);
-use YAML::Any qw(Dump);
-
-no autovivification;
-
 use aliased "Google::RestApi::SheetsApi4::Range";
-
-use Google::RestApi::Utils qw(bool dim dims dims_all);
-
 use parent "Google::RestApi::SheetsApi4::Request::Spreadsheet::Worksheet";
 
-do 'Google/RestApi/logger_init.pl';
-
-my %white = ( red => 1, blue => 1, green => 1, alpha => 1 );
-my %black = ( red => 0, blue => 0, green => 0, alpha => 1 );
-
-sub range { die "Pure virtual function 'range' must be overridden"; }
+sub range { LOGDIE "Pure virtual function 'range' must be overridden"; }
 
 sub left { shift->horizontal_alignment('LEFT'); }
 sub center { shift->horizontal_alignment('CENTER'); }
@@ -50,8 +32,8 @@ sub red { shift->_rgba('red' => shift); }
 sub blue { shift->_rgba('blue' => shift); }
 sub green { shift->_rgba('green' => shift); }
 sub alpha { shift->_rgba('alpha' => shift); }
-sub black { shift->color(\%black); }
-sub white { shift->color(\%white); }
+sub black { shift->color(cl_black()); }
+sub white { shift->color(cl_white()); }
 sub color { shift->text_format({ foregroundColor => shift }); }
 
 sub _bk_rgba { shift->bk_color({ (shift) => (shift // 1) }); }
@@ -59,8 +41,8 @@ sub bk_red { shift->_bk_rgba('red' => shift); }
 sub bk_blue { shift->_bk_rgba('blue' => shift); }
 sub bk_green { shift->_bk_rgba('green' => shift); }
 sub bk_alpha { shift->_bk_rgba('alpha' => shift); }
-sub bk_black { shift->bk_color(\%black); }
-sub bk_white { shift->bk_color(\%white); }
+sub bk_black { shift->bk_color(cl_black()); }
+sub bk_white { shift->bk_color(cl_white()); }
 sub bk_color { shift->user_entered_format({ backgroundColor => shift }); }
 
 sub text { shift->number_format('TEXT', @_); }
@@ -133,7 +115,7 @@ sub repeat_cell {
   my $p = $check->(@_);
 
   my $cell = $p->{cell};
-  my $fields = $p->{fields} || join(',', sort keys %{ $p->{cell} });
+  my $fields = $p->{fields} || join(',', sort keys %$cell);
 
   $self->batch_requests(
     repeatCell => {
@@ -157,8 +139,8 @@ sub bd_red { shift->_bd_rbga('red' => shift, @_); }
 sub bd_blue { shift->_bd_rbga('blue' => shift, @_); }
 sub bd_green { shift->_bd_rbga('green' => shift, @_); }
 sub bd_alpha { shift->_bd_rbga('alpha' => shift, @_); }
-sub bd_black { shift->bd_color(\%black, @_); }
-sub bd_white { shift->bd_color(\%white, @_); }
+sub bd_black { shift->bd_color(cl_black(), @_); }
+sub bd_white { shift->bd_color(cl_white(), @_); }
 sub bd_color { shift->_bd({ color => shift }, @_); }
 
 sub bd_dotted { shift->bd_style('DOTTED', @_); }
@@ -233,7 +215,7 @@ sub borders {
   # if these borders are to be part of repeatCell request, redirect
   # the borders to it.
   if ($self->{bd_repeat_cell}) {
-    die "Cannot use vertical|horizontal|inner when bd_repeat_cell is turned on"
+    LOGDIE "Cannot use vertical|horizontal|inner when bd_repeat_cell is turned on"
       if $p->{border} =~ /^(vertical|horizontal|inner)$/;
     return $self->user_entered_format(
       {
@@ -451,7 +433,7 @@ sub named_d { shift->delete_named(); }
 sub delete_named {
   my $self = shift;
 
-  my $named = $self->named() or die "Not a named range";
+  my $named = $self->named() or LOGDIE "Not a named range";
   $self->batch_requests(
     deleteNamedRange => {
       namedRangeId => $named->{namedRangeId},

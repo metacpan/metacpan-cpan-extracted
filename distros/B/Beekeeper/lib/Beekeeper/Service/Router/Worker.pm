@@ -3,7 +3,7 @@ package Beekeeper::Service::Router::Worker;
 use strict;
 use warnings;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 use Beekeeper::Worker ':log';
 use base 'Beekeeper::Worker';
@@ -11,6 +11,7 @@ use base 'Beekeeper::Worker';
 use Beekeeper::Worker::Util 'shared_cache';
 use Scalar::Util 'weaken';
 
+use constant FRONTEND_ROLE   =>'frontend';
 use constant SESSION_TIMEOUT => 1800;
 use constant SHUTDOWN_WAIT   => 2;
 use constant QUEUE_LANES     => 2;
@@ -30,15 +31,16 @@ sub authorize_request {
 sub on_startup {
     my $self = shift;
 
-    $self->_init_routing_table;
-
     my $worker_config = $self->{_WORKER}->{config};
     my $bus_config    = $self->{_WORKER}->{bus_config};
 
-    # Determine name of frontend bus group
-    my $frontend_role = $worker_config->{'frontend_role'} || 'frontend';
-    $self->{frontend_role} = $frontend_role;
+    $self->{sess_timeout}  = $worker_config->{'session_timeout'} || SESSION_TIMEOUT;
+    $self->{shutdown_wait} = $worker_config->{'shutdown_wait'}   || SHUTDOWN_WAIT;
+    $self->{frontend_role} = $worker_config->{'frontend_role'}   || FRONTEND_ROLE;
 
+    $self->_init_routing_table;
+
+    my $frontend_role = $self->{frontend_role};
     my $frontends_config = Beekeeper::Config->get_bus_group_config( bus_role => $frontend_role );
 
     unless (@$frontends_config) {
@@ -144,7 +146,7 @@ sub on_shutdown {
 
     # 4. Just in case of pool full stop, wait for workers to finish their current tasks
     my $wait = AnyEvent->condvar;
-    $tmr = AnyEvent->timer( after => SHUTDOWN_WAIT, cb => sub { $wait->send });
+    $tmr = AnyEvent->timer( after => $self->{shutdown_wait}, cb => sub { $wait->send });
     $wait->recv;
 
     $cv = AnyEvent->condvar;
@@ -248,7 +250,7 @@ sub pull_frontend_requests {
 
                 DEBUG && log_trace "Forwarded request:  $src_queue \@$frontend_id --> $dest_queue \@$backend_id";
 
-                $self->{_WORKER}->{calls_count}++;
+                $self->{_WORKER}->{call_count}++;
             },
             on_suback => sub {
                 log_debug "Forwarding $src_queue \@$frontend_id --> req/$backend_role/{app}/{service} \@$backend_id";
@@ -382,16 +384,13 @@ sub pull_backend_notifications {
 sub _init_routing_table {
     my $self = shift;
 
-    my $worker_config = $self->{_WORKER}->{config};
-    my $sess_timeout = $worker_config->{'session_timeout'} ||  SESSION_TIMEOUT;
-
     $self->{Addr_to_topics}   = {};
     $self->{Addr_to_sessions} = {};
 
     $self->{MqttSessions} = $self->shared_cache( 
         id => "router",
         persist => 1,
-        max_age => $sess_timeout,
+        max_age => $self->{sess_timeout},
         on_update => sub {
             my ($caller_id, $value, $old_value) = @_;
 
@@ -535,7 +534,7 @@ Beekeeper::Service::Router::Worker - Route messages between backend and frontend
 
 =head1 VERSION
  
-Version 0.06
+Version 0.07
 
 =head1 SYNOPSIS
 
@@ -548,18 +547,38 @@ forward them to the aproppiate frontend broker which the client is connected to.
 Additionally, routers include some primitives that can be used to implement session
 management and push notifications. In order to push unicasted notifications, routers will
 keep an in-memory shared table of client connections and server side assigned addresses.
+Each entry consumes 1.5 KiB of memory, so a table of 100K sessions will consume around
+150 MiB for each Router worker.
 
-If the application does not bind client sessions the routers can scale really well,
-as you can have a lot of them in a large number of servers. 
+If the application does not bind client sessions the routers can scale horizontally 
+really well, as you can have thousands of them connected to hundreds of brokers.
 
-But please note that when the application does use the session binding mechanism all
-routers will need the in-memory shared table, and this shared table will not scale as 
-well as the rest of the system. So a better strategy (some kind of partition) will 
-be needed for applications with a large number of concurrent clients.
+But please note that, when the application does use the session binding mechanism, all
+routers will need the in-memory shared table, and this shared table will not scale to 
+a great extent as the rest of the system. The limiting factor is the global rate of 
+updates to the table, which will cap around 5000 bind operations (logins) per second.
+This may be fixed on future releases by means of partitioning the table. Meanwhile, 
+this session binding mechanism is not suitable for applications with a large number
+of concurrent clients.
 
-=head1 SEE ALSO
- 
-L<Beekeeper::Service::Router>
+Router workers are not created automatically. In order to add Router workers to a pool
+these must be declared into config file C<pool.config.json>:
+
+  [
+      {
+          "pool_id" : "myapp",
+          "bus_id"  : "backend",
+          "workers" : {
+              "Beekeeper::Service::Router::Worker" : { "worker_count": 4 },
+               ...
+          },
+      },
+  ]
+
+=head1 METHODS
+
+See L<Beekeeper::Service::Router> for a description of the methods exposed by this
+worker class.
 
 =head1 AUTHOR
 

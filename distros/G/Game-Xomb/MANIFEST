@@ -18,6 +18,7 @@ t/20-misc.t
 t/damage-stats.t
 t/jsf.t
 t/mapgen.t
+t/pod-coverage.t
 t/pod.t
 t/xomb.t
 SIGNATURE    Added here by Module::Build

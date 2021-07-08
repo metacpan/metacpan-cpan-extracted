@@ -59,6 +59,8 @@ WriteMakefile(
 	OBJECT			=> join(" ",@$sources),
 	test			=> {TESTS => 't/*.t t/*/*.t'},
 	
+	(eval { ExtUtils::MakeMaker->VERSION(6.48) } ? (MIN_PERL_VERSION => 5.006) : ()),
+	
 	(eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
 		'meta-spec' => { version => 2 },
 		resources => {

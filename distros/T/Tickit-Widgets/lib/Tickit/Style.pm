@@ -1,17 +1,15 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2013-2020 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2013-2021 -- leonerd@leonerd.org.uk
 
 use Object::Pad 0.27;
 
-package Tickit::Style;
+package Tickit::Style 0.52;
 
 use strict;
 use warnings;
 use 5.010;
-
-our $VERSION = '0.51';
 
 use Carp;
 
@@ -476,13 +474,16 @@ sub on_style_load
 }
 
 class # hide from indexer
+   Tickit::Style::_Keyset :strict(params) {
+
+   # A "Keyset" is the set of style keys applied to one particular set of
+   # style tags
+   has $tags  :reader :param;
+   has $style :reader :param;
+}
+
+class # hide from indexer
    Tickit::Style::_Tagset;
-
-use Struct::Dumb;
-
-# A "Keyset" is the set of style keys applied to one particular set of style
-# tags
-struct Keyset => [qw( tags style )];
 
 has @_keysets;
 
@@ -493,7 +494,9 @@ BUILD
 
 method clone
 {
-   return __PACKAGE__->new( map { Keyset( $_->tags, { %{$_->style} } ) } @_keysets );
+   return __PACKAGE__->new(
+      map { Tickit::Style::_Keyset->new( tags => $_->tags, style => { %{$_->style} } ) } @_keysets
+   );
 }
 
 method add
@@ -519,7 +522,7 @@ method merge_with_tags
 {
    my ( $tags, $style ) = @_;
 
-   my $keyset = Keyset( $tags, $style );
+   my $keyset = Tickit::Style::_Keyset->new( tags => $tags, style => $style );
    @_keysets = ( $keyset ) and return if !@_keysets;
 
    # First see if we have to merge an existing one

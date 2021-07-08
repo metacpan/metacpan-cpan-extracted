@@ -1,10 +1,10 @@
 use strict;
 use warnings;
-package Task::Kensho; # git description: v0.39-64-ga952485
+package Task::Kensho; # git description: v0.40-29-gb2d78f6
 # ABSTRACT: A Glimpse at an Enlightened Perl
 # KEYWORDS: EPO enlightened recommendations curated
 
-our $VERSION = '0.40';
+our $VERSION = '0.41';
 
 __END__
 
@@ -18,7 +18,7 @@ Task::Kensho - A Glimpse at an Enlightened Perl
 
 =head1 VERSION
 
-version 0.40
+version 0.41
 
 =head1 SYNOPSIS
 
@@ -26,7 +26,12 @@ version 0.40
 
 =head1 DESCRIPTION
 
-=for stopwords Buddhism EPO Kenshō nonduality amongst Organisation installable
+=for stopwords Buddhism EPO Kenshō nonduality amongst Organisation installable WebSocket
+
+L<Task::Kensho> is a list of recommended, widely used and best-in-class modules
+for Enlightened Perl development. CPAN is wonderful, but there are too
+many wheels and you have to pick and choose amongst the various
+competing technologies.
 
 From L<http://en.wikipedia.org/wiki/Kensho>:
 
@@ -39,11 +44,6 @@ self."[2] It generally "refers to the realization of nonduality of
 subject and object."[3]
 
 =back
-
-L<Task::Kensho> is a list of recommended modules
-for Enlightened Perl development. CPAN is wonderful, but there are too
-many wheels and you have to pick and choose amongst the various
-competing technologies.
 
 The plan is for L<Task::Kensho> to be a rough testing ground for ideas that
 go into among other things the Enlightened Perl Organisation Extended
@@ -67,19 +67,35 @@ facilitates the ease and simplicity the distribution aims to achieve.
 
 =head1 RECOMMENDED MODULES
 
-=for stopwords Async
+=for stopwords Async Minimalistic
 
 =head2 L<Task::Kensho::Async>: Async Programming
 
 =over 4
 
+=item L<Future>
+
+represent an operation awaiting completion
+
 =item L<IO::Async>
 
 Asynchronous event-driven programming
 
+=item L<MCE>
+
+Many-Core Engine for Perl providing parallel processing capabilities
+
+=item L<Mojo::IOLoop>
+
+Minimalistic event loop
+
 =item L<POE>
 
 Multitasking and networking framework for Perl
+
+=item L<Parallel::ForkManager>
+
+A simple parallel processing fork manager
 
 =back
 
@@ -155,17 +171,9 @@ Manipulate structured data definitions (SQL and more)
 
 =over 4
 
-=item L<Date::Tiny>
-
-A date object with as little code as possible
-
 =item L<DateTime>
 
 A date and time object
-
-=item L<DateTime::Tiny>
-
-A date time object with as little code as possible
 
 =item L<Time::Moment>
 
@@ -175,9 +183,9 @@ A fast immutable object representing a date and time
 
 Date parsing both relative and absolute
 
-=item L<Time::Tiny>
+=item L<Time::Piece>
 
-A time object with as little code as possible
+A date and time object based on localtime or gmtime
 
 =back
 
@@ -207,19 +215,23 @@ Check validity of Internet email addresses
 
 =back
 
-=for stopwords CSV
+=for stopwords CSV XLS XLSX
 
 =head2 L<Task::Kensho::ExcelCSV>: Excel/CSV
 
 =over 4
 
-=item L<Spreadsheet::ParseExcel::Simple>
+=item L<Excel::Writer::XLSX>
 
-A simple interface to Excel data
+Create spreadsheets in the XLSX format
+
+=item L<Spreadsheet::Read>
+
+Read the data from a spreadsheet
 
 =item L<Spreadsheet::WriteExcel::Simple>
 
-Create Excel documents easily
+Create XLS documents easily
 
 =item L<Text::CSV_XS>
 
@@ -245,7 +257,7 @@ Make builtins and other functions die instead of returning undef on failure.
 
 =back
 
-=for stopwords whippitupitude Hackery
+=for stopwords whippitupitude Hackery Mojo
 
 =head2 L<Task::Kensho::Hackery>: Script Hackery
 
@@ -265,11 +277,19 @@ Comments that do more than just sit there
 
 Simple progress bars
 
+=item L<ojo>
+
+Fun one-liners with Mojo
+
 =back
 
 =head2 L<Task::Kensho::Logging>: Logging
 
 =over 4
+
+=item L<Log::Any>
+
+Bringing loggers and listeners together.
 
 =item L<Log::Contextual>
 
@@ -419,6 +439,10 @@ Perl binding for Redis database
 
 Code coverage metrics for Perl
 
+=item L<Test2::Suite>
+
+Distribution with a rich set of tools built upon the Test2 framework.
+
 =item L<Test::Deep>
 
 Test deep data structures
@@ -497,6 +521,8 @@ Perl extension for Version Objects
 
 =back
 
+=for stopwords WebSocket
+
 =head2 L<Task::Kensho::WebCrawling>: Web Crawling
 
 =over 4
@@ -516,6 +542,10 @@ Simple procedural interface to LWP
 =item L<LWP::UserAgent>
 
 Full-featured Web client library for Perl
+
+=item L<Mojo::UserAgent>
+
+Non-blocking I/O HTTP and WebSocket user agent
 
 =item L<WWW::Mechanize>
 
@@ -576,6 +606,10 @@ Catalyst is The Elegant MVC Web Application Framework. Task::Catalyst is all you
 =item L<Template>
 
 (Template::Toolkit) Template Processing System
+
+=item L<Web::Simple>
+
+A quick and easy way to build simple web applications
 
 =item L<XML::Atom>
 
@@ -640,7 +674,7 @@ L<Perl::Dist::Strawberry|Perl::Dist::Strawberry>
 
 =head1 SUPPORT
 
-bugs may be submitted through L<https://github.com/EnlightenedPerlOrganisation/task-kensho/issues>.
+Bugs may be submitted through L<https://github.com/EnlightenedPerlOrganisation/task-kensho/issues>.
 
 There is also an irc channel available for users of this distribution, at
 L<C<#epo> on C<irc.perl.org>|irc://irc.perl.org/#epo>.
@@ -651,7 +685,7 @@ Chris Prather <chris@prather.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Karen Etheridge Chris Nehren Leo Lapworth Dan Book Olaf Alders Shawn Sorichetti Rachel Kelly Andrew Whatson Rick Leir Florian Ragwitz
+=for stopwords Karen Etheridge Chris Nehren Leo Lapworth Dan Book Mohammad S Anwar Olaf Alders Rachel Kelly Shawn Sorichetti Andrew Whatson Florian Ragwitz Rick Leir Tina Müller
 
 =over 4
 
@@ -669,7 +703,15 @@ Leo Lapworth <leo@cuckoo.org>
 
 =item *
 
+Dan Book <grinnz@grinnz.com>
+
+=item *
+
 Dan Book <grinnz@gmail.com>
+
+=item *
+
+Mohammad S Anwar <mohammad.anwar@yahoo.com>
 
 =item *
 
@@ -677,11 +719,11 @@ Olaf Alders <olaf@wundersolutions.com>
 
 =item *
 
-Shawn Sorichetti <shawn@coloredblocks.com>
+Rachel Kelly <rkellyalso@gmail.com>
 
 =item *
 
-Rachel Kelly <rkellyalso@gmail.com>
+Shawn Sorichetti <shawn@coloredblocks.com>
 
 =item *
 
@@ -689,11 +731,15 @@ Andrew Whatson <whatson@gmail.com>
 
 =item *
 
+Florian Ragwitz <rafl@debian.org>
+
+=item *
+
 Rick Leir <rleir@leirtech.com>
 
 =item *
 
-Florian Ragwitz <rafl@debian.org>
+Tina Müller <cpan2@tinita.de>
 
 =back
 

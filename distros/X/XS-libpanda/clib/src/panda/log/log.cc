@@ -35,6 +35,7 @@ namespace details {
     struct Data {
         size_t rev = 0;
         std::ostringstream os;
+        std::ostringstream os_tmp;
         std::map<uintptr_t, ModuleData> map;
         string program_name;
 
@@ -105,7 +106,8 @@ namespace details {
         return data;
     }
 
-    std::ostream& get_os () { return get_data().os; }
+    std::ostream& get_os     () { return get_data().os; }
+    std::ostream& get_os_tmp () { return get_data().os_tmp; }
 
     static string_view default_program_name = "<unknown>";
 
@@ -404,6 +406,12 @@ std::vector<Module*> get_modules () {
     return ret;
 }
 
+void set_program_name(const string& value) noexcept {
+    SYNC_LOCK;
+    ++inst().src_data.rev;
+    inst().src_data.program_name = value;
+}
+
 std::ostream& operator<< (std::ostream& stream, const escaped& str) {
    for (auto c : str.src) {
        if (c > 31) {
@@ -415,10 +423,84 @@ std::ostream& operator<< (std::ostream& stream, const escaped& str) {
    return stream;
 }
 
-void set_program_name(const string& value) noexcept {
-    SYNC_LOCK;
-    ++inst().src_data.rev;
-    inst().src_data.program_name = value;
+void prettify_json::set_from_os (std::ostream& os) {
+    auto& ss = static_cast<std::ostringstream&>(os);
+    ss.flush();
+    str = ss.str();
+    ss.str({});
+    src = string_view(str.data(), str.size());
+}
+
+static inline char endof (char c) {
+    if (c == '{') {
+        return '}';
+    } else {
+        return ']';
+    }
+}
+
+std::ostream& operator<< (std::ostream& stream, const prettify_json& info) {
+    auto src = info.src;
+    auto unfold_limit = info.unfold_limit;
+    size_t depth = 0;
+    string result;
+    bool newline = false;
+    result.reserve(src.size() * 1.2);
+    auto ctrl = [&](char c) {
+        result += c;
+        newline = true;
+    };
+    auto tab = [&] {
+        if (newline) {
+            result += '\n';
+            for (size_t i = 0; i < depth; ++i) {
+                result += "    ";
+            }
+        }
+    };
+
+    for (size_t i = 0; i < src.size(); ++i) {
+        char c = src[i];
+        switch (c) {
+            case ' ':
+            case '\t': {
+                if (newline) break; // ignore spaces in the beggining
+                result += c;
+                newline = false;
+            } break;
+            case '{':
+            case '[':{
+                tab();
+                size_t another_begin = src.find(c, i+1);
+                size_t end = src.find(endof(c), i+1);
+                if (another_begin > end && end - i < unfold_limit) {
+                    result += src.substr(i, end+1-i);
+                    i = end;
+                    newline = true;
+                    break;
+                }
+                ctrl(c);
+                ++depth;
+            } break;
+            case '}':
+            case ']':{
+                if (depth) --depth;
+                newline = true;
+                tab();
+                ctrl(c);
+            } break;
+            case ',': {
+                ctrl(c);
+            } break;
+            default:
+                tab();
+                result += c;
+                newline = false;
+        }
+    }
+
+    stream << result;
+    return stream;
 }
 
 }}

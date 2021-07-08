@@ -33,7 +33,7 @@ struct LAMetrics : private ITimerImplListener {
         return total ? (double)(total - idle) / total : 0.0f;
     }
 
-    ~LAMetrics () {
+    virtual ~LAMetrics () {
         timer->destroy();
     }
 

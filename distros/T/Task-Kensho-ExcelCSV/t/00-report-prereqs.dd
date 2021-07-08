@@ -3,6 +3,9 @@ do { my $x = {
                         'requires' => {
                                         'ExtUtils::MakeMaker' => '0',
                                         'perl' => '5.006'
+                                      },
+                        'suggests' => {
+                                        'JSON::PP' => '2.27300'
                                       }
                       },
        'develop' => {
@@ -83,7 +86,8 @@ do { my $x = {
                     },
        'runtime' => {
                       'requires' => {
-                                      'Spreadsheet::ParseExcel::Simple' => '0',
+                                      'Excel::Writer::XLSX' => '0',
+                                      'Spreadsheet::Read' => '0',
                                       'Spreadsheet::WriteExcel::Simple' => '0',
                                       'Text::CSV_XS' => '0',
                                       'perl' => '5.006',

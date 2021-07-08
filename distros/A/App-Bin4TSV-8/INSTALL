@@ -11,10 +11,10 @@ Note that :
 
 
    App::colsummary
+   App::colgrep
    App::crosstable  
    App::csel
    App::csv2tsv    # This will also install Text::CSV
    App::digitdemog
    App::expandtab  # This will also install Text::VisualWidth
-   App::freq
    App::venn

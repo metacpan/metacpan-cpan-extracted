@@ -276,13 +276,27 @@ Revision history for StreamFinder
         some extraineous debug output.
 1.50    2021/05/22
         - Refactor all modules to combine all common methods into a separate 
-        internal module:  StreamFinder::_Class to greatly simplify and 
+        internal module:  StreamFinder::_Class (new) to greatly simplify and 
         eliminate redundant code.  This should make creating new site modules 
         much simpler (now most if not all functions other than "new()" should 
-        not be required in site modules unless it's necessary to override!
+        not be required in site modules unless it's necessary to override)!  
+        This better follows proper object-oriented programming standards.
         - StreamFinder::Tunein - Add "-notrim" option to NOT trim extra "ad", 
         misc. stuff from stream URLs (previously, and by default URLs are 
         "trimmed" removing this stuff (after and including the first "?").
         - StreamFinder::Tunein, StreamFinder::IHeartRadio - Attempt to grab 
         full description of podcasts (may include HTML, ie. links).
         - Misc. minor code cleanups found while converting.
+        - StreamFinder::Anystream - Fix bug that mangled some streams returned. 
+        Also make sure URLs returned containing "\/"s are unescaped to "/"s.
+1.51    2021/07/01
+        - Add "-log" and "-logfmt" options to append a line to a specified 
+        log file for each successful stream-url fetch (see docs).
+        - Fix bug that caused config file arguments with unescaped Perl regex 
+        characters in their values to be ignored.
+        - StreamFinder::Rumble - Fix bug that caused description to be cut 
+        short.
+        - StreamFinder::Spreaker - Handle their multiple URLs, and also fetch 
+        video streams.
+        - StreamFinder::SermonAudio - Handle additional "alternate" URLs as 
+        well as video streams they can contain.  Also try harder to find icon.

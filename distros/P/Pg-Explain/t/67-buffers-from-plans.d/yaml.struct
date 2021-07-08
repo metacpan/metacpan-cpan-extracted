@@ -1,0 +1,58 @@
+{
+  'execution_time' => '9.316',
+  'planning_buffers' => {
+    'shared' => {
+      'hit' => 149,
+      'read' => 44
+    },
+    'timings' => {
+      'read' => '0.888'
+    }
+  },
+  'top_node' => {
+    'actual_loops' => '1',
+    'actual_rows' => '1',
+    'actual_time_first' => '9.27',
+    'actual_time_last' => '9.271',
+    'buffers' => {
+      'shared' => {
+        'read' => 2087
+      },
+      'timings' => {
+        'read' => '16.319'
+      }
+    },
+    'estimated_row_width' => '8',
+    'estimated_rows' => '1',
+    'estimated_startup_cost' => '2337.01',
+    'estimated_total_cost' => '2337.02',
+    'is_analyzed' => 1,
+    'sub_nodes' => [
+      {
+        'actual_loops' => '1',
+        'actual_rows' => '20001',
+        'actual_time_first' => '0.006',
+        'actual_time_last' => '8.577',
+        'buffers' => {
+          'shared' => {
+            'read' => 2087
+          },
+          'timings' => {
+            'read' => '16.319'
+          }
+        },
+        'estimated_row_width' => '0',
+        'estimated_rows' => '20001',
+        'estimated_startup_cost' => '0',
+        'estimated_total_cost' => '2287.01',
+        'is_analyzed' => 1,
+        'scan_on' => {
+          'table_alias' => 'part_0',
+          'table_name' => 'part_0'
+        },
+        'type' => 'Seq Scan'
+      }
+    ],
+    'type' => 'Aggregate'
+  }
+}

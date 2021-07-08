@@ -1,30 +1,36 @@
-0.006   2019-05-06 (PERLANCAR)
+0.007   2021-07-08  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] [dist] Run InsertDistImage dzil plugin after PodWeaver
+	  to avoid mangled location.
+
+
+0.006   2019-05-06  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- [doc] Add sample screenshot.
 
 
-0.005   2019-03-28 (PERLANCAR)
+0.005   2019-03-28  Released-By: PERLANCAR
 
 	- Observe RSYNCCOLOR_RSYNC_CMD environment variable.
 
 
-0.004   2018-12-02 (PERLANCAR)
+0.004   2018-12-02  Released-By: PERLANCAR
 
 	- Observe NO_COLOR (see https://no-color.org).
 
 
-0.003   2018-02-01 (PERLANCAR)
+0.003   2018-02-01  Released-By: PERLANCAR
 
 	- Workaround to avoid undef warning.
 
 
-0.002   2018-02-01 (PERLANCAR)
+0.002   2018-02-01  Released-By: PERLANCAR
 
 	- [Bugfix] Use fgets() so progress (rsync -P) can get shown.
 
 
-0.001   2018-01-24 (PERLANCAR)
+0.001   2018-01-24  Released-By: PERLANCAR
 
         - First release.

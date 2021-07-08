@@ -11,7 +11,6 @@ WriteMakefile (
     App::csv2tsv => 0 , 
     App::digitdemog => 0 ,
     App::expandtab => 0 , 
-    App::freq => 0 , 
     App::venn => 0 
   },
   AUTHOR => 'Toshiyuki SHIMONO (bin4tsv at gmail.com)' , 

@@ -1,23 +1,12 @@
 package Google::RestApi::SheetsApi4::Request::Spreadsheet;
 
-use strict;
-use warnings;
+our $VERSION = '0.7';
 
-our $VERSION = '0.4';
-
-use 5.010_000;
-
-use autodie;
-use Type::Params qw(compile);
-use Types::Standard qw(Str);
-
-no autovivification;
+use Google::RestApi::Setup;
 
 use parent "Google::RestApi::SheetsApi4::Request";
 
-do 'Google/RestApi/logger_init.pl';
-
-sub spreadsheet_id { die "Pure virtual function 'spreadsheet_id' must be overridden"; }
+sub spreadsheet_id { LOGDIE "Pure virtual function 'spreadsheet_id' must be overridden"; }
 
 sub delete_protected_range {
   my $self = shift;

@@ -38,9 +38,9 @@ sub get_content {
     my @choices = (
         [ 'plain', '- Plain' ],
         [ 'copy',  '- Copy & Paste' ],
-        [ 'file',  '- File' ],
+        [ 'file',  '- From File' ],
     );
-    my $old_idx = 0;
+    $sf->{i}{gc}{old_idx_menu} //= 0;
     my $data_source_choice = $sf->{o}{insert}{'data_source_' . $sf->{i}{stmt_types}[0]};
 
     MENU: while ( 1 ) {
@@ -52,18 +52,18 @@ sub get_content {
                 # Choose
                 my $idx = $tc->choose(
                     $menu,
-                    { %{$sf->{i}{lyt_v}}, prompt => $prompt, index => 1, default => $old_idx,
+                    { %{$sf->{i}{lyt_v}}, prompt => $prompt, index => 1, default => $sf->{i}{gc}{old_idx_menu},
                       undef => '  <=' }
                 );
                 if ( ! defined $idx || ! defined $menu->[$idx] ) {
                     return;
                 }
                 if ( $sf->{o}{G}{menu_memory} ) {
-                    if ( $old_idx == $idx && ! $ENV{TC_RESET_AUTO_UP} ) {
-                        $old_idx = 0;
+                    if ( $sf->{i}{gc}{old_idx_menu} == $idx && ! $ENV{TC_RESET_AUTO_UP} ) {
+                        $sf->{i}{gc}{old_idx_menu} = 0;
                         next MENU;
                     }
-                    $old_idx = $idx;
+                    $sf->{i}{gc}{old_idx_menu} = $idx;
                 }
                 $sf->{i}{gc}{source_type} = $choices[$idx-@pre][0];
             }
@@ -75,8 +75,6 @@ sub get_content {
         GET_DATA: while ( 1 ) {
             my ( $aoa, $open_mode );
             if ( ! $skip_to || $skip_to eq 'GET_DATA' ) {
-                delete $sf->{i}{ct}{default_table_name};
-                #$sf->{i}{gc}{previous_file_fs} = $sf->{i}{gc}{file_fs} // ''; # DBBrowser.pm 635
                 my $ok;
                 if ( $sf->{i}{gc}{source_type} eq 'plain' ) {
                     ( $ok, $sf->{i}{gc}{file_fs} ) = $cr->from_col_by_col( $sql );
@@ -94,8 +92,8 @@ sub get_content {
                 }
             }
             my $file_fs = $sf->{i}{gc}{file_fs};
-            if ( ! defined $sf->{i}{S_R}{$file_fs}{book} ) {
-                delete $sf->{i}{S_R};
+            if ( ! defined $sf->{i}{ss}{$file_fs}{book} ) {
+                delete $sf->{i}{ss};
             }
 
             PARSE: while ( 1 ) {
@@ -135,6 +133,7 @@ sub get_content {
                         }
                         if ( ! $parse_ok ) {
                             $skip_to = '';
+                            next MENU if $sf->{i}{gc}{source_type} eq 'copy';
                             next GET_DATA;
                         }
                         if ( ! @{$sql->{insert_into_args}} ) {
@@ -144,6 +143,7 @@ sub get_content {
                             );
                             close $fh;
                             $skip_to = '';
+                            next MENU if $sf->{i}{gc}{source_type} eq 'copy';
                             next GET_DATA;
                         }
                     }
@@ -155,7 +155,7 @@ sub get_content {
                                 next GET_DATA;
                             }
                             if ( ! @{$sql->{insert_into_args}} ) { #
-                                next SHEET if $sf->{i}{S_R}{$file_fs}{sheet_count} >= 2;
+                                next SHEET if $sf->{i}{ss}{$file_fs}{sheet_count} >= 2;
                                 $skip_to = '';
                                 next GET_DATA;
                             }
@@ -171,11 +171,12 @@ sub get_content {
                 FILTER: while ( 1 ) {
                     my $ok = $cf->input_filter( $sql );
                     if ( ! $ok ) {
-                        if (    exists $sf->{i}{S_R}{$file_fs}{sheet_count}
-                            && defined $sf->{i}{S_R}{$file_fs}{sheet_count}
-                            && $sf->{i}{S_R}{$file_fs}{sheet_count} >= 2 ) {
+                        if (    exists $sf->{i}{ss}{$file_fs}{sheet_count}
+                            && defined $sf->{i}{ss}{$file_fs}{sheet_count}
+                            && $sf->{i}{ss}{$file_fs}{sheet_count} >= 2 ) {
                             next PARSE;
                         }
+                        next MENU if $sf->{i}{gc}{source_type} eq 'copy';
                         next GET_DATA;
                     }
                     elsif ( $ok == -1 ) {

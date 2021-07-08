@@ -1,3 +1,12 @@
+0.146		2021-07-06	T. R. Wyant
+    Update AMSAT URL.
+
+    Correct generation of 'provides' metadata.  Thanks to Favio Poletti
+    for blogging
+    https://github.polettix.it/ETOOBUSY/2021/06/15/the-real-pause-workaround/,
+    and ultimately to Joel Berger for the pointer to
+    https://metacpan.org/pod/CPAN::Meta::Spec#no_index
+
 0.145		2021-03-25	T. R. Wyant
     Allow identity file to have .gpg suffix.  This is for the benefit of
     the vim-gnupg plugin, and potentially other such things.

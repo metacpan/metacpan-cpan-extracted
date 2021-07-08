@@ -3,6 +3,9 @@ do { my $x = {
                         'requires' => {
                                         'ExtUtils::MakeMaker' => '0',
                                         'perl' => '5.006'
+                                      },
+                        'suggests' => {
+                                        'JSON::PP' => '2.27300'
                                       }
                       },
        'develop' => {
@@ -93,6 +96,7 @@ do { my $x = {
                                       'Plack' => '0',
                                       'Task::Catalyst' => '0',
                                       'Template' => '0',
+                                      'Web::Simple' => '0',
                                       'XML::Atom' => '0',
                                       'XML::RSS' => '0',
                                       'perl' => '5.006',

@@ -118,6 +118,7 @@ MANIFEST.SKIP
 misc/bench.pl
 misc/mytest.plx
 misc/trun.plx
+Protocol-HTTP.pro
 src/xs/protocol/http.cc
 src/xs/protocol/http.h
 t/compile/chunks.t

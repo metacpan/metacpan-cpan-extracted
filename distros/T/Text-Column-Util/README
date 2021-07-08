@@ -2,8 +2,26 @@ NAME
     Text::Column::Util - Utilities for displaying text in multiple columns
 
 VERSION
-    This document describes version 0.003 of Text::Column::Util (from Perl
-    distribution Text-Column-Util), released on 2020-06-07.
+    This document describes version 0.004 of Text::Column::Util (from Perl
+    distribution Text-Column-Util), released on 2021-03-02.
+
+DESCRIPTION
+    This module is written mainly to provide the functionality for
+    column-run, a CLI script to run several commands in sequence and display
+    their results side by side. It can handle ANSI color codes and wide
+    Unicode characters.
+
+    As alternatives to this module, you can also use modules that generate
+    text table. This module provides some convenience like:
+
+    *   finding out terminal width and setting column widths equally per
+        each command;
+
+    *   option to clip long output;
+
+    *   option to specify text as coderef;
+
+    *   option to display line number.
 
 FUNCTIONS
   show_texts_in_columns
@@ -62,7 +80,7 @@ SOURCE
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website
-    <https://rt.cpan.org/Public/Dist/Display.html?Name=Text-Column-Util>
+    <https://github.com/perlancar/perl-Text-Column-Util/issues>
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.
@@ -71,7 +89,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2020 by perlancar@cpan.org.
+    This software is copyright (c) 2021 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

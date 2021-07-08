@@ -1,5 +1,11 @@
 Revision history for Database-Async
 
+0.015     2021-07-07 18:00:29+08:00 Asia/Kuala_Lumpur
+    [Bugs fixed]
+
+    - database error exceptions were not propagated in all cases, thanks to Kok Jun Bon
+    for reporting and providing a test case for this
+
 0.014     2021-06-16 00:58:19+08:00 Asia/Kuala_Lumpur
     [New features]
 

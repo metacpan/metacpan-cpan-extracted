@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::KeysightE3633E;
-$Lab::Moose::Instrument::KeysightE3633E::VERSION = '3.760';
+$Lab::Moose::Instrument::KeysightE3633E::VERSION = '3.762';
 #ABSTRACT: Keysight E3633E voltage/current source.
 
 use v5.20;
@@ -155,7 +155,7 @@ Lab::Moose::Instrument::KeysightE3633E - Keysight E3633E voltage/current source.
 
 =head1 VERSION
 
-version 3.760
+version 3.762
 
 =head1 SYNOPSIS
 
@@ -247,7 +247,7 @@ Use rate limits (max_units_per_second, max_units_per_step) for sweep steps.
 This software is copyright (c) 2021 by the Lab::Measurement team; in detail:
 
   Copyright 2019       Simon Reinhardt
-            2020       Andreas K. HÃ¼ttel
+            2020       Andreas K. Huettel
 
 
 This is free software; you can redistribute it and/or modify it under

@@ -1,10 +1,10 @@
+use v5.14;
 package Getopt::EX::i18n;
-use 5.014;
-use strict;
+
+our $VERSION = '0.09';
+
 use warnings;
 use Data::Dumper;
-
-our $VERSION = "0.08";
 
 =encoding utf-8
 
@@ -224,12 +224,17 @@ my %cc;
 my %opthash;
 
 package LocaleObj {
-    use Moo;
-    has [ my @member = qw(name lang cc) ] => (is => 'ro', required => 1);
+    sub new {
+	my($class, %hash) = @_;
+	bless \%hash, $class;
+    }
+    sub name { $_[0]->{name} // '' }
+    sub lang { $_[0]->{lang} // '' }
+    sub cc   { $_[0]->{cc}   // '' }
     sub create {
 	(my $class, local $_) = @_;
 	/^(?<name>(?<lang>[a-z][a-z])_(?<cc>[A-Z][A-Z]))/ or die;
-	new $class map { $_ => $+{$_} // '' } @member;
+	$class->new(%+);
     }
     use Getopt::EX::i18n::iso639 qw(%iso639);
     use Getopt::EX::i18n::iso3361 qw(%iso3361);

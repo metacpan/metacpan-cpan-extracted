@@ -34,6 +34,7 @@ PICA::Data - PICA record processing
           # object accessors
           my $ppn      = $record->id;
           my $ppn      = $record->value('003@0');
+          my $ppn      = $record->subfields('003@')->{0};
           my $ddc      = $record->match('045Ue', split => 1, nested_array => 1);
           my $holdings = $record->holdings;
           my $items    = $record->items;
@@ -165,12 +166,19 @@ expression. The following are virtually equivalent:
 
 ## pica\_fields( $record\[, $path...\] )
 
-Returns a PICA record (or empty array reference) limited to fields specified in
-one ore more PICA path expression. The following are virtually equivalent:
+Returns a PICA record (or empty array reference) limited to fields optionally
+specified by PICA path expressions. The following are virtually equivalent:
 
     pica_fields($record, $path);
     $path->record_fields($record);
     $record->fields($path);
+
+## pica\_subfields( $record\[, $path...\] )
+
+Returns a [Hash::MultiValue](https://metacpan.org/pod/Hash::MultiValue) of all subfields of fields optionally specified
+by PICA path expressions. Also available as accessor `subfields`.
+
+## pica\_
 
 ## pica\_title( $record )
 
@@ -234,6 +242,11 @@ Same as `values` but only returns the first value.
 
 Returns a PICA record limited to fields specified in a [PICA::Path](https://metacpan.org/pod/PICA::Path)
 expression.  Always returns an array reference.
+
+## subfields( \[$path...\] )
+
+Returns a [Hash::MultiValue](https://metacpan.org/pod/Hash::MultiValue) of all subfields of fields optionally specified
+by PICA path expressions.
 
 ## holdings
 

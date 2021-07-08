@@ -4,10 +4,19 @@ use strict;
 use warnings;
 
 use Beekeeper::Worker ':log';
+use Beekeeper::Logger ':log_levels';
 use base 'Beekeeper::Worker';
 
+use Exporter 'import';
 
-# Common base class for all MyApp services
+our @EXPORT = (
+    @Beekeeper::Worker::EXPORT,
+    @Beekeeper::Worker::EXPORT_OK,
+    @Beekeeper::Logger::EXPORT_OK,
+);
+
+
+# Base class for all MyApp services
 
 sub authorize_request {
     my ($self, $req) = @_;
@@ -23,7 +32,7 @@ sub authorize_request {
     return BKPR_REQUEST_AUTHORIZED;
 }
 
-sub setup_myapp_stuff {
+sub init_persistent_connections {
     my ($self) = @_;
 
     # $self->{dbh} = DBI->connect ...

@@ -3,6 +3,8 @@ package Test::Google::RestApi::SheetsApi4::RangeGroup;
 use YAML::Any qw(Dump);
 use Test::Most;
 
+use aliased 'Google::RestApi::SheetsApi4::RangeGroup';
+
 use parent qw(Test::Class Test::Google::RestApi::SheetsApi4::Base);
 
 sub class { 'Google::RestApi::SheetsApi4::RangeGroup' }
@@ -36,7 +38,7 @@ sub ranges : Tests(1) {
   my $self = shift;
 
   my $range_group = $self->new_range_group("A1", "B2");
-  lives_ok sub { $range_group->bold()->red(0.1); }, "Setting bold and red should succeed";
+  isa_ok $range_group->bold()->red(0.1), RangeGroup, "Setting bold and red";
 
   return;
 }

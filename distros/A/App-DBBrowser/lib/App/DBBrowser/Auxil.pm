@@ -305,7 +305,13 @@ sub alias {
 
 sub quote_table {
     my ( $sf, $td ) = @_;
-    my @idx = $sf->{o}{G}{qualified_table_name} ? ( 0 .. 2 ) : ( 2 );
+    my @idx;
+    if ( $sf->{o}{G}{qualified_table_name} || $sf->{i}{db_attached} ) {
+        @idx = ( 0 .. 2 );
+    }
+    else {
+        @idx = ( 2 );
+    }
     if ( $sf->{o}{G}{quote_identifiers} ) {
         return $sf->{d}{dbh}->quote_identifier( @{$td}[@idx] );
     }

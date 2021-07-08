@@ -1,0 +1,45 @@
+---
+abstract: 'Catalyst-Plugin-Session-Store Redis-Fast plugin'
+author:
+  - 'Sushrut Pajai <spajai@cpan.org>'
+build_requires:
+  Catalyst: '0'
+  Catalyst::Plugin::Session::Test::Store: '0'
+  Catalyst::Test: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  FindBin: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Redis::Fast: '0'
+  Test::More: '0'
+  lib: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Catalyst-Plugin-Session-Store-Redis-Fast
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Catalyst::Plugin::Session::Store: '0'
+  Class::Data::Inheritable: '0'
+  MIME::Base64: '0'
+  MRO::Compat: '0'
+  Redis::Fast: '0'
+  Storable: '0'
+  Try::Tiny: '0'
+  base: '0'
+  perl: '5.006'
+resources:
+  repository: git://github.com/spajai/Catalyst-Plugin-Session-Store-Redis-Fast.git
+version: '1.001'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

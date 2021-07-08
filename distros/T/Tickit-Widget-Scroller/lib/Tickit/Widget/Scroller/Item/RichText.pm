@@ -5,7 +5,7 @@
 
 use Object::Pad 0.17;
 
-package Tickit::Widget::Scroller::Item::RichText 0.25;
+package Tickit::Widget::Scroller::Item::RichText 0.26;
 class Tickit::Widget::Scroller::Item::RichText
    extends Tickit::Widget::Scroller::Item::Text;
 

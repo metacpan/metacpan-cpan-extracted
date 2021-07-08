@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::OI_IPS;
-$Lab::Moose::Instrument::OI_IPS::VERSION = '3.760';
+$Lab::Moose::Instrument::OI_IPS::VERSION = '3.762';
 #ABSTRACT: Oxford Instruments IPS Intelligent Power Supply
 
 use v5.20;
@@ -387,7 +387,7 @@ Lab::Moose::Instrument::OI_IPS - Oxford Instruments IPS Intelligent Power Supply
 
 =head1 VERSION
 
-version 3.760
+version 3.762
 
 =head1 SYNOPSIS
 
@@ -522,7 +522,7 @@ This driver consumes the following roles:
 This software is copyright (c) 2021 by the Lab::Measurement team; in detail:
 
   Copyright 2019       Simon Reinhardt
-            2020       Andreas K. HÃ¼ttel, Simon Reinhardt
+            2020       Andreas K. Huettel, Simon Reinhardt
             2021       Simon Reinhardt
 
 

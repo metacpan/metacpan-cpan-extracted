@@ -2,8 +2,8 @@ NAME
     App::podtohtml - Convert POD to HTML
 
 VERSION
-    This document describes version 0.007 of App::podtohtml (from Perl
-    distribution App-podtohtml), released on 2019-05-25.
+    This document describes version 0.009 of App::podtohtml (from Perl
+    distribution App-podtohtml), released on 2021-02-26.
 
 FUNCTIONS
   podtohtml
@@ -39,7 +39,7 @@ FUNCTIONS
         perldoc.perl.org:
 
          podtohtml(
-           infile   => "some.pod",
+             infile   => "some.pod",
            browser  => 1,
            template => "perldoc_perl_org-20180911"
          );
@@ -90,6 +90,39 @@ FUNCTIONS
 
     Return value: (any)
 
+  podtohtml_metacpan
+    Usage:
+
+     podtohtml_metacpan(%args) -> [status, msg, payload, meta]
+
+    Show POD documentation roughly like how MetaCPAN would display it.
+
+    This is a shortcut for:
+
+     % podtohtml --template metacpan-20180911 --browser <infile>
+     % podtohtml --metacpan <infile>
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   infile => *perl::pod_or_pm_filename* (default: "-")
+
+        Input file (POD).
+
+        If not found, will search in for .pod or .pm files in @INC.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
 HOMEPAGE
     Please visit the project's homepage at
     <https://metacpan.org/release/App-podtohtml>.
@@ -100,7 +133,7 @@ SOURCE
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website
-    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-podtohtml>
+    <https://github.com/perlancar/perl-App-podtohtml/issues>
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.
@@ -112,7 +145,8 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019, 2018, 2017 by perlancar@cpan.org.
+    This software is copyright (c) 2021, 2019, 2018, 2017 by
+    perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

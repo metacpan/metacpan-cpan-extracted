@@ -1,0 +1,71 @@
+#!/usr/bin/env perl
+#
+# loremgen - set "lorem ipsum" to music (`ly-fu` is of App::MusicTools;
+# otherwise, disable "pitchstyle" and wrangle the numbers yourself)
+#
+#   perl loremgen \
+#    | ly-fu --absolute --layout --tempo=108 --instrument="fx 6 (goblins)" -
+
+use 5.24.0;
+use warnings;
+use Data::Dumper;
+use List::Util qw(shuffle sum uniq);
+use Music::Guidonian 0.03 'intervalize_scale_nums';
+use Music::Scales 'get_scale_nums';
+
+my $mg = Music::Guidonian->new(
+    key_set => {
+        intervals => intervalize_scale_nums( [ get_scale_nums('dorian') ] ),
+        keys      => [qw(a e i o u)],
+        min       => 61,
+        max       => 75,
+    },
+    pitchstyle => 'Music::PitchNum::Dutch'
+);
+#warn Dumper $mg->key2pitch;
+#exit;
+
+my $phrase = readline *DATA;
+
+# filter out repeated vowels
+my $prev   = -1;
+my @vowels = map {
+    if ( $_ eq $prev ) {
+        ()
+    } else {
+        $prev = $_;
+    }
+} $phrase =~ m/([aeiou])/g;
+
+# re-shuffle choices every time a renewal comes up
+my $iter =
+  $mg->iterator( \@vowels, renew => sub { $_[0] = [ shuffle $_[0]->@* ] } );
+
+# the melody is 1 in a 1000 (however this does not mean it's a *good* one)
+my $pick;
+for my $try ( 1 .. 1000 ) {
+    my $phrase = $iter->() // last;
+    rand($try) < 1 and $pick = $phrase;
+}
+
+say join ' ', map { $_ . rfunc() } @$pick;
+
+# randomize the rhythm (see also the Music::Voss module). another idea
+# would be to base the rhythm on the number of characters between
+# vowels, somehow
+sub rfunc {
+    state @values;
+    state $generation = 0;
+    for my $i ( 0 .. 3 ) {
+        if ( $generation % ( 2**$i ) == 0 ) {
+            $values[$i] = rand() - 0.5;
+        }
+    }
+    $generation++;
+    my $v = sum @values;
+    # half-note, or the same followed by a half-note rest
+    return $v > 0 ? 2 : '2 r2';
+}
+
+__DATA__
+Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua ut enim ad minim veniam quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur excepteur sint occaecat cupidatat non proident sunt in culpa qui officia deserunt mollit anim id est laborum

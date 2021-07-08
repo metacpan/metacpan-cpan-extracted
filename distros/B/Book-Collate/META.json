@@ -1,0 +1,58 @@
+{
+   "abstract" : "Tools to Collate and Report Text Documents",
+   "author" : [
+      "Leam Hall <leamhall@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4231",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Book-Collate",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4004"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Book::Collate" : {
+         "file" : "lib/Book/Collate.pm",
+         "version" : "v0.0.1"
+      },
+      "Book::Collate::Book" : {
+         "file" : "lib/Book/Collate/Book.pm",
+         "version" : "v0.0.1"
+      },
+      "Book::Collate::Report" : {
+         "file" : "lib/Book/Collate/Report.pm",
+         "version" : "v0.0.1"
+      },
+      "Book::Collate::Section" : {
+         "file" : "lib/Book/Collate/Section.pm",
+         "version" : "v0.0.1"
+      },
+      "Book::Collate::Writer::Report" : {
+         "file" : "lib/Book/Collate/Writer/Report.pm",
+         "version" : "v0.0.1"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://www.perlfoundation.org/artistic_license_2_0"
+      ]
+   },
+   "version" : "v0.0.1",
+   "x_serialization_backend" : "JSON::PP version 4.04"
+}

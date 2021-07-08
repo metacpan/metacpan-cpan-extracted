@@ -55,6 +55,6 @@
          "web" : "https://github.com/z-eos/gqmt.git"
       }
    },
-   "version" : "1.01",
+   "version" : "1.02",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

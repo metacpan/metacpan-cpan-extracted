@@ -25,7 +25,7 @@ WriteMakefile
    # A hash of modules that are needed to run the module.
 
    'PREREQ_PM'          => {
-                            'Math::BigInt'        => 1.999817,
+                            'Math::BigInt'        => 1.999819,
                             'Bit::Vector'         => 0,
                            },
 
@@ -37,9 +37,9 @@ WriteMakefile
                            },
 
    'LICENSE'            => 'perl_5',
-   'LIBS'               => [''],          # e.g., '-lm'
-   'DEFINE'             => '',            # e.g., '-DHAVE_SOMETHING'
-   'INC'                => '',            # e.g., '-I/usr/include/other'
+   'LIBS'               => [''],        # e.g., '-lm'
+   'DEFINE'             => '',          # e.g., '-DHAVE_SOMETHING'
+   'INC'                => '',          # e.g., '-I/usr/include/other'
    'SIGN'               => 1,
 
    'META_MERGE'         => {

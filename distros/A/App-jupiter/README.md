@@ -4,7 +4,9 @@ jupiter - turn a list of feeds into a HTML page, a river of news
 
 # SYNOPSIS
 
-**jupiter update** _feed.opml_
+To update the feeds from one or more OPML files:
+
+**jupiter update** _feed.opml_ … \[_/regex/_ …\]
 
 To generate `index.html`:
 
@@ -59,6 +61,26 @@ owners.
 
 The OPML file must use the .opml extension. You can update the feeds for
 multiple OPML files in one go.
+
+## Adding just one feed
+
+After a while, the list of feeds in your OPML starts getting unwieldy. When you
+add a new feed, you might not want to fetch all of them. In this case, provide a
+regular expression surrounded by slashes to the `update` command:
+
+    jupiter update feed.opml /example/
+
+Assuming a feed with a URL or title that matches the regular expression is
+listed in your OPML file, only that feed is going to get updated.
+
+There is no need to escape slashes in the regular expression: `//rss/` works
+just fine. Beware shell escaping, however. Most likely, you need to surround the
+regular expression with single quotes if it contains spaces:
+
+    jupiter update feed.opml '/Halberds & Helmets/'
+
+Notice how we assume that named entities such as `&amp;` have already been
+parsed into the appropriate strings.
 
 ## Generate the HTML
 
@@ -119,8 +141,11 @@ and if a title is provided, it is stored in the JSON file and overrides the
 title in the OPML file.
 
 `link` is the site's link for humans. When you generate the HTML, the feeds in
-the cache are parsed and if a title is provided, it is stored in the JSON file
-and overrides the link in the OPML file.
+the cache are parsed and if a link is provided, it is stored in the JSON file.
+If the OPML element contained a `htmlURL` attribute, however, that takes
+precedence. The reasoning is that when a podcast is hosted on a platform which
+generates a link that you don't like and you know the link to the human-readable
+blog elsehwere, use the `htmlURL` attribute in the OPML file to override this.
 
 `last_modified` and `etag` are two headers used for caching from the HTTP
 response that cannot be changed by data in the feed.
@@ -142,7 +167,7 @@ GNU Affero General Public License
 
 Using `cpan`:
 
-    cpan App::phoebe
+    cpan App::jupiter
 
 Manual install:
 
@@ -157,13 +182,11 @@ To run Jupiter on Debian we need:
 `libmodern-perl-perl` for [Modern::Perl](https://metacpan.org/pod/Modern%3A%3APerl)
 
 `libmojolicious-perl` for [Mojo::Template](https://metacpan.org/pod/Mojo%3A%3ATemplate), [Mojo::UserAgent](https://metacpan.org/pod/Mojo%3A%3AUserAgent), [Mojo::Log](https://metacpan.org/pod/Mojo%3A%3ALog),
-and [Mojo::Util](https://metacpan.org/pod/Mojo%3A%3AUtil)
+[Mojo::JSON](https://metacpan.org/pod/Mojo%3A%3AJSON), and [Mojo::Util](https://metacpan.org/pod/Mojo%3A%3AUtil)
 
 `libxml-libxml-perl` for [XML::LibXML](https://metacpan.org/pod/XML%3A%3ALibXML)
 
 `libfile-slurper-perl` for [File::Slurper](https://metacpan.org/pod/File%3A%3ASlurper)
-
-`libcpanel-json-xs-perl` for [Cpanel::JSON::XS](https://metacpan.org/pod/Cpanel%3A%3AJSON%3A%3AXS)
 
 `libdatetime-perl` for [DateTime](https://metacpan.org/pod/DateTime)
 

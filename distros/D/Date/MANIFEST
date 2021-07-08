@@ -14,6 +14,8 @@ clib/src/panda/date/parse-date.cc
 clib/src/panda/date/parse-date.rl
 clib/src/panda/date/parse-relative.cc
 clib/src/panda/date/parse-relative.rl
+clib/src/panda/date/strptime.cc
+clib/src/panda/date/strptime.rl
 clib/src/panda/time.h
 clib/src/panda/time/format.h
 clib/src/panda/time/os.icc
@@ -39,6 +41,7 @@ clib/tests/format/iso.cc
 clib/tests/format/iso8601.cc
 clib/tests/format/rfc822_1123.cc
 clib/tests/format/rfc850.cc
+clib/tests/format/strptime.cc
 clib/tests/main.cc
 clib/tests/misc.cc
 clib/tests/mksec.cc
@@ -1310,6 +1313,7 @@ t/format/iso.t
 t/format/iso8601.t
 t/format/rfc822_1123.t
 t/format/rfc850.t
+t/format/strptime.t
 t/integration/data-recursive-clone.t
 t/integration/json.t
 t/integration/storable.t

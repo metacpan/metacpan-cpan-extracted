@@ -47,7 +47,7 @@ sub automated_testing {
 
 sub _sleep {
     my ($self, $time) = @_;
-    # Run tests really slow on limited hardware of smoke testers
+    # Run tests really slow on constrained platforms
     $time *= 10 if $self->automated_testing;
     sleep $time;
 }
@@ -117,7 +117,7 @@ sub stop_test_workers : Test(shutdown) {
 sub start_workers {
     my ($self, $worker_class, %config) = @_;
 
-    my $workers_count = $config{'workers_count'} ||= 2;
+    my $worker_count = $config{'worker_count'} ||= 2;
     my $no_wait = delete $config{'no_wait'};
 
     unless ($Supervisor_pid) {
@@ -161,7 +161,7 @@ sub start_workers {
     my @started_pids;
 
     # Spawn workers
-    for (1..$workers_count) {
+    for (1..$worker_count) {
 
         my $pid = $self->_spawn_worker($worker_class, %config);
 
@@ -174,7 +174,7 @@ sub start_workers {
     unless ($no_wait) {
 
         # Wait until workers are running
-        diag "Waiting for $workers_count $worker_class workers" if $DEBUG;
+        diag "Waiting for $worker_count $worker_class workers" if $DEBUG;
 
         my $max_wait = 20;
         while ($max_wait--) {
@@ -184,12 +184,12 @@ sub start_workers {
                 timeout => 1,
             );
             my $running = $status->{$worker_class}->{count} || 0;
-            last if $running == $workers_count + $already_running;
+            last if $running == $worker_count + $already_running;
         }
 
         unless ($max_wait > 0) {
             $self->stop_all_workers;
-            $self->FAIL_ALL("Failed to start $workers_count workers $worker_class");
+            $self->FAIL_ALL("Failed to start $worker_count workers $worker_class");
         }
     }
 

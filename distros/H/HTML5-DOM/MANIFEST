@@ -6,8 +6,6 @@ examples/html5lib_tests.pl
 examples/simple.pl
 gen/modest_errors.c
 gen/tags_ua_style.c
-HTML5-DOM-1.23/META.json
-HTML5-DOM-1.23/META.yml
 leaks.pl
 lib/HTML5/DOM.pm
 lib/HTML5/DOM.pod
@@ -41,7 +39,6 @@ modest_myport.c
 modest_myurl.c
 port/openbsd/mcsync.c
 ppport.h
-README
 README.pod
 scripts/gen.pl
 scripts/tags.txt

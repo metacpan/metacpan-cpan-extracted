@@ -110,7 +110,7 @@ sub test_02_sync_calls : Test(20) {
     };
 
     is( $resp, undef );
-    like( $@, qr/Invalid method 'test.#' at /); # local error, call not made
+    like( $@, qr/Invalid method 'test.#' at /); # local error, the remote call was not made
 
     # Invalid method
     $resp = eval {
@@ -156,7 +156,7 @@ sub test_03_fire_and_forget_calls : Test(1) {
     is( $var, $expected, "Fire and forget method executed 3 times");
 }
 
-sub test_04_async_calls : Test(18) {
+sub test_04_async_calls : Test(25) {
     my $self = shift;
 
     my $cli = Beekeeper::Client->instance;
@@ -194,6 +194,43 @@ sub test_04_async_calls : Test(18) {
     foreach my $n (1..$count) {
         is( $reqs[$n-1]->result, $var + $n );
     }
+
+    # on_success callback
+    my $cb = AnyEvent->condvar;
+    my $resp;
+
+    $cli->call_remote_async(
+        method => 'test.echo',
+        params => 749,
+        on_success => sub {
+            $resp = shift;
+            $cb->send;
+        }
+    );
+
+    $cb->recv;
+    isa_ok( $resp, 'Beekeeper::JSONRPC::Response' );
+    is( $resp->success, 1 );
+    is( $resp->result, 749 );
+
+    # on_error callback
+    $cb = AnyEvent->condvar;
+    undef $resp;
+
+    $cli->call_remote_async(
+        method => 'test.fail',
+        params => { error => "error message 821" },
+        on_error => sub {
+            $resp = shift;
+            $cb->send;
+        }
+    );
+
+    $cb->recv;
+    isa_ok( $resp, 'Beekeeper::JSONRPC::Error' );
+    is( $resp->success, 0 );
+    is( $resp->code, -32000);
+    is( $resp->message, "error message 821");
 
     # Timeout
     eval {
@@ -269,7 +306,7 @@ sub test_06_client_api : Test(8) {
     is( $resp->result, 'foo');
 
 
-    $resp = $svc->fibonacci_1( 1 );
+    $resp = $svc->fibonacci( 2 );
 
     isa_ok($resp, 'Beekeeper::JSONRPC::Response');
     is( $resp->success, 1 );

@@ -1,5 +1,5 @@
 package Lab::Moose::Sweep::Step;
-$Lab::Moose::Sweep::Step::VERSION = '3.760';
+$Lab::Moose::Sweep::Step::VERSION = '3.762';
 #ABSTRACT: Base class for step/list sweeps
 
 use v5.20;
@@ -201,7 +201,7 @@ Lab::Moose::Sweep::Step - Base class for step/list sweeps
 
 =head1 VERSION
 
-version 3.760
+version 3.762
 
 =head1 SYNOPSIS
 
@@ -348,7 +348,7 @@ define defaults for this. E.g. for the Voltage sweep:
 This software is copyright (c) 2021 by the Lab::Measurement team; in detail:
 
   Copyright 2017-2018  Simon Reinhardt
-            2020       Andreas K. HÃ¼ttel
+            2020       Andreas K. Huettel
 
 
 This is free software; you can redistribute it and/or modify it under

@@ -1,48 +1,6 @@
 #!/usr/bin/perl
 
-# Script to get a web-based token that can be stored and
-# used later to authorize our REST API access. 
-
-# Based on code from https://gist.github.com/hexaddikt/6738162
-
-# To use this script:
-#
-# 1. Read over https://stackoverflow.com/questions/11485271/google-oauth-2-authorization-error-redirect-uri-mismatch
-#    It has a lot of useful background information.
-#
-# 2. Obtain a client_id and client_secret from your Google
-#    Developer's console page.
-#
-# 3. Create a yaml file with the following format:
-#
-# ---
-# auth:
-#   class: OAuth2Client
-#   client_id: <client-id-from-google>
-#   client_secret: <client-secret-from-google>
-#   token_file: <file-name-to-store-your-generated-token>
-#
-#    The token file will be stored in the same directory as
-#    the config file.
-#
-#    Once this process is complete, this same config file
-#    will be used by this package to access the Google API.
-#
-# 4. Run this script with the first arg pointing to the yaml
-#    file above, and follow the directions on the screen,
-#    which will take you through the following steps:
-#
-# 5. Copy the URL printed out, and paste the URL in a
-#    browser to load the page. 
-#
-# 6. On the resulting page, click OK (possibly after being
-#    asked to log in to your Google account). 
-#
-# 7. You will be redirected to a page that provides a string
-#    that you should copy and paste back into the terminal
-#    window, so this script can exchange it for an access
-#    token from Google, and store the token. That wil be
-#    the token for this package.
+# see perldoc below for instructions on how to use this script.
 
 use FindBin;
 use lib "$FindBin::RealBin/../lib";
@@ -63,10 +21,11 @@ my @scope = (
   'https://www.googleapis.com/auth/spreadsheets',
 );
 
-my $config_file = $ARGV[0];
-my $config = LoadFile($config_file);
-print "Config used:\n", Dump($config);
+my $config_file = $ARGV[0] or die "A config file name must be provided. See perldoc.\n";
+my $config = eval { LoadFile($config_file); };
+die "Unable to load YAML config file '$config_file': $@\n" if $@;
 
+print "Validating config:\n", Dump($config);
 my $check = compile_named(
   class         => StrMatch[qr/^OAuth2Client$/],
   client_id     => Str,
@@ -137,3 +96,84 @@ Token successfully stored in file $token_file.
 
 END2
     ;
+
+__END__
+
+=head1 SYNOPSIS
+
+Script to create an OAuth2 token that can be stored and used later to authorize our
+REST API access. 
+
+Based on code from https://gist.github.com/hexaddikt/6738162
+
+To create a config file for use as a perl script:
+
+=over
+
+    1. Read over https://stackoverflow.com/questions/11485271/google-oauth-2-authorization-error-redirect-uri-mismatch
+       It has a lot of useful background information.
+
+    2. Obtain a client_id and client_secret from your Google Developer's console page.
+
+=over
+
+    a. Go to https://console.cloud.google.com/apis/dashboard, sign in,
+       and create a project.
+    b. Go to the 'Credentials' tab on the left, and then '+ Create Credientials'
+       at the top of the screen and select 'OAuth client ID' from the dropdown.
+    c. Select 'Desktop app' (for a simple script) or 'Web application' (for a web
+       site). The rest of these instructions pertain to the easier 'Desktop app'.
+       It's best to get this more simple config working first, then move to more
+       complex setups once you're familiar with the process.
+    d. Pick a name for your script app and click on 'Create'. Copy the 'Client ID'
+       and 'Client Secret' for the next step.
+
+=back
+
+    3. Create a yaml file with the following format:
+    
+=over
+
+        ---
+        auth:
+            class: OAuth2Client
+            client_id: <client-id-from-google>
+            client_secret: <client-secret-from-google>
+            token_file: <file-name-to-store-your-generated-token> # just file name, not path.
+
+=back
+
+    The token file will be stored in the same directory as the config file.
+
+    Once this process is complete, this same config file will be used by this package
+    to access the Google API.
+
+    4. Run this script with the first arg pointing to the yaml file above, and follow
+       the directions on the screen, which will take you through the following steps:
+
+=over
+
+    a. Copy the URL printed out, and paste the URL in a browser to load the page. 
+    b. On the resulting page, click OK (possibly after being asked to log in to
+       your Google account). 
+    c. You will be redirected to a page that provides a string that you should copy
+       and paste back into the terminal window, so this script can exchange it for
+       an access token from Google, and store the token. That will be the token for
+       this package.
+
+    5. Once you have the YAML config file and token file created, you can now use them with
+       this package:
+
+=over
+
+        use Google::RestApi;
+        my $rest_api = new Google::RestApi->new(config_file => <path to config file>);
+
+=back
+
+      See Google::RestApi doc for further information on how to initialize this object
+      with the token file.
+
+=back
+
+=back

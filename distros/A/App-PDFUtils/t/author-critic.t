@@ -15,7 +15,7 @@ use warnings;
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/App/PDFUtils.pm','script/add-pdf-password','script/remove-pdf-password'];
+my $filenames = ['lib/App/PDFUtils.pm','lib/App/pdfgrep.pm','script/add-pdf-password','script/grep-from-pdf','script/pdfgrep','script/remove-pdf-password'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

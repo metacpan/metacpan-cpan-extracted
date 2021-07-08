@@ -16,6 +16,9 @@ struct FrameIterator : std::iterator<std::input_iterator_tag, FrameSP> {
         cur = NULL; // invalidate current iterator
         return MessageIteratorPair(MessageIterator(parser, parser->_get_message()), MessageIterator(parser, NULL));
     }
+
+    FrameIterator& operator=(const FrameIterator&) = default;
+    FrameIterator& operator=(FrameIterator&&)      = default;
 protected:
     Parser* parser;
     FrameSP cur;

@@ -1,16 +1,8 @@
 package Google::RestApi::Auth;
 
-use strict;
-use warnings;
+our $VERSION = '0.7';
 
-our $VERSION = '0.4';
-
-use 5.010_000;
-
-use autodie;
-no autovivification;
-
-do 'Google/RestApi/logger_init.pl';
+use Google::RestApi::Setup;
 
 sub params {{}}
 sub headers {[]};

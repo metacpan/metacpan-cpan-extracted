@@ -12,7 +12,7 @@ use Time::HiRes 'sleep';
 sub start_test_workers : Test(startup => 1) {
     my $self = shift;
 
-    my $running = $self->start_workers('Tests::Service::Worker', workers_count => 3);
+    my $running = $self->start_workers('Tests::Service::Worker', worker_count => 3);
     is( $running, 3, "Spawned 4 workers");
 };
 
@@ -28,7 +28,6 @@ sub test_01_recursion : Test(3) {
     $resp = $cli->call_remote(
         method  => 'test.fact',
         params  => 2,
-        timeout => 10,
     );
 
     is( $resp->result, 2, "factorial(2)");
@@ -38,7 +37,6 @@ sub test_01_recursion : Test(3) {
     $resp = $cli->call_remote(
         method  => 'test.fact',
         params  => 3,
-        timeout => 10,
     );
 
     is( $resp->result, 6, "factorial(3)");
@@ -50,14 +48,13 @@ sub test_01_recursion : Test(3) {
         $resp = $cli->call_remote(
             method  => 'test.fact',
             params  => $i,
-            timeout => 10,
         );
 
         is( $resp->result, $factorial[$i], "factorial($i)");
     }
 }
 
-sub test_02_recursion : Test(4) {
+sub test_02_recursion : Test(8) {
     my $self = shift;
 
     my $cli = Beekeeper::Client->instance;
@@ -68,7 +65,6 @@ sub test_02_recursion : Test(4) {
     $resp = $cli->call_remote(
         method  => 'test.fib1',
         params  => 1,
-        timeout => 10,
     );
 
     is( $resp->result, 1, "fib(1)");
@@ -76,7 +72,20 @@ sub test_02_recursion : Test(4) {
     $resp = $cli->call_remote(
         method  => 'test.fib2',
         params  => 1,
-        timeout => 10,
+    );
+
+    is( $resp->result, 1, "fib(1)");
+
+    $resp = $cli->call_remote(
+        method  => 'test.fib3',
+        params  => 1,
+    );
+
+    is( $resp->result, 1, "fib(1)");
+
+    $resp = $cli->call_remote(
+        method  => 'test.fib4',
+        params  => 1,
     );
 
     is( $resp->result, 1, "fib(1)");
@@ -86,7 +95,6 @@ sub test_02_recursion : Test(4) {
     $resp = $cli->call_remote(
         method  => 'test.fib1',
         params  => 2,
-        timeout => 10,
     );
 
     is( $resp->result, 1, "fib(2)");
@@ -94,23 +102,35 @@ sub test_02_recursion : Test(4) {
     $resp = $cli->call_remote(
         method  => 'test.fib2',
         params  => 2,
-        timeout => 10,
+    );
+
+    is( $resp->result, 1, "fib(2)");
+
+    $resp = $cli->call_remote(
+        method  => 'test.fib3',
+        params  => 2,
+    );
+
+    is( $resp->result, 1, "fib(2)");
+
+    $resp = $cli->call_remote(
+        method  => 'test.fib4',
+        params  => 2,
     );
 
     is( $resp->result, 1, "fib(2)");
 }
 
-sub test_03_recursion : Test(5) {
+sub test_03_recursion : Test(21) {
     my $self = shift;
 
     ## This test shows how effective is the broker doing load balance
 
     if ($self->automated_testing) {
-        # It is hard to make this test run reliably on some smoke testers platforms
-        return "This test may fail when not enough system resources are available";
+        return "This test does not run reliably on constrained platforms";
     }
 
-    my $running = $self->start_workers('Tests::Service::Worker', workers_count => 8);
+    my $running = $self->start_workers('Tests::Service::Worker', worker_count => 8);
     is( $running, 8, "Spawned 8 additional workers");
 
     my $cli = Beekeeper::Client->instance;
@@ -123,7 +143,6 @@ sub test_03_recursion : Test(5) {
         my $resp = $cli->call_remote(
             method  => 'test.fib1',
             params  => $i,
-            timeout => 10,
         );
 
         is( $resp->result, $fib[$i], "fib($i)");
@@ -135,33 +154,32 @@ sub test_03_recursion : Test(5) {
         my $resp = $cli->call_remote(
             method  => 'test.fib2',
             params  => $i,
-            timeout => 10,
         );
 
         is( $resp->result, $fib[$i], "fib($i)");
     }
-}
 
-sub test_04_client_api : Test(7) {
-    my $self = shift;
+    # Asynchronous workers are only limited by available memory
+    for (my $i = 3; $i <= 10; $i++) {
 
-    use_ok('Tests::Service::Client');
+        my $resp = $cli->call_remote(
+            method  => 'test.fib3',
+            params  => $i,
+        );
 
-    my $svc = 'Tests::Service::Client';
-    my $resp;
+        is( $resp->result, $fib[$i], "fib($i)");
+    }
 
-    $resp = $svc->fibonacci_1( 2 );
+    # Asynchronous workers are only limited by available memory
+    for (my $i = 3; $i <= 10; $i++) {
 
-    isa_ok($resp, 'Beekeeper::JSONRPC::Response');
-    is( $resp->success, 1 );
-    is( $resp->result, 1, "fib(2)");
+        my $resp = $cli->call_remote(
+            method  => 'test.fib4',
+            params  => $i,
+        );
 
-
-    $resp = $svc->fibonacci_2( 2 );
-
-    isa_ok($resp, 'Beekeeper::JSONRPC::Response');
-    is( $resp->success, 1 );
-    is( $resp->result, 1, "fib(2)");
+        is( $resp->result, $fib[$i], "fib($i)");
+    }
 }
 
 1;

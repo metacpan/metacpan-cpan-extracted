@@ -39,7 +39,7 @@ use warnings;
 use Rex::Helper::UserAgent;
 use Carp;
 
-our $VERSION = '1.13.3'; # VERSION
+our $VERSION = '1.13.4'; # VERSION
 
 use vars qw($has_wget $has_curl $has_lwp);
 

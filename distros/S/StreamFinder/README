@@ -129,19 +129,16 @@ DESCRIPTION
     (StreamFinder::Blogger), brighteon.com (StreamFinder::Brighteon),
     castbox.fm (StreamFinder::Castbox), podcasts.google.com
     (StreamFinder::Google), iheartradio.com (StreamFinder::IHeartRadio),
-    radio.net (StreamFinder::RadioNet), reciva.com (StreamFinder::Reciva),
-    rumble.com (StreamFinder::Rumble), sermonaudio.com
-    (StreamFinder::SermonAudio), spreaker.com podcasts
+    radio.net (StreamFinder::RadioNet), rumble.com (StreamFinder::Rumble),
+    sermonaudio.com (StreamFinder::SermonAudio), spreaker.com podcasts
     (StreamFinder::Spreaker), tunein.com (StreamFinder::Tunein), vimeo.com
     (StreamFinder::Vimeo), (youtube.com, et. al and other sites that
     youtube-dl supports) (StreamFinder::Youtube), and
     StreamFinder::Anystream - search any (other) webpage URL (not supported
     by any of the other submodules) for streams.
 
-    NOTE: StreamFinder::Reciva will likely be removed next release sometime
-    after April 30, 2021 due to that site's announcement that they're going
-    offline after that date, though as of this release, Reciva.com is still
-    active!
+    NOTE: StreamFinder::Reciva has been removed, as that site has now closed
+    down.
 
     NOTE: Facebook (Streamfinder::Facebook) has been removed because logging
     into Facebook via the call to youtube-dl is now interpreted by Facebook
@@ -215,7 +212,7 @@ SUBROUTINES/METHODS
         NOT handle Youtube videos nor use the fallback "Anystream" module,
         specify: *-omit* => *"Youtube,Anystream"*, which will cause
         StreamFinder::Anystream and StreamFinder::Youtube to not be used for
-        the stream search. Default is for all installed summodules to be
+        the stream search. Default is for all installed submodules to be
         considered.
 
         Another global option (applicable to all submodules) is the
@@ -236,6 +233,28 @@ SUBROUTINES/METHODS
         different submodules. A better way to change default options for one
         or more submodules is to set up submodule configuration files for
         the ones you wish to change.
+
+        Additional options:
+
+        *-log* => "*logfile*"
+
+        Specify path to a log file. If a valid and writable file is
+        specified, A line will be appended to this file every time one or
+        more streams is successfully fetched for a url.
+
+        DEFAULT i<-none> (no logging).
+
+        *-logfmt* specifies a format string for lines written to the log
+        file.
+
+        DEFAULT "*[time] [url] - [site]: [title] ([total])*".
+
+        The valid field *[variables]* are: [stream]: The url of the
+        first/best stream found. [site]: The site (submodule) name matching
+        the webpage url. [url]: The url searched for streams. [time]: Perl
+        timestamp when the line was logged. [title], [artist], [album],
+        [description], [year], [genre], [total], [albumartist]: The
+        corresponding field data returned (or "-na", if no value).
 
     $station->get(['playlist'])
         Returns an array of strings representing all stream URLs found. If
@@ -270,7 +289,8 @@ SUBROUTINES/METHODS
         call-letters ("fccid") for applicable sites and stations.
 
     $station->getTitle(['desc'])
-        Returns the station's title, or (long description).
+        Returns the station's title, (or long description, if "desc"
+        specified).
 
         NOTE: Some sights do not support a separate long description field,
         so if none found, the standard title field will always be returned.
@@ -302,7 +322,7 @@ SUBROUTINES/METHODS
     $station->getType()
         Returns the station / podcast / video's type (*submodule-name*).
         (one of: "Anystream", "Apple", "BitChute", "Blogger", "Brighteon",
-        "Castbox", "Google", "IHeartRadio", "RadioNet", "Reciva", "Rumble",
+        "Castbox", "Google", "IHeartRadio", "RadioNet", "Rumble",
         "SermonAudio", "Spreaker", "Tunein", "Youtube" or "Vimeo" -
         depending on the sight that matched the URL).
 

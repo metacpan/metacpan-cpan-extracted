@@ -9,7 +9,6 @@ lib/Tickit/Widget/Tabbed/Ribbon.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
-META.yml
 README
 t/00-pod.t
 t/00-use.t
@@ -31,4 +30,5 @@ t/22-tabs-late.t
 t/23-tab-subclass.t
 t/30-remove-last.t
 t/31-change-orientation.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

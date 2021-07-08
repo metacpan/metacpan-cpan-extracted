@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::Readme 6.022;
+package Dist::Zilla::Plugin::Readme 6.023;
 # ABSTRACT: build a README file
 
 use Moose;
@@ -95,7 +95,7 @@ Dist::Zilla::Plugin::Readme - build a README file
 
 =head1 VERSION
 
-version 6.022
+version 6.023
 
 =head1 DESCRIPTION
 
@@ -103,11 +103,12 @@ This plugin adds a very simple F<README> file to the distribution, citing the
 dist's name, version, abstract, and license.  It may be more useful or
 informative in the future.
 
-=head1 PERL VERSION SUPPORT
+=head1 PERL VERSION
 
-This module has the same support period as perl itself:  it supports the two
-most recent versions of perl.  (That is, if the most recently released version
-is v5.40, then this module should work on both v5.40 and v5.38.)
+This module should work on any version of perl still receiving updates from
+the Perl 5 Porters.  This means it should work on any version of perl released
+in the last two to three years.  (That is, if the most recently released
+version is v5.40, then this module should work on both v5.40 and v5.38.)
 
 Although it may work on older versions of perl, no guarantee is made that the
 minimum required version will not be increased.  The version may be increased

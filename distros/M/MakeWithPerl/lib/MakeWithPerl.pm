@@ -4,7 +4,7 @@
 # Philip R Brenan at gmail dot com, Appa Apps Ltd, 2017
 #-------------------------------------------------------------------------------
 package MakeWithPerl;
-our $VERSION = "20210534";
+our $VERSION = "20210601";
 use warnings FATAL => qw(all);
 use strict;
 use Carp qw(confess);
@@ -23,6 +23,7 @@ my $doc;                                                                        
 my $gccVersion;                                                                 # Alternate version of gcc is set.  Example: --gccVersion gcc-10
 my $htmlToPdf;                                                                  # Convert html to pdf
 my $run;                                                                        # Run
+my $search;                                                                     # Search for a local file to make the specified file
 my $upload;                                                                     # Upload files
 my $valgrind;                                                                   # Check C memory usage
 my $xmlCatalog;                                                                 # Verify xml
@@ -35,15 +36,13 @@ GetOptions(
   'doc'         =>\$doc,
   'gccVersion=s'=>\$gccVersion,
   'htmlToPdf'   =>\$htmlToPdf,
+  'javaHome=s'  =>\$javaHome,
   'run'         =>\$run,
+  'search!'     =>\$search,
   'valgrind'    =>\$valgrind,
   'upload'      =>\$upload,
   'xmlCatalog=s'=>\$xmlCatalog,
  );
-
-unless($compile or $run or $doc or $upload)                                     # Check action
- {confess "Specify --compile or --run or --doc or --upload";
- }
 
 my $file = shift @ARGV // $0;                                                   # File to process
 
@@ -55,15 +54,17 @@ if (! -e $file)                                                                 
  {confess "No such file:\n$file"
  }
 
-if ($upload)                                                                    # Upload files to GitHub
+if ($search)                                                                    # Upload files to GitHub or run some other action defined in the containing folder hierarchy unless search is forbidden
  {my @d = split m{/}, $file;                                                    # Split file name
   pop @d;
   while(@d)                                                                     # Look for a folder that contains a push command
-   {my $u = "/".fpe(@d, qw(pushToGitHub pl));
-    if (-e $u)
-     {say STDERR $u;
-      qx(perl $u);
-      exit;
+   {for my $n(qw(pushToGitHub upload package))
+     {my $u = "/".fpe(@d, $n, q(pl));
+      if (-e $u)
+       {say STDERR $u;
+        qx(perl $u);
+        exit;
+       }
      }
     pop @d;
    }
@@ -121,6 +122,25 @@ if ($file =~ m(\.p[lm]\Z))                                                      
   elsif ($doc)                                                                  # Document perl
    {say STDERR "Document perl $file";
     updatePerlModuleDocumentation($file);
+   }
+  exit;
+ }
+
+if ($file =~ m(\.(txt|htm)\Z))                                                  # Html
+ {my $s = expandWellKnownUrlsInHtmlFormat
+          expandWellKnownWordsAsUrlsInHtmlFormat
+          readFile $file;
+  my $o = setFileExtension $file, q(html);                                      # Output file
+  my $f = owf $o, $s;
+
+  if ($htmlToPdf)                                                               # Convert html to pdf if requested
+   {my $p = setFileExtension($file, q(pdf));
+    say STDERR qx(wkhtmltopdf $f $p);
+   }
+  else                                                                          # Show html in opera
+   {my $c = qq(timeout 3m opera $o);
+    say STDERR qq($c);
+    say STDERR qx($c);
    }
   exit;
  }
@@ -219,7 +239,8 @@ if ($file =~ m(\.adblog\Z))                                                     
  }
 
 if ($file =~ m(\.java\Z))                                                       # Java
- {my ($name, undef, $ext) = fileparse($file, qw(.java));                        # Parse file name
+ {my  $name   = fn $file;                                                       # Parse file name
+  !$javaHome and confess "Specify --javaHome keyword to specify the folder where class files are to go.";
   my $package = &getPackageNameFromFile($file);                                 # Get package name
   my $cp      = fpd($javaHome, qw(Classes));                                    # Folder containing java classes
   if ($compile)                                                                 # Compile
@@ -236,24 +257,6 @@ if ($file =~ m(\.java\Z))                                                       
    }
   &removeClasses;
   exit;
- }
-
-if ($file =~ m(\.(txt|htm)\Z))                                                  # Html
- {my $s = expandWellKnownUrlsInHtmlFormat
-          expandWellKnownWordsAsUrlsInHtmlFormat
-          readFile $file;
-  my $o = setFileExtension $file, q(html);                                      # Output file
-  my $f = owf $o, $s;
-
-  if ($htmlToPdf)                                                               # Convert html to pdf if requested
-   {my $p = setFileExtension($file, q(pdf));
-    say STDERR qx(wkhtmltopdf $f $p);
-   }
-  else                                                                          # Show html in opera
-   {my $c = qq(timeout 3m opera $o);
-    say STDERR qq($c);
-    say STDERR qx($c);
-   }
  }
 
 if ($file =~ m(\.py\Z))                                                         # Python

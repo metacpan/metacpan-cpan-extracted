@@ -1,6 +1,7 @@
 package Finance::IG;
 
-use 5.006;
+# use 5.010000;  I cannot get this to work, trying to say it should run with perl 5.10 or greater and should be fine with 5.32 
+# but get message ! Installing the dependencies failed: Your Perl (5.032001) is not in the range '5.10'
 use strict;
 no strict 'refs'; 
 use warnings;
@@ -23,11 +24,11 @@ You will need an API key to use this module, available free from IG Markets.
 
 =head1 VERSION
 
-Version 0.092
+Version 0.096
 
 =cut
 
-our $VERSION = '0.092';
+our $VERSION = '0.096';
 
 
 =head1 SYNOPSIS
@@ -43,7 +44,6 @@ our $VERSION = '0.092';
                 apikey=>   "4398232394029341776153276512736icab",
                 isdemo=>0,
    );
-   $ig->login;
  
    my $p=$ig->positions();    #  Get a list of positions
    $p=$ig->agg($p,$sortlist); #  Aggregate them, so one item per instrument. 
@@ -75,7 +75,12 @@ col=>1
 Causes Finance::IG to try to use Term::Chrome to do some simple coloration of output.
 If Term::Chrome is not installed, it will be silently ignored. See printpos.
 
-=head2 login, needs to be called once after new and before other calls.
+=head2 login
+
+Originally needed to be called once after new and before other calls. Now this is done automatically, 
+so you do not need to use this or be aware of it. Look for a 401 error if your password is 
+wrong. 
+
 
 No Parameters.
 
@@ -759,14 +764,8 @@ sub positions
                        'X-SECURITY-TOKEN'=> $self->XSECURITYTOKEN,
                        'X-IG-API-KEY'=> $self->apikey,
                     };
-    #my $jheaders = encode_json($headers);
-    my $jheaders=JSON->new->canonical->encode($headers);
+    #my $jheaders=JSON->new->canonical->encode($headers); # for debug 
 
- #   my $data =      {
- #                      encryptedPassword => "false",
- #                      identifier  => $self->username,
- #                      password  => $self->password
- #                   };
     my $client = REST::Client->new();
     $client->setHost($self->_url);
     #my $r;
@@ -1005,8 +1004,9 @@ sub nonagg
      $position->{createdDateOnly}=~s/ .*$//; 
      $position->{held}=Time::Piece->strptime($position->{createdDateUTC},"%Y-%m-%dT%H:%M:%S")  or die "strptime failed for ".$position->{createdDateOnly}; 
      $position->{held}=(gmtime()-$position->{held})/(24*3600); 
-    $position->{held}=int($position->{held}*10+0.5)/10;  
-     $position->{dailyp}=((1+$position->{profitpc}/100.0)**(1/$position->{held})-1)*100; 
+    $position->{held}=int($position->{held}*10+0.5)/10; 
+     $position->{dailyp}=''; 
+     $position->{dailyp}=((1+$position->{profitpc}/100.0)**(1/$position->{held})-1)*100 if ($position->{held}>0); 
     
    }
 
@@ -1373,6 +1373,271 @@ map { $self->printpos("stdout" , $_, $format) } @notdone;
 
 }
 
+#####################################################################
+
+=head2 prices - Obtain historical prices
+
+Obtain historical price information on an instrument. 
+
+=head3 Parameters 
+
+    Unused parameters should be set as undef or ''. (either); 
+
+    1 A aubstring to be searched for in the name. Eg "UB.D.FTNT.DAILY.IP"
+
+    2 Resolution. Should be one of the IG defined strings (left) or (in my opinion more memorable) aliases (right)
+
+      DAY       1d  
+      HOUR      1h  
+      HOUR_2    1h  
+      HOUR_3    2h  
+      HOUR_4    3h  
+      MINUTE    1m  
+      MINUTE_2  2m  
+      MINUTE_3  3m  
+      MINUTE_5  5m  
+      MINUTE_10 10m  
+      MINUTE_15 15m  
+      MINUTE_30 30m  
+      SECOND    1s  
+      WEEK      1w  
+      MONTH     1M  
+
+    4, 5 pageNumber, pageSize What page to produce, and how many items on it. 
+
+    6, 7 from , to (dates) can be a string of the form 2021-01-01T16:15:00  or a Time::Piece
+
+    8 max Limits the number of price points (not applicable if a date range has been specified)
+
+    
+
+
+
+=cut
+
+#####################################################################
+# Historical prices
+# epic, resolution , pagenum, pagessize, from.to max 
+#####################################################################
+sub prices
+{ 
+
+   my $self=shift;
+   my $epic=shift; 
+   my $resolution=shift; 
+   my $pagenumber=shift; 
+   my $pagesize=shift; 
+
+   my $from=shift; 
+   my $to=shift; 
+   my $max=shift; 
+
+   
+   if (ref($to) eq 'Time::Piece')
+   {
+      $to=$to->strftime("%Y-%m-%dT%H:%M:%S");
+   }
+   if (ref($from) eq 'Time::Piece')
+   {
+      $from=$from->strftime("%Y-%m-%dT%H:%M:%S");
+   }
+
+   $pagesize//=1;  # set a default of 1 item per page 
+   # $pagenumber=1;  # set a default of page 1, not needed as already set as defult 
+
+   my $headers =    {
+                       'Content-Type' => 'application/json; charset=UTF-8',
+                       'Accept' =>  'application/json; charset=UTF-8',
+                       VERSION => 3,
+                       #   'IG-ACCOUNT-ID'=> $accountid, 
+                       CST=>$self->CST,
+                       'X-SECURITY-TOKEN'=> $self->XSECURITYTOKEN,
+                       'X-IG-API-KEY'=> $self->apikey,
+                    };
+
+    $resolution="MINUTE_10"; 
+    $resolution="HOUR_4"; 
+
+# An alternative and more memorable resolution constants. IG values can also be used.
+    $resolution="DAY" if ($resolution eq '1d');  
+    $resolution="HOUR" if ($resolution eq'1h');  
+    $resolution="HOUR_2" if ($resolution eq '1h');  
+    $resolution="HOUR_3" if ($resolution eq '2h');  
+    $resolution="HOUR_4" if ($resolution eq '3h');  
+    $resolution="MINUTE" if ($resolution eq '1m');  
+    $resolution="MINUTE_2" if ($resolution eq '2m');  
+    $resolution="MINUTE_3" if ($resolution eq '3m');  
+    $resolution="MINUTE_5" if ($resolution eq '5m');  
+    $resolution="MINUTE_10" if ($resolution eq '10m');  
+    $resolution="MINUTE_15" if ($resolution eq '15m');  
+    $resolution="MINUTE_30" if ($resolution eq '30m');  
+    $resolution="SECOND" if ($resolution eq '1s');  
+    $resolution="WEEK" if ($resolution eq '1w');  
+    $resolution="MONTH" if ($resolution eq '1M');  
+
+    defined $resolution and 
+    (0==grep { $resolution eq $_} qw(DAY HOUR HOUR_2 HOUR_3 HOUR_4 MINUTE MINUTE_10 MINUTE_15 MINUTE_2 MINUTE_3 MINUTE_30 MINUTE_5 MONTH SECOND WEEK)) and 
+       die "Resolution is '$resolution', not recognised"; 
+
+    #my $jheaders=JSON->new->canonical->encode($headers);
+
+    my $client = REST::Client->new();
+    $client->setHost($self->_url);
+    #my $r;
+
+    my $values={
+                 pageNumber=>$pagenumber, 
+                 pageSize=>$pagesize, 
+                 resolution=>$resolution, 
+                 from=>$from,
+                 to=>$to,
+                 max=>$max, 
+               } ; 
+
+    delete @$values{ grep {!$values->{$_}  } keys %$values} ;        # delete all empty or undef values 
+    map { $values->{$_}=$_."=".$values->{$_} } keys %$values ;
+ 
+    my $url;  
+    $url=join('&',sort values(%$values)); 
+    $url='?'.$url if ($url);  
+    $url="prices/$epic".$url; 
+
+
+    $client->GET (    $url,
+                      $headers
+                    );
+
+    
+    my $resp=decode_json($client->responseContent());
+
+
+
+    $self->flatten_withunder($resp); 
+    # print JSON->new->canonical->pretty->encode($resp); exit; 
+
+    return $resp; 
+}
+#####################################################################
+# flatten_withunder
+# flattens a deep hash, 3 levels max, where complex hashes are 
+# removed and replace with _ joined shallow hash values
+# for exapmple: 
+#   { 
+#     "metadata" : {
+#      "allowance" : {
+#         "allowanceExpiry" : 530567,
+#         "remainingAllowance" : 9557,
+#         "totalAllowance" : 10000
+#      },
+#      ...
+# 
+# becomes 
+#      {
+#        "metadata_allowance_allowanceExpiry" : 530473,
+#        "metadata_allowance_remainingAllowance" : 9556,
+#        "metadata_allowance_totalAllowance" : 10000,
+#         ...
+# The advantage of a flattened structure is its easier to print. 
+
+#####################################################################
+
+=head2 flatten_withunder 
+
+Flatten a deep structure, up to 3 layers deep using underscores to create new keys by concatenating deeper keys. 
+Deep keys are removed. More than 3 layers can be removed by calling multiply. 
+
+=head3 Parameters 
+ 
+  One or more scalers to opperate on or an array. Each will be flattened 
+  where there are hashes or hashes or hashes of hashes of hashes  
+  to a single depth, with elements joined by underscores 
+
+=head3 Example
+
+   { 
+     "metadata" : {
+      "allowance" : {
+         "allowanceExpiry" : 530567,
+         "remainingAllowance" : 9557,
+         "totalAllowance" : 10000
+      },
+      ...
+ 
+ becomes 
+      {
+        "metadata_allowance_allowanceExpiry" : 530473,
+        "metadata_allowance_remainingAllowance" : 9556,
+        "metadata_allowance_totalAllowance" : 10000,
+         ...
+
+The advantage of a flattened structure is its easier to print with existing fuunctions like printpos
+
+=cut 
+
+#####################################################################
+sub flatten_withunder
+{ 
+  my ($self)=shift; 
+  my (@items)=@_; 
+  my $fudebug=0; 
+  $fudebug and printf "%d items to process\n",0+@items; 
+  for my $item (@items) 
+  { 
+     $fudebug and print "item is a ".ref($item)."\n"; 
+     return if (ref($item)eq ''); 
+     if (ref($item) eq 'HASH')
+     { 
+        $fudebug and print "is a hash\n"; 
+        for my $key (keys %$item)
+        { 
+         $fudebug and print "key1 $key\n"; 
+         if (ref($item->{$key}) eq 'HASH')
+         { 
+           for my $key2 (keys %{$item->{$key}}) 
+           { 
+              $fudebug and print "keyr2 $key2\n"; 
+              $item->{$key."_".$key2}=$item->{$key}->{$key2}; 
+              $fudebug and printf "creating $key"."_"."$key2 as a %s\n",ref($item->{$key}->{$key2}); 
+              
+              # $self->flatten_withunder($item->{$key}) if (ref($item->{$key}->{$key2}) eq 'HASH'); 
+              if (ref($item->{$key}->{$key2}) eq 'HASH')
+              { 
+                 for my $key3 (keys %{$item->{$key}->{$key2}}) 
+                 { 
+                   $fudebug and print "key3 $key3\n"; 
+                   $item->{$key."_".$key2."_".$key3}=$item->{$key}->{$key2}->{$key3}; 
+                   $fudebug and printf "creating $key"."_$key2"."_$key3 as a %s\n",ref($item->{$key}->{$key2}->{$key3}); 
+                 } 
+                 $fudebug and print "deleting $key->$key2 and $key _$key2\n"; 
+                 delete $item->{$key}->{$key2}; 
+                 delete $item->{$key."_".$key2}; 
+              } 
+           } 
+           $fudebug and print "deleting: $key\n"; 
+           delete $item->{$key}; 
+         }
+         if (ref($item->{$key}) eq 'ARRAY')
+         { 
+           $fudebug and print "$key is array ref\n"; 
+           for (@{$item->{$key}})
+           { 
+              $self->flatten_withunder($_); 
+           } 
+         } 
+        }
+     } 
+     if (ref($item) eq 'ARRAY')
+     { 
+       $fudebug and print "is an array\n"; 
+       for (@$item) 
+       { 
+          $self->flatten_withunder($_); 
+       } 
+     }
+   }    
+   $fudebug and print "processed\n"; 
+} 
+
 
 #####################################################################
 # uses known structure of supplied deep hash to search for item
@@ -1382,6 +1647,8 @@ map { $self->printpos("stdout" , $_, $format) } @notdone;
 =head2 fetch
 
 This function is a way to hide the various structures a position may have
+
+Obsolete but still used sometimes. 
 
 Parameters 
 
@@ -1427,18 +1694,15 @@ sub fetch
 
 Find the epic (unique identifier) for an instrument from the underlying share. 
 
-Parameters 
-
-    1 A aubstring to be searched for in the name. 
-
 This function calls IG's search API looking for a match to the name. If found 
 the value of the epic is returned. 
 
-=head3 Status - very experimental. 
+=head3 Status - very experimental. Seems to work well. 
 
 Contains print and die statements. Useful if you forgot to record the epic. 
 
 =cut 
+
 #####################################################################
 sub epicsearch
 {

@@ -78,6 +78,7 @@ sub _fix_internal_tz
         {
             $p->{ time_zone } = $new_tz;
             $date =~ s{$orig_tz}{}mxi;
+            $date =~ s{\(\)}{}g; # remove empty parens
             return ( $date , $p );
         }
     }

@@ -1,3 +1,11 @@
+0.014   2021-07-03  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Add more examples using addressbook.org, show usage of 'has'
+	  operator.
+
+
 0.013   2021-07-01  Released-By: PERLANCAR; Urgency: low
 
         - No functional changes.

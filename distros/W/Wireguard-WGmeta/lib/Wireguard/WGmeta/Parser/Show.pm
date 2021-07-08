@@ -28,13 +28,12 @@ use experimental 'signatures';
 use base 'Exporter';
 our @EXPORT = qw(wg_show_dump_parser);
 
-our $VERSION = "0.2.3"; # do not change manually, this variable is updated when calling make
+our $VERSION = "0.3.1"; # do not change manually, this variable is updated when calling make
 
 
 =head3 wg_show_dump_parser($input)
 
-Parser for the output of C<wg show dump>. Aims to be produce a similar structure as
-L<Wireguard::WGmeta::Parser::Config/parse_wg_config($config_file_content, $interface_name, $wg_meta_prefix, $disabled_prefix [, $use_checksum])>:
+Parser for the output of C<wg show dump>:
 
     {
         'interface_name' => {

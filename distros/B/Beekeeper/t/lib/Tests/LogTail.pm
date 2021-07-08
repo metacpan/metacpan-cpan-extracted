@@ -22,7 +22,7 @@ sub test_01_compile : Test(2) {
     use_ok('Beekeeper::Service::LogTail');
 }
 
-sub test_02_client : Test(11) {
+sub test_02_client : Test(9) {
     my $self = shift;
 
     # Cause a warning
@@ -35,8 +35,7 @@ sub test_02_client : Test(11) {
     my $logged = $svc->tail;
     my $last = $logged->[-1];
 
-    is($last->{type}, 'warning', 'Got warning');
-    is($last->{level}, 5, 'level');
+    is($last->{level}, 5, 'level 5 warning');
     like($last->{message}, qr/Foo/, 'message');
     is($last->{pool}, 'test-pool', 'pool');
     is($last->{service}, 'tests-service', 'service');
@@ -49,8 +48,7 @@ sub test_02_client : Test(11) {
     $logged = $svc->tail;
     $last = $logged->[-1];
 
-    is($last->{type}, 'error', 'Got error');
-    is($last->{level}, 4, 'level');
+    is($last->{level}, 4, 'level 4 error');
     like($last->{message}, qr/Bar/, 'message');
     is($last->{pool}, 'test-pool', 'pool');
     is($last->{service}, 'tests-service', 'service');

@@ -2,8 +2,8 @@ NAME
     Data::CSel - Select tree node objects using CSS Selector-like syntax
 
 VERSION
-    This document describes version 0.125 of Data::CSel (from Perl
-    distribution Data-CSel), released on 2021-07-01.
+    This document describes version 0.126 of Data::CSel (from Perl
+    distribution Data-CSel), released on 2021-07-03.
 
 SYNOPSIS
      use Data::CSel qw(csel csel_each);
@@ -126,7 +126,9 @@ EXPRESSION SYNTAX
 
     will select only objects that has an attribute "date", and the value of
     "date" is an object that has an attribute "month", and the value of
-    "month" is 12.
+    "month" is 12. When there is a failure in the chain somewhere (e.g. the
+    "date" object does not have the "month" attribute), the whole expression
+    evaluates to false.
 
    Literal
     There are several kinds of literals supported.
@@ -175,6 +177,12 @@ EXPRESSION SYNTAX
 
      //
      /ab(c|d)/i
+
+    Array. Examples:
+
+     []
+     [1,2,3]
+     ["foo", "bar","baz"]
 
    Operators
     The following are supported operators:
@@ -406,6 +414,26 @@ EXPRESSION SYNTAX
          Person[age isnt null]
 
         will select all Person objects where age is defined.
+
+    *   "has" and "hasnt"
+
+        Attribute value must be array. Will evaluate to true if one of the
+        elements matches the operand.
+
+        Examples:
+
+         Headline[tags has "tag1"]
+         Headline[tags has "tag2"][tags has "tag3"][tags hasnt "tag4"]
+
+    *   "in" and "notin"
+
+        Operand must be array. Will evaluate to true if one of the elements
+        of array matches the attribute value.
+
+        Examples:
+
+         Headline[level in [1,2,3]]
+         Headline[level not in [1,2]][tags notin ["old","deprecated"]]
 
   Class selector
     A *class selector* is a "." (dot) followed by Perl class/package name.

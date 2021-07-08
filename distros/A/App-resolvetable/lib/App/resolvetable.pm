@@ -1,7 +1,7 @@
 package App::resolvetable;
 
-our $DATE = '2019-08-20'; # DATE
-our $VERSION = '0.007'; # VERSION
+our $DATE = '2021-07-08'; # DATE
+our $VERSION = '0.008'; # VERSION
 
 use 5.010001;
 use strict;
@@ -294,11 +294,36 @@ App::resolvetable - Produce a colored table containing DNS resolve results of se
 
 =head1 VERSION
 
-This document describes version 0.007 of App::resolvetable (from Perl distribution App-resolvetable), released on 2019-08-20.
+This document describes version 0.008 of App::resolvetable (from Perl distribution App-resolvetable), released on 2021-07-08.
 
 =head1 DESCRIPTION
 
 Sample screenshot 1:
+
+=begin html
+
+<img src="https://st.aticpan.org/source/PERLANCAR/App-resolvetable-0.008/share/images/Screenshot_20190530_111051.png" />
+
+=end html
+
+
+Sample screenshot 2 (with C<--timings>):
+
+=begin html
+
+<img src="https://st.aticpan.org/source/PERLANCAR/App-resolvetable-0.008/share/images/Screenshot_20190530_112052.png" />
+
+=end html
+
+
+Sample screenshot 3 (with C<--compare>):
+
+=begin html
+
+<img src="https://st.aticpan.org/source/PERLANCAR/App-resolvetable-0.008/share/images/Screenshot_20190820_235000-redacted.png" />
+
+=end html
+
 
 =head1 FUNCTIONS
 
@@ -307,9 +332,9 @@ Sample screenshot 1:
 
 Usage:
 
- resolvetable(%args) -> [status, msg, payload, meta]
+ resolvetable(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
-Produce a colored table containing DNS resolve results of several names from several servers/resolvers.
+Produce a colored table containing DNS resolve results of several names from several serversE<sol>resolvers.
 
 This function is not exported.
 
@@ -346,28 +371,19 @@ with green.
 
 Type of DNS record to query.
 
+
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
-
-=for html <img src="https://st.aticpan.org/source/PERLANCAR/App-resolvetable-0.007/share/images/Screenshot_20190530_111051.png" />
-
-Sample screenshot 2 (with C<--timings>):
-
-=for html <img src="https://st.aticpan.org/source/PERLANCAR/App-resolvetable-0.007/share/images/Screenshot_20190530_112052.png" />
-
-Sample screenshot 3 (with C<--compare>):
-
-=for html <img src="https://st.aticpan.org/source/PERLANCAR/App-resolvetable-0.007/share/images/Screenshot_20190820_235000-redacted.png" />
 
 =head1 HOMEPAGE
 
@@ -393,7 +409,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

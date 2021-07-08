@@ -19,10 +19,10 @@ t/OSI.t
 t/OSI/AFL-3.0
 t/OSI/AGPL-3.0
 t/OSI/Apache-2.0
-t/OSI/Artistic-1.0
+t/OSI/Artistic-1.0-Perl
 t/OSI/Artistic-2.0
-t/OSI/BSD-2
-t/OSI/BSD-3
+t/OSI/BSD-2-Clause-Views
+t/OSI/BSD-3-Clause
 t/OSI/BSL-1.0
 t/OSI/CDDL-1.0
 t/OSI/CECILL-2.1

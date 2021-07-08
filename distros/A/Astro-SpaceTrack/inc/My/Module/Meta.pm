@@ -142,6 +142,27 @@ sub provides {
 	require Module::Metadata;
 	Module::Metadata->provides( version => 2, dir => 'lib' );
     } or return;
+
+    eval {
+	require CPAN::Meta;
+	# Skeleton so we can use should_index_file() and
+	# should_index_package().
+	my $meta = CPAN::Meta->new( {
+		name	=> 'Euler',
+		version	=> 2.71828,
+		no_index	=> no_index(),
+	    },
+	);
+	foreach my $pkg ( keys %{ $provides } ) {
+	    $meta->should_index_package( $pkg )
+		and $meta->should_index_file( $provides->{$pkg}{file} )
+		and next;
+	    delete $provides->{$pkg};
+	}
+
+	1;
+    } or return;
+
     return ( provides => $provides );
 }
 

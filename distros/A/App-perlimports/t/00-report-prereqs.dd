@@ -56,7 +56,6 @@ do { my $x = {
                                       'Ref::Util' => '0',
                                       'Sereal::Decoder' => '0',
                                       'Sereal::Encoder' => '0',
-                                      'String::InterpolatedVariables' => '0',
                                       'Sub::HandlesVia' => '0',
                                       'Symbol::Get' => '0.10',
                                       'Text::SimpleTable::AutoWidth' => '0',

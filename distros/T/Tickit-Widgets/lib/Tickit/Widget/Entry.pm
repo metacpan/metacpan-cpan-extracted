@@ -1,11 +1,11 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2011-2020 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2011-2021 -- leonerd@leonerd.org.uk
 
-use Object::Pad 0.27;
+use Object::Pad 0.43;  # ADJUST
 
-package Tickit::Widget::Entry 0.31;
+package Tickit::Widget::Entry 0.32;
 class Tickit::Widget::Entry
    extends Tickit::Widget;
 
@@ -177,20 +177,15 @@ Optional. Callback function to invoke when the C<< <Enter> >> key is pressed.
 
 =cut
 
-has $_text;
-has $_pos_ch;
+has $_text          :reader :param = "";
+has $_pos_ch        :reader(position) :param(position) = 0;
 has $_scrolloffs_co = 0;
 has $_overwrite     = 0;
 has %_keybindings;
-has $_on_enter;
+has $_on_enter      :reader :param = undef;
 
-BUILD
+ADJUST
 {
-   my %params = @_;
-
-   $_text = defined $params{text} ? $params{text} : "";
-   $_pos_ch = defined $params{position} ? $params{position} : 0;
-
    my $textlen = length $_text;
    $_pos_ch = $textlen if $_pos_ch > $textlen;
 
@@ -219,8 +214,6 @@ BUILD
       'Right'       => "key_forward_char",
       'C-Right'     => "key_forward_word",
    );
-
-   $self->set_on_enter( $params{on_enter} ) if defined $params{on_enter};
 
    # Since we take keyboard input we almost certainly want to take focus here
    $self->take_focus;
@@ -469,7 +462,7 @@ action is invoked; usually bound to the C<Enter> key.
 
 =cut
 
-method on_enter { $_on_enter }
+# generated accessor
 
 method set_on_enter
 {
@@ -484,7 +477,7 @@ Returns the current entry position, in terms of characters within the text.
 
 =cut
 
-method position { $_pos_ch }
+# generated accessor
 
 =head2 set_position
 
@@ -555,7 +548,7 @@ Returns the currently entered text.
 
 =cut
 
-method text { $_text }
+# generated accessor
 
 =head2 set_text
 

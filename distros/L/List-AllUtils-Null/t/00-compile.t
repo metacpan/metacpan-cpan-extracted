@@ -6,10 +6,12 @@ use warnings;
 
 use Test::More;
 
-plan tests => 2 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 4 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
+    'List/AllUtils/ContainsNull.pm',
     'List/AllUtils/Null.pm',
+    'List/Util/ContainsNull.pm',
     'List/Util/Null.pm'
 );
 

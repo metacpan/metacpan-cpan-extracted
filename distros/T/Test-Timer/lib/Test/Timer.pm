@@ -4,13 +4,13 @@ use warnings;
 use strict;
 
 use vars qw($VERSION @ISA @EXPORT);
-use Benchmark; # timestr
+use Benchmark;    # timestr
 use Carp qw(croak);
 use Error qw(:try);
 use Test::Builder;
 use base 'Test::Builder::Module';
 
-use constant TRUE => 1;
+use constant TRUE  => 1;
 use constant FALSE => 0;
 
 #own
@@ -18,12 +18,13 @@ use Test::Timer::TimeoutException;
 
 @EXPORT = qw(time_ok time_nok time_atleast time_atmost time_between);
 
-$VERSION = '2.11';
+$VERSION = '2.12';
 
-my $test  = Test::Builder->new;
+my $test    = Test::Builder->new;
 my $timeout = 0;
 
-our $alarm = 2; #default alarm
+# TODO: this should be renamed to ALARM to adhere with Variables::ProhibitPackageVars
+our $alarm = 2;    # default alarm
 
 # syntactic sugar for time_atmost
 sub time_ok {
@@ -35,20 +36,23 @@ sub time_nok {
     my ( $code, $upperthreshold, $name ) = @_;
 
     # timing from zero to upper threshold
-    my ($within, $time) = _runtest( $code, 0, $upperthreshold );
+    my ( $within, $time ) = _runtest( $code, 0, $upperthreshold );
 
     # are we within the specified threshold
-    if ($within == TRUE) {
+    if ( $within == TRUE ) {
 
         # we inverse the result, since we are the inverse of time_ok
         $within = FALSE;
-        $test->ok( $within, $name ); # no, we fail
-        $test->diag( "Test ran $time seconds and did not exceed specified threshold of $upperthreshold seconds" );
-    } else {
+        $test->ok( $within, $name );    # no, we fail
+        $test->diag(
+            "Test ran $time seconds and did not exceed specified threshold of $upperthreshold seconds"
+        );
+    }
+    else {
 
         # we inverse the result, since we are the inverse of time_ok
         $within = TRUE;
-        $test->ok( $within, $name ); # yes, we do not fail
+        $test->ok( $within, $name );    # yes, we do not fail
     }
 
     return $within;
@@ -59,14 +63,17 @@ sub time_atmost {
     my ( $code, $upperthreshold, $name ) = @_;
 
     # timing from zero to upper threshold
-    my ($within, $time) = _runtest( $code, 0, $upperthreshold );
+    my ( $within, $time ) = _runtest( $code, 0, $upperthreshold );
 
     # are we within the specified threshold
-    if ($within == TRUE) {
-        $test->ok( $within, $name ); # yes, we do not fail
-    } else {
-        $test->ok( $within, $name ); # no, we fail
-        $test->diag( "Test ran $time seconds and exceeded specified threshold of $upperthreshold seconds" );
+    if ( $within == TRUE ) {
+        $test->ok( $within, $name );    # yes, we do not fail
+    }
+    else {
+        $test->ok( $within, $name );    # no, we fail
+        $test->diag(
+            "Test ran $time seconds and exceeded specified threshold of $upperthreshold seconds"
+        );
     }
 
     return $within;
@@ -77,15 +84,18 @@ sub time_atleast {
     my ( $code, $lowerthreshold, $name ) = @_;
 
     # timing from lowerthreshold to nothing
-    my ($above, $time) = _runtest( $code, $lowerthreshold, undef );
+    my ( $above, $time ) = _runtest( $code, $lowerthreshold, undef );
 
     # are we above the specified threshold
-    if ($above == TRUE) {
-        $test->ok( $above, $name ); # yes, we do not fail
+    if ( $above == TRUE ) {
+        $test->ok( $above, $name );    # yes, we do not fail
 
-    } else {
-        $test->ok( $above, $name ); # no, we fail
-        $test->diag( "Test ran $time seconds and did not exceed specified threshold of $lowerthreshold seconds" );
+    }
+    else {
+        $test->ok( $above, $name );    # no, we fail
+        $test->diag(
+            "Test ran $time seconds and did not exceed specified threshold of $lowerthreshold seconds"
+        );
     }
 
     return $above;
@@ -96,17 +106,24 @@ sub time_between {
     my ( $code, $lowerthreshold, $upperthreshold, $name ) = @_;
 
     # timing from lower to upper threshold
-    my ($within, $time) = _runtest( $code, $lowerthreshold, $upperthreshold );
+    my ( $within, $time ) =
+        _runtest( $code, $lowerthreshold, $upperthreshold );
 
     # are we within the specified threshold
-    if ($within == TRUE) {
-        $test->ok( $within, $name ); # yes, we do not fail
-    } else {
-        $test->ok( $within, $name ); # no, we fail
+    if ( $within == TRUE ) {
+        $test->ok( $within, $name );    # yes, we do not fail
+    }
+    else {
+        $test->ok( $within, $name );    # no, we fail
         if ($timeout) {
-            $test->diag( "Execution ran $timeout seconds and did not execute within specified interval $lowerthreshold - $upperthreshold seconds and timed out");
-        } else {
-            $test->diag( "Test ran $time seconds and did not execute within specified interval $lowerthreshold - $upperthreshold seconds" );
+            $test->diag(
+                "Execution ran $timeout seconds and did not execute within specified interval $lowerthreshold - $upperthreshold seconds and timed out"
+            );
+        }
+        else {
+            $test->diag(
+                "Test ran $time seconds and did not execute within specified interval $lowerthreshold - $upperthreshold seconds"
+            );
         }
     }
 
@@ -118,44 +135,48 @@ sub time_between {
 sub _runtest {
     my ( $code, $lowerthreshold, $upperthreshold ) = @_;
 
-    my $ok = FALSE;
+    my $ok   = FALSE;
     my $time = 0;
 
     try {
 
-        # we have both a lower and upper threshold (time_between, time_most, time_ok)
+ # we have both a lower and upper threshold (time_between, time_most, time_ok)
         if ( defined $lowerthreshold and defined $upperthreshold ) {
 
             $time = _benchmark( $code, $upperthreshold );
 
             if ( $time >= $lowerthreshold and $time <= $upperthreshold ) {
                 $ok = TRUE;
-            } else {
+            }
+            else {
                 $ok = FALSE;
             }
 
-        # we just have a lower threshold (time_atleast)
-        } elsif ( defined $lowerthreshold ) {
+            # we just have a lower threshold (time_atleast)
+        }
+        elsif ( defined $lowerthreshold ) {
 
-            $time = _benchmark( $code );
+            $time = _benchmark($code);
 
             if ( $time >= $lowerthreshold ) {
                 $ok = TRUE;
-            } else {
+            }
+            else {
                 $ok = FALSE;
             }
         }
     }
+
     # catching a timeout so we do not run forever
     catch Test::Timer::TimeoutException with {
         my $E = shift;
 
         $timeout = $E->{-text};
 
-        return (undef, $time); # we return undef as result
+        return ( undef, $time );    # we return undef as result
     };
 
-    return ($ok, $time);
+    return ( $ok, $time );
 }
 
 # actual timing using benchmark
@@ -170,7 +191,7 @@ sub _benchmark {
     # We only define an alarm if we have an upper threshold
     # alarm is based on upper threshold + default alarm
     # default alarm can be extended, see the docs
-    if (defined $threshold) {
+    if ( defined $threshold ) {
         $local_alarm = $threshold + $alarm;
     }
 
@@ -190,13 +211,13 @@ sub _benchmark {
     };
 
     # setting alarm
-    alarm( $local_alarm );
+    alarm $local_alarm;
 
     # running code
     &{$code};
 
     # clear alarm
-    alarm( 0 );
+    alarm 0;
 
     # setting second benchmark
     my $t1 = Benchmark->new();
@@ -212,6 +233,16 @@ sub _benchmark {
 __END__
 
 =pod
+
+=encoding UTF-8
+
+=begin stopwords
+
+hokus pokus CPAN GitHub MetaCPAN AnnoCPAN jonasbn ACKNOWLEDGEMENTS Anwar PRs Johansen
+Morrott Bartosz BDFOY Gabor Szabo GZABO Gregor Herrmann alik Jakubski Veri Ivanova
+Leonerd PEVANS brian foy Brømsø MANWAR UNIEJO GREGOA NHORNE KENTNL SZABGAB
+
+=end stopwords
 
 =begin markdown
 
@@ -267,7 +298,7 @@ Test::Timer - test module to test/assert response times
 
 =head1 VERSION
 
-The documentation describes version 2.10 of Test::Timer
+The documentation describes version 2.12 of Test::Timer
 
 =head1 FEATURES
 
@@ -536,7 +567,7 @@ higher and run the test again.
 
 =item * Execution exceeded threshold and timed out, the exception is thrown if the execution of tested code exceeds even the alarm, which is default 2 seconds, but can be set by the user or is equal to the upper threshold + 2 seconds
 
-The exception results in a diagnostic for the failing test. This is a failsafe
+The exception results in a diagnostic for the failing test. This is a fail-safe
 to avoid that code runs forever. If you get this diagnose either your code is
 too slow and you should address this or it might be error prone. If this is not
 the case adjust the alarm setting to suit your situation.
@@ -593,9 +624,9 @@ Coverage report for the release described in this documentation (see L<VERSION|/
     ---------------------------- ------ ------ ------ ------ ------ ------ ------
     File                           stmt   bran   cond    sub    pod   time  total
     ---------------------------- ------ ------ ------ ------ ------ ------ ------
-    blib/lib/Test/Timer.pm        100.0   95.0   66.6  100.0  100.0   99.9   98.0
+    blib/lib/Test/Timer.pm        100.0  100.0  100.0  100.0  100.0   99.9  100.0
     ...Timer/TimeoutException.pm  100.0    n/a    n/a  100.0  100.0    0.0  100.0
-    Total                         100.0   95.0   66.6  100.0  100.0  100.0   98.4
+    Total                         100.0  100.0  100.0  100.0  100.0  100.0  100.0
     ---------------------------- ------ ------ ------ ------ ------ ------ ------
 
 The L<Test::Perl::Critic> test runs with severity 5 (gentle) for now, please
@@ -625,11 +656,11 @@ Travis reports are public available.
 
 =head1 ISSUE REPORTING
 
-Please report any bugs or feature requests using Github
+Please report any bugs or feature requests using GitHub
 
 =over
 
-=item * L<Github Issues|https://github.com/jonasbn/perl-test-timer/issues>
+=item * L<GitHub Issues|https://github.com/jonasbn/perl-test-timer/issues>
 
 =back
 
@@ -657,7 +688,7 @@ You can also look for information at:
 
 =over
 
-=item * L<Github Repository|https://github.com/jonasbn/perl-test-timer>, please see L<the guidelines for contributing|https://github.com/jonasbn/perl-test-timer/blob/master/CONTRIBUTING.md>.
+=item * L<GitHub Repository|https://github.com/jonasbn/perl-test-timer>, please see L<the guidelines for contributing|https://github.com/jonasbn/perl-test-timer/blob/master/CONTRIBUTING.md>.
 
 =back
 
@@ -665,7 +696,7 @@ You can also look for information at:
 
 =over
 
-=item * Jonas B. Nielsen (jonasbn) C<< <jonasbn at cpan.org> >>
+=item * Jonas Brømsø (jonasbn) C<< <jonasbn at cpan.org> >>
 
 =back
 
@@ -673,25 +704,25 @@ You can also look for information at:
 
 =over
 
-=item * Mohammad S Anwar, POD corrections PRs #23
+=item * Mohammad S Anwar (MANWAR), POD corrections PRs #23
 
-=item * Erik Johansen, suggestion for clearing alarm
+=item * Erik Johansen (UNIEJO), suggestion for clearing alarm
 
-=item * Gregor Herrmann from the Debian Perl Group, PR #16 fixes to spelling mistakes
+=item * Gregor Herrmann (GREGOA) from the Debian Perl Group, PR #16 fixes to spelling mistakes
 
-=item * Nigel Horne, issue #15 suggestion for better assertion in L<time_atleast|/time_atleast>
+=item * Nigel Horne (NHORNE), issue #15 suggestion for better assertion in L<time_atleast|/time_atleast>
 
-=item * Nigel Horne, issue #10/#12 suggestion for improvement to diagnostics
+=item * Nigel Horne (NHORNE), issue #10/#12 suggestion for improvement to diagnostics
 
 =item * p-alik, PR #4 eliminating warnings during test
 
-=item * Kent Fredric, PR #7 addressing file permissions
+=item * Kent Fredric (KENTNL), PR #7 addressing file permissions
 
 =item * Nick Morrott, PR #5 corrections to POD
 
 =item * Bartosz Jakubski, reporting issue #3
 
-=item * Gabor Szabo (GZABO), suggestion for specification of interval thresholds even though this was obsoleted by the later introduced time_between
+=item * Gabor Szabo (SZABGAB), suggestion for specification of interval thresholds even though this was obsoleted by the later introduced time_between
 
 =item * Paul Leonerd Evans (PEVANS), suggestions for time_atleast and time_atmost and the handling of $SIG{ALRM}. Also bug report for addressing issue with Debian packaging resulting in release 0.10
 
@@ -701,8 +732,8 @@ You can also look for information at:
 
 =head1 LICENSE AND COPYRIGHT
 
-Test::Timer and related modules are (C) by Jonas B. Nielsen,
-(jonasbn) 2007-2019
+Test::Timer and related modules are (C) by Jonas Brømsø
+(jonasbn) 2007-2021
 
 Test::Timer and related modules are released under the Artistic
 License 2.0

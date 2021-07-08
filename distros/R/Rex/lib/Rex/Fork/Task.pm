@@ -11,7 +11,7 @@ use strict;
 use warnings;
 use POSIX ":sys_wait_h";
 
-our $VERSION = '1.13.3'; # VERSION
+our $VERSION = '1.13.4'; # VERSION
 
 sub new {
   my $that  = shift;

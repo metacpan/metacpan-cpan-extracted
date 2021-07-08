@@ -34,7 +34,7 @@
    "provides" : {
       "MakeWithPerl" : {
          "file" : "lib/MakeWithPerl.pm",
-         "version" : "20210534"
+         "version" : "20210601"
       }
    },
    "release_status" : "stable",
@@ -49,6 +49,6 @@
          "url" : "https://github.com/philiprbrenan/MakeWithPerl"
       }
    },
-   "version" : "20210534",
+   "version" : "20210601",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

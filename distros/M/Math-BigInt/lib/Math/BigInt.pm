@@ -22,7 +22,7 @@ use warnings;
 
 use Carp qw< carp croak >;
 
-our $VERSION = '1.999818';
+our $VERSION = '1.999821';
 
 require Exporter;
 our @ISA = qw(Exporter);
@@ -228,7 +228,8 @@ our $_trap_inf = 0;                         # are infs ok? set w/ config()
 
 my $nan = 'NaN';                        # constants for easier life
 
-my $LIB = 'Math::BigInt::Calc';        # module to do the low level math
+my $DEFAULT_LIB = 'Math::BigInt::Calc'; # module to do the low level math
+my $LIB = $DEFAULT_LIB;
                                         # default is Calc.pm
 my $IMPORT = 0;                         # was import() called yet?
                                         # used to make require work
@@ -613,7 +614,8 @@ sub new {
         return $self;
     }
 
-    # Handle hexadecimal numbers.
+    # Handle hexadecimal numbers. We auto-detect hexadecimal numbers if they
+    # have a "0x" or "0X" prefix.
 
     if ($wanted =~ /^\s*[+-]?0[Xx]/) {
         $self = $class -> from_hex($wanted);
@@ -621,7 +623,17 @@ sub new {
         return $self;
     }
 
-    # Handle binary numbers.
+    # Handle octal numbers. We auto-detect octal numbers if they have a "0o"
+    # or "0O" prefix.
+
+    if ($wanted =~ /^\s*[+-]?0[Oo]/) {
+        $self = $class -> from_oct($wanted);
+        $self->round($a, $p, $r) unless @_ >= 3 && !defined $a && !defined $p;
+        return $self;
+    }
+
+    # Handle binary numbers. We auto-detect binary numbers if they have a "0b"
+    # or "0B" prefix.
 
     if ($wanted =~ /^\s*[+-]?0[Bb]/) {
         $self = $class -> from_bin($wanted);
@@ -730,7 +742,7 @@ sub from_hex {
                      ^
                      \s*
                      ( [+-]? )
-                     (0?x)?
+                     ( 0 [Xx] )?
                      (
                          [0-9a-fA-F]*
                          ( _ [0-9a-fA-F]+ )*
@@ -786,6 +798,7 @@ sub from_oct {
                      ^
                      \s*
                      ( [+-]? )
+                     ( 0 [Oo] )?
                      (
                          [0-7]*
                          ( _ [0-7]+ )*
@@ -798,7 +811,7 @@ sub from_oct {
         # underscores or invalid characters.
 
         my $sign = $1;
-        my $chrs = $2;
+        my $chrs = $3;
         $chrs =~ tr/_//d;
         $chrs = '0' unless CORE::length $chrs;
 
@@ -841,7 +854,7 @@ sub from_bin {
                      ^
                      \s*
                      ( [+-]? )
-                     (0?b)?
+                     ( 0 [Bb] )?
                      (
                          [01]*
                          ( _ [01]+ )*
@@ -943,6 +956,46 @@ sub from_base {
     $self -> {value}
       = $LIB->_from_base($str, $base -> {value}, @_ ? shift() : ());
     return $self
+}
+
+sub from_base_num {
+    my $self    = shift;
+    my $selfref = ref $self;
+    my $class   = $selfref || $self;
+
+    # Don't modify constant (read-only) objects.
+
+    return if $selfref && $self->modify('from_base_num');
+
+    # Make sure we have an array of non-negative, finite, numerical objects.
+
+    my $nums = shift;
+    $nums = [ @$nums ];         # create new reference
+
+    for my $i (0 .. $#$nums) {
+        # Make sure we have an object.
+        $nums -> [$i] = $class -> new($nums -> [$i])
+          unless ref($nums -> [$i]) && $nums -> [$i] -> isa($class);
+        # Make sure we have a finite, non-negative integer.
+        croak "the elements must be finite non-negative integers"
+          if $nums -> [$i] -> is_neg() || ! $nums -> [$i] -> is_int();
+    }
+
+    my $base = shift;
+    $base = $class -> new($base) unless ref($base) && $base -> isa($class);
+
+    # If called as a class method, initialize a new object.
+
+    $self = $class -> bzero() unless $selfref;
+
+    croak("from_base_num() requires a newer version of the $LIB library.")
+      unless $LIB->can('_from_base_num');
+
+    $self -> {sign}  = '+';
+    $self -> {value} = $LIB -> _from_base_num([ map { $_ -> {value} } @$nums ],
+                                           $base -> {value});
+
+    return $self;
 }
 
 sub bzero {
@@ -2895,7 +2948,7 @@ sub bfac {
     my ($class, $x, @r) = ref($_[0]) ? (undef, @_) : objectify(1, @_);
 
     return $x if $x->modify('bfac') || $x->{sign} eq '+inf'; # inf => inf
-    return $x->bnan() if $x->{sign} ne '+'; # NaN, <0 etc => NaN
+    return $x->bnan() if $x->{sign} ne '+'; # NaN, <0 => NaN
 
     $x->{value} = $LIB->_fac($x->{value});
     $x->round(@r);
@@ -2906,12 +2959,51 @@ sub bdfac {
     my ($class, $x, @r) = ref($_[0]) ? (undef, @_) : objectify(1, @_);
 
     return $x if $x->modify('bdfac') || $x->{sign} eq '+inf'; # inf => inf
-    return $x->bnan() if $x->{sign} ne '+'; # NaN, <0 etc => NaN
+    return $x->bnan() if $x->is_nan() || $x <= -2;
+    return $x->bone() if $x <= 1;
 
     croak("bdfac() requires a newer version of the $LIB library.")
         unless $LIB->can('_dfac');
 
     $x->{value} = $LIB->_dfac($x->{value});
+    $x->round(@r);
+}
+
+sub btfac {
+    # compute triple factorial, modify $x in place
+    my ($class, $x, @r) = objectify(1, @_);
+
+    return $x if $x->modify('btfac') || $x->{sign} eq '+inf'; # inf => inf
+
+    return $x->bnan() if $x->is_nan();
+
+    my $k = $class -> new("3");
+    return $x->bnan() if $x <= -$k;
+
+    my $one = $class -> bone();
+    return $x->bone() if $x <= $one;
+
+    my $f = $x -> copy();
+    while ($f -> bsub($k) > $one) {
+        $x -> bmul($f);
+    }
+    $x->round(@r);
+}
+
+sub bmfac {
+    # compute multi-factorial
+    my ($class, $x, $k, @r) = objectify(2, @_);
+
+    return $x if $x->modify('bmfac') || $x->{sign} eq '+inf';
+    return $x->bnan() if $x->is_nan() || $k->is_nan() || $k < 1 || $x <= -$k;
+
+    my $one = $class -> bone();
+    return $x->bone() if $x <= $one;
+
+    my $f = $x -> copy();
+    while ($f -> bsub($k) > $one) {
+        $x -> bmul($f);
+    }
     $x->round(@r);
 }
 
@@ -3352,6 +3444,7 @@ sub bround {
 
     if (($pad > 0) && ($pad <= $len)) {
         substr($xs, -$pad, $pad) = '0' x $pad; # replace with '00...'
+        $xs =~ s/^0+(\d)/$1/;                  # "00000" -> "0"
         $put_back = 1;                         # need to put back
     } elsif ($pad > $len) {
         $x->bzero();            # round to '0'
@@ -3373,7 +3466,6 @@ sub bround {
             last if $c != 0;    # no overflow => early out
         }
         $xs = '1'.$xs if $c == 0;
-
     }
     $x->{value} = $LIB->_new($xs) if $put_back == 1; # put back, if needed
 
@@ -3895,6 +3987,37 @@ sub to_base {
     return $LIB->_to_base($x->{value}, $base -> {value}, @_ ? shift() : ());
 }
 
+sub to_base_num {
+    my $x = shift;
+    my $class = ref $x;
+
+    # return a base anything string
+    croak("the value to convert must be a finite non-negative integer")
+      if $x -> is_neg() || !$x -> is_int();
+
+    my $base = shift;
+    $base = $class -> new($base) unless ref $base;
+
+    croak("the base must be a finite integer >= 2")
+      if $base < 2 || ! $base -> is_int();
+
+    croak("to_base() requires a newer version of the $LIB library.")
+      unless $LIB->can('_to_base');
+
+    # Get a reference to an array of library thingies, and replace each element
+    # with a Math::BigInt object using that thingy.
+
+    my $vals = $LIB -> _to_base_num($x->{value}, $base -> {value});
+
+    for my $i (0 .. $#$vals) {
+        my $x = $class -> bzero();
+        $x -> {value} = $vals -> [$i];
+        $vals -> [$i] = $x;
+    }
+
+    return $vals;
+}
+
 sub as_hex {
     # return as hex string, with prefixed 0x
     my $x = shift;
@@ -3941,13 +4064,13 @@ sub numify {
 
     if ($x -> is_nan()) {
         require Math::Complex;
-        my $inf = Math::Complex::Inf();
+        my $inf = $Math::Complex::Inf;
         return $inf - $inf;
     }
 
     if ($x -> is_inf()) {
         require Math::Complex;
-        my $inf = Math::Complex::Inf();
+        my $inf = $Math::Complex::Inf;
         return $x -> is_negative() ? -$inf : $inf;
     }
 
@@ -4105,76 +4228,90 @@ sub import {
     my $class = shift;
     $IMPORT++;                  # remember we did import()
     my @a;                      # unrecognized arguments
+    my @libs;                   # backend libriaries
     my $warn_or_die = 0;        # 0 - no warn, 1 - warn, 2 - die
+
     for (my $i = 0; $i <= $#_ ; $i++) {
+        croak "Error in import(): argument with index $i is undefined"
+          unless defined($_[$i]);
+
         if ($_[$i] eq ':constant') {
             # this causes overlord er load to step in
             overload::constant
                 integer => sub { $class->new(shift) },
                 binary  => sub { $class->new(shift) };
-        } elsif ($_[$i] eq 'upgrade') {
+        }
+
+        elsif ($_[$i] eq 'upgrade') {
             # this causes upgrading
             $upgrade = $_[$i+1]; # or undef to disable
             $i++;
-        } elsif ($_[$i] =~ /^(lib|try|only)\z/) {
-            # this causes a different low lib to take care...
-            $LIB = $_[$i+1] || '';
-            # try  => 0 (no warn)
+        }
+
+        elsif ($_[$i] =~ /^(lib|try|only)\z/) {
+            # try  => 0 (no warn if unavailable module)
             # lib  => 1 (warn on fallback)
             # only => 2 (die on fallback)
             $warn_or_die = 1 if $_[$i] eq 'lib';
             $warn_or_die = 2 if $_[$i] eq 'only';
+            # this causes the specified low lib to take care...
+            croak "Library argument for import parameter '$_[$i]' is undefined"
+              unless defined($_[$i+1]);
+            for my $lib (split /\s*,\s*/, $_[$i+1]) {
+                # limit to sane characters (warn about invalid characters?)
+                $lib =~ tr/a-zA-Z0-9_://cd;
+                $lib = 'Math::BigInt::' . $lib if $lib !~ /^Math::BigInt::/i;
+                push @libs, $lib;
+            }
             $i++;
-        } else {
+        }
+
+        else {
             push @a, $_[$i];
         }
     }
-    # any non :constant stuff is handled by our parent, Exporter
+
+    # any non ':constant' stuff is handled by our parent, Exporter
     if (@a > 0) {
         $class->SUPER::import(@a);            # need it for subclasses
         $class->export_to_level(1, $class, @a); # need it for MBF
     }
 
-    # try to load core math lib
-    my @c = split /\s*,\s*/, $LIB;
-    foreach (@c) {
-        tr/a-zA-Z0-9://cd;      # limit to sane characters
-    }
-    push @c, \'Calc'            # if all fail, try these
-      if $warn_or_die < 2;      # but not for "only"
-    $LIB = '';                  # signal error
-    foreach my $l (@c) {
-        # fallback libraries are "marked" as \'string', extract string if nec.
-        my $lib = $l;
-        $lib = $$l if ref($l);
+    # If all specified libraries fail, try the default, but pass it as a
+    # reference so we can tell later whether we had to revert to the default.
+    push @libs, \$DEFAULT_LIB   # if all fail, try this
+      if $warn_or_die < 2;      #    but not for "only"
 
-        next unless defined($lib) && CORE::length($lib);
-        $lib = 'Math::BigInt::'.$lib if $lib !~ /^Math::BigInt/i;
-        $lib =~ s/\.pm$//;
-        my @parts = split /::/, $lib;   # Math::BigInt => Math BigInt
-        $parts[-1] .= '.pm';            # BigInt => BigInt.pm
-        require File::Spec;
-        my $file = File::Spec->catfile(@parts);
-        eval { require $file; };
-        if ($@ eq '') {
-            $lib->import();
+    my $numfail = 0;            # increment for each lib that failed to load
+    my $arg;
+    for (my $i = 0 ; $i <= $#libs ; $i++) {
+        $arg = $libs[$i];
+        my $lib = ref($arg) ? $$arg : $arg;
+        eval "require $lib";
+        if (!$@) {
             $LIB = $lib;
-            if ($warn_or_die > 0 && ref($l)) {
-                my $msg = "Math::BigInt: couldn't load specified"
-                        . " math lib(s), fallback to $lib";
-                carp($msg)  if $warn_or_die == 1;
-                croak($msg) if $warn_or_die == 2;
-            }
-            last;               # found a usable one, break
+            last;
         }
+        $numfail++;
     }
-    if ($LIB eq '') {
-        if ($warn_or_die == 2) {
-            croak("Couldn't load specified math lib(s)" .
-                        " and fallback disallowed");
-        } else {
-            croak("Couldn't load any math lib(s), not even fallback to Calc.pm");
+
+    # If we were unable to load a library.
+
+    if ($numfail > 0) {
+        my $info = "Couldn't load the specified math lib(s)"
+          .  " (" . join(", ", grep { !ref } @libs) . ")";
+
+        if ($numfail == @libs) {
+            croak "$info, and fallback to $DEFAULT_LIB is disallowed"
+              if $warn_or_die == 2;
+            croak "$info, not even fallback to $DEFAULT_LIB";
         }
+
+        # If we failed to load some of the libraries, but were able to use the
+        # fallback library.
+
+        carp "$info, fallback to $DEFAULT_LIB"
+          if $warn_or_die == 1 && ref($arg);
     }
 
     # notify callbacks
@@ -4483,6 +4620,7 @@ Math::BigInt - Arbitrary size integer/float math package
   $x = Math::BigInt->from_oct('377');       # from octal
   $x = Math::BigInt->from_bin('1101');      # from binary
   $x = Math::BigInt->from_base('why', 36);  # from any base
+  $x = Math::BigInt->from_base_num([1, 0], 2);  # from any base
   $x = Math::BigInt->bzero();               # create a +0
   $x = Math::BigInt->bone();                # create a +1
   $x = Math::BigInt->bone('-');             # create a -1
@@ -4559,6 +4697,9 @@ Math::BigInt - Arbitrary size integer/float math package
   $x->bsqrt();            # calculate square root
   $x->broot($y);          # $y'th root of $x (e.g. $y == 3 => cubic root)
   $x->bfac();             # factorial of $x (1*2*3*4*..$x)
+  $x->bdfac();            # double factorial of $x ($x*($x-2)*($x-4)*...)
+  $x->btfac();            # triple factorial of $x ($x*($x-3)*($x-6)*...)
+  $x->bmfac($k);          # $k'th multi-factorial of $x ($x*($x-$k)*...)
 
   $x->blsft($n);          # left shift $n places in base 2
   $x->blsft($n,$b);       # left shift $n places in base $b
@@ -4619,6 +4760,7 @@ Math::BigInt - Arbitrary size integer/float math package
   $x->to_oct();       # as signed octal string
   $x->to_bytes();     # as byte string
   $x->to_base($b);    # as string in any base
+  $x->to_base_num($b);   # as array of integers in any base
 
   $x->as_hex();       # as signed hexadecimal string with prefixed 0x
   $x->as_bin();       # as signed binary string with prefixed 0b
@@ -4646,11 +4788,15 @@ Leading and trailing whitespace is ignored.
 
 =item *
 
-Leading and trailing zeros are ignored.
+Leading zeros are ignored.
 
 =item *
 
 If the string has a "0x" prefix, it is interpreted as a hexadecimal number.
+
+=item *
+
+If the string has a "0o" prefix, it is interpreted as an octal number.
 
 =item *
 
@@ -4666,10 +4812,6 @@ If the string can not be interpreted, NaN is returned.
 
 =back
 
-Octal numbers are typically prefixed by "0", but since leading zeros are
-stripped, these methods can not automatically recognize octal numbers, so use
-the constructor from_oct() to interpret octal strings.
-
 Some examples of valid string input
 
     Input string                Resulting value
@@ -4677,7 +4819,11 @@ Some examples of valid string input
     1.23e2                      123
     12300e-2                    123
     0xcafe                      51966
+    0XCAFE                      51966
+    0o1337                      735
+    0O1337                      735
     0b1101                      13
+    0B1101                      13
     67_538_754                  67538754
     -4_5_6.7_8_9e+0_1_0         -4567890000000
 
@@ -4968,6 +5114,16 @@ are equivalent
 
     $x = Math::BigInt->from_base("100", 2, "01");   # $x is 4
     $x = Math::BigInt->from_base("|--", 2, "-|");   # $x is 4
+
+=item from_base_num()
+
+Returns a new Math::BigInt object given an array of values and a base. This
+method is equivalent to C<from_base()>, but works on numbers in an array rather
+than characters in a string. Unlike C<from_base()>, all input values may be
+arbitrarily large.
+
+    $x = Math::BigInt->from_base_num([1, 1, 0, 1], 2)     # $x is 13
+    $x = Math::BigInt->from_base_num([3, 125, 39], 128)   # $x is 65191
 
 =item bzero()
 
@@ -5539,19 +5695,35 @@ Calculates the N'th root of C<$x>.
 
 =item bfac()
 
-    $x->bfac();                 # factorial of $x (1*2*3*4*..*$x)
+    $x->bfac();             # factorial of $x
 
-Returns the factorial of C<$x>, i.e., the product of all positive integers up
-to and including C<$x>.
+Returns the factorial of C<$x>, i.e., $x*($x-1)*($x-2)*...*2*1, the product of
+all positive integers up to and including C<$x>. C<$x> must be > -1. The
+factorial of N is commonly written as N!, or N!1, when using the multifactorial
+notation.
 
 =item bdfac()
 
-    $x->bdfac();                # double factorial of $x (1*2*3*4*..*$x)
+    $x->bdfac();                # double factorial of $x
 
-Returns the double factorial of C<$x>. If C<$x> is an even integer, returns the
-product of all positive, even integers up to and including C<$x>, i.e.,
-2*4*6*...*$x. If C<$x> is an odd integer, returns the product of all positive,
-odd integers, i.e., 1*3*5*...*$x.
+Returns the double factorial of C<$x>, i.e., $x*($x-2)*($x-4)*... C<$x> must be
+> -2. The double factorial of N is commonly written as N!!, or N!2, when using
+the multifactorial notation.
+
+=item btfac()
+
+    $x->btfac();            # triple factorial of $x
+
+Returns the triple factorial of C<$x>, i.e., $x*($x-3)*($x-6)*... C<$x> must be
+> -3. The triple factorial of N is commonly written as N!!!, or N!3, when using
+the multifactorial notation.
+
+=item bmfac()
+
+    $x->bmfac($k);          # $k'th multifactorial of $x
+
+Returns the multi-factorial of C<$x>, i.e., $x*($x-$k)*($x-2*$k)*... C<$x> must
+be > -$k. The multi-factorial of N is commonly written as N!K.
 
 =item bfib()
 
@@ -5953,6 +6125,19 @@ Here are some more examples
     $x = Math::BigInt->new("4")->to_base(2, "-|");  # returns "|--"
 
 See from_base() for information and examples.
+
+=item to_base_num()
+
+Converts the given number to the given base. This method is equivalent to
+C<_to_base()>, but returns numbers in an array rather than characters in a
+string. In the output, the first element is the most significant. Unlike
+C<_to_base()>, all input values may be arbitrarily large.
+
+    $x = Math::BigInt->new(13);
+    $x->to_base_num(2);                         # returns [1, 1, 0, 1]
+
+    $x = Math::BigInt->new(65191);
+    $x->to_base_num(128);                       # returns [3, 125, 39]
 
 =item as_hex()
 
@@ -6871,17 +7056,13 @@ You can also look for information at:
 
 =over 4
 
+=item * GitHub
+
+L<https://github.com/pjacklam/p5-Math-BigInt>
+
 =item * RT: CPAN's request tracker
 
-L<https://rt.cpan.org/Public/Dist/Display.html?Name=Math-BigInt>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Math-BigInt>
-
-=item * CPAN Ratings
-
-L<https://cpanratings.perl.org/dist/Math-BigInt>
+L<https://rt.cpan.org/Dist/Display.html?Name=Math-BigInt>
 
 =item * MetaCPAN
 
@@ -6890,6 +7071,10 @@ L<https://metacpan.org/release/Math-BigInt>
 =item * CPAN Testers Matrix
 
 L<http://matrix.cpantesters.org/?dist=Math-BigInt>
+
+=item * CPAN Ratings
+
+L<https://cpanratings.perl.org/dist/Math-BigInt>
 
 =item * The Bignum mailing list
 
@@ -6942,7 +7127,7 @@ Florian Ragwitz E<lt>flora@cpan.orgE<gt>, 2010.
 
 =item *
 
-Peter John Acklam E<lt>pjacklam@online.noE<gt>, 2011-.
+Peter John Acklam E<lt>pjacklam@gmail.comE<gt>, 2011-.
 
 =back
 

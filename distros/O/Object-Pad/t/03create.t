@@ -26,7 +26,7 @@ class Point {
 }
 
 my @buildargs;
-my @buildall;
+my @build;
 
 class WithBuildargs {
    sub BUILDARGS {
@@ -35,7 +35,7 @@ class WithBuildargs {
    }
 
    BUILD {
-      @buildall = @_;
+      @build = @_;
    }
 }
 
@@ -43,7 +43,24 @@ class WithBuildargs {
    WithBuildargs->new( 1, 2, 3 );
 
    is_deeply( \@buildargs, [qw( WithBuildargs 1 2 3 )], '@_ to BUILDARGS' );
-   is_deeply( \@buildall,  [qw( 4 5 6 )],               '@_ to BUILD' );
+   is_deeply( \@build,     [qw( 4 5 6 )],               '@_ to BUILD' );
+}
+
+{
+   my @called;
+
+   class WithAdjust {
+      BUILD {
+         push @called, "BUILD";
+      }
+
+      ADJUST {
+         push @called, "ADJUST";
+      }
+   }
+
+   WithAdjust->new;
+   is_deeply( \@called, [qw( BUILD ADJUST )], 'ADJUST invoked after BUILD' );
 }
 
 {

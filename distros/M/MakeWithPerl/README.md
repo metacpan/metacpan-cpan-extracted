@@ -16,19 +16,41 @@ Install from [CPAN](https://metacpan.org/release/MakeWithPerl)
 
 Configure **Geany->Build->Set Build Commands** as shown in the following image: ![image](https://github.com/philiprbrenan/MakeWithPerl/blob/main/Geany.png).
 
-The text to enter is:
+## Perl
+
+The text to enter for Perl is:
 
     perl -M"MakeWithPerl" -e"MakeWithPerl::makeWithPerl" -- --compile "%d/%f"
 
-    perl -M"MakeWithPerl" -e"MakeWithPerl::makeWithPerl" -- --run "%d/%f"
+    perl -M"MakeWithPerl" -e"MakeWithPerl::makeWithPerl" -- --run     "%d/%f"
 
     .+ at (.+) line ([0-9]+).*
 
-    perl -M"MakeWithPerl" -e"MakeWithPerl::makeWithPerl" --  --doc "%d/%f"
+    perl -M"MakeWithPerl" -e"MakeWithPerl::makeWithPerl" --  --doc    "%d/%f"
 
-    perl -M"MakeWithPerl" -e"MakeWithPerl::makeWithPerl" -- --upload "%d/%f"
+    perl -M"MakeWithPerl" -e"MakeWithPerl::makeWithPerl" -- --upload  "%d/%f"
 
-    perl -M"MakeWithPerl" -e"MakeWithPerl::makeWithPerl" --  --doc "%d/%f"
+    perl -M"MakeWithPerl" -e"MakeWithPerl::makeWithPerl" --  --doc    "%d/%f"
+
+## Java
+
+For java, specify a folder for the class files that will be created by the
+compilation using the **--javaHome** keyword. This folder is used to hold the
+class files from several java folders so that classes can be reused.
+
+The text to enter for Java is:
+
+    perl -M"MakeWithPerl" -e"MakeWithPerl::makeWithPerl" -- --compile "%d/%f" --javaHome "%d"
+
+    perl -M"MakeWithPerl" -e"MakeWithPerl::makeWithPerl" -- --run     "%d/%f" --javaHome "%d"
+
+    .+ at (.+) line ([0-9]+).*
+
+    perl -M"MakeWithPerl" -e"MakeWithPerl::makeWithPerl" --  --doc    "%d/%f"  --javaHome "%d"
+
+    perl -M"MakeWithPerl" -e"MakeWithPerl::makeWithPerl" -- --upload  "%d/%f"  --javaHome "%d"
+
+    perl -M"MakeWithPerl" -e"MakeWithPerl::makeWithPerl" --  --doc    "%d/%f"  --javaHome "%d"
 
 
 # Operation on Geany

@@ -1,5 +1,8 @@
 Revision history for Pg-Explain
 
+1.11    2021/07/04
+        - Added parsing of Buffers info
+
 1.10    2021/06/08
         - Add a way to get total number of rows returned by node over multiple
           loops or workers ($node->total_rows)

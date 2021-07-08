@@ -4,13 +4,21 @@
 
 use 5.24.0;
 use warnings;
+use Data::Dumper;
 use Game::Xomb;
+use List::Util qw(sum);
 use Test::Most;
 
-plan tests => 28;
+plan tests => 46;
 
 my $deeply = \&eq_or_diff;
 
+# terminal cursor motion
+is Game::Xomb::at(1, 2), "\e[2;1H";
+is Game::Xomb::at_row(5),  "\e[5;1H";
+is Game::Xomb::at_col(42), "\e[42G";
+
+# "clamp" from Alexandria
 is Game::Xomb::between(1, 6, -1), 1;
 is Game::Xomb::between(1, 6, 1),  1;
 is Game::Xomb::between(1, 6, 3),  3;
@@ -54,6 +62,46 @@ is Game::Xomb::between(1, 6, 9),  6;
         }
         my $offby = abs($hits - $total / 2) / $total;
         ok $offby < $maxerr or diag "HITS $hits of $total err $offby";
+    }
+}
+
+# fisher_yates_shuffle (uses JSF)
+{
+    Game::Xomb::init_jsf(1);
+
+    # may produce perl.core and break the test output early if the empty
+    # list does get over to the JSF integer math which is why there are
+    # now checks for that within fisher_yates_shuffle
+    lives_ok { Game::Xomb::fisher_yates_shuffle([]) };
+    lives_ok { Game::Xomb::fisher_yates_shuffle(['a']) };
+
+    my @array = 'a' .. 'b';
+    Game::Xomb::fisher_yates_shuffle(\@array);
+    $deeply->(\@array, [qw/b a/]);
+    push @array, 'c' .. 'f';
+    Game::Xomb::fisher_yates_shuffle(\@array);
+    $deeply->(\@array, [qw/c b a f e d/]);
+
+    # is there any notable shuffle (or RNG) bias?
+  SKIP: {
+        skip "no expensive tests without AUTHOR_TEST_JMATES=1", 7
+          unless $ENV{AUTHOR_TEST_JMATES};
+        my @array = 'a' .. 'c';
+        my %seen;
+        for (1 .. 1e5) {
+            Game::Xomb::init_jsf(int rand 2**32);
+            Game::Xomb::fisher_yates_shuffle(\@array);
+            $seen{ join '', @array }++;
+        }
+        my $fail = 0;
+        is(scalar keys %seen, 6) or $fail = 1;
+        my $total  = sum values %seen;
+        my $expect = $total / 6;
+        for my $v (values %seen) {
+            my $offby = abs($v - $expect) / $total;
+            ok($offby < 0.5) or $fail = 1;
+        }
+        diag Dumper \%seen if $fail;
     }
 }
 
@@ -103,4 +151,27 @@ is Game::Xomb::between(1, 6, 9),  6;
     # NOTE order may vary if internals change, ideally would sort output
     # numeric by row and column to account for that
     $deeply->(\@points, [ [ 0, 1 ], [ 1, 0 ], [ 1, 1 ] ]);
+
+    @points = ();
+    Game::Xomb::with_adjacent(0, 1, sub { push @points, $_[0] });
+    $deeply->(\@points, [ [ 0, 0 ], [ 0, 2 ], [ 1, 0 ], [ 1, 1 ], [ 1, 2 ] ]);
+
+    @points = ();
+    Game::Xomb::with_adjacent(1, 0, sub { push @points, $_[0] });
+    $deeply->(\@points, [ [ 0, 0 ], [ 0, 1 ], [ 1, 1 ], [ 2, 0 ], [ 2, 1 ] ]);
+
+    @points = ();
+    Game::Xomb::with_adjacent(1, 1, sub { push @points, $_[0] });
+    $deeply->(
+        \@points,
+        [   [ 0, 0 ], [ 0, 1 ], [ 0, 2 ], [ 1, 0 ],
+            [ 1, 2 ], [ 2, 0 ], [ 2, 1 ], [ 2, 2 ]
+        ]
+    );
+
+    # yes I want the test to break if someone changes the map dimensions
+    # without revisiting the tests (and the *.xs) (MAP_COLS, MAP_ROWS)
+    @points = ();
+    Game::Xomb::with_adjacent(77, 21, sub { push @points, $_[0] });
+    $deeply->(\@points, [ [ 76, 20 ], [ 76, 21 ], [ 77, 20 ] ]);
 }

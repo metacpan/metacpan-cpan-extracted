@@ -1,9 +1,9 @@
 package Test::Role::TinyCommons::Tree;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-05-06'; # DATE
+our $DATE = '2021-07-02'; # DATE
 our $DIST = 'Role-TinyCommons-Tree'; # DIST
-our $VERSION = '0.126'; # VERSION
+our $VERSION = '0.127'; # VERSION
 
 use strict;
 use warnings;
@@ -150,6 +150,12 @@ sub test_role_tinycommons_tree {
                   [],
                   "ancestors (2) (sub call)");
 
+        is_deeply([$n9->retrieve_parent],
+                  [$n8],
+                  "retrieve_parent (1)");
+        ok( $n1->retrieve_parent, "retrieve_parent [1]");
+        # XXX more
+
         is_deeply([$n0->descendants],
                   [$n1, $n2, $n3, $n4, $n5, $n6, $n7, $n8, $n9],
                   "descendants");
@@ -286,6 +292,9 @@ sub test_role_tinycommons_tree {
         is_deeply([Code::Includable::Tree::NodeMethods::next_siblings($n5)], [$n6, $n7], "next_siblings [1] (sub call)");
         is_deeply([Code::Includable::Tree::NodeMethods::next_siblings($n7)], []        , "next_siblings [2] (sub call)");
 
+        ok( $n0->is_root, "is_root [0]");
+        ok(!$n1->is_root, "is_root [1]");
+
         # check
         {
             lives_ok { $n0->check({check_root=>1}) };
@@ -337,7 +346,7 @@ Test::Role::TinyCommons::Tree - Test suite for Role::TinyCommons::Tree
 
 =head1 VERSION
 
-This document describes version 0.126 of Test::Role::TinyCommons::Tree (from Perl distribution Role-TinyCommons-Tree), released on 2021-05-06.
+This document describes version 0.127 of Test::Role::TinyCommons::Tree (from Perl distribution Role-TinyCommons-Tree), released on 2021-07-02.
 
 =head1 DESCRIPTION
 
@@ -411,7 +420,7 @@ Source repository is at L<https://github.com/perlancar/perl-Role-TinyCommons-Tre
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Role-TinyCommons-TreeNode/issues>
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Role-TinyCommons-Tree>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

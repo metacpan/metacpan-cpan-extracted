@@ -138,7 +138,7 @@
          "web" : "https://github.com/finance-quote/finance-quote"
       }
    },
-   "version" : "1.50",
+   "version" : "1.51",
    "x_serialization_backend" : "JSON::XS version 3.04"
 }
 

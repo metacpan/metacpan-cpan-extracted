@@ -23,6 +23,7 @@ requires:
   CPAN::Meta: '0'
   Capture::Tiny: '0.05'
   Devel::CheckOS: '1.52'
+  Env::Path: '0.19'
   File::Find::Rule: '0'
   File::Path: '2.17'
   File::Temp: '0.19'
@@ -40,5 +41,5 @@ requires:
 resources:
   bugtracker: https://github.com/DrHyde/perl-modules-CPAN-FindDependencies/issues
   repository: https://github.com/DrHyde/perl-modules-CPAN-FindDependencies
-version: '3.06'
+version: '3.08'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

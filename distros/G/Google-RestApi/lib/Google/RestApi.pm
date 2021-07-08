@@ -1,30 +1,17 @@
 package Google::RestApi;
 
-use strict;
-use warnings;
+our $VERSION = '0.7';
 
-our $VERSION = '0.4';
+use Google::RestApi::Setup;
 
-use 5.010_000;
-
-use autodie;
 use Furl;
 use JSON;
 use Scalar::Util qw(blessed);
 use Sub::Retry;
 use Storable qw(dclone);
 use Time::Out qw(timeout);
-use Type::Params qw(compile compile_named);
-use Types::Standard qw(Str StrMatch Int ArrayRef HashRef CodeRef);
 use URI;
 use URI::QueryParam;
-use YAML::Any qw(Dump);
-
-use Google::RestApi::Utils qw(config_file);
-
-no autovivification;
-
-do 'Google/RestApi/logger_init.pl';
 
 sub new {
   my $class = shift;
@@ -73,6 +60,7 @@ sub api {
   my @headers;
   push(@headers, 'Content-Type' => 'application/json') if $content;
   push(@headers, @{ $p->{headers} });
+  push(@headers, @{ $self->auth()->headers() });
 
   # some (outdated) auth mechanisms may allow auth info in the params.
   my %params = (%{ $p->{params} }, %{ $self->auth()->params() });
@@ -111,7 +99,7 @@ sub api {
   ) if $self->{post_process};
   DEBUG("Rest API response:\n", Dump($api_content));
 
-  # used for integration tests to avoid google 403's.
+  # used for integration tests to avoid google 403's and 429's.
   sleep($self->{throttle}) if $self->{throttle};
 
   return wantarray ? ($api_content, $api_response, $p) : $api_content;
@@ -148,7 +136,7 @@ sub _api {
       # timeout is in the ua too, but i've seen requests to spreadsheets
       # completely hang if the request isn't constructed correctly.
       timeout $self->{timeout} => sub {
-        $self->ua()->request($req);
+        return $self->ua()->request($req);
       };
     },
     sub {
@@ -170,7 +158,6 @@ sub ua {
   my $self = shift;
   if (!$self->{ua}) {
     $self->{ua} = Furl->new(
-      headers => $self->auth()->headers(),
       timeout => $self->{timeout},
     );
   }
@@ -184,7 +171,7 @@ sub auth {
     # turn OAuth2Client into Google::RestApi::Auth::OAuth2Client etc.
     my $class = __PACKAGE__ . "::Auth::" . delete $self->{auth}->{class};
     eval "require $class";
-    die "Unable to require '$class': $@" if $@;
+    LOGDIE "Unable to require '$class': $@" if $@;
     $self->{auth}->{parent_config_file} = $self->{config_file}
       if $self->{config_file};
     $self->{auth} = $class->new(%{ $self->{auth} });
@@ -262,7 +249,7 @@ endpoint on behalf of the underlying API classes (Sheets and Drive).
    specified between API calls to avoid threshhold errors from Google.
 
 You can specify any of the arguments in the optional YAML config file.
-Any passed in arguments will override what is in the config file.
+Any passed-in arguments will override what is in the config file.
 
 The 'auth' arg can specify a pre-blessed class of one of the Google::RestApi::Auth::*
 classes, or, for convenience sake, you can specify a hash of the required

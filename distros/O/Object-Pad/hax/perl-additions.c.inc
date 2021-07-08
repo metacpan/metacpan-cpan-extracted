@@ -231,3 +231,32 @@ static char *PL_savetype_name[] PERL_UNUSED_DECL = {
   [SAVEt_HINTS_HH]            = "HINTS_HH",
 #endif
 };
+
+#define dKWARG(count)      \
+  U32 kwargi = count;      \
+  U32 kwarg;               \
+  SV *kwval;               \
+  /* TODO: complain about odd number of args */
+
+#define KWARG_NEXT(args) \
+  S_kwarg_next(aTHX_ args, &kwargi, items, ax, &kwarg, &kwval)
+static bool S_kwarg_next(pTHX_ const char *args[], U32 *kwargi, U32 argc, U32 ax, U32 *kwarg, SV **kwval)
+{
+  if(*kwargi >= argc)
+    return FALSE;
+
+  SV *argname = ST(*kwargi); (*kwargi)++;
+  if(!SvOK(argname))
+    croak("Expected string for next argument name, got undef");
+
+  *kwarg = 0;
+  while(args[*kwarg]) {
+    if(strEQ(SvPV_nolen(argname), args[*kwarg])) {
+      *kwval = ST(*kwargi); (*kwargi)++;
+      return TRUE;
+    }
+    (*kwarg)++;
+  }
+
+  croak("Unrecognised argument name '%" SVf "'", SVfARG(argname));
+}

@@ -3,9 +3,11 @@ use Test::More;
 
 use Perl::Lexer;
 
+my $has_debug_token = $^V >= v5.33.6 ? 1 : 0;
+
 subtest '"5963"' => sub {
     my @tokens = @{Perl::Lexer->new->scan_string('5963')};
-    is 0+@tokens, 1;
+    is 0+@tokens, 1 + $has_debug_token;
     isa_ok $tokens[0], 'Perl::Lexer::Token';
     is $tokens[0]->name,   'THING';
     is $tokens[0]->type,   TOKENTYPE_OPVAL;
@@ -16,7 +18,7 @@ subtest '"5963"' => sub {
 
 subtest 'use Foo 0.01' => sub {
     my @tokens = @{Perl::Lexer->new->scan_string('use Foo 0.01')};
-    is 0+@tokens, 3;
+    is 0+@tokens, 3 + $has_debug_token;
     subtest 'first token' => sub {
         isa_ok $tokens[0], 'Perl::Lexer::Token';
         is $tokens[0]->name,   'USE';
@@ -41,7 +43,7 @@ subtest 'use Foo 0.01' => sub {
 
 subtest '3*5+2/4' => sub {
     my @tokens = @{Perl::Lexer->new->scan_string('3*5+2/4')};
-    is 0+@tokens, 7;
+    is 0+@tokens, 7 + $has_debug_token;
     subtest 'tokens' => sub {
         is $tokens[0]->name,   'THING';
         is $tokens[0]->yylval->sv->int_value, 3;
@@ -63,6 +65,10 @@ subtest '3*5+2/4' => sub {
 
         is $tokens[6]->name,   'THING';
         is $tokens[6]->yylval->sv->int_value, 4;
+
+        if ($has_debug_token) {
+            is $tokens[7]->name,   'PERLY_SEMICOLON';
+        }
     };
 };
 

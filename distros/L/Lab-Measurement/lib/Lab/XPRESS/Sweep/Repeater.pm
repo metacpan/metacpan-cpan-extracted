@@ -1,6 +1,6 @@
 package Lab::XPRESS::Sweep::Repeater;
 #ABSTRACT: Simple repeater
-$Lab::XPRESS::Sweep::Repeater::VERSION = '3.760';
+$Lab::XPRESS::Sweep::Repeater::VERSION = '3.762';
 use v5.20;
 
 use Lab::XPRESS::Sweep;
@@ -72,7 +72,7 @@ Lab::XPRESS::Sweep::Repeater - Simple repeater
 
 =head1 VERSION
 
-version 3.760
+version 3.762
 
 =head1 SYNOPSIS
 
@@ -163,11 +163,11 @@ probably none
 This software is copyright (c) 2021 by the Lab::Measurement team; in detail:
 
   Copyright 2012       Stefan Geissler
-            2013       Andreas K. HÃ¼ttel, Christian Butschkow, Stefan Geissler
+            2013       Andreas K. Huettel, Christian Butschkow, Stefan Geissler
             2015       Christian Butschkow
             2016       Simon Reinhardt
-            2017       Andreas K. HÃ¼ttel
-            2020       Andreas K. HÃ¼ttel
+            2017       Andreas K. Huettel
+            2020       Andreas K. Huettel
 
 
 This is free software; you can redistribute it and/or modify it under

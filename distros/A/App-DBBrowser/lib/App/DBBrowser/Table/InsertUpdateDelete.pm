@@ -82,9 +82,8 @@ sub table_write_access {
             if ( $ok ) {
                 $ok = $cs->commit_sql( $sql );
             }
-            delete $sf->{i}{gc}{old_dir_idx}            if exists $sf->{i}{gc}{old_dir_idx};
-            delete $sf->{i}{gc}{files_fs_in_chosen_dir} if exists $sf->{i}{gc}{files_fs_in_chosen_dir};
-            delete $sf->{i}{gc}{old_file_idx}           if exists $sf->{i}{gc}{old_file_idx};
+            delete $sf->{i}{ss} if exists $sf->{i}{ss};
+            delete $sf->{i}{gc} if exists $sf->{i}{gc};
             next STMT_TYPE;
         }
         my $sub_stmts = {
@@ -149,9 +148,6 @@ sub __build_insert_stmt {
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $gc = App::DBBrowser::GetContent->new( $sf->{i}, $sf->{o}, $sf->{d} );
     $ax->reset_sql( $sql );
-    if ( exists $sf->{i}{gc}{files_fs_in_chosen_dir} ) { ##
-        delete $sf->{i}{gc}{files_fs_in_chosen_dir};
-    }
 
     REQUIRED_COLS: while ( 1 ) {
         my $cols_ok = $sf->__insert_into_stmt_columns( $sql );

@@ -1,5 +1,8 @@
 Revision history for Game::PlatformsOfPeril
 
+0.10    2021-04-27
+        fix where the bomb expolsion happens
+
 0.09    2020-03-02
         tweaks related to code review due to development of Game::Xomb
 

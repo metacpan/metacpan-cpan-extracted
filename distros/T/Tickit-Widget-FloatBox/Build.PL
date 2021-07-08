@@ -7,7 +7,7 @@ my $build = Module::Build->new(
    module_name => 'Tickit::Widget::FloatBox',
    requires => {
       'perl' => '5.026',
-      'Object::Pad' => '0.27',
+      'Object::Pad' => '0.41',
 
       'Tickit::ContainerWidget' => 0,
    },

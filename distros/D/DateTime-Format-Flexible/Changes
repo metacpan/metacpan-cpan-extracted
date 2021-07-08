@@ -1,5 +1,10 @@
 Revision history for Perl module DateTime::Format::Flexible
 
+0.34
+  - support timezones in parenthesis
+  - Add support for YYYY-MM-DD HH:MM P.M. format
+    - thanks Michael Schout for the patch!
+
 0.33 Wed May 26 2021
   - changes to how some days are parsed to fix memory leaks
   - remove Module::Pluggable as a dependency

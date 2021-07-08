@@ -5,6 +5,8 @@ use warnings;
 
 use parent q(PLS::Server::Response);
 
+use PLS::Server::State;
+
 =head1 NAME
 
 PLS::Server::Response::InitializeResult
@@ -54,5 +56,13 @@ sub new
 
     return bless \%self, $class;
 } ## end sub new
+
+sub serialize
+{
+    my ($self) = @_;
+
+    $PLS::Server::State::INITIALIZED = 1;
+    return $self->SUPER::serialize();
+}
 
 1;

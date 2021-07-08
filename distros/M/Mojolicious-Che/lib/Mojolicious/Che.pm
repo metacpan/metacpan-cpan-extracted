@@ -38,13 +38,16 @@ sub new {
   my $home = $app->home;
   my $statics = $conf->{'mojo_static_paths'} || $conf->{'mojo.static.paths'} || $conf->{'mojo'}{'static'}{'paths'} || [];
    #~ push @{$app->static->paths}, @{$paths} if $paths;
-  push @{$app->static->paths},  $home->rel_file($_) for @$statics;
+  push @{$app->static->paths},  $home->rel_file($_)
+    for @$statics;
   
   my $templates_paths = $conf->{'mojo_renderer_paths'} || $conf->{'mojo.renderer.paths'} || $conf->{'mojo'}{'renderer'}{'paths'} || [];
-  push @{$app->renderer->paths}, $home->rel_dir($_) for @$templates_paths;
+  push @{$app->renderer->paths}, $home->rel_dir($_)
+    for @$templates_paths;
   
   my $renderer_classes = $conf->{'mojo_renderer_classes'} || $conf->{'mojo.renderer.classes'} || $conf->{'mojo'}{'renderer'}{'classes'} || [];
-  push @{$app->renderer->classes}, $_ for grep ! load_class($_), @$renderer_classes;
+  push @{$app->renderer->classes}, $_
+    for grep ! load_class($_), @$renderer_classes;
   
   $app->сессия();
   $app->хазы();
@@ -83,67 +86,6 @@ has плугины => sub {
   } @$plugins;
   return $плугины;
 };
-
-has dbh => sub {#~ sub базы {# обрабатывает dbh конфига
-  my $app = shift;
-  my $conf = $app->config;
-  my $c_dbh = $conf->{dbh} || $conf->{'базы'};
-  return unless $c_dbh && ref($c_dbh) eq 'HASH' && keys %$c_dbh;
-  
-  my $dbh = {};
-  
-  my $req_dbi;
-  while (my ($db, $opt) = each %$c_dbh) {
-    if ($opt->{dbh}) {# && ref $opt eq 'DBI::db'
-      $dbh->{$db} ||= $opt->{dbh};
-    } else {
-      ++$req_dbi
-        and require DBI
-        unless $req_dbi;
-      $dbh->{$db} ||= DBI->connect(@{$opt->{connect}});
-      $app->log->debug("Соединился с базой $opt->{connect}[0] app->dbh->{'$db'}");
-    }
-    
-    map {
-      $dbh->{$db}->do($_);
-    } @{$opt->{do}} if $opt->{do};
-    
-
-  }
-  return $dbh;
-  
-};
-
-#~ has sth => sub {#~ sub запросы {# обрабатывает sth конфига
-  #~ my $app = shift;
-  #~ my $dbh = eval { $app->dbh }
-    #~ or return;
-  #~ my $conf = $app->config;
-  
-  #~ my $c_dbh = $conf->{dbh} || $conf->{'базы'};
-  #~ my $c_sth = $conf->{sth} || $conf->{'запросы'} || {};
-    
-  #~ return
-    #~ unless ($c_sth && ref($c_sth) eq 'HASH' && keys %$c_sth);
-
-  #~ my $sth = {};
-  
-  #~ while (my ($db, $opt) = each %$c_dbh) {
-    #~ while (my ($st, $sql) = each %{$opt->{sth}}) {
-      #~ $sth->{$db}{$st} = $dbh->{$db}->prepare($sql);# $app->sth->{main}{...}
-      #~ $app->log->debug("Подготовился запрос [app->sth->{$db}{$st}]");
-    #~ }
-  #~ }
-  
-  #~ while (my ($db, $h) = each %$c_sth) {
-    #~ while (my ($st, $sql) = each %$h) {
-      #~ $sth->{$db}{$st} = $dbh->{$db}->prepare($sql);# $app->sth->{main}{...}
-      #~ $app->log->debug("Подготовился запрос [app->sth->{$db}{$st}]");
-    #~ }
-  #~ }
-  
-   #~ $sth;
-#~ };
 
   
 sub хуки {# Хуки из конфига
@@ -280,7 +222,7 @@ sub Mojolicious::dispatch {
 }
 
 
-our $VERSION = '0.09021';# as to Mojolicious/100+0.000<minor>
+our $VERSION = '0.09191';# as to Mojolicious/100+0.000<minor>
 
 =pod
 
@@ -294,7 +236,7 @@ our $VERSION = '0.09021';# as to Mojolicious/100+0.000<minor>
 
 =head1 VERSION
 
-0.09021
+0.09191
 
 =head1 NAME
 
@@ -347,43 +289,6 @@ Mojolicious::Che - Мой базовый модуль для приложени�
     foo => sub {my $app = shift; return 'is a bar';},
   },
   
-  # 'базы' => 
-  # will be as has!
-  dbh=>{
-    'main' => {
-      # DBI->connect(dsn, user, passwd, $attrs)
-      connect => ["DBI:Pg:dbname=test;", "postgres", undef, {
-        ShowErrorStatement => 1,
-        AutoCommit => 1,
-        RaiseError => 1,
-        PrintError => 1, 
-        pg_enable_utf8 => 1,
-        #mysql_enable_utf8 => 1,
-        #mysql_auto_reconnect=>1,
-      }],
-      # or use Foo::Dbh; external defined dbh
-      # dbh => Dbh->dbh,
-      # will do on connect
-      do => ['set datestyle to "ISO, DMY";',],
-      # prepared sth will be as has $app->sth->{<dbh name>}{<sth name>}
-      sth => {
-        foo => <<SQL,
-  select * 
-  from foo
-  where
-    bar = ?;
-  SQL
-      },
-    }
-  },
-  # 'запросы' => 
-  # prepared sth will be as has $app->sth->{<dbh name>}{<sth name>}
-  sth => {
-    main => {
-      now => "select now();"
-    },
-  },
-  
   # 'плугины'=> [
   mojo_plugins=>[ 
       ['Foo::Bar'],
@@ -419,18 +324,6 @@ Mojolicious::Che - Мой базовый модуль для приложени�
 
 B<Mojolicious::Che> inherits all attributes from L<Mojolicious> and implements the
 following new ones.
-
-=head2 dbh
-
-Set DBI handlers from config B<dbh> (или B<базы>)
-
-  my $dbh = $app->dbh->{main};
-
-=head2 sth
-
-Set prepared stattements from config B<sth> (или B<запросы>).
-
-  my $sth = $app->sth->{main}{foo};
 
 =head2 плугины
 

@@ -3,7 +3,7 @@ package Module::FeaturesUtil::Get;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2021-02-24'; # DATE
 our $DIST = 'Module-FeaturesUtil-Get'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use strict 'subs', 'vars';
 use warnings;
@@ -16,17 +16,34 @@ our @EXPORT_OK = qw(
                );
 
 sub get_features_decl {
-    my $mod = shift;
+    my ($mod, $load) = @_;
+
+    my $features_decl;
 
     # first, try to get features declaration from MODNAME::_ModuleFeatures's %FEATURES
-    my $proxymod = "$mod\::_ModuleFeatures";
-    (my $proxymodpm = "$proxymod.pm") =~ s!::!/!g;
-    my $features_decl = \%{"$proxymod\::FEATURES"};
-    return $features_decl if scalar keys %$features_decl;
+    {
+        my $proxymod = "$mod\::_ModuleFeatures";
+        (my $proxymodpm = "$proxymod.pm") =~ s!::!/!g;
+        $features_decl = \%{"$proxymod\::FEATURES"};
+        if ($load) {
+            eval { require $proxymodpm; 1 };
+            last if $@;
+        }
+        return $features_decl if scalar keys %$features_decl;
+    }
 
     # second, try to get features declaration from MODNAME %FEATURES
-    $features_decl = \%{"$mod\::FEATURES"};
-    return $features_decl; # if scalar keys %$features_decl;
+    {
+        if ($load) {
+            (my $modpm = "$mod.pm") =~ s!::!/!g;
+            eval { require $modpm; 1 };
+            last if $@;
+        }
+        $features_decl = \%{"$mod\::FEATURES"};
+        return $features_decl; # if scalar keys %$features_decl;
+    }
+
+    {};
 
     # XXX compare the two if both declarations exist
 }
@@ -65,7 +82,7 @@ Module::FeaturesUtil::Get - Get a feature
 
 =head1 VERSION
 
-This document describes version 0.001 of Module::FeaturesUtil::Get (from Perl distribution Module-FeaturesUtil-Get), released on 2021-02-24.
+This document describes version 0.002 of Module::FeaturesUtil::Get (from Perl distribution Module-FeaturesUtil-Get), released on 2021-02-24.
 
 =head1 SYNOPSIS
 

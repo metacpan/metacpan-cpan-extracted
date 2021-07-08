@@ -22,7 +22,7 @@ use strict ;
 
 package uHTML::std ;
 
-use version ; our $VERSION = "2.24" ;
+use version ; our $VERSION = "2.26" ;
 
 require Exporter;
 our @ISA = qw(Exporter);
@@ -31,13 +31,18 @@ our @EXPORT_OK = qw( uFilePath ) ;
 use uHTML ;
 use uHTML::ListFuncs( 'uniq','section','difference','shuffle' ) ;
 
-my( %MACROS ) ;
+my( %MACROS,$DEBUG,$DEBUG_MASK ) ;
 
 my $SO = qr/\s*,\s*/ ;
 my $RO = qr/\s*[,;:]\s*/ ;
 
 use constant { TIMEOUT => 6000 } ;
 
+sub setDebug
+{
+  $DEBUG      = shift ;
+  $DEBUG_MASK = shift ;
+}
 
 sub DoIf( $ )
 {
@@ -187,6 +192,7 @@ sub Include( $ )
   push @Files,grep -f,glob( uFilePath( $IFile,$env ) ) if $Node->testAttr( 'files' ) and $IFile = $Node->attr( 'files' ) ;
   @Files = grep -f,glob( uFilePath( $IFile,$env ) )    if not @Files and $IFile = $Node->attr( 'alt' ) ;
 
+  print STDERR "Include looks for $IFile (".$Node->attr( 'file' ).")\n" if $DEBUG > 1 ;
 
   if( @Files )
   {
@@ -196,6 +202,7 @@ sub Include( $ )
       {
         local $_ ;
 
+        print STDERR "include $FN\n" if $DEBUG > 0 ;
 
         if( $Node->testAttr( 'raw' ) )
         {
@@ -291,6 +298,10 @@ sub _Replace( $$$ )
   my $D = _getDefine( $Node->{'ENV'},$Var ) ;
 
 
+  print STDERR "Insert $Var = '$D->[0]'  ($Node->{'ENV'}, $Node->{'ENV'}->{'uHTML.Defines'})\n" if $DEBUG > 1 and ref $D ;
+  print STDERR "Insert $Var = '${$Node->{'ENV'}->{'uHTML.Defines'}->{$Var}}[0]'\n" if $DEBUG > 1 and ref $D eq 'ARRAY' ;
+  print STDERR "Insert $Var = ''\n" if $DEBUG > 1 and ref $D ne 'ARRAY' ;
+
   return( ref $D eq 'ARRAY' ? join '',uHTML::recode( $D->[0],$Node->{'ENV'} ) : '' ) ;
 }
 
@@ -308,6 +319,7 @@ sub Define( $ )
       next if $def eq 'createonly' or _testDefine( $env,$def ) ;
       uHTML::register( $def,\&_Replace,1 ) ;
       $env->{'uHTML.Defines'}->{$def}->[0] = $Node->attr( $def ) ;
+      print STDERR "Unique Define $def\=$env->{'uHTML.Defines'}->{$def}->[0]\n" if $DEBUG > 0 ;
     }
   }
   elsif( $Node->testAttr( 'replace' ) and not $Node->rawAttr( 'replace' ) )
@@ -317,6 +329,7 @@ sub Define( $ )
       next if $def eq 'replace' ;
       uHTML::register( $def,\&_Replace,1 ) unless _testDefine( $env,$def ) ;
       $env->{'uHTML.Defines'}->{$def}->[0] = $Node->attr( $def ) ;
+      print STDERR "Replace Define $def\=$env->{'uHTML.Defines'}->{$def}->[0]\n" if $DEBUG > 0 ;
     }
   }
   else
@@ -326,6 +339,7 @@ sub Define( $ )
       my $v = $Node->codeAttr( $def ) ;
       uHTML::register( $def,\&_Replace,1 ) unless _testDefine( $env,$def ) ;
       unshift @{$env->{'uHTML.Defines'}->{$def}},$Node->attr( $def ) ;
+      print STDERR "Define $def\=$env->{'uHTML.Defines'}->{$def}->[0]\n" if $DEBUG > 0 ;
     }
   }
 }
@@ -335,12 +349,14 @@ sub ClearDef( $ )
   my $Node = shift ;
 
   return unless $Node->attributes() ;
+    print STDERR "Undef ${\(join ',',keys %{$Node->attributes()})}\n" if $DEBUG > 0 ;
   foreach( keys %{$Node->attributes()} )
   {
     my $D = _getDefine( $Node->{'ENV'},$_ ) ;
     next unless ref $D eq 'ARRAY' and @{$D} ;
     shift @{$D} ;
     uHTML::register( $_,undef,1 ) unless @{$D} ;
+    print STDERR "Undef $_\n" if $DEBUG > 1 ;
   }
 }
 
@@ -400,6 +416,7 @@ sub _getMacroValue()
   my $env  = $Node->{'ENV'} ;
   my $M    = _checkMacro( $env,$Name ) ;
 
+  print STDERR "getMacroValue $Name (".ref($M).")\n" if $DEBUG > 0 ;
   return '' unless $M and ref $M eq 'uHTMLnode' ;
   return $env->{'uHTML.MacroHTML'}->{$Name} if exists $env->{'uHTML.MacroHTML'}->{$Name} ;
   my $Macro = $M->copy ;
@@ -430,13 +447,16 @@ sub _DoMacro( $ )
   my $Name = $Node->name() ;
   my $Macro ;
 
+  print STDERR "Check Macro '$Name'\n" if $DEBUG > 1 ;
   return unless my $M = _checkMacro( $env,$Name ) ;
+  print STDERR "Execute Macro '$Name'\n" if $DEBUG > 0 ;
 
-    $Node->map( '','' ) ;
+    $Node->map( '','' ) if $env->{'uHTML.MacroBody'}->{$Name} ;   # needed only if MacroBody is present
     $Macro = $M->copy() ;
 
     foreach( keys %{$env->{'uHTML.MacroVal'}->{$Name}} ) { $Node->setAttr( $_,$env->{'uHTML.MacroVal'}->{$Name}->{$_} ) unless $Node->testAttr( $_ ) }
     $Node->deleteAttr( 'createonly','replace' ) ;
+    print STDERR "Execute macro $Name(${\(join ',',map \"$_='${\($Node->attr($_))}'\",keys %{$Node->attributes()})})\n" if $DEBUG > 0 ;
     Define( $Node ) ;
     $Macro->map( '','' ) ;
     ClearDef( $Node ) ;
@@ -483,6 +503,7 @@ sub Macro( $ )
 
   return unless $Node->end() and $Name = $Node->attr( 'name' ) ;
   return if     $Replace = _checkMacro( $env,$Name ) and not $Node->testAttr( 'replace' ) ;
+  print STDERR "Define Macro '$Name\(${\($Node->attr( 'attributes' ))}\)'\n" if $DEBUG > 0 ;
   $env->{'uHTML.MacroBody'}->{$Name} = _findMacroBody( $env->{'uHTML.Macros'}->{$Name} = $Node ) ;
   if( $Node->testAttr( 'attributes' ) )
   {
@@ -873,9 +894,9 @@ glob rules and the included files get concatenated.
 The attribute raw without value prevents the interpretation of uHTML-elements in the
 included file. It should be used if files without uHTML-elements get included.
 
-=head4 nowarn
+=head4 warn
 
-The attribute nowarn without value prevents error messages in case the included file
+The attribute warn without value allows error messages in case the included file
 isn't found or is not readable.
 
 =head4 cond="clause"
@@ -1839,11 +1860,14 @@ B< >
 
 B< >
 
-=head2 uFilePath($path)
+=head2 uFilePath($path,$env)
 
 =head3 Overview
 
-The function uFilePath determines the absolute path of a file according to the uHTML path name conventions. Path names beginning with '/' are considered as relative to DOCUMENT_ROOT. Path names not beginning with '/' and not prefixed with '#' are considered as relative to the path of the current file. Path names prefixed with '#' are considered as file system absolute if a '/' follows the '#' and relative to DATA_ROOT (or the script directory) if no '/' follows the '#'.
+The function uFilePath determines the absolute path of a file according to the uHTML path name conventions and the environment $env.
+Path names beginning with '/' are considered as relative to DOCUMENT_ROOT. Path names not beginning with '/' and not prefixed with '#'
+are considered as relative to the path of the current file. Path names prefixed with '#' are considered as file system absolute if a '/'
+follows the '#' and relative to DATA_ROOT (or the script directory) if no '/' follows the '#'.
 
 =head3 Parameters
 
@@ -1851,9 +1875,13 @@ The function uFilePath determines the absolute path of a file according to the u
 
 Path to convert.
 
+=head4 $env
+
+Environment in which's context the path should be converted
+
 =head3 Example
 
-  if(-f uFilePath('/index.html')) {...
+  if(-f uFilePath('/index.html',$env)) {...
 
 
 

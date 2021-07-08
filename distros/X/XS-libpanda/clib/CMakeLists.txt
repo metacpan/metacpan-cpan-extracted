@@ -10,7 +10,17 @@ else()
 endif()
 
 file(GLOB_RECURSE libPandaSource RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "src/*.cc")
+file(GLOB_RECURSE win_sources RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "src/panda/win/*.cc")
+file(GLOB_RECURSE unix_sources RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "src/panda/unix/*.cc")
+
+if (UNIX)
+    list(REMOVE_ITEM libPandaSource ${win_sources})
+else()
+    list(REMOVE_ITEM libPandaSource ${unix_sources})
+endif()
+
 add_library(${PROJECT_NAME} ${LIB_TYPE} ${libPandaSource})
+
 target_include_directories(${PROJECT_NAME} PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
     $<INSTALL_INTERFACE:include>

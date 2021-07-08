@@ -1,28 +1,15 @@
 package Google::RestApi::DriveApi3;
 
-use strict;
-use warnings;
+our $VERSION = '0.7';
 
-our $VERSION = '0.4';
-
-use 5.010_000;
-
-use autodie;
-use Type::Params qw(compile compile_named);
-use Types::Standard qw(Str StrMatch HashRef HasMethods Any slurpy);
-
-no autovivification;
+use Google::RestApi::Setup;
 
 use aliased 'Google::RestApi::DriveApi3::File';
-
-use Google::RestApi::Utils qw(named_extra);
 
 # TODO: switch to ReadOnly
 use constant {
   Drive_File_Id => "[a-zA-Z0-9-_]+",
 };
-
-do 'Google/RestApi/logger_init.pl';
 
 sub new {
   my $class = shift;

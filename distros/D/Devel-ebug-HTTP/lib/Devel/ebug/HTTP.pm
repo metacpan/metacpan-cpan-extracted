@@ -17,7 +17,7 @@ use Storable qw(dclone);
 use File::ShareDir::Dist qw( dist_share );
 
 # ABSTRACT: A web front end to a simple, extensible Perl debugger
-our $VERSION = '0.33'; # VERSION
+our $VERSION = '0.34'; # VERSION
 
 # global for now, sigh
 my $codelines_cache;
@@ -249,7 +249,7 @@ Devel::ebug::HTTP - A web front end to a simple, extensible Perl debugger
 
 =head1 VERSION
 
-version 0.33
+version 0.34
 
 =head1 SYNOPSIS
 

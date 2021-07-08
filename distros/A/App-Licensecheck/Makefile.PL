@@ -40,9 +40,8 @@ my $meta = {
                                 "Pod::Usage"                => 0,
                                 "re::engine::RE2"           => 0,
                                 "Regexp::Pattern"           => "v0.2.12",
-                                "Regexp::Pattern::License"  => "v3.5.0",
+                                "Regexp::Pattern::License"  => "v3.4.0",
                                 "Sort::Key::Multi"          => 1.25,
-                                "strictures"                => 0,
                                 "String::Copyright"         => 0.003,
                                 "String::Escape"            => 0,
                                 "Try::Tiny"                 => 0,
@@ -51,6 +50,7 @@ my $meta = {
                             test => {
                               recommends => {
                                               "File::BaseDir" => 0,
+                                              "Regexp::Pattern::License" => "v3.6.0",
                                               "Software::LicenseUtils" => 0.103014,
                                               "YAML::XS" => 0,
                                             },
@@ -64,7 +64,7 @@ my $meta = {
                             },
                           },
   "provides"           => {
-                            "App::Licensecheck" => { file => "lib/App/Licensecheck.pm", version => "v3.2.1" },
+                            "App::Licensecheck" => { file => "lib/App/Licensecheck.pm", version => "v3.2.3" },
                           },
   "release_status"     => "stable",
   "resources"          => {
@@ -79,9 +79,9 @@ my $meta = {
                                             },
                             x_identifier => "http://purl.org/NET/cpan-uri/dist/App-Licensecheck/project",
                           },
-  "version"            => "v3.2.1",
+  "version"            => "v3.2.3",
   "x_contributors"     => ["Paul Wise <pabs\@debian.org>"],
-  "x_help_wanted"      => ["documenter", "tester"],
+  "x_help_wanted"      => ["tester", "documenter"],
   "x_provides_scripts" => { licensecheck => { file => "bin/licensecheck" } },
 };
 

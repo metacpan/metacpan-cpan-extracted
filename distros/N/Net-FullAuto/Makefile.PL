@@ -26,7 +26,7 @@
 ################################################################
 
 
-our $VERSION='1.0000607';
+our $VERSION='1.0000616';
 
 
 if ($ENV{'AUTOMATED_TESTING'}) {
@@ -1169,7 +1169,8 @@ END
       fa_system("sudo yum -y install 'nano'");
    }
 
-} elsif ((exists $amazon{'amazon_linux'}) || (exists $amazon{'centos'})) {
+} elsif ((exists $amazon{'amazon_linux'}) || (exists $amazon{'centos'}) ||
+      $system_type eq 'centos') {
 
    # Most Amazon images need a lot of helper software like compilers
    # to install all module dependencies. It is assumed users attempting
@@ -1184,7 +1185,8 @@ END
       fa_system("sudo yum -y install 'wget'");
    }
    unless (-1<index $yins,'figlet') {
-      fa_system('echo y | sudo amazon-linux-extras install epel');
+      fa_system('echo y | sudo amazon-linux-extras install epel')
+         if exists $amazon{'centos'};
       fa_system("sudo yum -y install 'figlet'");
       my $yins=`yum list installed`;
       unless (-1<index $yins,'figlet') {
@@ -1192,6 +1194,11 @@ END
                    "Packages/e/epel-release-7-11.noarch.rpm");
          fa_system("sudo rpm -Uvh epel-release*rpm");
          fa_system("sudo yum -y install 'figlet'");
+         unless (-e '/usr/local/bin/figlet') {
+            my $fs='ftp://ftp.figlet.org/pub/figlet/program'.
+                   '/unix/figlet-2.2.5.tar.gz';
+            fa_system("(wget $fs;tar zxvf fig*gz;cd figlet-2.2.5;make install)");
+         }
       }
    }
    unless (-1<index $yins,'nano') {

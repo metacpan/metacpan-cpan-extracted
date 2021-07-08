@@ -3,7 +3,7 @@ package Beekeeper::JSONRPC::Notification;
 use strict;
 use warnings;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 
 sub new {
@@ -22,7 +22,7 @@ sub params { $_[0]->{params} }
 sub id     { undef           }
 
 sub mqtt_properties {
-    $_[0]->{_mqtt_prop};
+    $_[0]->{_mqtt_properties};
 }
 
 1;
@@ -35,31 +35,38 @@ __END__
 
 =head1 NAME
  
-Beekeeper::JSONRPC::Notification - Representation of a JSON-RPC notification.
+Beekeeper::JSONRPC::Notification - Representation of a JSON-RPC notification
  
 =head1 VERSION
  
-Version 0.06
+Version 0.07
 
 =head1 DESCRIPTION
 
-Objects of this class represents a JSON-RPC notification (see L<http://www.jsonrpc.org/specification>).
+Objects of this class represent a JSON-RPC notification (see L<http://www.jsonrpc.org/specification>).
+
+On worker classes the method handlers setted by L<Beekeeper::Worker::accept_notifications> 
+will receive these objects as parameters.
 
 =head1 ACCESSORS
 
-=over 4
+=over
 
 =item method
 
-A string with the name of the method to be invoked.
+Returns a string with the name of the method invoked.
 
 =item params
 
-An arbitrary data structure to be passed as parameters to the defined method.
+Returns the arbitrary data structure passed as parameters.
 
 =item id
 
-It is always undef.
+Always returns undef.
+
+=item mqtt_properties
+
+Returns a hashref containing the MQTT properties of the notification.
 
 =back
 

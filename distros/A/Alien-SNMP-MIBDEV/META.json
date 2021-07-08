@@ -1,6 +1,8 @@
 {
    "abstract" : "Build and install Net-SNMP",
    "author" : [
+      "Eric A. Miller <emiller AT cpan DOT org>",
+      "Oliver Gorwits <oliver AT cpan DOT org>",
       "Nick Nauwelaerts <inphobia AT cpan DOT org>"
    ],
    "dynamic_config" : 1,
@@ -18,7 +20,8 @@
          "requires" : {
             "Alien::Base" : "0.020",
             "IO::Socket::SSL" : "1.56",
-            "Net::SSLeay" : "1.49"
+            "Net::SSLeay" : "1.49",
+            "Software::License" : "0"
          }
       },
       "configure" : {
@@ -51,7 +54,7 @@
    "provides" : {
       "Alien::SNMP::MIBDEV" : {
          "file" : "lib/Alien/SNMP/MIBDEV.pm",
-         "version" : "2.000000"
+         "version" : "2.020000"
       }
    },
    "release_status" : "stable",
@@ -60,7 +63,7 @@
          "web" : "https://github.com/inphobia/Alien-SNMP-MIBDEV/issues"
       },
       "license" : [
-         "http://opensource.org/licenses/bsd-license.php"
+         "http://opensource.org/licenses/BSD-3-Clause"
       ],
       "repository" : {
          "url" : "https://github.com/inphobia/Alien-SNMP-MIBDEV"
@@ -68,6 +71,6 @@
       "x_IRC" : "irc://irc.libera.chat/#netdisco",
       "x_MailingList" : "https://lists.sourceforge.net/lists/listinfo/snmp-info-users"
    },
-   "version" : "2.000000",
+   "version" : "2.020000",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

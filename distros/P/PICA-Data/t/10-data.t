@@ -55,4 +55,13 @@ is pica_annotation($annotated), undef, 'removed annotation';
 ok pica_empty([]), 'empty';
 ok pica_empty({ record => [] }), 'empty';
 
+is $record->subfields('003@')->{0}, '12345', 'subfields';
+is_deeply $record->subfields('01..')->mixed, {
+    0 => '0',
+    a => [qw(chi 2004 XB-CN)],
+    n => '2004.01',
+    x => '',
+    y => ''
+  }, 'subfields';
+
 done_testing;

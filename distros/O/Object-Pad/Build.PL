@@ -21,7 +21,9 @@ my $build = Module::Build->new(
          () :
          ( 'indirect' => 0 ) ),
 
-      'perl' => '5.016', # pad_add_name_pvn, pad_add_name_pvs, gv_init_pvn
+      'perl' => '5.018', # pad_add_name_pvn, pad_add_name_pvs, gv_init_pvn
+         # Technically probably would work on 5.16 but doesn't:
+         #   https://rt.cpan.org/Ticket/Display.html?id=132930
       'XS::Parse::Keyword' => '0.08',
       'XS::Parse::Sublike' => '0.10', # hookdata
    },

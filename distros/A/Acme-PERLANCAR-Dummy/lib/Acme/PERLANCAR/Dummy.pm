@@ -1,9 +1,9 @@
 package Acme::PERLANCAR::Dummy;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-02-21'; # DATE
+our $DATE = '2021-02-22'; # DATE
 our $DIST = 'Acme-PERLANCAR-Dummy'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 1;
 # ABSTRACT: Dummy distribution for various testing
@@ -20,7 +20,7 @@ Acme::PERLANCAR::Dummy - Dummy distribution for various testing
 
 =head1 VERSION
 
-This document describes version 0.001 of Acme::PERLANCAR::Dummy (from Perl distribution Acme-PERLANCAR-Dummy), released on 2021-02-21.
+This document describes version 0.002 of Acme::PERLANCAR::Dummy (from Perl distribution Acme-PERLANCAR-Dummy), released on 2021-02-22.
 
 =head1 HOMEPAGE
 

@@ -79,6 +79,7 @@ struct URI : Refcnt {
     uint16_t      default_port  () const { return scheme_info ? scheme_info->default_port : 0; }
     uint16_t      port          () const { return _port ? _port : default_port(); }
     bool          secure        () const { return scheme_info ? scheme_info->secure : false; }
+    bool          empty         () const { return _scheme.empty() && _host.empty() && _path.empty() && query_string().empty() && _fragment.empty(); }
 
     virtual void assign (const URI& source) {
         _scheme     = source._scheme;

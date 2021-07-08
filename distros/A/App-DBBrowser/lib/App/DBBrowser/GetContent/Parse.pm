@@ -281,11 +281,11 @@ sub parse_with_Spreadsheet_Read {
     my $tc = Term::Choose->new( { %{$sf->{i}{tc_default}}, clear_screen => 1 } );
     $sf->__print_waiting_str;
     require Spreadsheet::Read;
-    my $book = $sf->{i}{S_R}{$file_fs}{book};
+    my $book = $sf->{i}{ss}{$file_fs}{book};
     if ( ! defined $book ) {
-        delete $sf->{i}{S_R};
+        delete $sf->{i}{ss};
         $book = Spreadsheet::Read::ReadData( $file_fs, cells => 0, attr => 0, rc => 1, strip => 0 );
-        $sf->{i}{S_R}{$file_fs}{book} = $book;
+        $sf->{i}{ss}{$file_fs}{book} = $book;
         if ( ! defined $book ) {
             $tc->choose(
                 [ 'Press ENTER' ],
@@ -294,8 +294,8 @@ sub parse_with_Spreadsheet_Read {
             return;
         }
     }
-    $sf->{i}{S_R}{$file_fs}{sheet_count} = @$book - 1; # first sheet in $book contains meta info
-    my $sheet_count = $sf->{i}{S_R}{$file_fs}{sheet_count};
+    $sf->{i}{ss}{$file_fs}{sheet_count} = @$book - 1; # first sheet in $book contains meta info
+    my $sheet_count = $sf->{i}{ss}{$file_fs}{sheet_count};
     if ( $sheet_count == 0 ) {
         $tc->choose(
             [ 'Press ENTER' ],
@@ -311,27 +311,24 @@ sub parse_with_Spreadsheet_Read {
         my @sheets = map { '- ' . ( length $book->[$_]{label} ? $book->[$_]{label} : 'sheet_' . $_ ) } 1 .. $#$book;
         my @pre = ( undef );
         my $menu = [ @pre, @sheets ];
-        $sf->{i}{S_R}{$file_fs}{old_idx} //= 0;
-        my $old_idx = $sf->{i}{S_R}{$file_fs}{old_idx};
+        $sf->{i}{ss}{$file_fs}{old_idx_sheet} //= 0;
 
         SHEET: while ( 1 ) {
             # Choose
             my $idx = $tc->choose(
                 $menu,
-                { %{$sf->{i}{lyt_v}}, prompt => 'Choose a sheet', index => 1, default => $old_idx,
+                { %{$sf->{i}{lyt_v}}, prompt => 'Choose a sheet', index => 1, default => $sf->{i}{ss}{$file_fs}{old_idx_sheet},
                 undef => '  <=' }
             );
             if ( ! defined $idx || ! defined $menu->[$idx] ) {
                 return;
             }
             if ( $sf->{o}{G}{menu_memory} ) {
-                if ( $sf->{i}{S_R}{$file_fs}{old_idx} == $idx && ! $ENV{TC_RESET_AUTO_UP} ) {
-                    $old_idx = 0;
+                if ( $sf->{i}{ss}{$file_fs}{old_idx_sheet} == $idx && ! $ENV{TC_RESET_AUTO_UP} ) {
+                    $sf->{i}{ss}{$file_fs}{old_idx_sheet} = 0;
                     next SHEET;
                 }
-                $old_idx = $idx;
-                $sf->{i}{S_R}{$file_fs}{old_idx} = $idx;
-                # save the last active user chosen idx as the old_idx and not the auto-jumped idx (0)
+                $sf->{i}{ss}{$file_fs}{old_idx_sheet} = $idx;
             }
             $sheet_idx = $idx - @pre + 1;
             last SHEET;
@@ -347,7 +344,7 @@ sub parse_with_Spreadsheet_Read {
     }
     $sql->{insert_into_args} = [ Spreadsheet::Read::rows( $book->[$sheet_idx] ) ];
     if ( ! -T $file_fs && length $book->[$sheet_idx]{label} ) {
-        $sf->{i}{S_R}{$file_fs}{sheet_name} = $book->[$sheet_idx]{label};
+        $sf->{i}{ss}{$file_fs}{sheet_name} = $book->[$sheet_idx]{label};
     }
     return 1;
 }

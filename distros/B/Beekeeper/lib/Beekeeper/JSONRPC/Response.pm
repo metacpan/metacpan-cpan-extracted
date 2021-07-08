@@ -3,7 +3,7 @@ package Beekeeper::JSONRPC::Response;
 use strict;
 use warnings;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 
 sub new {
@@ -32,11 +32,11 @@ __END__
 
 =head1 NAME
  
-Beekeeper::JSONRPC::Response - Representation of a JSON-RPC response.
+Beekeeper::JSONRPC::Response - Representation of a JSON-RPC response
  
 =head1 VERSION
  
-Version 0.06
+Version 0.07
 
 =head1 SYNOPSIS
 
@@ -53,32 +53,32 @@ Version 0.06
 
 =head1 DESCRIPTION
 
-Objects of this class represents a JSON-RPC response (see L<http://www.jsonrpc.org/specification>).
+Objects of this class represent a JSON-RPC response (see L<http://www.jsonrpc.org/specification>).
 
-When a RPC call is made the worker replies with a L<Beekeeper::JSONRPC::Response> object
+When an RPC call is made the worker replies with a L<Beekeeper::JSONRPC::Response> object
 if the invoked method was executed successfully. On error, a L<Beekeeper::JSONRPC::Error>
 is returned instead.
 
-Method C<Beekeeper::Client-\>call_remote> returns objects of this class on success.
+Method L<Beekeeper::Client::call_remote> returns objects of this class on success.
 
 =head1 ACCESSORS
 
-=over 4
+=over
 
 =item result
 
-Arbitrary value or data structure returned by the invoked method.
+Returns the arbitrary value or data structure returned by the invoked method.
 It is undefined if the invoked method does not returns anything.
 
 =item id
 
-The id of the request it is responding to. It is unique per client connection,
+Returns the id of the request it is responding to. It is unique per client connection,
 and it is used for response matching.
 
 =item success
 
-Always returns true. Used to determine if a method was executed successfully
-or not ($response->result cannot be trusted as it may be undefined on success).
+Always returns true. It is used to determine if a method was executed successfully
+or not (C<$response-E<gt>result> cannot be trusted as it may be undefined on success).
 
 =back
 

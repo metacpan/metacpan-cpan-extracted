@@ -23,7 +23,7 @@ SYNOPSIS
                     is_dir($src_dir, $tmp_dir, 'fails without @ignore_files');
             };
             
-            # be verbose, print out the diff if doesn't match
+            # force verbose, print out the diff if doesn't match
             is_dir($src_dir, $tmp_dir, 'test with verbose on', \@ignore_files, 'verbose');
             
 
@@ -72,7 +72,8 @@ FUNCTIONS
     content into $expected_dir. Usefull for bootstraping test results or
     for acnkowledging results after code update.
 
-    $message, \@ignore_files, $verbose are optional.
+    $message, \@ignore_files, $verbose are optional. Default verbose value
+    is $ENV{TEST_VERBOSE}.
 
  dir_cleanup_ok($filename, $message)
 

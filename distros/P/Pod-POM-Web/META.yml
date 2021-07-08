@@ -18,7 +18,7 @@ name: Pod-POM-Web
 provides:
   Pod::POM::Web:
     file: lib/Pod/POM/Web.pm
-    version: '1.26'
+    version: '1.27'
   Pod::POM::Web::Indexer:
     file: lib/Pod/POM/Web/Indexer.pm
     version: '1.23'
@@ -38,6 +38,7 @@ requires:
   Module::CoreList: '0'
   Module::Metadata: '1.000033'
   POSIX: '0'
+  Params::Validate: '0'
   Path::Tiny: '0'
   Plack::Request: '0'
   Plack::Response: '0'
@@ -53,5 +54,5 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/damil/Pod-POM-Web
-version: '1.26'
+version: '1.27'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

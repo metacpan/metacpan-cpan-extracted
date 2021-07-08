@@ -1,3 +1,16 @@
+0.3.1 2021-07-06 Tobias Bossert (tobib at cpan.org)
+- Improved doc
+- fix: concurrency test -> added small delay between writes
+
+0.3.0 2021-07-03 Tobias Bossert (tobib at cpan.org)
+- changed: CLI: Seamless support for custom attributes (set and addpeer)
+- added: CLI: Ability to remove peers
+- added: CLI: Machine readable output (dump)
+- changed: Core: removed any predefined wg-meta attributes (except alias and checksum)
+- changed: Core: Rewrote parser architecture to be more general and extendable
+- changed: Tests: Are now not dependent on threads any more
+- changed: Wrapper: API of set() and add_peer()
+
 0.2.3 2021-04-15 Tobias Bossert (tobib at cpan.org)
 - changed: Commit behaviour when set to overwrite = False
 - changed: Adding custom attributes is now possible in code

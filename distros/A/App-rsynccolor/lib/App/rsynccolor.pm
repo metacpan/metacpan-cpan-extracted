@@ -1,7 +1,7 @@
 package App::rsynccolor;
 
-our $DATE = '2019-05-06'; # DATE
-our $VERSION = '0.006'; # VERSION
+our $DATE = '2021-07-08'; # DATE
+our $VERSION = '0.007'; # VERSION
 
 1;
 # ABSTRACT: Add some color to rsync output
@@ -18,7 +18,7 @@ App::rsynccolor - Add some color to rsync output
 
 =head1 VERSION
 
-This document describes version 0.006 of App::rsynccolor (from Perl distribution App-rsynccolor), released on 2019-05-06.
+This document describes version 0.007 of App::rsynccolor (from Perl distribution App-rsynccolor), released on 2021-07-08.
 
 =head1 SYNOPSIS
 
@@ -28,9 +28,14 @@ See the command-line script L<rsynccolor>.
 
 Sample screenshot:
 
-=for Pod::Coverage ^(.+)$
+=begin html
 
-=for html <img src="https://st.aticpan.org/source/PERLANCAR/App-rsynccolor-0.006/share/images/Screenshot_20190506_181519.png" />
+<img src="https://st.aticpan.org/source/PERLANCAR/App-rsynccolor-0.007/share/images/Screenshot_20190506_181519.png" />
+
+=end html
+
+
+=for Pod::Coverage ^(.+)$
 
 =head1 HOMEPAGE
 
@@ -54,7 +59,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2019, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

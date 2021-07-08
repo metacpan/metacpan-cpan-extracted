@@ -44,5 +44,5 @@ resources:
   bugtracker: https://github.com/pmqs/Archive-Zip-SimpleZip/issues
   homepage: https://github.com/pmqs/Archive-Zip-SimpleZip
   repository: git://github.com/pmqs/Archive-Zip-SimpleZip.git
-version: '0.039'
+version: '0.040'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

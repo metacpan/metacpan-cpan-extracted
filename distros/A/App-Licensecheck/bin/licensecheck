@@ -2,7 +2,8 @@
 
 use utf8;
 use open qw(:locale);
-use strictures;
+use strict;
+use warnings;
 use autodie;
 
 use version;
@@ -40,11 +41,11 @@ licensecheck - simple license checker for source files
 
 =head1 VERSION
 
-Version v3.2.1
+Version v3.2.3
 
 =cut
 
-our $VERSION = version->declare('v3.2.1');
+our $VERSION = version->declare('v3.2.3');
 
 my $progname = path($0)->basename;
 
@@ -81,15 +82,21 @@ only files matching B<--check> and not B<--ignore> are checked.
 
 =item B<--shortname-scheme>
 
+I<Since v3.2.>
+
 comma-separated priority list of license naming schemes
 to use for license identifiers
 S<(default value: unset (use verbose description))>
 
 =item B<--list-licenses>
 
+I<Since v3.2.>
+
 list identifiers for all detectable licenses and exit
 
 =item B<--list-naming-schemes>
+
+I<Since v3.2.>
 
 list all available license naming schemes and exit
 
@@ -109,17 +116,23 @@ push @OPT, qw(
 
 =item B<-c> I<REGEX>, B<--check>=I<REGEX>
 
+I<Since v2.10.10.>
+
 regular expression of files to include
 when more than one F<PATH> is provided
 S<(default value: common source files)>
 
 =item B<-i> I<REGEX>, B<--ignore>=I<REGEX>
 
+I<Since v2.10.10.>
+
 regular expression of files to skip
 when more than one F<PATH> is provided
 S<(default value: some backup and VCS files)>
 
 =item B<-r>, B<--recursive>
+
+I<Since v2.10.7.>
 
 traverse directories recursively
 
@@ -141,6 +154,8 @@ $OPT{ignore} = 'some backup and VCS files';
 
 =item B<-l> I<N>, B<--lines>=I<N>
 
+I<Since v2.10.3.>
+
 number of lines to parse from top of each file;
 implies optimistic search
 including only first cluster of detected copyrights or licenses;
@@ -150,11 +165,15 @@ S<(default value: I<60>)>
 
 =item B<--tail>=I<N>
 
+I<Since v2.15.10.>
+
 number of bytes to parse from bottom of each file;
 set to 0 to avoid parsing from end of file
 S<(default value: 5000 (roughly 60 lines))>
 
 =item B<-e> I<CODEC>, B<--encoding>=I<CODEC>
+
+I<Since v2.15.10.>
 
 try decode source files from the specified codec,
 with C<iso-8859-1> as fallback
@@ -176,20 +195,28 @@ $OPT{tail}  = 5000;
 
 =over 16
 
-=item B<--verbose>
+=item B<--[no-]verbose>
+
+I<Since v2.10.3.>
 
 add header of each file to license information
 
 =item B<--copyright>
 
+I<Since v2.10.7.>
+
 add copyright statements to license information
 
 =item B<-s>, B<--skipped>
+
+I<Since v2.15.10.>
 
 print to STDERR files in F<PATH>s
 matching neither B<--check> nor B<--ignore>
 
 =item B<-m>, B<--machine>
+
+I<Since v2.12.2.>
 
 print license information as C<TAB>-separated fields,
 for processing with line-oriented tools like C<awk> and C<sort>
@@ -197,10 +224,14 @@ S<(NB! B<--verbose> will kill readability)>
 
 =item B<--[no-]deb-machine>
 
+I<Since v3.0.0.>
+
 print license information like a Debian copyright file;
 implies B<--copyright> and B<--shortname-scheme>=I<debian,spdx>
 
 =item B<--list-delimiter>=I<PRINTF>
+
+I<Since v3.0.18.>
 
 printf-string used between multiple plain list items
 in Debian copyright file
@@ -208,17 +239,23 @@ S<(default value: I<'\n '> (NEWLINE SPACE))
 
 =item B<--rfc822-delimiter>=I<PRINTF>
 
+I<Since v3.0.18.>
+
 printf-string used between multiple RFC822-style items
 in Debian copyright file
 S<(default value: I<'\n  '> (NEWLINE SPACE SPACE))
 
 =item B<--copyright-delimiter>=I<PRINTF>
 
+I<Since v3.0.19.>
+
 printf-string used between years and owners
 in Debian copyright file
 S<(default value: I<', '> (COMMA SPACE))
 
 =item B<--[no-]merge-licenses>
+
+I<Since v3.0.0.>
 
 merge same-licensed files in Debian copyright file
 
@@ -349,7 +386,7 @@ foreach my $file ( $app->find(@ARGV) ) {
 			$owneryears_seem_correct = 0 unless ($owneryear);
 			$owner =~ s/,?\s+All Rights Reserved\.?//gi if ($owner);
 			push @ownerlines_clean,
-				join unbackslash( $OPT{copyright_delimiter}, ),
+				join unbackslash( $OPT{'copyright-delimiter'}, ),
 				$owneryear || (), $owner || ();
 			push @{ $owneryears{ $owner || '' } }, $owneryear;
 		}

@@ -86,6 +86,8 @@ my %depencencies = (
 
     'Math::Interpolate' => ['Lab/XPRESS/Data/XPRESS_dataset.pm'],
 
+    'Math::Round' => ['Lab/Moose/Instrument/Rigol_DG5000.pm'],
+
     'IPC::Run' => [
         qw{
             Lab/XPRESS/Xpression/PlotterGUI_bidirectional.pm
@@ -120,10 +122,13 @@ for my $module ( keys %depencencies ) {
 eval {
     load 'sys/ioctl.ph';
     diag("using sys/ioctl.ph");
+    load 'linux/usb/tmc.ph';
+    diag("using linux/usb/tmc.ph");
     1;
 
 } or do {
     diag("not using sys/ioctl.ph");
+    diag("not using linux/usb/tmc.ph");
     skip_modules('Lab/Bus/USBtmc.pm');
 };
 

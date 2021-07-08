@@ -1,11 +1,11 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2013-2020 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2013-2021 -- leonerd@leonerd.org.uk
 
 use Object::Pad 0.27;
 
-package Tickit::Widget::HSplit 0.31;
+package Tickit::Widget::HSplit 0.32;
 class Tickit::Widget::HSplit
    extends Tickit::Widget::LinearSplit;
 
@@ -97,32 +97,17 @@ use constant VALUE_METHOD => "lines";
 
 Constructs a new C<Tickit::Widget::HSplit> object.
 
-Takes the following named arguments
-
-=over 8
-
-=item top_child => WIDGET
-
-=item bottom_child => WIDGET
-
-Child widgets to use.
-
-These options are now discouraged in favour of the L</set_top_child> and
-L</set_bottom_child> methods.
-
-=back
-
 =cut
 
 BUILD
 {
    my %args = @_;
 
-   Carp::carp( "The 'top_child' constructor argument to ${\ref $self} is discouraged; use ->set_top_child instead" ) and
-      $self->set_top_child   ( $args{top_child}    ) if $args{top_child};
+   croak "The 'top_child' constructor argument to ${\ref $self} is no longer recognised; use ->set_top_child instead"
+      if $args{top_child};
 
-   Carp::carp( "The 'bottom_child' constructor argument to ${\ref $self} is discouraged; use ->set_bottom_child instead" ) and
-      $self->set_bottom_child( $args{bottom_child} ) if $args{bottom_child};
+   croak "The 'bottom_child' constructor argument to ${\ref $self} is no longer recognised; use ->set_bottom_child instead"
+      if $args{bottom_child};
 }
 
 method lines
@@ -178,9 +163,6 @@ use as chaining mutators; e.g.
    my $container = Tickit::Widget::HSplit->new( ... )
       ->set_top_child   ( Tickit::Widget::Box->new ... )
       ->set_bottom_child( Tickit::Widget::Box->new ... );
-
-These should be preferred over using the C<top_child> and C<bottom_child>
-constructor arguments, which are now discouraged.
 
 =cut
 

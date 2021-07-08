@@ -1,15 +1,40 @@
 use strict;
 use warnings;
-package Data::Rx::Type::MooseTC;
-{
-  $Data::Rx::Type::MooseTC::VERSION = '0.006';
-}
+package Data::Rx::Type::MooseTC 0.007;
 # ABSTRACT: experimental / proof of concept Rx types from Moose types
 use parent 'Data::Rx::CommonType::EasyNew';
 
 use Carp ();
 use Moose::Util::TypeConstraints ();
 
+#pod =head1 SYNOPSIS
+#pod
+#pod   use Data::Rx;
+#pod   use Data::Rx::Type::MooseTC;
+#pod   use Test::More tests => 2;
+#pod
+#pod   my $rx = Data::Rx->new({
+#pod     prefix  => {
+#pod       moose => 'tag:rjbs.manxome.org,2008-10-04:rx/moose/',
+#pod     },
+#pod     type_plugins => [ 'Data::Rx::Type::MooseTC' ]
+#pod   });
+#pod
+#pod   my $array_of_int = $rx->make_schema({
+#pod     type       => '/moose/tc',
+#pod     moose_type => 'ArrayRef[Int]',
+#pod   });
+#pod
+#pod   ok($array_of_int->check([1]), "[1] is an ArrayRef[Int]");
+#pod   ok(! $array_of_int->check( 1 ), "1 is not an ArrayRef[Int]");
+#pod
+#pod =head1 WARNING
+#pod
+#pod This module is primarly provided as a proof of concept and demonstration of
+#pod user-written Rx type plugins.  It isn't meant to be used for serious work.
+#pod Moose type constraints may change their interface in the future.
+#pod
+#pod =cut
 
 sub type_uri { 'tag:rjbs.manxome.org,2008-10-04:rx/moose/tc' }
 
@@ -62,7 +87,7 @@ Data::Rx::Type::MooseTC - experimental / proof of concept Rx types from Moose ty
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 
@@ -85,6 +110,16 @@ version 0.006
   ok($array_of_int->check([1]), "[1] is an ArrayRef[Int]");
   ok(! $array_of_int->check( 1 ), "1 is not an ArrayRef[Int]");
 
+=head1 PERL VERSION
+
+This library should run on perls released even a long time ago.  It should work
+on any version of perl released in the last five years.
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
+
 =head1 WARNING
 
 This module is primarly provided as a proof of concept and demonstration of
@@ -93,11 +128,11 @@ Moose type constraints may change their interface in the future.
 
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@cpan.org>
+Ricardo SIGNES <rjbs@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 by Ricardo SIGNES.
+This software is copyright (c) 2021 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

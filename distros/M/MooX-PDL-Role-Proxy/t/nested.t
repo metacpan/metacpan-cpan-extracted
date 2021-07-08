@@ -1,135 +1,41 @@
 #! perl
 
+use Test::Lib;
 use Test2::V0;
 use Test2::Tools::PDL;
 
-use Test::Lib;
-
-use My::NestedClass;
-use My::Class;
-use My::Util;
-
-use PDL::Lite;
-
-use Hash::Wrap;
-
 use Scalar::Util qw[ refaddr ];
 
-my $pbase = PDL->sequence( 5 );
+our $pbase = PDL->sequence( 5 );
 
-sub test_obj {
+package Test {
 
-    My::NestedClass->new(
-        c1 => My::Class->new(
+    use Test2::V0;
+    use Role::Tiny::With;
+    use PDL::Lite;
 
-            p1 => $pbase +0,     # 0 1 2 3 4
-            p2 => $pbase + 1,    # 1 2 3 4 5
-        ),
-        c2 => My::Class->new(
-            p1 => $pbase + 3,    # 3 4 5 6 7
-            p2 => $pbase + 2,    # 2 3 4 5 6
-        ),
-    );
+    with 'My::Test::Role::Nested';
 
-}
+    sub test_obj {
+        my $class = shift;
 
-sub build_expected {
+        $class->nested_test_class_new(
+            c1 => $class->test_class_new(
 
-    my %data = @_;
+                p1 => $::pbase +0,     # 0 1 2 3 4
+                p2 => $::pbase + 1,    # 1 2 3 4 5
+            ),
+            c2 => $class->test_class_new(
+                p1 => $::pbase + 3,    # 3 4 5 6 7
+                p2 => $::pbase + 2,    # 2 3 4 5 6
+            ),
+        );
 
-    My::NestedClass->new(
-        c1 => My::Class->new(
-            p1 => PDL->new( $data{c1}{p1} ),
-            p2 => PDL->new( $data{c1}{p2} ),
-        ),
-        c2 => My::Class->new(
-            p1 => PDL->new( $data{c2}{p1} ),
-            p2 => PDL->new( $data{c2}{p2} ),
-        ),
-    );
+    }
 
 }
 
-sub test_inplace {
-
-    my ( $sub, $expected ) = @_;
-
-    my $context = context();
-
-    subtest 'inplace' => sub {
-
-        my $orig = test_obj;
-
-        my $new = $sub->( $orig->inplace );
-
-        for my $c ( 'c1', 'c2' ) {
-
-            subtest $c => sub {
-                test_inplace_flat_obj( $orig->$c, $new->$c, $expected->$c );
-            }
-        }
-
-    };
-
-    $context->release;
-}
-
-sub test_not_inplace {
-
-    my ( $sub, $expected ) = @_;
-
-    my $context = context();
-
-    subtest '! inplace' => sub {
-
-        my $orig = test_obj;
-
-        my %data;
-
-        for my $c ( 'c1', 'c2' ) {
-
-            my $pobj = $orig->$c;
-
-            my $expected = $expected->$c;
-            my $fp       = $data{$c} = {};
-
-            for my $p ( 'p1', 'p2' ) {
-                $fp->{$p} = wrap_hash( {
-                    refaddr => refaddr( $pobj->$p->get_dataref ),
-                    copy    => $pobj->$p->copy,
-                } );
-            }
-        }
-
-        my $new = $sub->( $orig );
-
-        for my $c ( 'c1', 'c2' ) {
-            subtest $c => sub {
-                test_not_inplace_flat_obj( $orig->$c, $new->$c,
-                    $expected->$c, %{ $data{$c} } );
-            };
-        }
-
-        $context->release;
-    };
-}
-
-sub test {
-    my $context = context();
-    my ( $label, $sub, %expected ) = @_;
-
-    my $expected = build_expected( %expected );
-
-
-    subtest $label => sub {
-        test_inplace( $sub, $expected );
-        test_not_inplace( $sub, $expected );
-    };
-
-    $context->release;
-}
-
-test(
+Test->test(
     "where",
     sub {
         $_[0]->where( $pbase % 2 );
@@ -144,7 +50,7 @@ test(
     },
 );
 
-test(
+Test->test(
     "index",
     sub { $_[0]->index( PDL->new( 0, 1, 3 ) ) },
     c1 => {
@@ -159,7 +65,7 @@ test(
 
 
 subtest 'at' => sub {
-    my $orig = test_obj;
+    my $orig = Test->test_obj;
     my $at   = $orig->at( 3 );
 
     subtest 'c1' => sub {
@@ -176,7 +82,7 @@ subtest 'at' => sub {
 
 subtest 'copy' => sub {
 
-    my $orig = test_obj;
+    my $orig = Test->test_obj;
 
     my $new = $orig->copy;
 
@@ -211,7 +117,7 @@ subtest 'copy' => sub {
 
 subtest 'sever' => sub {
 
-    my $orig = test_obj;
+    my $orig = Test->test_obj;
 
     my $new = $orig->index( PDL->new( 0, 1, 3 ) );
 
@@ -248,7 +154,7 @@ subtest 'sever' => sub {
                     subtest $p => sub {
 
                         $new->$c->$p->set( 0, 24 );
-                        is( $new->$c->$p->at( 0 ), 24, 'new set works' );
+                        is( $new->$c->$p->at( 0 ),  24, 'new set works' );
                         is( $orig->$c->$p->at( 0 ), 22, 'original unchanged' );
                     };
                 }

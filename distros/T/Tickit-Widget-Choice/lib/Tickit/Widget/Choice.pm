@@ -4,9 +4,9 @@
 #  (C) Paul Evans, 2014-2020 -- leonerd@leonerd.org.uk
 
 use 5.026; # signatures
-use Object::Pad 0.27;
+use Object::Pad 0.41;
 
-package Tickit::Widget::Choice 0.04;
+package Tickit::Widget::Choice 0.05;
 class Tickit::Widget::Choice
    extends Tickit::Widget;
 
@@ -77,15 +77,13 @@ event handler.
 =cut
 
 has @_choices;
-has $_on_changed;
+has $_on_changed :param = undef;
 
 has $_chosen;
 
 BUILD ( %params )
 {
    $self->push_choice( @$_ ) for @{ $params{choices} || [] };
-
-   $self->set_on_changed( $params{on_changed} ) if $params{on_changed};
 }
 
 method lines () { 1 }

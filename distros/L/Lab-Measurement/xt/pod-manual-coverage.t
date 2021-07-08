@@ -15,7 +15,7 @@ my @module_links = $manual =~ /L<(Lab::.*?)>/g;
 
 # Create lookup table
 my %module_links = map { $_ => 1 } @module_links;
-print Dumper \%module_links;
+# print Dumper \%module_links;
 my @source_files;
 
 find(

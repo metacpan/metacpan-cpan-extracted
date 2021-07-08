@@ -2,34 +2,59 @@ MODE: INLINE
 #include "util.h"
 using namespace xs::xlog;
 
-struct PerlObjectFormatter : IFormatter, Backref {
-    string format (std::string& msg, const Info& i) const override {
-        if (!is_perl_thread()) throw std::logic_error("can't call pure-perl formatting callback: log() called from perl-foreign thread");
-        Object o = xs::out(this);
-        auto ret = o.call("format", xs::out(msg), xs::out(i.level), xs::out(i.module->name()), xs::out(i.file), xs::out(i.line), xs::out(i.func));
-        return xs::in<string>(ret);
-    }
-    
-    ~PerlObjectFormatter () { Backref::dtor(); }
-};
+namespace {
+    static bool no_format_warnings;
 
-struct PerlObjectLogger : ILogger, Backref {
-    void log_format (std::string& msg, const Info& i, const IFormatter& fmt) override {
-        if (!is_perl_thread()) throw std::logic_error("can't call pure-perl logging callback: log() called from perl-foreign thread");
-        Object o = xs::out(this);
-        auto sub = o.method("log_format");
-        if (!sub) return ILogger::log_format(msg, i, fmt);
-        sub.call(o.ref(), xs::out(msg), xs::out(i.level), xs::out(i.module->name()), xs::out(i.file), xs::out(i.line), xs::out(i.func), xs::out(&fmt));
-    }
+    struct PerlObjectFormatter : IFormatter, Backref {
+        string format (std::string& msg, const Info& i) const override {
+            if (!is_perl_thread()) throw std::logic_error("can't call pure-perl formatting callback: log() called from perl-foreign thread");
+            Object o = xs::out(this);
+            auto ret = o.call("format", xs::out(msg), xs::out(i.level), xs::out(i.module->name()), xs::out(i.file), xs::out(i.line), xs::out(i.func));
+            return xs::in<string>(ret);
+        }
+        
+        ~PerlObjectFormatter () { Backref::dtor(); }
+    };
     
-    void log (const string& msg, const Info& info) override {
-        if (!is_perl_thread()) throw std::logic_error("can't call pure-perl logging callback: log() called from perl-foreign thread");
-        Object o = xs::out(this);
-        o.call("log", xs::out(msg), xs::out(info.level));
-    }
+    struct PerlObjectLogger : ILogger, Backref {
+        void log_format (std::string& msg, const Info& i, const IFormatter& fmt) override {
+            if (!is_perl_thread()) throw std::logic_error("can't call pure-perl logging callback: log() called from perl-foreign thread");
+            Object o = xs::out(this);
+            auto sub = o.method("log_format");
+            if (!sub) return ILogger::log_format(msg, i, fmt);
+            sub.call(o.ref(), xs::out(msg), xs::out(i.level), xs::out(i.module->name()), xs::out(i.file), xs::out(i.line), xs::out(i.func), xs::out(&fmt));
+        }
+        
+        void log (const string& msg, const Info& info) override {
+            if (!is_perl_thread()) throw std::logic_error("can't call pure-perl logging callback: log() called from perl-foreign thread");
+            Object o = xs::out(this);
+            o.call("log", xs::out(msg), xs::out(info.level));
+        }
+        
+        ~PerlObjectLogger () { Backref::dtor(); }
+    };
     
-    ~PerlObjectLogger () { Backref::dtor(); }
-};
+    struct NoWarningsGuard {
+        NoWarningsGuard (bool enabled) : _enabled(enabled), _cop_warnings(), _dowarn() {
+            if (!_enabled) return;
+            _cop_warnings = PL_curcop->cop_warnings;
+            _dowarn       = PL_dowarn;
+            PL_curcop->cop_warnings = pWARN_STD;
+            PL_dowarn &= ~G_WARN_ON;
+        }
+        
+        ~NoWarningsGuard () {
+            if (!_enabled) return;
+            PL_curcop->cop_warnings = _cop_warnings;
+            PL_dowarn               = _dowarn;
+        }
+        
+    private:
+        bool                              _enabled;
+        decltype(PL_curcop->cop_warnings) _cop_warnings;
+        U8                                _dowarn;
+    };
+}
 
 namespace xs {
     template <class TYPE> struct Typemap<PerlObjectLogger*, TYPE> : Typemap<ILogger*, TYPE> {};
@@ -64,14 +89,18 @@ static inline CodePoint make_code_point () {
 
 static inline Sv format_args (SV** args, int items) {
     if (!items) return Simple(default_message);
+    
     if (items == 1) {
         Sv arg(args[0]);
         if (arg.is_simple()) { return arg; }
         else                 { return Simple(SvPV_nolen(args[0]));  }
     }
+    
+    NoWarningsGuard g(no_format_warnings); (void)g;
+    
     STRLEN patlen;
     auto pat = SvPV(args[0], patlen);
-    auto ret = Simple::create(patlen * 1.5);
+    Sv ret = Simple::create(patlen * 1.5);
     bool stub = false;
     sv_vcatpvfn(ret, pat, patlen, nullptr, args + 1, items - 1, &stub);
     return ret;
@@ -165,8 +194,12 @@ void log (Level level, ...) {
     if (!(PL_op->op_spare & 1)) xlog::optimize();
 }
 
-Module* resolve_module(size_t depth = 0) {
+Module* resolve_module (size_t depth = 0) {
     RETVAL = resolve_module(depth);
+}
+
+void disable_format_warnings () : ALIAS(enable_format_warnings=1) {
+    no_format_warnings = !ix;
 }
 
 void __logXXX (...) : ALIAS(verbose_debug=0, debug=1, info=2, notice=3, warning=4, error=5, critical=6, alert=7, emergency=8) {

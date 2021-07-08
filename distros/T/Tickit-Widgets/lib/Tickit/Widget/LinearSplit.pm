@@ -1,11 +1,11 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2013-2020 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2013-2021 -- leonerd@leonerd.org.uk
 
 use Object::Pad 0.09;
 
-package Tickit::Widget::LinearSplit 0.31;
+package Tickit::Widget::LinearSplit 0.32;
 class Tickit::Widget::LinearSplit
    extends Tickit::ContainerWidget;
 
@@ -14,13 +14,11 @@ use Tickit::Window 0.32; # needs drag_start
 use Carp;
 
 has $_split_fraction = 0.5;
-has $_A_child;
-has $_B_child;
+has $_A_child :reader;
+has $_B_child :reader;
 
 has $_split_at;  method _split_at  { $_split_at }
 has $_split_len; method _split_len { $_split_len }
-
-method A_child { $_A_child }
 
 method set_A_child
 {
@@ -29,8 +27,6 @@ method set_A_child
    $self->add( $_A_child = $child );
    return $self;
 }
-
-method B_child { $_B_child }
 
 method set_B_child
 {

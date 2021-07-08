@@ -22,6 +22,7 @@ lib/App/Greple/find.pm
 lib/App/Greple/line.pm
 lib/App/Greple/perl.pm
 lib/App/Greple/pgp.pm
+lib/App/Greple/select.pm
 minil.toml
 script/greple
 t/00_load.t
@@ -34,7 +35,8 @@ t/08_region.t
 t/09_filter.t
 t/10_select.t
 t/11_block.t
-t/12_persist.t
+t/12_error.t
+t/13_max.t
 t/Checker.pm
 t/JA.txt
 t/Runner.pm
@@ -44,5 +46,7 @@ t/line/00_load.t
 t/line/02_search.t
 t/pod-coverage.t
 t/pod.t
+t/select/00_load.t
+t/select/01_select.t
 META.yml
 MANIFEST

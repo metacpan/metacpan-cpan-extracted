@@ -23,7 +23,8 @@ WriteMakefile(
     'XML::LibXML' => 0,
     'File::Slurper' => 0,
     'File::ShareDir' => 0,
-    'Cpanel::JSON::XS' => 0,
+    'Mojo::JSON' => 0,
+    'Encode::Locale' => 0,
     'DateTime' => 0,
     'DateTime::Format::Mail' => 0,
     'DateTime::Format::ISO8601' => 0,
@@ -56,6 +57,7 @@ sub postamble {
   push @ret, <<'EOT';
 README.md: script/jupiter
 	pod2markdown $< $@
+	grep -L ERROR $@
 EOT
   return join "\n", @ret;
 }

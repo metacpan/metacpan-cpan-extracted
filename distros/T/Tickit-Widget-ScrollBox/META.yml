@@ -16,12 +16,12 @@ name: Tickit-Widget-ScrollBox
 provides:
   Tickit::Widget::ScrollBox:
     file: lib/Tickit/Widget/ScrollBox.pm
-    version: '0.09'
+    version: '0.10'
   Tickit::Widget::ScrollBox::Extent:
     file: lib/Tickit/Widget/ScrollBox/Extent.pm
-    version: '0.09'
+    version: '0.10'
 requires:
-  Object::Pad: '0.27'
+  Object::Pad: '0.41'
   Tickit::SingleChildWidget: '0.53'
   Tickit::Style: '0.35'
   Tickit::Window: '0.39'
@@ -29,5 +29,5 @@ requires:
 resources:
   IRC: irc://irc.freenode.net/#tickit
   license: http://dev.perl.org/licenses/
-version: '0.09'
+version: '0.10'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

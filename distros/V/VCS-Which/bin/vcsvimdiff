@@ -20,7 +20,7 @@ use IO::Prompt qw/prompt/;
 use Path::Tiny;
 use File::Copy qw/copy/;
 
-our $VERSION = version->new('0.6.8');
+our $VERSION = version->new('0.6.9');
 my ($name)   = $PROGRAM_NAME =~ m{^.*/(.*?)$}mxs;
 
 my %option = (
@@ -245,6 +245,8 @@ sub merge {
         if ( $ans eq 'y' ) {
             system 'git', 'add', $file;
         }
+
+        system 'git', 'status';
     }
 
     return;
@@ -367,7 +369,7 @@ vcsvimdiff - Uses vimdiff to compare a file with it unmodified version or histor
 
 =head1 VERSION
 
-This documentation refers to vcsvimdiff version 0.6.8.
+This documentation refers to vcsvimdiff version 0.6.9.
 
 =head1 SYNOPSIS
 
@@ -384,6 +386,7 @@ This documentation refers to vcsvimdiff version 0.6.8.
                 one revision specified.
   -a --all      If the file_or_dir is a directory this will run vcsvimdiff for
                 each file git has a log for.
+  -A --add      When used with --merge will add the file once you exit vimdiff.
   -c --change=int
                 Specify changes from a specific revision (see vcs help diff)
   -R --replay   Replay the revision history of "file", --verbose shows the
@@ -399,6 +402,7 @@ This documentation refers to vcsvimdiff version 0.6.8.
                 the either the last looked revision or the file on disk
   -C --changed-only
                 Don't run vimdiff unless the files actually differ
+  -n --readonly Open vim in readonly mode
   -t --test     Turn on testing (vimdiff wont actually be run)
      --no-test  Trurn off testing
   -d --diff=str Allows you to specify a diffing program (Default vimdiff)

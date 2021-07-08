@@ -3,7 +3,7 @@ package Beekeeper::Service::Supervisor;
 use strict;
 use warnings;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 use Beekeeper::Client;
 
@@ -93,28 +93,77 @@ __END__
 
 =head1 NAME
 
-Beekeeper::Service::Supervisor - Worker pool supervisor.
+Beekeeper::Service::Supervisor - Worker pool supervisor
 
 =head1 VERSION
 
-Version 0.06
+Version 0.07
 
 =head1 SYNOPSIS
 
 =head1 DESCRIPTION
 
-Supervisor service keeps a table of the status and performance metrics of every 
-worker connected to a logical bus.
+A Supervisor worker is created automatically in every worker pool.
 
-The command line tool L<bkpr-top> displays the contents of this status table.
+It keeps a shared table of the performance metrics of every worker connected to
+every broker, and routinely measures the CPU and memory usage of local workers.
 
-This module provides methods C<get_services_status> and C<get_workers_status> to
-query the table, allowing for example to shovel services status to an external 
-monitoring application.
+These metrics can be queried using the methods provided by this module or using
+the command line client L<bkpr-top>.
+
+=head3 Reported performance metrics
+
+=over
+
+=item nps
+
+Number of received notifications per second.
+
+=item cps
+
+Number of processed calls per second.
+
+=item err
+
+Number of errors per second generated while handling calls or notifications.
+
+=item mem
+
+Resident non shared memory size in KiB. This is roughly equivalent to the value
+of C<RES> minus C<SHR> displayed by C<top>.
+
+=item cpu
+
+Percentage of CPU load (100 indicates a full utilization of one core thread).
+
+=item load
+
+Percentage of busy time (100 indicates no idle time).
+
+Note that workers can have a high load with very little CPU usage when being
+blocked by synchronous operations (like slow SQL queries, for example).
+
+Due to inaccuracies of measurement the actual maximum may be slightly below 100.
+
+=back
+
+=head1 METHODS
+
+=head3 get_services_status ( %filters )
+
+Returns the aggregate performance metrics of all active services.
+
+Services can be filtered by C<host>, C<pool> and  C<class>.
+
+=head3 get_workers_status ( %filters )
+
+Returns the individual performance metrics of every worker of all active services.
+
+Services can be filtered by C<host>, C<pool> and  C<class>.
 
 =head1 SEE ALSO
  
-L<bkpr-top>, L<bkpr-restart>.
+L<bkpr-top>, L<bkpr-restart>, L<Beekeeper::Service::Supervisor::Worker>.
 
 =head1 AUTHOR
 

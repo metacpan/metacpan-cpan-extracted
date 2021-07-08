@@ -2,7 +2,7 @@ NAME
     XML::Sig
 
 VERSION
-    version 0.50
+    version 0.51
 
 SYNOPSIS
        my $xml = '<foo ID="abc">123</foo>';

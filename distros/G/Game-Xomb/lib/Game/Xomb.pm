@@ -5,14 +5,13 @@
 
 package Game::Xomb;
 
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 
 use 5.24.0;
 use warnings;
 use List::Util qw(min max);
 use List::UtilsBy qw(min_by nsort_by);
 use POSIX qw(STDIN_FILENO TCIFLUSH tcflush);
-use Scalar::Util qw(weaken);
 use Term::ReadKey qw(GetTerminalSize ReadKey ReadMode);
 use Time::HiRes qw(sleep);
 require XSLoader;
@@ -25,7 +24,7 @@ XSLoader::load('Game::Xomb', $VERSION);    # distance, line drawing, RNG
 sub NEED_ROWS () { 24 }
 sub NEED_COLS () { 80 }
 
-# ANSI or XTerm control sequences - http://invisible-island.net/xterm/
+# ANSI or XTerm Control Sequences - https://invisible-island.net/xterm/
 sub ALT_SCREEN ()   { "\e[?1049h" }
 sub CLEAR_LINE ()   { "\e[2K" }
 sub CLEAR_RIGHT ()  { "\e[K" }
@@ -164,7 +163,7 @@ our %Warned_About;          # limit annoying messages
 our %Damage_From = (
     acidburn => sub {
         my ($src, $duration) = @_;
-        my $max    = int($duration / 2);
+        my $max    = $duration >> 1;
         my $damage = 0;
         for (1 .. $duration) {
             $damage += coinflip();
@@ -375,12 +374,13 @@ sub apply_damage {
         if ($ani->[SPECIES] == HERO) {
             $ani->[DISPLAY] = '&';                 # the @ got unravelled
             $ani->[UPDATE]  = \&update_gameover;
+            log_message('Shield module failure.') unless $Warned_About{shieldfail}++;
         } else {
             log_message($Descript{ $ani->[SPECIES] }
                   . ' destroyed by '
                   . $Descript{ $rest[0]->[SPECIES] });
             if ($ani->[SPECIES] == FUNGI and $ani->[LMC][MINERAL] != GATE and onein(20)) {
-                reify($ani->[LMC], MINERAL,
+                reify($ani->[LMC],
                     passive_msg_maker('Broken rainbow conduits jut up from the regolith.'));
             }
             $ani->[BLACK_SPOT] = 1;
@@ -444,9 +444,7 @@ sub display_cellobjs {
 sub display_hitpoints {
     my $hp = $Animates[HERO][STASH][HITPOINTS];
     $hp = 0 if $hp < 0;
-    log_message('Shield module failure.')
-      if $hp == 0 and !$Warned_About{shieldfail}++;
-    my $ticks = int $hp / 2;
+    my $ticks = $hp >> 1;
     my $hpbar = '=' x $ticks;
     $hpbar .= '-' if $hp & 1;
     my $len = length $hpbar;
@@ -479,8 +477,9 @@ sub does_hit {
 
 sub fisher_yates_shuffle {
     my ($array) = @_;
-    my $i;
-    for ($i = @$array; --$i;) {
+    my $i = @$array;
+    return if $i < 2;
+    while (--$i) {
         my $j = irand($i + 1);
         next if $i == $j;
         @$array[ $i, $j ] = @$array[ $j, $i ];
@@ -516,7 +515,7 @@ sub game_loop {
         # simultaneous move shuffle, all movers "get a go" though there
         # can be edge cases related to LOS and wall destruction and who
         # goes when
-        fisher_yates_shuffle(\@movers) if @movers > 1;
+        fisher_yates_shuffle(\@movers);
 
         my $new_level = 0;
         for my $ani (@movers) {
@@ -534,7 +533,7 @@ sub game_loop {
             # NOTE other half of this is applied in the Bump-into-HOLE
             # logic, elsewhere. this last half happens here as the new
             # level is not yet available prior to the fall
-            apply_passives($Animates[HERO], $Animates[HERO][STASH][ECOST] / 2, 1);
+            apply_passives($Animates[HERO], $Animates[HERO][STASH][ECOST] >> 1, 1);
             show_status_bar();
             log_message('Proximal ' . AMULET_NAME . ' readings detected.') if $ammie;
             next GLOOP;
@@ -582,7 +581,7 @@ sub generate_map {
     for my $floor (RUBBLE, ACID, HOLE, WALL) {
         my $want = $Level_Features[$findex]{$floor} // 0;
         # ... and a few more than called for, for variety
-        $want += irand(2 + $want / 2) if $want > 0;
+        $want += irand(2 + ($want >> 1)) if $want > 0;
         while ($want > 0) {
             my $goal = max($want, min(20, int($want / 10)));
             my $seed = extract(\@seeds);
@@ -644,7 +643,7 @@ sub generate_map {
     ($col, $row) = extract(\@seeds)->@[ PCOL, PROW ];
     $LMap[$row][$col][MINERAL] = $Thingy{ onein(100) ? RUBBLE : FLOOR };
     if (onein(4)) {
-        reify($LMap[$row][$col], MINERAL,
+        reify($LMap[$row][$col],
             passive_msg_maker("Something was written here, but you can't make it out.", 1));
     }
     pathable($col, $row, $herop, @goodp);
@@ -938,7 +937,6 @@ sub make_player {
     my $row = irand(MAP_ROWS);
     $LMap[$row][$col][ANIMAL] = $hero;
     $hero->[LMC] = $LMap[$row][$col];
-    weaken $hero->[LMC];
 
     $Animates[HERO] = $hero;
 
@@ -1069,7 +1067,7 @@ sub move_animate {
         return MOVE_FAILED, 0
           if nope_regarding('Falling may cause damage', undef,
             'You decide against it.');
-        apply_passives($ani, $cost / 2, 0);
+        apply_passives($ani, $cost >> 1, 0);
         log_message('You plunge down into the crevasse.');
         relocate($ani, $dcol, $drow);
         pkc_log_code('0099');
@@ -1079,9 +1077,9 @@ sub move_animate {
         apply_damage($ani, 'falling', $src);
         return MOVE_LVLDOWN, $cost;
     } else {
-        apply_passives($ani, $cost / 2, 0);
+        apply_passives($ani, $cost >> 1, 0);
         relocate($ani, $dcol, $drow);
-        apply_passives($ani, $cost / 2, 1);
+        apply_passives($ani, $cost >> 1, 1);
         return MOVE_OKAY, $cost;
     }
 }
@@ -1378,7 +1376,6 @@ sub place_monster {
 
     $LMap[$row][$col][ANIMAL] = $monst;
     $monst->[LMC] = $LMap[$row][$col];
-    weaken $monst->[LMC];
 
     push @Animates, $monst;
 
@@ -1531,9 +1528,9 @@ sub refresh_board {
 
 # similar to tu'a in Lojban
 sub reify {
-    my ($lmc, $i, $update) = @_;
-    $lmc->[$i] = [ $lmc->[$i]->@* ];
-    $lmc->[$i][UPDATE] = $update if defined $update;
+    my ($lmc, $update) = @_;
+    $lmc->[MINERAL] = [ $lmc->[MINERAL]->@* ];
+    $lmc->[MINERAL][UPDATE] = $update if defined $update;
 }
 
 sub relocate {
@@ -1547,7 +1544,6 @@ sub relocate {
     undef $LMap[ $src->[PROW] ][ $src->[PCOL] ][ANIMAL];
 
     $ani->[LMC] = $dest_lmc;
-    weaken $ani->[LMC];
 
     my $cell = $lmc->[VEGGIE] // $lmc->[MINERAL];
     print at(map { MAP_DOFF + $_ } $src->@[ PCOL, PROW ]), $cell->[DISPLAY],
@@ -1603,7 +1599,7 @@ sub rubble_delay {
             $Violent_Sleep_Of_Reason = 1;
             log_message('Slow progress!');
         }
-        return int($cost / 2) + 2 + irand(4);
+        return ($cost >> 1) + 2 + irand(4);
     } else {
         return 2 + irand(4);
     }
@@ -2096,6 +2092,460 @@ documentation details other useful game information; it should be
 available once the module is installed via:
 
     perldoc xomb
+
+The remainder of this documentation concerns internal details likely
+only of interest to someone who wants to modify the source code.
+
+=head1 DESCRIPTION
+
+The game is data oriented in design; adding a new floor tile would
+require a new C<SPECIES> constant, suitable entries in C<%Thingy>,
+C<%Descript>, and C<@Level_Features>, and then any additional code for
+passive effects or whatever. Various routines may need adjustment for a
+new floor type as there is not a good component system to indicate
+whether a floor tile is solid, dangerous, etc. A new monster would
+require similar additions, and would need a custom B<update_*> function
+for when that critter has an action to make.
+
+Only the player can move, so much of the code assumes that. New player
+actions would need to be added to C<%Key_Commands> and suitable code
+added to carry out the new action.
+
+All entropy comes from the JSF random number generator (see
+C<src/jsf.c>). The perl built-in C<rand> function MUST NOT be used;
+instead use B<irand>, B<roll>, or one of the other utility functions
+that call into the JSF code.
+
+There are tests for some of the code, see the C<t> directory in the
+module's distribution.
+
+=head1 FUNCTIONS
+
+=over 4
+
+=item B<abort_run>
+
+Called by the movement code to determine whether the run should be
+aborted, e.g. before the player steps to a pool of acid. C<$Sticky>
+indicates whether a run is in progress, and runs are caused by the
+B<move_player_runner> or B<move_player_snooze> functions, see
+C<%Key_Commands>.
+
+=item B<apply_damage>
+
+Removes hitpoints from the given animate, with complications to report
+the damage and to mark the game as over (for the player) or otherwise
+the monster as dead. Calls over to C<%Damage_From> table entries which
+return the damage as appropriate for the arguments.
+
+=item B<at> B<at_col> B<at_row>
+
+These routines move the cursor around the terminal. B<at> takes
+arguments in col,row (x,y) form.
+
+=item B<apply_passives>
+
+Floor tiles can have passive effects that can vary depending on the
+duration the player is within the cell, or could be a message to the
+player. See B<passive_burn>, B<passive_msg_maker>.
+
+=item B<await_quit>
+
+Waits for the player to quit usually from a submenu. C<$RKFN> holds the
+function that read keys; these could either come from C<STDIN> or from a
+save game file.
+
+=item B<bad_terminal>
+
+Indicates whether a terminal exists and is of suitable dimensions.
+
+=item B<bail_out>
+
+Called when something goes horribly wrong, usually on fatal signal or
+internal error.
+
+=item B<between>
+
+Like C<clamp> from the Common LISP Alexandria library.
+
+=item B<bypair> I<callback> I<list ...>
+
+Calls the I<callback> function with pairs of items from the given
+list of items.
+
+=item B<coinflip>
+
+Returns C<0> or C<1>. Uses the JSF random number generator (see
+C<src/jsf.c>).
+
+=item B<display_cellobjs>
+
+Returns a string usually shown in the status bar consisting of the
+C<VEGGIE> (item, if any) and C<MINERAL> (floor tile) of the cell the
+player is in.
+
+=item B<display_hitpoints>
+
+Returns a string that prints the player's shield points in the status bar.
+
+=item B<display_shieldup>
+
+Returns a string that prints whether and if so what C<VEGGIE> is being
+used to regenerate the shield.
+
+=item B<distance>
+
+Pythagorean distance between two cells, with rounding. Will differ in
+some cases from the Chebyshev distance that the B<linecb> and B<walkcb>
+line functions use for an iterations count.
+
+=item B<does_hit>
+
+Whether or not the given weapon hits at the given B<distance>, and
+what the cost of that move was. The cost will be higher if the target
+is out of range so that the animate will not wake up until the player
+can be in range.
+
+=item B<extract>
+
+Removes a random element from the given array reference and returns it.
+Uses the JSF random number generator (see C<src/jsf.c>).
+
+Note that the original order of the array reference will not be
+preserved. If that order is important, do not use this call. Order
+preserving extraction can be done with:
+
+  ... = splice @array, irand(scalar @array), 1;
+
+=item B<fisher_yates_shuffle>
+
+Shuffles an array reference in place. Uses the JSF random number
+generator (see C<src/jsf.c>).
+
+=item B<game_loop>
+
+Entry point to the game, see C<bin/xomb> for how this gets called and
+what needs to be setup before that. Loops using a simple integer
+based energy system over active animates and calls the update
+function for each on that gets a go, plus some complications to
+change the level, etc.
+
+=item B<game_over>
+
+Called when the game needs to exit for various reasons mostly unrelated
+to gameplay (terminal size too small, fatal signal).
+
+=item B<generate_map>
+
+Generates a level map around where the player is. Various knobs can be
+found in C<@Level_Features>.
+
+=item B<getkey>
+
+Reads a key from the terminal until one in the hash of valid choices
+is entered. See also C<$RKFN>.
+
+=item B<has_amulet>
+
+Whether the player is carrying (or has equiped) the Amulet.
+
+=item B<has_lost>
+
+Exits game with death screen and score.
+
+=item B<has_won>
+
+Exits game with win screen and score. Should be the only C<0> exit
+status of the game.
+
+=item B<help_screen>
+
+In game information on keyboard command available
+
+=item B<init_jsf>
+
+Sets the seed for the JSF random number generator (see C<src/jsf.c>).
+
+=item B<init_map>
+
+Initial setup of the C<@LMap>. This is in row,col form though points use
+the col,row form. Each cell (C<LMC>) has C<WHERE>, C<MINERAL>,
+C<VEGGIE>, and C<ANIMAL> slots that contain a col,row point for the
+cell, the floor tile, item (if any), and animate (if any).
+
+=item B<irand> I<max>
+
+Integer random value between C<0> and C<max - 1>. Uses the JSF random
+number generator (see C<src/jsf.c>).
+
+=item B<linecb> I<callback> I<x0> I<y0> I<x1> I<y1>
+
+Bresenham line function with some features to keep it from going off of
+the map and to skip the first point and to abort should the callback
+return C<-1>.
+
+=item B<log_dim>
+
+Used to bold -> normal -> faint cycle log the most recent message (shown
+at the top of the screen) depending on the age of the message.
+
+=item B<log_message>
+
+Adds a message to the log and displays it at the top of the screen.
+
+=item B<loot_value>
+
+Returns the value of the loot the player is carrying.
+
+=item B<make_amulet>
+
+Creates the amulet and returns it.
+
+=item B<make_gem>
+
+Creates a gem and returns it.
+
+=item B<make_monster>
+
+Creates a monster and returns it. Suitable parameters must be supplied.
+
+=item B<make_player>
+
+Creates the player, places them into the C<HERO> slot of the
+C<@Animates> array, and returns the col,row starting position of the
+player. B<generate_map> builds the level map around this position.
+
+=item B<manage_inventory>
+
+A far too complicated routine to inspect, drop, or equip items in the
+inventory list.
+
+=item B<move_animate>
+
+Moves the player around the level map, with various game related
+complications. See C<%Key_Commands> and B<move_player_maker>.
+
+=item B<move_drop>
+
+Drops an item from the inventory.
+
+=item B<move_equip>
+
+Equips an item from the inventory.
+
+=item B<move_examine>
+
+Lets the player move the cursor around the level map to inspect
+various features.
+
+=item B<move_gate_down>
+
+For when the player climbs down the "stairs".
+
+=item B<move_gate_up>
+
+For when the player tries to climb up the "stairs".
+
+=item B<move_nop>
+
+For when the player rests for a turn.
+
+=item B<move_pickup>
+
+Picks an item (if any) up off of the level map.
+
+=item B<move_player_maker>
+
+Creates a function suitable for moving the player in a particular
+direction. See C<%Key_Commands>.
+
+=item B<move_player_runner>
+
+Creates a function suitable for running the player in a particular
+direction.
+
+=item B<move_player_snooze>
+
+Creates a function suitable for resting with over multiple turns.
+
+=item B<move_quit>
+
+Prompts whether they want to quit the game.
+
+=item B<move_remove>
+
+Unequips an item (if any).
+
+=item B<nope_regarding>
+
+Query the player whether they want to carry out some dangerous move.
+
+=item B<onein> I<max>
+
+Returns true if the RNG rolls C<0> within I<max>. Uses the JSF random
+number generator (see C<src/jsf.c>).
+
+=item B<passive_burn>
+
+Apply acid damage because the player is in a pool of acid.
+
+=item B<passive_msg_maker>
+
+Returns a subroutine that issues a message when a cell is entered into.
+The cell should probably be made unique with B<reify> first as otherwise
+all floor tiles of that type will share the same update routine.
+
+=item B<pathable> I<col> I<row> I<points ...>
+
+Ensures that a path exists between the given coordinates and the given
+list of points; used by B<generate_map> to ensure that the player can
+reach all the gates and gems.
+
+=item B<pick>
+
+Picks a random item from the given array reference. Uses the JSF random
+number generator (see C<src/jsf.c>).
+
+=item B<pkc_clear>
+
+Clears the PKC error code from the status bar.
+
+=item B<pkc_log_code>
+
+Prints a PKC error code in the status bar.
+
+=item B<place_floortype>
+
+Used by B<generate_map> to place floor tiles somewhat randomly (brown
+noise) around the level map, as controlled by C<@Level_Features> counts.
+
+=item B<place_monster>
+
+Creates and places a monster onto the level map, and that the monster
+has not been placed above a hole or in acid.
+
+=item B<plasma_annihilator>
+
+Displays and applies splash damage from Fungi attacks.
+
+=item B<raycast_fov>
+
+Calculates the FOV for the player and updates various related variables
+such as what monsters are visible.
+
+=item B<reduce>
+
+Reduces a map cell floor tile to C<RUBBLE>. Some monsters can
+destroy walls.
+
+=item B<refresh_board>
+
+Redraw the level map, status bar, and previous message if any.
+
+=item B<reify>
+
+Marks a particular level map item (C<MINERAL>, typically) as unique,
+usually so that a B<passive_msg_maker> can be applied to it.
+
+=item B<relocate>
+
+Handles moving the player from one level map cell to another.
+
+=item B<replay>
+
+Replays commands from a save game file. See also C<$RKFN>.
+
+=item B<report_position>
+
+Logs a message showing where the player is on the level map.
+
+=item B<report_version>
+
+Logs a message with the game version, seed, and current turn number.
+
+=item B<restore_term>
+
+Gets the terminal out of raw mode and more back to normal.
+
+=item B<roll> I<times> I<sides>
+
+Dice rolling, so C<3d6> would be C<roll(3,6)>. Uses the JSF random
+number generator (see C<src/jsf.c>).
+
+=item B<rubble_delay>
+
+Slow the player down when they move in (or into, or out of) rubble.
+
+=item B<sb_update_energy>
+
+Update the energy cost of the last move.
+
+=item B<score>
+
+Returns a string with the game score in it.
+
+=item B<show_messages>
+
+Show all the recent messages in the message log.
+
+=item B<show_status_bar>
+
+Prints the status bar at the bottom of the screen.
+
+=item B<show_top_message>
+
+Prints the most recent log message at the top of the screen.
+
+=item B<update_fungi>
+
+C<UPDATE> function for fungi.
+
+=item B<update_gameover>
+
+Custom C<UPDATE> function for when the player is dead.
+
+=item B<update_ghast>
+
+C<UPDATE> function for ghast.
+
+=item B<update_mimic>
+
+C<UPDATE> function for mimics.
+
+=item B<update_player>
+
+C<UPDATE> function for the player. Failed moves (zero-cost things) are
+looped over until a move that costs energy is made. Input comes from the
+C<$RKFN> which is usually a function that reads from standard input.
+
+=item B<update_stalker>
+
+C<UPDATE> function for stalkers.
+
+=item B<update_troll>
+
+C<UPDATE> function for trolls.
+
+=item B<use_item>
+
+Uses an item, possibly swapping it with some existing item.
+
+=item B<veggie_name>
+
+Returns a string with the name and value of a vegetable (a gem, or
+the amulet).
+
+=item B<walkcb>
+
+Like B<linecb> but continues until the edge of the level map or until
+the callback function returns C<-1>.
+
+=item B<with_adjacent> I<col> I<row> I<callback>
+
+Runs the I<callback> function for each cell adjacent to the given
+coordinates that is within the level map.
+
+=back
 
 =head1 BUGS
 

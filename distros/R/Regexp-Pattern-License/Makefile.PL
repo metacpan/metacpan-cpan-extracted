@@ -18,29 +18,21 @@ my $meta = {
   "no_index"         => { directory => ["eg", "examples", "inc", "t", "xt"] },
   "prereqs"          => {
                           configure => { requires => { "ExtUtils::MakeMaker" => 6.17 } },
-                          runtime => {
-                            requires => {
-                              "List::Util" => 1.45,
-                              "perl" => 5,
-                              "re::engine::RE2" => 0,
-                              "strictures" => 2,
-                            },
-                          },
+                          runtime => { requires => { "perl" => 5, "re::engine::RE2" => 0 } },
                           test => {
                             requires => {
                               "Regexp::Pattern"       => 0,
+                              "Test2::V0"             => 0,
                               "Test::Builder::Module" => 0,
-                              "Test::Exception"       => 0,
                               "Test::More"            => 0.98,
                               "Test::Regexp::Pattern" => 0.003,
-                              "Test::Requires"        => 0,
                               "Try::Tiny"             => 0,
                             },
                           },
                         },
   "provides"         => {
-                          "Regexp::Pattern::License"        => { file => "lib/Regexp/Pattern/License.pm", version => "v3.5.1" },
-                          "Regexp::Pattern::License::Parts" => { file => "lib/Regexp/Pattern/License/Parts.pm", version => "v3.5.1" },
+                          "Regexp::Pattern::License"        => { file => "lib/Regexp/Pattern/License.pm", version => "v3.6.1" },
+                          "Regexp::Pattern::License::Parts" => { file => "lib/Regexp/Pattern/License/Parts.pm", version => "v3.6.1" },
                         },
   "release_status"   => "stable",
   "resources"        => {
@@ -53,8 +45,8 @@ my $meta = {
                                           },
                           x_identifier => "http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/project",
                         },
-  "version"          => "v3.5.1",
-  "x_help_wanted"    => ["documenter", "tester"],
+  "version"          => "v3.6.1",
+  "x_help_wanted"    => ["tester", "documenter"],
   "x_static_install" => 1,
 };
 

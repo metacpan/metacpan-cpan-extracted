@@ -52,7 +52,7 @@ use 5.010001;
 use strict;
 use warnings;
 
-our $VERSION = '1.13.3'; # VERSION
+our $VERSION = '1.13.4'; # VERSION
 
 BEGIN {
   use Rex::Logger;
@@ -511,8 +511,7 @@ sub deprecated {
     "Please rewrite your code. This function will disappear in (R)?ex version $version."
   );
   Rex::Logger::info(
-    "If you need assistance please join #rex on irc.freenode.net or our google group."
-  );
+    "If you need assistance, get in touch via one of our support channels!");
 
 }
 
@@ -1038,7 +1037,7 @@ versions are activated. Available since version 0.56.
 
 =item autodie
 
-Will enable autodie feature: die on all failed L<filesytem commands|https://metacpan.org/pod/Rex::Commands::Fs>. Available since version 1.13.1.
+Will enable autodie feature: die on all failed L<filesystem commands|https://metacpan.org/pod/Rex::Commands::Fs>. Available since version 1.13.1.
 
 =item 0.55
 

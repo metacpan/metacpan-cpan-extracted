@@ -5,7 +5,11 @@ use warnings;
 
 use parent q(PLS::Server::Response);
 
+use IO::Async::Function;
+use IO::Async::Loop;
+
 use PLS::Parser::Document;
+use PLS::Server::State;
 
 =head1 NAME
 
@@ -18,23 +22,42 @@ after having been formatted.
 
 =cut
 
+# Set up formatting as a function because it can be slow
+my $loop = IO::Async::Loop->new();
+my $function = IO::Async::Function->new(
+    max_workers => 1,
+    code        => sub {
+        my ($self, $request, $text, $perltidyrc) = @_;
+
+        my ($ok, $formatted) = PLS::Parser::Document->format(text => $text, formatting_options => $request->{params}{options}, perltidyrc => $perltidyrc);
+        return $ok, $formatted;
+    }
+);
+$loop->add($function);
+
 sub new
 {
     my ($class, $request) = @_;
 
     my $self = bless {id => $request->{id}}, $class;
-    my ($ok, $formatted) = PLS::Parser::Document->format(uri => $request->{params}{textDocument}{uri}, formatting_options => $request->{params}{options});
+    my $text = PLS::Parser::Document::text_from_uri($request->{params}{textDocument}{uri});
 
-    if ($ok)
-    {
-        $self->{result} = $formatted;
-    }
-    else
-    {
-        $self->{error} = $formatted;
-    }
+    return $function->call(args => [$self, $request, $text, $PLS::Server::State::CONFIG->{perltidyrc}])->then(
+        sub {
+            my ($ok, $formatted) = @_;
 
-    return $self;
+            if ($ok)
+            {
+                $self->{result} = $formatted;
+            }
+            else
+            {
+                $self->{error} = $formatted;
+            }
+
+            return $self;
+        }
+    );
 } ## end sub new
 
 1;

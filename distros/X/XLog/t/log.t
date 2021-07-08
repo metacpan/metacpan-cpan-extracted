@@ -118,4 +118,22 @@ subtest 'from eval block' => sub {
     ok "passed";
 };
 
+subtest 'disable warnings' => sub {
+    use warnings FATAL => 'all';
+    my $ctx = Context->new;
+    my $ok = eval { XLog::warning("msg:%s", undef); 1 };
+    ok !$ok;
+    is $ctx->cnt, 0;
+    
+    XLog::disable_format_warnings();
+    XLog::warning("msg:%s", undef);
+    $ctx->check(msg => "msg:");
+    
+    XLog::enable_format_warnings();
+    $ok = eval { XLog::warning("msg:%s", undef); 1 };
+    ok !$ok;
+    is $ctx->cnt, 0;
+    
+};
+
 done_testing();

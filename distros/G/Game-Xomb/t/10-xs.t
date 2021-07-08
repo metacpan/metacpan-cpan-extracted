@@ -8,7 +8,7 @@ use warnings;
 use Game::Xomb;
 use Test::Most;
 
-plan tests => 26;
+plan tests => 27;
 
 my $deeply = \&eq_or_diff;
 
@@ -77,6 +77,8 @@ my $deeply = \&eq_or_diff;
     is Game::Xomb::pick(\@gismu), 'ratcu';
     is Game::Xomb::pick(\@gismu), 'cribe';
     $deeply->(\@gismu, [qw/cribe mlatu ratcu/]);
+
+    ok !defined Game::Xomb::pick([]);
 }
 
 # walkcb - linecb only without stopping (except at map boundaries)

@@ -64,7 +64,6 @@ examples/Sweeps/gate-trace.pl
 examples/Sweeps/manual-T-IV-freq.pl
 examples/Sweeps/manual.pl
 examples/Sweeps/voltage-sweep.pl
-examples/dualchannel_sweep.pl
 examples/singlechannel_sweep.pl
 lib/Lab/Bus.pm
 lib/Lab/Bus/DEBUG.pm
@@ -272,6 +271,8 @@ lib/Lab/Moose/Sweep/Step.pm
 lib/Lab/Moose/Sweep/Step/Frequency.pm
 lib/Lab/Moose/Sweep/Step/Magnet.pm
 lib/Lab/Moose/Sweep/Step/Power.pm
+lib/Lab/Moose/Sweep/Step/Pulsedelay.pm
+lib/Lab/Moose/Sweep/Step/Pulsewidth.pm
 lib/Lab/Moose/Sweep/Step/Repeat.pm
 lib/Lab/Moose/Sweep/Step/Temperature.pm
 lib/Lab/Moose/Sweep/Step/Voltage.pm

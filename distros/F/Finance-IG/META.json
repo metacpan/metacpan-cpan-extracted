@@ -38,7 +38,7 @@
             "Moose" : "0",
             "REST::Client" : "0",
             "Time::Piece" : "0",
-            "perl" : "5.10"
+            "perl" : "5.01"
          }
       },
       "test" : {
@@ -48,6 +48,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.092",
+   "version" : "0.096",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

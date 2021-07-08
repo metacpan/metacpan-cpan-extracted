@@ -3,7 +3,7 @@ package Beekeeper::WorkerPool;
 use strict;
 use warnings;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 use base 'Beekeeper::WorkerPool::Daemon';
 use POSIX ":sys_wait_h";
@@ -42,6 +42,14 @@ sub new {
     # Pool cannot be started without a proper config file
     $self->load_config || CORE::exit(1);
 
+    unless ($self->{config}->{log_file}) {
+        my $file = "$pool_id-pool.log";
+        my $dir  = '/var/log';
+        my $user = $self->{options}->{'user'} || getpwuid($>);
+        ($user) = ($user =~ m/^(\w+)$/); # untaint
+        $self->{config}->{log_file} = (-d "$dir/$user") ? "$dir/$user/$file" : "$dir/$file";
+    }
+
     return $self;
 }
 
@@ -58,7 +66,7 @@ sub cmd_help {
     print " --group      str  Run as specified group\n";
     print " --config-dir str  Path to directory containing config files\n";
     print " --debug           Turn on workers debug flag\n";
-    print " --help            Shows this message\n";
+    print " --help            Display this help and exit\n";
 }
 
 sub load_config {
@@ -105,9 +113,8 @@ sub main {
     my $pool_id        = $self->{config}->{'pool_id'};
 
     my @spawn_workers = (
-        # Every pool spawns at least a Supervisor and a Sinkhole
+        # Every pool spawns a Supervisor worker
         'Beekeeper::Service::Supervisor::Worker',
-        'Beekeeper::Service::Sinkhole::Worker',
     );
 
     if ($self->{config}->{'use_toybroker'}) {
@@ -116,7 +123,7 @@ sub main {
     }
 
     foreach my $worker_class (@spawn_workers) {
-        $workers_config->{$worker_class} ||= { workers_count => 1 };
+        $workers_config->{$worker_class} ||= { worker_count => 1 };
     }
 
     foreach my $worker_class (sort keys %$workers_config) {
@@ -126,7 +133,9 @@ sub main {
 
     # Make a list of individual workers to spawn
     foreach my $worker_class (@spawn_workers) {
-        my $worker_count = $workers_config->{$worker_class}->{workers_count};
+        my $worker_count = $workers_config->{$worker_class}->{worker_count}  ||
+                           $workers_config->{$worker_class}->{workers_count} ;  # compat
+        $worker_count = 1 unless defined $worker_count;
         for (1..$worker_count) {
             push @spawn_queue, $worker_class;
         }
@@ -357,11 +366,11 @@ __END__
 
 =head1 NAME
 
-Beekeeper::WorkerPool - Manage worker pools
+Beekeeper::WorkerPool - Start, restart or stop worker pools
 
 =head1 VERSION
  
-Version 0.06
+Version 0.07
 
 =head1 SYNOPSIS
 
@@ -379,17 +388,17 @@ Version 0.06
    --group      str  Run as specified group
    --config-dir str  Path to directory containing config files
    --debug           Turn on workers debug flag
-   --help            Shows this message
+   --help            Display this help and exit
 
 =head1 DESCRIPTION
 
-This module contains the core of the command line tool L<bkpr> which is used
-to manage worker pools: it start, stop and monitor pools of persistent
-L<Beekeeper::Worker> processes which receive RPC requests from message bus.
+This module contains the core of the command line tool L<bkpr> which is used to
+start, restart or stop worker pools of persistent L<Beekeeper::Worker> processes
+which receive RPC requests from the message bus.
 
-When started it daemonize itself (unless C<--foreground> option is passed) and
-fork all worker processes, then monitor those forked processes and immediately
-respawn defunct ones.
+When started it daemonizes itself (unless C<--foreground> option is passed) and forks
+all worker processes, then keeps monitoring those forked processes and immediately
+respawns defunct ones.
 
 =head1 CONFIGURATION
 
@@ -397,9 +406,9 @@ respawn defunct ones.
 
 Workers pools are defined into a file named C<pool.config.json>, which is searched
 for into ENV C<BEEKEEPER_CONFIG_DIR>, C<~/.config/beekeeper> and C</etc/beekeeper>.
-The file is in relaxed JSON format (so it allows comments and trailing commas).
+The file format is relaxed JSON, so it allows comments and trailing commas.
 
-All worker pools running on the host must be declared into the file, specifying 
+All worker pools running on the host must be declared into this file, specifying 
 which logical bus should be used and which services it will run. 
 
 Each entry define a worker pool. Required parameters are:
@@ -416,14 +425,14 @@ The following example defines "MyApp" as a pool of 2 C<MyApp::Worker> processes:
       "pool_id" : "MyApp",
       "bus_id"  : "backend",
       "workers" : {
-          "MyApp::Worker" : { "workers_count" : 2 },
+          "MyApp::Worker" : { "worker_count" : 2 },
       },
   }]
 
 =head3 bus.config.json
 
-All logical buses used by your application are defined into a file named 
-C<bus.config.json> and specify the conection parameters to the MQTT brokers
+All logical buses used by an application are defined into a file named 
+C<bus.config.json> which specifies the connection parameters to the MQTT brokers
 that will service them.
 
 Each entry define a logical bus. Required parameters are:

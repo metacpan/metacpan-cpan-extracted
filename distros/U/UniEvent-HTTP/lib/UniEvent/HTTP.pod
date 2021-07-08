@@ -85,7 +85,7 @@ UniEvent::HTTP - extremely fast sync/async http client and server framework
         if ($request->uri->path eq "/hello") {
             $request->respond({
                 code    => 200,
-                headers => {...}
+                headers => {...},
                 body    => "Hi",
             });
         } else {
@@ -93,7 +93,8 @@ UniEvent::HTTP - extremely fast sync/async http client and server framework
         }
     });
     
-    my $sig = UE::signal SIGINT, sub {
+    my $sig; $sig = UE::signal UE::Signal::SIGINT, sub {
+        $sig->stop;
         $server->stop;
     };
     

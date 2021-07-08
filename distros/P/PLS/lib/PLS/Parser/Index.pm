@@ -4,14 +4,14 @@ use strict;
 use warnings;
 use feature 'state';
 
+use Fcntl qw(:flock);
 use File::Find;
 use File::Path;
 use File::stat;
 use File::Spec;
 use FindBin;
-use IO::Async::Channel;
 use IO::Async::Loop;
-use IO::Async::Routine;
+use IO::Async::Function;
 use List::Util qw(all any);
 use Path::Tiny;
 use Time::Piece;
@@ -38,16 +38,22 @@ sub new
 
     my %args = @args;
 
-    my %self = (
-                root          => $args{root},
-                location      => File::Spec->catfile($args{root}, INDEX_LOCATION),
-                cache         => {},
-                subs_trie     => PLS::Trie->new(),
-                packages_trie => PLS::Trie->new(),
-                last_mtime    => 0
-               );
+    my $self = bless {
+                      root          => $args{root},
+                      location      => File::Spec->catfile($args{root}, INDEX_LOCATION),
+                      cache         => {},
+                      subs_trie     => PLS::Trie->new(),
+                      packages_trie => PLS::Trie->new(),
+                      last_mtime    => 0,
+                     }, $class;
 
-    return bless \%self, $class;
+    my (undef, $parent_dir) = File::Spec->splitpath($self->{location});
+    File::Path::make_path($parent_dir);
+
+    $self->start_indexing_function();
+    $self->start_cleanup_function();
+
+    return $self;
 } ## end sub new
 
 sub load_trie
@@ -59,32 +65,35 @@ sub load_trie
     foreach my $sub (keys %{$index->{subs}})
     {
         my $count = scalar @{$index->{subs}{$sub}};
-        $self->{subs_trie}->insert($sub, 1);
+        $self->{subs_trie}->insert($sub, $count);
     }
 
     foreach my $package (keys %{$index->{packages}})
     {
         my $count = scalar @{$index->{packages}{$package}};
-        $self->{packages_trie}->insert($package, 1);
+        $self->{packages_trie}->insert($package, $count);
     }
+
+    return;
 } ## end sub load_trie
 
-sub index_files
+sub start_indexing_function
 {
-    my ($self, @files) = @_;
+    my ($self) = @_;
 
-    state $indexing_running = 0;
+    my $loop = IO::Async::Loop->new();
 
-    return if $indexing_running;
-    $indexing_running = 1;
+    $self->{indexing_function} = IO::Async::Function->new(
+        min_workers => 0,
+        max_workers => 1,
+        code        => sub {
+            my ($self, @files) = @_;
 
-    my $loop    = IO::Async::Loop->new();
-    my $channel = IO::Async::Channel->new();
+            # Lock the index file for this critical section of code
+            open my $fh, '>>', $self->{location} or die $!;
+            flock $fh, LOCK_EX;
 
-    my $routine = IO::Async::Routine->new(
-        channels_out => [$channel],
-        code         => sub {
-            my $index = $self->index();
+            my $index = $self->index(1); # 1 indicates that we should not try to lock again
 
             unless (scalar @files)
             {
@@ -95,6 +104,8 @@ sub index_files
 
             my $total   = scalar @files;
             my $current = 0;
+
+            $self->load_trie();
 
             foreach my $file (@files)
             {
@@ -116,18 +127,68 @@ sub index_files
             } ## end foreach my $file (@files)
 
             $self->save($index);
-            $channel->send([$self->{cache}, $self->{last_mtime}]);
+
+            flock $fh, LOCK_UN;
+
+            return [@{$self}{qw(cache last_mtime subs_trie packages_trie)}];
         }
     );
 
-    $loop->add($routine);
+    $loop->add($self->{indexing_function});
 
-    $channel->recv(
-        on_recv => sub {
-            my (undef, $data) = @_;
+    return;
+} ## end sub start_indexing_function
 
-            ($self->{cache}, $self->{last_mtime}) = @{$data};
-            $indexing_running = 0;
+sub start_cleanup_function
+{
+    my ($self) = @_;
+
+    my $loop = IO::Async::Loop->new();
+
+    $self->{cleanup_function} = IO::Async::Function->new(
+        min_workers => 0,
+        max_workers => 1,
+        code        => sub {
+            my ($self) = @_;
+
+            # Lock the index file for this critical section of code
+            open my $fh, '>>', $self->{location} or die $!;
+            flock $fh, LOCK_EX;
+
+            my $index = $self->index(1); # 1 indicates that we should not try to lock again
+            $self->_cleanup_old_files($index);
+            $self->save($index);
+
+            flock $fh, LOCK_UN;
+
+            return [@{$self}{qw(cache last_mtime)}];
+        }
+    );
+
+    $loop->add($self->{cleanup_function});
+
+    return;
+} ## end sub start_cleanup_function
+
+sub index_files
+{
+    my ($self, @files) = @_;
+
+    my $class     = ref $self;
+    my $self_copy = bless {%{$self}{qw(root location cache last_mtime subs_trie packages_trie)}}, $class;
+
+    $self->{indexing_function}->call(
+        args      => [$self_copy, @files],
+        on_result => sub {
+            my ($result, $data) = @_;
+
+            if ($result ne 'return')
+            {
+                warn "$result\n";
+                return;
+            }
+
+            @{$self}{qw(cache last_mtime subs_trie packages_trie)} = @{$data};
         }
     );
 
@@ -142,6 +203,7 @@ sub save
     File::Path::make_path($parent_dir);
 
     Storable::nstore($index, $self->{location});
+
     $self->{cache}      = $index;
     $self->{last_mtime} = (stat $self->{location})->mtime;
 
@@ -150,7 +212,7 @@ sub save
 
 sub index
 {
-    my ($self) = @_;
+    my ($self, $no_lock) = @_;
 
     return {} unless -f $self->{location};
 
@@ -158,7 +220,11 @@ sub index
     return $self->{cache} if ($mtime <= $self->{last_mtime});
 
     $self->{last_mtime} = $mtime;
-    $self->{cache}      = Storable::retrieve($self->{location});
+
+    open my $fh, '<', $self->{location} or die $!;
+    flock $fh, LOCK_SH unless $no_lock;
+    $self->{cache}      = eval { Storable::fd_retrieve($fh) };
+    flock $fh, LOCK_UN unless $no_lock;
 
     return $self->{cache};
 } ## end sub index
@@ -264,34 +330,21 @@ sub cleanup_old_files
 {
     my ($self) = @_;
 
-    state $cleaning_up = 0;
+    my $class     = ref $self;
+    my $self_copy = bless {%{$self}{qw(root location cache last_mtime)}}, $class;
 
-    return if $cleaning_up;
+    $self->{cleanup_function}->call(
+        args      => [$self_copy],
+        on_result => sub {
+            my ($result, $data) = @_;
 
-    $cleaning_up = 1;
+            if ($result ne 'return')
+            {
+                warn "$result\n";
+                return;
+            }
 
-    my $loop    = IO::Async::Loop->new();
-    my $channel = IO::Async::Channel->new();
-
-    my $routine = IO::Async::Routine->new(
-        channels_out => [$channel],
-        code         => sub {
-            my $index = $self->index();
-            $self->_cleanup_old_files($index);
-            $self->save($index);
-
-            $channel->send([$self->{cache}, $self->{last_mtime}]);
-        }
-    );
-
-    $loop->add($routine);
-
-    $channel->recv(
-        on_recv => sub {
-            my (undef, $data) = @_;
-
-            ($self->{cache}, $self->{last_mtime}) = @{$data};
-            $cleaning_up = 0;
+            @{$self}{qw(cache last_mtime)} = @{$data};
         }
     );
 
@@ -348,6 +401,8 @@ sub _cleanup_old_files
 
         $self->log("Cleaning up $type references from index...") if ($refs_cleaned);
     } ## end foreach my $type (keys %{$index...})
+
+    return;
 } ## end sub _cleanup_old_files
 
 sub find_package_subroutine
@@ -549,6 +604,8 @@ sub log
     my $time = Time::Piece->new;
     $time = $time->ymd . ' ' . $time->hms;
     print {\*STDERR} "[$time] $message\n";
+
+    return;
 } ## end sub log
 
 1;

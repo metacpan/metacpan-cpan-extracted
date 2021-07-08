@@ -1,0 +1,18 @@
+sources:
+https://gist.github.com/mtigas/952344
+https://stackoverflow.com/questions/10175812/how-to-create-a-self-signed-certificate-with-openssl
+
+openssl req -x509 -newkey rsa:4096 -keyout ca.key -out ca.pem -days 36500  -subj '/CN=localhost' -nodes
+openssl req -x509 -newkey rsa:4096 -keyout ca2.key -out ca2.pem -days 36500  -subj '/CN=localhost' -nodes
+
+CLIENT_ID="01-alice"
+CLIENT_SERIAL=01
+openssl ecparam -genkey -name secp256r1 | openssl ec -out ${CLIENT_ID}.key
+openssl req -new -key ${CLIENT_ID}.key -out ${CLIENT_ID}.csr  -subj "/CN=${CLIENT_ID}"
+openssl x509 -req -days 36500 -in ${CLIENT_ID}.csr -CA ca.pem -CAkey ca.key -set_serial ${CLIENT_SERIAL} -out ${CLIENT_ID}.pem -sha256
+
+CLIENT_ID="02-bob"
+CLIENT_SERIAL=02
+openssl ecparam -genkey -name secp256r1 | openssl ec -out ${CLIENT_ID}.key
+openssl req -new -key ${CLIENT_ID}.key -out ${CLIENT_ID}.csr  -subj "/CN=${CLIENT_ID}"
+openssl x509 -req -days 36500 -in ${CLIENT_ID}.csr -CA ca.pem -CAkey ca.key -set_serial ${CLIENT_SERIAL} -out ${CLIENT_ID}.pem -sha256

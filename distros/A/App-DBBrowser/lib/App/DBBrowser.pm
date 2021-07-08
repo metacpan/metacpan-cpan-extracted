@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.010001;
 
-our $VERSION = '2.270';
+our $VERSION = '2.271';
 
 use File::Basename        qw( basename );
 use File::Spec::Functions qw( catfile catdir );
@@ -21,13 +21,13 @@ use Term::TablePrint     qw();
 use App::DBBrowser::Auxil;
 #use App::DBBrowser::CreateDropAttach; # required
 use App::DBBrowser::DB;
-#use App::DBBrowser::Join;        # required
+#use App::DBBrowser::Join;             # required
 use App::DBBrowser::Opt::Get;
-#use App::DBBrowser::Opt::Set;    # required
-#use App::DBBrowser::Opt::DBSet   # required
-#use App::DBBrowser::Subqueries;  # required
-#use App::DBBrowser::Table;       # required
-#use App::DBBrowser::Union;       # required
+#use App::DBBrowser::Opt::Set;         # required
+#use App::DBBrowser::Opt::DBSet        # required
+#use App::DBBrowser::Subqueries;       # required
+#use App::DBBrowser::Table;            # required
+#use App::DBBrowser::Union;            # required
 
 BEGIN {
     decode_argv(); # not at the end of the BEGIN block if less than perl 5.16
@@ -302,14 +302,7 @@ sub run {
                         $dbh->do( $stmt );
                     }
                     $sf->{i}{db_attached} = 1;
-                    if ( ! exists $sf->{backup_qtn} ) {
-                        $sf->{backup_qtn} = $sf->{o}{G}{qualified_table_name};
-                    }
-                    $sf->{o}{G}{qualified_table_name} = 1;
                 }
-            }
-            if ( exists $sf->{backup_qtn} && ! $sf->{i}{db_attached} ) {
-                $sf->{o}{G}{qualified_table_name} = delete $sf->{backup_qtn};
             }
             $sf->{i}{stmt_history} = [];
             $plui = App::DBBrowser::DB->new( $sf->{i}, $sf->{o} );
@@ -410,8 +403,8 @@ sub run {
                         push @$user_tables, $table;
                     }
                 }
-                #if ( $sf->{backup_qtn} ) {
-                #    for my $table ( @user_tables ) {
+                #if ( $sf->{i}{db_attached} ) {     # table menu: show the [alias] in front of the table name
+                #    for my $table ( @$user_tables ) {
                 #        my $tmp = delete $tables_info->{$table};
                 #        $table = '[' . $tmp->[1] . ']' . $tmp->[2];
                 #        $tables_info->{$table} = $tmp;
@@ -483,12 +476,30 @@ sub run {
                     if ( $table eq $hidden ) {
                         require App::DBBrowser::CreateDropAttach;
                         my $cda = App::DBBrowser::CreateDropAttach->new( $sf->{i}, $sf->{o}, $sf->{d} );
-                        my $old_idx_hidden = $cda->create_drop_or_attach( $table );
-                        if ( defined $old_idx_hidden ) {
-                            $sf->{old_idx_hidden} = $old_idx_hidden;
+                        my $old_idx_cda = $cda->create_drop_or_attach( $table );
+                        if ( defined $old_idx_cda ) {
+                            $sf->{i}{old_idx_cda} = $old_idx_cda;
                             $sf->{redo_db}     = $sf->{d}{db};
                             $sf->{redo_schema} = $sf->{d}{schema};
                             $sf->{redo_table}  = $table;
+                        }
+                        else {
+                            # when leaving CreateDropAttach menu:
+                            delete $sf->{i}{ss} if exists $sf->{i}{ss}; # deletes any existing saved books
+                            #if ( keys %{$sf->{i}{ss}} == 1 ) {
+                            #    my $file_fs = ( keys %{$sf->{i}{ss}} )[0];
+                            #    my $book = $sf->{i}{ss}{$file_fs}{book};
+                            #    if ( defined $book ) {
+                            #        require Devel::Size;
+                            #        if ( Devel::Size::size( $book ) > 1_000_000 ) {
+                            #            delete $sf->{i}{ss};
+                            #        }
+                            #    }
+                            #}
+                            #else {
+                            #    delete $sf->{i}{ss};
+                            #}
+                            delete $sf->{i}{gc} if exists $sf->{i}{gc};  # datasource file: delete menu memory
                         }
                         if ( $sf->{redo_db} ) {
                             $dbh->disconnect();
@@ -606,7 +617,7 @@ App::DBBrowser - Browse SQLite/MySQL/PostgreSQL databases and their tables inter
 
 =head1 VERSION
 
-Version 2.270
+Version 2.271
 
 =head1 DESCRIPTION
 

@@ -6,14 +6,18 @@
     'actual_rows' => '1',
     'actual_time_first' => '0.003',
     'actual_time_last' => '0.004',
+    'buffers' => {
+      'shared' => {
+        'hit' => '3'
+      }
+    },
     'estimated_row_width' => '4',
     'estimated_rows' => '1',
     'estimated_startup_cost' => '0.29',
     'estimated_total_cost' => '8.31',
     'extra_info' => [
       'Index Cond: (id = 1)',
-      'Heap Fetches: 1',
-      'Buffers: shared hit=3'
+      'Heap Fetches: 1'
     ],
     'is_analyzed' => 1,
     'scan_on' => {

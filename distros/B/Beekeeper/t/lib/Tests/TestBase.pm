@@ -11,7 +11,7 @@ use Test::More;
 sub test_01_spawn_workers : Test(5) {
     my $self = shift;
 
-    my @pids = $self->start_workers( 'Tests::Service::Worker', workers_count => 2 );
+    my @pids = $self->start_workers( 'Tests::Service::Worker', worker_count => 2 );
 
     is( scalar @pids, 2, "Spawned 2 workers");
 

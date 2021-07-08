@@ -17,7 +17,7 @@ use Modern::Perl;
 use Test::More tests => 32;
 use XML::LibXML;
 use File::Slurper qw(read_binary write_binary);
-use Cpanel::JSON::XS;
+use Mojo::JSON qw(decode_json encode_json);
 
 do './t/test.pl';
 my ($id, $port) = init();

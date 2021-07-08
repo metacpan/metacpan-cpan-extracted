@@ -19,7 +19,7 @@ use warnings;
 use Carp qw< carp croak >;
 use Math::BigInt ();
 
-our $VERSION = '1.999818';
+our $VERSION = '1.999821';
 
 require Exporter;
 our @ISA        = qw/Math::BigInt/;
@@ -426,8 +426,8 @@ sub new {
         return $self;
     }
 
-    # Handle octal numbers. We auto-detect octal numbers if they have a "0"
-    # prefix and a binary exponent.
+    # Handle octal numbers. We auto-detect octal numbers if they have a "0o"
+    # prefix or a "0" prefix and a binary exponent.
 
     if ($wanted =~ /
                        ^
@@ -436,23 +436,28 @@ sub new {
                        # sign
                        [+-]?
 
-                       # prefix
-                       0
-
-                       # significand using the octal digits 0..7
-                       [0-7]+ (?: _ [0-7]+ )*
                        (?:
-                           \.
-                           (?: [0-7]+ (?: _ [0-7]+ )* )?
-                       )?
+                           # prefix
+                           0 [Oo]
+                       |
 
-                       # exponent (power of 2) using decimal digits
-                       [Pp]
-                       [+-]?
-                       \d+ (?: _ \d+ )*
+                           # prefix
+                           0
 
-                       \s*
-                       $
+                           # significand using the octal digits 0..7
+                           [0-7]+ (?: _ [0-7]+ )*
+                           (?:
+                               \.
+                               (?: [0-7]+ (?: _ [0-7]+ )* )?
+                           )?
+
+                           # exponent (power of 2) using decimal digits
+                           [Pp]
+                           [+-]?
+                           \d+ (?: _ \d+ )*
+                           \s*
+                           $
+                       )
                  /x)
     {
         $self = $class -> from_oct($wanted);
@@ -572,7 +577,7 @@ sub from_hex {
                      ( [+-]? )
 
                      # optional "hex marker"
-                     (?: 0? x )?
+                     (?: 0 [Xx] )?
 
                      # significand using the hex digits 0..9 and a..f
                      (
@@ -661,6 +666,9 @@ sub from_oct {
 
                      # sign
                      ( [+-]? )
+
+                     # optional "octal marker"
+                     (?: 0 [Oo] )?
 
                      # significand using the octal digits 0..7
                      (
@@ -751,7 +759,7 @@ sub from_bin {
                      ( [+-]? )
 
                      # optional "bin marker"
-                     (?: 0? b )?
+                     (?: 0 [Bb] )?
 
                      # significand using the binary digits 0 and 1
                      (
@@ -2794,7 +2802,7 @@ sub bsin {
 
     #         constant object       or error in _find_round_parameters?
     return $x if $x->modify('bsin') || $x->is_nan();
-
+    return $x->bnan()    if $x->is_inf();
     return $x->bzero(@r) if $x->is_zero();
 
     # no rounding at all, so must use fallback
@@ -2884,7 +2892,7 @@ sub bcos {
 
     #         constant object       or error in _find_round_parameters?
     return $x if $x->modify('bcos') || $x->is_nan();
-
+    return $x->bnan()   if $x->is_inf();
     return $x->bone(@r) if $x->is_zero();
 
     # no rounding at all, so must use fallback
@@ -3519,11 +3527,12 @@ sub bdfac {
     ($class, $x, @r) = objectify(1, @_) if !ref($x);
 
     # inf => inf
-    return $x if $x->modify('bfac') || $x->{sign} eq '+inf';
+    return $x if $x->modify('bdfac') || $x->{sign} eq '+inf';
 
-    return $x->bnan()
-      if (($x->{sign} ne '+') || # inf, NaN, <0 etc => NaN
-          ($x->{_es} ne '+'));   # digits after dot?
+    return $x->bnan() if ($x->is_nan() ||
+                          $x->{_es} ne '+');    # digits after dot?
+    return $x->bnan() if $x <= -2;
+    return $x->bone() if $x <= 1;
 
     croak("bdfac() requires a newer version of the $LIB library.")
         unless $LIB->can('_dfac');
@@ -3535,6 +3544,55 @@ sub bdfac {
     }
     $x->{_m} = $LIB->_dfac($x->{_m});       # calculate factorial
     $x->bnorm()->round(@r);     # norm again and round result
+}
+
+sub btfac {
+    # compute triple factorial
+
+    # set up parameters
+    my ($class, $x, @r) = (ref($_[0]), @_);
+    # objectify is costly, so avoid it
+    ($class, $x, @r) = objectify(1, @_) if !ref($x);
+
+    # inf => inf
+    return $x if $x->modify('btfac') || $x->{sign} eq '+inf';
+
+    return $x->bnan() if ($x->is_nan() ||
+                          $x->{_es} ne '+');    # digits after dot?
+
+    my $k = $class -> new("3");
+    return $x->bnan() if $x <= -$k;
+
+    my $one = $class -> bone();
+    return $x->bone() if $x <= $one;
+
+    my $f = $x -> copy();
+    while ($f -> bsub($k) > $one) {
+        $x -> bmul($f);
+    }
+    $x->round(@r);
+}
+
+sub bmfac {
+    my ($class, $x, $k, @r) = objectify(2, @_);
+
+    # inf => inf
+    return $x if $x->modify('bmfac') || $x->{sign} eq '+inf';
+
+    return $x->bnan() if ($x->is_nan() || $k->is_nan() ||
+                          $k < 1 || $x <= -$k ||
+                          $x->{_es} ne '+' || $k->{_es} ne '+');
+
+    return $x->bnan() if $x <= -$k;
+
+    my $one = $class -> bone();
+    return $x->bone() if $x <= $one;
+
+    my $f = $x -> copy();
+    while ($f -> bsub($k) > $one) {
+        $x -> bmul($f);
+    }
+    $x->round(@r);
 }
 
 sub blsft {
@@ -4042,7 +4100,7 @@ sub sparts {
 
     # Finite number.
 
-    my $mant = $class -> bzero();
+    my $mant = $self -> copy() -> bzero();
     $mant -> {sign} = $self -> {sign};
     $mant -> {_m}   = $LIB->_copy($self -> {_m});
     return $mant unless wantarray;
@@ -4605,13 +4663,13 @@ sub numify {
 
     if ($x -> is_nan()) {
         require Math::Complex;
-        my $inf = Math::Complex::Inf();
+        my $inf = $Math::Complex::Inf;
         return $inf - $inf;
     }
 
     if ($x -> is_inf()) {
         require Math::Complex;
-        my $inf = Math::Complex::Inf();
+        my $inf = $Math::Complex::Inf;
         return $x -> is_negative() ? -$inf : $inf;
     }
 
@@ -5169,10 +5227,13 @@ Math::BigFloat - Arbitrary size floating point math package
 
   $x = Math::BigFloat->new($str);               # defaults to 0
   $x = Math::BigFloat->new('0x123');            # from hexadecimal
+  $x = Math::BigFloat->new('0o377');            # from octal
   $x = Math::BigFloat->new('0b101');            # from binary
   $x = Math::BigFloat->from_hex('0xc.afep+3');  # from hex
   $x = Math::BigFloat->from_hex('cafe');        # ditto
   $x = Math::BigFloat->from_oct('1.3267p-4');   # from octal
+  $x = Math::BigFloat->from_oct('01.3267p-4');  # ditto
+  $x = Math::BigFloat->from_oct('0o1.3267p-4'); # ditto
   $x = Math::BigFloat->from_oct('0377');        # ditto
   $x = Math::BigFloat->from_bin('0b1.1001p-4'); # from binary
   $x = Math::BigFloat->from_bin('0101');        # ditto
@@ -5340,7 +5401,10 @@ Leading and trailing whitespace is ignored.
 
 =item *
 
-Leading and trailing zeros are ignored.
+Leading zeros are ignored, except for floating point numbers with a binary
+exponent, in which case the number is interpreted as an octal floating point
+number. For example, "01.4p+0" gives 1.5, "00.4p+0" gives 0.5, but "0.4p+0"
+gives a NaN. And while "0377" gives 255, "0377p0" gives 255.
 
 =item *
 
@@ -5348,28 +5412,27 @@ If the string has a "0x" prefix, it is interpreted as a hexadecimal number.
 
 =item *
 
+If the string has a "0o" prefix, it is interpreted as an octal number.
+
+=item *
+
 If the string has a "0b" prefix, it is interpreted as a binary number.
 
 =item *
 
-For hexadecimal and binary numbers, the exponent must be separated from the
-significand (mantissa) by the letter "p" or "P", not "e" or "E" as with decimal
-numbers.
-
-=item *
-
-One underline is allowed between any two digits, including hexadecimal and
-binary digits.
+One underline is allowed between any two digits.
 
 =item *
 
 If the string can not be interpreted, NaN is returned.
 
-=back
+=item *
 
-Octal numbers are typically prefixed by "0", but since leading zeros are
-stripped, these methods can not automatically recognize octal numbers, so use
-the constructor from_oct() to interpret octal strings.
+For hexadecimal, octal, and binary numbers, the exponent must be separated from
+the significand (mantissa) by the letter "p" or "P", not "e" or "E" as with
+decimal numbers.
+
+=back
 
 Some examples of valid string input
 
@@ -5378,10 +5441,16 @@ Some examples of valid string input
     1.23e2                      123
     12300e-2                    123
     0xcafe                      51966
+    0XCAFE                      51966
+    0o1337                      735
+    0O1337                      735
     0b1101                      13
+    0B1101                      13
     67_538_754                  67538754
     -4_5_6.7_8_9e+0_1_0         -4567890000000
     0x1.921fb5p+1               3.14159262180328369140625e+0
+    0o1.2677025p1               2.71828174591064453125
+    01.2677025p1                2.71828174591064453125
     0b1.1001p-4                 9.765625e-2
 
 =head2 Output
@@ -6030,7 +6099,7 @@ Florian Ragwitz E<lt>flora@cpan.orgE<gt>, 2010.
 
 =item *
 
-Peter John Acklam E<lt>pjacklam@online.noE<gt>, 2011-.
+Peter John Acklam E<lt>pjacklam@gmail.comE<gt>, 2011-.
 
 =back
 

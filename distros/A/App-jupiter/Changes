@@ -1,3 +1,8 @@
+1.04
+
+- Add filters to the command line so that you can update just one
+  feed, or a group of feeds.
+
 1.03
 
 - Fixed handling of Atom feeds with content elements having

@@ -8,6 +8,8 @@ struct MessageIterator : std::iterator<std::input_iterator_tag, MessageSP> {
     MessageIterator (Parser* parser, const MessageSP& start_message) : parser(parser), cur(start_message) {}
     MessageIterator (const MessageIterator& oth)                     : parser(oth.parser), cur(oth.cur) {}
 
+    MessageIterator& operator=  (const MessageIterator&)           = default;
+    MessageIterator& operator=  (MessageIterator&&)                = default;
     MessageIterator& operator++ ()                                 { if (cur) cur = parser->_get_message(); return *this; }
     MessageIterator  operator++ (int)                              { MessageIterator tmp(*this); operator++(); return tmp; }
     bool             operator== (const MessageIterator& rhs) const { return parser == rhs.parser && cur.get() == rhs.cur.get(); }

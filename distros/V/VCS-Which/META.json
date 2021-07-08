@@ -47,27 +47,27 @@
    "provides" : {
       "VCS::Which" : {
          "file" : "lib/VCS/Which.pm",
-         "version" : "v0.6.8"
+         "version" : "v0.6.9"
       },
       "VCS::Which::Plugin" : {
          "file" : "lib/VCS/Which/Plugin.pm",
-         "version" : "v0.6.8"
+         "version" : "v0.6.9"
       },
       "VCS::Which::Plugin::Bazaar" : {
          "file" : "lib/VCS/Which/Plugin/Bazaar.pm",
-         "version" : "v0.6.8"
+         "version" : "v0.6.9"
       },
       "VCS::Which::Plugin::CVS" : {
          "file" : "lib/VCS/Which/Plugin/CVS.pm",
-         "version" : "v0.6.8"
+         "version" : "v0.6.9"
       },
       "VCS::Which::Plugin::Git" : {
          "file" : "lib/VCS/Which/Plugin/Git.pm",
-         "version" : "v0.6.8"
+         "version" : "v0.6.9"
       },
       "VCS::Which::Plugin::Subversion" : {
          "file" : "lib/VCS/Which/Plugin/Subversion.pm",
-         "version" : "v0.6.8"
+         "version" : "v0.6.9"
       }
    },
    "release_status" : "stable",
@@ -82,6 +82,6 @@
          "url" : "http://github.com/ivanwills/VCS-Which"
       }
    },
-   "version" : "v0.6.8",
+   "version" : "v0.6.9",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

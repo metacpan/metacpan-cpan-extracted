@@ -3,7 +3,7 @@ package Beekeeper::MQTT;
 use strict;
 use warnings;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 use AnyEvent;
 use AnyEvent::Handle;
@@ -1780,11 +1780,11 @@ __END__
 
 =head1 NAME
  
-Beekeeper::MQTT - Asynchronous MQTT 5.0 client.
+Beekeeper::MQTT - Asynchronous MQTT 5.0 client
  
 =head1 VERSION
  
-Version 0.06
+Version 0.07
 
 =head1 SYNOPSIS
 
@@ -1825,7 +1825,7 @@ Most methods allow to send arbitrary properties as key-value pairs of utf8 strin
 
 Except for trivial cases, error checking is delegated to the server.
 
-The MQTT specification can be found at L<https://mqtt.org/mqtt-specification>
+This client can send and receive around 20000 messages per second.
 
 =head1 TODO
 
@@ -1835,7 +1835,7 @@ The MQTT specification can be found at L<https://mqtt.org/mqtt-specification>
 
 =head3 new ( %options )
 
-=over 4
+=over
 
 =item host
 
@@ -1876,9 +1876,9 @@ connection when this is called.
 
 =head3 connect ( %options )
 
-Connect to the MQTT server and do handshake. On failure retries until timeout.
+Connects to the MQTT server. On failure retries until timeout.
 
-=over 4
+=over
 
 =item blocking => $bool
 
@@ -1895,7 +1895,7 @@ Callback which is executed after the server accepted the connection.
 
 Does a graceful disconnection from the server.
 
-=over 4
+=over
 
 =item $reason_code
 
@@ -1906,9 +1906,9 @@ Default is zero, meaning normal disconnection.
 
 =head3 subscribe ( %args )
 
-Create a subscription to a topic (or a list of topics). When a message is received,
+Creates a subscription to a topic (or a list of topics). When a message is received,
 it will be passed to given on_publish callback:
-  
+
   $mqtt->subscribe(
       topic       => 'topic/foo',
       maximum_qos => 1,
@@ -1918,11 +1918,11 @@ it will be passed to given on_publish callback:
       },
   );
 
-=over 4
+=over
 
 =item topics => \@topics
 
-List of topics to which the client wants to subscribe.
+List of topics that the client wants to subscribe to.
 
 =item on_publish => $cb->( \$payload, \%properties )
 
@@ -1943,18 +1943,26 @@ C<retain_handling> is sent as an "User Property" (a key-value pair of utf8 strin
 
 =head3 unsubscribe ( %params )
 
-Cancel an existing subscription, the client will no longer receive messages 
-from that topic. Example:
+Cancels existing subscriptions, the client will no longer receive messages 
+from the specified topics. Example:
 
   $mqtt->unsubscribe( 
-      topics => ['topic/foo','topic/bar']
+      topic => 'topic/foo',
+  );
+  
+  $mqtt->unsubscribe( 
+      topics => ['topic/bar','topic/baz']
   );
 
-=over 4
+=over
+
+=item topic => $topic
+
+The destination of an existing subscription.
 
 =item topics => \@topics
 
-The destination of an existing subscription.
+Reference to an array of destinations of existing subscriptions.
 
 =item on_unsuback => $cb->()
 
@@ -1976,7 +1984,7 @@ Sends a message to a topic. Example:
       }
   );
 
-=over 4
+=over
 
 =item topic => $str
 
@@ -2022,12 +2030,14 @@ of utf8 strings.
 
 =head3 puback ( %args )
 
-Used to acknowledge the receipt of a message received from a subscription with QoS 1.
+Acknowledges the receipt of a message received from a subscription with QoS 1.
 The server should resend the message until it is acknowledged.
 
-=over 4
+=over
 
 =item packet_id => $int
+
+Packet ID of the message being acknowledged.
 
 =item reason_code => $int
 
@@ -2043,6 +2053,10 @@ than individual send() calls because Nagle's algorithm is disabled.
 =head3 discard_buffer
 
 Discard buffered packets.
+
+=head1 SEE ALSO
+
+The MQTT specification can be found at L<https://mqtt.org/mqtt-specification>
 
 =head1 AUTHOR
 

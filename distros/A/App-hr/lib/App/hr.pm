@@ -1,7 +1,9 @@
 package App::hr;
 
-our $DATE = '2020-04-27'; # DATE
-our $VERSION = '0.262'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-07-08'; # DATE
+our $DIST = 'App-hr'; # DIST
+our $VERSION = '0.264'; # VERSION
 
 use feature 'say';
 use strict 'subs', 'vars';
@@ -12,6 +14,7 @@ our @ISA = qw(Exporter);
 our @EXPORT_OK = qw(
                        hr
                        hr_r
+                       hr_Br
                );
 
 our %SPEC;
@@ -32,7 +35,7 @@ if (defined $ENV{COLUMNS}) {
 }
 
 sub hr {
-    my ($pattern, $color) = @_;
+    my ($pattern, $color, $blink) = @_;
     $pattern = "=" if !defined($pattern) || !length($pattern);
     my $n  = int($term_width / length($pattern))+1;
     my $hr = substr(($pattern x $n), 0, $term_width);
@@ -51,6 +54,8 @@ sub hr {
         }
     };
     undef $color unless $do_color;
+
+    $hr = "\e[5m$hr\e[0m" if $blink;
 
     if (defined $color) {
         require Term::ANSIColor;
@@ -101,6 +106,8 @@ Usage:
 
     % hr -r  ;# shortcut for --random-pattern --random-color
 
+    % hr -Br ;# a BLINKING random pattern, random color bar
+
     % hr --help
 
 If you use Perl, you can also use the `hr` function in <pm:App::hr> module.
@@ -120,6 +127,11 @@ _
         },
         random_color => {
             schema => ['bool', is=>1],
+        },
+        blink => {
+            summary => 'Return a blinking bar',
+            schema => 'bool*',
+            cmdline_aliases => {B=>{}},
         },
         height => {
             summary => 'Specify height (number of rows)',
@@ -201,7 +213,7 @@ sub hr_app {
         );
     }
 
-    my $res = hr($args{pattern}, $args{color});
+    my $res = hr($args{pattern}, $args{color}, $args{blink});
     $res = join(
         "",
         ("\n" x ($args{space_before} // 0)),
@@ -214,6 +226,13 @@ sub hr_app {
 
 sub hr_r {
     my $res = hr_app(random_color=>1, random_pattern=>1);
+    my $hr  = $res->[2];
+    return $hr if defined(wantarray);
+    print $hr;
+}
+
+sub hr_Br {
+    my $res = hr_app(blink=>1, random_color=>1, random_pattern=>1);
     my $hr  = $res->[2];
     return $hr if defined(wantarray);
     print $hr;
@@ -234,7 +253,7 @@ App::hr - Print horizontal bar on the terminal
 
 =head1 VERSION
 
-This document describes version 0.262 of App::hr (from Perl distribution App-hr), released on 2020-04-27.
+This document describes version 0.264 of App::hr (from Perl distribution App-hr), released on 2021-07-08.
 
 =head1 SYNOPSIS
 
@@ -265,6 +284,12 @@ You can also use the provided CLI L<hr>.
 
 =head2 COLOR
 
+=head1 CONTRIBUTOR
+
+=for stopwords Steven Haryanto
+
+Steven Haryanto <sharyanto@cpan.org>
+
 =head1 FUNCTIONS
 
 =head2 hr([ $pattern [, $color ] ]) => optional STR
@@ -289,12 +314,17 @@ or program is run interactively.
 
 Like C<hr>, but will set random pattern and random color.
 
+=head2 hr_Br => optional STR
+
+Like C<hr>, but will set random pattern and random color and return a blinking
+bar.
+
 
 =head2 hr_app
 
 Usage:
 
- hr_app(%args) -> [status, msg, payload, meta]
+ hr_app(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Print horizontal bar on the terminal.
 
@@ -334,6 +364,8 @@ Usage:
  
  % hr -r  ;# shortcut for --random-pattern --random-color
  
+ % hr -Br ;# a BLINKING random pattern, random color bar
+ 
  % hr --help
 
 If you use Perl, you can also use the C<hr> function in L<App::hr> module.
@@ -343,6 +375,10 @@ This function is not exported.
 Arguments ('*' denotes required arguments):
 
 =over 4
+
+=item * B<blink> => I<bool>
+
+Return a blinking bar.
 
 =item * B<color> => I<str>
 
@@ -373,12 +409,12 @@ Number of empty rows before drawing the bar.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -410,7 +446,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2018, 2016, 2015, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2018, 2016, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

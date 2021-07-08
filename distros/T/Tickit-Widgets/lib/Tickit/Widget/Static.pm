@@ -1,11 +1,11 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2009-2020 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2009-2021 -- leonerd@leonerd.org.uk
 
-use Object::Pad 0.27;
+use Object::Pad 0.41;  # :param
 
-package Tickit::Widget::Static 0.52;
+package Tickit::Widget::Static 0.53;
 class Tickit::Widget::Static
    extends Tickit::Widget;
 
@@ -90,7 +90,7 @@ For more details see the accessors below.
 =cut
 
 has @_lines;
-has $_on_click;
+has $_on_click :reader :writer :param = undef;
 
 BUILD
 {
@@ -99,8 +99,6 @@ BUILD
    $self->set_text( $params{text} );
    $self->set_align( $params{align} || 0 );
    $self->set_valign( $params{valign} || 0 );
-
-   $self->set_on_click( $params{on_click} );
 
    return $self;
 }
@@ -173,10 +171,7 @@ See also L<Tickit::WidgetRole::Alignable>.
 
 =cut
 
-method set_on_click
-{
-   ( $_on_click ) = @_;
-}
+# generated accessor
 
 method render_to_rb
 {

@@ -6,7 +6,7 @@ use Mojo::File qw(curfile path tempdir);
 use Mojo::Util qw(encode decode);
 use lib curfile->dirname->dirname->child('lib')->to_string;
 my $t              = Test::Mojo->new('Mojolicious');
-my $random_tempdir = tempdir('opraziXXXX', TMPDIR => 1, CLEANUP => 1);
+my $random_tempdir = tempdir('obraziXXXX', TMPDIR => 1, CLEANUP => 1);
 
 my $COMMAND = 'Mojolicious::Command::Author::generate::obrazi';
 require_ok($COMMAND);
@@ -55,9 +55,12 @@ my $run = sub {
   }
 
   # note $buffer;
-  like $buffer            => qr/warn.+?Skipping.+?loga4.png. Image error: iCCP/, 'right warning';
-  like $buffer            => qr/loga16\.png/,                                    'right file';
-  like decode(U, $buffer) => qr/Inspecting category мозайки/,                    'right category';
+TODO: {
+    local $TODO = 'We are not sure if the underling PNG library will warn or not.';
+    like $buffer => qr/warn.+?Skipping.+?loga4.png. Image error: iCCP/, 'right warning';
+  }
+  like $buffer            => qr/loga16\.png/,                 'right file';
+  like decode(U, $buffer) => qr/Inspecting category мозайки/, 'right category';
 };
 my $run_custom = sub {
   my $from_dir = curfile->dirname->child('data/from');
@@ -81,10 +84,12 @@ my $run_custom = sub {
       '-t'       => $from_dir->child('obrazi_custom.html.ep')
     );
   }
-
-  like $buffer            => qr/warn.+?Skipping.+?loga4.png. Image error: iCCP/, 'right warning';
-  like $buffer            => qr/loga16\.png/,                                    'right file';
-  like decode(U, $buffer) => qr/Inspecting category мозайки/,                    'right category';
+TODO: {
+    local $TODO = 'We are not sure if the underling PNG library will warn or not.';
+    like $buffer => qr/warn.+?Skipping.+?loga4.png. Image error: iCCP/, 'right warning';
+  }
+  like $buffer            => qr/loga16\.png/,                 'right file';
+  like decode(U, $buffer) => qr/Inspecting category мозайки/, 'right category';
   is_deeply $command->max => {width => 500, height => 500},
     'right max';
   is_deeply $command->thumbs => {width => 120, height => 120},

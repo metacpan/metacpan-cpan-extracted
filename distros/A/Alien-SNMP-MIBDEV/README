@@ -2,7 +2,7 @@ NAME
     Alien::SNMP::MIBDEV - Alien package for the Net-SNMP library
 
 VERSION
-    Version 2.000000
+    Version 2.020000
 
 SYNOPSIS
      use Alien::SNMP::MIBDEV;
@@ -71,6 +71,8 @@ AUTHOR
 
 LICENSE AND COPYRIGHT
     Copyright 2015 Eric A. Miller.
+
+    Copyright 2020 Oliver Gorwits.
 
     Copyright 2021 Nick Nauwelaerts.
 

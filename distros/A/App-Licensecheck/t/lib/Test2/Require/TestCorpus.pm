@@ -1,6 +1,7 @@
 package Test2::Require::TestCorpus;
 
-use strictures;
+use strict;
+use warnings;
 
 use Test2::Require::Module qw(File::BaseDir);
 

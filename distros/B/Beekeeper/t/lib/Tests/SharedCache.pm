@@ -11,7 +11,7 @@ use Test::More;
 sub start_test_workers : Test(startup => 1) {
     my $self = shift;
 
-    my $running = $self->start_workers('Tests::Service::Cache', workers_count => 10);
+    my $running = $self->start_workers('Tests::Service::Cache', worker_count => 10);
     is( $running, 10, "Spawned 10 workers");
 };
 

@@ -14,7 +14,7 @@ Lab::Measurement::Legacy::Developer::Write-A-Source-Driver - Implementing a curr
 
 =head1 VERSION
 
-version 3.760
+version 3.762
 
 =head1 Implementing a current/voltage source driver
 
@@ -187,7 +187,7 @@ that are interpreted on connection level. This should in general also be possibl
 This software is copyright (c) 2021 by the Lab::Measurement team; in detail:
 
   Copyright 2012       Alois Dirnaichner
-            2017-2018  Andreas K. HÃ¼ttel
+            2017-2018  Andreas K. Huettel
 
 
 This is free software; you can redistribute it and/or modify it under

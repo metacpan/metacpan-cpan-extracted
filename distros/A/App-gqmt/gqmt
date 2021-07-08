@@ -25,9 +25,6 @@ gqmt [-h] <-u USER -R REPO -T TOKEN -P PACKAGE -t query.tt> REST OF OPTIONS
 
 script to clean up old package versions from GitHub repository
 
-currently it (packages list) is fixed, hardcoded list of packages (may
-be in future it becomes configurable)
-
 =head1 OPTIONS
 
 =over 4
@@ -38,7 +35,7 @@ dry run
 
 =item B<-a | --age> I<INTEGER>
 
-in seconds, default is 2 weeks
+age of version in seconds, to keep. default is 2 weeks
 
 =item B<-u | --user> I<STRING>
 
@@ -81,6 +78,10 @@ GraphQL API endpoint, default is I<https://api.github.com/graphql>
 package name to manage versions of
 
 supported packages are:
+
+=item B<--package-regex> I<STRING>
+
+regex to exclude package version name from been processed
 
 =over
 
@@ -136,7 +137,11 @@ help message
 
 =over
 
-gqmt < -u user-name -R repo-name -P pkg-name -T xxxxxxxxxxxxxxxxxx >
+    gqmt < -u user-name -R repo-name -P pkg-name -T xxxxxxxxxxxxxxxxxx >
+
+to exclude all versions from been deleted:
+
+    gqmt -u user-name -R repo-name -P pkg-name -T xxxxxxxxxxxxxxxxxx -D --package-regex '.*'
 
 =back
 
@@ -178,7 +183,7 @@ Example of query template:
 
 =head1 SEE ALSO
 
-L<https://docs.github.com/en/graphql/guides/forming-calls-with-graphq>
+L<https://docs.github.com/en/graphql/guides/forming-calls-with-graphql>
 
 =head1 AUTHOR
 

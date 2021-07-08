@@ -20,7 +20,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_14)
 
 target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra)
-set_source_files_properties(src/panda/unievent/socks/SocksFilter.cc PROPERTIES COMPILE_FLAGS -Wno-implicit-fallthrough)
+set_source_files_properties(src/panda/unievent/socks/SocksParser.cc PROPERTIES COMPILE_FLAGS "-Wno-implicit-fallthrough -Wno-unused-const-variable")
 
 find_program(ragel_bin ragel)
 if (ragel_bin)

@@ -40,7 +40,7 @@ use HTTP::Request::Common;
 use HTML::TreeBuilder;
 use Encode;
 
-our $VERSION = '1.50'; # VERSION
+our $VERSION = '1.51'; # VERSION
 
 use vars qw($OnVista_URL);
 

@@ -144,8 +144,8 @@ struct Fields {
     }
 
     auto get_multi (const string_view& key) const {
-        return fields | ::ranges::view::filter([key](const Field& f) {return f.matches(key);})
-                      | ::ranges::view::transform([](const Field& f) -> const string& {return f.value; });
+        return fields | ::ranges::views::filter([key](const Field& f) {return f.matches(key);})
+                      | ::ranges::views::transform([](const Field& f) -> const string& {return f.value; });
     }
 
     typename Container::iterator       begin  ()       { return fields.begin(); }

@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::Yokogawa7651;
-$Lab::Moose::Instrument::Yokogawa7651::VERSION = '3.760';
+$Lab::Moose::Instrument::Yokogawa7651::VERSION = '3.762';
 #ABSTRACT: Yokogawa7651 voltage/current source.
 
 use v5.20;
@@ -41,13 +41,12 @@ sub source_level_query {
     my ( $self, %args ) = validated_getter( \@_ );
 
     my $value = $self->query( command => "OD", %args );
+    # Typical result: NDCV+0.0000E-00
 
-    # FIXME: why do we need this????
-    $value = substr( $value, 4 );
+    # we need to drop the uppercase letters at the start
+    $value =~ s/^[A-Z]*//;
 
-    # ????????
-
-    return $self->cached_source_level();
+    return $self->cached_source_level($value);
 }
 
 sub source_level {
@@ -59,7 +58,7 @@ sub source_level {
     $self->write(
 
         # Trailing 'e' is trigger.
-        command => sprintf( "S%.17ge", $value ),
+        command => sprintf( "S%.10ge", $value ),
         %args
     );
     $self->cached_source_level($value);
@@ -123,7 +122,7 @@ Lab::Moose::Instrument::Yokogawa7651 - Yokogawa7651 voltage/current source.
 
 =head1 VERSION
 
-version 3.760
+version 3.762
 
 =head1 SYNOPSIS
 
@@ -194,7 +193,7 @@ For XPRESS voltage sweep. Equivalent to C<set_voltage>.
 This software is copyright (c) 2021 by the Lab::Measurement team; in detail:
 
   Copyright 2017       Simon Reinhardt
-            2020       Andreas K. HÃ¼ttel
+            2020-2021  Andreas K. Huettel
 
 
 This is free software; you can redistribute it and/or modify it under

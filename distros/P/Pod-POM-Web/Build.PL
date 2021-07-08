@@ -31,6 +31,7 @@ my $builder = Module::Build->new(
       'Plack::Util'          => 0,
       'Search::Indexer'      => 1.0,
       'CPAN::Common::Index'  => 0,
+      'Params::Validate'     => 0,
       },
     recommends => {
       'PPI::HTML'                 => 0,

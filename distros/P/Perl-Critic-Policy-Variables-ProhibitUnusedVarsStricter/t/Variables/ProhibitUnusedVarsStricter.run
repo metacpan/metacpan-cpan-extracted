@@ -639,6 +639,42 @@ say $answer;
 
 #-----------------------------------------------------------------------------
 
+## name Unused try/catch() variable allowed by default
+## failures 0
+## cut
+
+try {
+    foo();
+} catch ( $err ) {
+}
+
+#-----------------------------------------------------------------------------
+
+## name Unused try/catch() variable disallowed if so configured
+## parms { check_catch => '1' }
+## failures 1
+## cut
+
+try {
+    foo();
+} catch ( $err ) {
+}
+
+#-----------------------------------------------------------------------------
+
+## name Used try/catch() variable allowed
+## parms { check_catch => '1' }
+## failures 0
+## cut
+
+try {
+    foo();
+} catch ( $err ) {
+    bar( $err );
+}
+
+#-----------------------------------------------------------------------------
+
 # Local Variables:
 #   mode: cperl
 #   cperl-indent-level: 4

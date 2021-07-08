@@ -105,8 +105,9 @@ sub __transaction {
     }
     $ax->print_sql_info( $ax->get_sql_info( $sql ), $waiting );
     my $rolled_back;
+    my $sth;
     if ( ! eval {
-        my $sth = $dbh->prepare(
+        $sth = $dbh->prepare(
             $ax->get_stmt( $sql, $stmt_type, 'prepare' )
         );
         for my $values ( @$rows_to_execute ) {
@@ -128,7 +129,7 @@ sub __transaction {
             );
             $ax->print_sql_info( $info, $waiting );
             if ( ! defined $choice || $choice ne $commit_ok ) {
-                # $sth->finish if $sf->{i}{driver} eq 'SQLite'; # finish called automatically when $sth is destroyed ?
+                $sth->finish if $sf->{i}{driver} eq 'SQLite';
                 $dbh->rollback;
                 $rolled_back = 1;
             }
@@ -139,7 +140,7 @@ sub __transaction {
         1 }
     ) {
         $ax->print_error_message( $@ );
-        # $sth->finish if $sf->{i}{driver} eq 'SQLite'; # finish called automatically when $sth is destroyed ?
+        $sth->finish if $sf->{i}{driver} eq 'SQLite';
         $dbh->rollback;
         $rolled_back = 1;
     }

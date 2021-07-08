@@ -1,3 +1,9 @@
+0.002   2021-02-24  Released-By: PERLANCAR; Urgency: medium
+
+	- Add option to load modules in get_features_decl() (currently
+	  undocumented).
+
+
 0.001   2021-02-24  Released-By: PERLANCAR
 
         - First release.

@@ -17,12 +17,16 @@ sub entry_point($self) {
     $self->_run_command();
 }
 
-sub _run_command($self){
+sub _run_command($self) {
     my $interface = $self->_retrieve_or_die($self->{input_args}, 0);
 
     # please note that there ar potential problems with this commend as mentioned here: https://github.com/WireGuard/wireguard-tools/pull/3
     my $cmd_line = "su -c 'wg syncconf $interface <(wg-quick strip $interface)'";
-    run_external($cmd_line);
+    unless (defined $ENV{WGmeta_NO_WG}) {
+        run_external($cmd_line);
+    } else  {
+        print "Faked apply \n";
+    }
 }
 
 sub cmd_help($self) {

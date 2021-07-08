@@ -27,7 +27,7 @@ resources:
   bugtracker: https://github.com/perlancar/perl-Module-FeaturesUtil-Get/issues
   homepage: https://metacpan.org/release/Module-FeaturesUtil-Get
   repository: git://github.com/perlancar/perl-Module-FeaturesUtil-Get.git
-version: '0.001'
+version: '0.002'
 x_Dist_Zilla:
   perl:
     version: '5.030000'

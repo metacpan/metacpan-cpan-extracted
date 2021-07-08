@@ -1,110 +1,103 @@
 #!/usr/bin/perl
-use 5.001 ; use strict ; use warnings ; 
-use Getopt::Std ; getopts ':!=c:e:f:quvy1' , \my%o ; 
+use 5.014 ; use strict ; use warnings ; 
+use Getopt::Std ; getopts ':~!=c:e:f:i:u:y2:' , \my%o ; 
 use Encode qw/decode_utf8 encode_utf8/ ;
 use Term::ANSIColor qw/:constants/ ; $Term::ANSIColor::AUTORESET = 1 ;
 use FindBin qw[ $Script ] ;
 
-sub main ; 
+my @target_columns = & build_target_columns ( ) ; #
+my $tgt_col = $target_columns [0] ;# どの列を検索するか。 -cの指定が1始まりであるのとは異なり、0始まり <--- ??? 
+my $search_pattern = build_sp () ; 
+my $lineproc ; # どういう処理をするかを、init関数の中で定義する。
+my %words ; # 検索パターンを複数。
+my $o_inv = $o{'~'} ? 1 : 0 ; # 検索条件を反転するかどうか # -~にしたいかも。 inverse
+my $optu0 = exists $o{u} && $o{u} eq 0 ; # -u 0 が指定されているか否か。
+my $opt20 = exists $o{2} && $o{2} eq 0 ; # -u 0 が指定されているか否か。
+my $isep = $o{i} // "\t" ; # -i で指定される入力列区切り文字
+my $tgt_str ; # 検索対象となる文字列をここに格納する変数。
 
-main () ; 
+$| = 1 if $o{'!'} ;
+
+& build_subs ; # 関数を柔軟に指定する。高速化のため
+do { my $header = <> ; print "=:\t" if $o{':'} ; print ! $o{y} ? $header :  "=\n" } if $o{'='} ; 
+& main ; 
 exit 0 ; 
 
-# メインの部分の処理
 
+## オプション -c の内容を読み取って、@target_columnsに格納する。
+sub build_target_columns ( ) { 
+  my @temp ; 
+  my @ranges = split /,/ , $o{c} // '' , -1 ; 
+  grep { $_ = $_ . ".." . $_ unless m/\.\./ }  @ranges ; # <--
+  do { m/^(.+)\.\.(.+)/ ; push @temp , map { $_ > 0 ? $_ - 1 : $_ } $1 .. $2 } for @ranges ; 
+  return @temp ;
+}
+
+## 検索する正規表現の構成 sp はサーチパターンの略
+sub build_sp {  
+  return $optu0 ? $o{e} : decode_utf8 $o{e} if exists $o{e} ;  
+  if ( defined $o{f} ) { 
+    open my $fh , '<' , $o{f} or die "File `$o{f}' including the search words missing.  " , $! ;  
+    while ( <$fh> ) { chomp ; $words{ decode_utf8( $_ ) } = 1 } ; close $fh ; 
+    return join '|' , keys %words ; 
+  }
+}
+
+
+## main で使う3個の関数
+sub Select ( ); 
+sub LineProc ( $ ) ;
+sub Match (  ) ;
+
+## 関数3個を動的に設定する。毎行読んで処理する際の高速化のため。最初のオーバーヘッドは高いかも知れないが。
+sub build_subs ( ) { 
+    # 行全体から文字列を切り出す関数
+  sub Select0  { $tgt_str = $_ } ; 
+  sub Select0u { $tgt_str = decode_utf8 $_ } ; 
+  sub Selectc  { $tgt_str = [split/$isep/o,$_,-1]->[ $tgt_col ] } ;
+  sub Selectcu { $tgt_str = decode_utf8 [split/$isep/o,$_,-1]->[ $tgt_col ] } ;
+  sub SelectC  { $tgt_str = join $isep, @{[split/$isep/o,$_,-1]}[ @target_columns ] } ;
+  sub SelectCu { $tgt_str = decode_utf8 join $isep, @{[split/$isep/o,$_,-1]}[ @target_columns ] } ;
+  * Select = * Select0  ; # <-- - @tartget_columns == 0 に相当
+  * Select = * Select0u if ! $optu0 ; # <-- - @tartget_columns == 0 に相当
+  * Select = * Selectc  if @target_columns == 1 ; 
+  * Select = * Selectcu if @target_columns == 1 && ! $optu0 ; 
+  * Select = * SelectC  if @target_columns >= 2 ;  
+  * Select = * SelectCu if @target_columns >= 2 && ! $optu0 ;
+
+  # マッチの判定をする関数
+  sub matchP { $tgt_str =~ m/$search_pattern/o } ; 
+  sub matchN { $tgt_str !~ m/$search_pattern/o } ; 
+  sub matchEP { $words { $tgt_str } }  ; 
+  sub matchEN { $words { $tgt_str } ? 0 : 1 } ; 
+  * Match = * matchP ; 
+  * Match = * matchN if $o_inv ; 
+  * Match = * matchEP if $o{f} ;
+  * Match = * matchEN if $o_inv && $o{f} ;
+
+  # 下記の関数は printもするし、個数も返す。
+  sub L0  { $_[0] ? do { say $_ ; 1 } : 0 } # (encode_utf8 が以前問題を起こしていた。)
+  sub Ln  { $_[0] ? do { say "$.:\t$_" ; 1 } : 0 } # 行番号も出力
+  sub Ly  { my $y =  $_[0] ? 1 : 0 ; say $y ; return $y } # 0/1だけ表示
+  sub Lny { my $y =  $_[0] ? 1 : 0 ; say "$.:\t$y" ; return $y } # 0/1の前に行番号も出力
+  * LineProc = * L0 ; 
+  * LineProc = * Ln if $o{':'} ; 
+  * LineProc = * Ly if $o{'y'} ; 
+  * LineProc = * Lny if $o{':'} && $o{'y'} ; 
+}
+
+## メインの部分の処理
 sub main ( ) {
-
-  sub init ( ) ; 
-  sub Select ( ); 
-  sub LineProc ( $ ) ;
-  sub Match (  ) ;
-  our $search ; 
-  our $lineproc ; # どういう処理をするかを、init関数の中で定義する。
-  our %words ; # 検索パターンを複数。
-  our $flip ; # 反転するかどうか $o{v} と真偽は 一致
-  our $col ; # どの列を検索するか。 -cの指定が1始まりであるのとは異なり、0始まり
-  our @cols ; 
-  our $cstr ; 
-  our $isep = "\t" ; # <-- 指定可能とすることはあり得る。
-
-  init () ; 
-
   my $oL ; # 条件に適合したので、出力をした行数
   my $tL ; # 読み込んだ行数
-
   while ( <> ) { 
     chomp ; 
-    Select ()  ; # $cstr が操作されていることに注意。$_ から部分列を きりだす。
+    Select ()  ; # $tgt_str が操作されていることに注意。$_ から部分列を きりだす。
     $oL +=  LineProc Match ;
     $tL ++ ;
   }
-  #my $mL = $o{v} ? $tL - $oL : $oL ; # 条件にあった数。ただし、-v により条件を反転させる。
-  print STDERR CYAN sprintf "match:%d unmatch:%d total:%d ($Script)\n",$oL,$tL-$oL,$tL unless $o{q} ; 
+  print STDERR CYAN FAINT BOLD ITALIC sprintf "match:%d unmatch:%d total:%d ($Script)\n",$oL,$tL-$oL,$tL unless $opt20 ; 
   return ;
-
-  sub init ( ) { 
-
-    sub build_range ( ) { 
-      my @ranges = split /,/ , $o{c} // '' , -1 ; 
-      grep { $_ = $_ . ".." . $_ unless m/\.\./ }  @ranges ; # <--
-      do { m/^(.+)\.\.(.+)/ ; push @cols , map { $_ > 0 ? $_ - 1 : $_ } $1 .. $2 } for @ranges ; 
-    }
-
-    $| = 1 if $o{'!'} ;
-    #$col = $o{c} > 0 ? $o{c} - 1 : $o{c} if exists $o{c} ; # 負の数であれば、末尾から列位置を数えることになる。
-    build_range ( ) ;
-    $col = $cols[0] ;
-    $flip = $o{v} ? 1 : 0 ;
-
-    # 行全体から文字列を切り出す関数
-    sub Select0  { $cstr = $_ } ; 
-    sub Select0u { $cstr = decode_utf8 $_ } ; 
-    sub Selectc  { $cstr = [split/$isep/,$_,-1]->[$col] } ;
-    sub Selectcu { $cstr = decode_utf8 [split/$isep/,$_,-1]->[$col] } ;
-    sub SelectC  { $cstr = join $isep, @{[split/$isep/,$_,-1]}[@cols] } ;
-    sub SelectCu { $cstr = decode_utf8 join $isep, @{[split/$isep/,$_,-1]}[@cols] } ;
-    * Select = * Select0 ; 
-    * Select = * Select0u if $o{u} ; 
-    * Select = * Selectc  if @cols == 1 ; 
-    * Select = * Selectcu if @cols == 1 && $o{u} ; 
-    * Select = * SelectC  if @cols >= 2 ;  
-    * Select = * SelectCu if @cols >= 2 && $o{u} ;
-
-    # マッチの判定をする関数
-    sub matchP { $cstr =~ m/$search/ } ; 
-    sub matchN { $cstr !~ m/$search/ } ; 
-    sub matchEP { $words { $cstr } }  ; 
-    sub matchEN { $words { $cstr } ? 0 : 1 } ; 
-    * Match = * matchP ; 
-    * Match = * matchN if $flip ; 
-    * Match = * matchEP if $o{1} ;
-    * Match = * matchEN if $flip && $o{1} ;
-
-    # 下記の関数は printもするし、個数も返す。
-    sub L0  { if ($_[0]) { print encode_utf8($_) , "\n" ; return 1} else { return 0 } } 
-    sub Ll  { if ($_[0]) { print "$.:\t" , encode_utf8($_) , "\n" ; return 1} else { return 0 } } 
-    sub Ly  { my $y =  $_[0] ? 1 : 0 ; print "$y\n" ; return $y } 
-    sub Lly { my $y =  $_[0] ? 1 : 0 ; print "$.:\t$y\n" ; return $y } 
-    * LineProc = * L0 ; 
-    * LineProc = * Ll if $o{':'} ; 
-    * LineProc = * Ly if $o{'y'} ; 
-    * LineProc = * Lly if $o{':'} && $o{'y'} ; 
-
-    # 検索する正規表現の構成
-    $search = decode_utf8 $o{e} if exists $o{e} ;  
-    if ( defined $o{f} ) { 
-      open my $fh , '<' , $o{f} or die "File `$o{f}' including the search words missing.  " , $! ;  
-      while ( <$fh> ) { chomp ; $words{ decode_utf8( $_ ) } = 1 } ; close $fh ; 
-      $search = join '|' , keys %words ; 
-    }
-
-    if ( $o{'='} ) { 
-      my $header = <> ; 
-      print "=:\t" if $o{':'} ;
-      print ! $o{y} ? $header :  "=\n" ;
-      # $. = 0 ; # <- 他のコマンドと一致ないし整合性を図る必要がある。
-    }
-  }
 }
 
 # 主にコマンドの引数の部分の処理
@@ -137,26 +130,26 @@ sub HELP_MESSAGE {
   $0 -c 列番号  -e 正規表現       # 最も想定されている使い方。
   $0 -c 列番号 -f ファイル名   # ファイルの各行に検索したい正規表現があると見なされる。
   $0 正規表現                 #  列を指定しないで、行全体からマッチすれば、その行を出力
-  $0 -v -c 列番号 -e 正規表現     # -v の指定により、マッチしない行を出力する。
+  $0 -~ -c 列番号 -e 正規表現     # -v の指定により、マッチしない行を出力する。
   
  オプション : 
-  -c num : 検索対象を探す列を1個指定する。最左列は1、最右列は-1であり、右に向かうほど1ずつ増加。 
-  -e str ; 正規表現の指定。grep と違って1回のみ。
-  -f filename : 検索する正規表現が含まれているファイルの指定。各行がOR条件で検索されることになる。
-  -1 ; -f と共に用いる。ファイル filename の各行のどれかと指定列が一致するもののみを取り出す。高速のはず。
+  -c num : 検索対象を探す列を指定する。最左列は1、最右列は-1であり、右に向かうほど1ずつ増加。, や..も使える。
+  -e str ; 正規表現の指定。grep と違って -e は1個しか指定できない。(正規表現なので"|"でつなぐとよい。)
+  -f filename : 検索する文字列(正規表現では無い)が含まれているファイルの指定。各行がOR条件で検索されることになる。
 
-  -u ; 文字列の比較は utf8で行う。
+  -i str : 入力区切り文字の指定。未指定なら、タブ文字。
+  -u 0 ; デフォルトで文字列の比較は utf8で行うはずが、それをしない(ASCII文字であるかのように扱う。)
 
-  -v : 行の選択が反転する(マッチしない行が選択される)。
+  -~ : 行の選択が反転する(マッチしない行が選択される)。
   -y : マッチするかどうかで 1/0のみ各行に出力する。
-  -q : 何行マッチした、などの付加情報を標準エラー出力に出力しない。
+  -2 0 : 何行マッチした、などの付加情報を標準エラー出力に出力しない。
 
   -= ; 先頭行をヘッダと見なし、これに応じた処理をする。
   -: ; データの番号を出力する。
 
 開発メモ: 
-  * Colgrep がutf8に対応していない colgrep -= -c1 -e '^6307' 1504*c1.csv
-
+  * -f による指定は、各列の各値が完全一致のみであるという不便がある。
+  * -e による指定は、'^...$' のようにすると完全一致で検索するという説明をする必要のある不便さがある。
 
 =cut
 
@@ -165,8 +158,8 @@ sub HELP_MESSAGE {
   $0 - pattern searcher given which column to seek together with regular expression
 
 SYNOPSIS
-  $0 -c $col_num -e $regex  # The most usual usage
-  $0 -c $col_num -f $filename
+  $0 -c $tgt_col_num -e $regex  # The most usual usage
+  $0 -c $tgt_col_num -f $filename
   $0 -e $regex 
   $0 -v -c .. .. # unmatch ; reverse the matching condition.
 

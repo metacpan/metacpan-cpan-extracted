@@ -20,4 +20,22 @@ share {
     ffi => 1,
   );
 
+  my $configure_flags = '';
+
+  $configure_flags .= " --disable-assembler" if $^O eq 'MSWin32';
+
+  build [
+    "%{configure} --disable-shared $configure_flags",
+    '%{make}',
+    '%{make} install',
+  ];
+
+  ffi {
+    build [
+      "%{configure} --enable-shared --disable-static --libdir=%{.install.autoconf_prefix}/dynamic $configure_flags",
+      '%{make}',
+      '%{make} install',
+    ];
+  };
+
 };

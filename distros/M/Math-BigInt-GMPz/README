@@ -21,30 +21,33 @@ commands:
     make test
     make install
 
-SUPPORT AND DOCUMENTATION
+SUPPORT
 
-After installing, you can find documentation for these modules with the
+After installing, you can find documentation for this module with the
 perldoc command.
 
     perldoc Math::BigInt::GMPz
 
 You can also look for information at:
 
-    RT, CPAN's request tracker
-        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Math-BigInt-GMPz
+    GitHub
+        https://github.com/pjacklam/p5-Math-BigInt-GMPz
 
-    AnnoCPAN, Annotated CPAN documentation
-        http://annocpan.org/dist/Math-BigInt-GMPz
+    RT: CPAN's request tracker
+        https://rt.cpan.org/Dist/Display.html?Name=Math-BigInt-GMPz
+
+    MetaCPAN
+        https://metacpan.org/release/Math-BigInt-GMPz
+
+    CPAN Testers Matrix
+        http://matrix.cpantesters.org/?dist=Math-BigInt-GMPz
 
     CPAN Ratings
-        http://cpanratings.perl.org/d/Math-BigInt-GMPz
-
-    Search CPAN
-        http://search.cpan.org/dist/Math-BigInt-GMPz
+        https://cpanratings.perl.org/dist/Math-BigInt-GMPz
 
 COPYRIGHT AND LICENCE
 
-Peter John Acklam L<pjacklam@online.no>, 2016-.
+Peter John Acklam pjacklam@gmail.com, 2016-.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

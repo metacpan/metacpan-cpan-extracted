@@ -1,3 +1,8 @@
+0.051   2021-07-02  Released-By: PERLANCAR; Urgency: medium
+
+	- Split Bencher::Scenario::Perl::Startup to its own dist.
+
+
 0.050   2019-10-20  Released-By: PERLANCAR
 
         - Add scenarios: Perl::Swap, Perl::Hash.

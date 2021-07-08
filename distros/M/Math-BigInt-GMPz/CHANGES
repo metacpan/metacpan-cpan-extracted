@@ -1,3 +1,13 @@
+0.0006 2021-07-03
+
+ * Require Math::GMPz version 0.36.
+
+0.0005 2021-07-02
+
+ * Fix _lsft() and _rsft() so they don't hang.
+
+ * Sync test files with Math-BigInt.
+
 0.0004 2019-10-10
 
  * Add methods _fib() and _lucas().

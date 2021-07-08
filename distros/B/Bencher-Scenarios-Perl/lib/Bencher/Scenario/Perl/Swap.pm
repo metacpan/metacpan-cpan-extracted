@@ -1,7 +1,7 @@
 package Bencher::Scenario::Perl::Swap;
 
-our $DATE = '2019-10-20'; # DATE
-our $VERSION = '0.050'; # VERSION
+our $DATE = '2021-07-03'; # DATE
+our $VERSION = '0.051'; # VERSION
 
 use 5.010001;
 use strict;
@@ -37,7 +37,7 @@ Bencher::Scenario::Perl::Swap - Benchmark swapping two variables
 
 =head1 VERSION
 
-This document describes version 0.050 of Bencher::Scenario::Perl::Swap (from Perl distribution Bencher-Scenarios-Perl), released on 2019-10-20.
+This document describes version 0.051 of Bencher::Scenario::Perl::Swap (from Perl distribution Bencher-Scenarios-Perl), released on 2021-07-03.
 
 =head1 SYNOPSIS
 
@@ -89,25 +89,25 @@ Code template:
 
 =head1 SAMPLE BENCHMARK RESULTS
 
-Run on: perl: I<< v5.24.0 >>, CPU: I<< Intel(R) Core(TM) i7-4770 CPU @ 3.40GHz (4 cores) >>, OS: I<< GNU/Linux LinuxMint version 18.2 >>, OS kernel: I<< Linux version 4.8.0-53-generic >>.
+Run on: perl: I<< v5.30.2 >>, CPU: I<< Intel(R) Core(TM) i7-4770 CPU @ 3.40GHz (4 cores) >>, OS: I<< GNU/Linux LinuxMint version 19 >>, OS kernel: I<< Linux version 5.3.0-68-generic >>.
 
 Benchmark with default options (C<< bencher -m Perl::Swap >>):
 
  #table1#
- +------------------------------------------------------------------+--------------+-----------+-----------+------------+---------+---------+
- | participant                                                      | dataset      | rate (/s) | time (μs) | vs_slowest |  errors | samples |
- +------------------------------------------------------------------+--------------+-----------+-----------+------------+---------+---------+
- | my $a = <a>; my $b = <b>; for (1..1001) { ($a, $b) = ($b, $a) }  | long-string  |  7872.179 |  127.0296 |    1       | 5.4e-12 |      20 |
- | my $a = <a>; my $b = <b>; for (1..1001) { ($a, $b) = ($b, $a) }  | empty-string |  7872.18  |  127.0296 |    1       | 5.5e-12 |      20 |
- | my $a = <a>; my $b = <b>; my $tmp; for (1..1001) { $tmp = $a; $a | empty-string |  8947.86  |  111.759  |    1.13664 | 1.9e-11 |      20 |
- | my $a = <a>; my $b = <b>; my $tmp; for (1..1001) { $tmp = $a; $a | long-string  |  9050     |  110      |    1.15    | 5.3e-08 |      20 |
- | my $a = <a>; my $b = <b>; my $tmp; for (1..1001) { $tmp = $a; $a | short-string | 11200     |   89.2    |    1.42    | 2.7e-08 |      20 |
- | my $a = <a>; my $b = <b>; my $tmp; for (1..1001) { $tmp = $a; $a | number       | 11400     |   87.5    |    1.45    | 2.1e-08 |      32 |
- | my $a = <a>; my $b = <b>; my $tmp; for (1..1001) { $tmp = $a; $a | undef        | 11000     |   87      |    1.5     | 1.1e-07 |      20 |
- | my $a = <a>; my $b = <b>; for (1..1001) { ($a, $b) = ($b, $a) }  | short-string | 13600     |   73.6    |    1.73    | 2.6e-08 |      21 |
- | my $a = <a>; my $b = <b>; for (1..1001) { ($a, $b) = ($b, $a) }  | number       | 14000     |   72      |    1.8     |   1e-07 |      21 |
- | my $a = <a>; my $b = <b>; for (1..1001) { ($a, $b) = ($b, $a) }  | undef        | 14000     |   70      |    1.8     | 8.3e-08 |      33 |
- +------------------------------------------------------------------+--------------+-----------+-----------+------------+---------+---------+
+ +------------------------------------------------------------------+--------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
+ | participant                                                      | dataset      | rate (/s) | time (μs) | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors | samples |
+ +------------------------------------------------------------------+--------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
+ | my $a = <a>; my $b = <b>; for (1..1001) { ($a, $b) = ($b, $a) }  | empty-string |   8267.46 | 120.956   |                 0.00% |                80.43% |   0     |      20 |
+ | my $a = <a>; my $b = <b>; for (1..1001) { ($a, $b) = ($b, $a) }  | long-string  |   8272.35 | 120.885   |                 0.06% |                80.33% |   0     |      20 |
+ | my $a = <a>; my $b = <b>; my $tmp; for (1..1001) { $tmp = $a; $a | empty-string |  10300    |  96.7     |                25.10% |                44.23% |   8e-08 |      20 |
+ | my $a = <a>; my $b = <b>; my $tmp; for (1..1001) { $tmp = $a; $a | long-string  |  10529.8  |  94.9685  |                27.36% |                41.67% |   0     |      20 |
+ | my $a = <a>; my $b = <b>; for (1..1001) { ($a, $b) = ($b, $a) }  | number       |  14000    |  72       |                68.60% |                 7.02% | 1.1e-07 |      20 |
+ | my $a = <a>; my $b = <b>; my $tmp; for (1..1001) { $tmp = $a; $a | short-string |  14100    |  70.9     |                70.57% |                 5.78% | 2.7e-08 |      20 |
+ | my $a = <a>; my $b = <b>; my $tmp; for (1..1001) { $tmp = $a; $a | number       |  14197.45 |  70.43516 |                71.73% |                 5.07% | 4.8e-12 |      20 |
+ | my $a = <a>; my $b = <b>; for (1..1001) { ($a, $b) = ($b, $a) }  | short-string |  14300    |  70.1     |                72.49% |                 4.60% | 2.1e-08 |      31 |
+ | my $a = <a>; my $b = <b>; my $tmp; for (1..1001) { $tmp = $a; $a | undef        |  14299.1  |  69.93446 |                72.96% |                 4.32% | 5.7e-12 |      20 |
+ | my $a = <a>; my $b = <b>; for (1..1001) { ($a, $b) = ($b, $a) }  | undef        |  14917.19 |  67.03677 |                80.43% |                 0.00% | 4.6e-12 |      26 |
+ +------------------------------------------------------------------+--------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
 
 
 To display as an interactive HTML table on a browser, you can add option C<--format html+datatables>.
@@ -136,7 +136,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2019, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

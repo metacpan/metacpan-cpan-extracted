@@ -5,7 +5,7 @@
       "Leon Brocard <acme@astray.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.019, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.022, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -42,6 +42,7 @@
       "runtime" : {
          "requires" : {
             "Catalyst" : "0",
+            "Catalyst::Plugin::Static::Simple" : "0",
             "Catalyst::ScriptRunner" : "0",
             "Catalyst::View::TT" : "0",
             "Cwd" : "0",
@@ -78,7 +79,7 @@
          "web" : "https://github.com/uperl/Devel-ebug-HTTP"
       }
    },
-   "version" : "0.33",
+   "version" : "0.34",
    "x_contributors" : [
       "Leon Brocard <acme@astray.com>",
       "Graham Ollis <plicease@cpan.org>"

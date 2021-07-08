@@ -29,5 +29,5 @@ resources:
   homepage: https://metacpan.org/author/DAMI
   license: http://www.perlfoundation.org/artistic_license_2_0
   repository: https://github.com/damil/Search-Indexer.git
-version: '1.00'
+version: '1.01'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

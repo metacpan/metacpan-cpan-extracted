@@ -41,6 +41,14 @@ $r->get( '/notes', {
     resultset => 'Notes',
     template => 'notes/list',
 }, 'notes.list' );
+$r->get( '/notes/paged/:page', {
+    page => 1,
+    limit => 1,
+    controller => 'DBIC',
+    action => 'list',
+    resultset => 'Notes',
+    template => 'notes/list',
+}, 'notes.paged' );
 $r->any( [ 'GET', 'POST' ], '/notes/new', {
     controller => 'DBIC',
     action => 'set',
@@ -74,6 +82,24 @@ $t->get_ok( '/notes' )->status_is( 200 )
   ->text_is( 'li:nth-child(1)' => $notes[0]->title )
   ->text_is( 'li:nth-child(2)' => $notes[1]->title )
   ->text_is( 'li:nth-child(3)' => $notes[2]->title )
+  ;
+
+$t->get_ok( '/notes/paged' )->status_is( 200 )
+  ->or( sub { diag shift->tx->res->body } )
+  ->text_is( 'li:nth-child(1)' => $notes[0]->title )
+  ->element_exists_not( 'li:nth-child(2)' => 'only one row shown' )
+  ;
+
+$t->get_ok( '/notes/paged/2' )->status_is( 200 )
+  ->or( sub { diag shift->tx->res->body } )
+  ->text_is( 'li:nth-child(1)' => $notes[1]->title )
+  ->element_exists_not( 'li:nth-child(2)' => 'only one row shown' )
+  ;
+
+$t->get_ok( '/notes/paged', form => { '$order_by' => 'desc:id' } )->status_is( 200 )
+  ->or( sub { diag shift->tx->res->body } )
+  ->text_is( 'li:nth-child(1)' => $notes[2]->title )
+  ->element_exists_not( 'li:nth-child(2)' => 'only one row shown' )
   ;
 
 $t->get_ok( '/notes/1' )->status_is( 200 )

@@ -1,5 +1,5 @@
 CREATE TABLE semaphores (
-  id int PRIMARY KEY AUTO_INCREMENT,
+  id bigint unsigned NOT NULL PRIMARY KEY AUTO_INCREMENT,
   lockstring varchar(128) UNIQUE,
   created datetime NOT NULL,
   expires datetime NOT NULL,

@@ -1,32 +1,19 @@
 package Google::RestApi::Auth::OAuth2Client;
 
+our $VERSION = '0.7';
+
+use Google::RestApi::Setup;
+
 # this was taken from Net::Google::DataAPI::Auth::OAuth2 and had
 # a moose-ectomy. this will get rid of warnings about switching
 # to Moo instead of Moose::Any.
 
-use strict;
-use warnings;
-
-our $VERSION = '0.4';
-
-use 5.010_000;
-
-use autodie;
 use Net::OAuth2::Client;
 use Net::OAuth2::Profile::WebServer;
 use Storable qw(retrieve);
-use Type::Params qw(compile compile_named);
-use Types::Standard qw(Str Bool ArrayRef);
 use URI;
-use YAML::Any qw(Dump);
-
-no autovivification;
-
-use Google::RestApi::Utils qw(config_file resolve_config_file);
 
 use parent 'Google::RestApi::Auth';
-
-do 'Google/RestApi/logger_init.pl';
 
 sub new {
   my $class = shift;
@@ -154,9 +141,9 @@ sub userinfo {
   my $token = $self->access_token();
   my $url = URI->new($self->{userinfo_url});
   my $res = $token->get($url);
-  $res->is_success or die 'userinfo request failed: ' . $res->as_string;
+  $res->is_success or LOGDIE 'userinfo request failed: ' . $res->as_string;
   my %res_params = $self->oauth2_webserver()->params_from_response($res)
-    or die 'params_from_response for userinfo response failed';
+    or LOGDIE 'params_from_response for userinfo response failed';
   return \%res_params;
 }
 
@@ -198,8 +185,8 @@ and creates the 'Authorization' header for use in Furl or LWP::UserAgent.
 
 This was copied from Net::Google::DataAPI::Auth::OAuth2 and modified
 to fit this framework. The other framework was dated and produced
-constant warnings to upgrade to Moo. I removed Moose since I didn't
-use Moose anywhere else in this framework.
+constant warnings to upgrade from Moose to Moo. I removed Moose since I
+didn't use Moose anywhere else in this framework.
 
 =head1 ATTRIBUTES
 

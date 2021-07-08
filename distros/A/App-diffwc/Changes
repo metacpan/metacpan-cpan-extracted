@@ -1,3 +1,11 @@
+0.007   2021-07-08  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [bugfix] [dist] Run InsertDistImage dzil plugin after PodWeaver
+	  to avoid mangled location.
+
+
 0.006   2021-03-13  Released-By: PERLANCAR; Urgency: medium
 
 	- Update namespace to search for color themes to follow newer

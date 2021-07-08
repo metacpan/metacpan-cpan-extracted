@@ -1,6 +1,6 @@
-package Config::MVP::Reader::INI;
+package Config::MVP::Reader::INI 2.101464;
 # ABSTRACT: an MVP config reader for .ini files
-$Config::MVP::Reader::INI::VERSION = '2.101463';
+
 use Moose;
 extends 'Config::MVP::Reader';
 with 'Config::MVP::Reader::Findable::ByExtension';
@@ -91,16 +91,44 @@ Config::MVP::Reader::INI - an MVP config reader for .ini files
 
 =head1 VERSION
 
-version 2.101463
+version 2.101464
 
 =head1 DESCRIPTION
 
 Config::MVP::Reader::INI reads F<.ini> files containing MVP-style
 configuration.
 
+=head1 PERL VERSION
+
+This module should work on any version of perl still receiving updates from
+the Perl 5 Porters.  This means it should work on any version of perl released
+in the last two to three years.  (That is, if the most recently released
+version is v5.40, then this module should work on both v5.40 and v5.38.)
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
+
 =head1 AUTHOR
 
-Ricardo Signes <rjbs@cpan.org>
+Ricardo Signes <rjbs@semiotic.systems>
+
+=head1 CONTRIBUTORS
+
+=for stopwords nperez Olivier Mengué
+
+=over 4
+
+=item *
+
+nperez <nperez@cpan.org>
+
+=item *
+
+Olivier Mengué <dolmen@cpan.org>
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 

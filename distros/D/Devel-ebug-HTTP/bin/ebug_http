@@ -12,7 +12,7 @@ use Devel::ebug::HTTP;
 
 # PODNAME: ebug_http
 # ABSTRACT: A simple, extensible web Perl debugger
-our $VERSION = '0.33'; # VERSION
+our $VERSION = '0.34'; # VERSION
 
 my $filename = shift;
 die "Usage: ebug_http filename\n" unless $filename;
@@ -39,7 +39,7 @@ ebug_http - A simple, extensible web Perl debugger
 
 =head1 VERSION
 
-version 0.33
+version 0.34
 
 =head1 SYNOPSIS
 

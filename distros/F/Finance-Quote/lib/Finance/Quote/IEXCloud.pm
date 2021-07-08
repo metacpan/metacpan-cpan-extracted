@@ -26,7 +26,7 @@ use HTTP::Request::Common;
 use Text::Template;
 use DateTime::Format::Strptime qw( strptime strftime );
 
-our $VERSION = '1.50'; # VERSION
+our $VERSION = '1.51'; # VERSION
 
 my $IEX_URL = Text::Template->new(TYPE => 'STRING', SOURCE => 'https://cloud.iexapis.com/v1/stock/{$symbol}/quote?token={$token}');
 

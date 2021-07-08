@@ -15,7 +15,6 @@ $Data::Dumper::Sortkeys = 1;
 $Data::Dumper::Pad = "#";
 
 my $XS;
-my $TMAX = 492;
 
 # Force Data::Dumper::Dump to use perl. We test Dumpxs explicitly by calling
 # it direct. Out here it lets us knobble the next if to test that the perl
@@ -27,11 +26,8 @@ if (defined &Data::Dumper::Dumpxs) {
 }
 else {
     print "### XS extensions not loaded, will NOT run XS tests\n";
-    $TMAX /= 2;
     $XS = 0;
 }
-
-plan(tests => $TMAX);
 
 our ( @a, $c, $d, $foo, @foo, %foo, @globs, $v, $ping, %ping );
 our ( @dogs, %kennel, $mutts );
@@ -191,8 +187,7 @@ sub TEST_BOTH {
     }
 }
 
-#XXXif (0) {
-#############
+
 #############
 
 my @c = ('c');
@@ -231,7 +226,6 @@ SCOPE: {
               'Sparseseen with names: Dumpxs()',
               $want);
 }
-
 
 #############
 ##
@@ -390,7 +384,6 @@ EOT
             'Purity 0: Quotekeys 0: Terse 1: DumperX',
             $want);
 }
-
 
 #############
 ##
@@ -588,6 +581,7 @@ EOT
 
 #############
 #############
+
 {
   package main;
   @dogs = ( 'Fido', 'Wags' );
@@ -1064,7 +1058,7 @@ EOT
 
 # This is messy.
 # The controls (bare numbers) are stored either as integers or floating point.
-# [depending on whether the tokeniser sees things like ".".
+# [depending on whether the tokeniser sees things like ".".]
 # The peephole optimiser only runs for constant folding, not single constants,
 # so I already have some NVs, some IVs
 # The string versions are not. They are all PV
@@ -1740,6 +1734,55 @@ EOW
 }
 #############
 {
+  # [CPAN #84569]
+  my $dollar = '${\q($)}';
+  my $want = <<"EOW";
+#\$VAR1 = [
+#  "\\x{2e18}",
+#  qr/^\$/,
+#  qr/^\$/,
+#  qr/${dollar}foo/,
+#  qr/\\\$foo/,
+#  qr/$dollar \x{A3} /u,
+#  qr/$dollar \x{203d} /u,
+#  qr/\\\$ \x{203d} /u,
+#  qr/\\\\$dollar \x{203d} /u,
+#  qr/ \$| \x{203d} /u,
+#  qr/ (\$) \x{203d} /u,
+#  '\xA3'
+#];
+EOW
+  if ($] lt '5.014') {
+      $want =~ s{/u,$}{/,}mg;
+  }
+  if ($] lt '5.010001') {
+      $want =~ s!qr/!qr/(?-xism:!g;
+      $want =~ s!/,!)/,!g;
+  }
+  my $want_xs = $want;
+  $want_xs =~ s/'\x{A3}'/"\\x{a3}"/;
+  $want_xs =~ s/\x{A3}/\\x{a3}/;
+  $want_xs =~ s/\x{203D}/\\x{203d}/g;
+  my $have = <<"EOT";
+Data::Dumper->Dumpxs([ [
+  "\\x{2e18}",
+  qr/^\$/,
+  qr'^\$',
+  qr'\$foo',
+  qr/\\\$foo/,
+  qr'\$ \x{A3} ',
+  qr'\$ \x{203d} ',
+  qr/\\\$ \x{203d} /,
+  qr'\\\\\$ \x{203d} ',
+  qr/ \$| \x{203d} /,
+  qr/ (\$) \x{203d} /,
+  '\xA3'
+] ]);
+EOT
+  TEST_BOTH($have, "CPAN #84569", $want, $want_xs);
+}
+#############
+{
   # [perl #82948]
   # re::regexp_pattern was moved to universal.c in v5.10.0-252-g192c1e2
   # and apparently backported to maint-5.10
@@ -1871,3 +1914,26 @@ EOT
             'glob purity, useqq: Dumpxs()',
             $want);
 }
+#############
+{
+  my $want = <<'EOT';
+#$3 = {};
+#$bang = [];
+EOT
+  {
+    package fish;
+
+    use overload '""' => sub { return "bang" };
+
+    sub new {
+      return bless qr//;
+    }
+  }
+  # 4.5/1.5 generates the *NV* 3.0, which doesn't set SVf_POK true in 5.20.0+
+  # overloaded strings never set SVf_POK true
+  TEST_BOTH(q(Data::Dumper->Dumpxs([{}, []], [4.5/1.5, fish->new()])),
+            'names that are not simple strings: Dumpxs()',
+            $want);
+}
+
+done_testing();

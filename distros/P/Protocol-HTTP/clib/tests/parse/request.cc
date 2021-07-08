@@ -135,3 +135,16 @@ TEST("protocol-relative url parsed as path") {
     CHECK(req->uri->to_string() == "///my//path?a=b");
     CHECK(req->uri->path() == "///my//path");
 }
+
+TEST("uses allow_extended_chars for uri") {
+    RequestParser p;
+    string raw =
+        "GET /?a=b|c HTTP/1.0\r\n"
+        "Host: host1\r\n"
+        "\r\n";
+
+    auto result = p.parse(raw);
+    auto req = result.request;
+    CHECK(result.state == State::done);
+    CHECK(req->uri->to_string() == "/?a=b%7Cc");
+}

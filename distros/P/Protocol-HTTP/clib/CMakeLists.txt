@@ -18,9 +18,9 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_14)
 
 target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra)
-set_source_files_properties(src/panda/protocol/http/CookieParser.cc  PROPERTIES COMPILE_FLAGS -Wno-implicit-fallthrough)
-set_source_files_properties(src/panda/protocol/http/CookieStorage.cc PROPERTIES COMPILE_FLAGS -Wno-implicit-fallthrough)
-set_source_files_properties(src/panda/protocol/http/MessageParser.cc PROPERTIES COMPILE_FLAGS -Wno-implicit-fallthrough)
+set_source_files_properties(src/panda/protocol/http/CookieParser.cc  PROPERTIES COMPILE_FLAGS "-Wno-implicit-fallthrough -Wno-unused-const-variable")
+set_source_files_properties(src/panda/protocol/http/CookieStorage.cc PROPERTIES COMPILE_FLAGS "-Wno-implicit-fallthrough -Wno-unused-const-variable")
+set_source_files_properties(src/panda/protocol/http/MessageParser.cc PROPERTIES COMPILE_FLAGS "-Wno-implicit-fallthrough -Wno-unused-const-variable")
 
 find_program(ragel_bin ragel)
 if (ragel_bin)

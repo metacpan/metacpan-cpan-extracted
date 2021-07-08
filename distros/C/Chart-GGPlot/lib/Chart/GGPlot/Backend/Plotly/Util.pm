@@ -4,7 +4,7 @@ package Chart::GGPlot::Backend::Plotly::Util;
 
 use Chart::GGPlot::Setup qw(:base :pdl);
 
-our $VERSION = '0.0011'; # VERSION
+our $VERSION = '0.0016'; # VERSION
 
 use Data::Frame;
 use Data::Munge qw(elem);
@@ -18,11 +18,12 @@ use parent qw(Exporter::Tiny);
 use Chart::GGPlot::Util::Scales qw(
   csshex_to_rgb255 colorname_to_csshex
 );
+use Chart::GGPlot::Util qw(mm_to_px);
 
 use constant br => '<br />';
 
 our @EXPORT_OK = qw(
-  pt_to_px cex_to_px
+  to_px
   br
   to_rgb
   group_to_NA
@@ -33,12 +34,7 @@ our %EXPORT_TAGS = ( all => \@EXPORT_OK );
 
 my $dpi = 96;
 
-fun pt_to_px ($x) { $x / 72 * $dpi }
-
-# This is approximately similar to the size in ggplot2.
-# Default R fontsize is 12pt. And R scales many symbols by 0.75.
-# 0.3 is a magic number from my guess.
-fun cex_to_px ($x) { pt_to_px( 12 * $x * 0.75 * 0.3 ) }
+sub to_px { mm_to_px($_[0], $dpi) }
 
 sub _rgb {
     my ($c) = @_;
@@ -251,7 +247,7 @@ Chart::GGPlot::Backend::Plotly::Util - Utilities used by Chart::GGPlot::Backend:
 
 =head1 VERSION
 
-version 0.0011
+version 0.0016
 
 =head1 FUNCTIONS
 
@@ -278,7 +274,7 @@ Stephan Loyd <sloyd@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019-2020 by Stephan Loyd.
+This software is copyright (c) 2019-2021 by Stephan Loyd.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

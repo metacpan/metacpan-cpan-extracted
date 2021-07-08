@@ -1,30 +1,18 @@
 package Google::RestApi::SheetsApi4::Spreadsheet;
 
-use strict;
-use warnings;
+our $VERSION = '0.7';
 
-our $VERSION = '0.4';
+use Google::RestApi::Setup;
 
-use 5.010_000;
-
-use autodie;
 use Cache::Memory::Simple;
 use Carp qw(confess);
 use Scalar::Util qw(blessed);
-use Type::Params qw(compile compile_named);
-use Types::Standard qw(Int Str StrMatch ArrayRef HashRef CodeRef HasMethods Any slurpy);
-use YAML::Any qw(Dump);
 
-no autovivification;
-
-use Google::RestApi::Utils qw(named_extra);
 use aliased 'Google::RestApi::SheetsApi4';
 use aliased 'Google::RestApi::SheetsApi4::Worksheet';
 use aliased 'Google::RestApi::SheetsApi4::RangeGroup';
 
 use parent "Google::RestApi::SheetsApi4::Request::Spreadsheet";
-
-do 'Google/RestApi/logger_init.pl';
 
 sub new {
   my $class = shift;
@@ -48,14 +36,14 @@ sub new {
 
   if ($self->{config_id}) {
     my $config = $self->sheets_config($self->{config_id})
-      or die "Config '$self->{config_id}' is missing";
+      or LOGDIE "Config '$self->{config_id}' is missing";
     foreach (qw(id name uri)) {
       $self->{$_} = $config->{$_} if defined $config->{$_};
     }
     $self->{config} = $config->{worksheets} if $config->{worksheets};
   }
 
-  $self->{id} || $self->{name} || $self->{uri} or die "At least one of id, name, or uri must be specified";
+  $self->{id} || $self->{name} || $self->{uri} or LOGDIE "At least one of id, name, or uri must be specified";
 
   return $self;
 }
@@ -79,14 +67,14 @@ sub spreadsheet_id {
       my $qr_id = SheetsApi4->Spreadsheet_Id;
       my $qr_uri = SheetsApi4->Spreadsheet_Uri;
       ($self->{id}) = $self->{uri} =~ m|$qr_uri/($qr_id)|;
-      die "Unable to extract a sheet id from uri" if !$self->{id};
+      LOGDIE "Unable to extract a sheet id from uri" if !$self->{id};
       DEBUG("Got sheet ID '$self->{id}' via URI '$self->{uri}'.");
     } else {
       my $spreadsheets = $self->sheets()->spreadsheets();
       my ($spreadsheet) = grep {
         $_->{name} eq $self->{name};
       } @{ $spreadsheets->{files} };
-      die "Sheet '$self->{name}' not found on google drive" if !$spreadsheet;
+      LOGDIE "Sheet '$self->{name}' not found on google drive" if !$spreadsheet;
       $self->{id} = $spreadsheet->{id};
       DEBUG("Got sheet id '$self->{id}' via spreadsheet list.");
     }
@@ -98,14 +86,14 @@ sub spreadsheet_id {
 sub spreadsheet_uri {
   my $self = shift;
   $self->{uri} ||= $self->attrs('spreadsheetUrl')->{spreadsheetUrl}
-    or die "No spreadsheet URI found from get results";
+    or LOGDIE "No spreadsheet URI found from get results";
   return $self->{uri};
 }
 
 sub spreadsheet_name {
   my $self = shift;
   $self->{name} ||= $self->properties('title')->{title}
-    or die "No properties title present in properties";
+    or LOGDIE "No properties title present in properties";
   return $self->{name};
 }
 sub spreadsheet_title { spreadsheet_name(@_); }
@@ -261,57 +249,73 @@ sub submit_values {
   my $self = shift;
 
   state $check = compile_named(
-    values  => ArrayRef[HasMethods[qw(has_values batch_values values_response)]],
+    ranges  => ArrayRef[HasMethods[qw(has_values batch_values values_response_from_api)]],
     content => HashRef, { default => {} },
   );
   my $p = $check->(@_);
 
-  my @batch_values = grep { $_->has_values(); } @{ delete $p->{values} };
-  my @values = map { $_->batch_values(); } @batch_values;
+  # find out which ranges have something to send.
+  my @ranges = grep { $_->has_values(); } @{ delete $p->{ranges} };
+  my @values = map { $_->batch_values(); } @ranges;
   return if !@values;
 
   $p->{content}->{data} = \@values;
   $p->{content}->{valueInputOption} //= 'USER_ENTERED';
   $p->{method} = 'post';
   $p->{uri} = "/values:batchUpdate";
+  my $api = $self->api(%$p);
 
-  my $response = $self->api(%$p);
-  my $responses = $response->{responses};
-  my @responses = map { $_->values_response($responses); } @batch_values;
-  die "Returned batch update responses were not consumed" if @$responses;
+  # each range that had values should strip off the response from the api's
+  # responses array. if everything is in sync, there should be no responses left.
+  my $responses = delete $api->{responses};
+  $_->values_response_from_api($responses) foreach @ranges;
+  LOGDIE "Returned batch values update responses were not consumed" if @$responses;
 
-  return \@responses;
+  # return whatever's left over.
+  return $api;
 }
 
 sub submit_requests {
   my $self = shift;
 
   state $check = compile_named(
-    requests => ArrayRef[HasMethods[qw(batch_requests requests_response)]], { default => [] }, # might just be self.
-    content  => HashRef, { default => {} },
+    ranges  => ArrayRef[HasMethods[qw(batch_requests requests_response_from_api)]], { default => [] }, # might just be self.
+    content => HashRef, { default => {} },
   );
   my $p = $check->(@_);
 
-  my @batch_responses = map {
+  # for each object that has requests to submit, store them so that
+  # they can process the responses that come back.
+  my @ranges = map {
     $_->batch_requests() ? $_ : ();
-  } @{ $p->{requests} }, $self;   # add myself to the list.
-  return if !@batch_responses;
+  } @{ $p->{ranges} }, $self;   # add myself to the list.
+  return if !@ranges;
 
+  # pull out the requests hashes to be send to the rest api.
   my @batch_requests = map {
     $_->batch_requests();
-  } @{ delete $p->{requests} }, $self;
+  } @{ delete $p->{ranges} }, $self;
   return if !@batch_requests;
 
+  # call the batch requuest api. returns an array with:
+  #   $api_content (json decoded content)
+  #   $api_response (Furl::Response, also contains the string content)
+  #   $p (params of the original request)
+  # most users will only be interested in $api[0].
   $p->{content}->{requests} = \@batch_requests;
   $p->{method} = 'post';
   $p->{uri} = ':batchUpdate';
+  my $api = $self->api(%$p);
 
-  my @api = $self->api(%$p);
-  my $responses = $api[0]->{replies};
-  my @responses = map { $_->requests_response($responses); } @batch_responses;
-  die "Returned batch request responses were not consumed" if @$responses;
+  # grab the json decoded replies from the response.
+  my $responses = delete $api->{replies};
+  # present the responses back to those who are waiting, each will strip off the ones they requested.
+  $_->requests_response_from_api($responses) foreach @ranges;
+  # if there are any left over, it sux. we are out of sync somewhere. all requestors should
+  # process their corresponding response.
+  LOGDIE "Returned batch request responses were not consumed" if @$responses;
 
-  return wantarray ? @api : $api[0];
+  return $api;
 }
 
 sub protected_ranges { shift->attrs('sheets.protectedRanges')->{sheets}; }

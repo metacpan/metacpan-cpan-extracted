@@ -8,7 +8,7 @@ my $build = Module::Build->new(
    requires => {
       'perl' => '5.026', # signatures in Object::Pad
       'Future::AsyncAwait' => '0.47', # toplevel await
-      'Object::Pad' => '0.38',  # OP:MOP::Class->for_caller, ->for_class
+      'Object::Pad' => '0.41',
 
       'Future' => '0.26',
       'List::Util' => '1.33',

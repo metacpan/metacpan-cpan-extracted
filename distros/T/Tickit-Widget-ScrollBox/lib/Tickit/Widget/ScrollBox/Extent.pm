@@ -1,12 +1,12 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2013-2020 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2013-2021 -- leonerd@leonerd.org.uk
 
-use 5.026; # signatures
-use Object::Pad 0.27;
+use v5.26; # signatures
+use Object::Pad 0.41;
 
-package Tickit::Widget::ScrollBox::Extent 0.09;
+package Tickit::Widget::ScrollBox::Extent 0.10;
 class Tickit::Widget::ScrollBox::Extent;
 
 use Scalar::Util qw( weaken );
@@ -26,13 +26,12 @@ returned by the C<hextent> and C<vextent> methods of the associated ScrollBox.
 has $_start = 0;
 has $_total;
 
-has $_scrollbox;
-has $_id;
+has $_scrollbox :param;
+has $_id        :param;
 
-BUILD ( $scrollbox, $id )
+BUILD
 {
-   weaken( $_scrollbox = $scrollbox );
-   $_id = $id;
+   weaken( $_scrollbox );
 }
 
 method _clamp ()

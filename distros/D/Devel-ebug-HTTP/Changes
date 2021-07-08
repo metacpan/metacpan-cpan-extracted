@@ -1,5 +1,8 @@
 Revision history for Devel-ebug-HTTP
 
+0.34      2021-07-03 09:27:53 -0600
+  - Fixed prereqs (gh#19)
+
 0.33      2021-06-28 13:43:22 -0600
   - Switch from Catalyst::Plugin::Static to Catalyst::Plugin::Static::Simple
     (rt#29964, rt#50619, gh#1, gh#3, gh#6)

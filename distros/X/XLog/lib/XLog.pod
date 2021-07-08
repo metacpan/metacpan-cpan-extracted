@@ -266,6 +266,20 @@ module and it is desirable to skip it and let the log message appear in the sake
     }
 
 
+=head4 disable_format_warnings()
+
+Globally disables warnings when inappropriate arguments given to printf-like logging call. For example:
+
+    XLog::info("message is %s", undef);
+    
+This would normally emit C<Use of uninitialized value in subroutine entry> warning. After C<disable_format_warnings()> call such warnings will be
+supressed.
+
+
+=head4 enable_format_warnings()
+
+Rolls back the effect of C<disable_format_warnings()>.
+
 
 
 =head1 LOG LEVELS

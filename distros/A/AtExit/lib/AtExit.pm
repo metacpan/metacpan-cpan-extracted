@@ -8,7 +8,7 @@
 ##############################################################################
 
 package AtExit;
-$AtExit::VERSION = '2.04';
+$AtExit::VERSION = '2.05';
 # ABSTRACT: perform exit processing for a program or object
 
 require 5.002;

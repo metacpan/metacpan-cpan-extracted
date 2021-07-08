@@ -1,9 +1,9 @@
 package Text::Column::Util;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-07'; # DATE
+our $DATE = '2021-03-02'; # DATE
 our $DIST = 'Text-Column-Util'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
@@ -15,6 +15,22 @@ our %SPEC;
 $SPEC{':package'} = {
     v => 1.1,
     summary => 'Utilities for displaying text in multiple columns',
+    description => <<'_',
+
+This module is written mainly to provide the functionality for
+<prog:column-run>, a CLI script to run several commands in sequence and display
+their results side by side. It can handle ANSI color codes and wide Unicode
+characters.
+
+As alternatives to this module, you can also use modules that generate text
+table. This module provides some convenience like:
+
+- finding out terminal width and setting column widths equally per each command;
+- option to clip long output;
+- option to specify text as coderef;
+- option to display line number.
+
+_
 };
 
 # TODO: color theme
@@ -171,7 +187,30 @@ Text::Column::Util - Utilities for displaying text in multiple columns
 
 =head1 VERSION
 
-This document describes version 0.003 of Text::Column::Util (from Perl distribution Text-Column-Util), released on 2020-06-07.
+This document describes version 0.004 of Text::Column::Util (from Perl distribution Text-Column-Util), released on 2021-03-02.
+
+=head1 DESCRIPTION
+
+
+This module is written mainly to provide the functionality for
+L<column-run>, a CLI script to run several commands in sequence and display
+their results side by side. It can handle ANSI color codes and wide Unicode
+characters.
+
+As alternatives to this module, you can also use modules that generate text
+table. This module provides some convenience like:
+
+=over
+
+=item * finding out terminal width and setting column widths equally per each command;
+
+=item * option to clip long output;
+
+=item * option to specify text as coderef;
+
+=item * option to display line number.
+
+=back
 
 =head1 FUNCTIONS
 
@@ -238,7 +277,7 @@ Source repository is at L<https://github.com/perlancar/perl-Text-Column-Util>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Text-Column-Util>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Text-Column-Util/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -250,7 +289,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by perlancar@cpan.org.
+This software is copyright (c) 2021 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

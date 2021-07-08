@@ -1,6 +1,6 @@
 package App::colgrep ;  
-our $VERSION = '0.100' ; 
-our $DATE = '2021-06-07T02:12+09:00' ; 
+our $VERSION = '0.110' ; 
+our $DATE = '2021-07-03T02:22+09:00' ; 
 
 =encoding utf8
 

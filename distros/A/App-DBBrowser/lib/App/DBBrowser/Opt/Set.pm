@@ -79,14 +79,14 @@ sub _options {
             { name => '_e_write_access',  text => "- Write access",  section => 'enable' },
         ],
         group_sql => [
-            { name => '_meta',                   text => "- Metadata",       section => 'G'      },
-            { name => 'operators',               text => "- Operators",      section => 'G'      },
-            { name => '_alias',                  text => "- Alias",          section => 'alias'  },
-            { name => '_sql_identifiers',        text => "- Identifiers",    section => 'G'      },
-            { name => '_view_name_prefix',       text => "- View prefix",    section => 'create' },
-            { name => '_autoincrement_col_name', text => "- Auto increment", section => 'create' },
-            { name => '_data_type_guessing',     text => "- Col data types", section => 'create' },
-            { name => 'max_rows',                text => "- Max rows",       section => 'G'      },
+            { name => '_meta',                   text => "- Metadata",         section => 'G'      },
+            { name => 'operators',               text => "- Operators",        section => 'G'      },
+            { name => '_alias',                  text => "- Alias",            section => 'alias'  },
+            { name => '_sql_identifiers',        text => "- Identifiers",      section => 'G'      },
+            { name => '_view_name_prefix',       text => "- View prefix",      section => 'create' },
+            { name => '_autoincrement_col_name', text => "- Auto increment",   section => 'create' },
+            { name => '_data_type_guessing',     text => "- Guess data types", section => 'create' },
+            { name => 'max_rows',                text => "- Max rows",         section => 'G'      },
         ],
         group_output => [
             { name => 'min_col_width',       text => "- Col width",       section => 'table' },
@@ -113,6 +113,9 @@ sub _options {
             { name => 'history_dirs',       text => "- Directory history",             section => 'insert' },
             { name => '_file_filter',       text => "- File filter",                   section => 'insert' },
             { name => '_show_hidden_files', text => "- Show hidden files",             section => 'insert' },
+        ],
+        group_function => [ # available only in the Function-menu
+            { name => 'round_precision_sign', text => "- Function round", section => 'G' },
         ],
     };
     return $groups->{$group};
@@ -548,6 +551,13 @@ sub set_options {
                 my $prompt = 'Data type guessing';
                 my $sub_menu = [
                     [ 'data_type_guessing', "- Enable data type guessing", [ $no, $yes ] ]
+                ];
+                $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
+            }
+            elsif ( $opt eq 'round_precision_sign' ) {
+                my $prompt = 'Funtion \'round\': ask for precision sign?';
+                my $sub_menu = [
+                    [ 'round_precision_sign', "- ROUND: precision sign", [ $no, $yes ] ]
                 ];
                 $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
             }

@@ -106,6 +106,26 @@ subtest "simple selector: attribute selector" => sub {
             ]}],
         ],
     );
+
+    test_parse(
+        name=>"array literal (empty array)",
+        expr=>"T[attr in []]",
+        res=>[
+            [{type=>"T", filters=>[
+                {type=>"attr_selector", attr=>[{name=>"attr"}], op=>"in", value=>[]},
+            ]}],
+        ],
+    );
+    test_parse(
+        name=>"array literal (array with elements)",
+        expr=>'T[attr in [1,2,"foo",[],[4]]]',
+        res=>[
+            [{type=>"T", filters=>[
+                {type=>"attr_selector", attr=>[{name=>"attr"}], op=>"in", value=>[1,2,"foo",[],[4]]},
+            ]}],
+        ],
+    );
+
     test_parse(
         name=>"chained attributes",
         expr=>"T[foo.bar().baz(1) = str ]",

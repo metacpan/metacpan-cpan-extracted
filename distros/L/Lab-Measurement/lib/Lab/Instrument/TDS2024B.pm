@@ -1,6 +1,6 @@
 package Lab::Instrument::TDS2024B;
 #ABSTRACT: Tektronix TDS2024B digital oscilloscope
-$Lab::Instrument::TDS2024B::VERSION = '3.760';
+$Lab::Instrument::TDS2024B::VERSION = '3.762';
 use v5.20;
 
 use strict;
@@ -5056,7 +5056,7 @@ Lab::Instrument::TDS2024B - Tektronix TDS2024B digital oscilloscope
 
 =head1 VERSION
 
-version 3.760
+version 3.762
 
 =head1 SYNOPSIS
 
@@ -6978,8 +6978,8 @@ This is mostly for diagnostic purposes.
 This software is copyright (c) 2021 by the Lab::Measurement team; in detail:
 
   Copyright 2016       Charles Lane
-            2017       Andreas K. HÃ¼ttel
-            2020       Andreas K. HÃ¼ttel
+            2017       Andreas K. Huettel
+            2020       Andreas K. Huettel
             2021       Charles Lane
 
 

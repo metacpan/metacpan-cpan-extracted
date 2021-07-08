@@ -1,5 +1,9 @@
 Revision history for Config-MVP-Reader-INI
 
+2.101464  2021-07-03 13:18:24-04:00 America/New_York
+        - update author contact info
+        - document perl version policy
+
 2.101463  2014-06-30 21:43:49-04:00 America/New_York
           replace base with parent
 

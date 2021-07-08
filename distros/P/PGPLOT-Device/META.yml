@@ -7,12 +7,13 @@ build_requires:
   File::Spec: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
+  Test2::V0: '0'
   Test::More: '0'
   perl: '5.006'
 configure_requires:
-  ExtUtils::MakeMaker: '0'
+  Module::Build::Tiny: '0.034'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.020, CPAN::Meta::Converter version 2.150010'
 license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -29,10 +30,10 @@ no_index:
 provides:
   PGPLOT::Device:
     file: lib/PGPLOT/Device.pm
-    version: '0.09'
+    version: '0.11'
   PGPLOT::Device::PGWin:
     file: lib/PGPLOT/Device/PGWin.pm
-    version: '0.09'
+    version: '0.11'
 requires:
   Carp: '0'
   PDL::Graphics::PGPLOT::Window: '0'
@@ -42,6 +43,8 @@ requires:
   warnings: '0'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=PGPLOT-Device
-  repository: git://github.com/djerius/pgplot-device.git
-version: '0.09'
-x_serialization_backend: 'YAML::Tiny version 1.70'
+  repository: https://gitlab.com/djerius/pgplot-device.git
+version: '0.11'
+x_generated_by_perl: v5.28.1
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: GPL-3.0-only

@@ -1,10 +1,10 @@
 ## Flood example
 
 This example allows to estimate the performance of a Beekeper setup, which depends 
-mostly of the performance of the message broker and the network latency. 
+heavily on the performance of the message broker and the network latency. 
 
 
-To run this example start a worker pool of `TestWorker` processes:
+To run this example start the worker pool:
 ```
 cd beekeper/examples/flood
 source setup.sh
@@ -17,6 +17,11 @@ Then flood the worker pool with requests:
 Monitor the worker pool load:
 ```
 bkpr-top
+```
+Logs can be inspected with `bkpr-log` or with:
+```
+tail /var/log/myapp-pool.log
+tail /var/log/myapp-service-flood.log
 ```
 Finally stop the worker pool with:
 ```
@@ -33,15 +38,15 @@ Sample output running on a local Mosquitto 2.0.10:
 1000 notifications   of   5 Kb  in  0.086 sec   11676 /sec   0.09 ms each
 1000 notifications   of  10 Kb  in  0.094 sec   10623 /sec   0.09 ms each
 
-1000 sync calls      of   0 Kb  in  2.425 sec     412 /sec   2.43 ms each
-1000 sync calls      of   1 Kb  in  2.419 sec     413 /sec   2.42 ms each
-1000 sync calls      of   5 Kb  in  2.566 sec     390 /sec   2.57 ms each
-1000 sync calls      of  10 Kb  in  2.664 sec     375 /sec   2.66 ms each
+1000 sync calls      of   0 Kb  in  0.651 sec    1536 /sec   0.65 ms each
+1000 sync calls      of   1 Kb  in  0.695 sec    1440 /sec   0.69 ms each
+1000 sync calls      of   5 Kb  in  0.799 sec    1251 /sec   0.80 ms each
+1000 sync calls      of  10 Kb  in  0.982 sec    1019 /sec   0.98 ms each
 
 1000 async calls     of   0 Kb  in  0.117 sec    8543 /sec   0.12 ms each
 1000 async calls     of   1 Kb  in  0.126 sec    7915 /sec   0.13 ms each
 1000 async calls     of   5 Kb  in  0.139 sec    7175 /sec   0.14 ms each
-1000 async calls     of  10 Kb  in  0.163 sec    6128 /sec   0.16 ms each
+1000 async calls     of  10 Kb  in  0.162 sec    6177 /sec   0.16 ms each
 
 1000 fire & forget   of   0 Kb  in  0.091 sec   11031 /sec   0.09 ms each
 1000 fire & forget   of   1 Kb  in  0.102 sec    9840 /sec   0.10 ms each
@@ -58,7 +63,7 @@ Sample output running on a local HiveMQ 2021.1:
 1000 notifications   of   5 Kb  in  0.086 sec   11680 /sec   0.09 ms each
 1000 notifications   of  10 Kb  in  0.095 sec   10543 /sec   0.09 ms each
 
-1000 sync calls      of   0 Kb  in  3.020 sec     331 /sec   3.02 ms each
+1000 sync calls      of   0 Kb  in  3.020 sec     331 /sec   3.02 ms each  <- !!
 1000 sync calls      of   1 Kb  in  3.139 sec     319 /sec   3.14 ms each
 1000 sync calls      of   5 Kb  in  3.311 sec     302 /sec   3.31 ms each
 1000 sync calls      of  10 Kb  in  3.511 sec     285 /sec   3.51 ms each
@@ -83,10 +88,10 @@ Sample output running a ToyBroker:
 1000 notifications   of   5 Kb  in  0.073 sec   13750 /sec   0.07 ms each
 1000 notifications   of  10 Kb  in  0.082 sec   12160 /sec   0.08 ms each
 
-1000 sync calls      of   0 Kb  in  2.614 sec     382 /sec   2.61 ms each
-1000 sync calls      of   1 Kb  in  2.662 sec     376 /sec   2.66 ms each
-1000 sync calls      of   5 Kb  in  2.751 sec     363 /sec   2.75 ms each
-1000 sync calls      of  10 Kb  in  2.952 sec     339 /sec   2.95 ms each
+1000 sync calls      of   0 Kb  in  1.042 sec     960 /sec   1.04 ms each
+1000 sync calls      of   1 Kb  in  1.063 sec     941 /sec   1.06 ms each
+1000 sync calls      of   5 Kb  in  1.163 sec     860 /sec   1.16 ms each
+1000 sync calls      of  10 Kb  in  1.233 sec     811 /sec   1.23 ms each
 
 1000 async calls     of   0 Kb  in  0.100 sec    9982 /sec   0.10 ms each
 1000 async calls     of   1 Kb  in  0.105 sec    9522 /sec   0.11 ms each

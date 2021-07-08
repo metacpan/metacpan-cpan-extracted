@@ -452,7 +452,7 @@ sub FileData
   unless( $self->{'FileData'} )
   {
     my   $FILE ;
-    open $FILE,$self->file() or die "UHTML::request: $self->{'file'} not found" ;
+    open $FILE,$self->file() or die "uHTML::request: $self->{'file'} not found" ;
     read $FILE,$self->{'FileData'},-s $FILE ;
   }
   return \$self->{'FileData'} ;

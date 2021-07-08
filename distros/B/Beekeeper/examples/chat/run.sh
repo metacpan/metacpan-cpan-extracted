@@ -6,7 +6,7 @@ if [ -z "$BEEKEEPER_CONFIG_DIR" ]; then
     exit 
 fi
 
-case "$1" in
+case "${1-start}" in
     'start')
         bkpr --pool "broker"  start
         bkpr --pool "myapp-A" start

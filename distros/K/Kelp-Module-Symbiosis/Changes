@@ -1,5 +1,9 @@
 Revision history for Perl extension Kelp::Module::Symbiosis.
 
+1.12 Sun Jul 4 2021
+	- remove deprecated features
+	- add Symbiosis middleware, which work for all the applications
+
 1.11 Mon Jan 18 2021
 	- fix KelpX::Symbiosis::Test->can to match autoload
 	- add reverse_proxy configuration field

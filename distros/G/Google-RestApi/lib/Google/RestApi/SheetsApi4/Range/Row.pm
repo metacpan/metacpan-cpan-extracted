@@ -1,59 +1,46 @@
 package Google::RestApi::SheetsApi4::Range::Row;
 
-use strict;
-use warnings;
+our $VERSION = '0.7';
 
-our $VERSION = '0.4';
-
-use 5.010_000;
-
-use autodie;
-use Type::Params qw(compile compile_named);
-use Types::Standard qw(Str Int ArrayRef Any slurpy);
-use YAML::Any qw(Dump);
-use Google::RestApi::Utils qw(named_extra);
-
-no autovivification;
+use Google::RestApi::Setup;
 
 use aliased 'Google::RestApi::SheetsApi4::Range';
 use aliased 'Google::RestApi::SheetsApi4::Range::Cell';
 
 use parent 'Google::RestApi::SheetsApi4::Range';
 
-do 'Google/RestApi/logger_init.pl';
-
 sub range {
   my $self = shift;
   return $self->{normalized_range} if $self->{normalized_range};
+
   $self->{range} = { row => $self->{range} } if !ref($self->{range});
   my $range = $self->SUPER::range(@_);
   my $rowA1 = Range->RowA1;
-  die "Unable to translate '$range' into a worksheet row"
+  LOGDIE "Unable to translate '$range' into a worksheet row"
     if !$self->is_named() && $range !~ qr/$rowA1/;
   return $range;
 }
 
 sub values {
   my $self = shift;
-  my $p = _update_values(@_);
+  state $check = compile_named(
+    values => ArrayRef[Str], { optional => 1 },
+    _extra_ => slurpy Any,
+  );
+  my $p = named_extra($check->(@_));
+  $p->{values} = [ $p->{values} ] if defined $p->{values};
   my $values = $self->SUPER::values(%$p);
-  return $values->[0];
+  return defined $values ? $values->[0] : undef;
 }
 
 sub batch_values {
   my $self = shift;
-  my $p = _update_values(@_);
-  return $self->SUPER::batch_values(%$p);
-}
-
-sub _update_values {
   state $check = compile_named(
-    values  => ArrayRef[Str], { optional => 1 },
-    _extra_ => slurpy Any,
+    values => ArrayRef[Str], { optional => 1 },
   );
-  my $p = named_extra($check->(@_));
-  $p->{values} = [$p->{values}] if defined $p->{values};
-  return $p;
+  my $p = $check->(@_);
+  $p->{values} = [ $p->{values} ] if $p->{values};
+  return $self->SUPER::batch_values(%$p);
 }
 
 sub cell {

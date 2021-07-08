@@ -46,24 +46,13 @@ sub sleep {
     );
 }
 
-sub fibonacci_1 {
+sub fibonacci {
     my ($class, $n) = @_;
 
     my $cli = Beekeeper::Client->instance;
 
     $cli->call_remote(
-        method => 'test.fib1',
-        params => $n,
-    );
-}
-
-sub fibonacci_2 {
-    my ($class, $n) = @_;
-
-    my $cli = Beekeeper::Client->instance;
-
-    $cli->call_remote(
-        method => 'test.fib2',
+        method => 'test.fib4',
         params => $n,
     );
 }

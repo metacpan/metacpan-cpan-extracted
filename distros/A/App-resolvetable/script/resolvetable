@@ -1,11 +1,12 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/resolvetable/resolvetable
-# and generated automatically using Perinci::CmdLine::Gen version 0.491
+# and generated automatically using Perinci::CmdLine::Gen version 0.499
 
-our $DATE = '2019-08-20'; # DATE
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-07-08'; # DATE
 our $DIST = 'App-resolvetable'; # DIST
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 use 5.010001;
 use strict;
@@ -39,13 +40,17 @@ resolvetable - Produce a colored table containing DNS resolve results of several
 
 =head1 VERSION
 
-This document describes version 0.007 of resolvetable (from Perl distribution App-resolvetable), released on 2019-08-20.
+This document describes version 0.008 of resolvetable (from Perl distribution App-resolvetable), released on 2021-07-08.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % resolvetable [options] <name> ...
+ % resolvetable [--action=s] [--colorize] [--compare] [--debug]
+     [--format-options=s] [--format=name] [--json] [--log-level=level]
+     [--(no)naked-res] [--name=s+] [--names-json=s] [--no-colorize]
+     [--nocolorize] [--quiet] [-s=s+] [--server=s+] [--servers-json=s]
+     [-t=s] [--timings] [--trace] [--type=s] [--verbose] -- <name> ...
 
 Examples:
 
@@ -95,11 +100,15 @@ See C<--action>.
 
 =item B<--name>=I<s@>*
 
+Can also be specified as the 1st command-line argument and onwards.
+
 Can be specified multiple times.
 
 =item B<--names-json>=I<s>
 
 See C<--name>.
+
+Can also be specified as the 1st command-line argument and onwards.
 
 =item B<--no-colorize>
 
@@ -266,7 +275,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -3,7 +3,7 @@ package Beekeeper::Service::LogTail;
 use strict;
 use warnings;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 
 use Beekeeper::Client;
@@ -37,7 +37,7 @@ Beekeeper::Service::LogTail - Buffer log entries
 
 =head1 VERSION
 
-Version 0.06
+Version 0.07
 
 =head1 SYNOPSIS
 
@@ -53,17 +53,23 @@ Version 0.06
 
 =head1 DESCRIPTION
 
-By default all workers use a C<Beekeeper::Logger> logger which logs errors and
+By default all workers use a L<Beekeeper::Logger> logger which logs errors and
 warnings both to files and to a topic C<log/{level}/{service}> on the message bus.
 
-This service keeps an in-memory buffer of every log entry sent to that topic in 
-every broker in a logical message bus.
+LogTail workers keep an in-memory buffer of every log entry sent to these topics in
+every broker of a logical message bus. Then this buffer can be queried using the
+C<tail> method provided by this module or using the command line client L<bkpr-log>.
 
-The command line tool C<bkpr-log> use this service to inspect logs in real time. 
+Buffered entries consume 1.5 kiB for messages of 100 bytes, increasing to 2 KiB
+for messages of 500 bytes. Holding the last million log entries in memory will 
+consume around 2 GiB.
 
-Please note that receiving all log traffic on a single process does not scale
-at all, so a better strategy will be needed for inspecting logs of big real world
-applications.
+LogTail workers are CPU bound and can collect up to 20000 log entries per second.
+Applications exceeding that traffic will need another strategy to consolidate log
+entries from brokers.
+
+LogTail workers are not created automatically. In order to add a LogTail worker to a
+pool it must be declared into config file C<pool.config.json>.
 
 =head1 METHODS
 
@@ -88,8 +94,8 @@ C<message>: Regex that applies to error messages.
 C<after>: Return only entries generated after given timestamp.
 
 =head1 SEE ALSO
- 
-L<bkpr-log>.
+
+L<bkpr-log>, L<Beekeeper::Service::LogTail::Worker>.
 
 =head1 AUTHOR
 

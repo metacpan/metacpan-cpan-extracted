@@ -1,11 +1,11 @@
 use strict;
 use warnings;
 
-package Perl::PrereqScanner::Scanner::TestMore;
+package Perl::PrereqScanner::Scanner::TestMore 1.024;
 # ABSTRACT: scanner to find recent Test::More usage
-$Perl::PrereqScanner::Scanner::TestMore::VERSION = '1.023';
+
 use Moose;
-use List::MoreUtils 'none';
+use List::Util 1.33 'none';
 with 'Perl::PrereqScanner::Scanner';
 
 sub scan_for_prereqs {
@@ -33,13 +33,23 @@ Perl::PrereqScanner::Scanner::TestMore - scanner to find recent Test::More usage
 
 =head1 VERSION
 
-version 1.023
+version 1.024
 
 =head1 DESCRIPTION
 
 This scanner will check if a given test is using recent functions from
 L<Test::More>, and increase the minimum version for this module
 accordingly.
+
+=head1 PERL VERSION
+
+This library should run on perls released even a long time ago.  It should work
+on any version of perl released in the last five years.
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
 
 =head1 AUTHORS
 
@@ -51,7 +61,7 @@ Jerome Quelin
 
 =item *
 
-Ricardo Signes <rjbs@cpan.org>
+Ricardo Signes <rjbs@semiotic.systems>
 
 =back
 

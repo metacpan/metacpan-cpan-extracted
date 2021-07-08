@@ -1,0 +1,28 @@
+---
+abstract: 'Extract bibliographic data from the arXiv API'
+author:
+  - stuart-little
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::Simple: '1.302185'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-arxiv2bib
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Mojolicious: '9.19'
+  perl: '5.020000'
+  warnings: '0'
+resources:
+  repository: https://github.com/stuart-little/app-arxiv2bib.git
+version: 0.2
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

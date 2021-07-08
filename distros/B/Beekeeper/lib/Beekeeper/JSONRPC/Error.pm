@@ -3,7 +3,7 @@ package Beekeeper::JSONRPC::Error;
 use strict;
 use warnings;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 
 use overload '""' => sub { $_[0]->{error}->{message} };
@@ -130,11 +130,11 @@ __END__
 
 =head1 NAME
  
-Beekeeper::JSONRPC::Error - Representation of a JSON-RPC error.
+Beekeeper::JSONRPC::Error - Representation of a JSON-RPC error
  
 =head1 VERSION
  
-Version 0.06
+Version 0.07
 
 =head1 SYNOPSIS
 
@@ -152,17 +152,48 @@ Version 0.06
 
 =head1 DESCRIPTION
 
-Objects of this class represents a JSON-RPC error (see L<http://www.jsonrpc.org/specification>).
+Objects of this class represent a JSON-RPC error (see L<http://www.jsonrpc.org/specification>).
 
-When a RPC call could not be executed successfully the worker replies with a 
+When an RPC call could not be executed successfully the worker replies with a 
 L<Beekeeper::JSONRPC::Error> object. These objects may be returned also due to  
 client side errors, like network disconnections or timeouts.
 
-Method C<Beekeeper::Client-\>call_remote> returns objects of this class on failure.
+Method L<Beekeeper::Client::call_remote> returns objects of this class on failure.
 
 =head1 ACCESSORS
 
-=over 4
+=over
+
+=item message
+
+Returns a string providing a short description of the error.
+
+=item code
+
+Returns a number that indicates the error type that occurred.
+
+=item data
+
+Returns an arbitrary value or data structure containing additional information 
+about the error. This may be present or not.
+
+=item id
+
+Returns the id of the request it is responding to. It is unique per client connection,
+and it is used for response matching.
+
+=item success
+
+Always returns false. It is used to determine if a method was executed successfully
+or not (C<$response-E<gt>result> cannot be trusted as it may be undefined on success).
+
+=back
+
+=head1 CONSTRUCTORS
+
+=head3 new ( %args )
+
+=over
 
 =item message
 
@@ -172,27 +203,19 @@ A string providing a short description of the error.
 
 A number that indicates the error type that occurred.
 
+Error codes from and including -32768 to -32000 are reserved for predefined
+errors of the JSON-RPC spec.
+
 =item data
 
-Arbitrary value or data structure containing additional information about the error.
-This may be present or not.
-
-=item id
-
-The id of the request it is responding to. It is unique per client connection,
-and it is used for response matching.
-
-=item success
-
-Always returns false. Used to determine if a method was executed successfully
-or not ($response->result cannot be trusted as it may be undefined on success).
+An arbitrary value or data structure containing additional information 
+about the error. This may be present or not.
 
 =back
 
-=head1 Predefined errors
+=head3 server_error ( %args )
 
-Error codes from and including -32768 to -32000 are reserved for predefined
-errors of the JSON-RPC spec.
+=head3 invalid_params ( %args )
 
 =head1 AUTHOR
 

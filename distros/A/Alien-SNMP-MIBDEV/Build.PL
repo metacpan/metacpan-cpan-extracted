@@ -38,6 +38,7 @@ my %module_build_args = (
   alien_stage_install => 0,
   build_requires      => {
     "Alien::Base"        => '0.020',
+    "Software::License" => '0',
   },
   configure_requires  => {
     "perl"               => '5.010001',
@@ -47,20 +48,25 @@ my %module_build_args = (
     "PkgConfig"          => '0.14026',
     "Test2::Suite"       => '0.000067'
   },
-#  create_license    => 1,
+  create_license    => 1,
   create_readme     => 1,
   dist_abstract     => 'Build and install Net-SNMP',
-  dist_author       => 'Nick Nauwelaerts <inphobia AT cpan DOT org>',
+  dist_author       => [
+    'Eric A. Miller <emiller AT cpan DOT org>',
+    'Oliver Gorwits <oliver AT cpan DOT org>',
+    'Nick Nauwelaerts <inphobia AT cpan DOT org>',
+  ],
   dist_name         => 'Alien-SNMP-MIBDEV',
   dist_version_from => 'lib/Alien/SNMP/MIBDEV.pm',
   license           => 'bsd',
   module_name       => "Alien::SNMP::MIBDEV",
+  release_status    => 'stable',
   recommends        => {},
   requires          => {
     "Alien::Base"    => '0.020',
     "File::ShareDir" => '1.03',
-    "parent"         => 0,
-    "perl"           => '5.010001'
+    "parent"         => '0',
+    "perl"           => '5.010001',
   },
   test_requires => {
     "Test::Alien" => 0,
@@ -77,14 +83,6 @@ my %module_build_args = (
     },
   },
 );
-
-my %fallback_build_requires
-  = ("Test::Alien" => 0, "Test::More" => '0.94', "Test::Manifest" => '0.9', "perl" => '5.010001');
-
-unless (eval { Module::Build->VERSION(0.4004) }) {
-  delete $module_build_args{test_requires};
-  $module_build_args{build_requires} = \%fallback_build_requires;
-}
 
 my $builder = My::ModuleBuild->new(%module_build_args);
 

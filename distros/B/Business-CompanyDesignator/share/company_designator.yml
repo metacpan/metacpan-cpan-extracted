@@ -31,6 +31,19 @@ Anpartsselskab:
 association sans but lucratif:
   abbr: ASBL
   lang: fr
+'Акционерно дружество':
+  abbr:
+    - "АД"
+    - AD
+  lang: bg
+'Акціонерне Товариство':
+  abbr:
+    - "АТ"
+    - "ТОВ"
+    - AT
+    - TOV
+  lang: uk
+  lead: 1
 'Акционерное общество':
   abbr:
     - "АО"
@@ -54,7 +67,9 @@ Chartered:
   abbr: Chtd.
   lang: en
 Closed Joint Stock Company:
-  abbr: CJSC
+  abbr:
+    - CJSC
+    - PrJSC
   lang: en
   lead: 1
 Commanditaire vennootschap:
@@ -85,6 +100,22 @@ Cwmni Cyfyngedig Cyhoeddus:
 Cyfyngedig:
   abbr: Cyf
   lang: cy
+'Delniška družba':
+  abbr: d.d.
+  lang: sl
+'Družba z neomejeno odgovornostjo':
+  abbr: d.n.o.
+  lang: sl
+'Družba z omejeno odgovornostjo':
+  abbr: d.o.o.
+  lang: sl
+'Komanditna družba':
+  abbr: k.d.
+  lang: sl
+'Samostojni podjetnik':
+  abbr:
+    - s.p.
+  lang: sl
 'Egyéni Cég':
   abbr: e.c.
   lang: hu
@@ -165,6 +196,16 @@ Incorporated:
 'Julkinen osakeyhtiö':
   abbr: Oyj
   lang: fi
+Joint Stock Company:
+  abbr:
+    - JSC
+  lang: en
+  lead: 1
+Joint Stock Commercial Bank:
+  abbr:
+    - JSCB
+  lang: en
+  lead: 1
 Kollektivgesellschaft:
   abbr: KolG
   lang: de
@@ -219,9 +260,6 @@ Kommanditselskab:
 'Közös Vállalat':
   abbr: Kv.
   lang: hu
-Limitada:
-  abbr: Lda.
-  lang: pt
 Limited:
   abbr:
     - Ltd.
@@ -252,6 +290,7 @@ Limited Partnership:
 Limited Liability Company:
   abbr_std: LLC
   abbr:
+    - Limited Liability Companies
     - L.L.C.
     - ASC L.L.C.
     - Co. L.L.C.
@@ -505,7 +544,9 @@ Sociedad Civil Particular:
   abbr: SGPS
   lang: pt
 'Sociedade limitada':
-  abbr: Ltda.
+  abbr:
+    - Ltda.
+    - Limitada
   lang: pt
 'Società per Azioni':
   abbr:

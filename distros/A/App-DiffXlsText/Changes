@@ -1,3 +1,15 @@
+0.007   2021-07-07  Released-By: PERLANCAR; Urgency: medium
+
+	- Check for the right xls2csv from Spreadsheet::Read.
+
+
+0.006   2021-07-07  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux] Pull modules Spreadsheet::Read, Spreadsheet::ParseExcel,
+	  Spreadsheet::ParseXLSX, Spreadsheet::XLSX as dependencies, for
+	  convenience.
+
+
 0.005   2020-12-01  Released-By: PERLANCAR; Urgency: medium
 
         - No functional changes.

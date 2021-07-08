@@ -1,7 +1,8 @@
 package App::Licensecheck;
 
 use utf8;
-use strictures;
+use strict;
+use warnings;
 use autodie;
 
 use version;
@@ -13,7 +14,7 @@ use Try::Tiny;
 use Fcntl qw(:seek);
 use Encode;
 use Array::IntSpan;
-use Regexp::Pattern::License 3.5.0;
+use Regexp::Pattern::License 3.4.0;
 use Regexp::Pattern 0.2.12 (
 	're',
 	'License::*' => (
@@ -97,7 +98,7 @@ use MooX::Struct File => [
 	TO_STRING => sub { $_[0]->path->stringify }
 	],
 	Thing => [
-	qw( $name! +begin! +end! $file ),
+	qw( $name! +begin! +end! $file! ),
 	BUILDARGS => sub {
 		$log->tracef( 'detected something: %s: %d-%d', @{ $_[1] } );
 		return MooX::Struct::BUILDARGS(@_);
@@ -142,21 +143,21 @@ use MooX::Struct File => [
 	},
 	],
 	Licensing => [
-	-extends  => ['Thing'], qw(@traits),
+	qw( $name! ),
 	BUILDARGS => sub {
 		$log->debugf( 'collected some licensing: %s: %d-%d', @{ $_[1] } );
 		return MooX::Struct::BUILDARGS(@_);
 	}
 	],
 	Fulltext => [
-	-extends  => ['Licensing'],
+	-extends  => ['Thing'], qw(@traits),
 	BUILDARGS => sub {
 		$log->debugf( 'collected fulltext: %s: %d-%d', @{ $_[1] } );
 		return MooX::Struct::BUILDARGS(@_);
 	}
 	],
 	Grant => [
-	-extends  => ['Licensing'],
+	-extends  => ['Thing'], qw(@traits),
 	BUILDARGS => sub {
 		$log->debugf(
 			'collected grant: %s: %d-%d "%s"',
@@ -181,11 +182,11 @@ App::Licensecheck - functions for a simple license checker for source files
 
 =head1 VERSION
 
-Version v3.2.1
+Version v3.2.3
 
 =cut
 
-our $VERSION = version->declare('v3.2.1');
+our $VERSION = version->declare('v3.2.3');
 
 =head1 SYNOPSIS
 
@@ -601,6 +602,7 @@ sub best_value
 	for my $key (@keys) {
 		for my $org ( @{ $self->shortname_scheme } ) {
 			$value ||= $hashref->{"$key.alt.org.$org"};
+			$value ||= $hashref->{"$key.alt.org.$org.synth.nogrant"};
 		}
 		$value ||= $hashref->{$key};
 	}
@@ -670,7 +672,7 @@ sub licensepatterns
 	return %L = %list;
 }
 
-# grant pattern can be auto-skipped only stepwise, atomic scan is mandatory
+# license objects where atomic scan must always be applied
 my %L_grant_stepwise_incomplete = (
 
 	# usage
@@ -687,7 +689,7 @@ my %L_grant_stepwise_incomplete = (
 	public_domain => 1,
 );
 
-# grant pattern can be auto-skipped for only one of stepwise or atomic
+# license objects where stepwise scan cannot be skipped
 my %L_grant_atomic_incomplete = (
 	afl_1_1    => 1,
 	afl_1_2    => 1,
@@ -710,9 +712,10 @@ my %L_grant_atomic_incomplete = (
 	zpl_2_1    => 1,
 );
 
-# auto-skip by default; enable to test pattern coverage
-my $force_stepwise = 1;
-my $force_atomic   = 0;
+# scan for grants first stepwise and if not found then also atomic
+# flip either of these flags to test stepwise/atomic pattern coverage
+my $skip_stepwise = 0;
+my $force_atomic  = 0;
 
 sub parse_license
 {
@@ -795,7 +798,7 @@ sub parse_license
 			$v2    ? "(v$v2)"    : (),
 		);
 		my $expr = join( ' or ', sort @spdx );
-		push @expressions, Licensing [ $expr, -1, -1 ];
+		push @expressions, Licensing [$expr];
 		$license = join( ' ', $L{caption}{$legacy} || $legacy, $license );
 	};
 
@@ -844,7 +847,9 @@ sub parse_license
 			$coverage->get_range( $pos, $pos_license{$pos}{$license}->end )
 				->get_element(0) );
 		$coverage->set_range(
-			@{ $pos_license{$pos}{$license}->TO_ARRAY }[ 1, 2 ], $license );
+			@{ $pos_license{$pos}{$license}->TO_ARRAY }[ 1, 2 ],
+			$pos_license{$pos}{$license}
+		);
 		$license{$license} = 1;
 	}
 
@@ -862,19 +867,19 @@ sub parse_license
 		}
 	}
 	LICENSED_UNDER:
-	foreach my $pos (
-		(   sort { $a <=> $b } map { $_->end }
+	foreach my $licensed_under (
+		(   sort { $a->end <=> $b->end }
 			grep { $_->name eq 'license_label_trove' } @clues
 		),
-		(   sort { $a <=> $b } map { $_->end }
+		(   sort { $a->end <=> $b->end }
 			grep { $_->name eq 'license_label' } @clues
 			),
-		(   sort { $a <=> $b } map { $_->end }
+		(   sort { $a->end <=> $b->end }
 			grep { $_->name eq 'licensed_under' } @clues
 			),
 		)
 	{
-		my $pos_begin = $pos;
+		my $pos = $licensed_under->end;
 
 		# possible grant names
 		my @grant_types = (
@@ -933,7 +938,7 @@ sub parse_license
 				$coverage->get_range( $pos, $match{$name}{name}{$pos}->end )
 					->get_element(0)
 			)
-			and ( $force_stepwise or $L_grant_atomic_incomplete{$name} )
+			and ( !$skip_stepwise or $L_grant_atomic_incomplete{$name} )
 			)
 		{
 			my $pos_end = $pos = $match{$name}{name}{$pos}->end;
@@ -978,12 +983,16 @@ sub parse_license
 			}
 			if ($later) {
 				my $latername = "${name}_or_later";
-				push @clues, Trait [ $latername, $pos_begin, $pos_end ];
-				$grant{$latername} = 1;
+				push @clues, Trait [
+					$latername, $licensed_under->begin, $pos_end, $file,
+				];
+				$grant{$latername} = $clues[-1];
 				next LICENSED_UNDER if grep { $grant{$_} } @RE_NAME;
 			}
-			$grant{$name}
-				= Trait [ "grant($name)", $pos_begin, $pos_end, $file ];
+			$grant{$name} = Trait [
+				"grant($name)", $licensed_under->begin, $pos_end,
+				$file
+			];
 			push @clues, $grant{$name};
 		}
 	}
@@ -1015,6 +1024,7 @@ sub parse_license
 				$Regexp::Pattern::License::RE{$_}, $-[0], $+[0],
 				$file,
 			];
+			$coverage->set_range( $-[0], $+[0], $exception );
 			push @exceptions, $exception;
 		}
 	}
@@ -1211,6 +1221,10 @@ sub parse_license
 		}
 
 		if ( $grant{$id} ) {
+			$coverage->set_range(
+				$grant{$id}->begin, $grant{$id}->end,
+				$grant{$id}
+			);
 			$gen_license->( $id2patterns->($id) );
 
 			# skip singleversion and unversioned equivalents
@@ -1254,6 +1268,10 @@ sub parse_license
 		}
 
 		if ( $license{$id} or $grant{$id} ) {
+			$coverage->set_range(
+				$grant{$id}->begin, $grant{$id}->end,
+				$grant{$id}
+			) if $grant{$id};
 			$gen_license->( $id2patterns->($id) )
 				unless ( $match{$id}{custom} );
 
@@ -1304,6 +1322,10 @@ sub parse_license
 		}
 
 		if ( $grant{$id} ) {
+			$coverage->set_range(
+				$grant{$id}->begin, $grant{$id}->end,
+				$grant{$id}
+			);
 			$gen_license->($id);
 		}
 	}
@@ -1343,6 +1365,10 @@ sub parse_license
 			}
 		}
 		if ( $license{$id} or $grant{$id} ) {
+			$coverage->set_range(
+				$grant{$id}->begin, $grant{$id}->end,
+				$grant{$id}
+			) if $grant{$id};
 			$gen_license->($id);
 		}
 	}

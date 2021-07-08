@@ -68,3 +68,19 @@ TEST("empty log") {
     c.check_called();
     CHECK(c.str == "==> MARK <==");
 }
+
+struct Hello {};
+static std::ostream& operator<< (std::ostream& os, const Hello&) {
+    os << "{hello:1}";
+    return os;
+}
+
+TEST("prettify_json") {
+    Ctx c;
+    string_view s = "{epta:1, suka:2}";
+    panda_log_warning(prettify_json{s});
+    CHECK(c.str != s);
+
+    panda_log_warning(prettify_json{Hello()});
+    CHECK(c.str != "{hello:1}");
+}

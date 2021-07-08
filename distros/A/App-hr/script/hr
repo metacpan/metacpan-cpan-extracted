@@ -2,21 +2,21 @@
 
 ### begin code_after_shebang
 # Note: This script is a CLI for Riap function /App/hr/hr_app
-# and generated automatically using Perinci::CmdLine::Gen version 0.496
+# and generated automatically using Perinci::CmdLine::Gen version 0.499
 
 ### end code_after_shebang
-# PERICMD_INLINE_SCRIPT: {"code_after_shebang":"...","config_dirs":null,"config_filename":"hr.conf","env_name":"HR_OPT","include":["App::hr"],"log":null,"pack_deps":1,"pod":0,"read_config":"0","read_env":"0","script_name":"hr","script_summary":null,"script_version":"0.262","shebang":"perl","skip_format":1,"subcommands":null,"url":"/App/hr/hr_app","use_cleanser":1,"validate_args":1}
+# PERICMD_INLINE_SCRIPT: {"code_after_shebang":"...","config_dirs":null,"config_filename":"hr.conf","env_name":"HR_OPT","include":["App::hr"],"log":null,"pack_deps":1,"pod":0,"read_config":"0","read_env":"0","script_name":"hr","script_summary":null,"script_version":"0.264","shebang":"perl","skip_format":1,"subcommands":null,"url":"/App/hr/hr_app","use_cleanser":1,"validate_args":1}
 
-my $_pci_metas = {""=>{args=>{color=>{cmdline_aliases=>{c=>{}},schema=>["str",{req=>1},{}],summary=>"Specify a color (see Term::ANSIColor)"},height=>{cmdline_aliases=>{H=>{}},default=>1,schema=>["int",{min=>1,req=>1},{}],summary=>"Specify height (number of rows)"},pattern=>{cmdline_aliases=>{p=>{}},pos=>0,schema=>["str",{req=>1},{}],summary=>"Specify a pattern"},random_color=>{schema=>["bool",{is=>1},{}]},random_pattern=>{cmdline_aliases=>{r=>{code=>sub{"DUMMY"},is_flag=>1,summary=>"Alias for --random-pattern --random-color"}},schema=>["bool",{is=>1},{}]},space_after=>{cmdline_aliases=>{a=>{}},default=>0,schema=>["int",{min=>0,req=>1},{}],summary=>"Number of empty rows after drawing the bar"},space_before=>{cmdline_aliases=>{b=>{}},default=>0,schema=>["int",{min=>0,req=>1},{}],summary=>"Number of empty rows before drawing the bar"}},args_rels=>{"choose_one&"=>[["color","random_color"],["pattern","random_pattern"]]},description=>"\n<prog:hr> can be useful as a marker/separator, especially if you use other\ncommands that might produce a lot of output, and you need to scroll back lots of\npages to see previous output. Example:\n\n    % hr; command-that-produces-lots-of-output\n    ============================================================================\n    Command output\n    ...\n    ...\n    ...\n\n    % hr -r; some-command; hr -r; another-command\n\nUsage:\n\n    % hr\n    ============================================================================\n\n    % hr -c red  ;# will output the same bar, but in red\n\n    % hr --random-color  ;# will output the same bar, but in random color\n\n    % hr x----\n    x----x----x----x----x----x----x----x----x----x----x----x----x----x----x----x\n\n    % hr -- -x-  ;# specify a pattern that starts with a dash\n    % hr -p -x-  ;# ditto\n\n    % hr --random-pattern\n    vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv\n\n    % hr --random-pattern\n    *---*---*---*---*---*---*---*---*---*---*---*---*---*---*---*---*---*---*---\n\n    % hr -r  ;# shortcut for --random-pattern --random-color\n\n    % hr --help\n\nIf you use Perl, you can also use the `hr` function in <pm:App::hr> module.\n\n",result=>{},summary=>"Print horizontal bar on the terminal",v=>1.1}};
+my $_pci_metas = {""=>{args=>{blink=>{cmdline_aliases=>{B=>{}},schema=>["bool",{req=>1},{}],summary=>"Return a blinking bar"},color=>{cmdline_aliases=>{c=>{}},schema=>["str",{req=>1},{}],summary=>"Specify a color (see Term::ANSIColor)"},height=>{cmdline_aliases=>{H=>{}},default=>1,schema=>["int",{min=>1,req=>1},{}],summary=>"Specify height (number of rows)"},pattern=>{cmdline_aliases=>{p=>{}},pos=>0,schema=>["str",{req=>1},{}],summary=>"Specify a pattern"},random_color=>{schema=>["bool",{is=>1},{}]},random_pattern=>{cmdline_aliases=>{r=>{code=>sub{"DUMMY"},is_flag=>1,summary=>"Alias for --random-pattern --random-color"}},schema=>["bool",{is=>1},{}]},space_after=>{cmdline_aliases=>{a=>{}},default=>0,schema=>["int",{min=>0,req=>1},{}],summary=>"Number of empty rows after drawing the bar"},space_before=>{cmdline_aliases=>{b=>{}},default=>0,schema=>["int",{min=>0,req=>1},{}],summary=>"Number of empty rows before drawing the bar"}},args_rels=>{"choose_one&"=>[["color","random_color"],["pattern","random_pattern"]]},description=>"\n<prog:hr> can be useful as a marker/separator, especially if you use other\ncommands that might produce a lot of output, and you need to scroll back lots of\npages to see previous output. Example:\n\n    % hr; command-that-produces-lots-of-output\n    ============================================================================\n    Command output\n    ...\n    ...\n    ...\n\n    % hr -r; some-command; hr -r; another-command\n\nUsage:\n\n    % hr\n    ============================================================================\n\n    % hr -c red  ;# will output the same bar, but in red\n\n    % hr --random-color  ;# will output the same bar, but in random color\n\n    % hr x----\n    x----x----x----x----x----x----x----x----x----x----x----x----x----x----x----x\n\n    % hr -- -x-  ;# specify a pattern that starts with a dash\n    % hr -p -x-  ;# ditto\n\n    % hr --random-pattern\n    vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv\n\n    % hr --random-pattern\n    *---*---*---*---*---*---*---*---*---*---*---*---*---*---*---*---*---*---*---\n\n    % hr -r  ;# shortcut for --random-pattern --random-color\n\n    % hr -Br ;# a BLINKING random pattern, random color bar\n\n    % hr --help\n\nIf you use Perl, you can also use the `hr` function in <pm:App::hr> module.\n\n",result=>{},summary=>"Print horizontal bar on the terminal",v=>1.1}};
 
-# This script is generated by Perinci::CmdLine::Inline version 0.548 on Mon Apr 27 18:34:43 2020.
+# This script is generated by Perinci::CmdLine::Inline version 0.551 on Thu Jul  8 09:05:44 2021.
 
 # Rinci metadata taken from these modules: App::hr (no version)
 
 # You probably should not manually edit this file.
 
-our $DATE = '2020-04-27'; # DATE
-our $VERSION = '0.262'; # VERSION
+our $DATE = '2021-07-08'; # DATE
+our $VERSION = '0.264'; # VERSION
 # PODNAME: hr
 # ABSTRACT: Print horizontal bar on the terminal
 
@@ -131,16 +131,20 @@ sub _pci_json {
 my %mentioned_args;
 require Getopt::Long::EvenLess;
 my $go_spec1 = {
-    'help|h|?' => sub { print "hr - Print horizontal bar on the terminal\n\nUsage:\n  hr --help (or -h, -?)\n  hr --version (or -v)\n  hr [-H=s] [-a=s] [-b=s] [-c=s] [--color=s] [--height=s]\n    [--page-result[=program]] [-r] [--random-color] [--random-pattern]\n    [--space-after=s] [--space-before=s] [pattern]\n\n<prog:hr> can be useful as a marker/separator, especially if you use other\ncommands that might produce a lot of output, and you need to scroll back lots of\npages to see previous output. Example:\n\n    % hr; command-that-produces-lots-of-output\n    ============================================================================\n    Command output\n    ...\n    ...\n    ...\n\n    % hr -r; some-command; hr -r; another-command\n\nUsage:\n\n    % hr\n    ============================================================================\n\n    % hr -c red  ;# will output the same bar, but in red\n\n    % hr --random-color  ;# will output the same bar, but in random color\n\n    % hr x----\n    x----x----x----x----x----x----x----x----x----x----x----x----x----x----x----x\n\n    % hr -- -x-  ;# specify a pattern that starts with a dash\n    % hr -p -x-  ;# ditto\n\n    % hr --random-pattern\n    vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv\n\n    % hr --random-pattern\n    *---*---*---*---*---*---*---*---*---*---*---*---*---*---*---*---*---*---*---\n\n    % hr -r  ;# shortcut for --random-pattern --random-color\n\n    % hr --help\n\nIf you use Perl, you can also use the `hr` function in <pm:App::hr> module.\n\nMain options:\n  --color=s, -c         Specify a color (see Term::ANSIColor)\n  --height=s, -H        Specify height (number of rows) [1]\n  --pattern=s, -p       Specify a pattern (=arg[0])\n  --random-color        \n  --random-pattern      \n  --space-after=s, -a   Number of empty rows after drawing the bar [0]\n  --space-before=s, -b  Number of empty rows before drawing the bar [0]\n  -r                    Alias for --random-pattern --random-color\n\nOutput options:\n  --page-result  Filter output through a pager\n\nOther options:\n  --help, -h, -?  Display help message and exit\n  --version, -v   Display program's version and exit\n"; exit 0; },
+    'help|h|?' => sub { print "hr - Print horizontal bar on the terminal\n\nUsage:\n  hr --help (or -h, -?)\n  hr --version (or -v)\n  hr [--blink | -B | --no-blink | --noblink] [--color=s | -c=s] [--height=s |\n    -H=s] [--page-result[=program]] [--random-color] [--random-pattern | -r]\n    [--space-after=s | -a=s] [--space-before=s | -b=s] -- [pattern]\n\n<prog:hr> can be useful as a marker/separator, especially if you use other\ncommands that might produce a lot of output, and you need to scroll back lots of\npages to see previous output. Example:\n\n    % hr; command-that-produces-lots-of-output\n    ============================================================================\n    Command output\n    ...\n    ...\n    ...\n\n    % hr -r; some-command; hr -r; another-command\n\nUsage:\n\n    % hr\n    ============================================================================\n\n    % hr -c red  ;# will output the same bar, but in red\n\n    % hr --random-color  ;# will output the same bar, but in random color\n\n    % hr x----\n    x----x----x----x----x----x----x----x----x----x----x----x----x----x----x----x\n\n    % hr -- -x-  ;# specify a pattern that starts with a dash\n    % hr -p -x-  ;# ditto\n\n    % hr --random-pattern\n    vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv\n\n    % hr --random-pattern\n    *---*---*---*---*---*---*---*---*---*---*---*---*---*---*---*---*---*---*---\n\n    % hr -r  ;# shortcut for --random-pattern --random-color\n\n    % hr -Br ;# a BLINKING random pattern, random color bar\n\n    % hr --help\n\nIf you use Perl, you can also use the `hr` function in <pm:App::hr> module.\n\nMain options:\n  --blink, -B           Return a blinking bar\n  --color=s, -c         Specify a color (see Term::ANSIColor)\n  --height=s, -H        Specify height (number of rows) [1]\n  --pattern=s, -p       Specify a pattern (=arg[0])\n  --random-color        \n  --random-pattern      \n  --space-after=s, -a   Number of empty rows after drawing the bar [0]\n  --space-before=s, -b  Number of empty rows before drawing the bar [0]\n  -r                    Alias for --random-pattern --random-color\n\nOutput options:\n  --page-result  Filter output through a pager\n\nOther options:\n  --help, -h, -?  Display help message and exit\n  --version, -v   Display program's version and exit\n"; exit 0; },
     'page-result:s' => sub { $_pci_r->{page_result} = 1; },
-    'version|v' => sub { no warnings 'once'; require App::hr; print "hr version ", "0.262", ($App::hr::DATE ? " ($App::hr::DATE)" : ''), "\n"; print "  Generated by Perinci::CmdLine::Inline version 0.548 (2020-04-05)\n"; exit 0 },
+    'version|v' => sub { no warnings 'once'; require App::hr; print "hr version ", "0.264", ($App::hr::DATE ? " ($App::hr::DATE)" : ''), "\n"; print "  Generated by Perinci::CmdLine::Inline version 0.551 (2020-05-18)\n"; exit 0 },
 };
 my $go_spec2 = {
+    'B' => sub {         $_pci_args{'blink'} = $_[1];
+ },
     'H=s' => sub {         $_pci_args{'height'} = $_[1];
  },
     'a=s' => sub {         $_pci_args{'space_after'} = $_[1];
  },
     'b=s' => sub {         $_pci_args{'space_before'} = $_[1];
+ },
+    'blink' => sub {         $_pci_args{'blink'} = $_[1];
  },
     'c=s' => sub {         $_pci_args{'color'} = $_[1];
  },
@@ -149,6 +153,10 @@ my $go_spec2 = {
     'height=s' => sub {         $_pci_args{'height'} = $_[1];
  },
     'help|h|?' => sub {  },
+    'no-blink' => sub {         $_pci_args{'blink'} = 0;
+ },
+    'noblink' => sub {         $_pci_args{'blink'} = 0;
+ },
     'p=s' => sub {         $_pci_args{'pattern'} = $_[1];
  },
     'page-result:s' => sub {  },
@@ -189,7 +197,7 @@ if ($sc_name eq "") {
     $_pci_meta_result_type = "";
     require App::hr;
     eval { $_pci_r->{res} = App::hr::hr_app(%_pci_args) };
-    if ($@) { $_pci_r->{res} = [500, "Function died: $@"] }
+    if ($@) { die if $ENV{PERINCI_CMDLINE_INLINE_DEBUG_DIE}; $_pci_r->{res} = [500, "Function died: $@"] }
 }
 }
 
@@ -214,7 +222,7 @@ else { require Local::_pci_clean_json; require Perinci::Result::Format::Lite; $i
 my $use_utf8 = $_pci_r->{res}[3]{"x.hint.result_binary"} ? 0 : 0;
 if ($use_utf8) { binmode STDOUT, ":encoding(utf8)" }
 if ($is_stream) {
-    my $code = $_pci_r->{res}[2]; if (ref($code) ne "CODE") { die "Result is a stream but no coderef provided" } if ($_pci_meta_result_type_is_simple) { while(defined(my $l=$code->())) { print $fh $l; print $fh "\n" unless $_pci_meta_result_type eq "buf"; } } else { while (defined(my $rec=$code->())) { print $fh _pci_json()->encode($rec),"\n" } }
+    my $code = $_pci_r->{res}[2]; if (ref($code) ne "CODE") { die "Result is a stream but no coderef provided" } if ($_pci_meta_result_type_is_simple) { while(defined(my $l=$code->())) { print $fh $l; print $fh "\n" unless $_pci_meta_result_type eq "buf"; } } else { while (defined(my $rec=$code->())) { if (!defined($rec) || ref $rec) { print $fh _pci_json()->encode($rec),"\n" } else { print $fh $rec,"\n" } } }
 } else {
     print $fh $fres;
 }
@@ -239,15 +247,15 @@ hr - Print horizontal bar on the terminal
 
 =head1 VERSION
 
-This document describes version 0.262 of main (from Perl distribution App-hr), released on 2020-04-27.
+This document describes version 0.264 of main (from Perl distribution App-hr), released on 2021-07-08.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % hr [-H=s] [-a=s] [-b=s] [-c=s] [--color=s] [--height=s] [-r]
-     [--random-color] [--random-pattern] [--space-after=s]
-     [--space-before=s] [pattern]
+ % hr [--blink | -B | --no-blink | --noblink] [--color=s | -c=s]
+     [--height=s | -H=s] [--random-color] [--random-pattern | -r]
+     [--space-after=s | -a=s] [--space-before=s | -b=s] -- [pattern]
 
 =head1 DESCRIPTION
 
@@ -287,6 +295,8 @@ Usage:
  
  % hr -r  ;# shortcut for --random-pattern --random-color
  
+ % hr -Br ;# a BLINKING random pattern, random color bar
+ 
  % hr --help
 
 If you use Perl, you can also use the C<hr> function in L<App::hr> module.
@@ -298,6 +308,10 @@ C<*> marks required options.
 =head2 Main options
 
 =over
+
+=item B<--blink>, B<-B>
+
+Return a blinking bar.
 
 =item B<--color>=I<s>, B<-c>
 
@@ -314,6 +328,8 @@ Default value:
 =item B<--pattern>=I<s>, B<-p>
 
 Specify a pattern.
+
+Can also be specified as the 1st command-line argument.
 
 =item B<--random-color>
 
@@ -413,7 +429,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2018, 2016, 2015, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2018, 2016, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
@@ -422,17 +438,19 @@ the same terms as the Perl 5 programming language system itself.
 
 __DATA__
 Data::Section::Seekable v1
-App/hr.pm,18,7082,0;0
-Clone/PP.pm,7120,6331,1;287
-Getopt/Long/EvenLess.pm,13483,11364,2;480
-Local/_pci_check_args.pm,24880,5913,3;862
-Local/_pci_clean_json.pm,30826,4414,4;991
-Scalar/Util/Numeric/PP.pm,35274,3106,5;1053
+App/hr.pm,18,7700,0;0
+Clone/PP.pm,7738,6331,1;311
+Getopt/Long/EvenLess.pm,14101,11364,2;504
+Local/_pci_check_args.pm,25498,6528,3;886
+Local/_pci_clean_json.pm,32059,4414,4;1027
+Scalar/Util/Numeric/PP.pm,36507,3106,5;1089
 
 ### App/hr.pm ###
 #package App::hr;
 #
+## AUTHORITY
 ## DATE
+## DIST
 ## VERSION
 #
 #use feature 'say';
@@ -444,6 +462,7 @@ Scalar/Util/Numeric/PP.pm,35274,3106,5;1053
 #our @EXPORT_OK = qw(
 #                       hr
 #                       hr_r
+#                       hr_Br
 #               );
 #
 #our %SPEC;
@@ -464,7 +483,7 @@ Scalar/Util/Numeric/PP.pm,35274,3106,5;1053
 #}
 #
 #sub hr {
-#    my ($pattern, $color) = @_;
+#    my ($pattern, $color, $blink) = @_;
 #    $pattern = "=" if !defined($pattern) || !length($pattern);
 #    my $n  = int($term_width / length($pattern))+1;
 #    my $hr = substr(($pattern x $n), 0, $term_width);
@@ -483,6 +502,8 @@ Scalar/Util/Numeric/PP.pm,35274,3106,5;1053
 #        }
 #    };
 #    undef $color unless $do_color;
+#
+#    $hr = "\e[5m$hr\e[0m" if $blink;
 #
 #    if (defined $color) {
 #        require Term::ANSIColor;
@@ -533,6 +554,8 @@ Scalar/Util/Numeric/PP.pm,35274,3106,5;1053
 #
 #    % hr -r  ;# shortcut for --random-pattern --random-color
 #
+#    % hr -Br ;# a BLINKING random pattern, random color bar
+#
 #    % hr --help
 #
 #If you use Perl, you can also use the `hr` function in <pm:App::hr> module.
@@ -552,6 +575,11 @@ Scalar/Util/Numeric/PP.pm,35274,3106,5;1053
 #        },
 #        random_color => {
 #            schema => ['bool', is=>1],
+#        },
+#        blink => {
+#            summary => 'Return a blinking bar',
+#            schema => 'bool*',
+#            cmdline_aliases => {B=>{}},
 #        },
 #        height => {
 #            summary => 'Specify height (number of rows)',
@@ -633,7 +661,7 @@ Scalar/Util/Numeric/PP.pm,35274,3106,5;1053
 #        );
 #    }
 #
-#    my $res = hr($args{pattern}, $args{color});
+#    my $res = hr($args{pattern}, $args{color}, $args{blink});
 #    $res = join(
 #        "",
 #        ("\n" x ($args{space_before} // 0)),
@@ -646,6 +674,13 @@ Scalar/Util/Numeric/PP.pm,35274,3106,5;1053
 #
 #sub hr_r {
 #    my $res = hr_app(random_color=>1, random_pattern=>1);
+#    my $hr  = $res->[2];
+#    return $hr if defined(wantarray);
+#    print $hr;
+#}
+#
+#sub hr_Br {
+#    my $res = hr_app(blink=>1, random_color=>1, random_pattern=>1);
 #    my $hr  = $res->[2];
 #    return $hr if defined(wantarray);
 #    print $hr;
@@ -704,6 +739,11 @@ Scalar/Util/Numeric/PP.pm,35274,3106,5;1053
 #
 #Like C<hr>, but will set random pattern and random color.
 #
+#=head2 hr_Br => optional STR
+#
+#Like C<hr>, but will set random pattern and random color and return a blinking
+#bar.
+#
 #
 #=head1 ENVIRONMENT
 #
@@ -726,7 +766,7 @@ Scalar/Util/Numeric/PP.pm,35274,3106,5;1053
 #use vars qw($VERSION @EXPORT_OK);
 #use Exporter;
 #
-#$VERSION = 1.07;
+#$VERSION = 1.08;
 #
 #@EXPORT_OK = qw( clone );
 #sub import { goto &Exporter::import } # lazy Exporter
@@ -1311,6 +1351,17 @@ Scalar/Util/Numeric/PP.pm,35274,3106,5;1053
 #        require Scalar::Util::Numeric::PP;
 #        my $_sahv_dpath;
 #        my $_sahv_err;
+#        if (exists $args->{"blink"}) {
+#            $_sahv_dpath = [];
+#            # req #0
+#            ((defined($args->{"blink"})) ? 1 : (($_sahv_err //= "Required but not specified"),0))
+#            
+#            &&
+#            
+#            # check type 'bool'
+#            ((!ref($args->{"blink"})) ? 1 : (($_sahv_err //= "Not of type boolean value"),0))
+#             ; if ($_sahv_err) { return [400, "Argument validation failed: $_sahv_err"] }
+#        } # if date arg exists
 #        if (exists $args->{"color"}) {
 #            $_sahv_dpath = [];
 #            # req #0
@@ -1414,6 +1465,7 @@ Scalar/Util/Numeric/PP.pm,35274,3106,5;1053
 #        } # if date arg exists
 #
 #        # check required args
+#        return [400, "Missing required value for argument: blink"] if exists($args->{"blink"}) && !defined($args->{"blink"});
 #        return [400, "Missing required value for argument: color"] if exists($args->{"color"}) && !defined($args->{"color"});
 #        return [400, "Missing required value for argument: height"] if exists($args->{"height"}) && !defined($args->{"height"});
 #        return [400, "Missing required value for argument: pattern"] if exists($args->{"pattern"}) && !defined($args->{"pattern"});

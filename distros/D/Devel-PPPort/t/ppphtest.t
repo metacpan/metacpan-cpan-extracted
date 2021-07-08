@@ -52,9 +52,11 @@ Devel::PPPort->bootstrap;
 
 package main;
 
+# BEWARE: This number and SKIP_SLOW_TESTS must be the same!!!
+
 BEGIN {
   if ($ENV{'SKIP_SLOW_TESTS'}) {
-    skip("skip: SKIP_SLOW_TESTS", 238);
+    skip("skip: SKIP_SLOW_TESTS", 235);
     exit 0;
   }
 }

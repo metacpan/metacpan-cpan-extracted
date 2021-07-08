@@ -3,7 +3,7 @@ use warnings;
 use strict;
 use 5.010001;
 
-our $VERSION = '2.270';
+our $VERSION = '2.271';
 
 use Term::Choose::Screen qw( hide_cursor show_cursor clear_to_end_of_screen );
 
@@ -53,7 +53,7 @@ C<db-browser> - Browse C<SQLite>/C<MySQL>/C<PostgreSQL> databases and their tabl
 
 =head1 VERSION
 
-Version 2.270
+Version 2.271
 
 =head1 SYNOPSIS
 
@@ -790,6 +790,9 @@ If these menu entries are prefixed with C<=>, it is required to select the wante
 entry has been chosen.
 
 =head4 Functions
+
+Selecting the prompt line ('Function:') allows one the enable the possibility to set the sign (+/-) for the precision in
+the rounding function.
 
 =over
 

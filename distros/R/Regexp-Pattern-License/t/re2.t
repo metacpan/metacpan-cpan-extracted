@@ -1,14 +1,12 @@
-#!perl
+use Test2::V0;
 
-use strict;
-use warnings;
+plan 11;
 
-use Test::More tests => 11;
 use Test::Regexp::Pattern;
 
 use Regexp::Pattern;
 
-use Test::Requires { 're::engine::RE2' => 0 };
+use Test2::Require::Module 're::engine::RE2';
 
 my $re = re( 'License::beerware', engine => 'RE2', subject => 'name' );
 

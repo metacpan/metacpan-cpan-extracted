@@ -1,5 +1,5 @@
 package Lab::Moose::Connection::USB;
-$Lab::Moose::Connection::USB::VERSION = '3.760';
+$Lab::Moose::Connection::USB::VERSION = '3.762';
 #ABSTRACT: Connection backend to USB Test & Measurement (USBTMC) bus
 
 use v5.20;
@@ -141,7 +141,7 @@ Lab::Moose::Connection::USB - Connection backend to USB Test & Measurement (USBT
 
 =head1 VERSION
 
-version 3.760
+version 3.762
 
 =head1 SYNOPSIS
 
@@ -166,7 +166,7 @@ Connection backend based on libusb via the L<USB::TMC> distribution.
 This software is copyright (c) 2021 by the Lab::Measurement team; in detail:
 
   Copyright 2017-2018  Simon Reinhardt
-            2020       Andreas K. HÃ¼ttel
+            2020       Andreas K. Huettel
 
 
 This is free software; you can redistribute it and/or modify it under

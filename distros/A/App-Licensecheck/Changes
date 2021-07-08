@@ -7,6 +7,46 @@ Home page:    <https://metacpan.org/release/App-Licensecheck>
 Bug tracker:  <https://bugs.debian.org/cgi-bin/pkgreport.cgi?pkg=licensecheck>
 Maintainer:   Jonas Smedegaard (JONASS) <jonass@cpan.org>
 
+v3.2.3	2021-07-07
+
+ [ Bug Fixes ]
+ - fix option --copyright-delimiter (deb-machine output broken since
+   v3.2.0)
+
+ [ Test Suite ]
+ - rewrite encoding tests
+
+ [ Other ]
+ - stop use strictures (not sure why, but CPANTESTERS choke on it)
+
+v3.2.2	2021-07-04
+
+ [ Bug Fixes ]
+ - fix ignore atomic discoveries in areas already detected stepwise as a
+   license, grant, or exception
+ - fix include leading licensed_under when tracking detected positions
+ - fix resolve shortname not reusable in grant (e.g. SPDX using unversioned
+   SISSL for SISSL-1.1)
+
+ [ Documentation ]
+ - fix describe option --shortname-scheme (not bogus option
+   --shortname-schemes) in changelog entry for release v3.2
+ - fix trace output to include string for stepwise or_later grant trait
+ - mention in POD when each option was introduced
+
+ [ Test Suite ]
+ - add README to source, documenting origin of Fedora tests
+ - add test for not yet recognized PS-or-PDF-font exception
+ - tighten test requirement on Regexp::Pattern::License
+ - update tests to cover Regexp::Pattern::License v3.6.0
+
+ [ Packaging ]
+ - relax runtime requirement on Regexp::Pattern::License
+ - tighten .gitignore file
+
+ [ Other ]
+ - tighten internal trait objects to require file attribute
+
 v3.2.1	2021-06-29
 
  [ Bug Fixes ]
@@ -49,7 +89,7 @@ v3.2.0	2021-06-22
  [ Other ]
  - Added: add option --list-licenses
  - Added: add option --list-naming-schemes
- - Added: add option --shortname-schemes, replacing option --deb-fmt (kept
+ - Added: add option --shortname-scheme, replacing option --deb-fmt (kept
    for now, documented as deprecated)
  - logging: fix resolve identifier in trace of exception and flaw detection
  - resolve license patterns only when used, speeding up --help

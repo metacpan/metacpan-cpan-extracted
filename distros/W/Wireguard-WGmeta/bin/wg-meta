@@ -13,37 +13,68 @@ An you don't know the best yet: It's fully compatible with your existing setup (
 
 Intended to use as command wrapper for the C<wg show> and C<wg set> commands. Support for C<wg-quick> is enabled by default.
 
-Please note that B<all> attributes have to be specified in the `wg set` _syntax_, which means _AllowedIPs_ becomes
-allowed-ips and so on.
+Please note that B<all> non-meta attributes have to be specified in the `wg set` _syntax_, which means _AllowedIPs_ becomes
+allowed-ips and so on. wg-meta attributes on the other hand, have to be written in the exact same way as they were introduced!
 
-	sudo wg-meta show
+    $ wg-meta help
 
-	# output
-	interface: wg0
-	  State: UP
-	  ListenPort: 51888
-	  PublicKey: +qz742hzxD3E5z5QF7VOvleVS1onavQpXBK3NdTh40g=
+    wg-meta - An approach to add meta data to the Wireguard configuration
+    Usage: wg-meta <cmd> [<args>]
+    Available subcommands:
+             show: Shows the current configuration paired with available metadata
+             set:  Sets configuration attributes
+             enable:  Enables a peer
+             disable:  Disables a peer
+             addpeer:  Adds a peer and prints the client config to std_out
+             removepeer:  Removes a peer
+             apply:  Just a shorthand for `wg syncconf <iface> <(wg-quick strip <iface>)`
+    You may pass `help` to any of these subcommands to view their usage
 
-	+peer: WG_0_PEER_A_PUBLIC_KEY
-	  Name: testero
-	  Alias: Dual_stack_peer1
-	  AllowedIPs: fdc9:281f:04d7:9ee9::1/128, 10.0.3.43/32
-	  endpoint: 147.86.207.49:10400  latest-handshake: >month ago  transfer-rx: 0.26 MiB  transfer-tx: 1.36 MiB
+    $ sudo wg-meta show wg0
 
-	# Access using peer
-	sudo wg-meta set wg0 peer +qz742hzxD3E5z5QF7VOvleVS1onavQpXBK3NdTh40g= name Fancy_meta_name
+    interface: wg0
+      private-key: WG_0_PEER_B_PRIVATE_KEY
+      public-key: wg0d845RRItYcmcEW3i+dqatmja18F2P9ujy+lAtsBM=
+      listen-port: 51888
+      fwmark: off
 
-	# Access using alias
-	sudo wg-meta set wg0 some_alias description "Some Desc"
+    peer: IPv6_only1
+      public-key: WG_0_PEER_A_PUBLIC_KEY
+      preshared-key: PEER_A-PEER_B-PRESHARED_KEY
+      allowed-ips: fdc9:281f:04d7:9ee9::1/128
+      endpoint: 147.86.207.49:10400
+      latest-handshake: >month ago
+      transfer-rx: 0.26 MiB
+      transfer-tx: 1.36 MiB
+      persistent-keepalive: off
 
-	# Disable peer
-	sudo wg-meta disable wg0 some_alias
 
-	# Enable peer
-	sudo wg-meta enable wg0 +qz742hzxD3E5z5QF7VOvleVS1onavQpXBK3NdTh40g=
+    # Access using peer (note the '+' before 'name' -> we add a previously unseen attribute)
+    sudo wg-meta set wg0 peer WG_0_PEER_A_PUBLIC_KEY +name Fancy_meta_name
 
-	# Apply config
-	sudo wg-meta apply wg0
+    # Access using alias
+    sudo wg-meta set wg0 IPv6_only1 +description "Some Desc"
+
+    # Lets check our newly set attributes
+    sudo wg-meta show wg0 name description
+
+    # output
+    interface: wg0
+      name: (none)
+      description: (none)
+
+    peer: IPv6_only1
+      name: Fancy_meta_name
+      description: Some Desc
+
+    # Disable peer
+    sudo wg-meta disable wg0 IPv6_only1
+
+    # Enable peer
+    sudo wg-meta enable wg0 WG_0_PEER_A_PUBLIC_KEY
+
+    # Apply config
+    sudo wg-meta apply wg0
 
 =head1 INSTALLATION
 
@@ -68,7 +99,7 @@ S<Tobias Bossert E<lt>tobib at cpan.orgE<gt>>
 
 MIT License
 
-Copyright (c) 2020 Tobias Bossert
+Copyright (c) 2021 Tobias Bossert
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -101,7 +132,7 @@ use experimental 'signatures';
 use Wireguard::WGmeta::Cli::Router;
 use Wireguard::WGmeta::Cli::TerminalHelpers;
 
-our $VERSION = "0.2.3";
+our $VERSION = "0.3.1";
 
 local $SIG{__WARN__} = sub($message) {
     prettify_message($message, 1);

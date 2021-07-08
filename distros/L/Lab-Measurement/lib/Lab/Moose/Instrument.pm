@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument;
-$Lab::Moose::Instrument::VERSION = '3.760';
+$Lab::Moose::Instrument::VERSION = '3.762';
 #ABSTRACT: Base class for instrument drivers
 
 use v5.20;
@@ -274,7 +274,7 @@ Lab::Moose::Instrument - Base class for instrument drivers
 
 =head1 VERSION
 
-version 3.760
+version 3.762
 
 =head1 SYNOPSIS
 
@@ -282,18 +282,18 @@ A complete device driver based on Lab::Moose::Instrument:
 
  package Lab::Moose::Instrument::FooBar;
  use Moose;
- 
+
  use Lab::Moose::Instrument qw/validated_getter validated_setter/;
 
  use namespace::autoclean;
- 
+
  extends 'Lab::Moose::Instrument';
 
  sub get_foo {
      my ($self, %args) = validated_getter(\@_);
      return $self->query(command => "Foo?", %args);
  }
- 
+
  sub set_foo {
      my ($self, $value, %args) = validated_setter(\@_);
      return $self->write(command => "Foo $value", %args);
@@ -425,9 +425,10 @@ Analog to C<validated_channel_getter>.
 This software is copyright (c) 2021 by the Lab::Measurement team; in detail:
 
   Copyright 2016       Simon Reinhardt
-            2017       Andreas K. HÃ¼ttel, Simon Reinhardt
+            2017       Andreas K. Huettel, Simon Reinhardt
             2018       Simon Reinhardt
-            2020       Andreas K. HÃ¼ttel, Sam Bingner
+            2020       Andreas K. Huettel, Sam Bingner
+            2021       Fabian Weinelt
 
 
 This is free software; you can redistribute it and/or modify it under

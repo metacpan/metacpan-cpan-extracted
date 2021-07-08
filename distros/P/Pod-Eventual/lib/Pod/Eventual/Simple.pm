@@ -1,13 +1,31 @@
 use strict;
 use warnings;
-package Pod::Eventual::Simple;
-{
-  $Pod::Eventual::Simple::VERSION = '0.094001';
-}
+package Pod::Eventual::Simple 0.094002;
 use Pod::Eventual;
 BEGIN { our @ISA = 'Pod::Eventual' }
 # ABSTRACT: just get an array of the stuff Pod::Eventual finds
 
+#pod =head1 SYNOPSIS
+#pod
+#pod   use Pod::Eventual::Simple;
+#pod
+#pod   my $output = Pod::Eventual::Simple->read_file('awesome.pod');
+#pod
+#pod This subclass just returns an array reference when you use the reading methods.
+#pod The arrayref contains all the Pod events and non-Pod content.  Non-Pod content
+#pod is given as hashrefs like this:
+#pod
+#pod   {
+#pod     type       => 'nonpod',
+#pod     content    => "This is just some text\n",
+#pod     start_line => 162,
+#pod   }
+#pod
+#pod For just the POD events, grep for C<type> not equals "nonpod"
+#pod
+#pod =for Pod::Coverage new
+#pod
+#pod =cut
 
 sub new {
   my ($class) = @_;
@@ -37,13 +55,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Pod::Eventual::Simple - just get an array of the stuff Pod::Eventual finds
 
 =head1 VERSION
 
-version 0.094001
+version 0.094002
 
 =head1 SYNOPSIS
 
@@ -63,15 +83,25 @@ is given as hashrefs like this:
 
 For just the POD events, grep for C<type> not equals "nonpod"
 
+=head1 PERL VERSION
+
+This library should run on perls released even a long time ago.  It should work
+on any version of perl released in the last five years.
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
+
 =for Pod::Coverage new
 
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@cpan.org>
+Ricardo SIGNES <rjbs@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 by Ricardo SIGNES.
+This software is copyright (c) 2021 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

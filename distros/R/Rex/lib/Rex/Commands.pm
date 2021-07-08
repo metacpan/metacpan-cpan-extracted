@@ -112,7 +112,7 @@ use 5.010001;
 use strict;
 use warnings;
 
-our $VERSION = '1.13.3'; # VERSION
+our $VERSION = '1.13.4'; # VERSION
 
 require Rex::Exporter;
 use Rex::TaskList;
@@ -318,9 +318,6 @@ sub task {
   else {
     push( @_, "" );
   }
-
-  my $ref_to_tasks = qualify_to_ref( 'tasks', $class );
-  push( @{ *{$ref_to_tasks} }, { name => $task_name_save, code => $_[-2] } );
 
   $options->{'dont_register'} ||= $dont_register_tasks;
   my $task_o = Rex::TaskList->create()->create_task( $task_name, @_, $options );
@@ -1587,17 +1584,17 @@ sub last_command_output {
 This is a function to compare a string with some given options.
 
  task "mytask", "myserver", sub {
-   my $ntp_service = case operating_sytem, {
+   my $ntp_service = case operating_system, {
                  Debian  => "ntp",
                  default => "ntpd",
                };
 
-   my $ntp_service = case operating_sytem, {
+   my $ntp_service = case operating_system, {
                  qr{debian}i => "ntp",
                  default    => "ntpd",
                };
 
-   my $ntp_service = case operating_sytem, {
+   my $ntp_service = case operating_system, {
                  qr{debian}i => "ntp",
                  default    => sub { return "foo"; },
                };

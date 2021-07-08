@@ -4,10 +4,10 @@
 #  (C) Tom Molesworth 2011,
 #      Paul Evans, 2011-2015 -- leonerd@leonerd.org.uk
 
-use 5.026;
-use Object::Pad 0.27;
+use v5.26;
+use Object::Pad 0.43;  # ADJUST
 
-package Tickit::Widget::Tabbed 0.023;
+package Tickit::Widget::Tabbed 0.024;
 class Tickit::Widget::Tabbed
         extends Tickit::ContainerWidget;
 
@@ -29,10 +29,11 @@ Tickit::Widget::Tabbed - provide tabbed window support
 
 =head1 SYNOPSIS
 
- use Tickit::Widget::Tabbed;
- my $tabbed = Tickit::Widget::Tabbed->new;
- $tabbed->add_tab(Tickit::Widget::Static->new(text => 'some text'), label => 'First tab');
- $tabbed->add_tab(Tickit::Widget::Static->new(text => 'some text'), label => 'Second tab');
+   use Tickit::Widget::Tabbed;
+
+   my $tabbed = Tickit::Widget::Tabbed->new;
+   $tabbed->add_tab(Tickit::Widget::Static->new(text => 'some text'), label => 'First tab');
+   $tabbed->add_tab(Tickit::Widget::Static->new(text => 'some text'), label => 'Second tab');
 
 =head1 DESCRIPTION
 
@@ -111,10 +112,10 @@ Takes the following named parameters:
 
 =cut
 
-has $_tab_class;
+has $_tab_class :param = undef;
 method TAB_CLASS { $_tab_class || "Tickit::Widget::Tabbed::Tab" }
 
-has $_ribbon_class;
+has $_ribbon_class :param = undef;
 method RIBBON_CLASS { $_ribbon_class || "Tickit::Widget::Tabbed::Ribbon" }
 
 has $_ribbon;
@@ -123,9 +124,6 @@ method ribbon { $_ribbon }
 has @_child_window_geometry;
 
 BUILD ( %args ) {
-        $_tab_class    = delete($args{tab_class});
-        $_ribbon_class = delete($args{ribbon_class});
-
         $self->tab_position(delete($args{tab_position}) || 'top');
         # sets $_ribbon
 
@@ -422,20 +420,22 @@ C<active_tab>.
 
 =cut
 
-has $_tabbed;
+sub BUILDARGS ( $class, $tabbed, %args ) {
+        return ( tabbed => $tabbed, %args );
+}
 
-has $_widget;
-has $_label;
-has $_active = 0;
+has $_tabbed :param;
+
+has $_widget :param;
+has $_label  :param;
+has $_active        = 0;
 
 has $_on_activated;
 has $_on_deactivated;
 
-BUILD ( $tabbed, %args ) {
-        weaken( $_tabbed = $tabbed );
-
-        $_widget = $args{widget};
-        $_label  = $args{label};
+ADJUST
+{
+        weaken( $_tabbed );
 }
 
 =head2 index
@@ -568,25 +568,21 @@ To perform this, create a subclass of C<Tickit::Widget::Tabbed::Tab>. Since
 version 0.022 this module is implemented using L<Object::Pad>, so you can rely
 on having that available for implementing a subclass:
 
- use Object::Pad;
+   use Object::Pad;
 
- class MyCustomTabClass extends Tickit::Widget::Tabbed::Tab;
-
- BUILD {
-        ...
- }
+   class MyCustomTabClass extends Tickit::Widget::Tabbed::Tab;
 
 Arrange for this class to be used by the tabbed widget either by passing its
 name as a constructor argument called C<tab_class>, or by overriding a method
 called C<TAB_CLASS>.
 
- my $tabbed = Tickit::Widget::Tabbed->new(
-         tab_class => "MyCustomTabClass"
- );
+   my $tabbed = Tickit::Widget::Tabbed->new(
+           tab_class => "MyCustomTabClass"
+   );
 
 or
 
- use constant TAB_CLASS => "MyCustomTabClass";
+   use constant TAB_CLASS => "MyCustomTabClass";
 
 =head1 CUSTOM RIBBON CLASS
 

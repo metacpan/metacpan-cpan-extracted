@@ -6,14 +6,18 @@
     'actual_rows' => '3',
     'actual_time_first' => '0.007',
     'actual_time_last' => '0.009',
+    'buffers' => {
+      'shared' => {
+        'hit' => '9'
+      }
+    },
     'estimated_row_width' => '4',
     'estimated_rows' => '3',
     'estimated_startup_cost' => '12.9',
     'estimated_total_cost' => '24.27',
     'extra_info' => [
       'Recheck Cond: (id = ANY (\'{1,1000,5000}\'::integer[]))',
-      'Heap Blocks: exact=3',
-      'Buffers: shared hit=9'
+      'Heap Blocks: exact=3'
     ],
     'is_analyzed' => 1,
     'scan_on' => {
@@ -25,13 +29,17 @@
         'actual_rows' => '3',
         'actual_time_first' => '0.005',
         'actual_time_last' => '0.005',
+        'buffers' => {
+          'shared' => {
+            'hit' => '6'
+          }
+        },
         'estimated_row_width' => '0',
         'estimated_rows' => '3',
         'estimated_startup_cost' => '0',
         'estimated_total_cost' => '12.9',
         'extra_info' => [
-          'Index Cond: (id = ANY (\'{1,1000,5000}\'::integer[]))',
-          'Buffers: shared hit=6'
+          'Index Cond: (id = ANY (\'{1,1000,5000}\'::integer[]))'
         ],
         'is_analyzed' => 1,
         'scan_on' => {

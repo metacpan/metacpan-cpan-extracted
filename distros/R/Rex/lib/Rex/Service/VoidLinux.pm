@@ -12,7 +12,7 @@ use 5.010001;
 use strict;
 use warnings;
 
-our $VERSION = '1.13.3'; # VERSION
+our $VERSION = '1.13.4'; # VERSION
 
 use Rex::Helper::Run;
 

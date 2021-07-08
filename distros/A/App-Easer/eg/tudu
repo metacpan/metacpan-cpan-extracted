@@ -1,0 +1,331 @@
+#!/usr/bin/env perl
+use v5.24;
+use warnings;
+use experimental 'signatures';
+no warnings 'experimental::signatures';
+use App::Easer 'run';
+
+my $application = {
+   factory       => {prefixes => {'#' => 'TuDu#'}},
+   configuration => {
+      'auto-leaves'    => 1,
+      'help-on-stderr' => 1,
+   },
+   commands => {
+      MAIN => {
+         help        => 'to-do application',
+         description => 'A simple to-do application',
+         options     => [
+            {
+               help        => 'path to the configuration file',
+               getopt      => 'config|c=s',
+               environment => 'TUDU_CONFIG',
+            },
+            {
+               help        => 'base directory where tasks are kept',
+               getopt      => 'basedir|dir|d=s',
+               environment => 'TUDU_BASEDIR',
+               default     => "$ENV{HOME}/.tudu",
+            },
+            {
+               help   => 'max number of attempts to find non-colliding id',
+               getopt => 'attempts|max-attempts|M=i',
+               default => 9,
+            },
+         ],
+         sources        => '+SourcesWithFiles',
+         'config-files' => ["$ENV{HOME}/.tudu.conf", '/etc/tudu.conf'],
+         commit         => '#ensure_basedir',
+         children => [qw< list show cat add edit done wait resume remove >],
+      },
+      dump => { # this child is normally excluded!
+         help => 'dump configuration',
+         execute => sub ($m, $c, $a) {
+            require Data::Dumper;
+            warn Data::Dumper::Dumper({config => $c, args => $a});
+            return 0;
+         },
+      },
+      list => {
+         help        => 'list tasks',
+         description => 'Get full or partial list of tasks',
+         supports    => [qw< list ls >],
+         options     => [
+            {
+               help => 'include all tasks (including done) '
+                 . '(exclusion is not honored)',
+               getopt => 'all|A!',
+            },
+            {
+               help => 'include(/exclude) all active tasks '
+                 . '(ongoing and waiting)',
+               getopt => 'active|a!',
+            },
+            {
+               help   => 'include(/exclude) done tasks',
+               getopt => 'done|d!',
+            },
+            {
+               help   => 'include(/exclude) ongoing tasks',
+               getopt => 'ongoing|o!',
+            },
+            {
+               help   => 'include(/exclude) waiting tasks',
+               getopt => 'waiting|w!',
+            },
+            {
+               help   => 'use extended, unique identifiers',
+               getopt => 'id|i!',
+            },
+            {
+               help => 'limit up to n items for each category (0 -> inf)',
+               getopt => 'n=i'
+            },
+         ],
+         execute => '#list',
+      },
+      show => {
+         help        => 'print one task',
+         description => 'Print one whole task',
+         supports    => [qw< show print get >],
+         execute     => '#show',
+      },
+      cat => {
+         help        => 'print one task (no delimiters)',
+         description => 'Print one whole task, without adding delimiters',
+         execute     => '#cat',
+      },
+      add => {
+         help        => 'add a task',
+         description => 'Add a task, optionally setting it as waiting',
+         supports    => [qw< add new post >],
+         options     => [
+            {
+               help   => 'add the tasks as waiting',
+               getopt => 'waiting|w!'
+            },
+            {
+               help   => 'set the editor for adding the task, if needed',
+               getopt => 'editor|visual|e=s',
+               environment => 'VISUAL',
+               default     => 'vi',
+            }
+         ],
+         execute => '#add',
+      },
+      edit => {
+         help        => 'edit a task',
+         description => 'Start an editor to modify the task',
+         supports    => [qw< edit modify change update >],
+         options     => [
+            {
+               help   => 'set the editor for adding the task, if needed',
+               getopt => 'editor|visual|e=s',
+               environment => 'VISUAL',
+               default     => 'vi',
+            }
+         ],
+         execute => '#edit',
+      },
+      done => {
+         help        => 'mark a task as completed',
+         description => 'Archive a task as completed',
+         execute     => '#done',
+         supports    => [qw< done tick yay >],
+      },
+      wait => {
+         help        => 'mark a task as waiting',
+         description => 'Set a task as waiting for external action',
+         supports    => [qw< waiting wait >],
+         execute     => '#waiting',
+      },
+      resume => {
+         help        => 'mark a task as ongoing',
+         description => 'Set a task in active mode (from done or waiting)',
+         supports    => [qw< resume active restart ongoing >],
+         execute     => '#resume',
+      },
+      remove => {
+         help        => 'delete a task',
+         description => 'Get rid of a task (definitively)',
+         supports    => [qw< remove rm delete del >],
+         execute     => '#remove',
+      },
+   },
+};
+exit run($application, [@ARGV]);
+
+package TuDu;
+use Path::Tiny 'path';
+use POSIX 'strftime';
+
+sub ensure_basedir ($main, $spec, $args) {
+   my $path = path($main->{configs}[-1]{basedir});
+   $path->mkpath;
+   $path->child($_)->mkpath for qw< ongoing waiting done >;
+   return;
+} ## end sub ensure_basedir
+
+sub list_category ($config, $category) {
+   my $dir = path($config->{basedir})->child($category);
+   return reverse sort { $a cmp $b } $dir->children;
+}
+
+sub list ($main, $config, $args) {
+   my @active = qw< ongoing waiting >;
+   my @candidates = (@active, 'done');
+   my %included;
+
+   # Add stuff
+   if ($config->{all}) {
+      @included{@candidates} = (1) x @candidates;
+   }
+   for my $option (@candidates) {
+      $included{$option} = 1 if $config->{$option};
+   }
+   if ($config->{active} || !scalar keys %included) {
+      @included{@active} = (1) x @active;
+   }
+
+   # Remove stuff
+   delete @included{@active}
+     if exists $config->{active} && !$config->{active};
+   for my $option (@candidates) {
+      delete $included{$option}
+        if exists $config->{$option} && !$config->{$option};
+   }
+
+   my $basedir = path($config->{basedir});
+   my (%cf, %pf);
+   my $limit = $config->{n};
+   for my $source (@candidates) {
+      next unless $included{$source};
+      for my $file (list_category($config, $source)) {
+         my $title = get_title($file);
+         my $sid = $config->{id} ? '-' . $file->basename : ++$cf{$source};
+         my $id = substr($source, 0, 1) . $sid;
+         say "$id [$source] $title";
+         last if $limit && ++$pf{$source} >= $limit;
+      } ## end for my $file (list_category...)
+   } ## end for my $source (@candidates)
+
+   return 0;
+} ## end sub list
+
+sub resolve ($config, $oid) {
+   fatal("no identifier provided") unless defined $oid;
+   my $id = $oid;
+
+   my %name_for = (o => 'ongoing', d => 'done', w => 'waiting');
+   my $first = substr $id, 0, 1, '';
+   my $type = $name_for{$first} // fatal("invalid identifier '$oid'");
+
+   my $child;
+   if ($id =~ s{\A -}{}mxs) {    # exact id
+      $child = path($config->{basedir})->child($type, $id);
+      fatal("unknown identifier '$oid'") unless -r $child;
+   }
+   else {
+      fatal("invalid identifier '$oid'")
+        unless $id =~ m{\A [1-9]\d* \z}mxs;
+      my @children = list_category($config, $type);
+      fatal(
+"invalid identifier '$oid' (too high, max $first@{[scalar @children]})"
+      ) if $id > @children;
+      $child = $children[$id - 1];
+   } ## end else [ if ($id =~ s{\A -}{}mxs)]
+
+   return $child;
+} ## end sub resolve
+
+sub show ($main, $config, $args) {
+   my $child = resolve($config, $args->[0]);
+   my $contents = $child->slurp_utf8;
+   $contents =~ s{\n\z}{}mxs;
+   say "----\n$contents\n----";
+   return 0;
+} ## end sub show
+
+sub cat ($main, $config, $args) {
+   my $child = resolve($config, $args->[0]);
+   print {*STDOUT} $child->slurp_utf8;
+   return 0;
+} ## end sub show
+
+sub fatal ($message) { die join(' ', @_) . "\n" }
+sub notice ($message) { warn join(' ', @_) . "\n" }
+
+sub add_file ($config, $hint, $contents) {
+   my $attempts = 0;
+   my $file     = path($hint);
+   while ('necessary') {
+      eval {
+         my $fh =
+           $file->filehandle({exclusive => 1}, '>', ':encoding(UTF-8)');
+         print {$fh} $contents;
+         close $fh;
+      } && return $file;
+      ++$attempts;
+      last if $config->{attempts} && $attempts >= $config->{attempts};
+      $file = $hint->sibling($hint->basename . "-$attempts");
+   } ## end while ('necessary')
+   fatal("cannot save file '$hint' or variants");
+} ## end sub add_file
+
+sub move_task ($config, $src, $category) {
+   $src = $src->[0] if 'ARRAY' eq ref $src;
+   my $child = resolve($config, $src);
+   my $parent = $child->parent;
+   if ($parent->basename eq $category) {
+      notice("task is already $category");
+      return 0;
+   }
+   my $dest = $parent->sibling($category)->child($child->basename);
+   add_file($config, $dest, $child->slurp_utf8);
+   $child->remove;
+   return 0;
+} ## end sub move_task
+
+sub done ($m, $config, $args) { move_task($config, $args, 'done') }
+sub resume ($m, $config, $args) { move_task($config, $args, 'ongoing') }
+sub waiting ($m, $config, $args) { move_task($config, $args, 'waiting') }
+
+sub remove ($main, $config, $args) {
+   resolve($config, $args->[0])->remove;
+   return 0;
+}
+
+sub get_title ($path) {
+   my ($title) = $path->lines({count => 1});
+   ($title // '') =~ s{\A\s+|\s+\z}{}grmxs;
+}
+
+sub add ($main, $config, $args) {
+   my $id = strftime('%Y%m%d-%H%M%S', localtime);
+   my $category = $config->{waiting} ? 'waiting' : 'ongoing';
+   my $hint = path($config->{basedir})->child($category, $id);
+   my $target = add_file($config, $hint, '');
+   if ($args->@*) {
+      $target->spew_utf8(join(' ', $args->@*) . "\n");
+      return 0;
+   }
+   return 0 if edit_file($config, $target) && length get_title($target);
+   $target->remove if -e $target;
+   fatal("bailing out creating new task");
+} ## end sub add
+
+sub edit_file ($config, $path) {
+   my $editor = $config->{editor};
+   my $outcome = system {$editor} $editor, $path->stringify;
+   return $outcome == 0;
+}
+
+sub edit ($main, $config, $args) {
+   my $target = resolve($config, $args->[0]);
+   my $previous = $target->slurp_utf8;
+   return 0 if edit_file($config, $target) && length get_title($target);
+   $target->spew_utf8($previous);
+   fatal("bailing out editing task");
+}
+
+1;

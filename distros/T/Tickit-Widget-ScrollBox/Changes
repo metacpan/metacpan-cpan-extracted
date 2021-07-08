@@ -1,5 +1,11 @@
 Revision history for Tickit-Widget-ScrollBox
 
+0.10    2021-07-03
+        [CHANGES]
+         * Updates for Object::Pad 0.41:
+            + Use :param to simplify BUILD blocks
+            + Better use of kvlist constructor args of inner helper class
+
 0.09    2020-06-13
         [CHANGES]
          * Update to Object::Pad 0.27

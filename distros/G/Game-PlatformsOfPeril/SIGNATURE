@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.83.
+signed via the Module::Signature module, version 0.87.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,14 +12,14 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA256
+Hash: RIPEMD160
 
 SHA256 2a225db8a19893c4397b41fae070de66d72af65edd8647f4d7a0607fa1ffd122 .gitignore
-SHA256 1467eca78c56f6e1d100efa254b4d8c9398f68bb5b48191e92f38961547ab8ff Changes
+SHA256 735c79197de1acc5ac1c8adbd30d2d9336aa19e26e79fb85d1b413e8e60a57a2 Changes
 SHA256 db739608563af2d9f1763883315451cc38032cb67bdd42a443bfcc7eef1a49b2 LICENSE
 SHA256 45d58b9b26f2a6b201a1cd5831b05171c462cc3b27992fe655cf6a97aebb1f5e MANIFEST
-SHA256 e230ae414f2de1f12c8e7539e0f24cba174e689c922671b14a1d3c07902146fc META.json
-SHA256 e23ad948055d856b450cbaa8e39dadf025be28bed46a0b86b30cfde28f56d928 META.yml
+SHA256 016ff61d3c1148fb82ece83f42011a95d4c7571268bd2c7fcef3e3a2d762f5e2 META.json
+SHA256 5d86a25ee51648774b7601c243f70a998d689f0cfaf2efdf3aff234d375d3083 META.yml
 SHA256 29afc285a29a68b8a6bb441e8c76f53b75bec98e945e3c5e87af02ab1d373e0f Makefile.PL
 SHA256 5e073f04e73f9828c17d202fa0d105fc4e020ad587d40784f8fb922eb29bce9f README
 SHA256 e0116cbf2038321d0c378159c5ee117c5b9c476ab4b42ef9e5101742f856e38b levels/level0
@@ -29,18 +29,18 @@ SHA256 7163e9eb41c78508978dab6362e03c085a918d930de8d1cc30c02f7103bbda85 levels/l
 SHA256 f7f8c6e291ab1cacdad84171983bf69c8d591aeb203d04c43fb21da0b6521c9d levels/level4
 SHA256 4a8cbc34ebeb4167e1a4734c3076a051bdc5919c75a3ccb0e05ab248a62c048f levels/level5
 SHA256 ece05134b808d38ee59e85b1c367a24dd5a23dce4db0f28037419788bd0c8756 levels/level6
-SHA256 e4dec6788e3bdd706ac3fa16554a95ed2e4ae3006cfdf636f02f9c358b6f394f lib/Game/PlatformsOfPeril.pm
+SHA256 e815173d54e27d9ad67f4d572434e47ea270fff7357447c3d25e625470feaf4f lib/Game/PlatformsOfPeril.pm
 SHA256 3995d0fa8a4ea6117005d39013024aeb77b00d0f2de2de9c829036800d0d604b pperil
 SHA256 2fa0ccaf203dc53cbbdecd498e0df45026a221ae8184cf73aa782b1c36b00a44 t/00-load.t
 SHA256 903b477522c73bfcd5db74bd63282c490e4dd4cb774f0b70132c4486b84e0c49 t/pod.t
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEExz5nATgiJJxZ/1+dgZku4eEsA4UFAl51aIUACgkQgZku4eEs
-A4WACggAlNoRKouYG5f9mtW5ZCgB4BfV9mz8nQE+hHdczty1XAVTbEMFsqZdCVcI
-OJENjwlOrIFveaIhouvht+94wDd9zkvxUO9Iphl4IALK34UzPw35IaxjG3yu3wpw
-i6+JiBwbPcuEIBoOAR8Ys15i2F6K3WseRx2gTegUsTL/BgUb30TgIjchII6RgG0i
-w5ErS06BagsLgmL+Rb3gbhixB1uhsRfjXOQiR/+hHDFoa0Q88lSl1IgaceRHyC1h
-W/FQkgF0jv6q7TyrCCVUy9RiJPTYAy7BMGHNp/pjZKXHmKB0Z/6uKAsnFZV18oiV
-IF7MOsM/9ETPYzQNpq6A/qbjlIzIZA==
-=ql/z
+iQEzBAEBAwAdFiEExz5nATgiJJxZ/1+dgZku4eEsA4UFAmDkiUoACgkQgZku4eEs
+A4WlPgf+JRKGulK9tzRF7LV0AcSLsQaMNcVOYGYx2anqIc+MuIL79YPR8gKnevmn
+hmQaEyQY+DPFtGPnnWJBvWb6lnAgkJvHlnTEI4l/LBka5V9sXjBs3nE2Zf/ZBeSE
+AQz64eYsD92RRlxR12KxBtvuNU18mjqDwdr8lVfkUr7g7I73e12//JZ88hjdt0Nw
+otyges6Ww6ObDTdQ0fpG1ldkJY4rYg3cDc4tv3OkzPkgN+UL/GU1LAImjYLOdGfL
+4LCwCuCQLR25qy3Hq3N0uYVlO9UkGv64YmII1mDDt7QfEVPvcILl1p168fJ5HgSG
+Nvxw6SwINx6Euif4IwAWUZipvnvj2Q==
+=c8bu
 -----END PGP SIGNATURE-----

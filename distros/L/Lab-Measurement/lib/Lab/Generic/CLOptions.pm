@@ -1,5 +1,5 @@
 package Lab::Generic::CLOptions;
-$Lab::Generic::CLOptions::VERSION = '3.760';
+$Lab::Generic::CLOptions::VERSION = '3.762';
 #ABSTRACT: Global command line option processing
 
 use v5.20;
@@ -28,18 +28,18 @@ Lab::Generic::CLOptions - Global command line option processing
 
 =head1 VERSION
 
-version 3.760
+version 3.762
 
 =head1 COPYRIGHT AND LICENSE
 
 This software is copyright (c) 2021 by the Lab::Measurement team; in detail:
 
-  Copyright 2014       Andreas K. HÃ¼ttel
+  Copyright 2014       Andreas K. Huettel
             2015       Christian Butschkow
             2016       Simon Reinhardt
-            2017       Andreas K. HÃ¼ttel
+            2017       Andreas K. Huettel
             2019       Simon Reinhardt
-            2020       Andreas K. HÃ¼ttel
+            2020       Andreas K. Huettel
 
 
 This is free software; you can redistribute it and/or modify it under

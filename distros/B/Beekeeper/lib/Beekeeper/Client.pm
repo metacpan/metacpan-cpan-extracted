@@ -3,8 +3,9 @@ package Beekeeper::Client;
 use strict;
 use warnings;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
+use Beekeeper::AnyEvent;
 use Beekeeper::MQTT;
 use Beekeeper::JSONRPC;
 use Beekeeper::Config;
@@ -14,10 +15,6 @@ use Sys::Hostname;
 use Time::HiRes;
 use Digest::SHA 'sha256_hex';
 use Carp;
-
-# Prefer AnyEvent perl backend as it is fast enough and it
-# does not ignore exceptions thrown from within callbacks
-$ENV{'PERL_ANYEVENT_MODEL'} ||= 'Perl' unless $AnyEvent::MODEL;
 
 use constant QUEUE_LANES => 2;
 use constant REQ_TIMEOUT => 60;
@@ -232,7 +229,7 @@ sub accept_notifications {
                 }
 
                 bless $request, 'Beekeeper::JSONRPC::Notification';
-                $request->{_mqtt_prop} = $mqtt_properties;
+                $request->{_mqtt_properties} = $mqtt_properties;
 
                 my $method = $request->{method};
 
@@ -329,7 +326,7 @@ sub call_remote_async {
     my $self = shift;
 
     my $req = $self->__do_rpc_request( @_, req_type => 'ASYNCHRONOUS' );
-    
+
     return $req;
 }
 
@@ -633,7 +630,7 @@ Beekeeper::Client - Make RPC calls through message bus
 
 =head1 VERSION
  
-Version 0.06
+Version 0.07
 
 =head1 SYNOPSIS
 
@@ -670,7 +667,7 @@ Version 0.06
 
 =head1 DESCRIPTION
 
-This module connects to the message broker and makes RPC calls through message bus.
+This module connects to the message broker and makes RPC calls through it.
 
 There are four different methods to do so:
 
@@ -683,7 +680,7 @@ There are four different methods to do so:
   │ send_notification │ many workers │ no     │ no     │ no     │
   └───────────────────┴──────────────┴────────┴────────┴────────┘
 
-All methods in this module are exported by default to C<Beekeeper::Worker>.
+All methods in this module are exported by default to L<Beekeeper::Worker>.
 
 =head1 CONSTRUCTOR
 
@@ -698,17 +695,17 @@ to connect using the parameters defined in config file C<bus.config.json>.
 
 =head3 send_notification ( %args )
 
-Broadcast a notification to the message bus.
+Broadcasts a notification to the message bus.
 
 All clients and workers listening for given method will receive it. 
 
 If no one is listening for it the notification will be discarded.
 
-=over 4
+=over
 
 =item method
 
-A string with the name of the notification being sent with format C<"{service_class}.{method}">.
+A string with the name of the notification being sent with format C<{service_class}.{method}>.
 
 =item params
 
@@ -724,10 +721,10 @@ bus. Notifications to another bus need a router shoveling them.
 
 =head3 accept_notifications ( $method => $callback, ... )
 
-Make this client start accepting specified notifications from message bus.
+Makes a client start accepting the specified notifications from the message bus.
 
-C<$method> is a string with the format "{service_class}.{method}". A default
-or fallback handler can be specified using a wildcard as "{service_class}.*".
+C<$method> is a string with the format C<{service_class}.{method}>. A default
+or fallback handler can be specified using a wildcard like C<{service_class}.*>.
 
 C<$callback> is a coderef that will be called when a notification is received.
 When executed, the callback will receive a parameter C<$params> which contains
@@ -737,13 +734,7 @@ Please note that callbacks will not be executed timely if AnyEvent loop is not r
 
 =head3 stop_accepting_notifications ( $method, ... )
 
-Make this client stop accepting specified notifications from message bus.
-
-C<$method> must be one of the strings used previously in C<accept_notifications>.
-
-=head3 stop_accepting_notifications ( $method, ... )
-
-Make this client stop accepting specified notifications from message bus.
+Makes a client stop accepting the specified notifications from the message bus.
 
 C<$method> must be one of the strings used previously in C<accept_notifications>.
 
@@ -758,11 +749,11 @@ On error it will die unless C<raise_error> option is set to false.
 
 This method accepts the following parameters:
 
-=over 4
+=over
 
 =item method
 
-A string with the name of the method to be invoked with format C<"{service_class}.{method}">.
+A string with the name of the method to be invoked with format C<{service_class}.{method}>.
 
 =item params
 
@@ -798,7 +789,7 @@ will have a defined C<response>.
 This method  accepts parameters C<method>, C<params>, C<address> and C<timeout> 
 the same as C<call_remote>. Additionally two callbacks can be specified:
 
-=over 4
+=over
 
 =item on_success
 
@@ -814,7 +805,7 @@ L<Beekeeper::JSONRPC::Error> object as parameter. Must be a coderef.
 
 =head3 fire_remote ( %args )
 
-Fire and forget an RPC call to a service worker through the message bus.
+Makes a fire and forget RPC call to a service worker through the message bus.
 
 It returns undef immediately. The worker receiving the call will not send back a response.
 
@@ -822,12 +813,12 @@ This method accepts parameters C<method>, C<params> and C<address> the same as C
 
 =head3 wait_async_calls
 
-Wait (running the event loop) until all calls made by C<call_remote_async> are completed
+Waits (running the event loop) until all calls made by C<call_remote_async> are completed
 either by success, error or timeout.
 
 =head3 set_authentication_data ( $data )
 
-Add an arbitrary authentication data blob to subsequent calls or notifications sent.
+Adds an arbitrary authentication data blob to subsequent calls or notifications sent.
 
 This data persists for client lifetime in standalone clients. Within worker context
 it persists until the end of current request only, and will be piggybacked on
@@ -838,11 +829,11 @@ any special one to it.
 
 =head3 get_authentication_data
 
-Gets the current authentication data blob.
+Returns the current authentication data blob.
 
 =head1 SEE ALSO
  
-L<Beekeeper::Worker>, L<Beekeeper::MQTT>.
+L<Beekeeper::Worker>, L<Beekeeper::Config>, L<Beekeeper::MQTT>.
 
 =head1 AUTHOR
 

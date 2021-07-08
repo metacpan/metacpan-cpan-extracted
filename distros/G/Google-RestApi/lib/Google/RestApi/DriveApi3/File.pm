@@ -1,24 +1,10 @@
 package Google::RestApi::DriveApi3::File;
 
-use strict;
-use warnings;
+our $VERSION = '0.7';
 
-our $VERSION = '0.4';
-
-use 5.010_000;
-
-use autodie;
-use Type::Params qw(compile compile_named);
-use Types::Standard qw(Str StrMatch HasMethods Any slurpy);
-use YAML::Any qw(Dump);
-
-no autovivification;
+use Google::RestApi::Setup;
 
 use aliased 'Google::RestApi::DriveApi3';
-
-use Google::RestApi::Utils qw(named_extra);
-
-do 'Google/RestApi/logger_init.pl';
 
 sub new {
   my $class = shift;

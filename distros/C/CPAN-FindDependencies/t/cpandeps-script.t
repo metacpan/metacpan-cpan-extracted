@@ -44,7 +44,7 @@ my($stdout, $stderr) = capture { system(
         help
     )
 )};
-like($stdout, qr/cpandeps CPAN::FindDependencies --perl 5.8.8/, "Can spew out some help");
+like($stdout, qr/cpandeps.*CPAN::FindDependencies.*--perl.*5.8.8/, "Can spew out some help");
 
 ($stdout, $stderr) = capture { system(
     $Config{perlpath}, (map { "-I$_" } (@INC)),

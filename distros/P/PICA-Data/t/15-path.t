@@ -2,34 +2,37 @@ use strict;
 use Test::More;
 
 use PICA::Path;
-use constant SF => qr{[_A-Za-z0-9]};
 
 my %pathes = (
-    '003.$abc' => [[qr{003.}, undef, qr{[abc]}] => '003.$abc'],
-    '003.abc'  => [[qr{003.}, undef, qr{[abc]}] => '003.$abc'],
-    '001B$0'   => [[qr{001B}, undef, qr{[0]}]],
-    '123A[0.]/1-3' => [[qr{123A}, qr{0.}, SF, 1, 3]],
+    '003.$abc' => '003.$abc',
+    '003.abc'  => '003.$abc',
+    '001B$0'   => '001B$0',
+    '123A[0.]/1-3' => '123A[0.]/1-3',
     '123+'         => undef,
     '300@'         => undef,
     '003$$'        => undef,
     '123A/-'       => undef,
-    '003X/0'     => [[qr{003X}, undef, SF, 0,  1]     => '003X/0'],
-    '..../10-10' => [[qr{....}, undef, SF, 10, 1]     => '..../10'],
-    '..../1-'    => [[qr{....}, undef, SF, 1,  undef] => '..../1-'],
-    '..../0-' => [[qr{....}, undef, SF] => '....'],
-    '003X[0-01]' => [[qr{003X}, [0,1], SF] => '003X[0-1]'],
-    '003X[2-02]' => [[qr{003X}, qr{2}, SF] => '003X[2]'],
-    '003X[7-13]' => [[qr{003X}, qr{2}, SF] => '003X[7-13]'],
+    '003X/0'     => '003X/0',
+    '..../10-10' => '..../10',
+    '..../1-'    => '..../1-',
+    '..../0-' => '....',
+    '003X[0-01]' => '003X[0-1]',
+    '003X[2-02]' => '003X[2]',
+    '003X[7-13]' => '003X[7-13]',
     '003X[13-7]' => undef,
+    #'....{}'   => undef,
+    #'....{}}'   => undef,
+    #    '....{$x}{$y}'   => '....{$x}{$y}',
+    #'....{$x}'   => '....{$x}',
 );
 
 foreach my $path (keys %pathes) {
     my $parsed = eval {PICA::Path->new($path)};
     if ($@) {
-        is $parsed, undef, "invalid path: $path" if $@;
+        is $pathes{$path}, undef, "invalid path: $path";
     }
     else {
-        is "$parsed", ($pathes{$path}->[1] // $path), 'stringify';
+        is "$parsed", $pathes{$path}, 'stringify';
     }
 }
 

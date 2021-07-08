@@ -1,7 +1,7 @@
 package PICA::Parser::Base;
 use v5.14.1;
 
-our $VERSION = '1.27';
+our $VERSION = '1.28';
 
 use Carp qw(croak);
 use Scalar::Util qw(reftype);
@@ -51,12 +51,20 @@ sub new {
 sub next {
     my ($self) = @_;
 
-    # get last subfield from 003@ as id
     while (my $record = $self->_next_record) {
         next unless @$record;
-        my ($id) = map {$_->[-1]} grep {($_->[0] // '') =~ '003@'} @$record;
-        $record = {_id => $id, record => $record};
-        return bless $record, 'PICA::Data';
+
+        # get last 003@ $0 as _id
+        my $id;
+        if (my ($field) = grep {($_->[0] // '') =~ '003@'} @$record) {
+            for (my $i = 2; $i < @$field; $i += 2) {
+                if ($field->[$i] eq '0') {
+                    $id = $field->[$i + 1];
+                    last;
+                }
+            }
+        }
+        return bless {record => $record, _id => $id}, 'PICA::Data';
     }
 
     return;

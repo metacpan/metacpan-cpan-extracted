@@ -3,10 +3,10 @@
 #
 #  (C) Paul Evans, 2011-2020 -- leonerd@leonerd.org.uk
 
-use 5.026; # signatures
+use v5.26; # signatures
 use Object::Pad 0.27;
 
-package Tickit::Console 0.09;
+package Tickit::Console 0.10;
 class Tickit::Console
    extends Tickit::Widget::VBox;
 

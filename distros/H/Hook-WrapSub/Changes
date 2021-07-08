@@ -1,5 +1,9 @@
 Revision history for Perl module Hook::WrapSub
 
+0.08 2021-07-02 NEILB
+    - Added a simple README
+    - Switched to github issues for the bug tracker
+
 0.07 2016-02-04 NEILB
     - Added myself to the AUTHOR section, as suggested by the original
       author John Porter in RT#111728

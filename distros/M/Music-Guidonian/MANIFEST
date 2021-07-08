@@ -1,0 +1,14 @@
+Build.PL
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+README
+eg/loremgen
+lib/Music/Guidonian.pm
+t/00-load.t
+t/guido.t
+t/pod-coverage.t
+t/pod.t
+SIGNATURE    Added here by Module::Build

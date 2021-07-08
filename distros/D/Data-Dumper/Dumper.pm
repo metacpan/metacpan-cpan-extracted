@@ -29,7 +29,7 @@ our ( $Indent, $Trailingcomma, $Purity, $Pad, $Varname, $Useqq, $Terse, $Freezer
 our ( @ISA, @EXPORT, @EXPORT_OK, $VERSION );
 
 BEGIN {
-    $VERSION = '2.182'; # Don't forget to set version and release
+    $VERSION = '2.183'; # Don't forget to set version and release
                         # date in POD below!
 
     @ISA = qw(Exporter);
@@ -364,7 +364,16 @@ sub _dump {
         else {
           $pat = "$val";
         }
-        $pat =~ s <(\\.)|/> { $1 || '\\/' }ge;
+        $pat =~ s <
+                     (\\.)           # anything backslash escaped
+                   | (\$)(?![)|]|\z) # any unescaped $, except $| $) and end
+                   | /               # any unescaped /
+                  >
+                  {
+                      $1 ? $1
+                          : $2 ? '${\q($)}'
+                          : '\\/'
+                  }gex;
         $out .= "qr/$pat/$flags";
     }
     elsif ($realtype eq 'SCALAR' || $realtype eq 'REF'
@@ -1452,7 +1461,7 @@ modify it under the same terms as Perl itself.
 
 =head1 VERSION
 
-Version 2.182
+Version 2.183
 
 =head1 SEE ALSO
 

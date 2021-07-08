@@ -3,6 +3,9 @@ do { my $x = {
                         'requires' => {
                                         'ExtUtils::MakeMaker' => '0',
                                         'perl' => '5.006'
+                                      },
+                        'suggests' => {
+                                        'JSON::PP' => '2.27300'
                                       }
                       },
        'develop' => {
@@ -83,6 +86,7 @@ do { my $x = {
                     },
        'runtime' => {
                       'requires' => {
+                                      'Log::Any' => '0',
                                       'Log::Contextual' => '0',
                                       'Log::Dispatch' => '0',
                                       'Log::Log4perl' => '0',

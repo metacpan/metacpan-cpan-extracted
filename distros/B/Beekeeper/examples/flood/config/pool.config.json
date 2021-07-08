@@ -2,7 +2,7 @@
 #
 # All worker pools running on this host must be defined here, specifying 
 # which logical bus should be used and which services it will run. In this
-# example only one worker pool (named "test") is defined.
+# example only one worker pool (named "myapp") is defined.
 #
 # Each pool definition must contain the following parameters:
 #
@@ -10,19 +10,20 @@
 #  - bus_id  : identifier of logical bus used by worker processes
 #  - workers : a map of worker classes and its config hashes
 #
-# To start the worker pool use the "bkpr" command:
+# To start the worker pool use the "myapp" command:
 #
-# $ bkpr --pool "test" start
+# $ bkpr --pool "myapp" start
 
 [
     {
-        "pool_id"       : "test",
+        "pool_id"       : "myapp",
         "bus_id"        : "backend",
-        "description"   : "pool of test workers",
+        "description"   : "pool of MyApp workers",
         "use_toybroker" :  1,
 
         "workers" : {
-            "TestWorker" : { "workers_count" : 8 },
+            "Beekeeper::Service::LogTail::Worker" : { "worker_count" : 1 },
+            "MyApp::Service::Flood::Worker"       : { "worker_count" : 4 },
         },
     },
 ]

@@ -19,34 +19,37 @@ name: Pg-Explain
 provides:
   Pg::Explain:
     file: lib/Pg/Explain.pm
-    version: '1.10'
+    version: '1.11'
   Pg::Explain::Analyzer:
     file: lib/Pg/Explain/Analyzer.pm
-    version: '1.10'
+    version: '1.11'
+  Pg::Explain::Buffers:
+    file: lib/Pg/Explain/Buffers.pm
+    version: '1.11'
   Pg::Explain::From:
     file: lib/Pg/Explain/From.pm
-    version: '1.10'
+    version: '1.11'
   Pg::Explain::FromJSON:
     file: lib/Pg/Explain/FromJSON.pm
-    version: '1.10'
+    version: '1.11'
   Pg::Explain::FromText:
     file: lib/Pg/Explain/FromText.pm
-    version: '1.10'
+    version: '1.11'
   Pg::Explain::FromXML:
     file: lib/Pg/Explain/FromXML.pm
-    version: '1.10'
+    version: '1.11'
   Pg::Explain::FromYAML:
     file: lib/Pg/Explain/FromYAML.pm
-    version: '1.10'
+    version: '1.11'
   Pg::Explain::JIT:
     file: lib/Pg/Explain/JIT.pm
-    version: '1.10'
+    version: '1.11'
   Pg::Explain::Node:
     file: lib/Pg/Explain/Node.pm
-    version: '1.10'
+    version: '1.11'
   Pg::Explain::StringAnonymizer:
     file: lib/Pg/Explain/StringAnonymizer.pm
-    version: '1.10'
+    version: '1.11'
 requires:
   Clone: '0'
   Digest::SHA: '0'
@@ -60,5 +63,5 @@ resources:
   homepage: https://gitlab.com/depesz/Pg--Explain
   license: http://dev.perl.org/licenses/
   repository: https://gitlab.com/depesz/Pg--Explain.git
-version: '1.10'
+version: '1.11'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

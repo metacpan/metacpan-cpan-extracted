@@ -22,6 +22,7 @@ lib/RT/Extension/ArticleTemplates.pm
 Makefile.PL
 MANIFEST			This list of files
 META.yml
+patches/article-preformatted-ticket-object.patch
 README
 t/00.load.t
 t/pod-coverage.t

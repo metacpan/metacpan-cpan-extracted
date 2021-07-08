@@ -1,5 +1,9 @@
 Revision history for Perl module Geo::Coder::HostIP
 
+0.08 2021-07-03 JANITOR
+    - Switch to Dist::Zilla
+    - Switch bug tracker to github issues
+
 0.07 2015-10-24 NEILB
     - Updated repo URL after changing my github username
     - Explicitly set dyanmic_config to 0

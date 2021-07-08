@@ -1,5 +1,4 @@
 .drone.yml
-.github/workflows/test.yml
 .perlcriticrc
 Build.PL
 Changes

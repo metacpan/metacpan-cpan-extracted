@@ -4,9 +4,9 @@
 #  (C) Paul Evans, 2015-2021 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.38; # Object::Pad::MOP::Class->for_caller
+use Object::Pad 0.41; # :param
 
-package Test::Device::Chip::Adapter 0.18;
+package Test::Device::Chip::Adapter 0.19;
 class Test::Device::Chip::Adapter
    implements Device::Chip::Adapter;
 
@@ -188,8 +188,7 @@ BEGIN {
    }
 
    class Test::Device::Chip::Adapter::_TxnHelper {
-      has $_adapter;
-      BUILD { ( $_adapter ) = @_; }
+      has $_adapter :param;
 
       async method write { await $_adapter->write( @_ ) }
       async method read  { return await $_adapter->read( @_ ) }
@@ -200,7 +199,7 @@ BEGIN {
       $_protocol eq "I2C" or
          croak "Method ->txn not allowed in $_protocol protocol";
 
-      $_txn_helper //= Test::Device::Chip::Adapter::_TxnHelper->new( $self );
+      $_txn_helper //= Test::Device::Chip::Adapter::_TxnHelper->new( adapter => $self );
 
       $_obj->txn_start;
 

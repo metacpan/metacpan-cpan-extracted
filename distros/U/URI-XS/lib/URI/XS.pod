@@ -77,7 +77,7 @@ If true, URI::XS will use ';' as delimiter between query string params instead o
 
 =item ALLOW_EXTENDED_CHARS
 
-Allow non-rfc urls with additional chars in query string for parsing ('"', '{', '}') like browsers or other software with user input,
+Allow non-rfc urls with additional chars in query string for parsing ('"', '{', '}' and '|') like browsers or other software with user input,
 for example http://host.com?param={"key":"val"}
 
 The stringified form however will always be RFC-compliant
@@ -293,6 +293,10 @@ is the same as
     if ($uri->to_string) {}
     
 but runs faster.
+
+=head4 empty()
+
+Same as C<!$uri>.
 
 =head4 secure()
 

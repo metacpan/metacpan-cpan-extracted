@@ -167,7 +167,6 @@ lib/AsposeSlidesCloud/SlidesApi.pm
 LICENSE
 MakeFile.pl
 MANIFEST			This list of files
-prove.pl
 README.md
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

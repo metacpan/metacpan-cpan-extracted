@@ -3,17 +3,21 @@ NAME
     results of several names from several servers/resolvers
 
 VERSION
-    This document describes version 0.007 of App::resolvetable (from Perl
-    distribution App-resolvetable), released on 2019-08-20.
+    This document describes version 0.008 of App::resolvetable (from Perl
+    distribution App-resolvetable), released on 2021-07-08.
 
 DESCRIPTION
     Sample screenshot 1:
+
+    Sample screenshot 2 (with "--timings"):
+
+    Sample screenshot 3 (with "--compare"):
 
 FUNCTIONS
   resolvetable
     Usage:
 
-     resolvetable(%args) -> [status, msg, payload, meta]
+     resolvetable(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
     Produce a colored table containing DNS resolve results of several names
     from several servers/resolvers.
@@ -55,18 +59,17 @@ FUNCTIONS
 
     Returns an enveloped result (an array).
 
-    First element (status) is an integer containing HTTP status code (200
-    means OK, 4xx caller error, 5xx function error). Second element (msg) is
-    a string containing error message, or 'OK' if status is 200. Third
-    element (payload) is optional, the actual result. Fourth element (meta)
-    is called result metadata and is optional, a hash that contains extra
-    information.
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
 
     Return value: (any)
-
-    Sample screenshot 2 (with "--timings"):
-
-    Sample screenshot 3 (with "--compare"):
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -88,7 +91,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019 by perlancar@cpan.org.
+    This software is copyright (c) 2021, 2019 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

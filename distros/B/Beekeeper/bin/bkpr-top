@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 $ENV{PATH} = '/bin:/usr/bin'; # untaint
 
@@ -22,13 +22,14 @@ use Getopt::Long;
 ReadMode "cbreak";
 END { ReadMode "restore" }
 
-my ($opt_host, $opt_pool, $opt_class, $opt_list, $opt_help);
+my ($opt_host, $opt_pool, $opt_class, $opt_list, $opt_batch, $opt_help);
 
 GetOptions(
     "host=s"    => \$opt_host,    # --host
     "pool=s"    => \$opt_pool,    # --pool
     "class=s"   => \$opt_class,   # --class
     "list"      => \$opt_list,    # --list
+    "batch"     => \$opt_batch,   # --batch
     "help"      => \$opt_help,    # --help    
 ) or exit;
 
@@ -39,7 +40,8 @@ Display real-time performance metrics of running workers.
   -h, --host  str  display status only of specified host
   -p, --pool  str  display status only of specified pool
   -c, --class str  display status only of specified worker class
-  -l, --list       show detailed status of all individual workers
+  -l, --list       display status of every individual worker
+  -b, --batch      display current status and exit immediately
   -h, --help       display this help and exit
 
 Filters --host, --pool and --class can be combined.
@@ -48,8 +50,9 @@ The metrics displayed are:
 
    nps:   number of received notifications per second
    cps:   number of processed calls per second
-   mem:   resident memory size in KB
-   cpu:   percentage of cpu load
+   err:   number of errors per second
+   mem:   resident non shared memory size in KiB
+   cpu:   percentage of CPU load
    load:  percentage of busy time
 
 Change sorting pressing (N)otifications, (C)alls, (M)emory, cp(U) or (L)oad.
@@ -62,9 +65,6 @@ if ($opt_help) {
 }
 
 if ($opt_list) {
-
-    # Clear the screen
-    print "\033[2J";
 
     my $printed_lines = 0;
     my $sort_field = 'pid';
@@ -79,6 +79,7 @@ if ($opt_list) {
         'M' => 'mem',
         'N' => 'nps',
         'C' => 'cps',
+        'E' => 'err',
         'U' => 'cpu',
         'L' => 'load',
     );
@@ -95,18 +96,18 @@ if ($opt_list) {
         my ($lines)   = `tput lines` =~ m/(\d+)/;
 
         # Clear the screen when dimensions change
-        print "\033[2J" if ($scr_size ne "$columns-$lines");
+        print "\033[2J" if ($scr_size ne "$columns-$lines" && !$opt_batch);
         $scr_size = "$columns-$lines";
 
-        my $w = $columns - 60;
+        my $w = $columns - 66;
         $w = 0 if $w < 0;
 
         # Echo title
-        print "\033[0;0H";  # jump to 0,0
-        print "\033[7m";    # reverse
-        printf("%-${w}.${w}s %-8s %-8s %-8s %5s %5s %5s %5s %7s \n",
-               'class','pool','host','pid','mem','nps','cps','cpu','load');
-        print "\033[0m";    # normal
+        print "\033[0;0H" unless $opt_batch;  # jump to 0,0
+        print "\033[7m";                      # reverse
+        printf("%-${w}.${w}s %-8s %-8s %5s %8s %5s %5s %5s %5s %7s \n",
+               'class','pool','host','pid','KiB','nps','cps','err','cpu','load');
+        print "\033[0m";  # back to normal
 
         # Sort
         my @workers = ($sort_field =~ m/class|pool|host|queue/) ? 
@@ -119,7 +120,8 @@ if ($opt_list) {
         splice( @workers, $lines - 2 );
 
         foreach my $worker (@workers) {
-            printf("%-${w}.${w}s %-8s %-8s %-8s %5s %5s %5s %5s %5s %% \n",
+            $worker->{class} =~ s/::Worker$//;
+            printf("%-${w}.${w}s %-8s %-8s %5s %8s %5s %5s %5s %5s %5s %% \n",
                 $worker->{class},
                 $worker->{pool},
                 $worker->{host},
@@ -127,6 +129,7 @@ if ($opt_list) {
                 $worker->{mem} || '-',
                 sprintf("%.0f", $worker->{nps}  + .5) || '0',
                 sprintf("%.0f", $worker->{cps}  + .5) || '0',
+                sprintf("%.0f", $worker->{err}  + .5) || '0',
                 sprintf("%.0f", $worker->{cpu}  + .5) || '0',
                 sprintf("%.0f", $worker->{load} + .5) || '0',
             );
@@ -135,6 +138,8 @@ if ($opt_list) {
         # Clear old lines at bottom screen
         print " " x $columns . "\n" for (@workers..$printed_lines-1);
         $printed_lines = scalar @workers;
+
+        last if $opt_batch;
 
         sleep 1;
 
@@ -148,9 +153,6 @@ if ($opt_list) {
 }
 else {
 
-    # Clear the screen
-    print "\033[2J";
-
     my $printed_lines = 0;
     my $sort_field = 'class';
     my $order_desc = 1;
@@ -162,6 +164,7 @@ else {
         'M' => 'mem',
         'N' => 'nps',
         'C' => 'cps',
+        'E' => 'err',
         'U' => 'cpu',
         'L' => 'load',
     );
@@ -184,18 +187,18 @@ else {
         my ($lines)   = `tput lines` =~ m/(\d+)/;
 
         # Clear the screen when dimensions change
-        print "\033[2J" if ($scr_size ne "$columns-$lines");
+        print "\033[2J" if ($scr_size ne "$columns-$lines" && !$opt_batch);
         $scr_size = "$columns-$lines";
 
-        my $w = $columns - 48;
+        my $w = $columns - 57;
         $w = 0 if $w < 0;
 
         # Echo title
-        print "\033[0;0H";  # jump to 0,0
-        print "\033[7m";    # reverse
-        printf("%-${w}.${w}s %5s %8s %8s %8s %5s %7s \n",
-               'class','count','MB','nps','cps','cpu','load');
-        print "\033[0m";    # normal
+        print "\033[0;0H" unless $opt_batch;  # jump to 0,0
+        print "\033[7m";                      # reverse
+        printf("%-${w}.${w}s %5s %8s %8s %8s %8s %5s %7s \n",
+               'class','count','MiB','nps','cps','err','cpu','load');
+        print "\033[0m";  # back to normal
 
         # Sort
         @services = ($sort_field =~ m/class/) ? 
@@ -208,12 +211,14 @@ else {
         splice( @services, $lines - 2 );
 
         foreach my $svc (@services) {
-            printf("%-${w}.${w}s %5d %8.1f %8.1f %8.1f %5.0f %5.0f %% \n", 
+            $svc->{class} =~ s/::Worker$//;
+            printf("%-${w}.${w}s %5d %8.1f %8.1f %8.1f %8.1f %5.0f %5.0f %% \n", 
                 $svc->{class},
                 $svc->{count},
                 $svc->{mem} / 1000,
                 $svc->{nps},
                 $svc->{cps},
+                $svc->{err},
                 $svc->{cpu},
                 $svc->{load},
             );
@@ -222,6 +227,8 @@ else {
         # Clear old lines at bottom screen
         print " " x $columns, "\n" for (@services..$printed_lines-1);
         $printed_lines = scalar @services;
+
+        last if $opt_batch;
 
         sleep 1;
 
@@ -247,7 +254,7 @@ bkpr-top - Display real-time performance metrics of running workers
 
 =head1 VERSION
 
-Version 0.06
+Version 0.07
 
 =head1 SYNOPSIS
 
@@ -258,7 +265,8 @@ Version 0.06
     -h, --host  str  display status only of specified host
     -p, --pool  str  display status only of specified pool
     -c, --class str  display status only of specified worker class
-    -l, --list       show detailed status of all individual workers
+    -l, --list       display status of every individual worker
+    -b, --batch      display current status and exit immediately
     -h, --help       display this help and exit
   
   Filters --host, --pool and --class can be combined.
@@ -267,19 +275,68 @@ Version 0.06
   
      nps:   number of received notifications per second
      cps:   number of processed calls per second
-     mem:   resident memory size in KB
-     cpu:   percentage of cpu load
+     err:   number of errors per second
+     mem:   resident memory size in KiB
+     cpu:   percentage of CPU load
      load:  percentage of busy time
   
   Change sorting field pressing (N)otifications, (C)alls, (M)emory, cp(U) or (L)oad.
 
 =head1 DESCRIPTION
 
-Display in real-time performance metrics of all running workers connected
-to a logic message bus in a 'top' fashion.
+Display real-time performance metrics of running workers in a C<top> fashion.
 
 Sorting order can be changed pressing keys N, C, M, U and L.
 Pressing Q quits the program.
+
+=head3 Displayed metrics
+
+=over
+
+=item nps
+
+Number of received notifications per second.
+
+=item cps
+
+Number of processed calls per second.
+
+=item err
+
+Number of errors per second generated while handling calls or notifications.
+
+=item mem
+
+Resident non shared memory size in KiB. This is roughly equivalent to the value
+of C<RES> minus C<SHR> displayed by C<top>.
+
+For example, supposing that there are 2 GiB of memory available, a service that 
+shows a C<mem> usage of 1024 is using half of the memory resources.
+
+=item cpu
+
+Percentage of CPU load (100 indicates a full utilization of one core thread).
+
+For example, supposing that there are 4 core threads available, a service that
+shows a C<cpu> load of 200 is using half of the CPU resources.
+
+=item load
+
+Percentage of busy time (100% indicates that there are no idle workers).
+
+Note that workers can have a high load with very little CPU usage when being
+blocked by synchronous operations (like slow SQL queries).
+
+For example, supposing that there are 10 workers running, a service that shows a 
+C<load> of 50% is working at half capacity. Spawning 10 additional workers will 
+lower the load to 25%.
+
+Due to inaccuracies of measurement the actual maximum may be slightly below 100%.
+
+=back
+
+Unless the option C<--host> is passed the values shown are the aggregate of all
+workers, even if these are on different hosts.
 
 =head1 SEE ALSO
 

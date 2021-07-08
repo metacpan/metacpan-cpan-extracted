@@ -4,7 +4,7 @@
       "Tom Molesworth <TEAM@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.020, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.023, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -102,35 +102,35 @@
    "provides" : {
       "Ryu" : {
          "file" : "lib/Ryu.pm",
-         "version" : "3.001"
+         "version" : "3.002"
       },
       "Ryu::Buffer" : {
          "file" : "lib/Ryu/Buffer.pm",
-         "version" : "3.001"
+         "version" : "3.002"
       },
       "Ryu::Exception" : {
          "file" : "lib/Ryu/Exception.pm",
-         "version" : "3.001"
+         "version" : "3.002"
       },
       "Ryu::Node" : {
          "file" : "lib/Ryu/Node.pm",
-         "version" : "3.001"
+         "version" : "3.002"
       },
       "Ryu::Observable" : {
          "file" : "lib/Ryu/Observable.pm",
-         "version" : "3.001"
+         "version" : "3.002"
       },
       "Ryu::Sink" : {
          "file" : "lib/Ryu/Sink.pm",
-         "version" : "3.001"
+         "version" : "3.002"
       },
       "Ryu::Source" : {
          "file" : "lib/Ryu/Source.pm",
-         "version" : "3.001"
+         "version" : "3.002"
       },
       "Ryu::Stream" : {
          "file" : "lib/Ryu/Stream.pm",
-         "version" : "3.001"
+         "version" : "3.002"
       }
    },
    "release_status" : "stable",
@@ -145,7 +145,7 @@
          "web" : "https://github.com/team-at-cpan/Ryu"
       }
    },
-   "version" : "3.001",
+   "version" : "3.002",
    "x_authority" : "cpan:TEAM",
    "x_contributors" : [
       "Binary-Mohanad <mohanad@binary.com>",

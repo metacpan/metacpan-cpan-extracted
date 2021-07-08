@@ -11,19 +11,28 @@ To run this example start all worker pools:
 ```
 cd beekeper/examples/chat
 source setup.sh
-./run.sh start
+./run.sh
 ```
-Then open `chat.html` in a browser, or use the command line client:
+Then open `chat.html` in a browser (the JSON-RPC traffic will be dumped on browser console). 
 
+Or use the command line client:
 ```
 ./chat.pl
 ```
-The JSON-RPC traffic will be dumped on browser console. You can check the pool status with 
-`bkpr-top` or watch the stream of exceptions that this example may generate with `bkpr-log -f`. 
-
 The system can be stressed generating traffic with:
 ```
 ./flood.pl -c 50 -r 500
+```
+Monitor the worker pool load:
+```
+bkpr-top
+```
+Logs can be inspected with `bkpr-log` or with:
+```
+tail /var/log/myapp-pool.log
+tail /var/log/myapp-service-auth.log
+tail /var/log/myapp-service-chat.log
+tail /var/log/beekeeper-service-router.log
 ```
 Finally stop worker pools with:
 ```

@@ -4,7 +4,7 @@
       "ÐÐ¸ÑÐ°Ð¸Ð» Ð§Ðµ <mche@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -46,6 +46,6 @@
          "web" : "https://github.com/mche/Mojolicious-Che"
       }
    },
-   "version" : "0.09021",
+   "version" : "0.09191",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

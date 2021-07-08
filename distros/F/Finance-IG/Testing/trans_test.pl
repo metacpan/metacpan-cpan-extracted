@@ -33,15 +33,15 @@ $ig->login();
 #my $a=$ig->history('2020-10-29T00:00','2020-10-29'); 
 # my $a=$ig->history('2020-10-29T00:00',localtime->strftime("%Y-%m-%d")); 
 
-my $a; 
+my $aa; 
 my $page=0; 
 my @transactions; 
-# while ($a=$ig->transactions(++$page,(scalar localtime)-10*30*24*3600,scalar localtime))
-#while ($a=$ig->transactions(++$page,Time::Piece->strptime("2020-01-01","%Y-%m-%d-%H.%M"),scalar localtime))
-while ($a=$ig->transactions(++$page,Time::Piece->strptime("2020-01-01","%Y-%m-%d-%H.%M"),'2020-12-11T18:15:00'))
+# while ($aa=$ig->transactions(++$page,(scalar localtime)-10*30*24*3600,scalar localtime))
+#while ($aa=$ig->transactions(++$page,Time::Piece->strptime("2020-01-01","%Y-%m-%d-%H.%M"),scalar localtime))
+while ($aa=$ig->transactions(++$page,Time::Piece->strptime("2020-01-01","%Y-%m-%d-%H.%M"),'2020-12-11T18:15:00'))
 {  
-   @$a=grep { $_->{status} ne 'REJECTED' } @$a; 
-   push(@transactions,@$a); 
+   @$aa=grep { $_->{status} ne 'REJECTED' } @$aa; 
+   push(@transactions,@$aa); 
 
    # print @transactions+0, "\n"; 
 } 

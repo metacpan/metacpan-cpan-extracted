@@ -1,4 +1,4 @@
-package Dist::Zilla::App::Command::smoke 6.022;
+package Dist::Zilla::App::Command::smoke 6.023;
 # ABSTRACT: smoke your dist
 
 # BEGIN BOILERPLATE
@@ -84,7 +84,7 @@ Dist::Zilla::App::Command::smoke - smoke your dist
 
 =head1 VERSION
 
-version 6.022
+version 6.023
 
 =head1 SYNOPSIS
 
@@ -109,11 +109,12 @@ A build that fails tests will be left behind for analysis, and F<dzil> will
 exit a non-zero value.  If the tests are successful, the build directory will
 be removed and F<dzil> will exit with status 0.
 
-=head1 PERL VERSION SUPPORT
+=head1 PERL VERSION
 
-This module has the same support period as perl itself:  it supports the two
-most recent versions of perl.  (That is, if the most recently released version
-is v5.40, then this module should work on both v5.40 and v5.38.)
+This module should work on any version of perl still receiving updates from
+the Perl 5 Porters.  This means it should work on any version of perl released
+in the last two to three years.  (That is, if the most recently released
+version is v5.40, then this module should work on both v5.40 and v5.38.)
 
 Although it may work on older versions of perl, no guarantee is made that the
 minimum required version will not be increased.  The version may be increased

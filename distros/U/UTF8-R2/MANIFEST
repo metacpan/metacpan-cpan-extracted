@@ -46,6 +46,12 @@ t/1040_tr_hyphen.t
 t/1041_qr_posixclass.t
 t/1042_qr_neg_posixclass.t
 t/2001_podtest.t
+t/4003_UR2_do.t
+t/4005_UR2_eval.t
+t/4008_UR2_index_byte.t
+t/4013_UR2_require.t
+t/4016_UR2_rindex_byte.t
+t/8001_UR2_specialvar.t
 xt/1001_chop.t
 xt/1002_chr.t
 xt/1004_getc.t

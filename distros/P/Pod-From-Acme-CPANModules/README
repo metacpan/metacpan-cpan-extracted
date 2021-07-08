@@ -3,9 +3,9 @@ NAME
     module
 
 VERSION
-    This document describes version 0.007 of Pod::From::Acme::CPANModules
+    This document describes version 0.008 of Pod::From::Acme::CPANModules
     (from Perl distribution Pod-From-Acme-CPANModules), released on
-    2021-02-18.
+    2021-03-26.
 
 SYNOPSIS
      use Pod::From::Acme::CPANModules qw(gen_pod_from_acme_cpanmodules);

@@ -23,7 +23,7 @@ my @perls;
 {
     my %seen;
     my $res = $ua->get($api_url);
-    die "Can't get perl versions" unless $res->{success};
+    die "Can't get perl versions: ".encode_json($res) unless $res->{success};
     @perls =
         map {+{version => $_->[0], url => $_->[2], canon_version => $_->[3]}}
         grep {not ($seen{$_->[1]}++)}
@@ -147,7 +147,12 @@ for my $perl (@perls) {
                         # print "added $token to token_info\n";
                     }
                 }
-                print $out $_;
+                if (/DEBUG_TOKEN\s*\((\w+),\s*(\w+)\)\s*,/) {
+                    my ($type, $name) = ($1, $2);
+                    print $out qq/    { $name, TOKENTYPE_$type, "$name" },\n/;
+                } else {
+                    print $out $_;
+                }
                 $token_info .= $_;
                 $flag = 0 if /^\s*$/;
             }

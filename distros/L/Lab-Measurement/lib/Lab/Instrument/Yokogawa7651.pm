@@ -1,6 +1,6 @@
 package Lab::Instrument::Yokogawa7651;
 #ABSTRACT: Yokogawa 7651 DC source
-$Lab::Instrument::Yokogawa7651::VERSION = '3.760';
+$Lab::Instrument::Yokogawa7651::VERSION = '3.762';
 use v5.20;
 
 use warnings;
@@ -787,7 +787,7 @@ Lab::Instrument::Yokogawa7651 - Yokogawa 7651 DC source
 
 =head1 VERSION
 
-version 3.760
+version 3.762
 
 =head1 SYNOPSIS
 
@@ -1043,17 +1043,17 @@ The Yokogawa7651 class is a Source (L<Lab::Instrument::Source>)
 
 This software is copyright (c) 2021 by the Lab::Measurement team; in detail:
 
-  Copyright 2005-2006  Daniel SchrÃ¶er
-            2009       Andreas K. HÃ¼ttel, Daniela Taubert
-            2010       Andreas K. HÃ¼ttel, Daniel SchrÃ¶er
-            2011       Andreas K. HÃ¼ttel, Florian Olbrich
-            2012       Alois Dirnaichner, Andreas K. HÃ¼ttel, Florian Olbrich, Stefan Geissler
-            2013       Alois Dirnaichner, Andreas K. HÃ¼ttel, Christian Butschkow, Stefan Geissler
+  Copyright 2005-2006  Daniel Schroeer
+            2009       Andreas K. Huettel, Daniela Taubert
+            2010       Andreas K. Huettel, Daniel Schroeer
+            2011       Andreas K. Huettel, Florian Olbrich
+            2012       Alois Dirnaichner, Andreas K. Huettel, Florian Olbrich, Stefan Geissler
+            2013       Alois Dirnaichner, Andreas K. Huettel, Christian Butschkow, Stefan Geissler
             2014       Alexei Iankilevitch, Alois Dirnaichner, Christian Butschkow
-            2015       Andreas K. HÃ¼ttel, Christian Butschkow
+            2015       Andreas K. Huettel, Christian Butschkow
             2016       Simon Reinhardt
-            2017       Andreas K. HÃ¼ttel
-            2020       Andreas K. HÃ¼ttel
+            2017       Andreas K. Huettel
+            2020       Andreas K. Huettel
 
 
 This is free software; you can redistribute it and/or modify it under

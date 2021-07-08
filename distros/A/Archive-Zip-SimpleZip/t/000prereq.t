@@ -58,9 +58,20 @@ BEGIN
         }
         else
         {
-            my $ver = eval("\$${name}::VERSION");
-            is $ver, $VERSION, "$name version should be $VERSION"
-                or diag "$name version is $ver, need $VERSION" ;
+            eval " use $name $VERSION " ;
+
+            if ($@)
+            {
+                my $ver = eval("\$${name}::VERSION");
+
+                ok 0, "$name version should be $VERSION"
+                    or diag "$name version is $ver, need $VERSION" ;
+            }
+            else
+            {
+                ok 1, "$name is $VERSION" ;
+            }
+
         }
     }
 

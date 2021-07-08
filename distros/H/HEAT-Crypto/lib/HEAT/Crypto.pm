@@ -11,7 +11,7 @@ use Digest::SHA;
 use Crypt::Mode::CBC;
 use Crypt::PRNG qw(random_bytes);
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 XSLoader::load('HEAT::Crypto', $VERSION);
 
 use Exporter qw(import);

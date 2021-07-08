@@ -1,0 +1,24 @@
+# This file is in relaxed JSON format (it allows comments and trailing commas).
+#
+# Logical buses used in pool.config.json must be defined here, specifying
+# the conection parameters to the MQTT broker that will service them. In 
+# this example only one logical bus (named "backend") is defined.
+#
+# Each bus definition accepts the following parameters:
+#
+#  - bus_id   : unique identifier of the logical bus (required)
+#  - bus_role : specifies if the bus is acting as frontend or backend
+#  - host     : hostname or IP address of the broker (default is localhost)
+#  - port     : port of the broker (default is 1883)
+#  - tls      : if set to true enables the use of TLS on broker connection
+#  - username : username used to connect to the broker
+#  - password : password used to connect to the broker
+
+[
+    {
+        "bus_id"   : "backend",
+        "host"     : "localhost",
+        "username" : "backend",
+        "password" : "def456",
+    },
+]

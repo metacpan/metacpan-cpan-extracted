@@ -5,7 +5,7 @@
       "Neil Bowers <neilb@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -37,13 +37,19 @@
    },
    "release_status" : "stable",
    "resources" : {
-      "homepage" : "https://github.com/neilb/Hook-WrapSub",
+      "bugtracker" : {
+         "web" : "https://github.com/cpan-janitor/Hook-WrapSub/issues"
+      },
+      "homepage" : "https://github.com/cpan-janitor/Hook-WrapSub",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/neilb/Hook-WrapSub.git",
-         "web" : "https://github.com/neilb/Hook-WrapSub"
+         "url" : "https://github.com/cpan-janitor/Hook-WrapSub.git",
+         "web" : "https://github.com/cpan-janitor/Hook-WrapSub"
       }
    },
-   "version" : "0.07"
+   "version" : "0.08",
+   "x_generated_by_perl" : "v5.28.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.24",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

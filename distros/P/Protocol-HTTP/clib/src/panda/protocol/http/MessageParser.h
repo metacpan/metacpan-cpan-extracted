@@ -26,7 +26,7 @@ protected:
 
     MessageParser () {}
     MessageParser (const MessageParser&) = delete;
-    MessageParser (MessageParser&&)      = delete;
+    MessageParser (MessageParser&&)      = default;
 
     inline void reset () {
         message            = nullptr;

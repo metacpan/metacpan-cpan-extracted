@@ -20,14 +20,13 @@ WriteMakefile
 
    # A hash of modules that are needed to build the module but not run it.
 
-   'BUILD_REQUIRES'     => {
-                           },
+   'BUILD_REQUIRES'     => {},
 
    # A hash of modules that are needed to run the module.
 
    'PREREQ_PM'          => {
-                            'Math::BigInt'        => 1.999817,
-                            'Math::GMPz'          => 0,
+                            'Math::BigInt'        => 1.999819,
+                            'Math::GMPz'          => 0.36,
                            },
 
    # A hash of modules that are needed to test the module but not run or build

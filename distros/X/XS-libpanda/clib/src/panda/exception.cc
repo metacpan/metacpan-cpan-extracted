@@ -3,15 +3,12 @@
 #include <memory>
 #include <functional>
 
-#ifdef _WIN32
-  #include "exception/win.icc"
-#else
-  #include "exception/unix.icc"
-#endif
-
 namespace panda {
 
 using FrameProducers = std::vector<BacktraceProducer>;
+
+RawTraceProducer  get_default_raw_producer() noexcept;
+BacktraceProducer get_default_bt_producer () noexcept;
 
 static RawTraceProducer rawtrace_producer = get_default_raw_producer();
 static FrameProducers   frame_producers { get_default_bt_producer() };

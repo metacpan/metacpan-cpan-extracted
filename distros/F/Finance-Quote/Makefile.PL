@@ -75,7 +75,7 @@ my %WriteMakefileArgs = (
     "Web::Scraper" => 0,
     "feature" => 0
   },
-  "VERSION" => "1.50",
+  "VERSION" => "1.51",
   "test" => {
     "TESTS" => "t/*.t"
   }

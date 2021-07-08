@@ -1,5 +1,12 @@
 Revision history for Tickit-Console
 
+0.10    2021-07-06
+        [CHANGES]
+         * Updates for Object::Pad 0.43:
+            + Use :param and ADJUST blocks to remove/reduce BUILD blocks
+            + Use a BUILDARGS to reshape the constructor args into a normal
+              kvlist
+
 0.09    2020-06-22
         [CHANGES]
          * Added a way to override `localtime` for timestamp generation

@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::MetaNoIndex 6.022;
+package Dist::Zilla::Plugin::MetaNoIndex 6.023;
 # ABSTRACT: Stop CPAN from indexing stuff
 
 use Moose;
@@ -139,7 +139,7 @@ Dist::Zilla::Plugin::MetaNoIndex - Stop CPAN from indexing stuff
 
 =head1 VERSION
 
-version 6.022
+version 6.023
 
 =head1 SYNOPSIS
 
@@ -164,11 +164,12 @@ that are used for those purposes only, and are not part of the distribution.
 It does this by adding a C<no_index> block to your F<META.json> (or
 F<META.yml>) file in your distribution.
 
-=head1 PERL VERSION SUPPORT
+=head1 PERL VERSION
 
-This module has the same support period as perl itself:  it supports the two
-most recent versions of perl.  (That is, if the most recently released version
-is v5.40, then this module should work on both v5.40 and v5.38.)
+This module should work on any version of perl still receiving updates from
+the Perl 5 Porters.  This means it should work on any version of perl released
+in the last two to three years.  (That is, if the most recently released
+version is v5.40, then this module should work on both v5.40 and v5.38.)
 
 Although it may work on older versions of perl, no guarantee is made that the
 minimum required version will not be increased.  The version may be increased

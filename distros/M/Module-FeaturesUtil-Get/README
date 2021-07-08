@@ -2,7 +2,7 @@ NAME
     Module::FeaturesUtil::Get - Get a feature
 
 VERSION
-    This document describes version 0.001 of Module::FeaturesUtil::Get (from
+    This document describes version 0.002 of Module::FeaturesUtil::Get (from
     Perl distribution Module-FeaturesUtil-Get), released on 2021-02-24.
 
 SYNOPSIS

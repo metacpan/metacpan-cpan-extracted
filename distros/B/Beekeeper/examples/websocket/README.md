@@ -9,13 +9,22 @@ cd beekeper/examples/websocket
 source setup.sh
 ./run.sh
 ```
-Then open `client.html` in a browser, or use the command line client:
+Then open `client.html` in a browser (the JSON-RPC traffic will be dumped on browser console). 
+
+Or use the command line client:
 ```
 ./client.pl
 ```
-The JSON-RPC traffic will be dumped on browser console. You can check the pool status with 
-`bkpr-top` or watch the stream of exceptions that this example may generate with `bkpr-log -f`. 
-
+Monitor the worker pool load:
+```
+bkpr-top
+```
+Logs can be inspected with `bkpr-log` or with:
+```
+tail /var/log/myapp-pool.log
+tail /var/log/myapp-service-calculator.log
+tail /var/log/beekeeper-service-router.log
+```
 Finally stop the worker pool with:
 ```
 ./run.sh stop

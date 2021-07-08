@@ -268,6 +268,8 @@ This also means you can "merge" items from a series of sources.
 Note that this is not recursive - an arrayref of arrayrefs will be expanded out
 into the child arrayrefs, but no further.
 
+Failure on any input source will cause this source to be marked as failed as well.
+
 =head2 split
 
 Splits the input on the given delimiter.

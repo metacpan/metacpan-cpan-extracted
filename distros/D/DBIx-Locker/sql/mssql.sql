@@ -1,5 +1,5 @@
 CREATE TABLE [locks] (
-  [id] int NOT NULL IDENTITY (1, 1),
+  [id] bigint NOT NULL IDENTITY (1, 1),
   [lockstring] varchar(128) NOT NULL,
   [created] datetime NOT NULL,
   [expires] datetime NOT NULL,

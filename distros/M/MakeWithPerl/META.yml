@@ -15,7 +15,7 @@ name: MakeWithPerl
 provides:
   MakeWithPerl:
     file: lib/MakeWithPerl.pm
-    version: '20210534'
+    version: '20210601'
 requires:
   Carp: '0'
   Data::Dump: '0'
@@ -28,5 +28,5 @@ resources:
   bugtracker: https://github.com/philiprbrenan/MakeWithPerl/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/philiprbrenan/MakeWithPerl
-version: '20210534'
+version: '20210601'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

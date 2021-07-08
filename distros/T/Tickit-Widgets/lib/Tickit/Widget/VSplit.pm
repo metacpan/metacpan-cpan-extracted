@@ -1,11 +1,11 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2013-2020 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2013-2021 -- leonerd@leonerd.org.uk
 
 use Object::Pad 0.27;
 
-package Tickit::Widget::VSplit 0.31;
+package Tickit::Widget::VSplit 0.32;
 class Tickit::Widget::VSplit
    extends Tickit::Widget::LinearSplit;
 
@@ -97,32 +97,17 @@ use constant VALUE_METHOD => "cols";
 
 Constructs a new C<Tickit::Widget::VSplit> object.
 
-Takes the following named arguments
-
-=over 8
-
-=item left_child => WIDGET
-
-=item right_child => WIDGET
-
-Child widgets to use.
-
-These options are now discouraged in favour of the L</set_left_child> and
-L</set_right_child> methods.
-
-=back
-
 =cut
 
 BUILD
 {
    my %args = @_;
 
-   Carp::carp( "The 'left_child' constructor argument to ${\ref $self} is discouraged; use ->set_left_child instead" ) and
-      $self->set_left_child ( $args{left_child}  ) if $args{left_child};
+   croak "The 'left_child' constructor argument to ${\ref $self} is no longer recognised; use ->set_left_child instead"
+      if $args{left_child};
 
-   Carp::carp( "The 'right_child' constructor argument to ${\ref $self} is discouraged; use ->set_right_child instead" ) and
-      $self->set_right_child( $args{right_child} ) if $args{right_child};
+   croak "The 'right_child' constructor argument to ${\ref $self} is no longer recognised; use ->set_right_child instead"
+      if $args{right_child};
 }
 
 method lines
@@ -178,9 +163,6 @@ use as chaining mutators; e.g.
    my $container = Tickit::Widget::VSplit->new( ... )
       ->set_left_child ( Tickit::Widget::Box->new ... )
       ->set_right_child( Tickit::Widget::Box->new ... );
-
-These should be preferred over using the C<left_child> and C<right_child>
-constructor arguments, which are now discouraged.
 
 =cut
 

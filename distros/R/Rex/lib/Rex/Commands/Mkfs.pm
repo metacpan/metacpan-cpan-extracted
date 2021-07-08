@@ -21,7 +21,7 @@ use warnings;
 use 5.010001;
 use strict;
 
-our $VERSION = '1.13.3'; # VERSION
+our $VERSION = '1.13.4'; # VERSION
 
 require Rex::Exporter;
 use base qw(Rex::Exporter);

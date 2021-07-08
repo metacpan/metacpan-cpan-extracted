@@ -1,12 +1,12 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2014-2020 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2014-2021 -- leonerd@leonerd.org.uk
 
-use 5.026; # signatures
-use Object::Pad 0.27;
+use v5.26; # signatures
+use Object::Pad 0.41;
 
-package Tickit::Widget::FloatBox 0.08;
+package Tickit::Widget::FloatBox 0.09;
 class Tickit::Widget::FloatBox
    extends Tickit::ContainerWidget;
 
@@ -206,7 +206,7 @@ the C<show> method before it becomes visible.
 method add_float ( %args )
 {
    my $float = Tickit::Widget::FloatBox::Float->new(
-      $self, delete $args{child}, %args
+      floatbox => $self, %args
    );
    push @_floats, $float;
 
@@ -238,24 +238,18 @@ C<add_float> method.
 =cut
 
 class # hide
-   Tickit::Widget::FloatBox::Float;
-
-use Carp;
-
-has $_fb;
-has $_child;
-has $_hidden;
-has %_geom;
-
-BUILD ( $fb, $child, %args )
+   Tickit::Widget::FloatBox::Float
 {
-   $_fb = $fb;
-   $_child = $child;
+   use Carp;
 
-   $_hidden = delete $args{hidden} || 0;
+   has $_fb     :param(floatbox);
+   has $_child  :param;
+   has $_hidden :param = 0;
 
-   $self->move( %args );
-}
+   BUILD ( %args )
+   {
+      $self->move( %args{qw( top bottom left right )} );
+   }
 
 =head2 child
 
@@ -265,7 +259,7 @@ Returns the child widget in the region.
 
 =cut
 
-method child () { $_child }
+   method child () { $_child }
 
 =head2 move
 
@@ -297,41 +291,49 @@ current value pass a value of C<undef>.
 
 =cut
 
-method move ( %args )
-{
-   exists $args{$_} and $_geom{$_} = $args{$_} for qw( top bottom left right );
+   has $_top;
+   has $_bottom;
+   has $_left;
+   has $_right;
 
-   defined $_geom{top} or defined $_geom{bottom} or
-      croak "A Float needs at least one of 'top' or 'bottom'";
-   defined $_geom{left} or defined $_geom{right} or
-      croak "A Float needs at least one of 'left' or 'right'";
+   method move ( %args )
+   {
+      exists $args{top}    and $_top    = $args{top};
+      exists $args{bottom} and $_bottom = $args{bottom};
+      exists $args{left}   and $_left   = $args{left};
+      exists $args{right}  and $_right  = $args{right};
 
-   if( my $win = $_fb->window ) {
-      $_fb->_reshape_float( $self, $win );
+      defined $_top or defined $_bottom or
+         croak "A Float needs at least one of 'top' or 'bottom'";
+      defined $_left or defined $_right or
+         croak "A Float needs at least one of 'left' or 'right'";
+
+      if( my $win = $_fb->window ) {
+         $_fb->_reshape_float( $self, $win );
+      }
    }
-}
 
-method _get_geom ( $lines, $cols )
-{
-   my $clines = $self->child->requested_lines;
-   my $ccols  = $self->child->requested_cols;
+   method _get_geom ( $lines, $cols )
+   {
+      my $clines = $self->child->requested_lines;
+      my $ccols  = $self->child->requested_cols;
 
-   my ( $top, $bottom ) = _alloc_dimension( $_geom{top}, $_geom{bottom}, $lines, $clines );
-   my ( $left, $right ) = _alloc_dimension( $_geom{left}, $_geom{right}, $cols,  $ccols  );
+      my ( $top, $bottom ) = _alloc_dimension( $_top, $_bottom, $lines, $clines );
+      my ( $left, $right ) = _alloc_dimension( $_left, $_right, $cols,  $ccols  );
 
-   return ( $top, $left, $bottom-$top, $right-$left );
-}
+      return ( $top, $left, $bottom-$top, $right-$left );
+   }
 
-sub _alloc_dimension ( $start, $end, $parentsz, $childsz )
-{
-   # Need to off-by-one to allow -1 == right, etc..
-   defined and $_ < 0 and $_ += $parentsz+1 for $start, $end;
+   sub _alloc_dimension ( $start, $end, $parentsz, $childsz )
+   {
+      # Need to off-by-one to allow -1 == right, etc..
+      defined and $_ < 0 and $_ += $parentsz+1 for $start, $end;
 
-   $end   = $start + $childsz if !defined $end;
-   $start = $end   - $childsz if !defined $start;
+      $end   = $start + $childsz if !defined $end;
+      $start = $end   - $childsz if !defined $start;
 
-   return ( $start, $end );
-}
+      return ( $start, $end );
+   }
 
 =head2 remove
 
@@ -341,10 +343,10 @@ Removes the float from the FloatBox.
 
 =cut
 
-method remove ()
-{
-   $_fb->_remove_float( $self );
-}
+   method remove ()
+   {
+      $_fb->_remove_float( $self );
+   }
 
 =head2 hide
 
@@ -354,12 +356,12 @@ Hide the float by hiding the window of its child widget.
 
 =cut
 
-method hide ()
-{
-   $_hidden = 1;
+   method hide ()
+   {
+      $_hidden = 1;
 
-   $_child->window->hide if $_child->window;
-}
+      $_child->window->hide if $_child->window;
+   }
 
 =head2 show
 
@@ -370,12 +372,12 @@ of C<hide>.
 
 =cut
 
-method show ()
-{
-   $_hidden = 0;
+   method show ()
+   {
+      $_hidden = 0;
 
-   $_child->window->show if $_child->window;
-}
+      $_child->window->show if $_child->window;
+   }
 
 =head2 is_visible
 
@@ -385,9 +387,10 @@ Return true if the float is currently visible.
 
 =cut
 
-method is_visible ()
-{
-   return !$_hidden;
+   method is_visible ()
+   {
+      return !$_hidden;
+   }
 }
 
 =head1 TODO

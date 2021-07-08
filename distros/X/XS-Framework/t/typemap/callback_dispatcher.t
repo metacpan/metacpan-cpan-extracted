@@ -3,6 +3,7 @@ use warnings;
 use lib 't';
 use MyTest;
 use Test::Exception;
+use Scalar::Util 'weaken';
 
 my ($ret, $sub, $cnt);
 
@@ -358,6 +359,19 @@ subtest "add_weak" => sub {
         $d->remove($sub);
         $d->call;
         is $cnt, 1;
+    };
+    
+    subtest "already weakened closure" => sub {
+        my $obj = MyTest::DispatchingObject->new;
+        my $d = $obj->vv;
+        my $cnt = 0;
+        my $ref = {};
+        weaken(my $wref = $ref);
+        $d->add_weak($wref, sub {$cnt++; $wref}) for 1..3;
+        $d->call;
+        $ref = undef;
+        $d->call;
+        is $cnt, 3;
     };
     
     if (0) {

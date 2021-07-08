@@ -2,7 +2,16 @@ NAME
     Regexp::Pattern::License - Regular expressions for legal licenses
 
 VERSION
-    Version v3.5.1
+    Version v3.6.1
+
+SYNOPSIS
+        use Regexp::Pattern::License;
+        use Regexp::Pattern;
+
+        my $re     = re( 'License::gpl_3' );
+        my $string = 'GNU General Public License version 3 or later';
+
+        $string =~ /$re/; # => success
 
 DESCRIPTION
     Regexp::Pattern::License provides a hash of regular expression patterns
@@ -70,6 +79,8 @@ PATTERNS
 
     *   except_classpath_2
 
+    *   except_ecos_2
+
     *   except_epl
 
     *   except_epl_mpl
@@ -119,6 +130,8 @@ PATTERNS
     *   except_sollya_4_1
 
     *   except_warzone
+
+    *   except_wxwindows
 
     *   except_xerces
 
@@ -270,9 +283,35 @@ PATTERNS
 
     *   bsd_0_clause
 
+    *   bsd_1_clause
+
     *   bsd_2_clause
 
+    *   bsd_2_clause_freebsd
+
+    *   bsd_2_clause_netbsd
+
+    *   bsd_2_clause_patent
+
+    *   bsd_2_clause_views
+
     *   bsd_3_clause
+
+    *   bsd_3_clause_attribution
+
+    *   bsd_3_clause_clear
+
+    *   bsd_3_clause_lbnl
+
+    *   bsd_3_clause_modification
+
+    *   bsd_3_clause_no_military_license
+
+    *   bsd_3_clause_no_nuclear_license
+
+    *   bsd_3_clause_no_nuclear_license_2014
+
+    *   bsd_3_clause_no_nuclear_warranty
 
     *   bsd_4_clause
 
@@ -448,11 +487,25 @@ PATTERNS
 
     *   ecl_2
 
+    *   ecos_1_1
+
+    *   ecos_2
+
+    *   efl
+
+    *   efl_1
+
+    *   efl_2
+
+    *   entessa
+
     *   epl
 
     *   epl_1
 
     *   epl_2
+
+    *   eudatagrid
 
     *   eupl
 
@@ -463,6 +516,12 @@ PATTERNS
     *   eupl_1_2
 
     *   eurosym
+
+    *   fair
+
+    *   frameworx
+
+    *   frameworx_1
 
     *   fsfap
 
@@ -514,15 +573,21 @@ PATTERNS
 
     *   gpl_3_or_later
 
-    *   isc
+    *   hpnd
+
+    *   hpnd_sell
 
     *   icu
 
     *   intel
 
+    *   ipa
+
     *   ipl
 
     *   ipl_1
+
+    *   isc
 
     *   jabberpl
 
@@ -556,7 +621,25 @@ PATTERNS
 
     *   libpng
 
+    *   liliq_p
+
+    *   liliq_p_1_1
+
+    *   liliq_r
+
+    *   liliq_r_1_1
+
+    *   liliq_r_plus
+
+    *   liliq_r_plus_1_1
+
     *   llgpl
+
+    *   lpl
+
+    *   lpl_1
+
+    *   lpl_1_02
 
     *   lppl
 
@@ -569,6 +652,10 @@ PATTERNS
     *   lppl_1_3a
 
     *   lppl_1_3c
+
+    *   miros
+
+    *   mit_0
 
     *   mit_advertising
 
@@ -592,6 +679,8 @@ PATTERNS
 
     *   mit_oldstyle_permission
 
+    *   mit_open_group
+
     *   motosoto
 
     *   mpl
@@ -612,13 +701,29 @@ PATTERNS
 
     *   mulan_2
 
+    *   multics
+
+    *   nasa
+
+    *   nasa_1_3
+
+    *   naumen
+
+    *   ncsa
+
     *   ngpl
+
+    *   nokia
 
     *   npl
 
     *   npl_1
 
     *   npl_1_1
+
+    *   nposl
+
+    *   nposl_3
 
     *   ntp
 
@@ -643,6 +748,10 @@ PATTERNS
     *   ofl_1_1_no_rfn
 
     *   ofl_1_1_rfn
+
+    *   ogc
+
+    *   ogc_1
 
     *   ogtsl
 
@@ -682,6 +791,14 @@ PATTERNS
 
     *   openssl
 
+    *   opl
+
+    *   opl_1
+
+    *   oset_pl
+
+    *   oset_pl_2_1
+
     *   osl
 
     *   osl_1
@@ -693,6 +810,12 @@ PATTERNS
     *   osl_2_1
 
     *   osl_3
+
+    *   php
+
+    *   php_3
+
+    *   php_3_01
 
     *   postgresql
 
@@ -732,11 +855,21 @@ PATTERNS
 
     *   sgi_b_2
 
+    *   simpl
+
+    *   simpl_2
+
+    *   simple
+
+    *   simple_1_1
+
     *   sissl
 
     *   sissl_1_1
 
     *   sissl_1_2
+
+    *   sleepycat
 
     *   spl
 
@@ -748,11 +881,39 @@ PATTERNS
 
     *   sugarcrm_1_1_3
 
+    *   tosl
+
+    *   ucl
+
+    *   ucl_1
+
+    *   unicode_dfs_2015
+
+    *   unicode_dfs_2016
+
     *   unicode_strict
 
     *   unicode_tou
 
     *   unlicense
+
+    *   upl
+
+    *   upl_1
+
+    *   vsl
+
+    *   vsl_1
+
+    *   w3c
+
+    *   w3c_19980519
+
+    *   w3c_19980720
+
+    *   w3c_20021231
+
+    *   w3c_20150513
 
     *   watcom
 
@@ -767,6 +928,10 @@ PATTERNS
     *   wtfnmfpl
 
     *   wtfnmfpl_1
+
+    *   x11
+
+    *   xnet
 
     *   zlib
 
@@ -787,6 +952,8 @@ PATTERNS
 
     Each of these patterns has the tag type:combo .
 
+    *   net_snmp
+
     *   perl
 
   License groups
@@ -795,6 +962,8 @@ PATTERNS
     Each of these patterns has the tag type:group .
 
     *   bsd
+
+    *   cc
 
     *   gnu
 
@@ -963,6 +1132,17 @@ STRUCTURE
     *   type:versioned:decimal
 
         Pattern covers a license using decimal number versioning scheme.
+
+EXAMPLES
+  Browse patterns
+    The "official" way to browse patterns is using App::RegexpPatternUtils:
+
+        show-regexp-pattern-module --page-result -- License
+
+    Unfortunately, App::RegexpPatternUtils has a deep dependency tree. An
+    alternative is to use Data::Printer and `less`:
+
+        perl -CS -MRegexp::Pattern::License -MDDP -e 'p %Regexp::Pattern::License::RE, fulldump => 1, output => stdout' | less -RS
 
 AUTHOR
     Jonas Smedegaard `<dr@jones.dk>`

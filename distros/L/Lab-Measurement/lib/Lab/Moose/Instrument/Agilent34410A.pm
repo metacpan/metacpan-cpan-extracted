@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::Agilent34410A;
-$Lab::Moose::Instrument::Agilent34410A::VERSION = '3.760';
+$Lab::Moose::Instrument::Agilent34410A::VERSION = '3.762';
 #ABSTRACT: Agilent 34410A digital multimeter.
 
 use v5.20;
@@ -36,7 +36,7 @@ Lab::Moose::Instrument::Agilent34410A - Agilent 34410A digital multimeter.
 
 =head1 VERSION
 
-version 3.760
+version 3.762
 
 =head1 DESCRIPTION
 
@@ -47,7 +47,7 @@ Alias for L<Lab::Moose::Instrument::HP34410A> with adjusted USB vendor/product I
 This software is copyright (c) 2021 by the Lab::Measurement team; in detail:
 
   Copyright 2017-2018  Simon Reinhardt
-            2020       Andreas K. HÃ¼ttel
+            2020       Andreas K. Huettel
 
 
 This is free software; you can redistribute it and/or modify it under

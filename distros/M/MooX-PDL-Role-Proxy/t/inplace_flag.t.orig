@@ -1,0 +1,30 @@
+#! perl
+
+use 5.010
+use Test::Lib;
+use Test2::V0;
+use Test2::Tools::PDL;
+
+use My::Class;;
+
+my $obj = My::Class->new();
+
+# is ( !!$obj->is_inplace, !!0 , "initialized: not inplace" );
+# ref_is ( $obj->inplace, $obj, "inplace returns object" );
+# is ( !!$obj->is_inplace, !!1, "inplace sets flag" );
+# $obj->set_inplace( 0 );
+# is ( !!$obj->is_inplace, !!0, "set_inplace resets flag" );
+# $obj->set_inplace( 1 );
+# is ( !!$obj->is_inplace, !!1, "set_inplace sets flag" );
+
+
+$obj->p1( PDL->sequence(10) );
+$obj->p2( PDL->sequence(10) );
+
+my $sub = sub { say "SUB3"; $obj->inplace->cumusumover; PDL->sequence( 4 ) };
+$obj->inplace->index( $sub->() );
+
+pdl_is( $obj->p1, PDL->new( 0, 1, 3, 6 ), "nested indexing works" )
+  or note $obj;
+
+done_testing;

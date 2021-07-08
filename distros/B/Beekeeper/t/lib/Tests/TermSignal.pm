@@ -8,7 +8,7 @@ use base 'Tests::Service::Base';
 use Test::More;
 use Time::HiRes 'sleep';
 
-use constant DEBUG => 0;
+my $VERBOSE = $ENV{'HARNESS_IS_VERBOSE'};
 
 
 sub test_01_term_signal : Test(21) {
@@ -17,14 +17,13 @@ sub test_01_term_signal : Test(21) {
     ## Test that broker complete all requests before quitting when workers are stopped with TERM
 
     if ($self->automated_testing) {
-        # It is hard to make this test run reliably on smoke testers platforms
-        return "This test may fail when not enough system resources are available";
+        return "This test does not run reliably on constrained platforms";
     }
 
     my $cli = Beekeeper::Client->instance;
     my @req;
 
-    my @worker_pids = $self->start_workers('Tests::Service::Worker', workers_count => 4);
+    my @worker_pids = $self->start_workers('Tests::Service::Worker', worker_count => 4);
 
     for (1..20) {
 
@@ -39,17 +38,17 @@ sub test_01_term_signal : Test(21) {
 
         # When workers are stopped they are probably processing a request that must be completed before quitting
         my $old = shift @worker_pids;
-        DEBUG && diag "Stopping TERM worker $old";
+        $VERBOSE && diag "Stopping TERM worker $old";
         kill('TERM', $old);
 
-        my ($new) = $self->start_workers('Tests::Service::Worker', workers_count => 1, no_wait => 1);
+        my ($new) = $self->start_workers('Tests::Service::Worker', worker_count => 1, no_wait => 1);
         push @worker_pids, $new;
 
         sleep 1;
         ok(1);
     }
 
-    DEBUG && diag "Waiting for backlog";
+    $VERBOSE && diag "Waiting for backlog";
     $cli->wait_async_calls;
 
     my @ok = grep { $_->success } @req;

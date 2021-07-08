@@ -3,7 +3,7 @@ package Beekeeper::Service::Router;
 use strict;
 use warnings;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 use Exporter 'import';
 
@@ -74,7 +74,7 @@ Beekeeper::Service::Router - Route messages between backend and frontend buses
 
 =head1 VERSION
 
-Version 0.06
+Version 0.07
 
 =head1 SYNOPSIS
 
@@ -92,18 +92,29 @@ Version 0.06
 
 =head1 DESCRIPTION
 
-Router workers shovel requests messages between frontend and backend brokers.
+Router workers pull requests from all frontend brokers and forward them to the single
+backend broker it is connected to, and pull generated responses from the backend and
+forward them to the aproppiate frontend broker which the client is connected to.
 
-Additionally, routers include some primitives that can be used to implement session 
-management and push notifications.
+Additionally, routers include some primitives that can be used to implement session
+management and push notifications. In order to push unicasted notifications, routers will
+keep an in-memory shared table of client connections and server side assigned addresses.
+Each entry consumes 1.5 KiB of memory, so a table of 100K sessions will consume around
+150 MiB for each Router worker.
 
-If the application does not bind client sessions the routers can scale really well,
-as you can have a lot of them in a large number of servers. 
+If the application does not bind client sessions the routers can scale horizontally 
+really well, as you can have thousands of them connected to hundreds of brokers.
 
-But please note that when the application does use the session binding mechanism all
-routers will need to share an address table, and this shared table will not scale as 
-well as the rest of the system. So a better strategy (some kind of partition) will 
-be needed for applications with a large number of concurrent clients.
+But please note that, when the application does use the session binding mechanism, all
+routers will need the in-memory shared table, and this shared table will not scale to 
+a great extent as the rest of the system. The limiting factor is the global rate of 
+updates to the table, which will cap around 5000 bind operations (logins) per second.
+This may be fixed on future releases by means of partitioning the table. Meanwhile, 
+this session binding mechanism is not suitable for applications with a large number
+of concurrent clients.
+
+Router workers are not created automatically. In order to add Router workers to a pool
+these must be declared into config file C<pool.config.json>.
 
 =head1 METHODS
 

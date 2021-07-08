@@ -1,5 +1,7 @@
-use strict;
+## no critic (RequireVersionVar RequireExplicitPackage RequireEndWithOne)
+
 use warnings;
+use strict;
 use Test::More;
 
 use FindBin qw($Bin);

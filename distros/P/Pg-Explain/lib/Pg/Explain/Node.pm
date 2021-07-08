@@ -27,11 +27,11 @@ Pg::Explain::Node - Class representing single node from query plan
 
 =head1 VERSION
 
-Version 1.10
+Version 1.11
 
 =cut
 
-our $VERSION = '1.10';
+our $VERSION = '1.11';
 
 =head1 SYNOPSIS
 
@@ -123,6 +123,12 @@ Textual representation of type of current node. Some types for example:
 
 =back
 
+=head2 buffers
+
+Information about inclusive buffers usage in given node. It's either undef, or object of Pg::Explain::Buffers class.
+
+=cut
+
 =head2 scan_on
 
 Hashref with extra information in case of table scans.
@@ -202,6 +208,7 @@ sub subplans               { my $self = shift; $self->{ 'subplans' }            
 sub type                   { my $self = shift; $self->{ 'type' }                   = $_[ 0 ] if 0 < scalar @_; return $self->{ 'type' }; }
 sub workers_launched       { my $self = shift; $self->{ 'workers_launched' }       = $_[ 0 ] if 0 < scalar @_; return $self->{ 'workers_launched' }; }
 sub workers                { my $self = shift; $self->{ 'workers' }                = $_[ 0 ] if 0 < scalar @_; return $self->{ 'workers' } || 1; }
+sub buffers                { my $self = shift; $self->{ 'buffers' }                = $_[ 0 ] if 0 < scalar @_; return $self->{ 'buffers' }; }
 
 =head2 new
 
@@ -508,6 +515,8 @@ sub get_struct {
     $reply->{ 'initplans' } = [ map { $_->get_struct } @{ $self->initplans } ] if defined $self->initplans;
     $reply->{ 'subplans' }  = [ map { $_->get_struct } @{ $self->subplans } ]  if defined $self->subplans;
 
+    $reply->{ 'buffers' } = $self->buffers->get_struct() if $self->buffers;
+
     $reply->{ 'cte_order' } = clone( $self->cte_order ) if defined $self->cte_order;
     if ( defined $self->ctes ) {
         $reply->{ 'ctes' } = {};
@@ -606,6 +615,29 @@ sub total_exclusive_time {
     return 0 if $time < 0;
 
     return $time;
+}
+
+=head2 total_exclusive_buffers
+
+Method for getting total buffers used by node, without buffers used by subnodes.
+
+=cut
+
+sub total_exclusive_buffers {
+    my $self = shift;
+
+    return unless $self->buffers;
+
+    my @nodes = grep { $_->buffers } $self->all_subnodes;
+    return $self->buffers if 0 == scalar @nodes;
+
+    my $sub_node_buffers = $nodes[ 0 ]->buffers;
+    shift @nodes;
+    for my $n ( @nodes ) {
+        $sub_node_buffers = $sub_node_buffers + $n->buffers;
+    }
+
+    return $self->buffers - $sub_node_buffers;
 }
 
 =head2 all_subnodes
@@ -740,6 +772,11 @@ sub as_text {
         push @lines, $prefix_on_spaces . "  " . $_ for @{ $self->extra_info };
     }
     my $textual = join( "\n", @lines ) . "\n";
+    if ( $self->buffers ) {
+        my $buf_info = $self->buffers->as_text;
+        $buf_info =~ s/^/${prefix_on_spaces}/gm;
+        $textual .= $buf_info . "\n";
+    }
 
     if ( $self->cte_order ) {
         for my $cte_name ( @{ $self->cte_order } ) {

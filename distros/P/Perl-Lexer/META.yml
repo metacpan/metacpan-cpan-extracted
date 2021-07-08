@@ -26,7 +26,7 @@ no_index:
 provides:
   Perl::Lexer:
     file: lib/Perl/Lexer.pm
-    version: '0.33'
+    version: '0.35'
   Perl::Lexer::Token:
     file: lib/Perl/Lexer/Token.pm
 requires:
@@ -36,7 +36,7 @@ resources:
   bugtracker: https://github.com/tokuhirom/Perl-Lexer/issues
   homepage: https://github.com/tokuhirom/Perl-Lexer
   repository: git://github.com/tokuhirom/Perl-Lexer.git
-version: '0.33'
+version: '0.35'
 x_contributors:
   - 'Kenichi Ishigaki <charsbar@users.noreply.github.com>'
   - 'Kenichi Ishigaki <ishigaki@cpan.org>'

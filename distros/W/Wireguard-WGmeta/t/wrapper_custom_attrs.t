@@ -23,18 +23,18 @@ sub dummy_val($value) {
 
 my $custom_attr_config = {
     'email' => {
-        'in_config_name' => 'Email',
         'validator'      => \&dummy_val
     }
 };
 
 my $wg_meta = Wireguard::WGmeta::Wrapper::Config->new(TEST_DIR, '#+', '#-', '.not_applied', $custom_attr_config);
 
-$wg_meta->set('mini_wg0', 'WG_0_PEER_A_PUBLIC_KEY', 'email', 'test@test.com', 1);
+$wg_meta->set('mini_wg0', 'WG_0_PEER_A_PUBLIC_KEY', 'email', 'test@test.com');
 
 ok $validator_called, 'validator called';
 
-my $expected = '[Interface]
+my $expected = '
+[Interface]
 Address = 10.0.0.2/24, fdc9:281f:04d7:9ee9::2/64
 ListenPort = 51888
 PrivateKey = WG_0_PEER_B_PRIVATE_KEY
@@ -46,11 +46,10 @@ PresharedKey = PEER_A-PEER_B-PRESHARED_KEY
 Custom_attr_from_very_custom_implementation = Some crazy value with spaces :D
 AllowedIPs = fdc9:281f:04d7:9ee9::1/128
 Endpoint = 198.51.100.101:51871
-#+Email = test@test.com
-
+#+email = test@test.com
 ';
 
-my $actual = $wg_meta->_create_config('mini_wg0', 1);
+my $actual = $wg_meta->create_config('mini_wg0', 1);
 ok $actual eq $expected, 'generate config';
 
 $wg_meta->commit(1,1);

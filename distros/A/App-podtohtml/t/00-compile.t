@@ -13,8 +13,8 @@ my @module_files = (
 );
 
 my @scripts = (
-    'script/_podtohtml',
-    'script/podtohtml'
+    'script/podtohtml',
+    'script/podtohtml-metacpan'
 );
 
 # no fake home requested

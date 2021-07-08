@@ -6,7 +6,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 use Types::Standard -types;
 
@@ -15,12 +15,47 @@ use Hash::Wrap;
 use Scalar::Util ();
 
 use Moo::Role;
+use Lexical::Accessor;
 
 use namespace::clean;
 
+use constant {
+    INPLACE_SET   => 1,
+    INPLACE_STORE => 2,
+};
+
 use MooX::TaggedAttributes -tags => [qw( piddle )];
 
+my $croak = sub {
+    require Carp;
+    goto \&Carp::croak;
+};
+
+lexical_has attr_subs => (
+    is      => 'ro',
+    isa     => HashRef,
+    reader  => \( my $attr_subs ),
+    default => sub { {} },
+);
+
+
+lexical_has 'is_inplace' => (
+    is      => 'rw',
+    clearer => \( my $clear_inplace ),
+    reader  => \( my $is_inplace ),
+    writer  => \( my $set_inplace ),
+    default => 0
+);
+
+
 # requires 'clone_with_piddles';
+
+
+
+
+
+
+
 
 
 
@@ -35,26 +70,14 @@ has _piddles => (
     is       => 'lazy',
     isa      => ArrayRef [Str],
     init_arg => undef,
+    clearer  => 1,
     builder  => sub {
         my $self = shift;
         [ keys %{ $self->_tags->{piddle} } ];
     },
 );
 
-has _set_attr_subs => (
-    is       => 'ro',
-    isa      => HashRef,
-    init_arg => undef,
-    default  => sub { {} },
-);
 
-
-has _piddle_op_inplace => (
-    is       => 'rwp',
-    init_arg => undef,
-    clearer  => 1,
-    default  => 0
-);
 
 
 
@@ -75,16 +98,34 @@ has _piddle_op_inplace => (
 sub _apply_to_tagged_attrs {
     my ( $self, $action ) = @_;
 
-    my $inplace = $self->_piddle_op_inplace;
+    my $inplace = $self->$is_inplace;
 
     my %attr = map {
         my $field = $_;
         $field => $action->( $self->$field, $inplace );
     } @{ $self->_piddles };
 
-    if ( $self->_piddle_op_inplace ) {
-        $self->_clear_piddle_op_inplace;
-        $self->_set_attr( %attr );
+    if ( $inplace ) {
+        $self->$clear_inplace;
+
+        if ( $inplace == INPLACE_SET ) {
+            $self->_set_attr( %attr );
+        }
+
+        elsif ( $inplace == INPLACE_STORE ) {
+            for my $attr ( keys %attr ) {
+                # $attr{$attr} may be linked to $self->$attr,
+                # so if we reshape $self->$attr, it really
+                # messes up $attr{$attr}.  sever it to be sure.
+                my $pdl = $attr{$attr}->sever;
+                ( my $tmp = $self->$attr->reshape( $pdl->dims ) ) .= $pdl;
+            }
+        }
+
+        else {
+            $croak->( "unrecognized inplace flag value: $inplace\n" );
+        }
+
         return $self;
     }
 
@@ -100,10 +141,19 @@ sub _apply_to_tagged_attrs {
 
 
 
+
+
+
+
+
+
+
+
+
+
 sub inplace {
-    my $self = shift;
-    $self->_set__piddle_op_inplace( 1 );
-    return $self;
+    $_[0]->$set_inplace( @_ > 1 ? $_[1] : INPLACE_SET );
+    $_[0];
 }
 
 
@@ -114,7 +164,84 @@ sub inplace {
 
 
 
-sub is_inplace { !! $_[0]->__piddle_op_inplace }
+
+
+
+
+
+
+
+
+
+
+sub inplace_store {
+    $_[0]->$set_inplace( INPLACE_STORE );
+    $_[0];
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+sub inplace_set {
+    $_[0]->$set_inplace( INPLACE_SET );
+    $_[0];
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+sub set_inplace {
+    2 == @_ or $croak->( "set_inplace requires two arguments" );
+    $_[1] >= 0
+      && $_[0]->$set_inplace( $_[1] );
+    return;
+}
+
+
+
+
+
+
+
+
+
+sub is_inplace { goto &$is_inplace }
+
 
 
 
@@ -129,6 +256,12 @@ sub is_inplace { !! $_[0]->__piddle_op_inplace }
 
 sub copy {
     my $self = shift;
+
+    if ( $self->is_inplace ) {
+        $self->set_inplace( 0 );
+        return $self;
+    }
+
     return $self->clone_with_piddles( map { $_ => $self->$_->copy }
           @{ $self->_piddles } );
 }
@@ -141,10 +274,13 @@ sub copy {
 
 
 
+
 sub sever {
     my $self = shift;
     $self->$_->sever for @{ $self->_piddles };
+    return $self;
 }
+
 
 
 
@@ -192,6 +328,7 @@ sub at {
 
 
 
+
 sub where {
     my ( $self, $where ) = @_;
 
@@ -209,9 +346,11 @@ sub where {
 
 
 
+
+
 sub _set_attr {
     my ( $self, %attr ) = @_;
-    my $subs = $self->_set_attr_subs;
+    my $subs = $self->$attr_subs;
 
     for my $key ( keys %attr ) {
         my $sub = $subs->{$key};
@@ -227,6 +366,106 @@ sub _set_attr {
 
     return $self;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+sub qsort {
+
+    $_[0]->index( $_[0]->qsorti );
+}
+
+
+
+
+
+
+
+
+
+
+
+
+sub qsort_on {
+
+    my ( $self, $attr ) = @_;
+
+    $self->index( $attr->qsorti );
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+sub clip_on {
+
+    my ( $self, $attr, $min, $max ) = @_;
+
+    my $mask;
+
+    if ( defined $min ) {
+        $mask = $attr >= $min;
+        $mask &= $attr < $max
+          if defined $max;
+    }
+    elsif ( defined $max ) {
+        $mask = $attr < $max;
+    }
+    else {
+        $croak->( "one of min or max must be defined\n" );
+    }
+
+    $self->where( $mask );
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+sub slice {
+
+    my ( $self, $slice ) = @_;
+
+    return $self->_apply_to_tagged_attrs( sub { $_[0]->slice( $slice ) } );
+}
+
 
 
 1;
@@ -253,7 +492,7 @@ MooX::PDL::Role::Proxy - treat a container of piddles as if it were a piddle
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 
@@ -373,14 +612,21 @@ contained object appropriately.
 
 =head2 _piddles
 
-  @piddle_names = $self->_piddles;
+  @piddle_names = $obj->_piddles;
 
 This returns a list of the names of the object's attributes with
-a C<piddle> tag set.
+a C<piddle> tag set.  The list is lazily created by the C<_build__piddles>
+method, which can be modified or overridden if required. The default
+action is to find all tagged attributes with tag C<piddle>.
+
+=head2 _clear_piddles
+
+Clear the list of attributes which have been tagged as piddles.  The
+list will be reset to the defaults when C<_piddles> is next invoked.
 
 =head2 _apply_to_tagged_attrs
 
-   $self->_apply_to_tagged_attrs( \&sub );
+   $obj->_apply_to_tagged_attrs( \&sub );
 
 Execute the passed subroutine on all of the attributes tagged with the
 C<piddle> option. The subroutine will be invoked as
@@ -391,41 +637,107 @@ where C<$inplace> will be true if the operation is to take place inplace.
 
 The subroutine should return the piddle to be stored.
 
+Returns C<$obj> if applied in-place, or a new object if not.
+
 =head2 inplace
 
-  $self->inplace
+  $obj->inplace( ?$how )
 
-Indicate that the next I<inplace aware> operation should be done inplace
+Indicate that the next I<inplace aware> operation should be done inplace.
+
+An optional argument indicating how the piddles should be updated may be
+passed (see L</set_inplace> for more information).  This API differs from
+from the L<inplace|PDL::Core/inplace> method.
+
+It defaults to using the attributes' accessors to store the results,
+which will cause triggers, etc. to be called.
+
+Returns C<$obj>.
+See also L</inplace_direct> and L</inplace_accessor>.
+
+=head2 inplace_store
+
+  $obj->inplace_store
+
+Indicate that the next I<inplace aware> operation should be done
+inplace.  Piddles are changed inplace via the C<.=> operator, avoiding
+any side-effects caused by using the attributes' accessors.
+
+It is equivalent to calling
+
+  $obj->set_inplace( MooX::PDL::Role::Proxy::INPLACE_STORE );
+
+Returns C<$obj>.
+See also L</inplace> and L</inplace_accessor>.
+
+=head2 inplace_set
+
+  $obj->inplace_set
+
+Indicate that the next I<inplace aware> operation should be done inplace.
+The object level attribute accessors will be used to store the results (which
+may be the same piddle).  This will cause L<Moo> triggers, etc to be
+called.
+
+It is equivalent to calling
+
+  $obj->set_inplace( MooX::PDL::Role::Proxy::INPLACE_SET );
+
+Returns C<$obj>.
+See also L</inplace_direct> and L</inplace>.
+
+=head2 set_inplace
+
+  $obj->set_inplace( $value );
+
+Change the value of the inplace flag.  Accepted values are
+
+=over
+
+=item MooX::PDL::Role::Proxy::INPLACE_SET
+
+Use the object level attribute accessors to store the results (which
+may be the same piddle).  This will cause L<Moo> triggers, etc to be
+called.
+
+=item MooX::PDL::Role::Proxy::INPLACE_STORE
+
+Store the results directly in the existing piddle using the C<.=> operator.
+
+=back
 
 =head2 is_inplace
 
-  $bool = $self->is_inplace;
+  $bool = $obj->is_inplace;
 
 Test if the next I<inplace aware> operation should  be done inplace
 
 =head2 copy
 
-  $new = $self->copy;
+  $new = $obj->copy;
 
-Create a copy of the object and its piddles.  It is exactly equivalent to
+Create a copy of the object and its piddles.  If the C<inplace> flag
+is set, it returns C<$obj> otherwise it is exactly equivalent to
 
-  $self->clone_with_piddles( map { $_ => $self->$_->copy } @{ $self->_piddles } );
+  $obj->clone_with_piddles( map { $_ => $obj->$_->copy } @{ $obj->_piddles } );
 
 =head2 sever
 
-  $self->sever;
+  $obj = $obj->sever;
 
 Call L<PDL::Core/sever> on tagged attributes.  This is done inplace.
+Returns C<$obj>.
 
 =head2 index
 
-   $new = $self->index( PIDDLE );
+   $new = $obj->index( PIDDLE );
 
 Call L<PDL::Slices/index> on tagged attributes.  This is inplace aware.
+Returns C<$obj> if applied in-place, or a new object if not.
 
 =head2 at
 
-   $obj = $self->at( @indices );
+   $obj = $obj->at( @indices );
 
 Returns a simple object containing the results of running
 L<PDL::Core/index> on tagged attributes.  The object's attributes are
@@ -433,17 +745,67 @@ named after the tagged attributes.
 
 =head2 where
 
-   $obj = $self->where( $mask );
+   $obj = $obj->where( $mask );
 
-Apply L<PDL::Primitive/where> to the tagged attributes.  It is inplace aware.
+Apply L<PDL::Primitive/where> to the tagged attributes.  It is in-place aware.
+Returns C<$obj> if applied in-place, or a new object if not.
 
 =head2 _set_attr
 
-   $self->_set_attr( %attr )
+   $obj->_set_attr( %attr )
 
 Set the object's attributes to the values in the C<%attr> hash.
 
-Returns C<$self>.
+Returns C<$obj>.
+
+=head2 qsort
+
+  $obj->qsort;
+
+Sort the piddles.  This requires that the object has a C<qsorti> method, which should
+return a piddle index of the elements in ascending order.
+
+For example, to designate the C<radius> attribute as that which should be sorted
+on by qsort, include the C<handles> option when declaring it:
+
+  has radius => (
+      is      => 'ro',
+      piddle  => 1,
+      isa     => Piddle1D,
+      handles => ['qsorti'],
+  );
+
+It is in-place aware. Returns C<$obj> if applied in-place, or a new object if not.
+
+=head2 qsort_on
+
+  $obj->sort_on( $piddle );
+
+Sort on the specified C<$piddle>.
+
+It is in-place aware.
+Returns C<$obj> if applied in-place, or a new object if not.
+
+=head2 clip_on
+
+  $obj->clip_on( $piddle, $min, $max );
+
+Clip on the specified C<$piddle>, removing elements which are outside
+the bounds of [C<$min>, C<$max>).  Either bound may be C<undef> to indicate
+it should be ignore.
+
+It is in-place aware.
+
+Returns C<$obj> if applied in-place, or a new object if not.
+
+=head2 slice
+
+  $obj->slice( $slice );
+
+Slice.  See L<PDL::Slices/slice> for more information.
+
+It is in-place aware.
+Returns C<$obj> if applied in-place, or a new object if not.
 
 =head1 LIMITATIONS
 
@@ -468,14 +830,21 @@ non-inplace operations can create copies of the original object.
 
 =back
 
-=head1 BUGS
+=head1 SUPPORT
 
-Please report any bugs or feature requests on the bugtracker website
-L<https://rt.cpan.org/Public/Dist/Display.html?Name=MooX-PDL-Role-Proxy>
+=head2 Bugs
 
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
+Please report any bugs or feature requests to   or through the web interface at: https://rt.cpan.org/Public/Dist/Display.html?Name=MooX-PDL-Role-Proxy
+
+=head2 Source
+
+Source is available at
+
+  https://gitlab.com/djerius/moox-pdl-role-proxy
+
+and may be cloned from
+
+  https://gitlab.com/djerius/moox-pdl-role-proxy.git
 
 =head1 AUTHOR
 

@@ -34,8 +34,8 @@ my $builder = Module::Build->new(
     create_readme  => 1,
     meta_merge => {
         resources => {
-            repository => 'http://github.com/jozef/Test-Dirs/',
-            bugtracker => 'http://github.com/jozef/Test-Dirs/issues',
+            repository => 'https://github.com/jozef/Test-Dirs/',
+            bugtracker => 'https://github.com/jozef/Test-Dirs/issues',
         },
         keywords => [ qw/ test dir folder / ],
     },

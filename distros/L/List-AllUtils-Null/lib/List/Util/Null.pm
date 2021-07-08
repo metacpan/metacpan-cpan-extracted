@@ -1,9 +1,9 @@
 package List::Util::Null;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-04-01'; # DATE
+our $DATE = '2021-07-05'; # DATE
 our $DIST = 'List-AllUtils-Null'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 use alias::module 'List::AllUtils::Null';
 
@@ -22,7 +22,7 @@ List::Util::Null - Alias for List::AllUtils::Null
 
 =head1 VERSION
 
-This document describes version 0.001 of List::Util::Null (from Perl distribution List-AllUtils-Null), released on 2021-04-01.
+This document describes version 0.004 of List::Util::Null (from Perl distribution List-AllUtils-Null), released on 2021-07-05.
 
 =head1 SYNOPSIS
 
@@ -40,7 +40,7 @@ Source repository is at L<https://github.com/perlancar/perl-List-AllUtils-Null>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-List-AllUtils-Null/issues>
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=List-AllUtils-Null>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

@@ -1,9 +1,9 @@
 package Role::TinyCommons::Tree::FromObjArray;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-05-06'; # DATE
+our $DATE = '2021-07-02'; # DATE
 our $DIST = 'Role-TinyCommons-Tree'; # DIST
-our $VERSION = '0.126'; # VERSION
+our $VERSION = '0.127'; # VERSION
 
 use Role::Tiny;
 use Role::Tiny::With;
@@ -33,7 +33,7 @@ Role::TinyCommons::Tree::FromObjArray - Role that provides methods to build a tr
 
 =head1 VERSION
 
-This document describes version 0.126 of Role::TinyCommons::Tree::FromObjArray (from Perl distribution Role-TinyCommons-Tree), released on 2021-05-06.
+This document describes version 0.127 of Role::TinyCommons::Tree::FromObjArray (from Perl distribution Role-TinyCommons-Tree), released on 2021-07-02.
 
 =head1 MIXED IN ROLES
 
@@ -88,7 +88,7 @@ Source repository is at L<https://github.com/perlancar/perl-Role-TinyCommons-Tre
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Role-TinyCommons-TreeNode/issues>
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Role-TinyCommons-Tree>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

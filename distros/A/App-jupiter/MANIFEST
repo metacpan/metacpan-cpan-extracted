@@ -21,6 +21,9 @@ t/elements.t
 t/empty.t
 t/encoding-atom.t
 t/encoding-rss.t
+t/filters.t
+t/french.t
+t/html-url.t
 t/limits.t
 t/messages.t
 t/rss2sample.xml

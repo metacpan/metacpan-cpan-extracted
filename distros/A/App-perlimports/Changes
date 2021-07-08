@@ -1,5 +1,11 @@
 Revision history for App-perlimports
 
+0.000014  2021-07-08 19:47:54Z
+    - Detect symbols in nested quotes (GH#27) (Olaf Alders)
+
+0.000013  2021-07-08 14:54:28Z
+    - Detect functions used in regex replacements (GH#26) (Olaf Alders)
+
 0.000012  2021-06-23 17:52:22Z
     - Fix a warning that was being triggered by the logger
 

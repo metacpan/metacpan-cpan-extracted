@@ -3,8 +3,8 @@ NAME
     .xlsx) as two directories of CSV files
 
 VERSION
-    This document describes version 0.005 of App::DiffXlsText (from Perl
-    distribution App-DiffXlsText), released on 2020-12-01.
+    This document describes version 0.007 of App::DiffXlsText (from Perl
+    distribution App-DiffXlsText), released on 2021-07-07.
 
 SYNOPSIS
     See the included script diff-xls-text.
@@ -28,7 +28,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2020 by perlancar@cpan.org.
+    This software is copyright (c) 2021, 2020 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

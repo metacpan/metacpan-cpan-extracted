@@ -1,3 +1,9 @@
+0.296   2021-07-08  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux] In usage line, group command-line aliases or negative
+	  options together using alternation.
+
+
 0.295   2021-06-27  Released-By: PERLANCAR; Urgency: medium
 
 	- [ux] In usage line, separate options and arguments with '--' for

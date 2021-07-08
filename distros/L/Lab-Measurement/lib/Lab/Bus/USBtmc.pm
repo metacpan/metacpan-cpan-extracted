@@ -1,6 +1,6 @@
 package Lab::Bus::USBtmc;
 #ABSTRACT: USBtmc (Test & Measurement) Linux kernel driver bus
-$Lab::Bus::USBtmc::VERSION = '3.760';
+$Lab::Bus::USBtmc::VERSION = '3.762';
 use v5.20;
 use Config;
 
@@ -640,7 +640,7 @@ Lab::Bus::USBtmc - USBtmc (Test & Measurement) Linux kernel driver bus
 
 =head1 VERSION
 
-version 3.760
+version 3.762
 
 =head1 SYNOPSIS
 
@@ -811,8 +811,8 @@ This software is copyright (c) 2021 by the Lab::Measurement team; in detail:
 
   Copyright 2012       Hermann Kraus
             2016       Charles Lane, Simon Reinhardt
-            2017       Andreas K. HÃ¼ttel
-            2020       Andreas K. HÃ¼ttel
+            2017       Andreas K. Huettel
+            2020       Andreas K. Huettel
             2021       Charles Lane
 
 

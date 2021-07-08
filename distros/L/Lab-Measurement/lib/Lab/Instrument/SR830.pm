@@ -1,5 +1,5 @@
 package Lab::Instrument::SR830;
-$Lab::Instrument::SR830::VERSION = '3.760';
+$Lab::Instrument::SR830::VERSION = '3.762';
 #ABSTRACT: Stanford Research SR830 lock-in amplifier
 
 use v5.20;
@@ -270,7 +270,7 @@ Lab::Instrument::SR830 - Stanford Research SR830 lock-in amplifier
 
 =head1 VERSION
 
-version 3.760
+version 3.762
 
 =head1 SYNOPSIS
 
@@ -385,15 +385,15 @@ command to change a property like amplitude or time constant might have to be ex
 
 This software is copyright (c) 2021 by the Lab::Measurement team; in detail:
 
-  Copyright 2009       Andreas K. HÃ¼ttel, Daniela Taubert
-            2010       Andreas K. HÃ¼ttel, Daniel SchrÃ¶er
-            2011       Andreas K. HÃ¼ttel, Florian Olbrich
-            2013       Andreas K. HÃ¼ttel
-            2014       Alois Dirnaichner, Andreas K. HÃ¼ttel
+  Copyright 2009       Andreas K. Huettel, Daniela Taubert
+            2010       Andreas K. Huettel, Daniel Schroeer
+            2011       Andreas K. Huettel, Florian Olbrich
+            2013       Andreas K. Huettel
+            2014       Alois Dirnaichner, Andreas K. Huettel
             2016       Simon Reinhardt
-            2017       Andreas K. HÃ¼ttel
+            2017       Andreas K. Huettel
             2019       Simon Reinhardt
-            2020       Andreas K. HÃ¼ttel
+            2020       Andreas K. Huettel
 
 
 This is free software; you can redistribute it and/or modify it under

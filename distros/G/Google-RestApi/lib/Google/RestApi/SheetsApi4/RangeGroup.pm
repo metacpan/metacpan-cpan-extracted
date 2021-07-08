@@ -1,27 +1,19 @@
 package Google::RestApi::SheetsApi4::RangeGroup;
 
-use strict;
-use warnings;
+# some private subroutines of Range are called from here,
+# so think of RangeGroup as a friend of Range. the routines
+# called are commented thusly:
+# "private range routine called here!"
 
-our $VERSION = '0.4';
+our $VERSION = '0.7';
 
-use 5.010_000;
+use Google::RestApi::Setup;
 
-use autodie;
 use Carp qw(cluck confess);
 use List::Util qw(first);
 use Scalar::Util qw(looks_like_number);
-use Type::Params qw(compile compile_named);
-use Types::Standard qw(Str HashRef ArrayRef HasMethods Maybe Any slurpy);
-use YAML::Any qw(Dump);
-
-no autovivification;
 
 use aliased 'Google::RestApi::SheetsApi4::RangeGroup::Iterator';
-
-use Google::RestApi::Utils qw(named_extra);
-
-do 'Google/RestApi/logger_init.pl';
 
 sub new {
   my $class = shift;
@@ -34,12 +26,26 @@ sub new {
   return bless $check->(@_), $class;
 }
 
-sub append {
+sub push_ranges {
   my $self = shift;
   state $check = compile(slurpy ArrayRef[HasMethods['range']]);
   my ($ranges) = $check->(@_);
   push(@{ $self->{ranges} }, @$ranges);
   return;
+}
+
+sub clear {
+  my $self = shift;
+
+  $_->clear_cached_values() foreach $self->ranges();
+
+  my @ranges = map { $_->range(); } $self->ranges();
+  my %p = (
+    content => { ranges => \@ranges },
+    uri     => "/values:batchClear",
+    method  => "post",
+  );
+  return $self->api(%p);
 }
 
 sub values {
@@ -86,10 +92,8 @@ sub _batch_get {
   my $response = $self->api(%$p);
 
   my $value_ranges = $response->{valueRanges};
-  # rangegroup and range work together, so call private
-  # method here. private so that users of this framework
-  # won't call it. but we know what we're doing, right?
-  $ranges->[$_]->_value_range(%{ $value_ranges->[$_] })
+  # private range routine called here!
+  $ranges->[$_]->_cache_range_values(%{ $value_ranges->[$_] })
     foreach (0..$#$ranges);
 
   return;
@@ -106,7 +110,7 @@ sub batch_values {
   my $values = $p->{values};
   if (defined $values) {
     my @ranges = $self->ranges();
-    die "Too many values provided for range group" if scalar @$values > scalar @ranges;
+    LOGDIE "Too many values provided for range group" if scalar @$values > scalar @ranges;
     $ranges[$_]->batch_values(values => $values->[$_]) foreach (0..$#$values);
     return $self;
   }
@@ -118,19 +122,20 @@ sub batch_values {
   return \@batch_values;
 }
 
-sub submit_values {
-  my $self = shift;
-  return $self->spreadsheet()->submit_values(@_, values => [ $self ]);
-}
-
-sub values_response {
+sub values_response_from_api {
   my $self = shift;
   state $check = compile(ArrayRef);
   my ($updates) = $check->(@_);
   my @updates = map {
-    $_->has_values() ? ($_->values_response($updates)) : ();
+    $_->has_values() ? ($_->values_response_from_api($updates)) : ();
   } $self->ranges();
   return \@updates;
+}
+
+sub submit_values {
+  my $self = shift;
+  $self->spreadsheet()->submit_values(ranges => [ $self ], @_);
+  return $self->values();
 }
 
 sub batch_requests {
@@ -143,16 +148,16 @@ sub batch_requests {
 
 sub submit_requests {
   my $self = shift;
-  $self->spreadsheet()->submit_requests(requests => [ $self ], @_);
-  return $self;
+  return $self->spreadsheet()->submit_requests(ranges => [ $self ], @_);
+#  return $self;
 }
 
-sub requests_response {
+sub requests_response_from_api {
   my $self = shift;
   state $check = compile(ArrayRef);
   my ($requests) = $check->(@_);
   my @requests = map {
-    $_->requests_response($requests);
+    $_->requests_response_from_api($requests);
   } $self->ranges();
   return \@requests;
 }
@@ -194,7 +199,7 @@ Google::RestApi::SheetsApi4::RangeGroup - Represents a group of ranges in a Work
 
 =head1 DESCRIPTION
 
-A RangeGroup is a lightweight object represents a collection of ranges
+A RangeGroup is a lightweight object that represents a collection of ranges
 on which you can operate as one unit (e.g. RangeGroup::submit_values
 will submit all batch values for the underlying ranges).
 
@@ -223,10 +228,15 @@ You would not normally call this directly unless you were
 making a Google API call not currently supported by this API
 framework.
 
-=item append(<arrayref<Range>>);
+=item push_ranges(<arrayref<Range>>);
 
 Adds the extra ranges to this range group. No attempt is made to
 check for duplicate range objects.
+
+=item clear();
+
+Clears each range in the range group in one call using batchClear
+Google API call.
 
 =item values(%args);
 

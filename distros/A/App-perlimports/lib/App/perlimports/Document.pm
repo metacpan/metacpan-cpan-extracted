@@ -3,7 +3,7 @@ package App::perlimports::Document;
 use Moo;
 use utf8;
 
-our $VERSION = '0.000012';
+our $VERSION = '0.000014';
 
 use App::perlimports::Annotations ();
 use App::perlimports::Include     ();
@@ -13,12 +13,15 @@ use Module::Runtime qw( module_notional_filename );
 use MooX::StrictConstructor;
 use Path::Tiny qw( path );
 use PPI::Document 1.270 ();
-use PPIx::Utils::Classification qw( is_hash_key is_method_call );
+use PPIx::Utils::Classification qw(
+    is_function_call
+    is_hash_key
+    is_method_call
+);
 use Ref::Util qw( is_plain_arrayref is_plain_hashref );
-use String::InterpolatedVariables ();
 use Sub::HandlesVia;
 use Try::Tiny qw( catch try );
-use Types::Standard qw(ArrayRef Bool HashRef InstanceOf Maybe Object Str);
+use Types::Standard qw( ArrayRef Bool HashRef InstanceOf Maybe Object Str );
 
 with 'App::perlimports::Role::Logger';
 
@@ -237,6 +240,7 @@ my %default_ignore = (
     'Feature::Compat::Try'           => 1,
     'HTTP::Message::PSGI'            => 1,    # HTTP::Request::(to|from)_psgi
     'Mojo::Base'                     => 1,
+    'Mojo::Date'                     => 1,
     'Mojolicious::Lite'              => 1,
     'Moo'                            => 1,
     'Moo::Role'                      => 1,
@@ -486,16 +490,76 @@ sub _imports_for_include {
     return $imports;
 }
 
+sub _extract_symbols_from_snippet {
+    my $self    = shift;
+    my $snippet = shift;
+    return () unless defined $snippet;
+
+    # Restore line breaks
+    $snippet =~ s{\\n}{\n}g;
+
+    my $doc = PPI::Document->new( \$snippet );
+    my @symbols
+        = map { $_ . q{} } @{ $doc->find('PPI::Token::Symbol') || [] };
+
+    my $maybe_extract = $doc->find('PPI::Token::Word') || [];
+    for my $word ( @{$maybe_extract} ) {
+
+        # Turn ${FOO} into $FOO
+        #
+        # PPI::Token::Cast    '$'
+        # PPI::Structure::Block       { ... }
+        #   PPI::Statement
+        #     PPI::Token::Word        'FOO'
+        if (   "$word" =~ m{\A\w}
+            && $word->parent->isa('PPI::Statement')
+            && $word->parent->parent->isa('PPI::Structure::Block')
+            && $word->parent->parent->sprevious_sibling->isa(
+                'PPI::Token::Cast') ) {
+            push @symbols, $word->parent->parent->sprevious_sibling . "$word";
+            next;
+        }
+        push @symbols, "$word" if is_function_call($word);
+    }
+
+    return @symbols;
+}
+
+sub _unnest_quotes {
+    my $self  = shift;
+    my $token = shift;
+    my @words = @_;
+
+    if (  !$token->isa('PPI::Token::Quote')
+        || $token->isa('PPI::Token::Quote::Single') ) {
+        return @words;
+    }
+
+    push @words, $self->_extract_symbols_from_snippet( $token->string );
+
+    my $doc    = PPI::Document->new( \$token->string );
+    my $quotes = $doc->find('PPI::Token::Quote');
+    return @words unless $quotes;
+
+    for my $q (@$quotes) {
+        push @words, $self->_extract_symbols_from_snippet("$q");
+        push @words, $self->_unnest_quotes($q);
+    }
+
+    return @words;
+}
+
 sub _build_interpolated_symbols {
     my $self = shift;
-    my %symbols;
+    my @symbols;
 
-    for my $quote (
+    for my $token (
         @{
             $self->ppi_document->find(
                 sub {
                     ( $_[1]->isa('PPI::Token::Quote')
                             && !$_[1]->isa('PPI::Token::Quote::Single') )
+                        || $_[1]->isa('PPI::Token::Quote::Interpolate')
                         || $_[1]->isa('PPI::Token::QuoteLike::Regexp')
                         || $_[1]->isa('PPI::Token::Regexp');
                 }
@@ -503,20 +567,17 @@ sub _build_interpolated_symbols {
                 || []
         }
     ) {
-        my $vars = String::InterpolatedVariables::extract($quote);
-        for my $var ( @{$vars} ) {
-            ++$symbols{$var};
-        }
-
-        # Match on @{[ ... ]}
-        if ( $quote =~ m/ @ \{ \[ (.*) \] \} /x ) {
-            my $doc   = PPI::Document->new( \$1 );
-            my $words = $doc->find( sub { $_[1]->isa('PPI::Token::Word') } )
-                || [];
-            for my $word (@$words) {
-                ++$symbols{$word};
+        if (   $token->isa('PPI::Token::Regexp')
+            || $token->isa('PPI::Token::QuoteLike::Regexp') ) {
+            for my $snippet (
+                $token->get_match_string,
+                $token->get_substitute_string,
+            ) {
+                push @symbols, $self->_extract_symbols_from_snippet($snippet);
             }
         }
+
+        push @symbols, $self->_unnest_quotes($token);
     }
 
     # Crude hack to catch vars like ${FOO_BAR} in heredocs.
@@ -532,14 +593,7 @@ sub _build_interpolated_symbols {
     ) {
         my $content = join "\n", $heredoc->heredoc;
         next if $heredoc =~ m{'};
-
-        my $vars = String::InterpolatedVariables::extract($content);
-        for my $var ( @{$vars} ) {
-            if ( $var =~ m/([\$\@\%])\{(\w+)\}/ ) {
-                $var = $1 . $2;
-            }
-            ++$symbols{$var};
-        }
+        push @symbols, $self->_extract_symbols_from_snippet($content);
     }
 
     # Catch vars like ${FOO_BAR}. This is probably not good enough.
@@ -559,9 +613,10 @@ sub _build_interpolated_symbols {
         my $sigil   = $cast . q{};
         my $sibling = $cast->snext_sibling . q{};
         if ( $sibling =~ m/{(\w+)}/ ) {
-            ++$symbols{ $sigil . $1 };
+            push @symbols, $sigil . $1;
         }
     }
+    my %symbols = map { $_ => 1 } @symbols;
     return \%symbols;
 }
 
@@ -663,9 +718,16 @@ sub _is_used_fully_qualified {
         }
     );
 
+    # We could combine the regexes, but this is easy to read.
     for my $key ( keys %{ $self->interpolated_symbols } ) {
-        return 1 if $key =~ m{\A[*\$\@\%]+${module_name}::[a-zA-Z_]+\z};
+
+        # package level variable
+        return 1 if $key =~ m{\A[*\$\@\%]+${module_name}::[a-zA-Z0-9_]+\z};
+
+        # function
+        return 1 if $key =~ m/\A${module_name}::[a-zA-Z0-9_]+\z/;
     }
+
     return 0;
 }
 
@@ -905,7 +967,7 @@ App::perlimports::Document - Make implicit imports explicit
 
 =head1 VERSION
 
-version 0.000012
+version 0.000014
 
 =head2 inspector_for( $module_name )
 

@@ -1,22 +1,10 @@
 package Google::RestApi::SheetsApi4::RangeGroup::Iterator;
 
-use strict;
-use warnings;
+our $VERSION = '0.7';
 
-our $VERSION = '0.4';
-
-use 5.010_000;
-
-use autodie;
-use Type::Params qw(compile compile_named);
-use Types::Standard qw(Int HasMethods);
-use YAML::Any qw(Dump);
-
-no autovivification;
+use Google::RestApi::Setup;
 
 use aliased 'Google::RestApi::SheetsApi4::RangeGroup';
-
-do 'Google/RestApi/logger_init.pl';
 
 sub new {
   my $class = shift;
@@ -41,7 +29,7 @@ sub iterate {
   } $self->range_group()->ranges();
   my $range_group = $self->spreadsheet()->range_group(@ranges);
 
-  $self->{current} += $self->{by};
+  $self->{current} += $self->{by} if $range_group;
 
   return $range_group;
 }

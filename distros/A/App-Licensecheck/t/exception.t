@@ -3,7 +3,9 @@ use Test2::V0;
 use lib 't/lib';
 use Test2::Licensecheck;
 
-plan 44;
+my $ver = $Regexp::Pattern::License::VERSION;
+
+plan 45;
 
 # Autotools
 license_is(
@@ -71,6 +73,14 @@ license_is(
 	'GPL-3+ with FAUST exception'
 );
 
+# Font
+my $todo = todo 'not yet supported by Regexp::Pattern::License';
+license_is(
+	't/exception/Font/LICENSE',
+	'AGPL-3 with PS-or-PDF-font exception'
+);
+$todo = undef;
+
 # GCC
 license_is(
 	't/exception/GCC/unwind-cxx.h',
@@ -94,7 +104,9 @@ license_is(
 # Libtool
 license_is(
 	't/exception/Libtool/lt__dirent.h',
-	'LGPL-2+ with Libtool exception'
+	$ver >= v3.5
+	? 'LGPL-2+ with Libtool exception'
+	: 'LGPL-2+ with libtool exception'
 );
 
 # non-GPL

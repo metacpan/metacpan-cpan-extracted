@@ -1,10 +1,24 @@
-0.007   2019-05-25 (PERLANCAR)
+0.009   2021-02-26  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux] Tweak metacpan template some more.
+
+
+0.008   2021-02-26  Released-By: PERLANCAR; Urgency: medium
+
+	- Add CLI: podtohtml-metacpan (previously I added --metacpan
+	  shortcut option, but apparently I never used it).
+
+	- [ux] Substitute some text in metacpan template so the render
+	  result is more realistic.
+
+
+0.007   2019-05-25  Released-By: PERLANCAR
 
 	- Add option --metacpan as a shortcut for: --template
 	  metacpan-20180911 --browser.
 
 
-0.006   2018-09-11 (PERLANCAR)
+0.006   2018-09-11  Released-By: PERLANCAR
 
 	- [ux] Provide completion for --template (-t).
 
@@ -15,14 +29,14 @@
 	- [doc] Mention templates as feature of podtohtml.
 
 
-0.005   2018-09-11 (PERLANCAR)
+0.005   2018-09-11  Released-By: PERLANCAR
 
 	- Add templating functionality to give an idea how the rendered POD will
 	  look on various sites (MetaCPAN, search.cpan.org, perldoc.perl.org).
 	  Warning: currently very rough and quick-and-dirty implementation.
 
 
-0.004   2018-09-11 (PERLANCAR)
+0.004   2018-09-11  Released-By: PERLANCAR
 
 	- [ux] Add short option shortcuts for --infile (-i), --outfile
 	  (-o), --browser (-b).
@@ -31,13 +45,13 @@
           the generation of argument validation code.
 
 
-0.003   2018-09-10 (PERLANCAR)
+0.003   2018-09-10  Released-By: PERLANCAR
 
 	- [ux] Use inline Perinci::CmdLine to minimize dependency, skip
 	  reading config & env.
 
 
-0.002   2017-02-06 (PERLANCAR)
+0.002   2017-02-06  Released-By: PERLANCAR
 
 	- [ux] Replace perl_modname_or_filename schema with the newer
 	  perl::pod_or_pm_filename which will do the coercion of Foo::Bar
@@ -47,6 +61,6 @@
 	  exists).
 
 
-0.001   2017-01-31 (PERLANCAR)
+0.001   2017-01-31  Released-By: PERLANCAR
 
         - First release.

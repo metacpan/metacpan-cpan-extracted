@@ -8,7 +8,7 @@ use Math::BigInt::Lib 1.999801;
 
 our @ISA = qw< Math::BigInt::Lib >;
 
-our $VERSION = '0.0004';
+our $VERSION = '0.0006';
 
 use Math::GMPz qw< :mpz >;
 
@@ -171,32 +171,44 @@ sub _modpow {
 }
 
 sub _rsft {
-    # (X, Y, N) = @_; means X >> Y in base N
+    # (X, N, B) = @_; means X >> N in base B (= X / B^N)
+
+    # N must be an unsigned integer.
+    my $n = ref($_[2]) ? Rmpz_get_ui($_[2]) : $_[2];
+
     if ($_[3] == 2) {
-        Rmpz_div_2exp($_[1], $_[1], $_[2]);
+        Rmpz_div_2exp($_[1], $_[1], $n);
     } else {
-        # N must be an unsigned integer
-        my $n = Rmpz_init_set_ui($_[3]);
-        # Y must be a Math::GMPz
-        my $y = Rmpz_get_ui($_[2]);
-        Rmpz_pow_ui($n, $n, $y);
-        Rmpz_div($_[1], $_[1], $n);
+
+        # B must be a Math::GMPz object.
+        my $b = ref($_[3]) ? $_[3] : Rmpz_init_set_ui($_[3]);
+
+        my $p = Rmpz_init();
+        Rmpz_pow_ui($p, $b, $n);        # $p = $b**$n
+
+        Rmpz_div($_[1], $_[1], $p);
     }
+
     return $_[1];
 }
 
 sub _lsft {
-    # (X, Y, N) = @_; means X << Y in base N (= X * N^Y)
+    # (X, N, B) = @_; means X << N in base B (= X * B^N)
+
+    # N must be an unsigned integer.
+    my $n = ref($_[2]) ? Rmpz_get_ui($_[2]) : $_[2];
+
     if ($_[3] == 2) {
-        Rmpz_mul_2exp($_[1], $_[1], $_[2]);
+        Rmpz_mul_2exp($_[1], $_[1], $n);
     } else {
-        # N must be an unsigned integer
-        my $n = Rmpz_init_set_ui($_[3]);
-        # Y must be a Math::GMPz
-        my $y = Rmpz_get_ui($_[2]);
-        #$_[1] = $_[1] * $n ** $y;
-        Rmpz_pow_ui($n, $n, $y);
-        Rmpz_mul($_[1], $_[1], $n);
+
+        # B must be a Math::GMPz object.
+        my $b = ref($_[3]) ? $_[3] : Rmpz_init_set_ui($_[3]);
+
+        my $p = Rmpz_init();
+        Rmpz_pow_ui($p, $b, $n);        # $p = $b**$n
+
+        Rmpz_mul($_[1], $_[1], $p);
     }
     return $_[1];
 }
@@ -405,7 +417,7 @@ __END__
 
 =head1 NAME
 
-Math::BigInt::GMPz - Use Math::GMPz for Math::BigInt routines
+Math::BigInt::GMPz - a math backend library based on Math::GMPz
 
 =head1 SYNOPSIS
 
@@ -559,13 +571,13 @@ The following methods are implemented.
 Please report any bugs or feature requests to
 C<bug-math-bigint-gmpz at rt.cpan.org>, or through the web interface at
 L<https://rt.cpan.org/Ticket/Create.html?Queue=Math-BigInt-GMPz>
-(requires login).
-We will be notified, and then you'll automatically be notified of progress on
-your bug as I make changes.
+(requires login). We will be notified, and then you'll automatically be
+notified of progress on your bug as I make changes.
 
 =head1 SUPPORT
 
-You can find documentation for this module with the perldoc command.
+After installing, you can find documentation for this module with the perldoc
+command.
 
     perldoc Math::BigInt::GMPz
 
@@ -573,50 +585,32 @@ You can also look for information at:
 
 =over 4
 
-=item * RT: CPAN's request tracker
+=item GitHub
 
-L<https://rt.cpan.org/Public/Dist/Display.html?Name=Math-BigInt-GMPz>
+L<https://github.com/pjacklam/p5-Math-BigInt-GMPz>
 
-=item * AnnoCPAN: Annotated CPAN documentation
+=item RT: CPAN's request tracker
 
-L<http://annocpan.org/dist/Math-BigInt-GMPz>
+L<https://rt.cpan.org/Dist/Display.html?Name=Math-BigInt-GMPz>
 
-=item * CPAN Ratings
+=item MetaCPAN
 
-L<http://cpanratings.perl.org/dist/Math-BigInt-GMPz>
+L<https://metacpan.org/release/Math-BigInt-GMPz>
 
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/Math-BigInt-GMPz/>
-
-=item * CPAN Testers Matrix
+=item CPAN Testers Matrix
 
 L<http://matrix.cpantesters.org/?dist=Math-BigInt-GMPz>
 
-=item * The Bignum mailing list
+=item CPAN Ratings
 
-=over 4
-
-=item * Post to mailing list
-
-C<bignum at lists.scsys.co.uk>
-
-=item * View mailing list
-
-L<http://lists.scsys.co.uk/pipermail/bignum/>
-
-=item * Subscribe/Unsubscribe
-
-L<http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/bignum>
-
-=back
+L<https://cpanratings.perl.org/dist/Math-BigInt-GMPz>
 
 =back
 
 =head1 LICENSE
 
-This program is free software; you may redistribute it and/or modify it
-under the same terms as Perl itself.
+This program is free software; you may redistribute it and/or modify it under
+the same terms as Perl itself.
 
 =head1 AUTHOR
 

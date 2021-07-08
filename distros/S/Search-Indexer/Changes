@@ -1,5 +1,8 @@
 Revision history for Perl extension Search::Indexer.
 
+1.01 01.07.2021
+  - bug fix : CORE::fc did not compile with perl versions < 5.016
+
 1.0  29.06.2021
   - new algorithm (Okapi bm25) for relevancy scores, like ElasticSearch or SQLite FTS5
   - default tokenizer now relies on unicode \p{Word}

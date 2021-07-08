@@ -17,21 +17,9 @@ name: Tickit-Widget-Menu
 provides:
   Tickit::Widget::Menu:
     file: lib/Tickit/Widget/Menu.pm
-    version: '0.12'
-  Tickit::Widget::Menu::Item:
-    file: lib/Tickit/Widget/Menu/Item.pm
-    version: '0.12'
-  Tickit::Widget::Menu::base:
-    file: lib/Tickit/Widget/Menu/base.pm
-    version: '0.12'
-  Tickit::Widget::Menu::itembase:
-    file: lib/Tickit/Widget/Menu/itembase.pm
-    version: '0.12'
-  Tickit::Widget::MenuBar:
-    file: lib/Tickit/Widget/MenuBar.pm
-    version: '0.12'
+    version: '0.13'
 requires:
-  Object::Pad: '0.33'
+  Object::Pad: '0.42'
   Tickit::RenderBuffer: '0.43'
   Tickit::Test: '0'
   Tickit::Widget: '0.36'
@@ -40,5 +28,5 @@ requires:
 resources:
   IRC: irc://irc.freenode.net/#tickit
   license: http://dev.perl.org/licenses/
-version: '0.12'
+version: '0.13'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

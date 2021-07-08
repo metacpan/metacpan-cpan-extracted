@@ -1,7 +1,7 @@
 do { my $x = {
        'configure' => {
                         'requires' => {
-                                        'ExtUtils::MakeMaker' => '0'
+                                        'ExtUtils::MakeMaker' => '6.78'
                                       }
                       },
        'develop' => {
@@ -37,6 +37,7 @@ do { my $x = {
                                       'Sys::Hostname' => '0',
                                       'Throwable::Error' => '0.200003',
                                       'Try::Tiny' => '0',
+                                      'perl' => '5.012',
                                       'strict' => '0',
                                       'utf8' => '0',
                                       'warnings' => '0'

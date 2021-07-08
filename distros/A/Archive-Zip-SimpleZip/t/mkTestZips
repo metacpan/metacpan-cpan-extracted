@@ -20,7 +20,7 @@ mkdir $testZips;
 
 if (1)
 {
- 
+
     # Create a zip file that has exactly 64k members
     # but is not a zip64 archive
 
@@ -55,9 +55,9 @@ if (1)
     my $filename = "$testZips/test64k.zip" ;
 
     my $z = new Archive::Zip::SimpleZip $filename, Zip64 => 0, Minimal => 1 ;
-    
+
     for my $name (1 .. 0xFFFF )
-    {     
+    {
         $z->addString($name, Name => $name, Method => ZIP_CM_STORE);
     }
     $z->close() ;
@@ -70,9 +70,9 @@ if (1)
     my $filename = "$testZips/test64k-plus1.zip" ;
 
     my $z = new Archive::Zip::SimpleZip $filename, Zip64 => 1, Minimal => 1 ;
-    
+
     for my $name (1 .. 0xFFFF + 1 )
-    {     
+    {
         $z->addString($name, Name => $name, Method => ZIP_CM_STORE);
     }
     $z->close() ;
@@ -91,7 +91,7 @@ if (1)
     {
         my $zipfile = "$testZips/big1.zip";
         my $zip = new IO::Compress::Zip $zipfile,
-                                    Name => "first", 
+                                    Name => "first",
                                     Stream => 0,
                                     Sparse => $size,
                                     Method => ZIP_CM_STORE,
@@ -100,7 +100,7 @@ if (1)
         # isa_ok $zip, "IO::Compress::Zip";
         $zip->newStream(Name => "second", Sparse => 0, Comment => "c2");
         print $zip "data";
-        $zip->close();    
+        $zip->close();
     }
 }
 
@@ -118,7 +118,7 @@ if (1)
     {
         my $zipfile = "$testZips/big2.zip";
         my $zip = new IO::Compress::Zip $zipfile,
-                                    Name => "first", 
+                                    Name => "first",
                                     Stream => 0,
                                     Sparse => $size,
                                     Method => ZIP_CM_STORE,
@@ -128,8 +128,8 @@ if (1)
         print $zip "data";
         $zip->newStream(Name => "third", Sparse => $size);
         $zip->newStream(Name => "fourth", Sparse => 0);
-        print $zip "fore";        
-        $zip->close();    
+        print $zip "fore";
+        $zip->close();
     }
 }
 

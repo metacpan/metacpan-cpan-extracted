@@ -1,4 +1,4 @@
-package Dist::Zilla::Chrome::Term 6.022;
+package Dist::Zilla::Chrome::Term 6.023;
 # ABSTRACT: chrome used for terminal-based interaction
 
 use Moose;
@@ -221,18 +221,19 @@ Dist::Zilla::Chrome::Term - chrome used for terminal-based interaction
 
 =head1 VERSION
 
-version 6.022
+version 6.023
 
 =head1 OVERVIEW
 
 This class provides a L<Dist::Zilla::Chrome> implementation for use in a
 terminal environment.  It's the default chrome used by L<Dist::Zilla::App>.
 
-=head1 PERL VERSION SUPPORT
+=head1 PERL VERSION
 
-This module has the same support period as perl itself:  it supports the two
-most recent versions of perl.  (That is, if the most recently released version
-is v5.40, then this module should work on both v5.40 and v5.38.)
+This module should work on any version of perl still receiving updates from
+the Perl 5 Porters.  This means it should work on any version of perl released
+in the last two to three years.  (That is, if the most recently released
+version is v5.40, then this module should work on both v5.40 and v5.38.)
 
 Although it may work on older versions of perl, no guarantee is made that the
 minimum required version will not be increased.  The version may be increased

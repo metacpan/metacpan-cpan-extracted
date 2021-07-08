@@ -36,3 +36,4 @@
 2021-06-26  1.21    - fix link to issues
 2021-06-29  1.22    - replace re::is_regexp to ref() check for older perl versions
 2021-06-29  1.23    - fix "Search pattern not terminated"
+2021-07-06  1.24    - more Kwalitee fixes

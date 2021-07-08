@@ -22,7 +22,7 @@
         "use_toybroker" :  1,
 
         "workers" : {
-            "MyWorker" : { "workers_count" : 4 },
+            "MyWorker" : { "worker_count" : 4 },
         },
     },
 ]

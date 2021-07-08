@@ -3,7 +3,9 @@ use Test2::V0;
 use lib 't/lib';
 use Test2::Licensecheck;
 
-plan 38;
+my $ver = $Regexp::Pattern::License::VERSION;
+
+plan 37;
 
 license_is( 't/devscripts/academic.h',      'AFL-3.0' );
 license_is( 't/grant/Apache/one_helper.rb', 'Apache-2.0' );
@@ -16,7 +18,10 @@ license_is(
 	'Artistic-2.0'
 );
 license_is( 't/devscripts/beerware.cpp', 'Beerware' );
-license_is( 't/devscripts/bsd-1-clause-1.c', [ 'UNKNOWN', 'BSD~1-clause' ] );
+license_is(
+	't/devscripts/bsd-1-clause-1.c',
+	$ver >= v3.6 ? 'BSD-1-Clause' : 'UNKNOWN'
+);
 license_is( 't/devscripts/bsd.f', 'BSD-2-clause' );
 license_is(
 	[   qw(

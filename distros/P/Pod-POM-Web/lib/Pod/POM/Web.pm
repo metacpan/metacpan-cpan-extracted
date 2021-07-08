@@ -31,7 +31,7 @@ use Pod::POM::Web::Util qw/slurp_native_or_utf8 parse_version extract_POM_items/
 # GLOBAL VARIABLES
 #---------------------------------------------------------------------
 
-our $VERSION = '1.26';
+our $VERSION = '1.27';
 
 # directories for modules -- filter @INC (we don't want '.', nor server_root added by mod_perl)
 my $server_root = eval {Apache2::ServerUtil::server_root()} || "";
@@ -1365,7 +1365,7 @@ sub find_module {
 
 sub find_script {
   my ($self, $path) = @_;
-  return $self->find_files(script_dirs => $path, "$path.pl", "path.bat");
+  return $self->find_files(script_dirs => $path, "$path.pl", "$path.bat");
 }
 
 sub find_files {

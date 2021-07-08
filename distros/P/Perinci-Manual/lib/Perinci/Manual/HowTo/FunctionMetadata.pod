@@ -1,0 +1,100 @@
+package Perinci::Manual::HowTo::FunctionMetadata; # just to make podweaver happy
+
+# AUTHORITY
+# DATE
+our $DIST = 'Perinci-Manual'; # DIST
+# VERSION
+
+1;
+# ABSTRACT: How-to guides related to function metadata
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Perinci::Manual::HowTo::FunctionMetadata - How-to guides related to function metadata
+
+=head1 VERSION
+
+This document describes version 0.003 of Perinci::Manual::HowTo::FunctionMetadata (from Perl distribution Perinci-Manual), released on 2021-07-02.
+
+=head2 HIDING ARGUMENT
+
+To make an argument "hidden", you can add either a C<hidden>, C<hidden-cli>, or
+C<hidden-mod> to the C<tags> property. This will have the following effects:
+
+=over
+
+=item * L<Perinci::To::POD> (as well as its sisters like L<Perinci::To::Text>, L<Perinci::To::HTML>) will not list the argument in the generated documentation
+
+This is for C<hidden> or C<hidden-mod> tag.
+
+=item * L<Perinci::Sub::To::CLIDocData> (which is used by L<Perinci::CmdLine>) will not list the arguments in the CLI documentation as well as --help message
+
+This is for C<hidden> or C<hidden-cli> tag.
+
+=back
+
+So with C<hidden-cli> or C<hidden-mod> you can hide arguments from CLI-only or
+module POD only.
+
+=head1 HIDING FUNCTION
+
+To make a function "hidden", you can set C<x.no_index> attribute to true, or add
+a C<hidden> tag to the C<tags> property. This will have the following effects:
+
+=over
+
+=item * L<Perinci::To::POD> (as well as its sisters like L<Perinci::To::Text>, L<Perinci::To::HTML>) will not list the function in the generated documentation
+
+If you use the L<Pod::Weaver> plugin L<Pod::Weaver::Plugin::Rinci>, the
+generated POD documentation for your module will also skip the function, making
+the function undocumented in the POD.
+
+=item * L<Perinci::Access::Schemeless>, L<Perinci::Access::Perl>, as well as other C<Perinci::Access::*> modules which uses the former (like L<Perinci::Access::HTTP::Server>) will not list the function
+
+When you issue a C<list> CL<Riap> request to one of these modules, the function
+will not be listed in the package it is in.
+
+=back
+
+Keywords: undocumented, documentation
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/Perinci-Manual>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-Perinci-Manual>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-Manual>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+More specific how-to guides can be found in
+C<Perinci::Manual::HowTo::FunctionMetadata::XXX>, e.g.
+L<Perinci::Manual::HowTo::FunctionMetadata::Examples>
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2021 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

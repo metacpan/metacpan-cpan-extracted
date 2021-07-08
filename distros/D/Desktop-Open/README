@@ -1,0 +1,61 @@
+NAME
+    Desktop::Open - Open a file or URL in the user's preferred application
+
+VERSION
+    This document describes version 0.001 of Desktop::Open (from Perl
+    distribution Desktop-Open), released on 2021-07-02.
+
+SYNOPSIS
+     use Desktop::Open qw(open_desktop);
+     my $ok = open_desktop($path_or_url);
+     # !defined($ok);       no recognized command found
+     # $ok == 0;            command found and executed
+     # $ok != 0;            command found, error while executing
+
+DESCRIPTION
+    This module tries to open specified file or URL in the user's preferred
+    application. Here's how it does it.
+
+    1. If on Windows, use "start". If on other OS, use "xdg-open" if
+    available.
+
+    2. If #1 fails, resort to using Browser::Open's "open_browser". Return
+    its return value.
+
+    TODO: On OSX, use "openit". Any taker?
+
+FUNCTIONS
+  open_desktop
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Desktop-Open>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Desktop-Open>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Desktop-Open>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Browser::Open, on which our module is modelled upon.
+
+    Open::This also tries to do "The Right Thing" when opening files, but
+    it's heavily towards text editor and git/GitHub.
+
+    App::Open and its CLI openit also attempt to open file using appropriate
+    file. It requires setting up a configuration file to run.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2021 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

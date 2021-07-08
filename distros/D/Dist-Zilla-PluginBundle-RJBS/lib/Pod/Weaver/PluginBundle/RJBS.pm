@@ -1,6 +1,6 @@
 use v5.20.0;
 use warnings;
-package Pod::Weaver::PluginBundle::RJBS 5.019;
+package Pod::Weaver::PluginBundle::RJBS 5.020;
 # ABSTRACT: RJBS's default Pod::Weaver config
 
 #pod =head1 OVERVIEW
@@ -34,8 +34,8 @@ sub mvp_bundle_config {
     [ '@RJBS/Stability',   _exp('Generic'), { header      => 'STABILITY'   } ],
   );
 
-  if (my $perl_support = $Dist::Zilla::PluginBundle::RJBS::perl_support) {
-    push @plugins, $self->_perl_support_plugin($perl_support);
+  if (my $perl_window = $Dist::Zilla::PluginBundle::RJBS::perl_window) {
+    push @plugins, $self->_perl_window_plugin($perl_window);
   }
 
   for my $plugin (
@@ -59,9 +59,9 @@ sub mvp_bundle_config {
   return @plugins;
 }
 
-my %SUPPORT;
+my %WINDOW;
 
-$SUPPORT{toolchain} = <<'END';
+$WINDOW{toolchain} = <<'END';
 This module is part of CPAN toolchain, or is treated as such.  As such, it
 follows the agreement of the Perl Toolchain Gang to require no newer version of
 perl than v5.8.1.  This version may change by agreement of the Toolchain Gang,
@@ -70,11 +70,13 @@ Consensus|https://github.com/Perl-Toolchain-Gang/toolchain-site/blob/master/lanc
 of 2013.
 END
 
-$SUPPORT{none} = <<'END';
+$WINDOW{none} = <<'END';
 This code is effectively abandonware.  Although releases will sometimes be made
 to update contact info or to fix packaging flaws, bug reports will mostly be
 ignored.  Feature requests are even more likely to be ignored.  (If someone
 takes up maintenance of this code, they will presumably remove this notice.)
+This means that whatever version of perl is currently required is unlikely to
+change -- but also that it might change at any new maintainer's whim.
 END
 
 my $STOCK = <<'END';
@@ -84,24 +86,25 @@ for any reason, and there is no promise that patches will be accepted to lower
 the minimum required perl.
 END
 
-$SUPPORT{extreme} = <<"END";
-This module has an extremely long-term perl support period.  That means it will
-not require a version of perl released fewer than ten years ago.
+$WINDOW{extreme} = <<"END";
+This library should run on perls released even an extremely long time ago.  It
+should work on any version of perl released in the last ten years.
 
 $STOCK
 END
 
-$SUPPORT{'long-term'} = <<"END";
-This module has a long-term perl support period.  That means it will not
-require a version of perl released fewer than five years ago.
+$WINDOW{'long-term'} = <<"END";
+This library should run on perls released even a long time ago.  It should work
+on any version of perl released in the last five years.
 
 $STOCK
 END
 
-$SUPPORT{standard} = <<"END";
-This module has the same support period as perl itself:  it supports the two
-most recent versions of perl.  (That is, if the most recently released version
-is v5.40, then this module should work on both v5.40 and v5.38.)
+$WINDOW{standard} = <<"END";
+This module should work on any version of perl still receiving updates from
+the Perl 5 Porters.  This means it should work on any version of perl released
+in the last two to three years.  (That is, if the most recently released
+version is v5.40, then this module should work on both v5.40 and v5.38.)
 
 $STOCK
 END
@@ -109,7 +112,7 @@ END
 # To be used almost exclusively on stuff that I write for my own use and ship
 # to CPAN as a matter of convenience, rather than for libraries I expect to
 # become part of anyone's software stack. -- rjbs, 2021-04-03
-$SUPPORT{'no-mercy'} = <<"END";
+$WINDOW{'no-mercy'} = <<"END";
 This module is shipped with no promise about what version of perl it will
 require in the future.  In practice, this tends to mean "you need a perl from
 the last three years," but you can't rely on that.  If a new version of perl
@@ -117,17 +120,17 @@ ship, this software B<may> begin to require it for any reason, and there is no
 promise that patches will be accepted to lower the minimum required perl.
 END
 
-sub _perl_support_plugin {
+sub _perl_window_plugin {
   my ($self, $name) = @_;
 
-  Carp::confess("unknown perl support level $name") unless exists $SUPPORT{$name};
+  Carp::confess("unknown perl window $name") unless exists $WINDOW{$name};
 
   return [
     '@RJBS/PerlSupport',
     _exp('GenerateSection'),
     {
-      title  => 'PERL VERSION SUPPORT',
-      text   => [ split /\n/, $SUPPORT{$name} ],
+      title  => 'PERL VERSION',
+      text   => [ split /\n/, $WINDOW{$name} ],
     }
   ];
 }
@@ -146,7 +149,7 @@ Pod::Weaver::PluginBundle::RJBS - RJBS's default Pod::Weaver config
 
 =head1 VERSION
 
-version 5.019
+version 5.020
 
 =head1 OVERVIEW
 
@@ -164,7 +167,7 @@ C<-Transformer> with L<Pod::Elemental::Transformer::List>
 
 =back
 
-=head1 PERL VERSION SUPPORT
+=head1 PERL VERSION
 
 This module is shipped with no promise about what version of perl it will
 require in the future.  In practice, this tends to mean "you need a perl from

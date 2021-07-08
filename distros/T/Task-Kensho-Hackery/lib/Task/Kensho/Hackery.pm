@@ -1,9 +1,9 @@
 use strict;
 use warnings;
-package Task::Kensho::Hackery; # git description: v0.39-54-g424b360
+package Task::Kensho::Hackery; # git description: v0.40-26-g1a5de71
 # ABSTRACT: A Glimpse at an Enlightened Perl: Script Hackery
 
-our $VERSION = '0.40';
+our $VERSION = '0.41';
 
 __END__
 
@@ -17,7 +17,7 @@ Task::Kensho::Hackery - A Glimpse at an Enlightened Perl: Script Hackery
 
 =head1 VERSION
 
-version 0.40
+version 0.41
 
 =head1 SYNOPSIS
 
@@ -66,7 +66,7 @@ facilitates the ease and simplicity the distribution aims to achieve.
 
 =head1 RECOMMENDED MODULES
 
-=for stopwords whippitupitude Hackery
+=for stopwords whippitupitude Hackery Mojo
 
 =head2 L<Task::Kensho::Hackery>: Script Hackery
 
@@ -83,6 +83,10 @@ Comments that do more than just sit there
 =head3 L<Term::ProgressBar::Simple>
 
 Simple progress bars
+
+=head3 L<ojo>
+
+Fun one-liners with Mojo
 
 =head1 INSTALLING
 
@@ -110,7 +114,7 @@ starting place on the road to Enlightened Perl programming.
 Please report any bugs or feature requests to
 L<https://github.com/EnlightenedPerlOrganisation/task-kensho/issues>.
 
-bugs may be submitted through L<https://github.com/EnlightenedPerlOrganisation/task-kensho/issues>.
+Bugs may be submitted through L<https://github.com/EnlightenedPerlOrganisation/task-kensho/issues>.
 
 There is also an irc channel available for users of this distribution, at
 L<C<#epo> on C<irc.perl.org>|irc://irc.perl.org/#epo>.
@@ -121,7 +125,7 @@ Chris Prather <chris@prather.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Karen Etheridge Leo Lapworth Chris Nehren Olaf Alders Dan Book Rachel Kelly Shawn Sorichetti Rick Leir
+=for stopwords Karen Etheridge Leo Lapworth Dan Book Chris Nehren Mohammad S Anwar Olaf Alders Rachel Kelly Shawn Sorichetti Rick Leir Tina Müller
 
 =over 4
 
@@ -135,7 +139,15 @@ Leo Lapworth <leo@cuckoo.org>
 
 =item *
 
+Dan Book <grinnz@grinnz.com>
+
+=item *
+
 Chris Nehren <apeiron@cpan.org>
+
+=item *
+
+Mohammad S Anwar <mohammad.anwar@yahoo.com>
 
 =item *
 
@@ -156,6 +168,10 @@ Shawn Sorichetti <shawn@coloredblocks.com>
 =item *
 
 Rick Leir <rleir@leirtech.com>
+
+=item *
+
+Tina Müller <cpan2@tinita.de>
 
 =back
 

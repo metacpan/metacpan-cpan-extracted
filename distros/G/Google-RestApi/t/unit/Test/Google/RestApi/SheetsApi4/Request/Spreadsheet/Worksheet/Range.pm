@@ -1,9 +1,16 @@
-package Test::Google::RestApi::SheetsApi4::Range;
+package Test::Google::RestApi::SheetsApi4::Request::Spreadsheet::Worksheet::Range;
 
 use YAML::Any qw(Dump);
 use Test::Most;
 
-use parent qw(Test::Class Test::Google::RestApi::SheetsApi4::Range::Base);
+use Utils qw(:all);
+use Test::Mock::Worksheet;
+
+use aliased 'Google::RestApi::SheetsApi4::Range';
+
+use parent qw(Test::Class Test::Google::RestApi::SheetsApi4::Base);
+
+sub class { 'Google::RestApi::SheetsApi4::Request::Spreadsheet::Worksheet::Range' }
 
 my $index = {
   sheetId          => 'mock_worksheet_id',
@@ -43,10 +50,10 @@ sub range_text_format : Tests(29) {
   _range_text_format_color($cell, $range, 'green', 0);
   _range_text_format_color($cell, $range, 'alpha', .5);
 
-  lives_ok sub { $range->
+  isa_ok $range->
     bold()->italic()->strikethrough()->underline()->
-    red()->blue(0.2)->green(0)->font_family('joe')->font_size(1.1);
-  }, "Build all for text format should succeed";
+    red()->blue(0.2)->green(0)->font_family('joe')->font_size(1.1),
+    Range, "Build all for text format";
   my @requests = $range->batch_requests();
   is scalar @requests, 1, "Batch requests should have one entry.";
   is_deeply $requests[0], $cell, "Build all should be same as previous build";
@@ -54,7 +61,7 @@ sub range_text_format : Tests(29) {
   _range_text_format_color($cell, $range, 'white');
   _range_text_format_color($cell, $range, 'black');
 
-  lives_ok sub { $range->submit_requests(); }, "Submit text format request should succeed";
+  is_hash $range->submit_requests(), "Submit text format request";
   is scalar $range->batch_requests(), 0, "Batch requests should have been emptied";
 
   return;
@@ -129,7 +136,7 @@ sub range_background_color : Tests(13) {
   _range_background_color($cell, $range, 'white', 1, [qw(red blue green alpha)]);
   _range_background_color($cell, $range, 'black', 0, [qw(red blue green)]);
 
-  lives_ok sub { $range->bk_white()->bk_black(); }, "Background white/black should succeed";
+  isa_ok $range->bk_white()->bk_black(), Range, "Background white/black";
 
   return;
 }
@@ -331,7 +338,7 @@ sub range_border_colors : Tests(13) {
   _range_border_colors($cell, $range, 'white', 1, [qw(red blue green alpha)]);
   _range_border_colors($cell, $range, 'black', 0, [qw(red blue green)]);
 
-  lives_ok sub { $range->bd_white('top')->bd_black('top'); }, "Border white/black should succeed";
+  isa_ok $range->bd_white('top')->bd_black('top'), Range, "Border white/black";
 
   return;
 }
@@ -381,7 +388,7 @@ sub range_border_cells : Tests(7) {
   throws_ok { $range->bd_red('vertical'); } $err, "Turning on border vertical when repeat cell is on should die";
   throws_ok { $range->bd_red('horizontal'); } $err, "Turning on border horizontal when repeat cell is on should die";
 
-  lives_ok sub { $range->bd_red('top'); }, "Border red repeat cell should live";
+  isa_ok $range->bd_red('top'), Range, "Border red repeat cell";
   @requests = $range->batch_requests();
   is scalar $range->batch_requests(), 1, "Batch requests should have one entry.";
   $borders->{top}->{color}->{red} = 1;
@@ -424,6 +431,13 @@ sub range_merge : Tests(6) {
 
   return;
 }
+
+sub new_range {
+  my $self = shift;
+  return Range->new(worksheet => $self->worksheet(), range => shift);
+}
+
+sub worksheet : Test(setup) { shift->{worksheet} = Test::Mock::Worksheet->new(); }
 
 sub _add_field {
   my ($cell, $field) = (@_);

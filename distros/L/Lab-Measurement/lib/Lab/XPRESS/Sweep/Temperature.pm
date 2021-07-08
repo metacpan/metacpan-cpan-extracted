@@ -1,6 +1,6 @@
 package Lab::XPRESS::Sweep::Temperature;
 #ABSTRACT: Temperature sweep
-$Lab::XPRESS::Sweep::Temperature::VERSION = '3.760';
+$Lab::XPRESS::Sweep::Temperature::VERSION = '3.762';
 use v5.20;
 
 use Lab::XPRESS::Sweep;
@@ -409,7 +409,7 @@ Lab::XPRESS::Sweep::Temperature - Temperature sweep
 
 =head1 VERSION
 
-version 3.760
+version 3.762
 
 =head1 SYNOPSIS
 
@@ -580,11 +580,11 @@ probably none
 
 This software is copyright (c) 2021 by the Lab::Measurement team; in detail:
 
-  Copyright 2013       Andreas K. HÃ¼ttel, Christian Butschkow, Stefan Geissler
+  Copyright 2013       Andreas K. Huettel, Christian Butschkow, Stefan Geissler
             2014       Christian Butschkow
             2015       Alois Dirnaichner
-            2016-2017  Andreas K. HÃ¼ttel, Simon Reinhardt
-            2020       Andreas K. HÃ¼ttel
+            2016-2017  Andreas K. Huettel, Simon Reinhardt
+            2020       Andreas K. Huettel
 
 
 This is free software; you can redistribute it and/or modify it under

@@ -20,7 +20,9 @@ diag("");
 diag(sprintf("%12s %s\n", 'Version', 'Module'));
 diag(sprintf("%12s %s\n", '-------', '------'));
 for my $mod (@mods) {
-    diag(sprintf("%12s %s\n", $mod -> VERSION, $mod));
+    my $ver = $mod -> VERSION();
+    my $str = defined($ver) ? $ver : 'undef';
+    diag(sprintf("%12s %s\n", $str, $mod));
 }
 
 my $pari_ver_exp    = Math::Pari::pari_version_exp();

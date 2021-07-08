@@ -3,7 +3,7 @@ package Beekeeper::Worker;
 use strict;
 use warnings;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 use Beekeeper::Client ':worker';
 use Beekeeper::Logger ':log_levels';
@@ -17,8 +17,6 @@ use Scalar::Util 'blessed';
 use Carp;
 
 use constant COMPILE_ERROR_EXIT_CODE => 99;
-use constant REPORT_STATUS_PERIOD    => 5;
-use constant UNSUBSCRIBE_LINGER      => 2;
 use constant BKPR_REQUEST_AUTHORIZED => int(rand(90000000)+10000000);
 
 use Exporter 'import';
@@ -36,6 +34,7 @@ our @EXPORT_OK = qw(
     log_info
     log_debug
     log_trace
+    log_level
 );
 
 our %EXPORT_TAGS = ('log' => [ @EXPORT_OK, @EXPORT ]);
@@ -53,9 +52,13 @@ sub log_notice   (@) { $LogLevel >= LOG_NOTICE && $Logger->( LOG_NOTICE, @_ ) }
 sub log_info     (@) { $LogLevel >= LOG_INFO   && $Logger->( LOG_INFO,   @_ ) }
 sub log_debug    (@) { $LogLevel >= LOG_DEBUG  && $Logger->( LOG_DEBUG,  @_ ) }
 sub log_trace    (@) { $LogLevel >= LOG_TRACE  && $Logger->( LOG_TRACE,  @_ ) }
+sub log_level   (;$) { $LogLevel =  shift      if scalar @_; return $LogLevel }
 
 our $BUSY_SINCE; *BUSY_SINCE = \$Beekeeper::MQTT::BUSY_SINCE;
 our $BUSY_TIME;  *BUSY_TIME  = \$Beekeeper::MQTT::BUSY_TIME;
+
+our $REPORT_STATUS_PERIOD = 5;
+our $UNSUBSCRIBE_LINGER   = 2;
 
 my %AUTH_TOKENS;
 my $JSON;
@@ -90,9 +93,11 @@ sub new {
         task_queue_high => [],
         task_queue_low  => [],
         queued_tasks    => 0,
+        in_progress     => 0,
         last_report     => 0,
-        calls_count     => 0,
+        call_count      => 0,
         notif_count     => 0,
+        error_count     => 0,
         busy_time       => 0,
     };
 
@@ -128,8 +133,8 @@ sub new {
     };
 
     if ($@) {
-        log_error "Worker died while initialization: $@";
-        log_error "$class could not be started";
+        log_fatal "Worker died while initialization: $@";
+        log_fatal "$class could not be started";
         CORE::exit( COMPILE_ERROR_EXIT_CODE );
     }
 
@@ -224,8 +229,8 @@ sub __init_worker {
     AnyEvent->now_update;
 
     $self->{_WORKER}->{report_status_timer} = AnyEvent->timer(
-        after    => rand( REPORT_STATUS_PERIOD ), 
-        interval => REPORT_STATUS_PERIOD,
+        after    => rand( $REPORT_STATUS_PERIOD ), 
+        interval => $REPORT_STATUS_PERIOD,
         cb       => sub { $self->__report_status },
     );
 }
@@ -234,7 +239,7 @@ sub __init_worker {
 sub on_startup {
     # Placeholder, intended to be overrided
     my $class = ref $_[0];
-    log_warn "Worker class $class doesn't define on_startup() method";
+    log_fatal "Worker class $class doesn't define on_startup() method";
 }
 
 sub on_shutdown {
@@ -244,7 +249,7 @@ sub on_shutdown {
 sub authorize_request {
     # Placeholder, must to be overrided
     my $class = ref $_[0];
-    log_error "Worker class $class doesn't define authorize_request() method";
+    log_fatal "Worker class $class doesn't define authorize_request() method";
     return undef; # do not authorize
 }
 
@@ -312,7 +317,7 @@ sub __get_cb_coderef {
     else {
         my ($file, $line) = (caller(1))[1,2];
         my $at = "at $file line $line\n";
-        die "Invalid callback '$callback' for '$method' $at";
+        die "Invalid handler '$callback' for '$method' $at";
     }
 }
 
@@ -423,7 +428,7 @@ sub __drain_task_queue {
                 }
 
                 bless $request, 'Beekeeper::JSONRPC::Notification';
-                $request->{_mqtt_prop} = $mqtt_properties;
+                $request->{_mqtt_properties} = $mqtt_properties;
 
                 my $method = $request->{method};
 
@@ -445,7 +450,7 @@ sub __drain_task_queue {
                 }
 
                 unless ($cb) {
-                    log_error "No callback found for received notification '$method'";
+                    log_error "No handler found for received notification '$method'";
                     return;
                 }
 
@@ -455,6 +460,7 @@ sub __drain_task_queue {
             if ($@) {
                 # Got an exception while processing message
                 log_error $@;
+                $worker->{error_count}++;
             }
         }
 
@@ -464,7 +470,7 @@ sub __drain_task_queue {
 
             my ($payload_ref, $mqtt_properties) = @$task;
 
-            $worker->{calls_count}++;
+            $worker->{call_count}++;
             my ($request, $request_id, $result, $response);
 
             $result = eval {
@@ -480,7 +486,7 @@ sub __drain_task_queue {
                 my $method  = $request->{method};
 
                 bless $request, 'Beekeeper::JSONRPC::Request';
-                $request->{_mqtt_prop} = $mqtt_properties;
+                $request->{_mqtt_properties} = $mqtt_properties;
 
                 unless (defined $method && $method =~ m/^([\.\w-]+)\.([\w-]+)$/) {
                     log_error "Received request with invalid method '$method'";
@@ -500,31 +506,40 @@ sub __drain_task_queue {
                 }
 
                 unless ($cb) {
-                    log_error "No callback found for received request '$method'";
+                    log_error "No handler found for received request '$method'";
                     die Beekeeper::JSONRPC::Error->method_not_found;
                 }
 
-                # Execute method callback
+                # Execute method handler
                 $cb->($self, $request->{params}, $request);
             };
 
             if ($@) {
-                # Got an exception while executing method callback
+                # Got an exception while executing method handler
                 if (blessed($@) && $@->isa('Beekeeper::JSONRPC::Error')) {
                     # Handled exception
                     $response = $@;
+                    $worker->{error_count}++;
                 }
                 else {
                     # Unhandled exception
                     log_error $@;
+                    $worker->{error_count}++;
                     $response = Beekeeper::JSONRPC::Error->server_error;
                     # Sending exact error to caller is very handy, but it is also a security risk
-                    $response->{error}->{data} = $@ if $self->{_WORKER}->{debug};
+                    $response->{error}->{data} = $@ if $worker->{debug};
+                    $worker->{error_count}++;
                 }
             }
             elsif (blessed($result) && $result->isa('Beekeeper::JSONRPC::Error')) {
                 # Explicit error response
                 $response = $result;
+                $worker->{error_count}++;
+            }
+            elsif ($request->{_async_response}) {
+                # Response was deferred and will be sent later
+                $worker->{in_progress}++;
+                $request->{_worker} = $self;
             }
             else {
                 # Build a success response
@@ -534,9 +549,9 @@ sub __drain_task_queue {
                 };
             }
 
-            if ($request_id) {
+            if (defined $request_id && defined $response) {
 
-                # Send response back to caller
+                # Send back response to caller
 
                 $response->{id} = $request_id;
 
@@ -550,9 +565,9 @@ sub __drain_task_queue {
                     $json = $JSON->encode( $response );
                 }
 
-                # Request is ack'ed as received just after sending the response. So, if the
-                # process is abruptly interrupted here, the broker will send the request to
-                # another worker and it will be executed twice! (acking the request just before 
+                # Request is acknowledged as received just after sending the response. So, if
+                # the process is abruptly interrupted here, the broker will send the request to
+                # another worker and it will be executed twice (acking the request just before
                 # processing it may cause unprocessed requests or undelivered responses)
 
                 $self->{_BUS}->publish(
@@ -578,7 +593,8 @@ sub __drain_task_queue {
             }
             else {
 
-                # Fire and forget calls doesn't expect responses
+                # Acknowledge requests that doesn't send a response right now (fire & forget calls
+                # and requests handled asynchronously), signaling the broker to send more requests
 
                 $self->{_BUS}->puback(
                     packet_id => $mqtt_properties->{'packet_id'},
@@ -603,6 +619,62 @@ sub __drain_task_queue {
     }
 
     $worker->{queued_tasks} = 0;
+}
+
+sub __send_response {
+    my ($self, $request, $result) = @_;
+
+    # Send back async response to caller
+
+    my ($timing_tasks, $response);
+
+    $self->{_WORKER}->{in_progress}--;
+
+    # fire & forget calls doesn't expect responses
+    return unless defined $request->{id};
+
+    unless (defined $BUSY_SINCE) {
+        $BUSY_SINCE = Time::HiRes::time;
+        $timing_tasks = 1; 
+    }
+
+    if (blessed($result) && $result->isa('Beekeeper::JSONRPC::Error')) {
+        # Explicit error response
+        $response = $result;
+        $self->{_WORKER}->{error_count}++;
+    }
+    else {
+        # Build a success response
+        $response = {
+            jsonrpc => '2.0',
+            result  => $result,
+        };
+    }
+
+    $response->{id} = $request->{id};
+
+    local $@;
+    my $json = eval { $JSON->encode( $response ) };
+
+    if ($@) {
+        # Probably response contains blessed references 
+        log_error "Couldn't serialize response as JSON: $@";
+        $response = Beekeeper::JSONRPC::Error->server_error;
+        $response->{id} = $request->{id};
+        $json = $JSON->encode( $response );
+        $self->{_WORKER}->{error_count}++;
+    }
+
+    $self->{_BUS}->publish(
+        topic    => $request->{_mqtt_properties}->{'response_topic'},
+        addr     => $request->{_mqtt_properties}->{'addr'},
+        payload  => \$json,
+    );
+
+    if (defined $timing_tasks) {
+        $BUSY_TIME += Time::HiRes::time - $BUSY_SINCE;
+        undef $BUSY_SINCE;
+    }
 }
 
 
@@ -639,11 +711,11 @@ sub stop_accepting_notifications {
         # even then wait a bit more, as some brokers may send messages *after* unsubscription.
         my $postpone = sub {
 
-            $worker->{_timers}->{"unsub-$topic"} = AnyEvent->timer( 
-                after => UNSUBSCRIBE_LINGER, cb => sub {
+           my $unsub_tmr; $unsub_tmr = AnyEvent->timer( 
+                after => $UNSUBSCRIBE_LINGER, cb => sub {
 
                     delete $worker->{callbacks}->{"msg.$fq_meth"};
-                    delete $worker->{_timers}->{"unsub-$topic"};
+                    undef $unsub_tmr;
                 }
             );
         };
@@ -709,15 +781,36 @@ sub stop_accepting_calls {
         # bit more, as some brokers may send requests *after* unsubscription.
         my $postpone = sub {
 
-            $worker->{_timers}->{"unsub-$topic"} = AnyEvent->timer( 
-                after => UNSUBSCRIBE_LINGER, cb => sub {
+            $worker->{stop_cv}->begin;
+
+            my $unsub_tmr; $unsub_tmr = AnyEvent->timer( 
+                after => $UNSUBSCRIBE_LINGER, cb => sub {
 
                     delete $worker->{callbacks}->{$_} foreach @cb_keys;
                     delete $worker->{subscriptions}->{$service};
-                    delete $worker->{_timers}->{"unsub-$topic"};
+                    undef $unsub_tmr;
 
-                    # When shutting down tell _work_forever to stop
-                    $worker->{stop_cv}->end if $worker->{shutting_down};
+                    return unless $worker->{shutting_down};
+
+                    if ($worker->{in_progress} > 0) {
+
+                        # The task queue is empty now, but an asynchronous method handler is
+                        # still busy processing some requests received previously. Wait for
+                        # these requests to be completed before telling _work_forever to stop
+
+                        my $wait_time = 60;
+                        $worker->{stop_cv}->begin;
+
+                        my $busy_tmr; $busy_tmr = AnyEvent->timer( after => 1, interval => 1, cb => sub {
+                            unless ($worker->{in_progress} > 0 && --$wait_time > 0) {
+                                undef $busy_tmr;
+                                $worker->{stop_cv}->end;
+                            }
+                        });
+                    }
+
+                    # Tell _work_forever to stop
+                    $worker->{stop_cv}->end;
                 }
             );
         };
@@ -759,7 +852,7 @@ sub __work_forever {
     };
 
     if ($@) {
-        log_error "Worker died: $@";
+        log_fatal "Worker died: $@";
         CORE::exit(255);
     }
 
@@ -776,6 +869,9 @@ sub stop_working {
 
     # This is the default handler for TERM signal
 
+    return if $worker->{shutting_down};
+    $worker->{shutting_down} = 1;
+
     unless (exists $worker->{stop_cv}) {
         # Worker did not completed initialization yet
         CORE::exit(0);
@@ -787,20 +883,18 @@ sub stop_working {
         $services{$1} = 1;
     }
 
-    unless (keys %services) {
-        $worker->{stop_cv}->send;
-        return;
+    if (keys %services) {
+
+        # Cannot exit right now, as some requests could be in flight or already queued.
+        # So tell the broker to stop sending requests, and exit after the task queue is empty
+        foreach my $service (keys %services) {
+
+            $self->stop_accepting_calls( $service . '.*' );
+        }
     }
-
-    $worker->{shutting_down} = 1;
-
-    # Cannot exit right now, as some requests could be in flight or already queued.
-    # So tell the broker to stop sending requests, and exit after the task queue is empty
-    foreach my $service (keys %services) {
-
-        $worker->{stop_cv}->begin;
-
-        $self->stop_accepting_calls( $service . '.*' );
+    else {
+        # Tell _work_forever to stop
+        $worker->{stop_cv}->send;
     }
 }
 
@@ -817,18 +911,20 @@ sub __report_status {
     $worker->{last_report} = $now;
 
     # Average calls per second
-    my $cps = sprintf("%.2f", $worker->{calls_count} / $period);
-    $worker->{calls_count} = 0;
+    my $cps = sprintf("%.2f", $worker->{call_count} / $period);
+    $worker->{call_count} = 0;
 
     # Average notifications per second
     my $nps = sprintf("%.2f", $worker->{notif_count} / $period);
     $worker->{notif_count} = 0;
 
+    # Average errors per second
+    my $err = sprintf("%.2f", $worker->{error_count} / $period);
+    $worker->{error_count} = 0;
+
     # Average load as percentage of wall clock busy time (not cpu usage)
     my $load = sprintf("%.2f", ($BUSY_TIME - $worker->{busy_time}) / $period * 100);
     $worker->{busy_time} = $BUSY_TIME;
-
-    #ENHACEMENT: report handled and unhandled errors count
 
     # Queues
     my %queues;
@@ -850,6 +946,7 @@ sub __report_status {
             pid   => $$,
             cps   => $cps,
             nps   => $nps,
+            err   => $err,
             load  => $load,
             queue => [ keys %queues ],
         },
@@ -892,7 +989,7 @@ Beekeeper::Worker - Base class for creating services
 
 =head1 VERSION
 
-Version 0.06
+Version 0.07
 
 =head1 SYNOPSIS
 
@@ -964,11 +1061,11 @@ It can be overrided as needed, the default implementation does nothing.
 
 =head3 authorize_request( $req )
 
-This method MUST be overrided in worker classes, as the default behavior is
+This method must be overrided in worker classes, as the default behavior is
 to deny the execution of any request.
 
 When a request is received this method is called before executing the corresponding
-callback, and it must return the exported constant C<BKPR_REQUEST_AUTHORIZED> in order
+handler, and it must return the exported constant C<BKPR_REQUEST_AUTHORIZED> in order
 to authorize it. Returning any other value will result in the request being ignored. 
 
 This is the place to handle application authentication and authorization.
@@ -988,12 +1085,13 @@ implementing a C<log> method (see C<Beekeeper::Logger::log> for reference).
 
 For convenience you can import the ':log' symbols and expose to your class the
 functions C<log_fatal>, C<log_alert>, C<log_critical>, C<log_error>, C<log_warn>, 
-C<log_warning>, C<log_notice>, C<log_info>, C<log_debug> and C<log_trace>.
+C<log_warning>, C<log_notice>, C<log_info>, C<log_debug>, C<log_trace> and C<log_level>.
 
 These will call the underlying C<log> method of the logger class if the severity
-is equal or higher than C<$Beekeeper::Worker::LogLevel>, which is set to C<LOG_INFO>
-by default. The log level can be set to C<LOG_DEBUG> with the --debug option of L<bkpr>, 
-or setting a "debug" option to a true value in config file pool.config.json.
+is equal or higher than C<$Beekeeper::Worker::LogLevel>, which is C<LOG_INFO> by 
+default and can be set with C<log_level>. The default level can be set globally to 
+C<LOG_DEBUG> with the --debug option of L<bkpr>, or setting a "debug" option
+to a true value in config file pool.config.json.
 
 Using these functions makes very easy to switch logging backends at a later date.
 
@@ -1002,27 +1100,28 @@ logged (unless their severity is below the current log level).
 
 =head3 RPC call methods
 
-In order to make RPC calls to another services, methods C<send_notification>, 
-C<call_remote>, C<call_remote_async>, C<fire_remote> and C<wait_async_calls> are 
-automatically imported from L<Beekeeper::Client>.
+In order to make RPC calls to another services all methods from L<Beekeeper::Client>
+are imported automatically. Workers can use C<send_notification>, C<call_remote>,
+C<call_remote_async>, C<fire_remote>, C<wait_async_calls>, C<set_authentication_data>
+and C<get_authentication_data> the same as clients.
 
 =head3 accept_notifications ( $method => $callback, ... )
 
-Make this worker start accepting specified notifications from message bus.
+Makes a worker start accepting the specified notifications from the message bus.
 
-C<$method> is a string with the format "{service_class}.{method}". A default
-or fallback handler can be specified using a wildcard as "{service_class}.*".
+C<$method> is a string with the format C<{service_class}.{method}>. A default
+or fallback handler can be specified using a wildcard like C<{service_class}.*>.
 
-C<$callback> is a method name or a coderef that will be called when a notification
-is received. When executed, the callback will receive two parameters C<$params> 
-(which contains the notification data itself) and C<$req> which is a
+C<$callback> is the method handler (a method name or a coderef) that will be called 
+when a notification is received. When executed, the handler will receive two parameters
+C<$params> (which contains the notification data itself) and C<$req> which is a
 L<Beekeeper::JSONRPC::Notification> object (usually redundant unless it is necessary
-to inspect the MQTT properties of the request).
+to inspect the MQTT properties of the notification).
 
 Notifications are not expected to return a value. Any value returned from notification
-callbacks will be ignored.
+handlers will be ignored.
 
-The callback is executed within an eval block. If it dies the error will be logged
+The handler is executed within an eval block. If it dies the error will be logged
 but the worker will continue running.
 
 Example:
@@ -1033,7 +1132,7 @@ Example:
   use base 'Beekeeper::Worker';
   
   sub on_startup {
-      my $self = shift;
+      my ($self) = @_;
       
       $self->accept_notifications(
           'foo.bar' => 'bar',       # call $self->bar       for notifications 'foo.bar'
@@ -1043,7 +1142,7 @@ Example:
   }  
   
   sub bar {
-       my ($self, $params, $req) = @_
+       my ($self, $params, $req) = @_;
        
        # $self is a MyWorker object
        # $params is a ref to the notification data
@@ -1054,23 +1153,22 @@ Example:
 
 =head3 accept_remote_calls ( $method => $callback, ... )
 
-Make this worker start accepting specified RPC requests from message bus.
+Makes a worker start accepting the specified RPC requests from the message bus.
 
-C<$method> is a string with the format "{service_class}.{method}". A default
-or fallback handler can be specified using a wildcard as "{service_class}.*".
+C<$method> is a string with the format C<{service_class}.{method}>. A default
+or fallback handler can be specified using a wildcard like C<{service_class}.*>.
 
-C<$callback> is a method name or a coderef that will be called when a request
-is received. When executed, the callback will receive two parameters C<$params> 
-(which contains the notification data itself) and C<$req> which is a
-L<Beekeeper::JSONRPC::Request> object (usually redundant unless it is necessary
-to inspect the MQTT properties of the request).
+C<$callback> is the method handler (a method name or a coderef) that will be 
+called when a request is received. When executed, the handler will receive two 
+parameters C<$params> (which contains the notification data itself) and C<$req>
+which is a L<Beekeeper::JSONRPC::Request> object.
 
-The value or reference returned by the callback will be sent back to the caller
-as response.
+The value or reference returned by the handler will be sent back to the caller
+as response (unless the response is deferred with C<$req-E<gt>async_response>).
 
-The callback is executed within an eval block. If it dies the error will be
-logged and the caller will receive a generic error response, but the worker will
-continue running.
+The handler is executed within an eval block. If it dies the error will be logged 
+and the caller will receive a generic error response, but the worker will continue
+running.
 
 Example:
 
@@ -1080,7 +1178,7 @@ Example:
   use base 'Beekeeper::Worker';
   
   sub on_startup {
-      my $self = shift;
+       my ($self) = @_;
       
       $self->accept_remote_calls(
           'foo.inc' => 'increment',  # call $self->increment  for requests to 'foo.inc'
@@ -1090,7 +1188,7 @@ Example:
   }
   
   sub increment {
-       my ($self, $params, $req) = @_
+       my ($self, $params, $req) = @_;
        
        # $self is a MyWorker object
        # $params is a ref to the parameters of the request
@@ -1101,31 +1199,57 @@ Example:
        return $params->{number} + 1;
   }
 
+Remote calls can be processed concurrently by means of calling C<$req-E<gt>async_response>
+to tell Beekeeper that the response for the request will be deferred until it is
+available, freeing the worker to accept more requests. Once the response is ready, 
+it must be sent back to the caller with C<$req-E<gt>send_response>.
+
+This handler process requests concurrently:
+
+  sub increment {
+      my ($self, $params, $req) = @_;
+  
+      my $number = $params->{number};
+  
+      $req->async_response;
+  
+      my $t; $t = AnyEvent->timer( after => 1, cb => sub {
+          undef $t;
+          $req->send_response( $number + 1 );
+      });
+  }
+
+Note that callback closures will not be executed in Beekeeper scope but in the event loop
+one, so uncatched exceptions in these closures will cause the worker to die and be respawn.
+
+Asynchronous method handlers use system resources more efficiently, but are significantly 
+harder to write and debug.
+
 =head3 stop_accepting_notifications ( $method, ... )
 
-Make this worker stop accepting specified notifications from message bus.
+Makes a worker stop accepting the specified notifications from the message bus.
 
 C<$method> must be one of the strings used previously in C<accept_notifications>.
 
 =head3 stop_accepting_calls ( $method, ... )
 
-Make this worker stop accepting specified RPC requests from message bus.
+Makes a worker stop accepting the specified RPC requests from the message bus.
 
 C<$method> must be one of the strings used previously in C<accept_remote_calls>.
 
 =head3 stop_working 
 
-Make this worker stop accepting new RPC requests, process all requests already
+Makes a worker stop accepting new RPC requests, process all requests already
 received, execute C<on_shutdown> method, and then exit.
 
-This is the default signal handler for TERM signal. 
+This is the default signal handler for C<TERM> signal. 
 
 Please note that it is not possible to stop worker pools calling this method, as 
 WorkerPool will immediately respawn another worker after the current one exits.
 
 =head1 SEE ALSO
  
-L<Beekeeper::Client>, L<Beekeeper::Logger>, L<Beekeeper::WorkerPool>.
+L<Beekeeper::Client>, L<Beekeeper::Config>, L<Beekeeper::Logger>, L<Beekeeper::WorkerPool>.
 
 =head1 AUTHOR
 

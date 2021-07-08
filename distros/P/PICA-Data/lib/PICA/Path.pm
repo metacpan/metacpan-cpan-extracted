@@ -2,7 +2,7 @@ package PICA::Path;
 use v5.14.1;
 use utf8;
 
-our $VERSION = '1.27';
+our $VERSION = '1.28';
 
 use Carp qw(confess);
 use Scalar::Util qw(reftype);
@@ -10,18 +10,24 @@ use Scalar::Util qw(reftype);
 use overload '""' => \&stringify;
 
 sub new {
-    my ($class, $path, %options) = @_;
+    my $class = shift;
+    my $self  = parse(@_) or confess "invalid pica path";
+    bless $self, $class;
+}
 
-    confess "invalid pica path" if $path !~ /
-        ([012.][0-9.][0-9.][A-Z@.])     # tag
-        (\[([0-9.]{2,3}|\d+-\d+)\])?    # occurrence
-        (\$?([_A-Za-z0-9]+))?           # subfields
-        (\/(\d+)?(-(\d+)?)?)?           # position
+sub parse {
+    my ($path, %options) = @_;
+
+    return if $path !~ /^
+        (?<tag>[012.][0-9.][0-9.][A-Z@.])
+        (\[(?<occurrence>[0-9.]{2,3}|\d+-\d+)\])?
+        (\$?(?<subfields>[_A-Za-z0-9]+))?
+        (\/(\d+)?(-(\d+)?)?)? # position
     /x;
 
-    my $field      = $1;
-    my $occurrence = $3;
-    my $subfield   = defined $5 ? "[$5]" : "[_A-Za-z0-9]";
+    my $field      = $+{tag};
+    my $occurrence = $+{occurrence};
+    my $subfield = defined $+{subfields} ? "[$+{subfields}]" : "[_A-Za-z0-9]";
 
     my @position;
     if (defined $6) {    # position
@@ -32,11 +38,11 @@ sub new {
             my ($from, $dash, $to, $length) = ($7, $8, $9, 0);
 
             if ($dash) {
-                confess "invalid pica path" unless defined($from // $to); # /-
+                return unless defined($from // $to);    # /-
             }
 
             if (defined $to) {
-                if (!$from and $dash) {    # /-X
+                if (!$from and $dash) {                 # /-X
                     $from = 0;
                 }
                 $length = $to - $from + 1;
@@ -73,7 +79,7 @@ sub new {
                 $occurrence = [$from, $to];
             }
             else {
-                confess "invalid pica path";
+                return;
             }
         }
         else {
@@ -83,7 +89,12 @@ sub new {
 
     $subfield = qr{$subfield};
 
-    bless [$field, $occurrence, $subfield, @position], $class;
+    return {
+        field      => $field,
+        occurrence => $occurrence,
+        subfield   => $subfield,
+        position   => \@position
+    };
 }
 
 sub match_record {
@@ -151,8 +162,8 @@ sub match_record {
 sub match_field {
     my ($self, $field) = @_;
 
-    return if $field->[0] !~ $self->[0];
-    if (my $spec = $self->[1]) {
+    return if $field->[0] !~ $self->{field};
+    if (my $spec = $self->{occurrence}) {
         my $occ = $field->[1];
         if (ref $spec eq 'ARRAY') {
             return if $occ < $spec->[0] or $occ > $spec->[1];
@@ -168,9 +179,9 @@ sub match_field {
 sub match_subfields {
     my ($self, $field, %args) = @_;
 
-    my $subfield_regex = $self->[2];
-    my $from           = $self->[3];
-    my $length         = $self->[4];
+    my $subfield_regex = $self->{subfield};
+    my $from           = $self->{position}->[0];
+    my $length         = $self->{position}->[1];
 
     my @values;
 
@@ -182,7 +193,7 @@ sub match_subfields {
             push @{$subfield_href->{$field->[$i]}}, $field->[$i + 1];
         }
 
-        my $subfields = $self->[2];
+        my $subfields = $self->{subfield};
         $subfields =~ s{.*\[(.+)\].*}{$1}g;
         for my $subfield (split('', $subfields)) {
             my $value = $subfield_href->{$subfield} // [undef];
@@ -268,17 +279,17 @@ sub stringify {
 }
 
 sub fields {
-    return unescape($_[0]->[0]);
+    return unescape($_[0]->{field});
 }
 
 sub occurrences {
-    my $occ = $_[0]->[1];
+    my $occ = $_[0]->{occurrence};
     return join "-", @$occ if ref $occ eq 'ARRAY';    # range
-    return unescape($_[0]->[1]);                      # pattern
+    return unescape($occ);                            # pattern
 }
 
 sub subfields {
-    my $subfields = unescape($_[0]->[2]);
+    my $subfields = unescape($_[0]->{subfield});
     if (defined $subfields and $subfields ne '[_A-Za-z0-9]') {
         $subfields =~ s/\[|\]//g;
         return $subfields;
@@ -289,7 +300,7 @@ sub subfields {
 sub positions {
     my ($self) = @_;
 
-    my ($from, $length, $pos) = ($self->[3], $self->[4]);
+    my ($from, $length, $pos) = @{$self->{position}};
     if (defined $from) {
         if ($from) {
             $pos = $from;

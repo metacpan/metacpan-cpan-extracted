@@ -31,13 +31,12 @@ WriteMakefile
 
    # A hash of modules that are needed to build the module but not run it.
 
-   'BUILD_REQUIRES'     => {
-                           },
+   'BUILD_REQUIRES'     => {},
 
    # A hash of modules that are needed to run the module.
 
    'PREREQ_PM'          => {
-                            'Math::BigInt'        => 1.999817,
+                            'Math::BigInt'        => 1.999819,
                             'XSLoader'            => 0.02,
                            },
 

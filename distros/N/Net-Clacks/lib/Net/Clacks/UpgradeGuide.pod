@@ -159,6 +159,44 @@ Version 17 Server has better checks for Net::Clacks::Client call arguments and c
 This version does not introduce any incompatible changes but it will produce callback traces when called with missing arguments. Calling new() now
 croaks/dies when arguments are missing (as it should have from the beginning). 
 
+=head2 VERSION 18
+
+WARNING: BREAKING CHANGES regarding persistance files.
+
+Version 18 provides better reliability for the Clacks Server when using a persistance file, including startup problems and prevention of data loss.
+
+Here is the problem in older versions: If the server process is killed while writing the persistance file, the file on disk may be invalid (partial data) or completely blank.
+Blank files at least prevented the server from starting up, but otherwise incomplete files could lead to data corruption in cached data and/or all other sorts of problems. This
+relates to the fact that the server only does very minimal checks on its internal cache during runtime for performance reasons. The original persistance file was just a quick
+hack to dump/restore the cache between runs and did not account for system crashes or the process being killed while writing to disk.
+
+This new version of L<Net::Clacks::Server> tackles this in in a multi-stage approach:
+
+1.) The persistance file now includes the ENDBYTE string as a third line. This is used to check if the file is complete.
+
+2.) Before overwriting the current persistance file, it is COPIED to a file with '_bck' added to the configured name.
+
+3.) The file is written under a new name (with '_' added at the end) and then MOVED over the correct file name. File move (rename) within the same directory should be
+an atomic operation of the operating system, so it either works or doesn't (no stopping half-way inbetween).
+
+4.) An invalid persistance file doesn't prevent the clacks server startup. If it detects an invalid file, it first tries to load the previous version ('_bck'), then
+as a last desperate measure to prevent data loss, it tries to load the temporary file ('_'). If that also fails, it starts 'blankety-blank'.
+
+Clacks caching was always designed as a CACHE, not as the final storage for important data. This upgrade to Version 18 changes the file format of the persistance file slighty. The
+older format is now detected as invalid, resulting in a "blankety-blank" startup. If you really want or need (?!?!?!) to preserve the cached data for some reason, there are
+two ways to accomplish this:
+
+1.) Stop the clacks server and upgrade the Net::Clacks package. Edit the persistance file and add a third line with the word "ENDBYTES" without quotes as its only content.
+
+or
+
+2.) If you are running a master/slave setup with interclacks, you can stop ONLY the server that has the persistance file. Then upgrade Net::Clacks and start the server. It should
+start "blankety-blank" and automatically resyncronize cached data from the interclacks network. It works the same if all your clacks servers use persistance files for some weird reason,
+just restart them one-by-one, waiting inbetween for the interclacks sync to finish. 
+You can use the example rawclient.pl. Connect to the server you keep running and start the MONITOR command. While interclacks sync is in progress, you will see KEYSYNC commands
+flying between the servers. If you stop seeing them for a few seconds, KEYSYNC is finished.
+
+
 =head1 AUTHOR
 
 Rene Schickbauer, E<lt>cavac@cpan.orgE<gt>

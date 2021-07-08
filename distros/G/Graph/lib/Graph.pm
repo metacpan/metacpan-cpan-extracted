@@ -14,7 +14,7 @@ BEGIN {
 
 use Graph::AdjacencyMap qw(:flags :fields);
 
-our $VERSION = '0.9721';
+our $VERSION = '0.9722';
 
 require 5.006; # Weak references are absolutely required.
 
@@ -549,7 +549,7 @@ sub _cessors_by_radius {
 	$found->clear;
     }
     $got->remove($init->difference($self)->members) if $self_only_if_loop;
-    $got->members;
+    $got->${ wantarray ? \'members' : \'size' };
 }
 
 sub all_successors {
@@ -586,7 +586,7 @@ sub neighbours {
     require Set::Object;
     my $s = Set::Object->new(&successors);
     $s->insert(&predecessors) if &is_directed;
-    $s->members;
+    $s->${ wantarray ? \'members' : \'size' };
 }
 *neighbors = \&neighbours;
 

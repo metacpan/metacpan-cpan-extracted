@@ -19,7 +19,7 @@ require Exporter ;
 our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS, $SimpleZipError);
 
 $SimpleZipError= '';
-$VERSION = "0.039";
+$VERSION = "0.040";
 
 @ISA = qw(Exporter);
 @EXPORT_OK = qw( $SimpleZipError ) ;
@@ -48,6 +48,7 @@ our %PARAMS = (
         'filtercontainer' => [IO::Compress::Base::Common::Parse_code,  undef],
 #        'time'          => [IO::Compress::Base::Common::Parse_any,       undef],
 #        'extime'        => [IO::Compress::Base::Common::Parse_any,       undef],
+#        'efs'           => [IO::Compress::Base::Common::Parse_boolean,   0],
 
         # Zlib
         'level'         => [IO::Compress::Base::Common::Parse_signed,    Z_DEFAULT_COMPRESSION],
@@ -245,7 +246,7 @@ sub _newStream
         $self->{Zip} = IO::Compress::Base::Common::createSelfTiedObject('IO::Compress::Zip', \$SimpleZipError);
         $self->{Zip}->_create($options, $self->{FH})
             or die "_create $SimpleZipError";
-        $self->{Zip}->_autoflush()
+        $self->{Zip}->autoflush()
             if  $options->getValue('autoflush');
 
     }
@@ -1850,7 +1851,7 @@ See the Changes file.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2012-2019 Paul Marquess. All rights reserved.
+Copyright (c) 2012-2021 Paul Marquess. All rights reserved.
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.

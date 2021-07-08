@@ -3,7 +3,7 @@ package Beekeeper::WorkerPool::Daemon;
 use strict;
 use warnings;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 use POSIX;
 use Fcntl qw(:DEFAULT :flock);
@@ -250,7 +250,7 @@ sub _fork {
 sub redirect_output {
     my $self = shift;
 
-    my $logfile = $self->{config}->{logfile};
+    my $logfile = $self->{config}->{log_file};
 
     unless ($logfile) {
         my $dir  = $LOG_FILE_DIR;
@@ -471,9 +471,9 @@ sub stop_daemon {
     # Nothing to do if daemon is not running
     return unless ($pid);
 
-    my $send_SIGINT  = 15; # seconds
-    my $send_SIGKILL = 30; # seconds
-    my $give_up      = 90; # seconds
+    my $send_SIGINT  = 120; # seconds  #TODO: This should be configurable
+    my $send_SIGKILL = 130; # seconds
+    my $give_up      = 140; # seconds
 
     my $start_time = time();
     local $| = 1;
@@ -570,7 +570,7 @@ Beekeeper::WorkerPool::Daemon - Daemonize processes
 
 =head1 VERSION
 
-Version 0.06
+Version 0.07
 
 =head1 SYNOPSIS
 

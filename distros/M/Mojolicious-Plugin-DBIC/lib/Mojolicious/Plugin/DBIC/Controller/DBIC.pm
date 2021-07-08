@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::DBIC::Controller::DBIC;
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 # ABSTRACT: Build simple views to DBIC data
 
 #pod =head1 SYNOPSIS
@@ -56,14 +56,78 @@ use Mojo::Base 'Mojolicious::Controller';
 #pod
 #pod The L<DBIx::Class::ResultSet> object containing the desired objects.
 #pod
+#pod =item limit
+#pod
+#pod The number of items to show on the page. Defaults to C<10>.
+#pod
+#pod =item page
+#pod
+#pod The page number to show. Defaults to C<1>.
+#pod
+#pod =item order_by
+#pod
+#pod Set the default order for the items. Supports any DBIx::Class
+#pod C<order_by> structure.
+#pod
 #pod =back
+#pod
+#pod =head4 Query Params
+#pod
+#pod The following URL query parameters are allowed for this method:
+#pod
+#pod =over
+#pod
+#pod =item $page
+#pod
+#pod Instead of using the C<page> stash value, you can use the C<$page> query
+#pod paremeter to set the page.
+#pod
+#pod =item $offset
+#pod
+#pod Instead of using the C<page> stash value, you can use the C<$offset>
+#pod query parameter to set the page offset. This is overridden by the
+#pod C<$page> query parameter.
+#pod
+#pod =item $limit
+#pod
+#pod Instead of using the C<limit> stash value, you can use the C<$limit>
+#pod query parameter to allow users to specify their own page size.
+#pod
+#pod =item $order_by
+#pod
+#pod One or more fields to order by. Can be specified as C<< <name> >> or
+#pod C<< asc:<name> >> to sort in ascending order or C<< desc:<field> >>
+#pod to sort in descending order.
 #pod
 #pod =cut
 
 sub list {
     my ( $c ) = @_;
+
+    my $limit = $c->param( '$limit' ) // $c->stash->{ limit } // 10;
+    my $offset = $c->param( '$page' ) ? ( $c->param( '$page' ) - 1 ) * $limit
+        : $c->param( '$offset' ) ? $c->param( '$offset' )
+        : ( ( $c->stash->{page} // 1 ) - 1 ) * $limit;
+    $c->stash( page => int( $offset / $limit ) + 1 );
+
+    my $opt = {
+        rows => $limit,
+        offset => $offset,
+    };
+
+    if ( my $order_by = $c->param( '$order_by' ) ) {
+        $opt->{order_by} = [
+            map +{ "-" . ( $_->[1] ? $_->[0] : 'asc' ) => $_->[1] // $_->[0] },
+            map +[ split /:/ ],
+            split /,/, $order_by
+        ];
+    }
+    elsif ( $order_by = $c->stash( 'order_by' ) ) {
+        $opt->{order_by} = $order_by;
+    }
+
     my $rs_class = $c->stash( 'resultset' );
-    my $rs = $c->schema->resultset( $rs_class );
+    my $rs = $c->schema->resultset( $rs_class )->search( {}, $opt );
     return $c->stash(
         resultset => $rs,
     );
@@ -477,7 +541,7 @@ Mojolicious::Plugin::DBIC::Controller::DBIC - Build simple views to DBIC data
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -527,7 +591,48 @@ This method sets the following stash values for template rendering:
 
 The L<DBIx::Class::ResultSet> object containing the desired objects.
 
+=item limit
+
+The number of items to show on the page. Defaults to C<10>.
+
+=item page
+
+The page number to show. Defaults to C<1>.
+
+=item order_by
+
+Set the default order for the items. Supports any DBIx::Class
+C<order_by> structure.
+
 =back
+
+=head4 Query Params
+
+The following URL query parameters are allowed for this method:
+
+=over
+
+=item $page
+
+Instead of using the C<page> stash value, you can use the C<$page> query
+paremeter to set the page.
+
+=item $offset
+
+Instead of using the C<page> stash value, you can use the C<$offset>
+query parameter to set the page offset. This is overridden by the
+C<$page> query parameter.
+
+=item $limit
+
+Instead of using the C<limit> stash value, you can use the C<$limit>
+query parameter to allow users to specify their own page size.
+
+=item $order_by
+
+One or more fields to order by. Can be specified as C<< <name> >> or
+C<< asc:<name> >> to sort in ascending order or C<< desc:<field> >>
+to sort in descending order.
 
 =head2 get
 

@@ -1,0 +1,17 @@
+Music::Guidonian - a "Guidonian Hand" melodic phrase generator
+
+this module can be installed using cpanm:
+
+    cpanm Music::Guidonian
+
+run perldoc(1) on Music::Guidonian for documentation
+
+
+to author a new release:
+
+    ./Build testcover
+    RELEASE_TESTING=1 TEST_SIGNATURE=1 ./Build test
+    ./Build disttest
+    git tag -u ... -s v...
+    cpan-upload ...
+    ./Build realclean

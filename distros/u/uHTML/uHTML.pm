@@ -21,7 +21,7 @@
 
 use strict ;
 
-use version ; our $VERSION = "1.97" ;
+use version ; our $VERSION = "1.99" ;
 
 package uHTMLnode;
 
@@ -807,7 +807,7 @@ sub _struct( $$$ )
           }
         }
       }
-      lc $tag eq 'style' || lc $tag eq 'script' && !exists $Attributes{'src'} ?
+      lc $tag eq 'style' || lc $tag eq 'svg' || lc $tag eq 'script' && !exists $Attributes{'src'} ?
             $String =~ m/\G[^>]*>(.*?)(?=<\/$tag>)/sgci :
             $String =~ m/\G[^>]*>([^<]*)/sgc ;
       $New = uHTMLnode->new( $tag,$1,$Prev,$env ) ;
@@ -856,6 +856,14 @@ sub _struct( $$$ )
   $Prev->{Next} = uHTMLnode->new( '',$1,$Prev,$env ) if $String =~ m/\G(.+)/sg ;
   return $Struct ;
 
+}
+
+sub parse
+{
+  my( $data,$env ) = @_ ;
+
+  $env = \%ENV unless ref $env eq 'HASH' ;
+  return _struct( undef,$data,$env ) ;
 }
 
 sub recodedList( $$ )
@@ -1076,6 +1084,11 @@ Set the current file name for debug output. Ignored in production mode.
     uHTML::FileEnd
 
 Reset the current file name for debug output to the previous name. Ignored in production mode.
+
+    uHTML::parse( $text,$env ) ;
+
+Parses $text into a B<uHTML> tree. Returns a reference to a B<uHTMLnode> node.
+$env provides a reference to the environment. If not given, the current environment is used.
 
     uHTML::recoded_list( $uhtml,$env ) ;
 

@@ -1,9 +1,9 @@
 #!perl
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-07-01'; # DATE
+our $DATE = '2021-07-03'; # DATE
 our $DIST = 'App-orgsel'; # DIST
-our $VERSION = '0.013'; # VERSION
+our $VERSION = '0.014'; # VERSION
 
 use 5.010001;
 use strict;
@@ -32,9 +32,11 @@ orgsel - Select Org document elements using CSel (CSS-selector-like) syntax
 
 =head1 VERSION
 
-This document describes version 0.013 of orgsel (from Perl distribution App-orgsel), released on 2021-07-01.
+This document describes version 0.014 of orgsel (from Perl distribution App-orgsel), released on 2021-07-03.
 
 =head1 SYNOPSIS
+
+=head2 Examples using F<todo.org>
 
 Example document F<todo.org> (you can get this from the distribution shared
 file):
@@ -86,56 +88,6 @@ file):
  ** DONE [2020-05-29 Fri] csvutils: make csv-transpose (like 'td transpose')
  - log ::
    + [2020-08-16 Sun] done
-
-Example document F<addressbook.org> (you can get this from the distribution
-shared file):
-
- #+TODO: TODO | OLD
- 
- * business > tax consultants
- * business > veterinarian
- ** budi chandra                                                         :vet:
- - born :: 1981?
- - notes ::
-   + moslem
-   + has two kids, the older is 10yo @2012
- - address :: jl anggrek no 123, bandung
- - opening hours :: every day 07-21, also on call 24h
- - phone :: 0855 555 1234
- - log ::
-   + [2012-07-30 ] dr went to our house to vaccinate bonnie
-   + [2010-04-21 ] went to his clinic, bought worm tablets
- ** deni setiawan                                                        :vet:
- - notes ::
-   + day-care for dogs etc at his house, but there is concern about ticks
- - address :: jl mawar 456, bandung
- - phone :: 022 5551235
- - log ::
-   + [2013-09-18 Rab] entry
- * family tree > dad's side
- ** budi roland                                                     :deceased:
- ** grace shanti
- - notes ::
-   + father's first aunt
-   + 85 yo @2021
- - log ::
-   + [2021-06-26] entry
- * family tree > mom's side
- * zzz > old
- ** OLD rudi sanusi
- - phone/whatsapp :: 0855 555 9739
- - log ::
-   + [2021-06-27 Sun] mark as old
- * zzz > unorganized
- ** agus (lisa's husband)
- ** agus putra
- ** susan muliawati
- ** susi
- ** susi (ron's friend)                                                  :vet:
- - log ::
-   + [2021-04-03] met her again (the 3rd time i guess?) at ron's birthday party.
-     she's married now.
-   + [2019-01-02] entry
 
 To get a picture of the structure, you can use L<dump-org-structure>, for
 example C<dump-org-structure todo.org> will give:
@@ -254,7 +206,7 @@ example C<dump-org-structure todo.org> will give:
              Timestamp: 2020-08-16T00:00:00F "[2020-08-16 Sun]"
              Text: " done\n"
 
-Now for some selecting examples:
+Now for some selecting examples on F<todo.org>:
 
  # select the second-level headlines where we store the todo items (title-only)
  % orgsel todo.org 'Headline[level=2]' --node-action eval:'print $_->title->as_string,"\n"'
@@ -292,6 +244,69 @@ Now for some selecting examples:
  # number of list items under "log")
  % orgsel todo.org 'Headline[level=2] > List > ListItem[desc_term.text = "log"] + *:has-min-children(2):parent:parent'
 
+=head2 Examples using F<addressbook.org>
+
+Example document F<addressbook.org> (you can get this from the distribution
+shared file):
+
+ #+TODO: TODO | OLD
+ 
+ * business > tax consultants
+ * business > veterinarian
+ ** budi chandra                                                         :vet:
+ - born :: 1981?
+ - notes ::
+   + moslem
+   + has two kids, the older is 10yo @2012
+ - address :: jl anggrek no 123, bandung
+ - opening hours :: every day 07-21, also on call 24h
+ - phone :: 0855 555 1234
+ - log ::
+   + [2012-07-30 ] dr went to our house to vaccinate bonnie
+   + [2010-04-21 ] went to his clinic, bought worm tablets
+ ** deni setiawan                                                        :vet:
+ - notes ::
+   + day-care for dogs etc at his house, but there is concern about ticks
+ - address :: jl mawar 456, bandung
+ - phone :: 022 5551235
+ - log ::
+   + [2013-09-18 Rab] entry
+ * family tree > dad's side
+ ** budi roland                                                     :deceased:
+ ** grace shanti
+ - notes ::
+   + father's first aunt
+   + 85 yo @2021
+ - log ::
+   + [2021-06-26] entry
+ * family tree > mom's side
+ * zzz > old
+ ** OLD rudi sanusi
+ - phone/whatsapp :: 0855 555 9739
+ - log ::
+   + [2021-06-27 Sun] mark as old
+ * zzz > unorganized
+ ** agus (lisa's husband)
+ ** agus putra
+ ** susan muliawati
+ ** susi
+ ** susi (ron's friend)                                                  :vet:
+ - log ::
+   + [2021-04-03] met her again (the 3rd time i guess?) at ron's birthday party.
+     she's married now.
+   + [2019-01-02] entry
+
+Now for some selecting examples on F<todo.org>:
+
+ # list contacts which have certain tag ("vet")
+ % orgsel addressbook.org 'Headline[level=2][tags has "vet"]' --eval 'say $_->title->as_string'
+
+ # count contacts matching /budi (and list them as well)
+ % orgsel addressbook.org 'Headline[level=2][title.as_string =~ /budi/i]'  --eval 'say $_->title->as_string' --count
+
+ # show notes about contact 'deni setiawan'
+ % orgsel addressbook.org 'Headline[level=2][title.as_string = "deni setiawan"] > List > ListItem[desc_term.text = "notes"] + *'
+
 =head1 DESCRIPTION
 
 This utility allows you to select nodes from Org document on the command-line
@@ -309,6 +324,14 @@ L<Org::Parser> then selected with the given CSel expression. Types are
 C<Org::Element::*> classes (without the prefix).
 
 See examples in the Synopsis to get an idea on how to use B<orgsel>.
+
+Some tips:
+
+=over
+
+=item * To find out which attributes (methods) available for selecting using attribute selector, see documentation on C<Org::Element::*>
+
+=back
 
 =head1 OPTIONS
 

@@ -5,7 +5,7 @@ package Chart::GGPlot::Layer;
 use Chart::GGPlot::Class qw(:pdl);
 use namespace::autoclean;
 
-our $VERSION = '0.0011'; # VERSION
+our $VERSION = '0.0016'; # VERSION
 
 use List::AllUtils qw(pairgrep pairkeys pairmap);
 use Module::Load;
@@ -236,14 +236,15 @@ method map_statistic ( $data, $plot ) {
     return $data->merge($stat_data);
 }
 
-method compute_geom_1 ($data) {
+method compute_geom_1($data) {
     return Data::Frame->new() if ( $data->isempty );
 
     $self->geom->check_required_aes(
         [ @{ $data->names }, @{ $self->aes_params->names } ] );
-    
-    return $self->geom->setup_data( $data,
-        $self->geom_params->merge( $self->aes_params ) );
+
+    my $geom_params = $self->geom_params->merge( $self->aes_params );
+    $self->validate_params($geom_params);
+    return $self->geom->setup_data( $data, $geom_params );
 }
 
 method compute_position ( $data, $layout ) {
@@ -303,6 +304,23 @@ classmethod add_group ($data) {
     return $data;
 }
 
+# For type validation on aes and params
+my $aes2type = {
+    hjust => HJust,
+    vjust => VJust,
+};
+
+classmethod validate_params($params) {
+    for my $k ( @{ $params->keys } ) {
+        my $type = $aes2type->{$k};
+        next unless $type;
+        my $val = $params->at($k);
+        if ( my $msg = $type->validate($val) ) {
+            die "Validation failed on parameter \"$k\": $msg";
+        }
+    }
+}
+
 __PACKAGE__->meta->make_immutable;
 
 1;
@@ -319,7 +337,7 @@ Chart::GGPlot::Layer - Chart::GGPlot layer
 
 =head1 VERSION
 
-version 0.0011
+version 0.0016
 
 =head1 DESCRIPTION
 
@@ -403,7 +421,7 @@ Stephan Loyd <sloyd@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019-2020 by Stephan Loyd.
+This software is copyright (c) 2019-2021 by Stephan Loyd.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

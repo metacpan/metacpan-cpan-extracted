@@ -39,9 +39,10 @@ $mbv >= 0.26
 
 if ( $mbv >= 0.28 ) {
     $args{meta_merge} = $meta->meta_merge();
+    $args{no_index} = $meta->no_index();
     $args{meta_add} = {
-	no_index	=> $meta->no_index(),
-    };
+	$meta->provides(),
+    },
 }
 
 $mbv >= 0.34

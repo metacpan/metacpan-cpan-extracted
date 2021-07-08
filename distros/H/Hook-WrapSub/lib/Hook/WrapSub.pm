@@ -1,5 +1,5 @@
 package Hook::WrapSub;
-$Hook::WrapSub::VERSION = '0.07';
+$Hook::WrapSub::VERSION = '0.08';
 use 5.006;
 use strict;
 use warnings;

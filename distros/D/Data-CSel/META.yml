@@ -33,7 +33,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Data-CSel
   homepage: https://metacpan.org/release/Data-CSel
   repository: git://github.com/perlancar/perl-Data-CSel.git
-version: '0.125'
+version: '0.126'
 x_Dist_Zilla:
   perl:
     version: '5.034000'

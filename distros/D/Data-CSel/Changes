@@ -1,3 +1,10 @@
+0.126   2021-07-03  Released-By: PERLANCAR; Urgency: medium
+
+	- Support operator 'has', 'hasnt', 'in', 'notin'
+
+        - Support array literal.
+
+
 0.125   2021-07-01  Released-By: PERLANCAR; Urgency: medium
 
         - [experimental] Add experimental pseudo-classes: has-min-children,

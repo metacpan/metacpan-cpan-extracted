@@ -11,6 +11,7 @@ my $post_diag;
 
 $modules{$_} = $_ for qw(
   Catalyst
+  Catalyst::Plugin::Static::Simple
   Catalyst::ScriptRunner
   Catalyst::View::TT
   Cwd

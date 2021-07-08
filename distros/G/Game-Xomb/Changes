@@ -1,5 +1,11 @@
 Revision history for Game::Xomb
 
+1.03    2021-07-06 09:38 UTC
+    * better documentation, more tests
+    * remove weaken, pretty sure don't need it
+    * simplify reify as only needs operate on MINERAL
+    * some XS cleanups
+
 1.02    2020-03-19 16:15 UTC
     * only check for passive effects on MINERAL not also VEGGIE.
       simplify the passive_* calls a bit

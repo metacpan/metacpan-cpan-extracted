@@ -4,7 +4,7 @@
       "Jeremy Mates <jmates@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.42, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "bsd"
    ],
@@ -58,6 +58,6 @@
          "url" : "https://github.com/thrig/Game-PlatformsOfPeril"
       }
    },
-   "version" : "0.09",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "0.10",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

@@ -1,5 +1,5 @@
 package Lab::XPRESS::Sweep;
-$Lab::XPRESS::Sweep::VERSION = '3.760';
+$Lab::XPRESS::Sweep::VERSION = '3.762';
 #ABSTRACT: Base sweep class
 
 use v5.20;
@@ -1445,7 +1445,7 @@ Lab::XPRESS::Sweep - Base sweep class
 
 =head1 VERSION
 
-version 3.760
+version 3.762
 
 =head1 SYNOPSIS
 
@@ -1575,12 +1575,12 @@ probably some
 This software is copyright (c) 2021 by the Lab::Measurement team; in detail:
 
   Copyright 2012       Stefan Geissler
-            2013       Alois Dirnaichner, Andreas K. HÃ¼ttel, Christian Butschkow, Stefan Geissler
+            2013       Alois Dirnaichner, Andreas K. Huettel, Christian Butschkow, Stefan Geissler
             2014       Alexei Iankilevitch, Christian Butschkow
             2015       Christian Butschkow
-            2016-2017  Andreas K. HÃ¼ttel, Simon Reinhardt
+            2016-2017  Andreas K. Huettel, Simon Reinhardt
             2018       Simon Reinhardt
-            2020       Andreas K. HÃ¼ttel
+            2020       Andreas K. Huettel
 
 
 This is free software; you can redistribute it and/or modify it under

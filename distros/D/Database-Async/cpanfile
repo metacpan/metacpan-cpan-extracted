@@ -13,7 +13,7 @@ requires 'mro', 0;
 requires 'parent', 0;
 requires 'Path::Tiny', '>= 0.108';
 requires 'perl', '5.024';
-requires 'Ryu', '>= 1.008';
+requires 'Ryu', '>= 3.002';
 requires 'Ryu::Async', '>= 0.016';
 requires 'Scalar::Util', '>= 1.50';
 requires 'Syntax::Keyword::Try', '>= 0.11';

@@ -10,6 +10,8 @@ struct Query : panda::string_multimap<string, string> {
     uint32_t rev = 1;
 
     using Base::Base;
+    Query (const Query&) = default;
+    Query (Query&&)      = default;
 
     Query& operator= (const Query& x) {
         rev++;

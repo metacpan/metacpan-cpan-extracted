@@ -1,6 +1,6 @@
 package Kelp::Module::Symbiosis;
 
-our $VERSION = '1.11';
+our $VERSION = '1.12';
 
 use Kelp::Base qw(Kelp::Module);
 use Plack::App::URLMap;
@@ -8,9 +8,11 @@ use Carp;
 use Scalar::Util qw(blessed refaddr);
 use Plack::Middleware::Conditional;
 use Plack::Util;
+use Kelp::Module::Symbiosis::_Util;
 
 attr -mounted => sub { {} };
 attr -loaded => sub { {} };
+attr -middleware => sub { [] };
 attr reverse_proxy => 0;
 
 sub mount
@@ -46,14 +48,6 @@ sub _link
 	return scalar keys %{$loaded};
 }
 
-sub run_all
-{
-	my ($self) = shift;
-
-	warn 'Symbiosis: run_all method is deprecated, use run instead';
-	return $self->run(@_);
-}
-
 sub run
 {
 	my ($self) = shift;
@@ -80,7 +74,8 @@ sub run
 		}
 	}
 
-	return $self->_reverse_proxy_wrap($psgi_apps->to_app);
+	my $wrapped = Kelp::Module::Symbiosis::_Util::wrap($self, $psgi_apps->to_app);
+	return $self->_reverse_proxy_wrap($wrapped);
 }
 
 sub _reverse_proxy_wrap
@@ -102,16 +97,15 @@ sub build
 	$args{mount} //= '/'
 		unless exists $args{mount};
 
-	warn 'Symbiosis: automount configuration is deprecated, use mount instead'
-		if exists $args{automount};
-
-	if ($args{mount} && (!exists $args{automount} || $args{automount})) {
+	if ($args{mount}) {
 		$self->mount($args{mount}, $self->app);
 	}
 
 	if ($args{reverse_proxy}) {
 		$self->reverse_proxy(1);
 	}
+
+	Kelp::Module::Symbiosis::_Util::load_middleware($self, %args);
 
 	$self->register(
 		symbiosis => $self,
@@ -219,12 +213,6 @@ A string - will try finding a symbiotic module with that name and mounting it. S
 
 =back
 
-=head2 run_all
-
-	sig: run_all($self)
-
-I<DEPRECATED in 1.01 use L</run> instead. ETA on removal is no less than three months>
-
 =head2 run
 
 Constructs and returns a new L<Plack::App::URLMap> with all the mounted modules and Kelp itself.
@@ -273,27 +261,23 @@ Shortcut method, same as C<< $kelp->symbiosis->run() >>.
 
 Symbiosis should be the first of the symbiotic modules specified in your Kelp configuration. Failure to meet this requirement will cause your application to crash immediately.
 
-=head2 automount
-
-I<DEPRECATED in 1.10: use 'mount' instead. ETA on removal is no less than three months>
-
-Whether to automatically call I<mount> for the Kelp instance, which will be mounted to root path I</>. Defaults to I<1>.
-
-If you set this to I<0> you will have to run something like C<< $kelp->symbiosis->mount($mount_path, $kelp); >> in Kelp's I<build> method. This will allow other paths than root path for the base Kelp application, if needed.
-
 =head2 mount
 
 I<new in 1.10>
 
 A path to mount the Kelp instance, which defaults to I<'/'>. Specify a string if you wish a to use different path. Specify an I<undef> or empty string to avoid mounting at all - you will have to run something like C<< $kelp->symbiosis->mount($mount_path, $kelp); >> in Kelp's I<build> method.
 
-Collides with now deprecated L</automount> - if you specify both, automount will control if the app will be mounted where the I<mount> points to.
-
 =head2 reverse_proxy
 
 I<new in 1.11>
 
-A boolean flag (I<1/0>) which enables reverse proxy for all the Plack apps at once. Requires L<Plack::Middleware::ReverseProxy> to be installed. This feature is experimental.
+A boolean flag (I<1/0>) which enables reverse proxy for all the Plack apps at once. Requires L<Plack::Middleware::ReverseProxy> to be installed.
+
+=head2 middleware, middleware_init
+
+I<new in 1.12>
+
+Middleware specs for the entire ecosystem. Every application mounted in Symbiosis will be wrapped in these middleware. They are configured exactly the same as middlewares in Kelp. Regular Kelp middleware will be used just for the Kelp application, so if you want to wrap all symbionts at once, this is the place to do it.
 
 =head1 CAVEATS
 

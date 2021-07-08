@@ -40,6 +40,8 @@
       },
       "test" : {
          "requires" : {
+            "Data::Dumper" : "0",
+            "List::Util" : "0",
             "Scalar::Util" : "0",
             "Statistics::Lite" : "0",
             "Test::More" : "0.88",
@@ -52,7 +54,7 @@
    "provides" : {
       "Game::Xomb" : {
          "file" : "lib/Game/Xomb.pm",
-         "version" : "1.02"
+         "version" : "1.03"
       }
    },
    "release_status" : "stable",
@@ -64,6 +66,6 @@
          "url" : "https://github.com/thrig/Game-Xomb"
       }
    },
-   "version" : "1.02",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "1.03",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

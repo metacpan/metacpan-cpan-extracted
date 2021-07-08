@@ -3,7 +3,7 @@ package Beekeeper::Worker::Util::SharedCache;
 use strict;
 use warnings;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 use Beekeeper::Worker ':log';
 use AnyEvent;
@@ -525,7 +525,7 @@ Beekeeper::Worker::Util::SharedCache - Locally mirrored shared cache
 
 =head1 VERSION
 
-Version 0.06
+Version 0.07
 
 =head1 SYNOPSIS
 
@@ -545,7 +545,7 @@ Version 0.06
 =head1 DESCRIPTION
 
 This module implements a locally mirrored shared cache: each worker keeps a
-copy of all cached data, and all copies are synced through message bus.
+copy of all cached data, and all copies are synced through the message bus.
 
 Access operations are essentially free, as data is held locally. But changes 
 are expensive as they need to be propagated to every worker, and overall 
@@ -554,11 +554,12 @@ memory usage is high due to data cloning.
 Keep in mind that retrieved data may be stale due to latency in the propagation
 of changes through the bus which involves two MQTT messages.
 
-Even if you are using this cache for small data sets that do not change very
-often, please consider if a distributed memory cache (or even a plain DB) is 
-a better alternative.
+Due to propagation costs this cache does not scale very well. The limiting
+factor is the global rate of updates, which will cap around 5000 operations
+per second.
 
-Due to propagation costs, this cache does not scale very well.
+Thus this cache is suitable only for small data sets that do not change very 
+often.
 
 =head1 AUTHOR
 

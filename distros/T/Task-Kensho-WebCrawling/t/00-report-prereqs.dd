@@ -3,6 +3,9 @@ do { my $x = {
                         'requires' => {
                                         'ExtUtils::MakeMaker' => '0',
                                         'perl' => '5.006'
+                                      },
+                        'suggests' => {
+                                        'JSON::PP' => '2.27300'
                                       }
                       },
        'develop' => {
@@ -87,6 +90,7 @@ do { my $x = {
                                       'HTTP::Tiny' => '0',
                                       'LWP::Simple' => '0',
                                       'LWP::UserAgent' => '0',
+                                      'Mojo::UserAgent' => '0',
                                       'WWW::Mechanize' => '0',
                                       'WWW::Mechanize::TreeBuilder' => '0',
                                       'WWW::Selenium' => '0',

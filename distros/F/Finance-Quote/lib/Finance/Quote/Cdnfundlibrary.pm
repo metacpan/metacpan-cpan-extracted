@@ -25,7 +25,7 @@ use JSON;
 use warnings;
 use Time::Piece;
 
-our $VERSION = '1.50'; #VERSION
+our $VERSION = '1.51'; #VERSION
 
 # URLs of where to obtain information.
 

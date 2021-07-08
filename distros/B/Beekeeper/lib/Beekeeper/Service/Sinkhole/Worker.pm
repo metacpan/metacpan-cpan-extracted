@@ -3,7 +3,7 @@ package Beekeeper::Service::Sinkhole::Worker;
 use strict;
 use warnings;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 use Beekeeper::Worker ':log';
 use base 'Beekeeper::Worker';
@@ -127,7 +127,7 @@ Beekeeper::Service::Sinkhole::Worker - Handle unserviced call topics
 
 =head1 VERSION
  
-Version 0.06
+Version 0.07
 
 =head1 DESCRIPTION
 
@@ -144,8 +144,25 @@ receive an error response instead of timing out.
 As soon as a worker of the downed service becomes online again the Sinkhole
 workers will stop rejecting requests.
 
-A Sinkhole worker is created automatically in every worker pool, and it can 
-handle around 500 req/s. Extra workers can simply be declared into config file.
+A single Sinkhole worker can handle around 4000 req/s.
+
+Sinkhole workers are not created automatically. In order to add Sinkhole workers
+to a pool these must be declared into config file C<pool.config.json>:
+
+  [
+      {
+          "pool_id" : "myapp",
+          "bus_id"  : "backend",
+          "workers" : {
+              "Beekeeper::Service::Sinkhole::Worker" : { "worker_count": 2 },
+               ...
+          },
+      },
+  ]
+
+=head1 METHODS
+
+This worker class does not expose public methods.
 
 =head1 AUTHOR
 

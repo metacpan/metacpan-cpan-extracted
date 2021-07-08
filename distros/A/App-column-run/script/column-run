@@ -4,9 +4,9 @@
 # and generated automatically using Perinci::CmdLine::Gen version 0.499
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-06-25'; # DATE
+our $DATE = '2021-07-08'; # DATE
 our $DIST = 'App-column-run'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 use 5.010001;
 use strict;
@@ -40,7 +40,7 @@ column-run - Run several commands and show their output in multiple columns
 
 =head1 VERSION
 
-This document describes version 0.004 of column-run (from Perl distribution App-column-run), released on 2021-06-25.
+This document describes version 0.005 of column-run (from Perl distribution App-column-run), released on 2021-07-08.
 
 =head1 SYNOPSIS
 
@@ -53,7 +53,7 @@ Usage:
      [--log-level=level] [--no-show-linum] [--noshow-linum]
      [--on-long-line=s] [--page-result[=program]] [--quiet] [--separator=s]
      [--show-linum] [--trace] [--verbose] [--view-result[=program]]
-     [--wrap] <command> ...
+     [--wrap] -- <command> ...
 
 Examples:
 

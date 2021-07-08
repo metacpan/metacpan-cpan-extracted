@@ -27,6 +27,14 @@ sub import {
         no strict 'refs';
         *{"${caller}::$sym_name"} = \&{$sym_name};
     }
+    
+    *main::test_catch = \&test_catch;
+}
+
+sub test_catch {
+    chdir 'clib';
+    catch_run(@_);
+    chdir '../';
 }
 
 sub get_time {
@@ -64,7 +72,7 @@ sub variate_catch {
         foreach my $name (@names) {
             $add .= "[v-$name]" if MyTest->can("variate_$name")->();
         }
-        catch_run($catch_name.$add);
+        test_catch($catch_name.$add);
     });
 }
 

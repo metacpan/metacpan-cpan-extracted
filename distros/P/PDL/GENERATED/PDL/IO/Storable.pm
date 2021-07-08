@@ -53,10 +53,10 @@ be able to store and retrieve ndarrays via Storable.
 
 
 
-use Carp;
 
 { package # hide from PAUSE
     PDL;
+use Carp;
 # routines to make PDL work with Storable >= 1.03
 
 # pdlpack() serializes an ndarray, while pdlunpack() unserializes it. Earlier

@@ -1,9 +1,9 @@
 package App::column::run;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-06-25'; # DATE
+our $DATE = '2021-07-08'; # DATE
 our $DIST = 'App-column-run'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 use 5.010001;
 use strict;
@@ -194,11 +194,25 @@ App::column::run - Run several commands and show their output in multiple column
 
 =head1 VERSION
 
-This document describes version 0.004 of App::column::run (from Perl distribution App-column-run), released on 2021-06-25.
+This document describes version 0.005 of App::column::run (from Perl distribution App-column-run), released on 2021-07-08.
 
 =head1 DESCRIPTION
 
 Sample screenshots:
+
+=begin html
+
+<img src="https://st.aticpan.org/source/PERLANCAR/App-column-run-0.005/share/images/Screenshot_20210625_085610.png" />
+
+=end html
+
+
+=begin html
+
+<img src="https://st.aticpan.org/source/PERLANCAR/App-column-run-0.005/share/images/Screenshot_20210625_094844.png" />
+
+=end html
+
 
 =head1 FUNCTIONS
 
@@ -296,10 +310,6 @@ element (%result_meta) is called result metadata and is optional, a hash
 that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
-
-=for html <img src="https://st.aticpan.org/source/PERLANCAR/App-column-run-0.004/share/images/Screenshot_20210625_085610.png" />
-
-=for html <img src="https://st.aticpan.org/source/PERLANCAR/App-column-run-0.004/share/images/Screenshot_20210625_094844.png" />
 
 =head1 HOMEPAGE
 

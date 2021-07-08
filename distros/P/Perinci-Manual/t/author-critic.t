@@ -15,7 +15,7 @@ use warnings;
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/Perinci/Manual.pm','lib/Perinci/Manual/Cookbook.pod'];
+my $filenames = ['lib/Perinci/Manual.pm','lib/Perinci/Manual/HowTo/FunctionMetadata.pod','lib/Perinci/Manual/HowTo/FunctionMetadata/Examples.pod'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

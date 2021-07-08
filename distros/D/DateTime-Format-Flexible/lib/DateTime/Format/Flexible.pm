@@ -2,7 +2,7 @@ package DateTime::Format::Flexible;
 use strict;
 use warnings;
 
-our $VERSION = '0.33';
+our $VERSION = '0.34';
 
 use base 'DateTime::Format::Builder';
 
@@ -100,6 +100,7 @@ my $formats =
 [
  [ preprocess => \&_fix_alpha ] ,
  { length => [18..22] , params => $YMDHMSAP , regex => qr{\A(\d{4})$DELIM(\d{2})$DELIM(\d{2})\s$HMS\s?$AMPM\z} , postprocess => \&_fix_ampm } ,
+ { length => [16..20] , params => $YMDHMAP , regex => qr{\A(\d{4})$DELIM(\d{2})$DELIM(\d{2})\s$HM\s?$AMPM\z} , postprocess => \&_fix_ampm } ,
 
  # 2011-06-16-17.43.30.000000
  { length => [26] , params => $YMDHMSNS , regex => qr{\A(\d{4})$DELIM(\d{2})$DELIM(\d{2})${DELIM}$HMSNS\z} } ,

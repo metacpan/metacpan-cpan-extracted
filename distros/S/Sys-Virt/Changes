@@ -1,5 +1,9 @@
 Revision history for perl module Sys::Virt
 
+7.5.0 2021-07-02
+
+ - Add VIR_FROM_CH
+
 7.4.0 2021-06-02
 
  - Add VIR_DOMAIN_CORE_DUMP_FORMAT_WIN_DMP constant

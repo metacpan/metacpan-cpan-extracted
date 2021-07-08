@@ -25,7 +25,7 @@ sub new {
 
 sub create_drop_or_attach {
     my ( $sf, $table ) = @_;
-    my $old_idx_hidden = exists $sf->{old_idx_hidden} ? delete $sf->{old_idx_hidden} : 1;
+    my $old_idx_cda = exists $sf->{i}{old_idx_cda} ? delete $sf->{i}{old_idx_cda} : 1;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
 
@@ -51,17 +51,17 @@ sub create_drop_or_attach {
         # Choose
         my $idx = $tc->choose(
             $menu,
-            { %{$sf->{i}{lyt_v}}, prompt => '', index => 1, default => $old_idx_hidden, undef => '  <=' }
+            { %{$sf->{i}{lyt_v}}, prompt => '', index => 1, default => $old_idx_cda, undef => '  <=' }
         );
         if ( ! defined $idx || ! defined $menu->[$idx] ) {
             return;
         }
         if ( $sf->{o}{G}{menu_memory} ) {
-            if ( $old_idx_hidden == $idx && ! $ENV{TC_RESET_AUTO_UP} ) {
-                $old_idx_hidden = 1;
+            if ( $old_idx_cda == $idx && ! $ENV{TC_RESET_AUTO_UP} ) {
+                $old_idx_cda = 1;
                 next CREATE_DROP_ATTACH;
             }
-            $old_idx_hidden = $idx;
+            $old_idx_cda = $idx;
         }
         my $choice = $menu->[$idx];
         if ( $choice eq $hidden ) {
@@ -84,11 +84,6 @@ sub create_drop_or_attach {
                     $ax->print_error_message( $@ );
                 }
             }
-            #my $file_fs = $sf->{i}{gc}{file_fs} // $sf->{i}{gc}{previous_file_fs};
-            #my $book = $sf->{i}{S_R}{$file_fs}{book};
-            #if ( defined $sf->{i}{S_R}{$file_fs}{book} && -s $file_fs > 50_000_000 ) {
-            #    delete $sf->{i}{S_R};
-            #}
         }
         elsif ( $choice =~ /^-\ Drop/i ) {
             require App::DBBrowser::CreateDropAttach::DropTable;
@@ -124,7 +119,7 @@ sub create_drop_or_attach {
                 next CREATE_DROP_ATTACH;
             }
         }
-        return $old_idx_hidden;
+        return $old_idx_cda;
     }
 }
 

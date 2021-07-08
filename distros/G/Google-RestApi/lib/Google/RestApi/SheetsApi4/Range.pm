@@ -1,26 +1,20 @@
 package Google::RestApi::SheetsApi4::Range;
 
-use strict;
-use warnings;
+# some private subroutines here are called by RangeGroup,
+# so think of RangeGroup as a friend of Range. the routines
+# RangeGroup calls are commented thusly:
+# "private range routine called here!"
 
-our $VERSION = '0.4';
+our $VERSION = '0.7';
 
-use 5.010_000;
+use Google::RestApi::Setup;
 
-use autodie;
-use Carp qw(cluck confess);
+use Carp qw(confess);
 use List::Util qw(max);
 use List::MoreUtils qw(first_index);
-use Type::Params qw(compile compile_named);
-use Types::Standard qw(Int Str StrMatch Value HashRef ArrayRef HasMethods Maybe Defined Any slurpy);
 use Scalar::Util qw(blessed looks_like_number);
-use YAML::Any qw(Dump);
-
-no autovivification;
 
 use aliased 'Google::RestApi::SheetsApi4::Range::Iterator';
-
-use Google::RestApi::Utils qw(named_extra dim dims dims_all);
 
 use parent "Google::RestApi::SheetsApi4::Request::Spreadsheet::Worksheet::Range";
 
@@ -46,8 +40,6 @@ use constant {
   CellA1    => '^(?:.+!)*[A-Z]+\d+$',
 };
 
-do 'Google/RestApi/logger_init.pl';
-
 sub new {
   my $class = shift;
 
@@ -64,63 +56,154 @@ sub new {
 
 sub clear {
   my $self = shift;
-  delete $self->{value_range};
   my $range = $self->range();
   DEBUG("Clearing range '$range'");
   my %p = (
     uri    => "/values/$range:clear",
     method => 'post',
   );
-  return $self->api(%p);
+  my $response = $self->api(%p);
+  $self->clear_cached_values();
+  return $response;
 }
+
+sub clear_cached_values { delete shift->{cache_range_values}; }
 
 sub refresh_values {
   my $self = shift;
-  delete $self->{value_range};
+  $self->clear_cached_values();
   return $self->values();
 }
 
+# this gets or sets the values of a range immediately, no batch.
+# if no values passed, gets them. if values passed, sets them.
 sub values {
   my $self = shift;
   my %p = @_;
-  return $self->_update(@_)->{values} if $p{values};
-  return $self->_value_range(@_)->{values};
+  $self->_send_values(%p) if defined $p{values};
+  return $self->_cache_range_values(%p)->{values};
 }
 
-sub _value_range {
+# immediately update the values for a range (no batch).
+sub _send_values {
+  my $self = shift;
+
+  state $check = compile_named(
+    values  => ArrayRef, { optional => 1 }, # ArrayRef->plus_coercions(Str, sub { [ $_ ] } ),
+    params  => HashRef, { default => {} },
+    content => HashRef, { default => {} },
+    _extra_ => slurpy Any,
+  );
+  my $p = named_extra($check->(@_));
+  
+  my $range = $self->range();
+
+  # since we're sending these values, fake a response from the
+  # api to store them in our cache.
+  # if includeValuesInResponse is sent in the params, then the
+  # response will replace the cache again.
+  $self->_cache_range_values(
+    range          => $range,
+    majorDimension => $self->{dim},
+    values         => $p->{values},
+  );
+
+  $p->{content}->{range} = $range;
+  $p->{content}->{values} = delete $p->{values};
+  $p->{content}->{majorDimension} = $self->{dim};
+  $p->{params}->{valueInputOption} //= 'USER_ENTERED';
+  # $p->{params}->{includeValuesInResponse} = 1;
+  $p->{uri} = "/values/$range";
+  $p->{method} = 'put';
+
+  my $update = $self->api(%$p);
+
+  # this fakes out the batch response with this immediate response.
+  # batch response would be in an arrayref, so wrap it thusly.
+  return $self->values_response_from_api([ $update ]);
+}
+
+# this stores the response to an update request, either batch or immediate:
+# ---
+# spreadsheetId: 1ky2czjhPArP71a6woeo_dxRr8gBOZZxGAPjOCXJvCwA
+# updatedCells: 6
+# updatedColumns: 3
+# updatedRange: Sheet1!B3:D4
+# updatedRows: 2
+# if invludeValuesInResponse was requested, the values are stashed
+# from the updatedData response key.
+# spreadsheet object will call this on a batch update response.
+sub values_response_from_api {
+  my $self = shift;
+
+  state $check = compile(ArrayRef, { optional => 1 });
+  my ($updates) = $check->(@_);
+  return if !$updates;
+
+  # shift off the next update from the batch api response. if this is
+  # getting called from the spreadsheet object, it means we have an
+  # update response to process.
+  my $update = shift @$updates;
+
+  # updatedData is included if includeValuesInResponse query param was sent.
+  # updatedData:
+  #   majorDimension: ROWS
+  #   range: Sheet1!A1
+  #   values:
+  #   - - Fred
+  # if the data is included, then replace any cached values with this latest
+  # updated set of values.
+  $self->_cache_range_values(%{ delete $update->{updatedData} })
+    if $update->{updatedData};
+  $self->{values_response_from_api} = $update;
+
+  return $self->values();
+}
+
+# this returns the values and major dimension for a given range. it will store
+# the values returned from an api fetch. it will store the values from a staged
+# 'batch_values' call for later update from the api. it will store the values
+# from an update if includeValuesInResponse was included.
+# cache is in the format:
+# majorDimension: ROWS
+# values:
+# - - Fred
+# if a range is included it's a flag that the dim and values are present from
+# the returned api call.
+sub _cache_range_values {
   my $self = shift;
 
   my %p = @_;
+  # if a range is included, assume this cache is coming from the api as a reply.
+  # this is to store the values for this range when includeValuesInResponse is
+  # added to the url or content on the original values call. you can replace the
+  # original values using the valueRenderOption to replace, say, formulas with their
+  # calculated value.
   if ($p{range}) {
-    # comes from the api as a reply. this is to store the
-    # values for this range when includeValuesInResponse
-    # is added to the url or content on the original values
-    # call. you can replace the original values using the
-    # valueRenderOption to replace, say, formulas with their
-    # calculated value.
     state $check = compile_named(
       majorDimension => Dims,
       range          => StrMatch[qr/.+!/],
-      values         => Maybe[ArrayRef], { optional => 1 },
+      values         => ArrayRef, { optional => 1 }  # will not exist if values aren't set in the ss.
     );
     my $p = $check->(@_);
 
     my ($worksheet_name) = $p->{range} =~ /(.+)!/;
     $worksheet_name =~ s/'//g;
-    die "Setting range data to worksheet name '$worksheet_name' that doesn't belong to this range: ", $self->worksheet_name()
+    LOGDIE "Setting range data to worksheet name '$worksheet_name' that doesn't belong to this range: ", $self->worksheet_name()
       if $worksheet_name ne $self->worksheet_name();
-    $self->{value_range} = $p;
+    delete $p->{range};  # we only cache the values and dimensions.
+    $self->{cache_range_values} = $p;
   }
 
-  return $self->{value_range} if $self->{value_range};
+  # if the value range was just stored (above) or was previously stored, return it.
+  return $self->{cache_range_values} if $self->{cache_range_values};
 
-  # used by iterators to use a 'parent' range to query
-  # the values for this 'child' range. this is to reduce
-  # network calls when iterating through a range.
+  # used by iterators to use a 'parent' range to query the values for this 'child'
+  # range. this is to reduce network calls when iterating through a range.
   my $shared = $self->{shared};
   if ($shared && $shared->has_values()) {
-    my $dim = $shared->{value_range}->{majorDimension};
-    my $values = $shared->{value_range}->{values};
+    my $dim = $shared->{cache_range_values}->{majorDimension};
+    my $values = $shared->{cache_range_values}->{values};
 
     my ($top, $left, $bottom, $right) = $self->offsets($shared);
     my $data;
@@ -134,22 +217,67 @@ sub _value_range {
       $data = \@rows;
     }
 
+    # return a subsection of the cached value for the iterator.
     return {
       majorDimension => $dim,
       values         => $data,
     };
   }
 
-  my $range = $self->range();
-  $p{uri} = "/values/$range";
+  # no values are found for this range, go get them from the api immediately.
+  $p{uri} = sprintf("/values/%s", $self->range());
   $p{params}->{majorDimension} = $self->{dim};
+  $self->{cache_range_values} = $self->api(%p);
 
-  $self->{value_range} = $self->api(\%p);
+  $self->{cache_range_values}->{values} //= [];  # in case there's nothing set in the ss.
 
-  return $self->{value_range};
+  return $self->{cache_range_values};
 }
 
-sub _update {
+# stage batch values get/set for later use by submit_values
+sub batch_values {
+  my $self = shift;
+
+  state $check = compile_named(
+    values => ArrayRef, { optional => 1 },
+  );
+  my $p = $check->(@_);
+
+  if (defined $p->{values}) {
+    # since we're sending these values, fake a response from the
+    # api to store them in our cache.
+    # if includeValuesInResponse is sent in the params, then the
+    # response will replace the cache again.
+    $self->_cache_range_values(
+        range          => $self->range(),
+        majorDimension => $self->{dim},
+        values         => $p->{values},
+    );
+  }
+
+  return if !$self->{cache_range_values};
+
+  return {
+    range => $self->range(),
+    %{ $self->{cache_range_values} },
+  };
+}
+
+# tell the api to submit the batch values. the api will call back
+# values_response_from_api with the results of the update.
+sub submit_values {
+  my $self = shift;
+  $self->spreadsheet()->submit_values(ranges => [ $self ], @_);
+  return $self->values();
+}
+
+sub submit_requests {
+  my $self = shift;
+  my @api = $self->spreadsheet()->submit_requests(ranges => [ $self ], @_);
+  return wantarray ? @api : $api[0];
+}
+
+sub append {
   my $self = shift;
 
   state $check = compile_named(
@@ -165,59 +293,10 @@ sub _update {
   $p->{content}->{values} = delete $p->{values};
   $p->{content}->{majorDimension} = $self->{dim};
   $p->{params}->{valueInputOption} //= 'USER_ENTERED';
-  $p->{uri} = "/values/$range";
-  $p->{method} = 'put';
+  $p->{uri} = "/values/$range:append";
+  $p->{method} = 'post';
 
-  my $update = $self->api(%$p);
-
-  return $self->values_response([ $update ]);
-}
-
-sub batch_values {
-  my $self = shift;
-
-  state $check = compile_named(
-    values => ArrayRef, { optional => 1 },
-  );
-  my $p = $check->(@_);
-
-  if (defined $p->{values}) {
-    $self->{value_range}->{values} = $p->{values};
-    $self->{value_range}->{majorDimension} = $self->{dim};
-    return $self;
-  }
-
-  return if !$self->{value_range};
-  return {
-    range => $self->range(),
-    %{ $self->{value_range} },
-  };
-}
-
-sub submit_values {
-  my $self = shift;
-  return $self->spreadsheet()->submit_values(values => [ $self ], @_);
-}
-
-sub values_response {
-  my $self = shift;
-
-  state $check = compile(ArrayRef, { optional => 1 });
-  my ($updates) = $check->(@_);
-  return $self->{values_response} if !$updates;
-
-  my $update = shift @$updates;
-  $self->{values_response} = $update;
-
-  $self->_value_range(%{ delete $update->{updatedData} })
-    if $update->{updatedData};
-
-  return $update;
-}
-
-sub submit_requests {
-  my $self = shift;
-  return $self->spreadsheet()->submit_requests(requests => [ $self ], @_);
+  return $self->api(%$p);
 }
 
 sub normalize_named {
@@ -553,7 +632,7 @@ sub range_to_array {
 
   my $range = $self->range();
   ($range) = $range =~ /!(.+)/;
-  $range or die "Unable to convert range to array: ", $self->range();
+  $range or LOGDIE "Unable to convert range to array: ", $self->range();
 
   my ($start_cell, $end_cell) = split(':', $range);
   $end_cell = undef if defined $end_cell && $start_cell eq $end_cell;
@@ -713,7 +792,7 @@ sub share_values {
 
 sub api { shift->worksheet()->api(@_); }
 sub dimension { shift->{dim}; }
-sub has_values { shift->{value_range}; }
+sub has_values { shift->{cache_range_values}; }
 sub worksheet { shift->{worksheet}; }
 sub worksheet_name { shift->worksheet()->worksheet_name(@_); }
 sub worksheet_id { shift->worksheet()->worksheet_id(@_); }
@@ -837,7 +916,7 @@ represents.
 
 Returns the 'named range' for this range, if any.
 
-=item is_named {
+=item is_named();
 
 Returns a true value if this range represents a 'named range'. See:
 https://support.google.com/docs/answer/63175?co=GENIE.Platform%3DDesktop&hl=en

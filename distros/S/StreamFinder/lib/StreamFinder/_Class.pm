@@ -16,6 +16,10 @@ You may distribute this module under the terms of either the GNU General
 Public License or the Artistic License, as specified in the Perl README 
 file.
 
+NOTE:  This module is for internal use only by the other StreamFinder modules 
+and should not be used directly.  Please see the main module (L<StreamFinder>) 
+POD documentation for documentation for all the methods and how to use.
+
 =cut
 
 package StreamFinder::_Class;
@@ -48,7 +52,8 @@ sub new
 				chomp;
 				next  if (/^\s*\#/o);
 				($atr, $val) = split(/\s*\=\>\s*/o, $_, 2);
-				eval "\$self->{$atr} = $val";
+				eval "\$self->{$atr} = $val";  #CATCH JSON-LIKE ARGS, IE. "arg => {key => value, ...}"
+				eval "\$self->{$atr} = \"\Q$val\E\""  if ($@);  #CATCH UNESCAPED ARGS, IE. "arg => str[with brackets,commas,etc.]"
 			}
 			close IN;
 		}
@@ -62,6 +67,8 @@ sub new
 			unless (defined $self->{'agent'});
 	$self->{'timeout'} = 10  unless (defined $self->{'timeout'});
 	$self->{'secure'} = 0    unless (defined $self->{'secure'});
+	$self->{'log'} = '';
+	$self->{'logfmt'} = '[time] [url] - [site]: [title] ([total])';
 
 	while (@_) {
 		if ($_[0] =~ /^\-?debug$/o) {
@@ -70,6 +77,12 @@ sub new
 		} elsif ($_[0] =~ /^\-?secure$/o) {
 			shift;
 			$self->{'secure'} = (defined $_[0]) ? shift : 1;
+		} elsif ($_[0] =~ /^\-?log$/o) {
+			shift;
+			$self->{'log'} = (defined $_[0]) ? shift : '';
+		} elsif ($_[0] =~ /^\-?logfmt$/o) {
+			shift;
+			$self->{'logfmt'} = shift  if (defined $_[0]);
 		} else {
 			shift;
 		}
@@ -266,6 +279,30 @@ sub getImageData
 	$image_ext = ($self->{'imageurl'} =~ /\.(\w+)$/) ? $1 : 'png';
 	$image_ext =~ s/[^A-Za-z].*$//;
 	return ($image_ext, $art_image);
+}
+
+sub _log
+{
+	my $self = shift;
+	my $inurl = shift;
+
+	if ($self->{'log'} && open(LOG, '>>'.$self->{'log'})) {
+		my $logline = $self->{'logfmt'};
+		if ($logline =~ m/\[time\]/) {
+			my $time = time;
+			$logline =~ s/\[time\]/$time/;
+		}
+		$logline =~ s/\[stream\]/$self->{'total'} ? $$self{'Url'}: '-no streams!-'/e;
+		$logline =~ s/\[site\]/$$self{'_objname'}/;
+		$logline =~ s/\[url\]/$inurl/;
+		foreach my $f (qw(title artist album description created year genre iconurl total albumartist)) {
+			my $val = $self->{$f} || '-na-';
+			$logline =~ s/\[$f\]/$val/;
+		}
+		my $sep = $bummer ? "\r\n" : "\n";
+		print LOG $logline . $sep;
+		close LOG;
+	}
 }
 
 1

@@ -29,7 +29,7 @@ my @default_cmd = (
 my @mirror = qw(mirror t/mirrors/privatemirror);
 
 my($stdout, $stderr) = capture { system( @default_cmd, 'help') };
-like($stdout, qr/cpandeps-diff add Some::Module/, "Can spew out some help");
+like($stdout, qr/cpandeps-diff.*add.*Some::Module/, "Can spew out some help");
 
 ($stdout, $stderr) = capture { system( @default_cmd, 'list') };
 eq_or_diff($stdout, '', "Starting with an empty db");

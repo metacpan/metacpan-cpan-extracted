@@ -19,7 +19,7 @@ BEGIN {
 
 my ( $term, $win ) = mk_term_and_window;
 
-my @f_widgets = map { my $w = TestWidget->new; $w->{CAN_FOCUS} = 1; $w } 0 .. 2;
+my @f_widgets = map { TestWidget->new( CAN_FOCUS => 1 ) } 0 .. 2;
 my @n_widgets = map { TestWidget->new } 0 .. 3;
 
 # first/after/before/last on a single container
@@ -178,7 +178,7 @@ my @n_widgets = map { TestWidget->new } 0 .. 3;
 
 done_testing;
 
-use Object::Pad 0.09;
+use Object::Pad 0.41;  # :param
 
 class TestWidget extends Tickit::Widget {
    use constant WIDGET_PEN_FROM_STYLE => 1;
@@ -190,7 +190,7 @@ class TestWidget extends Tickit::Widget {
    method lines { 1 }
    method cols  { 5 }
 
-   method CAN_FOCUS { $self->{CAN_FOCUS} }
+   has $_CAN_FOCUS :reader :param = 0;
 }
 
 class TestContainer extends Tickit::Widget::HBox {

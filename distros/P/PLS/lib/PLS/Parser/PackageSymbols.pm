@@ -3,7 +3,7 @@ package PLS::Parser::PackageSymbols;
 use strict;
 use warnings;
 
-use Fcntl    ();
+use Fcntl ();
 use Storable ();
 
 =head1 NAME
@@ -17,32 +17,38 @@ its symbol table to find all of the symbols in the package.
 
 =cut
 
+my $script = do { local $/; <DATA> };
+
 sub get_package_functions
 {
-    my ($package, $inc) = @_;
+    my ($package, $config) = @_;
 
     return unless (length $package);
 
-    # Fork off a process that imports the package
-    # and gets a list of all the functions available.
-    #
-    # We fork to avoid polluting our own namespace.
     pipe my $read_fh, my $write_fh;
     my $pid = fork;
 
     if ($pid)
     {
         close $write_fh;
+
         my $timeout = 0;
         local $SIG{ALRM} = sub { $timeout = 1 };
         alarm 10;
         my $result = eval { Storable::fd_retrieve($read_fh) };
         alarm 0;
-        return if $timeout;
+
+        if ($timeout)
+        {
+            kill 'KILL', $pid;
+            waitpid $pid, 0;
+            return;
+        }
+
         waitpid $pid, 0;
         return if (ref $result ne 'HASH' or not $result->{ok});
         return $result->{functions};
-    } ## end if ($pid)
+    }
     else
     {
         close $read_fh;
@@ -50,60 +56,95 @@ sub get_package_functions
         my $flags = fcntl $write_fh, Fcntl::F_GETFD, 0;
         fcntl $write_fh, Fcntl::F_SETFD, $flags & ~Fcntl::FD_CLOEXEC;
 
-        my $script = _get_package_functions_script(fileno($write_fh), $package);
-        my @inc    = map { "-I$_" } @{$inc // []};
-        exec $^X, @inc, '-e', $script;
-    } ## end else [ if ($pid) ]
+        my @inc = map { "-I$_" } @{$config->{inc} // []};
+        my $perl = $config->{syntax}{perl};
+        $perl = $^X unless (-x $perl);
+        exec $^X, @inc, '-e', $script, fileno($write_fh), $package;
+    }
 } ## end sub get_package_functions
 
-sub _get_package_functions_script
-{
-    my ($fileno, $package) = @_;
+1;
 
-    my $script = << 'EOF';
+__DATA__
 use File::Spec;
-use Storable;
-use Sub::Util;
+use Storable ();
+use Sub::Util ();
 
 open STDOUT, '>', File::Spec->devnull;
 open STDERR, '>', File::Spec->devnull;
 
-open my $write_fh, '>>&=', %d;
-my $package = q{%s} =~ s/['"]//gr;
+open my $write_fh, '>>&=', $ARGV[0];
+my $find_package = $ARGV[1];
 
-my @module_parts = split /::/, $package;
+my @module_parts        = split /::/, $find_package;
 my @parent_module_parts = @module_parts;
 pop @parent_module_parts;
 
-my @functions;
+my %functions;
+my @packages;
 
 foreach my $parts (\@parent_module_parts, \@module_parts)
 {
     my $package = join '::', @{$parts};
+    next unless (length $package);
+
     eval "require $package";
-    next if $@;
+    next if (length $@);
 
-    my $ref = \%%::;
+    push @packages, $package;
 
-    foreach my $part (@{$parts})
+    my @isa = add_parent_classes($package);
+
+    foreach my $isa (@isa)
+    {
+        eval "require $isa";
+        next if (length $@);
+        push @packages, $isa;
+    }
+}
+
+foreach my $package (@packages)
+{
+    my @parts = split /::/, $package;
+    my $ref = \%::;
+
+    foreach my $part (@parts)
     {
         $ref = $ref->{"${part}::"};
     }
 
-    foreach my $name (keys %%{$ref})
+    foreach my $name (keys %{$ref})
     {
-        next if $name =~ /^BEGIN|UNITCHECK|INIT|CHECK|END|VERSION|import$/;
+        next if $name =~ /^BEGIN|UNITCHECK|INIT|CHECK|END|VERSION|import|unimport$/;
+
         my $code_ref = $package->can($name);
-        next unless (ref $code_ref eq 'CODE');
-        next if Sub::Util::subname($code_ref) !~ /^${package}(?:::.+)*::${name}$/;
-        push @functions, $name;
-    } ## end foreach my $name (keys %%{$ref...})
+        next if (ref $code_ref ne 'CODE');
+        next if Sub::Util::subname($code_ref) !~ /^\Q$package\E(?:::.+)*::\Q$name\E$/;
+
+        if ($find_package->isa($package))
+        {
+            push @{$functions{$find_package}}, $name;
+        }
+        else
+        {
+            push @{$functions{$package}}, $name;
+        }
+    } ## end foreach my $name (keys %{$ref...})
+} ## end foreach my $parts (\@parent_module_parts...)
+
+sub add_parent_classes
+{
+    my ($package) = @_;
+
+    my @isa = eval "\@${package}::ISA";
+    return unless (scalar @isa);
+
+    foreach my $isa (@isa)
+    {
+        push @isa, add_parent_classes($isa);
+    }
+
+    return @isa;
 }
 
-Storable::nstore_fd({ok => 1, functions => \@functions}, $write_fh);
-EOF
-
-    return sprintf $script, $fileno, $package;
-} ## end sub _get_package_functions_script
-
-1;
+Storable::nstore_fd({ok => 1, functions => \%functions}, $write_fh);

@@ -1,5 +1,12 @@
 Revision history for XML-Sig
 
+0.51 - 2021-07-03
+
+  [Change Log]
+
+  - TBD     Update Changes and Increment version
+  - 3ad26aa Renew RSA certificate for 10 years
+
 0.50 - 2021-04-18
 
   [Significant features implemented since 0.47]
@@ -9,8 +16,10 @@ Revision history for XML-Sig
 
   [Change Log]
 
-  - TBD     Update Changes and Increment version
-  - c1d7ecb Add generated README to repo
+  - a625d48 Update Changes and Increment version
+  - a57965c Add generated README to repo
+  - c690862 Merge pull request #30 from perl-net-saml2/matrix
+  - b812222 Merge pull request #34 from perl-net-saml2/sig_sub
   - 73cc529 Add HMAC and RIPEMD160 dependencies
   - 92fa091 Test dsa with nox509
   - eb3f912 Move signature calculation to subroutines

@@ -11,6 +11,7 @@ package Wireguard::WGmeta::Cli::Human;
 use strict;
 use warnings FATAL => 'all';
 use experimental 'signatures';
+use Scalar::Util qw(looks_like_number);
 use base 'Exporter';
 our @EXPORT = qw(disabled2human bits2human return_self timestamp2human);
 
@@ -42,8 +43,12 @@ $n_bits * 1_000_000 . "MiB"
 
 =cut
 sub bits2human($n_bits) {
-    # this calculation is probably not correct, however, I found no reference on what is actually the unit of the wg show dump...
-    return sprintf("%.2f %s", $n_bits / 1_000_000, "MiB");
+    if (looks_like_number($n_bits)){
+        # this calculation is probably not correct, however, I found no reference on what is actually the unit of the wg show dump...
+        return sprintf("%.2f %s", $n_bits / 1_000_000, "MiB");
+    }
+    return "0.0 MiB";
+
 }
 
 =head3 timestamp2human($timestamp)
@@ -66,10 +71,10 @@ A string describing how long ago this timestamp was
 
 =cut
 sub timestamp2human($timestamp) {
-    my $int_timestamp = int($timestamp);
-    if ($int_timestamp == 0) {
+    if (not looks_like_number($timestamp) or $timestamp == 0) {
         return "never"
     }
+    my $int_timestamp = int($timestamp);
     my $delta = time - $int_timestamp;
     if ($delta > 2592000) {
         return ">month ago";

@@ -1,11 +1,5 @@
 Revision history for Perl extension Finance::BankVal::UK.
 
-0.01  Thu Jul  8 14:28:02 2010
+0.01  Fri Jul  9 13:20:58 2010
 	- original version; created by h2xs 1.23 with options
 		-AX -b 5.8.0 Finance::BankVal::UK
-0.02  Mon Aug  2 10:23:00 2010
-	- updated makefile to include dependency on Crypt::SSLeay
-0.03  Mon Aug  2 12:00:00 2010
-	- removed worldwritables
-0.04  Sun Aug 8 20:03:00 2010
-	- Altered permissions

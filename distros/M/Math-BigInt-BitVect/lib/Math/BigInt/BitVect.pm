@@ -8,9 +8,8 @@ use Math::BigInt::Lib 1.999801;
 
 our @ISA = qw< Math::BigInt::Lib >;
 
-our $VERSION = '1.16';
+our $VERSION = '1.17';
 
-use Carp;
 use Bit::Vector;
 
 ##############################################################################
@@ -631,48 +630,56 @@ by Steffen Beier.
 =head1 BUGS
 
 Please report any bugs or feature requests to
-C<bug-math-bigint-parts at rt.cpan.org>, or through the web interface at
-
-  L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Math-BigInt-BitVect>
-
-I will be notified, and then you'll automatically be notified of progress on
-your bug as I make changes.
+C<bug-math-bigint-bitvect at rt.cpan.org>, or through the web interface at
+L<https://rt.cpan.org/Ticket/Create.html?Queue=Math-BigInt-BitVect>
+(requires login). We will be notified, and then you'll automatically be
+notified of progress on your bug as I make changes.
 
 =head1 SUPPORT
 
-You can find documentation for this module with the perldoc command.
+After installing, you can find documentation for this module with the perldoc
+command.
 
-  perldoc Math::BigInt::BitVect
+    perldoc Math::BigInt::BitVect
 
 You can also look for information at:
 
 =over 4
 
-=item * RT: CPAN's request tracker
+=item GitHub
 
-L<http://rt.cpan.org/Public/Dist/Display.html?Name=Math-BigInt-BitVect>
+L<https://github.com/pjacklam/p5-Math-BigInt-BitVect>
 
-=item * CPAN Ratings
+=item RT: CPAN's request tracker
 
-L<http://cpanratings.perl.org/dist/Math-BigInt-BitVect>
+L<https://rt.cpan.org/Dist/Display.html?Name=Math-BigInt-BitVect>
 
-=item * Search CPAN
+=item MetaCPAN
 
-L<http://search.cpan.org/dist/Math-BigInt-BitVect>
+L<https://metacpan.org/release/Math-BigInt-BitVect>
 
-=item * CPAN Testers PASS Matrix
-
-L<http://pass.cpantesters.org/distro/M/Math-BigInt-BitVect.html>
-
-=item * CPAN Testers Reports
-
-L<http://www.cpantesters.org/distro/M/Math-BigInt-BitVect.html>
-
-=item * CPAN Testers Matrix
+=item CPAN Testers Matrix
 
 L<http://matrix.cpantesters.org/?dist=Math-BigInt-BitVect>
 
+=item CPAN Ratings
+
+L<https://cpanratings.perl.org/dist/Math-BigInt-BitVect>
+
 =back
+
+=head1 LICENSE
+
+This program is free software; you may redistribute it and/or modify it under
+the same terms as Perl itself.
+
+=head1 AUTHORS
+
+(c) 2001, 2002, 2003, 2004 by Tels http://bloodgate.com
+
+Maintained by Peter John Acklam E<lt>pjacklam@gmail.comE<gt>, 2016-2021
+
+The module Bit::Vector is (c) by Steffen Beyer. Thanx!
 
 =head1 SEE ALSO
 
@@ -683,18 +690,5 @@ L<Math::BigInt::GMP>, and L<Math::BigInt::Pari>.
 
 The modules that use these libraries L<Math::BigInt>, L<Math::BigFloat>, and
 L<Math::BigRat>.
-
-=head1 AUTHOR
-
-(c) 2001, 2002, 2003, 2004 by Tels http://bloodgate.com
-
-Peter John Acklam E<lt>pjacklam@gmail.comE<gt>, 2016
-
-The module Bit::Vector is (c) by Steffen Beyer. Thanx!
-
-=head1 LICENSE
-
-This program is free software; you may redistribute it and/or modify it under
-the same terms as Perl itself.
 
 =cut

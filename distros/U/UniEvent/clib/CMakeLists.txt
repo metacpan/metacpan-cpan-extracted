@@ -40,14 +40,14 @@ target_link_libraries(unievent-tests PUBLIC Catch2::Catch2)
 
 #ctest
 enable_testing()
-add_library(test-lib STATIC EXCLUDE_FROM_ALL tests/lib/test.cc)
-target_compile_definitions(test-lib PRIVATE CATCH_CONFIG_MAIN)
-target_link_libraries(test-lib Catch2::Catch2 ${PROJECT_NAME})
+add_library(${PROJECT_NAME}-test-lib STATIC EXCLUDE_FROM_ALL tests/lib/test.cc)
+target_compile_definitions(${PROJECT_NAME}-test-lib PRIVATE CATCH_CONFIG_MAIN)
+target_link_libraries(${PROJECT_NAME}-test-lib Catch2::Catch2 ${PROJECT_NAME})
 list(FILTER testSource EXCLUDE REGEX "lib")
 foreach(tobj ${testSource})
     get_filename_component(tname ${tobj} NAME_WE)
     add_executable(t_${tname} ${EXCLUDE_TEST} ${tobj})
-    target_link_libraries(t_${tname} test-lib)
+    target_link_libraries(t_${tname} ${PROJECT_NAME}-test-lib)
     add_test(NAME ${tobj} COMMAND t_${tname} WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 endforeach()
 

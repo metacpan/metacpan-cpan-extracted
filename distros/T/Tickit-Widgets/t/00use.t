@@ -5,6 +5,8 @@ use warnings;
 
 use Test::More;
 
+use_ok( 'Tickit::WidgetRole::SingleChildContainer' );
+
 use_ok( 'Tickit::Widgets' );
 
 use_ok( 'Tickit::Widget::Border' );

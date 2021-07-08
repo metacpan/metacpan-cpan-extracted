@@ -16,7 +16,7 @@ use Perl::Critic::Policy::Variables::ProhibitUnusedVarsStricter;
 use Readonly;
 use Pod::Usage;
 
-our $VERSION = '0.110';
+our $VERSION = '0.111';
 
 Readonly::Scalar my $DEFAULT_SINGLE_FILE_FORMAT => 4;
 Readonly::Scalar my $DEFAULT_MULTI_FILE_FORMAT  => 5;
@@ -31,6 +31,7 @@ GetOptions( \%opt, qw{
         allow_if_computed_by|computed-by=s@
         allow_unused_subroutine_arguments|subroutine-arguments!
         allow_state_in_expression|state-in-expression!
+        check_catch|check-catch|catch!
         prohibit_reference_only_variables|reference-only-variables!
         prohibit_returned_lexicals|returned-lexicals!
         dump! trace=s
@@ -110,6 +111,19 @@ unused-vars - Find unused variables in Perl code
 The following options are accepted by this script. They are documented
 with leading double dashes, but single dashes are accepted, as are
 unique abbreviations.
+
+=head2 --catch
+
+This option is a synonym for L<--check-catch|/--check-catch>.
+
+=head2 --check-catch
+
+ --check-catch
+
+If this Boolean option is asserted, the C<catch()> portion of a
+try/catch construction is checked.
+
+The default is C<--no-check-catch>.
 
 =head2 --computed-by
 

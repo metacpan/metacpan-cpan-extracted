@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2020-2021 -- leonerd@leonerd.org.uk
 
-package Object::Pad::MOP::Class 0.41;
+package Object::Pad::MOP::Class 0.43;
 
 use v5.14;
 use warnings;
@@ -145,10 +145,35 @@ nor will it see methods inherited from a superclass.
 
 =head2 add_slot
 
-   $metaslot = $metaclass->add_slot( $name )
+   $metaslot = $metaclass->add_slot( $name, %args )
 
 Adds a new slot to the class, using the given name (which must begin with the
 sigil character C<$>, C<@> or C<%>).
+
+Recognises the following additional named arguments:
+
+=over 4
+
+=item default => SCALAR
+
+I<Since version 0.43.>
+
+Provides a default value for the slot; similar to using the syntax
+
+   has $slot = SCALAR;
+
+This value may be C<undef>, to set the value as being optional if it
+additionally has a parameter name.
+
+=item param => STRING
+
+I<Since version 0.43.>
+
+Provides a parameter name for the slot; similar to setting it using the
+C<:param> attribute. This parameter will be required unless a default value is
+set (such value may still be C<undef>).
+
+=back
 
 Returns an instance of L<Object::Pad::MOP::Slot> to represent it.
 
@@ -158,6 +183,15 @@ Returns an instance of L<Object::Pad::MOP::Slot> to represent it.
 
 Returns an instance of L<Object::Pad::MOP::Slot> to represent the slot of the
 given name, if one exists. If not an exception is thrown.
+
+=head2 slots
+
+   @metaslots = $metaclass->slots
+
+I<Since version 0.42.>
+
+Returns a list of L<Object::Pad::MOP::Slot> instances to represent all the
+slots of the class. This list may be empty.
 
 =cut
 

@@ -5,6 +5,11 @@ use YAML::Any qw(Dump);
 
 use parent 'Test::Google::RestApi::SheetsApi4::Base';
 
+use aliased 'Google::RestApi::SheetsApi4::Range::Col';
+use aliased 'Google::RestApi::SheetsApi4::RangeGroup::Tie';
+
+use Utils qw(:all);
+
 sub class { 'Google::RestApi::SheetsApi4::RangeGroup::Tie' }
 
 sub tie : Tests(9) {
@@ -13,8 +18,8 @@ sub tie : Tests(9) {
   my $worksheet = $self->worksheet();
 
   my $row;
-  lives_ok sub { $row = $worksheet->tie_cells({id => 'B2'}, {name => 'C2'}, {address => 'D2'}); }, "Tie should live";
-  lives_ok sub { tied(%$row)->values(); }, "Tied row batch values should live";
+  is_hash $row = $worksheet->tie_cells({id => 'B2'}, {name => 'C2'}, {address => 'D2'}), "Create tie";
+  is_array tied(%$row)->values(), "Tied row batch values";
 
   $row->{id} = 1000;
   $row->{name} = "Joe Blogs";
@@ -24,7 +29,7 @@ sub tie : Tests(9) {
   is $worksheet->cell("C2"), undef, "Cell 'C2' is 'undef'";
   is $worksheet->cell("D2"), undef, "Cell 'D2' is 'undef'";
 
-  lives_ok sub { tied(%$row)->submit_values(); }, "Updating a row should live";
+  is_array tied(%$row)->submit_values(), "Updating a row";
 
   is $worksheet->cell("B2"), 1000, "Cell 'B2' is '1000'";
   is $worksheet->cell("C2"), "Joe Blogs", "Cell 'C2' is 'Joe Blogs'";
@@ -39,45 +44,45 @@ sub tie_cols : Tests(11) {
   my $worksheet = $self->worksheet();
 
   my $cols;
-  lives_ok sub { $cols = $worksheet->tie_cols({id => 'B:B'}, {name => 'C:C'}, {address => 'D:D'}); }, "Tie cols should live";
+  is_hash $cols = $worksheet->tie_cols({id => 'B:B'}, {name => 'C:C'}, {address => 'D:D'}), "Tie cols";
 
   $cols->{id} = [ 1000, 1001, 1002 ];
   $cols->{name} = [ "Joe Blogs", "Freddie Mercury", "Iggy Pop" ];
   $cols->{address} = [ "123 Some Street", "345 Some Other Street", "Another Universe" ];
 
-  lives_ok sub { tied(%$cols)->submit_values(); }, "Updating a row should live";
+  is_array tied(%$cols)->submit_values(), "Updating a row";
 
-  is $worksheet->cell("B1"), 1000, "Cell 'B2' is '1000'";
-  is $worksheet->cell("C1"), "Joe Blogs", "Cell 'C2' is 'Joe Blogs'";
-  is $worksheet->cell("D1"), "123 Some Street", "Cell 'D2' is '123 Some Street'";
+  is $worksheet->cell("B1"), 1000, "Cell 'B1' is '1000'";
+  is $worksheet->cell("C1"), "Joe Blogs", "Cell 'C1' is 'Joe Blogs'";
+  is $worksheet->cell("D1"), "123 Some Street", "Cell 'D1' is '123 Some Street'";
 
-  is $worksheet->cell("B2"), 1001, "Cell 'B3' is '1001'";
-  is $worksheet->cell("C2"), "Freddie Mercury", "Cell 'C3' is 'Freddie Mercury'";
-  is $worksheet->cell("D2"), "345 Some Other Street", "Cell 'D3' is '345 Some Other Street'";
+  is $worksheet->cell("B2"), 1001, "Cell 'B2' is '1001'";
+  is $worksheet->cell("C2"), "Freddie Mercury", "Cell 'C2' is 'Freddie Mercury'";
+  is $worksheet->cell("D2"), "345 Some Other Street", "Cell 'D2' is '345 Some Other Street'";
 
-  is $worksheet->cell("B3"), 1002, "Cell 'B4' is '1002'";
-  is $worksheet->cell("C3"), "Iggy Pop", "Cell 'C4' is 'Iggy Pop'";
-  is $worksheet->cell("D3"), "Another Universe", "Cell 'D4' is 'Another Universe'";
+  is $worksheet->cell("B3"), 1002, "Cell 'B3' is '1002'";
+  is $worksheet->cell("C3"), "Iggy Pop", "Cell 'C3' is 'Iggy Pop'";
+  is $worksheet->cell("D3"), "Another Universe", "Cell 'D3' is 'Another Universe'";
 
   return;
 }
 
-sub tie_cell : Tests(10) {
+sub tie_cell : Tests(7) {
   my $self = shift;
 
   my $worksheet = $self->worksheet();
 
   my $cells;
-  lives_ok sub { $cells = $worksheet->tie(); }, "Tie should live";
+  is_hash $cells = $worksheet->tie(), "Create blank tie";
   my $ranges = $worksheet->tie_cells('A1', { fred => [2, 2] });
-  lives_ok sub { tied(%$cells)->add_tied($ranges); }, "Tied cells should live";
-  lives_ok sub { tied(%$cells)->values(); }, "Tied cell batch values should live";
+  is_hash tied(%$cells)->add_tied($ranges), Tie, "Adding tied cells";
+  is_array tied(%$cells)->values(), "Tied cell batch values";
 
-  lives_ok sub { $cells->{A1} = 1000; }, "Setting A1 directly should live";
-  lives_ok sub { $cells->{fred} = "Joe Blogs"; }, "Setting 'B2' as 'fred' should live";
-  lives_ok sub { $cells->{C3} = "123 Some Street"; }, "Setting a new cell 'C3' should live";
+  $cells->{A1} = 1000;
+  $cells->{fred} = "Joe Blogs";
+  $cells->{C3} = "123 Some Street";
 
-  lives_ok sub { tied(%$cells)->submit_values(); }, "Updating cells should live";
+  is_array tied(%$cells)->submit_values(), "Updating cells";
 
   is $worksheet->cell("A1"), 1000, "Cell 'A1' is '1000'";
   is $worksheet->cell("B2"), "Joe Blogs", "Cell 'B2' is 'Joe Blogs'";
@@ -86,20 +91,20 @@ sub tie_cell : Tests(10) {
   return;
 }
 
-sub tie_slice : Tests(9) {
+sub tie_slice : Tests(8) {
   my $self = shift;
 
   my $worksheet = $self->worksheet();
 
   my $cells;
-  lives_ok sub { $cells = $worksheet->tie(); }, "Tie should live";
-  lives_ok sub { @$cells{ 'A1', 'B2', 'C3', 'D4:E5' } = (1000, "Joe Blogs", "123 Some Street", [["Halifax"]]) }, "Hash slice should live";
+  is_hash $cells = $worksheet->tie(), "Create blank tie";
+  @$cells{ 'A1', 'B2', 'C3', 'D4:E5' } = (1000, "Joe Blogs", "123 Some Street", [["Halifax"]]);
 
   is $worksheet->cell("A1"), undef, "Cell 'A1' is 'undef'";
   is $worksheet->cell("B2"), undef, "Cell 'B2' is 'undef'";
   is $worksheet->cell("C3"), undef, "Cell 'C3' is 'undef'";
 
-  lives_ok sub { tied(%$cells)->submit_values(); }, "Updating cells should live";
+  is_array tied(%$cells)->submit_values(), "Updating cells";
 
   is $worksheet->cell("A1"), 1000, "Cell 'A1' is '1000'";
   is $worksheet->cell("B2"), "Joe Blogs", "Cell 'B2' is 'Joe Blogs'";
@@ -114,12 +119,12 @@ sub tie_return_objects : Tests(6) {
   my $worksheet = $self->worksheet();
 
   my $cols = $worksheet->tie_cols({id => 'B:B'}, {name => 'C:C'}, {address => 'D:D'});
-  lives_ok sub { tied(%$cols)->fetch_range(1); }, "Turning on cols return objects should succeed";
-  lives_ok sub { $cols->{id}->red(); }, "Setting id to red should succeed";
-  lives_ok sub { $cols->{name}->center(); }, "Setting name centered should succeed";
-  lives_ok sub { $cols->{address}->font_size(12); }, "Setting address font size should succeed";
-  lives_ok sub { tied(%$cols)->fetch_range(); }, "Turning off return objects should succeed";
-  lives_ok sub { tied(%$cols)->submit_requests(); }, "Submitting formats should succeed";
+  isa_ok tied(%$cols)->fetch_range(1), Tie, "Turning on cols return objects";
+  isa_ok $cols->{id}->red(), Col, "Setting id to red";
+  isa_ok $cols->{name}->center(), Col, "Setting name centered";
+  isa_ok $cols->{address}->font_size(12), Col, "Setting address font size";
+  isa_ok tied(%$cols)->fetch_range(), Tie, "Turning off return objects";
+  is_hash tied(%$cols)->submit_requests(), "Submitting requests";
 
   return;
 }

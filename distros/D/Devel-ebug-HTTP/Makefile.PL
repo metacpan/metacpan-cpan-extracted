@@ -35,48 +35,50 @@ my %WriteMakefileArgs = (
     "lib/Devel/ebug/HTTP/View/TT.pm" => "\$(INST_LIB)/Devel/ebug/HTTP/View/TT.pm"
   },
   "PREREQ_PM" => {
-    "Catalyst"               => 0,
-    "Catalyst::ScriptRunner" => 0,
-    "Catalyst::View::TT"     => 0,
-    "Cwd"                    => 0,
-    "Devel::ebug"            => 0,
-    "File::ShareDir::Dist"   => 0,
-    "HTML::Prototype"        => 0,
-    "List::Util"             => 0,
-    "PPI"                    => 0,
-    "PPI::HTML"              => 0,
-    "Path::Class"            => "0.26",
-    "Storable"               => 0,
-    "base"                   => 0
+    "Catalyst"                         => 0,
+    "Catalyst::Plugin::Static::Simple" => 0,
+    "Catalyst::ScriptRunner"           => 0,
+    "Catalyst::View::TT"               => 0,
+    "Cwd"                              => 0,
+    "Devel::ebug"                      => 0,
+    "File::ShareDir::Dist"             => 0,
+    "HTML::Prototype"                  => 0,
+    "List::Util"                       => 0,
+    "PPI"                              => 0,
+    "PPI::HTML"                        => 0,
+    "Path::Class"                      => "0.26",
+    "Storable"                         => 0,
+    "base"                             => 0
   },
   "TEST_REQUIRES" => {
     "HTTP::Request::Common"          => 0,
     "Test::More"                     => "0.98",
     "Test::WWW::Mechanize::Catalyst" => 0
   },
-  "VERSION" => "0.33",
+  "VERSION" => "0.34",
   "test"    => {
     "TESTS" => "t/*.t"
   }
 );
 
 my %FallbackPrereqs = (
-  "Catalyst"                       => 0,
-  "Catalyst::ScriptRunner"         => 0,
-  "Catalyst::View::TT"             => 0,
-  "Cwd"                            => 0,
-  "Devel::ebug"                    => 0,
-  "File::ShareDir::Dist"           => 0,
-  "HTML::Prototype"                => 0,
-  "HTTP::Request::Common"          => 0,
-  "List::Util"                     => 0,
-  "PPI"                            => 0,
-  "PPI::HTML"                      => 0,
-  "Path::Class"                    => "0.26",
-  "Storable"                       => 0,
-  "Test::More"                     => "0.98",
-  "Test::WWW::Mechanize::Catalyst" => 0,
-  "base"                           => 0
+  "Catalyst"                         => 0,
+  "Catalyst::Plugin::Static::Simple" => 0,
+  "Catalyst::ScriptRunner"           => 0,
+  "Catalyst::View::TT"               => 0,
+  "Cwd"                              => 0,
+  "Devel::ebug"                      => 0,
+  "File::ShareDir::Dist"             => 0,
+  "HTML::Prototype"                  => 0,
+  "HTTP::Request::Common"            => 0,
+  "List::Util"                       => 0,
+  "PPI"                              => 0,
+  "PPI::HTML"                        => 0,
+  "Path::Class"                      => "0.26",
+  "Storable"                         => 0,
+  "Test::More"                       => "0.98",
+  "Test::WWW::Mechanize::Catalyst"   => 0,
+  "base"                             => 0
 );
 
 unless ( eval { ExtUtils::MakeMaker->VERSION(6.63_03) } ) {

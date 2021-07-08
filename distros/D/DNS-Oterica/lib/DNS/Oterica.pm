@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package DNS::Oterica;
 # ABSTRACT: build dns configuration more easily
-$DNS::Oterica::VERSION = '0.311';
+$DNS::Oterica::VERSION = '0.312';
 #pod =head1 WARNING
 #pod
 #pod B<HIGHLY EXPERIMENTAL>
@@ -69,7 +69,7 @@ DNS::Oterica - build dns configuration more easily
 
 =head1 VERSION
 
-version 0.311
+version 0.312
 
 =head1 OVERVIEW
 
@@ -92,6 +92,16 @@ Nodes (both hosts and domains) can be parts of families.  Families are groups
 of behavior that nodes perform.  A family object is instantiated for each
 family, and once all nodes have been added to the DNS::Oterica hub, the family
 can emit more configuration.
+
+=head1 PERL VERSION
+
+This library should run on perls released even a long time ago.  It should work
+on any version of perl released in the last five years.
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
 
 =head1 WARNING
 
@@ -123,7 +133,7 @@ There's a lot of stuff to do.
 
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@cpan.org>
+Ricardo SIGNES <rjbs@semiotic.systems>
 
 =head1 CONTRIBUTORS
 
@@ -143,7 +153,7 @@ Joel Shea <jshea@fastmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Ricardo SIGNES.
+This software is copyright (c) 2021 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

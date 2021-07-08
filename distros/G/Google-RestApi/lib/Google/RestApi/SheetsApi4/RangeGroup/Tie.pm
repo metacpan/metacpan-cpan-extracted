@@ -1,25 +1,12 @@
 package Google::RestApi::SheetsApi4::RangeGroup::Tie;
 
-use strict;
-use warnings;
+our $VERSION = '0.7';
 
-our $VERSION = '0.4';
+use Google::RestApi::Setup;
 
-use 5.010_000;
-
-use autodie;
 use Tie::Hash;
-use Type::Params qw(compile compile_named);
-use Types::Standard qw(Int StrMatch ArrayRef HashRef HasMethods Any slurpy);
-use YAML::Any qw(Dump);
-
 use aliased 'Google::RestApi::SheetsApi4::RangeGroup::Tie::Iterator';
-
 use parent -norequire, 'Tie::StdHash';
-
-no autovivification;
-
-do 'Google/RestApi/logger_init.pl';
 
 sub iterator {
   my $self = shift;
@@ -54,7 +41,7 @@ sub add_ranges {
   state $check = compile(slurpy ArrayRef[HasMethods[qw(range)]]);
   $check->(CORE::values %ranges);
   @{ $self->{ranges} }{ keys %ranges } = CORE::values %ranges;
-  return;
+  return \%ranges;
 }
 
 sub add_tied {
@@ -115,7 +102,7 @@ sub FETCH {
   my $self = shift;
   my $key = shift;
   my $range = $self->ranges()->{$key}
-    or die "No range found for key '$key'";
+    or LOGDIE "No range found for key '$key'";
   return $self->{fetch_range} ? $range : $range->values();
 }
 
@@ -125,7 +112,7 @@ sub STORE {
   my ($key, $value) = @_;
   if (!$self->ranges()->{$key}) {
     my $worksheet = $self->worksheet()
-      or die "No default worksheet provided for new range '$key'. Call default_worksheet() first.";
+      or LOGDIE "No default worksheet provided for new range '$key'. Call default_worksheet() first.";
     # have to make assumptions here. if there is a : somewhere in
     # the range, assume it's a range, else a cell. this may not
     # always do the right thing. in those cases, the initial tie

@@ -25,7 +25,7 @@ for my $abbrev (@abbrev) {
     my $long = $record->long;
     ok($long && ! ref $long, "long is string: " . $long);
     my @abbr = $record->abbr;
-    ok(grep { $_ eq $abbrev } @abbr, "abbrev $abbrev included in '$long' abbreviations");
+    ok(grep({ $_ eq $abbrev } @abbr), "abbrev $abbrev included in '$long' abbreviations");
     if (my $abbr1 = $record->abbr1) {
       ok(! ref $abbr1, "abbr1 is string: " . $abbr1);
     }

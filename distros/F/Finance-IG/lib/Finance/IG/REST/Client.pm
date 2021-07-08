@@ -27,11 +27,11 @@ generate files as you will need to really access the IG site.
 
 =head1 VERSION 
 
-Version 0.092
+Version 0.093
 
 =cut
 
-our $VERSION=0.092; 
+our $VERSION=0.093; 
 
 =head1 SYNOPSIS
 

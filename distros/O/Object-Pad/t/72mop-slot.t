@@ -19,6 +19,11 @@ my $slotmeta = $classmeta->get_slot( '$slot' );
 
 is( $slotmeta->name, "\$slot", '$slotmeta->name' );
 is( $slotmeta->class->name, "Example", '$slotmeta->class gives class' );
+is( $slotmeta->param_name, undef, '$slotmeta->param_name' );
+ok( !$slotmeta->has_param, '$slotmeta->has_param' );
+
+is_deeply( [ $classmeta->slots ], [ $slotmeta ],
+   '$classmeta->slots' );
 
 # $slotmeta->value as accessor
 {
@@ -37,6 +42,35 @@ is( $slotmeta->class->name, "Example", '$slotmeta->class gives class' );
 
    is( $obj->slot, "a new value",
       '$obj->slot after $slotmeta->value as mutator' );
+}
+
+# $slotmeta->param
+{
+   class WithParam {
+      has $name :param;
+   }
+
+   my $slotmeta = Object::Pad::MOP::Class->for_class( "WithParam" )
+      ->get_slot( '$name' );
+
+   is( $slotmeta->name, '$name', '$slotmeta->name for param' );
+   is( $slotmeta->param_name, 'name', '$slotmeta->param_name for param' );
+}
+
+# RT136869
+{
+   class A {
+      has @arr;
+      BUILD { @arr = (1,2,3) }
+      method m { @arr }
+   }
+   role R {
+      has $data :param;
+   }
+   class B isa A does R {}
+
+   is_deeply( [ B->new( data => 456 )->m ], [ 1, 2, 3 ],
+      'Role params are embedded correctly' );
 }
 
 # Forbid writing to non-scalar slots via ->value

@@ -5,12 +5,20 @@
 		}
 	],
 	"settings": {
-		"perlSyntax.perlExecutable": "/Users/jonasbn/perl5/perlbrew/perls/perl-5.28.1/bin/perl",
-		"perlcritic.executable": "/Users/jonasbn/perl5/perlbrew/perls/perl-5.28.1/bin/perlcritic",
-		"perlcritic.severity": "brutal",
-		"perlcritic.additionalArguments": [
-			"--profile",
-			"t/perlcriticrc"
+		"perl-toolbox.lint.perlcriticProfile": "$workspaceRoot/.perlcriticrc",
+		"perl-toolbox.lint.useProfile": true,
+		"perl-toolbox.syntax.includePaths": [
+			"$workspaceRoot/lib",
+			"$workspaceRoot/t",
+			"/Users/jonasbn/.perlbrew/libs/perl-5.32.0@test-timer/lib/perl5/darwin-2level",
+			"/Users/jonasbn/.perlbrew/libs/perl-5.32.0@test-timer/lib/perl5"
+		],
+		"perl-toolbox.syntax.exec": "/Users/jonasbn/perl5/perlbrew/perls/perl-5.32.0/bin/perl",
+		"perl-toolbox.lint.path": "/Users/jonasbn/perl5/perlbrew/perls/perl-5.32.0/bin/perlcritic",
+		"perl-toolbox.syntax.enabled": true,
+		"perl-toolbox.syntax.path": "/Users/jonasbn/perl5/perlbrew/perls/perl-5.32.0/bin/perl",
+		"perl.perltidyArgs": [
+			"--pro=t/perltidyrc"
 		]
 	}
 }

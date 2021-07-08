@@ -3,7 +3,7 @@ package Database::Async::Backoff;
 use strict;
 use warnings;
 
-our $VERSION = '0.014'; # VERSION
+our $VERSION = '0.015'; # VERSION
 
 =head1 NAME
 

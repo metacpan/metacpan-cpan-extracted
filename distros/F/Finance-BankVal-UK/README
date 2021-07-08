@@ -1,4 +1,4 @@
-Finance-BankVal-UK version 0.02
+Finance-BankVal-UK version 0.9
 ===============================
 
 BankValUK - Perl extension for accessing Unified Software's bankValUK web
@@ -6,42 +6,40 @@ services requires Perl 5.8.0 or later
 
 UserID and PIN are available at:-
 
-http://www.unifiedsoftware.co.uk/freetrial/free-trial-home.html
+https://www.unifiedsoftware.co.uk/request-a-free-trial/
 
 SYNOPSIS
 
   use Finance::BankVal::UK qw(&bankValUK);
 
-  ans$ = bankValUK('xml','01-01-01','12345678');
+  $ans = bankValUK('01-01-01','12345678');
 
   ===================== or for OO ========================
 
   use Finance::BankVal::UK;
 
   my $bvObj = Finance::BankVal::UK->new();
-  $result = $bvObj->bankValUK('xml','01-01-01','12345678');
+  $result = $bvObj->bankValUK('01-01-01','12345678');
 
 DESCRIPTION
 
 This module handles all of the restful web service calls to Unified Software's
 BankValUK service. It also handles fail over to the back up services transparently to the
-calling script.It can be called either in a procedural sense or an OO one (see synopsis)
+calling script. It can be called either in a procedural sense or an OO one (see synopsis)
 
 The exposed method &bankValUK(); takes a number of parameters including;
 
-1: Format 	- the response format (either xml, json or csv)
+1: Sort code	- 6 digit number either 00-00-00, 00 00 00 or 000000
 
-2: Sort code	- 6 digit number either 00-00-00, 00 00 00 or 000000
+2: Account no.	- 6 to 12 digit (unseparated i.e. 00000000)
 
-3: Account no.	- 6 to 12 digit (unseperated i.e. 00000000)
+3: UserID	- available from www.unifiedsoftware.co.uk
 
-4: UserID	- available from www.unifiedsoftware.co.uk
+4: PIN		- available from www.unifiedsoftware.co.uk
 
-5: PIN		- available from www.unifiedsoftware.co.uk
+(UserID and PIN are available from https://www.unifiedsoftware.co.uk/request-a-free-trial/)
 
-(UserID and PIN are available from http://www.unifiedsoftware.co.uk/freetrial/free-trial-home.html)
-
-The order of the parameters MUST be as above although supplying an account number is optional.
+The order of the parameters MUST be as above.
 The UserID and PIN can also be stored in the LoginConfig.txt file bundled with this module, the
 use of this file saves passing the PIN and user ID data with each call to bankValUK.
 For example a call to validate a UK bank account passing the user ID and PIN as parameters
@@ -53,7 +51,7 @@ and printing the reply to console should follow this form:
 
  use Finance::BankVal::UK qw(&bankValUK);
 
- my $ans = bankValUK('XML','01-02-03','12345678','xmpl123','12345');
+ my $ans = bankValUK('01-02-03','12345678','xmpl123','12345');
 
  print $ans;
 
@@ -62,7 +60,7 @@ and printing the reply to console should follow this form:
  use Finance::BankVal::UK
 
  my $bvObj = Finance::BankVal::UK->new();
- my $ans = $bvObj->bankValUK('XML','01-02-03','12345678','xmpl123','12345');
+ my $ans = $bvObj->bankValUK('01-02-03','12345678','xmpl123','12345');
 
  print $ans;
 
@@ -70,15 +68,11 @@ and printing the reply to console should follow this form:
 
 valid parameter lists are:-
 
-bankValUK('$format','$sortcode','$account no.','$userID','$PIN');
+bankValUK('$sortcode','$account_no','$userID','$PIN');
 
-bankValUK('$format','$sortcode','$userID','$PIN');
+bankValUK('$sortcode','$account_no');
 
-bankValUK('$format','$sortcode','$account no.');
-
-bankValUK('$format','$sortcode');
-
-n.b. the last two parameter lists require that the user ID and PIN are stored
+n.b. the last parameter list requires that the user ID and PIN are stored
 in the LoginConfig.txt file bundled with this module.
 
 
@@ -98,35 +92,25 @@ A. Evans - Unified Software, support@unifiedsoftware.co.uk
 
 INSTALLATION
 
-To install this module type the following: (on Windows use dmake or nmake instead of make)
+To install this module type the following:
 
    perl Makefile.PL
    make
    make test
    make install
 
-   or just copy the .pm file to a folder in your PERL @INC and ensure you have all the dependencies listed below installed.
+   or just copy the .pm file to a folder in your PERL @INC
 
 DEPENDENCIES
 
 This module requires these other modules and libraries:
 
 LWP::UserAgent;
-XML::Simple;
 JSON;
-
-Crypt::SSLeay is also required as it is a dependency of LWP::UserAgent.
-
-Crypt::SSLeay is typically bundled with windows Perl ports, however on *nix you may need to install it by:
-
-sudo aptitude install libssl-dev (might not be neccessary and can be removed after install)
-sudo cpan -i Crypt::SSLeay
-
-
 
 COPYRIGHT AND LICENSE
 
-Copyright (C) 2010 by Unified Software Limited
+Copyright (C) 2021 by Unified Software Limited
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.0 or,

@@ -3,6 +3,10 @@ package Test::Google::RestApi::SheetsApi4::Range;
 use YAML::Any qw(Dump);
 use Test::Most;
 
+use Utils qw(:all);
+
+use aliased 'Google::RestApi::SheetsApi4::Range';
+
 use parent qw(Test::Class Test::Google::RestApi::SheetsApi4::Range::Base);
 
 sub class { 'Google::RestApi::SheetsApi4::Range' }
@@ -25,7 +29,7 @@ sub range : Tests(6) {
   my $x = "A1:B2";
 
   my $range;
-  lives_ok sub { $range = $self->new_range($x); }, "New range '$x' should live";
+  isa_ok $range = $self->new_range($x), Range, "New range '$x'";
   is $range->range(), "$self->{name}$x", "A1:B2 should be $x";
 
   $range = $self->new_range([[1,1], [2,2]]);

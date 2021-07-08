@@ -1,11 +1,11 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2013-2020 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2013-2021 -- leonerd@leonerd.org.uk
 
-use Object::Pad 0.27;
+use Object::Pad 0.43;  # ADJUST
 
-package Tickit::Widget::RadioButton 0.31;
+package Tickit::Widget::RadioButton 0.32;
 class Tickit::Widget::RadioButton
    extends Tickit::Widget;
 
@@ -150,20 +150,14 @@ is passed to the group's C<on_changed> callback.
 
 =cut
 
-has $_label;
-has $_on_toggle;
-has $_value;
-has $_group;
+has $_label     :reader         :param;
+has $_on_toggle :reader :writer :param = undef;
+has $_value     :reader :writer :param = undef;
+has $_group     :reader         :param = undef;
 
-BUILD
+ADJUST
 {
-   my %params = @_;
-
-   $self->set_label( $params{label} ) if defined $params{label};
-   $self->set_on_toggle( $params{on_toggle} ) if $params{on_toggle};
-   $self->set_value( $params{value} ) if defined $params{value};
-
-   $_group = $params{group} || Tickit::Widget::RadioButton::Group->new;
+   $_group //= Tickit::Widget::RadioButton::Group->new;
 }
 
 method lines
@@ -190,7 +184,7 @@ Returns the C<Tickit::Widget::RadioButton::Group> this button belongs to.
 
 =cut
 
-method group { $_group }
+# generated accessor
 
 =head2 label
 
@@ -204,7 +198,7 @@ Returns or sets the label text of the button.
 
 =cut
 
-method label { $_label }
+# generated accessor
 
 method set_label
 {
@@ -219,7 +213,7 @@ method set_label
 
 =cut
 
-method on_toggle { $_on_toggle }
+# generated accessor
 
 =head2 set_on_toggle
 
@@ -235,10 +229,7 @@ marked unactive before the new one is marked active.
 
 =cut
 
-method set_on_toggle
-{
-   $_on_toggle = $_[0];
-}
+# generated accessor
 
 =head2 value
 
@@ -246,7 +237,7 @@ method set_on_toggle
 
 =cut
 
-method value { $_value }
+# generated accessor
 
 =head2 set_value
 
@@ -258,10 +249,7 @@ stored by the button and not otherwise used.
 
 =cut
 
-method set_value
-{
-   $_value = $_[0];
-}
+# generated accessor
 
 =head1 METHODS
 
@@ -340,8 +328,8 @@ method on_mouse
    $self->activate;
 }
 
-class Tickit::Widget::RadioButton::Group;
-use Scalar::Util qw( weaken refaddr );
+class Tickit::Widget::RadioButton::Group {
+   use Scalar::Util qw( weaken refaddr );
 
 =head1 GROUPS
 
@@ -362,8 +350,8 @@ Returns a new group.
 
 =cut
 
-has $_active;
-has $_on_changed;
+   has $_active :reader;
+   has $_on_changed :reader :writer;
 
 =head2 active
 
@@ -373,21 +361,17 @@ Returns the button which is currently active in the group
 
 =cut
 
-method active { $_active }
-
-method set_active
-{
-   ( $_active ) = @_;
-   $_on_changed->( $self->active, $self->active->value ) if $_on_changed;
-}
+   method set_active
+   {
+      ( $_active ) = @_;
+      $_on_changed->( $self->active, $self->active->value ) if $_on_changed;
+   }
 
 =head2 on_changed
 
    $on_changed = $group->on_changed
 
 =cut
-
-method on_changed { $_on_changed }
 
 =head2 set_on_changed
 
@@ -403,9 +387,6 @@ The callback is passed the currently-active button, and its C<value>.
 
 =cut
 
-method set_on_changed
-{
-   ( $_on_changed ) = @_;
 }
 
 =head1 AUTHOR

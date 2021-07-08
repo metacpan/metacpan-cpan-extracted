@@ -21,7 +21,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Object::Pad" : "0.27",
+            "Object::Pad" : "0.41",
             "Tickit::RenderBuffer" : "0",
             "Tickit::Style" : "0",
             "Tickit::Widget" : "0",
@@ -33,7 +33,7 @@
    "provides" : {
       "Tickit::Widget::Choice" : {
          "file" : "lib/Tickit/Widget/Choice.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       }
    },
    "release_status" : "stable",
@@ -43,6 +43,6 @@
       ],
       "x_IRC" : "irc://irc.freenode.net/#tickit"
    },
-   "version" : "0.04",
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "version" : "0.05",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

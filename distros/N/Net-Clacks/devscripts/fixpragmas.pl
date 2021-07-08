@@ -7,7 +7,7 @@ use diagnostics;
 use mro 'c3';
 use English;
 use Carp;
-our $VERSION = 17;
+our $VERSION = 18;
 use autodie qw( close );
 use Array::Contains;
 use utf8;
@@ -71,7 +71,7 @@ foreach my $file (@files) {
             print $ofh "use mro 'c3';\n";
             print $ofh "use English;\n";
             print $ofh "use Carp;\n";
-            print $ofh "our \$VERSION = 17;\n";
+            print $ofh "our \$VERSION = 18;\n";
             print $ofh "use autodie qw( close );\n";
             print $ofh "use Array::Contains;\n";
             print $ofh "use utf8;\n";

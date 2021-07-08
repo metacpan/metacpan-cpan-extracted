@@ -1,0 +1,40 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.87.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 2ccde59e8dadcb7300613f1e250b1ce713e3210d03edefeda828d10d3e7c0f80 Build.PL
+SHA256 9ee54aa2811a81739d5af9234be08c661e7683cf302a64366ff1f9da57f2d7b0 Changes
+SHA256 63d5dc9cd1ee16c57a818cb7aeac699734d09aa8b02483837af4e2f954e139e9 LICENSE
+SHA256 ad9672ac5abcc397c6864a4ca1909a4223afcbcc07e166de1005b28c75d67cfe MANIFEST
+SHA256 b1be5c753bedad3b098ea4ec4a714e099f8766754e0ee70a185d56ca75828f76 META.json
+SHA256 a8852d4b42c2c74bc4aa4fc957a9354886fc5682b7d7e4f73d2d22e1c510c361 META.yml
+SHA256 b9171c6467ea90fd0bb399e7e7496457c078a6590c6865604548c4f1155b38ce README
+SHA256 5422e004f9d698a359baf2625cb8048abb0cccddb2fbbb6e490cfb583fb9c44d eg/loremgen
+SHA256 df99af282ee327d7080d06a0e21e3ba095cd79bdfc519c56a1c940474efd8614 lib/Music/Guidonian.pm
+SHA256 708287aa617f5f22401f4d11905923abba97838dc46a24c4839945667a19860a t/00-load.t
+SHA256 8af93f21239dc66b4b87b87fba245991633249830fc915548940553f23ab2b79 t/guido.t
+SHA256 a62d3a4919438967277e5fdf0b6e42b3ff3b051b8db1789fd04a672b0ee1d8c3 t/pod-coverage.t
+SHA256 db1599f2c4add3186cd9ae82e88f7102dd7ab0bbacaa4b5fa9c951cb56050f6b t/pod.t
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBAwAdFiEExz5nATgiJJxZ/1+dgZku4eEsA4UFAmDjwDgACgkQgZku4eEs
+A4VNBgf9FpCmKVikhXkeTX/Kwui4srz6lJKv3IP4gNVuLexpSOFvYFY28hWSuPXq
+iX6fFQq3T/lK/d/1T+Hp93kvrPcFTpO6r1mFCpn+6N+ujjQBB+1U5jN2PpKISafN
+yNl6XLlCezQQaFGch3rLKpqD01oaIpBUws54hZ1blcg9ENMvIBy8MaZAjb5sAosg
+/Zf8hSo6LtX+UqibQ+Y7EEgljntYnM/Ri6s/UPCCG7SWSwrLivPydtkW6j9YHaXh
+ZH3i1AD44ZfaVZ8uW+kEu1GWL08IThuHa/bnDDJ4UITzCZVnzfuPmlcLQdH8ilCO
+IQkanUU5+zGk3UCpSj87KeXvSmURcw==
+=aaFp
+-----END PGP SIGNATURE-----

@@ -3,13 +3,14 @@ package Beekeeper::Service::LogTail::Worker;
 use strict;
 use warnings;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 use Beekeeper::Worker ':log';
 use base 'Beekeeper::Worker';
 
-use JSON::XS;
+use Beekeeper::Logger ':log_levels';
 use Scalar::Util 'weaken';
+use JSON::XS;
 
 my @Log_buffer;
 
@@ -25,13 +26,16 @@ sub authorize_request {
 sub on_startup {
     my $self = shift;
 
-    $self->{max_size} = $self->{config}->{max_size} || 1000;
+    $self->{max_entries} = $self->{config}->{buffer_entries} || 100000;
+    $self->{log_level}   = $self->{config}->{log_level}      || LOG_INFO;
 
     $self->_connect_to_all_brokers;
 
     $self->accept_remote_calls(
         '_bkpr.logtail.tail' => 'tail',
     );
+
+    log_info "Ready";
 }
 
 sub _connect_to_all_brokers {
@@ -81,26 +85,38 @@ sub _connect_to_all_brokers {
 
 sub _collect_log {
     my ($self, $bus) = @_;
-    weaken($self);
 
     # Default logger logs to topic log/$level/$service
 
-    $bus->subscribe(
-        topic      => "log/#",
-        on_publish => sub {
-            my ($payload_ref, $mqtt_properties) = @_;
+    my $max_entries = $self->{max_entries};
+    my $log_level   = $self->{log_level};
+    my $worker      = $self->{_WORKER};
 
-            my $req = decode_json($$payload_ref);
+    foreach my $level (1..$log_level) {
 
-            $req->{params}->{type} = $req->{method};
+        my $topic = "log/$level/#";
+        my $req;
 
-            push @Log_buffer, $req->{params};
+        $bus->subscribe(
+            topic      => $topic,
+            on_publish => sub {
+              # my ($payload_ref, $mqtt_properties) = @_;
 
-            shift @Log_buffer if (@Log_buffer >= $self->{max_size});
+                $req = decode_json( ${$_[0]} );
 
-            $self->{notif_count}++;
-        }
-    );
+                push @Log_buffer, $req->{params};
+
+                shift @Log_buffer if (@Log_buffer > $max_entries);
+
+                # Track number of collected log entries
+                $worker->{notif_count}++;
+            },
+            on_suback => sub {
+                my ($success, $prop) = @_;
+                die "Could not subscribe to log topic '$topic'" unless $success;
+            },
+        );
+    }
 }
 
 sub on_shutdown {
@@ -176,7 +192,7 @@ Beekeeper::Service::LogTail::Worker - Buffer log entries
 
 =head1 VERSION
 
-Version 0.06
+Version 0.07
 
 =head1 SYNOPSIS
 
@@ -185,17 +201,37 @@ Version 0.06
 By default all workers use a L<Beekeeper::Logger> logger which logs errors and
 warnings both to files and to a topic C<log/{level}/{service}> on the message bus.
 
-This worker keeps an in-memory buffer of every log entry sent to that topic in
-every broker in a logical message bus.
+This worker keeps an in-memory buffer of every log entry sent to these topics in
+every broker of a logical message bus. Then this buffer can be queried using the 
+C<tail> method provided by L<Beekeeper::Service::LogTail> or using the command line
+client L<bkpr-log>.
 
-Please note that receiving all log traffic on a single process does not scale
-at all, so a better strategy will be needed for inspecting logs of big applications.
+Buffered entries consume 1.5 kiB for messages of 100 bytes, increasing to 2 KiB
+for messages of 500 bytes. Holding the last million log entries in memory will 
+consume around 2 GiB.
+
+LogTail workers are CPU bound and can collect up to 20000 log entries per second.
+Applications exceeding that traffic will need another strategy to consolidate log
+entries from brokers.
+
+LogTail workers are not created automatically. In order to add a LogTail worker to a
+pool it must be declared into config file C<pool.config.json>:
+
+  [
+      {
+          "pool_id" : "myapp",
+          "bus_id"  : "backend",
+          "workers" : {
+              "Beekeeper::Service::LogTail::Worker" : { "buffer_entries": 100000 },
+               ...
+          },
+      },
+  ]
 
 =head1 METHODS
 
-=head3 tail ( %filters )
-
-Returns all buffered entries that match the filter criteria.
+See L<Beekeeper::Service::LogTail> for a description of the methods exposed by 
+this worker class.
 
 =head1 AUTHOR
 

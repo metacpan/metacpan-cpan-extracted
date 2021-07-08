@@ -34,9 +34,11 @@ sub parse {
     timethese(-1, {
         big => sub { URI::XS::bench_parse($big) },
         mid => sub { URI::XS::bench_parse($mid) },
+        mid_ex => sub { URI::XS::bench_parse($mid, ALLOW_EXTENDED_CHARS) },
         sml => sub { URI::XS::bench_parse($sml) },
         enc => sub { URI::XS::bench_parse($enc) },
         min => sub { URI::XS::bench_parse($min) },
+        min_ex => sub { URI::XS::bench_parse($min, ALLOW_EXTENDED_CHARS) },
         ex1 => sub { URI::XS::bench_parse($ex1, ALLOW_EXTENDED_CHARS) },
         ex2 => sub { URI::XS::bench_parse($ex2, ALLOW_EXTENDED_CHARS) },
     });

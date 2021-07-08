@@ -1,5 +1,9 @@
 Revision history for Device-Chip
 
+0.19    2021-07-06
+        [CHANGES]
+         * Support 'counter' sensor types in addition to 'gauge'
+
 0.18    2021-06-04
         [BUGFIXES]
          * Fix I²C ->txn API for concurrency: pass a "helper" instance on

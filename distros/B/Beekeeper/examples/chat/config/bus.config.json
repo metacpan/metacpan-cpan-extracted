@@ -1,11 +1,11 @@
 # This file is in relaxed JSON format (it allows comments and trailing commas).
 #
-# Logical buses used in pool.config.json must be defined here, specifying
-# the conection parameters to the MQTT broker that will service them.
+# Logical buses used in pool.config.json must be defined here, specifying the
+# conection parameters to the MQTT broker that will service them.
 #
-# In this example four logical buses are defined, all residing in the same
-# local broker. For development purposes is handy to use a single broker to 
-# hold all logical buses and easily simulate a complex topology, but in 
+# In this example four logical buses are defined, all of them residing in the
+# same local broker. For development purposes it is handy to use a single broker
+# to hold all logical buses and easily simulate a complex topology, but in 
 # production enviroments it is desirable to isolate brokers from each other.
 #
 # Each bus definition accepts the following parameters:

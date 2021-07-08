@@ -1,6 +1,6 @@
 package App::Bin4TSV::8 ;  
-our $VERSION = '0.101' ; 
-our $DATE = '2021-06-17T01:39+09:00'
+our $VERSION = '0.120' ; 
+our $DATE = '2021-07-04T16:27+09:00'
 
 =encoding utf8
 
@@ -16,17 +16,14 @@ This module provides a Unix-like commands of :
   colsummary
   crosstable 
   csel
+  csv2tsv
   digitdemog
   expandtab
-  freq
   venn
  
 =head1 DESCRIPTION
 
-
-
 =head1 SEE ALSO
-
 
 =cut
 

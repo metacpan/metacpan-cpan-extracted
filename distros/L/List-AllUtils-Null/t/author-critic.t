@@ -15,7 +15,7 @@ use warnings;
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/List/AllUtils/Null.pm','lib/List/Util/Null.pm'];
+my $filenames = ['lib/List/AllUtils/ContainsNull.pm','lib/List/AllUtils/Null.pm','lib/List/Util/ContainsNull.pm','lib/List/Util/Null.pm'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

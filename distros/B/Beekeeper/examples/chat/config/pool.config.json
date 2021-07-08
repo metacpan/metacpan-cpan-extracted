@@ -20,22 +20,15 @@
 
 [
     {
-        "pool_id"       : "broker",
-        "bus_id"        : "toybroker",
-        "description"   : "ToyBroker",
-        "workers"       :  {},
-        "use_toybroker" :  1,
-    },
-    {
         "pool_id"       : "myapp-A",
         "bus_id"        : "backend-1",
         "description"   : "pool #1 of MyApp workers",
 
         "workers" : {
-            "MyApp::Service::Chat::Worker"         : { "workers_count" : 8 },
-            "MyApp::Service::Auth::Worker"         : { "workers_count" : 2 },
-            "Beekeeper::Service::Router::Worker"   : { "workers_count" : 2 },
-            "Beekeeper::Service::LogTail::Worker"  : { "workers_count" : 1 },
+            "Beekeeper::Service::LogTail::Worker" : { "worker_count" : 1 },
+            "Beekeeper::Service::Router::Worker"  : { "worker_count" : 2 },
+            "MyApp::Service::Chat::Worker"        : { "worker_count" : 4 },
+            "MyApp::Service::Auth::Worker"        : { "worker_count" : 2 },
         },
     },
     {
@@ -44,10 +37,17 @@
         "description" : "pool #2 of MyApp workers",
 
         "workers" : {
-            "MyApp::Service::Chat::Worker"         : { "workers_count" : 8 },
-            "MyApp::Service::Auth::Worker"         : { "workers_count" : 2 },
-            "Beekeeper::Service::Router::Worker"   : { "workers_count" : 2 },
-            "Beekeeper::Service::LogTail::Worker"  : { "workers_count" : 1 },
+            "Beekeeper::Service::LogTail::Worker" : { "worker_count" : 1 },
+            "Beekeeper::Service::Router::Worker"  : { "worker_count" : 2 },
+            "MyApp::Service::Chat::Worker"        : { "worker_count" : 4 },
+            "MyApp::Service::Auth::Worker"        : { "worker_count" : 2 },
         },
+    },
+    {
+        "pool_id"       : "broker",
+        "bus_id"        : "toybroker",
+        "description"   : "ToyBroker",
+        "workers"       :  {},
+        "use_toybroker" :  1,
     },
 ]

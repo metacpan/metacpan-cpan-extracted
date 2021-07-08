@@ -11,11 +11,11 @@ BEGIN {
 use strict;
 use warnings;
 
-# this test was generated with Dist::Zilla::Plugin::Test::Perl::Critic::Subset 3.001.000
+# this test was generated with Dist::Zilla::Plugin::Test::Perl::Critic::Subset 3.001.005
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/Bencher/Scenario/Perl/5200Perf_return.pm','lib/Bencher/Scenario/Perl/5220Perf_length.pm','lib/Bencher/Scenario/Perl/Hash.pm','lib/Bencher/Scenario/Perl/Startup.pm','lib/Bencher/Scenario/Perl/Swap.pm','lib/Bencher/Scenarios/Perl.pm'];
+my $filenames = ['lib/Bencher/Scenario/Perl/5200Perf_return.pm','lib/Bencher/Scenario/Perl/5220Perf_length.pm','lib/Bencher/Scenario/Perl/Hash.pm','lib/Bencher/Scenario/Perl/Swap.pm','lib/Bencher/Scenarios/Perl.pm'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

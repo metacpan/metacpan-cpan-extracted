@@ -16,11 +16,11 @@ Compatible with your existing setup (no configuration changes needed).
 
 =item *
 
-A CLI interface with abilities to I<set>, I<enable>, I<disable> and I<apply> your wireguard config(s).
+A CLI interface with abilities to I<set>, I<enable>, I<disable>, I<apply>, I<add> and I<remove> your wireguard config(s).
 
 =item *
 
-A fancy C<show> output which combines the meta-data, running-config and static-configs
+A fancy C<show> output which combines the meta-data, running-config and static-configs. Now also available in a machine readable format
 
 =item *
 
@@ -43,6 +43,10 @@ No external dependencies, runs on plain Perl (>=v5.20)!
 =item *
 
 B<WIREGUARD_HOME>: Directory containing the Wireguard configuration -> Make sure the path ends with a `/`. Defaults to I</etc/wireguard/>.
+
+=item *
+
+B<WGmeta_NO_WG>: If defined no actual C<wg *> commands are run
 
 =item *
 
@@ -76,7 +80,8 @@ B<WG_NO_COLOR>: If defined, the show command does not prettify the output with c
 
 =item *
 
-L<Wireguard::WGmeta::Parser::Config> - Wireguard configuration parser (bi-directional)
+L<Wireguard::WGmeta::Parser::Conf> - Wireguard configuration parser with support of custom attributes. Only useful
+with a "middleware" implementing the two required callbacks e.g L<Wireguard::WGmeta::Parser::Middleware>
 
 =item *
 
@@ -121,7 +126,7 @@ L<OETIKER+PARTNER AG|https://www.oetiker.ch/> for sponsoring this project.
 
 MIT License
 
-Copyright (c) 2020 Tobias Bossert
+Copyright (c) 2021 Tobias Bossert
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

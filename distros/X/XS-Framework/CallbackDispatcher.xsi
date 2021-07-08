@@ -117,11 +117,11 @@ void XSCallbackDispatcher::add_weak (Ref ref, Sub sub) {
     }
     if (!varptr) throw "passed argument is not captured by subroutine";
     
-    if (SvWEAKREF(*varptr)) XSRETURN_EMPTY;
-
-    SvREFCNT_dec_NN(*varptr);
-    *varptr = newRV(ref.value());
-    sv_rvweaken(*varptr);
+    if (!SvWEAKREF(*varptr)) {
+        SvREFCNT_dec_NN(*varptr);
+        *varptr = newRV(ref.value());
+        sv_rvweaken(*varptr);
+    }
     
     add_weak_ref_check(sub, i);
     

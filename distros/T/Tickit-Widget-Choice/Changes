@@ -1,5 +1,10 @@
 Revision history for Tickit-Widget-Choice
 
+0.05    2021-07-03
+        [CHANGES]
+         * Update to Object::Pad 0.41:
+            + Use :param to simplyify BUILD block
+
 0.04    2020-06-13
         [CHANGES]
          * Update to Object::Pad 0.27

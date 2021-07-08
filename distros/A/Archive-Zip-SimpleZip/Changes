@@ -1,6 +1,11 @@
 CHANGES
 -------
 
+  0.040 8 July 2020
+
+        * Test "at least" version for optional modules
+          38d2da279e8e0a931b29e91858be6505f0c18018
+
   0.039 9 September 2020
 
         * Fixes for failing tests

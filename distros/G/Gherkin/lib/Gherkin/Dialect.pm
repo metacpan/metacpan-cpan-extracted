@@ -1,5 +1,5 @@
 package Gherkin::Dialect;
-$Gherkin::Dialect::VERSION = '19.0.3';
+$Gherkin::Dialect::VERSION = '20.0.0';
 use strict;
 use warnings;
 

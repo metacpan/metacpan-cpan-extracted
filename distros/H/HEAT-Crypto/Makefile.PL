@@ -7,7 +7,7 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
     NAME           => 'HEAT::Crypto',
 	DISTNAME       => 'HEAT-Crypto',
-	VERSION        => '0.06',
+	VERSION_FROM   => 'lib/HEAT/Crypto.pm',
 	MIN_PERL_VERSION => '5.006',
 	TEST_REQUIRES  => { 'Test::More' => 0 },
 	PREREQ_PM      => { 

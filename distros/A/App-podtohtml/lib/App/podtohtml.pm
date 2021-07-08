@@ -1,7 +1,9 @@
 package App::podtohtml;
 
-our $DATE = '2019-05-25'; # DATE
-our $VERSION = '0.007'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-02-26'; # DATE
+our $DIST = 'App-podtohtml'; # DIST
+our $VERSION = '0.009'; # VERSION
 
 use 5.010001;
 use strict;
@@ -11,6 +13,21 @@ use FindBin '$Bin';
 use File::chdir;
 
 our %SPEC;
+
+our %argreq0_infile = (
+    infile => {
+        summary => 'Input file (POD)',
+        description => <<'_',
+
+If not found, will search in for .pod or .pm files in `@INC`.
+
+_
+        schema => 'perl::pod_or_pm_filename*',
+        default => '-',
+        pos => 0,
+        cmdline_aliases => {i=>{}},
+    },
+);
 
 sub _list_templates_or_get_template_tarball {
     require File::ShareDir;
@@ -68,18 +85,7 @@ It does not yet offer as many options as `pod2html`.
 
 _
     args => {
-        infile => {
-            summary => 'Input file (POD)',
-            description => <<'_',
-
-If not found, will search in for .pod or .pm files in `@INC`.
-
-_
-            schema => 'perl::pod_or_pm_filename*',
-            default => '-',
-            pos => 0,
-            cmdline_aliases => {i=>{}},
-        },
+        %argreq0_infile,
         outfile => {
             schema => 'filename*',
             pos => 1,
@@ -187,6 +193,7 @@ sub podtohtml {
 
     if ($browser) {
         require Browser::Open;
+        require HTML::Entities;
 
         my $url = "file:$tempdir/outfile.html";
 
@@ -209,9 +216,34 @@ sub podtohtml {
             my ($rpod) = $content =~ m!(<ul.+)</body>!s
                 or die "podtohtml: Cannot extract rendered POD from output file\n";
 
+            my $tmplvars;
+            {
+                (my $module = $args{-orig_infile}) =~ s!/!::!g;
+                (my $dist = $module) =~ s!::!-!g;
+                my $author = "AUTHOR";
+
+                $tmplvars = {
+                    module => $module,
+                    author => $author, # XXX some "actual" author
+                    author_letter1  => substr($author, 0, 1),
+                    author_letter12 => substr($author, 0, 2),
+                    dist   => $dist,
+
+                    version => 1.234, # XXX actual version
+                    release_date => "2021-12-31", # XXX today's date
+                    module_path => "lib/Foo/Bar.pm", # XXX "actual" module path
+                    abstract => "Some abstract", # XXX actual abstract
+                };
+            }
+
             my $tmplcontent = File::Slurper::read_text("$tmplname/$tmplname.html");
             $tmplcontent =~ s{<!--TEMPLATE:BEGIN_POD-->.+<!--TEMPLATE:END_POD-->}{$rpod}s
                 or die "podtohtml: Cannot insert rendered POD to template\n";
+            $tmplcontent =~ s{\[\[(\w+)(:raw|)\]\]}{
+                exists($tmplvars->{$1}) ?
+                    ($2 eq ':raw' ? $tmplvars->{$1} : HTML::Entities::encode_entities($tmplvars->{$1})) :
+                    "[[UNKNOWN_VAR:$1]]"
+            }eg;
             File::Slurper::write_text("$tmplname/$tmplname.html", $tmplcontent);
 
             $url = "file:$tempdir/$tmplname/$tmplname.html";
@@ -230,6 +262,27 @@ sub podtohtml {
     }
 }
 
+$SPEC{podtohtml_metacpan} = {
+    v => 1.1,
+    summary => 'Show POD documentation roughly like how MetaCPAN would display it',
+    description => <<'_',
+
+This is a shortcut for:
+
+    % podtohtml --template metacpan-20180911 --browser <infile>
+    % podtohtml --metacpan <infile>
+
+_
+    args => {
+        %argreq0_infile,
+    },
+};
+sub podtohtml_metacpan {
+    my %args = @_;
+
+    podtohtml(%args, template => "metacpan-20180911", browser => 1);
+}
+
 1;
 # ABSTRACT: Convert POD to HTML
 
@@ -245,7 +298,7 @@ App::podtohtml - Convert POD to HTML
 
 =head1 VERSION
 
-This document describes version 0.007 of App::podtohtml (from Perl distribution App-podtohtml), released on 2019-05-25.
+This document describes version 0.009 of App::podtohtml (from Perl distribution App-podtohtml), released on 2021-02-26.
 
 =head1 FUNCTIONS
 
@@ -281,7 +334,7 @@ Examples:
 =item * Convert POD file to HTML, show result in browser using the perldoc.perl.org template to give an idea how it will look on perldoc.perl.org:
 
  podtohtml(
-   infile   => "some.pod",
+     infile   => "some.pod",
    browser  => 1,
    template => "perldoc_perl_org-20180911"
  );
@@ -307,7 +360,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<browser> => I<true>
 
-Instead of outputing HTML to STDOUT/file, view it in browser.
+Instead of outputing HTML to STDOUTE<sol>file, view it in browser.
 
 =item * B<infile> => I<perl::pod_or_pm_filename> (default: "-")
 
@@ -324,6 +377,48 @@ List available templates.
 =item * B<template> => I<str>
 
 Pick a template to use, only relevant with --browser.
+
+
+=back
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (payload) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (any)
+
+
+
+=head2 podtohtml_metacpan
+
+Usage:
+
+ podtohtml_metacpan(%args) -> [status, msg, payload, meta]
+
+Show POD documentation roughly like how MetaCPAN would display it.
+
+This is a shortcut for:
+
+ % podtohtml --template metacpan-20180911 --browser <infile>
+ % podtohtml --metacpan <infile>
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<infile> => I<perl::pod_or_pm_filename> (default: "-")
+
+Input file (POD).
+
+If not found, will search in for .pod or .pm files in C<@INC>.
+
 
 =back
 
@@ -348,7 +443,7 @@ Source repository is at L<https://github.com/perlancar/perl-App-podtohtml>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-podtohtml>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-App-podtohtml/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -364,7 +459,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018, 2017 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2019, 2018, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

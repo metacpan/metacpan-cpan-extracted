@@ -22,9 +22,9 @@
         "use_toybroker" :  1,
 
         "workers" : {
-            "MyApp::Service::Calculator"           : { "workers_count" : 4 },
-            "Beekeeper::Service::Router::Worker"   : { "workers_count" : 2 },
-            "Beekeeper::Service::LogTail::Worker"  : { "workers_count" : 1 },
+            "Beekeeper::Service::LogTail::Worker" : { "worker_count" : 1 },
+            "Beekeeper::Service::Router::Worker"  : { "worker_count" : 2 },
+            "MyApp::Service::Calculator"          : { "worker_count" : 4 },
         },
     },
 ]

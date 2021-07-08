@@ -1,11 +1,44 @@
-package Pod::CYOA::Transformer;
-{
-  $Pod::CYOA::Transformer::VERSION = '0.002';
-}
+package Pod::CYOA::Transformer 0.003;
 use Moose;
 with 'Pod::Elemental::Transformer';
 # ABSTRACT: transform 'cyoa' regions
 
+#pod =head1 OVERVIEW
+#pod
+#pod Pod::CYOA::Transformer is a L<Pod::Elemental::Transformer> implementation.  It
+#pod looks for a region with the format name C<cyoa> and transforms it into a
+#pod C<=item>-list surrounded by C<html> regions.
+#pod
+#pod A C<cyoa> region is written with pairs of C<?>-separated values representing
+#pod page links and descriptions.  For example:
+#pod
+#pod   =for :cyoa
+#pod   ? pie-eating  ? eat a pie
+#pod   ? start       ? start over
+#pod   ? visit-lefty ? buy an "O"
+#pod
+#pod ...will become something like:
+#pod
+#pod   =for html
+#pod   <div class='cyoa'>
+#pod
+#pod   =over 4
+#pod
+#pod   =item * If you'd like to L<eat a pie|@pie-eating>
+#pod
+#pod   =item * If you'd like to L<start over|@start>
+#pod
+#pod   =item * If you'd like to L<buy an "O"|@visit-lefty>
+#pod
+#pod   =back
+#pod
+#pod   =for html
+#pod   </div>
+#pod
+#pod The C<@>-prefix on the link targets is expected to be handled by
+#pod L<Pod::CYOA::XHTML>.
+#pod
+#pod =cut
 
 use Pod::Elemental::Types qw(FormatName);
 
@@ -103,13 +136,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Pod::CYOA::Transformer - transform 'cyoa' regions
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 OVERVIEW
 
@@ -146,13 +181,25 @@ page links and descriptions.  For example:
 The C<@>-prefix on the link targets is expected to be handled by
 L<Pod::CYOA::XHTML>.
 
+=head1 PERL VERSION
+
+This module should work on any version of perl still receiving updates from
+the Perl 5 Porters.  This means it should work on any version of perl released
+in the last two to three years.  (That is, if the most recently released
+version is v5.40, then this module should work on both v5.40 and v5.38.)
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
+
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@cpan.org>
+Ricardo SIGNES <rjbs@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 by Ricardo SIGNES.
+This software is copyright (c) 2021 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

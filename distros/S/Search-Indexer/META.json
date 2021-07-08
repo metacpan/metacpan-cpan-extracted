@@ -56,6 +56,6 @@
          "url" : "https://github.com/damil/Search-Indexer.git"
       }
    },
-   "version" : "1.00",
+   "version" : "1.01",
    "x_serialization_backend" : "JSON::PP version 4.05"
 }

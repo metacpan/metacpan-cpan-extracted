@@ -257,7 +257,7 @@ PLUS
     while (my ($plain, $record) = each %tests) {
         is pica_string($record), $plain, 'write annotated PICA';
         my $pp = pica_string($record, 'plain', annotate => 1);
-        my $parsed = pica_parser(plain => \$plain, annotate => 1, bless => 1)->next;
+        my $parsed = pica_parser(plain => \$plain, annotate => 1)->next;
         is $plain, $parsed->string, 'round-tripping annotated PICA';
     }
 

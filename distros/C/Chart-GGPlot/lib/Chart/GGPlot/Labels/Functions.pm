@@ -4,7 +4,7 @@ package Chart::GGPlot::Labels::Functions;
 
 use Chart::GGPlot::Setup;
 
-our $VERSION = '0.0011'; # VERSION
+our $VERSION = '0.0016'; # VERSION
 
 use Chart::GGPlot::Labels;
 
@@ -54,7 +54,7 @@ Chart::GGPlot::Labels::Functions - Function interface for Chart::GGPlot::Labels
 
 =head1 VERSION
 
-version 0.0011
+version 0.0016
 
 =head1 FUNCTIONS
 
@@ -85,7 +85,7 @@ Stephan Loyd <sloyd@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019-2020 by Stephan Loyd.
+This software is copyright (c) 2019-2021 by Stephan Loyd.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

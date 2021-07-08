@@ -7,39 +7,39 @@ use warnings;
 
 our @ISA = qw();
 
-our $VERSION = '0.09';
+our $VERSION = '0.11';
 
 
 use PGPLOT::Device;
 use PGPLOT ();
 use PDL::Graphics::PGPLOT::Window ();
 
-#pod =method new
-#pod
-#pod   $pgwin = PGPLOT::Device::PGWin->new( \%opts );
-#pod
-#pod Create a new object.  The possible options are:
-#pod
-#pod =over
-#pod
-#pod =item Device
-#pod
-#pod The device specification.  This is passed directly to
-#pod L<PGPLOT::Device/new>, so see it's documentation.
-#pod
-#pod =item DevOpts
-#pod
-#pod A hashref containing options to pass to L<PGPLOT::Device/new>.
-#pod
-#pod =item WinOpts
-#pod
-#pod A hashref containing options to pass to
-#pod L<PDL::Graphics::PGPLOT::Windows/new>.  Do not include a C<Device>
-#pod option as that will break things.
-#pod
-#pod =back
-#pod
-#pod =cut
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 sub new
 {
@@ -63,29 +63,29 @@ sub new
   $self;
 }
 
-#pod =method device
-#pod
-#pod   $dev = $pgwin->device
-#pod
-#pod This method returns the underlying L<PGPLOT::Device> object.
-#pod
-#pod =cut
+
+
+
+
+
+
+
 
 sub device { $_[0]->{device} }
 
-#pod =method next
-#pod
-#pod   $win = $pgwin->next(  );
-#pod   $win = $pgwin->next( $override );
-#pod
-#pod This method returns the window handle to use for constructing the next
-#pod plot.  If the optional argument is specified, it is equivalent to the
-#pod following call sequence:
-#pod
-#pod   $pgwin->override( $override );
-#pod   $pgwin->next;
-#pod
-#pod =cut
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 sub next
 {
@@ -109,14 +109,14 @@ sub next
   $self->{win};
 }
 
-#pod =method override
-#pod
-#pod   $pgwin->override( ... );
-#pod
-#pod This is calls the B<override> method of the associated
-#pod L<PGPLOT::Device> object.
-#pod
-#pod =cut
+
+
+
+
+
+
+
+
 
 sub override
 {
@@ -124,33 +124,37 @@ sub override
   $self->{device}->override( @_ );
 }
 
-#pod =method finish
-#pod
-#pod   $pgwin->finish();
-#pod
-#pod Close the associated device.  This must be called to handle prompting
-#pod for ephemeral interactive graphic devices before a program finishes
-#pod execution.
-#pod
-#pod This is B<not> automatically called upon object destruction as there
-#pod seems to be an ordering problem in destructors called during Perl's
-#pod cleanup phase such that the underlying
-#pod L<PDL::Graphics::PGPLOT::Window> object is destroyed I<before> this
-#pod object.
-#pod
-#pod =cut
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 sub finish
 {
   my ( $self ) = @_;
   # make sure that the plot stays up until the user is done with it
   if ( defined $self->{win} )
   {
-    pgask(1) if $self->{device}->is_ephemeral;
+    PGPLOT::pgask(1) if $self->{device}->is_ephemeral;
     $self->{win}->close;
   }
 }
 
+__END__
+
 =pod
+
+=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory
 
 =head1 NAME
 
@@ -158,7 +162,7 @@ PGPLOT::Device::PGWin - convenience class for PDL::Graphics::PGPLOT::Window
 
 =head1 VERSION
 
-version 0.09
+version 0.11
 
 =head1 SYNOPSIS
 
@@ -266,21 +270,21 @@ object.
   $pgwin->finish;
   die $error if $error;
 
-=head1 BUGS
+=head1 SUPPORT
 
-Please report any bugs or feature requests on the bugtracker website
-L<https://rt.cpan.org/Public/Dist/Display.html?Name=PGPLOT-Device> or by
-email to
-L<bug-PGPLOT-Device@rt.cpan.org|mailto:bug-PGPLOT-Device@rt.cpan.org>.
+=head2 Bugs
 
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
+Please report any bugs or feature requests to bug-pgplot-device@rt.cpan.org  or through the web interface at: https://rt.cpan.org/Public/Dist/Display.html?Name=PGPLOT-Device
 
-=head1 SOURCE
+=head2 Source
 
-The development version is on github at L<https://github.com/djerius/pgplot-device>
-and may be cloned from L<git://github.com/djerius/pgplot-device.git>
+Source is available at
+
+  https://gitlab.com/djerius/pgplot-device
+
+and may be cloned from
+
+  https://gitlab.com/djerius/pgplot-device.git
 
 =head1 SEE ALSO
 
@@ -319,58 +323,3 @@ This is free software, licensed under:
   The GNU General Public License, Version 3, June 2007
 
 =cut
-
-__END__
-
-#pod =head1 SYNOPSIS
-#pod
-#pod   $pgwin = PGPLOT::Device::PGWin->new( { device => $user_device_spec,
-#pod                                          WinOpts => \%opts } );
-#pod
-#pod   $pgwin->override( $override );
-#pod   $win = $pgwin->next;
-#pod   $win->env( ... );
-#pod
-#pod   $pgwin->finish;
-#pod
-#pod
-#pod =head1 DESCRIPTION
-#pod
-#pod B<PGPLOT::Device::PGWin> is a convenience class which combines
-#pod L<PGPLOT::Device> and L<PDL::Graphics::PGPLOT::Window>.  It provides
-#pod the logic to handle interactive devices (as illustrated in the
-#pod Examples section of the B<PGPLOT::Device> documentation).
-#pod
-#pod Note that the L<PDL::Graphics::PGPLOT::Window/close> method should
-#pod B<never> be called when using this module, as that will surely mess
-#pod things up.
-#pod
-#pod
-#pod =head1 METHODS
-#pod
-#pod
-#pod =head1 EXAMPLES
-#pod
-#pod   my $pgwin = PGPLOT::Device::PGWin->new( { Device => $user_spec } );
-#pod
-#pod   eval {
-#pod
-#pod     for my $plot in ( qw/ plot1 plot2 / )
-#pod     {
-#pod       $pgwin->override( $plot );
-#pod       my $win = $pgwin->next();
-#pod       $win->env( ... );
-#pod       ...
-#pod     }
-#pod   };
-#pod   my $error = $@;
-#pod   $pgwin->finish;
-#pod   die $error if $error;
-#pod
-#pod =head1 SEE ALSO
-#pod
-#pod L<PGPLOT>
-#pod L<PDL>
-#pod L<PDL::Graphics::PGPLOT::Window>
-#pod
-#pod =cut

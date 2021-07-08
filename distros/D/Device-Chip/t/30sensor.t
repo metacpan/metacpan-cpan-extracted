@@ -33,15 +33,18 @@ use Future::AsyncAwait;
       precision => 2;
 
    async method read_size () { return 30, 50; };
+
+   declare_sensor_counter hits =>;
 }
 
 my $chip = TestChip->new;
 
 my @sensors = $chip->list_sensors;
-is( scalar @sensors, 3, '$chip->list_sensors yields 3 sensors' );
+is( scalar @sensors, 4, '$chip->list_sensors yields 3 sensors' );
 
 {
    my $sensor = $sensors[0];
+   is( $sensor->type,      "gauge",  '$sensor->type' );
    is( $sensor->name,      "height", '$sensor->height' );
    is( $sensor->units,     "metres", '$sensor->units' );
    is( $sensor->precision, 2,        '$sensor->precision' );
@@ -65,6 +68,12 @@ is( scalar @sensors, 3, '$chip->list_sensors yields 3 sensors' );
    my $sensor = $sensors[2];
 
    is_deeply( [ await $sensor->read ], [ 30 ], 'sensor is read as a single scalar' );
+}
+
+{
+   my $sensor = $sensors[3];
+
+   is( $sensor->type, "counter", '$sensor->type counter' );
 }
 
 done_testing;

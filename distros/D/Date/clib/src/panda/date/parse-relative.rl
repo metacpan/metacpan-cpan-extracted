@@ -1,4 +1,4 @@
-#include "DateRel.h" 
+#include "DateRel.h"
 
 %%{
     machine daterel_parser;

@@ -29,6 +29,11 @@
          "requires" : {
             "ExtUtils::MakeMaker" : "0"
          }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.006"
+         }
       }
    },
    "release_status" : "stable",
@@ -42,6 +47,6 @@
          "web" : "https://github.com/Azq2/perl-html5-dom"
       }
    },
-   "version" : "1.23",
+   "version" : "1.25",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

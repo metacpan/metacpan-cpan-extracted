@@ -1,25 +1,11 @@
 package Google::RestApi::Auth::ServiceAccount;
 
-use strict;
-use warnings;
+our $VERSION = '0.7';
 
-our $VERSION = '0.4';
+use Google::RestApi::Setup;
 
-use 5.010_000;
-
-use autodie;
-use Type::Params qw(compile_named);
-use Types::Standard qw(Str ArrayRef);
 use WWW::Google::Cloud::Auth::ServiceAccount;
-use YAML::Any qw(Dump);
-
-no autovivification;
-
-use Google::RestApi::Utils qw(config_file resolve_config_file);
-
 use parent 'Google::RestApi::Auth';
-
-do 'Google/RestApi/logger_init.pl';
 
 sub new {
   my $class = shift;
@@ -54,7 +40,7 @@ sub headers {
 sub access_token {
   my $self = shift;
   $self->{access_token} = $self->{auth}->get_token()
-    or die "Service Account Auth failed";
+    or LOGDIE "Service Account Auth failed";
   return $self->{access_token};
 }
 

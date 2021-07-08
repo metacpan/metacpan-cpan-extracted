@@ -12,7 +12,7 @@ use warnings;
 
 use Rex::Shared::Var::Common qw/__lock __store __retrieve/;
 
-our $VERSION = '1.13.3'; # VERSION
+our $VERSION = '1.13.4'; # VERSION
 
 sub TIEHASH {
   my $self = { varname => $_[1], };

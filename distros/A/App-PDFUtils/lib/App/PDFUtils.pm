@@ -1,9 +1,9 @@
 package App::PDFUtils;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-01-30'; # DATE
+our $DATE = '2021-07-06'; # DATE
 our $DIST = 'App-PDFUtils'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 use 5.010001;
 use strict;
@@ -233,7 +233,7 @@ App::PDFUtils - Command-line utilities related to PDF files
 
 =head1 VERSION
 
-This document describes version 0.004 of App::PDFUtils (from Perl distribution App-PDFUtils), released on 2021-01-30.
+This document describes version 0.005 of App::PDFUtils (from Perl distribution App-PDFUtils), released on 2021-07-06.
 
 =head1 SYNOPSIS
 
@@ -243,6 +243,10 @@ files:
 =over
 
 =item * L<add-pdf-password>
+
+=item * L<grep-from-pdf>
+
+=item * L<pdfgrep>
 
 =item * L<remove-pdf-password>
 
@@ -255,7 +259,7 @@ files:
 
 Usage:
 
- add_pdf_password(%args) -> [status, msg, payload, meta]
+ add_pdf_password(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Password-protect PDF files.
 
@@ -281,12 +285,12 @@ Whether to backup the original file to ORIG~.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -296,7 +300,7 @@ Return value:  (any)
 
 Usage:
 
- remove_pdf_password(%args) -> [status, msg, payload, meta]
+ remove_pdf_password(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Remove password from PDF files.
 
@@ -341,12 +345,12 @@ Whether to backup the original file to ORIG~.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -360,7 +364,7 @@ Source repository is at L<https://github.com/perlancar/perl-App-PDFUtils>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-App-PDFUtils/issues>
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-PDFUtils>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

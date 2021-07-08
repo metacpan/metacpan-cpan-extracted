@@ -4,7 +4,7 @@ package Chart::GGPlot::Aes::Functions;
 
 use Chart::GGPlot::Setup qw(:base :pdl);
 
-our $VERSION = '0.0011'; # VERSION
+our $VERSION = '0.0016'; # VERSION
 
 use Eval::Quosure;
 use List::AllUtils qw(pairmap);
@@ -14,6 +14,7 @@ use Types::Standard qw(ArrayRef);
 
 use Chart::GGPlot::Aes;
 use Chart::GGPlot::Types qw(:all);
+use Chart::GGPlot::Util qw(arraylike);
 
 use parent qw(Exporter::Tiny);
 
@@ -37,7 +38,7 @@ fun _aes ($mapping, $level=$aes_level_default) {
         # TODO: Shall we also support coderef sub { my ($df) = @_; } ?
         #  Thing is, is that really needed?
 
-        if ( $b->$_DOES('Eval::Quosure') ) {
+        if ( $b->$_DOES('Eval::Quosure') or arraylike($b)) {
             $val = $b;
         }
         else {
@@ -82,7 +83,7 @@ Chart::GGPlot::Aes::Functions - Function interface for aesthetics mappings
 
 =head1 VERSION
 
-version 0.0011
+version 0.0016
 
 =head1 METHODS
 
@@ -131,7 +132,7 @@ Stephan Loyd <sloyd@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019-2020 by Stephan Loyd.
+This software is copyright (c) 2019-2021 by Stephan Loyd.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

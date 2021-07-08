@@ -7,7 +7,7 @@ use autodie;
 
 use Pg::Explain;
 
-plan 'tests' => 8;
+plan 'tests' => 6;
 
 my $explain = Pg::Explain->new(
     'source' => q{
@@ -91,9 +91,7 @@ $sort_extra_info = join( "\n", @{ $sort_extra_info } ) if 'ARRAY' eq ref $sort_e
 my $seq_scan_extra_info = $seq_scan->extra_info;
 $seq_scan_extra_info = join( "\n", @{ $seq_scan_extra_info } ) if 'ARRAY' eq ref $seq_scan_extra_info;
 
-ok( $sort_extra_info     =~ m{Sort Key: relkind, relname DESC},      'Got sort keyfor sort' );
-ok( $sort_extra_info     =~ m{Sort Method: quicksort Memory: 131kB}, 'Got sort methodfor sort' );
-ok( $sort_extra_info     =~ m{Buffers: shared hit=13},               'Got buffers infofor sort' );
-ok( $seq_scan_extra_info =~ m{Buffers: shared hit=13},               'Got buffers info for seq scan' );
+ok( $sort_extra_info =~ m{Sort Key: relkind, relname DESC},      'Got sort keyfor sort' );
+ok( $sort_extra_info =~ m{Sort Method: quicksort Memory: 131kB}, 'Got sort methodfor sort' );
 
 exit;

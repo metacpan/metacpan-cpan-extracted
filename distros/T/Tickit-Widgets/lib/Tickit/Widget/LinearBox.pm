@@ -1,11 +1,11 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2009-2020 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2009-2021 -- leonerd@leonerd.org.uk
 
 use Object::Pad 0.27;
 
-package Tickit::Widget::LinearBox 0.48;
+package Tickit::Widget::LinearBox 0.49;
 class Tickit::Widget::LinearBox
    extends Tickit::ContainerWidget;
 
@@ -65,21 +65,11 @@ returned by C<get_child_base>.
 
 Returns a new C<Tickit::Widget::LinearBox>.
 
-Takes the following named argmuents:
-
-=over 8
-
-=item children => ARRAY[Tickit::Widget]
-
-Optional. If provided, the widgets in this array will be added, with no
-additional options. This is now discouraged in favour of the L</add> or
-L</add_children> methods.
-
-=back
-
 =cut
 
 has @_children;
+
+has $_suppress_redistribute;
 
 sub BUILDARGS
 {
@@ -96,8 +86,7 @@ BUILD
    my %args = @_;
 
    if( $args{children} ) {
-      Carp::carp( "The 'children' constructor argument to ${\ref $self} is discouraged; use ->add_children instead" );
-      $self->add( $_ ) for $args{children}->@*;
+      croak "The 'children' constructor argument to ${\ref $self} is no longer recognised; use ->add_children instead";
    }
 }
 
@@ -170,7 +159,7 @@ method set_child
    if( $old_child ) {
       %opts = $self->child_opts( $old_child );
 
-      dynamically $self->{suppress_redistribute} = 1;
+      dynamically $_suppress_redistribute = 1;
       $self->SUPER::remove( $old_child );
    }
 
@@ -216,9 +205,6 @@ use as a chaining mutator; e.g.
    my $container = Tickit::Widget::LinearBox->new( ... )
       ->add( Tickit::Widget::Static->new( ... ) )
       ->add( Tickit::Widget::Static->new( ... ) );
-
-This should be preferred over using the C<children> constructor argument,
-which is now discouraged.
 
 =cut
 
@@ -280,7 +266,7 @@ method remove
 
 method reshape
 {
-   $self->{suppress_redistribute} and return;
+   $_suppress_redistribute and return;
 
    my $window = $self->window;
 

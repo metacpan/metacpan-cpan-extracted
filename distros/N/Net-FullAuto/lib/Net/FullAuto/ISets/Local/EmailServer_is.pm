@@ -38,7 +38,7 @@ our @ISA = qw(Exporter);
 our @EXPORT = qw($select_emailserver_setup);
 
 use Net::FullAuto::Cloud::fa_amazon;
-use Net::FullAuto::FA_Core qw[$localhost cleanup fetch clean_filehandle];
+use Net::FullAuto::FA_Core qw[cleanup fetch clean_filehandle];
 use Time::Local;
 use File::HomeDir;
 use URI::Escape::XS qw/uri_escape/;
@@ -100,7 +100,7 @@ my $configure_emailserver=sub {
    my $recaptcha_publish_key=$_[6]||'';
    my $recpatcha_secret_key=$_[7]||'';
    my ($stdout,$stderr)=('','');
-   my $handle=$localhost;my $connect_error='';
+   my $handle=connect_shell();my $connect_error='';
    my $sudo=($^O eq 'cygwin')?'':
          'sudo env "LD_LIBRARY_PATH='.
          '/usr/local/lib64:$LD_LIBRARY_PATH" '.
@@ -772,13 +772,15 @@ if ($do==1) { # INSTALL LATEST VERSION OF PYTHON
       ($stdout,$stderr)=$handle->cmd($sudo.
          'sed -i "s/#SSL=/SSL=/" Modules/Setup');
       ($stdout,$stderr)=$handle->cmd($sudo.
-         'sed -i "s/\/ssl/\/include\/openssl/" Modules/Setup');
+         'sed -i "s/\/ssl//" Modules/Setup');
       ($stdout,$stderr)=$handle->cmd($sudo.
          'sed -i "s/#_ssl/_ssl/" Modules/Setup');
       ($stdout,$stderr)=$handle->cmd($sudo.
          'sed -i "s/#[ \t]*-DUSE_SSL/$(printf \'\t\')-DUSE_SSL/" Modules/Setup');
       ($stdout,$stderr)=$handle->cmd($sudo.
          'sed -i "s/#[ \t]*-L\$/$(printf \'\t\')-L\$/" Modules/Setup');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'sed -i "s/lib -lssl/lib64 -lssl/" Modules/Setup');
       ($stdout,$stderr)=$handle->cmd($sudo.
          './configure --prefix=/usr/local --exec-prefix=/usr/local '.
          '--enable-optimizations LDFLAGS="-Wl,-rpath /usr/local/lib" '.
@@ -1207,6 +1209,7 @@ END
          "$nginx_path/nginx/nginx.conf");
       ($stdout,$stderr)=$handle->cmd($sudo.
          'systemctl enable nginx.service','__display__');
+      sleep 2;
       ($stdout,$stderr)=$handle->cmd($sudo.
          'service nginx start','__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
@@ -1221,6 +1224,7 @@ END
       # https://ssldecoder.org
       ($stdout,$stderr)=$handle->cmd($sudo.
          'systemctl enable nginx.service','__display__');
+      sleep 2;
       ($stdout,$stderr)=$handle->cmd($sudo.
          'service nginx restart','__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
@@ -1463,6 +1467,7 @@ END
       ($stdout,$stderr)=$handle->cmd($sudo.
          'mv -v ~/sql_mode.cnf /etc/mysql/my.cnf.d/sql_mode.cnf',
          '__display__');
+      sleep 2;
       ($stdout,$stderr)=$handle->cmd($sudo.
          'service mysql start','__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
@@ -1753,7 +1758,8 @@ END
       ($stdout,$stderr)=$handle->cmd($sudo.
          'git -P tag -l','__display__');
       $stdout=~s/^.*\n(rel-\d-\d-\d).*$/$1/s;
- $stdout='rel-1-6-1';
+$stdout='rel-1-6-1';
+#$stdout='v1.8.0';
       ($stdout,$stderr)=$handle->cmd($sudo.
          "git checkout $stdout",'__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
@@ -1779,7 +1785,7 @@ END
          'ldconfig -v','__display__');
       ($stdout,$stderr)=$handle->cwd('/opt/source');
       ($stdout,$stderr)=$handle->cmd($sudo.
-         'git clone https://github.com/jedisct1/libsodium',
+         'git clone https://github.com/jedisct1/libsodium 2>&1',
          '__display__');
       ($stdout,$stderr)=$handle->cwd('libsodium');
       ($stdout,$stderr)=$handle->cmd($sudo.
@@ -1804,8 +1810,8 @@ END
       ($stdout,$stderr)=$handle->cmd($sudo.
          'git tag -l');
       #$stdout=~s/^.*(php-[\d.]+?)\s.*$/$1/s;
-      # composer.phar does not work with php 8
-      $stdout=~s/^.*(php-8.[\d.]+?)\s.*$/$1/s;
+      # roundcube does not work with php 8 as of 7/8/2021
+      $stdout=~s/^.*(php-7.[\d.]+?)\s.*$/$1/s;
       my $vn=$stdout;
       $vn=~s/^php-(\d).*$/$1/;
       ($stdout,$stderr)=$handle->cmd($sudo.
@@ -1931,12 +1937,13 @@ END
          'cp -v /opt/source/php-src/sapi/fpm/php-fpm.service '.
          '/etc/systemd/system','__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
-         'sed -i "s#PIDFile=/usr/local/php'.$vn.'"/#PIDFile=#" '.
+         'sed -i "s#PIDFile=/usr/local/php'.$vn.'#PIDFile=#" '.
          '/etc/systemd/system/php-fpm.service');
       ($stdout,$stderr)=$handle->cmd($sudo.
          'systemctl daemon-reload');
       ($stdout,$stderr)=$handle->cmd($sudo.
          'systemctl enable php-fpm.service','__display__');
+      sleep 2;
       ($stdout,$stderr)=$handle->cmd($sudo.
          'service php-fpm start','__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
@@ -1985,8 +1992,9 @@ END
          'https://download.imagemagick.org/'.
          'ImageMagick/download/ImageMagick.zip',
          '__display__');
+      sleep 2;
       ($stdout,$stderr)=$handle->cmd($sudo.
-         'unzip -f ImageMagick.zip','__display__');
+         'unzip -o ImageMagick.zip','__display__');
       ($stdout,$stderr)=$handle->cwd('ImageMag*');
       ($stdout,$stderr)=$handle->cmd($sudo.
          './configure --with-modules','__display__');
@@ -2011,6 +2019,7 @@ END
             $output='';
          } sleep 1;
       }
+      sleep 2;
       ($stdout,$stderr)=$handle->cmd($sudo.'service php-fpm start',
          '__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.'service php-fpm status -l',
@@ -2020,7 +2029,7 @@ END
          'cp -v /opt/cpanel/ea-php70/root/etc/php-fpm.d/www.conf.default '.
          '/opt/cpanel/ea-php70/root/etc/php-fpm.d/www.conf','__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
-         "/etc/init.d/ea-php70-php-fpm start",'__display__');
+         '/etc/init.d/ea-php70-php-fpm start','__display__');
    }
 
    ($stdout,$stderr)=$handle->cwd('/opt/source');
@@ -2254,13 +2263,13 @@ END
    #($stdout,$stderr)=$handle->cmd($sudo.
    #   'chmod -v 640 /etc/postfix/smtpd.key','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      "postfix start",'__display__');
+      'postfix start','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      "postfix reload",'__display__');
+      'postfix reload','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      "postfix status",'__display__');
+      'postfix status','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      "postconf -e \"inet_interfaces = all\"",'__display__');
+      'postconf -e "inet_interfaces = all"','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
       'postconf -e "mydestination = '.$domain_url.', \$myhostname, '.
       'localhost.\$mydomain, localhost"',
@@ -2627,9 +2636,16 @@ END
    ($stdout,$stderr)=$handle->cmd($sudo.
       'systemctl enable postfix.service','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      "yum -y install nmap",'__display__');
+      'postfix stop','__display__');
+   sleep 2;
    ($stdout,$stderr)=$handle->cmd($sudo.
-      "yum -y install telnet",'__display__');
+      'service postfix start','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'service postfix status -l','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'yum -y install nmap','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'yum -y install telnet','__display__');
 
 #https://github.com/postfixadmin/postfixadmin/releases/latest
 
@@ -2681,6 +2697,20 @@ END
    ($stdout,$stderr)=$handle->cmd($sudo.
       'mkdir -vp /var/www/html/postfixadmin/templates_c',
       '__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'chown -R www-data:www-data /var/www','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'find /var/www -type f');
+   foreach my $file (split /\n/, $stdout) {
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'chmod -v 644 '.$file,'__display__');
+   }
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'find /var/www -type d');
+   foreach my $dir (split /\n/, $stdout) {
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'chmod -v 755 '.$dir,'__display__');
+   }
    ($stdout,$stderr)=$handle->cmd($sudo.
       'setfacl -R -m u:www-data:rwx /var/www/html/postfixadmin/templates_c/',
       '__display__');
@@ -2761,14 +2791,14 @@ END
    ($stdout,$stderr)=$handle->cmd(
       "cp -v /etc/nginx/nginx.conf ~/nginx.conf",
       '__display__');
-   ($stdout,$stderr)=$handle->cmd('cat ~/nginx.conf','__display__');
    ($stdout,$stderr)=$handle->cmd(
-      'sed -i \'/}/,$!b;/}/{x;/./p;x;h};/}/!H;$!d;x;s/^}$//M\' ~/nginx.conf');
+      'sed -i "s/^}}/}/" ~/nginx.conf');
    ($stdout,$stderr)=$handle->cmd("echo -e \"$ad\" >> ".
       "~/nginx.conf");
    ($stdout,$stderr)=$handle->cmd($sudo.
       'mv -v ~/nginx.conf /etc/nginx/nginx.conf',
       '__display__');
+   sleep 2;
    ($stdout,$stderr)=$handle->cmd($sudo.
       'service nginx restart','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
@@ -2822,16 +2852,23 @@ END
    $gtarfile=~s/.tar.gz$//;
    ($stdout,$stderr)=$handle->cwd($gtarfile);
    ($stdout,$stderr)=$handle->cmd($sudo.
-      "./configure --with-mysql ",'__display__');
+      '"LDFLAGS=-L/usr/local/lib64 -Wl,-rpath /usr/local/lib -Wl,'.
+      '-rpath /usr/local/lib64" '.
+      '"CFLAGS=-I/usr/local/openssl/include" '.
+      './configure --localstatedir=/var '.
+      '--with-mysql --with-ssl=openssl','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      "make",'__display__');
+      'make','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      "make install",'__display__');
+      'make install','__display__');
    ($stdout,$stderr)=$handle->cwd('doc/example-config');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      "cp -v dovecot.conf /usr/local/etc/dovecot",'__display__');
+      'cp -v dovecot.conf /usr/local/etc/dovecot','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
       "sed -i \'s/#protocols/protocols/\' ".
+      "/usr/local/etc/dovecot/dovecot.conf");
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "sed -i \'s/#base_dir/base_dir/\' ".
       "/usr/local/etc/dovecot/dovecot.conf");
    ($stdout,$stderr)=$handle->cmd($sudo.
       "mkdir -vp /usr/local/etc/dovecot/conf.d",'__display__');
@@ -2888,14 +2925,14 @@ END
       'mv -v ~/10-auth.conf /usr/local/etc/dovecot/conf.d/10-auth.conf',
       '__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      "cp -v conf.d/auth-sql.conf.ext ".
-      "/usr/local/etc/dovecot/conf.d",
+      'cp -v conf.d/auth-sql.conf.ext '.
+      '/usr/local/etc/dovecot/conf.d',
       '__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
       "sed -i \'s#args = /etc#args = /usr/local/etc#\' ".
       "/usr/local/etc/dovecot/conf.d/auth-sql.conf.ext");
    ($stdout,$stderr)=$handle->cmd($sudo.
-      "cp -v dovecot-sql.conf.ext /usr/local/etc/dovecot",
+      'cp -v dovecot-sql.conf.ext /usr/local/etc/dovecot',
       '__display__');
    $ad='%NL%'.
        'driver = mysql%NL%'.
@@ -3069,33 +3106,41 @@ END
       'gpasswd -a www-data dovecot','__display__');
    ($stdout,$stderr)=$handle->cwd("/opt/source/$gtarfile");
    ($stdout,$stderr)=$handle->cmd($sudo.
-       "cp -v dovecot.service.in /etc/systemd/system/dovecot.service",
-       '__display__');
+      'mkdir -vp /var/run/dovecot','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
-       "sed -i \"s*.sbindir.*/usr/local/sbin*\" ".
-       "/etc/systemd/system/dovecot.service");
+      'cp -v dovecot.service.in /etc/systemd/system/dovecot.service',
+      '__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
-       "sed -i \"s*.bindir.*/usr/local/bin*\" ".
-       "/etc/systemd/system/dovecot.service");
+      'sed -i "s#PIDFile=/usr/local#PIDFile=#" '.
+      '/etc/systemd/system/dovecot.service');
    ($stdout,$stderr)=$handle->cmd($sudo.
-       'mkdir -vp /usr/local/var/run/dovecot','__display__');
+      'sed -i "s*.sbindir.*/usr/local/sbin*" '.
+      '/etc/systemd/system/dovecot.service');
    ($stdout,$stderr)=$handle->cmd($sudo.
-       "sed -i \"s*.rundir.*/usr/local/var/run/dovecot*\" ".
-       "/etc/systemd/system/dovecot.service");
+      'sed -i "s/#ProtectSystem/ProtectSystem/" '.
+      '/etc/systemd/system/dovecot.service');
    ($stdout,$stderr)=$handle->cmd($sudo.
-       'systemctl daemon-reload');
+      'sed -i "s*.bindir.*/usr/local/bin*" '.
+      '/etc/systemd/system/dovecot.service');
    ($stdout,$stderr)=$handle->cmd($sudo.
-       'systemctl enable saslauthd.service','__display__');
+      'sed -i "s*.rundir.*/var/run/dovecot*" '.
+      '/etc/systemd/system/dovecot.service');
    ($stdout,$stderr)=$handle->cmd($sudo.
-       'service saslauthd restart','__display__');
+      'systemctl daemon-reload');
    ($stdout,$stderr)=$handle->cmd($sudo.
-       'service saslauthd status -l','__display__');
+      'systemctl enable saslauthd.service','__display__');
+   sleep 2;
    ($stdout,$stderr)=$handle->cmd($sudo.
-       'systemctl enable dovecot.service'.'__display__');
+      'service saslauthd restart','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
-       'service dovecot restart','__display__');
+      'service saslauthd status -l','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
-       'service dovecot status -l','__display__');
+      'systemctl enable dovecot.service'.'__display__');
+   sleep 2;
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'service dovecot restart','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'service dovecot status -l','__display__');
    ($stdout,$stderr)=$handle->cwd('/opt/source');
    my $install_roundcube=<<'END';
 
@@ -3173,16 +3218,54 @@ END
       "cp -Rv $gtarfile/* /var/www/html/roundcube",
       '__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
+      'chown -R www-data:www-data /var/www/html/roundcube',
+      '__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'find /var/www/html/roundcube -type f');
+   foreach my $file (split /\n/, $stdout) {
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'chmod -v 644 '.$file,'__display__');
+   }
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'find /var/www -type d');
+   foreach my $dir (split /\n/, $stdout) {
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'chmod -v 755 '.$dir,'__display__');
+   }
+   ($stdout,$stderr)=$handle->cmd($sudo.
       "setfacl -R -m u:www-data:rwx /var/www/html/roundcube/temp/ ".
       "/var/www/html/roundcube/logs/",'__display__');
-
-
-#$config['smtp_server'] = 'localhost';
-#$config['smtp_port'] = 25;
-#$config['smtp_auth_type'] = '';
-#$config['smtp_user'] = '';
-#$config['smtp_pass'] = '';
-
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'cp -vp /var/www/html/roundcube/config/config.inc.php.sample '.
+      '/var/www/html/roundcube/config/config.inc.php','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'sed -i "s#roundcube:pass#roundcube:'.$service_and_cert_password.
+      '#" /var/www/html/roundcube/config/config.inc.php');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'sed -i "s#roundcubemail#roundcube#" '.
+      '/var/www/html/roundcube/config/config.inc.php');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'sed -i "s#localhost\'#ssl://mail.'.$domain_url.'\'#" '.
+      '/var/www/html/roundcube/config/config.inc.php');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'sed -i "s#= 587# = 465#" '.
+      '/var/www/html/roundcube/config/config.inc.php');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'sed -i "s#Roundcube Webmail#GetWisdom Webmail#" '.
+      '/var/www/html/roundcube/config/config.inc.php');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'sed -i "s#\'\'#\'https://www.getwisdom.com/contact-us\'#" '.
+      '/var/www/html/roundcube/config/config.inc.php');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'service php-fpm stop','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'service nginx restart','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'service nginx status -l','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'service php-fpm restart','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'service php-fpm status -l','__display__');
 
    my $install_redis=<<'END';
 
@@ -3272,6 +3355,8 @@ END
       'chown -v redis:redis /usr/local/etc/redis','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
       'cp -v redis.conf /usr/local/etc/redis','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'mkdir -vp /var/run/redis','__display__');
    #
    # echo-ing/streaming files over ssh can be tricky. Use echo -e
    #          and replace these characters with thier HEX
@@ -3312,7 +3397,7 @@ Documentation=http://redis.io/documentation, man:redis-server(1)
 Type=notify
 ExecStart=/usr/local/bin/redis-server /usr/local/etc/redis/redis.conf --supervised systemd --daemonize no
 ExecStop=/bin/kill -s TERM \\x24MAINPID
-PIDFile=/usr/local/var/run/redis/redis.pid
+PIDFile=/var/run/redis/redis.pid
 Restart=always
 User=redis
 Group=redis
@@ -3448,6 +3533,7 @@ END
       '/etc/resolv.conf');
    ($stdout,$stderr)=$handle->cmd($sudo.
       'systemctl enable unbound.service','__display__');
+   sleep 2;
    ($stdout,$stderr)=$handle->cmd($sudo.
       'service unbound restart','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
@@ -3532,7 +3618,8 @@ END
       "make install",'__display__');
    ($stdout,$stderr)=$handle->cwd('/opt/source');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      'git clone https://luajit.org/git/luajit-2.0.git','__display__');
+      'git clone https://luajit.org/git/luajit-2.0.git',
+      '__display__');
    ($stdout,$stderr)=$handle->cwd('luajit-2.0');
    ($stdout,$stderr)=$handle->cmd($sudo.
       'make install','__display__');
@@ -3541,6 +3628,13 @@ END
       'git clone --recursive https://github.com/boostorg/boost.git',
       '__display__');
    ($stdout,$stderr)=$handle->cwd('boost');
+   my $boost_tag='';
+   foreach my $tag (reverse split /\n/, $stdout) {
+      $boost_tag=$tag;
+      last unless $tag=~/beta/;
+   }
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "git checkout $boost_tag",'__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
       './bootstrap.sh','3600','__display__');
    ($stdout,$stderr)=clean_filehandle($handle);
@@ -3655,27 +3749,11 @@ END
       'chown -v _rspamd:_rspamd /var/lib/rspamd','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
       'systemctl enable rspamd.service','__display__');
+   sleep 2;
    ($stdout,$stderr)=$handle->cmd($sudo.
       'service rspamd restart','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
       'service rspamd status -l','__display__');
-
-#cleanup;
-
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      'chown -R www-data:www-data /var/www','__display__');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      'find /var/www -type f');
-   foreach my $file (split /\n/, $stdout) {
-      ($stdout,$stderr)=$handle->cmd($sudo.
-         'chmod -v 644 '.$file,'__display__');
-   }
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      'find /var/www -type d');
-   foreach my $dir (split /\n/, $stdout) {
-      ($stdout,$stderr)=$handle->cmd($sudo.
-         'chmod -v 755 '.$dir,'__display__');
-   }
 
 #cleanup;
 
@@ -4014,9 +4092,67 @@ END
 
 };
 
+our $test_letsencrypt=sub {
+
+   package test_letsencrypt;
+   use Net::FullAuto;
+   my $domain_url="]I[{'domain_url',1}";
+   my $handle=connect_shell();
+   my ($stdout,$stderr)=$handle->cmd(
+      "wget -qO- https://crt.sh/?Identity=mail.$domain_url");
+   my $tr=0;my $certid='';
+   unless ($stdout=~/None found/s) {
+      my $nextline=0;my $tr=0;
+      foreach my $line (split /\n/, $stdout) {
+         if ($line=~/TR/) {
+            $nextline=1;
+         } elsif ($nextline==1 and $line=~/id=/) {
+            $tr++;
+            $line=~s/^.*id=(.*)["].*$/$1/;
+            $nextline=0;
+         }
+         if ($tr==5) {
+            $certid=$line;last;
+         }
+      }
+   }
+   unless ($certid) {
+      $choose_strong_password->();
+   } else {
+      ($stdout,$stderr)=$handle->cmd(
+         "wget -qO- https://crt.sh/?id=$certid");
+      $stdout=~/^.*?Log URL.*?TD[>](.*?)[&].*?[>]([^ ]+) UTC.*$/s;
+      my $date=$1;my $time=$2;
+      my ($yr,$mn,$dy,$hr,$mt,$sc)=(0,0,0,0,0,0);
+      ($yr,$mn,$dy)=split /-/, $date;
+      ($hr,$mt,$sc)=split /:/, $time;
+      my $timestamp=&Net::FullAuto::FA_Core::timelocal(
+         $sc,$mt,$hr,$dy,$mn-1,$yr);
+      $timestamp-=21600;
+      my $diff=time()-$timestamp;
+      $diff=int($diff/3600);
+      if ($diff<169) {
+         $Net::FullAuto::ISets::Local::EmailServer_is::domain_url->($diff,$domain_url);
+      } else {
+         $choose_strong_password->();
+      }
+   }
+};
+
 our $domain_url=sub {
 
    package domain_url;
+   my $diff=$_[0]||'';
+   my $tried=$_[1]||'';
+   my $days=0;my $hours=0;
+   if ($diff) {
+      my $remain=168-$diff;
+      $days=int($remain/24);
+      $hours=$remain%24;
+   }
+   $tried="\n   ERROR! => Letsencrypt Cert for  $tried  is\n".
+          "             not available for $days days $hours hours!\n"
+          if $diff;
    use Net::FullAuto;
    my $handle=connect_shell();
    my ($stdout,$stderr)=$handle->cmd("wget -qO- https://icanhazip.com");
@@ -4045,10 +4181,7 @@ END
    Type or paste the domain url for the site:
 
    *** A properly registered domain url is necessary! ***
-
-   Check on Letsencrypt Availability (5 per week) at:
-   https://crt.sh/?Identity=mail.domain_url&iCAID=16418
-
+   $tried
    Make sure the DNS A/AAAA record(s) for this domain
    contain(s) this IP address --> $public_ip
 
@@ -4067,7 +4200,8 @@ END
 
       Name => 'domain_url',
       Input => 1,
-      Result => $choose_strong_password,
+      #Result => $choose_strong_password,
+      Result => $test_letsencrypt,
       #Result =>
    #$Net::FullAuto::ISets::Local::EmailServer_is::select_emailserver_setup,
       Banner => $domain_url_banner,

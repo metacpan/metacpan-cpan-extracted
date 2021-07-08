@@ -86,5 +86,27 @@ subtest 'early exit' => sub {
     }, undef, 'can dispose chained');
     done_testing;
 };
+
+subtest 'failed origin' => sub {
+    my $src = Ryu::Source->new(label => 'first');
+    my $next = Ryu::Source->new(label => 'nested');
+    my $chained = $src->flat_map(sub {
+        $next
+    });
+    ok(!$chained->is_ready, 'not marked as ready yet');
+    $src->fail('example');
+    ok( $chained->is_failed, 'now marked as failed');
+    done_testing;
+};
+subtest 'failed sources' => sub {
+    my $src = Ryu::Source->new(label => 'first');
+    my $chained = $src->flat_map(sub { $_ });
+    ok(!$chained->is_ready, 'not marked as ready yet');
+    $src->emit(my $next = Ryu::Source->new(label => 'nested'));
+    ok(!$chained->is_ready, 'not marked as ready yet');
+    $next->fail('example');
+    ok( $chained->is_failed, 'now marked as failed');
+    done_testing;
+};
 done_testing;
 

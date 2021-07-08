@@ -1,7 +1,7 @@
 package App::picadata;
 use v5.14.1;
 
-our $VERSION = '1.27';
+our $VERSION = '1.28';
 
 use Getopt::Long qw(GetOptionsFromArray :config bundling);
 use Pod::Usage;
@@ -148,16 +148,23 @@ sub new {
 
     $opt->{input} = @argv ? \@argv : ['-'];
 
-    $opt->{from}
-        = ($opt->{input}[0] =~ /\.([a-z]+)$/ && $TYPES{lc $1}) ? $1 : 'plain'
-        unless $opt->{from};
-    $opt->{from} = $TYPES{lc $opt->{from}}
-        or $opt->{error} = "unknown serialization type: " . $opt->{from};
+    if ($opt->{from}) {
+        $opt->{from} = $TYPES{lc $opt->{from}}
+            or $opt->{error} = "unknown serialization type: " . $opt->{from};
+    }
 
-    $opt->{to} = $opt->{from}
-        if !$opt->{to} and $command =~ /(convert|split|diff|patch)/;
-    $opt->{to} = 'plain'
-        if !$opt->{to} && $command eq 'validate' && $opt->{annotate};
+    # default output format
+    unless ($opt->{to}) {
+        if ($command =~ /(convert|split|diff|patch)/) {
+            $opt->{to} = $opt->{from};
+            $opt->{to} ||= $TYPES{lc $1}
+                if $opt->{input}->[0] =~ /\.([a-z]+)$/;
+            $opt->{to} ||= 'plain';
+        }
+        elsif ($command eq 'validate' && $opt->{annotate}) {
+            $opt->{to} = 'plain';
+        }
+    }
 
     if ($opt->{to}) {
         $opt->{to} = $TYPES{lc $opt->{to}}
@@ -180,7 +187,10 @@ sub parser_from_input {
         die "File not found: $in\n" unless -e $in;
     }
 
-    return pica_parser($format || $self->{from}, $in, bless => 1);
+    $format ||= $self->{from};
+    $format ||= $TYPES{lc $1} if $in =~ /\.([a-z]+)$/;
+
+    return pica_parser($format || 'plain', $in);
 }
 
 sub load_schema {
@@ -291,8 +301,6 @@ sub run {
             $stats->{fields} += @{$record->{record}};
         }
         $stats->{records}++;
-
-        last if $number and $stats->{records} >= $number;
     };
 
     if ($command eq 'diff') {
@@ -306,6 +314,7 @@ sub run {
             else {
                 last;
             }
+            last if $number && $number <= ++$stats->{record};
         }
     }
     elsif ($command eq 'patch') {
@@ -325,15 +334,17 @@ sub run {
             else {
                 $writer->write($changed || []);
             }
+
+            last if $number && $number <= ++$stats->{record};
         }
     }
     else {
-        foreach my $in (@{$self->{input}}) {
+    RECORD: foreach my $in (@{$self->{input}}) {
             my $parser = $self->parser_from_input($in);
             while (my $next = $parser->next) {
                 for ($command eq 'split' ? $next->split : $next) {
                     $process->($_);
-                    last if $number and $stats->{records} >= $number;
+                    last RECORD if $number and $stats->{records} >= $number;
                 }
             }
         }
@@ -371,10 +382,7 @@ sub run {
 }
 
 sub parse_path {
-    my $path = eval {PICA::Path->new($_[0], position_as_occurrence => 1)};
-    if ($path) {
-    }
-    return $path;
+    eval {PICA::Path->new($_[0], position_as_occurrence => 1)};
 }
 
 sub explain {

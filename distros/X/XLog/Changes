@@ -1,3 +1,6 @@
+1.1.1  xx.xx.2021
+           - fix compilation warnings
+           - add disable_format_warnings / enable_format_warnings
 1.1.0  08.04.2021
            - support for set_logger/set_formatter in modules
            - add XLog::Module docs

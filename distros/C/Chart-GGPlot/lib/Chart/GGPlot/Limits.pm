@@ -4,7 +4,7 @@ package Chart::GGPlot::Limits;
 
 use Chart::GGPlot::Setup qw(:base :pdl);
 
-our $VERSION = '0.0011'; # VERSION
+our $VERSION = '0.0016'; # VERSION
 
 use Data::Frame;
 use List::AllUtils qw(pairmap); 
@@ -14,9 +14,9 @@ use Types::PDL qw(Piddle1D PiddleFromAny);
 
 use Chart::GGPlot::Aes::Functions qw(aes_all);
 use Chart::GGPlot::Geom::Blank;
+use Chart::GGPlot::Scale::Functions;
 use Chart::GGPlot::Types;
 use Chart::GGPlot::Util qw(:all);
-use Chart::GGPlot::Scale::Functions qw(find_scale);
 
 use parent qw(Exporter::Tiny);
 
@@ -120,7 +120,7 @@ Chart::GGPlot::Limits - Functions for applying limits to the scales
 
 =head1 VERSION
 
-version 0.0011
+version 0.0016
 
 =head1 SYNOPSIS
 
@@ -190,7 +190,7 @@ Stephan Loyd <sloyd@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019-2020 by Stephan Loyd.
+This software is copyright (c) 2019-2021 by Stephan Loyd.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

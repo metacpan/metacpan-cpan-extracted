@@ -1,9 +1,9 @@
 package Role::TinyCommons::Tree;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-05-06'; # DATE
+our $DATE = '2021-07-02'; # DATE
 our $DIST = 'Role-TinyCommons-Tree'; # DIST
-our $VERSION = '0.126'; # VERSION
+our $VERSION = '0.127'; # VERSION
 
 1;
 # ABSTRACT: Roles related to object tree
@@ -20,7 +20,7 @@ Role::TinyCommons::Tree - Roles related to object tree
 
 =head1 VERSION
 
-This document describes version 0.126 of Role::TinyCommons::Tree (from Perl distribution Role-TinyCommons-Tree), released on 2021-05-06.
+This document describes version 0.127 of Role::TinyCommons::Tree (from Perl distribution Role-TinyCommons-Tree), released on 2021-07-02.
 
 =head1 DESCRIPTION
 
@@ -48,6 +48,12 @@ your class manually or just call the routines as a normal function call if you
 do not want to involve L<Role::Tiny>. See an example of this usage in
 L<Data::CSel>.
 
+=head1 CONTRIBUTOR
+
+=for stopwords perlancar (@pc-office)
+
+perlancar (@pc-office) <perlancar@gmail.com>
+
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/Role-TinyCommons-Tree>.
@@ -58,7 +64,7 @@ Source repository is at L<https://github.com/perlancar/perl-Role-TinyCommons-Tre
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Role-TinyCommons-TreeNode/issues>
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Role-TinyCommons-Tree>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

@@ -1,9 +1,9 @@
 use strict;
 use warnings;
 
-package Perl::PrereqScanner::Scanner::Perl5;
+package Perl::PrereqScanner::Scanner::Perl5 1.024;
 # ABSTRACT: scan for core Perl 5 language indicators of required modules
-$Perl::PrereqScanner::Scanner::Perl5::VERSION = '1.023';
+
 use Moose;
 with 'Perl::PrereqScanner::Scanner';
 
@@ -127,7 +127,7 @@ Perl::PrereqScanner::Scanner::Perl5 - scan for core Perl 5 language indicators o
 
 =head1 VERSION
 
-version 1.023
+version 1.024
 
 =head1 DESCRIPTION
 
@@ -168,6 +168,16 @@ C<minimum_version> must be a literal number, v-string, or single-quoted string. 
 
 =back
 
+=head1 PERL VERSION
+
+This library should run on perls released even a long time ago.  It should work
+on any version of perl released in the last five years.
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
+
 =head1 AUTHORS
 
 =over 4
@@ -178,7 +188,7 @@ Jerome Quelin
 
 =item *
 
-Ricardo Signes <rjbs@cpan.org>
+Ricardo Signes <rjbs@semiotic.systems>
 
 =back
 

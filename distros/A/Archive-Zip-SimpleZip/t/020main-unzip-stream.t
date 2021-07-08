@@ -293,7 +293,7 @@ if (1)
                         my $methodName = $methodsAvailable{$method} || '';
 
                         title "** TO $to, Method $methodName($method), Comment '$comment', Streamed $streamed. Zip64 $zip64";
-                        
+
                         skip "Skipping method $methodNames{$method} ($method): No uncompressor installed", 85
                             if ! $methodName && $method == ZIP_CM_ZSTD ;
 

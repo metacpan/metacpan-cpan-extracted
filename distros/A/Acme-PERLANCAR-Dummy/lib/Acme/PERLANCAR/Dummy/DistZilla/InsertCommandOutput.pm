@@ -1,9 +1,9 @@
 package Acme::PERLANCAR::Dummy::DistZilla::InsertCommandOutput;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-02-21'; # DATE
+our $DATE = '2021-02-22'; # DATE
 our $DIST = 'Acme-PERLANCAR-Dummy'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -23,7 +23,7 @@ Acme::PERLANCAR::Dummy::DistZilla::InsertCommandOutput
 
 =head1 VERSION
 
-This document describes version 0.001 of Acme::PERLANCAR::Dummy::DistZilla::InsertCommandOutput (from Perl distribution Acme-PERLANCAR-Dummy), released on 2021-02-21.
+This document describes version 0.002 of Acme::PERLANCAR::Dummy::DistZilla::InsertCommandOutput (from Perl distribution Acme-PERLANCAR-Dummy), released on 2021-02-22.
 
 =head1 DESCRIPTION
 

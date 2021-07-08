@@ -1,3 +1,18 @@
+0.20 2021-07-08
+
+ * Sync with recent changes to the Math-BigInt distribution.
+
+ * The from_hex() method accepts hexadecimal numbers with the prefix "0X" or
+   "0x", but not just "X" or "x".
+
+ * The from_oct() method accepts octal numbers with the prefix "0O" or "0o", but
+   not just "O" (capital letter O) or "o" (lowercase letter o).
+
+ * The from_bin() method accepts binary numbers with the prefix "0B" or "0b",
+   but not just "B" or "b".
+
+ * Updated the BUGS and SUPPORT sections in the POD.
+
 0.19 2019-10-24
 
  * Add test file for bnok().

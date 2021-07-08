@@ -1,10 +1,10 @@
 {
    "abstract" : "test module to test/assert response times",
    "author" : [
-      "Jonas B. Nielsen <jonasbn@cpan.org>"
+      "Jonas Br\u00f8ms\u00f8 <jonasbn@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.022, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -65,11 +65,11 @@
    "provides" : {
       "Test::Timer" : {
          "file" : "lib/Test/Timer.pm",
-         "version" : "2.11"
+         "version" : "2.12"
       },
       "Test::Timer::TimeoutException" : {
          "file" : "lib/Test/Timer/TimeoutException.pm",
-         "version" : "2.11"
+         "version" : "2.12"
       }
    },
    "release_status" : "stable",
@@ -84,8 +84,9 @@
          "web" : "https://github.com/jonasbn/perl-test-timer"
       }
    },
-   "version" : "2.11",
-   "x_generated_by_perl" : "v5.28.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.08"
+   "version" : "2.12",
+   "x_generated_by_perl" : "v5.32.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.25",
+   "x_spdx_expression" : "Artistic-2.0"
 }
 

@@ -1,9 +1,9 @@
 package Code::Includable::Tree::NodeMethods;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-05-06'; # DATE
+our $DATE = '2021-07-02'; # DATE
 our $DIST = 'Role-TinyCommons-Tree'; # DIST
-our $VERSION = '0.126'; # VERSION
+our $VERSION = '0.127'; # VERSION
 
 use strict;
 our $IGNORE_NO_CHILDREN_METHOD = 1;
@@ -77,6 +77,11 @@ sub ancestors {
         $parent = $parent->$GET_PARENT_METHOD;
     }
     @res;
+}
+
+sub retrieve_parent {
+    my $self = shift;
+    $self->$GET_PARENT_METHOD;
 }
 
 sub walk {
@@ -231,6 +236,30 @@ sub next_siblings {
     ();
 }
 
+sub is_root {
+    my ($self, $n) = @_;
+    my $parent = $self->$GET_PARENT_METHOD;
+    return $parent ? 0:1;
+}
+
+sub has_min_children {
+    my ($self, $m) = @_;
+    my @children = _children_as_list($self);
+    @children >= $m;
+}
+
+sub has_max_children {
+    my ($self, $n) = @_;
+    my @children = _children_as_list($self);
+    @children <= $n;
+}
+
+sub has_children_between {
+    my ($self, $m, $n) = @_;
+    my @children = _children_as_list($self);
+    @children >= $m && @children <= $n;
+}
+
 # remove self from parent
 sub remove {
     my $self = shift;
@@ -289,7 +318,7 @@ Code::Includable::Tree::NodeMethods - Tree node routines
 
 =head1 VERSION
 
-This document describes version 0.126 of Code::Includable::Tree::NodeMethods (from Perl distribution Role-TinyCommons-Tree), released on 2021-05-06.
+This document describes version 0.127 of Code::Includable::Tree::NodeMethods (from Perl distribution Role-TinyCommons-Tree), released on 2021-07-02.
 
 =head1 DESCRIPTION
 
@@ -338,6 +367,11 @@ this variable and C<$GET_CHILDREN_METHOD>.
 =head2 ancestors
 
 Return a list of ancestors, from the direct parent upwards to the root.
+
+=head2 retrieve_parent
+
+Return direct parent. Basically a standard way to call "get parent" method, as
+the latter can be customized.
 
 =head2 check
 
@@ -435,6 +469,20 @@ Return the sibling node directly before this node.
 Return all the previous siblings of this node, from the first to the one
 directly before.
 
+=head2 is_root
+
+=head2 has_min_children(m)
+
+Only select nodes that have at least I<m> direct children.
+
+=head2 has_max_children(n)
+
+Only select nodes that have at most I<n> direct children.
+
+=head2 has_children_between(m, n)
+
+Only select nodes that have between I<m> and I<n> direct children.
+
 =head2 remove
 
 Detach this node from its parent. Also set the parent of this node to undef.
@@ -460,7 +508,7 @@ Source repository is at L<https://github.com/perlancar/perl-Role-TinyCommons-Tre
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Role-TinyCommons-TreeNode/issues>
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Role-TinyCommons-Tree>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

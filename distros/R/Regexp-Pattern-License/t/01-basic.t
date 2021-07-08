@@ -1,13 +1,11 @@
-#!perl
-
-use strict;
-use warnings;
-use Test::Exception;
-use Test::More 0.98;
+use Test2::V0;
 
 use Regexp::Pattern;
 
-dies_ok { re("License::foo") } "get unknown -> dies";
+my $e = dies { re("License::foo") };
+like $e,
+	qr/No regexp pattern named 'foo' in package 'Regexp::Pattern::License'/,
+	"get unknown -> dies";
 
 subtest "get" => sub {
 	my $re = re("License::fsful");

@@ -4,6 +4,13 @@ History for the Lab-Measurement Perl distribution
 This document is work in progress (in the sense of adding
 historical information).
 
+3.762 2021-07-07
+  * Fix Yokogawa 7651 source driver
+
+3.761 2021-07-06
+  * Many improvements to Keysight DSOS604A and Rigol_DG5000 drivers
+  * Add pulse delay and pulse width sweeps
+
 3.760 2021-06-28
   * Additions for producing RPM of Lab::Measurement with Dist::Zilla
   * USBtmc: use interrupt i/o to check if transfer is complete

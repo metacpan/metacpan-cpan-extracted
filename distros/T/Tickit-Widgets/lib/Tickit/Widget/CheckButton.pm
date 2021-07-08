@@ -1,11 +1,11 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2013-2020 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2013-2021 -- leonerd@leonerd.org.uk
 
-use Object::Pad 0.27;
+use Object::Pad 0.41;  # :param
 
-package Tickit::Widget::CheckButton 0.31;
+package Tickit::Widget::CheckButton 0.32;
 class Tickit::Widget::CheckButton
    extends Tickit::Widget;
 
@@ -138,18 +138,10 @@ Optional. Callback function to invoke when the check state is changed.
 
 =cut
 
-has $_label;
-has $_on_toggle;
+has $_label     :reader         :param = undef;
+has $_on_toggle :reader :writer :param = undef;
 
 has $_active;
-
-BUILD
-{
-   my %params = @_;
-
-   $self->set_label( $params{label} ) if defined $params{label};
-   $self->set_on_toggle( $params{on_toggle} ) if $params{on_toggle};
-}
 
 method lines
 {
@@ -179,7 +171,7 @@ Returns or sets the label text of the button.
 
 =cut
 
-method label { $_label }
+# generated accessor
 
 method set_label
 {
@@ -194,7 +186,7 @@ method set_label
 
 =cut
 
-method on_toggle { $_on_toggle }
+# generated accessor
 
 =head2 set_on_toggle
 
@@ -207,10 +199,7 @@ changed.
 
 =cut
 
-method set_on_toggle
-{
-   $_on_toggle = $_[0];
-}
+# generated accessor
 
 =head1 METHODS
 

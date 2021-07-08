@@ -1,5 +1,4 @@
-Apache/OneTimeURL version 1.33
-==============================
+Apache::OneTimeURL
 
 This module is designed to provide a one-time URL for retrieval of a
 resource via HTTP. The module requires an Apache webserver with mod_perl

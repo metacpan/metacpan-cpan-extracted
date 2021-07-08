@@ -3,7 +3,7 @@ package Beekeeper::Config;
 use strict;
 use warnings;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 use JSON::XS;
 use Carp;
@@ -133,7 +133,7 @@ Beekeeper::Config - Read configuration files
  
 =head1 VERSION
  
-Version 0.06
+Version 0.07
 
 =head1 SYNOPSIS
 
@@ -147,10 +147,10 @@ and then C</etc/beekeeper>.
 
 =head3 pool.config.json
 
-This file defines all worker pools running on this host, specifying 
-which logical bus should be used and which services it will run.
+This file defines all worker pools running in a given host, specifying which
+logical bus should be used and which services it will run.
 
-The file format is in relaxed JSON, which allows comments and trailing commas.
+The file format is relaxed JSON, which allows comments and trailing commas.
 
 Each entry define a worker pool. Required parameters are:
 
@@ -169,22 +169,22 @@ Example:
           "description" : "pool of MyApp workers",
   
           "workers" : {
-              "MyApp::Service::Foo::Worker" : { "workers_count" : 4 },
-              "MyApp::Service::Bar::Worker" : { "workers_count" : 2 },
+              "MyApp::Service::Foo::Worker" : { "worker_count" : 4 },
+              "MyApp::Service::Bar::Worker" : { "worker_count" : 2 },
           },
       },
   ]
 
 =head3 bus.config.json
 
-This file defines all logical buses used by your application, specifying
+This file defines all logical buses used by an application, specifying
 the conection parameters to the MQTT brokers that will service them.
 
-For development purposes is handy to use a single broker to hold all 
+For development purposes it is handy to use a single broker to hold all 
 logical buses and easily simulate a complex topology, but in production 
 enviroments brokers should be isolated from each other.
 
-The file format is in relaxed JSON, which allows comments and trailing commas.
+The file format is relaxed JSON, which allows comments and trailing commas.
 
 Each entry define a logical bus. Accepted parameters are:
 

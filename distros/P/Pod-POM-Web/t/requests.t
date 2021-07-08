@@ -36,10 +36,10 @@ test_psgi $app, sub {
 
   # module documentation
   $response_like->("/Plack", qr/Perl Superglue for Web frameworks/, "module 1");
-  $response_like->("/Plack", qr/\(v\. \d\.\d+, installed \d\d/,     "module version and date");
+  $response_like->("/Plack", qr/\(v\. \d\.\d+, installed \d/,       "module version and date");
 
   # script
-  $response_like->("/script/plackup", qr/plackup is a command line utility/, "script");
+  $response_like->("/script/perlbug", qr/ how to submit bug reports on Perl/, "script");
 
   # wrong module
   $response_like->("/Foo/Bar/Bar", qr/could not be found/, "no such module");
@@ -66,7 +66,7 @@ test_psgi $app, sub {
   $response_like->("/toc/pragmas", qr/\bstrict.*?warnings/s, "toc/pragmas");
 
   # table of contents - scripts
-  $response_like->("/toc/scripts", qr/\bplackup/s, "toc/scripts");
+  $response_like->("/toc/scripts", qr/\bperlbug/s, "toc/scripts");
 
   # search in perlvar
   SKIP: {

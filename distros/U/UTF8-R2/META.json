@@ -1,6 +1,6 @@
 {
     "name" : "UTF8-R2",
-    "version" : "0.19",
+    "version" : "0.20",
     "abstract" : "makes UTF-8 scripting easy for enterprise use or LTS",
     "author" : [
         "ina <ina@cpan.org>"
@@ -26,6 +26,7 @@
     "prereqs" : {
         "build" : {
             "requires" : {
+                "Cwd" : "0",
                 "ExtUtils::MakeMaker" : "5.4302",
                 "File::Basename" : "2.6",
                 "File::Copy" : "2.02",
@@ -34,13 +35,14 @@
                 "Socket" : "0",
                 "Symbol" : "0",
                 "lib" : "0",
-                "perl" : "5.005_03",
+                "perl" : "5.00503",
                 "strict" : "1.01",
                 "vars" : "0"
             }
         },
         "configure" : {
             "requires" : {
+                "Cwd" : "0",
                 "ExtUtils::MakeMaker" : "5.4302",
                 "File::Basename" : "2.6",
                 "File::Copy" : "2.02",
@@ -49,13 +51,14 @@
                 "Socket" : "0",
                 "Symbol" : "0",
                 "lib" : "0",
-                "perl" : "5.005_03",
+                "perl" : "5.00503",
                 "strict" : "1.01",
                 "vars" : "0"
             }
         },
         "runtime" : {
             "requires" : {
+                "Cwd" : "0",
                 "ExtUtils::MakeMaker" : "5.4302",
                 "File::Basename" : "2.6",
                 "File::Copy" : "2.02",
@@ -64,7 +67,7 @@
                 "Socket" : "0",
                 "Symbol" : "0",
                 "lib" : "0",
-                "perl" : "5.005_03",
+                "perl" : "5.00503",
                 "strict" : "1.01",
                 "vars" : "0"
             }

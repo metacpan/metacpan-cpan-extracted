@@ -68,7 +68,7 @@
          "web" : "https://github.com/perlancar/perl-App-orgsel"
       }
    },
-   "version" : "0.013",
+   "version" : "0.014",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"

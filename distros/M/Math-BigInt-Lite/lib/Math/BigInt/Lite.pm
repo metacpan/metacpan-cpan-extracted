@@ -9,7 +9,7 @@ require 5.006002;
 use strict;
 use warnings;
 
-use Math::BigInt 1.999801;
+use Math::BigInt 1.999821;
 
 our ($_trap_inf, $_trap_nan);
 
@@ -17,7 +17,7 @@ our @ISA = qw(Math::BigInt);
 our @EXPORT_OK = qw/objectify/;
 my $class = 'Math::BigInt::Lite';
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 ##############################################################################
 # global constants, flags and accessory
@@ -610,12 +610,14 @@ sub from_hex {
 
     if ($str =~ s/
                      ^
+                     \s*
                      ( [+-]? )
-                     (0?x)?
+                     ( 0 [Xx] )?
                      (
                          [0-9a-fA-F]*
                          ( _ [0-9a-fA-F]+ )*
                      )
+                     \s*
                      $
                  //x)
     {
@@ -655,11 +657,14 @@ sub from_oct {
 
     if ($str =~ s/
                      ^
+                     \s*
                      ( [+-]? )
+                     ( 0 [Oo] )?
                      (
                          [0-7]*
                          ( _ [0-7]+ )*
                      )
+                     \s*
                      $
                  //x)
     {
@@ -667,7 +672,7 @@ sub from_oct {
         # underscores or invalid characters.
 
         my $sign = $1;
-        my $chrs = $2;
+        my $chrs = $3;
         $chrs =~ tr/_//d;
         $chrs = '0' unless CORE::length $chrs;
 
@@ -699,12 +704,14 @@ sub from_bin {
 
     if ($str =~ s/
                      ^
+                     \s*
                      ( [+-]? )
-                     (0?b)?
+                     ( 0 [Bb] )?
                      (
                          [01]*
                          ( _ [01]+ )*
                      )
+                     \s*
                      $
                  //x)
     {
@@ -1388,7 +1395,8 @@ All other methods from BigInt and BigFloat should work as expected.
 
 Please report any bugs or feature requests to
 C<bug-math-bigint at rt.cpan.org>, or through the web interface at
-L<https://rt.cpan.org/Ticket/Create.html?Queue=Math-BigInt-Lite> (requires login).
+L<https://rt.cpan.org/Ticket/Create.html?Queue=Math-BigInt-Lite>
+(requires login).
 We will be notified, and then you'll automatically be notified of
 progress on your bug as I make changes.
 
@@ -1402,25 +1410,25 @@ You can also look for information at:
 
 =over 4
 
+=item * GitHub
+
+L<https://github.com/pjacklam/p5-Math-BigInt>
+
 =item * RT: CPAN's request tracker
 
-L<https://rt.cpan.org/Public/Dist/Display.html?Name=Math-BigInt-Lite>
+L<https://rt.cpan.org/Dist/Display.html?Name=Math-BigInt>
 
-=item * AnnoCPAN: Annotated CPAN documentation
+=item * MetaCPAN
 
-L<http://annocpan.org/dist/Math-BigInt-Lite>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/dist/Math-BigInt-Lite>
-
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/Math-BigInt-Lite/>
+L<https://metacpan.org/release/Math-BigInt>
 
 =item * CPAN Testers Matrix
 
-L<http://matrix.cpantesters.org/?dist=Math-BigInt-Lite>
+L<http://matrix.cpantesters.org/?dist=Math-BigInt>
+
+=item * CPAN Ratings
+
+L<https://cpanratings.perl.org/dist/Math-BigInt>
 
 =back
 
@@ -1431,7 +1439,7 @@ the same terms as Perl itself.
 
 =head1 SEE ALSO
 
-L<Math::BigFloat> and L<Math::Big> as well as
+L<Math::BigFloat> and L<Math::BigInt> as well as
 L<Math::BigInt::Pari> and L<Math::BigInt::GMP>.
 
 The L<bignum|bignum> module.
@@ -1450,7 +1458,7 @@ Copyright 2010 Florian Ragwitz L<flora@cpan.org>.
 
 =item *
 
-Copyright 2016- Peter John Acklam L<pjacklam@online.no>.
+Copyright 2016- Peter John Acklam L<pjacklam@gmail.com>.
 
 =back
 

@@ -1,9 +1,9 @@
 use strict;
 use warnings;
-package Task::Kensho::DBDev; # git description: v0.39-49-ga30fff9
+package Task::Kensho::DBDev; # git description: v0.41-4-gd02392a
 # ABSTRACT: A Glimpse at an Enlightened Perl: Database Development
 
-our $VERSION = '0.40';
+our $VERSION = '0.41';
 
 __END__
 
@@ -17,7 +17,7 @@ Task::Kensho::DBDev - A Glimpse at an Enlightened Perl: Database Development
 
 =head1 VERSION
 
-version 0.40
+version 0.41
 
 =head1 SYNOPSIS
 
@@ -114,7 +114,7 @@ starting place on the road to Enlightened Perl programming.
 Please report any bugs or feature requests to
 L<https://github.com/EnlightenedPerlOrganisation/task-kensho/issues>.
 
-bugs may be submitted through L<https://github.com/EnlightenedPerlOrganisation/task-kensho/issues>.
+Bugs may be submitted through L<https://github.com/EnlightenedPerlOrganisation/task-kensho/issues>.
 
 There is also an irc channel available for users of this distribution, at
 L<C<#epo> on C<irc.perl.org>|irc://irc.perl.org/#epo>.
@@ -125,7 +125,7 @@ Chris Prather <chris@prather.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Karen Etheridge Leo Lapworth Chris Nehren Olaf Alders Dan Book Rachel Kelly Shawn Sorichetti Rick Leir
+=for stopwords Karen Etheridge Leo Lapworth Dan Book Chris Nehren Mohammad S Anwar Olaf Alders Rachel Kelly Shawn Sorichetti Rick Leir Tina Müller
 
 =over 4
 
@@ -139,7 +139,15 @@ Leo Lapworth <leo@cuckoo.org>
 
 =item *
 
+Dan Book <grinnz@grinnz.com>
+
+=item *
+
 Chris Nehren <apeiron@cpan.org>
+
+=item *
+
+Mohammad S Anwar <mohammad.anwar@yahoo.com>
 
 =item *
 
@@ -160,6 +168,10 @@ Shawn Sorichetti <shawn@coloredblocks.com>
 =item *
 
 Rick Leir <rleir@leirtech.com>
+
+=item *
+
+Tina Müller <cpan2@tinita.de>
 
 =back
 

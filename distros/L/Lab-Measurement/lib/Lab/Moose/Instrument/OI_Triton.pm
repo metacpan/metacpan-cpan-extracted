@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::OI_Triton;
-$Lab::Moose::Instrument::OI_Triton::VERSION = '3.760';
+$Lab::Moose::Instrument::OI_Triton::VERSION = '3.762';
 #ABSTRACT: Oxford Instruments Triton gas handling system control
 
 use v5.20;
@@ -267,7 +267,7 @@ Lab::Moose::Instrument::OI_Triton - Oxford Instruments Triton gas handling syste
 
 =head1 VERSION
 
-version 3.760
+version 3.762
 
 =head1 SYNOPSIS
 
@@ -388,9 +388,9 @@ Obviously this only makes sense while we're not in loop control mode.
 
 This software is copyright (c) 2021 by the Lab::Measurement team; in detail:
 
-  Copyright 2018       Andreas K. HÃ¼ttel, Simon Reinhardt
+  Copyright 2018       Andreas K. Huettel, Simon Reinhardt
             2019       Simon Reinhardt
-            2020       Andreas K. HÃ¼ttel, Simon Reinhardt
+            2020       Andreas K. Huettel, Simon Reinhardt
 
 
 This is free software; you can redistribute it and/or modify it under

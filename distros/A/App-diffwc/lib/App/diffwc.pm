@@ -1,7 +1,7 @@
 package App::diffwc;
 
-our $DATE = '2021-03-13'; # DATE
-our $VERSION = '0.006'; # VERSION
+our $DATE = '2021-07-08'; # DATE
+our $VERSION = '0.007'; # VERSION
 
 use strict;
 use warnings;
@@ -107,7 +107,7 @@ App::diffwc - diff + /w/ord highlighting + /c/olor
 
 =head1 VERSION
 
-This document describes version 0.006 of App::diffwc (from Perl distribution App-diffwc), released on 2021-03-13.
+This document describes version 0.007 of App::diffwc (from Perl distribution App-diffwc), released on 2021-07-08.
 
 =head1 SYNOPSIS
 
@@ -125,7 +125,7 @@ Source repository is at L<https://github.com/perlancar/perl-App-diffwc>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-App-diffwc/issues>
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-diffwc>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

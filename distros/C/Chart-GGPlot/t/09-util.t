@@ -81,4 +81,12 @@ subtest remove_missing => sub {
     is(remove_missing($airquality)->nrow, 111);
 };
 
+subtest mm_to_pt => sub {
+    is(mm_to_pt(3.88), 11);
+};
+
+subtest mm_to_px => sub {
+    is(mm_to_px(3.88), 15);
+};
+
 done_testing();

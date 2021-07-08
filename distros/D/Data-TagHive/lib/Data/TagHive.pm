@@ -1,14 +1,62 @@
 use 5.12.0;
 use warnings;
 
-package Data::TagHive;
-{
-  $Data::TagHive::VERSION = '0.003';
-}
+package Data::TagHive 0.004;
 # ABSTRACT: hierarchical tags with values
 
 use Carp;
 
+#pod =head1 SYNOPSIS
+#pod
+#pod   use Data::TagHive;
+#pod
+#pod   my $taghive = Data::TagHive->new;
+#pod
+#pod   $taghive->add_tag('book.topic:programming');
+#pod
+#pod   $taghive->has_tag('book'); # TRUE
+#pod
+#pod =head1 OVERVIEW
+#pod
+#pod Data::TagHive is the bizarre, corrupted union of L<String::TagString> and
+#pod L<Data::Hive>.  It combines the "simple list of strings" of the former with the
+#pod "hierarchical key-value/value pairs" of the latter, using a different interface
+#pod from either.
+#pod
+#pod It's probably better than that sounds, though.
+#pod
+#pod A Data::TagHive object represents a set of tags.  Each tag is a string that
+#pod represents a structure of nested key-value pairs.  For example, a library book
+#pod might be tagged:
+#pod
+#pod   book.pages.size:letter
+#pod   book.pages.count:180
+#pod   book.type:hardcover
+#pod   book.topic:programming.perl.cpan
+#pod
+#pod Each tag is a set of key-value pairs.  Later pairs are qualified by earlier
+#pod pairs.  Values are optional.  Keys and values are separated by colons.
+#pod Key-value pairs are separated by dots.
+#pod
+#pod A tag is considered present if it was set explicitly or if any more-specific
+#pod subtag of it was set.  For example, if we had explicitly added all the tags
+#pod shown above, a tag hive would then report true if asked whether each of the
+#pod following tags were set:
+#pod
+#pod   book
+#pod   book.pages
+#pod   book.pages.size
+#pod   book.pages.size:letter
+#pod   book.pages.count
+#pod   book.pages.count:180
+#pod   book.type
+#pod   book.type:hardcover
+#pod   book.topic
+#pod   book.topic:programming
+#pod   book.topic:programming.perl
+#pod   book.topic:programming.perl.cpan
+#pod
+#pod =cut
 
 sub new {
   my ($class) = @_;
@@ -46,6 +94,19 @@ sub __differ {
   return $x ne $y;
 }
 
+#pod =method add_tag
+#pod
+#pod   $taghive->add_tag( $tagstr );
+#pod
+#pod This method adds the given tag (given as a string) to the hive.  It will fail
+#pod if there are conflicts.  For example, if "foo:bar" is already set, "foo:xyz"
+#pod cannot be set.  Each tag can only have one value.
+#pod
+#pod Tags without values may be given values through C<add_tag>, but only if they
+#pod have no tags beneath them.  For example, given a tag hive with "foo.bar"
+#pod tagged, "foo.bar:baz" could be added, but not "foo:baz"
+#pod
+#pod =cut
 
 sub add_tag {
   my ($self, $tagstr) = @_;
@@ -94,6 +155,13 @@ sub add_tag {
   }
 }
 
+#pod =method has_tag
+#pod
+#pod   if ($taghive->has_tag( $tagstr )) { ... }
+#pod
+#pod This method returns true if the tag hive has the tag.
+#pod
+#pod =cut
 
 sub has_tag {
   my ($self, $tagstr) = @_;
@@ -105,6 +173,16 @@ sub has_tag {
   return;
 }
 
+#pod =method delete_tag
+#pod
+#pod   $taghive->delete_tag( $tagstr );
+#pod
+#pod This method deletes the tag from the hive, along with any tags below it.
+#pod
+#pod If your hive has "foo.bar:xyz.abc" and you C<delete_tag> "foo.bar" it will be
+#pod left with nothing but the tag "foo"
+#pod
+#pod =cut
 
 sub delete_tag {
   my ($self, $tagstr) = @_;
@@ -120,6 +198,12 @@ sub delete_tag {
   }
 }
 
+#pod =method all_tags
+#pod
+#pod This method returns, as a list of strings, all the tags set on the hive either
+#pod explicitly or implicitly.
+#pod
+#pod =cut
 
 sub all_tags {
   my ($self) = @_;
@@ -140,7 +224,7 @@ Data::TagHive - hierarchical tags with values
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 
@@ -192,6 +276,16 @@ following tags were set:
   book.topic:programming.perl
   book.topic:programming.perl.cpan
 
+=head1 PERL VERSION
+
+This library should run on perls released even a long time ago.  It should work
+on any version of perl released in the last five years.
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
+
 =head1 METHODS
 
 =head2 add_tag
@@ -228,7 +322,7 @@ explicitly or implicitly.
 
 =head1 AUTHOR
 
-Ricardo Signes <rjbs@cpan.org>
+Ricardo Signes <rjbs@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

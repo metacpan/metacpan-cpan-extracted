@@ -34,9 +34,9 @@ BEGIN {
     require 'inctools';
   }
 
-  if (49) {
+  if (50) {
     load();
-    plan(tests => 49);
+    plan(tests => 50);
   }
 }
 
@@ -105,6 +105,9 @@ $mhx = 42; is(&Devel::PPPort::SvPV_nomg($mhx), 2);
 $mhx = 42; is(&Devel::PPPort::SvPV_nomg_const($mhx), 2);
 $mhx = 42; is(&Devel::PPPort::SvPV_nomg_const_nolen($mhx), 0);
 $mhx = 42; is(&Devel::PPPort::SvPV_nomg_nolen($mhx), 0);
+
+&Devel::PPPort::SvPVCLEAR($mhx);
+is($mhx, "");
 
 my $str = "";
 &Devel::PPPort::SvPV_force($str);

@@ -20,8 +20,8 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_14)
 
 target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra)
-set_source_files_properties(src/panda/uri/parser.cc     PROPERTIES COMPILE_FLAGS -Wno-implicit-fallthrough)
-set_source_files_properties(src/panda/uri/parser_ext.cc PROPERTIES COMPILE_FLAGS -Wno-implicit-fallthrough)
+set_source_files_properties(src/panda/uri/parser.cc     PROPERTIES COMPILE_FLAGS "-Wno-implicit-fallthrough -Wno-unused-const-variable")
+set_source_files_properties(src/panda/uri/parser_ext.cc PROPERTIES COMPILE_FLAGS "-Wno-implicit-fallthrough -Wno-unused-const-variable")
 
 find_program(ragel_bin ragel)
 if (ragel_bin)
@@ -40,6 +40,7 @@ target_link_libraries(${PROJECT_NAME} panda-lib)
 
 ########################tests#######################################
 file(GLOB_RECURSE testSource RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "tests/*.cc")
+set_source_files_properties(${testSource} PROPERTIES COMPILE_FLAGS "-Wno-potentially-evaluated-expression")
 list(FILTER testSource EXCLUDE REGEX "tests/main.cc")
 
 add_library(${PROJECT_NAME}-tests STATIC EXCLUDE_FROM_ALL ${testSource})

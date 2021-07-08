@@ -7,6 +7,8 @@ struct Sub; struct Hash; struct Array;
 
 struct KeyProxy : Scalar {
     KeyProxy (SV** ptr, bool nullok) : Scalar(), ptr(ptr), nullok(nullok) { set(*ptr); }
+    KeyProxy (const KeyProxy&) = default;
+    KeyProxy (KeyProxy&&)      = default;
 
     KeyProxy& operator= (std::nullptr_t)    { return operator=(Scalar()); }
     KeyProxy& operator= (const KeyProxy& v) { return operator=((Scalar)v); }

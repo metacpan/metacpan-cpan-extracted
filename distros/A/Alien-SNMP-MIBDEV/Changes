@@ -1,3 +1,7 @@
+2.020000 - 2021-07-08
+
+  * drop test for snmp.pm module for now
+
 2.000000 - 2021-06-17
 
   * rework Alien::SNMP::MAXTC in Alien::SNMP::MIBDEV

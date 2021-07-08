@@ -3,8 +3,8 @@ NAME
     unknown, like null in SQL
 
 VERSION
-    This document describes version 0.001 of List::AllUtils::Null (from Perl
-    distribution List-AllUtils-Null), released on 2021-04-01.
+    This document describes version 0.004 of List::AllUtils::Null (from Perl
+    distribution List-AllUtils-Null), released on 2021-07-05.
 
 SYNOPSIS
      use List::AllUtils::Null qw(
@@ -22,6 +22,8 @@ SYNOPSIS
      say sum(1,2,undef,4,5); # => undef
 
 DESCRIPTION
+    Keywords: monadic zero.
+
 FUNCTIONS
   max
   maxstr
@@ -38,7 +40,7 @@ SOURCE
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website
-    <https://github.com/perlancar/perl-List-AllUtils-Null/issues>
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=List-AllUtils-Null>
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.
@@ -48,6 +50,8 @@ SEE ALSO
 
     List::Util and friends (List::SomeUtils, List::UtilsBy, List::MoreUtils,
     List::AllUtils).
+
+    List::AllUtils::ContainsNull
 
 AUTHOR
     perlancar <perlancar@cpan.org>

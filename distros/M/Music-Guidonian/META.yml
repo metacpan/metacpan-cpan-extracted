@@ -1,0 +1,32 @@
+---
+abstract: 'a "Guidonian Hand" melodic phrase generator'
+author:
+  - 'Jeremy Mates <jeremy.mates@gmail.com>'
+build_requires:
+  Music::Scales: '0'
+  Test2::V0: '0.000060'
+  perl: v5.24.0
+configure_requires:
+  Module::Build: '0.4004'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Music-Guidonian
+provides:
+  Music::Guidonian:
+    file: lib/Music/Guidonian.pm
+    version: '0.05'
+requires:
+  List::Util: '0'
+  List::UtilsBy: '0'
+  Moo: '0'
+  Music::PitchNum: '0'
+  namespace::clean: '0'
+  perl: v5.24.0
+resources:
+  license: http://opensource.org/licenses/BSD-3-Clause
+version: '0.05'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

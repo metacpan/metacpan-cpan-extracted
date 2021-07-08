@@ -1,3 +1,8 @@
+0.005   2021-07-05  Released-By: PERLANCAR; Urgency: medium
+
+	- Add utility: pdfgrep (with alias: grep-from-pdf).
+
+
 0.004   2021-01-30  Released-By: PERLANCAR; Urgency: medium
 
         [cli remove-pdf-password]

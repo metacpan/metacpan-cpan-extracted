@@ -21,3 +21,14 @@ Revision history for Perl extension Google::RestApi.
         - Cleaned up and simplified Range request class
         - Cleaned up range unit tests
         - Minor bug fixes
+
+0.5 Mon Jul 4 2021
+        - Code cleanup and simplification
+        - Made tests more comprehensive
+        - Improved documentation
+
+0.6 Wed Jul 7 2021
+        - Fix dist problems
+
+0.7 Thu Jul 8 2021
+        - Add ToolSet dependency

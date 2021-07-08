@@ -3,10 +3,10 @@
 #
 #  (C) Paul Evans, 2011-2020 -- leonerd@leonerd.org.uk
 
-use 5.026; # signatures
-use Object::Pad 0.27;
+use v5.26; # signatures
+use Object::Pad 0.41;
 
-package Tickit::Widget::Scroller 0.25;
+package Tickit::Widget::Scroller 0.26;
 class Tickit::Widget::Scroller
    extends Tickit::Widget;
 
@@ -16,7 +16,6 @@ Tickit::Window->VERSION( '0.57' );  # ->bind_event
 
 use Tickit::Window;
 use Tickit::Utils qw( textwidth );
-use Tickit::RenderBuffer;
 
 use Carp;
 
@@ -162,16 +161,16 @@ has $_gravity_bottom;
 
 has $_pending_scroll_to_bottom;
 
+has $_on_scrolled :param :reader :writer = undef;
+
+has $_gen_top_indicator    :param = undef;
+has $_gen_bottom_indicator :param = undef;
+
 BUILD ( %args )
 {
    my $gravity = delete $args{gravity} || "top";
 
    $_gravity_bottom = ( $gravity eq "bottom" );
-
-   $self->set_on_scrolled( $args{on_scrolled} ) if $args{on_scrolled};
-
-   $self->set_gen_top_indicator( $args{gen_top_indicator} );
-   $self->set_gen_bottom_indicator( $args{gen_bottom_indicator} );
 }
 
 =head1 METHODS
@@ -264,14 +263,7 @@ clipped if this would scroll past the beginning or end of the display.
 
 =cut
 
-has $_on_scrolled;
-
-method on_scrolled { $_on_scrolled }
-
-method set_on_scrolled
-{
-   ( $_on_scrolled ) = @_;
-}
+# generated accessors
 
 =head2 push
 
@@ -342,7 +334,7 @@ the head of the items, scrolling itself upwards as more are added.
 
 =cut
 
-method unshift :method ( @more )
+method unshift ( @more )
 {
    my $oldsize = @_items;
 
@@ -408,7 +400,7 @@ either by C<push> or C<unshift>, or may be discarded.
 
 =cut
 
-method shift :method ( $count = 1 )
+method shift ( $count = 1 )
 {
    croak '$count out of bounds' if $count <= 0;
    croak '$count out of bounds' if $count > @_items;
@@ -449,7 +441,7 @@ either by C<push> or C<unshift>, or may be discarded.
 
 =cut
 
-method pop :method ( $count = 1 )
+method pop ( $count = 1 )
 {
    croak '$count out of bounds' if $count <= 0;
    croak '$count out of bounds' if $count > @_items;
@@ -962,18 +954,16 @@ logic as methods without having to capture a closure.
 
 =cut
 
-has %_gen_indicator;
-
 method set_gen_top_indicator
 {
-   ( $_gen_indicator{top} ) = @_;
+   ( $_gen_top_indicator ) = @_;
 
    $self->update_indicators;
 }
 
 method set_gen_bottom_indicator
 {
-   ( $_gen_indicator{bottom} ) = @_;
+   ( $_gen_bottom_indicator ) = @_;
 
    $self->update_indicators;
 }
@@ -996,8 +986,11 @@ method update_indicators ()
    my $win = $self->window or return;
 
    for my $edge (qw( top bottom )) {
-      my $text = $_gen_indicator{$edge} ? $self->${ \$_gen_indicator{$edge} }
-                                        : undef;
+      my $gen_indicator = ( $edge eq "top" ) ? $_gen_top_indicator
+                                             : $_gen_bottom_indicator;
+
+      my $text = $gen_indicator ? $self->$gen_indicator
+                                : undef;
       $text //= "";
       next if $text eq ( $_indicator_text{$edge} // "" );
 

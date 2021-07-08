@@ -21,6 +21,7 @@ use base qw( Pg::Explain::From );
 use JSON;
 use Carp;
 use Pg::Explain::JIT;
+use Pg::Explain::Buffers;
 
 =head1 NAME
 
@@ -28,11 +29,11 @@ Pg::Explain::FromJSON - Parser for explains in JSON format
 
 =head1 VERSION
 
-Version 1.10
+Version 1.11
 
 =cut
 
-our $VERSION = '1.10';
+our $VERSION = '1.11';
 
 =head1 SYNOPSIS
 
@@ -98,6 +99,8 @@ sub parse_source {
 
     if ( $struct->{ 'Planning' } ) {
         $self->explain->planning_time( $struct->{ 'Planning' }->{ 'Planning Time' } );
+        my $buffers = Pg::Explain::Buffers->new( $struct->{ 'Planning' } );
+        $self->explain->planning_buffers( $buffers ) if $buffers;
     }
     elsif ( $struct->{ 'Planning Time' } ) {
         $self->explain->planning_time( $struct->{ 'Planning Time' } );

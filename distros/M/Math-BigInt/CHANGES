@@ -1,3 +1,38 @@
+1.999821 2021-07-06
+
+ * Make new() and from_hex() accept the "0X" prefix, not just the "0x" prefix,
+   but not accept just "X" or "x". Now, "0XFF" returns 255, not NaN.
+
+ * Make new() and from_bin() accept the "0B" prefix, not just the "0b" prefix, but
+   not accept just "B" or "b". Now, "0B1111" returns 255, not NaN.
+
+ * Make new() and from_oct() accept the "0o" and "0O" prefixes, but not accept
+   just "O" (capital letter O) or "o" (lowercase letter o). Now, "0o377" and
+   "0O377" return 255, not NaN. Also intepret floating point numbers with a
+   leading zero and a binary exponent as an octal number, so that "01.4p0"
+   returns 1.5, not NaN. There is still no ambiguety, since decimal floating
+   point numbers use "e" or "E" before the exponent, and binary and hexadecimal
+   floating point numbers use a "0b"/"0B" or "0x"/"0x" prefix, respectively.
+
+1.999820 2021-07-06
+
+ * Fix bug and improve error messages in Math::BigInt::import().
+
+1.999819 2021-07-02
+
+ * Add method btfac() (triple factorial) and bmfac() (multi-factorial),
+   including tests and documentation.
+
+ * Add missing and correct erroneous documentation for bfac() (factorial)
+   and bdfac() (double factorial). Also correct handling of special cases
+   and add tests for these cases.
+
+ * Fix error in bsin() and bcos() causing them to hang indefinitely if the
+   invocand is +/-inf.
+
+ * Make it possible for the end user to specify the base length used internally
+   in Math::BigInt::Calc.
+
 1.999818 2019-10-20
 
  * Fix CPAN RT #130736 regarding numify() on a Math::BigFloat with a large
@@ -736,6 +771,45 @@ Fixes:
    (Dana Jacobsen) for the patch. This was not intended to be added before the
    next release, but was included in this release by accident.
 
+1.9997_11 2015-12-10 pjacklam
+
+This release introduces no changes in the library code, i.e., the .pm files in
+the 'lib' directory, but there are a lot of changes in the test files. Since
+there are so many changes, I let this be a development release.
+
+ * Add 'use strict;' and 'use warnings;' to all test files.
+
+ * Reformat code in the test files according to the "perlstyle" manual page.
+   This makes the code a lot easier to read -- for me, anyway.
+
+ * Decrement required version of Perl from v5.6.2 to v5.6.1. All tests pass
+   when running the test suite with Perl 5.6.1 on Cygwin.
+
+ * Replace "use vars ..." with "our ..." in test files.
+
+ * Replace "BEGIN { unshift @INC, 't'; }" with "use lib 't';" in test files.
+
+ * Use "our $x; $x = ...;" rather than "our $x = ...;" since the latter causes
+   Perl 5.6.1 to complain about variables only used once.
+
+ * Add comment to all tests. Now the tests no longer says just "ok 123", but
+   rather "ok 123 - $x->blog(2)" etc. This makes it easier to identify failed
+   tests, especially in the smoke testing reports.
+
+ * Fix various flawed tests, e.g., ok($x, 2) was used testing whether $x was 2.
+
+ * Use the skip() feature of Test::More for skipping tests.
+
+ * Use more descriptive variable names in test files.
+
+ * Remove unused variables in test files.
+
+ * Move variable declarations to limit their scope in test files.
+
+ * Remove trailing whitespace in test files.
+
+ * Wrap (most) lines to fit 80 columns in test files.
+
 1.999710 2015-11-12 pjacklam
 
  * New method Math::BigFloat -> from_hex() which supports hexadecimal floating
@@ -982,45 +1056,6 @@ Fixes:
   * Increment test counts as needed for the new tests in the t/*.inc files.
  inc/Module/Install*
   * Upgrade bundled Module::Install from version 1.01 to version 1.08.
-
-1.9997_11 2012-12-10 pjacklam
-
-This release introduces no changes in the library code, i.e., the .pm files in
-the 'lib' directory, but there are a lot of changes in the test files. Since
-there are so many changes, I let this be a development release.
-
- * Add 'use strict;' and 'use warnings;' to all test files.
-
- * Reformat code in the test files according to the "perlstyle" manual page.
-   This makes the code a lot easier to read -- for me, anyway.
-
- * Decrement required version of Perl from v5.6.2 to v5.6.1. All tests pass
-   when running the test suite with Perl 5.6.1 on Cygwin.
-
- * Replace "use vars ..." with "our ..." in test files.
-
- * Replace "BEGIN { unshift @INC, 't'; }" with "use lib 't';" in test files.
-
- * Use "our $x; $x = ...;" rather than "our $x = ...;" since the latter causes
-   Perl 5.6.1 to complain about variables only used once.
-
- * Add comment to all tests. Now the tests no longer says just "ok 123", but
-   rather "ok 123 - $x->blog(2)" etc. This makes it easier to identify failed
-   tests, especially in the smoke testing reports.
-
- * Fix various flawed tests, e.g., ok($x, 2) was used testing whether $x was 2.
-
- * Use the skip() feature of Test::More for skipping tests.
-
- * Use more descriptive variable names in test files.
-
- * Remove unused variables in test files.
-
- * Move variable declarations to limit their scope in test files.
-
- * Remove trailing whitespace in test files.
-
- * Wrap (most) lines to fit 80 columns in test files.
 
 1.997 2011-09-04 pjacklam
 

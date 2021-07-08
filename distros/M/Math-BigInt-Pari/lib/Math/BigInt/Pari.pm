@@ -8,7 +8,7 @@ use Math::BigInt::Lib 1.999801;
 
 our @ISA = qw< Math::BigInt::Lib >;
 
-our $VERSION = '1.3006';
+our $VERSION = '1.3007';
 
 use Math::Pari qw(PARI pari2pv gdivent bittest
                   gcmp gcmp0 gcmp1 gcd ifact gpui gmul
@@ -353,7 +353,7 @@ __END__
 
 =head1 NAME
 
-Math::BigInt::Pari - Use Math::Pari for Math::BigInt routines
+Math::BigInt::Pari - a math backend library based on Math::Pari
 
 =head1 SYNOPSIS
 
@@ -378,13 +378,13 @@ of Math::Pari, an XS layer on top of the very fast PARI library.
 Please report any bugs or feature requests to
 C<bug-math-bigint-pari at rt.cpan.org>, or through the web interface at
 L<https://rt.cpan.org/Ticket/Create.html?Queue=Math-BigInt-Pari>
-(requires login).
-We will be notified, and then you'll automatically be notified of progress on
-your bug as I make changes.
+(requires login). We will be notified, and then you'll automatically be
+notified of progress on your bug as I make changes.
 
 =head1 SUPPORT
 
-You can find documentation for this module with the perldoc command.
+After installing, you can find documentation for this module with the perldoc
+command.
 
     perldoc Math::BigInt::Pari
 
@@ -392,55 +392,41 @@ You can also look for information at:
 
 =over 4
 
-=item * RT: CPAN's request tracker
+=item GitHub
 
-L<https://rt.cpan.org/Public/Dist/Display.html?Name=Math-BigInt-Pari>
+L<https://github.com/pjacklam/p5-Math-BigInt-Pari>
 
-=item * AnnoCPAN: Annotated CPAN documentation
+=item RT: CPAN's request tracker
 
-L<http://annocpan.org/dist/Math-BigInt-Pari>
+L<https://rt.cpan.org/Dist/Display.html?Name=Math-BigInt-Pari>
 
-=item * CPAN Ratings
+=item MetaCPAN
 
-L<http://cpanratings.perl.org/dist/Math-BigInt-Pari>
+L<https://metacpan.org/release/Math-BigInt-Pari>
 
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/Math-BigInt-Pari/>
-
-=item * CPAN Testers Matrix
+=item CPAN Testers Matrix
 
 L<http://matrix.cpantesters.org/?dist=Math-BigInt-Pari>
 
-=item * The Bignum mailing list
+=item CPAN Ratings
 
-=over 4
-
-=item * Post to mailing list
-
-C<bignum at lists.scsys.co.uk>
-
-=item * View mailing list
-
-L<http://lists.scsys.co.uk/pipermail/bignum/>
-
-=item * Subscribe/Unsubscribe
-
-L<http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/bignum>
-
-=back
+L<https://cpanratings.perl.org/dist/Math-BigInt-Pari>
 
 =back
 
 =head1 LICENSE
 
-This program is free software; you may redistribute it and/or modify it
-under the same terms as Perl itself.
+This program is free software; you may redistribute it and/or modify it under
+the same terms as Perl itself.
 
 =head1 AUTHOR
 
-Original Math::BigInt::Pari written by Benjamin Trott 2001, L<ben@rhumba.pair.com>.
+Original Math::BigInt::Pari written by Benjamin Trott 2001,
+L<ben@rhumba.pair.com>.
+
 Extended and maintained by Tels 2001-2007 L<http://bloodgate.com>
+
+Maintained by Peter John Acklam E<lt>pjacklam@gmail.comE<gt> 2010-2021.
 
 L<Math::Pari> was written by Ilya Zakharevich.
 

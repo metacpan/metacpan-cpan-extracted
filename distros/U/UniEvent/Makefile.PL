@@ -13,7 +13,6 @@ my %params = (
     SRC           => 'src xs',
     INC           => '-Isrc',
     CCFLAGS       => '-Wall -Wextra',
-    OPTIMIZE      => $ENV{OPTIMIZE},
     BIN_SHARE     => {INCLUDE  => {'src' => '/'}},
     CLIB          => {
         DIR          => 'clib',

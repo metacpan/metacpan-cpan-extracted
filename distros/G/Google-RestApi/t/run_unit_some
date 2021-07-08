@@ -6,9 +6,10 @@ use warnings;
 # use Carp::Always;
 use FindBin;
 use lib "$FindBin::RealBin/../lib";
-use lib "unit";
+use lib "$FindBin::RealBin/lib";
+use lib "$FindBin::RealBin/unit";
 
 # add the ones you want to test here...
-use Test::Google::RestApi;
+use Test::Google::RestApi::SheetsApi4::RangeGroup::Tie::Iterator;
 
 Test::Class->runtests();

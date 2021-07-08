@@ -22,11 +22,12 @@ use Wireguard::WGmeta::Cli::Commands::Enable;
 use Wireguard::WGmeta::Cli::Commands::Disable;
 use Wireguard::WGmeta::Cli::Commands::Apply;
 use Wireguard::WGmeta::Cli::Commands::Add;
+use Wireguard::WGmeta::Cli::Commands::Remove;
 
 use base 'Exporter';
 our @EXPORT = qw(route_command);
 
-our $VERSION = "0.2.3";
+our $VERSION = "0.3.1";
 
 =head2 route_command($ref_list_input_args)
 
@@ -80,6 +81,10 @@ sub route_command($ref_list_input_args) {
         };
         /^addpeer$/ && do {
             Wireguard::WGmeta::Cli::Commands::Add->new(@cmd_args)->entry_point();
+            last;
+        };
+        /^removepeer$/ && do {
+            Wireguard::WGmeta::Cli::Commands::Remove->new(@cmd_args)->entry_point();
             last;
         };
         /^apply$/ && do {

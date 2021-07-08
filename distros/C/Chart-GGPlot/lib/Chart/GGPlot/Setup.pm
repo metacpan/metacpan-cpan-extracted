@@ -5,14 +5,14 @@ package Chart::GGPlot::Setup;
 use 5.016;
 use warnings;
 
-our $VERSION = '0.0011'; # VERSION
+our $VERSION = '0.0016'; # VERSION
 
 use utf8;
 use feature ':5.16';
 
 use Import::Into;
 
-use Alt::Data::Frame::ButMore 0.0053;
+use Alt::Data::Frame::ButMore 0.0058;
 use Data::Frame::Autobox ();
 
 use Carp;
@@ -27,7 +27,6 @@ use Syntax::Keyword::Try ();
 use Module::Load;
 use Moose 2.1400;
 use Moose::Role               ();
-use MooseX::Aliases           ();
 use MooseX::MungeHas 0.011;
 use MooseX::StrictConstructor ();
 use boolean                   ();
@@ -103,7 +102,6 @@ sub _import_tag {
             qw(classmethod :modifiers) );
 
         Moose->import::into($target);
-        MooseX::Aliases->import::into($target);
         MooseX::MungeHas->import::into($target);
         MooseX::StrictConstructor->import::into($target);
     }
@@ -114,13 +112,11 @@ sub _import_tag {
             qw(classmethod :modifiers) );
 
         Moose::Role->import::into($target);
-        MooseX::Aliases->import::into($target);
         MooseX::MungeHas->import::into($target);
     }
     elsif ( $tag eq ':pdl' ) {
         require PDL::Lite;
         require PDL::Core;
-        #require PDL::IO::Dumper;
         require PDL::SV;
         require PDL::Factor;
         require PDL::DateTime;
@@ -128,7 +124,6 @@ sub _import_tag {
 
         PDL::Lite->import::into($target);
         PDL::Core->import::into( $target, qw(pdl null) );
-        #PDL::IO::Dumper->import::into($target);
 
         Role::Tiny->apply_roles_to_package( 'PDL', 'Data::Frame::PDL' );
 
@@ -165,7 +160,7 @@ Chart::GGPlot::Setup - Import stuffs into Chart::GGPlot classes
 
 =head1 VERSION
 
-version 0.0011
+version 0.0016
 
 =head1 SYNOPSIS
 
@@ -187,7 +182,7 @@ Stephan Loyd <sloyd@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019-2020 by Stephan Loyd.
+This software is copyright (c) 2019-2021 by Stephan Loyd.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,5 +1,10 @@
 Revision history for Tickit-Widget-Tabbed
 
+0.024     2021-07-06
+          [CHANGES]
+           * Update to Object::Pad 0.43
+              + Make use of :param and ADJUST to reduce/remove BUILD blocks
+
 0.023     2020-06-13
           [CHANGES]
            * Update to Object::Pad 0.27

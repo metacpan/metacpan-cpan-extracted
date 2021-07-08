@@ -24,7 +24,7 @@ use HTTP::Request::Common;
 use HTML::TableExtract;
 use Time::Piece;
 
-our $VERSION = '1.50'; # VERSION
+our $VERSION = '1.51'; # VERSION
 
 my $PRICE_URL = "https://api.boerse-frankfurt.de/v1/data/price_information";
 

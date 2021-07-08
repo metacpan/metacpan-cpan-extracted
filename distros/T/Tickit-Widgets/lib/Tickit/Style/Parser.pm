@@ -1,15 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2013-2015 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2013-2021 -- leonerd@leonerd.org.uk
 
-use Object::Pad 0.09;
+use Object::Pad 0.43;  # :strict(params)
 
-package Tickit::Style::Parser 0.51;
+package Tickit::Style::Parser 0.52;
 class Tickit::Style::Parser
-   extends Parser::MGC;
-
-use Struct::Dumb;
+   extends Parser::MGC
+   :strict(params);
 
 # Identifiers can include hyphens
 use constant pattern_ident => qr/[A-Z0-9_-]+/i;
@@ -27,8 +26,6 @@ method token_typename
    # Also accept the generic "*" wildcard
    $self->generic_token( typename => qr/(?:${\pattern_ident}::)*${\pattern_ident}|\*/ );
 }
-
-struct Definition => [qw( type class tags style )];
 
 method parse_def
 {
@@ -86,12 +83,26 @@ method parse_def
       '}'
    );
 
-   return Definition( $type, $class, \%tags, \%style );
+   return Tickit::Style::Parser::_Definition->new(
+      type  => $type,
+      class => $class,
+      tags  => \%tags,
+      style => \%style,
+   );
 }
 
 method token_boolean
 {
    return $self->token_kw(qw( true false )) eq "true";
+}
+
+class # hide from indexer
+   Tickit::Style::Parser::_Definition :strict(params) {
+
+   has $type  :reader :param;
+   has $class :reader :param;
+   has $tags  :reader :param;
+   has $style :reader :param;
 }
 
 0x55AA;

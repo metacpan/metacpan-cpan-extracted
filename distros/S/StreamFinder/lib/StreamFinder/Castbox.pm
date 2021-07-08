@@ -119,6 +119,25 @@ then only secure ("https://") streams will be returned.
 
 DEFAULT I<-secure> is 0 (false) - return all streams (http and https).
 
+Additional options:
+
+I<-log> => "I<logfile>"
+
+Specify path to a log file.  If a valid and writable file is specified, A line will be 
+appended to this file every time one or more streams is successfully fetched for a url.
+
+DEFAULT i<-none> (no logging).
+
+I<-logfmt> specifies a format string for lines written to the log file.
+
+DEFAULT "I<[time] [url] - [site]: [title] ([total])>".  
+
+The valid field I<[variables]> are:  [stream]: The url of the first/best stream found.  
+[site]:  The site name (Castbox).  [url]:  The url searched for streams.  
+[time]: Perl timestamp when the line was logged.  [title], [artist], [album], 
+[description], [year], [genre], [total], [albumartist]:  The corresponding field data 
+returned (or "-na", if no value).
+
 =item $podcast->B<get>(['playlist'])
 
 Returns an array of strings representing all stream URLs found.
@@ -467,6 +486,7 @@ sub new
 					. "\n#EXTART:" . $self->{'artist'} . "\n" . ${$self->{'streams'}}[0] . "\n";
 		}
 	}
+	$self->_log($url);
 
 	bless $self, $class;   #BLESS IT!
 

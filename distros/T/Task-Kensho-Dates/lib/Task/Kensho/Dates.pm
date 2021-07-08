@@ -1,9 +1,9 @@
 use strict;
 use warnings;
-package Task::Kensho::Dates; # git description: v0.39-50-g4281201
+package Task::Kensho::Dates; # git description: v0.40-18-g9d61e36
 # ABSTRACT: A Glimpse at an Enlightened Perl: Date Modules
 
-our $VERSION = '0.40';
+our $VERSION = '0.41';
 
 __END__
 
@@ -17,7 +17,7 @@ Task::Kensho::Dates - A Glimpse at an Enlightened Perl: Date Modules
 
 =head1 VERSION
 
-version 0.40
+version 0.41
 
 =head1 SYNOPSIS
 
@@ -68,17 +68,9 @@ facilitates the ease and simplicity the distribution aims to achieve.
 
 =head2 L<Task::Kensho::Dates>: Date Modules
 
-=head3 L<Date::Tiny>
-
-A date object with as little code as possible
-
 =head3 L<DateTime>
 
 A date and time object
-
-=head3 L<DateTime::Tiny>
-
-A date time object with as little code as possible
 
 =head3 L<Time::Moment>
 
@@ -88,9 +80,9 @@ A fast immutable object representing a date and time
 
 Date parsing both relative and absolute
 
-=head3 L<Time::Tiny>
+=head3 L<Time::Piece>
 
-A time object with as little code as possible
+A date and time object based on localtime or gmtime
 
 =head1 INSTALLING
 
@@ -118,7 +110,7 @@ starting place on the road to Enlightened Perl programming.
 Please report any bugs or feature requests to
 L<https://github.com/EnlightenedPerlOrganisation/task-kensho/issues>.
 
-bugs may be submitted through L<https://github.com/EnlightenedPerlOrganisation/task-kensho/issues>.
+Bugs may be submitted through L<https://github.com/EnlightenedPerlOrganisation/task-kensho/issues>.
 
 There is also an irc channel available for users of this distribution, at
 L<C<#epo> on C<irc.perl.org>|irc://irc.perl.org/#epo>.
@@ -129,7 +121,7 @@ Chris Prather <chris@prather.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Karen Etheridge Leo Lapworth Chris Nehren Olaf Alders Dan Book Rachel Kelly Shawn Sorichetti Rick Leir
+=for stopwords Karen Etheridge Leo Lapworth Dan Book Chris Nehren Mohammad S Anwar Olaf Alders Rachel Kelly Shawn Sorichetti Rick Leir Tina Müller
 
 =over 4
 
@@ -143,7 +135,15 @@ Leo Lapworth <leo@cuckoo.org>
 
 =item *
 
+Dan Book <grinnz@grinnz.com>
+
+=item *
+
 Chris Nehren <apeiron@cpan.org>
+
+=item *
+
+Mohammad S Anwar <mohammad.anwar@yahoo.com>
 
 =item *
 
@@ -164,6 +164,10 @@ Shawn Sorichetti <shawn@coloredblocks.com>
 =item *
 
 Rick Leir <rleir@leirtech.com>
+
+=item *
+
+Tina Müller <cpan2@tinita.de>
 
 =back
 

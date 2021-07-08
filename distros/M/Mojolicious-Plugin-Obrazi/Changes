@@ -1,8 +1,15 @@
 Revision history for Perl module Mojolicious::Plugin::Obrazi
 
-0.11 11.06.2021 (пт) 14:34:12 EEST
-    Initial release. We have a working command to generate a HTML page - a
-    gallery form a directory full of images.
+0.14 1.07.2021 (чт) 22:05:35 EEST
+    Fixed pod errors.
+
+0.13 1.07.2021 (чт) 18:22:58 EEST
+    Command: Fixed bug in default template — the ptah to the images was not
+    properly produced. Improved documentation. Marked some failing tests as
+    TODO. We do not know if Imager supports PNG and JPEG. This depends on C
+    libraries present on the testing machine. Added first demo URL.
+
+    Plugin: Improved documentation.
 
 0.12 12.06.2021 (сб) 17:22:30 EEST
     Command: Optimised regeneration of HTML. Images are not resized again if they are
@@ -12,3 +19,8 @@ Revision history for Perl module Mojolicious::Plugin::Obrazi
     handling of left and right keypresses. Improved documentation.
     Added a LICENSE file. Added a README. Now a template can be passed on the
     command-line via --template.
+
+0.11 11.06.2021 (пт) 14:34:12 EEST
+    Initial release. We have a working command to generate a HTML page - a
+    gallery form a directory full of images.
+

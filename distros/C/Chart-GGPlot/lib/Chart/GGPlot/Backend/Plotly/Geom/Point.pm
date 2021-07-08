@@ -4,13 +4,13 @@ package Chart::GGPlot::Backend::Plotly::Geom::Point;
 
 use Chart::GGPlot::Class;
 
-our $VERSION = '0.0011'; # VERSION
+our $VERSION = '0.0016'; # VERSION
 
 extends qw(Chart::GGPlot::Backend::Plotly::Geom::Path);
 
 use Module::Load;
 
-use Chart::GGPlot::Backend::Plotly::Util qw(cex_to_px to_rgb pdl_to_plotly);
+use Chart::GGPlot::Backend::Plotly::Util qw(to_px to_rgb pdl_to_plotly);
 use Chart::GGPlot::Util qw(ifelse);
 
 sub mode {
@@ -23,10 +23,10 @@ classmethod scatter_marker ($df, $params, @rest) {
       $df->exists('fill')
       ? ifelse( $df->at('fill')->isbad, $color, to_rgb( $df->at('fill') ) )
       : $color;
-    my $size = cex_to_px( $df->at('size') );
+    my $size = to_px( $df->at('size') );
     $size->where($size < 2) .= 2;
     my $opacity = $df->at('alpha')->setbadtoval(1);
-    my $stroke  = cex_to_px( $df->at('stroke') );
+    my $stroke  = to_px( $df->at('stroke') );
 
     my $use_webgl = $class->use_webgl($df);
     my $plotly_trace_class =
@@ -67,7 +67,7 @@ Chart::GGPlot::Backend::Plotly::Geom::Point - Chart::GGPlot's Plotly implementat
 
 =head1 VERSION
 
-version 0.0011
+version 0.0016
 
 =head1 SEE ALSO
 
@@ -80,7 +80,7 @@ Stephan Loyd <sloyd@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019-2020 by Stephan Loyd.
+This software is copyright (c) 2019-2021 by Stephan Loyd.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

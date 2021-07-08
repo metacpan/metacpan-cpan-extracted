@@ -70,6 +70,6 @@
          "web" : "https://github.com/pmqs/Archive-Zip-SimpleZip"
       }
    },
-   "version" : "0.039",
+   "version" : "0.040",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

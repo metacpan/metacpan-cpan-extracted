@@ -1,24 +1,11 @@
 package Google::RestApi::SheetsApi4::RangeGroup::Tie::Iterator;
 
-use strict;
-use warnings;
+our $VERSION = '0.7';
 
-our $VERSION = '0.4';
+use Google::RestApi::Setup;
 
-use 5.010_000;
-
-use autodie;
 use Carp qw(cluck);
-use Type::Params qw(compile_named);
-use Types::Standard qw(Int HashRef Any slurpy);
-use Google::RestApi::Utils qw(named_extra);
-use YAML::Any qw(Dump);
-
-no autovivification;
-
 use parent qw(Google::RestApi::SheetsApi4::RangeGroup::Iterator);
-
-do 'Google/RestApi/logger_init.pl';
 
 sub new {
   my $class = shift;

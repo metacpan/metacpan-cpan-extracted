@@ -10,8 +10,9 @@ use 5.010001;
 use strict;
 use warnings;
 
-our $VERSION = '1.13.3'; # VERSION
+our $VERSION = '1.13.4'; # VERSION
 
+use English qw(-no_match_vars);
 use Rex::Interface::Exec;
 use Rex::Helper::File::Spec;
 
@@ -163,7 +164,13 @@ sub cp {
   ($dest)   = $self->_normalize_path($dest);
 
   my $exec = Rex::Interface::Exec->create;
-  $exec->exec("cp -R $source $dest");
+
+  if ( $OSNAME =~ m/^MSWin/msx ) {
+    $exec->exec("copy /v /y $source $dest");
+  }
+  else {
+    $exec->exec("cp -R $source $dest");
+  }
 
   if ( $? == 0 ) { return 1; }
 

@@ -120,6 +120,15 @@ SUBROUTINES
     UTF8::R2::uc($_)
     UTF8::R2::ucfirst($_)
 
+  mb.pm MODULINO COMPATIBLE ROUTINES, VARIABLES
+    UTF8::R2::do($_)
+    UTF8::R2::eval($_)
+    UTF8::R2::index_byte($_, 'ABC', 5)
+    UTF8::R2::require($_)
+    UTF8::R2::rindex_byte($_, 'ABC', 5)
+    $UTF8::R2::PERL
+    $UTF8::R2::ORIG_PROGRAM_NAME
+
 SUPPORTED PERL VERSIONS
 
   perl version 5.005_03 to newest perl

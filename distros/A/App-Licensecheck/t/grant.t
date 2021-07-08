@@ -3,6 +3,8 @@ use Test2::V0;
 use lib 't/lib';
 use Test2::Licensecheck;
 
+my $ver = $Regexp::Pattern::License::VERSION;
+
 plan 54;
 
 # AFL
@@ -124,7 +126,6 @@ license_is( 't/grant/MIT/spaces.c',        'MIT~oldstyle~permission' );
 license_is(
 	[   qw(
 			t/grant/NTP/helvO12.bdf
-			t/grant/NTP/install.sh
 			t/grant/NTP/directory.h
 			t/grant/NTP/map.h
 			t/grant/NTP/monlist.c
@@ -133,6 +134,10 @@ license_is(
 	'NTP'
 );
 license_is( 't/grant/NTP/gslcdf-module.c', 'NTP~disclaimer' );
+license_is(
+	't/grant/NTP/install.sh',
+	$ver >= v3.6 ? 'HPND-sell-variant' : 'NTP'
+);
 
 # WTFPL
 license_is( 't/grant/WTFPL/COPYING.WTFPL', 'WTFPL-1.0' );

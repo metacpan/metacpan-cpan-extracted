@@ -142,6 +142,26 @@ again on that URL to find the stream).  Default is 0 (false) - search for
 StreamFinder-searchable URLs in an iframe, if the page is HTML and not an 
 actual video URL.
 
+Additional options:
+
+I<-log> => "I<logfile>"
+
+Specify path to a log file.  If a valid and writable file is specified, A line will be 
+appended to this file every time one or more streams is successfully fetched for a url.
+
+DEFAULT i<-none> (no logging).
+
+I<-logfmt> specifies a format string for lines written to the log file.
+
+DEFAULT "I<[time] [url] - [site]: [title] ([total])>".  
+
+The valid field I<[variables]> are:  [stream]: The url of the first/best stream found.  
+[site]:  The site name (Youtube - OR the site name of the embedded URL in the first 
+iframe, if found - see I<-noiframes> option above to prevent this feature).  
+[url]:  The url searched for streams.  [time]: Perl timestamp when the line was logged.  
+[title], [artist], [album], [description], [year], [genre], [total], [albumartist]:  
+The corresponding field data returned (or "-na", if no value).
+
 =item $video->B<get>()
 
 Returns an array of strings representing all stream URLs found.
@@ -383,6 +403,7 @@ $url2fetch =~ s/www\.youtube\.com/youtube\.be/;  #WWW.YOUTUBE.COM SEEMS TO NOW B
 			. '" ' . ((defined $self->{'youtube-dl-args'}) ? $self->{'youtube-dl-args'} : '');
 	my $try = 0;
 	my ($more, @ytdldata, @ytStreams);
+
 RETRYIT:
 	$_ = '';
 	if (defined($self->{'userid'}) && defined($self->{'userpw'})) {  #USER HAS A LOGIN CONFIGURED:
@@ -392,7 +413,7 @@ RETRYIT:
 	} else {
 		$_ = `youtube-dl $ytdlArgs "$url"`;
 	}
-	print STDERR "--TRY($try of 1): youtube-dl returned=$_= ARGS=$ytdlArgs=\n"  if ($DEBUG);
+	print STDERR "--TRY($try of 1): youtube-dl: ARGS=$ytdlArgs= RETURNED DATA===>$_<===\n"  if ($DEBUG);
 	@ytdldata = split /\r?\n/s;
 	unless ($try || scalar(@ytdldata) > 0) {  #IF NOTHING FOUND, RETRY WITHOUT THE SPECIFIC FILE-FORMAT:
 		unless ($self->{'noiframes'}) {
@@ -417,8 +438,13 @@ RETRYIT:
 					if ($embeddedURL) {
 						my $haveStreamFinder = 0;
 						eval { require 'StreamFinder.pm'; $haveStreamFinder = 1; };
-						$embedded_video = new StreamFinder($embeddedURL, -noiframes => 1, -debug => 1)
-								if ($haveStreamFinder);
+						if ($haveStreamFinder) {
+							my %globalArgs = (-noiframes => 1, -debug => $DEBUG);
+							foreach my $arg (qw(log logfmt)) {
+								$globalArgs{$arg} = $self->{$arg}  if (defined($self->{$arg}) && $self->{$arg});
+							}
+							$embedded_video = new StreamFinder($embeddedURL, %globalArgs);
+						}
 						last;
 					}
 				}
@@ -514,6 +540,7 @@ RETRYIT:
 	}
 	print STDERR "-2: title=".$self->{'title'}."= id=".$self->{'id'}."= artist=".$self->{'artist'}."= year(Published)=".$self->{'year'}."=\n"  if ($DEBUG);
 #print STDERR "\n--ID=".$self->{'id'}."=\n--TITLE=".$self->{'title'}."=\n--CNT=".$self->{'cnt'}."=\n--ICON=".$self->{'iconurl'}."=\n--1ST=".$self->{'Url'}."=\n"  if ($DEBUG);
+	$self->_log($url);
 
 	bless $self, $class;   #BLESS IT!
 

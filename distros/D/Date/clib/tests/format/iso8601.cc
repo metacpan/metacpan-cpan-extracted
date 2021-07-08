@@ -73,7 +73,7 @@ TEST("parse") {
         CHECK_YMDHMS(d, 2017, 1, 2);
 
         d = Date("2014-W01");
-        CHECK(d.error());
+        CHECK_YMDHMS(d, 2013, 12, 29);
     }
 
     SECTION("YYYY-Wnn-n") {
@@ -89,8 +89,9 @@ TEST("parse") {
         CHECK(!d.error());
         CHECK_YMDHMS(d, 2017, 1, 6);
 
-        d = Date("2014-W01-2");
-        CHECK(d.error());
+        d = Date("2009-W01-1");
+        CHECK(!d.error());
+        CHECK_YMDHMS(d, 2008, 12, 28);
     }
 
     SECTION("loyality for wrong delimiters in offset") {
@@ -106,6 +107,7 @@ TEST("parse") {
         };
     }
 }
+
 
 TEST("stringify") {
     Date d(2017, 8, 28, 13, 49, 35, 123456);

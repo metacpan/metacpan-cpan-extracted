@@ -33,7 +33,7 @@ use HTTP::Request::Common;
 use HTML::TableExtract;
 use Time::Piece;
 
-our $VERSION = '1.50'; # VERSION
+our $VERSION = '1.51'; # VERSION
 
 my $YIND_URL_HEAD = 'https://query1.finance.yahoo.com/v7/finance/quote?symbols=';
 my $YIND_URL_TAIL = '';

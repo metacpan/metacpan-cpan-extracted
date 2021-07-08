@@ -13,16 +13,6 @@ using panda::string_view;
     const auto LT_FORMAT = string_view("%a %b %e %H:%M:%S %Y");
 #endif
     
-static const unsigned char relchars[256] = {
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0,
-    0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-};
-
 // arguments overloading for new_ymd(), date_ymd(), ->set_ymd()
 static inline Date xs_date_ymd (SV** args, I32 items) {
     ptime_t vals[8] = {1970, 1, 1, 0, 0, 0, 0, -1};
@@ -215,6 +205,10 @@ Date* new (SV*, SV* val = {}, TimezoneSP tz = {}, int fmt = Date::InputFormat::a
 
 Date* new_ymd (...) {
     RETVAL = new Date(xs_date_ymd(&ST(1), items - 1));
+}
+
+Date* strptime (string date, string format) {
+    RETVAL = new Date(Date::strptime(date, format));
 }
 
 void Date::set (SV* val = {}, TimezoneSP tz = {}, int fmt = Date::InputFormat::all) {

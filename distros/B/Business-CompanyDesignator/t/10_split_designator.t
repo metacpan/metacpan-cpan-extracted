@@ -37,8 +37,10 @@ ok($bcd_data = $bcd->data, 'data method ok');
 
 my $i = 3;
 for my $t (@$data) {
-  next if $t->{skip} || $t->{skip_unless_lang};
   next if $match && $t->{name} !~ /$match/o;
+  # Let a name match override skip
+  delete $t->{skip} if $match;
+  next if $t->{skip} || $t->{skip_unless_lang};
 
   my $exp_before    = $t->{before}  // '';
   my $exp_des       = $t->{des}     // '';

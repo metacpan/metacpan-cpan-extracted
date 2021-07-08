@@ -5,7 +5,7 @@ package Chart::GGPlot::ScalesList;
 use Chart::GGPlot::Class qw(:pdl);
 use namespace::autoclean;
 
-our $VERSION = '0.0011'; # VERSION
+our $VERSION = '0.0016'; # VERSION
 
 use List::AllUtils qw(pairmap pairkeys);
 use Types::Standard qw(Any ArrayRef Object);
@@ -125,7 +125,7 @@ method transform_df ($df) {
 }
 
 # aesthetics: a list of aesthetic-variable mappings. The name of each
-#  item is the aesthetic, and the value of each item is the valiable in data.
+#  item is the aesthetic, and the value of each item is the variable in data.
 method add_defaults ($data, $aesthetics) {
     return if ( $aesthetics->isempty );
 
@@ -145,7 +145,7 @@ method add_defaults ($data, $aesthetics) {
         my ( $scale_f, $func_name ) = find_scale( $aes, $datacols{$aes} );
         unless ( defined $scale_f ) {
             # some aesthetics do not have scale functions
-            if ( List::AllUtils::any { $aes eq $_ } (qw(weight width)) ) {
+            if ( List::AllUtils::any { $aes eq $_ } (qw(weight width label)) ) {
                 next;
             }
             else {
@@ -192,7 +192,7 @@ Chart::GGPlot::ScalesList - Encapsulation multiple scale objects
 
 =head1 VERSION
 
-version 0.0011
+version 0.0016
 
 =head1 ATTRIBUTES
 
@@ -253,7 +253,7 @@ Stephan Loyd <sloyd@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019-2020 by Stephan Loyd.
+This software is copyright (c) 2019-2021 by Stephan Loyd.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

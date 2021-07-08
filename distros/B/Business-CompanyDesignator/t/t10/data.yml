@@ -857,3 +857,164 @@
   lang: ar
   position: begin
   doc: leading basic Company designator
+-
+  name: Cycle and Sea Adventures d.o.o.
+  before: Cycle and Sea Adventures
+  des: d.o.o.
+  des_std: d.o.o.
+  lang: sl
+  position: end
+-
+  name: Cycle and Sea Adventures d. o. o.
+  before: Cycle and Sea Adventures
+  des: d. o. o.
+  des_std: d.o.o.
+  lang: sl
+  position: end
+-
+  name: Cycle and Sea Adventures doo
+  before: Cycle and Sea Adventures
+  des: doo
+  des_std: d.o.o.
+  lang: sl
+  position: end
+-
+  name: ИНТЕРАГРИ БЪЛГАРИЯ АД
+  before: ИНТЕРАГРИ БЪЛГАРИЯ
+  des: АД
+  des_std: АД
+  lang: bg
+  position: end
+-
+  name: BORICA AD
+  before: BORICA
+  des: AD
+  des_std: AD
+  lang: bg
+  position: end
+-
+  name: Farlep-Invest PrJSC
+  before: Farlep-Invest
+  des: PrJSC
+  des_std: PrJSC
+  lang: en
+  position: end
+-
+  name: CROATIA OSIGURANJE d.d.
+  before: CROATIA OSIGURANJE
+  des: d.d.
+  des_std: d.d.
+  lang: sl
+  position: end
+-
+  name: CROATIA OSIGURANJE dd
+  before: CROATIA OSIGURANJE
+  des: dd
+  des_std: d.d.
+  lang: sl
+  position: end
+-
+  name: Diners Club BH d.o.o.
+  before: Diners Club BH
+  des: d.o.o.
+  des_std: d.o.o.
+  lang: sl
+  position: end
+-
+  name: Diners Club BH doo
+  before: Diners Club BH
+  des: doo
+  des_std: d.o.o.
+  lang: sl
+  position: end
+-
+  name: Česká pošta, s.p.
+  before: Česká pošta
+  des: s.p.
+  des_std: s.p.
+  lang: sl
+  position: end
+-
+  name: Česká pošta sp
+  before: Česká pošta
+  des: sp
+  des_std: s.p.
+  lang: sl
+  position: end
+-
+  name: JSC Bank of Georgia
+  after: Bank of Georgia
+  des: JSC
+  des_std: JSC
+  lang: en
+  position: begin
+-
+  name: Joint Stock Company ATK Consulting Group
+  after: ATK Consulting Group
+  des: Joint Stock Company
+  des_std: Joint Stock Company
+  lang: en
+  position: begin
+-
+  name: Joint Stock Commercial Bank Interprombank
+  after: Interprombank
+  des: Joint Stock Commercial Bank
+  des_std: Joint Stock Commercial Bank
+  lang: en
+  position: begin
+-
+  name: JSCB TENDER-BANK
+  after: TENDER-BANK
+  des: JSCB
+  des_std: JSCB
+  lang: en
+  position: begin
+-
+  name: Limited Liability Companies ATRIUM
+  after: ATRIUM
+  des: Limited Liability Companies
+  des_std: LLC
+  lang: en
+  position: begin
+-
+  name: COOPERATIVA NAZARETH LTDA
+  before: COOPERATIVA NAZARETH
+  des: LTDA
+  des_std: Ltda.
+  lang: pt
+  position: end
+-
+  name: Cooperativa Copafi Aregua Limitada
+  before: Cooperativa Copafi Aregua
+  des: Limitada
+  des_std: Limitada
+  lang: pt
+  position: end
+-
+  name: ТОВ "ЕКОМЕТ"
+  after: '"ЕКОМЕТ"'
+  des: ТОВ
+  des_std: ТОВ
+  lang: uk
+  position: begin
+-
+  name: TOV AZIYA GRUP
+  after: AZIYA GRUP
+  des: TOV
+  des_std: TOV
+  lang: uk
+  position: begin
+-
+  name: KORAL TREVEL TOV
+  before: KORAL TREVEL
+  des: TOV
+  des_std: TOV
+  lang: uk
+  position: end
+-
+  name: AT KhersonOblEnergo
+  after: KhersonOblEnergo
+  des: AT
+  des_std: AT
+  lang: uk
+  position: begin

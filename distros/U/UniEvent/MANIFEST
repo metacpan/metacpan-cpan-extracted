@@ -77,8 +77,6 @@ clib/src/panda/unievent/Poll.h
 clib/src/panda/unievent/Prepare.cc
 clib/src/panda/unievent/Prepare.h
 clib/src/panda/unievent/Queue.h
-clib/src/panda/unievent/random.cc
-clib/src/panda/unievent/random.h
 clib/src/panda/unievent/Request.h
 clib/src/panda/unievent/Resolver.cc
 clib/src/panda/unievent/Resolver.h
@@ -121,7 +119,6 @@ clib/src/panda/unievent/Work.h
 clib/tests/async.cc
 clib/tests/async_test.cc
 clib/tests/backend.cc
-clib/tests/bench.cc
 clib/tests/cert/01-alice.csr
 clib/tests/cert/01-alice.key
 clib/tests/cert/01-alice.pem
@@ -367,6 +364,7 @@ t/udp/udp.t
 t/util.t
 t/var/streamer/fout.txt
 t/work.t
+UniEvent.pro
 xs/Backend.xsi
 xs/Check.xs
 xs/Error.xs

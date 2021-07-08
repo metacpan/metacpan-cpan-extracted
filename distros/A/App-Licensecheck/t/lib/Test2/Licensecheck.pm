@@ -2,7 +2,8 @@ package Test2::Licensecheck;
 
 my $CLASS = __PACKAGE__;
 
-use strictures;
+use strict;
+use warnings;
 
 use Test2::API qw(context);
 use Test2::Todo;

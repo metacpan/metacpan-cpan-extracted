@@ -32,6 +32,7 @@ sub defaults {
             dots                 => 0,
             base_indent          => 1,
             file_find_warnings   => 0,
+            round_precision_sign => 0,
         },
         alias => {
             aggregate  => 0,

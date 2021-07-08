@@ -1,6 +1,6 @@
 package Lab::Instrument::Vectormagnet;
 #ABSTRACT: ???
-$Lab::Instrument::Vectormagnet::VERSION = '3.760';
+$Lab::Instrument::Vectormagnet::VERSION = '3.762';
 use v5.20;
 
 use strict;
@@ -637,18 +637,18 @@ Lab::Instrument::Vectormagnet - ???
 
 =head1 VERSION
 
-version 3.760
+version 3.762
 
 =head1 COPYRIGHT AND LICENSE
 
 This software is copyright (c) 2021 by the Lab::Measurement team; in detail:
 
   Copyright 2013       Christian Butschkow
-            2014       Andreas K. HÃ¼ttel
+            2014       Andreas K. Huettel
             2015       Christian Butschkow
             2016       Christian Butschkow, Simon Reinhardt
-            2017       Andreas K. HÃ¼ttel
-            2020       Andreas K. HÃ¼ttel
+            2017       Andreas K. Huettel
+            2020       Andreas K. Huettel
 
 
 This is free software; you can redistribute it and/or modify it under

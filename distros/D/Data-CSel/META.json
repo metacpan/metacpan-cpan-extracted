@@ -64,7 +64,7 @@
          "web" : "https://github.com/perlancar/perl-Data-CSel"
       }
    },
-   "version" : "0.125",
+   "version" : "0.126",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"

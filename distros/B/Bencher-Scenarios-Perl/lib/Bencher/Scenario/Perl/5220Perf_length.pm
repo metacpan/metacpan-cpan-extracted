@@ -1,7 +1,7 @@
 package Bencher::Scenario::Perl::5220Perf_length;
 
-our $DATE = '2019-10-20'; # DATE
-our $VERSION = '0.050'; # VERSION
+our $DATE = '2021-07-03'; # DATE
+our $VERSION = '0.051'; # VERSION
 
 our $scenario = {
     summary => 'Benchmark hash lookup',
@@ -29,7 +29,7 @@ Bencher::Scenario::Perl::5220Perf_length - Benchmark hash lookup
 
 =head1 VERSION
 
-This document describes version 0.050 of Bencher::Scenario::Perl::5220Perf_length (from Perl distribution Bencher-Scenarios-Perl), released on 2019-10-20.
+This document describes version 0.051 of Bencher::Scenario::Perl::5220Perf_length (from Perl distribution Bencher-Scenarios-Perl), released on 2021-07-03.
 
 =head1 SYNOPSIS
 
@@ -93,7 +93,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2019, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

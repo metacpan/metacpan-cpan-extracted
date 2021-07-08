@@ -21,6 +21,7 @@ use base qw( Pg::Explain::From );
 use XML::Simple;
 use Carp;
 use Pg::Explain::JIT;
+use Pg::Explain::Buffers;
 
 =head1 NAME
 
@@ -28,11 +29,11 @@ Pg::Explain::FromXML - Parser for explains in XML format
 
 =head1 VERSION
 
-Version 1.10
+Version 1.11
 
 =cut
 
-our $VERSION = '1.10';
+our $VERSION = '1.11';
 
 =head1 SYNOPSIS
 
@@ -52,6 +53,7 @@ sub normalize_node_struct {
     my @keys = keys %{ $struct };
     for my $key ( @keys ) {
         my $new_key = $key;
+        $new_key =~ s{^I-O-(Read|Write)-Time$}{I/O $1 Time};
         $new_key =~ s/-/ /g;
         $struct->{ $new_key } = delete $struct->{ $key } if $key ne $new_key;
     }
@@ -116,6 +118,8 @@ sub parse_source {
 
     if ( $struct->{ 'Planning' } ) {
         $self->explain->planning_time( $struct->{ 'Planning' }->{ 'Planning-Time' } );
+        my $buffers = Pg::Explain::Buffers->new( $self->normalize_node_struct( $struct->{ 'Planning' } ) );
+        $self->explain->planning_buffers( $buffers ) if $buffers;
     }
     elsif ( $struct->{ 'Planning-Time' } ) {
         $self->explain->planning_time( $struct->{ 'Planning-Time' } );

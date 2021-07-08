@@ -17,6 +17,8 @@ struct Stash : Hash {
 
     struct op_proxy : Glob {
         op_proxy (SV** ptr) : Glob(), ptr(ptr) { if (ptr) set(*ptr); }
+        op_proxy (const op_proxy&) = default;
+        op_proxy (op_proxy&&)      = default;
 
         op_proxy& operator= (SV*);
         op_proxy& operator= (AV* v) { _throw(); slot(v); return *this; }

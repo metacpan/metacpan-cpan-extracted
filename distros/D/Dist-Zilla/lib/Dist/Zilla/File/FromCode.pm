@@ -1,4 +1,4 @@
-package Dist::Zilla::File::FromCode 6.022;
+package Dist::Zilla::File::FromCode 6.023;
 # ABSTRACT: a file whose content is (re-)built on demand
 
 use Moose;
@@ -125,7 +125,7 @@ Dist::Zilla::File::FromCode - a file whose content is (re-)built on demand
 
 =head1 VERSION
 
-version 6.022
+version 6.023
 
 =head1 DESCRIPTION
 
@@ -137,11 +137,12 @@ coderef.  When the file's C<content> method is called, the code is used to
 generate the content.  This content is I<not> cached.  It is recomputed every
 time the content is requested.
 
-=head1 PERL VERSION SUPPORT
+=head1 PERL VERSION
 
-This module has the same support period as perl itself:  it supports the two
-most recent versions of perl.  (That is, if the most recently released version
-is v5.40, then this module should work on both v5.40 and v5.38.)
+This module should work on any version of perl still receiving updates from
+the Perl 5 Porters.  This means it should work on any version of perl released
+in the last two to three years.  (That is, if the most recently released
+version is v5.40, then this module should work on both v5.40 and v5.38.)
 
 Although it may work on older versions of perl, no guarantee is made that the
 minimum required version will not be increased.  The version may be increased

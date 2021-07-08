@@ -1,5 +1,10 @@
 Revision history for Tickit-Widget-Scroller
 
+0.26    2021-07-03
+        [CHANGES]
+         * Updates for Object::Pad 0.41:
+            + Use :param to simplify BUILD blocks
+
 0.25    2020-06-13
         [CHANGES]
          * Update to Object::Pad 0.27

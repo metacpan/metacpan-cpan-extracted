@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 
+use Env::Path;
 use Test::More;
 use Test::Differences;
 
@@ -40,10 +41,9 @@ sub multi_repo_find {
 
 SKIP: {
     {
-        no warnings qw(exec);
-        skip "bzip2 required for these tests", 4 unless(
-            open(my $bzipfh, '-|', qw(bzip2 -tq t/mirrors/privatemirror/authors/id/F/FR/FRUITCO/Fruit-1.0.tar.bz2))
-        );
+        (my $bzip2exe) = Env::Path->PATH->Whence('bzip2');
+        skip "bzip2 required for these tests", 4 unless($bzip2exe);
+        note("Found bzip2 at $bzip2exe");
     }
     multi_repo_find();
     eq_or_diff(

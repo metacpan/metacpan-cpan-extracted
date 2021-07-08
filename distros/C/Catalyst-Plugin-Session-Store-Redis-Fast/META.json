@@ -1,0 +1,73 @@
+{
+   "abstract" : "Catalyst-Plugin-Session-Store Redis-Fast plugin",
+   "author" : [
+      "Sushrut Pajai <spajai@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Catalyst-Plugin-Session-Store-Redis-Fast",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Catalyst::Plugin::Session::Store" : "0",
+            "Class::Data::Inheritable" : "0",
+            "MIME::Base64" : "0",
+            "MRO::Compat" : "0",
+            "Redis::Fast" : "0",
+            "Storable" : "0",
+            "Try::Tiny" : "0",
+            "base" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Catalyst" : "0",
+            "Catalyst::Plugin::Session::Test::Store" : "0",
+            "Catalyst::Test" : "0",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "FindBin" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Redis::Fast" : "0",
+            "Test::More" : "0",
+            "lib" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/spajai/Catalyst-Plugin-Session-Store-Redis-Fast.git",
+         "web" : "https://github.com/spajai/Catalyst-Plugin-Session-Store-Redis-Fast"
+      }
+   },
+   "version" : "1.001",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+}

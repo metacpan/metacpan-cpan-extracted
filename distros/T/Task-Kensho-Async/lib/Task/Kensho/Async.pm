@@ -1,9 +1,9 @@
 use strict;
 use warnings;
-package Task::Kensho::Async; # git description: v0.39-46-gdc10a77
+package Task::Kensho::Async; # git description: v0.40-24-g714534c
 # ABSTRACT: A Glimpse at an Enlightened Perl: Async Programming
 
-our $VERSION = '0.40';
+our $VERSION = '0.41';
 
 __END__
 
@@ -17,7 +17,7 @@ Task::Kensho::Async - A Glimpse at an Enlightened Perl: Async Programming
 
 =head1 VERSION
 
-version 0.40
+version 0.41
 
 =head1 SYNOPSIS
 
@@ -66,17 +66,33 @@ facilitates the ease and simplicity the distribution aims to achieve.
 
 =head1 RECOMMENDED MODULES
 
-=for stopwords Async
+=for stopwords Async Minimalistic
 
 =head2 L<Task::Kensho::Async>: Async Programming
+
+=head3 L<Future>
+
+represent an operation awaiting completion
 
 =head3 L<IO::Async>
 
 Asynchronous event-driven programming
 
+=head3 L<MCE>
+
+Many-Core Engine for Perl providing parallel processing capabilities
+
+=head3 L<Mojo::IOLoop>
+
+Minimalistic event loop
+
 =head3 L<POE>
 
 Multitasking and networking framework for Perl
+
+=head3 L<Parallel::ForkManager>
+
+A simple parallel processing fork manager
 
 =head1 INSTALLING
 
@@ -104,7 +120,7 @@ starting place on the road to Enlightened Perl programming.
 Please report any bugs or feature requests to
 L<https://github.com/EnlightenedPerlOrganisation/task-kensho/issues>.
 
-bugs may be submitted through L<https://github.com/EnlightenedPerlOrganisation/task-kensho/issues>.
+Bugs may be submitted through L<https://github.com/EnlightenedPerlOrganisation/task-kensho/issues>.
 
 There is also an irc channel available for users of this distribution, at
 L<C<#epo> on C<irc.perl.org>|irc://irc.perl.org/#epo>.
@@ -115,7 +131,7 @@ Chris Prather <chris@prather.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Karen Etheridge Leo Lapworth Chris Nehren Olaf Alders Dan Book Rachel Kelly Shawn Sorichetti Rick Leir
+=for stopwords Karen Etheridge Leo Lapworth Dan Book Chris Nehren Mohammad S Anwar Olaf Alders Rachel Kelly Shawn Sorichetti Rick Leir Tina Müller
 
 =over 4
 
@@ -129,7 +145,15 @@ Leo Lapworth <leo@cuckoo.org>
 
 =item *
 
+Dan Book <grinnz@grinnz.com>
+
+=item *
+
 Chris Nehren <apeiron@cpan.org>
+
+=item *
+
+Mohammad S Anwar <mohammad.anwar@yahoo.com>
 
 =item *
 
@@ -150,6 +174,10 @@ Shawn Sorichetti <shawn@coloredblocks.com>
 =item *
 
 Rick Leir <rleir@leirtech.com>
+
+=item *
+
+Tina Müller <cpan2@tinita.de>
 
 =back
 

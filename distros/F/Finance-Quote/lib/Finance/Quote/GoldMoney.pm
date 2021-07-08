@@ -35,7 +35,7 @@ use JSON;
 use strict;
 use warnings;
 
-our $VERSION = '1.50'; # VERSION
+our $VERSION = '1.51'; # VERSION
 
 sub methods {
     return ( goldmoney => \&goldmoney );

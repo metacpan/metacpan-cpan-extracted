@@ -7,6 +7,25 @@ namespace panda { namespace date {
 
 bool Date::_range_check = false;
 
+
+Date Date::strptime (string_view str, string_view fmt) {
+    Date d;
+    d._strptime(str, fmt);
+    if (d._error == errc::ok) {
+        if (d._has_date) {
+            d._has_date = true;
+            d._has_epoch = false;
+            d._normalized = false;
+            d.dsync();
+            d.dchg_auto();
+            if (_range_check) d.validate_range();
+        }
+    }
+    else d.epoch(0);
+    return d;
+}
+
+
 inline static ptime_t epoch_cmp (ptime_t s1, uint32_t mks1, ptime_t s2, uint32_t mks2) {
     return (s1 == s2) ? (ptime_t)mks1 - mks2 : s1 - s2;
 }
@@ -184,6 +203,30 @@ Date& Date::operator-= (const DateRel& operand) {
         echg();
     }
     return *this;
+}
+
+static constexpr const int32_t WEEK_1_OFFSETS[] = {0, -1, -2, -3, 4, 3, 2};
+static constexpr const int32_t WEEK_2_OFFSETS[] = {8, 7, 6, 5, 9, 10, 9};
+
+void Date::_post_parse_week(unsigned week) {
+    // convert from week to mday for YYYY-Wnn[-nn] format
+    if (week) {
+        auto days_since_christ = panda::time::christ_days(_date.year);
+        int32_t beginning_weekday = days_since_christ % 7;
+        if (!_date.wday) _date.wday = 1;
+        if (week == 1) {
+            _date.mday = WEEK_1_OFFSETS[beginning_weekday] + (_date.wday - 1);
+        }
+        else {
+            _date.mday = WEEK_2_OFFSETS[beginning_weekday] + (_date.wday - 1) + 7 * (week - 2);
+        }
+    }
+    else if (_date.wday) { // check wday number if included in date
+        if (_date.wday != panda::time::wday(_date.year, _date.mon, _date.mday)) {
+            _error = errc::out_of_range;
+            return;
+        }
+    }
 }
 
 using namespace panda::time::format;

@@ -1,5 +1,25 @@
-@  changeset:   133:b612b25e04cb
+@  changeset:   137:857454901ffa
 |  tag:         tip
+|  user:        Rene Schickbauer <cavac@earthrise>
+|  date:        Mon Jul 05 13:36:43 2021 +0200
+|  summary:     Use a multi-stage approach to try to preserve data by trying to load the backup and the temporary persistance file as fallback.
+|
+o  changeset:   136:116e68cbe261
+|  user:        Rene Schickbauer <cavac@earthrise>
+|  date:        Mon Jul 05 10:10:35 2021 +0200
+|  summary:     Start on Version 18: Reliability upgrades
+|
+o  changeset:   135:746384333ec1
+|  user:        Rene Schickbauer <cavac@venera>
+|  date:        Tue Sep 29 15:26:43 2020 +0200
+|  summary:     Remove unneeded STDERR output
+|
+o  changeset:   134:a98fd5b0192b
+|  user:        Rene Schickbauer <cavac@venera>
+|  date:        Tue Sep 29 15:22:00 2020 +0200
+|  summary:     Changes
+|
+o  changeset:   133:b612b25e04cb
 |  user:        Rene Schickbauer <cavac@venera>
 |  date:        Tue Sep 29 15:21:48 2020 +0200
 |  summary:     Add Checks for ::Client function call arguments

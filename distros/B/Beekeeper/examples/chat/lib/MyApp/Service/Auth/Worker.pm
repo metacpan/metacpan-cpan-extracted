@@ -3,11 +3,11 @@ package MyApp::Service::Auth::Worker;
 use strict;
 use warnings;
 
+use MyApp::Service::Base;
 use base 'MyApp::Service::Base';
 
 use Beekeeper::Service::Router ':all';
 use MyApp::Service::Chat;
-use Beekeeper::Worker;
 
 
 sub authorize_request {
@@ -22,13 +22,15 @@ sub authorize_request {
 sub on_startup {
     my $self = shift;
 
-    $self->setup_myapp_stuff;
+    $self->init_persistent_connections;
 
     $self->accept_remote_calls(
         'myapp.auth.login'  => 'login',
         'myapp.auth.logout' => 'logout',
         'myapp.auth.kick'   => 'kick',
     );
+
+    log_info "Ready";
 }
 
 sub login {

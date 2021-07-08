@@ -1,5 +1,5 @@
 package Lab::XPRESS::Sweep::Frequency;
-$Lab::XPRESS::Sweep::Frequency::VERSION = '3.760';
+$Lab::XPRESS::Sweep::Frequency::VERSION = '3.762';
 #ABSTRACT: Frequency sweep
 
 use v5.20;
@@ -102,7 +102,7 @@ Lab::XPRESS::Sweep::Frequency - Frequency sweep
 
 =head1 VERSION
 
-version 3.760
+version 3.762
 
 =head1 SYNOPSIS
 
@@ -263,12 +263,12 @@ probably none
 
 This software is copyright (c) 2021 by the Lab::Measurement team; in detail:
 
-  Copyright 2013       Alois Dirnaichner, Andreas K. HÃ¼ttel, Christian Butschkow, Stefan Geissler
-            2014       Andreas K. HÃ¼ttel
+  Copyright 2013       Alois Dirnaichner, Andreas K. Huettel, Christian Butschkow, Stefan Geissler
+            2014       Andreas K. Huettel
             2016       Simon Reinhardt
-            2017       Andreas K. HÃ¼ttel, Simon Reinhardt
+            2017       Andreas K. Huettel, Simon Reinhardt
             2019       Simon Reinhardt
-            2020       Andreas K. HÃ¼ttel
+            2020       Andreas K. Huettel
 
 
 This is free software; you can redistribute it and/or modify it under

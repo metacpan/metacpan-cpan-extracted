@@ -1,0 +1,17 @@
+Revision history for Music::Guidonian
+
+0.05    July  5 2021
+        Remove references to Test::More (Test2::V0 is instead used).
+
+0.03    July  3 2021
+        Allow use of Music::PitchNum to convert numbers to note names.
+        'renew' of undef turns that feature off. Change return value of
+        generated function when out of possibilities. More tests.
+
+0.02    July  2 2021
+        Add 'renew' parameter so that the caller can specify how the
+        choices are set at first or after all their values have been
+        worked through.
+
+0.01    July  1 2021
+        First version, released on an unsuspecting world.

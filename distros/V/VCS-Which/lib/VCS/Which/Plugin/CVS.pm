@@ -19,7 +19,7 @@ use Contextual::Return;
 
 extends 'VCS::Which::Plugin';
 
-our $VERSION = version->new('0.6.8');
+our $VERSION = version->new('0.6.9');
 our $name    = 'CVS';
 our $exe     = 'cvs';
 our $meta    = 'CVS';

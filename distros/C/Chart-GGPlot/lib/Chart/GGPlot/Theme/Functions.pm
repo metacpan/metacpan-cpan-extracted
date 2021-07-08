@@ -4,7 +4,7 @@ package Chart::GGPlot::Theme::Functions;
 
 use Chart::GGPlot::Setup;
 
-our $VERSION = '0.0011'; # VERSION
+our $VERSION = '0.0016'; # VERSION
 
 use Chart::GGPlot::Theme;
 use Chart::GGPlot::Types qw(:all);
@@ -51,7 +51,7 @@ Chart::GGPlot::Theme::Functions - Function interface of Chart::GGPlot::Theme
 
 =head1 VERSION
 
-version 0.0011
+version 0.0016
 
 =head1 SEE ALSO
 
@@ -63,7 +63,7 @@ Stephan Loyd <sloyd@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019-2020 by Stephan Loyd.
+This software is copyright (c) 2019-2021 by Stephan Loyd.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

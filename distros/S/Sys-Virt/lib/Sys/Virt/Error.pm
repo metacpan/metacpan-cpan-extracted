@@ -422,6 +422,10 @@ The TPM subsystem
 
 The BPF subsystem
 
+=item Sys::Virt::Error::FROM_CH
+
+The Cloud Hypervisor driver
+
 =back
 
 =head2 ERROR CODE CONSTANTS

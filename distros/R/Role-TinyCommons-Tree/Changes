@@ -1,3 +1,23 @@
+0.127   2021-07-02  Released-By: PERLANCAR; Urgency: high
+
+        - Merge releases 0.126, 0.126.1, 0.126.2.
+
+
+0.126.2 2021-07-01  Released-By: PERLANCAR; Urgency: medium
+
+	- Add node methods has_min_children(), has_max_children(),
+	  has_children_between().
+
+        - UPDATE: rename release 0.126 -> 0.126.2 due to conflict.
+
+
+0.126.1 2021-07-01  Released-By: PERLANCAR; Urgency: medium
+
+	- Add node methods: is_root(), retrieve_parent().
+
+        - UPDATE: rename release 0.125 -> 0.126.1 due to conflict.
+
+
 0.126   2021-05-06  Released-By: PERLANCAR; Urgency: low
 
 	- No functional changes.

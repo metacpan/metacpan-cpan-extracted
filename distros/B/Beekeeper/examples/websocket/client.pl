@@ -15,6 +15,8 @@ print "> ";
 while (my $line = <STDIN>) {
     chomp $line;
 
+    last if $line eq 'quit';
+
     my $result = eval { $calc->eval_expr($line) };
 
     print $@ ? "ERR: $@" : "= $result\n";

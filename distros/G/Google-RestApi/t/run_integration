@@ -1,1 +1,8 @@
-prove -r --reverse integration
+# this will run the integration scripts for you. to get further information
+# on particular tests, you can insert 'debug_on' and 'debug_off' to show debug
+# statements as the code runs.
+
+# to run individual tests, specify integration/Google/RestApi/SheetsApi4/Range.t
+# or whatever set of tests. add -v to see each individual test.
+
+prove -Ilib -I../lib -r integration "$@"

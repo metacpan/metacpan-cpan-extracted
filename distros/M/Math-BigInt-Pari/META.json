@@ -4,7 +4,7 @@
       "Peter John Acklam <pjacklam@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.38, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -30,7 +30,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Math::BigInt" : "1.999817",
+            "Math::BigInt" : "1.999819",
             "Math::Pari" : "2.010709",
             "perl" : "5.006002"
          }
@@ -49,6 +49,6 @@
          "web" : "https://github.com/pjacklam/p5-Math-BigInt-Pari"
       }
    },
-   "version" : "1.3006",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "1.3007",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

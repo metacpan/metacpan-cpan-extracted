@@ -9,7 +9,7 @@ my %WriteMakefileArgs = (
     VERSION_FROM     => 'lib/Finance/IG.pm',
     ABSTRACT_FROM    => 'lib/Finance/IG.pm',
     LICENSE          => 'artistic_2',
-    MIN_PERL_VERSION => '5.10',
+    MIN_PERL_VERSION => '5.01',
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => '0',
     },

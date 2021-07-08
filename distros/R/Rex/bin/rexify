@@ -9,7 +9,7 @@
 use strict;
 use warnings;
 
-our $VERSION = '1.13.3'; # VERSION
+our $VERSION = '1.13.4'; # VERSION
 
 BEGIN {
   # this is for new package format
@@ -840,10 +840,10 @@ unless ( -f 'lib' . $ARGV[0] . '.pm' ) {
   }
 
   print STDERR "Created Rexfile.\n";
-  print STDERR "Done.\n\nNow edit Rexfile to suite your needs.\n";
+  print STDERR "Done.\n\nNow edit Rexfile to suit your needs.\n";
   print STDERR "You can edit $dir/lib/$ARGV[0].pm to define tasks.\n";
   print STDERR
-    "\n\nIf you have any questions or wishes\n\n\tjust join #rex on freenode\n\nor post them here:\n\n\thttps://github.com/RexOps/Rex/issues\n\n";
+    "\nIf you need assistance, get in touch via one of our support channels!\n";
 }
 else {
 

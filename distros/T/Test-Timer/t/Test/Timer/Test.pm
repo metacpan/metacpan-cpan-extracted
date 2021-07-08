@@ -1,17 +1,18 @@
+## no critic (RequireVersionVar ProhibitUnusedPrivateSubroutines)
+
 package Test::Timer::Test;
 
 use strict;
 use warnings;
 
-require Exporter;
-our @ISA = qw(Exporter);
+use base qw(Exporter);
 
 our @EXPORT_OK = qw(_sleep);
 
 sub _sleep {
     my $interval = shift;
 
-    sleep($interval);
+    sleep $interval;
 
     return $interval;
 }

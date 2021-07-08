@@ -5,7 +5,7 @@ use Catalyst::View::TT;
 use base qw(Catalyst::View::TT);
 
 # ABSTRACT: Template Toolkit view for Devel::ebug::HTTP
-our $VERSION = '0.33'; # VERSION
+our $VERSION = '0.34'; # VERSION
 
 
 1;
@@ -22,7 +22,7 @@ Devel::ebug::HTTP::View::TT - Template Toolkit view for Devel::ebug::HTTP
 
 =head1 VERSION
 
-version 0.33
+version 0.34
 
 =head1 SYNOPSIS
 
