@@ -1,9 +1,9 @@
 package ColorTheme::Perinci::CmdLine::Classic::Default;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-05-07'; # DATE
+our $DATE = '2021-07-11'; # DATE
 our $DIST = 'Perinci-CmdLine-Classic'; # DIST
-our $VERSION = '1.814'; # VERSION
+our $VERSION = '1.815'; # VERSION
 
 use strict;
 use warnings;
@@ -40,7 +40,7 @@ ColorTheme::Perinci::CmdLine::Classic::Default
 
 =head1 VERSION
 
-This document describes version 1.814 of ColorTheme::Perinci::CmdLine::Classic::Default (from Perl distribution Perinci-CmdLine-Classic), released on 2021-05-07.
+This document describes version 1.815 of ColorTheme::Perinci::CmdLine::Classic::Default (from Perl distribution Perinci-CmdLine-Classic), released on 2021-07-11.
 
 =head1 HOMEPAGE
 
@@ -52,7 +52,7 @@ Source repository is at L<https://github.com/perlancar/perl-Perinci-CmdLine-Clas
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Perinci-CmdLine-Classic/issues>
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-CmdLine-Classic>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

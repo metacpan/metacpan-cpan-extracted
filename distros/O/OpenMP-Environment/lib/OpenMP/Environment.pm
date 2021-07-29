@@ -1,11 +1,10 @@
-package OpenMP::Environment;
-
+package OpenMP::Environment; 
 use strict;
 use warnings;
 
 use Validate::Tiny qw/filter is_in/;
 
-our $VERSION = q{1.0.5};
+our $VERSION = q{1.1.0};
 
 our @_OMP_VARS = (
     qw/OMP_CANCELLATION OMP_DISPLAY_ENV OMP_DEFAULT_DEVICE
@@ -444,48 +443,104 @@ __END__
 
 =head1 NAME
 
-OpenMP::Environment - Perl extension managing OpenMP variables in C<%ENV> within a script.
+OpenMP::Environment - Perl extension managing OpenMP variables in
+C<%ENV> within a script.
 
 =head1 SYNOPSIS
 
-Example 1; ensure an OpenMP environment is set up properly already (externally)
+  use OpenMP::Environment ();
+  my $env = OpenMP::Environment->new;
+  $env->assert_omp_environment;
+
+=head1 DESCRIPTION
+
+Provides accessors for affecting the OpenMP/GOMP environmental
+variables that affect some aspects of OpenMP programs and shared
+libraries at libary load and run times.
+
+This module is not directly useful with L<Inline::C> and L<Alien::OpenMP>,
+but can be. See L<Example 5> for more information on how to
+achieve this utility.
+
+There are setters, getters, and unsetters for all published OpenMP
+(and GOMP) environmental variables, in additional to some utility
+methods.
+
+C<The environment variables which beginning with OMP_ are defined
+by section 4 of the OpenMP specification in version 4.5, while
+those beginning with GOMP_ are GNU extensions.>
+
+=head1 ABOUT THIS DOCUMENT
+
+Most provided methods are meant to manipulate a particular OpenMP
+environmental variable. Each has a setter, getter, and unsetter
+(i.e., deletes the variable from C<%ENV> directly.
+
+Each method is documented, and it is noted if the setter will
+validate the provided value. Validation occurs whenever the set of
+values is a simple numerical value or is a limited set of specific
+strings. It is clearly noted below when a setter does not validate.
+This is extended to C<assert_omp_environment>, which will validate
+the variables it is able if they are already set in C<%ENV>.
+
+L<https://gcc.gnu.org/onlinedocs/libgomp/Environment-Variables.html>
+
+=head1 USES AND USE CASES
+
+=head2 BENCHMARKS
+
+This module is ideal to support benchmarks and test suites that
+are implemented using OpenMP. As a small example, there is an
+example of such a script, in C<benchmarks/demo-dc-NASA.pl> that
+shows the building and execution of the C<DC> benchmark. Distributed
+with this source is are the C and Fortran protions of NASA's NPB
+(version 3.4.1) benchmarking suite for OpenMP. It's okay, technically
+I in addition to all US Citizens own this code since we paid for
+it :). The link to the benchmark suite is
+L<https://www.nas.nasa.gov/publications/npb.html>, but it is one
+of many such OpenMP benchmarks and validation suites.
+
+=head2 SUPPORTING XS MODULES USING OPENMP
+
+The caveats for linking shared libraries that contain OpenMP are
+explained in C<Example 4> above. The C<OpenMP::Environment> module
+is not as effect as it is with stand alone executables that use
+OpenMP; but the can be made so with some minor modifications to
+the code that provide additional support for passing number of
+threads, etc and using the OpenMP API (e.g., C<omp_set_num_threads>)
+to affect the number of threads.
+
+=head1 EXAMPLES
+
+There is a growing set of example scripts in the distribution's,
+C<examples/> directory.
+
+The number and breadth of testing is also growing, so for more
+examples on using it and this module's flexibility; please see
+those.
+
+Lastly, the Section L<SUPPORTED C<OpenMP> ENVIRONMENTAL VARIABLES>
+provides the full description of each environmental variable
+available in the OpenMP and GOMP documentation. It also describes
+the range of values that are deemed C<valid> for each variable.
+
+=head2 Example 1
+
+Ensure an OpenMP environment is set up properly already (externally)
 
   use OpenMP::Environment;
   my $env = OpenMP::Environment->new;
   $env->assert_omp_environment;
 
-Example 2; Managing a range of thread scales (useful for benchmarking, testing, etc)
+=head2 Example 2
 
-  use OpenMP::Environment;
-  my $env = OpenMP::Environment->new;
+Managing a range of thread scales (useful for benchmarking, testing, etc)
 
-  foreach my $i (1 2 4 8 16 32 64 128 256) {
-    $env->omp_num_threads($i); # Note: validated
-    my $exit_code = system(qw{/path/to/my_prog_r --opt1 x --opt2 y});
-     
-    if ($exit_code == 0) {
-      # ... do some post processing
-    }
-    else {
-      # ... handle failed execution
-    }
-  }
-
-Example 3; Extended benchmarking, affecting C<OMP_SCHEDULE> in addition
-to C<OMP_NUM_THREADS>.
-
-  use OpenMP::Environment;
-  my $env = OpenMP::Environment->new;
-
-  foreach my $i (1 2 4 8 16 32 64 128 256) {
-    $env->omp_num_threads($i); # Note: validated
-    foreach my $sched (qw/static dynamic auto/) {
-      # compute chunk size
-      my $chunk = get_baby_ruth($i);
-      
-      # set schedule using prescribed format
-      $env->omp_schedule(qq{$sched;$chunk}); # Note: Not validated
-      
+    use OpenMP::Environment;
+    my $env = OpenMP::Environment->new;
+  
+    foreach my $i (1 2 4 8 16 32 64 128 256) {
+      $env->set_omp_num_threads($i); # Note: validated
       my $exit_code = system(qw{/path/to/my_prog_r --opt1 x --opt2 y});
        
       if ($exit_code == 0) {
@@ -495,30 +550,58 @@ to C<OMP_NUM_THREADS>.
         # ... handle failed execution
       }
     }
-  }
 
-Note: While it has not been tested, theoretically any Perl module that
-utilizes compiled libraries (via C::Inline, XS, FFIs, etc) that are C<OpenMP>
-aware should also be at home within the context of this module.
+=head2 Example 3
 
-Example 4; Use with an XS module that itself is C<OpenMP> aware:
+Extended benchmarking, affecting C<OMP_SCHEDULE> in addition toC<OMP_NUM_THREADS>.
 
-Note: OpenMP::Environment has no effect on Perl interfaces
-that utilize compiled code as shared objects, that also
-contain OpenMP constructs.
+    use OpenMP::Environment;
+    my $env = OpenMP::Environment->new;
+  
+    foreach my $i (1 2 4 8 16 32 64 128 256) {
+      $env->set_omp_num_threads($i); # Note: validated
+      foreach my $sched (qw/static dynamic auto/) {
+        # compute chunk size
+        my $chunk = get_baby_ruth($i);
+        
+        # set schedule using prescribed format
+        $env->set_omp_schedule(qq{$sched;$chunk}); # Note: Not validated
+        
+        my $exit_code = system(qw{/path/to/my_prog_r --opt1 x --opt2 y});
+         
+        if ($exit_code == 0) {
+          # ... do some post processing
+        }
+        else {
+          # ... handle failed execution
+        }
+      }
+    }
 
-The reason for this is that OpenMP implemented by compilers,
-gcc (gomp), anyway, only read in the environment once. In our
-use of Inline::C, this corresponds to the actual loading of
-the .so that is linked to the XS-based Perl interface it
-presents.  As a result, a developer must use the OpenMP API
-that is exposed. In the example below, we're using the
-C<omp_set_num_threads> rather than setting C<OMP_NUM_THREADS>
-via %ENV or using OpenMP::Environment's C<omp_num_threads>
-method.
+Note: While it has not been tested, theoretically any Perl module
+that utilizes compiled libraries (via C::Inline, XS, FFIs, etc)
+that are C<OpenMP> aware should also be at home within the context
+of this module.
 
-This example uses OpenMP::Environment, but shows that it works
-with two caveats:
+=head2 Example 4
+
+Use with an XS module that itself is C<OpenMP> aware:
+
+Note: OpenMP::Environment has no effect on Perl interfaces that
+utilize compiled code as shared objects, that also contain OpenMP
+constructs.
+
+The reason for this is that OpenMP implemented by compilers, gcc
+(gomp), anyway, only read in the environment once. In our use of
+Inline::C, this corresponds to the actual loading of the .so that
+is linked to the XS-based Perl interface it presents.  As a result,
+a developer must use the OpenMP API that is exposed. In the example
+below, we're using the C<omp_set_num_threads> rather than setting
+C<OMP_NUM_THREADS> via %ENV or using OpenMP::Environment's
+C<omp_num_threads> method.
+
+This example uses OpenMP::Environment, but shows that it works with
+two caveats:
 
 =over 4
 
@@ -575,71 +658,134 @@ that it sets
       }
     }
 
-=head1 DESCRIPTION
+L<Example 5> in the following section demostrates how get around this
+restriction somewhat. The caveat is that the respective environmental
+variable must also come with a corresponding I<setter> function in the
+OpenMP run time.
 
-Provides accessors for affecting the OpenMP/GOMP environmental
-variables described at at the time of this writing, as:
+=head2 Example 5
 
-There are setters, getters, and unsetters for all published OpenMP
-(and GOMP) environmental variables, in additional to some utility
-methods.
+Writing C functions that are aware of the OpenMP run time methods
+that are able to be affected by the set of C<omp_set_*> functions:
 
-C<The environment variables which beginning with OMP_ are defined
-by section 4 of the OpenMP specification in version 4.5, while
-those beginning with GOMP_ are GNU extensions.>
+The following is an example of emulating the familiar behavior of
+compiled OpenMP programs that respect a number of environmental
+variables at run time. The key difference between running a compiled
+OpenMP program at the commandline and a compiled subroutine in Perl
+that utilizes OpenMP, is that subsequent calls to the subroutine
+in the Perl script do not have an opportunity to relead the binary
+or shared library.
 
-=head1 ABOUT THIS DOCUMENT
+The "user experience" of one running an OpenMP program from the
+shell is that it the number of threads used in the program may be
+set implicitly using the OMP_NUM_THREADS environmental variable.
+Therefore, one may run the binary in a shell loop and update
+C<OMP_NUM_THREADS> environmentally.
 
-Most provided methods are meant to manipulate a particular OpenMP
-environmental variable. Each has a setter, getter, and unsetter (i.e.,
-deletes the variable from C<%ENV> directly.
+    # build and load subroutines
+    use Inline (
+        C           => 'DATA',
+        name        => q{Test},
+        ccflagsex   => q{-fopenmp},
+        lddlflags   => join( q{ }, $Config::Config{lddlflags}, q{-fopenmp} ),
+        BUILD_NOISY => 1,
+    );
+    
+    my $oenv = OpenMP::Environment->new;
+    for my $num_threads (qw/1 2 4 8 16 24/) {
+        $oenv->omp_num_threads($num_threads);
+        test();
+    }
+    
+    __DATA__
+    
+    __C__
+    #include <omp.h>
+    #include <stdio.h>
+    #include <stdlib.h>
+     
+    void test() {
+      _ENV_set_num_threads();
+      #pragma omp parallel
+      {
+        if (0 == omp_get_thread_num())
+          printf("%-2d threads\n", omp_get_num_threads()); 
+      }
+    }
+        
+    void _ENV_set_num_threads() {
+      char *num;
+      num = getenv("OMP_NUM_THREADS");
+      omp_set_num_threads(atoi(num));
+    }
 
-Each method is documented, and it is noted if the setter will validate
-the provided value. Validation occurs whenever the set of values is a
-simple numerical value or is a limited set of specific strings. It is
-clearly noted below when a setter does not validate. This is extended
-to C<assert_omp_environment>, which will validate the variables it is
-able if they are already set in C<%ENV>.
+OpenMP benchmarks are often written in this fashion. It is possible
+to affect the number of threads in the binary, but only through
+the use of run time methods. In the case of C<OMP_NUM_THREADS>,
+this function is C<omp_set_num_threads>. The issue here is that
+using run time setters breaks the veil that is so attractive about
+OpenMP; the pragmas offer a way to implicitly define OpenMP threads
+*if* the compiler can recognize them; if it can't, the pragmas are
+designed to appear as normal comments.
 
-L<https://gcc.gnu.org/onlinedocs/libgomp/Environment-Variables.html>
+Using run time functions is an explicit act, and therefore can't
+be hidden in the same manner. This requires the compiler to link
+against OpenMP run time libraries, even if there is no intention
+to run in parallel. There are 2 options here - hide the run time
+call from the compiler using C<ifdef> or the like; or link the
+OpenMP library and just ensure C<OMP_NUM_THREADS> is set to C<1>
+(as in a single thread).
 
-=head1 USES AND USE CASES
+Using C<OpenMP::Environment> introduces the consideration that the
+compiled subroutine is loaded only once when the Perl script is
+executed. It is true that in this situation, the environment is
+read in as expected - but, it is only considered I<once> and at
+library I<load> time.
 
-=head2 EXAMPLES
+To get away from this restriction and emulate more closely the
+C<user experience> of the commandline with respect to OpenMP
+environmental variable controls, we present the following example
+to show how to C<re-read> certain environmental variables.
 
-There is a growing set of example scripts in the distribution's,
-C<examples/> directory.
+Interestingly, there are only 6 run time I<setters> that correspond
+to OpenMP environmental variables to work with:
 
-The number and breadth of testing is also growing, so for more examples
-on using it and this module's flexibility; please see those.
+=over 4
 
-Lastly, the Section L<SUPPORTED C<OpenMP> ENVIRONMENTAL VARIABLES> provides
-the full description of each environmental variable available in the OpenMP
-and GOMP documentation. It also describes the range of values that are deemed
-C<valid> for each variable.
+=item C<omp_set_num_threads>
 
-=head2 BENCHMARKS
+Corresponds to C<omp_set_num_threads>.
 
-This module is ideal to support benchmarks and test suites that are
-implemented using OpenMP. As a small example, there is an example of such
-a script, in C<benchmarks/demo-dc-NASA.pl> that shows the building and
-execution of the C<DC> benchmark. Distributed with this source is are the
-C and Fortran protions of NASA's NPB (version 3.4.1) benchmarking suite
-for OpenMP. It's okay, technically I in addition to all US Citizens own
-this code since we paid for it :). The link to the benchmark suite is
-L<https://www.nas.nasa.gov/publications/npb.html>, but it is one of many
-such OpenMP benchmarks and validation suites.
+=item C<omp_set_default_device>
 
-=head2 SUPPORTING XS MODULES USING OPENMP
+Corresponds to C<OMP_DEFAULT_DEVICE>
 
-The caveats for linking shared libraries that contain OpenMP are explained
-in C<Example 4> above. The C<OpenMP::Environment> module is not as effect
-as it is with stand alone executables that use OpenMP; but the can be
-made so with some minor modifications to the code that provide additional
-support for passing number of threads, etc and using the OpenMP API (e.g.,
-C<omp_set_num_threads>) to affect the number of threads.
+=item C<omp_set_dynamic>
+
+Corresponds to C<OMP_DYNAMIC>.
+
+=item C<omp_set_max_active_levels>
+
+Corresponds to C<OMP_MAX_ACTIVE_LEVELS>
+
+=item C<omp_set_nested>
+
+Corresponds to C<OMP_NESTED>
+
+=item C<omp_set_schedule>
+
+Corresponds to C<OMP_SCHEDULE>.
+
+=back
 
 =head1 METHODS
+
+B<Note:> Due to the libary load time of functions compiled and
+exported (e.g., using L<Inline::C>), only environmental variables
+that are provided with a standard I<set> function for affecting at
+run time can be made to emulate the effective behavior that those
+familiar with executing OpenMP binaries my find familiar. See
+examples 4 and 5 above for more information about what this means.
 
 =over 3
 
@@ -649,17 +795,19 @@ Constructor
 
 =item C<assert_omp_environment>
 
-Validates OpenMP related environmental variables that might happen to be set
-in %ENV directly. Useful as a guard in launcher scripts to ensure the variables
-that are validated in this module are valid.
+Validates OpenMP related environmental variables that might happen
+to be set in %ENV directly. Useful as a guard in launcher scripts
+to ensure the variables that are validated in this module are valid.
 
-As is the case for all variables, an Environment completely devoid of any related
-variables being set is considered C<valid>. In other words, only variables that
-are already set in the Environment are validated.
+As is the case for all variables, an Environment completely devoid
+of any related variables being set is considered C<valid>. In other
+words, only variables that are already set in the Environment are
+validated.
 
 =item C<vars>
 
-Returns a list of all supported C<OMP_*> and C<GOMP_*> environmental variables.
+Returns a list of all supported C<OMP_*> and C<GOMP_*> environmental
+variables.
 
 =item C<vars_unset>
 
@@ -689,7 +837,8 @@ Uses internal method, C<_omp_summary_set> to get string to print.
 
 =item C<print_omp_summary>
 
-Prints summary of all set and unset variables; including values where applicable.
+Prints summary of all set and unset variables; including values where
+applicable.
 
 Uses internal method, C<_omp_summary> to get string to print.
 
@@ -719,6 +868,11 @@ Setter/getter for C<OMP_DEFAULT_DEVICE>.
 
 Validated.
 
+B<Note:> The other environmental variables presented in this module
+do not have run time I<setters>. Dealing with tese dynamically
+presents some additional hurdles and considerations; this will be
+addressed outside of this example.
+
 =item C<unset_omp_default_device>
 
 Unsets C<OMP_DEFAULT_DEVICE>, deletes it from localized C<%ENV>.
@@ -729,6 +883,11 @@ Setter/getter for C<OMP_DYNAMIC>.
 
 Validated.
 
+B<Note:> The other environmental variables presented in this module
+do not have run time I<setters>. Dealing with tese dynamically
+presents some additional hurdles and considerations; this will be
+addressed outside of this example.
+
 =item C<unset_omp_dynamic>
 
 Unsets C<OMP_DYNAMIC>, deletes it from localized C<%ENV>.
@@ -738,6 +897,11 @@ Unsets C<OMP_DYNAMIC>, deletes it from localized C<%ENV>.
 Setter/getter for C<OMP_MAX_ACTIVE_LEVELS>.
 
 Validated.
+
+B<Note:> The other environmental variables presented in this module
+do not have run time I<setters>. Dealing with tese dynamically
+presents some additional hurdles and considerations; this will be
+addressed outside of this example.
 
 =item C<unset_omp_max_active_levels>
 
@@ -761,6 +925,11 @@ Setter/getter for C<OMP_NESTED>.
 
 Validated.
 
+B<Note:> The other environmental variables presented in this module
+do not have run time I<setters>. Dealing with tese dynamically
+presents some additional hurdles and considerations; this will be
+addressed outside of this example.
+
 =item C<unset_omp_nested>
 
 Unsets C<OMP_NESTED>, deletes it from localized C<%ENV>.
@@ -770,6 +939,11 @@ Unsets C<OMP_NESTED>, deletes it from localized C<%ENV>.
 Setter/getter for C<OMP_NUM_THREADS>.
 
 Validated.
+
+B<Note:> This environmental variable has a I<Standards> defined run time
+function associated with it. Therefore, the approach of I<rereading> the
+environment demostrated in L<Example 5> may be used to use this module
+for affecting this setting at run time.
 
 =item C<unset_omp_num_threads>
 
@@ -810,6 +984,11 @@ Unsets C<OMP_STACKSIZE>, deletes it from localized C<%ENV>.
 Setter/getter for C<OMP_SCHEDULE>.
 
 Not validated.
+
+B<Note:> The other environmental variables presented in this module
+do not have run time I<setters>. Dealing with tese dynamically
+presents some additional hurdles and considerations; this will be
+addressed outside of this example.
 
 =item C<unset_omp_schedule>
 
@@ -905,87 +1084,170 @@ The following is essentially direct copy from the URL in DESCRIPTION:
 
 =item C<OMP_CANCELLATION>
 
-If set to TRUE, the cancellation is activated. If set to FALSE or if unset, cancellation is disabled and the cancel construct is ignored.
+If set to TRUE, the cancellation is activated. If set to FALSE or
+if unset, cancellation is disabled and the cancel construct is
+ignored.
 
 This variable is validated via setter.
 
 =item C<OMP_DISPLAY_ENV>
 
-If set to TRUE, the OpenMP version number and the values associated with the OpenMP environment variables are printed to stderr. If set to VERBOSE, it additionally shows the value of the environment variables which are GNU extensions. If undefined or set to FALSE, this information will not be shown.
+If set to TRUE, the OpenMP version number and the values associated
+with the OpenMP environment variables are printed to stderr. If
+set to VERBOSE, it additionally shows the value of the environment
+variables which are GNU extensions. If undefined or set to FALSE,
+this information will not be shown.
 
 This variable is validated via setter.
 
 =item C<OMP_DEFAULT_DEVICE>
 
-Set to choose the device which is used in a target region, unless the value is overridden by omp_get_set_assert_default_device or by a device clause. The value shall be the nonnegative device number. If no device with the given device number exists, the code is executed on the host. If unset, device number 0 will be used.
+Set to choose the device which is used in a target region, unless
+the value is overridden by omp_get_set_assert_default_device or by
+a device clause. The value shall be the nonnegative device number.
+If no device with the given device number exists, the code is
+executed on the host. If unset, device number 0 will be used.
 
 This variable is validated via setter.
 
 =item C<OMP_DYNAMIC>
 
-Enable or disable the dynamic adjustment of the number of threads within a team. The value of this environment variable shall be TRUE or FALSE. If undefined, dynamic adjustment is disabled by default.
+Enable or disable the dynamic adjustment of the number of threads
+within a team. The value of this environment variable shall be TRUE
+or FALSE. If undefined, dynamic adjustment is disabled by default.
 
 This variable is validated via setter.
 
 =item C<OMP_MAX_ACTIVE_LEVELS>
 
-Specifies the initial value for the maximum number of nested parallel regions. The value of this variable shall be a positive integer. If undefined, then if OMP_NESTED is defined and set to true, or if OMP_NUM_THREADS or OMP_PROC_BIND are defined and set to a list with more than one item, the maximum number of nested parallel regions will be initialized to the largest number supported, otherwise it will be set to one.
+Specifies the initial value for the maximum number of nested parallel
+regions. The value of this variable shall be a positive integer.
+If undefined, then if OMP_NESTED is defined and set to true, or if
+OMP_NUM_THREADS or OMP_PROC_BIND are defined and set to a list with
+more than one item, the maximum number of nested parallel regions
+will be initialized to the largest number supported, otherwise it
+will be set to one.
 
 This variable is validated via setter.
 
 =item C<OMP_MAX_TASK_PRIORITY>
 
-Specifies the initial value for the maximum priority value that can be set for a task. The value of this variable shall be a non-negative integer, and zero is allowed. If undefined, the default priority is 0.
+Specifies the initial value for the maximum priority value that
+can be set for a task. The value of this variable shall be a
+non-negative integer, and zero is allowed. If undefined, the default
+priority is 0.
 
 This variable is validated via setter.
 
 =item C<OMP_NESTED>
 
-Enable or disable nested parallel regions, i.e., whether team members are allowed to create new teams. The value of this environment variable shall be TRUE or FALSE. If set to TRUE, the number of maximum active nested regions supported will by default be set to the maximum supported, otherwise it will be set to one. If OMP_MAX_ACTIVE_LEVELS is defined, its setting will override this setting. If both are undefined, nested parallel regions are enabled if OMP_NUM_THREADS or OMP_PROC_BINDS are defined to a list with more than one item, otherwise they are disabled by default.
+Enable or disable nested parallel regions, i.e., whether team
+members are allowed to create new teams. The value of this environment
+variable shall be TRUE or FALSE. If set to TRUE, the number of
+maximum active nested regions supported will by default be set to
+the maximum supported, otherwise it will be set to one. If
+OMP_MAX_ACTIVE_LEVELS is defined, its setting will override this
+setting. If both are undefined, nested parallel regions are enabled
+if OMP_NUM_THREADS or OMP_PROC_BINDS are defined to a list with
+more than one item, otherwise they are disabled by default.
 
 This variable is validated via setter.
 
 =item C<OMP_NUM_THREADS>
 
-Specifies the default number of threads to use in parallel regions. The value of this variable shall be a comma-separated list of positive integers; the value specifies the number of threads to use for the corresponding nested level. Specifying more than one item in the list will automatically enable nesting by default. If undefined one thread per CPU is used.
+Specifies the default number of threads to use in parallel regions.
+The value of this variable shall be a comma-separated list of
+positive integers; the value specifies the number of threads to
+use for the corresponding nested level. Specifying more than one
+item in the list will automatically enable nesting by default. If
+undefined one thread per CPU is used.
 
 This variable is validated via setter.
 
 =item C<OMP_PROC_BIND>
 
-Specifies whether threads may be moved between processors. If set to TRUE, OpenMP theads should not be moved; if set to FALSE they may be moved. Alternatively, a comma separated list with the values MASTER, CLOSE and SPREAD can be used to specify the thread affinity policy for the corresponding nesting level. With MASTER the worker threads are in the same place partition as the master thread. With CLOSE those are kept close to the master thread in contiguous place partitions. And with SPREAD a sparse distribution across the place partitions is used. Specifying more than one item in the list will automatically enable nesting by default.
+Specifies whether threads may be moved between processors. If set
+to TRUE, OpenMP theads should not be moved; if set to FALSE they
+may be moved. Alternatively, a comma separated list with the values
+MASTER, CLOSE and SPREAD can be used to specify the thread affinity
+policy for the corresponding nesting level. With MASTER the worker
+threads are in the same place partition as the master thread. With
+CLOSE those are kept close to the master thread in contiguous place
+partitions. And with SPREAD a sparse distribution across the place
+partitions is used. Specifying more than one item in the list will
+automatically enable nesting by default.
 
-When undefined, OMP_PROC_BIND defaults to TRUE when OMP_PLACES or GOMP_CPU_AFFINITY is set and FALSE otherwise.
+When undefined, OMP_PROC_BIND defaults to TRUE when OMP_PLACES or
+GOMP_CPU_AFFINITY is set and FALSE otherwise.
 
 This module provides access to, but does NOT validate this variable.
 
 =item C<OMP_PLACES>
 
-The thread placement can be either specified using an abstract name or by an explicit list of the places. The abstract names threads, cores and sockets can be optionally followed by a positive number in parentheses, which denotes the how many places shall be created. With threads each place corresponds to a single hardware thread; cores to a single core with the corresponding number of hardware threads; and with sockets the place corresponds to a single socket. The resulting placement can be shown by setting the OMP_DISPLAY_ENV environment variable.
+The thread placement can be either specified using an abstract name
+or by an explicit list of the places. The abstract names threads,
+cores and sockets can be optionally followed by a positive number
+in parentheses, which denotes the how many places shall be created.
+With threads each place corresponds to a single hardware thread;
+cores to a single core with the corresponding number of hardware
+threads; and with sockets the place corresponds to a single socket.
+The resulting placement can be shown by setting the OMP_DISPLAY_ENV
+environment variable.
 
-Alternatively, the placement can be specified explicitly as comma separated list of places. A place is specified by set of nonnegative numbers in curly braces, denoting the denoting the hardware threads. The hardware threads belonging to a place can either be specified as comma separated list of nonnegative thread numbers or using an interval. Multiple places can also be either specified by a comma separated list of places or by an interval. To specify an interval, a colon followed by the count is placed after after the hardware thread number or the place. Optionally, the length can be followed by a colon and the stride number - otherwise a unit stride is assumed. For instance, the following specifies the same places list: "{0,1,2}, {3,4,6}, {7,8,9}, {10,11,12}"; "{0:3}, {3:3}, {7:3}, {10:3}"; and "{0:2}:4:3".
+Alternatively, the placement can be specified explicitly as comma
+separated list of places. A place is specified by set of nonnegative
+numbers in curly braces, denoting the denoting the hardware threads.
+The hardware threads belonging to a place can either be specified
+as comma separated list of nonnegative thread numbers or using an
+interval. Multiple places can also be either specified by a comma
+separated list of places or by an interval. To specify an interval,
+a colon followed by the count is placed after after the hardware
+thread number or the place. Optionally, the length can be followed
+by a colon and the stride number - otherwise a unit stride is
+assumed. For instance, the following specifies the same places
+list: "{0,1,2}, {3,4,6}, {7,8,9}, {10,11,12}"; "{0:3}, {3:3}, {7:3},
+{10:3}"; and "{0:2}:4:3".
 
-If OMP_PLACES and GOMP_CPU_AFFINITY are unset and OMP_PROC_BIND is either unset or false, threads may be moved between CPUs following no placement policy.
+If OMP_PLACES and GOMP_CPU_AFFINITY are unset and OMP_PROC_BIND is
+either unset or false, threads may be moved between CPUs following
+no placement policy.
 
 This module provides access to, but does NOT validate this variable.
 
 =item C<OMP_STACKSIZE>
 
-Set the default thread stack size in kilobytes, unless the number is suffixed by B, K, M or G, in which case the size is, respectively, in bytes, kilobytes, megabytes or gigabytes. This is different from pthread_attr_get_set_assertstacksize which gets the number of bytes as an argument. If the stack size cannot be set due to system constraints, an error is reported and the initial stack size is left unchanged. If undefined, the stack size is system dependent.
+Set the default thread stack size in kilobytes, unless the number
+is suffixed by B, K, M or G, in which case the size is, respectively,
+in bytes, kilobytes, megabytes or gigabytes. This is different from
+pthread_attr_get_set_assertstacksize which gets the number of bytes
+as an argument. If the stack size cannot be set due to system
+constraints, an error is reported and the initial stack size is
+left unchanged. If undefined, the stack size is system dependent.
 
 This module provides access to, but does NOT validate this variable.
 
 =item C<OMP_SCHEDULE>
 
-Allows to specify schedule type and chunk size. The value of the variable shall have the form: type[,chunk] where type is one of static, dynamic, guided or auto The optional chunk size shall be a positive integer. If undefined, dynamic scheduling and a chunk size of 1 is used.
+Allows to specify schedule type and chunk size. The value of the
+variable shall have the form: type[,chunk] where type is one of
+static, dynamic, guided or auto The optional chunk size shall be
+a positive integer. If undefined, dynamic scheduling and a chunk
+size of 1 is used.
 
 This module provides access to, but does NOT validate this variable.
 
 =item C<OMP_TARGET_OFFLOAD>
 
-Specifies the behaviour with regard to offloading code to a device. This variable can be set to one of three values - MANDATORY, DISABLED or DEFAULT.
+Specifies the behaviour with regard to offloading code to a device.
+This variable can be set to one of three values - MANDATORY, DISABLED
+or DEFAULT.
 
-If set to MANDATORY, the program will terminate with an error if the offload device is not present or is not supported. If set to DISABLED, then offloading is disabled and all code will run on the host. If set to DEFAULT, the program will try offloading to the device first, then fall back to running code on the host if it cannot.
+If set to MANDATORY, the program will terminate with an error if
+the offload device is not present or is not supported. If set to
+DISABLED, then offloading is disabled and all code will run on the
+host. If set to DEFAULT, the program will try offloading to the
+device first, then fall back to running code on the host if it
+cannot.
 
 If undefined, then the program will behave as if DEFAULT was set.
 
@@ -993,57 +1255,116 @@ This variable is validated via setter.
 
 =item C<OMP_THREAD_LIMIT>
 
-Specifies the number of threads to use for the whole program. The value of this variable shall be a positive integer. If undefined, the number of threads is not limited.
+Specifies the number of threads to use for the whole program. The
+value of this variable shall be a positive integer. If undefined,
+the number of threads is not limited.
 
 This variable is validated via setter.
 
 =item C<OMP_WAIT_POLICY>
 
-Specifies whether waiting threads should be active or passive. If the value is PASSIVE, waiting threads should not consume CPU power while waiting; while the value is ACTIVE specifies that they should. If undefined, threads wait actively for a short time before waiting passively.
+Specifies whether waiting threads should be active or passive. If
+the value is PASSIVE, waiting threads should not consume CPU power
+while waiting; while the value is ACTIVE specifies that they should.
+If undefined, threads wait actively for a short time before waiting
+passively.
 
 This variable is validated via setter.
 
 =item C<GOMP_CPU_AFFINITY>
 
-Binds threads to specific CPUs. The variable should contain a space-separated or comma-separated list of CPUs. This list may contain different kinds of entries: either single CPU numbers in any order, a range of CPUs (M-N) or a range with some stride (M-N:S). CPU numbers are zero based. For example, GOMP_CPU_AFFINITY="0 3 1-2 4-15:2" will bind the initial thread to CPU 0, the second to CPU 3, the third to CPU 1, the fourth to CPU 2, the fifth to CPU 4, the sixth through tenth to CPUs 6, 8, 10, 12, and 14 respectively and then start assigning back from the beginning of the list. GOMP_CPU_AFFINITY=0 binds all threads to CPU 0.
+Binds threads to specific CPUs. The variable should contain a
+space-separated or comma-separated list of CPUs. This list may
+contain different kinds of entries: either single CPU numbers in
+any order, a range of CPUs (M-N) or a range with some stride (M-N:S).
+CPU numbers are zero based. For example, GOMP_CPU_AFFINITY="0 3
+1-2 4-15:2" will bind the initial thread to CPU 0, the second to
+CPU 3, the third to CPU 1, the fourth to CPU 2, the fifth to CPU
+4, the sixth through tenth to CPUs 6, 8, 10, 12, and 14 respectively
+and then start assigning back from the beginning of the list.
+GOMP_CPU_AFFINITY=0 binds all threads to CPU 0.
 
-There is no libgomp library routine to determine whether a CPU affinity specification is in effect. As a workaround, language-specific library functions, e.g., getenv in C or GET_ENVIRONMENT_VARIABLE in Fortran, may be used to query the setting of the GOMP_CPU_AFFINITY environment variable. A defined CPU affinity on startup cannot be changed or disabled during the runtime of the application.
+There is no libgomp library routine to determine whether a CPU
+affinity specification is in effect. As a workaround,
+language-specific library functions, e.g., getenv in C or
+GET_ENVIRONMENT_VARIABLE in Fortran, may be used to query the
+setting of the GOMP_CPU_AFFINITY environment variable. A defined
+CPU affinity on startup cannot be changed or disabled during the
+run time of the application.
 
-If both GOMP_CPU_AFFINITY and OMP_PROC_BIND are set, OMP_PROC_BIND has a higher precedence. If neither has been set and OMP_PROC_BIND is unset, or when OMP_PROC_BIND is set to FALSE, the host system will handle the assignment of threads to CPUs.
+If both GOMP_CPU_AFFINITY and OMP_PROC_BIND are set, OMP_PROC_BIND
+has a higher precedence. If neither has been set and OMP_PROC_BIND
+is unset, or when OMP_PROC_BIND is set to FALSE, the host system
+will handle the assignment of threads to CPUs.
 
 This module provides access to, but does NOT validate this variable.
 
 =item C<GOMP_DEBUG>
 
-Enable debugging output. The variable should be set to 0 (disabled, also the default if not set), or 1 (enabled).
+Enable debugging output. The variable should be set to 0 (disabled,
+also the default if not set), or 1 (enabled).
 
-If enabled, some debugging output will be printed during execution. This is currently not specified in more detail, and subject to change.
+If enabled, some debugging output will be printed during execution.
+This is currently not specified in more detail, and subject to
+change.
 
 This variable is validated via setter.
 
 =item C<GOMP_STACKSIZE>
 
-Determines how long a threads waits actively with consuming CPU power before waiting passively without consuming CPU power. The value may be either INFINITE, INFINITY to always wait actively or an integer which gives the number of spins of the busy-wait loop. The integer may optionally be followed by the following suffixes acting as multiplication factors: k (kilo, thousand), M (mega, million), G (giga, billion), or T (tera, trillion). If undefined, 0 is used when OMP_WAIT_POLICY is PASSIVE, 300,000 is used when OMP_WAIT_POLICY is undefined and 30 billion is used when OMP_WAIT_POLICY is ACTIVE. If there are more OpenMP threads than available CPUs, 1000 and 100 spins are used for OMP_WAIT_POLICY being ACTIVE or undefined, respectively; unless the GOMP_SPINCOUNT is lower or OMP_WAIT_POLICY is PASSIVE.
+Determines how long a threads waits actively with consuming CPU
+power before waiting passively without consuming CPU power. The
+value may be either INFINITE, INFINITY to always wait actively or
+an integer which gives the number of spins of the busy-wait loop.
+The integer may optionally be followed by the following suffixes
+acting as multiplication factors: k (kilo, thousand), M (mega,
+million), G (giga, billion), or T (tera, trillion). If undefined,
+0 is used when OMP_WAIT_POLICY is PASSIVE, 300,000 is used when
+OMP_WAIT_POLICY is undefined and 30 billion is used when
+OMP_WAIT_POLICY is ACTIVE. If there are more OpenMP threads than
+available CPUs, 1000 and 100 spins are used for OMP_WAIT_POLICY
+being ACTIVE or undefined, respectively; unless the GOMP_SPINCOUNT
+is lower or OMP_WAIT_POLICY is PASSIVE.
 
 This module provides access to, but does NOT validate this variable.
 
 =item C<GOMP_SPINCOUNT>
 
-Set the default thread stack size in kilobytes. This is different from pthread_attr_get_set_assertstacksize which gets the number of bytes as an argument. If the stack size cannot be set due to system constraints, an error is reported and the initial stack size is left unchanged. If undefined, the stack size is system dependent.
+Set the default thread stack size in kilobytes. This is different
+from pthread_attr_get_set_assertstacksize which gets the number of
+bytes as an argument. If the stack size cannot be set due to system
+constraints, an error is reported and the initial stack size is
+left unchanged. If undefined, the stack size is system dependent.
 
 This module provides access to, but does NOT validate this variable.
 
 =item C<GOMP_RTEMS_THREAD_POOLS>
 
-This environment variable is only used on the RTEMS real-time operating system. It determines the scheduler instance specific thread pools. The format for GOMP_RTEMS_THREAD_POOLS is a list of optional <thread-pool-count>[$<priority>]@<scheduler-name> configurations separated by : where:
+This environment variable is only used on the RTEMS real-time
+operating system. It determines the scheduler instance specific
+thread pools. The format for GOMP_RTEMS_THREAD_POOLS is a list of
+optional <thread-pool-count>[$<priority>]@<scheduler-name>
+configurations separated by : where:
 
-1. C<thread-pool-count> is the thread pool count for this scheduler instance.
+1. C<thread-pool-count> is the thread pool count for this scheduler
+instance.
 
-2. $<priority> is an optional priority for the worker threads of a thread pool according to pthread_get_set_assertschedparam. In case a priority value is omitted, then a worker thread will inherit the priority of the OpenMP master thread that created it. The priority of the worker thread is not changed after creation, even if a new OpenMP master thread using the worker has a different priority.
+2. $<priority> is an optional priority for the worker threads of
+a thread pool according to pthread_get_set_assertschedparam. In
+case a priority value is omitted, then a worker thread will inherit
+the priority of the OpenMP master thread that created it. The
+priority of the worker thread is not changed after creation, even
+if a new OpenMP master thread using the worker has a different
+priority.
 
-3. @<scheduler-name> is the scheduler instance name according to the RTEMS application configuration.
+3. @<scheduler-name> is the scheduler instance name according to
+the RTEMS application configuration.
 
-In case no thread pool configuration is specified for a scheduler instance, then each OpenMP master thread of this scheduler instance will use its own dynamically allocated thread pool. To limit the worker thread count of the thread pools, each OpenMP master thread must call set_num_threads.
+In case no thread pool configuration is specified for a scheduler
+instance, then each OpenMP master thread of this scheduler instance
+will use its own dynamically allocated thread pool. To limit the
+worker thread count of the thread pools, each OpenMP master thread
+must call C<set_num_threads>.
 
 This module provides access to, but does NOT validate this variable.
 
@@ -1062,17 +1383,17 @@ oodler577
 
 =head1 ACKNOWLEDGEMENTS
 
-So far I've received great help on irc.perl.org channels, C<#pdl> and C<#native>. Specificially,
-C<sivoais>, C<mohawk_pts>, and C<plicease>; and specifically in regards to the use of C<Inline::C>
-above and investigating the issues related to shared library load time versus run time; and when
-the environment is initialized.
+So far I've received great help on irc.perl.org channels, C<#pdl>
+and C<#native>. Specificially, C<sivoais>, C<mohawk_pts>, and
+C<plicease>; and specifically in regards to the use of C<Inline::C>
+above and investigating the issues related to shared library load
+time versus run time; and when the environment is initialized.
 
 =head1 COPYRIGHT AND LICENSE
 
 Copyright (C) 2021 by oodler577
 
 This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.30.0 or,
-at your option, any later version of Perl 5 you may have available.
-
-=cut
+it under the same terms as Perl itself, either Perl version 5.30.0
+or, at your option, any later version of Perl 5 you may have
+available.

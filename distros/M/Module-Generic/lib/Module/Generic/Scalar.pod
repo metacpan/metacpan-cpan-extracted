@@ -242,6 +242,10 @@ Provided with a string or a regular expression like the one created with L<perlf
     $s->match( qr/WORLD/i ); # pass
     $s->match( 'monde' ); # obviously fail
 
+=head2 open
+
+Opens the scalar in read/write mode and returns an object with same capabilities as regular file handle.
+
 =head2 ord
 
 This returns the value of L<perlfunc/"ord"> on the string, as a L<Module::Generic::Number> object.
@@ -259,6 +263,14 @@ Provided with a number n and a string and this will create n instance of the str
 =head2 pos
 
 This sets or gets the position inside the string object. See L<perlfunc/pos> for detail about this.
+
+=head2 prepend
+
+Takes some data as its unique argument and prepend it to the scalar object underlying value.
+
+If you want to pass multiple data, you will have to join them first:
+
+    $s->prepend( join( '', qw( Cogito ergo sum ) ) );
 
 =head2 quotemeta
 

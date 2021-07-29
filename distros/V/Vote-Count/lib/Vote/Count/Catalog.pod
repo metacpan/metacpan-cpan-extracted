@@ -2,7 +2,7 @@
 
 =pod
 
-=head1 VERSION 2.00
+=head1 VERSION 2.01
 
 =head1 NAME
 
@@ -56,7 +56,7 @@ SmithSet IRV: L<Vote::Count::Method::CondorcetIRV>
 
 =item *
 
-BTR IRV: L<Vote::Count::Method::CondorcetIRV>
+BTR IRV: L<Vote::Count::IRV>
 
 =back
 
@@ -92,6 +92,10 @@ SmithSet IRV: L<Vote::Count::Method::CondorcetIRV>
 
 MinMax (Winning Votes and Margin) L<Vote::Count::Method::MinMax>
 
+=item *
+
+BTR IRV: L<Vote::Count::IRV>
+
 =back
 
 =head3 Complex Condorcet
@@ -112,7 +116,7 @@ SSD: I<unimplemented>
 
 =item *
 
-Kemmeny-Young: I<unimplemented>
+Kemeny-Young: I<unimplemented>
 
 =back
 

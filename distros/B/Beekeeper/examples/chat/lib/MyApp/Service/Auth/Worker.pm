@@ -6,7 +6,7 @@ use warnings;
 use MyApp::Service::Base;
 use base 'MyApp::Service::Base';
 
-use Beekeeper::Service::Router ':all';
+use Beekeeper::Worker::Extension::RemoteSession;
 use MyApp::Service::Chat;
 
 
@@ -31,6 +31,12 @@ sub on_startup {
     );
 
     log_info "Ready";
+}
+
+sub on_shutdown {
+    my $self = shift;
+
+    log_info "Stopped";
 }
 
 sub login {

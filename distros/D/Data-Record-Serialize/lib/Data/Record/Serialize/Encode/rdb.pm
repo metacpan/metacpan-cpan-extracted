@@ -4,7 +4,7 @@ package Data::Record::Serialize::Encode::rdb;
 
 use Moo::Role;
 
-our $VERSION = '0.20';
+our $VERSION = '0.23';
 
 has '+_need_types' => (
     is      => 'rwp',
@@ -25,10 +25,10 @@ has '+_needs_eol' => (
 
 use namespace::clean;
 
-#pod =for Pod::Coverage
-#pod   setup
-#pod
-#pod =cut
+
+
+
+
 
 sub setup {
 
@@ -39,10 +39,10 @@ sub setup {
 
 }
 
-#pod =for Pod::Coverage
-#pod  encode
-#pod
-#pod =cut
+
+
+
+
 
 sub encode {
     my $self = shift;
@@ -69,13 +69,15 @@ __END__
 
 =pod
 
+=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory
+
 =head1 NAME
 
 Data::Record::Serialize::Encode::rdb - encoded a record as /rdb
 
 =head1 VERSION
 
-version 0.20
+version 0.23
 
 =head1 SYNOPSIS
 

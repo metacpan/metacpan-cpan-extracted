@@ -1,4 +1,16 @@
-$Id: Changes 1839 2021-05-02 12:40:09Z willem $                       -*-text-*-
+$Id: Changes 1846 2021-07-16 12:15:07Z willem $                       -*-text-*-
+
+
+**** 1.32 Jul 16, 2021
+
+	Text: Offer both Unicode and escaped-ASCII strings.
+
+	Add LICENSE file to comply with Fedora/RedHat announcement.
+
+Fix rt.cpan.org #136666
+
+	Net::DNS::RR::ZoneFile parser erroneously strips line
+	terminators in quoted string forming part of multiline RR.
 
 
 **** 1.31 May 2, 2021

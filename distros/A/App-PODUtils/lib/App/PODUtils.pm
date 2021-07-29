@@ -1,9 +1,9 @@
 package App::PODUtils;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-06'; # DATE
+our $DATE = '2021-07-20'; # DATE
 our $DIST = 'App-PODUtils'; # DIST
-our $VERSION = '0.049'; # VERSION
+our $VERSION = '0.050'; # VERSION
 
 use 5.010001;
 use strict;
@@ -72,6 +72,20 @@ _
         pos => 0,
         default => ['-'],
         slurpy => 1,
+    },
+);
+
+our %argspecopt_naked_pod = (
+    naked_pod => {
+        schema => 'bool*',
+        summary => 'Strip =pod and =cut delimiters',
+        cmdline_aliases => {N=>{}},
+        description => <<'_',
+
+Normally, when outputing POD text, the `=pod` header and `=cut` footer are
+included. This option, if enabled, strips the outputting of such header/footer.
+
+_
     },
 );
 
@@ -195,6 +209,16 @@ sub _sort {
     $node->children(\@sorted_children);
 }
 
+sub _doc_as_pod_string {
+    my ($doc, $args) = @_;
+    my $res = $doc->as_pod_string;
+    if ($args->{naked_pod}) {
+        $res =~ s/\A\s*^=pod\s*//ms;
+        $res =~ s/^=cut\s*\z//ms;
+    }
+    $res;
+}
+
 $Sort::Sub::argsopt_sortsub{sort_sub}{cmdline_aliases} = {S=>{}};
 $Sort::Sub::argsopt_sortsub{sort_args}{cmdline_aliases} = {A=>{}};
 
@@ -246,6 +270,7 @@ rerun the utility and specify the `--command=head2` option.
 _
     args => {
         %arg0_pod,
+        %argspecopt_naked_pod,
         command => {
             schema => ['str*', {
                 match=>qr/\A\w+\z/,
@@ -269,7 +294,7 @@ sub sort_pod_headings {
 
     my $doc = _parse_pod($args{pod});
     _sort($doc, $command, $sorter, $sorter_meta);
-    $doc->as_pod_string;
+    _doc_as_pod_string($doc, \%args);
 }
 
 $SPEC{reverse_pod_headings} = {
@@ -277,6 +302,7 @@ $SPEC{reverse_pod_headings} = {
     summary => 'Reverse POD headings',
     args => {
         %arg0_pod,
+        %argspecopt_naked_pod,
         command => {
             schema => ['str*', {
                 match=>qr/\A\w+\z/,
@@ -347,7 +373,7 @@ App::PODUtils - Command-line utilities related to POD
 
 =head1 VERSION
 
-This document describes version 0.049 of App::PODUtils (from Perl distribution App-PODUtils), released on 2020-06-06.
+This document describes version 0.050 of App::PODUtils (from Perl distribution App-PODUtils), released on 2021-07-20.
 
 =head1 SYNOPSIS
 
@@ -383,7 +409,7 @@ POD:
 
 Usage:
 
- dump_pod_structure(%args) -> [status, msg, payload, meta]
+ dump_pod_structure(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Dump POD structure using Pod::Elemental.
 
@@ -408,12 +434,12 @@ Path to a .POD file, or a POD name (e.g. Foo::Bar) which will be searched in @IN
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -463,6 +489,13 @@ Arguments ('*' denotes required arguments):
 =over 4
 
 =item * B<command> => I<str> (default: "head1")
+
+=item * B<naked_pod> => I<bool>
+
+Strip =pod and =cut delimiters.
+
+Normally, when outputing POD text, the C<=pod> header and C<=cut> footer are
+included. This option, if enabled, strips the outputting of such header/footer.
 
 =item * B<pod> => I<perl::pod_filename> (default: "-")
 
@@ -533,6 +566,13 @@ Arguments ('*' denotes required arguments):
 
 =item * B<command> => I<str> (default: "head1")
 
+=item * B<naked_pod> => I<bool>
+
+Strip =pod and =cut delimiters.
+
+Normally, when outputing POD text, the C<=pod> header and C<=cut> footer are
+included. This option, if enabled, strips the outputting of such header/footer.
+
 =item * B<pod> => I<perl::pod_filename> (default: "-")
 
 Path to a .POD file, or a POD name (e.g. Foo::Bar) which will be searched in @INC.
@@ -570,11 +610,6 @@ feature.
 
 =head1 SEE ALSO
 
-
-L<pomdump>. Perinci::To::POD=HASH(0x55628ea7d630).
-
-L<podsel>.
-
 L<pod2html>
 
 L<podtohtml> from L<App::podtohtml>
@@ -589,7 +624,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2018, 2017, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

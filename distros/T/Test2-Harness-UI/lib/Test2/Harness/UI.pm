@@ -2,7 +2,7 @@ package Test2::Harness::UI;
 use strict;
 use warnings;
 
-our $VERSION = '0.000068';
+our $VERSION = '0.000075';
 
 use Router::Simple;
 use Text::Xslate(qw/mark_raw/);
@@ -56,7 +56,8 @@ sub init {
     $router->connect('/run/:id/delete'   => {controller => 'Test2::Harness::UI::Controller::Run', action => 'delete'});
     $router->connect('/run/:id/cancel'   => {controller => 'Test2::Harness::UI::Controller::Run', action => 'cancel'});
 
-    $router->connect('/job/:id'          => {controller => 'Test2::Harness::UI::Controller::Job'});
+    $router->connect('/job/:job'         => {controller => 'Test2::Harness::UI::Controller::Job'});
+    $router->connect('/job/:job/:try'    => {controller => 'Test2::Harness::UI::Controller::Job'});
     $router->connect('/event/:id'        => {controller => 'Test2::Harness::UI::Controller::Events', from => 'single_event'});
     $router->connect('/event/:id/events' => {controller => 'Test2::Harness::UI::Controller::Events', from => 'event'});
 
@@ -67,17 +68,23 @@ sub init {
     $router->connect('/coverage/:source'        => {controller => 'Test2::Harness::UI::Controller::Coverage'});
     $router->connect('/coverage/:source/:user'  => {controller => 'Test2::Harness::UI::Controller::Coverage'});
     $router->connect('/coverage/:source/delete' => {controller => 'Test2::Harness::UI::Controller::Coverage', delete => 1});
-    $router->connect('/failed/:source'          => {controller => 'Test2::Harness::UI::Controller::Failed'});
+
+    $router->connect('/failed/:source'                 => {controller => 'Test2::Harness::UI::Controller::Failed'});
+    $router->connect('/failed/:source/json'            => {controller => 'Test2::Harness::UI::Controller::Failed', json => 1});
+    $router->connect('/failed/:project/:idx'           => {controller => 'Test2::Harness::UI::Controller::Failed', json => 1});
+    $router->connect('/failed/:project/:username/:idx' => {controller => 'Test2::Harness::UI::Controller::Failed', json => 1});
 
     $router->connect('/download/:id' => {controller => 'Test2::Harness::UI::Controller::Download'});
 
-    $router->connect('/view'                  => {controller => 'Test2::Harness::UI::Controller::View'});
-    $router->connect('/view/:run_id'          => {controller => 'Test2::Harness::UI::Controller::View'});
-    $router->connect('/view/:run_id/:job_key' => {controller => 'Test2::Harness::UI::Controller::View'});
+    $router->connect('/view'                   => {controller => 'Test2::Harness::UI::Controller::View'});
+    $router->connect('/view/:run_id'           => {controller => 'Test2::Harness::UI::Controller::View'});
+    $router->connect('/view/:run_id/:job'      => {controller => 'Test2::Harness::UI::Controller::View'});
+    $router->connect('/view/:run_id/:job/:try' => {controller => 'Test2::Harness::UI::Controller::View'});
 
-    $router->connect('/stream'                  => {controller => 'Test2::Harness::UI::Controller::Stream'});
-    $router->connect('/stream/:run_id'          => {controller => 'Test2::Harness::UI::Controller::Stream'});
-    $router->connect('/stream/:run_id/:job_key' => {controller => 'Test2::Harness::UI::Controller::Stream'});
+    $router->connect('/stream'                   => {controller => 'Test2::Harness::UI::Controller::Stream'});
+    $router->connect('/stream/:run_id'           => {controller => 'Test2::Harness::UI::Controller::Stream'});
+    $router->connect('/stream/:run_id/:job'      => {controller => 'Test2::Harness::UI::Controller::Stream'});
+    $router->connect('/stream/:run_id/:job/:try' => {controller => 'Test2::Harness::UI::Controller::Stream'});
 
     $router->connect('/sweeper/:count/days'    => {controller => 'Test2::Harness::UI::Controller::Sweeper', units => 'day'});
     $router->connect('/sweeper/:count/hours'   => {controller => 'Test2::Harness::UI::Controller::Sweeper', units => 'hour'});

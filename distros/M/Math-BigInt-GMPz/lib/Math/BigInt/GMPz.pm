@@ -8,9 +8,9 @@ use Math::BigInt::Lib 1.999801;
 
 our @ISA = qw< Math::BigInt::Lib >;
 
-our $VERSION = '0.0006';
+our $VERSION = '0.0007';
 
-use Math::GMPz qw< :mpz >;
+use Math::GMPz 0.36 qw< :mpz >;
 
 sub import { }
 

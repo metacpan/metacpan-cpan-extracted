@@ -9,7 +9,7 @@ use vars qw($VERSION @EXPORT_OK %EXPORT_TAGS $DEBUG);
 
 $DEBUG = 0;
 # Based on XML::Sig VERSION = '0.47';
-$VERSION = '0.34';
+$VERSION = '0.40';
 
 use base qw(Class::Accessor);
 Net::SAML2::XML::Sig->mk_accessors(qw(key));
@@ -23,6 +23,7 @@ use base qw/Exporter/;
 
 use Digest::SHA qw(sha1 sha224 sha256 sha384 sha512);
 use XML::LibXML;
+use Net::SAML2::XML::Util qw/ no_comments /;
 use MIME::Base64;
 use Carp;
 
@@ -111,7 +112,12 @@ sub sign {
 
     local $XML::LibXML::skipXMLDeclaration = $self->{ no_xml_declaration };
 
-    my $dom = XML::LibXML->load_xml( string => $xml );
+    my $dom = no_comments($xml);
+    #my $dom = XML::LibXML->load_xml(
+    #                string => $xml,
+    #                no_network => 1,
+    #                load_ext_dtd => 0,
+    #                expand_entities => 0 );
 
     $self->{ parser } = XML::LibXML::XPathContext->new($dom);
     $self->{ parser }->registerNs('dsig', 'http://www.w3.org/2000/09/xmldsig#');
@@ -253,7 +259,12 @@ sub verify {
     delete $self->{signer_cert};
     my ($xml) = @_;
 
-    my $dom = XML::LibXML->load_xml( string => $xml );
+    my $dom = no_comments($xml);
+    #my $dom = XML::LibXML->load_xml(
+    #                string => $xml,
+    #                no_network => 1,
+    #                load_ext_dtd => 0,
+    #                expand_entities => 0 );
 
     $self->{ parser } = XML::LibXML::XPathContext->new($dom);
     $self->{ parser }->registerNs('dsig', 'http://www.w3.org/2000/09/xmldsig#');
@@ -1478,7 +1489,7 @@ Net::SAML2::XML::Sig
 
 =head1 VERSION
 
-version 0.34
+version 0.40
 
 =head1 SYNOPSIS
 
@@ -1793,18 +1804,11 @@ Maintainer: Timothy Legge <timlegge@cpan.org>
 
 =head1 AUTHOR
 
-Original Author: Chris Andrews  <chrisa@cpan.org>
+Chris Andrews  <chrisa@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Chris Andrews and Others; in detail:
-
-  Copyright 2011       Chris Andrews, Oskari Okko Ojala
-            2012       Chris Andrews, Peter Marschall
-            2016       Jeff Fearn
-            2017       Mike Wisener, xmikew
-            2019-2021  Timothy Legge
-
+This software is copyright (c) 2021 by Chris Andrews and Others, see the git log.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
@@ -1814,3 +1818,4 @@ the same terms as the Perl 5 programming language system itself.
 __END__
 
 }
+

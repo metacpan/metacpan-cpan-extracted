@@ -30,13 +30,12 @@ my @dec = exception_decode($error);
 my $msg = pop @dec;
 
 # error code changed from libxml2 2.9.9 to 2.9.10
-my $rc = delete $dec[1]{errno};
-$dec[1]{errno} = 'RC';
+my $rc = delete $dec[0]{errno};
+$dec[0]{errno} = 'RC';
 cmp_ok $rc, '>', 13000, 'error code';
 
 is_deeply \@dec,
-  , [ 'caught XML::LibXML::Error'
-    , { location => [ 'libxml', '', '1', 'parser' ], errno => 'RC' }
+  , [ { location => [ 'libxml', '', '1', 'parser' ], errno => 'RC' }
     , 'ERROR'
     ], 'error 1';
 

@@ -11,8 +11,8 @@ use Socket;
 use lib "t/lib";
 use UVTestHelpers qw(socketpair_inet_dgram);
 
-# TODO: This test might not work on MSWin32. We might need to find a different
-#   implementation, or just skip it?
+$^O eq "MSWin32" and
+    plan skip_all => "UV::UDP->open is not supported on Windows";
 
 # recv
 {

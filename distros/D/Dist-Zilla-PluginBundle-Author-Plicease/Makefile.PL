@@ -70,6 +70,7 @@ my %WriteMakefileArgs = (
     "lib/Dist/Zilla/PluginBundle/Author/Plicease.pm"            => "\$(INST_LIB)/Dist/Zilla/PluginBundle/Author/Plicease.pm"
   },
   "PREREQ_PM" => {
+    "Config::INI::Reader"                     => 0,
     "Data::Section"                           => 0,
     "Dist::Zilla"                             => "6.00",
     "Dist::Zilla::Plugin::AutoMetaResources"  => "1.20",
@@ -84,6 +85,7 @@ my %WriteMakefileArgs = (
     "Dist::Zilla::Plugin::Run::BeforeBuild"   => "0.035",
     "Dist::Zilla::Role::PluginBundle::Easy"   => 0,
     "Dist::Zilla::Role::TextTemplate"         => 0,
+    "Dist::Zilla::Util::AuthorDeps"           => 0,
     "Dist::Zilla::Util::CurrentCmd"           => 0,
     "File::ShareDir::Dist"                    => 0,
     "File::Which"                             => 0,
@@ -109,7 +111,7 @@ my %WriteMakefileArgs = (
     "Test2::V0"    => "0.000121",
     "Test::Script" => "1.10"
   },
-  "VERSION" => "2.66",
+  "VERSION" => "2.67",
   "test"    => {
     "TESTS" => "t/*.t"
   }

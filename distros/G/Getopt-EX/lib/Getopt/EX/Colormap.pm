@@ -1,5 +1,5 @@
 package Getopt::EX::Colormap;
-use version; our $VERSION = version->declare("v1.23.3");
+use version; our $VERSION = version->declare("v1.24.1");
 
 use v5.14;
 use warnings;
@@ -68,7 +68,7 @@ sub ansi256_number {
 	($r, $g, $b) = ($1, $2, $3);
     }
     elsif (my($n) = $code =~ /^L(\d+)/i) {
-	$n > 25 and die "Color spec error: $code";
+	$n > 25 and croak "Color spec error: $code.";
 	if ($n == 0 or $n == 25) {
 	    $r = $g = $b = $n / 5;
 	} else {
@@ -76,7 +76,7 @@ sub ansi256_number {
 	}
     }
     else {
-	die "Color spec error: $code";
+	croak "Color spec error: $code.";
     }
     defined $grey ? ($grey + 232) : ($r*36 + $g*6 + $b + 16);
 }
@@ -108,7 +108,7 @@ sub rgb24_number {
 sub rgbhex {
     my $rgb = shift =~ s/^#//r;
     my $len = length $rgb;
-    die "$rgb: Invalid RGB value" if $len == 0 || $len % 3;
+    croak "$rgb: Invalid RGB value." if $len == 0 || $len % 3;
     $len /= 3;
     my $max = (2 ** ($len * 4)) - 1;
     my @rgb24 = map { hex($_) * 255 / $max } $rgb =~ /[0-9a-z]{$len}/gi or die;
@@ -180,7 +180,7 @@ sub ansi_numbers {
 	}
 	elsif (my $rgb = $+{rgb}) {
 	    my @rgb = $rgb =~ /(\d+)/g;
-	    die "Unexpected value: $rgb\n" if grep { $_ > 255 } @rgb;
+	    croak "Unexpected value: $rgb." if grep { $_ > 255 } @rgb;
 	    my $hex = sprintf "%02X%02X%02X", @rgb;
 	    push @numbers, 38 + $toggle->value, rgbhex($hex);
 	}
@@ -214,14 +214,14 @@ sub ansi_numbers {
 	    if (my $rgb = $colornames->hex($+{name})) {
 		push @numbers, 38 + $toggle->value, rgbhex($rgb);
 	    } else {
-		die "Unknown color name: $+{name}\n";
+		croak "Unknown color name: $+{name}.";
 	    }
 	}
 	elsif (my $err = $+{err}) {
-	    die "Color spec error: \"$err\" in \"$_\".\n"
+	    croak "Color spec error: \"$err\" in \"$_\"."
 	}
 	else {
-	    die "$_: Something strange.\n";
+	    croak "$_: Something strange.";
 	}
     } continue {
 	if ($SPLIT_ANSI) {
@@ -340,7 +340,7 @@ sub cached_colorize {
 	}
 	push @result, $text;
     }
-    croak "Wrong number of parameters" if @_;
+    croak "Wrong number of parameters." if @_;
     join '', @result;
 }
 
@@ -364,7 +364,7 @@ sub new {
 
     $obj->{CACHE} = {};
     $opt{CONCAT} //= "^"; # Reset character for LabeledParam object
-    configure $obj %opt;
+    $obj->configure(%opt);
 
     $obj;
 }

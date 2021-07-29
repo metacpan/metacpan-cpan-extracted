@@ -1,0 +1,52 @@
+NAME
+    Mojolicious::Plugin::Mongodbv2 - MongoDB v2 driver in Mojolicious
+
+VERSION
+    version 1.00
+
+SYNOPSIS
+        plugin 'mongodbv2', {
+            host => 'mongodb://localhost/mongodbv2',
+            helper => 'db',
+        }
+
+DESCRIPTION
+    Provides helper to easy use MongoDB v2 driver in Mojolicious
+    application.
+
+CONFIGURATION OPTIONS
+        host                (optional)  MongoDB URI Connection
+                                        (default: 'mongodb://localhost/mongodbv2')
+        helper              (optional)  The name to give to the easy-access helper
+                                        (default: 'db')
+
+    All other options passed to the plugin are used to connect to MongoDB.
+
+HELPERS/ATTRIBUTES
+  mongodb_connection
+    This plugin helper will return the MongoDB::MongoClient object
+
+  db
+    This is the name of the default easy-access helper.
+
+BUGS/CONTRIBUTING
+    Please report any bugs through the web interface at
+    <https://github.com/EmilianoBruni/mojolicious-plugin-mongodbv2/issues>
+    If you want to contribute changes or otherwise involve yourself in
+    development, feel free to fork the Git repository from
+    <https://github.com/EmilianoBruni/mojolicious-plugin-mongodbv2/>.
+
+SUPPORT
+    You can find this documentation with the perldoc command too.
+
+        perldoc Mojolicious::Plugin::Mongodbv2
+
+AUTHOR
+    Emiliano Bruni <info@ebruni.it>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2021 by Emiliano Bruni.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -4,17 +4,34 @@ examples/number.pl
 lib/Math/BigInt/Named.pm
 lib/Math/BigInt/Named/English.pm
 lib/Math/BigInt/Named/German.pm
+lib/Math/BigInt/Named/Norwegian.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
 README
+README.md
+t/00sig.t
+t/01load.t
 t/english.t
 t/german.t
 t/named.t
-t/pod.t
-t/pod_cov.t
+t/norwegian.t
 TODO
+xt/author/critic.t
+xt/release/changelog.t
+xt/release/cpan-changes.t
+xt/release/dist-manifest.t
+xt/release/distmeta.t
+xt/release/git.t
+xt/release/kwalitee.t
+xt/release/minimum-version.t
+xt/release/pod-coverage.t
+xt/release/pod-linkcheck.t
+xt/release/pod-syntax.t
+xt/release/portability.t
+xt/release/unused-vars.t
+xt/release/version.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)
 SIGNATURE                                Public-key signature (added by MakeMaker)

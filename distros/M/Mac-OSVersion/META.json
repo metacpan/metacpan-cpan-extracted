@@ -1,10 +1,10 @@
 {
-   "abstract" : "Get the Mac OS X system version",
+   "abstract" : "Get the Mac OS X or macOS system version",
    "author" : [
       "brian d foy <bdfoy@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -49,6 +49,6 @@
          "web" : "https://github.com/briandfoy/mac-osversion"
       }
    },
-   "version" : "1.004",
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "version" : "1.006",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

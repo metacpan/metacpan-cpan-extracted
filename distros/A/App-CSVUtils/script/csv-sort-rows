@@ -1,12 +1,12 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/CSVUtils/csv_sort_rows
-# and generated automatically using Perinci::CmdLine::Gen version 0.496
+# and generated automatically using Perinci::CmdLine::Gen version 0.499
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-08-16'; # DATE
+our $DATE = '2021-07-10'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '0.032'; # VERSION
+our $VERSION = '0.034'; # VERSION
 
 use 5.010001;
 use strict;
@@ -38,23 +38,13 @@ csv-sort-rows - Sort CSV rows
 
 =head1 VERSION
 
-This document describes version 0.032 of csv-sort-rows (from Perl distribution App-CSVUtils), released on 2020-08-16.
+This document describes version 0.034 of csv-sort-rows (from Perl distribution App-CSVUtils), released on 2021-07-10.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % csv-sort-rows [-H] [--by-code-json=s] [--by-code=s] [--by-fields=s]
-     [--by-sortsub=s] [--ci] [--escape-char=s] [--format=name] [--hash]
-     [--header] [-i] [--input-header] [--input-tsv] [--json] [-k=s]
-     [--key-json=s] [--key=s] [--(no)naked-res] [--no-header]
-     [--no-output-header] [--no-output-tsv] [--no-tsv] [--noheader]
-     [--nooutput-header] [--nooutput-tsv] [--notsv]
-     [--output-escape-char=s] [--output-header] [--output-quote-char=s]
-     [--output-sep-char=s] [--output-tsv] [--page-result[=program]]
-     [--quote-char=s] [-r] [--reverse] [--sep-char=s]
-     [--sortsub-args-json=s] [--sortsub-args key=s] [--tsv]
-     [--view-result[=program]] <filename>
+% B<csv-sort-rows> [B<--by-code>=I<any>|B<--by-code-json>=I<json>] [B<--by-fields>=I<str>] [B<--by-sortsub>=I<str>] [B<--ci>|B<-i>] [B<--escape-char>=I<str>] [B<--format>=I<name>] [B<--hash>|B<-H>] [B<--header>|B<--input-header>|B<--no-header>|B<--noheader>] [B<--json>] [B<--key>=I<any>|B<--key-json>=I<json>|B<-k>=I<any>] [B<--(no)naked-res>] [B<--output-escape-char>=I<str>] [B<--output-header>|B<--no-output-header>|B<--nooutput-header>] [B<--output-quote-char>=I<str>] [B<--output-sep-char>=I<str>] [B<--output-tsv>|B<--no-output-tsv>|B<--nooutput-tsv>] [B<--page-result>[=I<program>]] [B<--quote-char>=I<str>] [B<--reverse>|B<-r>] [B<--sep-char>=I<str>] [(B<--sortsub-args> I<key>=I<s>)+|B<--sortsub-args-json>=I<json>] [B<--tsv>|B<--input-tsv>|B<--no-tsv>|B<--notsv>] [B<--view-result>[=I<program>]] -- E<lt>I<filename>E<gt>
 
 =head1 DESCRIPTION
 
@@ -233,6 +223,8 @@ Input CSV file.
 
 Use `-` to read from stdin.
 
+
+Can also be specified as the 1st command-line argument.
 
 =item B<--no-header>, B<--input-header>
 
@@ -434,7 +426,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2018, 2017, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

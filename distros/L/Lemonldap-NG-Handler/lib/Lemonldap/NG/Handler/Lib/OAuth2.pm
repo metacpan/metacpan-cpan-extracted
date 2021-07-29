@@ -1,8 +1,9 @@
 package Lemonldap::NG::Handler::Lib::OAuth2;
+use Lemonldap::NG::Common::JWT qw(getAccessTokenSessionId);
 
 use strict;
 
-our $VERSION = '2.0.8';
+our $VERSION = '2.0.12';
 
 sub retrieveSession {
     my ( $class, $req, $id ) = @_;
@@ -10,16 +11,17 @@ sub retrieveSession {
 
     # Retrieve regular session if this is not an offline access token
     unless ($offlineId) {
-        my $data = {
-            %{
-                $class->Lemonldap::NG::Handler::Main::retrieveSession( $req,
-                    $id )
-            },
-            $class->_getTokenAttributes($req)
-        };
+        my $data =
+          $class->Lemonldap::NG::Handler::Main::retrieveSession( $req, $id );
+        if ( ref($data) eq "HASH" ) {
+            $data = { %{$data}, $class->_getTokenAttributes($req) };
 
-        # Update cache
-        $class->data($data);
+            # Update cache
+            $class->data($data);
+        }
+        else {
+            $req->data->{oauth2_error} = 'invalid_token';
+        }
         return $data;
     }
 
@@ -86,7 +88,16 @@ sub fetchId {
     }
 
     # Get access token session
-    my $infos = $class->getOIDCInfos($access_token);
+    my $access_token_sid = getAccessTokenSessionId($access_token);
+    unless ($access_token_sid) {
+        $req->data->{oauth2_error} = 'invalid_token';
+        return;
+    }
+    my $infos = $class->getOIDCInfos($access_token_sid);
+    unless ($infos) {
+        $req->data->{oauth2_error} = 'invalid_token';
+        return;
+    }
 
     # Store scope and rpid for future session attributes
     if ( $infos->{rp} ) {
@@ -140,6 +151,20 @@ sub getOIDCInfos {
 
     unless ( $oidcSession->error ) {
         $class->logger->debug("Get OIDC session $id");
+
+        # Verify that session is valid
+        unless ( $oidcSession->data->{_utime} ) {
+            $class->logger->error("_utime missing from Access Token session");
+            return;
+        }
+
+        my $ttl = $class->tsv->{timeout} - time + $oidcSession->data->{_utime};
+        $class->logger->debug( "Session TTL = " . $ttl );
+
+        if ( time - $oidcSession->data->{_utime} > $class->tsv->{timeout} ) {
+            $class->logger->info("Access Token session $id expired");
+            return;
+        }
 
         $infos = { %{ $oidcSession->data } };
     }

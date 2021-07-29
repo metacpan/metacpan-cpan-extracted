@@ -4,8 +4,8 @@
 #
 package PDL::Graphics::PLplot;
 
-@EXPORT_OK  = qw( PL_PARSE_PARTIAL PL_PARSE_FULL PL_PARSE_QUIET PL_PARSE_NODELETE PL_PARSE_SHOWALL PL_PARSE_OVERRIDE PL_PARSE_NOPROGRAM PL_PARSE_NODASH PL_PARSE_SKIP PL_NOTSET DRAW_LINEX DRAW_LINEY DRAW_LINEXY MAG_COLOR BASE_CONT TOP_CONT SURF_CONT DRAW_SIDES FACETED MESH PL_FCI_SANS PL_FCI_MONO PLK_BackSpace PLK_Tab PLK_Linefeed PLK_Return PLK_Escape PLK_Delete PLK_Clear PLK_Pause PLK_Scroll_Lock PLK_Home PLK_Left PLK_Up PLK_Right PLK_Down PLK_Prior PLK_Next PLK_End PLK_Begin PLK_Select PLK_Print PLK_Execute PLK_Insert PLK_Undo PLK_Redo PLK_Menu PLK_Find PLK_Cancel PLK_Help PLK_Break PLK_Mode_switch PLK_script_switch PLK_Num_Lock PLK_KP_Space PLK_KP_Tab PLK_KP_Enter PLK_KP_F1 PLK_KP_F2 PLK_KP_F3 PLK_KP_F4 PLK_KP_Equal PLK_KP_Multiply PLK_KP_Add PLK_KP_Separator PLK_KP_Subtract PLK_KP_Decimal PLK_KP_Divide PLK_KP_0 PLK_KP_1 PLK_KP_2 PLK_KP_3 PLK_KP_4 PLK_KP_5 PLK_KP_6 PLK_KP_7 PLK_KP_8 PLK_KP_9 PLK_F1 PLK_F2 PLK_F3 PLK_F4 PLK_F5 PLK_F6 PLK_F7 PLK_F8 PLK_F9 PLK_F10 PLK_F11 PLK_L1 PLK_F12 PLK_L2 PLK_F13 PLK_L3 PLK_F14 PLK_L4 PLK_F15 PLK_L5 PLK_F16 PLK_L6 PLK_F17 PLK_L7 PLK_F18 PLK_L8 PLK_F19 PLK_L9 PLK_F20 PLK_L10 PLK_F21 PLK_R1 PLK_F22 PLK_R2 PLK_F23 PLK_R3 PLK_F24 PLK_R4 PLK_F25 PLK_R5 PLK_F26 PLK_R6 PLK_F27 PLK_R7 PLK_F28 PLK_R8 PLK_F29 PLK_R9 PLK_F30 PLK_R10 PLK_F31 PLK_R11 PLK_F32 PLK_R12 PLK_R13 PLK_F33 PLK_F34 PLK_R14 PLK_F35 PLK_R15 PLK_Shift_L PLK_Shift_R PLK_Control_L PLK_Control_R PLK_Caps_Lock PLK_Shift_Lock PLK_Meta_L PLK_Meta_R PLK_Alt_L PLK_Alt_R PLK_Super_L PLK_Super_R PLK_Hyper_L PLK_Hyper_R GRID_CSA GRID_DTLI GRID_NNI GRID_NNIDW GRID_NNLI GRID_NNAIDW PL_X_AXIS PL_Y_AXIS PL_Z_AXIS PL_COLORBAR_SHADE PL_COLORBAR_SHADE_LABEL PL_COLORBAR_IMAGE PL_COLORBAR_GRADIENT PL_COLORBAR_CAP_NONE PL_COLORBAR_CAP_LOW PL_COLORBAR_CAP_HIGH PL_COLORBAR_LABEL_LEFT PL_COLORBAR_LABEL_RIGHT PL_COLORBAR_LABEL_TOP PL_COLORBAR_LABEL_BOTTOM PL_LEGEND_BACKGROUND PL_LEGEND_BOUNDING_BOX PL_LEGEND_COLOR_BOX PL_LEGEND_LINE PL_LEGEND_NONE PL_LEGEND_ROW_MAJOR PL_LEGEND_SYMBOL PL_LEGEND_TEXT_LEFT PL_POSITION_BOTTOM PL_POSITION_INSIDE PL_POSITION_LEFT PL_POSITION_OUTSIDE PL_POSITION_RIGHT PL_POSITION_SUBPAGE PL_POSITION_TOP PL_POSITION_VIEWPORT plplot_use_standard_argument_order PDL::PP pladv plaxes PDL::PP plaxes_pp PDL::PP plbin plbop plbox PDL::PP plbox_pp plbox3 PDL::PP plbox3_pp plclear PDL::PP plcol0 PDL::PP plcol1 PDL::PP plcpstrm PDL::PP pldid2pc PDL::PP pldip2dc plend plend1 PDL::PP plenv PDL::PP plenv0 pleop PDL::PP plerrx PDL::PP plerry plfamadv PDL::PP plfill3 plflush PDL::PP plfont PDL::PP plfontld PDL::PP plgchr PDL::PP plgcompression PDL::PP plgdidev PDL::PP plgdiori PDL::PP plgdiplt PDL::PP plgfam PDL::PP plglevel PDL::PP plgpage plgra PDL::PP plgspa PDL::PP plgvpd PDL::PP plgvpw PDL::PP plgxax PDL::PP plgyax PDL::PP plgzax plinit PDL::PP pljoin pllab PDL::PP pllightsource PDL::PP pllsty plmtex PDL::PP plmtex_pp plmtex3 PDL::PP plmtex3_pp PDL::PP plpat PDL::PP plprec PDL::PP plpsty PDL::PP plptex PDL::PP plptex3 plreplot PDL::PP plschr PDL::PP plscmap0n PDL::PP plscmap1n PDL::PP plscol0 PDL::PP plscolbg PDL::PP plscolor PDL::PP plscompression plsdev PDL::PP plsdidev PDL::PP plsdimap PDL::PP plsdiori PDL::PP plsdiplt PDL::PP plsdiplz PDL::PP pl_setcontlabelparam PDL::PP pl_setcontlabelformat PDL::PP plsfam plsfnam PDL::PP plsmaj PDL::PP plsmin PDL::PP plsori PDL::PP plspage PDL::PP plspause PDL::PP plsstrm PDL::PP plssub PDL::PP plssym PDL::PP plstar plstart PDL::PP plstart_pp PDL::PP plstripa PDL::PP plstripd PDL::PP plsvpa PDL::PP plsxax PDL::PP plsxwin PDL::PP plsyax PDL::PP plszax pltext PDL::PP plvasp PDL::PP plvpas PDL::PP plvpor plvsta PDL::PP plw3d PDL::PP plwidth PDL::PP plwind plsetopt PDL::PP plP_gpixmm PDL::PP plscolbga PDL::PP plscol0a PDL::PP plline PDL::PP plpath PDL::PP plcolorpoints PDL::PP plsmem PDL::PP plfbox PDL::PP plfbox1 PDL::PP plunfbox PDL::PP plunfbox1 PDL::PP plParseOpts PDL::PP plpoin PDL::PP plpoin3 PDL::PP plline3 PDL::PP plpoly3 PDL::PP plhist PDL::PP plfill PDL::PP plgradient PDL::PP plsym PDL::PP plsurf3d PDL::PP plsurf3dl PDL::PP plstyl PDL::PP plseed PDL::PP plrandd pltr0 pltr1 pltr2 PDL::PP plAllocGrid plFreeGrid PDL::PP plAlloc2dGrid plFree2dGrid PDL::PP init_pltr plmap PDL::PP plmap_pp PDL::PP plstring PDL::PP plstring3 plmeridians PDL::PP plmeridians_pp plshades PDL::PP plshades_pp PDL::PP plcont PDL::PP plmesh PDL::PP plmeshc PDL::PP plot3d PDL::PP plot3dc PDL::PP plscmap1l plshade1 PDL::PP plshade1_pp PDL::PP plimage PDL::PP plimagefr plxormod plGetCursor plgstrm plgdev plgfnam plmkstrm plgver plstripc PDL::PP plstripc_pp PDL::PP plgriddata plarc plstransform plslabelfunc pllegend plspal0 plspal1 plbtime plconfigtime plctime pltimefmt plsesc PDL::PP plvect PDL::PP plsvect PDL::PP plhlsrgb PDL::PP plgcol0 PDL::PP plgcolbg PDL::PP plscmap0 PDL::PP plscmap1 PDL::PP plgcol0a PDL::PP plgcolbga PDL::PP plscmap0a PDL::PP plscmap1a PDL::PP plscmap1la PDL::PP plgfont PDL::PP plsfont PDL::PP plcalc_world  plgfci  plsfci );
-%EXPORT_TAGS = (Func=>[@EXPORT_OK]);
+our @EXPORT_OK = qw(PL_PARSE_PARTIAL PL_PARSE_FULL PL_PARSE_QUIET PL_PARSE_NODELETE PL_PARSE_SHOWALL PL_PARSE_OVERRIDE PL_PARSE_NOPROGRAM PL_PARSE_NODASH PL_PARSE_SKIP PL_NOTSET DRAW_LINEX DRAW_LINEY DRAW_LINEXY MAG_COLOR BASE_CONT TOP_CONT SURF_CONT DRAW_SIDES FACETED MESH PL_FCI_SANS PL_FCI_MONO PLK_BackSpace PLK_Tab PLK_Linefeed PLK_Return PLK_Escape PLK_Delete PLK_Clear PLK_Pause PLK_Scroll_Lock PLK_Home PLK_Left PLK_Up PLK_Right PLK_Down PLK_Prior PLK_Next PLK_End PLK_Begin PLK_Select PLK_Print PLK_Execute PLK_Insert PLK_Undo PLK_Redo PLK_Menu PLK_Find PLK_Cancel PLK_Help PLK_Break PLK_Mode_switch PLK_script_switch PLK_Num_Lock PLK_KP_Space PLK_KP_Tab PLK_KP_Enter PLK_KP_F1 PLK_KP_F2 PLK_KP_F3 PLK_KP_F4 PLK_KP_Equal PLK_KP_Multiply PLK_KP_Add PLK_KP_Separator PLK_KP_Subtract PLK_KP_Decimal PLK_KP_Divide PLK_KP_0 PLK_KP_1 PLK_KP_2 PLK_KP_3 PLK_KP_4 PLK_KP_5 PLK_KP_6 PLK_KP_7 PLK_KP_8 PLK_KP_9 PLK_F1 PLK_F2 PLK_F3 PLK_F4 PLK_F5 PLK_F6 PLK_F7 PLK_F8 PLK_F9 PLK_F10 PLK_F11 PLK_L1 PLK_F12 PLK_L2 PLK_F13 PLK_L3 PLK_F14 PLK_L4 PLK_F15 PLK_L5 PLK_F16 PLK_L6 PLK_F17 PLK_L7 PLK_F18 PLK_L8 PLK_F19 PLK_L9 PLK_F20 PLK_L10 PLK_F21 PLK_R1 PLK_F22 PLK_R2 PLK_F23 PLK_R3 PLK_F24 PLK_R4 PLK_F25 PLK_R5 PLK_F26 PLK_R6 PLK_F27 PLK_R7 PLK_F28 PLK_R8 PLK_F29 PLK_R9 PLK_F30 PLK_R10 PLK_F31 PLK_R11 PLK_F32 PLK_R12 PLK_R13 PLK_F33 PLK_F34 PLK_R14 PLK_F35 PLK_R15 PLK_Shift_L PLK_Shift_R PLK_Control_L PLK_Control_R PLK_Caps_Lock PLK_Shift_Lock PLK_Meta_L PLK_Meta_R PLK_Alt_L PLK_Alt_R PLK_Super_L PLK_Super_R PLK_Hyper_L PLK_Hyper_R GRID_CSA GRID_DTLI GRID_NNI GRID_NNIDW GRID_NNLI GRID_NNAIDW PL_X_AXIS PL_Y_AXIS PL_Z_AXIS PL_COLORBAR_SHADE PL_COLORBAR_SHADE_LABEL PL_COLORBAR_IMAGE PL_COLORBAR_GRADIENT PL_COLORBAR_CAP_NONE PL_COLORBAR_CAP_LOW PL_COLORBAR_CAP_HIGH PL_COLORBAR_LABEL_LEFT PL_COLORBAR_LABEL_RIGHT PL_COLORBAR_LABEL_TOP PL_COLORBAR_LABEL_BOTTOM PL_LEGEND_BACKGROUND PL_LEGEND_BOUNDING_BOX PL_LEGEND_COLOR_BOX PL_LEGEND_LINE PL_LEGEND_NONE PL_LEGEND_ROW_MAJOR PL_LEGEND_SYMBOL PL_LEGEND_TEXT_LEFT PL_POSITION_BOTTOM PL_POSITION_INSIDE PL_POSITION_LEFT PL_POSITION_OUTSIDE PL_POSITION_RIGHT PL_POSITION_SUBPAGE PL_POSITION_TOP PL_POSITION_VIEWPORT plplot_use_standard_argument_order PDL::PP pladv PDL::PP plaxes PDL::PP plbin plbop PDL::PP plbox PDL::PP plbox3 plclear PDL::PP plcol0 PDL::PP plcol1 PDL::PP plcpstrm PDL::PP pldid2pc PDL::PP pldip2dc plend plend1 PDL::PP plenv PDL::PP plenv0 pleop PDL::PP plerrx PDL::PP plerry plfamadv PDL::PP plfill3 plflush PDL::PP plfont PDL::PP plfontld PDL::PP plgchr PDL::PP plgcompression PDL::PP plgdidev PDL::PP plgdiori PDL::PP plgdiplt PDL::PP plgfam PDL::PP plglevel PDL::PP plgpage plgra PDL::PP plgspa PDL::PP plgvpd PDL::PP plgvpw PDL::PP plgxax PDL::PP plgyax PDL::PP plgzax plinit PDL::PP pljoin pllab PDL::PP pllightsource PDL::PP pllsty PDL::PP plmtex PDL::PP plmtex3 PDL::PP plpat PDL::PP plprec PDL::PP plpsty PDL::PP plptex PDL::PP plptex3 plreplot PDL::PP plschr PDL::PP plscmap0n PDL::PP plscmap1n PDL::PP plscol0 PDL::PP plscolbg PDL::PP plscolor PDL::PP plscompression plsdev PDL::PP plsdidev PDL::PP plsdimap PDL::PP plsdiori PDL::PP plsdiplt PDL::PP plsdiplz PDL::PP pl_setcontlabelparam PDL::PP pl_setcontlabelformat PDL::PP plsfam plsfnam PDL::PP plsmaj PDL::PP plsmin PDL::PP plsori PDL::PP plspage PDL::PP plspause PDL::PP plsstrm PDL::PP plssub PDL::PP plssym PDL::PP plstar PDL::PP plstart PDL::PP plstripa PDL::PP plstripd PDL::PP plsvpa PDL::PP plsxax PDL::PP plsxwin PDL::PP plsyax PDL::PP plszax pltext PDL::PP plvasp PDL::PP plvpas PDL::PP plvpor plvsta PDL::PP plw3d PDL::PP plwidth PDL::PP plwind plsetopt PDL::PP plP_gpixmm PDL::PP plscolbga PDL::PP plscol0a PDL::PP plline PDL::PP plpath PDL::PP plcolorpoints PDL::PP plsmem PDL::PP plfbox PDL::PP plfbox1 PDL::PP plunfbox PDL::PP plunfbox1 PDL::PP plParseOpts PDL::PP plpoin PDL::PP plpoin3 PDL::PP plline3 PDL::PP plpoly3 PDL::PP plhist PDL::PP plfill PDL::PP plgradient PDL::PP plsym PDL::PP plsurf3d PDL::PP plsurf3dl PDL::PP plstyl PDL::PP plseed PDL::PP plrandd pltr0 pltr1 pltr2 PDL::PP plAllocGrid plFreeGrid PDL::PP plAlloc2dGrid plFree2dGrid PDL::PP init_pltr PDL::PP plmap PDL::PP plstring PDL::PP plstring3 PDL::PP plmeridians PDL::PP plshades PDL::PP plcont PDL::PP plmesh PDL::PP plmeshc PDL::PP plot3d PDL::PP plot3dc PDL::PP plscmap1l PDL::PP plshade1 PDL::PP plimage PDL::PP plimagefr plxormod plGetCursor plgstrm plgdev plgfnam plmkstrm plgver PDL::PP plstripc PDL::PP plgriddata plarc plstransform plslabelfunc pllegend plspal0 plspal1 plbtime plconfigtime plctime pltimefmt plsesc PDL::PP plvect PDL::PP plsvect PDL::PP plhlsrgb PDL::PP plgcol0 PDL::PP plgcolbg PDL::PP plscmap0 PDL::PP plscmap1 PDL::PP plgcol0a PDL::PP plgcolbga PDL::PP plscmap0a PDL::PP plscmap1a PDL::PP plscmap1la PDL::PP plgfont PDL::PP plsfont PDL::PP plcalc_world  plgfci  plsfci pl_cmd pl_setCairoCtx );
+our %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
 
 use PDL::Core;
 use PDL::Exporter;
@@ -14,7 +14,7 @@ use DynaLoader;
 
 
    
-   @ISA    = ( 'PDL::Exporter','DynaLoader' );
+   our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::Graphics::PLplot ;
 
@@ -22,9 +22,11 @@ use DynaLoader;
 
 
 
+use Carp qw(confess);
+
 our $VERSION;
 BEGIN {
-$VERSION = '0.74'
+$VERSION = '0.76'
 };
 
 =head1 NAME
@@ -42,11 +44,14 @@ PDL::Graphics::PLplot - Object-oriented interface from perl/PDL to the PLPLOT pl
   $pl->xyplot($x, $y);
   $pl->close;
 
+Only version 5.15.0+ of PLplot is supported, due to a C-level API change
+that is invisible at PDL-level.
+
 For more information on PLplot, see
 
  http://www.plplot.org/
 
-Also see the test file, F<t/plplot.pl> in this distribution for some working examples.
+Also see the test file, F<t/plplot.t> in this distribution for some working examples.
 
 =head1 LONG NAMES
 
@@ -1771,13 +1776,13 @@ sub stripplots {
     $ys = [dog $yargs];
   }
   else {
-    barf("stripplots requires that its second argument be either a 2D piddle or\na reference to a list of 1D piddles, but you provided neither.");
+    barf("stripplots requires that its second argument be either a 2D ndarray or\na reference to a list of 1D ndarrays, but you provided neither.");
   }
 
 # This doesn't work because $xs can be an anonymous array, too
 #  # Let's be sure the user sent us what we expected:
 #  foreach (@$ys) {
-#    barf ("stripplots needs to have piddles for its y arguments!")
+#    barf ("stripplots needs to have ndarrays for its y arguments!")
 #      unless (ref =~ /PDL/);
 #    barf("stripplots requires that the x and y dimensions agree!")
 #      unless ($_->nelem == $xs->nelem);
@@ -2358,28 +2363,49 @@ sub close {
 
 
 
-sub reorder {
-  my $name = shift;
-  my %reorder = (
-                 plaxes       => [0,1,6,2,3,7,4,5],
-		 plbox        => [4,0,1,5,2,3], # 4th arg -> 0th arg, 0th arg -> 1st arg, etc
-                 plbox3       => [6,7,0,1,8,9,2,3,10,11,4,5],
-                 plmtex       => [3,0,1,2,4],
-                 plmtex3      => [3,0,1,2,4],
-                 plstart      => [2,0,1],
-                 plstripc     => [13,14,0,1,2,3,4,5,6,7,8,9,10,11,12,15,16,17,18],
-                 plmap        => [4,5,0,1,2,3],
-                 plmeridians  => [6,0,1,2,3,4,5],
-                 plshades     => [0,10,1,2,3,4,5,6,7,8,9,11,12],
-                 plshade1     => [0,15,1,2,3,4,5,6,7,8,9,10,11,12,13,14,16,17],
-		);
-  my $ordering = $reorder{$name};
-  die "Cannot find argument reordering for $name" if (!defined($ordering));
-  my @out;
-  for (my $i=0;$i<@_;$i++) {
-    $out[$$ordering[$i]] = $_[$i];
+my %REORDER = (
+ plaxes       => [0,1,6,2,3,7,4,5],
+ plbox        => [4,0,1,5,2,3], # 4th arg -> 0th arg, 0th arg -> 1st arg, etc
+ plbox3       => [6,7,0,1,8,9,2,3,10,11,4,5],
+ plmtex       => [3,0,1,2,4],
+ plmtex3      => [3,0,1,2,4],
+ plstart      => [2,0,1],
+ plstripc     => [\13,14,15,0..12,16..19],
+ plmap        => [4,5,0..3],
+ plmeridians  => [6,0..5], # 6th PDL arg gets sent as 0th C arg
+ plshades     => [0,10,1..9,11,12],
+ plshade1     => [0,15,1..14,16,17],
+);
+sub _reorder {
+  my ($name, $int_name, $need_reorder) = splice @_, 0, 3;
+  my $ordering = $REORDER{$name};
+  die "Cannot find argument reordering for $name" if !defined $ordering;
+  my $missing = @_ != @$ordering;
+  no strict 'refs';
+  return $int_name->(@_) if !$missing and !$need_reorder;
+  # either need to insert output ndarray, or reorder, or both
+  my ($outarg_index) = map ref($_)?$$_:(), @$ordering;
+  confess "$name: wrong number of args but no output arg\n"
+    if $missing and !defined $outarg_index;
+  my @pdl_args = @_;
+  if (!$need_reorder) {
+    # args in PDL order; by definition need insert output
+    splice @pdl_args, $outarg_index, 0, my $out_ndarray = PDL->null;
+    $int_name->(@pdl_args);
+    return $out_ndarray;
   }
-  return @out;
+  # need to reorder, might need to insert output
+  my $out_ndarray;
+  if ($missing) {
+    $out_ndarray = PDL->null;
+    my $i = 0;
+    @pdl_args = map ref($_) ? $out_ndarray : $pdl_args[$i++], @$ordering;
+  }
+  my @pdl_indices = map ref($_)?$$_:$_, @$ordering;
+  my @input_indices = 0..$#$ordering;
+  @pdl_args[@pdl_indices] = @pdl_args[@input_indices];
+  $int_name->(@pdl_args);
+  $missing ? $out_ndarray : ();
 }
 
 # Routine for users to set normal plplot argument order
@@ -2398,36 +2424,36 @@ site (L<http://www.plplot.org/>).
 
 There are three differences in the way the functions are called.  The first
 one is due to a limitation in the pp_def wrapper of PDL, which forces all
-the non-piddle arguments to be at the end of the arguments list.  It is
+the non-ndarray arguments to be at the end of the arguments list.  It is
 the case of strings (C<char *>) arguments in the C API.  This affects the
 following functions:
 
-plaxes
-plbox
-plbox3
-plmtex
-plmtex3
-plstart
-plstripc
-plmap
-plmeridians
-plshades
-plshade1
+  plaxes
+  plbox
+  plbox3
+  plmtex
+  plmtex3
+  plstart
+  plstripc
+  plmap
+  plmeridians
+  plshades
+  plshade1
 
 This difference can be got around by a call to
 
-plplot_use_standard_argument_order(1);
+  plplot_use_standard_argument_order(1);
 
 This re-arranges the string arguments to their proper/intuitive position
-compared with the C plplot interface.  This can be restored to it's default
+compared with the C plplot interface.  This can be restored to its default
 by calling:
 
-plplot_use_standard_argument_order(0);
+  plplot_use_standard_argument_order(0);
 
 The second notable different between the C and the PDL APIs is that many of
 the PDL calls do not need arguments to specify the size of the the vectors
 and/or matrices being passed.  These size parameters are deduced from the
-size of the piddles, when possible and are just omitted from the C call
+size of the ndarrays, when possible and are just omitted from the C call
 when translating it to perl.
 
 The third difference has to do with output parameters.  In C these are
@@ -2476,7 +2502,7 @@ info not available
 =for bad
 
 pladv does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -2492,7 +2518,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 
 
-=head2 plaxes_pp
+=head2 plaxes
 
 =for sig
 
@@ -2506,8 +2532,8 @@ info not available
 
 =for bad
 
-plaxes_pp does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+plaxes does not process bad values.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -2515,9 +2541,10 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 
 
+sub PDL::plaxes { _reorder('plaxes', 'PDL::_plaxes_int', $standard_order, @_) }
 
 
-*plaxes_pp = \&PDL::plaxes_pp;
+*plaxes = \&PDL::plaxes;
 
 
 
@@ -2538,7 +2565,7 @@ info not available
 =for bad
 
 plbin does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -2552,11 +2579,9 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 
 
-sub plbox { plbox_pp ($standard_order ? reorder ("plbox", @_) : @_) }
 
 
-
-=head2 plbox_pp
+=head2 plbox
 
 =for sig
 
@@ -2570,8 +2595,8 @@ info not available
 
 =for bad
 
-plbox_pp does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+plbox does not process bad values.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -2579,17 +2604,16 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 
 
+sub PDL::plbox { _reorder('plbox', 'PDL::_plbox_int', $standard_order, @_) }
 
 
-*plbox_pp = \&PDL::plbox_pp;
-
-
-
-sub plbox3 { plbox3_pp ($standard_order ? reorder ("plbox3", @_) : @_) }
+*plbox = \&PDL::plbox;
 
 
 
-=head2 plbox3_pp
+
+
+=head2 plbox3
 
 =for sig
 
@@ -2603,8 +2627,8 @@ info not available
 
 =for bad
 
-plbox3_pp does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+plbox3 does not process bad values.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -2612,9 +2636,10 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 
 
+sub PDL::plbox3 { _reorder('plbox3', 'PDL::_plbox3_int', $standard_order, @_) }
 
 
-*plbox3_pp = \&PDL::plbox3_pp;
+*plbox3 = \&PDL::plbox3;
 
 
 
@@ -2635,7 +2660,7 @@ info not available
 =for bad
 
 plcol0 does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -2666,7 +2691,7 @@ info not available
 =for bad
 
 plcol1 does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -2697,7 +2722,7 @@ info not available
 =for bad
 
 plcpstrm does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -2728,7 +2753,7 @@ info not available
 =for bad
 
 pldid2pc does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -2759,7 +2784,7 @@ info not available
 =for bad
 
 pldip2dc does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -2790,7 +2815,7 @@ info not available
 =for bad
 
 plenv does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -2821,7 +2846,7 @@ info not available
 =for bad
 
 plenv0 does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -2852,7 +2877,7 @@ info not available
 =for bad
 
 plerrx does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -2883,7 +2908,7 @@ info not available
 =for bad
 
 plerry does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -2914,7 +2939,7 @@ info not available
 =for bad
 
 plfill3 does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -2945,7 +2970,7 @@ info not available
 =for bad
 
 plfont does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -2976,7 +3001,7 @@ info not available
 =for bad
 
 plfontld does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -3007,7 +3032,7 @@ info not available
 =for bad
 
 plgchr does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -3038,7 +3063,7 @@ info not available
 =for bad
 
 plgcompression does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -3069,7 +3094,7 @@ info not available
 =for bad
 
 plgdidev does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -3100,7 +3125,7 @@ info not available
 =for bad
 
 plgdiori does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -3131,7 +3156,7 @@ info not available
 =for bad
 
 plgdiplt does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -3162,7 +3187,7 @@ info not available
 =for bad
 
 plgfam does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -3193,7 +3218,7 @@ info not available
 =for bad
 
 plglevel does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -3224,7 +3249,7 @@ info not available
 =for bad
 
 plgpage does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -3255,7 +3280,7 @@ info not available
 =for bad
 
 plgspa does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -3286,7 +3311,7 @@ info not available
 =for bad
 
 plgvpd does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -3317,7 +3342,7 @@ info not available
 =for bad
 
 plgvpw does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -3348,7 +3373,7 @@ info not available
 =for bad
 
 plgxax does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -3379,7 +3404,7 @@ info not available
 =for bad
 
 plgyax does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -3410,7 +3435,7 @@ info not available
 =for bad
 
 plgzax does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -3441,7 +3466,7 @@ info not available
 =for bad
 
 pljoin does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -3472,7 +3497,7 @@ info not available
 =for bad
 
 pllightsource does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -3503,7 +3528,7 @@ info not available
 =for bad
 
 pllsty does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -3517,11 +3542,9 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 
 
-sub plmtex { plmtex_pp ($standard_order ? reorder ("plmtex", @_) : @_) }
 
 
-
-=head2 plmtex_pp
+=head2 plmtex
 
 =for sig
 
@@ -3535,8 +3558,8 @@ info not available
 
 =for bad
 
-plmtex_pp does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+plmtex does not process bad values.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -3544,17 +3567,16 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 
 
+sub PDL::plmtex { _reorder('plmtex', 'PDL::_plmtex_int', $standard_order, @_) }
 
 
-*plmtex_pp = \&PDL::plmtex_pp;
-
-
-
-sub plmtex3 { plmtex3_pp ($standard_order ? reorder ("plmtex3", @_) : @_) }
+*plmtex = \&PDL::plmtex;
 
 
 
-=head2 plmtex3_pp
+
+
+=head2 plmtex3
 
 =for sig
 
@@ -3568,8 +3590,8 @@ info not available
 
 =for bad
 
-plmtex3_pp does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+plmtex3 does not process bad values.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -3577,9 +3599,10 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 
 
+sub PDL::plmtex3 { _reorder('plmtex3', 'PDL::_plmtex3_int', $standard_order, @_) }
 
 
-*plmtex3_pp = \&PDL::plmtex3_pp;
+*plmtex3 = \&PDL::plmtex3;
 
 
 
@@ -3600,7 +3623,7 @@ info not available
 =for bad
 
 plpat does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -3631,7 +3654,7 @@ info not available
 =for bad
 
 plprec does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -3662,7 +3685,7 @@ info not available
 =for bad
 
 plpsty does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -3693,7 +3716,7 @@ info not available
 =for bad
 
 plptex does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -3724,7 +3747,7 @@ info not available
 =for bad
 
 plptex3 does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -3755,7 +3778,7 @@ info not available
 =for bad
 
 plschr does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -3786,7 +3809,7 @@ info not available
 =for bad
 
 plscmap0n does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -3817,7 +3840,7 @@ info not available
 =for bad
 
 plscmap1n does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -3848,7 +3871,7 @@ info not available
 =for bad
 
 plscol0 does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -3879,7 +3902,7 @@ info not available
 =for bad
 
 plscolbg does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -3910,7 +3933,7 @@ info not available
 =for bad
 
 plscolor does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -3941,7 +3964,7 @@ info not available
 =for bad
 
 plscompression does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -3972,7 +3995,7 @@ info not available
 =for bad
 
 plsdidev does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -4003,7 +4026,7 @@ info not available
 =for bad
 
 plsdimap does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -4034,7 +4057,7 @@ info not available
 =for bad
 
 plsdiori does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -4065,7 +4088,7 @@ info not available
 =for bad
 
 plsdiplt does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -4096,7 +4119,7 @@ info not available
 =for bad
 
 plsdiplz does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -4127,7 +4150,7 @@ info not available
 =for bad
 
 pl_setcontlabelparam does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -4158,7 +4181,7 @@ info not available
 =for bad
 
 pl_setcontlabelformat does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -4189,7 +4212,7 @@ info not available
 =for bad
 
 plsfam does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -4220,7 +4243,7 @@ info not available
 =for bad
 
 plsmaj does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -4251,7 +4274,7 @@ info not available
 =for bad
 
 plsmin does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -4282,7 +4305,7 @@ info not available
 =for bad
 
 plsori does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -4313,7 +4336,7 @@ info not available
 =for bad
 
 plspage does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -4344,7 +4367,7 @@ info not available
 =for bad
 
 plspause does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -4375,7 +4398,7 @@ info not available
 =for bad
 
 plsstrm does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -4406,7 +4429,7 @@ info not available
 =for bad
 
 plssub does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -4437,7 +4460,7 @@ info not available
 =for bad
 
 plssym does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -4468,7 +4491,7 @@ info not available
 =for bad
 
 plstar does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -4482,11 +4505,9 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 
 
-sub plstart { plstart_pp ($standard_order ? reorder ("plstart", @_) : @_) }
 
 
-
-=head2 plstart_pp
+=head2 plstart
 
 =for sig
 
@@ -4500,8 +4521,8 @@ info not available
 
 =for bad
 
-plstart_pp does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+plstart does not process bad values.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -4509,9 +4530,10 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 
 
+sub PDL::plstart { _reorder('plstart', 'PDL::_plstart_int', $standard_order, @_) }
 
 
-*plstart_pp = \&PDL::plstart_pp;
+*plstart = \&PDL::plstart;
 
 
 
@@ -4532,7 +4554,7 @@ info not available
 =for bad
 
 plstripa does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -4563,7 +4585,7 @@ info not available
 =for bad
 
 plstripd does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -4594,7 +4616,7 @@ info not available
 =for bad
 
 plsvpa does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -4625,7 +4647,7 @@ info not available
 =for bad
 
 plsxax does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -4656,7 +4678,7 @@ info not available
 =for bad
 
 plsxwin does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -4687,7 +4709,7 @@ info not available
 =for bad
 
 plsyax does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -4718,7 +4740,7 @@ info not available
 =for bad
 
 plszax does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -4749,7 +4771,7 @@ info not available
 =for bad
 
 plvasp does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -4780,7 +4802,7 @@ info not available
 =for bad
 
 plvpas does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -4811,7 +4833,7 @@ info not available
 =for bad
 
 plvpor does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -4842,7 +4864,7 @@ info not available
 =for bad
 
 plw3d does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -4873,7 +4895,7 @@ info not available
 =for bad
 
 plwidth does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -4904,7 +4926,7 @@ info not available
 =for bad
 
 plwind does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -4935,7 +4957,7 @@ info not available
 =for bad
 
 plP_gpixmm does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -4966,7 +4988,7 @@ info not available
 =for bad
 
 plscolbga does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -4997,7 +5019,7 @@ info not available
 =for bad
 
 plscol0a does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -5027,7 +5049,7 @@ Draws line segments along (x1,y1)->(x2,y2)->(x3,y3)->...
 
 If the nth value of either x or y are bad, then it will be skipped, breaking
 the line.  In this way, you can specify multiple line segments with a single
-pair of x and y piddles.
+pair of x and y ndarrays.
 
 The usage is straight-forward:
 
@@ -5056,7 +5078,7 @@ For example:
 =for bad
 
 plline processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -5086,8 +5108,8 @@ info not available
 
 =for bad
 
-plpath ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+plpath ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -5117,7 +5139,7 @@ PDL-specific: Implements what amounts to a threaded version of plsym.
 
 Bad values for z are simply skipped; all other bad values are not processed.
 
-In the following usage, all of the piddles must have the same dimensions:
+In the following usage, all of the ndarrays must have the same dimensions:
 
 =for usage
 
@@ -5142,7 +5164,7 @@ For example:
 =for bad
 
 plcolorpoints processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -5173,7 +5195,7 @@ info not available
 =for bad
 
 plsmem does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -5204,7 +5226,7 @@ info not available
 =for bad
 
 plfbox does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -5235,7 +5257,7 @@ info not available
 =for bad
 
 plfbox1 does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -5266,7 +5288,7 @@ info not available
 =for bad
 
 plunfbox does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -5297,7 +5319,7 @@ info not available
 =for bad
 
 plunfbox1 does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -5321,12 +5343,12 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 =for ref
 
-FIXME: documentation here!
+Parse PLplot options given in @ARGV-like arrays
 
 =for bad
 
 plParseOpts does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -5357,7 +5379,7 @@ info not available
 =for bad
 
 plpoin does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -5388,7 +5410,7 @@ info not available
 =for bad
 
 plpoin3 does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -5419,7 +5441,7 @@ info not available
 =for bad
 
 plline3 does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -5450,7 +5472,7 @@ info not available
 =for bad
 
 plpoly3 does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -5481,7 +5503,7 @@ info not available
 =for bad
 
 plhist does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -5512,7 +5534,7 @@ info not available
 =for bad
 
 plfill does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -5543,7 +5565,7 @@ info not available
 =for bad
 
 plgradient does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -5574,7 +5596,7 @@ info not available
 =for bad
 
 plsym does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -5605,7 +5627,7 @@ info not available
 =for bad
 
 plsurf3d does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -5636,7 +5658,7 @@ info not available
 =for bad
 
 plsurf3dl does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -5667,7 +5689,7 @@ info not available
 =for bad
 
 plstyl does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -5698,7 +5720,7 @@ info not available
 =for bad
 
 plseed does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -5729,7 +5751,7 @@ info not available
 =for bad
 
 plrandd does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -5749,16 +5771,16 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 =for sig
 
-  Signature: (double xg(nx); double yg(ny); int [o] grid())
+  Signature: (double xg(nx); double yg(ny); indx [o] grid())
 
 =for ref
 
-FIXME: documentation here!
+Allocates a PLcGrid object for use in pltr1
 
 =for bad
 
 plAllocGrid does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -5778,16 +5800,16 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 =for sig
 
-  Signature: (double xg(nx,ny); double yg(nx,ny); int [o] grid())
+  Signature: (double xg(nx,ny); double yg(nx,ny); indx [o] grid())
 
 =for ref
 
-FIXME: documentation here!
+Allocates a PLcGrid2 object for use in pltr2
 
 =for bad
 
 plAlloc2dGrid does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -5809,14 +5831,17 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
   Signature: (P(); C(); SV* p0; SV* p1; SV* p2)
 
-=for ref
+Used internally to set the variables C<pltr{0,1,2}_iv> to the "pointers"
+of the Perl subroutines C<pltr{1,2,3}>.  These variables are later used by
+C<get_standard_pltrcb> to provide the pointers to the C function C<pltr{0,1,2}>.
+This accelerates functions like plcont and plshades when those standard
+transformation functions are used.
 
-FIXME: documentation here!
 
 =for bad
 
 init_pltr does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -5833,26 +5858,22 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 init_pltr (\&pltr0, \&pltr1, \&pltr2);
 
 
-sub plmap { plmap_pp ($standard_order ? reorder ("plmap", @_) : @_) }
 
 
-
-=head2 plmap_pp
+=head2 plmap
 
 =for sig
 
   Signature: (minlong(); maxlong(); minlat(); maxlat(); SV* mapform; char* type)
 
-
 =for ref
 
-info not available
-
+plot continental outline in world coordinates
 
 =for bad
 
-plmap_pp does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+plmap does not process bad values.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -5860,9 +5881,10 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 
 
+sub PDL::plmap { _reorder('plmap', 'PDL::_plmap_int', $standard_order, @_) }
 
 
-*plmap_pp = \&PDL::plmap_pp;
+*plmap = \&PDL::plmap;
 
 
 
@@ -5883,7 +5905,7 @@ info not available
 =for bad
 
 plstring does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -5914,7 +5936,7 @@ info not available
 =for bad
 
 plstring3 does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -5928,11 +5950,9 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 
 
-sub plmeridians { plmeridians_pp ($standard_order ? reorder ("plmeridians", @_) : @_) }
 
 
-
-=head2 plmeridians_pp
+=head2 plmeridians
 
 =for sig
 
@@ -5946,8 +5966,8 @@ info not available
 
 =for bad
 
-plmeridians_pp does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+plmeridians does not process bad values.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -5955,20 +5975,16 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 
 
+sub PDL::plmeridians { _reorder('plmeridians', 'PDL::_plmeridians_int', $standard_order, @_) }
 
 
-*plmeridians_pp = \&PDL::plmeridians_pp;
-
-
-
-  sub plshades {
-    plshades_pp ($standard_order ? reorder ("plshades", @_) : @_)
-  }
+*plmeridians = \&PDL::plmeridians;
 
 
 
 
-=head2 plshades_pp
+
+=head2 plshades
 
 =for sig
 
@@ -5984,8 +6000,8 @@ info not available
 
 =for bad
 
-plshades_pp does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+plshades does not process bad values.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -5993,9 +6009,10 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 
 
+sub PDL::plshades { _reorder('plshades', 'PDL::_plshades_int', $standard_order, @_) }
 
 
-*plshades_pp = \&PDL::plshades_pp;
+*plshades = \&PDL::plshades;
 
 
 
@@ -6014,7 +6031,7 @@ FIXME: documentation here!
 =for bad
 
 plcont does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -6038,12 +6055,12 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 =for ref
 
-FIXME: documentation here!
+Surface mesh
 
 =for bad
 
 plmesh does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -6067,12 +6084,12 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 =for ref
 
-FIXME: documentation here!
+Magnitude colored plot surface mesh with contour
 
 =for bad
 
 plmeshc does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -6096,12 +6113,12 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 =for ref
 
-FIXME: documentation here!
+3-d surface plot
 
 =for bad
 
 plot3d does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -6125,12 +6142,12 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 =for ref
 
-FIXME: documentation here!
+Plots a 3-d representation of the function z[x][y] with contour
 
 =for bad
 
 plot3dc does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -6154,12 +6171,12 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 =for ref
 
-FIXME: documentation here!
+Set color map1 colors using a piece-wise linear relationship
 
 =for bad
 
 plscmap1l does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -6173,11 +6190,9 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 
 
-sub plshade1 { plshade1_pp ($standard_order ? reorder ("plshade1", @_) : @_) }
 
 
-
-=head2 plshade1_pp
+=head2 plshade1
 
 =for sig
 
@@ -6185,12 +6200,12 @@ sub plshade1 { plshade1_pp ($standard_order ? reorder ("plshade1", @_) : @_) }
 
 =for ref
 
-FIXME: documentation here!
+Shade individual region on the basis of value
 
 =for bad
 
-plshade1_pp does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+plshade1 does not process bad values.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -6198,9 +6213,10 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 
 
+sub PDL::plshade1 { _reorder('plshade1', 'PDL::_plshade1_int', $standard_order, @_) }
 
 
-*plshade1_pp = \&PDL::plshade1_pp;
+*plshade1 = \&PDL::plshade1;
 
 
 
@@ -6221,7 +6237,7 @@ info not available
 =for bad
 
 plimage does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -6252,7 +6268,7 @@ info not available
 =for bad
 
 plimagefr does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -6358,15 +6374,13 @@ See the PLplot manual for reference.
 =cut
 
 
-sub plstripc { plstripc_pp ($standard_order ? reorder ("plstripc", @_) : @_) }
 
 
-
-=head2 plstripc_pp
+=head2 plstripc
 
 =for sig
 
-  Signature: (xmin(); xmax(); xjump(); ymin(); ymax();xlpos(); ylpos(); int y_ascl(); int acc();int colbox(); int collab();int colline(n); int styline(n);  int [o] id(); char* xspec; char* yspec; SV* legline;char* labx; char* laby; char* labtop)
+  Signature: (xmin(); xmax(); xjump(); ymin(); ymax();xlpos(); ylpos(); int y_ascl(); int acc();int colbox(); int collab();int colline(n); int styline(n);int [o] id(); char* xspec; char* yspec; SV* legline;char* labx; char* laby; char* labtop)
 
 =for ref
 
@@ -6374,8 +6388,8 @@ FIXME: documentation here!
 
 =for bad
 
-plstripc_pp does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+plstripc does not process bad values.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -6383,9 +6397,10 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 
 
+sub PDL::plstripc { _reorder('plstripc', 'PDL::_plstripc_int', $standard_order, @_) }
 
 
-*plstripc_pp = \&PDL::plstripc_pp;
+*plstripc = \&PDL::plstripc;
 
 
 
@@ -6404,7 +6419,7 @@ FIXME: documentation here!
 =for bad
 
 plgriddata does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -6495,12 +6510,12 @@ See the PLplot manual for more details.
 
 =for sig
 
-my ($legend_width, $legend_height) =
-    pllegend ($position, $opt, $x, $y, $plot_width, $bg_color, $nlegend,
-    \@opt_array,
-    $text_offset, $text_scale, $text_spacing, $test_justification,
-    \@text_colors, \@text, \@box_colors, \@box_patterns, \@box_scales, \@line_colors,
-    \@line_styles, \@line_widths, \@symbol_colors, \@symbol_scales, \@symbol_numbers, \@symbols);
+  my ($legend_width, $legend_height) =
+      pllegend ($position, $opt, $x, $y, $plot_width, $bg_color, $nlegend,
+      \@opt_array,
+      $text_offset, $text_scale, $text_spacing, $test_justification,
+      \@text_colors, \@text, \@box_colors, \@box_patterns, \@box_scales, \@line_colors,
+      \@line_styles, \@line_widths, \@symbol_colors, \@symbol_scales, \@symbol_numbers, \@symbols);
 
 =for ref
 
@@ -6543,7 +6558,7 @@ Set color palette 1 from the input .pal file.  See the PLplot manual for more de
 
 =for ref
 
-  Calculate broken-down time from continuous time for current stream.
+Calculate broken-down time from continuous time for current stream.
 
 =cut
 
@@ -6570,7 +6585,7 @@ vice versa) for current stream.
 
 =for ref
 
-  Calculate continuous time from broken-down time for current stream.
+Calculate continuous time from broken-down time for current stream.
 
 =cut
 
@@ -6612,12 +6627,12 @@ Set the escape character for text strings.  See the PLplot manual for more detai
 
 =for ref
 
-FIXME: documentation here!
+Vector field plots
 
 =for bad
 
 plvect does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -6646,7 +6661,7 @@ Give zero-length PDLs for arrowx and arrowy to pass NULL to PLplot func.
 =for bad
 
 plsvect does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -6677,7 +6692,7 @@ info not available
 =for bad
 
 plhlsrgb does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -6708,7 +6723,7 @@ info not available
 =for bad
 
 plgcol0 does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -6739,7 +6754,7 @@ info not available
 =for bad
 
 plgcolbg does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -6770,7 +6785,7 @@ info not available
 =for bad
 
 plscmap0 does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -6801,7 +6816,7 @@ info not available
 =for bad
 
 plscmap1 does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -6832,7 +6847,7 @@ info not available
 =for bad
 
 plgcol0a does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -6863,7 +6878,7 @@ info not available
 =for bad
 
 plgcolbga does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -6894,7 +6909,7 @@ info not available
 =for bad
 
 plscmap0a does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -6925,7 +6940,7 @@ info not available
 =for bad
 
 plscmap1a does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -6949,12 +6964,12 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 =for ref
 
-FIXME: documentation here!
+Set color map1 colors using a piece-wise linear relationship, include alpha channel
 
 =for bad
 
 plscmap1la does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -6985,7 +7000,7 @@ info not available
 =for bad
 
 plgfont does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -7016,7 +7031,7 @@ info not available
 =for bad
 
 plsfont does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -7047,7 +7062,7 @@ info not available
 =for bad
 
 plcalc_world does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -7059,6 +7074,35 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 *plcalc_world = \&PDL::plcalc_world;
 
+
+
+=head2 pl_cmd
+
+=for sig
+
+   pl_cmd($CMD, $data);
+
+=for ref
+
+   See the PLplot manual for reference.
+   Gives access to low level driver. $CMD is an integer. $data opaque data.
+
+=cut
+
+
+=head2 pl_setCairoCtx
+
+=for sig
+
+   pl_setCairoCtx($cairo_context);
+
+=for ref
+
+   Used with cairo external drivers to set the cairo context.
+   $cairo_context should be a Cairo::Context object.
+   Uses pl_cmd underneath, but extracts the real C struct pointer from the Cairo::Context.
+
+=cut
 
 
 

@@ -19,7 +19,7 @@ my %names = map {
 		// $RE{$key}{'caption.alt.org.osi'} // $RE{$key}{caption};
 	my @altcaptions = map { $RE{$key}{$_} } (
 		sort grep {
-			/^(?:(?:name|caption)\.alt\.org\.osi\.alt\.|summary\.alt\.org\.osi)/
+			/^(?:(?:name|caption)\.alt\.org\.osi\.misc\.|summary\.alt\.org\.osi)/
 				and !/\.version\./
 		} keys %{ $RE{$key} }
 	);

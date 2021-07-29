@@ -6,11 +6,11 @@ use Mouse;
 use Lemonldap::NG::Portal::Lib::SAML;
 use Lemonldap::NG::Common::FormEncode;
 use Lemonldap::NG::Portal::Main::Constants qw(
+  PE_OK
   PE_CONFIRM
   PE_IDPCHOICE
   PE_LOGOUT_OK
   PE_REDIRECT
-  PE_OK
   PE_SAML_ART_ERROR
   PE_SAML_CONDITIONS_ERROR
   PE_SAML_DESTINATION_ERROR
@@ -24,7 +24,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_SENDRESPONSE
 );
 
-our $VERSION = '2.0.9';
+our $VERSION = '2.0.12';
 
 extends qw(
   Lemonldap::NG::Portal::Main::Auth
@@ -1141,7 +1141,7 @@ sub extractFormInfo {
 }
 
 sub authenticate {
-    PE_OK;
+    return PE_OK;
 }
 
 sub setAuthSessionInfo {
@@ -1256,7 +1256,7 @@ sub setAuthSessionInfo {
     $req->data->{_lassoLogin} = $login;
     push @{ $req->steps }, sub { $self->authFinish(@_) };
 
-    PE_OK;
+    return PE_OK;
 }
 
 # Inserted in $req->steps by authenticate()
@@ -1456,7 +1456,7 @@ sub handleAuthRequests {
     if ( $req->uri =~ $self->sloRe ) {
         return $self->extractFormInfo($req);
     }
-    PE_OK;
+    return PE_OK;
 }
 
 # TODO: authForce

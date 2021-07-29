@@ -1,3 +1,20 @@
+0.006   2021-07-28  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Made the new pages as .pm instead of .pod.
+
+
+0.005   2021-07-28  Released-By: PERLANCAR; Urgency: medium
+
+	- Add
+	  :Reference::FunctionMetadata::Examples::PropertyAttributeIndex &
+	  :Reference::FunctionMetadata::PropertyAttributeIndex.
+
+
+0.004   2021-07-02  Released-By: PERLANCAR; Urgency: low
+
+	- Fix POD formatting.
+
+
 0.003   2021-07-02  Released-By: PERLANCAR; Urgency: high
 
         - Merge releases 0.002 and 0.002.1.

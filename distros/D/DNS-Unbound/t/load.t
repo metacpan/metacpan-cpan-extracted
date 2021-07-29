@@ -26,11 +26,11 @@ eval {
     is( $result->rcode(), Net::DNS::Parameters::rcodebyname('NXDOMAIN'), 'rcode()' );
     is( $result->{rcode}, Net::DNS::Parameters::rcodebyname('NXDOMAIN'), '{rcode}' );
 
-    ok( !$result->secure(), 'secure()' );
-    ok( !$result->{secure}, '{secure})' );
+    is( $result->secure(), 0, '!secure()' );
+    is( $result->{secure}, 0, '!{secure}' );
 
-    ok( !$result->bogus(), 'bogus()' );
-    ok( !$result->{bogus}, '{bogus}' );
+    is( $result->bogus(), 0, '!bogus()' );
+    is( $result->{bogus}, 0, '!{bogus}' );
 
     is( $result->why_bogus(), undef, 'why_bogus()' );
     is( $result->{'why_bogus'}, undef, '{why_bogus}' );
@@ -68,8 +68,8 @@ eval {
     ok( $result->havedata(), 'havedata()' );
     ok( $result->{havedata}, '{havedata}' );
 
-    ok( !$result->nxdomain(), '!nxdomain()' );
-    ok( !$result->{nxdomain}, '!{nxdomain}' );
+    is( $result->nxdomain(), 0, '!nxdomain()' );
+    is( $result->{nxdomain}, 0, '!{nxdomain}' );
 
     my $net_dns_packet = Net::DNS::Packet->new( \$result->answer_packet() );
 

@@ -3,13 +3,13 @@ package Lemonldap::NG::Portal::Auth::SSL;
 use strict;
 use Mouse;
 use Lemonldap::NG::Portal::Main::Constants qw(
-  PE_BADCERTIFICATE
   PE_CERTIFICATEREQUIRED
+  PE_BADCERTIFICATE
   PE_FIRSTACCESS
   PE_OK
 );
 
-our $VERSION = '2.0.8';
+our $VERSION = '2.0.12';
 
 extends 'Lemonldap::NG::Portal::Main::Auth';
 
@@ -89,13 +89,13 @@ sub extractFormInfo {
 }
 
 sub authenticate {
-    PE_OK;
+    return PE_OK;
 }
 
 sub setAuthSessionInfo {
     my ( $self, $req ) = @_;
     $req->sessionInfo->{authenticationLevel} = $self->conf->{SSLAuthnLevel};
-    PE_OK;
+    return PE_OK;
 }
 
 sub getDisplayType {
@@ -104,7 +104,7 @@ sub getDisplayType {
 }
 
 sub authLogout {
-    PE_OK;
+    return PE_OK;
 }
 
 1;

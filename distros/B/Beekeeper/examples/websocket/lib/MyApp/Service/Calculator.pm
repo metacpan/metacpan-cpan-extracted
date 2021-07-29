@@ -3,52 +3,42 @@ package MyApp::Service::Calculator;
 use strict;
 use warnings;
 
-use Beekeeper::Worker ':log';
-use base 'Beekeeper::Worker';
+use Beekeeper::Client;
+use Beekeeper::Config;
 
 
-sub on_startup {
-    my $self = shift;
+sub new {
+    my $class = shift;
 
-    $self->accept_remote_calls(
-        'myapp.calculator.eval_expr' => 'eval_expr',
+    my $self = {};
+
+    my $config = Beekeeper::Config->read_config_file('client.config.json');
+
+    # Connect to bus 'frontend', wich will forward requests to 'backend'
+    $self->{client} = Beekeeper::Client->instance(
+        bus_role   => "frontend",
+        forward_to => 'backend',
+        %$config,
     );
 
-    log_info "Ready";
+    bless $self, $class;
 }
 
-sub authorize_request {
-    my ($self, $req) = @_;
+sub client {
+    my $self = shift;
 
-    return BKPR_REQUEST_AUTHORIZED;
+    return $self->{client};
 }
 
 sub eval_expr {
-    my ($self, $params) = @_;
+    my ($self, $str) = @_;
 
-    my $expr = $params->{"expr"};
+    my $resp = $self->client->call_remote(
+        method => 'myapp.calculator.eval_expr',
+        params => { expr => $str },
+    );
 
-    unless (defined $expr) {
-        # Explicit error response. It will be not logged
-        return Beekeeper::JSONRPC->error( message => 'No expression given' );
-    }
-
-    ($expr) = $expr =~ m/^([ \d \. \+\-\*\/ ]*)$/x;
-
-    unless (defined $expr) {
-        # Throw a handled exception. It will be not logged
-        die Beekeeper::JSONRPC->error( message => 'Invalid expression' );
-    }
-
-    my $result = eval $expr;
-
-    if ($@) {
-        # Throw an unhandled exception which will be automatically logged
-        # The client will receive a generic error response (try division by zero)
-        die "Died while processing '$expr': $@";
-    }
-
-    return $result;
+    return $resp->result;
 }
 
 1;

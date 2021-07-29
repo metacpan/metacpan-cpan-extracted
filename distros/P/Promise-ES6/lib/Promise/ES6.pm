@@ -3,7 +3,7 @@ package Promise::ES6;
 use strict;
 use warnings;
 
-our $VERSION = '0.23';
+our $VERSION = '0.24';
 
 =encoding utf-8
 
@@ -40,6 +40,12 @@ Promise::ES6 - ES6-style promises in Perl
     my $allsettled_promise = Promise::ES6->allSettled( \@promises );
 
 =head1 DESCRIPTION
+
+=begin html
+
+<a href='https://coveralls.io/github/FGasper/p5-Promise-ES6?branch=master'><img src='https://coveralls.io/repos/github/FGasper/p5-Promise-ES6/badge.svg?branch=master' alt='Coverage Status' /></a>
+
+=end html
 
 This module provides a Perl implementation of L<promises|https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Using_promises>, a useful pattern
 for coordinating asynchronous tasks.
@@ -92,6 +98,32 @@ Note that, in the case of L<Future>, this will yield a “false-positive”, as
 Future is not compatible with promises.
 
 (See L<Promise::ES6::Future> for more tools to interact with L<Future>.)
+
+=head1 B<EXPERIMENTAL:> ASYNC/AWAIT SUPPORT
+
+This module implements L<Future::AsyncAwait::Awaitable>. This lets you do
+nifty stuff like:
+
+    use Future::AsyncAwait;
+
+    async sub do_stuff {
+        my $foo = await fetch_number_p();
+
+        # NB: The real return is a promise that provides this value:
+        return 1 + $foo;
+    }
+
+    my $one_plus_number = await do_stuff();
+
+… which roughly equates to:
+
+    sub do_stuff {
+        return fetch_number_p()->then( sub { 1 + $foo } );
+    }
+
+    do_stuff->then( sub {
+        $one_plus_number = shift;
+    } );
 
 =head1 UNHANDLED REJECTIONS
 
@@ -204,6 +236,8 @@ a canceled query in the “pending” state or to “settle” (i.e., resolve or
 reject) it. All things being equal, I feel the first approach is the most
 intuitive, while the latter ends up being “cleaner”.
 
+Of note: L<Future> implements native cancellation.
+
 =head1 MEMORY LEAKS
 
 It’s easy to create inadvertent memory leaks using promises in Perl.
@@ -278,7 +312,7 @@ mine are the nicest :), but YMMV. Enjoy!
 
 =head1 LICENSE & COPYRIGHT
 
-Copyright 2019-2020 Gasper Software Consulting.
+Copyright 2019-2021 Gasper Software Consulting.
 
 This library is licensed under the same terms as Perl itself.
 

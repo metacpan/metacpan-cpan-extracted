@@ -1,9 +1,18 @@
 package App::example::example_test;
 use strict;
 use warnings;
+
+our $opt_number;
+our @opt_list;
+our %opt_hash;
+
 1;
 
 __DATA__
+
+builtin set-number=i $opt_number
+builtin set-list=s   @opt_list
+builtin set-hash=s   %opt_hash
 
 option default --default
 

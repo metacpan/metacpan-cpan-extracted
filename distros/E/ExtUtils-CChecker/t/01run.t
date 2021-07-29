@@ -1,7 +1,10 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
+use v5;
 use strict;
-use Test::More tests => 6;
+use warnings;
+
+use Test::More;
 
 use ExtUtils::CChecker;
 
@@ -21,3 +24,5 @@ $cc->try_compile_run(
 );
 
 is_deeply( $cc->extra_compiler_flags, [ "-DHAVE_C" ], 'HAVE_C defined' );
+
+done_testing;

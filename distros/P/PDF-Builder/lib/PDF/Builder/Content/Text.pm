@@ -5,8 +5,8 @@ use base 'PDF::Builder::Content';
 use strict;
 use warnings;
 
-our $VERSION = '3.022'; # VERSION
-my $LAST_UPDATE = '3.022'; # manually update whenever code is changed
+our $VERSION = '3.023'; # VERSION
+our $LAST_UPDATE = '3.023'; # manually update whenever code is changed
 
 =head1 NAME
 
@@ -742,11 +742,11 @@ C<$over> is 1 or 0, with the default 1 (spills over the width).
 B<Example:>
 
     $txt->font($font,$fontsize);
-    $txt->lead($lead);
+    $txt->leading($leading);
     $txt->translate($x,$y);
     $overflow = $txt->paragraph( 'long paragraph here ...',
                                  $width,
-                                 $y+$lead-$bottom_margin );
+                                 $y+$leading-$bottom_margin );
 
 B<Note:> if you need to change any text treatment I<within> a paragraph 
 (B<bold> or I<italicized> text, for instance), this can not handle it. Only 
@@ -766,7 +766,7 @@ sub paragraph {
 
     my @line = ();
     my $nwidth = 0;
-    my $lead = $self->lead();
+    my $leading = $self->leading();
     my $align = 'l'; # default left
     if (defined($opts{'-align'})) {
 	if    ($opts{'-align'} =~ /^l/i) { $align = 'l'; }
@@ -790,7 +790,7 @@ sub paragraph {
 	if ($indent < 0 && !$first_line) { $lw += $indent*$em; }
 	# now, need to indent (move line start) right for 'l' and 'j'
 	if ($lw < $width && ($align eq 'l' || $align eq 'j')) {
-        $self->cr($lead); # go UP one line
+        $self->cr($leading); # go UP one line
 	    $self->nl(88*abs($indent)); # come down to right line and move right
 	}
 
@@ -808,7 +808,7 @@ sub paragraph {
 	$first_line = 0;
 
 	# bail out and just return remaining $text if run out of vertical space
-        last if ($height -= $lead) < 0;
+        last if ($height -= $leading) < 0;
     }
 
     if (wantarray) {

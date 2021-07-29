@@ -1,5 +1,28 @@
 Revision history for Perl extension UV
 
+2.000 2021-07-28
+    - Also add repository bugtracker URL to META files
+    - Document the `$callback` argument to `$loop->getnameinfo()`
+    - Add a TODO section to the documentation, outlining remaining libuv
+      functionallity that could still be handled, but isn't currently
+
+1.912 2021-07-25
+    - Documentation adjustment preparing for 2.000 release
+    - Misc small internal fixes to Build.PL and git metadata
+    - Bugfix the github CI workflows
+    - Add repository metadata to META files
+    - Regenerated README.md
+    - Back-compat to perl 5.14; declare minimum required perl version
+
+1.911 2021-07-16
+    - Fix an `#if` that should have been an `#ifdef`
+    - Fix skip message in t/12-udp-open.t
+
+1.910 2021-07-16
+    - Don't attempt to support UV::TCP->open or UV::UDP->open on Windows,
+      because we'd need WSA_FLAG_OVERLAPPED but Perl doesn't set it on sockets
+      it creates (related to #38).
+
 1.909 2021-05-26
     - Avoid use-after-free bug when ->close'ing newly listened client
       connections

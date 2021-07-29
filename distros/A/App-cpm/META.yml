@@ -6,7 +6,7 @@ build_requires: {}
 configure_requires:
   Module::Build::Tiny: '0.034'
 dynamic_config: 0
-generated_by: 'Dist::Milla version v1.0.20, Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Milla version v1.0.20, Dist::Zilla version 6.023, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -23,7 +23,7 @@ no_index:
 provides:
   App::cpm:
     file: lib/App/cpm.pm
-    version: '0.997004'
+    version: '0.997006'
   App::cpm::CLI:
     file: lib/App/cpm/CLI.pm
   App::cpm::CircularDependency:
@@ -48,10 +48,10 @@ provides:
     file: lib/App/cpm/Resolver.pm
   App::cpm::Resolver::02Packages:
     file: lib/App/cpm/Resolver/02Packages.pm
-  App::cpm::Resolver::CPANfile:
-    file: lib/App/cpm/Resolver/CPANfile.pm
   App::cpm::Resolver::Cascade:
     file: lib/App/cpm/Resolver/Cascade.pm
+  App::cpm::Resolver::Custom:
+    file: lib/App/cpm/Resolver/Custom.pm
   App::cpm::Resolver::MetaCPAN:
     file: lib/App/cpm/Resolver/MetaCPAN.pm
   App::cpm::Resolver::MetaDB:
@@ -74,8 +74,6 @@ provides:
     file: lib/App/cpm/Worker/Installer/Prebuilt.pm
   App::cpm::Worker::Resolver:
     file: lib/App/cpm/Worker/Resolver.pm
-  App::cpm::file:
-    file: lib/App/cpm/file.pm
   App::cpm::version:
     file: lib/App/cpm/version.pm
 recommends:
@@ -96,6 +94,7 @@ requires:
   Menlo::CLI::Compat: '1.9021'
   Module::CPANfile: '0'
   Module::Metadata: '0'
+  Module::cpmfile: '0.001'
   Parallel::Pipes: '0.004'
   Parse::PMFile: '0.43'
   YAML::PP: '0.026'
@@ -107,7 +106,7 @@ resources:
   bugtracker: https://github.com/skaji/cpm/issues
   homepage: https://github.com/skaji/cpm
   repository: https://github.com/skaji/cpm.git
-version: '0.997004'
+version: '0.997006'
 x_contributors:
   - 'Andrew Rodland <andrew@cleverdomain.org>'
   - 'Dave Rolsky <autarch@urth.org>'

@@ -65,22 +65,22 @@ my $binary_format;
 # TODO: add aarch64 detection
 if($^O eq 'linux' && $Config{archname} =~ /^x86_64/)
 {
-  $binary_release_name = 'Linux-x86_64';
+  $binary_release_name = 'linux-x86_64';
   $binary_format       = 'tar.gz';
 }
 elsif($^O eq 'linux' && $Config{archname} =~ /^aarch64/)
 {
-  $binary_release_name = 'Linux-aarch64';
+  $binary_release_name = 'linux-aarch64';
   $binary_format       = 'tar.gz';
 }
 elsif($^O eq 'MSWin32' && $Config{ptrsize} == 4)
 {
-  $binary_release_name = 'win32-x86';
+  $binary_release_name = 'windows-i386';
   $binary_format       = 'zip';
 }
 elsif($^O eq 'MSWin32' && $Config{ptrsize} == 8)
 {
-  $binary_release_name = 'win64-x64';
+  $binary_release_name = 'windows-x86_64';
   $binary_format       = 'zip';
 }
 elsif($^O eq 'darwin' && $Config{ptrsize} == 8)

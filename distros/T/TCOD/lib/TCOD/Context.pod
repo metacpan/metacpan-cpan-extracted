@@ -1,0 +1,208 @@
+=encoding UTF-8
+
+=head1 NAME
+
+TCOD::Context - A rendering context for TCOD
+
+=head1 SYNOPSIS
+
+    use TCOD;
+
+    my ( $width, $height ) = ( 640, 480 );
+
+    my $tileset = TCOD::Tileset->load_tilesheet(
+        dist_file( TCOD => 'arial10x10.png' ),
+        32, 8, TCOD::CHARMAP_TCOD,
+    );
+
+    my $context = TCOD::Context->new_terminal(
+        $width, $height,
+        tileset => $tileset,
+        title   => 'My window title',
+    );
+
+    my $console = TCOD::Console->new( $width, $height );
+    $console->print( 1, 1, '@' );
+
+    $context->present($console);
+
+=head1 DESCRIPTION
+
+This class represents a terminal emulator for rendering text-based games.
+
+=head1 METHODS
+
+=head2 new
+
+    $context = TCOD::Context->new(
+        x                 => $screen_x,
+        y                 => $screen_y,
+        width             => $pixel_width,
+        height            => $pixel_height,
+        renderer          => $renderer_type,
+        title             => $window_title,
+        tileset           => $tileset, # TCOD::Tileset
+        columns           => $columns,
+        rows              => $rows,
+        vsync             => $bool,
+        sdl_window_flags  => $sdl_flags,
+    );
+
+Create a new TCOD::Context with the desired pixel size.
+
+The C<x>, C<y>, C<width>, and C<height> parameters are the desired position
+and size of the window. If these are not specified, they will be derived from
+the values in C<columns> and C<rows>. So if you plan on having a console of a
+fixed size then you should set C<columns> and c<rows> instead of the window
+keywords.
+
+The C<columns> and C<rows> values specify the desired size of the console
+in tiles. They can be left undefined when you're setting a context by a window
+size instead of a console.
+
+Providing no size information at all is also acceptable.
+
+The value in C<renderer> is the desired libtcod renderer to use.
+Typical options are C<TCOD::RENDERER_OPENGL2|TCOD/Renderer> for a faster
+renderer or L<TCOD::RENDERER_SDL2|TCOD/Renderer> for a reliable renderer.
+
+The font / tileset is specified with the C<tileset> key. The fall-back tileset
+available as the default is useful for prototyping, but will be unreliable
+across platforms.
+
+The value in C<vsync> controls the vertical sync option for the window. This
+is enabled by default and is recommended, but you may want to disable it for
+benchmarking purposes.
+
+Additional SDL window flags can be passed as a bit-field in the
+C<sdl_window_flags>. By default, this will be set to C<SDL_WINDOW_RESIZABLE>.
+You can see more details on the flags that are available on
+L<the SDL2 documentation|https://wiki.libsdl.org/SDL_CreateWindow#remarks>.
+
+The desired title of the window can be set with the C<title> key.
+
+When a window size is given instead of a console size you can use
+L<recommended_console_size|/recommended_console_size> to automatically
+find the size of the console which should be used.
+
+This function will return undefined on error. You can examine the error with
+L<TCOD::get_error|TCOD/get_error>.
+
+=head2 new_console
+
+    $console = TCOD::Context->new_console( $cols, $rows, $magnification );
+    $console = TCOD::Context->new_console(
+        min_columns   => $cols,
+        min_rows      => $rows,
+        magnification => $magnification,
+    );
+
+Return a new L<TCOD::Console> sized for this context. The values in
+C<min_columns> and C<min_rows> are the minimum size to use for the new
+console.
+
+The value in C<magnification>, which must be greater than 0, determines the
+apparent size of the tiles on the output display. A value greater than 1 will
+output smaller consoles, which will show as larger tiles when presented.
+
+The times where it is the most useful to call this method are:
+
+=over
+
+=item * After the context is created, even if the console was given a specific size
+
+=item * After the L<change_tileset|/change_tileset> method is called
+
+=item * After any window resized event, or any manual resizing of the window
+
+=back
+
+=head2 present
+
+    $context->present( $console, %rest );
+    $context->present(
+        console         => $console,
+        keep_aspect     => $keep_aspect // 0,
+        integer_scaling => $bool        // 0,
+        clear_color     => $color       // TCOD::BLACK,
+        align           => $alignment   // [ 0.5, 0.5 ],
+    );
+
+Present the specified L<TCOD::Console> to this context's display.
+
+If C<keep_aspect> is set to a true value the console's aspect will be
+preserved with a letterbox. Otherwise the console will be stretched to
+fill the screen.
+
+If C<integer_scaling> is set to a true value the console will be scaled
+in integer increments. This will have no effect if the console must be
+shrunk. You can use
+L<TCOD::Console::recommended_size|TCOD::Console/recommended_size> to
+create a console which will fit the window without needing to be scaled.
+
+The value in C<clear_color> should be a L<TCOD::Color> that, if set, will
+be used to clear the screen before the console is presented. This will
+affect the border/letterbox color.
+
+The value in C<align> is an array reference of the shape C<[ x, y ]>
+determining where the console will be placed when letter-boxing exists.
+Values of 0 will put the console at the upper-left corner. Values of
+0.5 will centre the console.
+
+This function accepts named parameters, but the C<console> parameter may
+also be passed as the first positional parameter.
+
+=head2 recommended_console_size
+
+    ( $w, $h ) = $ctx->recommended_console_size( $min_cols, $min_rows );
+
+Return the recommended size in tiles of a console for this context.
+
+The values in C<$min_cols> and C<$min_rows> are the lowest values which will
+be returned.
+
+If the result is only used to create a new L<TCOD::Console> then you may want
+to call L<new_console|/new_console> instead.
+
+=head2 convert_event
+
+    $context->convert_event( $event );
+
+Add tile coordinates to a L<TCOD::Event|TCOD::Event/EVENT TYPES> that
+already has pixel coordinates. This applies only to some mouse events.
+
+=head2 pixel_to_tile
+
+    ( $tile_x, $tile_y ) = $context->pixel_to_tile( $pixel_x, $pixel_y );
+
+Convert from pixel coordinates to this context's tile coordinates. The
+components of the tile coordinates will be integers. See
+L<pixel_to_subtile|/pixel_to_subtile> for an alternative that returns
+floating point numbers.
+
+=head2 pixel_to_subtile
+
+    ( $tile_x, $tile_y ) = $ontext->pixel_to_subtile( $pixel_x, $pixel_y );
+
+Convert from pixel coordinates to this context's tile coordinates. The
+components of the tile coordinates will have sub-tile precision. If no such
+precision is needed, consider using L<pixel_to_tile|/pixel_to_tile> instead.
+
+=head1 SEE ALSO
+
+=over
+
+=item L<TCOD>
+
+=item L<TCOD::Console>
+
+=item L<TCOD::Tileset>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2021 José Joaquín Atria
+
+This library is free software; you can redistribute it and/or modify it under
+the Artistic License 2.0.

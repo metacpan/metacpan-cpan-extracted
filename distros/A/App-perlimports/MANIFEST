@@ -34,6 +34,7 @@ t/annotations.t
 t/args-in-import.t
 t/builtin.pl
 t/carp.t
+t/cast-in-regex.t
 t/cast.t
 t/cli.t
 t/config-in-import.pl
@@ -58,6 +59,7 @@ t/import-error.t
 t/interpolation.t
 t/is-ignored.t
 t/lib/TestHelper.pm
+t/lookalike-words.t
 t/meta.t
 t/method.t
 t/module-with-inner-packages.t
@@ -73,6 +75,7 @@ t/perl-imports.t
 t/perl.t
 t/pragma.t
 t/preserve-spaces.t
+t/qualified-bareword.t
 t/quoted-var.t
 t/re-export-via-sub-exporter.t
 t/regex-replacement.t
@@ -98,6 +101,7 @@ test-data/builtin.pl
 test-data/carp-with-no-imports.pl
 test-data/carp-without-verbose.pl
 test-data/carp.pl
+test-data/cast-in-regex.pl
 test-data/cast.pl
 test-data/config-in-import.pl
 test-data/dupes.pl
@@ -137,6 +141,7 @@ test-data/lib/Local/UsesUsesImportInto.pm
 test-data/lib/Local/ViaExporter.pm
 test-data/lib/Local/ViaSubExporter.pm
 test-data/lib/Local/WithInnerPkg.pm
+test-data/lookalike-words.pl
 test-data/messy-imports.pl
 test-data/meta.t
 test-data/method.pl
@@ -149,6 +154,7 @@ test-data/perl-version.pl
 test-data/pithub.pl
 test-data/pragma.t
 test-data/preserve-spaces.pl
+test-data/qualified-bareword.pl
 test-data/quoted-var.pl
 test-data/regex-replacement.pl
 test-data/require.pl

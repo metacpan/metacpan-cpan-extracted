@@ -1,7 +1,9 @@
 package Range::Iter;
 
-our $DATE = '2019-04-23'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-07-17'; # DATE
+our $DIST = 'Range-Iter'; # DIST
+our $VERSION = '0.003'; # VERSION
 
 use strict;
 use warnings;
@@ -54,7 +56,7 @@ Range::Iter - Generate a coderef iterator for range
 
 =head1 VERSION
 
-This document describes version 0.002 of Range::Iter (from Perl distribution Range-Iter), released on 2019-04-23.
+This document describes version 0.003 of Range::Iter (from Perl distribution Range-Iter), released on 2021-07-17.
 
 =head1 SYNOPSIS
 
@@ -102,7 +104,11 @@ feature.
 
 =head1 SEE ALSO
 
+L<Range::ArrayIter>, L<Range::Iterator>
+
 L<Array::Iter>
+
+L<IntRange::Iter>
 
 =head1 AUTHOR
 
@@ -110,7 +116,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

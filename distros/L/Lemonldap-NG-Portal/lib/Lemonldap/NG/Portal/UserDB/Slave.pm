@@ -13,7 +13,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_FORBIDDENIP
 );
 
-our $VERSION = '2.0.10';
+our $VERSION = '2.0.12';
 
 extends qw(
   Lemonldap::NG::Common::Module
@@ -22,16 +22,18 @@ extends qw(
 
 # INITIALIZATION
 
-sub init { 1 }
+sub init {
+    return 1;
+}
 
 # RUNNING METHODS
 
 sub getUser {
-    PE_OK;
+    return PE_OK;
 }
 
 sub findUser {
-    PE_OK;
+    return PE_OK;
 }
 
 # Search exportedVars values in HTTP headers.
@@ -54,7 +56,7 @@ sub setSessionInfo {
 }
 
 sub setGroups {
-    PE_OK;
+    return PE_OK;
 }
 
 1;

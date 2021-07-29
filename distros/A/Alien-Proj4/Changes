@@ -1,3 +1,6 @@
+2.019111 2021-07-23
+- fix POD typo - thanks @eserte for report
+
 2.019110 2019-05-09
  - more info on dynamic_lib in t/02-use.t
 

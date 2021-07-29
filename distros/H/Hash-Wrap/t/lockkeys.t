@@ -27,19 +27,19 @@ subtest 'existing attrs only' => sub {
 
         like(
             dies { $hash{c} = 1 },
-            qr/access/,
+            qr{access .* t/lockkeys.t},
             'hash'
             );
 
         like(
             dies { $obj->{c} = 1 },
-            qr/access/,
+            qr{access .* t/lockkeys.t},
             'object hash'
             );
 
         like(
             dies { $obj->c(2) },
-            qr/locate object method/,
+            qr{locate object method .* t/lockkeys.t},
             'accessor'
             );
     };
@@ -75,19 +75,19 @@ subtest 'extra attrs' => sub {
 
         like(
             dies { $hash{c} = 1 },
-            qr/access/,
+            qr{access .* t/lockkeys.t},
             'hash is locked'
             );
 
         like(
             dies { $obj->{c} = 1 },
-            qr/access/,
+            qr{access .* t/lockkeys.t},
             'object hash is locked'
             );
 
         like(
             dies { $obj->c(2) },
-            qr/locate object method/,
+            qr{locate object method .* t/lockkeys.t},
             'accessor'
             );
     };
@@ -99,7 +99,7 @@ subtest 'api' => sub {
           dies {
               Hash::Wrap->import ( { -lockkeys => [ '-a' ] } );
           },
-          qr/not a valid Perl identifier/,
+          qr{not a valid Perl identifier.*at t/lockkeys.t},
           'invalid identifier'
           );
 

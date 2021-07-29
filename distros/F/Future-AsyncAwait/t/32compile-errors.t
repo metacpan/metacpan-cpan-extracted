@@ -7,6 +7,8 @@ use Test::More;
 
 use Future::AsyncAwait;
 
+use constant HAVE_XPK_0_09 => ( $XS::Parse::Keyword::VERSION >= 0.09 );
+
 # All of these should fail to compile but not SEGV. If we get to the end of
 # the script without segfaulting, we've passed.
 
@@ -69,6 +71,10 @@ ok( !defined eval q'
 {
    local $@;
 
+   my $err = HAVE_XPK_0_09 ?
+      qr/^parse failed--compilation aborted / :
+      qr/^Global symbol "\$api" requires explicit package name/;
+
    ok( !defined eval q'
       package segfault;
       use strict;
@@ -82,8 +88,7 @@ ok( !defined eval q'
       })->()->get;
       ',
       'RT131487 strict-failing code fails to compile' );
-   like( "$@", qr/^Global symbol "\$api" requires explicit package name/,
-      'Failure message complains about undeclared $api' );
+   like( "$@", $err, 'Failure message complains about undeclared $api' );
 }
 
 done_testing;

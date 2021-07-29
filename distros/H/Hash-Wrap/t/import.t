@@ -26,7 +26,7 @@ ok (
 
 like (
     dies { P2::wrap_hash( ) },
-      qr/undefined subroutine/i,
+      qr{undefined subroutine.*at t/import.t}i,
       q[don't export]
     );
 

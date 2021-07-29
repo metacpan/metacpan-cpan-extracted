@@ -16,7 +16,7 @@
     margin:0 auto;
     background:#fff;
     margin-bottom:15px;
-    border-bottom:5px solid #D9D9D9;
+    border-bottom:1px solid #D9D9D9;
   }
   
   /* footer */
@@ -166,22 +166,21 @@
   .before-days {
     text-align:center;
   }
-  .side-list {
-    box-shadow: 0 0 3px rgba(0,0,0,.1);
+  .side_list {
+    margin-bottom:30px;
   }
-  .side-list-title {
+  .side_list_title {
     background:#009D82;
     color:white;
     font-weight:bold;
     padding: 12px 0px 10px 0px;
     text-align:center;
-    border:1px solid #E5E5E5;
-    border-bottom:none;
+    border:1px solid #009D82;
   }
-  .side-list ul {
+  .side_list ul {
     border:1px solid #ccc;
   }
-  .side-list li {
+  .side_list li {
     list-style:none;
     background:white;
     border-bottom:1px solid #E5E5E5;

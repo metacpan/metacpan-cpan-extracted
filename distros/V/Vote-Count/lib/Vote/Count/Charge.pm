@@ -20,7 +20,7 @@ use JSON::MaybeXS;
 use YAML::XS;
 # use Storable 3.15 'dclone';
 
-our $VERSION='2.00';
+our $VERSION='2.01';
 
 has 'Seats' => (
   is       => 'ro',
@@ -157,7 +157,7 @@ sub VCUpdateActive ($I) {
   my $active = {};
   for my $k ( keys $I->GetChoiceStatus()->%* ) {
     $active->{$k} = 1 if $I->{'choice_status'}->{$k}{'state'} eq 'hopeful';
-    $active->{$k} = 1 if $I->{'choice_status'}->{$k}{'state'} eq 'pending';
+    # $active->{$k} = 1 if $I->{'choice_status'}->{$k}{'state'} eq 'pending';
   }
   $I->SetActive($active);
 }
@@ -377,7 +377,7 @@ sub SetQuota ($I, $style='droop') {
 
 Vote::Count::Charge
 
-=head1 VERSION 2.00
+=head1 VERSION 2.01
 
 =cut
 
@@ -457,7 +457,7 @@ Takes the arguments of a Choice and a hashref with the keys 'state' and 'votes'.
 
 =head3 VCUpdateActive
 
-Update the ActiveSet of the underlying Vote::Count object to match the set of Choices that are currently 'hopeful' or 'pending'.
+Update the ActiveSet of the underlying Vote::Count object to match the set of Choices that are currently 'hopeful'.
 
 =head2 Elected and Pending
 

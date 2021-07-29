@@ -37,6 +37,7 @@ extends 'Business::Fixflo::Resource';
     Addresses
     Issues
     IsDeleted
+    IsNotManaged
     UpdateDate
     Warranties
 
@@ -58,6 +59,7 @@ has [ qw/
     UpdateDate
     Warranties
     IsDeleted
+    IsNotManaged
 / ] => (
     is => 'rw',
 );

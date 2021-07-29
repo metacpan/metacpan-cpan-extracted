@@ -1,0 +1,15 @@
+Changelog for Mojolicious-Plugin-Restify-OtherActions
+
+0.02 2021-07-20T07:52:45
+ - Solved a bug where new route is appended to wrong node
+ - [Minor] Changes to work with travis-ci.com
+ - [MINOR] Add config file for travis-ci.com
+ - [MINOR] Add README to github page
+
+0.01 2021-07-19T14:05:53
+ - Update documentation
+ - [MINOR]: Ignore build folders
+ - Add test
+ - Working library
+ - First import
+ - Initial commit

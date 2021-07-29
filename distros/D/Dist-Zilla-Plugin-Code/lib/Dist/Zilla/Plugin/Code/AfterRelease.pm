@@ -4,13 +4,14 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.003';
+our $VERSION = '0.006';
 
 use Moose;
 use namespace::autoclean;
 
 with 'Dist::Zilla::Role::AfterRelease';
 
+use Config::MVP 2.200012 ();    # https://github.com/rjbs/Config-MVP/issues/13
 use MooseX::Types::Moose qw(CodeRef);
 
 has after_release => (
@@ -43,7 +44,7 @@ Dist::Zilla::Plugin::Code::AfterRelease - something that runs after release is m
 
 =head1 VERSION
 
-Version 0.003
+Version 0.006
 
 =head1 SYNOPSIS
 
@@ -62,12 +63,10 @@ Version 0.003
             'SomeUniqueName',
             'Dist::Zilla::Plugin::Code::AfterRelease',
             {
-                after_release => [
-                    sub {
-                        my ( $self, $archive ) = @_;
-                        $self->log("Hello world");
-                    },
-                ],
+                after_release => sub {
+                    my ( $self, $archive ) = @_;
+                    $self->log('Hello world');
+                },
             },
         ];
 
@@ -87,12 +86,10 @@ Version 0.003
         $self->add_plugins([
             'Code::AfterRelease',
             {
-                after_release => [
-                    sub {
-                        my ( $self, $archive ) = @_;
-                        $self->log("Hello world");
-                    },
-                ],
+                after_release => sub {
+                    my ( $self, $archive ) = @_;
+                    $self->log('Hello world');
+                },
             },
         ]);
 
@@ -102,11 +99,6 @@ Version 0.003
 =head1 DESCRIPTION
 
 This plugin implements the L<Dist::Zilla::Role::AfterRelease> role.
-
-B<Note:> Because of the way L<Config::MVP> processes the arguments you have
-to put the sub reference inside an array reference. Otherwise you get an
-I<Not an ARRAY reference> error. See
-L<https://github.com/rjbs/Config-MVP/issues/13>.
 
 =head1 SUPPORT
 
@@ -131,7 +123,7 @@ Sven Kirmess <sven.kirmess@kzone.ch>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Sven Kirmess.
+This software is Copyright (c) 2020-2021 by Sven Kirmess.
 
 This is free software, licensed under:
 
@@ -139,7 +131,7 @@ This is free software, licensed under:
 
 =head1 SEE ALSO
 
-L<Dist::Zilla>, L<lib>
+L<Dist::Zilla>, L<Dist::Zilla::Role::AfterRelease>
 
 =cut
 

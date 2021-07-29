@@ -50,6 +50,13 @@
                     %#= link_to Triggers => 'zapp.list_triggers', class => join( ' ', 'nav-link', ('active')x!!(current_route =~ /triggers?$/) )
                 </div>
             </div>
+            <div class="pull-right">
+                %= form_for 'yancy.auth.password.login' => ( class => 'form-inline my-2 my-lg-0', method => 'POST' ), begin
+                    %= text_field username => class => 'form-control', 'placeholder' => l 'Username'
+                    %= password_field password => class => 'form-control', 'placeholder' => l 'Password'
+                    <button class="btn btn-primary"><%= l 'Login' %></button>
+                % end
+            </div>
         </nav>
     </header>
     <main class="container">

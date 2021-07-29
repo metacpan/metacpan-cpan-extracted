@@ -8,7 +8,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(PE_OK PE_ERROR);
 
 extends 'Lemonldap::NG::Portal::Main::Auth';
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.12';
 
 # INITIALIZATION
 
@@ -216,7 +216,7 @@ sub extractFormInfo {
             expires => 'Wed, 21 Oct 2015 00:00:00 GMT'
         )
     );
-    PE_OK;
+    return PE_OK;
 }
 
 sub setAuthSessionInfo {
@@ -228,15 +228,15 @@ sub setAuthSessionInfo {
     $req->{sessionInfo}->{_twitterScreenName} =
       $req->data->{_twitterScreenName};
 
-    PE_OK;
+    return PE_OK;
 }
 
 sub authenticate {
-    PE_OK;
+    return PE_OK;
 }
 
 sub authLogout {
-    PE_OK;
+    return PE_OK;
 }
 
 sub getDisplayType {

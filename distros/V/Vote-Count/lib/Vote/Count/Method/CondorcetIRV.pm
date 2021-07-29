@@ -9,13 +9,13 @@ use Moose;
 extends 'Vote::Count';
 with 'Vote::Count::BottomRunOff';
 
-our $VERSION='2.00';
+our $VERSION='2.01';
 
 =head1 NAME
 
 Vote::Count::Method::CondorcetIRV
 
-=head1 VERSION 2.00
+=head1 VERSION 2.01
 
 =cut
 
@@ -81,9 +81,11 @@ The Woodhull method is similar to Smith Set IRV. The difference is: instead of e
 
 The argument in favor of Woodhull over Smith would be that: Anything which alters the dropping order can alter the outcome of IRV, and Woodhull preserves the IRV dropping order. Since, a dropping order change has an equal possiblity of helping or hurting one's preferred choice, this side-effect is a random flaw. Removing the least consequential choices is preventing them from impacting the election (in a random manner), thus this author sees it as an advantage for Smith Set IRV.
 
-=head1 Method Common Name: Bottom Two Runoff IRV, BTR IRV (Implementation Soon)
+=head1 Method Common Name: Bottom Two Runoff IRV, BTR IRV
 
 This is the simplest modification to IRV which meets the Condorcet Winner Criteria. Instead of eliminating the low choice, the lowest two choices enter a virtual runoff, eliminating the loser. This is the easiest Hand Count Condorcet method, there will always be fewer pairings than choices. This method fails LNH, when there is no Condorcet Winner the LNH impact may substantial since it can come into play for each runoff. BTR IRV will only eliminate a member of the Smith Set when both members of the runoff are in it, it can never eliminate the final member of the Smith Set. BTR IRV meets both Condorcet Criteria and the Smith Criteria.
+
+This method is implemented in the Main IRV Role L<Vote::Count::IRV|Vote::Count::IRV/RunBTRIRV>.
 
 =head1 Method Common Names: Benham, Benham IRV
 
@@ -119,59 +121,6 @@ sub SmithSetIRV ( $E, $tiebreaker = 'all' ) {
     return $IRV;
   }
 }
-
-# sub BTRIRV ( $E ) {
-
-# }
-
-# sub RunIRV ( $self, $active = undef, $tiebreaker = undef ) {
-#   # external $active should not be changed.
-#   if ( defined $active ) { $active = dclone $active }
-#   # Object's active is altered by IRV.
-#   else { $active = dclone $self->Active() }
-#   unless ( defined $tiebreaker ) {
-#     if ( defined $self->TieBreakMethod() ) {
-#       $tiebreaker = $self->TieBreakMethod();
-#     }
-#     else {
-#       $tiebreaker = 'all';
-#     }
-#   }
-#   my $roundctr = 0;
-#   my $maxround = scalar( keys %{$active} );
-#   $self->logt( "Instant Runoff Voting",
-#     'Choices: ', join( ', ', ( sort keys %{$active} ) ) );
-#   # forever loop normally ends with return from $majority
-#   # a tie should be detected and also generate a
-#   # return from the else loop.
-#   # if something goes wrong roundcountr/maxround
-#   # will generate exception.
-# IRVLOOP:
-#   until (0) {
-#     $roundctr++;
-#     die "IRVLOOP infinite stopped at $roundctr" if $roundctr > $maxround;
-#     my $round = $self->TopCount($active);
-#     $self->logv( '---', "IRV Round $roundctr", $round->RankTable() );
-#     my $majority = $self->EvaluateTopCountMajority($round);
-#     if ( defined $majority->{'winner'} ) {
-#       return $majority;
-#     }
-#     else {
-#       my @bottom =
-#         $self->_ResolveTie( $active, $tiebreaker, $round->ArrayBottom()->@* );
-#       if ( scalar(@bottom) == scalar( keys %{$active} ) ) {
-#         # if there is a tie at the end, the finalists should
-#         # be both top and bottom and the active set.
-#         $self->logt( "Tied: " . join( ', ', @bottom ) );
-#         return { tie => 1, tied => \@bottom, winner => 0 };
-#       }
-#       $self->logv( "Eliminating: " . join( ', ', @bottom ) );
-#       for my $b (@bottom) {
-#         delete $active->{$b};
-#       }
-#     }
-#   }
-# }
 
 1;
 

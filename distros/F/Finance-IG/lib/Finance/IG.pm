@@ -24,11 +24,11 @@ You will need an API key to use this module, available free from IG Markets.
 
 =head1 VERSION
 
-Version 0.096
+Version 0.101
 
 =cut
 
-our $VERSION = '0.096';
+our $VERSION = '0.101';
 
 
 =head1 SYNOPSIS
@@ -2062,8 +2062,9 @@ sub printpos
      #die $format; 
      # print "$format\n"; exit; 
      #$"=":"; print "@$position\n"; 
+  
 
-
+    $format=~s/[\x82\x83\xc3]//g;   # so we get some strange characters like ÃÂ occuring in pairs. Not sure why. This removes them.   
      #$format="%-41s %+7s %11s %-10s £%-10s %5s%% £%12s %-9s %-4s"; 
      #print "$format\n"; #exit; 
     print $out Bold if ($self->col and defined $INC{'Term/Chrome.pm'});
@@ -2077,7 +2078,7 @@ sub printpos
   if (!defined $position or $position eq '')
   {
     $titles=~s/\n//g;
-    $titles=~s/%([-+0-9.]*)([sf])/%/g;
+    $titles=~s/%([-+0-9.]*)([sfd])/%/g;
     $titles=~s/%%/__PC__/g;
     $titles=~s/%//; # just one 
     $titles=~s/£%([a-zA-Z]+)/%$1£/g;
@@ -2098,6 +2099,7 @@ sub printpos
     #$format=~s/(%[-+0-9]+)\.[0-9]+/$1/g; 
     $format=~s/£//g;
     #die "format=$format titles=@titles"; 
+    $format=~s/[\x82\x83\xc3]//g;   # so we get some strange characters like ÃÂ occuring in pairs. Not sure why. This removes them.   
     print $out Bold  if ($self->col and defined $INC{'Term/Chrome.pm'});
     printf $out $format, @titles;
     print $out Reset if ($self->col and defined $INC{'Term/Chrome.pm'});
@@ -2183,7 +2185,7 @@ sub printpos
      }
 
           $col=&$colsub($position);
-     $len=~s/[sf]$//;
+     $len=~s/[dsf]$//;
      if ($len ne '') # len can be something like 0.2
      {
        $len=~s/%//;
@@ -2197,6 +2199,7 @@ sub printpos
   $col=&$colsub($position)//'' if ($self->col and defined $INC{'Term/Chrome.pm'});
   $format=~s/##/%/g;
   $format=~s/£-/-£/g;
+  $format=~s/[\x82\x83\xc3]//g;   # so we get some strange characters like ÃÂ occuring in pairs. Not sure why. This removes them.   
   print $out $col, $format;
   if (ref($col) ne '')
   { print $out Reset;

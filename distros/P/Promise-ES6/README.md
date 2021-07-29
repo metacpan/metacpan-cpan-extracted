@@ -32,6 +32,10 @@ Promise::ES6 - ES6-style promises in Perl
 
 # DESCRIPTION
 
+<div>
+    <a href='https://coveralls.io/github/FGasper/p5-Promise-ES6?branch=master'><img src='https://coveralls.io/repos/github/FGasper/p5-Promise-ES6/badge.svg?branch=master' alt='Coverage Status' /></a>
+</div>
+
 This module provides a Perl implementation of [promises](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Using_promises), a useful pattern
 for coordinating asynchronous tasks.
 
@@ -76,6 +80,32 @@ Note that, in the case of [Future](https://metacpan.org/pod/Future), this will y
 Future is not compatible with promises.
 
 (See [Promise::ES6::Future](https://metacpan.org/pod/Promise::ES6::Future) for more tools to interact with [Future](https://metacpan.org/pod/Future).)
+
+# **EXPERIMENTAL:** ASYNC/AWAIT SUPPORT
+
+This module implements [Future::AsyncAwait::Awaitable](https://metacpan.org/pod/Future::AsyncAwait::Awaitable). This lets you do
+nifty stuff like:
+
+    use Future::AsyncAwait;
+
+    async sub do_stuff {
+        my $foo = await fetch_number_p();
+
+        # NB: The real return is a promise that provides this value:
+        return 1 + $foo;
+    }
+
+    my $one_plus_number = await do_stuff();
+
+… which roughly equates to:
+
+    sub do_stuff {
+        return fetch_number_p()->then( sub { 1 + $foo } );
+    }
+
+    do_stuff->then( sub {
+        $one_plus_number = shift;
+    } );
 
 # UNHANDLED REJECTIONS
 
@@ -177,6 +207,8 @@ a canceled query in the “pending” state or to “settle” (i.e., resolve or
 reject) it. All things being equal, I feel the first approach is the most
 intuitive, while the latter ends up being “cleaner”.
 
+Of note: [Future](https://metacpan.org/pod/Future) implements native cancellation.
+
 # MEMORY LEAKS
 
 It’s easy to create inadvertent memory leaks using promises in Perl.
@@ -246,6 +278,6 @@ mine are the nicest :), but YMMV. Enjoy!
 
 # LICENSE & COPYRIGHT
 
-Copyright 2019-2020 Gasper Software Consulting.
+Copyright 2019-2021 Gasper Software Consulting.
 
 This library is licensed under the same terms as Perl itself.

@@ -1,5 +1,12 @@
 Revision history for Devel-ebug},
 
+0.64      2021-07-10 15:42:56 -0600
+  - Remove dependency on FindBin and File::Which (gh#51)
+  - Improve backend fallback; no longer require
+    ebug_backend_perl be in the PATH (gh#49, gh#51)
+  - Fix ebug_server and ebug_client documentation to
+    use underscores (gh#50, gh#51)
+
 0.63      2020-07-27 13:15:16 -0600
   - Fixed intermittent testing failure relating to Expect (gh#20)
 

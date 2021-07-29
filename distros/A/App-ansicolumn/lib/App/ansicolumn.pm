@@ -1,6 +1,6 @@
 package App::ansicolumn;
 
-our $VERSION = "1.08";
+our $VERSION = "1.10";
 
 use v5.14;
 use warnings;
@@ -21,113 +21,73 @@ use Text::ANSI::Printf qw(ansi_printf ansi_sprintf);
 use App::ansicolumn::Util;
 use App::ansicolumn::Border;
 
-sub new {
-    my $class = shift;
-    my $obj = bless {
-	width               => undef,
-	fillrows            => undef,
-	table               => undef,
-	table_columns_limit => 0,
-	table_right         => '',
-	separator           => ' ',
-	output_separator    => '  ',
-	page                => undef,
-	height              => 0,
-	column_unit         => 8,
-	pane                => 0,
-	pane_width          => undef,
-	tabstop             => 8,
-	tabhead             => undef,
-	tabspace            => undef,
-	tabstyle            => undef,
-	ignore_space        => 1,
-	fullwidth           => undef,
-	linestyle           => '',
-	boundary            => '',
-	linebreak           => '',
-	pagebreak           => 1,
-	runin               => 2,
-	runout              => 2,
-	border              => undef,
-	border_style        => 'vbar',
-	document            => undef,
-	insert_space        => undef,
-	white_space         => 2,
-	isolation           => 2,
-	fillup              => undef,
-	fillup_str          => '',
-	ambiguous           => 'narrow',
-	discard_el          => 1,
-	padchar             => ' ',
-	term_size           => undef,
-	debug               => undef,
-	version             => undef,
-	colormap            => [],
-	COLORHASH           => {},
-	COLORLIST           => [],
-	COLOR               => undef,
-	BORDER              => undef,
-	}, $class;
-    lock_keys %{$obj};
-    $obj;
-}
+use Getopt::EX::Hashed;
 
-sub use_keys {
-    my $obj = shift;
-    unlock_keys %{$obj};
-    lock_keys_plus %{$obj}, @_;
-}
+has debug               => spec  => '           ' , ;
+has help                => spec  => '    h      ' , ;
+has width               => spec  => ' =s c      ' , ;
+has fillrows            => spec  => '    x      ' , ;
+has table               => spec  => '    t      ' , ;
+has table_columns_limit => spec  => ' =i l      ' , default => 0 ;
+has table_right         => spec  => ' =s R      ' , default => '' ;
+has separator           => spec  => ' =s s      ' , default => ' ' ;
+has output_separator    => spec  => ' =s o      ' , default => '  ' ;
+has document            => spec  => '    D      ' , ;
+has page                => spec  => ' :i P      ' , ;
+has pane                => spec  => ' =i C      ' , default => 0 ;
+has pane_width          => spec  => ' =s S pw   ' , ;
+has fullwidth           => spec  => ' !  F      ' , ;
+has paragraph           => spec  => ' !  p      ' , ;
+has height              => spec  => ' =s        ' , default => 0 ;
+has column_unit         => spec  => ' =i cu     ' , default => 8 ;
+has tabstop             => spec  => ' =i        ' , default => 8 ;
+has tabhead             => spec  => ' =s        ' , ;
+has tabspace            => spec  => ' =s        ' , ;
+has tabstyle            => spec  => ' =s        ' , ;
+has ignore_space        => spec  => ' !  is     ' , default => 1 ;
+has linestyle           => spec  => ' =s ls     ' , default => '' ;
+has boundary            => spec  => ' =s        ' , default => '' ;
+has linebreak           => spec  => ' =s lb     ' , default => '' ;
+has runin               => spec  => ' =i        ' , default => 2 ;
+has runout              => spec  => ' =i        ' , default => 2 ;
+has pagebreak           => spec  => ' !         ' , default => 1 ;
+has border              => spec  => ' :s        ' , ;
+has border_style        => spec  => ' =s bs     ' , default => 'vbar' ;
+has white_space         => spec  => ' !         ' , default => 2 ;
+has isolation           => spec  => ' !         ' , default => 2 ;
+has fillup              => spec  => ' :s        ' , ;
+has fillup_str          => spec  => ' :s        ' , default => '' ;
+has ambiguous           => spec  => ' =s        ' , default => 'narrow' ;
+has discard_el          => spec  => ' !         ' , default => 1 ;
+has padchar             => spec  => ' =s        ' , default => ' ' ;
+has term_size           => spec  => '           ' , ;
+has version             => spec  => '           ' , ;
+has colormap            => spec  => ' =s@ cm    ' , default => [] ;
+
+has COLORHASH           => default => {};
+has COLORLIST           => default => [];
+has COLOR               => ;
+has BORDER              => ;
+
+no Getopt::EX::Hashed;
 
 sub run {
     my $obj = shift;
-    local @ARGV = map { utf8::is_utf8($_) ? $_ : decode('utf8', $_) } @_;
-    GetOptions(
-	$obj,
-	map { s/^(?=\w+_)(\w+)\K/"|".$1=~tr[_][-]r."|".$1=~tr[_][]dr/er } qw(
-	width|output_width|c=s
-	fillrows|x
-	table|t
-	table_columns_limit|l=i
-	table_right|R=s
-	separator|s=s
-	output_separator|o=s
-	page|P:i
-	height=s
-	column_unit|cu=i
-	pane|C=i
-	pane_width|pw|S=s
-	tabstop=i
-	tabhead=s
-	tabspace=s
-	tabstyle=s
-	ignore_space|is!
-	fullwidth|F!
-	linestyle|ls=s
-	boundary=s
-	linebreak|lb=s runin=i runout=i
-	pagebreak!
-	border:s
-	border_style|bs=s
-	document|D
-	colormap|cm=s@
-	insert_space|paragraph!
-	white_space!
-	isolation!
-	fillup:s
-	fillup_str:s
-	ambiguous=s
-	discard_el!
-	padchar=s
-	debug
-	version|v
-	)) || pod2usage();
-    $obj->{version} and do { say $VERSION; exit };
+    local @ARGV = decode_argv(@_);
+    $obj->getopt || pod2usage(2);
+
+    if ($obj->{help} or $obj->{version}) {
+	pod2usage(-verbose => 0, -exitval => "NOEXIT")
+	    if $obj->{help};
+	say "Version: $VERSION";
+	exit;
+    }
     $obj->setup_options;
 
     warn Dumper $obj if $obj->{debug};
 
     chomp(my @lines = <>);
-    @lines = insert_space @lines if $obj->{insert_space};
+    @lines = insert_space @lines if $obj->{paragraph};
 
     if ($obj->{table}) {
 	$obj->table_out(@lines);

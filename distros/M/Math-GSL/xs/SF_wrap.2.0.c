@@ -21257,6 +21257,34 @@ XS(_wrap_gsl_sf_legendre_array_n) {
 }
 
 
+XS(_wrap_gsl_sf_legendre_nlm) {
+  {
+    size_t arg1 ;
+    size_t val1 ;
+    int ecode1 = 0 ;
+    int argvi = 0;
+    size_t result;
+    dXSARGS;
+    
+    if ((items < 1) || (items > 1)) {
+      SWIG_croak("Usage: gsl_sf_legendre_nlm(lmax);");
+    }
+    ecode1 = SWIG_AsVal_size_t SWIG_PERL_CALL_ARGS_2(ST(0), &val1);
+    if (!SWIG_IsOK(ecode1)) {
+      SWIG_exception_fail(SWIG_ArgError(ecode1), "in method '" "gsl_sf_legendre_nlm" "', argument " "1"" of type '" "size_t""'");
+    } 
+    arg1 = (size_t)(val1);
+    result = gsl_sf_legendre_nlm(arg1);
+    ST(argvi) = SWIG_From_size_t  SWIG_PERL_CALL_ARGS_1((size_t)(result)); argvi++ ;
+    
+    XSRETURN(argvi);
+  fail:
+    
+    SWIG_croak_null();
+  }
+}
+
+
 XS(_wrap_gsl_sf_legendre_array_index) {
   {
     size_t arg1 ;
@@ -21289,34 +21317,6 @@ XS(_wrap_gsl_sf_legendre_array_index) {
     XSRETURN(argvi);
   fail:
     
-    
-    SWIG_croak_null();
-  }
-}
-
-
-XS(_wrap_gsl_sf_legendre_nlm) {
-  {
-    size_t arg1 ;
-    size_t val1 ;
-    int ecode1 = 0 ;
-    int argvi = 0;
-    size_t result;
-    dXSARGS;
-    
-    if ((items < 1) || (items > 1)) {
-      SWIG_croak("Usage: gsl_sf_legendre_nlm(lmax);");
-    }
-    ecode1 = SWIG_AsVal_size_t SWIG_PERL_CALL_ARGS_2(ST(0), &val1);
-    if (!SWIG_IsOK(ecode1)) {
-      SWIG_exception_fail(SWIG_ArgError(ecode1), "in method '" "gsl_sf_legendre_nlm" "', argument " "1"" of type '" "size_t""'");
-    } 
-    arg1 = (size_t)(val1);
-    result = gsl_sf_legendre_nlm(arg1);
-    ST(argvi) = SWIG_From_size_t  SWIG_PERL_CALL_ARGS_1((size_t)(result)); argvi++ ;
-    
-    XSRETURN(argvi);
-  fail:
     
     SWIG_croak_null();
   }
@@ -26839,8 +26839,8 @@ static swig_command_info swig_commands[] = {
 {"Math::GSL::SFc::gsl_sf_legendre_deriv2_alt_array", _wrap_gsl_sf_legendre_deriv2_alt_array},
 {"Math::GSL::SFc::gsl_sf_legendre_deriv2_alt_array_e", _wrap_gsl_sf_legendre_deriv2_alt_array_e},
 {"Math::GSL::SFc::gsl_sf_legendre_array_n", _wrap_gsl_sf_legendre_array_n},
-{"Math::GSL::SFc::gsl_sf_legendre_array_index", _wrap_gsl_sf_legendre_array_index},
 {"Math::GSL::SFc::gsl_sf_legendre_nlm", _wrap_gsl_sf_legendre_nlm},
+{"Math::GSL::SFc::gsl_sf_legendre_array_index", _wrap_gsl_sf_legendre_array_index},
 {"Math::GSL::SFc::gsl_sf_log_e", _wrap_gsl_sf_log_e},
 {"Math::GSL::SFc::gsl_sf_log", _wrap_gsl_sf_log},
 {"Math::GSL::SFc::gsl_sf_log_abs_e", _wrap_gsl_sf_log_abs_e},
@@ -27271,7 +27271,7 @@ XS(SWIG_init) {
   
   /*@SWIG:/usr/share/swig4.0/perl5/perltypemaps.swg,65,%set_constant@*/ do {
     SV *sv = get_sv((char*) SWIG_prefix "GSL_VERSION", TRUE | 0x2 | GV_ADDMULTI);
-    sv_setsv(sv, SWIG_From_double  SWIG_PERL_CALL_ARGS_1((double)(2.6)));
+    sv_setsv(sv, SWIG_From_double  SWIG_PERL_CALL_ARGS_1((double)(2.7)));
     SvREADONLY_on(sv);
   } while(0) /*@SWIG@*/;
   /*@SWIG:/usr/share/swig4.0/perl5/perltypemaps.swg,65,%set_constant@*/ do {
@@ -27281,7 +27281,7 @@ XS(SWIG_init) {
   } while(0) /*@SWIG@*/;
   /*@SWIG:/usr/share/swig4.0/perl5/perltypemaps.swg,65,%set_constant@*/ do {
     SV *sv = get_sv((char*) SWIG_prefix "GSL_MINOR_VERSION", TRUE | 0x2 | GV_ADDMULTI);
-    sv_setsv(sv, SWIG_From_int  SWIG_PERL_CALL_ARGS_1((int)(6)));
+    sv_setsv(sv, SWIG_From_int  SWIG_PERL_CALL_ARGS_1((int)(7)));
     SvREADONLY_on(sv);
   } while(0) /*@SWIG@*/;
   /*@SWIG:/usr/share/swig4.0/perl5/perltypemaps.swg,65,%set_constant@*/ do {

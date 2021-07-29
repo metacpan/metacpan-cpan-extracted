@@ -4,7 +4,7 @@ use Mojo::Base qw(Exporter);
 use Mojo::UserAgent;
 use Mojo::Util qw(deprecated md5_sum);
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 our @EXPORT  = qw( $_request_with_digest_auth );
 
 our $_request_with_digest_auth = sub {
@@ -25,7 +25,7 @@ Mojo::UserAgent::DigestAuth - Allow Mojo::UserAgent to execute digest auth reque
 
 =head1 VERSION
 
-0.05
+0.06
 
 =head1 DESCRIPTION
 

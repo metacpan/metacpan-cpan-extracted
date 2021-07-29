@@ -1,4 +1,6 @@
-1.0.2    xx.xx.2021
+1.0.3    xx.xx.xxxx
+           - allow stringifyable objects in various parts
+1.0.2    02.07.2021
            - C++ codes moved to its own library with cmake
 1.0.1    17.05.2021
            - add XLog to prerequisites

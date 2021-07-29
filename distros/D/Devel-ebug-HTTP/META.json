@@ -42,18 +42,14 @@
       "runtime" : {
          "requires" : {
             "Catalyst" : "0",
+            "Catalyst::Controller" : "0",
             "Catalyst::Plugin::Static::Simple" : "0",
             "Catalyst::ScriptRunner" : "0",
             "Catalyst::View::TT" : "0",
-            "Cwd" : "0",
-            "Devel::ebug" : "0",
+            "Devel::ebug" : "0.64",
             "File::ShareDir::Dist" : "0",
-            "HTML::Prototype" : "0",
-            "List::Util" : "0",
             "PPI" : "0",
             "PPI::HTML" : "0",
-            "Path::Class" : "0.26",
-            "Storable" : "0",
             "base" : "0",
             "perl" : "5.010001"
          }
@@ -79,7 +75,7 @@
          "web" : "https://github.com/uperl/Devel-ebug-HTTP"
       }
    },
-   "version" : "0.34",
+   "version" : "0.36",
    "x_contributors" : [
       "Leon Brocard <acme@astray.com>",
       "Graham Ollis <plicease@cpan.org>"

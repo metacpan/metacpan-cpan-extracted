@@ -111,11 +111,39 @@ subtest 'cloned' => sub {
 
 };
 
+use Hash::Wrap ( {
+        -as    => 'return_custom_cloned',
+        -clone => sub {
+            require Storable;
+            return Storable::dclone $_[0];
+        },
+    } );
 
-use Hash::Wrap ({
-    -as     => 'return_created_class',
-    -class  => 'My::CreatedClass',
-  });
+subtest 'custom cloned' => sub {
+
+    my %hash = ( a => 1, b => 2, c => [9] );
+    my $hash = \%hash;
+
+    my $obj = return_custom_cloned $hash;
+
+    isnt( refaddr( $obj ), refaddr( $hash ), "same hash reference" );
+    is( $obj->a, 1, 'retrieve value' );
+    is( $obj->b, 2, 'retrieve another value' );
+    is( $obj->c, [9], 'retrieve another value' );
+
+    $hash{a} = 2;
+    is( $obj->a, 1, 'object scalar independent of hash' );
+
+    $hash{c} = [10];
+    is( $obj->c, [9], 'object arrayref contents independent of hash' );
+
+};
+
+
+use Hash::Wrap ( {
+    -as    => 'return_created_class',
+    -class => 'My::CreatedClass',
+} );
 
 # check that caching and alternative classing with creation works
 subtest 'cache + create class' => sub {

@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2020 -- leonerd@leonerd.org.uk
 
-package Metrics::Any::Collector 0.06;
+package Metrics::Any::Collector 0.07;
 
 use v5.14;
 use warnings;
@@ -45,6 +45,26 @@ of metrics until the main activity has actually begin, it should be possible
 to allow programs to configure the metric reporting in a flexible manner
 during program startup.
 
+=head1 ENVIRONMENT
+
+=head2 METRICS_ANY_DISABLE
+
+I<Since version 0.07.>
+
+Provides a list of packages and namespaces in which to disable L<Metrics::Any>
+reporting entirely.
+
+This variable gives a comma-separated list of name patterns. Patterns may end
+with C<::*>, where they will match any package whose name starts with that
+prefix, or they may be literal package names. If any code in matching packages
+attempts to use L<Metrics::Any::Collector> to report metrics, that code will
+be given a C<Null> adapter, and no metrics will be reported from here.
+
+For example, to disable the metrics that C<Net::Async::HTTP::Server> itself
+creates when exporting Prometheus metrics:
+
+   $ METRICS_ANY_DISABLE=Net::Async::HTTP::Server ./program.pl
+
 =cut
 
 # Not public API; used by Metrics::Any::import_into
@@ -63,12 +83,44 @@ sub new
    }, $class;
 }
 
+my %disable_for_package;
+my %disable_for_namespace;
+if( my $val = $ENV{METRICS_ANY_DISABLE} ) {
+   foreach my $pattern ( split m/,/, $val ) {
+      if( $pattern =~ s/\*$// ) {
+         $pattern =~ s/::$//;
+         $disable_for_namespace{$pattern} = 1;
+      }
+      else {
+         $disable_for_package{$pattern} = 1;
+      }
+   }
+
+   require Metrics::Any::Adapter::Null;
+}
+
+sub _enabled_for_package
+{
+   my ( $pkg ) = @_;
+
+   return 0 if $disable_for_package{$pkg};
+   return 1 unless %disable_for_namespace;
+
+   do {
+      return 0 if $disable_for_namespace{$pkg};
+   } while( $pkg =~ s/::[^:]+// );
+
+   return 1;
+}
+
 sub adapter
 {
    my $self = shift;
    return $self->{adapter} if $self->{adapter};
 
-   my $adapter = $self->{adapter} = Metrics::Any::Adapter->adapter;
+   my $adapter = $self->{adapter} =
+      ( _enabled_for_package( $self->{package} ) ? Metrics::Any::Adapter->adapter
+                                                 : Metrics::Any::Adapter::Null->new );
    foreach my $call ( @{ $self->{deferred} } ) {
       my ( $method, @args ) = @$call;
       $adapter->$method( @args );

@@ -137,8 +137,8 @@ subtest 'VCUpdateActive' => sub {
   $G->VCUpdateActive();
   is_deeply(
     $G->GetActive(),
-    { MINTCHIP => 1, CARAMEL => 1 },
-    'VCUPDATEACTIVE set active with a choice pending');
+    { MINTCHIP => 1 },
+    'VCUPDATEACTIVE pending choice is no longer active ');
 };
 
 done_testing();

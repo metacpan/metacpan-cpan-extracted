@@ -3,15 +3,17 @@
 #
 #  (C) Paul Evans, 2019-2020 -- leonerd@leonerd.org.uk
 
-package Object::Pad 0.43;
+package Object::Pad 0.47;
 
 use v5.14;
 use warnings;
 
 use Carp;
 
-require XSLoader;
-XSLoader::load( __PACKAGE__, our $VERSION );
+sub dl_load_flags { 0x01 }
+
+require DynaLoader;
+__PACKAGE__->DynaLoader::bootstrap( our $VERSION );
 
 # So that feature->import will work in `class`
 require feature;
@@ -72,7 +74,7 @@ which helps create the object instances. This may respond to passed arguments,
 automatically assigning values of slots, and invoking other blocks of code
 provided by the class. It proceeds in the following stages:
 
-=head3 BUILDARGS
+=head3 The BUILDARGS phase
 
 If the class provides a C<BUILDARGS> class method, that is used to mangle the
 list of arguments before the C<BUILD> blocks are called. Note this must be a
@@ -93,14 +95,14 @@ The constructor will also check for required parameters (these are all the
 parameters for slots that do not have default initialisation expressions). If
 any of these are missing an exception is thrown.
 
-=head3 BUILD
+=head3 The BUILD phase
 
 As part of the construction process, the C<BUILD> block of every component
 class will be invoked, passing in the list of arguments the constructor was
 invoked with. Each class should perform its required setup behaviour, but does
 not need to chain to the C<SUPER> class first; this is handled automatically.
 
-=head3 ADJUST
+=head3 The ADJUST phase
 
 Finally, before the new object is returned from the constructor, the C<ADJUST>
 block of every component class is invoked. This happens after the slots are
@@ -401,6 +403,17 @@ I<Since version 0.28> all of these generated accessor methods will include
 argument checking similar to that used by subroutine signatures, to ensure the
 correct number of arguments are passed - usually zero, but exactly one in the
 case of a C<:writer> method.
+
+=head3 :weak
+
+I<Since version 0.44.>
+
+Generated code which sets the value of this slot will weaken it if it contains
+a reference. This applies to within the constructor if C<:param> is given, and
+to a C<:writer> accessor method. Note that this I<only> applies to
+automatically generated code; not normal code written in regular method
+bodies. If you assign into the slot variable you must remember to call
+C<Scalar::Util::weaken> yourself.
 
 =head3 :param, :param(NAME)
 
@@ -712,15 +725,14 @@ sub import_into
    croak "Unrecognised import symbols @{[ keys %syms ]}" if keys %syms;
 }
 
-# Double-experimental MOP-like API
-# Currently entirely undocumented. May eventually become part of an Object::Pad::MOP API
 sub begin_class
 {
    my $class = shift;
    my ( $name, %args ) = @_;
 
-   # TODO: Do we accept an `isa` arg ?
-   Object::Pad::_begin_class( $name, $args{extends} );
+   Carp::carp "Object::Pad->begin_class is deprecated; use Object::Pad::MOP::Class->begin_class instead";
+
+   Object::Pad::MOP::Class->begin_class( $name, %args );
 }
 
 # The universal base-class methods
@@ -869,6 +881,14 @@ time working on this module and other perl features.
 =item *
 
 Oetiker+Partner AG L<https://www.oetiker.ch/en/>
+
+=item *
+
+Deriv L<http://deriv.com>
+
+=item *
+
+Perl-Verein Schweiz L<https://www.perl-workshop.ch/>
 
 =back
 

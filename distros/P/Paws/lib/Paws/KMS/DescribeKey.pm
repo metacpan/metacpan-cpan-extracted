@@ -28,9 +28,8 @@ You shouldn't make instances of this class. Each attribute should be used as a n
 =head1 SYNOPSIS
 
     my $kms = Paws->service('KMS');
-    # To obtain information about a customer master key (CMK)
-    # The following example returns information (metadata) about the specified
-    # CMK.
+ # To obtain information about a customer master key (CMK)
+ # The following example returns information (metadata) about the specified CMK.
     my $DescribeKeyResponse =
       $kms->DescribeKey( 'KeyId' => '1234abcd-12ab-34cd-56ef-1234567890ab' );
 
@@ -49,7 +48,9 @@ For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/kms
 
 A list of grant tokens.
 
-For more information, see Grant Tokens
+Use a grant token when your permission to call this operation comes
+from a new grant that has not yet achieved I<eventual consistency>. For
+more information, see Grant token
 (https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#grant_token)
 in the I<AWS Key Management Service Developer Guide>.
 
@@ -64,10 +65,9 @@ KMS associates the alias with an AWS managed CMK
 (https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#master_keys)
 and returns its C<KeyId> and C<Arn> in the response.
 
-To specify a CMK, use its key ID, Amazon Resource Name (ARN), alias
-name, or alias ARN. When using an alias name, prefix it with
-C<"alias/">. To specify a CMK in a different AWS account, you must use
-the key ARN or alias ARN.
+To specify a CMK, use its key ID, key ARN, alias name, or alias ARN.
+When using an alias name, prefix it with C<"alias/">. To specify a CMK
+in a different AWS account, you must use the key ARN or alias ARN.
 
 For example:
 

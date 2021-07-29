@@ -3,7 +3,7 @@ use warnings;
 use strict;
 use 5.010001;
 
-our $VERSION = '2.271';
+our $VERSION = '2.277';
 
 use Term::Choose::Screen qw( hide_cursor show_cursor clear_to_end_of_screen );
 
@@ -53,7 +53,7 @@ C<db-browser> - Browse C<SQLite>/C<MySQL>/C<PostgreSQL> databases and their tabl
 
 =head1 VERSION
 
-Version 2.271
+Version 2.277
 
 =head1 SYNOPSIS
 
@@ -327,9 +327,9 @@ C<SpaceBar>, the highlighted column is not added to the chosen when C<Return> is
 
 =head4 LIMIT
 
-=head3 Reset
+=head3 Export
 
-Reset the SQL statement.
+Export the result of the chosen SQL statement to a C<CSV>-file.
 
 =head1 WRITE ACCESS
 
@@ -617,7 +617,7 @@ Choose the required database plugins.
 
 These driver specific I<DB Settings> are used as the default database settings.
 
-There is also in each L</Tables Menu> the entry I<Settings> (if enabled in L</Extensions>) to make database specific
+There is also in each L</Tables Menu> the entry I<DB Settings> (if enabled in L</Extensions>) to make database specific
 settings. If no database specific settings are set, these global (to the database plugin) I<DB Settings> are used.
 
 User defined database plugins: it depends on the plugin which items are offered to be set in each option and whether the
@@ -642,6 +642,10 @@ to the database.
 =item Attributes
 
 For the meaning of these driver specific attributes check the appropriate driver documentation.
+
+C<SQLite> unicode handling: if the C<DBD::SQLite> version is equal or greater then C<1.68>, the C<sqlite_string_mode>
+attribute is used, else the deprecated C<sqlite_unicode> attribute. Read in the
+L<SQLite documentation|https://metacpan.org/pod/DBD::SQLite#sqlite_string_mode> how these two attributes are used.
 
 =item Reset DB
 
@@ -744,47 +748,34 @@ Union All
 
 =head3 Substatements
 
-Substatement additions for:
+Enable substatement additions for:
 
 =over
 
 =item SELECT
 
-I<None>, I<Func>, I<SQ>, I<Func/SQ>
-
 =item WHERE
-
-I<None>, I<Func>, I<SQ>, I<Func/SQ>
 
 =item GROUP BY
 
-I<None>, I<Func>, I<SQ>, I<Func/SQ>
-
-=item HAVING
-
-I<None>, I<Func>, I<SQ>, I<Func/SQ>
-
 =item ORDER BY
-
-I<None>, I<Func>, I<SQ>, I<Func/SQ>
 
 =item SET
 
-I<None>, I<Func>, I<SQ>, I<=N>, I<Func/SQ/=N>
-
 =back
 
-If set to I<None>, no menu extensions are available.
+If enabled, C<%%> is shown as additionally menu entry. Selecting C<%%> lets one choose between the available extensions:
 
-If set to I<Func>, C<f()> is shown as additionally menu entry. Selecting C<f()> opens the L</Functions> menu.
+=over
 
-If set to I<SQ>, C<SQ> is shown as additionally menu entry. Selecting C<SQ> opens the L</Subqueries> menu.
+=item Functions (C<f()>). Selecting C<f()> opens the L</Functions> menu.
 
-If set to I<=N>, C<=N> is shown as additionally menu entry (available after the C<SET> in an C<UPDATE> statement).
-Selecting C<=N> sets the column to C<NULL>.
+=item Subqueries (C<SQ>). Selecting C<SQ> opens the L</Subqueries> menu.
 
-If set to I<Func/SQ> (or I<Func/SQ/=N>), C<%%> is shown as additionally menu entry. Selecting C<%%> lets one choose
-between all available extensions.
+=item Set column to C<NULL> (C<=N>). Available after the C<SET> in an C<UPDATE> statement. Selecting C<=N> sets the
+column to C<NULL>.
+
+=back
 
 If these menu entries are prefixed with C<=>, it is required to select the wanted operator I<after> the extended menu
 entry has been chosen.
@@ -909,7 +900,11 @@ derived tables which get then a default alias.
 
 =item
 
-Aggregate
+Functions/Subqueries in SELECT
+
+=item
+
+AGGREGATE functions
 
 =item
 
@@ -917,19 +912,11 @@ Derived tables
 
 =item
 
-Functions in the SELECT sub-statement.
+JOIN
 
 =item
 
-Join
-
-=item
-
-Subqueries in the SELECT sub-statement.
-
-=item
-
-Union
+UNION
 
 =back
 
@@ -1256,6 +1243,20 @@ If I<file> is selected as the data source type, only files matching this glob pa
 
 If I<file> is selected as the data source type, this setting determines if hidden files are part of the available files
 or not.
+
+=head2 Export to CSV
+
+=head3 Destination folder
+
+Set the folder where the data to be exported will be saved as a CSV file.
+
+=head3 Auto-File-Extension
+
+If this option is enabled, the file extension C<csv> is added automatically to the file-name.
+
+=head3 Encoding to CSV
+
+Set the C<Text::CSV::csv>-option C<encoding>.
 
 =head1 CONFIGURATION FILES
 

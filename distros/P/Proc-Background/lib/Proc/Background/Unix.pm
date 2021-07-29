@@ -1,5 +1,5 @@
 package Proc::Background::Unix;
-$Proc::Background::Unix::VERSION = '1.21';
+$Proc::Background::Unix::VERSION = '1.22';
 # ABSTRACT: Unix-specific implementation of process create/wait/kill
 require 5.004_04;
 
@@ -7,6 +7,17 @@ use strict;
 use Exporter;
 use Carp;
 use POSIX qw(:errno_h :sys_wait_h);
+# For un-explained mysterious reasons, Time::HiRes::alarm seem to misbehave on 5.10 and earlier
+if ($] >= 5.012) {
+	require Time::HiRes;
+	Time::HiRes->import('alarm');
+}
+else {
+	*alarm= sub {
+		# round up to whole seconds
+		CORE::alarm(POSIX::ceil($_[0]));
+	};
+}
 
 @Proc::Background::Unix::ISA = qw(Exporter);
 
@@ -70,11 +81,10 @@ sub _waitpid {
     # Implement the optional timeout with the 'alarm' call.
     my $result= 0;
     if ($blocking && $wait_seconds) {
-      require Time::HiRes;
       local $SIG{ALRM}= sub { die "alarm\n" };
-      Time::HiRes::alarm($wait_seconds);
+      alarm($wait_seconds);
       eval { $result= waitpid($self->{_os_obj}, 0); };
-      Time::HiRes::alarm(0);
+      alarm(0);
     }
     else {
       $result= waitpid($self->{_os_obj}, $blocking? 0 : WNOHANG);
@@ -123,10 +133,6 @@ __END__
 
 Proc::Background::Unix - Unix-specific implementation of process create/wait/kill
 
-=head1 VERSION
-
-version 1.21
-
 =head1 SYNOPSIS
 
 Do not use this module directly.
@@ -155,9 +161,13 @@ Michael Conrad <mike@nrdvana.net>
 
 =back
 
+=head1 VERSION
+
+version 1.22
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Michael Conrad, (C) 1998-2009 by Blair Zajac.
+This software is copyright (c) 2021 by Michael Conrad, (C) 1998-2009 by Blair Zajac.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

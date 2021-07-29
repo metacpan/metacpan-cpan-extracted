@@ -29,26 +29,22 @@ sub configure {
             $moniker,
             $plugin_name,
             {
-                $code => [
-                    sub {
-                        my ($self) = @_;
-                        $self->log("Name = $retval");
-                        return $retval;
-                    },
-                ],
+                $code => sub {
+                    my ($self) = @_;
+                    $self->log("Name = $retval");
+                    return $retval;
+                },
             },
         ],
         [
             'Code::BeforeBuild',
             'SayMyNameEasy',
             {
-                before_build => [
-                    sub {
-                        my ($self) = @_;
-                        $RESULT = $self->zilla->name;
-                        return;
-                    },
-                ],
+                before_build => sub {
+                    my ($self) = @_;
+                    $RESULT = $self->zilla->name;
+                    return;
+                },
             },
         ],
     );

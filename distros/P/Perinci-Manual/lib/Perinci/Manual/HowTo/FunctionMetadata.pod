@@ -20,9 +20,9 @@ Perinci::Manual::HowTo::FunctionMetadata - How-to guides related to function met
 
 =head1 VERSION
 
-This document describes version 0.003 of Perinci::Manual::HowTo::FunctionMetadata (from Perl distribution Perinci-Manual), released on 2021-07-02.
+This document describes version 0.006 of Perinci::Manual::HowTo::FunctionMetadata (from Perl distribution Perinci-Manual), released on 2021-07-28.
 
-=head2 HIDING ARGUMENT
+=head1 HIDING ARGUMENT
 
 To make an argument "hidden", you can add either a C<hidden>, C<hidden-cli>, or
 C<hidden-mod> to the C<tags> property. This will have the following effects:

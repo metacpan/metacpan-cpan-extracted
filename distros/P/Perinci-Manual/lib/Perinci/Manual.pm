@@ -1,9 +1,9 @@
 package Perinci::Manual;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-07-02'; # DATE
+our $DATE = '2021-07-28'; # DATE
 our $DIST = 'Perinci-Manual'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 1;
 # ABSTRACT: Extra documentation for Perinci
@@ -20,22 +20,17 @@ Perinci::Manual - Extra documentation for Perinci
 
 =head1 VERSION
 
-This document describes version 0.003 of Perinci::Manual (from Perl distribution Perinci-Manual), released on 2021-07-02.
+This document describes version 0.006 of Perinci::Manual (from Perl distribution Perinci-Manual), released on 2021-07-28.
 
 =head1 DESCRIPTION
 
 The C<Perinci> namespace contains several separate frameworks (for example:
 L<Perinci::Sub::Wrapper>, L<Perinci::CmdLine>), all themed around the L<Rinci>
-and L<Riap> specification, and each framework having its own documentation.
+and L<Riap> specification, and each framework having its own documentation. This
+distribution contains additional, mostly cross-framework documentation.
 
-This distribution contains additional, mostly cross-framework, and heavily
-task-oriented documentation.
-
-=head1 CONTRIBUTOR
-
-=for stopwords perlancar (on netbook-dell-xps13)
-
-perlancar (on netbook-dell-xps13) <perlancar@gmail.com>
+The documentation is organized around the concept of "four types of
+documentation". See L<https://documentation.divio.com/> for more details.
 
 =head1 HOMEPAGE
 

@@ -43,21 +43,22 @@ You shouldn't make instances of this class. Each attribute should be used as a n
             Html => {
               Data    => 'MyMessageData',
               Charset => 'MyCharset',       # OPTIONAL
-            },
+            },    # OPTIONAL
             Text => {
               Data    => 'MyMessageData',
               Charset => 'MyCharset',       # OPTIONAL
-            },
+            },    # OPTIONAL
           },
           Subject => {
             Data    => 'MyMessageData',
-            Charset => 'MyCharset',         # OPTIONAL
-          },
+            Charset => 'MyCharset',       # OPTIONAL
+          },    # OPTIONAL
 
         },    # OPTIONAL
         Template => {
-          TemplateArn  => 'MyTemplateArn',     # OPTIONAL
-          TemplateData => 'MyTemplateData',    # max: 262144; OPTIONAL
+          TemplateArn  => 'MyAmazonResourceName',    # OPTIONAL
+          TemplateData => 'MyEmailTemplateData',     # max: 262144; OPTIONAL
+          TemplateName => 'MyEmailTemplateName',     # min: 1; OPTIONAL
         },    # OPTIONAL
       },
       FromEmailAddress => 'MyEmailAddress',

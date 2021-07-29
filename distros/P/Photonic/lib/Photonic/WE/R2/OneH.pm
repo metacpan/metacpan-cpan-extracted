@@ -1,5 +1,5 @@
 package Photonic::WE::R2::OneH;
-$Photonic::WE::R2::OneH::VERSION = '0.017';
+$Photonic::WE::R2::OneH::VERSION = '0.018';
 
 =encoding UTF-8
 
@@ -133,7 +133,7 @@ Photonic::OneH::R2
 
 =head1 VERSION
 
-version 0.017
+version 0.018
 
 =head1 SYNOPSIS
 

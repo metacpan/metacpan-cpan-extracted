@@ -26,4 +26,5 @@ t/13adapter-stored.t
 t/14adapter-test.t
 t/20name-prefix.t
 t/21nonstrict.t
+t/22disable-package.t
 t/99pod.t

@@ -1,0 +1,231 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use File::Basename qw(basename dirname);
+use File::Copy qw(copy);
+use File::Temp qw(tempfile);
+use Getopt::Long qw(:config posix_default no_ignore_case bundling auto_help);
+use IO::File;
+use IPC::Open2 qw(open2);
+use Pod::Usage qw(pod2usage);
+
+# $VERSION depends on the stub module App::efm_perl. When this script is used
+# without installing from CPAN, it uses fixed string for this.
+our $VERSION = eval {
+    require App::efm_perl;
+    $App::efm_perl::VERSION;
+} // '0.0.1-script-only';
+
+sub chdir_to_root {
+    my ($filename) = @_;
+
+    chdir dirname $filename;
+    # ignore STDERR
+    open2 my $reader, undef, 'git rev-parse --show-toplevel';
+    chomp(my $git_root = <$reader>);
+    chdir $git_root if defined $git_root && -d $git_root;
+    return;
+}
+
+sub write_tempfile {
+    my ($filename) = @_;
+
+    STDIN->blocking(0);
+    ## no critic (Variables::RequireInitializationForLocalVars)
+    my $script_text = do { local $/; <> };
+    my ($script_fh, $script) = tempfile();
+    if (defined $script_text) {
+        $script_fh->print($script_text);
+    } else {
+        copy $filename => $script_fh;
+    }
+    $script_fh->close;
+    return $script;
+}
+
+sub create_runner {
+    my ($script, $lib) = @_;
+
+    my ($runner_fh, $runner) = tempfile();
+
+    my $shebang = do {
+        my $fh = IO::File->new($script, 'r');
+        <$fh>;
+    };
+    my $bin;
+    ## no critic (RegularExpressions::RequireExtendedFormatting)
+    ($bin) = $shebang =~ /^#!(\S*)/ if defined $shebang;
+
+    # $bin is NOT `env`, use the binary itself
+    if (defined $bin && basename($bin) ne 'env') {
+        $runner_fh->print(<<"EOS");
+export PERL5LIB=@{[$lib // '']}:\$PERL5LIB
+$bin -c $script
+EOS
+
+    # Otherwise, it should use perl resolved by $PATH and plenv.
+    } else {
+        $runner_fh->print(<<"EOS");
+#!/bin/bash
+if which plenv > /dev/null; then
+  eval "\$(plenv init -)"
+fi
+if which direnv > /dev/null; then
+  eval "\$(direnv export bash)"
+fi
+export PERL5LIB=@{[$lib // '']}:\$PERL5LIB
+perl -c $script
+EOS
+    }
+
+    $runner_fh->close;
+    return $runner;
+}
+
+sub run {
+    my ($runner, $script, $verbose) = @_;
+
+    open2 my $reader, undef, "sh $runner 2>&1";
+    while (<$reader>) {
+        print if $verbose;
+        chomp;
+        if (my ($message, $extracted_file, $lineno, $rest) = /
+            ^(.*)\s
+            at\s(.*)\s
+            line\s(\d+)
+            (
+                \.|
+                ,\snear\s\".*\"?
+            )$
+        /x) {
+            next unless $extracted_file eq $script;
+            ## no critic (RegularExpressions::RequireExtendedFormatting)
+            $message .= $rest if $rest =~ s/^,//;
+            print "$script:$lineno:$message\n";
+        }
+    }
+    return;
+}
+
+sub main {
+    GetOptions(
+        'lib|I=s' => \(my $lib),
+        'filename|f=s' => \(my $filename),
+        'verbose|v' => \(my $verbose),
+        'help|h' => \(my $help),
+        'version' => \(my $version),
+    ) or pod2usage(1);
+
+    pod2usage(-exitval => 1, -verbose => 2) if $help;
+    print("$VERSION\n"), exit 0 if $version;
+    pod2usage(2) unless defined $filename;
+
+    chdir_to_root($filename);
+    my $script = write_tempfile($filename);
+    my $runner = create_runner($script, $lib);
+    run($runner, $script, $verbose);
+    exit 0;
+}
+
+main if $0 eq __FILE__;
+
+__END__
+
+=head1 NAME
+
+efm-perl - perl -c executable with errorformat friendly outputs.
+
+=head1 SYNOPSIS
+
+    # load the script from -f option
+    efm-perl -f /path/to/script.pl
+
+    # load the script from STDIN but filter out messages by filename from -f option
+    cat /tmp/script.pl | efm-perl -f /path/to/script.pl
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--lib>, B<-I>
+
+Additional paths for C<$PERL5LIB>
+
+=item B<--filename>, B<-f>
+
+Filename to lint. This is mandatory.
+
+=item B<--verbose>, B<-v>
+
+Print out all outputs. Without this, it shows errors only.
+
+=item B<--help>, B<-h>
+
+Print a help message.
+
+=item B<--version>
+
+Show the version string.
+
+=back
+
+=head1 DESCRIPTION
+
+This is a tiny script to use with
+L<mattn/efm-langserver|https://github.com/mattn/efm-langserver>. It parses
+C<perl -c> outputs and arrange them to errorformat-friendly ones.
+
+For efm-langserver, set config.yaml as below.
+
+    tools:
+      efm-perl: &efm-perl
+        lint-command: efm-perl -f ${INPUT}
+        lint-ignore-exit-code: true
+        lint-stdin: true
+        lint-formats:
+          - '%f:%l:%m'
+
+    languages:
+      perl:
+        - <<: *efm-perl
+
+efm-perl borrows many ideas from the original
+L<efm_perl.pl|https://github.com/vim-perl/vim-perl/blob/dev/tools/efm_perl.pl>.
+This has improvements below after that.
+
+=over 4
+
+=item efm-perl can read STDIN.
+
+F<efm_perl.pl> can only read the supplied filename. efm-perl can parse from
+STDIN to lint codes on your text editor without saving to disk.
+
+=item efm-perl can deal with plenv & direnv.
+
+It detects the filename and chdir to Git root automatically. Then it setups
+L<plenv|https://github.com/tokuhirom/plenv> and
+L<direnv|https://github.com/direnv/direnv>, and lint with the desired Perl
+version and enviromental variables.
+
+=back
+
+=head1 USAGE
+
+You can install F<efm-perl> with F<cpanm>.
+
+    cpanm install App::efm_perl
+
+Or you can use simply by copying the script.
+
+    cp script/efm-perl /path/to/your/$PATH
+
+=head1 LICENSE
+
+Copyright (C) delphinus.
+
+This library is free software; you can redistribute it and/or modify it under
+MIT License.
+
+=head1 AUTHOR
+
+delphinus E<lt>me@delphinus.devE<gt>

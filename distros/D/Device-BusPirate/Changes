@@ -1,5 +1,12 @@
 Revision history for Device-BusPirate
 
+0.23    2021-07-18
+        [CHANGES]
+         * Convert to Object::Pad
+         * Use signatures from perl 5.26+
+         * Docs fix to explain which versino first supported multiple I²C
+           protocols
+
 0.22    2021-06-04
         [CHANGES]
          * Implement the helper-based Device::Chip::Adapter v0.18 ->txn API

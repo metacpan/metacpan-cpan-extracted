@@ -28,9 +28,9 @@ plan tests => scalar @modules;
 my %trustme = ();
 
 my @also_private = (
-                  qr/^copy_file$/u,
+                  qr/^impostor_hook$/u,
                   qr/^get_impostor_for$/u,
-                  qr/^get_impostor_dir$/u
+                  qr/^get_impostor_directory$/u
                 );
 
 for my $module ( sort @modules ) {

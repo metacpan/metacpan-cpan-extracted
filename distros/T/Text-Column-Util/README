@@ -2,7 +2,7 @@ NAME
     Text::Column::Util - Utilities for displaying text in multiple columns
 
 VERSION
-    This document describes version 0.004 of Text::Column::Util (from Perl
+    This document describes version 0.005 of Text::Column::Util (from Perl
     distribution Text-Column-Util), released on 2021-03-02.
 
 DESCRIPTION
@@ -12,7 +12,8 @@ DESCRIPTION
     Unicode characters.
 
     As alternatives to this module, you can also use modules that generate
-    text table. This module provides some convenience like:
+    text table, like Text::Table::More. This module provides some
+    conveniences like:
 
     *   finding out terminal width and setting column widths equally per
         each command;
@@ -84,6 +85,9 @@ BUGS
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Text::Table::More
 
 AUTHOR
     perlancar <perlancar@cpan.org>

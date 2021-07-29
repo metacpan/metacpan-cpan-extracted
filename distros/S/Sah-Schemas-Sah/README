@@ -2,8 +2,33 @@ NAME
     Sah::Schemas::Sah - Sah schemas for Sah
 
 VERSION
-    This document describes version 0.9.49.1 of Sah::Schemas::Sah (from Perl
-    distribution Sah-Schemas-Sah), released on 2020-05-08.
+    This document describes version 0.9.50.0 of Sah::Schemas::Sah (from Perl
+    distribution Sah-Schemas-Sah), released on 2021-07-23.
+
+SAH SCHEMAS
+    The following schemas are included in this distribution:
+
+    *   sah::array_schema
+
+    *   sah::clause_set
+
+    *   sah::defhash_example
+
+    *   sah::nondefhash_example
+
+    *   sah::nschema
+
+        Normalized Sah schema.
+
+    *   sah::schema
+
+    *   sah::schema_modname
+
+        Name of a Sah::Schema::* module, without the prefix.
+
+    *   sah::str_schema
+
+    *   sah::type_name
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -21,15 +46,16 @@ BUGS
     to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-    Sah - specification
+    Sah - schema specification
 
-    Data::Sah
+    Data::Sah - Perl implementation of Sah
 
 AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2020, 2019, 2016 by perlancar@cpan.org.
+    This software is copyright (c) 2021, 2020, 2019, 2016 by
+    perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

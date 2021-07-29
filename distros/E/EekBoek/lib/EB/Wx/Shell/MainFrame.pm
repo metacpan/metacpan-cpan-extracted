@@ -70,6 +70,7 @@ use Wx qw[
        ];
 
 my $prefctl;
+my $is_macos = $^O =~ /darwin/;
 
 ################ Locale ################
 
@@ -204,6 +205,12 @@ sub new {
 
 	Wx::Event::EVT_CHAR($self->{t_input}, sub { $self->OnChar(@_) });
 #	Wx::Event::EVT_IDLE($self, \&OnIdle);
+
+	# On MacOS, we cannot open arbitrary files due to sandboxing
+	# constraints.
+	if ( $is_macos ) {
+	    $self->{menubar}->FindItem(wxID_OPEN) ->Enable(0);
+	}
 
 	$prefctl ||=
 	  {
@@ -341,7 +348,7 @@ sub RunCommand {
 	       wxDefaultPosition);
 	    $md->ShowModal;
 	    $md->Destroy;
-	    $self->OnOpen;
+	    $self->OnOpen unless $is_macos;
 	    return;
 	}
 	my $cfg = EB->app_init( { app => $EekBoek::PACKAGE, config => $self->{_ebcfg} } );
@@ -354,6 +361,7 @@ sub RunCommand {
     $self->{t_output}->AppendText("eb> ");
     $self->ShowText($cmd, wxBLUE);
     $self->_cmd($cmd);
+    $self->{t_input}->SetFocus();
 }
 
 use Text::ParseWords qw(shellwords);
@@ -574,6 +582,9 @@ sub OnOpen {
 	my ($self, $event) = @_;
 # wxGlade: EB::Wx::Shell::MainFrame::OnOpen <event_handler>
 
+	# Cannot do this on MacOS.
+	return if $is_macos;
+
 	my $fd = Wx::FileDialog->new
 	  ($self,
 	   _T("Kies"),
@@ -699,12 +710,12 @@ sub OnAbout {
 	   __x("Geschreven door {author}",
 	       author => "Johan Vromans")."\n".
 	   "<jvromans\@squirrel.nl>\n".
-	   "http://www.squirrel.nl\n".
+	   "https://www.squirrel.nl\n".
 	   __x("Voor ondersteuning: {url}",
-	       url => "http://www.eekboek.nl/support.html")."\n".
+	       url => "https://www.eekboek.nl/support.html")."\n".
 	   "\n".
 	   __x("GUI ontwerp met {wxglade}",
-	       wxglade => "wxGlade, http://wxglade.sourceforge.net")."\n\n".
+	       wxglade => "wxGlade, https://wxglade.sourceforge.net")."\n\n".
 	   __x("{pkg} versie {ver}",
 	       pkg => "Perl",
 	       ver => $dd->(sprintf("%vd",$^V)))."\n".
@@ -740,14 +751,14 @@ sub OnSupport {
     $md->html->SetPage(_T(<<EOD));
 <p>Voor het uitwisselen van ervaringen, vragen om ondersteuning e.d.
 kunt u zich abonneren op de mailing list voor gebruikers op
-<a href="http://lists.sourceforge.net/lists/listinfo/eekboek-users">SourceForge</a>.</p>
+<a href="https://lists.sourceforge.net/lists/listinfo/eekboek-users">SourceForge</a>.</p>
 <p>De <font color='#C81900'>EekBoek</font> gebruikers houden zelf
-<a href="http://wiki.eekboek.nl/" target="_blank">een wiki</a> bij met
+<a href="https://wiki.eekboek.nl/" target="_blank">een wiki</a> bij met
 tips en andere wetenswaardigheden.</p>
 <p><font color='#C81900'>EekBoek</font> kan gratis worden gedownload en
 gebruikt. Mocht u echter aanvullende wensen hebben op het gebied van
 ondersteuning dan kan dat ook.
-<a href="http://www.squirrel.nl/nl/index.html" target="_blank">Squirrel Consultancy</a>
+<a href="https://www.squirrel.nl/nl/index.html" target="_blank">Squirrel Consultancy</a>
 is gaarne bereid u betaalde ondersteuning te bieden, bijvoorbeeld bij het
 installeren van <font color='#C81900'>EekBoek</font>, het opzetten van
 administraties, en het overzetten van uw bestaande administraties naar

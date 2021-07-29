@@ -171,11 +171,11 @@ __PACKAGE__->meta->make_immutable;
 1;
 __END__
 
-=head 1 Name
+=head1 Name
 
 Connector::Builtin::Authentication::PasswordScheme
 
-=head 1 Description
+=head1 Description
 
 Lightweight connector to check passwords against a password file holding
 username/password pairs where the password is encrypted using a salted hash.

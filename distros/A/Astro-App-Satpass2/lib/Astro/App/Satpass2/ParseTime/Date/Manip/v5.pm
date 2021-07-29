@@ -10,7 +10,7 @@ use parent qw{ Astro::App::Satpass2::ParseTime::Date::Manip };
 
 use Astro::App::Satpass2::Utils qw{ load_package @CARP_NOT };
 
-our $VERSION = '0.047';
+our $VERSION = '0.048';
 
 my $invalid;
 
@@ -77,6 +77,10 @@ sub tz {
     }
     return $self->SUPER::tz( @args );
 }
+
+sub __set_back_end_location {
+    return;
+};
 
 1;
 

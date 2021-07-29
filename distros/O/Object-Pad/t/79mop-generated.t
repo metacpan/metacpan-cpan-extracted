@@ -10,7 +10,7 @@ use Object::Pad;
 # An attempt to programmatically generate everything
 BEGIN {
    package Point;
-   my $classmeta = Object::Pad->begin_class( "Point" );
+   my $classmeta = Object::Pad::MOP::Class->begin_class( "Point" );
 
    my $xslotmeta = $classmeta->add_slot( '$x' );
    my $yslotmeta = $classmeta->add_slot( '$y' );

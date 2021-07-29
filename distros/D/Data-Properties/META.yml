@@ -1,0 +1,31 @@
+---
+abstract: 'Flexible properties handling'
+author:
+  - 'Johan Vromans <jvromans@squirrel.nl>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.46, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Data-Properties
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  ExtUtils::MakeMaker: '6.46'
+  File::LoadLines: '1.02'
+  String::Interpolate::Named: '1.01'
+  Test::More: '0'
+  Text::ParseWords: '0'
+  perl: '5.010001'
+resources:
+  bugtracker: https://github.com/sciurius/perl-Data-Properties/issues
+  repository: https://github.com/sciurius/perl-Data-Properties.git
+version: '1.05'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

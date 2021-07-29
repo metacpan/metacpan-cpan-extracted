@@ -17,6 +17,9 @@ t/all.t
 t/all_async.t
 t/allsettled.t
 t/anyevent.t
+t/async_await.t
+t/async_await_additional.t
+t/async_await_sync.t
 t/await.t
 t/await_then_with_async.t
 t/await_with_async.t
@@ -26,6 +29,7 @@ t/finally.t
 t/future.t
 t/global_destruction.t
 t/ioasync.t
+t/lib/AsyncAwait.pm
 t/lib/EventTest.pm
 t/lib/Eventer.pm
 t/lib/MemoryCheck.pm
@@ -34,6 +38,7 @@ t/lib/UseEventTest.pm
 t/memory_leaks.t
 t/mojo.t
 t/multi_then.t
+t/no_leak_stashed_ref.t
 t/race.t
 t/race_async.t
 t/race_fail.t

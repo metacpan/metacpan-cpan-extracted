@@ -30,7 +30,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "Text::Balanced" => 0,
     "Time::Piece" => 0,
-    "Yancy" => "1.067"
+    "Yancy" => "1.074"
   },
   "TEST_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0,
@@ -39,7 +39,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.004",
+  "VERSION" => "0.005",
   "test" => {
     "TESTS" => "t/*.t t/controller/*.t t/integration/*.t t/task/*.t t/task/action/*.t t/trigger/*.t t/type/*.t"
   }
@@ -63,7 +63,7 @@ my %FallbackPrereqs = (
   "Test::More" => 0,
   "Text::Balanced" => 0,
   "Time::Piece" => 0,
-  "Yancy" => "1.067"
+  "Yancy" => "1.074"
 );
 
 

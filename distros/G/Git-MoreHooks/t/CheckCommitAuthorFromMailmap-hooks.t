@@ -4,8 +4,6 @@ use 5.010;
 use strict;
 use warnings;
 use Test::Most;
-
-# use Data::Dumper;
 use Git::Hooks::Test ':all';
 use Path::Tiny;
 use Test::Requires::Git;
@@ -123,4 +121,3 @@ $ENV{'GIT_COMMITTER_EMAIL'} = 'me.myself@comp.xx';
 check_can_commit( 'commit file', 'file.txt' );
 
 done_testing();
-

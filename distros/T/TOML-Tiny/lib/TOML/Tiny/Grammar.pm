@@ -1,6 +1,6 @@
 package TOML::Tiny::Grammar;
 # ABSTRACT: exports regex definitions used to parse TOML source
-$TOML::Tiny::Grammar::VERSION = '0.12';
+$TOML::Tiny::Grammar::VERSION = '0.13';
 use strict;
 use warnings;
 use v5.18;
@@ -108,7 +108,7 @@ our $DateTime = qr/(?> $Date (?> [T ] $Time )?) | $Time/x;
 #-----------------------------------------------------------------------------
 our $DecFirstChar = qr/[1-9]/;
 our $DecChar      = qr/[0-9]/;
-our $HexChar      = qr/[0-9 a-f A-F]/;
+our $HexChar      = qr/[0-9a-fA-F]/;
 our $OctChar      = qr/[0-7]/;
 our $BinChar      = qr/[01]/;
 
@@ -146,7 +146,7 @@ TOML::Tiny::Grammar - exports regex definitions used to parse TOML source
 
 =head1 VERSION
 
-version 0.12
+version 0.13
 
 =head1 SYNOPSIS
 

@@ -1,0 +1,156 @@
+package SDL2::HapticDirection {
+    use SDL2::Utils;
+    has
+        type => 'uint8',
+        dir  => 'sint32[2]';
+
+=encoding utf-8
+
+=head1 NAME
+
+SDL2::HapticDirection - Structure that represents a haptic direction
+
+=head1 SYNOPSIS
+
+    use SDL2 qw[:all];
+    my $direction = SDL2::HapticDirection->new(
+        {   type => SDL_HAPTIC_CARTESIAN,    # Using cartesian direction encoding
+            dir  => [ 0, 1 ]                 # X and Y positions
+        }
+    );
+
+=head1 DESCRIPTION
+
+This is the direction where the force comes from, instead of the direction in
+which the force is exerted.
+
+Directions can be specified by:
+
+=over
+
+=item C<SDL_HAPTIC_POLAR> - Specified by polar coordinates
+
+=item C<SDL_HAPTIC_CARTESIAN> - Specified by cartesian coordinates
+
+=item C<SDL_HAPTIC_SPHERICAL> - Specified by spherical coordinates
+
+=back
+
+Cardinal directions of the haptic device are relative to the positioning of the
+device.  North is considered to be away from the user.
+
+The following diagram represents the cardinal directions:
+
+                 .--.
+                 |__| .-------.
+                 |=.| |.-----.|
+                 |--| ||     ||
+                 |  | |'-----'|
+                 |__|~')_____('
+                   [ COMPUTER ]
+                     North (0,-1)
+                         ^
+                         |
+                         |
+   (-1,0)  West <----[ HAPTIC ]----> East (1,0)
+                         |
+                         |
+                         v
+                      South (0,1)
+                      [ USER ]
+                        \|||/
+                        (o o)
+                  ---ooO-(_)-Ooo---
+
+
+If type is C<SDL_HAPTIC_POLAR>, direction is encoded by hundredths of a degree
+starting north and turning clockwise.  C<SDL_HAPTIC_POLAR> only uses  C<dir>
+parameter.  The cardinal directions would be:
+
+=over
+
+=item North - C<0> (0 degrees)
+
+=item  East - C<9000> (90 degrees)
+
+=item South - C<18000> (180 degrees)
+
+=item West - C<27000> (270 degrees)
+
+=back 
+ 
+If type is C<SDL_HAPTIC_CARTESIAN>, direction is encoded by three positions (X
+axis, Y axis and Z axis (with 3 axes)). C<SDL_HAPTIC_CARTESIAN> uses the first
+three C<dir> parameters.  The cardinal directions would be:
+
+=over
+ 
+=item North - C<0,-1, 0>
+
+=item East - C<1, 0, 0>
+
+=item South - C<0, 1, 0>
+
+=item West - C<-1, 0, 0>
+ 
+=back
+
+The Z axis represents the height of the effect if supported, otherwise it's
+unused.  In cartesian encoding C<(1, 2)> would be the same as C<(2, 4)>, you
+can use any multiple you want, only the direction matters.
+
+If type is C<SDL_HAPTIC_SPHERICAL>, direction is encoded by two rotations. The
+first two C<dir> parameters are used.  The C<dir> parameters are as follows
+(all values are in hundredths of degrees):
+
+=over
+
+=item Degrees from C<(1, 0)> rotated towards C<(0, 1)>.
+
+=item Degrees towards C<(0, 0, 1)> (device needs at least 3 axes).
+
+=back 
+
+Example of force coming from the south with all encodings (force coming from
+the south means the user will have to pull the stick to counteract):
+
+    # Cartesian directions
+    my $direction = SDL2::HapticDirection->new(
+        {   type => SDL_HAPTIC_CARTESIAN,    # Using cartesian direction encoding
+            dir  => [ 0, 1 ]                 # X and Y positions
+        }
+    );
+    # Assuming the device has 2 axes, we don't need to specify third parameter.
+
+    # Polar directions
+    $direction->type(SDL_HAPTIC_POLAR); # We'll be using polar direction encoding
+    $direction->dir->[0] = 18000;    # Polar only uses first parameter
+
+    # Spherical coordinates
+    $direction->type(SDL_HAPTIC_SPHERICAL);    # Spherical encoding
+    $direction->dir->[0] = 9000;    # Since we only have two axes we don't need more parameters
+
+=head1 Fields
+
+=over
+
+=item C<type> - The type of encoding
+
+=item C<dir> - The encoded direction as a list of numbers
+
+=back
+
+=head1 AUTHOR
+
+Sanko Robinson E<lt>sanko@cpan.orgE<gt>
+
+=begin stopwords
+
+cartesian encodings
+
+=end stopwords
+
+=cut
+
+};
+1;

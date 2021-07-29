@@ -114,7 +114,6 @@ categories =
     saml:               ['_idp', '_idpConfKey', '_samlToken', '_lassoSessionDump', '_lassoIdentityDump']
     groups:             ['groups', 'hGroups']
     ldap:               ['dn']
-    BrowserID:          ['_browserIdAnswer', '_browserIdAnswerRaw']
     OpenIDConnect:      ['_oidc_id_token', '_oidc_OP', '_oidc_access_token']
     sfaTitle:			['_2fDevices']
     oidcConsents:		['_oidcConsents']
@@ -177,11 +176,11 @@ llapp.controller 'SessionsExplorerCtrl', ['$scope', '$translator', '$location', 
 	# Delete RP Consent
 	$scope.deleteOIDCConsent = (rp, epoch) ->
 		items = document.querySelectorAll(".data-#{epoch}")
-		for e in items
-			e.remove()
 		$scope.waiting = true
 		$http['delete']("#{scriptname}sessions/OIDCConsent/#{sessionType}/#{$scope.currentSession.id}?rp=#{rp}&epoch=#{epoch}").then (response) ->
 			$scope.waiting = false
+			for e in items
+				e.remove()
 		, (resp) ->
 			$scope.waiting = false
 		$scope.showT = false
@@ -194,8 +193,6 @@ llapp.controller 'SessionsExplorerCtrl', ['$scope', '$translator', '$location', 
 			$scope.currentScope.remove()
 			$scope.waiting = false
 		, (resp) ->
-			$scope.currentSession = null
-			$scope.currentScope.remove()
 			$scope.waiting = false
 
 	# Open node

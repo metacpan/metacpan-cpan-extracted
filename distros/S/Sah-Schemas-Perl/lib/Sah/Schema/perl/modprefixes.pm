@@ -1,9 +1,9 @@
 package Sah::Schema::perl::modprefixes;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-01-20'; # DATE
+our $DATE = '2021-07-20'; # DATE
 our $DIST = 'Sah-Schemas-Perl'; # DIST
-our $VERSION = '0.035'; # VERSION
+our $VERSION = '0.038'; # VERSION
 
 our $schema = [array => {
     summary => 'Perl module prefixes, e.g. ["", "Foo::", "Foo::Bar::"]',
@@ -34,7 +34,7 @@ _
     # provide a default completion which is from list of installed perl modules
     'x.element_completion' => 'perl_modprefix',
 
-}, {}];
+}];
 
 1;
 # ABSTRACT: Perl module prefixes, e.g. ["", "Foo::", "Foo::Bar::"]
@@ -51,7 +51,7 @@ Sah::Schema::perl::modprefixes - Perl module prefixes, e.g. ["", "Foo::", "Foo::
 
 =head1 VERSION
 
-This document describes version 0.035 of Sah::Schema::perl::modprefixes (from Perl distribution Sah-Schemas-Perl), released on 2021-01-20.
+This document describes version 0.038 of Sah::Schema::perl::modprefixes (from Perl distribution Sah-Schemas-Perl), released on 2021-07-20.
 
 =head1 SYNOPSIS
 
@@ -81,7 +81,8 @@ To specify schema in L<Rinci> function metadata and use the metadata with
 L<Perinci::CmdLine> to create a CLI:
 
  # in lib/MyApp.pm
- package MyApp;
+ package
+   MyApp;
  our %SPEC;
  $SPEC{myfunc} = {
      v => 1.1,
@@ -101,7 +102,8 @@ L<Perinci::CmdLine> to create a CLI:
  1;
 
  # in myapp.pl
- package main;
+ package
+   main;
  use Perinci::CmdLine::Any;
  Perinci::CmdLine::Any->new(url=>'MyApp::myfunc')->run;
 
@@ -141,7 +143,7 @@ Source repository is at L<https://github.com/perlancar/perl-Sah-Schemas-Perl>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Sah-Schemas-Perl/issues>
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Sah-Schemas-Perl>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

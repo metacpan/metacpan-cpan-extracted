@@ -6,7 +6,7 @@ use File::Tempdir qw{};
 use Net::SFTP::Foreign qw{};
 use Net::SFTP::Foreign::Tempdir::Extract::File;
 
-our $VERSION = '0.14';
+our $VERSION = '0.18';
 
 =head1 NAME
 
@@ -264,10 +264,12 @@ sub options {
     delete $self->{'list'};
     delete $self->{'sftp'};
   }
-  $self->{'options'}=['-q'] unless defined $self->{'options'};
+  $self->{'options'} = $self->_options_default unless defined $self->{'options'};
   die 'Error: options must be an array reference.' unless ref($self->{'options'}) eq 'ARRAY';
   return $self->{'options'};
 }
+
+sub _options_default {['-q']};
 
 =head2 folder
 
@@ -385,11 +387,7 @@ sub sftp {
 
 =head1 BUGS
 
-Send email to author and log on RT.
-
-=head1 SUPPORT
-
-DavisNetworks.com supports all Perl applications including this package.
+Use GitHub to fork repository and submit pull requests.
 
 =head2 Testing
 
@@ -399,15 +397,30 @@ This packages relies on the SSH keys to be operational for the local account.  T
 
   Michael R. Davis
   CPAN ID: MRDVT
-  Satellite Tracking of People, LLC
-  mdavis@stopllc.com
-  http://www.stopllc.com/
 
-=head1 COPYRIGHT
+=head1 COPYRIGHT AND LICENSE
 
-This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+MIT License
 
-The full text of the license can be found in the LICENSE file included with this module.
+Copyright (c) 2021 Michael R. Davis
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
 
 =head1 SEE ALSO
 

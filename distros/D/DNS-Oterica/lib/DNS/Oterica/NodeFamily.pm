@@ -1,6 +1,6 @@
 package DNS::Oterica::NodeFamily;
 # ABSTRACT: a group of hosts that share common functions
-$DNS::Oterica::NodeFamily::VERSION = '0.312';
+$DNS::Oterica::NodeFamily::VERSION = '0.313';
 use Moose;
 
 #pod =attr nodes
@@ -73,7 +73,7 @@ DNS::Oterica::NodeFamily - a group of hosts that share common functions
 
 =head1 VERSION
 
-version 0.312
+version 0.313
 
 =head1 PERL VERSION
 

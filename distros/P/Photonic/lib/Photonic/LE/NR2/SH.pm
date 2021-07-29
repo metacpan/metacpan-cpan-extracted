@@ -1,5 +1,5 @@
 package Photonic::LE::NR2::SH;
-$Photonic::LE::NR2::SH::VERSION = '0.017';
+$Photonic::LE::NR2::SH::VERSION = '0.018';
 
 =encoding UTF-8
 
@@ -9,7 +9,7 @@ Photonic::LE::NR2::SH
 
 =head1 VERSION
 
-version 0.017
+version 0.018
 
 =head1 COPYRIGHT NOTICE
 
@@ -386,7 +386,7 @@ sub _build_quadrupolar {
     my $G=$self->nrf->nr->G; #cartesian, nx, ny...
     my $iG=i2C $G; #cartesian nx ny...
     my $iGnaaEE_G=($iG->(,*1)*$naaEE_G)->sumover; #dot - cartesian nx ny...
-    $iGnaaEE_G *= $self->nrf->filter if $self->nrf->has_filter; # nx ny...
+    $iGnaaEE_G *= $self->nrf->filter->(*1) if $self->nrf->has_filter; # nx ny...
     #back to real space. Get cartesian out of the way and then back
     my $P= GtoR($iGnaaEE_G, $ndims, 1); #cartesian, nx, ny...
     return $P;

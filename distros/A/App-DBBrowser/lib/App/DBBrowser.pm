@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.010001;
 
-our $VERSION = '2.271';
+our $VERSION = '2.277';
 
 use File::Basename        qw( basename );
 use File::Spec::Functions qw( catfile catdir );
@@ -43,7 +43,7 @@ sub new {
         tcu_default => { hide_cursor => 0, clear_screen => 1, page => 2 },
         lyt_h       => { order => 0, alignment => 2 },
         lyt_v       => { undef => '  BACK', layout => 3 },
-        dots        => [ [ '...', 3 ], [ '|', 1 ], [] ],
+        dots        => [ ' ...', '|', '' ],
         quit        => 'QUIT',
         back        => 'BACK',
         confirm     => 'CONFIRM',
@@ -75,7 +75,7 @@ sub __init {
     }
     my $app_dir = catdir( $config_home // $home, 'db_browser' );
     mkdir $app_dir or die $! if ! -d $app_dir;
-    $sf->{i}{home_dir} = $home;
+    $sf->{i}{home_dir} = $home; ##
     $sf->{i}{app_dir}  = $app_dir;
     $sf->{i}{f_settings}           = catfile $app_dir, 'general_settings.json';
     $sf->{i}{conf_file_fmt}        = catfile $app_dir, 'config_%s.json';
@@ -476,29 +476,15 @@ sub run {
                     if ( $table eq $hidden ) {
                         require App::DBBrowser::CreateDropAttach;
                         my $cda = App::DBBrowser::CreateDropAttach->new( $sf->{i}, $sf->{o}, $sf->{d} );
-                        my $old_idx_cda = $cda->create_drop_or_attach( $table );
-                        if ( defined $old_idx_cda ) {
-                            $sf->{i}{old_idx_cda} = $old_idx_cda;
+                        my $ok = $cda->create_drop_or_attach();
+                        if ( $ok ) {
                             $sf->{redo_db}     = $sf->{d}{db};
                             $sf->{redo_schema} = $sf->{d}{schema};
-                            $sf->{redo_table}  = $table;
+                            $sf->{redo_table}  = $table; # if $table == $hidden => redo 'create_drop_or_attach'
                         }
                         else {
-                            # when leaving CreateDropAttach menu:
-                            delete $sf->{i}{ss} if exists $sf->{i}{ss}; # deletes any existing saved books
-                            #if ( keys %{$sf->{i}{ss}} == 1 ) {
-                            #    my $file_fs = ( keys %{$sf->{i}{ss}} )[0];
-                            #    my $book = $sf->{i}{ss}{$file_fs}{book};
-                            #    if ( defined $book ) {
-                            #        require Devel::Size;
-                            #        if ( Devel::Size::size( $book ) > 1_000_000 ) {
-                            #            delete $sf->{i}{ss};
-                            #        }
-                            #    }
-                            #}
-                            #else {
-                            #    delete $sf->{i}{ss};
-                            #}
+                            # when leaving 'create_drop_or_attach'-menu:
+                            delete $sf->{i}{ss} if exists $sf->{i}{ss};  # deletes any existing saved books
                             delete $sf->{i}{gc} if exists $sf->{i}{gc};  # datasource file: delete menu memory
                         }
                         if ( $sf->{redo_db} ) {
@@ -587,7 +573,7 @@ sub __derived_table {
     if ( ! defined $qt_table ) {
         return;
     }
-    my $alias = $ax->alias( $tmp, 'subqueries', $qt_table, 'From_SQ' );
+    my $alias = $ax->alias( $tmp, 'derived_table', $qt_table, 'From_SQ' );
     $qt_table .= " AS " . $ax->quote_col_qualified( [ $alias ] );
     $tmp->{table} = $qt_table;
     my $sth = $sf->{d}{dbh}->prepare( "SELECT * FROM " . $qt_table . " LIMIT 0" );
@@ -617,7 +603,7 @@ App::DBBrowser - Browse SQLite/MySQL/PostgreSQL databases and their tables inter
 
 =head1 VERSION
 
-Version 2.271
+Version 2.277
 
 =head1 DESCRIPTION
 

@@ -7,10 +7,10 @@ build_requires:
   Test::Exception: '0'
   Test::Memory::Cycle: '1'
 configure_requires:
-  ExtUtils::MakeMaker: '6.5503'
+  ExtUtils::MakeMaker: '6.66'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.60, CPAN::Meta::Converter version 2.150010'
-license: open_source
+generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
+license: lgpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -22,10 +22,10 @@ no_index:
 requires:
   Compress::Zlib: '1'
   Font::TTF: '1.04'
-  perl: '5.020000'
+  perl: '5.022000'
 resources:
   bugtracker: https://github.com/PhilterPaper/Perl-PDF-Builder/issues
   homepage: https://metacpan.org/pod/PDF::Builder
   repository: git://github.com/PhilterPaper/Perl-PDF-Builder.git
-version: '3.022'
+version: '3.023'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -8,7 +8,7 @@ use Lemonldap::NG::Common::FormEncode;
 use Lemonldap::NG::Common::UserAgent;
 use Lemonldap::NG::Portal::Main::Constants qw(PE_OK PE_ERROR PE_REDIRECT);
 
-our $VERSION = '2.0.9';
+our $VERSION = '2.0.12';
 
 extends 'Lemonldap::NG::Portal::Main::Auth';
 
@@ -296,19 +296,19 @@ sub setAuthSessionInfo {
           $req->data->{githubData}->{$_};
     }
 
-    PE_OK;
+    return PE_OK;
 }
 
 sub authenticate {
-    PE_OK;
+    return PE_OK;
 }
 
 sub authFinish {
-    PE_OK;
+    return PE_OK;
 }
 
 sub authLogout {
-    PE_OK;
+    return PE_OK;
 }
 
 sub authForce {

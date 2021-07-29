@@ -12,9 +12,12 @@ package Paws::EMR::RunJobFlow;
   has Instances => (is => 'ro', isa => 'Paws::EMR::JobFlowInstancesConfig', required => 1);
   has JobFlowRole => (is => 'ro', isa => 'Str');
   has KerberosAttributes => (is => 'ro', isa => 'Paws::EMR::KerberosAttributes');
+  has LogEncryptionKmsKeyId => (is => 'ro', isa => 'Str');
   has LogUri => (is => 'ro', isa => 'Str');
+  has ManagedScalingPolicy => (is => 'ro', isa => 'Paws::EMR::ManagedScalingPolicy');
   has Name => (is => 'ro', isa => 'Str', required => 1);
   has NewSupportedProducts => (is => 'ro', isa => 'ArrayRef[Paws::EMR::SupportedProductConfig]');
+  has PlacementGroupConfigs => (is => 'ro', isa => 'ArrayRef[Paws::EMR::PlacementGroupConfig]');
   has ReleaseLabel => (is => 'ro', isa => 'Str');
   has RepoUpgradeOnBoot => (is => 'ro', isa => 'Str');
   has ScaleDownBehavior => (is => 'ro', isa => 'Str');
@@ -72,14 +75,16 @@ You shouldn't make instances of this class. Each attribute should be used as a n
             InstanceFleetType   => 'MASTER',    # values: MASTER, CORE, TASK
             InstanceTypeConfigs => [
               {
-                InstanceType => 'MyInstanceType',   # min: 1, max: 256; OPTIONAL
-                BidPrice     => 'MyXmlStringMaxLen256',    # max: 256
+                InstanceType => 'MyInstanceType',            # min: 1, max: 256
+                BidPrice     => 'MyXmlStringMaxLen256',      # max: 256
                 BidPriceAsPercentageOfOnDemandPrice => 1,    # OPTIONAL
                 Configurations                      => [
                   {
-                    Classification => 'MyString',
+                    Classification => 'MyString',            # OPTIONAL
                     Configurations => <ConfigurationList>,
-                    Properties     => { 'MyString' => 'MyString', },  # OPTIONAL
+                    Properties     => {
+                      'MyString' => 'MyString', # key: OPTIONAL, value: OPTIONAL
+                    },    # OPTIONAL
                   },
                   ...
                 ],    # OPTIONAL
@@ -87,11 +92,11 @@ You shouldn't make instances of this class. Each attribute should be used as a n
                   EbsBlockDeviceConfigs => [
                     {
                       VolumeSpecification => {
-                        SizeInGB   => 1,            # OPTIONAL
-                        VolumeType => 'MyString',
-                        Iops       => 1,            # OPTIONAL
+                        SizeInGB   => 1,             # OPTIONAL
+                        VolumeType => 'MyString',    # OPTIONAL
+                        Iops       => 1,             # OPTIONAL
                       },
-                      VolumesPerInstance => 1,      # OPTIONAL
+                      VolumesPerInstance => 1,       # OPTIONAL
                     },
                     ...
                   ],    # OPTIONAL
@@ -102,13 +107,25 @@ You shouldn't make instances of this class. Each attribute should be used as a n
               ...
             ],    # OPTIONAL
             LaunchSpecifications => {
+              OnDemandSpecification => {
+                AllocationStrategy => 'lowest-price',    # values: lowest-price
+                CapacityReservationOptions => {
+                  CapacityReservationPreference =>
+                    'open',    # values: open, none; OPTIONAL
+                  CapacityReservationResourceGroupArn =>
+                    'MyXmlStringMaxLen256',    # max: 256
+                  UsageStrategy => 'use-capacity-reservations-first'
+                  ,    # values: use-capacity-reservations-first; OPTIONAL
+                },    # OPTIONAL
+              },    # OPTIONAL
               SpotSpecification => {
                 TimeoutAction => 'SWITCH_TO_ON_DEMAND'
                 ,    # values: SWITCH_TO_ON_DEMAND, TERMINATE_CLUSTER
                 TimeoutDurationMinutes => 1,    # OPTIONAL
-                BlockDurationMinutes   => 1,    # OPTIONAL
-              },
-
+                AllocationStrategy     =>
+                  'capacity-optimized',   # values: capacity-optimized; OPTIONAL
+                BlockDurationMinutes => 1,    # OPTIONAL
+              },    # OPTIONAL
             },    # OPTIONAL
             Name                   => 'MyXmlStringMaxLen256',    # max: 256
             TargetOnDemandCapacity => 1,                         # OPTIONAL
@@ -120,7 +137,7 @@ You shouldn't make instances of this class. Each attribute should be used as a n
           {
             InstanceCount     => 1,                 # OPTIONAL
             InstanceRole      => 'MASTER',          # values: MASTER, CORE, TASK
-            InstanceType      => 'MyInstanceType',  # min: 1, max: 256; OPTIONAL
+            InstanceType      => 'MyInstanceType',  # min: 1, max: 256
             AutoScalingPolicy => {
               Constraints => {
                 MaxCapacity => 1,    # OPTIONAL
@@ -138,23 +155,23 @@ You shouldn't make instances of this class. Each attribute should be used as a n
                     },
                     Market => 'ON_DEMAND',   # values: ON_DEMAND, SPOT; OPTIONAL
                   },
-                  Name    => 'MyString',
+                  Name    => 'MyString',     # OPTIONAL
                   Trigger => {
                     CloudWatchAlarmDefinition => {
                       ComparisonOperator => 'GREATER_THAN_OR_EQUAL'
                       , # values: GREATER_THAN_OR_EQUAL, GREATER_THAN, LESS_THAN, LESS_THAN_OR_EQUAL
-                      MetricName => 'MyString',
-                      Period     => 1,            # OPTIONAL
-                      Threshold  => 1,            # OPTIONAL
+                      MetricName => 'MyString',    # OPTIONAL
+                      Period     => 1,             # OPTIONAL
+                      Threshold  => 1,             # OPTIONAL
                       Dimensions => [
                         {
-                          Key   => 'MyString',
-                          Value => 'MyString',
+                          Key   => 'MyString',    # OPTIONAL
+                          Value => 'MyString',    # OPTIONAL
                         },
                         ...
-                      ],                          # OPTIONAL
+                      ],    # OPTIONAL
                       EvaluationPeriods => 1,               # OPTIONAL
-                      Namespace         => 'MyString',
+                      Namespace         => 'MyString',      # OPTIONAL
                       Statistic         => 'SAMPLE_COUNT'
                       , # values: SAMPLE_COUNT, AVERAGE, SUM, MINIMUM, MAXIMUM; OPTIONAL
                       Unit => 'NONE'
@@ -162,7 +179,7 @@ You shouldn't make instances of this class. Each attribute should be used as a n
                     },
 
                   },
-                  Description => 'MyString',
+                  Description => 'MyString',    # OPTIONAL
                 },
                 ...
               ],
@@ -171,9 +188,11 @@ You shouldn't make instances of this class. Each attribute should be used as a n
             BidPrice       => 'MyXmlStringMaxLen256',    # max: 256
             Configurations => [
               {
-                Classification => 'MyString',
+                Classification => 'MyString',            # OPTIONAL
                 Configurations => <ConfigurationList>,
-                Properties     => { 'MyString' => 'MyString', },    # OPTIONAL
+                Properties     => {
+                  'MyString' => 'MyString',    # key: OPTIONAL, value: OPTIONAL
+                },    # OPTIONAL
               },
               ...
             ],    # OPTIONAL
@@ -181,11 +200,11 @@ You shouldn't make instances of this class. Each attribute should be used as a n
               EbsBlockDeviceConfigs => [
                 {
                   VolumeSpecification => {
-                    SizeInGB   => 1,            # OPTIONAL
-                    VolumeType => 'MyString',
-                    Iops       => 1,            # OPTIONAL
+                    SizeInGB   => 1,             # OPTIONAL
+                    VolumeType => 'MyString',    # OPTIONAL
+                    Iops       => 1,             # OPTIONAL
                   },
-                  VolumesPerInstance => 1,      # OPTIONAL
+                  VolumesPerInstance => 1,       # OPTIONAL
                 },
                 ...
               ],    # OPTIONAL
@@ -196,27 +215,31 @@ You shouldn't make instances of this class. Each attribute should be used as a n
           },
           ...
         ],    # OPTIONAL
-        KeepJobFlowAliveWhenNoSteps => 1,          # OPTIONAL
-        MasterInstanceType => 'MyInstanceType',    # min: 1, max: 256; OPTIONAL
-        Placement          => {
-          AvailabilityZone  => 'MyXmlString',      # max: 10280; OPTIONAL
+        KeepJobFlowAliveWhenNoSteps => 1,                   # OPTIONAL
+        MasterInstanceType          => 'MyInstanceType',    # min: 1, max: 256
+        Placement                   => {
+          AvailabilityZone  => 'MyXmlString',    # max: 10280; OPTIONAL
           AvailabilityZones => [
-            'MyXmlStringMaxLen256', ...            # max: 256
+            'MyXmlStringMaxLen256', ...          # max: 256
           ],    # OPTIONAL
         },    # OPTIONAL
-        ServiceAccessSecurityGroup => 'MyXmlStringMaxLen256',    # max: 256
-        SlaveInstanceType    => 'MyInstanceType',   # min: 1, max: 256; OPTIONAL
-        TerminationProtected => 1,                  # OPTIONAL
+        ServiceAccessSecurityGroup => 'MyXmlStringMaxLen256', # max: 256
+        SlaveInstanceType          => 'MyInstanceType',       # min: 1, max: 256
+        TerminationProtected       => 1,                      # OPTIONAL
       },
       Name           => 'MyXmlStringMaxLen256',
-      AdditionalInfo => 'MyXmlString',              # OPTIONAL
-      AmiVersion     => 'MyXmlStringMaxLen256',     # OPTIONAL
+      AdditionalInfo => 'MyXmlString',                        # OPTIONAL
+      AmiVersion     => 'MyXmlStringMaxLen256',               # OPTIONAL
       Applications   => [
         {
-          AdditionalInfo => { 'MyString' => 'MyString', },    # OPTIONAL
-          Args           => [ 'MyString', ... ],              # OPTIONAL
-          Name           => 'MyString',
-          Version        => 'MyString',
+          AdditionalInfo => {
+            'MyString' => 'MyString',    # key: OPTIONAL, value: OPTIONAL
+          },    # OPTIONAL
+          Args => [
+            'MyString', ...    # OPTIONAL
+          ],    # OPTIONAL
+          Name    => 'MyString',    # OPTIONAL
+          Version => 'MyString',    # OPTIONAL
         },
         ...
       ],    # OPTIONAL
@@ -236,9 +259,11 @@ You shouldn't make instances of this class. Each attribute should be used as a n
       ],    # OPTIONAL
       Configurations => [
         {
-          Classification => 'MyString',
+          Classification => 'MyString',            # OPTIONAL
           Configurations => <ConfigurationList>,
-          Properties     => { 'MyString' => 'MyString', },    # OPTIONAL
+          Properties     => {
+            'MyString' => 'MyString',    # key: OPTIONAL, value: OPTIONAL
+          },    # OPTIONAL
         },
         ...
       ],    # OPTIONAL
@@ -252,13 +277,32 @@ You shouldn't make instances of this class. Each attribute should be used as a n
         ADDomainJoinUser                 => 'MyXmlStringMaxLen256',   # max: 256
         CrossRealmTrustPrincipalPassword => 'MyXmlStringMaxLen256',   # max: 256
       },    # OPTIONAL
-      LogUri               => 'MyXmlString',    # OPTIONAL
+      LogEncryptionKmsKeyId => 'MyXmlString',    # OPTIONAL
+      LogUri                => 'MyXmlString',    # OPTIONAL
+      ManagedScalingPolicy  => {
+        ComputeLimits => {
+          MaximumCapacityUnits => 1,    # OPTIONAL
+          MinimumCapacityUnits => 1,    # OPTIONAL
+          UnitType             =>
+            'InstanceFleetUnits',  # values: InstanceFleetUnits, Instances, VCPU
+          MaximumCoreCapacityUnits     => 1,    # OPTIONAL
+          MaximumOnDemandCapacityUnits => 1,    # OPTIONAL
+        },    # OPTIONAL
+      },    # OPTIONAL
       NewSupportedProducts => [
         {
           Args => [
             'MyXmlString', ...    # max: 10280; OPTIONAL
           ],    # OPTIONAL
           Name => 'MyXmlStringMaxLen256',    # max: 256
+        },
+        ...
+      ],    # OPTIONAL
+      PlacementGroupConfigs => [
+        {
+          InstanceRole      => 'MASTER',    # values: MASTER, CORE, TASK
+          PlacementStrategy =>
+            'SPREAD',    # values: SPREAD, PARTITION, CLUSTER, NONE; OPTIONAL
         },
         ...
       ],    # OPTIONAL
@@ -295,8 +339,8 @@ You shouldn't make instances of this class. Each attribute should be used as a n
       ],    # OPTIONAL
       Tags => [
         {
-          Key   => 'MyString',
-          Value => 'MyString',
+          Key   => 'MyString',    # OPTIONAL
+          Value => 'MyString',    # OPTIONAL
         },
         ...
       ],    # OPTIONAL
@@ -384,9 +428,9 @@ For information about finding an AMI ID, see Finding a Linux AMI
 
 =head2 EbsRootVolumeSize => Int
 
-The size, in GiB, of the EBS root device volume of the Linux AMI that
-is used for each EC2 instance. Available in Amazon EMR version 4.x and
-later.
+The size, in GiB, of the Amazon EBS root device volume of the Linux AMI
+that is used for each EC2 instance. Available in Amazon EMR version 4.x
+and later.
 
 
 
@@ -411,7 +455,16 @@ Attributes for Kerberos configuration when Kerberos authentication is
 enabled using a security configuration. For more information see Use
 Kerberos Authentication
 (https://docs.aws.amazon.com/emr/latest/ManagementGuide/emr-kerberos.html)
-in the I<EMR Management Guide>.
+in the I<Amazon EMR Management Guide>.
+
+
+
+=head2 LogEncryptionKmsKeyId => Str
+
+The AWS KMS customer master key (CMK) used for encrypting log files. If
+a value is not provided, the logs remain encrypted by AES-256. This
+attribute is only available with Amazon EMR version 5.30.0 and later,
+excluding Amazon EMR 6.0.0.
 
 
 
@@ -419,6 +472,12 @@ in the I<EMR Management Guide>.
 
 The location in Amazon S3 to write the log files of the job flow. If a
 value is not provided, logs are not created.
+
+
+
+=head2 ManagedScalingPolicy => L<Paws::EMR::ManagedScalingPolicy>
+
+The specified managed scaling policy for an Amazon EMR cluster.
 
 
 
@@ -463,7 +522,7 @@ respectively.
 
 =item *
 
-"hunk" - launch the cluster with the Hunk Big Data Analtics Platform.
+"hunk" - launch the cluster with the Hunk Big Data Analytics Platform.
 
 =item *
 
@@ -480,6 +539,12 @@ installed.
 
 =back
 
+
+
+
+=head2 PlacementGroupConfigs => ArrayRef[L<Paws::EMR::PlacementGroupConfig>]
+
+The specified placement group configuration for an Amazon EMR cluster.
 
 
 
@@ -517,13 +582,13 @@ nodes at the instance-hour boundary, regardless of when the request to
 terminate the instance was submitted. This option is only available
 with Amazon EMR 5.1.0 and later and is the default for clusters created
 using that version. C<TERMINATE_AT_TASK_COMPLETION> indicates that
-Amazon EMR blacklists and drains tasks from nodes before terminating
-the Amazon EC2 instances, regardless of the instance-hour boundary.
-With either behavior, Amazon EMR removes the least active nodes first
-and blocks instance termination if it could lead to HDFS corruption.
-C<TERMINATE_AT_TASK_COMPLETION> available only in Amazon EMR version
-4.1.0 and later, and is the default for versions of Amazon EMR earlier
-than 5.1.0.
+Amazon EMR adds nodes to a deny list and drains tasks from nodes before
+terminating the Amazon EC2 instances, regardless of the instance-hour
+boundary. With either behavior, Amazon EMR removes the least active
+nodes first and blocks instance termination if it could lead to HDFS
+corruption. C<TERMINATE_AT_TASK_COMPLETION> available only in Amazon
+EMR version 4.1.0 and later, and is the default for versions of Amazon
+EMR earlier than 5.1.0.
 
 Valid values are: C<"TERMINATE_AT_INSTANCE_HOUR">, C<"TERMINATE_AT_TASK_COMPLETION">
 

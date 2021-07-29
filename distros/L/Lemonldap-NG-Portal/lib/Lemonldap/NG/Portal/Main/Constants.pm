@@ -4,9 +4,11 @@ package Lemonldap::NG::Portal::Main::Constants;
 use strict;
 use Exporter 'import';
 
-our $VERSION = '2.0.11';
+our $VERSION = '2.0.12';
 
 use constant HANDLER => 'Lemonldap::NG::Handler::PSGI::Main';
+use constant URIRE =>
+qr{(((?^:https?))://((?:(?:(?:(?:(?:[a-zA-Z0-9][-a-zA-Z0-9]*)?[a-zA-Z0-9])[.])*(?:[a-zA-Z][-a-zA-Z0-9]*[a-zA-Z0-9]|[a-zA-Z])[.]?)|(?:[0-9]+[.][0-9]+[.][0-9]+[.][0-9]+)))(?::((?:[0-9]*)))?(/(((?:(?:(?:(?:[a-zA-Z0-9\-_.!~*'():\@&=+\$,]+|(?:%[a-fA-F0-9][a-fA-F0-9]))*)(?:;(?:(?:[a-zA-Z0-9\-_.!~*'():\@&=+\$,]+|(?:%[a-fA-F0-9][a-fA-F0-9]))*))*)(?:/(?:(?:(?:[a-zA-Z0-9\-_.!~*'():\@&=+\$,]+|(?:%[a-fA-F0-9][a-fA-F0-9]))*)(?:;(?:(?:[a-zA-Z0-9\-_.!~*'():\@&=+\$,]+|(?:%[a-fA-F0-9][a-fA-F0-9]))*))*))*))(?:[?]((?:(?:[;/?:\@&=+\$,a-zA-Z0-9\-_.!~*'()]+|(?:%[a-fA-F0-9][a-fA-F0-9]))*)))?))?)};
 use constant {
     PE_IDPCHOICE                         => -5,
     PE_SENDRESPONSE                      => -4,
@@ -24,6 +26,7 @@ use constant {
     PE_APACHESESSIONERROR                => 8,
     PE_FIRSTACCESS                       => 9,
     PE_BADCERTIFICATE                    => 10,
+    PE_NO_PASSWORD_BE                    => 20,
     PE_PP_ACCOUNT_LOCKED                 => 21,
     PE_PP_PASSWORD_EXPIRED               => 22,
     PE_CERTIFICATEREQUIRED               => 23,
@@ -107,6 +110,8 @@ use constant {
     PE_PP_NOT_ALLOWED_CHARACTERS         => 101,
     PE_UPGRADESESSION                    => 102,
     PE_NO_SECOND_FACTORS                 => 103,
+    PE_BAD_DEVOPS_FILE                   => 104,
+    PE_FILENOTFOUND                      => 105,
 };
 
 sub portalConsts {
@@ -123,7 +128,10 @@ sub portalConsts {
         '101' => 'PE_PP_NOT_ALLOWED_CHARACTERS',
         '102' => 'PE_UPGRADESESSION',
         '103' => 'PE_NO_SECOND_FACTORS',
+        '104' => 'PE_BAD_DEVOPS_FILE',
+        '105' => 'PE_FILENOTFOUND',
         '2'   => 'PE_FORMEMPTY',
+        '20'  => 'PE_NO_PASSWORD_BE',
         '21'  => 'PE_PP_ACCOUNT_LOCKED',
         '22'  => 'PE_PP_PASSWORD_EXPIRED',
         '23'  => 'PE_CERTIFICATEREQUIRED',
@@ -218,6 +226,7 @@ sub portalConsts {
 our @EXPORT_OK = (
     'portalConsts',
     'HANDLER',
+    'URIRE',
     'PE_IDPCHOICE',
     'PE_SENDRESPONSE',
     'PE_INFO',
@@ -234,6 +243,7 @@ our @EXPORT_OK = (
     'PE_APACHESESSIONERROR',
     'PE_FIRSTACCESS',
     'PE_BADCERTIFICATE',
+    'PE_NO_PASSWORD_BE',
     'PE_PP_ACCOUNT_LOCKED',
     'PE_PP_PASSWORD_EXPIRED',
     'PE_CERTIFICATEREQUIRED',
@@ -316,7 +326,9 @@ our @EXPORT_OK = (
     'PE_PP_NOT_ALLOWED_CHARACTER',
     'PE_PP_NOT_ALLOWED_CHARACTERS',
     'PE_UPGRADESESSION',
-    'PE_NO_SECOND_FACTORS'
+    'PE_NO_SECOND_FACTORS',
+    'PE_BAD_DEVOPS_FILE',
+    'PE_FILENOTFOUND'
 );
 our %EXPORT_TAGS = ( 'all' => [ @EXPORT_OK, 'import' ], );
 

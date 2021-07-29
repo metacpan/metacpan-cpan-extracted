@@ -3,7 +3,7 @@ package Beekeeper::MQTT;
 use strict;
 use warnings;
 
-our $VERSION = '0.07';
+our $VERSION = '0.09';
 
 use AnyEvent;
 use AnyEvent::Handle;
@@ -837,7 +837,8 @@ sub _receive_disconnect {
     my ($self, $packet) = @_;
 
     # Handle abbreviated packet
-    $$packet = "\x00\x00" if (length $$packet == 0);
+    $$packet  = "\x00\x00" if (length $$packet == 0);
+    $$packet .= "\x00"     if (length $$packet == 1);
 
     # 3.14.2.1  Reason Code  (byte)
     my $offs = 0;
@@ -1784,7 +1785,7 @@ Beekeeper::MQTT - Asynchronous MQTT 5.0 client
  
 =head1 VERSION
  
-Version 0.07
+Version 0.09
 
 =head1 SYNOPSIS
 

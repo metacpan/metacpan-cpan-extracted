@@ -4,8 +4,9 @@ package Lemonldap::NG::Portal::2F::Register::U2F;
 use strict;
 use Mouse;
 use JSON qw(from_json to_json);
+use MIME::Base64 qw(encode_base64url decode_base64url);
 
-our $VERSION = '2.0.10';
+our $VERSION = '2.0.12';
 
 extends qw(
   Lemonldap::NG::Portal::Main::Plugin
@@ -141,7 +142,7 @@ sub run {
                   {
                     type       => 'U2F',
                     name       => $keyName,
-                    _userKey   => $self->encode_base64url( $userKey, '' ),
+                    _userKey   => encode_base64url( $userKey, '' ),
                     _keyHandle => $keyHandle,
                     epoch      => $epoch
                   };
@@ -347,7 +348,7 @@ sub loadUser {
                   . $_->{_userKey}
                   . "/ _keyHandle = "
                   . $_->{_keyHandle} );
-            $_->{_userKey} = $self->decode_base64url( $_->{_userKey} );
+            $_->{_userKey} = decode_base64url( $_->{_userKey} );
             push @u2fs, $_;
         }
     }

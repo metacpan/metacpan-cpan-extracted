@@ -3,7 +3,7 @@ were removed from the official distribution (2.026). However, I feel that
 they can provide some interesting examples of code, and thus should 
 continue to be provided.
 
-SOME OF THESE EXAMPLES DO NOT WORK (SEE NOTES). USE AT YOUR OWN RISK. THEY
+SOME OF THESE EXAMPLES MAY NOT WORK (SEE NOTES). USE AT YOUR OWN RISK. THEY
 ARE NOT INTENDED TO BE OFFICIAL TEST CASES, NOR ARE THEY WELL DOCUMENTED OR
 NECESSARILY EVEN WELL WRITTEN. They are provided as examples of code, and some
 (e.g., listing of fonts) may even be useful to you.
@@ -23,12 +23,19 @@ tested with each release thereafter
 
 =========== broken:
 
+=========== possibly OK:
+
 BarCode.pl       Demonstrate the bar code library, 1 page (11 one-dimensional
                  barcodes). It appears to mostly be there, but some heavy bars 
-                 seem to be merging into their neighbors, and there may be 
-                 other problems. My advice is to use the barcode functions 
+                 seem to be merging into their neighbors, AT LEAST ON LOW-TO-
+                 MEDIUM RESOLUTION screens, and there may be other problems. On 
+                 a laser printer the merged or "blotted" lines appear to
+                 separate into discrete lines, but MAY still be too close for
+                 accurate scanning! My advice is to use the barcode functions 
                  in production code ONLY WITH EXTREME CAUTION AND TESTING FOR 
-                 SUITABILITY, until they have been better tested and verified.
+                 SUITABILITY. Be sure to scan a number of sample bar codes with 
+                 production scanner equipment, before deciding that they're 
+                 suitable for real use.
 
 =========== successful (produced reasonable looking PDF, and no messages):
 

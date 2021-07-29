@@ -2,8 +2,8 @@ NAME
     Games::TabRace - A game played using shell tab completion
 
 VERSION
-    This document describes version 0.008 of Games::TabRace (from Perl
-    distribution Games-TabRace), released on 2021-06-12.
+    This document describes version 0.009 of Games::TabRace (from Perl
+    distribution Games-TabRace), released on 2021-07-09.
 
 SYNOPSIS
     See tabrace.

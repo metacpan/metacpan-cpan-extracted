@@ -6,6 +6,7 @@ package Paws::Snowball::UpdateJob;
   has ForwardingAddressId => (is => 'ro', isa => 'Str');
   has JobId => (is => 'ro', isa => 'Str', required => 1);
   has Notification => (is => 'ro', isa => 'Paws::Snowball::Notification');
+  has OnDeviceServiceConfiguration => (is => 'ro', isa => 'Paws::Snowball::OnDeviceServiceConfiguration');
   has Resources => (is => 'ro', isa => 'Paws::Snowball::JobResource');
   has RoleARN => (is => 'ro', isa => 'Str');
   has ShippingOption => (is => 'ro', isa => 'Str');
@@ -35,10 +36,10 @@ You shouldn't make instances of this class. Each attribute should be used as a n
 =head1 SYNOPSIS
 
     my $snowball = Paws->service('Snowball');
-   # To update a job
-   # This action allows you to update certain parameters for a job. Once the job
-   # changes to a different job state, usually within 60 minutes of the job
-   # being created, this action is no longer available.
+  # To update a job
+  # This action allows you to update certain parameters for a job. Once the job
+  # changes to a different job state, usually within 60 minutes of the job being
+  # created, this action is no longer available.
     my $UpdateJobResult = $snowball->UpdateJob(
       'AddressId'   => 'ADID1234ab12-3eec-4eb3-9be6-9374c10eb51b',
       'Description' =>
@@ -87,6 +88,14 @@ The new or updated Notification object.
 
 
 
+=head2 OnDeviceServiceConfiguration => L<Paws::Snowball::OnDeviceServiceConfiguration>
+
+Specifies the service or services on the Snow Family device that your
+transferred data will be exported from or imported into. AWS Snow
+Family supports Amazon S3 and NFS (Network File System).
+
+
+
 =head2 Resources => L<Paws::Snowball::JobResource>
 
 The updated C<JobResource> object, or the updated JobResource object.
@@ -113,7 +122,13 @@ Valid values are: C<"SECOND_DAY">, C<"NEXT_DAY">, C<"EXPRESS">, C<"STANDARD">
 The updated C<SnowballCapacityPreference> of this job's JobMetadata
 object. The 50 TB Snowballs are only available in the US regions.
 
-Valid values are: C<"T50">, C<"T80">, C<"T100">, C<"T42">, C<"NoPreference">
+For more information, see
+"https://docs.aws.amazon.com/snowball/latest/snowcone-guide/snow-device-types.html"
+(Snow Family Devices and Capacity) in the I<Snowcone User Guide> or
+"https://docs.aws.amazon.com/snowball/latest/developer-guide/snow-device-types.html"
+(Snow Family Devices and Capacity) in the I<Snowcone User Guide>.
+
+Valid values are: C<"T50">, C<"T80">, C<"T100">, C<"T42">, C<"T98">, C<"T8">, C<"T14">, C<"NoPreference">
 
 
 =head1 SEE ALSO

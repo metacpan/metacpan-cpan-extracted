@@ -3,6 +3,7 @@ LemonLDAP::NG TOTP registration script
 ###
 
 setMsg = (msg, level) ->
+	$('#msg').attr 'trspan', msg
 	$('#msg').html window.translate msg
 	$('#color').removeClass 'message-positive message-warning message-danger alert-success alert-warning alert-danger'
 	$('#color').addClass "message-#{level}"
@@ -19,14 +20,12 @@ displayError = (j, status, err) ->
 
 token=''
 
-getKey = (reset) ->
+getKey = () ->
 	setMsg 'yourTotpKey', 'warning'
 	$.ajax
 		type: "POST",
 		url: "#{portal}/2fregisters/totp/getkey"
 		dataType: 'json'
-		data:
-			newkey: reset
 		error: displayError
 		# Display key and QR code
 		success: (data) ->
@@ -50,7 +49,8 @@ getKey = (reset) ->
 				value: s
 				size:150
 			# Display serialized key
-			$('#serialized').text(s)
+			secret = data.secret || ""
+			$('#secret').text(secret.toUpperCase().replace(/(.{4})/g, '$1 ').trim())
 			# Show message (warning level if key is new)
 			if data.newkey
 				setMsg 'yourNewTotpKey', 'warning'
@@ -61,7 +61,8 @@ getKey = (reset) ->
 verify = ->
 	val = $('#code').val()
 	unless val
-		setMsg 'fillTheForm', 'warning'
+		setMsg 'totpMissingCode', 'warning'
+		$("#code").focus()
 	else
 		$.ajax
 			type: "POST",
@@ -82,6 +83,5 @@ verify = ->
 					setMsg 'yourKeyIsRegistered', 'success'					
 					
 $(document).ready ->
-	getKey(0)
-	$('#changekey').on 'click', () -> getKey(1)
+	getKey()
 	$('#verify').on 'click', () -> verify()

@@ -1,5 +1,5 @@
 package Finance::AMEX::Transaction::GRRCN::Transaction;
-$Finance::AMEX::Transaction::GRRCN::Transaction::VERSION = '0.003';
+$Finance::AMEX::Transaction::GRRCN::Transaction::VERSION = '0.004';
 use strict;
 use warnings;
 
@@ -8,6 +8,8 @@ use warnings;
 use base 'Finance::AMEX::Transaction::GRRCN::Base';
 
 sub field_map {
+  my ($self) = @_;
+
   return {
     RECORD_TYPE                             => [1, 10],
     PAYEE_MERCHANT_ID                       => [11, 15],
@@ -48,6 +50,13 @@ sub field_map {
     SUBSEQUENT_INSTALLMENT_AMOUNT           => [384, 16],
     NUMBER_OF_INSTALLMENTS                  => [400, 5],
     INSTALLMENT_NUMBER                      => [405, 5],
+
+    (
+      $self->version >= 2.01
+      ? ( FILLER => [410, 15] )
+      : ()
+    ),
+
     SERVICE_FEE_AMOUNT                      => [425, 16],
     ACCELERATION_AMOUNT                     => [441, 16],
   };
@@ -60,6 +69,7 @@ sub PAYEE_MERCHANT_ID                       {return $_[0]->_get_column('PAYEE_ME
 sub SETTLEMENT_ACCOUNT_TYPE_CODE            {return $_[0]->_get_column('SETTLEMENT_ACCOUNT_TYPE_CODE')}
 sub AMERICAN_EXPRESS_PAYMENT_NUMBER         {return $_[0]->_get_column('AMERICAN_EXPRESS_PAYMENT_NUMBER')}
 sub PAYMENT_DATE                            {return $_[0]->_get_column('PAYMENT_DATE')}
+sub FILLER                                  {return $_[0]->_get_column('FILLER')}
 
 sub PAYMENT_CURRENCY                        {return $_[0]->_get_column('PAYMENT_CURRENCY')}
 sub SUBMISSION_MERCHANT_ID                  {return $_[0]->_get_column('SUBMISSION_MERCHANT_ID')}
@@ -113,7 +123,7 @@ Finance::AMEX::Transaction::GRRCN::Transaction - Parse AMEX Global Reconciliatio
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 
@@ -518,11 +528,11 @@ Finance::AMEX::Transaction::GRRCN::Transaction - Object methods for AMEX Global 
 
 =head1 AUTHOR
 
-Tom Heady <theady@ziprecruiter.com>
+Tom Heady <cpan@punch.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by ZipRecruiter.
+This software is copyright (c) 2021 by ZipRecruiter.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

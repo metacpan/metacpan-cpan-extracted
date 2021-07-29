@@ -33,7 +33,7 @@ do {
 
   $client->cwd('t')->recv;
   isnt $client->pwd->recv, $config->{dir}, "in t dir";
-  
+
   my $res = eval { $client->cdup->recv };
   diag $@ if $@;
   isa_ok $res, 'AnyEvent::FTP::Response';

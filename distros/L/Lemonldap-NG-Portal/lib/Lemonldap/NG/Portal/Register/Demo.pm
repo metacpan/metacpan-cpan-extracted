@@ -9,10 +9,10 @@ use Lemonldap::NG::Portal::Main::Constants qw(
 
 extends 'Lemonldap::NG::Portal::Register::Base';
 
-our $VERSION = '2.0.10';
+our $VERSION = '2.0.12';
 
 sub init {
-    1;
+    return 1;
 }
 
 # Compute a login from register infos
@@ -44,6 +44,7 @@ sub createUser {
           . $req->data->{registerInfo}->{lastname},
         mail => $req->data->{registerInfo}->{login} . '@badwolf.org',
           };
+
     return PE_OK;
 }
 

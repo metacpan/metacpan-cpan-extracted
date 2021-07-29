@@ -151,7 +151,7 @@ ok(
 count(1);
 expectOK($res);
 
+$client->logout($id);
 clean_sessions();
-
 done_testing( count() );
 

@@ -186,35 +186,23 @@ sub from_file {
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
 
     DIR: while ( 1 ) {
-        if ( ! @{$sf->{i}{gc}{files_fs_in_chosen_dir}//[]} ) {
-            my $dir_fs = $sf->__directory( $sql );
-            if ( ! defined $dir_fs ) {
+        if ( ! @{$sf->{i}{gc}{files_in_chosen_dir}//[]} ) {
+            my $dir = $sf->__directory( $sql );
+            if ( ! defined $dir ) {
                 return;
             }
-            my @tmp_files;
-            if ( length $sf->{o}{insert}{file_filter} ) {
-                @tmp_files = map { basename $_} grep { -e $_ } glob( catfile( $dir_fs, $sf->{o}{insert}{file_filter} ) );
-            }
-            else {
-                opendir( my $dh, $dir_fs ) or die $!;
-                @tmp_files = readdir $dh;
-                closedir $dh;
-            }
-            my @files_fs;
-            for my $file ( sort @tmp_files ) {
-                next if $file =~ /^\./ && ! $sf->{o}{insert}{show_hidden_files};
-                next if -d catdir $dir_fs, $file;
-                push @files_fs, catfile( $dir_fs, $file );
-            }
-            $sf->{i}{gc}{files_fs_in_chosen_dir} = \@files_fs;
+            $sf->{i}{gc}{files_in_chosen_dir} = $sf->__files_in_dir( $dir );
         }
-        my @files = map { '  ' . decode( 'locale_fs', basename $_ ) } @{$sf->{i}{gc}{files_fs_in_chosen_dir}};
         $sf->{i}{gc}{old_idx_file} //= 1;
 
         FILE: while ( 1 ) {
             my $hidden = 'Choose File:';
             my @pre = ( $hidden, undef );
-            my $menu = [ @pre, @files ];
+            my $change_dir = '  Change dir';
+            if ( $sf->{o}{insert}{history_dirs} == 1 ) {
+                push @pre, $change_dir;
+            }
+            my $menu = [ @pre, map { '  ' . basename $_ } @{$sf->{i}{gc}{files_in_chosen_dir}} ]; #
             # Choose
             my $idx = $tc->choose(
                 $menu,
@@ -222,7 +210,7 @@ sub from_file {
                   undef => '  <=' }
             );
             if ( ! defined $idx || ! defined $menu->[$idx] ) {
-                delete $sf->{i}{gc}{files_fs_in_chosen_dir};
+                delete $sf->{i}{gc}{files_in_chosen_dir};
                 if ( $sf->{o}{insert}{history_dirs} == 1 ) {
                     return;
                 }
@@ -239,13 +227,40 @@ sub from_file {
                 require App::DBBrowser::Opt::Set;
                 my $opt_set = App::DBBrowser::Opt::Set->new( $sf->{i}, $sf->{o} );
                 say "Settings";
-                $opt_set->set_options( $sf->__file_setting_menu_entries() );
+                $opt_set->set_options( [ { name => 'group_insert', text => '' } ] );
                 next DIR;
             }
-            my $file_fs = $sf->{i}{gc}{files_fs_in_chosen_dir}[$idx-@pre];
+            elsif ( $menu->[$idx] eq $change_dir ) {
+                my $dir = $sf->__new_search_dir();
+                $sf->{i}{gc}{files_in_chosen_dir} = $sf->__files_in_dir( $dir );
+                next FILE;
+            }
+            my $file_fs = encode( 'locale_fs', $sf->{i}{gc}{files_in_chosen_dir}[$idx-@pre] );
             return 1, $file_fs;
         }
     }
+}
+
+
+sub __files_in_dir {
+    my ( $sf, $dir ) = @_;
+    my $dir_fs = realpath encode( 'locale_fs', $dir );
+    my @tmp_files_fs;
+    if ( length $sf->{o}{insert}{file_filter} ) {
+        @tmp_files_fs = map { basename $_} grep { -e $_ } glob( catfile( $dir_fs, $sf->{o}{insert}{file_filter} ) );
+    }
+    else {
+        opendir( my $dh, $dir_fs ) or die $!;
+        @tmp_files_fs = readdir $dh;
+        closedir $dh;
+    }
+    my $files = [];
+    for my $file_fs ( sort @tmp_files_fs ) {
+        next if $file_fs =~ /^\./ && ! $sf->{o}{insert}{show_hidden_files};
+        next if -d catdir $dir_fs, $file_fs;
+        push @$files, decode( 'locale_fs', catfile $dir_fs, $file_fs );
+    }
+    return $files;
 }
 
 
@@ -254,23 +269,13 @@ sub __directory {
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     if ( ! $sf->{o}{insert}{history_dirs} ) {
-        require App::DBBrowser::Opt::Set;
-        my $opt_set = App::DBBrowser::Opt::Set->new( $sf->{i}, $sf->{o} );
-        $opt_set->__new_dir_search();
-        if ( ! defined $sf->{o}{insert}{add_file_dir} ) {
-            return;
-        }
-        return realpath delete $sf->{o}{insert}{add_file_dir};
-    }
-    if ( $sf->{o}{insert}{add_file_dir} ) { # set in the prompt menu
-        my $dir_fs = delete $sf->{o}{insert}{add_file_dir};
-        $sf->__add_to_history( $dir_fs );
-        return realpath $dir_fs; # available in the prompt menu only if history_dirs == 1, therefore `return $dir_fs;`
+        my $dir = $sf->__new_search_dir();
+        return $dir;
     }
     if ( $sf->{o}{insert}{history_dirs} == 1 ) {
         my $h_ref = $ax->read_json( $sf->{i}{f_dir_history} ) // {};
         if ( @{$h_ref->{dirs}//[]} ) {
-            return realpath encode 'locale_fs', $h_ref->{dirs}[0];
+            return $h_ref->{dirs}[0];
         }
     }
     $sf->{i}{gc}{old_idx_dir} //= 0;
@@ -283,7 +288,7 @@ sub __directory {
         my @pre = ( undef, $new_search );
         my $menu = [ @pre, map( '- ' . $_, @dirs ) ];
         # Choose
-        my $idx = $tc->choose(
+        my $idx = $tc->choose( ##
             $menu,
             { %{$sf->{i}{lyt_v}}, prompt => $prompt, index => 1, default => $sf->{i}{gc}{old_idx_dir},
               undef => '  <=' }
@@ -298,54 +303,50 @@ sub __directory {
             }
             $sf->{i}{gc}{old_idx_dir} = $idx;
         }
-        my $dir_fs;
+        my $dir;
         if ( $menu->[$idx] eq $new_search ) {
-            require App::DBBrowser::Opt::Set;
-            my $opt_set = App::DBBrowser::Opt::Set->new( $sf->{i}, $sf->{o} );
-            $opt_set->__new_dir_search();
-            $dir_fs = delete $sf->{o}{insert}{add_file_dir};
-            if ( ! defined $dir_fs || ! length $dir_fs ) {
+            $dir = $sf->__new_search_dir();
+            if ( ! defined $dir || ! length $dir ) {
                 next DIR;
             }
         }
         else {
-            $dir_fs = realpath encode 'locale_fs', $dirs[$idx-@pre];
+            $dir = $dirs[$idx-@pre];
         }
-        $sf->__add_to_history( $dir_fs );
-        return $dir_fs;
+        $sf->__add_to_history( $dir );
+        return $dir;
     }
 }
 
 
 sub __add_to_history {
-    my ( $sf, $dir_fs ) = @_;
+    my ( $sf, $dir ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $h_ref = $ax->read_json( $sf->{i}{f_dir_history} ) // {};
-    my $dirs_fs = [ map { realpath encode( 'locale_fs', $_ ) } @{$h_ref->{dirs}//[]} ];
-    unshift @$dirs_fs, $dir_fs;
-    @$dirs_fs = uniq @$dirs_fs;
-    if ( @$dirs_fs > $sf->{o}{insert}{history_dirs} ) {
-        $#{$dirs_fs} = $sf->{o}{insert}{history_dirs} - 1;
+    my $dirs = $h_ref->{dirs};
+    unshift @$dirs, $dir;
+    @$dirs = uniq @$dirs;
+    if ( @$dirs > $sf->{o}{insert}{history_dirs} ) {
+        $#{$dirs} = $sf->{o}{insert}{history_dirs} - 1;
     }
-    $h_ref->{dirs} = [ map { decode( 'locale_fs', $_ ) } @$dirs_fs ];
+    $h_ref->{dirs} = $dirs;
     $ax->write_json( $sf->{i}{f_dir_history}, $h_ref );
 }
 
 
-sub __file_setting_menu_entries {
+sub __new_search_dir {
     my ( $sf ) = @_;
-    my $groups = [
-        { name => 'group_insert', text => '' }
-    ];
-    require App::DBBrowser::Opt::Set;
-    my $options = App::DBBrowser::Opt::Set::_options( 'group_insert' );
-    if ( $sf->{o}{insert}{history_dirs} == 1 ) {
-        push @$options, { name => 'add_file_dir', text => "- NEW search", section => 'insert' };
+    my $tu = Term::Choose::Util->new( $sf->{i}{tcu_default} );
+    my $default_dir = $sf->{i}{tmp_files_dir} // $sf->{i}{home_dir};
+    # Choose
+    my $dir = $tu->choose_a_directory(
+        { init_dir => $default_dir, decoded => 1, clear_screen => 1 }
+    );
+    if ( $dir ) {
+        $sf->{i}{tmp_files_dir} = $dir;
     }
-    return $groups, $options;
-
+    return $dir;
 }
-
 
 
 

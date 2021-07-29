@@ -92,7 +92,7 @@ AddrInfoHints Typemap<AddrInfoHints>::in (SV* arg) {
     Hash h = arg;
     for (auto& row : h) {
         auto k = row.key();
-        auto val = Simple(row.value());
+        auto val = row.value().number();
         if      (k == "family"  ) ret.family   = val;
         else if (k == "socktype") ret.socktype = val;
         else if (k == "protocol") ret.protocol = val;
@@ -126,22 +126,22 @@ Sv Typemap<Fs::FStat>::out (const Fs::FStat& s, const Sv&) {
 
 Fs::FStat Typemap<Fs::FStat>::in (const Array& a) {
     Fs::FStat ret;
-    ret.dev       = Simple(a.fetch(0));
-    ret.ino       = Simple(a.fetch(1));
-    ret.mode      = Simple(a.fetch(2));
-    ret.nlink     = Simple(a.fetch(3));
-    ret.uid       = Simple(a.fetch(4));
-    ret.gid       = Simple(a.fetch(5));
-    ret.rdev      = Simple(a.fetch(6));
-    ret.size      = Simple(a.fetch(7));
-    ret.atime     = Simple(a.fetch(8));
-    ret.mtime     = Simple(a.fetch(9));
-    ret.ctime     = Simple(a.fetch(10));
-    ret.blksize   = Simple(a.fetch(11));
-    ret.blocks    = Simple(a.fetch(12));
-    ret.flags     = Simple(a.fetch(13));
-    ret.gen       = Simple(a.fetch(14));
-    ret.birthtime = Simple(a.fetch(15));
+    ret.dev       = a.fetch(0).number();
+    ret.ino       = a.fetch(1).number();
+    ret.mode      = a.fetch(2).number();
+    ret.nlink     = a.fetch(3).number();
+    ret.uid       = a.fetch(4).number();
+    ret.gid       = a.fetch(5).number();
+    ret.rdev      = a.fetch(6).number();
+    ret.size      = a.fetch(7).number();
+    ret.atime     = a.fetch(8).number();
+    ret.mtime     = a.fetch(9).number();
+    ret.ctime     = a.fetch(10).number();
+    ret.blksize   = a.fetch(11).number();
+    ret.blocks    = a.fetch(12).number();
+    ret.flags     = a.fetch(13).number();
+    ret.gen       = a.fetch(14).number();
+    ret.birthtime = a.fetch(15).number();
     return ret;
 }
 
@@ -174,18 +174,18 @@ Sv Typemap<Fs::FsInfo>::out (const Fs::FsInfo& i, const Sv&) {
 
 Fs::FsInfo Typemap<Fs::FsInfo>::in (const Array& a) {
     Fs::FsInfo ret;
-    ret.type   = Simple(a.fetch(0));
-    ret.bsize  = Simple(a.fetch(1));
-    ret.blocks = Simple(a.fetch(2));
-    ret.bfree  = Simple(a.fetch(3));
-    ret.bavail = Simple(a.fetch(4));
-    ret.files  = Simple(a.fetch(5));
-    ret.ffree  = Simple(a.fetch(6));
+    ret.type   = a.fetch(0).number();
+    ret.bsize  = a.fetch(1).number();
+    ret.blocks = a.fetch(2).number();
+    ret.bfree  = a.fetch(3).number();
+    ret.bavail = a.fetch(4).number();
+    ret.files  = a.fetch(5).number();
+    ret.ffree  = a.fetch(6).number();
     Array spare = a.fetch(7);
-    ret.spare[0] = Simple(spare.fetch(0));
-    ret.spare[1] = Simple(spare.fetch(1));
-    ret.spare[2] = Simple(spare.fetch(2));
-    ret.spare[3] = Simple(spare.fetch(3));
+    ret.spare[0] = spare.fetch(0).number();
+    ret.spare[1] = spare.fetch(1).number();
+    ret.spare[2] = spare.fetch(2).number();
+    ret.spare[3] = spare.fetch(3).number();
     return ret;
 }
 
@@ -197,7 +197,7 @@ Sv Typemap<Fs::DirEntry>::out (const Fs::DirEntry& de, const Sv&) {
 }
 
 Fs::DirEntry Typemap<Fs::DirEntry>::in (const Array& a) {
-    return Fs::DirEntry(Simple(a[0]).as_string(), (Fs::FileType)(int)Simple(a[1]));
+    return Fs::DirEntry(a[0].as_string(), (Fs::FileType)a[1].as_number<int>());
 }
 
 Sv Typemap<Fs::path_fd_t>::out (const Fs::path_fd_t& val, const Sv&) {
@@ -208,7 +208,7 @@ Sv Typemap<Fs::path_fd_t>::out (const Fs::path_fd_t& val, const Sv&) {
 }
 
 Fs::path_fd_t Typemap<Fs::path_fd_t>::in (const Array& a) {
-    return Fs::path_fd_t{ Simple(a[0]).as_string(), (fd_t)(int)Simple(a[1]) };
+    return Fs::path_fd_t{ a[0].as_string(), (fd_t)a[1].as_number<int>() };
 }
 
 }

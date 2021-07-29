@@ -11,10 +11,11 @@ my $CMD = $ENV{'LICENSECHECK'} || 'bin/licensecheck';
 # ensure local script is executable
 path($CMD)->chmod('a+x') if ( $CMD eq 'bin/licensecheck' );
 
+# TODO: drop later alternative when Regexp::Pattern::License v3.7.0 is required
 subtest 'copyright declared on 2 lines' => sub {
 	run_ok $CMD, qw(-m --copyright t/devscripts/bsd-regents.c);
 	like stdout,
-		qr{BSD (?:3-clause "New" or "Revised" License|\(3 clause\))\t1987, 1993.*1994 The Regents of the University of California.},
+		qr{(?:BSD 3-Clause License|BSD 3-clause "New" or "Revised" License)\t1987, 1993.*1994 The Regents of the University of California.},
 		'Testing stdout';
 	is stderr, '', 'No stderr';
 };
@@ -39,7 +40,7 @@ subtest 'Duplicated copyright' => sub {
 	run_ok $CMD,
 		qw(-m --copyright t/devscripts/../grant/Apache/one_helper.rb);
 	like stdout,
-		qr{Apache(?: License)? \(v2.0\)	2002-2015,? OpenNebula Project \(OpenNebula.org\), C12G Labs},
+		qr{Apache License \(v2.0\)	2002-2015,? OpenNebula Project \(OpenNebula.org\), C12G Labs},
 		'Testing stdout';
 	is stderr, '', 'No stderr';
 };
@@ -51,8 +52,8 @@ subtest 'Duplicated copyright' => sub {
 };
 subtest 'machine-readable output; short-form option' => sub {
 	run_ok $CMD, qw(-m t/devscripts/beerware.cpp);
-	like stdout, qr{Beerware(?: License)?}, 'Testing stdout';
-	is stderr,   '',                        'No stderr';
+	like stdout, qr{Beerware License}, 'Testing stdout';
+	is stderr,   '',                   'No stderr';
 };
 subtest 'machine-readable output; long-form option' => sub {
 	run_ok $CMD, qw(--machine t/devscripts/gpl-2);
@@ -66,9 +67,12 @@ subtest 'machine-readable output w/ copyright' => sub {
 		'Testing stdout';
 	is stderr, '', 'No stderr';
 };
+
+# TODO: drop later alternative when Regexp::Pattern::License v3.7.0 is required
 subtest 'Fortran comments' => sub {
 	run_ok $CMD, qw(t/devscripts/bsd.f);
-	like stdout, qr{BSD (?:2-clause "Simplified" License|\(2 clause\))},
+	like stdout,
+		qr{(?:BSD 2-Clause License|BSD 2-clause "Simplified" License)},
 		'Testing stdout';
 	is stderr, '', 'No stderr';
 };
@@ -81,7 +85,7 @@ subtest 'comments; C++ inline style' => sub {
 subtest 'comments; hash style' => sub {
 	run_ok $CMD, qw(t/devscripts/comments-detection.txt);
 	like stdout,
-		qr{\*No copyright\* (?:GNU Lesser General Public License|LGPL) v2\.1 or later},
+		qr{\*No copyright\* GNU Lesser General Public License v2\.1 or later},
 		'Testing stdout';
 	is stderr, '', 'No stderr';
 };

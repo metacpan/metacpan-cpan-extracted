@@ -1,7 +1,7 @@
 /*
  * libecb - http://software.schmorp.de/pkg/libecb
  *
- * Copyright (©) 2009-2015,2018-2020 Marc Alexander Lehmann <libecb@schmorp.de>
+ * Copyright (©) 2009-2015,2018-2021 Marc Alexander Lehmann <libecb@schmorp.de>
  * Copyright (©) 2011 Emanuele Giaquinta
  * All rights reserved.
  *
@@ -42,7 +42,7 @@
 #define ECB_H
 
 /* 16 bits major, 16 bits minor */
-#define ECB_VERSION 0x00010008
+#define ECB_VERSION 0x00010009
 
 #include <string.h> /* for memcpy */
 
@@ -104,6 +104,12 @@
   #else
     #define ECB_AMD64 1
   #endif
+#endif
+
+#if ECB_PTRSIZE >= 8 || ECB_AMD64_X32
+  #define ECB_64BIT_NATIVE 1
+#else
+  #define ECB_64BIT_NATIVE 0
 #endif
 
 /* many compilers define _GNUC_ to some versions but then only implement
@@ -244,6 +250,7 @@
     #define ECB_MEMORY_FENCE         __atomic_thread_fence (__ATOMIC_SEQ_CST)
     #define ECB_MEMORY_FENCE_ACQUIRE __atomic_thread_fence (__ATOMIC_ACQUIRE)
     #define ECB_MEMORY_FENCE_RELEASE __atomic_thread_fence (__ATOMIC_RELEASE)
+    #undef ECB_MEMORY_FENCE_RELAXED
     #define ECB_MEMORY_FENCE_RELAXED __atomic_thread_fence (__ATOMIC_RELAXED)
 
   #elif ECB_CLANG_EXTENSION(c_atomic)
@@ -251,6 +258,7 @@
     #define ECB_MEMORY_FENCE         __c11_atomic_thread_fence (__ATOMIC_SEQ_CST)
     #define ECB_MEMORY_FENCE_ACQUIRE __c11_atomic_thread_fence (__ATOMIC_ACQUIRE)
     #define ECB_MEMORY_FENCE_RELEASE __c11_atomic_thread_fence (__ATOMIC_RELEASE)
+    #undef ECB_MEMORY_FENCE_RELAXED
     #define ECB_MEMORY_FENCE_RELAXED __c11_atomic_thread_fence (__ATOMIC_RELAXED)
 
   #elif ECB_GCC_VERSION(4,4) || defined __INTEL_COMPILER || defined __clang__
@@ -880,7 +888,7 @@ ecb_function_ ecb_const uint16_t
 ecb_binary32_to_binary16 (uint32_t x)
 {
   unsigned int s =  (x >> 16) & 0x00008000; /* sign bit, the easy part */
-  unsigned int e = ((x >> 23) & 0x000000ff) - (127 - 15); /* the desired exponent */
+  int          e = ((x >> 23) & 0x000000ff) - (127 - 15); /* the desired exponent */
   unsigned int m =   x        & 0x007fffff;
 
   x &= 0x7fffffff;
@@ -937,6 +945,228 @@ ecb_binary32_to_binary16 (uint32_t x)
   m >>= 13;
 
   return s | 0x7c00 | m | !m;
+}
+
+/*******************************************************************************/
+/* fast integer to ascii */
+
+/*
+ * This code is pretty complicated because it is general. The idea behind it,
+ * however, is pretty simple: first, the number is multiplied with a scaling
+ * factor (2**bits / 10**(digits-1)) to convert the integer into a fixed-point
+ * number with the first digit in the upper bits.
+ * Then this digit is converted to text and masked out. The resulting number
+ * is then multiplied by 10, by multiplying the fixed point representation
+ * by 5 and shifting the (binary) decimal point one to the right, so a 4.28
+ * format becomes 5.27, 6.26 and so on.
+ * The rest involves only advancing the pointer if we already generated a
+ * non-zero digit, so leading zeroes are overwritten.
+ */
+
+// simply return a mask with "bits" bits set
+#define ecb_i2a_mask(type,bits) ((((type)1) << (bits)) - 1)
+
+// oputput a single digit. maskvalue is 10**digitidx
+#define ecb_i2a_digit(type,bits,digitmask,maskvalue,digitidx) \
+  if (digitmask >= maskvalue) /* constant, used to decide how many digits to generate */ \
+    { \
+      char digit = x >> (bits - digitidx); /* calculate the topmost digit */ \
+      *ptr = digit + '0'; /* output it */ \
+      nz = (digitmask == maskvalue) || nz || digit; /* first term == always output last digit */ \
+      ptr += nz; /* output digit only if non-zero digit seen */ \
+      x = (x & ecb_i2a_mask (type, bits - digitidx)) * 5; /* *10, but shift decimal point right */ \
+    }
+
+// convert integer to fixed point format and multiply out digits, highest first
+// requires magic constants: max. digits and number of bits after the decimal point
+#define ecb_i2a_def(suffix,ptr,v,type,bits,digitmask,lz) \
+ecb_inline char *ecb_i2a_ ## suffix (char *ptr, uint32_t u) \
+{ \
+  char nz = lz; /* non-zero digit seen? */ \
+  /* convert to x.bits fixed-point */ \
+  type x = u * ((ecb_i2a_mask (type, bits) + digitmask) / digitmask); \
+  /* output up to 10 digits */ \
+  ecb_i2a_digit (type,bits,digitmask,          1, 0); \
+  ecb_i2a_digit (type,bits,digitmask,         10, 1); \
+  ecb_i2a_digit (type,bits,digitmask,        100, 2); \
+  ecb_i2a_digit (type,bits,digitmask,       1000, 3); \
+  ecb_i2a_digit (type,bits,digitmask,      10000, 4); \
+  ecb_i2a_digit (type,bits,digitmask,     100000, 5); \
+  ecb_i2a_digit (type,bits,digitmask,    1000000, 6); \
+  ecb_i2a_digit (type,bits,digitmask,   10000000, 7); \
+  ecb_i2a_digit (type,bits,digitmask,  100000000, 8); \
+  ecb_i2a_digit (type,bits,digitmask, 1000000000, 9); \
+  return ptr; \
+}
+
+// predefined versions of the above, for various digits
+// ecb_i2a_xN = almost N digits, limit defined by macro
+// ecb_i2a_N = up to N digits, leading zeroes suppressed
+// ecb_i2a_0N = exactly N digits, including leading zeroes
+
+// non-leading-zero versions, limited range
+#define ECB_I2A_MAX_X5       59074 // limit for ecb_i2a_x5
+#define ECB_I2A_MAX_X10 2932500665 // limit for ecb_i2a_x10
+ecb_i2a_def ( x5, ptr, v, uint32_t, 26,      10000, 0)
+ecb_i2a_def (x10, ptr, v, uint64_t, 60, 1000000000, 0)
+
+// non-leading zero versions, all digits, 4 and 9 are optimal for 32/64 bit
+ecb_i2a_def ( 2, ptr, v, uint32_t, 10,          10, 0)
+ecb_i2a_def ( 3, ptr, v, uint32_t, 12,         100, 0)
+ecb_i2a_def ( 4, ptr, v, uint32_t, 26,        1000, 0)
+ecb_i2a_def ( 5, ptr, v, uint64_t, 30,       10000, 0)
+ecb_i2a_def ( 6, ptr, v, uint64_t, 36,      100000, 0)
+ecb_i2a_def ( 7, ptr, v, uint64_t, 44,     1000000, 0)
+ecb_i2a_def ( 8, ptr, v, uint64_t, 50,    10000000, 0)
+ecb_i2a_def ( 9, ptr, v, uint64_t, 56,   100000000, 0)
+
+// leading-zero versions, all digits, 04 and 09 are optimal for 32/64 bit
+ecb_i2a_def (02, ptr, v, uint32_t, 10,          10, 1)
+ecb_i2a_def (03, ptr, v, uint32_t, 12,         100, 1)
+ecb_i2a_def (04, ptr, v, uint32_t, 26,        1000, 1)
+ecb_i2a_def (05, ptr, v, uint64_t, 30,       10000, 1)
+ecb_i2a_def (06, ptr, v, uint64_t, 36,      100000, 1)
+ecb_i2a_def (07, ptr, v, uint64_t, 44,     1000000, 1)
+ecb_i2a_def (08, ptr, v, uint64_t, 50,    10000000, 1)
+ecb_i2a_def (09, ptr, v, uint64_t, 56,   100000000, 1)
+
+#define ECB_I2A_I32_DIGITS 11
+#define ECB_I2A_U32_DIGITS 10
+#define ECB_I2A_I64_DIGITS 20
+#define ECB_I2A_U64_DIGITS 21
+#define ECB_I2A_MAX_DIGITS 21
+
+ecb_inline char *
+ecb_i2a_u32 (char *ptr, uint32_t u)
+{
+  #if ECB_64BIT_NATIVE
+    if (ecb_expect_true (u <= ECB_I2A_MAX_X10))
+      ptr = ecb_i2a_x10 (ptr, u);
+    else // x10 almost, but not fully, covers 32 bit
+      {
+        uint32_t u1 = u % 1000000000;
+        uint32_t u2 = u / 1000000000;
+
+        *ptr++ = u2 + '0';
+        ptr = ecb_i2a_09 (ptr, u1);
+      }
+  #else
+    if (ecb_expect_true (u <= ECB_I2A_MAX_X5))
+      ecb_i2a_x5 (ptr, u);
+    else if (ecb_expect_true (u <= ECB_I2A_MAX_X5 * 10000))
+      {
+        uint32_t u1 = u % 10000;
+        uint32_t u2 = u / 10000;
+
+        ptr = ecb_i2a_x5 (ptr, u2);
+        ptr = ecb_i2a_04 (ptr, u1);
+      }
+    else
+      {
+        uint32_t u1 = u  % 10000;
+        uint32_t ua = u  / 10000;
+        uint32_t u2 = ua % 10000;
+        uint32_t u3 = ua / 10000;
+
+        ptr = ecb_i2a_2  (ptr, u3);
+        ptr = ecb_i2a_04 (ptr, u2);
+        ptr = ecb_i2a_04 (ptr, u1);
+      }
+  #endif
+
+  return ptr;
+}
+
+ecb_inline char *
+ecb_i2a_i32 (char *ptr, int32_t v)
+{
+  *ptr = '-'; ptr += v < 0;
+  uint32_t u = v < 0 ? -(uint32_t)v : v;
+
+  #if ECB_64BIT_NATIVE
+    ptr = ecb_i2a_x10 (ptr, u); // x10 fully covers 31 bit
+  #else
+    ptr = ecb_i2a_u32 (ptr, u);
+  #endif
+
+  return ptr;
+}
+
+ecb_inline char *
+ecb_i2a_u64 (char *ptr, uint64_t u)
+{
+  #if ECB_64BIT_NATIVE
+    if (ecb_expect_true (u <= ECB_I2A_MAX_X10))
+      ptr = ecb_i2a_x10 (ptr, u);
+    else if (ecb_expect_false (u <= ECB_I2A_MAX_X10 * 1000000000))
+      {
+        uint64_t u1 = u % 1000000000;
+        uint64_t u2 = u / 1000000000;
+
+        ptr = ecb_i2a_x10 (ptr, u2);
+        ptr = ecb_i2a_09  (ptr, u1);
+      }
+    else
+      {
+        uint64_t u1 = u  % 1000000000;
+        uint64_t ua = u  / 1000000000;
+        uint64_t u2 = ua % 1000000000;
+        uint64_t u3 = ua / 1000000000;
+
+        ptr = ecb_i2a_2  (ptr, u3);
+        ptr = ecb_i2a_09 (ptr, u2);
+        ptr = ecb_i2a_09 (ptr, u1);
+      }
+  #else
+    if (ecb_expect_true (u <= ECB_I2A_MAX_X5))
+      ptr = ecb_i2a_x5 (ptr, u);
+    else
+      {
+        uint64_t u1 = u % 10000;
+        uint64_t u2 = u / 10000;
+
+        ptr = ecb_i2a_u64 (ptr, u2);
+        ptr = ecb_i2a_04 (ptr, u1);
+      }
+  #endif
+
+  return ptr;
+}
+
+ecb_inline char *
+ecb_i2a_i64 (char *ptr, int64_t v)
+{
+  *ptr = '-'; ptr += v < 0;
+  uint64_t u = v < 0 ? -(uint64_t)v : v;
+
+  #if ECB_64BIT_NATIVE
+    if (ecb_expect_true (u <= ECB_I2A_MAX_X10))
+      ptr = ecb_i2a_x10 (ptr, u);
+    else if (ecb_expect_false (u <= ECB_I2A_MAX_X10 * 1000000000))
+      {
+        uint64_t u1 = u % 1000000000;
+        uint64_t u2 = u / 1000000000;
+
+        ptr = ecb_i2a_x10 (ptr, u2);
+        ptr = ecb_i2a_09  (ptr, u1);
+      }
+    else
+      {
+        uint64_t u1 = u  % 1000000000;
+        uint64_t ua = u  / 1000000000;
+        uint64_t u2 = ua % 1000000000;
+        uint64_t u3 = ua / 1000000000;
+
+        // 2**31 is 19 digits, so the top is exactly one digit
+        *ptr++ = u3 + '0';
+        ptr = ecb_i2a_09 (ptr, u2);
+        ptr = ecb_i2a_09 (ptr, u1);
+      }
+  #else
+    ptr = ecb_i2a_u64 (ptr, u);
+  #endif
+
+  return ptr;
 }
 
 /*******************************************************************************/

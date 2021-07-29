@@ -24,10 +24,10 @@ sub new {
 
 
 sub create_drop_or_attach {
-    my ( $sf, $table ) = @_;
-    my $old_idx_cda = exists $sf->{i}{old_idx_cda} ? delete $sf->{i}{old_idx_cda} : 1;
+    my ( $sf ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
+    $sf->{i}{old_idx_cda} //= 1;
 
     CREATE_DROP_ATTACH: while ( 1 ) {
         my $hidden = $sf->{d}{db_string};
@@ -51,17 +51,17 @@ sub create_drop_or_attach {
         # Choose
         my $idx = $tc->choose(
             $menu,
-            { %{$sf->{i}{lyt_v}}, prompt => '', index => 1, default => $old_idx_cda, undef => '  <=' }
+            { %{$sf->{i}{lyt_v}}, prompt => '', index => 1, default => $sf->{i}{old_idx_cda}, undef => '  <=' }
         );
         if ( ! defined $idx || ! defined $menu->[$idx] ) {
             return;
         }
         if ( $sf->{o}{G}{menu_memory} ) {
-            if ( $old_idx_cda == $idx && ! $ENV{TC_RESET_AUTO_UP} ) {
-                $old_idx_cda = 1;
+            if ( $sf->{i}{old_idx_cda} == $idx && ! $ENV{TC_RESET_AUTO_UP} ) {
+                $sf->{i}{old_idx_cda} = 1;
                 next CREATE_DROP_ATTACH;
             }
-            $old_idx_cda = $idx;
+            $sf->{i}{old_idx_cda} = $idx;
         }
         my $choice = $menu->[$idx];
         if ( $choice eq $hidden ) {
@@ -119,7 +119,7 @@ sub create_drop_or_attach {
                 next CREATE_DROP_ATTACH;
             }
         }
-        return $old_idx_cda;
+        return 1;
     }
 }
 

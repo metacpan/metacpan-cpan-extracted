@@ -6,7 +6,7 @@ use warnings;
 use Beekeeper::Worker ':log';
 use base 'Beekeeper::Worker';
 
-use Beekeeper::Worker::Util 'shared_cache';
+use Beekeeper::Worker::Extension::SharedCache;
 use Time::HiRes 'sleep';
 
 =pod

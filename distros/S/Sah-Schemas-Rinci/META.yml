@@ -25,7 +25,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Sah-Schemas-Rinci
   homepage: https://metacpan.org/release/Sah-Schemas-Rinci
   repository: git://github.com/perlancar/perl-Sah-Schemas-Rinci.git
-version: 1.1.94.0
+version: 1.1.98.0
 x_Dist_Zilla:
   perl:
     version: '5.030002'
@@ -37,7 +37,7 @@ x_Dist_Zilla:
           Module::Metadata: '1.000036'
           version: '0.006'
       name: Sah::Schemas
-      version: '0.021'
+      version: '0.022'
     -
       class: Dist::Zilla::Plugin::PERLANCAR::CheckPendingRelease
       name: '@Author::PERLANCAR/PERLANCAR::CheckPendingRelease'
@@ -113,7 +113,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::BeforeBuild
       name: '@Author::PERLANCAR/PERLANCAR::BeforeBuild'
-      version: '0.602'
+      version: '0.604'
     -
       class: Dist::Zilla::Plugin::Rinci::AbstractFromMeta
       name: '@Author::PERLANCAR/Rinci::AbstractFromMeta'
@@ -129,7 +129,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::MetaResources
       name: '@Author::PERLANCAR/PERLANCAR::MetaResources'
-      version: '0.040'
+      version: '0.043'
     -
       class: Dist::Zilla::Plugin::CheckChangeLog
       name: '@Author::PERLANCAR/CheckChangeLog'
@@ -149,6 +149,17 @@ x_Dist_Zilla:
           version: '0.006'
       name: '@Author::PERLANCAR/CheckSelfDependency'
       version: '0.011'
+    -
+      class: Dist::Zilla::Plugin::Git::Contributors
+      config:
+        Dist::Zilla::Plugin::Git::Contributors:
+          git_version: 2.17.1
+          include_authors: 0
+          include_releaser: 1
+          order_by: name
+          paths: []
+      name: '@Author::PERLANCAR/Git::Contributors'
+      version: '0.036'
     -
       class: Dist::Zilla::Plugin::CopyrightYearFromGit
       name: '@Author::PERLANCAR/CopyrightYearFromGit'
@@ -270,6 +281,10 @@ x_Dist_Zilla:
               name: '@Author::PERLANCAR/Authors'
               version: '4.015'
             -
+              class: Pod::Weaver::Section::Contributors
+              name: '@Author::PERLANCAR/Contributors'
+              version: '0.009'
+            -
               class: Pod::Weaver::Section::Legal
               name: '@Author::PERLANCAR/Legal'
               version: '4.015'
@@ -296,7 +311,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::Sah::Schemas
               name: -Sah::Schemas
-              version: '0.063'
+              version: '0.065'
       name: '@Author::PERLANCAR/PodWeaver'
       version: '4.008'
     -
@@ -318,7 +333,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Rinci::EmbedValidator
       name: '@Author::PERLANCAR/Rinci::EmbedValidator'
-      version: '0.250'
+      version: '0.251'
     -
       class: Dist::Zilla::Plugin::SetScriptShebang
       name: '@Author::PERLANCAR/SetScriptShebang'
@@ -378,7 +393,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Prereqs::CheckCircular
       name: '@Author::PERLANCAR/Prereqs::CheckCircular'
-      version: '0.006'
+      version: '0.007'
     -
       class: Dist::Zilla::Plugin::UploadToCPAN::WWWPAUSESimple
       name: '@Author::PERLANCAR/UploadToCPAN::WWWPAUSESimple'

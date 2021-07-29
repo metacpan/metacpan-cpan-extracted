@@ -7,7 +7,7 @@ require Exporter;
 use parent 'Exporter';
 use OPCUA::Open62541::Constant;
 
-our $VERSION = '0.026';
+our $VERSION = '0.027';
 
 our @EXPORT_OK = @OPCUA::Open62541::Constant::EXPORT_OK;
 our %EXPORT_TAGS = %OPCUA::Open62541::Constant::EXPORT_TAGS;
@@ -272,6 +272,30 @@ in the callback.
 =item $limit = $server_config->getMaxMonitoredItemsPerCall()
 
 =item $server_config->setMaxMonitoredItemsPerCall($maxMonitoredItemsPerCall)
+
+=item $limit = $server_config->getMaxSubscriptions()
+
+=item $server_config->setMaxSubscriptions($maxSubscriptions)
+
+=item $limit = $server_config->getMaxSubscriptionsPerSession()
+
+=item $server_config->setMaxSubscriptionsPerSession($maxSubscriptionsPerSession)
+
+=item $limit = $server_config->getMaxNotificationsPerPublish()
+
+=item $server_config->setMaxNotificationsPerPublish($maxNotificationsPerPublish)
+
+=item $limit = $server_config->getEnableRetransmissionQueue()
+
+=item $server_config->setEnableRetransmissionQueue($enableRetransmissionQueue)
+
+=item $limit = $server_config->getMaxRetransmissionQueueSize()
+
+=item $server_config->setMaxRetransmissionQueueSize($maxRetransmissionQueueSize)
+
+=item $limit = $server_config->getMaxEventsPerNode()
+
+=item $server_config->setMaxEventsPerNode($maxEventsPerNode)
 
 =item $server_config->setUserRightsMaskReadonly($readonly)
 
@@ -642,6 +666,48 @@ run_iterate() or open62541 may try to operate on a non existent socket.
 
 =item $status_code = $client->writeWriteMaskAttribute(\%nodeId, $newUInt32)
 
+=item $request  = OPCUA::Open62541::Client->CreateSubscriptionRequest_default()
+
+=item $response = $client->Subscriptions_create(\%request, $subscriptionContext, \&statusChangeCallback, \&deleteCallback)
+
+=over 8
+
+=item $statusChangeCallback = sub { my ($client, $subscriptionId, $subscriptionContext, $notification) = @_ }
+
+=item $deleteCallback = sub { my ($client, $subscriptionId, $subscriptionContext) = @_ }
+
+=back
+
+=item $response = $client->Subscriptions_modify(\%request)
+
+=item $response = $client->Subscriptions_delete(\%request)
+
+=item $status_code = $client->Subscriptions_deleteSingle($subscriptionId)
+
+=item $response = $client->setPublishingMode(\%request)
+
+=item $request  = OPCUA::Open62541::Client->MonitoredItemCreateRequest_default(\%nodeId)
+
+=item $response = $client->MonitoredItems_createDataChange($subscriptionId,
+	$timestamps, \%request, $monitoredContext, \&dataChangeCallback, \&deleteCallback)
+
+=over 8
+
+=item $dataChangeCallback = sub { my ($client, $subscriptionId,
+	$subscriptionContext, $monitoredId, $monitoredContext, $value) = @_ }
+
+=item $deleteCallback = sub { my ($client, $subscriptionId,
+	$subscriptionContext, $monitoredId, $monitoredContext) = @_ }
+
+=back
+
+=item $response = $client->MonitoredItems_createDataChanges(\%request,
+	\@monitoredContexts, \@dataChangeCallbacks, \@deleteCallbacks)
+
+=item $response  = $client->MonitoredItems_delete(\%request)
+
+=item $status_code  = $client->MonitoredItems_deleteSingle($subscriptionId, $monitoredItemId)
+
 =back
 
 =head3 ClientConfig
@@ -720,9 +786,9 @@ This only works for Perl that is compiled on a 64 bit platform.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2020 Alexander Bluhm
+Copyright (c) 2020-2021 Alexander Bluhm
 
-Copyright (c) 2020 Anton Borowka
+Copyright (c) 2020-2021 Anton Borowka
 
 Copyright (c) 2020 Arne Becker
 

@@ -39,6 +39,9 @@ my $pid = fork or do {
 isa_ok $promise, 'Promise::ES6';
 is PromiseTest::await($promise, \@checkers), 123, 'get resolved value';
 
+# To avoid a leak in Devel::Cover:
+@checkers = ();
+
 waitpid $pid, 0;
 
 done_testing();

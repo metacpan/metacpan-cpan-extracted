@@ -1,3 +1,8 @@
+0.006   2021-07-13  Released-By: PERLANCAR; Urgency: medium
+
+	- Use File::Temp::MoreUtils.
+
+
 0.005   2020-10-27  Released-By: PERLANCAR; Urgency: medium
 
 	- [removed] Remove officess2csv and recommend users to use

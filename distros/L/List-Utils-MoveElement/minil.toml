@@ -1,0 +1,6 @@
+name = "List-Utils-MoveElement"
+module_maker="ModuleBuild"
+static_install = "auto"
+allow_pureperl = 1
+readme_from = "lib/List/Utils/MoveElement.pm"
+

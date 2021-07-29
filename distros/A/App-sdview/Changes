@@ -1,5 +1,9 @@
 Revision history for App-sdview
 
+0.03    2021-07-25
+        [CHANGES]
+         * Implement different output plugins too - generate POD and Markdown
+
 0.02    2021-06-29
         [BUGFIXES]
          * Set `less` raw option with "-R", not "+R" (RT136875, RT136977)

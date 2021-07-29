@@ -2614,123 +2614,6 @@ XS(_wrap_gsl_set_stream) {
 }
 
 
-XS(_wrap_gsl_complex_long_double_dat_set) {
-  {
-    gsl_complex_long_double *arg1 = (gsl_complex_long_double *) 0 ;
-    long double *arg2 ;
-    void *argp1 = 0 ;
-    int res1 = 0 ;
-    void *argp2 = 0 ;
-    int res2 = 0 ;
-    int argvi = 0;
-    dXSARGS;
-    
-    if ((items < 2) || (items > 2)) {
-      SWIG_croak("Usage: gsl_complex_long_double_dat_set(self,dat);");
-    }
-    res1 = SWIG_ConvertPtr(ST(0), &argp1,SWIGTYPE_p_gsl_complex_long_double, 0 |  0 );
-    if (!SWIG_IsOK(res1)) {
-      SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "gsl_complex_long_double_dat_set" "', argument " "1"" of type '" "gsl_complex_long_double *""'"); 
-    }
-    arg1 = (gsl_complex_long_double *)(argp1);
-    res2 = SWIG_ConvertPtr(ST(1), &argp2,SWIGTYPE_p_long_double, 0 |  0 );
-    if (!SWIG_IsOK(res2)) {
-      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "gsl_complex_long_double_dat_set" "', argument " "2"" of type '" "long double [2]""'"); 
-    } 
-    arg2 = (long double *)(argp2);
-    {
-      if (arg2) {
-        size_t ii = 0;
-        for (; ii < (size_t)2; ++ii) *(long double *)&arg1->dat[ii] = *((long double *)arg2 + ii);
-      } else {
-        SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in variable '""dat""' of type '""long double [2]""'");
-      }
-    }
-    ST(argvi) = &PL_sv_undef;
-    
-    
-    XSRETURN(argvi);
-  fail:
-    
-    
-    SWIG_croak_null();
-  }
-}
-
-
-XS(_wrap_gsl_complex_long_double_dat_get) {
-  {
-    gsl_complex_long_double *arg1 = (gsl_complex_long_double *) 0 ;
-    void *argp1 = 0 ;
-    int res1 = 0 ;
-    int argvi = 0;
-    long double *result = 0 ;
-    dXSARGS;
-    
-    if ((items < 1) || (items > 1)) {
-      SWIG_croak("Usage: gsl_complex_long_double_dat_get(self);");
-    }
-    res1 = SWIG_ConvertPtr(ST(0), &argp1,SWIGTYPE_p_gsl_complex_long_double, 0 |  0 );
-    if (!SWIG_IsOK(res1)) {
-      SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "gsl_complex_long_double_dat_get" "', argument " "1"" of type '" "gsl_complex_long_double *""'"); 
-    }
-    arg1 = (gsl_complex_long_double *)(argp1);
-    result = (long double *)(long double *) ((arg1)->dat);
-    ST(argvi) = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_long_double, 0 | 0); argvi++ ;
-    
-    XSRETURN(argvi);
-  fail:
-    
-    SWIG_croak_null();
-  }
-}
-
-
-XS(_wrap_new_gsl_complex_long_double) {
-  {
-    int argvi = 0;
-    gsl_complex_long_double *result = 0 ;
-    dXSARGS;
-    
-    if ((items < 0) || (items > 0)) {
-      SWIG_croak("Usage: new_gsl_complex_long_double();");
-    }
-    result = (gsl_complex_long_double *)calloc(1, sizeof(gsl_complex_long_double));
-    ST(argvi) = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_gsl_complex_long_double, SWIG_OWNER | SWIG_SHADOW); argvi++ ;
-    XSRETURN(argvi);
-  fail:
-    SWIG_croak_null();
-  }
-}
-
-
-XS(_wrap_delete_gsl_complex_long_double) {
-  {
-    gsl_complex_long_double *arg1 = (gsl_complex_long_double *) 0 ;
-    void *argp1 = 0 ;
-    int res1 = 0 ;
-    int argvi = 0;
-    dXSARGS;
-    
-    if ((items < 1) || (items > 1)) {
-      SWIG_croak("Usage: delete_gsl_complex_long_double(self);");
-    }
-    res1 = SWIG_ConvertPtr(ST(0), &argp1,SWIGTYPE_p_gsl_complex_long_double, SWIG_POINTER_DISOWN |  0 );
-    if (!SWIG_IsOK(res1)) {
-      SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_gsl_complex_long_double" "', argument " "1"" of type '" "gsl_complex_long_double *""'"); 
-    }
-    arg1 = (gsl_complex_long_double *)(argp1);
-    free((char *) arg1);
-    ST(argvi) = &PL_sv_undef;
-    
-    XSRETURN(argvi);
-  fail:
-    
-    SWIG_croak_null();
-  }
-}
-
-
 XS(_wrap_gsl_complex_dat_set) {
   {
     gsl_complex *arg1 = (gsl_complex *) 0 ;
@@ -2837,6 +2720,123 @@ XS(_wrap_delete_gsl_complex) {
       SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_gsl_complex" "', argument " "1"" of type '" "gsl_complex *""'"); 
     }
     arg1 = (gsl_complex *)(argp1);
+    free((char *) arg1);
+    ST(argvi) = &PL_sv_undef;
+    
+    XSRETURN(argvi);
+  fail:
+    
+    SWIG_croak_null();
+  }
+}
+
+
+XS(_wrap_gsl_complex_long_double_dat_set) {
+  {
+    gsl_complex_long_double *arg1 = (gsl_complex_long_double *) 0 ;
+    long double *arg2 ;
+    void *argp1 = 0 ;
+    int res1 = 0 ;
+    void *argp2 = 0 ;
+    int res2 = 0 ;
+    int argvi = 0;
+    dXSARGS;
+    
+    if ((items < 2) || (items > 2)) {
+      SWIG_croak("Usage: gsl_complex_long_double_dat_set(self,dat);");
+    }
+    res1 = SWIG_ConvertPtr(ST(0), &argp1,SWIGTYPE_p_gsl_complex_long_double, 0 |  0 );
+    if (!SWIG_IsOK(res1)) {
+      SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "gsl_complex_long_double_dat_set" "', argument " "1"" of type '" "gsl_complex_long_double *""'"); 
+    }
+    arg1 = (gsl_complex_long_double *)(argp1);
+    res2 = SWIG_ConvertPtr(ST(1), &argp2,SWIGTYPE_p_long_double, 0 |  0 );
+    if (!SWIG_IsOK(res2)) {
+      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "gsl_complex_long_double_dat_set" "', argument " "2"" of type '" "long double [2]""'"); 
+    } 
+    arg2 = (long double *)(argp2);
+    {
+      if (arg2) {
+        size_t ii = 0;
+        for (; ii < (size_t)2; ++ii) *(long double *)&arg1->dat[ii] = *((long double *)arg2 + ii);
+      } else {
+        SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in variable '""dat""' of type '""long double [2]""'");
+      }
+    }
+    ST(argvi) = &PL_sv_undef;
+    
+    
+    XSRETURN(argvi);
+  fail:
+    
+    
+    SWIG_croak_null();
+  }
+}
+
+
+XS(_wrap_gsl_complex_long_double_dat_get) {
+  {
+    gsl_complex_long_double *arg1 = (gsl_complex_long_double *) 0 ;
+    void *argp1 = 0 ;
+    int res1 = 0 ;
+    int argvi = 0;
+    long double *result = 0 ;
+    dXSARGS;
+    
+    if ((items < 1) || (items > 1)) {
+      SWIG_croak("Usage: gsl_complex_long_double_dat_get(self);");
+    }
+    res1 = SWIG_ConvertPtr(ST(0), &argp1,SWIGTYPE_p_gsl_complex_long_double, 0 |  0 );
+    if (!SWIG_IsOK(res1)) {
+      SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "gsl_complex_long_double_dat_get" "', argument " "1"" of type '" "gsl_complex_long_double *""'"); 
+    }
+    arg1 = (gsl_complex_long_double *)(argp1);
+    result = (long double *)(long double *) ((arg1)->dat);
+    ST(argvi) = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_long_double, 0 | 0); argvi++ ;
+    
+    XSRETURN(argvi);
+  fail:
+    
+    SWIG_croak_null();
+  }
+}
+
+
+XS(_wrap_new_gsl_complex_long_double) {
+  {
+    int argvi = 0;
+    gsl_complex_long_double *result = 0 ;
+    dXSARGS;
+    
+    if ((items < 0) || (items > 0)) {
+      SWIG_croak("Usage: new_gsl_complex_long_double();");
+    }
+    result = (gsl_complex_long_double *)calloc(1, sizeof(gsl_complex_long_double));
+    ST(argvi) = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_gsl_complex_long_double, SWIG_OWNER | SWIG_SHADOW); argvi++ ;
+    XSRETURN(argvi);
+  fail:
+    SWIG_croak_null();
+  }
+}
+
+
+XS(_wrap_delete_gsl_complex_long_double) {
+  {
+    gsl_complex_long_double *arg1 = (gsl_complex_long_double *) 0 ;
+    void *argp1 = 0 ;
+    int res1 = 0 ;
+    int argvi = 0;
+    dXSARGS;
+    
+    if ((items < 1) || (items > 1)) {
+      SWIG_croak("Usage: delete_gsl_complex_long_double(self);");
+    }
+    res1 = SWIG_ConvertPtr(ST(0), &argp1,SWIGTYPE_p_gsl_complex_long_double, SWIG_POINTER_DISOWN |  0 );
+    if (!SWIG_IsOK(res1)) {
+      SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_gsl_complex_long_double" "', argument " "1"" of type '" "gsl_complex_long_double *""'"); 
+    }
+    arg1 = (gsl_complex_long_double *)(argp1);
     free((char *) arg1);
     ST(argvi) = &PL_sv_undef;
     
@@ -12692,10 +12692,10 @@ XS(_wrap_gsl_matrix_int_div_elements) {
 XS(_wrap_gsl_matrix_int_scale) {
   {
     gsl_matrix_int *arg1 = (gsl_matrix_int *) 0 ;
-    double arg2 ;
+    int arg2 ;
     void *argp1 = 0 ;
     int res1 = 0 ;
-    double val2 ;
+    int val2 ;
     int ecode2 = 0 ;
     int argvi = 0;
     int result;
@@ -12709,11 +12709,11 @@ XS(_wrap_gsl_matrix_int_scale) {
       SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "gsl_matrix_int_scale" "', argument " "1"" of type '" "gsl_matrix_int *""'"); 
     }
     arg1 = (gsl_matrix_int *)(argp1);
-    ecode2 = SWIG_AsVal_double SWIG_PERL_CALL_ARGS_2(ST(1), &val2);
+    ecode2 = SWIG_AsVal_int SWIG_PERL_CALL_ARGS_2(ST(1), &val2);
     if (!SWIG_IsOK(ecode2)) {
-      SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "gsl_matrix_int_scale" "', argument " "2"" of type '" "double""'");
+      SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "gsl_matrix_int_scale" "', argument " "2"" of type '" "int""'");
     } 
-    arg2 = (double)(val2);
+    arg2 = (int)(val2);
     result = (int)gsl_matrix_int_scale(arg1,arg2);
     ST(argvi) = SWIG_From_int  SWIG_PERL_CALL_ARGS_1((int)(result)); argvi++ ;
     
@@ -12730,10 +12730,10 @@ XS(_wrap_gsl_matrix_int_scale) {
 XS(_wrap_gsl_matrix_int_add_constant) {
   {
     gsl_matrix_int *arg1 = (gsl_matrix_int *) 0 ;
-    double arg2 ;
+    int arg2 ;
     void *argp1 = 0 ;
     int res1 = 0 ;
-    double val2 ;
+    int val2 ;
     int ecode2 = 0 ;
     int argvi = 0;
     int result;
@@ -12747,11 +12747,11 @@ XS(_wrap_gsl_matrix_int_add_constant) {
       SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "gsl_matrix_int_add_constant" "', argument " "1"" of type '" "gsl_matrix_int *""'"); 
     }
     arg1 = (gsl_matrix_int *)(argp1);
-    ecode2 = SWIG_AsVal_double SWIG_PERL_CALL_ARGS_2(ST(1), &val2);
+    ecode2 = SWIG_AsVal_int SWIG_PERL_CALL_ARGS_2(ST(1), &val2);
     if (!SWIG_IsOK(ecode2)) {
-      SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "gsl_matrix_int_add_constant" "', argument " "2"" of type '" "double""'");
+      SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "gsl_matrix_int_add_constant" "', argument " "2"" of type '" "int""'");
     } 
-    arg2 = (double)(val2);
+    arg2 = (int)(val2);
     result = (int)gsl_matrix_int_add_constant(arg1,arg2);
     ST(argvi) = SWIG_From_int  SWIG_PERL_CALL_ARGS_1((int)(result)); argvi++ ;
     
@@ -12768,10 +12768,10 @@ XS(_wrap_gsl_matrix_int_add_constant) {
 XS(_wrap_gsl_matrix_int_add_diagonal) {
   {
     gsl_matrix_int *arg1 = (gsl_matrix_int *) 0 ;
-    double arg2 ;
+    int arg2 ;
     void *argp1 = 0 ;
     int res1 = 0 ;
-    double val2 ;
+    int val2 ;
     int ecode2 = 0 ;
     int argvi = 0;
     int result;
@@ -12785,11 +12785,11 @@ XS(_wrap_gsl_matrix_int_add_diagonal) {
       SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "gsl_matrix_int_add_diagonal" "', argument " "1"" of type '" "gsl_matrix_int *""'"); 
     }
     arg1 = (gsl_matrix_int *)(argp1);
-    ecode2 = SWIG_AsVal_double SWIG_PERL_CALL_ARGS_2(ST(1), &val2);
+    ecode2 = SWIG_AsVal_int SWIG_PERL_CALL_ARGS_2(ST(1), &val2);
     if (!SWIG_IsOK(ecode2)) {
-      SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "gsl_matrix_int_add_diagonal" "', argument " "2"" of type '" "double""'");
+      SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "gsl_matrix_int_add_diagonal" "', argument " "2"" of type '" "int""'");
     } 
-    arg2 = (double)(val2);
+    arg2 = (int)(val2);
     result = (int)gsl_matrix_int_add_diagonal(arg1,arg2);
     ST(argvi) = SWIG_From_int  SWIG_PERL_CALL_ARGS_1((int)(result)); argvi++ ;
     
@@ -20254,10 +20254,10 @@ XS(_wrap_gsl_matrix_char_div_elements) {
 XS(_wrap_gsl_matrix_char_scale) {
   {
     gsl_matrix_char *arg1 = (gsl_matrix_char *) 0 ;
-    double arg2 ;
+    char arg2 ;
     void *argp1 = 0 ;
     int res1 = 0 ;
-    double val2 ;
+    char val2 ;
     int ecode2 = 0 ;
     int argvi = 0;
     int result;
@@ -20271,11 +20271,11 @@ XS(_wrap_gsl_matrix_char_scale) {
       SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "gsl_matrix_char_scale" "', argument " "1"" of type '" "gsl_matrix_char *""'"); 
     }
     arg1 = (gsl_matrix_char *)(argp1);
-    ecode2 = SWIG_AsVal_double SWIG_PERL_CALL_ARGS_2(ST(1), &val2);
+    ecode2 = SWIG_AsVal_char SWIG_PERL_CALL_ARGS_2(ST(1), &val2);
     if (!SWIG_IsOK(ecode2)) {
-      SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "gsl_matrix_char_scale" "', argument " "2"" of type '" "double""'");
+      SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "gsl_matrix_char_scale" "', argument " "2"" of type '" "char""'");
     } 
-    arg2 = (double)(val2);
+    arg2 = (char)(val2);
     result = (int)gsl_matrix_char_scale(arg1,arg2);
     ST(argvi) = SWIG_From_int  SWIG_PERL_CALL_ARGS_1((int)(result)); argvi++ ;
     
@@ -20292,10 +20292,10 @@ XS(_wrap_gsl_matrix_char_scale) {
 XS(_wrap_gsl_matrix_char_add_constant) {
   {
     gsl_matrix_char *arg1 = (gsl_matrix_char *) 0 ;
-    double arg2 ;
+    char arg2 ;
     void *argp1 = 0 ;
     int res1 = 0 ;
-    double val2 ;
+    char val2 ;
     int ecode2 = 0 ;
     int argvi = 0;
     int result;
@@ -20309,11 +20309,11 @@ XS(_wrap_gsl_matrix_char_add_constant) {
       SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "gsl_matrix_char_add_constant" "', argument " "1"" of type '" "gsl_matrix_char *""'"); 
     }
     arg1 = (gsl_matrix_char *)(argp1);
-    ecode2 = SWIG_AsVal_double SWIG_PERL_CALL_ARGS_2(ST(1), &val2);
+    ecode2 = SWIG_AsVal_char SWIG_PERL_CALL_ARGS_2(ST(1), &val2);
     if (!SWIG_IsOK(ecode2)) {
-      SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "gsl_matrix_char_add_constant" "', argument " "2"" of type '" "double""'");
+      SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "gsl_matrix_char_add_constant" "', argument " "2"" of type '" "char""'");
     } 
-    arg2 = (double)(val2);
+    arg2 = (char)(val2);
     result = (int)gsl_matrix_char_add_constant(arg1,arg2);
     ST(argvi) = SWIG_From_int  SWIG_PERL_CALL_ARGS_1((int)(result)); argvi++ ;
     
@@ -20330,10 +20330,10 @@ XS(_wrap_gsl_matrix_char_add_constant) {
 XS(_wrap_gsl_matrix_char_add_diagonal) {
   {
     gsl_matrix_char *arg1 = (gsl_matrix_char *) 0 ;
-    double arg2 ;
+    char arg2 ;
     void *argp1 = 0 ;
     int res1 = 0 ;
-    double val2 ;
+    char val2 ;
     int ecode2 = 0 ;
     int argvi = 0;
     int result;
@@ -20347,11 +20347,11 @@ XS(_wrap_gsl_matrix_char_add_diagonal) {
       SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "gsl_matrix_char_add_diagonal" "', argument " "1"" of type '" "gsl_matrix_char *""'"); 
     }
     arg1 = (gsl_matrix_char *)(argp1);
-    ecode2 = SWIG_AsVal_double SWIG_PERL_CALL_ARGS_2(ST(1), &val2);
+    ecode2 = SWIG_AsVal_char SWIG_PERL_CALL_ARGS_2(ST(1), &val2);
     if (!SWIG_IsOK(ecode2)) {
-      SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "gsl_matrix_char_add_diagonal" "', argument " "2"" of type '" "double""'");
+      SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "gsl_matrix_char_add_diagonal" "', argument " "2"" of type '" "char""'");
     } 
-    arg2 = (double)(val2);
+    arg2 = (char)(val2);
     result = (int)gsl_matrix_char_add_diagonal(arg1,arg2);
     ST(argvi) = SWIG_From_int  SWIG_PERL_CALL_ARGS_1((int)(result)); argvi++ ;
     
@@ -21076,14 +21076,14 @@ static swig_command_info swig_commands[] = {
 {"Math::GSL::Matrixc::gsl_set_error_handler_off", _wrap_gsl_set_error_handler_off},
 {"Math::GSL::Matrixc::gsl_set_stream_handler", _wrap_gsl_set_stream_handler},
 {"Math::GSL::Matrixc::gsl_set_stream", _wrap_gsl_set_stream},
-{"Math::GSL::Matrixc::gsl_complex_long_double_dat_set", _wrap_gsl_complex_long_double_dat_set},
-{"Math::GSL::Matrixc::gsl_complex_long_double_dat_get", _wrap_gsl_complex_long_double_dat_get},
-{"Math::GSL::Matrixc::new_gsl_complex_long_double", _wrap_new_gsl_complex_long_double},
-{"Math::GSL::Matrixc::delete_gsl_complex_long_double", _wrap_delete_gsl_complex_long_double},
 {"Math::GSL::Matrixc::gsl_complex_dat_set", _wrap_gsl_complex_dat_set},
 {"Math::GSL::Matrixc::gsl_complex_dat_get", _wrap_gsl_complex_dat_get},
 {"Math::GSL::Matrixc::new_gsl_complex", _wrap_new_gsl_complex},
 {"Math::GSL::Matrixc::delete_gsl_complex", _wrap_delete_gsl_complex},
+{"Math::GSL::Matrixc::gsl_complex_long_double_dat_set", _wrap_gsl_complex_long_double_dat_set},
+{"Math::GSL::Matrixc::gsl_complex_long_double_dat_get", _wrap_gsl_complex_long_double_dat_get},
+{"Math::GSL::Matrixc::new_gsl_complex_long_double", _wrap_new_gsl_complex_long_double},
+{"Math::GSL::Matrixc::delete_gsl_complex_long_double", _wrap_delete_gsl_complex_long_double},
 {"Math::GSL::Matrixc::gsl_complex_float_dat_set", _wrap_gsl_complex_float_dat_set},
 {"Math::GSL::Matrixc::gsl_complex_float_dat_get", _wrap_gsl_complex_float_dat_get},
 {"Math::GSL::Matrixc::new_gsl_complex_float", _wrap_new_gsl_complex_float},
@@ -21826,7 +21826,7 @@ XS(SWIG_init) {
   
   /*@SWIG:/usr/share/swig4.0/perl5/perltypemaps.swg,65,%set_constant@*/ do {
     SV *sv = get_sv((char*) SWIG_prefix "GSL_VERSION", TRUE | 0x2 | GV_ADDMULTI);
-    sv_setsv(sv, SWIG_From_double  SWIG_PERL_CALL_ARGS_1((double)(2.6)));
+    sv_setsv(sv, SWIG_From_double  SWIG_PERL_CALL_ARGS_1((double)(2.7)));
     SvREADONLY_on(sv);
   } while(0) /*@SWIG@*/;
   /*@SWIG:/usr/share/swig4.0/perl5/perltypemaps.swg,65,%set_constant@*/ do {
@@ -21836,7 +21836,7 @@ XS(SWIG_init) {
   } while(0) /*@SWIG@*/;
   /*@SWIG:/usr/share/swig4.0/perl5/perltypemaps.swg,65,%set_constant@*/ do {
     SV *sv = get_sv((char*) SWIG_prefix "GSL_MINOR_VERSION", TRUE | 0x2 | GV_ADDMULTI);
-    sv_setsv(sv, SWIG_From_int  SWIG_PERL_CALL_ARGS_1((int)(6)));
+    sv_setsv(sv, SWIG_From_int  SWIG_PERL_CALL_ARGS_1((int)(7)));
     SvREADONLY_on(sv);
   } while(0) /*@SWIG@*/;
   /*@SWIG:/usr/share/swig4.0/perl5/perltypemaps.swg,65,%set_constant@*/ do {
@@ -22024,8 +22024,8 @@ XS(SWIG_init) {
     sv_setsv(sv, SWIG_From_int  SWIG_PERL_CALL_ARGS_1((int)(GSL_EOF)));
     SvREADONLY_on(sv);
   } while(0) /*@SWIG@*/;
-  SWIG_TypeClientData(SWIGTYPE_p_gsl_complex_long_double, (void*) "Math::GSL::Matrix::gsl_complex_long_double");
   SWIG_TypeClientData(SWIGTYPE_p_gsl_complex, (void*) "Math::GSL::Matrix::gsl_complex");
+  SWIG_TypeClientData(SWIGTYPE_p_gsl_complex_long_double, (void*) "Math::GSL::Matrix::gsl_complex_long_double");
   SWIG_TypeClientData(SWIGTYPE_p_gsl_complex_float, (void*) "Math::GSL::Matrix::gsl_complex_float");
   SWIG_TypeClientData(SWIGTYPE_p_gsl_vector, (void*) "Math::GSL::Matrix::gsl_vector");
   SWIG_TypeClientData(SWIGTYPE_p__gsl_vector_view, (void*) "Math::GSL::Matrix::_gsl_vector_view");

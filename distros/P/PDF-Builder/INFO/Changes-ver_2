@@ -1,8 +1,37 @@
 Change log for PDF::API2 version 2.xxx (predecessor to PDF::Builder)
 
-2.040     2021-03-04
+2.041     2021-04-26
+
+    - Renamed openpage to open_page in PDF::API2. The old name is deprecated.
+
+2.040     2021-04-13
+
+    - Fix open() followed by stringify() resulting in a corrupt (mostly-empty)
+      PDF, which was broken by changes in 2.039 (reported by Gareth Tunley).
+      (NOT fixed in Builder, code looks like something similiar had been done 
+      some time ago, and new t-tests run fine on existing Builder code)
+
+    - [RT #134993] Calling open($filename) followed by saveas($same_filename)
+      instead of update() resulted in a corrupt PDF in 2.039, which no longer
+      reads the entire file into memory on open (reported by Marco Pessotto).
+      (NOT yet implemented, sounds like RT #113516 enhancement of not reading 
+      whole file had a bug).
+
+    - [RT #134957] Fix encoding of \n in a PDF string containing non-printable
+      characters (reported by Stuart Henderson).
+
+    - [RT #133131] Fix endianness of 64-bit numbers in cross-reference stream
+      widths array (reported by Christopher Papademetrious, fix by Vadim Repin).
 
 2.039     2021-03-04
+
+    - PDF::API2->open($filename) no longer reads the entire file into memory
+      before working on it, instead reading from the file as needed.  This
+      results in a substantial reduction in memory usage and start-up time for
+      large PDF files, particularly in cases where the calling script doesn't
+      need to access all of the contents of the PDF. (RT 113516)
+      (not yet implemented in PDF::Builder, want to gain some experience 
+      with PDF::API2 first. if implement, also fix introduced bug 134993)
 
     - PDF files containing cross-reference streams can now be modified and saved
       normally.  Previously, they were read-only. (not yet done in PDF::Builder)
@@ -31,20 +60,22 @@ Change log for PDF::API2 version 2.xxx (predecessor to PDF::Builder)
       working through the licensing issues. (slightly different wording in
       PDF::Builder, approved by Pisar and Hoskens)
 
+    - Renamed $text->lead(...) to $text->leading(...).  The old name is
+      deprecated but will continue to work.  If you're modifying PDF::API2
+      objects by editing their hash values instead of using these accessors,
+      you'll need to update your code. (in PDF::Builder)
+
+    - Added a -compress option (on by default) to PDF::API2->new(), open(), and
+      open_scalar().  If disabled, most streams won't be compressed, which can
+      simplify debugging. (new() long in PDF::Builder, may need to add to
+      open() and open_scalar() [ ])
+
     - add missing trailing commas in Content.pm (not done in PDF::Builder)
 
     - update code style in Resource/Font/CoreFont.pm (not worth doing in 
       PDF::Builder)
 
     - expression form of grep changed in Basic/PDF/File.pm
-
-    - PDF::API2->open($filename) no longer reads the entire file into memory
-      before working on it, instead reading from the file as needed.  This
-      results in a substantial reduction in memory usage and start-up time for
-      large PDF files, particularly in cases where the calling script doesn't
-      need to access all of the contents of the PDF. (RT 113516)
-      (not yet implemented in PDF::Builder, want to gain some experience 
-      with PDF::API2 first)
 
 2.038     2020-08-31
 

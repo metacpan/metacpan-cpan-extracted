@@ -170,7 +170,7 @@ subtest 'tests with default borda weighting' => sub {
     CHERRY    => 24,
     VANILLA   => 24,
   };
-  my ($C1Rank) = $BC1->Borda($activeset);
+  my ($C1Rank) = $BC1->borda($activeset);
   is_deeply( $C1Rank->RawCount(), $activeset,
     "small set WITH active list default depth of 0" );
 

@@ -4,10 +4,10 @@ use 5.010;
 use Test::AnyEventFTPServer;
 
 eval {
-  package 
+  package
     AnyEvent::FTP::Server::Context::TestContext;
-  
-  use Moo;
+
+  use Moo;  ## no critic (Modules::ProhibitConditionalUseStatements)
   extends 'AnyEvent::FTP::Server::Context';
   with 'AnyEvent::FTP::Server::Role::Type';
   with 'AnyEvent::FTP::Server::Role::Auth';

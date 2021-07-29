@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-# Copyright (C) 2017–2020  Alex Schroeder <alex@gnu.org>
+# Copyright (C) 2017–2021  Alex Schroeder <alex@gnu.org>
 
 # This program is free software: you can redistribute it and/or modify it under
 # the terms of the GNU Affero General Public License as published by the Free
@@ -16,24 +16,30 @@
 
 =encoding utf8
 
-=head1 Gemini Chat
+=head1 NAME
 
-This is a test client. All it does is handle repeatedly post stuff to a Gemini
-URL. For example, assume that C<gemini://transjovian.org/do/chat/say> is the URL
-where you say stuff and C<gemini://transjovian.org/do/chat/listen> is where you
-read the chat.
+Gemini Chat - a client that keeps sending the lines you type to one URL
 
-First, generate your client certificate for as many or as few days as you like:
+=head1 DESCRIPTION
+
+All C<gemini-chat> does is repeatedly post stuff to a Gemini URL. For example,
+assume that there is a Phoebe wiki with chat enabled via L<App::Phoebe::Chat>.
+First, you connect to the I<listen> URL using C<gemini>:
+
+    gemini --cert_file=cert.pem --key_file=key.pem \
+      gemini://localhost/do/chat/listen
+
+Then you connect the chat client to the I<say> URL using C<gemini-chat>:
+
+    gemini-chat --cert=cert.pem --key=key.pem \
+      gemini://transjovian.org/do/chat/say
+
+To generate your client certificate for 100 days and using “Alex” as your common
+name:
 
     openssl req -new -x509 -newkey ec -subj "/CN=Alex" \
       -pkeyopt ec_paramgen_curve:prime256v1 -days 100 \
-      -nodes -out alex-cert.pem -keyout alex-key.pem
-
-Then start this program to say something:
-
-    gemini-chat --cert=alex-cert.pem --key=alex-key.pem \
-      --listen=gemini://transjovian.org/do/chat/listen \
-      --say=gemini://transjovian.org/do/chat/say \
+      -nodes -out cert.pem -keyout key.pem
 
 =cut
 
@@ -42,8 +48,11 @@ use Mojo::IOLoop;
 use Pod::Text;
 use Getopt::Long;
 use Term::ReadLine;
+use Encode::Locale qw(decode_argv);
+use Encode qw(decode_utf8 encode_utf8);
+use Net::IDN::Encode qw(:all);
 use URI::Escape;
-use Encode qw(encode_utf8);
+use IRI;
 
 my $cert;
 my $key;
@@ -54,9 +63,7 @@ my $say_url;
 GetOptions(
   'help' => \$help,
   'cert_file=s' => \$cert,
-  'key_file=s' => \$key,
-  'listen_url=s' => \$listen_url,
-  'say_url=s' => \$say_url)
+  'key_file=s' => \$key)
     or die("Error in command line arguments\n");
 
 # Help
@@ -66,72 +73,32 @@ if ($help) {
   exit;
 }
 
-die "⚠ You must provide --listen_url\n" unless $listen_url;
-die "⚠ You must provide --say_url\n" unless $say_url;
+die "⚠ You must provide an existing certificate and key file\n"
+    unless $cert and $key and -f $cert and -f $key;
 
-my($listen_scheme, $listen_authority, $listen_path, $listen_query, $listen_fragment) =
-    $listen_url =~ m|(?:([^:/?#]+):)?(?://([^/?#]*))?([^?#]*)(?:\?([^#]*))?(?:#(.*))?|;
+# Regular arguments
+decode_argv();
+my ($uri) = @ARGV;
 
-die "⚠ The URL '$listen_url' must use the gemini scheme\n" unless $listen_scheme and $listen_scheme eq 'gemini';
-die "⚠ The URL '$listen_url' must have an authority\n" unless $listen_authority;
+die "⚠ You must provide an URI\n" unless $uri;
 
-my($say_scheme, $say_authority, $say_path, $say_query, $say_fragment) =
-    $say_url =~ m|(?:([^:/?#]+):)?(?://([^/?#]*))?([^?#]*)(?:\?([^#]*))?(?:#(.*))?|;
+my $iri = IRI->new(value => encode_utf8 $uri);
 
-die "⚠ The URL '$say_url' must use the gemini scheme\n" unless $say_scheme and $say_scheme eq 'gemini';
-die "⚠ The URL '$say_url' must have an authority\n" unless $say_authority;
+die "⚠ The URI '$uri' must use the gemini scheme\n" unless $iri->scheme and $iri->scheme eq 'gemini';
+die "⚠ The URI '$uri' must have an authority\n" unless $iri->authority;
+warn "⚠ Ignoring path '" . $iri->path . "'\n" if $iri->path;
+warn "⚠ Ignoring fragment '" . $iri->fragment . "'\n" if $iri->fragment;
 
-my ($listen_host, $listen_port) = split(/:/, $listen_authority, 2);
-$listen_port //= 1965;
+my $host = domain_to_ascii(decode_utf8 $iri->host);
+my $port = $iri->port || 1965;
+my $unsafe = "^A-Za-z0-9\-\._~"; # the default
+my $path = uri_escape_utf8($iri->path, $unsafe . "/"); # path separator are safe
 
-my ($say_host, $say_port) = split(/:/, $say_authority, 2);
-$say_port //= 1965;
-
-our $pid = fork();
-
-END {
-  # client
-  if ($pid) {
-    kill 'KILL', $pid or warn "Could not kill server $pid";
-  }
-}
-
-if (!defined $pid) {
-  die "Cannot fork: $!";
-} elsif ($pid == 0) {
-  # Start client for listening
-  Mojo::IOLoop->client({
-    address => $listen_host,
-    port => $listen_port,
-    tls => 1,
-    tls_cert => $cert,
-    tls_key => $key,
-    tls_options => { SSL_verify_mode => 0x00 }} => sub {
-      my ($loop, $err, $stream) = @_;
-      # 1h timeout (for chat)
-      $stream->timeout(3600);
-      $stream->on(read => sub {
-	my ($stream, $bytes) = @_;
-	print "\es"; # save cursor position
-	print "\e[1G"; # column 1
-	print "\n";
-	print "\e[1F"; # previous line (on the empty line, now)
-	print encode_utf8 $bytes;
-	print "\eu" }); # restore cursor position
-      $stream->on(close => sub {
-	say "\e[31mConnection closed\e[0m"; # red
-	exit });
-      # Write request to the server
-      $stream->write("$listen_url\r\n")});
-  # Start event loop if necessary
-  Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
-  exit;
-}
-
-sleep 1;
+$uri = $iri->scheme . '://' . $host . ':' . $port;
+$uri .= $path if $path;
 
 # start read loop for saying stuff
-my $term = Term::ReadLine->new($say_url);
+my $term = Term::ReadLine->new($uri);
 my $prompt = "> ";
 my $OUT = $term->OUT || \*STDOUT;
 while (defined ($_ = $term->readline($prompt))) {
@@ -139,13 +106,14 @@ while (defined ($_ = $term->readline($prompt))) {
   # create client
   my $text = uri_escape_utf8($_);
   Mojo::IOLoop->client({
-    address => $say_host,
-    port => $say_port,
+    address => $host,
+    port => $port,
     tls => 1,
     tls_cert => $cert,
     tls_key => $key,
-    tls_verify => 0x00, } => sub {
+    tls_options => { SSL_verify_mode => 0x00 }} => sub {
       my ($loop, $err, $stream) = @_;
+      die $err if $err;
       $stream->on(read => sub {
 	my ($stream, $bytes) = @_;
 	if ($bytes =~ /^[123]/) {
@@ -155,7 +123,7 @@ while (defined ($_ = $term->readline($prompt))) {
 	  print "\e[31m$bytes\e[0m"; # red
 	}});
       # Write request to the server
-      $stream->write("$say_url?$text\r\n")});
+      $stream->write("$uri?$text\r\n")});
   # Start event loop if necessary
   Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
   # Add to history

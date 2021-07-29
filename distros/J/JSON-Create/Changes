@@ -1,3 +1,7 @@
+0.35 2021-07-16
+
+* Fix a problem with blessed values (blessed numbers have quotes added)
+
 0.34 2021-05-01
 
 * Add newlines after isolated scalars, so

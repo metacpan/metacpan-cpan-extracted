@@ -1,14 +1,14 @@
 NAME
-    Acme::CPANModules::NO_COLOR - Modules that follow the NO_COLOR
+    Acme::CPANModules::NO_COLOR - Modules/scripts that follow the NO_COLOR
     convention
 
 VERSION
-    This document describes version 0.005 of Acme::CPANModules::NO_COLOR
+    This document describes version 0.008 of Acme::CPANModules::NO_COLOR
     (from Perl distribution Acme-CPANModules-NO_COLOR), released on
-    2021-05-09.
+    2021-07-21.
 
 DESCRIPTION
-    The NO_COLOR convention (see https://no-color.org) lets user disable
+    The NO_COLOR convention (see <https://no-color.org>) lets user disable
     color output of console programs by defining an environment variable
     called NO_COLOR. The existence of said environment variable, regardless
     of its value, signals that programs should not use colored output.
@@ -17,29 +17,158 @@ DESCRIPTION
     me.
 
 ACME::CPANMODULES ENTRIES
-    *   App::DiffTarballs
+    *   App::ccdiff - Colored Character diff
 
-    *   App::hr
+        Author: HMBRAND <https://metacpan.org/author/HMBRAND>
 
-    *   Color::ANSI::Util
+        Script: ccdiff
 
-    *   Data::Dump::Color
+    *   App::Codeowners - A tool for managing CODEOWNERS files
 
-    *   Debug::Print
+        Author: CCM <https://metacpan.org/author/CCM>
 
-    *   Log::Any::Adapter::Screen
+        Script: git-codeowners
 
-    *   Log::ger::Output::Screen
+    *   App::DiffTarballs - Diff contents of two tarballs
+
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
+
+        Script: diff-tarballs
+
+    *   App::HL7::Dump - Base class for hl7dump script.
+
+        Author: SKIM <https://metacpan.org/author/SKIM>
+
+        Script: hl7dump
+
+    *   App::hr - Print horizontal bar on the terminal
+
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
+
+        Script: hr
+
+    *   App::Licensecheck - functions for a simple license checker for
+        source files
+
+        Author: JONASS <https://metacpan.org/author/JONASS>
+
+        Script: licensecheck
+
+    *   App::riap - Riap command-line client shell
+
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
+
+        Script: riap
+
+    *   App::rsynccolor - Add some color to rsync output
+
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
+
+        Script: rsynccolor
+
+    *   Color::ANSI::Util - Routines for dealing with ANSI colors
+
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
+
+    *   Data::Dump::Color - Like Data::Dump, but with color
+
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
+
+    *   Debug::Print - Make debugging with print() more awesome
+
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
+
+    *   Git::Deploy
+
+        Author: AVAR <https://metacpan.org/author/AVAR>
+
+        Script: git-deploy
+
+    *   Indent::Form
+
+        Author: SKIM <https://metacpan.org/author/SKIM>
+
+    *   Log::Any::Adapter::Screen - Send logs to screen, with colors and
+        some other features
+
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
+
+    *   Log::ger::Output::Screen - Output log to screen
+
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
+
+    *   Parse::Netstat::Colorizer - Searches and colorizes the output from
+        Parse::Netstat
+
+        Author: VVELOX <https://metacpan.org/author/VVELOX>
+
+        Script: cnetstat
+
+    *   Proc::ProcessTable::ncps - New Colorized(optional) PS, a enhanced
+        version of PS with advanced searching capabilities
+
+        Author: VVELOX <https://metacpan.org/author/VVELOX>
+
+        Script: ncps
 
     *   Progress::Any::Output::TermProgressBar
 
-    *   Term::ANSIColor::Conditional
+    *   Search::ESsearcher - Provides a handy system for doing templated
+        elasticsearch searches.
 
-    *   Term::ANSIColor::Patch::Conditional
+        Author: VVELOX <https://metacpan.org/author/VVELOX>
 
-    *   Term::App::Roles
+        Script: essearcher
 
-    *   Text::ANSITable
+    *   Spreadsheet::Read
+
+        Author: HMBRAND <https://metacpan.org/author/HMBRAND>
+
+        Script: xls2csv
+
+    *   String::Tagged::Terminal - format terminal output using
+        "String::Tagged"
+
+        Author: PEVANS <https://metacpan.org/author/PEVANS>
+
+    *   Term::ANSIColor - Color screen output using ANSI escape sequences
+
+        Author: RRA <https://metacpan.org/author/RRA>
+
+    *   Term::ANSIColor::Conditional - Colorize text only if color is
+        enabled
+
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
+
+    *   Term::ANSIColor::Patch::Conditional - Colorize text only if color is
+        enabled
+
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
+
+    *   Term::App::Roles - Collection of roles for terminal-based
+        application
+
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
+
+    *   Term::App::Roles::Attrs
+
+    *   Term::App::Util::Color - Determine color depth and whether to use
+        color or not
+
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
+
+    *   Text::CSV_XS - comma-separated values manipulation routines
+
+        Author: HMBRAND <https://metacpan.org/author/HMBRAND>
+
+        Script: csvdiff
+
+    *   Tree::Shell - Navigate and manipulate in-memory tree objects using a
+        CLI shell
+
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
+
+        Script: treesh
 
 FAQ
   What is an Acme::CPANModules::* module?
@@ -50,8 +179,13 @@ FAQ
 
   What are ways to use this Acme::CPANModules module?
     Aside from reading this Acme::CPANModules module's POD documentation,
-    you can install all the listed modules (entries) using cpanmodules CLI
-    (from App::cpanmodules distribution):
+    you can install all the listed modules (entries) using cpanm-cpanmodules
+    script (from App::cpanm::cpanmodules distribution):
+
+     % cpanm-cpanmodules -n NO_COLOR
+
+    Alternatively you can use the cpanmodules CLI (from App::cpanmodules
+    distribution):
 
         % cpanmodules ls-entries NO_COLOR | cpanm -n
 

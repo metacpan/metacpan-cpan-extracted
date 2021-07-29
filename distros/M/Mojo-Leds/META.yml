@@ -1,0 +1,65 @@
+---
+abstract: 'Leds aka Light Environment (emi) for Development System based on Mojolicious'
+author:
+  - 'Emiliano Bruni <info@ebruni.it>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Mojo::File: '0'
+  MongoDB: '0'
+  Test::Mojo: '0'
+  Test::More: '0'
+  lib: '0'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojo-Leds
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+provides:
+  Mojo::Leds:
+    file: lib/Mojo/Leds.pm
+    version: '1.02'
+  Mojo::Leds::Page:
+    file: lib/Mojo/Leds/Page.pm
+    version: '1.02'
+  Mojo::Leds::Rest:
+    file: lib/Mojo/Leds/Rest.pm
+    version: '1.02'
+  Mojo::Leds::Rest::MongoDB:
+    file: lib/Mojo/Leds/Rest/MongoDB.pm
+    version: '1.02'
+requires:
+  BSON::OID: '0'
+  File::Basename: '0'
+  Mojo::Base: '0'
+  Mojo::JSON: '0'
+  Mojo::Log: '0'
+  Mojo::Util: '0'
+  Mojolicious::Plugin::AutoRoutePm: '0'
+  Mojolicious::Plugin::Mongodbv2: '0'
+  Mojolicious::Plugin::RenderFile: '0'
+  Mojolicious::Plugin::Restify::OtherActions: '0'
+  Scalar::Util: '0'
+  Tie::IxHash: '0'
+  boolean: '0'
+  perl: '5.014'
+resources:
+  homepage: https://github.com/EmilianoBruni/Mojo-Leds
+  repository: https://github.com/EmilianoBruni/Mojo-Leds.git
+version: '1.02'
+x_generated_by_perl: v5.14.2
+x_serialization_backend: 'YAML::Tiny version 1.73'

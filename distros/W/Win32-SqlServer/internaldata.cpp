@@ -1,12 +1,21 @@
 /*---------------------------------------------------------------------
- $Header: /Perl/OlleDB/internaldata.cpp 14    19-07-19 22:00 Sommar $
+ $Header: /Perl/OlleDB/internaldata.cpp 15    21-07-12 21:41 Sommar $
 
   This file holds routines setting up the internaldata struct, and
   also release memory allocated in it.
 
-  Copyright (c) 2004-2019   Erland Sommarskog
+  Copyright (c) 2004-2021   Erland Sommarskog
 
   $History: internaldata.cpp $
+ * 
+ * *****************  Version 15  *****************
+ * User: Sommar       Date: 21-07-12   Time: 21:41
+ * Updated in $/Perl/OlleDB
+ * No longer tracking that a property is supported by SQLOLEDB and done
+ * away with the check for SQLOLEDB 2.5. Instead we have optional
+ * properties for the benefit of the different versions of MSOLEDBSQL, and
+ * this is want dwStatus -1 means this days, and therefore it should be
+ * part of the dump.
  * 
  * *****************  Version 14  *****************
  * User: Sommar       Date: 19-07-19   Time: 22:00
@@ -102,11 +111,10 @@
 void dump_properties(DBPROP init_properties[MAX_INIT_PROPERTIES],
                      BOOL   props_debug)
 {
-  BOOL too_old_sqloledb = FALSE;
-
   for (int i = 0; gbl_init_props[i].propset_enum != not_in_use; i++) {
        if (! props_debug &&
-           init_properties[i].dwStatus == DBPROPSTATUS_OK)
+             (init_properties[i].dwStatus == DBPROPSTATUS_OK ||
+              init_properties[i].dwStatus == -1))   // -1 are optional ones never set.
            continue;
 
        char * ststxt;
@@ -131,10 +139,6 @@ void dump_properties(DBPROP init_properties[MAX_INIT_PROPERTIES],
                ststxt = "DBPROPSTATUS_NOTSETTABLE"; break;
           case DBPROPSTATUS_NOTSUPPORTED :
                ststxt = "DBPROPSTATUS_NOTSUPPORTED"; break;
-          case -1 :
-               ststxt = "(not set by OLE DB provider)";
-               too_old_sqloledb |= gbl_init_props[i].is_sqloledb;
-               break;
        }
        PerlIO_printf(PerlIO_stderr(), "Property '%s', Status: %s, Value: ",
                       gbl_init_props[i].name, ststxt);
@@ -172,13 +176,6 @@ void dump_properties(DBPROP init_properties[MAX_INIT_PROPERTIES],
        }
 
        PerlIO_printf(PerlIO_stderr(), ".\n");
-   }
-
-   if (too_old_sqloledb) {
-      warn("The fact that status for one or more properties were not set by\n");
-      warn("by the OLE DB provider, indicates that you are running an unsupported\n");
-      warn("version of SQLOLEDB. To use Win32::SqlServer you must have at least\n");
-      croak("version 2.6 of the MDAC, or you must use SQL Native Client\n");
    }
 }
 
@@ -308,7 +305,7 @@ void * setupinternaldata()
        prop.dwPropertyID = gbl_init_props[j].property_id;
        prop.dwOptions    = DBPROPOPTIONS_REQUIRED;
        prop.colid        = DB_NULLID;
-       prop.dwStatus     = DBPROPSTATUS_OK;
+       prop.dwStatus     = (gbl_init_props[j].isoptional ? -1 : DBPROPSTATUS_OK);
        VariantInit(&prop.vValue);
        VariantCopy(&prop.vValue, &gbl_init_props[j].default_value);
     }

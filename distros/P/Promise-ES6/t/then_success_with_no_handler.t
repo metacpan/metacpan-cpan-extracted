@@ -42,6 +42,9 @@ my $pid = fork or do {
 
 is( PromiseTest::await($p, \@todo), 'first resolve' );
 
+# To avoid a leak in Devel::Cover:
+@todo = ();
+
 waitpid $pid, 0;
 
 done_testing;

@@ -113,6 +113,7 @@ clean_sessions();
 done_testing( count() );
 
 # Redefine LWP methods for tests
+no warnings 'redefine';
 sub switch {
     my $type = shift;
     @Lemonldap::NG::Handler::Main::_onReload = @{

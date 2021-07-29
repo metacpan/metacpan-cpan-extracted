@@ -1,6 +1,6 @@
 package Myriad::Subscription::Implementation::Memory;
 
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.010'; # VERSION
 our $AUTHORITY = 'cpan:DERIV'; # AUTHORITY
 
 use Myriad::Class extends => qw(IO::Async::Notifier);

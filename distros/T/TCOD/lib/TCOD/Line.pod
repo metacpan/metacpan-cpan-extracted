@@ -1,0 +1,64 @@
+=encoding UTF-8
+
+=head1 NAME
+
+TCOD::Line - Calculate lines between tiles
+
+=head1 SYNOPSIS
+
+    use TCOD;
+
+    # Get the points in the line as a list
+    my @points = TCOD::Line::bresenham( 0, 0, 10, 10 );
+
+    # Or iterate over them with a callback
+    TCOD::Line::bresenham( 0, 0, 10, 10, sub {
+        my ( $x, $y ) = @_;
+        ...;
+        return $continue_iteration; # Return false to abort
+    });
+
+=head1 DESCRIPTION
+
+This package includes functions to calculate lines between tile coordinates.
+It can be used to calculate line-of-sight, or for anything else that needs
+linear interpolation between two tiles.
+
+=head1 FUNCTIONS
+
+=head2 bresenham
+
+    @points = TCOD::Line::bresenham( $x1, $y1, $x2, $y2 );
+    TCOD::Line::bresenham( $x1, $y1, $x2, $y2, sub ( $x, $y ) { ... } );
+
+Calculate a line between two tile coordinates using the
+L<Bresenham algorithm|https://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm>.
+
+This functions works in two possible modes.
+
+If called with four integers values for the coordinates of the start and end
+points, it will return a list of array references, each of which will hold the
+coordinates for the next tile in the line. The points will include the start
+and end points.
+
+Alternatively, if called with an additional code ref at the end, this will be
+called once for each point in the line, with the coordinates of the current
+point as its only two parameters. The callback should return true if iteration
+should continue, or false if iteration should be aborted early.
+
+When using a callback, this function returns an empty list.
+
+=head1 SEE ALSO
+
+=over
+
+=item L<TCOD>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2021 José Joaquín Atria
+
+This library is free software; you can redistribute it and/or modify it under
+the Artistic License 2.0.

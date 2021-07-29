@@ -1,3 +1,13 @@
+0.002   2021-07-15  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Mention relpath, quickabspath; demonstrate how the three
+	  CLIs give different results.
+
+	- [ux] Add abspath CLI as alias to realpath.
+
+
 0.001   2019-10-09  Released-By: PERLANCAR
 
         - First release.

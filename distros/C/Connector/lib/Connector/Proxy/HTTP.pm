@@ -174,6 +174,19 @@ sub set {
     return 1;
 }
 
+sub get_meta {
+    my $self = shift;
+
+    # If we have no path, we tell the caller that we are a connector
+    my @path = $self->_build_path_with_prefix( shift );
+    if (scalar @path == 0) {
+        return { TYPE  => "connector" };
+    }
+
+    return {TYPE  => "scalar" };
+}
+
+
 sub _sanitize_path {
 
     my $self = shift;

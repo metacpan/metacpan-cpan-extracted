@@ -35,9 +35,9 @@ You shouldn't make instances of this class. Each attribute should be used as a n
 =head1 SYNOPSIS
 
     my $iam = Paws->service('IAM');
-    # To set or change the current account password policy
-    # The following command sets the password policy to require a minimum length
-    # of eight characters and to require one or more numbers in the password:
+ # To set or change the current account password policy
+ # The following command sets the password policy to require a minimum length of
+ # eight characters and to require one or more numbers in the password:
     $iam->UpdateAccountPasswordPolicy(
       'MinimumPasswordLength' => 8,
       'RequireNumbers'        => 1
@@ -54,7 +54,7 @@ For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/iam
 
 Allows all IAM users in your account to use the AWS Management Console
 to change their own passwords. For more information, see Letting IAM
-Users Change Their Own Passwords
+users change their own passwords
 (https://docs.aws.amazon.com/IAM/latest/UserGuide/HowToPwdIAMUser.html)
 in the I<IAM User Guide>.
 

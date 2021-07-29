@@ -1,0 +1,127 @@
+=encoding UTF-8
+
+=head1 NAME
+
+TCOD::Random - A fast and high quality pseudo-random number generator
+
+=head1 SYNOPSIS
+
+    use TCOD;
+
+    my $rng    = TCOD::Random->new( TCOD::RNG_CMWC );
+    my $backup = $rng->save;
+
+    # Generate 11 random numbers between 0 and 10 inclusive
+    my @numbers = map $rng->get_int( 0, 10 ), 0 .. 10;
+
+    $rng->restore( $backup );
+
+    # Generate _the same_ sequence of numbers after restoring state
+    my @more_numbers = map $rng->get_int( 0, 10 ), 0 .. 10;
+
+=head1 DESCRIPTION
+
+Perl already has great random generators available. But some parts of the
+Doryen library (noise, heightmap, ...) uses RNG as parameters. If you intend
+to use those functions, you must provide a RNG created with this library.
+
+=head1 METHODS
+
+=head2 get_instance
+
+    $rng = TCOD::Random->get_instance;
+
+The simplest way to get random number is to use the default generator. The
+first time you get this generator, it is initialised by calling L<new|/new>.
+Then, on successive calls, this function returns the same generator.
+
+The default instance uses the C<TCOD::RNG_CMWC> algorithm since libtcod 1.5.0.
+
+=head2 new
+
+    $rng = TCOD::Random->new( $algo );
+
+Initialise a random number generator with the specified algorithm. The value in
+C<$algo> must be one of the L<RandomAlgo|TCOD/RandomAlgo> enum.
+
+This function will internally call L<new_from_seed|/new_from_seed> with the
+current timestamp as the seed (which means that calling it twice in the same
+second will return the same generator).
+
+=head2 new_from_seed
+
+    $rng = TCOD::Random->new_from_seed( $algo, $seed );
+
+Create a new pseudo-random number generator with the specified algorithm and
+seed. The seed should be a 32-bit integer, while the algorithm must be a value
+in the L<RandomAlgo|TCOD/RandomAlgo> enum.
+
+=head2 save
+
+    $backup = $rng->save;
+
+Save the state of the generator.
+
+=head2 restore
+
+    $rng->restore( $backup );
+
+Restore a random number generator to a previous state. See L<save|/save> for
+how to capture this backup.
+
+=head2 set_distribution
+
+    $rng->set_distribution( $distribution );
+
+Set the distribution used by this pseudo-random number generator.
+The distribution must be one from the L<Distribution|TCOD/Distribution> enum,
+where  C<TCOD::DISTRIBUTION_LINEAR> is the default.
+
+All random number getters called on this generator will then use this
+distribution automatically to fetch your random numbers.
+
+Some functions (eg. L<get_int_mean|/get_int_mean> specify both a min-max range
+I<and> a custom mean, which can be any value (possibly either min or max, but
+it can even be outside that range). In case such a function is used, the
+distributions will trigger a slightly different behaviour.
+
+When using these distributions, the selected mean will have the highest
+probability of appearing:
+
+=over
+
+=item * TCOD::DISTRIBUTION_LINEAR
+
+=item * TCOD::DISTRIBUTION_GAUSSIAN
+
+=item * TCOD::DISTRIBUTION_GAUSSIAN_RANGE
+
+=back
+
+When using these distributions, the selected mean will have the lowest
+probability of appearing:
+
+=over
+
+=item * TCOD::DISTRIBUTION_GAUSSIAN_INVERSE
+
+=item * TCOD::DISTRIBUTION_GAUSSIAN_RANGE_INVERSE
+
+=back
+
+=head1 SEE ALSO
+
+=over
+
+=item L<TCOD>
+
+=item L<TCOD::Noise>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2021 José Joaquín Atria
+
+This library is free software; you can redistribute it and/or modify it under
+the Artistic License 2.0.

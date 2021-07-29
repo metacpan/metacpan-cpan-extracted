@@ -1,5 +1,5 @@
 package Photonic::LE::NR2::Field;
-$Photonic::LE::NR2::Field::VERSION = '0.017';
+$Photonic::LE::NR2::Field::VERSION = '0.018';
 
 
 =encoding UTF-8
@@ -10,7 +10,7 @@ Photonic::LE::NR2::Field
 
 =head1 VERSION
 
-version 0.017
+version 0.018
 
 =head1 COPYRIGHT NOTICE
 
@@ -214,7 +214,7 @@ sub evaluate {
 	my $EnGPsi_G=$GPsi_G*$Es->($n); #En ^G|psi_n>
 	$field_G+=$EnGPsi_G;
     }
-    $field_G *= $self->filter if $self->has_filter;
+    $field_G *= $self->filter->(*1) if $self->has_filter;
     #get cartesian out of the way, fourier transform, put cartesian.
     my $field_R=GtoR($field_G, $ndims, 1);
     $field_R*=$self->nr->B->nelem; #scale to have unit macroscopic field

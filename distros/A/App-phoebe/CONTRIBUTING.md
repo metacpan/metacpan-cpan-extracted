@@ -23,3 +23,8 @@ As for issues, your options are:
 * create a page on my [Software Wiki](https://alexschroeder.ch/software/Phoebe)
 
 * create an issue [on GitHub](https://github.com/kensanata/phoebe/issues)
+
+## Commit messages
+
+Use the [packaging] tag to indicate changes that package maintainers
+must know about.

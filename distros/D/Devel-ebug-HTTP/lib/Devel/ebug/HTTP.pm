@@ -5,27 +5,17 @@ use warnings;
 use 5.010001;
 use Catalyst qw/Static::Simple/;
 #use Catalyst qw/-Debug Static::Simple/;
-use Catalyst::View::TT;
-use Cwd;
-use Devel::ebug;
-use HTML::Prototype;
-use List::Util qw(max);
-use Path::Class;
-use PPI;
-use PPI::HTML;
-use Storable qw(dclone);
 use File::ShareDir::Dist qw( dist_share );
 
 # ABSTRACT: A web front end to a simple, extensible Perl debugger
-our $VERSION = '0.34'; # VERSION
+our $VERSION = '0.36'; # VERSION
 
 # global for now, sigh
 my $codelines_cache;
-our $ebug;
+my $ebug;
 my $lines_visible_above_count = 10;
 my $sequence = 1;
 my $vars;
-
 
 Devel::ebug::HTTP->config(
   name => 'Devel::ebug::HTTP',
@@ -49,13 +39,25 @@ Devel::ebug::HTTP->config(
 
 Devel::ebug::HTTP->setup;
 
+package Devel::ebug::HTTP::Controller::Root;
+
+use PPI;
+use PPI::HTML;
+use List::Util qw( max );
+use base qw( Catalyst::Controller );
+
+BEGIN {
+  $INC{'Devel/ebug/HTTP/Controller/Root.pm'} = __FILE__;
+  Devel::ebug::HTTP::Controller::Root->config( namespace => '' );
+}
+
 sub default : Private {
   my($self, $c) = @_;
   $c->stash->{template} = 'index';
   $c->forward('do_the_request');
 }
 
-sub ajax_variable : Regex('^ajax_variable$') {
+sub ajax_variable : Local {
   my ($self, $context, $variable) = @_;
   $variable = '\\' . $variable if $variable =~ /^[%@]/;
   my $value = $ebug->yaml($variable);
@@ -72,7 +74,7 @@ sub ajax_variable : Regex('^ajax_variable$') {
   $context->response->output($xml);
 }
 
-sub ajax_eval : Regex('^ajax_eval$') {
+sub ajax_eval : Local {
   my ($self, $context) = @_;
   my $eval = $context->request->parameters->{eval};
   my $result = $ebug->eval($eval) || "No output";
@@ -235,6 +237,38 @@ sub line_html {
   return qq{<a href="#" style="text-decoration: none" onClick="return break_point($line)">$line</a>};
 }
 
+package Devel::ebug::HTTP::View::TT;
+
+use strict;
+use warnings;
+use Catalyst::View::TT;
+use base qw(Catalyst::View::TT);
+
+BEGIN {
+  $INC{'Devel/ebug/HTTP/View/TT.pm'} = __FILE__;
+}
+
+package Devel::ebug::HTTP::App;
+
+sub main {
+  my $filename = shift @ARGV;
+  die "Usage: ebug_http filename\n" unless $filename;
+
+  require Devel::ebug;
+  $ebug = Devel::ebug->new;
+  $ebug->program($filename);
+  $ebug->load;
+
+  require Catalyst::ScriptRunner;
+  Catalyst::ScriptRunner->run('Devel::ebug::HTTP', 'Server');
+}
+
+sub ebug {
+  my(undef, $new) = @_;
+  $ebug = $new if @_ > 1;
+  return $ebug;
+}
+
 1;
 
 __END__
@@ -249,11 +283,11 @@ Devel::ebug::HTTP - A web front end to a simple, extensible Perl debugger
 
 =head1 VERSION
 
-version 0.34
+version 0.36
 
 =head1 SYNOPSIS
 
-  ebug_http calc.pl
+ ebug_http calc.pl
 
 =head1 DESCRIPTION
 
@@ -266,7 +300,21 @@ which you should point a web browser to.
 
 =head1 SEE ALSO
 
-L<Devel::ebug>, L<ebug_http>
+=over 4
+
+=item L<Devel::ebug>
+
+Simple extensible Perl debugger with clean API.
+
+=item L<ebug_http>
+
+Command-line interface to ebug/http debugger.
+
+=item L<Devel::hdb>
+
+Similar web based debugger for Perl
+
+=back
 
 =head1 AUTHOR
 

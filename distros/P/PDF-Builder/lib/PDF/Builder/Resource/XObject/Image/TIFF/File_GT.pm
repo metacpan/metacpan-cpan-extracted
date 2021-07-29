@@ -3,11 +3,11 @@ package PDF::Builder::Resource::XObject::Image::TIFF::File_GT;
 use strict;
 use warnings;
 
-our $VERSION = '3.022'; # VERSION
-my $LAST_UPDATE = '3.022'; # manually update whenever code is changed
+our $VERSION = '3.023'; # VERSION
+our $LAST_UPDATE = '3.023'; # manually update whenever code is changed
 
 use IO::File;
-use Graphics::TIFF 7 ':all';  # already confirmed to be installed
+use Graphics::TIFF ':all';  # already confirmed to be installed
 
 =head1 NAME
 
@@ -176,7 +176,7 @@ sub readTags {
     # may also be known as T6Options or Group4Options
     $self->{'g4Options'} = $self->{'object'}->GetField(TIFFTAG_GROUP4OPTIONS);
 
-    $self->{'lzwPredictor'} = $self->{'object'}->GetField(TIFFTAG_PREDICTOR);
+    $self->{'Predictor'} = $self->{'object'}->GetField(TIFFTAG_PREDICTOR);
     $self->{'imageId'} = $self->{'object'}->GetField(TIFFTAG_OPIIMAGEID);
     # TIFFTAG_SUBFILETYPE = 3 bits for various subfiles within image file
     # TIFFTAG_OSUBFILETYPE = 3 values concerning image types

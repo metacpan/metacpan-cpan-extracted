@@ -37,12 +37,12 @@ subtest 'basic' => sub {
 subtest 'content_is' => sub {
 
   my $server = create_ftpserver_ok('FSRO');
-  
+
   $server->command_ok('CWD' => "$CWD/corpus/nlst");
-  
+
   $server->nlst_ok;
   $server->content_is("one.txt\nthree.txt\ntwo.txt\n");
-  
+
   is(
     intercept { $server->content_is("one.txt\nthree.txt\ntwo.txt\n") },
     array {

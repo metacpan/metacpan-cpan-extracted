@@ -10,7 +10,8 @@ Makefile.PL
 README
 cpanfile
 lib/Rex/Hook/File/Impostor.pm
-t/module.t
+t/file.t
+t/impostor_path.t
 weaver.ini
 xt/author/00-compile.t
 xt/author/critic.t

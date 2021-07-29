@@ -33,7 +33,7 @@ Readonly::Array our @SNAK_TYPES => qw(
 	value
 );
 
-our $VERSION = 0.08;
+our $VERSION = 0.10;
 
 has datatype => (
 	is => 'ro',
@@ -147,8 +147,8 @@ Parameter is required.
 
 =item * C<datavalue>
 
-Value of data.
-Parameter is required.
+Value of data in form of Wikibase::Datatype::Value instance for concrete datatype.
+Parameter is required in situation when snaktype = 'value'.
 
 =item * C<property>
 
@@ -288,6 +288,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.08
+0.10
 
 =cut

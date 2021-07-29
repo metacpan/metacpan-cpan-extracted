@@ -1,6 +1,6 @@
 package Myriad::Transport::Memory;
 
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.010'; # VERSION
 # AUTHORTIY
 
 use strict;

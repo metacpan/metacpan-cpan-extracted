@@ -10,10 +10,10 @@ use 5.008;
 use strict;
 use warnings;
 
-package Dist::Zilla::Plugin::Git; # git description: v2.046-11-g57bbf9f
+package Dist::Zilla::Plugin::Git; # git description: v2.047-4-g1da1f49
 # ABSTRACT: Update your git repository after release
 
-our $VERSION = '2.047';
+our $VERSION = '2.048';
 
 1;
 
@@ -29,7 +29,7 @@ Dist::Zilla::Plugin::Git - Update your git repository after release
 
 =head1 VERSION
 
-version 2.047
+version 2.048
 
 =head1 DESCRIPTION
 
@@ -116,7 +116,7 @@ Jerome Quelin
 
 =head1 CONTRIBUTORS
 
-=for stopwords Christopher J. Madsen Jérôme Quelin Karen Etheridge Kent Fredric Yanick Champoux Ricardo Signes David Golden Graham Knop Mike Friedman Chris Weyl Stephen R. Scaffidi Randy Stauner Barr Apocalypse Doherty Michael Schout Nigel Metheringham Olivier Mengué Sean Whitton Tatsuhiko Miyagawa Tuomas Jormola Alessandro Ghedini Brian Phillips Steinbrunner Geoffrey Broadwell Harley Pig Jesse Luehrs Brendan Byrd Alexandr Ciornii Matt Follett McClimon
+=for stopwords Christopher J. Madsen Jérôme Quelin Karen Etheridge Kent Fredric Yanick Champoux Ricardo Signes David Golden Graham Knop Mike Friedman Chris Weyl Stephen R. Scaffidi Apocalypse Curtis Jewell Barr Doherty Randy Stauner Alessandro Ghedini Alexandr Ciornii Brendan Byrd Brian Phillips Steinbrunner Geoffrey Broadwell Harley Pig Jesse Luehrs Matt Follett Michael McClimon Schout Nigel Metheringham Olivier Mengué Sean Whitton Tatsuhiko Miyagawa Tuomas Jormola
 
 =over 4
 
@@ -166,7 +166,11 @@ Stephen R. Scaffidi <sscaffid@akamai.com>
 
 =item *
 
-Randy Stauner <randy@magnificent-tears.com>
+Apocalypse <perl@0ne.us>
+
+=item *
+
+Curtis Jewell <CSJEWELL@cpan.org>
 
 =item *
 
@@ -174,11 +178,51 @@ Graham Barr <gbarr@pobox.com>
 
 =item *
 
-Apocalypse <perl@0ne.us>
+Mike Doherty <doherty@cs.dal.ca>
 
 =item *
 
-Mike Doherty <doherty@cs.dal.ca>
+Randy Stauner <randy@magnificent-tears.com>
+
+=item *
+
+Alessandro Ghedini <al3xbio@gmail.com>
+
+=item *
+
+Alexandr Ciornii <alexchorny@gmail.com>
+
+=item *
+
+Brendan Byrd <Perl@ResonatorSoft.org>
+
+=item *
+
+Brian Phillips <bphillips@digitalriver.com>
+
+=item *
+
+David Steinbrunner <dsteinbrunner@pobox.com>
+
+=item *
+
+Geoffrey Broadwell <geoffb@corp.sonic.net>
+
+=item *
+
+Harley Pig <harleypig@gmail.com>
+
+=item *
+
+Jesse Luehrs <doy@tozt.net>
+
+=item *
+
+Matt Follett <matt.follett@gmail.com>
+
+=item *
+
+Michael McClimon <michael@mcclimon.org>
 
 =item *
 
@@ -203,46 +247,6 @@ Tatsuhiko Miyagawa <miyagawa@bulknews.net>
 =item *
 
 Tuomas Jormola <tj@solitudo.net>
-
-=item *
-
-Alessandro Ghedini <al3xbio@gmail.com>
-
-=item *
-
-Brian Phillips <bphillips@digitalriver.com>
-
-=item *
-
-David Steinbrunner <dsteinbrunner@pobox.com>
-
-=item *
-
-Geoffrey Broadwell <geoffb@corp.sonic.net>
-
-=item *
-
-Harley Pig <harleypig@gmail.com>
-
-=item *
-
-Jesse Luehrs <doy@tozt.net>
-
-=item *
-
-Brendan Byrd <Perl@ResonatorSoft.org>
-
-=item *
-
-Alexandr Ciornii <alexchorny@gmail.com>
-
-=item *
-
-Matt Follett <matt.follett@gmail.com>
-
-=item *
-
-Michael McClimon <michael@mcclimon.org>
 
 =back
 

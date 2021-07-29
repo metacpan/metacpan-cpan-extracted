@@ -18,10 +18,6 @@ namespace detail {
     template <typename T> inline panda::enable_if_unsigned_integral_t<T> _getrawnum (const SV* sv) { return SvUVX(sv); }
     template <typename T> inline panda::enable_if_floatp_t<T>            _getrawnum (const SV* sv) { return SvNVX(sv); }
 
-    template <typename T> inline panda::enable_if_signed_integral_t<T>   _getnum (SV* sv) { return SvIV(sv); }
-    template <typename T> inline panda::enable_if_unsigned_integral_t<T> _getnum (SV* sv) { return SvUV(sv); }
-    template <typename T> inline panda::enable_if_floatp_t<T>            _getnum (SV* sv) { return SvNV(sv); }
-
     template <typename T> inline void _setrawnum (SV* sv, T val, panda::enable_if_signed_integral_t<T>*   = nullptr) { SvIV_set(sv, val); }
     template <typename T> inline void _setrawnum (SV* sv, T val, panda::enable_if_unsigned_integral_t<T>* = nullptr) { SvUV_set(sv, val); }
     template <typename T> inline void _setrawnum (SV* sv, T val, panda::enable_if_floatp_t<T>*            = nullptr) { SvNV_set(sv, val); }
@@ -152,14 +148,6 @@ struct Simple : Scalar {
     template <typename T>      panda::enable_if_one_of_t<T, panda::string_view> get () const { return panda::string_view(SvPVX(sv), SvCUR(sv)); }
     template <typename T = SV> panda::enable_if_one_of_t<T,SV>*                 get () const { return sv; }
 
-    template <class T = panda::string>
-    T as_string () const {
-        if (!sv) return T();
-        STRLEN len;
-        const char* buf = SvPV_const(sv, len);
-        return T(buf, len);
-    }
-
     template <typename T, typename = panda::enable_if_arithmetic_t<T>>
     char operator[] (T i) const { return SvPVX_const(sv)[i]; }
     
@@ -196,9 +184,6 @@ private:
         _validate_rest();
     }
 };
-
-template <class T> T Scalar::as_string () const { return Simple(sv).as_string<T>(); }
-template <class T> T Scalar::as_number () const { return Simple(sv); }
 
 template <typename T, typename = panda::enable_if_arithmetic_t<T>> inline bool operator== (const Simple& lhs, T rhs) { return (T)lhs == rhs; }
 template <typename T, typename = panda::enable_if_arithmetic_t<T>> inline bool operator== (T lhs, const Simple& rhs) { return lhs == (T)rhs; }

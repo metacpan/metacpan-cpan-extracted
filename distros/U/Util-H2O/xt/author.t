@@ -8,7 +8,7 @@ Author tests for the Perl module L<Util::H2O>.
 
 =head1 Author, Copyright, and License
 
-Copyright (c) 2020 Hauke Daempfling (haukex@zero-g.net).
+Copyright (c) 2020-2021 Hauke Daempfling (haukex@zero-g.net).
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl 5 itself.
@@ -79,7 +79,8 @@ diag "### TO","DOs ###" if @tasks;
 diag "$$_[0]:$$_[1]: $$_[2]" for @tasks;
 diag "### ###" if @tasks;
 
-diag "To run coverage tests:\nperl Makefile.PL && make authorcover && firefox cover_db/coverage.html";
+diag "To run coverage tests:\nperl Makefile.PL && make authorcover && firefox cover_db/coverage.html\n"
+	. "rm -rf cover_db && make distclean && git clean -dxn";
 
 subtest 'code in POD' => sub { plan tests=>9;
 	my $verbatim = getverbatim($PERLFILES[0], qr/\b(?:synopsis)\b/i);
@@ -88,7 +89,7 @@ subtest 'code in POD' => sub { plan tests=>9;
 		ok eval('{'.<<"END_CODE".';1}'), 'synopsis runs' or diag explain $@; ## no critic (ProhibitStringyEval, RequireCheckingReturnValueOfEval)
 			use warnings; use strict;
 			$$verbatim[0];
-			is_deeply \$hash, { foo=>'bar', x=>'z', more=>'quz' }, 'synopsis \$hash';
+			is_deeply \$hash, { foo=>'bar', x=>'z', more=>'cowbell' }, 'synopsis \$hash';
 			is_deeply \$struct, { hello => { perl => "world!" } }, 'synopsis \$struct';
 			isa_ok \$one, 'Point';
 			is_deeply \$one, { x=>1, y=>2 }, 'synopsis \$one';

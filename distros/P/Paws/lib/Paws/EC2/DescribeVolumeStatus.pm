@@ -39,10 +39,10 @@ You shouldn't make instances of this class. Each attribute should be used as a n
     # Results:
     my $VolumeStatuses = $DescribeVolumeStatusResult->VolumeStatuses;
 
-    # Returns a L<Paws::EC2::DescribeVolumeStatusResult> object.
-    # To describe the status of impaired volumes
-    # This example describes the status for all volumes that are impaired. In
-    # this example output, there are no impaired volumes.
+  # Returns a L<Paws::EC2::DescribeVolumeStatusResult> object.
+  # To describe the status of impaired volumes
+  # This example describes the status for all volumes that are impaired. In this
+  # example output, there are no impaired volumes.
     my $DescribeVolumeStatusResult = $ec2->DescribeVolumeStatus(
       'Filters' => [
 
@@ -147,11 +147,11 @@ C<DescribeVolumeStatus> in paginated output. When this parameter is
 used, the request only returns C<MaxResults> results in a single page
 along with a C<NextToken> response element. The remaining results of
 the initial request can be seen by sending another request with the
-returned C<NextToken> value. This value can be between 5 and 1000; if
-C<MaxResults> is given a value larger than 1000, only 1000 results are
-returned. If this parameter is not used, then C<DescribeVolumeStatus>
-returns all results. You cannot specify this parameter and the volume
-IDs parameter in the same request.
+returned C<NextToken> value. This value can be between 5 and 1,000; if
+C<MaxResults> is given a value larger than 1,000, only 1,000 results
+are returned. If this parameter is not used, then
+C<DescribeVolumeStatus> returns all results. You cannot specify this
+parameter and the volume IDs parameter in the same request.
 
 
 

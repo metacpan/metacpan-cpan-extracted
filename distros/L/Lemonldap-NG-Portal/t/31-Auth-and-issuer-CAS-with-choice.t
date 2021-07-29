@@ -11,7 +11,7 @@ BEGIN {
 }
 my $userdb = tempdb();
 
-my $maintests = 21;
+my $maintests = 20;
 my $debug     = 'error';
 my ( $issuer, $sp, $res );
 
@@ -254,13 +254,7 @@ SKIP: {
     # Query IdP with iframe src
     $url   = $1;
     $query = $2;
-    ok(
-        getHeader( $res, 'Content-Security-Policy' ) =~
-          /child-src auth.idp.com/,
-        'Frame is authorized'
-      )
-      or explain( $res->[1],
-        'Content-Security-Policy => ...child-src auth.idp.com' );
+    expectCspChildOK($res, "auth.idp.com");
 
     # Get iframe from CAS server
     switch ('issuer');

@@ -5,8 +5,8 @@ use utf8;
 # Author          : Johan Vromans
 # Created On      : Tue Aug 30 09:49:11 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Thu Mar 13 17:55:41 2014
-# Update Count    : 313
+# Last Modified On: Mon Oct 23 20:20:12 2017
+# Update Count    : 318
 # Status          : Unknown, Use with caution!
 
 package main;
@@ -127,7 +127,7 @@ sub set_balans {
 	$anew = -$anew if ($e->[0] xor $debcrd);
 	$self->{o}->{balans}->{$acct}->[1] += $anew;
     }
-    else {
+    elsif ( $anew ) {		# skip nul values
 	$self->{o}->{balans}->{$acct} = [ $debcrd, $anew ];
     }
     "";

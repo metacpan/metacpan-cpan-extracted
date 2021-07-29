@@ -24,7 +24,7 @@
         "workers" : {
             "Beekeeper::Service::LogTail::Worker" : { "worker_count" : 1 },
             "Beekeeper::Service::Router::Worker"  : { "worker_count" : 2 },
-            "MyApp::Service::Calculator"          : { "worker_count" : 4 },
+            "MyApp::Service::Calculator::Worker"  : { "worker_count" : 4 },
         },
     },
 ]

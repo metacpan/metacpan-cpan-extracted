@@ -99,8 +99,11 @@ ok(
     'POST switchcontext'
 );
 expectRedirection( $res, 'http://auth.example.com/' );
+
 # Refresh cookie value
 my $id2 = expectCookie($res);
+ok( $id2 ne $id, 'New SSO session created' )
+  or explain( $id2, 'New SSO session created' );
 ok(
     $res = $client->_get(
         '/',
@@ -121,10 +124,17 @@ ok(
     ),
     'Stop context switching rtyler',
 );
-count(6);
-
-# Refresh cookie value
-$id = expectCookie($res);
+ok(
+    $res = $client->_get(
+        '/',
+        cookie => "lemonldap=$id2",
+        accept => 'text/html'
+    ),
+    'Get Menu',
+);
+ok( $res->[2]->[0] =~ m%<span trmsg="1">%, 'Found PE_SESSIONEXPIRED' )
+  or explain( $res->[2]->[0], 'Session expired' );
+count(9);
 
 # ContextSwitching form: dwho -> french
 # ------------------------
@@ -153,8 +163,11 @@ ok(
     'POST switchcontext'
 );
 expectRedirection( $res, 'http://auth.example.com/' );
+
 # Refresh cookie value
 $id2 = expectCookie($res);
+ok( $id2 ne $id, 'New SSO session created' )
+  or explain( $id2, 'New SSO session created' );
 ok(
     $res = $client->_get(
         '/',
@@ -167,7 +180,7 @@ expectAuthenticatedAs( $res, 'french' );
 ok( $res->[2]->[0] =~ m%<span trspan="contextSwitching_OFF">%,
     'Found trspan="contextSwitching_OFF"' )
   or explain( $res->[2]->[0], 'trspan="contextSwitching_OFF"' );
-count(5);
+count(6);
 
 # CheckUser request
 ok(
@@ -180,11 +193,14 @@ eval { $res = JSON::from_json( $res->[2]->[0] ) };
 ok( not($@), 'Content is JSON' )
   or explain( $res->[2]->[0], 'JSON content' );
 my @sessions_id =
-  map { $_->{key} =~ /_session_id$/ ? $_ : () } @{ $res->{ATTRIBUTES} };
+  map { $_->{key} =~ /^switching_session_id$/ ? $_ : () }
+  @{ $res->{ATTRIBUTES} };
 ok( $sessions_id[0]->{value} eq $id, 'Good switching_id found' )
-  or explain( $sessions_id[0]->{value}, 'Switching_session_id' );
-ok( $sessions_id[1]->{value} eq $id, 'Good Real_session_id found' )
-  or explain( $sessions_id[1]->{value}, 'Real_session_id' );
+  or explain( $sessions_id[0]->{value}, 'switching_session_id' );
+my @real_values =
+  map { $_->{key} =~ /^real_/ ? $_ : () } @{ $res->{ATTRIBUTES} };
+ok( scalar @real_values == 0, 'No real value found' )
+  or explain( scalar(@real_values), 'Found real value' );
 count(4);
 
 ok(

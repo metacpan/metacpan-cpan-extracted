@@ -27,9 +27,9 @@ You shouldn't make instances of this class. Each attribute should be used as a n
 =head1 SYNOPSIS
 
     my $kms = Paws->service('KMS');
-    # To retrieve the rotation status for a customer master key (CMK)
-    # The following example retrieves the status of automatic annual rotation of
-    # the key material for the specified CMK.
+# To retrieve the rotation status for a customer master key (CMK)
+# The following example retrieves the status of automatic annual rotation of the
+# key material for the specified CMK.
     my $GetKeyRotationStatusResponse = $kms->GetKeyRotationStatus(
       'KeyId' => '1234abcd-12ab-34cd-56ef-1234567890ab' );
 
@@ -46,10 +46,10 @@ For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/kms
 
 =head2 B<REQUIRED> KeyId => Str
 
-A unique identifier for the customer master key (CMK).
+Gets the rotation status for the specified customer master key (CMK).
 
-Specify the key ID or the Amazon Resource Name (ARN) of the CMK. To
-specify a CMK in a different AWS account, you must use the key ARN.
+Specify the key ID or key ARN of the CMK. To specify a CMK in a
+different AWS account, you must use the key ARN.
 
 For example:
 

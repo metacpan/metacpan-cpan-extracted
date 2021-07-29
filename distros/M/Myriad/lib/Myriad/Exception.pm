@@ -3,7 +3,7 @@ package Myriad::Exception;
 use strict;
 use warnings;
 
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.010'; # VERSION
 our $AUTHORITY = 'cpan:DERIV'; # AUTHORITY
 
 use utf8;
@@ -12,7 +12,7 @@ use utf8;
 
 =head1 NAME
 
-Myriad::Exception
+Myriad::Exception - standard exception rôle for all L<Myriad> code
 
 =head1 DESCRIPTION
 

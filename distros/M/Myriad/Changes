@@ -1,6 +1,29 @@
 
 Revision history for Myriad
 
+0.010     2021-07-22 07:14:15+00:00 UTC
+    [New features]
+    - Metrics adapter type is now configurable using --metrics_adapter.
+    - Metrics destination can be changed using --metrics_host and --metrics_port.
+
+    [Bugs fixed]
+    - RPC client to track message id for response before sending it.
+    - Subscription to use the right group name to acknowledge from stream.
+
+    [Dependencies]
+    - Object::Pad - use new ->begin_class from MOB package.
+    - Metrics::Any - update to v0.07 to disable metrics from certain packages.
+    - Metrics::Any::Adapter::Statsd - instead of DogStatsd standard.
+
+0.009     2021-07-14 18:39:34+08:00 Asia/Kuala_Lumpur
+    [API Changes]
+    - Syntax::Keyword::Match is now imported in Myriad::Service code
+    - Redis: A service will not create another service's stream.
+    - Allow service namespaces by adding '::*' to the startup command.
+
+    [New features]
+    - Added incr method for storage keys.
+
 0.008     2021-06-18 05:24:31+00:00 UTC
     [API Changes]
     - Breaking: RPC client will unwrap the extra 'response' level from the response.

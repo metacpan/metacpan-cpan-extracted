@@ -1,5 +1,8 @@
 Revision history for Perl extension Alien::GSL.
 
+1.04 2021-07-25 08:03:00 -0600
+  - Work around recent macOS compiler (gh#13)
+
 1.03 2021-06-01 06:20:16 -0600
   - Migrated to using alienfile for the installer.
   - New maintainer

@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary::MetaData;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Meta-Data vocabulary
 
-our $VERSION = '0.513';
+our $VERSION = '0.514';
 
 use 5.016;
 no if "$]" >= 5.031009, feature => 'indirect';
@@ -85,7 +85,7 @@ JSON::Schema::Modern::Vocabulary::MetaData - Implementation of the JSON Schema M
 
 =head1 VERSION
 
-version 0.513
+version 0.514
 
 =head1 DESCRIPTION
 
@@ -95,7 +95,11 @@ version 0.513
 
 Implementation of the JSON Schema Draft 2019-09 "Meta-Data" vocabulary, indicated in metaschemas
 with the URI C<https://json-schema.org/draft/2019-09/vocab/meta-data> and formally specified in
-L<https://json-schema.org/draft/2019-09/json-schema-validation.html#rfc.section.9>.
+L<https://datatracker.ietf.org/doc/html/draft-handrews-json-schema-validation-02#section-9>.
+
+Support is also provided for the equivalent Draft 7 keywords that correspond to this vocabulary and
+are formally specified in
+L<https://datatracker.ietf.org/doc/html/draft-handrews-json-schema-validation-01#section-10>.
 
 =head1 SUPPORT
 

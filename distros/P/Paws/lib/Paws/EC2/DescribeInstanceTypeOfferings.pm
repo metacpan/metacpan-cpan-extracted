@@ -36,8 +36,10 @@ You shouldn't make instances of this class. Each attribute should be used as a n
       DryRun  => 1,    # OPTIONAL
       Filters => [
         {
-          Name   => 'MyString',
-          Values => [ 'MyString', ... ],    # OPTIONAL
+          Name   => 'MyString',    # OPTIONAL
+          Values => [
+            'MyString', ...        # OPTIONAL
+          ],    # OPTIONAL
         },
         ...
       ],    # OPTIONAL
@@ -82,7 +84,7 @@ location type is C<region> (default), the location is the Region code
 
 =item *
 
-C<instance-type> - The instance type.
+C<instance-type> - The instance type. For example, C<c5.2xlarge>.
 
 =back
 

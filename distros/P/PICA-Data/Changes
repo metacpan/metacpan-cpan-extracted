@@ -1,5 +1,8 @@
 Revision history for PICA::Data
 
+1.29 2021-07-22T08:51:03Z
+    - picadata: Fix detection of terminal
+
 1.28 2021-07-06T09:52:24Z
     - Add method to get subfields as multihash (#98)
     - picadata: fix option --number (#111)

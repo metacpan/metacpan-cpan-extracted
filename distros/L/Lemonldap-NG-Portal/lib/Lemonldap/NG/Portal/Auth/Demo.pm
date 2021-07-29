@@ -11,7 +11,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(PE_OK PE_BADCREDENTIALS);
 
 extends qw(Lemonldap::NG::Portal::Auth::_WebForm);
 
-our $VERSION = '2.0.9';
+our $VERSION = '2.0.12';
 
 # INITIALIZATION
 
@@ -38,11 +38,11 @@ sub authenticate {
         return PE_BADCREDENTIALS;
     }
 
-    PE_OK;
+    return PE_OK;
 }
 
 sub authLogout {
-    PE_OK;
+    return PE_OK;
 }
 
 1;

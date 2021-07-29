@@ -11,10 +11,11 @@ use Exception::Class;
 use Workflow::Factory qw( FACTORY );
 use English qw( -no_match_vars );
 
-$Workflow::State::VERSION = '1.54';
+$Workflow::State::VERSION = '1.56';
 
 my @FIELDS   = qw( state description type );
-my @INTERNAL = qw( _test_condition_count _factory );
+my @INTERNAL = qw( _test_condition_count _factory _actions _conditions
+    _next_state );
 __PACKAGE__->mk_accessors( @FIELDS, @INTERNAL );
 
 
@@ -24,17 +25,28 @@ __PACKAGE__->mk_accessors( @FIELDS, @INTERNAL );
 sub get_conditions {
     my ( $self, $action_name ) = @_;
     $self->_contains_action_check($action_name);
-    return @{ $self->{_conditions}{$action_name} };
+    return @{ $self->_conditions->{$action_name} };
+}
+
+sub get_action {
+    my ( $self, $wf, $action_name ) = @_;
+    my $common_config =
+        $self->_factory->get_action_config($wf, $action_name);
+    my $state_config  = $self->_actions->{$action_name};
+    my $config        = { %{$common_config}, %{$state_config} };
+    my $action_class  = $common_config->{class};
+
+    return $action_class->new( $wf, $config );
 }
 
 sub contains_action {
     my ( $self, $action_name ) = @_;
-    return $self->{_actions}{$action_name};
+    return $self->_actions->{$action_name};
 }
 
 sub get_all_action_names {
     my ($self) = @_;
-    return keys %{ $self->{_actions} };
+    return keys %{ $self->_actions };
 }
 
 sub get_available_action_names {
@@ -48,12 +60,11 @@ sub get_available_action_names {
 
     foreach my $action_name (@all_actions) {
 
-        #From Ivan Paponov
-        my $action_group = $self->_factory()
-            ->{_action_config}{ $self->type() }{$action_name}{'group'};
-
-        if ( defined $group && length $group ) {
-            if ( $action_group ne $group ) {
+        if ( $group ) {
+            my $action_config =
+                $self->_factory()->get_action_config( $wf, $action_name );
+            if ( defined $action_config->{group}
+                 and $action_config->{group} ne $group ) {
                 next;
             }
         }
@@ -94,12 +105,7 @@ sub evaluate_action {
 
     my @conditions = $self->get_conditions($action_name);
     foreach my $condition (@conditions) {
-        my $condition_name;
-        if ( exists $condition->{name} ) {    # hash only, no object
-            $condition_name = $condition->{name};
-        } else {
-            $condition_name = $condition->name;
-        }
+        my $condition_name = $condition->name;
 
         my $rv;
         eval {
@@ -130,7 +136,7 @@ sub evaluate_action {
 sub get_next_state {
     my ( $self, $action_name, $action_return ) = @_;
     $self->_contains_action_check($action_name);
-    my $resulting_state = $self->{_actions}{$action_name}{resulting_state};
+    my $resulting_state = $self->_next_state->{$action_name};
     return $resulting_state unless ( ref($resulting_state) eq 'HASH' );
 
     if ( defined $action_return ) {
@@ -152,7 +158,7 @@ sub get_autorun_action_name {
     }
 
     my @actions   = $self->get_available_action_names($wf);
-    my $pre_error = "State '$state' should be automatically executed but ";
+    my $pre_error = "State '$state' should be automatically executed but";
     if ( scalar @actions > 1 ) {
         workflow_error "$pre_error there are multiple actions available ",
             "for execution. Actions are: ", join ', ', @actions;
@@ -161,9 +167,7 @@ sub get_autorun_action_name {
         workflow_error
             "$pre_error there are no actions available for execution.";
     }
-    $self->log->is_debug
-        && $self->log->debug(
-        "Auto-running state '$state' with action '$actions[0]'");
+    $self->log->debug("Auto-running state '$state' with action '$actions[0]'");
     return $actions[0];
 }
 
@@ -203,11 +207,13 @@ sub init {
 
     my $class = ref $self;
 
-    $self->log->is_debug
-        && $self->log->debug("Constructing '$class' object for state $name");
+    $self->log->debug("Constructing '$class' object for state $name");
 
     $self->state($name);
     $self->_factory($factory);
+    $self->_actions( {} );
+    $self->_conditions( {} );
+    $self->_next_state( {} );
 
     # Note this is the workflow type.
     $self->type( $config->{type} );
@@ -225,20 +231,12 @@ sub init {
     }
     foreach my $state_action_config ( @{ $config->{action} } ) {
         my $action_name = $state_action_config->{name};
-        my $resulting   = $state_action_config->{resulting_state};
-        if ( my $resulting_type = ref $resulting ) {
-            if ( $resulting_type eq 'ARRAY' ) {
-                $state_action_config->{resulting_state}
-                    = $self->_assign_resulting_state_from_array( $action_name,
-                    $resulting );
-            }
-        }
         $self->log->debug("Adding action '$action_name' to '$class' '$name'");
         $self->_add_action_config( $action_name, $state_action_config );
     }
 }
 
-sub _assign_resulting_state_from_array {
+sub _assign_next_state_from_array {
     my ( $self, $action_name, $resulting ) = @_;
     my $name          = $self->state;
     my @errors        = ();
@@ -259,10 +257,23 @@ sub _assign_resulting_state_from_array {
         workflow_error "Errors found assigning 'resulting_state' to ",
             "action '$action_name' in state '$name': ", join '; ', @errors;
     }
-    $self->log->is_debug
-        && $self->log->debug( "Assigned multiple resulting states in '$name' and ",
-        "action '$action_name' from array ok" );
+    $self->log->debug( "Assigned multiple resulting states in '$name' and ",
+                       "action '$action_name' from array ok" );
     return \%new_resulting;
+}
+
+sub _create_next_state {
+    my ( $self, $action_name, $resulting ) = @_;
+
+    if ( my $resulting_type = ref $resulting ) {
+        if ( $resulting_type eq 'ARRAY' ) {
+            $resulting
+                = $self->_assign_next_state_from_array( $action_name,
+                                                        $resulting );
+        }
+    }
+
+    return $resulting;
 }
 
 sub _add_action_config {
@@ -275,50 +286,48 @@ sub _add_action_config {
             "is required -- if you do not want the state to ",
             "change, use the value '$no_change_value'.";
     }
-    $self->log->is_debug
-        && $self->log->debug("Adding '$state' '$action_name' config");
-    $self->{_actions}{$action_name} = $action_config;
-    my @action_conditions = $self->_create_condition_objects($action_config);
-    $self->{_conditions}{$action_name} = \@action_conditions;
+    # Copy the action config,
+    # so we can delete keys consumed by the state below
+    my $copied_config   = { %$action_config };
+    my $resulting_state = delete $copied_config->{resulting_state};
+    my $condition       = delete $copied_config->{condition};
+
+    # Removes 'resulting_state' key from action_config
+    $self->_next_state->{$action_name} =
+        $self->_create_next_state( $action_name, $resulting_state );
+
+    # Removes 'condition' key from action_config
+    $self->_conditions->{$action_name} = [
+        $self->_create_condition_objects( $action_name, $condition )
+        ];
+
+    $self->_actions->{$action_name} = $copied_config;
 }
 
 sub _create_condition_objects {
-    my ( $self, $action_config ) = @_;
-    my @conditions = $self->normalize_array( $action_config->{condition} );
+    my ( $self, $action_name, $action_conditions ) = @_;
+    my @conditions = $self->normalize_array( $action_conditions );
     my @condition_objects = ();
+    my $count             = 1;
     foreach my $condition_info (@conditions) {
 
         # Special case: a 'test' denotes our 'evaluate' condition
         if ( $condition_info->{test} ) {
             my $state  = $self->state();
-            my $action = $action_config->{name};
-            my $count  = $self->_get_next_condition_count();
             push @condition_objects,
                 Workflow::Condition::Evaluate->new(
-                {   name  => "_$state\_$action\_condition\_$count",
+                {   name  => "_$state\_$action_name\_condition\_$count",
                     class => 'Workflow::Condition::Evaluate',
                     test  => $condition_info->{test},
                 }
                 );
+            $count++;
         } else {
-            if ( $condition_info->{name} =~ m{ \A ! }xms ) {
-                $self->log->is_debug
-                    && $self->log->debug(
-                    "Condition starts with !, pushing hash with name only");
-
-                # push a hashref only, not a real object
-                # the real object will be gotten from the factory
-                # if needed in evaluate_action
-                push @condition_objects,
-                    { 'name' => $condition_info->{name} };
-            } else {
-                $self->log->is_info
-                    && $self->log->info(
-                    "Fetching condition '$condition_info->{name}'");
-                push @condition_objects,
-                    $self->_factory()
-                    ->get_condition( $condition_info->{name}, $self->type() );
-            }
+            $self->log->info(
+                "Fetching condition '$condition_info->{name}'");
+            push @condition_objects,
+                $self->_factory()
+                ->get_condition( $condition_info->{name}, $self->type() );
         }
     }
     return @condition_objects;
@@ -330,18 +339,6 @@ sub _contains_action_check {
         workflow_error "State '", $self->state, "' does not contain ",
             "action '$action_name'";
     }
-}
-
-sub _get_next_condition_count {
-    my ($self) = @_;
-
-    # Initialize if not set.
-    my $count
-        = defined $self->_test_condition_count()
-        ? $self->_test_condition_count() + 1
-        : 1;
-
-    return $self->_test_condition_count($count);
 }
 
 1;
@@ -356,7 +353,7 @@ Workflow::State - Information about an individual state in a workflow
 
 =head1 VERSION
 
-This documentation describes version 1.54 of this package
+This documentation describes version 1.56 of this package
 
 =head1 SYNOPSIS
 
@@ -450,6 +447,14 @@ Returns a list of L<Workflow::Condition> objects for action
 C<$action_name>. Throws exception if object does not contain
 C<$action_name> at all.
 
+=head3 get_action( $workflow, $action_name )
+
+Returns an L<Workflow::Action> instance initialized using both the
+global configuration provided to the named action in the "action
+configuration" provided to the factory as well as any configuration
+specified as part of the listing of actions in the state of the
+workflow declaration.
+
 =head3 contains_action( $action_name )
 
 Returns true if this state contains action C<$action_name>, false if
@@ -498,7 +503,7 @@ Returns name of action to be used for autorunning the state.
 
 =head3 clear_condition_cache ( )
 
-Deprecated, kept for 1.54 compatibility.
+Deprecated, kept for 1.56 compatibility.
 
 Used to empties the condition result cache for a given state.
 

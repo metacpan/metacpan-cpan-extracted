@@ -5,7 +5,7 @@ use warnings;
 use base qw(Exporter);
 our @EXPORT = qw(filenames);
 
-our $VERSION = '0.63'; # VERSION
+our $VERSION = '0.64'; # VERSION
 
 # list filenames
 sub filenames {
@@ -29,7 +29,7 @@ Devel::ebug::Plugin::Filenames
 
 =head1 VERSION
 
-version 0.63
+version 0.64
 
 =head1 AUTHOR
 
@@ -45,7 +45,7 @@ Taisuke Yamada
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2005-2020 by Leon Brocard.
+This software is copyright (c) 2005-2021 by Leon Brocard.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

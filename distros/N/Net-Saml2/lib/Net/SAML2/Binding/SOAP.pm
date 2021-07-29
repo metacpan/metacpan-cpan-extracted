@@ -5,7 +5,7 @@ use Net::SAML2::XML::Util qw/ no_comments /;
 
 
 use Net::SAML2::XML::Sig;
-use XML::XPath;
+use XML::LibXML;
 use LWP::UserAgent;
 use HTTP::Request::Common;
 
@@ -67,9 +67,11 @@ sub handle_response {
     my $subject = sprintf("%s (verified)", $cert->subject);
 
     # parse the SOAP response and return the payload
-    my $parser = XML::XPath->new( xml => no_comments($response) );
-    $parser->set_namespace('soap-env', 'http://schemas.xmlsoap.org/soap/envelope/');
-    $parser->set_namespace('samlp', 'urn:oasis:names:tc:SAML:2.0:protocol');
+    my $dom = no_comments($response);
+
+    my $parser = XML::LibXML::XPathContext->new($dom);
+    $parser->registerNs('soap-env', 'http://schemas.xmlsoap.org/soap/envelope/');
+    $parser->registerNs('samlp', 'urn:oasis:names:tc:SAML:2.0:protocol');
 
     my $saml = $parser->findnodes_as_string('/soap-env:Envelope/soap-env:Body/*');
     return ($subject, $saml);
@@ -79,11 +81,14 @@ sub handle_response {
 sub handle_request {
     my ($self, $request) = @_;
 
-    my $parser = XML::XPath->new( xml => no_comments($request) );
-    $parser->set_namespace('soap-env', 'http://schemas.xmlsoap.org/soap/envelope/');
-    $parser->set_namespace('samlp', 'urn:oasis:names:tc:SAML:2.0:protocol');
+    my $dom = no_comments($request);
 
-    my $saml = $parser->findnodes_as_string('/soap-env:Envelope/soap-env:Body/*');
+    my $parser = XML::LibXML::XPathContext->new($dom);
+    $parser->registerNs('soap-env', 'http://schemas.xmlsoap.org/soap/envelope/');
+    $parser->registerNs('samlp', 'urn:oasis:names:tc:SAML:2.0:protocol');
+
+    my ($nodes) = $parser->findnodes('/soap-env:Envelope/soap-env:Body/*');
+    my $saml = $nodes->toString;
 
     if (defined $saml) {
         my $x = Net::SAML2::XML::Sig->new({ x509 => 1, cert_text => $self->idp_cert, exclusive => 1, });
@@ -161,7 +166,7 @@ Net::SAML2::Binding::SOAP
 
 =head1 VERSION
 
-version 0.34
+version 0.40
 
 =head1 SYNOPSIS
 
@@ -239,18 +244,11 @@ Signs and SOAP-wraps the given message.
 
 =head1 AUTHOR
 
-Original Author: Chris Andrews  <chrisa@cpan.org>
+Chris Andrews  <chrisa@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Chris Andrews and Others; in detail:
-
-  Copyright 2010-2011  Chris Andrews
-            2012       Peter Marschall
-            2019       Timothy Legge
-            2020       Timothy Legge, Wesley Schwengle
-            2021       Timothy Legge
-
+This software is copyright (c) 2021 by Chris Andrews and Others, see the git log.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

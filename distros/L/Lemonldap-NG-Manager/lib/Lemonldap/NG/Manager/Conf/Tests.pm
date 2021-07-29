@@ -7,7 +7,7 @@ use Lemonldap::NG::Common::Regexp;
 use Lemonldap::NG::Handler::Main;
 use Lemonldap::NG::Common::Util qw(getSameSite);
 
-our $VERSION = '2.0.11';
+our $VERSION = '2.0.12';
 
 ## @method hashref tests(hashref conf)
 # Return a hash ref where keys are the names of the tests and values
@@ -816,12 +816,20 @@ sub tests {
             return 1
               unless ( $conf->{oidcRPMetaDataOptions}
                 and %{ $conf->{oidcRPMetaDataOptions} } );
-            my @usingRSA = grep {
+            my @usingRSA =
+              grep {
                 $conf->{oidcRPMetaDataOptions}->{$_}
                   ->{oidcRPMetaDataOptionsIDTokenSignAlg}
                   and $conf->{oidcRPMetaDataOptions}->{$_}
                   ->{oidcRPMetaDataOptionsIDTokenSignAlg} =~ /^RS/
-            } keys %{ $conf->{oidcRPMetaDataOptions} };
+              } keys %{ $conf->{oidcRPMetaDataOptions} }, grep {
+                $conf->{oidcRPMetaDataOptions}->{$_}
+                  ->{oidcRPMetaDataOptionsAccessTokenSignAlg}
+                  and $conf->{oidcRPMetaDataOptions}->{$_}
+                  ->{oidcRPMetaDataOptionsAccessTokenSignAlg} =~ /^RS/
+                  and $conf->{oidcRPMetaDataOptions}->{$_}
+                  ->{oidcRPMetaDataOptionsAccessTokenJWT}
+              } keys %{ $conf->{oidcRPMetaDataOptions} };
 
             if ( @usingRSA and not $conf->{oidcServicePrivateKeySig} ) {
                 my $msg =
@@ -936,6 +944,19 @@ sub tests {
             return ( -1, 'Password module is enabled without password backend' )
               if (  $conf->{portalDisplayChangePassword}
                 and $conf->{passwordDB} eq 'Null' );
+            if (    $conf->{portalDisplayChangePassword}
+                and $conf->{passwordDB} eq 'Choice'
+                and $conf->{authChoiceModules} )
+            {
+                my $hasPwdBE = 0;
+                foreach ( keys %{ $conf->{authChoiceModules} } ) {
+                    my @mods = split /[;\|]/, $conf->{authChoiceModules}->{$_};
+                    $hasPwdBE ||= 1 unless $mods[2] eq 'Null';
+                }
+                return ( -1,
+'Password module is enabled without AuthChoice password backend'
+                ) unless $hasPwdBE;
+            }
             return 1;
         },
 
@@ -969,7 +990,10 @@ sub tests {
 
         # AuthChoice parameters must exist
         AuthChoiceParams => sub {
-            return 1 unless %{ $conf->{authChoiceModules} };
+            return 1
+              unless ( $conf->{authChoiceModules}
+                and %{ $conf->{authChoiceModules} }
+                and $conf->{authentication} eq 'Choice' );
             foreach (qw(AuthBasic FindUser)) {
                 if ( $conf->{"authChoice$_"} ) {
                     my $test  = $conf->{"authChoice$_"};

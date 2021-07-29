@@ -8,7 +8,6 @@ use File::Spec;
 
 my $ebug = Devel::ebug->new;
 $ebug->program("corpus/calc.pl");
-$ebug->backend("$^X bin/ebug_backend_perl");
 $ebug->load;
 
 my @trace = $ebug->stack_trace;
@@ -35,7 +34,6 @@ is($trace[0], 'add(1, 2)');
 
 $ebug = Devel::ebug->new;
 $ebug->program("corpus/calc_oo.pl");
-$ebug->backend("$^X bin/ebug_backend_perl");
 $ebug->load;
 $ebug->break_point("corpus/lib/Calc.pm", 19);
 
@@ -52,7 +50,6 @@ like($trace[0], qr{^fib1\("Calc=HASH\(.*\)", 14\)$});
 
 $ebug = Devel::ebug->new;
 $ebug->program("corpus/koremutake.pl");
-$ebug->backend("$^X bin/ebug_backend_perl");
 $ebug->load;
 
 $ebug->step;
@@ -62,7 +59,6 @@ is($trace[0], 'String::Koremutake->new()');
 
 $ebug = Devel::ebug->new;
 $ebug->program("corpus/koremutake.pl");
-$ebug->backend("$^X bin/ebug_backend_perl");
 $ebug->load;
 $ebug->break_point_subroutine("String::Koremutake::integer_to_koremutake");
 
@@ -73,7 +69,6 @@ like($trace[0], qr{^String::Koremutake::integer_to_koremutake\("String::Koremuta
 
 $ebug = Devel::ebug->new;
 $ebug->program("corpus/stack.pl");
-$ebug->backend("$^X bin/ebug_backend_perl");
 $ebug->load;
 $ebug->break_point_subroutine("main::show");
 

@@ -1,9 +1,9 @@
 package Sah::SchemaR::unix::signal;
 
-our $DATE = '2020-10-16'; # DATE
-our $VERSION = '0.013'; # VERSION
+our $DATE = '2021-07-22'; # DATE
+our $VERSION = '0.017'; # VERSION
 
-our $rschema = ["str",[{_=>undef,examples=>["HUP","INT","QUIT","ILL","ABRT","FPE","KILL","SEGV","PIPE","ALRM","TERM","USR1","USR2","CHLD","CONT","STOP","TSTP","TTIN","TTOU",1,2,3,4,5,6,7,8,9,10,11,12,13,14,15],match=>"\\A(?:[A-Z]+[0-9]*|[1-9][0-9]*)\\z",summary=>"Unix signal name (e.g. TERM or KILL) or number (9 or 15)"}],["str"]];
+our $rschema = ["str",[{_=>undef,examples=>["HUP","INT","QUIT","ILL","ABRT","FPE","KILL","SEGV","PIPE","ALRM","TERM","USR1","USR2","CHLD","CONT","STOP","TSTP","TTIN","TTOU",1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,{data=>"",valid=>0}],match=>"\\A(?:[A-Z]+[0-9]*|[1-9][0-9]*)\\z",summary=>"Unix signal name (e.g. TERM or KILL) or number (9 or 15)"}],["str"]];
 
 1;
 # ABSTRACT: Unix signal name (e.g. TERM or KILL) or number (9 or 15)
@@ -20,7 +20,7 @@ Sah::SchemaR::unix::signal - Unix signal name (e.g. TERM or KILL) or number (9 o
 
 =head1 VERSION
 
-This document describes version 0.013 of Sah::SchemaR::unix::signal (from Perl distribution Sah-Schemas-Unix), released on 2020-10-16.
+This document describes version 0.017 of Sah::SchemaR::unix::signal (from Perl distribution Sah-Schemas-Unix), released on 2021-07-22.
 
 =head1 DESCRIPTION
 
@@ -50,7 +50,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

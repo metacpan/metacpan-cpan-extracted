@@ -29,9 +29,9 @@ You shouldn't make instances of this class. Each attribute should be used as a n
 =head1 SYNOPSIS
 
     my $iam = Paws->service('IAM');
-    # To change the active status of a signing certificate for an IAM user
-    # The following command changes the status of a signing certificate for a
-    # user named Bob to Inactive.
+  # To change the active status of a signing certificate for an IAM user
+  # The following command changes the status of a signing certificate for a user
+  # named Bob to Inactive.
     $iam->UpdateSigningCertificate(
       'CertificateId' => 'TA7SMP42TDN5Z26OBPJE7EXAMPLE',
       'Status'        => 'Inactive',
@@ -58,8 +58,8 @@ consist of any upper or lowercased letter or digit.
 =head2 B<REQUIRED> Status => Str
 
 The status you want to assign to the certificate. C<Active> means that
-the certificate can be used for API calls to AWS C<Inactive> means that
-the certificate cannot be used.
+the certificate can be used for programmatic calls to AWS C<Inactive>
+means that the certificate cannot be used.
 
 Valid values are: C<"Active">, C<"Inactive">
 

@@ -1,9 +1,9 @@
 package Sah::SchemaR::unix::local_username;
 
-our $DATE = '2020-10-16'; # DATE
-our $VERSION = '0.013'; # VERSION
+our $DATE = '2021-07-22'; # DATE
+our $VERSION = '0.017'; # VERSION
 
-our $rschema = ["str",[{description=>"\nThe checking follows POSIX rules: does not begin with a hyphen and only contains\n[A-Za-z0-9._-].\n\nThe above rule allows integers like 1234, which can be confused with UID, so\nthis schema disallows pure integers.\n\nThe maximum length is 32 following libc6's limit.\n\n",examples=>[{valid=>0,value=>""},{valid=>1,value=>"foo"},{valid=>0,value=>"-andy"},{valid=>0,value=>1234},{valid=>1,value=>"andy2"},{valid=>0,value=>"an dy"},{valid=>1,value=>"an.dy"},{summary=>"Too long",value=>0}],match=>qr((?=\A[A-Za-z0-9._][A-Za-z0-9._-]{0,31}\z)(?=.*[A-Za-z._-])),max_len=>32,min_len=>1,summary=>"Unix account name"},{description=>"\nSupport coercion from UID.\n\n",prefilters=>["Unix::convert_uid_to_unix_user","Unix::check_unix_user_exists"],summary=>"Unix user name that must exist on the system"}],["unix::username","str"]];
+our $rschema = ["str",[{description=>"\nThe checking follows POSIX rules: does not begin with a hyphen and only contains\n[A-Za-z0-9._-].\n\nThe above rule allows integers like 1234, which can be confused with UID, so\nthis schema disallows pure integers.\n\nThe maximum length is 32 following libc6's limit.\n\n",examples=>[{valid=>0,value=>""},{valid=>1,value=>"foo"},{valid=>0,value=>"-andy"},{valid=>0,value=>1234},{valid=>1,value=>"andy2"},{valid=>0,value=>"an dy"},{valid=>1,value=>"an.dy"},{summary=>"Too long",valid=>0,value=>"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}],match=>qr((?=\A[A-Za-z0-9._][A-Za-z0-9._-]{0,31}\z)(?=.*[A-Za-z._-])),max_len=>32,min_len=>1,summary=>"Unix account name"},{description=>"\nSupport coercion from UID.\n\n",prefilters=>["Unix::convert_uid_to_unix_user","Unix::check_unix_user_exists"],summary=>"Unix user name that must exist on the system"}],["unix::username","str"]];
 
 1;
 # ABSTRACT: Unix user name that must exist on the system
@@ -20,7 +20,7 @@ Sah::SchemaR::unix::local_username - Unix user name that must exist on the syste
 
 =head1 VERSION
 
-This document describes version 0.013 of Sah::SchemaR::unix::local_username (from Perl distribution Sah-Schemas-Unix), released on 2020-10-16.
+This document describes version 0.017 of Sah::SchemaR::unix::local_username (from Perl distribution Sah-Schemas-Unix), released on 2021-07-22.
 
 =head1 DESCRIPTION
 
@@ -50,7 +50,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

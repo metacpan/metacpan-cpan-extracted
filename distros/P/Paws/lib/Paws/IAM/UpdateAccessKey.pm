@@ -29,9 +29,9 @@ You shouldn't make instances of this class. Each attribute should be used as a n
 =head1 SYNOPSIS
 
     my $iam = Paws->service('IAM');
-    # To activate or deactivate an access key for an IAM user
-    # The following command deactivates the specified access key (access key ID
-    # and secret access key) for the IAM user named Bob.
+ # To activate or deactivate an access key for an IAM user
+ # The following command deactivates the specified access key (access key ID and
+ # secret access key) for the IAM user named Bob.
     $iam->UpdateAccessKey(
       'AccessKeyId' => 'AKIAIOSFODNN7EXAMPLE',
       'Status'      => 'Inactive',
@@ -58,8 +58,8 @@ consist of any upper or lowercased letter or digit.
 =head2 B<REQUIRED> Status => Str
 
 The status you want to assign to the secret access key. C<Active> means
-that the key can be used for API calls to AWS, while C<Inactive> means
-that the key cannot be used.
+that the key can be used for programmatic calls to AWS, while
+C<Inactive> means that the key cannot be used.
 
 Valid values are: C<"Active">, C<"Inactive">
 

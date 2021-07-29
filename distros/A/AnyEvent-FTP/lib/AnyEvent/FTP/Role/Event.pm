@@ -6,7 +6,7 @@ use 5.010;
 use Moo::Role;
 
 # ABSTRACT: Event interface for AnyEvent::FTP objects
-our $VERSION = '0.16'; # VERSION
+our $VERSION = '0.17'; # VERSION
 
 
 sub define_events
@@ -51,20 +51,20 @@ AnyEvent::FTP::Role::Event - Event interface for AnyEvent::FTP objects
 
 =head1 VERSION
 
-version 0.16
+version 0.17
 
 =head1 SYNOPSIS
 
  package AnyEvent::FTP::Foo;
-
+ 
  use Moo;
  with 'AnyEvent::FTP::Role::Event';
  __PACKAGE__->define_events(qw( error good ));
-
+ 
  sub some_method
  {
    my($self) = @_;
-
+ 
    if($self->other_method)
    {
      $self->emit(good => 'paylod message');
@@ -78,7 +78,7 @@ version 0.16
 later on somewhere else
 
  use AnyEvent::FTP::Foo;
-
+ 
  my $foo = AnyEvent::FTP::Foo->new;
  $foo->on_good(sub {
    my($message) = @_;
@@ -88,7 +88,7 @@ later on somewhere else
    my($message) = @_;
    print "failed: $message";
  });
-
+ 
  $foo->some_method
 
 =head1 DESCRIPTION
@@ -139,7 +139,7 @@ José Joaquín Atria
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Graham Ollis.
+This software is copyright (c) 2017-2021 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

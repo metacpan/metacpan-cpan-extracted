@@ -16,21 +16,23 @@
 
 =encoding utf8
 
-=head1 Gemini Wiki Control
+=head1 NAME
 
-This script helps you maintain your Gemini Wiki installation.
+phoebe-ctl - Phoebe control
 
-=head2 Options
+=head1 DESCRIPTION
+
+This script helps you maintain your Phoebe installation.
 
 =over
 
-=item C<--wiki_dir=./wiki>
+=item B<--wiki_dir=>I<DIR>
 
 This the wiki data directory to use; the default is either the value of the
 C<GEMINI_WIKI_DATA_DIR> environment variable, or the C<./wiki> subdirectory. Use
 it to specify a space, too.
 
-=item C<--log=4>
+=item B<--log=>I<NUMBER>
 
 This is the log level to use. 1 only prints errors; 2 also prints warnings (this
 is the default); 3 prints any kind of information; 4 prints all sorts of info
@@ -40,22 +42,23 @@ the developer wanted to see as they were fixing bugs.
 
 =head2 Commands
 
-C<help>
+B<phoebe-ctl help>
 
 This is what you're reading right now.
 
-C<update-changes>
+B<phoebe-ctl update-changes>
 
 This command looks at all the pages in the F<page> directory and generates new
 entries for your changes log into F<changes.log>.
 
-C<erase-page>
+B<phoebe-ctl erase-page>
 
 This command removes pages from the F<page> directory, removes all the kept
 revisions in the F<keep> directory, and all the mentions in the F<change.log>.
 Use this if spammers and vandals created page names you want to eliminate.
 
-C<html-export> [--source=F<subdirectory> ...] [--target=F<directory>] [--no-extension]
+B<phoebe-ctl html-export> [B<--source=>F<subdirectory> ...]
+[B<--target=>F<directory>] [B<--no-extension>]
 
 This command converts all the pages in the subdirectories provided to HTML and
 writes the HTML files into the target directory. The subdirectories must exist
@@ -78,11 +81,13 @@ This will create HTML files in F</home/alex/transjovian.org>,
 F</home/alex/transjovian.org/phoebe>, F</home/alex/transjovian.org/gemini>, and
 F</home/alex/transjovian.org/titan>.
 
-Note that the links in these HTML do not include the F<.html> extension, so this
-relies on your web server doing the right thing: if you request C</foo it must
-serve F<foo.html> in the document root. If that doesn't work, perhaps using
-C<--no-extension> is your best bet: the HTML files will be written without the
-F<.html> extension.
+Note that the I<links> in these HTML files do not include the F<.html> extension
+(e.g. C</test>), so this relies on your web server doing the right thing: if a
+visitor requests C</test> the web server must serve F</test.html>. If that
+doesn't work, perhaps using C<--no-extension> is your best bet: the HTML files
+will be written without the F<.html> extension. This should also work for local
+browsing, although it does look strange, all those pages with the F<.html>
+extension.
 
 =cut
 

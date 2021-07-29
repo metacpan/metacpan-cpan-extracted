@@ -44,7 +44,7 @@
             "Test::More" : "0",
             "Text::Balanced" : "0",
             "Time::Piece" : "0",
-            "Yancy" : "1.067",
+            "Yancy" : "1.074",
             "perl" : "5.028"
          }
       },
@@ -64,91 +64,91 @@
    "provides" : {
       "Test::Zapp" : {
          "file" : "lib/Test/Zapp.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       },
       "Zapp" : {
          "file" : "lib/Zapp.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       },
       "Zapp::Controller::Plan" : {
          "file" : "lib/Zapp/Controller/Plan.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       },
       "Zapp::Controller::Run" : {
          "file" : "lib/Zapp/Controller/Run.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       },
       "Zapp::Controller::Trigger" : {
          "file" : "lib/Zapp/Controller/Trigger.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       },
       "Zapp::Formula" : {
          "file" : "lib/Zapp/Formula.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       },
       "Zapp::Task" : {
          "file" : "lib/Zapp/Task.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       },
       "Zapp::Task::Action" : {
          "file" : "lib/Zapp/Task/Action.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       },
       "Zapp::Task::Action::Confirm" : {
          "file" : "lib/Zapp/Task/Action/Confirm.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       },
       "Zapp::Task::GetOAuth2Token" : {
          "file" : "lib/Zapp/Task/GetOAuth2Token.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       },
       "Zapp::Task::Request" : {
          "file" : "lib/Zapp/Task/Request.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       },
       "Zapp::Task::SQL" : {
          "file" : "lib/Zapp/Task/SQL.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       },
       "Zapp::Task::Script" : {
          "file" : "lib/Zapp/Task/Script.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       },
       "Zapp::Task::Test" : {
          "file" : "lib/Zapp/Task/Test.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       },
       "Zapp::Trigger" : {
          "file" : "lib/Zapp/Trigger.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       },
       "Zapp::Trigger::Webhook" : {
          "file" : "lib/Zapp/Trigger/Webhook.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       },
       "Zapp::Type" : {
          "file" : "lib/Zapp/Type.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       },
       "Zapp::Type::File" : {
          "file" : "lib/Zapp/Type/File.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       },
       "Zapp::Type::SelectBox" : {
          "file" : "lib/Zapp/Type/SelectBox.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       },
       "Zapp::Type::Text" : {
          "file" : "lib/Zapp/Type/Text.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       },
       "Zapp::Type::Textarea" : {
          "file" : "lib/Zapp/Type/Textarea.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       },
       "Zapp::Util" : {
          "file" : "lib/Zapp/Util.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       }
    },
    "release_status" : "stable",
@@ -164,7 +164,7 @@
       },
       "x_IRC" : "irc://irc.libera.chat/#mojo-yancy"
    },
-   "version" : "0.004",
+   "version" : "0.005",
    "x_authority" : "cpan:PREACTION",
    "x_generated_by_perl" : "v5.28.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.06"

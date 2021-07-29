@@ -179,6 +179,8 @@ through only records that satisfy it. This might be used, for example,
 to specify `source=marc` to limit search result to only to those
 FOLIO instance records that were translated from MARC imports.
 
+See the section below on **Configuring filters**.
+
 ## `graphqlQuery`
 
 The name of a file, in the same directory as the main configuration
@@ -245,9 +247,7 @@ be mapped into MARC fields. It contains up to five elements:
     - `_callNumber`
     - `_callNumberPrefix`
     - `_callNumberSuffix`
-
-        \-item `_permanentLocation`
-
+    - `_permanentLocation`
     - `_holdingsLocation`
     - `_volume`
     - `_yearCaption`
@@ -347,6 +347,30 @@ This scheme allows us to handle several scenarios in a uniform way:
 - Basic configuration all in one place
 - Database-specific overrides, such as the FOLIO tenant and any customer-specific definition of ISBN searching (see issue ZF-24) in the database configuration, leaving the standard definition to apply to other tenants.
 - Application-specific overrides, such as those needed by the ABLE client (see issue ZF-25), specified only in a filter that is not used except when explicitly requested.
+
+# CONFIGURING FILTERS
+
+By design, the FOLIO Z39.50 server follows [the "Mechanism, Not Policy" approach](https://wiki.c2.com/?MechanismNotPolicy): it is not opinionated about what kinds of records should be returned, how holdings should be encoded in MARC, etc. — instead, it invites institutions to configure it according to their preference.
+
+In some cases, that preference is for suppressed-from-discovery records to be omitted. So the configuration needs to be set up accordingly. The way to do this is with the `queryFilter` configuration item, which is used to provide a query fragment that gets `and`ed with every query submitted by the client.
+
+The configuration file could be modified to include, at the top level:
+
+    "queryFilter": "cql.allRecords=1 NOT discoverySuppress=true"
+
+This could be done either in the top-level configuration, in a database-specific configuration, or in a filter configuration.
+
+When this was used this against a good-sized institution's test service, a search for "water" found 19395 records, as opposed to 39181 when the filter was not in place. Search time remained around one or two seconds.
+
+[A more rigorous filter](https://wiki.folio.org/display/FOLIOtips/Searching) can be used:
+
+    "queryFilter": "cql.allRecords=1 NOT discoverySuppress=true NOT holdingsItems.discoverySuppress=true NOT item.discoverySuppress=true"
+
+But as this is more complex, it has an impact on performance — as is the case when this query is used in the Inventory app's "query search". When this was used against the same institution's test service Chicago's test service, the "water" search came down to 19395 records, but it took nearly a minute to run.
+
+Or an intermediate version can be used that omits both suppressed instances and suppressed holdings, but not suppressed items. This got the result count down to 38791 — as one would expect, more than when only instances are suppress, but less then when items are also suppressed — and took two or three seconds.
+
+It's up to an individual installation to decide which trade-off best suits them. This trade-off may change as FOLIO's indexing changes: for example, if an index is added that makes the omit-instances-with-suppressed-items search much faster, that may become a more attractive option.
 
 # SEE ALSO
 

@@ -48,9 +48,16 @@ subtest humanize_getopt_long_opt_spec => sub {
     is(humanize_getopt_long_opt_spec('foo!'), '--(no)foo');
     is(humanize_getopt_long_opt_spec('foo|f!'), '--(no)foo, -f');
     is(humanize_getopt_long_opt_spec('foo=s'), '--foo=s');
+    is(humanize_getopt_long_opt_spec('foo=s@'), '(--foo=s)+');
+    is(humanize_getopt_long_opt_spec({value_label=>'filename'}, 'foo=s@'), '(--foo=filename)+');
+    is(humanize_getopt_long_opt_spec('foo=s%'), '(--foo key=s)+');
+    is(humanize_getopt_long_opt_spec({key_label=>'color', value_label=>'rgb'}, 'foo=s%'), '(--foo color=rgb)+');
     is(humanize_getopt_long_opt_spec('--foo=s'), '--foo=s');
     is(humanize_getopt_long_opt_spec('foo|bar=s'), '--foo=s, --bar');
     is(humanize_getopt_long_opt_spec('<>'), 'argument');
+
+    is_deeply(humanize_getopt_long_opt_spec({key_label=>'color', value_label=>'rgb', extended=>1}, 'foo=s%'),
+              {plaintext=>'(--foo color=rgb)+', pod=>'(B<--foo> I<color>=I<rgb>)+'});
 };
 
 DONE_TESTING:

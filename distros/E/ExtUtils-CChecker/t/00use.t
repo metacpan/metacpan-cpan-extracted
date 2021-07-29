@@ -1,6 +1,11 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
+use v5;
+use warnings;
 use strict;
-use Test::More tests => 1;
+
+use Test::More;
 
 use_ok( "ExtUtils::CChecker" );
+
+done_testing;

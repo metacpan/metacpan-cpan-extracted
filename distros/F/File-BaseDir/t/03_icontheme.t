@@ -1,10 +1,10 @@
-#!perl
 use strict;
-use warnings FATAL   => 'all';
+use warnings;
 use Test::More;
 use Config;
+use File::BaseDir;
 use File::IconTheme qw(xdg_icon_theme_search_dirs);
-require File::Spec;
+use File::Spec;
 use File::Temp qw();
 
 if ($^O eq 'MSWin32') {
@@ -24,8 +24,8 @@ $ENV{XDG_DATA_DIRS} = $dirs[1] . $Config{path_sep} . $dirs[2];
 is_deeply
     [xdg_icon_theme_search_dirs],
     [grep {-d $_ && -r $_}
-        File::Spec->catfile($ENV{HOME}, '.icons'),
+        File::Spec->catfile(File::BaseDir->_home, '.icons'),
         @icondirs,
         '/usr/share/pixmaps'
     ];
-    
+

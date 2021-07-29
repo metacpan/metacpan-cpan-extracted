@@ -224,6 +224,10 @@ A shared memory segment object must be first created with the L</open> method, b
 
 Set or get the boolean value to true to indicate you want to create the shared memory block if it does not exist already. Default to false.
 
+=head2 delete
+
+This is an alias for L</remove>
+
 =head2 destroy
 
 Set or get the boolean value to indicate that the shared memory should be automatically destroyed when the module object is destroyed. See L<perlmod> for more information about module object destruction.
@@ -375,9 +379,21 @@ The content is stored in shared memory after being encoded with L<Storable/freez
 
 Remove entire the shared memory identified with L</key>
 
+=head2 remove_semaphore
+
+Remove the semaphore associated with the shared memory.
+
 =head2 removed
 
 Returns true if the shared memory was removed, false otherwise.
+
+=head2 removed_semaphore
+
+Returns true if the semaphore has been removed, false otherwise.
+
+=head2 reset
+
+Reset the shared memory value. If a value is provided, it will be used as the new reset value, othewise an empty string will be used.
 
 =head2 semid
 
@@ -390,6 +406,10 @@ Returns the serial number used to create or access the shared memory segment.
 This serial is created based on the I<key> parameter provided either upon object instantiation or upon using the L</open> method.
 
 The serial is created by calling L<IPC::SysV/ftok> to provide a reliable and repeatable numeric identifier.
+
+=head2 shmstat
+
+Returns an C<Module::Generic::SharedStat> object representing the current shared memory properties.
 
 =head2 size
 

@@ -12,9 +12,10 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_OK
   PE_BADURL
   PE_SENDRESPONSE
+  URIRE
 );
 
-our $VERSION = '2.0.9';
+our $VERSION = '2.0.12';
 
 extends 'Lemonldap::NG::Portal::Main::Issuer',
   'Lemonldap::NG::Portal::Lib::CAS';
@@ -93,8 +94,7 @@ sub storeEnvAndCheckGateway {
         return PE_SENDRESPONSE;
     }
 
-    if ( $service and $service =~ m#^(https?://[^/]+)(/.*)?$# ) {
-        my ( $host, $uri ) = ( $1, $2 );
+    if ( $service and $service =~ URIRE ) {
         my $app = $self->getCasApp($service);
 
         if ($app) {
@@ -146,14 +146,22 @@ sub run {
 
         $self->logger->debug("URL $url detected as an CAS LOGIN URL");
 
-        # GET parameters
-        my $service = $self->p->getHiddenFormValue( $req, 'service' )
-          || $req->param('service');
+        my $cas_request = {};
+
+        foreach my $param (qw/service renew gateway/) {
+            $cas_request->{$param} =
+                 $self->p->getHiddenFormValue( $req, $param )
+              || $req->param($param);
+        }
+
+        my $h = $self->p->processHook( $req, 'casGotRequest', $cas_request );
+        return $h if ( $h != PE_OK );
+
+        my $service = $cas_request->{service};
         $service = '' if ( $self->p->checkXSSAttack( 'service', $service ) );
-        my $renew = $self->p->getHiddenFormValue( $req, 'renew' )
-          || $req->param('renew');
-        my $gateway = $self->p->getHiddenFormValue( $req, 'gateway' )
-          || $req->param('gateway');
+        my $renew   = $cas_request->{renew};
+        my $gateway = $cas_request->{gateway};
+
         my $casServiceTicket;
 
         # If no service defined, exit
@@ -281,6 +289,10 @@ sub run {
             $Sinfos->{_utime}  = $time;
             $Sinfos->{_casApp} = $app;
 
+            my $h = $self->p->processHook( $req, 'casGenerateServiceTicket',
+                $cas_request, $app, $Sinfos );
+            return $h if ( $h != PE_OK );
+
             my $casServiceSession = $self->getCasSession( undef, $Sinfos );
 
             unless ($casServiceSession) {
@@ -296,8 +308,9 @@ sub run {
         }
 
         # Redirect to service
-        my $service_url = $service;
-        $service_url .= ( $service =~ /\?/ ? '&' : '?' )
+        # cas_request may have been modified by hook
+        my $service_url = $cas_request->{service};
+        $service_url .= ( $service_url =~ /\?/ ? '&' : '?' )
           . build_urlencoded( ticket => $casServiceTicket );
 
         $self->logger->debug("Redirect user to $service_url");
@@ -542,6 +555,11 @@ sub validate {
 
     # Return success message
     $self->deleteCasSession($casServiceSession);
+
+    my $h =
+      $self->p->processHook( $req, 'casGenerateValidateResponse', $username );
+    return $self->returnCasValidateError() if ( $h != PE_OK );
+
     return $self->returnCasValidateSuccess( $req, $username );
 }
 
@@ -839,6 +857,12 @@ sub _validate2 {
 
     # Return success message
     $self->deleteCasSession($casServiceSession);
+
+    my $h =
+      $self->p->processHook( $req, 'casGenerateValidateResponse', $username,
+        $attributes );
+    return $self->returnCasValidateError() if ( $h != PE_OK );
+
     return $self->returnCasServiceValidateSuccess( $req, $username,
         $casProxyGrantingTicketIOU, $proxies, $attributes );
 }

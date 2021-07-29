@@ -1,5 +1,13 @@
 Revision history for Perl extension Getopt-EX
 
+v1.24.1 2021-07-25T13:27:05Z
+
+    - Require Getopt::Long 2.39 to rescure perl5.14.
+
+v1.24.0 2021-07-25T02:18:14Z
+
+    - Support storing options in hash object.
+
 v1.23.3 2021-06-25T02:27:41Z
 
     - Stop to use Moo in Numbers.pm.

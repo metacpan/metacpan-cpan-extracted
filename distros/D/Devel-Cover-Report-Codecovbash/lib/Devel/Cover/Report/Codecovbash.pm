@@ -12,7 +12,7 @@ use namespace::autoclean;
 use File::Spec;
 use JSON::MaybeXS qw( encode_json );
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 sub report {
     shift;
@@ -90,7 +90,7 @@ sub _get_line_coverage {
         if $branch && !$branch->[0]->error;
     return $branch->[0]->covered . '/' . $branch->[0]->total if $branch;
     return $statement unless $statement;
-    return if $statement->[0]->uncoverable;
+    return undef if $statement->[0]->uncoverable;
     return $statement->[0]->covered;
 }
 
@@ -110,7 +110,7 @@ Devel::Cover::Report::Codecovbash - Generate a JSON file to be uploaded with the
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 DESCRIPTION
 
@@ -135,21 +135,35 @@ Use the codecov bash script:
 
 =head1 SUPPORT
 
-Bugs may be submitted at L<https://github.com/houseabsolute/Devel-Cover-Report-Codecovbash/issues>.
-
 I am also usually active on IRC as 'autarch' on C<irc://irc.perl.org>.
 
 =head1 SOURCE
 
-The source code repository for Devel-Cover-Report-Codecovbash can be found at L<https://github.com/houseabsolute/Devel-Cover-Report-Codecovbash>.
+The source code repository for Devel-Cover-Report-Codecovbash can be found at L<https://github.com/perlpunk/Devel-Cover-Report-Codecovbash>.
 
 =head1 AUTHOR
 
+Tina Müller <tinita@cpan.org>
+
+=head1 CONTRIBUTORS
+
+=for stopwords Dave Rolsky Tina Müller
+
+=over 4
+
+=item *
+
 Dave Rolsky <autarch@urth.org>
+
+=item *
+
+Tina Müller <cpan2@tinita.de>
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by Pine Mizune.
+This software is Copyright (c) 2019 - 2021 by Pine Mizune.
 
 This is free software, licensed under:
 

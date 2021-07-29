@@ -1,0 +1,39 @@
+Support for PAR packaging
+=========================
+
+For consistency, CitrusPerl is used. Currently 5.24.1.
+
+linux
+-----
+
+  GNUmakefile : Makefile
+
+  Targets: ebshell (standalone binary)
+  	   ebwxshell (standalone binary)
+
+  ebwxshell.pp : pp options for ebwxshell
+		 (Linux, wxWidgets 3.0, all Wx libraries packaged)
+
+windows
+-------
+
+  ** Note: Make must be run from a CitrusTerm window.
+
+  Makefile : Makefile (dmake) for Microsoft Windows. Obsolete.
+  GNUmakefile : Makefile (gmake) for Microsoft Windows.
+
+  Targets: ebshell.exe (standalone binary)
+  	   ebwxshell.exe (standalone binary)
+
+  ebwxshell.pp : pp options for ebwxshell
+		(MSWindows, all Wx libraries packaged)
+
+common
+------
+
+  ebshell.pp : pp options for ebshell (generic)
+
+  ebwxshell.pp : pp options for ebwxshell (generic)
+
+
+

@@ -1,0 +1,34 @@
+NAME
+    App::DiffPDFText - Diff the text of two PDF documents
+
+VERSION
+    This document describes version 0.002 of App::DiffPDFText (from Perl
+    distribution App-DiffPDFText), released on 2021-07-17.
+
+SYNOPSIS
+    See the included script diff-pdf-text.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-DiffPDFText>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-DiffPDFText>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-DiffPDFText>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2021 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

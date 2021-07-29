@@ -391,45 +391,6 @@ package Math::GSL::Matrix;
 *gsl_matrix_hconcat = *Math::GSL::Matrixc::gsl_matrix_hconcat;
 *gsl_matrix_random = *Math::GSL::Matrixc::gsl_matrix_random;
 
-############# Class : Math::GSL::Matrix::gsl_complex_long_double ##############
-
-package Math::GSL::Matrix::gsl_complex_long_double;
-use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
-@ISA = qw( Math::GSL::Matrix );
-%OWNER = ();
-%ITERATORS = ();
-*swig_dat_get = *Math::GSL::Matrixc::gsl_complex_long_double_dat_get;
-*swig_dat_set = *Math::GSL::Matrixc::gsl_complex_long_double_dat_set;
-sub new {
-    my $pkg = shift;
-    my $self = Math::GSL::Matrixc::new_gsl_complex_long_double(@_);
-    bless $self, $pkg if defined($self);
-}
-
-sub DESTROY {
-    return unless $_[0]->isa('HASH');
-    my $self = tied(%{$_[0]});
-    return unless defined $self;
-    delete $ITERATORS{$self};
-    if (exists $OWNER{$self}) {
-        Math::GSL::Matrixc::delete_gsl_complex_long_double($self);
-        delete $OWNER{$self};
-    }
-}
-
-sub DISOWN {
-    my $self = shift;
-    my $ptr = tied(%$self);
-    delete $OWNER{$ptr};
-}
-
-sub ACQUIRE {
-    my $self = shift;
-    my $ptr = tied(%$self);
-    $OWNER{$ptr} = 1;
-}
-
-
 ############# Class : Math::GSL::Matrix::gsl_complex ##############
 
 package Math::GSL::Matrix::gsl_complex;
@@ -452,6 +413,45 @@ sub DESTROY {
     delete $ITERATORS{$self};
     if (exists $OWNER{$self}) {
         Math::GSL::Matrixc::delete_gsl_complex($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : Math::GSL::Matrix::gsl_complex_long_double ##############
+
+package Math::GSL::Matrix::gsl_complex_long_double;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( Math::GSL::Matrix );
+%OWNER = ();
+%ITERATORS = ();
+*swig_dat_get = *Math::GSL::Matrixc::gsl_complex_long_double_dat_get;
+*swig_dat_set = *Math::GSL::Matrixc::gsl_complex_long_double_dat_set;
+sub new {
+    my $pkg = shift;
+    my $self = Math::GSL::Matrixc::new_gsl_complex_long_double(@_);
+    bless $self, $pkg if defined($self);
+}
+
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        Math::GSL::Matrixc::delete_gsl_complex_long_double($self);
         delete $OWNER{$self};
     }
 }
@@ -2769,9 +2769,9 @@ sure if anyone wants these. Please speak up if you do and/or submit some patches
 
 =back
 
-You have to add the functions you want to use inside the qw /put_funtion_here /.
-You can also write use Math::GSL::Matrix qw/:all/ to use all avaible functions of the module.
-Other tags are also avaible, here is a complete list of all tags for this module :
+You have to add the functions you want to use inside the qw /put_function_here /.
+You can also write use Math::GSL::Matrix qw/:all/ to use all available functions of the module.
+Other tags are also available, here is a complete list of all tags for this module :
 
 =over 1
 
@@ -2787,7 +2787,7 @@ Other tags are also avaible, here is a complete list of all tags for this module
 
 =back
 
-For more informations on the functions, we refer you to the GSL offcial documentation
+For more informations on the functions, we refer you to the GSL official documentation
 L<http://www.gnu.org/software/gsl/manual/html_node/>
 
 
@@ -2855,7 +2855,7 @@ Jonathan "Duke" Leto <jonathan@leto.net> and Thierry Moisan <thierry.moisan@gmai
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2008-2020 Jonathan "Duke" Leto and Thierry Moisan
+Copyright (C) 2008-2021 Jonathan "Duke" Leto and Thierry Moisan
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

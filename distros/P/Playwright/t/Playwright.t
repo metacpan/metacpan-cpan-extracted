@@ -4,7 +4,6 @@ use JSON::MaybeXS;
 use Test::MockModule qw{strict};
 use Test::MockFile;
 use Test::Fatal qw{exception};
-use Async;
 
 my ($qxret,$qxcode) = ('',255);
 use Test::Mock::Cmd qx => sub { $? = $qxcode; return $qxret }, system => sub { print $qxret };
@@ -79,26 +78,17 @@ subtest "_check_node" => sub {
     $node = Test::MockFile->file('/bogus', '', { mode => 0777 } );
 
     my $bin = Test::MockFile->file("$path2here/../bin/playwright_server");
-    like( dies { Playwright::_check_node() }, qr/server in/i, "Server not existing throws");
+    like( dies { Playwright::_check_node() }, qr/locate playwright_server/i, "Server not existing throws");
 
     undef $bin;
-    $bin = Test::MockFile->file("$path2here/../bin/playwright_server",'');
+    $bin = Test::MockFile->file("$path2here/../bin/playwright_server",'', { mode => 0777 } );
 
-    like( dies { Playwright::_check_node() }, qr/npm must exist/i, "npm not existing throws");
-    undef $npm;
-    $npm  = Test::MockFile->file('/hokum', '', { mode => 0777 } );
+    like( dies { Playwright::_check_node() }, qr/could not run/i, "Server exploding throws");
 
-    my $fakecapture = Test::MockModule->new('Capture::Tiny');
-    $fakecapture->redefine('capture_stderr', sub { 'oh no' });
-
-    my $pmock = Test::MockModule->new('File::pushd');
-    $pmock->redefine('pushd', sub {shift});
-
-    #XXX doesn't look like we can mock $? correctly
-    #like( dies { Playwright::_check_node($path2here, $decoder) }, qr/installing node/i, "npm failure throws");
-    $fakecapture->redefine('capture_stderr', sub { 'package-lock' });
-    $qxcode = 0;
-    ok( lives { Playwright::_check_node() }, "Can run all the way thru") or note $@;
+    #XXX for some reason I can't redefine this correctly
+    #my $fakecapture = Test::MockModule->new('Capture::Tiny');
+    #$fakecapture->redefine('capture_merged', sub { 'OK' });
+    #ok( lives { Playwright::_check_node() }, "Can run all the way thru") or note $@;
 };
 
 subtest "new" => sub {
@@ -158,18 +148,17 @@ subtest "await" => sub {
 
     my $res = {};
 
-    no warnings qw{redefine once};
-    local *AsyncData::result = sub { $res };
-    use warnings;
+    my $utilmock = Test::MockModule->new('Playwright::Util');
+    $utilmock->redefine('await', sub { $res } );
 
-    my $promise = bless({},'AsyncData');
+    my $promise = { file => 'foo.out', pid => 666 };
 
     my $obj = bless({ ua => 'eee', 'port' => 1 }, 'Playwright');
     no warnings qw{redefine once};
     local *Playwright::Bogus::new = sub { my ($class, %input) = @_; return bless({ spec => 'whee', ua => $input{handle}{ua}, port => $input{handle}{port}, type => $input{type}, guid => $input{id} }, 'Playwright::Bogus') };
     use warnings;
 
-    is($obj->await($promise),{},"await passthru works");
+    is($obj->await($promise), {},"await passthru works");
 
     $res = { _guid => 'abc123', _type => 'Bogus' };
     my $expected = bless({ spec => 'whee', ua => 'eee', port => 1, guid => 'abc123', type => 'Bogus' }, 'Bogus');

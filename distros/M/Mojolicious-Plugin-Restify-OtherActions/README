@@ -1,0 +1,84 @@
+NAME
+    Mojolicious::Plugin::Restify::OtherActions - Mojolicious plug-in which
+    extends Restify with more actions
+
+VERSION
+    version 0.02
+
+SYNOPSIS
+        plugin 'Restify::OtherActions';
+
+DESCRIPTION
+    Extends Mojolicious::Plugin::Restify allowing to call other methods over
+    REST collection
+
+USAGE
+    When you create your controller (see Mojolicious::Plugin::Restify
+    documentation), you can use, as an example, this list method
+
+      sub list {
+        my $c               = shift;
+        my $query =  $c->stash('query');
+        return $c->$query if ($query);
+        ...your original list code ...
+      }
+
+    to redirect your call to an alternative $query method.
+
+    As an example, if your endpoint is "/accounts" then
+    "/accounts/list/my_method/other/parameters" is redirect to
+    "$c->my_method" and remaining url is available in "$c->stash->('opt')".
+
+    In addition to standard routes added by Mojolicious::Plugin::Restify, a
+    new route is added
+
+        # Pattern             Methods   Name                        Class::Method Name
+        # -------             -------   ----                        ------------------
+        # ....
+        # +/list/:query/*opt  GET       accounts_otheractions       Accounts::list
+
+Notes about Mojolicious::Plugin::Restify
+    This module extends Mojolicious::Plugin::Restify but solves also a
+    little bug in route naming.
+
+    In Mojolicious::Plugin::Restify /accounts and /accounts/:accounts_id
+    have the same name (accounts).
+
+    This module replace the second route appending "_id" so that in original
+    module where there is
+
+      # Pattern           Methods   Name                        Class::Method Name
+      # -------           -------   ----                        ------------------
+      # ...
+      #   +/:accounts_id  *         "accounts"
+
+    here there is
+
+      #   +/:accounts_id  *         "accounts_id".
+
+    There is a pull request in github repository for this little problem
+
+    <https://github.com/kwakwaversal/mojolicious-plugin-restify/pull/19>
+
+BUGS/CONTRIBUTING
+    Please report any bugs through the web interface at
+    <https://github.com/EmilianoBruni/Mojolicious-Plugin-Restify-OtherAction
+    s/issues> If you want to contribute changes or otherwise involve
+    yourself in development, feel free to fork the Git repository from
+    <https://github.com/EmilianoBruni/Mojolicious-Plugin-Restify-OtherAction
+    s/>.
+
+SUPPORT
+    You can find this documentation with the perldoc command too.
+
+        perldoc Mojolicious::Plugin::Restify::OtherActions
+
+AUTHOR
+    Emiliano Bruni <info@ebruni.it>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2021 by Emiliano Bruni.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

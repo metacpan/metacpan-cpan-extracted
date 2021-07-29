@@ -1,4 +1,4 @@
-#!/usr/bin/perl 
+#!/usr/bin/env perl
 #######################################################################################
 # 
 # This is tthe program that records the potted responses that are used in testing. 

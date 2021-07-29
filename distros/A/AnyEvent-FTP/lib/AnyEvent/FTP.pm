@@ -5,7 +5,7 @@ use warnings;
 use 5.010;
 
 # ABSTRACT: Simple asynchronous FTP client and server
-our $VERSION = '0.16'; # VERSION
+our $VERSION = '0.17'; # VERSION
 
 
 1;
@@ -22,13 +22,13 @@ AnyEvent::FTP - Simple asynchronous FTP client and server
 
 =head1 VERSION
 
-version 0.16
+version 0.17
 
 =head1 SYNOPSIS
 
  # For the client
  use AnyEvent::FTP::Client;
-
+ 
  # For the server
  use AnyEvent::FTP::Server;
 
@@ -161,7 +161,7 @@ José Joaquín Atria
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Graham Ollis.
+This software is copyright (c) 2017-2021 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -33,5 +33,19 @@ $(window).on("load", function() {
   modal.find('.remove2f').attr('epoch', epoch)
 })
 
+  // Set tab items (my applications, password, history, logout) tabbable
+  // (ie accessible via tab key)
+  // needed because of jquery-ui setting only active element tabbable
+  // (see #2561)
+  $('.nav-item').click(function() {
+    $('.nav-item').attr( "tabIndex", 0 );
+  });
+  $('.nav-item').focusin(function() {
+    $('.nav-item').attr( "tabIndex", 0 );
+  });
+  $('.nav-item').focusout(function() {
+    $('.nav-item').attr( "tabIndex", 0 );
+  });
+
 
 });

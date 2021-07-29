@@ -98,6 +98,7 @@ lib/Net/DNS/RR/ZONEMD.pm
 lib/Net/DNS/Text.pm
 lib/Net/DNS/Update.pm
 lib/Net/DNS/ZoneFile.pm
+LICENSE
 Makefile.PL
 MANIFEST			This list of files
 README
@@ -140,6 +141,7 @@ t/05-EUI48.t
 t/05-EUI64.t
 t/05-HINFO.t
 t/05-HIP.t
+t/05-HTTPS.t
 t/05-IPSECKEY.t
 t/05-ISDN.t
 t/05-L32.t
@@ -170,6 +172,7 @@ t/05-SOA.t
 t/05-SPF.t
 t/05-SRV.t
 t/05-SSHFP.t
+t/05-SVCB.t
 t/05-TKEY.t
 t/05-TLSA.t
 t/05-TSIG.t

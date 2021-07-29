@@ -3,40 +3,25 @@
 package Hash::DefHash;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-01-04'; # DATE
+our $DATE = '2021-07-21'; # DATE
 our $DIST = 'Hash-DefHash'; # DIST
-our $VERSION = '0.071'; # VERSION
+our $VERSION = '0.072'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
 
+use Regexp::Pattern::DefHash;
 use Scalar::Util qw(blessed);
 use String::Trim::More qw(trim_blank_lines);
 
 use Exporter qw(import);
 our @EXPORT = qw(defhash);
 
-our $re_prop = qr/\A[A-Za-z_][A-Za-z0-9_]*\z/;
-our $re_attr = qr/\A[A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z_][A-Za-z0-9_]*)*\z/;
-our $re_key  = qr/
-    \A(?:
-        # 1 = property
-        ([A-Za-z_][A-Za-z0-9_]*)
-        (?:
-            (?:
-                # 2 = attr
-                \. ([A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z_][A-Za-z0-9_]*)*)
-            ) |
-            (?:
-                # 3 = (LANG) shortcut
-                \(([A-Za-z]{2}(?:_[A-Za-z]{2})?)\)
-            )
-        )?
-    |
-        # 4 = attr without property
-        \.([A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z_][A-Za-z0-9_]*)*)
-    )\z/x;
+our $re_prop = $Regexp::Pattern::DefHash::RE{prop}{pat};
+our $re_attr = $Regexp::Pattern::DefHash::RE{attr}{pat};
+our $re_attr_part = $Regexp::Pattern::DefHash::RE{attr_part}{pat};
+our $re_key  = $Regexp::Pattern::DefHash::RE{key} {pat};
 
 sub defhash {
     # avoid wrapping twice if already a defhash
@@ -81,24 +66,16 @@ sub contents {
 
     my %props;
     for my $k (keys %$h) {
-        my ($p_prop, $p_attr, $p_lang, $p_attr_wo_prop) = $k =~ $re_key
+        my ($p_prop, $p_prop_of_attr, $p_attr) = $k =~ $re_key
             or die "Invalid hash key '$k'";
         my $v = $h->{$k};
         if (defined $p_prop) {
             next if $p_prop =~ /\A_/;
             $props{$p_prop} //= {};
-            if (defined $p_attr) {
-                next if $p_attr =~ /(?:\A|\.)_/;
-                $props{$p_prop}{$p_attr} = $v;
-            } elsif (defined $p_lang) {
-                $props{$p_prop}{"alt.lang.$p_lang"} = $v;
-            } else {
-                $props{$p_prop}{""} = $v;
-            }
+            $props{$p_prop}{''} = $v;
         } else {
-            next if $p_attr_wo_prop =~ /(?:\A|\.)_/;
-            $props{""} //= {};
-            $props{""}{$p_attr_wo_prop} = $v;
+            next if $p_attr =~ /(?:\A|\.)_/;
+            $props{$p_prop_of_attr // ""}{$p_attr} = $v;
         }
     }
     %props;
@@ -110,9 +87,9 @@ sub props {
 
     my %props;
     for my $k (keys %$h) {
-        my ($p_prop, $p_attr, $p_lang, $p_attr_wo_prop) = $k =~ $re_key
+        my ($p_prop, $p_prop_of_attr, $p_attr) = $k =~ $re_key
             or die "Invalid hash key '$k'";
-        next if defined $p_attr || $p_lang || defined $p_attr_wo_prop;
+        next unless defined $p_prop;
         next if $p_prop =~ /\A_/;
         $props{$p_prop}++;
     }
@@ -120,18 +97,79 @@ sub props {
 }
 
 sub prop {
-    my ($self, $prop) = @_;
+    my ($self, $prop, $opts) = @_;
+    $opts //= {};
+
+    my $opt_die = $opts->{die} // 1;
+    my $opt_mark_different_lang = $opts->{mark_different_lang} // 0;
     my $h = $self->{hash};
 
-    die "Property '$prop' not found" unless exists $h->{$prop};
-    $h->{$prop};
+    if ($opts->{alt}) {
+        my %alt = %{ $opts->{alt} };
+        my $default_lang = $self->default_lang;
+        $alt{lang} //= $default_lang;
+        my $has_v_different_lang;
+        my $v_different_lang;
+        my $different_lang;
+      KEY:
+        for my $k (keys %$h) {
+            my ($p_prop, $p_prop_of_attr, $p_attr) = $k =~ $re_key
+                or die "Invalid hash key '$k'";
+            my %prop_alt;
+            if (defined $p_prop) {
+                next unless $p_prop eq $prop;
+                %prop_alt = (lang=>$default_lang);
+            } else {
+                next unless $p_prop_of_attr eq $prop;
+                next unless $p_attr =~ /\Aalt\./;
+                my @attr_elems = split /\./, $p_attr;
+                shift @attr_elems; # the "alt"
+                while (my ($k2, $v2) = splice @attr_elems, 0, 2) {
+                    $prop_alt{$k2} = $v2;
+                }
+                $prop_alt{lang} //= $default_lang;
+            }
+
+            if ($opt_mark_different_lang) {
+                for my $an (keys %alt) {
+                    next if $an eq 'lang';
+                    next KEY unless defined $prop_alt{$an};
+                    next KEY unless $prop_alt{$an} eq $alt{$an};
+                }
+                if ($alt{lang} eq $prop_alt{lang}) {
+                    return $h->{$k};
+                } elsif (!$has_v_different_lang) {
+                    $has_v_different_lang = 1;
+                    $v_different_lang = $h->{$k};
+                    $different_lang = $prop_alt{lang};
+                }
+            } else {
+                for my $an (keys %alt) {
+                    next KEY unless defined $prop_alt{$an};
+                    next KEY unless $prop_alt{$an} eq $alt{$an};
+                }
+                return $h->{$k};
+            }
+        }
+
+        if ($opt_mark_different_lang && $has_v_different_lang) {
+            return "{$different_lang $v_different_lang}";
+        } else {
+            die "Property '$prop' (with requested alt ".join(".", %alt).") not found" if $opt_die;
+            return undef;
+        }
+    } else {
+        die "Property '$prop' not found" if !(exists $h->{$prop}) && $opt_die;
+        return $h->{$prop};
+    }
 }
 
 sub get_prop {
-    my ($self, $prop) = @_;
-    my $h = $self->{hash};
+    my ($self, $prop, $opts) = @_;
+    $opts = !defined($opts) ? {} : {%$opts};
 
-    $h->{$prop};
+    $opts->{die} = 0;
+    $self->prop($prop, $opts);
 }
 
 sub prop_exists {
@@ -182,12 +220,11 @@ sub del_all_props {
     my $h = $self->{hash};
 
     for my $k (keys %$h) {
-        my ($p_prop, $p_attr, $p_lang, $p_attr_wo_prop) = $k =~ $re_key
+        my ($p_prop, $p_prop_of_attr, $p_attr) = $k =~ $re_key
             or die "Invalid hash key '$k'";
         next if defined $p_prop && $p_prop =~ /\A_/;
         next if defined $p_attr && $p_attr =~ /(?:\A|\.)_/;
-        next if defined $p_attr_wo_prop && $p_attr_wo_prop =~ /(?:\A|\.)_/;
-        if (defined $p_attr || defined $p_lang || defined $p_attr_wo_prop) {
+        if (defined $p_attr) {
             delete $h->{$k} if $delattrs;
         } else {
             delete $h->{$k};
@@ -206,22 +243,14 @@ sub attrs {
 
     my %attrs;
     for my $k (keys %$h) {
-        my ($p_prop, $p_attr, $p_lang, $p_attr_wo_prop) = $k =~ $re_key
+        my ($p_prop, $p_prop_of_attr, $p_attr) = $k =~ $re_key
             or die "Invalid hash key '$k'";
-        $p_prop //= '';
+        next if defined $p_prop;
         my $v = $h->{$k};
-        if (defined $p_attr) {
-            next unless $prop eq $p_prop;
-            next if $p_attr =~ /(?:\A|\.)_/;
-            $attrs{$p_attr} = $v;
-        } elsif (defined $p_lang) {
-            next unless $prop eq $p_prop;
-            $attrs{"alt.lang.$p_lang"} = $v;
-        } elsif (defined $p_attr_wo_prop) {
-            next unless $prop eq '';
-            next if $p_attr_wo_prop =~ /(?:\A|\.)_/;
-            $attrs{$p_attr_wo_prop} = $v;
-        }
+        $p_prop_of_attr //= "";
+        next unless $p_prop_of_attr eq $prop;
+        next if $p_attr =~ /(?:\A|\.)_/;
+        $attrs{$p_attr} = $v;
     }
     %attrs;
 }
@@ -262,7 +291,7 @@ sub add_attr {
     if ($prop ne '') {
         die "Invalid property name '$prop'"  unless $prop =~ $re_prop;
     }
-    die "Invalid attribute name '$attr'" unless $attr =~ $re_attr;
+    die "Invalid attribute name '$attr'" unless $attr =~ $re_attr_part;
     my $k = "$prop.$attr";
     die "Attribute '$attr' for property '$prop' already exists"
         if exists($h->{$k});
@@ -277,7 +306,7 @@ sub set_attr {
     if ($prop ne '') {
         die "Invalid property name '$prop'"  unless $prop =~ $re_prop;
     }
-    die "Invalid attribute name '$attr'" unless $attr =~ $re_attr;
+    die "Invalid attribute name '$attr'" unless $attr =~ $re_attr_part;
     my $k = "$prop.$attr";
     if (exists($h->{$k})) {
         my $old = $h->{$k};
@@ -297,7 +326,7 @@ sub del_attr {
     if ($prop ne '') {
         die "Invalid property name '$prop'"  unless $prop =~ $re_prop;
     }
-    die "Invalid attribute name '$attr'" unless $attr =~ $re_attr;
+    die "Invalid attribute name '$attr'" unless $attr =~ $re_attr_part;
     my $k = "$prop.$attr";
     if (exists($h->{$k})) {
         return delete $h->{$k};
@@ -312,19 +341,12 @@ sub del_all_attrs {
     my $h = $self->{hash};
 
     for my $k (keys %$h) {
-        my ($p_prop, $p_attr, $p_lang, $p_attr_wo_prop) = $k =~ $re_key
+        my ($p_prop, $p_prop_of_attr, $p_attr) = $k =~ $re_key
             or die "Invalid hash key '$k'";
-        if (defined $p_attr) {
-            next unless $prop eq $p_prop;
-            next if $p_attr =~ /(?:\A|\.)_/;
-        } elsif ($p_lang) {
-            next unless $prop eq $p_prop;
-        } elsif (defined $p_attr_wo_prop) {
-            next unless $prop eq '';
-            next if $p_attr_wo_prop =~ /(?:\A|\.)_/;
-        } else {
-            next;
-        }
+        next if defined $p_prop;
+        $p_prop_of_attr //= "";
+        next if $p_attr =~ /(?:\A|\.)_/;
+        next unless $p_prop_of_attr eq $prop;
         delete $h->{$k};
     }
 }
@@ -373,32 +395,13 @@ sub tags {
 sub get_prop_lang {
     my ($self, $prop, $lang, $opts) = @_;
     my $h = $self->{hash};
-    $opts //= {};
+    $opts = !defined($opts) ? {} : {%$opts};
 
-    my $deflang = $self->default_lang;
-    $lang     //= $deflang;
-    my $mark    = $opts->{mark_different_lang} // 1;
-    #print "deflang=$deflang, lang=$lang, mark_different_lang=$mark\n";
-
-    my @k;
-    if ($lang eq $deflang) {
-        @k = ([$lang, $prop, 0]);
-    } else {
-        @k = ([$lang, "$prop.alt.lang.$lang", 0], [$deflang, $prop, $mark]);
-    }
-
-    for my $k (@k) {
-        #print "k=".join(", ", @$k)."\n";
-        my $v = $h->{$k->[1]};
-        if (defined $v) {
-            if ($k->[2]) {
-                my $has_nl = $v =~ s/\R\z//;
-                $v = "{$k->[0] $v}" . ($has_nl ? "\n" : "");
-            }
-            return trim_blank_lines($v);
-        }
-    }
-    return undef;
+    $opts->{die} //= 0;
+    $opts->{alt} //= {};
+    $opts->{alt}{lang} //= $lang;
+    $opts->{mark_different_lang} //= 1;
+    $self->prop($prop, $opts);
 }
 
 sub get_prop_all_langs {
@@ -424,7 +427,7 @@ Hash::DefHash - Manipulate defhash
 
 =head1 VERSION
 
-This document describes version 0.071 of Hash::DefHash (from Perl distribution Hash-DefHash), released on 2020-01-04.
+This document describes version 0.072 of Hash::DefHash (from Perl distribution Hash-DefHash), released on 2021-07-21.
 
 =head1 SYNOPSIS
 
@@ -514,6 +517,12 @@ This document describes version 0.071 of Hash::DefHash (from Perl distribution H
  # set value for alternative language
  $oldpropval = $dh->set_prop_lang($prop, $lang, $propval);
 
+=head1 CONTRIBUTOR
+
+=for stopwords Steven Haryanto
+
+Steven Haryanto <sharyanto@cpan.org>
+
 =head1 FUNCTIONS
 
 =head2 defhash([ $hash ]) => OBJ
@@ -602,13 +611,53 @@ e.g.:
 
 Usage:
 
- $val = $dh->prop($name);
+ $val = $dh->prop($prop [ , \%opts ]);
 
 Get property value, will die if property does not exist.
 
+Known options:
+
+=over
+
+=item * die
+
+Bool. Default true. Whether to die when requested property is not found.
+
+=item * alt
+
+Hashref.
+
+=item * mark_different_lang
+
+Bool. Default false. If set to true, then when a requested property is found but
+differs (only) in the language it will be returned but with a mark. For example,
+with this defhash:
+
+ {name=>"Chair", "name.alt.lang.id_ID"=>"Kursi"}
+
+then:
+
+ $dh->prop("name", {lang=>"fr_FR"});
+
+will die. But:
+
+ $dh->prop("name", {lang=>"fr_FR", mark_different_lang=>1});
+
+will return:
+
+ "{en_US Chair}"
+
+or:
+
+ "{id_ID Kursi}"
+
+=back
+
 =head2 get_prop
 
- $val = $dh->get_prop($name);
+Usage:
+
+ my $val = $dh->get_prop($prop [ , \%opts ]);
 
 Like L</prop>(), but will return undef if property does not exist.
 
@@ -656,6 +705,14 @@ Usage:
 
 =head2 get_prop_lang
 
+Usage:
+
+ my $val = $dh->get_prop_lang($prop, $lang [ , \%opts ]);
+
+This is just a special case for:
+
+ $dh->prop($prop, {alt=>{lang=>$lang}, mark_different_lang=>1, %opts});
+
 =head2 get_prop_all_langs
 
 =head2 set_prop_lang
@@ -686,7 +743,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2018, 2016, 2015, 2014, 2012 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2018, 2016, 2015, 2014, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

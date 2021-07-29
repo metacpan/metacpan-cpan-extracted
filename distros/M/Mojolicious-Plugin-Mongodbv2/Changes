@@ -1,0 +1,38 @@
+Changelog for Mojolicious-Plugin-Mongodbv2
+
+1.00 2021-07-13T15:37:44
+ - Switch to major release
+
+0.07 2021-07-13T15:34:30
+ - Update documentation
+
+0.06 2021-07-12T10:48:57
+ - [Minor] Added prereqs
+ - Try badge on one line
+
+0.05 2021-07-10T11:12:04
+ - [Minor] Rollback to manual badges
+ - [Minor] Add plugin for travis badge
+
+0.04 2021-07-10T10:40:03
+ - Add tests for alternative helper name
+ - [Minor] Use Starter::Git in dist.ini
+ - [Minor] Badge on same paragraph in documentation
+ - Add shield.io badges
+ - Add weaver.ini to put travis badge in correct place in documentation
+
+0.03 2021-07-09T16:43:06
+ - v0.03
+ - [Minor]: Removed author e license in documentation
+ - [Minor]: Changes in documentation for travis badge
+
+0.02 2021-07-09T16:13:35
+ - v0.02
+ - Add documentation
+ - [Minor] Changes must not be added to git
+ - Add Changes & README. Changed travis support
+
+0.01 2021-07-09T14:51:13
+ - Removed 00.load.t that is automatically added by Dist::Zilla.
+ - Add modules, tests and others
+ - Initial commit

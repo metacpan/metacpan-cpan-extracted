@@ -1,10 +1,10 @@
 {
-   "abstract" : "an app that serves a wiki as a Gemini and web site",
+   "abstract" : "a Gemini-based wiki",
    "author" : [
       "Alex Schroeder"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "agpl_3"
    ],
@@ -55,6 +55,6 @@
          "web" : "https://alexschroeder.ch/cgit/phoebe/about/"
       }
    },
-   "version" : 3,
+   "version" : 4,
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

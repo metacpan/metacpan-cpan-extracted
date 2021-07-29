@@ -1,9 +1,9 @@
 package Pod::Weaver::Plugin::Regexp::Pattern;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-09-14'; # DATE
+our $DATE = '2021-07-21'; # DATE
 our $DIST = 'Pod-Weaver-Plugin-Regexp-Pattern'; # DIST
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 use 5.010001;
 use Moose;
@@ -88,6 +88,9 @@ sub _process_module {
         for my $patname (@patnames) {
             my $patspec = $var->{$patname};
             push @pod, "=item * $patname\n\n";
+            if (defined $patspec->{tags}) {
+                push @pod, "Tags: ".(join ", ", @{ $patspec->{tags} })."\n\n";
+            }
             if (defined $patspec->{summary}) {
                 require String::PodQuote;
                 push @pod, String::PodQuote::pod_quote($patspec->{summary}), ".\n\n";
@@ -219,7 +222,7 @@ Pod::Weaver::Plugin::Regexp::Pattern - Plugin to use when building Regexp::Patte
 
 =head1 VERSION
 
-This document describes version 0.008 of Pod::Weaver::Plugin::Regexp::Pattern (from Perl distribution Pod-Weaver-Plugin-Regexp-Pattern), released on 2020-09-14.
+This document describes version 0.009 of Pod::Weaver::Plugin::Regexp::Pattern (from Perl distribution Pod-Weaver-Plugin-Regexp-Pattern), released on 2021-07-21.
 
 =head1 SYNOPSIS
 
@@ -276,7 +279,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2018, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2018, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

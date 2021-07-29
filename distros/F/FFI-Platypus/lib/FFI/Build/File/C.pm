@@ -11,7 +11,7 @@ use File::Path ();
 use FFI::Build::File::Object;
 
 # ABSTRACT: Class to track C source file in FFI::Build
-our $VERSION = '1.52'; # VERSION
+our $VERSION = '1.53'; # VERSION
 
 
 sub accept_suffix
@@ -186,7 +186,7 @@ FFI::Build::File::C - Class to track C source file in FFI::Build
 
 =head1 VERSION
 
-version 1.52
+version 1.53
 
 =head1 SYNOPSIS
 

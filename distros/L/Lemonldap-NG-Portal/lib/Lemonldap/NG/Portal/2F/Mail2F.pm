@@ -11,7 +11,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_MUSTHAVEMAIL
 );
 
-our $VERSION = '2.0.10';
+our $VERSION = '2.0.12';
 
 extends qw(
   Lemonldap::NG::Portal::Main::SecondFactor
@@ -82,8 +82,6 @@ sub run {
     }
 
     # Build mail content
-    my %tplPrms;
-    $tplPrms{MAIN_LOGO} = $self->conf->{portalMainLogo};
     my $tr      = $self->translate($req);
     my $subject = $self->conf->{mail2fSubject};
 
@@ -96,6 +94,11 @@ sub run {
 
         # We use a specific text message, no html
         $body = $self->conf->{mail2fBody};
+
+        # Replace variables in body
+        $body =~ s/\$code/$code/g;
+        $body =~ s/\$(\w+)/$req->{sessionInfo}->{$1} || ''/ge;
+
     }
     else {
 
@@ -104,14 +107,12 @@ sub run {
             $req,
             'mail_2fcode',
             filter => $tr,
-            params => \%tplPrms
+            params => {
+                code => $code,
+            },
         );
         $html = 1;
     }
-
-    # Replace variables in body
-    $body =~ s/\$code/$code/g;
-    $body =~ s/\$(\w+)/$req->{sessionInfo}->{$1} || ''/ge;
 
     # Send mail
     unless ( $self->send_mail( $dest, $subject, $body, $html ) ) {

@@ -1,4 +1,7 @@
-1.4.3  xx.xx.2021
+1.5.0  xx.xx.2021
+           - scalar's as_string/as_number now doesn't require SV to be Simple. It will stringify it anyway.
+           - add Scalar::auto_number()
+1.4.3  02.07.2021
            - callback dispatcher: support already weakened closured in add_weak()
            - fix compiler warnings
 1.4.2  23.05.2021

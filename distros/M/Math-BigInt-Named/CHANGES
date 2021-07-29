@@ -1,6 +1,27 @@
-Version history for Math::BigInt::Named:
+0.07 2021-07-17
 
-2016-12-03 v0.04 pjacklam
+ * Fix English names cf. CPAN RT #71259.
+
+0.06 2021-07-16
+
+ * Add support for Norwegian.
+
+ * Better argument processing and checking.
+
+ * Fix typo in English name ('twelf' -> 'twelve').
+
+0.05 2021-07-14
+
+ * Reorganize existing test files, and add more test files.
+
+ * The tests now require Test::More version 0.88 or newer.
+
+ * New MANIFEST.SKIP file based on the template in the ExtUtils-Manifest
+   distribution.
+
+ * Format CHANGES according to CPAN::Changes::Spec.
+
+0.04 2016-12-03 pjacklam
 
  * Use ExtUtils::MakeMaker rather than Module::Install in Makefile.PL
 
@@ -22,7 +43,7 @@ Version history for Math::BigInt::Named:
 
  * Inform that the TODO file is not up to date.
 
-2007-02-24 v0.03 Tels 181 tests
+0.03 2007-02-24 Tels 181 tests
 
  * modernize package (META.yml, SIGNATURE, etc.)
 
@@ -30,13 +51,10 @@ Version history for Math::BigInt::Named:
 
  * add POD tests
 
-2001-12-30 v0.02 Tels
+0.02 2001-12-30 Tels
 
  * added German and English (own subclass), some tests and some real code.
 
-2001-11-20 v0.01 Tels
+0.01 2001-11-20 Tels
 
  * first release
-
-Please send me test-reports, your experiences with this and your ideas - I love
-to hear about my work!

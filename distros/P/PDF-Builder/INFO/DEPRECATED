@@ -7,6 +7,12 @@ these deprecated usages before they disappear from PDF::Builder. Initially,
 the deprecated items MAY only be commented out (so they can be restored by a
 user in an emergency), but eventually they WILL be removed.
 
+CAUTION for maintainer: minimum 24 months after next RELEASE, not edit date!
+NOTE for maintainer: update t/deprecations.t with tests for both old 
+  (deprecated) and new interfaces. when REMOVE deprecated, move to "done" 
+  section here AND comment out that test in t/deprecations.t (but leave
+  replacement interface's test active).
+
 In order of scheduled removal date:
 
 elementsof()    method in a number of Basic/PDF/ routines
@@ -24,16 +30,23 @@ get_*box()      methods in Page.pm
    August, 2021.
 
 PDFStr()        method in Basic/PDF/Utils.pm
-   Use PDFString() instead. May be removed on or after October, 2022.
+   NOT scheduled to be removed, but use PDFString() instead. 
 
 PDFUtf()        method in Basic/PDF/Utils.pm
-   Use PDFString() instead. May be removed on or after October, 2022.
+   NOT scheduled to be removed, but use PDFString() instead. 
 
 lead()          method in Content.pm
    Use leading() instead. May be removed on or after March, 2023.
 
 textlead()      method in Lite.pm
    Use textleading() instead. May be removed on or after March, 2023.
+
+openpage()      method in Builder.pm
+   Use open_page() instead. May be removed on or after June, 2023.
+
+default()       method in Builder.pm
+   May be renamed in the future, as is flagged by Perl::Critic as reserved.
+   Use with caution.
 
 *** If I have missed any deprecated interfaces, please let me know! ***
 
@@ -54,12 +67,12 @@ hspace          method in Content.pm
    Misnamed, as it not an amount of horizontal space, but is a horizontal
    scaling factor. Use "hscale()" instead. A warning message is currently 
    given. Scheduled to be removed on or after August, 2019.
+   [Removed November, 2019]
 
    It is POSSIBLE that after hspace() is removed, a NEW hspace() might appear
    for the purpose of adding some amount of horizontal space to a line of text,
    but there are no firm plans at this point. If such a method is added before
    the old hspace() is cold and dead, it would have to get a different name.
-   [Removed November, 2019]
 
 linedash -full and -clear options   method in Content.pm
    The dash pattern setting hash options "-full" and "-clear" are deprecated in

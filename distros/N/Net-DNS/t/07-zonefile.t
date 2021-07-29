@@ -1,12 +1,12 @@
 #!/usr/bin/perl
-# $Id: 07-zonefile.t 1828 2020-12-24 15:33:41Z willem $	-*-perl-*-
+# $Id: 07-zonefile.t 1841 2021-06-23 20:34:28Z willem $	-*-perl-*-
 #
 
 use strict;
 use warnings;
 use IO::File;
 
-use Test::More tests => 91;
+use Test::More tests => 94;
 
 ## vvv	verbatim from Domain.pm
 use constant ASCII => ref eval {
@@ -18,8 +18,9 @@ use constant UTF8 => scalar eval {	## not UTF-EBCDIC  [see UTR#16 3.6]
 	Encode::encode_utf8( chr(182) ) eq pack( 'H*', 'C2B6' );
 };
 
-use constant LIBIDN2 => defined eval { require Net::LibIDN2 };
-use constant LIBIDN  => LIBIDN2 ? undef : defined eval { require Net::LibIDN };
+use constant LIBIDN2  => defined eval { require Net::LibIDN2 };
+use constant IDN2FLAG => LIBIDN2 ? &Net::LibIDN2::IDN2_NFC_INPUT + &Net::LibIDN2::IDN2_NONTRANSITIONAL : 0;
+use constant LIBIDN   => LIBIDN2 ? undef : defined eval { require Net::LibIDN };
 ## ^^^	verbatim from Domain.pm
 
 
@@ -351,24 +352,36 @@ hosta	A	192.0.2.1
 	     
 ; ^^^ line with white space
 	MX	10 hosta	; end of line comment
+	TXT	(string)	; redundant brackets
+	TXT	\(string\)
+	TXT	no\;comment
+	TXT	quoted\"quote
 
 	TXT	( multiline	; interspersed ( mischievously )
-		resource	; with	( confusing )
+		resource	; with	( possibly confusing )
 		record	)	; comments
-	TXT	(contig
-uous)
-	TXT	("quoted
-		string")
-	TXT	(string)
-	TXT	"(string)"
+
+	TXT	( contiguous
+string )			; excludes line terminator
+
+	TXT	( multiline
+		"quoted
+string" )			; includes line terminator
+
+	TXT	( "multiline
+quoted
+string" )			; includes line terminator
 EOF
-	is( $zonefile->read->name,    'hosta.example',		   'name of simple RR as expected' );
-	is( $zonefile->read->name,    'hosta.example',		   'name propagated from previous RR' );
-	is( $zonefile->read->txtdata, 'multiline resource record', 'multiline RR parsed correctly' );
-	is( $zonefile->read->txtdata, 'contiguous',		   'contiguous string reassembled' );
-	is( $zonefile->read->txtdata, 'quoted string',		   'quoted string reassembled' );
-	is( $zonefile->read->txtdata, 'string',			   'superfluous brackets ignored' );
-	is( $zonefile->read->txtdata, '(string)',		   'quoted brackets protected' );
+	is( $zonefile->read->name,     'hosta.example',		    'name of simple RR as expected' );
+	is( $zonefile->read->name,     'hosta.example',		    'name propagated from previous RR' );
+	is( $zonefile->read->rdstring, 'string',		    'redundant brackets ignored' );
+	is( $zonefile->read->rdstring, '"(string)"',		    'quoted brackets protected' );
+	is( $zonefile->read->rdstring, '"no;comment"',		    'quoted semicolon protected' );
+	is( $zonefile->read->rdstring, 'quoted\"quote',		    'quoted quote protected' );
+	is( $zonefile->read->rdstring, 'multiline resource record', 'multiline RR parsed correctly' );
+	is( $zonefile->read->rdstring, 'contiguousstring',	    'contiguous string reassembled' );
+	like( $zonefile->read->rdstring, '/quoted.*string$/', 'multiline string reassembled' );
+	like( $zonefile->read->rdstring, '/quoted.*string$/', 'quoted string reassembled' );
 }
 
 

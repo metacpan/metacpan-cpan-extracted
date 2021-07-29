@@ -46,6 +46,7 @@ do { my $x = {
                                       'List::Util' => '1.50',
                                       'Mojo::JSON::Pointer' => '0',
                                       'Mojo::URL' => '0',
+                                      'Mojolicious' => '7.23',
                                       'Ref::Util' => '0.100',
                                       'Scalar::Util' => '0',
                                       'Storable' => '0',

@@ -19,8 +19,8 @@ my $client = LLNG::Manager::Test->new( {
             passwordPolicyMinLower      => 0,
             passwordPolicyMinUpper      => 0,
             passwordPolicyMinDigit      => 0,
-            passwordPolicyMinSpeChar    => 2,
-            passwordPolicySpecialChar   => '',
+            passwordPolicyMinSpeChar    => 0,
+            passwordPolicySpecialChar   => '__ALL__',
             portalDisplayPasswordPolicy => 1
         }
     }

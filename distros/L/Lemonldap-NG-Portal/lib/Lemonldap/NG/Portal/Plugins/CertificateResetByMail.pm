@@ -31,7 +31,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_MAILCONFIRMATION_ALREADY_SENT
 );
 
-our $VERSION = '2.0.10';
+our $VERSION = '2.0.12';
 
 extends qw(
   Lemonldap::NG::Portal::Lib::SMTP
@@ -129,7 +129,7 @@ sub certificateReset {
 
 sub _certificateReset {
     my ( $self, $req ) = @_;
-    my ( $mailToken, %tplPrms );
+    my ($mailToken);
 
     # CertificatReset FORM => modifyCertificate()
     if ( $req->method =~ /^POST$/i
@@ -359,7 +359,6 @@ sub _certificateReset {
           );
 
         # Build mail content
-        $tplPrms{MAIN_LOGO} = $self->conf->{portalMainLogo};
         my $tr      = $self->translate($req);
         my $subject = $self->conf->{certificateResetByMailStep1Subject};
         unless ($subject) {
@@ -372,6 +371,13 @@ sub _certificateReset {
 
             # We use a specific text message, no html
             $body = $self->conf->{certificateResetByMailStep1Body};
+
+            # Replace variables in body
+            $body =~ s/\$expMailDate/$req->data->{expMailDate}/ge;
+            $body =~ s/\$expMailTime/$req->data->{expMailTime}/ge;
+            $body =~ s/\$url/$url/g;
+            $body =~ s/\$(\w+)/$req->{sessionInfo}->{$1} || ''/ge;
+
         }
         else {
 
@@ -380,16 +386,14 @@ sub _certificateReset {
                 $req,
                 'mail_certificateConfirm',
                 filter => $tr,
-                params => \%tplPrms
+                params => {
+                    expMailDate => $req->data->{expMailDate},
+                    expMailTime => $req->data->{expMailTime},
+                    url         => $url,
+                },
             );
             $html = 1;
         }
-
-        # Replace variables in body
-        $body =~ s/\$expMailDate/$req->data->{expMailDate}/ge;
-        $body =~ s/\$expMailTime/$req->data->{expMailTime}/ge;
-        $body =~ s/\$url/$url/g;
-        $body =~ s/\$(\w+)/$req->{sessionInfo}->{$1} || ''/ge;
 
         # Send mail
         unless (
@@ -420,7 +424,6 @@ sub _certificateReset {
 
 sub modifyCertificate {
     my ( $self, $req ) = @_;
-    my %tplPrms;
     my $nbio;
     my $x509;
     my $notAfter;
@@ -539,7 +542,6 @@ sub modifyCertificate {
         $req->{sessionInfo}->{ $self->conf->{mailSessionKey} } );
 
     # Build mail content
-    $tplPrms{MAIN_LOGO} = $self->conf->{portalMainLogo};
     my $tr      = $self->translate($req);
     my $subject = $self->conf->{certificateResetByMailStep2Subject};
     unless ($subject) {
@@ -552,6 +554,10 @@ sub modifyCertificate {
 
         # We use a specific text message, no html
         $body = $self->conf->{certificateResetByMailStep2Body};
+
+        # Replace variables in body
+        $body =~ s/\$(\w+)/$req->{sessionInfo}->{$1} || ''/ge;
+
     }
     else {
 
@@ -560,13 +566,10 @@ sub modifyCertificate {
             $req,
             'mail_certificateReset',
             filter => $tr,
-            params => \%tplPrms
+            params => {},
         );
         $html = 1;
     }
-
-    # Replace variables in body
-    $body =~ s/\$(\w+)/$req->{sessionInfo}->{$1} || ''/ge;
 
     # Send mail
     return PE_MAILERROR

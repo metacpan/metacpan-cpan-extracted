@@ -4,6 +4,7 @@ NAME
 SYNOPSIS
     For scripts that have no plan
 
+      use Test::More 'no_plan';
       use Test::NoWarnings;
 
     that's it, you don't need to do anything else
@@ -17,11 +18,21 @@ SYNOPSIS
       use Test::More tests => x + 1;
       use Test::NoWarnings;
 
+    For scripts that use done_testing, use:
+
+      use Test::More;
+      use Test::NoWarnings 'had_no_warnings';
+
+      ... # your actual tests
+
+      had_no_warnings;
+      done_testing;
+
 DESCRIPTION
     In general, your tests shouldn't produce warnings. This modules causes
     any warnings to be captured and stored. It automatically adds an extra
     test that will run when your script ends to check that there were no
-    warnings. If there were any warings, the test will give a "not ok" and
+    warnings. If there were any warnings, the test will give a "not ok" and
     diagnostics of where, when and what the warning was, including a stack
     trace of what was going on when the it occurred.
 
@@ -49,10 +60,13 @@ USAGE
     "clear_warnings", however, if you are doing this sort of thing then you
     probably want to use Test::Warn in combination with Test::NoWarnings.
 
+    If you have a test script written using done_testing and no test plan,
+    you have to call "had_no_warnings" before you call done_testing.
+
   use vs require
     You will almost always want to do
 
-      use Test::NoWarnings
+      use Test::NoWarnings;
 
     If you do a "require" rather than a "use", then there will be no
     automatic test at the end of your script.
@@ -61,12 +75,12 @@ USAGE
     If warning is captured during your test then the details will output as
     part of the diagnostics. You will get:
 
-    o the number and name of the test that was executed just before the
+    * the number and name of the test that was executed just before the
       warning (if no test had been executed these will be 0 and '')
 
-    o the message passed to "warn",
+    * the message passed to "warn",
 
-    o a full dump of the stack when warn was called, courtesy of the "Carp"
+    * a full dump of the stack when warn was called, courtesy of the "Carp"
       module
 
     By default, all warning messages will be emitted in one block at the end
@@ -132,10 +146,15 @@ PITFALLS
     When counting your tests for the plan, don't forget to include the test
     that runs automatically when your script ends.
 
+    Checking for warnings is done using $SIG{__WARN__}. If other modules use
+    this hook, it can interfere with this module's operation. For example,
+    using the Carp::Always module will cause this module to always report no
+    warnings.
+
 SUPPORT
     Bugs should be reported via the CPAN bug tracker at
 
-    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Test-NoWarnings>
+    <https://rt.cpan.org/Ticket/Create.html?Queue=Test-NoWarnings>
 
     For other issues, contact the author.
 
@@ -158,6 +177,6 @@ COPYRIGHT
     This program is free software and comes with no warranty. It is
     distributed under the LGPL license
 
-    See the file LGPL included in this distribution or
+    See the file LICENSE included in this distribution or
     http://www.fsf.org/licenses/licenses.html.
 

@@ -1,12 +1,13 @@
 package Desktop::Open;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-07-02'; # DATE
+our $DATE = '2021-07-05'; # DATE
 our $DIST = 'Desktop-Open'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use strict;
 use warnings;
+use Log::ger;
 
 require Exporter;
 our @ISA       = qw(Exporter);
@@ -26,7 +27,15 @@ sub open_desktop {
             if (File::Which::which("xdg-open")) {
                 system "xdg-open", $path_or_url;
                 $res = $?;
-                last if $res == 0;
+                my $exit_code = $? < 0 ? $? : $? >> 8;
+                last if $exit_code == 0 || $exit_code == 2; # 2 = file not found
+                # my xdg-open returns 4 instead of 2 when file is not found, so
+                # we test ourselves
+                if ($exit_code == 4 && $path_or_url !~ m!\A\w+://! && !(-e $path_or_url)) {
+                    log_trace "We changed xdg-open's exit code 4 to 2 since path $path_or_url does not exist";
+                    $res = 2 << 8;
+                    last;
+                }
             }
         }
 
@@ -51,7 +60,7 @@ Desktop::Open - Open a file or URL in the user's preferred application
 
 =head1 VERSION
 
-This document describes version 0.001 of Desktop::Open (from Perl distribution Desktop-Open), released on 2021-07-02.
+This document describes version 0.002 of Desktop::Open (from Perl distribution Desktop-Open), released on 2021-07-05.
 
 =head1 SYNOPSIS
 
@@ -69,7 +78,8 @@ application. Here's how it does it.
 1. If on Windows, use "start". If on other OS, use "xdg-open" if available.
 
 2. If #1 fails, resort to using L<Browser::Open>'s C<open_browser>. Return its
-return value.
+return value. An exception is if #1 fails with "file/URL does not exist" error,
+in which case we give up immediately.
 
 TODO: On OSX, use "openit". Any taker?
 

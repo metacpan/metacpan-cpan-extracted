@@ -1,0 +1,16 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/App/efm_perl.pm
+minil.toml
+script/efm-perl
+t/00_compile.t
+xt/01_podspell.t
+xt/02_perlcritic.t
+xt/03_pod.t
+xt/perlcriticrc
+META.yml
+MANIFEST

@@ -11,7 +11,7 @@ function Calculator () { return {
 
         this.bkpr.connect({
 
-            url:        CONFIG.url,       // "ws://localhost:8000/mqtt"
+            url:        CONFIG.url,       // "ws://localhost:18080/mqtt"
             username:   CONFIG.username,  // "frontend"
             password:   CONFIG.password,  // "abc123"
             debug:      CONFIG.debug,

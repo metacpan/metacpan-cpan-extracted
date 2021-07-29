@@ -21,23 +21,26 @@ perldoc command.
 
 You can also look for information at:
 
-    RT, CPAN's request tracker
-        http://rt.cpan.org/NoAuth/Bugs.html?Dist=bignum
+    GitHub
+        https://github.com/pjacklam/p5-bignum
 
-    AnnoCPAN, Annotated CPAN documentation
-        http://annocpan.org/dist/bignum
+    RT: CPAN's request tracker
+        https://rt.cpan.org/Dist/Display.html?Name=bignum
+
+    MetaCPAN
+        https://metacpan.org/release/bignum>
+
+    CPAN Testers Matrix
+        http://matrix.cpantesters.org/?dist=bignum
 
     CPAN Ratings
-        http://cpanratings.perl.org/d/bignum
-
-    Search CPAN
-        http://search.cpan.org/dist/bignum
+        https://cpanratings.perl.org/dist/bignum
 
 COPYRIGHT AND LICENCE
 
 Copyright 2002-2007 Tels, L<http://bloodgate.com>.
 
-Copyright 2014- Peter John Acklam L<pjacklam@online.no>.
+Copyright 2014- Peter John Acklam L<pjacklam@gmail.com>.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

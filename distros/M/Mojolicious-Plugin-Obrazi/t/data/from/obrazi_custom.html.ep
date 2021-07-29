@@ -6,9 +6,15 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <meta name="<%= $generator %>" />
         <title>Обраꙁи</title>
+        <script
+			  src="https://code.jquery.com/jquery-3.6.0.min.js"
+			  integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+			  crossorigin="anonymous"></script>
+        <link rel="stylesheet" href="https://unpkg.com/chota@latest">
     </head>
     <body>
         <h1>Обраꙁи</h1>
+        <link rel="stylesheet" href="<%== $css_file %>" />
         <section tabindex="0" class="obrazi">
 % my $cols     = int(12/2); #6
 % my $idx     = 0;
@@ -17,11 +23,12 @@
 %    my $images  = $processed->map(sub {my $img = shift; $cat->[0] eq $img->[0] ? $img : (); });
 %    next unless @$images;
 %    my $level = $cat->[1] =~ m|(/)|g;
-%    $level += 2; $idx++;
+%    $level += 1; $idx++;
 % if($cat->[2]) {
-        <h<%= $level %> data-index="<%= $idx %>"><%= $cat->[2] %></h<%= $level %>>
+        <h<%= $level %> class="primary button" id="cat<%= $idx %>" data-index="<%= $idx %>"><%= $cat->[2] %></h<%= $level %>>
 % }
-<section tabindex="<%= $idx %>" class="idx<%= $idx %> level<%= $level %>">
+<section tabindex="<%= $idx %>" class="idx<%= $idx %>" level<%= $level %>">
+<%= $app->t('p', $cat->[3]) if $cat->[3] %>
 %    while(my @row = splice @$images, 0, $cols) {
     <div class="row">
     %   for my $img(@row) { $img_idx++;
@@ -31,10 +38,9 @@
             style="background-image :url('<%= path($img->[1])->dirname->child($img->[-1])%>')">
             <div class="image" id="<%= $img_idx %>"
                 style="background-image: url('<%= path($img->[1])->dirname->child($img->[-2]) %>')">
-                <div class="prev-next">
                     <div data-index="<%= $img_idx %>" class="prev pull-left text-left text-light">⏴</div>
                     <div data-index="<%= $img_idx %>" class="next pull-right text-right text-light">⏵</div>
-                </div>
+		<h3 class="category text-right text-light"><%= $cat->[2] %></h3>
                 <div class="meta">
                     <h4><%= $img->[2] %></h4>
                     <p><%= $img->[3] %></p>
@@ -47,5 +53,6 @@
 </section>
 % } # end for @$categories
         </section><!-- end section class="obrazi"-->
+        <script src="<%= $js_file %>"></script>
     </body>
 </html>

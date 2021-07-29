@@ -9,7 +9,8 @@
 <style type="text/css">
 
 body {
-    padding: 10px; 
+    padding: 30px;
+    padding-left: 50px; 
     font-size: 11pt; 
     font-family: sans-serif;
 }
@@ -96,8 +97,10 @@ body {
 }
 
 #help {
+    float: left;
     padding: 20px;
-    padding-left: 10px;
+    margin-top: 20px;
+    margin-left: 20px;
 }
 
 #help i {
@@ -106,11 +109,19 @@ body {
 }
 
 #username {
+    font-size: 12pt; font-family: sans-serif;
     width: 130px;
+    padding: 6px;
+    border: solid 1px #999999;
+    border-radius: 4px;
 }
 
 #password {
+    font-size: 12pt; font-family: sans-serif;
     width: 130px;
+    padding: 6px;
+    border: solid 1px #999999;
+    border-radius: 4px;
 }
 
 </style>
@@ -119,14 +130,13 @@ body {
 <body>
 <div style="float:left">
 <input type="text" id="username" value="Joe" />
-<input type="password" id="password" value="12345" />
+<input type="password" id="password" value="123" />
 <input type="button" class="send" value="Login" onclick="chat.login_user()" />
 <div id="chat"></div>
 <input type="text" id="cmd" value="" />
 <input type="button" class="send" value="Send" onclick="chat.exec_command()" />
 </div>
 <div id="help">
-<br/>
 <p><strong>/pm <i>username</i> <i>message</i></strong><br/>Send private message</p>
 <p><strong>/logout</strong><br/>End user session</p>
 <p><strong>/kick <i>username</i></strong><br/>End another user session</p>

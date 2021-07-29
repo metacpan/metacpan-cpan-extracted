@@ -10,29 +10,29 @@
          "distname" : "Alien-GSL"
       },
       "old" : {
-         "prefix" : "/home/ollisg/opt/perl/5.34.0/lib/site_perl/5.34.0/x86_64-linux/auto/share/dist/Alien-GSL",
+         "prefix" : "/Users/ollisg/opt/perl/5.34.0/lib/site_perl/5.34.0/darwin-2level/auto/share/dist/Alien-GSL",
          "runtime" : {
             "alien_build_version" : "2.40",
-            "cflags" : "",
-            "cflags_static" : "",
-            "install_type" : "system",
+            "cflags" : "-I/Users/ollisg/opt/perl/5.34.0/lib/site_perl/5.34.0/darwin-2level/auto/share/dist/Alien-GSL/include ",
+            "cflags_static" : "-I/Users/ollisg/opt/perl/5.34.0/lib/site_perl/5.34.0/darwin-2level/auto/share/dist/Alien-GSL/include ",
+            "install_type" : "share",
             "legacy" : {
                "finished_installing" : 1,
-               "install_type" : "system",
+               "install_type" : "share",
                "name" : "gsl",
-               "original_prefix" : "/home/ollisg/opt/perl/5.34.0/lib/site_perl/5.34.0/x86_64-linux/auto/share/dist/Alien-GSL",
-               "version" : "2.5"
+               "original_prefix" : "/Users/ollisg/opt/perl/5.34.0/lib/site_perl/5.34.0/darwin-2level/auto/share/dist/Alien-GSL",
+               "version" : "2.7"
             },
-            "libs" : "-lgsl -lgslcblas -lm ",
-            "libs_static" : "-lgsl -lgslcblas -lm ",
-            "perl_module_version" : "1.01",
-            "prefix" : "/home/ollisg/opt/perl/5.34.0/lib/site_perl/5.34.0/x86_64-linux/auto/share/dist/Alien-GSL",
-            "version" : "2.5"
+            "libs" : "-L/Users/ollisg/opt/perl/5.34.0/lib/site_perl/5.34.0/darwin-2level/auto/share/dist/Alien-GSL/lib -lgsl -lgslcblas -lm ",
+            "libs_static" : "-L/Users/ollisg/opt/perl/5.34.0/lib/site_perl/5.34.0/darwin-2level/auto/share/dist/Alien-GSL/lib -lgsl -lgslcblas -lm ",
+            "perl_module_version" : "1.03",
+            "prefix" : "/Users/ollisg/opt/perl/5.34.0/lib/site_perl/5.34.0/darwin-2level/auto/share/dist/Alien-GSL",
+            "version" : "2.7"
          }
       },
       "patch" : null,
-      "root" : "/home/ollisg/dev/Alien-GSL/_alien",
-      "stage" : "/home/ollisg/dev/Alien-GSL/blib/lib/auto/share/dist/Alien-GSL",
+      "root" : "/Users/ollisg/dev/Alien-GSL/_alien",
+      "stage" : "/Users/ollisg/dev/Alien-GSL/blib/lib/auto/share/dist/Alien-GSL",
       "system_probe_class" : "Alien::Build::Plugin::PkgConfig::LibPkgConf",
       "system_probe_instance_id" : "71387b9465f1e8743dbed138dd448e27b2ec90fd"
    },

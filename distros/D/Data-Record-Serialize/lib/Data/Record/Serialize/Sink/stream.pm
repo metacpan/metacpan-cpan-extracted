@@ -7,7 +7,7 @@ use Moo::Role;
 
 use Data::Record::Serialize::Error { errors => [ '::create' ] }, -all;
 
-our $VERSION = '0.20';
+our $VERSION = '0.23';
 
 use IO::File;
 
@@ -33,12 +33,12 @@ has fh => (
 
 );
 
-#pod =for Pod::Coverage
-#pod  print
-#pod  say
-#pod  close
-#pod
-#pod =cut
+
+
+
+
+
+
 
 sub print { shift->fh->print( @_ ) }
 sub say   { shift->fh->say( @_ ) }
@@ -62,13 +62,15 @@ __END__
 
 =pod
 
+=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory
+
 =head1 NAME
 
 Data::Record::Serialize::Sink::stream - output encoded data to a stream.
 
 =head1 VERSION
 
-version 0.20
+version 0.23
 
 =head1 SYNOPSIS
 

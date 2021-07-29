@@ -2,8 +2,9 @@
 use warnings;
 use strict;
 
-use Test::More tests => 12;
+use Test::More tests => 16;
 
+use File::Temp qw(tempfile);
 use PDF::Builder;
 
 my $pdf = PDF::Builder->new();
@@ -92,5 +93,51 @@ $pdf = PDF::Builder->new('-compress' => 'none');
 $pdf->pageLabel(0, { -prefix => 'Test' });
 like($pdf->stringify(), qr{/PageLabels << /Nums \[ 0 << /P \(Test\) /S /D >> \] >>},
      q{Page Numbering: Decimal Characters (implicit), with prefix});
+
+## 
+## stringify
+##
+
+$pdf = PDF::Builder->new('-compress' => 'none');
+$gfx = $pdf->page()->gfx();
+$gfx->fillcolor('blue');
+
+$string = $pdf->stringify();
+like($string, qr/0 0 1 rg/,
+     q{Stringify of newly-created PDF contains expected content});
+
+my ($fh, $filename) = tempfile();
+print $fh $string;
+close $fh;
+
+$pdf = PDF::Builder->open($filename);
+$string = $pdf->stringify();
+like($string, qr/0 0 1 rg/,
+     q{Stringify of newly-opened PDF contains expected content});
+
+##
+## saveas with same filename
+## (in response to bug 134993, introduced by 113516, not yet in PDF::Builder)
+##
+
+$pdf = PDF::Builder->new(-compress => 'none');
+$gfx = $pdf->page->gfx();
+$gfx->fillcolor('blue');
+
+($fh, $filename) = tempfile();
+print $fh $pdf->stringify();
+close $fh;
+
+$pdf = PDF::Builder->open($filename, -compress => 'none');
+$gfx = $pdf->page->gfx();
+$gfx->fillcolor('red');
+$pdf->saveas($filename);
+
+$pdf = PDF::Builder->open($filename, -compress => 'none');
+$string = $pdf->stringify();
+like($string, qr/0 0 1 rg/,
+     q{saveas($opened_filename) contains original content});
+like($string, qr/1 0 0 rg/,
+     q{saveas($opened_filename) contains new content});
 
 1;

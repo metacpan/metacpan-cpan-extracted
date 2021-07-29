@@ -7,23 +7,13 @@ BEGIN {
 use strict;
 use warnings;
 #use lib::findbin '../lib'; # dev-only
-use Devel::ebug;
 use Devel::ebug::HTTP;
 
 # PODNAME: ebug_http
 # ABSTRACT: A simple, extensible web Perl debugger
-our $VERSION = '0.34'; # VERSION
+our $VERSION = '0.36'; # VERSION
 
-my $filename = shift;
-die "Usage: ebug_http filename\n" unless $filename;
-
-my $ebug = Devel::ebug->new();
-$ebug->program($filename);
-$ebug->load;
-$Devel::ebug::HTTP::ebug = $ebug;
-
-use Catalyst::ScriptRunner;
-Catalyst::ScriptRunner->run('Devel::ebug::HTTP', 'Server');
+Devel::ebug::HTTP::App->main;
 
 1;
 
@@ -39,7 +29,7 @@ ebug_http - A simple, extensible web Perl debugger
 
 =head1 VERSION
 
-version 0.34
+version 0.36
 
 =head1 SYNOPSIS
 

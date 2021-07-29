@@ -1,5 +1,40 @@
 Revision history for Object-Pad
 
+0.47    2021-07-29
+        [CHANGES]
+         * Large internal rewrites
+            + Split code among several smaller files instead of one giant
+              lib/Object/Pad.xs
+            + Rewrite the way that slot attributes work; allow an
+              externally-visible plugin-type system of hooks
+         * Removed `->param_name` and `->has_param` MOP::Slot accessors
+
+        Developement time for this release was sponsored by Perl-Verein Schweiz
+
+0.46    2021-07-21
+        [CHANGES]
+         * Accept reader, writer, mutator and weak as `->add_slot` parameters
+         * Document the `O:P:MOP::Class->begin_class` method
+         * Add `O:P:MOP::Class->begin_role`
+         * Enable `-DDEBUGGING` if building via debugperl
+
+        Development time for this release was sponsored by Deriv
+
+0.45    2021-07-17
+        [BUGFIXES]
+         * Don't give role embedding information a pad name or
+           Future::AsyncAwait will break it (RT137649)
+         * Make sure that `parammeta->is_weak` is initialised even for params
+           applied via roles (RT137751)
+
+0.44    2021-07-15
+        [CHANGES]
+         * Added `:weak` slot attribute
+         * Adjusted some documentation headings for better generation of HTML
+           anchors on metacpan.org
+
+        Development time for this release was sponsored by Oetiker+Partner AG
+
 0.43    2021-07-03
         [CHANGES]
          * Initial implementation of `ADJUST` blocks, without params

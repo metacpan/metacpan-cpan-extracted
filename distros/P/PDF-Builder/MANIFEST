@@ -1,10 +1,12 @@
 # This file is manually maintained
 .perlcriticrc
-.perl-version
 Changes
 CONTRIBUTING
 Makefile.PL
 MANIFEST
+META.json
+META.yml
+optional_update.pl
 README.md
 tools/1_pc.pl
 tools/2_t-tests.pl
@@ -67,11 +69,12 @@ examples/Boxes.pl
 examples/Bspline.pl
 examples/Content.pl
 examples/ContentText.pl
+examples/examples.output
 examples/HarfBuzz.pl
+examples/README
 examples/RMtutorial.pl
 examples/Rotated.pl
-examples/examples.output
-examples/README
+examples/ShowFont.pl
 examples/Windows/027_winfont
 examples/Windows/Win32.pm
 lib/PDF/Builder.pm
@@ -220,6 +223,7 @@ t/deprecations.t
 t/extgstate.t
 t/filter-ascii85decode.t
 t/filter-asciihexdecode.t
+t/filter-lzwdecode.t
 t/filter-runlengthdecode.t
 t/font-corefont.t
 t/font-synfont.t
@@ -244,5 +248,3 @@ t/string.t
 t/text.t
 t/tiff.t
 t/viewer-preferences.t
-META.yml                                 Module YAML meta-data (added by MakeMaker)
-META.json                                Module JSON meta-data (added by MakeMaker)

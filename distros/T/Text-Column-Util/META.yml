@@ -28,7 +28,7 @@ resources:
   bugtracker: https://github.com/perlancar/perl-Text-Column-Util/issues
   homepage: https://metacpan.org/release/Text-Column-Util
   repository: git://github.com/perlancar/perl-Text-Column-Util.git
-version: '0.004'
+version: '0.005'
 x_Dist_Zilla:
   perl:
     version: '5.030000'

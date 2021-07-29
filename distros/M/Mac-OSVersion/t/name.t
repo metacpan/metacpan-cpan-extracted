@@ -1,4 +1,4 @@
-use Test::More 'no_plan';
+use Test::More 1.0;
 
 my $class  = 'Mac::OSVersion';
 my $method = 'name';
@@ -11,3 +11,5 @@ can_ok( $class, $method );
 my ($major, $minor, $point, $name ) = $class->version;
 
 is( $class->$method, $name, "Name matches [$name]" );
+
+done_testing();

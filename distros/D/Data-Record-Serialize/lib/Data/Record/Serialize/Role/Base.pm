@@ -4,7 +4,7 @@ package Data::Record::Serialize::Role::Base;
 
 use Moo::Role;
 
-our $VERSION = '0.20';
+our $VERSION = '0.23';
 
 use Data::Record::Serialize::Error { errors => [ 'fields' ] }, -all;
 
@@ -17,29 +17,29 @@ use POSIX ();
 
 use namespace::clean;
 
-#pod =attr C<types>
-#pod
-#pod A hash or array mapping input field names to types (C<N>, C<I>,
-#pod C<S>).  If an array, the fields will be output in the specified
-#pod order, provided the encoder permits it (see below, however).  For example,
-#pod
-#pod   # use order if possible
-#pod   types => [ c => 'N', a => 'N', b => 'N' ]
-#pod
-#pod   # order doesn't matter
-#pod   types => { c => 'N', a => 'N', b => 'N' }
-#pod
-#pod If C<fields> is specified, then its order will override that specified
-#pod here.
-#pod
-#pod To understand how this attribute works in concert with L</fields> and
-#pod L</default_type>, please see L</Fields and their types>.
-#pod
-#pod =method has_types
-#pod
-#pod returns true if L</types> has been set.
-#pod
-#pod =cut
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 has types => (
     is  => 'rwp',
@@ -51,50 +51,50 @@ has types => (
     },
 );
 
-#pod =attr C<default_type> I<type>
-#pod
-#pod If set, output fields whose types were not
-#pod specified via the C<types> attribute will be assigned this type.
-#pod To understand how this attribute works in concert with L</fields> and
-#pod L</types>, please see L</Fields and their types>.
-#pod
-#pod =cut
+
+
+
+
+
+
+
+
 
 has default_type => (
     is  => 'ro',
     isa => Enum [qw( N I S )] | Undef,
 );
 
-#pod =attr C<fields>
-#pod
-#pod Which fields to output.  It may be one of:
-#pod
-#pod =over
-#pod
-#pod =item *
-#pod
-#pod An array containing the input names of the fields to be output. The
-#pod fields will be output in the specified order, provided the encoder
-#pod permits it.
-#pod
-#pod =item *
-#pod
-#pod The string C<all>, indicating that all input fields will be output.
-#pod
-#pod =item *
-#pod
-#pod Unspecified or undefined.
-#pod
-#pod =back
-#pod
-#pod To understand how this attribute works in concert with L</types> and
-#pod L</default_type>, please see L<Data::Record::Serialize/Fields and their types>.
-#pod
-#pod =method has_fields
-#pod
-#pod returns true if L</fields> has been set.
-#pod
-#pod =cut
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 has fields => (
     is      => 'rwp',
@@ -123,14 +123,14 @@ has _fieldh => (
 );
 
 
-#pod =method B<output_fields>
-#pod
-#pod   $array_ref = $s->output_fields;
-#pod
-#pod The names of the transformed output fields, in order of output (not
-#pod obeyed by all encoders);
-#pod
-#pod =cut
+
+
+
+
+
+
+
+
 
 has output_fields => (
     is      => 'lazy',
@@ -183,45 +183,45 @@ has _numify => (
 );
 
 
-#pod =attr nullify
-#pod
-#pod Specify which fields should be set to C<undef> if they are
-#pod empty. Sinks should encode C<undef> as the C<null> value.  By default,
-#pod no fields are nullified.
-#pod
-#pod B<nullify> may be passed:
-#pod
-#pod =over
-#pod
-#pod =item *  an array
-#pod
-#pod It should be a list of input field names.  These names are verified
-#pod against the input fields after the first record is read.
-#pod
-#pod =item * a code ref
-#pod
-#pod The coderef is passed the object, and should return a list of input
-#pod field names.  These names are verified against the input fields after
-#pod the first record is read.
-#pod
-#pod =item * a boolean
-#pod
-#pod If true, all field names are added to the list. When false, the list
-#pod is emptied.
-#pod
-#pod =back
-#pod
-#pod During verification, a
-#pod C<Data::Record::Serialize::Error::Role::Base::fields> error is thrown
-#pod if non-existent fields are specified.  Verification is I<not>
-#pod performed until the next record is sent (or the L</nullified> method
-#pod is called), so there is no immediate feedback.
-#pod
-#pod =method has_nullify
-#pod
-#pod returns true if L</nullify> has been set.
-#pod
-#pod =cut
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 has nullify => (
@@ -231,21 +231,21 @@ has nullify => (
     trigger   => sub { $_[0]->_clear_nullify },
 );
 
-#pod =method nullified
-#pod
-#pod   $fields = $obj->nullified;
-#pod
-#pod Returns a list of fields which are checked for empty values (see L</nullify>).
-#pod
-#pod This will return C<undef> if the list is not yet available (for example, if
-#pod fields names are determined from the first output record and none has been sent).
-#pod
-#pod If the list of fields is available, calling B<nullified> may result in
-#pod verification of the list of nullified fields against the list of
-#pod actual fields.  A disparity will result in an exception of class
-#pod C<Data::Record::Serialize::Error::Role::Base::fields>.
-#pod
-#pod =cut
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 sub nullified {
 
@@ -301,44 +301,44 @@ has _nullify => (
 );
 
 
-#pod =method B<numeric_fields>
-#pod
-#pod   $array_ref = $s->numeric_fields;
-#pod
-#pod The input field names for those fields deemed to be numeric.
-#pod
-#pod =cut
+
+
+
+
+
+
+
 
 sub numeric_fields { return $_[0]->type_index->{'numeric'} }
 
-#pod =method B<type_index>
-#pod
-#pod   $hash = $s->type_index;
-#pod
-#pod A hash, keyed off of field type or category.  The values are
-#pod an array of field names.  I<Don't edit this!>.
-#pod
-#pod The hash keys are:
-#pod
-#pod =over
-#pod
-#pod =item C<I>
-#pod
-#pod =item C<N>
-#pod
-#pod =item C<S>
-#pod
-#pod =item C<numeric>
-#pod
-#pod C<N> and C<I>.
-#pod
-#pod =item C<not_string>
-#pod
-#pod Everything but C<S>.
-#pod
-#pod =back
-#pod
-#pod =cut
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 has type_index => (
     is       => 'ro',
@@ -365,15 +365,15 @@ has type_index => (
     },
 );
 
-#pod =method B<output_types>
-#pod
-#pod   $hash_ref = $s->output_types;
-#pod
-#pod The mapping between output field name and output field type.  If the
-#pod encoder has specified a type map, the output types are the result of
-#pod that mapping.
-#pod
-#pod =cut
+
+
+
+
+
+
+
+
+
 
 has output_types => (
     is       => 'lazy',
@@ -420,35 +420,35 @@ has _map_types => (
     predicate => 1,
 );
 
-#pod =attr C<format_fields>
-#pod
-#pod A hash mapping the input field names to either a C<sprintf> style
-#pod format or a coderef. This will be applied prior to encoding the
-#pod record, but only if the C<format> attribute is also set.  Formats
-#pod specified here override those specified in C<format_types>.
-#pod
-#pod The coderef will be called with the value to format as its first
-#pod argument, and should return the formatted value.
-#pod
-#pod =cut
+
+
+
+
+
+
+
+
+
+
+
 
 has format_fields => (
     is  => 'ro',
     isa => HashRef [Str | CodeRef],
 );
 
-#pod =attr C<format_types>
-#pod
-#pod A hash mapping a field type (C<N>, C<I>, C<S>) to a C<sprintf> style
-#pod format or a coderef.  This will be applied prior to encoding the
-#pod record, but only if the C<format> attribute is also set.  Formats
-#pod specified here may be overridden for specific fields using the
-#pod C<format_fields> attribute.
-#pod
-#pod The coderef will be called with the value to format as its first
-#pod argument, and should return the formatted value.
-#pod
-#pod =cut
+
+
+
+
+
+
+
+
+
+
+
+
 
 has format_types => (
     is  => 'ro',
@@ -458,12 +458,12 @@ has format_types => (
 );
 
 
-#pod =attr C<rename_fields>
-#pod
-#pod A hash mapping input to output field names.  By default the input
-#pod field names are used unaltered.
-#pod
-#pod =cut
+
+
+
+
+
+
 
 has rename_fields => (
     is     => 'ro',
@@ -483,12 +483,12 @@ has rename_fields => (
 );
 
 
-#pod =attr C<format>
-#pod
-#pod If true, format the output fields using the formats specified in the
-#pod C<format_fields> and/or C<format_types> options.  The default is false.
-#pod
-#pod =cut
+
+
+
+
+
+
 
 has format => (
     is      => 'ro',
@@ -545,10 +545,10 @@ has _format => (
     init_arg => undef,
 );
 
-#pod =for Pod::Coverage
-#pod   BUILD
-#pod
-#pod =cut
+
+
+
+
 
 sub BUILD {
 
@@ -660,95 +660,21 @@ __END__
 
 =pod
 
+=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory
+
 =head1 NAME
 
 Data::Record::Serialize::Role::Base - Base Role for Data::Record::Serialize
 
 =head1 VERSION
 
-version 0.20
+version 0.23
 
 =head1 DESCRIPTION
 
 C<Data::Record::Serialize::Role::Base> is the base role for
 L<Data::Record::Serialize>.  It serves the place of a base class, except
 as a role there is no overhead during method lookup
-
-=head1 METHODS
-
-=head2 has_types
-
-returns true if L</types> has been set.
-
-=head2 has_fields
-
-returns true if L</fields> has been set.
-
-=head2 B<output_fields>
-
-  $array_ref = $s->output_fields;
-
-The names of the transformed output fields, in order of output (not
-obeyed by all encoders);
-
-=head2 has_nullify
-
-returns true if L</nullify> has been set.
-
-=head2 nullified
-
-  $fields = $obj->nullified;
-
-Returns a list of fields which are checked for empty values (see L</nullify>).
-
-This will return C<undef> if the list is not yet available (for example, if
-fields names are determined from the first output record and none has been sent).
-
-If the list of fields is available, calling B<nullified> may result in
-verification of the list of nullified fields against the list of
-actual fields.  A disparity will result in an exception of class
-C<Data::Record::Serialize::Error::Role::Base::fields>.
-
-=head2 B<numeric_fields>
-
-  $array_ref = $s->numeric_fields;
-
-The input field names for those fields deemed to be numeric.
-
-=head2 B<type_index>
-
-  $hash = $s->type_index;
-
-A hash, keyed off of field type or category.  The values are
-an array of field names.  I<Don't edit this!>.
-
-The hash keys are:
-
-=over
-
-=item C<I>
-
-=item C<N>
-
-=item C<S>
-
-=item C<numeric>
-
-C<N> and C<I>.
-
-=item C<not_string>
-
-Everything but C<S>.
-
-=back
-
-=head2 B<output_types>
-
-  $hash_ref = $s->output_types;
-
-The mapping between output field name and output field type.  If the
-encoder has specified a type map, the output types are the result of
-that mapping.
 
 =head1 ATTRIBUTES
 
@@ -866,6 +792,82 @@ field names are used unaltered.
 
 If true, format the output fields using the formats specified in the
 C<format_fields> and/or C<format_types> options.  The default is false.
+
+=head1 METHODS
+
+=head2 has_types
+
+returns true if L</types> has been set.
+
+=head2 has_fields
+
+returns true if L</fields> has been set.
+
+=head2 B<output_fields>
+
+  $array_ref = $s->output_fields;
+
+The names of the transformed output fields, in order of output (not
+obeyed by all encoders);
+
+=head2 has_nullify
+
+returns true if L</nullify> has been set.
+
+=head2 nullified
+
+  $fields = $obj->nullified;
+
+Returns a list of fields which are checked for empty values (see L</nullify>).
+
+This will return C<undef> if the list is not yet available (for example, if
+fields names are determined from the first output record and none has been sent).
+
+If the list of fields is available, calling B<nullified> may result in
+verification of the list of nullified fields against the list of
+actual fields.  A disparity will result in an exception of class
+C<Data::Record::Serialize::Error::Role::Base::fields>.
+
+=head2 B<numeric_fields>
+
+  $array_ref = $s->numeric_fields;
+
+The input field names for those fields deemed to be numeric.
+
+=head2 B<type_index>
+
+  $hash = $s->type_index;
+
+A hash, keyed off of field type or category.  The values are
+an array of field names.  I<Don't edit this!>.
+
+The hash keys are:
+
+=over
+
+=item C<I>
+
+=item C<N>
+
+=item C<S>
+
+=item C<numeric>
+
+C<N> and C<I>.
+
+=item C<not_string>
+
+Everything but C<S>.
+
+=back
+
+=head2 B<output_types>
+
+  $hash_ref = $s->output_types;
+
+The mapping between output field name and output field type.  If the
+encoder has specified a type map, the output types are the result of
+that mapping.
 
 =for Pod::Coverage BUILD
 

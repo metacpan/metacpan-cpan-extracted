@@ -60,12 +60,12 @@ if (1) { # new since 2017 (Ostkreuz, Suedringkurve)
 	'Treptower Park Warschauer Str.';
 }
 
-if (1) { # new since 2020
+if (1) { # new since 2020, Museumsinsel new since 2021
     my $routing = $graph->routing_for('Stadtmitte', 'Rotes Rathaus');
     my($best_route) = $routing->ordered_routes;
     my $line_stations = $best_route->line_stations;
     is join(", ", map { $_->station->name } @$line_stations),
-	'Stadtmitte, Unter den Linden, Unter den Linden, Rotes Rathaus';
+	'Stadtmitte, Unter den Linden, Unter den Linden, Museumsinsel, Rotes Rathaus';
 }
 
 __END__

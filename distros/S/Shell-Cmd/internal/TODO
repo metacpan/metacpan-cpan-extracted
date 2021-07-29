@@ -1,3 +1,5 @@
+Check String::ShellQuote for (perhaps) better quoting.
+
 Add the ability to add command prefix for every type of echoing.
 
 When running in script mode, take:

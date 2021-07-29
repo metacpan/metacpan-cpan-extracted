@@ -1,0 +1,42 @@
+NAME
+    Sah::Manual - Documentation for Sah
+
+VERSION
+    This document describes version 0.002 of Sah::Manual (from Perl
+    distribution Sah-Manual), released on 2021-07-28.
+
+DESCRIPTION
+    There are several frameworks that follow the Sah specification,
+    including Data::Sah, Params::Sah, and a few others, each framework
+    having its own documentation. This distribution contains additional,
+    mostly cross-framework documentation.
+
+    The documentation is organized around the concept of "four types of
+    documentation". See <https://documentation.divio.com/> for more details.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Sah-Manual>.
+
+SOURCE
+    Source repository is at <https://github.com/perlancar/perl-Sah-Manual>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Sah-Manual>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Sah
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2021 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

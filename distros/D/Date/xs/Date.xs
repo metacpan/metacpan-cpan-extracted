@@ -192,8 +192,8 @@ Date* date_ymd (...) {
     RETVAL = new Date(xs_date_ymd(&ST(0), items));
 }
 
-bool range_check (Simple newval = Simple()) {
-    if (newval) Date::range_check(newval.defined() && newval.is_true());
+bool range_check (Sv newval = {}) {
+    if (newval) Date::range_check(newval.is_true());
     RETVAL = Date::range_check();
 }
 

@@ -16,11 +16,11 @@ small {font-size: 90%;}
 </STYLE>
 </HEAD>
 <BODY>
-<H1 ALIGN="center">Win32::SqlServer 2.012</H1>
+<H1 ALIGN="center">Win32::SqlServer 2.013</H1>
 <UL>
 <P>This is Win32::SqlServer, a module for calling Microsoft SQL Server from Perl
   through OLE DB. </P>
-<P> Copyright © 2004-2019 Erland Sommarskog.
+<P> Copyright © 2004-2021 Erland Sommarskog.
   All rights reserved.</P>
 <P> This program is free software; you can redistribute it and/or modify it under
   the same terms as Perl itself. </P>
@@ -36,10 +36,10 @@ verbose code. A special feature of Win32::SqlServer is that you get fine-grained
   run on Unix &#8211; or any other non-Windows OS for that matter.</P>
 <H3>Prerequisites</H3>
 <UL>
-  <LI> Perl 5.20 or later. </LI>
+  <LI> Perl 5.12 or later. (That is what the <CODE>require</CODE> says. However, I don't aim to support older versions than Perl 5.24)</LI>
   <LI>Windows 7 SP1 or later (Client O/S), Windows Server 2008 R2 SP1 or later (Server O/S). Depending on which compiler you use to build the module, you may need to install  the update in <A HREF="https://support.microsoft.com/en-us/help/2999226/update-for-universal-c-runtime-in-windows">KB2999226</A> if you are on versions before Windows 10.</LI>
-  <LI> SQL Server 7 or later. Note that Windows Azure SQL Database has not been tested.</LI>
-  <LI> An OLE DB provider for SQL Server. SQLOLEDB comes with the OS, but it is very outdated. I recommend downloading and installing <A HREF="http://www.microsoft.com/download/details.aspx?id=56730">Microsoft OLE DB Driver for SQL Server</A>, originally released in March 2018. I recommend that you use version 18.2.1 (which is the current of this writing) or later.</LI>
+  <LI> SQL Server 2000 or later. The module should work with Azure SQL Database and Azure Managed Instance, but I have not tested against these platforms.</LI>
+  <LI> An OLE DB provider for SQL Server. SQLOLEDB comes with the OS, but it is very outdated. I recommend downloading and installing <A HREF="http://www.microsoft.com/download/details.aspx?id=56730">Microsoft OLE DB Driver for SQL Server</A>, originally released in March 2018. I recommend that you use version 18.2.1 or later.</LI>
 </UL>
 <P>For details, see the <A HREF="Win32-SqlServer.html#Prerequisites">Prerequisites</A> section in the Win32::SqlServer manual.</P>
 <P>Prerequisites for building, see below under <A HREF="#build_src">Building from
@@ -47,11 +47,8 @@ Sources</A>.</P>
 <H3>Support for Older Platforms</H3>
 <P>If you need support for older platforms than listed above, you can use an older version of Win32::SqlServer as follows:</P>
 <UL>
-  <LI>For support for Perl 5.18, use <A HREF="http://www.sommarskog.se/mssqlperl/Win32-SqlServer-2.011.zip">version 2.011</A> of Win32::SqlServer.</LI>
   <LI>To able to connect to SQL 7, use <A HREF="http://www.sommarskog.se/mssqlperl/Win32-SqlServer-2.011.zip">version 2.011</A> of Win32::SqlServer.</LI>
-  <LI>For support for Perl 5.12, 5.14 or 5.16, use <A HREF="http://www.sommarskog.se/mssqlperl/Win32-SqlServer-2.010.zip">version 2.010</A> of Win32::SqlServer.</LI>
   <LI>For support for older operating systems (Windows XP, Windows 2003, Windows 2000), use <A HREF="http://www.sommarskog.se/mssqlperl/Win32-SqlServer-2.010.zip">version 2.010</A> of Win32::SqlServer.</LI>
-  <LI>For support for Perl 5.8 or 5.10, you can use <A HREF="http://www.sommarskog.se/mssqlperl/Win32-SqlServer-2.008.zip">version 2.008</A> of Win32::SqlServer.</LI>
   <LI>To connect to SQL Server 6.5, use <A HREF="http://www.sommarskog.se/mssqlperl/Win32-SqlServer-2.008.zip">version 2.008</A> of Win32::SqlServer.</LI>
 </UL>
 <H3>What&#39;s in This Kit</H3>
@@ -82,7 +79,7 @@ I usually try to respond within 24-48 hours, but if I am on holiday I am.</P>
 (The link is the current as of this writing. Microsoft often twitches things
 around, so you have to search for it.)</LI>
 <LI> The SDK (header files and link libraries) for <A HREF="http://www.microsoft.com/download/details.aspx?id=56730">Microsoft OLE DB Driver for SQL Server</A>. Note that the SDK files are not installed by default when you install the provider.</LI>
-<LI>Perl 5.18 or later. </LI>
+<LI>Perl 5.12 or later (but beware that I have not tested any earlier version than Perl 5.24.)</LI>
 <LI> A C++ compiler, preferably Visual C++ 14.0 or later. If you don&#39;t have
   Visual Studio, the Windows SDK (see above), comes with one. I have only tested with the C++ compiler from Visual Studio 2017.</LI>
 <LI> A make facility. Microsoft&#39;s NMAKE also
@@ -117,7 +114,7 @@ prompt.</P>
 </OL>
 <HR />
 <I>
-Last updated <!--$$Modtime:--> 19-07-21 14:54 <!-- $-->
+Last updated <!--$$Modtime:--> 21-07-12 23:18 <!-- $-->
 </I>
 </BODY>
 </HTML>

@@ -10,6 +10,7 @@ my %modules;
 my $post_diag;
 
 $modules{$_} = $_ for qw(
+  Config::INI::Reader
   Data::Section
   Dist::Zilla
   Dist::Zilla::Plugin::AutoMetaResources
@@ -25,6 +26,7 @@ $modules{$_} = $_ for qw(
   Dist::Zilla::Plugin::Run::BeforeBuild
   Dist::Zilla::Role::PluginBundle::Easy
   Dist::Zilla::Role::TextTemplate
+  Dist::Zilla::Util::AuthorDeps
   Dist::Zilla::Util::CurrentCmd
   ExtUtils::MakeMaker
   File::ShareDir::Dist

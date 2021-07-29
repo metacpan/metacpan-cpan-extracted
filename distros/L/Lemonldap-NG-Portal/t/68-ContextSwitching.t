@@ -287,12 +287,14 @@ ok(
     'POST switchcontext'
 );
 
-# Refresh cookie value
-$id = expectCookie($res);
+# Get cookie value
+my $id1 = expectCookie($res);
+ok( $id1 ne $id, 'New SSO session created' )
+  or explain( $id1, 'New SSO session created' );
 ok(
     $res = $client->_get(
         '/',
-        cookie => "lemonldap=$id",
+        cookie => "lemonldap=$id1",
         accept => 'text/html'
     ),
     'Get Menu',
@@ -305,35 +307,37 @@ ok( $res->[2]->[0] =~ m%<span trspan="contextSwitching_OFF">%,
 ok(
     $res = $client->_get(
         '/switchcontext',
-        cookie => "lemonldap=$id",
+        cookie => "lemonldap=$id1",
         accept => 'text/html'
     ),
     'Stop context switching',
 );
+count(2);
 
-# Refresh cookie value
-my $id1 = expectCookie($res);
+# Get cookie value
+my $id0 = expectCookie($res);
+ok( $id0 eq $id, 'New SSO session created' )
+  or explain( $id0, 'New SSO session created' );
 ok(
     $res = $client->_get(
         '/',
-        cookie => "lemonldap=$id1",
+        cookie => "lemonldap=$id",
         accept => 'text/html'
     ),
     'Get Menu',
 );
-count(3);
 expectAuthenticatedAs( $res, 'dwho' );
 ok( $res->[2]->[0] =~ m%<span trspan="contextSwitching_ON">%,
     'Found trspan="contextSwitching_ON"' )
   or explain( $res->[2]->[0], 'trspan="contextSwitching_ON"' );
-count(1);
+count(4);
 
 # ContextSwitching form -> PE_OK
 # ------------------------
 ok(
     $res = $client->_get(
         '/switchcontext',
-        cookie => "lemonldap=$id1",
+        cookie => "lemonldap=$id",
         accept => 'text/html'
     ),
     'ContextSwitching form',
@@ -349,16 +353,20 @@ ok(
     $res = $client->_post(
         '/switchcontext',
         IO::String->new($query),
-        cookie => "lemonldap=$id1",
+        cookie => "lemonldap=$id",
         length => length($query),
         accept => 'text/html',
     ),
     'POST switchcontext'
 );
+count(3);
 
 # Refresh cookie value
 my $id2 = expectCookie($res);
-$client->logout($id1);
+ok( $id2 ne $id, 'New SSO session created' )
+  or explain( $id2, 'New SSO session created' );
+
+$client->logout($id);
 
 ok(
     $res = $client->_get(
@@ -382,7 +390,7 @@ ok(
     ),
     'Stop context switching',
 );
-count(6);
+count(4);
 
 ok( $res->[2]->[0] =~ m%<span trmsg="1">%, 'Found PE_SESSIONEXPIRED' )
   or explain( $res->[2]->[0], 'Session expired' );

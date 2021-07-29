@@ -6,8 +6,8 @@ use utf8;
 # Author          : Johan Vromans
 # Created On      : Sun Oct  4 15:11:05 2009
 # Last Modified By: Johan Vromans
-# Last Modified On: Wed Feb 19 14:50:46 2014
-# Update Count    : 113
+# Last Modified On: Mon Oct  9 10:45:52 2017
+# Update Count    : 114
 # Status          : Unknown, Use with caution!
 
 package main;
@@ -147,11 +147,6 @@ sub generate_config {
       ( $cfg->std_config, undef, $opts,
 	sub {
 	    my ( $self, $fd ) = @_;
-	    if ( $opts->{lang} ) {
-		print { $fd } ("[locale]\n");
-		printf { $fd } ( $fmt, "lang", $opts->{lang} );
-		print { $fd } ("\n");
-	    }
 	    print { $fd } ("[database]\n");
 	    printf { $fd } ( $fmt, "name", $opts->{db_naam} );
 	    foreach ( qw( driver host port user password path ) ) {
@@ -241,12 +236,12 @@ EOD
 		print { $fd } ( <<'EOD' );
 #   btw_ih	de rekening voor BTW boekingen voor inkopen, hoog tarief
 #   btw_il	idem, laag tarief
+#   btw_ip	idem, privé tarief
+#   btw_ia	idem, ander tarief
 #   btw_vh	idem, verkopen, hoog tarief
 #   btw_vl	idem, laag tarief
-#   btw_ph	idem, privé, hoog tarief
-#   btw_pl	idem, laag tarief
-#   btw_ah	idem, anders, hoog tarief
-#   btw_al	idem, laag tarief
+#   btw_vp	idem, privé tarief
+#   btw_va	idem, ander tarief
 #   btw_ok	rekening voor de betaalde BTW
 EOD
 	    }

@@ -1,5 +1,8 @@
 Revision history for Prometheus-Tiny
 
+0.008     2021-07-21 14:27:16+10:00 Australia/Melbourne
+- Add enum support
+
 0.007     2021-06-04 09:57:21+10:00 Australia/Melbourne
 - Ensure that a metric is not redeclared with different metadata
 

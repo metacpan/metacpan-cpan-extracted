@@ -15,6 +15,9 @@ WriteMakefile1(
                 web => 'https://github.com/FGasper/p5-Promise-ES6/issues',
             },
         },
+        recommends => {
+            'Future::AsyncAwait' => 0.47,
+        },
     },
 
     NAME         => 'Promise::ES6',

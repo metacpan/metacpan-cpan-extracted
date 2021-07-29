@@ -21,23 +21,26 @@ perldoc command.
 
 You can also look for information at:
 
-    RT, CPAN's request tracker
-        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Math-BigRat
+    GitHub
+        https://github.com/pjacklam/p5-Math-BigRat
 
-    AnnoCPAN, Annotated CPAN documentation
-        http://annocpan.org/dist/Math-BigRat
+    RT: CPAN's request tracker
+        https://rt.cpan.org/Dist/Display.html?Name=Math-BigRat
+
+    MetaCPAN
+        https://metacpan.org/release/Math-BigRat
+
+    CPAN Testers Matrix
+        http://matrix.cpantesters.org/?dist=Math-BigRat
 
     CPAN Ratings
-        http://cpanratings.perl.org/d/Math-BigRat
-
-    Search CPAN
-        http://search.cpan.org/dist/Math-BigRat
+        https://cpanratings.perl.org/dist/Math-BigRat
 
 COPYRIGHT AND LICENCE
 
 Copyright 2001-2008 Tels, L<http://bloodgate.com>.
 
-Copyright 2011- Peter John Acklam L<pjacklam@online.no>.
+Copyright 2011- Peter John Acklam L<pjacklam@gmail.com>.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

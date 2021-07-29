@@ -39,35 +39,28 @@ sub multi_repo_find {
     );
 }
 
-SKIP: {
-    {
-        (my $bzip2exe) = Env::Path->PATH->Whence('bzip2');
-        skip "bzip2 required for these tests", 4 unless($bzip2exe);
-        note("Found bzip2 at $bzip2exe");
-    }
-    multi_repo_find();
-    eq_or_diff(
-        \@CPAN::FindDependencies::net_log,
-        [
-            $private_repo_url.'/modules/02packages.details.txt.gz',
-            $cachedir_url.'/02packages.details.txt.gz',
-            $private_repo_url.'/authors/id/F/FR/FRUITCO/Brewery-1.0.meta',
-            $private_repo_url.'/authors/id/F/FR/FRUITCO/Brewery-1.0.tar.gz',
-            $private_repo_url.'/authors/id/F/FR/FRUITCO/Fruit-1.0.meta',
-            $private_repo_url.'/authors/id/F/FR/FRUITCO/Fruit-1.0.tar.bz2',
-            $private_repo_url.'/authors/id/F/FR/FRUITCO/Fruit-Role-Fermentable-1.0.meta',
-            $private_repo_url.'/authors/id/F/FR/FRUITCO/Fruit-Role-Fermentable-1.0.zip'
-        ],
-        "network traffic was as expected when the private repo isn't already cached"
-    );
-    
-    multi_repo_find();
-    eq_or_diff(
-        \@CPAN::FindDependencies::net_log,
-        [],
-        "less network traffic when the private repo is cached (and so is 02packages)"
-    );
-}
+multi_repo_find();
+eq_or_diff(
+    \@CPAN::FindDependencies::net_log,
+    [
+        $private_repo_url.'/modules/02packages.details.txt.gz',
+        $cachedir_url.'/02packages.details.txt.gz',
+        $private_repo_url.'/authors/id/F/FR/FRUITCO/Brewery-1.0.meta',
+        $private_repo_url.'/authors/id/F/FR/FRUITCO/Brewery-1.0.tar.gz',
+        $private_repo_url.'/authors/id/F/FR/FRUITCO/Fruit-1.0.meta',
+        $private_repo_url.'/authors/id/F/FR/FRUITCO/Fruit-1.0.tar.bz2',
+        $private_repo_url.'/authors/id/F/FR/FRUITCO/Fruit-Role-Fermentable-1.0.meta',
+        $private_repo_url.'/authors/id/F/FR/FRUITCO/Fruit-Role-Fermentable-1.0.zip'
+    ],
+    "network traffic was as expected when the private repo isn't already cached"
+);
+
+multi_repo_find();
+eq_or_diff(
+    \@CPAN::FindDependencies::net_log,
+    [],
+    "less network traffic when the private repo is cached (and so is 02packages)"
+);
 
 # so they don't confuse matters
 unlink(map { "t/cache/multi/$_" } qw(Brewery-1.0.meta Fruit-1.0.meta Fruit-Role-Fermentable-1.0.meta));

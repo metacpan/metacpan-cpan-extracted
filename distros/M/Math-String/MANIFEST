@@ -15,6 +15,9 @@ MANIFEST			This list of files
 MANIFEST.SKIP
 NEW
 README
+README.md
+t/00sig.t
+t/01load.t
 t/sequence.t
 t/setgpm.t
 t/setnpm.t
@@ -22,6 +25,19 @@ t/setspm.t
 t/stringpm.t
 t/study.t
 TODO
+xt/author/critic.t
+xt/release/changelog.t
+xt/release/cpan-changes.t
+xt/release/dist-manifest.t
+xt/release/distmeta.t
+xt/release/git.t
+xt/release/kwalitee.t
+xt/release/minimum-version.t
+xt/release/pod-linkcheck.t
+xt/release/pod-syntax.t
+xt/release/portability.t
+xt/release/unused-vars.t
+xt/release/version.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)
 SIGNATURE                                Public-key signature (added by MakeMaker)

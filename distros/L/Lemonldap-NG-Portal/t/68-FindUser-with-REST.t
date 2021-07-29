@@ -76,12 +76,13 @@ my $json;
 my $request;
 my $client = LLNG::Manager::Test->new( {
         ini => {
-            logLevel          => 'error',
-            authentication    => 'Null',
-            userDB            => 'REST',
-            passwordDB        => 'Null',
-            restUserDBUrl     => 'http://ws/user',
-            restFindUserDBUrl => 'http://ws/search',
+            logLevel       => 'error',
+            authentication => 'Null',
+            userDB         => 'REST',
+            passwordDB     => 'Null',
+            restUserDBUrl  => 'http://ws/search',
+
+            #restFindUserDBUrl => 'http://ws/search',
             findUser          => 1,
             impersonationRule => 1,
             useSafeJail       => 1,
@@ -101,7 +102,7 @@ ok(
         accept => 'application/json',
         length => length($request)
     ),
-    'Post good FindFuser request'
+    'Post good FindUser request'
 );
 expectOK($res);
 ok( $json = eval { from_json( $res->[2]->[0] ) }, 'Response is JSON' )
@@ -119,7 +120,7 @@ ok(
         accept => 'application/json',
         length => length($request)
     ),
-    'Post null response FindFuser request'
+    'Post null response FindUser request'
 );
 ok( $json = eval { from_json( $res->[2]->[0] ) }, 'Response is JSON' )
   or print STDERR "$@\n" . Dumper($res);
@@ -136,7 +137,7 @@ ok(
         accept => 'application/json',
         length => length($request)
     ),
-    'Post bad parameter FindFuser request'
+    'Post bad parameter FindUser request'
 );
 expectOK($res);
 ok( $json = eval { from_json( $res->[2]->[0] ) }, 'Response is JSON' )
@@ -154,7 +155,7 @@ ok(
         accept => 'application/json',
         length => length($request)
     ),
-    'Post empty response FindFuser request'
+    'Post empty response FindUser request'
 );
 expectOK($res);
 ok( $json = eval { from_json( $res->[2]->[0] ) }, 'Response is JSON' )
@@ -172,7 +173,7 @@ ok(
         accept => 'application/json',
         length => length($request)
     ),
-    'Post multi responses FindFuser request'
+    'Post multi responses FindUser request'
 );
 expectOK($res);
 ok( $json = eval { from_json( $res->[2]->[0] ) }, 'Response is JSON' )

@@ -3,13 +3,14 @@ abstract: 'Benchmark startup time of perls'
 author:
   - 'perlancar <perlancar@cpan.org>'
 build_requires:
-  Bencher::Backend: '1.053'
+  Bencher::Backend: '1.057'
   File::Spec: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
   Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
+  File::ShareDir::Install: '0.06'
 dynamic_config: 0
 generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
 license: perl
@@ -27,7 +28,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Bencher-Scenario-Perl-Startup
   homepage: https://metacpan.org/release/Bencher-Scenario-Perl-Startup
   repository: git://github.com/perlancar/perl-Bencher-Scenario-Perl-Startup.git
-version: '0.051'
+version: '0.053'
 x_Dist_Zilla:
   perl:
     version: '5.034000'
@@ -309,19 +310,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::Bencher::Scenario
               name: -Bencher::Scenario
-              version: '0.247'
-            -
-              class: Pod::Weaver::Plugin::Bencher::Scenario
-              name: 'Bencher::Scenario Perl::5220Perf_length'
-              version: '0.247'
-            -
-              class: Pod::Weaver::Plugin::Bencher::Scenario
-              name: 'Bencher::Scenario Perl::5200Perf_return'
-              version: '0.247'
-            -
-              class: Pod::Weaver::Plugin::Bencher::Scenario
-              name: 'Bencher::Scenario Perl::Hash'
-              version: '0.247'
+              version: '0.248'
       name: '@Author::PERLANCAR/PodWeaver'
       version: '4.008'
     -
@@ -408,6 +397,10 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::UploadToCPAN::WWWPAUSESimple
       name: '@Author::PERLANCAR/UploadToCPAN::WWWPAUSESimple'
       version: '0.04'
+    -
+      class: Dist::Zilla::Plugin::InsertDistImage
+      name: InsertDistImage
+      version: '0.005'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:

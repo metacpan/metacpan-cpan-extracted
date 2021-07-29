@@ -4,6 +4,8 @@ use strict;
 use warnings;
 use ExtUtils::MakeMaker;
 
+$| = 1;
+
 # This is a list of known backend libraries and the version number when these
 # libraries became subclasses of Math::BigInt::Lib. New library methods are
 # added to Math::BigInt::Lib first. Later, optimized versions are implemented
@@ -46,9 +48,10 @@ EOF
 #
 ##########################################################################
 
-Sleeping for a few seconds ...
 EOF
+    printf "Sleeping for a few seconds ...";
     sleep 5;
+    printf " done.\n";
 }
 
 my %WriteMakefileArgs =
@@ -74,6 +77,7 @@ my %WriteMakefileArgs =
 
    'PREREQ_PM'          => {
                             'Math::Complex'       => 1.36,
+                            'Carp'                => 1.22,
                            },
 
    # A hash of modules that are needed to test the module but not run or build

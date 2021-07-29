@@ -1,0 +1,124 @@
+#!/usr/bin/env perl
+# Copyright (C) 2017–2021  Alex Schroeder <alex@gnu.org>
+
+# This program is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, either version 3 of the License, or (at your option) any
+# later version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <https://www.gnu.org/licenses/>.
+
+=encoding utf8
+
+=head1 NAME
+
+Spartan - a command line client for the Spartan protocol
+
+=head1 SYNOPSIS
+
+B<titan> [B<--help>] [B<--verbose>] I<URL>
+
+=head1 DESCRIPTION
+
+This is a very simple test client. All it does is print the response. The header
+is printed to standard error so the rest can be redirected to get just the
+content.
+
+    spartan URL
+
+Usage:
+
+    spartan spartan://mozz.us/
+
+Send some text:
+
+    echo "Hello $USER!" | script/spartan spartan://mozz.us/echo
+
+=cut
+
+use Modern::Perl '2018';
+use Mojo::IOLoop;
+use Pod::Text;
+use Getopt::Long;
+use Encode::Locale;
+use Encode qw(encode decode);
+use URI::Escape;
+
+my $help;
+my $verbose;
+
+GetOptions(
+  'help' => \$help,
+  'verbose' => \$verbose)
+    or die("Error in command line arguments\n");
+
+# Help
+if ($help) {
+  my $parser = Pod::Text->new();
+  $parser->parse_file($0);
+  exit;
+}
+
+# Regular arguments
+my ($url) = @ARGV;
+
+die "⚠ You must provide an URL\n" unless $url;
+
+my($scheme, $authority, $path, $query, $fragment) =
+    $url =~ m|(?:([^:/?#]+):)?(?://([^/?#]*))?([^?#]*)(?:\?([^#]*))?(?:#(.*))?|;
+
+die "⚠ The URL '$url' must use the spartan scheme\n" unless $scheme and $scheme eq 'spartan';
+die "⚠ The URL '$url' must have an authority\n" unless $authority;
+
+my ($host, $port) = split(/:/, $authority);
+$port ||= 300;
+$path ||= "/";
+
+warn "Contacting $host:$port\n" if $verbose;
+
+my $data = "";
+if (not -t *STDIN) {
+  local $/ = undef;
+  $data = <STDIN>;
+}
+
+# create client
+Mojo::IOLoop->client({address => $host, port => $port} => sub {
+  my ($loop, $err, $stream) = @_;
+  die $err if $err;
+  # 1h timeout (for chat)
+  $stream->timeout(3600);
+  my ($header, $mimetype, $encoding);
+  $stream->on(read => sub {
+    my ($stream, $bytes) = @_;
+    if ($header and $encoding) {
+      print encode(locale => decode($encoding, $bytes));
+    } elsif ($header) {
+      print encode(locale => $bytes);
+    } else {
+      ($header) = $bytes =~ /^(.*?)\r\n/;
+      warn "$header\n";
+      if ($header =~ /^2\d* (?:text\/\S+)?(?:; *charset=(\S+))?$/g) {
+	# empty, or text without charset defaults to UTF-8
+	$encoding = $1 || 'UTF-8';
+      }
+      $bytes =~ s/^(.*?)\r\n//; # remove header
+      if ($encoding) {
+	say encode(locale => decode($encoding, $bytes));
+      } else {
+	print encode(locale => $bytes);
+      }
+    }});
+  # Write request
+  my $size = length($data);
+  warn "Requesting $host $path $size\n" if $verbose;
+  $stream->write("$host $path $size\r\n$data")});
+
+# Start event loop if necessary
+Mojo::IOLoop->start unless Mojo::IOLoop->is_running;

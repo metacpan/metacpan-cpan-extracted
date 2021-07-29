@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '0.125';
+our $VERSION = '0.129';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose_a_directory choose_a_file choose_directories choose_a_number choose_a_subset settings_menu
                      insert_sep get_term_size get_term_width get_term_height unicode_sprintf );
@@ -69,7 +69,12 @@ sub __prepare_opt {
     if ( %$opt ) {
         my $sub =  ( caller( 1 ) )[3];
         $sub =~ s/^.+::(?:__)?([^:]+)\z/$1/;
-        validate_options( _valid_options( $sub ), $opt );
+        if ( ! eval {
+            validate_options( _valid_options( $sub ), $opt );
+            1 }
+        ) {
+            croak "$sub: $@";
+        }
         my $defaults = _defaults();
         for my $key ( keys %$opt ) {
             if ( ! defined $opt->{$key} && defined $defaults->{$key} ) {
@@ -110,16 +115,12 @@ sub _valid_options {
         busy_string         => 'Str',
         info                => 'Str',
         init_dir            => 'Str',
-        add_dirs            => 'Str',
         back                => 'Str',
         filter              => 'Str',
         footer              => 'Str',             # undocumented
-        show_files          => 'Str',
         confirm             => 'Str',
-        parent_dir          => 'Str',
         prefix              => 'Str',
         prompt              => 'Str',
-        reset               => 'Str',
         cs_begin            => 'Str',
         cs_end              => 'Str',
         cs_label            => 'Str',
@@ -158,18 +159,14 @@ sub _defaults {
         layout         => 1,
         #tabs_info     => undef,
         #tabs_prompt   => undef,
-        add_dirs       => '[Choose-Dirs]',
         back           => 'BACK',
-        show_files     => '[Show-Files]',
         confirm        => 'CONFIRM',
-        parent_dir     => '..',
         #mark          => undef,
         mouse          => 0,
         order          => 1,
         #page          => undef,
         prefix         => '',
         #prompt        => undef,
-        reset          => 'reset',
         show_hidden    => 1,
         small_first    => 0,
         #solo          => undef,    # experimental
@@ -178,31 +175,35 @@ sub _defaults {
         #cs_label      => undef,
         cs_separator   => ', ',
         thousands_separator => ',',
+
+        ## intern:
+        parent_dir     => '..',
+        reset          => 'reset',
     };
 };
 
 
 sub _routine_options {
     my ( $caller ) = @_;
-    my @every = ( qw( info prompt clear_screen mouse hide_cursor confirm back color tabs_info tabs_prompt cs_label page footer keep ) ); # sort
+    my @every = ( qw( info prompt clear_screen mouse hide_cursor confirm back color tabs_info tabs_prompt page footer keep ) ); # sort
     my $options;
     if ( $caller eq 'choose_directories' ) {
-        $options = [ @every, qw( init_dir layout order alignment enchanted show_hidden parent_dir decoded add_dirs ) ];
+        $options = [ @every, qw( init_dir layout order alignment enchanted show_hidden decoded ) ];
     }
     elsif ( $caller eq 'choose_a_directory' ) {
-        $options = [ @every, qw( init_dir layout order alignment enchanted show_hidden parent_dir decoded ) ];
+        $options = [ @every, qw( init_dir layout order alignment enchanted show_hidden decoded cs_label ) ];
     }
     elsif ( $caller eq 'choose_a_file' ) {
-        $options = [ @every, qw( init_dir layout order alignment enchanted show_hidden parent_dir decoded show_files filter ) ];
+        $options = [ @every, qw( init_dir layout order alignment enchanted show_hidden decoded filter ) ];
     }
     elsif ( $caller eq 'choose_a_number' ) {
-        $options = [ @every, qw( small_first reset thousands_separator default_number ) ];
+        $options = [ @every, qw( small_first reset thousands_separator default_number cs_label ) ];
     }
     elsif ( $caller eq 'choose_a_subset' ) {
-        $options = [ @every, qw( layout order alignment enchanted keep_chosen index prefix all_by_default cs_begin cs_end cs_separator mark busy_string solo ) ];
+        $options = [ @every, qw( layout order alignment enchanted keep_chosen index prefix all_by_default cs_label cs_begin cs_end cs_separator mark busy_string solo ) ];
     }
     elsif ( $caller eq 'settings_menu' ) {
-        $options = [ @every, qw( cs_begin cs_end cs_separator ) ];
+        $options = [ @every, qw( cs_label cs_begin cs_end cs_separator ) ];
     }
     return $options;
 }
@@ -211,36 +212,36 @@ sub _routine_options {
 sub __prepare_path {
     my ( $self ) = @_;
     my $init_dir_fs;
-    if ( $self->{decoded} ) {
-        $init_dir_fs = encode 'locale_fs', $self->{init_dir};
+    if ( defined $self->{init_dir} ) {
+        $init_dir_fs = encode( 'locale_fs', $self->{init_dir} );
+        if ( ! -d $init_dir_fs ) {
+            my $prompt = 'Could not find the directory "';
+            $prompt .= decode 'locale_fs', $init_dir_fs;
+            $prompt .= '". Falling back to the home directory.';
+            # Choose
+            choose(
+                [ 'Press ENTER to continue' ],
+                { prompt => $prompt, hide_cursor => $self->{hide_cursor}, mouse => $self->{mouse}, page => $self->{page},
+                footer => $self->{footer}, keep => $self->{keep} }
+            );
+            $init_dir_fs = File::HomeDir->my_home();
+        }
     }
     else {
-        $init_dir_fs = $self->{init_dir};
-    }
-    if ( defined $init_dir_fs && ! -d $init_dir_fs ) {
-        my $prompt = 'Could not find the directory "';
-        $prompt .= decode 'locale_fs', $init_dir_fs;
-        $prompt .= '". Falling back to the home directory.';
-        # Choose
-        choose(
-            [ 'Press ENTER to continue' ],
-            { prompt => $prompt, hide_cursor => $self->{hide_cursor}, mouse => $self->{mouse}, page => $self->{page},
-              footer => $self->{footer}, keep => $self->{keep} }
-        );
-        $init_dir_fs = File::HomeDir->my_home();
-    }
-    if ( ! defined $init_dir_fs ) {
         $init_dir_fs = File::HomeDir->my_home();
     }
     if ( ! -d $init_dir_fs ) {
         croak "Could not find the home directory.";
     }
-    return $init_dir_fs;
+    my $dir_fs = realpath $init_dir_fs;
+    my $dir = decode( 'locale_fs', $dir_fs );
+    return $dir;
 }
 
 
 sub __available_dirs {
-    my ( $self, $dir_fs ) = @_;
+    my ( $self, $dir ) = @_;
+    my $dir_fs = encode( 'locale_fs', $dir );
     my $dh;
     if ( ! eval {
         opendir( $dh, $dir_fs ) or croak $!;
@@ -256,14 +257,16 @@ sub __available_dirs {
         $dir_fs = dirname $dir_fs;
         next;
     }
-    my @dirs_fs;
+    my @dirs;
     while ( my $file_fs = readdir $dh ) {
         next if $file_fs =~ /^\.\.?\z/;
         next if $file_fs =~ /^\./ && ! $self->{show_hidden};
-        push @dirs_fs, $file_fs if -d catdir $dir_fs, $file_fs;
+        if ( -d catdir $dir_fs, $file_fs ) {
+            push @dirs, decode( 'locale_fs', $file_fs );
+        }
     }
     closedir $dh;
-    return [ sort @dirs_fs ];
+    return [ sort @dirs ];
 }
 
 
@@ -274,76 +277,105 @@ sub choose_directories {
         return $ob->choose_directories( @_ );
     }
     my ( $self, $opt ) = @_;
-    if ( ! defined $opt->{cs_label} ) {
-        $opt->{cs_label} = 'Dirs: ';
-    }
     $self->__prepare_opt( $opt );
-    my $init_dir_fs = $self->__prepare_path();
-    my $dir_fs = realpath $init_dir_fs;
-    my $chosen_dirs_fs = [];
-    my ( $browse, $add_dirs ) = ( 'Browse', 'Add_Dirs' );
-    my $mode = $browse;
+    my $dir = $self->__prepare_path();
+    my $chosen_dirs = [];
+    my ( $confirm, $change_path, $add_dirs ) = ( '  ' . $self->{confirm}, '- Change Location', '- Add Directories' );
+    my $mode = $change_path;
     my @bu;
 
-    while ( 1 ) {
-        if ( $mode eq $browse ) {
-            ( $dir_fs, my $to_add_dirs ) = $self->__choose_a_path( $dir_fs, { chosen_dirs_fs => $chosen_dirs_fs } );
-            if ( ! defined $dir_fs ) {
-                if ( @bu ) {
-                    ( $dir_fs, $chosen_dirs_fs ) = @{pop @bu};
-                    next;
-                }
-                $self->__restore_defaults();
-                return;
+    CHOOSE_MODE: while ( 1 ) {
+        my $term_w = get_term_width();
+        my @tmp_prompt;
+        my $key_dirs = 'Chosen Dirs: ';
+        my $dirs_chosen = $key_dirs . ( @$chosen_dirs ? join( ', ', @$chosen_dirs ) : '---' );
+        push @tmp_prompt, line_fold( $dirs_chosen, $term_w, { subseq_tab => length( $key_dirs ), join => 0 } );
+        my $key_path = 'Location: ';
+        my $path = $key_path . $dir;
+        push @tmp_prompt, line_fold( $path, $term_w, { subseq_tab => length( $key_path ), join => 0 } );
+        my $prompt = join( "\n", @tmp_prompt );
+        # Choose
+        my $choice = choose(
+            [ undef, $confirm, $change_path, $add_dirs ],
+            { info => $self->{info}, prompt => $prompt, layout => 3, mouse => $self->{mouse},
+              clear_screen => $self->{clear_screen}, hide_cursor => $self->{hide_cursor}, page => $self->{page},
+              footer => $self->{footer}, keep => $self->{keep}, undef => '  ' . $self->{back} }
+        );
+        if ( ! defined $choice ) {
+            if ( @bu ) {
+                ( $dir, $chosen_dirs ) = @{pop @bu};
+                next CHOOSE_MODE;
             }
-            elsif ( defined $to_add_dirs ) {
-                $mode = $add_dirs;
-                next;
-            }
-            else {
-                my $chosen_dirs;
-                if ( $self->{decoded} ) {
-                    $chosen_dirs = [ map { decode 'locale_fs', $_ } @$chosen_dirs_fs ];
-                }
-                else {
-                    $chosen_dirs = $chosen_dirs_fs;
-                }
-                $self->__restore_defaults();
-                return $chosen_dirs;
+            return;
+        }
+        elsif ( $choice eq $confirm ) {
+            my $decoded = $self->{decoded};
+            $self->__restore_defaults();
+            return $decoded ? $chosen_dirs : [ map { encode 'locale_fs', $_ } @$chosen_dirs ];
+        }
+        elsif ( $choice eq $change_path ) {
+             my $prompt_fmt = $key_path . "%s\n" . ( defined $self->{prompt} ? $self->{prompt} : 'Choose:' );
+             my $tmp_dir = $self->__choose_a_path( $dir, $prompt_fmt, '<<', 'OK' );
+             if ( defined $tmp_dir ) {
+                $dir = $tmp_dir;
             }
         }
-        elsif ( $mode eq $add_dirs ) {
-            my $avail_dirs_fs = $self->__available_dirs( $dir_fs );
-            my $info = defined $self->{info} ? $self->{info} : '';
-            if ( length $info ) {
-                $info .= "\n";
+        elsif ( $choice eq $add_dirs ) {
+            my $avail_dirs = $self->__available_dirs( $dir );
+            my $prompt = $path . "\n" . length $self->{prompt} ? $self->{prompt} : 'Choose:';
+            my %bu_opt;
+            my $options = _routine_options( 'choose_directories' );
+            for my $o ( @$options ) {
+                $bu_opt{$o} = $self->{$o};
             }
-            my $cs_label_w = print_columns_ext( $self->{cs_label}, $self->{color} );
-            $info .= line_fold(
-                $self->{cs_label} . join( ', ', map { decode 'locale_fs', $_ } @$chosen_dirs_fs ), get_term_width(),
-                { subseq_tab => ' ' x $cs_label_w, color => $self->{color}, join => 1 }
-            );
-            my $prompt = "\n" . 'CHOOSE directories in "' . decode( 'locale_fs', $dir_fs ) . '":' . "\n";
-            my $bu_opt;
-            my @used_options = qw(info prompt back confirm cs_label cs_begin index);
-            for my $o ( @used_options ) {
-                $bu_opt->{$o} = $self->{$o};
+            my @tmp_info;
+            if ( length $self->{info} ) {
+                push @tmp_info, $self->{info};
             }
+            push @tmp_info, line_fold( $dirs_chosen, $term_w, { subseq_tab => length( $key_dirs ), join => 0 } );
+            my $info = join "\n", @tmp_info;
+            # choose_a_subset
             my $idxs = $self->choose_a_subset(
-                [ sort map { decode 'locale_fs', $_ } @$avail_dirs_fs ],
-                { info => $info, prompt => $prompt, back => '<<', confirm => 'OK', cs_begin => '+ ', cs_label => undef,
+                [ sort @$avail_dirs ],
+                { info => $info, prompt => $prompt, back => '<<', confirm => 'OK', cs_begin => undef, cs_label => 'Add to Dirs: ',
                   page => $self->{page}, footer => $self->{footer}, keep => $self->{keep}, index => 1 }
             );
-            for my $o ( @used_options ) {
-                $self->{$o} = $bu_opt->{$o};
+            for my $o ( keys %bu_opt ) {
+                $self->{$o} = $bu_opt{$o};
             }
             if ( defined $idxs && @$idxs ) {
-                push @bu, [ $dir_fs, [ @$chosen_dirs_fs ] ];
-                push @$chosen_dirs_fs, map { catdir $dir_fs, $_ } @{$avail_dirs_fs}[@$idxs];
+                push @bu, [ $dir, [ @$chosen_dirs ] ];
+                push @$chosen_dirs, map { catdir $dir, $_ } @{$avail_dirs}[@$idxs];
             }
-            $mode = $browse;
-            next;
         }
+    }
+}
+
+
+sub choose_a_file {
+    if ( ref $_[0] ne __PACKAGE__ ) {
+        my $ob = __PACKAGE__->new();
+        delete $ob->{backup_instance_defaults};
+        return $ob->choose_a_file( @_ );
+    }
+    my ( $self, $opt ) = @_;
+    $self->__prepare_opt( $opt );
+    my $init_dir = $self->__prepare_path();
+    my $curr_dir = $init_dir;
+
+    CHOOSE_DIR: while ( 1 ) {
+        my $prompt_fmt = "File-Directory: %s\n" . ( length $self->{prompt} ? $self->{prompt} : 'Choose:' );
+        my $chosen_dir = $self->__choose_a_path( $init_dir, $prompt_fmt, '<<', 'OK' );
+        if ( ! defined $chosen_dir ) {
+            return;
+        }
+        my $chosen_file = $self->__a_file( $chosen_dir );
+        if ( ! defined $chosen_file ) {
+            next CHOOSE_DIR;
+        }
+        my $decoded = $self->{decoded};
+        $self->__restore_defaults();
+        return $decoded ? $chosen_file : encode( 'locale_fs', $chosen_file );
     }
 }
 
@@ -359,54 +391,27 @@ sub choose_a_directory {
         $opt->{cs_label} = 'Dir: ';
     }
     $self->__prepare_opt( $opt );
-    my $init_dir_fs = $self->__prepare_path();
-    my $chosen_dir = $self->__choose_a_path( $init_dir_fs );
+    my $init_dir = $self->__prepare_path();
+    my $prompt_fmt = $opt->{cs_label} . "%s\n" . ( length $self->{prompt} ? $self->{prompt} : 'Choose:' );
+    my $chosen_dir = $self->__choose_a_path( $init_dir, $prompt_fmt, $self->{back}, $self->{confirm} );
+    my $decoded = $self->{decoded};
     $self->__restore_defaults();
-    return $chosen_dir;
+    if ( ! defined $chosen_dir ) {
+        return;
+    }
+    return $decoded ? $chosen_dir : encode( 'locale_fs', $chosen_dir );
 }
 
-
-sub choose_a_file {
-    if ( ref $_[0] ne __PACKAGE__ ) {
-        my $ob = __PACKAGE__->new();
-        delete $ob->{backup_instance_defaults};
-        return $ob->choose_a_file( @_ );
-    }
-    my ( $self, $opt ) = @_;
-    if ( ! defined $opt->{cs_label} ) {
-        $opt->{cs_label} = 'File: ';
-    }
-    $self->__prepare_opt( $opt );
-    my $init_dir_fs = $self->__prepare_path();
-    my $chosen_file = $self->__choose_a_path( $init_dir_fs );
-    $self->__restore_defaults();
-    return $chosen_file;
-}
 
 sub __choose_a_path {
-    my ( $self, $dir_fs, $opt ) = @_;
-    my $sub =  ( caller( 1 ) )[3];
-    $sub =~ s/^.+::(?:__)?([^:]+)\z/$1/;
-    my @pre;
-    my $enchanted_idx;
-    if ( $sub eq 'choose_a_directory' ) {
-        @pre = ( undef, $self->{confirm}, $self->{parent_dir} );
-        $enchanted_idx = 2;
-    }
-    elsif ( $sub eq 'choose_a_file' ) {
-        @pre = ( undef, $self->{show_files}, $self->{parent_dir} );
-        $enchanted_idx = 2;
-    }
-    elsif ( $sub eq 'choose_directories' ) {
-        @pre = ( undef, $self->{confirm}, $self->{add_dirs}, $self->{parent_dir} );
-        $enchanted_idx = 3;
-    }
+    my ( $self, $dir, $prompt_fmt, $back, $confirm ) = @_;
+    my $enchanted_idx = 2;
     my $default_idx = $self->{enchanted} ? $enchanted_idx : 0;
-    my $prev_dir_fs = $dir_fs;
-    my $wildcard = ' ? ';
+    my $prev_dir = $dir;
 
     while ( 1 ) {
         my ( $dh, @dirs );
+        my $dir_fs = encode( 'locale_fs', $dir );
         if ( ! eval {
             opendir( $dh, $dir_fs ) or croak $!;
             1 }
@@ -418,86 +423,63 @@ sub __choose_a_path {
                 { prompt => '', hide_cursor => $self->{hide_cursor}, mouse => $self->{mouse}, page => $self->{page},
                   footer => $self->{footer}, keep => $self->{keep} }
             );
-            $dir_fs = dirname $dir_fs;
+            $dir = dirname $dir;
             next;
         }
         while ( my $file_fs = readdir $dh ) {
             next if $file_fs =~ /^\.\.?\z/;
             next if $file_fs =~ /^\./ && ! $self->{show_hidden};
-            push @dirs, decode( 'locale_fs', $file_fs ) if -d catdir $dir_fs, $file_fs;
+            if ( -d catdir $dir_fs, $file_fs ) {
+                push @dirs, decode( 'locale_fs', $file_fs );
+            }
         }
         closedir $dh;
-        my @tmp;
-        if ( $sub eq 'choose_a_file' ) {
-            push @tmp, $self->{cs_label} . decode( 'locale_fs', ( catfile $dir_fs, $wildcard ) );
-            push @tmp, $self->{prompt} if defined $self->{prompt} && length $self->{prompt};
-        }
-        elsif ( $sub eq 'choose_directories' ) {
-            my $cs_label_w = print_columns_ext( $self->{cs_label}, $self->{color} );
-            push @tmp, line_fold(
-                $self->{cs_label} . join( ', ', map { decode 'locale_fs', $_ } @{$opt->{chosen_dirs_fs}} ), get_term_width(),
-                { subseq_tab => ' ' x $cs_label_w, color => $self->{color}, join => 0 }
-            );
-            my $prompt = defined $self->{prompt} ? $self->{prompt} : 'BROWSE directories';
-            push @tmp, "\n" . $prompt . ' in "' . decode( 'locale_fs', $dir_fs ) . '":' . "\n";
-        }
-        else {
-            push @tmp, $self->{cs_label} . decode( 'locale_fs', $dir_fs );
-            push @tmp, $self->{prompt} if defined $self->{prompt} && length $self->{prompt};
-        }
-        my $lines = join( "\n", @tmp );
+        my $parent_dir = $self->{parent_dir};
+        my @pre = ( undef, $confirm, $parent_dir );
+        my $prompt = sprintf $prompt_fmt, $prev_dir;
         # Choose
         my $choice = choose(
             [ @pre, sort( @dirs ) ],
-            { info => $self->{info}, prompt => $lines, default => $default_idx, alignment => $self->{alignment},
+            { info => $self->{info}, prompt => $prompt, default => $default_idx, alignment => $self->{alignment},
               layout => $self->{layout}, order => $self->{order}, mouse => $self->{mouse},
               clear_screen => $self->{clear_screen}, hide_cursor => $self->{hide_cursor},
               color => $self->{color}, tabs_info => $self->{tabs_info}, tabs_prompt => $self->{tabs_prompt},
-              page => $self->{page}, footer => $self->{footer}, keep => $self->{keep}, undef => $self->{back} }
+              page => $self->{page}, footer => $self->{footer}, keep => $self->{keep}, undef => $back }
         );
         if ( ! defined $choice ) {
             return;
         }
-        elsif ( $choice eq $self->{confirm} ) {
-            return $self->{decode} ? decode( 'locale_fs', $prev_dir_fs ) : $prev_dir_fs;
+        elsif ( $choice eq $confirm ) {
+            return $prev_dir;
         }
-        elsif ( $choice eq $self->{show_files} ) {
-            my $file_fs = $self->__a_file( $dir_fs, $wildcard );
-            if ( ! length $file_fs ) {
-                next;
-            }
-            return $self->{decode} ? decode( 'locale_fs', $file_fs ) : $file_fs;
-        }
-        elsif ( $choice eq $self->{add_dirs} ) {
-            return $prev_dir_fs, 1;
-        }
-        if ( $choice eq $self->{parent_dir} ) {
-            $dir_fs = dirname $dir_fs;
+        elsif ( $choice eq $parent_dir ) {
+            $dir = dirname $dir;
         }
         else {
-            $dir_fs = catdir $dir_fs, encode( 'locale_fs', $choice )
+            $dir = catdir $dir, $choice;
         }
-        if ( $prev_dir_fs eq $dir_fs ) {
+        if ( $prev_dir eq $dir ) {
             $default_idx = 0;
         }
         else {
             $default_idx = $self->{enchanted} ? $enchanted_idx : 0;
         }
-        $prev_dir_fs = $dir_fs;
+        $prev_dir = $dir;
     }
 }
 
 
 sub __a_file {
-    my ( $self, $dir_fs, $wildcard ) = @_;
-    my $prev_dir_fs = '';
+    my ( $self, $dir ) = @_;
+    my $prev_dir = '';
     my $chosen_file;
 
     while ( 1 ) {
         my @files_fs;
+        my $dir_fs = encode( 'locale_fs', $dir );
         if ( ! eval {
             if ( $self->{filter} ) {
-                @files_fs = map { basename $_} grep { -e $_ } glob( catfile( $dir_fs, $self->{filter} ) );
+                @files_fs = map { basename $_} grep { -e $_ } glob( encode( 'locale_fs', catfile $dir, $self->{filter} ) );
             }
             else {
                 opendir( my $dh, $dir_fs ) or croak $!;
@@ -519,30 +501,26 @@ sub __a_file {
         for my $file_fs ( @files_fs ) {
             next if $file_fs =~ /^\.\.?\z/;
             next if $file_fs =~ /^\./ && ! $self->{show_hidden};
-            next if -d catdir $dir_fs, $file_fs; #
+            next if -d catdir $dir_fs, $file_fs;
             push @files, decode( 'locale_fs', $file_fs );
         }
-        my @tmp;
-        if ( ! defined $self->{cs_label} ) {
-            $self->{cs_label} = 'New: ';
-        }
-        push @tmp, $self->{cs_label} . decode( 'locale_fs', ( catfile $dir_fs, length $prev_dir_fs ? $prev_dir_fs : $wildcard ) );
-        if ( defined $self->{prompt} && length $self->{prompt} ) {
-            push @tmp, $self->{prompt};
-        }
-        my $lines = join( "\n", @tmp );
+        my @tmp_prompt;
+        push @tmp_prompt, 'File-Directory: ' . $dir;
+        push @tmp_prompt, 'File: ' . ( length $prev_dir ? $prev_dir : ' ? ' );
+        push @tmp_prompt, length $self->{prompt} ? $self->{prompt} : 'Choose:';
+        my $prompt = join( "\n", @tmp_prompt );
         if ( ! @files ) {
-            my $prompt;
+            $prompt .= "\n";
             if ( $self->{filter} ) {
-                $prompt = 'No matches for "' .  $self->{filter} . '".';
+                $prompt .= 'No matches for filter "' .  $self->{filter} . '".';
             }
             else {
-                $prompt = 'No files.';
+                $prompt .= 'No files.';
             }
             # Choose
             choose(
                 [ ' < ' ],
-                { info => $self->{info}, prompt => "$lines\n$prompt", hide_cursor => $self->{hide_cursor},
+                { info => $self->{info}, prompt => $prompt, hide_cursor => $self->{hide_cursor},
                   mouse => $self->{mouse}, color => $self->{color}, page => $self->{page}, footer => $self->{footer},
                   keep => $self->{keep} }
             );
@@ -555,25 +533,25 @@ sub __a_file {
         # Choose
         $chosen_file = choose(
             [ @pre, sort( @files ) ],
-            { info => $self->{info}, prompt => $lines, alignment => $self->{alignment}, layout => $self->{layout},
+            { info => $self->{info}, prompt => $prompt, alignment => $self->{alignment}, layout => $self->{layout},
               order => $self->{order}, mouse => $self->{mouse}, clear_screen => $self->{clear_screen},
               hide_cursor => $self->{hide_cursor}, color => $self->{color}, tabs_info => $self->{tabs_info},
               tabs_prompt => $self->{tabs_prompt}, page => $self->{page}, footer => $self->{footer},
               keep => $self->{keep}, undef => $self->{back} }
         );
         if ( ! length $chosen_file ) {
-            if ( length $prev_dir_fs ) {
-                $prev_dir_fs = '';
+            if ( length $prev_dir ) {
+                $prev_dir = '';
                 next;
             }
             return;
         }
         elsif ( $chosen_file eq $self->{confirm} ) {
-            return if ! length $prev_dir_fs;
-            return catfile $dir_fs, $prev_dir_fs;
+            return if ! length $prev_dir;
+            return catfile $dir, $prev_dir;
         }
         else {
-            $prev_dir_fs = encode( 'locale_fs', $chosen_file );
+            $prev_dir = $chosen_file;
         }
     }
 }
@@ -644,19 +622,19 @@ sub choose_a_number {
                 $cs_row = $tmp_result;
             }
         }
-        my @tmp;
+        my @tmp_prompt;
         if ( defined $cs_row ) {
-            push @tmp, $cs_row;
+            push @tmp_prompt, $cs_row;
         }
         if ( length $self->{prompt} ) {
-            push @tmp, $self->{prompt};
+            push @tmp_prompt, $self->{prompt};
         }
-        my $lines = join "\n", @tmp;
+        my $prompt = join "\n", @tmp_prompt;
         my @pre = ( undef, $confirm_tmp ); # confirm if $result ?
         # Choose
         my $range = choose(
             $self->{small_first} ? [ @pre, reverse @ranges ] : [ @pre, @ranges ],
-            { info => $self->{info}, prompt => $lines, layout => 3, alignment => 1, mouse => $self->{mouse},
+            { info => $self->{info}, prompt => $prompt, layout => 3, alignment => 1, mouse => $self->{mouse},
               clear_screen => $self->{clear_screen}, hide_cursor => $self->{hide_cursor}, color => $self->{color},
               tabs_info => $self->{tabs_info}, tabs_prompt => $self->{tabs_prompt}, page => $self->{page},
               footer => $self->{footer}, keep => $self->{keep}, undef => $back_tmp }
@@ -685,7 +663,7 @@ sub choose_a_number {
         # Choose
         my $number = choose(
             [ undef, @choices, $self->{reset} ],
-            { info => $self->{info}, prompt => $lines, layout => 1, alignment => 2, order => 0,
+            { info => $self->{info}, prompt => $prompt, layout => 1, alignment => 2, order => 0,
               mouse => $self->{mouse}, clear_screen => $self->{clear_screen}, hide_cursor => $self->{hide_cursor},
               color => $self->{color}, tabs_info => $self->{tabs_info}, tabs_prompt => $self->{tabs_prompt},
               page => $self->{page}, footer => $self->{footer}, keep => $self->{keep}, undef => '<<' }
@@ -727,7 +705,7 @@ sub choose_a_subset {
     my @pre = ( undef, $self->{confirm} );
 
     while ( 1 ) {
-        my @tmp;
+        my @tmp_prompt;
         my $cs;
         if ( defined $self->{cs_label} ) {
             $cs .= $self->{cs_label};
@@ -739,10 +717,10 @@ sub choose_a_subset {
             $cs .= $self->{cs_begin} . '*' . $self->{cs_end};
         }
         if ( defined $cs ) {
-            @tmp = ( $cs );
+            @tmp_prompt = ( $cs );
         }
         if ( length $self->{prompt} ) {
-            push @tmp, $self->{prompt};
+            push @tmp_prompt, $self->{prompt};
         }
         my $mark;
         my $solo;
@@ -761,11 +739,11 @@ sub choose_a_subset {
             }
         }
         my $meta_items = [ 0 .. $#pre, @{$solo||[]} ];
-        my $lines = join "\n", @tmp;
+        my $prompt = join "\n", @tmp_prompt;
         # Choose
         my @idx = choose(
             [ @pre, length( $self->{prefix} ) ? map { $self->{prefix} . ( defined $_ ? $_ : '' ) } @$curr_avail : @$curr_avail ],
-            { info => $self->{info}, prompt => $lines, layout => $self->{layout}, index => 1,
+            { info => $self->{info}, prompt => $prompt, layout => $self->{layout}, index => 1,
               alignment => $self->{alignment}, order => $self->{order}, mouse => $self->{mouse},
               meta_items => $meta_items, mark => $mark, include_highlighted => 2,
               clear_screen => $self->{clear_screen}, hide_cursor => $self->{hide_cursor},
@@ -867,18 +845,18 @@ sub settings_menu {
     my $count = 0;
 
     while ( 1 ) {
-        my @tmp;
+        my @tmp_prompt;
         if ( defined $self->{cs_label} ) {
-            push @tmp, $self->{cs_label} . $self->{cs_begin} . join( $self->{cs_separator}, map { "$_=$new->{$_}" } keys %$new ) . $self->{cs_end};
+            push @tmp_prompt, $self->{cs_label} . $self->{cs_begin} . join( $self->{cs_separator}, map { "$_=$new->{$_}" } keys %$new ) . $self->{cs_end};
         }
         if ( defined $self->{prompt} && length $self->{prompt} ) {
-            push @tmp, $self->{prompt};
+            push @tmp_prompt, $self->{prompt};
         }
-        my $lines = join( "\n", @tmp );
+        my $prompt = join( "\n", @tmp_prompt );
         # Choose
         my $idx = choose(
             [ @pre, @print_keys ],
-            { info => $self->{info}, prompt => $lines, index => 1, default => $default, layout => 3, alignment => 0,
+            { info => $self->{info}, prompt => $prompt, index => 1, default => $default, layout => 3, alignment => 0,
               mouse => $self->{mouse}, clear_screen => $self->{clear_screen}, hide_cursor => $self->{hide_cursor},
               color => $self->{color}, tabs_info => $self->{tabs_info}, tabs_prompt => $self->{tabs_prompt},
               page => $self->{page}, footer => $self->{footer}, keep => $self->{keep}, undef => $self->{back} }
@@ -1019,9 +997,41 @@ Term::Choose::Util - TUI-related functions for selecting directories, files, num
 
 =head1 VERSION
 
-Version 0.125
+Version 0.129
 
 =cut
+
+=head1 Backward incompatible changes
+
+=head2 choose_directories
+
+=over
+
+=item Options I<add_dirs>, I<parent_dir> and I<cs_label> removed.
+
+=item The option I<init_dir> expects always a decoded string, regardless of how the option I<decoded> is set.
+
+=back
+
+=head2 choose_a_file
+
+=over
+
+=item Options I<show_files>, I<parent_dir> and I<cs_label> removed.
+
+=item The option I<init_dir> expects always a decoded string, regardless of how the option I<decoded> is set.
+
+=back
+
+=head2 choose_a_directory
+
+=over
+
+=item Option I<parent_dir> removed.
+
+=item The option I<init_dir> expects always a decoded string, regardless of how the option I<decoded> is set.
+
+=back
 
 =head1 SYNOPSIS
 
@@ -1104,17 +1114,6 @@ Values: [0],1.
 
 =item
 
-cs_label
-
-The value of I<cs_label> (current selection label) is a string which is placed in front of the current selection.
-
-Defaults: C<choose_directories>: 'Dirs: ', C<choose_a_directory>: 'Dir: ', C<choose_a_file>: 'File: '. For
-C<choose_a_number>, C<choose_a_subset> and C<settings_menu> the default is undefined.
-
-The current selection output is placed between the I<info> string and the I<prompt> string.
-
-=item
-
 prompt
 
 A string placed on top of the available choices.
@@ -1157,11 +1156,97 @@ To move around in the directory tree:
 
 - select a directory and press C<Return> to enter in the selected directory.
 
-- choose the "I<parent_dir>" menu entry to move upwards.
+- choose the "C<..>" (parent directory) menu entry to move upwards.
 
 To return the current working-directory as the chosen directory choose the "I<confirm>" menu entry.
 
 The "I<back>" menu entry causes C<choose_a_directory> to return nothing.
+
+Options:
+
+=over
+
+=item
+
+alignment
+
+Elements in columns are aligned to the left if set to C<0>, aligned to the right if set to C<1> and centered if set to
+C<2>.
+
+Values: [0],1,2.
+
+=item
+
+cs_label
+
+The value of I<cs_label> (current selection label) is a string which is placed in front of the current selection.
+
+Defaults: C<choose_directories>: 'Dirs: ', C<choose_a_directory>: 'Dir: ', C<choose_a_file>: 'File: '. For
+C<choose_a_number>, C<choose_a_subset> and C<settings_menu> the default is undefined.
+
+The current selection output is placed between the I<info> string and the I<prompt> string.
+
+=item
+
+decoded
+
+If enabled, the directory name is returned decoded with C<locale_fs> form L<Encode::Locale>.
+
+Values: 0,[1].
+
+=item
+
+enchanted
+
+If set to C<1>, the default cursor position is on the parent-directory menu entry (C<..>). If the directory name remains
+the same after an user input, the default cursor position changes to "I<back>".
+
+If set to C<0>, the default cursor position is on the "I<back>" menu entry.
+
+Values: 0,[1].
+
+=item
+
+init_dir
+
+Set the starting point directory. Defaults to the home directory.
+
+I<init_dir> expects the directory path as a decoded string.
+
+=item
+
+layout
+
+See the option I<layout> in L<Term::Choose>
+
+Values: 0,[1],2,3.
+
+=item
+
+order
+
+If set to C<1>, the items are ordered vertically else they are ordered horizontally.
+
+This option has no meaning if I<layout> is set to C<3>.
+
+Values: 0,[1].
+
+=item
+
+show_hidden
+
+If enabled, hidden directories are added to the available directories.
+
+Values: 0,[1].
+
+=back
+
+=head2 choose_a_file
+
+    $chosen_file = choose_a_file( { show_hidden => 0, ... } )
+
+Browse the directory tree the same way as described for C<choose_a_directory>. Select the "I<show_files>" menu entry to get the
+files of the current directory. To return the chosen file select the "I<confirm>" menu entry.
 
 Options:
 
@@ -1188,8 +1273,96 @@ Values: 0,[1].
 
 enchanted
 
-If set to C<1>, the default cursor position is on the "I<parent_dir>" menu entry. If the directory name remains the same after an
-user input, the default cursor position changes to "I<back>".
+If set to C<1>, the default cursor position is on the parent-directory menu entry (C<..>). If the directory name remains
+the same after an user input, the default cursor position changes to "I<back>".
+
+If set to C<0>, the default cursor position is on the "I<back>" menu entry.
+
+Values: 0,[1].
+
+=item
+
+filter
+
+If set, the value of this option is used as a glob pattern. Only files matching this pattern will be displayed.
+
+=item
+
+init_dir
+
+Set the starting point directory. Defaults to the home directory.
+
+If the option I<decoded> is enabled (default), I<init_dir> expects the directory path as a decoded string.
+
+=item
+
+layout
+
+See the option I<layout> in L<Term::Choose>
+
+Values: 0,[1],2,3.
+
+=item
+
+order
+
+If set to C<1>, the items are ordered vertically else they are ordered horizontally.
+
+This option has no meaning if I<layout> is set to C<3>.
+
+Values: 0,[1].
+
+=item
+
+show_hidden
+
+If enabled, hidden directories are added to the available directories.
+
+Values: 0,[1].
+
+=back
+
+=head2 choose_directories
+
+    $chosen_directories = choose_directories( { mouse => 1, ... } )
+
+C<choose_directories> is similar to C<choose_a_directory> but it is possible to return multiple directories.
+
+Selecting the  "I<add_dirs>" menu entry opens the add-directories sub menu: one can add there directories from the
+current working directory to the list of chosen directories.
+
+To return the list of chosen directories (as an array reference) select the "I<confirm>" entry in main menu.
+
+The "I<back>" menu entry removes the last added directories. If the list of chosen directories is empty, "I<back>" causes
+C<choose_directories> to return nothing.
+
+Options:
+
+=over
+
+=item
+
+alignment
+
+Elements in columns are aligned to the left if set to C<0>, aligned to the right if set to C<1> and centered if set to
+C<2>.
+
+Values: [0],1,2.
+
+=item
+
+decoded
+
+If enabled, the directory name is returned decoded with C<locale_fs> form L<Encode::Locale>.
+
+Values: 0,[1].
+
+=item
+
+enchanted
+
+If set to C<1>, the default cursor position is on the parent-directory menu entry (C<..>). If the directory name remains
+the same after an user input, the default cursor position changes to "I<back>".
 
 If set to C<0>, the default cursor position is on the "I<back>" menu entry.
 
@@ -1229,69 +1402,6 @@ If enabled, hidden directories are added to the available directories.
 
 Values: 0,[1].
 
-=item
-
-parent_dir
-
-Customize the string of the menu entry "I<parent_dir>".
-
-Default: C<..>
-
-=back
-
-=head2 choose_a_file
-
-    $chosen_file = choose_a_file( { show_hidden => 0, ... } )
-
-Browse the directory tree the same way as described for C<choose_a_directory>. Select the "I<show_files>" menu entry to get the
-files of the current directory. To return the chosen file select the "I<confirm>" menu entry.
-
-Options as in L</choose_a_directory> plus
-
-=over
-
-=item
-
-filter
-
-If set, the value of this option is used as a glob pattern. Only files matching this pattern will be displayed.
-
-=item
-
-show_files
-
-Customize the string of the menu entry "I<show_files>".
-
-Default: C<[Show-Files]>
-
-=back
-
-=head2 choose_directories
-
-    $chosen_directories = choose_directories( { mouse => 1, ... } )
-
-C<choose_directories> is similar to C<choose_a_directory> but it is possible to return multiple directories.
-
-Selecting the  "I<add_dirs>" menu entry opens the add-directories sub menu: one can add there directories from the
-current working directory to the list of chosen directories.
-
-To return the list of chosen directories (as an array reference) select the "I<confirm>" entry in main menu.
-
-The "I<back>" menu entry removes the last added directories. If the list of chosen directories is empty, "I<back>" causes
-C<choose_directories> to return nothing.
-
-Options as in L</choose_a_directory> plus
-
-=over
-
-=item
-
-add_dirs
-
-Customize the string of the menu entry "I<add_dirs>".
-
-Default: C<[Choose-Dirs]>
-
 =back
 
 =head2 choose_a_number
@@ -1306,6 +1416,16 @@ first argument to 4 would offer a range from 0 to 9999.
 Options:
 
 =over
+
+=item
+
+cs_label
+
+The value of I<cs_label> (current selection label) is a string which is placed in front of the current selection.
+
+Defaults: undef
+
+The current selection output is placed between the I<info> string and the I<prompt> string.
 
 =item
 
@@ -1366,6 +1486,41 @@ Values: [0],1,2.
 
 =item
 
+cs_begin
+
+Current selection: the I<cs_begin> string is placed between the I<cs_label> string and the chosen elements as soon as an
+element has been chosen.
+
+Default: empty string
+
+=item
+
+cs_end
+
+Current selection: as soon as elements have been chosen the I<cs_end> string is placed at the end of the chosen elements.
+
+Default: empty string
+
+=item
+
+cs_label
+
+The value of I<cs_label> (current selection label) is a string which is placed in front of the current selection.
+
+Default: undef
+
+The current selection output is placed between the I<info> string and the I<prompt> string.
+
+=item
+
+cs_separator
+
+Current selection: the I<cs_separator> is placed between the chosen list elements.
+
+Default: C< ,>
+
+=item
+
 index
 
 If true, the index positions in the available list of the made choices are returned.
@@ -1413,31 +1568,6 @@ I<prefix> expects as its value a string. This string is put in front of the elem
 The chosen elements are returned without this I<prefix>.
 
 Default: empty string.
-
-=item
-
-cs_begin
-
-Current selection: the I<cs_begin> string is placed between the I<cs_label> string and the chosen elements as soon as an
-element has been chosen.
-
-Default: empty string
-
-=item
-
-cs_separator
-
-Current selection: the I<cs_separator> is placed between the chosen list elements.
-
-Default: C< ,>
-
-=item
-
-cs_end
-
-Current selection: as soon as elements have been chosen the I<cs_end> string is placed at the end of the chosen elements.
-
-Default: empty string
 
 =back
 
@@ -1493,6 +1623,47 @@ the keys are the option names
 =item
 
 the values (C<0> if not defined) are the indexes of the current value of the respective key/option.
+
+=back
+
+With the optional third argument can be passed these options:
+
+=over
+
+=item
+
+cs_begin
+
+Current selection: the I<cs_begin> string is placed between the I<cs_label> string and the chosen elements as soon as an
+element has been chosen.
+
+Default: empty string
+
+=item
+
+cs_end
+
+Current selection: as soon as elements have been chosen the I<cs_end> string is placed at the end of the chosen elements.
+
+Default: empty string
+
+=item
+
+cs_label
+
+The value of I<cs_label> (current selection label) is a string which is placed in front of the current selection.
+
+Default: undef
+
+The current selection output is placed between the I<info> string and the I<prompt> string.
+
+=item
+
+cs_separator
+
+Current selection: the I<cs_separator> is placed between the chosen list elements.
+
+Default: C< ,>
 
 =back
 

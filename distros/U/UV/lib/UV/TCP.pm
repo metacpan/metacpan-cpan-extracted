@@ -1,6 +1,6 @@
 package UV::TCP;
 
-our $VERSION = '1.909';
+our $VERSION = '2.000';
 
 use strict;
 use warnings;
@@ -78,6 +78,12 @@ makes the following extra methods available.
 The L<open|http://docs.libuv.org/en/v1.x/tcp.html#c.uv_tcp_open> method
 associates the TCP handle with an existing filehandle already opened by the
 process.
+
+B<Note> that this method is not currently supported on Windows, because
+F<libuv> would want overlapped IO (created by C<WSA_FLAG_OVERLAPPED>), but
+Perl does not create such sockets.
+
+See also L<https://github.com/p5-UV/p5-UV/issues/38>.
 
 =head2 nodelay
 

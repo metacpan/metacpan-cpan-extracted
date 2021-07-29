@@ -9,6 +9,7 @@ use Encode                qw( encode decode );
 use File::Find            qw( find );
 use File::Spec::Functions qw( catfile );
 
+use DBD::SQLite::Constants ':dbd_sqlite_string_mode';
 use DBI            qw();
 use Encode::Locale qw();
 
@@ -37,17 +38,33 @@ sub get_db_driver {
 
 sub set_attributes {
     my ( $sf ) = @_;
-    return [
-        { name => 'sqlite_unicode',             default => 1, values => [ 0, 1 ] },
-        { name => 'sqlite_see_if_its_a_number', default => 1, values => [ 0, 1 ] },
-    ];
+    if ( DBD::SQLite->VERSION >= 1.68 ) {
+        my $values = [
+            DBD_SQLITE_STRING_MODE_PV               . ' DBD_SQLITE_STRING_MODE_PV',
+            DBD_SQLITE_STRING_MODE_BYTES            . ' DBD_SQLITE_STRING_MODE_BYTES',
+            DBD_SQLITE_STRING_MODE_UNICODE_NAIVE    . ' DBD_SQLITE_STRING_MODE_UNICODE_NAIVE',
+            DBD_SQLITE_STRING_MODE_UNICODE_FALLBACK . ' DBD_SQLITE_STRING_MODE_UNICODE_FALLBACK',
+            DBD_SQLITE_STRING_MODE_UNICODE_STRICT   . ' DBD_SQLITE_STRING_MODE_UNICODE_STRICT',
+        ];
+        return [
+            { name => 'sqlite_string_mode',         default => 3, values => $values },
+            { name => 'sqlite_see_if_its_a_number', default => 1, values => [ 0, 1 ] },
+        ];
+    }
+    else {
+        return [
+            { name => 'sqlite_unicode',             default => 1, values => [ 0, 1 ] },
+            { name => 'sqlite_see_if_its_a_number', default => 1, values => [ 0, 1 ] },
+        ];
+    }
 }
 
 
 sub get_db_handle {
     my ( $sf, $db ) = @_;
     my $db_opt_get = App::DBBrowser::Opt::DBGet->new( $sf->{i}, $sf->{o} );
-    my $attributes = $db_opt_get->attributes( $db );
+    my $db_opt = $db_opt_get->read_db_config_files();
+    my $attributes = $db_opt_get->attributes( $db, $db_opt );
     my $dsn = "dbi:$sf->{i}{driver}:dbname=$db";
     my $dbh = DBI->connect( $dsn, '', '', {
         PrintError => 0,
@@ -65,30 +82,34 @@ sub get_databases {
     return \@ARGV if @ARGV;
     my $cache_sqlite_files = catfile $sf->{i}{app_dir}, 'cache_SQLite_files.json';
     my $ax = App::DBBrowser::Auxil->new( {}, {}, {} );
+    my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my $db_cache = $ax->read_json( $cache_sqlite_files ) // {};
     my $dirs = $db_cache->{directories} // [ $sf->{i}{home_dir} ];
     my $databases = $db_cache->{databases} // [];
     if ( ! $sf->{i}{sqlite_search} && @$databases ) {
         return $databases;
     }
-    my ( $ok, $change ) = ( '- Confirm', '- Change' );
-    my $tc = Term::Choose->new( $sf->{i}{tc_default} );
-    my $choice = $tc->choose(
-        [ undef, $ok, $change ],
-        { %{$sf->{i}{lyt_v}}, prompt => 'Search path: ' . join( ', ', @$dirs ), info => 'SQLite Databases' }
-    );
-    if ( ! defined $choice ) {
-        return $databases;
-    }
-    if ( $choice eq $change ) {
-        my $tu = Term::Choose::Util->new( $sf->{i}{tcu_default} );
-        my $info = 'Curr: ' . join( ', ', @$dirs );
-        my $name = 'New : ';
-        my $new_dirs = $tu->choose_directories(
-            { cs_label => $name, info => $info }
+    while ( 1 ) {
+        my ( $ok, $change ) = ( '- Confirm', '- Change' );
+        # Choose
+        my $choice = $tc->choose(
+            [ undef, $ok, $change ],
+            { %{$sf->{i}{lyt_v}}, prompt => 'Search databases in: ' . join( ', ', @$dirs ), info => 'SQLite' }
         );
-        if ( defined $new_dirs && @$new_dirs ) {
+        if ( ! defined $choice ) {
+            return $databases;
+        }
+        elsif ( $choice eq $change ) {
+            my $tu = Term::Choose::Util->new( $sf->{i}{tcu_default} );
+            #my $info = 'Curr: ' . join( ', ', @$dirs ); #
+            my $new_dirs = $tu->choose_directories();
+            if ( ! @{$new_dirs//[]} ) {
+                next;
+            }
             $dirs = $new_dirs;
+        }
+        else {
+            last;
         }
     }
     $databases = [];

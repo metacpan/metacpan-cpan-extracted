@@ -1,8 +1,26 @@
+1.15 2021-07-13
 
-Complete version history
-========================
+ * This release does not add any new functionality. It is just to try to keep
+   the distribution up to date with the Perl environment.
 
-2016-12-03 v1.14 pjacklam
+ * Make to_base() a front-end to Math::BigInt->to_base().
+
+ * Add to_base() to the list of exported functions.
+
+ * Make fibonacci() a front-end to Math::BigInt->bfac().
+
+ * Reorganize existing test files, and add more test files.
+
+ * Better Makefile.PL.
+
+ * The tests now require Test::More version 0.88 or newer.
+
+ * New MANIFEST.SKIP file based on the template in the ExtUtils-Manifest
+   distribution.
+
+ * Format CHANGES according to CPAN::Changes::Spec.
+
+1.14 2016-12-03 pjacklam
 
  * Remove BENCHMARK file. The information there was obsolete.
 
@@ -20,7 +38,7 @@ Complete version history
 
  * Inform that the TODO file is not up to date.
 
-2016-04-26 v1.13 pjacklam
+1.13 2016-04-26 pjacklam
 
  * Replace "use vars ..." with "our ...".
 
@@ -74,7 +92,7 @@ Complete version history
 
  * Add more entries to "MANIFEST.SKIP".
 
-2007-04-17 1.12 Tels 182 tests
+1.12 2007-04-17 Tels 182 tests
 
  * speed up fibonacci():
    + by not making the argument a BigInt
@@ -90,56 +108,22 @@ Complete version history
  * bundle and use Module::Install
 
 ##############################################################################
-Older changelog for Math::Big:
 
-2001-03-17 1.00
+1.11 2005-01-02 Tels 177 tests
 
- * first version with primes(), fibonacci(), base()
+ * streamlined euler()
 
-2001-03-24 1.01
+ * @k = hailstone() is about 3..4 times faster
 
- * added: hailstone()
+ * $k = scalar hailstone() is about 6..7 times faster
 
-2001-04-12 1.02
+ * primes() is about 1.5 times faster
 
- * added: factors(), wheel() fixed: primes() 2001-05-07 1.03
+ * fix documentation for primes() (Thanx Es Allen Smith!)
 
- * added: factorial()
+ * add to_base($n, $base, [$alphabet]) (Thanx Tilghman Lesher!)
 
-2001-06-11 1.04
-
- * added: euler, bernoulli, cos, tan, sin, cosh, sinh, arctan, arctanh, arcsin,
-   arcsinh
-
- * moved: wheel, factor_wheel => Math::Big::Factorial
-
-2001-07-09 1.05
-
- * version increase for CPAN release
-
-2002-27-03 1.07
-
- * fixed testsuite to play nice with newest BigInt
-
- * small doc fixes
-
- * require v1.56, since v1.55 is broken on Windows
-
-2002-08-13 1.08
-
- * pi() finally works (thanx to Robert Jaeger)
-
- * require BigInt v1.61
-
- * some more tests
-
-2003-12-11 1.09 Tels
-
- * require Math::BigInt v1.67
-
- * factorial() uses simple BigInt bfac() for speed
-
-2004-08-13 1.10 Tels 161 tests
+1.10 2004-08-13 Tels 161 tests
 
  * __END__ in Big.pm, remove shebang line
 
@@ -157,36 +141,49 @@ Older changelog for Math::Big:
 
  * arcsin($x) were $x != 0 was broken
 
-2005-01-02 1.11 Tels 177 tests
+1.09 2003-12-11 Tels
 
- * streamlined euler()
+ * require Math::BigInt v1.67
 
- * @k = hailstone() is about 3..4 times faster
+ * factorial() uses simple BigInt bfac() for speed
 
- * $k = scalar hailstone() is about 6..7 times faster
+1.08 2002-08-13
 
- * primes() is about 1.5 times faster
+ * pi() finally works (thanx to Robert Jaeger)
 
- * fix documentation for primes() (Thanx Es Allen Smith!)
+ * require BigInt v1.61
 
- * add to_base($n, $base, [$alphabet]) (Thanx Tilghman Lesher!)
+ * some more tests
 
-##############################################################################
-Math::Big::Factors:
+1.07 2002-27-03
 
-2001-06-15 1.00
+ * fixed testsuite to play nice with newest BigInt
 
- * first version from Math::Big
+ * small doc fixes
 
-2004-08-13 1.01
+ * require v1.56, since v1.55 is broken on Windows
 
- * cleanups, remove shebang line and needless return statements
+1.05 2001-07-09
 
-##############################################################################
-Math::BigInt::Constant and Math::Roman are now separate CPAN packages. Please
-see L<http://search.cpan.org/>.
+ * version increase for CPAN release
 
-Please send me test-reports, your experiences with this and your ideas - I love
-to hear about my work!
+1.04 2001-06-11
 
-Tels <http://bloodgate.com/>
+ * added: euler, bernoulli, cos, tan, sin, cosh, sinh, arctan, arctanh, arcsin,
+   arcsinh
+
+ * moved: wheel, factor_wheel => Math::Big::Factorial
+
+1.02 2001-04-12
+
+ * added: factors(), wheel() fixed: primes() 2001-05-07 1.03
+
+ * added: factorial()
+
+1.01 2001-03-24
+
+ * added: hailstone()
+
+1.00 2001-03-17
+
+ * first version with primes(), fibonacci(), base()

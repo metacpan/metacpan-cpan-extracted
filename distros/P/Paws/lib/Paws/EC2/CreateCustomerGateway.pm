@@ -6,6 +6,7 @@ package Paws::EC2::CreateCustomerGateway;
   has DeviceName => (is => 'ro', isa => 'Str');
   has DryRun => (is => 'ro', isa => 'Bool', traits => ['NameInRequest'], request_name => 'dryRun' );
   has PublicIp => (is => 'ro', isa => 'Str', traits => ['NameInRequest'], request_name => 'IpAddress' );
+  has TagSpecifications => (is => 'ro', isa => 'ArrayRef[Paws::EC2::TagSpecification]', traits => ['NameInRequest'], request_name => 'TagSpecification' );
   has Type => (is => 'ro', isa => 'Str', required => 1);
 
   use MooseX::ClassAttribute;
@@ -32,9 +33,9 @@ You shouldn't make instances of this class. Each attribute should be used as a n
 =head1 SYNOPSIS
 
     my $ec2 = Paws->service('EC2');
-    # To create a customer gateway
-    # This example creates a customer gateway with the specified IP address for
-    # its outside interface.
+ # To create a customer gateway
+ # This example creates a customer gateway with the specified IP address for its
+ # outside interface.
     my $CreateCustomerGatewayResult = $ec2->CreateCustomerGateway(
       'BgpAsn'   => 65534,
       'PublicIp' => '12.1.2.3',
@@ -87,6 +88,12 @@ C<DryRunOperation>. Otherwise, it is C<UnauthorizedOperation>.
 
 The Internet-routable IP address for the customer gateway's outside
 interface. The address must be static.
+
+
+
+=head2 TagSpecifications => ArrayRef[L<Paws::EC2::TagSpecification>]
+
+The tags to apply to the customer gateway.
 
 
 

@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    Version 1.08
+    Version 1.10
 
 SYNOPSIS
 
@@ -267,6 +267,10 @@ SUBROUTINES/METHODS
     backward to complete or the session's page_load duration to elapse
     before returning, which, by default is 5 minutes. This method returns
     itself to aid in chaining methods.
+
+ default_binary_name
+
+    just returns the string 'firefox'. Only of interest when sub-classing.
 
  browser_version
 
@@ -1277,6 +1281,13 @@ SUBROUTINES/METHODS
             # redirecting to Test::More page
         }
 
+ macos_binary_paths
+
+    returns a list of filesystem paths that this module will check for
+    binaries that it can automate when running on MacOS
+    <https://en.wikipedia.org/wiki/MacOS>. Only of interest when
+    sub-classing.
+
  marionette_protocol
 
     returns the version for the Marionette protocol. Current most recent
@@ -1333,6 +1344,9 @@ SUBROUTINES/METHODS
       * addons - should any firefox extensions and themes be available in
       this session. This defaults to "0".
 
+      * binary - use the specified path to the Firefox
+      <https://firefox.org/> binary, rather than the default path.
+
       * capabilities - use the supplied capabilities object, for example to
       set whether the browser should accept insecure certs or whether the
       browser should use a proxy.
@@ -1359,9 +1373,6 @@ SUBROUTINES/METHODS
       * developer - only allow a developer edition
       <https://www.mozilla.org/en-US/firefox/developer/> to be launched.
       This defaults to "0" (off).
-
-      * firefox - use the specified path to the Firefox
-      <https://firefox.org/> binary, rather than the default path.
 
       * height - set the height
       <http://kb.mozillazine.org/Command_line_arguments#List_of_command_line_arguments_.28incomplete.29>
@@ -1751,6 +1762,22 @@ SUBROUTINES/METHODS
                                       $firefox->pause(4),
                     )->release();
 
+ restart
+
+    restarts the browser. After the restart, capabilities should be
+    restored. The same profile settings should be applied, but the current
+    state of the browser (such as the uri will be reset (like after a
+    normal browser restart). This method is primarily intended for use by
+    the update method. Not sure if this is useful by itself.
+
+        use Firefox::Marionette();
+    
+        my $firefox = Firefox::Marionette->new();
+    
+        $firefox->restart(); # but why?
+
+    This method returns itself to aid in chaining methods.
+
  screen_orientation
 
     returns the current browser orientation. This will be one of the valid
@@ -1915,6 +1942,29 @@ SUBROUTINES/METHODS
     page, such as filling out a text box. This method returns itself to aid
     in chaining methods.
 
+ update
+
+    queries the Update Services and applies any available updates. Restarts
+    the browser if necessary to complete the update.
+
+        use Firefox::Marionette();
+        use v5.10;
+    
+        my $firefox = Firefox::Marionette->new();
+    
+        my $update = $firefox->update();
+    
+        while($update->successful()) {
+            $update = $firefox->update();
+        }
+    
+        say "Updated to " . $update->display_version() . " - Build ID " . $update->build_id();
+    
+        $firefox->quit();
+
+    returns a status object that contains useful information about any
+    updates that occurred.
+
  uninstall
 
     accepts the GUID for the addon to uninstall. The GUID is returned when
@@ -1935,6 +1985,18 @@ SUBROUTINES/METHODS
 
     returns the current URI of current top level browsing context for
     Desktop. It is equivalent to the javascript document.location.href
+
+ win32_organisation
+
+    accepts a parameter of a Win32 product name and returns the matching
+    organisation. Only of interest when sub-classing.
+
+ win32_product_names
+
+    returns a hash of known Windows product names (such as 'Mozilla
+    Firefox') with priority orders. The lower the priority will determine
+    the order that this module will check for the existance of this
+    product. Only of interest when sub-classing.
 
  window_handle
 

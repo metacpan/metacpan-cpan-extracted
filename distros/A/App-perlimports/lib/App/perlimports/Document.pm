@@ -3,7 +3,7 @@ package App::perlimports::Document;
 use Moo;
 use utf8;
 
-our $VERSION = '0.000014';
+our $VERSION = '0.000017';
 
 use App::perlimports::Annotations ();
 use App::perlimports::Include     ();
@@ -495,31 +495,42 @@ sub _extract_symbols_from_snippet {
     my $snippet = shift;
     return () unless defined $snippet;
 
-    # Restore line breaks
+    # Restore line breaks and tabs
     $snippet =~ s{\\n}{\n}g;
+    $snippet =~ s{\\t}{\t}g;
 
     my $doc = PPI::Document->new( \$snippet );
     my @symbols
         = map { $_ . q{} } @{ $doc->find('PPI::Token::Symbol') || [] };
 
-    my $maybe_extract = $doc->find('PPI::Token::Word') || [];
-    for my $word ( @{$maybe_extract} ) {
+    my $casts = $doc->find('PPI::Token::Cast') || [];
+    for my $cast ( @{$casts} ) {
 
-        # Turn ${FOO} into $FOO
-        #
-        # PPI::Token::Cast    '$'
-        # PPI::Structure::Block       { ... }
-        #   PPI::Statement
-        #     PPI::Token::Word        'FOO'
-        if (   "$word" =~ m{\A\w}
-            && $word->parent->isa('PPI::Statement')
-            && $word->parent->parent->isa('PPI::Structure::Block')
-            && $word->parent->parent->sprevious_sibling->isa(
-                'PPI::Token::Cast') ) {
-            push @symbols, $word->parent->parent->sprevious_sibling . "$word";
+        # Optimistically avoid misinterpreting regex assertions as casts
+        # We don't want to match on "A" in the following example:
+        # if ( $thing =~ m{ \A b }x ) { ... }
+        next if $cast eq '\\';
+
+        my $full_cast   = $cast . $cast->snext_sibling;
+        my $cast_as_doc = PPI::Document->new( \$full_cast );
+        push @symbols,
+            map { $_ . q{} }
+            @{ $cast_as_doc->find('PPI::Token::Symbol') || [] };
+
+        my $words = $cast_as_doc->find('PPI::Token::Word') || [];
+
+        ## Turn ${FOO} into $FOO
+        if (   $words
+            && scalar @$words == 1
+            && $full_cast =~ m/([\$\@\%])\{$words->[0]}/ ) {
+            push @symbols, $1 . $words->[0];
             next;
         }
-        push @symbols, "$word" if is_function_call($word);
+
+        # This could likely be a source of false positives.
+        for my $word (@$words) {
+            push @symbols, "$word" if is_function_call($word);
+        }
     }
 
     return @symbols;
@@ -703,18 +714,22 @@ sub _is_used_fully_qualified {
 
     # We could tighten this up and check that the word following "::" is a sub
     # which exists in that package.
+    #
+    # Module::function
+    # Module::->new
+    # isa => ArrayRef[Module::]
     return 1 if $self->ppi_document->find(
         sub {
             (
                 $_[1]->isa('PPI::Token::Word')
                     && (
-                    $_[1]->content =~ m{\A${module_name}::[a-zA-Z_]}
+                    $_[1]->content =~ m{\A${module_name}::[a-zA-Z0-9_]*\z}
                     || (   $_[1]->content eq ${module_name}
                         && $_[1]->snext_sibling eq '->' )
                     )
                 )
                 || ( $_[1]->isa('PPI::Token::Symbol')
-                && $_[1] =~ m{\A[*\$\@\%]+${module_name}::[a-zA-Z_]} );
+                && $_[1] =~ m{\A[*\$\@\%]+${module_name}::[a-zA-Z0-9_]} );
         }
     );
 
@@ -967,7 +982,7 @@ App::perlimports::Document - Make implicit imports explicit
 
 =head1 VERSION
 
-version 0.000014
+version 0.000017
 
 =head2 inspector_for( $module_name )
 

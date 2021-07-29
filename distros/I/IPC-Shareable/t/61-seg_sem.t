@@ -12,6 +12,7 @@ my $k = tie my $sv, 'IPC::Shareable', 'test', { create => 1, destroy => 1 };
 
 my @seg_keys = qw(
     _id
+    _key
     _flags
     _type
     _size
@@ -43,6 +44,5 @@ is ref $tied_sem, 'IPC::Semaphore', "tied sem() is the proper object";
 
 is $knot_sem->id, $tied_sem->id, "knot and tied sem() hashes have the same id";
 
-print Dumper $k;
 done_testing();
 

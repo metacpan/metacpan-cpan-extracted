@@ -4,13 +4,13 @@
       "Craig DeForest <craig@deforest.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.133380",
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Alien-Gnuplot",
    "no_index" : {
@@ -36,7 +36,14 @@
             "File::Temp" : "0",
             "HTTP::Tiny" : "0",
             "POSIX" : "0",
-            "Time::HiRes" : "0"
+            "Time::HiRes" : "0",
+            "perl" : "5.006000"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Exception" : "0",
+            "Test::More" : "0"
          }
       }
    },
@@ -44,8 +51,10 @@
    "resources" : {
       "homepage" : "http://github.com/drzowie/Alien-Gnuplot",
       "repository" : {
+         "type" : "git",
          "url" : "git://github.com/drzowie/Alien-Gnuplot.git"
       }
    },
-   "version" : "1.033"
+   "version" : "1.034",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

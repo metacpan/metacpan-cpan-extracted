@@ -8,7 +8,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_SESSIONNOTGRANTED
 );
 
-our $VERSION = '2.0.10';
+our $VERSION = '2.0.12';
 
 extends 'Lemonldap::NG::Portal::Main::Plugin';
 
@@ -36,7 +36,7 @@ sub run {
     sub sortByComment {
         my $A = ( $a =~ /^.*?##(.*)$/ )[0];
         my $B = ( $b =~ /^.*?##(.*)$/ )[0];
-        return !$A ? 1 : !$B ? -1 : $A cmp $B;
+        return !( $A or $B ) ? $a cmp $b : !$A ? 1 : !$B ? -1 : $A cmp $B;
     }
 
     # Avoid display notification if AuthResult is not null

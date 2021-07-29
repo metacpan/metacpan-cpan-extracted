@@ -1,3 +1,28 @@
+2.041     2021-07-27
+
+    - Bug reports should now be made at GitHub Issues rather than RT.
+
+    - Rename openpage to open_page in PDF::API2.  The old name is deprecated.
+
+    - [RT #136648] Fix when writing PDFs containing cross-reference streams
+      (reported by Chris Papademetrious, fix by Vadim Repin from RT #117184).
+
+    - [RT #44877] GIFs containing comments or plain-text representations will no
+      longer result in an error (reported by Chris Czub).
+
+    - [RT #132844] Fix corruption when a PGM image is included (reported by Jeff
+      Ratcliffe, fix by Vadim Repin).
+
+    - Expand PNM support to include all image types.
+
+    - [RT #131657] Disable recursion warnings while releasing (destroying) PDF
+      indirect objects, which can be highly-interconnected (reported by Leon
+      Winter).
+
+    - [RT #41971] Fix when attempting to read an existing PDF's outlines
+      (reported by Damyan Ivanov, fix based on a patch by Vadim Repin).
+
+
 2.040     2021-04-13
 
     - Fix open() followed by stringify() resulting in a corrupt (mostly-empty)

@@ -62,7 +62,6 @@ my @files = (
     't/net-saml2-idp-metadata.xml',
     't/net-saml2-key.pem',
     't/net-saml2-metadata.xml',
-    't/release-trailing-space.t',
     't/sign-nopw-cert.pem'
 );
 

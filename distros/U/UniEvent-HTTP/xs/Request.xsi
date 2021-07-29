@@ -32,25 +32,25 @@ RequestSP Request::new (Hash params = Hash()) {
     if (params) fill(RETVAL, params);
 }
 
-double Request::timeout (Simple v = {}) {
+double Request::timeout (SV* v = nullptr) {
     if (v) {
-        THIS->timeout = double(v) * 1000;
+        THIS->timeout = xs::in<double>(v) * 1000;
         XSRETURN_UNDEF;
     }
     RETVAL = double(THIS->timeout)/1000;
 }
 
-bool Request::follow_redirect (Simple v = {}) {
+bool Request::follow_redirect (Sv v = {}) {
     if (v) {
-        THIS->follow_redirect = v;
+        THIS->follow_redirect = v.is_true();
         XSRETURN_UNDEF;
     }
     RETVAL = THIS->follow_redirect;
 }
 
-bool Request::tcp_nodelay (Simple v = {}) {
+bool Request::tcp_nodelay (Sv v = {}) {
     if (v) {
-        THIS->tcp_nodelay = v;
+        THIS->tcp_nodelay = v.is_true();
         XSRETURN_UNDEF;
     }
     RETVAL = THIS->tcp_nodelay;
@@ -64,9 +64,9 @@ AddrInfoHints Request::tcp_hints (Sv v = {}) {
     RETVAL = THIS->tcp_hints;
 }
 
-uint8_t Request::redirection_limit (Simple v = {}) {
+uint8_t Request::redirection_limit (Scalar v = Scalar()) {
     if (v) {
-        THIS->redirection_limit = v;
+        THIS->redirection_limit = v.number();
         XSRETURN_UNDEF;
     }
     RETVAL = THIS->redirection_limit;

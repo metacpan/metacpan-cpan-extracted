@@ -1,4 +1,6 @@
-Revision history for Alien-Gnuplot
+1.034 2021-07-23
+- reset stdin position before exec - thanks @vividsnow
+
 1.033   2017-02-24
 
    - bumb version number again and fix MANIFEST problem

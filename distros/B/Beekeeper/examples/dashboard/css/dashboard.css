@@ -1,0 +1,324 @@
+
+#sidebar {
+  position: fixed;
+  height: 100vh;
+  background-color: #f5f5f5;
+  padding-top: 68px;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+#sidebar .ui.menu > a.item {
+  padding: 10px 20px;
+  line-height: 20px;
+  color: #337ab7;
+  border-radius: 0 !important;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+#sidebar .ui.menu > a.item.active {
+  background-color: #337ab7;
+  color: white;
+  border: none !important;
+}
+
+#sidebar .ui.menu > a.item.active:hover {
+  background-color: #3175b0;
+  color: white;
+}
+
+#sidebar .ui.menu > a.item:hover {
+  background-color: #eee;
+  color: #23527c;
+}
+
+#content {
+  padding-top: 56px;
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+#content .ui.dividing.header {
+  width: 100%;
+}
+
+.ui.centered.small.circular.image {
+  margin-top: 14px;
+  margin-bottom: 14px;
+}
+
+.ui.borderless.menu {
+  box-shadow: none;
+  flex-wrap: wrap;
+  border: none;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.ui.mobile.only.grid .ui.menu .ui.vertical.menu {
+  display: none;
+}
+
+.section {
+  display: none;
+}
+
+/* Auth */
+
+#auth {
+  z-index: 1;
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  background-color: #eee;
+  display: table;
+}
+
+#auth > div {
+  display: table-cell;
+  vertical-align: middle;
+}
+
+#auth .login_form {
+  width: 300px;
+  margin: 0 auto;
+}
+
+/* Overview */
+
+#overview .statistic {
+  margin-bottom: 0px;
+}
+
+#ovw_mem + div {
+  text-transform: none;
+}
+
+#ovw_load {
+  color: limegreen;
+}
+
+#chart_ovw_req {
+  height: 120px;
+  width: 100%; 
+}
+
+#chart_ovw_load {
+  height: 120px;
+  width: 100%; 
+}
+
+#chart_ovw_req .data {
+  stroke: steelblue;
+}
+
+#chart_ovw_load .data {
+  stroke: darkorange;
+}
+
+#overview .chart_title {
+  margin-left: 55px;
+  margin-top: 5px; 
+  margin-bottom: -15px;
+}
+
+#bkservices th.sorting::after {
+  color: rgba(0,0,0,.87);
+}
+
+#bkservices {
+  text-align: right;
+}
+
+#bkservices th:first-child {
+  text-align: left;
+}
+
+#bkservices td:first-child {
+  text-align: left;
+}
+
+#bkservices td:first-child:hover {
+  cursor: pointer;
+}
+
+#bkservices th:nth-child(2) {
+  text-align: center;
+}
+
+#bkservices td:nth-child(2) {
+  text-align: center;
+}
+
+#bkservices td:nth-child(5):hover {
+  cursor: pointer;
+}
+
+/* Services */
+
+#services .statistic {
+  margin-bottom: 0px;
+}
+
+#services .statistics {
+  margin-bottom: 10px;
+}
+
+#svc_mem + div {
+  text-transform: none;
+}
+
+#svc_load {
+  color: limegreen;
+}
+
+#chart_svc_load {
+  height: 120px;
+  width: 100%; 
+}
+
+#chart_svc_req {
+  height: 120px;
+  width: 100%; 
+}
+
+#chart_svc_err {
+  height: 120px;
+  width: 100%; 
+}
+
+#chart_svc_cpu {
+  height: 120px;
+  width: 100%; 
+}
+
+#chart_svc_mem {
+  height: 120px;
+  width: 100%; 
+}
+
+#chart_svc_load .data {
+  stroke: darkorange;
+}
+
+#chart_svc_req .data {
+  stroke: steelblue;
+}
+
+#chart_svc_err .data {
+  stroke: red;
+}
+
+#chart_svc_cpu .data {
+  stroke: darkred;
+}
+
+#chart_svc_mem .data {
+  stroke: green;
+}
+
+#services .chart_title {
+  margin-left: 55px;
+  margin-top: 5px; 
+  margin-bottom: -15px;
+}
+
+/* Logs */
+
+#log_filters {
+  position: fixed;
+  width: 80%;
+  top: 50px;
+  right: 20px;
+}
+
+#log_entries .entry {
+  display: table;
+  width: 100%;
+  padding-top: 2px;
+  padding-bottom: 2px;
+  border-bottom: solid 1px #ddd;
+}
+
+#log_entries .level {
+  display: table-cell;
+  margin-left: 20px;
+  font-weight: bold;
+  font-family: monospace;
+  width: 8%;
+}
+
+#log_entries .tstamp {
+  display: table-cell;
+  white-space: nowrap;
+  margin-left: 20px;
+  font-size: 9pt;
+  width: 18%;
+}
+
+#log_entries .msg {
+  display: table-cell;
+  font-family: consolas,"Liberation Mono",courier,monospace;
+  font-size: 10pt;
+}
+
+#log_entries .entry .l1 {
+  color: red;
+}
+
+#log_entries .entry .l2 {
+  color: red;
+}
+
+#log_entries .entry .l3 {
+  color: red;
+}
+
+#log_entries .entry .l4 {
+  color: red;
+}
+
+#log_entries .entry .l5 {
+  color: darkorange;
+}
+
+#log_entries .entry .l6 {
+  color: green;
+}
+
+#log_entries .entry .l7 {
+  color: green;
+}
+
+#log_entries .entry .l8 {
+  color: steelblue;
+}
+
+#log_entries .level .l8 {
+  color: steelblue;
+}
+
+.rtchart .axis text {
+    font: 10px sans-serif;
+}
+
+/* Charts */
+
+.rtchart .axis path,
+.rtchart .axis line {
+    fill: none;
+    stroke: #000;
+    shape-rendering: crispEdges;
+}
+
+.rtchart .canvas {
+    fill: #f9f9fa;
+}
+
+.rtchart .data {
+    stroke: #000;
+    stroke-width: 2;
+}

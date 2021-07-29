@@ -30,9 +30,9 @@ You shouldn't make instances of this class. Each attribute should be used as a n
 =head1 SYNOPSIS
 
     my $streams.dynamodb = Paws->service('DynamoDBStreams');
-    # To obtain a shard iterator for the provided stream ARN and shard ID
-    # The following example returns a shard iterator for the provided stream ARN
-    # and shard ID.
+# To obtain a shard iterator for the provided stream ARN and shard ID
+# The following example returns a shard iterator for the provided stream ARN and
+# shard ID.
     my $GetShardIteratorOutput = $streams
       . dynamodb->GetShardIterator(
       'ShardId'           => '00000001414576573621-f55eea83',

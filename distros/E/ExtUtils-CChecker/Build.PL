@@ -1,3 +1,4 @@
+use v5;
 use strict;
 use warnings;
 
@@ -8,14 +9,14 @@ my $build = Module::Build->new(
    requires => {
       'ExtUtils::CBuilder' => 0,
    },
-   build_requires => {
-      'Module::Build' => 0,
+   test_requires => {
+      'Test::More' => '0.88', # done_testing
       'Test::Fatal' => 0,
-      'Test::More' => 0,
    },
-   auto_configure_requires => 0, # Don't add M::B to configure_requires
+   configure_requires => {
+      'Module::Build' => '0.4004', # test_requires
+   },
    license => 'perl',
-   create_makefile_pl => 'traditional',
    create_license => 1,
    create_readme  => 1,
 );

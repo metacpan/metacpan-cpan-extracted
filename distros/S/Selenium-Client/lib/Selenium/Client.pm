@@ -1,5 +1,5 @@
 package Selenium::Client;
-$Selenium::Client::VERSION = '1.04';
+$Selenium::Client::VERSION = '1.05';
 # ABSTRACT: Module for communicating with WC3 standard selenium servers
 
 use strict;
@@ -13,7 +13,7 @@ use feature qw/signatures/;
 
 use JSON::MaybeXS();
 use HTTP::Tiny();
-use Carp qw{confess};
+use Carp qw{confess cluck};
 use File::Path qw{make_path};
 use File::HomeDir();
 use File::Slurper();
@@ -21,6 +21,7 @@ use File::Spec();
 use Sub::Install();
 use Net::EmptyPort();
 use Capture::Tiny qw{capture_merged};
+use Unicode::Normalize qw{NFC};
 
 use Selenium::Specification;
 
@@ -43,6 +44,8 @@ sub new($class,%options) {
     $options{auto_close} //= 1;
     $options{browser}    //= '';
     $options{headless}   //= 1;
+    $options{normalize}  //= 1;
+    $options{fatal}      //= 1;
 
     #create client_dir and log-dir
     my $dir = File::Spec->catdir( $options{client_dir},"perl-client" );
@@ -300,8 +303,16 @@ sub _request($self, $method, %params) {
 
     print "$res->{status} : $res->{content}\n" if $self->{debug} && ref $res eq 'HASH';
 
-    my $decoded_content = eval { JSON::MaybeXS::decode_json($res->{content}) };
-    confess "$res->{reason} :\n Consult $subject->{href}\nRaw Error:\n$res->{content}\n" unless $res->{success};
+    # all the selenium servers are UTF-8
+    my $normal = $res->{content};
+    $normal = NFC( $normal ) if $self->{normalize};
+    my $decoded_content = eval { JSON::MaybeXS->new()->utf8()->decode( $normal ) };
+
+    if ($self->{fatal}) {
+        confess "$res->{reason} :\n Consult $subject->{href}\nRaw Error:\n$res->{content}\n" unless $res->{success};
+    } else {
+        cluck "$res->{reason} :\n Consult $subject->{href}\nRaw Error:\n$res->{content}\n" unless $res->{success};
+    }
 
     if (grep { $method eq $_ } @no_process) {
         return @{$decoded_content->{value}} if ref $decoded_content->{value} eq 'ARRAY';
@@ -365,15 +376,15 @@ sub _objectify($self,$result,$inject) {
 
 
 package Selenium::Capabilities;
-$Selenium::Capabilities::VERSION = '1.04';
+$Selenium::Capabilities::VERSION = '1.05';
 use parent qw{Selenium::Subclass};
 1;
 package Selenium::Session;
-$Selenium::Session::VERSION = '1.04';
+$Selenium::Session::VERSION = '1.05';
 use parent qw{Selenium::Subclass};
 1;
 package Selenium::Element;
-$Selenium::Element::VERSION = '1.04';
+$Selenium::Element::VERSION = '1.05';
 use parent qw{Selenium::Subclass};
 1;
 
@@ -389,7 +400,7 @@ Selenium::Client - Module for communicating with WC3 standard selenium servers
 
 =head1 VERSION
 
-version 1.04
+version 1.05
 
 =head1 CONSTRUCTOR
 
@@ -446,6 +457,12 @@ Only turn this off when you are debugging.
 
 Default: true
 
+=item C<normalize> BOOLEAN - Automatically normalize UTF-8 output using Normal Form C (NFC).
+
+If another normal form is preferred, you should turn this off and directly use L<Unicode::Normalize>.
+
+Default: true
+
 =item C<post_callbacks> ARRAY[CODE] - Executed after each request to the selenium server.
 
 Callbacks are passed $self, an HTTP::Tiny response hashref and the request hashref.
@@ -453,6 +470,12 @@ Use this to implement custom error handlers, testing harness modifications etc.
 
 Return a truthy value to immediately exit the request subroutine after all cbs are executed.
 Truthy values (if any are returned) are returned in order encountered.
+
+=item C<fatal> BOOLEAN - Whether or not to die on errors from the selenium server.
+
+Default: true
+
+Useful to turn off when using post_callbacks as error handlers.
 
 =back
 
@@ -656,6 +679,12 @@ Don't close this or your test will fail for obvious reasons.
 
 This also means that if you have to send ^C (SIGTERM) to your script or exit() prematurely, said window may be left dangling,
 as these behave a lot more like POSIX::_exit() does on unix systems.
+
+=head1 UTF-8 considerations
+
+The JSON responses from the selenium server are decoded as UTF-8, as per the Selenium standard.
+As a convenience, we automatically apply NFC to output via L<Unicode::Normalize>, which can be disabled by passing normalize=0 to the constructor.
+If you are comparing output from selenium calls against UTF-8 glyphs, `use utf8`, `use feature qw{unicode_strings}` and normalization is strongly suggested.
 
 =head1 AUTHOR
 

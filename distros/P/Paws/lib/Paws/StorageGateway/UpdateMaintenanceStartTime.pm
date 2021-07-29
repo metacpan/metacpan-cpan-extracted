@@ -31,10 +31,9 @@ You shouldn't make instances of this class. Each attribute should be used as a n
 =head1 SYNOPSIS
 
     my $storagegateway = Paws->service('StorageGateway');
-    # To update a gateway's maintenance start time
-    # Updates a gateway's weekly maintenance start time information, including
-    # day and time of the week. The maintenance time is in your gateway's time
-    # zone.
+  # To update a gateway's maintenance start time
+  # Updates a gateway's weekly maintenance start time information, including day
+  # and time of the week. The maintenance time is in your gateway's time zone.
     my $UpdateMaintenanceStartTimeOutput =
       $storagegateway->UpdateMaintenanceStartTime(
       'DayOfWeek'  => 2,
@@ -60,8 +59,6 @@ For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/sto
 The day of the month component of the maintenance start time
 represented as an ordinal number from 1 to 28, where 1 represents the
 first day of the month and 28 represents the last day of the month.
-
-This value is only available for tape and volume gateways.
 
 
 

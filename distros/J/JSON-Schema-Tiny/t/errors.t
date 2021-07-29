@@ -723,7 +723,7 @@ subtest 'bad regex in schema' => sub {
       valid => false,
       errors => [
         {
-          instanceLocation => ignore, # not important - JST errors at runtime, JSD2 at traverse time
+          instanceLocation => ignore, # not important - JST errors at runtime, JSM at traverse time
           keywordLocation => '/properties/my_pattern/pattern',
           error => re(qr/^Unmatched \( in regex/),
         },
@@ -743,7 +743,7 @@ subtest 'bad regex in schema' => sub {
       valid => false,
       errors => [
         {
-          instanceLocation => ignore, # not important - JST errors at runtime, JSD2 at traverse time
+          instanceLocation => ignore, # not important - JST errors at runtime, JSM at traverse time
           keywordLocation => '/properties/my_patternProperties/patternProperties/(',
           error => re(qr/^Unmatched \( in regex/),
         },
@@ -762,7 +762,7 @@ subtest 'bad regex in schema' => sub {
       valid => false,
       errors => [
         {
-          instanceLocation => '', # not important - JST and JSD2 both error at runtime
+          instanceLocation => '', # not important - JST and JSM both error at runtime
           keywordLocation => '',
           # in 5.28 and earlier: Can't find Unicode property definition "IsFoo"
           # in 5.30 and later:   Unknown user-defined property name \p{main::IsFoo}
@@ -909,7 +909,7 @@ subtest 'JSON pointer escaping' => sub {
       valid => false,
       errors => [
         {
-          instanceLocation => ignore, # not important - JST errors at runtime, JSD2 at traverse time
+          instanceLocation => ignore, # not important - JST errors at runtime, JSM at traverse time
           keywordLocation => '/$ref/properties/{}/patternProperties/a{',
           absoluteKeywordLocation => '#/$defs/mydef/properties/%7B%7D/patternProperties/a%7B',
           error => re(qr/^Unescaped left brace in regex is (illegal here|deprecated|passed through)/),

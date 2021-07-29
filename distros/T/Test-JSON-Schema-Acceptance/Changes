@@ -1,5 +1,8 @@
 Revision history for Test-JSON-Schema-Acceptance
 
+1.012     2021-07-22 05:14:11Z
+        - updated test suite to commit fd0aa9f8e2497d9048e17f071abb8fa409f5cb52
+
 1.011     2021-06-26 19:38:21Z
         - updated test suite to commit b6769f2b9ae8b3adbe8117d155a1f8ade092fb88
 

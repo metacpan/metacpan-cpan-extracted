@@ -70,11 +70,11 @@ __PACKAGE__->meta->make_immutable;
 1;
 __END__
 
-=head 1 Name
+=head1 Name
 
 Connector::Builtin::Env
 
-=head 1 Description
+=head1 Description
 
 Return the contents of a environment value.
 The value of LOCATION is not used.

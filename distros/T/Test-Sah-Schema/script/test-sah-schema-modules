@@ -1,9 +1,9 @@
 #!perl
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-13'; # DATE
+our $DATE = '2021-07-20'; # DATE
 our $DIST = 'Test-Sah-Schema'; # DIST
-our $VERSION = '0.009'; # VERSION
+our $VERSION = '0.010'; # VERSION
 
 use 5.010001;
 use strict;
@@ -46,7 +46,7 @@ test-sah-schema-modules - Test all Schema modules in distribution
 
 =head1 VERSION
 
-This document describes version 0.009 of test-sah-schema-modules (from Perl distribution Test-Sah-Schema), released on 2020-06-13.
+This document describes version 0.010 of test-sah-schema-modules (from Perl distribution Test-Sah-Schema), released on 2021-07-20.
 
 =head1 SYNOPSIS
 
@@ -115,7 +115,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -21,7 +21,7 @@ subtype 'Net::Songkick::DateTime',
 coerce 'Net::Songkick::DateTime',
   from 'HashRef',
   via {
-    my $dt = ( exists($_->{datetime}) )   ?
+    my $dt = $_->{datetime} ?
 
       DateTime::Format::Strptime->new(
       pattern => '%Y-%m-%dT%H:%M:%S%z',
@@ -52,4 +52,3 @@ This script is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
 
 =cut
-

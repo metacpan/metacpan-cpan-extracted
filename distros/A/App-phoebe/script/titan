@@ -16,10 +16,18 @@
 
 =encoding utf8
 
-=head1 Titan
+=head1 NAME
 
-This is a script to upload content to a Titan-enabled site like Gemini Wiki. It
-takes a varying number of arguments:
+Titan - a text and file uploader for using the Titan protocol
+
+=head1 SYNOPSIS
+
+B<titan> [B<--help>] B<--url=>I<URL> [B<--token=>I<TOKEN>] [B<--mime=>I<MIMETYPE>]
+[B<--cert_file=>I<FILE> B<--key_file=>I<FILE>] [I<FILES> ...]
+
+=head1 DESCRIPTION
+
+This is a script to upload content to a Titan-enabled site like Phoebe.
 
 B<--url=URL> specifies the Titan URL to use; this should be really similar to
 the Gemini URL you used to read the page.

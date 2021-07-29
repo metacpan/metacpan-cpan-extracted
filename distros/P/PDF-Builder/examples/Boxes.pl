@@ -21,8 +21,8 @@ my $trimbox_adj = 1/mm;  # in from bleed box
 my $bleedbox_adj = 36/pt;  # in from crop box on top and right for printer inst.
 my $cropbox_adj = 0.25/in;  # in from media edge
 
-our $VERSION = '3.022'; # VERSION
-my $LAST_UPDATE = '3.017'; # manually update whenever code is changed
+our $VERSION = '3.023'; # VERSION
+our $LAST_UPDATE = '3.023'; # manually update whenever code is changed
 
 my $PDFname = $0;
    $PDFname =~ s/\..*$//;  # remove extension such as .pl
@@ -264,7 +264,7 @@ my $LoremIpsum =
 	# some Lorem Ipsum text within trim box and a margin
 	$text->fillcolor('black');
 	$text->font($font, $fontsize);
-        $text->lead($fontsize * 1.25);
+        $text->leading($fontsize * 1.25);
 	$x1 += $trimbox_adj + 4/pt;
 	$y1 -= 5/pt + $fontsize/pt;  # top baseline less one line
 	$x2 -= $trimbox_adj + 4/pt;

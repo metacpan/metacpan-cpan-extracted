@@ -1,0 +1,8 @@
+0.02    2021-07-23
+    - supports different return values from request handling methods
+      Future, Array-Ref and Scalar
+      so request handling methods can be async (Future::AsyncAwait)
+    - add support for capture args
+
+0.01  2020-10-14
+    - initial version

@@ -17,7 +17,7 @@ name: Net-Songkick
 provides:
   Net::Songkick:
     file: lib/Net/Songkick.pm
-    version: v1.0.6
+    version: v1.0.7
   Net::Songkick::Artist:
     file: lib/Net/Songkick/Artist.pm
   Net::Songkick::City:
@@ -47,5 +47,5 @@ requires:
   perl: v5.6.0
 resources:
   license: http://dev.perl.org/licenses/
-version: v1.0.6
+version: v1.0.7
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

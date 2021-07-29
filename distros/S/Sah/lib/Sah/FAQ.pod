@@ -1,5 +1,8 @@
 package Sah::FAQ; # just to make PodWeaver happy
 
+# AUTHORITY
+# DATE
+our $DIST = 'Sah'; # DIST
 # VERSION
 
 1;
@@ -17,7 +20,7 @@ Sah::FAQ - Frequently asked questions
 
 =head1 VERSION
 
-This document describes version 0.9.49 of Sah::FAQ (from Perl distribution Sah), released on 2020-02-11.
+This document describes version 0.9.50 of Sah::FAQ (from Perl distribution Sah), released on 2021-07-20.
 
 =head1 GENERAL
 
@@ -317,7 +320,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -3,13 +3,13 @@ package Net::DNS::Parameters;
 ################################################
 ##
 ##	Domain Name System (DNS) Parameters
-##	(last updated 2021-03-08)
+##	(last updated 2021-05-26)
 ##
 ################################################
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: Parameters.pm 1832 2021-03-22 08:33:36Z willem $)[2];
+our $VERSION = (qw$Id: Parameters.pm 1841 2021-06-23 20:34:28Z willem $)[2];
 
 use integer;
 use Carp;
@@ -73,33 +73,33 @@ my @typebyname = (
 	RT	   => 21,					# RFC1183
 	NSAP	   => 22,					# RFC1706
 	'NSAP-PTR' => 23,					# RFC1348 RFC1637 RFC1706
-	SIG	   => 24,					# RFC4034 RFC3755 RFC2535 RFC2536 RFC2537 RFC2931 RFC3110 RFC3008
-	KEY	   => 25,					# RFC4034 RFC3755 RFC2535 RFC2536 RFC2537 RFC2539 RFC3008 RFC3110
+	SIG	   => 24,					# RFC2535 RFC2536 RFC2537 RFC2931 RFC3008 RFC3110 RFC3755 RFC4034
+	KEY	   => 25,					# RFC2535 RFC2536 RFC2537 RFC2539 RFC3008 RFC3110 RFC3755 RFC4034
 	PX	   => 26,					# RFC2163
 	GPOS	   => 27,					# RFC1712
 	AAAA	   => 28,					# RFC3596
 	LOC	   => 29,					# RFC1876
-	NXT	   => 30,					# RFC3755 RFC2535
+	NXT	   => 30,					# RFC2535 RFC3755
 	EID	   => 31,					# http://ana-3.lcs.mit.edu/~jnc/nimrod/dns.txt
 	NIMLOC	   => 32,					# http://ana-3.lcs.mit.edu/~jnc/nimrod/dns.txt
 	SRV	   => 33,					# RFC2782
 	ATMA	   => 34,					# http://www.broadband-forum.org/ftp/pub/approved-specs/af-dans-0152.000.pdf
-	NAPTR	   => 35,					# RFC2915 RFC2168 RFC3403
+	NAPTR	   => 35,					# RFC2168 RFC2915 RFC3403
 	KX	   => 36,					# RFC2230
 	CERT	   => 37,					# RFC4398
-	A6	   => 38,					# RFC3226 RFC2874 RFC6563
+	A6	   => 38,					# RFC2874 RFC3226 RFC6563
 	DNAME	   => 39,					# RFC6672
 	SINK	   => 40,					# http://tools.ietf.org/html/draft-eastlake-kitchen-sink
-	OPT	   => 41,					# RFC6891 RFC3225
+	OPT	   => 41,					# RFC3225 RFC6891
 	APL	   => 42,					# RFC3123
-	DS	   => 43,					# RFC4034 RFC3658
+	DS	   => 43,					# RFC3658 RFC4034
 	SSHFP	   => 44,					# RFC4255
 	IPSECKEY   => 45,					# RFC4025
-	RRSIG	   => 46,					# RFC4034 RFC3755
-	NSEC	   => 47,					# RFC4034 RFC3755
-	DNSKEY	   => 48,					# RFC4034 RFC3755
+	RRSIG	   => 46,					# RFC3755 RFC4034
+	NSEC	   => 47,					# RFC3755 RFC4034 RFC-ietf-dnsop-nsec-ttl-05
+	DNSKEY	   => 48,					# RFC3755 RFC4034
 	DHCID	   => 49,					# RFC4701
-	NSEC3	   => 50,					# RFC5155
+	NSEC3	   => 50,					# RFC5155 RFC-ietf-dnsop-nsec-ttl-05
 	NSEC3PARAM => 51,					# RFC5155
 	TLSA	   => 52,					# RFC6698
 	SMIMEA	   => 53,					# RFC8162

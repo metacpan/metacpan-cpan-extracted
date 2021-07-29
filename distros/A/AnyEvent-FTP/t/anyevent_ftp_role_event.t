@@ -3,7 +3,7 @@ use Test2::V0 -no_srand => 1;
 eval {
   package Foo;
 
-  use Moo;
+  use Moo;  ## no critic (Modules::ProhibitConditionalUseStatements)
 
   with 'AnyEvent::FTP::Role::Event';
 

@@ -1,3 +1,11 @@
+0.010   2021-07-20  Released-By: PERLANCAR; Urgency: medium
+
+	- Prefer normalized schema with no extras part (the new form), give
+	  warning if schema is old normalized form.
+
+	- Handle non-defhash examples.
+
+
 0.009   2020-06-13  Released-By: PERLANCAR; Urgency: medium
 
 	- Test examples with Perinci::Sub::Wrapper (PSW) if available, to test

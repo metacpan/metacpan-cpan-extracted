@@ -73,11 +73,11 @@ Modules and code layout
     Details on the request are in Myriad::RPC::Request and the response to
     be sent back is in Myriad::RPC::Response.
 
-      * Myriad::RPC::Redis
+      * Myriad::RPC::Implementation::Redis
 
-      * Myriad::RPC::PostgreSQL
+      * Myriad::RPC::Implementation::PostgreSQL
 
-      * Myriad::RPC::Memory
+      * Myriad::RPC::Implementation::Memory
 
     Additional transport mechanisms may be available, see CPAN for details.
 
@@ -88,11 +88,11 @@ Modules and code layout
 
     Subscription implementations include:
 
-      * Myriad::Subscription::Redis
+      * Myriad::Subscription::Implementation::Redis
 
-      * Myriad::Subscription::PostgreSQL
+      * Myriad::Subscription::Implementation::PostgreSQL
 
-      * Myriad::Subscription::Memory
+      * Myriad::Subscription::Implementation::Memory
 
     Additional transport mechanisms may be available, see CPAN for details.
 
@@ -250,6 +250,10 @@ METHODS
  setup_tracing
 
     Prepare OpenTracing collection.
+
+ setup_metrics
+
+    Prepare Metrics::Any::Adapter to collect metrics.
 
  run
 

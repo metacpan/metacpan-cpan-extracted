@@ -48,8 +48,8 @@ sub main {
 
         $tzil->test;
 
-        is( $Local::PluginBundle::RESULT, $prime * $prime, '... code did run' );
-        is( ( scalar grep { $_ eq "[$name] $prime" } @{ $tzil->log_messages() } ), 1, '... correct message got logged' )
+        is( $Local::PluginBundle::RESULT,                                          $prime * $prime, '... code did run' );
+        is( ( scalar grep { $_ eq "[$name] $prime" } @{ $tzil->log_messages() } ), 1,               '... correct message got logged' )
           or diag 'got log messages: ', explain $tzil->log_messages;
     }
 
@@ -82,8 +82,8 @@ sub main {
 
         $tzil->test;
 
-        is( $Local::PluginBundleEasy::RESULT, $prime * $prime, '... code did run' );
-        is( ( scalar grep { $_ eq "[=Local::PluginBundleEasy/$name] $prime" } @{ $tzil->log_messages() } ), 1, '... correct message got logged' )
+        is( $Local::PluginBundleEasy::RESULT,                                                               $prime * $prime, '... code did run' );
+        is( ( scalar grep { $_ eq "[=Local::PluginBundleEasy/$name] $prime" } @{ $tzil->log_messages() } ), 1,               '... correct message got logged' )
           or diag 'got log messages: ', explain $tzil->log_messages;
     }
 

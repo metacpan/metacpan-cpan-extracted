@@ -1,5 +1,14 @@
 Revision history for AnyEvent-FTP
 
+0.17      2021-07-12 08:43:17 -0600
+  - Fix bug related to space being in %PATH% on Windows
+  - Another fix on Perl where test suite could fail if
+    installed from a different volume than the temp
+    directory.
+  - Add dependency on Capture::Tiny
+  - Relax Perl requirement to 5.10.0 (had been
+    5.10.1)
+
 0.16      2017-08-30 09:08:58 -0400
   - Fix to timeout in now longer running client test
   - Fix to test that was not optionally using EV

@@ -1,5 +1,63 @@
 Revision history for Perl extension Net::SAML2.
 
+0.40 - 2021-07-26
+
+  [Significant Changes since 0.38]
+
+  - Add support for Auth0 SAML (bug fix)
+  - Add options to allow https for metadata urls
+
+  [Change Log]
+  - TDD     Update Changes and Increment version
+  - 314df85 Remove Test::TrailingSpace keeps failing on automatic License file
+  - 9bc0901 Mention TUTORIAL.md in synopsis and README
+  - 343ae20 Rename Tutorial
+  - b5591cc Update documentation for ssl_opts for Idp new_from_url
+
+0.39-TRIAL - 2021-07-25
+
+  [Change Log]
+  - b34f4f8 Update Changes and Increment version
+  - 5921d12 Fixes #28 support https urls for metadata
+  - 95a2311 Fixes #29 which also supports Auth0 SAML
+  - 09591b6 Test InResponseTo on Assertions
+
+0.38 - 2021-07-23
+
+  [Change Log]
+
+  - 88abdeb Update Changes and Increment version
+
+0.37-TRIAL - 2021-07-21
+
+  [Change Log]
+
+  - cc4e029 Update Changes and Increment version
+  - f6227a4 Replace remaining XML::XPath with XML::libXML
+
+0.36-TRIAL - 2021-07-15
+
+  [Change Log]
+
+  - 7bddf72 Update Changes and Increment version
+  - be1a42f Remove no_comments call from IdP
+
+0.35-TRIAL - 2021-07-14
+
+  [Significant Changes]
+
+  Replaces XML::XPath with XML::libXML which is better maintained and more
+  powerful.  XML::libXML options are set to disable loading external documents
+  and expanding entities as well as disabling network access.
+
+  [Change Log]
+
+  - a071834 Update Changes and Increment version
+  - 3741d2a Replace XML::XPath with XML::libXML
+  - f3887f5 Fixup Contributors and cleanup README
+  - 9d8c3bd Automatically generate README for repo
+  - 4a1f2ef Update dist.ini to use Pod2Readme
+
 0.34 - 2021-03-30
 
   [Significant Changes since 0.32]
@@ -14,7 +72,7 @@ Revision history for Perl extension Net::SAML2.
 
   [Change Log]
 
-  - TBD     Update Changes and Increment version
+  - 1ef0848 Update Changes and Increment version
 
 0.33-TRIAL - 2021-03-28
 

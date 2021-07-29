@@ -17,7 +17,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
 
 extends 'Lemonldap::NG::Portal::Main::Plugin';
 
-our $VERSION = '2.0.10';
+our $VERSION = '2.0.12';
 
 # INITIALIZATION
 
@@ -91,9 +91,23 @@ sub _modifyPassword {
       : PE_OK;
     return $cpq unless ( $cpq == PE_OK );
 
+    my $hook_result = $self->p->processHook(
+        $req, 'passwordBeforeChange', $req->user,
+        $req->data->{newpassword},
+        $req->data->{oldpassword}
+    );
+    return $hook_result if ( $hook_result != PE_OK );
+
     # Call password package
     my $res = $self->modifyPassword( $req, $req->data->{newpassword} );
     if ( $res == PE_PASSWORD_OK ) {
+
+        $self->p->processHook(
+            $req, 'passwordAfterChange', $req->user,
+            $req->data->{newpassword},
+            $req->data->{oldpassword}
+        );
+
         $self->logger->debug( 'Update password in session for ' . $req->user );
         my $userlog = $req->sessionInfo->{ $self->conf->{whatToTrace} };
         my $iplog   = $req->sessionInfo->{ipAddr};
@@ -176,7 +190,7 @@ sub checkPasswordQuality {
     ## Min special characters
     # Just number of special characters must be checked
     if ( $self->conf->{passwordPolicyMinSpeChar} && $speChars eq '__ALL__' ) {
-        my $spe = $password =~ s/\w//g;
+        my $spe = $password =~ s/\W//g;
         if ( $spe < $self->conf->{passwordPolicyMinSpeChar} ) {
             $self->logger->error("Password has not enough special characters");
             return PE_PP_INSUFFICIENT_PASSWORD_QUALITY;
@@ -195,17 +209,48 @@ sub checkPasswordQuality {
     }
 
     ## Fobidden special characters
-    $password =~ s/[\Q$speChars\E\w]//g;
-    if ($password) {
-        $self->logger->error( 'Password contains '
-              . length($password)
-              . " forbidden character(s): $password" );
-        return length($password) > 1
-          ? PE_PP_NOT_ALLOWED_CHARACTERS
-          : PE_PP_NOT_ALLOWED_CHARACTER;
+    unless ( $speChars eq '__ALL__' ) {
+        $password =~ s/[\Q$speChars\E\w]//g;
+        if ($password) {
+            $self->logger->error( 'Password contains '
+                  . length($password)
+                  . " forbidden character(s): $password" );
+            return length($password) > 1
+              ? PE_PP_NOT_ALLOWED_CHARACTERS
+              : PE_PP_NOT_ALLOWED_CHARACTER;
+        }
     }
 
     return PE_OK;
+}
+
+# This method should be called when resetting the password
+# in order to call the password hook
+sub setNewPassword {
+    my ( $self, $req, $pwd, $useMail ) = @_;
+
+    my $hook_result =
+      $self->p->processHook( $req, 'passwordBeforeChange', $req->user, $pwd );
+    return $hook_result if ( $hook_result != PE_OK );
+
+    # Delegate to subclass
+    my $mod_result = $self->modifyPassword( $req, $pwd, $useMail );
+
+    if ( $mod_result == PE_PASSWORD_OK ) {
+        $hook_result =
+          $self->p->processHook( $req, 'passwordAfterChange', $req->user,
+            $pwd );
+        if ( $hook_result != PE_OK ) {
+            return $hook_result;
+        }
+        else {
+            return PE_PASSWORD_OK;
+        }
+    }
+    else {
+        return $mod_result;
+    }
+
 }
 
 1;

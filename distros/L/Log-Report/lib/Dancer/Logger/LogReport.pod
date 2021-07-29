@@ -61,8 +61,8 @@ is controlled per dispatcher (as well)
 
 =head1 SEE ALSO
 
-This module is part of Log-Report distribution version 1.32,
-built on January 26, 2021. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Log-Report distribution version 1.33,
+built on July 17, 2021. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

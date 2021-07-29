@@ -1,0 +1,192 @@
+=encoding UTF-8
+
+=head1 NAME
+
+TCOD::Image - The TCOD image toolkit
+
+=head1 SYNOPSIS
+
+    use TCOD;
+
+    my $image = TCOD::Image->load( $path );
+    $image->invert;
+
+    # Render the whole image to the root console
+    $image->blit_rect( undef, 0, 0, -1, -1, TCOD::BKGND_NONE );
+
+=head1 DESCRIPTION
+
+This class makes it possible to load image files, manipulate them, and render
+them onto L<TCOD::Console> objects. Likewise, the contents of L<TCOD::Console>
+objects can be converted to images and saved to disk.
+
+=head1 METHODS
+
+=head2 new
+
+    $image = TCOD::Image->new( $width, $height );
+
+Create a black image with the specified dimensions.
+
+=head2 load
+
+    $image = TCOD::Image->load( $path );
+
+Load an image from a BMP or PNG file. If using PNG files, only 24- and 32-bit
+images are supported.
+
+=head2 from_console
+
+    $image = TCOD::Image->from_console( $console );
+
+Create an image with the contents of a console. The size of the image will
+depend on the size of the console and the character size of the font.
+
+=head2 save
+
+    $image->save( $path );
+
+Save the image to a BMP or PNG file.
+
+=head2 refresh_console
+
+    $image->refresh_console( $console );
+
+Refresh the image created with L<from_console> with the current content of a
+console. The console must have the same dimensions as the console used when
+the image was created.
+
+=head2 put_pixel
+
+    $image->put_pixel( $x, $y, $color );
+
+Change the color of the pixel specified by its coordinates.
+
+=head2 scale
+
+    $image->scale( $width, $height );
+
+Resize an image scaling its contents. Super-sampling is used for scaling down.
+Scaling up uses nearest neighbours.
+
+=head2 get_pixel
+
+    $color = $image->get_pixel( $x, $y );
+
+=head2 get_alpha
+
+    $alpha = $image->get_alpha( $x, $y );
+
+=head2 get_mipmap_pixel
+
+    $color = $image->get_mipmap_pixel( $x1, $y1, $x2, $y2 );
+
+=head2 rotate90
+
+    $image->rotate90( $times );
+
+Rotate the image clockwise in 90 degree increments. To rotate the image
+180 degrees, set C<$times> to 2.
+
+=head2 invert
+
+    $image->invert;
+
+Invert the colors of all the pixels in the image.
+
+=head2 vflip
+
+    $image->vflip;
+
+Flip the image vertically.
+
+=head2 hflip
+
+    $image->hflip;
+
+Flip the image horizontally.
+
+=head2 clear
+
+    $image->clear( $color );
+
+Set all the pixels in the image to the specified color.
+
+=head2 set_key_color
+
+    $image->set_key_color( $color );
+
+Set a key color that will be ignored by the blitting function. Pixels of this
+color will not be rendered, which makes it possible to blit non-rectangular
+images with transparent pixels.
+
+=head2 blit
+
+    $image->blit( $console, $x, $y, $flags, $scale_x, $scale_y, $angle );
+
+Blit an image on a console. The first two parameters (which must be integers)
+specify the coordinates of the cell in the target console where the centre
+of the image will be rendered. The flags determine how the cell's background
+is modified and must be a value in the L<BackgroundFlag|TCOD/BackgroundFlag>
+enum.
+
+The image can be scaled and rotated with the last three parameters. Of these,
+the first and second determine the horizontal and vertical scaling
+respectively. These must be values between 0 and 1. The last value determines
+the rotation angle in radians.
+
+=head2 blit_2x
+
+    $image->blit_2x(
+        $console,
+        $cell_x,
+        $cell_y,
+        $image_x,
+        $image_y,
+        $image_width,
+        $image_height,
+    );
+
+Blit the image with sub-cell resolution.
+
+The first two values determine the coordinate of the cell in the console where
+the upper-left corner of the blitted image will be.
+
+The last four values determine the portion of the image to blit. To blit the
+entire image, -1 can be used for the width and height.
+
+=head2 blit_rect
+
+    $image->blit_rect( $console, $x, $y, $w, $h, $flags );
+
+Blit a rectangular part of the image on a console without scaling or
+rotating it. Each pixel in the image fills a cell in the console. For a
+method that supports rotation and scaling, see L<blit|/blit>.
+
+The value in C<$flags> is one of those in the
+L<BackgroundFlag|TCOD/BackgroundFlag> enum.
+
+=head2 get_size
+
+    ( $w, $h ) = $image->get_size;
+
+Returns a list with the width and height of an image in pixels.
+
+=head1 SEE ALSO
+
+=over
+
+=item L<TCOD>
+
+=item L<TCOD::Color>
+
+=item L<TCOD::Console>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2021 José Joaquín Atria
+
+This library is free software; you can redistribute it and/or modify it under
+the Artistic License 2.0.

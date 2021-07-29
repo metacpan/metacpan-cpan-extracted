@@ -1,0 +1,62 @@
+---
+abstract: 'Add almanac date/time functionality (sunrise, etc.) to Date::Manip'
+author:
+  - 'Thomas R. Wyant, III F<wyant at cpan dot org>'
+build_requires:
+  Test2::Plugin::BailOnFail: '0'
+  Test2::Tools::LoadModule: '0'
+  Test2::V0: '0'
+configure_requires:
+  lib: '0'
+  strict: '0'
+  warnings: '0'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Date-ManipX-Almanac
+no_index:
+  directory:
+    - eg
+    - inc
+    - t
+    - tools
+    - xt
+provides:
+  Date::ManipX::Almanac:
+    file: lib/Date/ManipX/Almanac.pm
+    version: '0.001'
+  Date::ManipX::Almanac::Date:
+    file: lib/Date/ManipX/Almanac/Date.pm
+    version: '0.001'
+  Date::ManipX::Almanac::Lang:
+    file: lib/Date/ManipX/Almanac/Lang.pm
+    version: '0.001'
+  Date::ManipX::Almanac::Lang::english:
+    file: lib/Date/ManipX/Almanac/Lang/english.pm
+    version: '0.001'
+requires:
+  Astro::Coord::ECI: '0.119'
+  Astro::Coord::ECI::Moon: '0.119'
+  Astro::Coord::ECI::Sun: '0.119'
+  Astro::Coord::ECI::Utils: '0.119'
+  Carp: '0'
+  Date::Manip: '6.55'
+  Date::Manip::Date: '6.55'
+  Module::Load: '0'
+  Scalar::Util: '0'
+  Text::ParseWords: '0'
+  constant: '0'
+  parent: '0'
+  perl: '5.01'
+  strict: '0'
+  utf8: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Date-ManipX-Almanac
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/trwyant/perl-Date-ManipX-Almanac.git
+version: '0.001'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

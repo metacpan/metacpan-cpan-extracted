@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.733';
+our $VERSION = '1.735';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose );
 
@@ -49,6 +49,44 @@ sub new {
 }
 
 
+sub _valid_options {
+    return {
+        beep                => '[ 0 1 ]',
+        clear_screen        => '[ 0 1 ]',
+        codepage_mapping    => '[ 0 1 ]',
+        hide_cursor         => '[ 0 1 ]',
+        index               => '[ 0 1 ]',
+        mouse               => '[ 0 1 ]',
+        order               => '[ 0 1 ]',
+        alignment           => '[ 0 1 2 ]',
+        color               => '[ 0 1 2 ]',
+        f3                  => '[ 0 1 2 ]',
+        include_highlighted => '[ 0 1 2 ]',
+        page                => '[ 0 1 2 ]',
+        layout              => '[ 0 1 2 3 ]',
+        keep                => '[ 1-9 ][ 0-9 ]*', ## 0 ?
+        ll                  => '[ 1-9 ][ 0-9 ]*',
+        max_cols            => '[ 1-9 ][ 0-9 ]*',
+        max_height          => '[ 1-9 ][ 0-9 ]*',
+        max_width           => '[ 1-9 ][ 0-9 ]*',
+        default             => '[ 0-9 ]+',
+        pad                 => '[ 0-9 ]+',
+        mark                => 'Array_Int',
+        meta_items          => 'Array_Int',
+        no_spacebar         => 'Array_Int',
+        tabs_info           => 'Array_Int',
+        tabs_prompt         => 'Array_Int',
+        skip_items          => 'Regexp', # experimental
+        empty               => 'Str',
+        footer              => 'Str',
+        info                => 'Str',
+        prompt              => 'Str',
+        undef               => 'Str',
+        busy_string         => 'Str',
+    };
+};
+
+
 sub _defaults {
     return {
         alignment           => 0,
@@ -85,44 +123,6 @@ sub _defaults {
         #busy_string        => undef,
     };
 }
-
-
-sub _valid_options {
-    return {
-        beep                => '[ 0 1 ]',
-        clear_screen        => '[ 0 1 ]',
-        codepage_mapping    => '[ 0 1 ]',
-        hide_cursor         => '[ 0 1 ]',
-        index               => '[ 0 1 ]',
-        mouse               => '[ 0 1 ]',
-        order               => '[ 0 1 ]',
-        alignment           => '[ 0 1 2 ]',
-        color               => '[ 0 1 2 ]',
-        f3                  => '[ 0 1 2 ]',
-        include_highlighted => '[ 0 1 2 ]',
-        page                => '[ 0 1 2 ]',
-        layout              => '[ 0 1 2 3 ]',
-        keep                => '[ 1-9 ][ 0-9 ]*',
-        ll                  => '[ 1-9 ][ 0-9 ]*',
-        max_cols            => '[ 1-9 ][ 0-9 ]*',
-        max_height          => '[ 1-9 ][ 0-9 ]*',
-        max_width           => '[ 1-9 ][ 0-9 ]*',
-        default             => '[ 0-9 ]+',
-        pad                 => '[ 0-9 ]+',
-        mark                => 'Array_Int',
-        meta_items          => 'Array_Int',
-        no_spacebar         => 'Array_Int',
-        tabs_info           => 'Array_Int',
-        tabs_prompt         => 'Array_Int',
-        skip_items          => 'Regexp', # experimental
-        empty               => 'Str',
-        footer              => 'Str',
-        info                => 'Str',
-        prompt              => 'Str',
-        undef               => 'Str',
-        busy_string         => 'Str',
-    };
-};
 
 
 sub __copy_orig_list {
@@ -231,13 +231,16 @@ sub __get_key {
 
 sub __modify_options {
     my ( $self ) = @_;
+    if ( defined $self->{max_cols} && $self->{max_cols} == 1 ) {
+        $self->{layout} = 3;
+    }
     if ( length $self->{footer} && $self->{page} != 2 ) {
         $self->{page} = 2;
     }
     if ( $self->{page} == 2 && ! $self->{clear_screen} ) {
         $self->{clear_screen} = 1;
     }
-    if ( $self->{max_cols} && $self->{layout} != 0 && $self->{layout} != 3 ) {
+    if ( $self->{max_cols} && $self->{layout} != 0 && $self->{layout} != 3 ) { ##
         $self->{layout} = 0;
     }
     if ( ! defined $self->{prompt} ) {
@@ -696,12 +699,19 @@ sub __beep {
 
 sub __prepare_prompt_lines {
     my ( $self ) = @_;
+    my $info_w = $self->{term_width};
+    if ( $^O ne 'MSWin32' && $^O ne 'cygwin' ) {
+        $info_w += WIDTH_CURSOR;
+    }
+    if ( $self->{max_width} && $info_w > $self->{max_width} ) { ##
+        $info_w = $self->{max_width};
+    }
     my $prompt = '';
     if ( length $self->{info} ) {
         my $init   = $self->{tabs_info}[0] ? $self->{tabs_info}[0] : 0;
         my $subseq = $self->{tabs_info}[1] ? $self->{tabs_info}[1] : 0;
         $prompt .= line_fold(
-            $self->{info}, $self->{avail_width},
+            $self->{info}, $info_w,
             { init_tab => ' ' x $init, subseq_tab => ' ' x $subseq, color => $self->{color}, join => 1 }
         );
     }
@@ -712,7 +722,7 @@ sub __prepare_prompt_lines {
         my $init   = $self->{tabs_prompt}[0] ? $self->{tabs_prompt}[0] : 0;
         my $subseq = $self->{tabs_prompt}[1] ? $self->{tabs_prompt}[1] : 0;
         $prompt .= line_fold(
-            $self->{prompt}, $self->{avail_width},
+            $self->{prompt}, $info_w,
             { init_tab => ' ' x $init, subseq_tab => ' ' x $subseq, color => $self->{color}, join => 1 }
         );
     }
@@ -1199,7 +1209,7 @@ Term::Choose - Choose items from a list interactively.
 
 =head1 VERSION
 
-Version 1.733
+Version 1.735
 
 =cut
 

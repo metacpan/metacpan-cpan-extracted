@@ -3,7 +3,7 @@ package Firefox::Marionette::Proxy;
 use strict;
 use warnings;
 
-our $VERSION = '1.08';
+our $VERSION = '1.10';
 
 sub new {
     my ( $class, %parameters ) = @_;
@@ -83,7 +83,7 @@ Firefox::Marionette::Proxy - Represents a Proxy used by Firefox Capabilities usi
 
 =head1 VERSION
 
-Version 1.08
+Version 1.10
 
 =head1 SYNOPSIS
 
@@ -123,8 +123,6 @@ accepts a hash as a parameter.  Allowed keys are below;
 
 =item * https - defines the proxy host for encrypted TLS traffic when the L<type|Firefox::Marionette::Proxy#type> is 'manual'.
 
-=item * ftp - defines the proxy host for FTP traffic when the L<type|Firefox::Marionette::Proxy#type> is 'manual'.
-
 =item * none - lists the addresses for which the proxy should be bypassed when the L<type|Firefox::Marionette::Proxy#type> is 'manual'.  This may be a list of domains, IPv4 addresses, or IPv6 addresses.
 
 =item * socks - defines the proxy host for a SOCKS proxy traffic when the L<type|Firefox::Marionette::Proxy#type> is 'manual'.
@@ -150,10 +148,6 @@ returns the proxy host for HTTP traffic when the L<type|Firefox::Marionette::Pro
 =head2 https
 
 returns the proxy host for encrypted TLS traffic when the L<type|Firefox::Marionette::Proxy#type> is 'manual'.
-
-=head2 ftp
-
-returns the proxy host for FTP traffic when the L<type|Firefox::Marionette::Proxy#type> is 'manual'.
 
 =head2 none
 

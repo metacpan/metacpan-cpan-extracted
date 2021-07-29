@@ -6,12 +6,18 @@ use warnings;
 
 use Test::More;
 
-plan tests => 3 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 9 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Acme/PERLANCAR/Dummy.pm',
     'Acme/PERLANCAR/Dummy/DistZilla/InsertCommandOutput.pm',
-    'Acme/PERLANCAR/Dummy/ModuleFeatures/User1.pm'
+    'Acme/PERLANCAR/Dummy/MetaCPAN/HTML.pm',
+    'Acme/PERLANCAR/Dummy/ModuleFeatures/Declarer1.pm',
+    'Acme/PERLANCAR/Dummy/ModuleFeatures/Declarer2.pm',
+    'Acme/PERLANCAR/Dummy/ModuleFeatures/Declarer_PythonTrove.pm',
+    'Acme/PERLANCAR/Dummy/ModuleFeatures/Module1.pm',
+    'Acme/PERLANCAR/Dummy/ModuleFeatures/Module1/_ModuleFeatures.pm',
+    'Acme/PERLANCAR/Dummy/POD/LinkToSection.pm'
 );
 
 

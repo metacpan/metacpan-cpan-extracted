@@ -12,7 +12,7 @@ use Object::Pad;
       BEGIN {
          Object::Pad->import_into( "AClass" );
 
-         my $classmeta = Object::Pad->begin_class( "AClass" );
+         my $classmeta = Object::Pad::MOP::Class->begin_class( "AClass" );
 
          ::is( $classmeta->name, "AClass", '$classmeta->name' );
       }
@@ -31,7 +31,7 @@ class Parent { has $thing = "parent"; }
       BEGIN {
          Object::Pad->import_into( "Child" );
 
-         my $classmeta = Object::Pad->begin_class( "Child", extends => "Parent" );
+         my $classmeta = Object::Pad::MOP::Class->begin_class( "Child", extends => "Parent" );
 
          ::is( $classmeta->name, "Child", '$classmeta->name for Child' );
       }

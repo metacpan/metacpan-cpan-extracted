@@ -3,8 +3,8 @@
    "author" : [
       "Pali <pali@cpan.org>"
    ],
-   "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -27,13 +27,12 @@
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "6.68"
          }
       },
       "runtime" : {
          "requires" : {
-            "Attribute::Handlers" : "0",
-            "Test::Class" : "0.37",
+            "Test::Class" : "0.51",
             "parent" : "0",
             "perl" : "5.006000",
             "strict" : "0",
@@ -57,6 +56,6 @@
          "web" : "https://github.com/pali/Test-Class-WithStrictPlan"
       }
    },
-   "version" : "0.1",
-   "x_serialization_backend" : "JSON::PP version 2.94"
+   "version" : "0.2",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

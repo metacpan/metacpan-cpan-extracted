@@ -3,19 +3,23 @@ package Lemonldap::NG::Portal::Password::Null;
 use strict;
 use Mouse;
 use Lemonldap::NG::Portal::Main::Constants qw(
-  PE_PASSWORD_OK
+  PE_NO_PASSWORD_BE
 );
 
 extends 'Lemonldap::NG::Portal::Password::Base';
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.12';
 
-sub init { 1 }
+sub init {
+    return 1;
+}
 
-sub confirm { 1 }
+sub confirm {
+    return 1;
+}
 
 sub modifyPassword {
-    PE_PASSWORD_OK;
+    return PE_NO_PASSWORD_BE;
 }
 
 1;

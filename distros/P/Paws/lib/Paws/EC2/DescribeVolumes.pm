@@ -39,11 +39,10 @@ You shouldn't make instances of this class. Each attribute should be used as a n
     my $NextToken = $DescribeVolumesResult->NextToken;
     my $Volumes   = $DescribeVolumesResult->Volumes;
 
-    # Returns a L<Paws::EC2::DescribeVolumesResult> object.
-    # To describe volumes that are attached to a specific instance
-    # This example describes all volumes that are both attached to the instance
-    # with the ID i-1234567890abcdef0 and set to delete when the instance
-    # terminates.
+# Returns a L<Paws::EC2::DescribeVolumesResult> object.
+# To describe volumes that are attached to a specific instance
+# This example describes all volumes that are both attached to the instance with
+# the ID i-1234567890abcdef0 and set to delete when the instance terminates.
     my $DescribeVolumesResult = $ec2->DescribeVolumes(
       'Filters' => [
 
@@ -145,7 +144,7 @@ C<snapshot-id> - The snapshot from which the volume was created.
 
 =item *
 
-C<status> - The status of the volume (C<creating> | C<available> |
+C<status> - The state of the volume (C<creating> | C<available> |
 C<in-use> | C<deleting> | C<deleted> | C<error>).
 
 =item *
@@ -168,10 +167,8 @@ C<volume-id> - The volume ID.
 
 =item *
 
-C<volume-type> - The Amazon EBS volume type. This can be C<gp2> for
-General Purpose SSD, C<io1> for Provisioned IOPS SSD, C<st1> for
-Throughput Optimized HDD, C<sc1> for Cold HDD, or C<standard> for
-Magnetic volumes.
+C<volume-type> - The Amazon EBS volume type (C<gp2> | C<gp3> | C<io1> |
+C<io2> | C<st1> | C<sc1>| C<standard>)
 
 =back
 

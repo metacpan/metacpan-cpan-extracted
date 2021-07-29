@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>Text-PO Tests</title>
+        <link rel="gettext" href="/locale" />
+        <link rel="gettext" lang="ru-RU" href="/l10n" />
+        <script src="lib/sprintf.js"></script>
+        <script src="./gettext.js"></script>
+        <script src="test.js"></script>
+        <!--
+On the command line, go to the top directory of the Text::PO distribution and launch a small web server using python or anything else you would like:
+
+For Perl:
+
+    # With HTTP::Daemon
+    perl -MHTTP::Daemon -e '$d = HTTP::Daemon->new(LocalPort => 8000) or  +die $!; while 
+($c = $d->accept) { while ($r = $c->get_request) { +$c->send_file_response(".".$r->url->path) } }'
+
+    # After installing the module HTTP::Server::Brick
+    perl -MHTTP::Server::Brick -e '$s=HTTP::Server::Brick->new(port=>8000); $s->mount("/"=>{path=>"."}); $s->start'
+
+    # If you have Plack::App::Directory
+    perl -MPlack::App::Directory -e 'Plack::App::Directory->new(root=>".");' -p 8000
+
+    # With IO::All
+    perl -MIO::All -e 'io(":8000")->fork->accept->(sub { $_[0] < io(-x $1 +? "./$1 |" : $1) if /^GET \/(.*) / })'
+
+For python 2:
+
+    python -m SimpleHTTPServer
+
+For python 3:
+
+    python3 -m http.server
+
+Or using ruby:
+
+    ruby -run -e httpd -p 8000 . 
+
+Or with php:
+
+    php -S localhost:8000
+
+Or possibly with nodejs if you have it installed:
+
+    # to install http-server
+    npm install -g http-server
+    # or using brew:
+    brew install http-server
+    # then
+    http-server -c-1 -p 8000
+
+More information here: https://www.npmjs.com/package/http-server
+
+Then, you can go to http://localhost:8000/share/test.html
+        -->
+    </head>
+    <body>
+
+    </body>
+</html>

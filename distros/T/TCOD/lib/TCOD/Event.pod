@@ -1,0 +1,607 @@
+=encoding UTF-8
+
+=head1 NAME
+
+TCOD::Event - A TCOD wrapper around SDL2 events
+
+=head1 SYNOPSIS
+
+    use TCOD;
+
+    # Block until there is an event
+    my $iter = TCOD::Event::wait;
+
+    # Get each event in turn
+    while ( my $event = $iter->() ) {
+        exit if $event->type eq 'QUIT';
+    }
+
+=head1 DESCRIPTION
+
+This class is a thin wrapper around SDL2 events.
+
+=head1 METHODS
+
+=head2 new
+
+    $tcod_event = TCOD::Event->new( $sdl_event );
+
+Wrap an SDL2 event in a TCOD event. You will most likely not have to use
+this yourself, but it is called internally by the methods below.
+
+=head1 FUNCTIONS
+
+=head2 wait
+
+    $iterator = TCOD::Event::wait( $timeout );
+
+Block until events exist, then return an event iterator.
+
+The value in C<$timeout> is the maximum number of seconds to wait for the
+next event. If none is provided, or the value is 0, the code will block
+for as long as it takes for the next event to be registered.
+
+Returns the same iterator as a call L<get|/get>.
+
+=head2 get
+
+    $iterator = TCOD::Event::get;
+
+Return a coderef that can be used as an iterator for all pending events.
+Calling the coderef will return the next available event.
+
+Events are processed as the iterator is consumed. Breaking out of, or
+discarding the iterator will leave the remaining events on the event
+queue.
+
+=head1 EVENT TYPES
+
+All these events have a C<type> method that returns a string identifying
+their type as a string, and wrap around an SDL2 event from which they get
+their data They also have a C<as_string> method that can be used to transform
+the event into a printable string, useful for logging and debugging.
+
+=head2 TCOD::Event::Quit
+
+An application quit request event. See
+L<the SDL2 documentation|https://wiki.libsdl.org/SDL_EventType#sdl_quit>
+for more info on when this event may be triggered.
+
+=over
+
+=item * type
+
+Always returns C<QUIT>.
+
+=back
+
+=head2 TCOD::Event::KeyDown
+
+Triggered when a keyboard key is pressed.
+
+=over
+
+=item * type
+
+Always returns C<KEYDOWN>.
+
+=item * sym
+
+Returns the C<sym> value of the SDL2 keyboard event. This is a value in
+this module's L<Keycode|/Keycode> enum.
+
+=item * scancode
+
+Returns the C<scancode> value of the SDL2 keyboard event. This is a value in
+this module's L<Scancode|/Scancode> enum.
+
+=item * mod
+
+Returns the C<mod> value of the SDL2 keyboard event. This is a value in
+this module's L<Keymod|/Keymod> enum.
+
+=item * repeat
+
+Returns a true value if this is a repeat event for this key (eg. this key is
+being held down).
+
+=back
+
+=head2 TCOD::Event::KeyUp
+
+Triggered when a keyboard key is released.
+
+=over
+
+=item * type
+
+Always returns C<KEYUP>.
+
+=item * sym
+
+Returns the C<sym> value of the SDL2 keyboard event. This is a value in
+this module's L<Keycode|/Keycode> enum.
+
+=item * scancode
+
+Returns the C<scancode> value of the SDL2 keyboard event. This is a value in
+this module's L<Scancode|/Scancode> enum.
+
+=item * mod
+
+Returns the C<mod> value of the SDL2 keyboard event. This is a value in
+this module's L<Keymod|/Keymod> enum.
+
+=item * repeat
+
+Returns a true value if this is a repeat event for this key (eg. this key is
+being held down).
+
+=back
+
+=head2 TCOD::Event::MouseButtonUp
+
+Triggered when a mouse button is released.
+
+=over
+
+=item * type
+
+Always returns C<MOUSEBUTTONUP>.
+
+=item * xy
+
+Returns an array reference with the pixel coordinates of this mouse event.
+The individual components of this coordinate are also available through the
+C<x> and C<y> accessors.
+
+=item * tilexy
+
+If this event has been processed with
+L<TCOD::Context::convert_event|TCOD::Context/convert_event>, this will returns
+an array reference with the tile coordinates of this mouse event. Otherwise, this
+will return C<undef>.
+
+The individual components of this coordinate are also available through the
+C<tilex> and C<tiley> accessors.
+
+=item * state
+
+A bitfield with all the buttons that are currently being held. This can be checked
+against the values in this module's L<MouseButton|/MouseButton> enum.
+
+=item * button
+
+The button that triggered this mouse event. It will be one of the values in
+this module's L<MouseButton|/MouseButton> enum.
+
+=back
+
+=head2 TCOD::Event::MouseButtonDown
+
+Triggered when a mouse button is pressed.
+
+=over
+
+=item * type
+
+Always returns C<MOUSEBUTTONDOWN>.
+
+=item * xy
+
+Returns an array reference with the pixel coordinates of this mouse event.
+The individual components of this coordinate are also available through the
+C<x> and C<y> accessors.
+
+=item * tilexy
+
+If this event has been processed with
+L<TCOD::Context::convert_event|TCOD::Context/convert_event>, this will returns
+an array reference with the tile coordinates of this mouse event. Otherwise, this
+will return C<undef>.
+
+The individual components of this coordinate are also available through the
+C<tilex> and C<tiley> accessors.
+
+=item * state
+
+A bitfield with all the buttons that are currently being held. This can be checked
+against the values in this module's L<MouseButton|/MouseButton> enum.
+
+=item * button
+
+The button that triggered this mouse event. It will be one of the values in
+this module's L<MouseButton|/MouseButton> enum.
+
+=back
+
+=head2 TCOD::Event::MouseMotion
+
+Triggered when the mouse is moved.
+
+=over
+
+=item * type
+
+Always returns C<MOUSEMOTION>.
+
+=item * xy
+
+Returns an array reference with the pixel coordinates of this mouse event.
+The individual components of this coordinate are also available through the
+C<x> and C<y> accessors.
+
+=item * tilexy
+
+If this event has been processed with
+L<TCOD::Context::convert_event|TCOD::Context/convert_event>, this will returns
+an array reference with the tile coordinates of this mouse event. Otherwise, this
+will return C<undef>.
+
+The individual components of this coordinate are also available through the
+C<tilex> and C<tiley> accessors.
+
+=item * state
+
+A bitfield with all the buttons that are currently being held. This can be checked
+against the values in this module's L<MouseButton|/MouseButton> enum.
+
+=back
+
+=head2 TCOD::Event::MouseWheel
+
+Triggered when the mouse wheel is rolled.
+
+=over
+
+=item * type
+
+Always returns C<MOUSEWHEEL>.
+
+=item * xy
+
+Returns an array reference with the amount that was scrolled, horizontally and
+vertically, in pixels. Negative values point left and up, while positive values
+point in the opposite direction.
+
+The individual components of this array reference are also available through
+the C<x> and C<y> accessors.
+
+=item * flipped
+
+Returns a true value if either the user or the operating system has set the
+mouse to be flipped.
+
+=back
+
+=head2 TCOD::Event::TextInput
+
+Triggered when the user has entered some text.
+
+=over
+
+=item * type
+
+Always returns C<TEXTINPUT>.
+
+=item * text
+
+The text that was input.
+
+=back
+
+=head2 TCOD::Event::WindowClose
+
+Triggered when the window manager has requested the window to be closed.
+
+=over
+
+=item * type
+
+Always returns C<WINDOWCLOSE>.
+
+=back
+
+=head2 TCOD::Event::WindowEnter
+
+Triggered when the window has gained mouse focus.
+
+=over
+
+=item * type
+
+Always returns C<WINDOWENTER>.
+
+=back
+
+=head2 TCOD::Event::WindowLeave
+
+Triggered when the window has lost mouse focus.
+
+=over
+
+=item * type
+
+Always returns C<WINDOWLEAVE>.
+
+=back
+
+=head2 TCOD::Event::WindowRestored
+
+Triggered when the window has been restored to its normal size and position.
+
+=over
+
+=item * type
+
+Always returns C<WINDOWRESTORED>.
+
+=back
+
+=head2 TCOD::Event::WindowMinimized
+
+Triggered when the window has been minimised.
+
+=over
+
+=item * type
+
+Always returns C<WINDOWMINIMIZED>.
+
+=back
+
+=head2 TCOD::Event::WindowMaximized
+
+Triggered when the window has been maximised.
+
+=over
+
+=item * type
+
+Always returns C<WINDOWMAXIMIZED>.
+
+=back
+
+=head2 TCOD::Event::WindowExposed
+
+Triggered when a part of the window that was hidden has been exposed. This
+normally means the window needs to be redrawn.
+
+=over
+
+=item * type
+
+Always returns C<WINDOWEXPOSED>.
+
+=back
+
+=head2 TCOD::Event::WindowFocusGained
+
+Triggered when the window has gained keyboard focus.
+
+=over
+
+=item * type
+
+Always returns C<WINDOWFOCUSGAINED>.
+
+=back
+
+=head2 TCOD::Event::WindowFocusLost
+
+Triggered when the window has lost keyboard focus.
+
+=over
+
+=item * type
+
+Always returns C<WINDOWFOCUSLOST>.
+
+=back
+
+=head2 TCOD::Event::WindowTakeFocus
+
+Triggered when the window is being offered focus.
+
+=over
+
+=item * type
+
+Always returns C<WINDOWTAKEFOCUS>.
+
+=back
+
+=head2 TCOD::Event::WindowShown
+
+Triggered when the window has been shown.
+
+=over
+
+=item * type
+
+Always returns C<WINDOWSHOWN>.
+
+=back
+
+=head2 TCOD::Event::WindowHidden
+
+Triggered when the window has been hidden.
+
+=over
+
+=item * type
+
+Always returns C<WINDOWHIDDEN>.
+
+=back
+
+=head2 TCOD::Event::WindowHitTest
+
+Triggered when the window has had a hit test.
+
+=over
+
+=item * type
+
+Always returns C<WINDOWHITTEST>.
+
+=back
+
+=head2 TCOD::Event::WindowMoved
+
+Triggered when the window has been moved.
+
+=over
+
+=item * type
+
+Always returns C<WINDOWMOVED>.
+
+=item * xy
+
+Returns an array reference with the screen coordinates the window has been
+moved to.
+
+The individual components of this coordinate are also available through the
+C<x> and C<y> accessors.
+
+=back
+
+=head2 TCOD::Event::WindowResized
+
+Triggered when the window has been resized.
+
+=over
+
+=item * type
+
+Always returns C<WINDOWRESIZED>.
+
+=item * width
+
+Returns the window's new width in pixels.
+
+=item * height
+
+Returns the window's new height in pixels.
+
+=back
+
+=head2 TCOD::Event::Undefined
+
+A default event generated when no mapping could be found.
+
+=over
+
+=item * type
+
+Always returns C<UNDEFINED>.
+
+=back
+
+package
+    TCOD::Event::WindowEvent {
+    our @ISA = 'TCOD::Event::Base';
+    sub init {
+        my $self = shift;
+
+        my ( $e, $k ) = @{ $self }{qw( sdl_event !key )};
+        my $w = $e->$k if $k;
+
+        $self->{type} = $TCOD::SDL2::WindowEventID{ $w->event }
+            // return TCOD::Event::Undefined->new($e)->init;
+
+        $self->{type} =~ s/WINDOWEVENT_/WINDOW_/;
+        $self->{type} =~ s/([A-Z])([A-Z]*)_/$1\L$2/g;
+
+        $self;
+    }
+}
+
+=head1 ENUMS
+
+The enums listed below are available as constants like the ones defined using
+L<constant>, which means the same caveats apply here.
+
+To provide introspection into the values of the enums, they are also made
+available as package variables with the names of each enum. This makes it
+possible to get the name of a value in a given enum with code like the
+following:
+
+    say $TCOD::Event::Keycode{ TCOD::Event::K_UP }; # Prints 'K_UP'
+
+=head2 Keycode
+
+A translation of the L<SDL_Keycode|https://wiki.libsdl.org/SDL_Keycode> enum
+in SDL2. Keys and values should be the same as those in SDL2, without the
+C<SDL_> prefix (so C<SDLK_UP> becomes C<TCOD::Event::K_UP>).
+
+=head2 Keymod
+
+A translation of the L<SDL_Keymod|https://wiki.libsdl.org/SDL_Keymod> enum
+in SDL2. Keys and values should be the same as those in SDL2 (eg.
+C<TCOD::Event::KMOD_SHIFT>).
+
+=head2 Scancode
+
+A translation of the L<SDL_Scancode|https://wiki.libsdl.org/SDL_Scancode> enum
+in SDL2. Keys and values should be the same as those in SDL2, without the
+C<SDL_SCANCODE_> prefix (so C<SDL_SCANCODE_UP> becomes C<TCOD::Event::UP>).
+
+=head2 MouseButton
+
+Can be used to check the C<button> key of mouse button events for the button
+that triggered the event.
+
+=over
+
+=item * BUTTON_LEFT
+
+=item * BUTTON_MIDDLE
+
+=item * BUTTON_RIGHT
+
+=item * BUTTON_X1
+
+=item * BUTTON_X2
+
+=back
+
+=head2 MouseButtonMask
+
+Can be used to check the C<state> key of
+L<MouseMotion|/TCOD::Event::MouseMotion> events for the buttons that are
+currently being held.
+
+=over
+
+=item * BUTTON_LMASK
+
+=item * BUTTON_MMASK
+
+=item * BUTTON_RMASK
+
+=item * BUTTON_X1MASK
+
+=item * BUTTON_X2MASK
+
+=back
+
+=head1 SEE ALSO
+
+=over
+
+=item L<TCOD>
+
+=item L<TCOD::Color>
+
+=item L<TCOD::Console>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2021 José Joaquín Atria
+
+This library is free software; you can redistribute it and/or modify it under
+the Artistic License 2.0.

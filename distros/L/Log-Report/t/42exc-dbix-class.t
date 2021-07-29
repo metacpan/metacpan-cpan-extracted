@@ -25,8 +25,7 @@ help at /tmp/a.pl line 6.
 __WITHOUT_STACKTRACE
 
 is_deeply [ exception_decode(exception $dbix1) ]
-  , [ 'caught DBIx::Class::Exception'
-    , { location => [ $0, '/tmp/a.pl', '6', undef ] }
+  , [ { location => [ $0, '/tmp/a.pl', '6', undef ] }
     , 'ERROR'
     , 'help'
     ], 'set 1';
@@ -38,8 +37,7 @@ main::f(): help  at /tmp/a.pl line 6.
 __WITH_STACKTRACE
 
 is_deeply [ exception_decode(exception $dbix2) ]
-  , [ 'caught DBIx::Class::Exception'
-    , { location => [ 'main', '/tmp/a.pl', '6', 'f' ]
+  , [ { location => [ 'main', '/tmp/a.pl', '6', 'f' ]
       , stack    => [ [ 'main::f', '/tmp/a.pl',  '8' ]
                     , [ 'main::g', '/tmp/a.pl', '10' ]
                     ]
@@ -53,8 +51,7 @@ my $dbix3 = <<__WITHOUT_STACKTRACE;  # not inside function
 __WITHOUT_STACKTRACE
 
 is_deeply [ exception_decode(exception $dbix3) ]
-  , [ 'caught DBIx::Class::Exception'
-    , { location => [ $0, '/tmp/a.pl', '6', undef ] }
+  , [ { location => [ $0, '/tmp/a.pl', '6', undef ] }
     , 'ERROR'
     , 'help'
     ], 'set 3';
@@ -66,8 +63,7 @@ __FROM_DB
 #warn "DBIx4:", Dumper exception_decode(exception $dbix4);
 
 is_deeply [ exception_decode(exception $dbix4) ]
-  , [ 'caught DBIx::Class::Exception'
-    , { location =>
+  , [ { location =>
          [ 'DBIx::Class::Storage::DBI'
          , '/home/abeverley/git/Isaas/bin/../lib/Isaas/DBIC.pm'
          , '18'

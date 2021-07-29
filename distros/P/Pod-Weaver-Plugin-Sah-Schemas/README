@@ -3,9 +3,9 @@ NAME
     Sah::Schemas::* distribution
 
 VERSION
-    This document describes version 0.063 of
+    This document describes version 0.067 of
     Pod::Weaver::Plugin::Sah::Schemas (from Perl distribution
-    Pod-Weaver-Plugin-Sah-Schemas), released on 2020-05-08.
+    Pod-Weaver-Plugin-Sah-Schemas), released on 2021-07-22.
 
 SYNOPSIS
     In your weaver.ini:
@@ -26,6 +26,9 @@ DESCRIPTION
     It does the following to "Sah/Schema/*" in lib .pm files:
 
     *   Add "DESCRIPTION" POD section schema's description
+
+CONTRIBUTOR
+    Steven Haryanto <sharyanto@cpan.org>
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -52,7 +55,8 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2020, 2019, 2016 by perlancar@cpan.org.
+    This software is copyright (c) 2021, 2020, 2019, 2016 by
+    perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

@@ -19,10 +19,9 @@ package PDF::Builder::Basic::PDF::File;
 
 use strict;
 use warnings;
-#no warnings qw[ deprecated recursion uninitialized ];
 
-our $VERSION = '3.022'; # VERSION
-my $LAST_UPDATE = '3.022'; # manually update whenever code is changed
+our $VERSION = '3.023'; # VERSION
+our $LAST_UPDATE = '3.023'; # manually update whenever code is changed
 
 =head1 NAME
 
@@ -1483,6 +1482,9 @@ sub readxrtr {
             warn "Malformed xref in PDF file $self->{' fname'}";
 	}
     }
+
+    # did we get to here without managing to set $xmin?
+    $xmin ||= 0;
 
     $tdict->{' loc'} = $xpos;
     $tdict->{' xref'} = $xlist;

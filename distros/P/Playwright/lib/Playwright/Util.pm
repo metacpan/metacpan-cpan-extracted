@@ -1,5 +1,5 @@
 package Playwright::Util;
-$Playwright::Util::VERSION = '0.007';
+$Playwright::Util::VERSION = '0.011';
 use strict;
 use warnings;
 
@@ -7,6 +7,10 @@ use v5.28;
 
 use JSON::MaybeXS();
 use Carp qw{confess};
+use Sereal::Encoder;
+use Sereal::Decoder;
+use File::Temp;
+use POSIX();
 
 #ABSTRACT: Common utility functions for the Playwright module
 
@@ -35,6 +39,28 @@ sub arr2hash ( $array, $primary_key ) {
     return $inside_out;
 }
 
+# Serialize a subprocess because NOTHING ON CPAN DOES THIS GRRRRR
+sub async ($subroutine) {
+
+    # The fork would result in the tmpdir getting whacked when it terminates.
+    my ( undef, $filename ) = File::Temp::tempfile();
+    my $pid = fork() // die "Could not fork";
+    _child( $filename, $subroutine ) unless $pid;
+    return { pid => $pid, file => $filename };
+}
+
+sub _child ( $filename, $subroutine ) {
+    Sereal::Encoder->encode_to_file( $filename, $subroutine->() );
+
+    # Prevent destructors from firing due to exiting instantly
+    POSIX::_exit(0);
+}
+
+sub await ($to_wait) {
+    waitpid( $to_wait->{pid}, 0 );
+    return Sereal::Decoder->decode_from_file( $to_wait->{file} );
+}
+
 1;
 
 __END__
@@ -49,7 +75,7 @@ Playwright::Util - Common utility functions for the Playwright module
 
 =head1 VERSION
 
-version 0.007
+version 0.011
 
 =head2 request(STRING method, STRING url, INTEGER port, LWP::UserAgent ua, HASH args) = HASH
 

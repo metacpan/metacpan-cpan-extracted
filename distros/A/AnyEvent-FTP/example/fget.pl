@@ -21,7 +21,7 @@ GetOptions(
   'p' => \$progress,
   'a' => \$active,
 );
-    
+
 my $remote = shift;
 
 unless(defined $remote)
@@ -52,7 +52,7 @@ unless(defined $remote->password)
 do {
   my $from = $remote->clone;
   $from->password(undef);
-  
+
   say "SRC: ", $from;
 };
 
@@ -101,7 +101,7 @@ if($progress)
     $remote_size = $size;
     last;
   }
-  
+
   if(defined $remote_size)
   {
   }

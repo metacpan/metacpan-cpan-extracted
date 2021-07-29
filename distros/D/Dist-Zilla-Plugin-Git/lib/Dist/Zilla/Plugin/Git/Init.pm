@@ -13,7 +13,7 @@ use warnings;
 package Dist::Zilla::Plugin::Git::Init;
 # ABSTRACT: Initialize git repository on dzil new
 
-our $VERSION = '2.047';
+our $VERSION = '2.048';
 
 our %transform = (
   lc => sub { lc shift },
@@ -59,14 +59,20 @@ has remotes => (
   default => sub { [] },
 );
 
+has push_urls => (
+  is   => 'ro',
+  isa  => ArrayRef[Str],
+  default => sub { [] },
+);
+
 has config_entries => (
   is   => 'ro',
   isa  => ArrayRef[Str],
   default => sub { [] },
 );
 
-sub mvp_multivalue_args { qw(config_entries remotes) }
-sub mvp_aliases { return { config => 'config_entries', remote => 'remotes' } }
+sub mvp_multivalue_args { qw(config_entries remotes push_url) }
+sub mvp_aliases { return { config => 'config_entries', remote => 'remotes', push_url => 'push_urls' } }
 
 sub after_mint {
     my $self = shift;
@@ -91,10 +97,17 @@ sub after_mint {
       $git->commit({message => _format_string($self->commit_message, $self)});
       $self->log($message);
     }
+
     foreach my $remoteSpec (@{ $self->remotes }) {
       my ($remote, $url) = split ' ', _format_string($remoteSpec, $self), 2;
       $self->log_debug("Adding remote $remote as $url");
       $git->remote(add => $remote, $url);
+    }
+
+    foreach my $remoteSpec (@{ $self->push_urls }) {
+      my ($remote, $url) = split ' ', _format_string($remoteSpec, $self), 2;
+      $self->log_debug("Setting push URL for remote $remote to $url");
+      $git->remote('set-url' => $remote, '--push' => $url);
     }
 }
 
@@ -113,7 +126,7 @@ Dist::Zilla::Plugin::Git::Init - Initialize git repository on dzil new
 
 =head1 VERSION
 
-version 2.047
+version 2.048
 
 =head1 SYNOPSIS
 
@@ -123,7 +136,8 @@ In your F<profile.ini>:
     commit_message = initial commit  ; this is the default
     commit = 1                       ; this is the default
     branch =                         ; this is the default (means master)
-    remote = origin git@github.com:USERNAME/%{lc}N.git ; no default
+    remote = origin https://github.com/USERNAME/%N.git ; no default
+    push_url = origin git@github.com:USERNAME/%{lc}N.git ; no default
     config = user.email USERID@cpan.org  ; there is no default
 
 =head1 DESCRIPTION
@@ -156,11 +170,28 @@ C<OPTION VALUE>.  This may be specified multiple times to add multiple entries.
 added by default.  A remote is specified as C<NAME URL>.  This may be
 specified multiple times to add multiple remotes.
 
+=item * push_url - the URL to use to push to a particular remote to add to
+the repository.  No URLs are added by default.  A remote is specified as C<NAME URL>.
+This may be specified multiple times to specify push URLs for multiple remotes, and
+is not required if the URL is the same as the one already set for that remote.
+
+Per the documentation for L<git-remote(1)>: Note that the push_url and the
+corresponding URL specified with C<remote>, even though they can be set
+differently, must still refer to the same place. What you pushed to the push URL
+should be what you would see if you immediately fetched from the fetch URL (the URL
+specified with C<remote>.) If you are trying to fetch from one place (e.g. your
+upstream) and push to another (e.g. your publishing repository), use two
+separate remotes.
+
+This, therefore, is best used in cases where pushing requires authentication, but
+pulling does not, or if pulling is via git or ssh, but pushing is via https, on the
+same repository.
+
 =back
 
 =head2 Formatting options
 
-You can use the following codes in C<commit_message>, C<config>, or C<remote>:
+You can use the following codes in C<commit_message>, C<config>, C<remote>, or C<push_url>:
 
 =over 4
 

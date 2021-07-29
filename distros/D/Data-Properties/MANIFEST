@@ -1,6 +1,23 @@
 Changes
 MANIFEST
 Makefile.PL
-Properties.pm
-t/properties.t
-t/sample.properties
+README.md
+propfiles.md
+lib/Data/Properties.pm
+script/prp2json.pl
+t/00-load.t
+t/10-basic.t
+t/11-keys.t
+t/12-context.t
+t/13-null.t
+t/14-data.t
+t/15-escape.t
+t/16-array.t
+t/17-empty.t
+t/20-subst.t
+t/21-subst.t
+t/22-subst.t
+t/23-null.t
+t/80-roundtrip.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -117,9 +117,12 @@ sub _request_ok {
                     $body_str .= ($line || '');
                 }
             }
-        } elsif(ref $body) {
-            if (ref($body) eq 'ARRAY') {
+        } elsif(my $type = ref $body) {
+            if ($type eq 'ARRAY') {
                 $body_str = join '', @{$body};
+            } elsif ($type eq 'GLOB') {
+                local $/;
+                $body_str = <$body>;
             }
         };
 
@@ -145,11 +148,11 @@ Test::Mojo::Plack - Test Plack-compatible applications with Test:Mojo
 
 =head1 VERSION
 
-Version 0.10
+Version 0.13
 
 =cut
 
-our $VERSION = '0.11';
+our $VERSION = '0.13';
 
 =head1 SYNOPSIS
 

@@ -16,19 +16,19 @@
 
 =encoding utf8
 
-=head1 Gemini
+=head1 NAME
 
-This is a test client. All it does is dump the response.
+Gemini - a command line client for the Gemini protocol
 
-=over
+=head1 SYNOPSIS
 
-=item The first line is the server fingerprint on STDERR
+B<gemini> [B<--help>] [B<--verbose>] [B<--cert_file=>I<filename>
+B<--key_file=>I<filename>] I<URL>
 
-=item The second line is the response header on STDERR
+=head1 DESCRIPTION
 
-=item The rest is the response itself
-
-=back
+This is a very simple client. All it does is print the response. The header is
+printed to standard error so the rest can be redirected to get just the content.
 
 Usage:
 
@@ -36,7 +36,7 @@ Usage:
 
 Download an image:
 
-    ./gemini gemini://alexschroeder.ch:1965/do/gallery/2016-aminona/thumbs/Bisse_de_Tsittoret.jpg \
+    gemini gemini://alexschroeder.ch:1965/do/gallery/2016-aminona/thumbs/Bisse_de_Tsittoret.jpg \
       > Bisse_de_Tsittoret.jpg
 
 Download all the images on a page:
@@ -51,6 +51,13 @@ In the shell script above, the first call to gemini gets the page with all the
 links, grep then filters for the links to thumbnails, extract the URL using cut
 (assuming a space between "=>" and the URL), and download each URL, and save the
 output in the filename indicated by the URL.
+
+=head2 Client Certificates
+
+You can provide a certificate and a key file:
+
+        gemini --cert_file=cert.pem --key_file=key.pem \
+          gemini://campaignwiki.org/play/ijirait
 
 =cut
 
@@ -106,7 +113,7 @@ $uri .= $path if $path;
 $uri .= '?' . $query if $query;
 $uri .= '#' . $fragment if $fragment;
 
-say "Contacting $host:$port" if $verbose;
+warn "Contacting $host:$port" if $verbose;
 
 # create client
 Mojo::IOLoop->client({
@@ -130,7 +137,7 @@ Mojo::IOLoop->client({
       } else {
 	($header) = $bytes =~ /^(.*?)\r\n/;
 	$header = decode_utf8 $header;
-	say $header;
+	warn "$header\n";
 	if ($header =~ /^2\d* (?:text\/\S+)?(?:; *charset=(\S+))?$/g) {
 	  # empty, or text without charset defaults to UTF-8
 	  $encoding = $1 || 'UTF-8';
@@ -143,7 +150,7 @@ Mojo::IOLoop->client({
 	}
       }});
     # Write request
-    say "Requesting $uri" if $verbose;
+    warn "Requesting $uri\n" if $verbose;
     $stream->write("$uri\r\n")});
 
 # Start event loop if necessary

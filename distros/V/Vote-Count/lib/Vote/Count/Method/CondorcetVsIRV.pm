@@ -16,7 +16,7 @@ use Vote::Count::Method::CondorcetIRV;
 use Try::Tiny;
 use Data::Dumper;
 
-our $VERSION='2.00';
+our $VERSION='2.01';
 
 # no warnings 'uninitialized';
 no warnings qw/experimental/;
@@ -25,7 +25,7 @@ no warnings qw/experimental/;
 
 Vote::Count::Method::CondorcetVsIRV
 
-=head1 VERSION 2.00
+=head1 VERSION 2.01
 
 =cut
 
@@ -235,7 +235,6 @@ sub BUILD {
         BallotSet      => $self->BallotSet(),
         TieBreakMethod => $self->TieBreakMethod(),
         Active         => $self->Active(),
-        BallotSetType  => 'rcv',
         LogTo          => $self->{'LogTo'} . '_unredacted',
     );
     $self->{'RedactedElection'} = undef,;
@@ -263,7 +262,6 @@ sub CreateRedactedElection ( $self, $WonCondorcet, $WonIRV, $simpleflag=0 ) {
       BallotSet      => $ballotset,
       TieBreakMethod => $self->TieBreakMethod(),
       Active         => $self->Active(),
-      BallotSetType  => 'rcv',
       LogTo          => $self->LogRedactedTo(),
   );
   $self->logd(

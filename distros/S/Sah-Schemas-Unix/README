@@ -2,8 +2,100 @@ NAME
     Sah::Schemas::Unix - Various Sah schemas for Unix
 
 VERSION
-    This document describes version 0.013 of Sah::Schemas::Unix (from Perl
-    distribution Sah-Schemas-Unix), released on 2020-10-16.
+    This document describes version 0.017 of Sah::Schemas::Unix (from Perl
+    distribution Sah-Schemas-Unix), released on 2021-07-22.
+
+SAH SCHEMAS
+    The following schemas are included in this distribution:
+
+    *   unix::dirname
+
+        Directory name (with optional path) on a Unix system.
+
+        This is just a convenient alias for dirname::unix.
+
+    *   unix::filename
+
+        File name (with optional path) on a Unix system.
+
+        This is just a convenient alias for filename::unix.
+
+    *   unix::gid
+
+        Group identifier (GID).
+
+    *   unix::groupname
+
+        Unix group name.
+
+        The checking follows POSIX rules: does not begin with a hyphen and
+        only contains [A-Za-z0-9._-].
+
+        The above rule allows integers like 1234, which can be confused with
+        GID, so this schema disallows pure integers.
+
+        The maximum length is 32 following libc6's limit.
+
+    *   unix::local_gid
+
+        Group identifier (GID) that has to exist on the system.
+
+        Existing means having a group name associated with this GID, i.e.
+        "getgrgid" returns a record.
+
+        Support coercion from an existing group name.
+
+    *   unix::local_groupname
+
+        Unix group name that must exist on the system.
+
+        Support coercion from GID.
+
+    *   unix::local_uid
+
+        User identifier (UID) that has to exist (has associated username) on
+        the system.
+
+        Existing means having a user name associated with this UID, i.e.
+        "getpwuid" returns a record.
+
+        Support coercion from an existing user name.
+
+    *   unix::local_username
+
+        Unix user name that must exist on the system.
+
+        Support coercion from UID.
+
+    *   unix::pathname
+
+        Path name (filename or dirname) on a Unix system.
+
+        This is just a convenient alias for pathname::unix.
+
+    *   unix::pid
+
+        Process identifier (PID).
+
+    *   unix::signal
+
+        Unix signal name (e.g. TERM or KILL) or number (9 or 15).
+
+    *   unix::uid
+
+        User identifier (UID).
+
+    *   unix::username
+
+        Unix account name.
+
+        The checking follows POSIX rules: does not begin with a hyphen and
+        only contains [A-Za-z0-9._-].
+
+        The above rule allows integers like 1234, which can be confused with
+        UID, so this schema disallows pure integers.
+
+        The maximum length is 32 following libc6's limit.
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -29,7 +121,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
+    This software is copyright (c) 2021, 2020, 2019 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

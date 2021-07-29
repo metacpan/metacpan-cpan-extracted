@@ -12,13 +12,12 @@ use Math::BigInt '1.97';
 use Math::BigFloat;
 use Exporter;
 
-our $VERSION   = '1.14';
+our $VERSION   = '1.15';
 our @ISA       = qw( Exporter );
-our @EXPORT_OK = qw( primes fibonacci base hailstone factorial
+our @EXPORT_OK = qw( primes fibonacci base to_base hailstone factorial
                      euler bernoulli pi log
                      tan cos sin cosh sinh arctan arctanh arcsin arcsinh
                   );
-our @F;						# for fibonacci()
 
 # some often used constants:
 my $four    = Math::BigFloat->new(4);
@@ -69,194 +68,10 @@ sub primes {
 
 sub fibonacci
   {
-  my $n = shift; return unless defined $n;
-
-  if (ref($n))
-    {
-    return if $n->sign() ne '+';		# < 0, NaN, inf
-    }
-  else
-    {
-    return if $n < 0;
-    }
-
-  #####################
-  # list context
-  if (wantarray)
-    {
-    # make a scalar (if $n doesn't fit into a scalar, the resulting array
-    # will be too big, anyway)
-    $n = $n->numify() if ref($n);
-
-    my @fib = (Math::BigInt -> bzero(),Math::BigInt -> bone(),Math::BigInt -> bone);
-    my $i = 3;							# no BigInt
-    while ($i <= $n)
-      {
-      $fib[$i] = $fib[$i-1]+$fib[$i-2]; $i++;
-      }
-    return @fib;
-    }
-  #####################
-  # scalar context
-
-  _fibonacci_fast($n);
-  }
-
-my $F;
-
-BEGIN
-  {
-  # Sequence of the first few fibonacci numbers:
-
-  #     0,1,2,3,4,5,6,7, 8, 9, 10,11,12, 13, 14, 15, 16, 17,  18,  19,  20,
-  @F = (0,1,1,2,3,5,8,13,21,34,55,89,144,233,377,610,987,1597,2584,4181,6765,
-  #     21,
-        10946, 17711, 28657, 46368, 75025, 121393, 196418, 317811, 514229,
-  #     30,
-        832040, 1346269, 2178309, 3524578, 5702887, 9227465, 14930352,
-  #     37,                                                 42,
-        24157817, 39088169, 63245986, 102334155, 165580141, 267914296,
-  );
-#433494437
-#701408733
-#1134903170
-#1836311903
-#2971215073
-#4807526976
-#7778742049
-#12586269025
-  for (my $i = 0; $i < @F; $i++)
-    {
-    $F[$i] = Math::BigInt->new($F[$i]);
-    }
-  }
-
-sub _fibonacci_fast
-  {
-  my $x = shift; $x = $x->numify() if ref($x);
-  return $F[$x] if $x < @F;
-
-  # Knuth, TAOCR Vol 1, Third Edition, p. 81
-  # F(n+m) = Fm * Fn+1 + Fm-1 * Fn
-
-  # if m is set to n+1, we get:
-  # F(n+n+1) = F(n+1) * Fn+1 + Fn * Fn
-  # F(n*2+1) = F(n+1) ^ 2 + Fn ^ 2
-
-  # so to know Fx, we must know F((x-1)/2), which only works for odd x
-  # Fortunately:
-  # Fx+1 = F(x) + F(x-1)
-  # when x is even, then are x+1 and x-1 odd and can be calculated by the
-  # same means, and from this we get Fx.
-
-  # starting with level 0 at Fn we fill a hash with the different n we need
-  # to calculate all Fn of the previous level. Here is an example for F1000:
-
-  # To calculate F1000, we need F999 and F1001 (since 1000 is even)
-  # To calculate F999, we need F((999-1)/2) and F((999+1)/2), this are 499
-  # and 500. Sine for F1001 we need 500 and 501, we need F(500), F(501) and
-  # F(499) to calculate F(1001) and F(999), and from these we can get F(1000).
-  # For 500, we need 499 and 501, both are already needed.
-  # For 501, we need 250 and 251. An so on and on until all values at a level
-  # are under 17.
-  # For the deepest level we use a table-lookup. The other levels are then
-  # calulated backwards, until we arive at the top and the result is then in
-  # level 0.
-
-  # level
-  #   0        1         2           3    and so on
-  # 1000 ->   999   ->  499 <-  ->  249
-  #    |	|---->  500  |
-  #    |-->  1001   ->  501 <-  ->  250
-  #                       |------>  251
-
-  my @fibo;
-  $fibo[0]->{$x} = undef;		# mark our final result as needed
-  # if $x is even we need these two, too
-  if ($x % 1 == 0)
-    {
-    $fibo[0]->{$x-1} = undef; $fibo[0]->{$x+1} = undef;
-    }
-  # XXX
-  # for statistics
-  my $steps = 0; my $sum = 0; my $add = 0; my $mul = 0;
-  my $level = 0;
-  my $high = 1;				# keep going?
-  my ($t,$t1,$f);			# helper variables
-  while ($high > 0)
-    {
-    $level++;				# next level
-    $high = 0;				# count of results > @F
-#      print "at level $level (high=$high)\n";
-    foreach $f (keys %{$fibo[$level-1]})
-      {
-      $steps ++;
-      if (($f & 1) == 0)		# odd/even?
-        {
-        # if it is even, add $f-1 and $f+1 to last level
-        # if not existing in last level, we must add
-        # ($f-1-1)/2 & ($f-1-1/2)+1 to the next level, too
-	$t = $f-1;
-        if (!exists $fibo[$level-1]->{$t})
-          {
-          $fibo[$level-1]->{$t} = undef; $t--; $t /= 2;			# $t is odd
-          $fibo[$level]->{$t} = undef; $fibo[$level]->{$t+1} = undef;
-          $high = 1 if $t+1 >= @F;	# any value not in table?
-          }
-	$t = $f+1;
-        if (!exists $fibo[$level-1]->{$t})
-          {
-          $fibo[$level-1]->{$t} = undef; $t--; $t /= 2;			# $t is odd
-          $fibo[$level]->{$t} = undef; $fibo[$level]->{$t+1} = undef;
-          $high = 1 if $t+1 >= @F;	# any value not in table?
-          }
-#        print "$f even: ",$f-1," ",$f+1," in level ",$level-1,"\n";
-        }
-      else
-        {
-        # else add ($_-1)/2and ($_-1)/2 + 1 to this level
-        $t = $f-1; $t /= 2;
-        $fibo[$level]->{$t} = undef; $fibo[$level]->{$t+1} = undef;
-        $high = 1 if $t+1 >= @F;	# any value not in table?
-#       print "$_ odd: $t ",$t+1," in level $level (high = $high)\n";
-        }
-      }
-    }
-  # now we must fill our structure backwards with the results, combining them.
-  # numbers in the last level can be looked up:
-  foreach $f (keys %{$fibo[$level]})
-    {
-    # this inserts Math::BigInt objects, making the math below work:
-    $fibo[$level]->{$f} = $F[$f];
-    }
-#  use Data::Dumper; print Dumper(\@fibo);
-  my $l = $level;				# for statistics
-  while ($level > 0)
-    {
-    $level--;
-    #$sum += scalar keys %{$fibo[$level]};	# for statistics
-    # first do the odd ones
-    my $fibo_level = $fibo[$level];
-    foreach $f (keys %$fibo_level)
-      {
-      next if ($f & 1) == 0;
-      $t = $f-1; $t /= 2; my $t1 = $t+1;
-      $t = $fibo[$level+1]->{$t};
-      $t1 = $fibo[$level+1]->{$t1};
-      #$fibo_level->{$f} = $t*$t+$t1*$t1;
-      $fibo_level->{$f} = $t->copy->bmul($t)->badd($t1->copy()->bmul($t1));
-      #$mul += 2; $add ++;			# for statistics
-      }
-    # now the even ones
-    foreach $f (keys %{$fibo[$level]})
-      {
-      next if ($f & 1) != 0;
-      $fibo[$level]->{$f} = $fibo[$level]->{$f+1} - $fibo[$level]->{$f-1};
-      #$add ++;					# for statistics
-      }
-    }
-#  print "sum $sum level $l => ",$sum/$l," steps $steps adds $add muls $mul\n";
-  $fibo[0]->{$x};
+      my $x = shift;
+      $x = Math::BigInt -> new($x)
+        unless ref($x) && $x -> isa("Math::BigInt");
+      $x -> bfib();
   }
 
 sub base
@@ -280,40 +95,10 @@ sub base
 
 sub to_base
   {
-  # after an idea by Tilghman Lesher
-  my ($x, $base, $alphabet) = @_;
-
-  $x = Math::BigInt->new($x) unless ref $x;
-
-  return '0' if $x->is_zero();
-
-  # setup defaults:
-  $base = 2 unless defined $base;
-  my @digits = $alphabet ? split //, $alphabet : ('0' .. '9', 'A' .. 'Z');
-
-  if ($base > scalar(@digits))
-    {
-    require Carp;
-    Carp::carp("Base $base higher base than number of digits (" . scalar @digits . ") in alphabet");
-    }
-
-  if (!$x->is_pos())
-    {
-    require Carp;
-    Carp::carp("to_base() needs a positive number");
-    }
-
-  my $o = $x->copy();
-  my $r;
-
-  my $result = '';
-  while (!$o->is_zero)
-    {
-    ($o, $r) = $o->bdiv($base);
-    $result = $digits[$r] . $result;
-    }
-
-  $result;
+      my $x = shift;
+      $x = Math::BigInt->new($x)
+        unless ref($x) && $x -> isa("Math::BigInt");
+      $x -> to_base(@_);
   }
 
 sub hailstone
@@ -1106,7 +891,7 @@ If you know of an algorithmn to calculate them, please drop me a note.
 =head1 BUGS
 
 Please report any bugs or feature requests to
-C<bug-math-big at rt.cpan.org>, or through the web interface at
+C<bug-math-bigrat at rt.cpan.org>, or through the web interface at
 L<https://rt.cpan.org/Ticket/Create.html?Queue=Math-Big>
 (requires login).
 We will be notified, and then you'll automatically be notified of progress on
@@ -1122,25 +907,25 @@ You can also look for information at:
 
 =over 4
 
+=item * GitHub
+
+L<https://github.com/pjacklam/p5-Math-Big>
+
 =item * RT: CPAN's request tracker
 
-L<https://rt.cpan.org/Public/Dist/Display.html?Name=Math-Big>
+L<https://rt.cpan.org/Dist/Display.html?Name=Math-Big>
 
-=item * AnnoCPAN: Annotated CPAN documentation
+=item * MetaCPAN
 
-L<http://annocpan.org/dist/Math-Big>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/dist/Math-Big>
-
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/Math-Big/>
+L<https://metacpan.org/release/Math-Big>
 
 =item * CPAN Testers Matrix
 
 L<http://matrix.cpantesters.org/?dist=Math-Big>
+
+=item * CPAN Ratings
+
+L<https://cpanratings.perl.org/dist/Math-Big>
 
 =back
 
@@ -1159,7 +944,7 @@ Tels http://bloodgate.com 2001-2007.
 
 =item *
 
-Peter John Acklam E<lt>pjacklam@online.noE<gt> 2016.
+Peter John Acklam E<lt>pjacklam@gmail.comE<gt> 2016-.
 
 =back
 

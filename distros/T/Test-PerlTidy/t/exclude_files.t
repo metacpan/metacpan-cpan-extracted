@@ -11,7 +11,6 @@ my @wanted_files = sort qw(
   Build.PL
   Makefile.PL
   t/00-compile.t
-  t/critic.t
   t/exclude_files.t
   t/exclude_perltidy.t
   t/is_file_tidy.t

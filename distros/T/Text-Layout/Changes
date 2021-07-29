@@ -1,5 +1,9 @@
 Revision history for Text::Layout
 
+0.021	2021-07-09
+
+	Fix font cacheing problem with PDFAPI2.
+
 0.020	2021-05-18
 
 	Use common font cache for PDFAPI.

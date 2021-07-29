@@ -11,7 +11,7 @@ use warnings::register qw( Encode::dbi::queue );
 
 use Data::Record::Serialize::Error -all;
 
-our $VERSION = '0.20';
+our $VERSION = '0.23';
 
 use Package::Variant
   importing => ['Moo'],
@@ -19,28 +19,28 @@ use Package::Variant
 
 use namespace::clean;
 
-#pod =for Pod::Coverage make_variant
-#pod
-#pod =cut
 
-#pod =attr C<encode>
-#pod
-#pod I<Required>. The encoding format.  Specific encoders may provide
-#pod additional, or require specific, attributes. See L</Encoders>
-#pod for more information.
-#pod
-#pod =attr C<sink>
-#pod
-#pod Where the encoded data will be sent.  Specific sinks may provide
-#pod additional, or require specific attributes. See L</Sinks> for more
-#pod information.
-#pod
-#pod The default output sink is C<stream>, unless the encoder is also a
-#pod sink.
-#pod
-#pod It is an error to specify a sink if the encoder already acts as one.
-#pod
-#pod =cut
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 sub make_variant {
     my ( $class, $target, %attr ) = @_;
@@ -73,14 +73,14 @@ sub make_variant {
 }
 
 
-#pod =method B<new>
-#pod
-#pod   $s = Data::Record::Serialize->new( <attributes> );
-#pod
-#pod Construct a new object. I<attributes> may either be a hashref or a
-#pod list of key-value pairs. See L</ATTRIBUTES> for more information.
-#pod
-#pod =cut
+
+
+
+
+
+
+
+
 
 
 sub new {
@@ -115,13 +115,15 @@ __END__
 
 =pod
 
+=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory
+
 =head1 NAME
 
 Data::Record::Serialize - Flexible serialization of a record
 
 =head1 VERSION
 
-version 0.20
+version 0.23
 
 =head1 SYNOPSIS
 
@@ -329,98 +331,6 @@ record send to the output stream.
 Most errors result in exception objects being thrown, typically in the
 L<Data::Record::Serialize::Error> hierarchy.
 
-=head1 METHODS
-
-=head2 B<new>
-
-  $s = Data::Record::Serialize->new( <attributes> );
-
-Construct a new object. I<attributes> may either be a hashref or a
-list of key-value pairs. See L</ATTRIBUTES> for more information.
-
-=head2 has_types
-
-returns true if L</types> has been set.
-
-=head2 has_fields
-
-returns true if L</fields> has been set.
-
-=head2 B<output_fields>
-
-  $array_ref = $s->output_fields;
-
-The names of the transformed output fields, in order of output (not
-obeyed by all encoders);
-
-=head2 has_nullify
-
-returns true if L</nullify> has been set.
-
-=head2 nullified
-
-  $fields = $obj->nullified;
-
-Returns a list of fields which are checked for empty values (see L</nullify>).
-
-This will return C<undef> if the list is not yet available (for example, if
-fields names are determined from the first output record and none has been sent).
-
-If the list of fields is available, calling B<nullified> may result in
-verification of the list of nullified fields against the list of
-actual fields.  A disparity will result in an exception of class
-C<Data::Record::Serialize::Error::Role::Base::fields>.
-
-=head2 B<numeric_fields>
-
-  $array_ref = $s->numeric_fields;
-
-The input field names for those fields deemed to be numeric.
-
-=head2 B<type_index>
-
-  $hash = $s->type_index;
-
-A hash, keyed off of field type or category.  The values are
-an array of field names.  I<Don't edit this!>.
-
-The hash keys are:
-
-=over
-
-=item C<I>
-
-=item C<N>
-
-=item C<S>
-
-=item C<numeric>
-
-C<N> and C<I>.
-
-=item C<not_string>
-
-Everything but C<S>.
-
-=back
-
-=head2 B<output_types>
-
-  $hash_ref = $s->output_types;
-
-The mapping between output field name and output field type.  If the
-encoder has specified a type map, the output types are the result of
-that mapping.
-
-=head2 B<send>
-
-  $s->send( \%record );
-
-Encode and send the record to the associated sink.
-
-B<WARNING>: the passed hash is modified.  If you need the original
-contents, pass in a copy.
-
 =head1 ATTRIBUTES
 
 =head2 C<encode>
@@ -554,6 +464,98 @@ field names are used unaltered.
 
 If true, format the output fields using the formats specified in the
 C<format_fields> and/or C<format_types> options.  The default is false.
+
+=head1 METHODS
+
+=head2 B<new>
+
+  $s = Data::Record::Serialize->new( <attributes> );
+
+Construct a new object. I<attributes> may either be a hashref or a
+list of key-value pairs. See L</ATTRIBUTES> for more information.
+
+=head2 has_types
+
+returns true if L</types> has been set.
+
+=head2 has_fields
+
+returns true if L</fields> has been set.
+
+=head2 B<output_fields>
+
+  $array_ref = $s->output_fields;
+
+The names of the transformed output fields, in order of output (not
+obeyed by all encoders);
+
+=head2 has_nullify
+
+returns true if L</nullify> has been set.
+
+=head2 nullified
+
+  $fields = $obj->nullified;
+
+Returns a list of fields which are checked for empty values (see L</nullify>).
+
+This will return C<undef> if the list is not yet available (for example, if
+fields names are determined from the first output record and none has been sent).
+
+If the list of fields is available, calling B<nullified> may result in
+verification of the list of nullified fields against the list of
+actual fields.  A disparity will result in an exception of class
+C<Data::Record::Serialize::Error::Role::Base::fields>.
+
+=head2 B<numeric_fields>
+
+  $array_ref = $s->numeric_fields;
+
+The input field names for those fields deemed to be numeric.
+
+=head2 B<type_index>
+
+  $hash = $s->type_index;
+
+A hash, keyed off of field type or category.  The values are
+an array of field names.  I<Don't edit this!>.
+
+The hash keys are:
+
+=over
+
+=item C<I>
+
+=item C<N>
+
+=item C<S>
+
+=item C<numeric>
+
+C<N> and C<I>.
+
+=item C<not_string>
+
+Everything but C<S>.
+
+=back
+
+=head2 B<output_types>
+
+  $hash_ref = $s->output_types;
+
+The mapping between output field name and output field type.  If the
+encoder has specified a type map, the output types are the result of
+that mapping.
+
+=head2 B<send>
+
+  $s->send( \%record );
+
+Encode and send the record to the associated sink.
+
+B<WARNING>: the passed hash is modified.  If you need the original
+contents, pass in a copy.
 
 =for Pod::Coverage make_variant
 

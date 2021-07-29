@@ -1,9 +1,15 @@
 #---------------------------------------------------------------------
-# $Header: /Perl/OlleDB/t/9_loginproperties.t 29    19-07-19 22:42 Sommar $
+# $Header: /Perl/OlleDB/t/9_loginproperties.t 30    20-04-11 12:10 Sommar $
 #
 # This test suite tests that setloginproperty, Autoclose and CommandTimeout.
 #
 # $History: 9_loginproperties.t $
+# 
+# *****************  Version 30  *****************
+# User: Sommar       Date: 20-04-11   Time: 12:10
+# Updated in $/Perl/OlleDB/t
+# Changed conditions for the first two tests, since error message varies
+# between SQL Server versions.
 # 
 # *****************  Version 29  *****************
 # User: Sommar       Date: 19-07-19   Time: 22:42
@@ -213,12 +219,12 @@ my $errmsg;
 $testc = setup_testc(0);
 $testc->connect();
 if (not $testc->{ErrInfo}{Messages} or
-    $testc->{ErrInfo}{Messages}[0]{'text'} =~
-       /(trusted .+ connection)|(Login failed for .+\\.+)/) {
+    $testc->{ErrInfo}{Messages}[0]{'Errno'} == 18452) {
     print "ok 1\n";
 }
 else {
-    print "not ok 1\n";
+   my $msgno = $testc->{ErrInfo}{Messages}[0]{'text'};
+    print "not ok 1 # $msgno\n";
 }
 $testc->disconnect;
 
@@ -227,8 +233,7 @@ $testc = setup_testc(0);
 $testc->setloginproperty('IntegratedSecurity', 1);
 $testc->connect();
 if (not $testc->{ErrInfo}{Messages} or
-    $testc->{ErrInfo}{Messages}[0]{'text'} =~
-       /(trusted .+ connection)|(Login failed for .+\\.+)/) {
+    $testc->{ErrInfo}{Messages}[0]{'Errno'} == 18452) {
     print "ok 2\n";
 }
 else {

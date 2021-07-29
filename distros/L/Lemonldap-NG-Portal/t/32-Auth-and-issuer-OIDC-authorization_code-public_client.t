@@ -316,16 +316,8 @@ sub op {
                         name        => "cn"
                     }
                 },
-                oidcServiceMetaDataAuthorizeURI       => "authorize",
-                oidcServiceMetaDataCheckSessionURI    => "checksession.html",
-                oidcServiceMetaDataJWKSURI            => "jwks",
-                oidcServiceMetaDataEndSessionURI      => "logout",
-                oidcServiceMetaDataRegistrationURI    => "register",
-                oidcServiceMetaDataTokenURI           => "token",
-                oidcServiceMetaDataUserInfoURI        => "userinfo",
                 oidcServiceAllowHybridFlow            => 1,
                 oidcServiceAllowImplicitFlow          => 1,
-                oidcServiceAllowDynamicRegistration   => 1,
                 oidcServiceAllowAuthorizationCodeFlow => 1,
                 oidcRPMetaDataOptions                 => {
                     rp => {

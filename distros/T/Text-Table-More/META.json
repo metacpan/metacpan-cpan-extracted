@@ -72,7 +72,7 @@
          "web" : "https://github.com/perlancar/perl-Text-Table-More"
       }
    },
-   "version" : "0.013",
+   "version" : "0.014",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"
@@ -417,7 +417,7 @@
                      {
                         "class" : "Pod::Weaver::Plugin::Module::Features",
                         "name" : "-Module::Features",
-                        "version" : "0.001"
+                        "version" : "0.002"
                      }
                   ]
                }

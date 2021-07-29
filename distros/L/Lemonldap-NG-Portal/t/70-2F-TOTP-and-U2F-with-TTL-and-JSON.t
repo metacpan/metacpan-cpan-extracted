@@ -263,7 +263,7 @@ qr%<input type="hidden" name="reference1x1" value="RemoveSF-(\d{10})"/>%,
       or print STDERR Dumper( $res->[2]->[0] ), time(), " / $1";
     ok(
         $res->[2]->[0] =~
-qr%<p class="notifText">1 expired second factor\(s\) has/have been removed!</p>%,
+qr%<p class="notifText">1 expired second factor\(s\) has/have been removed \(\d{10}\)!</p>%,
         'Notification message found'
     ) or print STDERR Dumper( $res->[2]->[0] );
     $id = expectCookie($res);
@@ -298,7 +298,7 @@ qr%<input type="hidden" name="reference1x2" value="RemoveSF-(\d{10})"/>%,
       or print STDERR Dumper( $res->[2]->[0] ), time(), " / $1";
     my @notifs =
       ( $res->[2]->[0] =~
-m%<p class="notifText">1 expired second factor\(s\) has/have been removed!</p>%gs
+m%<p class="notifText">1 expired second factor\(s\) has/have been removed \((?:myTOTP|\d{10})\)!</p>%gs
       );
     ok( 2 == @notifs, '2 notifications found' )
       or print STDERR Dumper( $res->[2]->[0] );

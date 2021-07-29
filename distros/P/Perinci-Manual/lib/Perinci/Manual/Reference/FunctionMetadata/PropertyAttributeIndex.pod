@@ -1,0 +1,243 @@
+package Perinci::Manual::Reference::FunctionMetadata::PropertyAttributeIndex; # just to make podweaver happy
+
+# AUTHORITY
+# DATE
+our $DIST = 'Perinci-Manual'; # DIST
+# VERSION
+
+1;
+# ABSTRACT: Alphabetical list of properties/attributes used in Rinci function metadata
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Perinci::Manual::Reference::FunctionMetadata::PropertyAttributeIndex - Alphabetical list of properties/attributes used in Rinci function metadata
+
+=head1 VERSION
+
+This document describes version 0.006 of Perinci::Manual::Reference::FunctionMetadata::PropertyAttributeIndex (from Perl distribution Perinci-Manual), released on 2021-07-28.
+
+=head1 INDEX
+
+=head2 args_as
+
+L<Rinci> standard. See: L<Rinci::function>.
+
+=head2 args
+
+L<Rinci> standard. See: L<Rinci::function>.
+
+=head2 cmdline.chomp
+
+Observed by L<Perinci::CmdLine::Base>.
+
+=head2 cmdline.default_format
+
+Since 2014-03-27.
+
+Set default output format for CLI if not specified by user via C<--format>
+command-line options. Observed by L<Perinci::CmdLine::Base>.
+
+Example usage: L<Data::Unixish>, L<Perinci::CmdLine::Base>.
+
+=head2 cmdline.exit_code
+
+Exit code to use Observed by L<Perinci::CmdLine::Base>. By default exit code to
+use in CLI is derived from enveloped result's status (first element)
+
+Example usage: lots of CLI applications, e.g. L<App::ppgrep> and many others.
+
+=head2 cmdline.page_result
+
+Observed by L<Perinci::CmdLine::Base>.
+
+=head2 cmdline.view_result
+
+Observed by L<Perinci::CmdLine::Base>.
+
+=head2 cmdline.viewer
+
+Observed by L<Perinci::CmdLine::Base>.
+
+=head2 cmdline.result
+
+Result to display instead of enveloped result's payload (the third element),
+when on CLI. Observed by L<Perinci::CmdLine::Base>.
+
+=head2 cmdline.result.interactive
+
+Result to display instead of enveloped result's payload (the third element),
+when on CLI and interactive mdoe. Takes precedence over L</cmdline.result>.
+Observed by L<Perinci::CmdLine::Base>.
+
+See also: L<cmdline.result.noninteractive>.
+
+=head2 cmdline.result.noninteractive
+
+Result to display instead of enveloped result's payload (the third element),
+when on CLI and non-interactive mdoe. Takes precedence over L</cmdline.result>.
+Observed by L<Perinci::CmdLine::Base>.
+
+See also: L<cmdline.result.interactive>.
+
+=head2 deps
+
+Hash. L<Rinci> standard. See: L<Rinci::function>.
+
+=head2 examples
+
+Array of function example entries. L<Rinci> standard. See: L<Rinci::function>.
+
+See also:
+L<Perinci::Manual::Reference::FunctionMetadata::Examples::PropertyAttributeIndex>.
+
+=head2 features
+
+L<Rinci> standard. See: L<Rinci::function>.
+
+=head2 form.*
+
+2015-09-22.
+
+Observed by L<Borang> and C<Borang::*>.
+
+=head2 is_class
+
+Bool. L<Rinci> standard. See: L<Rinci::function>.
+
+=head2 is_func
+
+Bool. L<Rinci> standard. See: L<Rinci::function>.
+
+=head2 is_meth
+
+Bool. L<Rinci> standard. See: L<Rinci::function>.
+
+=head2 is_class_meth
+
+Bool. L<Rinci> standard. See: L<Rinci::function>.
+
+=head2 result
+
+Any. L<Rinci> standard. See: L<Rinci::function>.
+
+=head2 x.app.rimetadb.exclude
+
+2019-08-14.
+
+Bool. Observed by L<App::rimetadb> to allow excluding a function from being
+included in the database.
+
+=head2 x.dist.zilla.plugin.rinci.wrap.wrap_args
+
+2014-03-27.
+
+Bool. Observed by L<Dist::Zilla::Plugin:Rinci::Wrap>.
+
+=head2 x.dynamic_generator_modules
+
+2015-07-15.
+
+Array. Observed by L<Perinci::Sub::Gen::AccessTable>, L<Perinci::CmdLine::Lite>.
+The original goal is to be able to show the version of module that generates
+this function/function metadata in CLI via C<--version>, and to check via
+C<--check-version>.
+
+=head2 x.inline_generator_modules
+
+2015-07-15.
+
+Reserved but not yet observed. The idea is, if a module generates
+function/function metadata as inline and not dynamically, we don't have to show
+the module's version in C<--version>.
+
+=head2 x.no_index
+
+Observed by L<Perinci::To::Doc>, to avoid the function from being documented.
+Note that we can also use the C<hidden> tag for this.
+
+=head2 x.perinci.cmdline.base.exit_code
+
+Observed by L<Perinci::CmdLine::Base>.
+
+=head2 x.perinci.cmdline.base.exit_code
+
+Observed by L<Perinci::CmdLine::Base>.
+
+=head2 x.perinci.sub.wrapper.disable_validate_args
+
+Observed by L<Perinci::Sub::Wrapper>.
+
+Example usage: XXX.
+
+=head2 x.perinci.sub.wrapper.disable_validate_result
+
+Observed by L<Perinci::Sub::Wrapper>.
+
+Example usage: XXX.
+
+=head2 x.perinci.sub.wrapper.logs
+
+2014-03-27.
+
+Observed by L<Perinci::Sub::Wrapper>.
+
+Example usage: XXX.
+
+=head2 x.perinci.sub.wrapper.logs
+
+Observed by L<Perinci::Sub::Wrapper>.
+
+Example usage: XXX.
+
+=head1 INDEX (DEPRECATED)
+
+=head2 x.schema.entity
+
+2014-03-27. First used in Spanel project. Deprecated on 2019-07-03.
+
+Observed by L<Perinci::Sub::ArgEntity> and C<Perinci::Sub::ArgEntity::*>.
+
+=head2 x.schema.entity_id_arg
+
+2014-03-27. First used in Spanel project.
+
+Observed by L<Perinci::Sub::ArgEntity> and C<Perinci::Sub::ArgEntity::*>.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/Perinci-Manual>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-Perinci-Manual>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-Manual>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+Other C<Perinci::Manual::Reference::**::PropertyAttributeIndex> pages.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2021 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

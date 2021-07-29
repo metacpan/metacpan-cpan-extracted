@@ -137,4 +137,31 @@ EOMARKDOWN
    is( $items[2]->text, "Third", 'items[2] text' );
 };
 
+subtest "Numbered lists" => sub {
+   my @p = App::sdview::Parser::Markdown->new->parse_string( <<"EOMARKDOWN" );
+1. First
+2. Second
+
+3. Third
+EOMARKDOWN
+
+   is( scalar @p, 1, 'Received 1 paragraph' );
+
+   is( $p[0]->type, "list-number", 'p[0] type' );
+   is( $p[0]->indent, 4, 'p[0] indent' );
+
+   my @items = $p[0]->items;
+
+   is( scalar @items, 3, '3 items' );
+
+   is( $items[0]->type, "item",  'items[0] type' );
+   is( $items[0]->text, "First", 'items[0] text' );
+
+   is( $items[1]->type, "item",   'items[1] type' );
+   is( $items[1]->text, "Second", 'items[1] text' );
+
+   is( $items[2]->type, "item",  'items[2] type' );
+   is( $items[2]->text, "Third", 'items[2] text' );
+};
+
 done_testing;

@@ -8,7 +8,7 @@ use DateTime;
 use DateTime::Duration;
 use DateTime::Format::Strptime;
 
-BEGIN { use_ok( 'Module::Generic::Datetime' ) || BAIL_OUT( "Unable to load Module::Generic::Datetime" ); }
+BEGIN { use_ok( 'Module::Generic::DateTime' ) || BAIL_OUT( "Unable to load Module::Generic::DateTime" ); }
 
 my $hash =
 {
@@ -45,8 +45,8 @@ my $iso = $dt2->iso8601;
 my $iso2 = q{2021-03-31T10:21:48+0700};
 my $iso3 = q{2021-03-31T06:21:48+0700};
 ok( $dt > $dt2, "Is $dt (" . overload::StrVal( $dt ) . ") greater than $dt2 (" . overload::StrVal( $dt2 ) . ") ?" );
-my $dbt1 = Module::Generic::Datetime->new( $dt );
-my $dbt2 = Module::Generic::Datetime->new( $dt2 );
+my $dbt1 = Module::Generic::DateTime->new( $dt );
+my $dbt2 = Module::Generic::DateTime->new( $dt2 );
 # diag( "Using object overload" );
 ok( $dbt1 > $now, "is $dbt1 (" . overload::StrVal( $dbt1 ) . ") greater than $now (" . overload::StrVal( $now ) . ") ?" );
 # diag( "Using object overload (with iso string)" );
@@ -57,15 +57,15 @@ ok( !( $dbt1 > $iso2 ), "is $dbt1 (" . overload::StrVal( $dbt1 ) . ") greater th
 ok( $dbt1 > $iso3, "is $dbt1 (" . overload::StrVal( $dbt1 ) . ") greater than $iso3 (" . overload::StrVal( $iso3 ) . ") ?" );
 my $dur = DateTime::Duration->new( days => 2 );
 
-# diag( "\nUsing Module::Generic::Datetime." );
+# diag( "\nUsing Module::Generic::DateTime." );
 my $res = ( $dbt2 + $dur );
-isa_ok( $res, 'Module::Generic::Datetime', "Trying to do : \$dbt ($dbt2) + Duration (2 days [$dur]):" );
+isa_ok( $res, 'Module::Generic::DateTime', "Trying to do : \$dbt ($dbt2) + Duration (2 days [$dur]):" );
 
 # diag( $res->stringify );
 ok( $res->stringify eq '2021-03-21 12:08:15' );
 
 $res = ( $dbt1 - $dbt2 );
-isa_ok( $res, 'Module::Generic::Datetime::Interval', "Subtract \$dbt2 ($dbt2) from \$dbt1 ($dbt1)" );
+isa_ok( $res, 'Module::Generic::DateTime::Interval', "Subtract \$dbt2 ($dbt2) from \$dbt1 ($dbt1)" );
 # diag( "DateTime duration dump:\n", $res->dump );
 
 is( $res->weeks, 1, "Number of weeks" );

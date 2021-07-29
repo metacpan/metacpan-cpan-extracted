@@ -48,8 +48,8 @@ my $sec = $o{'@'} // 15 ; # 何秒ごとにレポートを表示させるか
 my $nc = 0 ; # 計数対象としなかったセルの数をカウント。
 my $rl ; # 各ファイルの読んだ行数を格納。
 my %fOut = (
-j => [map{UNDERLINE decode($_)}map{eval"\"$_\""}qw[列番 異なる値 数値化平均 列名 値の範囲 最頻値 最頻値 $o{r}最稀値の度数(重複) 桁数範囲]],
-e =>  [ map {UNDERLINE $_ } qw[ cpos diff ave. name range frequent frequency ] , "$o{r}lower(multi)",  "digits" ] ) ; 
+j => [map{UNDERLINE decode($_)}map{eval"\"$_\""}qw[列番 異なる値 数値化平均 列名 値の範囲 最頻値 頻度(重複)], q[], '桁数'],
+e =>  [ map {UNDERLINE $_ } qw[ cpos diff ave. name range frequent frequency(multi) ] , "",  "digits" ] ) ; 
 
 my $col = undef ; # 0オリジンのカラム番号 ## sub ColFreq 内で使う。
 * negcell = defined $o{'#'} ? sub { if (m/$o{'#'}/ ) { $col ++ ; $nc ++ ; goto EACH_CELL } }  : sub {} ; # o{'0'} をやめた

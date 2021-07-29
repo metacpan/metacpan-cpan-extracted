@@ -34,7 +34,7 @@ You shouldn't make instances of this class. Each attribute should be used as a n
       TransactItems => [
         {
           ConditionCheck => {
-            ConditionExpression => 'MyConditionExpression',    # OPTIONAL
+            ConditionExpression => 'MyConditionExpression',
             Key                 => {
               'MyAttributeName' => {
                 B    => 'BlobBinaryAttributeValue',    # OPTIONAL
@@ -46,11 +46,15 @@ You shouldn't make instances of this class. Each attribute should be used as a n
                 M => {
                   'MyAttributeName' => <AttributeValue>,    # key: max: 65535
                 },    # OPTIONAL
-                N    => 'MyNumberAttributeValue',
-                NS   => [ 'MyNumberAttributeValue', ... ],    # OPTIONAL
-                NULL => 1,                                    # OPTIONAL
-                S    => 'MyStringAttributeValue',
-                SS   => [ 'MyStringAttributeValue', ... ],    # OPTIONAL
+                N  => 'MyNumberAttributeValue',    # OPTIONAL
+                NS => [
+                  'MyNumberAttributeValue', ...    # OPTIONAL
+                ],    # OPTIONAL
+                NULL => 1,                           # OPTIONAL
+                S    => 'MyStringAttributeValue',    # OPTIONAL
+                SS   => [
+                  'MyStringAttributeValue', ...      # OPTIONAL
+                ],    # OPTIONAL
               },    # key: max: 65535
             },
             TableName                => 'MyTableName',    # min: 3, max: 255
@@ -69,11 +73,15 @@ You shouldn't make instances of this class. Each attribute should be used as a n
                 M => {
                   'MyAttributeName' => <AttributeValue>,    # key: max: 65535
                 },    # OPTIONAL
-                N    => 'MyNumberAttributeValue',
-                NS   => [ 'MyNumberAttributeValue', ... ],    # OPTIONAL
-                NULL => 1,                                    # OPTIONAL
-                S    => 'MyStringAttributeValue',
-                SS   => [ 'MyStringAttributeValue', ... ],    # OPTIONAL
+                N  => 'MyNumberAttributeValue',    # OPTIONAL
+                NS => [
+                  'MyNumberAttributeValue', ...    # OPTIONAL
+                ],    # OPTIONAL
+                NULL => 1,                           # OPTIONAL
+                S    => 'MyStringAttributeValue',    # OPTIONAL
+                SS   => [
+                  'MyStringAttributeValue', ...      # OPTIONAL
+                ],    # OPTIONAL
               },
             },    # OPTIONAL
             ReturnValuesOnConditionCheckFailure =>
@@ -91,15 +99,19 @@ You shouldn't make instances of this class. Each attribute should be used as a n
                 M => {
                   'MyAttributeName' => <AttributeValue>,    # key: max: 65535
                 },    # OPTIONAL
-                N    => 'MyNumberAttributeValue',
-                NS   => [ 'MyNumberAttributeValue', ... ],    # OPTIONAL
-                NULL => 1,                                    # OPTIONAL
-                S    => 'MyStringAttributeValue',
-                SS   => [ 'MyStringAttributeValue', ... ],    # OPTIONAL
+                N  => 'MyNumberAttributeValue',    # OPTIONAL
+                NS => [
+                  'MyNumberAttributeValue', ...    # OPTIONAL
+                ],    # OPTIONAL
+                NULL => 1,                           # OPTIONAL
+                S    => 'MyStringAttributeValue',    # OPTIONAL
+                SS   => [
+                  'MyStringAttributeValue', ...      # OPTIONAL
+                ],    # OPTIONAL
               },    # key: max: 65535
             },
             TableName           => 'MyTableName',             # min: 3, max: 255
-            ConditionExpression => 'MyConditionExpression',   # OPTIONAL
+            ConditionExpression => 'MyConditionExpression',
             ExpressionAttributeNames => {
               'MyExpressionAttributeNameVariable' =>
                 'MyAttributeName',    # , value: max: 65535
@@ -115,11 +127,15 @@ You shouldn't make instances of this class. Each attribute should be used as a n
                 M => {
                   'MyAttributeName' => <AttributeValue>,    # key: max: 65535
                 },    # OPTIONAL
-                N    => 'MyNumberAttributeValue',
-                NS   => [ 'MyNumberAttributeValue', ... ],    # OPTIONAL
-                NULL => 1,                                    # OPTIONAL
-                S    => 'MyStringAttributeValue',
-                SS   => [ 'MyStringAttributeValue', ... ],    # OPTIONAL
+                N  => 'MyNumberAttributeValue',    # OPTIONAL
+                NS => [
+                  'MyNumberAttributeValue', ...    # OPTIONAL
+                ],    # OPTIONAL
+                NULL => 1,                           # OPTIONAL
+                S    => 'MyStringAttributeValue',    # OPTIONAL
+                SS   => [
+                  'MyStringAttributeValue', ...      # OPTIONAL
+                ],    # OPTIONAL
               },
             },    # OPTIONAL
             ReturnValuesOnConditionCheckFailure =>
@@ -137,15 +153,19 @@ You shouldn't make instances of this class. Each attribute should be used as a n
                 M => {
                   'MyAttributeName' => <AttributeValue>,    # key: max: 65535
                 },    # OPTIONAL
-                N    => 'MyNumberAttributeValue',
-                NS   => [ 'MyNumberAttributeValue', ... ],    # OPTIONAL
-                NULL => 1,                                    # OPTIONAL
-                S    => 'MyStringAttributeValue',
-                SS   => [ 'MyStringAttributeValue', ... ],    # OPTIONAL
+                N  => 'MyNumberAttributeValue',    # OPTIONAL
+                NS => [
+                  'MyNumberAttributeValue', ...    # OPTIONAL
+                ],    # OPTIONAL
+                NULL => 1,                           # OPTIONAL
+                S    => 'MyStringAttributeValue',    # OPTIONAL
+                SS   => [
+                  'MyStringAttributeValue', ...      # OPTIONAL
+                ],    # OPTIONAL
               },    # key: max: 65535
             },
             TableName           => 'MyTableName',             # min: 3, max: 255
-            ConditionExpression => 'MyConditionExpression',   # OPTIONAL
+            ConditionExpression => 'MyConditionExpression',
             ExpressionAttributeNames => {
               'MyExpressionAttributeNameVariable' =>
                 'MyAttributeName',    # , value: max: 65535
@@ -161,11 +181,15 @@ You shouldn't make instances of this class. Each attribute should be used as a n
                 M => {
                   'MyAttributeName' => <AttributeValue>,    # key: max: 65535
                 },    # OPTIONAL
-                N    => 'MyNumberAttributeValue',
-                NS   => [ 'MyNumberAttributeValue', ... ],    # OPTIONAL
-                NULL => 1,                                    # OPTIONAL
-                S    => 'MyStringAttributeValue',
-                SS   => [ 'MyStringAttributeValue', ... ],    # OPTIONAL
+                N  => 'MyNumberAttributeValue',    # OPTIONAL
+                NS => [
+                  'MyNumberAttributeValue', ...    # OPTIONAL
+                ],    # OPTIONAL
+                NULL => 1,                           # OPTIONAL
+                S    => 'MyStringAttributeValue',    # OPTIONAL
+                SS   => [
+                  'MyStringAttributeValue', ...      # OPTIONAL
+                ],    # OPTIONAL
               },
             },    # OPTIONAL
             ReturnValuesOnConditionCheckFailure =>
@@ -183,16 +207,20 @@ You shouldn't make instances of this class. Each attribute should be used as a n
                 M => {
                   'MyAttributeName' => <AttributeValue>,    # key: max: 65535
                 },    # OPTIONAL
-                N    => 'MyNumberAttributeValue',
-                NS   => [ 'MyNumberAttributeValue', ... ],    # OPTIONAL
-                NULL => 1,                                    # OPTIONAL
-                S    => 'MyStringAttributeValue',
-                SS   => [ 'MyStringAttributeValue', ... ],    # OPTIONAL
+                N  => 'MyNumberAttributeValue',    # OPTIONAL
+                NS => [
+                  'MyNumberAttributeValue', ...    # OPTIONAL
+                ],    # OPTIONAL
+                NULL => 1,                           # OPTIONAL
+                S    => 'MyStringAttributeValue',    # OPTIONAL
+                SS   => [
+                  'MyStringAttributeValue', ...      # OPTIONAL
+                ],    # OPTIONAL
               },    # key: max: 65535
             },
             TableName           => 'MyTableName',             # min: 3, max: 255
             UpdateExpression    => 'MyUpdateExpression',
-            ConditionExpression => 'MyConditionExpression',   # OPTIONAL
+            ConditionExpression => 'MyConditionExpression',
             ExpressionAttributeNames => {
               'MyExpressionAttributeNameVariable' =>
                 'MyAttributeName',    # , value: max: 65535
@@ -208,11 +236,15 @@ You shouldn't make instances of this class. Each attribute should be used as a n
                 M => {
                   'MyAttributeName' => <AttributeValue>,    # key: max: 65535
                 },    # OPTIONAL
-                N    => 'MyNumberAttributeValue',
-                NS   => [ 'MyNumberAttributeValue', ... ],    # OPTIONAL
-                NULL => 1,                                    # OPTIONAL
-                S    => 'MyStringAttributeValue',
-                SS   => [ 'MyStringAttributeValue', ... ],    # OPTIONAL
+                N  => 'MyNumberAttributeValue',    # OPTIONAL
+                NS => [
+                  'MyNumberAttributeValue', ...    # OPTIONAL
+                ],    # OPTIONAL
+                NULL => 1,                           # OPTIONAL
+                S    => 'MyStringAttributeValue',    # OPTIONAL
+                SS   => [
+                  'MyStringAttributeValue', ...      # OPTIONAL
+                ],    # OPTIONAL
               },
             },    # OPTIONAL
             ReturnValuesOnConditionCheckFailure =>

@@ -12,8 +12,6 @@ MANIFEST.SKIP
 README
 t/00sig.t
 t/01load.t
-t/author-bigint-hex.t
-t/author-bigint-oct.t
 t/big_e_pi.t
 t/bigexp.t
 t/bigint.t
@@ -33,15 +31,17 @@ t/option_l.t
 t/option_p.t
 t/overrides.t
 t/ratopt_a.t
-t/release-cpan-changes.t
-t/release-pod-coverage.t
-t/release-pod.t
-t/release-portability.t
-t/release-test-version.t
 t/scope_f.t
 t/scope_i.t
 t/scope_r.t
 TODO
+xt/author/bigint-hex.t
+xt/author/bigint-oct.t
+xt/release/cpan-changes.t
+xt/release/pod-coverage.t
+xt/release/pod-syntax.t
+xt/release/portability.t
+xt/release/test-version.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)
 SIGNATURE                                Public-key signature (added by MakeMaker)

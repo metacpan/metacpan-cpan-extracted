@@ -1,4 +1,4 @@
-Road Map for Future Development of PDF::Builder              16 February 2021
+Road Map for Future Development of PDF::Builder                  02 July 2021
 
 In order to encourage others to contribute code and/or algorithms to the
 effort, I am publishing this road map of where I would like the product to go.
@@ -92,6 +92,17 @@ F. Fix Bar Code generation (CTS 1): there seems to be something quite wrong
    in section I, as bar codes are already implemented in the base, but it's 
    possible that bar codes could be removed and reimplemented in section II as 
    a separate library or module.
+
+   Update: Actually printing out the example bar codes separates the "merged"
+   blobs into discrete lines. This may indicate rounding errors when presenting
+   on a low-to-medium resolution computer screen. However, on a consumer-grade
+   laser printer, the lines are still so close that I fear most scanners would
+   hae trouble reading the bar codes. I may have to do something with reducing
+   bar widths a little to allow for irregular edges ("blotting").
+
+   Take a look at package PDF::QRCode. It uses Text::QRCode internally, but 
+   the interesting feature is using a code monkey to integrate itself (like
+   a retrovirus) into PDF::Builder, and can be called $gfx->qrcode(parms).
 
 G. Fix Small Caps (and capitalization in general) for ligatures (CTS 13):
    some ligatures given in Unicode or single byte encodings don't get properly
@@ -189,6 +200,19 @@ R. TTF/OTF font embedding: consider -forceASCII and -forceLatin1 options to
    might be useful in fillable forms and any other situation where an end user 
    gets to type in text. There is already the ability to embed the entire 
    font, but that's often overkill.
+
+S. Many requests in wkHTMLtoPDF to output an entire web page into a single
+   PDF page. This is not as ridiculous as it sounds, as there are roll 
+   printers that effectively have no fixed page height. For Builder, this 
+   would mean outputting to a page of indefinite height, which in turn means 
+   that Y-coordinate values as input would have to be updated to the new, 
+   extended page. Many calls to Builder routines involve x-y coordinates on 
+   the (fixed size) page, as opposed to a continuous print-at-the-bottom 
+   model. Perhaps start with a normal fixed size (minimum) page and allow 
+   Y-coordinates to go negative, and fix them all up at the end before or 
+   during render to the file? Another possibility is to use a negative 
+   Y-coordinate to mean "place me at the bottom". Also remember that beyond 
+   200 inches in height, support in readers and tools will vary.
 
 =============================================================================
 II. Items to add to a separate area (new module or sub-module)
@@ -337,6 +361,8 @@ J. ## DONE ## release 3.020  (documentation improved)
    the image what its orientation is, and leave translation and rotation of
    the placed image to user code, rather than trying to flip the contents of
    the image file directly. See writeup in Docs.pm.
+   Supposedly CSS img { image-orientation: from-image; } will get from EXIF,
+   although this may have been deprecated.
 
 K. A means to update PDF content already written to the $pdf data structure, 
    but not yet written to file. This could involve moving a text write (one

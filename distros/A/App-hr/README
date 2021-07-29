@@ -2,8 +2,8 @@ NAME
     App::hr - Print horizontal bar on the terminal
 
 VERSION
-    This document describes version 0.264 of App::hr (from Perl distribution
-    App-hr), released on 2021-07-08.
+    This document describes version 0.266 of App::hr (from Perl distribution
+    App-hr), released on 2021-07-09.
 
 SYNOPSIS
      use App::hr qw(hr hr_r);
@@ -27,8 +27,9 @@ SYNOPSIS
 
     You can also use the provided CLI hr.
 
-NO_COLOR
-  COLOR
+DESCRIPTION
+    A demo screencast:
+
 CONTRIBUTOR
     Steven Haryanto <sharyanto@cpan.org>
 
@@ -153,6 +154,8 @@ FUNCTIONS
     Return value: (any)
 
 ENVIRONMENT
+  NO_COLOR
+  COLOR
 HOMEPAGE
     Please visit the project's homepage at
     <https://metacpan.org/release/App-hr>.

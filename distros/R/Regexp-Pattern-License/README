@@ -2,7 +2,7 @@ NAME
     Regexp::Pattern::License - Regular expressions for legal licenses
 
 VERSION
-    Version v3.6.1
+    Version v3.8.0
 
 SYNOPSIS
         use Regexp::Pattern::License;
@@ -86,6 +86,12 @@ PATTERNS
     *   except_epl_mpl
 
     *   except_faust
+
+    *   except_font_2
+
+    *   except_gcc_2
+
+    *   except_gcc_3_1
 
     *   except_gstreamer
 
@@ -315,6 +321,10 @@ PATTERNS
 
     *   bsd_4_clause
 
+    *   bsd_4_clause_uc
+
+    *   bsd_protection
+
     *   bsl
 
     *   bsl_1
@@ -411,19 +421,47 @@ PATTERNS
 
     *   cc_cc0_1
 
+    *   cc_devnations
+
+    *   cc_devnations_2
+
     *   cc_nc
 
     *   cc_nc_1
+
+    *   cc_nc_sa
+
+    *   cc_nc_sa_1
+
+    *   cc_nc_sp
+
+    *   cc_nc_sp_1
+
+    *   cc_nd_nc
+
+    *   cc_nd_nc_1
 
     *   cc_nd
 
     *   cc_nd_1
 
+    *   cc_pd
+
+    *   cc_pdd
+
+    *   cc_pddc
+
     *   cc_sa
 
     *   cc_sa_1
 
+    *   cc_sampling
+
+    *   cc_sampling_1
+
     *   cc_sp
+
+    *   cc_sp_1
 
     *   cddl
 
@@ -455,6 +493,10 @@ PATTERNS
 
     *   cnri_python_gpl_compat
 
+    *   condor
+
+    *   condor_1_1
+
     *   cpal
 
     *   cpal_1
@@ -467,6 +509,8 @@ PATTERNS
 
     *   cpol_1_02
 
+    *   crossword
+
     *   cryptix
 
     *   cua_opl
@@ -478,6 +522,22 @@ PATTERNS
     *   curl
 
     *   cvw
+
+    *   d_fsd
+
+    *   d_fsd_1
+
+    *   dbad
+
+    *   dbad_0_2
+
+    *   dbad_0_3
+
+    *   dbad_1
+
+    *   dbad_1_1
+
+    *   dont_ask
 
     *   dsdp
 
@@ -505,6 +565,10 @@ PATTERNS
 
     *   epl_2
 
+    *   erlpl
+
+    *   erlpl_1_1
+
     *   eudatagrid
 
     *   eupl
@@ -518,6 +582,20 @@ PATTERNS
     *   eurosym
 
     *   fair
+
+    *   fair_source
+
+    *   fair_source_0_9
+
+    *   fal
+
+    *   fal_1_1
+
+    *   fal_1_2
+
+    *   fal_1_3
+
+    *   festival
 
     *   frameworx
 
@@ -553,6 +631,8 @@ PATTERNS
 
     *   gfdl_niv
 
+    *   glide
+
     *   gpl
 
     *   gpl_1
@@ -573,11 +653,21 @@ PATTERNS
 
     *   gpl_3_or_later
 
+    *   gsoap
+
+    *   gsoap_1.3b
+
     *   hpnd
 
     *   hpnd_sell
 
+    *   ibm_pibs
+
     *   icu
+
+    *   ijg
+
+    *   imlib2
 
     *   intel
 
@@ -596,6 +686,8 @@ PATTERNS
     *   jython
 
     *   kevlin_henney
+
+    *   leptonica
 
     *   lgpl
 
@@ -620,6 +712,8 @@ PATTERNS
     *   lgpl_bdwgc
 
     *   libpng
+
+    *   libtiff
 
     *   liliq_p
 
@@ -665,6 +759,8 @@ PATTERNS
 
     *   mit_enna
 
+    *   mit_epinions
+
     *   mit_feh
 
     *   mit_new
@@ -681,7 +777,21 @@ PATTERNS
 
     *   mit_open_group
 
+    *   mit_openvision
+
+    *   mit_osf
+
+    *   mit_unixcrypt
+
+    *   mit_whatever
+
+    *   mit_widget
+
+    *   mit_xfig
+
     *   motosoto
+
+    *   mpich2
 
     *   mpl
 
@@ -690,6 +800,8 @@ PATTERNS
     *   mpl_1_1
 
     *   mpl_2
+
+    *   ms_cl
 
     *   ms_pl
 
@@ -709,11 +821,19 @@ PATTERNS
 
     *   naumen
 
+    *   nbpl
+
+    *   nbpl_1
+
     *   ncsa
 
     *   ngpl
 
     *   nokia
+
+    *   nosl
+
+    *   nosl_1
 
     *   npl
 
@@ -734,6 +854,14 @@ PATTERNS
     *   oclc_1
 
     *   oclc_2
+
+    *   odbl
+
+    *   odbl_1
+
+    *   odc_by
+
+    *   odc_by_1
 
     *   ofl
 
@@ -811,6 +939,12 @@ PATTERNS
 
     *   osl_3
 
+    *   pddl
+
+    *   pddl_1
+
+    *   peer_production
+
     *   php
 
     *   php_3
@@ -847,6 +981,12 @@ PATTERNS
 
     *   rscpl
 
+    *   sax_pd
+
+    *   sds
+
+    *   sds_1
+
     *   sgi_b
 
     *   sgi_b_1
@@ -871,17 +1011,35 @@ PATTERNS
 
     *   sleepycat
 
+    *   sncl
+
+    *   sncl_1_10
+
+    *   sncl_2_0_1
+
+    *   sncl_2_0_2
+
+    *   sncl_2_1
+
+    *   sncl_2_3
+
     *   spl
 
     *   spl_1
 
     *   ssleay
 
+    *   stlport
+
     *   sugarcrm
 
     *   sugarcrm_1_1_3
 
     *   tosl
+
+    *   truecrypt
+
+    *   truecrypt_3
 
     *   ucl
 
@@ -905,6 +1063,8 @@ PATTERNS
 
     *   vsl_1
 
+    *   vspl
+
     *   w3c
 
     *   w3c_19980519
@@ -919,6 +1079,10 @@ PATTERNS
 
     *   watcom_1
 
+    *   wordnet
+
+    *   wordnet_3
+
     *   wtfpl
 
     *   wtfpl_1
@@ -931,7 +1095,29 @@ PATTERNS
 
     *   x11
 
+    *   xfree86
+
+    *   xfree86_1_1
+
     *   xnet
+
+    *   ypl
+
+    *   ypl_1
+
+    *   ypl_1_1
+
+    *   zed
+
+    *   zend
+
+    *   zend_2
+
+    *   zimbra
+
+    *   zimbra_1_3
+
+    *   zimbra_1_4
 
     *   zlib
 

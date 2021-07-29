@@ -1,3 +1,23 @@
+0.23      2021-07-26 12:39:08-04:00 America/New_York
+
+  [BUILD]
+
+    * Missing test prerequisites: Test2::Plugin::NoWarnings, File::Slurper
+
+0.22      2021-07-26 12:39:08-04:00 America/New_York
+
+  [BUILD]
+
+    * obsolete Makefile.PL was bundled with the distribution.
+
+0.21      2021-07-26 12:39:08-04:00 America/New_York
+
+  [BUILD]
+
+    * switch to Module::Build::Tiny
+    * Require Type::Tiny >= 1.010003 to fix broken CPAN tests: ++srezic (RT#131939)
+
+
 0.20      2020-04-15 11:17:27-04:00 America/New_York
 
   [BUG FIX]

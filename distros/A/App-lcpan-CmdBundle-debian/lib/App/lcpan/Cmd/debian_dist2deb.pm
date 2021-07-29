@@ -1,7 +1,9 @@
 package App::lcpan::Cmd::debian_dist2deb;
 
-our $DATE = '2017-07-10'; # DATE
-our $VERSION = '0.007'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-07-17'; # DATE
+our $DIST = 'App-lcpan-CmdBundle-debian'; # DIST
+our $VERSION = '0.008'; # VERSION
 
 use 5.010001;
 use strict;
@@ -79,12 +81,12 @@ sub handle_cmd {
     {
         push @fields, "dist_version";
         my $sth = $dbh->prepare(
-            "SELECT name,version FROM dist WHERE is_latest AND name IN (".
+            "SELECT dist_name,dist_version FROM file WHERE is_latest_dist AND dist_name IN (".
                 join(",", map { $dbh->quote($_) } @{ $args{dists} }).")");
         $sth->execute;
         my %versions;
         while (my $row = $sth->fetchrow_hashref) {
-            $versions{$row->{name}} = $row->{version};
+            $versions{$row->{dist_name}} = $row->{dist_version};
         }
         for (0..$#rows) {
             $rows[$_]{dist_version} = $versions{$rows[$_]{dist}};
@@ -139,7 +141,7 @@ App::lcpan::Cmd::debian_dist2deb - Show Debian package name/version for a dist
 
 =head1 VERSION
 
-This document describes version 0.007 of App::lcpan::Cmd::debian_dist2deb (from Perl distribution App-lcpan-CmdBundle-debian), released on 2017-07-10.
+This document describes version 0.008 of App::lcpan::Cmd::debian_dist2deb (from Perl distribution App-lcpan-CmdBundle-debian), released on 2021-07-17.
 
 =head1 SYNOPSIS
 
@@ -222,9 +224,9 @@ This module handles the L<lcpan> subcommand C<debian-dist2deb>.
 
 Usage:
 
- handle_cmd(%args) -> [status, msg, result, meta]
+ handle_cmd(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
-Show Debian package name/version for a dist.
+Show Debian package nameE<sol>version for a dist.
 
 This routine uses the simple rule of: converting the dist name to lowercase then
 add "lib" prefix and "-perl" suffix. A small percentage of Perl distributions do
@@ -242,11 +244,13 @@ Check each distribution if its Debian package exists, using Dist::Util::Debian::
 
 =item * B<cpan> => I<dirname>
 
-Location of your local CPAN mirror, e.g. /path/to/cpan.
+Location of your local CPAN mirror, e.g. E<sol>pathE<sol>toE<sol>cpan.
 
 Defaults to C<~/cpan>.
 
 =item * B<dists>* => I<array[perl::distname]>
+
+Distribution names (e.g. Foo-Bar).
 
 =item * B<exists_on_cpan> => I<bool>
 
@@ -260,6 +264,11 @@ Only output debs which exist on Debian repository.
 
 Filename of index.
 
+If C<index_name> is a filename without any path, e.g. C<index.db> then index will
+be located in the top-level of C<cpan>. If C<index_name> contains a path, e.g.
+C<./index.db> or C</home/ujang/lcpan.db> then the index will be located solely
+using the C<index_name>.
+
 =item * B<needs_update> => I<bool>
 
 Only output debs which has smaller version than its CPAN counterpart.
@@ -271,16 +280,24 @@ Will be passed to Dist::Util::Debian::dist_has_deb.
 Using this option is faster if you need to check existence for many Debian
 packages. See L<Dist::Util::Debian> documentation for more details.
 
+=item * B<use_bootstrap> => I<bool> (default: 1)
+
+Whether to use bootstrap database from App-lcpan-Bootstrap.
+
+If you are indexing your private CPAN-like repository, you want to turn this
+off.
+
+
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -306,7 +323,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

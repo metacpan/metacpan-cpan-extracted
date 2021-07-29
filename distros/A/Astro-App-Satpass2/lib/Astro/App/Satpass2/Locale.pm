@@ -14,7 +14,7 @@ use Exporter qw{ import };
 use I18N::LangTags ();
 use I18N::LangTags::Detect ();
 
-our $VERSION = '0.047';
+our $VERSION = '0.048';
 
 our @EXPORT_OK = qw{ __localize __message __preferred };
 
@@ -149,7 +149,7 @@ sub __message {
     my ( $msg, @arg ) = @_;
 
     instance( $msg, 'Template::Exception' )
-	and return join ' ', $msg->as_string(), @arg;
+	and return _message_template_exception( $msg, @arg );
 
     my $lcl = __localize(
 	text	=> [ '+message', $msg ],
@@ -170,6 +170,21 @@ sub __message {
 	}, \$output );
 
     return $output;
+}
+
+sub _message_template_exception {
+    my ( $ex, @arg ) = @_;
+    local $_ = $ex->info();
+    # NOTE we're assuming that if there is a return we caught a
+    # re-thrown exception that had already been munged.
+    m/ \n \z /smx
+	and return $ex;
+    $_ = join ' ', $_, @arg;
+    m/ [.?|] \z /smx
+	or $_ .= '.';
+    $_ .= "\n";
+    my $class = ref $ex;
+    return $class->new( $ex->type(), $_ );
 }
 
 sub __preferred {

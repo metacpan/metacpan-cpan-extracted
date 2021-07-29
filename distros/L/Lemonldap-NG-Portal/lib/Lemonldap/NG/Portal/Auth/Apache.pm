@@ -4,14 +4,14 @@ use strict;
 use Mouse;
 use Lemonldap::NG::Portal::Main::Constants qw(PE_ERROR PE_OK);
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.12';
 
 extends 'Lemonldap::NG::Portal::Main::Auth';
 
 # INITIALIZATION
 
 sub init {
-    1;
+    return 1;
 }
 
 # RUNNING METHODS
@@ -25,22 +25,22 @@ sub extractFormInfo {
 
     # This is needed for Kerberos authentication
     $req->{user} =~ s/^(.*)@.*$/$1/g;
-    PE_OK;
+    return PE_OK;
 }
 
 sub authenticate {
-    PE_OK;
+    return PE_OK;
 }
 
 sub setAuthSessionInfo {
     my ( $self, $req ) = @_;
     $req->{sessionInfo}->{authenticationLevel} =
       $self->conf->{apacheAuthnLevel};
-    PE_OK;
+    return PE_OK;
 }
 
 sub authLogout {
-    PE_OK;
+    return PE_OK;
 }
 
 sub getDisplayType {

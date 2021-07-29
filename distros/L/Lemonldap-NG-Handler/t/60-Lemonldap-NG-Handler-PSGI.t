@@ -234,7 +234,7 @@ ok(
       $client->_get( '/', undef, 'foo.example.fr', "lemonldap=$sessionId" ),
     'Reject "foo.example.fr"'
 );
-ok( $res->[0] == 302, ' Code is 302' ) or explain( $res, 302 );
+ok( $res->[0] == 403, ' Code is 403' ) or explain( $res, 403 );
 count(2);
 
 ok(
@@ -243,7 +243,7 @@ ok(
     ),
     'Reject "foo.example.org/orgdeny"'
 );
-ok( $res->[0] == 302, ' Code is 302' ) or explain( $res, 302 );
+ok( $res->[0] == 403, ' Code is 403' ) or explain( $res, 403 );
 count(2);
 
 ok(
@@ -261,7 +261,7 @@ ok(
     ),
     'Reject "abfoo.example.org/orgdeny"'
 );
-ok( $res->[0] == 302, ' Code is 302' ) or explain( $res, 302 );
+ok( $res->[0] == 403, ' Code is 403' ) or explain( $res, 403 );
 count(2);
 
 ok(
@@ -287,7 +287,7 @@ ok(
       $client->_get( '/', undef, 'abfoo.example.org', "lemonldap=$sessionId" ),
     'Reject "abfoo.example.org/"'
 );
-ok( $res->[0] == 302, ' Code is 302' ) or explain( $res, 302 );
+ok( $res->[0] == 403, ' Code is 403' ) or explain( $res, 403 );
 count(2);
 
 ok(

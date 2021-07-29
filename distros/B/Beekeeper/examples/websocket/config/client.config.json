@@ -5,7 +5,7 @@
 
 {
     "host"     : "localhost",
-    "port"     :  8001,
+    "port"     :  11883,
     "username" : "frontend",
     "password" : "abc123",
 }

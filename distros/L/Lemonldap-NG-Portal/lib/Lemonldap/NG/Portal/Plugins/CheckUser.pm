@@ -9,7 +9,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_BADCREDENTIALS
 );
 
-our $VERSION = '2.0.11';
+our $VERSION = '2.0.12';
 
 extends qw(
   Lemonldap::NG::Portal::Main::Plugin
@@ -133,7 +133,6 @@ sub display {
     $array_attrs = $self->_dispatchAttributes(
         $self->_createArray( $req, $attrs, $req->userData ) );
 
-    # Display form
     my $params = {
         PORTAL     => $self->conf->{portal},
         MAIN_LOGO  => $self->conf->{portalMainLogo},
@@ -166,19 +165,19 @@ sub check {
 
     # Check token
     if ( $self->ottRule->( $req, {} ) ) {
-        my $token = $req->param('token');
-        unless ($token) {
-            $self->userLogger->warn('CheckUser called without token');
-            $msg   = PE_NOTOKEN;
-            $token = $self->ott->createToken();
-        }
-        else {
+        my $token;
+        if ( $token = $req->param('token') ) {
             unless ( $self->ott->getToken($token) ) {
                 $self->userLogger->warn(
                     'CheckUser called with an expired/bad token');
                 $msg   = PE_TOKENEXPIRED;
                 $token = $self->ott->createToken();
             }
+        }
+        else {
+            $self->userLogger->warn('CheckUser called without token');
+            $msg   = PE_NOTOKEN;
+            $token = $self->ott->createToken();
         }
 
         my $params = {
@@ -191,7 +190,10 @@ sub check {
             LOGIN     => '',
             TOKEN     => $token,
         };
-        return $self->p->sendJSONresponse( $req, $params ) if $req->wantJSON;
+        return $self->p->sendJSONresponse( $req, $params )
+          if $req->wantJSON && $msg;
+
+        # Display form
         return $self->p->sendHtml( $req, 'checkuser', params => $params )
           if $msg;
     }
@@ -403,7 +405,7 @@ sub check {
 sub _resolveURL {
     my ( $self, $req, $url ) = @_;
     my ($proto) = $url =~ m#^(https?://).*#i;
-    my ( $vhost, $appuri ) = $url =~ m#^(?:https?://)?([^/]*)(.*)#i;
+    my ( $vhost, $appuri ) = $url =~ m@^(?:https?://)?([^/#]*)(.*)@i;
     my ($port) = $vhost =~ m#^.+(:\d+)$#;
     $port ||= '';
     $vhost =~ s/:\d+$//;
@@ -465,7 +467,7 @@ sub _userData {
 
 sub _authorization {
     my ( $self, $req, $uri, $attrs ) = @_;
-    my ( $vhost, $appuri ) = $uri =~ m#^https?://([^/]*)(.*)#;
+    my ( $vhost, $appuri ) = $uri =~ m@^https?://([^/#]*)(.*)@;
     my $exist = 0;
 
     $vhost =~ s/:\d+$//;
@@ -487,7 +489,7 @@ sub _authorization {
 
 sub _headers {
     my ( $self, $req, $uri, $attrs, $savedUserData ) = @_;
-    my ($vhost) = $uri =~ m#^https?://([^/]*).*#;
+    my ($vhost) = $uri =~ m@^https?://([^/#]*).*@;
 
     $vhost =~ s/:\d+$//;
     $req->{env}->{HTTP_HOST} = $vhost;

@@ -7,7 +7,7 @@ use XML::Simple;
 use Lemonldap::NG::Common::UserAgent;
 use URI;
 
-our $VERSION = '2.0.8';
+our $VERSION = '2.0.12';
 
 # PROPERTIES
 
@@ -47,44 +47,59 @@ sub loadSrv {
 # Load CAS application list
 sub loadApp {
     my ($self) = @_;
-    if ( $self->conf->{casAppMetaDataOptions}
+    unless ( $self->conf->{casAppMetaDataOptions}
         and %{ $self->conf->{casAppMetaDataOptions} } )
     {
-        $self->casAppList( $self->conf->{casAppMetaDataOptions} );
-    }
-    else {
         $self->logger->info("No CAS apps found in configuration");
     }
 
     foreach ( keys %{ $self->conf->{casAppMetaDataOptions} } ) {
 
+        my $valid = 1;
+
         # Load access rule
-        my $rule = $self->conf->{casAppMetaDataOptions}->{$_}
+        my $rule =
+          $self->conf->{casAppMetaDataOptions}->{$_}
           ->{casAppMetaDataOptionsRule};
         if ( length $rule ) {
             $rule = $self->p->HANDLER->substitute($rule);
             unless ( $rule = $self->p->HANDLER->buildSub($rule) ) {
-                $self->error( 'CAS App rule error: '
+                $self->logger->error(
+                    "Unable to build access rule for CAS Application $_: "
                       . $self->p->HANDLER->tsv->{jail}->error );
-                return 0;
+                $valid = 0;
             }
-            $self->spRules->{$_} = $rule;
         }
 
         # Load per-application macros
-        my $macros = $self->conf->{casAppMetaDataMacros}->{$_};
+        my $macros         = $self->conf->{casAppMetaDataMacros}->{$_};
+        my $compiledMacros = {};
         for my $macroAttr ( keys %{$macros} ) {
             my $macroRule = $macros->{$macroAttr};
             if ( length $macroRule ) {
                 $macroRule = $self->p->HANDLER->substitute($macroRule);
-                unless ( $macroRule = $self->p->HANDLER->buildSub($macroRule) )
-                {
-                    $self->error( 'SAML SP macro error: '
-                          . $self->p->HANDLER->tsv->{jail}->error );
-                    return 0;
+                if ( $macroRule = $self->p->HANDLER->buildSub($macroRule) ) {
+                    $compiledMacros->{$macroAttr} = $macroRule;
                 }
-                $self->spMacros->{$_}->{$macroAttr} = $macroRule;
+                else {
+                    $self->logger->error(
+"Unable to build macro $macroAttr for CAS Application $_: "
+                          . $self->p->HANDLER->tsv->{jail}->error );
+                    $valid = 0;
+                }
             }
+        }
+
+        if ($valid) {
+            $self->casAppList->{$_} =
+              $self->conf->{casAppMetaDataOptions}->{$_};
+            $self->spRules->{$_}  = $rule;
+            $self->spMacros->{$_} = $compiledMacros;
+        }
+        else {
+            $self->logger->error(
+                "CAS Application $_ has errors and will be ignored");
+
         }
     }
     return 1;
@@ -397,7 +412,7 @@ sub validateST {
 
     if ( defined $xml->{'cas:authenticationFailure'} ) {
         $self->logger->error( "Failed to validate Service Ticket $ticket: "
-              . $xml->{'cas:authenticationFailure'} );
+              . $xml->{'cas:authenticationFailure'}->{content} );
         return 0;
     }
 
@@ -527,8 +542,10 @@ sub getCasApp {
             }
         }
 
-        # Try to match host
-        $hostnameConfKey = $app if ( $hostname eq $candidateHost );
+        # Try to match host, only if strict matching is disabled
+        unless ( $self->conf->{casStrictMatching} ) {
+            $hostnameConfKey = $app if ( $hostname eq $candidateHost );
+        }
     }
 
     # Application found by prefix has priority

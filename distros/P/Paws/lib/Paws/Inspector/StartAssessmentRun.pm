@@ -28,10 +28,10 @@ You shouldn't make instances of this class. Each attribute should be used as a n
 =head1 SYNOPSIS
 
     my $inspector = Paws->service('Inspector');
-   # Start assessment run
-   # Starts the assessment run specified by the ARN of the assessment template.
-   # For this API to function properly, you must not exceed the limit of running
-   # up to 500 concurrent agents per AWS account.
+# Start assessment run
+# Starts the assessment run specified by the ARN of the assessment template. For
+# this API to function properly, you must not exceed the limit of running up to
+# 500 concurrent agents per AWS account.
     my $StartAssessmentRunResponse = $inspector->StartAssessmentRun(
       'AssessmentRunName'     => 'examplerun',
       'AssessmentTemplateArn' =>

@@ -12,7 +12,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_OK
 );
 
-our $VERSION = '2.0.3';
+our $VERSION = '2.0.12';
 
 extends 'Lemonldap::NG::Portal::Auth::_WebForm';
 
@@ -137,18 +137,18 @@ sub extractFormInfo {
 }
 
 sub authenticate {
-    PE_OK;
+    return PE_OK;
 }
 
 sub setAuthSessionInfo {
     my ( $self, $req ) = @_;
     $req->sessionInfo->{gpgMail}             = $req->data->{gpgMail};
     $req->sessionInfo->{authenticationLevel} = $self->conf->{gpgAuthnLevel};
-    PE_OK;
+    return PE_OK;
 }
 
 sub authLogout {
-    PE_OK;
+    return PE_OK;
 }
 
 sub getDisplayType {

@@ -40,12 +40,12 @@
 #   deb		de standaard tegenrekening (Debiteuren) voor verkoopboekingen
 #   btw_ih	de rekening voor BTW boekingen voor inkopen, hoog tarief
 #   btw_il	idem, laag tarief
+#   btw_ip	idem, privé tarief
+#   btw_ia	idem, ander tarief
 #   btw_vh	idem, verkopen, hoog tarief
 #   btw_vl	idem, laag tarief
-#   btw_ph	idem, privé, hoog tarief
-#   btw_pl	idem, laag tarief
-#   btw_ah	idem, anders, hoog tarief
-#   btw_al	idem, laag tarief
+#   btw_vp	idem, privé tarief
+#   btw_va	idem, ander tarief
 #   btw_ok	rekening voor de betaalde BTW
 #   winst	rekening waarop de winst wordt geboekt
 #

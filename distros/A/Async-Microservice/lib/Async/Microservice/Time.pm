@@ -13,6 +13,8 @@ our $VERSION = 0.01;
 use DateTime;
 use Time::HiRes qw(time);
 use AnyEvent;
+use AnyEvent::Future;
+use Future::AsyncAwait;
 
 sub service_name {
     return 'async-microservice-time';
@@ -26,88 +28,105 @@ sub get_routes {
                 POST => 'POST_datetime',
             },
         },
+        'datetime/:time_zone' => {
+            defaults => {
+                GET  => 'GET_datetime',
+                POST => 'POST_datetime',
+            },
+        },
+        'datetime/:time_zone_part1/:time_zone_part2' => {
+            defaults    => { GET       => 'GET_datetime_capture', },
+            validations => {
+                time_zone_part1 => qr{^\w+$},
+                time_zone_part2 => qr{^\w+$},
+            },
+        },
         'epoch' => {defaults => {GET => 'GET_epoch'}},
         'sleep' => {defaults => {GET => 'GET_sleep'}},
     );
 }
 
 sub GET_datetime {
-    my ($self, $this_req) = @_;
+    my ( $self, $this_req ) = @_;
     my $time_zone = $this_req->params->{time_zone} // 'UTC';
-    my $time_dt = eval {DateTime->now(time_zone => $time_zone);};
+    return $self->_get_datetime_time_zone( $this_req, $time_zone );
+}
+
+sub GET_datetime_capture {
+    my ( $self, $this_req, $match ) = @_;
+    my $time_zone = $this_req->params->{time_zone_part1} . '/'
+        . $this_req->params->{time_zone_part2};
+    return $self->_get_datetime_time_zone( $this_req, $time_zone );
+}
+
+sub _get_datetime_time_zone {
+    my ( $self, $this_req, $time_zone ) = @_;
+    my $time_dt = eval { DateTime->now( time_zone => $time_zone ); };
     if ($@) {
-        return $this_req->respond(
+        return [
             405,
             [],
             {   err_status => 405,
                 err_msg    => $@,
             }
-        );
+        ];
     }
-    return $this_req->respond(200, [], _datetime_as_data($time_dt));
+    return [ 200, [], _datetime_as_data($time_dt) ];
 }
 
 sub POST_datetime {
     my ($self, $this_req) = @_;
     my $epoch = eval {$this_req->json_content->{epoch}};
     if (!defined($epoch)) {
-        return $this_req->respond(
+        return [
             405,
             [],
             {   err_status => 405,
                 err_msg    => $@ || 'epoch data missing',
             }
-        );
+        ];
     }
     if ($epoch !~ m/^-?[0-9]+$/) {
-        return $this_req->respond(
+        return [
             405,
             [],
             {   err_status => 405,
                 err_msg    => 'epoch not a number',
             }
-        );
+        ];
     }
-    return $this_req->respond(200, [], _datetime_as_data(DateTime->from_epoch(epoch => $epoch)));
+    return [200, [], _datetime_as_data(DateTime->from_epoch(epoch => $epoch))];
 }
 
 sub GET_epoch {
-    my ($self, $this_req) = @_;
-    return $this_req->respond(200, [], {epoch => time()},);
+    my ( $self, $this_req ) = @_;
+    return [ 200, [], { epoch => time() } ];
 }
 
-sub GET_sleep {
-    my ($self, $this_req) = @_;
+async sub GET_sleep {
+    my ( $self, $this_req ) = @_;
     my $start_time = time();
-    my $sleep_time = ($this_req->params->{duration} // rand(10)) + 0;
-    if ($sleep_time <= 0) {
-        return $this_req->respond(
+    my $sleep_time = ( $this_req->params->{duration} // rand(10) ) + 0;
+    if ( $sleep_time <= 0 ) {
+        return [
             405,
             [],
             {   err_status => 405,
                 err_msg    => 'invalid sleep duration',
             }
-        );
+        ];
     }
 
-    my $w;
-    $w = AnyEvent->timer(
-        after => $sleep_time,
-        cb    => sub {
-            $w = undef;
-            my $stop_time = time();
-            $this_req->respond(
-                200,
-                [],
-                {   start    => $start_time,
-                    stop     => $stop_time,
-                    duration => ($stop_time - $start_time),
-                }
-            );
+    await AnyEvent::Future->new_delay( after => $sleep_time );
+    my $stop_time = time();
+    return [
+        200,
+        [],
+        {   start    => $start_time,
+            stop     => $stop_time,
+            duration => ( $stop_time - $start_time ),
         }
-    );
-
-    return;
+    ];
 }
 
 sub _datetime_as_data {

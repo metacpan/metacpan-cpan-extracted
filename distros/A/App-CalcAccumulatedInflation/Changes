@@ -1,3 +1,10 @@
+0.051   2021-04-01  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [ux] Add more examples.
+
+
 0.050   2021-04-01  Released-By: PERLANCAR; Urgency: medium
 
 	- Add options: --base-index, --base-year.

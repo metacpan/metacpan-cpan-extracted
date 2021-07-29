@@ -3,7 +3,7 @@ package Beekeeper::JSONRPC::Error;
 use strict;
 use warnings;
 
-our $VERSION = '0.07';
+our $VERSION = '0.09';
 
 
 use overload '""' => sub { $_[0]->{error}->{message} };
@@ -134,7 +134,7 @@ Beekeeper::JSONRPC::Error - Representation of a JSON-RPC error
  
 =head1 VERSION
  
-Version 0.07
+Version 0.09
 
 =head1 SYNOPSIS
 

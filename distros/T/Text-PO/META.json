@@ -1,0 +1,74 @@
+{
+   "abstract" : "Read and write PO files",
+   "author" : [
+      "Jacques Deguest (jack@deguest.jp)"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Text-PO",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Struct" : "0.65",
+            "DateTime" : "1.54",
+            "Encode" : "3.08",
+            "Fcntl" : "1.13",
+            "IO::File" : "1.41",
+            "JSON" : "4.03",
+            "Module::Generic" : "v0.15.4",
+            "Nice::Try" : "v1.1.2",
+            "Scalar::Util" : "1.50",
+            "Text::Wrap" : "2013.0523",
+            "open" : "1.11",
+            "overload" : "1.30",
+            "parent" : "0",
+            "perl" : "5.014000",
+            "strict" : "0.238",
+            "warnings" : "1.44"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "3.78",
+            "Test::More" : "1.302182",
+            "Test::Pod" : "1.52",
+            "utf8" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://git.deguest.jp/jack/Text-PO/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "web" : "https://git.deguest.jp/jack/Text-PO"
+      }
+   },
+   "version" : "v0.1.2",
+   "x_serialization_backend" : "JSON::PP version 4.06"
+}

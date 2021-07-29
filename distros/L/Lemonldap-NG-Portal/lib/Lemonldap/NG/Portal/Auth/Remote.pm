@@ -4,7 +4,7 @@ use strict;
 use Mouse;
 use Lemonldap::NG::Portal::Main::Constants qw(PE_OK);
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.12';
 
 extends 'Lemonldap::NG::Portal::Main::Auth',
   'Lemonldap::NG::Portal::Lib::Remote';
@@ -18,11 +18,11 @@ sub extractFormInfo {
     $req->{user} =
       $req->data->{rSessionInfo}->{ $self->conf->{remoteUserField} || 'uid' };
     $req->data->{password} = $req->data->{rSessionInfo}->{'_password'};
-    PE_OK;
+    return PE_OK;
 }
 
 sub authenticate {
-    PE_OK;
+    return PE_OK;
 }
 
 sub setAuthSessionInfo {
@@ -33,11 +33,11 @@ sub setAuthSessionInfo {
     $req->{sessionInfo}->{'_password'} = $req->data->{'password'};
     $req->{sessionInfo}->{authenticationLevel} =
       $req->data->{rSessionInfo}->{authenticationLevel};
-    PE_OK;
+    return PE_OK;
 }
 
 sub authLogout {
-    PE_OK;
+    return PE_OK;
 }
 
 sub getDisplayType {

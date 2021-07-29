@@ -37,7 +37,9 @@
       },
       "runtime" : {
          "requires" : {
-            "perl" : "5.008005"
+            "Mojolicious" : "7.60",
+            "Role::Tiny" : "2.000001",
+            "perl" : "v5.16.0"
          }
       },
       "test" : {
@@ -58,7 +60,7 @@
          "web" : "https://github.com/BD3i/Test-Mojo-Role-Routes"
       }
    },
-   "version" : "0.01",
+   "version" : "0.03",
    "x_contributors" : [
       "BD3i <66965284+BD3i@users.noreply.github.com>",
       "BD3i <bcd19@hotmail.com>"

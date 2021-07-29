@@ -3,7 +3,7 @@ package Myriad::Storage::Implementation::Memory;
 use strict;
 use warnings;
 
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.010'; # VERSION
 our $AUTHORITY = 'cpan:DERIV'; # AUTHORITY
 
 use Future::AsyncAwait;
@@ -109,6 +109,24 @@ async method getset : Defer ($k, $v) {
     my $original = delete $data{$k};
     $data{$k} = $v;
     return $original;
+}
+
+=head2 incr
+
+Takes the following parameters:
+
+=over 4
+
+=item * C<< $k >> - the relative key in storage
+
+=back
+
+Returns a L<Future> which will resolve to the corresponding incremented value, or C<undef> if none.
+
+=cut
+
+async method incr : Defer ($k) {
+    return ++$data{$k};
 }
 
 =head2 observe

@@ -6,7 +6,7 @@ use Mouse;
 use Lemonldap::NG::Common::Conf::Constants;
 use Lemonldap::NG::Common::Conf::ReConstants;
 
-our $VERSION = '2.0.9';
+our $VERSION = '2.0.12';
 
 extends 'Lemonldap::NG::Common::Conf::AccessLib';
 
@@ -418,7 +418,7 @@ sub _oidcMetaDataNodes {
     }
     # Return all exported attributes if asked
     elsif ( $query =~
-/^(?:oidc${type}MetaDataExportedVars|oidcRPMetaDataOptionsExtraClaims|oidcRPMetaDataMacros)$/
+/^(?:oidc${type}MetaDataExportedVars|oidcRPMetaDataOptionsExtraClaims|oidcRPMetaDataMacros|oidcRPMetaDataScopeRules)$/
       )
     {
         my $pk = eval { $self->getConfKey( $req, $query )->{$partner} } // {};

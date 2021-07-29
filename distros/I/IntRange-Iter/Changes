@@ -1,0 +1,25 @@
+0.004   2021-07-17  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Mention NumSeq::Iter.
+
+
+0.003   2021-07-17  Released-By: PERLANCAR; Urgency: medium
+
+	- [incompatible change] Disallow .. again by default (for
+	  compatibility with e.g. pdftk), but allow it when we pass
+	  allow_dotdot=>1 option to intrange_iter().
+
+	- Add option: allow_dash, which can be set to false and allow_dotdot=>1
+          if you only want m..n syntax.
+
+
+0.002   2021-07-17  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux] Allow m..n in addition to m-n.
+
+
+0.001    2021-07-17  Released-By: PERLANCAR
+
+         - First release.

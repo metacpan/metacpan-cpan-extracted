@@ -6,35 +6,35 @@
 use v5.26;
 use utf8;
 
-use Object::Pad 0.41;
+use Object::Pad 0.43;  # :strict(params)
 
-package App::sdview::Parser 0.02;
+package App::sdview::Parser 0.03;
 role App::sdview::Parser;
 
 use String::Tagged;
 
 # This package is empty but provides a bunch of helper classes
 
-class App::sdview::Para::Heading {
+class App::sdview::Para::Heading :strict(params) {
    has $level :param :reader;
    has $text  :param :reader;
 
    method type { "head" . $level }
 }
 
-class App::sdview::Para::Plain {
+class App::sdview::Para::Plain :strict(params) {
    has $text :param :reader;
 
    method type { "plain" }
 }
 
-class App::sdview::Para::Verbatim {
+class App::sdview::Para::Verbatim :strict(params) {
    has $text :param :reader;
 
    method type { "verbatim" }
 }
 
-class App::sdview::Para::List {
+class App::sdview::Para::List :strict(params) {
    has $listtype :param :reader;
    has $indent   :param :reader;
 
@@ -45,7 +45,7 @@ class App::sdview::Para::List {
    method type { "list-$listtype" }
 }
 
-class App::sdview::Para::ListItem {
+class App::sdview::Para::ListItem :strict(params) {
    has $text :param :reader;
 
    # TODO: Do we remember the list's type?

@@ -1,0 +1,41 @@
+NAME
+    Bencher::Scenarios::List::Utils::MoveElement - Scenarios to benchmark
+    List::Utils::MoveElement
+
+VERSION
+    This document describes version 0.003 of
+    Bencher::Scenarios::List::Utils::MoveElement (from Perl distribution
+    Bencher-Scenarios-List-Utils-MoveElement), released on 2021-07-23.
+
+DESCRIPTION
+    This distribution contains the following Bencher scenario modules:
+
+    *   Bencher::Scenario::List::Utils::MoveElement::move_element_to_beginni
+        ng
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Bencher-Scenarios-List-Utils-MoveElement>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Bencher-Scenarios-List-Utils-MoveElem
+    ent>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Bencher-Scenarios-Lis
+    t-Utils-MoveElement>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2021 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

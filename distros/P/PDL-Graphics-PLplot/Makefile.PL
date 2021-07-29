@@ -3,34 +3,7 @@ use Config;
 use File::Spec;
 use Data::Dumper;
 
-# comment this block out for PDL internal version
-eval {
-  require PDL::Core::Dev;  # needed for stand-alone version of package.
-                           # Need to comment out
-                           # for package included in PDL distro.
-
-  PDL::Core::Dev->import;
-};
-my $pdl_installed = ($@) ? 0 : 1; # make always == 1 for install from PDL distro.
-print "PDL ", ($pdl_installed ? 'is' : 'is not'), " installed\n";
-# end comment this block out for PDL internal version
-
-# my $pdl_installed = 1; # uncomment for PDL-internal version
-
-if (!$pdl_installed) {
-  # write dummy makefile if PDL not installed
-  WriteMakefile(
-		'NAME'         => 'PDL::Graphics::PLplot',
-		'PREREQ_PM'    => { PDL => 0 },
-		);
-  exit;
-}
-
-# require bad value support.  D. Hunt 10/20/2008
-unless ($PDL::Config{WITH_BADVAL}) {
-  buildDummy ("Bad value support required!  (Turn on WITH_BADVAL in perldl.conf)");
-  return if (caller); exit;
-}
+use PDL::Core::Dev;
 
 #
 ## Search for plplot library and include file
@@ -198,7 +171,11 @@ close   $fh;
 %hash = pdlpp_stdargs(@::pack);          # use this for separate module
 
 $hash{'PREREQ_PM'} = { PDL => 0 };
+$hash{CONFIGURE_REQUIRES} = { 'PDL::Core::Dev' => 0 };
 # $hash{'OPTIMIZE'}  = '-g'; # If you want to debug, uncomment this.
+$hash{TEST_REQUIRES} = {
+  'Test::More' => '0.88', # done_testing
+};
 $hash{'VERSION_FROM'}   = 'plplot.pd';
 $hash{'LIBS'}      = [$libs];
 # add this to allow one to use the /ops/tools/lib plplot libs even when

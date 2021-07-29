@@ -1,0 +1,7 @@
+Revision history for Perl module DateTime::Format::JP
+
+v0.1.1 2021-07-22T08:37:56+0900
+    - Added missing test units and updated documentation
+
+v0.1.0 2021-07-21T23:05:12+0900
+    - Initial version

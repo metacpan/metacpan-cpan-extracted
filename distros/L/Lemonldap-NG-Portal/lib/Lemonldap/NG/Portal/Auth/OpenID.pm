@@ -15,7 +15,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_REDIRECT
 );
 
-our $VERSION = '2.0.3';
+our $VERSION = '2.0.12';
 
 extends 'Lemonldap::NG::Portal::Main::Auth';
 
@@ -191,18 +191,18 @@ qq'Unknown "OpenID Simple Registration Extension" field name: $k'
 }
 
 sub authenticate {
-    PE_OK;
+    return PE_OK;
 }
 
 sub setAuthSessionInfo {
     my ( $self, $req ) = @_;
     $req->{sessionInfo}->{authenticationLevel} =
       $self->conf->{openIdAuthnLevel};
-    PE_OK;
+    return PE_OK;
 }
 
 sub authLogout {
-    PE_OK;
+    return PE_OK;
 }
 
 sub getDisplayType {

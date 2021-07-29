@@ -4,10 +4,14 @@ author:
   - 'Sven Verdoolaege (skimo@kotnet.org)'
 build_requires:
   ExtUtils::MakeMaker: '0'
+  FCGI::Client: '0'
+  File::Temp: '0'
+  IO::Socket::UNIX: '0'
+  Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'ExtUtils::MakeMaker version 7.3905, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.6304, CPAN::Meta::Converter version 2.150010'
 license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -23,5 +27,5 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=FCGI
   repository: https://github.com/perl-catalyst/FCGI.git
-version: '0.79'
+version: '0.80'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

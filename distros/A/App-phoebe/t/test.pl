@@ -15,7 +15,7 @@
 
 use Modern::Perl;
 use Test::More;
-use File::Slurper qw(write_text);
+use File::Slurper qw(write_text read_text read_dir);
 use Mojo::IOLoop;
 use File::Copy;
 use Encode;
@@ -38,50 +38,35 @@ our @spaces;
 our $port = Mojo::IOLoop::Server->generate_port;
 our $base = "gemini://$host:$port";
 our $dir = "./" . sprintf("test-%04d", int(rand(10000)));
+our $example;
+
+# Generating the config file for this test
+our @config;
+our @use;
 
 mkdir($dir);
-write_text("$dir/config", <<'EOT');
-package App::Phoebe;
+my $config = <<'EOT';
+# package is App::Phoebe
 use Modern::Perl;
-our (@init, @extensions, @main_menu);
-push(@main_menu, "=> gemini://localhost:1965/do/test Test");
-push(@extensions, \&serve_test);
-sub serve_test {
-  my $stream = shift;
-  my $url = shift;
-  my $hosts = host_regex();
-  my $port = port($stream);
-  if ($url =~ m!^gemini://($hosts):$port/do/test$!) {
-    $stream->write("20 text/plain\r\n");
-    $stream->write("Test\n");
-    return 1;
-  }
-  return;
-}
 no warnings 'redefine';
-sub get_ip_numbers {
-  return '127.0.0.1';
-}
-our $speed_bump_requests = 2;
-our $speed_bump_window = 5;
-our @known_fingerprints = qw(
-  sha256$0ba6ba61da1385890f611439590f2f0758760708d1375859b2184dcd8f855a00);
+sub get_ip_numbers { '127.0.0.1' }
 EOT
-
-our @config;
-if (@config) {
-  mkdir("$dir/conf.d");
-  my $i = 0;
-  for my $config (@config) {
-    if ($config =~ /\n/) {
-      # make sure this is loaded at the very end
-      write_text("$dir/conf.d/__$i.pl", $config);
-      $i++;
-    } else {
-      copy("contrib/$config", "$dir/conf.d/$config") or die "Failed to install $config: $!";
+$config .= join("\n", @config) if @config;
+$config .= join("", map { "use App::Phoebe::$_;\n" } @use) if @use;
+if ($example) {
+  for my $file ("blib/lib/App/Phoebe.pm", map { "blib/lib/App/Phoebe/$_" } grep /\.pm$/, read_dir("blib/lib/App/Phoebe")) {
+    my $source = read_text($file);
+    if ($source =~ /^(    # tested by $0\n(?:    .*\n|\t.*\n|\n)+)/m) {
+      $example = $1;
+      $example =~ s/\t/        /g;
+      $example =~ s/^    //gm;
+      $config .= $example;
+      last;
     }
   }
+  # test $example at the end
 }
+write_text("$dir/config", $config . "\n1;\n") if $config;
 
 our $pid = fork();
 
@@ -117,6 +102,7 @@ if (!defined $pid) {
 sub query_gemini {
   my $query = shift;
   my $text = shift;
+  my $cert = shift // 1; # suppress use of client certificate in the test
   my ($header, $mimetype, $encoding, $buffer);
 
   # create client
@@ -125,12 +111,13 @@ sub query_gemini {
       address => "localhost",
       port => $port,
       tls => 1,
-      tls_cert => "t/cert.pem",
-      tls_key => "t/key.pem",
+      tls_cert => ($cert ? "t/cert.pem" : undef),
+      tls_key => ($cert ? "t/key.pem" : undef),
       tls_options => { SSL_verify_mode => 0x00 },
     } => sub {
       my ($loop, $err, $stream) = @_;
       die "Client creation failed: $err\n" if $err;
+      $stream->timeout(2);
       $stream->on(error => sub {
 	my ($stream, $err) = @_;
 	die "Stream error: $err\n" if $err });
@@ -159,7 +146,8 @@ sub query_gemini {
 	  }
 	}});
       # Write request
-      $stream->write("$query\r\n");
+      $stream->write($query);
+      $stream->write("\r\n") unless $query =~ /^POST/; # GET and Gemini requests end in \r\n
       $stream->write($text) if $text });
   # Start event loop if necessary
   Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
@@ -171,7 +159,8 @@ sub query_gemini {
 
 sub query_web {
   my $query = shift;
-  return query_gemini("$query\r\n"); # add empty line
+  $query .= "\r\n" unless $query =~ /^POST/; # add empty line for GET requests
+  return query_gemini($query);
 }
 
 my $total = 0;
@@ -192,3 +181,10 @@ for (qw(1 1 1 1 1)) {
 }
 
 plan skip_all => "Giving up after ${total}s\n" unless $ok;
+
+# We cannot test $example up above; we must run this test once we established
+# that the plan is not to skil all. If we don't wait, we'll get the following
+# error: "Parse errors: Bad plan. You planned 0 tests but ran 1."
+like($example, qr/^# tested by $0\n/, "Example found") if $ok and $example;
+
+1;

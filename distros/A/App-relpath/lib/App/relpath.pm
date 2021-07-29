@@ -1,6 +1,9 @@
 package App::relpath;
 
-our $VERSION = '0.04'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-07-15'; # DATE
+our $DIST = 'App-relpath'; # DIST
+our $VERSION = '0.051'; # VERSION
 
 1;
 # ABSTRACT: Return the relative pathname
@@ -17,11 +20,17 @@ App::relpath - Return the relative pathname
 
 =head1 VERSION
 
-This document describes version 0.04 of App::relpath (from Perl distribution App-relpath), released on 2015-01-03.
+This document describes version 0.051 of App::relpath (from Perl distribution App-relpath), released on 2021-07-15.
 
 =head1 SYNOPSIS
 
 See the command-line script L<relpath>.
+
+=head1 CONTRIBUTOR
+
+=for stopwords Steven Haryanto
+
+Steven Haryanto <sharyanto@cpan.org>
 
 =head1 HOMEPAGE
 
@@ -29,7 +38,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-relpat
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/sharyanto/perl-App-relpath>.
+Source repository is at L<https://github.com/perlancar/perl-App-relpath>.
 
 =head1 BUGS
 
@@ -39,13 +48,17 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+=head1 SEE ALSO
+
+L<App::realpath>, L<App::quickabspath>
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

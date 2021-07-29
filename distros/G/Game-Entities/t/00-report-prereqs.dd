@@ -16,6 +16,7 @@ do { my $x = {
                     },
        'runtime' => {
                       'requires' => {
+                                      'Sub::Util' => '1.40',
                                       'perl' => 'v5.20.0'
                                     }
                     },

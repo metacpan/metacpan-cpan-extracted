@@ -162,8 +162,8 @@ sub database_setting {
                 for my $item ( @{$items->{$group}} ) {
                     my $required = $item->{name};
                     push @$sub_menu, [ $required, '- ' . $item->{prompt}, $item->{values} ];
-                              # db                               # global
-                    $db_opt->{$section}{$required} //= $db_opt->{$plugin}{$required} // 1; # default is required (1)
+                              # db specific                      # global
+                    $db_opt->{$section}{$required} //= $db_opt->{$plugin}{$required} // 1; # the default: "required" is true (1)
                 }
                 my $prompt = 'Required fields (' . $plugin . '):';
                 $sf->__settings_menu_wrap_db( $db_opt, $section, $sub_menu, $prompt );
@@ -182,7 +182,7 @@ sub database_setting {
                 for my $item ( @{$items->{$group}} ) {
                     my $env_variable = $item->{name};
                     push @$sub_menu, [ $env_variable, '- ' . $item->{prompt}, $item->{values} ];
-                    $db_opt->{$section}{$env_variable} //= $db_opt->{$plugin}{$env_variable} // 0; # default is disabled (0)
+                    $db_opt->{$section}{$env_variable} //= $db_opt->{$plugin}{$env_variable} // 0; # default: "disabled" (0)
                 }
                 my $prompt = 'Use ENV variables (' . $plugin . '):';
                 $sf->__settings_menu_wrap_db( $db_opt, $section, $sub_menu, $prompt );
@@ -196,7 +196,7 @@ sub database_setting {
                     push @$sub_menu, [ $opt, $prompt, $item->{values} ];
                     $db_opt->{$section}{$opt} //= $db_opt->{$plugin}{$opt} // $item->{values}[$item->{default}];
                 }
-                my $prompt = 'Options (' . $plugin . '):';
+                my $prompt = 'Options ' . $plugin . ':';
                 $sf->__settings_menu_wrap_db( $db_opt, $section, $sub_menu, $prompt );
                 next GROUP;
             }

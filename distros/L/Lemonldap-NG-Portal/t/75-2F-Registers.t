@@ -439,6 +439,7 @@ JjTJecOOS+88fK8qL1TrYv5rapIdqUI7aQ==
         ),
         'Push U2F signature'
     );
+    $id = expectCookie($res);
     ok(
         $res = $client->_get(
             '/2fregisters',

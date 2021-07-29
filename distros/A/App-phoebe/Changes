@@ -1,3 +1,55 @@
+4.00
+
+If you are using contributions or have a config that heavily interacts
+with the Phoebe code, this is a backwards-incompatible upgrade! Please
+review the documentation and rewrite your extensions.
+
+Review your conf.d folder; if you are linking any contributions from
+this directory, you will have to change the setup. For example,
+instead of linking web-edit.pl into your conf.d directory, you would
+edit your config file and add:
+
+    use App::Phoebe::WebEdit;
+
+Serving a web site is now also plugin. Add the following to
+your config file:
+
+    use App::Phoebe::Web;
+
+Other changes:
+
+- Search is now case insensitive
+
+- Changed how contributions work: instead of linking extensions into
+  your wiki dir's conf.d directory, you just "use" the appropriate
+  module; all modules now come with documentation and tests
+
+- App::Phoebe::StaticFiles is new; use it to serve static files from
+  directories on your server
+
+- App::Phoebe::Ijirait is new; a MUSH, i.e. a shared world for all
+  participants to build and interact in; script/ijirait is also new, a
+  custom CLI client for the game
+
+- App::Phoebe::Spartan is new; an alternative to Gemini and Titan
+  since it's very simply, suggests gemtext for text formatting, allows
+  uploads, but doesn't do TLS
+
+- App::Phoebe::Iapetus is new; an alternative to the Titan protocol
+  for uploading
+
+- App::Phoebe::SpeedBump loads the block list on startup; as it saves
+  every half an hour, that means you no longer have to worry too much
+  about losing information on the blocked IP numbers and networks
+
+- App::Gopher is new and improved; it no longer just prints the Gemini
+  text but does line wrapping and all that
+
+3.00
+
+- Add special feeds for the blog, i.e. the pages starting with an ISO
+  date
+
 2.08
 
 - Updated dependencies to Mojolicious 9.0 (because the tls_verify

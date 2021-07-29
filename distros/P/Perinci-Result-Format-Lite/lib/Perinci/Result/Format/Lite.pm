@@ -1,7 +1,9 @@
 package Perinci::Result::Format::Lite;
 
-our $DATE = '2021-03-08'; # DATE
-our $VERSION = '0.279'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-07-17'; # DATE
+our $DIST = 'Perinci-Result-Format-Lite'; # DIST
+our $VERSION = '0.280'; # VERSION
 
 use 5.010001;
 #IFUNBUILT
@@ -259,8 +261,8 @@ sub __gen_table {
                                 push @w_bd, 0;
                                 push @w_bd, 0;
                                 push @w_ad, 0;
-                            } elsif ($cell =~ /\A([+-]?\d+)(\.?)(\d*)\z/) {
-                                # decimal notation number
+                            } elsif ($cell =~ /\A([+-]?\d+)(\.?)(\d*)[%]?\z/) {
+                                # decimal notation number (with optional percent sign). TODO: allow arbitraty units after number, e.g. ml, mcg, etc? but should we align the unit too?
                                 push @w_bd, length($1);
                                 push @w_d , length($2);
                                 push @w_ad, length($3);
@@ -535,7 +537,7 @@ Perinci::Result::Format::Lite - Format enveloped result
 
 =head1 VERSION
 
-This document describes version 0.279 of Perinci::Result::Format::Lite (from Perl distribution Perinci-Result-Format-Lite), released on 2021-03-08.
+This document describes version 0.280 of Perinci::Result::Format::Lite (from Perl distribution Perinci-Result-Format-Lite), released on 2021-07-17.
 
 =head1 SYNOPSIS
 
@@ -581,7 +583,7 @@ Source repository is at L<https://github.com/perlancar/perl-Perinci-Result-Forma
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Perinci-Result-Format-Lite/issues>
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-Result-Format-Lite>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

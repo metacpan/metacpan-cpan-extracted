@@ -1,6 +1,12 @@
 Revision history for Term::TablePrint
 
 
+0.141   2021-07-22
+        - Update error handlng search function.
+
+0.140   2021-07-11
+        - Term::Choose minimum version 1.734.
+
 0.139   2021-06-30
         - New options 'info', 'page' and 'keep'.
         _ Renamed 'table_name' to 'footer'.

@@ -19,3 +19,4 @@ tar$
 \.swp$
 ^blib
 ^pm_to_blib$
+^xt/

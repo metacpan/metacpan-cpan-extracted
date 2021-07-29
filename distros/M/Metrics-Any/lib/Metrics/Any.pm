@@ -1,9 +1,9 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2020 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2020-2021 -- leonerd@leonerd.org.uk
 
-package Metrics::Any 0.06;
+package Metrics::Any 0.07;
 
 use v5.14;
 use warnings;
@@ -105,6 +105,29 @@ sub import_into
       *{"${caller}::${varname}"} = \$collector;
    }
 }
+
+=head1 SEE ALSO
+
+=over 4
+
+=item *
+
+The name and overall concept of this module is heavily influenced by a similar
+module for logging, L<Log::Any>.
+
+=item *
+
+For reporting metrics to one specific target collector, there are specific
+modules for systems like F<statsd> (L<Net::Statsd>, L<Net::Async::Statsd>) or
+F<prometheus> (L<Prometheus::Tiny>, L<Net::Prometheus>).
+
+=item *
+
+There is also a similar concept in L<Measure::Everything>.
+
+=back
+
+=cut
 
 =head1 AUTHOR
 

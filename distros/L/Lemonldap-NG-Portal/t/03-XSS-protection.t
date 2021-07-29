@@ -97,6 +97,11 @@ my @tests = (
     'aHR0cDovL3d3dz88c2NyaXB0Pg==',
     'http://test1.example.com/' => 0,
     'script with logout',
+
+    # 21 url=http://www.toto.com/, no referer
+    'aHR0cDovL3d3dy50b3RvLmNvbS8=',
+    '' => 1,
+    'Logout required by good site, empty referer',
 );
 
 my $res;

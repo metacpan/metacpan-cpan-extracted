@@ -1,5 +1,5 @@
 package Selenium::Specification;
-$Selenium::Specification::VERSION = '1.04';
+$Selenium::Specification::VERSION = '1.05';
 # ABSTRACT: Module for building a machine readable specification for Selenium
 
 use strict;
@@ -8,7 +8,7 @@ use warnings;
 use v5.28;
 
 no warnings 'experimental';
-use feature qw/signatures/;
+use feature qw/signatures unicode_strings/;
 
 use List::Util qw{uniq};
 use HTML::Parser();
@@ -19,6 +19,8 @@ use DateTime::Format::HTTP();
 use HTTP::Tiny();
 use File::Path qw{make_path};
 use File::Spec();
+use Encode qw{decode};
+use Unicode::Normalize qw{NFC};
 
 #TODO make a JSONWire JSON spec since it's not changing
 
@@ -49,8 +51,8 @@ sub read($client_dir, $type='stable', $nofetch=1) {
     my $file =  File::Spec->catfile( "$dir","$type.json");
     fetch( once => $nofetch, dir => $dir );
     die "could not write $file: $@" unless -f $file;
-    my $buf = File::Slurper::read_text($file);
-    my $array = JSON::MaybeXS::decode_json($buf);
+    my $buf = File::Slurper::read_binary($file);
+    my $array = JSON::MaybeXS->new()->utf8()->decode($buf);
     my %hash;
     @hash{map { $_->{name} } @$array} = @$array;
     return \%hash;
@@ -96,8 +98,8 @@ sub fetch (%options) {
 
 
 sub _write_spec ($spec, $file) {
-    my $spec_json = JSON::MaybeXS::encode_json($spec);
-    return File::Slurper::write_text($file, $spec_json);
+    my $spec_json = JSON::MaybeXS->new()->utf8()->encode($spec);
+    return File::Slurper::write_binary($file, $spec_json);
 }
 
 sub _build_spec($last_modified, %spec) {
@@ -109,7 +111,7 @@ sub _build_spec($last_modified, %spec) {
         return 'cache' if $modified < $last_modified;
     }
 
-    my $html = $page->{content};
+    my $html = NFC( decode('UTF-8', $page->{content}) );
 
     $parse = [];
     %state = ( id => $spec{section_id} );
@@ -256,7 +258,7 @@ Selenium::Specification - Module for building a machine readable specification f
 
 =head1 VERSION
 
-version 1.04
+version 1.05
 
 =head1 SUBROUTINES
 

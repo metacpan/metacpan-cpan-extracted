@@ -1,5 +1,10 @@
 Revision history for Dist-Zilla-PluginBundle-Author-Plicease
 
+2.67      2021-07-17 14:57:49 -0600
+  - Minting templates refer to Community instead of
+    deprecated Freenode alias
+  - More development prereqs
+
 2.66      2021-06-23 16:26:36 -0600
   - Put static testing in separate workflow for CI
 

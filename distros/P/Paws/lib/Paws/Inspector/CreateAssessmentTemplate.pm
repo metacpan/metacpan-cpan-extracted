@@ -31,9 +31,9 @@ You shouldn't make instances of this class. Each attribute should be used as a n
 =head1 SYNOPSIS
 
     my $inspector = Paws->service('Inspector');
-    # Create assessment template
-    # Creates an assessment template for the assessment target that is specified
-    # by the ARN of the assessment target.
+ # Create assessment template
+ # Creates an assessment template for the assessment target that is specified by
+ # the ARN of the assessment target.
     my $CreateAssessmentTemplateResponse = $inspector->CreateAssessmentTemplate(
       'AssessmentTargetArn' =>
         'arn:aws:inspector:us-west-2:123456789012:target/0-nvgVhaxX',

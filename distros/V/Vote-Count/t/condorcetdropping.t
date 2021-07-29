@@ -75,7 +75,7 @@ subtest 'Approval Dropping' => sub {
   note $LoopSet->logd();
 };
 
-subtest 'Boorda Dropping' => sub {
+subtest 'Borda Dropping' => sub {
 
   note "\n********** LOOPSET BORDA *********";
   my $LoopSetB = Vote::Count::Method::CondorcetDropping->new(

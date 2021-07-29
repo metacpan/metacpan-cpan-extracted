@@ -1,0 +1,6 @@
+Revision history for Perl extension Math::Cryptarithm.
+
+0.01  Thu Jul  8 19:30:37 2021
+	- original version; created by h2xs 1.23 with options
+		-AX Math::Cryptarithm
+

@@ -1,0 +1,62 @@
+=encoding UTF-8
+
+=head1 NAME
+
+TCOD::ColorRGBA - A representation of a color with an alpha channel
+
+=head1 DESCRIPTION
+
+This represents a four-channel color.
+
+=head1 METHODS
+
+=head2 new
+
+    $color = TCOD::ColorRGBA->new( $r, $g, $b, $a );
+
+Construct a new TCOD::ColorRGBA object. Takes the red, green, blue,
+and alpha components as positional parameters, as integers between
+0 and 255.
+
+=head2 r
+
+    $red = $color->r;
+
+The red component of this color, as an integer between 0 and 255.
+
+=head2 g
+
+    $green = $color->g;
+
+The green component of this color, as an integer between 0 and 255.
+
+=head2 b
+
+    $blue = $color->b;
+
+The blue component of this color, as an integer between 0 and 255.
+
+=head2 a
+
+    $alpha = $color->a;
+
+The alpha component of this color, as an integer between 0 and 255.
+
+=head1 SEE ALSO
+
+=over
+
+=item L<TCOD>
+
+=item L<TCOD::Color>
+
+=item L<TCOD::Console>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2021 José Joaquín Atria
+
+This library is free software; you can redistribute it and/or modify it under
+the Artistic License 2.0.

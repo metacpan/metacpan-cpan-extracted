@@ -1,0 +1,19 @@
+0.003   2021-07-22  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [build] Rebuild to show chart.
+
+
+0.002   2021-07-22  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [build] Rebuild with newer Pod::Weaver::Plugin::Bencher::Scenario
+          (0.248) to show benchmark results also as Benchmark.pm-formatted
+          tables.
+
+
+0.001   2021-07-22  Released-By: PERLANCAR
+
+        - First release.

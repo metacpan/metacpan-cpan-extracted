@@ -7,6 +7,74 @@ Home page:    <https://metacpan.org/release/Regexp-Pattern-License>
 Bug tracker:  <https://bugs.debian.org/libregexp-pattern-license-perl>
 Maintainer:   Jonas Smedegaard (JONASS) <jonass@cpan.org>
 
+v3.8.0	2021-07-27
+
+ [ Bug Fixes ]
+ - always check for optional shortname (regardless if some names contain
+   non-shortname parens) in synthesized grant patterns
+ - exclude shortname of versioned siblings in synthesized grant patterns
+ - use only defined publisher in synthesized name patterns
+
+ [ Test Suite ]
+ - avoid chained comparison in test, unsupported in older perls
+ - use Test2::V0 for test regexp-pattern.t
+
+ [ Other ]
+ - Added: add licenses bsd_protection condor condor_1_1 crossword d_fsl
+   d_fsl_1 dbad dbad_0_2 dbad_0_3 dbad_1 dbad_1_1 dont_ask fair_source
+   fair_source_0_9 fal fal_1_1 fal_1_2 fal_1_3 festival glide ibm_pibs ijg
+   imlib2 leptonica libtiff mpich2 mpl_2_no_copyleft_exception ms_cl nbpl
+   nbpl_1 nosl nosl_1 odbl odbl_1 odc_by odc_by_1 pddl pddl_1
+   peer_production sax_pd sds sds_1 sncl_1_10 sncl_2_0_1 sncl_2_0_2
+   sncl_2_1 sncl_2_3 stlport truecrypt truecrypt_3 vspl wordnet wordnet_3
+   xfree86 xfree86_1_1 ypl ypl_1 ypl_1_1 zed zend zend_2 zimbra zimbra_1_3
+   zimbra_1_4
+ - collect names and captions separately in synthesized grant patterns
+ - deduplicate name prefix/suffix in synthesized grant patterns
+ - deduplicate names in synthesized grant patterns
+ - extend internal function _join_pats to handle hashref options label
+   prefix suffix
+ - tighten version matching in synthesized grant patterns
+
+v3.7.1	2021-07-22
+
+ [ Test Suite ]
+ - avoid deprecated special lang syntax in DefHash property names, and fix
+   typos
+
+ [ Other ]
+ - add license pattern for group object mit
+
+v3.7.0	2021-07-17
+
+ [ Bug Fixes ]
+ - avoid leading number in attribute component, to comply with DefHash spec
+ - fix metadata and pattern for license object x11
+
+ [ Documentation ]
+ - update TODOs
+
+ [ Other ]
+ - Added: add license object bsd_4_clause_uc
+ - Added: add license objects cc_devnations cc_devnations_2 cc_nc_sa
+   cc_nc_sa_1 cc_nc_sp cc_nc_sp_1 cc_nd_nc cc_nd_nc_1 cc_pd cc_pdd cc_pddc
+   cc_sampling cc_sampling_1 cc_sp_1
+ - Added: add license objects erlpl erlpl_1_1
+ - Added: add license objects gsoap gsoap_1_3b
+ - Added: add licenses mit_epinions mit_openvision mit_osf mit_unixcrypt
+   mit_whatever mit_widget mit_xfig
+ - Added: add trait objects except_font_2 except_gcc_2 except_gcc_3_1
+ - add annotation [:]
+ - add metadata from old fossology shortnames
+ - improve SPDX metadata
+ - improve metadata and license patterns for cc_* objects
+ - relax pattern for license object intel
+ - tighten and generalize expat-style grant subpattern
+ - tighten annotations [-] [ - ], to cover some forms of soft-wrapping
+ - tighten license patterns for apache_1 bsd_4_clause openssl to
+   disambiguate between them
+ - tighten metadata: consistently use misc (not alt) and only once
+
 v3.6.1	2021-07-07
 
  [ Test Suite ]
@@ -43,20 +111,17 @@ v3.6.0	2021-07-04
  - Added: add licenses bsd_3_clause_attribution bsd_3_clause_clear
    bsd_3_clause_lbnl bsd_3_clause_no_military_license
    bsd_3_clause_no_nuclear_license bsd_3_clause_no_nuclear_license_2014
-   bsd_3_clause_no_nuclear_warranty naumen; improve patterns for zpl_2
-   zpl_2_1
+   bsd_3_clause_no_nuclear_warranty naumen
  - Added: add licenses efl efl_1 efl_2 entessa frameworx frameworx_1 lpl
    lpl_1 lpl_1_02 ncsa nokia opl opl_1 oset_pl oset_pl_2_1 php php_3
-   php_3_01 simpl simpl_2 simple_w3c simple_w3c_1_1 upl upl_1 vsl vsl_1
-   x11; update metadata for mpl_1 openssl
+   php_3_01 simpl simpl_2 simple_w3c simple_w3c_1_1 upl upl_1 vsl vsl_1 x11
  - Added: add licenses eudatagrid fair
  - Added: add licenses hpnd hpnd_sell mit_open_group, and combo net_snmp
  - Added: add licenses liliq_p liliq_p_1_1 liliq_r liliq_r_1_1 liliq_r_plus
    liliq_r_plus_1_1
  - Added: add licenses miros mit_0
  - Added: add licenses multics nasa nasa_1_3
- - Added: add licenses nposl nposl_3 ucl ucl_1; tighten patterns for
-   licenses afl_3 osl_3
+ - Added: add licenses nposl nposl_3 ucl ucl_1
  - Added: add licenses ogc ogc_1 w3c w3c_19980519 w3c_19980720 w3c_20021231
    w3c_20150513
  - Added: add licenses sleepycat tosl
@@ -67,8 +132,11 @@ v3.6.0	2021-07-04
  - improve annotations, and tighten to only use Latin-1 characters (now
    only mulan* patterns contain non-Latin-1 characters)
  - improve metadata for ipl ipl_1
+ - improve patterns for zpl_2 zpl_2_1
  - optimize DefHash creation slightly
  - stop use List::Util
+ - tighten patterns for licenses afl_3 osl_3
+ - update metadata for mpl_1 openssl
 
 v3.5.1	2021-06-02
 
@@ -98,8 +166,7 @@ v3.5.0	2021-06-22
  - Added: add license cvw
  - Added: add license intel
  - Added: add license jabberpl
- - Added: add license motosoto; add description and extend patterns for
-   licenses bittorrent_1 bittorrent_1_1
+ - Added: add license motosoto
  - Added: add licenses cal cal_1
  - Added: add licenses mulan mulan_1 mulan_2
  - Added: add licenses oldap oldap_1_1 oldap_1_2 oldap_1_3 oldap_1_4
@@ -108,6 +175,8 @@ v3.5.0	2021-06-22
  - Added: add licenses sissl sissl_1_1 sissl_1_2
  - Added: add name and caption for perl (as listed in POD of
    CPAN::Meta::Spec)
+ - add description and extend patterns for licenses bittorrent_1
+   bittorrent_1_1
  - annotate more consistently as [word] [ word]
 
 v3.4.0	2020-05-21
@@ -454,10 +523,10 @@ v3.1.95	2020-01-03
    capital You
  - relax trait pattern licensed_under to match "covered by"
  - relax trait pattern version_prefix and synthesized grant patterns to
-   match more version strings; tighten synthesized grant patterns to avoid
-   matching derived versions
+   match more version strings
  - synthesize patterns matching license granting declared as definition,
    i.e. in the form License: foo
+ - tighten synthesized grant patterns to avoid matching derived versions
 
 v3.1.94	2019-06-12
 

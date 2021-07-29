@@ -1,14 +1,14 @@
 package Net::SAML2::IdP;
 use Moose;
 use MooseX::Types::URI qw/ Uri /;
-use Net::SAML2::XML::Util qw/ no_comments /;
 
 
 use Crypt::OpenSSL::Verify;
 use Crypt::OpenSSL::X509;
 use HTTP::Request::Common;
 use LWP::UserAgent;
-use XML::XPath;
+use XML::LibXML;
+use Net::SAML2::XML::Util qw/ no_comments /;
 
 
 has 'entityid' => (isa => 'Str',          is => 'ro', required => 1);
@@ -27,9 +27,18 @@ sub new_from_url {
     my $req = GET $args{url};
     my $ua  = LWP::UserAgent->new;
 
+    if ( defined $args{ssl_opts} ) {
+        require LWP::Protocol::https;
+        $ua->ssl_opts( %{$args{ssl_opts}} );
+    }
+
     my $res = $ua->request($req);
-    die "no metadata" unless $res->is_success;
-    my $xml = no_comments($res->content);
+    if (! $res->is_success ) {
+        my $msg = "no metadata: " . $res->code . ": " . $res->message . "\n";
+        die $msg;
+    }
+
+    my $xml = $res->content;
 
     return $class->new_from_xml(xml => $xml, cacert => $args{cacert});
 }
@@ -38,9 +47,11 @@ sub new_from_url {
 sub new_from_xml {
     my($class, %args) = @_;
 
-    my $xpath = XML::XPath->new(xml => no_comments($args{xml}));
-    $xpath->set_namespace('md', 'urn:oasis:names:tc:SAML:2.0:metadata');
-    $xpath->set_namespace('ds', 'http://www.w3.org/2000/09/xmldsig#');
+    my $dom = no_comments($args{xml});
+
+    my $xpath = XML::LibXML::XPathContext->new($dom);
+    $xpath->registerNs('md', 'urn:oasis:names:tc:SAML:2.0:metadata');
+    $xpath->registerNs('ds', 'http://www.w3.org/2000/09/xmldsig#');
 
     my $data;
 
@@ -121,7 +132,7 @@ sub new_from_xml {
     }
 
     my $self = $class->new(
-        entityid       => $xpath->findvalue('//md:EntityDescriptor/@entityID')->value,
+        entityid       => $xpath->findvalue('//md:EntityDescriptor/@entityID'),
         sso_urls       => $data->{SSO},
         slo_urls       => $data->{SLO} || {},
         art_urls       => $data->{Art} || {},
@@ -220,11 +231,20 @@ Net::SAML2::IdP
 
 =head1 VERSION
 
-version 0.34
+version 0.40
 
 =head1 SYNOPSIS
 
-  my $idp = Net::SAML2::IdP->new_from_url( url => $url, cacert => $cacert );
+  my $idp = Net::SAML2::IdP->new_from_url(
+        url => $url,
+        cacert => $cacert,
+        ssl_opts =>         # Optional options supported by LWP::Protocol::https
+            {
+                SSL_ca_file     => '/your/directory/cacert.pem',
+                SSL_ca_path     => '/etc/ssl/certs',
+                verify_hostname => 1,
+            }
+        );
   my $sso_url = $idp->sso_url('urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect');
 
 =head1 NAME
@@ -243,11 +263,11 @@ Constructor
 
 =back
 
-=head2 new_from_url( url => $url, cacert => $cacert )
+=head2 new_from_url( url => $url, cacert => $cacert, ssl_opts => {} )
 
 Create an IdP object by retrieving the metadata at the given URL.
 
-Dies if the metadata can't be retrieved.
+Dies if the metadata can't be retrieved with reason.
 
 =head2 new_from_xml( xml => $xml, cacert => $cacert )
 
@@ -293,20 +313,11 @@ If no NameID formats were advertised by the IdP, returns undef.
 
 =head1 AUTHOR
 
-Original Author: Chris Andrews  <chrisa@cpan.org>
+Chris Andrews  <chrisa@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Chris Andrews and Others; in detail:
-
-  Copyright 2010-2011  Chris Andrews
-            2012       Peter Marschall
-            2015       Mike Wisener
-            2016       Jeff Fearn
-            2017       Alessandro Ranellucci
-            2019       Timothy Legge
-            2020       Timothy Legge, Wesley Schwengle
-
+This software is copyright (c) 2021 by Chris Andrews and Others, see the git log.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

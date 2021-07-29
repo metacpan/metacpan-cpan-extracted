@@ -2,14 +2,14 @@ package Myriad::Config;
 
 use Myriad::Class;
 
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.010'; # VERSION
 our $AUTHORITY = 'cpan:DERIV'; # AUTHORITY
 
 =encoding utf8
 
 =head1 NAME
 
-Myriad::Config
+Myriad::Config - dynamic configuration management for microservices
 
 =head1 DESCRIPTION
 
@@ -63,6 +63,9 @@ our %DEFAULTS = (
     storage_transport      => undef,
     transport              => 'redis',
     service_name           => '',
+    metrics_adapter        => 'Statsd',
+    metrics_host           => 'localhost',
+    metrics_port           => '8125',
 );
 
 =head2 FULLNAME_FOR

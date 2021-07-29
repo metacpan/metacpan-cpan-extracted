@@ -1,9 +1,11 @@
-package Dist::Zilla::Plugin::Author::Plicease::SpecialPrereqs 2.66 {
+package Dist::Zilla::Plugin::Author::Plicease::SpecialPrereqs 2.67 {
 
   use 5.020;
   use Moose;
   use experimental qw( postderef );
   use Dist::Zilla::Plugin::Author::Plicease;
+  use Config::INI::Reader;
+  use Dist::Zilla::Util::AuthorDeps;
 
   # ABSTRACT: Special prereq handling
 
@@ -194,6 +196,29 @@ package Dist::Zilla::Plugin::Author::Plicease::SpecialPrereqs 2.66 {
       }
     }
 
+    if(my($perlcritic_file) = grep { $_->name eq 'perlcriticrc' } $self->zilla->files->@*)
+    {
+      foreach my $policy (grep { $_ ne '_' } sort keys Config::INI::Reader->read_string($perlcritic_file->content)->%*)
+      {
+        $self->zilla->register_prereqs({
+          type  => 'recommends',
+          phase => 'develop',
+        }, "Perl::Critic::Policy::$policy" => 0);
+      }
+    }
+
+    foreach my $pairs (Dist::Zilla::Util::AuthorDeps::extract_author_deps('.',0)->@*)
+    {
+      foreach my $module (sort keys $pairs->%*)
+      {
+        my $version = $pairs->{$module};
+        $self->zilla->register_prereqs({
+          type => 'recommends',
+          phase => 'develop',
+        }, $module => $version);
+      }
+    }
+
   }
 
   sub before_release
@@ -267,7 +292,7 @@ Dist::Zilla::Plugin::Author::Plicease::SpecialPrereqs - Special prereq handling
 
 =head1 VERSION
 
-version 2.66
+version 2.67
 
 =head1 SYNOPSIS
 
@@ -377,7 +402,7 @@ Graham Ollis <plicease@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012,2013,2014,2015,2016,2017,2018,2019,2020,2021 by Graham Ollis.
+This software is copyright (c) 2012-2021 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

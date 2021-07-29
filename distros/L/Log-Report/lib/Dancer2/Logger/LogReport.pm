@@ -8,7 +8,7 @@
 
 package Dancer2::Logger::LogReport;
 use vars '$VERSION';
-$VERSION = '1.32';
+$VERSION = '1.33';
 
 # ABSTRACT: Dancer2 logger engine for Log::Report
 
@@ -38,7 +38,7 @@ has dispatchers =>
 sub BUILD
 {   my $self     = shift;
     my $configs  = $self->dispatchers || {default => undef};
-    $self->{use} = [keys %$configs];
+    $self->{use} = [ keys %$configs ];
 
     dispatcher 'do-not-reopen';
 

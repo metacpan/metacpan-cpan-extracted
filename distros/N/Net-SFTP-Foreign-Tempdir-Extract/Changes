@@ -1,5 +1,23 @@
 Revision history for Perl module Net::SFTP::Foreign::Tempdir::Extract
 
+0.18 2021-07-13
+  - Updates to host on GitHub
+  - Changed License from the Perl (GPL + Artistic) to MIT
+
+0.17 2021-07-13
+  - Updated lib/Net/SFTP/Foreign/Tempdir/Extract/File.pm
+    - Fixed bug where the file->extract method did not support zip files with folder structures
+    - Added test t/004_extract-multi-hierarchy.t
+
+0.16 2021-03-29
+  - Updated lib/Net/SFTP/Foreign/Tempdir/Extract/File.pm - Added die to catch exception when file extension is unknown to Archive::Extract
+
+0.15 2019-05-16
+  - Updated Net::SFTP::Foreign::Tempdir::Extract
+    - Updated options method to expose default value
+    - Added _options_default method to allow easy override in sub class
+    - Added options test
+
 0.14 2018-12-18
   - Fixed Makefile.PL and spec - version 0.08 replaced Archive::Zip for Archive::Extract - RT 128048 - Slaven
   - Updated t/004_extract-multi.t to remove hardcoded path

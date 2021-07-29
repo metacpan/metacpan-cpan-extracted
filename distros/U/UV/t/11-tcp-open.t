@@ -11,26 +11,8 @@ use Socket;
 use lib "t/lib";
 use UVTestHelpers qw(socketpair_inet_stream);
 
-# TODO: This test might not work on MSWin32. We might need to find a different
-#   implementation, or just skip it?
-
-# Launch watchdog on Windows in background
-if( $^O eq 'MSWin32' ) {
-    my $ppid = $$;
-    my $child= system(1, $^X,'-e',"sleep 5; kill KILL => $ppid");
-    if( !$child ) {
-        diag "Could not launch watchdog: $^E";
-    } else {
-            note "Watchdog started (5 seconds)";
-    };
-    END {
-        if( $child ) {
-            kill KILL => $child
-                or diag "Could not kill watchdog: $^E";
-            note "Watchdog removed";
-        }
-    }
-}
+$^O eq "MSWin32" and
+    plan skip_all => "UV::TCP->open is not supported on Windows";
 
 # read
 {

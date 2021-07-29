@@ -15,7 +15,7 @@ use warnings;
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/Acme/PERLANCAR/Dummy.pm','lib/Acme/PERLANCAR/Dummy/DistZilla/InsertCommandOutput.pm','lib/Acme/PERLANCAR/Dummy/ModuleFeatures/User1.pm'];
+my $filenames = ['lib/Acme/PERLANCAR/Dummy.pm','lib/Acme/PERLANCAR/Dummy/DistZilla/InsertCommandOutput.pm','lib/Acme/PERLANCAR/Dummy/MetaCPAN/HTML.pm','lib/Acme/PERLANCAR/Dummy/ModuleFeatures/Declarer1.pm','lib/Acme/PERLANCAR/Dummy/ModuleFeatures/Declarer2.pm','lib/Acme/PERLANCAR/Dummy/ModuleFeatures/Declarer_PythonTrove.pm','lib/Acme/PERLANCAR/Dummy/ModuleFeatures/Module1.pm','lib/Acme/PERLANCAR/Dummy/ModuleFeatures/Module1/_ModuleFeatures.pm','lib/Acme/PERLANCAR/Dummy/POD/LinkToSection.pm'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

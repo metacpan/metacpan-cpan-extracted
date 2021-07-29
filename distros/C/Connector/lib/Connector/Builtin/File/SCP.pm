@@ -365,7 +365,7 @@ Same as file, but allows the directory seperator (slash and backslash)
 in the resulting filename. Use this for the full path including the
 filename as the file parameter is not used, when path is set!
 
-=filemode (set mode only)
+=item filemode (set mode only)
 
 By default, the file is created with restrictive permissions of 0600. You 
 can set other permissions using filemode. Due to perls lack for variable

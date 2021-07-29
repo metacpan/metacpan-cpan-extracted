@@ -4,7 +4,7 @@ package Data::Record::Serialize::Encode::yaml;
 
 use Moo::Role;
 
-our $VERSION = '0.20';
+our $VERSION = '0.23';
 
 use YAML::Any qw[ Dump ];
 
@@ -13,10 +13,10 @@ use namespace::clean;
 has '+_need_types' => ( is => 'rwp', default => 0 );
 has '+_needs_eol' => ( is => 'rwp', default => 1 );
 
-#pod =for Pod::Coverage
-#pod  encode
-#pod
-#pod =cut
+
+
+
+
 
 
 sub encode { shift; goto \&Dump; }
@@ -39,13 +39,15 @@ __END__
 
 =pod
 
+=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory
+
 =head1 NAME
 
 Data::Record::Serialize::Encode::yaml - encode a record as YAML
 
 =head1 VERSION
 
-version 0.20
+version 0.23
 
 =head1 SYNOPSIS
 

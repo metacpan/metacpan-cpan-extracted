@@ -5,6 +5,9 @@ use Game::Entities;
 
 is_deeply [ sort keys %Game::Entities:: ], [qw(
     BEGIN
+    GUID::
+    Set::
+    VERSION
     View::
     __ANON__
     _dump_entities
@@ -20,6 +23,7 @@ is_deeply [ sort keys %Game::Entities:: ], [qw(
     get
     import
     new
+    sort
     valid
     view
 )] => 'No unexpected methods in Game::Entities namespace';
@@ -33,6 +37,7 @@ is_deeply [ sort keys %Game::Entities::View:: ], [qw|
     components
     each
     entities
+    first
     new
 |] => 'No unexpected methods in Game::Entities::View namespace';
 

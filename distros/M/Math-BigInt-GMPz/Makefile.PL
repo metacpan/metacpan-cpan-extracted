@@ -53,3 +53,28 @@ WriteMakefile
         },
     },
   );
+
+# See if we have the required version of the GMP library.
+#
+# Even if the version of Math::GMPz is recent enough, the tests for the double
+# factorial sometimes fail. I suspect this is because the GMP library is too
+# old. The double factorial function Rmpz_2fac_ui() was introduced in GMP
+# version 5.1.0.
+
+my $gmp_v_str_req = '5.1.0';
+my $gmp_v_flt_req = 5.001000;
+
+eval { require Math::GMPz; };
+unless ($@) {
+    my $gmp_v_str = Math::GMPz::gmp_v();
+
+    my @parts = split /\./, $gmp_v_str;
+    push @parts, (0) x (3 - @parts);
+    my $gmp_v_flt =
+      sprintf '%.6f', $parts[0] + 1e-3 * $parts[1] + 1e-6 * $parts[2];
+
+    if ($gmp_v_flt < $gmp_v_flt_req) {
+        warn "Warning: prerequisite GMP library $gmp_v_str_req not found.",
+          " We have $gmp_v_str_req.\n"
+    }
+}

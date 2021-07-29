@@ -14,16 +14,17 @@ SKIP: {
 
     my $client = LLNG::Manager::Test->new( {
             ini => {
-                logLevel                   => 'error',
-                totp2fSelfRegistration     => 1,
-                totp2fActivation           => 1,
-                totp2fTTL                  => 120,
-                sfRemovedMsgRule           => '$uid eq "dwho"',
-                sfRemovedUseNotif          => 1,
-                sfRemovedNotifRef          => 'Remov_e_TOTP',
-                portalMainLogo             => 'common/logos/logo_llng_old.png',
-                notification               => 1,
-                notificationStorage        => 'File',
+                logLevel               => 'error',
+                totp2fSelfRegistration => 1,
+                totp2fActivation       => 1,
+                totp2fTTL              => 120,
+                sfRemovedMsgRule       => '$uid eq "dwho"',
+                sfRemovedUseNotif      => 1,
+                sfRemovedNotifRef      => 'Remov_e_TOTP',
+                sfRemovedNotifMsg      => '_removedSF_ SF removed = _nameSF_',
+                portalMainLogo         => 'common/logos/logo_llng_old.png',
+                notification           => 1,
+                notificationStorage    => 'File',
                 notificationStorageOptions => { dirName => $main::tmpDir },
                 oldNotifFormat             => 0,
             }
@@ -153,7 +154,7 @@ qr%<input type="hidden" name="reference1x1" value="Remov-e-TOTP-(\d{10})"/>%,
       or print STDERR Dumper( $res->[2]->[0] ), time(), " / $1";
     ok(
         $res->[2]->[0] =~
-qr%<p class="notifText">1 expired second factor\(s\) has/have been removed!</p>%,
+qr%<p class="notifText">1 SF removed = myTOTP</p>%,
         'Notification message found'
     ) or print STDERR Dumper( $res->[2]->[0] );
     $id = expectCookie($res);

@@ -1,16 +1,12 @@
 # bvnv.dat -- EekBoek voorbeeld rekeningschema voor een BV/NV
 # Author          : Johan Vromans
-# Created On      : Wed Dec 14 16:22:15 2005
+# Created On      : Mon Dec 12 17:22:47 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Mon Nov 19 13:37:53 2012
-# Update Count    : 14
-#
-# Content-Type: text/plain; charset = UTF-8
+# Last Modified On: Mon Oct  9 09:51:50 2017
+# Update Count    : 19
 #
 # DIT SCHEMA IS INDICATIEF EN DIENT VOOR EIGEN GEBRUIK TE WORDEN
 # AANGEPAST
-#
-# Aangemaakt door EB::Tools::Schema op 12-12-2005 17:22:47
 
 # Dit bestand definiëert alle vaste gegevens van een administratie of
 # groep administraties: het rekeningschema (balansrekeningen en
@@ -52,12 +48,12 @@
 #   deb		de standaard tegenrekening (Debiteuren) voor verkoopboekingen
 #   btw_ih	de rekening voor BTW boekingen voor inkopen, hoog tarief
 #   btw_il	idem, laag tarief
+#   btw_ip	idem, privé tarief
+#   btw_ia	idem, ander tarief
 #   btw_vh	idem, verkopen, hoog tarief
 #   btw_vl	idem, laag tarief
-#   btw_ph	idem, privé, hoog tarief
-#   btw_pl	idem, laag tarief
-#   btw_ah	idem, anders, hoog tarief
-#   btw_al	idem, laag tarief
+#   btw_vp	idem, privé tarief
+#   btw_va	idem, ander tarief
 #   btw_ok	rekening voor de betaalde BTW
 #   winst	rekening waarop de winst wordt geboekt
 #
@@ -202,8 +198,10 @@ Balansrekeningen
          1941  C   Rekening-courant B.V. D
      48  Belastingen & soc. lasten
          1500  C   BTW Verkoop Hoog                           :koppeling=btw_vh
+         1505  C   BTW Verkoop Privé                          :koppeling=btw_vp
          1510  C   BTW Verkoop Laag                           :koppeling=btw_vl
          1520  D   BTW Inkoop Hoog                            :koppeling=btw_ih
+         1525  D   BTW Inkoop Privé                           :koppeling=btw_ip
          1530  D   BTW Inkoop Laag                            :koppeling=btw_il
          1540  C   BTW autokostenverg.
          1541  C   BTW privégebr. auto

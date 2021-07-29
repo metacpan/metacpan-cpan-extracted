@@ -1,11 +1,11 @@
 ## -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic.pm
-## Version v0.15.3
+## Version v0.15.5
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/08/24
-## Modified 2021/06/26
+## Modified 2021/07/26
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -26,7 +26,7 @@ BEGIN
     use File::Spec ();
     use Module::Generic::Array;
     use Module::Generic::Boolean;
-    use Module::Generic::Datetime;
+    use Module::Generic::DateTime;
     use Module::Generic::Dynamic;
     use Module::Generic::Exception;
     use Module::Generic::File;
@@ -67,7 +67,7 @@ BEGIN
     @EXPORT      = qw( );
     @EXPORT_OK   = qw( subclasses );
     %EXPORT_TAGS = ();
-    $VERSION     = 'v0.15.3';
+    $VERSION     = 'v0.15.5';
     $VERBOSE     = 0;
     $DEBUG       = 0;
     $SILENT_AUTOLOAD      = 1;
@@ -2246,6 +2246,14 @@ sub _is_hash
     return( Scalar::Util::reftype( $_[1] ) eq 'HASH' );
 }
 
+sub _is_number
+{
+    return( 0 ) if( scalar( @_ < 2 ) );
+    return( 0 ) if( !defined( $_[1] ) );
+    $_[0]->_load_class( 'Regexp::Common' ) || return( $_[0]->pass_error );
+    return( $_[1] =~ /^$Regexp::Common::RE{num}{real}$/ );
+}
+
 sub _is_object
 {
     return( 0 ) if( scalar( @_ < 2 ) );
@@ -2307,6 +2315,8 @@ sub _obj2h
     }
 }
 
+# Ref:
+# <https://en.wikipedia.org/wiki/Date_format_by_country>
 sub _parse_timestamp
 {
     my $self = shift( @_ );
@@ -2316,6 +2326,8 @@ sub _parse_timestamp
     my $this = $self->_obj2h;
     my $tz = DateTime::TimeZone->new( name => 'local' );
     my $error = 0;
+    # For some Japanese here
+    use utf8;
     my $opt = 
     {
     pattern   => '%Y-%m-%d %T',
@@ -2323,13 +2335,87 @@ sub _parse_timestamp
     time_zone => $tz->name,
     on_error => sub{ $error++ },
     };
+    
+    my $fmt =
+    {
+    pattern   => '%Y-%m-%d %T',
+    locale    => 'en_GB',
+    time_zone => $tz->name,
+    };
+    
+    my $formatter = 'DateTime::Format::Strptime';
+    
+    my $roman2regular =
+    {
+    I   => 1,
+    II  => 2,
+    III => 3,
+    IV  => 4,
+    V   => 5,
+    VI  => 6,
+    VII => 7,
+    VIII=> 8,
+    IX  => 9,
+    X   => 10,
+    XI  => 11,
+    XII => 12,
+    i   => 1,
+    ii  => 2,
+    iii => 3,
+    iv  => 4,
+    v   => 5,
+    vi  => 6,
+    vii => 7,
+    viii=> 8,
+    ix  => 9,
+    x   => 10,
+    xi  => 11,
+    xii => 12,
+    };
+    # (^(?=[MDCLXVI])M*(C[MD]|D?C{0,3})(X[CL]|L?X{0,3})(I[XV]|V?I{0,3})$)
+    # <https://stackoverflow.com/a/36576402/4814971>
+    # 
+    # ^(I[VX]|VI{0,3}|I{1,3})|((X[LC]|LX{0,3}|X{1,3})(I[VX]|V?I{0,3}))|((C[DM]|DC{0,3}|C{1,3})(X[LC]|L?X{0,3})(I[VX]|V?I{0,3}))|(M+(C[DM]|D?C{0,3})(X[LC]|L?X{0,3})(I[VX]|V?I{0,3}))$
+    # <https://stackoverflow.com/a/60469651/4814971>
+    
+    # Of course, when an era starts and another era ends, it is during the same Gregorian year, so we use the new era for the year start although it is perfectly correct to use the nth year for the year end as well, but that would mean two eras for the same year, and although for humans it is ok, for computing it does not work.
+    # For example end of Meiji is in 1912 (45th year) which is also the first of the Taisho era
+    # Ref: <http://www.ajnet.ne.jp/benri/conversion.hpml>
+    
+    # GNU PO file
+    # 2019-10-03 19-44+0000
+    # 2019-10-03 19:44:01+0000
+    if( $str =~ /^(?<year>\d{4})(?<d_sep>\D)(?<month>\d{1,2})\D(?<day>\d{1,2})(?<sep>[\s\t]+)(?<hour>\d{1,2})(?<t_sep>\D)(?<minute>\d{1,2})(?:\D(?<second>\d{1,2}))?(?<tz>([+-])(\d{2})(\d{2}))$/ )
+    {
+        my $re = { %+ };
+        # $self->message( 3, "Pattern 1 (PO): ", sub{ $self->dump( $re )} );
+        $fmt->{pattern} = join( $re->{d_sep}, qw( %Y %m %d ) ) . $re->{sep} . join( $re->{t_sep}, qw( %H %M ) );
+        if( length( $re->{second} ) )
+        {
+            $fmt->{pattern} .= $re->{t_sep} . '%S';
+        }
+        $fmt->{pattern} .= '%z';
+        $str = join( '-', @$re{qw( year month day )} ) . ' ' . join( ':', @$re{qw( hour minute )}, ( length( $re->{second} ) ? $re->{second} : '00' ) ) . $re->{tz};
+        $opt->{pattern} = '%F %T%z';
+        $fmt->{time_zone} = $opt->{time_zone} = $re->{tz};
+    }
     ## 2019-06-19 23:23:57.000000000+0900
     ## From PostgreSQL: 2019-06-20 11:02:36.306917+09
     ## ISO 8601: 2019-06-20T11:08:27
-    if( $str =~ /(\d{4})[-|\/](\d{1,2})[-|\/](\d{1,2})(?:[[:blank:]]+|T)(\d{1,2}:\d{1,2}:\d{1,2})(?:\.\d+)?((?:\+|\-)\d{2,4})?/ )
+    elsif( $str =~ /(?<year>\d{4})(?<d_sep>[-|\/])(?<month>\d{1,2})[-|\/](?<day>\d{1,2})(?<sep>[[:blank:]]+|T)(?<time>\d{1,2}:\d{1,2}:\d{1,2})(?:\.(?<milli>\d+))?(?<tz>(?:\+|\-)\d{2,4})?/ )
     {
-        my( $date, $time, $zone ) = ( "$1-$2-$3", $4, $5 );
-        if( !length( $zone ) )
+        my $re = { %+ };
+        # $self->message( 3, "Pattern 2 (SQL): ", sub{ $self->dump( $re )} );
+        $opt->{pattern} = join( $re->{d_sep}, qw( %Y %m %d ) ) . $re->{sep} . '%T';
+        $str = join( $re->{d_sep}, @$re{qw( year month day )} ) . $re->{sep} . $re->{time};
+        if( length( $re->{milli} ) )
+        {
+            $opt->{pattern} .= '.%' . length( $re->{milli} ) . 'N';
+            $str .= '.' . $re->{milli};
+        }
+        $fmt->{pattern} = $opt->{pattern};
+        
+        if( !length( $re->{tz} ) )
         {
             my $dt = DateTime->now( time_zone => $tz );
             my $offset = $dt->offset;
@@ -2337,44 +2423,187 @@ sub _parse_timestamp
             my $offset_hour = ( $offset / 3600 );
             ## e.g. 9.5 => 0.5 * 60 = 30
             my $offset_min  = ( $offset_hour - CORE::int( $offset_hour ) ) * 60;
-            $zone  = sprintf( '%+03d%02d', $offset_hour, $offset_min );
+            $str .= sprintf( '%+03d%02d', $offset_hour, $offset_min );
+            $opt->{pattern} .= '%z';
         }
-        $date =~ tr/\//-/;
-        $zone .= '00' if( length( $zone ) == 3 );
-        $str = "$date $time$zone";
-        $opt->{pattern} = '%Y-%m-%d %T%z';
+        else
+        {
+            $opt->{pattern} .= '%z';
+            $re->{tz} .= '00' if( length( $re->{tz} ) == 3 );
+            $str .= $re->{tz};
+            $fmt->{pattern} .= '%z';
+            $fmt->{time_zone} = $opt->{time_zone} = $re->{tz};
+        }
     }
     ## From SQLite: 2019-06-20 02:03:14
     ## From MySQL: 2019-06-20 11:04:01
-    elsif( $str =~ /(\d{4})[-|\/](\d{1,2})[-|\/](\d{1,2})(?:[[:blank:]]+|T)(\d{1,2}:\d{1,2}:\d{1,2})/ )
+    elsif( $str =~ /(?<year>\d{4})(?<d_sep>[-|\/])(?<month>\d{1,2})[-|\/](?<day>\d{1,2})(?<sep>[[:blank:]]+|T)(?<time>\d{1,2}:\d{1,2}:\d{1,2})/ )
     {
-        my( $date, $time ) = ( "$1-$2-$3", $4 );
+        my $re = { %+ };
+        $opt->{pattern} = $fmt->{pattern} = join( $re->{d_sep}, qw( %Y %m %d ) ) . $re->{sep} . $re->{time};
+        $str = join( $re->{d_sep}, @$re{qw( year month day )} ) . $re->{sep} . $re->{time};
         my $dt = DateTime->now( time_zone => $tz );
         my $offset = $dt->offset;
         ## e.g. 9 or possibly 9.5
         my $offset_hour = ( $offset / 3600 );
         ## e.g. 9.5 => 0.5 * 60 = 30
         my $offset_min  = ( $offset_hour - CORE::int( $offset_hour ) ) * 60;
-        my $offset_str  = sprintf( '%+03d%02d', $offset_hour, $offset_min );
-        $date =~ tr/\//-/;
-        $str = "$date $time$offset_str";
-        $opt->{pattern} = '%Y-%m-%d %T%z';
+        $str .= sprintf( '%+03d%02d', $offset_hour, $offset_min );
+        $opt->{pattern} .= '%z';
     }
-    elsif( $str =~ /^(\d{4})[-|\/](\d{1,2})[-|\/](\d{1,2})$/ )
+    # 2019-06-20
+    # 2019/06/20
+    # 2016.04.22
+    elsif( $str =~ /^(?<year>\d{4})(?<d_sep>\D)(?<month>\d{1,2})\D(?<day>\d{1,2})$/ )
     {
-        $str = "$1-$2-$3";
-        $opt->{pattern} = '%Y-%m-%d';
+        my $re = { %+ };
+        $str = join( $re->{d_sep}, @$re{qw( year month day )} );
+        $opt->{pattern} = $fmt->{pattern} = join( $re->{d_sep}, qw( %Y %m %d ) );
     }
-    elsif( $str =~ /^\d+$/ )
+    # 2014, Feb 17
+    elsif( $str =~ /^(?<year>\d{4}),(?<sep1>[[:blank:]\h]+)(?<month>[a-zA-Z]{3,4})(?<sep2>[[:blank:]\h]+)(?<day>\d{1,2})$/ )
+    {
+        my $re = { %+ };
+        $opt->{pattern} = $fmt->{pattern} = '%Y,' . $re->{sep1} . '%b' . $re->{sep2} . '%d';
+    }
+    # 17 Feb, 2014
+    elsif( $str =~ /^(?<day>\d{1,2})(?<sep1>[[:blank:]\h]+)(?<month>[a-zA-Z]{3,4}),(?<sep2>[[:blank:]\h]+)(?<year>\d{4})$/ )
+    {
+        my $re = { %+ };
+        $opt->{pattern} = $fmt->{pattern} = '%d' . $re->{sep1} . '%b,' . $re->{sep2} . '%Y';
+    }
+    # February 17, 2009
+    elsif( $str =~ /^(?<month>[a-zA-Z]{3,9})(?<sep1>[[:blank:]\h]+)(?<day>\d{1,2}),(?<sep2>[[:blank:]\h]+)(?<year>\d{4})$/ )
+    {
+        my $re = { %+ };
+        $opt->{pattern} = $fmt->{pattern} = '%B' . $re->{sep1} . '%d,' . $re->{sep2} . '%Y';
+    }
+    # 15 July 2021
+    elsif( $str =~ /^(?<day>\d{1,2})(?<sep1>[[:blank:]\h]+)(?<month>[a-zA-Z]{3,9})(?<sep2>[[:blank:]\h]+)(?<year>\d{4})$/ )
+    {
+        my $re = { %+ };
+        $opt->{pattern} = $fmt->{pattern} = '%d' . $re->{sep1} . '%B' . $re->{sep2} . '%Y';
+    }
+    # 22.04.2016
+    # 22-04-2016
+    # 17. 3. 2018.
+    elsif( $str =~ /^(?<day>\d{1,2})(?<sep>\D)(?<blank1>[[:blank:]\h]+)?(?<month>\d{1,2})\D(?<blank2>[[:blank:]\h]+)?(?<year>\d{4})(?<trailing_dot>\.)?$/ )
+    {
+        my $re = { %+ };
+        # $opt->{pattern} = $fmt->{pattern} = join( $re->{sep}, qw( %d %m %Y ) );
+        $opt->{pattern} = $fmt->{pattern} = "%d$re->{sep}$re->{blank1}%m$re->{sep}$re->{blank2}%Y$re->{trailing_dot}";
+        $fmt->{leading_zero} = 1 if( substr( $re->{day}, 0, 1 ) == 0 || substr( $re->{month}, 0, 1 ) == 0 );
+        {
+            package
+                DateTime::Format::DMY;
+            sub new
+            {
+                my $this = shift( @_ );
+                my $hash = { @_ };
+                return( bless( $hash => ( ref( $this ) || $this ) ) );
+            }
+            sub format_datetime
+            {
+                my( $self, $dt ) = @_;
+                my $d = $dt->day;
+                my $m = $dt->month;
+                my $y = $dt->year;
+                my $pat = $self->{pattern};
+                $pat =~ s/\%d/$d/;
+                $pat =~ s/\%m/$m/;
+                $pat =~ s/\%Y/$y/;
+                return( $pat );
+            }
+        }
+        if( $fmt->{leading_zero} )
+        {
+            # We do not want it to interfere with the module supported parameters
+            delete( $fmt->{leading_zero} );
+        }
+        else
+        {
+            $formatter = 'DateTime::Format::DMY';
+        }
+    }
+    # 17.III.2020
+    # 17. III. 2018.
+    elsif( $str =~ /^(?<day>\d{1,2})\.(?<blank1>[[:blank:]\h]+)?(?<month>XI{0,2}|I{0,3}|IV|VI{0,3}|IX)\.(?<blank2>[[:blank:]\h]+)?(?<year>\d{4})(?<trailing_dot>\.)?$/i )
+    {
+        my $re = { %+ };
+        $re->{month} = $roman2regular->{ $re->{month} };
+        $str = join( '-', @$re{qw( year month day )} );
+        $opt->{pattern} = '%F';
+        $fmt->{pattern} = "%d.$re->{blank1}%m.$re->{blank2}%Y$re->{trailing_dot}";
+        {
+            package
+                DateTime::Format::RomanDDXXXYYYY;
+            sub new
+            {
+                my $this = shift( @_ );
+                my $hash = { @_ };
+                return( bless( $hash => ( ref( $this ) || $this ) ) );
+            }
+            
+            sub parse_datetime {}
+            
+            sub parse_duration {}
+            
+            sub format_duration {}
+            
+            sub format_datetime
+            {
+                my( $self, $dt ) = @_;
+                my $d = $dt->day;
+                my $m = $dt->month;
+                my $y = $dt->year;
+                foreach my $k ( keys( %$roman2regular ) )
+                {
+                    # Skip lowercase ones
+                    next if( $k =~ /^[a-z]+$/ );
+                    if( $roman2regular->{ $k } == $m )
+                    {
+                        $m = $k;
+                        last;
+                    }
+                }
+                my $pat = $self->{pattern};
+                $pat =~ s/\%d/$d/;
+                $pat =~ s/\%m/$m/;
+                $pat =~ s/\%Y/$y/;
+                return( $pat );
+            }
+        }
+        $formatter = 'DateTime::Format::RomanDDXXXYYYY';
+    }
+    # 20030613
+    elsif( $str =~ /^(?<year>\d{4})(?<month>\d{2})(?<day>\d{2})$/ )
+    {
+        my $re = { %+ };
+        # $self->message( 3, "Pattern 10: ", sub{ $self->dump( $re )} );
+        $opt->{pattern} = '%F';
+        $str = join( '-', @$re{qw( year month day )} );
+        $fmt->{pattern} = join( '', qw( %Y %m %d ) );
+        # $opt->{pattern} = $fmt->{pattern} = join( '', qw( %d %m %Y ) );
+    }
+    # 2021年7月14日
+    # 令和3年7月14日
+    elsif( $str =~ /^(?<era>\p{Han})?(?<year>\d{1,4})年(?<month>\d{1,2})月(?<day>\d{1,2})日$/ )
+    {
+    }
+    # <https://en.wikipedia.org/wiki/Date_format_by_country>
+    elsif( $str =~ /^\d{10}$/ )
     {
         try
         {
             my $dt = DateTime->from_epoch( epoch => $str, time_zone => 'local' );
+            $opt->{pattern} = '%s';
+            my $strp = DateTime::Format::Strptime->new( %$opt );
+            $dt->set_formatter( $strp );
             return( $dt );
         }
         catch( $e )
         {
-            return( $self->error( "An error occurred while parsing the time stamp based on the unix timestamp '$str'." ) );
+            return( $self->error( "An error occurred while parsing the time stamp based on the unix timestamp '$str': $e" ) );
         }
     }
     elsif( $str =~ /^([\+\-]?\d+)([YMDhms])$/ )
@@ -2413,8 +2642,12 @@ sub _parse_timestamp
     
     try
     {
+        # $self->message( 3, "Parsing the string '$str' with the format '$opt->{pattern}'." );
         my $strp = DateTime::Format::Strptime->new( %$opt );
         my $dt = $strp->parse_datetime( $str );
+        my $strp2 = $formatter->new( %$fmt );
+        # To enable the date string to be stringified to its original format
+        $dt->set_formatter( $strp2 ) if( $dt );
         return( $dt );
     }
     catch( $e )
@@ -2796,7 +3029,7 @@ sub _set_get_datetime
         }
         elsif( Scalar::Util::blessed( $time ) )
         {
-            return( $self->error( "Object provided as value for $field, but this is not a DateTime or a Module::Generic::Datetime object" ) ) if( !$time->isa( 'DateTime' ) && !$time->isa( 'Module::Generic::Datetime' ) );
+            return( $self->error( "Object provided as value for $field, but this is not a DateTime or a Module::Generic::DateTime object" ) ) if( !$time->isa( 'DateTime' ) && !$time->isa( 'Module::Generic::DateTime' ) );
             $data->{ $field } = $time;
             return( $data->{ $field } );
         }
@@ -2815,7 +3048,7 @@ sub _set_get_datetime
         # $self->message( 3, "Creating a DateTime object out of $time\n" );
         try
         {
-            unless( Scalar::Util::blessed( $now ) && ( $now->isa( 'DateTime' ) || $now->isa( 'Module::Generic::Datetime' ) ) )
+            unless( Scalar::Util::blessed( $now ) && ( $now->isa( 'DateTime' ) || $now->isa( 'Module::Generic::DateTime' ) ) )
             {
                 require DateTime;
                 $now = DateTime->from_epoch(
@@ -3914,7 +4147,7 @@ Module::Generic - Generic Module to inherit from
 
 =head1 VERSION
 
-    v0.15.3
+    v0.15.5
 
 =head1 DESCRIPTION
 
@@ -3960,6 +4193,10 @@ If the method returned value is an object, it will call its L</"as_hash"> method
 
 It returns the hash reference built
 
+=head2 clear
+
+Alias for L</clear_error>
+
 =head2 clear_error
 
 Clear all error from the object and from the available global variable C<$ERROR>.
@@ -3987,6 +4224,12 @@ wrong has occured.
 Clone the current object if it is of type hash or array reference. It returns an error if the type is neither.
 
 It returns the clone.
+
+=head2 colour_close
+
+The marker to be used to set the closing of a command line colour sequence.
+
+Defaults to ">"
 
 =head2 colour_closest
 
@@ -4028,6 +4271,12 @@ The possible values are: I<bold>, I<italic>, I<underline>, I<blink>, I<reverse>,
 
 =back
 
+=head2 colour_open
+
+The marker to be used to set the opening of a command line colour sequence.
+
+Defaults to "<"
+
 =head2 colour_parse
 
 Provided with a string, this will parse the string for colour formatting. Formatting can be encapsulated in another formatting, and can be expressed in 2 different ways. For example:
@@ -4047,6 +4296,10 @@ would return a string with the words C<what about> in light red bold text on a w
 would return a string with the words C<everyone! This is> in bold red characters on white background and the word C<embedded> in underline blue color
 
 The idea for this syntax, not the code, is taken from L<Term::ANSIColor>
+
+=head2 colour_to_rgb
+
+Convert a human colour keyword like C<red>, C<green> into a rgb equivalent.
 
 =head2 coloured
 
@@ -4088,6 +4341,10 @@ Provided with a file to write to and some data, this will format the string repr
 Provided with some data, and optionally an hash reference of parameters as last argument, this will create a string representation of the data using L<Data::Dumper> and return it.
 
 This sets L<Data::Dumper> to be terse, to indent, to use C<qq> and optionally to not exceed a maximum I<depth> if it is provided in the argument hash reference.
+
+=head2 dumpto
+
+Alias for L</dumpto_dumper>
 
 =head2 printer
 
@@ -4334,6 +4591,10 @@ This is called by L</"message">
 
 Provided with a list of arguments, this method will check if the first argument is an integer and find out if a debug message should be printed out or not. It returns the list of arguments as an array reference.
 
+=head2 message_color
+
+Alias for L</message_colour>
+
 =head2 message_colour
 
 This is the same as L</"message">, except this will check for colour formatting, which
@@ -4344,6 +4605,10 @@ L</"message"> does not do. For example:
 L</"message_colour"> can also be called as B<message_color>
 
 See also L</"colour_format"> and L</"colour_parse">
+
+=head2 message_frame
+
+Return the optional hash reference of parameters, if any, that can be provided as the last argument to L</message>
 
 =head2 messagef
 

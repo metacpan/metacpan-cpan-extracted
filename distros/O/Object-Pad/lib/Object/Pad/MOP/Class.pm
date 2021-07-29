@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2020-2021 -- leonerd@leonerd.org.uk
 
-package Object::Pad::MOP::Class 0.43;
+package Object::Pad::MOP::Class 0.47;
 
 use v5.14;
 use warnings;
@@ -72,6 +72,38 @@ sub for_caller
 {
    return shift->for_class( caller );
 }
+
+=head2 begin_class
+
+   BEGIN {
+      my $metaclass = Object::Pad::MOP::Class->begin_class( $name, %args )
+      ...
+   }
+
+I<Since version 0.46.>
+
+Creates a new class of the given name and yields the metaclass for it. This
+must be done during C<BEGIN> time, as it creates a deferred code block at
+C<UNITCHECK> time of its surrounding scope, which is used to finalise the
+constructed class.
+
+Takes the following additional named arguments:
+
+=over 4
+
+=item extends => STRING
+
+An optional name of a superclass that this class will extend.
+
+=back
+
+=head2 begin_role
+
+I<Since version 0.46.>
+
+As L</begin_class> but creates a role instead of a class.
+
+=cut
 
 =head1 METHODS
 
@@ -172,6 +204,25 @@ I<Since version 0.43.>
 Provides a parameter name for the slot; similar to setting it using the
 C<:param> attribute. This parameter will be required unless a default value is
 set (such value may still be C<undef>).
+
+=item reader => STRING
+
+=item writer => STRING
+
+=item mutator => STRING
+
+I<Since version 0.46.>
+
+Provides method names for generated reader, writer or lvalue-mutator accessor
+methods, similar to setting them via the C<:reader>, C<:writer> or C<:mutator>
+attributes.
+
+=item weak => BOOL
+
+I<Since version 0.46.>
+
+If true, reference values assigned into the slot by the constructor or
+accessor methods will be weakened, similar to setting the C<:weak> attribute.
 
 =back
 

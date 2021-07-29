@@ -15,7 +15,7 @@ use warnings;
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/Sah/Schema/sah/array_schema.pm','lib/Sah/Schema/sah/clause_set.pm','lib/Sah/Schema/sah/extras.pm','lib/Sah/Schema/sah/schema.pm','lib/Sah/Schema/sah/schema_modname.pm','lib/Sah/Schema/sah/str_schema.pm','lib/Sah/Schema/sah/type_name.pm','lib/Sah/SchemaR/sah/array_schema.pm','lib/Sah/SchemaR/sah/clause_set.pm','lib/Sah/SchemaR/sah/extras.pm','lib/Sah/SchemaR/sah/schema.pm','lib/Sah/SchemaR/sah/schema_modname.pm','lib/Sah/SchemaR/sah/str_schema.pm','lib/Sah/SchemaR/sah/type_name.pm','lib/Sah/Schemas/Sah.pm'];
+my $filenames = ['lib/Sah/Schema/sah/array_schema.pm','lib/Sah/Schema/sah/clause_set.pm','lib/Sah/Schema/sah/defhash_example.pm','lib/Sah/Schema/sah/nondefhash_example.pm','lib/Sah/Schema/sah/nschema.pm','lib/Sah/Schema/sah/schema.pm','lib/Sah/Schema/sah/schema_modname.pm','lib/Sah/Schema/sah/str_schema.pm','lib/Sah/Schema/sah/type_name.pm','lib/Sah/SchemaR/sah/array_schema.pm','lib/Sah/SchemaR/sah/clause_set.pm','lib/Sah/SchemaR/sah/defhash_example.pm','lib/Sah/SchemaR/sah/nondefhash_example.pm','lib/Sah/SchemaR/sah/nschema.pm','lib/Sah/SchemaR/sah/schema.pm','lib/Sah/SchemaR/sah/schema_modname.pm','lib/Sah/SchemaR/sah/str_schema.pm','lib/Sah/SchemaR/sah/type_name.pm','lib/Sah/Schemas/Sah.pm'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

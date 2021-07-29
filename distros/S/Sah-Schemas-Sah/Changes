@@ -1,3 +1,13 @@
+0.9.50.0  2021-07-23  Released-By: PERLANCAR; Urgency: medium
+
+          - [incompatible change] Update to Sah 0.9.47+ and remove support for
+            extras part.
+
+	  - Add schema: sah::nschema.
+
+          - Tweaks and examples.
+
+
 0.9.49.1  2020-05-08  Released-By: PERLANCAR; Urgency: medium
 
 	  - [Incompatible change] Rename schema sah::schema_module ->

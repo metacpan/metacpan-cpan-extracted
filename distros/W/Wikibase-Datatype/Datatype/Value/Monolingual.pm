@@ -3,19 +3,30 @@ package Wikibase::Datatype::Value::Monolingual;
 use strict;
 use warnings;
 
-use Mo qw(default is);
+use Mo qw(is);
+use Wikibase::Datatype::Utils qw(check_language);
 
-our $VERSION = 0.08;
+our $VERSION = 0.10;
 
 extends 'Wikibase::Datatype::Value';
 
 has language => (
 	is => 'ro',
-	default => 'en',
 );
 
 sub type {
 	return 'monolingualtext';
+}
+
+sub BUILD {
+	my $self = shift;
+
+	if (! defined $self->{'language'}) {
+		$self->{'language'} = 'en',
+	}
+	check_language($self, 'language');
+
+	return;
 }
 
 1;
@@ -59,6 +70,7 @@ Returns instance of object.
 
 Language shortcut.
 Parameter is optional.
+Value is checked to ISO 639-1 language code.
 Default value is 'en'.
 
 =item * C<value>
@@ -97,6 +109,9 @@ Returns string.
  new():
          From Wikibase::Datatype::Value::new():
                  Parameter 'value' is required.
+         From Wikibase::Datatype::Utils::check_language():
+                 Language code '%s' isn't ISO 639-1 code.
+                 Language with ISO 639-1 code '%s' doesn't exist.
 
 =head1 EXAMPLE
 
@@ -163,6 +178,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.08
+0.10
 
 =cut

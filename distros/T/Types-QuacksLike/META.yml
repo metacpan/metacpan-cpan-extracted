@@ -1,0 +1,33 @@
+---
+abstract: 'Check for object providing all methods from a class or role'
+author:
+  - 'haarg - Graham Knop (cpan:HAARG) <haarg@haarg.org>'
+build_requires:
+  Test::More: '0.88'
+  Test::Needs: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Types-QuacksLike
+no_index:
+  directory:
+    - t
+    - xt
+recommends:
+  Sub::Util: '0'
+requires:
+  Type::Library: '0'
+  Types::Standard: '0'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Types-QuacksLike
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/haarg/Types-QuacksLike.git
+version: '0.001001'
+x_authority: cpan:HAARG
+x_breaks: {}
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -35,31 +35,31 @@ no_index:
 provides:
   Beam::Wire:
     file: lib/Beam/Wire.pm
-    version: '1.024'
+    version: '1.025'
   Beam::Wire::Event::BuildService:
     file: lib/Beam/Wire/Event/BuildService.pm
-    version: '1.024'
+    version: '1.025'
   Beam::Wire::Event::ConfigService:
     file: lib/Beam/Wire/Event/ConfigService.pm
-    version: '1.024'
+    version: '1.025'
   Beam::Wire::Exception:
     file: lib/Beam/Wire.pm
-    version: '1.024'
+    version: '1.025'
   Beam::Wire::Exception::Config:
     file: lib/Beam/Wire.pm
-    version: '1.024'
+    version: '1.025'
   Beam::Wire::Exception::Constructor:
     file: lib/Beam/Wire.pm
-    version: '1.024'
+    version: '1.025'
   Beam::Wire::Exception::InvalidConfig:
     file: lib/Beam/Wire.pm
-    version: '1.024'
+    version: '1.025'
   Beam::Wire::Exception::NotFound:
     file: lib/Beam/Wire.pm
-    version: '1.024'
+    version: '1.025'
   Beam::Wire::Exception::Service:
     file: lib/Beam/Wire.pm
-    version: '1.024'
+    version: '1.025'
 recommends:
   JSON: '0'
 requires:
@@ -79,9 +79,10 @@ resources:
   bugtracker: https://github.com/preaction/Beam-Wire/issues
   homepage: https://github.com/preaction/Beam-Wire
   repository: https://github.com/preaction/Beam-Wire.git
-version: '1.024'
+version: '1.025'
 x_authority: cpan:PREACTION
 x_contributors:
+  - 'Al Tom <al-tom.ru@yandex.ru>'
   - 'Ben Moon <guiltydolphin@gmail.com>'
   - 'Bruce Armstrong <bruce@armstronganchor.net>'
   - 'Diab Jerius <djerius@cfa.harvard.edu>'

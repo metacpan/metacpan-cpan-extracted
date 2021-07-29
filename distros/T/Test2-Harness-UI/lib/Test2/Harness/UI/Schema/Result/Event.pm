@@ -10,7 +10,7 @@ use Carp qw/confess/;
 confess "You must first load a Test2::Harness::UI::Schema::NAME module"
     unless $Test2::Harness::UI::Schema::LOADED;
 
-our $VERSION = '0.000068';
+our $VERSION = '0.000075';
 
 __PACKAGE__->parent_column('parent_id');
 
@@ -77,6 +77,7 @@ sub line_data {
     $out{event_id} = $cols{event_id};
 
     $out{is_parent} = $cols{facets}{parent} ? 1 : 0;
+    $out{is_fail} = $cols{facets}{assert} ? $cols{facets}{assert}{pass} ? 0 : 1 : undef;
 
     return \%out;
 }

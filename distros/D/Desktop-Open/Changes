@@ -1,3 +1,9 @@
+0.002   2021-07-05  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux] Give up immediately when xdg-open returns 2 (file not
+	  found).
+
+
 0.001   2021-07-02  Released-By: PERLANCAR
 
         - First release.

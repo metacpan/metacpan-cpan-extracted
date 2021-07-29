@@ -71,6 +71,12 @@ has sizelimit => (
     isa => 'Int',
     );
 
+has debug => (
+    is  => 'rw',
+    isa => 'Int',
+    default => 0,
+    );
+
 # ssl options
 has verify => (
     is  => 'rw',
@@ -129,7 +135,7 @@ sub _build_options {
 
 sub _build_new_options {
     my $self = shift;
-    return $self->_build_options(qw( timeout verify capath keepalive ));
+    return $self->_build_options(qw( timeout verify capath keepalive debug ));
 }
 
 sub _build_bind_options {
@@ -224,7 +230,19 @@ sub ldap {
     return $self->_bind;
 }
 
-
+# It looks like a half closed connection (server gone / load balancer etc)
+# causes an operational error and not a connection error
+# so the list of codes to use this reconnect foo is somewhat experimental
+sub _is_transient_error {
+    my $self = shift;
+    my $mesg = shift;
+    if ($mesg->is_error() && (grep { $_ == $mesg->code() } (1,81,82))) {
+        $self->log()->debug('Connection lost - try rebind and rerun query');
+        $self->_purge_bind();
+        return 1;
+    }
+    return 0;
+}
 
 sub _getbyDN {
 
@@ -236,13 +254,11 @@ sub _getbyDN {
 
     my $mesg = $ldap->search( base => $dn, scope  => 'base', filter => '(objectclass=*)');
 
-    # Check reconnet - same as in run_search
-    if ($mesg->is_error() && ($mesg->code() == 81 || $mesg->code() == 1)) {
-        $self->log()->debug('Connection lost - try rebind and rerun query');
-        $self->_purge_bind();
+    if ($self->_is_transient_error($mesg)) {
         $mesg = $ldap->search( base => $dn, scope  => 'base', filter => '(objectclass=*)');
     }
 
+    return if ($mesg->is_error());
 
     if ( $mesg->count() == 1) {
 
@@ -502,13 +518,7 @@ sub _run_search {
     my $mesg = $self->ldap()->search( %option );
 
     # Lost connection, try to rebind and rerun query
-    # It looks like a half closed connection (server gone / load balancer etc)
-    # causes an operational error and not a connection error
-    # so the list of codes to use this reconnect foo is somewhat experimental
-    # When changing this code please also check in _getByDN
-    if (ref $mesg && $mesg->is_error() && ($mesg->code() == 81 || $mesg->code() == 1)) {
-        $self->log()->debug('Connection lost - try rebind and rerun query ' . $mesg->code());
-        $self->_purge_bind();
+    if ($self->_is_transient_error($mesg)) {
         $mesg = $self->ldap()->search( %option );
     }
 
@@ -559,6 +569,25 @@ using an anonymous bind.
 
 Uses bind credentials and queries for entries having (at least) one of the
 mentioned attributes.
+
+=head2 connection control
+
+Following controls are passed to Net::LDAP->new from class parameters
+with the same name, see Net::LDAP for details.
+
+=over
+
+=item timeout
+
+=item keepalive
+
+=item debug
+
+=item verify
+
+=item capath
+
+=back
 
 =head2 setting values
 

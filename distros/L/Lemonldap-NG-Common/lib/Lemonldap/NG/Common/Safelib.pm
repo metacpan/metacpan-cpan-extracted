@@ -10,14 +10,15 @@ use Encode;
 use MIME::Base64;
 use Lemonldap::NG::Common::IPv6;
 use JSON::XS;
+use Date::Parse;
 
-our $VERSION = '2.0.11';
+our $VERSION = '2.0.12';
 
 # Set here all the names of functions that must be available in Safe objects.
 # Not that only functions, not methods, can be written here
 our $functions =
   [
-    qw(&checkLogonHours &date &checkDate &basic &unicode2iso &iso2unicode &groupMatch &isInNet6 &varIsInUri &has2f)
+    qw(&checkLogonHours &date &dateToTime &checkDate &basic &unicode2iso &iso2unicode &groupMatch &isInNet6 &varIsInUri &has2f)
   ];
 
 ## @function boolean checkLogonHours(string logon_hours, string syntax, string time_correction, boolean default_access)
@@ -120,34 +121,51 @@ sub date {
     return $year . $mon . $mday . $hour . $min . $sec;
 }
 
+
+## @function integer dateToTime(string date)
+# Converts a LDAP date into epoch time or returns undef upon failure.
+# @param $date string Date in YYYYMMDDHHMMSS[+/-0000] format. It may contain a differential timezone, otherwise default TZ is GMT
+# @return Date converted to time
+sub dateToTime {
+    my $date = shift;
+    return undef unless ( $date );
+
+    # Parse date
+    my ( $year, $month, $day, $hour, $min, $sec, $zone ) = ( $date =~ /(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})([-+\w]*)/ );
+
+    # Convert date to epoch time with GMT as default timezone if date contains none
+    return str2time( $year . "-" . $month . "-" . $day . "T" . $hour . ":" . $min . ":" . $sec . $zone, "GMT" );
+}
+
 ## @function boolean checkDate(string start, string end, boolean default_access)
 # Function to check a date
-# @param $start string Start date (GMT)
-# @param $end string End date (GMT)
-# @param $default_access optional what result to return for users without start or end start
+# @param $start string Start date in YYYYMMDDHHMMSS[+/-0000] format. It may contain a differential timezone, otherwise default TZ is GMT
+# @param $end string End date in YYYYMMDDHHMMSS[+/-0000] format. It may contain a differential timezone, otherwise default TZ is GMT
+# @param $default_access optional what result to return for users without start and end dates
 # @return 1 if access allowed, 0 else
 sub checkDate {
     my ( $start, $end, $default_access ) = @_;
-
-    # Get date in string
-    $start = substr( $start, 0, 14 );
-    $end   = substr( $end,   0, 14 );
 
     # Default access if no value
     $default_access ||= "0";
     return $default_access unless ( $start or $end );
 
-    # If no start, set start to 0
-    $start ||= 0;
+    # If no start, set start to 01 01 1970
+    $start ||= "19700101000000";
 
     # If no end, set end to the end of the world
-    $end ||= 999999999999999;
+    $end ||= "99991231235959";
 
-    # Get the present day and hour
-    my $date = &date;
+    # Convert dates to epoch time
+    my $starttime = &dateToTime($start);
+    my $endtime = &dateToTime($end);
 
-    return 1 if ( ( $date >= $start ) and ( $date <= $end ) );
+    # Convert current GMT date to epoch time
+    my $datetime = &dateToTime(&date(1));
+
+    return 1 if ( ( $datetime >= $starttime ) and ( $datetime <= $endtime ) );
     return 0;
+
 }
 
 ## @function string basic(string login, string password)

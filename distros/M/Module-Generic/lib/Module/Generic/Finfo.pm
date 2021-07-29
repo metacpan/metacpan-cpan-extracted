@@ -21,6 +21,7 @@ BEGIN
     use DateTime::Format::Strptime;
     use File::Basename ();
     use File::MMagic::XS ();
+    use Module::Generic::DateTime;
     use Module::Generic::Null;
     use Nice::Try;
     use Want;
@@ -354,7 +355,7 @@ sub _datetime
             time_zone => 'local',
         );
         $dt->set_formatter( $fmt );
-        return( Module::Generic::Datetime->new( $dt ) );
+        return( Module::Generic::DateTime->new( $dt ) );
     }
     catch( $e )
     {
@@ -512,7 +513,7 @@ This instantiate an object that is used to access other key methods. It takes a 
 
 =head2 atime
 
-Returns the file last access time as a L<Module::Generic::Datetime> object, which stringifies to its value in second since epoch. L<Module::Generic::Datetime> is just a thin wrapper around L<DateTime> to allow a L<DateTime> to be used in comparison with another non L<DateTime> value.
+Returns the file last access time as a L<Module::Generic::DateTime> object, which stringifies to its value in second since epoch. L<Module::Generic::DateTime> is just a thin wrapper around L<DateTime> to allow a L<DateTime> to be used in comparison with another non L<DateTime> value.
 
 For example:
 
@@ -525,6 +526,10 @@ For example:
 
 Returns the preferred I/O size in bytes for interacting with the file.
 You can also use C<block_size>.
+
+=head2 block_size
+
+Alias for L</blksize>
 
 =head2 blocks
 
@@ -552,7 +557,7 @@ Returns the total size of file, in bytes. Same as L</size>
 
 =head2 ctime
 
-Returns the file inode change time as a L<Module::Generic::Datetime> object, which stringifies to its value in second since epoch. L<Module::Generic::Datetime> is just a thin wrapper around L<DateTime> to allow a L<DateTime> to be used in comparison with another non L<DateTime> value.
+Returns the file inode change time as a L<Module::Generic::DateTime> object, which stringifies to its value in second since epoch. L<Module::Generic::DateTime> is just a thin wrapper around L<DateTime> to allow a L<DateTime> to be used in comparison with another non L<DateTime> value.
 
 =head2 dev
 
@@ -585,6 +590,10 @@ Returns the numeric group ID of file's owner. Same as L</group>
 =head2 group
 
 Returns the numeric group ID of file's owner. Same as L</gid>
+
+=head2 ino
+
+Alias for L</ino>
 
 =head2 inode
 
@@ -637,9 +646,17 @@ So you could do something like:
         print( "Everyone can execute too!\n" );
     }
 
+=head2 mode_n2s
+
+Returns the file or directory mode as human readable string
+
+=head2 mode_s2n
+
+Takes a string and convert it into octal mode.
+
 =head2 mtime
 
-Returns the file last modify time as a L<Module::Generic::Datetime> object, which stringifies to its value in second since epoch. L<Module::Generic::Datetime> is just a wrapper around L<DateTime> to allow a L<DateTime> to be used in comparison with another non L<DateTime> value.
+Returns the file last modify time as a L<Module::Generic::DateTime> object, which stringifies to its value in second since epoch. L<Module::Generic::DateTime> is just a wrapper around L<DateTime> to allow a L<DateTime> to be used in comparison with another non L<DateTime> value.
 
 =head2 name
 
@@ -656,6 +673,10 @@ Returns the number of (hard) links to the file.
 =head2 rdev
 
 Returns the device identifier (special files only).
+
+=head2 reset
+
+Force L<Module::Generic::Finfo> to reload the filesystem information of the underlying file or directory
 
 =head2 size
 

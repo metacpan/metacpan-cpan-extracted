@@ -36,12 +36,18 @@ my $mockfio = Test::Future::IO->controller;
    $mockfio->expect_sleep( 0.05 )
       ->returns();
    $mockfh->expect( setbaud =>115200 );
-   # OP
+   # Store CTRLB
    $mockfio->expect_syswrite_anyfh( "\x55\xC3\x08" );
    $mockfio->expect_sysread_anyfh( 3 )
       ->returns( "\x55\xC3\x08" );
    $mockfio->expect_sleep( 0.1 );
+   # Store CTRLA
+   $mockfio->expect_syswrite_anyfh( "\x55\xC2\x00" );
+   $mockfio->expect_sysread_anyfh( 3 )
+      ->returns( "\x55\xC2\x00" );
+   $mockfio->expect_sleep( 0.1 );
 
+   # Read SIB
    $mockfio->expect_syswrite_anyfh( "\x55\xE5" );
    $mockfio->expect_sysread_anyfh( 18 )
       ->returns( "\x55\xE5" . "tinyAVR\x00P:0D:0\x003" );

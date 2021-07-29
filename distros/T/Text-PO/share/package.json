@@ -1,0 +1,35 @@
+{
+    "name": "gettext",
+    "description": "A GNU Gettext JavaScript implementation",
+    "author": "Jacques Deguest <jack@deguest.jp>",
+    "version": "0.1.0",
+    "main": "gettext.js",
+    "files": [
+        "gettext.js"
+    ],
+    "license": "Perl Artistic License",
+    "dependencies": {},
+    "devDependencies": {},
+    "keywords": [
+        "internationalisation",
+        "localisation",
+        "i18n",
+        "l10n",
+        "locale",
+        "gettext",
+        "dgettext",
+        "ngettext",
+        "dngettext",
+        "po",
+        "javascript",
+        "web"
+    ],
+    "repository": {
+        "type": "git",
+        "url": "https://git.deguest.jp/jack/Text-PO.git"
+    },
+    "bugs": {
+        "url": "https://git.deguest.jp/jack/Text-PO/issues"
+    },
+    "homepage": "https://git.deguest.jp/jack/Text-PO"
+}

@@ -7,7 +7,7 @@ use Lemonldap::NG::Common::UserAgent;
 use Lemonldap::NG::Portal::Main::Constants qw(PE_OK PE_ERROR PE_BADCREDENTIALS);
 use Lemonldap::NG::Common::FormEncode;
 
-our $VERSION = '2.0.11';
+our $VERSION = '2.0.12';
 
 has ua => ( is => 'rw' );
 
@@ -61,13 +61,14 @@ sub getUser {
     $self->logger->debug( 'Store remote cookies in session ('
           . $req->sessionInfo->{_proxyCookies}
           . ')' );
-    PE_OK;
+
+    return PE_OK;
 }
 
 sub findUser {
 
     # Nothing to do here
-    PE_OK;
+    return PE_OK;
 }
 
 sub setSessionInfo {
@@ -96,7 +97,8 @@ sub setSessionInfo {
         $req->{sessionInfo}->{$_} ||= $res->{$_} unless (/^_/);
     }
     $req->data->{_setSessionInfoDone}++;
-    PE_OK;
+    
+    return PE_OK;
 }
 
 sub authLogout {
@@ -111,6 +113,7 @@ sub authLogout {
         ]
     );
     my $resp = $self->ua->request($q);
+    
     return PE_OK;
 }
 

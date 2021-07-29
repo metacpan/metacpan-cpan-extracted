@@ -1,6 +1,16 @@
+Fri July 9 07:33:00 JST 2021
+
+  Version 1.22
+
+  * Fix bug in timeout of $p->wait on Unix perl earlier than 5.12
+    where Time::HiRes::alarm was failing to set the alarm.
+  * Fix test case 47 (which was failing on about 5% of systems)
+    by waiting longer for the process to exit
+
 Tue Nov  5 17:39:00 EST 2019
 
   Version 1.21
+
   * Fix bug in timeout_system that caused it to wait the maximum
     duration on every call.
 

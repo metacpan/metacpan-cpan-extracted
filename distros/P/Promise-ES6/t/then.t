@@ -24,7 +24,7 @@ sub already_resolved : Tests {
     $p->then(sub {
         $called = 'called';
     });
-    is $called, 'called', 'call fulfilled callback if promise already reasolved';
+    is $called, 'called', 'call fulfilled callback if promise already resolved';
 }
 
 __PACKAGE__->runtests;

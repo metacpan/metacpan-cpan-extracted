@@ -5,7 +5,7 @@ use Mouse;
 use JSON qw(from_json);
 use POSIX qw(strftime);
 
-our $VERSION = '2.0.9';
+our $VERSION = '2.0.12';
 
 no warnings 'redefine';
 
@@ -21,7 +21,7 @@ has notifObject => ( is => 'rw' );
 # INITIALIZATION
 
 sub init {
-    1;
+    return 1;
 }
 
 # Search for notifications and if any, returns HTML fragment.

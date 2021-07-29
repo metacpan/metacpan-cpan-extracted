@@ -1,14 +1,29 @@
 /*---------------------------------------------------------------------
- $Header: /Perl/OlleDB/senddata.cpp 21    19-07-09 16:53 Sommar $
+ $Header: /Perl/OlleDB/senddata.cpp 23    21-07-03 23:21 Sommar $
 
   Implements the routines for sending data and command to SQL Server:
   initbatch, enterparameter and executebatch, including routines to
   convert from Perl variables to SQL Server data types, save datetime
   data; those are in datetime.cpp.
 
-  Copyright (c) 2004-2019   Erland Sommarskog
+  Copyright (c) 2004-2021   Erland Sommarskog
 
   $History: senddata.cpp $
+ * 
+ * *****************  Version 23  *****************
+ * User: Sommar       Date: 21-07-03   Time: 23:21
+ * Updated in $/Perl/OlleDB
+ * Iin SV_to_char we cannot coopy bytes as-is if ANSI and DB codepage is
+ * UTF-8 and UTF-8 but is not set, since Perl may onclude Latin-1
+ * characters without setting the UTF8 bit. So in this case we must
+ * convert over UTF-16.
+ * 
+ * *****************  Version 22  *****************
+ * User: Sommar       Date: 21-04-25   Time: 21:49
+ * Updated in $/Perl/OlleDB
+ * Removed the special ruls to always send sql_variant as varchar i DB
+ * code page is UTF8, since this does not work with MSOLEDBSQL 18.4 where
+ * they changed the rules.
  * 
  * *****************  Version 21  *****************
  * User: Sommar       Date: 19-07-09   Time: 16:53
@@ -155,8 +170,6 @@
 // Conversion-from-SV routines. These routines converts an SV to the
 // desired SQL Server type. For most types the conversion is implicit
 // from the data type of the Perl variable.
-// Note that SV_to_BSTR is in the beginning of the file, as this is a
-// generally used routine.
 //------------------------------------------------------------------
 
 // This is a helper routine, which uses DataConvert to convert a Perl
@@ -275,10 +288,14 @@ BOOL SV_to_char (SV       * sv,
                  char     * &charval,
                  DBLENGTH   &value_len)
 {
-   // We have to convert the data from one code page to another, but
-   // only do this if needed.
+   // We may have to convert the data from one code page to another, but
+   // not if 
+   // 1) The database has a UTF8 collation, and we have a UTF8 string.
+   // 2) The string is not UTF8, but DB collation matches ANSI code page.
+   //    But if DB code pages is UTF8, we must convert, since string
+   //    is not UTF-8.
    if (SvUTF8(sv) && DB_codepage == CP_UTF8 ||
-       ! SvUTF8(sv) && DB_codepage == GetACP()) {
+       ! SvUTF8(sv) && DB_codepage == GetACP() && DB_codepage != CP_UTF8) {
       // Just copy the string to our own buffer
       STRLEN strlen;
       char * perl_str = SvPV(sv, strlen);
@@ -522,12 +539,13 @@ BOOL SV_to_ssvariant (SV          * sv,
        variant.vt = VT_SS_R8;
        variant.dblFloatVal = SvNV(sv);
     }
-    else if (DB_codepage != CP_UTF8 &&
-            (SvUTF8(sv) || DB_codepage != GetACP())) {
-       // We probably have a string (but it would be a references or
-       // whatever). If database collation is UTF8. we always pass
-       // the value as varchar. Else we send nvarchar, if the UTF8
-       // bit is set, of the codeages are different.
+    else if (SvUTF8(sv) || DB_codepage != GetACP()) {
+       // We probably have a string (but it could be a references or
+       // whatever). We pass as nvarchar in most cases. Only if string
+       // does not have UTF-8 bit set and the database and client code
+       // page agree, we send as varchar.(We tried for a while to 
+       // always send as varchar if the database has a UTF-8 collation,
+       // but we had back out if this dues to changes in MSOLEDBSQL 18.4.)
        DBLENGTH bytelen;
        BSTR     bstr = SV_to_BSTR(sv, &bytelen);
 

@@ -1,3 +1,7 @@
+0.04     2021-07-20
+
+- Fix report for uncoverable lines
+
 0.03     2019-11-17
 
 - Fix example code showing how to pipe uploader script to bash.

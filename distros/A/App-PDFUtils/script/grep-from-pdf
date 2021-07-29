@@ -4,9 +4,9 @@
 # and generated automatically using Perinci::CmdLine::Gen version 0.499
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-07-06'; # DATE
+our $DATE = '2021-07-17'; # DATE
 our $DIST = 'App-PDFUtils'; # DIST
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 use 5.010001;
 use strict;
@@ -42,21 +42,13 @@ grep-from-pdf - Print lines matching text in PDF files
 
 =head1 VERSION
 
-This document describes version 0.005 of grep-from-pdf (from Perl distribution App-PDFUtils), released on 2021-07-06.
+This document describes version 0.007 of grep-from-pdf (from Perl distribution App-PDFUtils), released on 2021-07-17.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % grep-from-pdf [--all] [-c] [--color=s] [--count] [--dash-prefix-inverts]
-     [--debug] [-e=s+] [--file=s+] [--files-json=s] [--format=name] [-i]
-     [--ignore-case] [--invert-match] [--json] [--line-number]
-     [--log-level=level] [-n] [--(no)naked-res] [--no-dash-prefix-inverts]
-     [--no-ignore-case] [--no-invert-match] [--nodash-prefix-inverts]
-     [--noignore-case] [--noinvert-match] [--page-result[=program]] [-q]
-     [--quiet] [--quiet-arg] [--regexp=s+] [--regexps-json=s] [--silent]
-     [--trace] [-v] [--verbose] [--view-result[=program]] -- [pattern]
-     [file] ...
+% B<grep-from-pdf> [B<--all>] [B<--color>=I<str>] [B<--count>|B<-c>] [B<--dash-prefix-inverts>|B<--no-dash-prefix-inverts>|B<--nodash-prefix-inverts>] [B<--debug>|B<--log-level>=I<level>|B<--quiet>|B<--trace>|B<--verbose>] [(B<--file>=I<filename>)+] [B<--format>=I<name>|B<--json>] [B<--ignore-case>|B<-i>|B<--no-ignore-case>|B<--noignore-case>] [B<--invert-match>|B<-v>|B<--no-invert-match>|B<--noinvert-match>] [B<--line-number>|B<-n>] [B<--(no)naked-res>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] [B<--quiet-arg>] [(B<--regexp>=I<str>)+] [B<--files-json>=I<json>] [B<--regexps-json>=I<json>|(B<-e>=I<str>)+] [B<-q>|B<--silent>] -- [I<pattern>] [I<file>] ...
 
 =head1 DESCRIPTION
 

@@ -5,8 +5,9 @@ package Lemonldap::NG::Portal::Main::Menu;
 use strict;
 use Mouse;
 use Clone 'clone';
+use Lemonldap::NG::Portal::Main::Constants 'URIRE';
 
-our $VERSION = '2.0.8';
+our $VERSION = '2.0.12';
 
 extends 'Lemonldap::NG::Common::Module';
 
@@ -293,11 +294,11 @@ sub _buildApplicationHash {
     my $applications;
 
     # Get application items
-    my $appname = $apphash->{options}->{name}    || $appid;
-    my $appuri  = $apphash->{options}->{uri}     || "";
+    my $appname = $apphash->{options}->{name} || $appid;
+    my $appuri  = $apphash->{options}->{uri}  || "";
     my $appdesc = $apphash->{options}->{description};
     my $applogo = $apphash->{options}->{logo};
-    my $apptip  = $apphash->{options}->{tooltip} || $appname;
+    my $apptip = $apphash->{options}->{tooltip} || $appname;
 
     # Detect sub applications
     my $subapphash;
@@ -393,9 +394,8 @@ sub _filterHash {
             # Check rights
             my $appdisplay = $apphash->{$key}->{options}->{display}
               || "auto";
-            my ( $vhost, $appuri ) =
-              $apphash->{$key}->{options}->{uri} =~ m#^https?://([^/]*)(.*)#;
-            $vhost =~ s/:\d+$//;
+            $apphash->{$key}->{options}->{uri} =~ URIRE;
+            my ( $vhost, $appuri ) = ( $3, $5 );
             $vhost = $self->p->HANDLER->resolveAlias($vhost);
             $appuri ||= '/';
 

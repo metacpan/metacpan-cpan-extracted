@@ -5,6 +5,7 @@ use feature qw /postderef signatures/;
 
 package Vote::Count::Matrix;
 use Moose;
+use MooseX::StrictConstructor;
 
 with
   'Vote::Count::Common',
@@ -28,13 +29,13 @@ use Storable 3.15 'dclone';
 
 use YAML::XS;
 
-our $VERSION='2.00';
+our $VERSION='2.01';
 
 =head1 NAME
 
 Vote::Count::Matrix
 
-=head1 VERSION 2.00
+=head1 VERSION 2.01
 
 =cut
 
@@ -391,6 +392,7 @@ sub PairingVotesTable ( $self ) {
   return generate_table( rows => \@rows );
 }
 
+__PACKAGE__->meta->make_immutable;
 1;
 
 =pod

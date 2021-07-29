@@ -9,9 +9,9 @@ use lib $FindBin::RealBin."/../lib";
 use lib $FindBin::RealBin."/../lib/Finance/IG"; # if you are not careful here you will end up testing the installed version. 
 
 
-unless ( $ENV{RELEASE_TESTING} ) {
-    plan( skip_all => "Author tests not required for installation" );
-}
+#unless ( $ENV{RELEASE_TESTING} ) {
+#    plan( skip_all => "Author tests not required for installation" );
+#}
 
 # Ensure a recent version of Test::Pod::Coverage
 my $min_tpc = 1.08;

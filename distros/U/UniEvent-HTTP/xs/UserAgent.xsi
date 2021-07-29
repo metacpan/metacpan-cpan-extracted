@@ -3,7 +3,7 @@ PROTOTYPES: DISABLE
 
 UserAgentSP UserAgent::new (Hash config = Hash(), LoopSP loop = {}) {
     string serialized;
-    Simple v;
+    Scalar v;
     if ((v  = config.fetch("serialized"))) { serialized = v.as_string(); }
 
     UserAgent::Config cfg;
@@ -16,12 +16,11 @@ ClientSP UserAgent::request (RequestSP request, URISP context_uri = request->uri
 
 string UserAgent::to_string(bool include_session = false)
 
-UserAgent::Identity UserAgent::identity(SV* value = nullptr) {
+UserAgent::Identity UserAgent::identity(Scalar value = Scalar()) {
     using Identity = UserAgent::Identity;
     if (value) {
-        Sv val(value);
-        if (!val.defined()) THIS->identity(Identity());
-        else                THIS->identity(Identity(Simple(val).as_string()));
+        if (!value.defined()) THIS->identity(Identity());
+        else                  THIS->identity(Identity(value.as_string()));
         XSRETURN_UNDEF;
     }
     RETVAL = THIS->identity();

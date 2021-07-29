@@ -10,7 +10,7 @@ subtest api => sub {
         dies {
             Hash::Wrap->import( { -methods => [] } )
         },
-        qr/-methods.*must be a hashref/,
+        qr/-methods.*must be a hashref.*methods.t/,
         'wrong type of argument'
     );
 
@@ -21,7 +21,7 @@ subtest api => sub {
                         '!a' => sub { }
                     } } );
         },
-        qr/Perl identifier/,
+        qr/Perl identifier.*methods.t/,
         'illegal method name'
     );
 
@@ -30,7 +30,7 @@ subtest api => sub {
         dies {
             Hash::Wrap->import( { -methods => { a => [] } } );
         },
-        qr/value for method "a" must be a coderef/,
+        qr/value for method "a" must be a coderef.*methods.t/,
         'wrong argument for method name'
     );
 

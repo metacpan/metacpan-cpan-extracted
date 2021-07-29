@@ -7,7 +7,7 @@ use 5.010001;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Calculate accumulated inflation over the years",
+  "ABSTRACT" => "Calculate accumulated inflation (or savings rate, etc) over the years",
   "AUTHOR" => "perlancar <perlancar\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -36,7 +36,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.050",
+  "VERSION" => "0.051",
   "test" => {
     "TESTS" => "t/*.t"
   }

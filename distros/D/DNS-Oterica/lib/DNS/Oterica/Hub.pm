@@ -1,6 +1,6 @@
 package DNS::Oterica::Hub;
 # ABSTRACT: the center of control for a DNS::Oterica system
-$DNS::Oterica::Hub::VERSION = '0.312';
+$DNS::Oterica::Hub::VERSION = '0.313';
 use Moose;
 with 'DNS::Oterica::Role::RecordMaker';
 
@@ -284,7 +284,7 @@ DNS::Oterica::Hub - the center of control for a DNS::Oterica system
 
 =head1 VERSION
 
-version 0.312
+version 0.313
 
 =head1 OVERVIEW
 

@@ -3,24 +3,28 @@ abstract: "Make sure you didn't emit any warnings while testing"
 author:
   - 'Fergal Daly <fergal@esatclear.ie>'
 build_requires:
-  Test::More: 0.47
-  Test::Tester: 0.107
+  Test::More: '0.47'
+  Test::Tester: '0.107'
 configure_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.112621'
-license: open_source
+generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
+license: lgpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Test-NoWarnings
 no_index:
   directory:
     - t
-    - inc
+    - xt
 requires:
-  Test::Builder: 0.86
-  perl: 5.006
+  Test::Builder: '0.86'
+  perl: '5.006'
 resources:
-  repository: http://svn.ali.as/cpan/trunk/Test-NoWarnings
-version: 1.04
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Test-NoWarnings
+  license: https://www.gnu.org/licenses/lgpl-2.1.html
+  repository: https://github.com/haarg/Test-NoWarnings.git
+version: '1.06'
+x_authority: cpan:HAARG
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

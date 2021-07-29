@@ -37,324 +37,6 @@ DESCRIPTION
 
     Event loops that work properly on all platforms. YAY!
 
-CONSTANTS
-
- VERSION CONSTANTS
-
-  UV_VERSION_MAJOR
-
-  UV_VERSION_MINOR
-
-  UV_VERSION_PATCH
-
-  UV_VERSION_IS_RELEASE
-
-  UV_VERSION_SUFFIX
-
-  UV_VERSION_HEX
-
- ERROR CONSTANTS
-
-  UV_E2BIG
-
-    Argument list too long
-
-  UV_EACCES
-
-    Permission denied
-
-  UV_EADDRINUSE
-
-    Address already in use
-
-  UV_EADDRNOTAVAIL
-
-    Address not available
-
-  UV_EAFNOSUPPORT
-
-    Address family not supported
-
-  UV_EAGAIN
-
-    Resource temporarily unavailable
-
-  UV_EAI_ADDRFAMILY
-
-    Address family not supported
-
-  UV_EAI_AGAIN
-
-    Temporary failure
-
-  UV_EAI_BADFLAGS
-
-    Bad ai_flags value
-
-  UV_EAI_BADHINTS
-
-    Invalid value for hints
-
-  UV_EAI_CANCELED
-
-    Request canceled
-
-  UV_EAI_FAIL
-
-    Permanent failure
-
-  UV_EAI_FAMILY
-
-    ai_family not supported
-
-  UV_EAI_MEMORY
-
-    Out of memory
-
-  UV_EAI_NODATA
-
-    No address
-
-  UV_EAI_NONAME
-
-    Unknown node or service
-
-  UV_EAI_OVERFLOW
-
-    Argument buffer overflow
-
-  UV_EAI_PROTOCOL
-
-    Resolved protocol is unknown
-
-  UV_EAI_SERVICE
-
-    Service not available for socket type
-
-  UV_EAI_SOCKTYPE
-
-    Socket type not supported
-
-  UV_EALREADY
-
-    Connection already in progress
-
-  UV_EBADF
-
-    Bad file descriptor
-
-  UV_EBUSY
-
-    Resource busy or locked
-
-  UV_ECANCELED
-
-    Operation canceled
-
-  UV_ECHARSET
-
-    Invalid Unicode character
-
-  UV_ECONNABORTED
-
-    Software caused connection abort
-
-  UV_ECONNREFUSED
-
-    Connection refused
-
-  UV_ECONNRESET
-
-    Connection reset by peer
-
-  UV_EDESTADDRREQ
-
-    Destination address required
-
-  UV_EEXIST
-
-    File already exists
-
-  UV_EFAULT
-
-    Bad address in system call argument
-
-  UV_EFBIG
-
-    File too large
-
-  UV_EHOSTUNREACH
-
-    Host is unreachable
-
-  UV_EINTR
-
-    Interrupted system call
-
-  UV_EINVAL
-
-    Invalid argument
-
-  UV_EIO
-
-    i/o error
-
-  UV_EISCONN
-
-    Socket is already connected
-
-  UV_EISDIR
-
-    Illegal operation on a directory
-
-  UV_ELOOP
-
-    Too many symbolic links encountered
-
-  UV_EMFILE
-
-    Too many open files
-
-  UV_EMLINK
-
-    Too many links
-
-  UV_EMSGSIZE
-
-    Message too long
-
-  UV_ENAMETOOLONG
-
-    Name too long
-
-  UV_ENETDOWN
-
-    Network is down
-
-  UV_ENETUNREACH
-
-    Network is unreachable
-
-  UV_ENFILE
-
-    File table overflow
-
-  UV_ENOBUFS
-
-    No buffer space available
-
-  UV_ENODEV
-
-    No such device
-
-  UV_ENOENT
-
-    No such file or directory
-
-  UV_ENOMEM
-
-    Not enough memory
-
-  UV_ENONET
-
-    Machine is not on the network
-
-  UV_ENOPROTOOPT
-
-    Protocol not available
-
-  UV_ENOSPC
-
-    No space left on device
-
-  UV_ENOSYS
-
-    Function not implemented
-
-  UV_ENOTCONN
-
-    Socket is not connected
-
-  UV_ENOTDIR
-
-    Not a directory
-
-  UV_ENOTEMPTY
-
-    Directory not empty
-
-  UV_ENOTSOCK
-
-    Socket operation on non-socket
-
-  UV_ENOTSUP
-
-    Operation not supported on socket
-
-  UV_ENXIO
-
-    No such device or address
-
-  UV_EOF
-
-    End of file
-
-  UV_EPERM
-
-    Operation not permitted
-
-  UV_EPIPE
-
-    Broken pipe
-
-  UV_EPROTO
-
-    Protocol error
-
-  UV_EPROTONOSUPPORT
-
-    Protocol not supported
-
-  UV_EPROTOTYPE
-
-    Protocol wrong type for socket
-
-  UV_ERANGE
-
-    Result too large
-
-  UV_EROFS
-
-    Read-only file system
-
-  UV_ESHUTDOWN
-
-    Cannot send after transport endpoint shutdown
-
-  UV_ESPIPE
-
-    Invalid seek
-
-  UV_ESRCH
-
-    No such process
-
-  UV_ETIMEDOUT
-
-    Connection timed out
-
-  UV_ETXTBSY
-
-    Text file is busy
-
-  UV_EXDEV
-
-    Cross-device link not permitted
-
-  UV_UNKNOWN
-
-    Unknown error
-
 FUNCTIONS
 
     The following functions are available:
@@ -376,9 +58,9 @@ FUNCTIONS
         # will also return the default loop
         my $loop = UV::Loop->new(1);
 
-    Returns the default loop (which is a singleton object). This module
-    already creates the default loop and you get access to it with this
-    method.
+    Returns the default loop as a UV::Loop instance (which is a singleton
+    object). This module already creates the default loop and you get
+    access to it with this method.
 
  err_name
 
@@ -420,9 +102,9 @@ FUNCTIONS
         my $loop = UV::Loop->default_loop();
         my $loop = UV::Loop->default();
 
-    Returns the default loop (which is a singleton object). This module
-    already creates the default loop and you get access to it with this
-    method.
+    Returns the default loop as a UV::Loop instance (which is a singleton
+    object). This module already creates the default loop and you get
+    access to it with this method.
 
  poll
 
@@ -539,13 +221,348 @@ EXCEPTIONS
             else ...
         }
 
+CONSTANTS
+
+ VERSION CONSTANTS
+
+    UV_VERSION_MAJOR
+
+    UV_VERSION_MINOR
+
+    UV_VERSION_PATCH
+
+    UV_VERSION_IS_RELEASE
+
+    UV_VERSION_SUFFIX
+
+    UV_VERSION_HEX
+
+ ERROR CONSTANTS
+
+    UV_E2BIG
+
+      Argument list too long
+
+    UV_EACCES
+
+      Permission denied
+
+    UV_EADDRINUSE
+
+      Address already in use
+
+    UV_EADDRNOTAVAIL
+
+      Address not available
+
+    UV_EAFNOSUPPORT
+
+      Address family not supported
+
+    UV_EAGAIN
+
+      Resource temporarily unavailable
+
+    UV_EAI_ADDRFAMILY
+
+      Address family not supported
+
+    UV_EAI_AGAIN
+
+      Temporary failure
+
+    UV_EAI_BADFLAGS
+
+      Bad ai_flags value
+
+    UV_EAI_BADHINTS
+
+      Invalid value for hints
+
+    UV_EAI_CANCELED
+
+      Request canceled
+
+    UV_EAI_FAIL
+
+      Permanent failure
+
+    UV_EAI_FAMILY
+
+      ai_family not supported
+
+    UV_EAI_MEMORY
+
+      Out of memory
+
+    UV_EAI_NODATA
+
+      No address
+
+    UV_EAI_NONAME
+
+      Unknown node or service
+
+    UV_EAI_OVERFLOW
+
+      Argument buffer overflow
+
+    UV_EAI_PROTOCOL
+
+      Resolved protocol is unknown
+
+    UV_EAI_SERVICE
+
+      Service not available for socket type
+
+    UV_EAI_SOCKTYPE
+
+      Socket type not supported
+
+    UV_EALREADY
+
+      Connection already in progress
+
+    UV_EBADF
+
+      Bad file descriptor
+
+    UV_EBUSY
+
+      Resource busy or locked
+
+    UV_ECANCELED
+
+      Operation canceled
+
+    UV_ECHARSET
+
+      Invalid Unicode character
+
+    UV_ECONNABORTED
+
+      Software caused connection abort
+
+    UV_ECONNREFUSED
+
+      Connection refused
+
+    UV_ECONNRESET
+
+      Connection reset by peer
+
+    UV_EDESTADDRREQ
+
+      Destination address required
+
+    UV_EEXIST
+
+      File already exists
+
+    UV_EFAULT
+
+      Bad address in system call argument
+
+    UV_EFBIG
+
+      File too large
+
+    UV_EHOSTUNREACH
+
+      Host is unreachable
+
+    UV_EINTR
+
+      Interrupted system call
+
+    UV_EINVAL
+
+      Invalid argument
+
+    UV_EIO
+
+      i/o error
+
+    UV_EISCONN
+
+      Socket is already connected
+
+    UV_EISDIR
+
+      Illegal operation on a directory
+
+    UV_ELOOP
+
+      Too many symbolic links encountered
+
+    UV_EMFILE
+
+      Too many open files
+
+    UV_EMLINK
+
+      Too many links
+
+    UV_EMSGSIZE
+
+      Message too long
+
+    UV_ENAMETOOLONG
+
+      Name too long
+
+    UV_ENETDOWN
+
+      Network is down
+
+    UV_ENETUNREACH
+
+      Network is unreachable
+
+    UV_ENFILE
+
+      File table overflow
+
+    UV_ENOBUFS
+
+      No buffer space available
+
+    UV_ENODEV
+
+      No such device
+
+    UV_ENOENT
+
+      No such file or directory
+
+    UV_ENOMEM
+
+      Not enough memory
+
+    UV_ENONET
+
+      Machine is not on the network
+
+    UV_ENOPROTOOPT
+
+      Protocol not available
+
+    UV_ENOSPC
+
+      No space left on device
+
+    UV_ENOSYS
+
+      Function not implemented
+
+    UV_ENOTCONN
+
+      Socket is not connected
+
+    UV_ENOTDIR
+
+      Not a directory
+
+    UV_ENOTEMPTY
+
+      Directory not empty
+
+    UV_ENOTSOCK
+
+      Socket operation on non-socket
+
+    UV_ENOTSUP
+
+      Operation not supported on socket
+
+    UV_ENXIO
+
+      No such device or address
+
+    UV_EOF
+
+      End of file
+
+    UV_EPERM
+
+      Operation not permitted
+
+    UV_EPIPE
+
+      Broken pipe
+
+    UV_EPROTO
+
+      Protocol error
+
+    UV_EPROTONOSUPPORT
+
+      Protocol not supported
+
+    UV_EPROTOTYPE
+
+      Protocol wrong type for socket
+
+    UV_ERANGE
+
+      Result too large
+
+    UV_EROFS
+
+      Read-only file system
+
+    UV_ESHUTDOWN
+
+      Cannot send after transport endpoint shutdown
+
+    UV_ESPIPE
+
+      Invalid seek
+
+    UV_ESRCH
+
+      No such process
+
+    UV_ETIMEDOUT
+
+      Connection timed out
+
+    UV_ETXTBSY
+
+      Text file is busy
+
+    UV_EXDEV
+
+      Cross-device link not permitted
+
+    UV_UNKNOWN
+
+      Unknown error
+
+TODO
+
+    The following features of libuv are not currently wrapped by this
+    module, but may be possible in some future version:
+
+      * Filesystem requests listed in
+      http://docs.libuv.org/en/v1.x/fs.html.
+
+      * Thread pools listed in
+      http://docs.libuv.org/en/v1.x/threadpool.html.
+
+      * Many of the misc utilities listed in
+      http://docs.libuv.org/en/v1.x/misc.html.
+
+      * UV::Process stdio stream arguments given at
+      http://docs.libuv.org/en/v1.x/process.html#c.uv_stdio_flags.
+
 AUTHOR
 
-    Chase Whitener <capoeirab@cpan.org>
+    Paul Evans <leonerd@leonerd.org.uk>
 
-AUTHOR EMERITUS
+AUTHORS EMERITUS
 
-    Daisuke Murase <typester@cpan.org>
+    Daisuke Murase <typester@cpan.org>, Chase Whitener <capoeirab@cpan.org>
 
 COPYRIGHT AND LICENSE
 

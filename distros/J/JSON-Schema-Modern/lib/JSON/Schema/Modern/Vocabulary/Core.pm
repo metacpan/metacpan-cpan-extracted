@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary::Core;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Core vocabulary
 
-our $VERSION = '0.513';
+our $VERSION = '0.514';
 
 use 5.016;
 no if "$]" >= 5.031009, feature => 'indirect';
@@ -31,8 +31,8 @@ sub keywords {
     $spec_version ne 'draft7' ? '$anchor' : (),
     $spec_version eq 'draft2019-09' ? '$recursiveAnchor' : (),
     '$ref',
-    $spec_version ne 'draft7' ? qw($recursiveRef $vocabulary $comment) : (),
-    $spec_version eq 'draft7' ? 'definitions' : '$defs',
+    $spec_version eq 'draft2019-09' ? '$recursiveRef' : (),
+    $spec_version eq 'draft7' ? 'definitions' : qw($vocabulary $comment $defs),
   );
 }
 
@@ -209,11 +209,7 @@ sub _eval_keyword_ref {
     });
 }
 
-sub _traverse_keyword_recursiveRef {
-  my ($self, $schema, $state) = @_;
-  return if not assert_keyword_type($state, $schema, 'string');
-  return if not assert_uri_reference($state, $schema);
-}
+sub _traverse_keyword_recursiveRef { goto \&_traverse_keyword_ref }
 
 sub _eval_keyword_recursiveRef {
   my ($self, $data, $schema, $state) = @_;
@@ -292,7 +288,7 @@ JSON::Schema::Modern::Vocabulary::Core - Implementation of the JSON Schema Core 
 
 =head1 VERSION
 
-version 0.513
+version 0.514
 
 =head1 DESCRIPTION
 
@@ -302,7 +298,11 @@ version 0.513
 
 Implementation of the JSON Schema Draft 2019-09 "Core" vocabulary, indicated in metaschemas
 with the URI C<https://json-schema.org/draft/2019-09/vocab/core> and formally specified in
-L<https://json-schema.org/draft/2019-09/json-schema-core.html#rfc.section.8>.
+L<https://datatracker.ietf.org/doc/html/draft-handrews-json-schema-02#section-8>.
+
+Support is also provided for the equivalent Draft 7 keywords that correspond to this vocabulary and
+are formally specified in
+L<https://datatracker.ietf.org/doc/html/draft-handrews-json-schema-01>.
 
 =head1 SUPPORT
 

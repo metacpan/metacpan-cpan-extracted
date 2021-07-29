@@ -36,8 +36,8 @@ You shouldn't make instances of this class. Each attribute should be used as a n
           Attributes => {
             'My__string' => {
               Values        => [ 'My__string', ... ],
-              AttributeType =>
-                'INCLUSIVE',    # values: INCLUSIVE, EXCLUSIVE; OPTIONAL
+              AttributeType => 'INCLUSIVE'
+              , # values: INCLUSIVE, EXCLUSIVE, CONTAINS, BEFORE, AFTER, ON, BETWEEN; OPTIONAL
             },
           },    # OPTIONAL
           Behavior => {
@@ -104,11 +104,11 @@ You shouldn't make instances of this class. Each attribute should be used as a n
           UserAttributes => {
             'My__string' => {
               Values        => [ 'My__string', ... ],
-              AttributeType =>
-                'INCLUSIVE',    # values: INCLUSIVE, EXCLUSIVE; OPTIONAL
+              AttributeType => 'INCLUSIVE'
+              , # values: INCLUSIVE, EXCLUSIVE, CONTAINS, BEFORE, AFTER, ON, BETWEEN; OPTIONAL
             },
           },    # OPTIONAL
-        },
+        },    # OPTIONAL
         Name          => 'My__string',
         SegmentGroups => {
           Groups => [
@@ -118,8 +118,8 @@ You shouldn't make instances of this class. Each attribute should be used as a n
                   Attributes => {
                     'My__string' => {
                       Values        => [ 'My__string', ... ],
-                      AttributeType =>
-                        'INCLUSIVE',    # values: INCLUSIVE, EXCLUSIVE; OPTIONAL
+                      AttributeType => 'INCLUSIVE'
+                      , # values: INCLUSIVE, EXCLUSIVE, CONTAINS, BEFORE, AFTER, ON, BETWEEN; OPTIONAL
                     },
                   },    # OPTIONAL
                   Behavior => {
@@ -187,12 +187,12 @@ You shouldn't make instances of this class. Each attribute should be used as a n
                   UserAttributes => {
                     'My__string' => {
                       Values        => [ 'My__string', ... ],
-                      AttributeType =>
-                        'INCLUSIVE',    # values: INCLUSIVE, EXCLUSIVE; OPTIONAL
+                      AttributeType => 'INCLUSIVE'
+                      , # values: INCLUSIVE, EXCLUSIVE, CONTAINS, BEFORE, AFTER, ON, BETWEEN; OPTIONAL
                     },
                   },    # OPTIONAL
                 },
-                ...
+                ...     # OPTIONAL
               ],    # OPTIONAL
               SourceSegments => [
                 {

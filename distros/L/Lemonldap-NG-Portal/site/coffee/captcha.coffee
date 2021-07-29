@@ -8,8 +8,8 @@ renewCaptcha = () ->
 		url: "#{portal}renewcaptcha"
 		dataType: 'json'
 		error: (j, status, err) ->
-			console.log 'Error', err
-			res = JSON.parse j.responseText
+			console.log 'Error', err if err
+			res = JSON.parse j.responseText if j
 			if res and res.error
 				console.log 'Returned error', res
 		# On success, values are set

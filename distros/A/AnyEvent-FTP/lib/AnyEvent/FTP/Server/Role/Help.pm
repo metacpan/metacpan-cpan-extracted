@@ -6,7 +6,7 @@ use 5.010;
 use Moo::Role;
 
 # ABSTRACT: Help role for FTP server
-our $VERSION = '0.16'; # VERSION
+our $VERSION = '0.17'; # VERSION
 
 
 my %cmds;
@@ -29,7 +29,7 @@ sub cmd_help
     {
       no strict 'refs';
       $cmds{$class} = [
-        sort map { s/^cmd_//; uc $_ } grep /^cmd_/, keys %{$class . '::'}
+        sort map { my $x = $_; $x =~ s/^cmd_//; uc $x } grep /^cmd_/, keys %{$class . '::'}
       ];
     }
 
@@ -73,22 +73,22 @@ AnyEvent::FTP::Server::Role::Help - Help role for FTP server
 
 =head1 VERSION
 
-version 0.16
+version 0.17
 
 =head1 SYNOPSIS
 
 Create a context:
 
  package AnyEvent::FTP::Server::Context::EchoContext;
-  
+ 
  use Moo;
-  
+ 
  extends 'AnyEvent::FTP::Server::Context';
  with 'AnyEvent::FTP::Server::Role::Help';
-  
+ 
  # implement the non-existent echo command
  sub help_echo { 'ECHO <SP> text' }
-  
+ 
  sub cmd_echo
  {
    my($self, $con, $req) = @_;
@@ -144,7 +144,7 @@ José Joaquín Atria
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Graham Ollis.
+This software is copyright (c) 2017-2021 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -55,16 +55,16 @@ subtest 'create/edit a trigger' => sub {
     subtest 'create trigger form' => sub {
         $t->get_ok( "/plan/$plan_id/trigger", form => { type => 'Webhook' } )
             ->status_is( 200 )
-            ->element_exists( 'form' )
-            ->attr_is( form => action => "/plan/$plan_id/trigger/" )
-            ->attr_is( form => method => 'POST' )
+            ->element_exists( 'main form' )
+            ->attr_is( 'main form' => action => "/plan/$plan_id/trigger/" )
+            ->attr_is( 'main form' => method => 'POST' )
             ->element_exists( 'input[name=type]' )
             ->attr_is( 'input[name=type]', value => 'Webhook' )
             ->element_exists( 'input[name=plan_id]' )
             ->attr_is( 'input[name=plan_id]', value => $plan_id )
             ->element_exists( 'input[name=label]' )
             ->element_exists( '[name=description]' )
-            ->element_exists( 'form button' )
+            ->element_exists( 'main form button' )
             ;
 
         # Trigger input form

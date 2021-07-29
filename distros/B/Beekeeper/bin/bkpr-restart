@@ -1,17 +1,9 @@
-#!/usr/bin/perl -wT
+#!/usr/bin/env perl
 
 use strict;
 use warnings;
 
-our $VERSION = '0.07';
-
-BEGIN {
-
-    unless (eval { require Beekeeper }) {
-        # Modules not installed yet
-        unshift @INC, ($ENV{'PERL5LIB'} =~ m/([^:]+)/g);
-    }
-}
+our $VERSION = '0.09';
 
 use Beekeeper::Service::Supervisor;
 use Getopt::Long;
@@ -103,7 +95,7 @@ bkpr-restart - Gracefully restart pool of workers
 
 =head1 VERSION
 
-Version 0.07
+Version 0.09
 
 =head1 SYNOPSIS
 

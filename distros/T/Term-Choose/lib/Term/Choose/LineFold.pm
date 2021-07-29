@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.733';
+our $VERSION = '1.735';
 
 use Exporter qw( import );
 
@@ -98,9 +98,6 @@ sub line_fold {
     my ( $str, $avail_width, $opt ) = @_; #copy $str
     if ( ! defined $str || ! length $str ) {
         return $str;
-    }
-    if ( $^O ne 'MSWin32' && $^O ne 'cygwin' ) {
-        $avail_width += WIDTH_CURSOR;
     }
     for ( $opt->{init_tab}, $opt->{subseq_tab} ) {
         if ( defined $_ && length $_ ) {

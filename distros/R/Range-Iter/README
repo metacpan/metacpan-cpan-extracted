@@ -2,8 +2,8 @@ NAME
     Range::Iter - Generate a coderef iterator for range
 
 VERSION
-    This document describes version 0.002 of Range::Iter (from Perl
-    distribution Range-Iter), released on 2019-04-23.
+    This document describes version 0.003 of Range::Iter (from Perl
+    distribution Range-Iter), released on 2021-07-17.
 
 SYNOPSIS
       use Range::Iter qw(range_iter);
@@ -42,13 +42,17 @@ BUGS
     to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
+    Range::ArrayIter, Range::Iterator
+
     Array::Iter
+
+    IntRange::Iter
 
 AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019 by perlancar@cpan.org.
+    This software is copyright (c) 2021, 2019 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

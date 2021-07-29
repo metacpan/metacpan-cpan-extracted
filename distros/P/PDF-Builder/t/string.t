@@ -1,8 +1,9 @@
 #!/usr/bin/perl
 use strict;
 use warnings;
+use utf8;
 
-use Test::More tests => 40;
+use Test::More tests => 42;
 
 use PDF::Builder::Basic::PDF::String;
 
@@ -188,6 +189,12 @@ is($string->val(),
    "\x05",
    q{Escape Character: 1-digit octal});
 
+use PDF::Builder::Basic::PDF::Utils;
+# PDF::API2 enters string as 'PiDeltaPhi', not escapes
+$string = PDFStr("\x{03A0}\x{0394}\x{03A6}");
+is($string->as_pdf(),
+   '<FEFF03A0039403A6>',
+   q{A string with the utf8 flag set is automatically encoded as UCS-16BE});
 
 # RT 63918
 $string = PDF::Builder::Basic::PDF::String->from_pdf('(3\000f' . "\x5c\x5c" . '3\000f)');
@@ -203,4 +210,11 @@ is($string->as_pdf(),
    '<0000005C00000000>',
    q{[RT #63918] Incorrect handling of literal backslashes 2/2});
 
+
+# RT 134957
+$string = PDFStr("\x00\n\x00");
+is($string->as_pdf(),
+   '<000A00>',
+   q{\n in a string containing non-printable characters is hex-encoded});
+   
 1;

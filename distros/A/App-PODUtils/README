@@ -2,8 +2,8 @@ NAME
     App::PODUtils - Command-line utilities related to POD
 
 VERSION
-    This document describes version 0.049 of App::PODUtils (from Perl
-    distribution App-PODUtils), released on 2020-06-06.
+    This document describes version 0.050 of App::PODUtils (from Perl
+    distribution App-PODUtils), released on 2021-07-20.
 
 SYNOPSIS
     This distribution provides the following command-line utilities related
@@ -31,7 +31,7 @@ FUNCTIONS
   dump_pod_structure
     Usage:
 
-     dump_pod_structure(%args) -> [status, msg, payload, meta]
+     dump_pod_structure(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
     Dump POD structure using Pod::Elemental.
 
@@ -52,12 +52,15 @@ FUNCTIONS
 
     Returns an enveloped result (an array).
 
-    First element (status) is an integer containing HTTP status code (200
-    means OK, 4xx caller error, 5xx function error). Second element (msg) is
-    a string containing error message, or 'OK' if status is 200. Third
-    element (payload) is optional, the actual result. Fourth element (meta)
-    is called result metadata and is optional, a hash that contains extra
-    information.
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
 
     Return value: (any)
 
@@ -95,6 +98,14 @@ FUNCTIONS
     Arguments ('*' denotes required arguments):
 
     *   command => *str* (default: "head1")
+
+    *   naked_pod => *bool*
+
+        Strip =pod and =cut delimiters.
+
+        Normally, when outputing POD text, the "=pod" header and "=cut"
+        footer are included. This option, if enabled, strips the outputting
+        of such header/footer.
 
     *   pod => *perl::pod_filename* (default: "-")
 
@@ -158,6 +169,14 @@ FUNCTIONS
 
     *   command => *str* (default: "head1")
 
+    *   naked_pod => *bool*
+
+        Strip =pod and =cut delimiters.
+
+        Normally, when outputing POD text, the "=pod" header and "=cut"
+        footer are included. This option, if enabled, strips the outputting
+        of such header/footer.
+
     *   pod => *perl::pod_filename* (default: "-")
 
         Path to a .POD file, or a POD name (e.g. Foo::Bar) which will be
@@ -191,10 +210,6 @@ BUGS
     to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-    pomdump. Perinci::To::POD=HASH(0x55628ea7d630).
-
-    podsel.
-
     pod2html
 
     podtohtml from App::podtohtml
@@ -207,7 +222,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2020, 2019, 2018, 2017, 2016 by
+    This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016 by
     perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under

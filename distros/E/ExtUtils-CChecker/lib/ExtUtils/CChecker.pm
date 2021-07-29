@@ -1,14 +1,15 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2010-2015 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2010-2021 -- leonerd@leonerd.org.uk
 
 package ExtUtils::CChecker;
 
+use v5;
 use strict;
 use warnings;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 use Carp;
 
@@ -21,25 +22,25 @@ libraries, or OS features
 
 =head1 SYNOPSIS
 
- use Module::Build;
- use ExtUtils::CChecker;
+   use Module::Build;
+   use ExtUtils::CChecker;
 
- my $cc = ExtUtils::CChecker->new;
- 
- $cc->assert_compile_run(
-    diag => "no PF_MOONLASER",
-    source => <<'EOF' );
- #include <stdio.h>
- #include <sys/socket.h>
- int main(int argc, char *argv[]) {
-   printf("PF_MOONLASER is %d\n", PF_MOONLASER);
-   return 0;
- }
- EOF
+   my $cc = ExtUtils::CChecker->new;
 
- Module::Build->new(
-   ...
- )->create_build_script;
+   $cc->assert_compile_run(
+      diag => "no PF_MOONLASER",
+      source => <<'EOF' );
+   #include <stdio.h>
+   #include <sys/socket.h>
+   int main(int argc, char *argv[]) {
+     printf("PF_MOONLASER is %d\n", PF_MOONLASER);
+     return 0;
+   }
+   EOF
+
+   Module::Build->new(
+     ...
+   )->create_build_script;
 
 =head1 DESCRIPTION
 
@@ -62,12 +63,14 @@ provides assistance here.
 
 =cut
 
-=head2 $cc = ExtUtils::CChecker->new( %args )
+=head2 new
+
+   $cc = ExtUtils::CChecker->new( %args )
 
 Returns a new instance of a C<ExtUtils::CChecker> object. Takes the following
 named parameters:
 
-=over 8
+=over 4
 
 =item defines_to => PATH
 
@@ -119,7 +122,9 @@ sub new
 
 =cut
 
-=head2 $dirs = $cc->include_dirs
+=head2 include_dirs
+
+   $dirs = $cc->include_dirs
 
 Returns the currently-configured include directories in an ARRAY reference.
 
@@ -132,7 +137,9 @@ sub include_dirs
    return [ @{ $self->{include_dirs} } ];
 }
 
-=head2 $flags = $cc->extra_compiler_flags
+=head2 extra_compiler_flags
+
+   $flags = $cc->extra_compiler_flags
 
 Returns the currently-configured extra compiler flags in an ARRAY reference.
 
@@ -145,7 +152,9 @@ sub extra_compiler_flags
    return [ @{ $self->{extra_compiler_flags} } ];
 }
 
-=head2 $flags = $cc->extra_linker_flags
+=head2 extra_linker_flags
+
+   $flags = $cc->extra_linker_flags
 
 Returns the currently-configured extra linker flags in an ARRAY reference.
 
@@ -158,7 +167,9 @@ sub extra_linker_flags
    return [ @{ $self->{extra_linker_flags} } ];
 }
 
-=head2 $cc->push_include_dirs( @dirs )
+=head2 push_include_dirs
+
+   $cc->push_include_dirs( @dirs )
 
 Adds more include directories
 
@@ -170,7 +181,9 @@ sub push_include_dirs
    push @{ $self->{include_dirs} }, @_;
 }
 
-=head2 $cc->push_extra_compiler_flags( @flags )
+=head2 push_extra_compiler_flags
+
+   $cc->push_extra_compiler_flags( @flags )
 
 Adds more compiler flags
 
@@ -182,7 +195,9 @@ sub push_extra_compiler_flags
    push @{ $self->{extra_compiler_flags} }, @_;
 }
 
-=head2 $cc->push_extra_linker_flags( @flags )
+=head2 push_extra_linker_flags
+
+   $cc->push_extra_linker_flags( @flags )
 
 Adds more linker flags
 
@@ -248,9 +263,11 @@ sub define
    }
 }
 
-=head2 $success = $cc->try_compile_run( %args )
+=head2 try_compile_run
 
-=head2 $success = $cc->try_compile_run( $source )
+   $success = $cc->try_compile_run( %args )
+
+   $success = $cc->try_compile_run( $source )
 
 Try to compile, link, and execute a C program whose source is given. Returns
 true if the program compiled and linked, and exited successfully. Returns
@@ -259,21 +276,21 @@ false if any of these steps fail.
 Takes the following named arguments. If a single argument is given, that is
 taken as the source string.
 
-=over 8
+=over 4
 
-=item * source => STRING
+=item source => STRING
 
 The source code of the C program to try compiling, building, and running.
 
-=item * extra_compiler_flags => ARRAY
+=item extra_compiler_flags => ARRAY
 
 Optional. If specified, pass extra flags to the compiler.
 
-=item * extra_linker_flags => ARRAY
+=item extra_linker_flags => ARRAY
 
 Optional. If specified, pass extra flags to the linker.
 
-=item * define => STRING
+=item define => STRING
 
 Optional. If specified, then the named symbol will be defined if the program
 ran successfully. This will either on the C compiler commandline (by passing
@@ -341,16 +358,18 @@ sub try_compile_run
    return 1;
 }
 
-=head2 $cc->assert_compile_run( %args )
+=head2 assert_compile_run
+
+   $cc->assert_compile_run( %args )
 
 Calls C<try_compile_run>. If it fails, die with an C<OS unsupported> message.
 Useful to call from F<Build.PL> or F<Makefile.PL>.
 
 Takes one extra optional argument:
 
-=over 8
+=over 4
 
-=item * diag => STRING
+=item diag => STRING
 
 If present, this string will be appended to the failure message if one is
 generated. It may provide more useful information to the user on why the OS is
@@ -369,7 +388,65 @@ sub assert_compile_run
    $self->try_compile_run( %args ) or $self->fail( $diag );
 }
 
-=head2 $success = $cc->try_find_include_dirs_for( %args )
+=head2 try_find_cflags_for
+
+   $success = $cc->try_find_cflags_for( %args )
+
+I<Since version 0.11.>
+
+Try to compile, link and execute the given source, using extra compiler flags.
+
+When a usable combination is found, the flags are stored in the object for use
+in further compile operations, or returned by C<extra_compiler_flags>. The
+method then returns true.
+
+If no usable combination is found, it returns false.
+
+Takes the following extra arguments:
+
+=over 4
+
+=item source => STRING
+
+Source code to compile
+
+=item cflags => ARRAY of ARRAYs
+
+Gives a list of sets of flags. Each set of flags should be strings in its own
+array reference.
+
+=item define => STRING
+
+Optional. If specified, then the named symbol will be defined if the program
+ran successfully.
+
+=back
+
+=cut
+
+sub try_find_cflags_for
+{
+   my $self = shift;
+   my %args = @_;
+
+   ref( my $cflags = $args{cflags} ) eq "ARRAY" or croak "Expected 'cflags' as ARRAY ref";
+
+   foreach my $f ( @$cflags ) {
+      ref $f eq "ARRAY" or croak "Expected 'cflags' element as ARRAY ref";
+
+      $self->try_compile_run( %args, extra_compiler_flags => $f ) or next;
+
+      $self->push_extra_compiler_flags( @$f );
+
+      return 1;
+   }
+
+   return 0;
+}
+
+=head2 try_find_include_dirs_for
+
+   $success = $cc->try_find_include_dirs_for( %args )
 
 Try to compile, link and execute the given source, using extra include
 directories.
@@ -382,18 +459,18 @@ If no a usable combination is found, it returns false.
 
 Takes the following arguments:
 
-=over 8
+=over 4
 
-=item * source => STRING
+=item source => STRING
 
 Source code to compile
 
-=item * dirs => ARRAY of ARRAYs
+=item dirs => ARRAY of ARRAYs
 
 Gives a list of sets of dirs. Each set of dirs should be strings in its own
 array reference.
 
-=item * define => STRING
+=item define => STRING
 
 Optional. If specified, then the named symbol will be defined if the program
 ran successfully. This will either on the C compiler commandline (by passing
@@ -423,7 +500,9 @@ sub try_find_include_dirs_for
    return 0;
 }
 
-=head2 $success = $cc->try_find_libs_for( %args )
+=head2 try_find_libs_for
+
+   $success = $cc->try_find_libs_for( %args )
 
 Try to compile, link and execute the given source, when linked against a
 given set of extra libraries.
@@ -436,18 +515,18 @@ If no usable combination is found, it returns false.
 
 Takes the following arguments:
 
-=over 8
+=over 4
 
-=item * source => STRING
+=item source => STRING
 
 Source code to compile
 
-=item * libs => ARRAY of STRINGs
+=item libs => ARRAY of STRINGs
 
 Gives a list of sets of libraries. Each set of libraries should be
 space-separated.
 
-=item * define => STRING
+=item define => STRING
 
 Optional. If specified, then the named symbol will be defined if the program
 ran successfully. This will either on the C compiler commandline (by passing
@@ -477,18 +556,27 @@ sub try_find_libs_for
    return 0;
 }
 
-=head2 $cc->find_include_dirs_for( %args )
+=head2 find_cflags_for
 
-=head2 $cc->find_libs_for( %args )
+   $cc->find_cflags_for( %args )
 
-Calls C<try_find_include_dirs_for> or C<try_find_libs_for> respectively. If it
-fails, die with an C<OS unsupported> message.
+=head2 find_include_dirs_for
+
+   $cc->find_include_dirs_for( %args )
+
+=head2 find_libs_for
+
+   $cc->find_libs_for( %args )
+
+Calls C<try_find_cflags_for>, C<try_find_include_dirs_for> or
+C<try_find_libs_for> respectively. If it fails, die with an
+C<OS unsupported> message.
 
 Each method takes one extra optional argument:
 
-=over 8
+=over 4
 
-=item * diag => STRING
+=item diag => STRING
 
 If present, this string will be appended to the failure message if one is
 generated. It may provide more useful information to the user on why the OS is
@@ -498,7 +586,7 @@ unsupported.
 
 =cut
 
-foreach ( qw( find_libs_for find_include_dirs_for ) ) {
+foreach ( qw( find_cflags_for find_libs_for find_include_dirs_for ) ) {
    my $trymethod = "try_$_";
 
    my $code = sub {
@@ -513,7 +601,34 @@ foreach ( qw( find_libs_for find_include_dirs_for ) ) {
    *$_ = $code;
 }
 
-=head2 $mb = $cc->new_module_build( %args )
+=head2 extend_module_build
+
+   $cc->extend_module_build( $build )
+
+I<Since version 0.11.>
+
+Sets the appropriate arguments into the given L<Module::Build> instance.
+
+=cut
+
+sub extend_module_build
+{
+   my $self = shift;
+   my ( $build ) = @_;
+
+   foreach my $key (qw( include_dirs extra_compiler_flags extra_linker_flags )) {
+      my @vals = @{ $self->$key } or next;
+
+      push @vals, @{ $build->$key };
+
+      # Module::Build ->include_dirs wants an ARRAYref
+      $build->$key( $key eq "include_dirs" ? [ @vals ] : @vals );
+   }
+}
+
+=head2 new_module_build
+
+   $mb = $cc->new_module_build( %args )
 
 Construct and return a new L<Module::Build> object, preconfigured with the
 C<include_dirs>, C<extra_compiler_flags> and C<extra_linker_flags> options
@@ -531,17 +646,11 @@ sub new_module_build
    my %args = @_;
 
    require Module::Build;
+   my $build = Module::Build->new( %args );
 
-   foreach my $key (qw( include_dirs extra_compiler_flags extra_linker_flags )) {
-      if( exists $args{$key} ) {
-         $args{$key} = [ @{ $self->$key }, @{ $args{$key} } ];
-      }
-      else {
-         $args{$key} = $self->$key;
-      }
-   }
+   $self->extend_module_build( $build );
 
-   return Module::Build->new( %args );
+   return $build;
 }
 
 =head1 EXAMPLES
@@ -552,30 +661,30 @@ Some operating systems provide the BSD sockets API in their primary F<libc>.
 Others keep it in a separate library which should be linked against. The
 following example demonstrates how this would be handled.
 
- use ExtUtils::CChecker;
+   use ExtUtils::CChecker;
 
- my $cc = ExtUtils::CChecker->new;
+   my $cc = ExtUtils::CChecker->new;
 
- $cc->find_libs_for(
-    diag => "no socket()",
-    libs => [ "", "socket nsl" ],
-    source => q[
- #include <sys/socket.h>
- int main(int argc, char *argv) {
-   int fd = socket(PF_INET, SOCK_STREAM, 0);
-   if(fd < 0)
-     return 1;
-   return 0;
- }
- ] );
+   $cc->find_libs_for(
+      diag => "no socket()",
+      libs => [ "", "socket nsl" ],
+      source => q[
+   #include <sys/socket.h>
+   int main(int argc, char *argv) {
+     int fd = socket(PF_INET, SOCK_STREAM, 0);
+     if(fd < 0)
+       return 1;
+     return 0;
+   }
+   ] );
 
- $cc->new_module_build(
-    module_name => "Your::Name::Here",
-    requires => {
-       'IO::Socket' => 0,
-    },
-    ...
- )->create_build_script;
+   $cc->new_module_build(
+      module_name => "Your::Name::Here",
+      requires => {
+         'IO::Socket' => 0,
+      },
+      ...
+   )->create_build_script;
 
 By using the C<new_module_build> method, the detected C<extra_linker_flags>
 value has been automatically passed into the new C<Module::Build> object.
@@ -590,40 +699,40 @@ define a symbol to declare this fact if it is found. The XS code can then use
 this symbol to select between differing implementations. For example, the
 F<Build.PL>:
 
- use ExtUtils::CChecker;
+   use ExtUtils::CChecker;
 
- my $cc = ExtUtils::CChecker->new;
+   my $cc = ExtUtils::CChecker->new;
 
- $cc->try_compile_run(
-    define => "HAVE_MANGO",
-    source => <<'EOF' );
- #include <mango.h>
- #include <unistd.h>
- int main(void) {
-   if(mango() != 0)
-     exit(1);
-   exit(0);
- }
- EOF
+   $cc->try_compile_run(
+      define => "HAVE_MANGO",
+      source => <<'EOF' );
+   #include <mango.h>
+   #include <unistd.h>
+   int main(void) {
+     if(mango() != 0)
+       exit(1);
+     exit(0);
+   }
+   EOF
 
- $cc->new_module_build(
-    ...
- )->create_build_script;
+   $cc->new_module_build(
+      ...
+   )->create_build_script;
 
 If the C code compiles and runs successfully, and exits with a true status,
 the symbol C<HAVE_MANGO> will be defined on the compiler commandline. This
 allows the XS code to detect it, for example
 
- int
- mango()
-   CODE:
- #ifdef HAVE_MANGO
-     RETVAL = mango();
- #else
-     croak("mango() not implemented");
- #endif
-   OUTPUT:
-     RETVAL
+   int
+   mango()
+     CODE:
+   #ifdef HAVE_MANGO
+       RETVAL = mango();
+   #else
+       croak("mango() not implemented");
+   #endif
+     OUTPUT:
+       RETVAL
 
 This module will then still compile even if the operating system lacks this
 particular function. Trying to invoke the function at runtime will simply
@@ -644,25 +753,25 @@ files, which will provide the required constants and structures.
 The Linux kernel headers can be found using the F</lib/modules> directory. A
 fragment in F<Build.PL> like the following, may be appropriate.
 
- chomp( my $uname_r = `uname -r` );
+   chomp( my $uname_r = `uname -r` );
 
- my @dirs = (
-    [],
-    [ "/lib/modules/$uname_r/source/include" ],
- );
+   my @dirs = (
+      [],
+      [ "/lib/modules/$uname_r/source/include" ],
+   );
 
- $cc->find_include_dirs_for(
-    diag => "no PF_MOONLASER",
-    dirs => \@dirs,
-    source => <<'EOF' );
- #include <sys/socket.h>
- #include <moon/laser.h>
- int family = PF_MOONLASER;
- struct laserwl lwl;
- int main(int argc, char *argv[]) {
-   return 0;
- }
- EOF
+   $cc->find_include_dirs_for(
+      diag => "no PF_MOONLASER",
+      dirs => \@dirs,
+      source => <<'EOF' );
+   #include <sys/socket.h>
+   #include <moon/laser.h>
+   int family = PF_MOONLASER;
+   struct laserwl lwl;
+   int main(int argc, char *argv[]) {
+     return 0;
+   }
+   EOF
 
 This fragment will first try to compile the program as it stands, hoping that
 the F<libc> headers will be sufficient. If it fails, it will then try
@@ -677,24 +786,24 @@ This may be beneficial for cross-platform portability concerns, as not all C
 compilers may take extra C<-D> arguments on the command line, or platforms may
 have small length restrictions on the length of a command line.
 
- use ExtUtils::CChecker;
+   use ExtUtils::CChecker;
 
- my $cc = ExtUtils::CChecker->new(
-    defines_to => "mymodule-config.h",
- );
+   my $cc = ExtUtils::CChecker->new(
+      defines_to => "mymodule-config.h",
+   );
 
- $cc->try_compile_run(
-    define => "HAVE_MANGO",
-    source => <<'EOF' );
- #include <mango.h>
- #include <unistd.h>
- #include "mymodule-config.h"
- int main(void) {
-   if(mango() != 0)
-     exit(1);
-   exit(0);
- }
- EOF
+   $cc->try_compile_run(
+      define => "HAVE_MANGO",
+      source => <<'EOF' );
+   #include <mango.h>
+   #include <unistd.h>
+   #include "mymodule-config.h"
+   int main(void) {
+     if(mango() != 0)
+       exit(1);
+     exit(0);
+   }
+   EOF
 
 Because the F<mymodule-config.h> file is written and flushed after every
 define operation, it will still be useable in later C fragments to test for

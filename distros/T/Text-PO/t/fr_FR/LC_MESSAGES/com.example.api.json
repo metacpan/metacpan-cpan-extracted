@@ -1,0 +1,70 @@
+{
+   "domain" : "com.example.api",
+   "elements" : [
+      {
+         "msgid" : "There is nothing to do here.",
+         "msgstr" : "Il n'a rien à faire ici.",
+         "reference" : "/home/john/lib/My/Lib/API.pm:1011"
+      },
+      {
+         "msgid" : "You are not allowed to access this api resource.",
+         "msgstr" : "Vous n'êtes pas autorisé à acceder cette ressource api.",
+         "reference" : "/home/john/lib/My/Lib/API.pm:1042"
+      },
+      {
+         "msgid" : "Internal Server Error",
+         "msgstr" : "Erreur interne de serveur"
+      },
+      {
+         "msgid" : "Bad Request",
+         "msgstr" : "Mauvaise requête"
+      },
+      {
+         "msgid" : "Unknown properties: %s",
+         "msgstr" : "Propriété inconnue: %s"
+      },
+      {
+         "msgid" : "An unexpected server error occurred. Please try again later.",
+         "msgstr" : "Une erreur inattendue s'est produite. Veuillez réessayer plus tard."
+      },
+      {
+         "msgid" : "This account has been blocked and cannot use our services. For more information, please contact our support.",
+         "msgstr" : "Ce compte a été bloqué et ne peut utiliser nos services. Pour plus d'information, veuillez contacter notre service support.",
+         "reference" : "/home/john/lib/My/Lib/API.pm:2220"
+      },
+      {
+         "msgid" : "You have %d message",
+         "msgid_plural" : "You have %d messages",
+         "msgstr" : [
+            "Vous avez %d message",
+            "Vous avez %d messages"
+         ]
+      }
+   ],
+   "meta" : {
+      "Content-Transfer-Encoding" : "8bit",
+      "Content-Type" : "text/plain; charset=utf-8",
+      "Language" : "fr_FR",
+      "Language-Team" : "French <john.doe@example.com>",
+      "Last-Translator" : "John Doe <john.doe@example.com>",
+      "MIME-Version" : "1.0",
+      "PO-Revision-Date" : "2019-10-03 19-44+0000",
+      "POT-Creation-Date" : "2019-10-03 19-44+0000",
+      "Plural-Forms" : "nplurals=1; plural=n>1;",
+      "Project-Id-Version" : "MyProject 0.1",
+      "Report-Msgid-Bugs-To" : "john.doe@example.com"
+   },
+   "meta_keys" : [
+      "Project-Id-Version",
+      "Report-Msgid-Bugs-To",
+      "POT-Creation-Date",
+      "PO-Revision-Date",
+      "Last-Translator",
+      "Language-Team",
+      "Language",
+      "Plural-Forms",
+      "MIME-Version",
+      "Content-Type",
+      "Content-Transfer-Encoding"
+   ]
+}

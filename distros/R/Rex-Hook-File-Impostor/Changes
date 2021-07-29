@@ -1,5 +1,18 @@
 Revision history for Rex-Hook-File-Impostor
 
+v0.2.0 2021-07-28T20:04:33Z
+ - No code changes since v0.1.1.1 trial release
+
+v0.1.1.1 2021-07-11T15:57:00Z (TRIAL RELEASE)
+ [BUG FIXES]
+ - Use full path of managed files
+ - Use unique impostor directory
+ - Copy only existing files
+ - Fix full path handling on Windows
+
+ [ENHANCEMENTS]
+ - Use built-in Rex logic for file copy
+
 v0.1.1 2020-10-14T12:38:43Z
  [BUG FIXES]
  - Fix name of temporary directory

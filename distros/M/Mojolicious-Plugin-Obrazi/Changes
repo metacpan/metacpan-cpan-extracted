@@ -1,4 +1,11 @@
 Revision history for Perl module Mojolicious::Plugin::Obrazi
+0.15 12.07.2021 (пн) 15:44:36 EEST
+    Command: Improved documentation. Usage message shows supported formats.
+    Refactored the code. Added new attributes. Moved CSS and JS code to
+    separate files. Added template for single images. Added FB share button.
+    CSV file is updated after gallery regeneration, if needed.
+    Tests: Fixed failing tests. Skipping them when Imager does not support JPG
+    and PNG.
 
 0.14 1.07.2021 (чт) 22:05:35 EEST
     Fixed pod errors.

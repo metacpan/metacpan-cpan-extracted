@@ -1,5 +1,5 @@
 package Proc::Background;
-$Proc::Background::VERSION = '1.21';
+$Proc::Background::VERSION = '1.22';
 # ABSTRACT: Generic interface to background process management
 require 5.004_04;
 
@@ -265,9 +265,10 @@ sub timeout_system {
 
   my $proc = Proc::Background->new(@_) or return;
   my $end_time = $proc->start_time + $timeout;
-  my $delay;
-  while (($delay= ($end_time - time)) > 0 && !defined $proc->exit_code) {
+  my $delay= $timeout;
+  while ($delay > 0 && !defined $proc->exit_code) {
     $proc->wait($delay);
+    $delay= $end_time - time;
   }
 
   my $alive = $proc->alive;
@@ -291,10 +292,6 @@ __END__
 =head1 NAME
 
 Proc::Background - Generic interface to background process management
-
-=head1 VERSION
-
-version 1.21
 
 =head1 SYNOPSIS
 
@@ -596,9 +593,13 @@ Salvador Fandiño <sfandino@yahoo.com>
 
 =back
 
+=head1 VERSION
+
+version 1.22
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Michael Conrad, (C) 1998-2009 by Blair Zajac.
+This software is copyright (c) 2021 by Michael Conrad, (C) 1998-2009 by Blair Zajac.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

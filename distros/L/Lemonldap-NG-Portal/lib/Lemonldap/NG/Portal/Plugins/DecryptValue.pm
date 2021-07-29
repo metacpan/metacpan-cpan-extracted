@@ -8,7 +8,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_DECRYPTVALUE_SERVICE_NOT_ALLOWED
 );
 
-our $VERSION = '2.0.11';
+our $VERSION = '2.0.12';
 
 extends qw(
   Lemonldap::NG::Portal::Main::Plugin
@@ -90,19 +90,19 @@ sub run {
 
     # Check token
     if ( $self->ottRule->( $req, {} ) ) {
-        my $token = $req->param('token');
-        unless ($token) {
-            $self->userLogger->warn('decryptValue try without token');
-            $msg   = PE_NOTOKEN;
-            $token = $self->ott->createToken();
-        }
-        else {
+        my $token;
+        if ( $token = $req->param('token') ) {
             unless ( $self->ott->getToken($token) ) {
                 $self->userLogger->warn(
-                    'decryptValue try with expired/bad token');
+                    'DecryptValue called with an expired/bad token');
                 $msg   = PE_TOKENEXPIRED;
                 $token = $self->ott->createToken();
             }
+        }
+        else {
+            $self->userLogger->warn('DecryptValue called without token');
+            $msg   = PE_NOTOKEN;
+            $token = $self->ott->createToken();
         }
 
         my $params = {

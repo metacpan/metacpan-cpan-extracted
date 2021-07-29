@@ -1,5 +1,5 @@
 ---
-abstract: 'Calculate accumulated inflation over the years'
+abstract: 'Calculate accumulated inflation (or savings rate, etc) over the years'
 author:
   - 'perlancar <perlancar@cpan.org>'
 build_requires:
@@ -31,7 +31,7 @@ resources:
   bugtracker: https://github.com/perlancar/perl-App-CalcAccumulatedInflation/issues
   homepage: https://metacpan.org/release/App-CalcAccumulatedInflation
   repository: git://github.com/perlancar/perl-App-CalcAccumulatedInflation.git
-version: '0.050'
+version: '0.051'
 x_Dist_Zilla:
   perl:
     version: '5.030000'

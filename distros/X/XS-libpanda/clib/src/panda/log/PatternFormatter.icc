@@ -24,6 +24,8 @@ string_view default_format = "%1t %c[%L/%1M]%C %f:%l,%F(): %m";
 static const char  clear_color[] = "\e[0m";
 static const char* dates[] = {"%Y-%m-%d %H:%M:%S", "%y-%m-%d %H:%M:%S", "%H:%M:%S", "%Y/%m/%d %H:%M:%S"};
 
+PatternFormatter::PatternFormatter (string_view fmt) : _fmt(string(fmt)) {}
+
 static void add_mks (string& dest, long nsec, unsigned prec) {
     dest += '.';
     if (nsec < 100000000) dest += '0';
@@ -52,11 +54,36 @@ static inline void ymdhms (string& dest, time_t epoch, unsigned type) {
     dest += tmp;
 }
 
+static inline string format_multiline (const string& tmpl, size_t tmpl_pos, std::string& msg) {
+    size_t nlines = 0;
+    for (size_t pos = 0; pos != std::string::npos; pos = msg.find('\n', pos)) {
+        ++nlines;
+        ++pos;
+    }
+    
+    string ret(tmpl.length()*nlines + msg.length());
+    auto msglen = msg.length();
+    size_t pos = 0, epos = 0;
+    while (1) {
+        epos = msg.find('\n', pos);
+        if (epos == std::string::npos) epos = msglen;
+        if (pos != 0) ret += '\n';
+        auto ins_pos = ret.length() + tmpl_pos;
+        ret += tmpl;
+        ret.insert(ins_pos, msg.data() + pos, epos - pos);
+        if (epos == msglen) break;
+        pos = epos + 1;
+    }
+    
+    return ret;
+}
+
 string PatternFormatter::format (const string& fmt, std::string& msg, const Info& info) {
     auto len = fmt.length();
     auto s   = fmt.data();
     auto se  = s + len;
     string ret((len > 25 ? len*2 : 50) + msg.length());
+    auto multiline = string::npos;
 
     while (s < se) {
         char c = *s++;
@@ -89,8 +116,18 @@ string PatternFormatter::format (const string& fmt, std::string& msg, const Info
                 }
                 break;
             }
-            case 'l': ret += panda::to_string(info.line);           break;
-            case 'm': ret += string_view(msg.data(), msg.length()); break;
+            case 'l': {
+                ret += panda::to_string(info.line);
+                break;
+            }
+            case 'm': {
+                if (x == 1 && msg.find('\n') != std::string::npos) {
+                    multiline = ret.length();
+                } else {
+                    ret += string_view(msg.data(), msg.length());
+                }
+                break;
+            }
             case 'M': {
                 if (info.module->name().length()) ret += info.module->name();
                 else {
@@ -150,6 +187,8 @@ string PatternFormatter::format (const string& fmt, std::string& msg, const Info
             }
         }
     }
+    
+    if (multiline != string::npos) return format_multiline(ret, multiline, msg);
 
     return ret;
 }

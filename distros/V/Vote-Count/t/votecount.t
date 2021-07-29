@@ -17,6 +17,18 @@ use Vote::Count::ReadBallots 'read_ballots';
 
 my $VC1 = Vote::Count->new( BallotSet => read_ballots('t/data/data1.txt') );
 
+is_deeply( $VC1->{'Active'}, {
+    CARAMEL     => 1,
+    CHOCOLATE   => 1,
+    MINTCHIP    => 1,
+    PISTACHIO   => 1,
+    ROCKYROAD   => 1,
+    RUMRAISIN   => 1,
+    STRAWBERRY  => 1,
+    VANILLA     => 1
+}, 'Test that Active was initialized at Build'
+);
+
 my @ChoicesVC1 = sort ( qw/VANILLA CHOCOLATE STRAWBERRY PISTACHIO ROCKYROAD MINTCHIP CARAMEL RUMRAISIN/);
 is_deeply(
   [$VC1->GetChoices()],
@@ -46,7 +58,7 @@ is( $VC1->Defeat('YAKMILK'), undef,
   'Defeating a choice that isnt active returns undef');
 is( $VC1->{'Active'}{'STRAWBERRY'}, undef,
   'Defeated choice is no longer in Active Set');
-
+is( $VC1->{'Active'}{'VANILLA'}, 1, 'check a still active choice in active list');
 
 $VC1->logt('A Terse Entry');
 $VC1->logv('A Verbose Entry');
@@ -108,5 +120,20 @@ my $wda = $withdraws->GetActive;
 is( $wda->{'RUMRAISIN'},
     undef,
     'a choice removed by withdrawalist isnt in active set') ;
+
+for my $badcase ( 'none', 'all', undef ) {
+  my $case =
+    defined $badcase ? $badcase : 'tiebreakmethod undefined';
+  like(
+    dies {
+      my $z =
+        Vote::Count->new(
+          BallotSet => read_ballots('t/data/ties1.txt'),
+          TieBreakerFallBackPrecedence => 1 );
+    },
+    qr/FATAL: TieBreakerFallBackPrecedence will not be/,
+    "Incompatible with TieBreakerFallBackPrecedence: $case"
+  );
+}
 
 done_testing();

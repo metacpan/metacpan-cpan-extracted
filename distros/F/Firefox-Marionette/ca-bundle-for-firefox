@@ -8,10 +8,10 @@ use Firefox::Marionette();
 use FileHandle();
 use Encode();
 
-our $VERSION = '1.08';
+our $VERSION = '1.10';
 
 my %options;
-Getopt::Long::GetOptions( \%options, 'help', 'binary:s', 'file:s' );
+Getopt::Long::GetOptions( \%options, 'help', 'version', 'binary:s', 'file:s' );
 if ( $options{help} ) {
     require Pod::Simple::Text;
     my $parser = Pod::Simple::Text->new();
@@ -25,7 +25,7 @@ elsif ( $options{version} ) {
 }
 my %parameters;
 if ( $options{binary} ) {
-    $parameters{firefox} = $options{binary};
+    $parameters{binary} = $options{binary};
 }
 my $firefox = Firefox::Marionette->new(%parameters);
 
@@ -62,14 +62,14 @@ ca-bundle-for-firefox - generate the ca-bundle.crt for the current firefox insta
 
 =head1 VERSION
 
-Version 1.08
+Version 1.10
 
 =head1 USAGE
 
-$ ca-bundle-for-firefox >/etc/pki/tls/certs/ca-bundle.crt
-$ ca-bundle-for-firefox --file current.crt
-$ ca-bundle-for-firefox --binary=/path/to/old/firefox --file old.crt
-$ diff -Naur old.crt current.crt
+  $ ca-bundle-for-firefox >/etc/pki/tls/certs/ca-bundle.crt
+  $ ca-bundle-for-firefox --file current.crt
+  $ ca-bundle-for-firefox --binary=/path/to/old/firefox --file old.crt
+  $ diff -Naur old.crt current.crt
 
 =head1 DESCRIPTION
 

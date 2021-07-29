@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use 5.024;
 
-use feature qw /postderef signatures/;
+use feature qw /postderef signatures switch/;
 
 package Vote::Count::TieBreaker;
 use Moose::Role;
@@ -10,51 +10,56 @@ use Moose::Role;
 no warnings 'experimental';
 use List::Util qw( min max sum );
 use Path::Tiny;
-use Data::Dumper;
+# use Data::Dumper;
+# use Data::Printer;
 use Vote::Count::RankCount;
+use List::Util qw( min max sum);
 use Carp;
+use Try::Tiny;
 
-our $VERSION='2.00';
+our $VERSION='2.01';
 
 =head1 NAME
 
 Vote::Count::TieBreaker
 
-=head1 VERSION 2.00
+=head1 VERSION 2.01
 
 =head1 Synopsis
 
   my $Election = Vote::Count->new(
-    BallotSet      => $ballotsirvtie2,
-    TieBreakMethod => 'approval'
+    'BallotSet'      => $ballotsirvtie2,
+    'TieBreakMethod' => 'approval',
+    'TieBreakerFallBackPrecedence' => 0,
   );
 
 =cut
 
 # ABSTRACT: TieBreaker object for Vote::Count. Toolkit for vote counting.
 
-=head1 Tie Breakers
+=head1 TieBreakMethods
 
-The most important thing for a Tie Breaker to do is it should use some reproducible difference in the Ballots to pick a winner from a Tie. The next thing it should do is make sense. Finally, the ideal Tie Breaker will resolve when there is any difference to be found. The only fully resolvable method is unfortunately Random, but that is not reproducable between runs. Precedence sets a fixed resolution order and can be used to make Random reproducible.
-
-TieBreakMethod is specified as an argument to Vote::Count->new(). The TieBreaker is called internally from the resolution method via the TieBreaker function, which requires the caller to pass its TieBreakMethod.
-
-=head1 TieBreakMethod argument to Vote::Count->new
+=head2 TieBreakMethod argement to new
 
   'approval'
+  'topcount' [ of just tied choices ]
+  'topcount_active' [ currently active choices ]
   'all' [ eliminate all tied choices ]
-  'borda' [ applies Borda Count to current Active set ]
+  'borda' [ Borda Count to current Active set ]
+  'borda_all' [ includes all choices in Borda Count ]
   'grandjunction' [ more resolveable than simple TopCount would be ]
   'none' [ eliminate no choices ]
   'precedence' [ requires also setting PrecedenceFile ]
 
-=head1 Grand Junction
+Approval, TopCount, and Borda may be passed in either lower case or in the CamelCase form of the method name. borda_all calculates the Borda Count with all choices which can yield a different result than just the current choices. If you want TopCount to use all of the choices, or a snapshot such as after a floor rule, generate a Precedence File and then use that with Precedence as the Tie Breaker.
 
-The Grand Junction (also known as Bucklin) method is one of the simplest and easiest to Hand Count RCV resolution methods. Other than that it is generally not considered a good method.
+=head2 (Modified) Grand Junction
 
-Because it is simple, and always resolves, except when ballots are perfectly matched up, it is a great TieBreaker. It is not Later Harm Safe, but heavily favors higher rankings. It is the Vote::Count author's preferred Tie-Breaker.
+The Grand Junction (also known as Bucklin) method is one of the simplest and easiest to Hand Count RCV resolution methods. Other than that, it is generally not considered a good method.
 
-=head2 The (Standard) Grand Junction Method
+Because it is simple, and nearly always resolves, except when ballots are perfectly matched up, it is a great TieBreaker. It is not Later Harm Safe, but heavily favors higher rankings.
+
+=head3 The (Standard) Grand Junction Method
 
 Only the Tie-Breaker variant is currently implemented in Vote::Count.
 
@@ -82,7 +87,7 @@ When all ballots are exhausted the choice with the highest total wins.
 
 =back
 
-=head2 As a Tie Breaker
+=head3 As a Tie Breaker
 
 The Tie Breaker Method is modified.
 
@@ -90,7 +95,7 @@ Instead of Majority, any choice with a current total less than another is elimin
 
 The winner is the last choice remaining.
 
-=head2 TieBreakerGrandJunction
+=head3 TieBreakerGrandJunction
 
   my $resolve = $Election->TieBreakerGrandJunction( $choice1, $choice2 [ $choice3 ... ]  );
   if ( $resolve->{'winner'}) { say "Tie Winner is $resolve->{'winner'}"}
@@ -100,6 +105,10 @@ The winner is the last choice remaining.
   }
 
 The Tie Breaking will be logged to the verbose log, any number of tied choices may be provided.
+
+=head2 Changing Tie Breakers
+
+When Changing Tie Breakers or Precedence Files, the PairMatrix is not automatically updated. To update the PairMatrix it is necessary to call the UpdatePairMatrix Method.
 
 =cut
 
@@ -179,47 +188,90 @@ sub TieBreakerGrandJunction ( $self, @tiedchoices ) {
 
 =head1 TieBreaker
 
-Implements some basic methods for resolving ties. The default value for IRV is 'all', and the default value for Matrix is 'none'. 'all' is inappropriate for Matrix, and 'none' is inappropriate for IRV.
+Implements some basic methods for resolving ties. The default value for IRV is eliminate 'all', and the default value for Matrix is eliminate 'none'. 'all' is inappropriate for Matrix, and 'none' is inappropriate for IRV.
 
   my @keep = $Election->TieBreaker( $tiebreaker, $active, @tiedchoices );
 
 TieBreaker returns a list containing the winner, if the method is 'all' the list is empty, if 'none' the original @tiedchoices list is returned. If the TieBreaker is a tie there will be multiple elements.
 
-=head1 Precedence
+=head1 Breaking Ties With Precedence
 
 Since many existing Elections Rules call for Random, and Vote::Count does not accept Random as the result will be different bewtween runs, Precedence allows the Administrators of an election to randomly or arbitrarily determine who will win ties before running Vote::Count.
 
-The Precedence list takes the choices of the election one per line. Choices defeat any choice lower than them in the list. When Precedence is used an additional attribute must be specified for the Precedence List.
+The Precedence list takes the choices of the election one per line. Choices defeat any choice later than them in the list. When Precedence is used an additional attribute must be specified for the Precedence List.
 
  my $Election = Vote::Count->new(
    BallotSet => read_ballots('somefile'),
    TieBreakMethod => 'precedence',
    PrecedenceFile => '/path/to/precedencefile');
 
-A compound Tie Breaker can be created with a precedence list and any other methods that create an ordered list (Top Count, Approval, Borda), that can then be used for a new Precdence File. This is slight different than using Precedence as a fall back as the methods are normally checked against the current state, this variant only used the initial state.
+=head2 Precedence (Method)
+
+Returns a Vote::Count::RankCount object from the Precedence List. Takes a HashRef of an Active set as an optional argument, defaults to the Current Active Set.
+
+  my $RankCountByPrecedence = $Election->Precedence();
+  my $RankCountByPrecedence = $Election->Precedence( $active );
 
 =head2 CreatePrecedenceRandom
 
 Creates a Predictable Psuedo Random Precedence file, and returns the list. Randomizes the choices using the number of ballots as the Random Seed for Perl's built in rand() function. For any given Ballot File, it will always return the same list. If the precedence filename argument is not given it defaults to '/tmp/precedence.txt'. This is the best solution to use where the Rules call for Random, in a large election the number of ballots cast will be sufficiently random, while anyone with access to Perl can reproduce the Precedence file.
 
+  # Generate a random precedence file
   my @precedence = Vote::Count->new( BallotSet => read_ballots('somefile') )
     ->CreatePrecedenceRandom( '/tmp/precedence.txt');
+  # Create a new Election with it.
+  my $Election = Vote::Count->new( BallotSet => read_ballots('somefile'),
+    PrecedenceFile => '/tmp/precedence.txt', TieBreakMethod => 'Precedence' );
 
 =head2 TieBreakerFallBackPrecedence
 
-This optional argument enables or disables using precedence as a fallback, generates /tmp/precedence.txt if no PrecedenceFile is specified. Default is off.
+This optional argument enables or disables using precedence as a fallback if the primary tiebreaker cannot break the tie. Generates /tmp/precedence.txt using CreatePrecedenceRandom if no PrecedenceFile is specified. Default is off (0).
 
-=head1 UntieList
+TieBreakMethod must be defined and may not be all or none.
 
-Sort a list in an order determined by a TieBreaker method, sorted in Descending Order. The TieBreaker must be a method that returns a RankCount object, Borda, TopCount, and Approval, Precedence. To guarrantee reliable resolution Precedence must be used or have been set for fallback.
+=head2 UnTieList
 
-  my @orderedlosers = $Election->UntieList( 'Approval', @unorderedlosers );
+Sort a list in an order determined by a ranking method, sorted in Descending Order. The ranking must be a method that returns a RankCount object: Borda, TopCount, Precedence and Approval. If the tie is not resolved it will fall back to Precedence.
 
-=head1 UntieActive
+  my @orderedlosers = $Election->UnTieList(
+    'ranking1' => $Election->TieBreakMethod(), 'tied' => \@unorderedlosers );
 
-Produces a precedence list of all the active choices in the election. Takes a first and optional second method name, if one of the methods is not Precedence, TieBreakerPrecedence must be true. The methods may be TopCount, Approval, or any other method that returns a RankCount object. Returns a RankCount object (with the OrderedList method enabled).
+A second method may be provided.
 
-  my $precedenceRankCount = $Election->UntieActive( 'TopCount', 'Approval');
+  my @orderedlosers = $Election->UnTieList(
+    'ranking1' => 'TopCount', 'ranking2' => 'Borda', 'tied' => \@unorderedlosers );
+
+This method requires that Precedence be enabled either by having enabled TieBreakerFallBackPrecedence or by setting the TieBreakMethod to Precedence.
+
+=head2 UnTieActive
+
+Produces a precedence list of all the active choices in the election. Passes the ranking1 and ranking2 arguments to UnTieList and the Active Set as the list to untie.
+
+  my @untiedset = $Election->UnTieActive( 'ranking1' => 'TopCount', 'ranking2' => 'Approval');
+
+=head1 TopCount > Approval > Precedence
+
+Top Count > Approval > Precedence produces a fully resolveable Tie Breaker that will almost never fall back to Precedence. It makes sense to the voters and limits Later Harm by putting Top Count first. The Precedence order should be determined before counting, the old fashioned coffee can is great for this, or use CreatePrecedenceRandom.
+
+To apply Top Count > Approval > Precedence you need to start with a random Precedence File, Untie the choices, and switch Precedence Files:
+
+  use Path::Tiny;
+  my $Election = Vote::Count->new(
+    BallotSet      => read_ballots($ballots),
+    PrecedenceFile => $initial,
+    TieBreakMethod => 'Precedence',
+  );
+  # Create the new Precedence
+  my @newbreaker = $Election->UnTieActive(
+    'ranking1' => 'TopCount',
+    'ranking2' => 'Approval'
+  );
+  local $" = ' > ';    # set list separator to >
+  $Election->logv("Setting Tie Break Order to: @newbreaker");
+  local $" = "\n";     # set list separator to new line.
+  path($newprecedence)->spew("@newbreaker");
+  $Election->PrecedenceFile($newprecedence);
+  $Election->UpdatePairMatrix();
 
 =cut
 
@@ -268,11 +320,13 @@ sub CreatePrecedenceRandom ( $I, $outfile = '/tmp/precedence.txt' ) {
   my @precedence =
     ( map { $randomized{$_} } sort { $a <=> $b } ( keys %randomized ) );
   path($outfile)->spew( join( "\n", @precedence ) . "\n" );
+  $I->PrecedenceFile( $outfile );
   return @precedence;
 }
 
 sub TieBreaker ( $I, $tiebreaker, $active, @tiedchoices ) {
   no warnings 'uninitialized';
+  $tiebreaker = lc $tiebreaker;
   if ( $tiebreaker eq 'none' ) { return @tiedchoices }
   if ( $tiebreaker eq 'all' )  { return () }
   my $choices_hashref = { map { $_ => 1 } @tiedchoices };
@@ -288,6 +342,9 @@ sub TieBreaker ( $I, $tiebreaker, $active, @tiedchoices ) {
   }
   elsif ( $tiebreaker eq 'topcount' ) {
     $ranked = $I->TopCount($choices_hashref);
+  }
+  elsif ( $tiebreaker eq 'topcount_active' ) {
+    $ranked = $I->TopCount($active);
   }
   elsif ( $tiebreaker eq 'grandjunction' ) {
     my $GJ = $I->TieBreakerGrandJunction(@tiedchoices);
@@ -321,61 +378,81 @@ sub TieBreaker ( $I, $tiebreaker, $active, @tiedchoices ) {
     'terse'   => $terse,
     'verbose' => $ranked->RankTable(),
   };
-  if ( @highchoice > 1 ) {
-    if ( $I->TieBreakerFallBackPrecedence() ) {
-      return ( $I->TieBreakerPrecedence(@tiedchoices)->{'winner'} );
-    }
+  if ( @highchoice > 1 && $I->TieBreakerFallBackPrecedence() ) {
+    my $winner = $I->TieBreakerPrecedence(@tiedchoices)->{'winner'};
+    $I->{'last_tiebreaker'}{'terse'} .= "\nWinner by Precedence: $winner";
+    return ( $winner );
   }
   return (@highchoice);
 }
 
-sub UnTieList ( $I, $method, @tied ) {
-  no warnings 'uninitialized';
-  return $I->_precedence_sort( @tied ) if ( lc($method) eq 'precedence' );
-  unless ( $I->TieBreakerFallBackPrecedence() or $I->TieBreakMethod eq 'precedence') {
-    croak
-"TieBreakerFallBackPrecedence must be enabled or the specified method must be precedence to use UnTieList";
-  }
-  return @tied if scalar(@tied) == 1;
-  my @ordered = ();
-  my %active  = ( map { $_ => 1 } @tied );
-  # method should be topcount borda or approval which all take argument of active.
-  my $RC = $I->$method(\%active)->HashByRank();
+sub Precedence ( $I, $active = undef ) {
+  $active = $I->Active() unless defined $active;
+  return Vote::Count::RankCount->newFromList(
+    $I->_precedence_sort( keys( $active->%* ) ) );
+}
 
-  for my $level ( sort { $a <=> $b } ( keys $RC->%* ) ) {
-    my @l = @{ $RC->{$level} };
-    my @suborder =
-      ( 1 == @{ $RC->{$level} } )
-      ? @{ $RC->{$level} }
-      : $I->_precedence_sort( @l );
+sub precedence { Precedence(@_) }
+
+sub _shortuntie ( $I, $RC, @tied ) {
+  my %T     = map { $_ => $RC->{$_} } @tied;
+  my @order = ();
+  while ( keys %T ) {
+    my $best    = min values %T;
+    my @leaders = ();
+    for my $leader ( keys %T ) {
+      push @leaders, $leader if $T{$leader} == $best;
+    }
+    @leaders = $I->_precedence_sort(@leaders);
+    push @order, @leaders;
+    for (@leaders) { delete $T{$_} }
+  }
+  return @order;
+}
+
+sub UnTieList ( $I, %args ) {
+  no warnings 'uninitialized';
+  unless ( $I->TieBreakerFallBackPrecedence()
+    or lc($I->TieBreakMethod) eq 'precedence' )
+  {
+    croak
+"TieBreakerFallBackPrecedence must be enabled or TieBreakMethod must be precedence to use UnTieList [UnTieActive and BottomRunOff call it]";
+  }
+  my $ranking1  = $args{ranking1} ;
+  my $ranking2  = $args{ranking2} || 'Precedence';
+  my @tied      = $args{tied}->@*;
+  my %tieactive = map { $_ => 1 } @tied;
+
+  my @ordered = ();
+  return $I->_precedence_sort(@tied) if ( lc($ranking1) eq 'precedence' );
+  my $RC1 = try { $I->$ranking1( \%tieactive )->HashByRank() }
+    catch {
+      my $mthstr = $ranking1 ? $ranking1 : "missing ranking1 . methods $ranking1 ? $ranking2 ";
+      croak "Unable to rank choices by $mthstr."
+      };
+  my $RC2 = try {$I->$ranking2( \%tieactive )->HashWithOrder() }
+    catch {
+      my $mthstr = $ranking2 ? $ranking2 : "missing ranking2 . methods $ranking1 ? $ranking2 ";
+      croak "Unable to rank choices by $mthstr."
+      };
+  for my $level ( sort { $a <=> $b } ( keys $RC1->%* ) ) {
+    my @l = @{ $RC1->{$level} };
+    my @suborder = ();
+    if    ( 1 == $RC1->{$level}->@* ) { @suborder = @l }
+    elsif ( $ranking2 eq 'precedence' ) {
+      @suborder = $I->_precedence_sort(@l);
+    }
+    else {
+      @suborder = $I->_shortuntie( $RC2, @l );
+    }
     push @ordered, @suborder;
   }
   return @ordered;
 }
 
-sub UntieActive ( $I, $method1, $method2='precedence' ) {
-   if ( lc($method1) eq 'precedence' ) {
-    return Vote::Count::RankCount->newFromList(
-      $I->_precedence_sort( $I->GetActiveList() ));
-    }
-  my $hasprecedence = 0;
-  $hasprecedence = 1 if 1 == $I->TieBreakerFallBackPrecedence();
-  $hasprecedence = 1 if lc($method2) eq 'precedence';
-  unless ($hasprecedence) {
-    croak
-"TieBreakerFallBackPrecedence must be enabled or one of the specified methods must be precedence to use UntieActive";
-  }
-  my @ordered = ();
-  my $first   = $I->$method1()->HashByRank();
-  for my $level ( sort { $a <=> $b } ( keys %{$first} ) ) {
-    my @l = @{ $first->{$level} };
-    my @suborder =
-      ( 1 == @{ $first->{$level} } )
-      ? @{ $first->{$level} }
-      : $I->UnTieList( $method2, @l );
-    push @ordered, @suborder;
-  }
-  return Vote::Count::RankCount->newFromList( @ordered );
+sub UnTieActive ( $I, %ARGS ) {
+  $ARGS{'tied'} = [ $I->GetActiveList() ];
+  $I->UnTieList( %ARGS );
 }
 
 1;

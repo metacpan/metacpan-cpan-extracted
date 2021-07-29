@@ -3,7 +3,7 @@ package Beekeeper::Service::Sinkhole::Worker;
 use strict;
 use warnings;
 
-our $VERSION = '0.07';
+our $VERSION = '0.09';
 
 use Beekeeper::Worker ':log';
 use base 'Beekeeper::Worker';
@@ -38,13 +38,27 @@ sub on_startup {
     # Watch the Supervisor data traffic in order to stop rejecting
     # requests as soon as a worker handling these becomes online
 
+    my $topic = "msg/$local_bus/_sync/workers/set";
+
     $self->{_BUS}->subscribe(
-        topic      => "msg/$local_bus/_sync/workers/set",
+        topic      => $topic,
         on_publish => sub {
             my ($payload_ref, $properties) = @_;
             $self->on_worker_status( decode_json($$payload_ref)->[1] );
+        },
+        on_suback => sub {
+            my ($success) = @_;
+            log_error "Could not subscribe to topic '$topic'" unless $success;
         }
     );
+
+    log_info "Ready";
+}
+
+sub on_shutdown {
+    my $self = shift;
+
+    log_info "Stopped";
 }
 
 sub log_handler {
@@ -127,7 +141,7 @@ Beekeeper::Service::Sinkhole::Worker - Handle unserviced call topics
 
 =head1 VERSION
  
-Version 0.07
+Version 0.09
 
 =head1 DESCRIPTION
 
@@ -160,9 +174,7 @@ to a pool these must be declared into config file C<pool.config.json>:
       },
   ]
 
-=head1 METHODS
-
-This worker class does not expose public methods.
+This worker class does not expose public RPC methods.
 
 =head1 AUTHOR
 

@@ -1,42 +1,89 @@
-use 5.006;
 use strict;
-use ExtUtils::MakeMaker ();
+use warnings;
+use 5.006;
 
-WriteMakefile(
-	NAME             => 'Test::NoWarnings',
-	ABSTRACT         => "Make sure you didn't emit any warnings while testing",
-	VERSION_FROM     => 'lib/Test/NoWarnings.pm',
-	AUTHOR           => 'Fergal Daly <fergal@esatclear.ie>',
-	LICENSE          => 'lgpl',
-	MIN_PERL_VERSION => '5.006',
-	BUILD_REQUIRES   => {
-		'Test::More'    => '0.47',
-		'Test::Tester'  => '0.107',
-	},
-	PREREQ_PM => {
-		'Test::Builder' => '0.86',
-	},
-	META_MERGE => {
-		resources => {
-			repository => 'http://svn.ali.as/cpan/trunk/Test-NoWarnings',
-		},
-	},
+my %META = (
+  name => 'Test-NoWarnings',
+  license => 'lgpl_2_1',
+  prereqs => {
+    configure => { requires => {
+      'ExtUtils::MakeMaker' => 0,
+    } },
+    test => {
+      requires => {
+        'Test::More'    => '0.47',
+        'Test::Tester'  => '0.107',
+      },
+    },
+    runtime => {
+      requires => {
+        'perl'          => '5.006',
+        'Test::Builder' => '0.86',
+      },
+    },
+  },
+  resources => {
+    repository => {
+      url => 'https://github.com/haarg/Test-NoWarnings.git',
+      web => 'https://github.com/haarg/Test-NoWarnings',
+      type => 'git',
+    },
+    bugtracker => {
+      web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Test-NoWarnings',
+      mailto => 'bug-Test-NoWarnings@rt.cpan.org',
+    },
+    license => [ 'https://www.gnu.org/licenses/lgpl-2.1.html' ],
+  },
+  no_index => {
+    directory => [ 't', 'xt' ]
+  },
+  x_authority => 'cpan:HAARG',
 );
 
-# Written by Alexandr Ciornii, version 0.20. Added by eumm-upgrade.
-# Modified by ADAMK to make it look a little cleaner.
-sub WriteMakefile {
-	my %params = @_;
-	my $eumm_version = eval $ExtUtils::MakeMaker::VERSION;
-	die "License not specified" unless exists $params{LICENSE};
-	if ( $params{BUILD_REQUIRES} and $eumm_version < 6.5503 ) {
-		#EUMM 6.5502 has problems with BUILD_REQUIRES
-		$params{PREREQ_PM}={ %{$params{PREREQ_PM} || {}} , %{$params{BUILD_REQUIRES}} };
-		delete $params{BUILD_REQUIRES};
-	}
-	delete $params{MIN_PERL_VERSION} if $eumm_version < 6.48;
-	delete $params{META_MERGE}       if $eumm_version < 6.46;
-	delete $params{LICENSE}          if $eumm_version < 6.31;
+my %MM_ARGS = ();
 
-	ExtUtils::MakeMaker::WriteMakefile(%params);
+## BOILERPLATE ###############################################################
+require ExtUtils::MakeMaker;
+(do './maint/Makefile.PL.include' or die $@) unless -f 'META.yml';
+
+# have to do this since old EUMM dev releases miss the eval $VERSION line
+my $eumm_version  = eval $ExtUtils::MakeMaker::VERSION;
+my $mymeta        = $eumm_version >= 6.57_02;
+my $mymeta_broken = $mymeta && $eumm_version < 6.57_07;
+
+($MM_ARGS{NAME} = $META{name}) =~ s/-/::/g;
+($MM_ARGS{VERSION_FROM} = "lib/$MM_ARGS{NAME}.pm") =~ s{::}{/}g;
+$META{license} = [ $META{license} ]
+  if $META{license} && !ref $META{license};
+$MM_ARGS{LICENSE} = $META{license}[0]
+  if $META{license} && $eumm_version >= 6.30;
+$MM_ARGS{NO_MYMETA} = 1
+  if $mymeta_broken;
+$MM_ARGS{META_ADD} = { 'meta-spec' => { version => 2 }, %META }
+  unless -f 'META.yml';
+$MM_ARGS{PL_FILES} ||= {};
+$MM_ARGS{NORECURS} = 1
+  if not exists $MM_ARGS{NORECURS};
+
+for (qw(configure build test runtime)) {
+  my $key = $_ eq 'runtime' ? 'PREREQ_PM' : uc $_.'_REQUIRES';
+  my $r = $MM_ARGS{$key} = {
+    %{$META{prereqs}{$_}{requires} || {}},
+    %{delete $MM_ARGS{$key} || {}},
+  };
+  defined $r->{$_} or delete $r->{$_} for keys %$r;
 }
+
+$MM_ARGS{MIN_PERL_VERSION} = delete $MM_ARGS{PREREQ_PM}{perl} || 0;
+
+delete $MM_ARGS{MIN_PERL_VERSION}
+  if $eumm_version < 6.47_01;
+$MM_ARGS{BUILD_REQUIRES} = {%{$MM_ARGS{BUILD_REQUIRES}}, %{delete $MM_ARGS{TEST_REQUIRES}}}
+  if $eumm_version < 6.63_03;
+$MM_ARGS{PREREQ_PM} = {%{$MM_ARGS{PREREQ_PM}}, %{delete $MM_ARGS{BUILD_REQUIRES}}}
+  if $eumm_version < 6.55_01;
+delete $MM_ARGS{CONFIGURE_REQUIRES}
+  if $eumm_version < 6.51_03;
+
+ExtUtils::MakeMaker::WriteMakefile(%MM_ARGS);
+## END BOILERPLATE ###########################################################

@@ -17,7 +17,7 @@ use HTTP::Cookies::Netscape;
 use User;
 
 our
-$VERSION = 1.416;
+$VERSION = 1.417;
 
 =head1 NAME
 
@@ -66,11 +66,13 @@ use constant DEBUG_GET => 0;
 # We use global variables so that the callback function can see them:
 use vars qw( $sUser $sHostGlobal $oReal );
 
-my @asError;
+our @asError;
 
 sub _add_error
   {
-  push @asError, shift;
+  my $sMsg = shift || '';
+  # print STDERR " DDD   add error ==$sMsg==\n";
+  push @asError, $sMsg;
   } # _add_error
 
 sub new
@@ -85,8 +87,10 @@ sub new
       # Massage the hostname in an attempt to make it match MS' highlevel
       # naming scheme:
       my $sHost = $sHostGlobal;
+      print STDERR " DDD raw    sHost is $sHost\n" if DEBUG_NEW;
       $sHost =~ s!\.(com|edu|gov|net|org)\Z!!;  # delete USA domain
       $sHost =~ s!\.[a-z][a-z]\.[a-z][a-z]\Z!!;  # delete intl domain
+      print STDERR " DDD cooked sHost is $sHost\n" if DEBUG_NEW;
       # We only look at cookies for the logged-in user:
       $sUser = lc User->Login;
       print STDERR " + Finding cookies for user $sUser with host matching ($sHost)...\n" if DEBUG_NEW;
@@ -106,13 +110,14 @@ sub new
         _add_error qq{ EEE can not load module Win32::TieRegistry: $@\n};
         last WIN32_MSIE;
         } # if
+      print STDERR " DDD check registry...\n" if DEBUG_NEW;
       $sDir = $hsRegistry{"CUser/Software/Microsoft/Windows/CurrentVersion/Explorer/Shell Folders/Cookies"} || '';
-      if ($sDir eq '')
+      if ( ! defined($sDir) || ($sDir eq ''))
         {
         _add_error qq{ EEE can not find registry entry for MSIE cookies\n};
         last WIN32_MSIE;
         } # if
-      unless (-d $sDir)
+      if ( ! -d $sDir)
         {
         ; _add_error qq{ EEE registry entry for MSIE cookies is $sDir but that directory does not exist.\n}
         ; last WIN32_MSIE
@@ -126,6 +131,10 @@ sub new
           _get_cookies($sFnameCookies, 'HTTP::Cookies::Microsoft');
           last WIN32_MSIE;
           } # if
+        else
+          {
+          print STDERR " WWW cookie file $sFnameCookies does not exist\n" if DEBUG_NEW;
+          }
         } # foreach
       } # end of WIN32_MSIE block
     # At this point, $oReal contains MSIE cookies (or undef).
@@ -308,7 +317,7 @@ sub _get_cookies
                  : ($sClass =~ m!Mozilla!)   ? \&_callback_mozilla
                  :                             \&_callback_mozilla;
   # Our return value is an object of type HTTP::Cookies.
-  print STDERR " + _get_cookies($sFnameCookies,$sClass)\n" if DEBUG_GET;
+  print STDERR " DDD _get_cookies($sFnameCookies,$sClass)\n" if DEBUG_GET;
   if (! -f $sFnameCookies)
     {
     _add_error qq{ EEE cookies file $sFnameCookies does not exist\n};
@@ -319,7 +328,7 @@ sub _get_cookies
   my $oRealNS = $sClass->new;
   unless (ref $oRealNS)
     {
-    _add_error qq{ EEE can not create an empty $sClass object.\n};
+    _add_error qq{ EEE failed to create an empty $sClass object.\n};
     return undef;
     } # unless
   print STDERR " +   created oRealNS ==$oRealNS==...\n" if DEBUG_GET;
@@ -340,7 +349,6 @@ sub _get_cookies
   print STDERR " +   return oReal ==$oReal==...\n" if DEBUG_GET;
   return $oReal;
   } # _get_cookies
-
 
 sub _callback_msie
   {

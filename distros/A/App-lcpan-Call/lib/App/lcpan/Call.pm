@@ -1,7 +1,9 @@
 package App::lcpan::Call;
 
-our $DATE = '2016-10-09'; # DATE
-our $VERSION = '0.11'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-07-21'; # DATE
+our $DIST = 'App-lcpan-Call'; # DIST
+our $VERSION = '0.120'; # VERSION
 
 use 5.010001;
 use strict;
@@ -57,6 +59,16 @@ sub call_lcpan_script {
 $SPEC{check_lcpan} = {
     v => 1.1,
     summary => "Check that local CPAN mirror exists and is fairly recent",
+    description => <<'_',
+
+Will return status 200 if `lcpan` script is installed (available from PATH),
+local CPAN mirror exists, and is fairly recent and queryable. This routine will
+actually attempt to run "lcpan stats-last-index-time" and return the result if
+the result is 200 *and* the index is updated quite recently. By default "quite
+recently" is defined as not older than 2 weeks or whatever LCPAN_MAX_AGE says
+(in seconds).
+
+_
     args => {
         %common_args,
     },
@@ -89,7 +101,7 @@ sub check_lcpan {
 }
 
 1;
-# ABSTRACT: "Call" lcpan script
+# ABSTRACT: Check that local CPAN mirror exists and is fairly recent
 
 __END__
 
@@ -99,16 +111,20 @@ __END__
 
 =head1 NAME
 
-App::lcpan::Call - "Call" lcpan script
+App::lcpan::Call - Check that local CPAN mirror exists and is fairly recent
 
 =head1 VERSION
 
-This document describes version 0.11 of App::lcpan::Call (from Perl distribution App-lcpan-Call), released on 2016-10-09.
+This document describes version 0.120 of App::lcpan::Call (from Perl distribution App-lcpan-Call), released on 2021-07-21.
 
 =head1 FUNCTIONS
 
 
-=head2 call_lcpan_script(%args) -> [status, msg, result, meta]
+=head2 call_lcpan_script
+
+Usage:
+
+ call_lcpan_script(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 "Call" lcpan script.
 
@@ -127,23 +143,36 @@ Maximum index age (in seconds).
 If unspecified, will look at C<LCPAN_MAX_AGE> environment variable. If that is
 also undefined, will default to 14 days.
 
+
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
 
-=head2 check_lcpan(%args) -> [status, msg, result, meta]
+
+=head2 check_lcpan
+
+Usage:
+
+ check_lcpan(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Check that local CPAN mirror exists and is fairly recent.
+
+Will return status 200 if C<lcpan> script is installed (available from PATH),
+local CPAN mirror exists, and is fairly recent and queryable. This routine will
+actually attempt to run "lcpan stats-last-index-time" and return the result if
+the result is 200 I<and> the index is updated quite recently. By default "quite
+recently" is defined as not older than 2 weeks or whatever LCPAN_MAX_AGE says
+(in seconds).
 
 This function is not exported by default, but exportable.
 
@@ -158,16 +187,17 @@ Maximum index age (in seconds).
 If unspecified, will look at C<LCPAN_MAX_AGE> environment variable. If that is
 also undefined, will default to 14 days.
 
+
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -199,7 +229,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

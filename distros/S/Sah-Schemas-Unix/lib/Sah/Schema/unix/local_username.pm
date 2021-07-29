@@ -1,9 +1,9 @@
 package Sah::Schema::unix::local_username;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-10-16'; # DATE
+our $DATE = '2021-07-22'; # DATE
 our $DIST = 'Sah-Schemas-Unix'; # DIST
-our $VERSION = '0.013'; # VERSION
+our $VERSION = '0.017'; # VERSION
 
 our $schema = ['unix::username' => {
     summary => 'Unix user name that must exist on the system',
@@ -13,7 +13,7 @@ Support coercion from UID.
 
 _
     'prefilters' => ['Unix::convert_uid_to_unix_user', 'Unix::check_unix_user_exists'],
-}, {}];
+}];
 
 1;
 # ABSTRACT: Unix user name that must exist on the system
@@ -30,7 +30,7 @@ Sah::Schema::unix::local_username - Unix user name that must exist on the system
 
 =head1 VERSION
 
-This document describes version 0.013 of Sah::Schema::unix::local_username (from Perl distribution Sah-Schemas-Unix), released on 2020-10-16.
+This document describes version 0.017 of Sah::Schema::unix::local_username (from Perl distribution Sah-Schemas-Unix), released on 2021-07-22.
 
 =head1 SYNOPSIS
 
@@ -60,7 +60,8 @@ To specify schema in L<Rinci> function metadata and use the metadata with
 L<Perinci::CmdLine> to create a CLI:
 
  # in lib/MyApp.pm
- package MyApp;
+ package
+   MyApp;
  our %SPEC;
  $SPEC{myfunc} = {
      v => 1.1,
@@ -80,7 +81,8 @@ L<Perinci::CmdLine> to create a CLI:
  1;
 
  # in myapp.pl
- package main;
+ package
+   main;
  use Perinci::CmdLine::Any;
  Perinci::CmdLine::Any->new(url=>'MyApp::myfunc')->run;
 
@@ -119,7 +121,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

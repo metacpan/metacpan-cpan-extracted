@@ -13,62 +13,48 @@ use Lemonldap::NG::Common::Apache::Session;
 use Lemonldap::NG::Common::Session;
 use Config::IniFiles;
 use strict;
-use Getopt::Std;
-$Getopt::Std::STANDARD_HELP_VERSION = 1;
+use Getopt::Long;
+use Pod::Usage;
 
-our $VERSION = "2.0.6";
+our $VERSION = "2.0.12";
 
 # Options
 # -d: debug mode
 # -c: configuration file
+# -r: rename attributes
 # -i: ignore errors
-my $opts = {};
-getopts( 'dic:', $opts );
+# -x: exclude attributes
 
-my $debug         = $opts->{d};
-my $config_file   = $opts->{c};
-my $ignore_errors = $opts->{i};
-my $nb_converted  = 0;
-my $nb_error      = 0;
+my $debug;
+my $config_file;
+my $ignore_errors;
+my %rename;
+my @exclude;
+my $help;
+my $nb_converted = 0;
+my $nb_error     = 0;
 
-sub HELP_MESSAGE {
-    my $OUT = shift;
-    print $OUT <<END_MESSAGE;
-
-	$0 [-di] -c config_file.ini
-
-	-d	Debug mode
-	-i	Ignore errors
-
-This script converts sessions in between the two backends specified in the configuration file
-The configuration file must contain the following (adjust to your environment):
-
-[sessions_from]
-storageModule = Apache::Session::File
-storageModuleOptions = {	\\
-      'Directory' => '/var/lib/lemonldap-ng/sessions', 	\\
-      'LockDirectory' => '/var/lib/lemonldap-ng/sessions/lock', \\
-}
-# Only convert some session types
-# sessionKind = Persistent, SSO
-
-[sessions_to]
-storageModule = Apache::Session::Browseable::Postgres
-storageModuleOptions = {	\\
-	'DataSource' => 'DBI:Pg:database=lemonldapdb;host=pg.example.com', \\
-	'UserName' => 'lemonldaplogin', \\
-	'Password' => 'lemonldappw', \\
-	'Commit' => 1, \\
-	'Index' => 'ipAddr _whatToTrace user', \\
-	'TableName' => 'sessions', \\
-}
-
-END_MESSAGE
-}
+GetOptions(
+    'help|?'          => \$help,
+    'debug|d'         => \$debug,
+    'config|c=s'      => \$config_file,
+    'ignore-errors|i' => \$ignore_errors,
+    'rename|r=s'      => \%rename,
+    'exclude|x=s'     => \@exclude,
+) or pod2usage(2);
+pod2usage(
+    -exitval  => 1,
+    -verbose  => 99,
+    -sections => "SYNOPSIS|OPTIONS|CONFIGURATION FILE FORMAT"
+) if $help;
 
 unless ($config_file) {
-    HELP_MESSAGE( \*STDERR );
-    die "You must provide the -c option";
+    pod2usage(
+        -exitval  => 2,
+        -verbose  => 99,
+        -message  => "You must provide the -c option\n",
+        -sections => "SYNOPSIS|OPTIONS|CONFIGURATION FILE FORMAT"
+    );
 }
 
 my $inicfg =
@@ -91,8 +77,7 @@ for my $section (qw/sessions_from sessions_to/) {
         if ( $r->{$_} =~ /^[{\[].*[}\]]$/ || $r->{$_} =~ /^sub\s*{.*}$/ ) {
             eval "\$r->{$_} = $r->{$_}";
             if ($@) {
-                print $@;
-                return $r;
+                die "Error evaluating $section/$_: $@";
             }
         }
     }
@@ -129,6 +114,38 @@ Lemonldap::NG::Common::Apache::Session->get_key_from_all_sessions(
         my $entry = shift;
         my $id    = shift;
 
+        # If filtering sessionKind
+        if (@sessionKindOnly) {
+
+            unless ( grep { $_ eq $entry->{_session_kind} } @sessionKindOnly ) {
+                print "Ignoring session $id with type "
+                  . $entry->{_session_kind} . "\n"
+                  if $debug;
+                return undef;
+            }
+        }
+
+        if (%rename) {
+            for my $oldkey ( keys %rename ) {
+                my $newkey = $rename{$oldkey};
+                if ( $newkey and $entry->{$oldkey} ) {
+                    print "Renaming $oldkey to $newkey in session $id\n"
+                      if $debug;
+                    $entry->{$newkey} = delete $entry->{$oldkey};
+                }
+            }
+        }
+
+        if (@exclude) {
+            for my $excludekey (@exclude) {
+                if ( $entry->{$excludekey} ) {
+                    print "Exclude $excludekey in session $id\n"
+                      if $debug;
+                    delete $entry->{$excludekey};
+                }
+            }
+        }
+
         print "Processing session $id\n" if $debug;
         my $s = Lemonldap::NG::Common::Session->new( {
                 storageModule        => $backendTo->{backend},
@@ -138,14 +155,6 @@ Lemonldap::NG::Common::Apache::Session->get_key_from_all_sessions(
                 force                => 1,
             }
         );
-
-        # If filtering sessionKind
-        if (@sessionKindOnly) {
-
-            unless ( grep { $_ eq $entry->{_session_kind} } @sessionKindOnly ) {
-                return undef;
-            }
-        }
 
         if ( $s->error ) {
             die "Error encountered on session $id" unless $ignore_errors;
@@ -176,7 +185,7 @@ convertSessions - A tool to convert Lemonldap::NG sessions between storage backe
 
 =head1 SYNOPSIS
 
-  convertSession [-di] -c parameters.ini
+  convertSession [-di] [-r oldkey=newkey ] -c parameters.ini
 
 
 =head1 DESCRIPTION
@@ -192,6 +201,29 @@ destination backend will be kept, unless they have the same session ID as a
 session in the source backend. In that case, the source will overwrite the
 destination.
 
+=head1 OPTIONS
+
+=over
+
+=item B<--config>,B<-c>
+
+Specify configuration file
+
+=item B<--debug>,B<-d>
+
+Turns on debugging information
+
+=item B<--ignore-errors>,B<-i>
+
+Skip to the next session if converting a session fails
+
+=item B<--rename oldkey=newkey>,B<-r oldkey=newkey>
+
+Rename key names when migrating from one backend to the next.
+
+This option can be specified multiple times
+
+=back
 
 =head1 CONFIGURATION FILE FORMAT
 

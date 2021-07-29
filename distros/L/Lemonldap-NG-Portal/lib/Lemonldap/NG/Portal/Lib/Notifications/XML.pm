@@ -6,7 +6,7 @@ use XML::LibXML;
 use XML::LibXSLT;
 use POSIX qw(strftime);
 
-our $VERSION = '2.0.9';
+our $VERSION = '2.0.12';
 
 # Lemonldap::NG::Portal::Main::Plugin provides addAuthRoute() and
 # addUnauthRoute() methods in addition of Lemonldap::NG::Common::Module.
@@ -52,7 +52,7 @@ has server   => ( is => 'rw' );
 # INITIALIZATION
 
 sub init {
-    1;
+    return 1;
 }
 
 # Search for notifications and if any, returns HTML fragment.

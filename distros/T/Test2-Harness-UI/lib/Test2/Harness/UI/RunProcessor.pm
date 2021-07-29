@@ -2,7 +2,7 @@ package Test2::Harness::UI::RunProcessor;
 use strict;
 use warnings;
 
-our $VERSION = '0.000068';
+our $VERSION = '0.000075';
 
 use DateTime;
 use Data::GUID;
@@ -10,6 +10,7 @@ use Time::HiRes qw/time/;
 use List::Util qw/first min max/;
 use Data::Dumper qw/Dumper/;
 
+use Clone qw/clone/;
 use Carp qw/croak confess/;
 
 use Test2::Util::Facets2Legacy qw/causes_fail/;
@@ -356,7 +357,8 @@ sub process_event {
     my $self = shift;
     my ($event, $f, %params) = @_;
 
-    $f //= $event->{facet_data} // {};
+    $f //= $event->{facet_data};
+    $f = $f ? clone($f) : {};
 
     $self->start unless $self->{+RUNNING};
 
@@ -437,8 +439,6 @@ sub _process_event {
     my ($event, $f, %params) = @_;
     my $job = $params{job};
 
-    clean($f);
-    my $fjson = encode_json($f);
 
     my $harness = $f->{harness} // {};
     my $trace   = $f->{trace}   // {};
@@ -458,9 +458,12 @@ sub _process_event {
 
     my $is_time = $f->{harness_job_end} ? ($f->{harness_job_end}->{times} ? 1 : 0) : 0;
 
+    my $is_subtest = $f->{parent} ? 1 : 0;
+
     my $e = {
         event_id   => $e_id,
         nested     => $nested,
+        is_subtest => $is_subtest,
         is_diag    => $is_diag,
         is_harness => $is_harness,
         is_time    => $is_time,
@@ -477,7 +480,13 @@ sub _process_event {
     }
 
     if ($orphan) {
-        $e->{orphan}      = $fjson;
+        clean($f);
+
+        if ($f->{parent} && $f->{parent}->{children}) {
+            $f->{parent}->{children} = "Removed";
+        }
+
+        $e->{orphan}      = encode_json($f);
         $e->{orphan_line} = $params{line} if $params{line};
     }
     else {
@@ -485,9 +494,6 @@ sub _process_event {
         if (my $coverage = $f->{coverage}) {
             $self->add_coverage($job->{result}->file, $coverage);
         }
-
-        $e->{facets}      = $fjson;
-        $e->{facets_line} = $params{line} if $params{line};
 
         if ($f->{parent} && $f->{parent}->{children}) {
             $self->process_event({}, $_, job => $job, parent_id => $e_id, line => $params{line}) for @{$f->{parent}->{children}};
@@ -504,6 +510,10 @@ sub _process_event {
 
             $self->update_other($job, $f) if $e->{is_harness};
         }
+
+        clean($f);
+        $e->{facets}      = encode_json($f);
+        $e->{facets_line} = $params{line} if $params{line};
     }
 
     return $e;

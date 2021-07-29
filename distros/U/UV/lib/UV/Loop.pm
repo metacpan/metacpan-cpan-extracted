@@ -1,6 +1,6 @@
 package UV::Loop;
 
-our $VERSION = '1.909';
+our $VERSION = '2.000';
 
 use strict;
 use warnings;
@@ -330,7 +330,7 @@ C<AI_CANONNAME> flag was included in the request.
 
 =head2 getnameinfo
 
-    $req = $loop->getnameinfo($addr, $flags)
+    $req = $loop->getnameinfo($addr, $flags, $callback)
 
         $callback->($status, $hostname, $service)
 

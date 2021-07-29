@@ -1,5 +1,11 @@
 Revision History for Perl module Net::Songkick
 
+1.0.7 2021-07-17
+
+  - Fixed get_past_events() method
+  - Added tests
+  - Updated various URLs to https
+
 1.0.6 2021-01-15
 
   - Added bugtracker to metadata

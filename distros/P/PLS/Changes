@@ -62,3 +62,43 @@ Revision history for perl module PLS
    when it was appropriate to do so
  - Sigils now cause the completion pop-up to display. Before, you would also need to type the
    start of the variable name.
+
+0.89 2021-07-20
+
+ - Added syntax checking/linting one second after user stops typing.
+ - Fixed issue where the perl binary used was inconsistent.
+
+0.891 2021-07-22
+
+ - Syntax checking and linting now occurs in the background, which
+   should improve response times
+ - Syntax checking and linting is now single threaded, which fixes
+   a mysterious issue that prevents temporary files from being deleted.
+ - Linting now maps severity 1 issues to "information" level problems,
+   so that they are shown. Previously, they were considered "hints",
+   which are not shown by the VSCode GUI.
+ - Added some PLS::Parser::Document unit tests, and changes to code
+   to fix issues found by unit tests, mostly to improve completion.
+
+0.892 2021-07-22
+
+ - Syntax checking and linting are now separated so that they can
+   run in parallel, which should improve performance.
+ - Syntax checking now takes advantage of IO::Async::Process instead
+   of using IPC::Open3.
+
+0.893 2021-07-25
+
+ - Linting now runs single threaded, which prevents multiple runs of
+   linting and syntax checking from returning out of order and
+   showing incorrect diagnostics.
+ - Syntax checking and linting now create a temporary file with the same
+   name as the file being checked, so that no workarounds are needed
+   to prevent perlcritic from falsely reporting RequireFilenameMatchesPackage
+   errors.
+
+0.894 2021-07-25
+
+ - Fix to previous version - no longer index files in temporary directories
+   that are hidden.
+ - Fix to previous version - add missing File::Path import.

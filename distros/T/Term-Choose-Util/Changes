@@ -1,6 +1,19 @@
 Revision history for Term::Choose::Util
 
 
+0.129   2021-07-28
+        - Refactored 'choose_directories' and 'choose_a_file'.
+        - Backward incompatible changes.
+
+0.128   2021-07-20
+        - Bugfix in 'choose_directories'.
+
+0.127   2021-07-14
+        - 'choose_a_directory': bugfix option 'decoded'.
+
+0.126   2021-07-11
+        - Term::Choose minimum version 1.734.
+
 0.125   2021-06-30
         - Update 'choose_a_subset'.
 

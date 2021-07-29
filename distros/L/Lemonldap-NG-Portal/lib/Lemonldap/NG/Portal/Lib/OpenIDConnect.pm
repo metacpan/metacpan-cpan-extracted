@@ -14,12 +14,15 @@ use Digest::SHA
 use JSON;
 use Lemonldap::NG::Common::FormEncode;
 use Lemonldap::NG::Common::UserAgent;
-use MIME::Base64 qw/encode_base64 decode_base64/;
+use Lemonldap::NG::Common::JWT
+  qw(getAccessTokenSessionId getJWTPayload getJWTHeader getJWTSignature getJWTSignedData);
+use MIME::Base64
+  qw/encode_base64 decode_base64 encode_base64url decode_base64url/;
 use Mouse;
 
 use Lemonldap::NG::Portal::Main::Constants qw(PE_OK PE_REDIRECT);
 
-our $VERSION = '2.0.11';
+our $VERSION = '2.0.12';
 
 # OpenID Connect standard claims
 use constant PROFILE => [
@@ -31,6 +34,8 @@ use constant ADDRESS =>
   [qw/formatted street_address locality region postal_code country/];
 use constant PHONE => [qw/phone_number phone_number_verified/];
 
+use constant OIDC_SCOPES => [qw/openid profile email address phone/];
+
 # PROPERTIES
 
 has oidcOPList   => ( is => 'rw', default => sub { {} }, );
@@ -38,6 +43,7 @@ has oidcRPList   => ( is => 'rw', default => sub { {} }, );
 has rpAttributes => ( is => 'rw', default => sub { {} }, );
 has spRules      => ( is => 'rw', default => sub { {} } );
 has spMacros     => ( is => 'rw', default => sub { {} } );
+has spScopeRules => ( is => 'rw', default => sub { {} } );
 
 # return LWP::UserAgent object
 has ua => (
@@ -101,8 +107,11 @@ sub loadRPs {
             "No OpenID Connect Relying Party found in configuration");
         return 1;
     }
-    $self->oidcRPList( $self->conf->{oidcRPMetaDataOptions} );
-    foreach my $rp ( keys %{ $self->oidcRPList } ) {
+
+    foreach my $rp ( keys %{ $self->conf->{oidcRPMetaDataOptions} || {} } ) {
+        my $valid = 1;
+
+        # Handle attributes
         my $attributes = {
             profile => PROFILE,
             email   => EMAIL,
@@ -121,33 +130,69 @@ sub loadRPs {
                 $attributes->{$claim} = \@extraAttributes;
             }
         }
-        $self->rpAttributes->{$rp} = $attributes;
 
-        my $rule = $self->oidcRPList->{$rp}->{oidcRPMetaDataOptionsRule};
+        # Access rule
+        my $rule = $self->conf->{oidcRPMetaDataOptions}->{$rp}
+          ->{oidcRPMetaDataOptionsRule};
         if ( length $rule ) {
             $rule = $self->p->HANDLER->substitute($rule);
             unless ( $rule = $self->p->HANDLER->buildSub($rule) ) {
-                $self->error( 'OIDC RP rule error: '
+                $self->logger->error( "Unable to build access rule for RP $rp: "
                       . $self->p->HANDLER->tsv->{jail}->error );
-                return 0;
+                $valid = 0;
             }
-            $self->spRules->{$rp} = $rule;
         }
 
         # Load per-RP macros
-        my $macros = $self->conf->{oidcRPMetaDataMacros}->{$rp};
+        my $macros         = $self->conf->{oidcRPMetaDataMacros}->{$rp};
+        my $compiledMacros = {};
         for my $macroAttr ( keys %{$macros} ) {
             my $macroRule = $macros->{$macroAttr};
             if ( length $macroRule ) {
                 $macroRule = $self->p->HANDLER->substitute($macroRule);
-                unless ( $macroRule = $self->p->HANDLER->buildSub($macroRule) )
-                {
-                    $self->error( 'OIDC RP macro error: '
-                          . $self->p->HANDLER->tsv->{jail}->error );
-                    return 0;
+                if ( $macroRule = $self->p->HANDLER->buildSub($macroRule) ) {
+                    $compiledMacros->{$macroAttr} = $macroRule;
                 }
-                $self->spMacros->{$rp}->{$macroAttr} = $macroRule;
+                else {
+                    $self->logger->error(
+                        "Unable to build macro $macroAttr for RP $rp:"
+                          . $self->p->HANDLER->tsv->{jail}->error );
+                    $valid = 0;
+                }
             }
+        }
+
+        # Load per-RP dynamic scopes
+        my $scopes         = $self->conf->{oidcRPMetaDataScopeRules}->{$rp};
+        my $compiledScopes = {};
+        for my $scopeName ( keys %{$scopes} ) {
+            my $scopeRule = $scopes->{$scopeName};
+            if ( length $scopeRule ) {
+                $scopeRule = $self->p->HANDLER->substitute($scopeRule);
+                if ( $scopeRule = $self->p->HANDLER->buildSub($scopeRule) ) {
+                    $compiledScopes->{$scopeName} = $scopeRule;
+                }
+                else {
+                    $self->logger->error(
+                        "Unable to build scope $scopeName for RP $rp:"
+                          . $self->p->HANDLER->tsv->{jail}->error );
+                    $valid = 0;
+                }
+            }
+        }
+        if ($valid) {
+
+            # Register RP
+            $self->oidcRPList->{$rp} =
+              $self->conf->{oidcRPMetaDataOptions}->{$rp};
+            $self->rpAttributes->{$rp} = $attributes;
+            $self->spMacros->{$rp}     = $compiledMacros;
+            $self->spScopeRules->{$rp} = $compiledScopes;
+            $self->spRules->{$rp}      = $rule;
+        }
+        else {
+            $self->logger->error(
+                "Relaying Party $rp has errors and will be ignored");
         }
     }
     return 1;
@@ -342,7 +387,7 @@ sub buildAuthorizationCodeAuthnResponse {
 # return String Authentication Response URI
 sub buildImplicitAuthnResponse {
     my ( $self, $redirect_uri, $access_token, $id_token, $expires_in,
-        $state, $session_state )
+        $state, $session_state, $scope )
       = @_;
 
     my $response_url = "$redirect_uri#"
@@ -355,6 +400,7 @@ sub buildImplicitAuthnResponse {
         ),
         ( $expires_in    ? ( expires_in    => $expires_in )    : () ),
         ( $state         ? ( state         => $state )         : () ),
+        ( $scope         ? ( scope         => $scope )         : () ),
         ( $session_state ? ( session_state => $session_state ) : () )
       );
     return $response_url;
@@ -371,8 +417,8 @@ sub buildImplicitAuthnResponse {
 # return String Authentication Response URI
 sub buildHybridAuthnResponse {
     my (
-        $self,     $redirect_uri, $code,  $access_token,
-        $id_token, $expires_in,   $state, $session_state
+        $self,       $redirect_uri, $code,          $access_token, $id_token,
+        $expires_in, $state,        $session_state, $scope
     ) = @_;
 
     my $response_url = "$redirect_uri#"
@@ -389,6 +435,7 @@ sub buildHybridAuthnResponse {
         ),
         ( $expires_in    ? ( expires_in    => $expires_in )    : () ),
         ( $state         ? ( state         => $state )         : () ),
+        ( $scope         ? ( scope         => $scope )         : () ),
         ( $session_state ? ( session_state => $session_state ) : () )
       );
     return $response_url;
@@ -623,29 +670,42 @@ sub getUserInfo {
         return 0;
     }
 
+    my $userinfo_content = $response->decoded_content;
+
+    $self->logger->debug("UserInfo received: $userinfo_content");
+
     my $content_type = $response->header('Content-Type');
     if ( $content_type =~ /json/ ) {
-        return $response->decoded_content;
+        return $self->decodeUserInfo($userinfo_content);
     }
     elsif ( $content_type =~ /jwt/ ) {
-        my $jwt = $response->decoded_content;
-        return unless $self->verifyJWTSignature( $op, $jwt );
-        my $jwt_parts = $self->extractJWT($jwt);
-        return $jwt_parts->[1];
+        return unless $self->verifyJWTSignature( $userinfo_content, $op );
+        return getJWTPayload($userinfo_content);
     }
 }
 
 # Convert JSON to HashRef
 # @return HashRef JSON decoded content
-# TODO: remove this
 sub decodeJSON {
     my ( $self, $json ) = @_;
     my $json_hash;
 
     eval { $json_hash = from_json( $json, { allow_nonref => 1 } ); };
-    $json_hash->{error} = "parse_error" if ($@);
+    return undef if ($@);
 
     return $json_hash;
+}
+
+sub decodeTokenResponse {
+    return decodeJSON(@_);
+}
+
+sub decodeClientMetadata {
+    return decodeJSON(@_);
+}
+
+sub decodeUserInfo {
+    return decodeJSON(@_);
 }
 
 # Create a new Authorization Code
@@ -677,30 +737,141 @@ sub getAuthorizationCode {
 }
 
 # Create a new Access Token
-# @param info hashref of session info
+# @param req current request
+# @param scope access token scope
+# @param rp configuration key of the RP this token is being made for
+# @param sessionInfo. Hashref of session info OR session ID for lazy fetching
+# @param info hashref of access token session info (offline vs online)
 # @return new Lemonldap::NG::Common::Session object
 
 sub newAccessToken {
-    my ( $self, $rp, $info ) = @_;
+    my ( $self, $req, $rp, $scope, $sessionInfo, $info ) = @_;
 
-    return $self->getOpenIDConnectSession(
+    my $at_info = {
+
+        scope => $scope,
+        rp    => $rp,
+        %{$info},
+    };
+
+    my $session = $self->getOpenIDConnectSession(
         undef,
         "access_token",
         $self->conf->{oidcRPMetaDataOptions}->{$rp}
           ->{oidcRPMetaDataOptionsAccessTokenExpiration}
           || $self->conf->{oidcServiceAccessTokenExpiration},
-        $info
+        $at_info,
     );
+
+    if ($session) {
+        if ( $self->_wantJWT($rp) ) {
+            my $at_jwt =
+              $self->makeJWT( $req, $rp, $scope, $session->id, $sessionInfo );
+            $at_info->{sha256_hash} = $self->createHash( $at_jwt, 256 );
+            $self->updateToken( $session->id, $at_info );
+            return $at_jwt;
+        }
+        else {
+            return $session->id;
+        }
+    }
+    else {
+        return undef;
+    }
 }
 
-# Get existing Access Token
+sub _wantJWT {
+    my ( $self, $rp ) = @_;
+    return $self->conf->{oidcRPMetaDataOptions}->{$rp}
+      ->{oidcRPMetaDataOptionsAccessTokenJWT};
+}
+
+sub makeJWT {
+    my ( $self, $req, $rp, $scope, $id, $sessionInfo ) = @_;
+
+    my $exp =
+      $self->conf->{oidcRPMetaDataOptions}->{$rp}
+      ->{oidcRPMetaDataOptionsAccessTokenExpiration}
+      || $self->conf->{oidcServiceAccessTokenExpiration};
+    $exp += time;
+    my $client_id = $self->oidcRPList->{$rp}->{oidcRPMetaDataOptionsClientID};
+
+    my $access_token_payload = {
+        iss       => $self->iss,                  # Issuer Identifier
+        exp       => $exp,                        # expiration
+        aud       => $self->getAudiences($rp),    # Audience
+        client_id => $client_id,                  # Client ID
+        iat       => time,                        # Issued time
+        jti       => $id,                         # Access Token session ID
+        scope     => $scope,                      # Scope
+    };
+
+    my $claims;
+    if ( ref($sessionInfo) eq "HASH" ) {
+        $claims = $self->buildUserInfoResponseFromData( $req, $scope,
+            $rp, $sessionInfo );
+    }
+    else {
+        $claims =
+          $self->buildUserInfoResponseFromId( $req, $scope, $rp, $sessionInfo );
+    }
+
+    # Release claims, or only sub
+    if ( $self->conf->{oidcRPMetaDataOptions}->{$rp}
+        ->{oidcRPMetaDataOptionsAccessTokenClaims} )
+    {
+        foreach ( keys %$claims ) {
+            $access_token_payload->{$_} = $claims->{$_};
+        }
+    }
+    else {
+        $access_token_payload->{sub} = $claims->{sub};
+    }
+
+    # Call hook to let the user modify payload
+    my $h = $self->p->processHook( $req, 'oidcGenerateAccessToken',
+        $access_token_payload, $rp );
+    return undef if ( $h != PE_OK );
+
+    # Get signature algorithm
+    my $alg = $self->conf->{oidcRPMetaDataOptions}->{$rp}
+      ->{oidcRPMetaDataOptionsAccessTokenSignAlg} || "RS256";
+    $self->logger->debug("Access Token signature algorithm: $alg");
+
+    my $jwt = $self->createJWT( $access_token_payload, $alg, $rp, "at+JWT" );
+
+    return $jwt;
+}
+
+# Get an session from the supplied Access Token
 # @param id
 # @return new Lemonldap::NG::Common::Session object
-
 sub getAccessToken {
-    my ( $self, $id ) = @_;
+    my ( $self, $access_token ) = @_;
 
-    return $self->getOpenIDConnectSession( $id, "access_token" );
+    my $id = getAccessTokenSessionId($access_token);
+    return unless $id;
+
+    my $session = $self->getOpenIDConnectSession( $id, "access_token" );
+    return undef unless $session;
+
+    my $stored_hash = $session->{data}->{sha256_hash};
+    if ($stored_hash) {
+        my $incoming_hash = $self->createHash( $access_token, 256 );
+        if ( $stored_hash eq $incoming_hash ) {
+            return $session;
+        }
+        else {
+            $self->logger->error(
+                    "Incoming Access token hash $incoming_hash "
+                  . "does not match stored hash $stored_hash. "
+                  . "The access token might have been tampered with." );
+            return undef;
+        }
+    }
+    else {
+        return $session;
+    }
 }
 
 # Create a new Refresh Token
@@ -731,6 +902,11 @@ sub getRefreshToken {
 }
 
 sub updateRefreshToken {
+    my $self = shift;
+    return $self->updateToken($@);
+}
+
+sub updateToken {
     my ( $self, $id, $infos ) = @_;
 
     my %storage = (
@@ -904,16 +1080,6 @@ sub extractState {
     return 1;
 }
 
-# Extract parts of a JWT
-# @return arrayref JWT parts
-sub extractJWT {
-    my ( $self, $jwt ) = @_;
-
-    my @jwt_parts = split( /\./, $jwt );
-
-    return \@jwt_parts;
-}
-
 # Check signature of a JWT
 # @return boolean 1 if signature is verified, 0 else
 sub verifyJWTSignature {
@@ -922,24 +1088,21 @@ sub verifyJWTSignature {
     $self->logger->debug("Verification of JWT signature: $jwt");
 
     # Extract JWT parts
-    my $jwt_parts = $self->extractJWT($jwt);
-
-    # Read header
-    my $jwt_header_part = $jwt_parts->[0];
-    my $jwt_header_hash =
-      $self->decodeJSON( decode_base64url($jwt_header_part) );
+    my $jwt_header  = getJWTHeader($jwt);
+    my $signed_data = getJWTSignedData($jwt);
+    my $signature   = getJWTSignature($jwt);
 
     # Get signature algorithm
-    my $alg = $jwt_header_hash->{alg};
+    my $alg = $jwt_header->{alg};
 
     $self->logger->debug("JWT signature algorithm: $alg");
 
     if ( $alg eq "none" ) {
 
         # If none alg, signature should be empty
-        if ( $jwt_parts->[2] ) {
+        if ($signature) {
             $self->logger->debug( "Signature "
-                  . $jwt_parts->[2]
+                  . $signature
                   . " is present but algorithm is 'none'" );
             return 0;
         }
@@ -964,30 +1127,24 @@ sub verifyJWTSignature {
         my $digest;
 
         if ( $alg eq "HS256" ) {
-            $digest =
-              hmac_sha256_base64( $jwt_parts->[0] . "." . $jwt_parts->[1],
-                $client_secret );
+            $digest = hmac_sha256_base64( $signed_data, $client_secret );
         }
 
         if ( $alg eq "HS384" ) {
-            $digest =
-              hmac_sha384_base64( $jwt_parts->[0] . "." . $jwt_parts->[1],
-                $client_secret );
+            $digest = hmac_sha384_base64( $signed_data, $client_secret );
         }
 
         if ( $alg eq "HS512" ) {
-            $digest =
-              hmac_sha512_base64( $jwt_parts->[0] . "." . $jwt_parts->[1],
-                $client_secret );
+            $digest = hmac_sha512_base64( $signed_data, $client_secret );
         }
 
         # Convert + and / to get Base64 URL valid (RFC 4648)
         $digest =~ s/\+/-/g;
         $digest =~ s/\//_/g;
 
-        unless ( $digest eq $jwt_parts->[2] ) {
+        unless ( $digest eq $signature ) {
             $self->logger->debug(
-                "Digest $digest not equal to signature " . $jwt_parts->[2] );
+                "Digest $digest not equal to signature " . $signature );
             return 0;
         }
         return 1;
@@ -1011,7 +1168,7 @@ sub verifyJWTSignature {
         my $key_hash;
 
         # Find Key ID associated with signature
-        my $kid = $jwt_header_hash->{kid};
+        my $kid = $jwt_header->{kid};
 
         if ($kid) {
             $self->logger->debug("Search key with id $kid");
@@ -1058,10 +1215,8 @@ sub verifyJWTSignature {
             $public_key->use_sha512_hash;
         }
 
-        return $public_key->verify(
-            $jwt_parts->[0] . "." . $jwt_parts->[1],
-            decode_base64url( $jwt_parts->[2] )
-        );
+        return $public_key->verify( $signed_data,
+            decode_base64url($signature) );
     }
 
     # Other algorithms not managed
@@ -1082,16 +1237,10 @@ sub verifyHash {
 
     $self->logger->debug("Verification of value $value with hash $hash");
 
-    # Extract ID token parts
-    my $jwt_parts = $self->extractJWT($id_token);
-
-    # Read header
-    my $jwt_header_part = $jwt_parts->[0];
-    my $jwt_header_hash =
-      $self->decodeJSON( decode_base64url($jwt_header_part) );
+    my $jwt_header = getJWTHeader($id_token);
 
     # Get signature algorithm
-    my $alg = $jwt_header_hash->{alg};
+    my $alg = $jwt_header->{alg};
 
     $self->logger->debug("ID Token signature algorithm: $alg");
 
@@ -1183,6 +1332,20 @@ sub returnRedirectError {
 #sub returnJSONError {
 #my ( $self, $error ) = @_;
 #replace this by $self->p->sendError($req, $error,400);
+sub sendOIDCError {
+    my ( $self, $req, $err, $code, $description ) = @_;
+    $code ||= 500;
+
+    return $self->sendJSONresponse(
+        $req,
+        {
+            error => $err,
+            ( $description ? ( error_description => $description ) : () ),
+        },
+
+        code => $code
+    );
+}
 
 #sub returnJSON {
 #my ( $self, $content ) = @_;
@@ -1270,6 +1433,12 @@ sub getEndPointAuthenticationCredentials {
               split( /:/, decode_base64($1) );
         };
         $self->logger->error("Bad authentication header: $@") if ($@);
+
+        # Using multiple methods is an error
+        if ( $req->param('client_id') ) {
+            $self->logger->error("Multiple client authentication methods used");
+            ( $client_id, $client_secret ) = ( undef, undef );
+        }
     }
     elsif ( $req->param('client_id') and $req->param('client_secret') ) {
         $self->logger->debug("Method client_secret_post used");
@@ -1291,7 +1460,7 @@ sub getEndPointAccessToken {
     my $access_token;
 
     my $authorization = $req->authorization;
-    if ( $authorization and $authorization =~ /^Bearer (\w+)/i ) {
+    if ( $authorization and $authorization =~ /^Bearer ([\w\-\.]+)/i ) {
         $self->logger->debug("Bearer access token");
         $access_token = $1;
     }
@@ -1309,6 +1478,72 @@ sub getEndPointAccessToken {
 sub getAttributesListFromClaim {
     my ( $self, $rp, $claim ) = @_;
     return $self->rpAttributes->{$rp}->{$claim};
+}
+
+# Return granted scopes for this request
+# @param req current request
+# @param req selected RP
+# @param scope requested scope
+sub getScope {
+    my ( $self, $req, $rp, $scope ) = @_;
+
+    my @scope_values = split( /\s+/, $scope );
+
+    # Clean up unknown scopes
+    if ( $self->conf->{oidcServiceAllowOnlyDeclaredScopes} ) {
+        my @known_scopes = (
+            keys( %{ $self->spScopeRules->{$rp} || {} } ),
+            @{ OIDC_SCOPES() },
+            keys(
+                %{
+                    $self->conf->{oidcRPMetaDataOptionsExtraClaims}->{$rp} || {}
+                }
+            )
+        );
+        my @scope_values_tmp;
+        for my $scope_value (@scope_values) {
+            if ( grep { $_ eq $scope_value } @known_scopes ) {
+                push @scope_values_tmp, $scope_value;
+            }
+            else {
+                $self->logger->warn(
+                    "Unknown scope $scope_value requested for service $rp");
+            }
+        }
+        @scope_values = @scope_values_tmp;
+    }
+
+    # If this RP has dynamic scopes
+    if ( $self->spScopeRules->{$rp} ) {
+
+        # Add dynamic scopes
+        for my $dynamicScope ( keys %{ $self->spScopeRules->{$rp} } ) {
+
+            # Set a magic "$requested" variable that contains true if the
+            # scope was requested by the application
+            my $requested = grep { $_ eq $dynamicScope } @scope_values;
+            my $attributes = { %{ $req->userData }, requested => $requested };
+
+            # If scope is granted by the rule
+            if ( $self->spScopeRules->{$rp}->{$dynamicScope}
+                ->( $req, $attributes ) )
+            {
+                # Add to list
+                unless ( grep { $_ eq $dynamicScope } @scope_values ) {
+                    push @scope_values, $dynamicScope;
+                }
+
+            }
+
+            # Else make sure it is not granted
+            else {
+                @scope_values = grep { $_ ne $dynamicScope } @scope_values;
+            }
+        }
+    }
+
+    $self->p->processHook( $req, 'oidcResolveScope', \@scope_values, $rp );
+    return join( ' ', @scope_values );
 }
 
 # Return Hash of UserInfo data
@@ -1331,10 +1566,21 @@ sub buildUserInfoResponseFromId {
 # @return hashref UserInfo data
 sub buildUserInfoResponse {
     my ( $self, $req, $scope, $rp, $session ) = @_;
+    return $self->buildUserInfoResponseFromData( $req, $scope, $rp,
+        $session->data );
+}
+
+# Return Hash of UserInfo data
+# @param scope OIDC scope
+# @param rp Internal Relying Party identifier
+# @param sessionInfo hash of session data
+# @return hashref UserInfo data
+sub buildUserInfoResponseFromData {
+    my ( $self, $req, $scope, $rp, $session_data ) = @_;
     my $userinfo_response = {};
 
     my $data = {
-        %{ $session->data },
+        %{$session_data},
         _clientId => $self->oidcRPList->{$rp}->{oidcRPMetaDataOptionsClientID},
         _clientConfKey => $rp,
         _scope         => $scope,
@@ -1490,13 +1736,14 @@ sub _forceType {
 # @param rp Internal Relying Party identifier
 # @return String jwt JWT
 sub createJWT {
-    my ( $self, $payload, $alg, $rp ) = @_;
+    my ( $self, $payload, $alg, $rp, $type ) = @_;
 
     # Payload encoding
     my $jwt_payload = encode_base64url( to_json($payload), "" );
 
     # JWT header
-    my $jwt_header_hash = { typ => "JWT", alg => $alg };
+    my $typ = $type || "JWT";
+    my $jwt_header_hash = { typ => $typ, alg => $alg };
     if ( $alg eq "RS256" or $alg eq "RS384" or $alg eq "RS512" ) {
         $jwt_header_hash->{kid} = $self->conf->{oidcServiceKeyIdSig}
           if $self->conf->{oidcServiceKeyIdSig};
@@ -1619,18 +1866,8 @@ sub getFlowType {
 # @return String sub
 sub getIDTokenSub {
     my ( $self, $id_token ) = @_;
-    my $payload = $self->getJWTJSONData($id_token);
+    my $payload = getJWTPayload($id_token);
     return $payload->{sub};
-}
-
-# Return payload of a JWT as Hash ref
-# @param jwt JWT
-# @return HashRef payload
-sub getJWTJSONData {
-    my ( $self, $jwt ) = @_;
-    my $jwt_parts = $self->extractJWT($jwt);
-    return from_json(
-        decode_base64url( $jwt_parts->[1], { allow_nonref => 1 } ) );
 }
 
 # Return JWKS representation of a key
@@ -1722,31 +1959,6 @@ sub getRequestJWT {
     }
 
     return $response->decoded_content;
-}
-
-### Import encode_base64url and decode_base64url from recent MIME::Base64 module:
-sub encode_base64url {
-    my $e = encode_base64( shift, '' );
-    $e =~ s/=+\z//;
-    $e =~ tr[+/][-_];
-    return $e;
-}
-
-sub decode_base64url {
-    my $s = shift;
-    $s =~ tr[-_][+/];
-    $s .= '=' while length($s) % 4;
-    return decode_base64($s);
-}
-
-sub encodeBase64url {
-    my ( $self, $value ) = @_;
-    return encode_base64url($value);
-}
-
-sub decodeBase64url {
-    my ( $self, $value ) = @_;
-    return decode_base64url($value);
 }
 
 sub addRouteFromConf {
@@ -1970,10 +2182,6 @@ Store information in state database and return
 =head2 extractState
 
 Extract state information into $self
-
-=head2 extractJWT
-
-Extract parts of a JWT
 
 =head2 verifyJWTSignature
 

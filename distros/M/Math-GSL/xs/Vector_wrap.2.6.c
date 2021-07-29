@@ -4664,10 +4664,10 @@ XS(_wrap_gsl_vector_char_scale) {
 XS(_wrap_gsl_vector_char_add_constant) {
   {
     gsl_vector_char *arg1 = (gsl_vector_char *) 0 ;
-    double arg2 ;
+    char arg2 ;
     void *argp1 = 0 ;
     int res1 = 0 ;
-    double val2 ;
+    char val2 ;
     int ecode2 = 0 ;
     int argvi = 0;
     int result;
@@ -4681,11 +4681,11 @@ XS(_wrap_gsl_vector_char_add_constant) {
       SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "gsl_vector_char_add_constant" "', argument " "1"" of type '" "gsl_vector_char *""'"); 
     }
     arg1 = (gsl_vector_char *)(argp1);
-    ecode2 = SWIG_AsVal_double SWIG_PERL_CALL_ARGS_2(ST(1), &val2);
+    ecode2 = SWIG_AsVal_char SWIG_PERL_CALL_ARGS_2(ST(1), &val2);
     if (!SWIG_IsOK(ecode2)) {
-      SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "gsl_vector_char_add_constant" "', argument " "2"" of type '" "double""'");
+      SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "gsl_vector_char_add_constant" "', argument " "2"" of type '" "char""'");
     } 
-    arg2 = (double)(val2);
+    arg2 = (char)(val2);
     result = (int)gsl_vector_char_add_constant(arg1,arg2);
     ST(argvi) = SWIG_From_int  SWIG_PERL_CALL_ARGS_1((int)(result)); argvi++ ;
     
@@ -11965,10 +11965,10 @@ XS(_wrap_gsl_vector_int_scale) {
 XS(_wrap_gsl_vector_int_add_constant) {
   {
     gsl_vector_int *arg1 = (gsl_vector_int *) 0 ;
-    double arg2 ;
+    int arg2 ;
     void *argp1 = 0 ;
     int res1 = 0 ;
-    double val2 ;
+    int val2 ;
     int ecode2 = 0 ;
     int argvi = 0;
     int result;
@@ -11982,11 +11982,11 @@ XS(_wrap_gsl_vector_int_add_constant) {
       SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "gsl_vector_int_add_constant" "', argument " "1"" of type '" "gsl_vector_int *""'"); 
     }
     arg1 = (gsl_vector_int *)(argp1);
-    ecode2 = SWIG_AsVal_double SWIG_PERL_CALL_ARGS_2(ST(1), &val2);
+    ecode2 = SWIG_AsVal_int SWIG_PERL_CALL_ARGS_2(ST(1), &val2);
     if (!SWIG_IsOK(ecode2)) {
-      SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "gsl_vector_int_add_constant" "', argument " "2"" of type '" "double""'");
+      SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "gsl_vector_int_add_constant" "', argument " "2"" of type '" "int""'");
     } 
-    arg2 = (double)(val2);
+    arg2 = (int)(val2);
     result = (int)gsl_vector_int_add_constant(arg1,arg2);
     ST(argvi) = SWIG_From_int  SWIG_PERL_CALL_ARGS_1((int)(result)); argvi++ ;
     
@@ -13056,7 +13056,7 @@ XS(SWIG_init) {
   
   /*@SWIG:/usr/share/swig4.0/perl5/perltypemaps.swg,65,%set_constant@*/ do {
     SV *sv = get_sv((char*) SWIG_prefix "GSL_VERSION", TRUE | 0x2 | GV_ADDMULTI);
-    sv_setsv(sv, SWIG_From_double  SWIG_PERL_CALL_ARGS_1((double)(2.6)));
+    sv_setsv(sv, SWIG_From_double  SWIG_PERL_CALL_ARGS_1((double)(2.7)));
     SvREADONLY_on(sv);
   } while(0) /*@SWIG@*/;
   /*@SWIG:/usr/share/swig4.0/perl5/perltypemaps.swg,65,%set_constant@*/ do {
@@ -13066,7 +13066,7 @@ XS(SWIG_init) {
   } while(0) /*@SWIG@*/;
   /*@SWIG:/usr/share/swig4.0/perl5/perltypemaps.swg,65,%set_constant@*/ do {
     SV *sv = get_sv((char*) SWIG_prefix "GSL_MINOR_VERSION", TRUE | 0x2 | GV_ADDMULTI);
-    sv_setsv(sv, SWIG_From_int  SWIG_PERL_CALL_ARGS_1((int)(6)));
+    sv_setsv(sv, SWIG_From_int  SWIG_PERL_CALL_ARGS_1((int)(7)));
     SvREADONLY_on(sv);
   } while(0) /*@SWIG@*/;
   /*@SWIG:/usr/share/swig4.0/perl5/perltypemaps.swg,65,%set_constant@*/ do {

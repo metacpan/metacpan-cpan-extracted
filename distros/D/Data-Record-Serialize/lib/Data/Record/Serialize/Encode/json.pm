@@ -4,7 +4,7 @@ package Data::Record::Serialize::Encode::json;
 
 use Moo::Role;
 
-our $VERSION = '0.20';
+our $VERSION = '0.23';
 
 use JSON::MaybeXS qw[ encode_json ];
 
@@ -13,10 +13,10 @@ use namespace::clean;
 has '+_numify'    => ( is => 'rwp', default => 1 );
 has '+_needs_eol' => ( is => 'rwp', default => 1 );
 
-#pod =for Pod::Coverage
-#pod   encode
-#pod
-#pod =cut
+
+
+
+
 
 sub encode { shift; goto \&encode_json }
 
@@ -38,13 +38,15 @@ __END__
 
 =pod
 
+=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory
+
 =head1 NAME
 
 Data::Record::Serialize::Encode::json - encoded a record as JSON
 
 =head1 VERSION
 
-version 0.20
+version 0.23
 
 =head1 SYNOPSIS
 

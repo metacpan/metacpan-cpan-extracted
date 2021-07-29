@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 EXAMPLE_DIR=$(readlink -f -n $(dirname "${BASH_SOURCE[0]}"))
 PROJECT_DIR=$(readlink -f -n "$EXAMPLE_DIR/../../")

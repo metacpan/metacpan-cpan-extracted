@@ -1,0 +1,44 @@
+---
+abstract: 'scan for modules loaded with Test::Needs'
+author:
+  - 'Sven Kirmess <sven.kirmess@kzone.ch>'
+build_requires:
+  Perl::PrereqScanner: '0'
+  Test::More: '0.88'
+  lib: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.023, CPAN::Meta::Converter version 2.150010'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Perl-PrereqScanner-Scanner-TestNeeds
+no_index:
+  directory:
+    - t
+    - xt
+provides:
+  Perl::PrereqScanner::Scanner::TestNeeds:
+    file: lib/Perl/PrereqScanner/Scanner/TestNeeds.pm
+    version: '0.001'
+requires:
+  Moose: '0'
+  PPIx::Literal: '0'
+  Perl::PrereqScanner::Scanner: '0'
+  namespace::autoclean: '0'
+  perl: '5.006'
+  strict: '0'
+  version: '0.77'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/skirmess/Perl-PrereqScanner-Scanner-TestNeeds/issues
+  homepage: https://github.com/skirmess/Perl-PrereqScanner-Scanner-TestNeeds
+  repository: https://github.com/skirmess/Perl-PrereqScanner-Scanner-TestNeeds.git
+version: '0.001'
+x_generated_by_perl: v5.24.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: BSD-2-Clause-FreeBSD

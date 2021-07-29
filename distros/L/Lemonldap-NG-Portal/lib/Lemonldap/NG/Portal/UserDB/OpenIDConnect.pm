@@ -8,10 +8,12 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_OK
 );
 
-our $VERSION = '2.0.11';
+our $VERSION = '2.0.12';
 
-extends 'Lemonldap::NG::Common::Module',
-  'Lemonldap::NG::Portal::Lib::OpenIDConnect';
+extends qw(
+  Lemonldap::NG::Common::Module
+  Lemonldap::NG::Portal::Lib::OpenIDConnect
+);
 
 # INITIALIZATION
 
@@ -42,10 +44,7 @@ sub getUser {
         return PE_OK;
     }
 
-    $self->logger->debug("UserInfo received: $userinfo_content");
-
-    $req->data->{OpenIDConnect_user_info} =
-      $self->decodeJSON($userinfo_content);
+    $req->data->{OpenIDConnect_user_info} = $userinfo_content;
 
     # Check that received sub is the same than current user
     unless ( $req->data->{OpenIDConnect_user_info}->{sub} eq $req->{user} ) {
@@ -59,7 +58,7 @@ sub getUser {
 sub findUser {
 
     # Nothing to do here
-    PE_OK;
+    return PE_OK;
 }
 
 # Get all required attributes
@@ -76,12 +75,12 @@ sub setSessionInfo {
         $req->{sessionInfo}->{$k} = $req->data->{OpenIDConnect_user_info}->{$v};
     }
 
-    PE_OK;
+    return PE_OK;
 }
 
 # Does nothing
 sub setGroups {
-    PE_OK;
+    return PE_OK;
 }
 
 1;

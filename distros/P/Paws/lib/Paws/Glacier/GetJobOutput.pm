@@ -31,9 +31,9 @@ You shouldn't make instances of this class. Each attribute should be used as a n
 =head1 SYNOPSIS
 
     my $glacier = Paws->service('Glacier');
-    # To get the output of a previously initiated job
-    # The example downloads the output of a previously initiated inventory
-    # retrieval job that is identified by the job ID.
+# To get the output of a previously initiated job
+# The example downloads the output of a previously initiated inventory retrieval
+# job that is identified by the job ID.
     my $GetJobOutputOutput = $glacier->GetJobOutput(
       'AccountId' => '-',
       'JobId'     =>

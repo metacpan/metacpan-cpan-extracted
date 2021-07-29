@@ -8,7 +8,7 @@ use MIME::Base64;
 use Net::SAML2::IdP;
 use Net::SAML2::Protocol::Assertion;
 
-# This test follows the flow of the TUTORIAL.MD.  The comments below
+# This test follows the flow of the TUTORIAL.md.  The comments below
 # follows the major headings of that document to implement a full
 # SP client authentication process.
 

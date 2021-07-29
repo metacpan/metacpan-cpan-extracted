@@ -31,7 +31,7 @@ resources:
   bugtracker: https://github.com/PerlAlien/Alien-GSL/issues
   homepage: https://metacpan.org/pod/Alien::GSL
   repository: https://github.com/PerlAlien/Alien-GSL.git
-version: '1.03'
+version: '1.04'
 x_alienfile:
   generated_by: 'Alien::Build::MM version 2.40'
   requires:

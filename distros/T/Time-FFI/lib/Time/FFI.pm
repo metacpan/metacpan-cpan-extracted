@@ -9,7 +9,7 @@ use FFI::Platypus::Buffer;
 use FFI::Platypus::Memory;
 use Time::FFI::tm;
 
-our $VERSION = '2.001';
+our $VERSION = '2.002';
 
 our @EXPORT_OK = qw(asctime ctime gmtime localtime mktime strftime strptime timegm timelocal);
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
@@ -153,15 +153,15 @@ Time::FFI - libffi interface to POSIX date and time functions
   print "$epoch: ", strftime('%I:%M:%S %p on %B %e, %Y', $tm);
 
   my $tm = localtime time;
-  my $datetime = $tm->to_object('DateTime', 1);
+  my $datetime = $tm->to_object_as_local('DateTime');
 
   my $tm = gmtime time;
-  my $moment = $tm->to_object('Time::Moment', 0);
+  my $moment = $tm->to_object_as_utc('Time::Moment');
 
   use Time::FFI::tm;
   my $tm = Time::FFI::tm->from_object(DateTime->now);
-  my $epoch = $tm->epoch(1);
-  my $piece = $tm->to_object('Time::Piece', 1);
+  my $epoch = $tm->epoch_as_local;
+  my $piece = $tm->to_object_as_local('Time::Piece');
 
 =head1 DESCRIPTION
 

@@ -1,4 +1,7 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
+
+use v5;
+use warnings;
 
 use Test::More;
 

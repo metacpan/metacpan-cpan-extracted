@@ -6,7 +6,7 @@
       "Brock Wilcox <awwaiid@thelackthereof.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.022, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -29,10 +29,11 @@
       },
       "develop" : {
          "requires" : {
+            "FindBin" : "0",
             "Perl::Critic" : "0",
-            "Test2::Require::Module" : "0.000060",
+            "Test2::Require::Module" : "0.000121",
             "Test2::Tools::PerlCritic" : "0",
-            "Test2::V0" : "0.000060",
+            "Test2::V0" : "0.000121",
             "Test::EOL" : "0",
             "Test::Fixme" : "0.07",
             "Test::More" : "0.98",
@@ -47,8 +48,6 @@
          "requires" : {
             "Class::Accessor::Chained" : "0",
             "Devel::StackTrace" : "2.00",
-            "File::Which" : "0",
-            "FindBin" : "0",
             "IO::Socket::INET" : "0",
             "Module::Pluggable" : "0",
             "PadWalker" : "0",
@@ -72,24 +71,24 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/plicease/Devel-ebug/issues"
+         "web" : "https://github.com/uperl/Devel-ebug/issues"
       },
       "homepage" : "https://metacpan.org/pod/Devel::ebug",
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/plicease/Devel-ebug.git",
-         "web" : "https://github.com/plicease/Devel-ebug"
+         "url" : "git://github.com/uperl/Devel-ebug.git",
+         "web" : "https://github.com/uperl/Devel-ebug"
       }
    },
-   "version" : "0.63",
+   "version" : "0.64",
    "x_contributors" : [
       "Leon Brocard <acme@astray.com>",
       "Graham Ollis <plicease@cpan.org>",
       "Brock Wilcox <awwaiid@thelackthereof.org>",
       "Taisuke Yamada"
    ],
-   "x_generated_by_perl" : "v5.32.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
+   "x_generated_by_perl" : "v5.34.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.26",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
    "x_use_unsafe_inc" : 0
 }

@@ -1,9 +1,9 @@
 package Acme::CPANModules::COLOR;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-09-15'; # DATE
+our $DATE = '2021-03-27'; # DATE
 our $DIST = 'Acme-CPANModules-COLOR'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 our $LIST = {
     summary => "Modules that follow the COLOR & NO_COLOR convention",
@@ -73,7 +73,7 @@ Acme::CPANModules::COLOR - Modules that follow the COLOR & NO_COLOR convention
 
 =head1 VERSION
 
-This document describes version 0.002 of Acme::CPANModules::COLOR (from Perl distribution Acme-CPANModules-COLOR), released on 2020-09-15.
+This document describes version 0.003 of Acme::CPANModules::COLOR (from Perl distribution Acme-CPANModules-COLOR), released on 2021-03-27.
 
 =head1 DESCRIPTION
 
@@ -92,7 +92,7 @@ the environment variable.
 
 If you know of other modules that should be listed here, please contact me.
 
-=head1 MODULES INCLUDED IN THIS ACME::CPANMODULE MODULE
+=head1 ACME::CPANMODULES ENTRIES
 
 =over
 
@@ -150,10 +150,17 @@ If you know of other modules that should be listed here, please contact me.
 
 =head1 FAQ
 
-=head2 What are ways to use this module?
+=head2 What is an Acme::CPANModules::* module?
 
-Aside from reading it, you can install all the listed modules using
-L<cpanmodules>:
+An Acme::CPANModules::* module, like this module, contains just a list of module
+names that share a common characteristics. It is a way to categorize modules and
+document CPAN. See L<Acme::CPANModules> for more details.
+
+=head2 What are ways to use this Acme::CPANModules module?
+
+Aside from reading this Acme::CPANModules module's POD documentation, you can
+install all the listed modules (entries) using L<cpanmodules> CLI (from
+L<App::cpanmodules> distribution):
 
     % cpanmodules ls-entries COLOR | cpanm -n
 
@@ -161,9 +168,13 @@ or L<Acme::CM::Get>:
 
     % perl -MAcme::CM::Get=COLOR -E'say $_->{module} for @{ $LIST->{entries} }' | cpanm -n
 
-This module also helps L<lcpan> produce a more meaningful result for C<lcpan
-related-mods> when it comes to finding related modules for the modules listed
-in this Acme::CPANModules module.
+or directly:
+
+    % perl -MAcme::CPANModules::COLOR -E'say $_->{module} for @{ $Acme::CPANModules::COLOR::LIST->{entries} }' | cpanm -n
+
+This Acme::CPANModules module also helps L<lcpan> produce a more meaningful
+result for C<lcpan related-mods> command when it comes to finding related
+modules for the modules listed in this Acme::CPANModules module.
 
 =head1 HOMEPAGE
 
@@ -175,7 +186,7 @@ Source repository is at L<https://github.com/perlancar/perl-Acme-CPANModules-COL
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-COLOR>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Acme-CPANModules-COLOR/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -193,7 +204,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2018 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,3 +1,24 @@
+0.038   2021-07-20  Released-By: PERLANCAR; Urgency: medium
+
+	- Remove warning with latest Test::Sah::Schema (0.010).
+
+	- [schema perl::modname][doc] Mention a demo of this schema in CLI using
+          'pmless'.
+
+
+0.037   2021-07-19  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [build] Build with fixed Pod::Weaver plugin [-Sah::Schemas] (0.064) to
+          properly list schemas in the distribution in lib/Sah/Schemas/Perl.pm.
+
+
+0.036   2021-07-19  Released-By: PERLANCAR; Urgency: medium
+
+	- Add schemas: perl::modname::installed, perl::modname::not_installed.
+
+
 0.035   2021-01-20  Released-By: PERLANCAR; Urgency: medium
 
 	- [bugfix] Forgot to anchor patterns.

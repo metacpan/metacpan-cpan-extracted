@@ -6,7 +6,7 @@ use 5.008001;
 use base qw( Alien::Base );
 
 # ABSTRACT: Find or download or build cmake 3 or better
-our $VERSION = '0.06'; # VERSION
+our $VERSION = '0.08'; # VERSION
 
 
 sub exe
@@ -41,7 +41,7 @@ Alien::cmake3 - Find or download or build cmake 3 or better
 
 =head1 VERSION
 
-version 0.06
+version 0.08
 
 =head1 SYNOPSIS
 
@@ -130,6 +130,56 @@ In the opinion of the maintainer of both L<Alien::cmake3> and L<Alien::CMake> fo
 =back
 
 =back
+
+=head1 ENVIRONMENT
+
+=over 4
+
+=item ALIEN_INSTALL_TYPE
+
+This is the normal L<Alien::Build> environment variable and you can set it to one of
+C<share>, C<system> or C<default>.
+
+=item ALIEN_CMAKE_FROM_SOURCE
+
+If set to true, and if a share install is attempted, L<Alien::cmake3> will not try a
+binary share install (even if available), and instead a source share install.
+
+=back
+
+=head1 CAVEATS
+
+If you do not have a system C<cmake> of at least 3.0.0 available, then a share install
+will be attempted.
+
+Binary share installs are attempted on platforms for which the latest version of C<cmake>
+are provided.  As of this writing, this includes: Windows (32/64 bit), macOS
+(intel/arm universal) and Linux (intel/arm 64 bit).  No checks are made to ensure that
+your platform is supported by this binary installs.  Typically the same versions
+supported by the operating system vendor and supported by C<cmake>, so that should not
+be a problem.  If you are using an operating system not supported by its vendor
+Please Stop That, this is almost certainly a security vulnerability.
+
+That said if you really do need L<Alien::cmake3> on an unsupported system,
+you have some options:
+
+=over 4
+
+=item Install system version of C<cmake>
+
+If you can find an older version better than 3.0.0 that is supported by your operating
+system.
+
+=item Force a source code install
+
+Set the C<ALIEN_CMAKE_FROM_SOURCE> environment variable to a true value to build a
+share install from source.
+
+=back
+
+Source share installs are attempted on platforms for which the latest version of
+C<cmake> are not available, like the various flavours of *BSD.  This may not be ideal,
+and if you can install a system version of C<cmake> it may work better.
 
 =head1 AUTHOR
 

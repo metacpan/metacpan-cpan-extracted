@@ -18,7 +18,6 @@ SYNOPSIS
                 my @args = @_;
 
                 my $pending_sigset = new POSIX::SigSet ();
-                my $pending_signame = undef;
 
                 sleep(2);
 
@@ -41,8 +40,6 @@ SYNOPSIS
                 if ( $pending_sigset->ismember( POSIX::SIGALRM ) ) {
                     printf("%s is pending\n", 'SIGALRM');
                 }
-
-                printf("%s is pending\n", $pending_signame);
             },
             sigset => [qw/ ALRM TERM INT QUIT /]
         );

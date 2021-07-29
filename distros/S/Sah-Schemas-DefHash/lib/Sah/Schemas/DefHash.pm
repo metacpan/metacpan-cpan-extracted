@@ -1,7 +1,7 @@
 package Sah::Schemas::DefHash;
 
-our $DATE = '2016-07-25'; # DATE
-our $VERSION = '1.0.11.1'; # VERSION
+our $DATE = '2021-07-21'; # DATE
+our $VERSION = '1.0.13.0'; # VERSION
 
 1;
 # ABSTRACT: Sah schemas for DefHash
@@ -18,9 +18,11 @@ Sah::Schemas::DefHash - Sah schemas for DefHash
 
 =head1 VERSION
 
-This document describes version 1.0.11.1 of Sah::Schemas::DefHash (from Perl distribution Sah-Schemas-DefHash), released on 2016-07-25.
+This document describes version 1.0.13.0 of Sah::Schemas::DefHash (from Perl distribution Sah-Schemas-DefHash), released on 2021-07-21.
 
 =head1 SAH SCHEMAS
+
+The following schemas are included in this distribution:
 
 =over
 
@@ -62,7 +64,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

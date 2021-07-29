@@ -28,6 +28,7 @@ sub testScript {
    my $script  = $t[1];
    my $testdir = $::ti->testdir();
    $testdir    = `cd $testdir; pwd`;
+   die "Problem with test directory '$testdir', \$?=$?" if $?;
    chomp($testdir);
 
    if ($ssh) {

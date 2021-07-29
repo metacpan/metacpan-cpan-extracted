@@ -2,7 +2,7 @@ package Myriad::RPC::Implementation::Memory;
 
 use Myriad::Class extends => qw(IO::Async::Notifier);
 
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.010'; # VERSION
 our $AUTHORITY = 'cpan:DERIV'; # AUTHORITY
 
 =encoding utf8

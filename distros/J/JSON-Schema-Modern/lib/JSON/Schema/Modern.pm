@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package JSON::Schema::Modern; # git description: v0.512-18-g325e2e3
+package JSON::Schema::Modern; # git description: v0.513-21-g3e43847
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate data against a schema
 # KEYWORDS: JSON Schema data validation structure specification
 
-our $VERSION = '0.513';
+our $VERSION = '0.514';
 
 use 5.016;  # for fc, unicode_strings features
 no if "$]" >= 5.031009, feature => 'indirect';
@@ -115,11 +115,13 @@ sub add_schema {
       _evaluator => $self,  # used only for traversal during document construction
     );
 
-  die JSON::Schema::Modern::Result->new(
-    output_format => $self->output_format,
-    valid => 0,
-    errors => [ $document->errors ],
-  ) if $document->has_errors;
+  die((caller())[0] ne ref($self)
+    ? join('; ', map $_->keyword_location.': '.$_->error, $document->errors)
+    : die JSON::Schema::Modern::Result->new(
+      output_format => $self->output_format,
+      valid => 0,
+      errors => [ $document->errors ],
+    )) if $document->has_errors;
 
   if (not grep $_->{document} == $document, $self->_resource_values) {
     my $schema_content = $document->_serialized_schema
@@ -379,9 +381,8 @@ sub _eval_subschema {
   croak 'insufficient arguments' if @_ < 4;
   my ($self, $data, $schema, $state) = @_;
 
-  # do not propagate upwards changes to depth, traversed paths,
-  # but additions to annotations, errors are by reference and will be retained
-  $state = { %$state };
+  # callers created a new $state for us, so we do not propagate upwards changes to depth, traversed
+  # paths; but annotations, errors are arrayrefs so their contents will be shared
   delete @{$state}{'keyword', grep /^_/, keys %$state};
 
   abort($state, 'EXCEPTION: maximum evaluation depth exceeded')
@@ -612,7 +613,7 @@ JSON::Schema::Modern - Validate data against a schema
 
 =head1 VERSION
 
-version 0.513
+version 0.514
 
 =head1 SYNOPSIS
 
@@ -637,7 +638,7 @@ version of the specification.
 
 Indicates which version of the JSON Schema specification is used during evaluation. When not set,
 this value is derived from the C<$schema> keyword in the schema used in evaluation, or defaults to
-the latest (supported) version (draft2010-09). When left unset, the use of C<$schema> keywords in
+the latest (supported) version (draft2019-09). When left unset, the use of C<$schema> keywords in
 the schema is permitted, to switch between draft versions.
 
 May be one of:
@@ -706,16 +707,15 @@ Defaults to false (for now).
 
 =head2 evaluate_json_string
 
-  $result = $js->evaluate_json_string($data_as_json_string, $schema_data);
-  $result = $js->evaluate_json_string($data_as_json_string, $schema_data, { collect_annotations => 1});
+  $result = $js->evaluate_json_string($data_as_json_string, $schema);
+  $result = $js->evaluate_json_string($data_as_json_string, $schema, { collect_annotations => 1});
 
 Evaluates the provided instance data against the known schema document.
 
 The data is in the form of a JSON-encoded string (in accordance with
 L<RFC8259|https://tools.ietf.org/html/rfc8259>). B<The string is expected to be UTF-8 encoded.>
 
-The schema must represent a JSON Schema that respects the Draft 2019-09 meta-schema at
-L<https://json-schema.org/draft/2019-09/schema>, in one of these forms:
+The schema must be in one of these forms:
 
 =over 4
 
@@ -741,16 +741,15 @@ The result is a L<JSON::Schema::Modern::Result> object, which can also be used a
 
 =head2 evaluate
 
-  $result = $js->evaluate($instance_data, $schema_data);
-  $result = $js->evaluate($instance_data, $schema_data, { short_circuit => 0 });
+  $result = $js->evaluate($instance_data, $schema);
+  $result = $js->evaluate($instance_data, $schema, { short_circuit => 0 });
 
 Evaluates the provided instance data against the known schema document.
 
 The data is in the form of an unblessed nested Perl data structure representing any type that JSON
 allows: null, boolean, string, number, object, array. (See L</TYPES> below.)
 
-The schema must represent a JSON Schema that respects the Draft 2019-09 meta-schema at
-L<https://json-schema.org/draft/2019-09/schema>, in one of these forms:
+The schema must be in one of these forms:
 
 =over 4
 
@@ -777,10 +776,10 @@ The result is a L<JSON::Schema::Modern::Result> object, which can also be used a
 
 =head2 traverse
 
-  $result = $js->traverse($schema_data);
-  $result = $js->traverse($schema_data, { initial_schema_uri => 'http://example.com' });
+  $result = $js->traverse($schema);
+  $result = $js->traverse($schema, { initial_schema_uri => 'http://example.com' });
 
-Traverses the provided schema data without evaluating it against any instance data. Returns the
+Traverses the provided schema without evaluating it against any instance data. Returns the
 internal state object accumulated during the traversal, including any identifiers found therein, and
 any errors found during parsing. For internal purposes only.
 
@@ -817,8 +816,7 @@ before calling L</evaluate>, other than the standard metaschemas which are loade
 as needed.
 
 Returns C<undef> if the resource could not be found;
-if there were errors in the document, will die with a L<JSON::Schema::Modern::Result> object
-containing the errors;
+if there were errors in the document, will die with these errors;
 otherwise returns the L<JSON::Schema::Modern::Document> that contains the added schema.
 
 =head2 get
@@ -1022,6 +1020,8 @@ L<JSON::Schema::Tiny>: a more minimal implementation of the specification, with 
 =item *
 
 L<https://json-schema.org/draft/2019-09/release-notes.html>
+
+# L<https://json-schema.org/draft-07/json-schema-release-notes.html>
 
 =item *
 

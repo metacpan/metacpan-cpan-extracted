@@ -2,14 +2,14 @@
 # Author          : Johan Vromans
 # Created On      : Fri Sep  2 14:25:11 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Tue Aug 29 16:22:07 2017
-# Update Count    : 119
+# Last Modified On: Wed Jul 28 08:32:29 2021
+# Update Count    : 120
 # Status          : Unknown, Use with caution!
 
 # Ease the life of the CPAN testers.
-exit 0 if $ENV{AUTOMATED_TESTING} && $] < 5.008006;
+exit 0 if $ENV{AUTOMATED_TESTING} && $] < 5.010001;
 
-use 5.008006;
+use 5.010001;
 
 use strict;
 
@@ -39,7 +39,7 @@ WriteMakefile
  DISTNAME         => $distname,
  EXE_FILES        => [ map { "script/$_" } @bins ],
  VERSION          => $version,
- MIN_PERL_VERSION => 5.008006,
+ MIN_PERL_VERSION => 5.010001,
 
  PREREQ_PM   => {
      'Getopt::Long'     => '2.13',
@@ -48,6 +48,7 @@ WriteMakefile
      'DBI'              => '1.40',
      'Archive::Zip'	=> '1.16',
      'DBD::SQLite'      => '1.13',
+     'App::Packager'	=> '1.430',
  },
 
  CONFIGURE_REQUIRES => {

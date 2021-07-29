@@ -15,24 +15,29 @@
 # _cache		  : caches string form for speed
 
 package Math::String;
-my $class = "Math::String";
+
+require 5.008003;	# requires this Perl version or later
+use strict;
+use warnings;
 
 use Exporter;
 use Math::BigInt;
-@ISA = qw(Exporter Math::BigInt);
-@EXPORT_OK = qw(
-   as_number last first string from_number bzero bone binf bnan
-  );
-use Math::String::Charset;
-use strict;
-use vars qw($VERSION $AUTOLOAD $accuracy $precision $div_scale $round_mode);
-$VERSION = '1.29';	# Current version of this package
-require 5.008003;	# requires this Perl version or later
 
+our ($VERSION, @ISA, @EXPORT_OK);
+$VERSION   = '1.30';	# Current version of this package
+@ISA       = qw(Exporter Math::BigInt);
+@EXPORT_OK = qw( as_number last first string from_number
+                 bzero bone binf bnan );
+
+use Math::String::Charset;
+
+our ($accuracy, $precision, $div_scale, $round_mode);
 $accuracy   = undef;
 $precision  = undef;
 $div_scale  = 0;
 $round_mode = 'even';
+
+my $class = "Math::String";
 
 use overload
 'cmp'   =>      sub {
@@ -54,9 +59,6 @@ sub import
   my $self = shift;
 
   $CALC = Math::BigInt->config()->{lib} || 'Math::BigInt::Calc';
-
-  # register us with MBI to get notified of future lib changes
-  Math::BigInt::_register_callback( $self, sub { $CALC = $_[0]; } );
 
   Math::BigInt::import($self, @_);
   }
@@ -451,7 +453,7 @@ sub is_valid
 
 sub binc
   {
-  my ($self,$x,$a,$p,$r) = ref($_[0]) ?
+  my ($self,$x) = ref($_[0]) ?
    (ref($_[0]),@_) : (Math::BigInt::objectify(1,@_));
 
   # binc calls modify, and thus destroys the cache, so store it
@@ -472,7 +474,7 @@ sub binc
 
 sub bdec
   {
-  my ($self,$x,$a,$p,$r) = ref($_[0]) ?
+  my ($self,$x) = ref($_[0]) ?
    (ref($_[0]),@_) : (Math::BigInt::objectify(1,@_));
 
   # bdec calls modify, and thus destroys the cache, so store it
@@ -1073,7 +1075,8 @@ or a 26 ('z'), and which one is the right one is unclear.
 
 Please report any bugs or feature requests to
 C<bug-math-string at rt.cpan.org>, or through the web interface at
-L<https://rt.cpan.org/Ticket/Create.html?Queue=Math-String> (requires login).
+L<https://rt.cpan.org/Ticket/Create.html?Queue=Math-String>
+(requires login).
 We will be notified, and then you'll automatically be notified of progress on
 your bug as I make changes.
 
@@ -1089,25 +1092,25 @@ You can also look for information at:
 
 =over 4
 
+=item * GitHub
+
+L<https://github.com/pjacklam/p5-Math-String>
+
 =item * RT: CPAN's request tracker
 
 L<https://rt.cpan.org/Dist/Display.html?Name=Math-String>
 
-=item * AnnoCPAN: Annotated CPAN documentation
+=item * MetaCPAN
 
-L<http://annocpan.org/dist/Math-String>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/dist/Math-String>
-
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/Math-String/>
+L<https://metacpan.org/release/Math-String>
 
 =item * CPAN Testers Matrix
 
 L<http://matrix.cpantesters.org/?dist=Math-String>
+
+=item * CPAN Ratings
+
+L<https://cpanratings.perl.org/dist/Math-String>
 
 =back
 
@@ -1116,12 +1119,14 @@ L<http://matrix.cpantesters.org/?dist=Math-String>
 This program is free software; you may redistribute it and/or modify it under
 the same terms as Perl itself.
 
-=head1 AUTHOR
+=head1 AUTHORS
 
 If you use this module in one of your projects, then please email me. I want
 to hear about how my code helps you ;)
 
 Tels http://bloodgate.com 2000 - 2005.
+
+Maintained by Peter John Acklam, pjacklam@gmail.com 2017-
 
 =cut
 

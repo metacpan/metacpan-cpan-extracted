@@ -23,6 +23,7 @@ my %WriteMakefileArgs = (
         'REST::Client' => '0', 
         'JSON'=>0, 
         'Time::Piece'=>'0',
+        'Package::Alias'=>0. 
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Finance-IG-*' },

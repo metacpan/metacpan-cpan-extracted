@@ -21,7 +21,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_UNAUTHORIZEDPARTNER
 );
 
-our $VERSION = '2.0.10';
+our $VERSION = '2.0.12';
 
 extends 'Lemonldap::NG::Portal::Main::Issuer',
   'Lemonldap::NG::Portal::Lib::SAML';
@@ -247,6 +247,7 @@ sub run {
     my $idp_initiated           = $req->param('IDPInitiated');
     my $idp_initiated_sp        = $req->param('sp');
     my $idp_initiated_spConfKey = $req->param('spConfKey');
+    my $idp_initiated_spDest    = $req->param('spDest');
 
     # Normalize URL to be tolerant to SAML Path
     $url = $self->normalize_url( $url, $self->conf->{issuerDBSAMLPath},
@@ -367,12 +368,19 @@ sub run {
                   ->{$idp_initiated_spConfKey}
                   ->{samlSPMetaDataOptionsNameIDFormat} || "email";
                 eval {
+
                     $login->request()->NameIDPolicy()
                       ->Format( $self->getNameIDFormat($nameIDFormatKey) );
                 };
 
                 # Force AllowCreate to TRUE
                 eval { $login->request()->NameIDPolicy()->AllowCreate(1); };
+
+                # Allow selection the AssertionConsumerServiceURL by the user
+                if ($idp_initiated_spDest) {
+                    $login->request->AssertionConsumerServiceURL(
+                        $idp_initiated_spDest);
+                }
             }
 
             # Process authentication request
@@ -451,7 +459,9 @@ sub run {
                 }
 
                 unless ($result) {
-                    $self->logger->error("Signature is not valid");
+                    $self->logger->error(
+"Could not verify signature of incoming SSO request from $spConfKey"
+                    );
                     return PE_SAML_SIGNATURE_ERROR;
                 }
                 else {
@@ -462,11 +472,35 @@ sub run {
                 $self->logger->debug("Message signature will not be checked");
             }
 
+            my $nameIDFormat;
+
+            # Check NameID Policy in request
+            if ( $login->request()->NameIDPolicy ) {
+                $nameIDFormat = $login->request()->NameIDPolicy->Format();
+                $self->logger->debug(
+                    "Get NameID format $nameIDFormat from request");
+            }
+
+            # Get default NameID Format from configuration
+            # Set to "email" if no value in configuration
+            my $nameIDFormatKey =
+              $self->conf->{samlSPMetaDataOptions}->{$spConfKey}
+              ->{samlSPMetaDataOptionsNameIDFormat} || "email";
+
+            # NameID unspecified is forced to default NameID format
+            if (  !$nameIDFormat
+                or $nameIDFormat eq $self->getNameIDFormat("unspecified") )
+            {
+                $nameIDFormat = $self->getNameIDFormat($nameIDFormatKey);
+                eval {
+                    $login->request()->NameIDPolicy()->Format($nameIDFormat);
+                };
+            }
+
             # Force AllowCreate to TRUE for transient/persistent NameIDPolicy
             if ( $login->request()->NameIDPolicy ) {
-                my $nif = $login->request()->NameIDPolicy->Format();
-                if (   $nif eq $self->getNameIDFormat("transient")
-                    or $nif eq $self->getNameIDFormat("persistent") )
+                if (   $nameIDFormat eq $self->getNameIDFormat("transient")
+                    or $nameIDFormat eq $self->getNameIDFormat("persistent") )
                 {
                     $self->logger->debug(
                         "Force AllowCreate flag in NameIDPolicy");
@@ -559,27 +593,6 @@ sub run {
 
             $self->logger->debug("SSO: assertion is built");
 
-            # Get default NameID Format from configuration
-            # Set to "email" if no value in configuration
-            my $nameIDFormatKey =
-              $self->conf->{samlSPMetaDataOptions}->{$spConfKey}
-              ->{samlSPMetaDataOptionsNameIDFormat} || "email";
-            my $nameIDFormat;
-
-            # Check NameID Policy in request
-            if ( $login->request()->NameIDPolicy ) {
-                $nameIDFormat = $login->request()->NameIDPolicy->Format();
-                $self->logger->debug(
-                    "Get NameID format $nameIDFormat from request");
-            }
-
-            # NameID unspecified is forced to default NameID format
-            if (  !$nameIDFormat
-                or $nameIDFormat eq $self->getNameIDFormat("unspecified") )
-            {
-                $nameIDFormat = $self->getNameIDFormat($nameIDFormatKey);
-            }
-
             # Get session key associated with NameIDFormat
             # Not for unspecified, transient, persistent, entity, encrypted
             my $nameIDFormatConfiguration = {
@@ -592,7 +605,9 @@ sub run {
             };
 
             my $nameIDSessionKey =
-              $self->conf->{ $nameIDFormatConfiguration->{$nameIDFormat} };
+                $nameIDFormatConfiguration->{$nameIDFormat}
+              ? $self->conf->{ $nameIDFormatConfiguration->{$nameIDFormat} }
+              : '';
 
             # Override default NameID Mapping
             if ( $self->conf->{samlSPMetaDataOptions}->{$spConfKey}
@@ -604,12 +619,16 @@ sub run {
             }
 
             my $nameIDContent;
-            if ( $self->spMacros->{$sp}->{$nameIDSessionKey} ) {
+            if (    $nameIDSessionKey
+                and $self->spMacros->{$sp}->{$nameIDSessionKey} )
+            {
                 $nameIDContent =
                   $self->spMacros->{$sp}->{$nameIDSessionKey}
                   ->( $req, $req->{sessionInfo} );
             }
-            elsif ( defined $req->{sessionInfo}->{$nameIDSessionKey} ) {
+            elsif ( $nameIDSessionKey
+                and ( defined $req->{sessionInfo}->{$nameIDSessionKey} ) )
+            {
                 $nameIDContent =
                   $self->p->getFirstValue(
                     $req->{sessionInfo}->{$nameIDSessionKey} );
@@ -643,8 +662,8 @@ sub run {
 
             $self->logger->debug(
                 "NameID Format is " . $login->nameIdentifier->Format );
-            $self->logger->debug(
-                "NameID Content is " . $login->nameIdentifier->content );
+            $self->logger->debug( "NameID Content is "
+                  . ( $login->nameIdentifier->content || "" ) );
 
             # Push attributes
             my @attributes;
@@ -693,7 +712,8 @@ sub run {
                 }
 
                 $self->logger->debug(
-                    "SAML2 attribute $name will be set with $_ session key ($sp)");
+"SAML2 attribute $name will be set with $_ session key ($sp)"
+                );
 
                 # SAML2 attribute
                 my $attribute =
@@ -1310,8 +1330,7 @@ sub soapSloServer {
                 "SLO response signature according to metadata");
         }
 
-        $h =
-          $self->p->processHook( $req, 'samlBuildLogoutResponse', $logout );
+        $h = $self->p->processHook( $req, 'samlBuildLogoutResponse', $logout );
         if ( $h != PE_OK ) {
             return $self->p->sendError( $req,
                 "SLO: samlBuildLogoutResponse hook returned error", 400 );
@@ -1319,7 +1338,7 @@ sub soapSloServer {
 
         # Send logout response
         unless ( $self->buildLogoutResponseMsg($logout) ) {
-            $self->logger->error("Unable to build SLO response");
+            $self->logger->error("Unable to build SLO response for $spConfKey");
             return $self->p->sendError( $req, 'Unable to build SLO response',
                 400 );
         }
@@ -1969,7 +1988,9 @@ sub sloServer {
 
         if ($checkSLOMessageSignature) {
             unless ( $self->checkSignatureStatus($logout) ) {
-                $self->logger->error("Signature is not valid");
+                $self->logger->error(
+"Could not verify signature of incoming SLO request from $spConfKey"
+                );
                 $self->imgnok($req);
             }
             else {

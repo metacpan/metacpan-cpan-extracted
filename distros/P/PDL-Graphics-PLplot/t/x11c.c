@@ -25,12 +25,12 @@
 #define YPTS      46            // Data points in y
 #define LEVELS    10
 
-static int        opt[] = { DRAW_LINEXY, DRAW_LINEXY };
+static int           opt[] = { DRAW_LINEXY, DRAW_LINEXY };
 
-static PLFLT      alt[] = { 33.0, 17.0 };
-static PLFLT      az[] = { 24.0, 115.0 };
+static PLFLT         alt[] = { 33.0, 17.0 };
+static PLFLT         az[] = { 24.0, 115.0 };
 
-static const char *title[4] =
+static PLCHAR_VECTOR title[4] =
 {
     "#frPLplot Example 11 - Alt=33, Az=24, Opt=3",
     "#frPLplot Example 11 - Alt=17, Az=115, Opt=3",
@@ -65,7 +65,7 @@ cmap1_init( void )
 //--------------------------------------------------------------------------
 
 int
-main( int argc, const char *argv[] )
+main( int argc, char *argv[] )
 {
     int   i, j, k;
     PLFLT *x, *y, **z;
@@ -88,11 +88,11 @@ main( int argc, const char *argv[] )
     plAlloc2dGrid( &z, XPTS, YPTS );
     for ( i = 0; i < XPTS; i++ )
     {
-        x[i] = 3. * (double) ( i - ( XPTS / 2 ) ) / (double) ( XPTS / 2 );
+        x[i] = 3. * (PLFLT) ( i - ( XPTS / 2 ) ) / (PLFLT) ( XPTS / 2 );
     }
 
     for ( i = 0; i < YPTS; i++ )
-        y[i] = 3. * (double) ( i - ( YPTS / 2 ) ) / (double) ( YPTS / 2 );
+        y[i] = 3. * (PLFLT) ( i - ( YPTS / 2 ) ) / (PLFLT) ( YPTS / 2 );
 
     for ( i = 0; i < XPTS; i++ )
     {
@@ -112,7 +112,7 @@ main( int argc, const char *argv[] )
         }
     }
 
-    plMinMax2dGrid( (const PLFLT * const *) z, XPTS, YPTS, &zmax, &zmin );
+    plMinMax2dGrid( (PLFLT_MATRIX) z, XPTS, YPTS, &zmax, &zmin );
     step = ( zmax - zmin ) / ( nlevel + 1 );
     for ( i = 0; i < nlevel; i++ )
         clevel[i] = zmin + step + step * i;
@@ -135,19 +135,19 @@ main( int argc, const char *argv[] )
 
             // wireframe plot
             if ( i == 0 )
-                plmesh( x, y, (const PLFLT * const *) z, XPTS, YPTS, opt[k] );
+                plmesh( x, y, (PLFLT_MATRIX) z, XPTS, YPTS, opt[k] );
 
             // magnitude colored wireframe plot
             else if ( i == 1 )
-                plmesh( x, y, (const PLFLT * const *) z, XPTS, YPTS, opt[k] | MAG_COLOR );
+                plmesh( x, y, (PLFLT_MATRIX) z, XPTS, YPTS, opt[k] | MAG_COLOR );
 
             // magnitude colored wireframe plot with sides
             else if ( i == 2 )
-                plot3d( x, y, (const PLFLT * const *) z, XPTS, YPTS, opt[k] | MAG_COLOR, 1 );
+                plot3d( x, y, (PLFLT_MATRIX) z, XPTS, YPTS, opt[k] | MAG_COLOR, 1 );
 
             // magnitude colored wireframe plot with base contour
             else if ( i == 3 )
-                plmeshc( x, y, (const PLFLT * const *) z, XPTS, YPTS, opt[k] | MAG_COLOR | BASE_CONT,
+                plmeshc( x, y, (PLFLT_MATRIX) z, XPTS, YPTS, opt[k] | MAG_COLOR | BASE_CONT,
                     clevel, nlevel );
 
             plcol0( 3 );

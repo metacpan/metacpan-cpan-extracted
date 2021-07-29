@@ -1,5 +1,5 @@
 package Photonic::Roles::AllH;
-$Photonic::Roles::AllH::VERSION = '0.017';
+$Photonic::Roles::AllH::VERSION = '0.018';
 
 =encoding UTF-8
 
@@ -9,7 +9,7 @@ Photonic::Roles::AllH
 
 =head1 VERSION
 
-version 0.017
+version 0.018
 
 =head1 COPYRIGHT NOTICE
 
@@ -54,7 +54,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA  02110-1301 USA
 =item (for developers)
 
     package Photonic::LE::NR2::AllH;
-    $Photonic::LE::NR2::AllH::VERSION= '0.017';
+    $Photonic::LE::NR2::AllH::VERSION= '0.018';
     use namespace::autoclean;
     use Moose;
     has...

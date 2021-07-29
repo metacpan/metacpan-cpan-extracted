@@ -8,7 +8,7 @@ Tests for the Perl module L<Util::H2O>.
 
 =head1 Author, Copyright, and License
 
-Copyright (c) 2020 Hauke Daempfling (haukex@zero-g.net).
+Copyright (c) 2020-2021 Hauke Daempfling (haukex@zero-g.net).
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl 5 itself.
@@ -20,7 +20,7 @@ L<http://perldoc.perl.org/perlartistic.html>.
 
 =cut
 
-use Test::More tests => 128;
+use Test::More tests => 191;
 use Scalar::Util qw/blessed/;
 
 sub exception (&) { eval { shift->(); 1 } ? undef : ($@ || die) }  ## no critic (ProhibitSubroutinePrototypes, RequireFinalReturn, RequireCarping)
@@ -30,7 +30,10 @@ sub warns (&) { my @w; { local $SIG{__WARN__} = sub { push @w, shift }; shift->(
 
 diag "This is Perl $] at $^X on $^O";
 BEGIN { use_ok 'Util::H2O' }
-is $Util::H2O::VERSION, '0.10';
+is $Util::H2O::VERSION, '0.12';
+
+diag "If all tests pass, you can ignore the \"this Perl is too old\" warnings"
+	if $] lt '5.008009';
 
 my $PACKRE = qr/\AUtil::H2O::_[0-9A-Fa-f]+\z/;
 
@@ -77,6 +80,19 @@ my $PACKRE = qr/\AUtil::H2O::_[0-9A-Fa-f]+\z/;
 	is ref $o4->c, 'CODE';
 	is $o4->c, $code;
 }
+{
+	my $o = h2o -recurse, { foo => { bar => "quz" } };
+	SKIP: {
+		skip "Won't work on old Perls", 2 if $] lt '5.008009';
+		ok exception { $o->{abc} = 123 };
+		ok exception { $o->foo->{def} = 456 };
+	}
+	my $o2 = h2o -recurse, -nolock, { foo => { bar => "quz" } };
+	$o2->{abc} = 123;
+	$o2->foo->{def} = 456;
+	is_deeply [sort keys %$o2], [qw/ abc foo /];
+	is_deeply [sort keys %{$o2->foo}], [qw/ bar def /];
+}
 
 # -meth
 {
@@ -110,6 +126,11 @@ my $PACKRE = qr/\AUtil::H2O::_[0-9A-Fa-f]+\z/;
 	$o->{y} = 333;
 	is_deeply $o, { x=>111, y=>333 };
 	is $o->y, 222;
+}
+{
+	my $h = { foo => 123, bar => sub {} };
+	h2o -meth, $h;
+	is_deeply $h, { foo => 123 };
 }
 
 # -class
@@ -178,7 +199,6 @@ sub checksym {
 	isa_ok $n, 'Quz';
 	my $n2 = new_ok 'Quz';
 	is $n2->abc, undef;
-	$n2->{new} = sub{die};  ## no critic (RequireCarping)
 	my $n3 = $n2->new(abc=>444);
 	is $n3->abc, 444;
 	like exception { Quz->new(abc=>4,5) }, qr/\bOdd\b/;
@@ -271,14 +291,128 @@ sub checksym {
 {
 	h2o -class=>'Baz', -new, {}, qw/ abc /;
 	my $n = Baz->new(abc=>123);
+	if ($] lt '5.008009') {
+		$n->{def} = 456;
+		is_deeply [sort keys %$n], [qw/ abc def /];
+		pass 'dummy'; # so the number of tests still fits
+	}
+	else {
+		ok exception { $n->{def} = 456 };
+		is_deeply [sort keys %$n], [qw/ abc /];
+	}
+}
+{
+	h2o -class=>'Baz2', -new, -nolock, {}, qw/ abc /;
+	my $n = Baz2->new(abc=>123);
 	$n->{def} = 456;
 	is_deeply [sort keys %$n], [qw/ abc def /];
+}
+
+# -ro
+SKIP: {
+	skip "Won't work on old Perls", 36 if $] lt '5.008009';
+	my $o = h2o -ro, { foo=>123, bar=>undef };
+	is $o->foo, 123;
+	is $o->bar, undef;
+	ok exception { $o->foo(456) };
+	ok exception { $o->bar(789) };
+	ok exception { $o->{foo} = 456 };
+	ok exception { $o->{bar} = 789 };
+	ok exception { $o->{quz} = 111 };
+	is $o->foo, 123;
+	is $o->bar, undef;
+	is_deeply [sort keys %$o], [qw/ bar foo /];
+
+	my $or = h2o -ro, -recurse, { foo => { bar => 'quz' } };
+	ok exception { $or->foo(123) };
+	ok exception { $or->foo->bar(456) };
+	ok exception { $or->{foo} = 123 };
+	ok exception { $or->{foo}{bar} = 456 };
+	ok exception { $or->foo->{bar} = 456 };
+
+	my $on = h2o -ro, -new, {}, qw/foo bar/;
+	ok exception { $on->{foo} = 'x' };
+	ok exception { $on->{bar} = 'y' };
+	ok exception { $on->foo("x") };
+	is_deeply [%$on], [];
+	is $on->foo, undef;
+	is $on->bar, undef;
+	my $onn = $on->new(foo=>'quz');
+	isa_ok $onn, ref $on;
+	ok exception { $onn->{foo} = 'x' };
+	ok exception { $onn->{bar} = 'y' };
+	ok exception { $onn->foo("x") };
+	is_deeply [%$onn], [ foo=>'quz' ];
+	is $onn->foo, 'quz';
+	is $onn->bar, undef;
+
+	h2o -classify=>'ReadOnlyFoo', -ro, {
+			add => sub { $_[0]->x + $_[0]->y },
+		}, qw/ x y /;
+	my $x = ReadOnlyFoo->new(x=>123, y=>456);
+	is $x->add, 579;
+	ok exception { $x->x(111) };
+	ok exception { $x->y(222) };
+	ok exception { $x->{x}=111 };
+	ok exception { $x->{y}=222 };
+	is $x->add, 579;
+
+	ok exception { h2o -ro, { foo=>123 }, qw/ bar / };
+	ok exception { h2o -ro, -nolock, { foo=>123 } };
+}
+
+# plain AUTOLOAD
+{
+	my $o = h2o { AUTOLOAD => 123, baz => 789 }, 'abc';  ## no critic (ProhibitCommaSeparatedStatements)
+	is $o->AUTOLOAD, 123;
+	is $o->foo, 123;
+	is $o->bar(456), 456;
+	is $o->quz, 456;
+	is $o->baz, 789;
+	is $o->abc, undef;
+	$o->abc('def');
+	is $o->xyz, 456;
+	is $o->abc, 'def';
+	is $o->baz, 789;
+	is $o->AUTOLOAD, 456;
+}
+# -meth with AUTOLOAD
+{
+	my @auto;
+	my $o = h2o -meth, { AUTOLOAD => sub {
+			our $AUTOLOAD;
+			push @auto, $AUTOLOAD, [@_];
+			return 'ijk';
+		} }, 'quz';
+	is $o->foo("bar"), 'ijk';
+	is $o->bar(), 'ijk';
+	is $o->quz("baz"), 'baz';
+	is_deeply \@auto, [
+		ref($o).'::foo', [ $o, "bar" ],
+		ref($o).'::bar', [ $o ],
+	] or diag explain \@auto;
+	is $o->quz, "baz";
+	is_deeply [keys %$o], ["quz"];
 }
 
 ok !grep { /redefined/i } warns {
 	h2o { abc => "def" }, qw/ abc /;
 	h2o {}, qw/ abc abc /;
 };
+
+SKIP: {
+	skip "Tests only for old Perls", 4 if $] ge '5.008009';
+	my @w = warns {
+		my $o1 = h2o {};
+		$o1->{bar} = 456;
+		is_deeply [%$o1], [ bar=>456 ];
+		my $o2 = h2o -ro, { foo=>123 };
+		$o2->{foo} = 456;
+		ok exception { $o2->foo(789) };
+		is_deeply [%$o2], [ foo=>456 ];
+	};
+	is grep({ /\btoo old\b/i } @w), 2;
+}
 
 ok exception { h2o() };
 ok exception { h2o("blah") };

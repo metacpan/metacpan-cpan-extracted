@@ -211,13 +211,13 @@ void Stream::use_ssl (SslContext ctx = NULL) {
 
 void Stream::no_ssl ()
 
-void Stream::recv_buffer_size (Simple newval = Simple()) {
-    if (newval) XSRETURN_EXPECTED(THIS->recv_buffer_size(newval));
+void Stream::recv_buffer_size (SV* newval = {}) {
+    if (newval) XSRETURN_EXPECTED(THIS->recv_buffer_size(xs::in<int>(newval)));
     else        XSRETURN_EXPECTED(THIS->recv_buffer_size());
 }
 
-void Stream::send_buffer_size (Simple newval = Simple()) {
-    if (newval) XSRETURN_EXPECTED(THIS->send_buffer_size(newval));
+void Stream::send_buffer_size (SV* newval = {}) {
+    if (newval) XSRETURN_EXPECTED(THIS->send_buffer_size(xs::in<int>(newval)));
     else        XSRETURN_EXPECTED(THIS->send_buffer_size());
 }
 

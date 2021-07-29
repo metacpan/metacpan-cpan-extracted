@@ -1,3 +1,17 @@
+0.003   2021-07-11  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+        - [build] Rebuild with newer Perinci::Sub::To::CLIDocData (0.298) for
+          better usage line (grouped common options).
+
+
+0.002   2021-07-10  Released-By: PERLANCAR; Urgency: medium
+
+	- Remove arguments 'dash_prefix_inverts', 'all' from AppBase::Grep as
+          this is irrelevant to us.
+
+
 0.001   2021-07-01  Released-By: PERLANCAR
 
         - First release.

@@ -14,7 +14,6 @@ use App::cpm::Resolver::MetaCPAN;
 use App::cpm::Resolver::MetaDB;
 use App::cpm::Util qw(WIN32 determine_home maybe_abs);
 use App::cpm::Worker;
-use App::cpm::file;
 use App::cpm::version;
 use App::cpm;
 use Config;
@@ -24,6 +23,8 @@ use File::Path ();
 use File::Spec;
 use Getopt::Long qw(:config no_auto_abbrev no_ignore_case bundling);
 use List::Util ();
+use Module::CPANfile;
+use Module::cpmfile;
 use Parallel::Pipes;
 use Pod::Text ();
 
@@ -489,61 +490,49 @@ sub initial_task {
 
 sub load_dependency_file {
     my $self = shift;
-    my $method = "load_" . $self->{dependency_file}{type};
-    $self->$method($self->{dependency_file}{path});
-}
 
-sub load_cpmfile {
-    my ($self, $path) = @_;
-    my $file = App::cpm::file->new($path);
-    $self->{mirror} ||= $self->{_default_mirror};
-    my @phase = grep $self->{"with_$_"}, qw(configure build test runtime develop);
-    my @type  = grep $self->{"with_$_"}, qw(requires recommends suggests);
-    my $reqs = $file->cpanmeta_prereqs->merged_requirements(\@phase, \@type)->as_string_hash;
-    my @package = map +{ package => $_, version_range => $reqs->{$_} }, sort keys %$reqs;
-    return (\@package, [], undef);
-}
-
-sub load_cpanfile {
-    my ($self, $path) = @_;
-    require Module::CPANfile;
-    my $cpanfile = Module::CPANfile->load($path);
+    my $cpmfile;
+    if ($self->{dependency_file}{type} eq "cpmfile") {
+        $cpmfile = Module::cpmfile->load($self->{dependency_file}{path});
+    } else {
+        my $cpanfile = Module::CPANfile->load($self->{dependency_file}{path});
+        $cpmfile =  Module::cpmfile->from_cpanfile($cpanfile);
+    }
     if (!$self->{mirror}) {
-        my $mirrors = $cpanfile->mirrors;
+        my $mirrors = $cpmfile->{_mirrors} || [];
         if (@$mirrors) {
             $self->{mirror} = $self->normalize_mirror($mirrors->[0]);
         } else {
             $self->{mirror} = $self->{_default_mirror};
         }
     }
-    my $prereqs = $cpanfile->prereqs_with(@{ $self->{"feature"} });
     my @phase = grep $self->{"with_$_"}, qw(configure build test runtime develop);
     my @type  = grep $self->{"with_$_"}, qw(requires recommends suggests);
-    my $reqs = $prereqs->merged_requirements(\@phase, \@type)->as_string_hash;
+    my $reqs = $cpmfile->effective_requirements($self->{feature}, \@phase, \@type);
 
     my (@package, @reinstall);
     for my $package (sort keys %$reqs) {
-        my $option = $cpanfile->options_for_module($package) || {};
+        my $options = $reqs->{$package};
         my $req = {
             package => $package,
-            version_range => $reqs->{$package},
-            dev => $option->{dev},
-            reinstall => $option->{git} ? 1 : 0,
+            version_range => $options->{version},
+            dev => $options->{dev},
+            reinstall => $options->{git} ? 1 : 0,
         };
-        if ($option->{git}) {
+        if ($options->{git}) {
             push @reinstall, $req;
         } else {
             push @package, $req;
         }
     }
 
-    require App::cpm::Resolver::CPANfile;
-    my $resolver = App::cpm::Resolver::CPANfile->new(
-        cpanfile => $cpanfile,
+    require App::cpm::Resolver::Custom;
+    my $resolver = App::cpm::Resolver::Custom->new(
+        requirements => $reqs,
         mirror => $self->{mirror},
+        from => $self->{dependency_file}{type},
     );
-
-    (\@package, \@reinstall, $resolver);
+    return (\@package, \@reinstall, $resolver->effective ? $resolver : undef);
 }
 
 sub generate_resolver {

@@ -50,6 +50,10 @@ Line number
 
 Log message
 
+x=0: normal behaviour
+
+x=1: multiline message support. Each line of message will be "log-formatted" as if they all were written in log separately.
+
 =item %t
 
 Current time.

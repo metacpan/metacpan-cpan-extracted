@@ -4,7 +4,7 @@ use warnings;
 
 require 5.008_001;
 
-our $VERSION = '0.34';
+our $VERSION = '0.40';
 $VERSION = eval {$VERSION};
 
 
@@ -39,9 +39,12 @@ Net::SAML2
 
 =head1 VERSION
 
-version 0.34
+version 0.40
 
 =head1 SYNOPSIS
+
+  See TUTORIAL.md for implementation documentation and
+  t/12-full-client.t for a pseudo implementation following the tutorial
 
   # generate a redirect off to the IdP:
 
@@ -123,6 +126,8 @@ Identity Providers (IdPs).  It has been tested against:
 
 =item Keycloak
 
+=item Auth0 (requires Net::SAML2 >=0.39)
+
 =back
 
 =head1 NAME
@@ -139,9 +144,29 @@ Net::SAML2 - SAML bindings and protocol implementation
 
 =back
 
-=head1 AUTHOR
+=head1 CONTRIBUTORS
 
-Chris Andrews <chrisandrews@venda.com>
+=over
+
+=item Chris Andrews <chris@nodnol.org>
+
+=item Oskari Okko Ojala <okko@frantic.com>
+
+=item Peter Marschall <peter@adpm.de>
+
+=item Mike Wisener <xmikew@cpan.org>
+
+=item Jeff Fearn <jfearn@redhat.com>
+
+=item Alessandro Ranellucci <aar@cpan.org>
+
+=item Mike Wisener <mwisener@secureworks.com>, xmikew <github@32ths.com>
+
+=item xmikew <github@32ths.com>
+
+=item Timothy Legge <timlegge@gmail.com>
+
+=back
 
 =head1 COPYRIGHT
 
@@ -158,17 +183,11 @@ it under the same terms as Perl itself.
 
 =head1 AUTHOR
 
-Original Author: Chris Andrews  <chrisa@cpan.org>
+Chris Andrews  <chrisa@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Chris Andrews and Others; in detail:
-
-  Copyright 2010-2012  Chris Andrews
-            2016       Jeff Fearn
-            2017       xmikew
-            2019-2021  Timothy Legge
-
+This software is copyright (c) 2021 by Chris Andrews and Others, see the git log.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

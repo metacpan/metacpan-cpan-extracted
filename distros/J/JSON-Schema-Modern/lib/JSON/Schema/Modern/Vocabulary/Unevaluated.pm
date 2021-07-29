@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary::Unevaluated;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Unevaluated vocabulary
 
-our $VERSION = '0.513';
+our $VERSION = '0.514';
 
 use 5.016;
 no if "$]" >= 5.031009, feature => 'indirect';
@@ -169,7 +169,7 @@ JSON::Schema::Modern::Vocabulary::Unevaluated - Implementation of the JSON Schem
 
 =head1 VERSION
 
-version 0.513
+version 0.514
 
 =head1 DESCRIPTION
 
@@ -180,7 +180,7 @@ version 0.513
 Implementation of the C<unevaluatedItems> and C<unevaluatedProperties> keywords in the
 JSON Schema Draft 2019-09 "Applicator" vocabulary, indicated in metaschemas
 with the URI C<https://json-schema.org/draft/2019-09/vocab/applicator> and formally specified in
-L<https://json-schema.org/draft/2019-09/json-schema-core.html#rfc.section.9>.
+L<https://datatracker.ietf.org/doc/html/draft-handrews-json-schema-02#section-9>.
 
 =head1 SUPPORT
 

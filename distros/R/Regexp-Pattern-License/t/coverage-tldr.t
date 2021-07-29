@@ -34,8 +34,8 @@ my %names = map {
 like(
 	\%names,
 	hash {
-#		field '3dfx Glide License' => '3dfx-glide-license';
-		field '4-Clause BSD' => '4-clause-bsd';
+		field '3dfx Glide License' => '3dfx-glide-license';
+		field '4-Clause BSD'       => '4-clause-bsd';
 
 #		field '4k Video Downloader EULA' => '4k-video-downloader';
 		field 'Abstyles License' => 'abstyles-license';
@@ -86,8 +86,7 @@ like(
 			'bittorrent-open-source-license-v1.1-(bittorrent-1.1)';
 		field 'Boost Software License 1.0 (BSL-1.0)' =>
 			'boost-software-license-1.0-explained';
-
-#		field 'Borceux license' => 'borceux-license';
+		field 'Borceux license'             => 'borceux-license';
 		field 'BSD 0-Clause License (0BSD)' => 'bsd-0-clause-license';
 		field 'BSD 2-Clause License (FreeBSD/Simplified)' =>
 			'bsd-2-clause-license-(freebsd)';
@@ -121,8 +120,9 @@ like(
 		field
 			'Computer Associates Trusted Open Source License 1.1 (CATOSL-1.1)'
 			=> 'computer-associates-trusted-open-source-license-1.1-(catosl-1.1)';
+		field 'Condor Public License v1.1 (Condor-1.1)' =>
+			'condor-public-license-v1.1-(condor-1.1)';
 
-#		field 'Condor Public License v1.1 (Condor-1.1)' => 'condor-public-license-v1.1-(condor-1.1)';
 #		field 'Copyfree Open Innovation License 0.3 (COIL-0.3)' => 'coil-v0.3';
 		field 'Creative Commons Attribution 3.0 Unported (CC-BY)' =>
 			'creative-commons-attribution-(cc)';
@@ -156,19 +156,22 @@ like(
 			'creative-commons-attribution-share-alike-(cc-sa)';
 		field 'Creative Commons CC0 1.0 Universal (CC-0)' =>
 			'creative-commons-cc0-1.0-universal';
+		field 'Crossword License' => 'crossword-license';
 
-#		field 'Crossword License' => 'crossword-license';
 #		field 'CrystalStacker License' => 'crystalstacker-license';
 		field 'CUA Office Public License v1.0 (CUA-OPL-1.0)' =>
 			'cua-office-public-license-v1.0-(cua-opl-1.0)';
 		field 'Cube License' => 'cube-license';
 		field 'curl License' => 'curl-license';
 
-#		field 'DBAD Public License' => 'dbad-public-license';
+		field 'DBAD Public License' => 'dbad-public-license';
+
 #		field 'DejaVu Fonts License v1.00' => 'dejavu-fonts-license-v1.00';
 #		field 'diffmark license' => 'diffmark-license';
 #		field 'DOC License' => 'doc-license';
-#		field 'DON\'T BE A DICK PUBLIC LICENSE' => 'don\'t-be-a-dick-public-license';
+		field 'DON\'T BE A DICK PUBLIC LICENSE' =>
+			'don\'t-be-a-dick-public-license';
+
 #		field 'Doom Source Licence' => 'doom-source-licence';
 #		field 'Dotseqn License' => 'dotseqn-license';
 		field 'Do What The F*ck You Want To Public License v2 (WTFPL-2.0)' =>
@@ -192,24 +195,23 @@ like(
 		field 'enna License' => 'enna-license';
 		field 'Entessa Public License v1.0 (Entessa)' =>
 			'entessa-public-license-v1.0-(entessa)';
-
-#		field 'Erlang Public License v1.1 (ErlPL-1.1)' => 'erlang-public-license-v1.1-(erlpl-1.1)';
+		field 'Erlang Public License v1.1 (ErlPL-1.1)' =>
+			'erlang-public-license-v1.1-(erlpl-1.1)';
 		field 'EU DataGrid Software License (EUDatagrid)' =>
 			'eu-datagrid-software-license-(eudatagrid)';
 		field 'European Union Public License 1.1 (EUPL-1.1)' =>
 			'european-union-public-licence';
 		field 'Eurosym License'     => 'eurosym-license';
 		field 'Fair License (Fair)' => 'fair-license';
-
-#		field 'Fair Source License 0.9 (Fair-Source-0.9)' => 'fair-source-license-0.9-(fair-source-0.9)';
+		field 'Fair Source License 0.9 (Fair-Source-0.9)' =>
+			'fair-source-license-0.9-(fair-source-0.9)';
 		field 'feh License' => 'feh-license';
 
 #		field 'FlatStone Tech Custom License' => 'flatstone-tech-custom-license';
 #		field 'Foxit EULA' => 'foxit-reader-7';
 		field 'Frameworx Open License 1.0 (Frameworx-1.0)' =>
 			'frameworx-open-license-1.0-(frameworx-1.0)';
-
-#		field 'Free Art License (FAL)' => 'free-art-license-(fal)';
+		field 'Free Art License (FAL)' => 'free-art-license-(fal)';
 
 # TODO: have this test proprly handle alternate entries
 #		field 'Free Public License 1.0.0' => 'free-public-license-1.0.0';
@@ -238,14 +240,15 @@ like(
 #		field 'Haskell Language Report License' => 'haskell-language-report-license';
 		field 'Historic Permission Notice and Disclaimer (HPND)' =>
 			'historic-permission-notice-and-disclaimer-(hpnd)';
-
-#		field 'IBM PowerPC Initialization and Boot Software (IBM-pibs)' => 'ibm-powerpc-initialization-and-boot-software-(ibm-pibs)';
+		field 'IBM PowerPC Initialization and Boot Software (IBM-pibs)' =>
+			'ibm-powerpc-initialization-and-boot-software-(ibm-pibs)';
 		field 'IBM Public License 1.0 (IPL)' =>
 			'ibm-public-license-1.0-(ipl)';
 
 #		field 'IDGAF v1.0' => 'idgaf-v1.0';
-#		field 'Imlib2 License (Imlib2)' => 'imlib2-license-(imlib2)';
-#		field 'Independent JPEG Group License (IJG)' => 'independent-jpeg-group-license-(ijg)';
+		field 'Imlib2 License (Imlib2)' => 'imlib2-license-(imlib2)';
+		field 'Independent JPEG Group License (IJG)' =>
+			'independent-jpeg-group-license-(ijg)';
 		field 'Intel Open Source License (Intel)' =>
 			'intel-open-source-license-(intel)';
 		field 'IPA Font License (IPA)' => 'ipa-font-license-(ipa)';
@@ -262,7 +265,8 @@ like(
 			'latex-project-public-license-v1.3c-(lppl-1.3c)';
 
 #		field 'Liason License Agreement' => 'liason-license-agreement';
-#		field 'libtiff License' => 'libtiff-license';
+		field 'libtiff License' => 'libtiff-license';
+
 #		field 'Licence for 6 box js' => 'licence-for-6-box-js';
 		field 'Lisp Lesser General Public License (LLGPL)' =>
 			'lisp-lesser-general-public-license';
@@ -272,8 +276,9 @@ like(
 			'microsoft-public-license-(ms-pl)';
 		field 'Microsoft Reciprocal License (Ms-RL)' =>
 			'microsoft-reciprocal-license-(ms-rl)';
+		field 'Microsoft Shared Source Community License (MS-CL)' =>
+			'microsoft-shared-source-community-license-(ms-cl)';
 
-#		field 'Microsoft Shared Source Community License (MS-CL)' => 'microsoft-shared-source-community-license-(ms-cl)';
 #		field 'MinecraftForge License' => 'minecraftforge-license';
 		field 'MirOS License (MirOS)' => 'miros-license-(miros)';
 		field 'MIT License (Expat)'   => 'mit-license';
@@ -295,12 +300,12 @@ like(
 			'nasa-open-source-agreement-1.3-(nasa-1.3)';
 		field 'Naumen Public License (Naumen)' =>
 			'naumen-public-license-(naumen)';
-
-#		field 'Net Boolean Public License v1 (NBPL-1.0)' => 'net-boolean-public-license-v1-(nbpl-1.0)';
+		field 'Net Boolean Public License v1 (NBPL-1.0)' =>
+			'net-boolean-public-license-v1-(nbpl-1.0)';
 		field 'Nethack General Public License (NGPL)' =>
 			'nethack-general-public-license-(ngpl)';
-
-#		field 'Netizen Open Source License (NOSL)' => 'netizen-open-source-license-(nosl)';
+		field 'Netizen Open Source License (NOSL)' =>
+			'netizen-open-source-license-(nosl)';
 		field 'Netscape Public License v1.1 (NPL-1.1)' =>
 			'netscape-public-license-v1.1-(npl-1.1)';
 
@@ -317,9 +322,11 @@ like(
 		field 'NTP License (NTP)' => 'ntp-license-(ntp)';
 		field 'OCLC Research Public License 2.0 (OCLC-2.0)' =>
 			'oclc-research-public-license-2.0-(oclc-2.0)';
+		field 'ODC Open Database License (ODbL)' =>
+			'odc-open-database-license-(odbl)';
+		field 'ODC Public Domain Dedication & License 1.0 (PDDL-1.0)' =>
+			'odc-public-domain-dedication-&-license-1.0-(pddl-1.0)';
 
-#		field 'ODC Open Database License (ODbL)' => 'odc-open-database-license-(odbl)';
-#		field 'ODC Public Domain Dedication & License 1.0 (PDDL-1.0)' => 'odc-public-domain-dedication-&-license-1.0-(pddl-1.0)';
 #		field 'Open CASCADE Technology Public License v6.5' => 'open-cascade-technology-public-license-v6.5';
 #		field 'OPEN GAME LICENSE (OGL)' => 'open-game-license-(ogl)';
 #		field 'Open Government Licence v3 (UK)' => 'open-government-licence-v3-(uk)';
@@ -343,9 +350,9 @@ like(
 		field 'OpenSSL License (OpenSSL)' => 'openssl-license-(openssl)';
 
 #		field 'Oracle Binary Code License Agreement for the Java SE Platform Products and JavaFX' => 'oracle-binary-code-license-agreement-for-the-java-se-platform-products-and-javafx';
-#		field 'Peer Production License' => 'peer-production-license';
-		field 'PHP License 3.0.1'     => 'the-php-license-3.0.1';
-		field 'PHP License 3.0 (PHP)' => 'php-license-3.0-(php)';
+		field 'Peer Production License' => 'peer-production-license';
+		field 'PHP License 3.0.1'       => 'the-php-license-3.0.1';
+		field 'PHP License 3.0 (PHP)'   => 'php-license-3.0-(php)';
 		field 'PostgreSQL License (PostgreSQL)' =>
 			'postgresql-license-(postgresql)';
 
@@ -367,8 +374,9 @@ like(
 		field 'Ricoh Source Code Public License (RSCPL)' =>
 			'ricoh-source-code-public-license-(rscpl)';
 		field 'Ruby License (Ruby)' => 'ruby-license-(ruby)';
+		field 'Sax Public Domain Notice (SAX-PD)' =>
+			'sax-public-domain-notice-(sax-pd)';
 
-#		field 'Sax Public Domain Notice (SAX-PD)' => 'sax-public-domain-notice-(sax-pd)';
 #		field 'ScheduALL Software License' => 'scheduall-software-license';
 #		field 'Sendmail License' => 'sendmail-license';
 		field 'SGI Free Software License B v2.0 (SGI-B-2.0)' =>
@@ -377,9 +385,10 @@ like(
 #		field 'ShinobiControls license' => 'shinobicontrols-license';
 		field 'SIL Open Font License v1.1 (OFL-1.1)' =>
 			'open-font-license-(ofl)-explained';
-
-#		field 'Simple Non Code License (SNCL) 2.1.0' => 'simple-non-code-license-2.0.2';
-#		field 'Simple non code license (SNCL)' => 'simple-non-code-license-(sncl)';
+		field 'Simple Non Code License (SNCL) 2.1.0' =>
+			'simple-non-code-license-2.0.2';
+		field 'Simple non code license (SNCL)' =>
+			'simple-non-code-license-(sncl)';
 		field 'Simple Public License 2.0 (SimPL)' =>
 			'simple-public-license-2.0-(simpl)';
 
@@ -402,8 +411,8 @@ like(
 #		field 'Tcl' => 'tcl';
 		field 'The Code Project Open License (CPOL) 1.02' =>
 			'the-code-project-open-license-(cpol)-1.02';
-
-#		field 'The Don\'t Ask Me About It License' => 'the-don\'t-ask-me-about-it-license';
+		field 'The Don\'t Ask Me About It License' =>
+			'the-don\'t-ask-me-about-it-license';
 		field 'The JSON License' => 'the-json-license';
 
 #		field 'Themeforest Regular License' => 'themeforest-regular-license';
@@ -411,21 +420,25 @@ like(
 #		field 'Tóca Operating System General License 2.0 (TOSG-2.00)' => 'tosg-2.00-(toca-operating-system-general-license)';
 #		field 'TORQUE v2.5+ Software License v1.1' => 'torque-v2.5+-software-license-v1.1';
 #		field 'TrackingTeam Licence' => 'trackingteam-licence';
-#		field 'TrueCrypt License Version 3.0' => 'truecrypt-license-version-3.0';
+		field 'TrueCrypt License Version 3.0' =>
+			'truecrypt-license-version-3.0';
+
 #		field 'Ubuntu Font License 1.0 (UFL-1.0)' => 'ubuntu-font-license,-1.0';
 		field 'Universal Permissive License 1.0 (UPL-1.0)' =>
 			'universal-permissive-license-1.0-(upl-1.0)';
 		field 'University of Illinois - NCSA Open Source License (NCSA)' =>
 			'university-of-illinois---ncsa-open-source-license-(ncsa)';
 
-# TODO: have this test proprly handle alternate entries
+# TODO: have this test properly handle alternate entries
 #		field 'Unlicence' => 'unlicence';
 		field 'Unlicense' => 'unlicense';
 
 #		field 'Unreal Engine End User License Agreement v9' => 'unreal-engine-end-user-license-agreement-version-9';
 #		field 'Use License' => 'use-license';
 #		field 'VatSpy EULA' => 'vatspy-eula';
-#		field 'Very Simple Public License (VSPL)' => 'very-simple-public-license-(vspl)';
+		field 'Very Simple Public License (VSPL)' =>
+			'very-simple-public-license-(vspl)';
+
 #		field 'Vivaldi Browser EULA' => 'vivaldi-browser-eula';
 #		field 'VMware vSphere End User License Agreement' => 'vmware-vsphere-end-user-license-agreement';
 		field 'Vovida Software License v1.0 (VSL-1.0)' =>
@@ -439,15 +452,19 @@ like(
 		field 'X11 License' => 'x11-license';
 
 #		field 'Xerox License (Xerox)' => 'xerox-license-(xerox)';
-#		field 'XFree86 License 1.1 (XFree86-1.1)' => 'xfree86-license-1.1-(xfree86-1.1)';
+		field 'XFree86 License 1.1 (XFree86-1.1)' =>
+			'xfree86-license-1.1-(xfree86-1.1)';
 		field 'X.Net License (Xnet)' => 'x.net-license-(xnet)';
 
 #		field 'XSkat License' => 'xskat-license';
-#		field 'Yahoo! Public License v1.1 (YPL-1.1)' => 'yahoo!-public-license-v1.1-(ypl-1.1)';
+		field 'Yahoo! Public License v1.1 (YPL-1.1)' =>
+			'yahoo!-public-license-v1.1-(ypl-1.1)';
+
 #		field 'Zebra SDK' => 'zebra-sdk';
-#		field 'Zed License' => 'zed-license';
-#		field 'Zimbra Public License v1.3 (Zimbra-1.3)' => 'zimbra-public-license-v1.3-(zimbra-1.3)';
-#		field 'zimbra public license' => 'zimbra-public-license';
+		field 'Zed License' => 'zed-license';
+		field 'Zimbra Public License v1.3 (Zimbra-1.3)' =>
+			'zimbra-public-license-v1.3-(zimbra-1.3)';
+		field 'zimbra public license'      => 'zimbra-public-license';
 		field 'Zlib-Libpng License (Zlib)' => 'zlib-libpng-license-(zlib)';
 		field 'Zope Public License 1.1 (ZPL-1.1)' =>
 			'zope-public-license-1.1-(zpl-1.1)';

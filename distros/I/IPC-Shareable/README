@@ -4,87 +4,121 @@ NAME
 
 SYNOPSIS
 
+        use IPC::Shareable qw(:lock);
+    
+        tie SCALAR, 'IPC::Shareable', OPTIONS;
+        tie ARRAY,  'IPC::Shareable', OPTIONS;
+        tie HASH,   'IPC::Shareable', OPTIONS;
+    
+        (tied VARIABLE)->lock;
+        (tied VARIABLE)->unlock;
+    
+        (tied VARIABLE)->lock(LOCK_SH|LOCK_NB)
+            or print "Resource unavailable\n";
+    
+        my $segment   = (tied VARIABLE)->seg;
+        my $semaphore = (tied VARIABLE)->sem;
+    
+        (tied VARIABLE)->remove;
+    
+        IPC::Shareable->clean_up;
+        IPC::Shareable->clean_up_all;
+    
+        # Ensure only one instance of a script can be run at any time
+    
+        IPC::Shareable->singleton('UNIQUE SCRIPT LOCK STRING');
+
 DESCRIPTION
 
     IPC::Shareable allows you to tie a variable to shared memory making it
-    easy to share the contents of that variable with other Perl processes.
+    easy to share the contents of that variable with other Perl processes
+    and scripts.
 
-    Scalars, arrays, and hashes and even objects can be tied. The variable
+    Scalars, arrays, hashes and even objects can be tied. The variable
     being tied may contain arbitrarily complex data structures - including
     references to arrays, hashes of hashes, etc.
 
     The association between variables in distinct processes is provided by
-    GLUE (aka "key"). This is an integer number or 4 character string[1]
-    that serves as a common identifier for data across process space. Hence
-    the statement
+    GLUE (aka "key"). This is any arbitrary string or integer that serves
+    as a common identifier for data across process space. Hence the
+    statement:
 
-     tie my $scalar, 'IPC::Shareable', 'data';
+        tie my $scalar, 'IPC::Shareable', { key => 'GLUE STRING', create => 1 };
 
-    in program one and the statement
+    ...in program one and the statement
 
-     tie my $variable, 'IPC::Shareable', 'data';
+        tie my $variable, 'IPC::Shareable', { key => 'GLUE STRING' };
 
-    in program two will bind $scalar in program one and $variable in
-    program two.
+    ...in program two will create and bind $scalar the shared memory in
+    program one and bind it to $variable in program two.
 
     There is no pre-set limit to the number of processes that can bind to
     data; nor is there a pre-set limit to the complexity of the underlying
-    data of the tied variables[2]. The amount of data that can be shared
+    data of the tied variables. The amount of data that can be shared
     within a single bound variable is limited by the system's maximum size
     for a shared memory segment (the exact value is system-dependent).
 
     The bound data structures are all linearized (using Raphael Manfredi's
-    Storable module) before being slurped into shared memory. Upon
-    retrieval, the original format of the data structure is recovered.
-    Semaphore flags can be used for locking data between competing
-    processes.
+    Storable module or optionally JSON) before being slurped into shared
+    memory. Upon retrieval, the original format of the data structure is
+    recovered. Semaphore flags can be used for locking data between
+    competing processes.
 
 OPTIONS
 
-    Options are specified by passing a reference to a hash as the fourth
-    argument to the tie() function that enchants a variable. Alternatively
-    you can pass a reference to a hash as the third argument;
-    IPC::Shareable will then look at the field named key in this hash for
-    the value of GLUE. So,
+    Options are specified by passing a reference to a hash as the third
+    argument to the tie() function that enchants a variable.
 
-     tie my %variable, 'IPC::Shareable', 'data', \%options;
-
-    is equivalent to
-
-     tie my %variable, 'IPC::Shareable', { key => 'data', ... };
-
-    The following fields are recognized in the options hash.
+    The following fields are recognized in the options hash:
 
  key
 
-    The key field is used to determine the GLUE when using the
-    three-argument form of the call to tie(). This argument is then, in
-    turn, used as the KEY argument in subsequent calls to shmget() and
-    semget().
+    key is the GLUE that is a direct reference to the shared memory segment
+    that's to be tied to the variable.
 
-    The default value is IPC_PRIVATE, meaning that your variables cannot be
-    shared with other processes.
+    If this option is missing, we'll default to using IPC_PRIVATE. This
+    default key will not allow sharing of the variable between processes.
 
     Default: IPC_PRIVATE
 
  create
 
-    create is used to control whether calls to tie() create new shared
-    memory segments or not. If create is set to a true value,
-    IPC::Shareable will create a new binding associated with GLUE as
-    needed. If create is false, IPC::Shareable will not attempt to create a
-    new shared memory segment associated with GLUE. In this case, a shared
-    memory segment associated with GLUE must already exist or the call to
-    tie() will fail and return undef.
+    create is used to control whether the process creates a new shared
+    memory segment or not. If create is set to a true value, IPC::Shareable
+    will create a new binding associated with GLUE as needed. If create is
+    false, IPC::Shareable will not attempt to create a new shared memory
+    segment associated with GLUE. In this case, a shared memory segment
+    associated with GLUE must already exist or we'll croak().
 
-    Default: false
+    Defult: false
 
  exclusive
 
-    If exclusive field is set to a true value, calls to tie() will fail
-    (returning undef) if a data binding associated with GLUE already
-    exists. If set to a false value, calls to tie() will succeed even if a
-    shared memory segment associated with GLUE already exists.
+    If exclusive field is set to a true value, we will croak() if the data
+    binding associated with GLUE already exists. If set to a false value,
+    calls to tie() will succeed even if a shared memory segment associated
+    with GLUE already exists.
+
+    See "graceful" for a silent, non-exception exit if a second process
+    attempts to obtain an in-use exclusive segment.
+
+    Default: false
+
+ graceful
+
+    If exclusive is set to a true value, we normally croak() if a second
+    process attempts to obtain the same shared memory segment. Set graceful
+    to true and we'll exit silently and gracefully. This option does
+    nothing if exclusive isn't set.
+
+    Useful for ensuring only a single process is running at a time.
+
+    Default: false
+
+ warn
+
+    When set to a true value, graceful will output a warning if there are
+    process collisions.
 
     Default: false
 
@@ -98,11 +132,31 @@ OPTIONS
 
     Default: 0666 (world read and writeable)
 
+ size
+
+    This field may be used to specify the size of the shared memory segment
+    allocated.
+
+    The maximum size we allow by default is ~1GB. See the "limit" option to
+    override this default.
+
+    Default: IPC::Shareable::SHM_BUFSIZ() (ie. 65536)
+
+ limit
+
+    This field will allow you to set a segment size larger than the default
+    maximum which is 1,073,741,824 bytes (approximately 1 GB). If set, we
+    will croak() if a size specified is larger than the maximum. If it's
+    set to a false value, we'll croak() if you send in a size larger than
+    the total system RAM.
+
+    Default: true
+
  destroy
 
     If set to a true value, the shared memory segment underlying the data
-    binding will be removed when the process calling tie() exits
-    (gracefully)[3].
+    binding will be removed when the process that initialized the shared
+    memory segment exits (gracefully)[1].
 
     Only those memory segments that were created by the current process
     will be removed.
@@ -114,25 +168,69 @@ OPTIONS
 
     Default: false
 
- size
+ tidy
 
-    This field may be used to specify the size of the shared memory segment
-    allocated.
+    For long running processes, set this to a true value to clean up
+    unneeded segments from nested data structures. Comes with a slight
+    performance hit.
 
-    Default: IPC::Shareable::SHM_BUFSIZ() (ie. 65536)
+    Default: false
+
+ serializer
+
+    By default, we use Storable as the data serializer when writing to or
+    reading from the shared memory segments we create. For cross-platform
+    and cross-language purposes, you can optionally use JSON for this task.
+
+    Send in either json or storable as the value to use the respective
+    serializer.
+
+    Default: storable
 
  Default Option Values
 
     Default values for options are:
 
-         key       => IPC_PRIVATE,
-         create    => 0,
-         exclusive => 0,
-         destroy   => 0,
-         mode      => 0,
-         size      => IPC::Shareable::SHM_BUFSIZ(),
+        key         => IPC_PRIVATE,
+        create      => 0,
+        exclusive   => 0,
+        mode        => 0,
+        size        => IPC::Shareable::SHM_BUFSIZ(),
+        limit       => 1,
+        destroy     => 0,
+        graceful    => 0,
+        warn        => 0,
+        tidy        => 0,
+        serializer  => 'storable',
 
 METHODS
+
+ singleton($glue, $warn)
+
+    Class method that ensures that only a single instance of a script can
+    be run at any given time.
+
+    Parameters:
+
+        $glue
+
+    Mandatory, String: The key/glue that identifies the shared memory
+    segment.
+
+        $warn
+
+    Optional, Bool: Send in a true value to have subsequent processes throw
+    a warning that there's been a shared memory violation and that it will
+    exit.
+
+    Default: false
+
+ ipcs
+
+    Returns the number of instantiated shared memory segments that
+    currently exist on the system.
+
+    Return: Integer
 
  spawn(%opts)
 
@@ -157,13 +255,13 @@ METHODS
 
         use IPC::Shareable;
     
-        # following line sets things up and returns
+        # The following line sets things up and returns
     
-        IPC::Shareable->spawn(key => 'abcd');
+        IPC::Shareable->spawn(key => 'GLUE STRING');
 
     Now, either within the same script, or any other script on the system,
-    your data will be available at the key/glue abcd. Call unspawn() to
-    remove it.
+    your data will be available at the key/glue GLUE STRING. Call unspawn()
+    to remove it.
 
  unspawn($key, $destroy)
 
@@ -255,6 +353,21 @@ METHODS
     Called on either the tied variable or the tie object, returns the
     semaphore object related to the memory segment currently in use.
 
+ attributes
+
+    Retrieves the list of attributes that drive the IPC::Shareable object.
+
+    Parameters:
+
+        $attribute
+
+    Optional, String: The name of the attribute. If sent in, we'll return
+    the value of this specific attribute. Returns undef if the attribute
+    isn't found.
+
+    Returns: A hash reference of all attributes if $attributes isn't sent
+    in, the value of the specific attribute if it is.
+
  global_register
 
     Returns a hash reference of hashes of all in-use shared memory segments
@@ -277,7 +390,7 @@ LOCKING
 
     To lock and subsequently unlock a variable, do this:
 
-        my $knot = tie my %hash, 'IPC::Shareable', $glue, { %options };
+        my $knot = tie my %hash, 'IPC::Shareable', { %options };
     
         $knot->lock;
         $hash{a} = 'foo';
@@ -285,9 +398,9 @@ LOCKING
 
     or equivalently, if you've decided to throw away the return of tie():
 
-        tie my %hash, 'IPC::Shareable', $glue, { %options };
+        tie my %hash, 'IPC::Shareable', { %options };
     
-        tied(%hash)->shlock;
+        tied(%hash)->lock;
         $hash{a} = 'foo';
         tied(%hash)->unlock;
 
@@ -306,8 +419,7 @@ LOCKING
             print "Another process has an exlusive lock.\n";
         }
 
-    If no argument is provided to lock, it defaults to LOCK_EX. To unlock a
-    variable do this:
+    If no argument is provided to lock, it defaults to LOCK_EX.
 
     There are some pitfalls regarding locking and signals about which you
     should make yourself aware; these are discussed in "NOTES".
@@ -343,20 +455,20 @@ DESTRUCTION
     NOTE: The destruction is handled in an END block. Only those memory
     segments that are tied to the current process will be removed.
 
- remove()
+ remove
 
-        $knot->remove;
+        tied($var)->remove;
     
         # or
     
-        tied($var)->remove;
+        $knot->remove;
 
     Calling remove() on the object underlying a tie()d variable removes the
     associated shared memory segments. The segment is removed irrespective
     of whether it has the destroy option set or not and irrespective of
     whether the calling process created the segment.
 
- clean_up()
+ clean_up
 
         IPC::Shareable->clean_up;
     
@@ -372,7 +484,7 @@ DESTRUCTION
     shared memory segments created by the process. Segments not created by
     the calling process are not removed.
 
- clean_up_all()
+ clean_up_all
 
         IPC::Shareable->clean_up_all;
     
@@ -397,21 +509,15 @@ AUTHOR
 
     Benjamin Sugars <bsugars@canoe.ca>
 
+MAINTAINED BY
+
+    Steve Bertrand <steveb@cpan.org>
+
 NOTES
 
  Footnotes from the above sections
 
-      1. If GLUE is longer than 4 characters, only the 4 most significant
-      characters are used. These characters are turned into integers by
-      unpack()ing them. If GLUE is less than 4 characters, it is space
-      padded.
-
-      2. IPC::Shareable provides no pre-set limits, but the system does.
-      Namely, there are limits on the number of shared memory segments that
-      can be allocated and the total amount of memory usable by shared
-      memory.
-
-      3. If the process has been smoked by an untrapped signal, the binding
+      1. If the process has been smoked by an untrapped signal, the binding
       will remain in shared memory. If you're cautious, you might try
 
        $SIG{INT} = \&catch_int;
@@ -419,7 +525,7 @@ NOTES
            die;
        }
        ...
-       tie $variable, IPC::Shareable, 'data', { 'destroy' => 1 };
+       tie $variable, IPC::Shareable, { key => 'GLUE', create => 1, 'destroy' => 1 };
 
       which will at least clean up after your user hits CTRL-C because
       IPC::Shareable's END method will be called. Or, maybe you'd like to
@@ -461,15 +567,23 @@ NOTES
 
       Examples:
 
-          # list all semaphores and memory segments in use on the system
+          # List all semaphores and memory segments in use on the system
       
           ipcs -a
       
-          # list all memory segments along with each one's associated process ID
+          # List all memory segments and semaphores along with each one's associated process ID
       
           ipcs -ap
       
-          # remove *all* semaphores and memory segments
+          # List just the shared memory segments
+      
+          ipcs -m
+      
+          # List the details of an individual memory segment
+      
+          ipcs -i 12345678
+      
+          # Remove *all* semaphores and memory segments
       
           ipcrm -a
 
@@ -498,7 +612,6 @@ CREDITS
 
     Thanks to all those with comments or bug fixes, especially
 
-        Steve Bertrand      <steveb@cpan.org>
         Maurice Aubrey      <maurice@hevanet.com>
         Stephane Bortzmeyer <bortzmeyer@pasteur.fr>
         Doug MacEachern     <dougm@telebusiness.co.nz>
@@ -511,6 +624,7 @@ CREDITS
         Raphael Manfredi    <Raphael_Manfredi@pobox.com>
         Lee Lindley         <Lee.Lindley@bigfoot.com>
         Dave Rolsky         <autarch@urth.org>
+        Steve Bertrand      <steveb@cpan.org>
 
 SEE ALSO
 

@@ -1,0 +1,61 @@
+
+SV *
+name(self)
+    SV *self
+  ALIAS:
+    name  = 0
+    class = 1
+  CODE:
+  {
+    SlotMeta *meta = NUM2PTR(SlotMeta *, SvUV(SvRV(self)));
+    switch(ix) {
+      case 0:
+        RETVAL = SvREFCNT_inc(meta->name);
+        break;
+      case 1:
+        RETVAL = newSV(0);
+        sv_setref_uv(RETVAL, "Object::Pad::MOP::Class", PTR2UV(meta->class));
+        break;
+
+      default: RETVAL = NULL;
+    }
+  }
+  OUTPUT:
+    RETVAL
+
+void
+value(self, obj)
+    SV *self
+    SV *obj
+  PPCODE:
+  {
+    SlotMeta *meta = NUM2PTR(SlotMeta *, SvUV(SvRV(self)));
+    SV *objrv;
+
+    if(!SvROK(obj) || !SvOBJECT(objrv = SvRV(obj)))
+      croak("Cannot fetch slot value of a non-instance");
+
+    const char *stashname = HvNAME(meta->class->stash);
+
+    if(!stashname || !sv_derived_from(obj, stashname))
+      croak("Cannot fetch slot value from a non-derived instance");
+
+    AV *slotsav = (AV *)get_obj_slotsav(obj, meta->class->repr, true);
+
+    if(meta->slotix > av_top_index(slotsav))
+      croak("ARGH: instance does not have a slot at index %ld", (long int)meta->slotix);
+
+    SV *value = AvARRAY(slotsav)[meta->slotix];
+
+    /* We must prevent caller from assigning to non-scalar slots, in case
+     * they break the SvTYPE of the value. We can't cancel the CvLVALUE but we
+     * can yield a READONLY value in this case */
+    if(SvPV_nolen(meta->name)[0] != '$') {
+      value = sv_mortalcopy(value);
+      SvREADONLY_on(value);
+    }
+
+    /* stack does not contribute SvREFCNT */
+    ST(0) = value;
+    XSRETURN(1);
+  }

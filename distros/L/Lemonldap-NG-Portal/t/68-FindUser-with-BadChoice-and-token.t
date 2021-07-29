@@ -50,7 +50,7 @@ ok(
         accept => 'text/html',
         length => length($query)
     ),
-    'Post FindFuser request'
+    'Post FindUser request'
 );
 ok(
         $res->[2]->[0] =~

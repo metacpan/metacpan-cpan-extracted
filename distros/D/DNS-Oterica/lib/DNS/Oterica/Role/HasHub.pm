@@ -1,6 +1,6 @@
 package DNS::Oterica::Role::HasHub;
 # ABSTRACT: any part of the dnso system that has a reference to the hub
-$DNS::Oterica::Role::HasHub::VERSION = '0.312';
+$DNS::Oterica::Role::HasHub::VERSION = '0.313';
 use Moose::Role;
 
 use namespace::autoclean;
@@ -28,7 +28,7 @@ DNS::Oterica::Role::HasHub - any part of the dnso system that has a reference to
 
 =head1 VERSION
 
-version 0.312
+version 0.313
 
 =head1 PERL VERSION
 

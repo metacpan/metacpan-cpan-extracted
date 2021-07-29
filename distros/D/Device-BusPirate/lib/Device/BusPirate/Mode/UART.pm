@@ -3,11 +3,11 @@
 #
 #  (C) Paul Evans, 2020-2021 -- leonerd@leonerd.org.uk
 
-package Device::BusPirate::Mode::UART 0.22;
-
 use v5.14;
-use warnings;
-use base qw( Device::BusPirate::Mode );
+use Object::Pad 0.45;
+
+package Device::BusPirate::Mode::UART 0.23;
+class Device::BusPirate::Mode::UART isa Device::BusPirate::Mode;
 
 use Carp;
 
@@ -48,20 +48,25 @@ L<Future> instances.
 
 =cut
 
-async sub start
+has $_open_drain :mutator;
+has $_bits       :mutator;
+has $_parity     :mutator;
+has $_stop       :mutator;
+has $_baud;
+has $_version;
+
+async method start
 {
-   my $self = shift;
-
    # Bus Pirate defaults
-   $self->{open_drain} = 1;
-   $self->{bits}       = 8;
-   $self->{parity}     = "n";
-   $self->{stop}       = 1; # 1 stop bit, not 2
+   $_open_drain = 1;
+   $_bits       = 8;
+   $_parity     = "n";
+   $_stop       = 1; # 1 stop bit, not 2
 
-   $self->{baud} = 0;
+   $_baud = 0;
 
    await $self->_start_mode_and_await( "\x03", "ART" );
-   ( $self->{version} ) = await $self->pirate->read( 1, "UART start" );
+   ( $_version ) = await $self->pirate->read( 1, "UART start" );
 
    print STDERR "PIRATE UART STARTED\n" if PIRATE_DEBUG;
    return $self;
@@ -126,28 +131,25 @@ my %BAUDS = (
    115200 => 10, # sic - there is no rate 9
 );
 
-sub configure
+method configure ( %args )
 {
-   my $self = shift;
-   my %args = @_;
-
    my @f;
 
-   if( any { defined $args{$_} and $args{$_}//0 ne $self->{$_} } qw( open_drain bits parity stop ) ) {
-      my $bits   = $args{bits}   // $self->{bits};
-      my $parity = $args{parity} // $self->{parity};
-      my $stop   = $args{stop}   // $self->{stop};
+   if( any { defined $args{$_} and $args{$_}//0 ne $self->$_ } qw( open_drain bits parity stop ) ) {
+      my $bits   = $args{bits}   // $_bits;
+      my $parity = $args{parity} // $_parity;
+      my $stop   = $args{stop}   // $_stop;
 
       defined( my $dataconf = $DATACONF{$bits . uc $parity} ) or
          croak "Unrecognised bitsize/parity $bits$parity";
       $stop == 1 or $stop == 2 or
          croak "Unrecognised stop length $stop";
 
-      defined $args{$_} and $self->{$_} = $args{$_}//0 for qw( open_drain bits parity stop );
+      defined $args{$_} and $self->$_ = $args{$_}//0 for qw( open_drain bits parity stop );
 
       push @f, $self->pirate->write_expect_ack(
          chr( 0x80 |
-              ( $self->{open_drain} ? 0 : 0x10 ) | # sense is reversed
+              ( $_open_drain ? 0 : 0x10 ) | # sense is reversed
               ( $dataconf << 2 ) |
               ( $stop == 2 ? 0x02 : 0 ) |
               0 ), "UART configure" );
@@ -157,11 +159,11 @@ sub configure
       my $baud = $BAUDS{$args{baud}} //
          croak "Unrecognised baud '$args{baud}'";
 
-      last if $baud == $self->{baud};
+      last if $baud == $_baud;
 
-      $self->{baud} = $baud;
+      $_baud = $baud;
       push @f, $self->pirate->write_expect_ack(
-         chr( 0x60 | $self->{baud} ), "UART set baud" );
+         chr( 0x60 | $_baud ), "UART set baud" );
    }}
 
    return Future->needs_all( @f );
@@ -175,11 +177,8 @@ Sends the given bytes over the TX wire.
 
 =cut
 
-async sub write
+async method write ( $bytes )
 {
-   my $self = shift;
-   my ( $bytes ) = @_;
-
    printf STDERR "PIRATE UART WRITE %v02X\n", $bytes if PIRATE_DEBUG;
 
    # "Bulk Transfer" command can only send up to 16 bytes at once.

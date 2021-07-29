@@ -282,7 +282,7 @@ Zapp::Task - Base class for individual steps in a job
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 

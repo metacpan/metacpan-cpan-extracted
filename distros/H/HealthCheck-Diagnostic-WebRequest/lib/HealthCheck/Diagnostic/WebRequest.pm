@@ -3,7 +3,7 @@ use parent 'HealthCheck::Diagnostic';
 
 # ABSTRACT: Make HTTP/HTTPS requests to web servers to check connectivity
 use version;
-our $VERSION = 'v1.4.1'; # VERSION
+our $VERSION = 'v1.4.2'; # VERSION
 
 use strict;
 use warnings;
@@ -91,7 +91,7 @@ sub run {
     push @results, $self->check_content( $response )
         if $results[0]->{status} eq 'OK';
 
-    my $info = join '; ', map { $_->{info} } @results;
+    my $info = join '; ', grep { length } map { $_->{info} } @results;
 
     return { info => $info, results => \@results };
 }
@@ -165,7 +165,7 @@ HealthCheck::Diagnostic::WebRequest - Make HTTP/HTTPS requests to web servers to
 
 =head1 VERSION
 
-version v1.4.1
+version v1.4.2
 
 =head1 SYNOPSIS
 
@@ -319,7 +319,7 @@ Grant Street Group <developers@grantstreet.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 - 2020 by Grant Street Group.
+This software is Copyright (c) 2018 - 2021 by Grant Street Group.
 
 This is free software, licensed under:
 

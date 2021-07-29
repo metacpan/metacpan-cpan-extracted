@@ -42,7 +42,8 @@
       },
       "runtime" : {
          "requires" : {
-            "Getopt::EX" : "v1.23.3",
+            "Getopt::EX" : "v1.24.1",
+            "Getopt::EX::Hashed" : "0.99",
             "List::Util" : "1.45",
             "Math::RPN" : "0",
             "Term::ReadKey" : "0",
@@ -61,7 +62,7 @@
    "provides" : {
       "App::ansicolumn" : {
          "file" : "lib/App/ansicolumn.pm",
-         "version" : "1.08"
+         "version" : "1.10"
       },
       "App::ansicolumn::Border" : {
          "file" : "lib/App/ansicolumn/Border.pm"
@@ -81,7 +82,7 @@
          "web" : "https://github.com/kaz-utashiro/App-ansicolumn"
       }
    },
-   "version" : "1.08",
+   "version" : "1.10",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>"

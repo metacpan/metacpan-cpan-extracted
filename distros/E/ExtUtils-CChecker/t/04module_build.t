@@ -1,61 +1,55 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
+use v5;
 use strict;
-use Test::More tests => 4;
+use warnings;
+
+use Test::More;
 
 use ExtUtils::CChecker;
 
-my $mbpackage;
-my %mbargs;
-my $mbret;
-
-no warnings 'once';
-local *Module::Build::new = sub {
-   ( $mbpackage, %mbargs ) = @_;
-   return $mbret;
-};
-
 my $cc = ExtUtils::CChecker->new;
 
-$cc->new_module_build( module_name => "Foo::Bar" );
+# default configuration
+{
+   my $build = $cc->new_module_build( module_name => "ExtUtils::CChecker" );
 
-is( $mbpackage, "Module::Build", '$mbpackage after ->new_module_build' );
-is_deeply( \%mbargs,
-   {
-      module_name => "Foo::Bar",
-      include_dirs => [],
-      extra_compiler_flags => [],
-      extra_linker_flags => [],
-   },
-   '%mbargs after ->new_module_build' );
+   isa_ok( $build, "Module::Build", '$build' );
+
+   is( $build->module_name, "ExtUtils::CChecker", '$build->module_name in default config' );
+}
 
 $cc->push_include_dirs( "/usr/include/foo" );
 $cc->push_extra_compiler_flags( "-DHAVE_FOO" );
 $cc->push_extra_linker_flags( "-lfoo" );
 
-$cc->new_module_build( module_name => "Foo::Bar" );
+# stored configuration
+{
+   my $build = $cc->new_module_build( module_name => "ExtUtils::CChecker" );
 
-is_deeply( \%mbargs,
-   {
-      module_name => "Foo::Bar",
-      include_dirs => [ "/usr/include/foo" ],
-      extra_compiler_flags => [ "-DHAVE_FOO" ],
-      extra_linker_flags => [ "-lfoo" ],
-   },
-   '%mbargs sees correct dirs and flags' );
+   is_deeply( $build->include_dirs,         [ "/usr/include/foo" ],
+      '$build->include_dirs' );
+   is_deeply( $build->extra_compiler_flags, [ "-DHAVE_FOO" ],
+      '$build->extra_compiler_flags' );
+   is_deeply( $build->extra_linker_flags,   [ "-lfoo" ],
+      '$build->extra_linker_flags' );
+}
 
-$cc->new_module_build( 
-   module_name => "Foo::Bar",
-   include_dirs => [ "/usr/include/bar" ],
-   extra_compiler_flags => [ "-DHAVE_BAR" ],
-   extra_linker_flags => [ "-lbar" ],
-);
+# merged configuration
+{
+   my $build = $cc->new_module_build( 
+      module_name => "ExtUtils::CChecker",
+      include_dirs => [ "/usr/include/bar" ],
+      extra_compiler_flags => [ "-DHAVE_BAR" ],
+      extra_linker_flags => [ "-lbar" ],
+   );
 
-is_deeply( \%mbargs,
-   {
-      module_name => "Foo::Bar",
-      include_dirs => [ "/usr/include/foo", "/usr/include/bar" ],
-      extra_compiler_flags => [ "-DHAVE_FOO", "-DHAVE_BAR" ],
-      extra_linker_flags => [ "-lfoo", "-lbar" ],
-   },
-   'new_module_build merges %args and internal configuration' );
+   is_deeply( $build->include_dirs,         [ "/usr/include/foo", "/usr/include/bar" ],
+      '$build->include_dirs merged ');
+   is_deeply( $build->extra_compiler_flags, [ "-DHAVE_FOO", "-DHAVE_BAR" ],
+      '$build->extra_compiler_flags merged' );
+   is_deeply( $build->extra_linker_flags,   [ "-lfoo", "-lbar" ],
+      '$build->extra_linker_flags merged' );
+}
+
+done_testing;

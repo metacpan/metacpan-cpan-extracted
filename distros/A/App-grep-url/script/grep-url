@@ -4,9 +4,9 @@
 # and generated automatically using Perinci::CmdLine::Gen version 0.499
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-07-01'; # DATE
+our $DATE = '2021-07-11'; # DATE
 our $DIST = 'App-grep-url'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
@@ -42,26 +42,13 @@ grep-url - Print lines having URL(s) (optionally of certain criteria) in them
 
 =head1 VERSION
 
-This document describes version 0.001 of grep-url (from Perl distribution App-grep-url), released on 2021-07-01.
+This document describes version 0.003 of grep-url (from Perl distribution App-grep-url), released on 2021-07-11.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % grep-url [--all] [-c] [--color=s] [--count] [--dash-prefix-inverts]
-     [--debug] [--file=s+] [--files-json=s] [--format=name]
-     [--host-contains=s] [--host-matches=s] [--host-not-contains=s]
-     [--invert-match] [--json] [--line-number] [--log-level=level]
-     [--max-urls=s] [--min-urls=s] [-n] [--(no)naked-res]
-     [--no-dash-prefix-inverts] [--no-invert-match]
-     [--nodash-prefix-inverts] [--noinvert-match] [--page-result[=program]]
-     [--path-contains=s] [--path-matches=s] [--path-not-contains=s] [-q]
-     [--query-param-contains-json=s] [--query-param-contains key=s]
-     [--query-param-matches-json=s] [--query-param-matches key=s]
-     [--query-param-not-contains-json=s] [--query-param-not-contains key=s]
-     [--quiet] [--quiet-arg] [--scheme-contains=s] [--scheme-matches=s]
-     [--scheme-not-contains=s] [--scheme=s+] [--schemes-json=s] [--silent]
-     [--trace] [-v] [--verbose] [--view-result[=program]] -- [file] ...
+% B<grep-url> [B<--color>=I<str>] [B<--count>|B<-c>] [B<--debug>|B<--log-level>=I<level>|B<--quiet>|B<--trace>|B<--verbose>] [(B<--file>=I<filename>)+] [B<--format>=I<name>|B<--json>] [B<--host-contains>=I<str>] [B<--host-matches>=I<re>] [B<--host-not-contains>=I<str>] [B<--ignore-case>|B<-i>|B<--no-ignore-case>|B<--noignore-case>] [B<--invert-match>|B<-v>|B<--no-invert-match>|B<--noinvert-match>] [B<--line-number>|B<-n>] [B<--max-urls>=I<int>] [B<--min-urls>=I<uint>] [B<--(no)naked-res>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] [B<--path-contains>=I<str>] [B<--path-matches>=I<re>] [B<--path-not-contains>=I<str>] [(B<--query-param-contains> I<key>=I<s>)+] [(B<--query-param-matches> I<key>=I<s>)+] [(B<--query-param-not-contains> I<key>=I<s>)+] [B<--quiet-arg>] [B<--scheme-contains>=I<str>] [B<--scheme-matches>=I<re>] [B<--scheme-not-contains>=I<str>] [(B<--scheme>=I<str>)+] [B<--files-json>=I<json>] [B<--query-param-contains-json>=I<json>] [B<--query-param-matches-json>=I<json>] [B<--query-param-not-contains-json>=I<json>] [B<--schemes-json>=I<json>] [B<-q>|B<--silent>] -- [I<file>] ...
 
 Examples:
 
@@ -173,19 +160,7 @@ Shortcut for --log-level=info.
 
 =over
 
-=item B<--all>
-
-Require all patterns to match, instead of just one.
-
-=item B<--dash-prefix-inverts>
-
-When given pattern that starts with dash "-FOO", make it to mean "^(?!.*FOO)".
-
-This is a convenient way to search for lines that do not match a pattern.
-Instead of using `-v` to invert the meaning of all patterns, this option allows
-you to invert individual pattern using the dash prefix, which is also used by
-Google search and a few other search engines.
-
+=item B<--ignore-case>, B<-i>
 
 =item B<--invert-match>, B<-v>
 

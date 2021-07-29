@@ -1,13 +1,14 @@
 package Pod::From::Acme::CPANModules;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-03-26'; # DATE
+our $DATE = '2021-07-26'; # DATE
 our $DIST = 'Pod-From-Acme-CPANModules'; # DIST
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.011'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
+use Log::ger;
 
 use Exporter qw(import);
 our @EXPORT_OK = qw(gen_pod_from_acme_cpanmodules);
@@ -77,6 +78,32 @@ sub gen_pod_from_acme_cpanmodules {
     if ($list) {
         $res->{pod} = {};
 
+        my @mods;
+        for my $ent (@{ $list->{entries} }) {
+            push @mods, $ent->{module};
+        }
+
+        my %mod_abstracts; # key: module name, value: abstract
+        my %mod_authors; # key: module name, value: author
+      GET_MODULE_ABSTRACTS: {
+            last unless @mods;
+            require App::lcpan::Call;
+            my $res = App::lcpan::Call::check_lcpan();
+            unless ($res->[0] == 200) {
+                log_info "lcpan database is not available (%s), skipping retrieving module abstracts", $res;
+                last;
+            }
+            $res = App::lcpan::Call::call_lcpan_script(argv=>["mods", "-l", "-x", "--or", @mods]);
+            unless ($res->[0] == 200) {
+                log_info "Can't lcpan mods: %s, skipping retrieving module abstracts", $res;
+                last;
+            }
+            for (@{$res->[2]}) {
+                $mod_abstracts{ $_->{module} } = $_->{abstract} if defined $_->{abstract} && length $_->{abstract};
+                $mod_authors{ $_->{module} } = $_->{author};
+            }
+        }
+
         {
             my $pod = '';
             $pod .= _markdown_to_pod($list->{description})."\n\n"
@@ -88,7 +115,16 @@ sub gen_pod_from_acme_cpanmodules {
             my $pod = '';
             $pod .= "=over\n\n";
             for my $ent (@{ $list->{entries} }) {
-                $pod .= "=item * L<$ent->{module}>".($ent->{summary} ? " - $ent->{summary}" : "")."\n\n";
+                my $summary = $ent->{summary} //
+                    (defined $mod_abstracts{$ent->{module}} ?
+                     #"$mod_abstracts{$ent->{module}} (from module's Abstract)" :
+                     "$mod_abstracts{$ent->{module}}" :
+                     undef);
+                $pod .= "=item L<$ent->{module}>\n\n";
+                if (defined $ent->{summary}) {
+                    require String::PodQuote;
+                    $pod .= String::PodQuote::pod_quote($ent->{summary}) . ".\n\n";
+                }
                 if ($args{entry_description_code}) {
                     my $res;
                     {
@@ -97,6 +133,10 @@ sub gen_pod_from_acme_cpanmodules {
                     }
                     $pod .= $res;
                 } else {
+                    my $author = $mod_authors{$ent->{module}};
+                    if ($author) {
+                        $pod .= "Author: L<$author|https://metacpan.org/author/$author>\n\n";
+                    }
                     $pod .= _markdown_to_pod($ent->{description})."\n\n"
                         if $ent->{description} && $ent->{description} =~ /\S/;
                     $pod .= "Rating: $ent->{rating}/10\n\n"
@@ -105,6 +145,14 @@ sub gen_pod_from_acme_cpanmodules {
                         if $ent->{related_modules} && @{ $ent->{related_modules} };
                     $pod .= "Alternate modules: ".join(", ", map {"L<$_>"} @{ $ent->{alternate_modules} })."\n\n"
                         if $ent->{alternate_modules} && @{ $ent->{alternate_modules} };
+
+                    my @scripts;
+                    for ("script", "scripts") {
+                        push @scripts, (ref $ent->{$_} eq 'ARRAY' ? @{$ent->{$_}} : $ent->{$_}) if defined $ent->{$_};
+                    }
+                    if (@scripts) {
+                        $pod .= "Script".(@scripts > 1 ? "s":"").": ".join(", ", map {"L<$_>"} @scripts)."\n\n";
+                    }
                 }
             }
             $pod .= "=back\n\n";
@@ -138,7 +186,7 @@ Pod::From::Acme::CPANModules - Generate POD from an Acme::CPANModules::* module
 
 =head1 VERSION
 
-This document describes version 0.008 of Pod::From::Acme::CPANModules (from Perl distribution Pod-From-Acme-CPANModules), released on 2021-03-26.
+This document describes version 0.011 of Pod::From::Acme::CPANModules (from Perl distribution Pod-From-Acme-CPANModules), released on 2021-07-26.
 
 =head1 SYNOPSIS
 
@@ -198,7 +246,7 @@ Source repository is at L<https://github.com/perlancar/perl-Pod-From-Acme-CPANMo
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Pod-From-Acme-CPANModules/issues>
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Pod-From-Acme-CPANModules>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

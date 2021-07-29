@@ -10,10 +10,27 @@ Files: Changes
  lib/Regexp/Pattern/License.pm
  lib/Regexp/Pattern/License/Parts.pm
  t/01-basic.t
+ t/02-regexp-pattern.t
+ t/coverage-cc-deprecated.t
+ t/coverage-cc.t
  t/coverage-osi.t
  t/coverage-perl.t
+ t/coverage-spdx-1.16.t
+ t/coverage-spdx-1.17.t
+ t/coverage-spdx-1.18.t
+ t/coverage-spdx-1.19.t
+ t/coverage-spdx-1.20.t
+ t/coverage-spdx-2.0.t
+ t/coverage-spdx-2.1.t
+ t/coverage-spdx-2.2.t
+ t/coverage-spdx-2.3.t
+ t/coverage-spdx-2.4.t
+ t/coverage-spdx-2.5.t
+ t/coverage-spdx-2.6.t
+ t/coverage-spdx-3.0.t
  t/coverage-tldr.t
  t/lib/MyTest.pm
+ t/lib/Test2/Regexp/Pattern/License.pm
  t/normalized.t
  t/re2.t
 Copyright: Copyright 2021 Jonas Smedegaard.
@@ -38,10 +55,6 @@ License: GPL-1.0+ or Artistic-1.0
 
 Files: dist.ini
 Copyright: Copyright 2017 Jonas Smedegaard.
-License: GPL-3.0
-
-Files: t/02-regexp-pattern.t
-Copyright: Copyright 2020 Jonas Smedegaard.
 License: GPL-3.0
 
 License: GPL-3.0

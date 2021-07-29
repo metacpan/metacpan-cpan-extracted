@@ -6,7 +6,7 @@ use 5.010;
 use Moo::Role;
 
 # ABSTRACT: Authentication role for FTP server
-our $VERSION = '0.16'; # VERSION
+our $VERSION = '0.17'; # VERSION
 
 
 has user => (is => 'rw');
@@ -137,22 +137,22 @@ AnyEvent::FTP::Server::Role::Auth - Authentication role for FTP server
 
 =head1 VERSION
 
-version 0.16
+version 0.17
 
 =head1 SYNOPSIS
 
 In your context:
 
  package AnyEvent::FTP::Server::Context::MyContext;
-
+ 
  use Moo;
  extends 'AnyEvent::FTP::Server::Context';
  with 'AnyEvent::FTP::Server::Role::Auth';
-
+ 
  has '+unauthenticated_safe_commands' => (
    default => sub { [ qw( USER PASS HELP QUIT FOO ) ] },
  );
-
+ 
  # this command is deemed safe pre auth by
  # unauthenticated_safe_commands
  sub cmd_foo
@@ -161,7 +161,7 @@ In your context:
    $con->send_response(211 => 'Here to stay');
    $self->done;
  }
-
+ 
  # this command can pnly be executed after
  # authentication
  sub cmd_bar
@@ -174,20 +174,20 @@ In your context:
 Then when you create your server object:
 
  use AnyEvent:FTP::Server;
-
+ 
  my $server = AnyEvent::FTP::Server->new;
  $server->on_connect(sub {
    # $con isa AnyEvent::FTP::Server::Connection
    my $con = shift;
    # $context isa AnyEvent::FTP::Server::Context::MyContext
    my $context = $con->context;
-
+ 
    # allow login from user 'user' with password 'secret'
    $context->authenticator(sub {
      my($user, $pass) = @_;
      return $user eq 'user' && $pass eq 'secret';
    });
-
+ 
    # make the client wait 5 seconds if they enter a
    # bad username / password
    $context->bad_authentication_delay(5);
@@ -255,7 +255,7 @@ José Joaquín Atria
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Graham Ollis.
+This software is copyright (c) 2017-2021 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

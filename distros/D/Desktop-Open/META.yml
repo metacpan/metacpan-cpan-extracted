@@ -20,13 +20,14 @@ requires:
   Browser::Open: '0'
   Exporter: '5.57'
   File::Which: '0'
+  Log::ger: '0.038'
   strict: '0'
   warnings: '0'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Desktop-Open
   homepage: https://metacpan.org/release/Desktop-Open
   repository: git://github.com/perlancar/perl-Desktop-Open.git
-version: '0.001'
+version: '0.002'
 x_Dist_Zilla:
   perl:
     version: '5.034000'

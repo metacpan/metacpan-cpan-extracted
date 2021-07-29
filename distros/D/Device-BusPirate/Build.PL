@@ -7,7 +7,8 @@ use Module::Build;
 my $build = Module::Build->new(
    module_name => 'Device::BusPirate',
    requires => {
-      'perl' => '5.014',
+      'perl' => '5.026',
+      'Object::Pad' => '0.45',
 
       'Device::Chip::Adapter' => '0.02',
       'Device::Chip::ProtocolBase::SPI' => 0,

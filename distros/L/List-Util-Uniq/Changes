@@ -1,10 +1,16 @@
-0.002   2018-03-06 (PERLANCAR)
+0.003   2021-07-23  Released-By: PERLANCAR; Urgency: medium
+
+	- Add functions: is_uniq, is_uniq_ci, is_monovalued,
+	  is_monovalued_ci.
+
+
+0.002   2018-03-06  Released-By: PERLANCAR
 
 	- Handle undef in uniq_ci() just like List::Util's uniq().
 
         - Rework documentation: add Synopsis, mention List::Util.
 
 
-0.001   2018-02-21 (PERLANCAR)
+0.001   2018-02-21  Released-By: PERLANCAR
 
         - First version, split from SHARYANTO-List-Util.

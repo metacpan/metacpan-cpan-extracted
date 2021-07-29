@@ -2,7 +2,7 @@ package LinkEmbedder::Link;
 use Mojo::Base -base;
 
 use Mojo::Template;
-use Mojo::Util 'trim';
+use Mojo::Util qw(html_unescape trim);
 
 use constant DEBUG => $ENV{LINK_EMBEDDER_DEBUG} || 0;
 
@@ -82,7 +82,7 @@ sub _el {
   for my $sel (@sel) {
     my $e     = $dom->at($sel) or next;
     my ($val) = grep {$_} map { trim($_ // '') } $e->{content}, $e->{value}, $e->{href}, $e->text, $e->all_text;
-    return $val if defined $val;
+    return html_unescape $val if defined $val;
   }
 
   return '';

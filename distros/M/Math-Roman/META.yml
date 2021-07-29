@@ -3,11 +3,11 @@ abstract: unknown
 author:
   - unknown
 build_requires:
-  ExtUtils::MakeMaker: '0'
+  Test::More: '0.47'
 configure_requires:
-  ExtUtils::MakeMaker: '0'
+  ExtUtils::MakeMaker: '6.58'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
 license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -18,7 +18,8 @@ no_index:
     - t
     - inc
 requires:
-  Math::BigInt: '1.35'
-  Test: '0'
-version: 1.08
+  Math::BigInt: '1.2'
+resources:
+  repository: https://github.com/pjacklam/p5-Math-Roman.git
+version: '1.09'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

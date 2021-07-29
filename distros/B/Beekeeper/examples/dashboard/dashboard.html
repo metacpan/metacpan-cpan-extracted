@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+    <meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2, user-scalable=no" />
+    <meta name="description" content="Beekeeper dashboard" />
+    <meta name="theme-color" content="#ffffff" />
+    <title>Beekeeper dashboard</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.0.0/d3.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mqtt/4.2.8/mqtt.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.21/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.21/js/dataTables.semanticui.min.js"></script>
+    <link  href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css" rel="stylesheet" type="text/css"/>
+    <link  href="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.21/css/dataTables.semanticui.min.css" rel="stylesheet" type="text/css"/>
+    <script src="js/dashboard.js"></script>
+    <script src="js/config.js"></script>
+    <link  href="css/dashboard.css" rel="stylesheet" type="text/css"/>
+  </head>
+
+  <body id="root">
+    <div id="auth">
+      <div>
+        <div class="ui center aligned login_form">
+          <h1 class="ui medium header">Please sign in</h1>
+          <div class="ui message red login_error hidden">
+            Incorrect username or password.
+          </div>
+          <form class="ui large form" method="post">
+            <div class="field">
+              <div class="ui input">
+                <input name="username" placeholder="Username or email address" type="text" />
+              </div>
+            </div>
+            <div class="field">
+              <div class="ui input">
+                <input name="password" placeholder="Password" type="password" />
+              </div>
+            </div>
+            <button class="ui fluid large primary button" type="submit">
+              Sign in
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+    <div class="ui tablet computer only padded grid">
+      <div class="ui inverted borderless top fixed fluid menu">
+        <a class="header item">Beekeeper</a>
+        <div class="right menu">
+           <a class="item"></a>
+        </div>
+      </div>
+    </div>
+    <div class="ui mobile only padded grid">
+      <div class="ui top fixed borderless fluid inverted menu">
+        <a class="header item">Beekeeper</a>
+        <div class="right menu">
+          <div class="item">
+            <button class="ui icon toggle basic inverted button">
+              <i class="content icon"></i>
+            </button>
+          </div>
+        </div>
+        <div class="ui vertical borderless inverted fluid menu">
+           <a class="item"></a>
+        </div>
+      </div>
+    </div>
+    <div class="ui padded grid">
+      <div
+        class="two wide tablet only two wide computer only column"
+        id="sidebar"
+      >
+        <div class="ui vertical borderless fluid text menu">
+          <a id="overview_btn" class="item">Overview</a> 
+          <a id="services_btn" class="item">Services</a>
+          <a id="logs_btn" class="item">Logs</a>
+        </div>
+      </div>
+      <div
+        class="sixteen wide mobile fourteen wide tablet fourteen wide computer right floated column"
+        id="content"
+      >
+        <div id="overview" class="ui padded section">
+          <div class="ui cards tiny statistics five">
+            <div class="card">
+              <div class="content">
+                <div class="statistic">
+                  <div id="ovw_req" class="value">
+                  </div>
+                  <div class="label">
+                    req/s
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="content">
+                <div class="statistic">
+                  <div id="ovw_err" class="value">
+                  </div>
+                  <div class="label">
+                    errors/s
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="content">
+                <div class="statistic">
+                  <div id="ovw_mem" class="value">
+                  </div>
+                  <div class="label">
+                     GiB
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="content">
+                <div class="statistic">
+                  <div id="ovw_cpu" class="value">
+                  </div>
+                  <div class="label">
+                    CPU
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="content">
+                <div class="statistic">
+                  <div id="ovw_load" class="value">
+                  </div>
+                  <div class="label">
+                    Load
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="ui two column grid">
+            <div class="column">
+              <div class="ui tiny header chart_title">Requests / sec</div>
+              <div id="chart_ovw_req"></div>
+            </div>
+            <div class="column">
+              <div class="ui tiny header chart_title">System load &nbsp;%</div>
+              <div id="chart_ovw_load"></div>
+            </div>
+          </div>
+          <div class="row">&nbsp;</div>
+          <div class="row">
+            <table id="bkservices" class="ui sortable compact striped selectable single line table">
+              <thead>
+                <tr>
+                  <th>Class</th>
+                  <th>Workers</th>
+                  <th>MiB&nbsp;</th>
+                  <th>CPU&nbsp;</th>
+                  <th>Err/s&nbsp;</th>
+                  <th>Req/s&nbsp;</th>
+                  <th>Load %</th>
+                </tr>
+              </thead>
+            </table>
+          </div>
+        </div>
+        <div id="services" class="ui padded section">
+          <div class="ui grid">
+            <div class="ui ten wide column">
+              <div id="svc_class" class="ui fluid search selection dropdown">
+                <i class="dropdown icon"></i>
+                <div class="default text"></div>
+              </div>
+            </div>
+            <div class="ui three wide column">
+              <div id="svc_peak" class="ui fluid search selection dropdown">
+                <i class="dropdown icon"></i>
+                <div class="default text"></div>
+              </div>
+            </div>
+            <div class="ui three wide column">
+              <div id="svc_resolution" class="ui fluid search selection dropdown">
+                <i class="dropdown icon"></i>
+                <div class="default text"></div>
+              </div>
+            </div>
+          </div>
+          <div class="ui cards tiny statistics five">
+            <div class="card">
+              <div class="content">
+                <div class="statistic">
+                  <div id="svc_req" class="value">
+                  </div>
+                  <div class="label">
+                    req/s
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="content">
+                <div class="statistic">
+                  <div id="svc_err" class="value">
+                  </div>
+                  <div class="label">
+                    errors/s
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="content">
+                <div class="statistic">
+                  <div id="svc_mem" class="value">
+                  </div>
+                  <div class="label">
+                     MiB
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="content">
+                <div class="statistic">
+                  <div id="svc_cpu" class="value">
+                  </div>
+                  <div class="label">
+                    CPU
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="content">
+                <div class="statistic">
+                  <div id="svc_load" class="value">
+                  </div>
+                  <div class="label">
+                    Load
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+            <div>
+              <div class="ui tiny header chart_title">System load &nbsp;%</div>
+              <div id="chart_svc_load"></div>
+            </div>
+            <div>
+              <div class="ui tiny header chart_title">Requests / sec</div>
+              <div id="chart_svc_req"></div>
+            </div>
+            <div>
+              <div class="ui tiny header chart_title">Errors / sec</div>
+              <div id="chart_svc_err"></div>
+            </div>
+            <div>
+              <div class="ui tiny header chart_title">CPU load</div>
+              <div id="chart_svc_cpu"></div>
+            </div>
+             <div>
+              <div class="ui tiny header chart_title">Memory MiB</div>
+              <div id="chart_svc_mem"></div>
+            </div>       
+        </div>
+        <div id="logs" class="ui padded section">
+          <div id="log_filters">
+            <div id="log_filters" class="ui grid">
+              <div class="ui ten wide column">
+              </div>
+              <div class="ui four wide column">
+                <div id="log_service" class="ui fluid search selection dropdown">
+                  <i class="dropdown icon"></i>
+                  <div class="default text"></div>
+                </div>
+              </div>
+              <div class="ui two wide column">
+                <div id="log_level" class="ui fluid search selection dropdown">
+                  <i class="dropdown icon"></i>
+                  <div class="default text"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div id="log_entries">
+          </div>
+        </div>
+      </div>
+    </div>
+    <script>
+      $(document).ready(function() { new Dashboard; });
+    </script>
+  </body>
+</html>

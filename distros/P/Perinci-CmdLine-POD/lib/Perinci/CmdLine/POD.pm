@@ -1,9 +1,9 @@
 package Perinci::CmdLine::POD;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-05-07'; # DATE
+our $DATE = '2021-07-10'; # DATE
 our $DIST = 'Perinci-CmdLine-POD'; # DIST
-our $VERSION = '0.022'; # VERSION
+our $VERSION = '0.023'; # VERSION
 
 use 5.010001;
 use strict;
@@ -418,18 +418,18 @@ sub gen_pod_for_pericmd_script {
                 for my $sc_name (sort keys %clidocdata) {
                     next unless length $sc_name;
                     if (defined $gen_sc) { next unless $sc_name eq $gen_sc }
-                    my $usage = $clidocdata{$sc_name}->{usage_line};
+                    my $usage = $clidocdata{$sc_name}->{'usage_line.alt.fmt.pod'};
                     $usage =~ s/\[\[prog\]\]/$program_name $sc_name/;
-                    push @sectpod, Text::Wrap::wrap(' % ', '     ', "$usage\n");
+                    push @sectpod, "% $usage\n\n";
                 }
             } else {
-                push @sectpod, " % $program_name [options] [subcommand] [arg]...\n";
+                push @sectpod, "% B<$program_name> [I<options>] [I<subcommand>] [I<arg>]...\n\n";
             }
-            push @sectpod, "\n";
+            push @sectpod, "\n\n";
         } else {
-            my $usage = $clidocdata{''}->{usage_line};
+            my $usage = $clidocdata{''}->{'usage_line.alt.fmt.pod'};
             $usage =~ s/\[\[prog\]\]/$program_name/;
-            push @sectpod, Text::Wrap::wrap(" % ", "     ", "$usage\n")."\n";
+            push @sectpod, "% $usage\n\n";
         }
 
         my @examples;
@@ -1015,7 +1015,7 @@ Perinci::CmdLine::POD - Generate POD for Perinci::CmdLine-based CLI script
 
 =head1 VERSION
 
-This document describes version 0.022 of Perinci::CmdLine::POD (from Perl distribution Perinci-CmdLine-POD), released on 2021-05-07.
+This document describes version 0.023 of Perinci::CmdLine::POD (from Perl distribution Perinci-CmdLine-POD), released on 2021-07-10.
 
 =head1 SYNOPSIS
 
@@ -1030,7 +1030,7 @@ Please see the included CLI script L<gen-pod-for-pericmd-script>.
 
 Usage:
 
- gen_pod_for_pericmd_script(%args) -> [status, msg, payload, meta]
+ gen_pod_for_pericmd_script(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Generate POD for Perinci::CmdLine-based CLI script.
 
@@ -1134,12 +1134,12 @@ Set `url` attribute, see Perinci::CmdLine::Base for more details.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 

@@ -1,46 +1,81 @@
 {
-   "abstract" : "Add line numbers to eval'ed heredoc blocks",
+   "abstract" : "Add line numbers to heredoc blocks that contain perl source code",
    "author" : [
-      "David Muir Sharnoff <cpan@dave.sharnoff.org>"
+      "David Muir Sharnoff",
+      "Graham Ollis <plicease@cpan.org>"
    ],
-   "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.112150",
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.022, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "unknown"
+      "lgpl_2_1"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Eval-LineNumbers",
-   "no_index" : {
-      "directory" : [
-         "t",
-         "inc"
-      ]
-   },
    "prereqs" : {
-      "build" : {
-         "requires" : {
-            "ExtUtils::MakeMaker" : 0
-         }
-      },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : 0
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "FindBin" : "0",
+            "Test::CPAN::Changes" : "0",
+            "Test::EOL" : "0",
+            "Test::Fixme" : "0.07",
+            "Test::More" : "0.98",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "0",
+            "Test::Pod::Coverage" : "0",
+            "Test::Pod::Spelling::CommonMistakes" : "0",
+            "Test::Spelling" : "0",
+            "Test::Strict" : "0",
+            "YAML" : "0"
          }
       },
       "runtime" : {
          "requires" : {
-            "Exporter" : "5.57"
+            "Exporter" : "5.57",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98",
+            "perl" : "5.006"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/uperl/Eval-LineNumbers/issues"
+      },
+      "homepage" : "https://metacpan.org/pod/Eval::LineNumbers",
       "repository" : {
-         "url" : "http://github.com/muir/Eval-LineNumbers"
+         "type" : "git",
+         "url" : "git://github.com/uperl/Eval-LineNumbers.git",
+         "web" : "https://github.com/uperl/Eval-LineNumbers"
       }
    },
-   "version" : "0.34"
+   "version" : "0.35",
+   "x_contributors" : [
+      "David Muir Sharnoff",
+      "Graham Ollis <plicease@cpan.org>",
+      "Olivier Mengu\u00e9 (DOLMEN)",
+      "David Steinbrunner (dsteinbrunner)",
+      "Alexey Ugnichev (thaewrapt)"
+   ],
+   "x_generated_by_perl" : "v5.34.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.26",
+   "x_spdx_expression" : "LGPL-2.1",
+   "x_use_unsafe_inc" : 0
 }
+

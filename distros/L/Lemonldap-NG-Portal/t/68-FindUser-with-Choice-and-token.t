@@ -7,6 +7,7 @@ require 't/test-lib.pm';
 
 my $res;
 my $json;
+my $token;
 my $client = LLNG::Manager::Test->new( {
         ini => {
             logLevel          => 'error',
@@ -50,13 +51,14 @@ ok(
         accept => 'application/json',
         length => length($query)
     ),
-    'Post FindFuser request'
+    'Post FindUser request'
 );
 ok( $json = eval { from_json( $res->[2]->[0] ) }, 'Response is JSON' )
   or print STDERR "$@\n" . Dumper($res);
 ok( $json->{user} eq 'dwho', ' Good user' )
   or explain( $json, 'user => dwho' );
-count(3);
+ok( $token = $json->{token},  'Found token' );
+count(4);
 
 ok( $res = $client->_get( '/', accept => 'text/html' ), 'Get Portal', );
 ( $host, $url, $query ) =
@@ -69,7 +71,7 @@ ok(
         accept => 'application/json',
         length => length($query)
     ),
-    'Post expired FindFuser request'
+    'Post expired FindUser request'
 );
 ok( $json = eval { from_json( $res->[2]->[0] ) }, 'Response is JSON' )
   or print STDERR "$@\n" . Dumper($res);
@@ -77,7 +79,8 @@ ok( $json->{error} == 82, ' Token expired' )
   or explain( $json, 'Token expired' );
 ok( $json->{result} == 0, ' result => 0' )
   or explain( $json, 'Result => 0' );
-count(5);
+ok( $token = $json->{token},  'Found token' );
+count(6);
 
 clean_sessions();
 done_testing( count() );

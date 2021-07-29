@@ -9,7 +9,7 @@ BEGIN {
 use strict;
 use warnings;
 
-our $VERSION = '0.1903';
+our $VERSION = '0.1904';
 
 1;
 
@@ -25,7 +25,7 @@ Task::MusicBundle - A bundle of MIDI and music modules
 
 =head1 VERSION
 
-version 0.1903
+version 0.1904
 
 =head1 SYNOPSIS
 
@@ -102,6 +102,8 @@ L<Music::Duration>
 L<Music::Duration::Partition>
 
 L<Music::Gestalt>
+
+L<Music::Guidonian>
 
 L<Music::Harmonics>
 

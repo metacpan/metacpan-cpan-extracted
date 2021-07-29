@@ -3,9 +3,9 @@ package App::IndonesianHolidayUtils;
 use 5.010001;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-01-17'; # DATE
+our $DATE = '2021-07-24'; # DATE
 our $DIST = 'App-IndonesianHolidayUtils'; # DIST
-our $VERSION = '0.061'; # VERSION
+our $VERSION = '0.064'; # VERSION
 
 1;
 # ABSTRACT: List Indonesian holidays
@@ -22,7 +22,7 @@ App::IndonesianHolidayUtils - List Indonesian holidays
 
 =head1 VERSION
 
-This document describes version 0.061 of App::IndonesianHolidayUtils (from Perl distribution App-IndonesianHolidayUtils), released on 2021-01-17.
+This document describes version 0.064 of App::IndonesianHolidayUtils (from Perl distribution App-IndonesianHolidayUtils), released on 2021-07-24.
 
 =head1 SYNOPSIS
 
@@ -30,13 +30,23 @@ This distribution contains several CLI's related to Indonesian holidays:
 
 =over
 
+=item * L<count-idn-workdays>
+
 =item * L<is-idn-holiday>
+
+=item * L<is-idn-workday>
 
 =item * L<list-idn-holidays>
 
 =item * L<list-idn-workdays>
 
 =back
+
+=head1 CONTRIBUTOR
+
+=for stopwords perlancar (@pc-office)
+
+perlancar (@pc-office) <perlancar@gmail.com>
 
 =head1 HOMEPAGE
 
@@ -48,7 +58,7 @@ Source repository is at L<https://github.com/perlancar/perl-App-IndonesianHolida
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-App-IndonesianHolidayUtils/issues>
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-IndonesianHolidayUtils>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

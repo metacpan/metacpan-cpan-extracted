@@ -139,5 +139,5 @@ The [bignum](https://metacpan.org/pod/bignum) module.
 # AUTHORS
 
 - Copyright 2002-2007 Tels, [http://bloodgate.com](http://bloodgate.com).
-- Copyright 2010 Florian Ragwitz [flora@cpan.org](https://metacpan.org/pod/flora%40cpan.org).
-- Copyright 2016- Peter John Acklam [pjacklam@gmail.com](https://metacpan.org/pod/pjacklam%40gmail.com).
+- Copyright 2010 Florian Ragwitz <flora@cpan.org>.
+- Copyright 2016- Peter John Acklam <pjacklam@gmail.com>.

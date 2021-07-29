@@ -200,6 +200,10 @@ package Net::FullAuto::FA_Core;
 #  sudo dd conv=sparse if=${BOOTDRIVE} | gzip -c --fast |
 #     drive upload --stdin --title bootdrive.gz
 #
+## Use netstat to check for apps listening on what ports
+#
+#  sudo netstat -tulpn | grep LISTEN
+#
 ## *************************************************************
 
 use strict;
@@ -30811,7 +30815,7 @@ print "GOING TO INT EIGHTZZZ\n";
             $stderr=$lastline if $lastline=~/Connection to.*closed/s;
 print $Net::FullAuto::FA_Core::LOG "cmd() STDERRBOTTOM=$stderr<== and LASTLINE=$lastline<==\n"
    if $Net::FullAuto::FA_Core::log && -1<index $Net::FullAuto::FA_Core::LOG,'*';
-            if ($stderr!~s/^\s*$//s && $stderr ne '_funkyPrompt_') {
+            if ($stderr!~s/^\s*$//s && $stderr!~/^\s*_funkyPrompt_\s*$/s) {
                chomp($stderr);
                &Net::FullAuto::FA_Core::handle_error($stderr) if !$wantarray;
             }

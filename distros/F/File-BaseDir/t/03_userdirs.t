@@ -1,6 +1,5 @@
-#!perl
 use strict;
-use warnings FATAL => 'all';
+use warnings;
 use Test::More;
 use File::UserDirs qw(:all);
 use File::BaseDir qw(config_home);
@@ -13,8 +12,8 @@ if (which 'xdg-user-dir') {
     plan tests => 8;
     $xdg_user_dir_installed = 1;
 } else {
-    plan skip_all => '"xdg-user-dir" executable not found. Install package "xdg-user-dirs".';    
-    
+    plan skip_all => '"xdg-user-dir" executable not found. Install package "xdg-user-dirs".';
+
 }
 
 my $temphomedir = tempdir(CLEANUP => 1);

@@ -5,6 +5,41 @@ MODULE = DBD::SQLite    PACKAGE = DBD::SQLite::Constants
 
 PROTOTYPES: ENABLE
 
+BOOT:
+    newCONSTSUB( gv_stashpv("DBD::SQLite::Constants", FALSE), "DBD_SQLITE_STRING_MODE_PV", newSVuv(DBD_SQLITE_STRING_MODE_PV) );
+    newCONSTSUB( gv_stashpv("DBD::SQLite::Constants", FALSE), "DBD_SQLITE_STRING_MODE_BYTES", newSVuv(DBD_SQLITE_STRING_MODE_BYTES) );
+    newCONSTSUB( gv_stashpv("DBD::SQLite::Constants", FALSE), "DBD_SQLITE_STRING_MODE_UNICODE_NAIVE", newSVuv(DBD_SQLITE_STRING_MODE_UNICODE_NAIVE) );
+    newCONSTSUB( gv_stashpv("DBD::SQLite::Constants", FALSE), "DBD_SQLITE_STRING_MODE_UNICODE_FALLBACK", newSVuv(DBD_SQLITE_STRING_MODE_UNICODE_FALLBACK) );
+    newCONSTSUB( gv_stashpv("DBD::SQLite::Constants", FALSE), "DBD_SQLITE_STRING_MODE_UNICODE_STRICT", newSVuv(DBD_SQLITE_STRING_MODE_UNICODE_STRICT) );
+
+#if SQLITE_VERSION_NUMBER >= 3034000
+
+IV
+_const_allowed_return_values_from_sqlite3_txn_state_3034000()
+    ALIAS:
+        SQLITE_TXN_NONE = SQLITE_TXN_NONE
+        SQLITE_TXN_READ = SQLITE_TXN_READ
+        SQLITE_TXN_WRITE = SQLITE_TXN_WRITE
+    CODE:
+        RETVAL = ix;
+    OUTPUT:
+        RETVAL
+
+#else
+
+IV
+_const_allowed_return_values_from_sqlite3_txn_state_3034000_zero()
+    ALIAS:
+        SQLITE_TXN_NONE = 1
+        SQLITE_TXN_READ = 2
+        SQLITE_TXN_WRITE = 3
+    CODE:
+        RETVAL = 0;
+    OUTPUT:
+        RETVAL
+
+#endif
+
 IV
 _const_authorizer_action_codes()
     ALIAS:
@@ -1130,6 +1165,30 @@ _const_extended_result_codes_3032000_zero()
 
 #endif
 
+#if SQLITE_VERSION_NUMBER >= 3034000
+
+IV
+_const_extended_result_codes_3034000()
+    ALIAS:
+        SQLITE_IOERR_CORRUPTFS = SQLITE_IOERR_CORRUPTFS
+    CODE:
+        RETVAL = ix;
+    OUTPUT:
+        RETVAL
+
+#else
+
+IV
+_const_extended_result_codes_3034000_zero()
+    ALIAS:
+        SQLITE_IOERR_CORRUPTFS = 1
+    CODE:
+        RETVAL = 0;
+    OUTPUT:
+        RETVAL
+
+#endif
+
 IV
 _const_flags_for_file_open_operations()
     ALIAS:
@@ -1257,6 +1316,30 @@ IV
 _const_flags_for_file_open_operations_3031000_zero()
     ALIAS:
         SQLITE_OPEN_NOFOLLOW = 1
+    CODE:
+        RETVAL = 0;
+    OUTPUT:
+        RETVAL
+
+#endif
+
+#if SQLITE_VERSION_NUMBER >= 3033000
+
+IV
+_const_flags_for_file_open_operations_3033000()
+    ALIAS:
+        SQLITE_OPEN_SUPER_JOURNAL = SQLITE_OPEN_SUPER_JOURNAL
+    CODE:
+        RETVAL = ix;
+    OUTPUT:
+        RETVAL
+
+#else
+
+IV
+_const_flags_for_file_open_operations_3033000_zero()
+    ALIAS:
+        SQLITE_OPEN_SUPER_JOURNAL = 1
     CODE:
         RETVAL = 0;
     OUTPUT:
@@ -1711,6 +1794,30 @@ IV
 _const__flags_for_file_open_operations_3031000_zero()
     ALIAS:
         OPEN_NOFOLLOW = 1
+    CODE:
+        RETVAL = 0;
+    OUTPUT:
+        RETVAL
+
+#endif
+
+#if SQLITE_VERSION_NUMBER >= 3033000
+
+IV
+_const__flags_for_file_open_operations_3033000()
+    ALIAS:
+        OPEN_SUPER_JOURNAL = SQLITE_OPEN_SUPER_JOURNAL
+    CODE:
+        RETVAL = ix;
+    OUTPUT:
+        RETVAL
+
+#else
+
+IV
+_const__flags_for_file_open_operations_3033000_zero()
+    ALIAS:
+        OPEN_SUPER_JOURNAL = 1
     CODE:
         RETVAL = 0;
     OUTPUT:

@@ -217,11 +217,11 @@ __PACKAGE__->meta->make_immutable;
 1;
 __END__
 
-=head 1 Name
+=head1 Name
 
 Connector::Proxy::Config::Versioned
 
-=head 1 Description
+=head1 Description
 
 Fetch values ftom the underlying Config::Versioned repository.
 On init, the commit id of the head is written into the local

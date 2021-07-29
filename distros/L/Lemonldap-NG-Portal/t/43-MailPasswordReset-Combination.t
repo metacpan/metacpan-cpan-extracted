@@ -39,7 +39,7 @@ SKIP: {
     expectCookie( try( 'jkirk', 'jkirk' ) );
 
     # Get mail reset code
-    my $query = getMailQuery('jkirk@trek.star');
+    $query = getMailQuery('jkirk@trek.star');
 
     # Set new password
     expectPortalError( updatePassword( $query, "kobayashi" ),

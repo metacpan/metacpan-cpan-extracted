@@ -21,11 +21,11 @@ recommends:
 requires:
   Data::Dump: '0'
   Data::Sah: '0.907'
-  Data::Sah::Normalize: '0'
+  Data::Sah::Normalize: 0.050_001
   File::Spec: '0'
   Getopt::Long: '2.50'
-  Log::ger: '0.037'
-  Log::ger::App: '0.009'
+  Log::ger: '0.038'
+  Log::ger::App: '0.018'
   Test::Builder: '0'
   Test::More: '0.98'
   Text::Diff: '0'
@@ -36,11 +36,15 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Test-Sah-Schema
   homepage: https://metacpan.org/release/Test-Sah-Schema
   repository: git://github.com/perlancar/perl-Test-Sah-Schema.git
-version: '0.009'
+version: '0.010'
 x_Dist_Zilla:
   perl:
     version: '5.030002'
   plugins:
+    -
+      class: Dist::Zilla::Plugin::PERLANCAR::CheckPendingRelease
+      name: '@Author::PERLANCAR/PERLANCAR::CheckPendingRelease'
+      version: '0.001'
     -
       class: Dist::Zilla::Plugin::GatherDir
       config:
@@ -112,7 +116,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::BeforeBuild
       name: '@Author::PERLANCAR/PERLANCAR::BeforeBuild'
-      version: '0.600'
+      version: '0.604'
     -
       class: Dist::Zilla::Plugin::Rinci::AbstractFromMeta
       name: '@Author::PERLANCAR/Rinci::AbstractFromMeta'
@@ -128,7 +132,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::MetaResources
       name: '@Author::PERLANCAR/PERLANCAR::MetaResources'
-      version: '0.040'
+      version: '0.043'
     -
       class: Dist::Zilla::Plugin::CheckChangeLog
       name: '@Author::PERLANCAR/CheckChangeLog'
@@ -149,6 +153,17 @@ x_Dist_Zilla:
       name: '@Author::PERLANCAR/CheckSelfDependency'
       version: '0.011'
     -
+      class: Dist::Zilla::Plugin::Git::Contributors
+      config:
+        Dist::Zilla::Plugin::Git::Contributors:
+          git_version: 2.17.1
+          include_authors: 0
+          include_releaser: 1
+          order_by: name
+          paths: []
+      name: '@Author::PERLANCAR/Git::Contributors'
+      version: '0.036'
+    -
       class: Dist::Zilla::Plugin::CopyrightYearFromGit
       name: '@Author::PERLANCAR/CopyrightYearFromGit'
       version: '0.006'
@@ -165,9 +180,9 @@ x_Dist_Zilla:
       name: '@Author::PERLANCAR/MetaConfig'
       version: '6.014'
     -
-      class: Dist::Zilla::Plugin::Authority
-      name: '@Author::PERLANCAR/Authority'
-      version: '1.009'
+      class: Dist::Zilla::Plugin::PERLANCAR::Authority
+      name: '@Author::PERLANCAR/PERLANCAR::Authority'
+      version: '0.001'
     -
       class: Dist::Zilla::Plugin::OurDate
       name: '@Author::PERLANCAR/OurDate'
@@ -269,6 +284,10 @@ x_Dist_Zilla:
               name: '@Author::PERLANCAR/Authors'
               version: '4.015'
             -
+              class: Pod::Weaver::Section::Contributors
+              name: '@Author::PERLANCAR/Contributors'
+              version: '0.009'
+            -
               class: Pod::Weaver::Section::Legal
               name: '@Author::PERLANCAR/Legal'
               version: '4.015'
@@ -313,7 +332,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Rinci::EmbedValidator
       name: '@Author::PERLANCAR/Rinci::EmbedValidator'
-      version: '0.250'
+      version: '0.251'
     -
       class: Dist::Zilla::Plugin::SetScriptShebang
       name: '@Author::PERLANCAR/SetScriptShebang'
@@ -373,7 +392,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Prereqs::CheckCircular
       name: '@Author::PERLANCAR/Prereqs::CheckCircular'
-      version: '0.006'
+      version: '0.007'
     -
       class: Dist::Zilla::Plugin::UploadToCPAN::WWWPAUSESimple
       name: '@Author::PERLANCAR/UploadToCPAN::WWWPAUSESimple'

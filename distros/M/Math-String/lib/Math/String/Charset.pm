@@ -5,7 +5,14 @@
 #############################################################################
 
 package Math::String::Charset;
-use base Exporter;
+
+require 5.008003;	# requires this Perl version or later
+use strict;
+
+use base 'Exporter';
+
+our ($VERSION, @EXPORT_OK);
+$VERSION   = '1.30';	# Current version of this package
 @EXPORT_OK = qw/analyze/;
 
 BEGIN
@@ -13,14 +20,10 @@ BEGIN
   *analyze = \&study;
   }
 
-use vars qw($VERSION);
-$VERSION = '1.29';	# Current version of this package
-require  5.008003;	# requires this Perl version or later
-
-use strict;
 use Math::BigInt;
 
-use vars qw/$die_on_error $CALC/;
+our $CALC;
+our $die_on_error;
 $die_on_error = 1;		# set to 0 to not die
 
 use Math::String::Charset::Nested;
@@ -528,7 +531,7 @@ sub is_valid
     return $self->{_minlen} <= 0 ? 1 : 0;
     }
 
-  my $int = Math::BigInt->bzero();
+  #my $int = Math::BigInt->bzero();
   my @chars;
   if (defined $self->{_sep})
     {
@@ -801,7 +804,7 @@ sub next
 
   if ($str->{_cache} eq '')				# 0 => 1
     {
-    my $min = $self->{_minlen};
+    #my $min = $self->{_minlen};
     #$str->{_cache} = $self->first($min) and return if $min->is_positive();
     $str->{_cache} = $self->{_ones}->[0];
     return;
@@ -911,7 +914,7 @@ sub merge
   {
   # merge yourself with another simple charset
   my $self = shift;
-  my $other = shift;
+  #my $other = shift;
 
   # TODO
   $self;
@@ -937,17 +940,17 @@ sub study
 
   my $depth = abs($arg->{order} || $arg->{depth} || 1);
   my $words = $arg->{words} || [];
-  my $sep = $arg->{sep};
+  #my $sep = $arg->{sep};
   my $charlen = $arg->{charlen} || 1;
-  my $cut = $arg->{cut} || 0;
+  #my $cut = $arg->{cut} || 0;
   my $hist = $arg->{hist} || 0;
 
   die "depth of study must be between 1..2" if ($depth < 1 || $depth > 2);
   my $starts = {};              # word starts
   my $ends = {};                # word ends
   my $chars = {};               # for depth 1
-  my $bi = { }; my ($l,@chars,$x,$y,$word,$i);
-  foreach $word (@$words)
+  my $bi = { }; my ($l,$x,$y,$i);
+  foreach my $word (@$words)
     {
     # count starting chars and ending chars
     $starts->{substr($word,0,$charlen)} ++;
@@ -983,7 +986,7 @@ sub study
   $args->{end} = \@end;
   if ($depth > 1)
     {
-    my @sorted;
+    #my @sorted;
     foreach my $c (keys %$bi)
       {
       my $bc = $bi->{$c};
@@ -1929,7 +1932,7 @@ Must be longer than a (possible defined) minlen. If not given is set to +inf.
 
 =item scale
 
-Optional input/output scale. See L<scale()>.
+Optional input/output scale. See L</scale()>.
 
 =back
 
@@ -1995,7 +1998,7 @@ positive BigInt. Returns 'inf' if no maxlen is defined, because there should
 be no upper bound on how many strings are possible. (This might change if we
 can calculate an upper bound - not sure if this is possible with bigrams).
 
-If maxlen is defined, forces a calculation of all possible L<class()> values
+If maxlen is defined, forces a calculation of all possible L</class()> values
 and may therefore be very slow on the first call, it also caches possible
 lot's of values.
 
@@ -2055,7 +2058,7 @@ to (but much faster):
 	$order = $charset->order();
 
 Return the order of the charset: 1 for simple charsets, 2 (bi-grams), 3 etc
-for higher orders. See also L<type()>.
+for higher orders. See also L</type()>.
 
 =item type()
 
@@ -2063,7 +2066,7 @@ for higher orders. See also L<type()>.
 
 Return the type of the charset: 0 for simple charsets, 1 for grouped ones.
 If the type is 0, the order can be 1,23 etc, with type 1 the order is always
-1, too. See also L<order>.
+1, too. See also L</order()>.
 
 =item charlen()
 
@@ -2289,7 +2292,7 @@ array first.
 
 =item analyze()
 
-Is an exportable alias for L<study()>.
+Is an exportable alias for L</study()>.
 
 	use Math::String::Charset qw/analyze/;
 

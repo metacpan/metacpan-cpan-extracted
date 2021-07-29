@@ -1,13 +1,26 @@
 /*---------------------------------------------------------------------
- $Header: /Perl/OlleDB/convenience.cpp 5     19-07-08 22:33 Sommar $
+ $Header: /Perl/OlleDB/convenience.cpp 7     21-07-03 23:06 Sommar $
 
   This file holds general-purpose routines, mainly for converting
   between SV and BSTR and the like. All these are low-level, and do
   not have access to error handling. Such code should be in utils.cpp.
 
-  Copyright (c) 2004-2019   Erland Sommarskog
+  Copyright (c) 2004-2021   Erland Sommarskog
 
   $History: convenience.cpp $
+ * 
+ * *****************  Version 7  *****************
+ * User: Sommar       Date: 21-07-03   Time: 23:06
+ * Updated in $/Perl/OlleDB
+ * When converting from char to BSTR with a client codepage of UTF-8, we
+ * need to consider that Perl may actually have the data in code page 1252
+ * and not have the UTF8 bit set.
+ * 
+ * *****************  Version 6  *****************
+ * User: Sommar       Date: 21-04-29   Time: 22:20
+ * Updated in $/Perl/OlleDB
+ * Need to pas length to BSTR_to_SV, or else embedded NUL characters in
+ * varchar in sql_variant were handled incorrectly.
  * 
  * *****************  Version 5  *****************
  * User: Sommar       Date: 19-07-08   Time: 22:33
@@ -53,11 +66,28 @@ BSTR char_to_BSTR(char     * str,
    DWORD    err;
    BSTR     bstr;
    WCHAR  * tmp;
-   UINT     decoding = (isutf8 ? CP_UTF8 : CP_ACP);
-   DWORD    flags = (decoding == CP_UTF8 ? 0 : MB_PRECOMPOSED);
+   UINT     decoding;
+   DWORD    flags;
 
    if (inlen > 0) {
-      // First find out how long the wide string will be, by calling
+      // Determine the decoding. It the UTF-8 but set, it is UTF-8. If
+      // the bit is not set, we assume the ANSI code page - but if that
+      // page is UTF-8, we use 1252, Latin-1, as Perl may not set the
+      // UTF-8 bit if you include Latin-1 charactes like \x{00F6}.
+      if (isutf8) {
+         decoding = CP_UTF8;
+      }
+      else if (GetACP() != CP_UTF8) {
+         decoding = CP_ACP;
+      }
+      else {
+         decoding = 1252;
+      }
+
+      // Flags are used by MultiByteToWideChar.
+      flags = (decoding == CP_UTF8 ? 0 : MB_PRECOMPOSED);
+
+      // Find out how long the wide string will be, by calling
       // MultiByteToWideChar without a buffer.
       widelen = MultiByteToWideChar(decoding, flags, str, (int) inlen, 
                                     NULL, 0);
@@ -241,7 +271,6 @@ SV * char_to_UTF8_SV (char    * str,
    bstr = SysAllocStringLen(NULL, widelen);
    ret = MultiByteToWideChar(codepage, MB_PRECOMPOSED, str, (int) inlen, 
                              bstr, widelen);
-
    if (! ret) {
       int err = GetLastError();
       croak("MultiByteToWideChar failed with %ld when converting string '%s' to Unicode",
@@ -249,7 +278,7 @@ SV * char_to_UTF8_SV (char    * str,
    }
 
    // Then convert it to UTF-8
-   sv = BSTR_to_SV(bstr);
+   sv = BSTR_to_SV(bstr, SysStringLen(bstr));
    SysFreeString(bstr);
 
    return sv;

@@ -1,9 +1,9 @@
 package Bencher::Backend;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-04-10'; # DATE
+our $DATE = '2021-07-23'; # DATE
 our $DIST = 'Bencher-Backend'; # DIST
-our $VERSION = '1.053'; # VERSION
+our $VERSION = '1.057'; # VERSION
 
 use 5.010001;
 use strict;
@@ -1322,26 +1322,7 @@ sub _gen_items {
 
     } # ITER
 
-    # give each item a convenient name, which is a short combination of its
-    # permutation (unnecessarily unique, just as a human-readable name)
-    {
-        last unless @$items;
-        require Data::TableData::Object::aohos;
-        my $td = Data::TableData::Object::aohos->new($items);
-        my @const_cols = $td->const_col_names;
-
-        my @name_keys;
-        for my $k (sort keys %{$items->[0]}) {
-            next unless $k =~ /^(participant|p_.+|dataset|ds_.+|item_.+|arg_.+)$/;
-            next if grep {$k eq $_} @const_cols;
-            push @name_keys, $k;
-        }
-
-        for my $it (@$items) {
-            $it->{_name} = join(" ", map {"$_=".($it->{$_} // "(undef)")}
-                                    @name_keys);
-        }
-    }
+    _set_item_names($items);
 
     $items = _filter_records(
         entity => 'item',
@@ -1948,6 +1929,101 @@ sub _digest {
     $digests;
 }
 
+
+    # give each item a convenient name, which is a short combination of its
+    # permutation (unnecessarily unique, just as a human-readable name)
+sub _set_item_names {
+    my $items = shift;
+
+    return unless @$items;
+
+    require Data::TableData::Object::aohos;
+    my $td = Data::TableData::Object::aohos->new($items);
+    my @const_cols = $td->const_col_names;
+
+    my @name_keys;
+    for my $k (sort keys %{$items->[0]}) {
+        next unless $k =~ /^(participant|p_.+|dataset|ds_.+|item_.+|arg_.+)$/;
+        next if grep {$k eq $_} @const_cols;
+        push @name_keys, $k;
+    }
+
+    require Sort::BySpec;
+    my $sorter = Sort::BySpec::sort_by_spec(spec=>['participant', qr/^p_/, 'dataset', qr/^ds_/, qr/^item_/, qr/^arg_/]);
+    my @sorted_name_keys = $sorter->(@name_keys);
+
+    my $succinct_participant_names;
+    if (grep { $_ eq 'participant' } @name_keys) {
+        $succinct_participant_names = _compact_participant_names({req_uniq => @name_keys == 1 ? 1:0}, map { $_->{participant} } @$items);
+    }
+
+    for my $it (@$items) {
+        $it->{_name} = join(" ", map {"$_=".($it->{$_} // "(undef)")}
+                                @name_keys);
+        # _succinct_name is for e.g. showing Benchmark.pm result where the
+        # items' names are all shown together horizontally as columns, so
+        # the names need to be shorter to avoid being visually overwhelming
+        $it->{_succinct_name} = join(" ", map {($_ eq 'participant' ? $succinct_participant_names->{ $it->{$_} } : ($it->{$_} // "(undef)"))}
+                                         @sorted_name_keys);
+    }
+}
+
+sub _compact_participant_names {
+    require List::Util;
+    require List::Util::Uniq;
+
+    my ($opts, @names) = @_;
+
+    my %res;
+    goto RETURN_RESULT if (List::Util::max(map { length } @names) // 0) <= 12;
+
+    # assume Foo::Bar::baz form to be (module + func). otherwise we assume the
+    # whole name is func.
+    my (@prefixes, @funcs);
+    for my $name (@names) {
+        if ($name =~ /\A((?:\w+::)*)(\w+)\z/) {
+            push @prefixes, $1;
+            push @funcs, $2;
+        } else {
+            push @prefixes, '';
+            push @funcs, $name;
+        }
+    }
+
+    if (List::Util::Uniq::is_monovalued(@prefixes)) {
+        @prefixes = (('') x @prefixes);
+        goto FORM_RESULT if List::Util::max(map {length} @funcs) <= 12;
+    } else {
+        # XXX find unique parts, e.g. Foo::Bar & Foo::Baz -> FBr & FBz or
+        # something like this. currently we return FB & FB.
+        for (@prefixes) {
+            s/(.)[^:]*::/$1/g;
+            $_ = "$_:";
+        }
+    }
+
+    # XXX find unique parts, e.g. foo_bar & foo_baz -> f_bar, f_baz. currently
+    # we return f_b.
+    for (@funcs) {
+        s/(\S)\S*?(_|\z)/$1$2/g;
+    }
+
+  FORM_RESULT:
+    my @new_names = map { $prefixes[$_] . $funcs[$_] } 0..$#names;
+    if ($opts->{req_uniq}) {
+        goto UNCOMPACTED_RESULT unless List::Util::Uniq::is_uniq(@new_names);
+    }
+    %res = map { $names[$_] => $new_names[$_] } 0 .. $#names;
+    goto RETURN_RESULT;
+
+  UNCOMPACTED_RESULT:
+    %res = map {$_=>$_} @names;
+    goto RETURN_RESULT;
+
+  RETURN_RESULT:
+    return \%res;
+}
+
 my $_alias_spec_add_participant = {
     summary => 'Add a participant',
     code => sub {
@@ -2024,7 +2100,9 @@ sub format_result {
     my ($envres, $formatters, $opts) = @_;
 
     $opts //= {};
-    $opts->{render_as_text_table} //= 1;
+    # XXX exclusive choices
+    $opts->{render_as_benchmark_pm} //= 0;
+    $opts->{render_as_text_table}   //= $opts->{render_as_benchmark_pm} ? 0:1;
 
     $formatters //= [
         'AddComparisonFields',
@@ -2041,6 +2119,7 @@ sub format_result {
         'DeleteSeqField',
 
         ('RenderAsTextTable') x !!$opts->{render_as_text_table},
+        ('RenderAsBenchmarkPm') x !!$opts->{render_as_benchmark_pm},
     ];
 
     # load all formatter modules
@@ -2125,93 +2204,41 @@ _
 };
 sub chart_result {
     require Chart::Gnuplot;
-    require Package::Abbreviate;
 
     my %args = @_;
 
     return [412, "Output file already exists, use overwrite=1 if you want to ".
                 "overwrite the file"]
         if (-f $args{output_file}) && !$args{overwrite};
-
+    return [412, "Result has no items, can't chart"] unless @{$args{envres}[2]};
     my $envres = format_result($args{envres}, undef, {render_as_text_table=>0});
-    return [412, "No permute information in the result"]
-        unless $envres->[3]{'func.permute'};
-    my %permute = @{ $envres->[3]{'func.permute'} };
-    my $num_different = 0;
-    for (sort keys %permute) {
-        if (@{ $permute{$_} } > 1) {
-            $num_different++;
-        } else {
-            delete $permute{$_};
-        }
-    }
-    return [412, "Result needs to have 1-2 permutations of different items ".
-                "to be charted"]
-        unless $num_different >= 1 && $num_different <= 2;
-    my @permute = sort keys %permute;
-
+    _set_item_names($envres->[2]);
     my $data = $envres->[3]{'func.module_startup'} || $envres->[3]{'func.code_startup'} ? "time" : "rate";
 
     my $chart = Chart::Gnuplot->new(
         #imagesize => "0.5, 0.5",
         output => $args{output_file},
-        title  => $args{title} // 'Benchmark result',
+        title  => $args{title} // 'Benchmark result'.($data eq 'rate' ? " (higher is better)" : "(shorter is better)"),
         ylabel => $data,
         xlabel => "",
+        xtics  => {rotate=>"30 right"},
     );
 
-    my @chart_datasets;
-
-    if (@permute == 1) {
-        my (@ydata, @xdata);
-        for my $it (@{ $envres->[2] }) {
-            push @ydata, $it->{$data};
-            my $xdata = $it->{$permute[0]};
-            if ($permute[0] eq 'participant' && $xdata =~ /\A\w+(::\w+)+\z/) {
-                $xdata = Package::Abbreviate->new(10, {eager=>1})->abbr($xdata);
-            }
-            push @xdata, $xdata;
-        }
-        my $ds = Chart::Gnuplot::DataSet->new(
-            ydata  => \@ydata,
-            xdata  => \@xdata,
-            title  => _esc_gnuplot_title($permute[0]),
-            border => undef,
-            fill   => {}, # XXX color doesn't affect, on my PC?
-            style  => "histograms",
-        );
-        push @chart_datasets, $ds;
-    } elsif (@permute == 2) {
-        my %p1_values;
-        for my $it (@{ $envres->[2] }) {
-            $p1_values{ $it->{$permute[1]} }++;
-        }
-        for my $p1 (sort keys %p1_values) {
-            my (@ydata, @xdata);
-            for my $it (@{ $envres->[2] }) {
-                next unless $it->{ $permute[1] } eq $p1;
-                push @ydata, $it->{$data};
-                push @xdata, $it->{$permute[0]};
-            }
-            my $title;
-            if ($permute[1] eq 'participant' && $p1 =~ /\A\w+(::\w+)+\z/) {
-                $title = Package::Abbreviate->new(10, {eager=>1})->abbr($p1);
-            } else {
-                $title = $p1;
-            }
-
-            my $ds = Chart::Gnuplot::DataSet->new(
-                ydata  => \@ydata,
-                xdata  => \@xdata,
-                title  => _esc_gnuplot_title($title),
-                border => undef,
-                fill   => {}, # XXX color doesn't affect, on my PC?
-                style  => "histograms",
-            );
-            push @chart_datasets, $ds;
-        }
+    my (@ydata, @xdata);
+    for my $it (@{ $envres->[2] }) {
+        push @xdata, _esc_gnuplot_title($it->{_succinct_name});
+        push @ydata, $it->{$data};
     }
-
+    my @chart_datasets;
+    my $ds = Chart::Gnuplot::DataSet->new(
+        ydata  => \@ydata,
+        xdata  => \@xdata,
+        title  => "",
+        border => undef,
+        fill   => {}, # XXX color doesn't affect, on my PC?
+        style  => "histograms",
+    );
+    push @chart_datasets, $ds;
     $chart->plot2d(@chart_datasets);
     [200, "OK"];
 }
@@ -3946,7 +3973,7 @@ sub bencher {
             my %codes;
             my %legends;
             for my $it (@$items) {
-                my $key = $it->{_name};
+                my $key = $it->{_succinct_name};
                 if (!length($key)) {
                     $key = $it->{seq};
                 }
@@ -3960,6 +3987,7 @@ sub bencher {
                             sort keys %$it
                         );
             }
+            log_trace "Running benchmark with Benchmark.pm ...";
             my ($stdout, @res) = &Capture::Tiny::capture_stdout(
                 sub {
                     Benchmark::cmpthese($precision, \%codes);
@@ -4028,7 +4056,7 @@ sub bencher {
                 Data::Clone::clone($parsed->{env_hashes});
         }
 
-        log_trace("Running benchmark (precision=%g) ...", $precision);
+        log_trace("Running benchmark with %s (precision=%g) ...", $runner, $precision);
 
         my @columns        = ('seq'  , 'participant', 'dataset');
         my @column_aligns  = ('right', 'left'       , 'left');
@@ -4337,7 +4365,7 @@ Bencher::Backend - Backend for Bencher
 
 =head1 VERSION
 
-This document describes version 1.053 of Bencher::Backend (from Perl distribution Bencher-Backend), released on 2021-04-10.
+This document describes version 1.057 of Bencher::Backend (from Perl distribution Bencher-Backend), released on 2021-07-23.
 
 =head1 FUNCTIONS
 
@@ -4346,7 +4374,7 @@ This document describes version 1.053 of Bencher::Backend (from Perl distributio
 
 Usage:
 
- bencher(%args) -> [status, msg, payload, meta]
+ bencher(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 A benchmark framework.
 
@@ -4811,12 +4839,12 @@ Memory size is measured using L<Devel::Size>.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -4826,7 +4854,7 @@ Return value:  (any)
 
 Usage:
 
- chart_result(%args) -> [status, msg, payload, meta]
+ chart_result(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Generate chart from the result.
 
@@ -4861,12 +4889,12 @@ Enveloped result from bencher.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -4876,7 +4904,7 @@ Return value:  (any)
 
 Usage:
 
- format_result( [ \%optional_named_args ] , $envres, $formatters, $options) -> [status, msg, payload, meta]
+ format_result( [ \%optional_named_args ] , $envres, $formatters, $options) -> [$status_code, $reason, $payload, \%result_meta]
 
 Format bencher result.
 
@@ -4905,12 +4933,12 @@ Formatters specification.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -4920,7 +4948,7 @@ Return value:  (any)
 
 Usage:
 
- parse_scenario(%args) -> [status, msg, payload, meta]
+ parse_scenario(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Parse scenario (fill in default values, etc).
 
@@ -4939,12 +4967,12 @@ Unparsed scenario.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 

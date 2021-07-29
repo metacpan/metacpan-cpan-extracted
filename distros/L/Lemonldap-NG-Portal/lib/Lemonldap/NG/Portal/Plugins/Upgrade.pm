@@ -8,7 +8,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_TOKENEXPIRED
 );
 
-our $VERSION = '2.0.10';
+our $VERSION = '2.0.12';
 
 extends 'Lemonldap::NG::Portal::Main::Plugin';
 
@@ -125,7 +125,7 @@ sub confirm {
     my $res = $self->p->process($req);
     return $self->p->do( $req, [ sub { $res } ] ) if $res;
 
-    if ( $upg or $req->param('confirm') == 1 ) {
+    if ( $upg or $req->param('confirm') and $req->param('confirm') == 1 ) {
         $req->data->{noerror} = 1;
 
         if ($sfOnly) {
@@ -152,7 +152,11 @@ sub confirm {
         }
     }
     else {
+
         # Go to portal
+        $self->logger->debug("Upgrade session failed -> Go to portal");
+        $req->mustRedirect(1);
+        return $self->p->do( $req, [ sub { PE_OK } ] );
     }
 }
 

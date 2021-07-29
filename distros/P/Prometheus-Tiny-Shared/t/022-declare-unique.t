@@ -41,4 +41,22 @@ dies_ok(sub {
   $p->declare('h', buckets => [1,2,3,4,8]);
 }, 'redeclaring histogram metric with different buckets crashes');
 
+$p->declare('e', enum => 'v', enum_values => [qw(foo bar baz)]);
+lives_ok(sub {
+  $p->declare('e', enum => 'v', enum_values => [qw(foo bar baz)]);
+}, 'redeclaring enum metric with same buckets is allowed');
+
+dies_ok(sub {
+  $p->declare('e');
+}, 'redeclaring enum metric with missing meta crashes');
+dies_ok(sub {
+  $p->declare('e', enum => 'w', enum_values => [qw(foo bar baz)]);
+}, 'redeclaring enum metric with different enum label crashes');
+dies_ok(sub {
+  $p->declare('e', enum => 'v', enum_values => [qw(foo)]);
+}, 'redeclaring enum metric with different number of enum values crashes');
+dies_ok(sub {
+  $p->declare('e', enum => 'v', enum_values => [qw(one two three)]);
+}, 'redeclaring enum metric with different enum values crashes');
+
 done_testing;

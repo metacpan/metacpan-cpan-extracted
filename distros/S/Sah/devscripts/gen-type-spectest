@@ -100,7 +100,7 @@ sub gen_BaseType_tests {
         tags   => ['clause:v'],
     };
 
-    # schema_v & base_v is tested in 02-schema_versioning.json
+    # TODO schema_v & base_v
 
     # c
     push @res, {

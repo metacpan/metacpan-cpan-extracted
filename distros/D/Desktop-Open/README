@@ -2,8 +2,8 @@ NAME
     Desktop::Open - Open a file or URL in the user's preferred application
 
 VERSION
-    This document describes version 0.001 of Desktop::Open (from Perl
-    distribution Desktop-Open), released on 2021-07-02.
+    This document describes version 0.002 of Desktop::Open (from Perl
+    distribution Desktop-Open), released on 2021-07-05.
 
 SYNOPSIS
      use Desktop::Open qw(open_desktop);
@@ -20,7 +20,8 @@ DESCRIPTION
     available.
 
     2. If #1 fails, resort to using Browser::Open's "open_browser". Return
-    its return value.
+    its return value. An exception is if #1 fails with "file/URL does not
+    exist" error, in which case we give up immediately.
 
     TODO: On OSX, use "openit". Any taker?
 

@@ -11,21 +11,17 @@ my $post_diag;
 
 $modules{$_} = $_ for qw(
   Catalyst
+  Catalyst::Controller
   Catalyst::Plugin::Static::Simple
   Catalyst::ScriptRunner
   Catalyst::View::TT
-  Cwd
   Devel::ebug
   ExtUtils::MakeMaker
   File::ShareDir::Dist
   File::ShareDir::Install
-  HTML::Prototype
   HTTP::Request::Common
-  List::Util
   PPI
   PPI::HTML
-  Path::Class
-  Storable
   Test::More
   Test::WWW::Mechanize::Catalyst
 );

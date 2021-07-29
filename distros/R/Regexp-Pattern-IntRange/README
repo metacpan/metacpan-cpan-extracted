@@ -1,0 +1,452 @@
+NAME
+    Regexp::Pattern::IntRange - Regexp patterns related to integer ranges
+
+VERSION
+    This document describes version 0.001 of Regexp::Pattern::IntRange (from
+    Perl distribution Regexp-Pattern-IntRange), released on 2021-07-17.
+
+SYNOPSIS
+     use Regexp::Pattern; # exports re()
+     my $re = re("IntRange::int_range");
+
+DESCRIPTION
+    Regexp::Pattern is a convention for organizing reusable regex patterns.
+
+REGEXP PATTERNS
+    *   int_range
+
+        Integer range (sequence of ints/simple ranges), e.g. 1 / -5-7 / 1,10
+        / 1,5-7,10.
+
+        Currently does not check that start value in a simple range must not
+        be greater than end value.
+
+        Examples:
+
+        Empty string.
+
+         "" =~ re("IntRange::int_range");  # DOESN'T MATCH
+
+        Example #2.
+
+         1 =~ re("IntRange::int_range");  # matches
+
+        Example #3.
+
+         -2 =~ re("IntRange::int_range");  # matches
+
+        Float.
+
+         1.5 =~ re("IntRange::int_range");  # DOESN'T MATCH
+
+        Example #5.
+
+         "1-1" =~ re("IntRange::int_range");  # matches
+
+        Example #6.
+
+         "1-2" =~ re("IntRange::int_range");  # matches
+
+        Example #7.
+
+         "1 - 2" =~ re("IntRange::int_range");  # matches
+
+        Example #8.
+
+         "0-100" =~ re("IntRange::int_range");  # matches
+
+        Example #9.
+
+         "-1-2" =~ re("IntRange::int_range");  # matches
+
+        Example #10.
+
+         "-10--1" =~ re("IntRange::int_range");  # matches
+
+        Missing end value.
+
+         "1-" =~ re("IntRange::int_range");  # DOESN'T MATCH
+
+        Example #12.
+
+         "1-1.5" =~ re("IntRange::int_range");  # DOESN'T MATCH
+
+        Invalid simple int range syntax.
+
+         "1-2-3" =~ re("IntRange::int_range");  # DOESN'T MATCH
+
+        Leading and trailing whitespace is currently not allowed.
+
+         " 1-2 " =~ re("IntRange::int_range");  # DOESN'T MATCH
+
+        Example #15.
+
+         "1,2" =~ re("IntRange::int_range");  # matches
+
+        Example #16.
+
+         "1 , 2" =~ re("IntRange::int_range");  # matches
+
+        Example #17.
+
+         "1,2,-3,4" =~ re("IntRange::int_range");  # matches
+
+        Float.
+
+         "1,2,-3,4.5" =~ re("IntRange::int_range");  # DOESN'T MATCH
+
+        Dangling comma is currently not allowed.
+
+         "1," =~ re("IntRange::int_range");  # DOESN'T MATCH
+
+        Multiple commas are currently not allowed.
+
+         "1,,2" =~ re("IntRange::int_range");  # DOESN'T MATCH
+
+        Example #21.
+
+         "1,2-5" =~ re("IntRange::int_range");  # matches
+
+        Example #22.
+
+         "-1,-2-5,7,9-9" =~ re("IntRange::int_range");  # matches
+
+    *   simple_int_range
+
+        Simple integer range, e.g. 1-10 / -2-7.
+
+        Currently does not check that start value must not be greater than
+        end value.
+
+        Examples:
+
+        Empty string.
+
+         "" =~ re("IntRange::simple_int_range");  # DOESN'T MATCH
+
+        Not a range but single positive integer.
+
+         1 =~ re("IntRange::simple_int_range");  # DOESN'T MATCH
+
+        Not a range but single negative integer.
+
+         -2 =~ re("IntRange::simple_int_range");  # DOESN'T MATCH
+
+        Example #4.
+
+         "1-1" =~ re("IntRange::simple_int_range");  # matches
+
+        Example #5.
+
+         "1-2" =~ re("IntRange::simple_int_range");  # matches
+
+        Example #6.
+
+         "1 - 2" =~ re("IntRange::simple_int_range");  # matches
+
+        Example #7.
+
+         "0-100" =~ re("IntRange::simple_int_range");  # matches
+
+        Example #8.
+
+         "-1-2" =~ re("IntRange::simple_int_range");  # matches
+
+        Example #9.
+
+         "-10--1" =~ re("IntRange::simple_int_range");  # matches
+
+        Missing end value.
+
+         "1-" =~ re("IntRange::simple_int_range");  # DOESN'T MATCH
+
+        Example #11.
+
+         "1-1.5" =~ re("IntRange::simple_int_range");  # DOESN'T MATCH
+
+        Invalid syntax.
+
+         "1-2-3" =~ re("IntRange::simple_int_range");  # DOESN'T MATCH
+
+        Leading and trailing whitespace is currently not allowed.
+
+         " 1-2 " =~ re("IntRange::simple_int_range");  # DOESN'T MATCH
+
+    *   simple_int_seq
+
+        Simple integer sequence, e.g. 1,-3,12.
+
+        Examples:
+
+        Empty string.
+
+         "" =~ re("IntRange::simple_int_seq");  # DOESN'T MATCH
+
+        A range m-n is not valid in simple integer sequence.
+
+         "1-2" =~ re("IntRange::simple_int_seq");  # DOESN'T MATCH
+
+        Dangling comma is currently not allowed.
+
+         "1," =~ re("IntRange::simple_int_seq");  # DOESN'T MATCH
+
+        Multiple commas are currently not allowed.
+
+         "1,,2" =~ re("IntRange::simple_int_seq");  # DOESN'T MATCH
+
+        Float.
+
+         1.2 =~ re("IntRange::simple_int_seq");  # DOESN'T MATCH
+
+        Example #6.
+
+         1 =~ re("IntRange::simple_int_seq");  # matches
+
+        Example #7.
+
+         "1,2" =~ re("IntRange::simple_int_seq");  # matches
+
+        Example #8.
+
+         "1 , 2" =~ re("IntRange::simple_int_seq");  # matches
+
+        Example #9.
+
+         "1,2,-3,4" =~ re("IntRange::simple_int_seq");  # matches
+
+    *   simple_uint_range
+
+        Simple unsigned integer range, e.g. 1-10 / 2-7.
+
+        Currently does not check that start value must not be greater than
+        end value.
+
+        Examples:
+
+        Empty string.
+
+         "" =~ re("IntRange::simple_uint_range");  # DOESN'T MATCH
+
+        Not a range but single positive integer.
+
+         1 =~ re("IntRange::simple_uint_range");  # DOESN'T MATCH
+
+        Not a range but single negative integer.
+
+         -2 =~ re("IntRange::simple_uint_range");  # DOESN'T MATCH
+
+        Example #4.
+
+         "1-1" =~ re("IntRange::simple_uint_range");  # matches
+
+        Example #5.
+
+         "1-2" =~ re("IntRange::simple_uint_range");  # matches
+
+        Example #6.
+
+         "1 - 2" =~ re("IntRange::simple_uint_range");  # matches
+
+        Example #7.
+
+         "0-100" =~ re("IntRange::simple_uint_range");  # matches
+
+        Negative.
+
+         "-1-2" =~ re("IntRange::simple_uint_range");  # DOESN'T MATCH
+
+        Negative.
+
+         "-10--1" =~ re("IntRange::simple_uint_range");  # DOESN'T MATCH
+
+        Missing end value.
+
+         "1-" =~ re("IntRange::simple_uint_range");  # DOESN'T MATCH
+
+        Example #11.
+
+         "1-1.5" =~ re("IntRange::simple_uint_range");  # DOESN'T MATCH
+
+        Invalid syntax.
+
+         "1-2-3" =~ re("IntRange::simple_uint_range");  # DOESN'T MATCH
+
+        Leading and trailing whitespace is currently not allowed.
+
+         " 1-2 " =~ re("IntRange::simple_uint_range");  # DOESN'T MATCH
+
+    *   simple_uint_seq
+
+        Simple unsigned integer sequence, e.g. 1,3,12.
+
+        Examples:
+
+        Empty string.
+
+         "" =~ re("IntRange::simple_uint_seq");  # DOESN'T MATCH
+
+        A range m-n is not valid in simple integer sequence.
+
+         "1-2" =~ re("IntRange::simple_uint_seq");  # DOESN'T MATCH
+
+        Dangling comma is currently not allowed.
+
+         "1," =~ re("IntRange::simple_uint_seq");  # DOESN'T MATCH
+
+        Multiple commas are currently not allowed.
+
+         "1,,2" =~ re("IntRange::simple_uint_seq");  # DOESN'T MATCH
+
+        Float.
+
+         1.2 =~ re("IntRange::simple_uint_seq");  # DOESN'T MATCH
+
+        Example #6.
+
+         1 =~ re("IntRange::simple_uint_seq");  # matches
+
+        Example #7.
+
+         "1,2" =~ re("IntRange::simple_uint_seq");  # matches
+
+        Example #8.
+
+         "1 , 2" =~ re("IntRange::simple_uint_seq");  # matches
+
+        Negative.
+
+         "1,2,-3,4" =~ re("IntRange::simple_uint_seq");  # DOESN'T MATCH
+
+    *   uint_range
+
+        Unsigned integer range (sequence of uints/simple ranges), e.g. 1 /
+        5-7 / 1,10 / 1,5-7,10.
+
+        Currently does not check that start value in a simple range must not
+        be greater than end value.
+
+        Examples:
+
+        Empty string.
+
+         "" =~ re("IntRange::uint_range");  # DOESN'T MATCH
+
+        Example #2.
+
+         1 =~ re("IntRange::uint_range");  # matches
+
+        Negative.
+
+         -2 =~ re("IntRange::uint_range");  # DOESN'T MATCH
+
+        Float.
+
+         1.5 =~ re("IntRange::uint_range");  # DOESN'T MATCH
+
+        Example #5.
+
+         "1-1" =~ re("IntRange::uint_range");  # matches
+
+        Example #6.
+
+         "1-2" =~ re("IntRange::uint_range");  # matches
+
+        Example #7.
+
+         "1 - 2" =~ re("IntRange::uint_range");  # matches
+
+        Example #8.
+
+         "0-100" =~ re("IntRange::uint_range");  # matches
+
+        Negative.
+
+         "-1-2" =~ re("IntRange::uint_range");  # DOESN'T MATCH
+
+        Negative.
+
+         "-10--1" =~ re("IntRange::uint_range");  # DOESN'T MATCH
+
+        Missing end value.
+
+         "1-" =~ re("IntRange::uint_range");  # DOESN'T MATCH
+
+        Example #12.
+
+         "1-1.5" =~ re("IntRange::uint_range");  # DOESN'T MATCH
+
+        Invalid simple int range syntax.
+
+         "1-2-3" =~ re("IntRange::uint_range");  # DOESN'T MATCH
+
+        Leading and trailing whitespace is currently not allowed.
+
+         " 1-2 " =~ re("IntRange::uint_range");  # DOESN'T MATCH
+
+        Example #15.
+
+         "1,2" =~ re("IntRange::uint_range");  # matches
+
+        Example #16.
+
+         "1 , 2" =~ re("IntRange::uint_range");  # matches
+
+        Negative.
+
+         "1,2,-3,4" =~ re("IntRange::uint_range");  # DOESN'T MATCH
+
+        Float.
+
+         "1,2,-3,4.5" =~ re("IntRange::uint_range");  # DOESN'T MATCH
+
+        Dangling comma is currently not allowed.
+
+         "1," =~ re("IntRange::uint_range");  # DOESN'T MATCH
+
+        Multiple commas are currently not allowed.
+
+         "1,,2" =~ re("IntRange::uint_range");  # DOESN'T MATCH
+
+        Example #21.
+
+         "1,2-5" =~ re("IntRange::uint_range");  # matches
+
+        Negative.
+
+         "-1,-2-5,7,9-9" =~ re("IntRange::uint_range");  # DOESN'T MATCH
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Regexp-Pattern-IntRange>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Regexp-Pattern-IntRange>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Regexp-Pattern-IntRan
+    ge>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Sah::Schemas::IntRange
+
+    Regexp::Pattern::Int
+
+    Regexp::Pattern
+
+    Some utilities related to Regexp::Pattern: App::RegexpPatternUtils,
+    rpgrep from App::rpgrep.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2021 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

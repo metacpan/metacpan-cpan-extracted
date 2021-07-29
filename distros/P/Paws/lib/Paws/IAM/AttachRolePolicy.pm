@@ -28,9 +28,9 @@ You shouldn't make instances of this class. Each attribute should be used as a n
 =head1 SYNOPSIS
 
     my $iam = Paws->service('IAM');
-    # To attach a managed policy to an IAM role
-    # The following command attaches the AWS managed policy named ReadOnlyAccess
-    # to the IAM role named ReadOnlyRole.
+ # To attach a managed policy to an IAM role
+ # The following command attaches the AWS managed policy named ReadOnlyAccess to
+ # the IAM role named ReadOnlyRole.
     $iam->AttachRolePolicy(
       'PolicyArn' => 'arn:aws:iam::aws:policy/ReadOnlyAccess',
       'RoleName'  => 'ReadOnlyRole'
@@ -47,8 +47,7 @@ For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/iam
 
 The Amazon Resource Name (ARN) of the IAM policy you want to attach.
 
-For more information about ARNs, see Amazon Resource Names (ARNs) and
-AWS Service Namespaces
+For more information about ARNs, see Amazon Resource Names (ARNs)
 (https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html)
 in the I<AWS General Reference>.
 

@@ -11,7 +11,7 @@ use Test2::Require::Module 're::engine::RE2';
 my $re = re( 'License::beerware', engine => 'RE2', subject => 'name' );
 
 isa_ok( $re, 're::engine::RE2' );
-like( "$re", qr/\Q|(?:[Tt]he )?\bBeerware\b|/ );
+like( "$re", qr/\Q(?:[Tt]he )?(?:Beerware|/ );
 
 regexp_patterns_in_module_ok(
 	'Regexp::Pattern::License',

@@ -3,7 +3,7 @@ package Net::DNS::RR;
 use strict;
 use warnings;
 
-our $VERSION = (qw$Id: RR.pm 1834 2021-03-28 09:34:49Z willem $)[2];
+our $VERSION = (qw$Id: RR.pm 1841 2021-06-23 20:34:28Z willem $)[2];
 
 
 =head1 NAME
@@ -85,7 +85,7 @@ The trailing dot (.) is optional.
 
 =cut
 
-my $PARSE_REGEX = q/("[^"]*")|;[^\n]*|[ \t\n\r\f()]/;		# NB: *not* \s (matches Unicode white space)
+my $PARSE_REGEX = q/("[^"]*")|;[^\n]*|[ \t\n\r\f()]+/;		# NB: *not* \s (matches Unicode white space)
 
 sub _new_string {
 	my $base;
@@ -356,10 +356,7 @@ which have rudimentary parsers.
 =cut
 
 sub plain {
-	my $string = join ' ', shift->token;
-	$string =~ s/\\034/\\"/g;				# unescape "
-	$string =~ s/\\092/\\\\/g;				# unescape escape
-	return $string;
+	return join ' ', shift->token;
 }
 
 
@@ -377,11 +374,14 @@ sub token {
 	my @ttl	 = grep {defined} $self->{ttl};
 	my @core = ( $self->{owner}->string, @ttl, $self->class, $self->type );
 
-	my @rdata = $self->_empty ? () : eval { $self->_format_rdata };
-
 	# parse into quoted strings, contiguous non-whitespace and (discarded) comments
-	my @parse = map { split( /$PARSE_REGEX/o, $_ ) } @rdata;
-	return ( @core, grep { defined && length } @parse );
+	local $_ = $self->_empty ? '' : join( ' ', $self->_format_rdata );
+	s/\\\\/\\092/g;						# disguise escaped escape
+	s/\\"/\\034/g;						# disguise escaped quote
+	s/\\\(/\\040/g;						# disguise escaped bracket
+	s/\\\)/\\041/g;						# disguise escaped bracket
+	s/\\;/\\059/g;						# disguise escaped semicolon
+	return ( @core, grep { defined && length } split /$PARSE_REGEX/o );
 }
 
 
@@ -742,8 +742,8 @@ sub _wrap {
 
 	my ( @line, @fill );
 	foreach (@text) {
-		s/\\034/\\"/g;					# unescape "
-		s/\\092/\\\\/g;					# unescape escape
+		s/\\034/\\"/g;					# tart up escaped "
+		s/\\092/\\\\/g;					# tart up escaped escape
 		$coln += ( length || next ) + 1;
 		if ( $coln > $cols ) {				# start new line
 			push( @line, join ' ', @fill ) if @fill;

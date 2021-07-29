@@ -93,7 +93,7 @@ my $leading = $fontsize * 1.30;
 
 $text = $page->text();
 $text->font($f2, $fontsize);
-$text->lead($leading);
+$text->leading($leading);
 $text->translate(75, 700);  # upper left baseline of 250-wide paragraph
 my ($spill, $unused) = 
     $text->paragraph($LoremIpsum, 250,640, 0, -spillover=>1); 

@@ -4,10 +4,10 @@ use 5.010;
 use Test::AnyEventFTPServer;
 
 eval {
-  package 
+  package
     AnyEvent::FTP::Server::Context::TestContext;
-  
-  use Moo;
+
+  use Moo;  ## no critic (Modules::ProhibitConditionalUseStatements)
   extends 'AnyEvent::FTP::Server::Context';
   with 'AnyEvent::FTP::Server::Role::Auth';
   with 'AnyEvent::FTP::Server::Role::Help';
@@ -15,7 +15,7 @@ eval {
   has '+unauthenticated_safe_commands' => (
     default => sub { [ qw( USER PASS HELP QUIT FOO ) ] },
   );
-  
+
   sub cmd_foo
   {
     my($self, $con, $req) = @_;
@@ -29,7 +29,7 @@ eval {
     $con->send_response(211 => 'And another thing');
     $self->done;
   }
-  
+
   1;
   $INC{'AnyEvent/FTP/Server/Context/TestContext.pm'} = __FILE__;
 };

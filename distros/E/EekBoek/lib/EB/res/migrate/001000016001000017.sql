@@ -6,7 +6,6 @@ CREATE TABLE Attachments (
     att_id   		 int primary key,
     att_name		 text NOT NULL,
     att_size		 int NOT NULL,
-    att_encoding	 smallint,
     att_encoding	 smallint
       -- 0 = none, 1 = uri, 2 = base62
 );

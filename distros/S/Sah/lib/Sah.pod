@@ -1,6 +1,8 @@
 package Sah; # just to make PodWeaver happy
 
+# AUTHORITY
 # DATE
+our $DIST = 'Sah'; # DIST
 # VERSION
 
 1;
@@ -22,7 +24,7 @@ Sah - Schema for data structures (specification)
 
 =head1 VERSION
 
-This document describes version 0.9.49 of Sah (from Perl distribution Sah), released on 2020-02-11.
+This document describes version 0.9.50 of Sah (from Perl distribution Sah), released on 2021-07-20.
 
 =head1 STATUS
 
@@ -42,26 +44,36 @@ interpreted as described in RFC 2119.
 
 =head1 SCHEMA
 
-Although it can contain extra stuffs, a schema is essentially B<a type
-definition>, stating a set of valid values for data.
+A schema is essentially B<a type definition>, stating a set of valid values for
+data.
 
 Sah schemas are regular data structures, specifically arrays:
 
+ [TYPE_NAME, CLAUSE_SET]
+
+C<TYPE_NAME> is a string, C<CLAUSE_SET> is a hash of clauses. The old form:
+
  [TYPE_NAME, CLAUSE_SET, EXTRAS]
 
-C<TYPE_NAME> is a string, C<CLAUSE_SET> is a hash of clauses, and C<EXTRAS> is a
-hash and is optional. Some examples:
+(where EXTRAS is a hash) is deprecated but still supported, although EXTRAS is
+ignored. Some examples:
 
  ["int", {"min": 0, "max": 100}]
 
- // a definition of pos_even (positive even natural numbers). "pos" is defined
- // in the EXTRAS part.
- ["pos", {"div_by": 2}, {"def": {"pos": ["int": {"min": 0}]}}]
+ // a definition of "uint" (non-negative integer)
+ ["int": {"min": 0}]}}
+
+ // this schema "even_uint" (positive even natural number) is defined from (or
+ // based on) another schema "posint" (defined above)
+ ["posint", {"div_by": 2}]
 
 A shortcut string form containing only the type name is allowed when there are
 no clauses. It will be normalized into the array form:
 
  "int"
+
+ // normalized form of the above
+ ["int", {}]
 
 The type name can have a C<*> suffix as a shortcut for the C<< "req": 1 >>
 clause. This shortcut exists because stating something is required is very
@@ -77,10 +89,10 @@ common.
  // equivalent to
  ["int", {"req": 1, "min": 0}]
 
-A flattened array form is also supported when there are no C<EXTRAS>. It will be
-normalized into the non-flattened form. This shortcut exists to save a couple of
-keystrokes :-) And also reduce the number of nested structure, which can get a
-bit unwieldy for complex schemas.
+A flattened array form is also supported. It will be normalized into the
+non-flattened form. This shortcut exists to save a couple of keystrokes :-) And
+also reduce the number of nested structure, which can get a bit unwieldy for
+complex schemas.
 
  ["int", "min", 1, "max", 10]
 
@@ -135,13 +147,13 @@ is very much like subtyping. See L</"BASE SCHEMA"> for more information.
 As mentioned before, you can define a schema as a type and then write other
 schemas against that type. For example:
 
- // defined as pos_int type
+ // defined as "uint" type
  ["int", {"min": 0}]
 
 and later:
 
- // a positive integer, divisible by 5
- ["pos_int", {"div_by": 5}]
+ // a positive integer that divisible by 5
+ ["uint", {"div_by": 5}]
 
 During data validation, base schemas will be replaced by its original
 definition, and all the clause sets will be evaluated. Illustrated by the plus
@@ -149,58 +161,46 @@ sign:
 
  ["int", {"min": 0} + {"div_by": 5}]
 
-You can also declare base schemas/types locally using the C<def> key in
-C<EXTRAS>, for example:
+Another, more involved, example:
 
- ["throws", {},
-  {
-      "def": {
-          "single_dice_throw":  ["int": {"in": [1, 2, 3, 4, 5, 6]}],
-          "sdt":                "single_dice_throw", // short notation
-          "dice_pair_throw":    ["array": {"len": 2, "elems": ["sdt", "sdt"]}],
-          "dpt":                "dice_pair_throw",   // short notation
-          "throw":              ["any": {"of": ["sdt", "dpt"]}],
-          "throws":             ["array": {"of": "throw"}],
-      }
-  }
- ]
+ // definition for the "single_dice_throw" schema
+ ["int": {"in": [1, 2, 3, 4, 5, 6]}]
+
+ // definition for the "sdt" schema (short notation):
+ "single_dice_throw"
+
+ // definition for the "dice_pair_throw" schema
+ ["array": {"len": 2, "elems": ["sdt", "sdt"]}]
+
+ // definition for the "dpt" schema (short notation)
+ "dice_pair_throw"
+
+ // definition for the "throw" schema
+ ["any": {"of": ["sdt", "dpt"]}]
+
+ // definition for the "throws" schema
+ ["array": {"of": "throw"}]
 
 The above schema describes a list of dice throws (C<throws>). Each C<throw> can
 be a single dice throw (C<sdt>) which is a number between 1 and 6, or a throw of
 two dices (C<dpt>) which is a 2-element array (where each element is a number
 between 1 and 6).
 
-Examples of valid data for this schema:
+Examples of valid data for the "throws" schema:
 
  [1, [1,3], 6, 4, 2, [3,5]]
 
 Examples of invalid data:
 
  1                  // not an array
- [1, [2, 3], 0]     // the third throw is invalid
- [1, [2, 0, 4], 4]  // the second throw is invalid
+ [1, [2, 3], 0]     // the third throw is invalid (not between 1-6)
+ [1, [2, 0, 4], 4]  // the second throw is invalid (not sdt nor dpt)
 
-All the base schemas names C<throw>, C<throws>, C<sdt>, etc is only declared
-locally and unknown outside the schema. You can even nest this.
-
-=head2 Optional/conditional definition
-
-If you put a C<?> suffix after the definition name then it means that the
-definition is optional and can be skipped if the type is already defined, e.g.:
-
-  "def": {
-      "emailaddr?": ["str", {"req": 1, "match": ".+\@.+"}],
-      "username":   ["str", {"req": 1, "match": "^[a-z0-9_]+$"}]
-  }
-
-In the above example, if there is already an C<emailaddr> type defined at that
-time, the definition will be skipped instead of a "cannot redefine type" error
-being generated.
-
-Optional definition is useful if you want to provide some defaults (e.g. a
-rudimentary validation for email address) but don't mind if the validator
-already has something probably better (a stricter or more precise definition of
-email address).
+It is up to the implementation where the base schemas should be stored. The
+L<Data::Sah> implementation looks up base schemas in C<Sah::Schema::*> modules
+in the C<$schema> package variables. Old specification of Sah allows base
+schemas to be put in the schema itself in the extras part, but for simplicity
+this has been removed.
 
 =head1 CLAUSE AND CLAUSE SET
 
@@ -627,19 +627,6 @@ len(ARRAY) will return the number of elements in the ARRAY, while len(STR) will
 return the number of characters in the string. However, when an inappropriate
 argument is given, an exception will be thrown.
 
-=head1 EXTRAS
-
-The extras part of a schema (the third element) contains various stuffs. It is a
-DefHash that can contain these keys:
-
-=over
-
-=item * def
-
-Subschema definitions.
-
-=back
-
 =head1 HISTORY
 
 2012-07-21 split specification to Sah
@@ -678,7 +665,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

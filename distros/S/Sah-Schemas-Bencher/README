@@ -1,0 +1,57 @@
+NAME
+    Sah::Schemas::Bencher - Sah schemas for Bencher
+
+VERSION
+    This document describes version 1.054.1 of Sah::Schemas::Bencher (from
+    Perl distribution Sah-Schemas-Bencher), released on 2021-07-23.
+
+SAH SCHEMAS
+    The following schemas are included in this distribution:
+
+    *   bencher::dataset
+
+        A benchmark dataset.
+
+    *   bencher::env_hash
+
+        A hash of environment variable and their value.
+
+    *   bencher::participant
+
+        A benchmark participant.
+
+    *   bencher::scenario
+
+        Bencher scenario structure.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Sah-Schemas-Bencher>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Sah-Schemas-Bencher>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Sah-Schemas-Bencher>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Bencher
+
+    Sah - schema specification
+
+    Data::Sah - Perl implementation of Sah
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2021 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

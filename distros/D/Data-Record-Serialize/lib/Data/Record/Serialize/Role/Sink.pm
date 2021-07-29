@@ -6,24 +6,24 @@ use Moo::Role;
 
 use namespace::clean;
 
-our $VERSION = '0.20';
+our $VERSION = '0.23';
 
 requires 'print';
 requires 'say';
 
-#pod =method B<close>
-#pod
-#pod   $s->close;
-#pod
-#pod Flush any data written to the sink and close it.  While this will be
-#pod performed automatically when the object is destroyed, if the object is
-#pod not destroyed prior to global destruction at the end of the program,
-#pod it is quite possible that it will not be possible to perform this
-#pod cleanly.  In other words, make sure that sinks are closed prior to
-#pod global destruction.
-#pod
-#pod
-#pod =cut
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 requires 'close';
 
@@ -43,13 +43,15 @@ __END__
 
 =pod
 
+=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory
+
 =head1 NAME
 
 Data::Record::Serialize::Role::Sink - Sink Role
 
 =head1 VERSION
 
-version 0.20
+version 0.23
 
 =head1 DESCRIPTION
 

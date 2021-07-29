@@ -68,5 +68,7 @@ lib/PLS/Server/Request/TextDocument/Hover.pm
 lib/PLS/Server/Request/Initialize.pm
 lib/PLS/Server.pm
 t/00compile.t
+t/02document-new.t
+t/03document-find_word_under_cursor.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

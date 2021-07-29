@@ -2,15 +2,14 @@ package PDF::Builder;
 
 use strict;
 use warnings;
-#no warnings qw[ deprecated recursion uninitialized ];
 
 # $VERSION defined here so developers can run PDF::Builder from git.
 # it should be automatically updated as part of the CPAN build.
-our $VERSION = '3.022'; # VERSION
-my $LAST_UPDATE = '3.022'; # manually update whenever code is changed
+our $VERSION = '3.023'; # VERSION
+our $LAST_UPDATE = '3.023'; # manually update whenever code is changed
 
-my $GrTFversion = 7;     # minimum version of Graphics::TIFF
-my $LpngVersion = 0.56;  # minimum version of Image::PNG::Libpng
+my $GrTFversion = 16;    # minimum version of Graphics::TIFF
+my $LpngVersion = 0.57;  # minimum version of Image::PNG::Libpng
 
 use Carp;
 use Encode qw(:all);
@@ -61,7 +60,7 @@ PDF::Builder - Facilitates the creation and modification of PDF files
     $page = $pdf->page();
 
     # Retrieve an existing page
-    $page = $pdf->openpage($page_number);
+    $page = $pdf->open_page($page_number);
 
     # Set the page size
     $page->mediabox('Letter');
@@ -705,6 +704,10 @@ enables importing of annotations (B<*EXPERIMENTAL*>).
 
 =back
 
+B<CAUTION:> Perl::Critic (tools/1_pc.pl) has started flagging the name 
+"default" as a reserved keyword in higher Perl versions. Use with caution, and
+be aware that this name I<may> have to be changed in the future.
+
 =cut
 
 sub default {
@@ -1245,7 +1248,7 @@ sub page {
     return $page;
 } # end of page()
 
-=item $page = $pdf->openpage($page_number)
+=item $page = $pdf->open_page($page_number)
 
 Returns the L<PDF::Builder::Page> object of page $page_number.
 This is similar to C<< $page = $pdf->page() >>, except that C<$page> is 
@@ -1257,14 +1260,14 @@ document.
 B<Example:>
 
     $pdf  = PDF::Builder->open('our/99page.pdf');
-    $page = $pdf->openpage(1);   # returns the first page
-    $page = $pdf->openpage(99);  # returns the last page
-    $page = $pdf->openpage(-1);  # returns the last page
-    $page = $pdf->openpage(999); # returns undef
+    $page = $pdf->open_page(1);   # returns the first page
+    $page = $pdf->open_page(99);  # returns the last page
+    $page = $pdf->open_page(-1);  # returns the last page
+    $page = $pdf->open_page(999); # returns undef
 
 =cut
 
-sub openpage {
+sub open_page {
     my $self = shift();
     my $index = shift() || 0;
     my ($page, $rotate, $media, $trans);
@@ -1285,8 +1288,7 @@ sub openpage {
         weaken $page->{' apipdf'};
         weaken $page->{' api'};
         $self->{'pdf'}->out_obj($page);
-        if ((not defined($page->{' fixed'}) or $page->{' fixed'} < 1) and 
-            ($rotate = $page->find_prop('Rotate')) ) {
+        if (($rotate = $page->find_prop('Rotate')) and not $page->{' opened'}) {
             $rotate = ($rotate->val() + 360) % 360;
 
             if ($rotate != 0 and not $self->default('nounrotate')) {
@@ -1316,7 +1318,7 @@ sub openpage {
             $trans = '';
         }
 
-        if (defined $page->{'Contents'} and (not defined($page->{' fixed'}) or $page->{' fixed'} < 1)) {
+        if (defined $page->{'Contents'} and not $page->{' opened'}) {
             $page->fixcontents();
             my $uncontent = delete $page->{'Contents'};
             my $content = $page->gfx();
@@ -1333,20 +1335,16 @@ sub openpage {
                 $content->{' stream'} .= ' Q ';
             }
 
-            ## $content->{'Length'} = PDFNum(length($content->{' stream'}));
-            # this will be fixed by the following code or content or filters
-
-            ## if we like compress we will do it now to do quicker saves
+            # if we like compress we will do it now to do quicker saves
             if ($self->{'forcecompress'} eq 'flate' || 
                 $self->{'forcecompress'} =~ m/^[1-9]\d*$/) {
-                # $content->compressFlate();
                 $content->{' stream'} = dofilter($content->{'Filter'}, $content->{' stream'});
                 $content->{' nofilt'} = 1;
                 delete $content->{'-docompress'};
                 $content->{'Length'} = PDFNum(length($content->{' stream'}));
             }
         }
-        $page->{' fixed'} = 1;
+        $page->{' opened'} = 1;
     }
 
     $self->{'pdf'}->out_obj($page);
@@ -1358,6 +1356,17 @@ sub openpage {
 
     return $page;
 } # end of openpage()
+
+=item $page = $pdf->openpage($page_number)
+
+B<Deprecated.> Will be removed on or after June, 2023. Use C<open_page> call
+instead.
+
+=cut
+
+sub openpage { return open_page(@_); } ## no critic
+
+# internal utility
 
 sub _walk_obj {
     my ($object_cache, $source_pdf, $target_pdf, $source_object, @keys) = @_;
@@ -1450,7 +1459,7 @@ sub importPageIntoForm {
     if (ref($s_idx) eq 'PDF::Builder::Page') {
         $s_page = $s_idx;
     } else {
-        $s_page = $s_pdf->openpage($s_idx);
+        $s_page = $s_pdf->open_page($s_idx);
     }
 
     $self->{'apiimportcache'} ||= {};
@@ -1485,22 +1494,22 @@ sub importPageIntoForm {
     # create a whole content stream
     ## technically it is possible to submit an unfinished
     ## (e.g., newly created) source-page, but that's nonsense,
-    ## so we expect a page fixed by openpage and die otherwise
-    die "page not processed via openpage ..." unless $s_page->{' fixed'} == 1;
+    ## so we expect a page fixed by open_page and die otherwise
+    unless ($s_page->{' opened'}) {
+        croak join(' ',
+		   "Pages may only be imported from a complete PDF.",
+		   "Save and reopen the source PDF object first.");
+    }
 
-    # since the source page comes from openpage it may already
-    # contain the required starting 'q' without the final 'Q'
-    # if forcecompress is in effect
     if (defined $s_page->{'Contents'}) {
         $s_page->fixcontents();
 
         $xo->{' stream'} = '';
-        # openpage pages only contain one stream
+        # open_page pages only contain one stream
         my ($k) = $s_page->{'Contents'}->elements();
         $k->realise();
         if ($k->{' nofilt'}) {
-            # we have a finished stream here
-            # so we unfilter
+            # we have a finished stream here, so we unfilter
             $xo->add('q', unfilter($k->{'Filter'}, $k->{' stream'}), 'Q');
         } else {
             # stream is an unfinished/unfiltered content
@@ -1566,7 +1575,7 @@ sub import_page {
     if (ref($s_idx) eq 'PDF::Builder::Page') {
         $s_page = $s_idx;
     } else {
-        $s_page = $s_pdf->openpage($s_idx);
+        $s_page = $s_pdf->open_page($s_idx);
     }
 
     if (ref($t_idx) eq 'PDF::Builder::Page') {

@@ -76,8 +76,8 @@ subtest 'Recycling GUIDs' => sub {
     my @e = map $R->create, 1 .. 10;
 
     is  $R->alive, 10, 'Right number of alive entities when all alive';
-    ok  $R->valid(9),  'Entity is valid';
-    ok !$R->valid(10), 'Entity is not valid';
+    ok  $R->valid(10), 'Entity is valid';
+    ok !$R->valid(11), 'Entity is not valid';
 
     # Delete the entities we've just generated
     # Will mark their IDs as ready to be recycled
@@ -85,13 +85,13 @@ subtest 'Recycling GUIDs' => sub {
 
     is  $R->created, 10, 'Created counts all created entities';
     is  $R->alive,    0, 'Right number of alive entities when all dead';
-    ok !$R->valid(9),    'Entity is not valid';
+    ok !$R->valid(10),   'Entity is not valid';
 
     # Create 20 entities
     # They should re-use the first 10 IDs and use the next 10 ( 0 .. 19 )
     @e = map $R->create( Other->new ), 0 .. 19;
     is_deeply [ sort { $a <=> $b } map $_ & 0xFFFFF, @e ],
-        [ 0 .. 19 ],
+        [ 1 .. 20 ],
         'Recycled and generated the right IDs';
 
     ok $R->valid($e[8]), 'Entity is valid';
@@ -152,6 +152,14 @@ subtest 'View' => sub {
             ],
             [ 10, 2, 20, 200 ], 'deref';
 
+        {
+            my @first = $R->view('Aging')->first( sub { $_[1]->age > 100 } );
+            is_deeply [ $first[0], $first[1]->age ], [ 6, 200 ], 'first with match';
+        }
+
+        is_deeply [ $R->view('Aging')->first( sub { $_[1]->age > 1000 } ) ],
+            [], 'first with no match returns empty list';
+
         my @set;
         $R->view('Aging')->each( sub ( $guid, $age ) {
             push @set, $age->age;
@@ -202,7 +210,7 @@ subtest 'View' => sub {
             push @set, $guid . ':' . ( defined $R->get( $guid, 'Aging' ) ? 1 : 0 );
         });
 
-        is_deeply [ sort @set ], [qw( 0:0 1:1 2:1 4:1 5:1 )],
+        is_deeply [ sort @set ], [qw( 1:0 2:1 3:1 5:1 6:1 )],
             'Iterate over all entities';
     };
 };

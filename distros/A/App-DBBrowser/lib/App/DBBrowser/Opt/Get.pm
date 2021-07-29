@@ -35,11 +35,11 @@ sub defaults {
             round_precision_sign => 0,
         },
         alias => {
-            aggregate  => 0,
-            functions  => 0,
-            join       => 0,
-            union      => 0,
-            subqueries => 0,
+            select        => 0,
+            aggregate     => 0,
+            derived_table => 0,
+            join          => 0,
+            union         => 0,
         },
         enable => {
             create_table => 0,
@@ -127,7 +127,12 @@ sub defaults {
             blank_is_undef      => 1,
             binary              => 1,
             empty_is_undef      => 0,
-        }
+        },
+        export => {
+            export_dir      => $sf->{i}{home_dir},
+            add_extension   => 0,
+            export_encoding => 'UTF-8',
+        },
     };
     return $defaults                   if ! $section;
     return $defaults->{$section}       if ! $key;

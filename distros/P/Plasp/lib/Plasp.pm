@@ -14,13 +14,13 @@ use Type::Tiny;
 
 use Moo;
 use Sub::HandlesVia;
-use Types::Standard qw(InstanceOf Str Bool ArrayRef HashRef);
+use Types::Standard qw(InstanceOf Str Bool ArrayRef HashRef Object);
 use Types::Path::Tiny qw(Path AbsPath);
 use namespace::clean;
 
 with 'Plasp::Compiler', 'Plasp::Parser', 'Plasp::State';
 
-our $VERSION = '1.07';
+our $VERSION = '1.08';
 
 =head1 NAME
 
@@ -28,7 +28,7 @@ Plasp - PerlScript/ASP
 
 =head1 VERSION
 
-version 1.07
+version 1.08
 
 =head1 SYNOPSIS
 
@@ -393,7 +393,7 @@ has 'errors' => (
     handles_via => 'Array',
     handles     => {
         has_errors => 'count',
-    }
+    },
 );
 
 sub error {
@@ -401,6 +401,11 @@ sub error {
     $self->log->error( @_ );
     push @{ $self->errors }, $_[0];
 }
+
+has '_stack_trace' => (
+    is      => 'rw',
+    isa     => Object,
+);
 
 =head1 OBJECTS
 
@@ -645,12 +650,19 @@ sub execute {
     }
     if ( $@ ) {
 
-        unless ( blessed( $@ )
-            && ( $@->isa( 'Plasp::Exception::End' )
-                || $@->isa( 'Plasp::Exception::Redirect' ) ) ) {
+        if ( blessed( $@ ) && $@->isa( 'Plasp::Exception::Code' ) ) {
 
-            # "Rethrow" the error
-            Plasp::Exception::Code->throw( $@ );
+            # If an error has already been caught and so exception already
+            # thrown, then just rethrow it as is, keeping the stack trace
+            $@->rethrow;
+        } else {
+
+            # If catching a raw error, throw it as a Code exception and add the
+            # current stack trace captured
+            Plasp::Exception::Code->throw(
+                message     => $@,
+                stack_trace => $self->_stack_trace,
+            );
         }
     }
 

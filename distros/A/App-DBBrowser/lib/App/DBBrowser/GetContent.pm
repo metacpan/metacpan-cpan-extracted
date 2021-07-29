@@ -41,11 +41,11 @@ sub get_content {
         [ 'file',  '- From File' ],
     );
     $sf->{i}{gc}{old_idx_menu} //= 0;
-    my $data_source_choice = $sf->{o}{insert}{'data_source_' . $sf->{i}{stmt_types}[0]};
+    my $data_source_choice_idx = $sf->{o}{insert}{'data_source_' . $sf->{i}{stmt_types}[0]};
 
     MENU: while ( 1 ) {
         if ( ! $skip_to ) {
-            if ( $data_source_choice == 3 ) {
+            if ( $data_source_choice_idx == 3 ) {
                 my $prompt = 'Type of data source:';
                 my @pre = ( undef );
                 my $menu = [ @pre, map( $_->[1], @choices ) ];
@@ -68,7 +68,7 @@ sub get_content {
                 $sf->{i}{gc}{source_type} = $choices[$idx-@pre][0];
             }
             else {
-                $sf->{i}{gc}{source_type} = $choices[ $data_source_choice ][0];
+                $sf->{i}{gc}{source_type} = $choices[$data_source_choice_idx][0];
             }
         }
 
@@ -86,7 +86,7 @@ sub get_content {
                     ( $ok, $sf->{i}{gc}{file_fs} ) = $cr->from_file( $sql );
                 }
                 if ( ! $ok ) {
-                    return if $data_source_choice < 3;
+                    return if $data_source_choice_idx < 3;
                     $skip_to = '';
                     next MENU;
                 }

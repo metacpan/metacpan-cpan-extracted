@@ -1,0 +1,31 @@
+0.005   2021-07-20  Released-By: PERLANCAR; Urgency: medium
+
+	- No functional changes.
+
+        - [upload] Reupload to CPAN as MetaCPAN thinks 0.002 is the latest
+          version.
+
+
+0.004   2021-07-14  Released-By: PERLANCAR; Urgency: medium
+
+	- Add function: tempdir_named().
+
+
+0.003   2021-07-13  Released-By: PERLANCAR; Urgency: medium
+
+	- [test] Add test.
+
+	- [bugfix] D'oh, don't use stringy $!, d'oh, as the error message is
+          localized (RT#137587).
+
+
+0.002   2021-07-12  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Tweak summary & description.
+
+
+0.001   2021-07-12  Released-By: PERLANCAR
+
+        - First release.

@@ -1,0 +1,131 @@
+=encoding UTF-8
+
+=head1 NAME
+
+TCOD::Mouse - A representation of a mouse event
+
+=head1 SYNOPSIS
+
+    use TCOD;
+
+    my $key   = TCOD::Key->new;
+    my $mouse = TCOD::Mouse->new;
+
+    TCOD::Sys::check_for_event( TCOD::EVENT_ANY, $key, $mouse );
+
+    exit if $mouse->mbutton_pressed;
+
+=head1 DESCRIPTION
+
+This represents a TCOD mouse event. You will not normally be populating
+these objects. Most often you will create one, and pass it to one of
+the event listeners for it to be populated internally.
+
+In effect, this is a read-only class.
+
+=head1 SLOTS
+
+=head2 x
+
+The horizontal coordinate of the mouse cursor in pixels.
+
+=head2 y
+
+The vertical coordinate of the mouse cursor in pixels.
+
+=head2 dx
+
+The change in pixels in the horizontal coordinate of the mouse cursor.
+
+=head2 dy
+
+The change in pixels in the vertical coordinate of the mouse cursor.
+
+=head2 cx
+
+The horizontal coordinate of the mouse cursor in cells.
+
+=head2 cy
+
+The vertical coordinate of the mouse cursor in cells.
+
+=head2 dcx
+
+The change in cells in the horizontal coordinate of the mouse cursor.
+
+=head2 dcy
+
+The change in cells in the vertical coordinate of the mouse cursor.
+
+=head2 lbutton
+
+True if the left mouse button is pressed.
+
+=head2 rbutton
+
+True if the right mouse button is pressed.
+
+=head2 mbutton
+
+True if the middle mouse button or wheel is pressed.
+
+=head2 lbutton_pressed
+
+True if the left mouse button was pressed and released.
+
+=head2 rbutton_pressed
+
+True if the right mouse button was pressed and released.
+
+=head2 mbutton_pressed
+
+True if the middle mouse button or wheel was pressed and released.
+
+=head2 wheel_up
+
+True if the wheel was rolled up.
+
+=head2 wheel_down
+
+True if the wheel was rolled down.
+
+=head1 FUNCTIONS
+
+=head2 show_cursor
+
+    TCOD::Mouse::show_cursor( $bool );
+
+By default, the mouse cursor in visible in windowed mode, hidden in
+fullscreen mode. You can change it with this function.
+
+=head2 is_cursor_visible
+
+    $bool = TCOD::Mouse::is_cursor_visible;
+
+Get the current status of the mouse cursor (visible or hidden).
+
+=head2 move
+
+    TCOD::Mouse::move( $x, $y );
+
+Set the cursor position (in pixel coordinates, where (0,0) is the top-left
+corner).
+
+=head1 SEE ALSO
+
+=over
+
+=item L<TCOD>
+
+=item L<TCOD::Key>
+
+=item L<TCOD::Sys>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2021 José Joaquín Atria
+
+This library is free software; you can redistribute it and/or modify it under
+the Artistic License 2.0.

@@ -1830,8 +1830,9 @@ FUNCTIONS
         "IO::AIO::MAP_LOCKED", "IO::AIO::MAP_NORESERVE",
         "IO::AIO::MAP_POPULATE", "IO::AIO::MAP_NONBLOCK",
         "IO::AIO::MAP_FIXED", "IO::AIO::MAP_GROWSDOWN",
-        "IO::AIO::MAP_32BIT", "IO::AIO::MAP_HUGETLB" or
-        "IO::AIO::MAP_STACK".
+        "IO::AIO::MAP_32BIT", "IO::AIO::MAP_HUGETLB", "IO::AIO::MAP_STACK",
+        "IO::AIO::MAP_FIXED_NOREPLACE", "IO::AIO::MAP_SHARED_VALIDATE",
+        "IO::AIO::MAP_SYNC" or "IO::AIO::MAP_UNINITIALIZED".
 
         If $fh is "undef", then a file descriptor of -1 is passed.
 

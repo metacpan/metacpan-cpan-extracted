@@ -28,13 +28,14 @@ BEGIN {
 use locale;
 
 use DBD::SQLite;
+use DBD::SQLite::Constants ':dbd_sqlite_string_mode';
 
 foreach my $call_func (@CALL_FUNCS) {
 
-  for my $use_unicode (0, 1) {
+  for my $string_mode (DBD_SQLITE_STRING_MODE_BYTES, DBD_SQLITE_STRING_MODE_UNICODE_STRICT) {
 
     # connect
-    my $dbh = connect_ok( RaiseError => 1, sqlite_unicode => $use_unicode );
+    my $dbh = connect_ok( RaiseError => 1, sqlite_string_mode => $string_mode );
 
     # The following tests are about ordering, so don't reverse!
     if ($dbh->selectrow_array('PRAGMA reverse_unordered_selects')) {
@@ -43,7 +44,7 @@ foreach my $call_func (@CALL_FUNCS) {
 
     # populate test data
     my @vals = @words;
-    if ($use_unicode) {
+    if ($string_mode == DBD_SQLITE_STRING_MODE_BYTES) {
       utf8::upgrade($_) foreach @vals;
     }
 

@@ -23,22 +23,26 @@
         "bus_id"   : "backend-1",
         "bus_role" : "backend",
         "host"     : "localhost",
+        "port"     :  1883,
         "username" : "backend",
         "password" : "def456",
+        "auth_salt": "qQA9zC",
         "default"  : 1,
     },
     {
         "bus_id"   : "backend-2",
         "bus_role" : "backend",
         "host"     : "localhost",
+        "port"     :  1883,
         "username" : "backend",
         "password" : "def456",
+        "auth_salt": "qQA9zC",
     },
     {
         "bus_id"   : "frontend-1",
         "bus_role" : "frontend",
         "host"     : "localhost",
-        "port"     :  8001,
+        "port"     :  11883,
         "username" : "router",
         "password" : "ghi789",
     },
@@ -46,7 +50,7 @@
 #       "bus_id"   : "frontend-2",    # The MQTT topics for receiving notifications
 #       "bus_role" : "frontend",      # will clash when using the same broker for
 #       "host"     : "localhost",     # both 'frontend-1' and 'frontend-2', causing
-#       "port"     :  8001,           # the reception of duplicated notifications.
+#       "port"     :  11883,          # the reception of duplicated notifications.
 #       "username" : "router",        # Uncomment this if 'frontend-2' is actually a
 #       "password" : "ghi789",        # separate broker (as it should be).
 #   },

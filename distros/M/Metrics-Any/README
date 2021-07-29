@@ -70,6 +70,18 @@ USE STATEMENT
     packages within the same file will not see it and will have to declare
     their own.
 
+SEE ALSO
+
+      * The name and overall concept of this module is heavily influenced
+      by a similar module for logging, Log::Any.
+
+      * For reporting metrics to one specific target collector, there are
+      specific modules for systems like statsd (Net::Statsd,
+      Net::Async::Statsd) or prometheus (Prometheus::Tiny,
+      Net::Prometheus).
+
+      * There is also a similar concept in Measure::Everything.
+
 AUTHOR
 
     Paul Evans <leonerd@leonerd.org.uk>

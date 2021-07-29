@@ -25,8 +25,8 @@ my %WriteMakefileArgs =
    # A hash of modules that are needed to run the module.
 
    'PREREQ_PM'          => {
-                            'Math::BigInt'        => 1.999812,
-                            'Math::BigRat'        => 0.12,
+                            'Math::BigInt'        => 1.999823,
+                            'Math::BigRat'        => 0.2616,
                             #'Math::BigInt::Lite'  => 0.09,      # optional
                            },
 
@@ -42,6 +42,17 @@ my %WriteMakefileArgs =
    'DEFINE'             => '',          # e.g., '-DHAVE_SOMETHING'
    'INC'                => '',          # e.g., '-I/usr/include/other'
    'SIGN'               => 1,
+
+   'META_MERGE'         => {
+       'meta-spec' => { version => 2 },
+        resources => {
+            repository => {
+                type => 'git',
+                url  => 'https://github.com/pjacklam/p5-bignum.git',
+                web  => 'https://github.com/pjacklam/p5-bignum',
+            },
+        },
+    },
   );
 
 # Install over the core version? (Cf. CPAN RT #119199 and #119225.)

@@ -1,4 +1,4 @@
-package App::lcpan::Manual::Cookbook;
+package App::CSVUtils::Manual::Cookbook;
 
 # AUTHORITY
 # DATE
@@ -16,11 +16,11 @@ __END__
 
 =head1 NAME
 
-App::lcpan::Manual::Cookbook - App::CSVUtils cookbook
+App::CSVUtils::Manual::Cookbook - App::CSVUtils cookbook
 
 =head1 VERSION
 
-This document describes version 0.032 of App::lcpan::Manual::Cookbook (from Perl distribution App-CSVUtils), released on 2020-08-16.
+This document describes version 0.034 of App::CSVUtils::Manual::Cookbook (from Perl distribution App-CSVUtils), released on 2021-07-10.
 
 =head1 DESCRIPTION
 
@@ -183,7 +183,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2018, 2017, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

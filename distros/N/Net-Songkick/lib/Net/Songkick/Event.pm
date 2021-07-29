@@ -19,7 +19,7 @@ use Net::Songkick::Venue;
 
 has $_ => (
     is => 'ro',
-    isa => 'Str',
+    isa => 'Str|Undef',
 ) for qw(type status uri displayName popularity id ageRestriction);
 
 has location => (

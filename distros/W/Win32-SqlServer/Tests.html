@@ -37,12 +37,16 @@ tables and executable objects in tempdb. You may not have be a member of <B>sysa
 <P> A challenge with writing these scripts is that they to some extent depends on settings for language, regional settings etc, both on the client computer running the tests and the SQL Server instance. I have mainly developed the tests under these conditions:</P>
 <UL>
   <LI>Swedish regional settings client-side.</LI>
-  <LI>The <small>ANSI</SMALL> code page 1252 and the <SMALL>OEM</SMALL> code page 850, client-side.</LI>
+  <LI>The following code-page settings client side:
+  <UL>
+  <LI>The <small>ANSI</SMALL> code page 1252 and the <SMALL>OEM</SMALL> code page 850..</LI>
+  <LI><SMALL>ANSI</SMALL> and <SMALL>OEM</SMALL> code page 65001, i.e., UTF-8.</LI>
+  </UL></LI>
   <LI>English version of the <SMALL>OLE DB</SMALL> provider (matters for error messages).</LI>
   <LI>Server collation has mainly been a Finnish_Swedish collation, with or without UTF8 support. (Which  imples <SMALL>ANSI</SMALL> code page 1252 for varchar for collations without UTF8 support.)</LI>
   <LI>The SQL Server language set to <B>us_english</B> (matters for error messages).</LI>
 </UL>
-<P>I have occasionally run the tests with different regional settings to ensure that <SMALL>DATETIME_REGIONAL</SMALL> works. I have one test instance with a Czech collation and antoher with Chinese collations, and on these instances I see failures related to varchar data. I have not tested with a different <SMALL>ANSI</SMALL> code page on the client than 1252 &#8211; most likely you will see errors in this case. If you use non-English version of SQL Server and/or SQL Server client, tests where I test on text in error messages will fail. These shortcomings should not be construed as restrictions in what Win32::SqlServer supports, it is just the difficulty to cover all in a test script.</P>
+<P>I have occasionally run the tests with different regional settings to ensure that <SMALL>DATETIME_REGIONAL</SMALL> works. I have one test instance with a Czech collation and antoher with Chinese collations, and on these instances I see failures related to varchar data. I have not tested with a different <SMALL>ANSI</SMALL> code page that those listed above  &#8211; most likely you will see errors in this case, because the test may use characters not available in your code page.  If you use non-English version of SQL Server and/or SQL Server client, tests where I test on text in error messages will fail. These shortcomings should not be construed as restrictions in what Win32::SqlServer supports, it is just the difficulty to cover all in a test script.</P>
 <H2>Running the Test Scripts</H2>
 <P>
 All test scripts looks at the environment variable <SMALL>OLLEDBTEST.</SMALL>
@@ -71,7 +75,7 @@ certain provider. You will neeed to use this if you want to test against a versi
 <P>If you run a test script and one or more tests fail, please don't just tell
    me that test 324 in some script failed, put please send me the full output
    from the script. The test numbers are assigned dynamically in several of the
-   scripts, so I will not be able to easily find which is test 324. I also need to know which version of SQL Server you are using and which provider.</P>
+   scripts, so I may not be able to easily find which is test 324. I also need to know which version of SQL Server you are using and which provider.</P>
 <H2>The Test Scripts</H2>
 <H3>
 <B>1_resultsets.t</B> </H3>
@@ -99,7 +103,7 @@ file</A> is correctly constructed.
 <B>Creates in <SMALL>SQL</SMALL> Server</B>: Tables and stored
 procedures in tempdb, and on <SMALL>SQL</SMALL> 2005 and later also an <SMALL>XML</SMALL> schema collection and three
 <SMALL>CLR</SMALL> user-defined types (the latter only if <SMALL>CLR</SMALL> is enabled and CLR strict security is not in force). </P>
-<P><B>Known issues</B>: Five tests fails, unless you have a UTF8 collation, because of a bug in the OLE DB provider reated to NUL characters.</P>
+<P><B>Known issues</B>: For <SMALL>OLE DB</SMALL> providers earlier than <SMALL>MSOLEDBSQL</SMALL> 18.5, five tests fail, unless you have a UTF8 collation, because of a bug in the OLE DB providers reated to NUL characters.</P>
 <H3>
 <B>3_retvalues.t</B> </H3>
 <P>
@@ -200,6 +204,7 @@ with the name starting in &quot;Olle&quot; followed by random digits. The script
 login with <SMALL>CHECK_POLICY = OFF</SMALL>. As all other objects the test script creates, the
 login is dropped if the script terminates normally. No objects are created in
 the second server.</P>
+<P><B>Known issues</B>: I have seen the first two test fail when integrated security is not possible. Instead of the expected login error, the connection attempt sometimes out. There is a test where I attempt to force the SQLOLEDB provider. This can fail if the server requires TLS 1.2 (I guess that is the reason). I've seen this when attempting to connect to a VM that runs CentOS 8.</P>
 <H3>
 A_tableparam.t</H3>
 <P>
@@ -240,7 +245,7 @@ script.</P>
 <P><B>WARNING</B>! I have experienced Blue Screens with this test on one of my machines. Specifically it is the last test where I test to allocate too much that crashes Windows.  The Blue Screen occurs on the machine where SQL Server is running and the error code is BAD POOL CALLER. I have not nailed the exact conditions for the crash to occur, but it seems to be a combination of filter drivers. The machine in question has an installation of Storagecraft's Shadowprotect which sets up a filter driver. There is also the fileinfo filter driver, which I am told is only comes with client O/S like Windows 10, but not server O/Ss.</P>
 <H3>C_character.t</H3>
 <P><B>Tests</B> sending and retrieving char and varchar data with different collations.</P>
-<P><B>Number of tests</B>: 246 with SQL 2008 or later and the SQLNCLI10 provider or later. Fewer tests are executed with older versions of SQL Server and/or providers because of the lack of support for table parameters.</P>
+<P><B>Number of tests</B>: 210 with SQL 2008 or later and the SQLNCLI10 provider or later. Fewer tests are executed with older versions of SQL Server and/or providers because of the lack of support for table parameters.</P>
 <P><B>Creates in SQL Server</B>: Three databases. Olle$DB0 (with the collation Latin1_General_CS_AS), Olle$DB1 (colation Greek_CS_AS) and Olle$DB2 (collation Czech_CS_AS in SQL 2017 or earlier. Czech_100_CS_AS_SC_UTF8 on SQL 2019 or later.)</P>
 <H3>Y<B>_rowsetprops.t</B> </H3>
 <P>
@@ -285,7 +290,7 @@ generate output files.
 </P>
 <HR />
 <I>
-Last updated <!--$$Modtime:--> 19-07-22 22:56 <!-- $-->
+Last updated <!--$$Modtime:--> 21-07-04 0:06 <!-- $-->
 </I>
 </P>
 </BODY>

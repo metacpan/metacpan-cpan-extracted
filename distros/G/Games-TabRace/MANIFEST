@@ -9,6 +9,7 @@ README
 dist.ini
 lib/Games/TabRace.pm
 script/tabrace
+share/images/screencast1.gif
 t/00-compile.t
 t/author-critic.t
 t/author-pod-coverage.t

@@ -15,14 +15,14 @@ my $mockfio = Test::Future::IO->controller;
 
 my $updi = Device::AVR::UPDI->new( fh => MockFH->new, part => "ATtiny814" );
 # can't easily ->init_link without upsetting $mockfio
-$updi->{nvm_version} = "P:2";
+$updi->_set_nvm_version( 2 );
 
 # read_eeprom_page
 {
    # ST ptr
-   $mockfio->expect_syswrite_anyfh( "\x55\x69\x00\x14" );
-   $mockfio->expect_sysread_anyfh( 5 )
-      ->returns( "\x55\x69\x00\x14" . "\x40" );
+   $mockfio->expect_syswrite_anyfh( "\x55\x6A\x00\x14\x00" );
+   $mockfio->expect_sysread_anyfh( 6 )
+      ->returns( "\x55\x6A\x00\x14\x00" . "\x40" );
    $mockfio->expect_sleep( 0.1 );
    # REPEAT
    $mockfio->expect_syswrite_anyfh( "\x55\xA0\x03" );
@@ -44,18 +44,23 @@ $updi->{nvm_version} = "P:2";
 # write_eeprom_page
 {
    # NVMCTRL mode set write
-   $mockfio->expect_syswrite_anyfh( "\x55\x44\x00\x10" );
-   $mockfio->expect_sysread_anyfh( 5 )
-      ->returns( "\x55\x44\x00\x10" . "\x40" );
+   $mockfio->expect_syswrite_anyfh( "\x55\x48\x00\x10\x00" );
+   $mockfio->expect_sysread_anyfh( 6 )
+      ->returns( "\x55\x48\x00\x10\x00" . "\x40" );
    $mockfio->expect_sleep( 0.1 );
    $mockfio->expect_syswrite_anyfh( "\x13" );
    $mockfio->expect_sysread_anyfh( 2 )
       ->returns( "\x13" . "\x40" );
    $mockfio->expect_sleep( 0.1 );
+   # Set RSD
+   $mockfio->expect_syswrite_anyfh( "\x55\xC2\x08" );
+   $mockfio->expect_sysread_anyfh( 3 )
+      ->returns( "\x55\xC2\x08" );
+   $mockfio->expect_sleep( 0.1 );
    # Write actual data
-   $mockfio->expect_syswrite_anyfh( "\x55\x69\x10\x14" );
+   $mockfio->expect_syswrite_anyfh( "\x55\x6A\x10\x14\x00" );
    $mockfio->expect_sysread_anyfh( 5 )
-      ->returns( "\x55\x69\x10\x14" . "\x40" );
+      ->returns( "\x55\x6A\x10\x14\x00" );
    $mockfio->expect_sleep( 0.1 );
    # REPEAT
    $mockfio->expect_syswrite_anyfh( "\x55\xA0\x03" );
@@ -67,30 +72,33 @@ $updi->{nvm_version} = "P:2";
       ->returns( "\x55\x64" );
    $mockfio->expect_sleep( 0.1 );
    # Actual data
-   foreach ( qw( A B C D ) ) {
-      $mockfio->expect_syswrite_anyfh( $_ );
-      $mockfio->expect_sysread_anyfh( 2 )
-         ->returns( $_ . "\x40" );
-      $mockfio->expect_sleep( 0.1 );
-   }
+   $mockfio->expect_syswrite_anyfh( "ABCD" );
+   $mockfio->expect_sysread_anyfh( 4 )
+      ->returns( "ABCD" );
+   $mockfio->expect_sleep( 0.1 );
+   # Clear RSD
+   $mockfio->expect_syswrite_anyfh( "\x55\xC2\x00" );
+   $mockfio->expect_sysread_anyfh( 3 )
+      ->returns( "\x55\xC2\x00" );
+   $mockfio->expect_sleep( 0.1 );
    # NVMCTRL read status
-   $mockfio->expect_syswrite_anyfh( "\x55\x04\x02\x10" );
-   $mockfio->expect_sysread_anyfh( 5 )
-      ->returns( "\x55\x04\x02\x10" . "\x00" );
+   $mockfio->expect_syswrite_anyfh( "\x55\x08\x02\x10\x00" );
+   $mockfio->expect_sysread_anyfh( 6 )
+      ->returns( "\x55\x08\x02\x10\x00" . "\x00" );
    $mockfio->expect_sleep( 0.1 );
    # NVMCTRL mode clear
-   $mockfio->expect_syswrite_anyfh( "\x55\x44\x00\x10" );
-   $mockfio->expect_sysread_anyfh( 5 )
-      ->returns( "\x55\x44\x00\x10" . "\x40" );
+   $mockfio->expect_syswrite_anyfh( "\x55\x48\x00\x10\x00" );
+   $mockfio->expect_sysread_anyfh( 6 )
+      ->returns( "\x55\x48\x00\x10\x00" . "\x40" );
    $mockfio->expect_sleep( 0.1 );
    $mockfio->expect_syswrite_anyfh( "\x00" );
    $mockfio->expect_sysread_anyfh( 2 )
       ->returns( "\x00" . "\x40" );
    $mockfio->expect_sleep( 0.1 );
    # NVMCTRL read status
-   $mockfio->expect_syswrite_anyfh( "\x55\x04\x02\x10" );
-   $mockfio->expect_sysread_anyfh( 5 )
-      ->returns( "\x55\x04\x02\x10" . "\x00" );
+   $mockfio->expect_syswrite_anyfh( "\x55\x08\x02\x10\x00" );
+   $mockfio->expect_sysread_anyfh( 6 )
+      ->returns( "\x55\x08\x02\x10\x00" . "\x00" );
    $mockfio->expect_sleep( 0.1 );
 
    $updi->write_eeprom_page( 0x10, "ABCD" )->get;

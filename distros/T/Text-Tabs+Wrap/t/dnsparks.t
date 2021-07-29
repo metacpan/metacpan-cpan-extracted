@@ -1,4 +1,4 @@
-#!/usr/bin/perl -I. -w
+use strict; use warnings;
 
 BEGIN {
 	if ($ENV{HARNESS_ACTIVE}) {
@@ -64,7 +64,6 @@ BEGIN {
 #(perlmonks.org nick: t'mo)
 
 
-use strict;
 use Text::Wrap qw(wrap $columns);
 use Benchmark;
 

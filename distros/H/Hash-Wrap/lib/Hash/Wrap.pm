@@ -7,9 +7,9 @@ use 5.01000;
 use strict;
 use warnings;
 
-use Scalar::Util qw[ blessed reftype ];
+use Scalar::Util;
 use Digest::MD5;
-our $VERSION = '0.14';
+our $VERSION = '0.17';
 
 our @EXPORT = qw[ wrap_hash ];
 
@@ -33,8 +33,8 @@ sub _find_symbol {
       if defined $candidate
       && 2 ==
       grep { defined $_->[0] && defined $_->[1] ? $_->[0] eq $_->[1] : 1 }
-      [ $reftype->[0], reftype $candidate ],
-      [ $reftype->[1], reftype $$candidate ];
+      [ $reftype->[0], Scalar::Util::reftype $candidate ],
+      [ $reftype->[1], Scalar::Util::reftype $$candidate ];
 
     _croak( "Unable to find scalar \$$symbol in class $package" );
 }
@@ -79,6 +79,8 @@ sub import {
     my @imports = @_;
     push @imports, @EXPORT unless @imports;
 
+    my @return;
+
     for my $args ( @imports ) {
         if ( !ref $args ) {
             _croak( "$args is not exported by ", __PACKAGE__ )
@@ -107,8 +109,32 @@ sub import {
         $args->{-as} = 'wrap_hash' unless exists $args->{-as};
         my $name = delete $args->{-as};
 
-        if ( $args->{-base} ) {
+        if ( defined $name ) {
 
+            if ( defined( my $reftype = Scalar::Util::reftype( $name ) ) ) {
+
+                _croak(
+                    "-as must be undefined or a string or a reference to a scalar"
+                  )
+                  if $reftype ne 'SCALAR'
+                  && $reftype ne 'VSTRING'
+                  && $reftype ne 'REF'
+                  && $reftype ne 'GLOB'
+                  && $reftype ne 'LVALUE'
+                  && $reftype ne 'REGEXP';
+
+                $args->{-as_scalar_ref} = $name;
+
+            }
+
+            elsif ( $name eq '-return' ) {
+                $args->{-as_return} = 1;
+            }
+        }
+
+        if ( $args->{-base} ) {
+            _croak( "don't use -as => -return with -base" )
+              if $args->{-as_return};
             $args->{-class} = $caller;
             $args->{-new} = 1 unless !!$args->{-new};
             _build_class( $caller, $name, $args );
@@ -116,13 +142,15 @@ sub import {
 
         else {
             _build_class( $caller, $name, $args );
-            _build_constructor( $caller, $name, $args )
-              if defined $name;
+            if ( defined $name ) {
+                my $sub = _build_constructor( $caller, $name, $args );
+                push @return, $sub if $args->{-as_return};
+            }
         }
 
         # clean out known attributes
         delete @{$args}{
-            qw[ -base -as -class -lvalue -undef -exists -defined -new -copy -clone -immutable -lockkeys -methods ]
+            qw[ -base -as -class -lvalue -undef -exists -defined -new -copy -clone -immutable -lockkeys -methods -recurse -as_scalar_ref -as_return ]
         };
 
         if ( keys %$args ) {
@@ -130,6 +158,8 @@ sub import {
                 __PACKAGE__, "::import: ", join( ', ', keys %$args ) );
         }
     }
+
+    return @return;
 }
 
 # copied from Damian Conway's PPR: PerlIdentifier
@@ -138,18 +168,31 @@ use constant PerlIdentifier => qr/\A([^\W\d]\w*+)\z/;
 sub _build_class {
     my ( $caller, $name, $attr ) = @_;
 
+    # in case we're called inside a recursion and the recurse count
+    # has hit zero, default behavior is no recurse, so remove it so
+    # the attr signature computed below isn't contaminated by a
+    # useless -recurse => 0 attribute.
+    if ( exists $attr->{-recurse} ) {
+        _croak( "-recurse must be a number" )
+          unless Scalar::Util::looks_like_number( $attr->{-recurse} );
+        delete $attr->{-recurse} if $attr->{-recurse} == 0;
+    }
+
     if ( !defined $attr->{-class} ) {
 
         my @class = map {
-                ( my $key = $_ ) =~ s/-//;
-                ( $key, defined $attr->{$_} ? $attr->{$_} : "<undef>" )
-            } sort keys %$attr;
+            ( my $key = $_ ) =~ s/-//;
+            ( $key, defined $attr->{$_} ? $attr->{$_} : "<undef>" )
+        } sort keys %$attr;
 
-        $attr->{-class} = join '::', 'Hash::Wrap::Class', Digest::MD5::md5_hex( @class );
+        $attr->{-class} = join '::', 'Hash::Wrap::Class',
+          Digest::MD5::md5_hex( @class );
     }
 
     elsif ( $attr->{-class} eq '-caller' ) {
-      $attr->{-class} = $caller . '::' . $name;
+        _croak( "can't set -class => '-caller' if -as is not a plain string" )
+          if ref $name;
+        $attr->{-class} = $caller . '::' . $name;
     }
 
     my $class = $attr->{-class};
@@ -157,14 +200,16 @@ sub _build_class {
     return $class if defined $REGISTRY{$class};
 
     my %dict = (
-        class           => $class,
-        signature       => '',
-        body            => [],
-        autoload_attr   => '',
-        validate_inline => 'exists $self->{\<<KEY>>}',
-        validate_method => 'exists $self->{$key}',
-        set             => '$self->{q[\<<KEY>>]} = $_[0] if @_;',
-        meta => [  map { ( qq[q($_) => q($attr->{$_}),] ) } keys %$attr ],
+        class                 => $class,
+        signature             => '',
+        body                  => [],
+        autoload_attr         => '',
+        validate_inline       => 'exists $self->{\<<KEY>>}',
+        validate_method       => 'exists $self->{$key}',
+        set                   => '$self->{q[\<<KEY>>]} = $_[0] if @_;',
+        return_value          => '$self->{q[\<<KEY>>]}',
+        recursion_constructor => '',
+        meta => [ map { ( qq[q($_) => q($attr->{$_}),] ) } keys %$attr ],
     );
 
     if ( $attr->{-lvalue} ) {
@@ -194,11 +239,53 @@ sub _build_class {
     }
 
     if ( $attr->{-immutable} ) {
-        $dict{set} = 'Carp::croak( q[Modification of a read-only value attempted]) if @_;'
+        $dict{set} = <<'END';
+if ( @_ ) {
+  require Carp;
+  Carp::croak( q[Modification of a read-only value attempted])
+}
+END
+    }
+
+    if ( $attr->{-recurse} ) {
+
+        # decrement recursion limit.  It's infinite recursion if
+        # -recurse < 0; always set to -1 so we keep using the same
+        # class.  Note that -recurse will never be zero upon entrance
+        # of this block, as -recurse => 0 is removed from the
+        # attributes way upstream.
+
+        $dict{recurse_limit} = --$attr->{-recurse} < 0 ? -1 : $attr->{-recurse};
+
+        $dict{return_value} = <<'END';
+return 'HASH' eq (Scalar::Util::reftype( $self->{q[\<<KEY>>]} ) // '')
+        && ! Scalar::Util::blessed( $self->{q[\<<KEY>>]} )
+      ? $<<CLASS>>::recurse_into_hash->( $self->{q[\<<KEY>>]} )
+      : $self->{q[\<<KEY>>]};
+END
+
+        # do a two-step initialization of the constructor.  If
+        # the initialization sub is stored in $recurse_into_hash, and then
+        # $recurse_into_hash is set to the actual constructor I worry that
+        # Perl may decide to garbage collect the setup subroutine while it's
+        # busy setting $recurse_into_hash.  So, store the
+        # initialization sub in something other than $recurse_into_hash.
+
+        $dict{recursion_constructor} = <<'END';
+our $recurse_into_hash;
+our $setup_recurse_into_hash = sub {
+      require Hash::Wrap;
+      ( $recurse_into_hash ) = Hash::Wrap->import ( { -as => '-return', -recurse => <<RECURSE_LIMIT>> } );
+      goto &$recurse_into_hash;
+};
+$recurse_into_hash = $setup_recurse_into_hash;
+END
     }
 
     my $class_template = <<'END';
 package <<CLASS>>;
+
+<<CLOSURES>>
 
 use Scalar::Util ();
 
@@ -208,6 +295,8 @@ our $validate = sub {
     my ( $self, $key ) = @_;
     return <<VALIDATE_METHOD>>;
 };
+
+<<RECURSION_CONSTRUCTOR>>
 
 our $accessor_template = q[
   package \<<CLASS>>;
@@ -229,7 +318,7 @@ our $accessor_template = q[
 
    <<SET>>
 
-   return $self->{q[\<<KEY>>]};
+   return <<RETURN_VALUE>>;
   }
   \&\<<KEY>>;
 ];
@@ -295,16 +384,16 @@ END
             my $code = $methods->{$mth};
             _croak( qq{value for method "$mth" must be a coderef} )
               unless 'CODE' eq ref $code;
-            no strict 'refs';     ## no critic (ProhibitNoStrict)
-            *{ "${class}::${mth}" } = $code;
+            no strict 'refs';    ## no critic (ProhibitNoStrict)
+            *{"${class}::${mth}"} = $code;
         }
 
         $rentry->{methods} = { map { $_ => undef } keys %$methods };
     }
 
     push @CARP_NOT, $class;
-    $rentry->{accessor_template} =
-          _find_symbol( $class, "accessor_template", [ "SCALAR", undef ] );
+    $rentry->{accessor_template}
+      = _find_symbol( $class, "accessor_template", [ "SCALAR", undef ] );
 
     $rentry->{validate} = _find_symbol( $class, 'validate', [ 'REF', 'CODE' ] );
 
@@ -324,8 +413,9 @@ sub _build_constructor {
 
     my %dict = (
         package => $package,
-        name    => $name,
+        constructor_name    => $name,
         use     => [],
+        package_return_value => '1;',
     );
 
     $dict{class} = do {
@@ -376,16 +466,23 @@ sub _build_constructor {
         }
     };
 
+    # return the constructor sub from the factory and don't insert the
+    # name into the package namespace
+    if ( $args->{-as_scalar_ref} || $args->{-as_return} ) {
+        $dict{package_return_value} = '';
+        $dict{constructor_name} = '';
+    }
 
     #<<< no tidy
     my $code = q[
     package <<PACKAGE>>;
+    <<CLOSURES>>
     <<USE>>
     use Scalar::Util ();
 
     no warnings 'redefine';
 
-    sub <<NAME>> (;$) {
+    sub <<CONSTRUCTOR_NAME>> (;$) {
       my $class = <<CLASS>>
       my $hash = shift // {};
 
@@ -397,15 +494,17 @@ sub _build_constructor {
       bless $hash, $class;
       <<LOCK>>
     }
-    1;
+    <<PACKAGE_RETURN_VALUE>>
     ];
     #>>>
 
-    _interpolate( \$code, \%dict );
-
-    eval( $code )    ## no critic (ProhibitStringyEval)
+    my $result = _compile_from_tpl( \$code, \%dict, { '$clone' => $clone }  )
       || _croak(
         "error generating constructor (as $name) subroutine: $@\n$code" );
+
+    # caller asked for a coderef to be stuffed into a scalar
+    ${$name} = $result if $args->{-as_scalar_ref};
+    return $result;
 }
 
 sub _croak_about_code {
@@ -423,9 +522,12 @@ sub _line_number_code {
 }
 
 
-# can't handle closures; should use Sub::Quote
 sub _compile_from_tpl {
-    my ( $code, $dict ) = @_;
+    my ( $code, $dict, $closures ) = @_;
+
+    if ( defined $closures ) {
+        $dict->{closures} = join( "\n", map { "my $_ = \$closures->{'$_'};" } keys %$closures ) ;
+    }
 
     _interpolate( $code, $dict );
 
@@ -434,6 +536,7 @@ sub _compile_from_tpl {
         _line_number_code( \$code );
         print STDERR $code;
     }
+
 
     eval( $$code );    ## no critic (ProhibitStringyEval)
 }
@@ -480,7 +583,11 @@ sub _interpolate {
 #   The GNU General Public License, Version 3, June 2007
 #
 
+__END__
+
 =pod
+
+=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory getter
 
 =head1 NAME
 
@@ -488,7 +595,7 @@ Hash::Wrap - create on-the-fly objects from hashes
 
 =head1 VERSION
 
-version 0.14
+version 0.17
 
 =head1 SYNOPSIS
 
@@ -508,6 +615,17 @@ version 0.14
 
   my $copied = copied( { a => 1 } );
   print $copied->a;
+
+  # don't pollute up your namespace
+  my $wrap;
+  use Hash::Wrap { -as => \$wrap};
+  my $obj = $wrap->( { a => 1 } );
+
+  # apply constructors to hashes two levels deep into the hash
+  use Hash::Wrap { -recurse => 2 };
+
+  # apply constructors to hashes at any level
+  use Hash::Wrap { -recurse => -1 };
 
 =head1 DESCRIPTION
 
@@ -556,8 +674,6 @@ On recent enough versions of Perl, accessors can be lvalues, e.g.
    $obj->existing_key = $value;
 
 =back
-
-=for stopwords getter
 
 =head1 USAGE
 
@@ -681,9 +797,46 @@ behaviors.
 
 =over
 
-=item C<-as> => I<subroutine name>
+=item C<-as> => I<subroutine name>  || C<undef> || I<scalar ref> || C<-return>
 
-Import the constructor subroutine with the given name. It defaults to C<wrap_hash>.
+(This defaults to the string C<wrap_hash> )
+
+If the argument is
+
+=over
+
+=item *
+
+a string (but not the string C<-return>)
+
+Import the constructor subroutine with the given name.
+
+=item *
+
+undefined
+
+Do not import the constructor. This is usually only used with the L</-new> option.
+
+=item *
+
+a scalar ref
+
+Do not import the constructor. Store a reference to the constructor into the scalar.
+
+=item *
+
+The string C<-return>.
+
+Do not import the constructor. The constructor subroutine(s) will be returned
+from C<Hash::Import>'s C<import> method.  This is a fairly esoteric way of doing things:
+
+  require Hash::Wrap;
+  ( $copy, $clone ) = Hash::Wrap->import( { -as => '-return', copy => 1 },
+                                          { -as => '-return', clone => 1 } );
+
+A list is always returned, even if only one constructor is created.
+
+=back
 
 =item C<-copy> => I<boolean>
 
@@ -737,6 +890,31 @@ lvalue subroutines are only available on Perl version 5.16 and later.
 If C<-lvalue = 1> this option will silently be ignored on earlier versions of Perl.
 
 If C<-lvalue = -1> this option will cause an exception on earlier versions of Perl.
+
+=item C<-recurse> => I<integer level>
+
+Normally only the top level hash is wrapped in a class.  This option specifies
+how many levels deep into the hash hashes should be wrapped.  For example,
+if
+
+ %h = ( l => 0, a => { l => 1, b => { l => 2, c => { l => 3 } } } };
+
+ use Hash::Wrap { -recurse => 0 };
+ $h->l          # => 0
+ $h->a->l       # => ERROR
+
+ use Hash::Wrap { -recurse => 1 };
+ $h->l          # => 0
+ $h->a->l       # => 1
+ $h->a->b->l    # => ERROR
+
+ use Hash::Wrap { -recurse => 2 };
+ $h->l          # => 0
+ $h->a->l       # => 1
+ $h->a->b->l    # => 2
+ $h->a->b->c->l # => ERROR
+
+For infinite recursion, set C<-recurse> to C<-1>.
 
 =back
 
@@ -918,6 +1096,10 @@ throws by default, but can optionally return C<undef>
 
 =item * can add additional methods to the hash object's class
 
+=item * object tracks additions and deletions of entries in the hash
+
+=item * can store the constructor in a scalar
+
 =back
 
 =item L<Object::Result>
@@ -1081,54 +1263,43 @@ for existing keys in hash.
 
 =back
 
+=item L<Util::H2O>
+
+=over
+
+=item * has a cool name
+
+=item * core dependencies only
+
+=item * locks hash by default
+
+=item * optionally recurses into the hash
+
+=item * does not track changes to hash
+
+=item * can destroy class
+
+=item * can add methods
+
+=item * can use custom package
+
 =back
 
-=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+=back
 
 =head1 SUPPORT
 
-=head2 Websites
+=head2 Bugs
 
-The following websites have more information about this module, and may be of help to you. As always,
-in addition to those websites please use your favorite search engine to discover more resources.
+Please report any bugs or feature requests to bug-hash-wrap@rt.cpan.org  or through the web interface at: https://rt.cpan.org/Public/Dist/Display.html?Name=Hash-Wrap
 
-=over 4
+=head2 Source
 
-=item *
+Source is available at
 
-MetaCPAN
+  https://gitlab.com/djerius/hash-wrap
 
-A modern, open-source CPAN search engine, useful to view POD in HTML format.
-
-L<https://metacpan.org/release/Hash-Wrap>
-
-=item *
-
-RT: CPAN's Bug Tracker
-
-The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
-
-L<https://rt.cpan.org/Public/Dist/Display.html?Name=Hash-Wrap>
-
-=back
-
-=head2 Email
-
-You can email the author of this module at C<DJERIUS at cpan.org> asking for help with any problems you have.
-
-=head2 Bugs / Feature Requests
-
-Please report any bugs or feature requests by email to C<bug-hash-wrap at rt.cpan.org>, or through
-the web interface at L<https://rt.cpan.org/Public/Bug/Report.html?Queue=Hash-Wrap>. You will be automatically notified of any
-progress on the request by the system.
-
-=head2 Source Code
-
-The code is open to the world, and available for you to hack on. Please feel free to browse it and play
-with it, or whatever. If you want to contribute patches, please send me a diff or prod me to pull
-from your repository :)
-
-L<https://gitlab.com/djerius/hash-wrap>
+and may be cloned from
 
   https://gitlab.com/djerius/hash-wrap.git
 
@@ -1145,606 +1316,3 @@ This is free software, licensed under:
   The GNU General Public License, Version 3, June 2007
 
 =cut
-
-__END__
-
-#pod =for stopwords
-#pod getter
-#pod
-#pod =head1 SYNOPSIS
-#pod
-#pod
-#pod   use Hash::Wrap;
-#pod
-#pod   my $result = wrap_hash( { a => 1 } );
-#pod   print $result->a;  # prints
-#pod   print $result->b;  # throws
-#pod
-#pod   # import two constructors, <cloned> and <copied> with different behaviors.
-#pod   use Hash::Wrap
-#pod     { -as => 'cloned', clone => 1},
-#pod     { -as => 'copied', copy => 1 };
-#pod
-#pod   my $cloned = cloned( { a => 1 } );
-#pod   print $cloned->a;
-#pod
-#pod   my $copied = copied( { a => 1 } );
-#pod   print $copied->a;
-#pod
-#pod
-#pod =head1 DESCRIPTION
-#pod
-#pod B<Hash::Wrap> creates objects from hashes, providing accessors for
-#pod hash elements.  The objects are hashes, and may be modified using the
-#pod standard Perl hash operations and the object's accessors will behave
-#pod accordingly.
-#pod
-#pod Why use this class? Sometimes a hash is created on the fly and it's too
-#pod much of a hassle to build a class to encapsulate it.
-#pod
-#pod   sub foo () { ... ; return { a => 1 }; }
-#pod
-#pod With C<Hash::Wrap>:
-#pod
-#pod   use Hash::Wrap;
-#pod
-#pod   sub foo () { ... ; return wrap_hash( { a => 1 ); }
-#pod
-#pod   my $obj = foo ();
-#pod   print $obj->a;
-#pod
-#pod Elements can be added or removed to the object and accessors will
-#pod track them.  The object may be made immutable, or may have a restricted
-#pod set of attributes.
-#pod
-#pod There are many similar modules on CPAN (see L<SEE ALSO> for comparisons).
-#pod
-#pod What sets B<Hash::Wrap> apart is that it's possible to customize
-#pod object construction and accessor behavior:
-#pod
-#pod =over
-#pod
-#pod =item *
-#pod
-#pod It's possible to use the passed hash directly, or make shallow or deep copies of it.
-#pod
-#pod =item *
-#pod
-#pod Accessors can be customized so that accessing a non-existent element can throw an exception or return the undefined value.
-#pod
-#pod =item *
-#pod
-#pod On recent enough versions of Perl, accessors can be lvalues, e.g.
-#pod
-#pod    $obj->existing_key = $value;
-#pod
-#pod =back
-#pod
-#pod =head1 USAGE
-#pod
-#pod =head2 Simple Usage
-#pod
-#pod C<use>'ing B<Hash::Wrap> without options imports a subroutine called
-#pod C<wrap_hash> which takes a hash, blesses it into a wrapper class and
-#pod returns the hash:
-#pod
-#pod   use Hash::Wrap;
-#pod
-#pod   my $h = wrap_hash { a => 1 };
-#pod   print $h->a, "\n";             # prints 1
-#pod
-#pod The wrapper class has no constructor method, so the only way to create
-#pod an object is via the C<wrap_hash> subroutine. (See L</WRAPPER CLASSES>
-#pod for more about wrapper classes)  If C<wrap_hash> is called without
-#pod arguments, it will create a hash for you.
-#pod
-#pod =head2 Advanced Usage
-#pod
-#pod =head3 C<wrap_hash> is an awful name for the constructor subroutine
-#pod
-#pod So rename it:
-#pod
-#pod   use Hash::Wrap { -as => "a_much_better_name_for_wrap_hash" };
-#pod
-#pod   $obj = a_much_better_name_for_wrap_hash( { a => 1 } );
-#pod
-#pod =head3 The Wrapper Class name matters
-#pod
-#pod If the class I<name> matters, but it'll never be instantiated
-#pod except via the imported constructor subroutine:
-#pod
-#pod   use Hash::Wrap { -class => 'My::Class' };
-#pod
-#pod   my $h = wrap_hash { a => 1 };
-#pod   print $h->a, "\n";             # prints 1
-#pod   $h->isa( 'My::Class' );        # returns true
-#pod
-#pod or, if you want it to reflect the current package, try this:
-#pod
-#pod   package Foo;
-#pod   use Hash::Wrap { -class => '-caller', -as => 'wrapit' };
-#pod
-#pod   my $h = wrapit { a => 1 };
-#pod   $h->isa( 'Foo::wrapit' );  # returns true
-#pod
-#pod Again, the wrapper class has no constructor method, so the only way to create
-#pod an object is via the generated subroutine.
-#pod
-#pod =head3 The Wrapper Class needs its own class constructor method
-#pod
-#pod To generate a wrapper class which can be instantiated via its own
-#pod constructor method:
-#pod
-#pod   use Hash::Wrap { -class => 'My::Class', -new => 1 };
-#pod
-#pod The default C<wrap_hash> constructor subroutine is still exported, so
-#pod
-#pod   $h = My::Class->new( { a => 1 } );
-#pod
-#pod and
-#pod
-#pod   $h = wrap_hash( { a => 1 } );
-#pod
-#pod do the same thing.
-#pod
-#pod To give the constructor method a different name:
-#pod
-#pod   use Hash::Wrap { -class => 'My::Class',  -new => '_my_new' };
-#pod
-#pod To prevent the constructor subroutine from being imported:
-#pod
-#pod   use Hash::Wrap { -as => undef, -class => 'My::Class', -new => 1 };
-#pod
-#pod =head3 A stand alone Wrapper Class
-#pod
-#pod To create a stand alone wrapper class,
-#pod
-#pod    package My::Class;
-#pod
-#pod    use Hash::Wrap { -base => 1 };
-#pod
-#pod    1;
-#pod
-#pod And later...
-#pod
-#pod    use My::Class;
-#pod
-#pod    $obj = My::Class->new( \%hash );
-#pod
-#pod It's possible to modify the constructor and accessors:
-#pod
-#pod    package My::Class;
-#pod
-#pod    use Hash::Wrap { -base => 1, -new => 'new_from_hash', -undef => 1 };
-#pod
-#pod    1;
-#pod
-#pod =head1 OPTIONS
-#pod
-#pod B<Hash::Wrap> works at compile time.  To modify its behavior pass it
-#pod options when it is C<use>'d:
-#pod
-#pod   use Hash::Wrap { %options1 }, { %options2 }, ... ;
-#pod
-#pod Multiple options hashes may be passed; each hash specifies options for
-#pod a separate constructor or class.
-#pod
-#pod For example,
-#pod
-#pod   use Hash::Wrap
-#pod     { -as => 'cloned', clone => 1},
-#pod     { -as => 'copied', copy => 1 };
-#pod
-#pod creates two constructors, C<cloned> and C<copied> with different
-#pod behaviors.
-#pod
-#pod =head2 Constructor
-#pod
-#pod =over
-#pod
-#pod =item C<-as> => I<subroutine name>
-#pod
-#pod Import the constructor subroutine with the given name. It defaults to C<wrap_hash>.
-#pod
-#pod =item C<-copy> => I<boolean>
-#pod
-#pod If true, the object will store the data in a I<shallow> copy of the
-#pod hash. By default, the object uses the hash directly.
-#pod
-#pod =item C<-clone> => I<boolean> | I<coderef>
-#pod
-#pod Store the data in a deep copy of the hash. if I<true>, L<Storable/dclone>
-#pod is used. If a coderef, it will be called as
-#pod
-#pod    $clone = coderef->( $hash )
-#pod
-#pod By default, the object uses the hash directly.
-#pod
-#pod =item C<-immutable> => I<boolean>
-#pod
-#pod The object's attributes and values are locked and may not be altered. Note that this
-#pod locks the underlying hash.
-#pod
-#pod =item C<-lockkeys> => I<boolean> | I<arrayref>
-#pod
-#pod If the value is I<true>, the object's attributes are restricted to the existing keys in the hash.
-#pod If it is an array reference, it specifies which attributes are allowed, I<in addition to existing attributes>.
-#pod The attribute's values are not locked.  Note that this locks the underlying hash.
-#pod
-#pod =back
-#pod
-#pod =head2 Accessors
-#pod
-#pod =over
-#pod
-#pod =item C<-undef> => I<boolean>
-#pod
-#pod Normally an attempt to use an accessor for an non-existent key will
-#pod result in an exception.  This option causes the accessor
-#pod to return C<undef> instead.  It does I<not> create an element in
-#pod the hash for the key.
-#pod
-#pod =item C<-lvalue> => I<flag>
-#pod
-#pod If non-zero, the accessors will be lvalue routines, e.g. they can
-#pod change the underlying hash value by assigning to them:
-#pod
-#pod    $obj->attr = 3;
-#pod
-#pod The hash entry I<must already exist> or this will throw an exception.
-#pod
-#pod lvalue subroutines are only available on Perl version 5.16 and later.
-#pod
-#pod If C<-lvalue = 1> this option will silently be ignored on earlier versions of Perl.
-#pod
-#pod If C<-lvalue = -1> this option will cause an exception on earlier versions of Perl.
-#pod
-#pod =back
-#pod
-#pod =head2 Class
-#pod
-#pod =over
-#pod
-#pod =item C<-base> => I<boolean>
-#pod
-#pod If true, the enclosing package is converted into a proxy wrapper class.  This should
-#pod not be used in conjunction with C<-class>.  See L</A stand alone Wrapper Class>.
-#pod
-#pod =item C<-class> => I<class name>
-#pod
-#pod A class with the given name will be created and new objects will be
-#pod blessed into the specified class by the constructor subroutine.  The
-#pod new class will not have a constructor method.
-#pod
-#pod If I<class name> is the string C<-caller>, then the class name is
-#pod set to the fully qualified name of the constructor, e.g.
-#pod
-#pod   package Foo;
-#pod   use Hash::Wrap { -class => '-caller', -as => 'wrap_it' };
-#pod
-#pod results in a class name of C<Foo::wrap_it>.
-#pod
-#pod If not specified, the class name will be constructed based upon the
-#pod options.  Do not rely upon this name to determine if an object is
-#pod wrapped by B<Hash::Wrap>.
-#pod
-#pod =item C<-new> => I<boolean> | I<Perl Identifier>
-#pod
-#pod Add a class constructor method.
-#pod
-#pod If C<-new> is a true boolean value, the method will be called
-#pod C<new>. Otherwise C<-new> specifies the name of the method.
-#pod
-#pod =back
-#pod
-#pod =head3 Extra Class Methods
-#pod
-#pod =over
-#pod
-#pod =item C<-defined> => I<boolean> | I<Perl Identifier>
-#pod
-#pod Add a method which returns true if the passed hash key is defined or
-#pod does not exist. If C<-defined> is a true boolean value, the method will be called
-#pod C<defined>. Otherwise it specifies the name of the method. For
-#pod example,
-#pod
-#pod    use Hash::Wrap { -defined => 1 };
-#pod    $obj = wrap_hash( { a => 1, b => undef } );
-#pod
-#pod    $obj->defined( 'a' ); # TRUE
-#pod    $obj->defined( 'b' ); # FALSE
-#pod    $obj->defined( 'c' ); # FALSE
-#pod
-#pod or
-#pod
-#pod    use Hash::Wrap { -defined => 'is_defined' };
-#pod    $obj = wrap_hash( { a => 1 } );
-#pod    $obj->is_defined( 'a' );
-#pod
-#pod =item C<-exists> => I<boolean> | I<Perl Identifier>
-#pod
-#pod Add a method which returns true if the passed hash key exists. If
-#pod C<-exists> is a boolean, the method will be called
-#pod C<exists>. Otherwise it specifies the name of the method. For example,
-#pod
-#pod    use Hash::Wrap { -exists => 1 };
-#pod    $obj = wrap_hash( { a => 1 } );
-#pod    $obj->exists( 'a' );
-#pod
-#pod or
-#pod
-#pod    use Hash::Wrap { -exists => 'is_present' };
-#pod    $obj = wrap_hash( { a => 1 } );
-#pod    $obj->is_present( 'a' );
-#pod
-#pod
-#pod =item C<-methods> => { I<method name> => I<code reference>, ... }
-#pod
-#pod Install the passed code references into the class with the specified
-#pod names. These override any attributes in the hash.  For example,
-#pod
-#pod    use Hash::Wrap { -methods => { a => sub { 'b' } } };
-#pod
-#pod    $obj = wrap_hash( { a => 'a' } );
-#pod    $obj->a;  # returns 'b'
-#pod
-#pod =back
-#pod
-#pod =head1 WRAPPER CLASSES
-#pod
-#pod A wrapper class has the following characteristics.
-#pod
-#pod =over
-#pod
-#pod =item *
-#pod
-#pod It has the methods C<DESTROY>, C<AUTOLOAD> and C<can>.
-#pod
-#pod =item *
-#pod
-#pod It will have other methods if the C<-undef> and C<-exists> options are specified. It may
-#pod have other methods if it is L<a stand alone class|/A stand alone Wrapper Class>.
-#pod
-#pod =item *
-#pod
-#pod It will have a constructor if either of C<-base> or C<-new> is specified.
-#pod
-#pod =back
-#pod
-#pod =head2 Wrapper Class Limitations
-#pod
-#pod =over
-#pod
-#pod =item *
-#pod
-#pod Wrapper classes have C<DESTROY>, C<can> method, and
-#pod C<AUTOLOAD> methods, which will mask hash keys with the same names.
-#pod
-#pod =item *
-#pod
-#pod Classes which are generated without the C<-base> or C<-new> options do
-#pod not have a class constructor method, e.g C<< Class->new() >> will
-#pod I<not> return a new object.  The only way to instantiate them is via
-#pod the constructor subroutine generated via B<Hash::Wrap>.  This allows
-#pod the underlying hash to have a C<new> attribute which would otherwise be
-#pod masked by the constructor.
-#pod
-#pod =back
-#pod
-#pod =head1 LIMITATIONS
-#pod
-#pod =head2 Lvalue accessors
-#pod
-#pod Lvalue accessors are available only on Perl 5.16 and later.
-#pod
-#pod =head2 Accessors for deleted hash elements
-#pod
-#pod Accessors for deleted elements are not removed.  The class's C<can>
-#pod method will return C<undef> for them, but they are still available in
-#pod the class's stash.
-#pod
-#pod =head1 EXAMPLES
-#pod
-#pod =head1 Existing keys are not compatible with method names
-#pod
-#pod If a hash key contains characters that aren't legal in method names,
-#pod there's no way to access that hash entry.  One way around this is to
-#pod use a custom clone subroutine which modifies the keys so they are
-#pod legal method names.  The user can directly insert a non-method-name
-#pod key into the C<Hash::Wrap> object after it is created, and those still
-#pod have a key that's not available via a method, but there's no cure for
-#pod that.
-#pod
-#pod
-#pod
-#pod =head1 SEE ALSO
-#pod
-#pod Here's a comparison of this module and others on CPAN.
-#pod
-#pod
-#pod =over
-#pod
-#pod =item L<Hash::Wrap> (this module)
-#pod
-#pod =over
-#pod
-#pod =item * core dependencies only
-#pod
-#pod =item * only applies object paradigm to top level hash
-#pod
-#pod =item * accessors may be lvalue subroutines
-#pod
-#pod =item * accessing a non-existing element via an accessor
-#pod throws by default, but can optionally return C<undef>
-#pod
-#pod =item * can use custom package
-#pod
-#pod =item * can copy/clone existing hash. clone may be customized
-#pod
-#pod =item * can add additional methods to the hash object's class
-#pod
-#pod =back
-#pod
-#pod
-#pod =item L<Object::Result>
-#pod
-#pod As you might expect from a
-#pod L<DCONWAY|https://metacpan.org/author/DCONWAY> module, this does just
-#pod about everything you'd like.  It has a very heavy set of dependencies.
-#pod
-#pod =item L<Hash::AsObject>
-#pod
-#pod =over
-#pod
-#pod =item * core dependencies only
-#pod
-#pod =item * applies object paradigm recursively
-#pod
-#pod =item * accessing a non-existing element via an accessor creates it
-#pod
-#pod =back
-#pod
-#pod =item L<Data::AsObject>
-#pod
-#pod =over
-#pod
-#pod =item * moderate dependency chain (no XS?)
-#pod
-#pod =item * applies object paradigm recursively
-#pod
-#pod =item * accessing a non-existing element throws
-#pod
-#pod =back
-#pod
-#pod =item L<Class::Hash>
-#pod
-#pod =over
-#pod
-#pod =item * core dependencies only
-#pod
-#pod =item * only applies object paradigm to top level hash
-#pod
-#pod =item * can add generic accessor, mutator, and element management methods
-#pod
-#pod =item * accessing a non-existing element via an accessor creates it (not documented, but code implies it)
-#pod
-#pod =item * C<can()> doesn't work
-#pod
-#pod =back
-#pod
-#pod =item L<Hash::Inflator>
-#pod
-#pod =over
-#pod
-#pod =item * core dependencies only
-#pod
-#pod =item * accessing a non-existing element via an accessor returns undef
-#pod
-#pod =item * applies object paradigm recursively
-#pod
-#pod =back
-#pod
-#pod =item L<Hash::AutoHash>
-#pod
-#pod =over
-#pod
-#pod =item * moderate dependency chain.  Requires XS, tied hashes
-#pod
-#pod =item * applies object paradigm recursively
-#pod
-#pod =item * accessing a non-existing element via an accessor creates it
-#pod
-#pod =back
-#pod
-#pod =item L<Hash::Objectify>
-#pod
-#pod =over
-#pod
-#pod =item * light dependency chain.  Requires XS.
-#pod
-#pod =item * only applies object paradigm to top level hash
-#pod
-#pod =item * accessing a non-existing element throws, but if an existing
-#pod element is accessed, then deleted, accessor returns undef rather than
-#pod throwing
-#pod
-#pod =item * can use custom package
-#pod
-#pod =back
-#pod
-#pod =item L<Data::OpenStruct::Deep>
-#pod
-#pod =over
-#pod
-#pod =item * uses source filters
-#pod
-#pod =item * applies object paradigm recursively
-#pod
-#pod =back
-#pod
-#pod =item L<Object::AutoAccessor>
-#pod
-#pod =over
-#pod
-#pod =item * light dependency chain
-#pod
-#pod =item * applies object paradigm recursively
-#pod
-#pod =item * accessing a non-existing element via an accessor creates it
-#pod
-#pod =back
-#pod
-#pod =item L<Data::Object::Autowrap>
-#pod
-#pod =over
-#pod
-#pod =item * core dependencies only
-#pod
-#pod =item * no documentation
-#pod
-#pod =back
-#pod
-#pod =item L<Object::Accessor>
-#pod
-#pod =over
-#pod
-#pod =item * core dependencies only
-#pod
-#pod =item * only applies object paradigm to top level hash
-#pod
-#pod =item * accessors may be lvalue subroutines
-#pod
-#pod =item * accessing a non-existing element via an accessor
-#pod returns C<undef> by default, but can optionally throw. Changing behavior
-#pod is done globally, so all objects are affected.
-#pod
-#pod =item * accessors must be explicitly added.
-#pod
-#pod =item * accessors may have aliases
-#pod
-#pod =item * values may be validated
-#pod
-#pod =item * invoking an accessor may trigger a callback
-#pod
-#pod =back
-#pod
-#pod =item L<Object::Adhoc>
-#pod
-#pod =over
-#pod
-#pod =item * minimal non-core dependencies (L<Exporter::Shiny>
-#pod
-#pod =item * uses L<Class::XSAccessor> if available
-#pod
-#pod =item * only applies object paradigm to top level hash
-#pod
-#pod =item * provides separate getter and predicate methods, but only
-#pod for existing keys in hash.
-#pod
-#pod =item * hash keys are locked.
-#pod
-#pod =item * operates directly on hash.
-#pod
-#pod =back
-#pod
-#pod =back

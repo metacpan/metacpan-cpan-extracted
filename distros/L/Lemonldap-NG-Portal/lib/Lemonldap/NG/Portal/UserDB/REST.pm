@@ -15,22 +15,26 @@ extends qw(
   Lemonldap::NG::Portal::Lib::REST
 );
 
-our $VERSION = '2.0.11';
+our $VERSION = '2.0.12';
 
 # INITIALIZATION
+
+has findUserDBUrl => (
+    is      => 'ro',
+    lazy    => 1,
+    default => sub {
+        $_[0]->conf->{restFindUserDBUrl} || $_[0]->conf->{restUserDBUrl};
+    }
+);
 
 sub init {
     my $self = shift;
 
-    # Add warning in log
     unless ( $self->conf->{restUserDBUrl} ) {
-        $self->logger->error('User REST URL ids not set');
+        $self->logger->error('REST User data URL is not set');
         return 0;
     }
-    if ( !$self->conf->{restFindUserDBUrl} && $self->conf->{findUser} ) {
-        $self->logger->error('findUser REST URL is not set');
-        return 0;
-    }
+
     return 1;
 }
 
@@ -85,7 +89,7 @@ sub findUser {
     ];
     $res = eval {
         $self->restCall(
-            $self->conf->{restFindUserDBUrl},
+            $self->findUserDBUrl,
             {
                 searchingAttributes => to_json($searching),
                 (
@@ -124,11 +128,12 @@ sub setSessionInfo {
     my ( $self, $req ) = @_;
     $req->sessionInfo->{$_} = $req->data->{restUserDBInfo}->{$_}
       foreach ( keys %{ $req->data->{restUserDBInfo} } );
-    PE_OK;
+
+    return PE_OK;
 }
 
 sub setGroups {
-    PE_OK;
+    return PE_OK;
 }
 
 1;

@@ -1,5 +1,4 @@
 package SDL2::version 0.01 {
-    use lib '../lib', 'lib', '/home/sanko/Projects/SDL2.pm/lib';
     use SDL2::Utils;
     has major => 'uint8', minor => 'uint8', patch => 'uint8';
 
@@ -20,7 +19,7 @@ SDL2::version - Information About the Version of SDL in Use
 SDL2::version represents the library's version as three levels: major, minor,
 and patch level.
 
-=head1 Methods
+=head1 Fields
 
 =head2 C<major( )>
 

@@ -6,8 +6,8 @@
 use warnings;
 use strict;
 
-our $VERSION = '3.022'; # VERSION
-my $LAST_UPDATE = '3.021'; # manually update whenever code is changed
+our $VERSION = '3.023'; # VERSION
+our $LAST_UPDATE = '3.023'; # manually update whenever code is changed
 
 use Math::Trig;
 use List::Util qw(min max);
@@ -92,7 +92,7 @@ makeCell(@cellLoc, @cellSize);
 $text->font($fontR, 12);
 $text->strokecolor('black');
 $text->fillcolor('black');
-$text->lead(15);
+$text->leading(15);
 
 $grfx->linewidth(1);
 $grfx->strokecolor('red');
@@ -128,7 +128,7 @@ makeCell(@cellLoc, @cellSize);
 $text->font($fontR, 12);
 $text->strokecolor('black');
 $text->fillcolor('black');
-$text->lead(15);
+$text->leading(15);
 
 $grfx->linewidth(1);
 $grfx->strokecolor('red');
@@ -164,7 +164,7 @@ makeCell(@cellLoc, @cellSize);
 $text->font($fontR, 12);
 $text->strokecolor('black');
 $text->fillcolor('black');
-$text->lead(15);
+$text->leading(15);
 
 $grfx->linewidth(1);
 $grfx->strokecolor('red');
@@ -198,7 +198,7 @@ makeCell(@cellLoc, @cellSize);
 $text->font($fontR, 12);
 $text->strokecolor('black');
 $text->fillcolor('black');
-$text->lead(15);
+$text->leading(15);
 
 $grfx->linewidth(1);
 $grfx->strokecolor('red');
@@ -232,7 +232,7 @@ makeCell(@cellLoc, @cellSize);
 $text->font($fontR, 12);
 $text->strokecolor('black');
 $text->fillcolor('black');
-$text->lead(15);
+$text->leading(15);
 
 $grfx->linewidth(1);
 $grfx->strokecolor('red');
@@ -266,7 +266,7 @@ makeCell(@cellLoc, @cellSize);
 $text->font($fontR, 12);
 $text->strokecolor('black');
 $text->fillcolor('black');
-$text->lead(15);
+$text->leading(15);
 
 $grfx->linewidth(1);
 $grfx->strokecolor('red');
@@ -300,7 +300,7 @@ makeCell(@cellLoc, @cellSize);
 $text->font($fontR, 12);
 $text->strokecolor('black');
 $text->fillcolor('black');
-$text->lead(15);
+$text->leading(15);
 
 $grfx->linewidth(1);
 $grfx->strokecolor('red');
@@ -334,7 +334,7 @@ makeCell(@cellLoc, @cellSize);
 $text->font($fontR, 12);
 $text->strokecolor('black');
 $text->fillcolor('black');
-$text->lead(15);
+$text->leading(15);
 
 $grfx->linewidth(1);
 $grfx->strokecolor('red');
@@ -369,7 +369,7 @@ makeCell(@cellLoc, @cellSize);
 $text->font($fontR, 12);
 $text->strokecolor('black');
 $text->fillcolor('black');
-$text->lead(15);
+$text->leading(15);
 
 $grfx->linewidth(1);
 $grfx->strokecolor('red');
@@ -404,7 +404,7 @@ makeCell(@cellLoc, @cellSize);
 $text->font($fontR, 12);
 $text->strokecolor('black');
 $text->fillcolor('black');
-$text->lead(15);
+$text->leading(15);
 
 $grfx->linewidth(1);
 $grfx->strokecolor('red');
@@ -438,7 +438,7 @@ makeCell(@cellLoc, @cellSize);
 $text->font($fontR, 12);
 $text->strokecolor('black');
 $text->fillcolor('black');
-$text->lead(15);
+$text->leading(15);
 
 $grfx->linewidth(1);
 $grfx->strokecolor('red');
@@ -472,7 +472,7 @@ makeCell(@cellLoc, @cellSize);
 $text->font($fontR, 12);
 $text->strokecolor('black');
 $text->fillcolor('black');
-$text->lead(15);
+$text->leading(15);
 
 $grfx->linewidth(1);
 $grfx->strokecolor('red');
@@ -506,7 +506,7 @@ makeCell(@cellLoc, @cellSize);
 $text->font($fontR, 12);
 $text->strokecolor('black');
 $text->fillcolor('black');
-$text->lead(15);
+$text->leading(15);
 
 $grfx->linewidth(1);
 $grfx->strokecolor('red');
@@ -540,7 +540,7 @@ makeCell(@cellLoc, @cellSize);
 $text->font($fontR, 12);
 $text->strokecolor('black');
 $text->fillcolor('black');
-$text->lead(15);
+$text->leading(15);
 
 $grfx->linewidth(1);
 $grfx->strokecolor('red');
@@ -574,7 +574,7 @@ makeCell(@cellLoc, @cellSize);
 $text->font($fontR, 12);
 $text->strokecolor('black');
 $text->fillcolor('black');
-$text->lead(15);
+$text->leading(15);
 
 $grfx->linewidth(1);
 $grfx->strokecolor('red');
@@ -608,7 +608,7 @@ makeCell(@cellLoc, @cellSize);
 $text->font($fontR, 12);
 $text->strokecolor('black');
 $text->fillcolor('black');
-$text->lead(15);
+$text->leading(15);
 
 $grfx->linewidth(1);
 $grfx->strokecolor('red');
@@ -642,7 +642,7 @@ makeCell(@cellLoc, @cellSize);
 $text->font($fontR, 12);
 $text->strokecolor('black');
 $text->fillcolor('black');
-$text->lead(15);
+$text->leading(15);
 
 $grfx->linewidth(1);
 $grfx->strokecolor('red');
@@ -676,7 +676,7 @@ makeCell(@cellLoc, @cellSize);
 $text->font($fontR, 12);
 $text->strokecolor('black');
 $text->fillcolor('black');
-$text->lead(15);
+$text->leading(15);
 
 $grfx->linewidth(1);
 $grfx->strokecolor('red');
@@ -710,7 +710,7 @@ makeCell(@cellLoc, @cellSize);
 $text->font($fontR, 12);
 $text->strokecolor('black');
 $text->fillcolor('black');
-$text->lead(15);
+$text->leading(15);
 
 $grfx->linewidth(1);
 $grfx->strokecolor('red');
@@ -746,7 +746,7 @@ makeCell(@cellLoc, @cellSize);
 $text->font($fontR, 12);
 $text->strokecolor('black');
 $text->fillcolor('black');
-$text->lead(15);
+$text->leading(15);
 
 $grfx->linewidth(1);
 $grfx->strokecolor('red');
@@ -790,7 +790,7 @@ makeCell(@cellLoc, @cellSize);
 $text->font($fontR, 12);
 $text->strokecolor('black');
 $text->fillcolor('black');
-$text->lead(15);
+$text->leading(15);
 
 $grfx->linewidth(1);
 $grfx->strokecolor('red');
@@ -834,7 +834,7 @@ makeCell(@cellLoc, @cellSize);
 $text->font($fontR, 12);
 $text->strokecolor('black');
 $text->fillcolor('black');
-$text->lead(15);
+$text->leading(15);
 
 $grfx->linewidth(1);
 $grfx->strokecolor('red');
@@ -878,7 +878,7 @@ makeCell(@cellLoc, @cellSize);
 $text->font($fontR, 12);
 $text->strokecolor('black');
 $text->fillcolor('black');
-$text->lead(15);
+$text->leading(15);
 
 $grfx->linewidth(1);
 $grfx->strokecolor('red');
@@ -922,7 +922,7 @@ makeCell(@cellLoc, @cellSize);
 $text->font($fontR, 12);
 $text->strokecolor('black');
 $text->fillcolor('black');
-$text->lead(15);
+$text->leading(15);
 
 $grfx->linewidth(1);
 $grfx->strokecolor('red');
@@ -966,7 +966,7 @@ makeCell(@cellLoc, @cellSize);
 $text->font($fontR, 12);
 $text->strokecolor('black');
 $text->fillcolor('black');
-$text->lead(15);
+$text->leading(15);
 
 $grfx->linewidth(1);
 $grfx->strokecolor('red');
@@ -1011,7 +1011,7 @@ makeCell(@cellLoc, @cellSize);
 $text->font($fontR, 12);
 $text->strokecolor('black');
 $text->fillcolor('black');
-$text->lead(15);
+$text->leading(15);
 
 #my $f1 = $pdf->corefont('Helvetica', -encode=>'latin1');
 my $f2 = $pdf->corefont('Helvetica-Bold', -encode=>'latin1');
@@ -1118,7 +1118,7 @@ makeCell(@cellLoc, @cellSize);
 $text->font($fontR, 12);
 $text->strokecolor('black');
 $text->fillcolor('black');
-$text->lead(15);
+$text->leading(15);
 
 $grfx->linewidth(1);
 $grfx->strokecolor('red');
@@ -1153,7 +1153,7 @@ makeCell(@cellLoc, @cellSize);
 $text->font($fontR, 12);
 $text->strokecolor('black');
 $text->fillcolor('black');
-$text->lead(15);
+$text->leading(15);
 
 $grfx->linewidth(1);
 $grfx->strokecolor('red');
@@ -1188,7 +1188,7 @@ makeCell(@cellLoc, @cellSize);
 $text->font($fontR, 12);
 $text->strokecolor('black');
 $text->fillcolor('black');
-$text->lead(15);
+$text->leading(15);
 
 $grfx->linewidth(1);
 $grfx->strokecolor('red');
@@ -1222,7 +1222,7 @@ makeCell(@cellLoc, @cellSize);
 $text->font($fontR, 12);
 $text->strokecolor('black');
 $text->fillcolor('black');
-$text->lead(15);
+$text->leading(15);
 
 $grfx->linewidth(1);
 $grfx->strokecolor('red');
@@ -1257,7 +1257,7 @@ makeCell(@cellLoc, @cellSize);
 $text->font($fontR, 12);
 $text->strokecolor('black');
 $text->fillcolor('black');
-$text->lead(15);
+$text->leading(15);
 
 $grfx->linewidth(1);
 $grfx->strokecolor('red');
@@ -1292,7 +1292,7 @@ makeCell(@cellLoc, @cellSize);
 $text->font($fontR, 12);
 $text->strokecolor('black');
 $text->fillcolor('black');
-$text->lead(15);
+$text->leading(15);
 
 $grfx->linewidth(1);
 $grfx->strokecolor('red');
@@ -1327,7 +1327,7 @@ makeCell(@cellLoc, @cellSize);
 $text->font($fontR, 12);
 $text->strokecolor('black');
 $text->fillcolor('black');
-$text->lead(15);
+$text->leading(15);
 
 $grfx->linewidth(1);
 $grfx->strokecolor('red');
@@ -1358,7 +1358,7 @@ makeCell(@cellLoc, @cellSize);
 $text->font($fontR, 12);
 $text->strokecolor('black');
 $text->fillcolor('black');
-$text->lead(15);
+$text->leading(15);
 
 $grfx->linewidth(1);
 $grfx->strokecolor('red');

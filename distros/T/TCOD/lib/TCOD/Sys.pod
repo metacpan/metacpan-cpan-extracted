@@ -1,0 +1,217 @@
+=encoding UTF-8
+
+=head1 NAME
+
+TCOD::Sys - System functions for TCOD
+
+=head1 SYNOPSIS
+
+    use TCOD;
+
+    ...
+
+=head1 DESCRIPTION
+
+Handle events in TCOD applications.
+
+=head1 FUNCTIONS
+
+=head2 set_fps
+
+    TCOD::Sys::set_fps( $fps );
+
+The C<set_fps> function allows you to limit the number of frames per second.
+If a frame is rendered faster than expected, the TCOD_console_flush function
+will wait so that the frame rate never exceed this value.
+
+You can call this function during your game initialisation.
+
+You can dynamically change the frame rate. Just call this function once again.
+
+B<You should always limit the frame rate, except during benchmarks, else your
+game will use 100% of the CPU power>.
+
+=head2 get_fps
+
+    $fps = TCOD::Sys::get_fps;
+
+The value returned by this function is updated every second.
+
+=head2 get_last_frame_length
+
+    $seconds = TCOD::Sys::get_last_frame_length;
+
+This function returns the length in seconds of the last rendered frame.
+You can use this value to update every time dependent object in the world.
+
+=head2 sleep_milli
+
+    TCOD::Sys::sleep_milli( $milliseconds );
+
+Use this function to stop the program execution for a specified number
+of milliseconds.
+
+=head2 elapsed_milli
+
+    $milliseconds = TCOD::Sys::elapsed_milli;
+
+This function returns the number of milliseconds since the program has
+started.
+
+=head2 elapsed_seconds
+
+    $seconds = TCOD::Sys::elapsed_seconds;
+
+This function returns the number of seconds since the program has started.
+
+=head2 save_screenshot
+
+    TCOD::Sys::save_screenshot( $path );
+
+This function allows you to save the current game screen in a PNG file, or
+possibly a BMP file if you provide a filename ending with C<.bmp>.
+
+=head2 update_char
+
+    TCOD::Sys::update_char( $code, $x, $y, $image, $x, $y );
+
+You can dynamically change the bitmap of a character in the font. All cells
+using this ASCII code will be updated at next flush call.
+
+=head2 set_renderer
+
+    TCOD::Sys::set_renderer( $renderer );
+
+As of 1.5.1, libtcod contains 3 different renderers:
+
+=over
+
+=item * SDL
+
+Historic libtcod renderer. Should work and be pretty fast everywhere
+
+=item * OpenGL
+
+Requires OpenGL compatible video card. Might be much faster or much slower
+than SDL, depending on the drivers
+
+=item * GLSDL
+
+Requires OpenGL 1.4 compatible video card with C<GL_ARB_shader_objects>
+extension. Blazing fast if you have the proper hardware and drivers.
+
+=back
+
+This function switches the current renderer dynamically. The value in
+C<$renderer> must be an element of the L<Renderer|TCOD/Renderer> enum.
+
+=head2 get_renderer
+
+    $renderer = TCOD::Sys::get_renderer;
+
+Get the internal renderer. This will be an element of the
+L<Renderer|TCOD/Renderer> enum.
+
+=head2 get_char_size
+
+    ( $w, $h ) = TCOD::Sys::get_char_size;
+
+You can get the size in pixels of the characters in the font.
+
+=head2 get_current_resolution
+
+    ( $w, $h ) = TCOD::Sys::get_current_resolution;
+
+You can get the current screen resolution with
+L<get_current_resolution|/get_current_resolution>.
+
+You can use it for example to get the desktop resolution before initialising
+the root console.
+
+=head2 force_fullscreen_resolution
+
+    TCOD::Sys::force_fullscreen_resolution( $width, $height );
+
+This function allows you to force the use of a specific resolution in
+fullscreen mode. The default resolution depends on the root console size
+and the font character size.
+
+=head2 get_directory_contents
+
+    @filenames = TCOD::Sys::get_directory_contents( $path );
+
+Returns a list of the contents of a directory (including files and
+subdirectories), not including C<.> and C<..>. Will die with an error message
+if the operation fails.
+
+This function is implemented here for compatibility. Standard Perl solutions
+are probably preferable.
+
+=head2 wait_for_event
+
+    # Deprecated
+    TCOD::Sys::wait_for_event( $mask, \$key, \$mouse, $flush );
+
+This function waits for an event from the user. The C<$mask> shows what
+events we're waiting for. The return value indicate what event was actually
+triggered. Values in key and mouse structures are updated accordingly.
+
+If flush is false, the function waits only if there are no pending events,
+else it returns the first event in the buffer.
+
+This function is deprecated. Use C<SDL_WaitEvent> from SDL instead.
+
+=head2 check_for_event
+
+    # Deprecated
+    $event = TCOD::Sys::check_for_event( $mask, \$key, \$mouse );
+
+This function checks if an event from the user is in the buffer. The
+C<$mask> shows what events we're waiting for. The return value indicates what
+event was actually found. Values in key and mouse structures are updated
+accordingly.
+
+This function is deprecated. Use C<SDL_PollEvent> from SDL instead.
+
+=head2 clipboard_set
+
+    # Deprecated
+    $bool = TCOD::Sys::clipboard_set( $contents );
+
+Takes UTF-8 text and copies it into the system clipboard. On Linux, because
+an application cannot access the system clipboard unless a window is open,
+if no window is open the call will do nothing.
+
+This function is deprecated. Use SDL2 to handle the clipboard.
+
+=head2 clipboard_get
+
+    # Deprecated
+    $contents = TCOD::Sys::clipboard_get;
+
+Returns the UTF-8 text currently in the system clipboard. On Linux, because
+an application cannot access the system clipboard unless a window is open,
+if no window is open an empty string will be returned.
+
+This function is deprecated. Use SDL2 to handle the clipboard.
+
+=head1 SEE ALSO
+
+=over
+
+=item L<TCOD>
+
+=item L<TCOD::Console>
+
+=item L<TCOD::Key>
+
+=item L<TCOD::Mouse>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2021 José Joaquín Atria
+
+This library is free software; you can redistribute it and/or modify it under
+the Artistic License 2.0.

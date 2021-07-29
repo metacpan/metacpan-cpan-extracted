@@ -15,23 +15,23 @@ my $mockfio = Test::Future::IO->controller;
 
 my $updi = Device::AVR::UPDI->new( fh => MockFH->new, part => "ATtiny814" );
 # can't easily ->init_link without upsetting $mockfio
-$updi->{nvm_version} = "P:2";
+$updi->_set_nvm_version( 2 );
 
 # write_fuse
 {
    # NVMCTRL mode set write
-   $mockfio->expect_syswrite_anyfh( "\x55\x44\x00\x10" );
-   $mockfio->expect_sysread_anyfh( 5 )
-      ->returns( "\x55\x44\x00\x10" . "\x40" );
+   $mockfio->expect_syswrite_anyfh( "\x55\x48\x00\x10\x00" );
+   $mockfio->expect_sysread_anyfh( 6 )
+      ->returns( "\x55\x48\x00\x10\x00" . "\x40" );
    $mockfio->expect_sleep( 0.1 );
    $mockfio->expect_syswrite_anyfh( "\x13" );
    $mockfio->expect_sysread_anyfh( 2 )
       ->returns( "\x13" . "\x40" );
    $mockfio->expect_sleep( 0.1 );
    # Write actual data
-   $mockfio->expect_syswrite_anyfh( "\x55\x69\x85\x12" );
-   $mockfio->expect_sysread_anyfh( 5 )
-      ->returns( "\x55\x69\x85\x12" . "\x40" );
+   $mockfio->expect_syswrite_anyfh( "\x55\x6A\x85\x12\x00" );
+   $mockfio->expect_sysread_anyfh( 6 )
+      ->returns( "\x55\x6A\x85\x12\x00" . "\x40" );
    $mockfio->expect_sleep( 0.1 );
    $mockfio->expect_syswrite_anyfh( "\x55\x64" );
    $mockfio->expect_sysread_anyfh( 2 )
@@ -42,23 +42,23 @@ $updi->{nvm_version} = "P:2";
       ->returns( "\xC8" . "\x40" );
    $mockfio->expect_sleep( 0.1 );
    # NVMCTRL read status
-   $mockfio->expect_syswrite_anyfh( "\x55\x04\x02\x10" );
-   $mockfio->expect_sysread_anyfh( 5 )
-      ->returns( "\x55\x04\x02\x10" . "\x00" );
+   $mockfio->expect_syswrite_anyfh( "\x55\x08\x02\x10\x00" );
+   $mockfio->expect_sysread_anyfh( 6 )
+      ->returns( "\x55\x08\x02\x10\x00" . "\x00" );
    $mockfio->expect_sleep( 0.1 );
    # NVMCTRL mode clear
-   $mockfio->expect_syswrite_anyfh( "\x55\x44\x00\x10" );
-   $mockfio->expect_sysread_anyfh( 5 )
-      ->returns( "\x55\x44\x00\x10" . "\x40" );
+   $mockfio->expect_syswrite_anyfh( "\x55\x48\x00\x10\x00" );
+   $mockfio->expect_sysread_anyfh( 6 )
+      ->returns( "\x55\x48\x00\x10\x00" . "\x40" );
    $mockfio->expect_sleep( 0.1 );
    $mockfio->expect_syswrite_anyfh( "\x00" );
    $mockfio->expect_sysread_anyfh( 2 )
       ->returns( "\x00" . "\x40" );
    $mockfio->expect_sleep( 0.1 );
    # NVMCTRL read status
-   $mockfio->expect_syswrite_anyfh( "\x55\x04\x02\x10" );
-   $mockfio->expect_sysread_anyfh( 5 )
-      ->returns( "\x55\x04\x02\x10" . "\x00" );
+   $mockfio->expect_syswrite_anyfh( "\x55\x08\x02\x10\x00" );
+   $mockfio->expect_sysread_anyfh( 6 )
+      ->returns( "\x55\x08\x02\x10\x00" . "\x00" );
    $mockfio->expect_sleep( 0.1 );
 
    $updi->write_fuse( 5, 0xC8 )->get;

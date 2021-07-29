@@ -149,6 +149,18 @@ You want to import only the ones you need.
 
 =back
 
+=item :MONITORINGMODE
+
+=over 8
+
+=item MONITORINGMODE_DISABLED
+
+=item MONITORINGMODE_SAMPLING
+
+=item MONITORINGMODE_REPORTING
+
+=back
+
 =item :NODECLASS
 
 =over 8
@@ -22112,6 +22124,22 @@ You want to import only the ones you need.
 =item STATUSCODE_BADSYNTAXERROR
 
 =item STATUSCODE_BADMAXCONNECTIONSREACHED
+
+=back
+
+=item :TIMESTAMPSTORETURN
+
+=over 8
+
+=item TIMESTAMPSTORETURN_SOURCE
+
+=item TIMESTAMPSTORETURN_SERVER
+
+=item TIMESTAMPSTORETURN_BOTH
+
+=item TIMESTAMPSTORETURN_NEITHER
+
+=item TIMESTAMPSTORETURN_INVALID
 
 =back
 

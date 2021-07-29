@@ -17,6 +17,7 @@ use Modern::Perl;
 use Test::More;
 use File::Slurper qw(write_text write_binary read_binary);
 
+our @config = ('# empty config file');
 our $host;
 our $port;
 our $base;

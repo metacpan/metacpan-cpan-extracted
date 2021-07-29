@@ -1,9 +1,9 @@
 package Sah::SchemaR::sah::schema_modname;
 
-our $DATE = '2020-05-08'; # DATE
-our $VERSION = '0.9.49.1'; # VERSION
+our $DATE = '2021-07-23'; # DATE
+our $VERSION = '0.9.50.0'; # VERSION
 
-our $rschema = ["str",[{description=>"\nPerl module name, e.g. `Foo`, `Foo::Bar`.\n\nContains coercion rule so you can also input `Foo-Bar`, `Foo/Bar`, or\n`Foo/Bar.pm` and it will be normalized into `Foo::Bar`.\n\nSee also: `perl::modargs`.\n\n",match=>"\\A[A-Za-z_][A-Za-z_0-9]*(::[A-Za-z_0-9]+)*\\z",summary=>"Perl module name","x.completion"=>"perl_modname","x.perl.coerce_rules"=>["From_str::normalize_perl_modname"]},{summary=>"Name of a Sah::Schema::* module, without the prefix","x.completion"=>["perl_modname",{ns_prefix=>"Sah::Schema"}]}],["perl::modname","str"]];
+our $rschema = ["str",[{description=>"\nThis is a schema you can use when you want to accept a Perl module name. It\noffers basic checking of syntax as well as a couple of conveniences. First, it\noffers completion from list of locally installed Perl modules. Second, it\ncontains coercion rule so you can also input `Foo-Bar`, `Foo/Bar`, `Foo/Bar.pm`\nor even 'Foo.Bar' and it will be normalized into `Foo::Bar`.\n\nTo see this schema in action on the CLI, you can try e.g. the `pmless` script\nfrom <pm:App::PMUtils> and activate its tab completion (see its manpage for more\ndetails). Then on the CLI try typing:\n\n    % pmless M/<tab>\n    % pmless dzp/<tab>\n    % pmless Module/List/Wildcard\n    % pmless Module::List::Wildcard\n\nNote that this schema does not check that the Perl module exists or is installed\nlocally. To check that, use the `perl::modname::installed` schema. And there's\nalso a `perl::modname::not_installed` schema.\n\n",examples=>[{valid=>0,value=>""},{valid=>1,value=>"Foo::Bar"},{valid=>1,validated_value=>"Foo::Bar",value=>"Foo-Bar"},{valid=>1,validated_value=>"Foo::Bar",value=>"Foo/Bar"},{valid=>1,validated_value=>"Foo::Bar",value=>"Foo/Bar.pm"},{valid=>1,validated_value=>"Foo::Bar",value=>"Foo.Bar"},{valid=>0,value=>"Foo|Bar"}],match=>"\\A(?:[A-Za-z_][A-Za-z_0-9]*(::[A-Za-z_0-9]+)*)\\z",prefilters=>["Perl::normalize_perl_modname"],summary=>"Perl module name, e.g. Foo::Bar","x.completion"=>"perl_modname"},{summary=>"Name of a Sah::Schema::* module, without the prefix","x.completion"=>["perl_modname",{ns_prefix=>"Sah::Schema"}]}],["perl::modname","str"]];
 
 1;
 # ABSTRACT: Name of a Sah::Schema::* module, without the prefix
@@ -20,7 +20,7 @@ Sah::SchemaR::sah::schema_modname - Name of a Sah::Schema::* module, without the
 
 =head1 VERSION
 
-This document describes version 0.9.49.1 of Sah::SchemaR::sah::schema_modname (from Perl distribution Sah-Schemas-Sah), released on 2020-05-08.
+This document describes version 0.9.50.0 of Sah::SchemaR::sah::schema_modname (from Perl distribution Sah-Schemas-Sah), released on 2021-07-23.
 
 =head1 DESCRIPTION
 
@@ -50,7 +50,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

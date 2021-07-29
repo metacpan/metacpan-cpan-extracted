@@ -1,5 +1,14 @@
 Revision history for Perl extension Mojolicious-Plugin-Model
 
+0.13 2021-07-12T15:34:48Z
+
+    - Fixed detection of default namespaces for windows. (lucas1)
+
+0.12 2021-07-11T08:20:12Z
+
+    - Improved detection of default namespaces. (lucas1)
+    - Move to GitHub Actions from Travis CI.
+
 0.11 2017-12-12T04:24:32Z
     - Fixed dependency.
 
@@ -19,7 +28,7 @@ Revision history for Perl extension Mojolicious-Plugin-Model
 
 0.06 2016-01-16T15:39:55Z
     - Added support of using models as general objects, not only as singleton
-      with static methods. (Logioniz)
+      with static methods. (logioniz)
 
 0.05 2015-08-08T10:16:02Z
     - Added support of model parameters. (dionys, avkhozov)

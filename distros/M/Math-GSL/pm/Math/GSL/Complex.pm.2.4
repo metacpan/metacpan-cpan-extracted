@@ -120,45 +120,6 @@ package Math::GSL::Complex;
 *doubleArray_getitem = *Math::GSL::Complexc::doubleArray_getitem;
 *doubleArray_setitem = *Math::GSL::Complexc::doubleArray_setitem;
 
-############# Class : Math::GSL::Complex::gsl_complex_long_double ##############
-
-package Math::GSL::Complex::gsl_complex_long_double;
-use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
-@ISA = qw( Math::GSL::Complex );
-%OWNER = ();
-%ITERATORS = ();
-*swig_dat_get = *Math::GSL::Complexc::gsl_complex_long_double_dat_get;
-*swig_dat_set = *Math::GSL::Complexc::gsl_complex_long_double_dat_set;
-sub new {
-    my $pkg = shift;
-    my $self = Math::GSL::Complexc::new_gsl_complex_long_double(@_);
-    bless $self, $pkg if defined($self);
-}
-
-sub DESTROY {
-    return unless $_[0]->isa('HASH');
-    my $self = tied(%{$_[0]});
-    return unless defined $self;
-    delete $ITERATORS{$self};
-    if (exists $OWNER{$self}) {
-        Math::GSL::Complexc::delete_gsl_complex_long_double($self);
-        delete $OWNER{$self};
-    }
-}
-
-sub DISOWN {
-    my $self = shift;
-    my $ptr = tied(%$self);
-    delete $OWNER{$ptr};
-}
-
-sub ACQUIRE {
-    my $self = shift;
-    my $ptr = tied(%$self);
-    $OWNER{$ptr} = 1;
-}
-
-
 ############# Class : Math::GSL::Complex::gsl_complex ##############
 
 package Math::GSL::Complex::gsl_complex;
@@ -181,6 +142,45 @@ sub DESTROY {
     delete $ITERATORS{$self};
     if (exists $OWNER{$self}) {
         Math::GSL::Complexc::delete_gsl_complex($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : Math::GSL::Complex::gsl_complex_long_double ##############
+
+package Math::GSL::Complex::gsl_complex_long_double;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( Math::GSL::Complex );
+%OWNER = ();
+%ITERATORS = ();
+*swig_dat_get = *Math::GSL::Complexc::gsl_complex_long_double_dat_get;
+*swig_dat_set = *Math::GSL::Complexc::gsl_complex_long_double_dat_set;
+sub new {
+    my $pkg = shift;
+    my $self = Math::GSL::Complexc::new_gsl_complex_long_double(@_);
+    bless $self, $pkg if defined($self);
+}
+
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        Math::GSL::Complexc::delete_gsl_complex_long_double($self);
         delete $OWNER{$self};
     }
 }
@@ -806,7 +806,7 @@ Jonathan "Duke" Leto <jonathan@leto.net> and Thierry Moisan <thierry.moisan@gmai
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2008-2020 Jonathan "Duke" Leto and Thierry Moisan
+Copyright (C) 2008-2021 Jonathan "Duke" Leto and Thierry Moisan
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

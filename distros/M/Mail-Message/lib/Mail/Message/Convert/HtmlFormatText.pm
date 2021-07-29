@@ -1,4 +1,4 @@
-# Copyrights 2001-2020 by [Mark Overmeer <markov@cpan.org>].
+# Copyrights 2001-2021 by [Mark Overmeer <markov@cpan.org>].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.02.
@@ -8,7 +8,7 @@
 
 package Mail::Message::Convert::HtmlFormatText;
 use vars '$VERSION';
-$VERSION = '3.010';
+$VERSION = '3.011';
 
 use base 'Mail::Message::Convert';
 
@@ -27,9 +27,9 @@ sub init($)
     $self->SUPER::init($args);
 
     $self->{MMCH_formatter} = HTML::FormatText->new
-     ( leftmargin  => (defined $args->{leftmargin}  ? $args->{leftmargin}  : 3)
-     , rightmargin => (defined $args->{rightmargin} ? $args->{rightmargin} : 72)
-     );
+      ( leftmargin  => $args->{leftmargin}  //  3,
+      , rightmargin => $args->{rightmargin} // 72,
+      );
       
     $self;
 }

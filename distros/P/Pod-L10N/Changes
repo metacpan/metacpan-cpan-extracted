@@ -1,5 +1,16 @@
 Revision history for Perl module Pod::L10N
 
+1.05 2021-07-21T14:23:56Z
+
+	- fix test failure on Pod::Simple older than 3.28
+	- ban some buggy versions of Pod::Simple
+	- minor pod fix
+
+1.04 2021-07-19T07:26:59Z
+
+	- upgrade base version to 1.2202
+	- change not to use outer namespaces
+
 1.03 2015-01-23T19:57:50Z
 
 	- fix substhead.t

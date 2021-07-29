@@ -18,15 +18,15 @@ App::lcpan::Manual::Tutorial::700_SettingUpADarkPAN - Setting up a DarkPAN mirro
 
 =head1 VERSION
 
-version 1.058.000
+version 1.062.000
 
 =head1 DESCRIPTION
 
 A DarkPAN is a term to refer to a CPAN-like directory structure which contains
 regular CPAN modules plus some of your own private modules, or perhaps purely
-your own module only. It can be available over the Internet, but often not at
-all (hence the term "dark"). The use of CPAN-like directory makes it possible to
-use existing toolchain used for CPAN, including installer like
+your own modules only. It can be available over the public Internet, but often
+not at all (hence the term "dark"). The use of CPAN-like directory makes it
+possible to use existing toolchain used for CPAN, including installer like
 L<cpanm|App::cpanminus>.
 
 =head1 SETTING UP YOUR DARKPAN
@@ -52,7 +52,7 @@ distribution.
 B<However, the next 'lcpan update' will again remove your distribution from the
 index as lcpan will synchronize to the remote CPAN index>. Either you never
 update the CPAN mirror, or you re-inject your distributions after every 'lcpan
-update', both of which are not convenient. The future lcpan version will add a
+update'; both of which are not convenient. The future lcpan version will add a
 pinning mechanism to retain your injected distribution and when that version is
 released this page will be updated accordingly.
 
@@ -113,7 +113,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

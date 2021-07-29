@@ -12,7 +12,7 @@ use Path::Class qw( tempdir );
 extends 'AnyEvent::FTP::Server';
 
 # ABSTRACT: Test (non-blocking) ftp clients against a real FTP server
-our $VERSION = '0.16'; # VERSION
+our $VERSION = '0.17'; # VERSION
 
 
 has test_uri => (
@@ -68,57 +68,57 @@ has _client => (
 sub create_ftpserver_ok (;$$)
 {
   my($context, $message) = @_;
-  
+
   my $ctx = context();
 
   my $uri = URI->new("ftp://127.0.0.1");
-  
+
   $context //= 'Memory';
   $context = "AnyEvent::FTP::Server::Context::$context"
     unless $context =~ /::/;
   my $name = (split /::/, $context)[-1];
-  
+
   my $user = join '', map { chr(ord('a') + int rand(26)) } (1..10);
   my $pass = join '', map { chr(ord('a') + int rand(26)) } (1..10);
   $uri->userinfo(join(':', $user, $pass));
-  
+
   my $server;
-  eval { 
+  eval {
     $server = Test::AnyEventFTPServer->new(
       default_context => $context,
       hostname        => '127.0.0.1',
       port            => undef,
       test_uri        => $uri,
     );
-    
+
     if($ENV{AEF_DEBUG})
     {
       $server->on_connect(sub {
         my $con = shift;
         $ctx->note("CONNECT");
-        
+
         $con->on_request(sub {
           my $raw = shift;
           $ctx->note("CLIENT: $raw");
         });
-        
+
         $con->on_response(sub {
           my $raw = shift;
           $ctx->note("SERVER: $raw");
         });
-        
+
         $con->on_close(sub {
           $ctx->note("DISCONNECT");
         });
       });
     }
-    
+
     $server->on_connect(sub {
       shift->context->authenticator(sub {
         return $_[0] eq $user && $_[1] eq $pass;
       });
     });
-    
+
     my $cv = AnyEvent->condvar;
     my $timer = AnyEvent->timer(
       after => 5,
@@ -132,13 +132,13 @@ sub create_ftpserver_ok (;$$)
     $cv->recv;
   };
   my $error = $@;
-  
+
   $message //= "created FTP ($name) server at $uri";
 
   $ctx->ok($error eq '', $message);
   $ctx->diag($error) if $error;
   $ctx->release;
-  
+
   $server;
 }
 
@@ -168,14 +168,14 @@ sub connect_ftpclient_ok
     $cv->recv;
   };
   my $error = $@;
-  
+
   $message //= "connected to FTP server at " . $self->test_uri;
-  
+
   my $ctx = context();
   $ctx->ok($error eq '', $message);
-  $ctx->diag($error) if $error;  
+  $ctx->diag($error) if $error;
   $ctx->release;
-  
+
   $client;
 }
 
@@ -183,14 +183,14 @@ sub connect_ftpclient_ok
 sub help_coverage_ok
 {
   my($self, $class, $message) = @_;
-  
+
   $class //= $self->default_context;
-  
+
   my @missing;
 
   my $client = eval { $self->_client };
   my $error = $@;
-  
+
   my $count = 0;
   unless($error)
   {
@@ -207,7 +207,7 @@ sub help_coverage_ok
   my $ctx = context();
   $ctx->ok($error eq '' && @missing == 0, $message);
   $ctx->diag($error) if $error;
-  $ctx->diag("commands missing help: @missing") if @missing; 
+  $ctx->diag("commands missing help: @missing") if @missing;
   $ctx->diag("didn't find ANY commands for class: $class")
     if $count == 0;
   $ctx->release;
@@ -219,10 +219,10 @@ sub help_coverage_ok
 sub command_ok
 {
   my($self, $command, $args, $message) = @_;
-  
+
   my $client = eval { $self->_client };
   my $error = $@;
-  
+
   unless($error)
   {
     my $res = (eval { $client->push_command([$command, $args])->recv } || $@);
@@ -231,14 +231,14 @@ sub command_ok
     else
     { $error = $res; $self->res(undef) }
   }
-  
+
   $message //= "command: $command";
-  
+
   my $ctx = context();
   $ctx->ok($error eq '', $message);
   $ctx->diag($error) if $error;
   $ctx->release;
-  
+
   $self;
 }
 
@@ -246,51 +246,51 @@ sub command_ok
 sub code_is
 {
   my($self, $code, $message) = @_;
-  
+
   $message //= "response code is $code";
-  
+
   my $ctx = context();
   my $actual = eval { $self->res->code } // 'undefined';
   $ctx->ok($actual == $code, $message);
   $ctx->diag("actual code returned is $actual")
     unless $actual == $code;
   $ctx->release;
-  
-  $self;  
+
+  $self;
 }
 
 
 sub code_like
 {
   my($self, $regex, $message) = @_;
-  
+
   $message //= "response code matches";
-  
+
   my $ctx = context();
   my $actual = eval { $self->res->code } // 'undefined';
   $ctx->ok($actual =~ $regex, $message);
   $ctx->diag("code $actual does not match $regex")
     unless $actual =~ $regex;
   $ctx->release;
-  
-  $self;  
+
+  $self;
 }
 
 
 sub message_like
 {
   my($self, $regex, $message) = @_;
-  
+
   $message //= "response message matches";
-  
+
   my $ok = 0;
-  
+
   my @message = @{ (eval { $self->res->message }) // [] };
   foreach my $line (@message)
   {
     $ok = 1 if $line =~ $regex;
   }
-  
+
   my $ctx = context();
   $ctx->ok($ok, $message);
   unless($ok)
@@ -300,7 +300,7 @@ sub message_like
     $ctx->diag("does not match $regex");
   }
   $ctx->release;
-  
+
   $self;
 }
 
@@ -308,18 +308,18 @@ sub message_like
 sub message_is
 {
   my($self, $string, $message) = @_;
-  
+
   $message //= "response message matches";
-  
+
   my $ok = 0;
-  
+
   my @message = @{ (eval { $self->res->message }) // [] };
-  
+
   foreach my $line (@message)
   {
     $ok = 1 if $line eq $string;
   }
-  
+
   my $ctx = context();
   $ctx->ok($ok, $message);
   unless($ok)
@@ -329,7 +329,7 @@ sub message_is
     $ctx->diag("does not match $string");
   }
   $ctx->release;
-  
+
   $self;
 }
 
@@ -337,26 +337,26 @@ sub message_is
 sub list_ok
 {
   my($self, $location, $message) = @_;
-  
+
   $message //= defined $location ? "list: $location" : 'list';
-  
+
   my $client = eval { $self->_client };
   my $error = $@;
-  
+
   $self->content('');
-  
+
   unless($error)
   {
     my $list = eval { $client->list($location)->recv };
     $error = $@;
     $self->content(join "\n", @$list, '') unless $error;
   }
-  
+
   my $ctx = context();
   $ctx->ok($error eq '', $message);
   $ctx->diag($error) if $error;
   $ctx->release;
-  
+
   $self;
 }
 
@@ -364,26 +364,26 @@ sub list_ok
 sub nlst_ok
 {
   my($self, $location, $message) = @_;
-  
+
   $message //= defined $location ? "nlst: $location" : 'nlst';
-  
+
   my $client = eval { $self->_client };
   my $error = $@;
-  
+
   $self->content('');
-  
+
   unless($error)
   {
     my $list = eval { $client->nlst($location)->recv };
     $error = $@;
     $self->content(join "\n", @$list, '') unless $error;
   }
-  
+
   my $ctx = context();
   $ctx->ok($error eq '', $message);
   $ctx->diag($error) if $error;
   $ctx->release;
-  
+
   $self;
 }
 
@@ -394,17 +394,17 @@ sub _display_content
   state $counter = 0;
   my $method = 'diag';
   #$method = 'note' if $tb->todo;
-  
+
   unless(defined $temp)
   {
     $temp = tempdir(CLEANUP => 1);
   }
-  
+
   my $file = $temp->file(sprintf("data.%d", $counter++));
   $file->spew($_[0]);
-  
+
   my $ctx = context();
-  
+
   if(-T $file)
   {
     $ctx->$method("  $_") for split /\n/, $_[0];
@@ -420,20 +420,20 @@ sub _display_content
       $ctx->$method("  binary content");
     }
   }
-  
+
   $ctx->release;
-  
+
   $file->remove;
 }
 
 sub content_is
 {
   my($self, $string, $message) = @_;
-  
+
   $message ||= 'content matches';
-  
+
   my $ok = $self->content eq $string;
-  
+
   my $ctx = context();
   $ctx->ok($ok, $message);
   unless($ok)
@@ -443,9 +443,9 @@ sub content_is
     $ctx->diag("expected:");
     _display_content($string);
   }
-  
+
   $ctx->release;
-  
+
   $self;
 }
 
@@ -453,10 +453,10 @@ sub content_is
 sub global_timeout_ok (;$$)
 {
   my($timeout, $message) = @_;
-  
+
   $timeout //= 120;
   $message //= "global timeout of $timeout seconds";
-  
+
   my $ctx = context();
 
   state $timers = [];
@@ -468,14 +468,14 @@ sub global_timeout_ok (;$$)
     );
   };
   my $error = $@;
-  
+
   my $ok = $error eq '';
-  
+
   $ctx->ok($ok, $message);
   $ctx->diag($error) if $error;
-  
+
   $ctx->release;
-  
+
   $ok;
 }
 
@@ -503,7 +503,7 @@ Test::AnyEventFTPServer - Test (non-blocking) ftp clients against a real FTP ser
 
 =head1 VERSION
 
-version 0.16
+version 0.17
 
 =head1 SYNOPSIS
 
@@ -535,7 +535,7 @@ version 0.16
 
 =head1 DESCRIPTION
 
-This module makes it easy to test ftp clients against a real 
+This module makes it easy to test ftp clients against a real
 L<AnyEvent::FTP> FTP server.  The FTP server is non-blocking in
 and does not C<fork>, so if you are testing a FTP client that
 blocks then you will need to do it in a separate process.
@@ -612,7 +612,7 @@ context roles.
  $test_command->command_ok( $command, $arguments );
  $test_command->command_ok( $command, $arguments, $test_name );
 
-Execute the given command with the given arguments on the 
+Execute the given command with the given arguments on the
 remote server.  Fails only if a valid FTP response is not
 returned from the server (even error responses are okay).
 
@@ -668,7 +668,7 @@ the given string.
 
 Execute a the C<LIST> command on the given C<$location>
 and wait for the results.  You can see the result using
-the C<content> attribute or test it with the C<content_is> 
+the C<content> attribute or test it with the C<content_is>
 method.
 
 =head2 nlst_ok
@@ -679,7 +679,7 @@ method.
 
 Execute a the C<NLST> command on the given C<$location>
 and wait for the results.  You can see the result using
-the C<content> attribute or test it with the C<content_is> 
+the C<content> attribute or test it with the C<content_is>
 method.
 
 =head2 content_is
@@ -716,7 +716,7 @@ José Joaquín Atria
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Graham Ollis.
+This software is copyright (c) 2017-2021 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

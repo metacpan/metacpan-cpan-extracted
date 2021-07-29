@@ -15,7 +15,7 @@ use warnings;
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/Sah/Schema/hexstr.pm','lib/Sah/Schema/latin_alpha.pm','lib/Sah/Schema/latin_alphanum.pm','lib/Sah/Schema/latin_letter.pm','lib/Sah/SchemaR/hexstr.pm','lib/Sah/SchemaR/latin_alpha.pm','lib/Sah/SchemaR/latin_alphanum.pm','lib/Sah/SchemaR/latin_letter.pm','lib/Sah/Schemas/Str.pm'];
+my $filenames = ['lib/Sah/Schema/hexstr.pm','lib/Sah/Schema/latin_alpha.pm','lib/Sah/Schema/latin_alphanum.pm','lib/Sah/Schema/latin_letter.pm','lib/Sah/Schema/str_or_aos.pm','lib/Sah/Schema/str_or_aos1.pm','lib/Sah/SchemaR/hexstr.pm','lib/Sah/SchemaR/latin_alpha.pm','lib/Sah/SchemaR/latin_alphanum.pm','lib/Sah/SchemaR/latin_letter.pm','lib/Sah/SchemaR/str_or_aos.pm','lib/Sah/SchemaR/str_or_aos1.pm','lib/Sah/Schemas/Str.pm'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

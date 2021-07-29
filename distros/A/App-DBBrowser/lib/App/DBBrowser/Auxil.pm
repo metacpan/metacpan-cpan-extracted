@@ -124,7 +124,7 @@ sub get_stmt {
             my $stmt = "SELECT " . join( ', ', @{$ref->[1]} );
             $stmt .= " FROM " . $ref->[0];
             if ( $count < @{$sql->{subselect_data}} ) {
-                $stmt .= " UNION ALL ";
+                $stmt .= " UNION ALL";
             }
             push @tmp, $sf->__stmt_fold( $stmt, $term_w, $indent1 );
         }
@@ -185,9 +185,11 @@ sub info_format_insert_args {
 sub __prepare_table_row {
     my ( $sf, $row, $indent, $term_w ) = @_;
     my $list_sep = ', ';
+    my $dots = $sf->{i}{dots}[ $sf->{o}{G}{dots} ];
+    my $dots_w = print_columns( $dots );
     no warnings 'uninitialized';
     my $row_str = join( $list_sep, map { s/\t/  /g; s/\n/[NL]/g; s/\v/[VWS]/g; $_ } @$row );
-    return unicode_sprintf( $indent . $row_str, $term_w, { mark_if_truncated => $sf->{i}{dots}[ $sf->{o}{G}{dots} ] } );
+    return unicode_sprintf( $indent . $row_str, $term_w, { mark_if_truncated => [ $dots, $dots_w ] } );
 }
 
 
@@ -440,7 +442,6 @@ sub read_json {
     }
     return $ref;
 }
-
 
 
 

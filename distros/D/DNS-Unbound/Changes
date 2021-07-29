@@ -1,5 +1,9 @@
 Revision history for Perl module DNS::Unbound
 
+0.24 Tue, 27 Jul 2021
+- BUG FIX: Several memory leaks from errantly-high reference counts.
+- Various tweaks for efficiency: pre-extend arrays, etc.
+
 0.23 Tue, 1 Jun 2021
 - Make unbound_version() a regular XSUB rather than a constant. This avoids
   the need to recompile perlcc-compiled binaries when updating Unbound.

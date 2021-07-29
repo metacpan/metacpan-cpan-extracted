@@ -22,6 +22,12 @@ sub on_startup {
     log_info "Ready";
 }
 
+sub on_shutdown {
+    my $self = shift;
+
+    log_info "Stopped";
+}
+
 sub send_message {
     my ($self, $params) = @_;
 

@@ -1,5 +1,12 @@
-Revision history for Sah-Schemas-DefHash
+1.0.13.0  2021-07-21  Released-By: PERLANCAR; Urgency: medium
 
-1.0.11.1  2016-07-25 (PERLANCAR)
+          - Adjust to DefHash 1.0.13 (remove "LANG(PROP)" syntax).
+
+	  - Use Regexp::Pattern::DefHash.
+
+          - Add some examples.
+
+
+1.0.11.1  2016-07-25  Released-By: PERLANCAR
 
           - First release, split from DefHash.

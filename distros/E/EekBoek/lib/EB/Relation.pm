@@ -4,8 +4,8 @@
 # Author          : Johan Vromans
 # Created On      : Thu Jul 14 12:54:08 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Sat Mar  1 22:19:37 2014
-# Update Count    : 122
+# Last Modified On: Tue Apr 24 10:45:31 2018
+# Update Count    : 130
 # Status          : Unknown, Use with caution!
 
 package main;
@@ -77,12 +77,11 @@ sub add {
 	$ddesc = $desc;
     }
 
-    # There are virtually no restrictions on what can go in a relation
-    # code. Relation codes that start with digits and a dash may lead
-    # to parse errors.
-    # Except for the schema SQL this is the only place where the length
-    # constraint is explicit.
-    if ( $code =~ /^\d+-/ || length($code) > 10 ) {
+    # There are few restrictions on what can go in a relation code. A
+    # colon is disallowed since that is used to separate the code from
+    # a booking reference. Relation codes that start with digits and a
+    # dash may lead to parse errors.
+    if ( $code =~ /:/ || $code =~ /^\d+-/ ) {
 	warn("?".__x("Ongeldige relatiecode: {rel}", rel => $code)."\n");
 	return;
     }

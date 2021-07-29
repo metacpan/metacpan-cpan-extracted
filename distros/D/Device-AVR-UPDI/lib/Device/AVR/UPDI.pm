@@ -3,10 +3,11 @@
 #
 #  (C) Paul Evans, 2019-2021 -- leonerd@leonerd.org.uk
 
-package Device::AVR::UPDI 0.08;
-
 use v5.20;
-use warnings;
+use Object::Pad 0.45;
+
+package Device::AVR::UPDI 0.09;
+class Device::AVR::UPDI :repr(HASH);
 
 use Carp;
 
@@ -136,37 +137,36 @@ before any of the command methods are used.
 
 =cut
 
-sub new
+has $_fh;
+has $_partinfo :reader;
+
+has $_nvm_version :writer(_set_nvm_version);
+
+BUILD
 {
-   my $class = shift;
    my %args = @_;
 
-   my $fh = $args{fh} // do {
+   $_fh = $args{fh} // do {
       require IO::Termios;
       IO::Termios->open( $args{dev} ) or
          die "Unable to open $args{dev} - $!\n";
    };
 
-   $fh->cfmakeraw();
+   $_fh->cfmakeraw();
 
    my $baud = $args{baud} // 115200;
    # 8bits, Even parity, 2 stop
-   $fh->set_mode( "$baud,8,e,2" );
-   $fh->setflag_clocal( 1 );
+   $_fh->set_mode( "$baud,8,e,2" );
+   $_fh->setflag_clocal( 1 );
 
-   $fh->autoflush;
+   $_fh->autoflush;
 
    my $part = $args{part} or croak "Require 'part'";
-   my $partinfo = $partinfos{lc $part} //
+   $_partinfo = $partinfos{lc $part} //
       croak "Unrecognised part name $part";
-
-   my $self = bless {
-      fh => $fh,
-      partinfo => $partinfo,
-   }, $class;
-
-   return $self;
 }
+
+has $_reg_ctrla = 0;
 
 =head1 ACCESSORS
 
@@ -200,11 +200,7 @@ The returned structure provides the following fields
 
 =cut
 
-sub partinfo
-{
-   my $self = shift;
-   return $self->{partinfo};
-}
+# generated accessor
 
 =head2 fuseinfo
 
@@ -216,10 +212,11 @@ F<share/> directory for more details.
 
 =cut
 
-sub fuseinfo
+has $_fuseinfo;
+
+method fuseinfo
 {
-   my $self = shift;
-   return $self->{fuseinfo} //= do {
+   return $_fuseinfo //= do {
       my $yamlpath = "$SHAREDIR/${\ $self->partinfo->name }.yaml";
       unless( -f $yamlpath ) {
          die "No YAML file found at $yamlpath\n";
@@ -245,7 +242,8 @@ use constant {
       OP_DATA8       => 0x00,
       OP_DATA16      => 0x01,
       OP_ADDR8       => 0x00,
-      OP_ADDR16      => 0x04,
+      OP_ADDR16      => 0x01,
+      OP_ADDR24      => 0x02,
    OP_LD          => 0x20,
    OP_ST          => 0x60,
       OP_PTR         => 0x00,
@@ -261,6 +259,11 @@ use constant {
    REG_STATUSA => 0x00,
    REG_STATUSB => 0x01,
    REG_CTRLA   => 0x02,
+      CTRLA_IBDLY => (1<<7),
+      CTRLA_PARD  => (1<<5),
+      CTRLA_DTD   => (1<<4),
+      CTRLA_RSD   => (1<<3),
+      CTRLA_GTVAL_MASK => 0x07,
    REG_CTRLB   => 0x03,
       CTRLB_NACKDIS  => (1<<4),
       CTRLB_CCDETDIS => (1<<3),
@@ -287,36 +290,29 @@ use constant {
    KEY_NVMPROG   => "\x20\x67\x6F\x72\x50\x4D\x56\x4E",
 };
 
-async sub _break
+async method _break
 {
-   my $self = shift;
-
-   my $fh = $self->{fh};
-
-   my $was_baud = $fh->getobaud;
+   my $was_baud = $_fh->getobaud;
 
    # Writing a 0 at 300baud is sufficient to look like a BREAK
-   $fh->setbaud( 300 );
-   $fh->print( "\x00" );
+   $_fh->setbaud( 300 );
+   $_fh->print( "\x00" );
 
    await Future->wait_any(
-      Future::IO->sysread( $fh, 1 ),
+      Future::IO->sysread( $_fh, 1 ),
       Future::IO->sleep( 0.05 )
          ->then_fail( "Timed out waiting for echo of BREAK - is this a UPDI programmer?\n" )
    );
 
-   $fh->setbaud( $was_baud );
+   $_fh->setbaud( $was_baud );
 }
 
-async sub _op_writeread
+async method _op_writeread
 {
-   my $self = shift;
    my ( $write, $readlen ) = @_;
 
-   my $fh = $self->{fh};
-
    printf STDERR "WR: => %v02X\n", $write if DEBUG > 1;
-   await Future::IO->syswrite_exactly( $fh, $write );
+   await Future::IO->syswrite_exactly( $_fh, $write );
 
    my $buf = "";
    my $len = length( $write ) + $readlen;
@@ -327,7 +323,7 @@ async sub _op_writeread
          "echo of command - is this a UPDI programmer?";
 
       $buf .= await Future->wait_any(
-         Future::IO->sysread( $fh, $len - length $buf ),
+         Future::IO->sysread( $_fh, $len - length $buf ),
          Future::IO->sleep( 0.1 )
             ->then_fail( "Timed out waiting for $what\n" )
       );
@@ -344,42 +340,69 @@ async sub _op_writeread
    return substr( $buf, length( $write ) );
 }
 
-async sub lds8
+method _pack_op_addr
 {
-   my $self = shift;
+   my ( $op, $addr ) = @_;
+
+   return $_nvm_version >= 2
+      ? pack( "C CCC", $op|OP_ADDR24<<2, $addr, $addr >> 8, $addr >> 16 )
+      : pack( "C CC",  $op|OP_ADDR16<<2, $addr, $addr >> 8 );
+}
+
+async method _op_write_expecting_ack
+{
+   my ( $op, $write ) = @_;
+
+   if( $_reg_ctrla & CTRLA_RSD ) {
+      # No ACK expected
+      await $self->_op_writeread( $write, 0 );
+   }
+   else {
+      my $ack = await $self->_op_writeread( $write, 1 );
+      $ack eq "\x40" or croak "Expected ACK to $op";
+   }
+}
+
+async method stptr
+{
+   my ( $addr ) = @_;
+
+   my $cmd = $_nvm_version >= 2
+      ? pack( "C CCC", OP_ST|OP_PTRREG|OP_ADDR24, $addr, $addr >> 8, $addr >> 16 )
+      : pack( "C CC",  OP_ST|OP_PTRREG|OP_ADDR16, $addr, $addr >> 8 );
+
+   await $self->_op_write_expecting_ack( "ST PTR" => SYNC . $cmd );
+}
+
+async method lds8
+{
    my ( $addr ) = @_;
 
    my $ret = unpack "C", await
-      $self->_op_writeread( SYNC . pack( "C S<", OP_LDS|OP_ADDR16, $addr ), 1 );
+      $self->_op_writeread( SYNC . $self->_pack_op_addr( OP_LDS, $addr ), 1 );
 
    printf STDERR ">> LDS8[%04X] -> %02X\n", $addr, $ret if DEBUG;
    return $ret;
 }
 
-async sub sts8
+async method sts8
 {
-   my $self = shift;
    my ( $addr, $val ) = @_;
 
    printf STDERR ">> STS8[%04X] = %02X\n", $addr, $val if DEBUG;
 
-   my $ack = await
-      $self->_op_writeread( SYNC . pack( "C S<", OP_STS|OP_ADDR16, $addr ), 1 );
-   $ack eq "\x40" or croak "Expected ACK to STS8";
+   await $self->_op_write_expecting_ack( STS8 =>
+      SYNC . $self->_pack_op_addr( OP_STS, $addr ) );
 
-   $ack = await
-      $self->_op_writeread( pack( "C", $val ), 1 );
-   $ack eq "\x40" or croak "Expected ACK to STS8 DATA";
+   await $self->_op_write_expecting_ack( "STS8 DATA" =>
+      pack( "C", $val ) );
 }
 
-async sub ld
+async method ld
 {
-   my $self = shift;
    my ( $addr, $len ) = @_;
 
-   my $ack = await
-      $self->_op_writeread( SYNC . pack( "C S<", OP_ST|OP_PTRREG|OP_DATA16, $addr ), 1 );
-   $ack eq "\x40" or croak "Expected ACK to ST PTR";
+   await $self->stptr( $addr );
 
    my $ret = "";
 
@@ -400,18 +423,15 @@ async sub ld
    return $ret;
 }
 
-async sub st8
+async method st8
 {
-   my $self = shift;
    my ( $addr, $data ) = @_;
 
    printf STDERR ">> ST[%04X] = %v02X\n", $addr, $data if DEBUG;
 
    my $len = length( $data );
 
-   my $ack = await
-      $self->_op_writeread( SYNC . pack( "C S<", OP_ST|OP_PTRREG|OP_DATA16, $addr ), 1 );
-   $ack eq "\x40" or croak "Expected ACK to ST PTR";
+   await $self->stptr( $addr );
 
    await
       $self->_op_writeread( SYNC . pack( "C C", OP_REPEAT, $len - 1 ), 0 ) if $len > 1;
@@ -419,15 +439,19 @@ async sub st8
    await
       $self->_op_writeread( SYNC . pack( "C", OP_ST|OP_PTRINC|OP_DATA8 ), 0 );
 
-   foreach my $byte ( split //, $data ) {
-      $ack = await $self->_op_writeread( $byte, 1 );
-      $ack eq "\x40" or croak "Expected ACK to STR data";
+   # If we're in RSD mode we might as well just write all the data in one go
+   if( $_reg_ctrla & CTRLA_RSD ) {
+      await $self->_op_writeread( $data, 0 )
+   }
+   else {
+      foreach my $byte ( split //, $data ) {
+         await $self->_op_write_expecting_ack( "STR data" => $byte );
+      }
    }
 }
 
-async sub st16
+async method st16
 {
-   my $self = shift;
    my ( $addr, $data ) = @_;
 
    printf STDERR ">> ST[%04X] = %v02X\n", $addr, $data if DEBUG;
@@ -435,9 +459,7 @@ async sub st16
    # Count in 16bit words
    my $len = int( length( $data ) / 2 );
 
-   my $ack = await
-      $self->_op_writeread( SYNC . pack( "C S<", OP_ST|OP_PTRREG|OP_DATA16, $addr ), 1 );
-   $ack eq "\x40" or croak "Expected ACK to ST PTR";
+   await $self->stptr( $addr );
 
    await
       $self->_op_writeread( SYNC . pack( "C C", OP_REPEAT, $len - 1 ), 0 ) if $len > 1;
@@ -445,9 +467,14 @@ async sub st16
    await
       $self->_op_writeread( SYNC . pack( "C", OP_ST|OP_PTRINC|OP_DATA16 ), 0 );
 
-   foreach my $word ( $data =~ m/.{2}/sg ) {
-      $ack = await $self->_op_writeread( $word, 1 );
-      $ack eq "\x40" or croak "Expected ACK to STR data";
+   # If we're in RSD mode we might as well just write all the data in one go
+   if( $_reg_ctrla & CTRLA_RSD ) {
+      await $self->_op_writeread( substr( $data, 0, $len*2 ), 0 );
+   }
+   else {
+      foreach my $word ( $data =~ m/.{2}/sg ) {
+         await $self->_op_write_expecting_ack( "STR data" => $word );
+      }
    }
 
    if( length( $data ) % 2 ) {
@@ -456,14 +483,12 @@ async sub st16
       await
          $self->_op_writeread( SYNC . pack( "C", OP_ST|OP_PTRINC|OP_DATA8 ), 0 );
 
-      $ack = await $self->_op_writeread( $byte, 1 );
-      $ack eq "\x40" or croak "Expected ACK to STR data";
+      await $self->_op_write_expecting_ack( "STR data" => $byte );
    }
 }
 
-async sub ldcs
+async method ldcs
 {
-   my $self = shift;
    my ( $reg ) = @_;
 
    my $ret = unpack "C", await
@@ -473,9 +498,8 @@ async sub ldcs
    return $ret;
 }
 
-async sub stcs
+async method stcs
 {
-   my $self = shift;
    my ( $reg, $value ) = @_;
 
    printf STDERR ">> STCS[%02X] = %02X\n", $reg, $value if DEBUG;
@@ -484,9 +508,8 @@ async sub stcs
       $self->_op_writeread( SYNC . pack( "CC", OP_STCS | $reg, $value ), 0 );
 }
 
-async sub key
+async method key
 {
-   my $self = shift;
    my ( $key ) = @_;
 
    length $key == 8 or
@@ -496,6 +519,15 @@ async sub key
 
    await
       $self->_op_writeread( SYNC . pack( "C a*", OP_KEY, $key ), 0 );
+}
+
+async method set_rsd
+{
+   my ( $on ) = @_;
+
+   my $val = $on ? $_reg_ctrla | CTRLA_RSD : $_reg_ctrla & ~CTRLA_RSD;
+
+   await $self->stcs( REG_CTRLA, $_reg_ctrla = $val ) if $_reg_ctrla != $val;
 }
 
 =head2 init_link
@@ -509,10 +541,8 @@ of the other commands.
 
 =cut
 
-async sub init_link
+async method init_link
 {
-   my $self = shift;
-
    # Sleep 100msec before sending BREAK in case of attached UPDI 12V pulse hardware
    await Future::IO->sleep( 0.1 );
 
@@ -522,9 +552,13 @@ async sub init_link
    # properly
    await $self->stcs( REG_CTRLB, CTRLB_CCDETDIS );
 
+   # Set CTRLA to known state also
+   await $self->stcs( REG_CTRLA, $_reg_ctrla = 0 );
+
    # Read the SIB so we can determine what kind of NVM controller is required
    my $sib = await $self->read_sib;
-   $self->{nvm_version} = $sib->{nvm_version};
+   $sib->{nvm_version} =~ m/^P:(\d)/ or croak "Unrecognised NVM_VERSION string: $sib->{nvm_version}";
+   $_nvm_version = $1;
 }
 
 =head2 read_updirev
@@ -535,10 +569,8 @@ Reads the C<UPDIREV> field of the C<STATUSA> register.
 
 =cut
 
-async sub read_updirev
+async method read_updirev
 {
-   my $self = shift;
-
    return ( await $self->ldcs( REG_STATUSA ) ) >> 4;
 }
 
@@ -548,10 +580,8 @@ Reads the C<ASI_SYS_STATUS> register.
 
 =cut
 
-async sub read_asi_sys_status
+async method read_asi_sys_status
 {
-   my $self = shift;
-
    return await $self->ldcs( REG_ASI_SYS_STATUS );
 }
 
@@ -572,10 +602,8 @@ This is returned in a HASH reference, containing four keys:
 
 =cut
 
-async sub read_sib
+async method read_sib
 {
-   my $self = shift;
-
    my $bytes = await
       $self->_op_writeread( SYNC . pack( "C", OP_KEY_READSIB ), 16 );
    printf STDERR ">> READSIB -> %v02X\n", $bytes if DEBUG;
@@ -598,10 +626,8 @@ returned as a plain byte string of length 3.
 
 =cut
 
-async sub read_signature
+async method read_signature
 {
-   my $self = shift;
-
    # The ATtiny814 datasheet says
    #   All Atmel microcontrollers have a three-byte signature code which
    #   identifies the device. This code can be read in both serial and parallel
@@ -610,7 +636,7 @@ async sub read_signature
    # So far no attempt at reading signature over UPDI from a locked device has
    # been successful. :(
 
-   return await $self->ld( $self->{partinfo}->baseaddr_sigrow, 3 );
+   return await $self->ld( $_partinfo->baseaddr_sigrow, 3 );
 }
 
 =head2 request_reset
@@ -625,9 +651,8 @@ reset by momentarilly toggling the request on and off again:
 
 =cut
 
-async sub request_reset
+async method request_reset
 {
-   my $self = shift;
    my ( $reset ) = @_;
 
    await $self->stcs( REG_ASI_RESET_REQ, $reset ? ASI_RESET_REQ_SIGNATURE : 0 );
@@ -658,9 +683,8 @@ may be required e.g. to recover from a bad C<SYSCFG0> fuse setting.
 
 =cut
 
-async sub erase_chip
+async method erase_chip
 {
-   my $self = shift;
    my %opts = @_;
 
    await $self->key( KEY_CHIPERASE );
@@ -689,10 +713,8 @@ Requests the chip to enter NVM programming mode.
 
 =cut
 
-async sub enable_nvmprog
+async method enable_nvmprog
 {
-   my $self = shift;
-
    await $self->key( KEY_NVMPROG );
 
    die "Failed to set NVMPROG key\n" unless ASI_KEY_NVMPROG & await $self->ldcs( REG_ASI_KEY_STATUS );
@@ -709,24 +731,24 @@ async sub enable_nvmprog
    die "Timed out waiting for NVMPROG key to be accepted\n" if !$timeout;
 }
 
-sub nvmctrl
+has $_nvmctrl;
+
+method nvmctrl
 {
-   my $self = shift;
+   return $_nvmctrl if defined $_nvmctrl;
 
-   return $self->{nvmctrl} if defined $self->{nvmctrl};
-
-   defined( my $nvm_version = $self->{nvm_version} ) or
+   defined $_nvm_version or
       croak "Must ->init_link before calling ->nvmctrl";
 
    # ATtiny and ATmega chips claim "P:0"
-   return $self->{nvmctrl} = Device::AVR::UPDI::_NVMCtrlv0->new( $self )
-      if $nvm_version eq "P:0";
+   return $_nvmctrl = Device::AVR::UPDI::_NVMCtrlv0->new( updi => $self )
+      if $_nvm_version == 0;
 
    # AVR Dx chips claim "P:2"
-   return $self->{nvmctrl} = Device::AVR::UPDI::_NVMCtrlv2->new( $self )
-      if $nvm_version eq "P:2";
+   return $_nvmctrl = Device::AVR::UPDI::_NVMCtrlv2->new( updi => $self )
+      if $_nvm_version == 2;
 
-   croak "Unrecognised NVM version string $nvm_version";
+   croak "Unrecognised NVM version $_nvm_version";
 }
 
 =head2 read_flash_page
@@ -738,9 +760,8 @@ address space.
 
 =cut
 
-async sub read_flash_page
+async method read_flash_page
 {
-   my $self = shift;
    my ( $addr, $len ) = @_;
 
    return await $self->nvmctrl->read_flash_page( $addr, $len );
@@ -755,9 +776,8 @@ C<$addr> is within the flash address space.
 
 =cut
 
-async sub write_flash_page
+async method write_flash_page
 {
-   my $self = shift;
    my ( $addr, $data ) = @_;
 
    await $self->nvmctrl->write_flash_page( $addr, $data );
@@ -772,9 +792,8 @@ address space.
 
 =cut
 
-async sub read_eeprom_page
+async method read_eeprom_page
 {
-   my $self = shift;
    my ( $addr, $len ) = @_;
 
    return await $self->nvmctrl->read_eeprom_page( $addr, $len );
@@ -787,9 +806,8 @@ command and C<$addr> is within the EEPROM address space.
 
 =cut
 
-async sub write_eeprom_page
+async method write_eeprom_page
 {
-   my $self = shift;
    my ( $addr, $data ) = @_;
 
    await $self->nvmctrl->write_eeprom_page( $addr, $data );
@@ -804,9 +822,8 @@ segment, from 0 onwards.
 
 =cut
 
-async sub write_fuse
+async method write_fuse
 {
-   my $self = shift;
    my ( $idx, $value ) = @_;
 
    await $self->nvmctrl->write_fuse( $idx, $value );
@@ -821,23 +838,58 @@ segment, from 0 onwards.
 
 =cut
 
-async sub read_fuse
+async method read_fuse
 {
-   my $self = shift;
    my ( $idx ) = @_;
 
-   my $addr = $self->{partinfo}->baseaddr_fuse + $idx;
+   my $addr = $_partinfo->baseaddr_fuse + $idx;
 
    return await $self->lds8( $addr );
 }
 
-package # hide from indexer
-   Device::AVR::UPDI::_NVMCtrlv0 {
+role # hide from indexer
+   Device::AVR::UPDI::_NVMCtrl {
+
+   use constant {
+      NVMCTRL_CTRLA  => 0,
+      NVMCTRL_STATUS => 2,
+         NVMCTRL_STATUS_FBUSY => (1<<0),
+   };
+
+   has $_updi     :reader :param;
+   has $_partinfo :reader;
+
+   ADJUST
+   {
+      $_partinfo = $_updi->partinfo;
+   }
+
+   async method nvmctrl_command
+   {
+      my ( $cmd ) = @_;
+
+      await $self->updi->sts8( $self->partinfo->baseaddr_nvmctrl + NVMCTRL_CTRLA, $cmd );
+   }
+
+   async method await_nvm_not_busy
+   {
+      my $timeout = 50;
+      while( --$timeout ) {
+         last if not( NVMCTRL_STATUS_FBUSY & await $self->updi->lds8(
+            $self->partinfo->baseaddr_nvmctrl + NVMCTRL_STATUS, 1 ) );
+
+         await Future::IO->sleep( 0.01 );
+      }
+   }
+}
+
+class # hide from indexer
+   Device::AVR::UPDI::_NVMCtrlv0 does Device::AVR::UPDI::_NVMCtrl {
 
    use Carp;
 
    use constant {
-      NVMCTRL_CTRLA  => 0,
+      # Command values
          NVMCTRL_CMD_WP   => 1,
          NVMCTRL_CMD_ER   => 2,
          NVMCTRL_CMD_ERWP => 3,
@@ -846,74 +898,24 @@ package # hide from indexer
          NVMCTRL_CMD_EEER => 6,
          NVMCTRL_CMD_WFU  => 7,
       NVMCTRL_CTRLB  => 1,
-      NVMCTRL_STATUS => 2,
-         NVMCTRL_STATUS_FBUSY => (1<<0),
       NVMCTRL_DATA   => 6,
       NVMCTRL_ADDR   => 8,
    };
 
-   sub new
+   async method read_flash_page
    {
-      my $class = shift;
-      my ( $updi ) = @_;
-
-      return bless [ $updi, $updi->{partinfo} ], $class;
-   }
-
-   sub updi
-   {
-      my $self = shift;
-      return $self->[0];
-   }
-
-   sub partinfo
-   {
-      my $self = shift;
-      return $self->[1];
-   }
-
-   async sub nvmctrl_command
-   {
-      my $self = shift;
-      my ( $cmd ) = @_;
-
-      my $updi = $self->updi;
-
-      await $updi->sts8( $self->partinfo->baseaddr_nvmctrl + NVMCTRL_CTRLA, $cmd );
-   }
-
-   async sub await_nvm_not_busy
-   {
-      my $self = shift;
-
-      my $updi = $self->updi;
-
-      my $timeout = 50;
-      while( --$timeout ) {
-         last if not( NVMCTRL_STATUS_FBUSY & await $updi->lds8(
-            $self->partinfo->baseaddr_nvmctrl + NVMCTRL_STATUS, 1 ) );
-
-         await Future::IO->sleep( 0.01 );
-      }
-   }
-
-   async sub read_flash_page
-   {
-      my $self = shift;
       my ( $addr, $len ) = @_;
       return await $self->updi->ld( $self->partinfo->baseaddr_flash + $addr, $len );
    }
 
-   async sub read_eeprom_page
+   async method read_eeprom_page
    {
-      my $self = shift;
       my ( $addr, $len ) = @_;
       return await $self->updi->ld( $self->partinfo->baseaddr_eeprom + $addr, $len );
    }
 
-   async sub _write_page
+   async method _write_page
    {
-      my $self = shift;
       my ( $addr, $data, $wordsize, $cmd ) = @_;
 
       my $updi = $self->updi;
@@ -921,6 +923,9 @@ package # hide from indexer
       # clear page buffer
       await $self->nvmctrl_command( NVMCTRL_CMD_PBC );
       await $self->await_nvm_not_busy;
+
+      # Disable response sig for speed
+      await $updi->set_rsd( 1 );
 
       if( $wordsize == 8 ) {
          await $updi->st8( $addr, $data );
@@ -932,27 +937,27 @@ package # hide from indexer
          croak "Invalid word size";
       }
 
+      # Re-enable response sig again
+      await $updi->set_rsd( 0 );
+
       await $self->nvmctrl_command( $cmd );
       await $self->await_nvm_not_busy;
    }
 
-   async sub write_flash_page
+   async method write_flash_page
    {
-      my $self = shift;
       my ( $addr, $data ) = @_;
       await $self->_write_page( $self->partinfo->baseaddr_flash + $addr, $data, 16, NVMCTRL_CMD_WP );
    }
 
-   async sub write_eeprom_page
+   async method write_eeprom_page
    {
-      my $self = shift;
       my ( $addr, $data ) = @_;
       await $self->_write_page( $self->partinfo->baseaddr_eeprom + $addr, $data, 8, NVMCTRL_CMD_ERWP );
    }
 
-   async sub write_fuse
+   async method write_fuse
    {
-      my $self = shift;
       my ( $idx, $value ) = @_;
 
       my $updi = $self->updi;
@@ -973,10 +978,8 @@ package # hide from indexer
    }
 }
 
-package # hide from indexer
-   Device::AVR::UPDI::_NVMCtrlv2 {
-
-   use base 'Device::AVR::UPDI::_NVMCtrlv0';
+class # hide from indexer
+   Device::AVR::UPDI::_NVMCtrlv2 does Device::AVR::UPDI::_NVMCtrl {
 
    use Carp;
 
@@ -987,22 +990,17 @@ package # hide from indexer
          NVMCTRL_CMD_EEERWR => 0x13,
 
       NVMCTRL_CTRLB => 1,
-
-      NVMCTRL_DATA   => 6,
-      NVMCTRL_ADDR   => 8,
    };
 
-   async sub _set_flmap
+   async method _set_flmap
    {
-      my $self = shift;
       my ( $bank ) = @_;
 
       await $self->updi->sts8( $self->partinfo->baseaddr_nvmctrl + NVMCTRL_CTRLB, $bank << 4 );
    }
 
-   async sub read_flash_page
+   async method read_flash_page
    {
-      my $self = shift;
       my ( $addr, $len ) = @_;
 
       await $self->_set_flmap( $addr >> 15 );
@@ -1011,15 +1009,24 @@ package # hide from indexer
       return await $self->updi->ld( $self->partinfo->baseaddr_flash + $addr, $len );
    }
 
-   async sub _write_page
+   async method read_eeprom_page
    {
-      my $self = shift;
+      my ( $addr, $len ) = @_;
+      return await $self->updi->ld( $self->partinfo->baseaddr_eeprom + $addr, $len );
+   }
+
+   async method _write_page
+   {
       my ( $addr, $data, $wordsize, $cmd ) = @_;
 
       my $updi = $self->updi;
 
       # set page write mode
       await $self->nvmctrl_command( $cmd );
+
+      # Disable response sig for speed on long data
+      #  (no point on single-byte fuses)
+      await $updi->set_rsd( 1 ) if length $data > 1;
 
       if( $wordsize == 8 ) {
          await $updi->st8( $addr, $data );
@@ -1031,6 +1038,9 @@ package # hide from indexer
          croak "Invalid word size";
       }
 
+      # Re-enable response sig again
+      await $updi->set_rsd( 0 );
+
       await $self->await_nvm_not_busy;
 
       # clear command
@@ -1038,9 +1048,8 @@ package # hide from indexer
       await $self->await_nvm_not_busy;
    }
 
-   async sub write_flash_page
+   async method write_flash_page
    {
-      my $self = shift;
       my ( $addr, $data ) = @_;
 
       await $self->_set_flmap( $addr >> 15 );
@@ -1049,17 +1058,15 @@ package # hide from indexer
       await $self->_write_page( $self->partinfo->baseaddr_flash + $addr, $data, 16, NVMCTRL_CMD_FLWR );
    }
 
-   async sub write_eeprom_page
+   async method write_eeprom_page
    {
-      my $self = shift;
       my ( $addr, $data ) = @_;
 
       await $self->_write_page( $self->partinfo->baseaddr_eeprom + $addr, $data, 8, NVMCTRL_CMD_EEERWR );
    }
 
-   async sub write_fuse
+   async method write_fuse
    {
-      my $self = shift;
       my ( $idx, $value ) = @_;
 
       # Fuses are written by pretending it's EEPROM

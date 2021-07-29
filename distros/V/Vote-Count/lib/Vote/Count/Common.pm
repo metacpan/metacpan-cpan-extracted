@@ -13,13 +13,13 @@ use Path::Tiny;
 
 # ABSTRACT: Role shared by Count and Matrix for common functionality. See Vote::Count Documentation.
 
-our $VERSION='2.00';
+our $VERSION='2.01';
 
 =head1 NAME
 
 Vote::Count::Common
 
-=head1 VERSION 2.00
+=head1 VERSION 2.01
 
 =head1 Synopsis
 
@@ -47,6 +47,33 @@ has 'WithdrawalList' => (
   isa     => 'Str',
   required => 0,
   );
+
+has 'PairMatrix' => (
+  is      => 'ro',
+  isa     => 'Object',
+  lazy    => 1,
+  builder => '_buildmatrix',
+);
+
+sub _buildmatrix ($self) {
+  my $tiebreak =
+    defined( $self->TieBreakMethod() )
+    ? $self->TieBreakMethod()
+    : 'none';
+  my %args = (
+    BallotSet      => $self->BallotSet(),
+    Active         => $self->Active(),
+    TieBreakMethod => $tiebreak,
+    LogTo          => $self->LogTo() . '_matrix',
+  );
+  $args{'PrecedenceFile'} = $self->PrecedenceFile() if $self->PrecedenceFile();
+  $args{'TieBreakerFallBackPrecedence'} = $self->TieBreakerFallBackPrecedence();
+  return Vote::Count::Matrix->new( %args  );
+}
+
+sub UpdatePairMatrix ($self) {
+  $self->{'PairMatrix'} = $self->_buildmatrix();
+}
 
 sub GetChoices ( $self ) {
   return sort keys( $self->BallotSet()->{'choices'}->%* );
@@ -156,7 +183,7 @@ Sets the Active Set at creation. See L<Active Sets>.
 
 =head2 VoteValue
 
-Use to set a Vote Value for methods that weight votes. The default value is 1.
+Sets a VoteValue for use in weighted systems like STV. The default value is 1. Approval and TopCount are aware of VoteValue for RCV ballots.
 
 =head2 LogTo
 
@@ -234,14 +261,6 @@ Has the following Attributes:
 
 A text file containing choices 1 per line that are withdrawn. Use when a choice may be included in the ballots but should be treated as not-present. Removing a choice from the choices list in a Ballot File will generate an exception from ReadBallots if it appears on any Ballots. Withdrawing a choice will exclude it from the Active Set if it is present in the Ballots.
 
-=head2 Active
-
-Get Active Set as HashRef to the active set. Changing the new HashRef will change the internal Active Set, GetActive is recommended as it will return a HashRef that is a copy instead.
-
-=head2 GetActive
-
-Returns a hashref containing a copy of the Active Set.
-
 =head2 Choices
 
 Returns an array of all of the Choices in the Ballot Set.
@@ -268,34 +287,6 @@ Remove $choice from current Active List.
 
   $Election->Defeat( $choice );
   $Election->logv( "Defeated $choice");
-
-=head2 BallotSet
-
-Get BallotSet
-
-=head2 GetBallots
-
-Get just the Ballots from the BallotSet.
-
-=head2 PairMatrix
-
-Get a Matrix Object for the Active Set. Generated and cached on the first request.
-
-=head2 UpdatePairMatrix
-
-Regenerate and cache Matrix with current Active Set.
-
-=head2 VotesCast
-
-Returns the number of votes cast.
-
-=head2 VotesActive
-
-Returns the number of non-exhausted ballots based on the current Active Set.
-
-=head2 VoteValue
-
-Sets a VoteValue for use in weighted systems like STV. The default value is 1. Approval and TopCount are aware of VoteValue for RCV ballots.
 
 =cut
 

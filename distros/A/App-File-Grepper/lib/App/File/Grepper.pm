@@ -11,7 +11,7 @@ App::File::Grepper - Greps files for pattern
 
 =cut
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 =head1 SYNOPSIS
 
@@ -72,7 +72,7 @@ pattern is applied to the basename of each file, not the full path.
 Also, this pattern is applied before the filter pattern.
 
 Version control directories C<RCS>, C<CVS>, C<.svn>, C<.git> and
-C<.hg> are always excluded.
+C<.hg> are always excluded, as are common editor backups.
 
 =back
 
@@ -124,6 +124,9 @@ sub main {
 	$exclude = $opts->{exclude};
 	$exclude = qr/$exclude/;
     }
+    else {
+	$exclude = qr{ (?: ^\# | ^\.\.?(?!/) | ~$ ) }x;
+    }
 
     binmode( STDOUT, ":utf8" );
 
@@ -139,8 +142,14 @@ sub main {
 	return unless -f $_;
 
 	# Handle include/exclude filters.
-	return if $exclude && ( $_ =~ $exclude );
-	return if $filter && ( $_ !~ $filter );
+	if ( $exclude && ( $_ =~ $exclude ) ) {
+	    warn("EXCL: $_\n") if $opts->{debug};
+	    return;
+	}
+	if ( $filter && ( $_ !~ $filter ) ) {
+	    warn("FLTR: $_\n") if $opts->{debug};
+	    return;
+	}
 
 	my $file = $_;
 

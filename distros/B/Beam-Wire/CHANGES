@@ -1,5 +1,12 @@
 Changelog for Beam-Wire
 
+1.025     2021-07-08 10:21:29-05:00 America/Chicago
+
+    [Fixed]
+
+    - Fixed using false/undef values as value services. Thanks
+      @al-tom-ru for providing this patch! [Github #75]
+
 1.024     2021-04-26 23:17:42-05:00 America/Chicago
 
     [Fixed]

@@ -73,12 +73,12 @@ ConnectRequestSP Tcp::connect (Sv host_or_params, uint16_t port = 0, Sv arg3 = S
             auto key = row.key();
             if (!key.length()) continue;
             switch (key[0]) {
-                case 'h' : if (key == "host")      host     = Simple(row.value()).as_string();
+                case 'h' : if (key == "host")      host     = row.value().as_string();
                       else if (key == "hints")     hints    = xs::in<AddrInfoHints>(row.value());
                       break;
-                case 'p' : if (key == "port")      port     = Simple(row.value()); break;
+                case 'p' : if (key == "port")      port     = row.value().number(); break;
                 case 'c' : if (key == "callback")  callback = row.value(); break;
-                case 't' : if (key == "timeout")   tsec     = Simple(row.value()); break;
+                case 't' : if (key == "timeout")   tsec     = row.value().number(); break;
                 case 'a' : if (key == "addr")      addr     = xs::in<SockAddr>(row.value()); break;
                 case 'u' : if (key == "use_cache") req->use_cache(row.value().is_true()); break;
             }
@@ -93,11 +93,11 @@ ConnectRequestSP Tcp::connect (Sv host_or_params, uint16_t port = 0, Sv arg3 = S
         if (items < 2) throw "port required";
         req->to(xs::in<string>(host_or_params), port);
         if (items >= 4) {
-            tsec = Simple(arg3);
+            tsec = Scalar(arg3).number();
             callback = arg4;
         } else if (items == 3 && arg3.defined()) {
             if (arg3.is_sub_ref()) callback = arg3;
-            else                   tsec = Simple(arg3);
+            else                   tsec = Scalar(arg3).number();
         }
     }
 
@@ -119,12 +119,12 @@ ConnectRequestSP Tcp::connect_addr (SockAddr addr, Sv arg1 = Sv(), Sv arg2 = Sv(
     double tsec = 0;
     Sub callback;
     if (items >= 3) {
-        tsec = Simple(arg1);
+        tsec = Scalar(arg1).number();
         callback = arg2;
     }
     else if (items == 2 && arg1.defined()) {
         if (arg1.is_sub_ref()) callback = arg1;
-        else                   tsec = Simple(arg1);
+        else                   tsec = Scalar(arg1).number();
     }
     auto req = THIS->connect()->to(addr)->timeout(tsec * 1000);
     if (callback) {

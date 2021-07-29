@@ -4,7 +4,7 @@
       "Jan Henning Thorsen <jhthorsen@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -30,8 +30,10 @@
       },
       "runtime" : {
          "requires" : {
+            "Class::Method::Modifiers" : "2.00",
             "Mojolicious" : "9.11",
-            "Role::Tiny" : "2.000001"
+            "Role::Tiny" : "2.000001",
+            "perl" : "v5.16.0"
          }
       },
       "test" : {
@@ -52,7 +54,7 @@
          "web" : "https://github.com/jhthorsen/mojo-useragent-digestauth"
       }
    },
-   "version" : "0.05",
+   "version" : "0.06",
    "x_contributors" : [],
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

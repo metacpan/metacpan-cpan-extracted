@@ -14,7 +14,7 @@ static inline void msgfill (Message* m, const Hash& h) {
         switch (key[0]) {
             case 'h':
                 if      (key == "headers")      set_headers(m, v);
-                else if (key == "http_version") m->http_version = Simple(v);
+                else if (key == "http_version") m->http_version = xs::in<int>(v);
                 break;
             case 'b':
                 if (key == "body") m->body = xs::in<string>(v);
@@ -52,10 +52,7 @@ static void fill(Request::Form& form, Array& arr, Request::EncType enc_type)  {
         for(size_t i = 0; i < last; i += 2) {
             string key = arr.at(i).as_string();
             auto value = arr.at(i +1);
-            if (value.is_simple()) {
-                form.add(key, value.as_string());
-            }
-            else if(value.is_array_ref()) {
+            if(value.is_array_ref()) {
                 auto values = Array(value);
                 if (values.size() != 3) {
                     string err = "invalid file fieild '";
@@ -64,6 +61,9 @@ static void fill(Request::Form& form, Array& arr, Request::EncType enc_type)  {
                     throw err;
                 }
                 form.add(key, values[1].as_string(), values[0].as_string(), values[2].as_string());
+            }
+            else {
+                form.add(key, value.as_string());
             }
         }
         if (!even) {
@@ -137,11 +137,11 @@ void fill (Response* res, const Hash& h) {
         auto v = row.value();
         switch (key[0]) {
             case 'c':
-                if      (key == "code")    res->code = Simple(v);
+                if      (key == "code")    res->code = v.as_number<int>();
                 else if (key == "cookies") set_response_cookies(res, v);
                 break;
             case 'm':
-                if (key == "message") res->message = Simple(v).as_string();
+                if (key == "message") res->message = v.as_string();
                 break;
         }
     }
@@ -178,15 +178,15 @@ using CookieJar = panda::protocol::http::CookieJar;
 
 Response::Cookie Typemap<Response::Cookie>::in (const Hash& h) {
     Response::Cookie c;
-    Sv sv; Simple v;
-    if ((v  = h.fetch("value")))     c.value(v.as_string());
-    if ((v  = h.fetch("domain")))    c.domain(v.as_string());
-    if ((v  = h.fetch("path")))      c.path(v.as_string());
-    if ((sv = h.fetch("expires")))   c.expires(xs::in<panda::date::Date>(sv));
-    if ((v  = h.fetch("max_age")))   c.max_age(v);
-    if ((sv = h.fetch("secure")))    c.secure(sv.is_true());
-    if ((sv = h.fetch("http_only"))) c.http_only(sv.is_true());
-    if ((v  = h.fetch("same_site"))) c.same_site((Cookie::SameSite)(int)v);
+    Scalar v;
+    if ((v = h.fetch("value")))     c.value(v.as_string());
+    if ((v = h.fetch("domain")))    c.domain(v.as_string());
+    if ((v = h.fetch("path")))      c.path(v.as_string());
+    if ((v = h.fetch("expires")))   c.expires(xs::in<panda::date::Date>(v));
+    if ((v = h.fetch("max_age")))   c.max_age(v.as_number<uint64_t>());
+    if ((v = h.fetch("secure")))    c.secure(v.is_true());
+    if ((v = h.fetch("http_only"))) c.http_only(v.is_true());
+    if ((v = h.fetch("same_site"))) c.same_site((Cookie::SameSite)v.as_number<int>());
     return c;
 }
 

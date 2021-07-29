@@ -15,6 +15,8 @@ namespace panda { namespace log {
  *      x=1: full path as it appeared during compilation
  * %l - line
  * %m - message
+ *      x=0: default multiline message behaviour
+ *      x=1: decorate each line of multiline message
  * %t - current time
  *      x=0: YYYY-MM-DD HH:MM:SS
  *      x=1: YY-MM-DD HH:MM:SS
@@ -32,9 +34,12 @@ namespace panda { namespace log {
 extern string_view default_format;
 
 struct PatternFormatter : IFormatter {
-    PatternFormatter (string_view fmt) : _fmt(string(fmt)) {}
     static string format (const string&, std::string&, const Info&);
-           string format (std::string&, const Info&) const override;
+
+    PatternFormatter (string_view fmt);
+
+    string format (std::string&, const Info&) const override;
+
 private:
     string _fmt;
 };

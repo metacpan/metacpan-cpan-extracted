@@ -93,6 +93,7 @@ Goran
 gory
 harvard
 hoc
+iCal
 illum
 INI
 ini

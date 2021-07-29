@@ -15,8 +15,6 @@ $modules{$_} = $_ for qw(
   Expect
   Expect::Simple
   ExtUtils::MakeMaker
-  File::Which
-  FindBin
   IO::Socket::INET
   Module::Pluggable
   PadWalker
@@ -70,7 +68,7 @@ if(@keys > 0)
   spacer;
 }
 
-diag sprintf $format, 'perl ', $];
+diag sprintf $format, 'perl', "$] $^O $Config{archname}";
 
 foreach my $module (@modules)
 {

@@ -4,7 +4,7 @@
    'test.syms' defines macro SYM on the compile command.
 */
 
-#define _XOPEN_SOURCE_EXTENDED  /* We expect wide character functions */
+#define _XOPEN_SOURCE_EXTENDED 1  /* We expect wide character functions */
 
 #include "c-config.h"
 

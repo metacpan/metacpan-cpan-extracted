@@ -4,7 +4,7 @@ use 5.010001;
 
 package RT::Extension::REST2;
 
-our $VERSION = '1.12';
+our $VERSION = '1.13';
 our $REST_PATH = '/REST/2.0';
 
 use Plack::Builder;
@@ -464,8 +464,19 @@ curl for SSL like --cacert.
     GET /tickets?simple=1;query=<simple search query>
         search for tickets using simple search syntax
 
+    # If there are multiple saved searches using the same description, the
+    # behavior of "which saved search shall be selected" is undefined, use
+    # id instead in this case.
+
+    # If both search and other arguments like "query" are specified, the
+    # latter takes higher precedence than the corresponding fields defined
+    # in the given saved search.
+
+    GET /tickets?search=<saved search id or description>
+        search for tickets using saved search
+
     POST /tickets
-        search for tickets with the 'query' and optional 'simple' parameters
+        search for tickets with the 'search' or 'query' and optional 'simple' parameters 
 
     POST /ticket
         create a ticket; provide JSON content
@@ -491,6 +502,10 @@ curl for SSL like --cacert.
 
     PUT /tickets/bulk
         update multiple tickets' metadata; provide JSON content(array of hashes)
+
+    POST /tickets/bulk/correspond
+    POST /tickets/bulk/comment
+        add a reply or comment to multiple tickets; provide JSON content(array of hashes)
 
 =head3 Ticket Examples
 
@@ -534,6 +549,15 @@ Below are some examples using the endpoints above.
     curl -X POST -H "Content-Type: application/json" -u 'root:password'
         -d '{ "Content": "Testing a comment", "ContentType": "text/plain", "CustomRoles": {"Manager": "manager@example.com"} }'
         'https://myrt.com/REST/2.0/ticket/6/comment'
+
+    # Update many tickets at once with bulk by sending an array with ticket ids
+    # Results are returned for each update in a JSON array with ticket ids and corresponding messages
+    curl -X POST -H "Content-Type: application/json" -u 'root:password'
+        -d '[{ "id": "20", "Content": "Testing a correspondence", "ContentType": "text/plain" },
+             { "id": "18", "Content": "Testing a correspondence", "ContentType": "text/plain", "Status":"resolved", "CustomRoles": {"Manager": "manager@example.com"}, "CustomFields": {"State": "New York"} }]'
+        'https://myrt.com/REST/2.0/tickets/bulk/correspond'
+
+    [["20","Correspondence added"],["18","Correspondence added","State New York added","Added manager@example.com as Manager for this ticket","Status changed from 'open' to 'resolved'"]]
 
 =head3 Transactions
 
@@ -809,6 +833,16 @@ Below are some examples using the endpoints above.
 
     GET /customrole/:id
         retrieve a custom role
+
+=head3 Saved Searches
+
+    GET /searches?query=<JSON>
+    POST /searches
+        search for saved searches using L</JSON searches> syntax
+
+    GET /search/:id
+    GET /search/:description
+        retrieve a saved search
 
 =head3 Miscellaneous
 
@@ -1105,14 +1139,14 @@ You can use additional fields parameters to expand child blocks, for
 example (line wrapping inserted for readability):
 
     XX_RT_URL_XX/REST/2.0/tickets
-      ?fields=Owner,Status,Created,Subject,Queue,CustomFields
+      ?fields=Owner,Status,Created,Subject,Queue,CustomFields,Requestor,Cc,AdminCc,RT::CustomRole-1
       &fields[Queue]=Name,Description
 
 Says that in the result set for tickets, the extra fields for Owner, Status,
-Created, Subject, Queue and CustomFields should be included. But in
-addition, for the Queue block, also include Name and Description. The
-results would be similar to this (only one ticket is displayed in this
-example):
+Created, Subject, Queue, CustomFields, Requestor, Cc, AdminCc and
+CustomRoles should be included. But in addition, for the Queue block, also
+include Name and Description. The results would be similar to this (only one
+ticket is displayed in this example):
 
    "items" : [
       {
@@ -1142,8 +1176,30 @@ example):
                  "name" : "My Custom Field",
                  "values" : [
                      "CustomField value"
-                 },
+                 ]
              }
+         ],
+         "Requestor" : [
+            {
+               "id" : "root",
+               "type" : "user",
+               "_url" : "XX_RT_URL_XX/REST/2.0/user/root"
+            }
+         ],
+         "Cc" : [
+            {
+               "id" : "root",
+               "type" : "user",
+               "_url" : "XX_RT_URL_XX/REST/2.0/user/root"
+            }
+         ],
+         "AdminCc" : [],
+         "RT::CustomRole-1" : [
+            {
+               "_url" : "XX_RT_URL_XX/REST/2.0/user/foo@example.com",
+               "type" : "user",
+               "id" : "foo@example.com"
+            }
          ]
       }
       { … },

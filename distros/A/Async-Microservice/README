@@ -1,0 +1,253 @@
+NAME
+
+    Async::Microservice - Async HTTP Microservice Moose Role
+
+SYNOPSYS
+
+        # lib/Async/Microservice/HelloWorld.pm
+        package Async::Microservice::HelloWorld;
+        use Moose;
+        with qw(Async::Microservice);
+        sub service_name {return 'asmi-helloworld';}
+        sub get_routes {return ('hello' => {defaults => {GET => 'GET_hello'}});}
+        sub GET_hello {
+            my ( $self, $this_req ) = @_;
+            return [ 200, [], 'Hello world!' ];
+        }
+        1;
+    
+        # bin/async-microservice-helloworld.psgi
+        use Async::Microservice::HelloWorld;
+        my $mise = Async::Microservice::HelloWorld->new();
+        return sub { $mise->plack_handler(@_) };
+    
+        $ plackup -Ilib --port 8089 --server Twiggy bin/async-microservice-helloworld.psgi
+    
+        $ curl http://localhost:8089/v1/hello
+        Hello world!
+
+DESCRIPTION
+
+    This Moose::Role helps to quicly bootstrap async http service that is
+    including OpenAPI documentation.
+
+    See https://time.meon.eu/ and Async::Microservice::Time code.
+
+ To bootstrap new async service
+
+    Create new package for your APIs from current examples
+    lib/Async/Microservice/*. Inside set return value of service_name. This
+    string will be used to set process name and to read/locate OpenAPI yaml
+    definition for the documentation. Any GET/POST processing funtions must
+    be defined in get_routes funtion.
+
+    Copy one of the bin/*.psgi update it with your new package name.
+
+    Copy one of the root/static/*.yaml to have the same name as
+    service_name.
+
+    Now you are able to lauch the http service with:
+
+        plackup -Ilib --port 8089 --server Twiggy bin/async-microservice-YOUNAME.psgi
+
+    In your broser you can read the OpenAPI documentation:
+    http://0.0.0.0:8089/v1/ and also use editor to extend it:
+    http://0.0.0.0:8089/v1/edit
+
+SEE ALSO
+
+    OpenAPI Specification:
+    https://github.com/OAI/OpenAPI-Specification/tree/master/versions or
+    https://swagger.io/docs/specification/about/
+
+    Async::MicroserviceReq Twiggy
+
+TODO
+
+        - graceful termination (finish all requests before terminating on sigterm/hup)
+        - systemd service file examples
+        - static/index.html and static/edit.html are not really static, should be moved
+
+CONTRIBUTORS & CREDITS
+
+    The following people have contributed to this distribution by
+    committing their code, sending patches, reporting bugs, asking
+    questions, suggesting useful advice, nitpicking, chatting on IRC or
+    commenting on my blog (in no particular order):
+
+        you?
+
+    Also thanks to my current day-job-employer https://www.apa-it.at/.
+
+BUGS
+
+    Please report any bugs or feature requests via
+    https://github.com/jozef/Async-Microservice/issues.
+
+AUTHOR
+
+    Jozef Kutej
+
+COPYRIGHT & LICENSE
+
+    Copyright 2020 Jozef Kutej, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+
+----------------------------------------------------------------------------
+NAME
+
+    Async::MicroserviceReq - async microservice request class
+
+SYNOPSYS
+
+        my $this_req  = Async::MicroserviceReq->new(
+            method     => $plack_req->method,
+            headers    => $plack_req->headers,
+            content    => $plack_req->content,
+            path       => $plack_req->path_info,
+            params     => $plack_req->parameters,
+            static_dir => $self->static_dir,
+        );
+    
+        ...
+    
+        my $plack_handler_sub = sub {
+            my ($plack_respond) = @_;
+            $this_req->plack_respond($plack_respond);
+        ...
+
+DESCRIPTION
+
+    This is an object created for each request handled by
+    Async::Microservice. It is passed to all request handling functions as
+    first argument and it provides some request info and response helper
+    methods.
+
+ATTRIBUTES
+
+        method
+        headers
+        path
+        params
+        plack_respond
+        static_dir
+        base_url
+        want_json
+        content
+        json_content
+
+METHODS
+
+ text_plain(@text_lines)
+
+    Send text plain response.
+
+ respond($status, $headers, $payload)
+
+    Send plack response.
+
+ redirect($location_path)
+
+    Send redirect.
+
+ static($file_name, $content_cb)
+
+    Send static file, can be updated/modified using optional callback.
+
+ get_pending_req
+
+    Returns number of currently pending async requests.
+
+
+----------------------------------------------------------------------------
+NAME
+
+    Async::Microservice::Time - example time async microservice
+
+SYNOPSYS
+
+        # can be started using:
+        plackup --port 8085 -Ilib --access-log /dev/null --server Twiggy bin/async-microservice-time.psgi
+    
+        curl "http://localhost:8085/v1/hcheck" -H "accept: application/json"
+        curl "http://localhost:8085/v1/epoch"  -H "accept: application/json"
+        curl "http://localhost:8085/v1/datetime?time_zone=local" -H "accept: application/json"
+
+DESCRIPTION
+
+    This is an example asynchronous http micro service using
+    Async::Microservice. View the source code it's minimal.
+
+METHODS
+
+ service_name
+
+    Just a name, used to identify process and look for OpenAPI
+    documentation.
+
+ get_routes
+
+    Path::Router configuration for dispatching
+
+ http response methods
+
+  GET_datetime
+
+    https://time.meon.eu/v1/datetime
+
+  POST_datetime
+
+        $ curl -X POST "https://time.meon.eu/v1/datetime" -H  "accept: application/json" -H  "Content-Type: application/json" -d "{\"epoch\":-42}"
+        {
+           "date" : "1969-12-31",
+           "datetime" : "1969-12-31 23:59:18 +0000",
+           "day" : "31",
+           "epoch" : -42,
+           "hour" : "23",
+           "minute" : "59",
+           "month" : "12",
+           "second" : "18",
+           "time" : "23:59:18",
+           "time_zone" : "+0000",
+           "time_zone_name" : "UTC",
+           "year" : "1969"
+        }
+
+  GET_epoch
+
+    https://time.meon.eu/v1/epoch
+
+  GET_sleep
+
+    https://time.meon.eu/v1/sleep?duration=2.5
+
+    This is the only parallel processed reponse method (the other ones are
+    pure CPU-only bound) that sleep given (or random) number of seconds and
+    only then returns the request response with when it started and how
+    long it took. Normally this the same as what is in duration parameter,
+    but in case the server is overloaded with requests, the event loop may
+    call the timer handler much later than the duration. Try:
+
+        ab -n 1000 -c 500 http://localhost:8085/v1/sleep?duration=3
+        Connection Times (ms)
+                      min  mean[+/-sd] median   max
+        Connect:        0  259 432.8     21    1033
+        Processing:  3001 3090  72.5   3061    3253
+        Waiting:     3001 3090  72.5   3061    3253
+        Total:       3022 3349 394.1   3155    4065
+
+    Then try to run together with 100% CPU load:
+
+        ab -q -n 10000 -c 50 http://localhost:8085/v1/datetime
+
+  the rest
+
+    Check out Async::Microservice for built-in http response methods.
+
+SEE ALSO
+
+    t/02_Async-Microservice-Time.t for an example how to test this service.
+

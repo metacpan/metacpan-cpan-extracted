@@ -1,5 +1,5 @@
 package Finance::AMEX::Transaction::CBNOT::Base;
-$Finance::AMEX::Transaction::CBNOT::Base::VERSION = '0.003';
+$Finance::AMEX::Transaction::CBNOT::Base::VERSION = '0.004';
 use strict;
 use warnings;
 
@@ -47,7 +47,7 @@ Finance::AMEX::Transaction::CBNOT::Base - Parse AMEX Chargeback Notification Fil
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 DESCRIPTION
 
@@ -73,11 +73,11 @@ Finance::AMEX::Transaction::CBNOT::Base - Shared methods for AMEX chargeback not
 
 =head1 AUTHOR
 
-Tom Heady <theady@ziprecruiter.com>
+Tom Heady <cpan@punch.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by ZipRecruiter.
+This software is copyright (c) 2021 by ZipRecruiter.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

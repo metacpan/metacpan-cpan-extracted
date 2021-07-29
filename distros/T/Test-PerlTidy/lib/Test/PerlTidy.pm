@@ -1,5 +1,5 @@
 package Test::PerlTidy;
-$Test::PerlTidy::VERSION = '20200930';
+$Test::PerlTidy::VERSION = '20210709';
 use 5.014;
 use strict;
 use warnings;
@@ -195,7 +195,7 @@ Test::PerlTidy - check that all your files are tidy.
 
 =head1 VERSION
 
-version 20200930
+version 20210709
 
 =head1 SYNOPSIS
 
@@ -352,7 +352,7 @@ that refers to a hash ref of options that will be passed to Perl::Tidy::perltidy
 
 L<Perl::Tidy>
 
-=head1 AUTHOR
+=head1 ORIGINAL AUTHOR
 
 Edmund von der Burg, C<< <evdb at ecclestoad.co.uk> >>
 
@@ -363,6 +363,8 @@ Duncan J. Ferguson, C<< <duncan_j_ferguson at yahoo.co.uk> >>
 Stephen, C<< <stephen at enterity.com> >>
 
 Larry Leszczynski, C<< <larryl at cpan.org> >>
+
+Shlomi Fish, L<https://www.shlomifish.org/>
 
 =head1 SUGGESTIONS
 
@@ -471,7 +473,7 @@ feature.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Edmund von der Burg.
+This software is copyright (c) 2021 by Edmund von der Burg.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

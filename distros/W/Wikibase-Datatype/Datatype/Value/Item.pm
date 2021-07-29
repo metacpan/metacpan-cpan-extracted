@@ -3,11 +3,10 @@ package Wikibase::Datatype::Value::Item;
 use strict;
 use warnings;
 
-use Error::Pure qw(err);
 use Mo qw(build);
 use Wikibase::Datatype::Utils qw(check_entity);
 
-our $VERSION = 0.08;
+our $VERSION = 0.10;
 
 extends 'Wikibase::Datatype::Value';
 
@@ -152,6 +151,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.08
+0.10
 
 =cut

@@ -1,5 +1,5 @@
 ---
-abstract: 'Modules that follow the NO_COLOR convention'
+abstract: 'Modules/scripts that follow the NO_COLOR convention'
 author:
   - 'perlancar <perlancar@cpan.org>'
 build_requires:
@@ -20,7 +20,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-NO_COLOR
   homepage: https://metacpan.org/release/Acme-CPANModules-NO_COLOR
   repository: git://github.com/perlancar/perl-Acme-CPANModules-NO_COLOR.git
-version: '0.005'
+version: '0.008'
 x_Dist_Zilla:
   perl:
     version: '5.030002'
@@ -104,7 +104,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::BeforeBuild
       name: '@Author::PERLANCAR/PERLANCAR::BeforeBuild'
-      version: '0.603'
+      version: '0.604'
     -
       class: Dist::Zilla::Plugin::Rinci::AbstractFromMeta
       name: '@Author::PERLANCAR/Rinci::AbstractFromMeta'
@@ -140,6 +140,17 @@ x_Dist_Zilla:
           version: '0.006'
       name: '@Author::PERLANCAR/CheckSelfDependency'
       version: '0.011'
+    -
+      class: Dist::Zilla::Plugin::Git::Contributors
+      config:
+        Dist::Zilla::Plugin::Git::Contributors:
+          git_version: 2.17.1
+          include_authors: 0
+          include_releaser: 1
+          order_by: name
+          paths: []
+      name: '@Author::PERLANCAR/Git::Contributors'
+      version: '0.036'
     -
       class: Dist::Zilla::Plugin::CopyrightYearFromGit
       name: '@Author::PERLANCAR/CopyrightYearFromGit'
@@ -261,6 +272,10 @@ x_Dist_Zilla:
               name: '@Author::PERLANCAR/Authors'
               version: '4.015'
             -
+              class: Pod::Weaver::Section::Contributors
+              name: '@Author::PERLANCAR/Contributors'
+              version: '0.009'
+            -
               class: Pod::Weaver::Section::Legal
               name: '@Author::PERLANCAR/Legal'
               version: '4.015'
@@ -287,7 +302,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::Acme::CPANModules
               name: -Acme::CPANModules
-              version: '0.008'
+              version: '0.009'
       name: '@Author::PERLANCAR/PodWeaver'
       version: '4.008'
     -
@@ -369,7 +384,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Prereqs::CheckCircular
       name: '@Author::PERLANCAR/Prereqs::CheckCircular'
-      version: '0.006'
+      version: '0.007'
     -
       class: Dist::Zilla::Plugin::UploadToCPAN::WWWPAUSESimple
       name: '@Author::PERLANCAR/UploadToCPAN::WWWPAUSESimple'

@@ -1,0 +1,50 @@
+---
+abstract: 'Validator for JSON Schema Draft4 and OpenAPI Specification 3.0'
+author:
+  - 'Alexey Stavrov <logioniz@ya.ru>'
+  - 'Ivan Putintsev <uid@rydlab.ru>'
+  - 'Anton Fedotov <tosha.fedotov.2000@gmail.com>'
+  - 'Denis Ibaev <dionys@gmail.com>'
+  - 'Andrey Khozov <andrey@rydlab.ru>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+  perl: v5.16.0
+  utf8: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.023, CPAN::Meta::Converter version 2.150010'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: JSONSchema-Validator
+no_index:
+  directory:
+    - t
+requires:
+  B: '0'
+  Carp: '0'
+  Cwd: '0'
+  Encode: '0'
+  File::Basename: '0'
+  JSON::PP: '0'
+  Scalar::Util: '0'
+  Time::Piece: '0'
+  URI: '1.00'
+  constant: '0'
+  overload: '0'
+  parent: '0'
+  perl: v5.16.0
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/skbkontur/perl-jsonschema-validator/issues
+  repository: git://github.com/skbkontur/perl-jsonschema-validator.git
+version: '0.002'
+x_generated_by_perl: v5.32.1
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: MIT

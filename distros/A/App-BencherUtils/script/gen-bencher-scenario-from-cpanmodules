@@ -1,12 +1,12 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /Acme/CPANModulesUtil/Bencher/gen_bencher_scenario
-# and generated automatically using Perinci::CmdLine::Gen version 0.497
+# and generated automatically using Perinci::CmdLine::Gen version 0.499
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-01-20'; # DATE
+our $DATE = '2021-07-23'; # DATE
 our $DIST = 'App-BencherUtils'; # DIST
-our $VERSION = '0.243'; # VERSION
+our $VERSION = '0.244'; # VERSION
 
 use 5.010001;
 use strict;
@@ -40,15 +40,13 @@ gen-bencher-scenario-from-cpanmodules - Generate/extract Bencher scenario from i
 
 =head1 VERSION
 
-This document describes version 0.243 of gen-bencher-scenario-from-cpanmodules (from Perl distribution App-BencherUtils), released on 2021-01-20.
+This document describes version 0.244 of gen-bencher-scenario-from-cpanmodules (from Perl distribution App-BencherUtils), released on 2021-07-23.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % gen-bencher-scenario-from-cpanmodules [--debug] [--format=name] [--json]
-     [--log-level=level] [--(no)naked-res] [--page-result[=program]]
-     [--quiet] [--trace] [--verbose] [--view-result[=program]] <cpanmodule>
+% B<gen-bencher-scenario-from-cpanmodules> [B<--debug>|B<--log-level>=I<level>|B<--quiet>|B<--trace>|B<--verbose>] [B<--format>=I<name>|B<--json>] [B<--(no)naked-res>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] -- E<lt>I<cpanmodule>E<gt>
 
 =head1 DESCRIPTION
 
@@ -106,6 +104,8 @@ C<*> marks required options.
 =item B<--cpanmodule>=I<s>*
 
 Name of Acme::CPANModules::* module, without the prefix.
+
+Can also be specified as the 1st command-line argument.
 
 =back
 
@@ -240,7 +240,7 @@ Source repository is at L<https://github.com/perlancar/perl-App-BencherUtils>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-App-BencherUtils/issues>
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-BencherUtils>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

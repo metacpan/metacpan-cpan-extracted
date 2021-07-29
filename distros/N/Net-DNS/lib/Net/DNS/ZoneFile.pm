@@ -3,7 +3,7 @@ package Net::DNS::ZoneFile;
 use strict;
 use warnings;
 
-our $VERSION = (qw$Id: ZoneFile.pm 1832 2021-03-22 08:33:36Z willem $)[2];
+our $VERSION = (qw$Id: ZoneFile.pm 1841 2021-06-23 20:34:28Z willem $)[2];
 
 
 =head1 NAME
@@ -51,6 +51,11 @@ our @EXPORT = qw(parse read readfh);
 
 use constant PERLIO => defined eval { require PerlIO };
 
+use constant UTF8 => scalar eval {	## not UTF-EBCDIC  [see Unicode TR#16 3.6]
+	require Encode;
+	Encode::encode_utf8( chr(182) ) eq pack( 'H*', 'C2B6' );
+};
+
 require Net::DNS::Domain;
 require Net::DNS::RR;
 
@@ -73,10 +78,12 @@ exhausted or all references to the ZoneFile object cease to exist.
 
 The optional second argument specifies $ORIGIN for the zone file.
 
-Character encoding is specified indirectly by creating a file handle
-with the desired encoding layer, which is then passed as an argument
-to new(). The specified encoding is propagated to files introduced
-by $include directives.
+Zone files are presumed to be UTF-8 encoded where that is supported.
+
+Alternative character encodings may be specified indirectly by creating
+a file handle with the desired encoding layer, which is then passed as
+an argument to new(). The specified encoding is propagated to files
+introduced by $INCLUDE directives.
 
 =cut
 
@@ -93,7 +100,8 @@ sub new {
 	}
 
 	croak 'filename argument undefined' unless $file;
-	$self->{filehandle} = IO::File->new( $file, '<' ) or croak "$file: $!";
+	my $discipline = UTF8 ? '<:encoding(UTF-8)' : '<';
+	$self->{filehandle} = IO::File->new( $file, $discipline ) or croak "$file: $!";
 	$self->{fileopen}{$file}++;
 	$self->{filename} = $file;
 	return $self;
@@ -364,8 +372,8 @@ sub parse {
 		my ( $first, $last ) = split m#[-]#, $bound;
 		$first ||= 0;
 		$last  ||= $first;
-		$step = abs( $step || 1 );			# coerce step to match range
-		$step = -$step if $last < $first;
+		$step  ||= 1;					# coerce step to match range
+		$step = ( $last < $first ) ? -abs($step) : abs($step);
 		$self->{count} = int( ( $last - $first ) / $step ) + 1;
 
 		@{$self}{qw(instant step template line)} = ( $first, $step, $template, $line );
@@ -430,7 +438,7 @@ sub _generate {				## expand $GENERATE into input stream
 }
 
 
-my $LEX_REGEX = q/("[^"]*"|"[^"]*$)|;.*$|([()])|[ \t\n\r\f]/;
+my $LEX_REGEX = q/("[^"]*"|"[^"]*$)|;[^\n]*|([()])|[ \t\n\r\f]+/;
 
 sub _getline {				## get line from current source
 	my $self = shift;
@@ -440,33 +448,41 @@ sub _getline {				## get line from current source
 		next if /^\s*;/;				# discard comment line
 		next unless /\S/;				# discard blank line
 
-		if (/[(]/) {					# concatenate multi-line RR
-			chomp;					# discard line terminator
+		if (/["(]/) {
 			s/\\\\/\\092/g;				# disguise escaped escape
 			s/\\"/\\034/g;				# disguise escaped quote
 			s/\\\(/\\040/g;				# disguise escaped bracket
 			s/\\\)/\\041/g;				# disguise escaped bracket
 			s/\\;/\\059/g;				# disguise escaped semicolon
 			my @token = grep { defined && length } split /(^\s)|$LEX_REGEX/o;
-			if ( grep( { $_ eq '(' } @token ) && !grep( { $_ eq ')' } @token ) ) {
-				while (<$fh>) {
-					chomp;			# discard line terminator
-					tr[\t ][ ]s;		# squash white space
+
+			while ( $token[-1] =~ /^"[^"]*$/ ) {	# multiline quoted string
+				$_ = pop(@token) . <$fh>;	# reparse fragments
+				s/\\\\/\\092/g;			# disguise escaped escape
+				s/\\"/\\034/g;			# disguise escaped quote
+				s/\\\(/\\040/g;			# disguise escaped bracket
+				s/\\\)/\\041/g;			# disguise escaped bracket
+				s/\\;/\\059/g;			# disguise escaped semicolon
+				push @token, grep { defined && length } split /$LEX_REGEX/o;
+				$_ = join ' ', @token;		# reconstitute RR string
+			}
+
+			if ( grep { $_ eq '(' } @token ) {	# concatenate multiline RR
+				until ( grep { $_ eq ')' } @token ) {
+					$_ = pop(@token) . <$fh>;
 					s/\\\\/\\092/g;		# disguise escaped escape
 					s/\\"/\\034/g;		# disguise escaped quote
 					s/\\\(/\\040/g;		# disguise escaped bracket
 					s/\\\)/\\041/g;		# disguise escaped bracket
 					s/\\;/\\059/g;		# disguise escaped semicolon
-					$_ = pop(@token) . $_;	# reparse fragmented string
-					my @part = grep { defined && length } split /$LEX_REGEX/o;
-					push @token, @part;
-					last if grep { $_ eq ')' } @part;
+					push @token, grep { defined && length } split /$LEX_REGEX/o;
+					chomp $token[-1] unless $token[-1] =~ /^"[^"]*$/;
 				}
 				$_ = join ' ', @token;		# reconstitute RR string
 			}
 		}
 
-		return $_ unless /^\$/;				# RR string
+		return $_ unless /^[\$]/;			# RR string
 
 		if (/^\$INCLUDE/) {				# directive
 			my ( $keyword, @argument ) = split;
@@ -475,12 +491,12 @@ sub _getline {				## get line from current source
 
 		} elsif (/^\$GENERATE/) {			# directive
 			my ( $keyword, $range, @template ) = split;
-			die '$GENERATE incomplete' unless $range;
+			die '$GENERATE incomplete' unless @template;
 			$fh = $self->_generate( $range, "@template\n" );
 
 		} elsif (/^\$ORIGIN/) {				# directive
 			my ( $keyword, $origin, @etc ) = split;
-			die '$ORIGIN incomplete' unless $origin;
+			die '$ORIGIN incomplete' unless defined $origin;
 			$self->_origin($origin);
 
 		} elsif (/^\$TTL/) {				# directive

@@ -39,7 +39,7 @@ package SDL2::Window {
 
 =head1 NAME
 
-SDL2::Window - Information About the Version of SDL in Use
+SDL2::Window - SDL Window Structure, Corresponding to Toplevel Windows
 
 =head1 SYNOPSIS
 

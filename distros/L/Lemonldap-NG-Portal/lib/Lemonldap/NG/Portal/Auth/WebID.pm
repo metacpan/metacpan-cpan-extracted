@@ -5,14 +5,15 @@ use Mouse;
 use Regexp::Assemble;
 use Web::ID;
 use Lemonldap::NG::Portal::Main::Constants qw(
+  PE_OK
+  PE_BADPARTNER
   PE_BADCERTIFICATE
   PE_BADCREDENTIALS
-  PE_BADPARTNER
   PE_CERTIFICATEREQUIRED
-  PE_OK
+
 );
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.12';
 
 extends 'Lemonldap::NG::Portal::Main::Auth';
 
@@ -83,13 +84,13 @@ sub extractFormInfo {
 }
 
 sub authenticate {
-    PE_OK;
+    return PE_OK;
 }
 
 sub setAuthSessionInfo {
     my ( $self, $req ) = @_;
     $req->{sessionInfo}->{authenticationLevel} = $self->conf->{webIDAuthnLevel};
-    PE_OK;
+    return PE_OK;
 }
 
 sub getDisplayType {

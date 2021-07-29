@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 
 use utf8;
 use open qw(:locale);
@@ -41,11 +41,11 @@ licensecheck - simple license checker for source files
 
 =head1 VERSION
 
-Version v3.2.3
+Version v3.2.5
 
 =cut
 
-our $VERSION = version->declare('v3.2.3');
+our $VERSION = version->declare('v3.2.5');
 
 my $progname = path($0)->basename;
 

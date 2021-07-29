@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2021-06-12'; # DATE
-our $VERSION = '0.008'; # VERSION
+our $DATE = '2021-07-09'; # DATE
+our $VERSION = '0.009'; # VERSION
 
 # FRAGMENT id=shcompgen-hint command=tabrace
 
@@ -300,7 +300,7 @@ tabrace - A game played by shell tab completion
 
 =head1 VERSION
 
-This document describes version 0.008 of tabrace (from Perl distribution Games-TabRace), released on 2021-06-12.
+This document describes version 0.009 of tabrace (from Perl distribution Games-TabRace), released on 2021-07-09.
 
 =head1 SYNOPSIS
 
@@ -320,6 +320,15 @@ To type a number (type digit marked by x):
  4700    4701    4702    4703    4704   4705    4706    4707    4708x    4709
  % tabrace 4708<tab>
  % tabrace 4708 _<enter>
+
+A demo screencast:
+
+=begin html
+
+<img src="https://st.aticpan.org/source/PERLANCAR/Games-TabRace-0.009/share/images/screencast1.gif" />
+
+=end html
+
 
 =head1 DESCRIPTION
 

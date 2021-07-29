@@ -1,7 +1,7 @@
 package Perinci::CmdLine::Classic;
 
-our $DATE = '2021-05-07'; # DATE
-our $VERSION = '1.814'; # VERSION
+our $DATE = '2021-07-11'; # DATE
+our $VERSION = '1.815'; # VERSION
 
 use 5.010001;
 #use strict; # enabled by Moo
@@ -246,6 +246,7 @@ sub BUILD {
                     $r->{skip_parse_subcommand_argv} = 1;
                 },
                 tags => ['category:undo'],
+                key => 'action',
             };
             $copts->{clear_history} = {
                 getopt  => "clear-history",
@@ -256,6 +257,7 @@ sub BUILD {
                     $r->{skip_parse_subcommand_argv} = 1;
                 },
                 tags => ['category:undo'],
+                key => 'action',
             };
             $copts->{undo} = {
                 getopt  => 'undo',
@@ -266,6 +268,7 @@ sub BUILD {
                     $r->{skip_parse_subcommand_argv} = 1;
                 },
                 tags => ['category:undo'],
+                key => 'action',
             };
             $copts->{redo} = {
                 getopt  => 'redo',
@@ -275,6 +278,8 @@ sub BUILD {
                     $r->{action} = 'redo';
                     $r->{skip_parse_subcommand_argv} = 1;
                 },
+                tags => ['category:undo'],
+                key => 'action',
             };
         }
         $self->{common_opts} = $copts;
@@ -773,7 +778,7 @@ Perinci::CmdLine::Classic - Rinci/Riap-based command-line application framework
 
 =head1 VERSION
 
-This document describes version 1.814 of Perinci::CmdLine::Classic (from Perl distribution Perinci-CmdLine-Classic), released on 2021-05-07.
+This document describes version 1.815 of Perinci::CmdLine::Classic (from Perl distribution Perinci-CmdLine-Classic), released on 2021-07-11.
 
 =head1 SYNOPSIS
 
@@ -940,6 +945,12 @@ All those supported by L<Perinci::CmdLine::Base>, plus:
 If set to true, then when formatting to C<text> formats, this class won't print
 any newline to keep the data being printed unmodified.
 
+=head1 CONTRIBUTOR
+
+=for stopwords Steven Haryanto
+
+Steven Haryanto <sharyanto@cpan.org>
+
 =head1 ATTRIBUTES
 
 All the attributes of L<Perinci::CmdLine::Base>, plus:
@@ -1018,7 +1029,7 @@ Source repository is at L<https://github.com/perlancar/perl-Perinci-CmdLine-Clas
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Perinci-CmdLine-Classic/issues>
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-CmdLine-Classic>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

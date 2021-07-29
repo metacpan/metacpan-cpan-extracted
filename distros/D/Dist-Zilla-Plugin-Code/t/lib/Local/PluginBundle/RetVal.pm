@@ -26,26 +26,22 @@ sub bundle_config {
         $plugin_name,
         $plugin_class,
         {
-            $code => [
-                sub {
-                    my ($self) = @_;
-                    $self->log("Name = $retval");
-                    return $retval;
-                },
-            ],
+            $code => sub {
+                my ($self) = @_;
+                $self->log("Name = $retval");
+                return $retval;
+            },
         },
       ],
       [
         'SayMyName',
         'Dist::Zilla::Plugin::Code::BeforeBuild',
         {
-            before_build => [
-                sub {
-                    my ($self) = @_;
-                    $RESULT = $self->zilla->name;
-                    return;
-                },
-            ],
+            before_build => sub {
+                my ($self) = @_;
+                $RESULT = $self->zilla->name;
+                return;
+            },
         },
       ];
 }

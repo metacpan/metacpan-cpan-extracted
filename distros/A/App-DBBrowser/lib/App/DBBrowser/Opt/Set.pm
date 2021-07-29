@@ -11,7 +11,7 @@ use File::Spec::Functions qw( catfile );
 use FindBin               qw( $RealBin $RealScript );
 #use Pod::Usage            qw( pod2usage ); # required
 
-use Encode::Locale  qw();
+use Encode::Locale qw();
 
 use Term::Choose       qw();
 use Term::Choose::Util qw( insert_sep );
@@ -40,12 +40,13 @@ sub _groups {
     my $groups = [
         { name => 'group_help',     text => "  HELP"        },
         { name => 'group_path',     text => "  Path"        },
-        { name => 'group_database', text => "- DB Options" },
+        { name => 'group_database', text => "- DB Options"  },
         { name => 'group_behavior', text => "- Behavior"    },
         { name => 'group_enable',   text => "- Extensions"  },
         { name => 'group_sql',      text => "- SQL",        },
         { name => 'group_output',   text => "- Output"      },
         { name => 'group_insert',   text => "- Insert Data" },
+        { name => 'group_export',   text => "- Export to CSV"      },
     ];
     return $groups;
 }
@@ -104,9 +105,9 @@ sub _options {
             { name => '_data_source_type',  text => "- Source type of input data",     section => 'insert' },
             { name => '_parse_file',        text => "- Parse tool for 'file'",         section => 'insert' },
             { name => '_parse_copy',        text => "- Parse tool for 'copy & paste'", section => 'insert' },
-            { name => '_csv_char',          text => "- csv settings-a",                section => 'csv'    },
-            { name => '_csv_options',       text => "- csv settings-b",                section => 'csv'    },
-            { name => '_split_config',      text => "- 'split' settings",              section => 'split'  },
+            { name => '_csv_char',          text => "- Settings: csv-a",               section => 'csv'    },
+            { name => '_csv_options',       text => "- Settings: csv-b",               section => 'csv'    },
+            { name => '_split_config',      text => "- Settings: split",               section => 'split'  },
             { name => '_input_filter',      text => "- Enable input filter",           section => 'insert' },
             { name => '_empty_to_null',     text => "- Empty to NULL",                 section => 'insert' },
             { name => '_file_encoding',     text => "- File encoding",                 section => 'insert' },
@@ -114,8 +115,13 @@ sub _options {
             { name => '_file_filter',       text => "- File filter",                   section => 'insert' },
             { name => '_show_hidden_files', text => "- Show hidden files",             section => 'insert' },
         ],
+        group_export => [
+            { name => 'export_dir',           text => "- Destination folder",  section => 'export' },
+            { name => '_exported_files',      text => "- Auto-File-Extension", section => 'export' },
+            { name => '_export_csv_settings', text => "- Encoding to CSV",     section => 'export' },
+        ],
         group_function => [ # available only in the Function-menu
-            { name => 'round_precision_sign', text => "- Function round", section => 'G' },
+            { name => '_round_precision_sign', text => "- Function round", section => 'G' },
         ],
     };
     return $groups->{$group};
@@ -319,6 +325,13 @@ sub set_options {
                 my $prompt = 'Default auto increment column name';
                 $sf->__group_readline( $section, $items, $prompt );
             }
+            elsif ( $opt eq '_export_csv_settings' ) {
+                my $items = [
+                    { name => 'export_encoding', prompt => "Encoding" },
+                ];
+                my $prompt = 'Data to CSV-files';
+                $sf->__group_readline( $section, $items, $prompt );
+            }
             elsif ( $opt eq 'history_dirs' ) {
                 my $digits = 2;
                 my $prompt = 'Number of saved dirs: ';
@@ -397,7 +410,7 @@ sub set_options {
             elsif ( $opt eq '_dots' ) {
                 my $prompt = '"How to mark truncated lines"';
                 my $sub_menu = [
-                    [ 'dots', "- Mark of truncated lines", [ '...', '|', 'none' ] ]
+                    [ 'dots', "- Mark of truncated lines", [ $sf->{i}{dots}[0], $sf->{i}{dots}[1], 'none' ] ]
                 ];
                 $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
             }
@@ -446,11 +459,11 @@ sub set_options {
             elsif ( $opt eq '_alias' ) {
                 my $prompt = 'Alias for:';
                 my $sub_menu = [
-                    [ 'aggregate',  "- Aggregate",  [ $no, $yes ] ], # s - p
-                    [ 'functions',  "- Functions",  [ $no, $yes ] ],
-                    [ 'join',       "- Join",       [ $no, $yes ] ],
-                    [ 'subqueries', "- Subqueries", [ $no, $yes ] ],
-                    [ 'union',      "- Union",      [ $no, $yes ] ],
+                    [ 'select',        "- Functions/Subqueries in SELECT",  [ $no, $yes ] ],
+                    [ 'aggregate',     "- AGGREGATE functions",             [ $no, $yes ] ],
+                    [ 'derived_table', "- Derived table",                   [ $no, $yes ] ],
+                    [ 'join',          "- JOIN",                            [ $no, $yes ] ],
+                    [ 'union',         "- UNION",                           [ $no, $yes ] ],
                 ];
                 $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
             }
@@ -508,15 +521,22 @@ sub set_options {
                 $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
             }
             elsif ( $opt eq '_e_substatements' ) {
-                my $prompt = 'Substatement Additions:';
+                my $prompt = 'Enable Substatement Additions (functions, subqueries):';
                 my $sub_menu = [
-                    [ 'expand_select',   "- SELECT",   [ 'None', 'Func', 'SQ',       'Func/SQ'    ] ],
-                    [ 'expand_where',    "- WHERE",    [ 'None', 'Func', 'SQ',       'Func/SQ'    ] ],
-                    [ 'expand_group_by', "- GROUB BY", [ 'None', 'Func', 'SQ',       'Func/SQ'    ] ],
-                    [ 'expand_having',   "- HAVING",   [ 'None', 'Func', 'SQ',       'Func/SQ'    ] ],
-                    [ 'expand_order_by', "- ORDER BY", [ 'None', 'Func', 'SQ',       'Func/SQ'    ] ],
-                    [ 'expand_set',      "- SET",      [ 'None', 'Func', 'SQ', '=N', 'Func/SQ/=N' ] ],
+                    [ 'expand_select',   "- SELECT",   [ $no, $yes ] ],
+                    [ 'expand_where',    "- WHERE",    [ $no, $yes ] ],
+                    [ 'expand_group_by', "- GROUB BY", [ $no, $yes ] ],
+                    [ 'expand_having',   "- HAVING",   [ $no, $yes ] ],
+                    [ 'expand_order_by', "- ORDER BY", [ $no, $yes ] ],
+                    [ 'expand_set',      "- SET",      [ $no, $yes ] ],
                 ];
+                ############################################# 06.07.2021
+                for my $key ( keys %{$sf->{o}{$section}} ) {
+                    if ( $sf->{o}{$section}{$key} > 1 ) {
+                        $sf->{o}{$section}{$key} = 1;
+                    }
+                }
+                #############################################
                 $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
             }
             elsif ( $opt eq '_e_parentheses' ) {
@@ -554,7 +574,7 @@ sub set_options {
                 ];
                 $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
             }
-            elsif ( $opt eq 'round_precision_sign' ) {
+            elsif ( $opt eq '_round_precision_sign' ) {
                 my $prompt = 'Funtion \'round\': ask for precision sign?';
                 my $sub_menu = [
                     [ 'round_precision_sign', "- ROUND: precision sign", [ $no, $yes ] ]
@@ -568,9 +588,16 @@ sub set_options {
                 ];
                 $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
             }
-            elsif ( $opt eq 'add_file_dir' ) { # special case
-                $sf->__new_dir_search();
-                last GROUP;
+            elsif ( $opt eq '_exported_files' ) {
+                my $prompt = 'Exported files';
+                my $sub_menu = [
+                    [ 'add_extension', "- Add automatically '.csv'-extension", [ $no, $yes ] ]
+                ];
+                $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
+            }
+            elsif ( $opt eq 'export_dir' ) {
+                my $prompt = 'Choose destination folder for data exported in CSV-files';
+                $sf->__choose_a_directory_wrap( $section, $opt, $prompt );
             }
             else {
                 die "Unknown option: $opt";
@@ -593,6 +620,7 @@ sub set_options {
 
 
 sub __settings_menu_wrap {
+    # sets the options to the index of the chosen values, not to the values itself
     my ( $sf, $section, $sub_menu, $prompt ) = @_;
     my $tu = Term::Choose::Util->new( $sf->{i}{tcu_default} );
     my $changed = $tu->settings_menu(
@@ -644,6 +672,18 @@ sub __choose_a_number_wrap {
 }
 
 
+sub __choose_a_directory_wrap {
+    my ( $sf, $section, $opt, $prompt ) = @_;
+    my $tu = Term::Choose::Util->new( $sf->{i}{tcu_default} );
+    #my $current = $sf->{o}{$section}{$opt};
+    my $choice = $tu->choose_a_directory( { show_hidden => 1, prompt => $prompt, clear_screen => 1, decoded => 1 } ); ##
+    return if ! defined $choice;
+    $sf->{o}{$section}{$opt} = $choice;
+    $sf->{write_config}++;
+    return;
+}
+
+
 sub __group_readline {
     my ( $sf, $section, $items, $prompt ) = @_;
     my $list = [ map {
@@ -663,21 +703,6 @@ sub __group_readline {
         }
         $sf->{write_config}++;
     }
-}
-
-
-sub __new_dir_search { # used in Read.pm
-    my ( $sf ) = @_;
-    my $tu = Term::Choose::Util->new( $sf->{i}{tcu_default} );
-    my $default_dir = $sf->{i}{tmp_files_dir} // $sf->{i}{home_dir};
-    # Choose
-    my $dir_fs = $tu->choose_a_directory(
-        { init_dir => $default_dir, decoded => 0, clear_screen => 1 }
-    );
-    if ( $dir_fs ) {
-        $sf->{i}{tmp_files_dir} = $dir_fs;
-    }
-    $sf->{o}{insert}{add_file_dir} = $dir_fs; # don't keep saved value even if $dir_fs is not defined
 }
 
 

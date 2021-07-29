@@ -30,9 +30,8 @@ You shouldn't make instances of this class. Each attribute should be used as a n
 =head1 SYNOPSIS
 
     my $glacier = Paws->service('Glacier');
-    # To abort a multipart upload identified by the upload ID
-    # The example deletes an in-progress multipart upload to a vault named
-    # my-vault:
+# To abort a multipart upload identified by the upload ID
+# The example deletes an in-progress multipart upload to a vault named my-vault:
     $glacier->AbortMultipartUpload(
       'AccountId' => '-',
       'UploadId'  =>

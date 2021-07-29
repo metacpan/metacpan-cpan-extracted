@@ -1,10 +1,21 @@
-#---------------------------------------------------------------------
-# $Header: /Perl/OlleDB/t/2_datatypes.t 38    19-07-08 22:15 Sommar $
+Ôªø#---------------------------------------------------------------------
+# $Header: /Perl/OlleDB/t/2_datatypes.t 40    21-06-30 23:12 Sommar $
 #
 # This test script tests using sql_sp and sql_insert in all possible
 # ways and with testing use of all datatypes.
 #
 # $History: 2_datatypes.t $
+# 
+# *****************  Version 40  *****************
+# User: Sommar       Date: 21-06-30   Time: 23:12
+# Updated in $/Perl/OlleDB/t
+# Some adjustments for OEMCP = UTF-8.
+# 
+# *****************  Version 39  *****************
+# User: Sommar       Date: 21-04-25   Time: 21:45
+# Updated in $/Perl/OlleDB/t
+# Changed expected results for sql_variant due to changes in MSOLEDBSQL
+# 18.4.
 # 
 # *****************  Version 38  *****************
 # User: Sommar       Date: 19-07-08   Time: 22:15
@@ -66,7 +77,7 @@
 # *****************  Version 29  *****************
 # User: Sommar       Date: 09-08-16   Time: 13:58
 # Updated in $/Perl/OlleDB/t
-# Modified test fˆr bit to handle empty string as input.
+# Modified test f√∂r bit to handle empty string as input.
 #
 # *****************  Version 28  *****************
 # User: Sommar       Date: 08-05-04   Time: 22:27
@@ -217,6 +228,7 @@
 #---------------------------------------------------------------------
 
 use strict;
+use utf8;
 use IO::File;
 use English;
 use Config;
@@ -590,35 +602,35 @@ sub create_unicode {
    sql(<<SQLEND);
       CREATE TABLE unicode(ncharcol             nchar(20)     NULL,
                            \x{0144}varcharcol   nvarchar(20)  NULL,
-                           nch‰rcˆl2            nchar(20)     NOT NULL);
+                           nch√§rc√∂l2            nchar(20)     NOT NULL);
 SQLEND
 
-   @tblcols = ("ncharcol", "\x{0144}varcharcol", "nch‰rcˆl2");
+   @tblcols = ("ncharcol", "\x{0144}varcharcol", "nch√§rc√∂l2");
 
    sql(<<SQLEND);
       CREATE TRIGGER unicode_tri ON unicode FOR INSERT AS
       UPDATE unicode
       SET    ncharcol     = reverse(ncharcol),
              \x{0144}varcharcol  = reverse(\x{0144}varcharcol),
-             nch‰rcˆl2    = reverse(nch‰rcˆl2)
+             nch√§rc√∂l2    = reverse(nch√§rc√∂l2)
 SQLEND
 
    sql(<<SQLEND);
    CREATE PROCEDURE unicode_sp
                     \@ncharcol     nchar(20)    OUTPUT,
                     \@\x{0144}varcharcol  nvarchar(20) OUTPUT,
-                    \@nch‰rcˆl2    nchar(20)    OUTPUT AS
+                    \@nch√§rc√∂l2    nchar(20)    OUTPUT AS
 
    DELETE unicode
 
-   INSERT unicode(ncharcol, \x{0144}varcharcol, nch‰rcˆl2)
-      VALUES (\@ncharcol, \@\x{0144}varcharcol, \@nch‰rcˆl2)
+   INSERT unicode(ncharcol, \x{0144}varcharcol, nch√§rc√∂l2)
+      VALUES (\@ncharcol, \@\x{0144}varcharcol, \@nch√§rc√∂l2)
 
    SELECT \@ncharcol     = upper(\@ncharcol),
           \@\x{0144}varcharcol  = upper(\@\x{0144}varcharcol),
-          \@nch‰rcˆl2    = upper(\@nch‰rcˆl2)
+          \@nch√§rc√∂l2    = upper(\@nch√§rc√∂l2)
 
-   SELECT ncharcol, \x{0144}varcharcol, nch‰rcˆl2
+   SELECT ncharcol, \x{0144}varcharcol, nch√§rc√∂l2
    FROM   unicode
 SQLEND
 }
@@ -629,35 +641,35 @@ sub create_utf8 {
    sql(<<SQLEND);
       CREATE TABLE utf8(charcol            char(40)     NULL,
                         \x{0144}varcharcol varchar(40)  NULL,
-                        ch‰rcˆl2           char(40)     NOT NULL);
+                        ch√§rc√∂l2           char(40)     NOT NULL);
 SQLEND
 
-   @tblcols = ("charcol", "\x{0144}varcharcol", "ch‰rcˆl2");
+   @tblcols = ("charcol", "\x{0144}varcharcol", "ch√§rc√∂l2");
 
    sql(<<SQLEND);
       CREATE TRIGGER utf8_tri ON utf8 FOR INSERT AS
       UPDATE utf8
       SET    charcol     = reverse(charcol),
              \x{0144}varcharcol  = reverse(\x{0144}varcharcol),
-             ch‰rcˆl2    = reverse(ch‰rcˆl2)
+             ch√§rc√∂l2    = reverse(ch√§rc√∂l2)
 SQLEND
 
    sql(<<SQLEND);
    CREATE PROCEDURE utf8_sp
                     \@charcol     char(40)    OUTPUT,
                     \@\x{0144}varcharcol  varchar(40) OUTPUT,
-                    \@ch‰rcˆl2    char(40)    OUTPUT AS
+                    \@ch√§rc√∂l2    char(40)    OUTPUT AS
 
    DELETE utf8
 
-   INSERT utf8(charcol, \x{0144}varcharcol, ch‰rcˆl2)
-      VALUES (\@charcol, \@\x{0144}varcharcol, \@ch‰rcˆl2)
+   INSERT utf8(charcol, \x{0144}varcharcol, ch√§rc√∂l2)
+      VALUES (\@charcol, \@\x{0144}varcharcol, \@ch√§rc√∂l2)
 
    SELECT \@charcol     = upper(\@charcol),
           \@\x{0144}varcharcol  = upper(\@\x{0144}varcharcol),
-          \@ch‰rcˆl2    = upper(\@ch‰rcˆl2)
+          \@ch√§rc√∂l2    = upper(\@ch√§rc√∂l2)
 
-   SELECT charcol, \x{0144}varcharcol, ch‰rcˆl2
+   SELECT charcol, \x{0144}varcharcol, ch√§rc√∂l2
    FROM   utf8
 SQLEND
 }
@@ -1286,7 +1298,7 @@ SQLEND
      sql(<<SQLEND);
 CREATE XML SCHEMA COLLECTION [Olles SC] AS '
 <schema xmlns="http://www.w3.org/2001/XMLSchema">
-      <element name="TƒST" type="string"/>
+      <element name="T√ÑST" type="string"/>
 </schema>
 '
 SQLEND
@@ -1306,11 +1318,11 @@ SQLEND
        UPDATE xmltest
        SET    xmlcol    = (SELECT nvarcol FROM xmltest FOR XML AUTO),
               xmlsccol  = (SELECT 1 AS Tag, NULL as Parent,
-                                  nvarsccol AS [TƒST!1]
+                                  nvarsccol AS [T√ÑST!1]
                            FROM   xmltest
                            FOR    XML EXPLICIT),
               nvarcol   = nullif(convert(nvarchar(MAX), xmlcol), ''),
-              nvarsccol = xmlsccol.value(N'/TƒST[1]', 'nvarchar(MAX)')
+              nvarsccol = xmlsccol.value(N'/T√ÑST[1]', 'nvarchar(MAX)')
 SQLEND
 
    my $spcode = <<'SQLEND';
@@ -1332,10 +1344,10 @@ SQLEND
        SELECT @nvarcol = @xmlcol.value(N'/*[1]', 'nvarchar(MAX)'),
               @nvarsccol = nullif(convert(nvarchar(MAX), @xmlsccol), '')
 
-       SELECT @xmlcol = (SELECT lower(@tmp) AS LÂgland
+       SELECT @xmlcol = (SELECT lower(@tmp) AS L√•gland
                          FOR XML RAW, ELEMENTS),
               @xmlsccol = (SELECT 1 AS Tag, NULL as Parent,
-                                  upper(@tmpsc) AS [TƒST!1]
+                                  upper(@tmpsc) AS [T√ÑST!1]
                            FOR    XML EXPLICIT)
 
        SELECT xmlcol, xmlsccol, nvarcol, nvarsccol
@@ -1387,7 +1399,7 @@ sub ISO_to_regional {
   open DH, "datehelperout.txt";
   my $line = <DH>;
   close DH;
-  my $ret = (split(/\s*£\s*/, $line))[0];
+  my $ret = (split(/\s*\xc2?¬£\s*/, $line))[0];  # The \xC2 is needed wen OENCP = UTf-8. Perl bug?
   $ret =~ s/^\s*|\s*$//g;
   $ret .= $tz if defined $tz;
   return $ret;
@@ -1591,6 +1603,8 @@ my $collation = $X->sql_one("SELECT serverproperty('Collation')", SCALAR);
 my $codepage = codepage($X);
 my $is_utf8 = ($codepage == 65001);
 
+# We want output as UTF-8.
+binmode(STDOUT, "encoding(UTF-8)");
 
 # Make sure that we have standard settings, except for ANSI_WARNINGS
 # that we want to be off, as we test overlong input.
@@ -1797,13 +1811,13 @@ do_tests($X, 1, 'binary', 'BinaryAsStr = x. empty');
 $X->{BinaryAsStr} = 0;
 %tbl       = (bincol       => '4711ABCD',
               varbincol    => 'Typewriter',
-              tstamp       => "\x00\x00/!#§ß=");
+              tstamp       => "\x00\x00/!#\xA4\xA5=");
 %expectcol = (bincol       => "\x00" x 12 . 'CDAB1147',
               varbincol    => 'eritwrpeTy',
               tstamp       => "^(.|\\n){8}\$");
 %expectpar = (bincol       => '47114711ABCD' . "\x00" x 8,
               varbincol    => 'TypewriterTypewriter',
-              tstamp       => "#§ß=\x00\x00/!");
+              tstamp       => "#\xA4\xA5=\x00\x00/!");
 %test      = (bincol       => '%s eq %s',
               varbincol    => '%s eq %s',
               tstamp       => '%s =~ /%s/');
@@ -2198,7 +2212,7 @@ clear_test_data;
 create_unicode;
 
 my $nvarcharcol = "\x{0144}varcharcol";
-my $ncharcol2 = 'nch‰rcˆl2';
+my $ncharcol2 = 'nch√§rc√∂l2';
 binmode(STDOUT, ':utf8:');
 
 %tbl       = (ncharcol      => "\x{00E6}\x{00E5}\x{00F6}\x{FFFD}",
@@ -2258,7 +2272,7 @@ if ($is_utf8) {
    create_utf8;
 
    my $varcharcol = "\x{0144}varcharcol";
-   my $charcol2 = 'ch‰rcˆl2';
+   my $charcol2 = 'ch√§rc√∂l2';
    binmode(STDOUT, ':utf8:');
 
    %tbl       = (charcol      => "\x{00E6}\x{00E5}\x{00F6}\x{FFFD}",
@@ -2496,7 +2510,7 @@ if ($x86) {
                  intype  => undef,
                  outtype => 'bigint');
    %expectcol = (varcol  => '123456900000000',
-                 intype  => 'varchar',
+                 intype  => 'n?varchar',
                  outtype => $tbl{'outtype'});
    %expectpar = (varcol  => '-246913824691356',
                  intype  => $expectcol{'intype'},
@@ -2505,7 +2519,7 @@ if ($x86) {
                  intype  => 'NULL',
                  outtype => "N'$tbl{'outtype'}'");
    %test      = (varcol  => '%s eq %s',
-                 intype  => '%s eq %s',
+                 intype  => '%s =~ /%s/',
                  outtype => '%s eq %s');
    do_tests($X, 0, 'sql_variant', 'bigint x86 as str');
 }
@@ -2636,7 +2650,7 @@ $X->{DecimalAsStr} = 1;
               intype  => undef,
               outtype => 'decimal');
 %expectcol = (varcol  => '123456900000000.123456',
-              intype  => 'varchar',
+              intype  => 'n?varchar',
               outtype => $tbl{'outtype'});
 %expectpar = (varcol  => '-246913824691356.246912',
               intype  => $expectcol{'intype'},
@@ -2645,7 +2659,7 @@ $X->{DecimalAsStr} = 1;
               intype  => 'NULL',
               outtype => "N'$tbl{'outtype'}'");
 %test      = (varcol  => '%s eq %s',
-              intype  => '%s eq %s',
+              intype  => '%s =~ /%s/',
               outtype => '%s eq %s');
 do_tests($X, 0, 'sql_variant', 'decimal as str');
 
@@ -2654,7 +2668,7 @@ $X->{DecimalAsStr} = 1;
               intype  => undef,
               outtype => 'smallmoney');
 %expectcol = (varcol  => '0.3412',
-              intype  => 'varchar',
+              intype  => 'n?varchar',
               outtype => $tbl{'outtype'});
 %expectpar = (varcol  => '-24690.6824',
               intype  => $expectcol{'intype'},
@@ -2663,7 +2677,7 @@ $X->{DecimalAsStr} = 1;
               intype  => 'NULL',
               outtype => "N'$tbl{'outtype'}'");
 %test      = (varcol  => '%s eq %s',
-              intype  => '%s eq %s',
+              intype  => '%s =~ /%s/',
               outtype => '%s eq %s');
 do_tests($X, 0, 'sql_variant', 'smallmoney as str');
 
@@ -2672,7 +2686,7 @@ $X->{DecimalAsStr} = 0;
               intype  => undef,
               outtype => 'decimal');
 %expectcol = (varcol  => 123456900000000.123456,
-              intype  => 'varchar',
+              intype  => 'n?varchar',
               outtype => $tbl{'outtype'});
 %expectpar = (varcol  => -246913824691356.246912,
               intype  => $expectcol{'intype'},
@@ -2681,7 +2695,7 @@ $X->{DecimalAsStr} = 0;
               intype  => 'NULL',
               outtype => "N'$tbl{'outtype'}'");
 %test      = (varcol  => 'abs(%s - %s) < 0.01',
-              intype  => '%s eq %s',
+              intype  => '%s =~ /%s/',
               outtype => '%s eq %s');
 do_tests($X, 0, 'sql_variant', 'money as dec');
 
@@ -2743,7 +2757,7 @@ $X->{DatetimeOption} = DATETIME_REGIONAL;
               intype  => 'NULL',
               outtype => "N'$tbl{'outtype'}'");
 %test      = (varcol  => '%s eq %s',
-              intype  => '%s eq %s',
+              intype  => '%s =~ /%s/',
               outtype => '%s eq %s');
 do_tests($X, 0, 'sql_variant', 'datetime hash/regional');
 
@@ -2753,7 +2767,7 @@ $X->{DatetimeOption} = DATETIME_HASH;
               outtype => 'datetime');
 %expectcol = (varcol  => {Year => 1996, Month => 9, Day => 1, Hour => 14,
                           Minute => 16, Second => 23, Fraction => 0},
-              intype  => 'varchar',
+              intype  => 'n?varchar',
               outtype => $tbl{'outtype'});
 %expectpar = (varcol  => {Year => 1996, Month => 10, Day => 22, Hour => 0,
                           Minute => 16, Second => 23, Fraction => 0},
@@ -2763,7 +2777,7 @@ $X->{DatetimeOption} = DATETIME_HASH;
               intype  => 'NULL',
               outtype => "N'$tbl{'outtype'}'");
 %test      = (varcol  => 'datehash_compare(%s, %s)',
-              intype  => '%s eq %s',
+              intype  => '%s =~ /%s/',
               outtype => '%s eq %s');
 do_tests($X, 0, 'sql_variant', 'datetime iso/hash');
 
@@ -2772,7 +2786,7 @@ do_tests($X, 0, 'sql_variant', 'datetime iso/hash');
               outtype => 'smalldatetime');
 %expectcol = (varcol  => {Year => 2079, Month => 4, Day => 1, Hour => 14,
                           Minute => 16, Second => 0, Fraction => 0},
-              intype  => 'varchar',
+              intype  => 'n?varchar',
               outtype => $tbl{'outtype'});
 %expectpar = (varcol  => {Year => 2079, Month => 5, Day => 22, Hour => 0,
                           Minute => 16, Second => 0, Fraction => 0},
@@ -2782,7 +2796,7 @@ do_tests($X, 0, 'sql_variant', 'datetime iso/hash');
               intype  => 'NULL',
               outtype => "N'$tbl{'outtype'}'");
 %test      = (varcol  => 'datehash_compare(%s, %s)',
-              intype  => '%s eq %s',
+              intype  => '%s =~ /%s/',
               outtype => '%s eq %s');
 do_tests($X, 0, 'sql_variant', 'smalldatetime iso/hash');
 
@@ -2790,7 +2804,7 @@ do_tests($X, 0, 'sql_variant', 'smalldatetime iso/hash');
               intype  => undef,
               outtype => 'char');
 %expectcol = (varcol  => ' ' x 17 . "cba",
-              intype  => 'varchar',
+              intype  => 'n?varchar',
               outtype => $tbl{'outtype'});
 %expectpar = (varcol  => "ABC" . ' ' x 17,
               intype  => $expectcol{'intype'},
@@ -2799,42 +2813,43 @@ do_tests($X, 0, 'sql_variant', 'smalldatetime iso/hash');
               intype  => 'NULL',
               outtype => "N'$tbl{'outtype'}'");
 %test      = (varcol  => '%s eq %s',
-              intype  => '%s eq %s',
+              intype  => '%s =~ /%s/',
               outtype => '%s eq %s');
 do_tests($X, 0, 'sql_variant', 'char');
 
-%tbl       = (varcol  => "‰23456789\x00123456789nn",
+hit:
+%tbl       = (varcol  => "√§23456789\x00123456789nn",
               intype  => undef,
               outtype => 'varchar');
-%expectcol = (varcol  => "nn987654321\x0098765432‰",
-              intype  => 'varchar',
+%expectcol = (varcol  => "nn987654321\x0098765432√§",
+              intype  => 'n?varchar',
               outtype => $tbl{'outtype'});
-%expectpar = (varcol  => "ƒ23456789\x00123456789NN",
+%expectpar = (varcol  => "√Ñ23456789\x00123456789NN",
               intype  => $expectcol{'intype'},
               outtype => $tbl{'outtype'});
 %expectfile= (varcol  => "N'$tbl{'varcol'}'",
               intype  => 'NULL',
               outtype => "N'$tbl{'outtype'}'");
 %test      = (varcol  => '%s eq %s',
-              intype  => '%s eq %s',
+              intype  => '%s =~ /%s/',
               outtype => '%s eq %s');
 do_tests($X, 0, 'sql_variant', 'varchar');
 
 %tbl       = (varcol  => "abcdefghij" x 900,
               intype  => undef,
               outtype => 'varchar');
-%expectcol = (varcol  => "jihgfedcba" x 800,
-              intype  => 'varchar',
+%expectcol = (varcol  => "jihgfedcba" x 400 . '(' . "jihgfedcba" x 400 . ')?',
+              intype  => 'n?varchar',
               outtype => $tbl{'outtype'});
-%expectpar = (varcol  => "ABCDEFGHIJ" x 800,
+%expectpar = (varcol  => "ABCDEFGHIJ" x 400 . '(' . "ABCDEFGHIJ" x 400 . ')?',
               intype  => $expectcol{'intype'},
               outtype => $tbl{'outtype'});
 %expectfile= (varcol  => "N'$tbl{'varcol'}'",
               intype  => 'NULL',
               outtype => "N'$tbl{'outtype'}'");
-%test      = (varcol  => '%s eq %s',
-              intype  => '%s eq %s',
-              outtype => '%s eq %s');
+%test      = (varcol  => '%s =~ /%s/',
+              intype  => '%s =~ /%s/',
+              outtype => '%s =~ /%s/');
 do_tests($X, 0, 'sql_variant', 'too long varchar');
 
 
@@ -2842,7 +2857,7 @@ do_tests($X, 0, 'sql_variant', 'too long varchar');
               intype  => undef,
               outtype => 'varchar');
 %expectcol = (varcol  => "",
-              intype  => 'varchar',
+              intype  => 'n?varchar',
               outtype => $tbl{'outtype'});
 %expectpar = (varcol  => "",
               intype  => $expectcol{'intype'},
@@ -2851,7 +2866,7 @@ do_tests($X, 0, 'sql_variant', 'too long varchar');
               intype  => 'NULL',
               outtype => "N'$tbl{'outtype'}'");
 %test      = (varcol  => '%s eq %s',
-              intype  => '%s eq %s',
+              intype  => '%s =~ /%s/',
               outtype => '%s eq %s');
 do_tests($X, 0, 'sql_variant', 'varchar empty str');
 
@@ -2860,7 +2875,7 @@ do_tests($X, 0, 'sql_variant', 'varchar empty str');
               intype  => undef,
               outtype => 'nchar');
 %expectcol = (varcol  => ' ' x 15 . "\x{FFFD}\x{010B}cba",
-              intype  => ($is_utf8 ? 'varchar' : 'nvarchar'),
+              intype  => 'nvarchar',
               outtype => $tbl{'outtype'});
 %expectpar = (varcol  => "ABC\x{010A}\x{FFFD}" . ' ' x 15,
               intype  => $expectcol{'intype'},
@@ -2877,7 +2892,7 @@ do_tests($X, 0, 'sql_variant', 'nchar');
               intype  => undef,
               outtype => 'nvarchar');
 %expectcol = (varcol  => "\x{FFFD}987654321\x{010B}",
-              intype  => ($is_utf8 ? 'varchar' : 'nvarchar'),
+              intype  => 'nvarchar',
               outtype => $tbl{'outtype'});
 %expectpar = (varcol  => "\x{010A}123456789\x{FFFD}",
               intype  => $expectcol{'intype'},
@@ -2894,7 +2909,7 @@ do_tests($X, 0, 'sql_variant', 'nvarchar');
               intype  => undef,
               outtype => 'nvarchar');
 %expectcol = (varcol  => "\x{FFFD}87654321\x{010B}" x 400,
-              intype  => ($is_utf8 ? 'varchar' : 'nvarchar'),
+              intype  => 'nvarchar',
               outtype => $tbl{'outtype'});
 %expectpar = (varcol  => "\x{010A}12345678\x{FFFD}" x 400,
               intype  => $expectcol{'intype'},
@@ -2912,9 +2927,8 @@ $X->{BinaryAsStr} = 0;
 %tbl       = (varcol  => "123456789\x{FFFD}",
               intype  => undef,
               outtype => 'binary');
-%expectcol = (varcol  => ($is_utf8 ? "123456789\xEF\xBF\xBD" . "\x00" x 8
-                                   : "1\x002\x003\x004\x005\x006\x007\x008\x009\x00\xFD\xFF"),
-              intype  => ($is_utf8 ? 'varchar' : 'nvarchar'),
+%expectcol = (varcol  => "1\x002\x003\x004\x005\x006\x007\x008\x009\x00\xFD\xFF",
+              intype  => 'nvarchar',
               outtype => $tbl{'outtype'});
 %expectpar = (varcol  => $expectcol{'varcol'},
               intype  => $expectcol{'intype'},
@@ -2931,43 +2945,44 @@ $X->{BinaryAsStr} = 1;
 %tbl       = (varcol  => "abc",
               intype  => undef,
               outtype => 'varbinary');
-%expectcol = (varcol  => "616263",
-              intype  => 'varchar',
+%expectcol = (varcol  => "61(00)?62(00)?63(00)?",
+              intype  => 'n?varchar',
               outtype => $tbl{'outtype'});
-%expectpar = (varcol  => "616263",
+%expectpar = (varcol  => $expectcol{'varcol'},
               intype  => $expectcol{'intype'},
               outtype => $tbl{'outtype'});
 %expectfile= (varcol  => "N'$tbl{'varcol'}'",
               intype  => 'NULL',
               outtype => "N'$tbl{'outtype'}'");
-%test      = (varcol  => '%s eq %s',
-              intype  => '%s eq %s',
-              outtype => '%s eq %s');
+%test      = (varcol  => '%s =~ /%s/',
+              intype  => '%s =~ /%s/',
+              outtype => '%s =~ /%s/');
 do_tests($X, 0, 'sql_variant', 'varbinary as str');
 
 $X->{BinaryAsStr} = 'x';
 %tbl       = (varcol  => "abc",
               intype  => undef,
               outtype => 'binary');
-%expectcol = (varcol  => "0x616263" . '00' x 17,
-              intype  => 'varchar',
+%expectcol = (varcol  => "0x(616263" . '00' x 17 . 
+                         ')|(610062006300' . '00' x 14 . ')',
+              intype  => 'n?varchar',
               outtype => $tbl{'outtype'});
-%expectpar = (varcol  => "0x616263" . '00' x 17,
+%expectpar = (varcol  => $expectcol{'varcol'},
               intype  => $expectcol{'intype'},
               outtype => $tbl{'outtype'});
 %expectfile= (varcol  => "N'$tbl{'varcol'}'",
               intype  => 'NULL',
               outtype => "N'$tbl{'outtype'}'");
-%test      = (varcol  => '%s eq %s',
-              intype  => '%s eq %s',
-              outtype => '%s eq %s');
+%test      = (varcol  => '%s =~ /%s/',
+              intype  => '%s =~ /%s/',
+              outtype => '%s =~ /%s/');
 do_tests($X, 0, 'sql_variant', 'binary as 0x');
 
 %tbl       = (varcol  => "1B2EA68F-6E22-4471-B67E-2E4EFCC283CD",
               intype  => undef,
               outtype => 'uniqueidentifier');
 %expectcol = (varcol  => "{1B2EA68F-6E22-4471-B67E-2E4EFCC283CD}",
-              intype  => 'varchar',
+              intype  => 'n?varchar',
               outtype => $tbl{'outtype'});
 %expectpar = (varcol  => "{1B2EA68F-6E22-4471-B67E-2E4EFCC283CD}",
               intype  => $expectcol{'intype'},
@@ -2976,7 +2991,7 @@ do_tests($X, 0, 'sql_variant', 'binary as 0x');
               intype  => 'NULL',
               outtype => "N'$tbl{'outtype'}'");
 %test      = (varcol  => '%s eq %s',
-              intype  => '%s eq %s',
+              intype  => '%s =~ /%s/',
               outtype => '%s eq %s');
 do_tests($X, 0, 'sql_variant', 'uniqueidentifier');
 
@@ -2984,7 +2999,7 @@ do_tests($X, 0, 'sql_variant', 'uniqueidentifier');
               intype  => undef,
               outtype => 'NULL');
 %expectcol = (varcol  => undef,
-              intype  => 'varchar',
+              intype  => 'n?varchar',
               outtype => $tbl{'outtype'});
 %expectpar = (varcol  => undef,
               intype  => $expectcol{'intype'},
@@ -2993,7 +3008,7 @@ do_tests($X, 0, 'sql_variant', 'uniqueidentifier');
               intype  => 'NULL',
               outtype => "N'$tbl{'outtype'}'");
 %test      = (varcol  => 'not defined %s',
-              intype  => '%s eq %s',
+              intype  => '%s =~ /%s/',
               outtype => '%s eq %s');
 do_tests($X, 0, 'sql_variant', 'NULL out');
 
@@ -3082,13 +3097,13 @@ if ($sqlver >= 10) {
    else {
       $tbl{'outtype'} = 'varchar';
       %expectcol = (varcol  => '\(HSAH$',
-                    intype  => 'varchar',
+                    intype  => 'n?varchar',
                     outtype => $tbl{'outtype'});
       %expectpar = (varcol  => '^HASH\(',
                     intype  => $expectcol{'intype'},
                     outtype => $tbl{'outtype'});
       %test      = (varcol  => '%s =~ %s',
-                    intype  => '%s eq %s',
+                    intype  => '%s =~ /%s/',
                     outtype => '%s eq %s');
    }
    %expectfile= (varcol  => "N'$tbl{'varcol'}'",
@@ -3102,7 +3117,7 @@ if ($sqlver >= 10) {
                  outtype => 'date');
    if ($X->{Provider} >= PROVIDER_SQLNCLI10) {
       %expectcol = (varcol  => {Year => 1996, Month => 9, Day => 1},
-                    intype  => 'varchar',
+                    intype  => 'n?varchar',
                     outtype => $tbl{'outtype'});
       %expectpar = (varcol  => {Year => 2006, Month => 10, Day => 21},
                     intype  => $expectcol{'intype'},
@@ -3110,7 +3125,7 @@ if ($sqlver >= 10) {
    }
    else {
       %expectcol = (varcol  => '1996-09-01',
-                    intype  => 'varchar',
+                    intype  => 'n?varchar',
                     outtype => $tbl{'outtype'});
       %expectpar = (varcol  => '2006-10-21',
                     intype  => $expectcol{'intype'},
@@ -3121,12 +3136,12 @@ if ($sqlver >= 10) {
                  outtype => "N'$tbl{'outtype'}'");
    if ($X->{Provider} >= PROVIDER_SQLNCLI10) {
       %test      = (varcol  => 'datehash_compare(%s, %s)',
-                    intype  => '%s eq %s',
+                    intype  => '%s =~ /%s/',
                     outtype => '%s eq %s');
    }
    else {
       %test      = (varcol  => '%s eq %s',
-                    intype  => '%s eq %s',
+                    intype  => '%s =~ /%s/',
                     outtype => '%s eq %s');
    }
    do_tests($X, 0, 'sql_variant', 'date iso/hash');
@@ -3138,7 +3153,7 @@ if ($sqlver >= 10) {
    if ($X->{Provider} >= PROVIDER_SQLNCLI10) {
       %expectcol = (varcol  => {Year => 1996, Month => 9, Day => 1, Hour => 22,
                                 Minute => 16, Second => 0, Fraction => 0},
-                    intype  => 'varchar',
+                    intype  => 'n?varchar',
                     outtype => $tbl{'outtype'});
       %expectpar = (varcol  => {Year => 1996, Month => 10, Day => 22, Hour => 8,
                                 Minute => 16, Second => 0, Fraction => 0},
@@ -3147,7 +3162,7 @@ if ($sqlver >= 10) {
    }
    else {
       %expectcol = (varcol  => '1996-09-01 14:16:00 +00:00',
-                    intype  => 'varchar',
+                    intype  => 'n?varchar',
                     outtype => $tbl{'outtype'});
       %expectpar = (varcol  => '1996-10-22 00:16:00.0000000 +00:00',
                     intype  => $expectcol{'intype'},
@@ -3158,12 +3173,12 @@ if ($sqlver >= 10) {
                  outtype => "N'$tbl{'outtype'}'");
    if ($X->{Provider} >= PROVIDER_SQLNCLI10) {
       %test      = (varcol  => 'datehash_compare(%s, %s)',
-                    intype  => '%s eq %s',
+                    intype  => '%s =~ /%s/',
                     outtype => '%s eq %s');
    }
    else {
       %test      = (varcol  => '%s eq %s',
-                    intype  => '%s eq %s',
+                    intype  => '%s =~ /%s/',
                     outtype => '%s eq %s');
    }
    do_tests($X, 0, 'sql_variant', 'datetimeoffset (tzoffset) iso/hash');
@@ -3174,7 +3189,7 @@ if ($sqlver >= 10) {
                  intype  => undef,
                  outtype => 'time');
    %expectcol = (varcol  => '14:16:20.76538',
-                 intype  => 'varchar',
+                 intype  => 'n?varchar',
                  outtype => $tbl{'outtype'});
    %expectpar = (varcol  => '00:16:20.7654321',
                  intype  => $expectcol{'intype'},
@@ -3183,7 +3198,7 @@ if ($sqlver >= 10) {
                  intype  => 'NULL',
                  outtype => "N'$tbl{'outtype'}'");
    %test      = (varcol  => '%s eq %s',
-                 intype  => '%s eq %s',
+                 intype  => '%s =~ /%s/',
                  outtype => '%s eq %s');
    do_tests($X, 0, 'sql_variant', 'time iso');
 }
@@ -3252,7 +3267,7 @@ else {
               intype  => undef,
               outtype => 'varchar');
 %expectcol = (varcol  => '\(HSAH$',
-              intype  => 'varchar',
+              intype  => 'n?varchar',
               outtype => $tbl{'outtype'});
 %expectpar = (varcol  => '^HASH\(',
               intype  => $expectcol{'intype'},
@@ -3261,7 +3276,7 @@ else {
               intype  => 'NULL',
               outtype => "N'$tbl{'outtype'}'");
 %test      = (varcol  => '%s =~ %s',
-              intype  => '%s eq %s',
+              intype  => '%s =~ /%s/',
               outtype => '%s eq %s');
 do_tests($X, 0, 'sql_variant', 'Incomplete date-time hash1');
 
@@ -3270,7 +3285,7 @@ do_tests($X, 0, 'sql_variant', 'Incomplete date-time hash1');
               intype  => undef,
               outtype => 'varchar');
 %expectcol = (varcol  => '\(HSAH$',
-              intype  => 'varchar',
+              intype  => 'n?varchar',
               outtype => $tbl{'outtype'});
 %expectpar = (varcol  => '^HASH\(',
               intype  => $expectcol{'intype'},
@@ -3279,7 +3294,7 @@ do_tests($X, 0, 'sql_variant', 'Incomplete date-time hash1');
               intype  => 'NULL',
               outtype => "N'$tbl{'outtype'}'");
 %test      = (varcol  => '%s =~ %s',
-              intype  => '%s eq %s',
+              intype  => '%s =~ /%s/',
               outtype => '%s eq %s');
 do_tests($X, 0, 'sql_variant', 'Incomplete date-time hash2');
 
@@ -3287,7 +3302,7 @@ do_tests($X, 0, 'sql_variant', 'Incomplete date-time hash2');
               intype  => undef,
               outtype => 'varchar');
 %expectcol = (varcol  => '\(HSAH$',
-              intype  => 'varchar',
+              intype  => 'n?varchar',
               outtype => $tbl{'outtype'});
 %expectpar = (varcol  => '^HASH\(',
               intype  => $expectcol{'intype'},
@@ -3296,7 +3311,7 @@ do_tests($X, 0, 'sql_variant', 'Incomplete date-time hash2');
               intype  => 'NULL',
               outtype => "N'$tbl{'outtype'}'");
 %test      = (varcol  => '%s =~ %s',
-              intype  => '%s eq %s',
+              intype  => '%s =~ /%s/',
               outtype => '%s eq %s');
 do_tests($X, 0, 'sql_variant', 'Incomplete date-time hash3');
 
@@ -3304,7 +3319,7 @@ do_tests($X, 0, 'sql_variant', 'Incomplete date-time hash3');
               intype  => undef,
               outtype => 'varchar');
 %expectcol = (varcol  => '\(HSAH$',
-              intype  => 'varchar',
+              intype  => 'n?varchar',
               outtype => $tbl{'outtype'});
 %expectpar = (varcol  => '^HASH\(',
               intype  => $expectcol{'intype'},
@@ -3313,7 +3328,7 @@ do_tests($X, 0, 'sql_variant', 'Incomplete date-time hash3');
               intype  => 'NULL',
               outtype => "N'$tbl{'outtype'}'");
 %test      = (varcol  => '%s =~ %s',
-              intype  => '%s eq %s',
+              intype  => '%s =~ /%s/',
               outtype => '%s eq %s');
 do_tests($X, 0, 'sql_variant', 'Incomplete date-time hash4');
 
@@ -3321,7 +3336,7 @@ do_tests($X, 0, 'sql_variant', 'Incomplete date-time hash4');
               intype  => undef,
               outtype => 'varchar');
 %expectcol = (varcol  => '\(HSAH$',
-              intype  => 'varchar',
+              intype  => 'n?varchar',
               outtype => $tbl{'outtype'});
 %expectpar = (varcol  => '^HASH\(',
               intype  => $expectcol{'intype'},
@@ -3330,7 +3345,7 @@ do_tests($X, 0, 'sql_variant', 'Incomplete date-time hash4');
               intype  => 'NULL',
               outtype => "N'$tbl{'outtype'}'");
 %test      = (varcol  => '%s =~ %s',
-              intype  => '%s eq %s',
+              intype  => '%s =~ /%s/',
               outtype => '%s eq %s');
 do_tests($X, 0, 'sql_variant', 'Incomplete date-time hash5');
 
@@ -3710,30 +3725,30 @@ create_xmltest($X, $X->{Provider} >= PROVIDER_SQLNCLI);
               xmlsccol  => ($codepage == 1252 
                               ? '<?xml version="1.0" encoding="iso-8859-1"?>' . "\n"
                               : '') . 
-                            "<TƒST>" .
-                            "Vi ‰r alltid b‰st i r‰ksmˆrgÂst‰ster! " x 1500 .
-                            "</TƒST>\n<TƒST>I alla fall n‰stan alltid!</TƒST>",
+                            "<T√ÑST>" .
+                            "Vi √§r alltid b√§st i r√§ksm√∂rg√•st√§ster! " x 1500 .
+                            "</T√ÑST>\n<T√ÑST>I alla fall n√§stan alltid!</T√ÑST>",
               nvarcol   => "21 PA\x{0179}DZIERNIKA 2004 " x 2000,
-              nvarsccol => "The naÔve rÙles coˆperate with their rÈsumÈs "
+              nvarsccol => "The na√Øve r√¥les co√∂perate with their r√©sum√©s "
                            x 1000);
 %expectcol = (xmlcol    => '<xmltest nvarcol\s*=\s*"' .
                            "21 PA\x{0179}DZIERNIKA 2004 " x 2000 . '"\s*/\s*>',
-              xmlsccol  => '<TƒST>' .
-                           "The naÔve rÙles coˆperate with their rÈsumÈs "
-                           x 1000 . '</TƒST>',
+              xmlsccol  => '<T√ÑST>' .
+                           "The na√Øve r√¥les co√∂perate with their r√©sum√©s "
+                           x 1000 . '</T√ÑST>',
               nvarcol   => $tbl{'xmlcol'},
-              nvarsccol => "Vi ‰r alltid b‰st i r‰ksmˆrgÂst‰ster! " x 1500);
+              nvarsccol => "Vi √§r alltid b√§st i r√§ksm√∂rg√•st√§ster! " x 1500);
 if ($X->{Provider} >= PROVIDER_SQLNCLI) {
-   %expectpar = (xmlcol   => '<row><LÂgland>' .
+   %expectpar = (xmlcol   => '<row><L√•gland>' .
                              "21 pa\x{017A}dziernika 2004 " x 2000 .
-                             '</LÂgland></row>',
-                 xmlsccol => '<TƒST>' .
-                             "THE NAœVE R‘LES CO÷PERATE WITH THEIR R…SUM…S "
-                             x 1000 . '</TƒST>',
+                             '</L√•gland></row>',
+                 xmlsccol => '<T√ÑST>' .
+                             "THE NA√èVE R√îLES CO√ñPERATE WITH THEIR R√âSUM√âS "
+                             x 1000 . '</T√ÑST>',
                  nvarcol  => "21 pa\x{017A}dziernika 2004 " x 2000 ,
-                 nvarsccol=> "<TƒST>" .
-                             "Vi ‰r alltid b‰st i r‰ksmˆrgÂst‰ster! " x 1500 .
-                             "</TƒST><TƒST>I alla fall n‰stan alltid!</TƒST>");
+                 nvarsccol=> "<T√ÑST>" .
+                             "Vi √§r alltid b√§st i r√§ksm√∂rg√•st√§ster! " x 1500 .
+                             "</T√ÑST><T√ÑST>I alla fall n√§stan alltid!</T√ÑST>");
 }
 else {
    %expectpar = ();
@@ -3750,24 +3765,24 @@ do_tests($X, 1, 'xmltest');
                            "21 pa\x{017A}dziernika 2004 " .
                            "</R\x{00C4}KSM\x{00D6}RG\x{00C5}S>  ",
               xmlsccol  => '<?xml  version="1.0" encoding="UTF-8" ?>' . "\n" .
-                            "<TƒST>" .
-                            "Vi ‰r alltid b‰st i r‰ksmˆrgÂst‰ster! " .
-                            "</TƒST>\n<TƒST>I alla fall n‰stan alltid!</TƒST>",
+                            "<T√ÑST>" .
+                            "Vi √§r alltid b√§st i r√§ksm√∂rg√•st√§ster! " .
+                            "</T√ÑST>\n<T√ÑST>I alla fall n√§stan alltid!</T√ÑST>",
               nvarcol   => "   ",
               nvarsccol => 'undef');
 %expectcol = (xmlcol    => '<xmltest nvarcol\s*=\s*"   "\s*/\s*>',
-              xmlsccol  => '<TƒST>undef</TƒST>',
+              xmlsccol  => '<T√ÑST>undef</T√ÑST>',
               nvarcol   => "<R\x{00C4}KSM\x{00D6}RG\x{00C5}S>" .
                            "21 pa\x{017A}dziernika 2004 " .
                            "</R\x{00C4}KSM\x{00D6}RG\x{00C5}S>",
-              nvarsccol => "Vi ‰r alltid b‰st i r‰ksmˆrgÂst‰ster! ");
+              nvarsccol => "Vi √§r alltid b√§st i r√§ksm√∂rg√•st√§ster! ");
 if ($X->{Provider} >= PROVIDER_SQLNCLI) {
-   %expectpar = (xmlcol   => '<row><LÂgland>( |\&\#x20;){3,3}</LÂgland></row>',
-                 xmlsccol => '<TƒST>UNDEF</TƒST>',
+   %expectpar = (xmlcol   => '<row><L√•gland>( |\&\#x20;){3,3}</L√•gland></row>',
+                 xmlsccol => '<T√ÑST>UNDEF</T√ÑST>',
                  nvarcol  => "21 pa\x{017A}dziernika 2004 ",
-                 nvarsccol=> "<TƒST>" .
-                             "Vi ‰r alltid b‰st i r‰ksmˆrgÂst‰ster! ".
-                             "</TƒST><TƒST>I alla fall n‰stan alltid!</TƒST>");
+                 nvarsccol=> "<T√ÑST>" .
+                             "Vi √§r alltid b√§st i r√§ksm√∂rg√•st√§ster! ".
+                             "</T√ÑST><T√ÑST>I alla fall n√§stan alltid!</T√ÑST>");
 }
 else {
    %expectpar = ();
@@ -3784,12 +3799,12 @@ do_tests($X, 1, 'xmltest', 'take two');
               nvarcol   => undef,
               nvarsccol => undef);
 %expectcol = (xmlcol    => '<xmltest\s*/\s*>',
-              xmlsccol  => '<TƒST/>',
+              xmlsccol  => '<T√ÑST/>',
               nvarcol   => undef,
               nvarsccol => undef);
 if ($X->{Provider} >= PROVIDER_SQLNCLI) {
    %expectpar = (xmlcol   => '<row\s*/\s*>',
-                 xmlsccol => '<TƒST/>',
+                 xmlsccol => '<T√ÑST/>',
                  nvarcol  => undef,
                  nvarsccol=> undef);
 }
@@ -4446,7 +4461,7 @@ else {
 do_tests($X, 1, 'hierarchy', 'NULL');
 drop_test_objects('hierarchy');
 
-#---------------------------†Spatial datatypes -------------------------
+#---------------------------¬†Spatial datatypes -------------------------
 # Since these are large UDT we can test these with SQLOLEDB.
 goto done_spatial if $X->{Provider} == PROVIDER_SQLOLEDB;
 

@@ -1,9 +1,9 @@
 package Text::ANSITable::StyleSet::Calendar::Indonesia::Holiday::HolidayType;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-01-17'; # DATE
+our $DATE = '2021-07-24'; # DATE
 our $DIST = 'App-IndonesianHolidayUtils'; # DIST
-our $VERSION = '0.061'; # VERSION
+our $VERSION = '0.064'; # VERSION
 
 use 5.010;
 use Moo;
@@ -68,7 +68,7 @@ Text::ANSITable::StyleSet::Calendar::Indonesia::Holiday::HolidayType - Set foreg
 
 =head1 VERSION
 
-This document describes version 0.061 of Text::ANSITable::StyleSet::Calendar::Indonesia::Holiday::HolidayType (from Perl distribution App-IndonesianHolidayUtils), released on 2021-01-17.
+This document describes version 0.064 of Text::ANSITable::StyleSet::Calendar::Indonesia::Holiday::HolidayType (from Perl distribution App-IndonesianHolidayUtils), released on 2021-07-24.
 
 =for Pod::Coverage ^(summary|apply)$
 
@@ -92,7 +92,7 @@ Source repository is at L<https://github.com/perlancar/perl-App-IndonesianHolida
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-App-IndonesianHolidayUtils/issues>
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-IndonesianHolidayUtils>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

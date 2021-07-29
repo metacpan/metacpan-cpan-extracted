@@ -1,9 +1,9 @@
 package Sah::Schema::perl::modname_or_prefix;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-01-20'; # DATE
+our $DATE = '2021-07-20'; # DATE
 our $DIST = 'Sah-Schemas-Perl'; # DIST
-our $VERSION = '0.035'; # VERSION
+our $VERSION = '0.038'; # VERSION
 
 our $schema = [str => {
     summary => 'Perl module name (e.g. Foo::Bar) or prefix (e.g. Foo::Bar::)',
@@ -36,7 +36,7 @@ _
         {value=>'Foo|Bar', valid=>0},
     ],
 
-}, {}];
+}];
 
 1;
 # ABSTRACT: Perl module name (e.g. Foo::Bar) or prefix (e.g. Foo::Bar::)
@@ -53,7 +53,7 @@ Sah::Schema::perl::modname_or_prefix - Perl module name (e.g. Foo::Bar) or prefi
 
 =head1 VERSION
 
-This document describes version 0.035 of Sah::Schema::perl::modname_or_prefix (from Perl distribution Sah-Schemas-Perl), released on 2021-01-20.
+This document describes version 0.038 of Sah::Schema::perl::modname_or_prefix (from Perl distribution Sah-Schemas-Perl), released on 2021-07-20.
 
 =head1 SYNOPSIS
 
@@ -83,7 +83,8 @@ To specify schema in L<Rinci> function metadata and use the metadata with
 L<Perinci::CmdLine> to create a CLI:
 
  # in lib/MyApp.pm
- package MyApp;
+ package
+   MyApp;
  our %SPEC;
  $SPEC{myfunc} = {
      v => 1.1,
@@ -103,7 +104,8 @@ L<Perinci::CmdLine> to create a CLI:
  1;
 
  # in myapp.pl
- package main;
+ package
+   main;
  use Perinci::CmdLine::Any;
  Perinci::CmdLine::Any->new(url=>'MyApp::myfunc')->run;
 
@@ -152,7 +154,7 @@ Source repository is at L<https://github.com/perlancar/perl-Sah-Schemas-Perl>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Sah-Schemas-Perl/issues>
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Sah-Schemas-Perl>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

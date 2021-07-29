@@ -5,7 +5,7 @@ use IO::String;
 
 require 't/test-lib.pm';
 
-my $maintests = 54;
+my $maintests = 53;
 
 my $res;
 my $json;
@@ -45,7 +45,7 @@ ok(
         accept => 'text/html',
         length => length($request)
     ),
-    'Post empty FindFuser request'
+    'Post empty FindUser request'
 );
 ( $host, $url, $query ) =
   expectForm( $res, '#', undef, 'user', 'password', 'spoofId' );
@@ -63,10 +63,8 @@ ok(
         accept => 'text/html',
         length => length($request)
     ),
-    'Post FindFuser request'
+    'Post FindUser request'
 );
-ok( $res->[2]->[0] =~ m%value="dwho"%, 'value="dwho"' )
-  or explain( $res->[2]->[0], 'value="dwho"' );
 ok( $res->[2]->[0] =~ m%autocomplete="off"%, 'autocomplete="off"' )
   or explain( $res->[2]->[0], 'autocomplete="off"' );
 ok(
@@ -106,7 +104,7 @@ ok(
         accept => 'application/json',
         length => length($request)
     ),
-    'Post FindFuser request'
+    'Post FindUser request'
 );
 ok( $json = eval { from_json( $res->[2]->[0] ) }, 'Response is JSON' )
   or print STDERR "$@\n" . Dumper($res);
@@ -120,7 +118,7 @@ ok(
         accept => 'application/json',
         length => length($request)
     ),
-    'Post FindFuser request with bad user'
+    'Post FindUser request with bad user'
 );
 ok( $json = eval { from_json( $res->[2]->[0] ) }, 'Response is JSON' )
   or print STDERR "$@\n" . Dumper($res);
@@ -136,7 +134,7 @@ ok(
         accept => 'application/json',
         length => length($request)
     ),
-    'Post FindFuser request one result'
+    'Post FindUser request one result'
 );
 ok( $json = eval { from_json( $res->[2]->[0] ) }, 'Response is JSON' )
   or print STDERR "$@\n" . Dumper($res);
@@ -150,7 +148,7 @@ ok(
         accept => 'application/json',
         length => length($request)
     ),
-    'Post FindFuser request with a not allowed select value'
+    'Post FindUser request with a not allowed select value'
 );
 ok( $json = eval { from_json( $res->[2]->[0] ) }, 'Response is JSON' )
   or print STDERR "$@\n" . Dumper($res);
@@ -166,7 +164,7 @@ ok(
         accept => 'application/json',
         length => length($request)
     ),
-    'Post FindFuser request multi results'
+    'Post FindUser request multi results'
 );
 ok( $json = eval { from_json( $res->[2]->[0] ) }, 'Response is JSON' )
   or print STDERR "$@\n" . Dumper($res);
@@ -180,7 +178,7 @@ ok(
         accept => 'application/json',
         length => length($request)
     ),
-    'Post FindFuser request with bad arg'
+    'Post FindUser request with bad arg'
 );
 ok( $json = eval { from_json( $res->[2]->[0] ) }, 'Response is JSON' )
   or print STDERR "$@\n" . Dumper($res);
@@ -196,7 +194,7 @@ ok(
         accept => 'application/json',
         length => length($request)
     ),
-    'Post FindFuser request with two args'
+    'Post FindUser request with two args'
 );
 ok( $json = eval { from_json( $res->[2]->[0] ) }, 'Response is JSON' )
   or print STDERR "$@\n" . Dumper($res);
@@ -210,7 +208,7 @@ ok(
         accept => 'application/json',
         length => length($request)
     ),
-    'Post FindFuser request with wrong args'
+    'Post FindUser request with wrong args'
 );
 ok( $json = eval { from_json( $res->[2]->[0] ) }, 'Response is JSON' )
   or print STDERR "$@\n" . Dumper($res);
@@ -226,7 +224,7 @@ ok(
         accept => 'application/json',
         length => length($request)
     ),
-    'Post FindFuser request with excluding result'
+    'Post FindUser request with excluding result'
 );
 ok( $json = eval { from_json( $res->[2]->[0] ) }, 'Response is JSON' )
   or print STDERR "$@\n" . Dumper($res);
@@ -242,7 +240,7 @@ ok(
         accept => 'application/json',
         length => length($request)
     ),
-    'Post FindFuser request with excluding result'
+    'Post FindUser request with excluding result'
 );
 ok( $json = eval { from_json( $res->[2]->[0] ) }, 'Response is JSON' )
   or print STDERR "$@\n" . Dumper($res);
@@ -258,7 +256,7 @@ ok(
         accept => 'application/json',
         length => length($request)
     ),
-    'Post FindFuser request with wildcard'
+    'Post FindUser request with wildcard'
 );
 ok( $json = eval { from_json( $res->[2]->[0] ) }, 'Response is JSON' )
   or print STDERR "$@\n" . Dumper($res);

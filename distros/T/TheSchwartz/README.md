@@ -250,7 +250,7 @@ Given a job handle (a scalar string) _$handle_, runs the job, then returns.
 
 ## `$client->grab_and_work_on($handle)`
 
-Similar to [$client->work\_on($handle)](https://metacpan.org/pod/$client->work_on\($handle\)), except that the job will be grabbed
+Similar to [$client->work\_on($handle)](https://metacpan.org/pod/%24client-%3Ework_on%28%24handle%29), except that the job will be grabbed
 before being run. It guarantees that only one worker will work on it (at least
 in the `grab_for` interval).
 

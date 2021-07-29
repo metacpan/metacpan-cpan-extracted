@@ -3,7 +3,7 @@ package Beekeeper::Client;
 use strict;
 use warnings;
 
-our $VERSION = '0.07';
+our $VERSION = '0.09';
 
 use Beekeeper::AnyEvent;
 use Beekeeper::MQTT;
@@ -13,7 +13,7 @@ use Beekeeper::Config;
 use JSON::XS;
 use Sys::Hostname;
 use Time::HiRes;
-use Digest::SHA 'sha256_hex';
+use Digest::MD5 'md5_base64';
 use Carp;
 
 use constant QUEUE_LANES => 2;
@@ -62,7 +62,7 @@ sub new {
         callbacks      => {},
     };
 
-    unless (exists $args{'host'} && exists $args{'username'} && exists $args{'password'}) {
+    unless (exists $args{'username'} && exists $args{'password'}) {
 
         # Get broker connection parameters from config file
 
@@ -92,7 +92,7 @@ sub new {
     }
 
     $self->{_CLIENT}->{forward_to} = delete $args{'forward_to'};
-    $self->{_CLIENT}->{auth_salt}  = delete $args{'auth_salt'};
+    $self->{_CLIENT}->{auth_salt}  = delete $args{'auth_salt'} || $args{'bus_id'};
 
     # Start a fresh new MQTT session on connect
     $args{'clean_start'} = 1;
@@ -305,7 +305,11 @@ sub call_remote {
 
     # Make AnyEvent allow one level of recursive condvar blocking, as we may
     # block both in $worker->__work_forever and in $client->__do_rpc_request
-    $AE_WAITING && Carp::confess "Recursive condvar blocking wait attempted";
+    $AE_WAITING && Carp::confess "Recursive blocking call attempted: "                  .
+        "trying to make a call_remote while another call_remote is still in progress, " .
+        "but it is not possible to make two blocking calls simultaneously "             .
+        "(tip: one of the two calls must be made with call_remote_async)";
+
     local $AE_WAITING = 1;
     local $AnyEvent::CondVar::Base::WAITING = 0;
 
@@ -589,13 +593,13 @@ sub __use_authorization_token {
     # but it is not an effective access restriction: anyone with access to the backend
     # bus credentials can easily inspect and clone auth data tokens
 
-    my $salt = $self->{_CLIENT}->{auth_salt} || '';
+    my $salt = $self->{_CLIENT}->{auth_salt};
 
     my $adata_ref = \$self->{_CLIENT}->{auth_data};
 
     my $guard = Beekeeper::Client::Guard->new( $adata_ref );
 
-    $$adata_ref = sha256_hex($token . $salt);
+    $$adata_ref = md5_base64($token . $salt);
 
     return $guard;
 }
@@ -630,7 +634,7 @@ Beekeeper::Client - Make RPC calls through message bus
 
 =head1 VERSION
  
-Version 0.07
+Version 0.09
 
 =head1 SYNOPSIS
 

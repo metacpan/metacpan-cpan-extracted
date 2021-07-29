@@ -1,0 +1,92 @@
+=encoding UTF-8
+
+=head1 NAME
+
+TCOD::Key - A representation of a key event
+
+=head1 SYNOPSIS
+
+    use TCOD;
+
+    my $key   = TCOD::Key->new;
+    my $mouse = TCOD::Mouse->new;
+
+    TCOD::Sys::check_for_event( TCOD::EVENT_ANY, $key, $mouse );
+
+    exit if $key->vk == TCOD::K_ESCAPE;
+
+=head1 DESCRIPTION
+
+This represents a TCOD key event. You will not normally be populating
+these objects. Most often you will create one, and pass it to one of
+the event listeners for it to be populated internally.
+
+In effect, this is a read-only class.
+
+=head1 SLOTS
+
+=head2 vk
+
+The keycode that has been pressed as one of the values in the C<Keycode>
+enum. If no key has been pressed, this will be C<TCOD::K_NONE>.
+
+=head2 c
+
+If the key is a printable character, this will hold that character as a string.
+Otherwise, it will be C<\0>.
+
+=head2 text
+
+If the value of C<vk> is C<TCOD::K_TEXT>, this will hold the text that
+has been input.
+
+=head2 pressed
+
+True if a key has been pressed.
+
+=head2 lalt
+
+True if the left Alt key is pressed.
+
+=head2 lctrl
+
+True if the left Control key is pressed.
+
+=head2 lmeta
+
+True if the left Meta key is pressed.
+
+=head2 ralt
+
+True if the right Alt key is pressed.
+
+=head2 rctrl
+
+True if the right Control key is pressed.
+
+=head2 rmeta
+
+True if the right Meta key is pressed.
+
+=head2 shift
+
+True if the shift key is pressed.
+
+=head1 SEE ALSO
+
+=over
+
+=item L<TCOD>
+
+=item L<TCOD::Key>
+
+=item L<TCOD::Sys>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2021 José Joaquín Atria
+
+This library is free software; you can redistribute it and/or modify it under
+the Artistic License 2.0.

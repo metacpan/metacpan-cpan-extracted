@@ -992,6 +992,23 @@ json_create_add_float (json_create_t * jc, SV * sv)
     return json_create_ok;
 }
 
+static INLINE json_create_status_t
+json_create_add_magic (json_create_t * jc, SV * r)
+{
+    /* There are some edge cases with blessed references
+       containing numbers which we need to handle correctly. */
+    if (SvIOK (r)) {
+	CALL (json_create_add_integer (jc, r));
+    }
+    else if (SvNOK (r)) {
+	CALL (json_create_add_float (jc, r));
+    }
+    else {
+	CALL (json_create_add_string (jc, r));
+    }
+    return json_create_ok;
+}
+
 /* Add a number which is already stringified. This bypasses snprintf
    and just copies the Perl string straight into the buffer. */
 
@@ -1344,17 +1361,7 @@ json_create_handle_ref (json_create_t * jc, SV * r)
     case SVt_PVMG:
 	MSG("PVMG");
 	STRICT_NO_SCALAR;
-	/* There are some edge cases with blessed references
-	   containing numbers which we need to handle correctly. */
-	if (SvIOK (r)) {
-	    CALL (json_create_add_integer (jc, r));
-	}
-	else if (SvNOK (r)) {
-	    CALL (json_create_add_float (jc, r));
-	}
-	else {
-	    CALL (json_create_add_string (jc, r));
-	}
+	CALL (json_create_add_magic (jc, r));
 	break;
 
     default:
@@ -1522,8 +1529,12 @@ json_create_not_ref (json_create_t * jc, SV * r)
 	break;
 
     case SVt_PVMG:
+	MSG ("SVt_PVMG %s", SvPV_nolen (r));
+	CALL (json_create_add_magic (jc, r));
+	break;
+
     case SVt_PV:
-	MSG ("SVt_PV/PVMG %s", SvPV_nolen (r));
+	MSG ("SVt_PV %s", SvPV_nolen (r));
 	CALL (json_create_add_string (jc, r));
 	break;
 

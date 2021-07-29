@@ -1,0 +1,188 @@
+NAME
+    Graphite::Simple - Perl XS package provides methods to collect metrics
+    and send them to Graphite server.
+
+SYNOPSIS
+      use Graphite::Simple ();
+
+      my $graphite = Graphite::Simple->new(\%options);
+
+      $graphite->connect();
+
+      $graphite->disconnect();
+
+      my $bulk = $graphite->get_bulk_metrics();
+
+      my $status = $graphite->send_bulk();
+
+      my $status = $graphite->send_bulk_delegate();
+
+      my $metrics = $graphite->get_metrics();
+
+      my $avg_counters = $graphite->get_average_counters();
+
+      $graphite->clear_bulk();
+
+      $graphite->incr_bulk($key, $value);
+      $graphite->incr_bulk($key);
+
+      $graphite->append_bulk($hash, $prefix);
+      $graphite->append_bulk($hash);
+
+      my $is_valid = $graphite->is_valid_key();
+
+      my $counter = $graphite->get_invalid_key_counter();
+
+      $graphite->check_and_bump_invalid_metric($key);
+
+      my $is_blocked = $graphite->is_metric_blocked($key);
+
+      $graphite->set_blocked_metrics_re($re);
+
+      $graphite->DESTROY();
+
+      # the following is actual only if C<use_global_storage> was set
+      my %metrics      = %Graphite::Simple::bulk;
+      my %avg_counters = %Graphite::Simple::avg_counters;
+
+DESCRIPTION
+      This package provides methods to collect metrics and send them to Graphite server over UDP socket.
+
+  $class->new(\%options)
+    It's a class constructor. Takes a hash reference as argument.
+
+    enabled
+        By default this option equals to 0. The connection to Graphite host
+        will be established if this value is true.
+
+    host
+        Sets the hostname or IPv4 address of Graphite server. This option is
+        mandatory if "enabled" is true.
+
+    port
+        Sets the port number of Graphite server. This option is mandatory if
+        "enabled" is true.
+
+    project
+        Sets a project's name (global prefix for all metrics). This prefix
+        will be applied to each metric before sending to server.
+
+    sender_name
+        Sets the method's name in format "package::method".
+
+        This method will be called from "send_bulk_delegate" sub. The hash
+        reference with result metrics will be passed as arguments.
+
+        Be aware that the invocation of this method can lead to some
+        performance penalties.
+
+        Optional.
+
+    block_metrics_re
+        The compiled regular expression. If any metric matches, then it will
+        be ignored and won't be stored in the resulted hash.
+
+        Optional.
+
+    use_global_storage
+        This flag is optional. If flag is set then the package global hashes
+        will be used to store collected data.
+
+          my %metrics      = %Graphite::Simple::bulk;
+          my %avg_counters = %Graphite::Simple::avg_counters;
+
+        Otherweise internal hashes will be used.
+
+  $self->connect()
+    Establishes the connection to Graphite server if "enabled" was set as
+    true.
+
+  $self->disconnect()
+    Closes the connection.
+
+  $self->send_bulk_delegate()
+    Calculates the result metrics and passes them to specified method in
+    "sender_name".
+
+    Previously stored keys will be used as average counters while getting
+    the result. Example:
+
+      $graphite->incr_bulk("avg,key", 4);
+      $graphite->incr_bulk("avg,key", 8);
+
+    Here "avg.key" counter will be equal to 2. And the result value for
+    "avg.key" is 6: (4 + 8) / 2
+
+    Be aware that the invocation of this method can lead to some performance
+    penalties.
+
+  $self->send_bulk()
+    Calculates the result metrics and send them to Graphite server via
+    direct connection.
+
+    Previously stored keys will be used as average counters while getting
+    the result. Example:
+
+      $graphite->incr_bulk("avg,key", 4);
+      $graphite->incr_bulk("avg,key", 8);
+
+    Here "avg.key" counter will be equal to 2. And result value for
+    "avg.key" is 6: (4 + 8) / 2
+
+  $self->get_average_counters()
+    Returns the hash reference with counters of average metrics. Average
+    metric is a metric started with "avg." string.
+
+  $self->get_metrics()
+    Returns the hash reference with result metrics. Each metric started with
+    "avg." string is divided by its counter from "average_counter".
+
+  $self->clear_bulk()
+    Clears all collected metrics;
+
+  $self->incr_bulk($key, $value = 1)
+    Increments metric $key by value $value. If $value is unspecified then 1
+    will be used.
+
+  $self->append_bulk($hash, $prefix = undef)
+    Increments metrics specified in $hash.
+
+    The $hash format:
+
+    $hash = {key1 => $value1, key2 => $value2, ...};
+
+    The second argument is optional and it specifies the common prefix. If
+    prefix doesn't contain a dot at the end, then it will be added
+    automatically.
+
+  $self->is_valid_key($key)
+    Returns 1 if $key is valid for usage as Graphite metric path. Otherwise
+    returns 0.
+
+  $self->get_invalid_key_counter()
+    Returns the amount of invalid metrics detected by "is_valid_key" method.
+
+  $self->check_and_bump_invalid_metric($key)
+    If "get_invalid_key_counter" returns a non-zero value, then this value
+    will be written into passed $key. IF passed $key is invalid, then
+    invalid key counter will be bumped by 1.
+
+  $self->is_metric_blocked($key)
+    Returns 1 if $key matches with reqular expression set with
+    "set_blocked_metrics_re" or "block_metrics_re".
+
+    Otherwise returns 0.
+
+  $self->set_blocked_metrics_re($re = undef)
+    Sets regular expression to detect blocked metrics. Such metrics won't be
+    added to result.
+
+    If $re is omitted or undefined then no any detection for blocked metrics
+    will be used.
+
+  DESTROY
+    Destructor. Destroys object.
+
+AUTHOR
+    Chernenko Dmitiry cdn@cpan.org
+

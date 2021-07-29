@@ -1,9 +1,9 @@
 package Games::TabRace;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-06-12'; # DATE
+our $DATE = '2021-07-09'; # DATE
 our $DIST = 'Games-TabRace'; # DIST
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 1;
 # ABSTRACT: A game played using shell tab completion
@@ -20,7 +20,7 @@ Games::TabRace - A game played using shell tab completion
 
 =head1 VERSION
 
-This document describes version 0.008 of Games::TabRace (from Perl distribution Games-TabRace), released on 2021-06-12.
+This document describes version 0.009 of Games::TabRace (from Perl distribution Games-TabRace), released on 2021-07-09.
 
 =head1 SYNOPSIS
 

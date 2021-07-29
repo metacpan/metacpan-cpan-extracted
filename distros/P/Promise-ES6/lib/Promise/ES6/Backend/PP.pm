@@ -26,6 +26,10 @@ use constant {
     _ON_RESOLVE_IDX  => _DEBUG + 4,
     _ON_REJECT_IDX   => _DEBUG + 5,
     _IS_FINALLY_IDX  => _DEBUG + 6,
+
+    # For async/await:
+    _ON_READY_IMMEDIATE_IDX => _DEBUG + 7,
+    _SELF_REF_IDX => _DEBUG + 8,
 };
 
 # "$value_sr" => $value_sr
@@ -68,6 +72,10 @@ sub new {
 
         bless $value_sr, _RESOLUTION_CLASS();
 
+        $self->[_ON_READY_IMMEDIATE_IDX]->() if $self->[_ON_READY_IMMEDIATE_IDX];
+
+        undef $self->[_SELF_REF_IDX];
+
         if (@children) {
             $_->_settle($value_sr) for splice @children;
         }
@@ -92,6 +100,10 @@ sub new {
         bless $value_sr, _REJECTION_CLASS();
 
         $_UNHANDLED_REJECTIONS{$value_sr} = $value_sr;
+
+        $self->[_ON_READY_IMMEDIATE_IDX]->() if $self->[_ON_READY_IMMEDIATE_IDX];
+
+        undef $self->[_SELF_REF_IDX];
 
         # We do not repromise rejections. Whatever is in $$value_sr
         # is literally what rejection callbacks receive.
@@ -314,6 +326,10 @@ sub _settle_now {
         $_->_settle( $self->[_VALUE_SR_IDX] ) for splice @{ $self->[_CHILDREN_IDX] };
     }
 
+    $self->[_ON_READY_IMMEDIATE_IDX]->() if $self->[_ON_READY_IMMEDIATE_IDX];
+
+    undef $self->[_SELF_REF_IDX];
+
     return;
 }
 
@@ -333,5 +349,69 @@ sub DESTROY {
         }
     }
 }
+
+#----------------------------------------------------------------------
+
+# Future::AsyncAwait::Awaitable interface:
+
+# Future::AsyncAwait doesn’t retain a strong reference to its created
+# promises, as a result of which we need to create a self-reference
+# inside the promise. We’ll clear that self-reference once the promise
+# is finished, which avoids memory leaks.
+#
+sub _immortalize {
+    my $method = $_[0];
+
+    my $new = $_[1]->$method(@_[2 .. $#_]);
+
+    $new->[_SELF_REF_IDX] = $new;
+}
+
+sub AWAIT_NEW_DONE {
+    _immortalize('resolve', (ref($_[0]) || $_[0]), $_[1]);
+}
+
+sub AWAIT_NEW_FAIL {
+    _immortalize('reject', (ref($_[0]) || $_[0]), $_[1]);
+}
+
+sub AWAIT_CLONE {
+    _immortalize('new', ref($_[0]), \&_noop);
+}
+
+sub AWAIT_DONE {
+    my $copy = $_[1];
+
+    $_[0]->_settle_now(bless \$copy, _RESOLUTION_CLASS);
+}
+
+sub AWAIT_FAIL {
+    my $copy = $_[1];
+
+    $_[0]->_settle_now(bless(\$copy, _REJECTION_CLASS), 1);
+}
+
+sub AWAIT_IS_READY {
+    !UNIVERSAL::isa( $_[0]->[_VALUE_SR_IDX], _PENDING_CLASS );
+}
+
+use constant AWAIT_IS_CANCELLED => 0;
+
+sub AWAIT_GET {
+    delete $_UNHANDLED_REJECTIONS{$_[0]->[_VALUE_SR_IDX]};
+
+    return ${ $_[0]->[_VALUE_SR_IDX] } if UNIVERSAL::isa( $_[0]->[_VALUE_SR_IDX], _RESOLUTION_CLASS );
+
+    die ${ $_[0]->[_VALUE_SR_IDX] };
+}
+
+use constant _noop => ();
+
+sub AWAIT_ON_READY {
+    $_[0][_ON_READY_IMMEDIATE_IDX] = $_[1];
+}
+
+*AWAIT_CHAIN_CANCEL = *_noop;
+*AWAIT_ON_CANCEL = *_noop;
 
 1;

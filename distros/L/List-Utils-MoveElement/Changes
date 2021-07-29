@@ -1,0 +1,11 @@
+Revision history for Perl extension List-Utils-MoveElement
+
+0.03 2021-07-28T19:17:52Z
+    - fix location of .xs file
+
+0.02 2021-07-22T15:46:24Z
+    - fix in documentation
+
+0.01 2021-07-22T15:25:30Z
+    - original version
+

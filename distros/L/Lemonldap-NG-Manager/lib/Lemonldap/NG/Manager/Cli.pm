@@ -7,7 +7,7 @@ use Data::Dumper;
 use JSON;
 use Lemonldap::NG::Common::Conf::ReConstants;
 
-our $VERSION = '2.0.10';
+our $VERSION = '2.0.12';
 $Data::Dumper::Useperl = 1;
 
 extends('Lemonldap::NG::Manager::Cli::Lib');
@@ -416,8 +416,7 @@ sub _setKey {
 sub _save {
     my ( $self, $new ) = @_;
     require Lemonldap::NG::Manager::Conf::Parser;
-    my $parser = Lemonldap::NG::Manager::Conf::Parser->new(
-        {
+    my $parser = Lemonldap::NG::Manager::Conf::Parser->new( {
             newConf => $new,
             refConf => $self->mgr->hLoadedPlugins->{conf}->currentConf,
             req     => $self->req

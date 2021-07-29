@@ -6,14 +6,14 @@ use Moo::Role;
 
 use namespace::clean;
 
-our $VERSION = '0.20';
+our $VERSION = '0.23';
 
-#pod =for Pod::Coverage
-#pod  print
-#pod  say
-#pod  close
-#pod
-#pod =cut
+
+
+
+
+
+
 
 sub print { }
 sub say   { }
@@ -38,13 +38,15 @@ __END__
 
 =pod
 
+=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory
+
 =head1 NAME
 
 Data::Record::Serialize::Sink::null - send output to nowhere.
 
 =head1 VERSION
 
-version 0.20
+version 0.23
 
 =head1 SYNOPSIS
 

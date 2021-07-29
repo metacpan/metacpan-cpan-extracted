@@ -28,15 +28,15 @@ use_ok $_ for qw(
     Beekeeper::Worker
     Beekeeper::WorkerPool::Daemon
     Beekeeper::WorkerPool
-    Beekeeper::Worker::Util
+    Beekeeper::Worker::Extension::SharedCache
+    Beekeeper::Worker::Extension::RemoteSession
     Beekeeper::Service::Supervisor
     Beekeeper::Service::Supervisor::Worker
-    Beekeeper::Service::Sinkhole::Worker
     Beekeeper::Service::LogTail
     Beekeeper::Service::LogTail::Worker
-    Beekeeper::Service::Router
     Beekeeper::Service::Router::Worker
     Beekeeper::Service::ToyBroker::Worker
+    Beekeeper::Service::Sinkhole::Worker
 );
 
 diag( "Testing Beekeeper $Beekeeper::VERSION, Perl $]" );

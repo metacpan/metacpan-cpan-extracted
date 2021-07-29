@@ -1,9 +1,9 @@
 package App::grep::url;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-07-01'; # DATE
+our $DATE = '2021-07-11'; # DATE
 our $DIST = 'App-grep-url'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
@@ -25,9 +25,10 @@ This is a grep-like utility that greps for URLs of certain criteria.
 
 _
     remove_args => [
-        'ignore_case',
         'regexps',
         'pattern',
+        'dash_prefix_inverts',
+        'all',
     ],
     add_args    => {
         min_urls => {
@@ -341,7 +342,13 @@ App::grep::url - Print lines having URL(s) (optionally of certain criteria) in t
 
 =head1 VERSION
 
-This document describes version 0.001 of App::grep::url (from Perl distribution App-grep-url), released on 2021-07-01.
+This document describes version 0.003 of App::grep::url (from Perl distribution App-grep-url), released on 2021-07-11.
+
+=head1 CONTRIBUTOR
+
+=for stopwords perlancar (on netbook-dell-xps13)
+
+perlancar (on netbook-dell-xps13) <perlancar@gmail.com>
 
 =head1 FUNCTIONS
 
@@ -362,24 +369,11 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
-=item * B<all> => I<true>
-
-Require all patterns to match, instead of just one.
-
 =item * B<color> => I<str> (default: "auto")
 
 =item * B<count> => I<true>
 
 Supress normal output, return a count of matching lines.
-
-=item * B<dash_prefix_inverts> => I<bool>
-
-When given pattern that starts with dash "-FOO", make it to mean "^(?!.*FOO)".
-
-This is a convenient way to search for lines that do not match a pattern.
-Instead of using C<-v> to invert the meaning of all patterns, this option allows
-you to invert individual pattern using the dash prefix, which is also used by
-Google search and a few other search engines.
 
 =item * B<files> => I<array[filename]>
 
@@ -388,6 +382,8 @@ Google search and a few other search engines.
 =item * B<host_matches> => I<re>
 
 =item * B<host_not_contains> => I<str>
+
+=item * B<ignore_case> => I<bool>
 
 =item * B<invert_match> => I<bool>
 

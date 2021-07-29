@@ -116,11 +116,11 @@ __PACKAGE__->meta->make_immutable;
 1;
 __END__
 
-=head 1 Name
+=head1 Name
 
 Connector::Proxy::Authentication::KeyNanny
 
-=head 1 Description
+=head1 Description
 
 Lightweight connector to check passwords against a Keynanny daemon.
 LOCATION must point to the keynannyd socket file, PREFIX can be set

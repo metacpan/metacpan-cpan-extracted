@@ -3,9 +3,9 @@
 package Test::Regexp::Pattern;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-01-04'; # DATE
+our $DATE = '2021-07-21'; # DATE
 our $DIST = 'Test-Regexp-Pattern'; # DIST
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -31,10 +31,17 @@ sub import {
 }
 
 sub _test_regexp_pattern {
-    my ($re, $fqname, $opts) = @_;
+    my ($re, $parent, $fqname, $opts) = @_;
     my $ok = 1;
 
   GENERAL: {
+        my $dh;
+        eval { $dh = Hash::DefHash->new($re, parent=>$parent); 1 };
+        my $eval_err = $@;
+        $Test->ok(!$eval_err, "Must be a valid defhash") or do {
+            $Test->diag("error in defhash check: $eval_err");
+            $ok = 0;
+        };
         $Test->ok(($re->{pat} xor $re->{gen}), "Must declare pat OR gen but not both") or $ok = 0;
     }
 
@@ -47,7 +54,9 @@ sub _test_regexp_pattern {
             $Test->subtest(
                 "example #$i" .
                     ($eg->{name} ? " ($eg->{name})" :
-                     ($eg->{summary} ? " ($eg->{summary})" : "")),
+                     ($eg->{summary} ? " ($eg->{summary})" :
+                      (defined $eg->{str} ? " (str $eg->{str})" :
+                       ""))),
                 sub {
                     $Test->ok(defined($eg->{str}), 'example provides string to match') or do {
                         $ok = 0;
@@ -147,14 +156,15 @@ sub regexp_patterns_in_module_ok {
                 goto L1;
             }
 
-            my $dh = defhash(\%{ "$module\::RE" });
+            my $RE = \%{ "$module\::RE" };
+            my $dh = defhash($RE);
             for my $name ($dh->props) {
-                my $re = ${"$module\::RE"}{$name};
+                my $re = $RE->{$name};
                 $has_tests++;
                 $Test->subtest(
                     "pattern $prefix$name",
                     sub {
-                        _test_regexp_pattern($re, "$prefix$name", \%opts) or $ok = 0;
+                        _test_regexp_pattern($re, $RE, "$prefix$name", \%opts) or $ok = 0;
                     },
                 ) or $ok = 0;
             }
@@ -269,7 +279,7 @@ Test::Regexp::Pattern - Test Regexp::Pattern patterns
 
 =head1 VERSION
 
-This document describes version 0.006 of Test::Regexp::Pattern (from Perl distribution Test-Regexp-Pattern), released on 2020-01-04.
+This document describes version 0.009 of Test::Regexp::Pattern (from Perl distribution Test-Regexp-Pattern), released on 2021-07-21.
 
 =head1 SYNOPSIS
 
@@ -290,11 +300,11 @@ Alternatively, you can check all regexp patterns in all modules in a distro:
 =head1 DESCRIPTION
 
 This module performs various checks on a module's L<Regexp::Pattern> patterns.
-It is recommended that you include something like C<release-regexp-pattern.t> in
-your distribution if you add regexp patterns to your code. If you use
-L<Dist::Zilla> to build your distribution, there is
-L<[Regexp::Pattern]|Dist::Zilla::Plugin::Regexp::Pattern> which automatically
-adds a release test file for this during build.
+It is recommended that you include something like the above
+C<release-regexp-pattern.t> in your distribution if you add regexp patterns to
+your code. If you use L<Dist::Zilla> to build your distribution, there is a
+L<[Regexp::Pattern]|Dist::Zilla::Plugin::Regexp::Pattern> plugin which
+automatically adds this release test file during build.
 
 =for Pod::Coverage ^(all_modules)$
 
@@ -356,7 +366,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2018 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

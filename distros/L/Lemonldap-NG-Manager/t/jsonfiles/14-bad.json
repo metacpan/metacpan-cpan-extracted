@@ -287,9 +287,6 @@
         "k": "AD",
         "v": "Active Directory"
       }, {
-        "k": "BrowserID",
-        "v": "BrowserID (Mozilla Persona)"
-      }, {
         "k": "Choice",
         "v": "authChoice"
       }, {
@@ -408,33 +405,6 @@
       "id": "apacheParams",
       "show": false,
       "title": "apacheParams",
-      "type": "simpleInputContainer"
-    }, {
-      "_nodes": [{
-        "default": 1,
-        "id": "browserIdAuthnLevel",
-        "title": "browserIdAuthnLevel",
-        "type": "int"
-      }, {
-        "id": "browserIdAutoLogin",
-        "title": "browserIdAutoLogin",
-        "type": "bool"
-      }, {
-        "id": "browserIdVerificationURL",
-        "title": "browserIdVerificationURL"
-      }, {
-        "id": "browserIdSiteName",
-        "title": "browserIdSiteName"
-      }, {
-        "id": "browserIdSiteLogo",
-        "title": "browserIdSiteLogo"
-      }, {
-        "id": "browserIdBackgroundColor",
-        "title": "browserIdBackgroundColor"
-      }],
-      "id": "browserIdParams",
-      "show": false,
-      "title": "browserIdParams",
       "type": "simpleInputContainer"
     }, {
       "_nodes": [{

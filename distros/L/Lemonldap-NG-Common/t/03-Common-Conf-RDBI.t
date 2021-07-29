@@ -44,7 +44,6 @@ SKIP: {
     ok(
         $h->_dbh->do(
 "CREATE TABLE lmConfig ( cfgNum int not null, field varchar(255) NOT NULL DEFAULT '', value longblob, PRIMARY KEY (cfgNum,field))"
-
         ),
         'Test database created'
     );

@@ -17,7 +17,7 @@
 
 package Lemonldap::NG::Manager::Build::Tree;
 
-our $VERSION = '2.0.11';
+our $VERSION = '2.0.12';
 
 # TODO: Missing:
 #  * activeTimer
@@ -79,6 +79,7 @@ sub tree {
                                         'portalRequireOldPassword',
                                         'hideOldPassword',
                                         'mailOnPasswordChange',
+                                        'portalEnablePasswordDisplay',
                                     ]
                                 },
                                 {
@@ -393,9 +394,9 @@ sub tree {
                             help  => 'authrest.html',
                             form  => 'simpleInputContainer',
                             nodes => [
-                                'restAuthnLevel',   'restAuthUrl',
-                                'restUserDBUrl',    'restPwdConfirmUrl',
-                                'restPwdModifyUrl', 'restFindUserDBUrl'
+                                'restAuthnLevel', 'restAuthUrl',
+                                'restUserDBUrl',  'restPwdConfirmUrl',
+                                'restPwdModifyUrl'
                             ]
                         },
                         {
@@ -621,13 +622,32 @@ sub tree {
                         {
                             title => 'portalServers',
                             help  => 'portalservers.html',
-                            form  => 'simpleInputContainer',
                             nodes => [
-                                'wsdlServer',         'restExportSecretKeys',
-                                'restClockTolerance', 'restSessionServer',
-                                'restConfigServer',   'restAuthServer',
-                                'restPasswordServer', 'soapSessionServer',
-                                'soapConfigServer',   'exportedAttr',
+                                'exportedAttr',
+                                {
+                                    title => 'restServices',
+                                    help  => 'portalservers.html#REST',
+                                    form  => 'simpleInputContainer',
+                                    nodes => [
+                                        'restSessionServer',
+                                        'restConfigServer',
+                                        'restAuthServer',
+                                        'restPasswordServer',
+                                        'restExportSecretKeys',
+                                        'restClockTolerance',
+                                    ]
+                                },
+                                {
+                                    title => 'soapServices',
+                                    help =>
+                                      'portalservers.html#SOAP_(deprecated)',
+                                    form  => 'simpleInputContainer',
+                                    nodes => [
+                                        'soapSessionServer',
+                                        'soapConfigServer',
+                                        'wsdlServer',
+                                    ]
+                                },
                             ]
                         },
                         {
@@ -781,6 +801,12 @@ sub tree {
                             ]
                         },
                         {
+                            title => 'devOpsCheck',
+                            help  => 'checkdevops.html',
+                            form  => 'simpleInputContainer',
+                            nodes => [ 'checkDevOps', 'checkDevOpsDownload' ],
+                        },
+                        {
                             title => 'impersonation',
                             help  => 'impersonation.html',
                             form  => 'simpleInputContainer',
@@ -800,6 +826,7 @@ sub tree {
                                 'findUser',
                                 'findUserWildcard',
                                 'findUserControl',
+                                'restFindUserDBUrl',
                                 'findUserSearchingAttributes',
                                 'findUserExcludingAttributes'
                             ]
@@ -853,13 +880,11 @@ sub tree {
                             nodes => [
                                 'totp2fActivation',
                                 'totp2fSelfRegistration',
+                                'totp2fUserCanRemoveKey',
                                 'totp2fIssuer',
                                 'totp2fInterval',
                                 'totp2fRange',
                                 'totp2fDigits',
-                                'totp2fDisplayExistingSecret',
-                                'totp2fUserCanChangeKey',
-                                'totp2fUserCanRemoveKey',
                                 'totp2fTTL',
                                 'totp2fAuthnLevel',
                                 'totp2fLabel',
@@ -884,12 +909,12 @@ sub tree {
                             nodes => [
                                 'yubikey2fActivation',
                                 'yubikey2fSelfRegistration',
+                                'yubikey2fUserCanRemoveKey',
                                 'yubikey2fClientID',
                                 'yubikey2fSecretKey',
                                 'yubikey2fNonce',
                                 'yubikey2fUrl',
                                 'yubikey2fPublicIDSize',
-                                'yubikey2fUserCanRemoveKey',
                                 'yubikey2fFromSessionAttribute',
                                 'yubikey2fTTL',
                                 'yubikey2fAuthnLevel',
@@ -956,6 +981,7 @@ sub tree {
                                 'sfRemovedNotifMsg',
                             ],
                         },
+                        'sfRegisterTimeout',
                     ]
                 },
                 {
@@ -1004,6 +1030,14 @@ sub tree {
                                 'formTimeout',
                                 'tokenUseGlobalStorage',
                                 {
+                                    title => 'CrowdSecPlugin',
+                                    help  => 'crowdsec.html',
+                                    nodes => [
+                                        'crowdsec',    'crowdsecAction',
+                                        'crowdsecUrl', 'crowdsecKey',
+                                    ],
+                                },
+                                {
                                     title => 'bruteForceAttackProtection',
                                     help  => 'bruteforceprotection.html',
                                     form  => 'simpleInputContainer',
@@ -1017,7 +1051,6 @@ sub tree {
                                 },
                                 'lwpOpts',
                                 'lwpSslOpts',
-
                                 {
                                     title => 'contentSecurityPolicy',
                                     help  => 'security.html#portal',
@@ -1293,6 +1326,7 @@ sub tree {
                             ],
                         },
                         'oidcServiceAllowDynamicRegistration',
+                        'oidcServiceAllowOnlyDeclaredScopes',
                         'oidcServiceAllowAuthorizationCodeFlow',
                         'oidcServiceAllowImplicitFlow',
                         'oidcServiceAllowHybridFlow',
@@ -1321,6 +1355,7 @@ sub tree {
                 'casStorage',
                 'casStorageOptions',
                 'casAttributes',
+                'casStrictMatching',
 
             ]
         },

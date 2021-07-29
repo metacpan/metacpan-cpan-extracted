@@ -4,6 +4,8 @@
  *  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
  */
 
+#define PERL_NO_GET_CONTEXT
+
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
@@ -18,15 +20,67 @@
 
 #include "lexer-additions.c.inc"
 
+/* yycroak() is a long function and hard to emulate or copy-paste for our
+ * purposes; we'll reïmplement a smaller version of it
+ *
+ * ours will croak instead of warn
+ */
+
+#define LEX_IGNORE_UTF8_HINTS   0x00000002
+
+#define PL_linestr (PL_parser->linestr)
+
+#ifdef USE_UTF8_SCRIPTS
+#   define UTF cBOOL(!IN_BYTES)
+#elif HAVE_PERL_VERSION(5, 16, 0)
+#   define UTF cBOOL((PL_linestr && DO_UTF8(PL_linestr)) || ( !(PL_parser->lex_flags & LEX_IGNORE_UTF8_HINTS) && (PL_hints & HINT_UTF8)))
+#else
+#   define UTF cBOOL((PL_linestr && DO_UTF8(PL_linestr)) || (PL_hints & HINT_UTF8))
+#endif
+
+#if HAVE_PERL_VERSION(5, 20, 0)
+#  define HAVE_UTF8f
+#endif
+
+#define yycroak(s)  S_yycroak(aTHX_ s)
+static void S_yycroak(pTHX_ const char *s)
+{
+  SV *message = sv_2mortal(newSVpvs_flags("", 0));
+
+  char *context = PL_parser->oldbufptr;
+  STRLEN contlen = PL_parser->bufptr - PL_parser->oldbufptr;
+
+  sv_catpvf(message, "%s at %s line %" IVdf,
+      s, OutCopFILE(PL_curcop), (IV)CopLINE(PL_curcop));
+
+  if(context)
+#ifdef HAVE_UTF8f
+    sv_catpvf(message, ", near \"%" UTF8f "\"", UTF8fARG(UTF, contlen, context));
+#else
+    sv_catpvf(message, ", near \"%" SVf "\"", SVfARG(newSVpvn_flags(context, contlen, SVs_TEMP | (UTF ? SVf_UTF8 : 0))));
+#endif
+
+  sv_catpvf(message, "\n");
+
+  PL_parser->error_count++;
+  croak_sv(message);
+}
+
+#define yycroakf(fmt, ...) yycroak(Perl_form(aTHX_ fmt, __VA_ARGS__))
+
 #define lex_expect_unichar(c)  MY_lex_expect_unichar(aTHX_ c)
 void MY_lex_expect_unichar(pTHX_ int c)
 {
   if(lex_peek_unichar(0) != c)
     /* TODO: A slightly different message if c == '\'' */
-    croak("Expected '%c'", c);
+    yycroakf("Expected '%c'", c);
 
   lex_read_unichar(0);
 }
+
+#define CHECK_PARSEFAIL      \
+  if(PL_parser->error_count) \
+    croak("parse failed--compilation aborted")
 
 /* TODO: Only ASCII */
 #define lex_probe_str(s)   MY_lex_probe_str(aTHX_ s)
@@ -46,7 +100,7 @@ void MY_lex_expect_str(pTHX_ const char *s)
 {
   STRLEN len = lex_probe_str(s);
   if(!len)
-    croak("Expected \"%s\"", s);
+    yycroakf("Expected \"%s\"", s);
 
   lex_read_to(PL_parser->bufptr + len);
 }
@@ -100,7 +154,7 @@ static bool probe_piece(pTHX_ SV *argsv, size_t *argidx, const struct XSParseKey
     }
 
     case XS_PARSE_KEYWORD_FAILURE:
-      croak("%s", piece->u.str);
+      yycroak(piece->u.str);
       NOT_REACHED;
 
     case XS_PARSE_KEYWORD_BLOCK:
@@ -129,28 +183,30 @@ static bool probe_piece(pTHX_ SV *argsv, size_t *argidx, const struct XSParseKey
     {
       const struct XSParseKeywordPieceType *choices = piece->u.pieces;
       THISARG.i = 0;
+      (*argidx)++; /* tentative */
       while(choices->type) {
         if(probe_piece(aTHX_ argsv, argidx, choices + 0)) {
-          (*argidx)++;
           return TRUE;
         }
         choices++;
         THISARG.i++;
       }
+      (*argidx)--;
       return FALSE;
     }
 
     case XS_PARSE_KEYWORD_TAGGEDCHOICE:
     {
       const struct XSParseKeywordPieceType *choices = piece->u.pieces;
+      (*argidx)++; /* tentative */
       while(choices->type) {
         if(probe_piece(aTHX_ argsv, argidx, choices + 0)) {
           THISARG.i = choices[1].type;
-          (*argidx)++;
           return TRUE;
         }
         choices += 2;
       }
+      (*argidx)--;
       return FALSE;
     }
 
@@ -219,7 +275,7 @@ static void parse_piece(pTHX_ SV *argsv, size_t *argidx, const struct XSParseKey
       return;
 
     case XS_PARSE_KEYWORD_FAILURE:
-      croak("%s", piece->u.str);
+      yycroak(piece->u.str);
       NOT_REACHED;
 
     case XS_PARSE_KEYWORD_BLOCK:
@@ -242,9 +298,11 @@ static void parse_piece(pTHX_ SV *argsv, size_t *argidx, const struct XSParseKey
 
       /* TODO: Can we name the syntax keyword here to make a better message? */
       if(lex_peek_unichar(0) != '{')
-        croak("Expected a block");
+        yycroak("Expected a block");
 
       OP *body = parse_block(0);
+      CHECK_PARSEFAIL;
+
       THISARG.op = block_end(save_ix, body);
 
       if(is_special)
@@ -264,6 +322,8 @@ static void parse_piece(pTHX_ SV *argsv, size_t *argidx, const struct XSParseKey
 
       I32 save_ix = block_start(0);
       OP *body = parse_block(0);
+      CHECK_PARSEFAIL;
+
       SvREFCNT_inc(PL_compcv);
       body = block_end(save_ix, body);
 
@@ -281,12 +341,16 @@ static void parse_piece(pTHX_ SV *argsv, size_t *argidx, const struct XSParseKey
         lex_read_unichar(0);
 
         THISARG.op = parse_fullexpr(0);
+        CHECK_PARSEFAIL;
+
         lex_read_space(0);
 
         lex_expect_unichar(')');
       }
-      else
+      else {
         THISARG.op = parse_termexpr(0);
+        CHECK_PARSEFAIL;
+      }
 
       if(want)
         THISARG.op = op_contextualize(THISARG.op, want);
@@ -296,6 +360,7 @@ static void parse_piece(pTHX_ SV *argsv, size_t *argidx, const struct XSParseKey
 
     case XS_PARSE_KEYWORD_LISTEXPR:
       THISARG.op = parse_listexpr(0);
+      CHECK_PARSEFAIL;
 
       if(want)
         THISARG.op = op_contextualize(THISARG.op, want);
@@ -321,15 +386,15 @@ static void parse_piece(pTHX_ SV *argsv, size_t *argidx, const struct XSParseKey
       switch(SvPVX(varname)[0]) {
         case '$':
           if(!piece->u.c & XPK_LEXVAR_SCALAR)
-            croak("Lexical scalars are not permitted");
+            yycroak("Lexical scalars are not permitted");
           break;
         case '@':
           if(!piece->u.c & XPK_LEXVAR_ARRAY)
-            croak("Lexical arrays are not permitted");
+            yycroak("Lexical arrays are not permitted");
           break;
         case '%':
           if(!piece->u.c & XPK_LEXVAR_HASH)
-            croak("Lexical hashes are not permitted");
+            yycroak("Lexical hashes are not permitted");
           break;
       }
       if(type == XS_PARSE_KEYWORD_LEXVARNAME) {
@@ -342,12 +407,12 @@ static void parse_piece(pTHX_ SV *argsv, size_t *argidx, const struct XSParseKey
 
       /* Forbid $_ / @_ / %_ */
       if(SvCUR(varname) == 2 && SvPVX(varname)[1] == '_')
-        croak("Can't use global %s in \"my\"", SvPVX(varname));
+        yycroakf("Can't use global %s in \"my\"", SvPVX(varname));
 
       if(is_special)
         THISARG.padix = pad_add_name_pvn(SvPVX(varname), SvCUR(varname), 0, NULL, NULL);
       else
-        croak("TODO: XS_PARSE_KEYWORD_LEXVAR without LEXVAR_MY");
+        yycroak("TODO: XS_PARSE_KEYWORD_LEXVAR without LEXVAR_MY");
 
       (*argidx)++;
       return;
@@ -552,7 +617,7 @@ static int parse(pTHX_ OP **op, struct Registration *reg)
     else if(!c || c == '}')
       ; /* all is good */
     else
-      croak("Expected: ';' or end of block");
+      yycroak("Expected: ';' or end of block");
   }
 
   XSParseKeywordPiece *args = (XSParseKeywordPiece *)SvPVX(argsv);
@@ -576,13 +641,13 @@ static int parse(pTHX_ OP **op, struct Registration *reg)
 
   switch(hooks->flags & (XPK_FLAG_EXPR|XPK_FLAG_STMT)) {
     case XPK_FLAG_EXPR:
-      if(ret != KEYWORD_PLUGIN_EXPR)
-        croak("Expected parse function for '%s' keyword to return KEYWORD_PLUGIN_EXPR but it did not",
+      if(ret && (ret != KEYWORD_PLUGIN_EXPR))
+        yycroakf("Expected parse function for '%s' keyword to return KEYWORD_PLUGIN_EXPR but it did not",
           reg->kwname);
 
     case XPK_FLAG_STMT:
-      if(ret != KEYWORD_PLUGIN_STMT)
-        croak("Expected parse function for '%s' keyword to return KEYWORD_PLUGIN_STMT but it did not",
+      if(ret && (ret != KEYWORD_PLUGIN_STMT))
+        yycroakf("Expected parse function for '%s' keyword to return KEYWORD_PLUGIN_STMT but it did not",
           reg->kwname);
   }
 

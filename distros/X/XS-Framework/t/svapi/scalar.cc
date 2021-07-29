@@ -131,7 +131,7 @@ TEST_CASE("Scalar", "[Scalar]") {
 
         REQUIRE(Scalar().as_string() == panda::string());
         REQUIRE(Scalar::undef.as_string() == panda::string());
-        REQUIRE_THROWS_AS(Ref::create(Array::create()).as_string(), std::invalid_argument);
+        REQUIRE(Ref::create(Array::create()).as_string() != "");
     }
 
     SECTION("as_number") {
@@ -140,7 +140,7 @@ TEST_CASE("Scalar", "[Scalar]") {
         REQUIRE(Scalar(Simple(111.7)).as_number<double>() == 111.7);
         REQUIRE(Scalar().as_number() == 0);
         REQUIRE(Scalar::undef.as_number() == 0);
-        REQUIRE_THROWS_AS(Ref::create(Array::create()).as_number(), std::invalid_argument);
+        REQUIRE(Ref::create(Array::create()).as_number() != 0);
    }
 
     SECTION("LV") {

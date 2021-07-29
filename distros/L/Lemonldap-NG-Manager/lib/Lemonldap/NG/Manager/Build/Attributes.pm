@@ -6,7 +6,7 @@
 
 package Lemonldap::NG::Manager::Build::Attributes;
 
-our $VERSION = '2.0.11';
+our $VERSION = '2.0.12';
 use strict;
 use Regexp::Common qw/URI/;
 
@@ -29,7 +29,8 @@ sub perlExpr {
           split( /\n/, $@ ) );
     return ( -1, "__badExpression__: $err" )
       if ( $err && $conf->{useSafeJail} );
-    return ( $val =~ qr/(?<=[^=<!>\|\?])=(?![>=~])/ && $conf->{avoidAssignment} )
+    return ( $val =~ qr/(?<=[^=<!>\|\?])=(?![>=~])/
+          && $conf->{avoidAssignment} )
       ? ( 1, "__badExpressionAssignment__" )
       : 1;
 }
@@ -462,6 +463,18 @@ sub attributes {
         checkStateSecret => {
             type          => 'text',
             documentation => 'Secret token for CheckState plugin',
+        },
+        checkDevOps => {
+            default       => 0,
+            type          => 'bool',
+            documentation => 'Enable check DevOps',
+            flags         => 'p',
+        },
+        checkDevOpsDownload => {
+            default       => 1,
+            type          => 'bool',
+            documentation => 'Enable check DevOps download field',
+            flags         => 'p',
         },
         checkUser => {
             default       => 0,
@@ -1111,11 +1124,34 @@ sub attributes {
         },
         lwpOpts => {
             type          => 'keyTextContainer',
-            documentation => 'Options given to LWP::UserAgent',
+            documentation => 'Options passed to LWP::UserAgent',
         },
         lwpSslOpts => {
             type          => 'keyTextContainer',
-            documentation => 'SSL options given to LWP::UserAgent',
+            documentation => 'SSL options passed to LWP::UserAgent',
+        },
+
+        # CrowdSec plugin
+        crowdsec => {
+            type          => 'bool',
+            documentation => 'CrowdSec plugin activation',
+        },
+        crowdsecAction => {
+            type   => 'select',
+            select => [
+                { k => 'reject', v => 'Reject' },
+                { k => 'warn',   v => 'Warn' },
+            ],
+            default       => 'reject',
+            documentation => 'CrowdSec action',
+        },
+        crowdsecUrl => {
+            type          => 'url',
+            documentation => 'Base URL of CrowdSec local API',
+        },
+        crowdsecKey => {
+            type          => 'text',
+            documentation => 'CrowdSec API key',
         },
 
         # History
@@ -1192,6 +1228,11 @@ sub attributes {
             default       => 1,
             type          => 'bool',
             documentation => 'Display link to refresh the user session',
+        },
+        portalEnablePasswordDisplay => {
+            default       => 0,
+            type          => 'bool',
+            documentation => 'Allow to display password in login form',
         },
 
         # Cookies
@@ -1837,17 +1878,6 @@ sub attributes {
             default       => 6,
             documentation => 'Number of digits for TOTP code',
         },
-        totp2fDisplayExistingSecret => {
-            type    => 'bool',
-            default => 0,
-            documentation =>
-              'Display existing TOTP secret in registration form',
-        },
-        totp2fUserCanChangeKey => {
-            type          => 'bool',
-            default       => 0,
-            documentation => 'Authorize users to change existing TOTP secret',
-        },
         totp2fUserCanRemoveKey => {
             type          => 'bool',
             default       => 1,
@@ -2382,6 +2412,11 @@ sub attributes {
         casStorageOptions => {
             type          => 'keyTextContainer',
             documentation => 'Apache::Session module parameters',
+        },
+        casStrictMatching => {
+            default       => 0,
+            type          => 'bool',
+            documentation => 'Disable host-based matching of CAS services',
         },
         issuerDBCASActivation => {
             default       => 0,
@@ -3196,9 +3231,13 @@ sub attributes {
         sfRemovedNotifMsg => {
             type => 'text',
             default =>
-              '_removedSF_ expired second factor(s) has/have been removed!',
+'_removedSF_ expired second factor(s) has/have been removed (_nameSF_)!',
             help          => 'secondfactor.html',
             documentation => 'Notification message',
+        },
+        sfRegisterTimeout => {
+            type          => 'int',
+            documentation => 'Timeout for 2F registration process',
         },
         available2F => {
             type          => 'text',
@@ -4046,6 +4085,11 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
             default       => 0,
             documentation => 'OpenID Connect allow dynamic client registration',
         },
+        oidcServiceAllowOnlyDeclaredScopes => {
+            type          => 'bool',
+            default       => 0,
+            documentation => 'OpenID Connect allow only declared scopes',
+        },
         oidcServiceAllowAuthorizationCodeFlow => {
             type          => 'bool',
             default       => 1,
@@ -4116,8 +4160,14 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
         oidcRPMetaDataOptions => { type => 'subContainer', },
 
         # OpenID Connect providers
-        oidcOPMetaDataJSON         => { type => 'file', },
-        oidcOPMetaDataJWKS         => { type => 'file', },
+        oidcOPMetaDataJSON => {
+            type    => 'file',
+            keyTest => sub { 1 }
+        },
+        oidcOPMetaDataJWKS => {
+            type    => 'file',
+            keyTest => sub { 1 }
+        },
         oidcOPMetaDataExportedVars => {
             type    => 'keyTextContainer',
             default => {
@@ -4196,6 +4246,32 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
         },
         oidcRPMetaDataOptionsIDTokenExpiration => { type => 'int' },
         oidcRPMetaDataOptionsIDTokenForceClaims =>
+          { type => 'bool', default => 0 },
+        oidcRPMetaDataOptionsAccessTokenSignAlg => {
+            type   => 'select',
+            select => [
+                { k => 'RS256', v => 'RS256' },
+                { k => 'RS384', v => 'RS384' },
+                { k => 'RS512', v => 'RS512' },
+            ],
+            default => 'RS256',
+        },
+        oidcRPMetaDataOptionsUserInfoSignAlg => {
+            type   => 'select',
+            select => [
+                { k => '',      v => 'JSON' },
+                { k => 'none',  v => 'JWT/None' },
+                { k => 'HS256', v => 'JWT/HS256' },
+                { k => 'HS384', v => 'JWT/HS384' },
+                { k => 'HS512', v => 'JWT/HS512' },
+                { k => 'RS256', v => 'JWT/RS256' },
+                { k => 'RS384', v => 'JWT/RS384' },
+                { k => 'RS512', v => 'JWT/RS512' },
+            ],
+            default => '',
+        },
+        oidcRPMetaDataOptionsAccessTokenJWT => { type => 'bool', default => 0 },
+        oidcRPMetaDataOptionsAccessTokenClaims =>
           { type => 'bool', default => 0 },
         oidcRPMetaDataOptionsAdditionalAudiences         => { type => 'text' },
         oidcRPMetaDataOptionsAccessTokenExpiration       => { type => 'int' },
@@ -4285,6 +4361,19 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
             },
             default       => {},
             documentation => 'Macros',
+        },
+        oidcRPMetaDataScopeRules => {
+            type => 'keyTextContainer',
+            help => 'idpopenidconnect.html#scope-rules',
+            test => {
+
+                # RFC6749
+                keyTest    => qr/^[\x21\x23-\x5B\x5D-\x7E]+$/,
+                keyMsgFail => '__badMacroName__',
+                test       => sub { return perlExpr(@_) },
+            },
+            default       => {},
+            documentation => 'Scope rules',
         },
     };
 }

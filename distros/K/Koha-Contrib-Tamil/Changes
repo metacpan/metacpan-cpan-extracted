@@ -1,5 +1,9 @@
 Revision history for Perl module Koha::Contrib::Tamil
 
+0,066 2020-07-25
+
+  - Fix marcxml biblio data retrieving from biblio_metadata
+
 0.065 2020-04-16
 
   - koha-auth load_from_file: create indicators different from blank (space)

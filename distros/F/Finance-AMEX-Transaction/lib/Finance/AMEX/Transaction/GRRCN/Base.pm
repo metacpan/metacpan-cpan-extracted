@@ -1,5 +1,5 @@
 package Finance::AMEX::Transaction::GRRCN::Base;
-$Finance::AMEX::Transaction::GRRCN::Base::VERSION = '0.003';
+$Finance::AMEX::Transaction::GRRCN::Base::VERSION = '0.004';
 use strict;
 use warnings;
 
@@ -13,6 +13,7 @@ sub new {
     _line        => $props{line},
     _file_format => $props{file_format},
     _fields      => undef,
+    _version     => $props{version} || 1.01,
   }, $class;
 
   my $map = $self->field_map;
@@ -41,6 +42,11 @@ sub file_format {
 sub fields {
   my ($self) = @_;
   return $self->{_fields};
+}
+
+sub version {
+  my ($self) = @_;
+  return $self->{_version};
 }
 
 sub _get_column {
@@ -97,7 +103,7 @@ Finance::AMEX::Transaction::GRRCN::Base - Parse AMEX Global Reconciliation (GRRC
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 DESCRIPTION
 
@@ -119,11 +125,11 @@ Finance::AMEX::Transaction::GRRCN::Base - Shared methods for AMEX reconciliation
 
 =head1 AUTHOR
 
-Tom Heady <theady@ziprecruiter.com>
+Tom Heady <cpan@punch.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by ZipRecruiter.
+This software is copyright (c) 2021 by ZipRecruiter.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -2,7 +2,7 @@ package Test2::Tools::EventDumper;
 use strict;
 use warnings;
 
-our $VERSION = '0.000012';
+our $VERSION = '0.000013';
 
 use Carp qw/croak/;
 use Scalar::Util qw/blessed reftype/;
@@ -42,7 +42,7 @@ my %DEFAULTS = (
     other_sort_order => 9000,
 
     include_fields => undef,
-    exclude_fields => {buffered => 1, nested => 1, in_subtest => 1, is_subtest => 1, subtest_id => 1, hubs => 1},
+    exclude_fields => {buffered => 1, nested => 1, in_subtest => 1, is_subtest => 1, subtest_id => 1, hubs => 1, start_stamp => 1, stop_stamp => 1},
 
     indent_sequence => '    ',
 

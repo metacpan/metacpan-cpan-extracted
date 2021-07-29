@@ -8,7 +8,7 @@ use Moo;
 extends 'AnyEvent::FTP::Client::Site::Base';
 
 # ABSTRACT: Site specific commands for Net::FTPServer
-our $VERSION = '0.16'; # VERSION
+our $VERSION = '0.17'; # VERSION
 
 
 # TODO add a test for this
@@ -29,7 +29,7 @@ AnyEvent::FTP::Client::Site::NetFtpServer - Site specific commands for Net::FTPS
 
 =head1 VERSION
 
-version 0.16
+version 0.17
 
 =head1 SYNOPSIS
 
@@ -96,7 +96,7 @@ José Joaquín Atria
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Graham Ollis.
+This software is copyright (c) 2017-2021 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

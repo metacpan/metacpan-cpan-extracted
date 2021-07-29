@@ -249,7 +249,7 @@ sub _new_ldap {
     return $ldap;
 }
 
-# NOTE: it returns undef in case of error
+# calls log_and_die if bind is not successful
 sub _bind {
     my $self = shift;
     my $mesg;
@@ -270,11 +270,10 @@ sub _bind {
         );
     }
     if($mesg->is_error()) {
-        $self->log()->error('LDAP bind returned error code '.$mesg->code.' (error: '.$mesg->error_desc.')');
-        return undef;
+        $self->_log_and_die('LDAP bind returned error code '.$mesg->code.' (error: '.$mesg->error_desc.')');
     } else {
         $self->log()->debug('LDAP bind successfull');
-        return $ldap;
+        return $mesg;
     }
 }
 

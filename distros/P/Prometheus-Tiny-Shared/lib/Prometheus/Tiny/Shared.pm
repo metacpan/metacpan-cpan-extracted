@@ -1,11 +1,11 @@
 package Prometheus::Tiny::Shared;
-$Prometheus::Tiny::Shared::VERSION = '0.023';
+$Prometheus::Tiny::Shared::VERSION = '0.024';
 # ABSTRACT: A tiny Prometheus client with a shared database behind it
 
 use warnings;
 use strict;
 
-use Prometheus::Tiny 0.005;
+use Prometheus::Tiny 0.008;
 use parent 'Prometheus::Tiny';
 
 use Hash::SharedMem qw(shash_open shash_get shash_set shash_cset shash_keys_array shash_group_get_hash);
@@ -97,10 +97,18 @@ sub declare {
       (exists $old->{type} && $old->{type} ne $meta{type})) ||
     ((exists $old->{help} ^ exists $meta{help}) ||
       (exists $old->{help} && $old->{help} ne $meta{help})) ||
+    ((exists $old->{enum} ^ exists $meta{enum}) ||
+      (exists $old->{enum} && $old->{enum} ne $meta{enum})) ||
     ((exists $old->{buckets} ^ exists $meta{buckets}) ||
       (exists $old->{buckets} && (
       @{$old->{buckets}} ne @{$meta{buckets}} ||
       grep { $old->{buckets}[$_] != $meta{buckets}[$_] } (0 .. $#{$meta{buckets}})
+      ))
+    ) ||
+    ((exists $old->{enum_values} ^ exists $meta{enum_values}) ||
+      (exists $old->{enum_values} && (
+      @{$old->{enum_values}} ne @{$meta{enum_values}} ||
+      grep { $old->{enum_values}[$_] ne $meta{enum_values}[$_] } (0 .. $#{$meta{enum_values}})
       ))
     )
   ) {
@@ -119,6 +127,17 @@ sub histogram_observe {
   $self->{meta}{$name} = decode_json(shash_get($self->{_shash}, $key) || '{}');
 
   return $self->SUPER::histogram_observe(@_);
+}
+
+sub enum_set {
+  my $self = shift;
+  my ($name) = @_;
+
+  my $key = join('-', 'm', $name);
+
+  $self->{meta}{$name} = decode_json(shash_get($self->{_shash}, $key) || '{}');
+
+  return $self->SUPER::enum_set(@_);
 }
 
 sub format {

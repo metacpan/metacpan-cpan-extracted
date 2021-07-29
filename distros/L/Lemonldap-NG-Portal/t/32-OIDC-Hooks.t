@@ -36,23 +36,13 @@ my $op = LLNG::Manager::Test->new( {
                     name        => "cn"
                 }
             },
-            oidcServiceMetaDataAuthorizeURI       => "authorize",
-            oidcServiceMetaDataCheckSessionURI    => "checksession.html",
-            oidcServiceMetaDataJWKSURI            => "jwks",
-            oidcServiceMetaDataEndSessionURI      => "logout",
-            oidcServiceMetaDataRegistrationURI    => "register",
-            oidcServiceMetaDataTokenURI           => "token",
-            oidcServiceMetaDataUserInfoURI        => "userinfo",
-            oidcServiceAllowHybridFlow            => 1,
-            oidcServiceAllowImplicitFlow          => 1,
-            oidcServiceAllowDynamicRegistration   => 1,
-            oidcServiceAllowAuthorizationCodeFlow => 1,
-            oidcRPMetaDataOptions                 => {
+            oidcRPMetaDataOptions => {
                 rp => {
                     oidcRPMetaDataOptionsDisplayName           => "RP",
                     oidcRPMetaDataOptionsIDTokenExpiration     => 3600,
                     oidcRPMetaDataOptionsClientID              => "rpid",
                     oidcRPMetaDataOptionsIDTokenSignAlg        => "HS512",
+                    oidcRPMetaDataOptionsAccessTokenJWT        => 1,
                     oidcRPMetaDataOptionsClientSecret          => "rpsecret",
                     oidcRPMetaDataOptionsUserIDAttr            => "",
                     oidcRPMetaDataOptionsAccessTokenExpiration => 3600,
@@ -65,19 +55,9 @@ my $op = LLNG::Manager::Test->new( {
                     oidcRPMetaDataOptionsUserIDAttr   => "",
                 }
             },
-            oidcOPMetaDataOptions           => {},
-            oidcOPMetaDataJSON              => {},
-            oidcOPMetaDataJWKS              => {},
-            oidcServiceMetaDataAuthnContext => {
-                'loa-4' => 4,
-                'loa-1' => 1,
-                'loa-5' => 5,
-                'loa-2' => 2,
-                'loa-3' => 3
-            },
             oidcServicePrivateKeySig => oidc_key_op_private_sig,
             oidcServicePublicKeySig  => oidc_key_op_public_sig,
-            customPlugins => 't::OidcHookPlugin',
+            customPlugins            => 't::OidcHookPlugin',
         }
     }
 );
@@ -110,7 +90,8 @@ ok(
     "Get authorization code"
 );
 
-my ($code) = expectRedirection( $res, qr#http://rp2\.com/.*code=([^\&]*)# );
+my ($code) =
+  expectRedirection( $res, qr#http://rp2\.com/\?hooked=1.*code=([^\&]*)# );
 
 # Exchange code for AT
 $query =
@@ -134,7 +115,7 @@ ok( $token, 'Access token present' );
 my $id_token = $json->{id_token};
 ok( $id_token, 'ID token present' );
 my $id_token_payload = id_token_payload($id_token);
-is ($id_token_payload->{id_token_hook}, 1, "Found hooked claim in ID token");
+is( $id_token_payload->{id_token_hook}, 1, "Found hooked claim in ID token" );
 
 # Get userinfo
 $res = $op->_post(
@@ -148,8 +129,9 @@ $res = $op->_post(
 );
 
 $json = expectJSON($res);
-is ($json->{userinfo_hook}, 1, "Found hooked claim in Userinfo token");
+is( $json->{userinfo_hook}, 1, "Found hooked claim in Userinfo token" );
 
+expectJWT( $token, access_token_hook => 1 );
 
 # Introspect to find scopes
 $query = "token=$token";
@@ -168,7 +150,8 @@ ok(
 
 expectOK($res);
 $json = from_json( $res->[2]->[0] );
-like($json->{scope}, qr/\bmy_hooked_scope\b/, "Found hook defined scope");
+like( $json->{scope}, qr/\bmy_hooked_scope\b/, "Found hook defined scope" );
+like( $json->{scope}, qr/\bmyscope\b/, "Found result of oidcResolveScope" );
 
 clean_sessions();
 done_testing();

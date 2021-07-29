@@ -1,0 +1,163 @@
+NAME
+    Clipboard::Any - Common interface to clipboard manager functions
+
+VERSION
+    This document describes version 0.001 of Clipboard::Any (from Perl
+    distribution Clipboard-Any), released on 2021-07-15.
+
+DESCRIPTION
+    This module provides a common interface to interact with clipboard.
+
+    Some terminology:
+
+    *   clipboard content
+
+        The current clipboard content. Some clipboard manager supports
+        storing multiple items (multiple contents). All the items are called
+        "clipboard history".
+
+    *   clipboard history
+
+        Some clipboard manager supports storing multiple items (multiple
+        contents). All the items are called clipboard history. It is
+        presented as an array. The current item/content is at index 0, the
+        secondmost current item is at index 1, and so on.
+
+    This module provides common functions related to clipboard manager.
+
+    Supported clipboard manager: KDE Plasma's Klipper ("klipper"). Support
+    for more clipboard managers, e.g. on Windows or other Linux desktop
+    environment is welcome.
+
+NOTES
+    2021-07-15 - Tested on my system (KDE Plasma 5.12.9 on Linux).
+
+FUNCTIONS
+  clear_clipboard_history
+    Usage:
+
+     clear_clipboard_history() -> [$status_code, $reason, $payload, \%result_meta]
+
+    Delete all clipboard items.
+
+    This function is not exported by default, but exportable.
+
+    No arguments.
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (str)
+
+  detect_clipboard_manager
+    Usage:
+
+     detect_clipboard_manager() -> str
+
+    Detect which clipboard manager program is currently running.
+
+    Will return a string containing name of clipboard manager program, e.g.
+    "klipper". Will return undef if no known clipboard manager is detected.
+
+    This function is not exported by default, but exportable.
+
+    No arguments.
+
+    Return value: (str)
+
+  get_clipboard_content
+    Usage:
+
+     get_clipboard_content() -> [$status_code, $reason, $payload, \%result_meta]
+
+    Get the clipboard content (most recent, history index [0]).
+
+    Caveats for klipper: Non-text item is not retrievable by
+    getClipboardContents(). If the current item is e.g. an image, then the
+    next text item from history will be returned instead, or empty string if
+    none exists.
+
+    This function is not exported by default, but exportable.
+
+    No arguments.
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (str)
+
+  list_clipboard_history
+    Usage:
+
+     list_clipboard_history() -> [$status_code, $reason, $payload, \%result_meta]
+
+    List the clipboard history.
+
+    Caveats for klipper: 1) Klipper does not provide method to get the
+    length of history. So we retrieve history item one by one using
+    getClipboardHistoryItem(i) from i=0, i=1, and so on. And assume that if
+    we get two consecutive empty string, it means we reach the end of the
+    clipboard history before the first empty result.
+
+    2) Non-text items are not retrievable by getClipboardHistoryItem().
+
+    This function is not exported by default, but exportable.
+
+    No arguments.
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (str)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Clipboard-Any>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Clipboard-Any>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Clipboard-Any>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2021 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -9,8 +9,8 @@
 use warnings;
 use strict;
 
-our $VERSION = '3.022'; # VERSION
-my $LAST_UPDATE = '3.021'; # manually update whenever code is changed
+our $VERSION = '3.023'; # VERSION
+our $LAST_UPDATE = '3.023'; # manually update whenever code is changed
 
 use Math::Trig;
 use List::Util qw(min max);
@@ -83,7 +83,7 @@ makeCell(@cellLoc, @cellSize);
 $text->font($fontR, 20);
 $text->strokecolor('black');
 $text->fillcolor('black');
-$text->lead(15);
+$text->leading(15);
 
 $type = 'Codabar';
 ##$content = 'A32134567890123B';  # len 16 includes start/stop chars, encode=16
@@ -128,7 +128,7 @@ makeCell(@cellLoc, @cellSize);
 $text->font($fontR, 20);
 $text->strokecolor('black');
 $text->fillcolor('black');
-$text->lead(15);
+$text->leading(15);
 
 $type = 'Code 128 A';
 $content = 'TEST of '.$type;
@@ -172,7 +172,7 @@ makeCell(@cellLoc, @cellSize);
 $text->font($fontR, 20);
 $text->strokecolor('black');
 $text->fillcolor('black');
-$text->lead(15);
+$text->leading(15);
 
 $type = 'Code 128 B';
 ##$content = 'Test Of '.$type;
@@ -213,7 +213,7 @@ makeCell(@cellLoc, @cellSize);
 $text->font($fontR, 20);
 $text->strokecolor('black');
 $text->fillcolor('black');
-$text->lead(15);
+$text->leading(15);
 
 $type = 'Code 128 C';
 #$content = '0123456789';  # doesn't work!
@@ -260,7 +260,7 @@ makeCell(@cellLoc, @cellSize);
 $text->font($fontR, 20);
 $text->strokecolor('black');
 $text->fillcolor('black');
-$text->lead(15);
+$text->leading(15);
 
 $type = 'Code EAN-128';
 #$content = '00123456780000000001';  # seems to be too long
@@ -302,7 +302,7 @@ makeCell(@cellLoc, @cellSize);
 $text->font($fontR, 20);
 $text->strokecolor('black');
 $text->fillcolor('black');
-$text->lead(15);
+$text->leading(15);
 
 $type = 'Code 3 of 9';
 ##$content = 'Test '.$type;  # 3 of 9 will uppercase this
@@ -344,7 +344,7 @@ makeCell(@cellLoc, @cellSize);
 $text->font($fontR, 20);
 $text->strokecolor('black');
 $text->fillcolor('black');
-$text->lead(15);
+$text->leading(15);
 
 $type = 'Code 3 of 9';
 $content = 'Test '.$type;  # 3 of 9 will uppercase this
@@ -385,7 +385,7 @@ makeCell(@cellLoc, @cellSize);
 $text->font($fontR, 20);
 $text->strokecolor('black');
 $text->fillcolor('black');
-$text->lead(15);
+$text->leading(15);
 
 $type = 'Code 3 of 9';
 $content = 'Test '.$type;  # 3 of 9 will uppercase this
@@ -426,7 +426,7 @@ makeCell(@cellLoc, @cellSize);
 $text->font($fontR, 20);
 $text->strokecolor('black');
 $text->fillcolor('black');
-$text->lead(15);
+$text->leading(15);
 
 $type = 'Code 3 of 9';
 $content = 'Test '.$type;  # 3 of 9 will uppercase this
@@ -485,7 +485,7 @@ makeCell(@cellLoc, @cellSize);
 $text->font($fontR, 20);
 $text->strokecolor('black');
 $text->fillcolor('black');
-$text->lead(15);
+$text->leading(15);
 
 $type = 'Code EAN-13';
 ##$content = '9123456789013';
@@ -527,7 +527,7 @@ makeCell(@cellLoc, @cellSize);
 $text->font($fontR, 20);
 $text->strokecolor('black');
 $text->fillcolor('black');
-$text->lead(15);
+$text->leading(15);
 
 $type = 'Code Int 2 of 5';
 ##$content = '0123456789';

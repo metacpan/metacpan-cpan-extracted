@@ -6,8 +6,8 @@ use strict;
 use warnings;
 #no warnings qw[ recursion uninitialized ];
 
-our $VERSION = '3.022'; # VERSION
-my $LAST_UPDATE = '3.021'; # manually update whenever code is changed
+our $VERSION = '3.023'; # VERSION
+our $LAST_UPDATE = '3.021'; # manually update whenever code is changed
 
 # TBD: do -rect and -border apply to Named Destinations (link, url, file)? 
 #      There is nothing to implement these options. Perhaps the code was copied 

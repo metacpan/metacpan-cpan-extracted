@@ -1,9 +1,9 @@
 package Bencher::Formatter;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-04-10'; # DATE
+our $DATE = '2021-07-23'; # DATE
 our $DIST = 'Bencher-Backend'; # DIST
-our $VERSION = '1.053'; # VERSION
+our $VERSION = '1.057'; # VERSION
 
 use 5.010001;
 use strict;
@@ -29,7 +29,7 @@ Bencher::Formatter - Base class for formatter
 
 =head1 VERSION
 
-This document describes version 1.053 of Bencher::Formatter (from Perl distribution Bencher-Backend), released on 2021-04-10.
+This document describes version 1.057 of Bencher::Formatter (from Perl distribution Bencher-Backend), released on 2021-07-23.
 
 =for Pod::Coverage .*
 

@@ -333,6 +333,8 @@ execute( q{almanac '20090401T000000Z'},
 2009/04/01 19:07:26 end twilight
 EOD
 
+execute( 'show events', "set events 9\n", 'Accumulated 9 events' );
+
 execute( q{almanac -notransit '20090401T000000Z'},
     <<'EOD', 'Almanac for April Fools 2009' );
 2009/04/01 01:17:47 Moon set
@@ -342,6 +344,8 @@ execute( q{almanac -notransit '20090401T000000Z'},
 2009/04/01 18:33:28 Sunset
 2009/04/01 19:07:26 end twilight
 EOD
+
+execute( 'show events', "set events 15\n", 'Accumulated 15 events' );
 
 execute( q{almanac -rise -transit '20090401T000000Z'},
     <<'EOD', 'Almanac for April Fools 2009' );
@@ -518,6 +522,30 @@ EOD
 error 'Something happened'
 echo 'Nothing happened'
 EOD
+
+    call_m( qw{ set events 0 }, undef, 'Clear events accumulator' );
+
+    execute( <<'EOD', 'No events', 'if ... then begin, else, end' );
+if attr events then begin
+echo Have events
+else
+echo No events
+end
+EOD
+    execute( 'if not $events then echo No events', 'No events',
+	'Literal value in if()' );
+
+    execute( <<'EOD', 'No events', 'if ... elsif' );
+if $events then begin
+    echo Have events
+elsif 0 then
+    echo Have nothing
+elsif not $events then
+    echo No events
+else
+    echo Default
+end
+EOD
 }
 
 execute( 'status clear', undef, 'Clear status for testing'  );
@@ -535,6 +563,8 @@ SKIP: {
 status add 88888 iridium + 'Iridium 88888' ''
 EOD
 
+    call_m( qw{ set events 0 }, undef, 'Clear events accumulator' );
+
     execute( q{flare '19801013T000000Z' '+1'}, <<'EOD', 'Predict flare' );
                                                      Degre
                                                       From   Center Center
@@ -542,6 +572,8 @@ Time     Name         Eleva  Azimuth      Range Magn   Sun  Azimuth  Range
 1980/10/13
 05:43:26               29.9  48.1 NE      412.9 -0.4 night  76.2 E    49.9
 EOD
+
+    execute( 'show events', "set events 1\n", 'Accumuated 1 event' );
 }
 
 execute( 'choose 88888', undef, 'Keep OID 88888, losing all others' );
@@ -562,11 +594,13 @@ execute( 'list', undef, 'Confirm that the list is empty again' );
 
 execute( 'load t/data.tle', undef, 'Load the TLE file again' );
 
+# Note that the t/data.tle has the TLEs in the opposite order, but the
+# 'tle' command/method sorts them.
 execute( 'tle', <<'EOD', 'List the loaded TLEs' );
-1 88888U          80275.98708465  .00073094  13844-3  66816-4 0    8
-2 88888  72.8435 115.9689 0086731  52.6988 110.5714 16.05824518  105
 1 11801U          80230.29629788  .01431103  00000-0  14311-1
 2 11801  46.7916 230.4354 7318036  47.4722  10.4117  2.28537848
+1 88888U          80275.98708465  .00073094  13844-3  66816-4 0    8
+2 88888  72.8435 115.9689 0086731  52.6988 110.5714 16.05824518  105
 EOD
 
 execute( 'drop 88888', undef, 'Drop object 88888' );
@@ -702,6 +736,8 @@ execute( 'clear', undef, 'Ensure we have no TLEs loaded' );
 
 execute( 'load t/data.tle', undef, 'Load our usual set of TLEs' );
 
+execute( 'set events 0', undef, 'Clear events accumulator' );
+
 execute( 'pass 19801012T000000Z', <<'EOD',
     Time Eleva  Azimuth      Range Latitude Longitude Altitud Illum Event
 
@@ -740,6 +776,10 @@ execute( 'pass 19801012T000000Z', <<'EOD',
 05:14:16   0.0  19.0 N      1814.7  66.0412   12.6971   234.9 lit   set
 EOD
     'Calculate passes over Greenwich' );
+
+execute( 'show events', "set events 6\n", 'Accumulated 6 events' );
+
+call_m( qw{ set events 0 }, undef, 'Clear events accumulator' );
 
 execute( 'pass -am 19801012T000000Z', <<'EOD',
     Time Eleva  Azimuth      Range Latitude Longitude Altitud Illum Event
@@ -780,10 +820,16 @@ execute( 'pass -am 19801012T000000Z', <<'EOD',
 EOD
     'Calculate morning passes over Greenwich' );
 
+execute( 'show events', "set events 6\n", 'Generated 6 events' );
+
+call_m( qw{ set events 0 }, undef, 'Clear events accumulator' );
+
 execute( 'pass -pm 19801012T000000Z', <<'EOD',
     Time Eleva  Azimuth      Range Latitude Longitude Altitud Illum Event
 EOD
     'Calculate evening passes over Greenwich' );
+
+execute( 'show events', "set events 0\n", 'Generated 0 events' );
 
 call_m( set => pass_threshold => 60, undef,
     q{Set pass_threshold to 60 degrees} );
@@ -1036,6 +1082,8 @@ TODO: {
 2009/03/26 16:05:47 New Moon
 EOD
 	'Quarters of Moon and Sun, Mar 1 2009' );
+
+    execute( 'show events', "set events 5\n", 'Generated 5 events' );
 }
 
 execute( 'sky list', <<'EOD', 'List what is in the sky' );

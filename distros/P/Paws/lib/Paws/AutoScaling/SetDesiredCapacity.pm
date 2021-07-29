@@ -29,9 +29,8 @@ You shouldn't make instances of this class. Each attribute should be used as a n
 =head1 SYNOPSIS
 
     my $autoscaling = Paws->service('AutoScaling');
-    # To set the desired capacity for an Auto Scaling group
-    # This example sets the desired capacity for the specified Auto Scaling
-    # group.
+  # To set the desired capacity for an Auto Scaling group
+  # This example sets the desired capacity for the specified Auto Scaling group.
     $autoscaling->SetDesiredCapacity(
       'AutoScalingGroupName' => 'my-auto-scaling-group',
       'DesiredCapacity'      => 2,
@@ -53,8 +52,9 @@ The name of the Auto Scaling group.
 
 =head2 B<REQUIRED> DesiredCapacity => Int
 
-The number of EC2 instances that should be running in the Auto Scaling
-group.
+The desired capacity is the initial capacity of the Auto Scaling group
+after this operation completes and the capacity it attempts to
+maintain.
 
 
 

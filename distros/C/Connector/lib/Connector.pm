@@ -10,7 +10,7 @@ package Connector;
 # because of the '//' operator in one of the sub-modules.
 use 5.10.1;
 
-our $VERSION = '1.37';
+our $VERSION = '1.41';
 
 use strict;
 use warnings;
@@ -310,6 +310,8 @@ sub exists {
         }
     };
 
+    $self->log()->debug('Got eval error ($EVAL_ERROR) for exist on path ' . join ".", @path ) if ($EVAL_ERROR);
+
     return $result;
 }
 
@@ -375,7 +377,7 @@ Set to true if you want the connector to die when a query reaches a non-exisitin
 node. This will affect calls to get/get_list/get_hash and will not affect
 values that are explicitly set to undef (if supported by the connector!).
 
-=head 1 Accessor Methods
+=head1 Accessor Methods
 
 Each accessor method is valid only on special types of nodes. If you call them
 on a wrong type of node, the connector may retunr unexpected result or simply die.

@@ -6,7 +6,7 @@ build_requires:
   Alien::Build: '0.32'
   Alien::Build::MM: '0.32'
   ExtUtils::MakeMaker: '6.52'
-  Test2::V0: '0.000060'
+  Test2::V0: '0.000121'
   Test::Alien: '0.92'
   perl: '5.008001'
 configure_requires:
@@ -18,7 +18,7 @@ configure_requires:
   Path::Tiny: '0'
   perl: '5.008001'
 dynamic_config: 1
-generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.022, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -32,9 +32,9 @@ resources:
   bugtracker: https://github.com/PerlAlien/Alien-cmake3/issues
   homepage: https://metacpan.org/pod/Alien::cmake3
   repository: git://github.com/PerlAlien/Alien-cmake3.git
-version: '0.06'
+version: '0.08'
 x_alienfile:
-  generated_by: 'Dist::Zilla::Plugin::AlienBuild version 0.31'
+  generated_by: 'Dist::Zilla::Plugin::AlienBuild version 0.32'
   requires:
     share:
       Archive::Tar: '0'

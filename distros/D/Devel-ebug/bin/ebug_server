@@ -2,7 +2,7 @@
 
 # PODNAME: ebug_client
 # ABSTRACT: Debugger server for remote debugging Perl script
-our $VERSION = '0.63'; # VERSION
+our $VERSION = '0.64'; # VERSION
 
 
 #use lib::findbin '../lib'; # dev-only
@@ -27,7 +27,7 @@ $ENV{SECRET} = $key;
 print STDERR <<EOF;
 Debuggee started. Please attach with:
 
- ebug-client -key $key -port $port
+ ebug_client -key $key -port $port
 
 Waiting...
 EOF
@@ -56,26 +56,26 @@ ebug_client - Debugger server for remote debugging Perl script
 
 =head1 VERSION
 
-version 0.63
+version 0.64
 
 =head1 SYNOPSIS
 
-ebug-server [-keepio][-port port] -- script args...
+ ebug_server [-keepio][-port port] -- script args...
 
 =head1 DESCRIPTION
 
-ebug-server is an debugger server for remote debugging
-Perl script, using ebug-client.
+L<ebug_server> is an debugger server for remote debugging
+Perl script, using L<ebug_client>.
 
-When invoked, it will show you how to invoke ebug-client.
+When invoked, it will show you how to invoke L<ebug_client>.
 
 =head1 EXAMPLE
 
- # Run hello.pl and wait for "ebug-client" to attach
- $ ebug-server -- hello.pl
+ # Run hello.pl and wait for "ebug_client" to attach
+ $ ebug_server -- hello.pl
  
  # Same as above, but keep I/O happen on server side
- $ ebug-server -keepio -- hello.pl
+ $ ebug_server -keepio -- hello.pl
 
 =head1 NOTE
 
@@ -88,7 +88,7 @@ remote debugging.
 
 =head1 SEE ALSO
 
-L<Devel::debug>, L<ebug>, L<ebug-client>
+L<Devel::debug>, L<ebug>, L<ebug_client>
 
 =head1 AUTHOR
 
@@ -104,7 +104,7 @@ Taisuke Yamada
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2005-2020 by Leon Brocard.
+This software is copyright (c) 2005-2021 by Leon Brocard.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

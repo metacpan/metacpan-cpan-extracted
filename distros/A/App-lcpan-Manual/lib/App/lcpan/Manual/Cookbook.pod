@@ -20,7 +20,7 @@ App::lcpan::Manual::Cookbook - App::lcpan cookbook
 
 =head1 VERSION
 
-version 1.058.000
+version 1.062.000
 
 =head1 DESCRIPTION
 
@@ -31,6 +31,11 @@ Items relevant to CPAN authors are tagged with C<[author]>.
 =head2 Listing recent authors
 
 TODO.
+
+=head2 Sampling some random authors (1.063+)
+
+ % lcpan authors    --random --result-limit 100
+ % lcpan authors -l --random --result-limit 100
 
 =head1 QUERYING DEPENDENCIES
 
@@ -74,6 +79,11 @@ TODO.
 
 TODO
 
+=head2 Sampling some random distributions (1.063+)
+
+ % lcpan dists    --random --result-limit 100
+ % lcpan dists -l --random --result-limit 100
+
 =head1 QUERYING MODULES
 
 =head2 Comparing version of installed modules vs local CPAN versions
@@ -108,6 +118,11 @@ L<td> is provided by L<App::td>.
 
 There's also C<lcpan whatsnew>.
 
+=head2 Sampling some random modules (1.063+)
+
+ % lcpan mods    --random --result-limit 100
+ % lcpan mods -l --random --result-limit 100
+
 =head2 Showing related modules
 
 You like L<Sub::Exporter> and wonder what other modules might be similar or
@@ -115,13 +130,24 @@ related to it:
 
     % lcpan related-mods Sub::Exporter
 
+=head1 QUERYING RELEASES
+
+=head2 Listing recent releases
+
+TODO.
+
+=head2 Sampling some random releases (1.063+)
+
+ % lcpan rels    --random --result-limit 100
+ % lcpan rels -l --random --result-limit 100
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

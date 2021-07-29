@@ -157,7 +157,7 @@ qr%<input type="hidden" name="reference1x1" value="Remove-TOTP-(\d{10})">%,
       or print STDERR Dumper( $res->[2]->[0] ), time(), " / $1";
     ok(
         $res->[2]->[0] =~
-qr%<p class="notifText">1 expired second factor\(s\) has/have been removed!</p>%,
+qr%<p class="notifText">1 expired second factor\(s\) has/have been removed \(myTOTP\)!</p>%,
         'Notification message found'
     ) or print STDERR Dumper( $res->[2]->[0] );
     $id = expectCookie($res);

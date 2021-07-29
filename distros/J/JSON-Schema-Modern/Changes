@@ -1,5 +1,9 @@
 Revision history for JSON-Schema-Modern
 
+0.514     2021-07-22 05:17:08Z
+          - add_schema() now dies with the errors themselves, rather than an
+            object that serializes to an unhelpful value in uncaught die()s.
+
 0.513     2021-06-26 19:45:51Z
           - skip acceptance test for integer overflow when nvsize is too
             large to produce the expected error

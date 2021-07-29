@@ -14,6 +14,7 @@ use HTTP::Status qw( :constants );
             JWT => {
                 secret => 'test-secret',
                 set_authorization_header => 0,
+                expose_authorization_header => 0,
                 set_cookie_header => 0,
                 set_location_header => 1,
             }
@@ -69,6 +70,7 @@ subtest 'define' => sub {
     $mech->content_is('UNDEFINED', 'by default it is undef');
 
     $mech->lacks_header_ok('Authorization', 'No Authorization header');
+    $mech->lacks_header_ok('Access-Control-Expose-Headers', 'No Access-Control-Expose-Headers header');
     $mech->lacks_header_ok('Set-Cookie', 'No Set-Cookie header');
     $mech->lacks_header_ok('Location', 'No Location header');
 

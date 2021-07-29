@@ -1,0 +1,29 @@
+package main;
+
+use strict;
+use warnings;
+
+use Test::More 0.88;	# Because of done_testing();
+
+eval {
+    require Test::Prereq::Meta;
+    1;
+} or plan skip_all => 'Test::Prereq::Meta not available';
+
+use lib qw{ inc };
+use My::Module::Meta;
+my $meta = My::Module::Meta->new();
+
+my $tpm = Test::Prereq::Meta->new(
+    accept	=> [ $meta->optionals_for_testing() ],
+);
+
+$tpm->all_prereq_ok();
+
+$tpm->all_prereqs_used();
+
+done_testing;
+
+1;
+
+# ex: set textwidth=72 :

@@ -1,9 +1,9 @@
 package Text::Table::More;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-04-04'; # DATE
+our $DATE = '2021-04-06'; # DATE
 our $DIST = 'Text-Table-More'; # DIST
-our $VERSION = '0.013'; # VERSION
+our $VERSION = '0.014'; # VERSION
 
 use 5.010001;
 use strict;
@@ -607,7 +607,7 @@ Text::Table::More - Generate text table with simple interface and many options
 
 =head1 VERSION
 
-This document describes version 0.013 of Text::Table::More (from Perl distribution Text-Table-More), released on 2021-04-04.
+This document describes version 0.014 of Text::Table::More (from Perl distribution Text-Table-More), released on 2021-04-06.
 
 =head1 SYNOPSIS
 
@@ -774,11 +774,15 @@ Value: yes.
 
 =item * can_color
 
-Value: yes.
+Can produce colored table.
+
+Value: no.
 
 =item * can_color_theme
 
-Value: yes.
+Allow choosing colors from a named set of palettes.
+
+Value: no.
 
 =item * can_colspan
 
@@ -786,39 +790,57 @@ Value: yes.
 
 =item * can_customize_border
 
+Let user customize border character in some way, e.g. selecting from several available borders, disable border.
+
 Value: yes.
 
 =item * can_halign
+
+Provide a way for user to specify horizontal alignment (leftE<sol>middleE<sol>right) of cells.
 
 Value: yes.
 
 =item * can_halign_individual_cell
 
+Provide a way for user to specify different horizontal alignment (leftE<sol>middleE<sol>right) for individual cells.
+
 Value: yes.
 
 =item * can_halign_individual_column
+
+Provide a way for user to specify different horizontal alignment (leftE<sol>middleE<sol>right) for individual columns.
 
 Value: yes.
 
 =item * can_halign_individual_row
 
+Provide a way for user to specify different horizontal alignment (leftE<sol>middleE<sol>right) for individual rows.
+
 Value: yes.
 
 =item * can_hpad
 
-Value: yes.
+Provide a way for user to specify horizontal padding of cells.
+
+Value: no.
 
 =item * can_hpad_individual_cell
 
-Value: yes.
+Provide a way for user to specify different horizontal padding of individual cells.
+
+Value: no.
 
 =item * can_hpad_individual_column
 
-Value: yes.
+Provide a way for user to specify different horizontal padding of individual columns.
+
+Value: no.
 
 =item * can_hpad_individual_row
 
-Value: yes.
+Provide a way for user to specify different horizontal padding of individual rows.
+
+Value: no.
 
 =item * can_rowspan
 
@@ -826,57 +848,85 @@ Value: yes.
 
 =item * can_set_cell_height
 
-Value: yes.
+Allow setting height of rows.
+
+Value: no.
 
 =item * can_set_cell_height_of_individual_row
 
-Value: yes.
+Allow setting height of individual rows.
+
+Value: no.
 
 =item * can_set_cell_width
 
-Value: yes.
+Allow setting height of rows.
+
+Value: no.
 
 =item * can_set_cell_width_of_individual_column
 
-Value: yes.
+Allow setting height of individual rows.
+
+Value: no.
 
 =item * can_use_box_character
+
+Can use terminal box-drawing character when drawing border.
 
 Value: yes.
 
 =item * can_valign
 
+Provide a way for user to specify vertical alignment (topE<sol>middleE<sol>bottom) of cells.
+
 Value: yes.
 
 =item * can_valign_individual_cell
+
+Provide a way for user to specify different vertical alignment (topE<sol>middleE<sol>bottom) for individual cells.
 
 Value: yes.
 
 =item * can_valign_individual_column
 
+Provide a way for user to specify different vertical alignment (topE<sol>middleE<sol>bottom) for individual columns.
+
 Value: yes.
 
 =item * can_valign_individual_row
+
+Provide a way for user to specify different vertical alignment (topE<sol>middleE<sol>bottom) for individual rows.
 
 Value: yes.
 
 =item * can_vpad
 
-Value: yes.
+Provide a way for user to specify vertical padding of cells.
+
+Value: no.
 
 =item * can_vpad_individual_cell
 
-Value: yes.
+Provide a way for user to specify different vertical padding of individual cells.
+
+Value: no.
 
 =item * can_vpad_individual_column
 
-Value: yes.
+Provide a way for user to specify different vertical padding of individual columns.
+
+Value: no.
 
 =item * can_vpad_individual_row
 
-Value: yes.
+Provide a way for user to specify different vertical padding of individual rows.
+
+Value: no.
 
 =item * speed
+
+Subjective speed rating, relative to other text table modules.
 
 Value: "slow".
 

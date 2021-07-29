@@ -7,7 +7,7 @@ use Config ();
 use POSIX ();
 use Carp qw/ croak /;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 our @EXPORT_OK = qw/ safe_exec /;
 
 sub safe_exec  {
@@ -81,7 +81,6 @@ Fork::Utils - set of usefull methods to work with processes and signals
             my @args = @_;
 
             my $pending_sigset = new POSIX::SigSet ();
-            my $pending_signame = undef;
 
             sleep(2);
 
@@ -104,8 +103,6 @@ Fork::Utils - set of usefull methods to work with processes and signals
             if ( $pending_sigset->ismember( POSIX::SIGALRM ) ) {
                 printf("%s is pending\n", 'SIGALRM');
             }
-
-            printf("%s is pending\n", $pending_signame);
         },
         sigset => [qw/ ALRM TERM INT QUIT /]
     );

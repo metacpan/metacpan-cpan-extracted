@@ -3,30 +3,31 @@ package Lemonldap::NG::Portal::UserDB::OpenID;
 use strict;
 use Mouse;
 use Lemonldap::NG::Portal::Main::Constants qw(
-  PE_MISSINGREQATTR
   PE_OK
+  PE_MISSINGREQATTR
 );
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.12';
 
-extends 'Lemonldap::NG::Common::Module',
-  'Lemonldap::NG::Portal::Lib::OpenIDConnect';
+extends qw(
+  Lemonldap::NG::Common::Module
+  Lemonldap::NG::Portal::Lib::OpenIDConnect
+);
 
 # INITIALIZATION
 
 sub init {
-    my ($self) = @_;
     return 1;
 }
 
 # RUNNING METHODS
 
 sub getUser {
-    PE_OK;
+    return PE_OK;
 }
 
 sub findUser {
-    PE_OK;
+    return PE_OK;
 }
 
 sub setSessionInfo {
@@ -54,12 +55,13 @@ sub setSessionInfo {
             );
         }
     }
-    PE_OK;
+
+    return PE_OK;
 }
 
 # Does nothing
 sub setGroups {
-    PE_OK;
+    return PE_OK;
 }
 
 1;

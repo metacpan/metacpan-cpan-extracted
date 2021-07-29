@@ -55,6 +55,7 @@ t/escape-slash.t
 t/fformat.t
 t/float.t
 t/funky-numbers.t
+t/guff.txt
 t/indent.t
 t/jcbool.t
 t/JCT.pm
@@ -67,6 +68,7 @@ t/single.t
 t/sort-cmp.t
 t/sort.t
 t/strict.t
+t/string-num.t
 t/to-json.t
 t/unicode.t
 t/user-undef.t

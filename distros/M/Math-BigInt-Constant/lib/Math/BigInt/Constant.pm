@@ -5,7 +5,7 @@ package Math::BigInt::Constant;
 use strict;
 use warnings;
 
-our $VERSION = '1.11';
+our $VERSION = '1.12';
 
 use Math::BigInt '1.999802';
 our @ISA = qw( Math::BigInt );
@@ -17,6 +17,17 @@ use overload;                   # inherit from Math::BigInt
 
 sub modify {
     my ($self, $method) = @_;
+
+    unless (defined $method) {
+        my @callinfo = caller(0);
+        for (my $i = 1 ; ; ++$i) {
+            my @next = caller($i);
+            last unless @next;
+            @callinfo = @next;
+        }
+        $method = $callinfo[3];
+    }
+
     die("Can not modify ", ref($self), " $self via $method()\n");
 }
 
@@ -164,7 +175,49 @@ C<Math::BigInt> object.
 
 =head1 BUGS
 
-None discovered yet.
+Please report any bugs or feature requests to
+C<bug-math-bigrat at rt.cpan.org>, or through the web interface at
+L<https://rt.cpan.org/Ticket/Create.html?Queue=Math-BigInt-Constant>
+(requires login).
+We will be notified, and then you'll automatically be notified of progress on
+your bug as I make changes.
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc Math::BigInt::Constant
+
+You can also look for information at:
+
+=over 4
+
+=item * GitHub
+
+L<https://github.com/pjacklam/p5-Math-BigInt-Constant>
+
+=item * RT: CPAN's request tracker
+
+L<https://rt.cpan.org/Dist/Display.html?Name=Math-BigInt-Constant>
+
+=item * MetaCPAN
+
+L<https://metacpan.org/release/Math-BigInt-Constant>
+
+=item * CPAN Testers Matrix
+
+L<http://matrix.cpantesters.org/?dist=Math-BigInt-Constant>
+
+=item * CPAN Ratings
+
+L<https://cpanratings.perl.org/dist/Math-BigInt-Constant>
+
+=back
+
+=head1 LICENSE
+
+This program is free software; you may redistribute it and/or modify it under
+the same terms as Perl itself.
 
 =head1 SEE ALSO
 
@@ -180,7 +233,7 @@ Tels L<http://bloodgate.com/> in early 2001-2007.
 
 =item *
 
-Peter John Acklam E<lt>pjacklam@online.noE<gt>, 2016-.
+Peter John Acklam E<lt>pjacklam@gmail.comE<gt>, 2016-.
 
 =back
 

@@ -12,10 +12,10 @@ use Carp qw(cluck);
 use DateTime;
 use DateTime::Format::Strptime;
 use List::Compare;
-use List::MoreUtils qw(none uniq firstval);
+use List::MoreUtils qw(none uniq lastval);
 use Scalar::Util qw(weaken);
 
-our $VERSION = '1.56';
+our $VERSION = '1.58';
 
 my %translation = (
 	1 => 'Nähere Informationen in Kürze',
@@ -86,7 +86,7 @@ my %translation = (
 	59 => 'Schnee und Eis',
 	60 => 'Witterungsbedingt verminderte Geschwindigkeit',
 	61 => 'Defekte Tür',
-	62 => 'Behobener Defekt am Zug',
+	62 => 'Behobener Defekt am Zug',                         # r 36
 	63 => 'Technische Untersuchung am Zug',
 	64 => 'Defekt an einer Weiche',    # xlsx: "Reparatur an der Weiche"
 	65 => 'Erdrutsch',
@@ -130,10 +130,10 @@ my %translation = (
 );
 
 Travel::Status::DE::IRIS::Result->mk_ro_accessors(
-	qw(arrival arrival_delay arrival_is_additional arrival_is_cancelled
+	qw(arrival arrival_delay arrival_has_realtime arrival_is_additional arrival_is_cancelled
 	  date datetime delay
-	  departure departure_delay departure_is_additional departure_is_cancelled
-	  ds100 is_transfer is_unscheduled is_wing
+	  departure departure_delay departure_has_realtime departure_is_additional departure_is_cancelled
+	  ds100 has_realtime is_transfer is_unscheduled is_wing
 	  line_no old_train_id old_train_no operator platform raw_id
 	  realtime_xml route_start route_end
 	  sched_arrival sched_departure sched_platform sched_route_start
@@ -267,6 +267,7 @@ sub set_ar {
 	my ( $self, %attrib ) = @_;
 
 	if ( $attrib{status} and $attrib{status} eq 'c' ) {
+		$self->{has_realtime}         = $self->{arrival_has_realtime} = 1;
 		$self->{arrival_is_cancelled} = 1;
 	}
 	elsif ( $attrib{status} and $attrib{status} eq 'a' ) {
@@ -285,7 +286,8 @@ sub set_ar {
 	}
 
 	if ( $attrib{arrival_ts} ) {
-		$self->{arrival} = $self->parse_ts( $attrib{arrival_ts} );
+		$self->{has_realtime} = $self->{arrival_has_realtime} = 1;
+		$self->{arrival}      = $self->parse_ts( $attrib{arrival_ts} );
 		if ( not $self->{arrival_is_cancelled} ) {
 			$self->{delay} = $self->{arrival_delay}
 			  = $self->arrival->subtract_datetime( $self->sched_arrival )
@@ -330,6 +332,7 @@ sub set_dp {
 	my ( $self, %attrib ) = @_;
 
 	if ( $attrib{status} and $attrib{status} eq 'c' ) {
+		$self->{has_realtime}           = $self->{arrival_has_realtime} = 1;
 		$self->{departure_is_cancelled} = 1;
 	}
 	elsif ( $attrib{status} and $attrib{status} eq 'a' ) {
@@ -348,7 +351,8 @@ sub set_dp {
 	}
 
 	if ( $attrib{departure_ts} ) {
-		$self->{departure} = $self->parse_ts( $attrib{departure_ts} );
+		$self->{has_realtime} = $self->{departure_has_realtime} = 1;
+		$self->{departure}    = $self->parse_ts( $attrib{departure_ts} );
 		if ( not $self->{departure_is_cancelled} ) {
 			$self->{delay} = $self->{departure_delay}
 			  = $self->departure->subtract_datetime( $self->sched_departure )
@@ -564,16 +568,22 @@ sub destination {
 sub delay_messages {
 	my ($self) = @_;
 
-	my @keys   = reverse sort keys %{ $self->{messages} };
+	my @keys   = sort keys %{ $self->{messages} };
 	my @msgs   = grep { $_->[1] eq 'd' } map { $self->{messages}{$_} } @keys;
 	my @msgids = uniq( map { $_->[2] } @msgs );
 	my @ret;
 
 	for my $id (@msgids) {
-		my $msg = firstval { $_->[2] == $id } @msgs;
-		push( @ret,
-			[ $self->parse_ts( $msg->[0] ), $self->translate_msg($id) ] );
+		if ( my @superseded = $self->superseded_messages($id) ) {
+			@ret = grep { not( $_->[2] ~~ \@superseded ) } @ret;
+		}
+		my $msg = lastval { $_->[2] == $id } @msgs;
+		push( @ret, $msg );
 	}
+
+	@ret = reverse
+	  map { [ $self->parse_ts( $_->[0] ), $self->translate_msg( $_->[2] ) ] }
+	  @ret;
 
 	return @ret;
 }
@@ -799,6 +809,7 @@ sub sched_route {
 sub superseded_messages {
 	my ( $self, $msg ) = @_;
 	my %superseded = (
+		62 => [36],
 		73 => [74],
 		74 => [73],
 		75 => [76],
@@ -865,7 +876,7 @@ arrival/departure received by Travel::Status::DE::IRIS
 
 =head1 VERSION
 
-version 1.56
+version 1.58
 
 =head1 DESCRIPTION
 
@@ -895,6 +906,10 @@ train starts here. Contains realtime data if available.
 Estimated arrival delay in minutes (integer number). undef if no realtime
 data is available, the train starts at the specified station, or there is
 no scheduled arrival time (e.g. due to diversions). May be negative.
+
+=item $result->arrival_has_realtime
+
+True if "arrival" is based on real-time data.
 
 =item $result->arrival_is_additional
 
@@ -965,6 +980,10 @@ Estimated departure delay in minutes (integer number). undef if no realtime
 data is available, the train terminates at the specified station, or there is
 no scheduled departure time (e.g. due to diversions). May be negative.
 
+=item $result->departure_has_realtime
+
+True if "departure" is based on real-time data.
+
 =item $result->departure_is_additional
 
 True if the train's departure at this stop is unscheduled (additional), i.e.,
@@ -984,6 +1003,14 @@ empty list) otherwise.
 =item $result->destination
 
 Alias for route_end.
+
+=item $result->has_realtime
+
+True if arrival or departure time are based on real-time data. Note that this
+is different from C<< defined($esult->delay) >>. If delay is defined, some kind
+of realtime information for the train is available, but not necessarily its
+arrival/departure time. If has_realtime is true, arrival/departure time are
+available. This behaviour may change in the future.
 
 =item $result->info
 

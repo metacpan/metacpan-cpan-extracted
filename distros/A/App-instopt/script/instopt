@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2021-04-24'; # DATE
-our $VERSION = '0.019'; # VERSION
+our $DATE = '2021-07-25'; # DATE
+our $VERSION = '0.020'; # VERSION
 
 use 5.010;
 use strict;
@@ -63,7 +63,7 @@ instopt - Download and install software
 
 =head1 VERSION
 
-This document describes version 0.019 of instopt (from Perl distribution App-instopt), released on 2021-04-24.
+This document describes version 0.020 of instopt (from Perl distribution App-instopt), released on 2021-07-25.
 
 =head1 SYNOPSIS
 
@@ -415,11 +415,15 @@ View output using a viewer.
 
 =item B<--software-or-pattern>=I<s@>*
 
+Can also be specified as the 1st command-line argument and onwards.
+
 Can be specified multiple times.
 
 =item B<--softwares-or-patterns-json>=I<s>
 
 See C<--software-or-pattern>.
+
+Can also be specified as the 1st command-line argument and onwards.
 
 =back
 
@@ -439,6 +443,8 @@ See C<--software-or-pattern>.
 
 =item B<--software>=I<s>*
 
+Can also be specified as the 1st command-line argument.
+
 =back
 
 =head2 Options for subcommand is-downloaded-latest
@@ -448,6 +454,8 @@ See C<--software-or-pattern>.
 =item B<--quiet-arg>, B<-q>
 
 =item B<--software>=I<s>*
+
+Can also be specified as the 1st command-line argument.
 
 =back
 
@@ -459,6 +467,8 @@ See C<--software-or-pattern>.
 
 =item B<--software>=I<s>*
 
+Can also be specified as the 1st command-line argument.
+
 =back
 
 =head2 Options for subcommand is-installed-latest
@@ -468,6 +478,8 @@ See C<--software-or-pattern>.
 =item B<--quiet-arg>, B<-q>
 
 =item B<--software>=I<s>*
+
+Can also be specified as the 1st command-line argument.
 
 =back
 
@@ -527,6 +539,8 @@ version installed, will be included.
 
 =item B<--software>=I<s>*
 
+Can also be specified as the 1st command-line argument.
+
 =back
 
 =head2 Options for subcommand list-installed
@@ -543,6 +557,8 @@ version installed, will be included.
 
 =item B<--software>=I<s>*
 
+Can also be specified as the 1st command-line argument.
+
 =back
 
 =head2 Options for subcommand update
@@ -555,11 +571,15 @@ Do not download latest version from URL, just find from download dir.
 
 =item B<--software-or-pattern>=I<s@>*
 
+Can also be specified as the 1st command-line argument and onwards.
+
 Can be specified multiple times.
 
 =item B<--softwares-or-patterns-json>=I<s>
 
 See C<--software-or-pattern>.
+
+Can also be specified as the 1st command-line argument and onwards.
 
 =item B<-D>
 
@@ -635,7 +655,7 @@ You can put multiple profiles in a single file by using section names like C<[pr
 
 You can also put configuration for multiple programs inside a single file, and use filter C<program=NAME> in section names, e.g. C<[program=NAME ...]> or C<[SOMESECTION program=NAME]>. The section will then only be used when the reading program matches.
 
-You can also filter a section by environment variable using the filter C<env=CONDITION> in section names. For example if you only want a section to be read if a certain environment variable is true: C<[env=SOMEVAR ...]> or C<[SOMESECTION env=SOMEVAR ...]>. If you only want a section to be read when the value of an environment variable has value equals something: C<[env=HOSTNAME=blink ...]> or C<[SOMESECTION env=HOSTNAME=blink ...]>. If you only want a section to be read when the value of an environment variable does not equal something: C<[env=HOSTNAME!=blink ...]> or C<[SOMESECTION env=HOSTNAME!=blink ...]>. If you only want a section to be read when an environment variable contains something: C<[env=HOSTNAME*=server ...]> or C<[SOMESECTION env=HOSTNAME*=server ...]>. Note that currently due to simplistic parsing, there must not be any whitespace in the value being compared because it marks the beginning of a new section filter or section name.
+You can also filter a section by environment variable using the filter C<env=CONDITION> in section names. For example if you only want a section to be read if a certain environment variable is true: C<[env=SOMEVAR ...]> or C<[SOMESECTION env=SOMEVAR ...]>. If you only want a section to be read when the value of an environment variable equals some string: C<[env=HOSTNAME=blink ...]> or C<[SOMESECTION env=HOSTNAME=blink ...]>. If you only want a section to be read when the value of an environment variable does not equal some string: C<[env=HOSTNAME!=blink ...]> or C<[SOMESECTION env=HOSTNAME!=blink ...]>. If you only want a section to be read when the value of an environment variable includes some string: C<[env=HOSTNAME*=server ...]> or C<[SOMESECTION env=HOSTNAME*=server ...]>. If you only want a section to be read when the value of an environment variable does not include some string: C<[env=HOSTNAME!*=server ...]> or C<[SOMESECTION env=HOSTNAME!*=server ...]>. Note that currently due to simplistic parsing, there must not be any whitespace in the value being compared because it marks the beginning of a new section filter or section name.
 
 To load and configure plugins, you can use either the C<-plugins> parameter (e.g. C<< -plugins=DumpArgs >> or C<< -plugins=DumpArgs@before_validate_args >>), or use the C<[plugin=NAME ...]> sections, for example:
 
@@ -764,7 +784,7 @@ Source repository is at L<https://github.com/perlancar/perl-App-instopt>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-App-instopt/issues>
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-instopt>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

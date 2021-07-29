@@ -13,7 +13,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
 
 extends 'Lemonldap::NG::Common::Module';
 
-our $VERSION = '2.0.11';
+our $VERSION = '2.0.12';
 
 # PROPERTIES
 
@@ -76,8 +76,9 @@ has findUserFilter => (
     is      => 'ro',
     lazy    => 1,
     builder => sub {
-        $_[0]->conf->{AuthLDAPFilter}
-          || $_[0]->conf->{LDAPFilter}
+
+        # $_[0]->conf->{AuthLDAPFilter} ||
+        $_[0]->conf->{LDAPFilter}
           || '(&(uid=$user)(objectClass=inetOrgPerson))';
     }
 );

@@ -2,7 +2,7 @@ package Net::DNS::RR::SVCB;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: SVCB.pm 1838 2021-05-02 12:35:14Z willem $)[2];
+our $VERSION = (qw$Id: SVCB.pm 1845 2021-07-14 15:30:16Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -23,6 +23,17 @@ use Net::DNS::RR::AAAA;
 use Net::DNS::Text;
 
 
+my %keybyname = (
+	mandatory	  => 'key0',
+	alpn		  => 'key1',
+	'no-default-alpn' => 'key2',
+	port		  => 'key3',
+	ipv4hint	  => 'key4',
+	ech		  => 'key5',
+	ipv6hint	  => 'key6',
+	);
+
+
 sub _decode_rdata {			## decode rdata from wire-format octet string
 	my $self = shift;
 	my ( $data, $offset ) = @_;
@@ -40,7 +51,7 @@ sub _decode_rdata {			## decode rdata from wire-format octet string
 		push @$params, ( $key, substr $rdata, $index + 4, $size );
 		$index += ( $size + 4 );
 	}
-	die 'corrupt RDATA in ' . $self->type unless $index == length($rdata);
+	die $self->type . ': corrupt RDATA' unless $index == length($rdata);
 	return;
 }
 
@@ -94,14 +105,19 @@ sub _parse_rdata {			## populate RR from rdata in argument list
 	$self->svcpriority(shift);
 	$self->targetname(shift);
 
+	local $SIG{__WARN__} = sub { die @_ };
 	while ( my $svcparam = shift ) {
 		for ($svcparam) {
-			my @value = '';
-			if (/=(.*)$/) {
+			my @value;
+			if (/^key\d+=(.*)$/i) {
+				push @value, length($1) ? $1 : shift;
+			} elsif (/=(.*)$/) {
 				local $_ = length($1) ? $1 : shift;
 				s/^(["'])(.*)\1$/$2/;		# strip paired quotes
 				s/\\,/\\044/g;			# disguise escaped comma
-				@value = ( $svcparam =~ /^key/i ) ? $_ : split /,/;
+				push @value, split /,/;
+			} else {
+				push @value, '' unless $keybyname{lc $_};    # empty keyNNN
 			}
 
 			s/[-]/_/g;				# extract identifier
@@ -124,10 +140,11 @@ sub _post_parse {			## parser post processing
 		foreach ( grep { !$unique{$_}++ } unpack 'n*', $params{0} ) {
 			croak( $self->type . qq[: unexpected "key0" in mandatory list] ) if $unique{0};
 			croak( $self->type . qq[: duplicate "key$_" in mandatory list] ) if --$unique{$_};
-			croak( $self->type . qq[: mandatory "key$_" not defined] ) unless defined $params{$_};
+			croak( $self->type . qq[: mandatory "key$_" not present] ) unless defined $params{$_};
 		}
-		$self->mandatory( keys %unique );		# sort mandatory key list
+		$self->mandatory( keys %unique );		# restore mandatory key list
 	}
+	croak( $self->type . qq[: expected alpn="..." not present] ) if defined( $params{2} ) and !$params{1};
 	return;
 }
 
@@ -161,38 +178,16 @@ sub targetname {
 
 ########################################
 
-use constant ASCII => chr(65) eq 'A';
-
-my %escape = do {			## precalculated ASCII escape table
-	my %table = map { ( chr($_) => chr($_) ) } ( 0 .. 255 );
-
-	foreach my $codepoint ( 0 .. 32, 92, 127 .. 255 ) {	# numerical escape
-		my $ddd = sprintf( '%03u', $codepoint );
-		$ddd =~ tr [0-9] [\060-\071];			# transliterate non-ASCII
-		$table{pack( 'C', $codepoint )} = pack 'C a3', 92, $ddd;
-	}
-
-	foreach my $codepoint ( 34, 44 ) {			# character escape
-		$table{pack( 'C', $codepoint )} = pack 'C2', 92, $codepoint;
-	}
-
-	%table;
-};
 
 sub _presentation {			## render octet string(s) in presentation format
 	return () unless scalar @_;
-	local $_ = join '', map { $escape{$_} } split( //, join '', @_ );
-
-	# partial transliteration for non-ASCII character encodings
-	tr
-	[\040-\176\000-\377]
-	[ !"#$%&'()*+,\-./0-9:;<=>?@A-Z\[\\\]^_`a-z{|}~?] unless ASCII;
-
-	return $_;
+	my $raw = join '', @_;
+	my $txt = Net::DNS::Text->decode( \$raw, 0, length($raw) );
+	return map { s/ /\\032/g; s/,/\\044/g; $_ } $txt->string;
 }
 
 sub _base64 {
-	return map { _presentation( MIME::Base64::decode($_) ) } @_;
+	return _presentation( map { MIME::Base64::decode($_) } @_ );
 }
 
 sub _integer16 {
@@ -200,11 +195,11 @@ sub _integer16 {
 }
 
 sub _ipv4 {
-	return _presentation( map { bless( {}, 'Net::DNS::RR::A' )->address($_) } @_ );
+	return _presentation( map { Net::DNS::RR::A::address( {}, $_ ) } @_ );
 }
 
 sub _ipv6 {
-	return _presentation( map { bless( {}, 'Net::DNS::RR::AAAA' )->address($_) } @_ );
+	return _presentation( map { Net::DNS::RR::AAAA::address( {}, $_ ) } @_ );
 }
 
 sub _string {
@@ -212,36 +207,29 @@ sub _string {
 }
 
 
-my %keybyname = (
-	mandatory	  => 0,
-	alpn		  => 1,
-	'no-default-alpn' => 2,
-	port		  => 3,
-	ipv4hint	  => 4,
-	ech		  => 5,
-	echconfig	  => 5,					# draft-ietf-dnsop-svcb-https compatible
-	ipv6hint	  => 6,
-	);
-
-
 sub mandatory {				## mandatory=key1,port,...
-	my ( $self, @arg ) = grep {defined} @_;
-	my @keys = map { $keybyname{lc $_} || ( /(\d+)$/ ? $1 : croak qq["$_" unknown] ) } @arg;
+	my $self = shift;
+	my @list = map { $keybyname{lc $_} || $_ } map { split /,/ } @_;
+	my @keys = map { /(\d+)$/ ? $1 : croak( $self->type . qq[: unexpected "$_"] ) } @list;
 	return $self->key0( _integer16( sort { $a <=> $b } @keys ) );
 }
 
 sub alpn {				## alpn=h3,h2,...
 	my $self = shift;
-	return $self->key1( _string(@_) );
+
+	###	tolerate unnecessary double-escape nonsense in draft-ietf-dnsop-svcb-https	###
+	my @sanitized = map { s/\\092,/\\044/g; s/\\092\\092/\\092/g; split /,/ } join ',', @_;
+	return $self->key1( scalar(@_) ? _string(@sanitized) : () );
 }
 
 sub no_default_alpn {			## no-default-alpn
-	return shift->key2( map {''} @_ );			# uncoverable pod
+	my $self = shift;					# uncoverable pod
+	return $self->key2( ( defined(wantarray) ? @_ : '' ), @_ );
 }
 
 sub port {				## port=1234
 	my $self = shift;
-	return $self->key3( _integer16(@_) );
+	return $self->key3( map { _integer16($_) } @_ );
 }
 
 sub ipv4hint {				## ipv4hint=192.0.2.1,...
@@ -251,12 +239,7 @@ sub ipv4hint {				## ipv4hint=192.0.2.1,...
 
 sub ech {				## ech=base64string
 	my $self = shift;
-	return $self->key5( _base64(@_) );
-}
-
-sub echconfig {				## echconfig=base64string
-	$_[0]->_deprecate(qq[please use "ech"]);		# uncoverable pod
-	return &ech;
+	return $self->key5( map { _base64($_) } @_ );
 }
 
 sub ipv6hint {				## ipv6hint=2001:DB8::1,...
@@ -281,10 +264,13 @@ sub AUTOLOAD {				## Dynamic constructor/accessor methods
 
 	if ( scalar @_ ) {
 		my $arg = shift;				# keyNN($value);
-		croak 'unexpected number of arguments' if scalar @_;
-		delete $params{$key};
+		delete $params{$key} unless defined $arg;
+		croak( $self->type . qq[: duplicate SvcParam "key$key"] ) if defined $params{$key};
 		$params{$key} = Net::DNS::Text->new("$arg")->raw if defined $arg;
 		$self->{SvcParams} = [map { ( $_, $params{$_} ) } sort { $a <=> $b } keys %params];
+		croak( $self->type . qq[: unexpected number of values for "key$key"] ) if scalar @_;
+	} else {
+		croak( $self->type . qq[: no value specified for "key$key"] ) unless defined wantarray;
 	}
 
 	my $value = $params{$key};
@@ -349,7 +335,7 @@ owner name of this record must be used as the effective TargetName.
     $string = $rr->port();	# \004\210
     $rr->key3($string);
 
-Constructor methods for mnemonic SvcParams defined in draft-ietf-dnsop-svcb-https-02.
+Constructor methods for mnemonic SvcParams defined in draft-ietf-dnsop-svcb-https.
 When invoked without arguments, the methods return the presentation format
 value for the underlying key.
 The behaviour with undefined arguments is not specified.
@@ -397,6 +383,6 @@ DEALINGS IN THE SOFTWARE.
 
 =head1 SEE ALSO
 
-L<perl>, L<Net::DNS>, L<Net::DNS::RR>, draft-ietf-dnsop-svcb-https-02
+L<perl>, L<Net::DNS>, L<Net::DNS::RR>, draft-ietf-dnsop-svcb-https
 
 =cut

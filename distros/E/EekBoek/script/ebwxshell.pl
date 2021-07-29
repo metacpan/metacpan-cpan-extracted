@@ -4,18 +4,18 @@
 # Author          : Johan Vromans
 # Created On      : Fri Dec 18 21:54:24 2009
 # Last Modified By: Johan Vromans
-# Last Modified On: Wed Feb  1 15:13:55 2017
-# Update Count    : 119
+# Last Modified On: Tue Jan 26 22:34:21 2021
+# Update Count    : 127
 # Status          : Unknown, Use with caution!
-
-use strict;
-use utf8;
-# use lib qw(EekBoekLibrary);
 
 package main;
 
 use strict;
 use warnings;
+use utf8;
+
+# use lib qw(EekBoekLibrary);
+
 use File::Spec;
 use File::Basename;
 
@@ -40,10 +40,12 @@ if ( -s File::Spec->catfile( $lib, "EekBoek.pm" ) ) {
     $ENV{PATH} = File::Spec->rel2abs($lib) . $sep . $ENV{PATH};
 }
 
+use App::Packager qw( :name EekBoek );
+
 check_install( "EekBoek", "EekBoek.pm", "EB.pm", "EB/res/schema/eekboek.sql" );
 
 require EekBoek;
-check_version( "EekBoek", $EekBoek::VERSION, "2.01.00" );
+check_version( "EekBoek", $EekBoek::VERSION, "2.030" );
 
 check_install( "De EekBoek WxShell", "EB/Wx/Shell/Main.pm", "EB/Wx/IniWiz.pm" );
 
@@ -70,6 +72,7 @@ if ( ( $Wx::VERSION =~ /^0[.,]9[56]$/ )
 check_version( "wxWidgets", $Wx::wxVERSION, "2.008" );
 
 require EB::Wx::Shell::Main;
+exit if @ARGV == 1 && $ARGV[0] eq "--quit";
 EB::Wx::Shell::Main->run;
 
 ################ Subroutines ################

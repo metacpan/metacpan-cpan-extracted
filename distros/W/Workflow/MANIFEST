@@ -55,6 +55,7 @@ lib/Workflow/Condition/GreedyOR.pm
 lib/Workflow/Condition/HasUser.pm
 lib/Workflow/Condition/LazyAND.pm
 lib/Workflow/Condition/LazyOR.pm
+lib/Workflow/Condition/Negated.pm
 lib/Workflow/Condition/Nested.pm
 lib/Workflow/Config.pm
 lib/Workflow/Config/Perl.pm
@@ -100,6 +101,7 @@ t/TestApp/Action/TicketCreateType.pm
 t/TestApp/Action/TicketUpdate.pm
 t/TestApp/Condition/AlwaysTrue.pm
 t/TestApp/Condition/HasUserType.pm
+t/TestApp/CustomWorkflow.pm
 t/TestApp/Ticket.pm
 t/TestApp/User.pm
 t/TestApp/Web.pm

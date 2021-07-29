@@ -1,5 +1,5 @@
 package Shell::Cmd;
-# Copyright (c) 2013-2018 Sullivan Beck. All rights reserved.
+# Copyright (c) 2013-2021 Sullivan Beck. All rights reserved.
 # This program is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 
@@ -25,7 +25,7 @@ use IO::File;
 use Cwd;
 
 our($VERSION);
-$VERSION = "3.03";
+$VERSION = "3.04";
 
 $| = 1;
 $Data::Dumper::Sortkeys = 1;
@@ -241,7 +241,7 @@ sub env {
 
    while (@tmp) {
       my $var = shift(@tmp);
-      my $val = shift(@tmp);
+      my $val = $self->_quote(shift(@tmp));
       push @{ $$self{'e'} },($var,$val);
    }
 

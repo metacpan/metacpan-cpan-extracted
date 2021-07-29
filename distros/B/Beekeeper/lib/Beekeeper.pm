@@ -3,7 +3,7 @@ package Beekeeper;
 use strict;
 use warnings;
 
-our $VERSION = '0.07';
+our $VERSION = '0.09';
 
 1;
 
@@ -19,7 +19,7 @@ Beekeeper - Framework for building applications with a microservices architectur
  
 =head1 VERSION
  
-Version 0.07
+Version 0.09
 
 =head1 SYNOPSIS
 
@@ -147,6 +147,8 @@ B<What does this framework provides:>
 - Centralized logging, which can be shoveled to an external monitoring application.
 
 - Performance metrics gathering, which can be shoveled to an external monitoring application.
+
+- A nice HTML dashboard, which can be used in any project.
 
 
 =head1 Getting Started
@@ -307,8 +309,12 @@ C<examples/websocket> uses a service from a browser using WebSockets.
 
 C<examples/chat> implements a real world setup with isolated buses and redundancy.
 
+C<examples/dashboard> is an HTML dashboard for Beekeeper projects.
+
 
 =head1 SEE ALSO
+
+L<How to run Beekeeper pools as systemd services|https://github.com/jmico/beekeeper/blob/master/doc/Install.md>.
 
 L<Notes about supported MQTT brokers|https://github.com/jmico/beekeeper/blob/master/doc/Brokers.md> configuration.
 

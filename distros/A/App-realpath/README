@@ -1,12 +1,12 @@
 NAME
-    App::realpath - Print the resolved path
+    App::realpath - Print the resolved (absolute) path
 
 VERSION
-    This document describes version 0.001 of App::realpath (from Perl
-    distribution App-realpath), released on 2019-10-09.
+    This document describes version 0.002 of App::realpath (from Perl
+    distribution App-realpath), released on 2021-07-15.
 
 DESCRIPTION
-    See the included script realpath.
+    See the included script realpath (or its alias (abspath).
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -24,11 +24,15 @@ BUGS
     to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
+    App::relpath
+
+    App::quickabspath
+
 AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019 by perlancar@cpan.org.
+    This software is copyright (c) 2021, 2019 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

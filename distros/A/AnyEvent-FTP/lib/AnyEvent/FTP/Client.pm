@@ -9,7 +9,7 @@ use Carp qw( croak );
 use Socket qw( unpack_sockaddr_in inet_ntoa );
 
 # ABSTRACT: Simple asynchronous ftp client
-our $VERSION = '0.16'; # VERSION
+our $VERSION = '0.17'; # VERSION
 
 
 with 'AnyEvent::FTP::Role::Event';
@@ -338,7 +338,7 @@ AnyEvent::FTP::Client - Simple asynchronous ftp client
 
 =head1 VERSION
 
-version 0.16
+version 0.17
 
 =head1 SYNOPSIS
 
@@ -358,7 +358,7 @@ Non blocking example:
  
    # use binary mode
    $client->type('I')->cb(sub {
-       
+ 
      # download the file directly into a filehandle
      open my $fh, '>', 'perl-5.16.3.tar.gz';
      $client->retr('perl-5.16.3.tar.gz', $fh)->cb(sub {
@@ -392,7 +392,7 @@ Same, but using recv to wait for each command to complete (not supported in all 
  
  # use binary mode
  $client->type('I')->recv;
-       
+ 
  # download the file directly into a filehandle
  open my $fh, '>', 'perl-5.16.3.tar.gz';
  $client->retr('perl-5.16.3.tar.gz', $fh)->recv;
@@ -994,7 +994,7 @@ FTP commands and their responses as they happen.
    'p' => \$progress,
    'a' => \$active,
  );
-     
+ 
  my $remote = shift;
  
  unless(defined $remote)
@@ -1025,7 +1025,7 @@ FTP commands and their responses as they happen.
  do {
    my $from = $remote->clone;
    $from->password(undef);
-   
+ 
    say "SRC: ", $from;
  };
  
@@ -1074,7 +1074,7 @@ FTP commands and their responses as they happen.
      $remote_size = $size;
      last;
    }
-   
+ 
    if(defined $remote_size)
    {
    }
@@ -1242,7 +1242,7 @@ and a remote FTP URL.
    my $from = URI::file->new_abs($local);
    my $to = $remote->clone;
    $to->password(undef);
-   
+ 
    say "SRC: ", $from;
    say "DST: ", $to;
  };
@@ -1338,7 +1338,7 @@ José Joaquín Atria
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Graham Ollis.
+This software is copyright (c) 2017-2021 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

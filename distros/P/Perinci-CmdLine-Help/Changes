@@ -1,3 +1,10 @@
+0.174   2021-07-10  Released-By: PERLANCAR; Urgency: medium
+
+	- Better wrapping of usage line to adjust for the newer
+	  Perinci::Sub::To::CLIDocData (0.297+) which does not use spaces
+	  between alternation |.
+
+
 0.173   2020-04-27  Released-By: PERLANCAR; Urgency: medium
 
 	- Wrap potentially long usage line.

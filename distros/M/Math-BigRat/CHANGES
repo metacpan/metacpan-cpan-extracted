@@ -1,3 +1,25 @@
+0.2617 2021-07-12
+
+ * Fix CPAN RT #132712.
+
+ * Reorganize existing test files and add more test files.
+
+0.2616 2021-07-12
+
+ * Improve the handling of the backend libraries.
+
+0.2615 2021-07-10
+
+ * Fix bnok(). It didn't work at all.
+
+ * Fix minor POD error (CPAN RT #125148).
+
+ * Better Makefile.PL.
+
+ * Update the BUGS and SUPPORT sections in the POD.
+
+ * Update README.
+
 0.2614 2018-04-17
 
  * Fix bug in bpow() (CPAN RT #124002). Add tests to verify fix.
@@ -39,7 +61,7 @@
 
  * Import carp() and croak() from Carp.
 
- * Make tests pass when '.' is not in @INC.
+ * Make tests pass when '.' is not in @INC (CPAN RT #120892).
 
  * Remove t/bigroot.t and t/biglog.t which didn't test Math::BigRat at all.
 
@@ -322,10 +344,6 @@
  * add tests for octal and from_hex()/from_bin()
 
  * bundle and use Module::Install
-
-Older revision history:
-
-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
 0.16 2007-01-28 Tels 926 tests
 

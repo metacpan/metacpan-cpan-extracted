@@ -31,6 +31,7 @@ sub init {
         cookieName          => 'lemonldap',
         securedCookie       => 0,
         https               => 0,
+        hiddenAttributes    => 'mail cn',
         logger              => 'Lemonldap::NG::Common::Logger::Std',
         %$prms
     );

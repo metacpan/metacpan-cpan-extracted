@@ -126,7 +126,6 @@
     saml: ['_idp', '_idpConfKey', '_samlToken', '_lassoSessionDump', '_lassoIdentityDump'],
     groups: ['groups', 'hGroups'],
     ldap: ['dn'],
-    BrowserID: ['_browserIdAnswer', '_browserIdAnswerRaw'],
     OpenIDConnect: ['_oidc_id_token', '_oidc_OP', '_oidc_access_token'],
     sfaTitle: ['_2fDevices'],
     oidcConsents: ['_oidcConsents']
@@ -194,15 +193,18 @@
         return $scope.showM = false;
       };
       $scope.deleteOIDCConsent = function(rp, epoch) {
-        var e, i, items, len;
+        var items;
         items = document.querySelectorAll(".data-" + epoch);
-        for (i = 0, len = items.length; i < len; i++) {
-          e = items[i];
-          e.remove();
-        }
         $scope.waiting = true;
         $http['delete'](scriptname + "sessions/OIDCConsent/" + sessionType + "/" + $scope.currentSession.id + "?rp=" + rp + "&epoch=" + epoch).then(function(response) {
-          return $scope.waiting = false;
+          var e, i, len, results;
+          $scope.waiting = false;
+          results = [];
+          for (i = 0, len = items.length; i < len; i++) {
+            e = items[i];
+            results.push(e.remove());
+          }
+          return results;
         }, function(resp) {
           return $scope.waiting = false;
         });
@@ -215,8 +217,6 @@
           $scope.currentScope.remove();
           return $scope.waiting = false;
         }, function(resp) {
-          $scope.currentSession = null;
-          $scope.currentScope.remove();
           return $scope.waiting = false;
         });
       };

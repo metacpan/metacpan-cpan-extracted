@@ -5,12 +5,13 @@
 
 use v5.26;
 
-use Object::Pad 0.41;
+use Object::Pad 0.43;  # :strict(params), ADJUST
 
-package App::sdview::Parser::Pod 0.02;
+package App::sdview::Parser::Pod 0.03;
 class App::sdview::Parser::Pod
    isa Pod::Simple
-   does App::sdview::Parser;
+   does App::sdview::Parser
+   :strict(params);
 
 use List::Keywords qw( any );
 use List::Util qw( min );
@@ -19,12 +20,21 @@ use String::Tagged;
 
 use constant format => "POD";
 
+sub find_file ( $class, $name )
+{
+   open my $f, "-|", "perldoc", "-l", $name;
+   my $file = <$f>; chomp $file if defined $file;
+   close $f;
+   $? == 0 or return undef;
+   return $file;
+}
+
 sub can_parse_file ( $class, $file )
 {
    return $file =~ m/\.pm$|\.pl$|\.pod$/;
 }
 
-BUILD
+ADJUST
 {
    $self->nix_X_codes( 1 );
 }
@@ -73,7 +83,10 @@ method _handle_element_start ($type, $attrs)
       %_curtags = ();
    }
    elsif( $type eq "L" ) {
-      $_curtags{L} = { target => $attrs->{to} };
+      my $target = $attrs->{to};
+      # TODO: more customizable
+      $target = "https://metacpan.org/pod/$target" unless $target =~ m(^\w+://);
+      $_curtags{L} = { target => $target };
    }
    elsif( any { $type eq $_ } @FORMAT_TYPES ) {
       ++$_curtags{$type};

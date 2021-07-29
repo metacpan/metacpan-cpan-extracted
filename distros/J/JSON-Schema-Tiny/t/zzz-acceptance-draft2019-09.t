@@ -21,13 +21,20 @@ BEGIN {
     if not -d '.git' and not grep $ENV{$_}, @variables;
 }
 
+my $version = 'draft2019-09';
+
 acceptance_tests(
   acceptance => {
+    specification => $version,
     skip_dir => 'optional/format',
   },
-  output_file => 'draft2019-09.txt',
+  evaluator => {
+    specification_version => $version,
+  },
+  output_file => $version.'-acceptance.txt',
   test => {
     $ENV{NO_TODO} ? () : ( todo_tests => [
+      # unsupported keywords or subfeatures
       { file => [ qw(
           anchor.json
           id.json
@@ -45,17 +52,17 @@ acceptance_tests(
         ] },
       { file => 'unknownKeyword.json', group_description => '$id inside an unknown keyword is not a real identifier', test_description => 'type matches second anyOf, which has a real schema in it' },
       { file => [
-          'optional/bignum.json',                     # TODO: see JSD2 issue #10
-          'optional/ecmascript-regex.json',           # TODO: see JSD2 issue #27
+          'optional/bignum.json',                     # TODO: see JSM issue #10
+          'optional/ecmascript-regex.json',           # TODO: see JSM issue #27
           'optional/float-overflow.json',             # see slack logs re multipleOf algo
         ] },
       # various edge cases that are difficult to accomodate
-      $Config{ivsize} < 8 || $Config{nvsize} < 8 ?    # see JSD2 issue #10
+      $Config{ivsize} < 8 || $Config{nvsize} < 8 ?    # see JSM issue #10
         { file => 'const.json',
           group_description => 'float and integers are equal up to 64-bit representation limits',
           test_description => 'float is valid' }
         : (),
-      $Config{nvsize} >= 16 ? # see https://github.com/json-schema-org/JSON-Schema-Test-Suite/pull/438#issuecomment-714670854
+      $Config{nvsize} >= 12 ? # see https://github.com/json-schema-org/JSON-Schema-Test-Suite/pull/438#issuecomment-714670854
         { file => 'multipleOf.json',
           group_description => 'invalid instance should not raise error when float division = inf',
           test_description => 'always invalid, but naive implementations may raise an overflow error' }
@@ -64,7 +71,18 @@ acceptance_tests(
   },
 );
 
+END {
+diag <<DIAG
+
+###############################
+
+Attention CPANTesters: you do not need to file a ticket when this test fails. I will receive the test reports and act on it soon. thank you!
+
+###############################
+DIAG
+  if not Test::Builder->new->is_passing;
+}
+
 done_testing;
 __END__
-
-see t/results/draft2019-09.txt for test results
+see t/results/draft2019-09-acceptance.txt for test results

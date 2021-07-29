@@ -1,5 +1,14 @@
 Revision history for Perl extension App-ansicolumn
 
+1.10 2021-07-26T04:44:51Z
+
+    - Use external Getopt::EX::Hashed.
+    - Rename --insert-space to --paragraph/-p.
+
+1.09 2021-07-15T03:47:36Z
+
+    - Add --border-style=c-box.
+
 1.08 2021-06-25T04:08:26Z
 
     - Implement -l, --table-columns-limit option.

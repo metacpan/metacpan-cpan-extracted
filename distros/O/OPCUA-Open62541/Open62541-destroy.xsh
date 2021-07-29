@@ -63,6 +63,24 @@ UA_ByteString_DESTROY(byteString)
 	DPRINTF("byteString %p", byteString);
 	UA_ByteString_delete(byteString);
 
+MODULE = OPCUA::Open62541	PACKAGE = OPCUA::Open62541::CreateMonitoredItemsRequest	PREFIX = UA_CreateMonitoredItemsRequest_
+
+void
+UA_CreateMonitoredItemsRequest_DESTROY(createMonitoredItemsRequest)
+	OPCUA_Open62541_CreateMonitoredItemsRequest	createMonitoredItemsRequest
+    CODE:
+	DPRINTF("createMonitoredItemsRequest %p", createMonitoredItemsRequest);
+	UA_CreateMonitoredItemsRequest_delete(createMonitoredItemsRequest);
+
+MODULE = OPCUA::Open62541	PACKAGE = OPCUA::Open62541::CreateSubscriptionRequest	PREFIX = UA_CreateSubscriptionRequest_
+
+void
+UA_CreateSubscriptionRequest_DESTROY(createSubscriptionRequest)
+	OPCUA_Open62541_CreateSubscriptionRequest	createSubscriptionRequest
+    CODE:
+	DPRINTF("createSubscriptionRequest %p", createSubscriptionRequest);
+	UA_CreateSubscriptionRequest_delete(createSubscriptionRequest);
+
 MODULE = OPCUA::Open62541	PACKAGE = OPCUA::Open62541::DataTypeAttributes	PREFIX = UA_DataTypeAttributes_
 
 void
@@ -71,6 +89,24 @@ UA_DataTypeAttributes_DESTROY(dataTypeAttributes)
     CODE:
 	DPRINTF("dataTypeAttributes %p", dataTypeAttributes);
 	UA_DataTypeAttributes_delete(dataTypeAttributes);
+
+MODULE = OPCUA::Open62541	PACKAGE = OPCUA::Open62541::DeleteMonitoredItemsRequest	PREFIX = UA_DeleteMonitoredItemsRequest_
+
+void
+UA_DeleteMonitoredItemsRequest_DESTROY(deleteMonitoredItemsRequest)
+	OPCUA_Open62541_DeleteMonitoredItemsRequest	deleteMonitoredItemsRequest
+    CODE:
+	DPRINTF("deleteMonitoredItemsRequest %p", deleteMonitoredItemsRequest);
+	UA_DeleteMonitoredItemsRequest_delete(deleteMonitoredItemsRequest);
+
+MODULE = OPCUA::Open62541	PACKAGE = OPCUA::Open62541::DeleteSubscriptionsRequest	PREFIX = UA_DeleteSubscriptionsRequest_
+
+void
+UA_DeleteSubscriptionsRequest_DESTROY(deleteSubscriptionsRequest)
+	OPCUA_Open62541_DeleteSubscriptionsRequest	deleteSubscriptionsRequest
+    CODE:
+	DPRINTF("deleteSubscriptionsRequest %p", deleteSubscriptionsRequest);
+	UA_DeleteSubscriptionsRequest_delete(deleteSubscriptionsRequest);
 
 MODULE = OPCUA::Open62541	PACKAGE = OPCUA::Open62541::Double	PREFIX = UA_Double_
 
@@ -107,6 +143,24 @@ UA_LocalizedText_DESTROY(localizedText)
     CODE:
 	DPRINTF("localizedText %p", localizedText);
 	UA_LocalizedText_delete(localizedText);
+
+MODULE = OPCUA::Open62541	PACKAGE = OPCUA::Open62541::ModifySubscriptionRequest	PREFIX = UA_ModifySubscriptionRequest_
+
+void
+UA_ModifySubscriptionRequest_DESTROY(modifySubscriptionRequest)
+	OPCUA_Open62541_ModifySubscriptionRequest	modifySubscriptionRequest
+    CODE:
+	DPRINTF("modifySubscriptionRequest %p", modifySubscriptionRequest);
+	UA_ModifySubscriptionRequest_delete(modifySubscriptionRequest);
+
+MODULE = OPCUA::Open62541	PACKAGE = OPCUA::Open62541::MonitoredItemCreateRequest	PREFIX = UA_MonitoredItemCreateRequest_
+
+void
+UA_MonitoredItemCreateRequest_DESTROY(monitoredItemCreateRequest)
+	OPCUA_Open62541_MonitoredItemCreateRequest	monitoredItemCreateRequest
+    CODE:
+	DPRINTF("monitoredItemCreateRequest %p", monitoredItemCreateRequest);
+	UA_MonitoredItemCreateRequest_delete(monitoredItemCreateRequest);
 
 MODULE = OPCUA::Open62541	PACKAGE = OPCUA::Open62541::NodeClass	PREFIX = UA_NodeClass_
 
@@ -179,6 +233,15 @@ UA_ReferenceTypeAttributes_DESTROY(referenceTypeAttributes)
     CODE:
 	DPRINTF("referenceTypeAttributes %p", referenceTypeAttributes);
 	UA_ReferenceTypeAttributes_delete(referenceTypeAttributes);
+
+MODULE = OPCUA::Open62541	PACKAGE = OPCUA::Open62541::SetPublishingModeRequest	PREFIX = UA_SetPublishingModeRequest_
+
+void
+UA_SetPublishingModeRequest_DESTROY(setPublishingModeRequest)
+	OPCUA_Open62541_SetPublishingModeRequest	setPublishingModeRequest
+    CODE:
+	DPRINTF("setPublishingModeRequest %p", setPublishingModeRequest);
+	UA_SetPublishingModeRequest_delete(setPublishingModeRequest);
 
 MODULE = OPCUA::Open62541	PACKAGE = OPCUA::Open62541::String	PREFIX = UA_String_
 

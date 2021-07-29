@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 use Moose;
 
@@ -107,6 +107,8 @@ sub _checkout {
     $self->log("Checking out $checkout in $dir");
     $git->checkout($checkout);
 
+    $git->pull('--ff-only');
+
     return;
 }
 
@@ -136,7 +138,7 @@ Dist::Zilla::Plugin::Git::Checkout - clone and checkout a Git repository
 
 =head1 VERSION
 
-Version 0.002
+Version 0.003
 
 =head1 SYNOPSIS
 
@@ -210,7 +212,7 @@ Sven Kirmess <sven.kirmess@kzone.ch>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Sven Kirmess.
+This software is Copyright (c) 2020-2021 by Sven Kirmess.
 
 This is free software, licensed under:
 

@@ -1,8 +1,5 @@
-.appveyor.cmd
-.appveyor.yml
 .mailmap
 .perltidyrc
-.travis.yml
 Build.PL
 Changes
 CONTRIBUTING.md
@@ -77,4 +74,5 @@ t/20-getaddrinfo.t
 t/21-getnameinfo.t
 t/30-process.t
 t/31-process-root.t
+t/99-pod.t
 t/lib/UVTestHelpers.pm

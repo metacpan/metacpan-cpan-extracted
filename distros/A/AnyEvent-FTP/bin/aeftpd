@@ -11,7 +11,7 @@ use Pod::Usage qw( pod2usage );
 
 # PODNAME: aeftpd
 # ABSTRACT: FTP Server
-our $VERSION = '0.16'; # VERSION
+our $VERSION = '0.17'; # VERSION
 
 
 my $port;
@@ -104,17 +104,17 @@ if($verbose)
       my $raw = shift;
       say STDERR "CLIENT: $raw";
     });
-  
+
     $con->on_response(sub {
       my $raw = shift;
       $raw =~ s/\015?\012$//g;
       say STDERR "SERVER: $raw";
     });
-    
+
     $con->on_close(sub {
       say STDERR "DISCONNECT";
     });
-    
+
     say STDERR "CONNECT";
   });
 }
@@ -138,26 +138,26 @@ elsif($simple_auth_class)
     say STDERR "install Authen::Simple::$simple_auth_class in order to use $simple_auth_class authentication";
     exit 2;
   }
-  
+
   my $pam = "Authen::Simple::$simple_auth_class"->new(
     @simple_auth_args,
   );
-  
+
   $server->on_connect(sub {
     my $con = shift;
-    
+
     my $user_class;
     if($inet && $< == 0 && $^O !~ /^(cygwin|MSWin32)$/)
     {
       $user_class = 'AnyEvent::FTP::Server::OS::UNIX';
       eval "use $user_class"; die $@ if $@;
     }
-    
+
     $con->context->authenticator(sub {
       my($name, $pass) = @_;
-      
+
       $name = 'ftp' if $name eq 'anonymous';
-     
+
       my $user;
       if(defined $user_class)
       {
@@ -166,18 +166,18 @@ elsif($simple_auth_class)
       }
 
       return 0 if $name ne 'ftp' && ! $pam->authenticate( $name, $pass );
-      
+
       if(defined $user)
       {
         $user->jail if $chroot || $name eq 'ftp';
         $user->drop_privileges;
       }
     });
-    
+
     $con->context->bad_authentication_delay(0);
-      
+
     1;
-    
+
   });
 }
 else
@@ -202,20 +202,20 @@ aeftpd - FTP Server
 
 =head1 VERSION
 
-version 0.16
+version 0.17
 
 =head1 SYNOPSIS
 
- % aeftpd [ --port port ] 
-          [ --hostname hostname ] 
-          [ --inet ] 
-          [ --stderr path ] 
+ % aeftpd [ --port port ]
+          [ --hostname hostname ]
+          [ --inet ]
+          [ --stderr path ]
           [ --context context ]
-          [ --chroot ] 
-            --pam service | 
+          [ --chroot ]
+            --pam service |
             --cred user:pass |
             --cred random |
-            --auth class [ --auth key=val ] 
+            --auth class [ --auth key=val ]
           [ --verbose ]
  % aeftpd --version
  % aeftpd --help
@@ -262,7 +262,7 @@ then a randomly generated username and password will be used.
 =head2 --auth I<class>
 
 Specify a L<Authen::Simple> class to use for authentication.  You should NOT
-include the Authen::Simple prefix when specifying the class (that is use 
+include the Authen::Simple prefix when specifying the class (that is use
 C<PAM> instead of C<Authen::Simple::PAM>).
 
 =head2 --auth I<key>=I<val>
@@ -309,7 +309,7 @@ José Joaquín Atria
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Graham Ollis.
+This software is copyright (c) 2017-2021 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

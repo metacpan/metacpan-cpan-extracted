@@ -477,6 +477,20 @@ function templates(tpl,key) {
                   "type" : "bool"
                },
                {
+                  "default" : 0,
+                  "get" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsAccessTokenJWT",
+                  "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsAccessTokenJWT",
+                  "title" : "oidcRPMetaDataOptionsAccessTokenJWT",
+                  "type" : "bool"
+               },
+               {
+                  "default" : 0,
+                  "get" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsAccessTokenClaims",
+                  "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsAccessTokenClaims",
+                  "title" : "oidcRPMetaDataOptionsAccessTokenClaims",
+                  "type" : "bool"
+               },
+               {
                   "get" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsAdditionalAudiences",
                   "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsAdditionalAudiences",
                   "title" : "oidcRPMetaDataOptionsAdditionalAudiences"
@@ -530,6 +544,68 @@ function templates(tpl,key) {
                      }
                   ],
                   "title" : "oidcRPMetaDataOptionsIDTokenSignAlg",
+                  "type" : "select"
+               },
+               {
+                  "default" : "RS256",
+                  "get" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsAccessTokenSignAlg",
+                  "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsAccessTokenSignAlg",
+                  "select" : [
+                     {
+                        "k" : "RS256",
+                        "v" : "RS256"
+                     },
+                     {
+                        "k" : "RS384",
+                        "v" : "RS384"
+                     },
+                     {
+                        "k" : "RS512",
+                        "v" : "RS512"
+                     }
+                  ],
+                  "title" : "oidcRPMetaDataOptionsAccessTokenSignAlg",
+                  "type" : "select"
+               },
+               {
+                  "default" : "",
+                  "get" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsUserInfoSignAlg",
+                  "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsUserInfoSignAlg",
+                  "select" : [
+                     {
+                        "k" : "",
+                        "v" : "JSON"
+                     },
+                     {
+                        "k" : "none",
+                        "v" : "JWT/None"
+                     },
+                     {
+                        "k" : "HS256",
+                        "v" : "JWT/HS256"
+                     },
+                     {
+                        "k" : "HS384",
+                        "v" : "JWT/HS384"
+                     },
+                     {
+                        "k" : "HS512",
+                        "v" : "JWT/HS512"
+                     },
+                     {
+                        "k" : "RS256",
+                        "v" : "JWT/RS256"
+                     },
+                     {
+                        "k" : "RS384",
+                        "v" : "JWT/RS384"
+                     },
+                     {
+                        "k" : "RS512",
+                        "v" : "JWT/RS512"
+                     }
+                  ],
+                  "title" : "oidcRPMetaDataOptionsUserInfoSignAlg",
                   "type" : "select"
                },
                {
@@ -655,6 +731,14 @@ function templates(tpl,key) {
       "help" : "exportedvars.html#extend-variables-using-macros-and-groups",
       "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataMacros",
       "title" : "oidcRPMetaDataMacros",
+      "type" : "keyTextContainer"
+   },
+   {
+      "cnodes" : tpl+"s/"+key+"/"+"oidcRPMetaDataScopeRules",
+      "default" : [],
+      "help" : "idpopenidconnect.html#scope-rules",
+      "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataScopeRules",
+      "title" : "oidcRPMetaDataScopeRules",
       "type" : "keyTextContainer"
    },
    {

@@ -1,6 +1,6 @@
 Math-Big
 
-Math::Big - arbitrarily big integer constants
+Math::Big - routines with big numbers
 
 INSTALLATION
 
@@ -21,23 +21,26 @@ perldoc command.
 
 You can also look for information at:
 
-    RT, CPAN's request tracker
-        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Math-Big
+    GitHub
+        https://github.com/pjacklam/p5-Math-Big>
 
-    AnnoCPAN, Annotated CPAN documentation
-        http://annocpan.org/dist/Math-Big
+    RT: CPAN's request tracker
+        https://rt.cpan.org/Dist/Display.html?Name=Math-Big>
+
+    MetaCPAN
+        https://metacpan.org/release/Math-Big>
+
+    CPAN Testers Matrix
+        http://matrix.cpantesters.org/?dist=Math-Big>
 
     CPAN Ratings
-        http://cpanratings.perl.org/d/Math-Big
-
-    Search CPAN
-        http://search.cpan.org/dist/Math-Big
+        https://cpanratings.perl.org/dist/Math-Big>
 
 COPYRIGHT AND LICENCE
 
-Copyright 2001-2007 Tels, L<http://bloodgate.com>.
+Copyright 2001-2007 Tels, http://bloodgate.com
 
-Copyright 2016- Peter John Acklam L<pjacklam@online.no>.
+Copyright 2016- Peter John Acklam, pjacklam@gmail.com
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

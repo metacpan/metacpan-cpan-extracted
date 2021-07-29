@@ -2,14 +2,14 @@ package Myriad::Service::Storage;
 
 use Myriad::Class;
 
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.010'; # VERSION
 our $AUTHORITY = 'cpan:DERIV'; # AUTHORITY
 
 =encoding utf8
 
 =head1 NAME
 
-Myriad::Service:Storage - microservice storage abstraction
+Myriad::Service::Storage - microservice storage abstraction layer
 
 =head1 SYNOPSIS
 
@@ -18,6 +18,11 @@ Myriad::Service:Storage - microservice storage abstraction
  await $storage->hash_add('some_key', 'hash_key', 13);
 
 =head1 DESCRIPTION
+
+This module provides service storage access.
+
+It implements L<Myriad::Role::Storage> in an object available as the C<$storage>
+lexical in any service class. See that module for more details on the API.
 
 =cut
 

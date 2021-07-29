@@ -23,13 +23,13 @@ use Try::Tiny;
 use Path::Tiny;
 use Carp;
 
-our $VERSION='2.00';
+our $VERSION='2.01';
 
 =head1 NAME
 
 Vote::Count::Method::Cascade
 
-=head1 VERSION 2.00
+=head1 VERSION 2.01
 
 =cut
 
@@ -38,23 +38,16 @@ Vote::Count::Method::Cascade
 =pod
 
 =head1 SYNOPSIS
+
 ....
+
 =head1 Description
 
-Implements Weighted Improved Gregory Single Transferable Vote based on Scotland's rules.
-
-=head1 WIGRun
-
-Run and log the Election.
-
-=head2 Implementation Notes
-
-.
-=head1 Experimental
-
-Small discrepencies with the stages data available for testing have been seen, which are likely to be rounding issues. Until further review can be taken, this code should be considered a preview.
+Experimental Implementation of a method using Full Cascade Charging.
 
 =head1 The Rules
+
+...
 
 =cut
 
@@ -386,8 +379,6 @@ ENDROUND:
 }
 
 1;
-
-=pod
 
 #FOOTER
 

@@ -118,7 +118,8 @@ sub getNodes {
     my @res;
     foreach my $k (@$tree) {
         if ( ref($k) ) {
-            push @res, $k->{title}, @{ getNodes( $k->{nodes} ) };
+            push @res, $k->{title}, @{ getNodes( $k->{nodes} ) },
+              @{ getNodes( $k->{nodes_cond} ) };
         }
         else {
             push @res, $k;

@@ -31,8 +31,7 @@ sub new {
     if ( $info->{driver} eq 'Pg' ) {
         $sf->{aggregate}[3] = "STRING_AGG(X)";
     }
-    $sf->{i}{menu_additions}     = [ '',  'f()', 'SQ',       '%%' ];
-    $sf->{i}{menu_additions_set} = [ '',  'f()', 'SQ', '=N', '%%' ];
+    $sf->{i}{menu_addition} = '%%';
     bless $sf, $class;
 }
 
@@ -43,9 +42,10 @@ sub select {
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my $menu = [];
-    my $i = $sf->{o}{enable}{'expand_' . $clause};
-    my $menu_addition = $sf->{i}{menu_additions}[$i];
-    my @pre = ( undef, $sf->{i}{ok}, $menu_addition ? $menu_addition : () );
+    my @pre = ( undef, $sf->{i}{ok} );
+    if ( $sf->{o}{enable}{'expand_' . $clause} ) {
+        push @pre, $sf->{i}{menu_addition};
+    }
     if ( @{$sql->{group_by_cols}} || @{$sql->{aggr_cols}} ) {
         $menu = [ @pre, @{$sql->{group_by_cols}}, @{$sql->{aggr_cols}} ];
     }
@@ -76,16 +76,25 @@ sub select {
         if ( $menu->[$idx[0]] eq $sf->{i}{ok} ) {
             shift @idx;
             push @{$sql->{select_cols}}, @{$menu}[@idx];
+            if ( ! @{$sql->{select_cols}} ) {
+                return 0;
+            }
             return 1;
         }
-        elsif ( $menu->[$idx[0]] eq $menu_addition ) {
+        elsif ( $menu->[$idx[0]] eq $sf->{i}{menu_addition} ) {
             my $ext = App::DBBrowser::Table::Extensions->new( $sf->{i}, $sf->{o}, $sf->{d} );
-            my $complex_column = $ext->complex_unit( $sql, $clause );
-            if ( ! defined $complex_column ) {
+            my $complex_columns = $ext->complex_unit( $sql, $clause, 1 );
+            if ( ! defined $complex_columns ) {
                 ( $sql->{select_cols}, $sql->{alias} ) = @{pop @bu};
             }
             else {
-                push @{$sql->{select_cols}}, $complex_column;
+                for my $complex_col ( @$complex_columns ) {
+                    my $alias = $ax->alias( $sql, 'select', $complex_col );
+                    if ( defined $alias && length $alias ) {
+                        $sql->{alias}{$complex_col} = $ax->quote_col_qualified( [ $alias ] );
+                    }
+                    push @{$sql->{select_cols}}, $complex_col;
+                }
             }
             next COLUMNS;
         }
@@ -118,6 +127,9 @@ sub distinct {
             return;
         }
         elsif ( $select_distinct eq $sf->{i}{ok} ) {
+            if ( ! length $sql->{distinct_stmt} ) {
+                return 0;
+            }
             return 1;
         }
         $sql->{distinct_stmt} = ' ' . $select_distinct;
@@ -141,6 +153,9 @@ sub aggregate {
             return;
         }
         elsif ( $ret eq $sf->{i}{ok} ) {
+            if ( ! @{$sql->{aggr_cols}} ) {
+                return 0;
+            }
             return 1;
         }
     }
@@ -243,6 +258,9 @@ sub set {
             if ( $col_sep eq ' ' ) {
                 $sql->{set_stmt} = '';
             }
+            if ( ! length $sql->{set_stmt} ) {
+                return 0;
+            }
             return 1;
         }
         push @bu_col, [ $sql->{set_stmt}, [@{$sql->{set_args}}], $col_sep ];
@@ -284,9 +302,10 @@ sub where {
     my $unclosed = 0;
     my $count = 0;
     my @bu_col;
-    my $i = $sf->{o}{enable}{'expand_' . $clause};
-    my $menu_addition = $sf->{i}{menu_additions}[$i];
-    my @pre = ( undef, $sf->{i}{ok}, $i ? $menu_addition : () );
+    my @pre = ( undef, $sf->{i}{ok} );
+    if ( $sf->{o}{enable}{'expand_' . $clause} ) {
+        push @pre, $sf->{i}{menu_addition};
+    }
 
     COL: while ( 1 ) {
         my @choices = ( @cols );
@@ -315,11 +334,14 @@ sub where {
                 $sql->{where_stmt} .= " )";
                 $unclosed = 0;
             }
+            if ( ! length $sql->{where_stmt} ) {
+                return 0;
+            }
             return 1;
         }
-        if ( $quote_col eq $menu_addition ) {
+        if ( $quote_col eq $sf->{i}{menu_addition} ) {
             my $ext = App::DBBrowser::Table::Extensions->new( $sf->{i}, $sf->{o}, $sf->{d} );
-            my $complex_column = $ext->complex_unit( $sql, $clause );
+            my $complex_column = $ext->complex_unit( $sql, $clause, 0 );
             if ( ! defined $complex_column ) {
                 if ( @bu_col ) {
                     ( $sql->{where_stmt}, $sql->{where_args}, $AND_OR, $unclosed, $count ) = @{pop @bu_col};
@@ -388,9 +410,10 @@ sub group_by {
     $sql->{group_by_stmt} = "GROUP BY";
     $sql->{group_by_cols} = [];
     $sql->{select_cols} = [];
-    my $i = $sf->{o}{enable}{'expand_' . $clause};
-    my $menu_addition = $sf->{i}{menu_additions}[$i];
-    my @pre = ( undef, $sf->{i}{ok}, $menu_addition ? $menu_addition : () );
+    my @pre = ( undef, $sf->{i}{ok} );
+    if ( $sf->{o}{enable}{'expand_' . $clause} ) {
+        push @pre, $sf->{i}{menu_addition};
+    }
     my $menu = [ @pre, @{$sql->{cols}} ];
 
     GROUP_BY: while ( 1 ) {
@@ -420,11 +443,14 @@ sub group_by {
             else {
                 $sql->{group_by_stmt} = "GROUP BY " . join ', ', @{$sql->{group_by_cols}};
             }
+            if ( ! length $sql->{group_by_stmt} ) {
+                return 0;
+            }
             return 1;
         }
-        elsif ( $menu->[$idx[0]] eq $menu_addition ) {
+        elsif ( $menu->[$idx[0]] eq $sf->{i}{menu_addition} ) {
             my $ext = App::DBBrowser::Table::Extensions->new( $sf->{i}, $sf->{o}, $sf->{d} );
-            my $complex_column = $ext->complex_unit( $sql, $clause );
+            my $complex_column = $ext->complex_unit( $sql, $clause, 0 );
             if ( defined $complex_column ) {
                 push @{$sql->{group_by_cols}}, $complex_column;
             }
@@ -478,6 +504,9 @@ sub having {
             if ( $unclosed == 1 ) { # close an open parentheses automatically on OK
                 $sql->{having_stmt} .= ")";
                 $unclosed = 0;
+            }
+            if ( ! length $sql->{having_stmt} ) {
+                return 0;
             }
             return 1;
         }
@@ -543,9 +572,10 @@ sub order_by {
     my $clause = 'order_by';
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
-    my $i = $sf->{o}{enable}{'expand_' . $clause};
-    my $menu_addition = $sf->{i}{menu_additions}[$i];
-    my @pre = ( undef, $sf->{i}{ok}, $menu_addition ? $menu_addition : () );
+    my @pre = ( undef, $sf->{i}{ok} );
+    if ( $sf->{o}{enable}{'expand_' . $clause} ) {
+        push @pre, $sf->{i}{menu_addition};
+    }
     my @cols;
     if ( @{$sql->{aggr_cols}} || @{$sql->{group_by_cols}} ) {
         @cols = ( @{$sql->{group_by_cols}}, @{$sql->{aggr_cols}} );
@@ -576,11 +606,14 @@ sub order_by {
             if ( $col_sep eq ' ' ) {
                 $sql->{order_by_stmt} = '';
             }
+            if ( ! length $sql->{order_by_stmt} ) {
+                return 0;
+            }
             return 1;
         }
-        elsif ( $col eq $menu_addition ) {
+        elsif ( $col eq $sf->{i}{menu_addition} ) {
             my $ext = App::DBBrowser::Table::Extensions->new( $sf->{i}, $sf->{o}, $sf->{d} );
-            my $complex_column = $ext->complex_unit( $sql, $clause );
+            my $complex_column = $ext->complex_unit( $sql, $clause, 0 );
             if ( ! defined $complex_column ) {
                 if ( @bu ) {
                     ( $sql->{order_by_stmt}, $col_sep ) = @{pop @bu};
@@ -635,6 +668,9 @@ sub limit_offset {
             return;
         }
         if ( $choice eq $sf->{i}{ok} ) {
+            if ( ! length $sql->{limit_stmt} && ! length $sql->{offset_stmt} ) {
+                return 0;
+            }
             return 1;
         }
         push @bu, [ $sql->{limit_stmt}, $sql->{offset_stmt} ];

@@ -1,10 +1,10 @@
 {
    "abstract" : "Embed / expand oEmbed resources and other URL / links",
    "author" : [
-      "Bruno Ramos <brunoramos.lu@gmail.com>"
+      "Jan Henning Thorsen <jhthorsen@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -51,9 +51,9 @@
          "web" : "https://github.com/jhthorsen/linkembedder"
       }
    },
-   "version" : "1.19",
+   "version" : "1.20",
    "x_contributors" : [
       "Jan Henning Thorsen"
    ],
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

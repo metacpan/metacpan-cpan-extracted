@@ -9,7 +9,7 @@ use warnings;
 use Math::BigInt::Named;
 our @ISA = qw< Math::BigInt::Named >;
 
-our $VERSION = '0.04';
+our $VERSION = '0.07';
 
 sub name
   {
@@ -34,7 +34,6 @@ sub name
     {
     return $ret . $self->_triple($y,1,0);
     }
-  my $triple;
   while (!$y->is_zero())
     {
     ($y,$rem) = $y->bdiv(1000);
@@ -225,7 +224,7 @@ the same terms as Perl itself.
 
 =head1 SEE ALSO
 
-L<Math::BigInt::Named>, L<Math::BigIn> and L<Math::BigFloat>.
+L<Math::BigInt::Named>, L<Math::BigInt> and L<Math::BigFloat>.
 
 =head1 AUTHORS
 
@@ -237,7 +236,7 @@ L<Math::BigInt::Named>, L<Math::BigIn> and L<Math::BigFloat>.
 
 =item *
 
-Maintained by Peter John Acklam E<lt>pjacklam@gmail.com<gt>, 2016-.
+Maintained by Peter John Acklam E<lt>pjacklam@gmail.comE<gt>, 2016-.
 
 =back
 

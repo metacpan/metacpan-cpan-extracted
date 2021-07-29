@@ -1,3 +1,8 @@
+0.023   2021-07-20  Released-By: PERLANCAR; Urgency: medium
+
+	- Bump Test::Sah::Schema to 0.010.
+
+
 0.022   2020-11-13  Released-By: PERLANCAR; Urgency: medium
 
 	- Update prereq's new name: Require::Hook::DzilBuild ->

@@ -29,9 +29,9 @@ You shouldn't make instances of this class. Each attribute should be used as a n
 =head1 SYNOPSIS
 
     my $inspector = Paws->service('Inspector');
-    # Update assessment target
-    # Updates the assessment target that is specified by the ARN of the
-    # assessment target.
+  # Update assessment target
+  # Updates the assessment target that is specified by the ARN of the assessment
+  # target.
     $inspector->UpdateAssessmentTarget(
       'AssessmentTargetArn' =>
         'arn:aws:inspector:us-west-2:123456789012:target/0-nvgVhaxX',

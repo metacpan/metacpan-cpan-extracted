@@ -1,11 +1,21 @@
+1.09 2021-7-15
 
-Complete version history
-========================
+ * Sync with Math-BigInt distribution now that Math::BigInt->new("X") no longer
+   returns a NaN, but returns 0, just like CORE::hex("X").
 
-##############################################################################
-Math::Roman:
+ * Update Makefile.PL.
 
-2017-01-13 1.08 pjacklam
+ * Add MANIFEST.SKIP file based on the template in the ExtUtils-Manifest
+   distribution.
+
+ * Reorganize existing test files and add more test files.
+
+ * Add MANIFEST.SKIP file.
+
+ * Format CHANGES according to CPAN::Changes::Spec. Add test file
+   t/release-cpan-changes.t.
+
+1.08 2017-01-13 pjacklam
 
  * Change order of entries in CHANGES file (this file) to have newest entries
    at the top.
@@ -26,7 +36,7 @@ Math::Roman:
 
  * Add more references to CPAN in the POD.
 
-2004-03-12 1.07 Tels
+1.07 2004-03-12 Tels
 
  * require Math::BigInt v1.70 (v1.45 is now rather outdated)
 
@@ -35,26 +45,24 @@ Math::Roman:
 
  * add SIGNATURE
 
-2002-04-01 1.06 Tels (not released)
+1.06 2002-04-01 Tels (not released)
 
  * fixed roman() (Thanx to Richard Jelinek)
 
  * LXL is invalid (LX == 40 and is thus smaller than L (50))
 
-2001-11-08 1.05
+1.05 2001-11-08
 
  * made seperate package
 
-2001-05-07 1.04
+1.04 2001-05-07
 
  * got rid of C&P in overload section
 
-2001-04-14 1.03
+1.03 2001-04-14
 
  * fixed as_number() to return BigInt
 
-2001-02-17 1.02
+1.02 2001-02-17
 
  * require 5_005;
-
-Tels <http://bloodgate.com/>

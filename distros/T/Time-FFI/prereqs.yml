@@ -1,0 +1,18 @@
+runtime:
+  requires:
+    perl: '5.008001'
+    Carp: 0
+    Exporter: '5.57'
+    FFI::Platypus: '1.00'
+    Module::Runtime: 0
+    Time::Local: 0
+test:
+  requires:
+    Test2::V0: 0
+    Test::Needs: 0
+develop:
+  requires:
+    Time::Piece: '1.16'
+    Time::Moment: 0
+    Time::Moment::Role::TimeZone: 0
+    DateTime: 0

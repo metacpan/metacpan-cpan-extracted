@@ -11,7 +11,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_TOKENEXPIRED
 );
 
-our $VERSION = '2.0.10';
+our $VERSION = '2.0.12';
 
 extends qw(
   Lemonldap::NG::Portal::Main::Plugin
@@ -65,38 +65,50 @@ sub run {
     my $moduleOptions = $self->conf->{globalStorageOptions} || {};
     $moduleOptions->{backend} = $self->conf->{globalStorage};
 
-    my $sessions = $self->module->searchOn(
-        $moduleOptions,
-        $self->conf->{whatToTrace},
-        $req->{sessionInfo}->{ $self->conf->{whatToTrace} }
-    );
+    my $singleSessionRuleMatched =
+      $self->singleSessionRule->( $req, $req->sessionInfo );
+    my $singleIPRuleMatched = $self->singleIPRule->( $req, $req->sessionInfo );
+    my $singleUserByIPRuleMatched =
+      $self->singleUserByIPRule->( $req, $req->sessionInfo );
 
-    if ( $self->conf->{securedCookie} == 2 ) {
-        $self->logger->debug("Looking for double sessions...");
-        $linkedSessionId = $sessions->{ $req->id }->{_httpSession};
-        my $msg =
-          $linkedSessionId
-          ? "Linked session found -> $linkedSessionId / " . $req->id
-          : "NO linked session found!";
-        $self->logger->debug($msg);
-    }
+    if (   $singleSessionRuleMatched
+        or $singleIPRuleMatched
+        or $self->conf->{notifyOther} )
+    {
+        my $sessions = $self->module->searchOn(
+            $moduleOptions,
+            $self->conf->{whatToTrace},
+            $req->{sessionInfo}->{ $self->conf->{whatToTrace} }
+        );
 
-    foreach my $id ( keys %$sessions ) {
-        next if ( $req->id eq $id );
-        next if ( $linkedSessionId and $id eq $linkedSessionId );
-        my $session = $self->p->getApacheSession($id) or next;
-        if (
-            $self->singleSessionRule->( $req, $req->sessionInfo )
-            or (    $self->singleIPRule->( $req, $req->sessionInfo )
-                and $req->{sessionInfo}->{ipAddr} ne $session->data->{ipAddr} )
-          )
-        {
-            push @$deleted, $self->p->_sumUpSession( $session->data );
-            $self->p->_deleteSession( $req, $session, 1 );
+        if ( $self->conf->{securedCookie} == 2 ) {
+            $self->logger->debug("Looking for double sessions...");
+            $linkedSessionId = $sessions->{ $req->id }->{_httpSession};
+            my $msg =
+              $linkedSessionId
+              ? "Linked session found -> $linkedSessionId / " . $req->id
+              : "NO linked session found!";
+            $self->logger->debug($msg);
         }
-        else {
-            push @$otherSessions,  $self->p->_sumUpSession( $session->data );
-            push @otherSessionsId, $id;
+
+        foreach my $id ( keys %$sessions ) {
+            next if ( $req->id eq $id );
+            next if ( $linkedSessionId and $id eq $linkedSessionId );
+            my $session = $self->p->getApacheSession($id) or next;
+            if (
+                $self->singleSessionRule->( $req, $req->sessionInfo )
+                or (    $self->singleIPRule->( $req, $req->sessionInfo )
+                    and $req->{sessionInfo}->{ipAddr} ne
+                    $session->data->{ipAddr} )
+              )
+            {
+                push @$deleted, $self->p->_sumUpSession( $session->data );
+                $self->p->_deleteSession( $req, $session, 1 );
+            }
+            else {
+                push @$otherSessions, $self->p->_sumUpSession( $session->data );
+                push @otherSessionsId, $id;
+            }
         }
     }
 
@@ -106,7 +118,7 @@ sub run {
         }
     ) if @otherSessionsId;
 
-    if ( $self->singleUserByIPRule->( $req, $req->sessionInfo ) ) {
+    if ($singleUserByIPRuleMatched) {
         my $sessions =
           $self->module->searchOn( $moduleOptions, 'ipAddr',
             $req->sessionInfo->{ipAddr} );

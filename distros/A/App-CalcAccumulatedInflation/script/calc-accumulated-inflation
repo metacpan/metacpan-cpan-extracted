@@ -6,7 +6,7 @@
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2021-04-01'; # DATE
 our $DIST = 'App-CalcAccumulatedInflation'; # DIST
-our $VERSION = '0.050'; # VERSION
+our $VERSION = '0.051'; # VERSION
 
 use 5.010001;
 use strict;
@@ -21,7 +21,7 @@ my $cmdline = Perinci::CmdLine::Any->new(
 
 $cmdline->run;
 
-# ABSTRACT: Calculate accumulated inflation over the years
+# ABSTRACT: Calculate accumulated inflation (or savings rate, etc) over the years
 # PODNAME: calc-accumulated-inflation
 
 __END__
@@ -32,11 +32,11 @@ __END__
 
 =head1 NAME
 
-calc-accumulated-inflation - Calculate accumulated inflation over the years
+calc-accumulated-inflation - Calculate accumulated inflation (or savings rate, etc) over the years
 
 =head1 VERSION
 
-This document describes version 0.050 of calc-accumulated-inflation (from Perl distribution App-CalcAccumulatedInflation), released on 2021-04-01.
+This document describes version 0.051 of calc-accumulated-inflation (from Perl distribution App-CalcAccumulatedInflation), released on 2021-04-01.
 
 =head1 SYNOPSIS
 
@@ -69,6 +69,22 @@ See accumulated 6%/year inflation for 10 years:
  | 1.7908 | 10   |
  +--------+------+
 
+See accumulated 5.5%/year inflation for 7 years:
+
+ % calc-accumulated-inflation --yearly-rate 5.5 --years 7
+ +--------+------+
+ | index  | year |
+ +--------+------+
+ | 1      | 0    |
+ | 1.0550 | 1    |
+ | 1.1130 | 2    |
+ | 1.1742 | 3    |
+ | 1.2388 | 4    |
+ | 1.3070 | 5    |
+ | 1.3788 | 6    |
+ | 1.4547 | 7    |
+ +--------+------+
+
 Indonesia's inflation rate for 2003-2014:
 
  % calc-accumulated-inflation --rates 5.16,6.4,17.11,6.6,6.59,11.06,2.78,6.96,3.79,4.3,8.38,8.36
@@ -90,11 +106,31 @@ Indonesia's inflation rate for 2003-2014:
  | 2.3110 | 8.36%  | 12   |
  +--------+--------+------+
 
+How much will your $100,000 grow over the next 10 years, if the savings rate is 4%; assuming this year is 2021:
+
+ % calc-accumulated-inflation --base-index 100000 --base-year 2021 --yearly-rate 4 --years 10
+ +-------------+------+
+ | index       | year |
+ +-------------+------+
+ | 100000      | 2021 |
+ | 104000.0000 | 2022 |
+ | 108160.0000 | 2023 |
+ | 112486.4000 | 2024 |
+ | 116985.8560 | 2025 |
+ | 121665.2902 | 2026 |
+ | 126531.9018 | 2027 |
+ | 131593.1779 | 2028 |
+ | 136856.9050 | 2029 |
+ | 142331.1812 | 2030 |
+ | 148024.4285 | 2031 |
+ +-------------+------+
+
 =head1 DESCRIPTION
 
 This routine generates a table of accumulated inflation over a period of several
 years. You can either specify a fixed rate for every years (C<yearly_rate>), or
-specify each year's rates (C<rates>).
+specify each year's rates (C<rates>). You can also optionally set base index
+(default to 1) and base year (default to 0).
 
 =head1 OPTIONS
 

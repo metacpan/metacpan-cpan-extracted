@@ -45,6 +45,8 @@ can_ok(
         Issues
 		PropertyId
 		Warranties
+        IsDeleted
+        IsNotManaged
     /,
 );
 

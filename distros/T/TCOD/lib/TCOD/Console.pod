@@ -1,0 +1,697 @@
+=encoding UTF-8
+
+=head1 NAME
+
+TCOD::Console - Terminal emulator for rendering game screens
+
+=head1 SYNOPSIS
+
+    use TCOD;
+
+    TCOD::Console::init_root( 10, 10, 'Test', 0, TCOD::RENDERER_SDL );
+
+    my $start = TCOD::Console->new( 10, 10 );
+    $start->print( 1, 1, 'X' );
+
+    my $end = TCOD::Console->new( 10, 10 );
+    $end->print( 8, 8, 'X' );
+
+    for ( 1 .. 255 ) {
+        $start->blit( alpha => 1,       );
+        $end->blit(   alpha => $_ / 255 );
+        TCOD::Console::flush;
+
+        TCOD::Sys::sleep_milli(5);
+    }
+
+=head1 DESCRIPTION
+
+This class represents a terminal emulator for rendering text-based games.
+
+=head1 METHODS
+
+=head2 new
+
+    $console = TCOD::Console->new( $width, $height );
+
+You can create as many off-screen consoles as you want by using this function.
+You can draw on them as you would do with the root console, but you cannot
+flush them to the screen. Else, you can blit them on other consoles, including
+the root console. See L<blit|/blit>.
+
+This function returns a TCOD::Console object that can be used as a target in
+most console drawing functions.
+
+=head2 from_file
+
+    $console = TCOD::Console->from_file( $path );
+
+You can create an off-screen console from a C<.asc> or C<.apf> file created
+with ASCII Paint with this constructor
+
+=head2 save_asc
+
+    $bool = $console->save_asc( $path );
+
+You can save data from a console to ASCII Paint format with this function.
+The function returns false if it couldn't write the file. This is the only
+ASC function that works also with the root console!
+
+=head2 save_apf
+
+    $bool = $console->save_apf( $path );
+
+You can save data from a console to ASCII Paint format with this function.
+The function returns false if it couldn't write the file. This is the only
+ASC function that works also with the root console!
+
+=head2 blit
+
+    $console->blit(
+        src_x     => $source_x         // 0,
+        src_y     => $source_y         // 0,
+        width     => $source_width     // 0,
+        height    => $source_height    // 0,
+        dest      => $target,
+        dest_x    => $target_x         // 0,
+        dest_y    => $target_y         // 0,
+        fg_alpha  => $foreground_alpha // 1,
+        bg_alpha  => $background_alpha // 1,
+        alpha     => $default_alpha    // 1,
+        key_color => $key_color,
+    );
+
+This function allows you to blit a rectangular area of the source console at
+a specific position on a destination console. It can also simulate alpha
+transparency with foreground and background alpha parameters.
+
+By default, it will blit the entire source console onto the destination
+console at its origin, with full opacity.
+
+The value in the C<alpha> parameter is there as a convenience, and only used
+to set the default value for C<fg_alpha> and C<bg_alpha> if these are not set.
+It is useful for when both values are the same.
+
+If C<key_color> is set to a L<TCOD::Color> object, cells of this color in the
+source console will I<not> be printed on the target console. This can be used
+to blit only some parts of the console.
+
+=head2 clear
+
+    $console->clear(
+        fg => $foreground_color,
+        bg => $background_color,
+        ch => $char_code,
+    );
+
+Reset all the cells in a console.
+
+After calling this method, the color in all cells will be set to the ones
+specified in C<fg> for the foreground, and C<bg> for the background, and their
+character to the one set in C<ch>.
+
+The C<fg> and C<bg> parameters will default to the console's foreground and
+background colours respectively. The C<ch> parameters will default to the ASCII
+code of a blank space (32).
+
+=head2 print
+
+    $console->print( $x, $y, $string, %rest );
+    $console->print(
+        x         => $x,
+        y         => $y,
+        string    => $string,
+        fg        => $fg_color,
+        bg        => $bg_color,
+        bg_blend  => $flag      // TCOD::BKGND_SET,
+        alignment => $alignment // TCOD::LEFT,
+    );
+
+Print a string on a console with manual line breaks.
+
+The C<x> and C<y> parameters specify, in tile coordinates, the position
+of the start of the string. The C<string> parameter will be internally
+encoded as UTF-8 before printing.
+
+The behaviour of the background can be controlled with the C<bg_blend>
+parameter, which must be a value in the L<BackgroundFlag|TCOD/BackgroundFlag>
+enum.
+
+The alignment of the text can be set with the C<alignment> parameter,
+which must be a value in the L<Alignment|TCOD/Alignment> enum.
+
+This function accepts named parameters, but the C<x>, C<y>, and C<string>
+parameters may also be passed as the first three positional parameters in
+that order.
+
+=head2 print_box
+
+    $height = $console->print_box(
+        x         => $x,
+        y         => $y,
+        width     => $width,
+        height    => $height,
+        string    => $string,
+        fg        => $fg_color,
+        bg        => $bg_color,
+        bg_blend  => $flag      // TCOD::BKGND_SET,
+        alignment => $alignment // TCOD::LEFT,
+    );
+
+Print a string constrained to a rectangle and return the height.
+
+The C<x> and C<y> determine the starting tile, with C<0, 0> as the
+upper-left corner of the console. The size of the frame is determined
+by the C<width> and C<height> parameters, in tiles. The C<string>
+parameter will be internally encoded as UTF-8 before printing.
+
+The foreground and background colors are set with C<fg> and C<bg>
+respectively. If set, they should be set to L<TCOD::Color> objects.
+If none are provided, the colors will remain unchanged.
+
+The behaviour of the background can be controlled with the C<bg_blend>
+parameter, which must be a value in the L<BackgroundFlag|TCOD/BackgroundFlag>
+enum.
+
+The alignment of the text can be set with the C<alignment> parameter,
+which must be a value in the L<Alignment|TCOD/Alignment> enum.
+
+Returns the actual height of the printed area.
+
+=head2 draw_frame
+
+    $console->draw_frame(
+        x          => $x,
+        y          => $y,
+        decoration => $decoration // ..., # See below
+        fg         => $fg_color,
+        bg         => $bg_color,
+        bg_blend   => $flag       // TCOD::BKGND_SET,
+        clear      => $clear      // 1,
+    );
+
+Draw a framed rectangle.
+
+The C<x> and C<y> determine the starting tile, with C<0, 0> as the
+upper-left corner of the console. The size of the frame is determined
+by the C<width> and C<height> parameters, in tiles.
+
+If C<clear> is set to a true value, the region inside the frame will be
+cleared. This is the default.
+
+The foreground and background colors are set with C<fg> and C<bg>
+respectively. If set, they should be set to L<TCOD::Color> objects.
+If none are provided, the colours will remain unchanged.
+
+The behaviour of the background can be controlled with the C<bg_blend>
+parameter, which must be a value in the L<BackgroundFlag|TCOD/BackgroundFlag>
+enum.
+
+The value in C<decoration> is a sequence of glyphs to use for rendering
+the borders. This can either be a string with 9 characters, or an array
+reference with 9 values, each of which should be a single character
+arranged in row-major order. If none is set, the default value will use
+the following glyphs:
+
+    ┌─┐│ │└─┘
+
+To print a title on the frame, call this function, and then use
+L<print_box|/print_box> to print your title on top, constrained to the
+right dimensions.
+
+=head2 draw_rect
+
+    $console->draw_rect(
+        x        => $x,
+        y        => $y,
+        width    => $width,
+        height   => $height,
+        ch       => $char_code,
+        fg       => $fg_color,
+        bg       => $bg_color,
+        bg_blend => $flag // TCOD::BKGND_SET,
+    );
+
+Draw characters and colors over a rectangular region.
+
+The C<x> and C<y> determine the starting tile, with C<0, 0> as the
+upper-left corner of the console. The size of the frame is determined
+by the C<width> and C<height> parameters, in tiles.
+
+If C<ch> is set to a non-zero integer value, the rectangle will be filled
+with the character that integer represents. Setting it to 0 will leave
+the characters as they were.
+
+The foreground and background colors are set with C<fg> and C<bg>
+respectively. If set, they should be set to L<TCOD::Color> objects.
+If none are provided, the colors will remain unchanged.
+
+The behaviour of the background can be controlled with the C<bg_blend>
+parameter, which must be a value in the L<BackgroundFlag|TCOD/BackgroundFlag>
+enum.
+
+=head2 get_width
+
+    $width = $console->get_width;
+
+Get the width of the console.
+
+=head2 get_height
+
+    $height = $console->get_height;
+
+Get the height of the console.
+
+=head2 set_background_flag
+
+    $console->set_background_flag( $flag );
+
+Set the background mode for the console. The value of C<$flag> should be a
+member of the L<BackgroundFlag|TCOD/BackgroundFlag> enum, determines how the
+background color is modified.
+
+=head2 get_background_flag
+
+    $flag = $console->get_background_flag;
+
+Get the console's default background flag. It will be a value from the
+L<BackgroundFlag|TCOD/BackgroundFlag> enum.
+
+=head2 set_alignment
+
+    $console->set_alignment( $alignment );
+
+Set the alignment for the console. The value of C<$alignment> should be a
+member of the L<Alignment|TCOD/Alignment> enum.
+
+=head2 get_alignment
+
+    $alignment = $console->get_alignment;
+
+Get the console's default alignment flag. It will be a value from the
+L<Alignment|TCOD/Alignment> enum.
+
+=head2 set_char_background
+
+    $console->set_char_background( $x, $y, $color, $flag );
+
+Set the background color of a cell, leaving other properties (foreground color
+and ASCII code) unchanged. The value of C<$flag>, which should be a member of
+the L<BackgroundFlag|TCOD/BackgroundFlag> enum, determines how the background
+color is modified.
+
+=head2 get_char_background
+
+    $color = $console->get_char_background( $x, $y );
+
+Get the background color of a cell.
+
+=head2 set_char_foreground
+
+    $console->set_char_foreground( $x, $y, $color, $flag );
+
+Set the foreground color of a cell, leaving other properties (background color
+and ASCII code) unchanged. The value of C<$flag>, which should be a member of
+the L<BackgroundFlag|TCOD/BackgroundFlag> enum, determines how the background
+color is modified.
+
+=head2 get_char_foreground
+
+    $color = $cosole->get_char_foreground( $x, $y );
+
+Get the foreground color of a cell.
+
+=head2 set_default_background
+
+    $console->set_default_background( $color );
+
+Change the default background color for a console. This is used by several of
+the drawing functions described in this document.
+
+=head2 get_default_background
+
+    $color = $console->get_default_background;
+
+Get the default background color for a console. This is used by several of
+the drawing functions described in this document.
+
+=head2 set_default_foreground
+
+    $console->set_default_foreground( $color );
+
+Change the default foreground color for a console. This is used by several of
+the drawing functions described in this document.
+
+=head2 get_default_foreground
+
+    $color = $console->get_default_foreground;
+
+Get the default foreground color for a console. This is used by several of
+the drawing functions described in this document.
+
+=head2 set_char
+
+    $console->set_char( $x, $y, $char_code );
+
+Set the character at the specified coordinate to the specified character
+without changing its colors.
+
+The character is passed as an integer code, like one returned by C<ord>
+or one of the values in the L<Char|TCOD/Char> enum.
+
+=head2 get_char
+
+    $char_code = $console->get_char( $x, $y );
+
+Return the character at the specified position in the console.
+
+The character is returned as an integer code, like one returned by C<ord>
+or one of the values in the L<Char|TCOD/Char> enum.
+
+=head2 put_char
+
+    $console->put_char( $x, $y, $char_code, $background_flag );
+
+Draw a character on a console using the default colors.
+
+The character is passed as an integer code, like one returned by C<ord>
+or one of the values in the L<Char|TCOD/Char> enum.
+
+The value in C<$background_flag> determines the behaviour of the background,
+and should be one of the values in the L<BackgroundFlag|TCOD/BackgroundFlag>
+enum.
+
+=head2 put_char_ex
+
+    $console->put_char_ex(
+        $x,
+        $y,
+        $char_code,
+        $foreground_color,
+        $background_color,
+    );
+
+Draw a character on a console using the default colors.
+
+The character is passed as an integer code, like one returned by C<ord>
+or one of the values in the L<Char|TCOD/Char> enum.
+
+=head2 get_height_rect
+
+    $height = $console->get_height_rect(     $x, $y, $w, $h, $string );
+    $height = $console->get_height_rect_utf( $x, $y, $w, $h, $string );
+
+Returns the expected height of an auto-wrapped string without actually printing
+the string with one of the L<print_rect> family of functions.
+
+=head1 FUNCTIONS
+
+=head2 init_root
+
+    TCOD::Console::init_root(
+        $width,
+        $height,
+        $title,
+        $fullscreen,
+        $renderer,
+    );
+
+Initialise the global game window.
+
+The width and height parameters specify the dimensions of the screen in
+characters. The size of the window in pixels will depend on the font used.
+The default font uses characters that are 8x8 pixels. See
+L<set_custom_font|/set_custom_font> for how to change this font after
+creation.
+
+The title will be displayed on top of the window, except when in fullscreen
+mode. See L<set_window_title|/set_window_title> for how to change this after
+creation.
+
+The window will be created in fullscreen if the value of C<$fullscreen> is
+true. See L<set_fullscreen|/set_fullscreen> and
+L<is_fullscreen|/is_fullscreen> for ways to modify this after creation.
+
+The renderer will be one of the elements of the L<Renderer|TCOD/Renderer>
+enum. If you select a renderer that is not supported by the player's machine,
+the underlying library will scan the lower renderers until it finds a working
+one.
+
+On recent video cards, GLSL (enabled with C<TCOD::RENDERER_GLSL>) results in
+up to 900% increase of framerates in the true color sample compared to SDL
+renderer.
+
+Whatever renderer you use, it can always be overridden by the player through
+the C<libtcod.cfg> file.
+
+You can dynamically change the renderer after calling this function with
+L<TCOD::Sys::set_renderer|TCOD::Sys/set_renderer>. You can also read the
+current renderer with L<TCOD::Sys::get_renderer|TCOD::Sys/get_renderer>. This
+might be different from the one you set when calling this function in case
+it's not supported on the player's computer.
+
+=head2 set_custom_font
+
+    TCOD::Console::set_custom_font(
+        $string,
+        $flags,
+        $horizontal_chars,
+        $vertical_chars,
+    );
+
+This function allows you to use a bitmap font (PNG or BMP) with custom
+character size or layout.
+
+It should be called before initialising the root console with
+L<init_root|/init_root>.
+
+Once this function is called, you can define your own custom mappings using
+mapping functions
+
+The value in C<$flags> will be a combination of a layout and a type from the
+L<FontFlag|TCOD/FontFlag> enum. The last two parameters determine the number
+of characters in the font along both axes. If set to 0, these will be deduced
+from the layout flag.
+
+=head2 map_ascii_code_to_font
+
+    TCOD::Console::map_ascii_code_to_font( $code, $x, $y );
+
+Maps a single ASCII code to a character in the current font.
+
+=head2 map_ascii_codes_to_font
+
+    TCOD::Console::map_ascii_codes_to_font(
+        $range_start,
+        $range_length,
+        $x,
+        $y,
+    );
+
+Maps consecutive ASCII codes to characters in the current font. The
+coordinate provided (in characters) corresponds to the first character in
+the range.
+
+=head2 map_string_to_font
+
+    TCOD::Console::map_string_to_font( $string, $x, $y );
+
+Maps the ASCII codes in a string to consecutive characters in the current
+font. The coordinate provided (in characters) corresponds to the first
+character in the range.
+
+=head2 is_fullscreen
+
+    TCOD::Console::is_fullscreen;
+
+Returns true if the current mode is fullscreen.
+
+=head2 set_fullscreen
+
+    TCOD::Console::set_fullscreen( $bool );
+
+Enable or disable fullscreen mode.
+
+=head2 set_window_title
+
+    TCOD::Console::set_window_title( $title );
+
+This function dynamically changes the title of the game window.
+
+=head2 is_window_closed
+
+    $bool = TCOD::Console::is_window_closed;
+
+When you start the program, this returns false. Once a "close window"
+event has been sent by the window manager, it will always return true.
+You're supposed to cleanly exit the game.
+
+=head2 has_mouse_focus
+
+    $bool = TCOD::Console::has_mouse_focus;
+
+Returns true if the mouse cursor is inside the game window area and the
+game window is the active application.
+
+=head2 is_active
+
+    $bool = TCOD::Console::is_active;
+
+Returns false if the game window is not the active window or is iconified.
+
+=head2 credits
+
+    TCOD::Console::credits;
+
+Render a credits screen with the message "Powered by libtcod C<$VERSION>",
+with the current libtcod version you are running. This can be shown during
+startup by calling after L<init_root|/init_root>.
+
+The credits screen can be skipped by pressing any key.
+
+=head2 credits_render
+
+    $bool = TCOD::Console::credits_render( $x, $y, $alpha );
+
+Render the credits message on top of an existing screen at the specified
+coordinates. If C<$alpha> is set to a true value, the credits will be
+rendered transparently on the existing screen. For this to work, this
+function must be called between your screen rendering code and the console
+L<flush|/flush>.
+
+Returns true when the credits screen is finished.
+
+=head2 credits_reset
+
+    TCOD::Console::credits_reset;
+
+When using L<credits_render>, you can restart the credits animation from
+the beginning before it's finished by calling this function.
+
+=head2 flush
+
+    TCOD::Console::flush;
+
+Once the root console is initialised, you can use one of the printing
+functions to change the background colors, the foreground colors or the
+ASCII characters on the console.
+
+Once you've finished rendering the root console, you have to actually
+apply the updates to the screen with this function.
+
+=head2 set_fade
+
+    TCOD::Console::set_fade( $fade, $color );
+
+This function defines the fading parameters, allowing you to fade the game
+screen to/from a color. Once they are defined, the fading parameters are
+valid until changed (with another call to this function). You don't have to
+call this function for each rendered frame.
+
+=head2 get_fade
+
+    $fade = TCOD::Console::get_fade;
+
+Get the current fade amount. See L<set_fade|/set_fade> for how this is set.
+
+=head2 get_fading_color
+
+    $color = TCOD::Console::get_fading_color;
+
+Get the current fade color. See L<set_fade|/set_fade> for how this is set.
+
+=head2 set_color_control
+
+    TCOD::Console::set_color_control(
+        $code,
+        $foreground_color,
+        $background_color,
+    );
+
+If you want to draw a string using different colors for each word, the basic
+solution is to call a string printing function several times, changing the
+default colors between each call.
+
+An arguably simpler way to do this is to use "color control codes" in your
+string, which allows you to draw a string using different colors in a single
+call.
+
+A color control code is associated with a foreground and background color set.
+If you insert this code in your string, the next characters will use the
+colors associated with the color control code.
+
+There are 5 predefined color control codes:
+
+=over
+
+=item * TCOD::COLCTRL_1
+
+=item * TCOD::COLCTRL_2
+
+=item * TCOD::COLCTRL_3
+
+=item * TCOD::COLCTRL_4
+
+=item * TCOD::COLCTRL_5
+
+=back
+
+This function allows you to associate a control code to a color set.
+
+To go back to the console's default colors, insert in your string the color
+stop control code: C<TCOD::COLCTRL_STOP>.
+
+You can also use any color without assigning it to a control code, using the
+generic control codes: C<TCOD::COLCTRL_FORE_RGB> and C<TCOD::COLCTRL_BACK_RGB>.
+
+These controls respectively change the foreground and background color used to
+print the string characters. In the string, you must insert the red, green,
+and blue components of the color as numbers between 1 and 255 immediately
+after this code. Note that using 0 in this context is not allowed, because it
+represents the end of the string in C/C++.
+
+=head2 check_for_keypress
+
+    # Deprecated
+    $key = TCOD::Console::check_for_keypress( $mask );
+
+Return immediately with a L<TCOD::Key> populated with data from a recently
+pressed key.
+
+The current recommendation, however, is to use SDL functions directly to check
+the keyboard state. Consider that option if available.
+
+=head2 is_key_pressed
+
+    # Deprecated
+    $bool = TCOD::Console::is_key_pressed( $keycode );
+
+Given a keycode from the L<Keycode|TCOD/Keycode> enum, this function returns
+true if the key is currently pressed.
+
+A better way to check for user input is to use
+L<TCOD::Sys::check_for_event|TCOD::Sys/check_for_event>.
+
+The current best recommendation, however, is to use SDL functions directly to
+check the keyboard state. Consider that option if available.
+
+=head1 SEE ALSO
+
+=over
+
+=item L<TCOD>
+
+=item L<TCOD::Key>
+
+=item L<TCOD::Color>
+
+=item L<TCOD::Image>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2021 José Joaquín Atria
+
+This library is free software; you can redistribute it and/or modify it under
+the Artistic License 2.0.

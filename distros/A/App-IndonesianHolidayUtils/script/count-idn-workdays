@@ -1,0 +1,216 @@
+#!perl
+
+# Note: This script is a CLI for Riap function /Calendar/Indonesia/Holiday/count_idn_workdays
+# and generated automatically using Perinci::CmdLine::Gen version 0.499
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-07-24'; # DATE
+our $DIST = 'App-IndonesianHolidayUtils'; # DIST
+our $VERSION = '0.064'; # VERSION
+
+use 5.010001;
+use strict;
+use warnings;
+
+use Perinci::CmdLine::Any;
+
+my $cmdline = Perinci::CmdLine::Any->new(
+    url => "/Calendar/Indonesia/Holiday/count_idn_workdays",
+    program_name => "count-idn-workdays",
+    read_config => 0,
+    read_env => 0,
+);
+
+$cmdline->run;
+
+# ABSTRACT: Count working days (non-holiday business days) for a certain period
+# PODNAME: count-idn-workdays
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+count-idn-workdays - Count working days (non-holiday business days) for a certain period
+
+=head1 VERSION
+
+This document describes version 0.064 of count-idn-workdays (from Perl distribution App-IndonesianHolidayUtils), released on 2021-07-24.
+
+=head1 SYNOPSIS
+
+Usage:
+
+% B<count-idn-workdays> [B<--format>=I<name>|B<--json>] [B<--(no)naked-res>] [B<--observe-joint-leaves>|B<-j>|B<--no-observe-joint-leaves>|B<--noobserve-joint-leaves>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] [B<--work-saturdays>|B<--no-work-saturdays>|B<--nowork-saturdays>] -- [I<start_date>] [I<end_date>]
+
+=head1 DESCRIPTION
+
+Working day is defined as day that is not Saturday*/Sunday/holiday/joint leave
+days*. If work_saturdays is set to true, Saturdays are also counted as working
+days. If observe_joint_leaves is set to false, joint leave days are also counted
+as working days.
+
+Contains data from years 1990 to 2021
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Main options
+
+=over
+
+=item B<--end-date>=I<s>
+
+End date.
+
+Defaults to end of current month. Either a string in the form of "YYYY-MM-DD",
+or a DateTime object, is accepted.
+
+
+Can also be specified as the 2nd command-line argument.
+
+=item B<--no-observe-joint-leaves>, B<-j>
+
+=item B<--start-date>=I<s>
+
+Starting date.
+
+Defaults to start of current month. Either a string in the form of "YYYY-MM-DD",
+or a DateTime object, is accepted.
+
+
+Can also be specified as the 1st command-line argument.
+
+=item B<--work-saturdays>
+
+If set to 1, Saturday is a working day.
+
+=back
+
+=head2 Output options
+
+=over
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--naked-res>
+
+When outputing as JSON, strip result envelope.
+
+Default value:
+
+ 0
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+    [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+`--naked-res` so you just get:
+
+    [1,2,3]
+
+
+=item B<--page-result>
+
+Filter output through a pager.
+
+=item B<--view-result>
+
+View output using a viewer.
+
+=back
+
+=head2 Other options
+
+=over
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C count-idn-workdays count-idn-workdays
+
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete count-idn-workdays 'p/*/`count-idn-workdays`/'
+
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install L<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install L<shcompgen> as described above.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-IndonesianHolidayUtils>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-IndonesianHolidayUtils>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-IndonesianHolidayUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2021, 2016, 2015 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

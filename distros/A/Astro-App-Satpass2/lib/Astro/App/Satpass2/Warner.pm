@@ -8,7 +8,7 @@ use warnings;
 use Astro::App::Satpass2::Locale qw{ __message };
 use Astro::App::Satpass2::Utils qw{ @CARP_NOT };
 
-our $VERSION = '0.047';
+our $VERSION = '0.048';
 
 sub new {
     my ( $class, @arg ) = @_;
@@ -27,6 +27,8 @@ sub new {
 sub wail {
     my ($self, @args) = @_;
     my $msg = __message( @args );
+    ref $msg
+	and die $msg;
     chomp $msg;
     if ($self->warning()) {
 	$msg =~ m/[.?!]\z/msx or $msg .= '.';
@@ -59,6 +61,11 @@ sub weep {
 sub whinge {
     my ($self, @args) = @_;
     my $msg = __message( @args );
+    ref $msg
+	and do {
+	warn $msg;
+	return;
+    };
     chomp $msg;
     if ($self->warning()) {
 	$msg =~ m/ [.?!] \z /msx or $msg .= '.';

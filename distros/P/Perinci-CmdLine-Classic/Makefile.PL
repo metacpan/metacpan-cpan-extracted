@@ -42,7 +42,7 @@ my %WriteMakefileArgs = (
     "Perinci::CmdLine::Base" => "1.816",
     "Perinci::Object" => "0.311",
     "Perinci::Result::Format" => "0.42",
-    "Perinci::Sub::To::CLIDocData" => "0.294",
+    "Perinci::Sub::To::CLIDocData" => "0.298",
     "Perinci::Sub::Wrapper" => "0.83",
     "Progress::Any" => "0.219",
     "Progress::Any::Output" => 0,
@@ -64,7 +64,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "0.98",
     "Test::Perinci::CmdLine" => "1.480"
   },
-  "VERSION" => "1.814",
+  "VERSION" => "1.815",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -93,7 +93,7 @@ my %FallbackPrereqs = (
   "Perinci::CmdLine::Base" => "1.816",
   "Perinci::Object" => "0.311",
   "Perinci::Result::Format" => "0.42",
-  "Perinci::Sub::To::CLIDocData" => "0.294",
+  "Perinci::Sub::To::CLIDocData" => "0.298",
   "Perinci::Sub::Wrapper" => "0.83",
   "Progress::Any" => "0.219",
   "Progress::Any::Output" => 0,

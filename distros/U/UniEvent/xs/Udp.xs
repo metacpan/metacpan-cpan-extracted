@@ -152,13 +152,13 @@ void Udp::set_ttl (int ttl) {
 
 size_t Udp::send_queue_size ()
 
-void Udp::recv_buffer_size (Simple newval = Simple()) {
-    if (newval) XSRETURN_EXPECTED(THIS->recv_buffer_size(newval));
+void Udp::recv_buffer_size (Scalar newval = Scalar()) {
+    if (newval) XSRETURN_EXPECTED(THIS->recv_buffer_size(newval.number()));
     else        XSRETURN_EXPECTED(THIS->recv_buffer_size());
 }
 
-void Udp::send_buffer_size (Simple newval = Simple()) {
-    if (newval) XSRETURN_EXPECTED(THIS->send_buffer_size(newval));
+void Udp::send_buffer_size (Scalar newval = Scalar()) {
+    if (newval) XSRETURN_EXPECTED(THIS->send_buffer_size(newval.number()));
     else        XSRETURN_EXPECTED(THIS->send_buffer_size());
 }
 

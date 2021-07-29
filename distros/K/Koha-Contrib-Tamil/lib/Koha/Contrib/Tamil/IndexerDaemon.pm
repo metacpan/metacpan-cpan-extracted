@@ -1,6 +1,6 @@
 package Koha::Contrib::Tamil::IndexerDaemon;
 # ABSTRACT: Class implementing a Koha records indexer daemon
-$Koha::Contrib::Tamil::IndexerDaemon::VERSION = '0.065';
+$Koha::Contrib::Tamil::IndexerDaemon::VERSION = '0.066';
 use Moose;
 
 use 5.010;
@@ -109,7 +109,7 @@ Koha::Contrib::Tamil::IndexerDaemon - Class implementing a Koha records indexer 
 
 =head1 VERSION
 
-version 0.065
+version 0.066
 
 =head1 SYNOPSIS
 
@@ -152,7 +152,7 @@ Frédéric Demians <f.demians@tamil.fr>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Fréderic Démians.
+This software is Copyright (c) 2021 by Fréderic Démians.
 
 This is free software, licensed under:
 

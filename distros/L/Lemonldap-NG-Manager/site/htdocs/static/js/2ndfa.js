@@ -150,7 +150,7 @@
       $scope.displaySession = function(scope) {
         var sessionId, transformSession;
         transformSession = function(session) {
-          var _insert, _stToStr, array, arrayDate, attr, attrs, category, epoch, i, id, k, key, len, len1, name, pattern, res, sfDevice, subres, time, title, value;
+          var _insert, _stToStr, array, arrayDate, attr, attrs, category, epoch, i, k, key, len, len1, name, pattern, res, sfDevice, subres, time, title, value;
           _stToStr = function(s) {
             return s;
           };
@@ -176,7 +176,6 @@
             }
           };
           time = session._utime;
-          id = session._session_id;
           for (key in session) {
             value = session[key];
             if (!value) {
@@ -256,14 +255,14 @@
           }
           return {
             _utime: time,
-            id: id,
             nodes: res
           };
         };
         $scope.currentScope = scope;
         sessionId = scope.$modelValue.session;
         $http.get(scriptname + "sfa/" + sessionType + "/" + sessionId).then(function(response) {
-          return $scope.currentSession = transformSession(response.data);
+          $scope.currentSession = transformSession(response.data);
+          return $scope.currentSession.id = sessionId;
         });
         return $scope.showT = false;
       };

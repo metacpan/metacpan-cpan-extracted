@@ -10,9 +10,12 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_SAML_LOAD_SERVICE_ERROR
 );
 
-our $VERSION = '2.0.5';
+our $VERSION = '2.0.12';
 
-extends 'Lemonldap::NG::Common::Module', 'Lemonldap::NG::Portal::Lib::SAML';
+extends qw(
+  Lemonldap::NG::Common::Module
+  Lemonldap::NG::Portal::Lib::SAML
+);
 
 # INITIALIZATION
 
@@ -23,6 +26,7 @@ sub init {
     $self->lassoServer(
         $self->p->loadedModules->{'Lemonldap::NG::Portal::Auth::SAML'}
           ->lassoServer );
+
     return 1;
 }
 
@@ -30,11 +34,11 @@ sub init {
 
 # Does nothing
 sub getUser {
-    PE_OK;
+    return PE_OK;
 }
 
 sub findUser {
-    PE_OK;
+    return PE_OK;
 }
 
 # Get all required attributes
@@ -179,12 +183,12 @@ sub setSessionInfo {
     # Restore current Lasso::Server
     $self->lassoServer = $current_server;
 
-    PE_OK;
+    return PE_OK;
 }
 
 # Does nothing
 sub setGroups {
-    PE_OK;
+    return PE_OK;
 }
 
 1;

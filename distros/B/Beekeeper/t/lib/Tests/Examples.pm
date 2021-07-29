@@ -14,10 +14,6 @@ use IPC::Open3;
 my $VERBOSE = $ENV{'HARNESS_IS_VERBOSE'};
 
 
-sub automated_testing {
-    return ($ENV{'AUTOMATED_TESTING'} || $ENV{'PERL_BATCH'}) ? 1 : 0;
-}
-
 sub run_cmd {
     my ($self, @cmds) = @_;
 
@@ -78,14 +74,15 @@ sub check_01_supported_os : Test(startup => 1) {
     ok( 1, "Supported OS ($^O)");
 }
 
-sub check_02_automated_testing : Test(startup => 1) {
+sub check_02_author_testing : Test(startup => 1) {
     my ($self) =  @_;
 
-    if ($self->automated_testing) {
-        $self->SKIP_ALL("This test does not run reliably on constrained platforms");
+    unless ($ENV{'AUTHOR_TESTING'}) {
+        # Fiddling with shell stdin/stdout makes test fail when run by cpanm or dzil
+        $self->SKIP_ALL("This test fails when run by cpanm or dzil");
     }
 
-    ok( 1, "Not automated testing");
+    ok( 1, "Author testing");
 }
 
 sub check_03_dzil_release_testing : Test(startup => 1) {
@@ -235,8 +232,8 @@ sub test_04_example_websocket : Test(1) {
     Using commands from .../bin
     Starting pool of MyApp workers: beekeeper-myapp.
     > = 4
-    > ERR: Call to 'myapp.calculator.eval_expr' failed: -32603 Invalid expression at .../MyApp/Calculator.pm line ...
-    > ERR: Call to 'myapp.calculator.eval_expr' failed: -32000 Server error at .../MyApp/Calculator.pm line ...
+    > ERR: Call to 'myapp.calculator.eval_expr' failed: -32603 Invalid expression at .../MyApp/Service/Calculator.pm line ...
+    > ERR: Call to 'myapp.calculator.eval_expr' failed: -32000 Server error at .../MyApp/Service/Calculator.pm line ...
     > Stopping pool of MyApp workers: beekeeper-myapp.
     };
 
@@ -265,7 +262,7 @@ sub test_05_example_chat : Test(1) {
     Using configs from  .../examples/chat/config
     Using modules from  .../examples/chat/lib:/.../lib
     Using commands from .../bin
-    Starting ToyBroker: beekeeper-broker.
+    Starting ToyBroker: beekeeper-myapp-broker.
     Starting pool #1 of MyApp workers: beekeeper-myapp-A.
     Starting pool #2 of MyApp workers: beekeeper-myapp-B.
     Available commands:
@@ -285,7 +282,7 @@ sub test_05_example_chat : Test(1) {
     > Sorry, you were kicked
     Stopping pool #1 of MyApp workers: beekeeper-myapp-A.
     Stopping pool #2 of MyApp workers: beekeeper-myapp-B.
-    Stopping ToyBroker: beekeeper-broker.
+    Stopping ToyBroker: beekeeper-myapp-broker.
     };
 
     $expected =~ s/^\\\n//;

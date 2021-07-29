@@ -1,11 +1,17 @@
 /*---------------------------------------------------------------------
- $Header: /Perl/OlleDB/connect.cpp 12    19-07-19 22:00 Sommar $
+ $Header: /Perl/OlleDB/connect.cpp 13    21-07-12 21:42 Sommar $
 
   Implements the connection routines on Win32::SqlServer.
 
-  Copyright (c) 2004-2019   Erland Sommarskog
+  Copyright (c) 2004-2021   Erland Sommarskog
 
   $History: connect.cpp $
+ * 
+ * *****************  Version 13  *****************
+ * User: Sommar       Date: 21-07-12   Time: 21:42
+ * Updated in $/Perl/OlleDB
+ * Since we now have optional login properties, we set them from a copy of
+ * the property-set array in internaldata.
  * 
  * *****************  Version 12  *****************
  * User: Sommar       Date: 19-07-19   Time: 22:00
@@ -161,6 +167,52 @@ void get_sqlversion_and_dbname (SV * olle_ptr) {
     property_ptr->Release();
 }
 
+// Sets the property for one property set. We have it all set up in mydata - 
+// almost. Some property may have status -1, meaning that we should not set
+// set them, so we copy to local variables.
+void set_one_property_set (SV            * olle_ptr,
+                           IDBProperties * property_ptr,
+                           init_propsets   init_propset ) 
+{
+   internaldata * mydata = get_internaldata(olle_ptr);
+   DBPROPSET      propset;
+   DBPROP         properties[MAX_INIT_PROPERTIES];
+   ULONG          prop_ix = 0;
+
+
+   // Initialise the property set.
+   propset.rgProperties    = properties;
+   propset.cProperties     = 0;
+   propset.guidPropertySet = mydata->init_propsets[init_propset].guidPropertySet;
+
+   // Then copy the *defined* properties to the DBPROP array.
+   for (UINT i = init_propset_info[init_propset].start;
+        i < mydata->init_propsets[init_propset].cProperties +
+           init_propset_info[init_propset].start; i++) {
+      if (mydata->init_properties[i].dwStatus == DBPROPSTATUS_OK) {
+         DBPROP  &prop = properties[prop_ix++];
+         prop.dwPropertyID = mydata->init_properties[i].dwPropertyID;
+         prop.dwOptions    = DBPROPOPTIONS_REQUIRED;
+         prop.colid        = DB_NULLID;
+         prop.dwStatus     = DBPROPSTATUS_OK;
+         VariantInit(&prop.vValue);
+         VariantCopy(&prop.vValue, &mydata->init_properties[i].vValue);
+      }
+   }
+
+   // If any properties were copied, we can set them now.
+   if (prop_ix > 0) {
+      propset.cProperties = prop_ix - 1;
+      HRESULT ret = property_ptr->SetProperties(1, &propset);
+      if (FAILED(ret)) {
+         dump_properties(properties, OptPropsDebug(olle_ptr));
+         croak("Internal error: property_ptr->SetProperties for initialization propset %d failed with hresult %x", init_propset, ret);
+      }
+   }
+}
+
+                     
+
 
 // Connect, called from $X->Connect() and $X->executebatch for autoconnect.
 BOOL do_connect (SV    * olle_ptr,
@@ -227,22 +279,9 @@ BOOL do_connect (SV    * olle_ptr,
     mydata->init_propsets[ssinit_props].cProperties =  
                                           no_of_ssprops(mydata->provider);
 
-    // Set all dwStatus to -1 for the first two propsets, this helps to
-    // detect that some properties were not set, because we're in for an
-    // old version of SQLOLEDB.
-    for (int p = oleinit_props; p <= ssinit_props; p++) {
-       for (UINT i = init_propset_info[p].start;
-            i < mydata->init_propsets[p].cProperties +
-               init_propset_info[p].start; i++) {
-          mydata->init_properties[i].dwStatus = -1;
-       }
-    }
-
-    ret = property_ptr->SetProperties(2, mydata->init_propsets);
-    if (FAILED(ret)) {
-       dump_properties(mydata->init_properties, OptPropsDebug(olle_ptr));
-       croak("Internal error: property_ptr->SetProperties for initialization props failed with hresult %x", ret);
-    }
+    // Set the properties for the initialisation sets.
+    set_one_property_set(olle_ptr, property_ptr, oleinit_props);
+    set_one_property_set(olle_ptr, property_ptr, ssinit_props);
 
     // This is the place where we actually log in to SQL Server. We might
     // be reusing a connection from a pool.
@@ -251,10 +290,7 @@ BOOL do_connect (SV    * olle_ptr,
     // If success, continue with creating data-source object.
     if (SUCCEEDED(ret)) {
        // Set properties for the data source.
-       ret = property_ptr->SetProperties(1, &mydata->init_propsets[datasrc_props]);
-       check_for_errors(NULL, "property_ptr->SetProperties for data-source props",
-                        ret);
-
+       set_one_property_set(olle_ptr, property_ptr, datasrc_props);
 
        // Get a data source object.
        ret = mydata->init_ptr->QueryInterface(IID_IDBCreateSession,
@@ -264,7 +300,6 @@ BOOL do_connect (SV    * olle_ptr,
        mydata->isautoconnected = isautoconnect;
     }
     else {
-       dump_properties(mydata->init_properties, OptPropsDebug(olle_ptr));
        check_for_errors(olle_ptr, "init_ptr->Initialize", ret);
     }
 
@@ -310,13 +345,14 @@ void setloginproperty(SV   * olle_ptr,
 
    // Some properties affects others.
    if (gbl_init_props[ix].propset_enum == oleinit_props &&
-       gbl_init_props[ix].property_id == DBPROP_AUTH_USERID) {
+         gbl_init_props[ix].property_id == DBPROP_AUTH_USERID ||
+         gbl_init_props[ix].property_id == SSPROP_AUTH_MODE) {
       // If userid is set, we clear Integrated security.
       setloginproperty(olle_ptr, "IntegratedSecurity", &PL_sv_undef);
    }
    else if (gbl_init_props[ix].propset_enum == oleinit_props &&
             gbl_init_props[ix].property_id == DBPROP_INIT_PROVIDERSTRING) {
-      // In this case, all other properties should be flushed, except for
+      // In this case, all other properties should be ignored, except for
       // AUTOTRANSLATE, since we over rule its default.
       for (int j = 0; gbl_init_props[j].propset_enum != datasrc_props; j++) {
          if (mydata->init_properties[j].dwPropertyID != SSPROP_INIT_AUTOTRANSLATE) {
@@ -353,7 +389,10 @@ void setloginproperty(SV   * olle_ptr,
    }
         
 
-   // First clear the current value and set property to VT_EMPTY.
+   // First mark that the property has been set explicitly.
+   mydata->init_properties[ix].dwStatus = DBPROPSTATUS_OK;
+   
+   // clear the current value and set property to VT_EMPTY.
    VariantClear(&mydata->init_properties[ix].vValue);
 
    // Then set the value appropriately

@@ -4,6 +4,7 @@ use Moose;
 use Moose::Util::TypeConstraints;
 use Paws::Net::CallerRole;
 use Paws::Credential;
+use feature 'state';
 
 coerce 'Paws::Net::CallerRole',
   from 'Str',
@@ -57,7 +58,7 @@ __PACKAGE__->meta->make_immutable;
 
 package Paws;
 
-our $VERSION = '0.43';
+our $VERSION = '0.44';
 
 use Carp;
 
@@ -89,8 +90,10 @@ class_has default_config => (is => 'rw', isa => 'Paws::SDK::Config', default => 
 
 sub load_class {
   my (undef, @classes) = @_;
-  foreach my $class (@classes) {
+  state %loaded;
+  foreach my $class (grep !$loaded{$_}, @classes) {
     Module::Runtime::require_module($class);
+    $loaded{$class} = 1;
     # immutability is a global setting that will affect all instances
     $class->meta->make_immutable if (Paws->default_config->immutable);
   }
@@ -103,14 +106,14 @@ sub new_with_coercions {
   Paws->load_class($class);
   my %p;
 
-  if ($class->does('Paws::API::StrToObjMapParser')) {
+  if (do { state %d; $d{$class} //= $class->does('Paws::API::StrToObjMapParser') }) {
     my ($subtype) = ($class->meta->find_attribute_by_name('Map')->type_constraint =~ m/^HashRef\[(.*?)\]$/);
     if (my ($array_of) = ($subtype =~ m/^ArrayRef\[(.*?)\]$/)){
       $p{ Map } = { map { $_ => [ map { Paws->new_with_coercions("$array_of", %$_) } @{ $params{ $_ } } ] } keys %params };
     } else {
       $p{ Map } = { map { $_ => Paws->new_with_coercions("$subtype", %{ $params{ $_ } }) } keys %params };
     }
-  } elsif ($class->does('Paws::API::StrToNativeMapParser')) {
+  } elsif (do { state %d; $d{$class} //= $class->does('Paws::API::StrToNativeMapParser') }) {
     $p{ Map } = { %params };
   } else {
     foreach my $att (keys %params){
@@ -329,6 +332,8 @@ L<Paws::AlexaForBusiness>
 
 L<Paws::Amplify>
 
+L<Paws::AmplifyBackend>
+
 L<Paws::ApiGateway>
 
 L<Paws::ApiGatewayManagement>
@@ -337,17 +342,29 @@ L<Paws::ApiGatewayV2>
 
 L<Paws::AppConfig>
 
+L<Paws::Appflow>
+
+L<Paws::AppIntegrations>
+
 L<Paws::ApplicationAutoScaling>
+
+L<Paws::ApplicationCostProfiler>
 
 L<Paws::ApplicationInsights>
 
+L<Paws::ApplicationMigration>
+
 L<Paws::AppMesh>
+
+L<Paws::AppRunner>
 
 L<Paws::AppStream>
 
 L<Paws::AppSync>
 
 L<Paws::Athena>
+
+L<Paws::AuditManager>
 
 L<Paws::AutoScaling>
 
@@ -356,6 +373,8 @@ L<Paws::AutoScalingPlans>
 L<Paws::Backup>
 
 L<Paws::Batch>
+
+L<Paws::Braket>
 
 L<Paws::Budgets>
 
@@ -381,11 +400,11 @@ L<Paws::CloudTrail>
 
 L<Paws::CloudWatch>
 
-L<Paws::CloudWatch>
-
 L<Paws::CloudWatchEvents>
 
 L<Paws::CloudWatchLogs>
+
+L<Paws::CodeArtifact>
 
 L<Paws::CodeBuild>
 
@@ -421,11 +440,15 @@ L<Paws::Config>
 
 L<Paws::Connect>
 
+L<Paws::ConnectContactLens>
+
 L<Paws::ConnectParticipant>
 
 L<Paws::CostExplorer>
 
 L<Paws::CUR>
+
+L<Paws::CustomerProfiles>
 
 L<Paws::DataExchange>
 
@@ -438,6 +461,8 @@ L<Paws::DAX>
 L<Paws::Detective>
 
 L<Paws::DeviceFarm>
+
+L<Paws::DevOpsGuru>
 
 L<Paws::DirectConnect>
 
@@ -463,9 +488,9 @@ L<Paws::EC2InstanceConnect>
 
 L<Paws::ECR>
 
-L<Paws::ECS>
+L<Paws::ECRPublic>
 
-L<Paws::EFS>
+L<Paws::ECS>
 
 L<Paws::EFS>
 
@@ -481,17 +506,21 @@ L<Paws::ElasticTranscoder>
 
 L<Paws::ELB>
 
-L<Paws::ELB>
-
 L<Paws::ELBv2>
 
 L<Paws::EMR>
 
-L<Paws::EMR>
+L<Paws::EMRContainers>
 
 L<Paws::ES>
 
+L<Paws::Finspace>
+
+L<Paws::FinspaceData>
+
 L<Paws::Firehose>
+
+L<Paws::FIS>
 
 L<Paws::FMS>
 
@@ -511,13 +540,21 @@ L<Paws::GlobalAccelerator>
 
 L<Paws::Glue>
 
+L<Paws::GlueDataBrew>
+
 L<Paws::Greengrass>
+
+L<Paws::GreengrassV2>
 
 L<Paws::GroundStation>
 
 L<Paws::GuardDuty>
 
 L<Paws::Health>
+
+L<Paws::HealthLake>
+
+L<Paws::Honeycode>
 
 L<Paws::IAM>
 
@@ -537,15 +574,25 @@ L<Paws::IoTAnalytics>
 
 L<Paws::IoTData>
 
+L<Paws::IoTDeviceAdvisor>
+
 L<Paws::IoTEvents>
 
 L<Paws::IoTEventsData>
+
+L<Paws::IoTFleetHub>
 
 L<Paws::IoTJobsData>
 
 L<Paws::IoTSecureTunneling>
 
+L<Paws::IoTSiteWise>
+
 L<Paws::IoTThingsGraph>
+
+L<Paws::IoTWireless>
+
+L<Paws::IVS>
 
 L<Paws::Kafka>
 
@@ -573,15 +620,29 @@ L<Paws::Lambda>
 
 L<Paws::LexModels>
 
+L<Paws::LexModelsV2>
+
 L<Paws::LexRuntime>
+
+L<Paws::LexRuntimeV2>
 
 L<Paws::LicenseManager>
 
 L<Paws::Lightsail>
 
+L<Paws::LocationService>
+
+L<Paws::LookoutEquipment>
+
+L<Paws::LookoutMetrics>
+
+L<Paws::LookoutVision>
+
 L<Paws::MachineLearning>
 
 L<Paws::Macie>
+
+L<Paws::Macie2>
 
 L<Paws::ManagedBlockchain>
 
@@ -619,9 +680,15 @@ L<Paws::MQ>
 
 L<Paws::MTurk>
 
+L<Paws::MWAA>
+
 L<Paws::Neptune>
 
+L<Paws::NetworkFirewall>
+
 L<Paws::NetworkManager>
+
+L<Paws::NimbleStudio>
 
 L<Paws::OpsWorks>
 
@@ -651,6 +718,10 @@ L<Paws::Polly>
 
 L<Paws::Pricing>
 
+L<Paws::Prometheus>
+
+L<Paws::Proton>
+
 L<Paws::QLDB>
 
 L<Paws::QLDBSession>
@@ -664,6 +735,8 @@ L<Paws::RDS>
 L<Paws::RDSData>
 
 L<Paws::RedShift>
+
+L<Paws::RedshiftData>
 
 L<Paws::Rekognition>
 
@@ -683,9 +756,15 @@ L<Paws::S3>
 
 L<Paws::S3Control>
 
+L<Paws::S3Outposts>
+
 L<Paws::SageMaker>
 
 L<Paws::SageMakerA2IRuntime>
+
+L<Paws::SageMakerEdge>
+
+L<Paws::SageMakerFeatureStoreRuntime>
 
 L<Paws::SageMakerRuntime>
 
@@ -703,11 +782,11 @@ L<Paws::ServerlessRepo>
 
 L<Paws::ServiceCatalog>
 
+L<Paws::ServiceCatalogAppRegistry>
+
 L<Paws::ServiceDiscovery>
 
 L<Paws::ServiceQuotas>
-
-L<Paws::SES>
 
 L<Paws::SES>
 
@@ -716,10 +795,6 @@ L<Paws::SESv2>
 L<Paws::Shield>
 
 L<Paws::Signer>
-
-L<Paws::Signin>
-
-L<Paws::SimpleDB>
 
 L<Paws::SimpleWorkflow>
 
@@ -733,7 +808,15 @@ L<Paws::SQS>
 
 L<Paws::SSM>
 
+L<Paws::SSMContacts>
+
+L<Paws::SSMIncidents>
+
 L<Paws::SSO>
+
+L<Paws::SSOAdmin>
+
+L<Paws::SSOIdentityStore>
 
 L<Paws::SSOOidc>
 
@@ -745,7 +828,13 @@ L<Paws::STS>
 
 L<Paws::Support>
 
+L<Paws::Synthetics>
+
 L<Paws::Textract>
+
+L<Paws::TimestreamQuery>
+
+L<Paws::TimestreamWrite>
 
 L<Paws::Transcribe>
 
@@ -757,7 +846,9 @@ L<Paws::WAF>
 
 L<Paws::WAFRegional>
 
-L<Paws::WAFv2>
+L<Paws::WAFV2>
+
+L<Paws::WellArchitected>
 
 L<Paws::WorkDocs>
 
@@ -1138,12 +1229,25 @@ leonerd for (between others)
 
 campus-explorer for contributing to test suite
 
-byterock for testing and fixing PinPoint
+byterock for:
+ - testing and fixing PinPoint
+ - standing up as comaint, and releasing 0.43
+ - improving S3 support
 
 torrentale for fixing QueryCaller to correctly signal empty arrays
 
-Jess Robinson and shadowcat.co.uk  for setting up ver 0.43
- 
+Jess Robinson and shadowcat.co.uk for:
+ - doing lots of comaint work
+ - working hard on new features
+
+shogo82148 for migrating our Travis pipelines to GitHub Actions (and 
+improving them)
+
+aeruder for contributing
+ - Fixing DynamoDB retry fixes
+ - Completing speedups and benchmarking code
+ - Substituting Config::INI for Config::AWS 
+ - Parrallelizing and fixing generation inconsistencies of the SDK
 
 
 =cut

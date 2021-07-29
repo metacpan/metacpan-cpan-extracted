@@ -33,8 +33,8 @@
 use warnings;
 use strict;
 
-our $VERSION = '3.022'; # VERSION
-my $LAST_UPDATE = '3.021'; # manually update whenever code is changed
+our $VERSION = '3.023'; # VERSION
+our $LAST_UPDATE = '3.021'; # manually update whenever code is changed
 
 use Math::Trig;
 use List::Util qw(min max);

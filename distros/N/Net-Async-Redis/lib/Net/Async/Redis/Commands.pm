@@ -3,7 +3,7 @@ package Net::Async::Redis::Commands;
 use strict;
 use warnings;
 
-our $VERSION = '3.013'; # VERSION
+our $VERSION = '3.015'; # VERSION
 
 =head1 NAME
 
@@ -43,10 +43,13 @@ our %KEY_FINDER = (
     'DEL' => 1,
     'DUMP' => 1,
     'EVAL' => 3,
+    'EVAL_RO' => 3,
     'EVALSHA' => 3,
+    'EVALSHA_RO' => 3,
     'EXISTS' => 1,
     'EXPIRE' => 1,
     'EXPIREAT' => 1,
+    'EXPIRETIME' => 1,
     'GEOADD' => 1,
     'GEODIST' => 1,
     'GEOHASH' => 1,
@@ -99,6 +102,7 @@ our %KEY_FINDER = (
     'PERSIST' => 1,
     'PEXPIRE' => 1,
     'PEXPIREAT' => 1,
+    'PEXPIRETIME' => 1,
     'PFADD' => 1,
     'PFCOUNT' => 1,
     'PSETEX' => 1,
@@ -1107,6 +1111,25 @@ sub expireat : method {
     $self->execute_command(qw(EXPIREAT) => @args)
 }
 
+=head2 expiretime
+
+Get the expiration Unix timestamp for a key.
+
+=over 4
+
+=item * key
+
+=back
+
+L<https://redis.io/commands/expiretime>
+
+=cut
+
+sub expiretime : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(EXPIRETIME) => @args)
+}
+
 =head2 keys
 
 Find all keys matching the given pattern.
@@ -1264,6 +1287,25 @@ L<https://redis.io/commands/pexpireat>
 sub pexpireat : method {
     my ($self, @args) = @_;
     $self->execute_command(qw(PEXPIREAT) => @args)
+}
+
+=head2 pexpiretime
+
+Get the expiration Unix timestamp for a key in milliseconds.
+
+=over 4
+
+=item * key
+
+=back
+
+L<https://redis.io/commands/pexpiretime>
+
+=cut
+
+sub pexpiretime : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(PEXPIRETIME) => @args)
 }
 
 =head2 pttl
@@ -2770,6 +2812,31 @@ sub eval : method {
     $self->execute_command(qw(EVAL) => @args)
 }
 
+=head2 eval_ro
+
+Execute a read-only Lua script server side.
+
+=over 4
+
+=item * script
+
+=item * numkeys
+
+=item * key [key ...]
+
+=item * arg [arg ...]
+
+=back
+
+L<https://redis.io/commands/eval-ro>
+
+=cut
+
+sub eval_ro : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(EVAL_RO) => @args)
+}
+
 =head2 evalsha
 
 Execute a Lua script server side.
@@ -2793,6 +2860,31 @@ L<https://redis.io/commands/evalsha>
 sub evalsha : method {
     my ($self, @args) = @_;
     $self->execute_command(qw(EVALSHA) => @args)
+}
+
+=head2 evalsha_ro
+
+Execute a read-only Lua script server side.
+
+=over 4
+
+=item * sha1
+
+=item * numkeys
+
+=item * key [key ...]
+
+=item * arg [arg ...]
+
+=back
+
+L<https://redis.io/commands/evalsha-ro>
+
+=cut
+
+sub evalsha_ro : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(EVALSHA_RO) => @args)
 }
 
 =head2 script_debug

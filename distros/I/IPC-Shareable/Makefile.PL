@@ -32,11 +32,13 @@ WriteMakefile(
     BUILD_REQUIRES => {
         'IPC::Semaphore' => 0,
         'Test::More'       => 0,
-        'Test::SharedFork' => 0,
+        'Test::SharedFork' => 0.35,
     },
     PREREQ_PM    => {
-        'Storable' => 0.607,
-        'Scalar::Util' => 0,
+        'JSON'          => 0,
+        'Scalar::Util'  => 0,
+        'Storable'      => 0.607,
+        'String::CRC32' => 0,
     },
 
 );

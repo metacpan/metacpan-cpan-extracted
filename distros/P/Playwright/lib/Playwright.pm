@@ -1,5 +1,5 @@
 package Playwright;
-$Playwright::VERSION = '0.007';
+$Playwright::VERSION = '0.011';
 use strict;
 use warnings;
 
@@ -7,7 +7,6 @@ use warnings;
 use 5.006;
 use v5.28.0;    # Before 5.006, v5.10.0 would not be understood.
 
-use File::pushd;
 use File::ShareDir();
 use File::Basename();
 use Cwd();
@@ -15,7 +14,6 @@ use LWP::UserAgent();
 use Sub::Install();
 use Net::EmptyPort();
 use JSON::MaybeXS();
-use File::Slurper();
 use File::Which();
 use Capture::Tiny qw{capture_merged capture_stderr};
 use Carp qw{confess};
@@ -35,48 +33,44 @@ sub _check_node {
     confess("node must exist, be in your PATH and executable")
       unless $node_bin && -x $node_bin;
 
-    my $global_install = '';
     my $path2here =
       File::Basename::dirname( Cwd::abs_path( $INC{'Playwright.pm'} ) );
 
     # Make sure it's possible to start the server
-    $server_bin = "$path2here/../bin/playwright_server";
-    if ( !-f $server_bin ) {
-        $server_bin     = File::Which::which('playwright_server');
-        $global_install = 1;
-    }
-    confess("Can't locate Playwright server in '$server_bin'!")
-      unless -f $server_bin;
+    $server_bin = File::Which::which('playwright_server');
+    confess(
+        "Can't locate playwright_server!
+    Please ensure it is installed in your PATH.
+    If you installed this module from CPAN, it should already be."
+    ) unless $server_bin && -x $server_bin;
 
     # Attempt to start the server.  If we can't do this, we almost certainly have dependency issues.
     my ($output) =
       capture_merged { system( $node_bin, $server_bin, '--check' ) };
     return if $output =~ m/OK/;
 
-    # Check for the necessary modules, this relies on package.json
-    my $npm_bin = File::Which::which('npm');
-    confess("npm must exist and be executable") unless -x $npm_bin;
+    warn $output if $output;
 
-    # pushd/popd closure
-    {
-        my $curdir = pushd( File::Basename::dirname($server_bin) );
+    confess(
+        "playwright_server could not run successfully.
+    See the above error message for why.
+    It's likely to be unmet dependencies, or a NODE_PATH issue.
 
-        # Attempt to install deps automatically.
-        confess(
-            "Production install of node dependencies must be done manually by nonroot users. Run the following:\n\n pushd '$curdir' && sudo npm i yargs express playwright uuid; popd\n\n"
-        ) if $global_install;
+    Install of node dependencies must be done manually.
+    Run the following:
 
-        my $err = capture_stderr { qx{npm i} };
+    npm i express playwright uuid
+    sudo npx playwright install-deps
+    export NODE_PATH=\"\$(pwd)/node_modules\".
 
-        # XXX apparently doing it 'once more with feeling' fixes issues on windows, lol
-        $err = capture_stderr { qx{npm i} };
-        my $exit = $? >> 8;
+    If you still experience issues, run the following:
 
-        # Ignore failing for bogus reasons
-        if ( $err !~ m/package-lock/ ) {
-            confess("Error installing node dependencies:\n$err") if $exit;
-        }
-    }
+    NODE_DEBUG=module playwright_server --check
+
+    This should tell you why node can't find the deps you have installed.
+    "
+    );
+
 }
 
 sub _build_classes {
@@ -111,7 +105,8 @@ sub _build_classes {
             return $class->new(
                 handle => $self,
                 id     => $res->{_guid},
-                type   => $class
+                type   => $class,
+                parent => $self,
             );
         };
 
@@ -240,8 +235,7 @@ sub launch ( $self, %args ) {
 }
 
 sub await ( $self, $promise ) {
-    confess("Input must be an AsyncData") unless $promise->isa('AsyncData');
-    my $obj = $promise->result(1);
+    my $obj = Playwright::Util::await($promise);
 
     return $obj unless $obj->{_type};
     my $class = "Playwright::$obj->{_type}";
@@ -305,7 +299,7 @@ sub _start_server ( $port, $timeout, $debug ) {
         return $pid;
     }
 
-    exec( $node_bin, $server_bin, "-p", $port, $debug );
+    exec( $node_bin, $server_bin, "--port", $port, $debug );
 }
 
 1;
@@ -322,7 +316,7 @@ Playwright - Perl client for Playwright
 
 =head1 VERSION
 
-version 0.007
+version 0.011
 
 =head1 SYNOPSIS
 
@@ -367,6 +361,14 @@ All the classes mentioned there will correspond to a subclass of the Playwright 
     my $element = $ctx->select('body');
 
 See example.pl for a more thoroughly fleshed-out display on how to use this module.
+
+=head3 Getting Started
+
+When using the playwright module for the first time, you may be told to install node.js libraries.
+It should provide you with instructions which will get you working right away.
+
+However, depending on your node installation this may not work due to dependencies for node.js not being in the expected location.
+To fix this, you will need to update your NODE_PATH environment variable to point to the correct location.
 
 =head3 Questions?
 
@@ -444,14 +446,31 @@ L<https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/ar
 
 =head2 Asynchronous operations
 
-The waitFor* methods defined on various classes will return an instance of AsyncData, a part of the L<Async> module.
-You will then need to wait on the result of the backgrounded action with the await() method documented below.
+The waitFor* methods defined on various classes are essentially a light wrapper around Mojo::IOLoop::Subprocess.
+You will need to wait on the result of the backgrounded action with the await() method documented below.
 
     # Assuming $handle is a Playwright object
     my $async = $page->waitForEvent('console');
     $page->evaluate('console.log("whee")');
     my $result = $handle->await( $async );
     my $logged = $result->text();
+
+=head2 Getting Object parents
+
+Some things, like elements naturally are children of the pages in which they are found.
+Sometimes this can get confusing when you are using multiple pages, especially if you let the ref to the page go out of scope.
+Don't worry though, you can access the parent attribute on most Playwright::* objects:
+
+    # Assuming $element is a Playwright::ElementHandle
+    my $page = $element->{parent};
+
+=head2 Firefox Specific concerns
+
+By default, firefox will open PDFs in a pdf.js window.
+To suppress this behavior (such as in the event you are await()ing a download event), you will have to pass this option to launch():
+
+    # Assuming $handle is a Playwright object
+    my $browser = $handle->launch( type => 'firefox', firefoxUserPrefs => { 'pdfjs.disabled' => JSON::true } );
 
 =head1 INSTALLATION NOTE
 
@@ -480,7 +499,7 @@ L<https://playwright.dev/docs/api/class-browsertype#browsertypelaunchoptions>
 
 There is an additional "special" argument, that of 'type', which is used to specify what type of browser to use, e.g. 'firefox'.
 
-=head2 await (AsyncData) = Object
+=head2 await (HASH) = Object
 
 Waits for an asynchronous operation returned by the waitFor* methods to complete and returns the value.
 

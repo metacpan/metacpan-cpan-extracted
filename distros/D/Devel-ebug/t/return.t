@@ -7,7 +7,6 @@ use Devel::ebug;
 
 my $ebug = Devel::ebug->new;
 $ebug->program("corpus/calc_oo.pl");
-$ebug->backend("$^X bin/ebug_backend_perl");
 $ebug->load;
 
 $ebug->break_point_subroutine("Calc::add");
@@ -24,7 +23,6 @@ is($ebug->filename, 'corpus/calc_oo.pl');
 
 $ebug = Devel::ebug->new;
 $ebug->program("corpus/calc_oo.pl");
-$ebug->backend("$^X bin/ebug_backend_perl");
 $ebug->load;
 
 $ebug->break_point_subroutine("Calc::add");

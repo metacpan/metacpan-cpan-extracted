@@ -5,7 +5,7 @@ use warnings;
 use 5.008004;
 
 # ABSTRACT: Legacy Platypus interfaces
-our $VERSION = '1.52'; # VERSION
+our $VERSION = '1.53'; # VERSION
 
 
 package FFI::Platypus;
@@ -78,7 +78,7 @@ FFI::Platypus::Legacy - Legacy Platypus interfaces
 
 =head1 VERSION
 
-version 1.52
+version 1.53
 
 =head1 DESCRIPTION
 

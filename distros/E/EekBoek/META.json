@@ -4,14 +4,14 @@
       "Johan Vromans (jvromans@squirrel.nl)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.46, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown",
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "EekBoek",
    "no_index" : {
@@ -39,13 +39,14 @@
             "HTML::Entities" : "1.35"
          },
          "requires" : {
+            "App::Packager" : "1.430",
             "Archive::Zip" : "1.16",
             "DBD::SQLite" : "1.13",
             "DBI" : "1.40",
             "Getopt::Long" : "2.13",
             "Term::ReadLine" : "0",
             "Term::ReadLine::Gnu" : "0",
-            "perl" : "5.008006"
+            "perl" : "5.010001"
          }
       },
       "test" : {
@@ -58,7 +59,7 @@
    "provides" : {
       "EekBoek" : {
          "file" : "lib/EekBoek.pm",
-         "version" : "v2.30.1"
+         "version" : "2.051"
       }
    },
    "release_status" : "stable",
@@ -68,6 +69,6 @@
          "https://dev.perl.org/licenses/"
       ]
    },
-   "version" : "v2.030.1",
-   "x_serialization_backend" : "JSON::PP version 2.27400"
+   "version" : "2.051",
+   "x_serialization_backend" : "JSON::PP version 4.05"
 }

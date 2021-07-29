@@ -6,6 +6,7 @@ build_requires:
   ExtUtils::CBuilder: '0'
   Test::More: '0.88'
 configure_requires:
+  ExtUtils::CChecker: '0.11'
   Module::Build: '0.4004'
 dynamic_config: 1
 generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
@@ -17,13 +18,10 @@ name: XS-Parse-Keyword
 provides:
   XS::Parse::Keyword:
     file: lib/XS/Parse/Keyword.pm
-    version: '0.08'
-  XS::Parse::Keyword::Builder:
-    file: lib/XS/Parse/Keyword/Builder.pm
-    version: '0.08'
+    version: '0.10'
 requires:
   perl: '5.014'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.08'
+version: '0.10'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -3,12 +3,12 @@ package Beekeeper::Service::Router::Worker;
 use strict;
 use warnings;
 
-our $VERSION = '0.07';
+our $VERSION = '0.09';
 
 use Beekeeper::Worker ':log';
 use base 'Beekeeper::Worker';
 
-use Beekeeper::Worker::Util 'shared_cache';
+use Beekeeper::Worker::Extension::SharedCache;
 use Scalar::Util 'weaken';
 
 use constant FRONTEND_ROLE   =>'frontend';
@@ -183,8 +183,10 @@ sub on_shutdown {
         $frontend_bus->disconnect;
     }
 
-    # Disconnect from backend bus group
-    $self->{MqttSessions}->disconnect;
+    # Disconnect shared cache
+    undef $self->{MqttSessions};
+
+    log_info "Stopped";
 }
 
 sub pull_frontend_requests {
@@ -221,7 +223,7 @@ sub pull_frontend_requests {
 
                 # eg: req/backend/myapp/service
                 $dest_queue = $mqtt_properties->{'fwd_to'} || '';
-                return unless $dest_queue =~ m|^req(/(?!_)[\w-]+)+$|;
+                return unless $dest_queue =~ m|^req(?:/(?!_)[\w-]+)+$|;
 
                 # eg: priv/7nXDsxMDwgLUSedX
                 $reply_to = $mqtt_properties->{'response_topic'} || '';
@@ -534,7 +536,7 @@ Beekeeper::Service::Router::Worker - Route messages between backend and frontend
 
 =head1 VERSION
  
-Version 0.07
+Version 0.09
 
 =head1 SYNOPSIS
 
@@ -575,10 +577,10 @@ these must be declared into config file C<pool.config.json>:
       },
   ]
 
-=head1 METHODS
+=head1 SEE ALSO
 
-See L<Beekeeper::Service::Router> for a description of the methods exposed by this
-worker class.
+L<Beekeeper::Worker::Extension::RemoteSession>, which is the interface to the RPC
+methods exposed by this worker class.
 
 =head1 AUTHOR
 

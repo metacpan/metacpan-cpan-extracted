@@ -8,6 +8,7 @@ LemonLDAP::NG 2F registration script
   var delete2F, displayError, setMsg;
 
   setMsg = function(msg, level) {
+    $('#msg').attr('trspan', msg);
     $('#msg').html(window.translate(msg));
     $('#color').removeClass('message-positive message-warning alert-success alert-warning');
     $('#color').addClass("message-" + level);

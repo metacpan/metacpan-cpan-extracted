@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::AutoRoutePm;
-$Mojolicious::Plugin::AutoRoutePm::VERSION = '0.13';
+
 use Mojo::Base 'Mojolicious::Plugin';
 # ABSTRACT: Mojolicious plugin to create routes by *.pm modules which are a controller
 
@@ -25,8 +25,9 @@ sub register {
 	# removing it we got the base path
 	my $template_base_dirs = [];
 	foreach (@$system_template_base_dirs) {
-		s/templates$//;
-		push @$template_base_dirs, $_;
+        my $tmpl_base_dir = $_; # so next replace doesn't affect origianl path
+		$tmpl_base_dir =~ s/templates$//;
+		push @$template_base_dirs, $tmpl_base_dir;
 	}
   # Top directory
   my $top_dir = $conf->{top_dir} || '.';
@@ -121,28 +122,30 @@ __END__
 
 =pod
 
-=encoding UTF-8
-
 =head1 NAME
 
 Mojolicious::Plugin::AutoRoutePm - Mojolicious plugin to create routes by *.pm modules which are a controller
 
+=for html <img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/EmilianoBruni/mojolicious-plugin-autoroutepm?style=plastic"> <a href="https://travis-ci.com/EmilianoBruni/mojolicious-plugin-mongodbv2"><img alt="Travis tests" src="https://img.shields.io/travis/com/EmilianoBruni/mojolicious-plugin-autoroutepm?label=Travis%20tests&style=plastic"></a>
+
 =head1 VERSION
 
-version 0.13
+version 0.16
 
-=head1 METHODS
+=head1 SYNOPSIS
 
-=head2 register
+    use Mojolicious::Lite;
+    plugin 'AutoRoutePm', {
+        route   => [ app->routes ],
+        top_dir => 'site',
+    };
 
-  plugin->register($app);
+=head1 DESCRIPTION
 
-Register plugin in L<Mojolicious> application.
+This module recursive passes through template_base_dir to find perl modules
+(*.pm) that are a subclass of Mojolicious::Controller and adds routes for them.
 
 =head1 USAGE
-
-This module recursive passes through template_base_dir to find perl module
-(*.pm) that are a subclass of Mojolicious::Controller and some paths;
 
 For module X::Y::Z it adds the decamelize version
 
@@ -166,6 +169,12 @@ a base_url like this
   % my $base_url = url_for(undef, {query => undef}); $base_url =~ s|/$||;
   <base href="<%= $base_url %>" />
 
+=head2 register
+
+  plugin->register($app);
+
+Register plugin in L<Mojolicious> application.
+
 =head1 SEE ALSO
 
 L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicio.us>.
@@ -176,7 +185,7 @@ Emiliano Bruni <info@ebruni.it>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Emiliano Bruni.
+This software is copyright (c) 2021 by Emiliano Bruni.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

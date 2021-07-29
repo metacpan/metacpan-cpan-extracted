@@ -189,7 +189,7 @@ llapp.controller 'TreeCtrl', [
 					id: "cfgLog"
 					title: "cfgLog"
 					data: if $scope.result then $scope.result else ''
-				$http.post("#{window.confPrefix}?cfgNum=#{$scope.currentCfg.cfgNum}#{if $scope.forceSave then "&force=1" else ''}", $scope.data).then (response) ->
+				$http.post("#{window.confPrefix}?cfgNum=#{$scope.currentCfg.cfgNum}&cfgDate=#{$scope.currentCfg.cfgDate}#{if $scope.forceSave then "&force=1" else ''}", $scope.data).then (response) ->
 					$scope.data.pop()
 					_checkSaveResponse response.data
 				,(response) ->

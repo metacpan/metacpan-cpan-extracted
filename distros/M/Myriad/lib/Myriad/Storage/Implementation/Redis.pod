@@ -13,9 +13,14 @@ sure you change the first line.
 
 =head1 NAME
 
-Myriad::Storage::Redis - microservice storage abstraction
+Myriad::Storage::Implementation::Redis - access to microservice storage via Redis
 
-=head1 SYNOPSIS
+=head1 DESCRIPTION
+
+This provides an implementation of L<Myriad::Role::Storage> using L<https://redis.io>
+as the underlying storage mechanism and transport layer.
+
+See L<Myriad::Role::Storage> for API details.
 
 =head2 apply_prefix
 
@@ -66,6 +71,18 @@ Note that references are currently B<not> supported - attempts to write an array
 or object will fail.
 
 Returns a L<Future> which will resolve to the original value on completion.
+
+=head2 incr
+
+Takes the following parameters:
+
+=over 4
+
+=item * C<$k> - the relative key in storage
+
+=back
+
+Returns a L<Future> which will resolve to the corresponding incremented value, or C<undef> if none.
 
 =head2 observe
 

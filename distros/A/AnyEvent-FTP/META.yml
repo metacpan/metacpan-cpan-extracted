@@ -4,14 +4,14 @@ author:
   - 'Graham Ollis <plicease@cpan.org>'
 build_requires:
   EV: '0'
-  Test2::V0: '0.000060'
-  perl: '5.010001'
+  Test2::V0: '0.000121'
+  perl: '5.010'
 configure_requires:
   ExtUtils::MakeMaker: '0'
   File::ShareDir::Install: '0.06'
   perl: '5.010'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.022, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -25,6 +25,7 @@ recommends:
   EV: '0'
 requires:
   AnyEvent: '0'
+  Capture::Tiny: '0'
   File::ShareDir::Dist: '0'
   File::Which: '0'
   File::chdir: '0'
@@ -33,15 +34,18 @@ requires:
   PerlIO::eol: '0'
   Test2::API: '1.302015'
   URI: '0'
-  perl: '5.010001'
+  perl: '5.010'
 resources:
-  bugtracker: https://github.com/plicease/AnyEvent-FTP/issues
+  bugtracker: https://github.com/uperl/AnyEvent-FTP/issues
   homepage: https://metacpan.org/pod/AnyEvent::FTP
-  repository: git://github.com/plicease/AnyEvent-FTP.git
-version: '0.16'
+  repository: git://github.com/uperl/AnyEvent-FTP.git
+version: '0.17'
 x_contributors:
   - 'Graham Ollis <plicease@cpan.org>'
   - 'Ryo Okamoto'
   - 'Shlomi Fish'
   - 'José Joaquín Atria'
-x_serialization_backend: 'YAML::Tiny version 1.70'
+x_generated_by_perl: v5.34.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
+x_use_unsafe_inc: 0

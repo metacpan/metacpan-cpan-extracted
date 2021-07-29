@@ -9,7 +9,7 @@ my @localtime = CORE::localtime $time;
 my @gmtime = CORE::gmtime $time;
 
 my $local_tm = Time::FFI::tm->from_list(@localtime);
-my $local_tp = $local_tm->to_object('Time::Piece', 1);
+my $local_tp = $local_tm->to_object_as_local('Time::Piece');
 isa_ok $local_tp, 'Time::Piece';
 is $local_tp, object {
   call sec   => $local_tm->sec;
@@ -31,10 +31,10 @@ is $local_from, object {
   call mon   => $local_tm->mon;
   call year  => $local_tm->year;
 }, 'local tm structure from Time::Piece object';
-is $local_from->epoch(1), $time, 'right epoch timestamp from local time';
+is $local_from->epoch_as_local, $time, 'right epoch timestamp from local time';
 
 my $utc_tm = Time::FFI::tm->from_list(@gmtime);
-my $utc_tp = $utc_tm->to_object('Time::Piece', 0);
+my $utc_tp = $utc_tm->to_object_as_utc('Time::Piece');
 isa_ok $utc_tp, 'Time::Piece';
 is $utc_tp, object {
   call sec   => $utc_tm->sec;
@@ -56,7 +56,7 @@ is $utc_from, object {
   call mon   => $utc_tm->mon;
   call year  => $utc_tm->year;
 }, 'UTC tm structure from Time::Piece object';
-is $utc_from->epoch(0), $time, 'right epoch timestamp from UTC time';
+is $utc_from->epoch_as_utc, $time, 'right epoch timestamp from UTC time';
 
 my $dst_tm = Time::FFI::tm->new(
   year => 119,
@@ -66,7 +66,7 @@ my $dst_tm = Time::FFI::tm->new(
   min  => 0,
   sec  => 0,
 );
-my $dst_tp = $dst_tm->to_object('Time::Piece', 1);
+my $dst_tp = $dst_tm->to_object_as_local('Time::Piece');
 my $real_tp = Time::Piece::localtime->strptime('2019-06-20 05:00:00', '%Y-%m-%d %H:%M:%S');
 is $dst_tp->epoch, $real_tp->epoch, '(possible) DST interpreted correctly';
 

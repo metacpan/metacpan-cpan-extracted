@@ -16,7 +16,7 @@ use Scalar::Util 'weaken', 'isweak';
 use Try::Tiny;
 use PerlX::Maybe;
 
-our $VERSION = '0.66';
+our $VERSION = '0.67';
 our @CARP_NOT;
 
 =head1 NAME
@@ -137,6 +137,7 @@ has 'transport' => (
     ]],
 );
 
+# This is maybe deprecated?
 has 'targetId' => (
     is => 'rw',
 );
@@ -244,8 +245,16 @@ sub connect( $self, %args ) {
     $done = $done->then(sub {
         $self->{l} = $self->transport->add_listener('Target.receivedMessageFromTarget', sub {
             if( $s ) {
+                $s->log( 'trace', '(target) receivedMessage', $_[0] );
                 my $id = $s->targetId;
-                if( !$id or $id eq $_[0]->{params}->{targetId}) {
+                my $sid = $s->sessionId;
+                if( exists $_[0]->{params}->{sessionId}
+                    and $sid
+                    and $_[0]->{params}->{sessionId} eq $sid) {
+                    my $payload = $_[0]->{params}->{message};
+                    $s->on_response( undef, $payload );
+                } elsif( !$id
+                         or ($_[0]->{params}->{targetId} and $id eq $_[0]->{params}->{targetId})) {
                     my $payload = $_[0]->{params}->{message};
                     $s->on_response( undef, $payload );
                 };
@@ -485,6 +494,9 @@ sub on_response( $self, $connection, $message ) {
         if( ! $receiver) {
             $self->log( 'debug', "Ignored response to unknown receiver", $response )
 
+        } elsif( $receiver eq 'ignore') {
+            # silently ignore that reply
+
         } elsif( $response->{error} ) {
             $self->log( 'debug', "Replying to error $response->{id}", $response );
             $receiver->die( join "\n", $response->{error}->{message},$response->{error}->{data} // '',$response->{error}->{code} // '');
@@ -571,8 +583,8 @@ sub _send_packet( $self, $response, $method, %params ) {
         # real target. This is done in the listener for receivedMessageFromTarget
         #my $ignore = $s->future->retain;
         $result = $s->transport->_send_packet(
-            #$ignore, # this one leads to a circular reference somewher?!
-            undef,
+            #$ignore, # this one leads to a circular reference somewhere when using AnyEvent backends?!
+            'ignore',
             'Target.sendMessageToTarget',
             message => $payload,
             targetId => $s->targetId,

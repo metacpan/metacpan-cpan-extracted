@@ -309,6 +309,13 @@ m@<form.+?action="(?:(?:http://([^/]+))?(/.*?)?|(#))".+method="(post|get)"@is,
               m#<input.+?name="([^"]+)"[^>]+(?:value="([^"]*?)")?#gs,
             %fields
         );
+
+        # Add textarea
+        %fields = (
+            $res->[2]->[0] =~
+              m#<textarea.+?name="([^"]+)"[^>]+(?:value="([^"]*?)")?#gs,
+            %fields
+        );
         my $query = buildForm( \%fields );
         foreach my $f (@requiredFields) {
             ok( exists $fields{$f}, qq{ Field "$f" is defined} );
@@ -330,9 +337,7 @@ Verify that result has a C<Lm-Remote-User> header and value is $user
 
 sub expectAuthenticatedAs {
     my ( $res, $user ) = @_;
-    ok( getHeader( $res, 'Lm-Remote-User' ) eq $user,
-        " Authenticated as $user" )
-      or explain( $res->[1], "Lm-Remote-User => $user" );
+    is( getHeader( $res, 'Lm-Remote-User' ), $user, "Authenticated as $user" );
     count(1);
 }
 
@@ -366,6 +371,18 @@ sub expectJSON {
     ok( not($@), 'Content is valid JSON' );
     count(3);
     return $json;
+}
+
+=head4 expectForbidden($res)
+
+Verify that returned code is 403.
+
+=cut
+
+sub expectForbidden {
+    my ($res) = @_;
+    ok( $res->[0] == 403, ' HTTP code is 403' ) or explain( $res->[0], 403 );
+    count(1);
 }
 
 =head4 expectBadRequest($res)
@@ -436,6 +453,23 @@ sub expectCookie {
     return $id;
 }
 
+=head4 expectPdata( $res );
+
+Check if the pdata cookie exists and returns its deserialized value.
+
+=cut
+
+sub expectPdata {
+    my ($res) = @_;
+    my $val = expectCookie( $res, "lemonldappdata" );
+    ok( $val, "Pdata is not empty" );
+    count(1);
+    my $pdata;
+    eval { $pdata = JSON::from_json( uri_unescape($val) ); };
+    diag($@) if $@;
+    return $pdata;
+}
+
 =head4 exceptCspFormOK( $res, $host )
 
 Verify that C<Content-Security-Policy> header allows one to connect to $host.
@@ -461,6 +495,16 @@ sub exceptCspFormOK {
         fail(" CSP header authorize POST request to $host");
         explain( $res->[1], "form-action ... $host" );
     }
+    count(1);
+}
+
+sub expectCspChildOK {
+    my ( $res, $host ) = @_;
+    return 1 unless ($host);
+    my $csp = getHeader( $res, 'Content-Security-Policy' );
+    ok( $csp, "Content-Security-Policy header found" );
+    count(1);
+    like( $csp, qr/child-src[^;]*\Q$host\E/, "Found $host in CSP child-src" );
     count(1);
 }
 
@@ -592,6 +636,20 @@ use Mouse;
 
 extends 'Lemonldap::NG::Common::PSGI::Cli::Lib';
 
+# try to find template dir in @INC
+my $templateDir = "site/templates";
+unless ( -d $templateDir ) {
+    for (@INC) {
+        if ( -d "$_/site/templates" ) {
+            $templateDir = "$_/site/templates";
+            last;
+        }
+    }
+    unless ( -d $templateDir ) {
+        die "Could not find template dir";
+    }
+}
+
 our $defaultIni = {
     configStorage => {
         type    => 'File',
@@ -606,7 +664,7 @@ our $defaultIni = {
     logLevel              => 'error',
     cookieName            => 'lemonldap',
     domain                => 'example.com',
-    templateDir           => 'site/templates',
+    templateDir           => $templateDir,
     staticPrefix          => '/static',
     tokenUseGlobalStorage => 0,
     securedCookie         => 0,
@@ -689,7 +747,7 @@ has ini => (
         main::ok( $self->{p} = $self->class->new(), 'Portal object' );
         main::count(1);
         unless ( $self->confFailure ) {
-            main::ok( $self->{p}->init($ini),           'Init' );
+            main::ok( $self->{p}->init($ini), 'Init' );
             main::ok( $self->{app} = $self->{p}->run(), 'Portal app' );
             main::count(2);
             no warnings 'redefine';

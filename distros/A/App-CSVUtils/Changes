@@ -1,3 +1,16 @@
+0.034   2021-07-10  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix][doc] Cookbook package was not renamed.
+
+
+0.033   2021-07-10  Released-By: PERLANCAR; Urgency: medium
+
+	- Add logging.
+
+        - [build] Rebuild with newer Perinci::CmdLine::POD 0.023 to generate
+          POD-formatted usage line.
+
+
 0.032   2020-08-16  Released-By: PERLANCAR; Urgency: medium
 
 	- Add utility: csv-transpose.

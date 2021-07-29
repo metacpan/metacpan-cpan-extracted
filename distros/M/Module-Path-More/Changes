@@ -1,4 +1,11 @@
-0.33    2017-02-01 (PERLANCAR)
+0.340   2021-07-20  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+	- [doc] Mention Module::Installed::Tiny.
+
+
+0.33    2017-02-01  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -7,13 +14,13 @@
         - [doc] Tweak POD links.
 
 
-0.32    2017-02-01 (PERLANCAR)
+0.32    2017-02-01  Released-By: PERLANCAR
 
 	- Allow customizing whether to prioritize finding
 	  .pm/.pmc/.pod/prefix by making find_* ints instead of bools.
 
 
-0.31    2016-08-04 (PERLANCAR)
+0.31    2016-08-04  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -22,12 +29,12 @@
         - [doc][build] Update repository link.
 
 
-0.30    2016-01-09 (PERLANCAR)
+0.30    2016-01-09  Released-By: PERLANCAR
 
 	- Make $SEPARATOR a package global so it's accessible from outside.
 
 
-0.29    2015-09-03 (PERLANCAR)
+0.29    2015-09-03  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -36,7 +43,7 @@
 	  requirement.
 
 
-0.28    2015-04-15 (PERLANCAR)
+0.28    2015-04-15  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -44,7 +51,7 @@
 	  check the availability of a module.
 
 
-0.27    2014-12-29 (PERLANCAR)
+0.27    2014-12-29  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -53,7 +60,7 @@
 	- [opt] Avoid creating hash twice in podpath.
 
 
-0.26    2014-12-28 (PERLANCAR)
+0.26    2014-12-28  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -61,7 +68,7 @@
 	  systems.
 
 
-0.25    2014-12-26 (PERLANCAR)
+0.25    2014-12-26  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -69,7 +76,7 @@
 	  for/against doing abs_path().
 
 
-0.24    2014-12-26 (PERLANCAR)
+0.24    2014-12-26  Released-By: PERLANCAR
 
 	- Make module tinier by avoiding the use of Perinci::Sub::Util.
 
@@ -81,62 +88,62 @@
 	  usually no actual need to do so.
 
 
-0.23    2014-12-10 (PERLANCAR)
+0.23    2014-12-10  Released-By: PERLANCAR
 
         - No functional changes.
 
         - POD wording/grammar fixes.
 
 
-0.22    2014-12-03 (PERLANCAR)
+0.22    2014-12-03  Released-By: PERLANCAR
 
         - Rename dist/module from SHARYANTO-Module-Path to Module-Path-More.
 
 
-0.21    2014-12-02 (PERLANCAR)
+0.21    2014-12-02  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Fix/sync Rinci metadata (find_prefix is by default 0).
 
 
-0.20     2014-08-26 (SHARYANTO)
+0.20     2014-08-26  Released-By: SHARYANTO
 
          - [Removed] Remove completion-related routines (moved to App-PMUtils).
 
          - Add note in Description about why this module exists.
 
 
-0.19     2014-06-25 (SHARYANTO)
+0.19     2014-06-25  Released-By: SHARYANTO
 
          - Use case-insensitive module completion, for convenience.
 
 
-0.18     2014-06-25 (SHARYANTO)
+0.18     2014-06-25  Released-By: SHARYANTO
 
          - Fix typo.
 
          - Use Complete::Util (renamed from SHARYANTO::Complete::Util).
 
 
-0.17     2014-06-24 (SHARYANTO)
+0.17     2014-06-24  Released-By: SHARYANTO
 
          - No functional changes.
 
          - Fix test to avoid failure [CT].
 
 
-0.16     2014-06-24 (SHARYANTO)
+0.16     2014-06-24  Released-By: SHARYANTO
 
          - A couple of bug fixes and tweaks.
 
 
-0.15     2014-06-23 (SHARYANTO)
+0.15     2014-06-23  Released-By: SHARYANTO
 
          - Add completion routine 'module' argument.
 
 
-0.14     2014-06-22 (SHARYANTO)
+0.14     2014-06-22  Released-By: SHARYANTO
 
          [INCOMPATIBLE CHANGES]
 
@@ -154,7 +161,7 @@
            Module-Path. Will replace with App-PMUtils' pmpath.
 
 
-0.13.2   2014-06-22 (SHARYANTO)
+0.13.2   2014-06-22  Released-By: SHARYANTO
 
          - [Bugfix] Fix logic bug which made --find-prefix negates other
            --find-*.
@@ -162,25 +169,25 @@
          - Add short options: -a (for --all), -P (for --abs).
 
 
-0.13.1   2014-06-22 (SHARYANTO)
+0.13.1   2014-06-22  Released-By: SHARYANTO
 
          - Add option: find_prefix (--find-prefix, -p).
 
 
-0.13     2014-04-25 (SHARYANTO)
+0.13     2014-04-25  Released-By: SHARYANTO
 
          - No functional changes.
 
          - Increase version number to match original's (0.13).
 
 
-0.02     2014-04-12 (SHARYANTO)
+0.02     2014-04-12  Released-By: SHARYANTO
 
          - Some tweaks to bin/mpath: Make --pod equal to --find-pod --nofind-pm
            --nofind-pmc. Turn on full by default if there are more than one
            argument. Use tab as separator character.
 
 
-0.01     2014-04-09 (SHARYANTO)
+0.01     2014-04-09  Released-By: SHARYANTO
 
          - First release.

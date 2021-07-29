@@ -1,0 +1,30 @@
+NAME
+    Mojo::Leds - Leds aka Light Environment (emi) for Development System
+    based on Mojolicious
+
+VERSION
+    version 1.02
+
+SYNOPSIS
+DESCRIPTION
+BUGS/CONTRIBUTING
+    Please report any bugs through the web interface at
+    <https://github.com/EmilianoBruni/Mojo-Leds/issues> If you want to
+    contribute changes or otherwise involve yourself in development, feel
+    free to fork the Git repository from
+    <https://github.com/EmilianoBruni/Mojo-Leds/>.
+
+SUPPORT
+    You can find this documentation with the perldoc command too.
+
+        perldoc Mojo::Leds
+
+AUTHOR
+    Emiliano Bruni <info@ebruni.it>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2021 by Emiliano Bruni.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

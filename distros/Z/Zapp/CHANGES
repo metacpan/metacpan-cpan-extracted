@@ -1,5 +1,10 @@
 Changelog for Zapp
 
+0.005     2021-07-28 19:27:11-05:00 America/Chicago
+
+    - Updated Yancy dependency to get default authentication
+      and authorization.
+
 0.004     2021-05-25 23:34:37-05:00 America/Chicago
 
     - Updated IRC channel. We've moved to libera.chat

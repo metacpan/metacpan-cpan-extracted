@@ -265,11 +265,11 @@ __PACKAGE__->meta->make_immutable;
 __END__
 
 
-=head 1 Name
+=head1 Name
 
 Connector::Proxy::DBI
 
-=head 1 Description
+=head1 Description
 
 Use DBI to make a query to a database.
 

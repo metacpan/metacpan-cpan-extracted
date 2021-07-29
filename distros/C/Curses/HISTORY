@@ -11,7 +11,12 @@ The module has always been distributed via CPAN.
 Curses itself is much older than the Perl implementation.  Curses was
 originally only a C programming library.
 
-New in 1.37 (Not released yet)
+New in 1.38 (Released July 26, 2021)
+
+  Fix compilation failure with some compilers, including AIX's because
+  _XOPEN_SOURCE_EXTENDED was defined with null value.
+
+New in 1.37 (Released October 3, 2020)
 
   Fix printw for wide characters.
 

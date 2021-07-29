@@ -11,7 +11,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
 
 extends qw(Lemonldap::NG::Portal::Auth::_WebForm);
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.12';
 
 # PROPERTIES
 
@@ -64,7 +64,7 @@ sub authenticate {
 }
 
 sub authLogout {
-    PE_OK;
+    return PE_OK;
 }
 
 1;

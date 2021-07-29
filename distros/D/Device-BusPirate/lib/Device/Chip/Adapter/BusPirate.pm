@@ -3,11 +3,15 @@
 #
 #  (C) Paul Evans, 2015-2021 -- leonerd@leonerd.org.uk
 
-package Device::Chip::Adapter::BusPirate 0.22;
-
 use v5.14;
-use warnings;
-use base qw( Device::Chip::Adapter );
+use Object::Pad 0.45;
+
+package Device::Chip::Adapter::BusPirate 0.23;
+class Device::Chip::Adapter::BusPirate;
+
+# Can't isa Device::Chip::Adapter because it doesn't have a 'new'
+use Device::Chip::Adapter;
+*make_protocol = \&Device::Chip::Adapter::make_protocol;
 
 use Carp;
 
@@ -42,22 +46,16 @@ same named arguments as L<Device::BusPirate/new>.
 
 =cut
 
-sub new
+has $_bp;
+has $_mode = undef;
+
+BUILD ( %args )
 {
-   my $class = shift;
-
-   my $bp = Device::BusPirate->new( @_ );
-
-   bless {
-      bp => $bp,
-      mode => undef,
-   }, $class;
+   $_bp = Device::BusPirate->new( %args );
 }
 
-sub new_from_description
+sub new_from_description ( $class, %args )
 {
-   my $class = shift;
-   my %args = @_;
    # Whitelist known-OK constructor args
    $class->new( map { $_ => $args{$_} } qw( serial baud ) );
 }
@@ -67,235 +65,186 @@ sub new_from_description
 This module provides no new methods beyond the basic API documented in
 L<Device::Chip::Adapter/METHODS> at version 0.01.
 
-Since version I<NEXT> this module now supports multiple instances of the I2C
+Since version I<0.16> this module now supports multiple instances of the I2C
 protocol, allowing multiple chips to be shared on the same bus.
 
 =cut
 
-sub _modename { return ( ref($_[0]) =~ m/.*::(.*?)$/ )[0] }
+sub _modename ( $mode ) { return ( ref($mode) =~ m/.*::(.*?)$/ )[0] }
 
-async sub make_protocol_GPIO
+async method make_protocol_GPIO
 {
-   my $self = shift;
+   $_mode and
+      croak "Cannot enter GPIO protocol when " . _modename( $_mode ) . " already active";
 
-   $self->{mode} and
-      croak "Cannot enter GPIO protocol when " . _modename( $self->{mode} ) . " already active";
+   $_mode = await $_bp->enter_mode( "BB" );
 
-   my $mode = await $self->{bp}->enter_mode( "BB" );
-   $self->{mode} = $mode;
+   await $_mode->configure( open_drain => 0 );
 
-   await $mode->configure( open_drain => 0 );
-
-   return Device::Chip::Adapter::BusPirate::_GPIO->new( $mode );
+   return Device::Chip::Adapter::BusPirate::_GPIO->new( mode => $_mode );
 }
 
-async sub make_protocol_SPI
+async method make_protocol_SPI
 {
-   my $self = shift;
+   $_mode and
+      croak "Cannot enter SPI protocol when " . _modename( $_mode ) . " already active";
 
-   $self->{mode} and
-      croak "Cannot enter SPI protocol when " . _modename( $self->{mode} ) . " already active";
+   $_mode = await $_bp->enter_mode( "SPI" );
 
-   my $mode = await $self->{bp}->enter_mode( "SPI" );
-   $self->{mode} = $mode;
+   await $_mode->configure( open_drain => 0 );
 
-   await $mode->configure( open_drain => 0 );
-
-   return Device::Chip::Adapter::BusPirate::_SPI->new( $mode );
+   return Device::Chip::Adapter::BusPirate::_SPI->new( mode => $_mode );
 }
 
-async sub _enter_mode_I2C
+async method _enter_mode_I2C
 {
-   my $self = shift;
+   return $_mode if
+      $_mode and _modename( $_mode ) eq "I2C";
 
-   return $self->{mode} if
-      $self->{mode} and _modename( $self->{mode} ) eq "I2C";
+   $_mode and
+      croak "Cannot enter I2C protocol when " . _modename( $_mode ) . " already active";
 
-   $self->{mode} and
-      croak "Cannot enter I2C protocol when " . _modename( $self->{mode} ) . " already active";
+   $_mode = await $_bp->enter_mode( "I2C" );
 
-   my $mode = await $self->{bp}->enter_mode( "I2C" );
-   $self->{mode} = $mode;
+   await $_mode->configure( open_drain => 1 );
 
-   await $mode->configure( open_drain => 1 );
-
-   return $mode;
+   return $_mode;
 }
 
-async sub make_protocol_I2C
-{
-   my $self = shift;
+has $_mutex;
 
+async method make_protocol_I2C
+{
    my $mode = await $self->_enter_mode_I2C;
 
-   my $mutex = $self->{mutex} //= Future::Mutex->new;
+   $_mutex //= Future::Mutex->new;
 
-   return Device::Chip::Adapter::BusPirate::_I2C->new( $mode, $mutex );
+   return Device::Chip::Adapter::BusPirate::_I2C->new( mode => $mode, mutex => $_mutex );
 }
 
-async sub make_protocol_UART
+async method make_protocol_UART
 {
-   my $self = shift;
+   $_mode and
+      croak "Cannot enter UART protocol when " . _modename( $_mode ) . " already active";
 
-   $self->{mode} and
-      croak "Cannot enter UART protocol when " . _modename( $self->{mode} ) . " already active";
+   $_mode = await $_bp->enter_mode( "UART" );
 
-   my $mode = await $self->{bp}->enter_mode( "UART" );
-   $self->{mode} = $mode;
+   await $_mode->configure( open_drain => 0 );
 
-   await $mode->configure( open_drain => 0 );
-
-   return Device::Chip::Adapter::BusPirate::_UART->new( $mode );
+   return Device::Chip::Adapter::BusPirate::_UART->new( mode => $_mode );
 }
 
-sub shutdown
+method shutdown
 {
-   my $self = shift;
-   $self->{mode}->power( 0 )->get;
-   $self->{bp}->stop;
+   $_mode->power( 0 )->get;
+   $_bp->stop;
 }
 
-package
-   Device::Chip::Adapter::BusPirate::_base;
+class
+   Device::Chip::Adapter::BusPirate::_base {
 
-use Carp;
-use List::Util qw( first );
+   use Carp;
+   use List::Util qw( first );
 
-sub new
-{
-   my $class = shift;
-   my ( $mode, $mutex ) = @_;
+   has $_mode  :reader :param;
+   has $_mutex :reader :param = undef; # only required for I2C
 
-   bless { mode => $mode, mutex => $mutex }, $class;
-}
-
-sub sleep
-{
-   my $self = shift;
-   $self->{mode}->pirate->sleep( @_ );
-}
-
-sub power
-{
-   my $self = shift;
-   $self->{mode}->power( @_ );
-}
-
-sub _find_speed
-{
-   shift;
-   my ( $max_bitrate, @speeds ) = @_;
-
-    return first {
-        my $rate = $_;
-        $rate =~ m/(.*)k$/ and $rate = 1E3 * $1;
-        $rate =~ m/(.*)M$/ and $rate = 1E6 * $1;
-
-        $rate <= $max_bitrate
-    } @speeds;
-}
-
-# Most modes only have access to the AUX GPIO pin
-sub list_gpios { return qw( AUX ) }
-
-sub meta_gpios
-{
-   my $self = shift;
-
-   return map { Device::Chip::Adapter::GPIODefinition( $_, "rw", 0 ) }
-          $self->list_gpios;
-}
-
-sub write_gpios
-{
-   my $self = shift;
-   my ( $gpios ) = @_;
-
-   my $mode = $self->{mode};
-
-   foreach my $pin ( keys %$gpios ) {
-      $pin eq "AUX" or
-         croak "Unrecognised GPIO pin name $pin";
-
-      return $mode->aux( $gpios->{$pin} );
+   method sleep ( $timeout )
+   {
+      $_mode->pirate->sleep( $timeout );
    }
 
-   Future->done;
-}
-
-sub read_gpios
-{
-   my $self = shift;
-   my ( $gpios ) = @_;
-
-   my $mode = $self->{mode};
-
-   my @f;
-   foreach my $pin ( @$gpios ) {
-      $pin eq "AUX" or
-         croak "Unrecognised GPIO pin name $pin";
-
-      return $mode->read_aux
-         ->transform( done => sub { { AUX => $_[0] } } );
+   method power ( $on )
+   {
+      $_mode->power( $on );
    }
 
-   Future->done( {} );
+   method _find_speed ( $max_bitrate, @speeds )
+   {
+       return first {
+           my $rate = $_;
+           $rate =~ m/(.*)k$/ and $rate = 1E3 * $1;
+           $rate =~ m/(.*)M$/ and $rate = 1E6 * $1;
+
+           $rate <= $max_bitrate
+       } @speeds;
+   }
+
+   # Most modes only have access to the AUX GPIO pin
+   method list_gpios { return qw( AUX ) }
+
+   method meta_gpios
+   {
+      return map { Device::Chip::Adapter::GPIODefinition( $_, "rw", 0 ) }
+             $self->list_gpios;
+   }
+
+   method write_gpios ( $gpios )
+   {
+      foreach my $pin ( keys %$gpios ) {
+         $pin eq "AUX" or
+            croak "Unrecognised GPIO pin name $pin";
+
+         return $_mode->aux( $gpios->{$pin} );
+      }
+
+      Future->done;
+   }
+
+   method read_gpios ( $gpios )
+   {
+      my @f;
+      foreach my $pin ( @$gpios ) {
+         $pin eq "AUX" or
+            croak "Unrecognised GPIO pin name $pin";
+
+         return $_mode->read_aux
+            ->transform( done => sub { { AUX => $_[0] } } );
+      }
+
+      Future->done( {} );
+   }
+
+   # there's no more efficient way to tris_gpios than just read and ignore the result
+   async sub tris_gpios
+   {
+      my $self = shift;
+      await $self->read_gpios;
+      return;
+   }
 }
 
-# there's no more efficient way to tris_gpios than just read and ignore the result
-async sub tris_gpios
-{
-   my $self = shift;
-   await $self->read_gpios;
-   return;
-}
-
-package
-   Device::Chip::Adapter::BusPirate::_GPIO;
-use base qw( Device::Chip::Adapter::BusPirate::_base );
+class
+   Device::Chip::Adapter::BusPirate::_GPIO isa Device::Chip::Adapter::BusPirate::_base;
 
 use List::Util 1.29 qw( pairmap );
 
-sub list_gpios { return qw( MISO CS MOSI CLK AUX ) }
+method list_gpios { return qw( MISO CS MOSI CLK AUX ) }
 
-sub write_gpios
+method write_gpios ( $gpios )
 {
-   my $self = shift;
-   my ( $gpios ) = @_;
-
-   my $mode = $self->{mode};
-
    # TODO: validity checking
-   $mode->write(
+   $self->mode->write(
       pairmap { lc $a => $b } %$gpios
    )
 }
 
-async sub read_gpios
+async method read_gpios ( $gpios )
 {
-   my $self = shift;
-   my ( $gpios ) = @_;
-
-   my $mode = $self->{mode};
-
-   my $vals = await $mode->read( map { lc $_ } @$gpios );
+   my $vals = await $self->mode->read( map { lc $_ } @$gpios );
 
    return { pairmap { uc $a => $b } %$vals };
 }
 
-package
-   Device::Chip::Adapter::BusPirate::_SPI;
-use base qw( Device::Chip::Adapter::BusPirate::_base Device::Chip::ProtocolBase::SPI );
+class
+   Device::Chip::Adapter::BusPirate::_SPI isa Device::Chip::Adapter::BusPirate::_base;
 
 use Carp;
 
 my @SPI_SPEEDS = (qw( 8M 4M 2.6M 2M 1M 250k 125k 30k ));
 
-sub configure
+method configure ( %args )
 {
-    my $self = shift;
-    my %args = @_;
-
     my $mode        = delete $args{mode};
     my $max_bitrate = delete $args{max_bitrate};
 
@@ -305,7 +254,7 @@ sub configure
     croak "Unrecognised configuration options: " . join( ", ", keys %args )
         if %args;
 
-    $self->{mode}->configure(
+    $self->mode->configure(
         ( defined $mode ?
            ( mode  => $mode ) : () ),
         ( defined $max_bitrate ?
@@ -313,64 +262,54 @@ sub configure
     );
 }
 
-sub readwrite
+method readwrite ( $data )
 {
-   my $self = shift;
-   my ( $data ) = @_;
-
-   $self->{mode}->writeread_cs( $data );
+   $self->mode->writeread_cs( $data );
 }
 
-sub readwrite_no_ss
+method readwrite_no_ss ( $data )
 {
-   my $self = shift;
-   my ( $data ) = @_;
-
-   $self->{mode}->writeread( $data );
+   $self->mode->writeread( $data );
 }
 
-sub assert_ss
+method assert_ss
 {
-   my $self = shift;
-   $self->{mode}->chip_select( 0 );
+   $self->mode->chip_select( 0 );
 }
 
-sub release_ss
+method release_ss
 {
-   my $self = shift;
-   $self->{mode}->chip_select( 1 );
+   $self->mode->chip_select( 1 );
 }
 
-package
-    Device::Chip::Adapter::BusPirate::_I2C;
-use base qw( Device::Chip::Adapter::BusPirate::_base );
+class
+    Device::Chip::Adapter::BusPirate::_I2C isa Device::Chip::Adapter::BusPirate::_base;
 
 use Carp;
 
 my @I2C_SPEEDS = (qw( 400k 100k 50k 5k ));
 
-# TODO - addr ought to be a mount option somehow
-sub configure
-{
-    my $self = shift;
-    my %args = @_;
+has $_addr;
 
+# TODO - addr ought to be a mount option somehow
+method configure ( %args )
+{
     my $addr        = delete $args{addr};
     my $max_bitrate = delete $args{max_bitrate};
 
     croak "Unrecognised configuration options: " . join( ", ", keys %args )
         if %args;
 
-    $self->{addr} = $addr if defined $addr;
+    $_addr = $addr if defined $addr;
 
     my @f;
 
-    push @f, $self->{mode}->configure(
+    push @f, $self->mode->configure(
        speed => $self->_find_speed( $max_bitrate, @I2C_SPEEDS )
     ) if defined $max_bitrate;
 
     # It's highly likely the user will want the pullups enabled here
-    push @f, $self->{mode}->pullup( 1 );
+    push @f, $self->mode->pullup( 1 );
 
     Future->needs_all( @f );
 }
@@ -378,91 +317,71 @@ sub configure
 sub DESTROY
 {
    my $self = shift;
-   $self->{mode}->pullup( 0 )->get if $self->{mode};
+   $self->mode->pullup( 0 )->get if $self->mode;
 }
 
-async sub write
+async method write ( $bytes )
 {
-   my $self = shift;
-   my ( $bytes ) = @_;
-
    await $self->txn(sub { shift->write( $bytes ) });
 }
 
-async sub read
+async method read ( $len )
 {
-   my $self = shift;
-   my ( $len ) = @_;
-
    return await $self->txn(sub { shift->read( $len ) });
 }
 
-async sub write_then_read
+async method write_then_read ( $write_bytes, $read_len )
 {
-   my $self = shift;
-   my ( $write_bytes, $read_len ) = @_;
-
-   return await $self->txn(async sub {
-      my ( $helper ) = @_;
+   return await $self->txn(async sub ( $helper ){
       await $helper->write( $write_bytes );
       return await $helper->read( $read_len );
    });
 }
 
-sub txn
-{
-   my $self = shift;
-   my ( $code ) = @_;
+has $_txn_helper;
 
-   defined( my $addr = $self->{addr} ) or
+method txn ( $code )
+{
+   defined $_addr or
       croak "Cannot ->txn without a defined addr";
 
-   my $helper = $self->{txn_helper} //= bless( [ $self->{mode}, $self->{addr} ], "Device::Chip::Adapter::BusPirate::_I2C::Txn" );
+   my $helper = $_txn_helper //= Device::Chip::Adapter::BusPirate::_I2C::Txn->new( mode => $self->mode, addr => $_addr );
 
-   return $self->{mutex}->enter(sub {
-      return $code->( $helper )->followed_by(sub {
-         my ( $f ) = @_;
-         return $self->{mode}->stop_bit->then( sub { $f } );
+   return $self->mutex->enter(sub {
+      return $code->( $helper )->followed_by(sub ( $f ) {
+         return $self->mode->stop_bit->then( sub { $f } );
       });
    });
 }
 
-package
-   Device::Chip::Adapter::BusPirate::_I2C::Txn;
+class
+   Device::Chip::Adapter::BusPirate::_I2C::Txn {
 
-async sub write
-{
-   my $self = shift;
-   my ( $bytes ) = @_;
-   my ( $mode, $addr ) = @$self;
+   has $_mode :param;
+   has $_addr :param;
 
-   await $mode->start_bit;
-   await $mode->write( chr( $addr << 1 | 0 ) . $bytes );
+   async method write ( $bytes )
+   {
+      await $_mode->start_bit;
+      await $_mode->write( chr( $_addr << 1 | 0 ) . $bytes );
+   }
+
+   async method read ( $len )
+   {
+      await $_mode->start_bit;
+      await $_mode->write( chr( $_addr << 1 | 1 ) );
+      return await $_mode->read( $len );
+   }
 }
 
-async sub read
-{
-   my $self = shift;
-   my ( $len ) = @_;
-   my ( $mode, $addr ) = @$self;
-
-   await $mode->start_bit;
-   await $mode->write( chr( $addr << 1 | 1 ) );
-   return await $mode->read( $len );
-}
-
-package
-   Device::Chip::Adapter::BusPirate::_UART;
-use base qw( Device::Chip::Adapter::BusPirate::_base );
+class
+   Device::Chip::Adapter::BusPirate::_UART isa Device::Chip::Adapter::BusPirate::_base;
 
 use Carp;
 
-sub configure
+method configure ( %args )
 {
-   my $self = shift;
-   my %args = @_;
-
-   return $self->{mode}->configure(
+   return $self->mode->configure(
       baud   => $args{baudrate},
       bits   => $args{bits},
       parity => $args{parity},
@@ -470,15 +389,12 @@ sub configure
    );
 }
 
-sub write
+method write ( $bytes )
 {
-   my $self = shift;
-   my ( $bytes ) = @_;
-
-   return $self->{mode}->write( $bytes );
+   return $self->mode->write( $bytes );
 }
 
-sub read { croak "Device::BusPirate does not support read on UART" }
+method read { croak "Device::BusPirate does not support read on UART" }
 
 =head1 AUTHOR
 

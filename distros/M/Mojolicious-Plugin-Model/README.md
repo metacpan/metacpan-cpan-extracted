@@ -1,4 +1,3 @@
-[![Build Status](https://travis-ci.org/avkhozov/Mojolicious-Plugin-Model.svg?branch=master)](https://travis-ci.org/avkhozov/Mojolicious-Plugin-Model)
 # NAME
 
 Mojolicious::Plugin::Model - Model for Mojolicious applications
@@ -21,7 +20,7 @@ Model Users
 
       # Or HTTP check
       return $self->app->ua->post($url => json => {user => $name, pass => $pass})
-        ->rex->tx->json('/result');
+        ->res->tx->json('/result');
     }
 
     1;
@@ -77,12 +76,12 @@ All available options
 
 # DESCRIPTION
 
-[Mojolicious::Plugin::Model](https://metacpan.org/pod/Mojolicious::Plugin::Model) is a Model (M in MVC architecture) for Mojolicious applications. Each
+[Mojolicious::Plugin::Model](https://metacpan.org/pod/Mojolicious%3A%3APlugin%3A%3AModel) is a Model (M in MVC architecture) for Mojolicious applications. Each
 model has an `app` attribute.
 
 # OPTIONS
 
-[Mojolicious::Plugin::Model](https://metacpan.org/pod/Mojolicious::Plugin::Model) supports the following options.
+[Mojolicious::Plugin::Model](https://metacpan.org/pod/Mojolicious%3A%3APlugin%3A%3AModel) supports the following options.
 
 ## namespaces
 
@@ -96,7 +95,7 @@ Namespace to load models from, defaults to `$moniker::Model`.
     # Mojolicious::Lite
     plugin Model => {base_classes => ['MyApp::Model']};
 
-Base classes used to identify models, defaults to [MojoX::Model](https://metacpan.org/pod/MojoX::Model).
+Base classes used to identify models, defaults to [MojoX::Model](https://metacpan.org/pod/MojoX%3A%3AModel).
 
 ## default
 
@@ -121,7 +120,7 @@ Parameters to be passed to the class constructor of the model.
 
 # HELPERS
 
-[Mojolicious::Plugin::Model](https://metacpan.org/pod/Mojolicious::Plugin::Model) implements the following helpers.
+[Mojolicious::Plugin::Model](https://metacpan.org/pod/Mojolicious%3A%3APlugin%3A%3AModel) implements the following helpers.
 
 ## model
 
@@ -140,8 +139,8 @@ Use `entity` instead of `model` when you need stateful objects.
 
 # METHODS
 
-[Mojolicious::Plugin::Model](https://metacpan.org/pod/Mojolicious::Plugin::Model) inherits all methods from
-[Mojolicious::Plugin](https://metacpan.org/pod/Mojolicious::Plugin) and implements the following new ones.
+[Mojolicious::Plugin::Model](https://metacpan.org/pod/Mojolicious%3A%3APlugin%3A%3AModel) inherits all methods from
+[Mojolicious::Plugin](https://metacpan.org/pod/Mojolicious%3A%3APlugin) and implements the following new ones.
 
 ## register
 
@@ -151,7 +150,7 @@ Register plugin in [Mojolicious](https://metacpan.org/pod/Mojolicious) applicati
 
 # SEE ALSO
 
-[Mojolicious](https://metacpan.org/pod/Mojolicious), [Mojolicious::Guides](https://metacpan.org/pod/Mojolicious::Guides), [http://mojolicio.us](http://mojolicio.us).
+[Mojolicious](https://metacpan.org/pod/Mojolicious), [Mojolicious::Guides](https://metacpan.org/pod/Mojolicious%3A%3AGuides), [http://mojolicio.us](http://mojolicio.us).
 
 # AUTHOR
 

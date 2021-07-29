@@ -2,7 +2,7 @@ package Lemonldap::NG::Manager::Conf::Zero;
 
 use strict;
 
-our $VERSION = '2.0.9';
+our $VERSION = '2.0.12';
 
 sub zeroConf {
     my ( $domain, $sessionDir, $persistentSessionDir, $notificationDir, $cacheDir ) = @_;
@@ -167,7 +167,7 @@ sub zeroConf {
             },
             "manager.$domain" => {
                 'default' => 'inGroup("timelords") or $uid eq "rtyler"',
-'(?#Configuration)^/(.*?\.(fcgi|psgi)/)?(manager\.html|confs/|$)'
+'(?#Configuration)^/(.*?\.(fcgi|psgi)/)?(manager\.html|confs|prx/|$)'
                   => 'inGroup("timelords")',
                 '(?#Sessions)/(.*?\.(fcgi|psgi)/)?sessions' =>
                   'inGroup("timelords") or $uid eq "rtyler"',

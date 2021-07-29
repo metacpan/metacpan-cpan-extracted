@@ -22,7 +22,7 @@ use warnings;
 
 use Carp qw< carp croak >;
 
-our $VERSION = '1.999821';
+our $VERSION = '1.999823';
 
 require Exporter;
 our @ISA = qw(Exporter);
@@ -228,12 +228,11 @@ our $_trap_inf = 0;                         # are infs ok? set w/ config()
 
 my $nan = 'NaN';                        # constants for easier life
 
-my $DEFAULT_LIB = 'Math::BigInt::Calc'; # module to do the low level math
-my $LIB = $DEFAULT_LIB;
+my $DEFAULT_LIB = 'Math::BigInt::Calc';
+my $LIB;                                # module to do the low level math
                                         # default is Calc.pm
 my $IMPORT = 0;                         # was import() called yet?
                                         # used to make require work
-my %CALLBACKS;                          # callbacks to notify on lib loads
 
 ##############################################################################
 # the old code had $rnd_mode, so we need to support it, too
@@ -615,27 +614,27 @@ sub new {
     }
 
     # Handle hexadecimal numbers. We auto-detect hexadecimal numbers if they
-    # have a "0x" or "0X" prefix.
+    # have a "0x", "0X", "x", or "X" prefix, cf. CORE::oct().
 
-    if ($wanted =~ /^\s*[+-]?0[Xx]/) {
+    if ($wanted =~ /^\s*[+-]?0?[Xx]/) {
         $self = $class -> from_hex($wanted);
         $self->round($a, $p, $r) unless @_ >= 3 && !defined $a && !defined $p;
         return $self;
     }
 
-    # Handle octal numbers. We auto-detect octal numbers if they have a "0o"
-    # or "0O" prefix.
+    # Handle octal numbers. We auto-detect octal numbers if they have a "0o",
+    # "0O", "o", "O" prefix, cf. CORE::oct().
 
-    if ($wanted =~ /^\s*[+-]?0[Oo]/) {
+    if ($wanted =~ /^\s*[+-]?0?[Oo]/) {
         $self = $class -> from_oct($wanted);
         $self->round($a, $p, $r) unless @_ >= 3 && !defined $a && !defined $p;
         return $self;
     }
 
-    # Handle binary numbers. We auto-detect binary numbers if they have a "0b"
-    # or "0B" prefix.
+    # Handle binary numbers. We auto-detect binary numbers if they have a "0b",
+    # "B", "b", or "B" prefix, cf. CORE::oct().
 
-    if ($wanted =~ /^\s*[+-]?0[Bb]/) {
+    if ($wanted =~ /^\s*[+-]?0?[Bb]/) {
         $self = $class -> from_bin($wanted);
         $self->round($a, $p, $r) unless @_ >= 3 && !defined $a && !defined $p;
         return $self;
@@ -742,7 +741,7 @@ sub from_hex {
                      ^
                      \s*
                      ( [+-]? )
-                     ( 0 [Xx] )?
+                     ( 0? [Xx] )?
                      (
                          [0-9a-fA-F]*
                          ( _ [0-9a-fA-F]+ )*
@@ -798,7 +797,7 @@ sub from_oct {
                      ^
                      \s*
                      ( [+-]? )
-                     ( 0 [Oo] )?
+                     ( 0? [Oo] )?
                      (
                          [0-7]*
                          ( _ [0-7]+ )*
@@ -854,7 +853,7 @@ sub from_bin {
                      ^
                      \s*
                      ( [+-]? )
-                     ( 0 [Bb] )?
+                     ( 0? [Bb] )?
                      (
                          [01]*
                          ( _ [01]+ )*
@@ -4235,18 +4234,22 @@ sub import {
         croak "Error in import(): argument with index $i is undefined"
           unless defined($_[$i]);
 
+        # Enable overloading of constants.
+
         if ($_[$i] eq ':constant') {
-            # this causes overlord er load to step in
             overload::constant
                 integer => sub { $class->new(shift) },
                 binary  => sub { $class->new(shift) };
         }
 
+        # Enable/disable upgrading.
+
         elsif ($_[$i] eq 'upgrade') {
-            # this causes upgrading
-            $upgrade = $_[$i+1]; # or undef to disable
+            $upgrade = $_[$i+1];        # undef to disable
             $i++;
         }
+
+        # Use a user-specified backend libray.
 
         elsif ($_[$i] =~ /^(lib|try|only)\z/) {
             # try  => 0 (no warn if unavailable module)
@@ -4254,15 +4257,30 @@ sub import {
             # only => 2 (die on fallback)
             $warn_or_die = 1 if $_[$i] eq 'lib';
             $warn_or_die = 2 if $_[$i] eq 'only';
-            # this causes the specified low lib to take care...
+
+            # Get and check the list of libraries.
+
+            my $userlibs = $_[$i+1];
             croak "Library argument for import parameter '$_[$i]' is undefined"
-              unless defined($_[$i+1]);
-            for my $lib (split /\s*,\s*/, $_[$i+1]) {
-                # limit to sane characters (warn about invalid characters?)
+              unless defined($userlibs);
+            $userlibs =~ s/^\s+//;
+            $userlibs =~ s/\s+$//;
+            my @userlibs = split /\s*,\s*/, $userlibs;
+            carp "Argument for import parameter '$_[$i]' contains no libraries"
+              unless @userlibs;
+
+            for my $lib (@userlibs) {
+                # Limit to sane characters. Should we warn about invalid
+                # characters, i.e., invalid module names?
                 $lib =~ tr/a-zA-Z0-9_://cd;
-                $lib = 'Math::BigInt::' . $lib if $lib !~ /^Math::BigInt::/i;
-                push @libs, $lib;
+                if (CORE::length $lib) {
+                    $lib = "Math::BigInt::$lib" if $lib !~ /^Math::BigInt::/i;
+                    push @libs, $lib;
+                    next;
+                }
+                carp "Specified library name is empty or invalid";
             }
+
             $i++;
         }
 
@@ -4271,64 +4289,83 @@ sub import {
         }
     }
 
-    # any non ':constant' stuff is handled by our parent, Exporter
+    # Any non ':constant' stuff is handled by our parent, Exporter
+
     if (@a > 0) {
         $class->SUPER::import(@a);            # need it for subclasses
         $class->export_to_level(1, $class, @a); # need it for MBF
     }
 
-    # If all specified libraries fail, try the default, but pass it as a
-    # reference so we can tell later whether we had to revert to the default.
-    push @libs, \$DEFAULT_LIB   # if all fail, try this
-      if $warn_or_die < 2;      #    but not for "only"
+    if (@libs) {
 
-    my $numfail = 0;            # increment for each lib that failed to load
-    my $arg;
-    for (my $i = 0 ; $i <= $#libs ; $i++) {
-        $arg = $libs[$i];
-        my $lib = ref($arg) ? $$arg : $arg;
-        eval "require $lib";
-        if (!$@) {
-            $LIB = $lib;
-            last;
+        # Try to load the specified libraries, if any.
+
+        my $numfail = 0;        # increment for each lib that fails to load
+        for (my $i = 0 ; $i <= $#libs ; $i++) {
+            my $lib = $libs[$i];
+            eval "require $lib";
+            unless ($@) {
+                $LIB = $lib;
+                last;
+            }
+            $numfail++;
         }
-        $numfail++;
-    }
 
-    # If we were unable to load a library.
-
-    if ($numfail > 0) {
-        my $info = "Couldn't load the specified math lib(s)"
-          .  " (" . join(", ", grep { !ref } @libs) . ")";
+        # All attempts to load a library failed.
 
         if ($numfail == @libs) {
-            croak "$info, and fallback to $DEFAULT_LIB is disallowed"
-              if $warn_or_die == 2;
-            croak "$info, not even fallback to $DEFAULT_LIB";
+
+            # The fallback library is either the most recently loaded library,
+            # or the default library, if no library has been successfully yet.
+
+            my $FALLBACK_LIB = defined($LIB) ? $LIB : $DEFAULT_LIB;
+
+            # If the user requested a specific list of modules and didn't allow
+            # a fallback.
+
+            if ($warn_or_die == 2) {
+                croak "Couldn't load the specified math lib(s) ",
+                  join(", ", map "'$_'", @libs),
+                  ", and fallback to '$FALLBACK_LIB' is disallowed";
+            }
+
+            # The user accepts the use of a fallback library, so try to load it.
+            # Note that it might already have been loaded successfully, but we
+            # don't know that, and there is minimal overhead in trying to load
+            # it again.
+
+            eval "require $FALLBACK_LIB";
+            if ($@) {
+                croak "Couldn't load the specified math lib(s) ",
+                  join(", ", map "'$_'", @libs),
+                  ", not even the fallback lib '$FALLBACK_LIB'";
+            }
+
+            # The fallback library was successfully loaded, but the user might
+            # want to know that we are using the fallback.
+
+            if ($warn_or_die == 1) {
+                carp "Couldn't load the specified math lib(s) ",
+                  join(", ", map "'$_'", @libs),
+                  ", so using fallback lib '$FALLBACK_LIB'";
+            }
         }
-
-        # If we failed to load some of the libraries, but were able to use the
-        # fallback library.
-
-        carp "$info, fallback to $DEFAULT_LIB"
-          if $warn_or_die == 1 && ref($arg);
     }
 
-    # notify callbacks
-    foreach my $class (keys %CALLBACKS) {
-        &{$CALLBACKS{$class}}($LIB);
+    # We might not have loaded any backend library yet, either because the user
+    # didn't specify any, or because the specified libraries failed to load and
+    # the user allows the use of a fallback library.
+
+    unless (defined $LIB) {
+        eval "require $DEFAULT_LIB";
+        if ($@) {
+            croak "No lib specified, and couldn't load the default",
+              " lib '$DEFAULT_LIB'";
+        }
+        $LIB = $DEFAULT_LIB;
     }
 
     # import done
-}
-
-sub _register_callback {
-    my ($class, $callback) = @_;
-
-    if (ref($callback) ne 'CODE') {
-        croak("$callback is not a coderef");
-    }
-    $CALLBACKS{$class} = $callback;
 }
 
 sub _split_dec_string {
@@ -4585,13 +4622,13 @@ Math::BigInt - Arbitrary size integer/float math package
   # pure Perl if the GMP library is not installed):
   # (See also the L<MATH LIBRARY> section!)
 
-  # warns if Math::BigInt::GMP cannot be found
+  # to warn if Math::BigInt::GMP cannot be found, use
   use Math::BigInt lib => 'GMP';
 
-  # to suppress the warning use this:
+  # to suppress the warning if Math::BigInt::GMP cannot be found, use
   # use Math::BigInt try => 'GMP';
 
-  # dies if GMP cannot be loaded:
+  # to die if Math::BigInt::GMP cannot be found, use
   # use Math::BigInt only => 'GMP';
 
   my $str = '1234567890';
@@ -6570,32 +6607,68 @@ instead relying on the internal representation.
 
 =head2 MATH LIBRARY
 
-Math with the numbers is done (by default) by a module called
-C<Math::BigInt::Calc>. This is equivalent to saying:
+The mathematical computations are performed by a backend library. It is not
+required to specify which backend library to use, but some backend libraries
+are much faster than the default library.
+
+=head3 The default library
+
+The default library is L<Math::BigInt::Calc>, which is implemented in
+pure Perl and hence does not require a compiler.
+
+=head3 Specifying a library
+
+The simple case
+
+    use Math::BigInt;
+
+is equivalent to saying
 
     use Math::BigInt try => 'Calc';
 
-You can change this backend library by using:
+You can use a different backend library with, e.g.,
 
     use Math::BigInt try => 'GMP';
 
-B<Note>: General purpose packages should not be explicit about the library to
-use; let the script author decide which is best.
+which attempts to load the L<Math::BigInt::GMP> library, and falls back to the
+default library if the specified library can't be loaded.
 
-If your script works with huge numbers and Calc is too slow for them, you can
-also for the loading of one of these libraries and if none of them can be used,
-the code dies:
+Multiple libraries can be specified by separating them by a comma, e.g.,
+
+    use Math::BigInt try => 'GMP,Pari';
+
+If you request a specific set of libraries and do not allow fallback, specify
+them using "only",
 
     use Math::BigInt only => 'GMP,Pari';
 
-The following would first try to find Math::BigInt::Foo, then
-Math::BigInt::Bar, and when this also fails, revert to Math::BigInt::Calc:
+If you prefer a specific set of libraries, but want to see a warning if the
+fallback library is used, specify them using "lib",
+
+    use Math::BigInt lib => 'GMP,Pari';
+
+The following first tries to find Math::BigInt::Foo, then Math::BigInt::Bar, and
+if this also fails, reverts to Math::BigInt::Calc:
 
     use Math::BigInt try => 'Foo,Math::BigInt::Bar';
 
-The library that is loaded last is used. Note that this can be overwritten at
-any time by loading a different library, and numbers constructed with different
-libraries cannot be used in math operations together.
+=head3 The fallback library
+
+The library that is used is the first library that was successfully loaded. The
+fallback library is the most recent library that was successfully loaded, or the
+default library, if no library has been successfully loaded.
+
+In the following example, assume "Pari" can be loaded, but "Foo" can't. Since
+"Pari" can be loaded, it is used. Since "Foo" can't be loaded, "Pari" is used as
+the fallback library, since it is the most recently successfully loaded library.
+
+    use Math::BigInt;                   # "Calc" (default) is used
+    use Math::BigInt try => "Pari";     # "Pari" is used
+    use Math::BigFloat try => "Foo";    # fallback to "Pari"
+
+As shown, multiple libraries can be loaded, and the library in used can be
+changed. However, all library loading should be done before any objects are
+created. Mixing objects that use different backend libraries won't work.
 
 =head3 What library to use?
 
@@ -6603,16 +6676,16 @@ B<Note>: General purpose packages should not be explicit about the library to
 use; let the script author decide which is best.
 
 L<Math::BigInt::GMP> and L<Math::BigInt::Pari> are in cases involving big
-numbers much faster than Calc, however it is slower when dealing with very
-small numbers (less than about 20 digits) and when converting very large
-numbers to decimal (for instance for printing, rounding, calculating their
-length in decimal etc).
+numbers much faster than L<Math::BigInt::Calc>. However it is slower when
+dealing with very small numbers (less than about 20 digits) and when converting
+very large numbers to decimal (for instance for printing, rounding, calculating
+their length in decimal etc.).
 
 So please select carefully what library you want to use.
 
-Different low-level libraries use different formats to store the numbers.
-However, you should B<NOT> depend on the number having a specific format
-internally.
+Different low-level libraries use different formats to store the numbers, so
+mixing them won't work. You should not depend on the number having a specific
+internal format.
 
 See the respective math library module documentation for further details.
 

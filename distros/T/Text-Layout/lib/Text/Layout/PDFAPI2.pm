@@ -21,6 +21,10 @@ sub new {
     }
     my $self = $pkg->SUPER::new;
     $self->{_context} = $data[0];
+    if ( !$fc || $fc->{__PDF__} ne $data[0] ) {
+	# Init cache.
+	$fc = { __PDF__ => $data[0] };
+    }
     $self;
 }
 

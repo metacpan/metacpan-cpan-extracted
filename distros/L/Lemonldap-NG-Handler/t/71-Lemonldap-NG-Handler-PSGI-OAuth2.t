@@ -4,7 +4,7 @@ BEGIN {
     require 't/test-psgi-lib.pm';
 }
 
-my $maintests = 18;
+my $maintests = 25;
 
 init(
     'Lemonldap::NG::Handler::Server',
@@ -57,7 +57,7 @@ Lemonldap::NG::Common::Session->new( {
         info  => {
             "user_session_id" => $sessionId,
             "_type"           => "access_token",
-            "_utime"          => time,
+            "_utime"          => ( time - 72000 + 300 ),
             "rp"              => "rp-example2",
             "scope"           => "openid email read"
         }
@@ -74,7 +74,7 @@ Lemonldap::NG::Common::Session->new( {
         info                 => {
             "offline_session_id" => '000999000',
             "_type"              => "refresh_token",
-            "_utime"             => time,
+            "_utime"             => ( time - 72000 + 300 ),
             "rp"                 => "rp-example",
             "scope"              => "openid email read"
         }
@@ -117,6 +117,7 @@ ok(
 
 # Check headers
 %h = @{ $res->[1] };
+is( $res->[0],              401,      "Got correct HTTP code" );
 is( $h{'WWW-Authenticate'}, 'Bearer', 'Got WWW-Authenticate: Bearer' );
 
 # Request with invalid Access Token
@@ -172,6 +173,24 @@ ok(
 );
 is( $res->[0], 403, "Unauthorized because the write scope is not granted" );
 
+# Request with JWT Access Token
+ok(
+    $res = $client->_get(
+        '/test',             undef,
+        'test1.example.com', '',
+        VHOSTTYPE => 'OAuth2',
+        HTTP_AUTHORIZATION =>
+'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwianRpIjoiZjBmZDRlODUwMDBjZTM1ZDA2MmY5N2Y1YjQ2NmZjMDBhYmMyZmFkMDQwNmUwM2UwODY2MDVmOTI5ZWM0YTI0OSJ9.h0RDBLo5Vy8lqbltEP2L496KOzJLhLCIRZZmEqcPuN8',
+    ),
+    'Invalid access token'
+);
+
+# Check headers
+%h = @{ $res->[1] };
+is( $res->[0], 200, "Request accepted" );
+ok( $h{'Auth-User'} eq 'dwho', 'Header Auth-User is set to "dwho"' )
+  or explain( \%h, 'Auth-User => "dwho"' );
+
 # Request with Access token from offline session
 ok(
     $res = $client->_get(
@@ -191,6 +210,24 @@ is( $h{'Auth-ClientID'}, 'example', 'Client ID correctly transmitted' );
 is( $h{'Auth-ClientConfKey'},
     'rp-example', 'Client confkey correctly transmitted' );
 like( $h{'Auth-Scope'}, qr/\bemail\b/, 'Scope correctly transmitted' );
+
+Time::Fake->offset("+600s");
+ok(
+    $res = $client->_get(
+        '/read',             undef,
+        'test1.example.com', '',
+        VHOSTTYPE          => 'OAuth2',
+        HTTP_AUTHORIZATION => 'Bearer 999888777',
+    ),
+    'Invalid access token'
+);
+%h = @{ $res->[1] };
+is( $res->[0], 401, "Access was rejected" );
+is(
+    $h{'WWW-Authenticate'},
+    'Bearer error="invalid_token"',
+    'Got correct error code'
+);
 
 count($maintests);
 done_testing( count() );

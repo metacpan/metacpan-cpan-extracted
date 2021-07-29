@@ -11,7 +11,7 @@ use constant TLS => eval { require IO::Socket::SSL; IO::Socket::SSL->VERSION('2.
 
 use constant DEBUG => $ENV{LINK_EMBEDDER_DEBUG} || 0;
 
-our $VERSION = '1.19';
+our $VERSION = '1.20';
 
 my $PROTOCOL_RE = qr!^(\w+):\w+!i;    # Examples: mail:, spotify:, ...
 
@@ -119,12 +119,16 @@ sub serve {
 sub test_ok {
   my ($self, $url, $expect) = @_;
 
+  state $n = 0;
+  return if $ENV{N} and $ENV{N} ne ++$n;
+
   my $subtest = sub {
     my $link = shift;
     my $json = $link->TO_JSON;
     Test::More::isa_ok($link, $expect->{isa}) if $expect->{isa};
     Test::More::is(Mojo::DOM->new($json->{html})->children->first->{class}, $expect->{class}, 'class')
       if $expect->{class};
+    Test::More::unlike($json->{html}, qr{&amp;quot;}, 'avoid double &amp;quot; HTML entities') if $json->{html};
 
     for my $key (sort keys %$expect) {
       next if $key eq 'isa' or $key eq 'class';

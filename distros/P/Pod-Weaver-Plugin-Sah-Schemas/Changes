@@ -1,3 +1,32 @@
+0.067   2021-07-22  Released-By: PERLANCAR; Urgency: medium
+
+	- Fix typo in generated example.
+
+	- Tweak wording in generated mention.
+
+
+0.066   2021-07-20  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Non-defhash example was not handled correctly (results
+	  in 'undef' in POD).
+
+	- Add preamble in generated SAH SCHEMAS POD section.
+
+
+0.065   2021-07-19  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [dist] Workaround to avoid triggering PAUSE's simplistic package
+	  detection (package MyApp in example POD was detected as a package
+	  declaration).
+
+
+0.064   2021-07-19  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Didn't search for Sah::Schema::* modules recursively.
+
+
 0.063   2020-05-08  Released-By: PERLANCAR; Urgency: medium
 
 	- In generated Synopsis, show how to use with Params::Sah and show

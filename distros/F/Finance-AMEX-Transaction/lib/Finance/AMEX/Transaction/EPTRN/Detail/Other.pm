@@ -1,5 +1,5 @@
 package Finance::AMEX::Transaction::EPTRN::Detail::Other;
-$Finance::AMEX::Transaction::EPTRN::Detail::Other::VERSION = '0.003';
+$Finance::AMEX::Transaction::EPTRN::Detail::Other::VERSION = '0.004';
 use strict;
 use warnings;
 
@@ -68,7 +68,7 @@ Finance::AMEX::Transaction::EPTRN::Detail::Other - Parse AMEX Transaction/Invoic
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 
@@ -298,11 +298,11 @@ Finance::AMEX::Transaction::EPTRN::Detail::Other - Object methods for AMEX Recon
 
 =head1 AUTHOR
 
-Tom Heady <theady@ziprecruiter.com>
+Tom Heady <cpan@punch.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by ZipRecruiter.
+This software is copyright (c) 2021 by ZipRecruiter.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

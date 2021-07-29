@@ -1,10 +1,22 @@
 #---------------------------------------------------------------------
-# $Header: /Perl/OlleDB/t/A_tableparam.t 13    19-07-08 22:12 Sommar $
+# $Header: /Perl/OlleDB/t/A_tableparam.t 15    21-06-30 23:11 Sommar $
 #
 # This test script tests table parameters with sql_sp and sql in with
 # all data types.
 #
 # $History: A_tableparam.t $
+# 
+# *****************  Version 15  *****************
+# User: Sommar       Date: 21-06-30   Time: 23:11
+# Updated in $/Perl/OlleDB/t
+# Adjustment for possible Perl bug with UTF-8 code page.
+# 
+# *****************  Version 14  *****************
+# User: Sommar       Date: 21-04-25   Time: 22:01
+# Updated in $/Perl/OlleDB/t
+# For sql_variant tests permit either varchar or nvarchar data for plain
+# strings, since it will always be nvarchar if DB code page and client
+# code page are different.
 # 
 # *****************  Version 13  *****************
 # User: Sommar       Date: 19-07-08   Time: 22:12
@@ -740,7 +752,7 @@ sub ISO_to_regional {
   open DH, "datehelperout.txt";
   my $line = <DH>;
   close DH;
-  my $ret = (split(/\s*£\s*/, $line))[0];
+  my $ret = (split(/\s*\xc2?£\s*/, $line))[0];  # The \xC2 is needed wen OENCP = UTf-8. Perl bug?
   $ret =~ s/^\s*|\s*$//g;
   $ret .= $tz if defined $tz;
   return $ret;
@@ -1773,7 +1785,6 @@ clear_test_data;
 create_sql_variant;
 
 my @vartable;
-my $nvarchar = ($codepage == 65001 ? "varchar" : 'nvarchar');
 
 @vartable = ([1, {Year => 2008, Month => 3, Day => 22}],
              [2, {Year => 2008, Month => 3, Day => 22,
@@ -1789,12 +1800,12 @@ my $nvarchar = ($codepage == 65001 ? "varchar" : 'nvarchar');
 
 %inparam   = (vartable => \@vartable);
 %expectcol = (basetype => "date;datetimeoffset;datetime2;time;int;" .
-                          "float;$nvarchar;varchar;varchar;",
+                          "float;nvarchar;n?varchar;n?varchar;",
               varcol   => "2008-03-22;2008-03-22 18:30:00.0000000 +01:00;" .
                           "2008-03-22 18:30:00.0311000;00:00:00.0000001;" .
                           "12345678;1e+202;abc\x{010B}\x{FFFD};Lycksele;;");
 %expectpar = ();
-%test      = (basetype => "%s eq %s",
+%test      = (basetype => "%s =~ /%s/",
               varcol   => "%s eq %s");
 do_tests($X, 0, 'sql_variant', 'all sorts');
 

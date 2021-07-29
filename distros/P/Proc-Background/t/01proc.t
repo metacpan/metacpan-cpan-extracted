@@ -203,8 +203,10 @@ $options{die_upon_destroy} = 1;
     sleep 1;
     ok(kill(0, $pid) == 1);					# 46
     $p7 = undef;
-    sleep 1;
-    ok(kill(0, $pid) == 0);					# 47
+    # sleep up to 10 seconds waiting for the process id to stop being valid
+    my $kill= 1;
+    for (1..10) { sleep 1; last if !($kill=kill(0, $pid)); }
+    ok($kill == 0);					# 47
   } else {
     ok(0);							# 45
     ok(0);							# 46

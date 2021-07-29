@@ -1,14 +1,14 @@
 ---
 abstract: 'Parse AMEX transaction files: EPRAW, EPPRC, EPTRN, CBNOT, GRRCN'
 author:
-  - 'Tom Heady <theady@ziprecruiter.com>'
+  - 'Tom Heady <cpan@punch.net>'
 build_requires:
   JSON: '0'
   Test::More: '0.88'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.023, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -17,172 +17,174 @@ name: Finance-AMEX-Transaction
 provides:
   Finance::AMEX::Transaction:
     file: lib/Finance/AMEX/Transaction.pm
-    version: '0.003'
+    version: '0.004'
   Finance::AMEX::Transaction::CBNOT:
     file: lib/Finance/AMEX/Transaction/CBNOT.pm
-    version: '0.003'
+    version: '0.004'
   Finance::AMEX::Transaction::CBNOT::Base:
     file: lib/Finance/AMEX/Transaction/CBNOT/Base.pm
-    version: '0.003'
+    version: '0.004'
   Finance::AMEX::Transaction::CBNOT::Detail:
     file: lib/Finance/AMEX/Transaction/CBNOT/Detail.pm
-    version: '0.003'
+    version: '0.004'
   Finance::AMEX::Transaction::CBNOT::Header:
     file: lib/Finance/AMEX/Transaction/CBNOT/Header.pm
-    version: '0.003'
+    version: '0.004'
   Finance::AMEX::Transaction::CBNOT::Trailer:
     file: lib/Finance/AMEX/Transaction/CBNOT/Trailer.pm
-    version: '0.003'
+    version: '0.004'
   Finance::AMEX::Transaction::CBNOT::Unknown:
     file: lib/Finance/AMEX/Transaction/CBNOT/Unknown.pm
-    version: '0.003'
+    version: '0.004'
   Finance::AMEX::Transaction::EPPRC:
     file: lib/Finance/AMEX/Transaction/EPPRC.pm
-    version: '0.003'
+    version: '0.004'
   Finance::AMEX::Transaction::EPPRC::Base:
     file: lib/Finance/AMEX/Transaction/EPPRC/Base.pm
-    version: '0.003'
+    version: '0.004'
   Finance::AMEX::Transaction::EPPRC::Detail::Adjustment:
     file: lib/Finance/AMEX/Transaction/EPPRC/Detail/Adjustment.pm
-    version: '0.003'
+    version: '0.004'
   Finance::AMEX::Transaction::EPPRC::Detail::ChargeSummary:
     file: lib/Finance/AMEX/Transaction/EPPRC/Detail/ChargeSummary.pm
-    version: '0.003'
+    version: '0.004'
   Finance::AMEX::Transaction::EPPRC::Detail::ChargeSummaryPricing:
     file: lib/Finance/AMEX/Transaction/EPPRC/Detail/ChargeSummaryPricing.pm
-    version: '0.003'
+    version: '0.004'
   Finance::AMEX::Transaction::EPPRC::Detail::Chargeback:
     file: lib/Finance/AMEX/Transaction/EPPRC/Detail/Chargeback.pm
-    version: '0.003'
+    version: '0.004'
   Finance::AMEX::Transaction::EPPRC::Detail::Other:
     file: lib/Finance/AMEX/Transaction/EPPRC/Detail/Other.pm
-    version: '0.003'
+    version: '0.004'
   Finance::AMEX::Transaction::EPPRC::Detail::RecordSummary:
     file: lib/Finance/AMEX/Transaction/EPPRC/Detail/RecordSummary.pm
-    version: '0.003'
+    version: '0.004'
   Finance::AMEX::Transaction::EPPRC::Detail::RecordSummaryPricing:
     file: lib/Finance/AMEX/Transaction/EPPRC/Detail/RecordSummaryPricing.pm
-    version: '0.003'
+    version: '0.004'
   Finance::AMEX::Transaction::EPPRC::Header:
     file: lib/Finance/AMEX/Transaction/EPPRC/Header.pm
-    version: '0.003'
+    version: '0.004'
   Finance::AMEX::Transaction::EPPRC::Summary:
     file: lib/Finance/AMEX/Transaction/EPPRC/Summary.pm
-    version: '0.003'
+    version: '0.004'
   Finance::AMEX::Transaction::EPPRC::Trailer:
     file: lib/Finance/AMEX/Transaction/EPPRC/Trailer.pm
-    version: '0.003'
+    version: '0.004'
   Finance::AMEX::Transaction::EPPRC::Unknown:
     file: lib/Finance/AMEX/Transaction/EPPRC/Unknown.pm
-    version: '0.003'
+    version: '0.004'
   Finance::AMEX::Transaction::EPRAW:
     file: lib/Finance/AMEX/Transaction/EPRAW.pm
-    version: '0.003'
+    version: '0.004'
   Finance::AMEX::Transaction::EPRAW::Base:
     file: lib/Finance/AMEX/Transaction/EPRAW/Base.pm
-    version: '0.003'
+    version: '0.004'
   Finance::AMEX::Transaction::EPRAW::Detail::Adjustment:
     file: lib/Finance/AMEX/Transaction/EPRAW/Detail/Adjustment.pm
-    version: '0.003'
+    version: '0.004'
   Finance::AMEX::Transaction::EPRAW::Detail::ChargeSummary:
     file: lib/Finance/AMEX/Transaction/EPRAW/Detail/ChargeSummary.pm
-    version: '0.003'
+    version: '0.004'
   Finance::AMEX::Transaction::EPRAW::Detail::Chargeback:
     file: lib/Finance/AMEX/Transaction/EPRAW/Detail/Chargeback.pm
-    version: '0.003'
+    version: '0.004'
   Finance::AMEX::Transaction::EPRAW::Detail::Other:
     file: lib/Finance/AMEX/Transaction/EPRAW/Detail/Other.pm
-    version: '0.003'
+    version: '0.004'
   Finance::AMEX::Transaction::EPRAW::Header:
     file: lib/Finance/AMEX/Transaction/EPRAW/Header.pm
-    version: '0.003'
+    version: '0.004'
   Finance::AMEX::Transaction::EPRAW::Summary:
     file: lib/Finance/AMEX/Transaction/EPRAW/Summary.pm
-    version: '0.003'
+    version: '0.004'
   Finance::AMEX::Transaction::EPRAW::Trailer:
     file: lib/Finance/AMEX/Transaction/EPRAW/Trailer.pm
-    version: '0.003'
+    version: '0.004'
   Finance::AMEX::Transaction::EPRAW::Unknown:
     file: lib/Finance/AMEX/Transaction/EPRAW/Unknown.pm
-    version: '0.003'
+    version: '0.004'
   Finance::AMEX::Transaction::EPTRN:
     file: lib/Finance/AMEX/Transaction/EPTRN.pm
-    version: '0.003'
+    version: '0.004'
   Finance::AMEX::Transaction::EPTRN::Base:
     file: lib/Finance/AMEX/Transaction/EPTRN/Base.pm
-    version: '0.003'
+    version: '0.004'
   Finance::AMEX::Transaction::EPTRN::Detail::Adjustment:
     file: lib/Finance/AMEX/Transaction/EPTRN/Detail/Adjustment.pm
-    version: '0.003'
+    version: '0.004'
   Finance::AMEX::Transaction::EPTRN::Detail::ChargeSummary:
     file: lib/Finance/AMEX/Transaction/EPTRN/Detail/ChargeSummary.pm
-    version: '0.003'
+    version: '0.004'
   Finance::AMEX::Transaction::EPTRN::Detail::Chargeback:
     file: lib/Finance/AMEX/Transaction/EPTRN/Detail/Chargeback.pm
-    version: '0.003'
+    version: '0.004'
   Finance::AMEX::Transaction::EPTRN::Detail::Other:
     file: lib/Finance/AMEX/Transaction/EPTRN/Detail/Other.pm
-    version: '0.003'
+    version: '0.004'
   Finance::AMEX::Transaction::EPTRN::Detail::RecordSummary:
     file: lib/Finance/AMEX/Transaction/EPTRN/Detail/RecordSummary.pm
-    version: '0.003'
+    version: '0.004'
   Finance::AMEX::Transaction::EPTRN::Header:
     file: lib/Finance/AMEX/Transaction/EPTRN/Header.pm
-    version: '0.003'
+    version: '0.004'
   Finance::AMEX::Transaction::EPTRN::Summary:
     file: lib/Finance/AMEX/Transaction/EPTRN/Summary.pm
-    version: '0.003'
+    version: '0.004'
   Finance::AMEX::Transaction::EPTRN::Trailer:
     file: lib/Finance/AMEX/Transaction/EPTRN/Trailer.pm
-    version: '0.003'
+    version: '0.004'
   Finance::AMEX::Transaction::EPTRN::Unknown:
     file: lib/Finance/AMEX/Transaction/EPTRN/Unknown.pm
-    version: '0.003'
+    version: '0.004'
   Finance::AMEX::Transaction::GRRCN:
     file: lib/Finance/AMEX/Transaction/GRRCN.pm
-    version: '0.003'
+    version: '0.004'
   Finance::AMEX::Transaction::GRRCN::Adjustment:
     file: lib/Finance/AMEX/Transaction/GRRCN/Adjustment.pm
-    version: '0.003'
+    version: '0.004'
   Finance::AMEX::Transaction::GRRCN::Base:
     file: lib/Finance/AMEX/Transaction/GRRCN/Base.pm
-    version: '0.003'
+    version: '0.004'
   Finance::AMEX::Transaction::GRRCN::Chargeback:
     file: lib/Finance/AMEX/Transaction/GRRCN/Chargeback.pm
-    version: '0.003'
+    version: '0.004'
   Finance::AMEX::Transaction::GRRCN::FeeRevenue:
     file: lib/Finance/AMEX/Transaction/GRRCN/FeeRevenue.pm
-    version: '0.003'
+    version: '0.004'
   Finance::AMEX::Transaction::GRRCN::Header:
     file: lib/Finance/AMEX/Transaction/GRRCN/Header.pm
-    version: '0.003'
+    version: '0.004'
   Finance::AMEX::Transaction::GRRCN::Submission:
     file: lib/Finance/AMEX/Transaction/GRRCN/Submission.pm
-    version: '0.003'
+    version: '0.004'
   Finance::AMEX::Transaction::GRRCN::Summary:
     file: lib/Finance/AMEX/Transaction/GRRCN/Summary.pm
-    version: '0.003'
+    version: '0.004'
   Finance::AMEX::Transaction::GRRCN::TaxRecord:
     file: lib/Finance/AMEX/Transaction/GRRCN/TaxRecord.pm
-    version: '0.003'
+    version: '0.004'
   Finance::AMEX::Transaction::GRRCN::Trailer:
     file: lib/Finance/AMEX/Transaction/GRRCN/Trailer.pm
-    version: '0.003'
+    version: '0.004'
   Finance::AMEX::Transaction::GRRCN::Transaction:
     file: lib/Finance/AMEX/Transaction/GRRCN/Transaction.pm
-    version: '0.003'
+    version: '0.004'
   Finance::AMEX::Transaction::GRRCN::TxnPricing:
     file: lib/Finance/AMEX/Transaction/GRRCN/TxnPricing.pm
-    version: '0.003'
+    version: '0.004'
   Finance::AMEX::Transaction::GRRCN::Unknown:
     file: lib/Finance/AMEX/Transaction/GRRCN/Unknown.pm
-    version: '0.003'
+    version: '0.004'
 recommends:
   Text::CSV_XS: '0'
 requires:
   Text::CSV: '0'
   perl: '5.006'
 resources:
-  repository: git://github.com/ZipRecruiter/Finance-AMEX-Transaction.git
-version: '0.003'
+  repository: git://github.com/tomheady/Finance-AMEX-Transaction.git
+version: '0.004'
+x_generated_by_perl: v5.32.1
 x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

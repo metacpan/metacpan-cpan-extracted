@@ -71,6 +71,16 @@ Returns a hashref of receiver methods for the given class.
 Reformat a given string to make it combatible with our services
 naming strategy
 
+it takes the following args:
+
+=over 4
+
+=item * name - a String with the original name
+
+=item * namespace - If available the service name will not contain the namespace
+
+=back
+
 =head1 INHERITED METHODS
 
 =over 4

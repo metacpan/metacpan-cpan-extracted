@@ -1,7 +1,7 @@
 package Sah::SchemaR::perl::podname;
 
-our $DATE = '2021-01-20'; # DATE
-our $VERSION = '0.035'; # VERSION
+our $DATE = '2021-07-20'; # DATE
+our $VERSION = '0.038'; # VERSION
 
 our $rschema = ["str",[{description=>"\nPerl POD name, e.g. `Config`, `Some::Other::POD`.\n\nBasically the same as `perl::modname`, but with a different completion.\n\n",match=>"\\A[A-Za-z_][A-Za-z_0-9]*(::[A-Za-z_0-9]+)*\\z",summary=>"Perl POD name, e.g. Moose::Cookbook","x.completion"=>"perl_modname","x.perl.coerce_rules"=>["From_str::normalize_perl_modname"]}],["str"]];
 
@@ -20,7 +20,7 @@ Sah::SchemaR::perl::podname - Perl POD name, e.g. Moose::Cookbook
 
 =head1 VERSION
 
-This document describes version 0.035 of Sah::SchemaR::perl::podname (from Perl distribution Sah-Schemas-Perl), released on 2021-01-20.
+This document describes version 0.038 of Sah::SchemaR::perl::podname (from Perl distribution Sah-Schemas-Perl), released on 2021-07-20.
 
 =head1 DESCRIPTION
 
@@ -38,7 +38,7 @@ Source repository is at L<https://github.com/perlancar/perl-Sah-Schemas-Perl>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Sah-Schemas-Perl/issues>
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Sah-Schemas-Perl>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

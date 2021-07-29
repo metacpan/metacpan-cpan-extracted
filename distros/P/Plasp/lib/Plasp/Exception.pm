@@ -1,7 +1,7 @@
 package Plasp::Exception;
 
 use Moo::Role;
-use Types::Standard qw(Str);
+use Types::Standard qw(Str Object);
 
 use overload
     q{""}    => sub { $_[0]->as_string },
@@ -38,6 +38,11 @@ has message => (
     is      => 'ro',
     isa     => Str,
     default => sub { $! || '' },
+);
+
+has stack_trace => (
+    is      => 'ro',
+    isa     => Object,
 );
 
 =head1 METHODS

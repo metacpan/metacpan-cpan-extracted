@@ -15,9 +15,11 @@ Sah::Schemas::Str - Various string schemas
 
 =head1 VERSION
 
-This document describes version 0.002 of Sah::Schemas::Str (from Perl distribution Sah-Schemas-Str), released on 2020-05-27.
+This document describes version 0.003 of Sah::Schemas::Str (from Perl distribution Sah-Schemas-Str), released on 2021-07-23.
 
 =head1 SAH SCHEMAS
+
+The following schemas are included in this distribution:
 
 =over
 
@@ -36,6 +38,14 @@ String containing only zero or more Latin lettersE<sol>digits, i.e. A-Za-z0-9.
 =item * L<latin_letter|Sah::Schema::latin_letter>
 
 Latin letter, i.e. A-Z or a-z.
+
+=item * L<str_or_aos|Sah::Schema::str_or_aos>
+
+String or array (0+ length) of (defined) string.
+
+=item * L<str_or_aos1|Sah::Schema::str_or_aos1>
+
+String or array (1+ length) of (defined) string.
 
 =back
 
@@ -57,9 +67,9 @@ feature.
 
 =head1 SEE ALSO
 
-L<Sah> - specification
+L<Sah> - schema specification
 
-L<Data::Sah>
+L<Data::Sah> - Perl implementation of Sah
 
 =head1 AUTHOR
 
@@ -67,7 +77,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

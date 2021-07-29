@@ -15,7 +15,7 @@ use Lemonldap::NG::Common::EmailTransport;
 use MIME::Base64;
 use Encode;
 
-our $VERSION = '2.0.9';
+our $VERSION = '2.0.12';
 
 our $transport;
 
@@ -49,6 +49,7 @@ sub loadMailTemplate {
     # HTML::Template cache interferes with email translation (#1897)
     $prm{cache} = 0 unless defined $prm{cache};
     $prm{params}->{STATIC_PREFIX} = $self->p->staticPrefix;
+    $prm{params}->{MAIN_LOGO}     = $self->conf->{portalMainLogo};
     my %extra =
         $self->p->can('tplParams')
       ? $self->p->tplParams($req)

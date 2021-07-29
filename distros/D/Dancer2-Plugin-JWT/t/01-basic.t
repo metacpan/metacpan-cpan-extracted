@@ -53,6 +53,7 @@ my $response = $mech->res();
 my $authorization = $response->authorization;
 ok($authorization, "We have something");
 ok($mech->header_exists_ok('Authorization'), 'Has Authorization header');
+ok($mech->header_exists_ok('Access-Control-Expose-Headers'), 'Has Access-Control-Expose-Headers header');
 ok($mech->header_exists_ok('Set-Cookie'), 'Has Set-Cookie header');
 ok($mech->lacks_header_ok('Location'), 'No Location header');
 my $x = decode_jwt(token => $authorization, key => "secret");

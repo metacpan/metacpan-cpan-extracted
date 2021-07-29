@@ -1,0 +1,40 @@
+NAME
+    Types::QuacksLike - Check for object providing all methods from a class
+    or role
+
+SYNOPSIS
+      use Types::QuacksLike -all;
+
+      {
+        package MyClass;
+        use Moo;
+        sub my_method {}
+      }
+
+      my $duck_type = QuacksLike["MyClass"]; # same as HasMethods["my_method"];
+
+DESCRIPTION
+    Check for object providing all methods from a class or role.
+
+TYPES
+  QuacksLike[ $package ]
+    Generates a Type::Tiny::Duck type requiring all of the methods that
+    exist in the given package. Supports roles from Moose, Moo, and
+    Role::Tiny, and classes from Moose, Moo, or standard perl. Methods
+    beginning with an underscore are considered private, and are not
+    included.
+
+AUTHOR
+    haarg - Graham Knop (cpan:HAARG) <haarg@haarg.org>
+
+CONTRIBUTORS
+    None so far.
+
+COPYRIGHT
+    Copyright (c) 2019 the Types::QuacksLike "AUTHOR" and "CONTRIBUTORS" as
+    listed above.
+
+LICENSE
+    This library is free software and may be distributed under the same
+    terms as perl itself. See <https://dev.perl.org/licenses/>.
+

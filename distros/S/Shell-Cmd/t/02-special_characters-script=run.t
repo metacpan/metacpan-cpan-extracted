@@ -10,6 +10,7 @@ require "script.pl";
 testScript(
            'mode'   => 'dry-run',
            'script' => 'run',
+           'env'    => [ qw(SC_VAR_1  val$1   SC_VAR_2  val'2  SC_VAR_3  val"3) ],
           );
 
 #Local Variables:

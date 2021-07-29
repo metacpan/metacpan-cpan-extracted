@@ -1,13 +1,26 @@
-Revision history for App-relpath
+0.051   2021-07-15  Released-By: PERLANCAR; Urgency: low
 
-0.04    2015-01-03 (PERLANCAR)
+	- No functional changes.
+
+        - Fix version number.
+
+
+0.050   2021-07-15  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- Remove =for POD heading because this will cause the demo to be
+	  put in Description section (by PodWeaver?).
+
+
+0.04    2015-01-03  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Rebuild (Generate TODO.md).
 
 
-0.03    2014-12-05 (PERLANCAR)
+0.03    2014-12-05  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -15,11 +28,11 @@ Revision history for App-relpath
 	  File::MoreUtil.
 
 
-0.02    2014-04-09 (SHARYANTO)
+0.02    2014-04-09  Released-By: SHARYANTO
 
         - Add options -c and -C (alias for --check and --nocheck, respectively).
 
 
-0.01    2014-04-09 (SHARYANTO)
+0.01    2014-04-09  Released-By: SHARYANTO
 
         - First release.

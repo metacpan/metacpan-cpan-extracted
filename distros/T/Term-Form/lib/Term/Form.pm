@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '0.535';
+our $VERSION = '0.537';
 use Exporter 'import';
 our @EXPORT_OK = qw( fill_form read_line );
 
@@ -369,7 +369,11 @@ sub __init_readline {
         print clear_screen();
     }
     if ( length $self->{info} ) {
-        my @info = line_fold( $self->{info}, $self->{i}{term_w}, { color => $self->{color}, join => 0 } );
+        my $info_w = $term_w;
+        if ( $^O ne 'MSWin32' && $^O ne 'cygwin' ) {
+            $info_w += WIDTH_CURSOR;
+        }
+        my @info = line_fold( $self->{info}, $info_w, { color => $self->{color}, join => 0 } );
         $self->{i}{info_row_count} = @info;
         print join( "\n", @info ), "\n";
     }
@@ -911,7 +915,11 @@ sub __prepare_hight {
     my ( $self, $list, $term_w, $term_h ) = @_;
     $self->{i}{avail_h} = $term_h;
     if ( length $self->{i}{pre_text} ) {
-        $self->{i}{pre_text} = line_fold( $self->{i}{pre_text}, $term_w, { color => $self->{color}, join => 1 } );
+        my $info_w = $term_w;
+        if ( $^O ne 'MSWin32' && $^O ne 'cygwin' ) {
+            $info_w += WIDTH_CURSOR;
+        }
+        $self->{i}{pre_text} = line_fold( $self->{i}{pre_text}, $info_w, { color => $self->{color}, join => 1 } );
         $self->{i}{pre_text_row_count} = $self->{i}{pre_text} =~ tr/\n//;
         $self->{i}{pre_text_row_count} += 1;
         $self->{i}{avail_h} -= $self->{i}{pre_text_row_count};
@@ -1566,7 +1574,7 @@ Term::Form - Read lines from STDIN.
 
 =head1 VERSION
 
-Version 0.535
+Version 0.537
 
 =cut
 

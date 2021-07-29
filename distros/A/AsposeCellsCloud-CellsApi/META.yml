@@ -20,7 +20,9 @@ provides:
     file: lib/AsposeCellsCloud/ApiFactory.pm
   AsposeCellsCloud::CellsApi:
     file: lib/AsposeCellsCloud/CellsApi.pm
-    version: 21.5
+    version: 21.6
+  AsposeCellsCloud::LiteCellsApi:
+    file: lib/AsposeCellsCloud/LiteCellsApi.pm
   AsposeCellsCloud::Configuration:
     file: lib/AsposeCellsCloud/Configuration.pm
   AsposeCellsCloud::Object::AboveAverage:
@@ -153,6 +155,10 @@ provides:
     file: lib/AsposeCellsCloud/Object/Error.pm
   AsposeCellsCloud::Object::ErrorDetails:
     file: lib/AsposeCellsCloud/Object/ErrorDetails.pm
+  AsposeCellsCloud::Object::FileInfo:
+    file: lib/AsposeCellsCloud/Object/FileInfo.pm
+  AsposeCellsCloud::Object::FilesResult:
+    file: lib/AsposeCellsCloud/Object/FilesResult.pm
   AsposeCellsCloud::Object::FileSource:
     file: lib/AsposeCellsCloud/Object/FileSource.pm
   AsposeCellsCloud::Object::FileVersion:
@@ -544,5 +550,5 @@ requires:
   strict: '0'
   utf8: '0'
   warnings: '0'
-version: 21.1
+version: 21.6
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

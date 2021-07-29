@@ -3,6 +3,7 @@ LemonLDAP::NG 2F registration script
 ###
 
 setMsg = (msg, level) ->
+	$('#msg').attr 'trspan', msg
 	$('#msg').html window.translate msg
 	$('#color').removeClass 'message-positive message-warning alert-success alert-warning'
 	$('#color').addClass "message-#{level}"

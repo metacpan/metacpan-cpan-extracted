@@ -10,11 +10,13 @@ use strict;
 use Getopt::Long;
 use Pod::Usage;
 
-our $VERSION = "2.0.9";
+our $VERSION = "2.0.12";
 
 # Options
 my $opts = {};
 my $help;
+my $opt_user  = '__APACHEUSER__';
+my $opt_group = '__APACHEGROUP__';
 
 GetOptions(
     'help|h'       => \$help,
@@ -23,13 +25,15 @@ GetOptions(
     'backend|b=s'  => \$opts->{backend},
     'persistent|p' => \$opts->{persistent},
     'id-only|i'    => \$opts->{idonly},
+    'user|u=s'     => \$opt_user,
+    'group|g=s'    => \$opt_group,
 ) or pod2usage( -exitcode => 1, -verbose => 0 );
 
 pod2usage( -exitcode => 0, -verbose => 2 ) if $help;
 
 eval {
-    POSIX::setgid( scalar( getgrnam('__APACHEGROUP__') ) );
-    POSIX::setuid( scalar( getpwnam('__APACHEUSER__') ) );
+    POSIX::setgid( scalar( getgrnam($opt_group) ) );
+    POSIX::setuid( scalar( getpwnam($opt_user) ) );
 };
 
 my $action = shift @ARGV;
@@ -127,7 +131,8 @@ Options:
 	--persistent	Search in persistent sessions
 	--where		Set search filter (search/delete only)
 	--id-only	Only return IDs (search only)
-
+	--user      Change user running the script
+	--group     Change group running the script
 
 =head1 COMMANDS
 
@@ -167,8 +172,11 @@ Examples
 	lemonldap-ng-sessions search --where uid=dwho \
 		--id-only
 
+	lemonldap-ng-sessions search --backend persistent \
+		--where _session_uid=dwho
+
 	lemonldap-ng-sessions search --where uid=dwho \
-		 --select authenticationLevel
+		--select authenticationLevel
 
 =head2 Delete
 
@@ -190,6 +198,8 @@ Or you can give it a search expression.
 Examples:
 
 	lemonldap-ng-sessions delete --where uid=dwho
+
+	lemonldap-ng-sessions delete --persistent --where _session_uid=dwho
 
 =head2 Set Key
 
@@ -283,7 +293,7 @@ Examples:
 
 =item B<--persistent>,B<-p>
 
-This options is a shortcut for specifying --backend persistent and using
+This option is a shortcut for specifying --backend persistent and using
 the UID hash as a session ID
 
 Example:
@@ -298,7 +308,7 @@ is the same as
 
 =item B<--id-only>,B<-i>
 
-This option replace the standard JSON output format with a simpler format of
+This option replaces the standard JSON output format with a simpler format of
 one session ID per line.
 
 This allows some intersting combos using xargs. For example, if you want to
@@ -307,7 +317,13 @@ remove all sessions started by "dwho"
 	lemonldap-ng-sessions search --where uid=dwho --id-only | \
 		xargs lemonldap-ng-sessions delete
 
+=item B<--user>,B<-u>
 
+This option forces the system user that runs the script.
+
+=item B<--group>,B<-g>
+
+This option forces the system group that runs the script.
 
 =back
 

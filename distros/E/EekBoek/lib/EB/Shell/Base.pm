@@ -419,7 +419,8 @@ sub quit {
 	    $self->term->WriteHistory($h);
 	}
 	elsif ( open( my $fd, '>:encoding(utf8)', $h ) ) {
-	    print { $fd } @{ $self->{_history} };
+	    print { $fd } @{ $self->{_history} }
+	      if @{ $self->{_history} };
 	    close($fd);
 	}
     }

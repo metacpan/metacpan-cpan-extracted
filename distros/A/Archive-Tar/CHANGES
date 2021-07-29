@@ -1,3 +1,7 @@
+2.40  27/07/2021 (KHW && ATOOMIC)
+- Generalize for EBCDIC
+- Update GitHub workflow with deprecated add-path
+
 2.38  25/06/2020 (ATOOMIC)
 - Avoid indirect calls
 - Add use warnings to bin/ptar*

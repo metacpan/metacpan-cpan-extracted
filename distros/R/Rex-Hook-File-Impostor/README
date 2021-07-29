@@ -1,11 +1,11 @@
 NAME
 
     Rex::Hook::File::Impostor - execute Rex file management commands on a
-    copy of the original file
+    copy of the managed path
 
 VERSION
 
-    version v0.1.1
+    version v0.2.0
 
 SYNOPSIS
 
@@ -13,8 +13,9 @@ SYNOPSIS
 
 DESCRIPTION
 
-    This module lets Rex <https://metacpan.org/pod/Rex> execute file
-    management commands on a copy of the file instead of the original one.
+    This module makes Rex <https://metacpan.org/pod/Rex> execute file
+    management commands on a copy of the managed path instead of the
+    original one.
 
     This could be particularly useful when it is loaded conditionally to be
     combined with other modules. For example together with
@@ -60,7 +61,7 @@ AUTHOR
 
 COPYRIGHT AND LICENSE
 
-    This software is Copyright (c) 2020 by Ferenc Erki.
+    This software is Copyright (c) 2020,2021 by Ferenc Erki.
 
     This is free software, licensed under:
 

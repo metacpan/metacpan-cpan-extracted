@@ -3,15 +3,14 @@
 #
 #  (C) Paul Evans, 2014-2021 -- leonerd@leonerd.org.uk
 
-package Device::BusPirate::Mode::BB 0.22;
-
 use v5.14;
-use warnings;
-use base qw( Device::BusPirate::Mode );
+use Object::Pad 0.45;
+
+package Device::BusPirate::Mode::BB 0.23;
+class Device::BusPirate::Mode::BB isa Device::BusPirate::Mode;
 
 use Carp;
 
-use Future;
 use Future::AsyncAwait;
 
 use constant MODE => "BB";
@@ -68,15 +67,16 @@ with the five basic IO lines in bit-banging mode.
 
 =cut
 
-sub start
+has $_dir_mask;
+has $_out_mask;
+
+async method start
 {
-   my $self = shift;
+   $_dir_mask = 0x1f; # all inputs
 
-   $self->{dir_mask} = 0x1f; # all inputs
+   $_out_mask = 0; # all off
 
-   $self->{out_mask} = 0; # all off
-
-   Future->done( $self );
+   return $self;
 }
 
 =head2 configure
@@ -98,15 +98,11 @@ will be driven to GND in either case.
 
 =cut
 
-sub configure
+has $_open_drain;
+
+async method configure ( %args )
 {
-   my $self = shift;
-   my %args = @_;
-
-   defined $args{$_} and $self->{$_} = $args{$_}
-      for (qw( open_drain ));
-
-   return Future->done
+   defined $args{open_drain} and $_open_drain = $args{open_drain};
 }
 
 =head2 write
@@ -117,20 +113,17 @@ Sets the state of multiple output pins at the same time.
 
 =cut
 
-async sub _writeread
+async method _writeread ( $want_read, $pins_write, $pins_read )
 {
-   my $self = shift;
-   my ( $want_read, $pins_write, $pins_read ) = @_;
-
-   my $out = $self->{out_mask};
-   my $dir = $self->{dir_mask};
+   my $out = $_out_mask;
+   my $dir = $_dir_mask;
 
    foreach my $pin ( keys %$pins_write ) {
       my $mask = $PIN_MASK{$pin} or
          croak "Unrecognised BB pin name $pin";
       my $val = $pins_write->{$pin};
 
-      if( $val and !$self->{open_drain} ) {
+      if( $val and !$_open_drain ) {
          $dir &= ~$mask;
          $out |=  $mask;
       }
@@ -151,18 +144,18 @@ async sub _writeread
    }
 
    my $len = 0;
-   if( $dir != $self->{dir_mask} ) {
+   if( $dir != $_dir_mask ) {
       $self->pirate->write( chr( 0x40 | $dir ) );
       $len++;
 
-      $self->{dir_mask} = $dir;
+      $_dir_mask = $dir;
    }
 
-   if( $want_read or $out != $self->{out_mask} ) {
+   if( $want_read or $out != $_out_mask ) {
       $self->pirate->write( chr( 0x80 | $out ) );
       $len++;
 
-      $self->{out_mask} = $out;
+      $_out_mask = $out;
    }
 
    return unless $len;
@@ -176,27 +169,23 @@ async sub _writeread
    my $pins;
    foreach my $pin ( keys %PIN_MASK ) {
       my $mask = $PIN_MASK{$pin};
-      next unless $self->{dir_mask} & $mask;
+      next unless $_dir_mask & $mask;
       $pins->{$pin} = !!( $buf & $mask );
    }
 
    return $pins;
 }
 
-sub write
+method write ( %pins )
 {
-   my $self = shift;
-   $self->_writeread( 0, { @_ }, [] );
+   $self->_writeread( 0, \%pins, [] );
 }
 
-async sub _input1
+async method _input1 ( $mask )
 {
-   my $self = shift;
-   my ( $mask ) = @_;
+   $_dir_mask |= $mask;
 
-   $self->{dir_mask} |= $mask;
-
-   $self->pirate->write( chr( 0x40 | $self->{dir_mask} ) );
+   $self->pirate->write( chr( 0x40 | $_dir_mask ) );
    return ord( await $self->pirate->read( 1 ) ) & $mask;
 }
 
@@ -211,10 +200,9 @@ is being read at the same time.
 
 =cut
 
-sub read
+method read ( @pins )
 {
-   my $self = shift;
-   $self->_writeread( 1, {}, [ @_ ] );
+   $self->_writeread( 1, {}, \@pins );
 }
 
 =head2 writeread
@@ -227,10 +215,9 @@ pins currently set as inputs.
 
 =cut
 
-sub writeread
+method writeread ( %pins )
 {
-   my $self = shift;
-   $self->_writeread( 1, { @_ }, [] );
+   $self->_writeread( 1, \%pins, [] );
 }
 
 =head2 power
@@ -241,14 +228,11 @@ Enable or disable the C<VREG> 5V and 3.3V power outputs.
 
 =cut
 
-async sub power
+async method power ( $on )
 {
-   my $self = shift;
-   my ( $state ) = @_;
-
-   $state ? ( $self->{out_mask} |=  CONF_POWER )
-          : ( $self->{out_mask} &= ~CONF_POWER );
-   $self->pirate->write( chr( 0x80 | $self->{out_mask} ) );
+   $on ? ( $_out_mask |=  CONF_POWER )
+       : ( $_out_mask &= ~CONF_POWER );
+   $self->pirate->write( chr( 0x80 | $_out_mask ) );
    await $self->pirate->read( 1 );
    return;
 }
@@ -262,14 +246,11 @@ to the C<MISO>, C<CLK>, C<MOSI> and C<CS> pins.
 
 =cut
 
-async sub pullup
+async method pullup ( $on )
 {
-   my $self = shift;
-   my ( $state ) = @_;
-
-   $state ? ( $self->{out_mask} |=  CONF_PULLUP )
-          : ( $self->{out_mask} &= ~CONF_PULLUP );
-   $self->pirate->write( chr( 0x80 | $self->{out_mask} ) );
+   $on ? ( $_out_mask |=  CONF_PULLUP )
+       : ( $_out_mask &= ~CONF_PULLUP );
+   $self->pirate->write( chr( 0x80 | $_out_mask ) );
    await $self->pirate->read( 1 );
    return;
 }
@@ -294,13 +275,20 @@ Sets the pin to input direction and reads its current state.
 
 =cut
 
-foreach my $pin ( keys %PIN_MASK ) {
-   no strict 'refs';
-   *$pin      = sub { shift->_writeread( 0, { $pin => $_[0] }, [] ) };
+BEGIN {
+   my $metaclass = Object::Pad::MOP::Class->for_caller;
 
-   my $mask = __PACKAGE__->${\"MASK_\U$pin"};
-   my $read_pin = "read_$pin";
-   *$read_pin = sub { shift->_input1( $mask ) };
+   foreach my $pin (qw( cs miso clk mosi aux )) {
+      my $mask = __PACKAGE__->${\"MASK_\U$pin"};
+
+      $metaclass->add_method(
+         $pin => method ( $on ) { $self->_writeread( 0, { $pin => $on }, [] ) }
+      );
+
+      $metaclass->add_method(
+         "read_$pin" => method { $self->_input1( $mask ) }
+      );
+   }
 }
 
 =head1 TODO

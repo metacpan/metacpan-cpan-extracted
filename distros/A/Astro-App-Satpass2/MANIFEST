@@ -85,6 +85,7 @@ t/source.dat
 t/tokenize.t
 t/whole_app.t
 t/whole_app_file
+tools/intrinsic-magnitude
 xt/author/basic.t
 xt/author/carp_not.t
 xt/author/changes.t

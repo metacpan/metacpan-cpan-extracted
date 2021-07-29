@@ -5,7 +5,7 @@ use warnings;
 use 5.010;
 use utf8;
 
-our $VERSION = 0.01;
+our $VERSION = '0.02';
 
 use Moose::Role;
 requires qw(get_routes service_name);
@@ -117,10 +117,43 @@ sub plack_handler {
             '' => sub {
                 if (my $match = $self->router->match($sub_path_info)) {
                     my $func = $match->{mapping}->{$this_req->method};
-                    if ($func) {
-                        if (my $misc_fn = $self->can($func)) {
-                            return $misc_fn->($self, $this_req);
+                    if ($func && (my $misc_fn = $self->can($func))) {
+                        %{$this_req->params} = (
+                            %{$this_req->params},
+                            %{$match->{mapping}}
+                        );
+                        my $resp = $misc_fn->($self, $this_req, $match);
+                        if (blessed($resp) && $resp->isa('Future')) {
+                            $resp->retain;
+                            $resp->on_done(
+                                sub {
+                                    my ($resp_data) = @_;
+                                    if ( ref($resp_data) eq 'ARRAY' ) {
+                                        $this_req->respond(@$resp_data);
+                                    }
+                                    else {
+                                        $this_req->respond( 200,
+                                            [], $resp_data );
+                                    }
+                                }
+                            );
+                            $resp->on_fail(sub {
+                                my ($err_msg) = @_;
+                                $err_msg ||= 'unknown';
+                                $this_req->respond(
+                                    503, [], 'internal server error calling '.$func.': ' . $err_msg
+                                );
+                            });
+                            $resp->on_cancel(sub {
+                                $this_req->respond(
+                                    429, [], 'request for '.$func.' canceled'
+                                );
+                            });
                         }
+                        elsif (ref($resp) eq 'ARRAY') {
+                            $this_req->respond(@$resp);
+                        }
+                        return;
                     }
                 }
                 return $this_req->respond(404, [], 'not found');
@@ -167,8 +200,8 @@ Async::Microservice - Async HTTP Microservice Moose Role
     sub service_name {return 'asmi-helloworld';}
     sub get_routes {return ('hello' => {defaults => {GET => 'GET_hello'}});}
     sub GET_hello {
-        my ($self, $this_req) = @_;
-        return $this_req->respond(200, [], 'Hello world!');
+        my ( $self, $this_req ) = @_;
+        return [ 200, [], 'Hello world!' ];
     }
     1;
 

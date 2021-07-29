@@ -1,0 +1,8 @@
+0.002   2021-07-28  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Made the pages as .pm instead of .pod.
+
+
+0.001   2021-07-28  Released-By: PERLANCAR
+
+        - First release.

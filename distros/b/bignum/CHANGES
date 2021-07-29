@@ -1,3 +1,15 @@
+0.53 2021-07-12
+
+ * Sync with the Math-BigInt distribution.
+
+0.52 2021-07-10
+
+ * Updated BUGS and SUPPORT sections in POD (remove dead links, add reference
+   to GitHub repo, update the author's e-mail address, etc.).
+
+ * Add tests to verify that Math::BigInt::Lite supports new functionality
+   introduced in Math::BigInt.
+
 0.51 2018-10-08
 
  * Better way to catch warnings (CPAN RT #126900).

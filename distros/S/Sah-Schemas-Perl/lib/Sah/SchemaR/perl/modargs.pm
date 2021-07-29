@@ -1,7 +1,7 @@
 package Sah::SchemaR::perl::modargs;
 
-our $DATE = '2021-01-20'; # DATE
-our $VERSION = '0.035'; # VERSION
+our $DATE = '2021-07-20'; # DATE
+our $VERSION = '0.038'; # VERSION
 
 our $rschema = ["str",[{description=>"\nPerl module name with optional arguments which will be used as import arguments,\njust like the `-MMODULE=ARGS` shortcut that `perl` provides. Examples:\n\n    Foo\n    Foo::Bar\n    Foo::Bar=arg1,arg2\n\nSee also: `perl::modname`.\n\n",examples=>[{valid=>0,value=>""},{valid=>1,value=>"Foo::Bar"},{valid=>1,value=>"Foo::Bar=arg1,arg2"},{valid=>1,validated_value=>"Foo::Bar=arg1,arg2",value=>"Foo-Bar=arg1,arg2"}],match=>"\\A(?:[A-Za-z_][A-Za-z_0-9]*(::[A-Za-z_0-9]+)*(?:=.*)?)\\z",summary=>"Perl module name (e.g. Foo::Bar) with optional arguments (e.g. Foo::Bar=arg1,arg2)","x.completion"=>"perl_modname","x.perl.coerce_rules"=>["From_str::normalize_perl_modname"]},{summary=>"Shorter alias for perl::modname_with_optional_args"}],["perl::modname_with_optional_args","str"]];
 
@@ -20,7 +20,7 @@ Sah::SchemaR::perl::modargs - Shorter alias for perl::modname_with_optional_args
 
 =head1 VERSION
 
-This document describes version 0.035 of Sah::SchemaR::perl::modargs (from Perl distribution Sah-Schemas-Perl), released on 2021-01-20.
+This document describes version 0.038 of Sah::SchemaR::perl::modargs (from Perl distribution Sah-Schemas-Perl), released on 2021-07-20.
 
 =head1 DESCRIPTION
 
@@ -38,7 +38,7 @@ Source repository is at L<https://github.com/perlancar/perl-Sah-Schemas-Perl>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Sah-Schemas-Perl/issues>
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Sah-Schemas-Perl>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

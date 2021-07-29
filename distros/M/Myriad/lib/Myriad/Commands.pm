@@ -2,14 +2,14 @@ package Myriad::Commands;
 
 use Myriad::Class;
 
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.010'; # VERSION
 our $AUTHORITY = 'cpan:DERIV'; # AUTHORITY
 
 =encoding utf8
 
 =head1 NAME
 
-Myriad::Commands
+Myriad::Commands - common abstraction for user interface commands
 
 =head1 DESCRIPTION
 
@@ -42,11 +42,12 @@ Attempts to load and start one or more services.
 =cut
 
 async method service (@args) {
-    my @modules;
+    my (@modules, $namespace);
     while(my $entry = shift @args) {
         if($entry =~ /,/) {
             unshift @args, split /,/, $entry;
-        } elsif(my ($base) = $entry =~ m{^([a-z0-9_:]+)::$}i) {
+        } elsif(my ($base, $hierarchy) = $entry =~ m{^([a-z0-9_:]+)::(\*(?:::\*)*)?$}i) {
+            $namespace = $base . '::' if $hierarchy;
             require Module::Pluggable::Object;
             my $search = Module::Pluggable::Object->new(
                 search_path => [ $base ]
@@ -83,7 +84,7 @@ async method service (@args) {
         $log->debugf('Preparing %s', $module);
         try {
             if ($service_custom_name eq '') {
-                await $myriad->add_service($module);
+                await $myriad->add_service($module, namespace => $namespace);
             } else {
                 await $myriad->add_service($module, name => $service_custom_name);
             }

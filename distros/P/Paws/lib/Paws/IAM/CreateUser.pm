@@ -30,9 +30,9 @@ You shouldn't make instances of this class. Each attribute should be used as a n
 =head1 SYNOPSIS
 
     my $iam = Paws->service('IAM');
-    # To create an IAM user
-    # The following create-user command creates an IAM user named Bob in the
-    # current account.
+# To create an IAM user
+# The following create-user command creates an IAM user named Bob in the current
+# account.
     my $CreateUserResponse = $iam->CreateUser( 'UserName' => 'Bob' );
 
     # Results:
@@ -49,7 +49,7 @@ For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/iam
 =head2 Path => Str
 
 The path for the user name. For more information about paths, see IAM
-Identifiers
+identifiers
 (https://docs.aws.amazon.com/IAM/latest/UserGuide/Using_Identifiers.html)
 in the I<IAM User Guide>.
 
@@ -75,14 +75,14 @@ the user.
 
 =head2 Tags => ArrayRef[L<Paws::IAM::Tag>]
 
-A list of tags that you want to attach to the newly created user. Each
-tag consists of a key name and an associated value. For more
-information about tagging, see Tagging IAM Identities
+A list of tags that you want to attach to the new user. Each tag
+consists of a key name and an associated value. For more information
+about tagging, see Tagging IAM resources
 (https://docs.aws.amazon.com/IAM/latest/UserGuide/id_tags.html) in the
 I<IAM User Guide>.
 
-If any one of the tags is invalid or if you exceed the allowed number
-of tags per user, then the entire request fails and the user is not
+If any one of the tags is invalid or if you exceed the allowed maximum
+number of tags, then the entire request fails and the resource is not
 created.
 
 

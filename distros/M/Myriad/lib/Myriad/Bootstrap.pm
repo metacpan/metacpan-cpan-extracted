@@ -5,15 +5,14 @@ use warnings;
 
 use 5.010;
 
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.010'; # VERSION
 our $AUTHORITY = 'cpan:DERIV'; # AUTHORITY
 
 =encoding utf8
 
 =head1 NAME
 
-Myriad::Bootstrap - starts up a Myriad child process ready for loading modules
-for the main functionality
+Myriad::Bootstrap - dæmon functionality and hot-reload for Myriad
 
 =head1 DESCRIPTION
 

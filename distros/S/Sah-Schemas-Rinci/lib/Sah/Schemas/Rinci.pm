@@ -1,7 +1,9 @@
 package Sah::Schemas::Rinci;
 
-our $DATE = '2020-09-23'; # DATE
-our $VERSION = '1.1.94.0'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-07-20'; # DATE
+our $DIST = 'Sah-Schemas-Rinci'; # DIST
+our $VERSION = '1.1.98.0'; # VERSION
 
 1;
 # ABSTRACT: Sah schemas for Rinci
@@ -18,7 +20,25 @@ Sah::Schemas::Rinci - Sah schemas for Rinci
 
 =head1 VERSION
 
-This document describes version 1.1.94.0 of Sah::Schemas::Rinci (from Perl distribution Sah-Schemas-Rinci), released on 2020-09-23.
+This document describes version 1.1.98.0 of Sah::Schemas::Rinci (from Perl distribution Sah-Schemas-Rinci), released on 2021-07-20.
+
+=head1 SAH SCHEMAS
+
+=over
+
+=item * L<rinci::function_meta|Sah::Schema::rinci::function_meta>
+
+Rinci function metadata.
+
+=item * L<rinci::meta|Sah::Schema::rinci::meta>
+
+Rinci metadata.
+
+=item * L<rinci::result_meta|Sah::Schema::rinci::result_meta>
+
+Rinci envelope result metadata.
+
+=back
 
 =head1 HOMEPAGE
 
@@ -48,7 +68,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2018, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2018, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

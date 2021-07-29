@@ -49,7 +49,7 @@ DESCRIPTION
     other blocks of code provided by the class. It proceeds in the
     following stages:
 
-  BUILDARGS
+  The BUILDARGS phase
 
     If the class provides a BUILDARGS class method, that is used to mangle
     the list of arguments before the BUILD blocks are called. Note this
@@ -71,7 +71,7 @@ DESCRIPTION
     the parameters for slots that do not have default initialisation
     expressions). If any of these are missing an exception is thrown.
 
-  BUILD
+  The BUILD phase
 
     As part of the construction process, the BUILD block of every component
     class will be invoked, passing in the list of arguments the constructor
@@ -79,7 +79,7 @@ DESCRIPTION
     behaviour, but does not need to chain to the SUPER class first; this is
     handled automatically.
 
-  ADJUST
+  The ADJUST phase
 
     Finally, before the new object is returned from the constructor, the
     ADJUST block of every component class is invoked. This happens after
@@ -393,6 +393,17 @@ KEYWORDS
     argument checking similar to that used by subroutine signatures, to
     ensure the correct number of arguments are passed - usually zero, but
     exactly one in the case of a :writer method.
+
+  :weak
+
+    Since version 0.44.
+
+    Generated code which sets the value of this slot will weaken it if it
+    contains a reference. This applies to within the constructor if :param
+    is given, and to a :writer accessor method. Note that this only applies
+    to automatically generated code; not normal code written in regular
+    method bodies. If you assign into the slot variable you must remember
+    to call Scalar::Util::weaken yourself.
 
   :param, :param(NAME)
 
@@ -786,6 +797,10 @@ SPONSORS
     spend time working on this module and other perl features.
 
       * Oetiker+Partner AG https://www.oetiker.ch/en/
+
+      * Deriv http://deriv.com
+
+      * Perl-Verein Schweiz https://www.perl-workshop.ch/
 
     Additional details may be found at
     https://github.com/Ovid/Cor/wiki/Sponsors.

@@ -1,9 +1,9 @@
 package Getopt::Long::Util;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-10-27'; # DATE
+our $DATE = '2021-07-10'; # DATE
 our $DIST = 'Getopt-Long-Util'; # DIST
-our $VERSION = '0.892'; # VERSION
+our $VERSION = '0.895'; # VERSION
 
 use 5.010001;
 use strict;
@@ -140,15 +140,20 @@ $SPEC{humanize_getopt_long_opt_spec} = {
 Convert <pm:Getopt::Long> option specification into a more human-friendly
 notation that is suitable for including in help/usage text, for example:
 
-    help|h|?       ->  --help, -h, -?
-    help|h|?       ->  --help | -h | -?  (if you provide 'separator')
-    --foo=s        ->  --foo=s
-    --foo=s        ->  --foo=somelabel  (if you provide 'value_label')
-    --foo:s        ->  --foo[=s]
-    --foo=s@       ->  --foo=s+
-    --foo=s%       ->  --foo key=value
-    --foo=s        ->  --foo=somelabel  (if you provide 'value_label')
-    --debug!       ->  --(no)debug
+    help|h|?       ->  "--help, -h, -?"
+    help|h|?       ->  "--help | -h | -?"               # if you provide 'separator')
+    --foo=s        ->  "--foo=s"
+    --foo=s        ->  "--foo=somelabel"                # if you provide 'value_label'
+    --foo:s        ->  "--foo[=s]"
+    --foo=s@       ->  "(--foo=s)+"
+    --foo=s%       ->  "(--foo key=value)+"
+    --foo=s%       ->  "(--foo somelabel1=somelabel2)+" # if you provide 'key_label' and 'value_label'
+    --debug!       ->  "--(no)debug"
+
+It also produces POD-formatted string for use in POD documentation:
+
+    --foo=s        ->  {plaintext=>"--foo=s", pod=>"B<--foo>=I<s>"}
+                                                        # if you set 'extended' to true
 
 Will die if can't parse the optspec string.
 
@@ -170,12 +175,15 @@ _
         value_label => {
             schema => 'str*',
         },
-
+        extended => {
+            summary => 'If set to true, will return a hash of multiple formats instead of a single plaintext format',
+            schema => 'bool*',
+        },
     },
     args_as => 'array',
     result_naked => 1,
     result => {
-        schema => 'str*',
+        schema => ['any*', {of=>[['str*'], ['hash*', {of=>'str*'}]]}],
     },
 };
 sub humanize_getopt_long_opt_spec {
@@ -187,34 +195,61 @@ sub humanize_getopt_long_opt_spec {
 
     return "argument" if $parse->{is_arg};
 
-    my $res = '';
+    my $plain_res = '';
+    my $pod_res   = '';
     my $i = 0;
     for (@{ $parse->{opts} }) {
         $i++;
-        $res .= ($opts->{separator} // ", ") if length($res);
+        my $opt_plain_res = '';
+        my $opt_pod_res   = '';
         if ($parse->{is_neg} && length($_) > 1) {
-            $res .= "--(no)$_";
+            $opt_plain_res .= "--(no)$_";
+            $opt_pod_res   .= "B<--(no)$_>";
         } else {
             if (length($_) > 1) {
-                $res .= "--$_";
+                $opt_plain_res .= "--$_";
+                $opt_pod_res   .= "B<--$_>";
             } else {
-                $res .= "-$_";
+                $opt_plain_res .= "-$_";
+                $opt_pod_res   .= "B<-$_>";
             }
             if ($i==1 && ($parse->{type} || $parse->{opttype})) {
                 # show value label
                 my $key_label = $opts->{key_label} // 'key';
                 my $value_label = $opts->{value_label} //
                     $parse->{type} // $parse->{opttype};
-                $res .= "[" if $parse->{opttype};
-                $res .= ($parse->{type} && $parse->{desttype} eq '%' ? " " : "=");
-                $res .= "key=" if $parse->{desttype} eq '%';
-                $res .= $value_label;
-                $res .= "]" if $parse->{opttype};
+
+                $opt_plain_res .= "[" if $parse->{opttype};
+                $opt_plain_res .= ($parse->{type} && $parse->{desttype} eq '%' ? " " : "=");
+                $opt_plain_res .= "$key_label=" if $parse->{desttype} eq '%';
+                $opt_plain_res .= $value_label;
+                $opt_plain_res .= "]" if $parse->{opttype};
+
+                $opt_pod_res   .= "[" if $parse->{opttype};
+                $opt_pod_res   .= ($parse->{type} && $parse->{desttype} eq '%' ? " " : "=");
+                $opt_pod_res   .= "I<$key_label>=" if $parse->{desttype} eq '%';
+                $opt_pod_res   .= "I<$value_label>";
+                $opt_pod_res   .= "]" if $parse->{opttype};
             }
-            $res .= "+" if ($parse->{desttype} // '') eq '@';
+            $opt_plain_res = "($opt_plain_res)+" if ($parse->{desttype} // '') =~ /@|%/;
+            $opt_pod_res   = "($opt_pod_res)+"   if ($parse->{desttype} // '') =~ /@|%/;
         }
+
+        $plain_res .= ($opts->{separator} // ", ") if length($plain_res);
+        $pod_res   .= ($opts->{separator} // ", ") if length($pod_res);
+
+        $plain_res .= $opt_plain_res;
+        $pod_res   .= $opt_pod_res;
     }
-    $res;
+
+    if ($opts->{extended}) {
+        return {
+            plaintext => $plain_res,
+            pod => $pod_res,
+        };
+    } else {
+        $plain_res;
+    }
 }
 
 $SPEC{detect_getopt_long_script} = {
@@ -392,7 +427,13 @@ Getopt::Long::Util - Utilities for Getopt::Long
 
 =head1 VERSION
 
-This document describes version 0.892 of Getopt::Long::Util (from Perl distribution Getopt-Long-Util), released on 2020-10-27.
+This document describes version 0.895 of Getopt::Long::Util (from Perl distribution Getopt-Long-Util), released on 2021-07-10.
+
+=head1 CONTRIBUTOR
+
+=for stopwords Steven Haryanto
+
+Steven Haryanto <sharyanto@cpan.org>
 
 =head1 FUNCTIONS
 
@@ -401,7 +442,7 @@ This document describes version 0.892 of Getopt::Long::Util (from Perl distribut
 
 Usage:
 
- detect_getopt_long_script(%args) -> [status, msg, payload, meta]
+ detect_getopt_long_script(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Detect whether a file is a Getopt::Long-based CLI script.
 
@@ -444,12 +485,12 @@ String to be checked.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -493,20 +534,25 @@ Return value:  (hash)
 
 Usage:
 
- humanize_getopt_long_opt_spec( [ \%optional_named_args ] , $optspec) -> str
+ humanize_getopt_long_opt_spec( [ \%optional_named_args ] , $optspec) -> str|hash
 
 Convert L<Getopt::Long> option specification into a more human-friendly
 notation that is suitable for including in help/usage text, for example:
 
- help|h|?       ->  --help, -h, -?
- help|h|?       ->  --help | -h | -?  (if you provide 'separator')
- --foo=s        ->  --foo=s
- --foo=s        ->  --foo=somelabel  (if you provide 'value_label')
- --foo:s        ->  --foo[=s]
- --foo=s@       ->  --foo=s+
- --foo=s%       ->  --foo key=value
- --foo=s        ->  --foo=somelabel  (if you provide 'value_label')
- --debug!       ->  --(no)debug
+ help|h|?       ->  "--help, -h, -?"
+ help|h|?       ->  "--help | -h | -?"               # if you provide 'separator')
+ --foo=s        ->  "--foo=s"
+ --foo=s        ->  "--foo=somelabel"                # if you provide 'value_label'
+ --foo:s        ->  "--foo[=s]"
+ --foo=s@       ->  "(--foo=s)+"
+ --foo=s%       ->  "(--foo key=value)+"
+ --foo=s%       ->  "(--foo somelabel1=somelabel2)+" # if you provide 'key_label' and 'value_label'
+ --debug!       ->  "--(no)debug"
+
+It also produces POD-formatted string for use in POD documentation:
+
+ --foo=s        ->  {plaintext=>"--foo=s", pod=>"B<--foo>=I<s>"}
+                                                     # if you set 'extended' to true
 
 Will die if can't parse the optspec string.
 
@@ -515,6 +561,10 @@ This function is not exported by default, but exportable.
 Arguments ('*' denotes required arguments):
 
 =over 4
+
+=item * B<extended> => I<bool>
+
+If set to true, will return a hash of multiple formats instead of a single plaintext format.
 
 =item * B<key_label> => I<str> (default: "key")
 
@@ -527,7 +577,7 @@ Arguments ('*' denotes required arguments):
 
 =back
 
-Return value:  (str)
+Return value:  (str|hash)
 
 
 
@@ -626,7 +676,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2016, 2015, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2016, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

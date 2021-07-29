@@ -54,8 +54,8 @@ sub main {
 
         $tzil->build;
 
-        is( $Local::PluginBundle::FileConsumer::RESULT, $prime * $prime, '... code did run' );
-        is( ( scalar grep { $_ eq "[$name] $prime" } @{ $tzil->log_messages() } ), 1, '... correct message got logged' )
+        is( $Local::PluginBundle::FileConsumer::RESULT,                            $prime * $prime, '... code did run' );
+        is( ( scalar grep { $_ eq "[$name] $prime" } @{ $tzil->log_messages() } ), 1,               '... correct message got logged' )
           or diag 'got log messages: ', explain $tzil->log_messages;
 
         is_deeply( $Local::FileConsumer::RESULT, [ "lib/file-2-${prime}.pm", "lib/file-3-${prime}.pm" ], '... correct files were found' );
@@ -94,8 +94,8 @@ sub main {
 
         $tzil->build;
 
-        is( $Local::PluginBundleEasy::FileConsumer::RESULT, $prime * $prime, '... code did run' );
-        is( ( scalar grep { $_ eq "[=Local::PluginBundleEasy::FileConsumer/$name] $prime" } @{ $tzil->log_messages() } ), 1, '... correct message got logged' )
+        is( $Local::PluginBundleEasy::FileConsumer::RESULT,                                                               $prime * $prime, '... code did run' );
+        is( ( scalar grep { $_ eq "[=Local::PluginBundleEasy::FileConsumer/$name] $prime" } @{ $tzil->log_messages() } ), 1,               '... correct message got logged' )
           or diag 'got log messages: ', explain $tzil->log_messages;
 
         is_deeply( $Local::FileConsumer::RESULT, [ "lib/file-1-${prime}.pm", "lib/file-3-${prime}.pm" ], '... correct files were found' );

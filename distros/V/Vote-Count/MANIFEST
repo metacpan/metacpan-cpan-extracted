@@ -9,7 +9,6 @@ Makefile.PL
 README
 README.md
 Range.md
-badpod.pl
 buildpod.pl
 cpanfile
 dist.ini
@@ -51,7 +50,6 @@ lib/Vote/Count/Start.pm
 lib/Vote/Count/TextTableTiny.pm
 lib/Vote/Count/TieBreaker.pm
 lib/Vote/Count/TopCount.pm
-review.ods
 review.tmp
 t/approval.t
 t/borda.t
@@ -128,10 +126,14 @@ t/data/tcinvertapproval.txt
 t/data/tennessee.range.json
 t/data/tennessee.range.yml
 t/data/tennessee.txt
+t/data/tennessee_precedence.txt
 t/data/tiebreakerprecedence1.txt
 t/data/tiebreakerprecedence2.txt
 t/data/ties1.txt
 t/data/ties2.txt
+t/data/ties3.txt
+t/data/ties3precedence.txt
+t/data/ties3revprecedence.txt
 t/data/tweedles.txt
 t/data/tweedlesprecedence2.txt
 t/data/twobeatirv.txt

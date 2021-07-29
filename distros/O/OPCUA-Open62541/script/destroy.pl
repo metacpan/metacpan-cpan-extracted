@@ -6,30 +6,37 @@ use warnings;
 
 my @types = qw(
     Boolean
-    Byte
-    Int32
-    UInt32
-    Double
-    String
-    ByteString
     BrowseDescription
     BrowseNextRequest
     BrowseRequest
     BuildInfo
-    ReadRequest
-    NodeId
-    ExpandedNodeId
-    LocalizedText
-    QualifiedName
-    Variant
-    NodeClass
+    Byte
+    ByteString
+    CreateMonitoredItemsRequest
+    CreateSubscriptionRequest
     DataTypeAttributes
+    DeleteMonitoredItemsRequest
+    DeleteSubscriptionsRequest
+    Double
+    ExpandedNodeId
+    Int32
+    LocalizedText
+    ModifySubscriptionRequest
+    MonitoredItemCreateRequest
+    NodeClass
+    NodeId
     ObjectAttributes
     ObjectTypeAttributes
+    QualifiedName
+    ReadRequest
     ReadValueId
     ReferenceTypeAttributes
+    SetPublishingModeRequest
+    String
+    UInt32
     VariableAttributes
     VariableTypeAttributes
+    Variant
     ViewAttributes
     WriteValue
 );

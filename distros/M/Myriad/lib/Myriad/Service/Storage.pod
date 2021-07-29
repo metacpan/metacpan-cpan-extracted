@@ -13,7 +13,7 @@ sure you change the first line.
 
 =head1 NAME
 
-Myriad::Service:Storage - microservice storage abstraction
+Myriad::Service::Storage - microservice storage abstraction layer
 
 =head1 SYNOPSIS
 
@@ -22,6 +22,11 @@ Myriad::Service:Storage - microservice storage abstraction
  await $storage->hash_add('some_key', 'hash_key', 13);
 
 =head1 DESCRIPTION
+
+This module provides service storage access.
+
+It implements L<Myriad::Role::Storage> in an object available as the C<$storage>
+lexical in any service class. See that module for more details on the API.
 
 =head2 apply_prefix
 

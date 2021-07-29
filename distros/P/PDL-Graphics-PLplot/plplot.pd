@@ -1,8 +1,3 @@
-use Config;
-
-my $ptrsize = length($Config{'byteorder'}); # 4 or 8 bytes
-my $int_ptr_type = ($ptrsize == 4) ? 'I32' : 'long';
-
 # User can set this global variable to 1 if he wants
 # to use the normal plplot order of arguments, not the PP-required
 # order for functions with OtherPars.
@@ -12,9 +7,11 @@ $PDL::Graphics::PLplot::standard_order = 0;
 my $plversion = do './OPTIONS!';
 pp_addpm({At => Top}, <<'EOD');
 
+use Carp qw(confess);
+
 our $VERSION;
 BEGIN {
-$VERSION = '0.74'
+$VERSION = '0.76'
 };
 
 =head1 NAME
@@ -32,11 +29,14 @@ PDL::Graphics::PLplot - Object-oriented interface from perl/PDL to the PLPLOT pl
   $pl->xyplot($x, $y);
   $pl->close;
 
+Only version 5.15.0+ of PLplot is supported, due to a C-level API change
+that is invisible at PDL-level.
+
 For more information on PLplot, see
 
  http://www.plplot.org/
 
-Also see the test file, F<t/plplot.pl> in this distribution for some working examples.
+Also see the test file, F<t/plplot.t> in this distribution for some working examples.
 
 =head1 LONG NAMES
 
@@ -1761,13 +1761,13 @@ sub stripplots {
     $ys = [dog $yargs];
   }
   else {
-    barf("stripplots requires that its second argument be either a 2D piddle or\na reference to a list of 1D piddles, but you provided neither.");
+    barf("stripplots requires that its second argument be either a 2D ndarray or\na reference to a list of 1D ndarrays, but you provided neither.");
   }
 
 # This doesn't work because $xs can be an anonymous array, too
 #  # Let's be sure the user sent us what we expected:
 #  foreach (@$ys) {
-#    barf ("stripplots needs to have piddles for its y arguments!")
+#    barf ("stripplots needs to have ndarrays for its y arguments!")
 #      unless (ref =~ /PDL/);
 #    barf("stripplots requires that the x and y dimensions agree!")
 #      unless ($_->nelem == $xs->nelem);
@@ -2487,33 +2487,60 @@ PL_POSITION_VIEWPORT
 
 EODEF
 
-# This subroutine is used to reorder PP_DEF arguments into the
+# This code is used to reorder PP_DEF arguments into the
 # standard plplot order.  This is necessary for some plplot functions
 # with a mixture of PDL and non-PDL arguments, since pp_def requires
 # all non-PDL (OtherPars) arguments to go at the end of the argument list
-pp_addpm (<<'EOPM');
-sub reorder {
+sub _make_reorder {
   my $name = shift;
-  my %reorder = (
-                 plaxes       => [0,1,6,2,3,7,4,5],
-		 plbox        => [4,0,1,5,2,3], # 4th arg -> 0th arg, 0th arg -> 1st arg, etc
-                 plbox3       => [6,7,0,1,8,9,2,3,10,11,4,5],
-                 plmtex       => [3,0,1,2,4],
-                 plmtex3      => [3,0,1,2,4],
-                 plstart      => [2,0,1],
-                 plstripc     => [13,14,0,1,2,3,4,5,6,7,8,9,10,11,12,15,16,17,18],
-                 plmap        => [4,5,0,1,2,3],
-                 plmeridians  => [6,0,1,2,3,4,5],
-                 plshades     => [0,10,1,2,3,4,5,6,7,8,9,11,12],
-                 plshade1     => [0,15,1,2,3,4,5,6,7,8,9,10,11,12,13,14,16,17],
-		);
-  my $ordering = $reorder{$name};
-  die "Cannot find argument reordering for $name" if (!defined($ordering));
-  my @out;
-  for (my $i=0;$i<@_;$i++) {
-    $out[$$ordering[$i]] = $_[$i];
+<<EOF;
+sub PDL::$name { _reorder('$name', 'PDL::_${name}_int', \$standard_order, \@_) }
+EOF
+}
+pp_addpm (<<'EOPM');
+my %REORDER = (
+ plaxes       => [0,1,6,2,3,7,4,5],
+ plbox        => [4,0,1,5,2,3], # 4th arg -> 0th arg, 0th arg -> 1st arg, etc
+ plbox3       => [6,7,0,1,8,9,2,3,10,11,4,5],
+ plmtex       => [3,0,1,2,4],
+ plmtex3      => [3,0,1,2,4],
+ plstart      => [2,0,1],
+ plstripc     => [\13,14,15,0..12,16..19],
+ plmap        => [4,5,0..3],
+ plmeridians  => [6,0..5], # 6th PDL arg gets sent as 0th C arg
+ plshades     => [0,10,1..9,11,12],
+ plshade1     => [0,15,1..14,16,17],
+);
+sub _reorder {
+  my ($name, $int_name, $need_reorder) = splice @_, 0, 3;
+  my $ordering = $REORDER{$name};
+  die "Cannot find argument reordering for $name" if !defined $ordering;
+  my $missing = @_ != @$ordering;
+  no strict 'refs';
+  return $int_name->(@_) if !$missing and !$need_reorder;
+  # either need to insert output ndarray, or reorder, or both
+  my ($outarg_index) = map ref($_)?$$_:(), @$ordering;
+  confess "$name: wrong number of args but no output arg\n"
+    if $missing and !defined $outarg_index;
+  my @pdl_args = @_;
+  if (!$need_reorder) {
+    # args in PDL order; by definition need insert output
+    splice @pdl_args, $outarg_index, 0, my $out_ndarray = PDL->null;
+    $int_name->(@pdl_args);
+    return $out_ndarray;
   }
-  return @out;
+  # need to reorder, might need to insert output
+  my $out_ndarray;
+  if ($missing) {
+    $out_ndarray = PDL->null;
+    my $i = 0;
+    @pdl_args = map ref($_) ? $out_ndarray : $pdl_args[$i++], @$ordering;
+  }
+  my @pdl_indices = map ref($_)?$$_:$_, @$ordering;
+  my @input_indices = 0..$#$ordering;
+  @pdl_args[@pdl_indices] = @pdl_args[@input_indices];
+  $int_name->(@pdl_args);
+  $missing ? $out_ndarray : ();
 }
 
 # Routine for users to set normal plplot argument order
@@ -2537,36 +2564,36 @@ site (L<http://www.plplot.org/>).
 
 There are three differences in the way the functions are called.  The first
 one is due to a limitation in the pp_def wrapper of PDL, which forces all
-the non-piddle arguments to be at the end of the arguments list.  It is
+the non-ndarray arguments to be at the end of the arguments list.  It is
 the case of strings (C<char *>) arguments in the C API.  This affects the
 following functions:
 
-plaxes
-plbox
-plbox3
-plmtex
-plmtex3
-plstart
-plstripc
-plmap
-plmeridians
-plshades
-plshade1
+  plaxes
+  plbox
+  plbox3
+  plmtex
+  plmtex3
+  plstart
+  plstripc
+  plmap
+  plmeridians
+  plshades
+  plshade1
 
 This difference can be got around by a call to
 
-plplot_use_standard_argument_order(1);
+  plplot_use_standard_argument_order(1);
 
 This re-arranges the string arguments to their proper/intuitive position
-compared with the C plplot interface.  This can be restored to it's default
+compared with the C plplot interface.  This can be restored to its default
 by calling:
 
-plplot_use_standard_argument_order(0);
+  plplot_use_standard_argument_order(0);
 
 The second notable different between the C and the PDL APIs is that many of
 the PDL calls do not need arguments to specify the size of the the vectors
 and/or matrices being passed.  These size parameters are deduced from the
-size of the piddles, when possible and are just omitted from the C call
+size of the ndarrays, when possible and are just omitted from the C call
 when translating it to perl.
 
 The third difference has to do with output parameters.  In C these are
@@ -2606,12 +2633,12 @@ pp_def ('pladv',
 	Code => 'c_pladv($page());'
        );
 
-sub plaxes { plaxes_pp ($standard_order ? reorder ('plaxes', @_) : @_) } pp_add_exported('plaxes');
-pp_def ('plaxes_pp',
+pp_def ('plaxes',
         NoPthread => 1,
 	GenericTypes => [D],
 	Pars => 'double xzero();double yzero();double xtick();int nxsub();double ytick();int nysub()',
 	OtherPars => 'char *xopt;char *yopt',
+	PMCode => _make_reorder('plaxes'),
 	Code => 'c_plaxes($xzero(),$yzero(),$COMP(xopt),$xtick(),$nxsub(),$COMP(yopt),$ytick(),$nysub());'
        );
 
@@ -2632,21 +2659,21 @@ CODE:
 EOC
 pp_add_exported('plbop');
 
-pp_addpm ('sub plbox { plbox_pp ($standard_order ? reorder ("plbox", @_) : @_) }'); pp_add_exported('plbox');
-pp_def ('plbox_pp',
+pp_def ('plbox',
         NoPthread => 1,
 	GenericTypes => [D],
 	Pars => 'double xtick();int nxsub();double ytick();int nysub()',
 	OtherPars => 'char *xopt;char *yopt',
+	PMCode => _make_reorder('plbox'),
 	Code => 'c_plbox($COMP(xopt),$xtick(),$nxsub(),$COMP(yopt),$ytick(),$nysub());'
        );
 
-pp_addpm ('sub plbox3 { plbox3_pp ($standard_order ? reorder ("plbox3", @_) : @_) }'); pp_add_exported('plbox3');
-pp_def ('plbox3_pp',
+pp_def ('plbox3',
         NoPthread => 1,
 	GenericTypes => [D],
 	Pars => 'double xtick();int nsubx();double ytick();int nsuby();double ztick();int nsubz()',
 	OtherPars => 'char *xopt;char *xlabel;char *yopt;char *ylabel;char *zopt;char *zlabel',
+	PMCode => _make_reorder('plbox3'),
 	Code => 'c_plbox3($COMP(xopt),$COMP(xlabel),$xtick(),$nsubx(),$COMP(yopt),$COMP(ylabel),$ytick(),$nsuby(),$COMP(zopt),$COMP(zlabel),$ztick(),$nsubz());'
        );
 
@@ -2966,21 +2993,21 @@ pp_def ('pllsty',
 	Code => 'c_pllsty($lin());'
        );
 
-pp_addpm ('sub plmtex { plmtex_pp ($standard_order ? reorder ("plmtex", @_) : @_) }'); pp_add_exported('plmtex');
-pp_def ('plmtex_pp',
+pp_def ('plmtex',
         NoPthread => 1,
 	GenericTypes => [D],
 	Pars => 'double disp();double pos();double just()',
 	OtherPars => 'char *side;char *text',
+	PMCode => _make_reorder('plmtex'),
 	Code => 'c_plmtex($COMP(side),$disp(),$pos(),$just(),$COMP(text));'
        );
 
-pp_addpm ('sub plmtex3 { plmtex3_pp ($standard_order ? reorder ("plmtex3", @_) : @_) }'); pp_add_exported('plmtex3');
-pp_def ('plmtex3_pp',
+pp_def ('plmtex3',
         NoPthread => 1,
 	GenericTypes => [D],
 	Pars => 'double disp();double pos();double just()',
 	OtherPars => 'char *side;char *text',
+	PMCode => _make_reorder('plmtex3'),
 	Code => 'c_plmtex3($COMP(side),$disp(),$pos(),$just(),$COMP(text));'
        );
 
@@ -3245,12 +3272,12 @@ pp_def ('plstar',
 	Code => 'c_plstar($nx(),$ny());'
        );
 
-pp_addpm ('sub plstart { plstart_pp ($standard_order ? reorder ("plstart", @_) : @_) }'); pp_add_exported('plstart');
-pp_def ('plstart_pp',
+pp_def ('plstart',
         NoPthread => 1,
 	GenericTypes => [D],
 	Pars => 'int nx();int ny()',
 	OtherPars => 'char *devname',
+	PMCode => _make_reorder('plstart'),
 	Code => 'c_plstart($COMP(devname),$nx(),$ny());'
        );
 
@@ -3442,7 +3469,7 @@ Draws line segments along (x1,y1)->(x2,y2)->(x3,y3)->...
 
 If the nth value of either x or y are bad, then it will be skipped, breaking
 the line.  In this way, you can specify multiple line segments with a single
-pair of x and y piddles.
+pair of x and y ndarrays.
 
 The usage is straight-forward:
 
@@ -3508,7 +3535,7 @@ PDL-specific: Implements what amounts to a threaded version of plsym.
 
 Bad values for z are simply skipped; all other bad values are not processed.
 
-In the following usage, all of the piddles must have the same dimensions:
+In the following usage, all of the ndarrays must have the same dimensions:
 
 =for usage
 
@@ -3653,17 +3680,12 @@ pp_def ('plunfbox1',
                   plline(4, x, y);',
         );
 
-
-#
-## Parse PLplot options given in @ARGV-like arrays
-#
-
 pp_def ('plParseOpts',
         NoPthread => 1,
         GenericTypes => [D],
         Pars => 'int [o] retval()',
         OtherPars => 'SV* argv; int mode',
-        Doc => 'FIXME: documentation here!',
+        Doc => 'Parse PLplot options given in @ARGV-like arrays',
         Code => '
                 SV* sv = $COMP (argv);
                 SV* dummy;
@@ -3678,7 +3700,7 @@ pp_def ('plParseOpts',
                 arr = (AV*) SvRV (sv);
                 newargc = argc = av_len (arr) + 1;
                 if (argc > 0) {
-                  New(1, args, argc, char *);
+                  Newx(args, argc, char *);
                   if(args == NULL) croak("Failed to allocate memory in plParseOpts");
 
                   for (i = 0; i < argc; i++) {
@@ -3686,7 +3708,7 @@ pp_def ('plParseOpts',
                           args[i] = SvPV (* av_fetch (arr, i, 0), len);
                   }
 
-                  $retval() = c_plparseopts (&newargc, (const char **)args, $COMP (mode));
+                  $retval() = c_plparseopts (&newargc, (PLCHAR_NC_MATRIX)args, $COMP (mode));
 
                   for (i = 0; i < newargc; i++)
                           av_push (arr, newSVpv (args[i], 0));
@@ -3864,14 +3886,11 @@ EOC
   pp_add_exported ($func);
 }
 
-
-# Allocates a PLcGrid object for use in pltr1
-
 pp_def ('plAllocGrid',
         NoPthread => 1,
-        Pars => 'double xg(nx); double yg(ny); int [o] grid()',
+        Pars => 'double xg(nx); double yg(ny); indx [o] grid()',
         GenericTypes => [D],
-        Doc => 'FIXME: documentation here!',
+        Doc => 'Allocates a PLcGrid object for use in pltr1',
         Code => '
           PLcGrid *grid;
           int i, nx, ny;
@@ -3879,11 +3898,11 @@ pp_def ('plAllocGrid',
           nx = $SIZE(nx);
           ny = $SIZE(ny);
 
-          New(1, grid, 1, PLcGrid);
+          Newx(grid, 1, PLcGrid);
           if(grid == NULL) croak("Failed to allocate memory for grid");
-          Newz(2, grid->xg, nx, PLFLT);
+          Newxz(grid->xg, nx, PLFLT);
           if(grid->xg == NULL) croak("Failed to allocate memory for grid->xg");
-          Newz(3, grid->yg, ny, PLFLT);
+          Newxz(grid->yg, ny, PLFLT);
           if(grid->yg == NULL) croak("Failed to allocate memory for grid->yg");
           grid->nx = nx;
           grid->ny = ny;
@@ -3894,7 +3913,7 @@ pp_def ('plAllocGrid',
           for (i = 0; i < ny; i++)
             grid->yg[i] = $yg(ny => i);
 
-          $grid() = ('.$int_ptr_type.') grid;'
+          $grid() = (IV) grid;'
         );
 
 
@@ -3913,14 +3932,11 @@ EOC
 
 pp_add_exported (plFreeGrid);
 
-
-# Allocates a PLcGrid2 object for use in pltr2
-
 pp_def ('plAlloc2dGrid',
         NoPthread => 1,
-        Pars => 'double xg(nx,ny); double yg(nx,ny); int [o] grid()',
+        Pars => 'double xg(nx,ny); double yg(nx,ny); indx [o] grid()',
         GenericTypes => [D],
-        Doc => 'FIXME: documentation here!',
+        Doc => 'Allocates a PLcGrid2 object for use in pltr2',
         Code => '
           PLcGrid2 *grid;
           int i, j, nx, ny;
@@ -3941,7 +3957,7 @@ pp_def ('plAlloc2dGrid',
           grid->nx = nx;
           grid->ny = ny;
 
-          $grid() = ('.$int_ptr_type.') grid;'
+          $grid() = (IV) grid;'
         );
 
 
@@ -4104,7 +4120,7 @@ mapform_callback (PLINT n, PLFLT* x, PLFLT* y)
   ax = (SP - PL_stack_base) + 1;
 
   if (count != 2)
-    croak ("mapform: must return two piddles");
+    croak ("mapform: must return two ndarrays");
 
   tx = (PLFLT*) ((PDL->SvPDLV(ST(0)))->data);
   ty = (PLFLT*) ((PDL->SvPDLV(ST(1)))->data);
@@ -4202,19 +4218,18 @@ void labelfunc_callback (PLINT axis, PLFLT value, char *label_text, PLINT length
 
 EOH
 
-# The init_pltr is used internally by the PLD::Graphics::PLplot
-# module to set the variables pltr{0,1,2}_iv to the "pointers"
-# of the Perl subroutines pltr{1,2,3}.  These variables are later used by
-# get_standard_pltrcb to provide the pointers to the C function pltr{0,1,2}.
-# This accelerates functions like plcont and plshades when those standard
-# transformation functions are used.
-
 pp_def ('init_pltr',
         NoPthread => 1,
          GenericTypes => [D],
          Pars => '',
          OtherPars => 'SV* p0; SV* p1; SV* p2;',
-         Doc => 'FIXME: documentation here!',
+         Doc => <<'EOF',
+Used internally to set the variables C<pltr{0,1,2}_iv> to the "pointers"
+of the Perl subroutines C<pltr{1,2,3}>.  These variables are later used by
+C<get_standard_pltrcb> to provide the pointers to the C function C<pltr{0,1,2}>.
+This accelerates functions like plcont and plshades when those standard
+transformation functions are used.
+EOF
          Code => '
            pltr0_iv = (IV) SvRV ($COMP(p0));
            pltr1_iv = (IV) SvRV ($COMP(p1));
@@ -4224,13 +4239,12 @@ pp_addpm (<<'EOPM');
 init_pltr (\&pltr0, \&pltr1, \&pltr2);
 EOPM
 
-# plot continental outline in world coordinates
-
-pp_addpm ('sub plmap { plmap_pp ($standard_order ? reorder ("plmap", @_) : @_) }'); pp_add_exported('plmap');
-pp_def ('plmap_pp',
+pp_def ('plmap',
         NoPthread => 1,
         Pars => 'minlong(); maxlong(); minlat(); maxlat();', # 0-3
 	OtherPars => 'SV* mapform; char* type;', # 4,5
+	PMCode => _make_reorder('plmap'),
+	Doc => 'plot continental outline in world coordinates',
         GenericTypes => [D],
         Code => '
            int use_xform;
@@ -4262,11 +4276,11 @@ pp_def ('plstring3',
        ) if ($plversion->{'c_pllegend'});
 
 # Plot the latitudes and longitudes on the background
-pp_addpm ('sub plmeridians { plmeridians_pp ($standard_order ? reorder ("plmeridians", @_) : @_) }'); pp_add_exported('plmeridians');
-pp_def ('plmeridians_pp',
+pp_def ('plmeridians',
         NoPthread => 1,
         Pars => 'dlong(); dlat(); minlong(); maxlong(); minlat(); maxlat();', # 0-5
 	OtherPars => 'SV* mapform;', # 6
+	PMCode => _make_reorder('plmeridians'),
         GenericTypes => [D],
         Code => '
            mapform_subroutine = $COMP(mapform);
@@ -4281,19 +4295,13 @@ pp_def ('plmeridians_pp',
 
 # Shade regions on the basis of value
 
-pp_addpm(<<'EOD'
-  sub plshades {
-    plshades_pp ($standard_order ? reorder ("plshades", @_) : @_)
-  }
-EOD
-);
-pp_add_exported('plshades');
-pp_def ('plshades_pp',
+pp_def ('plshades',
         NoPthread => 1,
          Pars => 'z(x,y); xmin(); xmax(); ymin(); ymax();
                   clevel(l); int fill_width(); int cont_color();
                   int cont_width(); int rectangular()', # 0-9
          OtherPars => 'SV* defined; SV* pltr; SV* pltr_data;', # 10-12
+         PMCode => _make_reorder('plshades'),
          GenericTypes => [D],
          Code => '
            int nx    = $SIZE(x);
@@ -4372,14 +4380,11 @@ pp_def ('plcont',
            plFree2dGrid (ff, size_x, size_y);'
         );
 
-
-# Surface mesh
-
 pp_def ('plmesh',
         NoPthread => 1,
          Pars => 'x(nx); y(ny); z(nx,ny); int opt()',
          GenericTypes => [D],
-         Doc => 'FIXME: documentation here!',
+         Doc => 'Surface mesh',
          Code => '
            int i, j, size_x, size_y;
            PLFLT** zz;
@@ -4398,13 +4403,11 @@ pp_def ('plmesh',
            plFree2dGrid (zz, size_x, size_y);'
         );
 
-# Magnitude colored plot surface mesh with contour
-
 pp_def ('plmeshc',
         NoPthread => 1,
          Pars => 'x(nx); y(ny); z(nx,ny); int opt(); clevel(nlevel)',
          GenericTypes => [D],
-         Doc => 'FIXME: documentation here!',
+         Doc => 'Magnitude colored plot surface mesh with contour',
          Code => '
            int i, j, size_x, size_y;
            PLFLT** zz;
@@ -4424,13 +4427,11 @@ pp_def ('plmeshc',
            plFree2dGrid (zz, size_x, size_y);'
         );
 
-# 3-d surface plot
-
 pp_def ('plot3d',
         NoPthread => 1,
          Pars => 'x(nx); y(ny); z(nx,ny); int opt(); int side()',
          GenericTypes => [D],
-         Doc => 'FIXME: documentation here!',
+         Doc => '3-d surface plot',
          Code => '
            int i, j, size_x, size_y;
            PLFLT** zz;
@@ -4449,14 +4450,11 @@ pp_def ('plot3d',
            plFree2dGrid (zz, size_x, size_y);'
         );
 
-
-# Plots a 3-d representation of the function z[x][y] with contour
-
 pp_def ('plot3dc',
         NoPthread => 1,
          Pars => 'x(nx); y(ny); z(nx,ny); int opt(); clevel(nlevel)',
          GenericTypes => [D],
-         Doc => 'FIXME: documentation here!',
+         Doc => 'Plots a 3-d representation of the function z[x][y] with contour',
          Code => '
            int i, j, size_x, size_y;
            PLFLT** zz;
@@ -4476,15 +4474,12 @@ pp_def ('plot3dc',
            plFree2dGrid (zz, size_x, size_y);'
         );
 
-
-# Set color map1 colors using a piece-wise linear relationship
-
 pp_def ('plscmap1l',
         NoPthread => 1,
          Pars => 'int itype(); isty(n); coord1(n); coord2(n); coord3(n);'
 	         . ' int rev(nrev)',
          GenericTypes => [D],
-         Doc => 'FIXME: documentation here!',
+         Doc => 'Set color map1 colors using a piece-wise linear relationship',
          Code => '
 	   PLINT* rev;
 
@@ -4493,16 +4488,13 @@ pp_def ('plscmap1l',
 	   else if ($SIZE(nrev) == $SIZE(n))
    	     rev = $P(rev);
            else
-             croak ("plscmap1l: rev must have either lenght == 0 or have the same length of the other input arguments");
+             croak ("plscmap1l: rev must have either length == 0 or have the same length of the other input arguments");
 
 	   c_plscmap1l ($itype(), $SIZE(n), $P(isty), $P(coord1),
 	                       $P(coord2), $P(coord3), rev);'
         );
 
-# Shade individual region on the basis of value
-
-pp_addpm ('sub plshade1 { plshade1_pp ($standard_order ? reorder ("plshade1", @_) : @_) }'); pp_add_exported('plshade1');
-pp_def ('plshade1_pp',
+pp_def ('plshade1',
         NoPthread => 1,
          GenericTypes => [D],
          Pars => 'a(nx,ny); left(); right(); bottom(); top(); shade_min();'
@@ -4510,22 +4502,23 @@ pp_def ('plshade1_pp',
                  . 'min_color(); min_width(); max_color(); max_width();'
                  . 'rectangular()', # 0-14
          OtherPars => 'SV* defined; SV* pltr; SV* pltr_data;',# 15-17
-         Doc => 'FIXME: documentation here!',
+         PMCode => _make_reorder('plshade1'),
+         Doc => 'Shade individual region on the basis of value',
          Code => '
            int i, j, size_x, size_y;
-           PLFLT* a;
+           PLFLT **a;
 	   void (*pltrcb) ();
            PLPointer pltrdt;
 
            size_x = $SIZE(nx);
            size_y = $SIZE(ny);
 
-           New(3, a, size_x * size_y, PLFLT);
+           plAlloc2dGrid (&a, size_x, size_y);
            if(a == NULL) croak("Failed to allocate memory in plshade1_pp");
 
            for (i = 0; i < size_x; i++)
              for (j = 0; j < size_y; j++)
-               a[i * size_y + j] = (PLFLT) $a(nx => i, ny => j);
+               a[i][j] = $a(nx => i, ny => j);
 
            defined_subroutine = $COMP(defined);
 	   check_sub_pointer (defined_subroutine,
@@ -4541,14 +4534,14 @@ pp_def ('plshade1_pp',
            else
              pltrdt = $COMP(pltr_data);
 
-           c_plshade1 (a, size_x, size_y,
+           c_plshade ((PLFLT_MATRIX) a, size_x, size_y,
              SvTRUE ($COMP(defined)) ? defined_callback : NULL,
              $left(), $right(), $bottom(), $top(),
              $shade_min(), $shade_max(), $sh_cmap(), $sh_color(), $sh_width(),
              $min_color(), $min_width(), $max_color(), $max_width(),
              plfill, $rectangular(), pltrcb, pltrdt);
 
-           Safefree (a);'
+           plFree2dGrid(a, size_x, size_y);'
         );
 
 # Plot gray-level image
@@ -4849,16 +4842,17 @@ pp_add_exported ('plgver');
 
 #----------------------------------------------------------------------------
 
-pp_addpm ('sub plstripc { plstripc_pp ($standard_order ? reorder ("plstripc", @_) : @_) }'); pp_add_exported('plstripc');
-pp_def ('plstripc_pp',
+pp_def ('plstripc',
         NoPthread => 1,
          GenericTypes => [D],
-         Pars => 'xmin(); xmax(); xjump(); ymin(); ymax();'
-	         . 'xlpos(); ylpos(); int y_ascl(); int acc();'
-                 . 'int colbox(); int collab();'
-                 . 'int colline(n); int styline(n);  int [o] id()', # 0-12
-         OtherPars => 'char* xspec; char* yspec; SV* legline;' # 13-18
-                      . 'char* labx; char* laby; char* labtop',
+         Pars => 'xmin(); xmax(); xjump(); ymin(); ymax();' # 0-4
+	         . 'xlpos(); ylpos(); int y_ascl(); int acc();' # 5-8
+                 . 'int colbox(); int collab();' # 9-10
+                 . 'int colline(n); int styline(n);' # 11-12
+                 . 'int [o] id()', # 13 if given - else decr the rest
+         OtherPars => 'char* xspec; char* yspec; SV* legline;' # 14-16
+                      . 'char* labx; char* laby; char* labtop', # 17-19
+         PMCode => _make_reorder('plstripc'),
          Doc => 'FIXME: documentation here!',
          Code => '
            I32 i;
@@ -5056,12 +5050,12 @@ pp_addpm (<<'EOPM');
 
 =for sig
 
-my ($legend_width, $legend_height) =
-    pllegend ($position, $opt, $x, $y, $plot_width, $bg_color, $nlegend,
-    \@opt_array,
-    $text_offset, $text_scale, $text_spacing, $test_justification,
-    \@text_colors, \@text, \@box_colors, \@box_patterns, \@box_scales, \@line_colors,
-    \@line_styles, \@line_widths, \@symbol_colors, \@symbol_scales, \@symbol_numbers, \@symbols);
+  my ($legend_width, $legend_height) =
+      pllegend ($position, $opt, $x, $y, $plot_width, $bg_color, $nlegend,
+      \@opt_array,
+      $text_offset, $text_scale, $text_spacing, $test_justification,
+      \@text_colors, \@text, \@box_colors, \@box_patterns, \@box_scales, \@line_colors,
+      \@line_styles, \@line_widths, \@symbol_colors, \@symbol_scales, \@symbol_numbers, \@symbols);
 
 =for ref
 
@@ -5295,7 +5289,7 @@ pp_addpm (<<'EOPM');
 
 =for ref
 
-  Calculate broken-down time from continuous time for current stream.
+Calculate broken-down time from continuous time for current stream.
 
 =cut
 EOPM
@@ -5371,7 +5365,7 @@ pp_addpm (<<'EOPM');
 
 =for ref
 
-  Calculate continuous time from broken-down time for current stream.
+Calculate continuous time from broken-down time for current stream.
 
 =cut
 EOPM
@@ -5449,14 +5443,12 @@ pp_add_exported ('plsesc');
 
 if ($plversion->{'plsvect'}) {
 
-# Vector field plots
-
   pp_def ('plvect',
           NoPthread => 1,
 	  GenericTypes => [D],
 	  Pars => 'u(nx,ny); v(nx,ny); scale();',
 	  OtherPars => 'SV* pltr; SV* pltr_data;',
-	  Doc => 'FIXME: documentation here!',
+	  Doc => 'Vector field plots',
 	  Code => '
            int i, j, size_x, size_y;
            PLFLT** u;
@@ -5572,14 +5564,12 @@ if ($plversion->{'plsvect'}) {
 	    Code => 'c_plscmap1a($P(r),$P(g),$P(b),$P(a),$SIZE(n));'
 	   );
 
-    # Set color map1 colors using a piece-wise linear relationship, include alpha channel
-
     pp_def ('plscmap1la',
             NoPthread => 1,
 	    Pars => 'int itype(); isty(n); coord1(n); coord2(n); coord3(n); coord4(n);'
 	    . ' int rev(nrev)',
 	    GenericTypes => [D],
-	    Doc => 'FIXME: documentation here!',
+	    Doc => 'Set color map1 colors using a piece-wise linear relationship, include alpha channel',
 	    Code => '
 	      PLINT* rev;
 
@@ -5648,6 +5638,57 @@ plsfci(fci)
         c_plsfci(fci);
 EOC
 pp_add_exported('', 'plsfci');
+
+pp_addpm (<<'EOPM');
+=head2 pl_cmd
+
+=for sig
+
+   pl_cmd($CMD, $data);
+
+=for ref
+
+   See the PLplot manual for reference.
+   Gives access to low level driver. $CMD is an integer. $data opaque data.
+
+=cut
+EOPM
+
+pp_addxs (<<"EOC");
+void
+pl_cmd (cmd, data)
+  int cmd
+  void *data
+CODE:
+  pl_cmd(cmd, data);
+EOC
+pp_add_exported('pl_cmd');
+
+pp_addpm (<<'EOPM');
+=head2 pl_setCairoCtx
+
+=for sig
+
+   pl_setCairoCtx($cairo_context);
+
+=for ref
+
+   Used with cairo external drivers to set the cairo context.
+   $cairo_context should be a Cairo::Context object.
+   Uses pl_cmd underneath, but extracts the real C struct pointer from the Cairo::Context.
+
+=cut
+EOPM
+
+pp_addxs (<<"EOC");
+void
+pl_setCairoCtx(SV *sv)
+CODE:
+  pl_cmd(PLESC_DEVINIT, (void *)(SvIV ((SV *) SvRV (sv))));
+EOC
+pp_add_exported('pl_setCairoCtx');
+
+
 
 pp_addpm (<<'EOPM');
 

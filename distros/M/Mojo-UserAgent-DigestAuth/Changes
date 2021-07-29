@@ -1,5 +1,8 @@
 Revision history for perl distribution Mojo-UserAgent-DigestAuth
 
+0.06 2021-07-10T14:53:52+0900
+ - Fix missing dependencies #5
+
 0.05 2021-06-17T09:00:58+0900
  - Add Mojo::UserAgent::Role::DigestAuth
  - Deprecated Mojo::UserAgent::DigestAuth

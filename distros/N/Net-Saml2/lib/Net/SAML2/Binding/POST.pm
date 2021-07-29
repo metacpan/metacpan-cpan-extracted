@@ -4,7 +4,6 @@ use strict;
 use warnings;
 
 use Moose;
-use Net::SAML2::XML::Util qw/ no_comments /;
 
 
 use Net::SAML2::XML::Sig;
@@ -20,7 +19,7 @@ sub handle_response {
     my ($self, $response) = @_;
 
     # unpack and check the signature
-    my $xml = no_comments(decode_base64($response));
+    my $xml = decode_base64($response);
     my $xml_opts = { x509 => 1 };
     $xml_opts->{ cert_text } = $self->cert_text if ($self->cert_text);
     $xml_opts->{ exclusive } = 1;
@@ -58,7 +57,7 @@ Net::SAML2::Binding::POST
 
 =head1 VERSION
 
-version 0.34
+version 0.40
 
 =head1 SYNOPSIS
 
@@ -96,21 +95,11 @@ Base64-encoded response, from the SAMLResponse CGI parameter.
 
 =head1 AUTHOR
 
-Original Author: Chris Andrews  <chrisa@cpan.org>
+Chris Andrews  <chrisa@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Chris Andrews and Others; in detail:
-
-  Copyright 2010-2011  Chris Andrews
-            2012       Peter Marschall
-            2015       Mike Wisener
-            2016       Jeff Fearn
-            2017       Alessandro Ranellucci
-            2019       Timothy Legge
-            2020       Timothy Legge, Wesley Schwengle
-            2021       Timothy Legge
-
+This software is copyright (c) 2021 by Chris Andrews and Others, see the git log.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

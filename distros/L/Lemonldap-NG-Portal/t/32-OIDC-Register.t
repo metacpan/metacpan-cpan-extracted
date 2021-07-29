@@ -95,13 +95,6 @@ sub op {
                   { "extra_var" => "mail" },
                 oidcServiceDynamicRegistrationExtraClaims =>
                   { "extra_claim" => "extra_var" },
-                oidcServiceMetaDataAuthorizeURI       => "authorize",
-                oidcServiceMetaDataCheckSessionURI    => "checksession.html",
-                oidcServiceMetaDataJWKSURI            => "jwks",
-                oidcServiceMetaDataEndSessionURI      => "logout",
-                oidcServiceMetaDataRegistrationURI    => "register",
-                oidcServiceMetaDataTokenURI           => "token",
-                oidcServiceMetaDataUserInfoURI        => "userinfo",
                 oidcServiceAllowHybridFlow            => 1,
                 oidcServiceAllowImplicitFlow          => 1,
                 oidcServiceAllowDynamicRegistration   => 1,

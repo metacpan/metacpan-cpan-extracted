@@ -1,3 +1,16 @@
+0.011   2021-07-26  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux] In generated sample output section, linkify entry.
+
+
+0.010   2021-07-26  Released-By: PERLANCAR; Urgency: medium
+
+	- [doc] Add (generated) POD section to show the sample output of
+	  (some of the) modules.
+
+	- Add description for Text::Table::Sprintf.
+
+
 0.009   2021-02-20  Released-By: PERLANCAR; Urgency: medium
 
 	- Add features: column_width, per_column_width, row_height,

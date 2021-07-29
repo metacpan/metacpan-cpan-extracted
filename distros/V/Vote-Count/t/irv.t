@@ -190,4 +190,6 @@ subtest 'Range Ballot' => sub {
     $expecttenr, 'Ran IRV on converted Tennessee Range BallotSet' );
 };
 
+note 'coverage of BTR IRV is in bottomrunoff.t';
+
 done_testing();

@@ -8,13 +8,13 @@ use Carp;
 
 use subs qw();
 
-our $VERSION = '1.004';
+our $VERSION = '1.006';
 
 =encoding utf8
 
 =head1 NAME
 
-Mac::OSVersion - Get the Mac OS X system version
+Mac::OSVersion - Get the Mac OS X or macOS system version
 
 =head1 SYNOPSIS
 
@@ -38,9 +38,14 @@ Mac::OSVersion - Get the Mac OS X system version
 
 =head1 DESCRIPTION
 
-Extract the values for the various OS numbers (Mac OS X version, build,
+Extract the values for the various OS numbers (Mac OS version, build,
 kernel) using various methods. Methods may use other modules or
 external programs. So far this only works on the current machine.
+
+I started this module with only Mac OS X in mind. Now that macOS 11 is
+on the way, I've bolted on a optional "major" argument to most
+methods. If you don't supply that argument, it defaults to "10" to get
+the same behavior as the Mac OS X world.
 
 =cut
 
@@ -50,7 +55,7 @@ external programs. So far this only works on the current machine.
 
 =item version( METHOD );
 
-In scalar context, returns the numeric version of OS X, I<e.g.> 10.4.11.
+In scalar context, returns the numeric version of Mac OS X or macOS, I<e.g.> 10.4.11.
 
 In list context, returns the list of the major, minor, point, name, and
 kernel versions. Some methods may not return all values, but the values
@@ -94,7 +99,6 @@ sub version {
 
 	croak( "$class doesn't know about method [$method]" ) unless
 		eval { $class->can( $method ) };
-
 	my @list = $class->$method;
 	unless( wantarray ) {
 		return join ".", @list[0,1], (defined($list[2]) ? $list[2] : ());
@@ -106,17 +110,29 @@ sub version {
 sub methods { () = keys %methods }
 }
 
+=item default_major_version
+
+Returns the default major version, which is C<10> for Mac OS X. This
+is a bit of a kludge because I didn't think about this module covering
+a future major version.
+
+=item major_version_exists( MAJOR )
+
+Returns true if the argument is a known major version number.
+
 =item name( [METHOD] )
 
-Returns the name of  major version number, I<e.g.> 'Tiger' 10.4.
+Returns the name of version number, I<e.g.> 'Tiger' 10.4.
 
 C<METHOD> optionally specifies the method to use to get the answer. See
 C<version> for the possible values.
 
-=item minor_to_name( MINOR )
+=item minor_to_name( MINOR [, MAJOR] )
 
 Returns the name ( I<e.g.> 'Tiger' ) for the given minor version
 number.
+
+With major version 10:
 
 	0	Cheetah
 	1	Puma
@@ -135,41 +151,82 @@ number.
 	14	Mojave
 	15	Catalina
 
-=item minor_version_numbers()
+With major version 11:
 
-Returns a list of the minor version numbers
+	Big Sur
 
-=item minor_version_names()
+With major version 12:
+
+	Monterey
+
+=item minor_version_numbers( [ MAJOR ] )
+
+Returns a list of the minor version numbers. This takes an optional
+major version argument, which is C<10> by default.
+
+=item minor_version_names( [ MAJOR ] )
 
 Returns a list of the names of the minor versions ( I<e.g.>
-qw(Cheetah Puma ... )
+C<qw(Cheetah Puma ... )>). This takes an optional
+major version argument, which is C<10> by default.
 
 =cut
 
 BEGIN {
-my @names = ( 'Cheetah', 'Puma', 'Jaguar', 'Panther', 'Tiger',
+my %names = (
+	'10' => [ 'Cheetah', 'Puma', 'Jaguar', 'Panther', 'Tiger',
 	'Leopard', 'Snow Leopard', 'Lion', 'Mountain Lion',
 	'Mavericks', 'Yosemite', 'El Capitan', 'Sierra',
-	'High Sierra', 'Mojave', 'Catalina' );
+	'High Sierra', 'Mojave', 'Catalina'],
+	'11' => [ 'Big Sur' ],
+	'12' => [ 'Monterey' ],
+	 );
 
-sub minor_to_name { $names[ $_[1] ] }
+my %release_dates = (
+	10 => [ ],
+	11 => [ ],
+	12 => [ ],
+	);
 
-sub minor_version_numbers { ( 0 .. $#names ) }
+sub default_major_version { '10' }
 
-sub minor_version_numbers { @names }
+sub major_version_exists {
+	my( $class, $major ) = @_;
+	return exists $names{$major};
+	}
+
+sub minor_to_name {
+	my( $class, $minor, $major ) = @_;
+	carp "No MAJOR argument to minor_to_name is deprecated. It will assume " . $class->default_major_version
+		unless defined $major;
+	$major //= $class->default_major_version;
+	croak "Unknown Mac version <$major>" unless $class->major_version_exists( $major );
+	$major == 10 ? $names{$major}[ $minor ] : $names{$major}[ 0 ]
+	}
+
+sub minor_version_numbers {
+	my( $class, $minor, $major ) = @_;
+	$major //= $class->default_major_version;
+	croak "Unknown Mac version <$major>" unless $class->major_version_exists( $major );
+	0 .. $#{ $names{$major} };
+	}
+
 }
 
 sub name {
-	$_[0]->minor_to_name(
-		${
-			[ $_[0]->version( $_[1] ) ]
-		}[_MINOR]
-		)
+	my( $class, $method ) = @_;
+
+	my @version = $class->version( $method );
+
+	my( $major, $minor ) = @version[_MAJOR, _MINOR];
+	croak "Unknown Mac version <$major>" unless $class->major_version_exists( $major );
+
+	$class->minor_to_name( $minor, $major );
 	}
 
 =item major( [METHOD] )
 
-Returns the major version number, I<e.g.> 10 or 10.4.11.
+Returns the major version number, I<e.g.> 10 of 10.4.11.
 
 C<METHOD> optionally specifies the method to use to get the answer. See
 C<version> for the possible values. Not all methods can return an answer.
@@ -323,7 +380,7 @@ sub sw_vers {
 
 	( $list[_MAJOR], $list[_MINOR], $list[_POINT] ) = split /\./, $product;
 	$list[_BUILD] = $build;
-	$list[_NAME] = $class->minor_to_name( $list[_MINOR] );
+	$list[_NAME] = $class->minor_to_name( $list[_MINOR], $list[_MAJOR] );
 
 	@list;
 	}
@@ -365,7 +422,7 @@ sub system_profiler {
 
 		$list[_BUILD]  = $build;
 		$list[_KERNEL] = $kernel;
-		$list[_NAME]   = $class->minor_to_name( $list[_MINOR] );
+		$list[_NAME]   = $class->minor_to_name( $list[_MINOR], $list[_MAJOR] );
 		}
 
 	@list;
@@ -449,7 +506,7 @@ brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2007-2018, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2007-2021, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
 You may redistribute this under the terms of the Artistic License 2.0.
 

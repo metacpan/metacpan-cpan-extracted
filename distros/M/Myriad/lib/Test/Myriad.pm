@@ -3,7 +3,7 @@ package Test::Myriad;
 use strict;
 use warnings;
 
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.010'; # VERSION
 our $AUTHORITY = 'cpan:DERIV'; # AUTHORITY
 
 use IO::Async::Loop;
@@ -14,6 +14,8 @@ use Check::UnitCheck;
 use Myriad;
 use Myriad::Service::Implementation;
 use Test::Myriad::Service;
+
+use Log::Any::Adapter;
 
 our @REGISTERED_SERVICES;
 
@@ -68,7 +70,7 @@ sub add_service {
     } elsif ($service = delete $args{name}) {
         die 'The name should look like a Perl package name' unless $service =~ /::/;
         $pkg  = $service;
-        $meta = Object::Pad->begin_class($pkg, extends => 'Myriad::Service::Implementation');
+        $meta = Object::Pad::MOP::Class->begin_class($pkg, extends => 'Myriad::Service::Implementation');
 
         {
             no strict 'refs';
@@ -101,6 +103,10 @@ sub import {
     my $self = shift;;
     Check::UnitCheck::unitcheckify(sub {
         $myriad->configure_from_argv(('--transport', $ENV{MYRIAD_TEST_TRANSPORT} // 'memory', 'service'))->get();
+
+        # Override logger
+        Log::Any::Adapter->set('TAP', filter => 'info');
+
         $loop->later(sub {
             (fmap0 {
                 $myriad->add_service($_);

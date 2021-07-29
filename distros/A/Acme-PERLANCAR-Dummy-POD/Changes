@@ -1,0 +1,23 @@
+0.005   2021-07-09  Released-By: PERLANCAR; Urgency: medium
+
+	- Add =for technique (provide rendered code for each output).
+
+
+0.004   2021-07-09  Released-By: PERLANCAR; Urgency: medium
+
+	- LineBreak: add the E<10> + E<8> trick.
+
+
+0.003   2021-07-09  Released-By: PERLANCAR; Urgency: medium
+
+	- Add module: Acme::PERLANCAR::Dummy::POD::LineBreak.
+
+
+0.002   2021-04-14  Released-By: PERLANCAR; Urgency: medium
+
+	- Add an argument to =back for testing.
+
+
+0.001   2021-04-14  Released-By: PERLANCAR
+
+        - First release, separate from Acme-PERLANCAR-Dummy.

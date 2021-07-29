@@ -1,0 +1,69 @@
+{
+   "abstract" : "Check for object providing all methods from a class or role",
+   "author" : [
+      "haarg - Graham Knop (cpan:HAARG) <haarg@haarg.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Types-QuacksLike",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {}
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {}
+      },
+      "runtime" : {
+         "recommends" : {
+            "Sub::Util" : "0"
+         },
+         "requires" : {
+            "Type::Library" : "0",
+            "Types::Standard" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88",
+            "Test::Needs" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Types-QuacksLike@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Types-QuacksLike"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/haarg/Types-QuacksLike.git",
+         "web" : "https://github.com/haarg/Types-QuacksLike"
+      }
+   },
+   "version" : "0.001001",
+   "x_authority" : "cpan:HAARG",
+   "x_breaks" : {},
+   "x_serialization_backend" : "JSON::PP version 4.06"
+}

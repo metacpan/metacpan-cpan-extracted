@@ -5,11 +5,11 @@ NAME
 
 VERSION
 
-    version 0.34
+    version 0.36
 
 SYNOPSIS
 
-      ebug_http calc.pl
+     ebug_http calc.pl
 
 DESCRIPTION
 
@@ -22,7 +22,17 @@ DESCRIPTION
 
 SEE ALSO
 
-    Devel::ebug, ebug_http
+    Devel::ebug
+
+      Simple extensible Perl debugger with clean API.
+
+    ebug_http
+
+      Command-line interface to ebug/http debugger.
+
+    Devel::hdb
+
+      Similar web based debugger for Perl
 
 AUTHOR
 

@@ -1,3 +1,13 @@
+0.072   2021-07-21  Released-By: PERLANCAR; Urgency: medium; Backward-Incompatible: yes
+
+	- [incompatible change] Adjust to DefHash 1.0.13 (remove support for
+	  PROP(LANG) syntax).
+
+        - Add options argument to prop(), get_prop().
+
+	- Use Regexp::Pattern::DefHash.
+
+
 0.071   2020-01-04  Released-By: PERLANCAR; Urgency: low
 
 	- No functional changes.

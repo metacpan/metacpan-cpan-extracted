@@ -5,7 +5,7 @@ package Data::Record::Serialize::Types;
 use strict;
 use warnings;
 
-our $VERSION = '0.20';
+our $VERSION = '0.23';
 
 use Type::Utils -all;
 use Types::Standard -types;
@@ -37,13 +37,15 @@ __END__
 
 =pod
 
+=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory
+
 =head1 NAME
 
 Data::Record::Serialize::Types - Types for Data::Record::Serialize
 
 =head1 VERSION
 
-version 0.20
+version 0.23
 
 =head1 SUPPORT
 

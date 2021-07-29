@@ -23,7 +23,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_NO_SECOND_FACTORS
 );
 
-our $VERSION = '2.0.10';
+our $VERSION = '2.0.12';
 
 extends 'Lemonldap::NG::Portal::Main::Plugin';
 with 'Lemonldap::NG::Portal::Lib::OverConf';
@@ -42,6 +42,19 @@ has ott => (
         my $ott =
           $_[0]->{p}->loadModule('Lemonldap::NG::Portal::Lib::OneTimeToken');
         $ott->timeout( $_[0]->{conf}->{formTimeout} );
+        return $ott;
+    }
+);
+
+has regOtt => (
+    is      => 'rw',
+    lazy    => 1,
+    default => sub {
+        my $ott =
+          $_[0]->{p}->loadModule('Lemonldap::NG::Portal::Lib::OneTimeToken');
+        my $timeout = $_[0]->{conf}->{sfRegisterTimeout}
+          // $_[0]->{conf}->{formTimeout};
+        $ott->timeout($timeout);
         return $ott;
     }
 );
@@ -240,6 +253,7 @@ sub run {
 
         $self->logger->debug("Looking for expired 2F device(s)...");
         my $removed = 0;
+        my $name    = '';
         my $now     = time();
         foreach my $device (@$_2fDevices) {
             my $type = lc( $device->{type} );
@@ -252,16 +266,18 @@ sub run {
                 );
                 $self->userLogger->info("Remove expired $device->{type}");
                 $device->{type} = 'EXPIRED';
+                $name .= "$device->{name}; ";
                 $removed++;
             }
         }
 
         if ($removed) {
+            $name =~ s/;\s$//;
             $self->logger->debug(
 "Found $removed EXPIRED 2F device(s) => Update persistent session"
             );
             $self->userLogger->notice(
-                " -> $removed expired 2F device(s) removed");
+                " -> $removed expired 2F device(s) removed ($name)");
             @$_2fDevices =
               map { $_->{type} =~ /\bEXPIRED\b/ ? () : $_ } @$_2fDevices;
             $self->p->updatePersistentSession( $req,
@@ -276,13 +292,13 @@ sub run {
                 my $title = $self->conf->{sfRemovedNotifTitle}
                   || 'Second factor notification';
                 my $msg = $self->conf->{sfRemovedNotifMsg}
-                  || "$removed expired second factor(s) has/have been removed!";
+                  || "$removed expired second factor(s) has/have been removed ($name)!";
                 $msg =~ s/_removedSF_/$removed/;
-
+                $msg =~ s/_nameSF_/$name/;
                 my $params =
                   $removed > 1
-                  ? { trspan => "expired2Fremoved, $removed" }
-                  : { trspan => "oneExpired2Fremoved" };
+                  ? { trspan => "expired2Fremoved, $removed, $name" }
+                  : { trspan => "oneExpired2Fremoved, $name" };
 
                 my $notifEngine = $self->p->loadedModules->{
                     'Lemonldap::NG::Portal::Plugins::Notifications'};
@@ -309,7 +325,7 @@ sub run {
             $self->logger->debug("2F is required...");
             $self->logger->debug(" -> Register 2F");
             $req->pdata->{sfRegToken} =
-              $self->ott->createToken( $req->sessionInfo );
+              $self->regOtt->createToken( $req->sessionInfo );
             $self->logger->debug("Just one 2F is enabled");
             $self->logger->debug(" -> Redirect to 2fregisters/");
             $req->response( [
@@ -384,8 +400,8 @@ sub run {
 
 # bool public display2fRegisters($req, $session)
 #
-# Return true if at least 1 register module is available for this user. Used
-# by Menu to display or not /2fregisters page
+# Return true if at least 1 register module is available for this user.
+# Used by Menu for displaying or not /2fregisters page
 sub display2fRegisters {
     my ( $self, $req, $session ) = @_;
     foreach my $m ( @{ $self->sfRModules } ) {
@@ -599,7 +615,7 @@ sub restoreSession {
     my ( $self, $req, @path ) = @_;
     my $token = $req->pdata->{sfRegToken}
       or return [ 302, [ Location => $self->conf->{portal} ], [] ];
-    $req->userData( $self->ott->getToken( $token, 1 ) );
+    $req->userData( $self->regOtt->getToken( $token, 1 ) );
     $req->data->{sfRegRequired} = 1;
     return $req->method eq 'POST'
       ? $self->register( $req, @path )

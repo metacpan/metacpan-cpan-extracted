@@ -231,6 +231,18 @@
 #ifndef MAP_STACK
 #define MAP_STACK 0
 #endif
+#ifndef MAP_FIXED_NOREPLACE
+#define MAP_FIXED_NOREPLACE 0
+#endif
+#ifndef MAP_SHARED_VALIDATE
+#define MAP_SHARED_VALIDATE 0
+#endif
+#ifndef MAP_SYNC
+#define MAP_SYNC 0
+#endif
+#ifndef MAP_UNINITIALIZED
+#define MAP_UNINITIALIZED 0
+#endif
 #ifndef MREMAP_MAYMOVE
 #define MREMAP_MAYMOVE 0
 #endif

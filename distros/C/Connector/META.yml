@@ -3,53 +3,143 @@ abstract: 'a generic connection to a hierarchical-structured data set'
 author:
   - 'Scott Hardin <mrscotty@cpan.org>'
 build_requires:
-  Config::Merge: 0
-  Config::Std: 0
-  Config::Versioned: 0
-  DBD::SQLite: 0
-  DBI: 0
-  ExtUtils::MakeMaker: 6.59
-  IO::Socket::SSL: 0
-  JSON: 0
-  LWP::Protocol::https: 0
-  LWP::UserAgent: 0
-  Proc::SafeExec: 0
-  Template: 0
-  Test::More: 0
-  YAML: 0
+  Config::Merge: '0'
+  Config::Std: '0'
+  Config::Versioned: '0'
+  DBD::SQLite: '0'
+  DBI: '0'
+  ExtUtils::MakeMaker: '6.59'
+  IO::Socket::SSL: '0'
+  JSON: '0'
+  LWP::Protocol::https: '0'
+  LWP::UserAgent: '0'
+  Proc::SafeExec: '0'
+  Template: '0'
+  Test::More: '0'
+  YAML: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 6.59
-distribution_type: module
-dynamic_config: 1
-generated_by: 'Module::Install version 1.19'
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.3, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Connector
 no_index:
   directory:
-    - inc
     - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Connector:
+    file: lib/Connector.pm
+    version: '1.41'
+  Connector::Builtin:
+    file: lib/Connector/Builtin.pm
+  Connector::Builtin::Authentication::LDAP:
+    file: lib/Connector/Builtin/Authentication/LDAP.pm
+  Connector::Builtin::Authentication::Password:
+    file: lib/Connector/Builtin/Authentication/Password.pm
+  Connector::Builtin::Authentication::PasswordScheme:
+    file: lib/Connector/Builtin/Authentication/PasswordScheme.pm
+  Connector::Builtin::Env:
+    file: lib/Connector/Builtin/Env.pm
+  Connector::Builtin::File::Path:
+    file: lib/Connector/Builtin/File/Path.pm
+  Connector::Builtin::File::SCP:
+    file: lib/Connector/Builtin/File/SCP.pm
+  Connector::Builtin::File::Simple:
+    file: lib/Connector/Builtin/File/Simple.pm
+  Connector::Builtin::Memory:
+    file: lib/Connector/Builtin/Memory.pm
+  Connector::Builtin::Static:
+    file: lib/Connector/Builtin/Static.pm
+  Connector::Iterator:
+    file: lib/Connector/Iterator.pm
+  Connector::Multi:
+    file: lib/Connector/Multi.pm
+  Connector::Multi::Merge:
+    file: lib/Connector/Multi/Merge.pm
+  Connector::Multi::YAML:
+    file: lib/Connector/Multi/YAML.pm
+  Connector::Proxy:
+    file: lib/Connector/Proxy.pm
+  Connector::Proxy::Authentication::KeyNanny:
+    file: lib/Connector/Proxy/Authentication/KeyNanny.pm
+  Connector::Proxy::Config::Std:
+    file: lib/Connector/Proxy/Config/Std.pm
+  Connector::Proxy::Config::Versioned:
+    file: lib/Connector/Proxy/Config/Versioned.pm
+  Connector::Proxy::DBI:
+    file: lib/Connector/Proxy/DBI.pm
+  Connector::Proxy::HTTP:
+    file: lib/Connector/Proxy/HTTP.pm
+  Connector::Proxy::JSON:
+    file: lib/Connector/Proxy/JSON.pm
+  Connector::Proxy::Net::FTP:
+    file: lib/Connector/Proxy/Net/FTP.pm
+  Connector::Proxy::Net::LDAP:
+    file: lib/Connector/Proxy/Net/LDAP.pm
+  Connector::Proxy::Net::LDAP::DN:
+    file: lib/Connector/Proxy/Net/LDAP/DN.pm
+  Connector::Proxy::Net::LDAP::Simple:
+    file: lib/Connector/Proxy/Net/LDAP/Simple.pm
+  Connector::Proxy::Net::LDAP::Single:
+    file: lib/Connector/Proxy/Net/LDAP/Single.pm
+  Connector::Proxy::Proc::SafeExec:
+    file: lib/Connector/Proxy/Proc/SafeExec.pm
+  Connector::Proxy::SOAP::Lite:
+    file: lib/Connector/Proxy/SOAP/Lite.pm
+  Connector::Proxy::YAML:
+    file: lib/Connector/Proxy/YAML.pm
+  Connector::Role::LocalPath:
+    file: lib/Connector/Role/LocalPath.pm
+  Connector::Role::SSLUserAgent:
+    file: lib/Connector/Role/SSLUserAgent.pm
+  Connector::Tee:
+    file: lib/Connector/Tee.pm
+  Connector::Types:
+    file: lib/Connector/Types.pm
+  Connector::Wrapper:
+    file: lib/Connector/Wrapper.pm
 recommends:
-  Config::Std: 0
+  Config::Std: '0'
   Config::Versioned: '0.5'
-  DBI: 0
-  IO::Socket::SSL: 0
-  JSON: 0
-  LWP::Protocol::https: 0
-  LWP::UserAgent: 0
-  Net::LDAP: 0
-  Proc::SafeExec: 0
-  Template: 0
-  Text::CSV_XS: 0
-  YAML: 0
+  DBI: '0'
+  IO::Socket::SSL: '0'
+  JSON: '0'
+  LWP::Protocol::https: '0'
+  LWP::UserAgent: '0'
+  Net::LDAP: '0'
+  Proc::SafeExec: '0'
+  Template: '0'
+  Text::CSV_XS: '0'
+  YAML: '0'
 requires:
-  Log::Log4perl: 0
-  Moose: 0
-  perl: 5.10.1
+  Log::Log4perl: '0'
+  Moose: '0'
+  perl: v5.10.1
 resources:
   bugtracker: https://github.com/mrscotty/connector/issues
-  license: http://dev.perl.org/licenses/
-  repository: https://github.com/mrscotty/connector
-version: '1.37'
+  homepage: https://github.com/mrscotty/connector
+  repository: git://github.com/mrscotty/connector.git
+version: '1.41'
+x_contributors:
+  - 'Martin Bartosch <m.bartosch@cynops.de>'
+  - 'Martin Bartosch <mbartosch@whiterabbitsecurity.com>'
+  - 'Oliver Welter <github@oliwel.de>'
+  - 'Oliver Welter <mail@oliwel.de>'
+  - 'Oliver Welter <owelter@whiterabbitsecurity.com>'
+  - 'Paweł Tomulik <ptomulik@meil.pw.edu.pl>'
+  - 'Scott Hardin <scott@hnsc.de>'
+  - 'Scott Hardin <shardin@whiterabbitsecurity.com>'
+  - 'Scott T. Hardin <scott-1@hnsc.de>'
+  - 'Scott T. Hardin <scott.hardin@hnsc.de>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

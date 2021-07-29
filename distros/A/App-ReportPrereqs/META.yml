@@ -3,18 +3,14 @@ abstract: 'report prerequisite versions'
 author:
   - 'Sven Kirmess <sven.kirmess@kzone.ch>'
 build_requires:
-  Capture::Tiny: '0'
-  Cwd: '0'
-  FindBin: '0'
-  Test::MockModule: '0'
   Test::More: '0.88'
   lib: '0'
   perl: '5.006'
 configure_requires:
   ExtUtils::MakeMaker: '0'
   perl: '5.006'
-dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.022, CPAN::Meta::Converter version 2.150010'
+dynamic_config: 1
+generated_by: 'Dist::Zilla version 6.023, CPAN::Meta::Converter version 2.150010'
 license: open_source
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -28,7 +24,7 @@ no_index:
 provides:
   App::ReportPrereqs:
     file: bin/report-prereqs
-    version: '0.005'
+    version: '0.006'
 requires:
   ExtUtils::MakeMaker: '0'
   File::Basename: '0'
@@ -45,7 +41,7 @@ resources:
   bugtracker: https://github.com/skirmess/App-ReportPrereqs/issues
   homepage: https://github.com/skirmess/App-ReportPrereqs
   repository: https://github.com/skirmess/App-ReportPrereqs.git
-version: '0.005'
+version: '0.006'
 x_contributors:
   - 'Stephan Sachse <ste.sachse@gmail.com>'
 x_generated_by_perl: v5.24.0

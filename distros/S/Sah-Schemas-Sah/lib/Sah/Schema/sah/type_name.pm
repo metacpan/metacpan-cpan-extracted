@@ -1,11 +1,21 @@
 package Sah::Schema::sah::type_name;
 
-our $DATE = '2020-05-08'; # DATE
-our $VERSION = '0.9.49.1'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-07-23'; # DATE
+our $DIST = 'Sah-Schemas-Sah'; # DIST
+our $VERSION = '0.9.50.0'; # VERSION
 
 our $schema = [str => {
     match => '\A[A-Za-z][A-Za-z0-9_]*(::[A-Za-z][A-Za-z0-9_]*)*\z',
-}, {}];
+
+    examples => [
+        {value=>'', valid=>0},
+        {value=>'int', valid=>1},
+        {value=>'pos-int', valid=>0},
+        {value=>'path::name', valid=>1},
+    ],
+
+}];
 
 1;
 # ABSTRACT: Type name
@@ -22,23 +32,38 @@ Sah::Schema::sah::type_name - Type name
 
 =head1 VERSION
 
-This document describes version 0.9.49.1 of Sah::Schema::sah::type_name (from Perl distribution Sah-Schemas-Sah), released on 2020-05-08.
+This document describes version 0.9.50.0 of Sah::Schema::sah::type_name (from Perl distribution Sah-Schemas-Sah), released on 2021-07-23.
 
 =head1 SYNOPSIS
 
-Using with L<Data::Sah>:
+To check data against this schema (requires L<Data::Sah>):
 
  use Data::Sah qw(gen_validator);
- my $vdr = gen_validator("sah::type_name*");
- say $vdr->($data) ? "valid" : "INVALID!";
+ my $validator = gen_validator("sah::type_name*");
+ say $validator->($data) ? "valid" : "INVALID!";
 
- # Data::Sah can also create a validator to return error message, coerced value,
- # even validators in other languages like JavaScript, from the same schema.
- # See its documentation for more details.
+ # Data::Sah can also create validator that returns nice error message string
+ # and/or coerced value. Data::Sah can even create validator that targets other
+ # language, like JavaScript. All from the same schema. See its documentation
+ # for more details.
 
-Using in L<Rinci> function metadata (to be used with L<Perinci::CmdLine>, etc):
+To validate function parameters against this schema (requires L<Params::Sah>):
 
- package MyApp;
+ use Params::Sah qw(gen_validator);
+
+ sub myfunc {
+     my @args = @_;
+     state $validator = gen_validator("sah::type_name*");
+     $validator->(\@args);
+     ...
+ }
+
+To specify schema in L<Rinci> function metadata and use the metadata with
+L<Perinci::CmdLine> to create a CLI:
+
+ # in lib/MyApp.pm
+ package
+   MyApp;
  our %SPEC;
  $SPEC{myfunc} = {
      v => 1.1,
@@ -55,6 +80,32 @@ Using in L<Rinci> function metadata (to be used with L<Perinci::CmdLine>, etc):
      my %args = @_;
      ...
  }
+ 1;
+
+ # in myapp.pl
+ package
+   main;
+ use Perinci::CmdLine::Any;
+ Perinci::CmdLine::Any->new(url=>'/MyApp/myfunc')->run;
+
+ # in command-line
+ % ./myapp.pl --help
+ myapp - Routine to do blah ...
+ ...
+
+ % ./myapp.pl --version
+
+ % ./myapp.pl --arg1 ...
+
+Sample data:
+
+ ""  # INVALID
+
+ "int"  # valid
+
+ "pos-int"  # INVALID
+
+ "path::name"  # valid
 
 =head1 HOMEPAGE
 
@@ -78,7 +129,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

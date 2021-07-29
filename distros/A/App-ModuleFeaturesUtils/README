@@ -1,0 +1,237 @@
+NAME
+    App::ModuleFeaturesUtils - CLI Utilities related to Module::Features
+
+VERSION
+    This document describes version 0.003 of App::ModuleFeaturesUtils (from
+    Perl distribution App-ModuleFeaturesUtils), released on 2021-02-25.
+
+DESCRIPTION
+    This distribution includes the following utilities:
+
+    *   check-feature-set-spec
+
+    *   check-features-decl
+
+    *   check-module-features
+
+    *   get-feature-set-spec
+
+    *   get-features-decl
+
+    *   list-feature-set-features
+
+    *   list-feature-sets
+
+FUNCTIONS
+  check_feature_set_spec
+    Usage:
+
+     check_feature_set_spec(%args) -> [status, msg, payload, meta]
+
+    Check specification in %FEATURES_DEF in Modules::Features::* module.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   feature_set* => *perl::modulefeatures::modname*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  check_features_decl
+    Usage:
+
+     check_features_decl(%args) -> [status, msg, payload, meta]
+
+    Check %FEATURES in a module.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   module* => *perl::modname*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  check_module_features
+    Usage:
+
+     check_module_features(%args) -> [status, msg, payload, meta]
+
+    Check %FEATURES in a module and return the value of specified feature.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   feature_name => *str*
+
+        Can be unqualified:
+
+         feature_name
+
+        or qualified with feature set name using the "::" or "/" separator:
+
+         Feature::SetName::feature_name
+         Feature/SetName/feature_name
+
+    *   module* => *perl::modname*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  get_feature_set_spec
+    Usage:
+
+     get_feature_set_spec(%args) -> [status, msg, payload, meta]
+
+    Get feature set specification.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   feature_set* => *perl::modulefeatures::modname*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  get_features_decl
+    Usage:
+
+     get_features_decl(%args) -> [status, msg, payload, meta]
+
+    Get features declaration.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   module* => *perl::modname*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  list_feature_set_features
+    Usage:
+
+     list_feature_set_features(%args) -> [status, msg, payload, meta]
+
+    List features in a feature set.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   detail => *bool*
+
+        Return detailed record for each result item.
+
+    *   feature_set* => *perl::modulefeatures::modname*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  list_feature_sets
+    Usage:
+
+     list_feature_sets(%args) -> [status, msg, payload, meta]
+
+    List feature sets (in modules under Module::Features:: namespace).
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   detail => *bool*
+
+        Return detailed record for each result item.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-ModuleFeaturesUtils>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-ModuleFeaturesUtils>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://github.com/perlancar/perl-App-ModuleFeaturesUtils/issues>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Module::Features
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2021 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

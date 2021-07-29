@@ -31,9 +31,9 @@ You shouldn't make instances of this class. Each attribute should be used as a n
 =head1 SYNOPSIS
 
     my $devicefarm = Paws->service('DeviceFarm');
-    # To create a new device pool
-    # The following example creates a new device pool named MyDevicePool inside
-    # an existing project.
+  # To create a new device pool
+  # The following example creates a new device pool named MyDevicePool inside an
+  # existing project.
     my $CreateDevicePoolResult = $devicefarm->CreateDevicePool(
       'Description' => 'My Android devices',
       'Name'        => 'MyDevicePool',

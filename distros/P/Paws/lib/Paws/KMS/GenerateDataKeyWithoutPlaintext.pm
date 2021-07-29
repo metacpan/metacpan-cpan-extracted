@@ -31,10 +31,10 @@ You shouldn't make instances of this class. Each attribute should be used as a n
 =head1 SYNOPSIS
 
     my $kms = Paws->service('KMS');
-    # To generate an encrypted data key
-    # The following example generates an encrypted copy of a 256-bit symmetric
-    # data encryption key (data key). The data key is encrypted with the
-    # specified customer master key (CMK).
+ # To generate an encrypted data key
+ # The following example generates an encrypted copy of a 256-bit symmetric data
+ # encryption key (data key). The data key is encrypted with the specified
+ # customer master key (CMK).
     my $GenerateDataKeyWithoutPlaintextResponse =
       $kms->GenerateDataKeyWithoutPlaintext(
       'KeyId'   => 'alias/ExampleAlias',
@@ -76,7 +76,9 @@ in the I<AWS Key Management Service Developer Guide>.
 
 A list of grant tokens.
 
-For more information, see Grant Tokens
+Use a grant token when your permission to call this operation comes
+from a new grant that has not yet achieved I<eventual consistency>. For
+more information, see Grant token
 (https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#grant_token)
 in the I<AWS Key Management Service Developer Guide>.
 
@@ -87,10 +89,9 @@ in the I<AWS Key Management Service Developer Guide>.
 The identifier of the symmetric customer master key (CMK) that encrypts
 the data key.
 
-To specify a CMK, use its key ID, Amazon Resource Name (ARN), alias
-name, or alias ARN. When using an alias name, prefix it with
-C<"alias/">. To specify a CMK in a different AWS account, you must use
-the key ARN or alias ARN.
+To specify a CMK, use its key ID, key ARN, alias name, or alias ARN.
+When using an alias name, prefix it with C<"alias/">. To specify a CMK
+in a different AWS account, you must use the key ARN or alias ARN.
 
 For example:
 

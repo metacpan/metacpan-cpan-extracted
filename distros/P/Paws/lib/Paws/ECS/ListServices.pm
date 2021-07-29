@@ -31,9 +31,8 @@ You shouldn't make instances of this class. Each attribute should be used as a n
 =head1 SYNOPSIS
 
     my $ecs = Paws->service('ECS');
-    # To list the services in a cluster
-    # This example lists the services running in the default cluster for an
-    # account.
+# To list the services in a cluster
+# This example lists the services running in the default cluster for an account.
     my $ListServicesResponse = $ecs->ListServices();
 
     # Results:
@@ -49,17 +48,17 @@ For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/ecs
 
 =head2 Cluster => Str
 
-The short name or full Amazon Resource Name (ARN) of the cluster that
-hosts the services to list. If you do not specify a cluster, the
-default cluster is assumed.
+The short name or full Amazon Resource Name (ARN) of the cluster to use
+when filtering the C<ListServices> results. If you do not specify a
+cluster, the default cluster is assumed.
 
 
 
 =head2 LaunchType => Str
 
-The launch type for the services to list.
+The launch type to use when filtering the C<ListServices> results.
 
-Valid values are: C<"EC2">, C<"FARGATE">
+Valid values are: C<"EC2">, C<"FARGATE">, C<"EXTERNAL">
 
 =head2 MaxResults => Int
 
@@ -89,7 +88,8 @@ purposes.
 
 =head2 SchedulingStrategy => Str
 
-The scheduling strategy for services to list.
+The scheduling strategy to use when filtering the C<ListServices>
+results.
 
 Valid values are: C<"REPLICA">, C<"DAEMON">
 

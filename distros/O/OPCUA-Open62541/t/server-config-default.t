@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use OPCUA::Open62541;
 
-use Test::More tests => 69;
+use Test::More tests => 94;
 use Test::Deep;
 use Test::Exception;
 use Test::LeakTrace;
@@ -159,3 +159,58 @@ ok(my $maxmonitoreditemspercall = $config->getMaxMonitoredItemsPerCall(),
 no_leaks_ok { $config->getMaxMonitoredItemsPerCall() }
     "max monitored items per call leak";
 is($maxmonitoreditemspercall, 10008, "max max monitored items per call");
+
+lives_ok { $config->setMaxSubscriptions(42) }
+    "set max subscriptions";
+no_leaks_ok { $config->setMaxSubscriptions(42) }
+    "set max subscriptions leak";
+
+ok(my $maxsubscriptions = $config->getMaxSubscriptions(),
+    "get max subscriptions");
+no_leaks_ok { $config->getMaxSubscriptions() }
+    "get max subscriptions leak";
+is($maxsubscriptions, 42, "custom max subscriptions");
+
+lives_ok { $config->setMaxSubscriptionsPerSession(42) }
+    "set max subscriptions per session";
+no_leaks_ok { $config->setMaxSubscriptionsPerSession(42) }
+    "set max subscriptions per session leak";
+
+ok(my $maxsubscriptionspersession = $config->getMaxSubscriptionsPerSession(),
+    "get max subscriptions per session");
+no_leaks_ok { $config->getMaxSubscriptionsPerSession() }
+    "get max subscriptions per session leak";
+is($maxsubscriptionspersession, 42, "custom max subscriptions per session");
+
+lives_ok { $config->setMaxNotificationsPerPublish(42) }
+    "set max notifications per publish";
+no_leaks_ok { $config->setMaxNotificationsPerPublish(42) }
+    "set max notifications per publish leak";
+
+ok(my $maxnotificationsperpublish = $config->getMaxNotificationsPerPublish(),
+    "get max notifications per publish");
+no_leaks_ok { $config->getMaxNotificationsPerPublish() }
+    "get max notifications per publish leak";
+is($maxnotificationsperpublish, 42, "custom max notifications per publish");
+
+lives_ok { $config->setEnableRetransmissionQueue(1) }
+    "set enable retransmission queue";
+no_leaks_ok { $config->setEnableRetransmissionQueue(1) }
+    "set enable retransmission queue leak";
+
+ok(my $enableretransmissionqueue = $config->getEnableRetransmissionQueue(),
+    "get enable retransmission queue");
+no_leaks_ok { $config->getEnableRetransmissionQueue() }
+    "get enable retransmission queue leak";
+is($enableretransmissionqueue, 1, "custom enable retransmission queue");
+
+lives_ok { $config->setMaxRetransmissionQueueSize(42) }
+    "set max retransmission queue size";
+no_leaks_ok { $config->setMaxRetransmissionQueueSize(42) }
+    "set max retransmission queue size leak";
+
+ok(my $maxretransmissionqueuesize = $config->getMaxRetransmissionQueueSize(),
+    "get max retransmission queue size");
+no_leaks_ok { $config->getMaxRetransmissionQueueSize() }
+    "get max retransmission queue size leak";
+is($maxretransmissionqueuesize, 42, "custom max retransmission queue size");

@@ -30,9 +30,9 @@ You shouldn't make instances of this class. Each attribute should be used as a n
 =head1 SYNOPSIS
 
     my $devicefarm = Paws->service('DeviceFarm');
-    # To create a new test package upload
-    # The following example creates a new Appium Python test package upload
-    # inside an existing project.
+  # To create a new test package upload
+  # The following example creates a new Appium Python test package upload inside
+  # an existing project.
     my $CreateUploadResult = $devicefarm->CreateUpload(
       'Name'       => 'MyAppiumPythonUpload',
       'ProjectArn' =>

@@ -17,20 +17,10 @@
 #	because the vcalendar standard specifies UT.
 
 localize formatter
-# localize output_layers
 
 # An iCal file is supposed to have <cr><lf> line breaks
 
 # set output_layers :encoding(utf-8):crlf
-
-# We intend to use date(units='z') to format the event begin and end,
-# and the alert times.
-
-formatter date_format %Y%m%dT%H%M%SZ
-
-# We intend to use time() to format the individual event times.
-
-formatter time_format %I:%M:%S
 
 # The individual pass events get concatenated to the description, with
 # no newline between.
@@ -47,7 +37,7 @@ VERSION:2.0
 [%- first = events.first %]
 [%- punct = '' %]
 BEGIN:VEVENT
-DTSTART:[% first.date( units = 'zulu' ) %]
+DTSTART:[% first.date( format = '%Y%m%dT%H%M%SZ', units = 'zulu' ) %]
 BEGIN:VALARM
 TRIGGER:-PT5M
 ACTION:DISPLAY
@@ -60,7 +50,7 @@ SUMMARY:[% first.name %]
 DESCRIPTION:
     [%- FOREACH evt IN events %][% punct %]
 	[%- evt_name = evt.event %]
-	[%- end_date = evt.date( units = 'z' ) %]
+	[%- end_date = evt.date( format = '%Y%m%dT%H%M%SZ', units = 'z' ) %]
 	[%- evt_name %]
 	[%- IF 'apls' == evt_name %]
             [%- appulse = evt.appulse %]

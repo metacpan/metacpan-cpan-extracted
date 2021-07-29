@@ -93,9 +93,12 @@ is($assertion->valid('http://ct.local'), 0, "ct.local isn't valid either");
 # fudge validity times to test valid()
 $assertion->{not_before} = DateTime->now;
 $assertion->{not_after} = DateTime->now->add(minutes => 15);
-is($assertion->valid('http://ct.local'), 1, "ct.local is valid now");
+is($assertion->valid('http://ct.local'), 1, "ct.local is valid now - InResponseTo not Checked");
+is($assertion->valid('http://ct.local', 'N3k95Hg41WCHdwc9mqXynLPhB'), 1, "ct.local is valid now - InResponseTo Checked");
+is($assertion->valid('http://ct.local', 'N3k95Hg41WCHdwc9mqXyn'), 0, "Invalid InResponseTo Checked and failed");
 
 $assertion->{not_before} = DateTime->now->add(minutes => 5);
-is($assertion->valid('http://ct.local'), 0, "and invalid again");
+is($assertion->valid('http://ct.local'), 0, "and invalid again - InResponseTo not Checked");
+is($assertion->valid('http://ct.local', 'N3k95Hg41WCHdwc9mqXynLPhB'), 0, "and invalid again - InResponseTo Checked");
 
 done_testing;

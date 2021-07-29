@@ -14,25 +14,27 @@ commands:
 
 SUPPORT AND DOCUMENTATION
 
-After installing, you can find documentation for these modules with the
+After installing, you can find documentation for this module with the
 perldoc command.
 
-    perldoc Math::BigInt
-    perldoc Math::BigFloat
+    perldoc Math::BigInt::Named
 
 You can also look for information at:
 
-    RT, CPAN's request tracker
-        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Math-BigInt
+    GitHub
+        https://github.com/pjacklam/p5-Math-BigInt-Named
 
-    AnnoCPAN, Annotated CPAN documentation
-        http://annocpan.org/dist/Math-BigInt
+    RT: CPAN's request tracker
+        https://rt.cpan.org/Dist/Display.html?Name=Math-BigInt-Named
+
+    MetaCPAN
+        https://metacpan.org/release/Math-BigInt-Named
+
+    CPAN Testers Matrix
+        http://matrix.cpantesters.org/?dist=Math-BigInt-Named
 
     CPAN Ratings
-        http://cpanratings.perl.org/d/Math-BigInt
-
-    Search CPAN
-        http://search.cpan.org/dist/Math-BigInt
+        https://cpanratings.perl.org/dist/Math-BigInt-Named
 
 This package is a subclass of Math::BigInt and was inspired by Chris London
 Noll's 'number.pl' program.
@@ -41,7 +43,7 @@ COPYRIGHT AND LICENCE
 
 Copyright 2001, 2002, 2007 Tels, L<http://bloodgate.com>.
 
-Copyright 2016- Peter John Acklam L<pjacklam@online.no>.
+Copyright 2016- Peter John Acklam L<pjacklam@gmail.com>.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

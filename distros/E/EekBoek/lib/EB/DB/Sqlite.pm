@@ -4,8 +4,8 @@
 # Author          : Johan Vromans
 # Created On      : Sat Oct  7 10:10:36 2006
 # Last Modified By: Johan Vromans
-# Last Modified On: Tue Oct 13 16:32:32 2015
-# Update Count    : 186
+# Last Modified On: Tue Jul 27 21:32:20 2021
+# Update Count    : 194
 # Status          : Unknown, Use with caution!
 
 package main;
@@ -102,7 +102,11 @@ sub connect {
     }
 
     # Our database is UTF8, so deal with it properly.
-    if ( $DBD::SQLite::VERSION ge "1.26_06" ) {
+    if ( $DBD::SQLite::VERSION ge "1.67_04" ) {
+	require DBD::SQLite::Constants;
+	$dbh->{sqlite_string_mode} = DBD::SQLite::Constants::DBD_SQLITE_STRING_MODE_UNICODE_FALLBACK();
+    }
+    elsif ( $DBD::SQLite::VERSION ge "1.26_06" ) {
 	$dbh->{sqlite_unicode} = 1;
     }
     else {

@@ -20,6 +20,7 @@ TODO: name_to_handle_At + open_by_handle_at = clone fds
 TODO: lchown
 TODO: mount/umount2/MS_* flags
 TODO: fsmount/fspick/fsconfig/fsmount et al. https://lwn.net/Articles/759499/
+TODO: ioprio_get/set
 
 TODO: rewrite rmtree et al. to support working directories (also speed them up)
 TODO: maybe IO::AIO leaks fds when requests are cancelled? maybe initialise result to -1?
@@ -37,7 +38,6 @@ TODO: dup3, pipe2, accept4
 TODO: dump config.log when automated testign and configure fails
 TODO: ns time resolution in utime
 TODO: statx
-TODO: pidfd_open/pidfd_send_signal (open/poll /proc?)
 TODO: aio_fchdir/chdir? emulate chdirat?
 TODO: rt-4.0.18-20109-1573826674-1229.126277-5-0@rt.cpan.org
 TODO: aio_splice, aio_tee
@@ -47,6 +47,14 @@ TODO: io_uring, but it's so broken  :/
 TODO: allow import of fds as aio_wd
 TODO: close_range
 TODO: move_mount, open_tree
+
+4.76 Tue Jul 27 20:45:01 CEST 2021
+	- add autoconf test for siginfo_t, which is, of course, not
+          available on windows (reported by Peter Petky).
+	- disable syscalls on solaris, as perl seems to provide an
+          incompatible syscall prototype that clashes with sys/syscall.h.
+        - add MAP_FIXED_NOREPLACE, MAP_SHARED_VALIDATE, MAP_SYNC and
+          MAP_UNINITIALIZED.
 
 4.75 Wed Dec 30 08:44:55 CET 2020
 	- removed leftover debug output from treescan.

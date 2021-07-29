@@ -1,14 +1,20 @@
 /*---------------------------------------------------------------------
- $Header: /Perl/OlleDB/getdata.cpp 9     19-07-09 16:53 Sommar $
+ $Header: /Perl/OlleDB/getdata.cpp 10    21-07-03 23:18 Sommar $
 
   Implements the routines for getting data and metadata from SQL Server:
   nextresultset, getcolumninfo, nextrow, getoutputparams. Includes routines
   to Server data types to Perl values, save datetime data; those are in
   datetime.cpp.
 
-  Copyright (c) 2004-2019   Erland Sommarskog
+  Copyright (c) 2004-2021   Erland Sommarskog
 
   $History: getdata.cpp $
+ * 
+ * *****************  Version 10  *****************
+ * User: Sommar       Date: 21-07-03   Time: 23:18
+ * Updated in $/Perl/OlleDB
+ * Starting with MSOLEDBSQL 18.4 varchar data for sql_variant always comes
+ * back in the ANSI code page.
  * 
  * *****************  Version 9  *****************
  * User: Sommar       Date: 19-07-09   Time: 16:53
@@ -827,7 +833,13 @@ static SV * ssvariant_to_SV(SV          * olle_ptr,
 
        case VT_SS_STRING    :
        case VT_SS_VARSTRING : {
-             UINT codepage = OptCurrentCodepage(olle_ptr);
+             // They changed the rules with MSOLEDBSQL 18.4. Before that they
+             // accepted the bytes vene if DB collation was different from
+             // ANSI code page, but now they always convert.
+             internaldata * mydata = get_internaldata(olle_ptr);
+             UINT codepage = (mydata->provider >= provider_msoledbsql ?
+                                       GetACP() :
+                                       OptCurrentCodepage(olle_ptr));
              if (codepage == GetACP() && codepage != CP_UTF8) {
                 perl_value = newSVpvn(ssvar.CharVal.pchCharVal,
                                       ssvar.CharVal.sActualLength);
@@ -838,8 +850,8 @@ static SV * ssvariant_to_SV(SV          * olle_ptr,
                                              codepage);
              }
              OLE_malloc_ptr->Free(ssvar.CharVal.pchCharVal);
-             if (ssvar.NCharVal.pwchReserved != NULL) {
-                OLE_malloc_ptr->Free(ssvar.NCharVal.pwchReserved);
+             if (ssvar.CharVal.pwchReserved != NULL) {
+                OLE_malloc_ptr->Free(ssvar.CharVal.pwchReserved);
              }
           }
           break;

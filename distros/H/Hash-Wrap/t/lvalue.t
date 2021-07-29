@@ -30,7 +30,7 @@ sub test_generator {
     is( $obj->a, 2, 'object scalar not independent of hash' );
 
 
-    like( dies { $obj->c }, qr/locate object method/, 'unknown attribute' );
+    like( dies { $obj->c }, qr/locate object method.*lvalue.t/, 'unknown attribute' );
 
     $hash{c} = 4;
     is( $obj->c, 4, 'retrieve value added through hash' );
@@ -38,7 +38,7 @@ sub test_generator {
     delete $obj->{c};
     like(
         dies { $obj->c },
-        qr/locate object method/,
+        qr/locate object method.*lvalue.t/,
         'retrieve deleted attribute'
     );
 
@@ -100,7 +100,7 @@ else {
 
             1;
         },
-        qr/lvalue accessors require Perl 5.16 or later/,
+        qr/lvalue accessors require Perl 5.16 or later.*lvalue.t/,
         "Perl < 5.16, lvalue => -1"
     );
 

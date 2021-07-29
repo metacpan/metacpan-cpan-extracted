@@ -21,6 +21,7 @@ my $client = LLNG::Manager::Test->new( {
                 '$uid eq "msmith"' => '=5',
             },
             restSessionServer => 1,
+            exportedAttr      => '+ mail uid _session_id'
         }
     }
 );
@@ -46,8 +47,11 @@ ok(
 count(1);
 $json = expectJSON($res);
 
+ok( $json->{uid} eq 'dwho', 'uid found' ) or explain( $json, "uid='dwho'" );
 ok( $json->{authenticationLevel} == 3, 'Authentication level upgraded' );
-count(1);
+ok( scalar keys %$json == 10,          'Ten exported attributes found' )
+  or explain( $json, 'Ten exported attributes' );
+count(3);
 
 ok( $client->logout($id), 'Logout' );
 count(1);

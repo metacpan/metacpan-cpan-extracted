@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 
+use Error::Pure::Utils qw(clean);
 use Test::More 'tests' => 3;
 use Test::NoWarnings;
 use Unicode::UTF8 qw(decode_utf8);

@@ -13,13 +13,13 @@ with 'Vote::Count::TieBreaker';
 
 use Storable 3.15 'dclone';
 
-our $VERSION='2.00';
+our $VERSION='2.01';
 
 =head1 NAME
 
 Vote::Count::IRV
 
-=head1 VERSION 2.00
+=head1 VERSION 2.01
 
 =cut
 
@@ -28,6 +28,7 @@ Vote::Count::IRV
 no warnings 'experimental';
 use List::Util qw( min max );
 #use Data::Dumper;
+# use Data::Printer;
 
 sub _ResolveTie ( $self, $active, $tiebreaker, @tiedchoices ) {
   return @tiedchoices if @tiedchoices == 1;
@@ -50,18 +51,25 @@ sub _ResolveTie ( $self, $active, $tiebreaker, @tiedchoices ) {
 }
 
 sub RunIRV ( $self, $active = undef, $tiebreaker = undef ) {
-  # external $active should not be changed.
-  if ( defined $active ) { $active = dclone $active }
-  # Object's active is altered by IRV.
-  else { $active = dclone $self->Active() }
-  unless ( defined $tiebreaker ) {
-    if ( defined $self->TieBreakMethod() ) {
-      $tiebreaker = $self->TieBreakMethod();
-    }
-    else {
-      $tiebreaker = 'all';
-    }
-  }
+  $self->_IRVDO( active => $active, tiebreaker => $tiebreaker );
+}
+
+sub RunBTRIRV ( $self, %args ) {
+  my $ranking2 = $args{'ranking2'} ? $args{'ranking2'} : 'precedence';
+  $self->_IRVDO( 'btr' => 1, ranking2 => $ranking2 );
+}
+
+# RunIRV needed a new argument and was a long established method,
+# so now it hands everything off to this private method that uses
+# named arguments.
+sub _IRVDO ( $self, %args ) {
+  local $" = ', ';
+  my $active = defined $args{'active'} ? dclone $args{'active'} : dclone $self->Active() ;
+  my $tiebreaker = do {
+    if ( defined $args{'tiebreaker'} ) { $args{'tiebreaker'} }
+    elsif ( defined $self->TieBreakMethod() ) { $self->TieBreakMethod() }
+    else { 'all' }
+  };
   my $roundctr = 0;
   my $maxround = scalar( keys %{$active} );
   $self->logt( "Instant Runoff Voting",
@@ -81,20 +89,26 @@ IRVLOOP:
     if ( defined $majority->{'winner'} ) {
       return $majority;
     }
-    else {
-      my @bottom =
-        $self->_ResolveTie( $active, $tiebreaker, $round->ArrayBottom()->@* );
+    elsif ( $args{'btr'}) {
+      my $br = $self->BottomRunOff(
+        'active' => $active, 'ranking2' => $args{'ranking2'} );
+      $self->logv( $br->{'runoff'});
+      $self->logt( "Eliminating: ${\ $br->{'eliminate'} }" );
+      delete $active->{ $br->{'eliminate'} };
+    }
+    else { #--
+      my @bottom = $self->_ResolveTie( $active, $tiebreaker, $round->ArrayBottom()->@* );
       if ( scalar(@bottom) == scalar( keys %{$active} ) ) {
         # if there is a tie at the end, the finalists should
         # be both top and bottom and the active set.
-        $self->logt( "Tied: " . join( ', ', @bottom ) );
+        $self->logt( "Tied: @bottom" );
         return { tie => 1, tied => \@bottom, winner => 0 };
       }
-      $self->logv( "Eliminating: " . join( ', ', @bottom ) );
+      $self->logt( "Eliminating: @bottom" );
       for my $b (@bottom) {
         delete $active->{$b};
       }
-    }
+    } #--
   }
 }
 
@@ -134,14 +148,12 @@ There is no standard accepted method for IRV tie resolution, Eliminate All is a 
 
 Returns a tie when all of the remaining choices are in a tie.
 
-An optional value to RunIRV is to specify tiebreaker, see TieBreaker.
+An optional value to RunIRV is to specify tiebreaker, see L<Vote::Count::TieBreaker>.
 
 =head2 RunIRV
 
   $Election->RunIRV();
-
   $Election->RunIRV( $active )
-
   $Election->RunIRV( $active, 'approval' )
 
 Runs IRV on the provided Ballot Set. Takes an optional parameter of $active which is a hashref for which the keys are the currently active choices.
@@ -154,13 +166,20 @@ Returns results in a hashref which will be the results of  Vote::Count::TopCount
 
 Supports the Vote::Count logt, logv, and logd methods for providing details of the method.
 
-=head2 TieBreaker
+=head1 Bottom Two Runoff IRV
 
-Uses TieBreaker from the TieBreaker Role. The default is 'all', which is to not break ties. 'none' the default for the Matrix (Condorcet) Object should not be used for IRV.
+B<Bottom Two Runoff IRV> is the simplest modification to IRV which meets the Condorcet Winner Criteria. Instead of eliminating the low choice, the lowest two choices enter a virtual runoff, eliminating the loser. This is the easiest possible Hand Count Condorcet method, there will always be fewer pairings than choices. As a Condorcet method it fails Later No Harm.
 
-All was chosen as the module default because it is Later Harm safe. Modified Grand Junction is extremely resolvable and simple.
+BTR IRV will only eliminate a member of the Smith Set when both members of the runoff are in it, so it can never eliminate the final member of the Smith Set, and is thus Smith compliant.
 
-In the event that the tie-breaker returns a tie eliminate all that remain tied is used, unless that would eliminate all choices, in which case the election returns a tie.
+=head2 RunBTRIRV
+
+  my $result = $Election->RunBTRIRV();
+  my $result = $Election->RunBTRIRV( 'ranking2' => 'Approval');
+
+Choices are ordered by TopCount, ties for position are decided by Precedence. It is mandatory that either the TieBreakMethod is Precedence or TieBreakerFallBackPrecedence is True. The optional ranking2 option will use a second method before Precedence, see UnTieList in L<Vote::Count::TieBreaker|Vote::Count::TieBreaker/UnTieList>.
+
+The returned values and logging are the same as for RunIRV.
 
 =cut
 

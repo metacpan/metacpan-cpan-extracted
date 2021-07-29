@@ -2,8 +2,11 @@ NAME
     DefHash - Define things according to a specification, using hashes
 
 VERSION
-    This document describes version 1.0.12 of DefHash (from Perl
-    distribution DefHash), released on 2019-06-18.
+    This document describes version 1.0.13 of DefHash (from Perl
+    distribution DefHash), released on 2021-07-21.
+
+CONTRIBUTOR
+    Steven Haryanto <sharyanto@cpan.org>
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -23,7 +26,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019, 2015, 2014, 2013, 2012 by
+    This software is copyright (c) 2021, 2019, 2015, 2014, 2013, 2012 by
     perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under

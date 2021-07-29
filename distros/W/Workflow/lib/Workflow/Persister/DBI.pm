@@ -15,7 +15,7 @@ use Workflow::Persister::DBI::SequenceId;
 use Carp qw(croak);
 use English qw( -no_match_vars );
 
-$Workflow::Persister::DBI::VERSION = '1.54';
+$Workflow::Persister::DBI::VERSION = '1.56';
 
 my @FIELDS = qw( _wf_fields _hist_fields handle dsn user password driver
     workflow_table history_table date_format parser autocommit);
@@ -39,8 +39,7 @@ sub init {
     $self->handle($self->create_handle);
     my $driver
         = $self->handle ? $self->handle->{Driver}->{Name} : ($params->{driver} || '');
-    $self->log->is_debug
-        && $self->log->debug("Pulled driver '$driver' from DBI DSN");
+    $self->log->debug( "Pulled driver '$driver' from DBI DSN" );
     $self->driver($driver);
     $self->assign_generators( $params, $driver );
     $self->log->info(
@@ -81,9 +80,8 @@ sub create_handle {
     $dbh->{PrintError} = 0;
     $dbh->{ChopBlanks} = 1;
     $dbh->{AutoCommit} = $self->autocommit();
-    $self->log->is_debug
-        && $self->log->debug( "Connected to database '",
-        $self->dsn, "' and ", "assigned to persister ok" );
+    $self->log->debug( "Connected to database '",
+                       $self->dsn, "' and ", "assigned to persister ok" );
 
     return $dbh;
 }
@@ -97,24 +95,19 @@ sub assign_generators {
 
     my ( $wf_gen, $history_gen );
     if ( $driver eq 'Pg' ) {
-        $self->log->is_debug
-            && $self->log->debug("Assigning ID generators for PostgreSQL");
+        $self->log->debug("Assigning ID generators for PostgreSQL");
         ( $wf_gen, $history_gen ) = $self->init_postgres_generators($params);
     } elsif ( $driver eq 'Oracle' ) {
-        $self->log->is_debug
-            && $self->log->debug("Assigning ID generators for Oracle");
+        $self->log->debug("Assigning ID generators for Oracle");
         ( $wf_gen, $history_gen ) = $self->init_oracle_generators($params);
     } elsif ( $driver eq 'mysql' ) {
-        $self->log->is_debug
-            && $self->log->debug("Assigning ID generators for MySQL");
+        $self->log->debug("Assigning ID generators for MySQL");
         ( $wf_gen, $history_gen ) = $self->init_mysql_generators($params);
     } elsif ( $driver eq 'SQLite' ) {
-        $self->log->is_debug
-            && $self->log->debug("Assigning ID generators for SQLite");
+        $self->log->debug("Assigning ID generators for SQLite");
         ( $wf_gen, $history_gen ) = $self->init_sqlite_generators($params);
     } else {
-        $self->log->is_debug
-            && $self->log->debug("Assigning random ID generators");
+        $self->log->debug("Assigning random ID generators");
         ( $wf_gen, $history_gen ) = $self->init_random_generators($params);
     }
     $self->workflow_id_generator($wf_gen);
@@ -205,8 +198,7 @@ sub create_workflow {
     if ($id) {
         push @fields, $wf_fields[0];
         push @values, $id;
-        $self->log->is_debug
-            && $self->log->debug("Got ID from pre_fetch_id: $id");
+        $self->log->debug("Got ID from pre_fetch_id: $id");
     }
     my $sql = 'INSERT INTO %s ( %s ) VALUES ( %s )';
 
@@ -376,8 +368,7 @@ sub fetch_history {
         $self->log->error("Caught error fetching workflow history: $EVAL_ERROR");
         persist_error $EVAL_ERROR;
     }
-    $self->log->is_debug
-        && $self->log->debug("Prepared and executed ok");
+    $self->log->debug("Prepared and executed ok");
 
     my @history = ();
     while ( my $row = $sth->fetchrow_arrayref ) {
@@ -391,8 +382,7 @@ sub fetch_history {
                 date        => $self->parser->parse_datetime( $row->[6] ),
             }
         );
-        $self->log->is_debug
-            && $self->log->debug("Fetched history object '$row->[0]'");
+        $self->log->debug("Fetched history object '$row->[0]'");
         $hist->set_saved();
         push @history, $hist;
     }
@@ -469,7 +459,7 @@ Workflow::Persister::DBI - Persist workflow and history to DBI database
 
 =head1 VERSION
 
-This documentation describes version 1.54 of this package
+This documentation describes version 1.56 of this package
 
 =head1 SYNOPSIS
 

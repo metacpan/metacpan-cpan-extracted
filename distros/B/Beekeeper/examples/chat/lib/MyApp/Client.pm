@@ -53,7 +53,7 @@ sub run {
         print $msg{message} . "\n";
     });
 
-    if ($ARGV[-1] eq '--test') { 
+    if ($ARGV[-1] && $ARGV[-1] eq '--test') { 
         $self->run_tests; 
         exit;
     }

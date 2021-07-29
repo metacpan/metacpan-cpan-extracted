@@ -1,3 +1,13 @@
+0.09    2021-07-23
+  - Add instructions for running pools as systemd services.
+  - Update install instructions for Mosquitto broker.
+  - Honor PATH and PERL5LIB environment variables.
+  - Add links to live examples.
+
+0.08    2021-07-16
+  - Introduce HTML dashboard.
+  - Reorganize worker extensions.
+
 0.07    2021-07-02
   - Add support for asynchronous method handlers in workers.
   - Introduce scraper example demonstrating asynchronous workers.

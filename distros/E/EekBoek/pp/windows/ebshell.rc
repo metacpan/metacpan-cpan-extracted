@@ -1,0 +1,29 @@
+// see https://docs.microsoft.com/en-us/windows/desktop/menurc/versioninfo-resource
+
+4711 ICON "..\\..\\lib\\EB\\res\\Wx\\icons\\eb.ico"
+
+1 VERSIONINFO
+FILEVERSION     0,975,0,0
+PRODUCTVERSION  0,975,0,0
+
+BEGIN
+  BLOCK "StringFileInfo"
+  BEGIN
+    BLOCK "040904E4" // US English CP 1252 (Windows ANSI)
+    BEGIN
+      VALUE "CompanyName", "Squirrel Consultancy"
+      VALUE "FileDescription", "EekBoek CLI Launcher"
+      VALUE "FileVersion", "0.975"
+      VALUE "InternalName", "ebshell"
+      VALUE "LegalCopyright", "Copyright 2005,2020 Squirrel Consultancy"
+      VALUE "OriginalFilename", "ebshell.exe"
+      VALUE "ProductName", "EekBoek"
+      VALUE "ProductVersion", "0.975.beta"
+    END
+  END
+  BLOCK "VarFileInfo"
+  BEGIN
+    VALUE "Translation", 0x409, 1252
+  END
+END
+

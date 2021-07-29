@@ -57,9 +57,10 @@ sub set_attributes {
 sub get_db_handle {
     my ( $sf, $db ) = @_;
     my $db_opt_get = App::DBBrowser::Opt::DBGet->new( $sf->{i}, $sf->{o} );
-    my $login_data  = $db_opt_get->login_data( $db );
-    my $env_var_yes = $db_opt_get->enabled_env_vars( $db );
-    my $attributes  = $db_opt_get->attributes( $db );
+    my $db_opt = $db_opt_get->read_db_config_files();
+    my $login_data  = $db_opt_get->login_data( $db, $db_opt );
+    my $env_var_yes = $db_opt_get->enabled_env_vars( $db, $db_opt );
+    my $attributes  = $db_opt_get->attributes( $db, $db_opt );
     my $cred = App::DBBrowser::Credentials->new( $sf->{i}, $sf->{o} );
     my $settings = { login_data => $login_data, env_var_yes => $env_var_yes };
     my $dsn;

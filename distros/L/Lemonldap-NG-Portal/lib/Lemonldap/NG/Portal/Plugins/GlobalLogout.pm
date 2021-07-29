@@ -12,7 +12,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_SENDRESPONSE
 );
 
-our $VERSION = '2.0.10';
+our $VERSION = '2.0.12';
 
 extends qw(
   Lemonldap::NG::Portal::Main::Plugin
@@ -172,50 +172,52 @@ sub activeSessions {
     my $customParam    = $self->conf->{globalLogoutCustomParam} || '';
 
     # Try to retrieve sessions from sessions DB
-    $self->logger->debug('Try to retrieve sessions from DB');
-    my $moduleOptions = $self->conf->{globalStorageOptions} || {};
-    $moduleOptions->{backend} = $self->conf->{globalStorage};
-    $self->logger->debug("Looking for \"$user\" sessions...");
-    $sessions =
-      $self->module->searchOn( $moduleOptions, $self->conf->{whatToTrace},
-        $user );
+    if ($user) {
+        $self->logger->debug('Try to retrieve sessions from DB');
+        my $moduleOptions = $self->conf->{globalStorageOptions} || {};
+        $moduleOptions->{backend} = $self->conf->{globalStorage};
+        $self->logger->debug("Looking for \"$user\" sessions...");
+        $sessions =
+          $self->module->searchOn( $moduleOptions, $self->conf->{whatToTrace},
+            $user );
 
-    $self->logger->debug('Remove non-SSO session(s)...');
-    my $other = 0;
-    foreach ( keys %$sessions ) {
-        unless ( $sessions->{$_}->{_session_kind} eq 'SSO' ) {
-            delete $sessions->{$_};
-            $other++;
+        $self->logger->debug('Skip non-SSO session(s)...');
+        my $other = 0;
+        foreach ( keys %$sessions ) {
+            unless ( $sessions->{$_}->{_session_kind} eq 'SSO' ) {
+                delete $sessions->{$_};
+                $other++;
+            }
         }
-    }
-    $self->logger->info("$other non-SSO session(s) removed")
-      if $other;
+        $self->logger->info("$other non-SSO session(s) skipped")
+          if $other;
 
-    $self->logger->debug('Build an array ref with sessions info...');
-    @$activeSessions =
-      map {
-        my $epoch;
-        my $regex = '^(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})$';
-        $_->{startTime} =~ /$regex/;
-        $epoch = timelocal( $6, $5, $4, $3, $2 - 1, $1 );
-        $_->{startTime} = $epoch;
-        if ( $_->{updateTime} ) {
-            $_->{updateTime} =~ /$regex/;
+        $self->logger->debug('Build an array ref with sessions info...');
+        @$activeSessions =
+          map {
+            my $epoch;
+            my $regex = '^(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})$';
+            $_->{startTime} =~ /$regex/;
             $epoch = timelocal( $6, $5, $4, $3, $2 - 1, $1 );
-            $_->{updateTime} = $epoch;
-        }
-        $_;
-      }
-      sort { $b->{startTime} cmp $a->{startTime} } map { {
-            id          => $_,
-            customParam => $sessions->{$_}->{$customParam},
-            ipAddr      => $sessions->{$_}->{ipAddr},
-            authLevel   => $sessions->{$_}->{authenticationLevel},
-            startTime   => $sessions->{$_}->{_startTime},
-            updateTime  => $sessions->{$_}->{_updateTime}
-        };
-      } keys %$sessions;
-
+            $_->{startTime} = $epoch;
+            if ( $_->{updateTime} ) {
+                $_->{updateTime} =~ /$regex/;
+                $epoch = timelocal( $6, $5, $4, $3, $2 - 1, $1 );
+                $_->{updateTime} = $epoch;
+            }
+            $_;
+          }
+          sort { $b->{startTime} cmp $a->{startTime} } map { {
+                id          => $_,
+                customParam => $sessions->{$_}->{$customParam},
+                ipAddr      => $sessions->{$_}->{ipAddr},
+                authLevel   => $sessions->{$_}->{authenticationLevel},
+                startTime   => $sessions->{$_}->{_startTime},
+                updateTime  => $sessions->{$_}->{_updateTime}
+            };
+          } keys %$sessions;
+    }
+    
     return $activeSessions;
 }
 

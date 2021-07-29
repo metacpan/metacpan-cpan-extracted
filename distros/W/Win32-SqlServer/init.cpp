@@ -1,5 +1,5 @@
 /*---------------------------------------------------------------------
- $Header: /Perl/OlleDB/init.cpp 12    19-07-19 22:00 Sommar $
+ $Header: /Perl/OlleDB/init.cpp 14    21-07-12 21:37 Sommar $
 
   This file holds code that is run when the module initialiases, and
   when a new OlleDB object is created. This file also declares global
@@ -7,9 +7,23 @@
   constants that are set up once and then never changed.
 
 
-  Copyright (c) 2004-2019   Erland Sommarskog
+  Copyright (c) 2004-2021   Erland Sommarskog
 
   $History: init.cpp $
+ * 
+ * *****************  Version 14  *****************
+ * User: Sommar       Date: 21-07-12   Time: 21:37
+ * Updated in $/Perl/OlleDB
+ * No longer tracking whether a property is for SQLOLEDB, but instead
+ * added a concept of optional properties, to permit adding login
+ * properties that are not added by all versions of MSOLEDBSQL. Also added
+ * five new login properties to support what MSOLEDBSQL supports.
+ * 
+ * *****************  Version 13  *****************
+ * User: Sommar       Date: 20-01-10   Time: 21:40
+ * Updated in $/Perl/OlleDB
+ * Bugfix: error code reported as 0 when initialisation failed, making it
+ * difficult to diagnose an error.
  * 
  * *****************  Version 12  *****************
  * User: Sommar       Date: 19-07-19   Time: 22:00
@@ -183,7 +197,7 @@ static BSTR get_hostname() {
 static void add_init_property (const char *  name,
                                init_propsets propset_enum,
                                DBPROPID      propid,
-                               BOOL          is_sqloledb,
+                               BOOL          isoptional,
                                VARTYPE       datatype,
                                BOOL          default_empty,
                                const WCHAR * default_str,
@@ -201,10 +215,10 @@ static void add_init_property (const char *  name,
    init_propset_info[propset_enum].no_of_props++;
 
    strcpy_s(gbl_init_props[ix].name, INIT_PROPNAME_LEN, name);
-   gbl_init_props[ix].propset_enum = propset_enum;
-   gbl_init_props[ix].property_id  = propid;
-   gbl_init_props[ix].is_sqloledb  = is_sqloledb;
-   gbl_init_props[ix].datatype     = datatype;
+   gbl_init_props[ix].propset_enum  = propset_enum;
+   gbl_init_props[ix].property_id   = propid;
+   gbl_init_props[ix].isoptional    = isoptional;
+   gbl_init_props[ix].datatype      = datatype;
    VariantInit(&gbl_init_props[ix].default_value);
 
    if (! default_empty) {
@@ -259,53 +273,52 @@ static void setup_init_properties ()
    init_propset_info[oleinit_props].no_of_props = 0;
 
    add_init_property("IntegratedSecurity", oleinit_props, DBPROP_AUTH_INTEGRATED,
-                     TRUE, VT_BSTR, FALSE, L"SSPI", NULL, ix);
+                     FALSE, VT_BSTR, FALSE, L"SSPI", NULL, ix);
    add_init_property("Password", oleinit_props, DBPROP_AUTH_PASSWORD,
-                     TRUE, VT_BSTR, TRUE, NULL, NULL, ix);
+                     FALSE, VT_BSTR, TRUE, NULL, NULL, ix);
    add_init_property("Username", oleinit_props, DBPROP_AUTH_USERID,
-                     TRUE, VT_BSTR, TRUE, NULL, NULL, ix);
+                     FALSE, VT_BSTR, TRUE, NULL, NULL, ix);
    add_init_property("Database", oleinit_props, DBPROP_INIT_CATALOG,
-                     TRUE, VT_BSTR, FALSE, L"tempdb", NULL, ix);
+                     FALSE, VT_BSTR, FALSE, L"tempdb", NULL, ix);
    add_init_property("Server", oleinit_props, DBPROP_INIT_DATASOURCE,
-                     TRUE, VT_BSTR, FALSE, L"(local)", NULL, ix);
+                     FALSE, VT_BSTR, FALSE, L"(local)", NULL, ix);
    add_init_property("GeneralTimeout", oleinit_props, DBPROP_INIT_GENERALTIMEOUT,
-                     TRUE, VT_I4, FALSE, NULL, 0, ix);
+                     FALSE, VT_I4, FALSE, NULL, 0, ix);
    add_init_property("LCID", oleinit_props, DBPROP_INIT_LCID,
-                     TRUE, VT_I4, FALSE, NULL, GetUserDefaultLCID(), ix);
+                     FALSE, VT_I4, FALSE, NULL, GetUserDefaultLCID(), ix);
    add_init_property("Pooling", oleinit_props, DBPROP_INIT_OLEDBSERVICES,
-                     TRUE, VT_I4, FALSE, NULL, DBPROPVAL_OS_RESOURCEPOOLING, ix);
+                     FALSE, VT_I4, FALSE, NULL, DBPROPVAL_OS_RESOURCEPOOLING, ix);
    add_init_property("Prompt", oleinit_props, DBPROP_INIT_PROMPT,
-                     TRUE, VT_I2, FALSE, NULL, DBPROMPT_NOPROMPT, ix);
+                     FALSE, VT_I2, FALSE, NULL, DBPROMPT_NOPROMPT, ix);
    add_init_property("ConnectionString", oleinit_props, DBPROP_INIT_PROVIDERSTRING,
-                     TRUE, VT_BSTR, TRUE, NULL, NULL, ix);
+                     FALSE, VT_BSTR, TRUE, NULL, NULL, ix);
    add_init_property("ConnectTimeout", oleinit_props, DBPROP_INIT_TIMEOUT,
-                     TRUE, VT_I4, FALSE, NULL, 15, ix);
+                     FALSE, VT_I4, FALSE, NULL, 15, ix);
 
    // DBPROPSET_SQLSERVERDBINIT, SQLOLEDB specific proprties.
    init_propset_info[ssinit_props].start = ix;
    init_propset_info[ssinit_props].no_of_props = 0;
 
    add_init_property("Appname", ssinit_props, SSPROP_INIT_APPNAME,
-                     TRUE, VT_BSTR, FALSE, scriptname, NULL, ix);
+                     FALSE, VT_BSTR, FALSE, scriptname, NULL, ix);
    add_init_property("Autotranslate", ssinit_props, SSPROP_INIT_AUTOTRANSLATE,
-                     TRUE, VT_BOOL, FALSE, NULL, NULL, ix);
+                     FALSE, VT_BOOL, FALSE, NULL, NULL, ix);
    add_init_property("Language", ssinit_props, SSPROP_INIT_CURRENTLANGUAGE,
-                     TRUE, VT_BSTR, TRUE, NULL, NULL, ix);
+                     FALSE, VT_BSTR, TRUE, NULL, NULL, ix);
    add_init_property("AttachFilename", ssinit_props, SSPROP_INIT_FILENAME,
-                     TRUE, VT_BSTR, TRUE, NULL, NULL, ix);
+                     FALSE, VT_BSTR, TRUE, NULL, NULL, ix);
    add_init_property("NetworkAddress", ssinit_props, SSPROP_INIT_NETWORKADDRESS,
-                     TRUE, VT_BSTR, TRUE, NULL, NULL, ix);
+                     FALSE, VT_BSTR, TRUE, NULL, NULL, ix);
    add_init_property("Netlib", ssinit_props, SSPROP_INIT_NETWORKLIBRARY,
-                     TRUE, VT_BSTR, TRUE, NULL, NULL, ix);
+                     FALSE, VT_BSTR, TRUE, NULL, NULL, ix);
    add_init_property("PacketSize", ssinit_props, SSPROP_INIT_PACKETSIZE,
-                     TRUE, VT_I4, TRUE, NULL, NULL, ix);
+                     FALSE, VT_I4, TRUE, NULL, NULL, ix);
    add_init_property("UseProcForPrep", ssinit_props, SSPROP_INIT_USEPROCFORPREP,
-                     TRUE, VT_I4, FALSE, NULL, SSPROPVAL_USEPROCFORPREP_OFF, ix);
+                     FALSE, VT_I4, FALSE, NULL, SSPROPVAL_USEPROCFORPREP_OFF, ix);
    add_init_property("Hostname", ssinit_props, SSPROP_INIT_WSID,
-                     TRUE, VT_BSTR, FALSE, hostname, NULL, ix);
-   // Available first in 2.6.
+                     FALSE, VT_BSTR, FALSE, hostname, NULL, ix);
    add_init_property("Encrypt", ssinit_props, SSPROP_INIT_ENCRYPT,
-                     TRUE, VT_BOOL, TRUE, NULL, NULL, ix);
+                     FALSE, VT_BOOL, TRUE, NULL, NULL, ix);
    // The above properties are those that are in SQLOLEDB.
    no_of_ssprops_sqloledb = init_propset_info[ssinit_props].no_of_props;
 
@@ -332,7 +345,17 @@ static void setup_init_properties ()
 
    // This one appeared first with the undeprecated driver in 2018.
    add_init_property("MultiSubnetFailover", ssinit_props, SSPROP_INIT_MULTISUBNETFAILOVER,
-                     FALSE, VT_BOOL, FALSE, NULL, FALSE, ix);
+                     TRUE, VT_BOOL, FALSE, NULL, FALSE, ix);
+   add_init_property("AccessToken", ssinit_props, SSPROP_AUTH_ACCESS_TOKEN,
+                     TRUE, VT_BSTR, TRUE, NULL, FALSE, ix);
+   add_init_property("Authentication", ssinit_props, SSPROP_AUTH_MODE,
+                     TRUE, VT_BSTR, TRUE, NULL, FALSE, ix);
+   add_init_property("ConnectRetryCount", ssinit_props, SSPROP_INIT_CONNECT_RETRY_COUNT,
+                     TRUE, VT_I4, FALSE, NULL, 1, ix);
+   add_init_property("ConnectRetryInterval", ssinit_props, SSPROP_INIT_CONNECT_RETRY_INTERVAL,
+                     TRUE, VT_I4, FALSE, NULL, 10, ix);
+   add_init_property("TransparentNetworkIPResolution", ssinit_props, SSPROP_INIT_TNIR,
+                     TRUE, VT_BOOL, FALSE, NULL, FALSE, ix);
    no_of_ssprops_msoledbsql = init_propset_info[ssinit_props].no_of_props;
    
    // DBPROPSET_DATASOURCE, data-source properties.
@@ -340,7 +363,7 @@ static void setup_init_properties ()
    init_propset_info[datasrc_props].no_of_props = 0;
 
    add_init_property("MultiConnections", datasrc_props, DBPROP_MULTIPLECONNECTIONS,
-                     TRUE, VT_BOOL, FALSE, NULL, FALSE, ix);
+                     FALSE, VT_BOOL, FALSE, NULL, FALSE, ix);
 
    SysFreeString(scriptname);
    SysFreeString(hostname);
@@ -431,22 +454,27 @@ void initialize ()
       ret = CoCreateInstance(CLSID_MSDAINITIALIZE, NULL, CLSCTX_INPROC_SERVER,
                              IID_IDataInitialize,
                              reinterpret_cast<LPVOID *>(&data_init_ptr));
-      if (FAILED(ret)) {
-         obj = "IDataInitialize";
-      }
 
-      // Fill the type map and the default login properties here.
-      fill_type_map();
-      setup_init_properties();
+      if (SUCCEEDED(ret)) {
+         // Fill the type map and the default login properties here.
+         fill_type_map();
+         setup_init_properties();
 
 #ifdef FILEDEBUG
-      // Open debug file.
-      if (dbgfile == NULL) {
-         dbgfile = _wfopen(L"C:\\temp\\ut.txt", L"wbc");
-         fprintf(dbgfile, "\xFF\xFE");
-      }
+         // Open debug file.
+         if (dbgfile == NULL) {
+            dbgfile = _wfopen(L"C:\\temp\\ut.txt", L"wbc");
+            fprintf(dbgfile, "\xFF\xFE");
+         }
 #endif
+      }
+      else {
+         obj = "IDataInitialize";
+         err = GetLastError();
+      }
    }
+
+
    if (SUCCEEDED(ret) && data_convert_ptr == NULL) {
       ret = CoCreateInstance(CLSID_OLEDB_CONVERSIONLIBRARY,
                              NULL, CLSCTX_INPROC_SERVER,
@@ -454,14 +482,14 @@ void initialize ()
                              (void **) &data_convert_ptr);
       if (FAILED(ret)) {
          obj = "IDataConvert";
+         err = GetLastError();
       }
    }
 
    LeaveCriticalSection(&CS);
 
    if (FAILED(ret)) {
-      err = GetLastError();
-      warn("Could not create '%s' object: %d", obj, err);
+      warn("Could not create '%s' object: err: %d, ret: %d", obj, err, ret);
       warn("This could be because you don't have the MDAC on your machine,\n");
       warn("or an MDAC version you have is too arcane and not supported by\n");
       croak("Win32::SqlServer, which requires MDAC 2.6\n");

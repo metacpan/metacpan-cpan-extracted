@@ -5,7 +5,7 @@ ansicolumn - ANSI terminal sequence aware column command
 
 # VERSION
 
-Version 1.08
+Version 1.10
 
 # SYNOPSIS
 
@@ -24,6 +24,7 @@ ansicolumn \[options\] \[file ...\]
     -C#                  number of panes
     -S#                  pane width
     -F                   full-width
+    -p                   paragraph mode
 
     --height=#           page height
     --column-unit=#      column unit (default 8)
@@ -36,9 +37,6 @@ ansicolumn \[options\] \[file ...\]
     --border=#           print border
     --border-style=#     border style
     --[no-]ignore-space  ignore space in table output
-    --[no-]insert-space  insert empty line
-    --[no-]paragraph     same as --insert-space
-    --[no-]white-space   allow page top white spaces
     --[no-]isolation     page-end line isolation
     --fillup=#           fill-up unit (pane|page|none)
     --tabstop=#          tab-stop character
@@ -62,7 +60,8 @@ default, from the standard input.
 
 - **-c**#, **--width**=#, **--output-width**=#
 
-    Output is formatted for a display columns wide.
+    Output is formatted for a display columns wide.  See ["CALCULATION"](#calculation)
+    section.
 
 - **-s**#, **--separator**=#
 
@@ -78,7 +77,7 @@ default, from the standard input.
 
 - **-l**_#_, **--table-columns-limit** _number_
 
-    Specify maximal number of the input columns. The last column will
+    Specify maximal number of the input columns.  The last column will
     contain all remaining line data if the limit is smaller than the
     number of the columns in the input data.
 
@@ -102,13 +101,14 @@ default, from the standard input.
 
     Page mode.  Set these options.
 
-        --height=[ terminal height - 1 ]
+        --height=# or 1-
         --linestyle=wrap
         --border
         --fillup
 
     If optional number is given, it is used as a page height unless option
-    **--height** exists.
+    **--height** exists.  Otherwise page height is set to terminal height
+    minus one.
 
 - **-D**, **--document**
 
@@ -133,16 +133,21 @@ default, from the standard input.
 
 - **-S**#, **--pane-width**=#, **--pw**=#
 
-    Specify pane width.  This includes border spaces.
+    Specify pane width.  This includes border spaces.  See ["CALCULATION"](#calculation)
+    section.
 
 - **-F**, **--fullwidth**
 
     Use full width of the terminal.  Each panes are expanded to fill
     terminal width, unless **--pane-width** is specified.
 
+- **-p**, **--paragraph**
+
+    Insert empty line between every successive non-empty lines.
+
 - **--height**=#
 
-    Set page height and page mode on.
+    Set page height and page mode on.  See ["CALCULATION"](#calculation) section.
 
 - **--column-unit**=#
 
@@ -195,6 +200,7 @@ default, from the standard input.
     vbar, fence,
     line, heavy-line,
     ascii-frame, ascii-box,
+    c-box,
     box, frame, page-frame,
     shadow, shadow-box,
     comb, rake, mesh,
@@ -222,11 +228,6 @@ default, from the standard input.
 
     When used **-t** option, leading spaces are ignored by default.  Use
     **--no-ignore-space** option to disable it.
-
-- **--**\[**no-**\]**insert-space**
-- **--**\[**no-**\]**paragraph**
-
-    Insert empty line between every successive non-empty lines.
 
 - **--**\[**no-**\]**white-space**
 
@@ -318,7 +319,8 @@ To get the latest code, use this:
 
 # SEE ALSO
 
-[column(1)](http://man.he.net/man1/column)
+[column(1)](http://man.he.net/man1/column),
+[https://man7.org/linux/man-pages/man1/column.1.html](https://man7.org/linux/man-pages/man1/column.1.html)
 
 [App::ansicolumn](https://metacpan.org/pod/App::ansicolumn),
 [https://github.com/kaz-utashiro/App-ansicolumn](https://github.com/kaz-utashiro/App-ansicolumn)
@@ -332,7 +334,7 @@ Kazumasa Utashiro
 
 # LICENSE
 
-Copyright 2020- Kazumasa Utashiro.
+Copyright 2020-2021 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

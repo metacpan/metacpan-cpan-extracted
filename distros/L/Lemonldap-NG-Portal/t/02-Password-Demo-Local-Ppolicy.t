@@ -9,7 +9,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
 
 require 't/test-lib.pm';
 
-my $res;
+my ($res, $json);
 
 my $client = LLNG::Manager::Test->new( {
         ini => {
@@ -56,7 +56,7 @@ ok(
     'Password min size not respected'
 );
 expectBadRequest($res);
-my $json;
+
 ok( $json = eval { from_json( $res->[2]->[0] ) }, 'Response is JSON' )
   or print STDERR "$@\n" . Dumper($res);
 ok(

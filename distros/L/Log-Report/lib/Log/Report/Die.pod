@@ -30,10 +30,10 @@ croak(), or confess().  This routine tries to convert this into
 parameters for L<Log::Report::report()|Log::Report/"Report Production and Configuration">.  This is done in a very
 smart way, even trying to find the stringifications of C<$!>.
 
-Return are four elements: the error string which is used to trigger
-a C<Log::Report> compatible C<die()>, and the options, reason, and
-text message.  The options is a HASH which, amongst other things,
-may contain a stack trace and location.
+Returned are four elements: the error string or object which triggered
+the death originally (the original $@), and the opts, reason, and plain
+text message.  The opts is a HASH which, amongst other things, may contain
+a stack trace and location extracted from the death text or object.
 
 Translated components will have exception classes C<perl>, and C<die> or
 C<confess>.  On the moment, the C<croak> cannot be distiguished from the
@@ -78,8 +78,8 @@ Currently supported:
 
 =head1 SEE ALSO
 
-This module is part of Log-Report distribution version 1.32,
-built on January 26, 2021. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Log-Report distribution version 1.33,
+built on July 17, 2021. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

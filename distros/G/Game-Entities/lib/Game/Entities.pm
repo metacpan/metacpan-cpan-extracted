@@ -8,8 +8,11 @@ use Carp         ();
 use Data::Dumper ();
 use List::Util   ();
 use Scalar::Util ();
+use Sub::Util    ();
 
 use experimental 'signatures';
+
+our $VERSION = '0.010';
 
 # The main entity registry, inspired by https://github.com/skypjack/entt
 
@@ -24,14 +27,40 @@ use constant {
     ENTITY_MASK  => 0xFFFFF, # Used to convert GUIDs to entity numbers
     VERSION_MASK => 0xFFF,   # Used to convert GUIDs to entity versions
     ENTITY_SHIFT => 20,      # The size of the entity number within a GUID
+    NULL_ENTITY  => 0,       # The null entity
 };
 
 ## Entity "methods"
 
-my $version = sub ($e) { $e >> ENTITY_SHIFT };
-my $entity  = sub ($e) { $e &  ENTITY_MASK  };
-my $is_null = sub ($e) { $e->$entity == ENTITY_MASK  };
-my $format  = sub ($e) { sprintf '%012b:%020b', $e->$version, $e->$entity };
+my $base = __PACKAGE__ . '::';
+my $version = Sub::Util::set_subname "${base}GUID::version" => sub ($e) { $e >> ENTITY_SHIFT };
+my $entity  = Sub::Util::set_subname "${base}GUID::entity"  => sub ($e) { $e &  ENTITY_MASK  };
+my $is_null = Sub::Util::set_subname "${base}GUID::is_null" => sub ($e) { $e->$entity == NULL_ENTITY };
+my $format  = Sub::Util::set_subname "${base}GUID::format"  => sub ($e) { sprintf '%03X:%05X', $e->$version, $e->$entity };
+
+## Sparse set "methods"
+
+my $swap_components = Sub::Util::set_subname "${base}Set::swap_components" => sub ( $set, $le, $re ) {
+    my ( $ld, $rd ) = @{ $set->[SPARSE] }[ $le, $re ];
+    @{ $set->[COMPONENTS] }[ $ld, $rd ] = @{ $set->[COMPONENTS] }[ $rd, $ld ];
+};
+
+my $swap = Sub::Util::set_subname "${base}Set::swap" => sub ( $set, $le, $re ) {
+    my ( $ld, $rd ) = @{ $set->[SPARSE] }[ $le, $re ];
+    my ( $ls, $rs ) = @{ $set->[DENSE ] }[ $ld, $rd ];
+
+    Carp::confess "Cannot swap $le and $re: they are not members of the set"
+        unless $ls == $le && $rs == $re;
+
+    $set->$swap_components( $le, $re );
+    @{ $set->[DENSE ] }[ $ld, $rd ] = @{ $set->[DENSE ] }[ $rd, $ld ];
+    @{ $set->[SPARSE] }[ $ls, $rs ] = @{ $set->[SPARSE] }[ $rs, $ls ];
+};
+
+my $contains = Sub::Util::set_subname "${base}Set::contains" => sub ( $set, $index ) {
+    my $sparse = $set->[SPARSE][$index] // return;
+    return ( $set->[DENSE][$sparse] // $index + 1 ) == $index;
+};
 
 ## Private, hidden methods
 
@@ -40,8 +69,8 @@ my $add_version = sub ($self, $index) {
 };
 
 my $generate_guid = sub ($self) {
-    die 'Exceeded maximum number of entities'
-        if @{ $self->{entities} //= [] } >= ENTITY_MASK - 1;
+    Carp::croak 'Exceeded maximum number of entities'
+        if @{ $self->{entities} } >= ENTITY_MASK;
 
     my $guid = @{ $self->{entities} };
     push @{ $self->{entities} }, $guid;
@@ -52,7 +81,7 @@ my $generate_guid = sub ($self) {
 my $recycle_guid = sub ($self) {
     my $next = $self->{available};
 
-    die 'Cannot recycle GUID if none has been released'
+    Carp::croak 'Cannot recycle GUID if none has been released'
         if $next->$is_null;
 
     my $ver = $self->{entities}[$next]->$version;
@@ -80,15 +109,17 @@ my $get = sub ( $self, $unsafe, $guid, @types ) {
 ## Public methods
 
 sub new ( $class ) {
-    bless { available => ENTITY_MASK }, $class;
+    my $self = bless {}, $class;
+    $self->clear;
+    $self;
 }
 
-sub created ($self) { scalar @{ $self->{entities} // [] } }
+sub created ($self) { scalar @{ $self->{entities} } - 1 }
 
 # Get the number of created entities that are still valid; that is, that have
 # not been deleted.
 sub alive ($self) {
-    my $size = @{ $self->{entities} // [] };
+    my $size = @{ $self->{entities} } - 1;
     my $current = $self->{available};
 
     until ( $current->$is_null ) {
@@ -110,8 +141,8 @@ sub clear ($self) {
 
     # Parameters used for recycling entity GUIDs
     # See https://skypjack.github.io/2019-05-06-ecs-baf-part-3
-    delete $self->{entities};
-    $self->{available} = ENTITY_MASK;
+    $self->{entities} = [ undef ];
+    $self->{available} = NULL_ENTITY;
 
     return;
 }
@@ -136,8 +167,8 @@ sub check ( $self, $guid, $type ) {
 
     my $index  = $guid->$entity;
     my $set    = $self->{components}{"$type"};
-    my $sparse = $set->[SPARSE][$index] // return;
-    return ( $set->[DENSE][$sparse] // $index + 1 ) == $index;
+
+    $set->$contains( $index );
 }
 
 # Add or replace a component for an entity
@@ -248,6 +279,65 @@ sub valid ( $self, $guid ) {
         && ( $self->{entities}[$pos] // $guid + 1 ) == $guid;
 }
 
+sub sort ( $self, $name, $comparator ) {
+    my $set = $self->{components}{$name}
+        // Carp::croak "Cannot sort $name: no such component in registry";
+
+    my $sparse = $set->[SPARSE];
+    my $dense  = $set->[DENSE];
+    my $comps  = $set->[COMPONENTS];
+
+    # Sorting a component invalidates any cached view that uses it
+    delete $self->{view_cache}{$_} for
+        grep { index( $_, "|$name|" ) != -1 }
+        keys %{ $self->{view_cache} };
+
+    if ( ! ref $comparator ) {
+        my $other = $self->{components}{$comparator}
+            // Carp::croak "Cannot sort according to $comparator: no such component in registry";
+
+        my $j = 0;
+        for my $i ( 0 .. $#{ $other->[DENSE] } ) {
+            last if $i > $#{ $dense };
+
+            my $this = $dense->[$j]        // die "Undefined in set";
+            my $that = $other->[DENSE][$i] // die 'Undefined in other';
+
+            next unless $set->$contains($that);
+
+            $set->$swap( $this, $that ) unless $this == $that;
+            $j++;
+        }
+
+        return;
+    }
+
+    # See https://skypjack.github.io/2019-09-25-ecs-baf-part-5/
+    my $caller = caller;
+    {
+        no strict 'refs';
+        @$dense = sort {
+            local ${ $caller . '::a' } = $comps->[ $sparse->[ $a ] ];
+            local ${ $caller . '::b' } = $comps->[ $sparse->[ $b ] ];
+            $comparator->();
+        } @$dense;
+    }
+
+    for my $curr ( 0 .. $#$dense ) {
+        my $next = $sparse->[ $dense->[ $curr ] ];
+
+        while ( $next != $curr ) {
+            $set->$swap_components( @{ $dense }[ $curr, $next ] );
+
+            $sparse->[ $dense->[ $curr ] ] = $curr;
+            $curr = $next;
+            $next = $sparse->[ $dense->[ $curr ] ];
+        }
+    }
+
+    return;
+}
+
 package
     Game::Entities::View {
     no overloading;
@@ -264,6 +354,11 @@ package
         $code->( $_->[0], @{ $_->[1] } ) for List::Util::pairs @$self
     }
 
+    sub first ( $self, $code ) {
+        my $res = List::Util::first { $code->( $_->[0], @{ $_->[1] } ) } List::Util::pairs @$self;
+        return $res ? ( $res->[0], @{ $res->[1] } ) : ();
+    }
+
     sub entities   ($self) { ( List::Util::pairkeys   @$self ) }
     sub components ($self) { ( List::Util::pairvalues @$self ) }
 }
@@ -275,7 +370,7 @@ sub view ( $self, @types ) {
         return Game::Entities::View->new(
             map {; $self->$add_version( $_->$entity ) => [] }
                 grep $self->valid( $_ ),
-                @{ $self->{entities} }
+                @{ $self->{entities} }[ 1 .. $#{ $self->{entities} } ]
         )
     }
 
@@ -330,7 +425,8 @@ sub _dump_entities ( $self, @types ) {
     local $Data::Dumper::Terse  = 1;
     local $Data::Dumper::Indent = 0;
 
-    my @names = @types || keys %{ $self->{components} };
+    my @names = @types;
+    @names = sort keys %{ $self->{components} } unless @types;
 
     my $print = ! defined wantarray;
     open my $fh, '>', \my $out or $print = 1;
@@ -367,6 +463,7 @@ delete $Game::Entities::{$_} for qw(
     DENSE
     ENTITY_MASK
     ENTITY_SHIFT
+    NULL_ENTITY
     SPARSE
     VERSION_MASK
 );

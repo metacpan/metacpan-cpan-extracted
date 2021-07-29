@@ -232,8 +232,19 @@ Especially useful in combination with the C<flattenMultiparts> rule.
 Any C<text/html> part which is not accompanied by an alternative
 plain text part will have one added.  You must have a working
 L<Mail::Message::Convert::HtmlFormatText|Mail::Message::Convert::HtmlFormatText>, which means that
-HTML::TreeBuilder and HTML::FormatText  must be installed on
+HTML::TreeBuilder and HTML::FormatText must be installed on
 your system.
+
+When you are planning to create an automatic html to plain text
+filter for your email, then have a look at
+F<https://github.com/logological/mimestrip>
+
+B<. Example: using parameter with C<textAlternativeForHtml>>
+
+  my $result = $msg->rebuild
+    ( extra_rules => [ 'textAlternativeForHtml' ]
+    , textAlternativeForHtml => { leftmargin => 0 }
+    );
 
 =item * removeExtraAlternativeText
 
@@ -279,12 +290,12 @@ When you have your own routine, you simply call:
 
 =head1 SEE ALSO
 
-This module is part of Mail-Message distribution version 3.010,
-built on October 14, 2020. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Message distribution version 3.011,
+built on July 27, 2021. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2001-2020 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+Copyrights 2001-2021 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

@@ -2,6 +2,7 @@
 package Paws::EC2::CopySnapshot;
   use Moose;
   has Description => (is => 'ro', isa => 'Str');
+  has DestinationOutpostArn => (is => 'ro', isa => 'Str');
   has DestinationRegion => (is => 'ro', isa => 'Str', traits => ['NameInRequest'], request_name => 'destinationRegion' );
   has DryRun => (is => 'ro', isa => 'Bool', traits => ['NameInRequest'], request_name => 'dryRun' );
   has Encrypted => (is => 'ro', isa => 'Bool', traits => ['NameInRequest'], request_name => 'encrypted' );
@@ -35,10 +36,10 @@ You shouldn't make instances of this class. Each attribute should be used as a n
 =head1 SYNOPSIS
 
     my $ec2 = Paws->service('EC2');
-   # To copy a snapshot
-   # This example copies a snapshot with the snapshot ID of
-   # ``snap-066877671789bd71b`` from the ``us-west-2`` region to the
-   # ``us-east-1`` region and adds a short description to identify the snapshot.
+ # To copy a snapshot
+ # This example copies a snapshot with the snapshot ID of
+ # ``snap-066877671789bd71b`` from the ``us-west-2`` region to the ``us-east-1``
+ # region and adds a short description to identify the snapshot.
     my $CopySnapshotResult = $ec2->CopySnapshot(
       'Description'       => 'This is my copied snapshot.',
       'DestinationRegion' => 'us-east-1',
@@ -60,6 +61,21 @@ For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/ec2
 =head2 Description => Str
 
 A description for the EBS snapshot.
+
+
+
+=head2 DestinationOutpostArn => Str
+
+The Amazon Resource Name (ARN) of the Outpost to which to copy the
+snapshot. Only specify this parameter when copying a snapshot from an
+AWS Region to an Outpost. The snapshot must be in the Region for the
+destination Outpost. You cannot copy a snapshot from an Outpost to a
+Region, from one Outpost to another, or within the same Outpost.
+
+For more information, see Copying snapshots from an AWS Region to an
+Outpost
+(https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/snapshots-outposts.html#copy-snapshots)
+in the I<Amazon Elastic Compute Cloud User Guide>.
 
 
 
@@ -93,7 +109,7 @@ is not enabled, enable encryption using this parameter. Otherwise, omit
 this parameter. Encrypted snapshots are encrypted, even if you omit
 this parameter and encryption by default is not enabled. You cannot set
 this parameter to false. For more information, see Amazon EBS
-Encryption
+encryption
 (https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/EBSEncryption.html)
 in the I<Amazon Elastic Compute Cloud User Guide>.
 
@@ -112,7 +128,7 @@ You can specify the CMK using any of the following:
 
 =item *
 
-Key ID. For example, key/1234abcd-12ab-34cd-56ef-1234567890ab.
+Key ID. For example, 1234abcd-12ab-34cd-56ef-1234567890ab.
 
 =item *
 
@@ -121,12 +137,12 @@ Key alias. For example, alias/ExampleAlias.
 =item *
 
 Key ARN. For example,
-arn:aws:kms:I<us-east-1>:I<012345678910>:key/I<abcd1234-a123-456a-a12b-a123b4cd56ef>.
+arn:aws:kms:us-east-1:012345678910:key/1234abcd-12ab-34cd-56ef-1234567890ab.
 
 =item *
 
 Alias ARN. For example,
-arn:aws:kms:I<us-east-1>:I<012345678910>:alias/I<ExampleAlias>.
+arn:aws:kms:us-east-1:012345678910:alias/ExampleAlias.
 
 =back
 
@@ -140,7 +156,7 @@ but eventually fails.
 
 When you copy an encrypted source snapshot using the Amazon EC2 Query
 API, you must supply a pre-signed URL. This parameter is optional for
-unencrypted snapshots. For more information, see Query Requests
+unencrypted snapshots. For more information, see Query requests
 (https://docs.aws.amazon.com/AWSEC2/latest/APIReference/Query-Requests.html).
 
 The C<PresignedUrl> should use the snapshot source endpoint, the
@@ -149,7 +165,7 @@ C<SourceSnapshotId>, and C<DestinationRegion> parameters. The
 C<PresignedUrl> must be signed using AWS Signature Version 4. Because
 EBS snapshots are stored in Amazon S3, the signing algorithm for this
 parameter uses the same logic that is described in Authenticating
-Requests by Using Query Parameters (AWS Signature Version 4)
+Requests: Using Query Parameters (AWS Signature Version 4)
 (https://docs.aws.amazon.com/AmazonS3/latest/API/sigv4-query-string-auth.html)
 in the I<Amazon Simple Storage Service API Reference>. An invalid or
 improperly signed C<PresignedUrl> will cause the copy operation to fail

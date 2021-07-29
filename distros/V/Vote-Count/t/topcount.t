@@ -259,9 +259,9 @@ subtest 'odd situations' => sub {
   is_deeply( $VC1->TopCount(),
   { 'error' => 'no active choices'},
   'No active set returns a hashref containing an error instead of a rankcount.');
-  isa_ok( $VC1->TopCount( { 'CARAMEL' => 1 }),
+  isa_ok( $VC1->topcount( { 'CARAMEL' => 1 }),
   ['Vote::Count::RankCount'],
-  'while object active is empty, passing an alternate active still gets a rankcount');
+  'while object active is empty, alternate active still gets a rankcount, used lowercase alias');
 };
 
 done_testing();

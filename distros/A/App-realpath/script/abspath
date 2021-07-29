@@ -1,0 +1,156 @@
+#!perl
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-07-15'; # DATE
+our $DIST = 'App-realpath'; # DIST
+our $VERSION = '0.002'; # VERSION
+
+use strict;
+use warnings;
+
+use Getopt::Long qw(:config gnu_getopt no_ignore_case);
+
+sub parse_cmdline {
+    my $res = GetOptions(
+        'help|h' => sub {
+            print <<USAGE;
+Usage:
+  realpath [OPTIONS]... <FILE>...
+  realpath --version (-v)
+  realpath --help (-h, -?)
+
+Options:
+
+For more details, see the manpage/documentation.
+USAGE
+            exit 0;
+        },
+        'version|v' => sub {
+            no warnings 'once';
+            print "realpath (perl-based) version ".($main::VERSION // 'dev').
+                "\n";
+            exit 0;
+        },
+    );
+    if ($res) {
+        if (!@ARGV) {
+            warn "realpath: Please specify one or more files\n";
+            $res = 0;
+        }
+    }
+    exit 99 if !$res;
+}
+
+sub run {
+    require Cwd;
+    for my $path (@ARGV) {
+        print Cwd::realpath($path), "\n";
+    }
+}
+
+# MAIN
+
+parse_cmdline();
+run();
+
+1;
+# ABSTRACT: Print the resolved (absolute) path
+# PODNAME: abspath
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+abspath - Print the resolved (absolute) path
+
+=head1 VERSION
+
+This document describes version 0.002 of abspath (from Perl distribution App-realpath), released on 2021-07-15.
+
+=head1 SYNOPSIS
+
+ % realpath [OPTION]... <FILE>...
+ % abspath  [OPTION]... <FILE>...
+
+To demonstrate how C<realpath>, C<quickabspath>, and C<relpath> give you
+different results:
+
+ % pwd
+ /home/ujang
+
+ % mkdir dir1
+ % ln -s dir1 sym1
+
+ % cd sym1
+
+ % realpath .      ;# gives absolute path and resolve symlinks
+ /home/ujang/dir1
+ % abspath .       ;# an alias for realpath
+ /home/ujang/dir1
+
+ % quickabspath .  ;# gives absolute path but does not resolve symlinks
+ /home/ujang/sym1
+
+ % relpath /home/ujang/dir1
+ .
+ % relpath /home/ujang/sym1
+ ../sym1
+
+=head1 DESCRIPTION
+
+This is the Perl-based implementation alternative for the Unix utility
+B<realpath> (also aliased to L<abspath>). It uses L<Cwd>'s C<realpath> (which is
+the same as C<abs_path>) function. The function works by reading "." (the
+current directory) and moving upwards until it reaches the root directory,
+resolving symlinks along the way.
+
+=head1 EXIT CODES
+
+0 on success.
+
+99 on command-line options error.
+
+=head1 OPTIONS
+
+=head1 FAQ
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-realpath>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-realpath>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-realpath>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+Unix utility B<realpath>
+
+L<relpath>, L<quickabspath>
+
+L<Cwd>
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2021, 2019 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

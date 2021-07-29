@@ -242,6 +242,18 @@ Sets the thousand separator to be used uppon formatting.
 
 Return the absolute value of the number object. Same as L<perlfunc/"abs">
 
+=head2 as_array
+
+Return the number object as a L<Module::Generic::Array> object.
+
+=head2 as_boolean
+
+Return the number object as  a L<Module::Generic::Boolean> object.
+
+=head2 as_scalar
+
+Return the number object as  a L<Module::Generic::Scalar> object.
+
 =head2 atan
 
 Returns the arcus tangent for the number object. See L<POSIX/"atan">
@@ -305,6 +317,10 @@ Sets or gets the currency symbol to be used for formatting the number object wit
 =head2 decimal
 
 Sets or gets the decimal separator to be used for formatting the number object
+
+=head2 default
+
+Sets the dictionary (hash reference) of property-value pairs used for the number object formatting.
 
 =head2 exp
 
@@ -389,6 +405,10 @@ Returns the integer portion of the number object. See L<perlfunc/"int"> for more
     # Assuming $n is an object for 3.14159265358979323846
     $n->int # 3
 
+=head2 is_decimal
+
+Returns true if the number is a decimal number.
+
 =head2 is_even
 
 Returns true if the number is even, i.e. if the modulus of the number divided by 2 is 0.
@@ -415,6 +435,10 @@ Returns true if the number is an integer. It uses L<POSIX/"modf"> to find out.
 
 Returns true if the number is not a number, i.e. NaN. See L<POSIX/"isnan">
 
+=head2 is_neg
+
+Alias for I</is_negative>
+
 =head2 is_negative
 
 Returns true if the number object is negative, false otherwise. See L<POSIX/"signbit">
@@ -428,6 +452,10 @@ Returns true if the argument is normal (that is, not a subnormal/denormal, and n
 Returns true if the number is odd, i.e. if the modulus of the number divided by 2 is 1.
 
 See L</is_even>
+
+=head2 is_pos
+
+Alias for L</is_positive>
 
 =head2 is_positive
 
@@ -473,6 +501,10 @@ Returns the lowest number of either the number object, or the additional number 
 
     $n->min( 2000 ) # 2000
 
+=head2 min
+
+Provided with another number and this returns the smallest of the two as an L<Module::Generic::Number> object.
+
 =head2 mod
 
 Returns the remainder for the number bject divided by another number provided as additional argument. See L<POSIX/"fmod"> for more details.
@@ -511,6 +543,12 @@ Sets or gets the I<precede> property of this object. This is used by L<Number::F
 
 Sets or gets the I<precede_neg> property of this object. This is used by L<Number::Format> to determine if the currency symbol should be set before or after the number when it is a negative number.
 
+=head2 precede_pos
+
+Sets or gets the property value for I<precede>.
+
+1 if the currency symbol precedes the currency value for nonnegative values, 0 if it follows.
+
 =head2 precision
 
 Sets or gets the floating precision of the number.
@@ -527,6 +565,18 @@ See L<perlfunc/"rand"> for more information.
 =head2 round
 
 Provided with an optional precision, this will round the number object. Internally it uses L<perldoc/"sprintf"> to achieve that.
+
+=head2 round_zero
+
+This will round the number using L<POSIX/round>, which will return "the integer (but still as floating point) nearest to the argument"
+
+=head2 round2
+
+Round the number using L<Number::Format/round>. It will pass through whatever argument that is provided.
+
+=head2 scalar
+
+Same as L</as_string>. This forces the return of the object as a raw number.
 
 =head2 sign_neg
 
@@ -547,6 +597,10 @@ Sets or gets the I<space> property of this object. 1 if a space is inserted betw
 =head2 space_neg
 
 Sets or gets the I<space_neg> property of this object. 1 if a space is inserted between the currency symbol and the currency value for negative values, 0 otherwise.
+
+=head2 space_pos
+
+Sets or gets the I<space> property. 1 if a space is inserted between the currency symbol and the currency value for nonnegative values, 0 otherwise.
 
 =head2 sqrt
 

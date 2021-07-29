@@ -5,7 +5,9 @@ use Module::Build;
 use XS::Parse::Keyword::Builder;
 use XS::Parse::Sublike::Builder;
 
-my @extra_compiler_flags = qw( -Ihax );
+my @extra_compiler_flags = qw( -Iinclude -Ihax );
+
+push @extra_compiler_flags, qw( -DDEBUGGING=-g ) if $^X =~ m|/debugperl|;
 
 use Config;
 if( $Config{ccname} eq "gcc" ) {
@@ -43,6 +45,7 @@ my $build = Module::Build->new(
    create_readme  => 1,
 
    extra_compiler_flags => \@extra_compiler_flags,
+   c_source => [ "src/" ],
 );
 
 XS::Parse::Keyword::Builder->extend_module_build( $build );

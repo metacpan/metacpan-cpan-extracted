@@ -3,16 +3,19 @@ package Lemonldap::NG::Portal::Auth::OpenIDConnect;
 use strict;
 use Mouse;
 use MIME::Base64 qw/encode_base64 decode_base64/;
+use Lemonldap::NG::Common::JWT qw(getJWTPayload);
 use Lemonldap::NG::Portal::Main::Constants qw(
+  PE_OK
   PE_ERROR
   PE_IDPCHOICE
-  PE_OK
 );
 
-our $VERSION = '2.0.7';
+our $VERSION = '2.0.12';
 
-extends 'Lemonldap::NG::Portal::Main::Auth',
-  'Lemonldap::NG::Portal::Lib::OpenIDConnect';
+extends qw(
+  Lemonldap::NG::Portal::Main::Auth
+  Lemonldap::NG::Portal::Lib::OpenIDConnect
+);
 
 # INTERFACE
 
@@ -147,15 +150,15 @@ sub extractFormInfo {
             $auth_method );
         return PE_ERROR unless $content;
 
-        my $json = $self->decodeJSON($content);
+        my $token_response = $self->decodeTokenResponse($content);
 
-        if ( $json->{error} ) {
-            $self->logger->error( "Error in token response:" . $json->{error} );
+        unless ($token_response) {
+            $self->logger->error("Could not decode Token Response: $content");
             return PE_ERROR;
         }
 
         # Check validity of token response
-        unless ( $self->checkTokenResponseValidity($json) ) {
+        unless ( $self->checkTokenResponseValidity($token_response) ) {
             $self->logger->error("Token response is not valid");
             return PE_ERROR;
         }
@@ -163,8 +166,8 @@ sub extractFormInfo {
             $self->logger->debug("Token response is valid");
         }
 
-        my $access_token = $json->{access_token};
-        my $id_token     = $json->{id_token};
+        my $access_token = $token_response->{access_token};
+        my $id_token     = $token_response->{id_token};
 
         $self->logger->debug("Access token: $access_token");
         $self->logger->debug("ID token: $id_token");
@@ -183,10 +186,12 @@ sub extractFormInfo {
             $self->logger->debug("JWT signature check disabled");
         }
 
-        my $id_token_payload = $self->extractJWT($id_token)->[1];
-
-        my $id_token_payload_hash =
-          $self->decodeJSON( $self->decodeBase64url($id_token_payload) );
+        my $id_token_payload_hash = getJWTPayload($id_token);
+        unless ( defined $id_token_payload_hash ) {
+            $self->logger->error(
+                "Could not decode incoming ID token: $id_token");
+            return PE_ERROR;
+        }
 
         # Check validity of Access Token (optional)
         my $at_hash = $id_token_payload_hash->{at_hash};
@@ -273,7 +278,7 @@ sub extractFormInfo {
 }
 
 sub authenticate {
-    PE_OK;
+    return PE_OK;
 }
 
 sub setAuthSessionInfo {
@@ -297,7 +302,7 @@ sub setAuthSessionInfo {
         $self->logger->debug("ID Token will not be stored in session");
     }
 
-    PE_OK;
+    return PE_OK;
 }
 
 sub authLogout {
@@ -324,7 +329,7 @@ sub authLogout {
     else {
         $self->logger->debug("No end session endpoint found for $op");
     }
-    PE_OK;
+    return PE_OK;
 }
 
 sub getDisplayType {

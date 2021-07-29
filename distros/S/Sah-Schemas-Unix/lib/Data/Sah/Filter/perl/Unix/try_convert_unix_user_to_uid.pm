@@ -1,9 +1,9 @@
 package Data::Sah::Filter::perl::Unix::try_convert_unix_user_to_uid;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-10-16'; # DATE
+our $DATE = '2021-07-22'; # DATE
 our $DIST = 'Sah-Schemas-Unix'; # DIST
-our $VERSION = '0.013'; # VERSION
+our $VERSION = '0.017'; # VERSION
 
 use 5.010001;
 use strict;
@@ -46,7 +46,7 @@ Data::Sah::Filter::perl::Unix::try_convert_unix_user_to_uid
 
 =head1 VERSION
 
-This document describes version 0.013 of Data::Sah::Filter::perl::Unix::try_convert_unix_user_to_uid (from Perl distribution Sah-Schemas-Unix), released on 2020-10-16.
+This document describes version 0.017 of Data::Sah::Filter::perl::Unix::try_convert_unix_user_to_uid (from Perl distribution Sah-Schemas-Unix), released on 2021-07-22.
 
 =for Pod::Coverage ^(meta|filter)$
 
@@ -79,7 +79,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

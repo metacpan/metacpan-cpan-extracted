@@ -10,13 +10,13 @@ use List::Util qw( min max sum);
 use Vote::Count::TextTableTiny qw/generate_table/;
 use Sort::Hash;
 
-our $VERSION='2.00';
+our $VERSION='2.01';
 
 =head1 NAME
 
 Vote::Count::RankCount
 
-=head1 VERSION 2.00
+=head1 VERSION 2.01
 
 =cut
 
@@ -128,7 +128,7 @@ Returns the array that was to create the RankCount object if it was created from
 
 =head3 CountVotes
 
-Returns the number of votes in the RawCount. This is not the same as the votes in the BallotSet from which that was derived. For TopCount it is the number of non-exhausted ballots in the round that generated RawCount, for Approval and Boorda it is probably not useful.
+Returns the number of votes in the RawCount. This is not the same as the votes in the BallotSet from which that was derived. For TopCount it is the number of non-exhausted ballots in the round that generated RawCount, for Approval and Borda it is probably not useful.
 
 =head3 Leader
 

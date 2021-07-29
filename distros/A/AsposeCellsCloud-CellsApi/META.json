@@ -62,7 +62,10 @@
       },
       "AsposeCellsCloud::CellsApi" : {
          "file" : "lib/AsposeCellsCloud/CellsApi.pm",
-         "version" : "21.5"
+         "version" : "21.6"
+      },
+      "AsposeCellsCloud::LiteCellsApi" : {
+         "file" : "lib/AsposeCellsCloud/LiteCellsApi.pm"
       },
       "AsposeCellsCloud::Configuration" : {
          "file" : "lib/AsposeCellsCloud/Configuration.pm"
@@ -261,6 +264,12 @@
       },
       "AsposeCellsCloud::Object::ErrorDetails" : {
          "file" : "lib/AsposeCellsCloud/Object/ErrorDetails.pm"
+      },
+      "AsposeCellsCloud::Object::FilesResult" : {
+         "file" : "lib/AsposeCellsCloud/Object/FilesResult.pm"
+      },
+      "AsposeCellsCloud::Object::FileInfo" : {
+         "file" : "lib/AsposeCellsCloud/Object/FileInfo.pm"
       },
       "AsposeCellsCloud::Object::FileSource" : {
          "file" : "lib/AsposeCellsCloud/Object/FileSource.pm"
@@ -813,6 +822,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "21.1",
+   "version" : "21.6",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

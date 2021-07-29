@@ -10,6 +10,7 @@ dist.ini
 lib/App/hr.pm
 script/_hr
 script/hr
+share/images/screencast1.gif
 t/00-compile.t
 t/author-critic.t
 t/author-pod-coverage.t

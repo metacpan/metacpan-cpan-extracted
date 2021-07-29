@@ -1,3 +1,21 @@
+0.011   2021-07-26  Released-By: PERLANCAR; Urgency: medium
+
+	- Linkify entry heading.
+
+
+0.010   2021-07-21  Released-By: PERLANCAR; Urgency: medium
+
+	- Show author (from lcpan if available) and scripts for each entry.
+
+	- [ux] When entry does not have summary, use module Abstract (from lcpan
+          if available).
+
+
+0.009   2021-05-01  Released-By: PERLANCAR; Urgency: high
+
+        - Merge releases 0.006 & 0.006.2.
+
+
 0.008   2021-03-26  Released-By: PERLANCAR; Urgency: medium
 
 	- [bugfix] Fix typo in header name: ACME::MODULES ENTRIES.
@@ -8,12 +26,19 @@
 	- Add argument: entry_description_code.
 
 
-0.006   2020-12-14  Released-By: PERLANCAR; Urgency: medium
+0.006.2 2020-12-14  Released-By: PERLANCAR; Urgency: medium
 
 	- Rename sections to be less mouthful: 'Modules Included In This
 	  Acme::CPANModule Module' -> 'Acme::CPANModules Entries', 'Feature
 	  Comparison Matrix of Modules Included In This Acme::CPANModules
 	  Module' -> 'Acme::CPANModules Feature Comparison Matrix'.
+
+        - UPDATE: Rename version to 0.006.2 due to conflict.
+
+
+0.006   2020-10-19  Released-By: PERLANCAR; Urgency: medium
+
+	- Fix typo.
 
 
 0.005   2020-09-15  Released-By: PERLANCAR; Urgency: medium

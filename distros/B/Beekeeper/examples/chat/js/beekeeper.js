@@ -14,7 +14,7 @@
     let bkpr = new BeekeeperClient;
 
     bkpr.connect({
-        url:       "ws://localhost:8000/mqtt",
+        url:       "ws://localhost:18080/mqtt",
         username:  "guest",
         password:  "guest",
         on_connect: function() {...}

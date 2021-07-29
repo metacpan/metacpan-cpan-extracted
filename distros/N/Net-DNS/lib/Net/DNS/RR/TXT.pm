@@ -2,7 +2,7 @@ package Net::DNS::RR::TXT;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: TXT.pm 1814 2020-10-14 21:49:16Z willem $)[2];
+our $VERSION = (qw$Id: TXT.pm 1840 2021-05-21 12:32:06Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -50,7 +50,7 @@ sub _format_rdata {			## format rdata portion of RR string.
 	my $self = shift;
 
 	my $txtdata = $self->{txtdata};
-	return ( map { $_->string } @$txtdata );
+	return ( map { $_->unicode } @$txtdata );
 }
 
 

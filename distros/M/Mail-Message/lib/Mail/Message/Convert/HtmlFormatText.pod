@@ -25,6 +25,8 @@ HTML::FormatText which are not installed by default together with
 Mail::Box.  See also L<Mail::Message::rebuild()|Mail::Message::Construct::Rebuild/"Constructing a message"> with rule
 C<text_alternative_for_html>.
 
+This module is a small wrapper around HTML::FormatText.
+
 Extends L<"DESCRIPTION" in Mail::Message::Convert|Mail::Message::Convert/"DESCRIPTION">.
  
 =head1 METHODS
@@ -173,12 +175,12 @@ of the package.
 
 =head1 SEE ALSO
 
-This module is part of Mail-Message distribution version 3.010,
-built on October 14, 2020. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Message distribution version 3.011,
+built on July 27, 2021. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2001-2020 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+Copyrights 2001-2021 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

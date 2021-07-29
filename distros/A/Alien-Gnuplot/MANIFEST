@@ -3,5 +3,8 @@ lib/Alien/Gnuplot.pm
 Makefile.PL
 MANIFEST			This list of files
 README.pod
+t/01-vars.t
+t/02-version.t
+t/03-env.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

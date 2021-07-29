@@ -1,5 +1,5 @@
 /*---------------------------------------------------------------------
- $Header: /Perl/OlleDB/init.h 7     19-07-19 22:00 Sommar $
+ $Header: /Perl/OlleDB/init.h 8     21-07-12 21:37 Sommar $
 
   This file holds code associated with module and object initialitaion.
   This file also declares global variables that exist through the lifetime
@@ -8,9 +8,17 @@
   The header file also define some enums related to initialisation.
 
 
-  Copyright (c) 2004-2018   Erland Sommarskog
+  Copyright (c) 2004-2021   Erland Sommarskog
 
   $History: init.h $
+ * 
+ * *****************  Version 8  *****************
+ * User: Sommar       Date: 21-07-12   Time: 21:37
+ * Updated in $/Perl/OlleDB
+ * No longer tracking whether a property is for SQLOLEDB, but instead
+ * added a concept of optional properties, to permit adding login
+ * properties that are not added by all versions of MSOLEDBSQL. Also added
+ * five new login properties to support what MSOLEDBSQL supports.
  * 
  * *****************  Version 7  *****************
  * User: Sommar       Date: 19-07-19   Time: 22:00
@@ -81,10 +89,10 @@ init_propsets;
 typedef struct {
    char             name[INIT_PROPNAME_LEN];  // Name of prop exposed to user.
    init_propsets    propset_enum;    // In which property set property belongs.
-   BOOL             is_sqloledb;     // This is a property that SQLOLEDB 2.6 supports.
-   DBPROPID         property_id;    // ID for property in OLE DB.
-   VARTYPE          datatype;       // Datatype of the property.
-   VARIANT          default_value;  // Default value for the property.
+   BOOL             isoptional;      // We only send this property to OLE DB if it has been set explicitly.
+   DBPROPID         property_id;     // ID for property in OLE DB.
+   VARTYPE          datatype;        // Datatype of the property.
+   VARIANT          default_value;   // Default value for the property.
 } init_property;
 #define MAX_INIT_PROPERTIES 50
 

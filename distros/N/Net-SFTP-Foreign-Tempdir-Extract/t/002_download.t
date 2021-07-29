@@ -3,6 +3,7 @@
 use strict;
 use warnings;
 use Test::More tests => 15;
+use Cwd;
 
 BEGIN { use_ok( 'Net::SFTP::Foreign::Tempdir::Extract' ); }
 
@@ -11,8 +12,9 @@ my $run      = $ENV{"Net_SFTP_Foreign_Tempdir_Extract"}          || 0;
 SKIP: {
   skip 'export Net_SFTP_Foreign_Tempdir_Extract=1 #to run', 14 unless $run;
 
+  my $dir      = getcwd;
   my $host     = $ENV{"Net_SFTP_Foreign_Tempdir_Extract_host"}     || "127.0.0.1";
-  my $folder   = $ENV{"Net_SFTP_Foreign_Tempdir_Extract_folder"}   || "/var/www/html/perl/packages/Net-SFTP-Foreign-Tempdir-Extract/t/files";
+  my $folder   = $ENV{"Net_SFTP_Foreign_Tempdir_Extract_folder"}   || "$dir/t/files";
 
   my $fileX="";
   {

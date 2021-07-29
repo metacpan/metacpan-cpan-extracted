@@ -2,14 +2,14 @@ package Myriad::Plugin;
 
 use Myriad::Class;
 
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.010'; # VERSION
 our $AUTHORITY = 'cpan:DERIV'; # AUTHORITY
 
 =encoding utf8
 
 =head1 NAME
 
-Myriad::Plugin
+Myriad::Plugin - extensible L<Myriad> functionality using attributes
 
 =head1 DESCRIPTION
 

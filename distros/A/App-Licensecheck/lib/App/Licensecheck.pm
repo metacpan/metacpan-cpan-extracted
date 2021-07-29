@@ -182,11 +182,11 @@ App::Licensecheck - functions for a simple license checker for source files
 
 =head1 VERSION
 
-Version v3.2.3
+Version v3.2.5
 
 =cut
 
-our $VERSION = version->declare('v3.2.3');
+our $VERSION = version->declare('v3.2.5');
 
 =head1 SYNOPSIS
 
@@ -571,6 +571,8 @@ sub clean_cruft
 {
 	local $_ = shift or return q{};
 
+	s/\/?<(?:p|br)>//gi;
+
 	# TODO: decode latin1/UTF-8/HTML data instead
 	s/\xcb\x97|\xe2\x80[\x90-\x95|\xe2\x81\x83|\xe2\x88\x92|\xef\x89\xa3|\xef\xbc\x8d]|[&](?:ndash|mdash|horbar|minus|[#](?:727|820[8-9]|821[0-3]|8259|8722|65123|65293|x727|z201[0-5]|x2043|x2212|xFE63|xFF0D))[;]/-/gm;
 	s/\x58\xa9|\xc2\xa9|\xe2\x92\x9e|\xe2\x92\xb8|\xe2\x93\x92|\xf0\x9f\x84\x92|\xf0\x9f\x84\xab|\xf0\x9f\x85\x92|[&](?:copy|[#](?:169|9374|9400|9426|127250|127275|127314|x0A9|x249E|x24b8|x24D2|x0F112|x0F12B|x0F152))[;]/©/gm;
@@ -585,6 +587,12 @@ sub clean_cruft_and_spaces
 {
 	local $_ = shift or return q{};
 
+	# strip trailing dash, assuming it is soft-wrap
+	# (example: disclaimers in GNU autotools file "install-sh")
+	s/-\r?\n//g;
+
+	s/\/?<(?:p|br)>//gi;
+
 	tr/\t\r\n/ /;
 
 	# this also removes quotes
@@ -594,17 +602,39 @@ sub clean_cruft_and_spaces
 	return $_;
 }
 
+my $any           = '[A-Za-z_][A-Za-z0-9_]*';
+my $str           = '[A-Za-z][A-Za-z0-9_]*';
+my $re_prop_attrs = qr/
+	\A(?'prop'$str)\.alt(?:
+		\.org\.(?'org'$str)|
+		\.version\.(?'version'$str)|
+		\.since\.date_(?'since_date'\d{8})|
+		\.until\.date_(?'until_date'\d{8})|
+		\.synth\.$any|
+		(?'other'\.$any)
+	)*\z/x;
+
 sub best_value
 {
-	my ( $self, $hashref, @keys ) = @_;
+	my ( $self, $hashref, @props ) = @_;
 	my $value;
 
-	for my $key (@keys) {
+	PROPERTY:
+	for my $prop (@props) {
 		for my $org ( @{ $self->shortname_scheme } ) {
-			$value ||= $hashref->{"$key.alt.org.$org"};
-			$value ||= $hashref->{"$key.alt.org.$org.synth.nogrant"};
+			for ( keys %$hashref ) {
+				/$re_prop_attrs/;
+				next unless $+{prop} and $+{prop} eq $prop;
+				next unless $+{org}  and $+{org} eq $org;
+				next if $+{version};
+				next if $+{other};
+				next if $+{until_date};
+
+				$value = $hashref->{$_};
+				last PROPERTY;
+			}
 		}
-		$value ||= $hashref->{$key};
+		$value ||= $hashref->{$prop};
 	}
 
 	return $value;

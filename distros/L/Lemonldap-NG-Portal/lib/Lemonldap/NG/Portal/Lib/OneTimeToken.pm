@@ -5,7 +5,7 @@ use Mouse;
 use JSON qw(from_json to_json);
 use Crypt::URandom;
 
-our $VERSION = '2.0.6';
+our $VERSION = '2.0.12';
 
 extends 'Lemonldap::NG::Common::Module';
 
@@ -42,7 +42,9 @@ has cache => (
     },
 );
 
-sub init { 1 }
+sub init {
+    return 1;
+}
 
 sub createToken {
     my ( $self, $infos ) = @_;

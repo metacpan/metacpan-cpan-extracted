@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use parent qw( Alien::Base );
 
-our $VERSION = '2.019110';
+our $VERSION = '2.019111';
 
 #  most of the following are for compat with PDLA Makefiles
 #  and should not be used by other code
@@ -40,7 +40,7 @@ sub load_projection_descriptions {
   my ($class) = @_;
   my $incflags = $class->cflags;
   my $libflags = $class->libs;
-  
+
   require Inline;
   Inline->bind(C => <<'EOF', inc => $incflags, libs => $libflags) unless defined &list_projections;
 #include "projects.h"
@@ -123,13 +123,13 @@ __END__
 Alien::Proj4 - Compile the PROJ library, version 4
 
 =head1 BUILD STATUS
- 
+
 =begin HTML
- 
+
 <p>
     <img src="https://img.shields.io/badge/perl-5.10+-blue.svg" alt="Requires Perl 5.10+" />
-    <a href="https://travis-ci.org/shawnlaffan/perl-alien-proj4"><img src="https://travis-ci.org/shawnlaffan/perl-alien-proj4.svg?branch=master" /></a>
-    <a href="https://ci.appveyor.com/project/shawnlaffan/perl-alien-proj4"><img src="https://ci.appveyor.com/api/projects/status/3lv9qu9ea2ex3p5d?svg=true" /></a>
+    <a href="https://travis-ci.org/PDLPorters/Alien-Proj4"><img src="https://travis-ci.org/PDLPorters/Alien-Proj4.svg?branch=master" /></a>
+    <a href="https://ci.appveyor.com/project/mohawk2/alien-proj4"><img src="https://ci.appveyor.com/api/projects/status/re5a1bpkj153p45x?svg=true" /></a>
 </p>
 
 =end HTML
@@ -138,7 +138,7 @@ Alien::Proj4 - Compile the PROJ library, version 4
 
     use Alien::Proj4;
 
-    
+
 =head1 DESCRIPTION
 
 PROJ is a generic coordinate transformation software.  See L<https://proj4.org/about.html>.
@@ -147,20 +147,20 @@ This Alien package is probably most useful for compilation of other modules, e.g
 
 This is a fork of the main L<Alien::proj>, but with the major version fixed to 4.
 Later versions of the proj code have changed their API, so this ensure stability until
-dependent projects have updated.  
+dependent projects have updated.
 
-The Proj library can be accessed from Perl code via the L<Geo::Proj4> package.  
+The Proj library can be accessed from Perl code via the L<Geo::Proj4> package.
 
 =head1 REPORTING BUGS
 
-Please send any bugs, suggestions, or feature requests to 
+Please send any bugs, suggestions, or feature requests to
 L<https://github.com/PDLPorters/Alien-Proj4/issues>.
 
 =head1 SEE ALSO
 
 L<Alien::proj>
 
-L<Geo:Proj4>
+L<Geo::Proj4>
 
 L<Geo::GDAL::FFI>
 
@@ -178,6 +178,6 @@ Copyright 2018- by Shawn Laffan
 
 
 This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself. 
+it under the same terms as Perl itself.
 
 =cut

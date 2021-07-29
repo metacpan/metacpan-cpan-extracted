@@ -20,6 +20,55 @@
 #######################################################################
 
 
+2021-07-26  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000624 released
+
+        * Modified EmailServer_is.pm.
+
+2021-07-22  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000623 released
+
+        * Modified EmailServer_is.pm.
+
+2021-07-21  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000622 released
+
+        * Modified EmailServer_is.pm.
+
+2021-07-20  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000621 released
+
+        * Modified EmailServer_is.pm.
+
+2021-07-19  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000620 released
+
+        * Modified EmailServer_is.pm.
+
+2021-07-16  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000619 released
+
+        * Modified EmailServer_is.pm.
+
+2021-07-15  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000618 released
+
+        * Modified EmailServer_is.pm.
+	  Added Rspamd configuration.
+
+2021-07-12  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000617 released
+
+        * Modified EmailServer_is.pm.
+
 2021-07-08  Brian M. Kelly <Brian.Kelly@fullauto.com>
 
         * Version 1.0000616 released

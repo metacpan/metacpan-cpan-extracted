@@ -1,13 +1,14 @@
 package App::CSVUtils;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-08-16'; # DATE
+our $DATE = '2021-07-10'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '0.032'; # VERSION
+our $VERSION = '0.034'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
+use Log::ger;
 
 use Hash::Subset qw(hash_subset);
 
@@ -18,6 +19,7 @@ sub _compile {
     return $str if ref $str eq 'CODE';
     defined($str) && length($str) or die "Please specify code (-e)\n";
     $str = "package main; no strict; no warnings; sub { $str }";
+    log_trace "Compiling Perl code: $str";
     my $code = eval $str;
     die "Can't compile code (-e) '$str': $@\n" if $@;
     $code;
@@ -577,6 +579,7 @@ $SPEC{csvutil} = {
 };
 sub csvutil {
     my %args = @_;
+    #use DD; dd \%args;
 
     my $action = $args{action};
     my $has_header = $args{header} // 1;
@@ -2445,7 +2448,7 @@ App::CSVUtils - CLI utilities related to CSV
 
 =head1 VERSION
 
-This document describes version 0.032 of App::CSVUtils (from Perl distribution App-CSVUtils), released on 2020-08-16.
+This document describes version 0.034 of App::CSVUtils (from Perl distribution App-CSVUtils), released on 2021-07-10.
 
 =head1 DESCRIPTION
 
@@ -2522,7 +2525,7 @@ This distribution contains the following CLI utilities:
 
 Usage:
 
- csv2td(%args) -> [status, msg, payload, meta]
+ csv2td(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Return an enveloped aoaos table data from CSV data.
 
@@ -2581,12 +2584,12 @@ those options is specified, then C<--tsv> will be ignored.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -2596,7 +2599,7 @@ Return value:  (any)
 
 Usage:
 
- csv_add_field(%args) -> [status, msg, payload, meta]
+ csv_add_field(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Add a field to CSV file.
 
@@ -2727,12 +2730,12 @@ those options is specified, then C<--tsv> will be ignored.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -2742,7 +2745,7 @@ Return value:  (any)
 
 Usage:
 
- csv_avg(%args) -> [status, msg, payload, meta]
+ csv_avg(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Output a summary row which are arithmetic averages of data rows.
 
@@ -2847,12 +2850,12 @@ Whether to also output data rows.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -2862,7 +2865,7 @@ Return value:  (any)
 
 Usage:
 
- csv_concat(%args) -> [status, msg, payload, meta]
+ csv_concat(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Concatenate several CSV files together, collecting all the fields.
 
@@ -2993,12 +2996,12 @@ those options is specified, then C<--tsv> will be ignored.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -3008,7 +3011,7 @@ Return value:  (any)
 
 Usage:
 
- csv_convert_to_hash(%args) -> [status, msg, payload, meta]
+ csv_convert_to_hash(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Return a hash of field names as keys and first row as values.
 
@@ -3068,12 +3071,12 @@ those options is specified, then C<--tsv> will be ignored.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -3083,7 +3086,7 @@ Return value:  (any)
 
 Usage:
 
- csv_csv(%args) -> [status, msg, payload, meta]
+ csv_csv(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Convert CSV to CSV.
 
@@ -3191,12 +3194,12 @@ those options is specified, then C<--tsv> will be ignored.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -3206,7 +3209,7 @@ Return value:  (any)
 
 Usage:
 
- csv_delete_field(%args) -> [status, msg, payload, meta]
+ csv_delete_field(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Delete one or more fields from CSV file.
 
@@ -3311,12 +3314,12 @@ those options is specified, then C<--tsv> will be ignored.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -3326,7 +3329,7 @@ Return value:  (any)
 
 Usage:
 
- csv_dump(%args) -> [status, msg, payload, meta]
+ csv_dump(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Dump CSV as data structure (array of arrayE<sol>hash).
 
@@ -3386,12 +3389,12 @@ those options is specified, then C<--tsv> will be ignored.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -3401,7 +3404,7 @@ Return value:  (any)
 
 Usage:
 
- csv_each_row(%args) -> [status, msg, payload, meta]
+ csv_each_row(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Run Perl code for every row.
 
@@ -3481,12 +3484,12 @@ those options is specified, then C<--tsv> will be ignored.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -3496,7 +3499,7 @@ Return value:  (any)
 
 Usage:
 
- csv_grep(%args) -> [status, msg, payload, meta]
+ csv_grep(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Only output row(s) where Perl expression returns true.
 
@@ -3506,7 +3509,7 @@ Examples:
 
 =item * Only show rows where the amount field is divisible by 7:
 
- csv_grep( filename => "file.csv", eval => "\$_->{amount} % 7 ? 1:0", hash => 1);
+ csv_grep(filename => "file.csv", eval => "\$_->{amount} % 7 ? 1:0", hash => 1);
 
 =item * Only show rows where date is a Wednesday:
 
@@ -3633,12 +3636,12 @@ those options is specified, then C<--tsv> will be ignored.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -3648,7 +3651,7 @@ Return value:  (any)
 
 Usage:
 
- csv_info(%args) -> [status, msg, payload, meta]
+ csv_info(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Show information about CSV file (number of rows, fields, etc).
 
@@ -3704,12 +3707,12 @@ those options is specified, then C<--tsv> will be ignored.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -3719,7 +3722,7 @@ Return value:  (any)
 
 Usage:
 
- csv_list_field_names(%args) -> [status, msg, payload, meta]
+ csv_list_field_names(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 List field names of CSV file.
 
@@ -3775,12 +3778,12 @@ those options is specified, then C<--tsv> will be ignored.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -3790,7 +3793,7 @@ Return value:  (any)
 
 Usage:
 
- csv_lookup_fields(%args) -> [status, msg, payload, meta]
+ csv_lookup_fields(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Fill fields of a CSV file from another.
 
@@ -3929,12 +3932,12 @@ those options is specified, then C<--tsv> will be ignored.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -3944,7 +3947,7 @@ Return value:  (any)
 
 Usage:
 
- csv_map(%args) -> [status, msg, payload, meta]
+ csv_map(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Return result of Perl code for every row.
 
@@ -4036,12 +4039,12 @@ those options is specified, then C<--tsv> will be ignored.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -4051,7 +4054,7 @@ Return value:  (any)
 
 Usage:
 
- csv_munge_field(%args) -> [status, msg, payload, meta]
+ csv_munge_field(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Munge a field in every row of CSV file.
 
@@ -4166,12 +4169,12 @@ those options is specified, then C<--tsv> will be ignored.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -4181,7 +4184,7 @@ Return value:  (any)
 
 Usage:
 
- csv_replace_newline(%args) -> [status, msg, payload, meta]
+ csv_replace_newline(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Replace newlines in CSV values.
 
@@ -4290,12 +4293,12 @@ those options is specified, then C<--tsv> will be ignored.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -4305,7 +4308,7 @@ Return value:  (any)
 
 Usage:
 
- csv_select_fields(%args) -> [status, msg, payload, meta]
+ csv_select_fields(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Only output selected field(s).
 
@@ -4414,12 +4417,12 @@ those options is specified, then C<--tsv> will be ignored.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -4429,7 +4432,7 @@ Return value:  (any)
 
 Usage:
 
- csv_select_row(%args) -> [status, msg, payload, meta]
+ csv_select_row(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Only output specified row(s).
 
@@ -4534,12 +4537,12 @@ those options is specified, then C<--tsv> will be ignored.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -4549,7 +4552,7 @@ Return value:  (any)
 
 Usage:
 
- csv_setop(%args) -> [status, msg, payload, meta]
+ csv_setop(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Set operation against several CSV files.
 
@@ -4731,12 +4734,12 @@ those options is specified, then C<--tsv> will be ignored.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -4746,7 +4749,7 @@ Return value:  (any)
 
 Usage:
 
- csv_sort_fields(%args) -> [status, msg, payload, meta]
+ csv_sort_fields(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Sort CSV fields.
 
@@ -4870,12 +4873,12 @@ those options is specified, then C<--tsv> will be ignored.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -4885,7 +4888,7 @@ Return value:  (any)
 
 Usage:
 
- csv_sort_rows(%args) -> [status, msg, payload, meta]
+ csv_sort_rows(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Sort CSV rows.
 
@@ -5110,12 +5113,12 @@ those options is specified, then C<--tsv> will be ignored.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -5125,7 +5128,7 @@ Return value:  (any)
 
 Usage:
 
- csv_split(%args) -> [status, msg, payload, meta]
+ csv_split(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Split CSV file into several files.
 
@@ -5238,12 +5241,12 @@ those options is specified, then C<--tsv> will be ignored.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -5253,7 +5256,7 @@ Return value:  (any)
 
 Usage:
 
- csv_sum(%args) -> [status, msg, payload, meta]
+ csv_sum(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Output a summary row which are arithmetic sums of data rows.
 
@@ -5358,12 +5361,12 @@ Whether to also output data rows.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -5373,7 +5376,7 @@ Return value:  (any)
 
 Usage:
 
- csv_transpose(%args) -> [status, msg, payload, meta]
+ csv_transpose(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Transpose a CSV.
 
@@ -5474,12 +5477,12 @@ those options is specified, then C<--tsv> will be ignored.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -5525,22 +5528,13 @@ L<App::LTSVUtils>
 
 L<App::SerializeUtils>
 
-
-L<csv-select-row>.
-
-L<csvgrep>.
-
-L<setop>.
-
-L<csv-split>.
-
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2018, 2017, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -17,60 +17,19 @@ my $res;
 # Initialization
 ok( my $op = op(), 'OP portal' );
 
-ok( $res = $op->_get('/oauth2/jwks'), 'Get JWKS,     endpoint /oauth2/jwks' );
-expectOK($res);
-my $jwks = $res->[2]->[0];
-
-ok(
-    $res = $op->_get('/.well-known/openid-configuration'),
-    'Get metadata, endpoint /.well-known/openid-configuration'
-);
-expectOK($res);
-my $metadata = $res->[2]->[0];
-
-my $query =
-"response_type=code&scope=openid%20profile%20email&client_id=rpid&state=af0ifjsldkj&redirect_uri=http%3A%2F%2Frp.com%2F";
-
-# Push request to OP
-ok(
-    $res =
-      $op->_get( "/oauth2/authorize", query => $query, accept => 'text/html' ),
-    "Start Authorization Code flow"
-);
-expectOK($res);
-
-# Try to authenticate to OP
-$query = "user=french&password=french&$query";
-ok(
-    $res = $op->_post(
-        "/oauth2/authorize",
-        IO::String->new($query),
-        accept => 'text/html',
-        length => length($query),
-    ),
-    "Post authentication"
-);
-my $idpId = expectCookie($res);
-my ($code) = expectRedirection( $res, qr#http://rp.com/\?.*code=([^&]+)# );
-
-# Get access token
-$query =
-"grant_type=authorization_code&code=$code&redirect_uri=http%3A%2F%2Frp.com%2F";
-
-ok(
-    $res = $op->_post(
-        "/oauth2/token",
-        IO::String->new($query),
-        accept => 'text/html',
-        length => length($query),
-        custom => {
-            HTTP_AUTHORIZATION => "Basic " . encode_base64("rpid:rpsecret"),
-        },
-    ),
-    "Post token"
+my $idpId = login( $op, "french" );
+my $code  = authorize(
+    $op, $idpId,
+    {
+        response_type => "code",
+        scope         => "openid profile email",
+        client_id     => "rpid",
+        state         => "af0ifjsldkj",
+        redirect_uri  => "http://rp.com/"
+    }
 );
 
-my $tokenresp = JSON::from_json( $res->[2]->[0] );
+my $tokenresp = expectJSON( codeGrant( $op, 'rpid', $code, "http://rp.com/" ) );
 ok( my $access_token = $tokenresp->{access_token}, 'Found access token' );
 
 # Get Userinfo
@@ -85,9 +44,9 @@ ok(
     "Post token"
 );
 
-my $userinfo = JSON::from_json( $res->[2]->[0] );
-is( $userinfo->{family_name}, 'Accents', 'Correct macro value' );
-is( $userinfo->{sub}, 'customfrench', 'Sub macro correctly evaluated' );
+my $userinfo = expectJSON( getUserinfo( $op, $access_token ) );
+is( $userinfo->{family_name}, 'Accents',      'Correct macro value' );
+is( $userinfo->{sub},         'customfrench', 'Sub macro correctly evaluated' );
 
 clean_sessions();
 done_testing();
@@ -96,7 +55,7 @@ sub op {
     return LLNG::Manager::Test->new( {
             ini => {
                 logLevel                        => $debug,
-                domain                          => 'idp.com',
+                domain                          => 'op.com',
                 portal                          => 'http://auth.op.com',
                 authentication                  => 'Demo',
                 userDB                          => 'Same',
@@ -109,16 +68,8 @@ sub op {
                         name        => "cn"
                     }
                 },
-                oidcServiceMetaDataAuthorizeURI       => "authorize",
-                oidcServiceMetaDataCheckSessionURI    => "checksession.html",
-                oidcServiceMetaDataJWKSURI            => "jwks",
-                oidcServiceMetaDataEndSessionURI      => "logout",
-                oidcServiceMetaDataRegistrationURI    => "register",
-                oidcServiceMetaDataTokenURI           => "token",
-                oidcServiceMetaDataUserInfoURI        => "userinfo",
                 oidcServiceAllowHybridFlow            => 1,
                 oidcServiceAllowImplicitFlow          => 1,
-                oidcServiceAllowDynamicRegistration   => 1,
                 oidcServiceAllowAuthorizationCodeFlow => 1,
                 oidcRPMetaDataMacros                  => {
                     rp => {
@@ -133,9 +84,10 @@ sub op {
                         oidcRPMetaDataOptionsClientID          => "rpid",
                         oidcRPMetaDataOptionsIDTokenSignAlg    => "HS512",
                         oidcRPMetaDataOptionsBypassConsent     => 1,
-                        oidcRPMetaDataOptionsClientSecret      => "rpsecret",
+                        oidcRPMetaDataOptionsClientSecret      => "rpid",
                         oidcRPMetaDataOptionsUserIDAttr        => "custom_sub",
                         oidcRPMetaDataOptionsAccessTokenExpiration => 3600,
+                        oidcRPMetaDataOptionsRedirectUri           => 3600,
                     }
                 },
                 oidcOPMetaDataOptions           => {},

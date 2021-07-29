@@ -10,7 +10,7 @@ use Path::Class::Dir;
 extends 'AnyEvent::FTP::Server::Context';
 
 # ABSTRACT: FTP Server client context class with full read/write access
-our $VERSION = '0.16'; # VERSION
+our $VERSION = '0.17'; # VERSION
 
 
 with 'AnyEvent::FTP::Server::Role::Auth';
@@ -462,12 +462,12 @@ AnyEvent::FTP::Server::Context::Memory - FTP Server client context class with fu
 
 =head1 VERSION
 
-version 0.16
+version 0.17
 
 =head1 SYNOPSIS
 
  use AnyEvent::FTP::Server;
-
+ 
  my $server = AnyEvent::FTP::Server->new(
    default_context => 'AnyEvent::FTP::Server::Context::Memory',
  );
@@ -571,7 +571,7 @@ José Joaquín Atria
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Graham Ollis.
+This software is copyright (c) 2017-2021 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -34,8 +34,10 @@ You shouldn't make instances of this class. Each attribute should be used as a n
       DryRun  => 1,    # OPTIONAL
       Filters => [
         {
-          Name   => 'MyString',
-          Values => [ 'MyString', ... ],    # OPTIONAL
+          Name   => 'MyString',    # OPTIONAL
+          Values => [
+            'MyString', ...        # OPTIONAL
+          ],    # OPTIONAL
         },
         ...
       ],    # OPTIONAL
@@ -77,7 +79,8 @@ C<availability-zone>: The Availability Zone of the snapshot.
 
 =item *
 
-C<owner-id>: The ID of the AWS account that owns the snapshot.
+C<owner-id>: The ID of the AWS account that enabled fast snapshot
+restore on the snapshot.
 
 =item *
 

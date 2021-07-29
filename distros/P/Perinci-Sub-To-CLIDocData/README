@@ -3,9 +3,9 @@ NAME
     structure convenient for producing CLI documentation (help/usage/POD)
 
 VERSION
-    This document describes version 0.296 of Perinci::Sub::To::CLIDocData
+    This document describes version 0.298 of Perinci::Sub::To::CLIDocData
     (from Perl distribution Perinci-Sub-To-CLIDocData), released on
-    2021-07-08.
+    2021-07-11.
 
 SYNOPSIS
      use Perinci::Sub::To::CLIDocData qw(gen_cli_doc_data_from_meta);
@@ -50,9 +50,9 @@ SYNOPSIS
          200,
          "OK",
          {
-           compact_usage_line => "[[prog]] [options] <str1>",
-           example_categories => { Examples => { order => 99 } },
-           examples => [
+           "compact_usage_line" => "[[prog]] [options] <str1>",
+           "example_categories" => { Examples => { order => 99 } },
+           "examples" => [
              {
                categories   => ["Examples"],
                category     => "Examples",
@@ -66,8 +66,8 @@ SYNOPSIS
                summary      => "Summary for an example",
              },
            ],
-           option_categories => { "Cat1 options" => { order => 50 }, "Main options" => { order => 0 } },
-           opts => {
+           "option_categories" => { "Cat1 options" => { order => 50 }, "Main options" => { order => 0 } },
+           "opts" => {
              "--bool1" => {
                arg         => "bool1",
                arg_spec    => {
@@ -136,14 +136,15 @@ SYNOPSIS
                tags        => 'fix',
              },
            },
-           usage_line => "[[prog]] [--bool1 | -z | --no-bool1 | --nobool1] [--flag1 | -f] -- <str1>",
+           "usage_line" => "[[prog]] [--bool1|-z|--no-bool1|--nobool1] [--flag1|-f] -- <str1>",
+           "usage_line.alt.fmt.pod" => "B<[[prog]]> [B<--bool1>|B<-z>|B<--no-bool1>|B<--nobool1>] [B<--flag1>|B<-f>] -- E<lt>I<str1>E<gt>",
          },
        ];
-       $a->[2]{opts}{"--bool1"}{tags} = $a->[2]{opts}{"--bool1"}{arg_spec}{tags};
-       $a->[2]{opts}{"--flag1, -f"}{tags} = $a->[2]{opts}{"--flag1, -f"}{arg_spec}{tags};
-       $a->[2]{opts}{"-z"}{alias_spec} = $a->[2]{opts}{"--bool1"}{arg_spec}{cmdline_aliases}{z};
-       $a->[2]{opts}{"-z"}{arg_spec} = $a->[2]{opts}{"--bool1"}{arg_spec};
-       $a->[2]{opts}{"-z"}{tags} = $a->[2]{opts}{"--bool1"}{arg_spec}{tags};
+       $a->[2]{"opts"}{"--bool1"}{tags} = $a->[2]{"opts"}{"--bool1"}{arg_spec}{tags};
+       $a->[2]{"opts"}{"--flag1, -f"}{tags} = $a->[2]{"opts"}{"--flag1, -f"}{arg_spec}{tags};
+       $a->[2]{"opts"}{"-z"}{alias_spec} = $a->[2]{"opts"}{"--bool1"}{arg_spec}{cmdline_aliases}{z};
+       $a->[2]{"opts"}{"-z"}{arg_spec} = $a->[2]{"opts"}{"--bool1"}{arg_spec};
+       $a->[2]{"opts"}{"-z"}{tags} = $a->[2]{"opts"}{"--bool1"}{arg_spec}{tags};
        $a;
      }
     For a more complete sample, see function metadata for C<demo_cli_opts> in
@@ -245,7 +246,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2021, 2020, 2019, 2016, 2015, 2014 by
+    This software is copyright (c) 2021, 2019, 2016, 2015, 2014 by
     perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under

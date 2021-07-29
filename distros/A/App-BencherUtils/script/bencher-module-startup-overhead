@@ -1,12 +1,12 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/BencherUtils/bencher_module_startup_overhead
-# and generated automatically using Perinci::CmdLine::Gen version 0.497
+# and generated automatically using Perinci::CmdLine::Gen version 0.499
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-01-20'; # DATE
+our $DATE = '2021-07-23'; # DATE
 our $DIST = 'App-BencherUtils'; # DIST
-our $VERSION = '0.243'; # VERSION
+our $VERSION = '0.244'; # VERSION
 
 use 5.010001;
 use strict;
@@ -41,18 +41,13 @@ bencher-module-startup-overhead - Accept a list of module names and perform star
 
 =head1 VERSION
 
-This document describes version 0.243 of bencher-module-startup-overhead (from Perl distribution App-BencherUtils), released on 2021-01-20.
+This document describes version 0.244 of bencher-module-startup-overhead (from Perl distribution App-BencherUtils), released on 2021-07-23.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % bencher-module-startup-overhead [--config-path=path | -c]
-     [--config-profile=profile | -P] [--debug] [--format=name] [--json]
-     [--log-level=level] [--module=s+] [--modules-json=s] [--(no)naked-res]
-     [--no-config | -C] [--no-env] [--page-result[=program]] [--quiet]
-     [--trace] [--verbose] [--view-result[=program]] [--with-process-size]
-     [--without-process-size] <module> ...
+% B<bencher-module-startup-overhead> [B<--config-path>=I<path>|B<-c>|B<--no-config>|B<-C>] [B<--config-profile>=I<profile>|B<-P>] [B<--debug>|B<--log-level>=I<level>|B<--quiet>|B<--trace>|B<--verbose>] [B<--format>=I<name>|B<--json>] [(B<--module>=I<perl::modargs>)+] [B<--(no)naked-res>] [B<--no-env>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] [B<--with-process-size>|B<--without-process-size>] [B<--modules-json>=I<json>] -- E<lt>I<module>E<gt> ...
 
 =head1 DESCRIPTION
 
@@ -95,11 +90,15 @@ C<*> marks required options.
 
 =item B<--module>=I<s@>*
 
+Can also be specified as the 1st command-line argument and onwards.
+
 Can be specified multiple times.
 
 =item B<--modules-json>=I<s>
 
 See C<--module>.
+
+Can also be specified as the 1st command-line argument and onwards.
 
 =item B<--with-process-size>
 
@@ -268,7 +267,7 @@ You can put multiple profiles in a single file by using section names like C<[pr
 
 You can also put configuration for multiple programs inside a single file, and use filter C<program=NAME> in section names, e.g. C<[program=NAME ...]> or C<[SOMESECTION program=NAME]>. The section will then only be used when the reading program matches.
 
-You can also filter a section by environment variable using the filter C<env=CONDITION> in section names. For example if you only want a section to be read if a certain environment variable is true: C<[env=SOMEVAR ...]> or C<[SOMESECTION env=SOMEVAR ...]>. If you only want a section to be read when the value of an environment variable has value equals something: C<[env=HOSTNAME=blink ...]> or C<[SOMESECTION env=HOSTNAME=blink ...]>. If you only want a section to be read when the value of an environment variable does not equal something: C<[env=HOSTNAME!=blink ...]> or C<[SOMESECTION env=HOSTNAME!=blink ...]>. If you only want a section to be read when an environment variable contains something: C<[env=HOSTNAME*=server ...]> or C<[SOMESECTION env=HOSTNAME*=server ...]>. Note that currently due to simplistic parsing, there must not be any whitespace in the value being compared because it marks the beginning of a new section filter or section name.
+You can also filter a section by environment variable using the filter C<env=CONDITION> in section names. For example if you only want a section to be read if a certain environment variable is true: C<[env=SOMEVAR ...]> or C<[SOMESECTION env=SOMEVAR ...]>. If you only want a section to be read when the value of an environment variable equals some string: C<[env=HOSTNAME=blink ...]> or C<[SOMESECTION env=HOSTNAME=blink ...]>. If you only want a section to be read when the value of an environment variable does not equal some string: C<[env=HOSTNAME!=blink ...]> or C<[SOMESECTION env=HOSTNAME!=blink ...]>. If you only want a section to be read when the value of an environment variable includes some string: C<[env=HOSTNAME*=server ...]> or C<[SOMESECTION env=HOSTNAME*=server ...]>. If you only want a section to be read when the value of an environment variable does not include some string: C<[env=HOSTNAME!*=server ...]> or C<[SOMESECTION env=HOSTNAME!*=server ...]>. Note that currently due to simplistic parsing, there must not be any whitespace in the value being compared because it marks the beginning of a new section filter or section name.
 
 To load and configure plugins, you can use either the C<-plugins> parameter (e.g. C<< -plugins=DumpArgs >> or C<< -plugins=DumpArgs@before_validate_args >>), or use the C<[plugin=NAME ...]> sections, for example:
 
@@ -323,7 +322,7 @@ Source repository is at L<https://github.com/perlancar/perl-App-BencherUtils>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-App-BencherUtils/issues>
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-BencherUtils>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

@@ -1,3 +1,59 @@
+0.011   2021-07-26  Released-By: PERLANCAR; Urgency: medium
+
+	- Update doc in :POD::LinkToSection.
+
+
+0.010   2021-07-26  Released-By: PERLANCAR; Urgency: medium
+
+	- More tests for :POD::LinkToSection.
+
+
+0.009   2021-07-26  Released-By: PERLANCAR; Urgency: medium
+
+	- Add module: :POD::LinkToSection.
+
+	- Mention HTML::Restrict.
+
+
+0.008   2021-07-18  Released-By: PERLANCAR; Urgency: medium
+
+	- Add :MetaCPAN::HTML.
+
+
+0.007   2021-03-26  Released-By: PERLANCAR; Urgency: medium
+
+	- Add module:
+	  Acme/PERLANCAR/Dummy/ModuleFeatures/Declarer_PythonTrove.pm.
+
+
+0.006   2021-02-26  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [build] Rebuild with Dist::Zilla plugin [Module::Features].
+
+
+0.005   2021-02-25  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [build] Rebuild with Pod::Weaver plugin [Module::Features] to render
+          information into POD pages.
+
+
+0.004   2021-02-25  Released-By: PERLANCAR; Urgency: medium
+
+	- Add module: Acme::PERLANCAR::Dummy::ModuleFeatures::Declarer2.
+
+
+0.003   2021-02-23  Released-By: PERLANCAR; Urgency: medium
+
+	- Update to Module::Features 0.1.3.
+
+	- Add Acme::PERLANCAR::Dummy::ModuleFeatures::{Module1,Module1::_ModuleFeatures}, rename
+	  Acme::PERLANCAR::Dummy::ModuleFeatures::{User1,Declarer1}.
+
+
 0.002   2021-02-22  Released-By: PERLANCAR; Urgency: medium
 
 	- Add module: Acme::PERLANCAR::Dummy::ModuleFeatures::User1 for

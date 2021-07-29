@@ -2,7 +2,7 @@ package Myriad::RPC::Client::Implementation::Redis;
 
 use Myriad::Class extends => qw(IO::Async::Notifier);
 
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.010'; # VERSION
 our $AUTHORITY = 'cpan:DERIV'; # AUTHORITY
 
 =encoding utf8
@@ -87,10 +87,9 @@ async method call_rpc($service, $method, %args) {
         await $self->is_started();
 
         my $stream_name = stream_name_from_service($service, $method);
-        await $redis->xadd($stream_name => '*', $request->as_hash->%*);
-
-        $log->tracef('Sent RPC request %s', $request->as_hash);
         $pending_requests->{$message_id} = $pending;
+        await $redis->xadd($stream_name => '*', $request->as_hash->%*);
+        $log->tracef('Sent RPC request %s', $request->as_hash);
 
         # The subscription loop will parse the message for us
         my $message = await Future->wait_any($self->loop->timeout_future(after => $timeout), $pending);

@@ -70,7 +70,7 @@ Simple Message::body (SV* newval = nullptr) {
 
 int Message::http_version (SV* newval = nullptr) {
     if (newval) {
-        THIS->http_version = Simple(newval);
+        THIS->http_version = SvIV(newval);
         XSRETURN_UNDEF;
     }
     RETVAL = THIS->http_version;

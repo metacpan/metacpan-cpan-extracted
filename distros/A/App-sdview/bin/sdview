@@ -9,11 +9,13 @@ use Getopt::Long;
 
 GetOptions(
    'format|f=s' => \my $FORMAT,
+   'output|t=s' => \my $OUTPUT,
 ) or exit 1;
 
 exit App::sdview->new->run(
    shift @ARGV,
    format => $FORMAT,
+   output => $OUTPUT,
 );
 
 =head1 NAME
@@ -60,6 +62,14 @@ for viewing POD out of toplevel scripts whose filename does not indicate a
 language:
 
    $ sdview -f POD bin/sdview
+
+=head2 -t, --output FORMAT
+
+Specifies that a different form of output will be generated, instead of
+rendering formatted output directly to the terminal. Useful for cross-
+converting between file types:
+
+   $ sdview lib/App/sdview.pm -t Markdown > sdview.md
 
 =head1 AUTHOR
 

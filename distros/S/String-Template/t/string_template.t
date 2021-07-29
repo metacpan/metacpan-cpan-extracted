@@ -38,7 +38,7 @@ subtest 'expand_hash' => sub {
   my @TestCases =
   (
       {
-          Hash => 
+          Hash =>
           {
               X => '<Y>',
               Y => 1
@@ -51,7 +51,7 @@ subtest 'expand_hash' => sub {
           Status => 1
       },
       {
-          Hash => 
+          Hash =>
           {
               X => '<Y>',
               Y => '<Z>',
@@ -66,7 +66,7 @@ subtest 'expand_hash' => sub {
           Status => 1
       },
       {
-          Hash => 
+          Hash =>
           {
               X => '<Y>',
               Y => '<Z>',
@@ -79,10 +79,10 @@ subtest 'expand_hash' => sub {
               Z => 1
           },
           Status => undef,
-          MaxDepth => 1   
+          MaxDepth => 1
       },
       {
-          Hash => 
+          Hash =>
           {
               X => '<Y>',
           },

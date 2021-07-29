@@ -125,7 +125,7 @@ then.
 
 6) make
 
-   `make' will first run a perl script called `test.syms' that investigates
+   `make' will first run a program called `test.syms' that investigates
    what the Curses libraries are like on your system and records the
    results in the file "CursesDef.h".
 
@@ -259,7 +259,7 @@ in September 2007.  He gave these notes:
 
   - Test:
 
-       demo, demo2, demo.panel scripts successfully run
+       demo, demo2, demo.panel programs successfully run
 
        > nmake cdemo
        > cdemo

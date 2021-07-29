@@ -51,7 +51,7 @@ I<italic> I<< italic >>
 
 C<code> C<< code->with->arrows >>
 
-L<link|target://>
+L<link|target://> L<Module::Here>
 EOPOD
 
    is( scalar @p, 4, 'Received 4 paragraphs' );
@@ -65,8 +65,11 @@ EOPOD
    is( $p[2]->text, "code code->with->arrows", 'code text' );
    ok( $p[2]->text->get_tag_at( 0, "C" ), 'code tag' );
 
-   is( $p[3]->text, "link", 'link text' );
-   is_deeply( $p[3]->text->get_tag_at( 0, "L" ), { target => "target://" }, 'link tag' );
+   is( $p[3]->text, "link Module::Here", 'link text' );
+   is_deeply( $p[3]->text->get_tag_at( 0, "L" ), { target => "target://" },
+      'link tag' );
+   is_deeply( $p[3]->text->get_tag_at( 5, "L" ), { target => "https://metacpan.org/pod/Module::Here" },
+      'link to metacpan' );
 };
 
 subtest "Verbatim trimming" => sub {

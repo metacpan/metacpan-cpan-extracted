@@ -7,7 +7,6 @@ use Devel::ebug;
 
 my $ebug = Devel::ebug->new;
 $ebug->program("corpus/calc.pl");
-$ebug->backend("$^X bin/ebug_backend_perl");
 $ebug->load;
 
 # Let's step through the program, and check that we get the
@@ -41,7 +40,6 @@ foreach (1..9) {
 
 $ebug = Devel::ebug->new;
 $ebug->program("corpus/stack.pl");
-$ebug->backend("$^X bin/ebug_backend_perl");
 $ebug->load;
 $ebug->break_point(22);
 

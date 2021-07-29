@@ -1,6 +1,6 @@
 package DNS::Oterica::RecordMaker::TinyDNS;
 # ABSTRACT: a tinydns recordmaker for DNSO.
-$DNS::Oterica::RecordMaker::TinyDNS::VERSION = '0.312';
+$DNS::Oterica::RecordMaker::TinyDNS::VERSION = '0.313';
 use Moose;
 
 #pod =head1 DESCRIPTION
@@ -430,7 +430,7 @@ DNS::Oterica::RecordMaker::TinyDNS - a tinydns recordmaker for DNSO.
 
 =head1 VERSION
 
-version 0.312
+version 0.313
 
 =head1 DESCRIPTION
 

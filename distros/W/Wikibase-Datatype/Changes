@@ -1,3 +1,15 @@
+0.10 2021-07-17T15:11:15+02:00
+ - Add test for Wikibase::Datatype::Value::Monolingual with utf8 text.
+ - Improve doc for Snak.
+
+0.09 2021-07-13T14:06:21+02:00
+ - Add check_language() helper for check ISO 639-1 language code.
+ - Add check for ISO 639-1 language code to
+   Wikibase::Datatype::Value::Monolingual.
+ - Fix doc for Snak 'datavalue' parameter.
+ - Fix sentences in doc of Wikibase::Datatype::Utils.
+ - Fix usage of Error::Pure::err in Value/* classes.
+
 0.08 2021-01-26T21:24:31+01:00
  - Rewrite example in doc for Mediainfo to some real.
  - Rewrite exmaple in doc for MediainfoSnak to some real.

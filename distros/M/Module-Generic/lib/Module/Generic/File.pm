@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/File.pm
-## Version v0.1.2
+## Version v0.1.3
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/05/20
-## Modified 2021/06/26
+## Modified 2021/06/29
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -39,7 +39,7 @@ BEGIN
         bool     => sub () { 1 },
         fallback => 1,
     );
-    our $VERSION = 'v0.1.2';
+    our $VERSION = 'v0.1.3';
     ## https://en.wikipedia.org/wiki/Path_(computing)
     ## perlport
     our $OS2SEP  =
@@ -872,8 +872,29 @@ sub extension
     my $self = shift( @_ );
     return( '' ) if( $self->is_dir );
     my $file = $self->filepath;
-    my $ext = ( $file =~ /\.(\w+)$/ )[0] || '';
-    return( $self->new_scalar( $ext ) );
+    if( @_ )
+    {
+        my $new = shift( @_ ); # It could be empty if the user wanted to remove the extension
+        $new //= '';
+        if( CORE::length( $new ) )
+        {
+            $file =~ s/\.(\w+)$/\.${new}/;
+        }
+        else
+        {
+            $file =~ s/\.(\w+)$//;
+        }
+        return( $self->new( $file,
+            debug     => $self->debug,
+            base_dir  => $self->base_dir,
+            base_file => $self->base_file,
+        ) );
+    }
+    else
+    {
+        my $ext = ( $file =~ /\.(\w+)$/ )[0] || '';
+        return( $self->new_scalar( $ext ) );
+    }
 }
 
 sub file
@@ -958,6 +979,7 @@ sub filename
         
         # If we provide a string for the abs() method it works on Unix, but not on Windows
         # By providing an object, we make it work
+        $self->message( 3, "Is file '$newfile' absolute?" );
         unless( File::Spec->file_name_is_absolute( $newfile ) )
         {
             $newfile = URI::file->new( $newfile )->abs( URI::file->new( $base_dir ) )->file( $^O );
@@ -1084,6 +1106,8 @@ sub flatten
     return( $self->new( $self->collapse_dots( "$path", { separator => $DIR_SEP } )->file( $^O ) ) );
 }
 
+sub fragments { return( shift->split( remove_leading_sep => 1 ) ); }
+
 sub gobble { return( shift->load( @_ ) ); }
 
 sub gush { return( shift->unload( @_ ) ); }
@@ -1185,6 +1209,28 @@ sub iterator
     };
     $crawl->( $self );
     return( $self );
+}
+
+sub join
+{
+    my $self = &_function2method( \@_ ) || return( __PACKAGE__->pass_error );
+    my $frags = $self->_get_args_as_array( @_ );
+    for( my $i = 0; $i < scalar( @$frags ); $i++ )
+    {
+        if( ref( $frags->[$i] ) && 
+            $self->_is_a( $frags->[$i], 'Module::Generic::File' ) )
+        {
+            my $elems = $frags->[$i]->split;
+            CORE::splice( @$frags, $i, 1, @$elems );
+            $i += ( scalar( @$elems ) - 1 );
+        } 
+    }
+    # For Windows OS
+    my $vol = $self->volume;
+    my $base = pop( @$frags );
+    my $dirs = File::Spec->catdir( @$frags );
+    my $new = File::Spec->catpath( $vol, $dirs, $base );
+    return( $self->new( $new, debug => $self->debug ) );
 }
 
 sub length
@@ -1477,6 +1523,7 @@ sub open
                 else
                 {
                     $self->message( 3, "Setting binmode to '$opts->{binmode}'." );
+                    $opts->{binmode} = 'encoding(utf-8)' if( lc( $opts->{binmode} ) eq 'utf-8' );
                     $opts->{binmode} =~ s/^\://g;
                     $io->binmode( ":$opts->{binmode}" ) || return( $self->error( "Unable to set binmode to \"$opts->{binmode}\" for file \"$file\": $!" ) );
                 }
@@ -1983,6 +2030,23 @@ sub spew { return( shift->unload( @_ ) ); }
 
 sub spew_utf8 { return( shift->unload_utf8( @_ ) ); }
 
+sub split
+{
+    my $self = shift( @_ );
+    my $opts = $self->_get_args_as_hash( @_ );
+    # e.g. /some/where/my/file.txt
+    my $file = $self->filename;
+    $opts->{remove_leading_sep} //= 0;
+    my( $vol, $path, $base ) = File::Spec->splitpath( $file );
+    $self->message( 3, "Path is '$path'" );
+    # /some/where/my/
+    my $frags = [File::Spec->splitdir( $path )];
+    pop( @$frags ) if( scalar( @$frags ) > 1 && !CORE::length( $frags->[-1] ) );
+    shift( @$frags ) if( scalar( @$frags ) > 1 && !CORE::length( $frags->[0] ) && $opts->{remove_leading_sep} );
+    push( @$frags, $base );
+    return( $self->new_array( $frags ) );
+}
+
 sub stat { return( shift->finfo ); }
 
 sub symlink
@@ -2038,6 +2102,15 @@ sub tempfile
     $opts->{auto_remove} = 0 unless( CORE::exists( $opts->{auto_remove} ) );
     my $uuid = Data::UUID->new;
     my $fname = $uuid->create_str;
+    if( CORE::exists( $opts->{extension} ) && !CORE::exists( $opts->{suffix} ) )
+    {
+        $opts->{suffix} = CORE::delete( $opts->{extension} );
+    }
+    elsif( CORE::exists( $opts->{ext} ) && !CORE::exists( $opts->{suffix} ) )
+    {
+        $opts->{suffix} = CORE::delete( $opts->{ext} );
+    }
+    
     $fname .= $opts->{suffix} if( CORE::defined( $opts->{suffix} ) && CORE::length( $opts->{suffix} ) && $opts->{suffix} =~ /^\.[\w\-]+$/ );
     $self->message( 3, "Filename generated is '$fname'" );
     my $dir;
@@ -2681,7 +2754,7 @@ Module::Generic::File - File Object Abstraction Class
 
 =head1 VERSION
 
-    v0.1.2
+    v0.1.3
 
 =head1 DESCRIPTION
 
@@ -2788,7 +2861,11 @@ This methods accepts as an optional parameter a list or an array reference of po
 
 This returns the file base name as a L<Module::Generic::Scalar> object.
 
-You can provide optionally a list or array reference of possible extensions.
+You can provide optionally a list or array reference of possible extensions or regular expressions.
+
+    my $f = Module::Generic::File->new( "/some/where/my/file.txt" );
+    my $base = $f->basename( [qw( .zip .txt .pl )] ); # returns "file"
+    my $base = $f->basename( qr/\.(.*?)$/ ); # returns "file"
 
 =head2 binmode
 
@@ -2901,6 +2978,10 @@ It returns a new L<Module::Generic::File> object representing the new file path.
 
 Note that you can also use the shortcut C<cp> instead of C<copy>
 
+=head2 cp
+
+Shorthand for L</copy>
+
 =head2 cwd
 
 Returns a new L<Module::Generic::File> object representing the current working directory.
@@ -2939,9 +3020,15 @@ This uses L<Module::Generic::Finfo/exists>
 
 =head2 extension
 
-Returns the current file extension as a L<Module::Generic::Scalar> object if it is a regular file, or an empty string if it is a directory.
+if an argument is provided, and is undefined or zero byte in length, this will remove the extension characterised with the following pattern C<qr/\.(\w+)$/>. otherwise, if a non-empty value was provided, it will substitute any previous value for the new one and return a new L<Module::Generic::File> object.
+
+If no argument is provided, this simply returns the current file extension as a L<Module::Generic::Scalar> object if it is a regular file, or an empty string if it is a directory.
 
 Extension is simply defined with the regular expression C<\.(\w+)$>
+
+    my $f = file( "/some/where/file.txt" );
+    my $new = $f->extension( 'pl' ); # /some/where/file.pl
+    my $new = $f->extension( undef() ); # /some/where/file
 
 =head2 filehandle
 
@@ -2992,6 +3079,15 @@ It returns undef and sets an exception object if an error occurred.
 This will resolve the file/directory path and remove the possible dots in its path.
 
 It will return a new object, or undef and set an exception object if an error occurred.
+
+=head2 fragments
+
+Returns an array object (L<Module::Generic::Array>) of path fragments. For example:
+
+Assuming the file object is: /some/where/in/time.txt
+
+    my $frags = $f->fragments;
+    # Returns: ['some', 'where', 'in', 'time.txt'];
 
 =head2 gobble
 
@@ -3072,6 +3168,18 @@ If true, the symbolic link will be resolved and followed.
 =back
 
 The returned value from the callback is ignored.
+
+=head2 join
+
+Takes a list or an array reference of path fragments and this returns a new L<Module::Generic::File> object.
+
+It does not use nor affect the current object used and it can actually be called as a class method. For example:
+
+    my $f = Module::Generic::File->join( qw( this is here.txt ) );
+    # Returning a file object for /this/is/here.txt or maybe on Windows C:\\this\is\here.txt
+    my $f = Module::Generic::File->join( [qw( this is here.txt )] ); # works too
+    my $f2 = $f->join( [qw( new path please )] ); # works using an existing object
+    # Returns: /new/path/please
 
 =head2 length
 
@@ -3192,6 +3300,10 @@ This behaves exactly like L</copy> except it moves the element instead of copyin
 
 Note that you can use C<mv> as a method shortcut instead.
 
+=head2 mv
+
+Shorthand for L</move>
+
 =head2 open
 
 This takes an optional mode or defaults to E<lt>
@@ -3310,6 +3422,14 @@ This will call L<perlfunc/rewind> on the file handle.
 
 This will call L<IO::Dir/rewinddir> on the directory file handle.
 
+=head2 rmdir
+
+Removes the directory represented by ths object. It silently ignores and return the current object if it is called ona a file object.
+
+If the directory is not empty, this will set an error and return undef.
+
+If all goes well, it returns the value returned by L<perlfunc/rmdir>
+
 =head2 root_dir
 
 This returns an object representation of the system root directory.
@@ -3363,6 +3483,19 @@ This is an alias for L</unload>
 =head2 spew_utf8
 
 This is an alias for L</unload_utf8>
+
+=head2 split
+
+This does the reverse of L</join> and will return an array object (L<Module::Generic::Array>) representing the path fragments of the underlying object file or directory. For example:
+
+    # $f is /some/where/in/time.txt
+    my $frags = $f->split;
+    # Returns ['', 'some', 'where', 'in', 'time.txt']
+
+It can take an optional hash or hash reference of parameters. The only one currently supported is I<remove_leading_sep>, which, if true, will skip the first entry of the array:
+
+    my $frags = $f->split( remove_leading_sep => 1 );
+    # Returns ['some', 'where', 'in', 'time.txt']
 
 =head2 stat
 

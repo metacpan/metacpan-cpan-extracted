@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package DNS::Oterica::RecordMaker::Diagnostic;
 # ABSTRACT: a collector of record generation requests, for testing
-$DNS::Oterica::RecordMaker::Diagnostic::VERSION = '0.312';
+$DNS::Oterica::RecordMaker::Diagnostic::VERSION = '0.313';
 use Sub::Install;
 
 #pod =head1 DESCRIPTION
@@ -54,7 +54,7 @@ DNS::Oterica::RecordMaker::Diagnostic - a collector of record generation request
 
 =head1 VERSION
 
-version 0.312
+version 0.313
 
 =head1 DESCRIPTION
 

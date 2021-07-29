@@ -28,9 +28,9 @@ You shouldn't make instances of this class. Each attribute should be used as a n
 =head1 SYNOPSIS
 
     my $autoscaling = Paws->service('AutoScaling');
-    # To resume Auto Scaling processes
-    # This example resumes the specified suspended scaling process for the
-    # specified Auto Scaling group.
+# To resume Auto Scaling processes
+# This example resumes the specified suspended scaling process for the specified
+# Auto Scaling group.
     $autoscaling->ResumeProcesses(
       'AutoScalingGroupName' => 'my-auto-scaling-group',
       'ScalingProcesses'     => ['AlarmNotification']
@@ -51,8 +51,7 @@ The name of the Auto Scaling group.
 
 =head2 ScalingProcesses => ArrayRef[Str|Undef]
 
-One or more of the following processes. If you omit this parameter, all
-processes are specified.
+One or more of the following processes:
 
 =over
 
@@ -66,15 +65,7 @@ C<Terminate>
 
 =item *
 
-C<HealthCheck>
-
-=item *
-
-C<ReplaceUnhealthy>
-
-=item *
-
-C<AZRebalance>
+C<AddToLoadBalancer>
 
 =item *
 
@@ -82,14 +73,27 @@ C<AlarmNotification>
 
 =item *
 
-C<ScheduledActions>
+C<AZRebalance>
 
 =item *
 
-C<AddToLoadBalancer>
+C<HealthCheck>
+
+=item *
+
+C<InstanceRefresh>
+
+=item *
+
+C<ReplaceUnhealthy>
+
+=item *
+
+C<ScheduledActions>
 
 =back
 
+If you omit this parameter, all processes are specified.
 
 
 

@@ -4,6 +4,11 @@
 
     satpass2> formatter format eg/tle_celestia.tt
 
+    or,
+
+    satpass2> formatter template tle_celestia <eg/tle_celestia.tt
+    satpass2> tle -celestia
+
     -%]
 [% UNLESS data %]
     [%- SET data = sp.tle( arg ) %]

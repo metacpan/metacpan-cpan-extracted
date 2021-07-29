@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+Simple.xs
+t/Graphite-Simple.t
+lib/Graphite/Simple.pm

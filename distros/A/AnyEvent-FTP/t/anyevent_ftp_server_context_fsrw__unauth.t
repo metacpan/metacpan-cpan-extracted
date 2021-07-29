@@ -6,7 +6,7 @@ use Test::AnyEventFTPServer;
 my $t = create_ftpserver_ok('FSRW');
 $t->auto_login(0);
 
-my @cmd = qw( CWD CDUP PWD SIZE MKD RMD DELE RNFR RNTO STAT PASV PORT REST RETR NLST LIST STOR 
+my @cmd = qw( CWD CDUP PWD SIZE MKD RMD DELE RNFR RNTO STAT PASV PORT REST RETR NLST LIST STOR
 APPE STOU ALLO NOOP SYST TYPE );
 
 foreach my $cmd (@cmd)

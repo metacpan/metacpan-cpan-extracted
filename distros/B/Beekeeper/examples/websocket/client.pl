@@ -6,9 +6,9 @@ use warnings;
 BEGIN { unshift @INC, ($ENV{'PERL5LIB'} =~ m/([^:]+)/g); }
 
 
-use MyApp::Calculator;
+use MyApp::Service::Calculator;
 
-my $calc = MyApp::Calculator->new;
+my $calc = MyApp::Service::Calculator->new;
 
 print "> ";
 

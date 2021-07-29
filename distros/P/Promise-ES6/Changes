@@ -1,6 +1,10 @@
 Revision history for Perl module Promise::ES6
 
-0.23 Wed 15 July 2020
+0.24 Fri 16 Jul 2021
+- Added EXPERIMENTAL async/await support via Future::AsyncAwait.
+- Fix tests under Devel::Cover.
+
+0.23 Wed 15 Jul 2020
 - Undefined or missing rejection values now trigger a warning.
 
 0.22 Sun 19 Apr 2020

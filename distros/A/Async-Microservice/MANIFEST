@@ -2,11 +2,15 @@ bin/async-microservice-helloworld.psgi
 bin/async-microservice-time.psgi
 bin/run-async-microservice-time
 Build.PL
+Changes
 lib/Async/Microservice.pm
 lib/Async/Microservice/HelloWorld.pm
 lib/Async/Microservice/Time.pm
 lib/Async/MicroserviceReq.pm
 MANIFEST			This list of files
+META.json
+META.yml
+README
 root/static/asmi-helloworld_openapi.yaml
 root/static/async-microservice-time_openapi.yaml
 root/static/edit.html
@@ -16,5 +20,3 @@ t/01_Async-Microservice.t
 t/02_Async-Microservice-Time.t
 t/tlib/Test/Async/Microservice/HelloWorld.pm
 t/tlib/Test/Async/Microservice/Time.pm
-META.yml
-META.json

@@ -1,3 +1,6 @@
+0.13 2021-07-26
+-Fix a spurious warning being raised on trailing spaces in hexadecimal numbers (thanks jjatria)
+
 0.12 2021-05-28
 -Fix bug causing to_toml to incorrectly dereference \1 and \0 (thanks oschwald)
 

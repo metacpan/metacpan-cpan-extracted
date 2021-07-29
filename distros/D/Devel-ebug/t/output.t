@@ -7,7 +7,6 @@ use Devel::ebug;
 
 my $ebug = Devel::ebug->new;
 $ebug->program("corpus/carp.pl");
-$ebug->backend("$^X bin/ebug_backend_perl");
 $ebug->load;
 
 is($ebug->line, 6);

@@ -29,9 +29,9 @@ requires:
   Complete::Util: '0.608'
   Data::Clean::ForJSON: '0'
   Data::Clone: '0'
-  Data::Dmp: '0.240'
+  Data::Dmp: '0.241'
   Data::Dump: '0'
-  Data::TableData::Object::aohos: '0'
+  Data::TableData::Object::aohos: '0.112'
   Devel::Platform::Info: '0'
   Devel::Size: '0'
   Exporter: '5.57'
@@ -43,6 +43,7 @@ requires:
   JSON::MaybeXS: '0'
   List::MoreUtils: '0'
   List::Util: '1.45'
+  List::Util::Uniq: '0.003'
   Log::ger: '0.038'
   Math::ScientificNotation::Util: '0'
   Module::Load: '0'
@@ -50,15 +51,16 @@ requires:
   Module::XSOrPP: '0'
   PERLANCAR::Module::List: '0.004004'
   POSIX: '0'
-  Package::Abbreviate: '0'
-  Perinci::Result::Format::Lite: '0.277'
+  Perinci::Result::Format::Lite: '0.280'
   Permute::Named::Iter: '0'
   Proc::ChildError: '0'
   Role::Tiny: '0'
   Role::Tiny::With: '0'
   Scalar::Util: '0'
+  Sort::BySpec: '0.03'
   String::ShellQuote: '0'
   Sys::Info: '0'
+  Text::Table::More: '0'
   Time::HiRes: '0'
   experimental: '0'
   parent: '0'
@@ -69,7 +71,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Bencher-Backend
   homepage: https://metacpan.org/release/Bencher-Backend
   repository: git://github.com/perlancar/perl-Bencher-Backend.git
-version: '1.053'
+version: '1.057'
 x_Dist_Zilla:
   perl:
     version: '5.030002'
@@ -149,7 +151,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::BeforeBuild
       name: '@Filter/PERLANCAR::BeforeBuild'
-      version: '0.603'
+      version: '0.604'
     -
       class: Dist::Zilla::Plugin::Rinci::AbstractFromMeta
       name: '@Filter/Rinci::AbstractFromMeta'
@@ -165,7 +167,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::MetaResources
       name: '@Filter/PERLANCAR::MetaResources'
-      version: '0.040'
+      version: '0.043'
     -
       class: Dist::Zilla::Plugin::CheckChangeLog
       name: '@Filter/CheckChangeLog'
@@ -185,6 +187,17 @@ x_Dist_Zilla:
           version: '0.006'
       name: '@Filter/CheckSelfDependency'
       version: '0.011'
+    -
+      class: Dist::Zilla::Plugin::Git::Contributors
+      config:
+        Dist::Zilla::Plugin::Git::Contributors:
+          git_version: 2.17.1
+          include_authors: 0
+          include_releaser: 1
+          order_by: name
+          paths: []
+      name: '@Filter/Git::Contributors'
+      version: '0.036'
     -
       class: Dist::Zilla::Plugin::CopyrightYearFromGit
       name: '@Filter/CopyrightYearFromGit'
@@ -306,6 +319,10 @@ x_Dist_Zilla:
               name: '@Author::PERLANCAR/Authors'
               version: '4.015'
             -
+              class: Pod::Weaver::Section::Contributors
+              name: '@Author::PERLANCAR/Contributors'
+              version: '0.009'
+            -
               class: Pod::Weaver::Section::Legal
               name: '@Author::PERLANCAR/Legal'
               version: '4.015'
@@ -332,7 +349,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::Sah::Schemas
               name: -Sah::Schemas
-              version: '0.063'
+              version: '0.067'
       name: '@Filter/PodWeaver'
       version: '4.008'
     -
@@ -406,7 +423,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Prereqs::CheckCircular
       name: '@Filter/Prereqs::CheckCircular'
-      version: '0.006'
+      version: '0.007'
     -
       class: Dist::Zilla::Plugin::UploadToCPAN::WWWPAUSESimple
       name: '@Filter/UploadToCPAN::WWWPAUSESimple'

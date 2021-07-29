@@ -1,0 +1,12 @@
+diff -urN Math-BigRat-0.2614.orig/lib/Math/BigRat.pm Math-BigRat-0.2614/lib/Math/BigRat.pm
+--- Math-BigRat-0.2614.orig/lib/Math/BigRat.pm	2018-03-22 20:32:02.000000000 +0100
++++ Math-BigRat-0.2614/lib/Math/BigRat.pm	2018-04-20 12:49:00.000000000 +0200
+@@ -2513,7 +2513,7 @@
+ In scalar context, divides $x by $y and returns the result. In list context,
+ does floored division (F-division), returning an integer $q and a remainder $r
+ so that $x = $q * $y + $r. The remainer (modulo) is equal to what is returned
+-by C<$x->bmod($y)>.
++by C<< $x->bmod($y) >>.
+ 
+ =item bdec()
+ 

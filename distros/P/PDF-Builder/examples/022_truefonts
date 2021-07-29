@@ -250,7 +250,7 @@ foreach my $fn (@ARGV) {
     $tx->transform(-translate => [50, 800]);
     $tx->fillcolor('black');
     $tx->font($font, 18);
-    $tx->lead(18*1.25);
+    $tx->leading(18*1.25);
     my $toprint;
     while ($textL ne '') {
     	($toprint, $textL) = $tx->_text_fill_line($textL, 500, 0);

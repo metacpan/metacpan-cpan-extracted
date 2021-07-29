@@ -3,7 +3,7 @@ package Text::Column::Util;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2021-03-02'; # DATE
 our $DIST = 'Text-Column-Util'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 use 5.010001;
 use strict;
@@ -23,7 +23,7 @@ their results side by side. It can handle ANSI color codes and wide Unicode
 characters.
 
 As alternatives to this module, you can also use modules that generate text
-table. This module provides some convenience like:
+table, like <pm:Text::Table::More>. This module provides some conveniences like:
 
 - finding out terminal width and setting column widths equally per each command;
 - option to clip long output;
@@ -187,7 +187,7 @@ Text::Column::Util - Utilities for displaying text in multiple columns
 
 =head1 VERSION
 
-This document describes version 0.004 of Text::Column::Util (from Perl distribution Text-Column-Util), released on 2021-03-02.
+This document describes version 0.005 of Text::Column::Util (from Perl distribution Text-Column-Util), released on 2021-03-02.
 
 =head1 DESCRIPTION
 
@@ -198,7 +198,7 @@ their results side by side. It can handle ANSI color codes and wide Unicode
 characters.
 
 As alternatives to this module, you can also use modules that generate text
-table. This module provides some convenience like:
+table, like L<Text::Table::More>. This module provides some conveniences like:
 
 =over
 
@@ -282,6 +282,10 @@ Please report any bugs or feature requests on the bugtracker website L<https://g
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
+
+=head1 SEE ALSO
+
+L<Text::Table::More>
 
 =head1 AUTHOR
 

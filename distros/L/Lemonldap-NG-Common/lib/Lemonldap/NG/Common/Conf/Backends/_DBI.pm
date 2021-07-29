@@ -5,7 +5,7 @@ use utf8;
 use DBI;
 use Lemonldap::NG::Common::Conf::Constants;    #inherits
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.12';
 our @ISA     = qw(Lemonldap::NG::Common::Conf::Constants);
 our ( @EXPORT, %EXPORT_TAGS );
 
@@ -36,8 +36,8 @@ sub available {
     my $sth =
       $self->_dbh->prepare( "SELECT DISTINCT cfgNum from "
           . $self->{dbiTable}
-          . " order by cfgNum" );
-    $sth->execute();
+          . " order by cfgNum" ) or $self->logError;
+    $sth->execute() or $self->logError;
     my @conf;
     while ( my @row = $sth->fetchrow_array ) {
         push @conf, $row[0];
@@ -105,8 +105,9 @@ sub unlock {
 sub delete {
     my ( $self, $cfgNum ) = @_;
     my $req =
-      $self->_dbh->prepare("DELETE FROM $self->{dbiTable} WHERE cfgNum=?");
-    my $res = $req->execute($cfgNum);
+      $self->_dbh->prepare("DELETE FROM $self->{dbiTable} WHERE cfgNum=?")
+        or $self->logError;
+    my $res = $req->execute($cfgNum) or $self->logError;
     $Lemonldap::NG::Common::Conf::msg .=
       "Unable to find conf $cfgNum (" . $self->_dbh->errstr . ")"
       unless ($res);
@@ -116,8 +117,7 @@ sub delete {
 sub logError {
     my $self = shift;
     $Lemonldap::NG::Common::Conf::msg .=
-      "Database error: " . $self->_dbh->errstr . "\n";
+      "Database error: " . $DBI::errstr . "\n";
 }
 
 1;
-__END__

@@ -1,0 +1,84 @@
+{
+   "abstract" : "Parse cpmfile",
+   "author" : [
+      "Shoichi Kaji <skaji@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Milla version v1.0.20, Dist::Zilla version 6.023, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Module-cpmfile",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "share",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.034"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Milla" : "v1.0.20",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CPAN::Meta::Prereqs" : "0",
+            "CPAN::Meta::Requirements" : "2.130",
+            "Exporter" : "5.57",
+            "YAML::PP" : "0.027",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Module::CPANfile" : "0",
+            "Test2::V0" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Module::cpmfile" : {
+         "file" : "lib/Module/cpmfile.pm",
+         "version" : "0.001"
+      },
+      "Module::cpmfile::Prereqs" : {
+         "file" : "lib/Module/cpmfile/Prereqs.pm"
+      },
+      "Module::cpmfile::Util" : {
+         "file" : "lib/Module/cpmfile/Util.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/skaji/cpmfile/issues"
+      },
+      "homepage" : "https://github.com/skaji/cpmfile",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/skaji/cpmfile.git",
+         "web" : "https://github.com/skaji/cpmfile"
+      }
+   },
+   "version" : "0.001",
+   "x_generated_by_perl" : "v5.34.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.26",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
+   "x_static_install" : 1
+}
+

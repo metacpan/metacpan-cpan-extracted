@@ -1,5 +1,4 @@
 # This file is generated. Do not edit!
 package EB::Version;
-our $VERSION = "2.030.1";
-print "$VERSION
-" unless caller;
+our $VERSION = "2.051";
+print "$VERSION\n" unless caller;

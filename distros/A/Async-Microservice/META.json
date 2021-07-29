@@ -4,7 +4,7 @@
       "Jozef Kutej <jkutej@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4214",
+   "generated_by" : "Module::Build version 0.4229",
    "keywords" : [
       "async",
       "asynchronous",
@@ -18,7 +18,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Async-Microservice",
    "prereqs" : {
@@ -38,8 +38,10 @@
       "runtime" : {
          "requires" : {
             "AnyEvent" : "0",
+            "AnyEvent::Future" : "0",
             "AnyEvent::IO" : "0",
             "DateTime" : "0",
+            "Future::AsyncAwait" : "0",
             "JSON::XS" : "0",
             "Moose" : "0",
             "MooseX::Types::Path::Class" : "0",
@@ -59,7 +61,7 @@
    "provides" : {
       "Async::Microservice" : {
          "file" : "lib/Async/Microservice.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       },
       "Async::Microservice::HelloWorld" : {
          "file" : "lib/Async/Microservice/HelloWorld.pm"
@@ -84,6 +86,6 @@
          "url" : "https://github.com/meon/Async-Microservice.git"
       }
    },
-   "version" : "0.01",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

@@ -236,6 +236,7 @@ my @CC_DEFINE = (
 #	'-DSQLITE_ENABLE_STAT4',            # for sqlite >= 3.8.3.1
 	'-DSQLITE_ENABLE_JSON1',            # for sqlite >= 3.9.0
 	'-DSQLITE_ENABLE_FTS5',             # for sqlite >= 3.9.0
+	'-DSQLITE_ENABLE_MATH_FUNCTIONS',   # for sqlite >= 3.35.0
 	'-DNDEBUG=1',
 );
 
@@ -261,7 +262,7 @@ if ( $^O eq 'cygwin') {
 if ( $Config{d_usleep} || $Config{osname} =~ m/linux/ ) {
 	push @CC_DEFINE, '-DHAVE_USLEEP=1';
 }
-unless ( $Config{usethreads} ) {
+if ( !$Config{usethreads} and $Config{libs} !~ /pthread/ ) {
 	push @CC_DEFINE, '-DTHREADSAFE=0';
 }
 if ($^O eq 'hpux' and $Config{osvers} <= 10.20) {
@@ -288,6 +289,12 @@ if ($^O =~ /bsd/i && $^O !~ /(?:open|net)bsd/) {
 }
 
 my (@CCFLAGS, @LDFLAGS, @LDDLFLAGS);
+
+if ($ENV{TEST_DBD_SQLITE_WITH_ASAN}) {
+    push @CCFLAGS, '-fsanitize=address -static-libasan -fuse-ld=gold -fno-omit-frame-pointer -g -O2';
+    push @LDFLAGS, '-fsanitize=address -static-libasan -fuse-ld=gold -fno-omit-frame-pointer -g -O2';
+    push @LDDLFLAGS, '-fsanitize=address -static-libasan -fuse-ld=gold -fno-omit-frame-pointer -g -O2';
+}
 
 # RT #70135: See if ld supports Bsymbolic; 
 unless ($^O eq 'MSWin32' && $Config{ld} =~ /link/) {
@@ -393,6 +400,9 @@ WriteMakefile(
 		? '$(O_FILES)'
 		: 'SQLite.o dbdimp.o'
 	),
+	depend           => {
+        	'dbdimp.o' => 'dbdimp_tokenizer.inc dbdimp_virtual_table.inc',
+	},
 	clean            => {
 		FILES => 'SQLite.xsi config.h tv.log *.old',
 	},

@@ -48,6 +48,7 @@ t/01-select-backend-implementation.t
 t/02-chrome-devtools-tab.t
 t/03-listener-leak-test.t
 t/47-mech-simplest.t
+t/49-existing-port.t
 t/49-launch.t
 t/49-mech-get-file-lc-ct.html
 t/49-mech-get-file.html
@@ -92,6 +93,7 @@ t/51-mech-submit.html
 t/51-mech-submit.t
 t/52-frameset.html
 t/52-iframeset.html
+t/52-mech-logfh.t
 t/52-nested-frameset.html
 t/52-secondary-subframe.html
 t/52-subframe.html

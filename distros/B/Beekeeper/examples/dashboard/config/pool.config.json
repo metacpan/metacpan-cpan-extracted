@@ -1,0 +1,29 @@
+# This file is in relaxed JSON format (it allows comments and trailing commas).
+#
+# All worker pools running on this host must be defined here, specifying 
+# which logical bus should be used and which services it will run. In this
+# example only one worker pool (named "myapp") is defined.
+#
+# Each pool definition must contain the following parameters:
+#
+#  - pool_id : arbitrary identifier of worker pool
+#  - bus_id  : identifier of logical bus used by worker processes
+#  - workers : a map of worker classes and its config hashes
+#
+# To start the worker pool use the "bkpr" command:
+#
+# $ bkpr --pool "myapp" start
+
+[
+    {
+        "pool_id"     : "myapp",
+        "bus_id"      : "backend-1",
+        "description" : "pool of MyApp workers",
+
+        "workers" : {
+            "Beekeeper::Service::LogTail::Worker"   : { "worker_count" : 1 },
+            "Beekeeper::Service::Router::Worker"    : { "worker_count" : 2 },
+            "Beekeeper::Service::Dashboard::Worker" : { "worker_count" : 1 },
+        },
+    },
+]

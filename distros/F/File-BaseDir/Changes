@@ -1,4 +1,9 @@
-Revision history for Perl extension File::BaseDir.
+Revision history for File-BaseDir
+
+0.09      2021-07-08 14:04:14 -0600
+ - Tests can now be run in parallel or isolation safely (rt#199256)
+ - Fallback on getpwuid if environment variable not set (rt#127138)
+ - Test suite works with or without environment variables (rt#127138)
 
 0.08 13 Mar 2018
     Fix for failing test in 03_userdirs.t, thanks to Pierre Labastie

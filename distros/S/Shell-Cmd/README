@@ -22,7 +22,7 @@ DESCRIPTION
 
     This module is designed to take a list of shell commands and
     automatically turn them into a shell script (using only basic shell
-    commands which are available in any bourne shell variation) which adds
+    commands which are available in any bourne shell variant) which adds
     some common desirable functionality including:
 
     Handle STDOUT/STDERR
@@ -658,10 +658,9 @@ OUTPUT OPTIONS
     When commands are run in the 'script' mode, the output is stored in the
     object.
 
-    To access the output, use one of the following calls to the output
-    method:
+    To access the output, use the following:
 
-       $obj->output(%options);
+       @out = $obj->output(%options);
 
     Each call to the method will return one part of the output. To following
     options may be used to determine what is returned.

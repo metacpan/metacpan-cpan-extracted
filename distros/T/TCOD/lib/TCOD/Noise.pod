@@ -1,0 +1,100 @@
+=encoding UTF-8
+
+=head1 NAME
+
+TCOD::Noise - A generator of Perlin noise and other derived noises
+
+=head1 SYNOPSIS
+
+    use TCOD;
+
+    ...
+
+=head1 DESCRIPTION
+
+This toolkit provides several functions to generate Perlin noise and other
+derived noises. It can handle noise functions from 1 to 4 dimensions.
+
+=head1 METHODS
+
+=head2 new
+
+    $noise = TCOD::Noise->new( $dimensions, $hurst, $lacunarity, $random );
+
+Initialise a noise generator from a number of dimensions (from 1 to 4), some
+fractal parameters and a L<TCOD::Random> random number generator. You can pass
+C<undef> as the value for the random number generator to use the default one.
+
+=head2 set_type
+
+    $noise->set_type( $type );
+
+Use this function to define the default algorithm used by the noise functions.
+The default algorithm is simplex. It's much faster than Perlin, especially in
+4 dimensions. It has a better contrast too.
+
+The value in C<$type> must be one of the values in the
+L<NoiseType|TCOD/NoiseType> enum.
+
+=head2 get
+
+    $float = $noise->get(    \@coords        );
+    $float = $noise->get_ex( \@coords, $type );
+
+This function returns the noise function value between -1 and 1 at the given
+coordinates. The number of values needed for the coordinate will depend on the
+dimensions of the generator. For the same generator, the same coordinates will
+always result in the same value.
+
+The value in C<$type> for the C<_ex> variant allows you to override the default
+noise type for this generator. See L<set_type|/set_type> for how to set it. If
+none is set, C<TCOD::NOISE_SIMPLEX> will be used.
+
+=head2 get_fbm
+
+    $float = $noise->get_fbm(    \@coords, $octaves        );
+    $float = $noise->get_fbm_ex( \@coords, $octaves, $type );
+
+This function returns the fbm function value between -1 and 1 at given
+coordinates, using fractal hurst and lacunarity defined when the generator
+has been created.
+
+The value in C<$octaves> determines the number of iterations. It must be less
+than C<TCOD::NOISE_MAX_OCTAVES> (128).
+
+The value in C<$type> for the C<_ex> variant allows you to override the default
+noise type for this generator. See L<set_type|/set_type> for how to set it.
+If none is set, C<TCOD::NOISE_SIMPLEX> will be used.
+
+=head2 get_turbulence
+
+    $float = $noise->get_turbulence(    \@coords, $octaves        );
+    $float = $noise->get_turbulence_ex( \@coords, $octaves, $type );
+
+This function returns the turbulence function value between -1 and 1 at given
+coordinates, using fractal hurst and lacunarity defined when the generator
+has been created.
+
+The value in C<$octaves> determines the number of iterations. It must be less
+than C<TCOD::NOISE_MAX_OCTAVES> (128).
+
+The value in C<$type> for the C<_ex> variant allows you to override the default
+noise type for this generator. See L<set_type|/set_type> for how to set it.
+If none is set, C<TCOD::NOISE_SIMPLEX> will be used.
+
+=head1 SEE ALSO
+
+=over
+
+=item L<TCOD>
+
+=item L<TCOD::Random>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2021 José Joaquín Atria
+
+This library is free software; you can redistribute it and/or modify it under
+the Artistic License 2.0.

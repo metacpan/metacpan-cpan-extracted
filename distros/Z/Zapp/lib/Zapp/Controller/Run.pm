@@ -327,7 +327,7 @@ sub list_runs( $self ) {
 
 sub feed_run( $self ) {
     $self->inactivity_timeout(3600);
-    my $interval = int( $self->param( 'interval' ) ) || 1;
+    my $interval = int( $self->param( 'interval' ) ) || 5;
 
     # Establish the current state of the run and every task
     my $run_id = $self->param( 'run_id' );
@@ -417,7 +417,7 @@ Zapp::Controller::Run
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 AUTHOR
 

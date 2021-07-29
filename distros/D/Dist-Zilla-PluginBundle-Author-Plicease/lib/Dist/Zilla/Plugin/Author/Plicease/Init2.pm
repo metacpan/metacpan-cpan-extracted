@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::Author::Plicease::Init2 2.66 {
+package Dist::Zilla::Plugin::Author::Plicease::Init2 2.67 {
 
   use 5.020;
   use Moose;
@@ -385,7 +385,7 @@ Dist::Zilla::Plugin::Author::Plicease::Init2 - Dist::Zilla initialization tasks 
 
 =head1 VERSION
 
-version 2.66
+version 2.67
 
 =head1 DESCRIPTION
 
@@ -397,7 +397,7 @@ Graham Ollis <plicease@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012,2013,2014,2015,2016,2017,2018,2019,2020,2021 by Graham Ollis.
+This software is copyright (c) 2012-2021 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
@@ -442,30 +442,30 @@ __[ dist/perlcriticrc ]__
 severity = 1
 only = 1
 
-[Freenode::ArrayAssignAref]
-[Freenode::BarewordFilehandles]
-[Freenode::ConditionalDeclarations]
-[Freenode::ConditionalImplicitReturn]
-[Freenode::DeprecatedFeatures]
-[Freenode::DiscouragedModules]
-[Freenode::DollarAB]
-[Freenode::Each]
-[Freenode::EmptyReturn]
-[Freenode::IndirectObjectNotation]
-[Freenode::LexicalForeachIterator]
-[Freenode::LoopOnHash]
-[Freenode::ModPerl]
-[Freenode::OpenArgs]
-[Freenode::OverloadOptions]
-[Freenode::POSIXImports]
-[Freenode::PackageMatchesFilename]
-[Freenode::PreferredAlternatives]
-[Freenode::StrictWarnings]
+[Community::ArrayAssignAref]
+[Community::BarewordFilehandles]
+[Community::ConditionalDeclarations]
+[Community::ConditionalImplicitReturn]
+[Community::DeprecatedFeatures]
+[Community::DiscouragedModules]
+[Community::DollarAB]
+[Community::Each]
+[Community::EmptyReturn]
+[Community::IndirectObjectNotation]
+[Community::LexicalForeachIterator]
+[Community::LoopOnHash]
+[Community::ModPerl]
+[Community::OpenArgs]
+[Community::OverloadOptions]
+[Community::POSIXImports]
+[Community::PackageMatchesFilename]
+[Community::PreferredAlternatives]
+[Community::StrictWarnings]
 extra_importers = Test2::V0
-[Freenode::Threads]
-[Freenode::Wantarray]
-[Freenode::WarningsSwitch]
-[Freenode::WhileDiamondDefaultAssignment]
+[Community::Threads]
+[Community::Wantarray]
+[Community::WarningsSwitch]
+[Community::WhileDiamondDefaultAssignment]
 
 [BuiltinFunctions::ProhibitBooleanGrep]
 [BuiltinFunctions::ProhibitStringyEval]
@@ -503,7 +503,7 @@ allow_leading_tabs = 0
 __[ dist/xt/author/critic.t ]__
 use Test2::Require::Module 'Test2::Tools::PerlCritic';
 use Test2::Require::Module 'Perl::Critic';
-use Test2::Require::Module 'Perl::Critic::Freenode';
+use Test2::Require::Module 'Perl::Critic::Community';
 use Test2::V0;
 use Perl::Critic;
 use Test2::Tools::PerlCritic;

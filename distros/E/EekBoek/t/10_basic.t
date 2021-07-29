@@ -1,12 +1,15 @@
 #! perl
 
 use strict;
-use Test::More tests => 11;
+use Test::More tests => 12;
 
 # Some basic tests.
 
+# Note that App::Packager must be accessible before app_init.
+
 BEGIN {
     $ENV{LANG} = "nl_NL";
+    use_ok( "App::Packager" => 1.430 );
     use_ok("EB");
     EB->app_init( { app => "Test", nostdconf => 1 } );
     ok( $::cfg, "Got config" );

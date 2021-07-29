@@ -4,8 +4,8 @@ module_maker="ModuleBuildTiny"
 static_install = "auto"
 license="artistic_2"
 authority="cpan:SANKO"
-readme_from="lib/SDL2/FFI.pod"
-abstract_from="lib/SDL2/FFI.pod"
+readme_from="lib/SDL2/FFI.pm"
+abstract_from="lib/SDL2/FFI.pm"
 
 [release]
 hook=[

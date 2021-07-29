@@ -1,7 +1,8 @@
-#!perl
+# -*- mode: perl -*-
 
 use strict;
 use warnings;
+
 use ExtUtils::MakeMaker;
 
 WriteMakefile
@@ -9,7 +10,7 @@ WriteMakefile
    'NAME'               => 'Math::BigInt::Lite',
    'VERSION_FROM'       => 'lib/Math/BigInt/Lite.pm',
    'AUTHOR'             => 'Peter John Acklam <pjacklam@gmail.com>',
-   'MIN_PERL_VERSION'   => 5.006,
+   'MIN_PERL_VERSION'   => 5.006002,
 
    # A hash of modules that are required to run Makefile.PL itself, but not to
    # run the distribution.
@@ -27,7 +28,7 @@ WriteMakefile
 
    'PREREQ_PM'          => {
                             'Math::BigInt'        => 1.999821,
-                            'Carp'                => 1.22,
+                            'Carp'                => 0,
                            },
 
    # A hash of modules that are needed to test the module but not run or build
@@ -35,6 +36,7 @@ WriteMakefile
 
    'TEST_REQUIRES'      => {
                             'Test::More'          => 0.94,
+                            'Math::BigRat'        => 0.2616,
                            },
 
    'LICENSE'            => 'perl_5',

@@ -1,3 +1,10 @@
+0.020   2021-07-25  Released-By: PERLANCAR; Urgency: medium
+
+	- No functional changes.
+
+	- [bugfix] Fix cleanup-download-dir (used old key name).
+
+
 0.019   2021-04-24  Released-By: PERLANCAR; Urgency: medium
 
 	- [subcommand cleanup-install-dir] [bugfix] Old hash key names were

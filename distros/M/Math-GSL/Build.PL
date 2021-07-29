@@ -26,11 +26,13 @@ use lib 'inc';
 use GSLBuilder;
 use Ver2Func;
 use File::Spec::Functions qw/:ALL/;
+use Alien::GSL;
 
 our $MIN_GSL_VERSION = "1.15";
 
 my $gsl_conf;
 
+check_alien_gsl_share_dir();
 $gsl_conf = check_gsl_version();
 $gsl_conf = check_gsl_version_pkgconfig() if not $gsl_conf;
 
@@ -63,6 +65,12 @@ if ( GSLBuilder::is_cygwin()  && $Config{shrpenv} =~ m{\Aenv LD_RUN_PATH=(.*)\Z}
     $ldflags .= " -L$1 -lperl";
     # Should we check the 32-ness?
     $swig_flags = '-DNEED_LONG';
+} elsif (GSLBuilder::is_msys()) {
+    # It is not possible to leave a symbol in a PE DLL undefined at link time, 
+    # to be satisfied at runtime, as it is instead possible with most UNIX shared objects
+    # See https://autotools.io/libtool/windows.html
+    # So we need to link with libperl.dll.a on MSYS2
+    $ldflags .= " -L$Config{archlib}/CORE -lperl";
 } elsif (GSLBuilder::is_darwin()) {
     $ldflags .= ' -bundle -flat_namespace ';
 }
@@ -240,6 +248,14 @@ sub try_cflags {
     }
     print "no\n";
     return '';
+}
+
+sub check_alien_gsl_share_dir {
+    if (Alien::GSL->install_type eq "share") {
+        my $dist_dir = Alien::GSL->dist_dir;
+        my $bin_dir = File::Spec->catfile( $dist_dir, "bin" );
+        $ENV{PATH} .= ":$bin_dir";
+    }
 }
 
 sub check_gsl_version_pkgconfig {

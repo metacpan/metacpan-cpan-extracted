@@ -84,7 +84,8 @@ version of an entity which will remain valid as long as that entity is not
 deleted (with `delete` or `clear`).
 
 Each Game::Entities registry supports up to 1,048,575 (2^20 - 1) simultaneous
-valid entity GUIDs.
+valid entity GUIDs. They will never be 0, so they should always be truthy
+values.
 
 ## Valid entities
 
@@ -96,7 +97,7 @@ outside it.
 ## Components
 
 As far as Game::Entities is concerned, any reference of any type can be used
-as a component and added to an entity. This includes blessed and non-blessd
+as a component and added to an entity. This includes blessed and non-blessed
 references.
 
 Entities can have any number of components attached to them, but they will
@@ -174,7 +175,7 @@ specified entity has a component by that name, or a falsy value otherwise.
 
 ## valid
 
-    $ECS->valid($guid);
+    $bool = $ECS->valid($guid);
 
 Takes an entity's GUID and returns a truthy value if the specified entity is
 valid, or a falsy value otherwise. An entity is valid if it has been created
@@ -201,6 +202,42 @@ entities that have been created and not yet deleted.
 Resets the internal storage of the registry. Calling this method leaves no
 trace from the previous state.
 
+## sort
+
+    $ECS->sort( $component_name => $parent_name      );
+    $ECS->sort( $component_name => sub { $a ... $b } );
+
+_Since version 0.006._
+
+Under normal circumstances, the order in which a particular set of components
+is stored is not guaranteed, and will depend entirely on the additions and
+deletions of that component type.
+
+However, it will sometimes be useful to impose an order on a component set.
+This will be the case for example when renderable components need to be drawn
+back to front, etc.
+
+This function accommodates this use case.
+
+Given a single component name, and a code reference to a comparator function,
+the specified component will be sorted accordingly. The comparator function
+can use the global `$a` and `$b` variables as with regular
+[sort](https://perldoc.perl.org/functions/sort), which will be assigned to
+the two components being sorted.
+
+Alternatively, if given the name of another component (`B`) instead of a
+comparator function, the order of the first component (`A`) will follow that
+of the `B`. After this, iterating over the entities that have `A` will
+return
+
+- all of the entities that also have `B`, according to the order in `B`
+- all of the entities that _do not_ have `B`, in no particular order
+
+Sorting a component pool invalidates any cached views that use that component.
+
+The imposed order for this component is guaranteed to be stable as long as no
+components of this type are added or removed.
+
 ## view
 
     $view = $ECS->view;
@@ -213,7 +250,7 @@ same.
 
 As a special case, calling this method with no arguments will generate a
 view which is guaranteed have all entities that were valid at the moment the
-view ws created.
+view was created.
 
 Once a view has been created, it should remain valid as long as none of the
 components in the view's set are added or deleted from any entity. Once this
@@ -253,6 +290,26 @@ empty.
 Within the callback, it is safe to add or delete entities, as well as to add
 or remove components from those entities.
 
+### first
+
+    my ( $guid, @comps ) = $view->first( sub ( $guid, @comps ) { ... } );
+
+_Since version 0.009._
+
+This function is similar to [each](#each), with the difference that iteration
+through the view will stop early the first time the provided coderef returns a
+true value.
+
+If the coderef ever returns true, a flat list with the GUID and the components
+in the view will be returned. If it never returns true, this method will
+return an empty list.
+
+This function is equivalent to the following code
+
+    my ( $guid, @comps )
+        = map { ( $_[0], @{ $_[1] } ) }
+        List::Util::first { $coderef->( $_[0], @{ $_[1] } ) } @{ $view };
+
 ### entities
 
     @guids = $view->entities;
@@ -277,7 +334,7 @@ Useful for iterating like
 # PERFORMANCE
 
 Game::Entities aims to implement a simple entity that is as fast as possible.
-Specifically, this means tht it needs to be fast enough to be used in game
+Specifically, this means that it needs to be fast enough to be used in game
 development, which is the natural use case for ECS designs.
 
 To this end, the library caches component iterators which are invalidated

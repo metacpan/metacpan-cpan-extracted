@@ -1,3 +1,43 @@
+2.051	2021-07-28
+
+	* Cannot switch to semantic versioning, since 2.05 is
+          considered 2.50.0. Use pseudo-semantic x.yyz.
+
+2.05.1	2021-07-28
+
+	* (Makefile.PL) Add dependency App::Packager.
+
+2.05	2021-07-27
+
+	* Support DBD::SQLite 1.68. This version of SQLite breaks
+          existing code due to incompatible changes in unicode
+          handling.
+
+	* Prevent writing command history if the ReadLine does not support it.
+
+2.04	2021-01-24
+
+	* (Relation) Verwijder de lengtecontrole voor relatiecodes. Let
+          the database handle it (or not).
+
+	* Verhoog de lengte van de code voor relaties naar 80.
+
+	* (IV) In inkoop/verkoopboekingen kan de boekingsreferentie ook
+          worden opgegeven in de relatiecode, zoals bij bankboekingen.
+	  RELATIE --ref=Ref is equivalent aan RELATIE:Ref.
+
+	* (Opening) Fix probleem dat openingsdata voor
+          debiteuren/crediteuren openstaande posten eiste, ook als het
+          bedrag nul was.
+
+	* Wijziging kleine-ondernemersregeling per 2020. Indien de
+          onderneming slechts geringe omzet draait kan bij de
+          belastingdienst volledige vrijstelling van BTW-aangifte (en
+          dus afdracht) worden aangevraagd.
+
+	* (Import) Fix probleem dat willekeurige bestanden tijdens
+	  import als bijlage werden gezien.
+
 2.030.1	Aug 31, 2017
 
 	* File::Glob fix for Perls older than 5.16. Not really an emergency.

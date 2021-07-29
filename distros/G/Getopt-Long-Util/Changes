@@ -1,3 +1,33 @@
+0.895   2021-07-10  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Update doc.
+
+
+0.894   2021-07-10  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- Edit/update Changes for 0.893.
+
+
+0.893   2021-07-10  Released-By: PERLANCAR; Urgency: medium
+
+	[function humanize_getopt_long_opt_spec]
+
+        - Tweak format of desttype '@', e.g. --foo=s@ from '--foo=s+' to
+          '(--foo=s)+' to become clearer.
+
+        - Tweak format of desttype '%', e.g. --foo=s% from '--foo key=val' to
+          '(--foo key=val)+' to become clearer.
+
+        - Add option 'extended' to return plaintext version as well as
+          POD-formatted version.
+
+        - [bugfix] key_label option was not observed.
+
+
 0.892   2020-10-27  Released-By: PERLANCAR; Urgency: medium
 
 	- [bugfix] Fix regex so 'opt:1' is recognized.
@@ -130,4 +160,3 @@
 
         - First release. Extracted from SHARYANTO-Utils (renamed module from
           SHARYANTO::Getopt::Long::Util to Getopt::Long::Util).
-

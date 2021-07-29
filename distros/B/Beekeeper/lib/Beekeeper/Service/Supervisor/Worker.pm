@@ -3,12 +3,12 @@ package Beekeeper::Service::Supervisor::Worker;
 use strict;
 use warnings;
 
-our $VERSION = '0.07';
+our $VERSION = '0.09';
 
 use Beekeeper::Worker ':log';
 use base 'Beekeeper::Worker';
 
-use Beekeeper::Worker::Util 'shared_cache';
+use Beekeeper::Worker::Extension::SharedCache;
 
 our $CHECK_PERIOD = $Beekeeper::Worker::REPORT_STATUS_PERIOD;
 
@@ -59,6 +59,13 @@ sub on_startup {
             $self->check_queues;
         },
     );
+}
+
+sub on_shutdown {
+    my $self = shift;
+
+    # Disconnect shared cache
+    undef $self->{Workers};
 }
 
 sub log_handler {
@@ -413,7 +420,7 @@ Beekeeper::Service::Supervisor::Worker - Worker pool supervisor
 
 =head1 VERSION
 
-Version 0.07
+Version 0.09
 
 =head1 DESCRIPTION
 
@@ -461,10 +468,10 @@ Due to inaccuracies of measurement the actual maximum may be slightly below 100.
 
 =back
 
-=head1 METHODS
+=head1 SEE ALSO
 
-See L<Beekeeper::Service::Supervisor> for a description of the methods exposed 
-by this worker class.
+L<Beekeeper::Service::Supervisor>, which is the interface to the RPC methods
+exposed by this worker class.
 
 =head1 AUTHOR
 

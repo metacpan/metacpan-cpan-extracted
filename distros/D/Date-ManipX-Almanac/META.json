@@ -1,0 +1,96 @@
+{
+   "abstract" : "Add almanac date/time functionality (sunrise, etc.) to Date::Manip",
+   "author" : [
+      "Thomas R. Wyant, III F<wyant at cpan dot org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4231",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Date-ManipX-Almanac",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "inc",
+         "t",
+         "tools",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test2::Plugin::BailOnFail" : "0",
+            "Test2::Tools::LoadModule" : "0",
+            "Test2::V0" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "lib" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Astro::Coord::ECI" : "0.119",
+            "Astro::Coord::ECI::Moon" : "0.119",
+            "Astro::Coord::ECI::Sun" : "0.119",
+            "Astro::Coord::ECI::Utils" : "0.119",
+            "Carp" : "0",
+            "Date::Manip" : "6.55",
+            "Date::Manip::Date" : "6.55",
+            "Module::Load" : "0",
+            "Scalar::Util" : "0",
+            "Text::ParseWords" : "0",
+            "constant" : "0",
+            "parent" : "0",
+            "perl" : "5.01",
+            "strict" : "0",
+            "utf8" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Date::ManipX::Almanac" : {
+         "file" : "lib/Date/ManipX/Almanac.pm",
+         "version" : "0.001"
+      },
+      "Date::ManipX::Almanac::Date" : {
+         "file" : "lib/Date/ManipX/Almanac/Date.pm",
+         "version" : "0.001"
+      },
+      "Date::ManipX::Almanac::Lang" : {
+         "file" : "lib/Date/ManipX/Almanac/Lang.pm",
+         "version" : "0.001"
+      },
+      "Date::ManipX::Almanac::Lang::english" : {
+         "file" : "lib/Date/ManipX/Almanac/Lang/english.pm",
+         "version" : "0.001"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "wyant@cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Date-ManipX-Almanac"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/trwyant/perl-Date-ManipX-Almanac.git",
+         "web" : "https://github.com/trwyant/perl-Date-ManipX-Almanac"
+      }
+   },
+   "version" : "0.001",
+   "x_serialization_backend" : "JSON::PP version 4.06"
+}

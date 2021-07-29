@@ -7,11 +7,11 @@ use Safe;
 extends 'Lemonldap::NG::Portal::Lib::Wrapper';
 with 'Lemonldap::NG::Portal::Lib::OverConf';
 
-our $VERSION = '2.0.11';
+our $VERSION = '2.0.12';
 
-has modules => ( is => 'rw', default => sub { {} } );
-has rules   => ( is => 'rw', default => sub { {} } );
-has type    => ( is => 'rw' );
+has modules    => ( is => 'rw', default => sub { {} } );
+has rules      => ( is => 'rw', default => sub { {} } );
+has type       => ( is => 'rw' );
 has catch      => ( is => 'rw', default => sub { {} } );
 has sessionKey => ( is => 'ro', default => '_choice' );
 
@@ -117,6 +117,15 @@ sub checkChoice {
 
     unless ($name) {
 
+        # Set by OAuth Resource Owner grant // RESTServer pwdCheck
+        if ( $req->data->{_pwdCheck} and $self->{conf}->{authChoiceAuthBasic} )
+        {
+            $name = $self->{conf}->{authChoiceAuthBasic};
+        }
+    }
+
+    unless ($name) {
+
         # Check with other methods
         $name ||=
              $req->data->{findUserChoice}
@@ -206,7 +215,7 @@ sub _buildAuthLoop {
             if ( $auth and $userDB and $passwordDB ) {
 
                 # Default URL
-                $req->{cspFormAction} ||= '';
+                $req->data->{cspFormAction} ||= {};
                 if (
                     defined $url
                     and not $self->checkXSSAttack( 'URI',
@@ -215,11 +224,9 @@ sub _buildAuthLoop {
                     q%^(https?://)?[^\s/.?#$].[^\s]+$% # URL must be well formatted
                   )
                 {
-                    #$url .= $req->env->{'REQUEST_URI'};
 
-                    # Avoid append same URL
-                    $req->{cspFormAction} .= " $url"
-                      unless $req->{cspFormAction} =~ qr%\b$url\b%;
+                    my $csp_uri = $self->cspGetHost($url);
+                    $req->data->{cspFormAction}->{$csp_uri} = 1;
                 }
                 else {
                     $url .= '#';

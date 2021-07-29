@@ -31,23 +31,18 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010001",
   "NAME"             => "Devel::ebug::HTTP",
   "PM"               => {
-    "lib/Devel/ebug/HTTP.pm"         => "\$(INST_LIB)/Devel/ebug/HTTP.pm",
-    "lib/Devel/ebug/HTTP/View/TT.pm" => "\$(INST_LIB)/Devel/ebug/HTTP/View/TT.pm"
+    "lib/Devel/ebug/HTTP.pm" => "\$(INST_LIB)/Devel/ebug/HTTP.pm"
   },
   "PREREQ_PM" => {
     "Catalyst"                         => 0,
+    "Catalyst::Controller"             => 0,
     "Catalyst::Plugin::Static::Simple" => 0,
     "Catalyst::ScriptRunner"           => 0,
     "Catalyst::View::TT"               => 0,
-    "Cwd"                              => 0,
-    "Devel::ebug"                      => 0,
+    "Devel::ebug"                      => "0.64",
     "File::ShareDir::Dist"             => 0,
-    "HTML::Prototype"                  => 0,
-    "List::Util"                       => 0,
     "PPI"                              => 0,
     "PPI::HTML"                        => 0,
-    "Path::Class"                      => "0.26",
-    "Storable"                         => 0,
     "base"                             => 0
   },
   "TEST_REQUIRES" => {
@@ -55,7 +50,7 @@ my %WriteMakefileArgs = (
     "Test::More"                     => "0.98",
     "Test::WWW::Mechanize::Catalyst" => 0
   },
-  "VERSION" => "0.34",
+  "VERSION" => "0.36",
   "test"    => {
     "TESTS" => "t/*.t"
   }
@@ -63,19 +58,15 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Catalyst"                         => 0,
+  "Catalyst::Controller"             => 0,
   "Catalyst::Plugin::Static::Simple" => 0,
   "Catalyst::ScriptRunner"           => 0,
   "Catalyst::View::TT"               => 0,
-  "Cwd"                              => 0,
-  "Devel::ebug"                      => 0,
+  "Devel::ebug"                      => "0.64",
   "File::ShareDir::Dist"             => 0,
-  "HTML::Prototype"                  => 0,
   "HTTP::Request::Common"            => 0,
-  "List::Util"                       => 0,
   "PPI"                              => 0,
   "PPI::HTML"                        => 0,
-  "Path::Class"                      => "0.26",
-  "Storable"                         => 0,
   "Test::More"                       => "0.98",
   "Test::WWW::Mechanize::Catalyst"   => 0,
   "base"                             => 0

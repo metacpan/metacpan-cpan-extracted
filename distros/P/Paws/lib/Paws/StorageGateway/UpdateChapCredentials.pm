@@ -30,9 +30,9 @@ You shouldn't make instances of this class. Each attribute should be used as a n
 =head1 SYNOPSIS
 
     my $storagegateway = Paws->service('StorageGateway');
-    # To update CHAP credentials for an iSCSI target
-    # Updates the Challenge-Handshake Authentication Protocol (CHAP) credentials
-    # for a specified iSCSI target.
+# To update CHAP credentials for an iSCSI target
+# Updates the Challenge-Handshake Authentication Protocol (CHAP) credentials for
+# a specified iSCSI target.
     my $UpdateChapCredentialsOutput = $storagegateway->UpdateChapCredentials(
       'InitiatorName' =>
         'iqn.1991-05.com.microsoft:computername.domain.example.com',

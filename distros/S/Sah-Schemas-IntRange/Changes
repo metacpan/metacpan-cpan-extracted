@@ -1,0 +1,24 @@
+0.004   2021-07-17  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Mention Sah::Schemas::NumSeq.
+
+
+0.003   2021-07-17  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc][test] Make sure each invalid example has summary.
+
+
+0.002   2021-07-16  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Mention Sah::Schemas::Int.
+
+
+0.001   2021-07-16  Released-By: PERLANCAR
+
+        - First release.

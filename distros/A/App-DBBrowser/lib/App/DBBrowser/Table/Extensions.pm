@@ -23,69 +23,62 @@ sub new {
 
 
 sub complex_unit {
-    my ( $sf, $sql, $clause ) = @_;
+    my ( $sf, $sql, $clause, $want_array ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
-    my ( $none, $function, $subquery, $all ) = @{$sf->{i}{menu_additions}};
-    my $set_to_null = '=N';
-    my @values;
-    if ( $clause eq 'set' ) {
-        @values = ( undef, [ $function ], [ $subquery ], [ $set_to_null ], [ $function, $subquery, $set_to_null ] );
-    }
-    else {
-        @values = ( undef, [ $function ], [ $subquery ], [ $function, $subquery ] );
-    }
-    my $i = $sf->{o}{enable}{'expand_' . $clause};
-    my @types = @{$values[$i]};
-    my $type;
-    if ( @types == 1 ) {
-        $type = $types[0];
-    }
-    else {
-        my $info = $ax->get_sql_info( $sql );
-        # Choose
-        $type = $tc->choose(
-            [ undef, @types ],
-            { %{$sf->{i}{lyt_h}}, info => $info }
-        );
-        $ax->print_sql_info( $info );
-        if ( ! defined $type ) {
-            return;
+    my ( $function, $subquery, $set_to_null ) = ( 'f()', 'SQ', '=N' );
+    my @types;
+    if ( $sf->{o}{enable}{'expand_' . $clause} ) {
+        if ( $clause eq 'set' ) {
+            @types = ( $function, $subquery, $set_to_null );
+        }
+        else {
+            @types = ( $function, $subquery );
         }
     }
-    my ( $complex_unit, $alias_type );
-    if ( $type eq $subquery ) {
+    my $info = $ax->get_sql_info( $sql );
+    # Choose
+    my $type = $tc->choose(
+        [ undef, @types ],
+        { %{$sf->{i}{lyt_h}}, info => $info }
+    );
+    $ax->print_sql_info( $info );
+    if ( ! defined $type ) {
+        return;
+    }
+    my $complex_units = [];
+    if ( $type eq $set_to_null ) {
+        return "NULL";
+    }
+    elsif ( $type eq $subquery ) {
         require App::DBBrowser::Subqueries;
         my $new_sq = App::DBBrowser::Subqueries->new( $sf->{i}, $sf->{o}, $sf->{d} );
         my $subq = $new_sq->choose_subquery( $sql );
         if ( ! defined $subq ) {
             return;
         }
-        $complex_unit = $subq;
-        $alias_type = 'subqueries';
+        if ( $want_array ) {
+            return [ $subq ];
+        }
+        else {
+            return $subq;
+        }
     }
     elsif ( $type eq $function ) {
         require App::DBBrowser::Table::Functions;
         my $new_func = App::DBBrowser::Table::Functions->new( $sf->{i}, $sf->{o}, $sf->{d} );
-        my $func = $new_func->col_function( $sql, $clause );
-        if ( ! defined $func ) {
+        my $col_with_func = $new_func->col_function( $sql, $clause );
+        if ( ! defined $col_with_func ) {
             return;
         }
-        $complex_unit = $func;
-        $alias_type = 'functions';
-    }
-    elsif ( $type eq $set_to_null ) {
-        return "NULL";
-    }
-    #if ( $clause !~ /^(?:set|where|having|group_by|order_by)\z/i ) {
-    if ( $clause eq 'select' ) {
-        my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-        my $alias = $ax->alias( $sql, $alias_type, $complex_unit );
-        if ( defined $alias && length $alias ) {
-            $sql->{alias}{$complex_unit} = $ax->quote_col_qualified( [ $alias ] );
+        if ( $want_array ) { # SELECT
+            return $col_with_func;
+        }
+        else {
+            return join( ', ', @$col_with_func );
+            # with 'WHERE' + ('IN' or 'NOT IN') possible @$func > 1
         }
     }
-    return $complex_unit;
 }
 
 

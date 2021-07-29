@@ -55,7 +55,7 @@ do {
   my $from = URI::file->new_abs($local);
   my $to = $remote->clone;
   $to->password(undef);
-  
+
   say "SRC: ", $from;
   say "DST: ", $to;
 };

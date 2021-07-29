@@ -35,8 +35,10 @@ You shouldn't make instances of this class. Each attribute should be used as a n
       DryRun  => 1,    # OPTIONAL
       Filters => [
         {
-          Name   => 'MyString',
-          Values => [ 'MyString', ... ],    # OPTIONAL
+          Name   => 'MyString',    # OPTIONAL
+          Values => [
+            'MyString', ...        # OPTIONAL
+          ],    # OPTIONAL
         },
         ...
       ],    # OPTIONAL
@@ -74,7 +76,39 @@ One or more filters.
 
 =head2 LocalGatewayIds => ArrayRef[Str|Undef]
 
-The IDs of the local gateways.
+One or more filters.
+
+=over
+
+=item *
+
+C<local-gateway-id> - The ID of a local gateway.
+
+=item *
+
+C<local-gateway-route-table-id> - The ID of the local gateway route
+table.
+
+=item *
+
+C<local-gateway-route-table-virtual-interface-group-association-id> -
+The ID of the association.
+
+=item *
+
+C<local-gateway-route-table-virtual-interface-group-id> - The ID of the
+virtual interface group.
+
+=item *
+
+C<outpost-arn> - The Amazon Resource Name (ARN) of the Outpost.
+
+=item *
+
+C<state> - The state of the association.
+
+=back
+
 
 
 

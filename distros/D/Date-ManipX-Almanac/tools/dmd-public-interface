@@ -1,0 +1,83 @@
+#!/usr/bin/env perl
+
+use 5.010;
+
+use strict;
+use warnings;
+
+use Date::Manip::Date;
+# use Getopt::Long 2.33 qw{ :config auto_version };
+use Getopt::Long 2.33;
+use Pod::Usage;
+
+use lib qw{ tools };
+use My::Symdump;
+
+our $VERSION = '0.001';
+
+my %opt;
+
+GetOptions( \%opt,
+    help => sub { pod2usage( { -verbose => 2 } ) },
+    version	=> sub {
+	print <<"EOD";
+$0 version $VERSION
+Date::Manip::Date version $Date::Manip::Date::VERSION
+(Getopt::Long::GetOptions version $Getopt::Long::GetOptions::VERSION; Perl version $^V
+EOD
+	exit;
+    },
+) or pod2usage( { -verbose => 0 } );
+
+say for My::Symdump->dmd_public_interface();
+
+__END__
+
+=head1 TITLE
+
+dmd-public-interface - List the Date::Manip::Date public interface.
+
+=head1 SYNOPSIS
+
+ dmd-public-interface
+ dmd-public-interface --help
+ dmd-public-interface --version
+
+=head1 OPTIONS
+
+=head2 --help
+
+This option displays the documentation for this script. The script then
+exits.
+
+=head2 --version
+
+This option displays the version of this script, and of
+L<Date::Manip::Date|Date::Manip::Date>. The script then exits.
+
+=head1 DETAILS
+
+This Perl script simply prints the names of the methods in the
+L<Data::Manip::Date|Date::Manip::Date> public interface, one per line.
+It is really just a wrapper for
+C<< My::Symdump->dmd_public_interface() >>.
+
+=head1 AUTHOR
+
+Thomas R. Wyant, III F<wyant at cpan dot org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2021 by Thomas R. Wyant, III
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl 5.10.0. For more details, see the full text
+of the licenses in the directory LICENSES.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+=cut
+
+# ex: set textwidth=72 :

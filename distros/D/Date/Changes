@@ -1,4 +1,6 @@
-5.2.7    xx.xx.2021
+5.2.8    xx.xx.2021
+           - internal improvements
+5.2.7    02.07.2021
            - add Date::strptime
            - More correctly parse dates in ISO8601 YYYY-Www format
            - fix compilation warnings

@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 35;
+plan tests => 36;
 
 my @module_files = (
     'Workflow.pm',
@@ -22,6 +22,7 @@ my @module_files = (
     'Workflow/Condition/HasUser.pm',
     'Workflow/Condition/LazyAND.pm',
     'Workflow/Condition/LazyOR.pm',
+    'Workflow/Condition/Negated.pm',
     'Workflow/Condition/Nested.pm',
     'Workflow/Config.pm',
     'Workflow/Config/Perl.pm',

@@ -1,0 +1,24 @@
+prereqs:
+  develop:
+    requires:
+      P1:
+      P2: { version: '2' }
+  runtime:
+    recommends:
+      P3:
+    requires:
+      P4: { version: '4' }
+      P5: { version: '5', opt1: a, opt2: b }
+
+features:
+  hoge:
+    description: This is a description
+    prereqs:
+      runtime:
+        requires:
+          P2: { version: '22' }
+  bar:
+    prereqs:
+      test:
+        suggests:
+          P4: { opt3: c }

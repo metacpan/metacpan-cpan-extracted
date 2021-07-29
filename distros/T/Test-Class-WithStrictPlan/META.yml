@@ -6,9 +6,9 @@ build_requires:
   ExtUtils::MakeMaker: '0'
   Test::More: '0'
 configure_requires:
-  ExtUtils::MakeMaker: '0'
-dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010'
+  ExtUtils::MakeMaker: '6.68'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -19,8 +19,7 @@ no_index:
     - t
     - inc
 requires:
-  Attribute::Handlers: '0'
-  Test::Class: '0.37'
+  Test::Class: '0.51'
   parent: '0'
   perl: '5.006000'
   strict: '0'
@@ -28,5 +27,5 @@ requires:
 resources:
   bugtracker: https://github.com/pali/Test-Class-WithStrictPlan/issues
   repository: git://github.com/pali/Test-Class-WithStrictPlan.git
-version: '0.1'
+version: '0.2'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

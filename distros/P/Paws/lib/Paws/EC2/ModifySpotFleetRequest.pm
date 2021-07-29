@@ -1,7 +1,9 @@
 
 package Paws::EC2::ModifySpotFleetRequest;
   use Moose;
+  has Context => (is => 'ro', isa => 'Str');
   has ExcessCapacityTerminationPolicy => (is => 'ro', isa => 'Str', traits => ['NameInRequest'], request_name => 'excessCapacityTerminationPolicy' );
+  has LaunchTemplateConfigs => (is => 'ro', isa => 'ArrayRef[Paws::EC2::LaunchTemplateConfig]', traits => ['NameInRequest'], request_name => 'LaunchTemplateConfig' );
   has OnDemandTargetCapacity => (is => 'ro', isa => 'Int');
   has SpotFleetRequestId => (is => 'ro', isa => 'Str', traits => ['NameInRequest'], request_name => 'spotFleetRequestId' , required => 1);
   has TargetCapacity => (is => 'ro', isa => 'Int', traits => ['NameInRequest'], request_name => 'targetCapacity' );
@@ -41,10 +43,10 @@ You shouldn't make instances of this class. Each attribute should be used as a n
     # Results:
     my $Return = $ModifySpotFleetRequestResponse->Return;
 
-    # Returns a L<Paws::EC2::ModifySpotFleetRequestResponse> object.
-    # To decrease the target capacity of a Spot fleet request
-    # This example decreases the target capacity of the specified Spot fleet
-    # request without terminating any Spot Instances as a result.
+# Returns a L<Paws::EC2::ModifySpotFleetRequestResponse> object.
+# To decrease the target capacity of a Spot fleet request
+# This example decreases the target capacity of the specified Spot fleet request
+# without terminating any Spot Instances as a result.
     my $ModifySpotFleetRequestResponse = $ec2->ModifySpotFleetRequest(
       'ExcessCapacityTerminationPolicy' => 'NoTermination ',
       'SpotFleetRequestId' => 'sfr-73fbd2ce-aa30-494c-8788-1cee4EXAMPLE',
@@ -62,6 +64,12 @@ For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/ec2
 =head1 ATTRIBUTES
 
 
+=head2 Context => Str
+
+Reserved.
+
+
+
 =head2 ExcessCapacityTerminationPolicy => Str
 
 Indicates whether running Spot Instances should be terminated if the
@@ -69,6 +77,15 @@ target capacity of the Spot Fleet request is decreased below the
 current size of the Spot Fleet.
 
 Valid values are: C<"noTermination">, C<"default">
+
+=head2 LaunchTemplateConfigs => ArrayRef[L<Paws::EC2::LaunchTemplateConfig>]
+
+The launch template and overrides. You can only use this parameter if
+you specified a launch template (C<LaunchTemplateConfigs>) in your Spot
+Fleet request. If you specified C<LaunchSpecifications> in your Spot
+Fleet request, then omit this parameter.
+
+
 
 =head2 OnDemandTargetCapacity => Int
 

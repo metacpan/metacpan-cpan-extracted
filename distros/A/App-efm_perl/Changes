@@ -1,0 +1,31 @@
+Revision history for Perl extension App-efm_perl
+
+1.0.0 2021-07-26T06:17:52Z
+
+    - The first public release
+
+0.06 2021-07-26T04:01:50Z
+
+    - Add --version option
+    - Add install instruction on POD
+
+0.05 2021-07-26T03:23:36Z
+
+    - Fix for perlcritic
+
+0.04 2021-07-25T14:17:53Z
+
+    - Add tests
+
+0.03 2021-07-25T12:41:48Z
+
+    - Fix typo
+
+0.02 2021-07-25T12:39:33Z
+
+    - Remove dependencies for CPAN modules
+
+0.01 2021-07-25T12:23:35Z
+
+    - original version
+

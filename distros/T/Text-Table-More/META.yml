@@ -36,7 +36,7 @@ resources:
   bugtracker: https://github.com/perlancar/perl-Text-Table-More/issues
   homepage: https://metacpan.org/release/Text-Table-More
   repository: git://github.com/perlancar/perl-Text-Table-More.git
-version: '0.013'
+version: '0.014'
 x_Dist_Zilla:
   perl:
     version: '5.030000'
@@ -311,7 +311,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::Module::Features
               name: -Module::Features
-              version: '0.001'
+              version: '0.002'
       name: '@Author::PERLANCAR/PodWeaver'
       version: '4.008'
     -

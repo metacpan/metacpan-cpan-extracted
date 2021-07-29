@@ -5,7 +5,7 @@ use Mouse;
 use SOAP::Lite;
 use Lemonldap::NG::Portal::Main::Constants qw(PE_OK PE_ERROR PE_BADCREDENTIALS);
 
-our $VERSION = '2.0.11';
+our $VERSION = '2.0.12';
 
 # INITIALIZATION
 
@@ -61,13 +61,14 @@ sub getUser {
         return PE_ERROR;
     }
     $req->data->{_proxyQueryDone}++;
-    PE_OK;
+
+    return PE_OK;
 }
 
 sub findUser {
 
     # Nothing to do here
-    PE_OK;
+    return PE_OK;
 }
 
 sub setSessionInfo {
@@ -90,11 +91,12 @@ sub setSessionInfo {
           unless (/^_/);
     }
     $req->data->{_setSessionInfoDone}++;
-    PE_OK;
+
+    return PE_OK;
 }
 
 sub authLogout {
-    PE_OK;
+    return PE_OK;
 }
 
 1;

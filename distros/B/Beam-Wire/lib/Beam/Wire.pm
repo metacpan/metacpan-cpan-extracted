@@ -1,5 +1,5 @@
 package Beam::Wire;
-our $VERSION = '1.024';
+our $VERSION = '1.025';
 # ABSTRACT: Lightweight Dependency Injection Container
 
 #pod =head1 SYNOPSIS
@@ -496,7 +496,7 @@ sub create_service {
             error => '"value" cannot be used with "class" or "extends"',
         );
     }
-    if ( $service_info{value} ) {
+    if ( exists $service_info{value} ) {
         return $service_info{value};
     }
 
@@ -1284,7 +1284,7 @@ Beam::Wire - Lightweight Dependency Injection Container
 
 =head1 VERSION
 
-version 1.024
+version 1.025
 
 =head1 SYNOPSIS
 
@@ -1787,9 +1787,13 @@ Al Newkirk <anewkirk@ana.io>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Ben Moon Bruce Armstrong Diab Jerius Kent Fredric Mohammad S Anwar mohawk2
+=for stopwords Al Tom Ben Moon Bruce Armstrong Diab Jerius Kent Fredric Mohammad S Anwar mohawk2
 
 =over 4
+
+=item *
+
+Al Tom <al-tom.ru@yandex.ru>
 
 =item *
 

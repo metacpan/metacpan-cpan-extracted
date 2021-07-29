@@ -27,7 +27,7 @@ use Config::IniFiles;
 #inherits Lemonldap::NG::Common::Conf::Backends::SOAP
 #inherits Lemonldap::NG::Common::Conf::Backends::LDAP
 
-our $VERSION = '2.0.9';
+our $VERSION = '2.0.12';
 our $msg     = '';
 our $iniObj;
 
@@ -119,10 +119,13 @@ sub saveConf {
     my ( $self, $conf, %args ) = @_;
 
     my $last = $self->lastCfg;
+    return UNKNOWN_ERROR if $last < 1;
 
     # If configuration was modified, return an error
     if ( not $args{force} ) {
-        return CONFIG_WAS_CHANGED if ( $conf->{cfgNum} != $last );
+        return CONFIG_WAS_CHANGED
+          if ( $conf->{cfgNum} ne $last
+            || $args{cfgDate} && $args{cfgDate} ne $args{currentCfgDate} );
         return DATABASE_LOCKED if ( $self->isLocked() or not $self->lock() );
     }
     $conf->{cfgNum} = $last + 1 unless ( $args{cfgNumFixed} );
@@ -393,6 +396,7 @@ sub getDBConf {
           : $a[0];
     }
     my $conf = $self->load( $args->{cfgNum} );
+    return undef if $conf == "-1";
     $msg .= "Get configuration $conf->{cfgNum}.\n"
       if ( defined $conf->{cfgNum} );
     return $conf;
@@ -411,7 +415,11 @@ sub _launch {
         alarm 0;
         die $@ if $@;
     };
-    $msg .= $@ if $@;
+    if($@) {
+        $msg .= $@;
+        print STDERR "MSG $msg\n";
+        return undef;
+    }
     return wantarray ? (@res) : $res[0];
 }
 

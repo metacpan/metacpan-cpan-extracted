@@ -3,7 +3,7 @@ package Beekeeper::Logger;
 use strict;
 use warnings;
 
-our $VERSION = '0.07';
+our $VERSION = '0.09';
 
 use constant LOG_FATAL  => 1;
 use constant LOG_ALERT  => 2;
@@ -176,7 +176,7 @@ Beekeeper::Logger - Default logger used by worker processes
 
 =head1 VERSION
 
-Version 0.07
+Version 0.09
 
 =head1 SYNOPSIS
 

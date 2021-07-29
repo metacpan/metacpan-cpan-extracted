@@ -1,0 +1,20 @@
+TYPEMAP
+GraphiteXS_Object *      T_GRAPHITE_XS_OBJECT
+
+
+INPUT
+T_GRAPHITE_XS_OBJECT
+        /*
+          We disable the derived check because it's kinda useless but slow.
+        */
+        //if (1 || sv_derived_from($arg, \"Graphite::SImple\"))
+        //  {
+            $var = INT2PTR(GraphiteXS_Object *, SvUV((SV *) SvRV($arg)));
+        //  }
+        //else
+        //  croak(\"$var is not of type Graphite::Simple\");
+
+
+OUTPUT
+T_GRAPHITE_XS_OBJECT
+        sv_setref_pv($arg, class_name, (void*) $var);

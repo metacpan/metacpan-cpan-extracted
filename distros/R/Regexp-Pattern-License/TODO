@@ -55,6 +55,10 @@ Patterns:
 Metadata:
   * Tag classifications:
     * https://en.wikipedia.org/wiki/Free_license#Classification_and_licenses
+  * Map to Creative Commons license spectrum
+    * https://en.wikipedia.org/wiki/Creative_Commons_license#Types_of_license
+  * Maybe tag non-free licenses by their nature (guild/peace/etc.)
+    * https://wiki.creativecommons.org/wiki/Parametric_license
   * Maybe link (where appropriate) to kemitchell:
     * https://writing.kemitchell.com/
   * Limit metadata name to shortnames usable in grant statements:

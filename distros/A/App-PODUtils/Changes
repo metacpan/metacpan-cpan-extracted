@@ -1,3 +1,9 @@
+0.050   2021-07-20  Released-By: PERLANCAR; Urgency: medium
+
+	- [cli sort-pod-headings][cli reverse-pod-headings] Add option
+	  --naked-pod (-N).
+
+
 0.049   2020-06-06  Released-By: PERLANCAR; Urgency: medium
 
 	- Add CLI: podstrip.

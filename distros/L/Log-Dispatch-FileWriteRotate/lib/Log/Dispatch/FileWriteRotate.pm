@@ -1,7 +1,7 @@
 package Log::Dispatch::FileWriteRotate;
 
-our $DATE = '2019-01-09'; # DATE
-our $VERSION = '0.060'; # VERSION
+our $DATE = '2021-07-21'; # DATE
+our $VERSION = '0.062'; # VERSION
 
 use 5.010001;
 use warnings;
@@ -26,9 +26,8 @@ sub _make_handle {
     my %args = @_;
 
     for (keys %args) {
-        # XXX hook_*
         delete $args{$_} unless /\A(
-                                     dir|prefix|suffix|period|size|histories|
+                                     hook_.+|dir|prefix|suffix|period|size|histories|
                                      binmode|buffer_size|lock_mode|
                                      rotate_probability
                                  )\z/x;
@@ -41,6 +40,11 @@ sub log_message {
     my %args = @_;
 
     $self->{_fwr}->write($args{message});
+}
+
+sub fwr {
+    my $self = shift;
+    $self->{_fwr};
 }
 
 1;
@@ -58,7 +62,7 @@ Log::Dispatch::FileWriteRotate - Log to files that archive/rotate themselves, w/
 
 =head1 VERSION
 
-This document describes version 0.060 of Log::Dispatch::FileWriteRotate (from Perl distribution Log-Dispatch-FileWriteRotate), released on 2019-01-09.
+This document describes version 0.062 of Log::Dispatch::FileWriteRotate (from Perl distribution Log-Dispatch-FileWriteRotate), released on 2021-07-21.
 
 =head1 SYNOPSIS
 
@@ -85,6 +89,12 @@ L<File::Write::Rotate> as backend, thus interoperates more easily with other
 modules which use File::Write::Rotate as backend, e.g.
 L<Tie::Handle::FileWriteRotate> or L<Process::Govern>.
 
+=head1 CONTRIBUTOR
+
+=for stopwords Steven Haryanto
+
+Steven Haryanto <sharyanto@cpan.org>
+
 =head1 METHODS
 
 =head2 new(%args)
@@ -99,6 +109,13 @@ L<File::Write::Rotate>).
 Send a message to the appropriate output. Generally this shouldn't be called
 directly but should be called through the C<log()> method (in
 LLog::Dispatch::Output>).
+
+=head2 fwr
+
+Expose File::Write::Rotate object. You can do access this object e.g. to
+compress logfiles:
+
+ $file->fwd->compress;
 
 =head1 HOMEPAGE
 
@@ -130,7 +147,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2015, 2013, 2012 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2019, 2015, 2013, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -561,6 +561,29 @@ LemonLDAP::NG Portal jQuery scripts
     if ((window.datas.ppolicy != null) && $('#newpassword').length) {
       $('#reset').change(togglecheckpassword);
     }
+    if (datas['enablePasswordDisplay']) {
+      if (datas['dontStorePassword']) {
+        $(".toggle-password").mousedown(function() {
+          $(this).toggleClass("fa-eye fa-eye-slash");
+          return $("input[name=password]").attr('class', 'form-control');
+        });
+        $(".toggle-password").mouseup(function() {
+          $(this).toggleClass("fa-eye fa-eye-slash");
+          if ($("input[name=password]").get(0).value) {
+            return $("input[name=password]").attr('class', 'form-control key');
+          }
+        });
+      } else {
+        $(".toggle-password").mousedown(function() {
+          $(this).toggleClass("fa-eye fa-eye-slash");
+          return $("input[name=password]").attr("type", "text");
+        });
+        $(".toggle-password").mouseup(function() {
+          $(this).toggleClass("fa-eye fa-eye-slash");
+          return $("input[name=password]").attr("type", "password");
+        });
+      }
+    }
     if (datas['pingInterval'] && datas['pingInterval'] > 0) {
       window.setTimeout(ping, datas['pingInterval']);
     }
@@ -573,26 +596,118 @@ LemonLDAP::NG Portal jQuery scripts
       return removeOidcConsent($(this).attr('partner'));
     });
     $('#show-hide-button').on('click', function() {
-      if ($("#newpassword").attr('type') === 'password') {
-        console.log('Show passwords');
-        $("#newpassword").attr('type', 'input');
-        $("#confirmpassword").attr('type', 'input');
-        $("#show-hide-icon-button").removeClass('fa-eye');
-        return $("#show-hide-icon-button").addClass('fa-eye-slash');
+      if (datas['dontStorePassword']) {
+        if ($("#newpassword").attr('class') === 'form-control key' || $("#confirmpassword").attr('class') === 'form-control key') {
+          console.log('Show passwords');
+          $("#newpassword").attr('class', 'form-control');
+          $("#confirmpassword").attr('class', 'form-control');
+          return $("#show-hide-icon-button").attr('class', 'fa fa-eye-slash');
+        } else {
+          console.log('Hide passwords');
+          if ($("#newpassword").get(0).value) {
+            $("#newpassword").attr('class', 'form-control key');
+          }
+          if ($("#confirmpassword").get(0).value) {
+            $("#confirmpassword").attr('class', 'form-control key');
+          }
+          if ($("#newpassword").get(0).value || $("#confirmpassword").get(0).value) {
+            return $("#show-hide-icon-button").attr('class', 'fa fa-eye');
+          }
+        }
       } else {
-        console.log('Hide passwords');
-        $("#newpassword").attr('type', 'password');
-        $("#confirmpassword").attr('type', 'password');
-        $("#show-hide-icon-button").removeClass('fa-eye-slash');
-        return $("#show-hide-icon-button").addClass('fa-eye');
+        if ($("#newpassword").attr('type') === 'password') {
+          console.log('Show passwords');
+          $("#newpassword").attr('type', 'text');
+          $("#confirmpassword").attr('type', 'text');
+          return $("#show-hide-icon-button").attr('class', 'fa fa-eye-slash');
+        } else {
+          console.log('Hide passwords');
+          $("#newpassword").attr('type', 'password');
+          $("#confirmpassword").attr('type', 'password');
+          return $("#show-hide-icon-button").attr('class', 'fa fa-eye');
+        }
       }
     });
-    if (window.location.href.match(/\/finduser/)) {
-      console.log('Set Portal URL: ' + portal);
-      return window.history.pushState({
-        page: 'Portal'
-      }, 'Portal', portal);
-    }
+    $('#passwordfield').on('input', function() {
+      if ($('#passwordfield').get(0).value && datas['dontStorePassword']) {
+        return $("#passwordfield").attr('class', 'form-control key');
+      } else {
+        return $("#passwordfield").attr('class', 'form-control');
+      }
+    });
+    $('#oldpassword').on('input', function() {
+      if ($('#oldpassword').get(0).value && datas['dontStorePassword']) {
+        return $("#oldpassword").attr('class', 'form-control key');
+      } else {
+        return $("#oldpassword").attr('class', 'form-control');
+      }
+    });
+    $('#newpassword').on('input', function() {
+      if ($('#newpassword').get(0).value && datas['dontStorePassword']) {
+        if ($("#show-hide-icon-button").attr('class') === 'fa fa-eye') {
+          return $("#newpassword").attr('class', 'form-control key');
+        }
+      } else {
+        return $("#newpassword").attr('class', 'form-control');
+      }
+    });
+    $('#confirmpassword').on('input', function() {
+      if ($('#confirmpassword').get(0).value && datas['dontStorePassword']) {
+        if ($("#show-hide-icon-button").attr('class') === 'fa fa-eye') {
+          return $("#confirmpassword").attr('class', 'form-control key');
+        }
+      } else {
+        return $("#confirmpassword").attr('class', 'form-control');
+      }
+    });
+    $('#resetfinduserform').on('click', function() {
+      console.log('Reset form');
+      return $('#finduserForm').trigger('reset');
+    });
+    $('#closefinduserform').on('click', function() {
+      console.log('Clear modal');
+      return $('#finduserForm').trigger('reset');
+    });
+    return $('#finduserbutton').on('click', function(event) {
+      var str;
+      event.preventDefault();
+      document.body.style.cursor = 'progress';
+      str = $("#finduserForm").serialize();
+      console.log('Send findUser request with parameters', str);
+      return $.ajax({
+        type: "POST",
+        url: portal + "finduser",
+        dataType: 'json',
+        data: str,
+        success: function(data) {
+          var user;
+          document.body.style.cursor = 'default';
+          user = data.user;
+          console.log('Suggested spoofId=', user);
+          $('#spoofIdfield').attr('value', user);
+          if (data.captcha) {
+            $('#captcha').attr('src', data.captcha);
+          }
+          if (data.token) {
+            $('#finduserToken').attr('value', data.token);
+            return $('#token').attr('value', data.token);
+          }
+        },
+        error: function(j, status, err) {
+          var res;
+          document.body.style.cursor = 'default';
+          if (err) {
+            console.log('Error', err);
+          }
+          if (j) {
+            res = JSON.parse(j.responseText);
+          }
+          if (res && res.error) {
+            return console.log('Returned error', res);
+          }
+        }
+      });
+    });
   });
 
 }).call(this);

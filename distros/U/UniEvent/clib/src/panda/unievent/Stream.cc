@@ -184,7 +184,7 @@ void Stream::finalize_handle_read (string& buf, const ErrorCode& err) {
 
 // ===================== WRITE ===============================
 void Stream::write (const WriteRequestSP& req) {
-    panda_log_debug("ConnectRequest::exec req: " << req << ", this: " << this);
+    panda_log_debug("WriteRequest::exec req: " << req << ", this: " << this);
     for (const auto& buf : req->bufs) _wq_size += buf.length();
     req->set(this);
     queue.push(req);

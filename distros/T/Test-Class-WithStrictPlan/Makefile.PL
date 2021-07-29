@@ -1,5 +1,4 @@
-#!/usr/bin/perl
-use ExtUtils::MakeMaker;
+use ExtUtils::MakeMaker 6.68;
 WriteMakefile(
 	NAME             => 'Test::Class::WithStrictPlan',
 	VERSION_FROM     => 'lib/Test/Class/WithStrictPlan.pm',
@@ -8,17 +7,18 @@ WriteMakefile(
 	LICENSE          => 'perl_5',
 	MIN_PERL_VERSION => '5.6.0',
 
+	CONFIGURE_REQUIRES => {
+		'ExtUtils::MakeMaker'    => '6.68',
+	},
 	PREREQ_PM => {
 		'parent'                 => '0',
 		'strict'                 => '0',
 		'warnings'               => '0',
-		'Attribute::Handlers'    => '0',
-		'Test::Class'            => '0.37',
+		'Test::Class'            => '0.51',
 	},
 	TEST_REQUIRES => {
 		'Test::More'             => '0',
 	},
-	eval { ExtUtils::MakeMaker->VERSION('6.68') } ? (
 	META_MERGE => {
 		'meta-spec' => {
 			version => 2,
@@ -33,6 +33,6 @@ WriteMakefile(
 				type => 'git',
 			},
 		},
+		'dynamic_config' => 0,
 	},
-	) : (),
 );

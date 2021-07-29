@@ -1,4 +1,15 @@
-2017-02-01 1.29 pjacklam
+1.30 2021-07-18
+
+ * Clean up and modernize the code.
+
+ * Reorganize test files and add more test files.
+
+ * New MANIFEST.SKIP file based on the template in the ExtUtils-Manifest
+   distribution.
+
+ * Format CHANGES according to CPAN::Changes::Spec.
+
+1.29 2017-02-01 pjacklam
 
  * Fix case in Math::String when bzero() is called as a class method.
 
@@ -26,166 +37,10 @@
 
  * Fix flawed tests.
 
-2008-04-03 1.28 Tels 662 tests
+1.28 2008-04-03 Tels 662 tests
 
  * do not use "lib => GMP", instead let the user decide which lib we take
 
  * bundle Module::Install and amend Makefile.PL
 
  * require Math::BigInt v1.87
-
-Older version history:
-======================
-
-##############################################################################
-Math::String:
-
-1.02: fixed new() as copy, bstr works now, dropped multiple charsets
-1.03: 02/2001: added support for Math::String::Charset and thus bi-grams
-               added: caching for more speed
-2001-02-14 1.04: fixed inheritance/overloading bugs (objectify)
-                 finally got rid of copy&paste overload
-2001-02-16 1.05: fixed overload bug in cmp (Math::String cmp something other)
-2001-02-22 1.06: fixed: digits() => length()
-2001-03-18 1.07: fixed: documentation
-2001-03-25 1.08: added: support for caching of string form
-2001-04-13 1.09: as_number: returns now Math::BigInt
-2001-05-07 1.10: finally got rid of C&P of overload section
-2001-05-13 1.11: added accuracy/precision/fallback/rnd_mode and tests for this
-2001-07-08 1.12: added bnan(), binf(), fixed $x->bzero(), added test for these
-		 fixed bug in copy() code in from_number()
-2001-07-26 1.13: new( { str => 'abc', num => '123' } );
-2001-08-08 1.14: bstr() was not caching string form, some more tests
-	         copy() does no longer make a (costly) true copy of the charset
-2001-09-01 1.15: unreleased
-		 binc(), bdec() modify cache for speedup (instead clearing it)
-                 added bone(), is_valid(), maxlen(), minlen()
-2001-11-05 1.16: added class()
-		 binc(), bdec() modify cache instead of clearing it (speedup)
-		 added bone(), is_valid(), minlen(), maxlen(), type(), class()
-2002-02-20 1.17: removed debug output
-		 _core_lib => config()->{lib}
-2002-02-28 1.18: binc()/bdec() four times as fast
-		 as_number twice as fast
-2003-02-06 1.19: removed some needless return statements
-		 removed debug printout "changing charset..."
-		 added __END__ marker for faster loading
-2003-04-07 1.20: added: scale()
-		 as_number() uses _scale to scale output
-2003-04-10 1.21: fixed: bug in UNIVERSAL::isa() call in from_number
-2003-04-22 1.22: prefer Math::BigInt::GMP on use
-2003-07-26 1.23: removed shebang line
-2003-12-11 1.24 Tels 599 tests
-  * new( { str => ..., num => ... } ) did not honour scale from charset
-2004-11-20 1.25 Tels 662 tests
-  * simplify caching:
-    + remove unused len cache
-    + since we only cache on thing, use a plain scalar instead of a hash, this
-      saves memory per Math::String object and makes everything go a little
-      faster since a hash lookup for ->{str} is no longer necessary
-  * bstr() for uncached strings with SIMPLE charset is now about twice as fast
-  * copy() is about 16% faster (due to simpler cache and streamlining)
-2004-11-20 1.26 Tels 662 tests
-  * avoid caching wrong $CALC - load GMP rightaway
-2005-01-01 1.27 Tels 662 tests
-  * use register_callback to get notified by Math::BigInt on lib changes
-##############################################################################
-Math::String::Charset:
-
-2000-02-07 1.02: first version with bi-grams
-2000-02-14 1.03: fixed: simple charsets to work now,
-                 added: _end hash and _ones set
-2000-02-16 1.04: added: char(), charlength()
-2000-02-17 1.05: fixed: chars with diff. len raise error, works now with
-                        characters of length > 1
-                        some slight optimizations for simple charsets
-2000-02-22 1.06: fixed: documentation (fill-characters, die on error)
-			toggle $Math::String::Charset::die_on_error
-		        num2str() is now about a small, constant amount faster
-2000-03-18 1.07: fixed: documentation
-		 added: separator string/char for 'the lazy fox' style strings
-		 	renamed type() to order()
-		 	documented that length() always returns count of chars
-2000-03-25 1.08: added: next(), prev() for simple charsets (cache in M::S)
-2000-06-26 1.09: fixed: bug accessing BigInt's internals, fails for BitVect etc
-2000-09-01 1.10: split: into Charset, Nested and Grouped
-                 fixed: next()/prev() work now
-		 added: support for minlen, maxlen, ones(), type()
-2000-10-19 1.11: fixed: Math::BigInt::bzero() => Math::BigInt->bero()
-		 split Charset.pm into
-			Math::String::Charset::Simple  (type = 0, order = 1)
-			Math::String::Charset::Nested  (type = 0, order > 1)
-			Math::String::Charset::Grouped (type = 1, order = 1)
-	         added: support for minlen and maxlen
-	                ones(), count(), zero(), one(), type() and tests
-			next/prev actually work
-			analyze is alias for study, can export analyze
-		fixed:  better error handling upon initialization
-  			is now subclassable
-			first()/last() work now with sep char, added tests
-  			make Math::String->first($length,$set) work
-			 (and last(), too), test for it
-			study:
-			 'chars' and 'start' for depth => 1
-			 depth as alias for order
-			 can return histogram (hist => 1)
-			 now works for the "hocuspocus" example
-			 tests are now in seperate file
-2003-02-06 1.12: added __END__ marker for faster loading
-2003-04-10 1.13: added scale() and scale as parameter to new()
-2003-04-22 1.14: fix for scale not beeing a legal parameter to new()
-		 prefer Math::BigInt::GMP on use
-		 added method copy()
-2003-07-26 1.15: require Math::String::Charset::Wordlist vs. use
-		 added lib => 'GMP'
-		 removed shebang line
-2004-11-20 1.16
-  * for simple Charsets, the _end hash can be shared with the _map hash. That
-    reduces memory by at least 20% (a..z, leaning towards 30% for larger sets)
-    and makes new() at least 10% (a..z, more for larger sets) faster, too :)
-  * dump() returns the dump as string instead of printing it
-  * fix end keys in dump from SIMPLE charsets
-  * dump() takes optional indend parameter
-  * remove unused SIMPLE() in Charset.pm
-  * streamlined str2num() to make "new()" faster
-  * streamlined num2str() to make "bstr()" faster
-  * remove GMP lib (let caller decide)
-
-
-##############################################################################
-Math::String::Charset::Grouped:
-2000-09-20 0.01: first version from Charset
-2000-10-25 0.02: fixed bugs, added sep char support
-2003-02-06 0.03: added __END__ marker for faster loading
-2003-04-14 0.04: fix for scale not beeing a legal parameter to new()
-2003-07-26 0.05: added lib => 'GMP'
-		 removed shebang line
-2004-11-20 0.06: fix dump() for GROUPED charsets
-		 remove GMP lib (let caller decide)
-
-##############################################################################
-Math::String::Charset::Nested:
-2000-09-15 0.01: split from Charset
-		 fixed: bi-gram chars w/o followers can't be in _start
-		 class() was wrong for bi-grams (with some start sets)
-2003-02-06 0.02: added __END__ marker for faster loading
-2003-04-14 0.03: fix for scale not beeing a legal parameter to new()
-2003-07-26 0.04: added lib => 'GMP'
-		 removed shebang line
-2004-11-20 0.05: remove GMP lib (let caller decide)
-
-##############################################################################
-Math::String::Charset::Wordlist was moved into it's own distribution
-
-##############################################################################
-Math::String::Sequence:
-
-2001-03-20 1.00 first version, complete with test and doc
-2001-03-24 1.01 support for reversed sequences
-2001-04-21 1.02 added: as_array for 'a'..'z' emulation
-2003-02-06 1.03 added __END__ marker for faster loading
-		fixed a potential problem in as_array()
-2003-07-26 1.04 added lib => 'GMP'
-		removed shebang line
-2004-11-20 0.05: remove GMP lib (let caller decide)
-2005-01-01 0.06: remove a couple of needless return statements

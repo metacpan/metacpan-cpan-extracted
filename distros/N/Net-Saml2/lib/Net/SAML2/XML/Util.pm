@@ -3,13 +3,13 @@ package Net::SAML2::XML::Util;
 use strict;
 use warnings;
 
-use XML::Tidy;
+use XML::LibXML;
 
 # use 'our' on v5.6.0
 use vars qw($VERSION @EXPORT_OK %EXPORT_TAGS $DEBUG);
 
 $DEBUG = 0;
-$VERSION = '0.34';
+$VERSION = '0.40';
 
 # We are exporting functions
 use base qw/Exporter/;
@@ -23,9 +23,17 @@ sub no_comments {
     my $xml = shift;
 
     # Remove comments from XML to mitigate XML comment auth bypass
-    my $tidy_obj = XML::Tidy->new(xml => $xml);
-    $tidy_obj->prune('//comment()');
-    return $tidy_obj->toString();
+    my $dom = XML::LibXML->load_xml(
+                    string => $xml,
+                    no_network => 1,
+                    load_ext_dtd => 0,
+                    expand_entities => 0 );
+
+    for my $comment_node ($dom->findnodes('//comment()')) {
+        $comment_node->parentNode->removeChild($comment_node);
+    }
+
+    return $dom;
 }
 
 1;
@@ -42,7 +50,7 @@ Net::SAML2::XML::Util
 
 =head1 VERSION
 
-version 0.34
+version 0.40
 
 =head1 SYNOPSIS
 
@@ -63,14 +71,11 @@ authentication bypass in SAML2 implementations
 
 =head1 AUTHOR
 
-Original Author: Chris Andrews  <chrisa@cpan.org>
+Chris Andrews  <chrisa@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Chris Andrews and Others; in detail:
-
-  Copyright 2019-2021  Timothy Legge
-
+This software is copyright (c) 2021 by Chris Andrews and Others, see the git log.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

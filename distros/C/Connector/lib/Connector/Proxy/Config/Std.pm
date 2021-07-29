@@ -207,8 +207,8 @@ __PACKAGE__->meta->make_immutable;
 1;
 __END__
 
-=head 1 Name
+=head1 Name
 
 Connector::Proxy::Config::Std
 
-=head 1 Description
+=head1 Description

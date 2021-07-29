@@ -41,13 +41,16 @@
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ssimms/pdfapi2/issues"
+      },
       "repository" : {
          "type" : "git",
          "url" : "git://github.com/ssimms/pdfapi2.git",
          "web" : "https://github.com/ssimms/pdfapi2"
       }
    },
-   "version" : "2.040",
+   "version" : "2.041",
    "x_generated_by_perl" : "v5.28.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.09",
    "x_spdx_expression" : "LGPL-2.1"

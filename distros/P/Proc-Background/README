@@ -87,6 +87,6 @@ utility to extract documentation from the module files directly.
 
 COPYRIGHT
 
-Copyright (C) 1998-2005 Blair Zajac.  All rights reserved.  This
-package is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
+Copyright (C) 1998-2005 Blair Zajac, 2019-2021 Michael Conrad.
+All rights reserved.  This package is free software; you can
+redistribute it and/or modify it under the same terms as Perl itself.

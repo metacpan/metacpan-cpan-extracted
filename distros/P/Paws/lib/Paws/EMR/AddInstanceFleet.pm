@@ -39,9 +39,11 @@ You shouldn't make instances of this class. Each attribute should be used as a n
             BidPriceAsPercentageOfOnDemandPrice => 1,    # OPTIONAL
             Configurations                      => [
               {
-                Classification => 'MyString',
+                Classification => 'MyString',            # OPTIONAL
                 Configurations => <ConfigurationList>,
-                Properties     => { 'MyString' => 'MyString', },    # OPTIONAL
+                Properties     => {
+                  'MyString' => 'MyString',    # key: OPTIONAL, value: OPTIONAL
+                },    # OPTIONAL
               },
               ...
             ],    # OPTIONAL
@@ -50,7 +52,7 @@ You shouldn't make instances of this class. Each attribute should be used as a n
                 {
                   VolumeSpecification => {
                     SizeInGB   => 1,
-                    VolumeType => 'MyString',
+                    VolumeType => 'MyString',    # OPTIONAL
                     Iops       => 1,
                   },
                   VolumesPerInstance => 1,
@@ -64,13 +66,25 @@ You shouldn't make instances of this class. Each attribute should be used as a n
           ...
         ],    # OPTIONAL
         LaunchSpecifications => {
+          OnDemandSpecification => {
+            AllocationStrategy         => 'lowest-price', # values: lowest-price
+            CapacityReservationOptions => {
+              CapacityReservationPreference =>
+                'open',    # values: open, none; OPTIONAL
+              CapacityReservationResourceGroupArn =>
+                'MyXmlStringMaxLen256',    # max: 256
+              UsageStrategy => 'use-capacity-reservations-first'
+              ,    # values: use-capacity-reservations-first; OPTIONAL
+            },    # OPTIONAL
+          },    # OPTIONAL
           SpotSpecification => {
             TimeoutAction => 'SWITCH_TO_ON_DEMAND'
             ,    # values: SWITCH_TO_ON_DEMAND, TERMINATE_CLUSTER
             TimeoutDurationMinutes => 1,    # OPTIONAL
-            BlockDurationMinutes   => 1,    # OPTIONAL
-          },
-
+            AllocationStrategy     =>
+              'capacity-optimized',    # values: capacity-optimized; OPTIONAL
+            BlockDurationMinutes => 1, # OPTIONAL
+          },    # OPTIONAL
         },    # OPTIONAL
         Name                   => 'MyXmlStringMaxLen256',    # max: 256
         TargetOnDemandCapacity => 1,                         # OPTIONAL

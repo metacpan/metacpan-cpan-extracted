@@ -1,0 +1,476 @@
+NAME
+    Regexp::Pattern::DefHash - Regexp patterns related to DefHash
+
+VERSION
+    This document describes version 0.001 of Regexp::Pattern::DefHash (from
+    Perl distribution Regexp-Pattern-DefHash), released on 2021-07-22.
+
+SYNOPSIS
+     use Regexp::Pattern; # exports re()
+     my $re = re("DefHash::attr");
+
+DESCRIPTION
+    Regexp::Pattern is a convention for organizing reusable regex patterns.
+
+REGEXP PATTERNS
+    *   attr
+
+        Tags: anchored, capturing
+
+        Attribute key.
+
+        Examples:
+
+        Example #1.
+
+         ".attr" =~ re("DefHash::attr");  # matches
+
+        Example #2.
+
+         "._attr" =~ re("DefHash::attr");  # matches
+
+        Example #3.
+
+         ".attr1.subattr2" =~ re("DefHash::attr");  # matches
+
+        Example #4.
+
+         "prop.attr1" =~ re("DefHash::attr");  # matches
+
+        Example #5.
+
+         "_prop._attr1" =~ re("DefHash::attr");  # matches
+
+        Example #6.
+
+         "Prop.attr1.subattr2.Subattr3" =~ re("DefHash::attr");  # matches
+
+        Example #7.
+
+         "_prop.attr1" =~ re("DefHash::attr");  # matches
+
+        Cannot start with digit (1).
+
+         ".0attr" =~ re("DefHash::attr");  # DOESN'T MATCH
+
+        Cannot start with digit (2).
+
+         "prop.0attr" =~ re("DefHash::attr");  # DOESN'T MATCH
+
+        Cannot start with digit (3).
+
+         "prop.attr.0subattr" =~ re("DefHash::attr");  # DOESN'T MATCH
+
+        Invalid character: dash (1).
+
+         ".attr-ibute" =~ re("DefHash::attr");  # DOESN'T MATCH
+
+        Invalid character: dash (2).
+
+         "prop-erty.attribute" =~ re("DefHash::attr");  # DOESN'T MATCH
+
+        Invalid character: dash (3).
+
+         "prop.attr-ibute" =~ re("DefHash::attr");  # DOESN'T MATCH
+
+        Invalid character: whitespace (1).
+
+         "property .attr" =~ re("DefHash::attr");  # DOESN'T MATCH
+
+        Invalid character: whitespace (2).
+
+         "property.attr " =~ re("DefHash::attr");  # DOESN'T MATCH
+
+        Invalid character: whitespace (3).
+
+         ".attr " =~ re("DefHash::attr");  # DOESN'T MATCH
+
+        Invalid syntax: dot only.
+
+         "." =~ re("DefHash::attr");  # DOESN'T MATCH
+
+        Invalid syntax: double dot.
+
+         "..attr" =~ re("DefHash::attr");  # DOESN'T MATCH
+
+        Invalid syntax: dot without attr.
+
+         "attr." =~ re("DefHash::attr");  # DOESN'T MATCH
+
+        Invalid syntax: dot without attr (2).
+
+         "attr.." =~ re("DefHash::attr");  # DOESN'T MATCH
+
+        Empty.
+
+         "" =~ re("DefHash::attr");  # DOESN'T MATCH
+
+        Property, not attribute.
+
+         "p" =~ re("DefHash::attr");  # DOESN'T MATCH
+
+        Property, not attribute.
+
+         "_" =~ re("DefHash::attr");  # DOESN'T MATCH
+
+    *   attr_part
+
+        Tags: anchored
+
+        Attribute part in attribute key.
+
+        Examples:
+
+        Empty.
+
+         "" =~ re("DefHash::attr_part");  # DOESN'T MATCH
+
+        Example #2.
+
+         "p" =~ re("DefHash::attr_part");  # matches
+
+        Example #3.
+
+         "p.q" =~ re("DefHash::attr_part");  # matches
+
+        Dot prefix must not be included.
+
+         ".p" =~ re("DefHash::attr_part");  # DOESN'T MATCH
+
+    *   key
+
+        Tags: anchored, capturing
+
+        Attribute key or property key.
+
+        All keys in defhash must match this pattern.
+
+        Examples:
+
+        Example #1.
+
+         "p" =~ re("DefHash::key");  # matches
+
+        Example #2.
+
+         "_" =~ re("DefHash::key");  # matches
+
+        Example #3.
+
+         "prop" =~ re("DefHash::key");  # matches
+
+        Example #4.
+
+         "Prop2" =~ re("DefHash::key");  # matches
+
+        Example #5.
+
+         "prop_" =~ re("DefHash::key");  # matches
+
+        Cannot start with digit.
+
+         "0prop" =~ re("DefHash::key");  # DOESN'T MATCH
+
+        Invalid character: dash.
+
+         "prop-erty" =~ re("DefHash::key");  # DOESN'T MATCH
+
+        Invalid character: whitespace.
+
+         "property " =~ re("DefHash::key");  # DOESN'T MATCH
+
+        Example #9.
+
+         ".attr" =~ re("DefHash::key");  # matches
+
+        Example #10.
+
+         "._attr" =~ re("DefHash::key");  # matches
+
+        Example #11.
+
+         ".attr1.subattr2" =~ re("DefHash::key");  # matches
+
+        Example #12.
+
+         "prop.attr1" =~ re("DefHash::key");  # matches
+
+        Example #13.
+
+         "_prop._attr1" =~ re("DefHash::key");  # matches
+
+        Example #14.
+
+         "Prop.attr1.subattr2.Subattr3" =~ re("DefHash::key");  # matches
+
+        Example #15.
+
+         "_prop.attr1" =~ re("DefHash::key");  # matches
+
+        Cannot start with digit (1).
+
+         ".0attr" =~ re("DefHash::key");  # DOESN'T MATCH
+
+        Cannot start with digit (2).
+
+         "prop.0attr" =~ re("DefHash::key");  # DOESN'T MATCH
+
+        Cannot start with digit (3).
+
+         "prop.attr.0subattr" =~ re("DefHash::key");  # DOESN'T MATCH
+
+        Invalid character: dash (1).
+
+         ".attr-ibute" =~ re("DefHash::key");  # DOESN'T MATCH
+
+        Invalid character: dash (2).
+
+         "prop-erty.attribute" =~ re("DefHash::key");  # DOESN'T MATCH
+
+        Invalid character: dash (3).
+
+         "prop.attr-ibute" =~ re("DefHash::key");  # DOESN'T MATCH
+
+        Invalid character: whitespace (1).
+
+         "property .attr" =~ re("DefHash::key");  # DOESN'T MATCH
+
+        Invalid character: whitespace (2).
+
+         "property.attr " =~ re("DefHash::key");  # DOESN'T MATCH
+
+        Invalid character: whitespace (3).
+
+         ".attr " =~ re("DefHash::key");  # DOESN'T MATCH
+
+        Invalid syntax: dot only.
+
+         "." =~ re("DefHash::key");  # DOESN'T MATCH
+
+        Invalid syntax: double dot.
+
+         "..attr" =~ re("DefHash::key");  # DOESN'T MATCH
+
+        Invalid syntax: dot without attr.
+
+         "attr." =~ re("DefHash::key");  # DOESN'T MATCH
+
+        Invalid syntax: dot without attr (2).
+
+         "attr.." =~ re("DefHash::key");  # DOESN'T MATCH
+
+        Empty.
+
+         "" =~ re("DefHash::key");  # DOESN'T MATCH
+
+    *   prop
+
+        Tags: anchored
+
+        Property key.
+
+        Examples:
+
+        Example #1.
+
+         "p" =~ re("DefHash::prop");  # matches
+
+        Example #2.
+
+         "_" =~ re("DefHash::prop");  # matches
+
+        Example #3.
+
+         "prop" =~ re("DefHash::prop");  # matches
+
+        Example #4.
+
+         "Prop2" =~ re("DefHash::prop");  # matches
+
+        Example #5.
+
+         "prop_" =~ re("DefHash::prop");  # matches
+
+        Cannot start with digit.
+
+         "0prop" =~ re("DefHash::prop");  # DOESN'T MATCH
+
+        Invalid character: dash.
+
+         "prop-erty" =~ re("DefHash::prop");  # DOESN'T MATCH
+
+        Invalid character: whitespace.
+
+         "property " =~ re("DefHash::prop");  # DOESN'T MATCH
+
+        Empty.
+
+         "" =~ re("DefHash::prop");  # DOESN'T MATCH
+
+        Attribute, not property.
+
+         "prop.attr" =~ re("DefHash::prop");  # DOESN'T MATCH
+
+        Attribute, not property.
+
+         ".attr" =~ re("DefHash::prop");  # DOESN'T MATCH
+
+    *   prop_or_attr
+
+        Tags: anchored, capturing
+
+        Attribute key or property key.
+
+        All keys in defhash must match this pattern.
+
+        Examples:
+
+        Example #1.
+
+         "p" =~ re("DefHash::prop_or_attr");  # matches
+
+        Example #2.
+
+         "_" =~ re("DefHash::prop_or_attr");  # matches
+
+        Example #3.
+
+         "prop" =~ re("DefHash::prop_or_attr");  # matches
+
+        Example #4.
+
+         "Prop2" =~ re("DefHash::prop_or_attr");  # matches
+
+        Example #5.
+
+         "prop_" =~ re("DefHash::prop_or_attr");  # matches
+
+        Cannot start with digit.
+
+         "0prop" =~ re("DefHash::prop_or_attr");  # DOESN'T MATCH
+
+        Invalid character: dash.
+
+         "prop-erty" =~ re("DefHash::prop_or_attr");  # DOESN'T MATCH
+
+        Invalid character: whitespace.
+
+         "property " =~ re("DefHash::prop_or_attr");  # DOESN'T MATCH
+
+        Example #9.
+
+         ".attr" =~ re("DefHash::prop_or_attr");  # matches
+
+        Example #10.
+
+         "._attr" =~ re("DefHash::prop_or_attr");  # matches
+
+        Example #11.
+
+         ".attr1.subattr2" =~ re("DefHash::prop_or_attr");  # matches
+
+        Example #12.
+
+         "prop.attr1" =~ re("DefHash::prop_or_attr");  # matches
+
+        Example #13.
+
+         "_prop._attr1" =~ re("DefHash::prop_or_attr");  # matches
+
+        Example #14.
+
+         "Prop.attr1.subattr2.Subattr3" =~ re("DefHash::prop_or_attr");  # matches
+
+        Example #15.
+
+         "_prop.attr1" =~ re("DefHash::prop_or_attr");  # matches
+
+        Cannot start with digit (1).
+
+         ".0attr" =~ re("DefHash::prop_or_attr");  # DOESN'T MATCH
+
+        Cannot start with digit (2).
+
+         "prop.0attr" =~ re("DefHash::prop_or_attr");  # DOESN'T MATCH
+
+        Cannot start with digit (3).
+
+         "prop.attr.0subattr" =~ re("DefHash::prop_or_attr");  # DOESN'T MATCH
+
+        Invalid character: dash (1).
+
+         ".attr-ibute" =~ re("DefHash::prop_or_attr");  # DOESN'T MATCH
+
+        Invalid character: dash (2).
+
+         "prop-erty.attribute" =~ re("DefHash::prop_or_attr");  # DOESN'T MATCH
+
+        Invalid character: dash (3).
+
+         "prop.attr-ibute" =~ re("DefHash::prop_or_attr");  # DOESN'T MATCH
+
+        Invalid character: whitespace (1).
+
+         "property .attr" =~ re("DefHash::prop_or_attr");  # DOESN'T MATCH
+
+        Invalid character: whitespace (2).
+
+         "property.attr " =~ re("DefHash::prop_or_attr");  # DOESN'T MATCH
+
+        Invalid character: whitespace (3).
+
+         ".attr " =~ re("DefHash::prop_or_attr");  # DOESN'T MATCH
+
+        Invalid syntax: dot only.
+
+         "." =~ re("DefHash::prop_or_attr");  # DOESN'T MATCH
+
+        Invalid syntax: double dot.
+
+         "..attr" =~ re("DefHash::prop_or_attr");  # DOESN'T MATCH
+
+        Invalid syntax: dot without attr.
+
+         "attr." =~ re("DefHash::prop_or_attr");  # DOESN'T MATCH
+
+        Invalid syntax: dot without attr (2).
+
+         "attr.." =~ re("DefHash::prop_or_attr");  # DOESN'T MATCH
+
+        Empty.
+
+         "" =~ re("DefHash::prop_or_attr");  # DOESN'T MATCH
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Regexp-Pattern-DefHash>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Regexp-Pattern-DefHash>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Regexp-Pattern-DefHas
+    h>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    DefHash specification.
+
+    Regexp::Pattern
+
+    Some utilities related to Regexp::Pattern: App::RegexpPatternUtils,
+    rpgrep from App::rpgrep.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2021 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -1,9 +1,9 @@
 package Module::Features::TextTable;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-02-25'; # DATE
+our $DATE = '2021-02-26'; # DATE
 our $DIST = 'Module-Features-TextTable'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
@@ -61,7 +61,7 @@ Module::Features::TextTable - Features of modules that generate text tables
 
 =head1 VERSION
 
-This document describes version 0.002 of Module::Features::TextTable (from Perl distribution Module-Features-TextTable), released on 2021-02-25.
+This document describes version 0.003 of Module::Features::TextTable (from Perl distribution Module-Features-TextTable), released on 2021-02-26.
 
 =head1 DESCRIPTION
 

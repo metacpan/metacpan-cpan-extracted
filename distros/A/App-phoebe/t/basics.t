@@ -1,4 +1,4 @@
-# Copyright (C) 2017–2020  Alex Schroeder <alex@gnu.org>
+# Copyright (C) 2017–2021  Alex Schroeder <alex@gnu.org>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -209,11 +209,5 @@ $page = query_gemini("$base/file/Alex");
 like($page, qr/^40 /, "File no longer exists");
 $page = query_gemini("$base/do/changes");
 like($page, qr/^Alex \(deleted file\)/m, "Alex was deleted");
-
-# extension
-$page = query_gemini("$base/");
-like($page, qr/^=> gemini:\/\/localhost:1965\/do\/test Test\n/m, "Extension installed Test menu");
-$page = query_gemini("$base/do/test");
-like($page, qr/^Test\n/m, "Extension runs");
 
 done_testing();

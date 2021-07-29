@@ -2,8 +2,8 @@ NAME
     Hash::DefHash - Manipulate defhash
 
 VERSION
-    This document describes version 0.071 of Hash::DefHash (from Perl
-    distribution Hash-DefHash), released on 2020-01-04.
+    This document describes version 0.072 of Hash::DefHash (from Perl
+    distribution Hash-DefHash), released on 2021-07-21.
 
 SYNOPSIS
      use Hash::DefHash; # imports defhash()
@@ -92,6 +92,9 @@ SYNOPSIS
      # set value for alternative language
      $oldpropval = $dh->set_prop_lang($prop, $lang, $propval);
 
+CONTRIBUTOR
+    Steven Haryanto <sharyanto@cpan.org>
+
 FUNCTIONS
   defhash([ $hash ]) => OBJ
     Shortcut for "Hash::DefHash->new($hash)". As a bonus, can also detect if
@@ -166,12 +169,49 @@ METHODS
   prop
     Usage:
 
-     $val = $dh->prop($name);
+     $val = $dh->prop($prop [ , \%opts ]);
 
     Get property value, will die if property does not exist.
 
+    Known options:
+
+    *   die
+
+        Bool. Default true. Whether to die when requested property is not
+        found.
+
+    *   alt
+
+        Hashref.
+
+    *   mark_different_lang
+
+        Bool. Default false. If set to true, then when a requested property
+        is found but differs (only) in the language it will be returned but
+        with a mark. For example, with this defhash:
+
+         {name=>"Chair", "name.alt.lang.id_ID"=>"Kursi"}
+
+        then:
+
+         $dh->prop("name", {lang=>"fr_FR"});
+
+        will die. But:
+
+         $dh->prop("name", {lang=>"fr_FR", mark_different_lang=>1});
+
+        will return:
+
+         "{en_US Chair}"
+
+        or:
+
+         "{id_ID Kursi}"
+
   get_prop
-     $val = $dh->get_prop($name);
+    Usage:
+
+     my $val = $dh->get_prop($prop [ , \%opts ]);
 
     Like "prop"(), but will return undef if property does not exist.
 
@@ -199,6 +239,14 @@ METHODS
   description
   tags
   get_prop_lang
+    Usage:
+
+     my $val = $dh->get_prop_lang($prop, $lang [ , \%opts ]);
+
+    This is just a special case for:
+
+     $dh->prop($prop, {alt=>{lang=>$lang}, mark_different_lang=>1, %opts});
+
   get_prop_all_langs
   set_prop_lang
 HOMEPAGE
@@ -223,8 +271,8 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2020, 2018, 2016, 2015, 2014, 2012 by
-    perlancar@cpan.org.
+    This software is copyright (c) 2021, 2020, 2018, 2016, 2015, 2014, 2012
+    by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

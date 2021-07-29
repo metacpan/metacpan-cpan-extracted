@@ -1,7 +1,7 @@
 benchmarks/bench_changes.pl
 benchmarks/bench_results.txt
-benchmarks/sereal_vs_storable_without_ipc.pl
-benchmarks/storable_vs_serial.pl
+benchmarks/sereal_vs_storable_vs_json_without_ipc.pl
+benchmarks/storable_vs_json.pl
 Changes
 COPYING
 CREDITS
@@ -14,9 +14,11 @@ MANIFEST.SKIP
 README
 t/00-base.t
 t/02-create.t
+t/04-key.t
 t/05-sv.t
 t/10-av.t
 t/15-hv.t
+t/17-attributes.t
 t/20-ref.t
 t/25-ipc.t
 t/30-lock_operation.t
@@ -30,22 +32,28 @@ t/50-ipcobj.t
 t/55-lsync.t
 t/60-tied.t
 t/61-seg_sem.t
+t/63-nested_segs_tidy.t
+t/64-nested_segs_untidy.t
 t/65-seg_size.t
+t/66-size_exceeded.t
+t/67-out_of_memory.t
 t/71-unspawn.t
 t/72-unspawn_destroy.t
 t/75-graceful.t
 t/76-singleton.t
 t/77-singleton_warn.t
 t/80-exceptions.t
+t/85-spawn_object_contains_data.t
+t/86-unspawn_object_contains_data.t
 t/90-pod_coverage.t
 t/91-pod_linkcheck.t
 t/92-pod.t
 t/93-manifest.t
 t/_spawn
 t/_spawn_class
-t/spawn_data_in_object/75-spawn_object_contains_data.t
-t/spawn_data_in_object/76-unspawn_object_contains_data.t
-t/spawn_data_in_object/SpawnTest.pm
+t/SpawnTest.pm
+testing/one_deep_hash.pl
 testing/sharelite_with_sereal.pl
+testing/two_deep_hash.pl
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

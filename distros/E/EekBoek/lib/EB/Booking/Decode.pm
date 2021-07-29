@@ -10,8 +10,8 @@ package EB::Booking::Decode;
 # Author          : Johan Vromans
 # Created On      : Tue Sep 20 15:16:31 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Tue Oct 13 16:58:45 2015
-# Update Count    : 194
+# Last Modified On: Tue Apr 24 08:39:59 2018
+# Update Count    : 198
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -83,7 +83,8 @@ sub decode {
 	    $cmd =~ s/[^[:alnum:]]/_/g;
 	    $cmd .= ":$bsk_bky" if $ex_bky;
 	    $cmd .= ":$bsk_nr" if $ex_bsknr;
-	    $cmd .= " --".__xt("cmo:boeking:ref")."=" . _quote($bsk_ref) if defined $bsk_ref;
+#	    $cmd .= " --".__xt("cmo:boeking:ref")."=" . _quote($bsk_ref) if defined $bsk_ref;
+	    $rel_code .= ":" . $bsk_ref if defined $bsk_ref;
 	    $cmd .= " ".datefmt_full($bsk_date)." ";
 	    if ( $dbktype == DBKTYPE_INKOOP || $dbktype == DBKTYPE_VERKOOP ) {
 		$cmd .= $no_ivbskdesc ? _quote($rel_code) : _quote($bsk_desc, $rel_code);
@@ -127,6 +128,7 @@ sub decode {
 	    elsif ( defined $bsk_open ) {
 		$cmd .= $bsk_open ? ", @{[numfmt_plain(abs($bsk_open))]} open" : ", voldaan"
 	    }
+	    $cmd .= ", ref " . _quote($bsk_ref) if defined $bsk_ref;
 	    $cmd .= "\n";
 	}
     };
@@ -180,7 +182,7 @@ sub decode {
 	my $a = EB::Booking::->norm_btw($bsr_amount, $bsr_btw_id);
 	$tot += $a->[0];
 
-	next unless $trail;
+	$rr = $sth->fetchrow_arrayref, next unless $trail;
 
 	$bsr_acc_id ||= "";
 	my $btw = "";

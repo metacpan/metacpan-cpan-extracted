@@ -5,7 +5,7 @@ package Data::Record::Serialize::Error;
 use strict;
 use warnings;
 
-our $VERSION = '0.20';
+our $VERSION = '0.23';
 
 use Exporter::Shiny qw( error );
 
@@ -14,15 +14,15 @@ use custom::failures ( qw[
       method::stub
 ] );
 
-#pod =attr msg
-#pod
-#pod =attr payload
-#pod
-#pod =attr trace
-#pod
-#pod See L<failures/Attributes>.
-#pod
-#pod =cut
+
+
+
+
+
+
+
+
+
 
 sub _exporter_validate_opts {
 
@@ -43,17 +43,17 @@ sub _exporter_validate_opts {
     $class->SUPER::_exporter_validate_opts( @_ );
 }
 
-#pod =sub error
-#pod
-#pod   error( $error_class, @_ );
-#pod
-#pod Throw an error. C<$error_class> is converted to a fully qualified class
-#pod name; see L</Error Class Names>.  The remaining parameters are passed
-#pod directly to the L<failures> throw method (see L<failures/Throwing
-#pod failures>).
-#pod
-#pod
-#pod =cut
+
+
+
+
+
+
+
+
+
+
+
 
 sub error {
     my $class = shift;
@@ -99,13 +99,15 @@ __END__
 
 =pod
 
+=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory
+
 =head1 NAME
 
 Data::Record::Serialize::Error - Error objects
 
 =head1 VERSION
 
-version 0.20
+version 0.23
 
 =head1 SYNOPSIS
 

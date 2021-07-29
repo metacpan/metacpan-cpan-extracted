@@ -1,11 +1,8 @@
 CHANGELOG
 lib.modern/Text/Tabs.pm
 lib.modern/Text/Wrap.pm
-lib.old/Text/Tabs.pm
-lib.old/Text/Wrap.pm
 Makefile.PL
 MANIFEST
-META.yml                                 Module meta-data (added by MakeMaker)
 README
 t/37000.t
 t/39548.t
@@ -14,14 +11,16 @@ t/belg4mit.t
 t/dandv.t
 t/dnsparks.t
 t/fill.t
-t/Jacobson2.t
 t/Jacobson.t
+t/Jacobson2.t
 t/Jochen.t
-t/sep2.t
+t/lib/ok.pl
 t/sep.t
-t/tabs.t
-t/wrap_separator2.t
-t/wrap.t
+t/sep2.t
 t/Tabs-ElCid.t
+t/tabs.t
 t/Wrap-JLB.t
+t/wrap.t
+t/wrap_separator2.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -26,6 +26,7 @@ doc/srs/using-srs.md
 etc/config.able.json
 etc/config.chicago.json
 etc/config.dummy.json
+etc/config.include-suppressed.json
 etc/config.indexdata.json
 etc/config.invalidisbn.json
 etc/config.json
@@ -33,6 +34,8 @@ etc/config.lehigh.json
 etc/config.localgql.json
 etc/config.marcHoldings.json
 etc/config.snapshot.json
+etc/config.unsuppressed-holdings.json
+etc/config.unsuppressed-items.json
 etc/folio2marcxml.xsl
 etc/folio2opac.xsl
 etc/instances.graphql-query

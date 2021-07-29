@@ -15,7 +15,7 @@ use warnings;
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/App/IndonesianHolidayUtils.pm','lib/Text/ANSITable/StyleSet/Calendar/Indonesia/Holiday/HolidayType.pm','script/is-idn-holiday','script/list-idn-holidays','script/list-idn-workdays'];
+my $filenames = ['lib/App/IndonesianHolidayUtils.pm','lib/Text/ANSITable/StyleSet/Calendar/Indonesia/Holiday/HolidayType.pm','script/count-idn-workdays','script/is-idn-holiday','script/is-idn-workday','script/list-idn-holidays','script/list-idn-workdays'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

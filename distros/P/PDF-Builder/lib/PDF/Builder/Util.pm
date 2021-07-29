@@ -4,8 +4,8 @@ use strict;
 use warnings;
 #no warnings qw[ recursion uninitialized ];
 
-our $VERSION = '3.022'; # VERSION
-my $LAST_UPDATE = '3.021'; # manually update whenever code is changed
+our $VERSION = '3.023'; # VERSION
+our $LAST_UPDATE = '3.021'; # manually update whenever code is changed
 
 # note: $a and $b are "Magic variables" according to perlcritic, and so it
 # has conniptions over using them as variable names (even with "my"). so, I

@@ -1,0 +1,31 @@
+Changelog for Mojo-Leds
+
+1.02 2021-07-28T14:01:04
+ - Better identification of static files managed by controller (e.g. .js,
+   .css local to the controller)
+ - Add minimum version for perl owing to s///r usage in Page.pm
+
+1.01 2021-07-27T15:56:12
+ - [Minor] cosmetic changes
+ - Log to file in configuration. If no log path configuration, no log to
+   file
+ - Solved a bug that incorrect route file with extension .css/.js/.txt
+
+1.00 2021-07-27T14:00:49
+ - Update number version to major release
+
+0.03 2021-07-27T13:53:58
+ - [Minor] Update GitHub badge
+ - Removed a bug for Mojolicious > 9.00
+ - Remove given/when constructs
+ - Trying to resolve when/given experimental warnings
+
+0.02 2021-07-27T11:13:12
+ - Applied perltidy to perl scripts
+ - Now the configuration element 'plugins' is compatible with Mojolicious
+   9.0. Add support for this parameter in previous versions
+ - [MINOR] Add Readme
+
+0.01 2021-07-26T16:00:28
+ - First Import
+ - Initial commit

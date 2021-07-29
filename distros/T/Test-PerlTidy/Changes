@@ -1,8 +1,14 @@
 CHANGES
 
+20210709        2021-07-09
+
+            * Fix the tests when TEST_AUTHOR=1
+                - Remove t/critic.t
+                - https://github.com/shlomif/Test-PerlTidy/issues/6
+
 20200930        2020-09-30
 
-            * Fix the tests with lates Perl::Tidy
+            * Fix the tests with latest Perl::Tidy
 
 20200412        2020-04-12
 

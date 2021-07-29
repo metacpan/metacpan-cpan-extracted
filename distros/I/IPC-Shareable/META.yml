@@ -5,7 +5,7 @@ author:
 build_requires:
   IPC::Semaphore: '0'
   Test::More: '0'
-  Test::SharedFork: '0'
+  Test::SharedFork: '0.35'
 configure_requires:
   ExtUtils::MakeMaker: '6.72'
 dynamic_config: 1
@@ -20,11 +20,13 @@ no_index:
     - t
     - inc
 requires:
+  JSON: '0'
   Scalar::Util: '0'
   Storable: '0.607'
+  String::CRC32: '0'
   perl: '5.010'
 resources:
   bugtracker: https://github.com/stevieb9/ipc-shareable/issues
   repository: https://github.com/stevieb9/ipc-shareable.git
-version: '1.04'
+version: '1.05'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

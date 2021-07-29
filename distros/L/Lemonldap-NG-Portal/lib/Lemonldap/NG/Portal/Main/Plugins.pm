@@ -2,7 +2,7 @@
 # into "plugins" list in lemonldap-ng.ini, section "portal"
 package Lemonldap::NG::Portal::Main::Plugins;
 
-our $VERSION = '2.0.11';
+our $VERSION = '2.0.12';
 
 package Lemonldap::NG::Portal::Main;
 
@@ -28,6 +28,7 @@ our @pList = (
     checkState                          => '::Plugins::CheckState',
     portalForceAuthn                    => '::Plugins::ForceAuthn',
     checkUser                           => '::Plugins::CheckUser',
+    checkDevOps                         => '::Plugins::CheckDevOps',
     impersonationRule                   => '::Plugins::Impersonation',
     contextSwitchingRule                => '::Plugins::ContextSwitching',
     decryptValueRule                    => '::Plugins::DecryptValue',
@@ -36,6 +37,7 @@ our @pList = (
       '::Plugins::AdaptativeAuthenticationLevel',
     globalLogoutRule => '::Plugins::GlobalLogout',
     refreshSessions  => '::Plugins::Refresh',
+    crowdsec         => '::Plugins::CrowdSec',
 );
 
 ##@method list enabledPlugins
@@ -82,8 +84,9 @@ sub enabledPlugins {
     # Add REST (check is done by it)
     push @res, '::Plugins::RESTServer';
 
+    # Check if password is enabled
     if ( my $p = $conf->{passwordDB} ) {
-        push @res, "::Password::$p" if ( $p ne 'Null' );
+        push @res, "::Password::$p";
     }
 
     # Check if register is enabled
@@ -91,11 +94,11 @@ sub enabledPlugins {
       if ( $conf->{registerDB} and $conf->{registerDB} ne 'Null' );
 
     # Check if custom plugins are required
-    # TODO: change this name
     if ( $conf->{customPlugins} ) {
         $self->logger->debug( 'Custom plugins: ' . $conf->{customPlugins} );
         push @res, grep ( /\w+/, split( /,\s*/, $conf->{customPlugins} ) );
     }
+    
     return @res;
 }
 

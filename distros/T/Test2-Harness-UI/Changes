@@ -1,3 +1,37 @@
+0.000075  2021-07-26 14:12:59-07:00 America/Los_Angeles
+
+    - Add qvfds, same as qvfd but includes subtests (main event only)
+    - Add option to keep subtests when sweeping
+    - Add 'is_subtest' field to events
+
+0.000074  2021-07-23 14:54:03-07:00 America/Los_Angeles
+
+    - Allow control over what sweeper deletes
+
+0.000073  2021-07-23 11:54:06-07:00 America/Los_Angeles
+
+    - Fix 'failed' controller
+
+0.000072  2021-07-23 09:22:19-07:00 America/Los_Angeles
+
+    - Add more capabilities to 'failed' controller
+
+0.000071  2021-07-22 14:41:57-07:00 America/Los_Angeles
+
+    - s/http/https/ in some docs and dzil build files
+    - Add /failed/PROJECT/json API to get more details about failures
+
+0.000070  2021-07-16 13:43:35-07:00 America/Los_Angeles
+
+    - Use clone to copy facet data before any modifications
+
+0.000069  2021-07-15 15:54:51-07:00 America/Los_Angeles
+
+    - Fix bug where child data was stored in json
+    - Make it possible to link to jobs by job-id+try
+    - Make it possible to highlight subtests
+    - Make failing subtests auto-expand
+
 0.000068  2021-06-16 13:25:20-07:00 America/Los_Angeles
 
     - Fix sweeper so it can delete coverage

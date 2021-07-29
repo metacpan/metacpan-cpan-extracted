@@ -1,21 +1,18 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /Calendar/Indonesia/Holiday/list_idn_workdays
-# and generated automatically using Perinci::CmdLine::Gen version 0.497
+# and generated automatically using Perinci::CmdLine::Gen version 0.499
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-01-17'; # DATE
+our $DATE = '2021-07-24'; # DATE
 our $DIST = 'App-IndonesianHolidayUtils'; # DIST
-our $VERSION = '0.061'; # VERSION
+our $VERSION = '0.064'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
 
 use Perinci::CmdLine::Any;
-
-# code_before_instantiate_cmdline
-$ENV{ANSITABLE_STYLE_SETS} //= '[["Calendar::Indonesia::Holiday::HolidayType",{"holiday_bgcolor":"330000", "joint_leave_bgcolor":"333300"}]]';
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/Calendar/Indonesia/Holiday/list_idn_workdays",
@@ -26,7 +23,7 @@ my $cmdline = Perinci::CmdLine::Any->new(
 
 $cmdline->run;
 
-# ABSTRACT: 
+# ABSTRACT: List working days (non-holiday business days) for a certain period
 # PODNAME: list-idn-workdays
 
 __END__
@@ -37,19 +34,26 @@ __END__
 
 =head1 NAME
 
-list-idn-workdays -  
+list-idn-workdays - List working days (non-holiday business days) for a certain period
 
 =head1 VERSION
 
-This document describes version 0.061 of list-idn-workdays (from Perl distribution App-IndonesianHolidayUtils), released on 2021-01-17.
+This document describes version 0.064 of list-idn-workdays (from Perl distribution App-IndonesianHolidayUtils), released on 2021-07-24.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % list-idn-workdays [--end-date=s] [--format=name] [--json] [--month=s]
-     [--(no)naked-res] [--page-result[=program]] [--start-date=s]
-     [--view-result[=program]] [--year=s]
+% B<list-idn-workdays> [B<--format>=I<name>|B<--json>] [B<--(no)naked-res>] [B<--observe-joint-leaves>|B<-j>|B<--no-observe-joint-leaves>|B<--noobserve-joint-leaves>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] [B<--work-saturdays>|B<--no-work-saturdays>|B<--nowork-saturdays>] -- [I<start_date>] [I<end_date>]
+
+=head1 DESCRIPTION
+
+Working day is defined as day that is not Saturday*/Sunday/holiday/joint leave
+days*. If work_saturdays is set to true, Saturdays are also counted as working
+days. If observe_joint_leaves is set to false, joint leave days are also counted
+as working days.
+
+Contains data from years 1990 to 2021
 
 =head1 OPTIONS
 
@@ -61,11 +65,29 @@ C<*> marks required options.
 
 =item B<--end-date>=I<s>
 
-=item B<--month>=I<s>
+End date.
+
+Defaults to end of current month. Either a string in the form of "YYYY-MM-DD",
+or a DateTime object, is accepted.
+
+
+Can also be specified as the 2nd command-line argument.
+
+=item B<--no-observe-joint-leaves>, B<-j>
 
 =item B<--start-date>=I<s>
 
-=item B<--year>=I<s>
+Starting date.
+
+Defaults to start of current month. Either a string in the form of "YYYY-MM-DD",
+or a DateTime object, is accepted.
+
+
+Can also be specified as the 1st command-line argument.
+
+=item B<--work-saturdays>
+
+If set to 1, Saturday is a working day.
 
 =back
 
@@ -174,7 +196,7 @@ Source repository is at L<https://github.com/perlancar/perl-App-IndonesianHolida
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-App-IndonesianHolidayUtils/issues>
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-IndonesianHolidayUtils>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

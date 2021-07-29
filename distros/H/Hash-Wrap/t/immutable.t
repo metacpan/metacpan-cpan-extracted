@@ -18,19 +18,19 @@ subtest 'set' => sub {
 
         like(
             dies { $hash{a} = 2 },
-            qr/read-only/,
+            qr{Modification of a read-only .* at t/immutable.t},
             'hash'
             );
 
         like(
             dies { $obj->{a} = 2 },
-            qr/read-only/,
+            qr{Modification of a read-only .* at t/immutable.t},
             'object hash'
             );
 
         like(
             dies { $obj->a(2) },
-            qr/read-only/,
+            qr{Modification of a read-only .* at t/immutable.t},
             'accessor'
             );
 
@@ -40,19 +40,19 @@ subtest 'set' => sub {
 
         like(
             dies { $hash{c} = 1 },
-            qr/access/,
+            qr{access disallowed key .* at t/immutable.t},
             'hash'
             );
 
         like(
             dies { $obj->{c} = 1 },
-            qr/access/,
+            qr{access disallowed key .* at t/immutable.t},
             'object hash'
             );
 
         like(
             dies { $obj->c(2) },
-            qr/locate object method/,
+            qr{locate object method .* at t/immutable.t},
             'accessor'
             );
     };

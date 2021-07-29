@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package Test::Warnings; # git description: v0.029-2-g97d1c9f
-# vim: set ts=8 sts=4 sw=4 tw=115 et :
+package Test::Warnings; # git description: v0.030-6-gf367162
+# vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Test for warnings and the lack of them
 # KEYWORDS: testing tests warnings
 
-our $VERSION = '0.030';
+our $VERSION = '0.031';
 
 use parent 'Exporter';
 use Test::Builder;
@@ -25,8 +25,7 @@ my $fail_on_warning;
 my $report_warnings;
 my @collected_warnings;
 
-sub import
-{
+sub import {
     my $class = shift @_;
 
     my %names; @names{@_} = ();
@@ -43,10 +42,8 @@ sub import
 
 # for testing this module only!
 my $tb;
-sub _builder(;$)
-{
-    if (not @_)
-    {
+sub _builder(;$) {
+    if (not @_) {
         $tb ||= Test::Builder->new;
         return $tb;
     }
@@ -56,12 +53,10 @@ sub _builder(;$)
 
 my $_orig_warn_handler = $SIG{__WARN__};
 $SIG{__WARN__} = sub {
-    if ($warnings_allowed)
-    {
+    if ($warnings_allowed) {
         Test::Builder->new->note($_[0]);
     }
-    else
-    {
+    else {
         $forbidden_warnings_found++;
         push @collected_warnings, $_[0] if $report_warnings;
 
@@ -82,8 +77,7 @@ $SIG{__WARN__} = sub {
     }
 };
 
-sub warnings(;&)
-{
+sub warnings(;&) {
     # if someone manually does warnings->import in the same namespace this is
     # imported into, this sub will be called.  in that case, just return the
     # string "warnings" so it calls the correct method.
@@ -99,14 +93,12 @@ sub warnings(;&)
     @warnings;
 }
 
-sub warning(&)
-{
+sub warning(&) {
     my @warnings = &warnings(@_);
     return @warnings == 1 ? $warnings[0] : \@warnings;
 }
 
-if (Test::Builder->can('done_testing'))
-{
+if (Test::Builder->can('done_testing')) {
     # monkeypatch Test::Builder::done_testing:
     # check for any forbidden warnings, and record that we have done so
     # so we do not check again via END
@@ -119,8 +111,7 @@ if (Test::Builder->can('done_testing'))
         my $builder = _builder;
         my $in_subtest_sub = $builder->can('in_subtest');
         if (not $no_end_test
-            and not ($in_subtest_sub ? $builder->$in_subtest_sub : $builder->parent))
-        {
+            and not ($in_subtest_sub ? $builder->$in_subtest_sub : $builder->parent)) {
             local $Test::Builder::Level = $Test::Builder::Level + 3;
             had_no_warnings('no (unexpected) warnings (via done_testing)');
             $done_testing_called = 1;
@@ -136,16 +127,14 @@ END {
         # skip this if there is no plan and no tests have been run (e.g.
         # compilation tests of this module!)
         and (_builder->expected_tests or _builder->current_test > 0)
-    )
-    {
+    ) {
         local $Test::Builder::Level = $Test::Builder::Level + 1;
         had_no_warnings('no (unexpected) warnings (via END block)');
     }
 }
 
 # setter
-sub allow_warnings(;$)
-{
+sub allow_warnings(;$) {
     $warnings_allowed = @_ || defined $_[0] ? $_[0] : 1;
 }
 
@@ -153,8 +142,7 @@ sub allow_warnings(;$)
 sub allowing_warnings() { $warnings_allowed }
 
 # call at any time to assert no (unexpected) warnings so far
-sub had_no_warnings(;$)
-{
+sub had_no_warnings(;$) {
     _builder->ok(!$forbidden_warnings_found, shift || 'no (unexpected) warnings');
     if ($report_warnings and $forbidden_warnings_found) {
         _builder->diag("Got the following unexpected warnings:");
@@ -178,7 +166,7 @@ Test::Warnings - Test for warnings and the lack of them
 
 =head1 VERSION
 
-version 0.030
+version 0.031
 
 =head1 SYNOPSIS
 
@@ -467,7 +455,7 @@ L<http://lists.perl.org/list/perl-qa.html>.
 There is also an irc channel available for users of this distribution, at
 L<C<#perl> on C<irc.perl.org>|irc://irc.perl.org/#perl-qa>.
 
-I am also usually active on irc, as 'ether' at C<irc.perl.org>.
+I am also usually active on irc, as 'ether' at C<irc.perl.org> and C<irc.libera.chat>.
 
 =head1 AUTHOR
 

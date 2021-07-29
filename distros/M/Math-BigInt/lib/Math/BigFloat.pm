@@ -19,7 +19,7 @@ use warnings;
 use Carp qw< carp croak >;
 use Math::BigInt ();
 
-our $VERSION = '1.999821';
+our $VERSION = '1.999823';
 
 require Exporter;
 our @ISA        = qw/Math::BigInt/;
@@ -417,17 +417,18 @@ sub new {
         return $self;
     }
 
-    # Handle hexadecimal numbers. We auto-detect hexadecimal numbers if they
-    # have a "0x" or "0X" prefix.
+    # Handle hexadecimal numbers. Just like CORE::oct(), we accept octal numbers with
+    # prefix "0x", "0X", "x", or "X".
 
-    if ($wanted =~ /^\s*[+-]?0[Xx]/) {
+    if ($wanted =~ /^\s*[+-]?0?[Xx]/) {
         $self = $class -> from_hex($wanted);
         $self->round(@r) unless @r >= 2 && !defined $r[0] && !defined $r[1];
         return $self;
     }
 
-    # Handle octal numbers. We auto-detect octal numbers if they have a "0o"
-    # prefix or a "0" prefix and a binary exponent.
+    # Handle octal numbers. Just like CORE::oct(), we accept octal numbers with
+    # prefix "0o", "0O", "o", or "O". If the prefix is just "0", the number must
+    # have a binary exponent, or else the number is interpreted as decimal.
 
     if ($wanted =~ /
                        ^
@@ -438,7 +439,7 @@ sub new {
 
                        (?:
                            # prefix
-                           0 [Oo]
+                           0? [Oo]
                        |
 
                            # prefix
@@ -465,10 +466,10 @@ sub new {
         return $self;
     }
 
-    # Handle binary numbers. We auto-detect binary numbers if they have a "0b"
-    # or "0B" prefix.
+    # Handle binary numbers.  Just like CORE::oct(), we accept octal numbers with
+    # prefix "0b", "0B", "b", or "B".
 
-    if ($wanted =~ /^\s*[+-]?0[Bb]/) {
+    if ($wanted =~ /^\s*[+-]?0?[Bb]/) {
         $self = $class -> from_bin($wanted);
         $self->round(@r) unless @r >= 2 && !defined $r[0] && !defined $r[1];
         return $self;
@@ -576,8 +577,8 @@ sub from_hex {
                      # sign
                      ( [+-]? )
 
-                     # optional "hex marker"
-                     (?: 0 [Xx] )?
+                     # optional hexadecimal prefix
+                     (?: 0? [Xx] )?
 
                      # significand using the hex digits 0..9 and a..f
                      (
@@ -667,8 +668,8 @@ sub from_oct {
                      # sign
                      ( [+-]? )
 
-                     # optional "octal marker"
-                     (?: 0 [Oo] )?
+                     # optional octal prefix
+                     (?: 0? [Oo] )?
 
                      # significand using the octal digits 0..7
                      (
@@ -758,8 +759,8 @@ sub from_bin {
                      # sign
                      ( [+-]? )
 
-                     # optional "bin marker"
-                     (?: 0 [Bb] )?
+                     # optional binary prefix
+                     (?: 0? [Bb] )?
 
                      # significand using the binary digits 0 and 1
                      (
@@ -4683,65 +4684,59 @@ sub numify {
 
 sub import {
     my $class = shift;
-    my $l = scalar @_;
+    $IMPORT++;                  # remember we did import()
+    my @a;                      # unrecognized arguments
     my $lib = '';
-    my @a;
     my $lib_kind = 'try';
-    $IMPORT=1;
-    for (my $i = 0; $i < $l ; $i++) {
+
+    for (my $i = 0; $i <= $#_ ; $i++) {
+        croak "Error in import(): argument with index $i is undefined"
+          unless defined($_[$i]);
+
         if ($_[$i] eq ':constant') {
             # This causes overlord er load to step in. 'binary' and 'integer'
             # are handled by BigInt.
             overload::constant float => sub { $class->new(shift); };
-        } elsif ($_[$i] eq 'upgrade') {
+        }
+
+        elsif ($_[$i] eq 'upgrade') {
             # this causes upgrading
-            $upgrade = $_[$i+1]; # or undef to disable
+            $upgrade = $_[$i+1];        # or undef to disable
             $i++;
-        } elsif ($_[$i] eq 'downgrade') {
+        }
+
+        elsif ($_[$i] eq 'downgrade') {
             # this causes downgrading
-            $downgrade = $_[$i+1]; # or undef to disable
+            $downgrade = $_[$i+1];      # or undef to disable
             $i++;
-        } elsif ($_[$i] =~ /^(lib|try|only)\z/) {
+        }
+
+        elsif ($_[$i] =~ /^(lib|try|only)\z/) {
             # alternative library
-            $lib = $_[$i+1] || ''; # default Calc
-            $lib_kind = $1;        # lib, try or only
+            $lib = $_[$i+1] || '';
+            $lib_kind = $1;             # "lib", "try", or "only"
             $i++;
-        } elsif ($_[$i] eq 'with') {
+        }
+
+        elsif ($_[$i] eq 'with') {
             # alternative class for our private parts()
             # XXX: no longer supported
-            # $LIB = $_[$i+1] || 'Math::BigInt';
+            # $LIB = $_[$i+1] || 'Calc';
+            # carp "'with' is no longer supported, use 'lib', 'try', or 'only'";
             $i++;
-        } else {
+        }
+
+        else {
             push @a, $_[$i];
         }
     }
 
-    $lib =~ tr/a-zA-Z0-9,://cd; # restrict to sane characters
-    # let use Math::BigInt lib => 'GMP'; use Math::BigFloat; still work
-    my $mbilib = eval { Math::BigInt->config('lib') };
-    if ((defined $mbilib) && ($LIB eq 'Math::BigInt::Calc')) {
-        # $LIB already loaded
-        Math::BigInt->import($lib_kind, "$lib, $mbilib", 'objectify');
-    } else {
-        # $LIB not loaded, or with ne "Math::BigInt::Calc"
-        $lib .= ",$mbilib" if defined $mbilib;
-        $lib =~ s/^,//;         # don't leave empty
+    my @import = ('objectify');
+    push @import, $lib_kind, $lib if $lib ne '';
+    Math::BigInt -> import(@import);
 
-        # replacement library can handle lib statement, but also could ignore it
-
-        # Perl < 5.6.0 dies with "out of memory!" when eval() and ':constant' is
-        # used in the same script, or eval inside import(). So we require MBI:
-        require Math::BigInt;
-        Math::BigInt->import($lib_kind => $lib, 'objectify');
-    }
-    if ($@) {
-        croak("Couldn't load $lib: $! $@");
-    }
     # find out which one was actually loaded
     $LIB = Math::BigInt->config('lib');
-
-    # register us with MBI to get notified of future lib changes
-    Math::BigInt::_register_callback($class, sub { $LIB = $_[0]; });
 
     $class->export_to_level(1, $class, @a); # export wanted functions
 }
@@ -6013,8 +6008,7 @@ influence any further operation.
 
 Please report any bugs or feature requests to
 C<bug-math-bigint at rt.cpan.org>, or through the web interface at
-L<https://rt.cpan.org/Ticket/Create.html?Queue=Math-BigInt>
-(requires login).
+L<https://rt.cpan.org/Ticket/Create.html?Queue=Math-BigInt> (requires login).
 We will be notified, and then you'll automatically be notified of progress on
 your bug as I make changes.
 
@@ -6028,17 +6022,13 @@ You can also look for information at:
 
 =over 4
 
+=item * GitHub
+
+L<https://github.com/pjacklam/p5-Math-BigInt>
+
 =item * RT: CPAN's request tracker
 
-L<https://rt.cpan.org/Public/Dist/Display.html?Name=Math-BigInt>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Math-BigInt>
-
-=item * CPAN Ratings
-
-L<https://cpanratings.perl.org/dist/Math-BigInt>
+L<https://rt.cpan.org/Dist/Display.html?Name=Math-BigInt>
 
 =item * MetaCPAN
 
@@ -6047,6 +6037,10 @@ L<https://metacpan.org/release/Math-BigInt>
 =item * CPAN Testers Matrix
 
 L<http://matrix.cpantesters.org/?dist=Math-BigInt>
+
+=item * CPAN Ratings
+
+L<https://cpanratings.perl.org/dist/Math-BigInt>
 
 =item * The Bignum mailing list
 
@@ -6075,7 +6069,7 @@ the same terms as Perl itself.
 
 =head1 SEE ALSO
 
-L<Math::BigFloat> and L<Math::BigInt> as well as the backends
+L<Math::BigInt> and L<Math::BigInt> as well as the backends
 L<Math::BigInt::FastCalc>, L<Math::BigInt::GMP>, and L<Math::BigInt::Pari>.
 
 The pragmas L<bignum>, L<bigint> and L<bigrat> also might be of interest

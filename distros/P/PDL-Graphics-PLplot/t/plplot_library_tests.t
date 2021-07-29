@@ -25,9 +25,7 @@ my $maindir = '..' if (-s "../OPTIONS!");
    $maindir = '.'  if (-s "./OPTIONS!");
 my $plversion = do "$maindir/OPTIONS!";
 
-if ($plversion->{'c_plwidth'}) {
-  plan qw(no_plan);
-} else {
+if (!$plversion->{'c_plwidth'}) {
   plan skip_all => 'plwidth not found--plplot version needs to be 5.9.10 or greater to run library tests';
 }
 
@@ -38,7 +36,7 @@ foreach my $plplot_test_script (@scripts) {
   (my $c_code = $plplot_test_script) =~ s/\.pl/c\.c/;
 
   # Compile C version
-  my $cmd_line = "$plversion->{'C_COMPILE'} $c_code -O -o $tmpdir/a.out -lm $plversion->{'C_COMPILE_SUFFIX'}";
+  my $cmd_line = "$plversion->{'C_COMPILE'} $c_code -o $tmpdir/a.out -lm $plversion->{'C_COMPILE_SUFFIX'}";
   $cmd_line = "LD_RUN_PATH=\"$plversion->{'PLPLOT_LIB'}\" $cmd_line" if $^O !~ /MSWin32/i;
   system $cmd_line;
   ok ((($? == 0) && -s "$tmpdir/a.out"), "$c_code compiled successfully");
@@ -64,6 +62,8 @@ foreach my $plplot_test_script (@scripts) {
     cmp_files($perlfile, $reffile);
   }
 }
+
+done_testing;
 
 sub cmp_files {
   my ($perlfile, $reffile) = @_;

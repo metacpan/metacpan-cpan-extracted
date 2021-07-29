@@ -1,7 +1,7 @@
 package App::picadata;
 use v5.14.1;
 
-our $VERSION = '1.28';
+our $VERSION = '1.29';
 
 use Getopt::Long qw(GetOptionsFromArray :config bundling);
 use Pod::Usage;
@@ -39,8 +39,7 @@ my %COLORS
 sub new {
     my ($class, @argv) = @_;
 
-    my $interactive = -t *STDOUT;                               ## no critic
-    my $command     = (!@argv && $interactive) ? 'help' : '';
+    my $command = (!@argv && -t *STDIN) ? 'help' : '';    ## no critic
 
     my $number = 0;
     if (my ($i) = grep {$argv[$_] =~ /^-(\d+)$/} (0 .. @argv - 1)) {
@@ -75,9 +74,10 @@ sub new {
         'version|V',
     ) or pod2usage(2);
 
-    $opt->{number}   = $number;
+    $opt->{number} = $number;
     $opt->{annotate} = 0 if $noAnnotate;
-    $opt->{color}    = !$opt->{mono} && ($opt->{color} || $interactive);
+    $opt->{color}
+        = !$opt->{mono} && ($opt->{color} || -t *STDOUT);    ## no critic
 
     delete $opt->{$_} for qw(count build help version);
 
@@ -211,10 +211,10 @@ sub load_schema {
 }
 
 sub run {
-    my ($self)  = @_;
+    my ($self) = @_;
     my $command = $self->{command};
-    my @pathes  = @{$self->{path} || []};
-    my $schema  = $self->{schema};
+    my @pathes = @{$self->{path} || []};
+    my $schema = $self->{schema};
 
     # commands that don't parse any input data
     if ($self->{error}) {
@@ -246,7 +246,7 @@ sub run {
     if ($self->{to}) {
         $writer = pica_writer(
             $self->{to},
-            color    => ($self->{color} ? \%COLORS : undef),
+            color => ($self->{color} ? \%COLORS : undef),
             schema   => $schema,
             annotate => $self->{annotate},
         );
@@ -297,7 +297,7 @@ sub run {
         if ($command eq 'count') {
             $stats->{holdings}
                 += grep {@{$_->fields('1...')}} @{$record->holdings};
-            $stats->{items}  += grep {!$_->empty} @{$record->items};
+            $stats->{items} += grep {!$_->empty} @{$record->items};
             $stats->{fields} += @{$record->{record}};
         }
         $stats->{records}++;

@@ -177,15 +177,15 @@ $txt->fillcolor('black');
 
 $txt->transform(-translate => [50, 800]);
 $txt->font($f1, 18);
-$txt->lead(18*1.25);
+$txt->leading(18*1.25);
 $txt->text("Some 18 point Helvetica text");
 $txt->font($f2, 18);
-$txt->lead(18*1.25);
+$txt->leading(18*1.25);
 $txt->text("   Some 18 point Times-Roman text");
 
 $txt->transform(-translate => [50, 800-18*1.25]);
 $txt->font($font, 18);
-$txt->lead(18*1.25);
+$txt->leading(18*1.25);
 my $toprint;
 while ($textL ne '') {
     ($toprint, $textL) = $txt->_text_fill_line($textL, 500, 0);

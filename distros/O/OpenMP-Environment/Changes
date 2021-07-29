@@ -24,5 +24,8 @@ Revision history for Perl extension OpenMP::Environment.
 1.0.4 Fri Apr 16 23:12:00 2021
          - non-impactful, updated repo for cpan
 
-1.0.5 Fri Apr 17 23:12:01 2021
-         - POD fix
+1.1.0 Fri Jun 24 23:12:00 2021
+         - added 2 examples and updatred POD concerning
+           the reading of the environment in C using "getenv"
+           and how to implement this to create dynamic C
+           methods that respect %ENV.

@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2020-01-04'; # DATE
-our $VERSION = '0.006'; # VERSION
+our $DATE = '2021-07-21'; # DATE
+our $VERSION = '0.009'; # VERSION
 
 use 5.010;
 use strict;
@@ -40,7 +40,7 @@ test-regexp-pattern - Test Regexp::Pattern patterns in all modules of your distr
 
 =head1 VERSION
 
-This document describes version 0.006 of test-regexp-pattern (from Perl distribution Test-Regexp-Pattern), released on 2020-01-04.
+This document describes version 0.009 of test-regexp-pattern (from Perl distribution Test-Regexp-Pattern), released on 2021-07-21.
 
 =head1 SYNOPSIS
 
@@ -89,7 +89,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2018 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

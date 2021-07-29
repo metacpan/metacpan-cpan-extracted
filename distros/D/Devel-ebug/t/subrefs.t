@@ -8,7 +8,6 @@ use Devel::ebug;
 note "First we'll step over the subref";
 my $ebug = Devel::ebug->new;
 $ebug->program("corpus/calc_subref.pl");
-$ebug->backend("$^X bin/ebug_backend_perl");
 $ebug->load;
 
 # Let's step through the program, and check that we step through the
@@ -39,7 +38,6 @@ $ebug->next;
 note "Now testing stepping into the subref";
 $ebug = Devel::ebug->new;
 $ebug->program("corpus/calc_subref.pl");
-$ebug->backend("$^X bin/ebug_backend_perl");
 $ebug->load;
 is($ebug->line, 7, "Next line is 7");
 is($ebug->filename, 'corpus/calc_subref.pl', 'Still in corpus/calc_subref.pl');
@@ -61,7 +59,6 @@ is($ebug->filename, 'corpus/calc_subref.pl', 'Still in corpus/calc_subref.pl');
 note "Try a breakpoint in the subref";
 $ebug = Devel::ebug->new;
 $ebug->program("corpus/calc_subref.pl");
-$ebug->backend("$^X bin/ebug_backend_perl");
 $ebug->load;
 $ebug->break_point("corpus/calc_subref.pl", 4);
 $ebug->run;

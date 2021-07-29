@@ -2,6 +2,7 @@
     {
         "description": "A $dynamicRef to a $dynamicAnchor in the same schema resource should behave like a normal $ref to an $anchor",
         "schema": {
+            "$id": "https://test.json-schema.org/dynamicRef-dynamicAnchor-same-schema/root",
             "type": "array",
             "items": { "$dynamicRef": "#items" },
             "$defs": {
@@ -27,6 +28,7 @@
     {
         "description": "A $dynamicRef to an $anchor in the same schema resource should behave like a normal $ref to an $anchor",
         "schema": {
+            "$id": "https://test.json-schema.org/dynamicRef-anchor-same-schema/root",
             "type": "array",
             "items": { "$dynamicRef": "#items" },
             "$defs": {
@@ -52,6 +54,7 @@
     {
         "description": "A $ref to a $dynamicAnchor in the same schema resource should behave like a normal $ref to an $anchor",
         "schema": {
+            "$id": "https://test.json-schema.org/ref-dynamicAnchor-same-schema/root",
             "type": "array",
             "items": { "$ref": "#items" },
             "$defs": {
@@ -75,7 +78,7 @@
         ]
     },
     {
-        "description": "A $dynamicRef should resolve to the first $dynamicAnchor that is encountered when the schema is evaluated",
+        "description": "A $dynamicRef should resolve to the first $dynamicAnchor still in scope that is encountered when the schema is evaluated",
         "schema": {
             "$id": "https://test.json-schema.org/typical-dynamic-resolution/root",
             "$ref": "list",
@@ -379,6 +382,63 @@
                 "description": "recurse to integerNode - floats are not allowed",
                 "data": { "november": 1.1 },
                 "valid": false
+            }
+        ]
+    },
+    {
+        "description": "after leaving a dynamic scope, it should not be used by a $dynamicRef",
+        "schema": {
+            "$id": "https://test.json-schema.org/dynamic-ref-leaving-dynamic-scope/main",
+            "if": {
+                "$id": "first_scope",
+                "$defs": {
+                    "thingy": {
+                        "$comment": "this is first_scope#thingy",
+                        "$dynamicAnchor": "thingy",
+                        "type": "number"
+                    }
+                }
+            },
+            "then": {
+                "$id": "second_scope",
+                "$ref": "start",
+                "$defs": {
+                    "thingy": {
+                        "$comment": "this is second_scope#thingy, the final destination of the $dynamicRef",
+                        "$dynamicAnchor": "thingy",
+                        "type": "null"
+                    }
+                }
+            },
+            "$defs": {
+                "start": {
+                    "$comment": "this is the landing spot from $ref",
+                    "$id": "start",
+                    "$dynamicRef": "inner_scope#thingy"
+                },
+                "thingy": {
+                    "$comment": "this is the first stop for the $dynamicRef",
+                    "$id": "inner_scope",
+                    "$dynamicAnchor": "thingy",
+                    "type": "string"
+                }
+            }
+        },
+        "tests": [
+            {
+                "description": "string matches /$defs/thingy, but the $dynamicRef does not stop here",
+                "data": "a string",
+                "valid": false
+            },
+            {
+                "description": "first_scope is not in dynamic scope for the $dynamicRef",
+                "data": 42,
+                "valid": false
+            },
+            {
+                "description": "/then/$defs/thingy is the final stop for the $dynamicRef",
+                "data": null,
+                "valid": true
             }
         ]
     }

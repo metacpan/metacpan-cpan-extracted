@@ -1,5 +1,12 @@
 Revision history for Perl module Ma::OSVersion
 
+1.006 2021-07-28T17:18:59Z
+	* More updates to make this behave properly under 11.x and 12.x.
+	The previous release is broken.
+
+1.005 2021-07-28T06:18:42Z
+	* Support Big Sur and Monterey
+
 1.004 2020-02-12T06:32:03Z
 	* Add Catalina
 

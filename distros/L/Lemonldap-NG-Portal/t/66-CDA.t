@@ -24,7 +24,10 @@ my $client = LLNG::Manager::Test->new( {
 ok(
     $res = $client->_get(
         '/',
-        query  => 'url=aHR0cDovL3Rlc3QuZXhhbXBsZS5vcmcv',
+        query => buildForm( {
+                url => encodeUrl('http://test.example.org/'),
+            }
+        ),
         accept => 'text/html',
     ),
     'Unauth CDA request'
@@ -44,9 +47,29 @@ ok(
     'Post credentials'
 );
 count(1);
+my $id = expectCookie($res);
 
 ($query) =
   expectRedirection( $res, qr#^http://test.example.org/\?(lemonldapcda=.*)$# );
+
+# Check URLs are correctly filtered
+ok(
+    $res = $client->_get(
+        '/',
+        query => buildForm( {
+                url => encodeUrl(
+'http://your-untrusted-domain.com/?attack=http://test.example.org/'
+                ),
+            }
+        ),
+        cookie => "lemonldap=$id",
+        accept => 'text/html',
+    ),
+    'Dangerous request'
+);
+count(1);
+
+expectPortalError( $res, 37, "Untrusted URL denied by portal" );
 
 # Handler part
 use_ok('Lemonldap::NG::Handler::Server');

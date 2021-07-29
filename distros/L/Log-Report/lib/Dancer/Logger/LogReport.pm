@@ -8,7 +8,7 @@
 
 package Dancer::Logger::LogReport;
 use vars '$VERSION';
-$VERSION = '1.32';
+$VERSION = '1.33';
 
 use base 'Dancer::Logger::Abstract', 'Exporter';
 

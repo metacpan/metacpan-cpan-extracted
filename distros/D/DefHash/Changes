@@ -1,4 +1,27 @@
-1.0.12  2019-06-18 (PERLANCAR)
+1.0.13  2021-07-21  Released-By: PERLANCAR; Urgency: medium; Backward-Incompatible: yes
+
+        [INCOMPATIBLE CHANGES]
+
+        - [removed] Remove support for "PROP(LANG)" syntax, to make DefHash
+          rules simpler and more orthogonal. This must now be written as
+          "PROP.alt.lang.LANG".
+
+	- Change alt combination rule. Previously, when multiple alt subjects
+          are specified, for example lang=id_ID and env=cmdline, it must be
+          written as "PROP.alt.env_lang.cmdline.id_ID". It is now changed to
+          either "PROP.alt.env.cmdline.lang.id_ID" or
+          "PROP.alt.lang.id_ID.env.cmdline". Implementations are free to do a
+          first-match when getting the property's value.
+
+        [OTHERS]
+
+        - Make it clear that uppercase letters are acceptable in
+          property/attribute name. Tweak the regexes.
+
+	- Mention implementations.
+
+
+1.0.12  2019-06-18  Released-By: PERLANCAR
 
         - No spec changes.
 
@@ -8,49 +31,49 @@
           require releasing a new spec release.
 
 
-1.0.11  2015-09-03 (PERLANCAR)
+1.0.11  2015-09-03  Released-By: PERLANCAR
 
 	- No spec changes.
 
 	- Remove requirement of perl 5.010001.
 
 
-1.0.10  2015-04-24 (PERLANCAR)
+1.0.10  2015-04-24  Released-By: PERLANCAR
 
 	- Introduce 'prop(LANG)' as shortcut for prop.alt.lang.LANG.
 
 
-1.0.9   2015-04-02 (PERLANCAR)
+1.0.9   2015-04-02  Released-By: PERLANCAR
 
 	- Rename alt.numnoun.* to alt.plurality.*.
 
 
-1.0.8   2014-12-02 (PERLANCAR)
+1.0.8   2014-12-02  Released-By: PERLANCAR
 
 	- Change alt.{neg,pos,posneg} to alt.bool.{not} to allow alternate
 	  combination; specify alt.numnoun.
 
 
-1.0.7   2014-11-20 (PERLANCAR)
+1.0.7   2014-11-20  Released-By: PERLANCAR
 
         - No spec changes.
 
         - Mention 'alt.neg' and 'alt.posneg'.
 
 
-1.0.6   2014-10-22 (PERLANCAR)
+1.0.6   2014-10-22  Released-By: PERLANCAR
 
         - Introduce 'caption' property.
 
 
-1.0.5   2014-04-27 (SHARYANTO)
+1.0.5   2014-04-27  Released-By: SHARYANTO
 
         - No spec changes.
 
         - Add Sah::Schema::DefHash.
 
 
-1.0.4   2014-03-27 (SHARYANTO)
+1.0.4   2014-03-27  Released-By: SHARYANTO
 
         - Specify that each tag in 'tags' can also be a defhash (this is already
           practised by Perinci::Sub::Gen::AccessTable for some time).
@@ -58,22 +81,22 @@
         - Fix typos.
 
 
-1.0.3   2013-04-11 (SHARYANTO)
+1.0.3   2013-04-11  Released-By: SHARYANTO
 
         - Introduce property 'x'.
 
 
-1.0.2   2012-11-10 (SHARYANTO)
+1.0.2   2012-11-10  Released-By: SHARYANTO
 
         - Property 'default_lang' should be set to LANG first before falling
           back to 'en_US'.
 
 
-1.0.1   2012-09-14 (SHARYANTO)
+1.0.1   2012-09-14  Released-By: SHARYANTO
 
         - No spec changes. Fix typos.
 
 
-1.0.0   2012-09-14 (SHARYANTO)
+1.0.0   2012-09-14  Released-By: SHARYANTO
 
         - First version.

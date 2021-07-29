@@ -34,8 +34,10 @@ You shouldn't make instances of this class. Each attribute should be used as a n
       $ec2->DescribeNetworkInterfacePermissions(
       Filters => [
         {
-          Name   => 'MyString',
-          Values => [ 'MyString', ... ],    # OPTIONAL
+          Name   => 'MyString',    # OPTIONAL
+          Values => [
+            'MyString', ...        # OPTIONAL
+          ],    # OPTIONAL
         },
         ...
       ],    # OPTIONAL
@@ -76,11 +78,11 @@ network interface.
 
 =item *
 
-C<network-interface-permission.aws-account-id> - The AWS account ID.
+C<network-interface-permission.aws-account-id> - The account ID.
 
 =item *
 
-C<network-interface-permission.aws-service> - The AWS service.
+C<network-interface-permission.aws-service> - The Amazon Web Service.
 
 =item *
 

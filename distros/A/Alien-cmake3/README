@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.06
+    version 0.08
 
 SYNOPSIS
 
@@ -90,6 +90,52 @@ SEE ALSO
 
 	In the opinion of the maintainer of both Alien::cmake3 and
 	Alien::CMake for these reasons.
+
+ENVIRONMENT
+
+    ALIEN_INSTALL_TYPE
+
+      This is the normal Alien::Build environment variable and you can set
+      it to one of share, system or default.
+
+    ALIEN_CMAKE_FROM_SOURCE
+
+      If set to true, and if a share install is attempted, Alien::cmake3
+      will not try a binary share install (even if available), and instead
+      a source share install.
+
+CAVEATS
+
+    If you do not have a system cmake of at least 3.0.0 available, then a
+    share install will be attempted.
+
+    Binary share installs are attempted on platforms for which the latest
+    version of cmake are provided. As of this writing, this includes:
+    Windows (32/64 bit), macOS (intel/arm universal) and Linux (intel/arm
+    64 bit). No checks are made to ensure that your platform is supported
+    by this binary installs. Typically the same versions supported by the
+    operating system vendor and supported by cmake, so that should not be a
+    problem. If you are using an operating system not supported by its
+    vendor Please Stop That, this is almost certainly a security
+    vulnerability.
+
+    That said if you really do need Alien::cmake3 on an unsupported system,
+    you have some options:
+
+    Install system version of cmake
+
+      If you can find an older version better than 3.0.0 that is supported
+      by your operating system.
+
+    Force a source code install
+
+      Set the ALIEN_CMAKE_FROM_SOURCE environment variable to a true value
+      to build a share install from source.
+
+    Source share installs are attempted on platforms for which the latest
+    version of cmake are not available, like the various flavours of *BSD.
+    This may not be ideal, and if you can install a system version of cmake
+    it may work better.
 
 AUTHOR
 

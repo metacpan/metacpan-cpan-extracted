@@ -43,7 +43,7 @@ Issues are currently reported using CPAN [bug tracker](https://git.deguest.jp/ja
 
 ## More information
 
-Please refer to the [README](https://metacpan.org/source/JDEGUEST/Module-Generic-v0.15.2/README.md)
+Please refer to the [README](https://metacpan.org/source/JDEGUEST/Module-Generic-v0.15.4/README.md)
 
 ## Author
 

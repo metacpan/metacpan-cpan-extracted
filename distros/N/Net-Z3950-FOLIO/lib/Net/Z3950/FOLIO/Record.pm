@@ -56,6 +56,14 @@ sub holdings {
     return $this->{holdingsStructure};
 }
 
+sub _marc2folioId {
+    my $marc = shift;
+
+    my @fields999 = $marc->field(999);
+    my $last999 = $fields999[-1];
+    return $last999->subfield('i');
+}
+
 sub marcRecord {
     my $this = shift();
     my $rs = $this->{rs};
@@ -68,7 +76,9 @@ sub marcRecord {
 	my $chunk = int($this->{offset} / $chunkSize);
 	my @marcRecords = $session->_getSRSRecords($rs, $chunk * $chunkSize, $chunkSize);
 	for (my $i = 0; $i < @marcRecords; $i++) {
-	    my $rec = $rs->record($chunk * $chunkSize + $i);
+	    my $marc = $marcRecords[$i];
+	    my $id = _marc2folioId($marc);
+	    my $rec = $rs->recordById($id);
 	    $rec->{marc} = $marcRecords[$i];
 	}
 

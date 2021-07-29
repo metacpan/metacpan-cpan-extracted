@@ -22,14 +22,21 @@ t/mbi_ali.t
 t/new-mbil.t
 t/with.t
 TODO
+xt/author/critic.t
+xt/release/changelog.t
 xt/release/cpan-changes.t
+xt/release/dist-manifest.t
+xt/release/distmeta.t
+xt/release/git.t
 xt/release/kwalitee.t
+xt/release/minimum-version.t
 xt/release/pod-coverage.t
+xt/release/pod-linkcheck.t
 xt/release/pod-syntax.t
 xt/release/portability.t
 xt/release/synopsis.t
-xt/release/test-version.t
 xt/release/unused-vars.t
+xt/release/version.t
 xt/release/whitespaces.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

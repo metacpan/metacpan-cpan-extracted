@@ -1,0 +1,41 @@
+---
+abstract: 'Mojolicious plug-in which extends Restify with more actions'
+author:
+  - 'Emiliano Bruni <info@ebruni.it>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::Mojo: '0'
+  Test::More: '0'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojolicious-Plugin-Restify-OtherActions
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+provides:
+  Mojolicious::Plugin::Restify::OtherActions:
+    file: lib/Mojolicious/Plugin/Restify/OtherActions.pm
+    version: '0.02'
+requires:
+  Mojo::Base: '0'
+  Mojolicious::Plugin::Restify: '0'
+resources:
+  homepage: https://github.com/EmilianoBruni/Mojolicious-Plugin-Restify-OtherActions
+  repository: https://github.com/EmilianoBruni/Mojolicious-Plugin-Restify-OtherActions.git
+version: '0.02'
+x_generated_by_perl: v5.14.2
+x_serialization_backend: 'YAML::Tiny version 1.73'

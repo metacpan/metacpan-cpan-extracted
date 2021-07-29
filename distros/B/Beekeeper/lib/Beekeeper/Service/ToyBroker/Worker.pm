@@ -3,7 +3,7 @@ package Beekeeper::Service::ToyBroker::Worker;
 use strict;
 use warnings;
 
-our $VERSION = '0.07';
+our $VERSION = '0.09';
 
 use Beekeeper::Worker ':log';
 use base 'Beekeeper::Worker';
@@ -26,32 +26,19 @@ sub new {
 
     $self->start_broker;
 
-    eval {
-        $self->SUPER::__init_client;
-
-        $self->{_LOGGER}->{_BUS} = $self->{_BUS};
-
-        $self->SUPER::__init_worker;
-
-        $self->{_WORKER}->{report_status_timer} = AnyEvent->timer(
-            after    => 0, 
-            interval => 1,
-            cb       => sub { $self->__report_status },
-        );
-    };
-
-    if ($@) {
-        log_error "Worker died while initialization: $@";
-        log_error "$class could not be started";
-        CORE::exit( 99 );
-    }
+    # Postponed initialization
+    $self->SUPER::__init_client;
+    $self->{_LOGGER}->{_BUS} = $self->{_BUS};
+    $self->SUPER::__init_auth_tokens;
+    $self->SUPER::__init_worker;
 
     return $self;
 }
 
-sub __init_client { }
-sub __init_worker { }
-sub on_startup    { }
+sub __init_client      { }
+sub __init_auth_tokens { }
+sub __init_worker      { }
+sub   on_startup       { }
 
 sub on_shutdown {
     my $self = shift;
@@ -61,16 +48,16 @@ sub on_shutdown {
     # Wait for clients to gracefully disconnect
     for (1..60) {
         my $conn_count = scalar keys %{$self->{connections}};
-        last if $conn_count <= 1; # our one
+        last if $conn_count <= 1; # our self connection
         my $wait = AnyEvent->condvar;
         my $tmr = AnyEvent->timer( after => 0.5, cb => $wait );
         $wait->recv;
     }
 
-    undef $self->{_LOGGER}->{_BUS};
-
-    # Get rid of our connection to ourselves
+    # Get rid of our self connection
     $self->{_BUS}->disconnect;
+
+    log_info "Stopped";
 }
 
 sub authorize_request {
@@ -1508,7 +1495,7 @@ Beekeeper::Service::ToyBroker::Worker - Basic MQTT 5.0 broker
 
 =head1 VERSION
 
-Version 0.07
+Version 0.09
 
 =head1 DESCRIPTION
 
@@ -1536,7 +1523,7 @@ Example configuration:
       },
       {
           "listen_addr" : "127.0.0.1",
-          "listen_port" : "8001",
+          "listen_port" : "11883",
   
           "users" : {
               "frontend" : { "password" : "abc123" },

@@ -17,7 +17,7 @@ use Modern::Perl;
 use Test::More;
 use File::Slurper qw(write_text write_binary read_binary);
 use utf8; # tests contain UTF-8 characters and it matters
-
+our @use = qw(Web);
 our $host;
 our @hosts = qw(127.0.0.1 localhost);
 our @spaces = qw(127.0.0.1/alex localhost/berta);
@@ -30,6 +30,5 @@ require './t/test.pl';
 
 my $page = query_gemini("GET /alex HTTP/1.0\r\nhost: $host:$port\r\n");
 like($page, qr!<a href="https://$host:$port/alex/page/Alex">Alex</a>!, "main menu of alex space contains Alex");
-like($page, qr!<a href="https://$host:$port/do/source">Source</a>!, "HTML links to source code");
 
 done_testing();

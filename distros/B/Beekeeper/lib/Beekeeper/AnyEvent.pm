@@ -3,7 +3,7 @@ package Beekeeper::AnyEvent;
 use strict;
 use warnings;
 
-our $VERSION = '0.07';
+our $VERSION = '0.09';
 
 use AnyEvent;
 use AnyEvent::Socket;
@@ -54,7 +54,7 @@ Beekeeper::AnyEvent - AnyEvent customizations
 
 =head1 VERSION
 
-Version 0.07
+Version 0.09
 
 =head1 DESCRIPTION
 

@@ -3,10 +3,11 @@
 #
 #  (C) Paul Evans, 2014-2021 -- leonerd@leonerd.org.uk
 
-package Device::BusPirate 0.22;
+use v5.26;
+use Object::Pad 0.45;
 
-use v5.14;
-use warnings;
+package Device::BusPirate 0.23;
+class Device::BusPirate;
 
 use Carp;
 
@@ -102,13 +103,12 @@ change this from its default of C<115200>.
 
 =cut
 
-sub new
-{
-   my $class = shift;
-   my %args = @_;
+has $_fh;
 
+BUILD ( %args )
+{
    # undocumented 'fh 'argument for unit testing
-   my $fh = $args{fh} // do {
+   $_fh = $args{fh} // do {
       my $serial = $args{serial} || BUS_PIRATE;
       my $baud   = $args{baud} || 115200;
 
@@ -126,10 +126,6 @@ sub new
 
       $fh;
    };
-
-   return bless {
-      fh => $fh,
-   }, $class;
 }
 
 =head1 METHODS
@@ -140,33 +136,24 @@ L<Future> instances.
 =cut
 
 # For Modes
-sub write
+method write ( $buf )
 {
-   my $self = shift;
-   my ( $buf ) = @_;
-
    printf STDERR "PIRATE >> %v02x\n", $buf if PIRATE_DEBUG > 1;
 
-   my $f = Future::IO->syswrite_exactly( $self->{fh}, $buf );
+   my $f = Future::IO->syswrite_exactly( $_fh, $buf );
 
    return $f if wantarray;
    $f->on_ready( sub { undef $f } );
 }
 
-async sub write_expect_ack
+async method write_expect_ack ( $out, $name, $timeout = undef )
 {
-   my $self = shift;
-   my ( $out, $name, $timeout ) = @_;
-
    await $self->write_expect_acked_data( $out, 0, $name, $timeout );
    return;
 }
 
-async sub write_expect_acked_data
+async method write_expect_acked_data ( $out, $readlen, $name, $timeout = undef )
 {
-   my $self = shift;
-   my ( $out, $readlen, $name, $timeout ) = @_;
-
    $self->write( $out );
    my $buf = await $self->read( 1 + $readlen, $name, $timeout );
 
@@ -177,15 +164,12 @@ async sub write_expect_acked_data
 }
 
 # For Modes
-sub read
+method read ( $n, $name = undef, $timeout = undef )
 {
-   my $self = shift;
-   my ( $n, $name, $timeout ) = @_;
-
    return Future->done( "" ) unless $n;
 
    my $buf = "";
-   my $f = Future::IO->sysread_exactly( $self->{fh}, $n );
+   my $f = Future::IO->sysread_exactly( $_fh, $n );
 
    $f->on_done( sub {
       printf STDERR "PIRATE << %v02x\n", $_[0];
@@ -208,11 +192,8 @@ seconds), unless it is cancelled first.
 
 =cut
 
-sub sleep
+method sleep ( $timeout )
 {
-   my $self = shift;
-   my ( $timeout ) = @_;
-
    return Future::IO->sleep( $timeout );
 }
 
@@ -230,12 +211,11 @@ each other.
 
 =cut
 
-sub enter_mutex
-{
-   my $self = shift;
-   my ( $code ) = @_;
+has $_mutex;
 
-   ( $self->{mutex} //= Future::Mutex->new )->enter( $code );
+method enter_mutex ( $code )
+{
+   ( $_mutex //= Future::Mutex->new )->enter( $code );
 }
 
 =head2 enter_mode
@@ -273,18 +253,17 @@ information.
 
 =cut
 
-async sub enter_mode
-{
-   my $self = shift;
-   my ( $modename ) = @_;
+has $_mode;
 
+async method enter_mode ( $modename )
+{
    my $modeclass = $MODEMAP{$modename} or
       croak "Unrecognised mode '$modename'";
 
    await $self->start;
 
-   $self->{mode} = $modeclass->new( $self );
-   await $self->{mode}->start;
+   $_mode = $modeclass->new( pirate => $self );
+   await $_mode->start;
 }
 
 =head2 start
@@ -297,15 +276,15 @@ explicitly as it will be done by the setup code of the mode object.
 
 =cut
 
-sub start
-{
-   my $self = shift;
+has $_version;
 
+method start ()
+{
    Future->wait_any(
       (async sub {
          my $buf = await $self->read( 5, "start", 2.5 );
-         ( $self->{version} ) = $buf =~ m/^BBIO(\d)/;
-         return $self->{version};
+         ( $_version ) = $buf =~ m/^BBIO(\d)/;
+         return $_version;
       })->(),
       (async sub {
          foreach my $i ( 1 .. 20 ) {
@@ -327,10 +306,8 @@ return it to a mode that a user can interact with normally on a terminal.
 
 =cut
 
-sub stop
+method stop ()
 {
-   my $self = shift;
-
    $self->write( "\0\x0f" );
 }
 

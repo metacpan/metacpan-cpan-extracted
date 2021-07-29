@@ -5,7 +5,7 @@
 
 package Lemonldap::NG::Manager::Build::PortalConstants;
 
-our $VERSION = '2.0.8';
+our $VERSION = '2.0.12';
 
 sub portalConstants {
     return {
@@ -28,6 +28,7 @@ sub portalConstants {
         PE_APACHESESSIONERROR                => 8,
         PE_FIRSTACCESS                       => 9,
         PE_BADCERTIFICATE                    => 10,
+        PE_NO_PASSWORD_BE                    => 20,
         PE_PP_ACCOUNT_LOCKED                 => 21,
         PE_PP_PASSWORD_EXPIRED               => 22,
         PE_CERTIFICATEREQUIRED               => 23,
@@ -110,7 +111,9 @@ sub portalConstants {
         PE_PP_NOT_ALLOWED_CHARACTER          => 100,
         PE_PP_NOT_ALLOWED_CHARACTERS         => 101,
         PE_UPGRADESESSION                    => 102,
-        PE_NO_SECOND_FACTORS                 => 103
+        PE_NO_SECOND_FACTORS                 => 103,
+        PE_BAD_DEVOPS_FILE                   => 104,
+        PE_FILENOTFOUND                      => 105
     };
 }
 

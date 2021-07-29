@@ -17,7 +17,7 @@ ansicolumn - ANSI terminal sequence aware column command
 
 =head1 VERSION
 
-Version 1.08
+Version 1.10
 
 =head1 SYNOPSIS
 
@@ -36,6 +36,7 @@ ansicolumn [options] [file ...]
     -C#                  number of panes
     -S#                  pane width
     -F                   full-width
+    -p                   paragraph mode
 
     --height=#           page height
     --column-unit=#      column unit (default 8)
@@ -48,9 +49,6 @@ ansicolumn [options] [file ...]
     --border=#           print border
     --border-style=#     border style
     --[no-]ignore-space  ignore space in table output
-    --[no-]insert-space  insert empty line
-    --[no-]paragraph     same as --insert-space
-    --[no-]white-space   allow page top white spaces
     --[no-]isolation     page-end line isolation
     --fillup=#           fill-up unit (pane|page|none)
     --tabstop=#          tab-stop character
@@ -76,7 +74,8 @@ default, from the standard input.
 
 =item B<-c>#, B<--width>=#, B<--output-width>=#
 
-Output is formatted for a display columns wide.
+Output is formatted for a display columns wide.  See L</CALCULATION>
+section.
 
 =item B<-s>#, B<--separator>=#
 
@@ -92,7 +91,7 @@ pretty-printing displays.
 
 =item B<-l>I<#>, B<--table-columns-limit> I<number>
 
-Specify maximal number of the input columns. The last column will
+Specify maximal number of the input columns.  The last column will
 contain all remaining line data if the limit is smaller than the
 number of the columns in the input data.
 
@@ -120,13 +119,14 @@ Support only numbers.
 
 Page mode.  Set these options.
 
-    --height=[ terminal height - 1 ]
+    --height=# or 1-
     --linestyle=wrap
     --border
     --fillup
 
 If optional number is given, it is used as a page height unless option
-B<--height> exists.
+B<--height> exists.  Otherwise page height is set to terminal height
+minus one.
 
 =item B<-D>, B<--document>
 
@@ -151,16 +151,21 @@ of panes implies B<--fullwidth> option enabled.
 
 =item B<-S>#, B<--pane-width>=#, B<--pw>=#
 
-Specify pane width.  This includes border spaces.
+Specify pane width.  This includes border spaces.  See L</CALCULATION>
+section.
 
 =item B<-F>, B<--fullwidth>
 
 Use full width of the terminal.  Each panes are expanded to fill
 terminal width, unless B<--pane-width> is specified.
 
+=item B<-p>, B<--paragraph>
+
+Insert empty line between every successive non-empty lines.
+
 =item B<--height>=#
 
-Set page height and page mode on.
+Set page height and page mode on.  See L</CALCULATION> section.
 
 =item B<--column-unit>=#
 
@@ -213,6 +218,7 @@ none,
 vbar, fence,
 line, heavy-line,
 ascii-frame, ascii-box,
+c-box,
 box, frame, page-frame,
 shadow, shadow-box,
 comb, rake, mesh,
@@ -240,12 +246,6 @@ lines in your C<$HOME/.ansicolumnrc> file, for example.
 
 When used B<-t> option, leading spaces are ignored by default.  Use
 B<--no-ignore-space> option to disable it.
-
-=item B<-->[B<no->]B<insert-space>
-
-=item B<-->[B<no->]B<paragraph>
-
-Insert empty line between every successive non-empty lines.
 
 =item B<-->[B<no->]B<white-space>
 
@@ -352,7 +352,8 @@ L<https://github.com/kaz-utashiro/App-ansicolumn/tree/master/images>
 
 =head1 SEE ALSO
 
-L<column(1)>
+L<column(1)>,
+L<https://man7.org/linux/man-pages/man1/column.1.html>
 
 L<App::ansicolumn>,
 L<https://github.com/kaz-utashiro/App-ansicolumn>
@@ -366,7 +367,7 @@ Kazumasa Utashiro
 
 =head1 LICENSE
 
-Copyright 2020- Kazumasa Utashiro.
+Copyright 2020-2021 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

@@ -1,3 +1,9 @@
+3.09    2021-07-14
+
+- No functional changes. Internal improvements for handling bzipped archives,
+  and less picky (and hence more correct) testing of the bundled scripts'
+  rendered help output.
+
 3.08    2021-07-08
 
 - Work around another bug in perl on Windows

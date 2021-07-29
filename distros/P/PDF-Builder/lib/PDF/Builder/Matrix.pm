@@ -13,8 +13,8 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION = '3.022'; # VERSION
-my $LAST_UPDATE = '3.020'; # manually update whenever code is changed
+our $VERSION = '3.023'; # VERSION
+our $LAST_UPDATE = '3.020'; # manually update whenever code is changed
 
 =head1 NAME
 

@@ -4,7 +4,7 @@ Mojo::UserAgent::DigestAuth - Allow Mojo::UserAgent to execute digest auth reque
 
 # VERSION
 
-0.05
+0.06
 
 # DESCRIPTION
 

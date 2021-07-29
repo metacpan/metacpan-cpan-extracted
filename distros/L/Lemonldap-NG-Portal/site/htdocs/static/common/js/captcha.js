@@ -10,8 +10,12 @@
       dataType: 'json',
       error: function(j, status, err) {
         var res;
-        console.log('Error', err);
-        res = JSON.parse(j.responseText);
+        if (err) {
+          console.log('Error', err);
+        }
+        if (j) {
+          res = JSON.parse(j.responseText);
+        }
         if (res && res.error) {
           return console.log('Returned error', res);
         }

@@ -9,7 +9,7 @@ my @localtime = CORE::localtime $time;
 my @gmtime = CORE::gmtime $time;
 
 my $local_tm = Time::FFI::tm->from_list(@localtime);
-my $local_mt = $local_tm->to_object('Time::Moment', 1);
+my $local_mt = $local_tm->to_object_as_local('Time::Moment');
 isa_ok $local_mt, 'Time::Moment';
 is $local_mt, object {
   call second => $local_tm->sec;
@@ -31,10 +31,10 @@ is $local_from, object {
   call mon   => $local_tm->mon;
   call year  => $local_tm->year;
 }, 'local tm structure from Time::Moment object';
-is $local_from->epoch(1), $time, 'right epoch timestamp from local time';
+is $local_from->epoch_as_local, $time, 'right epoch timestamp from local time';
 
 my $utc_tm = Time::FFI::tm->from_list(@gmtime);
-my $utc_mt = $utc_tm->to_object('Time::Moment', 0);
+my $utc_mt = $utc_tm->to_object_as_utc('Time::Moment');
 isa_ok $utc_mt, 'Time::Moment';
 is $utc_mt, object {
   call second => $utc_tm->sec;
@@ -56,7 +56,7 @@ is $utc_from, object {
   call mon   => $utc_tm->mon;
   call year  => $utc_tm->year;
 }, 'UTC tm structure from Time::Moment object';
-is $utc_from->epoch(0), $time, 'right epoch timestamp from UTC time';
+is $utc_from->epoch_as_utc, $time, 'right epoch timestamp from UTC time';
 
 subtest dst_check => sub {
   test_needs 'Role::Tiny', 'Time::Moment::Role::TimeZone';
@@ -69,7 +69,7 @@ subtest dst_check => sub {
     min  => 0,
     sec  => 0,
   );
-  my $dst_mt = $dst_tm->to_object('Time::Moment', 1);
+  my $dst_mt = $dst_tm->to_object_as_local('Time::Moment');
   my $real_mt = Role::Tiny->create_class_with_roles('Time::Moment', 'Time::Moment::Role::TimeZone')->new(
     year   => 2019,
     month  => 6,

@@ -32,6 +32,10 @@ This provides an object oriented array iterator. Each of its elements are L<Modu
 
 Provided with an array reference or an L<Module::Generic::Array> object, and this will create a new iterator and return it.
 
+=head2 elements
+
+Contains the array elements
+
 =head2 eof
 
 Returns true if the position in the iterator has reached the end of the array.

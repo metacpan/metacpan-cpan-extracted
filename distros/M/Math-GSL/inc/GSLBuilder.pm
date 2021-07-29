@@ -253,6 +253,7 @@ sub compile_swig {
 sub is_windows { $^O =~ /MSWin32/i }
 sub is_darwin  { $^O =~ /darwin/i  }
 sub is_cygwin  { $^O =~ /cygwin/i }
+sub is_msys  { $^O eq "msys" }
 
 # Windows fixes courtesy of <sisyphus@cpan.org>
 sub link_c {
@@ -315,6 +316,7 @@ sub compile_c {
 			? map {"-I$_"} (@{$p->{include_dirs}}, catdir($cf->{installarchlib}, 'CORE'))
 			: map {"-I$_"} ( catdir($cf->{installarchlib}, 'CORE') ) ;
 
+  fix_mac_os_system_perl_core_include(\@include_dirs);
   my @extra_compiler_flags = $self->split_like_shell($p->{extra_compiler_flags});
   my @cccdlflags           = $self->split_like_shell($cf->{cccdlflags});
   my @ccflags              = $self->split_like_shell($cf->{ccflags});
@@ -338,6 +340,24 @@ sub compile_c {
     or die "error building $Config{_o} file from '$file'";
 
   return $obj_file;
+}
+
+sub fix_mac_os_system_perl_core_include {
+   my ($inc_dirs)  = @_;
+   my @inc;
+   for my $inc (@$inc_dirs) {
+     if ( $^O eq 'darwin' && $^X eq '/usr/bin/perl' ) {
+       my @osvers = split /\./, $Config{osvers};
+       if ($osvers[0] >= 18 ) {
+          if ($inc =~ /-I(\/System.*?CORE)/) {
+            push @inc, '-iwithsysroot', $1;
+            next;
+          }
+        }
+     }
+     push @inc, $inc;
+   }
+   @$inc_dirs = @inc;
 }
 
 # Propagate version numbers to all modules

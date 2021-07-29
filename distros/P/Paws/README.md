@@ -230,8 +230,6 @@ This creates the branch for working on the next release.
 We bump the version number in the builder. Edit `builder-lib/Paws/API/Builder/Paws.pm`. Near line 12
 we will find Paws version number. Replace X.XX for Y.YY
 
-```
-
 We add Y.YY to the Changes file. Commit the changes and push:
 
 ```
@@ -455,9 +453,22 @@ leonerd for (between others)
 
 campus-explorer for contributing to test suite
 
-byterock for testing and fixing PinPoint
+byterock for:
+ - testing and fixing PinPoint
+ - standing up as comaint, and releasing 0.43
+ - improving S3 support
 
 torrentale for fixing QueryCaller to correctly signal empty arrays
 
-Jess Robinson and shadowcat.co.uk  for setting up ver 0.43
- 
+Jess Robinson and shadowcat.co.uk for:
+ - doing lots of comaint work
+ - working hard on new features
+
+shogo82148 for migrating our Travis pipelines to GitHub Actions (and 
+improving them)
+
+aeruder for contributing
+ - Fixing DynamoDB retry fixes
+ - Completing speedups and benchmarking code
+ - Substituting Config::INI for Config::AWS 
+ - Parrallelizing and fixing generation inconsistencies of the SDK

@@ -40,7 +40,7 @@ requires:
   Perinci::CmdLine::Base: '1.816'
   Perinci::Object: '0.311'
   Perinci::Result::Format: '0.42'
-  Perinci::Sub::To::CLIDocData: '0.294'
+  Perinci::Sub::To::CLIDocData: '0.298'
   Perinci::Sub::Wrapper: '0.83'
   Progress::Any: '0.219'
   Progress::Any::Output: '0'
@@ -56,10 +56,10 @@ requires:
   strict: '0'
   warnings: '0'
 resources:
-  bugtracker: https://github.com/perlancar/perl-Perinci-CmdLine-Classic/issues
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-CmdLine-Classic
   homepage: https://metacpan.org/release/Perinci-CmdLine-Classic
   repository: git://github.com/perlancar/perl-Perinci-CmdLine-Classic.git
-version: '1.814'
+version: '1.815'
 x_Dist_Zilla:
   perl:
     version: '5.030002'
@@ -143,7 +143,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::BeforeBuild
       name: '@Author::PERLANCAR/PERLANCAR::BeforeBuild'
-      version: '0.603'
+      version: '0.604'
     -
       class: Dist::Zilla::Plugin::Rinci::AbstractFromMeta
       name: '@Author::PERLANCAR/Rinci::AbstractFromMeta'
@@ -159,7 +159,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::MetaResources
       name: '@Author::PERLANCAR/PERLANCAR::MetaResources'
-      version: '0.042'
+      version: '0.043'
     -
       class: Dist::Zilla::Plugin::CheckChangeLog
       name: '@Author::PERLANCAR/CheckChangeLog'
@@ -179,6 +179,17 @@ x_Dist_Zilla:
           version: '0.006'
       name: '@Author::PERLANCAR/CheckSelfDependency'
       version: '0.011'
+    -
+      class: Dist::Zilla::Plugin::Git::Contributors
+      config:
+        Dist::Zilla::Plugin::Git::Contributors:
+          git_version: 2.17.1
+          include_authors: 0
+          include_releaser: 1
+          order_by: name
+          paths: []
+      name: '@Author::PERLANCAR/Git::Contributors'
+      version: '0.036'
     -
       class: Dist::Zilla::Plugin::CopyrightYearFromGit
       name: '@Author::PERLANCAR/CopyrightYearFromGit'
@@ -300,6 +311,10 @@ x_Dist_Zilla:
               name: '@Author::PERLANCAR/Authors'
               version: '4.015'
             -
+              class: Pod::Weaver::Section::Contributors
+              name: '@Author::PERLANCAR/Contributors'
+              version: '0.009'
+            -
               class: Pod::Weaver::Section::Legal
               name: '@Author::PERLANCAR/Legal'
               version: '4.015'
@@ -404,7 +419,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Prereqs::CheckCircular
       name: '@Author::PERLANCAR/Prereqs::CheckCircular'
-      version: '0.006'
+      version: '0.007'
     -
       class: Dist::Zilla::Plugin::UploadToCPAN::WWWPAUSESimple
       name: '@Author::PERLANCAR/UploadToCPAN::WWWPAUSESimple'
@@ -491,6 +506,8 @@ x_Dist_Zilla:
       is_trial: '0'
     version: '6.014'
 x_authority: cpan:PERLANCAR
+x_contributors:
+  - 'Steven Haryanto <sharyanto@cpan.org>'
 x_generated_by_perl: v5.30.2
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

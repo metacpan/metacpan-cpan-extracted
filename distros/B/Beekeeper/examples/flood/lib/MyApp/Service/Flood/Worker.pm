@@ -7,6 +7,12 @@ use Beekeeper::Worker ':log';
 use base 'Beekeeper::Worker';
 
 
+sub authorize_request {
+    my ($self, $req) = @_;
+
+    return BKPR_REQUEST_AUTHORIZED;
+}
+
 sub on_startup {
     my $self = shift;
 
@@ -22,10 +28,10 @@ sub on_startup {
     log_info "Ready";
 }
 
-sub authorize_request {
-    my ($self, $req) = @_;
+sub on_shutdown {
+    my $self = shift;
 
-    return BKPR_REQUEST_AUTHORIZED;
+    log_info "Stopped";
 }
 
 

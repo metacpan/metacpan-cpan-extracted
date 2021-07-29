@@ -1,9 +1,25 @@
+0.023   2021-07-10  Released-By: PERLANCAR; Urgency: high
+
+	- Merge releases 0.022 and 0.022.1.
+
+
+0.022.1 2021-07-10  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux] Use POD-formatted usage line from
+	  Perinci::Sub::To::CLIDocData 0.297.
+
+	- Mention support for [env=VARNAME=value] section in the generated POD.
+
+        - UPDATE 2021-07-10: rename release from 0.022 to 0.022.1 due to
+          conflict.
+
+
 0.022   2021-05-07  Released-By: PERLANCAR; Urgency: medium
 
 	- Note command-line options that can be specified as command-line
 	  arguments ('pos' defined).
 
-	- Mention support for [env=VARNAME=value] section.
+	- Mention support for [env=VARNAME=value] section in the generated POD.
 
 
 0.021   2020-10-21  Released-By: PERLANCAR; Urgency: medium

@@ -1,5 +1,8 @@
 Revision history for PDF-TableX
 
+0.015
+        Fixed issues when running on perl 5.26.0
+
 0.02
         Add missing method stubs to doc.
         Add missing pod stubs.

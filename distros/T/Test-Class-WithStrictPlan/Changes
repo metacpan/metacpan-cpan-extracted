@@ -1,4 +1,7 @@
 Revision history for Test-Class-WithStrictPlan
 
+0.2  Fri Jul 09 20:47:12 2021
+	- Fixed support for no_plan
+
 0.1  Fri Nov 03 10:09:35 2017
 	- Initial version

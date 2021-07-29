@@ -3,8 +3,8 @@ NAME
     framework
 
 VERSION
-    This document describes version 1.814 of Perinci::CmdLine::Classic (from
-    Perl distribution Perinci-CmdLine-Classic), released on 2021-05-07.
+    This document describes version 1.815 of Perinci::CmdLine::Classic (from
+    Perl distribution Perinci-CmdLine-Classic), released on 2021-07-11.
 
 SYNOPSIS
     In "gen-random-num" script:
@@ -145,6 +145,9 @@ RESULT METADATA
     If set to true, then when formatting to "text" formats, this class won't
     print any newline to keep the data being printed unmodified.
 
+CONTRIBUTOR
+    Steven Haryanto <sharyanto@cpan.org>
+
 ATTRIBUTES
     All the attributes of Perinci::CmdLine::Base, plus:
 
@@ -209,7 +212,8 @@ SOURCE
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website
-    <https://github.com/perlancar/perl-Perinci-CmdLine-Classic/issues>
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-CmdLine-Class
+    ic>
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.

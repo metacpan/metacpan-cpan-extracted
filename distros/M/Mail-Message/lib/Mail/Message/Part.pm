@@ -1,4 +1,4 @@
-# Copyrights 2001-2020 by [Mark Overmeer <markov@cpan.org>].
+# Copyrights 2001-2021 by [Mark Overmeer <markov@cpan.org>].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.02.
@@ -8,7 +8,7 @@
 
 package Mail::Message::Part;
 use vars '$VERSION';
-$VERSION = '3.010';
+$VERSION = '3.011';
 
 use base 'Mail::Message';
 

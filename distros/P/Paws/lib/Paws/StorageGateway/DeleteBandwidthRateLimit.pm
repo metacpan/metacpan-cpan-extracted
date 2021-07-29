@@ -28,9 +28,9 @@ You shouldn't make instances of this class. Each attribute should be used as a n
 =head1 SYNOPSIS
 
     my $storagegateway = Paws->service('StorageGateway');
-    # To delete bandwidth rate limits of gateway
-    # Deletes the bandwidth rate limits of a gateway; either the upload or
-    # download limit, or both.
+ # To delete bandwidth rate limits of gateway
+ # Deletes the bandwidth rate limits of a gateway; either the upload or download
+ # limit, or both.
     my $DeleteBandwidthRateLimitOutput =
       $storagegateway->DeleteBandwidthRateLimit(
       'BandwidthType' => 'All',
@@ -54,7 +54,7 @@ For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/sto
 One of the BandwidthType values that indicates the gateway bandwidth
 rate limit to delete.
 
-Valid Values: C<Upload>, C<Download>, C<All>.
+Valid Values: C<UPLOAD> | C<DOWNLOAD> | C<ALL>
 
 
 

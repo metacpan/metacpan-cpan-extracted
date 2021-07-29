@@ -26,15 +26,13 @@ sub bundle_config {
         $plugin_name,
         $plugin_class,
         {
-            $code => [
-                sub {
-                    my ($self) = @_;
-                    $self->log($input);
-                    $RESULT = $input * $input;
-                    mkdir 'blib';    ## no critic (InputOutput::RequireCheckedSyscalls)
-                    return;
-                },
-            ],
+            $code => sub {
+                my ($self) = @_;
+                $self->log($input);
+                $RESULT = $input * $input;
+                mkdir 'blib';    ## no critic (InputOutput::RequireCheckedSyscalls)
+                return;
+            },
         },
     ];
 }

@@ -29,11 +29,11 @@ subtest 'connect and set mode' => sub {
   $t->command_ok(TYPE => 'A')
     ->code_is(200)
     ->message_like(qr{Type set to A});
-    
+
   $t->command_ok(CWD => $tmp)
     ->code_is(250)
     ->message_like(qr{CWD command successful});;
-    
+
   $client = $t->_client;
 };
 
@@ -52,7 +52,7 @@ subtest 'store native (default)' => sub {
   $test1 = do { local $/; <$fh> };
   close $fh;
   is $test1, "one\ntwo\nthree\n", "stored as native";
-  
+
   xd('test1.txt');
 
   $test1 = '';
@@ -66,19 +66,19 @@ subtest 'store native (default)' => sub {
   is $test1, "one\ntwo\nthree\none\ntwo\nthree\n", "stored as native (append)";
 
   xd('test1.txt');
-  
+
   my $xfer = $client->stou(undef, \$payload_crlf);
   is $xfer->recv->code, 226, 'stou okay fn = ' . $xfer->remote_name;
- 
-  $test1 = ''; 
+
+  $test1 = '';
   is $client->retr($xfer->remote_name, \$test1)->recv->code, 226, 'retr okay';
   is $test1, $payload_crlf, "payload response matches what we sent (stou)";
-  
+
   open $fh, '<', $xfer->remote_name;
   $test1 = do { local $/; <$fh> };
   close $fh;
   is $test1, "one\ntwo\nthree\n", "stored as native";
-  
+
   xd($xfer->remote_name);
 };
 

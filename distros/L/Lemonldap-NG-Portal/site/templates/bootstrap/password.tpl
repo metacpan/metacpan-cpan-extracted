@@ -26,7 +26,6 @@
     </TMPL_IF>
 
     <TMPL_IF NAME="REQUIRE_OLDPASSWORD">
-
       <TMPL_IF NAME="HIDE_OLDPASSWORD">
         <input id="oldpassword" name="oldpassword" type="hidden" value="<TMPL_VAR NAME=OLDPASSWORD>" aria-required="true">
       <TMPL_ELSE>
@@ -34,10 +33,13 @@
           <div class="input-group-prepend">
             <span class="input-group-text"><label for="oldpassword" class="mb-0"><i class="fa fa-lock"></i></label></span>
           </div>
-          <input id="oldpassword" name="oldpassword" type="password" value="<TMPL_VAR NAME=OLDPASSWORD>" class="form-control" trplaceholder="currentPwd" required aria-required="true">
+          <TMPL_IF NAME="DONT_STORE_PASSWORD">
+            <input id="oldpassword" name="oldpassword" type="text" value="<TMPL_VAR NAME=OLDPASSWORD>" class="form-control" trplaceholder="currentPwd" autocomplete="off" required aria-required="true">
+          <TMPL_ELSE>
+            <input id="oldpassword" name="oldpassword" type="password" value="<TMPL_VAR NAME=OLDPASSWORD>" class="form-control" trplaceholder="currentPwd" required aria-required="true">
+          </TMPL_IF>
         </div>
       </TMPL_IF>
-
     </TMPL_IF>
 
     <TMPL_IF NAME="DISPLAY_PPOLICY"><TMPL_INCLUDE NAME="passwordpolicy.tpl"></TMPL_IF>
@@ -46,15 +48,22 @@
       <div class="input-group-prepend">
         <span class="input-group-text"><label for="newpassword" class="mb-0"><i class="fa fa-lock"></i></label></span>
       </div>
-      <input id="newpassword" name="newpassword" type="password" class="form-control" trplaceholder="newPassword" required aria-required="true"/>
+      <TMPL_IF NAME="DONT_STORE_PASSWORD">
+        <input id="newpassword" name="newpassword" type="text" class="form-control" trplaceholder="newPassword" autocomplete="off" required aria-required="true"/>
+      <TMPL_ELSE>
+        <input id="newpassword" name="newpassword" type="password" class="form-control" trplaceholder="newPassword" required aria-required="true"/>
+      </TMPL_IF>
     </div>
     <div class="form-group input-group">
       <div class="input-group-prepend">
         <span class="input-group-text"><label for="confirmpassword" class="mb-0"><i class="fa fa-lock"></i></label></span>
       </div>
-      <input id="confirmpassword" name="confirmpassword" type="password" class="form-control" trplaceholder="confirmPwd" required aria-required="true"/>
+      <TMPL_IF NAME="DONT_STORE_PASSWORD">
+        <input id="confirmpassword" name="confirmpassword" type="text" class="form-control" trplaceholder="confirmPwd" autocomplete="off" required aria-required="true"/>
+      <TMPL_ELSE>
+        <input id="confirmpassword" name="confirmpassword" type="password" class="form-control" trplaceholder="confirmPwd" required aria-required="true"/>
+      </TMPL_IF>
     </div>
-
     <div class="buttons">
       <button type="submit" class="btn btn-success">
         <span class="fa fa-check-circle"></span>

@@ -1,3 +1,11 @@
+0.014   2021-04-04  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+	- [build] Rebuild with updated Pod::Weaver plugin [ModuleFeatures] to
+          fix the generated POD.
+
+
 0.013   2021-04-04  Released-By: PERLANCAR; Urgency: medium
 
 	- [bugfix] Test optional prereq conditionally (GH#2).

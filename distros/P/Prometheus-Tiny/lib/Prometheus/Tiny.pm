@@ -1,5 +1,5 @@
 package Prometheus::Tiny;
-$Prometheus::Tiny::VERSION = '0.007';
+$Prometheus::Tiny::VERSION = '0.008';
 # ABSTRACT: A tiny Prometheus client
 
 use warnings;
@@ -79,6 +79,17 @@ sub histogram_observe {
   return;
 }
 
+sub enum_set {
+  my ($self, $name, $value, $labels, $timestamp) = @_;
+
+  my $enum_label = $self->{meta}{$name}{enum} ||
+    croak "enum not declared for '$name'";
+
+  for my $ev (@{$self->{meta}{$name}{enum_values} || []}) {
+    $self->set($name, $value eq $ev ? 1 : 0, { %{$labels || {}}, $enum_label => $ev }, $timestamp);
+  }
+}
+
 sub declare {
   my ($self, $name, %meta) = @_;
 
@@ -88,10 +99,18 @@ sub declare {
        (exists $old->{type} && $old->{type} ne $meta{type})) ||
       ((exists $old->{help} ^ exists $meta{help}) ||
        (exists $old->{help} && $old->{help} ne $meta{help})) ||
+      ((exists $old->{enum} ^ exists $meta{enum}) ||
+       (exists $old->{enum} && $old->{enum} ne $meta{enum})) ||
       ((exists $old->{buckets} ^ exists $meta{buckets}) ||
        (exists $old->{buckets} && (
         @{$old->{buckets}} ne @{$meta{buckets}} ||
         grep { $old->{buckets}[$_] != $meta{buckets}[$_] } (0 .. $#{$meta{buckets}})
+       ))
+      ) ||
+      ((exists $old->{enum_values} ^ exists $meta{enum_values}) ||
+       (exists $old->{enum_values} && (
+        @{$old->{enum_values}} ne @{$meta{enum_values}} ||
+        grep { $old->{enum_values}[$_] ne $meta{enum_values}[$_] } (0 .. $#{$meta{enum_values}})
        ))
       )
     ) {
@@ -252,6 +271,16 @@ buckets you want to use. If you don't, the following buckets will be used.
 
     [ 0.005, 0.01, 0.025, 0.05, 0.075, 0.1, 0.25, 0.5, 0.75, 1.0, 2.5, 5.0, 7.5, 10 ]
 
+=head2 enum_set
+
+    $prom->enum_set($name, $value, { labels }, [timestamp])
+
+Set an enum value for the named metric. The labels hashref is optiona. The timestamp is optional.
+
+You should declare your metric beforehand, using the C<enum> key to set the
+label to use for the enum value, and the C<enum_values> key to list the
+possible values for the enum.
+
 
 =head2 declare
 
@@ -272,6 +301,14 @@ Type of the metric, typically C<gauge> or C<counter>.
 =item C<buckets>
 
 For C<histogram> metrics, an arrayref of the buckets to use. See C<histogram_observe>.
+
+=item C<enum>
+
+For C<enum> metrics, the name of the label to use for the enum value. See C<enum_set>.
+
+=item C<enum_values>
+
+For C<enum> metrics, the possible values the enum can take. See C<enum_set>.
 
 =back
 

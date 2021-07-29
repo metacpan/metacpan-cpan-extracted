@@ -10,11 +10,11 @@ Regexp::Pattern::License::Parts - Regular expressions for licensing sub-parts
 
 =head1 VERSION
 
-Version v3.6.1
+Version v3.8.0
 
 =cut
 
-our $VERSION = version->declare("v3.6.1");
+our $VERSION = version->declare("v3.8.0");
 
 =head STATUS
 
@@ -34,12 +34,13 @@ It is a class of internally used patterns.
 
 # [ ]           end-of-sentence space
 # [.]           full stop
+# [:]           colon
 # [;]           semicolon or colon or comma
 # ["]           quote
 # ["*]          quote or bullet
 # [*)]          start-of-sentence bullet or count
 # [/]           slash or space or none
-# [-]           dash
+# [-]           dash maybe space after, or none
 # [- ]          dash or space
 # [ - ]         dash with space around
 # [(]           parens-open
@@ -85,8 +86,12 @@ our %RE = (
 		pat =>
 			'to deal in the Software without restriction, including without limitation the rights '
 	},
-	to_copy_prg      => { pat => 'to use or copy this program ' },
-	to_dist          => { pat => 'to use, copy, modify,? and distribute ' },
+	to_copy_prg  => { pat => 'to use or copy this program ' },
+	to_dist      => { pat => 'to use, copy, modify,? and distribute ' },
+	to_reproduce => {
+		pat =>
+			'to use, reproduce, prepare derivative works, and to redistribute to others'
+	},
 	to_mod_sublic_sw => {
 		pat =>
 			'to use, copy, modify, merge, publish, distribute, sublicense, and[/]or sell copies of the Software, '
@@ -236,11 +241,11 @@ our %RE = (
 
 	# texts
 	ack_dev_by => {
-		pat => 'the following acknowledge?ments?:?[ ]'
+		pat => 'the following acknowledge?ments?[:]?[ ]'
 			. '["]?This product includes software developed by '
 	},
 	ack_written_by => {
-		pat => 'the following acknowledge?ment:?[ ]'
+		pat => 'the following acknowledge?ment[:]?[ ]'
 			. '["]?This product includes(?: cryptographic)? software written by'
 	},
 	authors_copr    => { pat => 'the Authors, the Copyright' },
@@ -283,6 +288,10 @@ our %RE = (
 );
 
 $RE{perm_granted}{pat} = 'Permission ' . $RE{granted}{pat} . ',? ';
+$RE{to_copy_sublicence_conditions}{pat}
+	= $RE{to_mod_sublic_sw}{pat}
+	. $RE{and_to_perm_pers}{pat}
+	. $RE{subj_cond}{pat};
 $RE{ad_mat_ack_this}{pat}
 	= 'All advertising materials mentioning features or use of this software must display '
 	. $RE{ack_dev_by}{pat};
@@ -373,6 +382,10 @@ $RE{nopromo_neither}{pat}
 	. $RE{namenot}{pat} . ')'
 	. $RE{used_endorse_deriv}{pat}
 	. $RE{without_prior_written}{pat};
+$RE{nopromo_university}{pat}
+	= 'Neither the name of the University nor the names of its contributors may '
+	. $RE{used_endorse_deriv}{pat}
+	. $RE{without_prior_written}{pat};
 $RE{nopromo_nothing_deemed}{pat}
 	= '[*)]?Nothing in this license shall be deemed to grant';
 $RE{redist_ack_this}{pat}
@@ -418,7 +431,7 @@ $RE{discl_liability_claim}{pat}
 	= 'IN NO EVENT SHALL[ word]{1,15} BE LIABLE'
 	. ' FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY'
 	. ', WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE'
-	. ', ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE'
+	. ', ARISING FROM, OUT OF OR IN CONNEC[-]TION WITH THE SOFTWARE'
 	. ' OR THE USE OR OTHER DEALINGS IN THE SOFTWARE';
 
 =encoding UTF-8

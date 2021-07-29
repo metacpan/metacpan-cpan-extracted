@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use English;
 
-use Test::More tests => 18;
+use Test::More tests => 22;
 
 use Log::Log4perl;
 Log::Log4perl->easy_init( { level   => 'ERROR' } );
@@ -62,3 +62,14 @@ is( $sub->get(''), 'foo' );
 $conn->set('bar', $sub);
 
 is($conn->get_meta('bar')->{TYPE}, 'connector');
+
+
+my $prim = Connector::Builtin::Memory->new({
+    primary_attribute => 'zero'
+});
+
+$prim->set('use.hash', { foo => 1, bar => 2, zero => 0});
+is( $prim->get_meta('use.hash')->{TYPE}, 'hash' );
+is( $prim->get('use.hash.foo'), 1 );
+is( $prim->get('use.hash.zero'), 0 );
+is( $prim->get('use.hash'), 0 );

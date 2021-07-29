@@ -30,9 +30,8 @@ You shouldn't make instances of this class. Each attribute should be used as a n
 =head1 SYNOPSIS
 
     my $ec2 = Paws->service('EC2');
-    # To release an Elastic IP address for EC2-VPC
-    # This example releases an Elastic IP address for use with instances in a
-    # VPC.
+  # To release an Elastic IP address for EC2-VPC
+  # This example releases an Elastic IP address for use with instances in a VPC.
     $ec2->ReleaseAddress( 'AllocationId' => 'eipalloc-64d5890a' );
 
     # To release an Elastic IP addresses for EC2-Classic
@@ -64,7 +63,8 @@ C<DryRunOperation>. Otherwise, it is C<UnauthorizedOperation>.
 
 =head2 NetworkBorderGroup => Str
 
-The location that the IP address is released from.
+The set of Availability Zones, Local Zones, or Wavelength Zones from
+which AWS advertises IP addresses.
 
 If you provide an incorrect network border group, you will receive an
 C<InvalidAddress.NotFound> error. For more information, see Error Codes

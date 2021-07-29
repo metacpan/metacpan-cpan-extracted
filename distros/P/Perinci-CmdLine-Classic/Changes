@@ -1,3 +1,9 @@
+1.815   2021-07-11  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux] Provide key to common options to be able to group them in
+	  usage line (ref: Perinci::Sub::To::CLIDocData 0.298).
+
+
 1.814   2021-05-07  Released-By: PERLANCAR; Urgency: medium
 
 	- Adjust to new BorderStyle and ColorTheme specification (2.x)

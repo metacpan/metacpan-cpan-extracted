@@ -1,3 +1,10 @@
+0.76 2021-07-29
+- add pl_cmd and pl_setCairoCtx - thanks @mikef5410
+
+0.75 2021-07-29
+- updated library tests back to 5.13.0's ones
+- update library tests and API support to 5.15.0
+
 0.74 2020-07-16
 - Fix placement of plschr to change CHARSIZE.  Had been a bug introduced in 0.73 which rendered CHARSIZE
   inoperative in a call to $pl->text

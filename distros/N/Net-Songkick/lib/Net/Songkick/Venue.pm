@@ -21,7 +21,7 @@ coerce 'Net::Songkick::Venue',
 
 has $_ => (
     is => 'ro',
-    isa => 'Str',
+    isa => 'Undef|Str',
 ) for qw[uri lat id lng displayName street zip phone website capacity description];
 
 has city => (

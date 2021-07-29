@@ -32,7 +32,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_PP_INSUFFICIENT_PASSWORD_QUALITY
 );
 
-our $VERSION = '2.0.10';
+our $VERSION = '2.0.12';
 
 extends qw(
   Lemonldap::NG::Portal::Lib::SMTP
@@ -91,7 +91,7 @@ sub resetPwd {
 
 sub _reset {
     my ( $self, $req ) = @_;
-    my ( $mailToken, %tplPrms );
+    my ($mailToken);
 
     # PASSWORD CHANGE FORM => changePwd()
     if (
@@ -323,7 +323,6 @@ sub _reset {
           );
 
         # Build mail content
-        $tplPrms{MAIN_LOGO} = $self->conf->{portalMainLogo};
         my $tr      = $self->translate($req);
         my $subject = $self->conf->{mailConfirmSubject};
         unless ($subject) {
@@ -336,6 +335,13 @@ sub _reset {
 
             # We use a specific text message, no html
             $body = $self->conf->{mailConfirmBody};
+
+            # Replace variables in body
+            $body =~ s/\$expMailDate/$req->data->{expMailDate}/ge;
+            $body =~ s/\$expMailTime/$req->data->{expMailTime}/ge;
+            $body =~ s/\$url/$url/g;
+            $body =~ s/\$(\w+)/$req->{sessionInfo}->{$1} || ''/ge;
+
         }
         else {
 
@@ -344,16 +350,14 @@ sub _reset {
                 $req,
                 'mail_confirm',
                 filter => $tr,
-                params => \%tplPrms
+                params => {
+                    expMailDate => $req->data->{expMailDate},
+                    expMailTime => $req->data->{expMailTime},
+                    url         => $url,
+                },
             );
             $html = 1;
         }
-
-        # Replace variables in body
-        $body =~ s/\$expMailDate/$req->data->{expMailDate}/ge;
-        $body =~ s/\$expMailTime/$req->data->{expMailTime}/ge;
-        $body =~ s/\$url/$url/g;
-        $body =~ s/\$(\w+)/$req->{sessionInfo}->{$1} || ''/ge;
 
         $self->logger->info( "User "
               . $req->data->{mailAddress}
@@ -475,7 +479,7 @@ sub changePwd {
 
     $req->user( $req->{sessionInfo}->{_user} );
     my $result =
-      $self->p->_passwordDB->modifyPassword( $req,
+      $self->p->_passwordDB->setNewPassword( $req,
         $req->data->{newpassword}, 1 );
     $req->{user} = undef;
 
@@ -496,7 +500,6 @@ sub changePwd {
         $req->{sessionInfo}->{ $self->conf->{mailSessionKey} } );
 
     # Build mail content
-    $tplPrms{MAIN_LOGO} = $self->conf->{portalMainLogo};
     my $tr      = $self->translate($req);
     my $subject = $self->conf->{mailSubject};
     unless ($subject) {
@@ -505,10 +508,17 @@ sub changePwd {
     }
     my $body;
     my $html;
+    my $password = $req->data->{newpassword};
+
     if ( $self->conf->{mailBody} ) {
 
         # We use a specific text message, no html
         $body = $self->conf->{mailBody};
+
+        # Replace variables in body
+        $body =~ s/\$password/$password/g;
+        $body =~ s/\$(\w+)/$req->{sessionInfo}->{$1} || ''/ge;
+
     }
     else {
 
@@ -517,15 +527,12 @@ sub changePwd {
             $req,
             'mail_password',
             filter => $tr,
-            params => \%tplPrms
+            params => {
+                %tplPrms, password => $password,
+            },
         );
         $html = 1;
     }
-
-    # Replace variables in body
-    my $password = $req->data->{newpassword};
-    $body =~ s/\$password/$password/g;
-    $body =~ s/\$(\w+)/$req->{sessionInfo}->{$1} || ''/ge;
 
     # Send mail
     return PE_MAILERROR

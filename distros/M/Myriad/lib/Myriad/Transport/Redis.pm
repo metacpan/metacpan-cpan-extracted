@@ -2,7 +2,7 @@ package Myriad::Transport::Redis;
 
 use Myriad::Class extends => qw(IO::Async::Notifier);
 
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.010'; # VERSION
 our $AUTHORITY = 'cpan:DERIV'; # AUTHORITY
 
 =pod
@@ -39,6 +39,12 @@ use Net::Async::Redis;
 use Net::Async::Redis::Cluster;
 
 use List::Util qw(pairmap);
+
+use Myriad::Exception::Builder category => 'transport_redis';
+
+declare_exception 'NoSuchStream' => (
+    message => 'There is no such stream, is the other service running?',
+);
 
 # Cluster mode by default
 has $use_cluster = 1;
@@ -400,12 +406,18 @@ by default it's C<$> which means the last message.
 
 =cut
 
-async method create_group ($stream, $group, $start_from = '$') {
+async method create_group ($stream, $group, $start_from = '$', $make_stream = 0) {
     try {
-        await $redis->xgroup('CREATE', $self->apply_prefix($stream), $group, $start_from, 'MKSTREAM');
+        my @args = ('CREATE', $self->apply_prefix($stream), $group, $start_from);
+        push @args, 'MKSTREAM' if $make_stream;
+        await $redis->xgroup(@args);
     } catch ($e) {
         if($e =~ /BUSYGROUP/){
             return;
+        } elsif ($e =~ /requires the key to exist/) {
+            Myriad::Exception::Transport::Redis::NoSuchStream->throw(
+                reason => "no such stream: $stream",
+            );
         } else {
             die $e;
         }
@@ -599,6 +611,10 @@ async method set ($key, $v) {
 
 async method getset($key, $v) {
     await $redis->set($self->apply_prefix($key), $v);
+}
+
+async method incr ($key) {
+    await $redis->incr($self->apply_prefix($key));
 }
 
 async method rpush($key, @v) {

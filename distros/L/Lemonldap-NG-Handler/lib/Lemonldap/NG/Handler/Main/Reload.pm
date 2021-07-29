@@ -1,6 +1,6 @@
 package Lemonldap::NG::Handler::Main::Reload;
 
-our $VERSION = '2.0.10';
+our $VERSION = '2.0.12';
 
 package Lemonldap::NG::Handler::Main;
 
@@ -59,9 +59,16 @@ sub checkConf {
     }
     $Lemonldap::NG::Common::Conf::msg = '';
 
-    if ( $force or !$class->cfgNum or $class->cfgNum != $conf->{cfgNum} ) {
+    if (   $force
+        or !$class->cfgNum
+        or !$class->cfgDate
+        or $class->cfgNum != $conf->{cfgNum}
+        or $class->cfgDate != $conf->{cfgDate} )
+    {
         $class->logger->debug("Get configuration $conf->{cfgNum}");
-        unless ( $class->cfgNum( $conf->{cfgNum} ) ) {
+        unless ( $class->cfgNum( $conf->{cfgNum} )
+            && $class->cfgDate( $conf->{cfgDate} ) )
+        {
             $class->logger->error('No configuration available');
             return 0;
         }
@@ -80,7 +87,7 @@ sub checkConf {
             }
         }
     }
-    $class->tsv->{checkTime} = $conf->{checkTime} if ( $conf->{checkTime} );
+    $class->checkTime( $conf->{checkTime} ) if $conf->{checkTime};
     $class->lastCheck( time() );
     $class->logger->debug("$class: configuration is up to date");
     return 1;
@@ -203,7 +210,8 @@ sub defaultValuesInit {
         timeoutActivityInterval useRedirectOnError useRedirectOnForbidden
         useSafeJail             whatToTrace        handlerInternalCache
         handlerServiceTokenTTL  customToTrace      lwpOpts lwpSslOpts
-        authChoiceParam         authChoiceAuthBasic
+        authChoiceAuthBasic     authChoiceParam    hiddenAttributes
+        upgradeSession
         )
     );
 

@@ -1,0 +1,12 @@
+{
+    "project": "My API",
+    "version": "0.1.0",
+    "bugs-to": "https://git.example.com/l10n/issues",
+    "tz": "Asia/Tokyo",
+    "translator": "John Doe <john.doe@example.com>",
+    "team": "French <l10n-fr@example.com>",
+    "language": "fr_FR",
+    "charset": "utf-8",
+    "encoding": "8bit",
+    "header": "French localisation file\nCopyright (C) 2020-2021 Example, Inc\nThis file is distributed under the same license as the PACKAGE package.\nJohn Doe <john.doe@example.com>"
+}

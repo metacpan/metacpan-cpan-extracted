@@ -23,6 +23,7 @@ requires 'Error::Pure' => 0.15;
 requires 'Exporter' => 0;
 requires 'Mo' => 0;
 requires 'Mo::utils' => 0.03;
+requires 'ISO::639::3' => 0;
 requires 'List::MoreUtils' => 0;
 requires 'Readonly' => 0;
 requires 'Unicode::UTF8' => 0;
@@ -35,7 +36,7 @@ test_requires 'Test::MockObject' => 0;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.08';
+version '0.10';
 
 # Run.
 WriteAll();

@@ -3,11 +3,11 @@
 #
 #  (C) Paul Evans, 2014-2021 -- leonerd@leonerd.org.uk
 
-package Device::BusPirate::Mode::I2C 0.22;
-
 use v5.14;
-use warnings;
-use base qw( Device::BusPirate::Mode );
+use Object::Pad 0.45;
+
+package Device::BusPirate::Mode::I2C 0.23;
+class Device::BusPirate::Mode::I2C isa Device::BusPirate::Mode;
 
 use Carp;
 
@@ -54,14 +54,14 @@ L<Future> instances.
 
 =cut
 
-# Not to be confused with start_bit
-async sub start
-{
-   my $self = shift;
+has $_version;
 
+# Not to be confused with start_bit
+async method start
+{
    await $self->_start_mode_and_await( "\x02", "I2C" );
 
-   ( $self->{version} ) = await $self->pirate->read( 1, "I2C start" );
+   ( $_version ) = await $self->pirate->read( 1, "I2C start" );
 
    print STDERR "PIRATE I2C STARTED\n" if PIRATE_DEBUG;
    return $self;
@@ -92,11 +92,8 @@ my %SPEEDS = (
    '400k' => 3,
 );
 
-async sub configure
+async method configure ( %args )
 {
-   my $self = shift;
-   my %args = @_;
-
    my $bytes = "";
 
    if( defined $args{speed} ) {
@@ -123,10 +120,8 @@ Sends an I2C START bit transition
 
 =cut
 
-sub start_bit
+method start_bit
 {
-   my $self = shift;
-
    print STDERR "PIRATE I2C START-BIT\n" if PIRATE_DEBUG;
 
    $self->pirate->write_expect_ack( "\x02", "I2C start_bit" );
@@ -140,10 +135,8 @@ Sends an I2C STOP bit transition
 
 =cut
 
-sub stop_bit
+method stop_bit
 {
-   my $self = shift;
-
    print STDERR "PIRATE I2C STOP-BIT\n" if PIRATE_DEBUG;
 
    $self->pirate->write_expect_ack( "\x03", "I2C stop_bit" );
@@ -159,11 +152,8 @@ C<send> and C<recv> methods.
 
 =cut
 
-async sub write
+async method write ( $bytes )
 {
-   my $self = shift;
-   my ( $bytes ) = @_;
-
    printf STDERR "PIRATE I2C WRITE %v02X\n", $bytes if PIRATE_DEBUG;
    my @chunks = $bytes =~ m/(.{1,16})/gs;
 
@@ -189,11 +179,8 @@ each one but the final, to which is sent a NACK.
 
 =cut
 
-async sub read
+async method read ( $length )
 {
-   my $self = shift;
-   my ( $length ) = @_;
-
    my $ret = "";
 
    print STDERR "PIRATE I2C READING $length\n" if PIRATE_DEBUG;
@@ -212,11 +199,8 @@ async sub read
 
 # TODO: Turn this into an `async sub` without ->then chaining; though currently the
 #   ->followed_by makes that trickier
-sub _i2c_txn
+method _i2c_txn ( $code )
 {
-   my $self = shift;
-   my ( $code ) = @_;
-
    $self->pirate->enter_mutex( sub {
       $self->start_bit
          ->then( $code )
@@ -240,11 +224,8 @@ C<$address> should be an integer, in the range 0 to 0x7f.
 
 =cut
 
-sub send
+method send ( $address, $bytes )
 {
-   my $self = shift;
-   my ( $address, $bytes ) = @_;
-
    $address >= 0 and $address < 0x80 or
       croak "Invalid I2C slave address";
 
@@ -266,11 +247,8 @@ C<$address> should be an integer, in the range 0 to 0x7f.
 
 =cut
 
-sub recv
+method recv ( $address, $length )
 {
-   my $self = shift;
-   my ( $address, $length ) = @_;
-
    $address >= 0 and $address < 0x80 or
       croak "Invalid I2C slave address";
 
@@ -294,11 +272,8 @@ C<$address> should be an integer, in the range 0 to 0x7f.
 
 =cut
 
-sub send_then_recv
+method send_then_recv ( $address, $bytes_out, $read_len )
 {
-   my $self = shift;
-   my ( $address, $bytes_out, $read_len ) = @_;
-
    $address >= 0 and $address < 0x80 or
       croak "Invalid I2C slave address";
 

@@ -1,0 +1,106 @@
+=encoding UTF-8
+
+=head1 NAME
+
+TCOD::Tileset - Font loading functions
+
+=head1 SYNOPSIS
+
+    use TCOD;
+    use File::Share 'dist_file';
+
+    my $tileset = TCOD::Tileset->load_tilesheet(
+        path    => dist_file( TCOD => 'arial10x10.png' ),
+        columns => 32,
+        rows    => 8,
+        charmap => TCOD::CHARMAP_TCOD,
+    );
+
+=head1 DESCRIPTION
+
+Tilesets encapsulate font loading functions.
+
+Tilesets can be loaded as a whole from tile-sheets or True-Type fonts.
+
+=head1 METHODS
+
+=head2 load_tilesheet
+
+    $tileset = TCOD::Tileset->load_tilesheet( $path, $cols, $rows, $charmap );
+    $tileset = TCOD::Tileset->load_tilesheet(
+        path    => $path,
+        columns => $cols,
+        rows    => $rows,
+        charmap => $charmap,
+    );
+
+Return a new TCOD::Tileset from a simple tilesheet PNG image. The location
+of this file in disk is specified in C<path>.
+
+The values in C<columns> and C<rows> is the shape of the tileset. Tiles are
+assumed to take up the entire space of the image.
+
+The value in C<charmap> is the character mapping to use. This is an array
+reference of codepoints which map the tiles like this:
+
+    $charmap->[ $tile_index ] = $codepoint
+
+For common tilesets, C<charmap> should be the value in C<TCOD::CHARMAP_CP437>.
+If you're using tilesets using the standard TCOD layout, then you can set it
+to C<TCOD::CHARMAP_TCOD>.
+
+There is no default value. If no value is provided, no tiles will be mapped.
+In this case, you'll need to use L<remap|/remap> to assign codepoints to this
+tileset.
+
+This function accepts named parameters, but can also be called with the
+C<path>, C<columns>, C<rows>, and C<charmap> parameters as positional, in that
+order.
+
+=head2 load_bdf
+
+    $tileset = TCOD::Tileset->load_bdf( $path );
+
+Return a new TCOD::Tileset from a C<.bdf> file.
+
+For best results, the font should be monospace, cell-based, and single-width.
+As an example, a good set of fonts would be the Unicode fonts and tools for the
+X11 package.
+
+=head2 tile_shape
+
+    ( $width, $height ) = $tileset->tile_shape;
+
+Returns a list with the width and height of the tile in pixels.
+
+=head2 remap
+
+    $tileset->remap( $x, $y, $codepoint );
+
+Reassign the Unicode codepoint specified in C<$codepoint> to the character
+in this tilesheet at the position specified by the C<$x> and C<$y> coordinates.
+
+This is the tile position itself, not the pixel position of the tile.
+Large values of C<$x> will wrap to the next row, so using C<$x> by itself
+is equivalent to C<Tile Index> in the python-tcod
+L<Character Table Reference|https://python-tcod.readthedocs.io/en/latest/tcod/charmap-reference.html>.
+
+This is normally used on loaded tilesheets. Other methods of TCOD::Tileset
+creation won't have reliable tile indices.
+
+=head1 SEE ALSO
+
+=over
+
+=item L<TCOD>
+
+=item L<TCOD::Context>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2021 José Joaquín Atria
+
+This library is free software; you can redistribute it and/or modify it under
+the Artistic License 2.0.

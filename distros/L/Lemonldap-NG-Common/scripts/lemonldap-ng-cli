@@ -3,12 +3,20 @@
 use warnings;
 use strict;
 use POSIX;
+use Getopt::Long qw(:config pass_through);
+
+our $opt_user  = '__APACHEUSER__';
+our $opt_group = '__APACHEGROUP__';
+GetOptions(
+    "user=s"  => \$opt_user,
+    "group=s" => \$opt_group
+) or die("Error in command line arguments\n");
 
 my $action;
 
 eval {
-    POSIX::setgid( scalar( getgrnam('__APACHEGROUP__') ) );
-    POSIX::setuid( scalar( getpwnam('__APACHEUSER__') ) );
+    POSIX::setgid( scalar( getgrnam($opt_group) ) );
+    POSIX::setuid( scalar( getpwnam($opt_user) ) );
 };
 
 for ( my $i = 0 ; $i < @ARGV ; $i++ ) {
@@ -67,6 +75,10 @@ Options:
  - cfgNum <num>                  : set new configuration number (requires -force 1)
  - sep <char>                    : separator of hierarchical values (by default: /)
  - iniFile <file>                : path to an alternate lemonldap-ng.ini file
+
+Additional options:
+ - --user=<user>    : change user running the script
+ - --group=<group>  : change group running the script
 
 See Lemonldap::NG::Manager::Cli(3) for more
 };
@@ -170,13 +182,21 @@ Allows you to set the log message that will be displayed in the manager
 
 The configuration change will be aborted if it contains errors (default: 0)
 
+=item -force
+
+Allows you to force overwriting an existing configuration (default: 0)
+
 =item -cfgNum
 
 Choose a particular configuration number (default: latest)
 
-=item -force
+=item -sep 
 
-Allows you to force overwriting an existing configuration (default: 0)
+Allows you to define hierarchical separator
+
+=item -iniFile
+
+Allows you to set an alternative ini file
 
 =back
 
@@ -189,11 +209,13 @@ L<http://lemonldap-ng.org/>
 
 =over
 
-=item David Coutateur, E<lt>david.jose.delassus@gmail.comE<gt>
+=item Clement Oudot, E<lt>clement@oodo.netE<gt>
 
-=item Clement Oudot, E<lt>clem.oudot@gmail.comE<gt>
+=item Xavier Guimard, E<lt>yadd@debian.orgE<gt>
 
-=item Xavier Guimard, E<lt>x.guimard@free.frE<gt>
+=item Maxime Besson, E<lt>maxime.besson@worteks.comE<gt>
+
+=item Christophe Maudoux, E<lt>chrmdx@gmail.comE<gt>
 
 =back
 
@@ -205,7 +227,7 @@ L<https://gitlab.ow2.org/lemonldap-ng/lemonldap-ng/issues>
 =head1 DOWNLOAD
 
 Lemonldap::NG is available at
-L<http://forge.objectweb.org/project/showfiles.php?group_id=274>
+L<https://release.ow2.org/lemonldap/>
 
 =head1 COPYRIGHT AND LICENSE
 

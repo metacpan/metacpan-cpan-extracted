@@ -10,13 +10,22 @@ use English qw(-no_match_vars);
 use File::Temp;
 use POSIX qw(setuid setgid);
 use Safe;
+use Getopt::Long;
 use strict;
 
 my $cli = Lemonldap::NG::Manager::Cli::Lib->new;
 
+our $opt_user  = '__APACHEUSER__';
+our $opt_group = '__APACHEGROUP__';
+
+GetOptions(
+    "user=s"  => \$opt_user,
+    "group=s" => \$opt_group
+) or die("Error in command line arguments\n");
+
 eval {
-    setgid( ( getgrnam('__APACHEGROUP__') )[2] );
-    setuid( ( getpwnam('__APACHEUSER__') )[2] );
+    setgid( ( getgrnam($opt_group) )[2] );
+    setuid( ( getpwnam($opt_user) )[2] );
     print STDERR "Running as uid $EUID and gid $EGID\n";
 };
 

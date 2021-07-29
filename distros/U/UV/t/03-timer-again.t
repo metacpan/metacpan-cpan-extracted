@@ -5,7 +5,6 @@ use Test::More;
 use UV;
 use UV::Timer ();
 
-diag("We're running against libuv v".UV::version_string());
 my $close_cb_called = 0;
 my $repeat_1_cb_called = 0;
 my $repeat_2_cb_called = 0;

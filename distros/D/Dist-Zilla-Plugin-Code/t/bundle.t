@@ -48,8 +48,8 @@ sub main {
 
         $tzil->build;
 
-        is( $Local::PluginBundle::Bundle::RESULT, $prime * $prime, '... code did run' );
-        is( $stdout, ">>$prime<<\n}}A${prime}Z{{\n", '... correct message got logged' );
+        is( $Local::PluginBundle::Bundle::RESULT, $prime * $prime,                '... code did run' );
+        is( $stdout,                              ">>$prime<<\n}}A${prime}Z{{\n", '... correct message got logged' );
     }
 
     note('Dist::Zilla::Role::PluginBundle (wrong usage)');

@@ -1,12 +1,25 @@
-Complete version history for Math::BigInt::Constant:
-===================================================
+1.12 2021-07-14
 
-2016-12-08 1.11 pjacklam
+ * Convert test files t/pod.t and t/pod_cov.t into t/release-pod.t and
+   t/release-pod-coverage.t.
+
+ * Better Makefile.PL.
+
+ * The tests now require Test::More version 0.88 or newer.
+
+ * Reorganize existing test files, and add more test files.
+
+ * New MANIFEST.SKIP file based on the template in the ExtUtils-Manifest
+   distribution.
+
+ * Format CHANGES according to CPAN::Changes::Spec.
+
+1.11 2016-12-08 pjacklam
 
  * Add more tests, including tests for the from_hex(), from_oct(), from_bin(),
-   and from_bytes() to confirm latest fix in Math-BigInt-1.999804 regarding 
+   and from_bytes() to confirm latest fix in Math-BigInt-1.999804 regarding
 
-2016-12-03 1.10 pjacklam
+1.10 2016-12-03 pjacklam
 
  * Use ExtUtils::MakeMaker rather than Module::Install in Makefile.PL
 
@@ -29,7 +42,7 @@ Complete version history for Math::BigInt::Constant:
  * CHANGES file now has the same formatting as other Math::BigInt-related
    distributions.
 
-2016-11-28 1.09 pjacklam
+1.09 2016-11-28 pjacklam
 
  * In Makefile.PL, add "#!perl" to the top, as it gives nice syntax
    highlighting in some editors.
@@ -49,7 +62,7 @@ Complete version history for Math::BigInt::Constant:
 
  * Update bundled version of Module::Install to 1.17 (was 0.65).
 
-2007-05-05 1.08 Tels 322 tests
+1.08 2007-05-05 Tels 322 tests
 
  * require Math::BigInt v1.85
 
@@ -59,11 +72,11 @@ Complete version history for Math::BigInt::Constant:
 
  * add tests for: bnok(), bexp(), as_oct() etc.
 
-2006-03-14 1.07 Tels 129 tests
+1.07 2006-03-14 Tels 129 tests
 
  * fix failing tests due to 0 vs '' difference
 
-2005-01-01 1.06 Tels 129 tests
+1.06 2005-01-01 Tels 129 tests
 
  * require Math::BigInt v1.74
 
@@ -71,7 +84,7 @@ Complete version history for Math::BigInt::Constant:
 
  * write our own META.yml in Makefile.PL to fix License field
 
-2004-01-12 1.05 Tels 103 tests
+1.05 2004-01-12 Tels 103 tests
 
  * added bfround(), bround(), bfac(), bmodinv(), bmodpow() to tests
 
@@ -83,31 +96,26 @@ Complete version history for Math::BigInt::Constant:
 
  * converted test file to Test::More
 
-2002-02-10 1.04 Tels 72 tests
+1.04 2002-02-10 Tels 72 tests
 
  * broken out from Math::Big
 
  * added blog()/bfac()/band() to the testsuite
 
-2001-06-29 1.03
+1.03 2001-06-29
 
  * fixed copy(); added tests for bgcd() and blcm()
 
-2001-06-15 1.02
+1.02 2001-06-15
 
  * fixed documentation to match current version
 
  * added tests for band(), bior(), bxor(), bceil(), bfloor(), bnan() and binf()
 
-2001-03-27 1.01
+1.01 2001-03-27
 
  * fixed up documentation
 
-2001-03-24 1.00
+1.00 2001-03-24
 
  * first version
-
-Please send me test-reports, your experiences with this and your ideas - I love
-to hear about my work!
-
-Tels <http://bloodgate.com/>

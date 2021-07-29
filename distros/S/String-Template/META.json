@@ -5,7 +5,7 @@
       "Brian Duggan <bduggan@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.023, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -25,10 +25,14 @@
          "requires" : {
             "File::Spec" : "0",
             "FindBin" : "0",
+            "Perl::Critic" : "0",
+            "Test2::Require::Module" : "0.000121",
+            "Test2::Tools::PerlCritic" : "0",
+            "Test2::V0" : "0.000121",
             "Test::CPAN::Changes" : "0",
             "Test::EOL" : "0",
             "Test::Fixme" : "0.07",
-            "Test::More" : "0.94",
+            "Test::More" : "0.98",
             "Test::NoTabs" : "0",
             "Test::Pod" : "0",
             "Test::Pod::Coverage" : "0",
@@ -47,7 +51,7 @@
       },
       "test" : {
          "requires" : {
-            "Test2::V0" : "0.000060",
+            "Test2::V0" : "0.000121",
             "Time::Piece" : "1.17",
             "perl" : "5.008001"
          }
@@ -56,16 +60,16 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/plicease/String-Template/issues"
+         "web" : "https://github.com/uperl/String-Template/issues"
       },
       "homepage" : "https://metacpan.org/pod/String::Template",
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/plicease/String-Template.git",
-         "web" : "https://github.com/plicease/String-Template"
+         "url" : "git://github.com/uperl/String-Template.git",
+         "web" : "https://github.com/uperl/String-Template"
       }
    },
-   "version" : "0.21",
+   "version" : "0.23",
    "x_contributors" : [
       "Brian Duggan",
       "Graham Ollis <plicease@cpan.org>",
@@ -73,6 +77,9 @@
       "Jeremy Mates (thirg, JMATES)",
       "Jos\u00e9 Joaqu\u00edn Atria"
    ],
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
+   "x_generated_by_perl" : "v5.34.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.26",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
+   "x_use_unsafe_inc" : 0
 }
 

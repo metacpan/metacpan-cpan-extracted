@@ -51,7 +51,7 @@ sub DESTROY { }
 
 package Curses;
 
-$VERSION = '1.37'; # Makefile.PL picks this up
+$VERSION = '1.38'; # Makefile.PL picks this up
 
 use Carp;
 require Exporter;
@@ -407,7 +407,7 @@ If C<wget_wch()> is not available (i.e. The Curses library does not understand
 wide characters), this calls C<wgetch()>, but returns the values described
 above nonetheless.  This can be a problem because with a multibyte character
 encoding like UTF-8, you will receive two one-character strings for a
-two-byte-character (e.g. "Å√" and "Å§" for "Å‰").  If you append
+two-byte-character (e.g. "ıÄÇÇ" and "‚ñΩ" for "‚àΩ").  If you append
 these characters to a Perl string, that string may internally contain a valid
 UTF-8 encoding of a character, but Perl will not interpret it that way. Perl
 may even try to convert what it believes to be two characters to UTF-8, giving
@@ -442,7 +442,7 @@ failure.
 
 =over 4
 
-	addstring("HÅ‰llÅˆ, WÅˆrld") || die "addstring failed";
+	addstring("H‚àΩll‚Ä°, W‚Ä°rld") || die "addstring failed";
 
 =back
 

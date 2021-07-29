@@ -15,7 +15,7 @@ servers:
 paths:
   '/datetime':
     get:
-      description: 'Processes somed PS attributes, returns PS attachment attributes'
+      description: 'Returns detailed date-time'
       parameters:
         - name: time_zone
           in: query
@@ -46,6 +46,35 @@ paths:
                 epoch:
                   type: integer
                   example: 1586355387
+      responses:
+        200:
+          description: 'current time'
+          content:
+            'application/json':
+              schema:
+                  $ref: '#/components/schemas/Detailed-DateTime'
+        405:
+          $ref: '#/components/responses/Input-Processing-Error'
+        500:
+          $ref: '#/components/responses/Internal-Server-Error'
+  '/datetime/{time_zone_part1}/{time_zone_part2}':
+    get:
+      description: 'Returns detailed date-time'
+      parameters:
+        - name: time_zone_part1
+          in: path
+          description: timezone part1 string
+          required: true
+          schema:
+            type: string
+            example: Europe
+        - name: time_zone_part2
+          in: path
+          description: timezone part2 string
+          required: true
+          schema:
+            type: string
+            example: Vienna
       responses:
         200:
           description: 'current time'

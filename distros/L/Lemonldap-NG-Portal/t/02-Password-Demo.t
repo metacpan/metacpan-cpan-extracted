@@ -138,7 +138,7 @@ count(1);
 expectReject( $res, 200, 35, "Expect PE_PASSWORD_OK" );
 
 # Check updated password in session (#2430)
-my $json =
+$json =
   expectJSON( $client->_get("/sessions/global/$id"), 'Get session content' );
 is( $json->{_password}, "test", "password updated in session" );
 count(1);

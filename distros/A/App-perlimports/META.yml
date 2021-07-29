@@ -71,7 +71,7 @@ resources:
   bugtracker: https://github.com/oalders/App-perlimports/issues
   homepage: https://github.com/oalders/App-perlimports
   repository: https://github.com/oalders/App-perlimports.git
-version: '0.000014'
+version: '0.000017'
 x_Dist_Zilla:
   perl:
     version: '5.030002'
@@ -160,7 +160,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::InstallGuide
       config:
         Dist::Zilla::Role::ModuleMetadata:
-          Module::Metadata: '1.000037'
+          Module::Metadata: '1.000036'
           version: '0.006'
       name: '@Author::OALDERS/InstallGuide'
       version: '1.200014'
@@ -363,7 +363,7 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Git::GatherDir:
           include_untracked: 0
       name: '@Author::OALDERS/Git::GatherDir'
-      version: '2.047'
+      version: '2.048'
     -
       class: Dist::Zilla::Plugin::CopyFilesFromRelease
       config:
@@ -394,7 +394,7 @@ x_Dist_Zilla:
           git_version: 2.32.0
           repo_root: .
       name: '@Author::OALDERS/Git::Check'
-      version: '2.047'
+      version: '2.048'
     -
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
@@ -496,7 +496,7 @@ x_Dist_Zilla:
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@Author::OALDERS/@Git::VersionManager/release snapshot'
-      version: '2.047'
+      version: '2.048'
     -
       class: Dist::Zilla::Plugin::Git::Tag
       config:
@@ -504,7 +504,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.000014
+          tag: v0.000017
           tag_format: v%V
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
@@ -513,7 +513,7 @@ x_Dist_Zilla:
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@Author::OALDERS/@Git::VersionManager/Git::Tag'
-      version: '2.047'
+      version: '2.048'
     -
       class: Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional
       config:
@@ -551,7 +551,7 @@ x_Dist_Zilla:
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@Author::OALDERS/@Git::VersionManager/post-release commit'
-      version: '2.047'
+      version: '2.048'
     -
       class: Dist::Zilla::Plugin::Git::Push
       config:
@@ -563,7 +563,7 @@ x_Dist_Zilla:
           git_version: 2.32.0
           repo_root: .
       name: '@Author::OALDERS/Git::Push'
-      version: '2.047'
+      version: '2.048'
     -
       class: Dist::Zilla::Plugin::PruneFiles
       name: PruneFiles

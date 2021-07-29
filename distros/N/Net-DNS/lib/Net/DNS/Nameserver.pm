@@ -3,7 +3,7 @@ package Net::DNS::Nameserver;
 use strict;
 use warnings;
 
-our $VERSION = (qw$Id: Nameserver.pm 1813 2020-10-08 21:58:40Z willem $)[2];
+our $VERSION = (qw$Id: Nameserver.pm 1841 2021-06-23 20:34:28Z willem $)[2];
 
 
 =head1 NAME
@@ -21,7 +21,7 @@ Net::DNS::Nameserver - DNS server class
 
     my $nameserver = Net::DNS::Nameserver->new(
 	LocalAddr	=> '10.1.2.3',
-	LocalPort	=> 53,
+	LocalPort	=> 5353,
 	ReplyHandler	=> \&reply_handler
     );
 
@@ -632,7 +632,7 @@ could not be created.
 Each instance is configured using the following optional arguments:
 
     LocalAddr		IP address on which to listen	Defaults to loopback address
-    LocalPort		Port on which to listen		Defaults to 53
+    LocalPort		Port on which to listen		Defaults to 5353
     ZoneFile		Name of file containing RRs
 			accessed using the default
 			reply-handling subroutine
@@ -685,10 +685,8 @@ See RFC 1035 and the IANA dns-parameters file for more information:
   ftp://ftp.rfc-editor.org/in-notes/rfc1035.txt
   http://www.isi.edu/in-notes/iana/assignments/dns-parameters
 
-The nameserver will listen for both UDP and TCP connections.  On
-Unix-like systems, the program will probably have to run as root
-to listen on the default port, 53.	A non-privileged user should
-be able to listen on ports 1024 and higher.
+The nameserver will listen for both UDP and TCP connections.
+On Unix-like systems, unprivileged users are denied access to ports below 1024.
 
 UDP reply truncation functionality was introduced in VERSION 830.
 The size limit is determined by the EDNS0 size advertised in the query,
@@ -800,9 +798,9 @@ additional filtering on its basis may be applied.
 
 =head1 BUGS
 
-Limitations in perl 5.8.6 makes it impossible to guarantee that
-replies to UDP queries from Net::DNS::Nameserver are sent from the
-IP-address they were received on. This is a problem for machines with
+Limitations in perl make it impossible to guarantee that replies to
+UDP queries from Net::DNS::Nameserver are sent from the IP-address
+to which the query was directed.  This is a problem for machines with
 multiple IP-addresses and causes violation of RFC2181 section 4.
 Thus a UDP socket created listening to INADDR_ANY (all available
 IP-addresses) will reply not necessarily with the source address being

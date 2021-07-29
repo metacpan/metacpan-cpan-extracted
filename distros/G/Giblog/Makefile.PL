@@ -1,7 +1,25 @@
-use 5.008007;
+use 5.016;
 use strict;
 use warnings;
 use ExtUtils::MakeMaker;
+
+# Giblog don't support Windows
+{
+  if ($^O eq 'MSWin32') {
+    warn "Giblog does'nt support Windows\n";
+    die "OS unsupported\n";
+  }
+}
+
+# Giblog need git command
+{
+  my $git_help = 'git --help';
+  my $ret = system($git_help);
+  if ($ret != 0) {
+    warn "Giblog need git command\n";
+    die "OS unsupported\n";
+  }
+}
 
 WriteMakefile(
     NAME             => 'Giblog',
@@ -19,8 +37,7 @@ WriteMakefile(
     },
     EXE_FILES => ['script/giblog'],
     PREREQ_PM => {
-        #'ABC'              => '1.6',
-        #'Foo::Bar::Module' => '5.0401',
+      Mojolicious => '9.19'
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Giblog-* t/tmp' },

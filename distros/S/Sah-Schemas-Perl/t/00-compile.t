@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 56 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 63 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Data/Sah/Coerce/perl/To_array/From_str_or_array/expand_perl_modname_wildcard.pm',
@@ -20,6 +20,9 @@ my @module_files = (
     'Data/Sah/Coerce/perl/To_str/From_str/normalize_perl_modname.pm',
     'Data/Sah/Coerce/perl/To_str/From_str/normalize_perl_modname_or_prefix.pm',
     'Data/Sah/Coerce/perl/To_str/From_str/normalize_perl_modprefix.pm',
+    'Data/Sah/Filter/perl/Perl/check_module_installed.pm',
+    'Data/Sah/Filter/perl/Perl/check_module_not_installed.pm',
+    'Data/Sah/Filter/perl/Perl/normalize_perl_modname.pm',
     'Sah/Schema/perl/distname.pm',
     'Sah/Schema/perl/distname_with_optional_ver.pm',
     'Sah/Schema/perl/distname_with_ver.pm',
@@ -27,6 +30,8 @@ my @module_files = (
     'Sah/Schema/perl/funcname.pm',
     'Sah/Schema/perl/modargs.pm',
     'Sah/Schema/perl/modname.pm',
+    'Sah/Schema/perl/modname/installed.pm',
+    'Sah/Schema/perl/modname/not_installed.pm',
     'Sah/Schema/perl/modname_or_prefix.pm',
     'Sah/Schema/perl/modname_with_optional_args.pm',
     'Sah/Schema/perl/modname_with_optional_ver.pm',
@@ -49,6 +54,8 @@ my @module_files = (
     'Sah/SchemaR/perl/funcname.pm',
     'Sah/SchemaR/perl/modargs.pm',
     'Sah/SchemaR/perl/modname.pm',
+    'Sah/SchemaR/perl/modname/installed.pm',
+    'Sah/SchemaR/perl/modname/not_installed.pm',
     'Sah/SchemaR/perl/modname_or_prefix.pm',
     'Sah/SchemaR/perl/modname_with_optional_args.pm',
     'Sah/SchemaR/perl/modname_with_optional_ver.pm',

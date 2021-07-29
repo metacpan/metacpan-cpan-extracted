@@ -28,6 +28,7 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
+            "Clone" : "0",
             "Crypt::Eksblowfish::Bcrypt" : "0",
             "DBI" : "0",
             "DBIx::Class::InflateColumn::DateTime" : "0",
@@ -93,14 +94,14 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "http://github.com/Test-More/Test2-Harness-UI/issues"
+         "web" : "https://github.com/Test-More/Test2-Harness-UI/issues"
       },
       "repository" : {
          "type" : "git",
-         "url" : "http://github.com/Test-More/Test2-Harness-UI/"
+         "url" : "https://github.com/Test-More/Test2-Harness-UI/"
       }
    },
-   "version" : "0.000068",
+   "version" : "0.000075",
    "x_generated_by_perl" : "v5.32.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.25",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"

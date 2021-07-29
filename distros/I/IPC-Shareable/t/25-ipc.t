@@ -16,14 +16,14 @@ if ($pid == 0) {
 
     sleep unless $awake;
 
-    tie my %h, 'IPC::Shareable', { key => 'test', destroy => 0 };
+    tie my %h, 'IPC::Shareable', { key => 'testing25', destroy => 0 };
     $h{a} = 'foo';
     exit;
 } else {
     # parent
 
     tie my %h, 'IPC::Shareable', {
-        key     => 'test',
+        key     => 'testing25',
         create  => 1,
         destroy => 1,
     };
@@ -38,6 +38,5 @@ if ($pid == 0) {
 
     IPC::Shareable->clean_up_all;
 }
-
 
 done_testing();

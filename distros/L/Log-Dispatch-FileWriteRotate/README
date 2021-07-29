@@ -3,9 +3,9 @@ NAME
     themselves, w/ File::Write::Rotate
 
 VERSION
-    This document describes version 0.060 of Log::Dispatch::FileWriteRotate
+    This document describes version 0.062 of Log::Dispatch::FileWriteRotate
     (from Perl distribution Log-Dispatch-FileWriteRotate), released on
-    2019-01-09.
+    2021-07-21.
 
 SYNOPSIS
      use Log::Dispatch::FileWriteRotate;
@@ -30,6 +30,9 @@ DESCRIPTION
     other modules which use File::Write::Rotate as backend, e.g.
     Tie::Handle::FileWriteRotate or Process::Govern.
 
+CONTRIBUTOR
+    Steven Haryanto <sharyanto@cpan.org>
+
 METHODS
   new(%args)
     Constructor. This method takes a hash of parameters. The following
@@ -41,6 +44,12 @@ METHODS
     Send a message to the appropriate output. Generally this shouldn't be
     called directly but should be called through the "log()" method (in
     LLog::Dispatch::Output>).
+
+  fwr
+    Expose File::Write::Rotate object. You can do access this object e.g. to
+    compress logfiles:
+
+     $file->fwd->compress;
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -69,7 +78,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019, 2015, 2013, 2012 by
+    This software is copyright (c) 2021, 2019, 2015, 2013, 2012 by
     perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under

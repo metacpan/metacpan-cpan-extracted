@@ -8,6 +8,7 @@ use feature qw /postderef signatures/;
 package Vote::Count;
 use namespace::autoclean;
 use Moose;
+use MooseX::StrictConstructor;
 
 use Data::Dumper;
 use Time::Piece;
@@ -17,13 +18,13 @@ use Vote::Count::Matrix;
 
 no warnings 'experimental';
 
-our $VERSION='2.00';
+our $VERSION = '2.01';
 
 =head1 NAME
 
 Vote::Count - a tool kit for preferential ballots
 
-=head1 VERSION 2.00
+=head1 VERSION 2.01
 
 =head2 A Toolkit for Resolving Preferential Ballots.
 
@@ -39,34 +40,35 @@ An overview of Preferential Voting and an introduction to Vote::Count. Read this
 
 The core methods of Vote::Count are documented in this Module.
 
-=head2 L<CATALOG|Catalog>
+=head2 L<CATALOG|Vote::Count::Catalog>
 
 Catalog of Preferential Voting Methods implemented by Vote::Count and the Modules providing them.
 
-=head2 L<MULTIMEMBER|MultiMember>
+=head2 L<MULTIMEMBER|Vote::Count::MultiMember>
 
 Overview of Preferential Ballots for Multi-Member Elections and their implementation in Vote::Count.
 
 =cut
 
-has 'PairMatrix' => (
-  is      => 'ro',
-  isa     => 'Object',
-  lazy    => 1,
-  builder => '_buildmatrix',
-);
-
-sub _buildmatrix ( $self ) {
-  my $tiebreak =
-    defined( $self->TieBreakMethod() )
-    ? $self->TieBreakMethod()
-    : 'none';
-  return Vote::Count::Matrix->new(
-    BallotSet      => $self->BallotSet(),
-    Active         => $self->Active(),
-    TieBreakMethod => $tiebreak,
-    LogTo          => $self->LogTo() . '_matrix',
-  );
+# This should be in tiebreaker's BUILD but
+# I've found role's BUILD unreliable.
+sub _tiebreakvalidation ( $self ) {
+  if ( defined $self->TieBreakMethod ) {
+    if ( lc( $self->TieBreakMethod ) eq 'precedence' ) {
+      unless ( defined $self->PrecedenceFile() ) {
+        die
+'Precedence File must be defined when setting TieBreakMethod to Precedence';
+      }
+    }
+  }
+  if ( $self->TieBreakerFallBackPrecedence ) {
+    no warnings 'uninitialized';
+    my $tb = $self->TieBreakMethod;
+    if ( $tb eq 'none' or $tb eq 'all' or !defined($tb) ) {
+      die
+"FATAL: TieBreakerFallBackPrecedence will not be triggered if the TieBreakMethod is none, all or undefined.\n";
+    }
+  }
 }
 
 sub BUILD {
@@ -78,6 +80,11 @@ sub BUILD {
   $self->{'LogD'} .= localtime->cdate . "\n";
   # Terse Log
   $self->{'LogT'} = '';
+# Force build of Active, Methods that deal with it often go to $self->{'Active'}
+# make sure it is built before this happens, Active has to be built after
+# loading ballotset.
+  $self->GetActive();
+  $self->_tiebreakvalidation();
 }
 
 # load the roles providing the underlying ops.
@@ -107,7 +114,7 @@ __PACKAGE__->meta->make_immutable;
 
 =item *
 
-L<Vote::Count - a tool kit for preferential ballots>
+L<Vote::Count|<Vote::Count>
 
 =item *
 
@@ -123,7 +130,7 @@ L<Vote::Count::BottomRunOff>
 
 =item *
 
-L<Vote::Count::Catalog>
+L<Vote::Count::Catalog> - Catalog of Common Methods and their Vote::Count Implementation.
 
 =item *
 
@@ -203,11 +210,11 @@ L<Vote::Count::Method::WIGM>
 
 =item *
 
-L<Vote::Count::MultiMember - Overview of Multi Member and Proportional Elections and Vote::Count support for them.>
+L<Vote::Count::MultiMember> - Overview of Multi Member and Proportional Elections and L<Vote::Count> support for them.
 
 =item *
 
-L<Vote::Count::Overview>
+L<Vote::Count::Overview> - Overview of Preferential Voting and Introduction to L<Vote::Count>.
 
 =item *
 

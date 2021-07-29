@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.63
+    version 0.64
 
 SYNOPSIS
 
@@ -391,9 +391,24 @@ SEE ALSO
 
     perldebguts
 
-BUGS
+      The guts of debugging Perl
 
-    Devel::ebug does not quite work under 5.8.0.
+    Devel::Chitin
+
+      A class that exposes the Perl debugging facilities as an API, with
+      some functional overlap with Devel::ebug.
+
+    ebug
+
+      Command-line interface to Devel::ebug
+
+    ebug_http
+
+      Web based interface to Devel::ebug
+
+CAVEATS
+
+    Devel::ebug does not support Perls prior to 5.10.1.
 
     Devel::ebug does not handle signals under Windows.
 
@@ -411,7 +426,7 @@ AUTHOR
 
 COPYRIGHT AND LICENSE
 
-    This software is copyright (c) 2005-2020 by Leon Brocard.
+    This software is copyright (c) 2005-2021 by Leon Brocard.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

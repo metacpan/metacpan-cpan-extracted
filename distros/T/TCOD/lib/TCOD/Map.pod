@@ -1,0 +1,118 @@
+=encoding UTF-8
+
+=head1 NAME
+
+TCOD::Map - A grid of cells for field-of-view calculations
+
+=head1 SYNOPSIS
+
+    use TCOD;
+
+    my $map = TCOD::Map->new( 10, 10 );
+
+    $map->set_properties( 6, 5, 0, 0 ); # Opaque cell
+    $map->compute_fov( 5, 5 );
+
+    $map->is_in_fov( 7, 5 );
+    # False: [ 6, 5 ] is opaque and obstructs the view from [ 5, 5 ]
+
+=head1 DESCRIPTION
+
+A TCOD::Map represents a grid of cells that can be used for path-finding and
+field-of-view calculations.
+
+=head1 METHODS
+
+=head2 new
+
+    $map = TCOD::Map->new( $width, $height );
+
+Construct a new TCOD::Map. Takes the width and height of the map in cells as
+positional arguments.
+
+=head2 set_properties
+
+    $map->set_properties( $x, $y, $walkable, $transparent );
+
+Set the properties of a cell in the map. Specifically, C<$walkable> should be
+true if this cell does not obstruct the pathfinder, and C<$transparent> should
+be true if this cell does not obstruct the field of vision algorithm.
+
+=head2 clear
+
+    $map->clear( $walkable, $transparent );
+
+Resets all of a map's cells to have the specified attributes.
+
+=head2 copy
+
+    $source->copy( $destination );
+
+Copy the cells of one map into another. The destination map should be at least
+large enough to hold the source map.
+
+=head2 compute_fov
+
+    $map->compute_fov( $x, $y, $radius, $light_walls, $algorithm );
+
+Compute the field of view from the specified cell. The value in the C<$radius>
+parameter will determine how far to extend the line of sight, while the value
+in C<$light_walls> will determine whether walls adjacent to visible cells should
+themselves be visible.
+
+The value in C<$algorithm> should be one of the values in the L<FOV|TCOD/FOV>
+enum. If no value is set, it will default to C<TCOD::FOV_BASIC>.
+
+=head2 is_in_fov
+
+    $bool = $map->is_in_fov( $x, $y );
+
+After computing the field of view for this map, this method queries whether a
+particular cell is visible or not.
+
+=head2 is_transparent
+
+    $bool = $map->is_transparent( $x, $y );
+
+Returns true if the specified cell has the attribute C<transparent> set to a
+true value.
+
+=head2 is_walkable
+
+    $bool = $map->is_walkable( $x, $y );
+
+Returns true if the specified cell has the attribute C<walkable> set to a
+true value.
+
+=head2 get_width
+
+    $width = $map->get_width;
+
+Returns the width of the map in cells. This is the same value used during object
+construction.
+
+=head2 get_height
+
+    $height = $map->get_height;
+
+Returns the height of the map in cells. This is the same value used during object
+construction.
+
+=head1 SEE ALSO
+
+=over
+
+=item L<TCOD>
+
+=item L<TCOD::Path>
+
+=item L<TCOD::Dijkstra>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2021 José Joaquín Atria
+
+This library is free software; you can redistribute it and/or modify it under
+the Artistic License 2.0.

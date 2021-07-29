@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.003';
+our $VERSION = '0.006';
 
 use Moose;
 use namespace::autoclean;
@@ -59,7 +59,7 @@ Dist::Zilla::PluginBundle::Code - a dynamic bundle
 
 =head1 VERSION
 
-Version 0.003
+Version 0.006
 
 =head1 SYNOPSIS
 
@@ -112,11 +112,6 @@ role immediately resolve other bundles themselves, there is no way to push
 a bundle back onto the stack. Therefore it doesn't make sense to use this
 code bundle inside L<Dist::Zilla::Role::PluginBundle::Easy> bundles.
 
-B<Note:> Because of the way L<Config::MVP> processes the arguments you have
-to put the sub reference inside an array reference. Otherwise you get an
-I<Not an ARRAY reference> error. See
-L<https://github.com/rjbs/Config-MVP/issues/13>.
-
 =head1 SUPPORT
 
 =head2 Bugs / Feature Requests
@@ -140,7 +135,7 @@ Sven Kirmess <sven.kirmess@kzone.ch>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Sven Kirmess.
+This software is Copyright (c) 2020-2021 by Sven Kirmess.
 
 This is free software, licensed under:
 
@@ -148,7 +143,7 @@ This is free software, licensed under:
 
 =head1 SEE ALSO
 
-L<Dist::Zilla>, L<lib>
+L<Dist::Zilla>, L<Dist::Zilla::Role::PluginBundle>
 
 =cut
 

@@ -29,6 +29,7 @@ requires:
   Class::Utils: 0.03
   Error::Pure: 0.15
   Exporter: 0
+  ISO::639::3: 0
   List::MoreUtils: 0
   Mo: 0
   Mo::utils: 0.03
@@ -40,4 +41,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/Wikibase-Datatype
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Wikibase-Datatype
-version: '0.08'
+version: '0.10'

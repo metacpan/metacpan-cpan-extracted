@@ -5,16 +5,14 @@ package SDL2::Utils {
     use experimental 'signatures';
     use base 'Exporter::Tiny';
     our @EXPORT = qw[attach define deprecate has enum ffi];
+    use Alien::libsdl2;
     use FFI::CheckLib;
     use FFI::Platypus 1.46;
-    use FFI::C;
-    use Alien::libsdl2;
-
-    #use FFI::C::StructDef;
     use FFI::Platypus::Memory qw[malloc strcpy free];
+    use FFI::C;
     use FFI::C::Def;
-    use FFI::C::StructDef;
     use FFI::C::ArrayDef;
+    use FFI::C::StructDef;
     use FFI::Platypus::Closure;
 
     sub deprecate ($str) {
@@ -36,16 +34,20 @@ package SDL2::Utils {
 
     sub enum (%args) {
         my ($package) = caller();
+        $package = 'SDL2::FFI';
         for my $tag ( keys %args ) {
-            FFI::C->enum( $tag => $args{$tag}, { package => 'SDL2::FFI' } );
-            $SDL2::FFI::EXPORT_TAGS{ lc substr $tag, 4 }
-                = [ sort map { ref $_ ? ref $_ eq 'CODE' ? $_->() : $_->[0] : $_ }
-                    @{ $args{$tag} } ];
+            FFI::C->enum( $tag => $args{$tag}, { package => $package } );
+            my $_tag = $tag;                                     # Simple rules:
+            $_tag =~ s[^SDL_][];                                 # No SDL_XXXXX
+            $_tag = lcfirst $_tag unless $_tag =~ m[^.[A-Z]];    # Save GLattr
+            push @{ $SDL2::FFI::EXPORT_TAGS{$_tag} },
+                sort map { ref $_ ? ref $_ eq 'CODE' ? $_->() : $_->[0] : $_ } @{ $args{$tag} };
         }
     }
 
     sub attach (%args) {
         my ($package) = caller();
+        $package = 'SDL2::FFI';
         for my $tag ( sort keys %args ) {
             for my $func ( sort keys %{ $args{$tag} } ) {
 
@@ -80,6 +82,7 @@ package SDL2::Utils {
 
     sub define (%args) {
         my ($package) = caller();
+        $package = 'SDL2::FFI';
         for my $tag ( keys %args ) {
 
             #print $_->[0] . ' ' for sort { $a->[0] cmp $b->[0] } @{ $Defines{$tag} };
@@ -91,10 +94,8 @@ package SDL2::Utils {
                 ->() :
                 constant->import( $package . '::' . $_->[0] => $_->[1] )
                 for @{ $args{$tag} };
-
-            #constant->import( $_ => $_ ) for @{ $Defines{$tag} };
-            $SDL2::FFI::EXPORT_TAGS{ lc substr $tag, 4 }
-                = [ sort map { ref $_ ? $_->[0] : $_ } @{ $args{$tag} } ];
+            push @{ $SDL2::FFI::EXPORT_TAGS{$tag} },
+                sort map { ref $_ ? $_->[0] : $_ } @{ $args{$tag} };
         }
     }
 };

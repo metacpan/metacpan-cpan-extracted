@@ -4,7 +4,7 @@ use strict;
 use Mouse;
 use Lemonldap::NG::Portal::Main::Constants qw(PE_OK);
 
-our $VERSION = '2.0.3';
+our $VERSION = '2.0.12';
 
 extends 'Lemonldap::NG::Portal::Auth::_WebForm';
 
@@ -29,7 +29,7 @@ sub init {
 sub setAuthSessionInfo {
     my ( $self, $req ) = @_;
     $req->{sessionInfo}->{authenticationLevel} = $self->conf->{proxyAuthnLevel};
-    PE_OK;
+    return PE_OK;
 }
 
 sub getDisplayType {

@@ -7,8 +7,8 @@
 ### SYNOPSIS
 
 ```perl
-        use Fork::Utils qw/ safe_exec /;
-        use POSIX ();
+    use Fork::Utils qw/ safe_exec /;
+    use POSIX ();
 
     my $sig_action = sub { printf("SIG%s was received\n", $_[0]); };
 

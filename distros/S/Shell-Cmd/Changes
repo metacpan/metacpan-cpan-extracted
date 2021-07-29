@@ -2,6 +2,13 @@ Written by:
    Sullivan Beck (sbeck@cpan.org)
 Any suggestions, bug reports, or donations :-) should be sent to me.
 
+3.04  2021-07-14
+   - Fixed test script to fail if the test directory not writable.
+     Alexandr Ciornii on GitHub (Pull request #2)
+   - Fixed a bug where environment variables weren't getting properly
+     quoted, so special characters were causing problems.  RT 133107
+     and Github #3.
+
 3.03  2019-08-19
    - Fixed problem with output=quiet mode=script
    - Fixed a bug where the per-command dire option wasn't working

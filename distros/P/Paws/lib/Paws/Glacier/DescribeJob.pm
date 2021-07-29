@@ -30,9 +30,9 @@ You shouldn't make instances of this class. Each attribute should be used as a n
 =head1 SYNOPSIS
 
     my $glacier = Paws->service('Glacier');
-    # To get information about a previously initiated job
-    # The example returns information about the previously initiated job
-    # specified by the job ID.
+  # To get information about a previously initiated job
+  # The example returns information about the previously initiated job specified
+  # by the job ID.
     my $GlacierJobDescription = $glacier->DescribeJob(
       'AccountId' => '-',
       'JobId'     =>

@@ -1,16 +1,24 @@
 package Sah::Schema::unix::signal;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-10-16'; # DATE
+our $DATE = '2021-07-22'; # DATE
 our $DIST = 'Sah-Schemas-Unix'; # DIST
-our $VERSION = '0.013'; # VERSION
+our $VERSION = '0.017'; # VERSION
 
 our $schema = ['str' => {
     'summary' => 'Unix signal name (e.g. TERM or KILL) or number (9 or 15)',
     match => '\A(?:[A-Z]+[0-9]*|[1-9][0-9]*)\z',
-    examples => [qw/HUP INT QUIT ILL ABRT FPE KILL SEGV PIPE ALRM TERM USR1 USR2 CHLD CONT STOP TSTP TTIN TTOU/, 1..15],
+    examples => [
+        # valid signals found in most Unix systems. included here for tab
+        # completion hints.
+        qw/HUP INT QUIT ILL ABRT FPE KILL SEGV PIPE ALRM TERM USR1 USR2 CHLD CONT STOP TSTP TTIN TTOU/,
+        1..15,
+
+        # other tests
+        {data=>'', valid=>0},
+    ],
 _
-}, {}];
+}];
 
 1;
 # ABSTRACT: Unix signal name (e.g. TERM or KILL) or number (9 or 15)
@@ -27,7 +35,7 @@ Sah::Schema::unix::signal - Unix signal name (e.g. TERM or KILL) or number (9 or
 
 =head1 VERSION
 
-This document describes version 0.013 of Sah::Schema::unix::signal (from Perl distribution Sah-Schemas-Unix), released on 2020-10-16.
+This document describes version 0.017 of Sah::Schema::unix::signal (from Perl distribution Sah-Schemas-Unix), released on 2021-07-22.
 
 =head1 SYNOPSIS
 
@@ -57,7 +65,8 @@ To specify schema in L<Rinci> function metadata and use the metadata with
 L<Perinci::CmdLine> to create a CLI:
 
  # in lib/MyApp.pm
- package MyApp;
+ package
+   MyApp;
  our %SPEC;
  $SPEC{myfunc} = {
      v => 1.1,
@@ -77,7 +86,8 @@ L<Perinci::CmdLine> to create a CLI:
  1;
 
  # in myapp.pl
- package main;
+ package
+   main;
  use Perinci::CmdLine::Any;
  Perinci::CmdLine::Any->new(url=>'MyApp::myfunc')->run;
 
@@ -92,73 +102,75 @@ L<Perinci::CmdLine> to create a CLI:
 
 Sample data:
 
- undef  # INVALID
+ "HUP"  # valid
 
- undef  # INVALID
+ "INT"  # valid
 
- undef  # INVALID
+ "QUIT"  # valid
 
- undef  # INVALID
+ "ILL"  # valid
 
- undef  # INVALID
+ "ABRT"  # valid
 
- undef  # INVALID
+ "FPE"  # valid
 
- undef  # INVALID
+ "KILL"  # valid
 
- undef  # INVALID
+ "SEGV"  # valid
 
- undef  # INVALID
+ "PIPE"  # valid
 
- undef  # INVALID
+ "ALRM"  # valid
 
- undef  # INVALID
+ "TERM"  # valid
 
- undef  # INVALID
+ "USR1"  # valid
 
- undef  # INVALID
+ "USR2"  # valid
 
- undef  # INVALID
+ "CHLD"  # valid
 
- undef  # INVALID
+ "CONT"  # valid
 
- undef  # INVALID
+ "STOP"  # valid
 
- undef  # INVALID
+ "TSTP"  # valid
 
- undef  # INVALID
+ "TTIN"  # valid
 
- undef  # INVALID
+ "TTOU"  # valid
 
- undef  # INVALID
+ 1  # valid
 
- undef  # INVALID
+ 2  # valid
 
- undef  # INVALID
+ 3  # valid
 
- undef  # INVALID
+ 4  # valid
 
- undef  # INVALID
+ 5  # valid
 
- undef  # INVALID
+ 6  # valid
 
- undef  # INVALID
+ 7  # valid
 
- undef  # INVALID
+ 8  # valid
 
- undef  # INVALID
+ 9  # valid
 
- undef  # INVALID
+ 10  # valid
 
- undef  # INVALID
+ 11  # valid
 
- undef  # INVALID
+ 12  # valid
 
- undef  # INVALID
+ 13  # valid
 
- undef  # INVALID
+ 14  # valid
 
- undef  # INVALID
+ 15  # valid
+
+ ""  # INVALID
 
 =head1 HOMEPAGE
 
@@ -182,7 +194,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

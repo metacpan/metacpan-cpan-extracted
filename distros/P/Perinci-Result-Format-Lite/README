@@ -2,9 +2,9 @@ NAME
     Perinci::Result::Format::Lite - Format enveloped result
 
 VERSION
-    This document describes version 0.279 of Perinci::Result::Format::Lite
+    This document describes version 0.280 of Perinci::Result::Format::Lite
     (from Perl distribution Perinci-Result-Format-Lite), released on
-    2021-03-08.
+    2021-07-17.
 
 SYNOPSIS
 DESCRIPTION
@@ -40,7 +40,8 @@ SOURCE
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website
-    <https://github.com/perlancar/perl-Perinci-Result-Format-Lite/issues>
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-Result-Format
+    -Lite>
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.

@@ -1,5 +1,9 @@
 Revision history for Test-Warnings
 
+0.031     2021-07-13 22:13:48Z
+          - remove unneeded develop prereqs that caused metacpan to unduly
+            raise the river position of some dependent modules
+
 0.030     2020-03-21 16:56:30Z
           - fix tests that can fail when there is already an installed module
             named Foo::Bar::Baz (RT#132140)

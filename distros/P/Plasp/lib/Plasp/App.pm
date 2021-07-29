@@ -181,6 +181,18 @@ my $_asp;
 my %startup_env;
 $startup_env{$_} = $ENV{$_} for ( keys %ENV );
 
+my $stack_trace_ignore = sub {
+    return 0 if grep {
+        $_[0]{caller}[0] =~ /$_/
+    } ( qw(
+        ^Plasp::
+        ^Plack
+        ^Try::Catch$
+    ) );
+
+    return 1;
+};
+
 sub psgi_app {
     my $class = shift;
 
@@ -287,22 +299,17 @@ sub psgi_app {
             }
 
             # Keep the stacktrace available for exception processing
-            my $stack_trace;
             $success = try {
                 local $SIG{__DIE__} = sub {
-                    $stack_trace = Devel::StackTrace->new(
-                        skip_frames    => 1,
-                        indent         => 1,
-                        ignore_package => __PACKAGE__,
-                    )->as_string;
+                    $_asp->_stack_trace( Devel::StackTrace->new(
+                        frame_filter => $stack_trace_ignore,
+                    ) );
                 };
                 local $SIG{__WARN__} = sub {
                     $_asp->log->warn(
                         $_[0],
                         stack_trace => Devel::StackTrace->new(
-                            skip_frames    => 1,
-                            indent         => 1,
-                            ignore_package => __PACKAGE__,
+                            frame_filter => $stack_trace_ignore,
                         )->as_string
                     );
                 };
@@ -314,12 +321,18 @@ sub psgi_app {
                 1;
             } catch {
                 if ( blessed( $_ ) ) {
-                    if ( $_->isa( 'Plasp::Exception::Code' )
-                        || ( !$_->isa( 'Plasp::Exception::End' )
-                            && !$_->isa( 'Plasp::Exception::Redirect' ) ) ) {
+
+                    # A Redirect or End might come here (without already being
+                    # caught). In that case, just ignore it and continue
+                    # processing.
+
+                    if ( $_->isa( 'Plasp::Exception::Code' ) ) {
+
+                        # If an application error occured, log the error along
+                        # with the stack trace that was captured
                         $_asp->error(
                             "Encountered application error: $_",
-                            stack_trace => $stack_trace,
+                            stack_trace => $_->stack_trace,
                         );
                     }
 
@@ -328,6 +341,16 @@ sub psgi_app {
                         $refs{responder},
                         '500_error'
                     ) if $_asp->has_errors;
+                } else {
+
+                    # Plasp did not throw exception, implying a bug in Plasp
+                    # itself
+                    $_asp->log->fatal( "Plasp error: $_" );
+                    $error_response = _error_response(
+                        $refs{responder},
+                        'plasp_error',
+                        $_asp->config->{Debug} ? "<pre>$_</pre>" : ''
+                    );
                 }
 
                 return;

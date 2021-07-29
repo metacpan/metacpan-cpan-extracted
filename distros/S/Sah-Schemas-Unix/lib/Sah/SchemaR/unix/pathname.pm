@@ -1,7 +1,7 @@
 package Sah::SchemaR::unix::pathname;
 
-our $DATE = '2020-10-16'; # DATE
-our $VERSION = '0.013'; # VERSION
+our $DATE = '2021-07-22'; # DATE
+our $VERSION = '0.017'; # VERSION
 
 our $rschema = ["str",[{examples=>[{valid=>0,value=>""},{valid=>1,value=>"/"},{valid=>1,value=>"foo/bar"},{valid=>1,validated_value=>"foo/bar",value=>"foo//bar"},{summary=>"Path element too long",valid=>0,value=>"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"},{summary=>"Contains null character",valid=>0,value=>"foo\0"}],match=>"\\A(?:/|/?(?:[^/\\0]{1,255})(?:/[^/\\0]{1,255})*)\\z",prefilters=>["Path::expand_tilde","Path::strip_slashes"],summary=>"Filesystem path name on a Unix system","x.completion"=>["filename"]},{description=>"\nThis is just a convenient alias for pathname::unix.\n\n",examples=>[],summary=>"Path name (filename or dirname) on a Unix system"}],["pathname::unix","str"]];
 
@@ -20,7 +20,7 @@ Sah::SchemaR::unix::pathname - Path name (filename or dirname) on a Unix system
 
 =head1 VERSION
 
-This document describes version 0.013 of Sah::SchemaR::unix::pathname (from Perl distribution Sah-Schemas-Unix), released on 2020-10-16.
+This document describes version 0.017 of Sah::SchemaR::unix::pathname (from Perl distribution Sah-Schemas-Unix), released on 2021-07-22.
 
 =head1 DESCRIPTION
 
@@ -50,7 +50,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

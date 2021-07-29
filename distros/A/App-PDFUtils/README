@@ -2,8 +2,8 @@ NAME
     App::PDFUtils - Command-line utilities related to PDF files
 
 VERSION
-    This document describes version 0.005 of App::PDFUtils (from Perl
-    distribution App-PDFUtils), released on 2021-07-06.
+    This document describes version 0.007 of App::PDFUtils (from Perl
+    distribution App-PDFUtils), released on 2021-07-17.
 
 SYNOPSIS
     This distribution provides tha following command-line utilities related
@@ -39,6 +39,61 @@ FUNCTIONS
     *   files* => *array[filename]*
 
     *   password* => *str*
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
+  convert_pdf_to_text
+    Usage:
+
+     convert_pdf_to_text(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Convert PDF file to text.
+
+    This utility uses one of the following backends:
+
+    *   pdftotext
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   file* => *filename*
+
+        Input file.
+
+    *   fmt => *bool*
+
+        Run Unix fmt over the txt output.
+
+    *   output => *filename*
+
+        Output path.
+
+    *   overwrite => *bool*
+
+    *   pages => *uint_range*
+
+        Only convert a range of pages.
+
+    *   return_output_file => *bool*
+
+        Return the path of output file instead.
+
+        This is useful when you do not specify an output file but do not
+        want to show the converted document to stdout, but instead want to
+        get the path to a temporary output file.
 
     Returns an enveloped result (an array).
 
@@ -124,6 +179,9 @@ BUGS
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    diff-pdf-text from App::DiffPDFText.
 
 AUTHOR
     perlancar <perlancar@cpan.org>

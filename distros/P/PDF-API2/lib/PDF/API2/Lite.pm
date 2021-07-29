@@ -3,7 +3,7 @@ package PDF::API2::Lite;
 use strict;
 no warnings qw[ deprecated recursion uninitialized ];
 
-our $VERSION = '2.040'; # VERSION
+our $VERSION = '2.041'; # VERSION
 
 BEGIN {
 

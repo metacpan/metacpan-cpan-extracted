@@ -7,9 +7,11 @@ Makefile.PL
 lib/Net/SFTP/Foreign/Tempdir/Extract.pm
 lib/Net/SFTP/Foreign/Tempdir/Extract/File.pm
 t/001_load.t
+t/002_00_StrictHostKeyChecking-no.t
 t/002_download.t
 t/003_extract.t
 t/004_extract-multi.t
+t/004_extract-multi-hierarchy.t
 t/005_download_backup.t
 t/006_upload.t
 t/007_port.t
@@ -17,4 +19,9 @@ perl-Net-SFTP-Foreign-Tempdir-Extract.spec
 scripts/Net-SFTP-Foreign-Tempdir-Extract-file.zip
 scripts/Net-SFTP-Foreign-Tempdir-Extract-download-example.pl
 scripts/Net-SFTP-Foreign-Tempdir-Extract-File-example.pl
-META.yml                                 Module meta-data (added by MakeMaker)
+t/files/archive-single.zip
+t/files/archive-multi.zip
+t/files/archive-multi-hierarchy.zip
+t/files/hello-world.txt
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

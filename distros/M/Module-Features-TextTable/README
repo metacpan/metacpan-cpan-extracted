@@ -3,9 +3,9 @@ NAME
     tables
 
 VERSION
-    This document describes version 0.002 of Module::Features::TextTable
+    This document describes version 0.003 of Module::Features::TextTable
     (from Perl distribution Module-Features-TextTable), released on
-    2021-02-25.
+    2021-02-26.
 
 DESCRIPTION
 DEFINED FEATURES

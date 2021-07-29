@@ -3,9 +3,9 @@
 package Test::Sah::Schema;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-13'; # DATE
+our $DATE = '2021-07-20'; # DATE
 our $DIST = 'Test-Sah-Schema'; # DIST
-our $VERSION = '0.009'; # VERSION
+our $VERSION = '0.010'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -40,6 +40,11 @@ sub _test_module {
 
 }
 
+sub _set_option_defaults {
+    my $opts = shift;
+    $opts->{test_schema_examples} //= 1;
+}
+
 sub sah_schema_module_ok {
     require Data::Sah::Normalize;
 
@@ -49,7 +54,7 @@ sub sah_schema_module_ok {
     my $res;
     my $ok = 1;
 
-    $opts{test_schema_examples} //= [];
+    _set_option_defaults(\%opts);
 
     my $modulep = $module; $modulep =~ s!::!/!g; $modulep .= ".pm";
     require $modulep;
@@ -64,11 +69,17 @@ sub sah_schema_module_ok {
                 require Data::Dump;
                 require Text::Diff;
                 my $nsch = Data::Sah::Normalize::normalize_schema($sch);
+                my $nsch_with_extras = [@$nsch, {}]; # extras part still accepted because most of my schema modules have it
 
                 my $sch_dmp  = Data::Dump::dump($sch);
                 my $nsch_dmp = Data::Dump::dump($nsch);
+                my $nsch_with_extras_dmp = Data::Dump::dump($nsch_with_extras);
+
                 if ($sch_dmp eq $nsch_dmp) {
                     $Test->ok(1, "Schema is normalized");
+                } elsif ($sch_dmp eq $nsch_with_extras_dmp) {
+                    $Test->carp("\e[31mSchema still contains extras part, please remove it to avoid this warning\e[0m");
+                    $Test->ok(1, "Schema is normalized but still contains extras part");
                 } else {
                     my $diff = Text::Diff::diff(\$sch_dmp, \$nsch_dmp);
                     $Test->diag("Schema difference with normalized version: $diff");
@@ -107,6 +118,12 @@ sub sah_schema_module_ok {
                 my $i = 0;
                 for my $eg (@{ $sch->[1]{examples} }) {
                     $i++;
+                    # non-defhash example is allowed, this means the example
+                    # just specifies valid value. we normalize to hash form.
+                    unless (ref $eg eq 'HASH') {
+                        $eg = {value=>$eg, valid=>1};
+                    }
+
                     next unless $eg->{test} // 1;
                     $Test->subtest(
                         "example #$i" .
@@ -229,6 +246,8 @@ sub sah_schema_modules_ok {
     my $msg  = shift;
     my $ok = 1;
 
+    _set_option_defaults($opts);
+
     my @starters = _starting_points();
     local @INC = (@starters, @INC);
 
@@ -297,7 +316,7 @@ Test::Sah::Schema - Test Sah::Schema::* modules in distribution
 
 =head1 VERSION
 
-This document describes version 0.009 of Test::Sah::Schema (from Perl distribution Test-Sah-Schema), released on 2020-06-13.
+This document describes version 0.010 of Test::Sah::Schema (from Perl distribution Test-Sah-Schema), released on 2021-07-20.
 
 =head1 SYNOPSIS
 
@@ -390,7 +409,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

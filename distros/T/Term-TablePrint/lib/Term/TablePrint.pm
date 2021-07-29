@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '0.139';
+our $VERSION = '0.141';
 use Exporter 'import';
 our @EXPORT_OK = qw( print_table );
 
@@ -722,13 +722,15 @@ sub __search {
     require Term::Form;
     Term::Form->VERSION(0.530);
     my $term = Term::Form->new();
+    my $error_message;
     my $prompt = '> search-pattern: ';
-    my $string = '';
+    my $default = '';
 
     READ: while ( 1 ) {
-        $string = $term->readline(
+        my $string = $term->readline(
             $prompt,
-            { hide_cursor => 2, clear_screen => length $string ? 1 : 2, color => $self->{color}, default => $string }
+            { info => $error_message, hide_cursor => 2, clear_screen => defined $error_message ? 1 : 2,
+              color => $self->{color}, default => $default }
         );
         if ( ! length $string ) {
             return;
@@ -739,8 +741,8 @@ sub __search {
             'Teststring' =~ $vs->{filter};
             1
         } ) {
-            chomp $@;
-            choose( [ 'Continue with ENTER' ], { prompt => "$@", layout => 0, clear_screen => 1 } );
+            $default = $default eq $string ? '' : $string;
+            $error_message = "$@";
             next READ;
         }
         last READ;
@@ -839,7 +841,7 @@ Term::TablePrint - Print a table to the terminal and browse it interactively.
 
 =head1 VERSION
 
-Version 0.139
+Version 0.141
 
 =cut
 

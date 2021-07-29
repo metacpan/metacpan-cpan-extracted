@@ -9,6 +9,7 @@ README
 dist.ini
 lib/Bencher/Scenario/Perl/Startup.pm
 lib/Bencher/ScenarioR/Perl/Startup.pm
+share/images/bencher-result-1.png
 t/00-compile.t
 t/author-critic.t
 t/author-pod-coverage.t

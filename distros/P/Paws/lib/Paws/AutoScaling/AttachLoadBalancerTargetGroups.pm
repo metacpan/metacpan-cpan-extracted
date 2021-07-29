@@ -28,9 +28,9 @@ You shouldn't make instances of this class. Each attribute should be used as a n
 =head1 SYNOPSIS
 
     my $autoscaling = Paws->service('AutoScaling');
-    # To attach a target group to an Auto Scaling group
-    # This example attaches the specified target group to the specified Auto
-    # Scaling group.
+# To attach a target group to an Auto Scaling group
+# This example attaches the specified target group to the specified Auto Scaling
+# group.
     my $AttachLoadBalancerTargetGroupsResultType =
       $autoscaling->AttachLoadBalancerTargetGroups(
       'AutoScalingGroupName' => 'my-auto-scaling-group',
@@ -55,7 +55,10 @@ The name of the Auto Scaling group.
 =head2 B<REQUIRED> TargetGroupARNs => ArrayRef[Str|Undef]
 
 The Amazon Resource Names (ARN) of the target groups. You can specify
-up to 10 target groups.
+up to 10 target groups. To get the ARN of a target group, use the
+Elastic Load Balancing DescribeTargetGroups
+(https://docs.aws.amazon.com/elasticloadbalancing/latest/APIReference/API_DescribeTargetGroups.html)
+API operation.
 
 
 

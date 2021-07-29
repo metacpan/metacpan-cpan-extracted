@@ -1,9 +1,9 @@
 package Sah::Schema::filename::unix;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-08-26'; # DATE
+our $DATE = '2021-07-17'; # DATE
 our $DIST = 'Sah-Schemas-Path'; # DIST
-our $VERSION = '0.015'; # VERSION
+our $VERSION = '0.016'; # VERSION
 
 our $schema = ["str" => {
     summary => 'Filesystem file name on a Unix system',
@@ -40,7 +40,7 @@ Sah::Schema::filename::unix - Filesystem file name on a Unix system
 
 =head1 VERSION
 
-This document describes version 0.015 of Sah::Schema::filename::unix (from Perl distribution Sah-Schemas-Path), released on 2020-08-26.
+This document describes version 0.016 of Sah::Schema::filename::unix (from Perl distribution Sah-Schemas-Path), released on 2021-07-17.
 
 =head1 SYNOPSIS
 
@@ -139,7 +139,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2018, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2018, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

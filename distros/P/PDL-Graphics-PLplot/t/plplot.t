@@ -9,7 +9,7 @@
 use PDL;
 use PDL::Config;
 use PDL::Graphics::PLplot;
-use Test::More qw(no_plan);
+use Test::More;
 
 ######################### End of black magic.
 
@@ -479,6 +479,8 @@ ok ($count == 120, "Opening/closing of > 100 streams");
 
 # comment this out for testing!!!
 unlink glob ("test*.$dev");
+
+done_testing;
 
 # Local Variables:
 # mode: cperl

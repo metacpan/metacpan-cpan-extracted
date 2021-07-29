@@ -1,7 +1,10 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
+use v5;
 use strict;
-use Test::More tests => 5;
+use warnings;
+
+use Test::More;
 
 use ExtUtils::CChecker;
 
@@ -25,3 +28,5 @@ ok( -e "test-config.h", 'test-config.h exists' );
 
 open my $fh, "<", "test-config.h" or die "Cannot read test-config.h - $!";
 is( scalar <$fh>, "#define HAVE_C /**/\n", 'test-config.h has #define HAVE_C' );
+
+done_testing;

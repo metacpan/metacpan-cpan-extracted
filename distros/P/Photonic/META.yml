@@ -48,5 +48,5 @@ requires:
   perl: '5.014000'
 resources:
   repository: https://github.com/wlmb/Photonic
-version: '0.017'
+version: '0.018'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

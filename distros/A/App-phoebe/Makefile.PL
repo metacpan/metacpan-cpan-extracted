@@ -5,8 +5,8 @@ os_unsupported if $^O eq 'MSWin32';
 
 WriteMakefile(
   NAME             => 'App::phoebe',
-  VERSION_FROM     => 'lib/App/phoebe.pm',
-  ABSTRACT_FROM    => 'lib/App/phoebe.pm',
+  VERSION_FROM     => 'lib/App/Phoebe.pm',
+  ABSTRACT         => 'a Gemini-based wiki',
   AUTHOR           => 'Alex Schroeder',
   LICENSE          => 'agpl_3',
   MIN_PERL_VERSION => '5.26.0', # Modern::Perl '2018'
@@ -16,6 +16,8 @@ WriteMakefile(
     'script/gemini',
     'script/gemini-chat',
     'script/titan',
+    'script/ijirait',
+    'script/spartan',
   ],
   PREREQ_PM => {
     # t/prerequisites.t is serious about all these!
@@ -85,8 +87,10 @@ dev:
 
 # Update the README file. The Perl script no only converts the POD
 # documentation to Markdown, it also adds a table of contents.
-README.md: script/phoebe
-	./update-readme script/phoebe
+README.md: script/phoebe \
+  $(sort $(filter-out phoebe,$(filter-out %~,$(wildcard script/*)))) \
+  lib/App/Phoebe.pm $(sort $(wildcard lib/App/Phoebe/*.pm))
+	./update-readme $^
 
 # Run the test using multiple jobs.
 parallel-test:

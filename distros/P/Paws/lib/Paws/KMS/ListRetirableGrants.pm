@@ -29,9 +29,9 @@ You shouldn't make instances of this class. Each attribute should be used as a n
 =head1 SYNOPSIS
 
     my $kms = Paws->service('KMS');
-    # To list grants that the specified principal can retire
-    # The following example lists the grants that the specified principal
-    # (identity) can retire.
+# To list grants that the specified principal can retire
+# The following example lists the grants that the specified principal (identity)
+# can retire.
     my $ListGrantsResponse = $kms->ListRetirableGrants(
       'RetiringPrincipal' => 'arn:aws:iam::111122223333:role/ExampleRole' );
 
@@ -68,7 +68,8 @@ truncated response you just received.
 
 =head2 B<REQUIRED> RetiringPrincipal => Str
 
-The retiring principal for which to list grants.
+The retiring principal for which to list grants. Enter a principal in
+your AWS account.
 
 To specify the retiring principal, use the Amazon Resource Name (ARN)
 (https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html)

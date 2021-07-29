@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!perl
 
 # todo: could be faster,storing values of tokes as BigInt instead integer
 #       makes it slower (due to $k < $last)
@@ -22,17 +22,21 @@
 # 2001-11-08: Don't think we need it, othe subclasses don't do it, either. Tels
 
 package Math::Roman;
-use vars qw($VERSION);
-$VERSION = 1.08;	# Current version of this package
-require  5.005;		# requires this Perl version or later
 
-require Exporter;
-use Math::BigInt;
-@ISA = qw(Exporter Math::BigInt);
-@EXPORT_OK = qw( as_number tokens roman error);
 use strict;
+use warnings;
+use Math::BigInt;
 
-use overload;	# inherit from MBI
+require 5.006;          # requires this Perl version or later
+require Exporter;
+
+our ($VERSION, @ISA, @EXPORT_OK);
+
+$VERSION   = '1.09';    # current version of this package
+@ISA       = qw(Exporter Math::BigInt);
+@EXPORT_OK = qw( as_number tokens roman error );
+
+use overload;           # inherit from MBI
 
 #############################################################################
 # global variables
@@ -45,38 +49,43 @@ my $err;      # error message
 my $bt;       # biggest token
 my $bv;       # biggest value
 
-# some shortcuts for easier life
-sub roman
-  {
-  # exportable version of new
-  my $c = 'Math::Roman';
-  my $value = shift; $value = 0 if !defined $value;
-  # try construct a number (if we got '1999')
-  my $self = Math::BigInt->new($value);
-  # if first failed, so check for Roman
-  _initialize($self,$value) if $self->{sign} eq 'NaN';
-  bless $self, $c;						# rebless
-  $self;
-  }
+# roman() is an exportable version of new()
+sub roman {
+    my $class = __PACKAGE__;
+    return $class -> new(shift);
+}
 
-sub error
-  {
-  # return last error message in case of NaN
-  return $err;
-  }
+sub error {
+    # return last error message in case of NaN
+    return $err;
+}
 
-sub new
-  {
-  my $c = shift;
-  $c = ref($c) || __PACKAGE__;
-  my $value = shift; $value = 0 if !defined $value;
-  # try construct a number (if we got '1999')
-  my $self = Math::BigInt->new($value);
-  # if first failed, so check for Roman
-  _initialize($self,$value) if $self->{sign} eq 'NaN';
-  bless $self, $c;						# rebless
-  $self;
-  }
+sub new {
+    my $proto = shift;
+    my $class = ref($proto) || $proto;
+
+    my $value = shift;
+    $value = 0 if !defined $value;
+
+    # Try construct a number (if we got '1999').
+    #
+    # After Math::BigInt started supporting hexadecimal numbers with just the
+    # "X" prefix, like CORE::hex(), the value can no longer be fed directly to
+    # Math::BigInt->new(). For instance, Math::BigInt->new("X") used to return a
+    # "NaN", now it returns 0, just like CORE::hex("X").
+
+    my $self;
+    if ($value =~ /[IVXLCDM]/) {
+        $self = Math::Roman -> bzero();
+        $self -> _initialize($value);
+    } elsif (length $value) {
+        $self = Math::BigInt -> new($value);
+    } else {
+        $self = Math::BigInt -> bzero();
+    }
+
+    bless $self, $class;            # rebless
+}
 
 #############################################################################
 # self initalization
@@ -120,35 +129,35 @@ sub tokens
 BEGIN
   {
   tokens( qw(
-	IIII		-1
-	XXXX		-1
-	CCCC		-1
-	DD		-1
-	LL		-1
-	VV		-1
-	C[MD][CDM]	-1
-	X[LC][XLCDM]    -1
-	I[VX][IVXLCDM]  -1
-        LXL		-1
-	III	3
-	XXX	30
-	CCC	300
-	II	2
-	XX	20
-	CC	200
-	IV	4
-	IX	9
-	XL	40
-	XC	90
-	CD	400
-	CM	900
-	I	1
-	V	5
-	X	10
-	L	50
-	C	100
-	D	500
-	M	1000
+        IIII            -1
+        XXXX            -1
+        CCCC            -1
+        DD              -1
+        LL              -1
+        VV              -1
+        C[MD][CDM]      -1
+        X[LC][XLCDM]    -1
+        I[VX][IVXLCDM]  -1
+        LXL             -1
+        III     3
+        XXX     30
+        CCC     300
+        II      2
+        XX      20
+        CC      200
+        IV      4
+        IX      9
+        XL      40
+        XC      90
+        CD      400
+        CM      900
+        I       1
+        V       5
+        X       10
+        L       50
+        C       100
+        D       500
+        M       1000
   ) );
   undef $err;
   }
@@ -168,10 +177,10 @@ BEGIN
   # LD  450
   # LM  950
   # not smaller then 10 preceding:
-  # IL	49
-  # IC	99
-  # ID	499
-  # IM	999
+  # IL  49
+  # IC  99
+  # ID  499
+  # IM  999
   # XD  490
   # XM  990
   # illegal ones, smaller then following (several cases are already caught
@@ -195,7 +204,7 @@ sub _initialize
   $self->bzero(); # start with 0
 
   # this is probably very inefficient...
-  my $k; my $e = 0; my $last = -1; undef $err;
+  my $e = 0; my $last = -1; undef $err;
   while ((length($value) > 0) && ($e == 0))
     {
     # can't use /o since tokens might redefine $re
@@ -264,7 +273,7 @@ sub bstr
   while (($level < scalar @$ss) && (!$rem->is_zero()))
     {
     $level++;
-    next if $ss->[$level] > $rem;		# this wont fit
+    next if $ss->[$level] > $rem;               # this wont fit
     # calculate number of biggest token
     ($cnt,$rem) = $rem->bdiv($ss->[$level]);
     if ($rem->sign() eq 'NaN')
@@ -391,13 +400,13 @@ from Math::BigInt are available.
 
 The Roman single digits are as follows:
 
-        I       1
-        V       5
-        X       10
-        L       50
-        C       100
-        D       500
-        M       1000
+    I       1
+    V       5
+    X       10
+    L       50
+    C       100
+    D       500
+    M       1000
 
 The following (quite modern) rules are in effect:
 
@@ -427,31 +436,31 @@ to create the next Roman number.
 
 The default list of valid tokens a Roman number can consist of is thus:
 
-	III	3
-	XXX	30
-	CCC	300
-	II	2
-	XX	20
-	CC	200
-	IV	4
-	IX	9
-	XL	40
-	XC	90
-	CD	400
-	CM	900
-	I	1
-	V	5
-	X	10
-	L	50
-	C	100
-	D	500
-	M	1000
+        III     3
+        XXX     30
+        CCC     300
+        II      2
+        XX      20
+        CC      200
+        IV      4
+        IX      9
+        XL      40
+        XC      90
+        CD      400
+        CM      900
+        I       1
+        V       5
+        X       10
+        L       50
+        C       100
+        D       500
+        M       1000
 
 The default list of invalid tokens is as follows:
 
-	IIII		XXXX		CCCC
-	DD		LL		VV
-	C[MD][CDM]	X[LC][XLCDM]    I[VX][IVXLCDM]
+        IIII            XXXX            CCCC
+        DD              LL              VV
+        C[MD][CDM]      X[LC][XLCDM]    I[VX][IVXLCDM]
 
 =back
 
@@ -480,16 +489,16 @@ redefine the token set completely and parses 'AAB' to be 25:
 
 =over
 
-	use Math::Roman;
+    use Math::Roman;
 
-	Math::Roman::tokens( qw(I 1  V 5  X 10  L 50  C 100  D 500  M 1000));
-	$r = Math::Roman::roman('XIIII');
-	print "'$r' is ",$r->as_number(),"\n";
-	$r = Math::Roman::roman('XV');
-	print "'$r' is ",$r->as_number(),"\n";
-	Math::Roman::tokens ( qw(A 10 B 5) );
-	$r = Math::Roman::roman('AAB');
-	print "'$r' is ",$r->as_number(),"\n";
+    Math::Roman::tokens( qw(I 1  V 5  X 10  L 50  C 100  D 500  M 1000));
+    $r = Math::Roman::roman('XIIII');
+    print "'$r' is ",$r->as_number(),"\n";
+    $r = Math::Roman::roman('XV');
+    print "'$r' is ",$r->as_number(),"\n";
+    Math::Roman::tokens ( qw(A 10 B 5) );
+    $r = Math::Roman::roman('AAB');
+    print "'$r' is ",$r->as_number(),"\n";
 
 =back
 
@@ -497,16 +506,16 @@ Another idea is to implement the dash over symbols, this indicates
 multiplying by 1000. Since it is hard to do this in ASCII, lower-case
 letters could be used like in the following:
 
-	use Math::Roman;
+    use Math::Roman;
 
-        # will wrongly ommit the 'M's, but so much 'M's would not fit
-	# on your screen anyway
-	print 'old: ',new Math::Roman ('+12345678901234567890'),"\n";
-	@a = Math::Roman::tokens();
-	push @a, qw ( v 5000  x 10000  l 50000  c 100000  d 500000
-		      m 1000000 );
-	Math::Roman::tokens(@a);
-	print 'new: ',new Math::Roman ('+12345678901234567890'),"\n";
+    # will wrongly ommit the 'M's, but so much 'M's would not fit
+    # on your screen anyway
+    print 'old: ',new Math::Roman ('+12345678901234567890'),"\n";
+    @a = Math::Roman::tokens();
+    push @a, qw ( v 5000  x 10000  l 50000  c 100000  d 500000
+                  m 1000000 );
+    Math::Roman::tokens(@a);
+    print 'new: ',new Math::Roman ('+12345678901234567890'),"\n";
 
 =head1 USEFUL METHODS
 
@@ -514,7 +523,7 @@ letters could be used like in the following:
 
 =item new()
 
-            new();
+    new();
 
 Create a new Math::Roman object. Argument is a Roman number as string,
 like 'MCMLXXIII' (1973) of the form /^[IVXLCDM]*$/ (see above for further
@@ -522,19 +531,19 @@ rules) or a string number as used by Math::BigInt.
 
 =item roman()
 
-            roman();
+    roman();
 
 Just like new, but you can import it to write shorter code.
 
 =item error()
 
-	    Math::Roman::error();
+    Math::Roman::error();
 
 Return error of last number creation when result was NaN.
 
 =item bstr()
 
-            $roman->bstr();
+    $roman->bstr();
 
 Return a string representing the internal value as a Roman number
 according to the aforementioned rules. A zero will be represented by
@@ -545,7 +554,7 @@ This function always generates the shortest possible form.
 
 =item as_number()
 
-            $roman->as_number();
+    $roman->as_number();
 
 Return a string representing the internal value as a normalized arabic
 number, including sign.
@@ -563,19 +572,19 @@ can look at the sign with C<sign()> or use C<as_number()>.
 
 =head1 EXAMPLES
 
-  use Math::Roman qw(roman);
+    use Math::Roman qw(roman);
 
-  print Math::Roman->new('MCMLXXII')->as_number(),"\n";
-  print Math::Roman->new('LXXXI')->as_number(),"\n";
-  print roman('MDCCCLXXXVIII')->as_number(),"\n";
+    print Math::Roman->new('MCMLXXII')->as_number(),"\n";
+    print Math::Roman->new('LXXXI')->as_number(),"\n";
+    print roman('MDCCCLXXXVIII')->as_number(),"\n";
 
-  $a = roman('1311');
-  print "$a is ",$a->as_number(),"\n";
+    $a = roman('1311');
+    print "$a is ",$a->as_number(),"\n";
 
-  $a = roman('MCMLXXII');
-  print "\$a is now $a (",$a->as_number(),")\n";
-  $a++; $a += 'MCMXII'; $a = $a * 'X' - 'I';
-  print "\$a is now $a (",$a->as_number(),")\n";
+    $a = roman('MCMLXXII');
+    print "\$a is now $a (",$a->as_number(),")\n";
+    $a++; $a += 'MCMXII'; $a = $a * 'X' - 'I';
+    print "\$a is now $a (",$a->as_number(),")\n";
 
 =head1 LIMITS
 
@@ -604,19 +613,19 @@ of 12.
 You can not import ordinary math functions like C<badd()> and write
 things like:
 
-	use Math::Roman qw(badd);		# will fail
+    use Math::Roman qw(badd);               # will fail
 
-	$a = badd('MCM','M');			# does not work
-	$a = Math::Roman::badd('MCM','M');	# neither
+    $a = badd('MCM','M');                   # does not work
+    $a = Math::Roman::badd('MCM','M');      # neither
 
 It is be possible to make this work, but this takes quite a lot of
 Copy&Paste code, and some small overhead price for every calculation.
 I think this is really not needed, since you can always use:
 
-	use Math::Roman;
+    use Math::Roman;
 
-	$a = new Math::Roman 'MCM'; $a += 'M';	# neat isn't it?
-	$a = Math::Roman->badd('MCM','M');	# or this
+    $a = new Math::Roman 'MCM'; $a += 'M';  # neat isn't it?
+    $a = Math::Roman->badd('MCM','M');      # or this
 
 =head2 '0'-'9' as tokens
 
@@ -628,7 +637,8 @@ constructed, and in this case, would succeed.
 
 Please report any bugs or feature requests to
 C<bug-math-roman at rt.cpan.org>, or through the web interface at
-L<https://rt.cpan.org/Ticket/Create.html?Queue=Math-Roman> (requires login).
+L<https://rt.cpan.org/Ticket/Create.html?Queue=Math-Roman>
+(requires login).
 We will be notified, and then you'll automatically be notified of progress on
 your bug as I make changes.
 
@@ -642,25 +652,25 @@ You can also look for information at:
 
 =over 4
 
+=item * GitHub
+
+L<https://github.com/pjacklam/p5-Math-Roman>
+
 =item * RT: CPAN's request tracker
 
 L<https://rt.cpan.org/Dist/Display.html?Name=Math-Roman>
 
-=item * AnnoCPAN: Annotated CPAN documentation
+=item * MetaCPAN
 
-L<http://annocpan.org/dist/Math-Roman>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/dist/Math-Roman>
-
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/Math-Roman/>
+L<https://metacpan.org/release/Math-Roman>
 
 =item * CPAN Testers Matrix
 
 L<http://matrix.cpantesters.org/?dist=Math-Roman>
+
+=item * CPAN Ratings
+
+L<https://cpanratings.perl.org/dist/Math-Roman>
 
 =back
 

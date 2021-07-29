@@ -1,9 +1,9 @@
 package Pod::Weaver::Plugin::Sah::Schemas;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-05-08'; # DATE
+our $DATE = '2021-07-22'; # DATE
 our $DIST = 'Pod-Weaver-Plugin-Sah-Schemas'; # DIST
-our $VERSION = '0.063'; # VERSION
+our $VERSION = '0.067'; # VERSION
 
 use 5.010001;
 use Moose;
@@ -40,7 +40,7 @@ sub weave_section {
                 {
                     local @INC = ("lib");
                     $res = Module::List::list_modules(
-                        "Sah::Schema::", {list_modules=>1});
+                        "Sah::Schema::", {recurse=>1, list_modules=>1});
                 }
                 for my $mod (keys %$res) {
                     my $schema_name = $mod; $schema_name =~ s/^Sah::Schema:://;
@@ -56,6 +56,8 @@ sub weave_section {
                 last unless keys %schemas;
                 require Markdown::To::POD;
                 my @pod;
+                push @pod, "The following schemas are included in this distribution:\n\n";
+
                 push @pod, "=over\n\n";
                 for my $name (sort keys %schemas) {
                     my $sch = $schemas{$name};
@@ -81,8 +83,8 @@ sub weave_section {
             {
                 # XXX don't add if current See Also already mentions it
                 my @pod = (
-                    "L<Sah> - specification\n\n",
-                    "L<Data::Sah>\n\n",
+                    "L<Sah> - schema specification\n\n",
+                    "L<Data::Sah> - Perl implementation of Sah\n\n",
                 );
                 $self->add_text_to_section(
                     $document, join('', @pod), 'SEE ALSO',
@@ -134,7 +136,8 @@ To specify schema in L<Rinci> function metadata and use the metadata with
 L<Perinci::CmdLine> to create a CLI:
 
  # in lib/MyApp.pm
- package MyApp;
+ package
+   MyApp;
  our \%SPEC;
  \$SPEC{myfunc} = {
      v => 1.1,
@@ -154,9 +157,10 @@ L<Perinci::CmdLine> to create a CLI:
  1;
 
  # in myapp.pl
- package main;
+ package
+   main;
  use Perinci::CmdLine::Any;
- Perinci::CmdLine::Any->new(url=>'MyApp::myfunc')->run;
+ Perinci::CmdLine::Any->new(url=>'/MyApp/myfunc')->run;
 
  # in command-line
  % ./myapp.pl --help
@@ -177,6 +181,9 @@ _
                     last unless $egs && @$egs;
                     push @pod, "Sample data:\n\n";
                     for my $eg (@$egs) {
+                        # normalize non-defhash example
+                        $eg = {value=>$eg, valid=>1} if ref $eg ne 'HASH';
+
                         # XXX if dump is too long, use Data::Dump instead
                         my $value = exists $eg->{value} ? $eg->{value} :
                             $eg->{data};
@@ -242,7 +249,7 @@ Pod::Weaver::Plugin::Sah::Schemas - Plugin to use when building Sah::Schemas::* 
 
 =head1 VERSION
 
-This document describes version 0.063 of Pod::Weaver::Plugin::Sah::Schemas (from Perl distribution Pod-Weaver-Plugin-Sah-Schemas), released on 2020-05-08.
+This document describes version 0.067 of Pod::Weaver::Plugin::Sah::Schemas (from Perl distribution Pod-Weaver-Plugin-Sah-Schemas), released on 2021-07-22.
 
 =head1 SYNOPSIS
 
@@ -275,6 +282,12 @@ It does the following to L<lib/Sah/Schema/*> .pm files:
 
 =for Pod::Coverage weave_section
 
+=head1 CONTRIBUTOR
+
+=for stopwords Steven Haryanto
+
+Steven Haryanto <sharyanto@cpan.org>
+
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/Pod-Weaver-Plugin-Sah-Schemas>.
@@ -303,7 +316,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -2,7 +2,7 @@ package Mojolicious::Plugin::Obrazi;
 use Mojo::Base 'Mojolicious::Plugin', -signatures;
 use feature ':5.26';
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 my sub _obrazi {
   return 'Helper obrazi(…) is not implemented yet…';
@@ -19,7 +19,7 @@ sub register ($self, $app, $config) {
 
 =head1 NAME
 
-Mojolicious::Plugin::Obrazi - Mojolicious Plugin
+Mojolicious::Plugin::Obrazi - A static gallery generator (and renderer) for any site. 
 
 =head1 SYNOPSIS
 
@@ -29,14 +29,17 @@ Mojolicious::Plugin::Obrazi - Mojolicious Plugin
   # Mojolicious::Lite
   plugin 'Obrazi';
 
+    <!-- in a template - not implemented yet -->
+    <%= obrazi(csv_file => 'path/to/obrazi.csv') %>
+
 =head1 DESCRIPTION
 
-L<Mojolicious::Plugin::Obrazi> is a L<Mojolicious> plugin. It consists of a
-command — L<Mojolicious::Command::Author::generate::obrazi>, that generates html
-for an images gallery and a not yet wirtten L<helper|/obrazi> which produces
-HTML from a CSV file found in a directory, containing images. While the command
-is functional already the plugin is empty. This is a yet early release. Todo:
-write the helper.
+L<Mojolicious::Plugin::Obrazi> is a L<Mojolicious> plugin that consists of a
+command — L<Mojolicious::Command::Author::generate::obrazi>, which resizes a
+set of images and generates html for a gallery and, a not yet wirtten
+L<helper|/obrazi> which produces HTML from a CSV file found in a directory,
+containing images. While the command is functional already, the plugin is
+empty.  This is a yet early release. Todo: write the helper.
 
 =head1 METHODS
 

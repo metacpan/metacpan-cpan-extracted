@@ -26,7 +26,7 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "Module::Build::Tiny" : "0.034"
          }
       },
       "develop" : {
@@ -38,12 +38,14 @@
             "Dist::Zilla::Plugin::EnsureChangesHasContent" : "0",
             "Dist::Zilla::Plugin::EnsurePrereqsInstalled" : "0",
             "Dist::Zilla::Plugin::GatherDir" : "0",
+            "Dist::Zilla::Plugin::GatherDir::Template" : "0",
             "Dist::Zilla::Plugin::InsertCopyright" : "0",
             "Dist::Zilla::Plugin::InsertExample" : "0",
             "Dist::Zilla::Plugin::MetaJSON" : "0",
             "Dist::Zilla::Plugin::MetaNoIndex" : "0",
             "Dist::Zilla::Plugin::MetaProvides::Package" : "0",
             "Dist::Zilla::Plugin::MetaResources" : "0",
+            "Dist::Zilla::Plugin::ModuleBuildTiny" : "0",
             "Dist::Zilla::Plugin::NextRelease" : "0",
             "Dist::Zilla::Plugin::PodCoverageTests" : "0",
             "Dist::Zilla::Plugin::PodSyntaxTests" : "0",
@@ -57,8 +59,9 @@
             "Dist::Zilla::Plugin::RunExtraTests" : "0",
             "Dist::Zilla::Plugin::Test::CPAN::Changes" : "0",
             "Dist::Zilla::Plugin::Test::CPAN::Meta::JSON" : "0",
-            "Dist::Zilla::Plugin::Test::CheckManifest" : "0",
+            "Dist::Zilla::Plugin::Test::CleanNamespaces" : "0",
             "Dist::Zilla::Plugin::Test::Compile" : "0",
+            "Dist::Zilla::Plugin::Test::DistManifest" : "0",
             "Dist::Zilla::Plugin::Test::Fixme" : "0",
             "Dist::Zilla::Plugin::Test::NoBreakpoints" : "0",
             "Dist::Zilla::Plugin::Test::NoTabs" : "0",
@@ -71,11 +74,14 @@
             "Dist::Zilla::PluginBundle::Basic" : "0",
             "Dist::Zilla::PluginBundle::Filter" : "0",
             "Pod::Coverage::TrustPod" : "0",
+            "Pod::Weaver::Plugin::StopWords" : "0",
             "Pod::Weaver::Section::Contributors" : "0",
-            "Pod::Weaver::Section::Support" : "0",
+            "Pod::Weaver::Section::GenerateSection" : "0",
             "Software::License::GPL_3" : "0",
             "Test::CPAN::Changes" : "0.19",
             "Test::CPAN::Meta::JSON" : "0.16",
+            "Test::CleanNamespaces" : "0.15",
+            "Test::DistManifest" : "0",
             "Test::More" : "0.88",
             "Test::NoBreakpoints" : "0.15",
             "Test::NoTabs" : "0",
@@ -84,6 +90,7 @@
             "Test::Pod::Coverage" : "1.08",
             "Test::Spelling" : "0.12",
             "Test::TrailingSpace" : "0.0203",
+            "Test::Vars" : "0.015",
             "Test::Version" : "1"
          }
       },
@@ -110,12 +117,13 @@
    "provides" : {
       "Hash::Wrap" : {
          "file" : "lib/Hash/Wrap.pm",
-         "version" : "0.14"
+         "version" : "0.17"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
+         "mailto" : "bug-hash-wrap@rt.cpan.org",
          "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Hash-Wrap"
       },
       "repository" : {
@@ -123,7 +131,7 @@
          "web" : "https://gitlab.com/djerius/hash-wrap"
       }
    },
-   "version" : "0.14",
+   "version" : "0.17",
    "x_generated_by_perl" : "v5.28.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.12",
    "x_spdx_expression" : "GPL-3.0-only"

@@ -10,7 +10,7 @@ Vote::Count::Overview
 
 An Overview of Alternative Voting and Preferential Methods and Introduction to Vote::Count.
 
-=head1 VERSION 2.00
+=head1 VERSION 2.01
 
 =head2 A Toolkit for determining the outcome of Preferential Ballots.
 
@@ -74,7 +74,7 @@ The cases described above: Monotonicity, Independence of Irrelevant Alternatives
 
 =head4 Complexity
 
-Is it feasible to count 100 ballots by hand? How difficult is it to understand the process (can the average middle school student understand it at all)? How many steps? People by their nature are likely to reject things they don't understand, and conversely are likely to embrace something that makes sense, especially if it took a little bit of effort to understand.
+Is it feasible to count 100 ballots by hand? How difficult is it to understand the process (can the average middle school student understand it at all)? How many steps? People by their nature are likely to reject things they don't understand.
 
 =head4 Resolvability
 
@@ -182,7 +182,7 @@ Advocates claim that this Ballot Style is a better expression of voter preferenc
 
 The Range Ballot resolves the Borda weighting problem and allows the voter to manage the later harm effect, so it is clearly a better choice than Borda. Condorcet and IRV can resolve Range Ballots, but ignore the extra information and would prefer strict ordinality (not allowing equal ranking).
 
-Voters may find the Range Ballot to be more complex than the Ranked Choice Ballot.
+Voters may find the Range Ballot to be more complex than the Ranked Choice Ballot. While the voter can manipulate the Later Harm effect, doing so encourages strategic manipulation, therefore more effort for the voter.
 
 =head1 Objective and Motivation
 
@@ -274,9 +274,9 @@ The Documentation for the Vote::Count Module is in L<Vote::Count::Common>
 
 It is the policy of Vote::Count to only develop with recent versions of Perl. Support for older versions will be dropped when they either require additional maintenance or impair adoption of new features.
 
-=head1 Catalog of Methods
+=head1 Methods
 
-Directory of Vote Counting Methods linking to the Vote::Count module for it.
+Vote Counting Methods linking to the Vote::Count module for it.
 
 =head3 Consumed As Roles By Vote::Count
 
@@ -317,6 +317,16 @@ L<Vote::Count::Score>
 =item *
 
 L<Vote::Count::TieBreaker>
+
+=back
+
+=head3 STV
+
+=over
+
+=item *
+
+L<Vote::Count::Charge>
 
 =back
 
@@ -408,7 +418,7 @@ L<Vote::Count::Start|https://metacpan.org/pod/Vote::Count::Start>
 
 =head1 Call for Contributions
 
-This project needs contributions from Programmers and Mathematicians. Review and citations from Mathematicians are urgently requested, because in addition to being a Tool-set for implementing vote counting this documentation will for many also be the manual. From coders there is a lot of help that could be given: any well known method could use a write up if it is easy to implement with the toolkit (see Benham) or a code submission if it is not. Currently Tiedeman, SSD, and Kemmeny-Young are unimplemented.
+This project needs contributions from Programmers and Mathematicians. Review and citations from Mathematicians are urgently requested, because in addition to being a Tool-set for implementing vote counting this documentation will for many also be the manual. From coders there is a lot of help that could be given: any well known method could use a write up if it is easy to implement with the toolkit (see L<Vote::Count::Method::CondorcetDropping/Benham|Benham)> or a code submission if it is not.
 
 =cut
 

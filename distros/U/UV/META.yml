@@ -1,7 +1,7 @@
 ---
 abstract: 'Perl interface to libuv'
 author:
-  - 'Chase Whitener <F<capoeirab@cpan.org>>'
+  - 'Paul Evans <leonerd@leonerd.org.uk>'
 build_requires:
   ExtUtils::CBuilder: '0'
   Test::More: '0.88'
@@ -18,63 +18,66 @@ name: UV
 provides:
   UV:
     file: lib/UV.pm
-    version: '1.909'
+    version: '2.000'
   UV::Async:
     file: lib/UV/Async.pm
-    version: '1.909'
+    version: '2.000'
   UV::Check:
     file: lib/UV/Check.pm
-    version: '1.909'
+    version: '2.000'
   UV::Exception:
     file: lib/UV.pm
   UV::Handle:
     file: lib/UV/Handle.pm
-    version: '1.909'
+    version: '2.000'
   UV::Idle:
     file: lib/UV/Idle.pm
-    version: '1.909'
+    version: '2.000'
   UV::Loop:
     file: lib/UV/Loop.pm
-    version: '1.909'
+    version: '2.000'
   UV::Pipe:
     file: lib/UV/Pipe.pm
-    version: '1.909'
+    version: '2.000'
   UV::Poll:
     file: lib/UV/Poll.pm
-    version: '1.909'
+    version: '2.000'
   UV::Prepare:
     file: lib/UV/Prepare.pm
-    version: '1.909'
+    version: '2.000'
   UV::Process:
     file: lib/UV/Process.pm
-    version: '1.909'
+    version: '2.000'
   UV::Req:
     file: lib/UV/Req.pm
-    version: '1.909'
+    version: '2.000'
   UV::Signal:
     file: lib/UV/Signal.pm
-    version: '1.909'
+    version: '2.000'
   UV::Stream:
     file: lib/UV/Stream.pm
-    version: '1.909'
+    version: '2.000'
   UV::TCP:
     file: lib/UV/TCP.pm
-    version: '1.909'
+    version: '2.000'
   UV::TTY:
     file: lib/UV/TTY.pm
-    version: '1.909'
+    version: '2.000'
   UV::Timer:
     file: lib/UV/Timer.pm
-    version: '1.909'
+    version: '2.000'
   UV::UDP:
     file: lib/UV/UDP.pm
-    version: '1.909'
+    version: '2.000'
 requires:
   Carp: '0'
   Exporter: '5.57'
   Scalar::Util: '0'
-  XSLoader: '0.14'
+  XSLoader: '0.13'
+  perl: '5.014'
 resources:
+  bugtracker: https://github.com/p5-UV/p5-UV/issues
   license: http://dev.perl.org/licenses/
-version: '1.909'
+  repository: git://github.com/p5-UV/p5-UV.git
+version: '2.000'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

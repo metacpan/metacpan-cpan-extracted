@@ -71,6 +71,7 @@ sub init {
        pdfviewer   => "",
        editfont	   => 0,
        editsize	   => FONTSIZE,
+       tmplfile    => "",
       };
 
     if ( $^O =~ /^mswin/i ) {
@@ -120,8 +121,8 @@ sub init {
     }
 
     Wx::Log::SetTimestamp(' ');
-    if ( @ARGV && -s $ARGV[0] ) {
-	$self->openfile( shift(@ARGV) );
+    if ( @ARGV ) {
+	$self->openfile( shift(@ARGV) ) || return 0;
 	return 1;
     }
 
@@ -195,6 +196,17 @@ sub opendialog {
 
 sub openfile {
     my ( $self, $file ) = @_;
+
+    unless ( -f -r $file ) {
+	my $md = Wx::MessageDialog->new
+	  ( $self,
+	    "Error opening $file: $!",
+	    "File open error",
+	    wxOK | wxICON_ERROR );
+	my $ret = $md->ShowModal;
+	$md->Destroy;
+	return;
+    }
     unless ( $self->{t_source}->LoadFile($file) ) {
 	my $md = Wx::MessageDialog->new
 	  ( $self,
@@ -219,15 +231,29 @@ sub openfile {
 
     $self->{prefs_xpose} = 0;
     $self->{prefs_xposesharp} = 0;
+    return 1;
 }
 
 sub newfile {
     my ( $self ) = @_;
     undef $self->{_currentfile};
-    $self->{t_source}->SetValue( <<EOD );
-{title: New Song}
 
-EOD
+    my $file = $self->{prefs_tmplfile};
+    my $content = "{title: New Song}\n\n";
+    if ( $file ) {
+	if ( -f -r $file ) {
+	    if ( $self->{t_source}->LoadFile($file) ) {
+		$content = "";
+	    }
+	    else {
+		$content = "# Error opening template $file: $!\n\n" . $content;
+	    }
+	}
+	else {
+	    $content = "# Error opening template $file: $!\n\n" . $content;
+	}
+     }
+    $self->{t_source}->SetValue($content) unless $content eq "";
     $self->{t_source}->SetModified(0);
     Wx::LogStatus("New file");
     $self->{prefs_xpose} = 0;

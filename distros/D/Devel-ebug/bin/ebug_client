@@ -6,7 +6,7 @@ use warnings;
 
 # PODNAME: ebug_client
 # ABSTRACT: Debugger client for remote debugging Perl script
-our $VERSION = '0.63'; # VERSION
+our $VERSION = '0.64'; # VERSION
 
 __END__
 
@@ -20,32 +20,32 @@ ebug_client - Debugger client for remote debugging Perl script
 
 =head1 VERSION
 
-version 0.63
+version 0.64
 
 =head1 SYNOPSIS
 
-ebug-client -key <secret> -port <port>
+ ebug_client -key <secret> -port <port>
 
 =head1 DESCRIPTION
 
-ebug-client is an debugger front end for attaching to
-remotely executing perl script, running on ebug-server.
+L<ebug_client> is an debugger front end for attaching to
+remotely executing perl script, running on L<ebug_server>.
 
-To invoke ebug-client, you must first invoke ebug-server to
+To invoke L<ebug_client>, you must first invoke L<ebug_server> to
 run debuggee and generate "key" and "port" needed for connection.
-When ebug-server is invoked, it will show exact command-line to
-invoke ebug-client.
+When L<ebug_server> is invoked, it will show exact command-line to
+invoke L<ebug_client>.
 
 =head1 EXAMPLE
 
- # Attach to ebug-server running on port 4023, with key "begripra"
- $ ebug-client -key begripra -port 4023
+ # Attach to ebug_server running on port 4023, with key "begripra"
+ $ ebug_client -key begripra -port 4023
 
 =head1 NOTE
 
 Currently, you cannot "restart" debuggee. You'll need to
-restart one manually by re-invoking both ebug-server and
-ebug-client.
+restart one manually by re-invoking both L<ebug_server> and
+L<ebug_client>.
 
 Since Devel::ebug::Backend listens to "localhost" socket,
 you will need to relay I/O using tool like socat for true
@@ -56,7 +56,7 @@ a complete ripoff of Devel::ebug source.
 
 =head1 SEE ALSO
 
-L<Devel::debug>, L<ebug>, L<ebug-server>
+L<Devel::debug>, L<ebug>, L<ebug_server>
 
 =head1 cut
 
@@ -107,7 +107,7 @@ Taisuke Yamada
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2005-2020 by Leon Brocard.
+This software is copyright (c) 2005-2021 by Leon Brocard.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

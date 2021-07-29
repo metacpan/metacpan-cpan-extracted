@@ -51,7 +51,7 @@ my $id = expectCookie($res);
 expectRedirection( $res, 'http://auth.example.com/' );
 
 # CheckUser form
-# ------------------------
+# --------------
 ok(
     $res = $client->_get(
         '/checkuser',

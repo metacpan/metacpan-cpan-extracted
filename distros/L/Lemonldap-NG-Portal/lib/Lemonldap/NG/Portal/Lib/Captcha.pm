@@ -1,11 +1,11 @@
 package Lemonldap::NG::Portal::Lib::Captcha;
 
 use strict;
-use GD::SecurityImage use_magick => 1;
 use Mouse;
 use MIME::Base64;
+use GD::SecurityImage use_magick => 1;
 
-our $VERSION = '2.0.1';
+our $VERSION = '2.0.12';
 
 extends 'Lemonldap::NG::Common::Module';
 
@@ -60,7 +60,9 @@ has ott => (
     }
 );
 
-sub init { 1 }
+sub init {
+    return 1;
+}
 
 # Returns secret + a HTML image src content
 sub getCaptcha {
@@ -76,7 +78,7 @@ sub getCaptcha {
     $image->random;
     $image->create( 'normal', 'default', $self->fgColor, $self->bgColor );
     my ( $imageData, $mimeType, $rdm ) = $image->out( force => 'png' );
-    my $img = 'data:image/png;base64,' . encode_base64( $imageData, '' );
+    my $img   = 'data:image/png;base64,' . encode_base64( $imageData, '' );
     my $token = $self->ott->createToken( { captcha => $rdm } );
     return ( $token, $img );
 }

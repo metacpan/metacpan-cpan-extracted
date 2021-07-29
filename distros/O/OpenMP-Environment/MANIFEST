@@ -185,7 +185,9 @@ dist.ini
 examples/01-inline-c-omp.pl
 examples/02-inline-c-omp.pl
 examples/03-inline-c-omp.pl
-examples/04-inline-c-omp-Alien::OpenMP.pl
+examples/04-inline-c-omp.pl
+examples/05-inline-c-omp-Alien::OpenMP.pl
+examples/06-inline-c-omp-Alien::OpenMP.pl
 examples/launcher.pl
 examples/summarize_env.pl
 examples/validate_first.pl

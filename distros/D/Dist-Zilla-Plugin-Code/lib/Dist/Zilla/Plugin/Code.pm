@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.003';
+our $VERSION = '0.006';
 
 1;
 
@@ -20,7 +20,7 @@ Dist::Zilla::Plugin::Code - dynamically create plugins from a bundle
 
 =head1 VERSION
 
-Version 0.003
+Version 0.006
 
 =head1 DESCRIPTION
 
@@ -139,7 +139,7 @@ Sven Kirmess <sven.kirmess@kzone.ch>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Sven Kirmess.
+This software is Copyright (c) 2020-2021 by Sven Kirmess.
 
 This is free software, licensed under:
 

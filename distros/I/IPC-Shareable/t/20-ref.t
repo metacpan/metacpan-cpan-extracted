@@ -2,6 +2,7 @@ use warnings;
 use strict;
 
 use Carp;
+use Data::Dumper;
 use IPC::Shareable;
 use Test::More;
 
@@ -69,11 +70,13 @@ for ('a' .. 'z') {
 
 IPC::Shareable->clean_up_all;
 
-tie $sv, 'IPC::Shareable', { destroy => 1 };
-
 # deeply nested
 
+tie $sv, 'IPC::Shareable', { destroy => 1 };
+
 $sv->{this}->{is}->{nested}->{deeply}->[0]->[1]->[2] = 'found';
+
+
 is
     $sv->{this}->{is}->{nested}->{deeply}->[0]->[1]->[2],
     'found',

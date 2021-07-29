@@ -177,6 +177,7 @@ sub detach_db {
             }
             else {
                 delete $h_ref->{$sf->{d}{db}};
+                $sf->{i}{old_idx_cda} = 1; # no @$attached_db == no Detach-DB menu-entry to return to
             }
             $ax->write_json( $sf->{i}{f_attached_db}, $h_ref );
             return 1;

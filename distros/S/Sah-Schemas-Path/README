@@ -2,21 +2,72 @@ NAME
     Sah::Schemas::Path - Schemas related to filesystem path
 
 VERSION
-    This document describes version 0.015 of Sah::Schemas::Path (from Perl
-    distribution Sah-Schemas-Path), released on 2020-08-26.
+    This document describes version 0.016 of Sah::Schemas::Path (from Perl
+    distribution Sah-Schemas-Path), released on 2021-07-17.
 
 SAH SCHEMAS
     *   dirname
 
         Filesystem directory name.
 
+        This schema is basically string with some checks and prefilters. Why
+        use this schema instead of plain ol' str? Mainly to give you the
+        ability to change tilde to user's home directory, e.g. "~/foo" into
+        "/home/someuser/foo". Normally this expansion is done by a Unix
+        shell, but sometimes your program receives an unexpanded path, e.g.
+        when you get it from some config file.
+
+        See also more OS-specific schemas like "dirname::unix", which adds
+        some more checks (e.g. filename cannot contain forward slash and
+        each component cannot be longer than 255 characters) and
+        preprocessing (e.g. stripping extraneous slashes like "foo//bar"
+        into "foo/bar".
+
+        What's the difference between this schema and "filename"? The
+        default completion rule. This schema's completion by default only
+        includes directories.
+
     *   filename
 
         Filesystem file name.
 
+        This schema is basically string with some checks and prefilters. Why
+        use this schema instead of plain ol' str? Mainly to give you the
+        ability to change tilde to user's home directory, e.g. "~/foo.txt"
+        into "/home/someuser/foo.txt". Normally this expansion is done by a
+        Unix shell, but sometimes your program receives an unexpanded path,
+        e.g. when you get it from some config file.
+
+        See also more OS-specific schemas like "filename::unix", which adds
+        some more checks (e.g. filename cannot contain forward slash and
+        each component cannot be longer than 255 characters) and
+        preprocessing (e.g. stripping extraneous slashes like "foo//bar"
+        into "foo/bar".
+
+        What's the difference between this schema and "dirname"? The default
+        completion rule. This schema's completion by default only includes
+        files and not directories.
+
     *   pathname
 
         Filesystem path name.
+
+        This schema is basically string with some checks and prefilters. Why
+        use this schema instead of plain ol' str? Mainly to give you the
+        ability to change tilde to user's home directory, e.g. "~/foo" into
+        "/home/someuser/foo". Normally this expansion is done by a Unix
+        shell, but sometimes your program receives an unexpanded path, e.g.
+        when you get it from some config file.
+
+        See also more OS-specific schemas like "pathname::unix", which adds
+        some more checks (e.g. pathname cannot contain forward slash and
+        each component cannot be longer than 255 characters) and
+        preprocessing (e.g. stripping extraneous slashes like "foo//bar"
+        into "foo/bar".
+
+        What's the difference between this schema and "filename" and
+        "dirname"? The default completion rule. This schema's completion by
+        default includes files as well as directories.
 
     *   pathnames
 
@@ -48,7 +99,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2020, 2019, 2018, 2016 by
+    This software is copyright (c) 2021, 2020, 2019, 2018, 2016 by
     perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under

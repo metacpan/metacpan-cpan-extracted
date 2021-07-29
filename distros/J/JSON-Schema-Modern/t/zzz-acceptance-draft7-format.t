@@ -20,6 +20,13 @@ BEGIN {
     if not -d '.git' and not grep $ENV{$_}, @variables;
 }
 
+if (-d '.git' or $ENV{AUTHOR_TESTING} or $ENV{EXTENDED_TESTING}) {
+  eval { +require Time::Moment; 1 } or fail $@;
+  eval { +require Email::Address::XS; Email::Address::XS->VERSION(1.01); 1 } or fail $@;
+  eval { +require Data::Validate::Domain; 1 } or fail $@;
+  eval { +require Net::IDN::Encode; 1 } or fail $@;
+}
+
 my $version = 'draft7';
 
 acceptance_tests(
@@ -38,10 +45,10 @@ acceptance_tests(
           'iri-reference.json',                       # not yet implemented
           'uri-template.json',                        # not yet implemented
           # these all depend on optional prereqs
-          $ENV{AUTOMATED_TESTING} && !eval { +require 'Time::Moment'; 1 } ? qw(date-time.json date.json time.json) : (),
-          $ENV{AUTOMATED_TESTING} && !eval { +require 'Email::Address::XS'; Email::Address::XS->VERSION(1.01); 1 } ? qw(email.json idn-email.json) : (),
-          $ENV{AUTOMATED_TESTING} && !eval { +require 'Data::Validate::Domain'; 1 } ? 'hostname.json' : (),
-          $ENV{AUTOMATED_TESTING} && !eval { +require 'Net::IDN::Encode'; 1 } ? 'idn-hostname.json' : (),
+          $ENV{AUTOMATED_TESTING} && !eval { +require Time::Moment; 1 } ? qw(date-time.json date.json time.json) : (),
+          $ENV{AUTOMATED_TESTING} && !eval { +require Email::Address::XS; Email::Address::XS->VERSION(1.01); 1 } ? qw(email.json idn-email.json) : (),
+          $ENV{AUTOMATED_TESTING} && !eval { +require Data::Validate::Domain; 1 } ? 'hostname.json' : (),
+          $ENV{AUTOMATED_TESTING} && !eval { +require Net::IDN::Encode; 1 } ? 'idn-hostname.json' : (),
         ] },
       # various edge cases that are difficult to accomodate
       { file => 'iri.json', group_description => 'validation of IRIs',  # see test suite issue 395

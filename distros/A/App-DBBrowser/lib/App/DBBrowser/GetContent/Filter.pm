@@ -62,8 +62,8 @@ sub input_filter {
         my $skip = ' ';
         my $regex = qr/^\Q$skip\E\z/;
         my $menu = [
-            undef,          $choose_cols,   $skip,         $skip,
-            $confirm,       $choose_rows,   $range_rows,   $row_groups,
+            undef,          $choose_rows,   $range_rows,   $row_groups,
+            $confirm,       $choose_cols,   $skip,         $skip,
             $reset,         $s_and_replace, $skip,         $skip,
             $reparse,       $remove_cell,   $insert_cell,  $skip,
             $empty_to_null, $join_columns,  $split_column, $append_col,
@@ -674,11 +674,13 @@ sub __merge_rows {
     my $term_w = get_term_width();
     my $stringified_rows;
     {
+        my $dots = $sf->{i}{dots}[ $sf->{o}{G}{dots} ];
+        my $dots_w = print_columns( $dots );
         no warnings 'uninitialized';
         @$stringified_rows = map {
             my $str_row = join( ',', @$_ );
             if ( print_columns( $str_row ) > $term_w ) {
-                unicode_sprintf( $str_row, $term_w, { mark_if_trundated => $sf->{i}{dots}[ $sf->{o}{G}{dots} ] } );
+                unicode_sprintf( $str_row, $term_w, { mark_if_trundated => [ $dots, $dots_w ] } );
             }
             else {
                 $str_row;

@@ -22,7 +22,7 @@ require Exporter;
 @ISA = qw(Exporter);
 @EXPORT_OK = qw(finddeps);
 
-$VERSION = '3.08';
+$VERSION = '3.09';
 
 use constant MAXINT => ~0;
 
@@ -544,37 +544,22 @@ sub _getreqs {
                 print $fh $file_data;
                 close($fh);
 
-                my $tar_extractor = sub {
-                    my $tar = Archive::Tar->new(shift());
-                    # sort to ensure that we get JSON by preference, META.json
-                    # often contains more info
-                    if(my @members = sort { $a cmp $b } grep { /$meta_file_re/ } $tar->list_files()) {
-                        return $tar->get_content($members[0])
-                    }
-                };
-
                 if(File::Type->mime_type($file_data) eq 'application/zip') {
                     my $zip = Archive::Zip->new($tempfile);
                     if(my @members = sort { $a cmp $b } $zip->membersMatching($meta_file_re)) {
                         $rval = $zip->contents($members[0])
                     }
-                } elsif(File::Type->mime_type($file_data) =~ m{^application/x-(gzip|tar)$}) {
-                    $rval = $tar_extractor->($tempfile);
-                } elsif(File::Type->mime_type($file_data) eq 'application/x-bzip2') {
-                    no warnings qw(exec);
-                    # can't use list form of pipe open because it's broken
-                    # on Windows perl < 5.22. See https://github.com/perl/perl5/issues/13574
-                    # and can't rely on open() to return false if bzip2 doesn't exist
-                    # on Windows either, hence finding the binary the hard way first. We then
-                    # rely on being able to find it in the PATH because apparently
-                    # C:\Program Files\... is toooo haaaaard for Windows to understand.
-                    if((my $bzip2exe) = Env::Path->PATH->Whence('bzip2')) {
-                        open(my $fh, "bzip2 -dc $tempfile |");
-                        $rval = $tar_extractor->($fh);
-                    } else {
-                        $self->_yell("Can't unbzip2 $tempfile: $!");
-                    }
+                } elsif(File::Type->mime_type($file_data) =~ m{^application/x-(bzip2|gzip|tar)$}) {
+                    $rval = sub {
+                        my $tar = Archive::Tar->new(shift());
+                        # sort to ensure that we get JSON by preference, META.json
+                        # often contains more info
+                        if(my @members = sort { $a cmp $b } grep { /$meta_file_re/ } $tar->list_files()) {
+                            return $tar->get_content($members[0])
+                        }
+                    }->($tempfile);
                 } else { $rval = $file_data; } # oh, it must have been a meta file
+
                 return $rval;
             },
         );

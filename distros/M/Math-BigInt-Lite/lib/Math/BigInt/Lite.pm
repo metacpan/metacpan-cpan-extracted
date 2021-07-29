@@ -9,7 +9,7 @@ require 5.006002;
 use strict;
 use warnings;
 
-use Math::BigInt 1.999821;
+use Math::BigInt;
 
 our ($_trap_inf, $_trap_nan);
 
@@ -17,7 +17,7 @@ our @ISA = qw(Math::BigInt);
 our @EXPORT_OK = qw/objectify/;
 my $class = 'Math::BigInt::Lite';
 
-our $VERSION = '0.20';
+our $VERSION = '0.23';
 
 ##############################################################################
 # global constants, flags and accessory
@@ -612,7 +612,7 @@ sub from_hex {
                      ^
                      \s*
                      ( [+-]? )
-                     ( 0 [Xx] )?
+                     ( 0? [Xx] )?
                      (
                          [0-9a-fA-F]*
                          ( _ [0-9a-fA-F]+ )*
@@ -659,7 +659,7 @@ sub from_oct {
                      ^
                      \s*
                      ( [+-]? )
-                     ( 0 [Oo] )?
+                     ( 0? [Oo] )?
                      (
                          [0-7]*
                          ( _ [0-7]+ )*
@@ -706,7 +706,7 @@ sub from_bin {
                      ^
                      \s*
                      ( [+-]? )
-                     ( 0 [Bb] )?
+                     ( 0? [Bb] )?
                      (
                          [01]*
                          ( _ [01]+ )*
@@ -1134,6 +1134,14 @@ sub bfac {
     $upgrade->bfac($x, $a, $p, $r);
 }
 
+sub bdfac {
+    my ($self, $x, $a, $p, $r) = ref($_[0]) ? (ref($_[0]), @_) :
+      ($class, $class->new($_[0]), $_[1], $_[2], $_[3], $_[4]);
+
+    $x = $upgrade->new($$x) if $x->isa($class);
+    $upgrade->bdfac($x, $a, $p, $r);
+}
+
 sub bpow {
     my ($class, $x, $y, @r) = objectify(2, @_);
 
@@ -1454,11 +1462,11 @@ Copyright 2002-2007 Tels, L<http://bloodgate.com>.
 
 =item *
 
-Copyright 2010 Florian Ragwitz L<flora@cpan.org>.
+Copyright 2010 Florian Ragwitz E<lt>flora@cpan.orgE<gt>.
 
 =item *
 
-Copyright 2016- Peter John Acklam L<pjacklam@gmail.com>.
+Copyright 2016- Peter John Acklam E<lt>pjacklam@gmail.comE<gt>.
 
 =back
 

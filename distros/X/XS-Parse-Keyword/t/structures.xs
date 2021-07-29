@@ -75,7 +75,8 @@ static const struct XSParseKeywordHooks hooks_choice = {
     XPK_CHOICE(
       XPK_LITERAL("zero"),
       XPK_LITERAL("one"),
-      XPK_LITERAL("two")
+      XPK_LITERAL("two"),
+      XPK_BLOCK
     ),
     {0}
   },

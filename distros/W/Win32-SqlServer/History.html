@@ -13,6 +13,35 @@
 <CENTER>
 <H1>History Win32::SqlServer</H1>
 </CENTER>
+<H3>2021-07-16 &#8211; 2.013</H3>
+<UL>
+  <LI><B>Platform support</B>:
+<UL>
+      <LI>This version includes binaries for these Perl versions: 5.24, 5.26, 5.28, 5.30, 5.32 and 5.34. All binaries up version 5.32 have been tested with Strawberry Perl. I have not tested with Strawberry Perl 5.34, as it was not avilable when I completed my release.</LI>
+      <LI>Thus, I no longer supply binaries for Perl 5.20 and 5.22, nor have I tested with these versions. The module itself continues to accept all Perl versions from 5.12 and up, though.</LI>
+      <LI>The module have been tested with MSOLEDBSQL 18.6, which was the most recent version of this provider at the time of release of 2.013.</LI>
+      <LI>Win32::SqlServer now workts when you have set your ANSI and OEM code pages in Windows 10 to UTF-8 with these restructions:
+        <UL>
+          <LI>You must be connecting to SQL 2019 or later.</LI>
+          <LI>You need to use at least version 18.5 of the provider MSOLEDBSQL. </LI>
+        </UL>
+      These restrictions are due to the limitations in the OLE DB providers.</LI>
+    </UL>
+  </LI>
+  <LI><B>Breaking changes</B>. There are some breaking changes with string data and the <B><CODE>sql_varaint</CODE></B> data type, due to changes that Microsoft introduced in version 18.4 of the MSOLEDBSQL provider.
+    <UL>
+      <LI>In 2.012, Win32::SqlServer always sent string data for <B><CODE>sql_variant</CODE></B> as <B><CODE>varchar</CODE></B> when the database had an UTF-8 collation, no matter the client code page. Because of the changes in MSOLEDBSQL 18.4, I have removed this rule, and in 2.013 string data for <B><CODE>sql_variant</CODE></B> is always passed as <B><CODE>nvarchar</CODE></B> when the database code page does not agree with the ANSI code page of the client. This applies also if you are using an older provider than MSOLEDBSQL. Win32::SqlServer will only pass the data as <B><CODE>varchar</CODE></B>, if the ANSI code page of the client agrees with the code page of the database collation.</LI>
+      <LI>When receiving varchar data in <B><CODE>sql_variant</CODE></B>, Win32::SqlServer now assumes that the data is in the ANSI code page if you are using the MSOLEDBSQL proivider (including versions 18.3 and earlier). If you are using an older provider such as SQLNCLI11 or earlier, Win32::SqlServer will assume that the data is the database collation, that is, the same as in earlier versions.</LI>
+    </UL>
+  </LI>
+  <LI><B>Feature enhancements</B>. There are five new login properties that support new connection properties added in the MSOLEDBSQL provider: <B>AccessToken</B> (MSOLEDBSQL 18.2), 
+  <B>Authentication</B> (18.2), <B>ConnectRetryCount</B> (18.6), <B>ConnectRetryInterval</B> (18.5) and <B>TransparentNetworkIPResolution</B> (18.4). I will need to add the caveat that my testing of these properties has been limited.</LI>
+  <LI><B>Bug fixes</B>: 
+    <UL>
+      <LI>There was an issue in Win32::SqlServer 2.012 with embedded NUL characters in value <B><CODE>(var)char</CODE></B> columns, so that the string &quot;abcd\0efghij&quot; incorrectly same back to Perl as &quot;abcd&quot;. This issue has been resolved, but only if you use version 18.5 or later of the MSOLEDBSQL provider. (The issue is a bug in the OLE DB providers, not in Win32::SqlServer.)</LI>
+    </UL>
+  </LI>
+</UL>
 <H3>2019-07-22 &#8211; 2.012</H3>
 <P><B>Beware</B>: the name of the install script has changed. It is now called Win32-SqlServer-install.pl (and not activeperl-copy.pl). Apart from the name change, you run it as in earlier versions.</P>
 <UL>
@@ -309,7 +338,7 @@ source distribution for further details.
 
 <HR>
 <I>
-Last updated <!--$$Modtime:--> 19-07-22 22:54 <!-- $-->
+Last updated <!--$$Modtime:--> 21-07-16 23:16 <!-- $-->
 </I>
 </BODY>
 </HTML>

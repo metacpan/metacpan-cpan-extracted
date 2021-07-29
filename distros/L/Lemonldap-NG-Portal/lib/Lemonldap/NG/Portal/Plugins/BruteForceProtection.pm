@@ -7,12 +7,12 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_WAIT
 );
 
-our $VERSION = '2.0.10';
+our $VERSION = '2.0.12';
 
 extends 'Lemonldap::NG::Portal::Main::Plugin';
 
 # INITIALIZATION
-use constant aroundSub => { authenticate => 'check' };
+use constant afterSub => { setPersistentSessionInfo => 'run' };
 
 has lockTimes => (
     is      => 'rw',
@@ -61,7 +61,9 @@ sub init {
           sort { $a <=> $b }
           map {
             $_ =~ s/\D//;
-            abs $_ < $self->conf->{bruteForceProtectionMaxLockTime} ? abs $_ : ()
+            abs $_ < $self->conf->{bruteForceProtectionMaxLockTime}
+              ? abs $_
+              : ()
           }
           grep { /\d+/ }
           split /\s*,\s*/, $self->conf->{bruteForceProtectionLockTimes};
@@ -99,13 +101,9 @@ sub init {
 }
 
 # RUNNING METHOD
-sub check {
-    my ( $self, $sub, $req ) = @_;
-    my $now = time;
-    $self->p->setSessionInfo($req);
-    $self->logger->debug("Retrieve $req->{user} logins history");
-    $self->p->setPersistentSessionInfo( $req, $req->{user} );
-
+sub run {
+    my ( $self, $req ) = @_;
+    my $now         = time;
     my $countFailed = my @failedLogins =
       map { ( $now - $_->{_utime} ) <= $self->maxAge ? $_ : () }
       @{ $req->sessionInfo->{_loginHistory}->{failedLogin} };
@@ -115,7 +113,7 @@ sub check {
     my $lastFailedLoginEpoch = $failedLogins[0]->{_utime} || undef;
 
     if ( $self->conf->{bruteForceProtectionIncrementalTempo} ) {
-        return $sub->($req) unless $lastFailedLoginEpoch;
+        return PE_OK unless $lastFailedLoginEpoch;
 
         # Delta between current attempt and last failed login
         my $delta = $now - $lastFailedLoginEpoch;
@@ -148,10 +146,10 @@ sub check {
             $req->lockTime( $waitingTime - $delta );
             return PE_WAIT;
         }
-        return $sub->($req);
+        return PE_OK;
     }
 
-    return $sub->($req)
+    return PE_OK
       if ( $countFailed < $self->maxFailed );
 
     # Delta between current attempt and last failed login
@@ -159,7 +157,7 @@ sub check {
     $self->logger->debug(" -> Delta = $delta");
 
     # Delta < Tempo => wait
-    return $sub->($req)
+    return PE_OK
       unless ( $delta < $self->conf->{bruteForceProtectionTempo}
         && $countFailed );
 

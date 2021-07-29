@@ -1,3 +1,11 @@
+1.062.000  2021-04-15  Released-By: PERLANCAR; Urgency: medium
+
+	   - Add cookbook items: sampling some random
+	     {authors,modules,distributions,releases}.
+
+	   - Minor grammar fixes.
+
+
 1.058.000  2020-05-29  Released-By: PERLANCAR; Urgency: medium
 
            - Update to App::lcpan 1.058 (some renamed options).

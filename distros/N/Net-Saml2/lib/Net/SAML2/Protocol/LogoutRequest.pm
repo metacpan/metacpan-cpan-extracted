@@ -15,17 +15,19 @@ has 'nameid_format' => (isa => NonEmptySimpleStr, is => 'ro', required => 1);
 sub new_from_xml {
     my ($class, %args) = @_;
 
-    my $xpath = XML::XPath->new( xml => no_comments($args{xml}) );
-    $xpath->set_namespace('saml', 'urn:oasis:names:tc:SAML:2.0:assertion');
-    $xpath->set_namespace('samlp', 'urn:oasis:names:tc:SAML:2.0:protocol');
+    my $dom = no_comments($args{xml});
+
+    my $xpath = XML::LibXML::XPathContext->new($dom);
+    $xpath->registerNs('saml', 'urn:oasis:names:tc:SAML:2.0:assertion');
+    $xpath->registerNs('samlp', 'urn:oasis:names:tc:SAML:2.0:protocol');
 
     my $self = $class->new(
-        id            => $xpath->findvalue('/samlp:LogoutRequest/@ID')->value,
-        session       => $xpath->findvalue('/samlp:LogoutRequest/samlp:SessionIndex')->value,
-        issuer        => $xpath->findvalue('/samlp:LogoutRequest/saml:Issuer')->value,
-        nameid        => $xpath->findvalue('/samlp:LogoutRequest/saml:NameID')->value,
-        nameid_format => $xpath->findvalue('/samlp:LogoutRequest/saml:NameID/@Format')->value,
-        destination   => $xpath->findvalue('/samlp:LogoutRequest/saml:NameID/@NameQualifier')->value,
+        id            => $xpath->findvalue('/samlp:LogoutRequest/@ID'),
+        session       => $xpath->findvalue('/samlp:LogoutRequest/samlp:SessionIndex'),
+        issuer        => $xpath->findvalue('/samlp:LogoutRequest/saml:Issuer'),
+        nameid        => $xpath->findvalue('/samlp:LogoutRequest/saml:NameID'),
+        nameid_format => $xpath->findvalue('/samlp:LogoutRequest/saml:NameID/@Format'),
+        destination   => $xpath->findvalue('/samlp:LogoutRequest/saml:NameID/@NameQualifier'),
     );
 
     return $self;
@@ -78,7 +80,7 @@ Net::SAML2::Protocol::LogoutRequest
 
 =head1 VERSION
 
-version 0.34
+version 0.40
 
 =head1 SYNOPSIS
 
@@ -145,17 +147,11 @@ Returns the LogoutRequest as XML.
 
 =head1 AUTHOR
 
-Original Author: Chris Andrews  <chrisa@cpan.org>
+Chris Andrews  <chrisa@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Chris Andrews and Others; in detail:
-
-  Copyright 2010-2011  Chris Andrews
-            2012       Peter Marschall
-            2017       Alessandro Ranellucci
-            2019-2020  Timothy Legge
-
+This software is copyright (c) 2021 by Chris Andrews and Others, see the git log.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

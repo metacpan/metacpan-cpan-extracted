@@ -35,14 +35,18 @@ You shouldn't make instances of this class. Each attribute should be used as a n
       DryRun  => 1,    # OPTIONAL
       Filters => [
         {
-          Name   => 'MyString',
-          Values => [ 'MyString', ... ],    # OPTIONAL
+          Name   => 'MyString',    # OPTIONAL
+          Values => [
+            'MyString', ...        # OPTIONAL
+          ],    # OPTIONAL
         },
         ...
       ],    # OPTIONAL
-      MaxResults   => 1,                      # OPTIONAL
-      NextToken    => 'MyString',             # OPTIONAL
-      ServiceNames => [ 'MyString', ... ],    # OPTIONAL
+      MaxResults   => 1,             # OPTIONAL
+      NextToken    => 'MyString',    # OPTIONAL
+      ServiceNames => [
+        'MyString', ...              # OPTIONAL
+      ],    # OPTIONAL
     );
 
     # Results:
@@ -76,6 +80,10 @@ One or more filters.
 =item *
 
 C<service-name> - The name of the service.
+
+=item *
+
+C<service-type> - The type of service (C<Interface> | C<Gateway>).
 
 =item *
 

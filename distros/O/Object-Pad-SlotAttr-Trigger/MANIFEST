@@ -1,0 +1,13 @@
+Build.PL
+Changes
+include/object_pad.h
+lib/Object/Pad/SlotAttr/Trigger.pm
+lib/Object/Pad/SlotAttr/Trigger.xs
+MANIFEST			This list of files
+t/00use.t
+t/01trigger.t
+t/99pod.t
+README
+LICENSE
+META.yml
+META.json

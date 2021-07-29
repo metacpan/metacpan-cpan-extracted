@@ -8,7 +8,7 @@
 
 package MojoX::Log::Report;
 use vars '$VERSION';
-$VERSION = '1.32';
+$VERSION = '1.33';
 
 use Mojo::Base 'Mojo::Log';  # implies use strict etc
 

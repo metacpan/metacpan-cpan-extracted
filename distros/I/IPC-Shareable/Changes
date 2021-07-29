@@ -1,5 +1,22 @@
 Revision history for Perl extension IPC::Shareable.
 
+1.05    2021-07-16
+    - Bump prereq version of Test::SharedFork to 0.35
+    - Added ability to use JSON as the serializer
+    - Added ipcs()
+    - Added test to ensure we croak if data size is greater than segment size
+    - Added 'tidy' attribute, removes unneeded nested structure segments
+    - In SharedMem, added _key attribute, and added set/get methods
+    - Changed key generation from using padding, pack and unpack to using
+      String::CRC32's crc32(), which allows arbitrary, unpadded strings
+    - Added attributes() allows fetching one, or all of the object's atttributes
+    - Added 'limit' attribute, by setting false, allows a user to set a segment
+      size larger than our internal 1GB default
+    - Cleaned up exception throwing (particularly if seg size eats up all
+      memory, we throw an appropriate message)
+    - Display proper exception if we try to exhaust all available shared memory
+      segments (fixes #3)
+
 1.04    2021-06-28
     - Skip unspawn tests for perls with -Duselongdouble, as Storable is not
       compatible storing/retrieving such numbers (closes #5)
@@ -25,6 +42,7 @@ Revision history for Perl extension IPC::Shareable.
       croaking
 
 1.00    2021-06-09
+    - Project adopted by Steve Bertrand
     - Added global_register() and process_register() to return the
       registries of active segments and semaphores
     - Added seg() and sem() methods, returns the structure of a shared

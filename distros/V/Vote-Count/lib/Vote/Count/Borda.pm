@@ -7,13 +7,13 @@ package Vote::Count::Borda;
 
 use Moose::Role;
 
-our $VERSION='2.00';
+our $VERSION='2.01';
 
 =head1 NAME
 
 Vote::Count::Borda
 
-=head1 VERSION 2.00
+=head1 VERSION 2.01
 
 =cut
 
@@ -190,6 +190,8 @@ BORDALOOPACTIVE:
   }
   return Vote::Count::RankCount->Rank($BordaCounted);
 }
+
+sub borda { Borda(@_) }
 
 1;
 

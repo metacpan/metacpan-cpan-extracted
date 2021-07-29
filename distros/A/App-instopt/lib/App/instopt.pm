@@ -1,9 +1,9 @@
 package App::instopt;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-04-24'; # DATE
+our $DATE = '2021-07-25'; # DATE
 our $DIST = 'App-instopt'; # DIST
-our $VERSION = '0.019'; # VERSION
+our $VERSION = '0.020'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -811,9 +811,8 @@ sub cleanup_download_dir {
   SW:
     for my $row (@{ $res->[2] }) {
         my $sw = $row->{software};
-        next unless $row->{all_versions};
-        for my $arch (sort keys %{ $row->{all_versions} }) {
-            my @vers = @{ $row->{all_versions}{$arch} };
+        for my $arch (sort keys %{ $row->{downloaded_versions} }) {
+            my @vers = @{ $row->{downloaded_versions}{$arch} };
             unless (@vers > 1) {
                 log_trace "Skipping software '$sw' arch '$arch' (<2 versions)";
                 next SW;
@@ -1117,7 +1116,7 @@ App::instopt - Download and install software
 
 =head1 VERSION
 
-This document describes version 0.019 of App::instopt (from Perl distribution App-instopt), released on 2021-04-24.
+This document describes version 0.020 of App::instopt (from Perl distribution App-instopt), released on 2021-07-25.
 
 =head1 SYNOPSIS
 
@@ -1130,7 +1129,7 @@ See L<instopt> script.
 
 Usage:
 
- cleanup_download_dir(%args) -> [status, msg, payload, meta]
+ cleanup_download_dir(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Remove older versions of downloaded software.
 
@@ -1164,12 +1163,12 @@ Pass -dry_run=E<gt>1 to enable simulation mode.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -1179,7 +1178,7 @@ Return value:  (any)
 
 Usage:
 
- cleanup_install_dir(%args) -> [status, msg, payload, meta]
+ cleanup_install_dir(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Remove inactive versions of installed software.
 
@@ -1213,12 +1212,12 @@ Pass -dry_run=E<gt>1 to enable simulation mode.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -1228,7 +1227,7 @@ Return value:  (any)
 
 Usage:
 
- compare_versions(%args) -> [status, msg, payload, meta]
+ compare_versions(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Compare installed vs downloaded vs latest versions of installed software.
 
@@ -1249,12 +1248,12 @@ Arguments ('*' denotes required arguments):
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -1264,7 +1263,7 @@ Return value:  (any)
 
 Usage:
 
- download(%args) -> [status, msg, payload, meta]
+ download(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Download latest version of one or more software.
 
@@ -1289,12 +1288,12 @@ Arguments ('*' denotes required arguments):
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -1304,7 +1303,7 @@ Return value:  (any)
 
 Usage:
 
- download_all(%args) -> [status, msg, payload, meta]
+ download_all(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Download latest version of all known software.
 
@@ -1327,12 +1326,12 @@ Arguments ('*' denotes required arguments):
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -1342,7 +1341,7 @@ Return value:  (any)
 
 Usage:
 
- is_downloaded_any(%args) -> [status, msg, payload, meta]
+ is_downloaded_any(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Check if any version of a software is downloaded.
 
@@ -1370,12 +1369,12 @@ Arguments ('*' denotes required arguments):
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -1385,7 +1384,7 @@ Return value:  (any)
 
 Usage:
 
- is_downloaded_latest(%args) -> [status, msg, payload, meta]
+ is_downloaded_latest(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Check if latest version of a software has been downloaded.
 
@@ -1413,12 +1412,12 @@ Arguments ('*' denotes required arguments):
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -1428,7 +1427,7 @@ Return value:  (any)
 
 Usage:
 
- is_installed_any(%args) -> [status, msg, payload, meta]
+ is_installed_any(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Check if any version of a software is installed.
 
@@ -1456,12 +1455,12 @@ Arguments ('*' denotes required arguments):
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -1471,7 +1470,7 @@ Return value:  (any)
 
 Usage:
 
- is_installed_latest(%args) -> [status, msg, payload, meta]
+ is_installed_latest(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Check if latest version of a software is installed.
 
@@ -1499,12 +1498,12 @@ Arguments ('*' denotes required arguments):
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -1514,7 +1513,7 @@ Return value:  (any)
 
 Usage:
 
- list(%args) -> [status, msg, payload, meta]
+ list(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 List software.
 
@@ -1524,22 +1523,22 @@ Examples:
 
 =item * List software that are installed but out-of-date:
 
- list( installed => 1, latest_installed => 0);
+ list(installed => 1, latest_installed => 0);
 
 Result:
 
  [
    500,
-   "Function died: Failed to change directory to '/home/u1/software': No such file or directory at lib/App/instopt.pm line 331.\n",
+   "Function died: Failed to change directory to '/home/s1/software': No such file or directory at lib/App/instopt.pm line 331.\n",
    undef,
    {
      logs => [
        {
-         file    => "/home/u1/perl5/perlbrew/perls/perl-5.30.0/lib/site_perl/5.30.0/Perinci/Access/Schemeless.pm",
+         file    => "/home/s1/perl5/perlbrew/perls/perl-5.30.2/lib/site_perl/5.30.2/Perinci/Access/Schemeless.pm",
          func    => "Perinci::Access::Schemeless::action_call",
-         line    => 494,
+         line    => 501,
          package => "Perinci::Access::Schemeless",
-         time    => 1619270870,
+         time    => 1627177634,
          type    => "create",
        },
      ],
@@ -1548,11 +1547,11 @@ Result:
 
 =item * List software that have been downloaded but out-of-date:
 
- list( downloaded => 1, latest_downloaded => 0); # -> [200, "OK", [], {}]
+ list(downloaded => 1, latest_downloaded => 0); # -> [200, "OK", [], {}]
 
 =item * List software that have their latest version downloaded but not installed:
 
- list( latest_downloaded => 1, latest_installed => 0); # -> [200, "OK", [], {}]
+ list(latest_downloaded => 1, latest_installed => 0); # -> [200, "OK", [], {}]
 
 =back
 
@@ -1603,12 +1602,12 @@ version installed, will be included.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -1618,7 +1617,7 @@ Return value:  (any)
 
 Usage:
 
- list_downloaded(%args) -> [status, msg, payload, meta]
+ list_downloaded(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 List all downloaded software.
 
@@ -1643,12 +1642,12 @@ Arguments ('*' denotes required arguments):
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -1658,7 +1657,7 @@ Return value:  (any)
 
 Usage:
 
- list_downloaded_versions(%args) -> [status, msg, payload, meta]
+ list_downloaded_versions(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 List all downloaded versions of a software.
 
@@ -1683,12 +1682,12 @@ Arguments ('*' denotes required arguments):
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -1698,7 +1697,7 @@ Return value:  (any)
 
 Usage:
 
- list_installed(%args) -> [status, msg, payload, meta]
+ list_installed(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 List all installed software.
 
@@ -1721,12 +1720,12 @@ Arguments ('*' denotes required arguments):
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -1736,7 +1735,7 @@ Return value:  (any)
 
 Usage:
 
- list_installed_versions(%args) -> [status, msg, payload, meta]
+ list_installed_versions(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 List all installed versions of a software.
 
@@ -1759,12 +1758,12 @@ Arguments ('*' denotes required arguments):
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -1774,7 +1773,7 @@ Return value:  (any)
 
 Usage:
 
- update(%args) -> [status, msg, payload, meta]
+ update(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Update a software to the latest version.
 
@@ -1801,12 +1800,12 @@ Whether to download latest version from URLor just find from download dir.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -1816,7 +1815,7 @@ Return value:  (any)
 
 Usage:
 
- update_all(%args) -> [status, msg, payload, meta]
+ update_all(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Update all installed software.
 
@@ -1841,12 +1840,12 @@ Whether to download latest version from URLor just find from download dir.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -1860,7 +1859,7 @@ Source repository is at L<https://github.com/perlancar/perl-App-instopt>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-App-instopt/issues>
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-instopt>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -1869,6 +1868,26 @@ feature.
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTORS
+
+=for stopwords James Raspass liana (on netbook-dell-xps13) perlancar pc-office)
+
+=over 4
+
+=item *
+
+James Raspass <jraspass@gmail.com>
+
+=item *
+
+liana (on netbook-dell-xps13) <lianamelati88@gmail.com>
+
+=item *
+
+perlancar (on pc-office) <perlancar@gmail.com>
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 

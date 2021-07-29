@@ -4,7 +4,7 @@
       "Deriv Services Ltd <DERIV@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.023, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -56,11 +56,11 @@
             "Check::UnitCheck" : "0",
             "Class::Method::Modifiers" : "0",
             "Config::Any" : "0.32",
-            "Database::Async" : "0.014",
+            "Database::Async" : "0.015",
             "Database::Async::Engine::PostgreSQL" : "0.011",
             "Devel::MAT::Dumper" : "0",
             "Future" : "0.47",
-            "Future::AsyncAwait" : "0.51",
+            "Future::AsyncAwait" : "0.52",
             "Future::Queue" : "0",
             "Getopt::Long" : "0",
             "Heap" : "0.80",
@@ -74,31 +74,32 @@
             "Log::Any::Adapter" : "1.709",
             "Log::Any::Adapter::OpenTracing" : "0.001",
             "Math::Random::Secure" : "0",
-            "Metrics::Any" : "0.06",
-            "Metrics::Any::Adapter::DogStatsd" : "0.03",
+            "Metrics::Any" : "0.07",
+            "Metrics::Any::Adapter::Statsd" : "0.03",
             "Module::Load" : "0",
             "Module::Pluggable::Object" : "0",
             "Module::Runtime" : "0",
             "Net::Async::HTTP" : "0.48",
             "Net::Async::HTTP::Server" : "0.13",
             "Net::Async::OpenTracing" : "1.000",
-            "Net::Async::Redis" : "3.013",
+            "Net::Async::Redis" : "3.014",
             "Net::Async::SMTP" : "0.002",
-            "Object::Pad" : "0.40",
+            "Object::Pad" : "0.46",
             "OpenTracing::Any" : "1.003",
             "Pod::Simple::Text" : "0",
             "Pod::Usage" : "0",
             "Role::Tiny" : "2.002004",
-            "Ryu" : "3.000",
+            "Ryu" : "3.002",
             "Ryu::Async" : "0.019",
             "Scope::Guard" : "0",
             "Syntax::Keyword::Defer" : "0.05",
             "Syntax::Keyword::Dynamically" : "0.08",
+            "Syntax::Keyword::Match" : "0.04",
             "Syntax::Keyword::Try" : "0.25",
             "Sys::Hostname" : "0",
             "Time::Moment" : "0.44",
             "Unicode::UTF8" : "0",
-            "XS::Parse::Keyword" : "0.06",
+            "XS::Parse::Keyword" : "0.10",
             "YAML::XS" : "0.83",
             "bareword::filehandles" : "0",
             "curry" : "1.001",
@@ -132,191 +133,195 @@
    "provides" : {
       "Myriad" : {
          "file" : "lib/Myriad.pm",
-         "version" : "0.008"
+         "version" : "0.010"
       },
       "Myriad::API" : {
          "file" : "lib/Myriad/API.pm",
-         "version" : "0.008"
+         "version" : "0.010"
       },
       "Myriad::Bootstrap" : {
          "file" : "lib/Myriad/Bootstrap.pm",
-         "version" : "0.008"
+         "version" : "0.010"
       },
       "Myriad::Class" : {
          "file" : "lib/Myriad/Class.pm",
-         "version" : "0.008"
+         "version" : "0.010"
       },
       "Myriad::Commands" : {
          "file" : "lib/Myriad/Commands.pm",
-         "version" : "0.008"
+         "version" : "0.010"
       },
       "Myriad::Config" : {
          "file" : "lib/Myriad/Config.pm",
-         "version" : "0.008"
+         "version" : "0.010"
       },
       "Myriad::Exception" : {
          "file" : "lib/Myriad/Exception.pm",
-         "version" : "0.008"
+         "version" : "0.010"
       },
       "Myriad::Exception::Base" : {
          "file" : "lib/Myriad/Exception/Base.pm",
-         "version" : "0.008"
+         "version" : "0.010"
       },
       "Myriad::Exception::Builder" : {
          "file" : "lib/Myriad/Exception/Builder.pm",
-         "version" : "0.008"
+         "version" : "0.010"
       },
       "Myriad::Exception::General" : {
          "file" : "lib/Myriad/Exception/General.pm",
-         "version" : "0.008"
+         "version" : "0.010"
       },
       "Myriad::Exception::InternalError" : {
          "file" : "lib/Myriad/Exception/InternalError.pm",
-         "version" : "0.008"
+         "version" : "0.010"
       },
       "Myriad::Plugin" : {
          "file" : "lib/Myriad/Plugin.pm",
-         "version" : "0.008"
+         "version" : "0.010"
       },
       "Myriad::RPC" : {
          "file" : "lib/Myriad/RPC.pm",
-         "version" : "0.008"
+         "version" : "0.010"
       },
       "Myriad::RPC::Client" : {
          "file" : "lib/Myriad/RPC/Client.pm",
-         "version" : "0.008"
+         "version" : "0.010"
       },
       "Myriad::RPC::Client::Implementation::Memory" : {
          "file" : "lib/Myriad/RPC/Client/Implementation/Memory.pm",
-         "version" : "0.008"
+         "version" : "0.010"
       },
       "Myriad::RPC::Client::Implementation::Redis" : {
          "file" : "lib/Myriad/RPC/Client/Implementation/Redis.pm",
-         "version" : "0.008"
+         "version" : "0.010"
       },
       "Myriad::RPC::Implementation::Memory" : {
          "file" : "lib/Myriad/RPC/Implementation/Memory.pm",
-         "version" : "0.008"
+         "version" : "0.010"
       },
       "Myriad::RPC::Implementation::Redis" : {
          "file" : "lib/Myriad/RPC/Implementation/Redis.pm",
-         "version" : "0.008"
+         "version" : "0.010"
       },
       "Myriad::RPC::Message" : {
          "file" : "lib/Myriad/RPC/Message.pm",
-         "version" : "0.008"
+         "version" : "0.010"
       },
       "Myriad::Redis::Pending" : {
          "file" : "lib/Myriad/Redis/Pending.pm",
-         "version" : "0.008"
+         "version" : "0.010"
       },
       "Myriad::Registry" : {
          "file" : "lib/Myriad/Registry.pm",
-         "version" : "0.008"
+         "version" : "0.010"
+      },
+      "Myriad::Role" : {
+         "file" : "lib/Myriad/Role.pm",
+         "version" : "0.010"
       },
       "Myriad::Role::RPC" : {
          "file" : "lib/Myriad/Role/RPC.pm",
-         "version" : "0.008"
+         "version" : "0.010"
       },
       "Myriad::Role::Storage" : {
          "file" : "lib/Myriad/Role/Storage.pm",
-         "version" : "0.008"
+         "version" : "0.010"
       },
       "Myriad::Role::Subscription" : {
          "file" : "lib/Myriad/Role/Subscription.pm",
-         "version" : "0.008"
+         "version" : "0.010"
       },
       "Myriad::Service" : {
          "file" : "lib/Myriad/Service.pm",
-         "version" : "0.008"
+         "version" : "0.010"
       },
       "Myriad::Service::Attributes" : {
          "file" : "lib/Myriad/Service/Attributes.pm",
-         "version" : "0.008"
+         "version" : "0.010"
       },
       "Myriad::Service::Implementation" : {
          "file" : "lib/Myriad/Service/Implementation.pm",
-         "version" : "0.008"
+         "version" : "0.010"
       },
       "Myriad::Service::Remote" : {
          "file" : "lib/Myriad/Service/Remote.pm",
-         "version" : "0.008"
+         "version" : "0.010"
       },
       "Myriad::Service::Storage" : {
          "file" : "lib/Myriad/Service/Storage.pm",
-         "version" : "0.008"
+         "version" : "0.010"
       },
       "Myriad::Service::Storage::Remote" : {
          "file" : "lib/Myriad/Service/Storage/Remote.pm",
-         "version" : "0.008"
+         "version" : "0.010"
       },
       "Myriad::Storage" : {
          "file" : "lib/Myriad/Storage.pm",
-         "version" : "0.008"
+         "version" : "0.010"
       },
       "Myriad::Storage::Implementation::Memory" : {
          "file" : "lib/Myriad/Storage/Implementation/Memory.pm",
-         "version" : "0.008"
+         "version" : "0.010"
       },
       "Myriad::Storage::Implementation::Redis" : {
          "file" : "lib/Myriad/Storage/Implementation/Redis.pm",
-         "version" : "0.008"
+         "version" : "0.010"
       },
       "Myriad::Subscription" : {
          "file" : "lib/Myriad/Subscription.pm",
-         "version" : "0.008"
+         "version" : "0.010"
       },
       "Myriad::Subscription::Implementation::Memory" : {
          "file" : "lib/Myriad/Subscription/Implementation/Memory.pm",
-         "version" : "0.008"
+         "version" : "0.010"
       },
       "Myriad::Subscription::Implementation::Redis" : {
          "file" : "lib/Myriad/Subscription/Implementation/Redis.pm",
-         "version" : "0.008"
+         "version" : "0.010"
       },
       "Myriad::Transport::HTTP" : {
          "file" : "lib/Myriad/Transport/HTTP.pm",
-         "version" : "0.008"
+         "version" : "0.010"
       },
       "Myriad::Transport::Memory" : {
          "file" : "lib/Myriad/Transport/Memory.pm",
-         "version" : "0.008"
+         "version" : "0.010"
       },
       "Myriad::Transport::PostgreSQL" : {
          "file" : "lib/Myriad/Transport/PostgreSQL.pm",
-         "version" : "0.008"
+         "version" : "0.010"
       },
       "Myriad::Transport::Redis" : {
          "file" : "lib/Myriad/Transport/Redis.pm",
-         "version" : "0.008"
+         "version" : "0.010"
       },
       "Myriad::UI::Readline" : {
          "file" : "lib/Myriad/UI/Readline.pm",
-         "version" : "0.008"
+         "version" : "0.010"
       },
       "Myriad::Util::Defer" : {
          "file" : "lib/Myriad/Util/Defer.pm",
-         "version" : "0.008"
+         "version" : "0.010"
       },
       "Myriad::Util::Secret" : {
          "file" : "lib/Myriad/Util/Secret.pm",
-         "version" : "0.008"
+         "version" : "0.010"
       },
       "Myriad::Util::UUID" : {
          "file" : "lib/Myriad/Util/UUID.pm",
-         "version" : "0.008"
+         "version" : "0.010"
       },
       "Test::Myriad" : {
          "file" : "lib/Test/Myriad.pm",
-         "version" : "0.008"
+         "version" : "0.010"
       },
       "Test::Myriad::Service" : {
          "file" : "lib/Test/Myriad/Service.pm",
-         "version" : "0.008"
+         "version" : "0.010"
       },
       "yriad" : {
          "file" : "lib/yriad.pm",
-         "version" : "0.008"
+         "version" : "0.010"
       }
    },
    "release_status" : "stable",
@@ -331,7 +336,7 @@
          "web" : "https://github.com/binary-com/perl-Myriad"
       }
    },
-   "version" : "0.008",
+   "version" : "0.010",
    "x_authority" : "cpan:DERIV",
    "x_contributors" : [
       "Tom Molesworth <tom@binary.com>",
@@ -341,7 +346,7 @@
       "ea-binary <52806974+ea-binary@users.noreply.github.com>"
    ],
    "x_generated_by_perl" : "v5.32.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.25",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.26",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

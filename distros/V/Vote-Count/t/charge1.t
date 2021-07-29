@@ -20,43 +20,7 @@ use Vote::Count::ReadBallots 'read_ballots', 'read_range_ballots';
 use Test2::Tools::Exception qw/dies lives/;
 use Test2::Tools::Warnings qw/warns warning warnings no_warnings/;
 
-use Data::Dumper;
-
-subtest '_setTieBreaks' => sub {
-  my $A = Vote::Count::Charge->new(
-    Seats     => 5,
-    VoteValue => 100,
-    BallotSet => read_ballots('t/data/data1.txt')
-  );
-  like(
-    $A->logd(),
-    qr/TieBreakMethod is undefined, setting to precedence/,
-    "Logged: TieBreakMethod is undefined, setting to precedence"
-  );
-  note(
-    'this subtest is just for coverage, but did find error by writing it.');
-  my $B = Vote::Count::Charge->new(
-    BallotSet      => read_ballots('t/data/data1.txt'),
-    Seats          => 2,
-    VoteValue      => 1000000,
-    TieBreakMethod => 'grandjunction',
-    PrecedenceFile => 't/data/tiebreakerprecedence1.txt',
-  );
-  is( $B->TieBreakMethod, 'grandjunction', 'correct tiebreaker reported' );
-  is(
-    $B->PrecedenceFile,
-    't/data/tiebreakerprecedence1.txt',
-    'correct precedencefile reported'
-  );
-  my $C = Vote::Count::Charge->new(
-    BallotSet      => read_ballots('t/data/data1.txt'),
-    TieBreakMethod => 'precedence',
-    Seats          => 4,
-  );
-  is( $C->TieBreakMethod, 'precedence', 'correct tiebreaker reported' );
-  is( $C->PrecedenceFile, '/tmp/precedence.txt',
-    'precedencefile set when missing' );
-};
+# use Data::Dumper;
 
 subtest '_inits' => sub {
   my $D = Vote::Count::Charge->new(

@@ -1,5 +1,5 @@
 package Getopt::EX::Long;
-use version; our $VERSION = version->declare("v1.23.3");
+use version; our $VERSION = version->declare("v1.24.1");
 
 use v5.14;
 use warnings;
@@ -44,7 +44,14 @@ sub GetOptionsFromArray {
 
     $loader->deal_with($argv);
 
-    push @_, $loader->builtins;
+    my @builtins = do {
+	if (ref $_[1] eq 'HASH') {
+	    $loader->hashed_builtins($_[1]);
+	} else {
+	    $loader->builtins;
+	}
+    };
+    push @_, @builtins;
 
     goto &Getopt::Long::GetOptionsFromArray;
 }
@@ -119,7 +126,7 @@ sub new {
     while (defined (my $i = first { $_[$_] eq 'exconfig' } 0 .. $#_)) {
 	push @exconfig, @{ (splice @_, $i, 2)[1] };
     }
-    if (@exconfig == 0 and $Getopt::EX::Long::AUTO_DEFAULT) {
+    if (@exconfig == 0 and $ConfigOption{AUTO_DEFAULT}) {
 	@exconfig = Getopt::EX::Long::get_default();
     }
 
@@ -137,7 +144,14 @@ sub getoptionsfromarray {
 
     $loader->deal_with($argv);
 
-    push @_, $loader->builtins;
+    my @builtins = do {
+	if (ref $_[1] eq 'HASH') {
+	    $loader->hashed_builtins($_[1]);
+	} else {
+	    $loader->builtins;
+	}
+    };
+    push @_, @builtins;
 
     $obj->SUPER::getoptionsfromarray(@_);
 }
@@ -200,6 +214,9 @@ same as rc file.  So you can define arbitrary option there.  Combined
 with startup function call described above, it is possible to control
 module behavior by user defined option.
 
+As for start-up file and Module specification, read
+L<Getopt::EX::Module> document for detail.
+
 =head1 CONFIG OPTIONS
 
 Config options are set by B<Getopt::ExConfigure> or B<exconfig>
@@ -227,4 +244,5 @@ be exported.
 
 =head1 SEE ALSO
 
-L<Getopt::EX>
+L<Getopt::EX>,
+L<Getopt::EX::Module>

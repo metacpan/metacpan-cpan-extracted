@@ -22,8 +22,9 @@ no_index:
 requires:
   JSON: '0'
   Moose: '0'
+  Package::Alias: '0'
   REST::Client: '0'
   Time::Piece: '0'
   perl: '5.01'
-version: '0.096'
+version: '0.101'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

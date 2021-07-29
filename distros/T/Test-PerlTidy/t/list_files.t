@@ -12,7 +12,6 @@ my @wanted_files = sort qw(
   Makefile.PL
   lib/Test/PerlTidy.pm
   t/00-compile.t
-  t/critic.t
   t/exclude_files.t
   t/exclude_perltidy.t
   t/is_file_tidy.t

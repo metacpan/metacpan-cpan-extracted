@@ -1,9 +1,9 @@
 package Sah::SchemaR::sah::clause_set;
 
-our $DATE = '2020-05-08'; # DATE
-our $VERSION = '0.9.49.1'; # VERSION
+our $DATE = '2021-07-23'; # DATE
+our $VERSION = '0.9.50.0'; # VERSION
 
-our $rschema = ["hash",[{allowed_keys_re=>"\\A(\\.\\w+(\\.\\w+)*|\\w+(\\.\\w+)*(\\([a-z]{2}(_[A-Z]{2})?\\))?)\\z",keys=>{caption=>["str",{req=>1},{}],default_lang=>["str",{match=>"\\A[a-z]{2}(_[A-Z]{2})?\\z",req=>1},{}],defhash_v=>["int",{default=>1,req=>1},{}],description=>["str",{req=>1},{}],name=>["str",{clset=>[{match=>"\\A\\w+\\z","match.err_level"=>"warn","match.err_msg"=>"should be a word"},{max_len=>32,"max_len.err_level"=>"warn","max_len.err_msg"=>"should be short"}],"clset.op"=>"and",req=>1},{}],summary=>["str",{clset=>[{max_len=>72,"max_len.err_level"=>"warn","max_len.err_msg"=>"should be short"},{match=>qr(\n),"match.err_level"=>"warn","match.err_msg"=>"should only be a single-line text","match.op"=>"not"}],"clset.op"=>"and",req=>1},{}],tags=>["array",{of=>["any",{of=>[["str",{req=>1},{}],["defhash",{req=>1},{}]],req=>1},{}]},{}],v=>["float",{default=>1,req=>1},{}],x=>["any",{},{}]},"keys.restrict"=>0,summary=>"DefHash"},{_prop=>{clause=>{},clset=>{},default_lang=>{},defhash_v=>{},description=>{},examples=>{},invalid_examples=>{},name=>{},summary=>{},tags=>{},v=>{},x=>{}}}],["defhash","hash"]];
+our $rschema = ["hash",[{allowed_keys_re=>qr(\A(?:([A-Za-z_][A-Za-z0-9_]*)|([A-Za-z_][A-Za-z0-9_]*)?\.([A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z_][A-Za-z0-9_]*)*))\z),examples=>[{valid=>1,value=>{}},{valid=>1,value=>{bar=>1,foo=>1}},{summary=>"Invalid property syntax, contains dash",valid=>0,value=>{"foo-bar"=>1}}],keys=>{caption=>["str",{req=>1}],default_lang=>["str",{match=>"\\A[a-z]{2}(_[A-Z]{2})?\\z",req=>1},{}],defhash_v=>["int",{default=>1,req=>1}],description=>["str",{req=>1}],name=>["str",{clset=>[{match=>"\\A\\w+\\z","match.err_level"=>"warn","match.err_msg"=>"should be a word"},{max_len=>32,"max_len.err_level"=>"warn","max_len.err_msg"=>"should be short"}],"clset.op"=>"and",req=>1}],summary=>["str",{clset=>[{max_len=>72,"max_len.err_level"=>"warn","max_len.err_msg"=>"should be short"},{match=>qr(\n),"match.err_level"=>"warn","match.err_msg"=>"should only be a single-line text","match.op"=>"not"}],"clset.op"=>"and",req=>1}],tags=>["array",{of=>["any",{of=>[["str",{req=>1}],["hash",{req=>1}]],req=>1}]}],v=>["float",{default=>1,req=>1}],x=>["any",{},{}]},"keys.restrict"=>0,summary=>"DefHash"},{_prop=>{clause=>{},clset=>{},default_lang=>{},defhash_v=>{},description=>{},examples=>{},invalid_examples=>{},name=>{},summary=>{},tags=>{},v=>{},x=>{}},examples=>[{valid=>1,value=>{}},{valid=>1,value=>{max=>1,min=>1}}],keys=>{examples=>["any",{of=>[["sah::nondefhash_example",{}],["sah::defhash_example",{}]]}]},"keys.restrict"=>0}],["defhash","hash"]];
 
 1;
 # ABSTRACT: 
@@ -20,7 +20,7 @@ Sah::SchemaR::sah::clause_set -
 
 =head1 VERSION
 
-This document describes version 0.9.49.1 of Sah::SchemaR::sah::clause_set (from Perl distribution Sah-Schemas-Sah), released on 2020-05-08.
+This document describes version 0.9.50.0 of Sah::SchemaR::sah::clause_set (from Perl distribution Sah-Schemas-Sah), released on 2021-07-23.
 
 =head1 DESCRIPTION
 
@@ -50,7 +50,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -2,11 +2,14 @@ package Lemonldap::NG::Portal::UserDB::Remote;
 
 use strict;
 use Mouse;
-use Lemonldap::NG::Portal::Main::Constants qw(PE_OK);
+use Lemonldap::NG::Portal::Main::Constants 'PE_OK';
 
-our $VERSION = '2.0.11';
+our $VERSION = '2.0.12';
 
-extends 'Lemonldap::NG::Common::Module', 'Lemonldap::NG::Portal::Lib::Remote';
+extends qw(
+  Lemonldap::NG::Common::Module
+  Lemonldap::NG::Portal::Lib::Remote
+);
 
 # RUNNING METHODS
 
@@ -15,18 +18,19 @@ extends 'Lemonldap::NG::Common::Module', 'Lemonldap::NG::Portal::Lib::Remote';
 sub findUser {
 
     # Nothing to do here
-    PE_OK;
+    return PE_OK;
 }
 
 sub setSessionInfo {
     my ( $self, $req ) = @_;
     delete $req->data->{rSessionInfo}->{_session_id};
     $req->{sessionInfo} = $req->data->{rSessionInfo};
-    PE_OK;
+    
+    return PE_OK;
 }
 
 sub setGroups {
-    PE_OK;
+    return PE_OK;
 }
 
 1;

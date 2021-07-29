@@ -55,10 +55,10 @@ You shouldn't make instances of this class. Each attribute should be used as a n
     my $DisableApiTermination = $InstanceAttribute->DisableApiTermination;
     my $InstanceId            = $InstanceAttribute->InstanceId;
 
-    # Returns a L<Paws::EC2::InstanceAttribute> object.
-    # To describe the block device mapping for an instance
-    # This example describes the ``blockDeviceMapping`` attribute of the
-    # specified instance.
+  # Returns a L<Paws::EC2::InstanceAttribute> object.
+  # To describe the block device mapping for an instance
+  # This example describes the ``blockDeviceMapping`` attribute of the specified
+  # instance.
 
     my $InstanceAttribute = $ec2->DescribeInstanceAttribute(
       'Attribute'  => 'blockDeviceMapping',
@@ -83,7 +83,7 @@ The instance attribute.
 
 Note: The C<enaSupport> attribute is not supported at this time.
 
-Valid values are: C<"instanceType">, C<"kernel">, C<"ramdisk">, C<"userData">, C<"disableApiTermination">, C<"instanceInitiatedShutdownBehavior">, C<"rootDeviceName">, C<"blockDeviceMapping">, C<"productCodes">, C<"sourceDestCheck">, C<"groupSet">, C<"ebsOptimized">, C<"sriovNetSupport">, C<"enaSupport">
+Valid values are: C<"instanceType">, C<"kernel">, C<"ramdisk">, C<"userData">, C<"disableApiTermination">, C<"instanceInitiatedShutdownBehavior">, C<"rootDeviceName">, C<"blockDeviceMapping">, C<"productCodes">, C<"sourceDestCheck">, C<"groupSet">, C<"ebsOptimized">, C<"sriovNetSupport">, C<"enaSupport">, C<"enclaveOptions">
 
 =head2 DryRun => Bool
 

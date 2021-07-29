@@ -2,15 +2,15 @@ use strict;
 use warnings;
 
 use HTTP::BrowserDetect ();
-use List::Util qw();
-use Test::Most;
+use List::Util          ();
+use Test::More;
 
 my $detect = HTTP::BrowserDetect->new;
 
 my %names = $detect->_robot_names;
 my @ids   = $detect->all_robot_ids;
 my %fixup = $detect->_robot_ids;
-is( scalar @ids, 74, 'correct number of ids' );
+is( scalar @ids, 75, 'correct number of ids' );
 
 foreach my $id (@ids) {
     subtest $id => sub {

@@ -9,7 +9,7 @@ use parent qw{ Astro::App::Satpass2::Macro };
 
 use Astro::App::Satpass2::Utils qw{ quoter ARRAY_REF @CARP_NOT };
 
-our $VERSION = '0.047';
+our $VERSION = '0.048';
 
 sub execute {
     my ( $self, $name ) = @_;
@@ -24,7 +24,7 @@ sub execute {
 	    }
 	    1;
 	} or do {
-	    $satpass2->__wail( "$@" );
+	    $satpass2->__wail( $@ );
 	}
     }
     return $output;

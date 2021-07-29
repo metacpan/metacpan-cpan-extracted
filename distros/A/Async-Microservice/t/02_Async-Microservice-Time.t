@@ -37,6 +37,14 @@ subtest '/datetime' => sub {
     );
     is($dt_data->{time_zone_name}, 'CEST');
 
+    $mech->get_ok($service_url . 'datetime/Europe/London');
+    lives_ok(sub {$dt_data = $json->decode($mech->content)}, 'json content');
+    is($dt_data->{time_zone_name}, 'BST');
+
+    $mech->get_ok($service_url . 'datetime/EST');
+    lives_ok(sub {$dt_data = $json->decode($mech->content)}, 'json content');
+    is($dt_data->{time_zone}, '-0500');
+
     $mech->post($service_url . 'datetime', content => $json->encode({epoch => 10}));
     ok($mech->success, 'post with epoch timestamp');
     lives_ok(sub {$dt_data = $json->decode($mech->content)}, 'json content');
@@ -75,9 +83,9 @@ subtest '/sleep' => sub {
     my $dt_data;
     my $start_time = time();
     $mech->get_ok($service_url . 'sleep?duration=0.1');
-    cmp_ok(time() - $start_time, '>=', 0.1, 'duration waited');
-    lives_ok(sub {$dt_data = $json->decode($mech->content)}, 'json content');
-    cmp_ok($dt_data->{duration}, '>=', 0.1, 'duration returned back in json');
+    cmp_ok(time() - $start_time, '>', 0.09, 'duration waited');
+    lives_ok(sub {$dt_data = $json->decode($mech->content)}, 'json content') or diag $mech->content;
+    cmp_ok($dt_data->{duration}, '>', 0.09, 'duration returned back in json');
 };
 
 done_testing();

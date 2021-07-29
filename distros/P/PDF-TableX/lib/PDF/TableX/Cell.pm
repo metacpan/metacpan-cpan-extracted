@@ -31,7 +31,7 @@ sub _get_content { return PDF::API2->new()->page; }
 
 sub _get_min_width {
 	my ($self) = @_;
-	my $txt = $self->_pdf_api_content->text();
+	my $txt = PDF::API2->new()->page->text();
 	$txt->font( PDF::API2->new()->corefont( $self->font ), $self->font_size );
 	my $min_width = 0;
 	for (split(/\s/, $self->content)) {
@@ -43,7 +43,7 @@ sub _get_min_width {
 
 sub _get_reg_width {
 	my ($self) = @_;
-	my $txt = $self->_pdf_api_content->text();
+	my $txt = PDF::API2->new()->page->text();
 	$txt->font( PDF::API2->new()->corefont( $self->font ), $self->font_size );
 	my $reg_width = 0;
 	for (split("\n", $self->content)) {

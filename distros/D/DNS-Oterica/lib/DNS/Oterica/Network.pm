@@ -1,15 +1,17 @@
 package DNS::Oterica::Network;
 # ABSTRACT: a network to which results are served
-$DNS::Oterica::Network::VERSION = '0.312';
+$DNS::Oterica::Network::VERSION = '0.313';
 use Moose;
 
 use Net::IP;
 use Moose::Util::TypeConstraints;
 
 # TODO: move these to a types library
+# XXX: Wait, why does the first one not line-break before the second => ?
+#      Well, because if I do, it fails to parse on 5.14.  What??
+#      -- rjbs, 2021-07-11
 subtype 'DNS::Oterica::Type::Network'
-  => as Object
-  => where { $_->isa('Net::IP') };
+  => as Object => where { $_->isa('Net::IP') };
 
 coerce 'DNS::Oterica::Type::Network'
   => from 'Str'
@@ -105,7 +107,7 @@ DNS::Oterica::Network - a network to which results are served
 
 =head1 VERSION
 
-version 0.312
+version 0.313
 
 =head1 OVERVIEW
 

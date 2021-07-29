@@ -2725,18 +2725,6 @@
                         "type" : "int"
                      },
                      {
-                        "default" : 0,
-                        "id" : "totp2fDisplayExistingSecret",
-                        "title" : "totp2fDisplayExistingSecret",
-                        "type" : "bool"
-                     },
-                     {
-                        "default" : 0,
-                        "id" : "totp2fUserCanChangeKey",
-                        "title" : "totp2fUserCanChangeKey",
-                        "type" : "bool"
-                     },
-                     {
                         "default" : 1,
                         "id" : "totp2fUserCanRemoveKey",
                         "title" : "totp2fUserCanRemoveKey",

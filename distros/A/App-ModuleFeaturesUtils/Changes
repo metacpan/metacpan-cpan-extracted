@@ -1,0 +1,13 @@
+0.003   2021-02-25  Released-By: PERLANCAR; Urgency: medium
+
+	- Add CLIs: get-feature-set-spec, get-features-decl.
+
+
+0.002   2021-02-24  Released-By: PERLANCAR; Urgency: medium
+
+	- Refactor to use Module::FeaturesUtil::Get.
+
+
+0.001   2021-02-22  Released-By: PERLANCAR
+
+        - First release.

@@ -9,7 +9,7 @@ use AnyEvent::Handle;
 use Carp qw( confess );
 
 # ABSTRACT: Transfer class for asynchronous ftp client
-our $VERSION = '0.16'; # VERSION
+our $VERSION = '0.17'; # VERSION
 
 
 # TODO: implement ABOR
@@ -100,21 +100,21 @@ AnyEvent::FTP::Client::Transfer - Transfer class for asynchronous ftp client
 
 =head1 VERSION
 
-version 0.16
+version 0.17
 
 =head1 SYNOPSIS
 
  use AnyEvent::FTP::Client;
  my $client = AnyEvent::FTP::Client;
  $client->connect('ftp://ftp.cpan.org')->cb(sub {
-
+ 
    # $upload_transfer and $download_transfer are instances of
    # AnyEvent::FTP::Client::Transfer
    my $upload_transfer = $client->stor('remote_filename.txt', 'content');
-
+ 
    my $buffer;
    my $download_transfer = $client->retr('remote_filename.txt', \$buffer);
-
+ 
  });
 
 =head1 DESCRIPTION
@@ -209,7 +209,7 @@ José Joaquín Atria
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Graham Ollis.
+This software is copyright (c) 2017-2021 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

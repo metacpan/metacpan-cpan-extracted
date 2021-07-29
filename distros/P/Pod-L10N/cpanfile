@@ -1,4 +1,4 @@
-requires 'Pod::Simple', '3.18';
+requires 'Pod::Simple', '>=3.18, !=3.26, !=3.30';
 
 on build => sub {
     requires 'ExtUtils::MakeMaker';

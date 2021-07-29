@@ -1,9 +1,9 @@
 package App::OfficeUtils;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-10-27'; # DATE
+our $DATE = '2021-07-13'; # DATE
 our $DIST = 'App-OfficeUtils'; # DIST
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 use 5.010001;
 use strict;
@@ -89,6 +89,7 @@ sub officewp2txt {
 
     require File::Copy;
     require File::Temp;
+    require File::Temp::MoreUtils;
     require File::Which;
     require IPC::System::Options;
 
@@ -112,12 +113,11 @@ sub officewp2txt {
         }
 
         my $tempdir = File::Temp::tempdir(CLEANUP => !$args{return_output_file});
-        my ($temp_fh, $temp_file) = File::Temp::tempfile(undef, SUFFIX => ".$ext", DIR => $tempdir);
+        my ($temp_fh, $temp_file)      = File::Temp::MoreUtils::tempfile_named(name=>$input_file, dir=>$tempdir);
         (my $temp_out_file = $temp_file) =~ s/\.\w+\z/.txt/;
         File::Copy::copy($input_file, $temp_file) or do {
             return [500, "Can't copy '$input_file' to '$temp_file': $!"];
         };
-        # XXX check that $temp_file/.doc/.txt doesn't exist yet
         IPC::System::Options::system(
             {die=>1, log=>1},
             $libreoffice_path, "--headless", "--convert-to", "txt:Text (encoded):UTF8", $temp_file, "--outdir", $tempdir);
@@ -172,7 +172,7 @@ App::OfficeUtils - Utilities related to Office suite files (.doc, .docx, .odt, .
 
 =head1 VERSION
 
-This document describes version 0.005 of App::OfficeUtils (from Perl distribution App-OfficeUtils), released on 2020-10-27.
+This document describes version 0.006 of App::OfficeUtils (from Perl distribution App-OfficeUtils), released on 2021-07-13.
 
 =head1 DESCRIPTION
 
@@ -191,7 +191,7 @@ This distributions provides the following command-line utilities:
 
 Usage:
 
- officewp2txt(%args) -> [status, msg, payload, meta]
+ officewp2txt(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Convert Office word-processor format file (.doc, .docx, .odt, etc) to .txt.
 
@@ -240,12 +240,12 @@ temporary output file.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -284,7 +284,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

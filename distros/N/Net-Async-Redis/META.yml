@@ -17,7 +17,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.023, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -33,37 +33,37 @@ no_index:
 provides:
   Net::Async::Redis:
     file: lib/Net/Async/Redis.pm
-    version: '3.013'
+    version: '3.015'
   Net::Async::Redis::Cluster:
     file: lib/Net/Async/Redis/Cluster.pm
-    version: '3.013'
+    version: '3.015'
   Net::Async::Redis::Cluster::Node:
     file: lib/Net/Async/Redis/Cluster/Node.pm
-    version: '3.013'
+    version: '3.015'
   Net::Async::Redis::Commands:
     file: lib/Net/Async/Redis/Commands.pm
-    version: '3.013'
+    version: '3.015'
   Net::Async::Redis::Multi:
     file: lib/Net/Async/Redis/Multi.pm
-    version: '3.013'
+    version: '3.015'
   Net::Async::Redis::Protocol:
     file: lib/Net/Async/Redis/Protocol.pm
-    version: '3.013'
+    version: '3.015'
   Net::Async::Redis::Server:
     file: lib/Net/Async/Redis/Server.pm
-    version: '3.013'
+    version: '3.015'
   Net::Async::Redis::Server::Connection:
     file: lib/Net/Async/Redis/Server/Connection.pm
-    version: '3.013'
+    version: '3.015'
   Net::Async::Redis::Server::Database:
     file: lib/Net/Async/Redis/Server/Database.pm
-    version: '3.013'
+    version: '3.015'
   Net::Async::Redis::Subscription:
     file: lib/Net/Async/Redis/Subscription.pm
-    version: '3.013'
+    version: '3.015'
   Net::Async::Redis::Subscription::Message:
     file: lib/Net/Async/Redis/Subscription/Message.pm
-    version: '3.013'
+    version: '3.015'
 requires:
   Cache::LRU: '0.04'
   Class::Method::Modifiers: '0'
@@ -89,7 +89,7 @@ resources:
   bugtracker: https://github.com/team-at-cpan/Net-Async-Redis/issues
   homepage: https://github.com/team-at-cpan/Net-Async-Redis
   repository: https://github.com/team-at-cpan/Net-Async-Redis.git
-version: '3.013'
+version: '3.015'
 x_authority: cpan:TEAM
 x_contributors:
   - 'Eyad Arnabeh <eyadof@gmail.com>'
@@ -98,6 +98,6 @@ x_contributors:
   - 'Marc Frank <mfrank@sipxpert.de>'
   - 'Michael Mueller <michael.mueller@binary.com>'
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
-x_generated_by_perl: v5.32.0
+x_generated_by_perl: v5.34.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

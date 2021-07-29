@@ -6,7 +6,7 @@
 static GV *sub_to_gv(pTHX_ SV *sv);
 Perl_ppaddr_t orig_subhandler;
 Perl_ppaddr_t orig_openhandler;
-Perl_ppaddr_t orig_sysopenhandler;
+//Perl_ppaddr_t orig_sysopenhandler;
 
 // If we do not use threads we will make this global
 // The performance impact of fetching it each time is significant, so avoid it
@@ -114,7 +114,7 @@ static GV *sub_to_gv(pTHX_ SV *sv) {
     switch (SvTYPE(sv)) {
         default:
             if (!SvROK(sv)) {
-                char *sym;
+                char *sym = NULL;
 
                 if (sv == &PL_sv_yes) {           /* unfound import, ignore */
                     return NULL;
@@ -125,9 +125,11 @@ static GV *sub_to_gv(pTHX_ SV *sv) {
                         goto got_rv;
                     sym = SvPOKp(sv) ? SvPVX(sv) : Nullch;
                 }
-                else
+                // else {
                     // This causes the warnings from issue #2 https://github.com/Test-More/Test2-Plugin-Cover/issues/2
                     //sym = SvPV_nolen(sv);
+                // }
+
                 if (!sym)
                     return NULL;
                 if (PL_op->op_private & HINT_STRICT_REFS)
@@ -204,18 +206,18 @@ static OP* my_openhandler(pTHX) {
     return orig_openhandler(aTHX);
 }
 
-static OP* my_sysopenhandler(pTHX) {
-    dSP;
-    SV **mark = PL_stack_base + TOPMARK;
-    I32 ax    = (I32)(mark - PL_stack_base + 1);
-    I32 items = (I32)(sp - mark);
-
-    if (items >= 2) {
-        _sv_file_handler(PL_stack_base[ax + (1)]);
-    }
-
-    return orig_sysopenhandler(aTHX);
-}
+//static OP* my_sysopenhandler(pTHX) {
+//    dSP;
+//    SV **mark = PL_stack_base + TOPMARK;
+//    I32 ax    = (I32)(mark - PL_stack_base + 1);
+//    I32 items = (I32)(sp - mark);
+//
+//    if (items >= 2) {
+//        _sv_file_handler(PL_stack_base[ax + (1)]);
+//    }
+//
+//    return orig_sysopenhandler(aTHX);
+//}
 
 MODULE = Test2::Plugin::Cover PACKAGE = Test2::Plugin::Cover
 

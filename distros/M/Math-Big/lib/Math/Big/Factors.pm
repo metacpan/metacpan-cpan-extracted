@@ -13,7 +13,7 @@ use Math::BigFloat;
 use Math::Big;
 use Exporter;
 
-our $VERSION   = '1.14';
+our $VERSION   = '1.15';
 our @ISA       = qw( Exporter );
 our @EXPORT_OK = qw( wheel factors_wheel
                   );
@@ -64,7 +64,7 @@ sub _transform_wheel
   # input:  ref to array with prime wheel
   # output: ($restart,$ref_to_add_table);
 
-  my (@wheel,$we);
+  my (@wheel);
   my $add = shift; shift @$add;         # remove the first 2 from wheel
 
   if (@$add == 1)                       # order 1
@@ -146,7 +146,7 @@ sub factors_wheel
     }
   # 8 => 6 => 3, 7, 6 => 3, 5, 4 => 2 => 1, 3, 2 => 1, are all prime
   # so the first number interesting for us is 9
-  my $op = 0;
+  #my $op = 0;
  OUTER:
   while ($x > 8)
     {
@@ -247,7 +247,7 @@ Factor a number into its prime factors and return a list of factors.
 =head1 BUGS
 
 Please report any bugs or feature requests to
-C<bug-math-big at rt.cpan.org>, or through the web interface at
+C<bug-math-bigrat at rt.cpan.org>, or through the web interface at
 L<https://rt.cpan.org/Ticket/Create.html?Queue=Math-Big>
 (requires login).
 We will be notified, and then you'll automatically be notified of progress on
@@ -257,31 +257,31 @@ your bug as I make changes.
 
 You can find documentation for this module with the perldoc command.
 
-    perldoc Math::Big::Factors
+    perldoc Math::Big
 
 You can also look for information at:
 
 =over 4
 
+=item * GitHub
+
+L<https://github.com/pjacklam/p5-Math-Big>
+
 =item * RT: CPAN's request tracker
 
-L<https://rt.cpan.org/Public/Dist/Display.html?Name=Math-Big>
+L<https://rt.cpan.org/Dist/Display.html?Name=Math-Big>
 
-=item * AnnoCPAN: Annotated CPAN documentation
+=item * MetaCPAN
 
-L<http://annocpan.org/dist/Math-Big>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/dist/Math-Big>
-
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/Math-Big/>
+L<https://metacpan.org/release/Math-Big>
 
 =item * CPAN Testers Matrix
 
 L<http://matrix.cpantesters.org/?dist=Math-Big>
+
+=item * CPAN Ratings
+
+L<https://cpanratings.perl.org/dist/Math-Big>
 
 =back
 
@@ -300,7 +300,7 @@ Tels http://bloodgate.com 2001-2007.
 
 =item *
 
-Peter John Acklam E<lt>pjacklam@online.noE<gt> 2016.
+Peter John Acklam E<lt>pjacklam@gmail.comE<gt> 2016-.
 
 =back
 

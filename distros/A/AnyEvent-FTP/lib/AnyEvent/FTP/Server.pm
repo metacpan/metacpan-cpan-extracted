@@ -10,7 +10,7 @@ use AnyEvent::FTP::Server::Connection;
 use Socket qw( unpack_sockaddr_in inet_ntoa );
 
 # ABSTRACT: Simple asynchronous ftp server
-our $VERSION = '0.16'; # VERSION
+our $VERSION = '0.17'; # VERSION
 
 
 $AnyEvent::FTP::Server::VERSION //= 'dev';
@@ -204,13 +204,13 @@ AnyEvent::FTP::Server - Simple asynchronous ftp server
 
 =head1 VERSION
 
-version 0.16
+version 0.17
 
 =head1 SYNOPSIS
 
  use AnyEvent;
  use AnyEvent::FTP::Server;
-
+ 
  my $server = AnyEvent::FTP::Server->new;
  $server->start;
  AnyEvent->condvar->recv;
@@ -305,7 +305,7 @@ José Joaquín Atria
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Graham Ollis.
+This software is copyright (c) 2017-2021 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

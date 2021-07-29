@@ -95,6 +95,187 @@ $ua->map_response(
   ),
 );
 
+$ua->map_response(
+  qr{/users/.+/gigography} => HTTP::Response->new(
+    200, 'OK', ['Content-Type' => 'application/json' ], qq[{
+  "resultsPage": {
+    "status": "ok",
+    "results": {
+      "event": [
+        {
+          "type": "Concert",
+          "status": "ok",
+          "ageRestriction": null,
+          "start": {
+            "time": null,
+            "datetime": null,
+            "date": "1976-07-30"
+          },
+          "performance": [
+            {
+              "artist": {
+                "identifier": [
+                  {
+                    "href": "http://api.songkick.com/api/3.0/artists/mbid:0561d857-1d15-4ca1-93ec-ff6036c6e1a2.json",
+                    "mbid": "0561d857-1d15-4ca1-93ec-ff6036c6e1a2"
+                  }
+                ],
+                "uri": "http://www.songkick.com/artists/120463-showaddywaddy?utm_source=1666&utm_medium=partner",
+                "id": 120463,
+                "displayName": "Showaddywaddy"
+              },
+              "id": 3884986,
+              "billingIndex": 1,
+              "billing": "headline",
+              "displayName": "Showaddywaddy"
+            }
+          ],
+          "venue": {
+            "metroArea": {
+              "uri": "http://www.songkick.com/metro_areas/24495-uk-leeds?utm_source=1666&utm_medium=partner",
+              "id": 24495,
+              "country": {
+                "displayName": "UK"
+              },
+              "displayName": "Leeds"
+            },
+            "lat": 54.0022992,
+            "lng": -1.5480721,
+            "uri": "http://www.songkick.com/venues/33397-royal-hall?utm_source=1666&utm_medium=partner",
+            "id": 33397,
+            "displayName": "Royal Hall"
+          },
+          "location": {
+            "city": "Harrogate, UK",
+            "lat": 54.0022992,
+            "lng": -1.5480721
+          },
+          "uri": "http://www.songkick.com/concerts/2399921-showaddywaddy-at-royal-hall?utm_source=1666&utm_medium=partner",
+          "id": 2399921,
+          "displayName": "Showaddywaddy at Royal Hall (July 30, 1976)",
+          "popularity": 0.00367
+        },
+        {
+          "type": "Concert",
+          "popularity": 0.008877,
+          "status": "ok",
+          "displayName": "After the Fire at St Osyth's College (February 18, 1978)",
+          "start": {
+            "time": null,
+            "date": "1978-02-18",
+            "datetime": null
+          },
+          "ageRestriction": null,
+          "location": {
+            "city": "Clacton, UK",
+            "lat": 51.789534,
+            "lng": 1.153035
+          },
+          "uri": "http://www.songkick.com/concerts/2399836-after-the-fire-at-st-osyths-college?utm_source=1666&utm_medium=partner",
+          "id": 2399836,
+          "performance": [
+            {
+              "billingIndex": 1,
+              "displayName": "After the Fire",
+              "billing": "headline",
+              "id": 3884696,
+              "artist": {
+                "displayName": "After the Fire",
+                "identifier": [
+                  {
+                    "mbid": "3edac1c5-19cd-4cd4-bd7c-bf38d0efdcd8",
+                    "href": "http://api.songkick.com/api/3.0/artists/mbid:3edac1c5-19cd-4cd4-bd7c-bf38d0efdcd8.json"
+                  }
+                ],
+                "uri": "http://www.songkick.com/artists/463746-after-the-fire?utm_source=1666&utm_medium=partner",
+                "id": 463746
+              }
+            }
+          ],
+          "venue": {
+            "metroArea": {
+              "displayName": "Colchester",
+              "country": {
+                "displayName": "UK"
+              },
+              "uri": "http://www.songkick.com/metro_areas/24604-uk-colchester?utm_source=1666&utm_medium=partner",
+              "id": 24604
+            },
+            "displayName": "St Osyth's College",
+            "lat": 51.789534,
+            "lng": 1.153035,
+            "uri": "http://www.songkick.com/venues/493306-st-osyths-college?utm_source=1666&utm_medium=partner",
+            "id": 493306
+          }
+        },
+        {
+          "id": 2399726,
+          "displayName": "Lindisfarne at Odeon (May 31, 1978)",
+          "type": "Concert",
+          "uri": "https://www.songkick.com/concerts/2399726-lindisfarne-at-odeon?utm_source=1666&utm_medium=partner",
+          "status": "ok",
+          "popularity": 0.003412,
+          "start": {
+            "date": "1978-05-31",
+            "datetime": null,
+            "time": null
+          },
+          "performance": [
+            {
+              "id": 75468572,
+              "displayName": "Lindisfarne",
+              "billing": "headline",
+              "billingIndex": 1,
+              "artist": {
+                "id": 363886,
+                "displayName": "Lindisfarne",
+                "uri": "https://www.songkick.com/artists/363886-lindisfarne?utm_source=1666&utm_medium=partner",
+                "identifier": [
+                  {
+                    "mbid": "c39c15bd-ed29-4feb-8aa6-22876a7d7bf1",
+                    "href": "https://api.songkick.com/api/3.0/artists/mbid:c39c15bd-ed29-4feb-8aa6-22876a7d7bf1.json"
+                  },
+                  {
+                    "mbid": "433931b5-3f1d-428b-bac0-3218627dc57b",
+                    "href": "https://api.songkick.com/api/3.0/artists/mbid:433931b5-3f1d-428b-bac0-3218627dc57b.json"
+                  }
+                ]
+              }
+            }
+          ],
+          "ageRestriction": null,
+          "flaggedAsEnded": true,
+          "venue": {
+            "id": 58446,
+            "displayName": "Odeon",
+            "uri": "https://www.songkick.com/venues/58446-odeon?utm_source=1666&utm_medium=partner",
+            "metroArea": {
+              "displayName": "Chelmsford",
+              "country": {
+                "displayName": "UK"
+              },
+              "id": 24602,
+              "uri": "https://www.songkick.com/metro-areas/24602-uk-chelmsford?utm_source=1666&utm_medium=partner"
+            },
+            "lat": null,
+            "lng": null
+          },
+          "location": {
+            "city": "Chelmsford, UK",
+            "lat": 51.7333,
+            "lng": 0.48333
+          }
+        }
+      ]
+    },
+    "perPage": 3,
+    "page": 1,
+    "totalEntries": 527
+  }
+}],
+  )
+);
+
 my $ns = Net::Songkick->new({
     api_key => 'dummy',
     ua      => $ua,
@@ -117,5 +298,7 @@ isa_ok($event->venue, 'Net::Songkick::Venue');
 isa_ok($event->venue->metroArea, 'Net::Songkick::MetroArea');
 
 ok($events = $ns->get_upcoming_events({ user => 'foo' }));
+
+ok($events = $ns->get_past_events({ user => 'foo' }));
 
 done_testing;

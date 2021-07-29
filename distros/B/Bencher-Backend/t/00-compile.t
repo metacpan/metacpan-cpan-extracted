@@ -17,6 +17,7 @@ my @module_files = (
     'Bencher/Formatter/DeleteNotesFieldIfEmpty.pm',
     'Bencher/Formatter/DeleteSeqField.pm',
     'Bencher/Formatter/ModuleStartup.pm',
+    'Bencher/Formatter/RenderAsBenchmarkPm.pm',
     'Bencher/Formatter/RenderAsTextTable.pm',
     'Bencher/Formatter/RoundNumbers.pm',
     'Bencher/Formatter/ScaleRate.pm',
@@ -32,8 +33,7 @@ my @module_files = (
     'Bencher/Scenario/Example/CommandNotFound.pm',
     'Bencher/Scenario/Example/MultipleArgValues/Array.pm',
     'Bencher/Scenario/Example/MultipleArgValues/Hash.pm',
-    'Benchmark/Dumb/SimpleTime.pm',
-    'Sah/Schema/bencher/scenario.pm'
+    'Benchmark/Dumb/SimpleTime.pm'
 );
 
 

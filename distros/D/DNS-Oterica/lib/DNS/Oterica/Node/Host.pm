@@ -1,6 +1,6 @@
 package DNS::Oterica::Node::Host;
 # ABSTRACT: a host node
-$DNS::Oterica::Node::Host::VERSION = '0.312';
+$DNS::Oterica::Node::Host::VERSION = '0.313';
 use Moose;
 extends 'DNS::Oterica::Node';
 
@@ -133,7 +133,7 @@ DNS::Oterica::Node::Host - a host node
 
 =head1 VERSION
 
-version 0.312
+version 0.313
 
 =head1 OVERVIEW
 

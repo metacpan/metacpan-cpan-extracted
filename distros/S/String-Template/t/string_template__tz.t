@@ -2,18 +2,9 @@ use Test2::V0 -no_srand => 1;
 use String::Template;
 use Time::Piece 1.17;
 
-# these tests depend on the time zone.
-# earm.  Which is awesome?  Well anyway.
-# Try to set the time zone to US EST, which
-# is where the original programmer was
-# located.  Which is awesome?
-
-$ENV{TZ} = 'EST5EDT'; # override so test in local TZ will succeed
+$ENV{TZ} = 'UTC'; # override so test in local TZ will succeed
 
 if($^O eq 'MSWin32') {
-  # it would be nice to use POSIX for this
-  # instead since that is a public interface
-  # but of course Strawberry has borked it.
   Time::Piece::_tzset();
 }
 
@@ -67,7 +58,7 @@ subtest 'expand' => sub {
           Name     => 'date format with :(local) and !(utc)',
           Template => 'local: <date:%Y-%m-%d %H:%M> utc: <date!%Y-%m-%d %H:%M>',
           Fields   => { date => '2008-02-27T17:57:00Z' },
-          Correct  => 'local: 2008-02-27 12:57 utc: 2008-02-27 17:57'
+          Correct  => 'local: 2008-02-27 17:57 utc: 2008-02-27 17:57'
       }
   );
 
@@ -99,15 +90,15 @@ subtest 'case insensitive' => sub {
 
   is (expand_stringi( 'local: <date:%Y-%m-%d %H:%M> utc: <date!%Y-%m-%d %H:%M>',
       { date => '2008-02-27T17:57:00Z' } ),
-      'local: 2008-02-27 12:57 utc: 2008-02-27 17:57' );
+      'local: 2008-02-27 17:57 utc: 2008-02-27 17:57' );
 
   is (expand_stringi( 'local: <date:%Y-%m-%d %H:%M> utc: <date!%Y-%m-%d %H:%M>',
       { Date => '2008-02-27T17:57:00Z' } ),
-      'local: 2008-02-27 12:57 utc: 2008-02-27 17:57' );
+      'local: 2008-02-27 17:57 utc: 2008-02-27 17:57' );
 
   is (expand_stringi( 'local: <dAte:%Y-%m-%d %H:%M> utc: <DATE!%Y-%m-%d %H:%M>',
       { daTE => '2008-02-27T17:57:00Z' } ),
-      'local: 2008-02-27 12:57 utc: 2008-02-27 17:57' );
+      'local: 2008-02-27 17:57 utc: 2008-02-27 17:57' );
 };
 
 done_testing;

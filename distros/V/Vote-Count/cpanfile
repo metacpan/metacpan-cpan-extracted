@@ -13,6 +13,7 @@ requires "Math::BigRat" => "0";
 requires "Mojo::Template" => "0";
 requires "Moose" => "0";
 requires "Moose::Role" => "0";
+requires "MooseX::StrictConstructor" => "0.21";
 requires "Path::Tiny" => "0.108";
 requires "Ref::Util" => "0.202";
 requires "Sort::Hash" => "0";

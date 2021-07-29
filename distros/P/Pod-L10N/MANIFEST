@@ -50,5 +50,7 @@ t/substitem.pod
 t/substitem.t
 t/substlink.pod
 t/substlink.t
+testdir/perlpodspec-copy.pod
+testdir/perlvar-copy.pod
 META.yml
 MANIFEST

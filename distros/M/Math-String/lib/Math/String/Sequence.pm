@@ -12,18 +12,21 @@
 # _rev   : 1 if reversed sequence
 
 package Math::String::Sequence;
-use vars qw($VERSION);
-$VERSION = '1.29';	# Current version of this package
-require  5.005;		# requires this Perl version or later
+
+require 5.005;		# requires this Perl version or later
+use strict;
+use warnings;
 
 use Exporter;
-@ISA = qw(Exporter);
+
+our ($VERSION, @ISA, @EXPORT_OK);
+$VERSION   = '1.30';	# Current version of this package
+@ISA       = qw(Exporter);
 @EXPORT_OK = qw(sequence);
 
 use Math::String;
 use Math::String::Charset;
 
-use strict;
 my $class = "Math::String::Sequence";
 
 # some shortcuts for easier life

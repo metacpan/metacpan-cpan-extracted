@@ -417,6 +417,7 @@ in the usual way, hence we  have to render our own response!
 
 async sub handleUpload {
     my $self = shift;
+    $self->render_later;
     if (not $self->user->isUserAuthenticated){
         return $self->render(json => {exception=>{
             message=>trm('Access Denied'),code=>4922}});
@@ -454,7 +455,7 @@ async sub handleUpload {
         if (blessed $error){
             if ($error->isa('CallBackery::Exception')){
                 return $self->render(json=>{exception=>{
-                    message=>$error->message,code=>$error->code}});
+                   message=>$error->message,code=>$error->code}});
             }
             elsif ($error->isa('Mojo::Exception')){
                 return $self->render(json=>{exception=>{message=>$error->message,code=>9999}});
@@ -463,8 +464,7 @@ async sub handleUpload {
         return $self->render(json=>{exception=>{message=>$error,code=>9999}});
 
     }
-    $self->render_later;
-    return $self->render(json=>shift);
+    return $self->render(json=>$return);
 }
 
 =head2 handleDownload

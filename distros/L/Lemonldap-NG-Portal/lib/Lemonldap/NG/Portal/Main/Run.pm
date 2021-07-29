@@ -9,12 +9,13 @@
 #
 package Lemonldap::NG::Portal::Main::Run;
 
-our $VERSION = '2.0.10';
+our $VERSION = '2.0.12';
 
 package Lemonldap::NG::Portal::Main;
 
 use strict;
 use URI::Escape;
+use URI;
 use JSON;
 use Lemonldap::NG::Common::Util qw(getPSessionID);
 
@@ -581,8 +582,10 @@ sub updateSession {
         foreach ( keys %$infos ) {
             $self->logger->debug("Update sessionInfo $_");
             $self->_dump( $infos->{$_} );
-            $req->{sessionInfo}->{$_} = $self->HANDLER->data->{$_} =
-              $infos->{$_};
+            $req->{sessionInfo}->{$_} = $infos->{$_};
+            if ( $id eq $self->HANDLER->data->{_session_id} ) {
+                $self->HANDLER->data->{$_} = $infos->{$_};
+            }
         }
 
         # Update session in global storage with _updateTime
@@ -885,22 +888,28 @@ sub sendHtml {
     my $csp = $self->csp . "form-action " . $self->conf->{cspFormAction};
     if ( my $url = $req->urldc ) {
         $self->logger->debug("Required urldc : $url");
-        $url =~ s#(https?://[^/]+).*#$1#;
+        $url =~ URIRE;
+        $url = $2 . '://' . $3 . ( $4 ? ":$4" : '' );
         $self->logger->debug("Set CSP form-action with urldc : $url");
         $csp .= " $url";
     }
     my $url = $args{params}->{URL};
     if ( defined $url ) {
         $self->logger->debug("Required Params URL : $url");
-        if ( $url =~ s#(https?://[^/]+).*#$1# ) {
+        if ( $url =~ URIRE ) {
+            $url = $2 . '://' . $3 . ( $4 ? ":$4" : '' );
             $self->logger->debug("Set CSP form-action with Params URL : $url");
             $csp .= " $url";
         }
     }
-    if ( defined $req->{cspFormAction} ) {
-        $self->logger->debug(
-            "Set CSP form-action with request URL: " . $req->{cspFormAction} );
-        $csp .= " " . $req->{cspFormAction};
+    if ( defined $req->data->{cspFormAction}
+        and ref( $req->data->{cspFormAction} ) eq "HASH" )
+    {
+        my $request_csp_form_action =
+          join( " ", keys %{ $req->data->{cspFormAction} } );
+        $self->logger->debug( "Set CSP form-action with request URL: "
+              . $request_csp_form_action );
+        $csp .= " " . $request_csp_form_action;
     }
 
     # Set SAML Discovery Protocol in form-action
@@ -930,10 +939,17 @@ sub sendHtml {
     }
 
     # Check if frames need to be embedded
+    # FIXME: we should use $req->data->{cspChildSrc} anywhere an iframe is
+    # created in the code, and remove this
     my @url;
     if ( $req->info ) {
         @url = map { s#https?://([^/]+).*#$1#; $_ }
           ( $req->info =~ /<iframe.*?src="(.*?)"/sg );
+    }
+
+    # Update child-src header from request data
+    if ( ref( $req->data->{cspChildSrc} ) eq "HASH" ) {
+        push @url, keys %{ $req->data->{cspChildSrc} };
     }
     if (@url) {
         $csp .= join( ' ', 'child-src', @url, "'self'" ) . ';';
@@ -1037,9 +1053,7 @@ sub tplParams {
 }
 
 sub registerLogin {
-
-    # $user passed by BruteForceProtection plugin
-    my ( $self, $req, $uid ) = @_;
+    my ( $self, $req ) = @_;
     return
       unless ( $self->conf->{loginHistoryEnabled}
         and defined $req->authResult );
@@ -1069,8 +1083,7 @@ sub registerLogin {
                 }
             }
         }
-        $self->updatePersistentSession( $req, { 'loginHistory' => undef },
-            $uid );
+        $self->updatePersistentSession( $req, { 'loginHistory' => undef } );
         delete $req->sessionInfo->{loginHistory};
     }
 
@@ -1095,7 +1108,7 @@ sub registerLogin {
       if ( scalar @{ $history->{$type} } > $self->conf->{ $type . "Number" } );
 
     # Save into persistent session
-    $self->updatePersistentSession( $req, { _loginHistory => $history }, $uid );
+    $self->updatePersistentSession( $req, { _loginHistory => $history, } );
 
     PE_OK;
 }
@@ -1196,6 +1209,18 @@ sub loadTemplate {
         $tpl->param( %{ $prm{params} } );
     }
     return $tpl->output;
+}
+
+# This method extracts the scheme://host:port part of a URL for use in
+# Content-Security-Polity header
+sub cspGetHost {
+    my ( $self, $url ) = @_;
+    my $uri = $url // "";
+    unless ( $uri->isa("URI") ) {
+        $uri = URI->new($uri);
+    }
+    return (
+        $uri->scheme . "://" . ( $uri->_port ? $uri->host_port : $uri->host ) );
 }
 
 1;

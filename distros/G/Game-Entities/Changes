@@ -1,6 +1,44 @@
 Revision history for Game-Entities
 
+0.010     2021-07-20 20:57:09+01:00 Europe/London
+
+    Fixes:
+        - Fix error in documentation for 'first'.
+
+0.009     2022-07-20 20:54:28+01:00 Europe/London
+
+    New:
+        - Aded the `first` method for view objects
+
+0.008     2021-07-16 19:18:37+01:00 Europe/London
+
+    Fixes:
+        - Fixed some test failures reported in FreeBSD
+
+0.007     2021-07-10 18:13:06+01:00 Europe/London
+
+    Fixes:
+        - Minor corrections in documentation
+
+0.006     2021-07-10 17:59:27+01:00 Europe/London
+
+    New:
+        - Sorting component pools is now supported with the `sort`
+          method which allows sorting with comparator functions or
+          in reference to other component pools.
+    Changes:
+        - We now depend on Sub::Util 1.40. This is a core module
+    Fixes:
+        - Define a $VERSION package variable that was missing
+
+0.005     2021-07-08 23:49:05+01:00 Europe/London
+
+    Changes:
+        - Entity IDs now start from 1 so they should always be truthy
+        - User errors are now reported using Carp
+
 0.004     2021-06-03 18:48:26+01:00 Europe/London
+
     Fixes:
         - Expanded documentation to include a section on perforance
           and references to EnTT and its role as a reference

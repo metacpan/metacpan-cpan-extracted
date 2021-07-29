@@ -24,11 +24,15 @@ resources:
   bugtracker: https://github.com/perlancar/perl-Module-Features-TextTable/issues
   homepage: https://metacpan.org/release/Module-Features-TextTable
   repository: git://github.com/perlancar/perl-Module-Features-TextTable.git
-version: '0.002'
+version: '0.003'
 x_Dist_Zilla:
   perl:
     version: '5.030000'
   plugins:
+    -
+      class: Dist::Zilla::Plugin::Module::Features
+      name: Module::Features
+      version: '0.002'
     -
       class: Dist::Zilla::Plugin::PERLANCAR::CheckPendingRelease
       name: '@Author::PERLANCAR/PERLANCAR::CheckPendingRelease'

@@ -1,0 +1,3 @@
+{
+  "queryFilter": "cql.allRecords=1 NOT discoverySuppress=true NOT holdingsItems.discoverySuppress=true"
+}

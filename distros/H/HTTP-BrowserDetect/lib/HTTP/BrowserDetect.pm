@@ -5,7 +5,7 @@ use 5.006;
 
 package HTTP::BrowserDetect;
 
-our $VERSION = '3.31';
+our $VERSION = '3.33';
 
 # Operating Systems
 our @OS_TESTS = qw(
@@ -164,6 +164,7 @@ my @OLD_ROBOT_TESTS = qw(
     yahoo
     yandex
     yandeximages
+    headlesschrome
 );
 
 our @ROBOT_TESTS = (
@@ -292,6 +293,7 @@ my %ROBOT_NAMES = (
     'yahoo-slurp'         => 'Yahoo! Slurp',
     yandex                => 'Yandex',
     'yandex-images'       => 'YandexImages',
+    'headless-chrome'     => 'HeadlessChrome',
 );
 
 my %ROBOT_IDS = (
@@ -340,6 +342,7 @@ my %ROBOT_IDS = (
     yahoo           => 'yahoo',
     yandex          => 'yandex',
     yandeximages    => 'yandex-images',
+    headlesschrome  => 'headless-chrome',
 );
 
 my %BROWSER_NAMES = (
@@ -1044,7 +1047,7 @@ sub _init_robots {
         $robot_tests->{yahoo} = 1;
     }
     elsif (index( $ua, 'yahoo' ) != -1
-        && index( $ua, 'jp.co.yahoo.android' ) == -1 ) {
+        && index( $ua, 'jp.co.yahoo' ) == -1 ) {
         $r = 'yahoo';
     }
     elsif ( index( $ua, 'msnbot-mobile' ) != -1 ) {
@@ -1206,6 +1209,9 @@ sub _init_robots {
     }
     elsif ( index( $ua, 'yandeximages' ) != -1 ) {
         $r = 'yandeximages';
+    }
+    elsif ( index( $ua, 'headlesschrome' ) != -1 ) {
+        $r = 'headlesschrome';
     }
     elsif ( $ua =~ m{^java} && !$self->{browser} ) {
         $r = 'java';
@@ -1399,7 +1405,7 @@ sub _init_os {
             $os                = 'windows';
             if ( index( $ua, 'windows 3.1' ) != -1 ) {
                 $os_tests->{win31} = 1;
-                $os_string = 'Win3x';    # FIXME bug compatibility
+                $os_string = 'Win3x';            # FIXME bug compatibility
             }
             else {
                 $os_string = 'Win3x';
@@ -1577,31 +1583,31 @@ sub _init_os {
         $os_tests->{sun} = $os_tests->{unix} = 1;
     }
     elsif ( index( $ua, 'samsung' ) == -1 && index( $ua, 'sun' ) != -1 ) {
-        $os              = 'unix';
-        $os_string       = 'SunOS';
-        $os_tests->{sun} = $os_tests->{unix} = 1;
+        $os                 = 'unix';
+        $os_string          = 'SunOS';
+        $os_tests->{sun}    = $os_tests->{unix} = 1;
         $os_tests->{suni86} = 1 if index( $ua, 'i86' ) != -1;
         $os_tests->{sun4}   = 1 if index( $ua, 'sunos 4' ) != -1;
         $os_tests->{sun5}   = 1 if index( $ua, 'sunos 5' ) != -1;
     }
     elsif ( index( $ua, 'irix' ) != -1 ) {
-        $os               = 'unix';
-        $os_string        = 'Irix';
-        $os_tests->{irix} = $os_tests->{unix} = 1;
+        $os                = 'unix';
+        $os_string         = 'Irix';
+        $os_tests->{irix}  = $os_tests->{unix} = 1;
         $os_tests->{irix5} = 1 if ( index( $ua, 'irix5' ) != -1 );
         $os_tests->{irix6} = 1 if ( index( $ua, 'irix6' ) != -1 );
     }
     elsif ( index( $ua, 'hp-ux' ) != -1 ) {
-        $os               = 'unix';
-        $os_string        = 'HP-UX';
-        $os_tests->{hpux} = $os_tests->{unix} = 1;
+        $os                 = 'unix';
+        $os_string          = 'HP-UX';
+        $os_tests->{hpux}   = $os_tests->{unix} = 1;
         $os_tests->{hpux9}  = 1 if index( $ua, '09.' ) != -1;
         $os_tests->{hpux10} = 1 if index( $ua, '10.' ) != -1;
     }
     elsif ( index( $ua, 'aix' ) != -1 ) {
-        $os              = 'unix';
-        $os_string       = 'AIX';
-        $os_tests->{aix} = $os_tests->{unix} = 1;
+        $os               = 'unix';
+        $os_string        = 'AIX';
+        $os_tests->{aix}  = $os_tests->{unix} = 1;
         $os_tests->{aix1} = 1 if ( index( $ua, 'aix 1' ) != -1 );
         $os_tests->{aix2} = 1 if ( index( $ua, 'aix 2' ) != -1 );
         $os_tests->{aix3} = 1 if ( index( $ua, 'aix 3' ) != -1 );
@@ -2004,11 +2010,11 @@ sub _init_version {
     if ( $browser_tests->{netscape} ) {
 
         # Netscape browsers
-        $version_tests->{nav2}   = 1 if $major == 2;
-        $version_tests->{nav3}   = 1 if $major == 3;
-        $version_tests->{nav4}   = 1 if $major == 4;
-        $version_tests->{nav4up} = 1 if $major >= 4;
-        $version_tests->{nav45}  = 1 if $major == 4 && $minor == 5;
+        $version_tests->{nav2}    = 1 if $major == 2;
+        $version_tests->{nav3}    = 1 if $major == 3;
+        $version_tests->{nav4}    = 1 if $major == 4;
+        $version_tests->{nav4up}  = 1 if $major >= 4;
+        $version_tests->{nav45}   = 1 if $major == 4 && $minor == 5;
         $version_tests->{nav45up} = 1
             if ( $major == 4 && ".$minor" >= .5 )
             || $major >= 5;
@@ -2982,7 +2988,7 @@ HTTP::BrowserDetect - Determine Web browser, version, and platform from an HTTP 
 
 =head1 VERSION
 
-version 3.31
+version 3.33
 
 =head1 SYNOPSIS
 
@@ -3185,7 +3191,7 @@ googleadsbot, googleadsense, googlebotimage, googlebotnews,
 googlebotvideo, googlefavicon, googlemobile, google, golib, indy,
 infoseek, ipsagent, linkchecker, linkexchange, lycos, malware,
 mj12bot, nutch, phplib, puf, rubylib, scooter, specialarchiver,
-wget, yandexbot, yandeximages, java, unknown
+wget, yandexbot, yandeximages, java, headlesschrome, unknown
 
 Returns "unknown" when the user agent is believed to be a robot but
 is not identified as one of the above specific robots.
@@ -3534,6 +3540,8 @@ value. This is by no means a complete list of robots that exist on the Web.
 =head3 yandex
 
 =head3 yandeximages
+
+=head3 headlesschrome
 
 =head2 Engine properties
 

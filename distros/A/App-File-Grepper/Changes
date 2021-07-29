@@ -1,5 +1,12 @@
 Revision history for App-File-Grepper
 
+1.01	2021-07-21
+
+	Make the default exclusion pattern less picky, so that
+	files starting with ./ and ../ are no longer excluded.
+
+	Improve debugging.
+
 1.00	2016-08-29
 	Eliminate obsoleted File::Find option chdir.
 

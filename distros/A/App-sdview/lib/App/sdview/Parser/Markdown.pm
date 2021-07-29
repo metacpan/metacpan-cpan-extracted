@@ -5,15 +5,18 @@
 
 use v5.26;
 
-use Object::Pad 0.41;
+use Object::Pad 0.43;  # :strict(params)
 
-package App::sdview::Parser::Markdown 0.02;
+package App::sdview::Parser::Markdown 0.03;
 class App::sdview::Parser::Markdown
-   does App::sdview::Parser;
+   does App::sdview::Parser
+   :strict(params);
 
 use File::Slurper 'read_text';
 
 use constant format => "Markdown";
+
+sub find_file ( $class, $name ) { return undef }
 
 sub can_parse_file ( $class, $file )
 {
@@ -107,6 +110,29 @@ method parse_string ( $str )
             else {
                push @_paragraphs, $list = App::sdview::Para::List->new(
                   listtype => "bullet",
+                  indent   => 4,
+               );
+            }
+
+            $list->push_item( App::sdview::Para::ListItem->new(
+                  text => $self->_handle_spans( $raw )
+            ) );
+
+            next;
+         }
+         elsif( $lines[0] =~ s/^\d+\.\s+// ) {
+            my $raw = shift @lines;
+            while( @lines and $lines[0] !~ m/^\d+\./ ) {
+               $raw .= " " . ( shift(@lines) =~ m/^\s*(.*)$/ )[0];
+            }
+
+            my $list;
+            if( @_paragraphs and $_paragraphs[-1]->type eq "list-number" ) {
+               $list = $_paragraphs[-1];
+            }
+            else {
+               push @_paragraphs, $list = App::sdview::Para::List->new(
+                  listtype => "number",
                   indent   => 4,
                );
             }

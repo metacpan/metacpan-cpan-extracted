@@ -38,8 +38,10 @@ You shouldn't make instances of this class. Each attribute should be used as a n
       ,                                     # OPTIONAL
       Filters => [
         {
-          Name   => 'MyString',
-          Values => [ 'MyString', ... ],    # OPTIONAL
+          Name   => 'MyString',             # OPTIONAL
+          Values => [
+            'MyString', ...                 # OPTIONAL
+          ],    # OPTIONAL
         },
         ...
       ],    # OPTIONAL

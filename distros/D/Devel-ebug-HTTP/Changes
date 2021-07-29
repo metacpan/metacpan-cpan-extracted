@@ -1,5 +1,14 @@
 Revision history for Devel-ebug-HTTP
 
+0.36      2021-07-10 16:07:35 -0600
+  - Require Devel::ebug 0.64 for required fixes.
+
+0.35      2021-07-09 04:27:52 -0600
+  - Removed deprecated Regex dispatches; this should also fix another
+    prereqs problem that wasn't addressed in 0.34 (gh#12, gh#20)
+  - Move dispatch logic into root controller to fix other
+    deprecation (gh#11, gh#20)
+
 0.34      2021-07-03 09:27:53 -0600
   - Fixed prereqs (gh#19)
 

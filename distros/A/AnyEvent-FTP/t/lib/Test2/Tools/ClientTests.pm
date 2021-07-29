@@ -61,16 +61,16 @@ else
     port => 0,
     default_context => 'AnyEvent::FTP::Server::Context::FSRW',
   );
-  
+
   $config->{host} = 'localhost';
   $config->{user} = join '', map { chr(ord('a') + int rand(26)) } (1..10);
   $config->{pass} = join '', map { chr(ord('a') + int rand(26)) } (1..10);
   {
     my $ctx = context();
-    $ctx->note("using fake credentials ", join ':', $config->{user}, $config->{pass});  
+    $ctx->note("using fake credentials ", join ':', $config->{user}, $config->{pass});
     $ctx->release;
   }
-  
+
   $server->on_bind(sub {
     my $port = shift;
     $config->{port} = $port;
@@ -78,7 +78,7 @@ else
     $ctx->note("binding aeftpd localhost:$port");
     $ctx->release;
   });
-  
+
   $server->on_connect(sub {
     my $con = shift;
     $con->context->authenticator(sub {
@@ -87,9 +87,9 @@ else
     });
     $con->context->bad_authentication_delay(0);
   });
-  
+
   $server->start;
-  
+
   $detect->{ae} = 1;
 }
 
@@ -128,7 +128,7 @@ sub prep_client
       $ctx->release;
     });
   }
-  
+
 
   $client->on_greeting(sub {
     my $res = shift;
@@ -163,13 +163,13 @@ sub translate_dir
 sub net_pwd
 {
   my($pwd) = @_;
-  
+
   if($^O eq 'MSWin32')
   {
     (undef,$pwd) = File::Spec->splitpath($pwd,1);
     $pwd =~ s{\\}{/}g;
   }
-  
+
   my_abs_path($pwd);
 }
 

@@ -1,5 +1,5 @@
 #!/usr/local/bin/perl -w
-# $Id: check_zone 1811 2020-10-05 08:24:23Z willem $
+# $Id: check_zone 1842 2021-07-08 14:25:00Z willem $
 
 =head1 NAME
 
@@ -46,8 +46,6 @@ Check each record processed for being with the class requested. This is an inter
 
 =over 4
 
-=back
-
 =item C<-r>
 
 Perform a recursive check on subdomains.
@@ -65,6 +63,8 @@ Treat <alternate_domain> as equal to <domain>. This is useful when supporting a 
 Ignore exceptions in file <exception_file>. File format can be space-separated domain pairs, one pair per line, or it can be straight output from this program itself (for simple cut-and-paste functionality). 
 This allows for skipping entries that are odd or unusual, but not causing problems. Note: this only works with A - PTR checks.
 
+=back
+
 =head1 AUTHORS
 
 Originally developed by Michael Fuhr (mfuhr@dimensional.com) and
@@ -72,9 +72,6 @@ hacked--with furor--by Dennis Glatting
 (dennis.glatting@software-munitions.com).
 
 "-a" and "-e" options added by Paul Archer
-
-
-=head1 COPYRIGHT
 
 =head1 SEE ALSO
 

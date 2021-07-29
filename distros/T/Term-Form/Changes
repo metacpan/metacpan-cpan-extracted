@@ -1,6 +1,12 @@
 Revision history for Term::Form
 
 
+0.537   2021-07-12
+        - The info-lines get their own term_w.
+
+0.536   2021-07-11
+        - Term::Choose minimum version 1.734.
+
 0.535   2021-06-30
         - Replaced the option 'section_separators' with the option 'skip_items'.
         - Update documentation.

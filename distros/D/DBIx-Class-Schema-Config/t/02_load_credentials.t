@@ -176,6 +176,62 @@ my $tests = [
         },
         title => "Overriding the user and password works.",
     }, 
+
+    # Mojo-like postgresql connection lines.
+    {
+        put => [ 'postgresql://username:password@hostname:5433/minion' ],
+        get => {
+            dsn => 'dbi:Pg:dbname=minion;host=hostname;port=5433',
+            user => 'username',
+            password => 'password',
+        },
+        title => "Mojo-like postgresql:// connect line, with port.",
+    },
+    {
+        put => [ 'postgresql://username:password@hostname/minion' ],
+        get => {
+            dsn => 'dbi:Pg:dbname=minion;host=hostname',
+            user => 'username',
+            password => 'password',
+        },
+        title => "Mojo-like postgresql:// connect line.",
+    },
+    {
+        put => [ 'postgresql://:password@hostname/minion' ],
+        get => {
+            dsn => 'dbi:Pg:dbname=minion;host=hostname',
+            user => '',
+            password => 'password',
+        },
+        title => "Mojo-like postgresql:// connect line, no user.",
+    },
+    {
+        put => [ 'postgresql://username:@hostname/minion' ],
+        get => {
+            dsn => 'dbi:Pg:dbname=minion;host=hostname',
+            user => 'username',
+            password => '',
+        },
+        title => "Mojo-like postgresql:// connect line, no password.",
+    },
+    {
+        put => [ 'postgresql://username@hostname/minion' ],
+        get => {
+            dsn => 'dbi:Pg:dbname=minion;host=hostname',
+            user => 'username',
+            password => '',
+        },
+        title => "Mojo-like postgresql:// connect line, ambiguous user@ is username.",
+    },
+    {
+        put => [ 'postgresql://hostname/minion' ],
+        get => {
+            dsn => 'dbi:Pg:dbname=minion;host=hostname',
+            user => '',
+            password => '',
+        },
+        title => "Mojo-like postgresql:// connect line, no credentials.",
+    },
 ];
 
 for my $test ( @$tests ) {

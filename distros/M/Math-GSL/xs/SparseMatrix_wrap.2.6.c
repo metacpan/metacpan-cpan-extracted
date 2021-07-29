@@ -5315,44 +5315,6 @@ XS(_wrap_gsl_spmatrix_add) {
 }
 
 
-XS(_wrap_gsl_spmatrix_add_to_dense) {
-  {
-    gsl_matrix *arg1 = (gsl_matrix *) 0 ;
-    gsl_spmatrix *arg2 = (gsl_spmatrix *) 0 ;
-    void *argp1 = 0 ;
-    int res1 = 0 ;
-    void *argp2 = 0 ;
-    int res2 = 0 ;
-    int argvi = 0;
-    int result;
-    dXSARGS;
-    
-    if ((items < 2) || (items > 2)) {
-      SWIG_croak("Usage: gsl_spmatrix_add_to_dense(a,b);");
-    }
-    res1 = SWIG_ConvertPtr(ST(0), &argp1,SWIGTYPE_p_gsl_matrix, 0 |  0 );
-    if (!SWIG_IsOK(res1)) {
-      SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "gsl_spmatrix_add_to_dense" "', argument " "1"" of type '" "gsl_matrix *""'"); 
-    }
-    arg1 = (gsl_matrix *)(argp1);
-    res2 = SWIG_ConvertPtr(ST(1), &argp2,SWIGTYPE_p_gsl_spmatrix, 0 |  0 );
-    if (!SWIG_IsOK(res2)) {
-      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "gsl_spmatrix_add_to_dense" "', argument " "2"" of type '" "gsl_spmatrix const *""'"); 
-    }
-    arg2 = (gsl_spmatrix *)(argp2);
-    result = (int)gsl_spmatrix_add_to_dense(arg1,(gsl_spmatrix const *)arg2);
-    ST(argvi) = SWIG_From_int  SWIG_PERL_CALL_ARGS_1((int)(result)); argvi++ ;
-    
-    
-    XSRETURN(argvi);
-  fail:
-    
-    
-    SWIG_croak_null();
-  }
-}
-
-
 XS(_wrap_gsl_spmatrix_d2sp) {
   {
     gsl_spmatrix *arg1 = (gsl_spmatrix *) 0 ;
@@ -5417,6 +5379,44 @@ XS(_wrap_gsl_spmatrix_sp2d) {
     }
     arg2 = (gsl_spmatrix *)(argp2);
     result = (int)gsl_spmatrix_sp2d(arg1,(gsl_spmatrix const *)arg2);
+    ST(argvi) = SWIG_From_int  SWIG_PERL_CALL_ARGS_1((int)(result)); argvi++ ;
+    
+    
+    XSRETURN(argvi);
+  fail:
+    
+    
+    SWIG_croak_null();
+  }
+}
+
+
+XS(_wrap_gsl_spmatrix_add_to_dense) {
+  {
+    gsl_matrix *arg1 = (gsl_matrix *) 0 ;
+    gsl_spmatrix *arg2 = (gsl_spmatrix *) 0 ;
+    void *argp1 = 0 ;
+    int res1 = 0 ;
+    void *argp2 = 0 ;
+    int res2 = 0 ;
+    int argvi = 0;
+    int result;
+    dXSARGS;
+    
+    if ((items < 2) || (items > 2)) {
+      SWIG_croak("Usage: gsl_spmatrix_add_to_dense(a,b);");
+    }
+    res1 = SWIG_ConvertPtr(ST(0), &argp1,SWIGTYPE_p_gsl_matrix, 0 |  0 );
+    if (!SWIG_IsOK(res1)) {
+      SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "gsl_spmatrix_add_to_dense" "', argument " "1"" of type '" "gsl_matrix *""'"); 
+    }
+    arg1 = (gsl_matrix *)(argp1);
+    res2 = SWIG_ConvertPtr(ST(1), &argp2,SWIGTYPE_p_gsl_spmatrix, 0 |  0 );
+    if (!SWIG_IsOK(res2)) {
+      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "gsl_spmatrix_add_to_dense" "', argument " "2"" of type '" "gsl_spmatrix const *""'"); 
+    }
+    arg2 = (gsl_spmatrix *)(argp2);
+    result = (int)gsl_spmatrix_add_to_dense(arg1,(gsl_spmatrix const *)arg2);
     ST(argvi) = SWIG_From_int  SWIG_PERL_CALL_ARGS_1((int)(result)); argvi++ ;
     
     
@@ -7638,44 +7638,6 @@ XS(_wrap_gsl_spmatrix_complex_long_double_add) {
 }
 
 
-XS(_wrap_gsl_spmatrix_complex_long_double_add_to_dense) {
-  {
-    gsl_matrix_complex_long_double *arg1 = (gsl_matrix_complex_long_double *) 0 ;
-    gsl_spmatrix_complex_long_double *arg2 = (gsl_spmatrix_complex_long_double *) 0 ;
-    void *argp1 = 0 ;
-    int res1 = 0 ;
-    void *argp2 = 0 ;
-    int res2 = 0 ;
-    int argvi = 0;
-    int result;
-    dXSARGS;
-    
-    if ((items < 2) || (items > 2)) {
-      SWIG_croak("Usage: gsl_spmatrix_complex_long_double_add_to_dense(a,b);");
-    }
-    res1 = SWIG_ConvertPtr(ST(0), &argp1,SWIGTYPE_p_gsl_matrix_complex_long_double, 0 |  0 );
-    if (!SWIG_IsOK(res1)) {
-      SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "gsl_spmatrix_complex_long_double_add_to_dense" "', argument " "1"" of type '" "gsl_matrix_complex_long_double *""'"); 
-    }
-    arg1 = (gsl_matrix_complex_long_double *)(argp1);
-    res2 = SWIG_ConvertPtr(ST(1), &argp2,SWIGTYPE_p_gsl_spmatrix_complex_long_double, 0 |  0 );
-    if (!SWIG_IsOK(res2)) {
-      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "gsl_spmatrix_complex_long_double_add_to_dense" "', argument " "2"" of type '" "gsl_spmatrix_complex_long_double const *""'"); 
-    }
-    arg2 = (gsl_spmatrix_complex_long_double *)(argp2);
-    result = (int)gsl_spmatrix_complex_long_double_add_to_dense(arg1,(gsl_spmatrix_complex_long_double const *)arg2);
-    ST(argvi) = SWIG_From_int  SWIG_PERL_CALL_ARGS_1((int)(result)); argvi++ ;
-    
-    
-    XSRETURN(argvi);
-  fail:
-    
-    
-    SWIG_croak_null();
-  }
-}
-
-
 XS(_wrap_gsl_spmatrix_complex_long_double_d2sp) {
   {
     gsl_spmatrix_complex_long_double *arg1 = (gsl_spmatrix_complex_long_double *) 0 ;
@@ -7740,6 +7702,44 @@ XS(_wrap_gsl_spmatrix_complex_long_double_sp2d) {
     }
     arg2 = (gsl_spmatrix_complex_long_double *)(argp2);
     result = (int)gsl_spmatrix_complex_long_double_sp2d(arg1,(gsl_spmatrix_complex_long_double const *)arg2);
+    ST(argvi) = SWIG_From_int  SWIG_PERL_CALL_ARGS_1((int)(result)); argvi++ ;
+    
+    
+    XSRETURN(argvi);
+  fail:
+    
+    
+    SWIG_croak_null();
+  }
+}
+
+
+XS(_wrap_gsl_spmatrix_complex_long_double_add_to_dense) {
+  {
+    gsl_matrix_complex_long_double *arg1 = (gsl_matrix_complex_long_double *) 0 ;
+    gsl_spmatrix_complex_long_double *arg2 = (gsl_spmatrix_complex_long_double *) 0 ;
+    void *argp1 = 0 ;
+    int res1 = 0 ;
+    void *argp2 = 0 ;
+    int res2 = 0 ;
+    int argvi = 0;
+    int result;
+    dXSARGS;
+    
+    if ((items < 2) || (items > 2)) {
+      SWIG_croak("Usage: gsl_spmatrix_complex_long_double_add_to_dense(a,b);");
+    }
+    res1 = SWIG_ConvertPtr(ST(0), &argp1,SWIGTYPE_p_gsl_matrix_complex_long_double, 0 |  0 );
+    if (!SWIG_IsOK(res1)) {
+      SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "gsl_spmatrix_complex_long_double_add_to_dense" "', argument " "1"" of type '" "gsl_matrix_complex_long_double *""'"); 
+    }
+    arg1 = (gsl_matrix_complex_long_double *)(argp1);
+    res2 = SWIG_ConvertPtr(ST(1), &argp2,SWIGTYPE_p_gsl_spmatrix_complex_long_double, 0 |  0 );
+    if (!SWIG_IsOK(res2)) {
+      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "gsl_spmatrix_complex_long_double_add_to_dense" "', argument " "2"" of type '" "gsl_spmatrix_complex_long_double const *""'"); 
+    }
+    arg2 = (gsl_spmatrix_complex_long_double *)(argp2);
+    result = (int)gsl_spmatrix_complex_long_double_add_to_dense(arg1,(gsl_spmatrix_complex_long_double const *)arg2);
     ST(argvi) = SWIG_From_int  SWIG_PERL_CALL_ARGS_1((int)(result)); argvi++ ;
     
     
@@ -9961,44 +9961,6 @@ XS(_wrap_gsl_spmatrix_complex_float_add) {
 }
 
 
-XS(_wrap_gsl_spmatrix_complex_float_add_to_dense) {
-  {
-    gsl_matrix_complex_float *arg1 = (gsl_matrix_complex_float *) 0 ;
-    gsl_spmatrix_complex_float *arg2 = (gsl_spmatrix_complex_float *) 0 ;
-    void *argp1 = 0 ;
-    int res1 = 0 ;
-    void *argp2 = 0 ;
-    int res2 = 0 ;
-    int argvi = 0;
-    int result;
-    dXSARGS;
-    
-    if ((items < 2) || (items > 2)) {
-      SWIG_croak("Usage: gsl_spmatrix_complex_float_add_to_dense(a,b);");
-    }
-    res1 = SWIG_ConvertPtr(ST(0), &argp1,SWIGTYPE_p_gsl_matrix_complex_float, 0 |  0 );
-    if (!SWIG_IsOK(res1)) {
-      SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "gsl_spmatrix_complex_float_add_to_dense" "', argument " "1"" of type '" "gsl_matrix_complex_float *""'"); 
-    }
-    arg1 = (gsl_matrix_complex_float *)(argp1);
-    res2 = SWIG_ConvertPtr(ST(1), &argp2,SWIGTYPE_p_gsl_spmatrix_complex_float, 0 |  0 );
-    if (!SWIG_IsOK(res2)) {
-      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "gsl_spmatrix_complex_float_add_to_dense" "', argument " "2"" of type '" "gsl_spmatrix_complex_float const *""'"); 
-    }
-    arg2 = (gsl_spmatrix_complex_float *)(argp2);
-    result = (int)gsl_spmatrix_complex_float_add_to_dense(arg1,(gsl_spmatrix_complex_float const *)arg2);
-    ST(argvi) = SWIG_From_int  SWIG_PERL_CALL_ARGS_1((int)(result)); argvi++ ;
-    
-    
-    XSRETURN(argvi);
-  fail:
-    
-    
-    SWIG_croak_null();
-  }
-}
-
-
 XS(_wrap_gsl_spmatrix_complex_float_d2sp) {
   {
     gsl_spmatrix_complex_float *arg1 = (gsl_spmatrix_complex_float *) 0 ;
@@ -10063,6 +10025,44 @@ XS(_wrap_gsl_spmatrix_complex_float_sp2d) {
     }
     arg2 = (gsl_spmatrix_complex_float *)(argp2);
     result = (int)gsl_spmatrix_complex_float_sp2d(arg1,(gsl_spmatrix_complex_float const *)arg2);
+    ST(argvi) = SWIG_From_int  SWIG_PERL_CALL_ARGS_1((int)(result)); argvi++ ;
+    
+    
+    XSRETURN(argvi);
+  fail:
+    
+    
+    SWIG_croak_null();
+  }
+}
+
+
+XS(_wrap_gsl_spmatrix_complex_float_add_to_dense) {
+  {
+    gsl_matrix_complex_float *arg1 = (gsl_matrix_complex_float *) 0 ;
+    gsl_spmatrix_complex_float *arg2 = (gsl_spmatrix_complex_float *) 0 ;
+    void *argp1 = 0 ;
+    int res1 = 0 ;
+    void *argp2 = 0 ;
+    int res2 = 0 ;
+    int argvi = 0;
+    int result;
+    dXSARGS;
+    
+    if ((items < 2) || (items > 2)) {
+      SWIG_croak("Usage: gsl_spmatrix_complex_float_add_to_dense(a,b);");
+    }
+    res1 = SWIG_ConvertPtr(ST(0), &argp1,SWIGTYPE_p_gsl_matrix_complex_float, 0 |  0 );
+    if (!SWIG_IsOK(res1)) {
+      SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "gsl_spmatrix_complex_float_add_to_dense" "', argument " "1"" of type '" "gsl_matrix_complex_float *""'"); 
+    }
+    arg1 = (gsl_matrix_complex_float *)(argp1);
+    res2 = SWIG_ConvertPtr(ST(1), &argp2,SWIGTYPE_p_gsl_spmatrix_complex_float, 0 |  0 );
+    if (!SWIG_IsOK(res2)) {
+      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "gsl_spmatrix_complex_float_add_to_dense" "', argument " "2"" of type '" "gsl_spmatrix_complex_float const *""'"); 
+    }
+    arg2 = (gsl_spmatrix_complex_float *)(argp2);
+    result = (int)gsl_spmatrix_complex_float_add_to_dense(arg1,(gsl_spmatrix_complex_float const *)arg2);
     ST(argvi) = SWIG_From_int  SWIG_PERL_CALL_ARGS_1((int)(result)); argvi++ ;
     
     
@@ -12380,44 +12380,6 @@ XS(_wrap_gsl_spmatrix_long_double_add) {
 }
 
 
-XS(_wrap_gsl_spmatrix_long_double_add_to_dense) {
-  {
-    gsl_matrix_long_double *arg1 = (gsl_matrix_long_double *) 0 ;
-    gsl_spmatrix_long_double *arg2 = (gsl_spmatrix_long_double *) 0 ;
-    void *argp1 = 0 ;
-    int res1 = 0 ;
-    void *argp2 = 0 ;
-    int res2 = 0 ;
-    int argvi = 0;
-    int result;
-    dXSARGS;
-    
-    if ((items < 2) || (items > 2)) {
-      SWIG_croak("Usage: gsl_spmatrix_long_double_add_to_dense(a,b);");
-    }
-    res1 = SWIG_ConvertPtr(ST(0), &argp1,SWIGTYPE_p_gsl_matrix_long_double, 0 |  0 );
-    if (!SWIG_IsOK(res1)) {
-      SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "gsl_spmatrix_long_double_add_to_dense" "', argument " "1"" of type '" "gsl_matrix_long_double *""'"); 
-    }
-    arg1 = (gsl_matrix_long_double *)(argp1);
-    res2 = SWIG_ConvertPtr(ST(1), &argp2,SWIGTYPE_p_gsl_spmatrix_long_double, 0 |  0 );
-    if (!SWIG_IsOK(res2)) {
-      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "gsl_spmatrix_long_double_add_to_dense" "', argument " "2"" of type '" "gsl_spmatrix_long_double const *""'"); 
-    }
-    arg2 = (gsl_spmatrix_long_double *)(argp2);
-    result = (int)gsl_spmatrix_long_double_add_to_dense(arg1,(gsl_spmatrix_long_double const *)arg2);
-    ST(argvi) = SWIG_From_int  SWIG_PERL_CALL_ARGS_1((int)(result)); argvi++ ;
-    
-    
-    XSRETURN(argvi);
-  fail:
-    
-    
-    SWIG_croak_null();
-  }
-}
-
-
 XS(_wrap_gsl_spmatrix_long_double_d2sp) {
   {
     gsl_spmatrix_long_double *arg1 = (gsl_spmatrix_long_double *) 0 ;
@@ -12482,6 +12444,44 @@ XS(_wrap_gsl_spmatrix_long_double_sp2d) {
     }
     arg2 = (gsl_spmatrix_long_double *)(argp2);
     result = (int)gsl_spmatrix_long_double_sp2d(arg1,(gsl_spmatrix_long_double const *)arg2);
+    ST(argvi) = SWIG_From_int  SWIG_PERL_CALL_ARGS_1((int)(result)); argvi++ ;
+    
+    
+    XSRETURN(argvi);
+  fail:
+    
+    
+    SWIG_croak_null();
+  }
+}
+
+
+XS(_wrap_gsl_spmatrix_long_double_add_to_dense) {
+  {
+    gsl_matrix_long_double *arg1 = (gsl_matrix_long_double *) 0 ;
+    gsl_spmatrix_long_double *arg2 = (gsl_spmatrix_long_double *) 0 ;
+    void *argp1 = 0 ;
+    int res1 = 0 ;
+    void *argp2 = 0 ;
+    int res2 = 0 ;
+    int argvi = 0;
+    int result;
+    dXSARGS;
+    
+    if ((items < 2) || (items > 2)) {
+      SWIG_croak("Usage: gsl_spmatrix_long_double_add_to_dense(a,b);");
+    }
+    res1 = SWIG_ConvertPtr(ST(0), &argp1,SWIGTYPE_p_gsl_matrix_long_double, 0 |  0 );
+    if (!SWIG_IsOK(res1)) {
+      SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "gsl_spmatrix_long_double_add_to_dense" "', argument " "1"" of type '" "gsl_matrix_long_double *""'"); 
+    }
+    arg1 = (gsl_matrix_long_double *)(argp1);
+    res2 = SWIG_ConvertPtr(ST(1), &argp2,SWIGTYPE_p_gsl_spmatrix_long_double, 0 |  0 );
+    if (!SWIG_IsOK(res2)) {
+      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "gsl_spmatrix_long_double_add_to_dense" "', argument " "2"" of type '" "gsl_spmatrix_long_double const *""'"); 
+    }
+    arg2 = (gsl_spmatrix_long_double *)(argp2);
+    result = (int)gsl_spmatrix_long_double_add_to_dense(arg1,(gsl_spmatrix_long_double const *)arg2);
     ST(argvi) = SWIG_From_int  SWIG_PERL_CALL_ARGS_1((int)(result)); argvi++ ;
     
     
@@ -14791,44 +14791,6 @@ XS(_wrap_gsl_spmatrix_uint_add) {
 }
 
 
-XS(_wrap_gsl_spmatrix_uint_add_to_dense) {
-  {
-    gsl_matrix_uint *arg1 = (gsl_matrix_uint *) 0 ;
-    gsl_spmatrix_uint *arg2 = (gsl_spmatrix_uint *) 0 ;
-    void *argp1 = 0 ;
-    int res1 = 0 ;
-    void *argp2 = 0 ;
-    int res2 = 0 ;
-    int argvi = 0;
-    int result;
-    dXSARGS;
-    
-    if ((items < 2) || (items > 2)) {
-      SWIG_croak("Usage: gsl_spmatrix_uint_add_to_dense(a,b);");
-    }
-    res1 = SWIG_ConvertPtr(ST(0), &argp1,SWIGTYPE_p_gsl_matrix_uint, 0 |  0 );
-    if (!SWIG_IsOK(res1)) {
-      SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "gsl_spmatrix_uint_add_to_dense" "', argument " "1"" of type '" "gsl_matrix_uint *""'"); 
-    }
-    arg1 = (gsl_matrix_uint *)(argp1);
-    res2 = SWIG_ConvertPtr(ST(1), &argp2,SWIGTYPE_p_gsl_spmatrix_uint, 0 |  0 );
-    if (!SWIG_IsOK(res2)) {
-      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "gsl_spmatrix_uint_add_to_dense" "', argument " "2"" of type '" "gsl_spmatrix_uint const *""'"); 
-    }
-    arg2 = (gsl_spmatrix_uint *)(argp2);
-    result = (int)gsl_spmatrix_uint_add_to_dense(arg1,(gsl_spmatrix_uint const *)arg2);
-    ST(argvi) = SWIG_From_int  SWIG_PERL_CALL_ARGS_1((int)(result)); argvi++ ;
-    
-    
-    XSRETURN(argvi);
-  fail:
-    
-    
-    SWIG_croak_null();
-  }
-}
-
-
 XS(_wrap_gsl_spmatrix_uint_d2sp) {
   {
     gsl_spmatrix_uint *arg1 = (gsl_spmatrix_uint *) 0 ;
@@ -14893,6 +14855,44 @@ XS(_wrap_gsl_spmatrix_uint_sp2d) {
     }
     arg2 = (gsl_spmatrix_uint *)(argp2);
     result = (int)gsl_spmatrix_uint_sp2d(arg1,(gsl_spmatrix_uint const *)arg2);
+    ST(argvi) = SWIG_From_int  SWIG_PERL_CALL_ARGS_1((int)(result)); argvi++ ;
+    
+    
+    XSRETURN(argvi);
+  fail:
+    
+    
+    SWIG_croak_null();
+  }
+}
+
+
+XS(_wrap_gsl_spmatrix_uint_add_to_dense) {
+  {
+    gsl_matrix_uint *arg1 = (gsl_matrix_uint *) 0 ;
+    gsl_spmatrix_uint *arg2 = (gsl_spmatrix_uint *) 0 ;
+    void *argp1 = 0 ;
+    int res1 = 0 ;
+    void *argp2 = 0 ;
+    int res2 = 0 ;
+    int argvi = 0;
+    int result;
+    dXSARGS;
+    
+    if ((items < 2) || (items > 2)) {
+      SWIG_croak("Usage: gsl_spmatrix_uint_add_to_dense(a,b);");
+    }
+    res1 = SWIG_ConvertPtr(ST(0), &argp1,SWIGTYPE_p_gsl_matrix_uint, 0 |  0 );
+    if (!SWIG_IsOK(res1)) {
+      SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "gsl_spmatrix_uint_add_to_dense" "', argument " "1"" of type '" "gsl_matrix_uint *""'"); 
+    }
+    arg1 = (gsl_matrix_uint *)(argp1);
+    res2 = SWIG_ConvertPtr(ST(1), &argp2,SWIGTYPE_p_gsl_spmatrix_uint, 0 |  0 );
+    if (!SWIG_IsOK(res2)) {
+      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "gsl_spmatrix_uint_add_to_dense" "', argument " "2"" of type '" "gsl_spmatrix_uint const *""'"); 
+    }
+    arg2 = (gsl_spmatrix_uint *)(argp2);
+    result = (int)gsl_spmatrix_uint_add_to_dense(arg1,(gsl_spmatrix_uint const *)arg2);
     ST(argvi) = SWIG_From_int  SWIG_PERL_CALL_ARGS_1((int)(result)); argvi++ ;
     
     
@@ -17129,44 +17129,6 @@ XS(_wrap_gsl_spmatrix_complex_add) {
 }
 
 
-XS(_wrap_gsl_spmatrix_complex_add_to_dense) {
-  {
-    gsl_matrix_complex *arg1 = (gsl_matrix_complex *) 0 ;
-    gsl_spmatrix_complex *arg2 = (gsl_spmatrix_complex *) 0 ;
-    void *argp1 = 0 ;
-    int res1 = 0 ;
-    void *argp2 = 0 ;
-    int res2 = 0 ;
-    int argvi = 0;
-    int result;
-    dXSARGS;
-    
-    if ((items < 2) || (items > 2)) {
-      SWIG_croak("Usage: gsl_spmatrix_complex_add_to_dense(a,b);");
-    }
-    res1 = SWIG_ConvertPtr(ST(0), &argp1,SWIGTYPE_p_gsl_matrix_complex, 0 |  0 );
-    if (!SWIG_IsOK(res1)) {
-      SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "gsl_spmatrix_complex_add_to_dense" "', argument " "1"" of type '" "gsl_matrix_complex *""'"); 
-    }
-    arg1 = (gsl_matrix_complex *)(argp1);
-    res2 = SWIG_ConvertPtr(ST(1), &argp2,SWIGTYPE_p_gsl_spmatrix_complex, 0 |  0 );
-    if (!SWIG_IsOK(res2)) {
-      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "gsl_spmatrix_complex_add_to_dense" "', argument " "2"" of type '" "gsl_spmatrix_complex const *""'"); 
-    }
-    arg2 = (gsl_spmatrix_complex *)(argp2);
-    result = (int)gsl_spmatrix_complex_add_to_dense(arg1,(gsl_spmatrix_complex const *)arg2);
-    ST(argvi) = SWIG_From_int  SWIG_PERL_CALL_ARGS_1((int)(result)); argvi++ ;
-    
-    
-    XSRETURN(argvi);
-  fail:
-    
-    
-    SWIG_croak_null();
-  }
-}
-
-
 XS(_wrap_gsl_spmatrix_complex_d2sp) {
   {
     gsl_spmatrix_complex *arg1 = (gsl_spmatrix_complex *) 0 ;
@@ -17231,6 +17193,44 @@ XS(_wrap_gsl_spmatrix_complex_sp2d) {
     }
     arg2 = (gsl_spmatrix_complex *)(argp2);
     result = (int)gsl_spmatrix_complex_sp2d(arg1,(gsl_spmatrix_complex const *)arg2);
+    ST(argvi) = SWIG_From_int  SWIG_PERL_CALL_ARGS_1((int)(result)); argvi++ ;
+    
+    
+    XSRETURN(argvi);
+  fail:
+    
+    
+    SWIG_croak_null();
+  }
+}
+
+
+XS(_wrap_gsl_spmatrix_complex_add_to_dense) {
+  {
+    gsl_matrix_complex *arg1 = (gsl_matrix_complex *) 0 ;
+    gsl_spmatrix_complex *arg2 = (gsl_spmatrix_complex *) 0 ;
+    void *argp1 = 0 ;
+    int res1 = 0 ;
+    void *argp2 = 0 ;
+    int res2 = 0 ;
+    int argvi = 0;
+    int result;
+    dXSARGS;
+    
+    if ((items < 2) || (items > 2)) {
+      SWIG_croak("Usage: gsl_spmatrix_complex_add_to_dense(a,b);");
+    }
+    res1 = SWIG_ConvertPtr(ST(0), &argp1,SWIGTYPE_p_gsl_matrix_complex, 0 |  0 );
+    if (!SWIG_IsOK(res1)) {
+      SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "gsl_spmatrix_complex_add_to_dense" "', argument " "1"" of type '" "gsl_matrix_complex *""'"); 
+    }
+    arg1 = (gsl_matrix_complex *)(argp1);
+    res2 = SWIG_ConvertPtr(ST(1), &argp2,SWIGTYPE_p_gsl_spmatrix_complex, 0 |  0 );
+    if (!SWIG_IsOK(res2)) {
+      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "gsl_spmatrix_complex_add_to_dense" "', argument " "2"" of type '" "gsl_spmatrix_complex const *""'"); 
+    }
+    arg2 = (gsl_spmatrix_complex *)(argp2);
+    result = (int)gsl_spmatrix_complex_add_to_dense(arg1,(gsl_spmatrix_complex const *)arg2);
     ST(argvi) = SWIG_From_int  SWIG_PERL_CALL_ARGS_1((int)(result)); argvi++ ;
     
     
@@ -19556,44 +19556,6 @@ XS(_wrap_gsl_spmatrix_char_add) {
 }
 
 
-XS(_wrap_gsl_spmatrix_char_add_to_dense) {
-  {
-    gsl_matrix_char *arg1 = (gsl_matrix_char *) 0 ;
-    gsl_spmatrix_char *arg2 = (gsl_spmatrix_char *) 0 ;
-    void *argp1 = 0 ;
-    int res1 = 0 ;
-    void *argp2 = 0 ;
-    int res2 = 0 ;
-    int argvi = 0;
-    int result;
-    dXSARGS;
-    
-    if ((items < 2) || (items > 2)) {
-      SWIG_croak("Usage: gsl_spmatrix_char_add_to_dense(a,b);");
-    }
-    res1 = SWIG_ConvertPtr(ST(0), &argp1,SWIGTYPE_p_gsl_matrix_char, 0 |  0 );
-    if (!SWIG_IsOK(res1)) {
-      SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "gsl_spmatrix_char_add_to_dense" "', argument " "1"" of type '" "gsl_matrix_char *""'"); 
-    }
-    arg1 = (gsl_matrix_char *)(argp1);
-    res2 = SWIG_ConvertPtr(ST(1), &argp2,SWIGTYPE_p_gsl_spmatrix_char, 0 |  0 );
-    if (!SWIG_IsOK(res2)) {
-      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "gsl_spmatrix_char_add_to_dense" "', argument " "2"" of type '" "gsl_spmatrix_char const *""'"); 
-    }
-    arg2 = (gsl_spmatrix_char *)(argp2);
-    result = (int)gsl_spmatrix_char_add_to_dense(arg1,(gsl_spmatrix_char const *)arg2);
-    ST(argvi) = SWIG_From_int  SWIG_PERL_CALL_ARGS_1((int)(result)); argvi++ ;
-    
-    
-    XSRETURN(argvi);
-  fail:
-    
-    
-    SWIG_croak_null();
-  }
-}
-
-
 XS(_wrap_gsl_spmatrix_char_d2sp) {
   {
     gsl_spmatrix_char *arg1 = (gsl_spmatrix_char *) 0 ;
@@ -19658,6 +19620,44 @@ XS(_wrap_gsl_spmatrix_char_sp2d) {
     }
     arg2 = (gsl_spmatrix_char *)(argp2);
     result = (int)gsl_spmatrix_char_sp2d(arg1,(gsl_spmatrix_char const *)arg2);
+    ST(argvi) = SWIG_From_int  SWIG_PERL_CALL_ARGS_1((int)(result)); argvi++ ;
+    
+    
+    XSRETURN(argvi);
+  fail:
+    
+    
+    SWIG_croak_null();
+  }
+}
+
+
+XS(_wrap_gsl_spmatrix_char_add_to_dense) {
+  {
+    gsl_matrix_char *arg1 = (gsl_matrix_char *) 0 ;
+    gsl_spmatrix_char *arg2 = (gsl_spmatrix_char *) 0 ;
+    void *argp1 = 0 ;
+    int res1 = 0 ;
+    void *argp2 = 0 ;
+    int res2 = 0 ;
+    int argvi = 0;
+    int result;
+    dXSARGS;
+    
+    if ((items < 2) || (items > 2)) {
+      SWIG_croak("Usage: gsl_spmatrix_char_add_to_dense(a,b);");
+    }
+    res1 = SWIG_ConvertPtr(ST(0), &argp1,SWIGTYPE_p_gsl_matrix_char, 0 |  0 );
+    if (!SWIG_IsOK(res1)) {
+      SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "gsl_spmatrix_char_add_to_dense" "', argument " "1"" of type '" "gsl_matrix_char *""'"); 
+    }
+    arg1 = (gsl_matrix_char *)(argp1);
+    res2 = SWIG_ConvertPtr(ST(1), &argp2,SWIGTYPE_p_gsl_spmatrix_char, 0 |  0 );
+    if (!SWIG_IsOK(res2)) {
+      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "gsl_spmatrix_char_add_to_dense" "', argument " "2"" of type '" "gsl_spmatrix_char const *""'"); 
+    }
+    arg2 = (gsl_spmatrix_char *)(argp2);
+    result = (int)gsl_spmatrix_char_add_to_dense(arg1,(gsl_spmatrix_char const *)arg2);
     ST(argvi) = SWIG_From_int  SWIG_PERL_CALL_ARGS_1((int)(result)); argvi++ ;
     
     
@@ -21967,44 +21967,6 @@ XS(_wrap_gsl_spmatrix_uchar_add) {
 }
 
 
-XS(_wrap_gsl_spmatrix_uchar_add_to_dense) {
-  {
-    gsl_matrix_uchar *arg1 = (gsl_matrix_uchar *) 0 ;
-    gsl_spmatrix_uchar *arg2 = (gsl_spmatrix_uchar *) 0 ;
-    void *argp1 = 0 ;
-    int res1 = 0 ;
-    void *argp2 = 0 ;
-    int res2 = 0 ;
-    int argvi = 0;
-    int result;
-    dXSARGS;
-    
-    if ((items < 2) || (items > 2)) {
-      SWIG_croak("Usage: gsl_spmatrix_uchar_add_to_dense(a,b);");
-    }
-    res1 = SWIG_ConvertPtr(ST(0), &argp1,SWIGTYPE_p_gsl_matrix_uchar, 0 |  0 );
-    if (!SWIG_IsOK(res1)) {
-      SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "gsl_spmatrix_uchar_add_to_dense" "', argument " "1"" of type '" "gsl_matrix_uchar *""'"); 
-    }
-    arg1 = (gsl_matrix_uchar *)(argp1);
-    res2 = SWIG_ConvertPtr(ST(1), &argp2,SWIGTYPE_p_gsl_spmatrix_uchar, 0 |  0 );
-    if (!SWIG_IsOK(res2)) {
-      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "gsl_spmatrix_uchar_add_to_dense" "', argument " "2"" of type '" "gsl_spmatrix_uchar const *""'"); 
-    }
-    arg2 = (gsl_spmatrix_uchar *)(argp2);
-    result = (int)gsl_spmatrix_uchar_add_to_dense(arg1,(gsl_spmatrix_uchar const *)arg2);
-    ST(argvi) = SWIG_From_int  SWIG_PERL_CALL_ARGS_1((int)(result)); argvi++ ;
-    
-    
-    XSRETURN(argvi);
-  fail:
-    
-    
-    SWIG_croak_null();
-  }
-}
-
-
 XS(_wrap_gsl_spmatrix_uchar_d2sp) {
   {
     gsl_spmatrix_uchar *arg1 = (gsl_spmatrix_uchar *) 0 ;
@@ -22069,6 +22031,44 @@ XS(_wrap_gsl_spmatrix_uchar_sp2d) {
     }
     arg2 = (gsl_spmatrix_uchar *)(argp2);
     result = (int)gsl_spmatrix_uchar_sp2d(arg1,(gsl_spmatrix_uchar const *)arg2);
+    ST(argvi) = SWIG_From_int  SWIG_PERL_CALL_ARGS_1((int)(result)); argvi++ ;
+    
+    
+    XSRETURN(argvi);
+  fail:
+    
+    
+    SWIG_croak_null();
+  }
+}
+
+
+XS(_wrap_gsl_spmatrix_uchar_add_to_dense) {
+  {
+    gsl_matrix_uchar *arg1 = (gsl_matrix_uchar *) 0 ;
+    gsl_spmatrix_uchar *arg2 = (gsl_spmatrix_uchar *) 0 ;
+    void *argp1 = 0 ;
+    int res1 = 0 ;
+    void *argp2 = 0 ;
+    int res2 = 0 ;
+    int argvi = 0;
+    int result;
+    dXSARGS;
+    
+    if ((items < 2) || (items > 2)) {
+      SWIG_croak("Usage: gsl_spmatrix_uchar_add_to_dense(a,b);");
+    }
+    res1 = SWIG_ConvertPtr(ST(0), &argp1,SWIGTYPE_p_gsl_matrix_uchar, 0 |  0 );
+    if (!SWIG_IsOK(res1)) {
+      SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "gsl_spmatrix_uchar_add_to_dense" "', argument " "1"" of type '" "gsl_matrix_uchar *""'"); 
+    }
+    arg1 = (gsl_matrix_uchar *)(argp1);
+    res2 = SWIG_ConvertPtr(ST(1), &argp2,SWIGTYPE_p_gsl_spmatrix_uchar, 0 |  0 );
+    if (!SWIG_IsOK(res2)) {
+      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "gsl_spmatrix_uchar_add_to_dense" "', argument " "2"" of type '" "gsl_spmatrix_uchar const *""'"); 
+    }
+    arg2 = (gsl_spmatrix_uchar *)(argp2);
+    result = (int)gsl_spmatrix_uchar_add_to_dense(arg1,(gsl_spmatrix_uchar const *)arg2);
     ST(argvi) = SWIG_From_int  SWIG_PERL_CALL_ARGS_1((int)(result)); argvi++ ;
     
     
@@ -24378,44 +24378,6 @@ XS(_wrap_gsl_spmatrix_int_add) {
 }
 
 
-XS(_wrap_gsl_spmatrix_int_add_to_dense) {
-  {
-    gsl_matrix_int *arg1 = (gsl_matrix_int *) 0 ;
-    gsl_spmatrix_int *arg2 = (gsl_spmatrix_int *) 0 ;
-    void *argp1 = 0 ;
-    int res1 = 0 ;
-    void *argp2 = 0 ;
-    int res2 = 0 ;
-    int argvi = 0;
-    int result;
-    dXSARGS;
-    
-    if ((items < 2) || (items > 2)) {
-      SWIG_croak("Usage: gsl_spmatrix_int_add_to_dense(a,b);");
-    }
-    res1 = SWIG_ConvertPtr(ST(0), &argp1,SWIGTYPE_p_gsl_matrix_int, 0 |  0 );
-    if (!SWIG_IsOK(res1)) {
-      SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "gsl_spmatrix_int_add_to_dense" "', argument " "1"" of type '" "gsl_matrix_int *""'"); 
-    }
-    arg1 = (gsl_matrix_int *)(argp1);
-    res2 = SWIG_ConvertPtr(ST(1), &argp2,SWIGTYPE_p_gsl_spmatrix_int, 0 |  0 );
-    if (!SWIG_IsOK(res2)) {
-      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "gsl_spmatrix_int_add_to_dense" "', argument " "2"" of type '" "gsl_spmatrix_int const *""'"); 
-    }
-    arg2 = (gsl_spmatrix_int *)(argp2);
-    result = (int)gsl_spmatrix_int_add_to_dense(arg1,(gsl_spmatrix_int const *)arg2);
-    ST(argvi) = SWIG_From_int  SWIG_PERL_CALL_ARGS_1((int)(result)); argvi++ ;
-    
-    
-    XSRETURN(argvi);
-  fail:
-    
-    
-    SWIG_croak_null();
-  }
-}
-
-
 XS(_wrap_gsl_spmatrix_int_d2sp) {
   {
     gsl_spmatrix_int *arg1 = (gsl_spmatrix_int *) 0 ;
@@ -24480,6 +24442,44 @@ XS(_wrap_gsl_spmatrix_int_sp2d) {
     }
     arg2 = (gsl_spmatrix_int *)(argp2);
     result = (int)gsl_spmatrix_int_sp2d(arg1,(gsl_spmatrix_int const *)arg2);
+    ST(argvi) = SWIG_From_int  SWIG_PERL_CALL_ARGS_1((int)(result)); argvi++ ;
+    
+    
+    XSRETURN(argvi);
+  fail:
+    
+    
+    SWIG_croak_null();
+  }
+}
+
+
+XS(_wrap_gsl_spmatrix_int_add_to_dense) {
+  {
+    gsl_matrix_int *arg1 = (gsl_matrix_int *) 0 ;
+    gsl_spmatrix_int *arg2 = (gsl_spmatrix_int *) 0 ;
+    void *argp1 = 0 ;
+    int res1 = 0 ;
+    void *argp2 = 0 ;
+    int res2 = 0 ;
+    int argvi = 0;
+    int result;
+    dXSARGS;
+    
+    if ((items < 2) || (items > 2)) {
+      SWIG_croak("Usage: gsl_spmatrix_int_add_to_dense(a,b);");
+    }
+    res1 = SWIG_ConvertPtr(ST(0), &argp1,SWIGTYPE_p_gsl_matrix_int, 0 |  0 );
+    if (!SWIG_IsOK(res1)) {
+      SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "gsl_spmatrix_int_add_to_dense" "', argument " "1"" of type '" "gsl_matrix_int *""'"); 
+    }
+    arg1 = (gsl_matrix_int *)(argp1);
+    res2 = SWIG_ConvertPtr(ST(1), &argp2,SWIGTYPE_p_gsl_spmatrix_int, 0 |  0 );
+    if (!SWIG_IsOK(res2)) {
+      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "gsl_spmatrix_int_add_to_dense" "', argument " "2"" of type '" "gsl_spmatrix_int const *""'"); 
+    }
+    arg2 = (gsl_spmatrix_int *)(argp2);
+    result = (int)gsl_spmatrix_int_add_to_dense(arg1,(gsl_spmatrix_int const *)arg2);
     ST(argvi) = SWIG_From_int  SWIG_PERL_CALL_ARGS_1((int)(result)); argvi++ ;
     
     
@@ -26789,44 +26789,6 @@ XS(_wrap_gsl_spmatrix_short_add) {
 }
 
 
-XS(_wrap_gsl_spmatrix_short_add_to_dense) {
-  {
-    gsl_matrix_short *arg1 = (gsl_matrix_short *) 0 ;
-    gsl_spmatrix_short *arg2 = (gsl_spmatrix_short *) 0 ;
-    void *argp1 = 0 ;
-    int res1 = 0 ;
-    void *argp2 = 0 ;
-    int res2 = 0 ;
-    int argvi = 0;
-    int result;
-    dXSARGS;
-    
-    if ((items < 2) || (items > 2)) {
-      SWIG_croak("Usage: gsl_spmatrix_short_add_to_dense(a,b);");
-    }
-    res1 = SWIG_ConvertPtr(ST(0), &argp1,SWIGTYPE_p_gsl_matrix_short, 0 |  0 );
-    if (!SWIG_IsOK(res1)) {
-      SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "gsl_spmatrix_short_add_to_dense" "', argument " "1"" of type '" "gsl_matrix_short *""'"); 
-    }
-    arg1 = (gsl_matrix_short *)(argp1);
-    res2 = SWIG_ConvertPtr(ST(1), &argp2,SWIGTYPE_p_gsl_spmatrix_short, 0 |  0 );
-    if (!SWIG_IsOK(res2)) {
-      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "gsl_spmatrix_short_add_to_dense" "', argument " "2"" of type '" "gsl_spmatrix_short const *""'"); 
-    }
-    arg2 = (gsl_spmatrix_short *)(argp2);
-    result = (int)gsl_spmatrix_short_add_to_dense(arg1,(gsl_spmatrix_short const *)arg2);
-    ST(argvi) = SWIG_From_int  SWIG_PERL_CALL_ARGS_1((int)(result)); argvi++ ;
-    
-    
-    XSRETURN(argvi);
-  fail:
-    
-    
-    SWIG_croak_null();
-  }
-}
-
-
 XS(_wrap_gsl_spmatrix_short_d2sp) {
   {
     gsl_spmatrix_short *arg1 = (gsl_spmatrix_short *) 0 ;
@@ -26891,6 +26853,44 @@ XS(_wrap_gsl_spmatrix_short_sp2d) {
     }
     arg2 = (gsl_spmatrix_short *)(argp2);
     result = (int)gsl_spmatrix_short_sp2d(arg1,(gsl_spmatrix_short const *)arg2);
+    ST(argvi) = SWIG_From_int  SWIG_PERL_CALL_ARGS_1((int)(result)); argvi++ ;
+    
+    
+    XSRETURN(argvi);
+  fail:
+    
+    
+    SWIG_croak_null();
+  }
+}
+
+
+XS(_wrap_gsl_spmatrix_short_add_to_dense) {
+  {
+    gsl_matrix_short *arg1 = (gsl_matrix_short *) 0 ;
+    gsl_spmatrix_short *arg2 = (gsl_spmatrix_short *) 0 ;
+    void *argp1 = 0 ;
+    int res1 = 0 ;
+    void *argp2 = 0 ;
+    int res2 = 0 ;
+    int argvi = 0;
+    int result;
+    dXSARGS;
+    
+    if ((items < 2) || (items > 2)) {
+      SWIG_croak("Usage: gsl_spmatrix_short_add_to_dense(a,b);");
+    }
+    res1 = SWIG_ConvertPtr(ST(0), &argp1,SWIGTYPE_p_gsl_matrix_short, 0 |  0 );
+    if (!SWIG_IsOK(res1)) {
+      SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "gsl_spmatrix_short_add_to_dense" "', argument " "1"" of type '" "gsl_matrix_short *""'"); 
+    }
+    arg1 = (gsl_matrix_short *)(argp1);
+    res2 = SWIG_ConvertPtr(ST(1), &argp2,SWIGTYPE_p_gsl_spmatrix_short, 0 |  0 );
+    if (!SWIG_IsOK(res2)) {
+      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "gsl_spmatrix_short_add_to_dense" "', argument " "2"" of type '" "gsl_spmatrix_short const *""'"); 
+    }
+    arg2 = (gsl_spmatrix_short *)(argp2);
+    result = (int)gsl_spmatrix_short_add_to_dense(arg1,(gsl_spmatrix_short const *)arg2);
     ST(argvi) = SWIG_From_int  SWIG_PERL_CALL_ARGS_1((int)(result)); argvi++ ;
     
     
@@ -29200,44 +29200,6 @@ XS(_wrap_gsl_spmatrix_float_add) {
 }
 
 
-XS(_wrap_gsl_spmatrix_float_add_to_dense) {
-  {
-    gsl_matrix_float *arg1 = (gsl_matrix_float *) 0 ;
-    gsl_spmatrix_float *arg2 = (gsl_spmatrix_float *) 0 ;
-    void *argp1 = 0 ;
-    int res1 = 0 ;
-    void *argp2 = 0 ;
-    int res2 = 0 ;
-    int argvi = 0;
-    int result;
-    dXSARGS;
-    
-    if ((items < 2) || (items > 2)) {
-      SWIG_croak("Usage: gsl_spmatrix_float_add_to_dense(a,b);");
-    }
-    res1 = SWIG_ConvertPtr(ST(0), &argp1,SWIGTYPE_p_gsl_matrix_float, 0 |  0 );
-    if (!SWIG_IsOK(res1)) {
-      SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "gsl_spmatrix_float_add_to_dense" "', argument " "1"" of type '" "gsl_matrix_float *""'"); 
-    }
-    arg1 = (gsl_matrix_float *)(argp1);
-    res2 = SWIG_ConvertPtr(ST(1), &argp2,SWIGTYPE_p_gsl_spmatrix_float, 0 |  0 );
-    if (!SWIG_IsOK(res2)) {
-      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "gsl_spmatrix_float_add_to_dense" "', argument " "2"" of type '" "gsl_spmatrix_float const *""'"); 
-    }
-    arg2 = (gsl_spmatrix_float *)(argp2);
-    result = (int)gsl_spmatrix_float_add_to_dense(arg1,(gsl_spmatrix_float const *)arg2);
-    ST(argvi) = SWIG_From_int  SWIG_PERL_CALL_ARGS_1((int)(result)); argvi++ ;
-    
-    
-    XSRETURN(argvi);
-  fail:
-    
-    
-    SWIG_croak_null();
-  }
-}
-
-
 XS(_wrap_gsl_spmatrix_float_d2sp) {
   {
     gsl_spmatrix_float *arg1 = (gsl_spmatrix_float *) 0 ;
@@ -29302,6 +29264,44 @@ XS(_wrap_gsl_spmatrix_float_sp2d) {
     }
     arg2 = (gsl_spmatrix_float *)(argp2);
     result = (int)gsl_spmatrix_float_sp2d(arg1,(gsl_spmatrix_float const *)arg2);
+    ST(argvi) = SWIG_From_int  SWIG_PERL_CALL_ARGS_1((int)(result)); argvi++ ;
+    
+    
+    XSRETURN(argvi);
+  fail:
+    
+    
+    SWIG_croak_null();
+  }
+}
+
+
+XS(_wrap_gsl_spmatrix_float_add_to_dense) {
+  {
+    gsl_matrix_float *arg1 = (gsl_matrix_float *) 0 ;
+    gsl_spmatrix_float *arg2 = (gsl_spmatrix_float *) 0 ;
+    void *argp1 = 0 ;
+    int res1 = 0 ;
+    void *argp2 = 0 ;
+    int res2 = 0 ;
+    int argvi = 0;
+    int result;
+    dXSARGS;
+    
+    if ((items < 2) || (items > 2)) {
+      SWIG_croak("Usage: gsl_spmatrix_float_add_to_dense(a,b);");
+    }
+    res1 = SWIG_ConvertPtr(ST(0), &argp1,SWIGTYPE_p_gsl_matrix_float, 0 |  0 );
+    if (!SWIG_IsOK(res1)) {
+      SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "gsl_spmatrix_float_add_to_dense" "', argument " "1"" of type '" "gsl_matrix_float *""'"); 
+    }
+    arg1 = (gsl_matrix_float *)(argp1);
+    res2 = SWIG_ConvertPtr(ST(1), &argp2,SWIGTYPE_p_gsl_spmatrix_float, 0 |  0 );
+    if (!SWIG_IsOK(res2)) {
+      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "gsl_spmatrix_float_add_to_dense" "', argument " "2"" of type '" "gsl_spmatrix_float const *""'"); 
+    }
+    arg2 = (gsl_spmatrix_float *)(argp2);
+    result = (int)gsl_spmatrix_float_add_to_dense(arg1,(gsl_spmatrix_float const *)arg2);
     ST(argvi) = SWIG_From_int  SWIG_PERL_CALL_ARGS_1((int)(result)); argvi++ ;
     
     
@@ -31611,44 +31611,6 @@ XS(_wrap_gsl_spmatrix_ushort_add) {
 }
 
 
-XS(_wrap_gsl_spmatrix_ushort_add_to_dense) {
-  {
-    gsl_matrix_ushort *arg1 = (gsl_matrix_ushort *) 0 ;
-    gsl_spmatrix_ushort *arg2 = (gsl_spmatrix_ushort *) 0 ;
-    void *argp1 = 0 ;
-    int res1 = 0 ;
-    void *argp2 = 0 ;
-    int res2 = 0 ;
-    int argvi = 0;
-    int result;
-    dXSARGS;
-    
-    if ((items < 2) || (items > 2)) {
-      SWIG_croak("Usage: gsl_spmatrix_ushort_add_to_dense(a,b);");
-    }
-    res1 = SWIG_ConvertPtr(ST(0), &argp1,SWIGTYPE_p_gsl_matrix_ushort, 0 |  0 );
-    if (!SWIG_IsOK(res1)) {
-      SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "gsl_spmatrix_ushort_add_to_dense" "', argument " "1"" of type '" "gsl_matrix_ushort *""'"); 
-    }
-    arg1 = (gsl_matrix_ushort *)(argp1);
-    res2 = SWIG_ConvertPtr(ST(1), &argp2,SWIGTYPE_p_gsl_spmatrix_ushort, 0 |  0 );
-    if (!SWIG_IsOK(res2)) {
-      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "gsl_spmatrix_ushort_add_to_dense" "', argument " "2"" of type '" "gsl_spmatrix_ushort const *""'"); 
-    }
-    arg2 = (gsl_spmatrix_ushort *)(argp2);
-    result = (int)gsl_spmatrix_ushort_add_to_dense(arg1,(gsl_spmatrix_ushort const *)arg2);
-    ST(argvi) = SWIG_From_int  SWIG_PERL_CALL_ARGS_1((int)(result)); argvi++ ;
-    
-    
-    XSRETURN(argvi);
-  fail:
-    
-    
-    SWIG_croak_null();
-  }
-}
-
-
 XS(_wrap_gsl_spmatrix_ushort_d2sp) {
   {
     gsl_spmatrix_ushort *arg1 = (gsl_spmatrix_ushort *) 0 ;
@@ -31713,6 +31675,44 @@ XS(_wrap_gsl_spmatrix_ushort_sp2d) {
     }
     arg2 = (gsl_spmatrix_ushort *)(argp2);
     result = (int)gsl_spmatrix_ushort_sp2d(arg1,(gsl_spmatrix_ushort const *)arg2);
+    ST(argvi) = SWIG_From_int  SWIG_PERL_CALL_ARGS_1((int)(result)); argvi++ ;
+    
+    
+    XSRETURN(argvi);
+  fail:
+    
+    
+    SWIG_croak_null();
+  }
+}
+
+
+XS(_wrap_gsl_spmatrix_ushort_add_to_dense) {
+  {
+    gsl_matrix_ushort *arg1 = (gsl_matrix_ushort *) 0 ;
+    gsl_spmatrix_ushort *arg2 = (gsl_spmatrix_ushort *) 0 ;
+    void *argp1 = 0 ;
+    int res1 = 0 ;
+    void *argp2 = 0 ;
+    int res2 = 0 ;
+    int argvi = 0;
+    int result;
+    dXSARGS;
+    
+    if ((items < 2) || (items > 2)) {
+      SWIG_croak("Usage: gsl_spmatrix_ushort_add_to_dense(a,b);");
+    }
+    res1 = SWIG_ConvertPtr(ST(0), &argp1,SWIGTYPE_p_gsl_matrix_ushort, 0 |  0 );
+    if (!SWIG_IsOK(res1)) {
+      SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "gsl_spmatrix_ushort_add_to_dense" "', argument " "1"" of type '" "gsl_matrix_ushort *""'"); 
+    }
+    arg1 = (gsl_matrix_ushort *)(argp1);
+    res2 = SWIG_ConvertPtr(ST(1), &argp2,SWIGTYPE_p_gsl_spmatrix_ushort, 0 |  0 );
+    if (!SWIG_IsOK(res2)) {
+      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "gsl_spmatrix_ushort_add_to_dense" "', argument " "2"" of type '" "gsl_spmatrix_ushort const *""'"); 
+    }
+    arg2 = (gsl_spmatrix_ushort *)(argp2);
+    result = (int)gsl_spmatrix_ushort_add_to_dense(arg1,(gsl_spmatrix_ushort const *)arg2);
     ST(argvi) = SWIG_From_int  SWIG_PERL_CALL_ARGS_1((int)(result)); argvi++ ;
     
     
@@ -32228,9 +32228,9 @@ static swig_command_info swig_commands[] = {
 {"Math::GSL::SparseMatrixc::gsl_spmatrix_scale_columns", _wrap_gsl_spmatrix_scale_columns},
 {"Math::GSL::SparseMatrixc::gsl_spmatrix_scale_rows", _wrap_gsl_spmatrix_scale_rows},
 {"Math::GSL::SparseMatrixc::gsl_spmatrix_add", _wrap_gsl_spmatrix_add},
-{"Math::GSL::SparseMatrixc::gsl_spmatrix_add_to_dense", _wrap_gsl_spmatrix_add_to_dense},
 {"Math::GSL::SparseMatrixc::gsl_spmatrix_d2sp", _wrap_gsl_spmatrix_d2sp},
 {"Math::GSL::SparseMatrixc::gsl_spmatrix_sp2d", _wrap_gsl_spmatrix_sp2d},
+{"Math::GSL::SparseMatrixc::gsl_spmatrix_add_to_dense", _wrap_gsl_spmatrix_add_to_dense},
 {"Math::GSL::SparseMatrixc::gsl_spmatrix_equal", _wrap_gsl_spmatrix_equal},
 {"Math::GSL::SparseMatrixc::gsl_spmatrix_transpose", _wrap_gsl_spmatrix_transpose},
 {"Math::GSL::SparseMatrixc::gsl_spmatrix_transpose2", _wrap_gsl_spmatrix_transpose2},
@@ -32296,9 +32296,9 @@ static swig_command_info swig_commands[] = {
 {"Math::GSL::SparseMatrixc::gsl_spmatrix_complex_long_double_scale_columns", _wrap_gsl_spmatrix_complex_long_double_scale_columns},
 {"Math::GSL::SparseMatrixc::gsl_spmatrix_complex_long_double_scale_rows", _wrap_gsl_spmatrix_complex_long_double_scale_rows},
 {"Math::GSL::SparseMatrixc::gsl_spmatrix_complex_long_double_add", _wrap_gsl_spmatrix_complex_long_double_add},
-{"Math::GSL::SparseMatrixc::gsl_spmatrix_complex_long_double_add_to_dense", _wrap_gsl_spmatrix_complex_long_double_add_to_dense},
 {"Math::GSL::SparseMatrixc::gsl_spmatrix_complex_long_double_d2sp", _wrap_gsl_spmatrix_complex_long_double_d2sp},
 {"Math::GSL::SparseMatrixc::gsl_spmatrix_complex_long_double_sp2d", _wrap_gsl_spmatrix_complex_long_double_sp2d},
+{"Math::GSL::SparseMatrixc::gsl_spmatrix_complex_long_double_add_to_dense", _wrap_gsl_spmatrix_complex_long_double_add_to_dense},
 {"Math::GSL::SparseMatrixc::gsl_spmatrix_complex_long_double_equal", _wrap_gsl_spmatrix_complex_long_double_equal},
 {"Math::GSL::SparseMatrixc::gsl_spmatrix_complex_long_double_transpose", _wrap_gsl_spmatrix_complex_long_double_transpose},
 {"Math::GSL::SparseMatrixc::gsl_spmatrix_complex_long_double_transpose2", _wrap_gsl_spmatrix_complex_long_double_transpose2},
@@ -32364,9 +32364,9 @@ static swig_command_info swig_commands[] = {
 {"Math::GSL::SparseMatrixc::gsl_spmatrix_complex_float_scale_columns", _wrap_gsl_spmatrix_complex_float_scale_columns},
 {"Math::GSL::SparseMatrixc::gsl_spmatrix_complex_float_scale_rows", _wrap_gsl_spmatrix_complex_float_scale_rows},
 {"Math::GSL::SparseMatrixc::gsl_spmatrix_complex_float_add", _wrap_gsl_spmatrix_complex_float_add},
-{"Math::GSL::SparseMatrixc::gsl_spmatrix_complex_float_add_to_dense", _wrap_gsl_spmatrix_complex_float_add_to_dense},
 {"Math::GSL::SparseMatrixc::gsl_spmatrix_complex_float_d2sp", _wrap_gsl_spmatrix_complex_float_d2sp},
 {"Math::GSL::SparseMatrixc::gsl_spmatrix_complex_float_sp2d", _wrap_gsl_spmatrix_complex_float_sp2d},
+{"Math::GSL::SparseMatrixc::gsl_spmatrix_complex_float_add_to_dense", _wrap_gsl_spmatrix_complex_float_add_to_dense},
 {"Math::GSL::SparseMatrixc::gsl_spmatrix_complex_float_equal", _wrap_gsl_spmatrix_complex_float_equal},
 {"Math::GSL::SparseMatrixc::gsl_spmatrix_complex_float_transpose", _wrap_gsl_spmatrix_complex_float_transpose},
 {"Math::GSL::SparseMatrixc::gsl_spmatrix_complex_float_transpose2", _wrap_gsl_spmatrix_complex_float_transpose2},
@@ -32434,9 +32434,9 @@ static swig_command_info swig_commands[] = {
 {"Math::GSL::SparseMatrixc::gsl_spmatrix_long_double_scale_columns", _wrap_gsl_spmatrix_long_double_scale_columns},
 {"Math::GSL::SparseMatrixc::gsl_spmatrix_long_double_scale_rows", _wrap_gsl_spmatrix_long_double_scale_rows},
 {"Math::GSL::SparseMatrixc::gsl_spmatrix_long_double_add", _wrap_gsl_spmatrix_long_double_add},
-{"Math::GSL::SparseMatrixc::gsl_spmatrix_long_double_add_to_dense", _wrap_gsl_spmatrix_long_double_add_to_dense},
 {"Math::GSL::SparseMatrixc::gsl_spmatrix_long_double_d2sp", _wrap_gsl_spmatrix_long_double_d2sp},
 {"Math::GSL::SparseMatrixc::gsl_spmatrix_long_double_sp2d", _wrap_gsl_spmatrix_long_double_sp2d},
+{"Math::GSL::SparseMatrixc::gsl_spmatrix_long_double_add_to_dense", _wrap_gsl_spmatrix_long_double_add_to_dense},
 {"Math::GSL::SparseMatrixc::gsl_spmatrix_long_double_equal", _wrap_gsl_spmatrix_long_double_equal},
 {"Math::GSL::SparseMatrixc::gsl_spmatrix_long_double_transpose", _wrap_gsl_spmatrix_long_double_transpose},
 {"Math::GSL::SparseMatrixc::gsl_spmatrix_long_double_transpose2", _wrap_gsl_spmatrix_long_double_transpose2},
@@ -32504,9 +32504,9 @@ static swig_command_info swig_commands[] = {
 {"Math::GSL::SparseMatrixc::gsl_spmatrix_uint_scale_columns", _wrap_gsl_spmatrix_uint_scale_columns},
 {"Math::GSL::SparseMatrixc::gsl_spmatrix_uint_scale_rows", _wrap_gsl_spmatrix_uint_scale_rows},
 {"Math::GSL::SparseMatrixc::gsl_spmatrix_uint_add", _wrap_gsl_spmatrix_uint_add},
-{"Math::GSL::SparseMatrixc::gsl_spmatrix_uint_add_to_dense", _wrap_gsl_spmatrix_uint_add_to_dense},
 {"Math::GSL::SparseMatrixc::gsl_spmatrix_uint_d2sp", _wrap_gsl_spmatrix_uint_d2sp},
 {"Math::GSL::SparseMatrixc::gsl_spmatrix_uint_sp2d", _wrap_gsl_spmatrix_uint_sp2d},
+{"Math::GSL::SparseMatrixc::gsl_spmatrix_uint_add_to_dense", _wrap_gsl_spmatrix_uint_add_to_dense},
 {"Math::GSL::SparseMatrixc::gsl_spmatrix_uint_equal", _wrap_gsl_spmatrix_uint_equal},
 {"Math::GSL::SparseMatrixc::gsl_spmatrix_uint_transpose", _wrap_gsl_spmatrix_uint_transpose},
 {"Math::GSL::SparseMatrixc::gsl_spmatrix_uint_transpose2", _wrap_gsl_spmatrix_uint_transpose2},
@@ -32572,9 +32572,9 @@ static swig_command_info swig_commands[] = {
 {"Math::GSL::SparseMatrixc::gsl_spmatrix_complex_scale_columns", _wrap_gsl_spmatrix_complex_scale_columns},
 {"Math::GSL::SparseMatrixc::gsl_spmatrix_complex_scale_rows", _wrap_gsl_spmatrix_complex_scale_rows},
 {"Math::GSL::SparseMatrixc::gsl_spmatrix_complex_add", _wrap_gsl_spmatrix_complex_add},
-{"Math::GSL::SparseMatrixc::gsl_spmatrix_complex_add_to_dense", _wrap_gsl_spmatrix_complex_add_to_dense},
 {"Math::GSL::SparseMatrixc::gsl_spmatrix_complex_d2sp", _wrap_gsl_spmatrix_complex_d2sp},
 {"Math::GSL::SparseMatrixc::gsl_spmatrix_complex_sp2d", _wrap_gsl_spmatrix_complex_sp2d},
+{"Math::GSL::SparseMatrixc::gsl_spmatrix_complex_add_to_dense", _wrap_gsl_spmatrix_complex_add_to_dense},
 {"Math::GSL::SparseMatrixc::gsl_spmatrix_complex_equal", _wrap_gsl_spmatrix_complex_equal},
 {"Math::GSL::SparseMatrixc::gsl_spmatrix_complex_transpose", _wrap_gsl_spmatrix_complex_transpose},
 {"Math::GSL::SparseMatrixc::gsl_spmatrix_complex_transpose2", _wrap_gsl_spmatrix_complex_transpose2},
@@ -32642,9 +32642,9 @@ static swig_command_info swig_commands[] = {
 {"Math::GSL::SparseMatrixc::gsl_spmatrix_char_scale_columns", _wrap_gsl_spmatrix_char_scale_columns},
 {"Math::GSL::SparseMatrixc::gsl_spmatrix_char_scale_rows", _wrap_gsl_spmatrix_char_scale_rows},
 {"Math::GSL::SparseMatrixc::gsl_spmatrix_char_add", _wrap_gsl_spmatrix_char_add},
-{"Math::GSL::SparseMatrixc::gsl_spmatrix_char_add_to_dense", _wrap_gsl_spmatrix_char_add_to_dense},
 {"Math::GSL::SparseMatrixc::gsl_spmatrix_char_d2sp", _wrap_gsl_spmatrix_char_d2sp},
 {"Math::GSL::SparseMatrixc::gsl_spmatrix_char_sp2d", _wrap_gsl_spmatrix_char_sp2d},
+{"Math::GSL::SparseMatrixc::gsl_spmatrix_char_add_to_dense", _wrap_gsl_spmatrix_char_add_to_dense},
 {"Math::GSL::SparseMatrixc::gsl_spmatrix_char_equal", _wrap_gsl_spmatrix_char_equal},
 {"Math::GSL::SparseMatrixc::gsl_spmatrix_char_transpose", _wrap_gsl_spmatrix_char_transpose},
 {"Math::GSL::SparseMatrixc::gsl_spmatrix_char_transpose2", _wrap_gsl_spmatrix_char_transpose2},
@@ -32712,9 +32712,9 @@ static swig_command_info swig_commands[] = {
 {"Math::GSL::SparseMatrixc::gsl_spmatrix_uchar_scale_columns", _wrap_gsl_spmatrix_uchar_scale_columns},
 {"Math::GSL::SparseMatrixc::gsl_spmatrix_uchar_scale_rows", _wrap_gsl_spmatrix_uchar_scale_rows},
 {"Math::GSL::SparseMatrixc::gsl_spmatrix_uchar_add", _wrap_gsl_spmatrix_uchar_add},
-{"Math::GSL::SparseMatrixc::gsl_spmatrix_uchar_add_to_dense", _wrap_gsl_spmatrix_uchar_add_to_dense},
 {"Math::GSL::SparseMatrixc::gsl_spmatrix_uchar_d2sp", _wrap_gsl_spmatrix_uchar_d2sp},
 {"Math::GSL::SparseMatrixc::gsl_spmatrix_uchar_sp2d", _wrap_gsl_spmatrix_uchar_sp2d},
+{"Math::GSL::SparseMatrixc::gsl_spmatrix_uchar_add_to_dense", _wrap_gsl_spmatrix_uchar_add_to_dense},
 {"Math::GSL::SparseMatrixc::gsl_spmatrix_uchar_equal", _wrap_gsl_spmatrix_uchar_equal},
 {"Math::GSL::SparseMatrixc::gsl_spmatrix_uchar_transpose", _wrap_gsl_spmatrix_uchar_transpose},
 {"Math::GSL::SparseMatrixc::gsl_spmatrix_uchar_transpose2", _wrap_gsl_spmatrix_uchar_transpose2},
@@ -32782,9 +32782,9 @@ static swig_command_info swig_commands[] = {
 {"Math::GSL::SparseMatrixc::gsl_spmatrix_int_scale_columns", _wrap_gsl_spmatrix_int_scale_columns},
 {"Math::GSL::SparseMatrixc::gsl_spmatrix_int_scale_rows", _wrap_gsl_spmatrix_int_scale_rows},
 {"Math::GSL::SparseMatrixc::gsl_spmatrix_int_add", _wrap_gsl_spmatrix_int_add},
-{"Math::GSL::SparseMatrixc::gsl_spmatrix_int_add_to_dense", _wrap_gsl_spmatrix_int_add_to_dense},
 {"Math::GSL::SparseMatrixc::gsl_spmatrix_int_d2sp", _wrap_gsl_spmatrix_int_d2sp},
 {"Math::GSL::SparseMatrixc::gsl_spmatrix_int_sp2d", _wrap_gsl_spmatrix_int_sp2d},
+{"Math::GSL::SparseMatrixc::gsl_spmatrix_int_add_to_dense", _wrap_gsl_spmatrix_int_add_to_dense},
 {"Math::GSL::SparseMatrixc::gsl_spmatrix_int_equal", _wrap_gsl_spmatrix_int_equal},
 {"Math::GSL::SparseMatrixc::gsl_spmatrix_int_transpose", _wrap_gsl_spmatrix_int_transpose},
 {"Math::GSL::SparseMatrixc::gsl_spmatrix_int_transpose2", _wrap_gsl_spmatrix_int_transpose2},
@@ -32852,9 +32852,9 @@ static swig_command_info swig_commands[] = {
 {"Math::GSL::SparseMatrixc::gsl_spmatrix_short_scale_columns", _wrap_gsl_spmatrix_short_scale_columns},
 {"Math::GSL::SparseMatrixc::gsl_spmatrix_short_scale_rows", _wrap_gsl_spmatrix_short_scale_rows},
 {"Math::GSL::SparseMatrixc::gsl_spmatrix_short_add", _wrap_gsl_spmatrix_short_add},
-{"Math::GSL::SparseMatrixc::gsl_spmatrix_short_add_to_dense", _wrap_gsl_spmatrix_short_add_to_dense},
 {"Math::GSL::SparseMatrixc::gsl_spmatrix_short_d2sp", _wrap_gsl_spmatrix_short_d2sp},
 {"Math::GSL::SparseMatrixc::gsl_spmatrix_short_sp2d", _wrap_gsl_spmatrix_short_sp2d},
+{"Math::GSL::SparseMatrixc::gsl_spmatrix_short_add_to_dense", _wrap_gsl_spmatrix_short_add_to_dense},
 {"Math::GSL::SparseMatrixc::gsl_spmatrix_short_equal", _wrap_gsl_spmatrix_short_equal},
 {"Math::GSL::SparseMatrixc::gsl_spmatrix_short_transpose", _wrap_gsl_spmatrix_short_transpose},
 {"Math::GSL::SparseMatrixc::gsl_spmatrix_short_transpose2", _wrap_gsl_spmatrix_short_transpose2},
@@ -32922,9 +32922,9 @@ static swig_command_info swig_commands[] = {
 {"Math::GSL::SparseMatrixc::gsl_spmatrix_float_scale_columns", _wrap_gsl_spmatrix_float_scale_columns},
 {"Math::GSL::SparseMatrixc::gsl_spmatrix_float_scale_rows", _wrap_gsl_spmatrix_float_scale_rows},
 {"Math::GSL::SparseMatrixc::gsl_spmatrix_float_add", _wrap_gsl_spmatrix_float_add},
-{"Math::GSL::SparseMatrixc::gsl_spmatrix_float_add_to_dense", _wrap_gsl_spmatrix_float_add_to_dense},
 {"Math::GSL::SparseMatrixc::gsl_spmatrix_float_d2sp", _wrap_gsl_spmatrix_float_d2sp},
 {"Math::GSL::SparseMatrixc::gsl_spmatrix_float_sp2d", _wrap_gsl_spmatrix_float_sp2d},
+{"Math::GSL::SparseMatrixc::gsl_spmatrix_float_add_to_dense", _wrap_gsl_spmatrix_float_add_to_dense},
 {"Math::GSL::SparseMatrixc::gsl_spmatrix_float_equal", _wrap_gsl_spmatrix_float_equal},
 {"Math::GSL::SparseMatrixc::gsl_spmatrix_float_transpose", _wrap_gsl_spmatrix_float_transpose},
 {"Math::GSL::SparseMatrixc::gsl_spmatrix_float_transpose2", _wrap_gsl_spmatrix_float_transpose2},
@@ -32992,9 +32992,9 @@ static swig_command_info swig_commands[] = {
 {"Math::GSL::SparseMatrixc::gsl_spmatrix_ushort_scale_columns", _wrap_gsl_spmatrix_ushort_scale_columns},
 {"Math::GSL::SparseMatrixc::gsl_spmatrix_ushort_scale_rows", _wrap_gsl_spmatrix_ushort_scale_rows},
 {"Math::GSL::SparseMatrixc::gsl_spmatrix_ushort_add", _wrap_gsl_spmatrix_ushort_add},
-{"Math::GSL::SparseMatrixc::gsl_spmatrix_ushort_add_to_dense", _wrap_gsl_spmatrix_ushort_add_to_dense},
 {"Math::GSL::SparseMatrixc::gsl_spmatrix_ushort_d2sp", _wrap_gsl_spmatrix_ushort_d2sp},
 {"Math::GSL::SparseMatrixc::gsl_spmatrix_ushort_sp2d", _wrap_gsl_spmatrix_ushort_sp2d},
+{"Math::GSL::SparseMatrixc::gsl_spmatrix_ushort_add_to_dense", _wrap_gsl_spmatrix_ushort_add_to_dense},
 {"Math::GSL::SparseMatrixc::gsl_spmatrix_ushort_equal", _wrap_gsl_spmatrix_ushort_equal},
 {"Math::GSL::SparseMatrixc::gsl_spmatrix_ushort_transpose", _wrap_gsl_spmatrix_ushort_transpose},
 {"Math::GSL::SparseMatrixc::gsl_spmatrix_ushort_transpose2", _wrap_gsl_spmatrix_ushort_transpose2},
@@ -33295,7 +33295,7 @@ XS(SWIG_init) {
   
   /*@SWIG:/usr/share/swig4.0/perl5/perltypemaps.swg,65,%set_constant@*/ do {
     SV *sv = get_sv((char*) SWIG_prefix "GSL_VERSION", TRUE | 0x2 | GV_ADDMULTI);
-    sv_setsv(sv, SWIG_From_double  SWIG_PERL_CALL_ARGS_1((double)(2.6)));
+    sv_setsv(sv, SWIG_From_double  SWIG_PERL_CALL_ARGS_1((double)(2.7)));
     SvREADONLY_on(sv);
   } while(0) /*@SWIG@*/;
   /*@SWIG:/usr/share/swig4.0/perl5/perltypemaps.swg,65,%set_constant@*/ do {
@@ -33305,7 +33305,7 @@ XS(SWIG_init) {
   } while(0) /*@SWIG@*/;
   /*@SWIG:/usr/share/swig4.0/perl5/perltypemaps.swg,65,%set_constant@*/ do {
     SV *sv = get_sv((char*) SWIG_prefix "GSL_MINOR_VERSION", TRUE | 0x2 | GV_ADDMULTI);
-    sv_setsv(sv, SWIG_From_int  SWIG_PERL_CALL_ARGS_1((int)(6)));
+    sv_setsv(sv, SWIG_From_int  SWIG_PERL_CALL_ARGS_1((int)(7)));
     SvREADONLY_on(sv);
   } while(0) /*@SWIG@*/;
   /*@SWIG:/usr/share/swig4.0/perl5/perltypemaps.swg,65,%set_constant@*/ do {

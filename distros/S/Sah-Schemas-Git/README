@@ -2,10 +2,18 @@ NAME
     Sah::Schemas::Git - Sah schemas related to git
 
 VERSION
-    This document describes version 0.003 of Sah::Schemas::Git (from Perl
-    distribution Sah-Schemas-Git), released on 2020-03-27.
+    This document describes version 0.004 of Sah::Schemas::Git (from Perl
+    distribution Sah-Schemas-Git), released on 2021-07-20.
 
 SYNOPSIS
+CONTRIBUTOR
+    perlancar (on netbook-dell-xps13) <perlancar@gmail.com>
+
+SAH SCHEMAS
+    *   git::refname
+
+        git reference name.
+
 HOMEPAGE
     Please visit the project's homepage at
     <https://metacpan.org/release/Sah-Schemas-Git>.
@@ -30,7 +38,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2020 by perlancar@cpan.org.
+    This software is copyright (c) 2021, 2020 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

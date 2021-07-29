@@ -1,9 +1,9 @@
 package Data::CSel;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-07-03'; # DATE
+our $DATE = '2021-07-13'; # DATE
 our $DIST = 'Data-CSel'; # DIST
-our $VERSION = '0.126'; # VERSION
+our $VERSION = '0.127'; # VERSION
 
 use 5.020000;
 use strict;
@@ -802,16 +802,18 @@ Data::CSel - Select tree node objects using CSS Selector-like syntax
 
 =head1 VERSION
 
-This document describes version 0.126 of Data::CSel (from Perl distribution Data-CSel), released on 2021-07-03.
+This document describes version 0.127 of Data::CSel (from Perl distribution Data-CSel), released on 2021-07-13.
 
 =head1 SYNOPSIS
 
  use Data::CSel qw(csel csel_each);
 
+ # using csel():
  my @cells = csel("Table[name=~/data/i] TCell[value != '']:first", $tree);
  for (@cells) { say $_->value }
 
-Using L</csel_each>:
+ # using csel_each():
+ csel_each { say $_->value } "Table[name=~/data/i] TCell[value != '']:first", $tree;
 
 Using selection object:
 

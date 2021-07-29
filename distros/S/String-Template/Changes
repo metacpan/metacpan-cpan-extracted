@@ -1,5 +1,12 @@
 Revision history for Perl extension String-Template
 
+0.23      2021-07-18 14:06:54 -0600
+  - Use UTC in tests should hopefully improve reliability (gh#10)
+
+0.22      2021-07-10 03:44:53 -0600
+  - Documentation fixes (gh#9)
+  - [internal] do not import everything from POSIX (gh#9)
+
 0.21      2017-08-25 08:02:04 -0400
   - Allow tight fields when using curly braces (jjatria++)
 

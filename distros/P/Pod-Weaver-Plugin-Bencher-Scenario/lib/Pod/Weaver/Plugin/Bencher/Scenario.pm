@@ -1,9 +1,9 @@
 package Pod::Weaver::Plugin::Bencher::Scenario;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-04-19'; # DATE
+our $DATE = '2021-07-23'; # DATE
 our $DIST = 'Pod-Weaver-Plugin-Bencher-Scenario'; # DIST
-our $VERSION = '0.247'; # VERSION
+our $VERSION = '0.248'; # VERSION
 
 use 5.010001;
 use Moose;
@@ -308,6 +308,11 @@ sub _process_bencher_scenario_or_acme_cpanmodules_module {
                     $fres =~ s/^/ /gm;
                     $table_num++;
                     push @pod, " #table$table_num#\n", " ", dmp($split_item->[0]), "\n$fres\n";
+                    {
+                        $fres = Bencher::Backend::format_result($split_item->[1], undef, {render_as_benchmark_pm=>1});
+                        $fres =~ s/^/ /gm;
+                        push @pod, "Formatted as L<Benchmark.pm|Benchmark> result:\n\n$fres\n";
+                    }
                     push @pod, __html_result($bench_res, $table_num) if $self->gen_html_tables;
                     $self->_gen_chart($tempdir, $input, \@pod, $split_item->[1], $table_num);
                     push @bench_res, $split_item->[1];
@@ -318,6 +323,11 @@ sub _process_bencher_scenario_or_acme_cpanmodules_module {
                 $fres =~ s/^/ /gm;
                 $table_num++;
                 push @pod, "$bench->{title}:\n\n #table$table_num#\n$fres\n\n";
+                {
+                    $fres = Bencher::Backend::format_result($bench_res, undef, {render_as_benchmark_pm=>1});
+                    $fres =~ s/^/ /gm;
+                    push @pod, "Formatted as L<Benchmark.pm|Benchmark> result:\n\n$fres\n";
+                }
                 push @pod, __html_result($bench_res, $table_num) if $self->gen_html_tables;
                 $self->_gen_chart($tempdir, $input, \@pod, $bench_res, $table_num);
                 push @bench_res, $bench_res;
@@ -336,6 +346,11 @@ sub _process_bencher_scenario_or_acme_cpanmodules_module {
             $fres =~ s/^/ /gm;
             $table_num++;
             push @pod, "Benchmark module startup overhead (C<< bencher ".($is_cpanmodules ? "--cpanmodules-module $cpanmodules_name" : "-m $scenario_name")." --module-startup >>):\n\n #table$table_num#\n", $fres, "\n\n";
+            {
+                $fres = Bencher::Backend::format_result($bench_res2, undef, {render_as_benchmark_pm=>1});
+                $fres =~ s/^/ /gm;
+                push @pod, "Formatted as L<Benchmark.pm|Benchmark> result:\n\n$fres\n";
+            }
             push @pod, __html_result($bench_res2, $table_num) if $self->gen_html_tables;
             $self->_gen_chart($tempdir, $input, \@pod, $bench_res2, $table_num);
         }
@@ -655,7 +670,7 @@ Pod::Weaver::Plugin::Bencher::Scenario - Plugin to use when building Bencher::Sc
 
 =head1 VERSION
 
-This document describes version 0.247 of Pod::Weaver::Plugin::Bencher::Scenario (from Perl distribution Pod-Weaver-Plugin-Bencher-Scenario), released on 2020-04-19.
+This document describes version 0.248 of Pod::Weaver::Plugin::Bencher::Scenario (from Perl distribution Pod-Weaver-Plugin-Bencher-Scenario), released on 2021-07-23.
 
 =head1 SYNOPSIS
 
@@ -812,7 +827,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2017, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

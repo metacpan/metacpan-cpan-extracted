@@ -1,10 +1,15 @@
 #---------------------------------------------------------------------
-# $Header: /Perl/OlleDB/SqlServer.pm 87    19-07-22 10:47 Sommar $
+# $Header: /Perl/OlleDB/SqlServer.pm 88    21-04-29 22:28 Sommar $
 #
-# Copyright (c) 2004-2019 Erland Sommarskog
+# Copyright (c) 2004-2021 Erland Sommarskog
 #
 #
 # $History: SqlServer.pm $
+# 
+# *****************  Version 88  *****************
+# User: Sommar       Date: 21-04-29   Time: 22:28
+# Updated in $/Perl/OlleDB
+# Version number 2.013.
 # 
 # *****************  Version 87  *****************
 # User: Sommar       Date: 19-07-22   Time: 10:47
@@ -141,7 +146,7 @@
 # and parameter lists than 4000 chars on SQL 2000 and SQL7.
 #
 # *****************  Version 65  *****************
-# User: Sommar       Date: 08-05-02   Time: 0:52
+# User: Sommar       Date2.13: 08-05-02   Time: 0:52
 # Updated in $/Perl/OlleDB
 # When testing that the code pages are correct, we need to pass a
 # variable, a constant string won't do.
@@ -301,7 +306,7 @@ use vars qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS
             %NEWDATETIMETYPES %MAXTYPES %TYPEINFOTYPES $VERSION);
 
 
-$VERSION = '2.012';
+$VERSION = '2.013';
 
 @ISA = qw(Exporter DynaLoader Tie::StdHash);
 

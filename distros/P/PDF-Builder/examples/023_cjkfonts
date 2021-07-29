@@ -139,7 +139,7 @@ foreach my $fn (@fontnames) {
     $text->transform(-translate => [50, 800]);
     $text->fillcolor('black');
     $text->font($font, 18);
-    $text->lead(18*1.25);
+    $text->leading(18*1.25);
     my $toprint;
     while($textL ne '') {
     	($toprint, $textL) = $text->_text_fill_line($textL, 500, 0);

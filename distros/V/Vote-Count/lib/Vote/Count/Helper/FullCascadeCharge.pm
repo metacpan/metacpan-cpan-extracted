@@ -8,19 +8,15 @@ use feature qw /postderef signatures/;
 use Sort::Hash;
 use Vote::Count::TextTableTiny qw/generate_table/;
 
-our $VERSION='2.00';
+our $VERSION='2.01';
 
-# ABSTRACT: Non OO Components for the Vote::Charge implementation of STV.
+# ABSTRACT: Non OO Components for the Vote::Charge implementation of STV FullCascadeCharge.
 
 =head1 NAME
 
 Vote::Count::Helper::FullCascadeCharge
 
-=head1 VERSION 2.00
-
-=cut
-
-=pod
+=head1 VERSION 2.01
 
 =head1 SYNOPSIS
 
@@ -36,7 +32,7 @@ Parameters are Ballots, Quota, Cost (HashRef of elected choices and the charge t
 
 Return Value is a HashRef where the keys are the Elected Choices, the values are a HashRef with the keys: value, count, surplus. The value key is the total Vote Value charged for that choice, the count is the number of Ballots which contributed any amount to that charge, and finally the surplus is the amount of value over or under (negative) the quota.
 
-The method is non-OO (thus the need to import it). This permits isolation of values, which may be needed for performing estimations to establish the Costs.
+The method is non-OO. This permits isolation of values, which may be needed for performing estimations to establish the Costs.
 
 The Ballots are passed as a HashRef and the votevalue will be modified, if you do not want the Ballots modified, provide a copy of them (Storable 'dclone' is recommended)
 

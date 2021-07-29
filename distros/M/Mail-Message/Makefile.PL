@@ -4,7 +4,7 @@ require 5.010;
 
 use IO::Handle;
 
-my $VERSION = '3.010';
+my $VERSION = '3.011';
 
 my @optional =
 ( 

@@ -1,9 +1,9 @@
 package Data::Sah::Coerce::perl::To_str::From_str::normalize_perl_distname;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-01-20'; # DATE
+our $DATE = '2021-07-20'; # DATE
 our $DIST = 'Sah-Schemas-Perl'; # DIST
-our $VERSION = '0.035'; # VERSION
+our $VERSION = '0.038'; # VERSION
 
 use 5.010001;
 use strict;
@@ -54,7 +54,7 @@ Data::Sah::Coerce::perl::To_str::From_str::normalize_perl_distname
 
 =head1 VERSION
 
-This document describes version 0.035 of Data::Sah::Coerce::perl::To_str::From_str::normalize_perl_distname (from Perl distribution Sah-Schemas-Perl), released on 2021-01-20.
+This document describes version 0.038 of Data::Sah::Coerce::perl::To_str::From_str::normalize_perl_distname (from Perl distribution Sah-Schemas-Perl), released on 2021-07-20.
 
 =head1 DESCRIPTION
 
@@ -82,7 +82,7 @@ Source repository is at L<https://github.com/perlancar/perl-Sah-Schemas-Perl>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Sah-Schemas-Perl/issues>
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Sah-Schemas-Perl>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

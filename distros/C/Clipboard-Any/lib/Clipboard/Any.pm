@@ -1,0 +1,396 @@
+package Clipboard::Any;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-07-15'; # DATE
+our $DIST = 'Clipboard-Any'; # DIST
+our $VERSION = '0.001'; # VERSION
+
+use 5.010001;
+use strict;
+use warnings;
+use Log::ger;
+
+use Exporter::Rinci qw(import);
+use File::Which qw(which);
+use IPC::System::Options 'system', 'readpipe', -log=>1;
+
+my $known_clipboard_managers = [qw/klipper/];
+my $sch_clipboard_manager = ['str', in=>$known_clipboard_managers];
+our %arg_clipboard_manager = (
+    clipboard_manager => {
+        summary => 'Explicitly set clipboard manager to use',
+        schema => $sch_clipboard_manager,
+        description => <<'_',
+
+The default, when left undef, is to detect what clipboard manager is running.
+
+_
+    },
+);
+
+our %SPEC;
+
+$SPEC{':package'} = {
+    v => 1.1,
+    summary => 'Common interface to clipboard manager functions',
+    description => <<'_',
+
+This module provides common functions related to clipboard manager.
+
+Supported clipboard manager: KDE Plasma's Klipper (`klipper`). Support for more
+clipboard managers, e.g. on Windows or other Linux desktop environment is
+welcome.
+
+_
+};
+
+$SPEC{'detect_clipboard_manager'} = {
+    v => 1.1,
+    summary => 'Detect which clipboard manager program is currently running',
+    description => <<'_',
+
+Will return a string containing name of clipboard manager program, e.g.
+`klipper`. Will return undef if no known clipboard manager is detected.
+
+_
+    result_naked => 1,
+    result => {
+        schema => $sch_clipboard_manager,
+    },
+};
+sub detect_clipboard_manager {
+    my %args = @_;
+
+    #require Proc::Find;
+    #no warnings 'once';
+    #local $Proc::Find::CACHE = 1;
+
+  KLIPPER:
+    {
+        log_trace "Checking whether clipboard manager klipper is running ...";
+        unless (which "qdbus") {
+            log_trace "qdbus not found in PATH, system is probably not using klipper";
+            last;
+        }
+        my $out;
+        system({capture_merged=>\$out}, "qdbus", "org.kde.klipper", "/klipper");
+        unless ($? == 0) {
+            # note, when klipper is disabled via System Tray Settings > General
+            # > Extra Items, the object path /klipper disappears.
+            log_trace "Failed listing org.kde.klipper /klipper methods, system is probably not using klipper";
+            last;
+        }
+        log_trace "Concluding klipper is active";
+        return "klipper";
+    }
+
+    log_trace "No known clipboard manager is detected";
+    undef;
+}
+
+$SPEC{'clear_clipboard_history'} = {
+    v => 1.1,
+    summary => 'Delete all clipboard items',
+    description => <<'_',
+
+_
+    result => {
+        schema => $sch_clipboard_manager,
+    },
+};
+sub clear_clipboard_history {
+    my %args = @_;
+
+    my $clipboard_manager = $args{clipboard_manager} // detect_clipboard_manager();
+    return [412, "Can't detect any known clipboard manager"]
+        unless $clipboard_manager;
+
+    if ($clipboard_manager eq 'klipper') {
+        my ($stdout, $stderr);
+        # qdbus likes to emit an empty line
+        system({capture_stdout=>\$stdout, capture_stderr=>\$stderr},
+               "qdbus", "org.kde.klipper", "/klipper", "clearClipboardHistory");
+        my $exit_code = $? < 0 ? $? : $?>>8;
+        return [500, "/klipper's clearClipboardHistory failed: $exit_code"] if $exit_code;
+        return [200, "OK"];
+    }
+
+    [412, "Cannot clear clipboard history (clipboard manager=$clipboard_manager)"];
+}
+
+$SPEC{'get_clipboard_content'} = {
+    v => 1.1,
+    summary => 'Get the clipboard content (most recent, history index [0])',
+    description => <<'_',
+
+Caveats for klipper: Non-text item is not retrievable by getClipboardContents().
+If the current item is e.g. an image, then the next text item from history will
+be returned instead, or empty string if none exists.
+
+_
+    result => {
+        schema => $sch_clipboard_manager,
+    },
+};
+sub get_clipboard_content {
+    my %args = @_;
+
+    my $clipboard_manager = $args{clipboard_manager} // detect_clipboard_manager();
+    return [412, "Can't detect any known clipboard manager"]
+        unless $clipboard_manager;
+
+    if ($clipboard_manager eq 'klipper') {
+        my ($stdout, $stderr);
+        system({capture_stdout=>\$stdout, capture_stderr=>\$stderr},
+               "qdbus", "org.kde.klipper", "/klipper", "getClipboardContents");
+        my $exit_code = $? < 0 ? $? : $?>>8;
+        return [500, "/klipper's getClipboardContents failed: $exit_code"] if $exit_code;
+        chomp $stdout;
+        return [200, "OK", $stdout];
+    }
+
+    [412, "Cannot get clipboard content (clipboard manager=$clipboard_manager)"];
+}
+
+$SPEC{'list_clipboard_history'} = {
+    v => 1.1,
+    summary => 'List the clipboard history',
+    description => <<'_',
+
+Caveats for klipper: 1) Klipper does not provide method to get the length of
+history. So we retrieve history item one by one using getClipboardHistoryItem(i)
+from i=0, i=1, and so on. And assume that if we get two consecutive empty
+string, it means we reach the end of the clipboard history before the first
+empty result.
+
+2) Non-text items are not retrievable by getClipboardHistoryItem().
+
+_
+    result => {
+        schema => $sch_clipboard_manager,
+    },
+};
+sub list_clipboard_history {
+    my %args = @_;
+
+    my $clipboard_manager = $args{clipboard_manager} // detect_clipboard_manager();
+    return [412, "Can't detect any known clipboard manager"]
+        unless $clipboard_manager;
+
+    if ($clipboard_manager eq 'klipper') {
+        my @rows;
+        my $i = 0;
+        my $got_empty;
+        while (1) {
+            my ($stdout, $stderr);
+            system({capture_stdout=>\$stdout, capture_stderr=>\$stderr},
+               "qdbus", "org.kde.klipper", "/klipper", "getClipboardHistoryItem", $i);
+            my $exit_code = $? < 0 ? $? : $?>>8;
+            return [500, "/klipper's getClipboardHistoryItem($i) failed: $exit_code"] if $exit_code;
+            chomp $stdout;
+            if ($stdout eq '') {
+                log_trace "Got empty result";
+                if ($got_empty++) {
+                    pop @rows;
+                    last;
+                } else {
+                    push @rows, $stdout;
+                }
+            } else {
+                log_trace "Got result '%s'", $stdout;
+                $got_empty = 0;
+                push @rows, $stdout;
+            }
+            $i++;
+        }
+        return [200, "OK", \@rows];
+    }
+
+    [412, "Cannot list clipboard history (clipboard manager=$clipboard_manager)"];
+}
+
+1;
+# ABSTRACT: Common interface to clipboard manager functions
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Clipboard::Any - Common interface to clipboard manager functions
+
+=head1 VERSION
+
+This document describes version 0.001 of Clipboard::Any (from Perl distribution Clipboard-Any), released on 2021-07-15.
+
+=head1 DESCRIPTION
+
+This module provides a common interface to interact with clipboard.
+
+Some terminology:
+
+=over
+
+=item * clipboard content
+
+The current clipboard content. Some clipboard manager supports storing multiple
+items (multiple contents). All the items are called L</clipboard history>.
+
+=item * clipboard history
+
+Some clipboard manager supports storing multiple items (multiple contents). All
+the items are called clipboard history. It is presented as an array. The current
+item/content is at index 0, the secondmost current item is at index 1, and so
+on.
+
+=back
+
+
+This module provides common functions related to clipboard manager.
+
+Supported clipboard manager: KDE Plasma's Klipper (C<klipper>). Support for more
+clipboard managers, e.g. on Windows or other Linux desktop environment is
+welcome.
+
+=head1 NOTES
+
+2021-07-15 - Tested on my system (KDE Plasma 5.12.9 on Linux).
+
+=head1 FUNCTIONS
+
+
+=head2 clear_clipboard_history
+
+Usage:
+
+ clear_clipboard_history() -> [$status_code, $reason, $payload, \%result_meta]
+
+Delete all clipboard items.
+
+This function is not exported by default, but exportable.
+
+No arguments.
+
+Returns an enveloped result (an array).
+
+First element ($status_code) is an integer containing HTTP-like status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
+
+Return value:  (str)
+
+
+
+=head2 detect_clipboard_manager
+
+Usage:
+
+ detect_clipboard_manager() -> str
+
+Detect which clipboard manager program is currently running.
+
+Will return a string containing name of clipboard manager program, e.g.
+C<klipper>. Will return undef if no known clipboard manager is detected.
+
+This function is not exported by default, but exportable.
+
+No arguments.
+
+Return value:  (str)
+
+
+
+=head2 get_clipboard_content
+
+Usage:
+
+ get_clipboard_content() -> [$status_code, $reason, $payload, \%result_meta]
+
+Get the clipboard content (most recent, history index [0]).
+
+Caveats for klipper: Non-text item is not retrievable by getClipboardContents().
+If the current item is e.g. an image, then the next text item from history will
+be returned instead, or empty string if none exists.
+
+This function is not exported by default, but exportable.
+
+No arguments.
+
+Returns an enveloped result (an array).
+
+First element ($status_code) is an integer containing HTTP-like status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
+
+Return value:  (str)
+
+
+
+=head2 list_clipboard_history
+
+Usage:
+
+ list_clipboard_history() -> [$status_code, $reason, $payload, \%result_meta]
+
+List the clipboard history.
+
+Caveats for klipper: 1) Klipper does not provide method to get the length of
+history. So we retrieve history item one by one using getClipboardHistoryItem(i)
+from i=0, i=1, and so on. And assume that if we get two consecutive empty
+string, it means we reach the end of the clipboard history before the first
+empty result.
+
+2) Non-text items are not retrievable by getClipboardHistoryItem().
+
+This function is not exported by default, but exportable.
+
+No arguments.
+
+Returns an enveloped result (an array).
+
+First element ($status_code) is an integer containing HTTP-like status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
+
+Return value:  (str)
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/Clipboard-Any>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-Clipboard-Any>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Clipboard-Any>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2021 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

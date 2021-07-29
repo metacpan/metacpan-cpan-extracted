@@ -1,0 +1,22 @@
+
+SV *
+name(self)
+    SV *self
+  ALIAS:
+    name  = 0
+    class = 1
+  CODE:
+  {
+    MethodMeta *meta = NUM2PTR(MethodMeta *, SvUV(SvRV(self)));
+    switch(ix) {
+      case 0: RETVAL = SvREFCNT_inc(meta->name); break;
+      case 1:
+        RETVAL = newSV(0);
+        sv_setref_uv(RETVAL, "Object::Pad::MOP::Class", PTR2UV(meta->class));
+        break;
+
+      default: RETVAL = NULL;
+    }
+  }
+  OUTPUT:
+    RETVAL

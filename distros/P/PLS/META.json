@@ -4,7 +4,7 @@
       "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -39,7 +39,7 @@
             "PPI" : "1.264",
             "PPR" : "0.000028",
             "Path::Tiny" : "0.114",
-            "Perl::Critic" : "1.138",
+            "Perl::Critic" : "1.14",
             "Perl::Tidy" : "20210402",
             "Pod::Markdown" : "3.2",
             "URI" : "1.76",
@@ -55,6 +55,6 @@
          "web" : "https://github.com/FractalBoy/perl-language-server"
       }
    },
-   "version" : "0.88",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "0.894",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

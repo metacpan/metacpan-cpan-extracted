@@ -1,9 +1,9 @@
 package Sah::Schema::perl::modname;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-01-20'; # DATE
+our $DATE = '2021-07-20'; # DATE
 our $DIST = 'Sah-Schemas-Perl'; # DIST
-our $VERSION = '0.035'; # VERSION
+our $VERSION = '0.038'; # VERSION
 
 use Regexp::Pattern::Perl::Module ();
 
@@ -11,14 +11,30 @@ our $schema = [str => {
     summary => 'Perl module name, e.g. Foo::Bar',
     description => <<'_',
 
-Contains coercion rule so you can also input `Foo-Bar`, `Foo/Bar`, `Foo/Bar.pm`
+This is a schema you can use when you want to accept a Perl module name. It
+offers basic checking of syntax as well as a couple of conveniences. First, it
+offers completion from list of locally installed Perl modules. Second, it
+contains coercion rule so you can also input `Foo-Bar`, `Foo/Bar`, `Foo/Bar.pm`
 or even 'Foo.Bar' and it will be normalized into `Foo::Bar`.
+
+To see this schema in action on the CLI, you can try e.g. the `pmless` script
+from <pm:App::PMUtils> and activate its tab completion (see its manpage for more
+details). Then on the CLI try typing:
+
+    % pmless M/<tab>
+    % pmless dzp/<tab>
+    % pmless Module/List/Wildcard
+    % pmless Module::List::Wildcard
+
+Note that this schema does not check that the Perl module exists or is installed
+locally. To check that, use the `perl::modname::installed` schema. And there's
+also a `perl::modname::not_installed` schema.
 
 _
     match => '\\A(?:' . $Regexp::Pattern::Perl::Module::RE{perl_modname}{pat} . ')\\z',
 
-    'x.perl.coerce_rules' => [
-        'From_str::normalize_perl_modname',
+    'prefilters' => [
+        'Perl::normalize_perl_modname',
     ],
 
     # provide a default completion which is from list of installed perl modules
@@ -34,7 +50,7 @@ _
         {value=>'Foo|Bar', valid=>0},
     ],
 
-}, {}];
+}];
 
 1;
 # ABSTRACT: Perl module name, e.g. Foo::Bar
@@ -51,7 +67,7 @@ Sah::Schema::perl::modname - Perl module name, e.g. Foo::Bar
 
 =head1 VERSION
 
-This document describes version 0.035 of Sah::Schema::perl::modname (from Perl distribution Sah-Schemas-Perl), released on 2021-01-20.
+This document describes version 0.038 of Sah::Schema::perl::modname (from Perl distribution Sah-Schemas-Perl), released on 2021-07-20.
 
 =head1 SYNOPSIS
 
@@ -81,7 +97,8 @@ To specify schema in L<Rinci> function metadata and use the metadata with
 L<Perinci::CmdLine> to create a CLI:
 
  # in lib/MyApp.pm
- package MyApp;
+ package
+   MyApp;
  our %SPEC;
  $SPEC{myfunc} = {
      v => 1.1,
@@ -101,7 +118,8 @@ L<Perinci::CmdLine> to create a CLI:
  1;
 
  # in myapp.pl
- package main;
+ package
+   main;
  use Perinci::CmdLine::Any;
  Perinci::CmdLine::Any->new(url=>'MyApp::myfunc')->run;
 
@@ -132,8 +150,24 @@ Sample data:
 
 =head1 DESCRIPTION
 
-Contains coercion rule so you can also input C<Foo-Bar>, C<Foo/Bar>, C<Foo/Bar.pm>
+This is a schema you can use when you want to accept a Perl module name. It
+offers basic checking of syntax as well as a couple of conveniences. First, it
+offers completion from list of locally installed Perl modules. Second, it
+contains coercion rule so you can also input C<Foo-Bar>, C<Foo/Bar>, C<Foo/Bar.pm>
 or even 'Foo.Bar' and it will be normalized into C<Foo::Bar>.
+
+To see this schema in action on the CLI, you can try e.g. the C<pmless> script
+from L<App::PMUtils> and activate its tab completion (see its manpage for more
+details). Then on the CLI try typing:
+
+ % pmless M/<tab>
+ % pmless dzp/<tab>
+ % pmless Module/List/Wildcard
+ % pmless Module::List::Wildcard
+
+Note that this schema does not check that the Perl module exists or is installed
+locally. To check that, use the C<perl::modname::installed> schema. And there's
+also a C<perl::modname::not_installed> schema.
 
 =head1 HOMEPAGE
 
@@ -145,7 +179,7 @@ Source repository is at L<https://github.com/perlancar/perl-Sah-Schemas-Perl>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Sah-Schemas-Perl/issues>
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Sah-Schemas-Perl>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

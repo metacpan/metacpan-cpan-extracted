@@ -1,5 +1,15 @@
 Revision history for Net-Async-Redis
 
+3.015     2021-07-27 03:47:43+08:00 Asia/Kuala_Lumpur
+    [Bugs fixed]
+    - The CLUSTER INFO command generated warnings (RT138053, thanks to Nael for
+    reporting)
+
+3.014     2021-07-20 18:37:09+08:00 Asia/Kuala_Lumpur
+    [New features]
+
+    - ->expiretime and ->eval_ro from latest commands list
+
 3.013     2021-04-27 10:28:39+08:00 Asia/Kuala_Lumpur
     No new features.
 

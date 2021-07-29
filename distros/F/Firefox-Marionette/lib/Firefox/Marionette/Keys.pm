@@ -53,7 +53,7 @@ our @EXPORT_OK = qw(
 
 our %EXPORT_TAGS = ( 'all' => \@EXPORT_OK, );
 
-our $VERSION = '1.08';
+our $VERSION = '1.10';
 
 sub CANCEL          { return chr hex '0xE001' }
 sub HELP            { return chr hex '0xE002' }
@@ -108,7 +108,7 @@ Firefox::Marionette::Keys - Human readable special keys for the Marionette proto
 
 =head1 VERSION
 
-Version 1.08
+Version 1.10
 
 =head1 SYNOPSIS
 
@@ -133,7 +133,7 @@ This module handles the implementation of the Firefox Marionette human readable 
 
 =head2 ALT
 
-returns the Alt (the same as L<ALT_LEFT|Firefox::Marionette::Keys::ALT_LEFT>) codepoint, which is 0xE00A
+returns the Alt (the same as L<ALT_LEFT|Firefox::Marionette::Keys#ALT_LEFT>) codepoint, which is 0xE00A
 
 =head2 ALT_LEFT
 
@@ -173,7 +173,7 @@ returns the Clear codepoint, which is 0xE005
 
 =head2 CONTROL
 
-returns the Control (the same as L<CONTROL_LEFT|Firefox::Marionette::Keys::CONTROL_LEFT>) codepoint, which is 0xE009
+returns the Control (the same as L<CONTROL_LEFT|Firefox::Marionette::Keys#CONTROL_LEFT>) codepoint, which is 0xE009
 
 =head2 CONTROL_LEFT
 
@@ -261,7 +261,7 @@ returns the Insert codepoint, which is 0xE016
 
 =head2 META
 
-returns the Meta (the same as L<META_LEFT|Firefox::Marionette::Keys::META_LEFT>) codepoint, which is 0xE03D
+returns the Meta (the same as L<META_LEFT|Firefox::Marionette::Keys#META_LEFT>) codepoint, which is 0xE03D
 
 =head2 META_LEFT
 
@@ -285,7 +285,7 @@ returns the Pause codepoint, which is 0xE00B
 
 =head2 SHIFT
 
-returns the Shift (the same as L<SHIFT_LEFT|Firefox::Marionette::Keys::SHIFT_LEFT>) codepoint, which is 0xE008
+returns the Shift (the same as L<SHIFT_LEFT|Firefox::Marionette::Keys#SHIFT_LEFT>) codepoint, which is 0xE008
 
 =head2 SHIFT_LEFT
 

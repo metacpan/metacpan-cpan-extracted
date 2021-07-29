@@ -118,6 +118,8 @@ t/use_lib1.t
 t/use_lib2.t
 t/use_lib3.t
 t/use_lib4.t
+t/use_lib5.t
+t/use_lib6.t
 t/use_mbfw.t
 t/with_sub.t
 TODO

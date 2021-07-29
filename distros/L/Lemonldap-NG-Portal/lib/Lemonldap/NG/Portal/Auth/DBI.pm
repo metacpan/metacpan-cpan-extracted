@@ -4,7 +4,7 @@ use strict;
 use Mouse;
 use Lemonldap::NG::Portal::Main::Constants qw(PE_OK PE_BADCREDENTIALS);
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.12';
 
 extends 'Lemonldap::NG::Portal::Auth::_WebForm',
   'Lemonldap::NG::Portal::Lib::DBI';
@@ -43,7 +43,7 @@ sub authenticate {
 }
 
 sub authLogout {
-    PE_OK;
+    return PE_OK;
 }
 
 1;

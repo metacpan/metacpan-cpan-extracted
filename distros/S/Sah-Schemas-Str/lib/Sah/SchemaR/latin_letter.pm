@@ -1,7 +1,7 @@
 package Sah::SchemaR::latin_letter;
 
-our $DATE = '2020-05-27'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2021-07-23'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 our $rschema = ["str",[{examples=>[{valid=>0,value=>""},{valid=>1,value=>"A"},{valid=>0,value=>"AB"},{valid=>0,value=>1}],len=>1,match=>qr(\A[A-Za-z]\z),summary=>"Latin letter, i.e. A-Z or a-z"}],["str"]];
 
@@ -20,7 +20,7 @@ Sah::SchemaR::latin_letter - Latin letter, i.e. A-Z or a-z
 
 =head1 VERSION
 
-This document describes version 0.002 of Sah::SchemaR::latin_letter (from Perl distribution Sah-Schemas-Str), released on 2020-05-27.
+This document describes version 0.003 of Sah::SchemaR::latin_letter (from Perl distribution Sah-Schemas-Str), released on 2021-07-23.
 
 =head1 DESCRIPTION
 
@@ -50,7 +50,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

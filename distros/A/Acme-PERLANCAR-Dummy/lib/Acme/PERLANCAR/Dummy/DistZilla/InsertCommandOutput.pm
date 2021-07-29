@@ -1,9 +1,9 @@
 package Acme::PERLANCAR::Dummy::DistZilla::InsertCommandOutput;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-02-22'; # DATE
+our $DATE = '2021-07-26'; # DATE
 our $DIST = 'Acme-PERLANCAR-Dummy'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.011'; # VERSION
 
 use 5.010001;
 use strict;
@@ -23,7 +23,7 @@ Acme::PERLANCAR::Dummy::DistZilla::InsertCommandOutput
 
 =head1 VERSION
 
-This document describes version 0.002 of Acme::PERLANCAR::Dummy::DistZilla::InsertCommandOutput (from Perl distribution Acme-PERLANCAR-Dummy), released on 2021-02-22.
+This document describes version 0.011 of Acme::PERLANCAR::Dummy::DistZilla::InsertCommandOutput (from Perl distribution Acme-PERLANCAR-Dummy), released on 2021-07-26.
 
 =head1 DESCRIPTION
 
@@ -39,7 +39,7 @@ Source repository is at L<https://github.com/perlancar/perl-Acme-PERLANCAR-Dummy
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Acme-PERLANCAR-Dummy/issues>
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-PERLANCAR-Dummy>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

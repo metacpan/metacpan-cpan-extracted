@@ -1,0 +1,67 @@
+NAME
+
+    Object::Pad::SlotAttr::Final - declare Object::Pad slots readonly after
+    construction
+
+SYNOPSIS
+
+       use Object::Pad;
+       use Object::Pad::SlotAttr::Final;
+    
+       class Rectangle {
+          has $width  :param :reader :Final;
+          has $height :param :reader :Final;
+    
+          has $area :reader :Final;
+    
+          ADJUST {
+             $area = $width * $height;
+          }
+       }
+
+DESCRIPTION
+
+    This module provides a third-party slot attribute for Object::Pad-based
+    classes, which declares that the slot it is attached to shall be set as
+    readonly when the constructor returns, disallowing further modification
+    to it.
+
+    WARNING The ability for Object::Pad to take third-party slot attributes
+    is still new and highly experimental, and subject to much API change in
+    future. As a result, this module should be considered equally
+    experimental. As a further point, it is currently pinned to requiring
+    an exact $Object::Pad::VERSION of 0.47, to defend against possible API
+    or ABI breakage. It is expected that as the API eventually stablises,
+    this restriction can be removed.
+
+SLOT ATTRIBUTES
+
+ :Final
+
+       has $slot :Final ...;
+       has $slot :Final ... = DEFAULT;
+
+    Declares that the slot variable will be set readonly at the end of the
+    constructor, after any assignments from :param declarations or ADJUST
+    blocks. At this point, the value cannot otherwise be modified by
+    directly writing into the slot variable.
+
+       has $slot :Final;
+    
+       ADJUST { $slot = 123; }    # this is permitted
+    
+       method m { $slot = 456; }  # this will fail
+
+    Note that this is only a shallow readonly setting; if the slot variable
+    contains a reference to a data structure, that structure itself remains
+    mutable.
+
+       has $aref :Final;
+       ADJUST { $aref = []; }
+    
+       method more { push @$aref, "another"; }   # this is permitted
+
+AUTHOR
+
+    Paul Evans <leonerd@leonerd.org.uk>
+

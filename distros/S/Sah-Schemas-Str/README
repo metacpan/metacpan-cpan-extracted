@@ -2,10 +2,12 @@ NAME
     Sah::Schemas::Str - Various string schemas
 
 VERSION
-    This document describes version 0.002 of Sah::Schemas::Str (from Perl
-    distribution Sah-Schemas-Str), released on 2020-05-27.
+    This document describes version 0.003 of Sah::Schemas::Str (from Perl
+    distribution Sah-Schemas-Str), released on 2021-07-23.
 
 SAH SCHEMAS
+    The following schemas are included in this distribution:
+
     *   hexstr
 
         String of bytes in hexadecimal.
@@ -23,6 +25,14 @@ SAH SCHEMAS
 
         Latin letter, i.e. A-Z or a-z.
 
+    *   str_or_aos
+
+        String or array (0+ length) of (defined) string.
+
+    *   str_or_aos1
+
+        String or array (1+ length) of (defined) string.
+
 HOMEPAGE
     Please visit the project's homepage at
     <https://metacpan.org/release/Sah-Schemas-Str>.
@@ -39,15 +49,15 @@ BUGS
     to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-    Sah - specification
+    Sah - schema specification
 
-    Data::Sah
+    Data::Sah - Perl implementation of Sah
 
 AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2020 by perlancar@cpan.org.
+    This software is copyright (c) 2021, 2020 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

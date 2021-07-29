@@ -1,3 +1,27 @@
+0.008   2021-07-21  Released-By: PERLANCAR; Urgency: medium
+
+	- Add entries: App::HL7::Dump (hl7dump), App::Licensecheck
+	  (licensecheck), Git::Deploy (git-deploy), Indent::Form,
+	  Spreadsheet::Read (xls2csv), String::Tagged::Terminal,
+	  Term::App::Util::Color.
+
+
+0.007   2021-06-01  Released-By: PERLANCAR; Urgency: medium
+
+	- Add entries: App::ccdiff, App::Codeowners, App::riap,
+	  App::rsynccolor, Parse::Netstat::Colorizer,
+	  Proc::ProcessTable::ncps, Search::ESsearcher, Term::ANSIColor,
+	  Term::App::Roles::Attrs, Text::CSV_XS, Tree::Shell; note the
+	  scripts.
+
+
+0.006   2021-06-01  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- Tweak formatting.
+
+
 0.005   2021-05-09  Released-By: PERLANCAR; Urgency: medium
 
 	- Add entry: App::DiffTarballs.

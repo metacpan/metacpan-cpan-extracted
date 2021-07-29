@@ -1,7 +1,10 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
+use v5;
 use strict;
-use Test::More tests => 2;
+use warnings;
+
+use Test::More;
 use Test::Fatal;
 
 use ExtUtils::CChecker;
@@ -18,3 +21,5 @@ like(
    qr/^OS unsupported - broken source$/,
    'Broken C program does not compile and run'
 );
+
+done_testing;

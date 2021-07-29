@@ -1,0 +1,141 @@
+=encoding UTF-8
+
+=head1 NAME
+
+TCOD::Event::Dispatch - A role to dispatch TCOD events
+
+=head1 SYNOPSIS
+
+    use TCOD;
+
+    package My::Dispatch {
+        use Role::Tiny::With;
+        with 'TCOD::Event::Dispatch';
+
+        sub ev_quit { exit }
+
+        sub ev_keydown {
+            my ( $event, @extra ) = @_;
+
+            for ( $event->sym ) {
+                return { move => [  0, -1 ] } if $_ == TCOD::Event::K_UP;
+                return { move => [  0,  1 ] } if $_ == TCOD::Event::K_DOWN;
+                return { move => [ -1,  0 ] } if $_ == TCOD::Event::K_LEFT;
+                return { move => [  1,  0 ] } if $_ == TCOD::Event::K_RIGHT;
+            }
+
+            return;
+        }
+    }
+
+    my $iter = TCOD::Event::wait;
+    while ( my $event = $iter->() ) {
+        my $action = My::Dispatch->dispatch( $event, @extra );
+
+        if ( my $delta = $action->{move} ) {
+            print 'Movement delta is ' . join ', ', @{ $delta };
+        }
+    }
+
+=head1 DESCRIPTION
+
+This is a L<Role::Tiny> role that an be used to write your own dispatch code
+that can translate between one of the event types defined in
+L<TCOD::Event|TCOD::Event/EVENT TYPES>.
+
+=head1 METHODS
+
+=head2 dispatch
+
+    ... = $dispatcher->dispatch( $event, @other );
+
+Dispatch to one of this packages event handlers depending on the
+L<TCOD::Event> passed as an argument.
+
+The event will be passed as the first argument to one of the event handler
+methods mentioned below. Any other parameters passed to this method will
+be passed down to the dispatched method as well.
+
+The method to dispatch to will be selected by taking the result of calling
+C<type> on the event, converting it to lowercase, and adding the C<ev_>
+prefix. For example, if the event is of type C<KEYUP>, this method will
+dispatch to C<ev_keyup>. For more details on what these types are and under
+what circumstances these events may trigger, please see the L<TCOD::Event>
+documentation.
+
+The event handler methods do nothing by default. The user is expected to
+override them in the package that consumes this role. See the
+L<synopsis|/SYNOPSYS> for an example of how this can be done.
+
+The pre-defined event handler methods are the following:
+
+=over
+
+=item * ev_keydown
+
+=item * ev_keyup
+
+=item * ev_mousebuttondown
+
+=item * ev_mousebuttonup
+
+=item * ev_mousemotion
+
+=item * ev_mousewheel
+
+=item * ev_quit
+
+=item * ev_textinput
+
+=item * ev_undefined
+
+=item * ev_windowclose
+
+=item * ev_windowenter
+
+=item * ev_windowexposed
+
+=item * ev_windowfocusgained
+
+=item * ev_windowfocuslost
+
+=item * ev_windowhidden
+
+=item * ev_windowhittest
+
+=item * ev_windowleave
+
+=item * ev_windowmaximized
+
+=item * ev_windowminimized
+
+=item * ev_windowmoved
+
+=item * ev_windowresized
+
+=item * ev_windowrestored
+
+=item * ev_windowshown
+
+=item * ev_windowsizechanged
+
+=item * ev_windowtakefocus
+
+=back
+
+=head1 SEE ALSO
+
+=over
+
+=item L<TCOD>
+
+=item L<TCOD::Event>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2021 José Joaquín Atria
+
+This library is free software; you can redistribute it and/or modify it under
+the Artistic License 2.0.

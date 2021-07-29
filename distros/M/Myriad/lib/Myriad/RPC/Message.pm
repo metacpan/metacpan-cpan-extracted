@@ -2,7 +2,7 @@ package Myriad::RPC::Message;
 
 use Myriad::Class;
 
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.010'; # VERSION
 our $AUTHORITY = 'cpan:DERIV'; # AUTHORITY
 
 =encoding utf8
@@ -86,7 +86,7 @@ A JSON encoded string contains the argument of the procedure.
 
 method args { $args }
 
-=head2 resposne
+=head2 response
 
 The response to this message.
 

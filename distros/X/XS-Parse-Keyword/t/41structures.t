@@ -31,6 +31,7 @@ BEGIN { $^H{"t::structures/permit"} = 1; }
 {
    is( structchoice zero, 0, 'choice zero' );
    is( structchoice two, 2, 'choice two' );
+   is( structchoice { 1234 }, 3, 'choice block' ); # RT136845
    is( structchoice, -1, 'choice absent' );
 }
 

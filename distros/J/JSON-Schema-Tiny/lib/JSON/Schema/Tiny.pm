@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package JSON::Schema::Tiny; # git description: v0.005-10-ga1acb0b
+package JSON::Schema::Tiny; # git description: v0.006-22-g9909903
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate data against a schema, minimally
 # KEYWORDS: JSON Schema data validation structure specification tiny
 
-our $VERSION = '0.006';
+our $VERSION = '0.007';
 
 use 5.016;  # for the unicode_strings feature
 no if "$]" >= 5.031009, feature => 'indirect';
@@ -21,7 +21,7 @@ use Storable 'dclone';
 use JSON::MaybeXS 1.004001 'is_bool';
 use Feature::Compat::Try;
 use JSON::PP ();
-use List::Util 1.33 'any';
+use List::Util 1.33 qw(any none);
 use Scalar::Util 'blessed';
 use namespace::clean;
 use Exporter 5.57 'import';
@@ -31,7 +31,13 @@ our @EXPORT_OK = qw(evaluate);
 our $BOOLEAN_RESULT = 0;
 our $SHORT_CIRCUIT = 0;
 our $MAX_TRAVERSAL_DEPTH = 50;
-our $MOJO_BOOLEANS = 0;
+our $MOJO_BOOLEANS; # deprecated; renamed to $SCALARREF_BOOLEANS
+our $SCALARREF_BOOLEANS;
+our $SPECIFICATION_VERSION;
+
+my %version_uris = (
+  'https://json-schema.org/draft/2019-09/schema' => 'draft2019-09',
+);
 
 sub new {
   my ($class, %args) = @_;
@@ -41,12 +47,17 @@ sub new {
 sub evaluate {
   croak 'evaluate called in void context' if not defined wantarray;
 
+  $SCALARREF_BOOLEANS = $SCALARREF_BOOLEANS // $MOJO_BOOLEANS;
   local $BOOLEAN_RESULT = $_[0]->{boolean_result} // $BOOLEAN_RESULT,
   local $SHORT_CIRCUIT = $_[0]->{short_circuit} // $SHORT_CIRCUIT,
   local $MAX_TRAVERSAL_DEPTH = $_[0]->{max_traversal_depth} // $MAX_TRAVERSAL_DEPTH,
-  local $MOJO_BOOLEANS = $_[0]->{mojo_booleans} // $MOJO_BOOLEANS,
+  local $SCALARREF_BOOLEANS = $_[0]->{scalarref_booleans} // $SCALARREF_BOOLEANS // $_[0]->{mojo_booleans},
+  local $SPECIFICATION_VERSION = $_[0]->{specification_version} // $SPECIFICATION_VERSION,
   shift
     if blessed($_[0]) and blessed($_[0])->isa(__PACKAGE__);
+
+  croak '$SPECIFICATION_VERSION value is invalid'
+    if defined $SPECIFICATION_VERSION and none { $SPECIFICATION_VERSION eq $_ } values %version_uris;
 
   croak 'insufficient arguments' if @_ < 2;
   my ($data, $schema) = @_;
@@ -61,11 +72,12 @@ sub evaluate {
     seen => {},
     short_circuit => $BOOLEAN_RESULT || $SHORT_CIRCUIT,
     root_schema => $schema,                 # so we can do $refs within the same document
+    spec_version => $SPECIFICATION_VERSION,
   };
 
   my $valid;
   try {
-    $valid = _eval($data, $schema, $state)
+    $valid = _eval_subschema($data, $schema, $state)
   }
   catch ($e) {
     if (is_plain_hashref($e)) {
@@ -88,14 +100,17 @@ sub evaluate {
 
 ######## NO PUBLIC INTERFACES FOLLOW THIS POINT ########
 
-# keyword => undef, or arrayref of alternatives
+# current spec version => { keyword => undef, or arrayref of alternatives }
 my %removed_keywords = (
-  definitions => [ '$defs' ],
-  dependencies => [ qw(dependentSchemas dependentRequired) ],
+  'draft2019-09' => {
+    id => [ '$id' ],
+    definitions => [ '$defs' ],
+    dependencies => [ qw(dependentSchemas dependentRequired) ],
+  },
 );
 
-sub _eval {
-  croak '_eval called in void context' if not defined wantarray;
+sub _eval_subschema {
+  croak '_eval_subschema called in void context' if not defined wantarray;
   croak 'insufficient arguments' if @_ < 3;
   my ($data, $schema, $state) = @_;
 
@@ -121,6 +136,7 @@ sub _eval {
   abort($state, 'invalid schema type: %s', $schema_type) if $schema_type ne 'object';
 
   my $valid = 1;
+  my $spec_version = $state->{spec_version}//'';
 
   foreach my $keyword (
     # CORE KEYWORDS
@@ -155,12 +171,12 @@ sub _eval {
   }
 
   # check for previously-supported but now removed keywords
-  foreach my $keyword (keys %removed_keywords) {
+  foreach my $keyword (sort keys %{$removed_keywords{$spec_version}}) {
     next if not exists $schema->{$keyword};
     my $message ='no-longer-supported "'.$keyword.'" keyword present (at location "'
       .canonical_schema_uri($state).'")';
-    if ($removed_keywords{$keyword}) {
-      my @list = map '"'.$_.'"', @{$removed_keywords{$keyword}};
+    if (my $alternates = $removed_keywords{$spec_version}->{$keyword}) {
+      my @list = map '"'.$_.'"', @$alternates;
       @list = ((map $_.',', @list[0..$#list-1]), $list[-1]) if @list > 2;
       splice(@list, -1, 0, 'or') if @list > 1;
       $message .= ': this should be rewritten as '.join(' ', @list);
@@ -177,12 +193,20 @@ sub _eval_keyword_schema {
   my ($data, $schema, $state) = @_;
 
   return if not assert_keyword_type($state, $schema, 'string');
+  assert_uri($state, $schema);
 
   return abort($state, '$schema can only appear at the schema resource root')
     if length($state->{schema_path});
 
-  abort($state, 'custom $schema references are not supported')
-    if $schema->{'$schema'} ne 'https://json-schema.org/draft/2019-09/schema';
+  my $spec_version = $version_uris{$schema->{'$schema'}};
+  abort($state, 'custom $schema URIs are not supported (must be one of: %s',
+     join(', ', map '"'.$_.'"', keys %version_uris))
+    if not $spec_version;
+
+  abort($state, '"$schema" indicates a different version than that requested by $JSON::Schema::Tiny::SPECIFICATION_VERSION')
+    if defined $SPECIFICATION_VERSION and $SPECIFICATION_VERSION ne $spec_version;
+
+  $state->{spec_version} = $spec_version;
 }
 
 sub _eval_keyword_ref {
@@ -203,7 +227,7 @@ sub _eval_keyword_ref {
   my $subschema = Mojo::JSON::Pointer->new($state->{root_schema})->get($uri->fragment);
   abort($state, 'EXCEPTION: unable to find resource %s', $uri) if not defined $subschema;
 
-  return _eval($data, $subschema,
+  return _eval_subschema($data, $subschema,
     +{ %$state,
       traversed_schema_path => $state->{traversed_schema_path}.$state->{schema_path}.'/$ref',
       initial_schema_uri => $uri,
@@ -216,8 +240,7 @@ sub _eval_keyword_recursiveRef {
 
   return if not assert_keyword_type($state, $schema, 'string');
 
-  my $uri = Mojo::URL->new($schema->{'$recursiveRef'})->to_abs($state->{canonical_schema_uri});
-
+  my $uri = Mojo::URL->new($schema->{'$recursiveRef'})->to_abs($state->{initial_schema_uri});
   abort($state, '$refs to anchors are not supported')
     if ($uri->fragment//'') !~ m{^(/(?:[^~]|~[01])*|)$};
 
@@ -237,7 +260,7 @@ sub _eval_keyword_recursiveRef {
     abort($state, 'EXCEPTION: unable to find resource %s', $uri) if not defined $subschema;
   }
 
-  return _eval($data, $subschema,
+  return _eval_subschema($data, $subschema,
     +{ %$state,
       traversed_schema_path => $state->{traversed_schema_path}.$state->{schema_path}.'/$recursiveRef',
       initial_schema_uri => $uri,
@@ -275,7 +298,7 @@ sub _eval_keyword_recursiveAnchor {
   my ($data, $schema, $state) = @_;
 
   return if not assert_keyword_type($state, $schema, 'boolean');
-  return 1 if not $schema->{'$recursiveAnchor'};
+  return 1 if not $schema->{'$recursiveAnchor'} or exists $state->{recursive_anchor_uri};
 
   # this is required because the location is used as the base URI for future resolution
   # of $recursiveRef, and the fragment would be disregarded in the base
@@ -335,7 +358,7 @@ sub _eval_keyword_type {
 
     foreach my $type (@{$schema->{type}}) {
       return 1 if is_type($type, $data)
-        or ($type eq 'boolean' and $MOJO_BOOLEANS and is_type('reference to SCALAR', $data));
+        or ($type eq 'boolean' and $SCALARREF_BOOLEANS and is_type('reference to SCALAR', $data));
     }
     return E($state, 'wrong type (expected one of %s)', join(', ', @{$schema->{type}}));
   }
@@ -345,7 +368,7 @@ sub _eval_keyword_type {
       if not any { ($schema->{type}//'') eq $_ } qw(null boolean object array string number integer);
 
     return 1 if is_type($schema->{type}, $data)
-      or ($schema->{type} eq 'boolean' and $MOJO_BOOLEANS and is_type('reference to SCALAR', $data));
+      or ($schema->{type} eq 'boolean' and $SCALARREF_BOOLEANS and is_type('reference to SCALAR', $data));
     return E($state, 'wrong type (expected %s)', $schema->{type});
   }
 }
@@ -357,9 +380,7 @@ sub _eval_keyword_enum {
   abort($state, '"enum" values are not unique') if not is_elements_unique($schema->{enum});
 
   my @s; my $idx = 0;
-  return 1
-    if any { is_equal($data, $_, $s[$idx++] = { $MOJO_BOOLEANS ? (lhs_mojo_bool => 1) : () }) }
-      @{$schema->{enum}};
+  return 1 if any { is_equal($data, $_, $s[$idx++] = {}) } @{$schema->{enum}};
 
   return E($state, 'value does not match'
     .(!(grep $_->{path}, @s) ? ''
@@ -369,7 +390,7 @@ sub _eval_keyword_enum {
 sub _eval_keyword_const {
   my ($data, $schema, $state) = @_;
 
-  return 1 if is_equal($data, $schema->{const}, my $s = { $MOJO_BOOLEANS ? (lhs_mojo_bool => 1) : () });
+  return 1 if is_equal($data, $schema->{const}, my $s = {});
   return E($state, 'value does not match'
     .($s->{path} ? ' (differences start at "'.$s->{path}.'")' : ''));
 }
@@ -588,7 +609,7 @@ sub _eval_keyword_allOf {
 
   my @invalid;
   foreach my $idx (0 .. $#{$schema->{allOf}}) {
-    next if _eval($data, $schema->{allOf}[$idx],
+    next if _eval_subschema($data, $schema->{allOf}[$idx],
       +{ %$state, schema_path => $state->{schema_path}.'/allOf/'.$idx });
 
     push @invalid, $idx;
@@ -609,7 +630,7 @@ sub _eval_keyword_anyOf {
   my $valid = 0;
   my @errors;
   foreach my $idx (0 .. $#{$schema->{anyOf}}) {
-    next if not _eval($data, $schema->{anyOf}[$idx],
+    next if not _eval_subschema($data, $schema->{anyOf}[$idx],
       +{ %$state, errors => \@errors, schema_path => $state->{schema_path}.'/anyOf/'.$idx });
     ++$valid;
     last if $state->{short_circuit};
@@ -627,7 +648,7 @@ sub _eval_keyword_oneOf {
 
   my (@valid, @errors);
   foreach my $idx (0 .. $#{$schema->{oneOf}}) {
-    next if not _eval($data, $schema->{oneOf}[$idx],
+    next if not _eval_subschema($data, $schema->{oneOf}[$idx],
       +{ %$state, errors => \@errors, schema_path => $state->{schema_path}.'/oneOf/'.$idx });
     push @valid, $idx;
     last if @valid > 1 and $state->{short_circuit};
@@ -647,7 +668,7 @@ sub _eval_keyword_oneOf {
 sub _eval_keyword_not {
   my ($data, $schema, $state) = @_;
 
-  return 1 if not _eval($data, $schema->{not},
+  return 1 if not _eval_subschema($data, $schema->{not},
     +{ %$state, schema_path => $state->{schema_path}.'/not', short_circuit => 1, errors => [] });
 
   return E($state, 'subschema is valid');
@@ -657,12 +678,12 @@ sub _eval_keyword_if {
   my ($data, $schema, $state) = @_;
 
   return 1 if not exists $schema->{then} and not exists $schema->{else};
-  my $keyword = _eval($data, $schema->{if},
+  my $keyword = _eval_subschema($data, $schema->{if},
       +{ %$state, schema_path => $state->{schema_path}.'/if', short_circuit => 1, errors => [] })
     ? 'then' : 'else';
 
   return 1 if not exists $schema->{$keyword};
-  return 1 if _eval($data, $schema->{$keyword},
+  return 1 if _eval_subschema($data, $schema->{$keyword},
     +{ %$state, schema_path => $state->{schema_path}.'/'.$keyword });
   return E({ %$state, keyword => $keyword }, 'subschema is not valid');
 }
@@ -677,7 +698,7 @@ sub _eval_keyword_dependentSchemas {
   my $valid = 1;
   foreach my $property (sort keys %{$schema->{dependentSchemas}}) {
     next if not exists $data->{$property}
-      or _eval($data, $schema->{dependentSchemas}{$property},
+      or _eval_subschema($data, $schema->{dependentSchemas}{$property},
         +{ %$state, schema_path => jsonp($state->{schema_path}, 'dependentSchemas', $property) });
 
     $valid = 0;
@@ -723,7 +744,7 @@ sub _eval_keyword__items_array_schemas {
         _schema_path_suffix => $idx }, 'item not permitted');
     }
     else {
-      next if _eval($data->[$idx], $schema->{$state->{keyword}}[$idx],
+      next if _eval_subschema($data->[$idx], $schema->{$state->{keyword}}[$idx],
         +{ %$state, data_path => $state->{data_path}.'/'.$idx,
           schema_path => $state->{schema_path}.'/'.$state->{keyword}.'/'.$idx });
     }
@@ -752,7 +773,7 @@ sub _eval_keyword__items_schema {
         '%sitem not permitted', $state->{keyword} eq 'additionalItems' ? 'additional ' : '');
     }
     else {
-      next if _eval($data->[$idx], $schema->{$state->{keyword}},
+      next if _eval_subschema($data->[$idx], $schema->{$state->{keyword}},
         +{ %$state, data_path => $state->{data_path}.'/'.$idx,
           schema_path => $state->{schema_path}.'/'.$state->{keyword} });
       $valid = 0;
@@ -776,7 +797,7 @@ sub _eval_keyword_contains {
   $state->{_num_contains} = 0;
   my @errors;
   foreach my $idx (0 .. $#{$data}) {
-    if (_eval($data->[$idx], $schema->{contains},
+    if (_eval_subschema($data->[$idx], $schema->{contains},
         +{ %$state, errors => \@errors,
           data_path => $state->{data_path}.'/'.$idx,
           schema_path => $state->{schema_path}.'/contains' })) {
@@ -813,7 +834,7 @@ sub _eval_keyword_properties {
         _schema_path_suffix => $property }, 'property not permitted');
     }
     else {
-      next if _eval($data->{$property}, $schema->{properties}{$property},
+      next if _eval_subschema($data->{$property}, $schema->{properties}{$property},
         +{ %$state,
           data_path => jsonp($state->{data_path}, $property),
           schema_path => jsonp($state->{schema_path}, 'properties', $property) });
@@ -847,7 +868,7 @@ sub _eval_keyword_patternProperties {
           _schema_path_suffix => $property_pattern }, 'property not permitted');
       }
       else {
-        next if _eval($data->{$property}, $schema->{patternProperties}{$property_pattern},
+        next if _eval_subschema($data->{$property}, $schema->{patternProperties}{$property_pattern},
           +{ %$state,
             data_path => jsonp($state->{data_path}, $property),
             schema_path => jsonp($state->{schema_path}, 'patternProperties', $property_pattern) });
@@ -880,7 +901,7 @@ sub _eval_keyword_additionalProperties {
         'additional property not permitted');
     }
     else {
-      next if _eval($data->{$property}, $schema->{additionalProperties},
+      next if _eval_subschema($data->{$property}, $schema->{additionalProperties},
         +{ %$state,
           data_path => jsonp($state->{data_path}, $property),
           schema_path => $state->{schema_path}.'/additionalProperties' });
@@ -901,7 +922,7 @@ sub _eval_keyword_propertyNames {
 
   my $valid = 1;
   foreach my $property (sort keys %$data) {
-    next if _eval($property, $schema->{propertyNames},
+    next if _eval_subschema($property, $schema->{propertyNames},
       +{ %$state,
         data_path => jsonp($state->{data_path}, $property),
         schema_path => $state->{schema_path}.'/propertyNames' });
@@ -916,12 +937,12 @@ sub _eval_keyword_propertyNames {
 
 sub _eval_keyword_unevaluatedItems {
   my ($data, $schema, $state) = @_;
-  abort($state, 'keyword not supported');
+  abort($state, 'keyword not yet supported');
 }
 
 sub _eval_keyword_unevaluatedProperties {
   my ($data, $schema, $state) = @_;
-  abort($state, 'keyword not supported');
+  abort($state, 'keyword not yet supported');
 }
 
 # UTILITIES
@@ -999,8 +1020,10 @@ sub is_equal {
 
   my @types = map get_type($_), $x, $y;
 
-  return 1 if $state->{lhs_mojo_bool}
-    and $types[0] eq 'reference to SCALAR' and $types[1] eq 'boolean' and not ($$x xor $y);
+  if ($SCALARREF_BOOLEANS) {
+    ($x, $types[0]) = (0+!!$$x, 'boolean') if $types[0] eq 'reference to SCALAR';
+    ($y, $types[1]) = (0+!!$$y, 'boolean') if $types[1] eq 'reference to SCALAR';
+  }
 
   return 0 if $types[0] ne $types[1];
   return 1 if $types[0] eq 'null';
@@ -1161,7 +1184,7 @@ JSON::Schema::Tiny - Validate data against a schema, minimally
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 
@@ -1183,8 +1206,8 @@ version 0.006
 =head1 DESCRIPTION
 
 This module aims to be a slimmed-down L<JSON Schema|https://json-schema.org/> evaluator and
-validator, supporting the most popular keywords used in the draft 2019-09 version of the
-specification. (See L</UNSUPPORTED JSON-SCHEMA FEATURES> below for exclusions.)
+validator, supporting the most popular keywords.
+(See L</UNSUPPORTED JSON-SCHEMA FEATURES> below for exclusions.)
 
 =head1 FUNCTIONS
 
@@ -1201,8 +1224,8 @@ Evaluates the provided instance data against the known schema document.
 The data is in the form of an unblessed nested Perl data structure representing any type that JSON
 allows: null, boolean, string, number, object, array. (See L</TYPES> below.)
 
-The schema must represent a JSON Schema that respects the Draft 2019-09 meta-schema at
-L<https://json-schema.org/draft/2019-09/schema>, in the form of a Perl data structure, such as what is returned from a JSON decode operation.
+The schema must represent a valid JSON Schema in the form of a Perl data structure, such as what is
+returned from a JSON decode operation.
 
 With default configuration settings, the return value is a hashref indicating the validation success
 or failure, plus (when validation failed), an arrayref of error strings in standard JSON Schema
@@ -1259,14 +1282,30 @@ The maximum number of levels deep a schema traversal may go, before evaluation i
 protect against accidental infinite recursion, such as from two subschemas that each reference each
 other, or badly-written schemas that could be optimized. Defaults to 50.
 
-=head2 C<$MOJO_BOOLEANS>
+=head2 C<$SCALARREF_BOOLEANS>
 
 When true, any type that is expected to be a boolean B<in the instance data> may also be expressed as
-scalar references to a number, e.g. C<\0> or C<\1> (which are serialized as booleans by L<Mojo::JSON>).
-(Warning: scalar references and real booleans should not be mixed in data being checked by the
-C<uniqueItems> keyword.)
-
+the scalar references C<\0> or C<\1> (which are serialized as booleans by JSON backends).
 Defaults to false.
+
+=head2 C<$SPECIFICATION_VERSION>
+
+When set, the version of the draft specification is locked to one particular value, and use of
+keywords inconsistent with that specification version will result in an error. Will be set
+internally automatically with the use of the C<$schema> keyword. When not set, all keywords will be
+honoured (when otherwise supported).
+
+Supported values for this option, and the corresponding values for the C<$schema> keyword, are:
+
+=over 4
+
+=item *
+
+L<C<draft2019-09>|https://json-schema.org/specification-links.html#2019-09-formerly-known-as-draft-8>, corresponding to metaschema C<https://json-schema.org/draft/2019-09/schema>.
+
+=back
+
+Defaults to undef.
 
 =head1 UNSUPPORTED JSON-SCHEMA FEATURES
 
@@ -1297,7 +1336,7 @@ will result in an error):
 
 =item *
 
-C<$schema> - only accepted if set to the draft201909 metaschema URI ("C<https://json-schema.org/draft/2019-09/schema>")
+C<$schema> - only accepted if set to one of the specification metaschema URIs (see L<$SPECIFICATION_VERSION> for supported values)
 
 =item *
 

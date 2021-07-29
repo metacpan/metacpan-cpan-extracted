@@ -1,0 +1,69 @@
+{
+   "domain" : "com.example.api",
+   "elements" : [
+      {
+         "msgid" : "There is nothing to do here.",
+         "msgstr" : "ここでやるべきなことはないです。",
+         "reference" : "/home/john/lib/My/Lib/API.pm:1011"
+      },
+      {
+         "msgid" : "You are not allowed to access this api resource.",
+         "msgstr" : "このAPIリソースをアクセス制限はないです。",
+         "reference" : "/home/john/lib/My/Lib/API.pm:1042"
+      },
+      {
+         "msgid" : "Internal Server Error",
+         "msgstr" : "内部サーバーエラーが発生"
+      },
+      {
+         "msgid" : "Bad Request",
+         "msgstr" : "不正リクエスト"
+      },
+      {
+         "msgid" : "Unknown properties: %s",
+         "msgstr" : "不明プロパティ：%s"
+      },
+      {
+         "msgid" : "An unexpected server error occurred. Please try again later.",
+         "msgstr" : "予期せぬエラーが発生してしまいました。あと暫くして経ってからやり直してください。"
+      },
+      {
+         "msgid" : "This account has been blocked and cannot use our services. For more information, please contact our support.",
+         "msgstr" : "このアカウントあはブロックされ、こちらのサービスをアクセス不可能になりました。詳しくは顧客サポートにお問い合わせください。",
+         "reference" : "/home/john/lib/My/Lib/API.pm:2220"
+      },
+      {
+         "msgid" : "You have %d message",
+         "msgid_plural" : "You have %d messages",
+         "msgstr" : [
+            "%dメッセージがある。",
+         ]
+      }
+   ],
+   "meta" : {
+      "Content-Transfer-Encoding" : "8bit",
+      "Content-Type" : "text/plain; charset=utf-8",
+      "Language" : "ja_JP",
+      "Language-Team" : "Japanese <nadehiko.yamato@example.com>",
+      "Last-Translator" : "Momo Taro <taro.momo@example.com>",
+      "MIME-Version" : "1.0",
+      "PO-Revision-Date" : "2019-10-03 19-44+0000",
+      "POT-Creation-Date" : "2019-10-03 19-44+0000",
+      "Plural-Forms" : "nplurals=1; plural=0;",
+      "Project-Id-Version" : "MyProject 0.1",
+      "Report-Msgid-Bugs-To" : "taro.momo@example.com"
+   },
+   "meta_keys" : [
+      "Project-Id-Version",
+      "Report-Msgid-Bugs-To",
+      "POT-Creation-Date",
+      "PO-Revision-Date",
+      "Last-Translator",
+      "Language-Team",
+      "Language",
+      "Plural-Forms",
+      "MIME-Version",
+      "Content-Type",
+      "Content-Transfer-Encoding"
+   ]
+}

@@ -1,5 +1,5 @@
 package Playwright::Base;
-$Playwright::Base::VERSION = '0.007';
+$Playwright::Base::VERSION = '0.011';
 use strict;
 use warnings;
 
@@ -7,7 +7,6 @@ use v5.28;
 
 use Sub::Install();
 
-use Async;
 use JSON;
 use Playwright::Util();
 
@@ -20,11 +19,12 @@ sub new ( $class, %options ) {
 
     my $self = bless(
         {
-            spec => $Playwright::spec->{ $options{type} }{members},
-            type => $options{type},
-            guid => $options{id},
-            ua   => $options{handle}{ua},
-            port => $options{handle}{port},
+            spec   => $Playwright::spec->{ $options{type} }{members},
+            type   => $options{type},
+            guid   => $options{id},
+            ua     => $options{handle}{ua},
+            port   => $options{handle}{port},
+            parent => $options{parent},
         },
         $class
     );
@@ -66,7 +66,8 @@ sub _request ( $self, %args ) {
 
     %args = Playwright::Base::_coerce( $self->{spec}, %args );
 
-    return AsyncData->new( sub { &Playwright::Base::_do( $self, %args ) } )
+    return Playwright::Util::async(
+        sub { &Playwright::Base::_do( $self, %args ) } )
       if $args{command} =~ m/^waitFor/;
 
     my $msg = Playwright::Base::_do->( $self, %args );
@@ -107,7 +108,7 @@ Playwright::Base - Object representing Playwright pages
 
 =head1 VERSION
 
-version 0.007
+version 0.011
 
 =head2 DESCRIPTION
 
@@ -128,9 +129,10 @@ Creates a new page and returns a handle to interact with it.
 
 =head3 INPUT
 
-    handle (Playwright) : Playwright object.
-    id (STRING)         : _guid returned by a response from the Playwright server with the provided type.
-    type (STRING)       : Type to actually use
+    handle (Playwright)    : Playwright object.
+    id (STRING)            : _guid returned by a response from the Playwright server with the provided type.
+    type (STRING)          : Type to actually use
+    parent (Playwright::*) : Parent Object (such as a page)
 
 =head1 SEE ALSO
 

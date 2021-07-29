@@ -17,13 +17,13 @@ use Storable 'dclone';
 
 # ABSTRACT: TopCount and related methods for Vote::Count. Toolkit for vote counting.
 
-our $VERSION='2.00';
+our $VERSION='2.01';
 
 =head1 NAME
 
 Vote::Count::TopCount
 
-=head1 VERSION 2.00
+=head1 VERSION 2.01
 
 =head1 Synopsis
 
@@ -119,6 +119,8 @@ sub TopCount ( $self, $active = undef ) {
     return $self->_RangeTopCount($active);
   }
 }
+
+sub topcount { TopCount(@_) }
 
 =head2 TopChoice
 

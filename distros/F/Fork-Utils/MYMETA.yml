@@ -16,10 +16,10 @@ name: Fork-Utils
 provides:
   Fork::Utils:
     file: lib/Fork/Utils.pm
-    version: '0.04'
+    version: '0.05'
 resources:
   bugtracker: https://github.com/KalessinD/perl_fork_utils/issues
   license: http://www.apache.org/licenses/LICENSE-2.0.txt
   repository: https://github.com/KalessinD/perl_fork_utils
-version: '0.04'
+version: '0.05'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

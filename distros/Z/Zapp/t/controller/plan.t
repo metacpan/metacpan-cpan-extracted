@@ -23,10 +23,10 @@ subtest 'create new plan' => sub {
     subtest 'new plan form' => sub {
         $t->get_ok( '/plan/create' )->status_is( 200 )
             ->or( $dump_debug )
-            ->element_exists( 'form#plan', 'form exists' )
-            ->attr_is( 'form#plan', enctype => 'multipart/form-data', 'form enctype correct' )
-            ->attr_is( 'form#plan', action => '/plan/create', 'form action correct' )
-            ->attr_is( 'form#plan', method => 'POST', 'form method correct' )
+            ->element_exists( 'main form#plan', 'form exists' )
+            ->attr_is( 'main form#plan', enctype => 'multipart/form-data', 'form enctype correct' )
+            ->attr_is( 'main form#plan', action => '/plan/create', 'form action correct' )
+            ->attr_is( 'main form#plan', method => 'POST', 'form method correct' )
             ->element_exists(
                 'label[for=label]',
                 'label label exists',
@@ -239,9 +239,9 @@ subtest 'edit existing plan' => sub {
     subtest 'edit plan form' => sub {
         $t->get_ok( "/plan/$plan_id/edit" )->status_is( 200 )
             ->or( $dump_debug )
-            ->element_exists( 'form#plan', 'form exists' )
-            ->attr_is( 'form#plan', action => "/plan/$plan_id/edit", 'form action correct' )
-            ->attr_is( 'form#plan', method => 'POST', 'form method correct' )
+            ->element_exists( 'main form#plan', 'form exists' )
+            ->attr_is( 'main form#plan', action => "/plan/$plan_id/edit", 'form action correct' )
+            ->attr_is( 'main form#plan', method => 'POST', 'form method correct' )
             ->element_exists(
                 'label[for=label]',
                 'label label exists',
@@ -313,75 +313,75 @@ subtest 'edit existing plan' => sub {
 
         subtest 'inputs form' => sub {
             $t->element_exists(
-                'form [name="input[0].name"]',
+                'main form [name="input[0].name"]',
                 'first input name input exists',
             );
             $t->attr_is(
-                'form [name="input[0].name"]',
+                'main form [name="input[0].name"]',
                 value => 'delay',
                 'first input name input value is correct',
-            ) or diag $t->tx->res->dom->at( 'form [name="input[0].name"]' );
+            ) or diag $t->tx->res->dom->at( 'main form [name="input[0].name"]' );
             $t->element_exists(
-                'form [name="input[0].type"]',
+                'main form [name="input[0].type"]',
                 'first input type input exists',
             );
             $t->attr_is(
-                'form [name="input[0].type"]',
+                'main form [name="input[0].type"]',
                 value => 'number',
                 'first input type input value is correct',
             );
             $t->element_exists(
-                'form [name="input[0].description"]',
+                'main form [name="input[0].description"]',
                 'first input description input exists',
             );
             $t->text_is(
-                'form [name="input[0].description"]',
+                'main form [name="input[0].description"]',
                 'Time to give crew to survive, in minutes',
                 'first input description input value is correct',
             );
             $t->element_exists(
-                'form [name="input[0].config"]',
+                'main form [name="input[0].config"]',
                 'first input default input exists',
             );
             $t->attr_is(
-                'form [name="input[0].config"]',
+                'main form [name="input[0].config"]',
                 value => '25',
                 'first input default value input value is correct',
             );
 
             $t->element_exists(
-                'form [name="input[1].name"]',
+                'main form [name="input[1].name"]',
                 'second input name input exists',
             );
             $t->attr_is(
-                'form [name="input[1].name"]',
+                'main form [name="input[1].name"]',
                 value => 'location',
                 'second input name input value is correct',
             );
             $t->element_exists(
-                'form [name="input[1].type"]',
+                'main form [name="input[1].type"]',
                 'second input type input exists',
             );
             $t->attr_is(
-                'form [name="input[1].type"]',
+                'main form [name="input[1].type"]',
                 value => 'string',
                 'second input type input value is correct',
             );
             $t->element_exists(
-                'form [name="input[1].description"]',
+                'main form [name="input[1].description"]',
                 'second input description input exists',
             );
             $t->text_is(
-                'form [name="input[1].description"]',
+                'main form [name="input[1].description"]',
                 'Where to place the bomb',
                 'second input description input value is correct',
             );
             $t->element_exists(
-                'form [name="input[1].config"]',
+                'main form [name="input[1].config"]',
                 'second input default input exists',
             );
             $t->attr_is(
-                'form [name="input[1].config"]',
+                'main form [name="input[1].config"]',
                 value => 'In the center',
                 'second input default value input value is correct',
             );
@@ -1182,12 +1182,12 @@ subtest 'view plan' => sub {
         ->text_is( h1 => $plan->{label} )
         ->element_exists( qq{a[href="/plan/$plan_id/edit"]}, 'edit link exists' )
         ->element_exists( qq{a[href="/plan/$plan_id/delete"]}, 'delete link exists' )
-        ->element_exists( form => 'run form exists' )
-        ->attr_is( form => action => '/run' )
+        ->element_exists( 'main form' => 'run form exists' )
+        ->attr_is( 'main form' => action => '/run' )
         ->element_exists( '[name="input[0].value"]', 'Color input exists' )
         ->attr_is( '[name="input[0].value"]', value => 'White', 'Color input has default value' )
-        ->or(sub { diag shift->tx->res->dom->at( 'form' ) } )
-        ->element_exists( 'form button', 'submit button exists' )
+        ->or(sub { diag shift->tx->res->dom->at( 'main form' ) } )
+        ->element_exists( 'main form button', 'submit button exists' )
         ->element_exists( qq{a[href="/plan/$plan_id/trigger/?type=Webhook"]}, 'add trigger link exists' )
         ->or(sub { diag shift->tx->res->dom->at( '.add-trigger-types' ) })
         ->element_exists( qq{a[href="/plan/$plan_id/trigger/$trigger_id"]}, 'edit trigger link exists' )
@@ -1224,9 +1224,9 @@ subtest 'delete plan' => sub {
     my $plan_id = $plan->{plan_id};
     $t->get_ok( "/plan/$plan_id/delete" )->status_is( 200 )
         ->content_like( qr{Cut Ribbon at DOOP Headquarters}, 'content contains plan label' )
-        ->element_exists( '.alert form', 'form exists in alert' )
-        ->attr_is( '.alert form', action => "/plan/$plan_id/delete", 'form url is correct' )
-        ->attr_is( '.alert form', method => 'POST', 'form method is correct' )
+        ->element_exists( 'main .alert form', 'form exists in alert' )
+        ->attr_is( 'main .alert form', action => "/plan/$plan_id/delete", 'form url is correct' )
+        ->attr_is( 'main .alert form', method => 'POST', 'form method is correct' )
         ->element_exists( 'a[href].cancel', 'cancel link exists' )
         ->attr_is( 'a[href].cancel', href => '/', 'cancel link href correct (back to plan list)' )
         ;

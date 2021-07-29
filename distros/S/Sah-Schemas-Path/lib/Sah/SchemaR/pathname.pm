@@ -1,9 +1,9 @@
 package Sah::SchemaR::pathname;
 
-our $DATE = '2020-08-26'; # DATE
-our $VERSION = '0.015'; # VERSION
+our $DATE = '2021-07-17'; # DATE
+our $VERSION = '0.016'; # VERSION
 
-our $rschema = ["str",[{examples=>[{valid=>0,value=>""},{valid=>1,value=>"foo"},{valid=>1,value=>"foo/bar"}],min_len=>1,prefilters=>["Path::expand_tilde_when_on_unix","Path::strip_slashes_when_on_unix"],summary=>"Filesystem path name","x.completion"=>["filename"]}],["str"]];
+our $rschema = ["str",[{description=>"\nThis schema is basically string with some checks and prefilters. Why use this\nschema instead of plain ol' str? Mainly to give you the ability to change tilde\nto user's home directory, e.g. `~/foo` into `/home/someuser/foo`. Normally this\nexpansion is done by a Unix shell, but sometimes your program receives an\nunexpanded path, e.g. when you get it from some config file.\n\nSee also more OS-specific schemas like `pathname::unix`, which adds some more\nchecks (e.g. pathname cannot contain forward slash and each component cannot be\nlonger than 255 characters) and preprocessing (e.g. stripping extraneous slashes\nlike `foo//bar` into `foo/bar`.\n\nWhat's the difference between this schema and `filename` and `dirname`? The\ndefault completion rule. This schema's completion by default includes\nfiles as well as directories.\n\n",examples=>[{valid=>0,value=>""},{valid=>1,value=>"foo"},{valid=>1,value=>"foo/bar"}],min_len=>1,prefilters=>["Path::expand_tilde_when_on_unix","Path::strip_slashes_when_on_unix"],summary=>"Filesystem path name","x.completion"=>["filename"]}],["str"]];
 
 1;
 # ABSTRACT: Filesystem path name
@@ -20,7 +20,7 @@ Sah::SchemaR::pathname - Filesystem path name
 
 =head1 VERSION
 
-This document describes version 0.015 of Sah::SchemaR::pathname (from Perl distribution Sah-Schemas-Path), released on 2020-08-26.
+This document describes version 0.016 of Sah::SchemaR::pathname (from Perl distribution Sah-Schemas-Path), released on 2021-07-17.
 
 =head1 DESCRIPTION
 
@@ -50,7 +50,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2018, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2018, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,5 +1,5 @@
 package Photonic::WE::R2::Field;
-$Photonic::WE::R2::Field::VERSION = '0.017';
+$Photonic::WE::R2::Field::VERSION = '0.018';
 
 =encoding UTF-8
 
@@ -9,7 +9,7 @@ Photonic::WE::R2::Field
 
 =head1 VERSION
 
-version 0.017
+version 0.018
 
 =head1 COPYRIGHT NOTICE
 
@@ -203,7 +203,7 @@ sub evaluate {
 	       *$self->nr->polarization->conj)->sumover;
     # Normalize result so macroscopic field is 1.
     $Es*=$e_0;
-    $Es *= $self->filter if $self->has_filter;
+    $Es *= $self->filter->(*1) if $self->has_filter;
     ##get cartesian out of the way, fourier transform, put cartesian.
     my $field_R=GtoR($Es, $ndims, 1);
     $field_R*=$self->nr->B->nelem; #scale to have unit macroscopic field

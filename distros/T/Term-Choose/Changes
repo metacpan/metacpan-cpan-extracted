@@ -1,6 +1,12 @@
 Revision history for Term::Choose
 
 
+1.735   2021-07-12
+    - prepare_promptline gets its own term_w.
+
+1.734   2021-07-11
+    - Bugfix: undo the last 'line_fold' update.
+
 1.733   2021-06-22
     - Modified footer line.
     - New option 'max_cols'.

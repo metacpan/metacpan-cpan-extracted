@@ -28,7 +28,7 @@
    "provides" : {
       "Fork::Utils" : {
          "file" : "lib/Fork/Utils.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       }
    },
    "release_status" : "stable",
@@ -43,6 +43,6 @@
          "url" : "https://github.com/KalessinD/perl_fork_utils"
       }
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_serialization_backend" : "JSON::PP version 4.05"
 }

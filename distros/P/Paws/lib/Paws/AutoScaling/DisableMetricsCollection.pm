@@ -28,9 +28,9 @@ You shouldn't make instances of this class. Each attribute should be used as a n
 =head1 SYNOPSIS
 
     my $autoscaling = Paws->service('AutoScaling');
-    # To disable metrics collection for an Auto Scaling group
-    # This example disables collecting data for the GroupDesiredCapacity metric
-    # for the specified Auto Scaling group.
+ # To disable metrics collection for an Auto Scaling group
+ # This example disables collecting data for the GroupDesiredCapacity metric for
+ # the specified Auto Scaling group.
     $autoscaling->DisableMetricsCollection(
       'AutoScalingGroupName' => 'my-auto-scaling-group',
       'Metrics'              => ['GroupDesiredCapacity']
@@ -51,8 +51,7 @@ The name of the Auto Scaling group.
 
 =head2 Metrics => ArrayRef[Str|Undef]
 
-One or more of the following metrics. If you omit this parameter, all
-metrics are disabled.
+Specifies one or more of the following metrics:
 
 =over
 
@@ -88,8 +87,57 @@ C<GroupTerminatingInstances>
 
 C<GroupTotalInstances>
 
+=item *
+
+C<GroupInServiceCapacity>
+
+=item *
+
+C<GroupPendingCapacity>
+
+=item *
+
+C<GroupStandbyCapacity>
+
+=item *
+
+C<GroupTerminatingCapacity>
+
+=item *
+
+C<GroupTotalCapacity>
+
+=item *
+
+C<WarmPoolDesiredCapacity>
+
+=item *
+
+C<WarmPoolWarmedCapacity>
+
+=item *
+
+C<WarmPoolPendingCapacity>
+
+=item *
+
+C<WarmPoolTerminatingCapacity>
+
+=item *
+
+C<WarmPoolTotalCapacity>
+
+=item *
+
+C<GroupAndWarmPoolDesiredCapacity>
+
+=item *
+
+C<GroupAndWarmPoolTotalCapacity>
+
 =back
 
+If you omit this parameter, all metrics are disabled.
 
 
 

@@ -1,3 +1,13 @@
+0.9.50  2021-07-20  Released-By: PERLANCAR; Urgency: medium
+
+        - No spec changes.
+
+        - Edit Changes entry for 0.9.47. The important incompatible change,
+          which is the removal of extras/subschemas, was not mentioned.
+
+        - Remove remaining subschema/extras stuffs, e.g. in the spectest.
+
+
 0.9.49  2020-02-11  Released-By: PERLANCAR; Urgency: medium
 
 	- In addition to string (filter rule name), element of
@@ -11,7 +21,12 @@
 	- Fix prefilters spectest.
 
 
-0.9.47  2020-02-10  Released-By: PERLANCAR; Urgency: medium
+0.9.47  2020-02-10  Released-By: PERLANCAR; Urgency: medium; Backward-Incompatible: yes
+
+        - [incompatible change] Remove extras/subschemas, for simplicity. The
+          canonicalized form of a schema is now just [$TYPENAME, \%CLAUSE_SET],
+          but the old form [$TYPENAME, \%CLAUSE_SET, \%EXTRAS] is still
+          supported for now and the \%EXTRAS part must be an empty hashref.
 
 	- [incompatible change] prefilters/postfilters values are now rule
 	  names instead of expr.

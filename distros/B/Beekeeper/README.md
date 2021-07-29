@@ -41,11 +41,12 @@ Requests and responses are shoveled between buses by a few router processes.
 
 **What does this framework provides:**
 
-- `Beekeeper::Worker`, to create service workers.
+- [`Beekeeper::Worker`](https://metacpan.org/pod/Beekeeper::Worker), to create service workers.
 
-- `Beekeeper::Client`, to create service clients.
+- [`Beekeeper::Client`](https://metacpan.org/pod/Beekeeper::Client), to create service clients.
 
-- `bkpr` command which spawns and controls worker processes.
+- [`bkpr`](https://metacpan.org/dist/Beekeeper/view/bin/bkpr) command which spawns and controls
+  worker processes.
 
 - Command line tools for monitoring and controlling worker pools.
 
@@ -56,6 +57,8 @@ Requests and responses are shoveled between buses by a few router processes.
 - Centralized logging, which can be shoveled to an external monitoring application.
 
 - Performance metrics gathering, which can be shoveled to an external monitoring application.
+
+- A nice HTML [dashboard](./examples/dashboard), which can be used in any project.
 
 
 ## Getting Started
@@ -165,11 +168,14 @@ processes and immediately respawns defunct ones.
 
 The framework includes these command line tools to manage worker pools:
 
-- `bkpr-top` allows to monitor in real time the performance of workers.
+- [`bkpr-top`](https://metacpan.org/dist/Beekeeper/view/bin/bkpr-top) allows to monitor in real
+  time the performance of workers.
 
-- `bkpr-log` allows to monitor in real time the log output of workers.
+- [`bkpr-log`](https://metacpan.org/dist/Beekeeper/view/bin/bkpr-log) allows to monitor in real
+  time the log output of workers.
 
-- `bkpr-restart` gracefully restarts worker pools.
+- [`bkpr-restart`](https://metacpan.org/dist/Beekeeper/view/bin/bkpr-restart) gracefully restarts 
+  worker pools.
 
 
 ## Performance
@@ -220,8 +226,12 @@ This distribution includes some examples that can be run out of the box using an
 
 [examples/chat](./examples/chat) implements a real world setup with isolated buses and redundancy.
 
+[examples/dashboard](./examples/dashboard) is an HTML dashboard for Beekeeper projects.
+
 
 ## See also
+
+- [How to run Beekeeper pools as systemd services](./doc/Install.md).
 
 - [Notes about supported MQTT brokers](./doc/Brokers.md) configuration.
 
@@ -233,14 +243,11 @@ This distribution includes some examples that can be run out of the box using an
 
 ## Dependencies
 
-This framework requires `Anyevent`, `JSON::XS`, `Term::ReadKey`, and `ps`.
+This framework requires `Anyevent`, `JSON::XS`, `Net::SSLeay`, `Term::ReadKey` and `ps`.
 
 To install these dependencies on a Debian system run:
 ```
-apt install libanyevent-perl
-apt install libjson-xs-perl
-apt install libterm-readkey-perl
-apt install procps
+apt install libanyevent-perl libjson-xs-perl libnet-ssleay-perl libterm-readkey-perl procps
 ```
 
 ## License

@@ -7,8 +7,9 @@ use File::HomeDir;
 use Storable qw( dclone );
 use Hash::Merge qw( merge );
 use namespace::clean;
+use URI;
 
-our $VERSION = '0.001013'; # 0.1.13
+our $VERSION = '0.001014'; # 0.1.14
 $VERSION = eval $VERSION;
 
 sub connection {
@@ -28,9 +29,39 @@ sub connection {
     # Take responsibility for passing through normal-looking
     # credentials.
     $attrs = $class->load_credentials($attrs)
-        unless $attrs->{dsn} =~ /dbi:/i;
+        unless $attrs->{dsn} =~ /^dbi:/i;
 
     return $class->next::method( $attrs );
+}
+
+sub coerce_credentials_from_mojolike {
+    my ( $class, $attrs ) = @_;
+
+    (my $in = $attrs->{dsn}) =~ s/^postgresql/http/;
+    my $url = URI->new( $in );
+
+    my $db = ($url->path_segments)[1];
+
+    my $dsn = defined $db ? "dbi:Pg:dbname=$db" : 'dbi:Pg:';
+    $dsn .= ";host=" . $url->host if $url->host;
+    $dsn .= ";port=" . $url->port if $url->port and $url->port != 80;
+
+    $attrs->{dsn} = $dsn;
+
+    # Set user & password, default to '',
+    #   then use $url->userinfo, like so:
+    #
+    # user@      -> username, ''
+    # user:@     -> username, ''
+    # :password@ -> '', password
+    ($attrs->{user}, $attrs->{password}) = ('', '');
+    if ( $url->userinfo ) {
+        my ( $user, $password ) = split /:/, $url->userinfo, 2;
+        $attrs->{user}     = $user;
+        $attrs->{password} = $password || '';
+    }
+
+    return $attrs;
 }
 
 # Normalize arguments into a single hash.  If we get a single hashref,
@@ -77,6 +108,10 @@ sub _load_config {
 
 sub load_credentials {
     my ( $class, $connect_args ) = @_;
+
+    # Handle mojo-like postgres:// urls
+    return $class->coerce_credentials_from_mojolike($connect_args)
+        if $connect_args->{dsn} =~ /^postgresql:/i;
 
     # While ->connect is responsible for returning normal-looking
     # credential information, we do it here as well so that it can be
@@ -252,6 +287,12 @@ called as both a class and instance method.
 
 The API has been designed to be simple to override if you have additional
 needs in loading DBIC configurations.
+
+=head2 Mojo::Pg-Like Connection Strings
+
+Calls to connect with L<Mojo::Pg>-like URIs are supported.
+
+    my $schema = My::Schema->connect( 'postgresql://username:password@localhost/dbname' );
 
 =head2 Overriding Connection Configuration
 

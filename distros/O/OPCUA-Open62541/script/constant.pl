@@ -38,6 +38,8 @@ my @consts = (
   [qw(	define	NS0ID			nodeids		)],
   # needed for production
   [qw(	enum	NODECLASS		types_generated	)],
+  [qw(	enum	MONITORINGMODE		types_generated	)],
+  [qw(	enum	TIMESTAMPSTORETURN	types_generated	)],
 );
 
 parse_consts($version, sort { $a->[1] cmp $b->[1] } @consts);

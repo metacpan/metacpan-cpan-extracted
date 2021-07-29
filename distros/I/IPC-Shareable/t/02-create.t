@@ -5,7 +5,7 @@ use IPC::Shareable;
 use Test::More;
 
 my $ok = eval {
-    tie my $sv, 'IPC::Shareable', {key => 'TEST', destroy => 1};
+    tie my $sv, 'IPC::Shareable', {key => 'test02', destroy => 1};
     1;
 };
 

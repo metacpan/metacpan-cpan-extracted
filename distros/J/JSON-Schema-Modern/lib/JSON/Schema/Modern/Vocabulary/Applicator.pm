@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary::Applicator;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Applicator vocabulary
 
-our $VERSION = '0.513';
+our $VERSION = '0.514';
 
 use 5.016;
 no if "$]" >= 5.031009, feature => 'indirect';
@@ -45,7 +45,7 @@ sub keywords {
     $spec_version eq 'draft7' ? 'dependencies' : 'dependentSchemas',
     qw(items additionalItems contains
       properties patternProperties additionalProperties propertyNames),
-    $spec_version ne 'draft7' ? $self->unevaluated_vocabulary->keywords($spec_version) : (),
+    $spec_version eq 'draft2019-09' ? $self->unevaluated_vocabulary->keywords($spec_version) : (),
   );
 }
 
@@ -213,9 +213,6 @@ sub _traverse_keyword_dependencies {
     if (is_type('array', $schema->{dependencies}{$property})) {
       # as in dependentRequired
 
-      E($state, 'dependencies array at %s is empty', $property)
-        if $state->{spec_version} eq 'draft4' and not @{$schema->{dependencies}{$property}};
-
       foreach my $index (0..$#{$schema->{dependencies}{$property}}) {
         E({ %$state, _schema_path_suffix => $property }, 'element #%d is not a string', $index)
           if not is_type('string', $schema->{dependencies}{$property}[$index]);
@@ -328,7 +325,8 @@ sub _eval_keyword__items_array_schemas {
 
   return E($state, 'not all items are valid') if not $valid;
   push @{$state->{annotations}}, @new_annotations;
-  return A($state, $state->{_last_items_index});
+  return A($state,
+    ($state->{_last_items_index}//-1) == $#{$data} ? true : $state->{_last_items_index});
 }
 
 # schema-based items and additionalItems
@@ -590,7 +588,7 @@ JSON::Schema::Modern::Vocabulary::Applicator - Implementation of the JSON Schema
 
 =head1 VERSION
 
-version 0.513
+version 0.514
 
 =head1 DESCRIPTION
 
@@ -600,9 +598,13 @@ version 0.513
 
 Implementation of the JSON Schema Draft 2019-09 "Applicator" vocabulary, indicated in metaschemas
 with the URI C<https://json-schema.org/draft/2019-09/vocab/applicator> and formally specified in
-L<https://json-schema.org/draft/2019-09/json-schema-core.html#rfc.section.9> (except for the
+L<https://datatracker.ietf.org/doc/html/draft-handrews-json-schema-02#section-9> (except for the
 C<unevaluatedItems> and C<unevaluatedProperties> keywords, which are implemented in
 L<JSON::Schema::Modern::Vocabulary::Unevaluated>).
+
+Support is also provided for the equivalent Draft 7 keywords that correspond to this vocabulary and
+are formally specified in
+L<https://datatracker.ietf.org/doc/html/draft-handrews-json-schema-validation-01#section-6>.
 
 =head1 SUPPORT
 

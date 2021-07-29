@@ -18,6 +18,7 @@
     {
         "bus_id"   : "backend",
         "host"     : "localhost",
+        "port"     :  1883,
         "username" : "backend",
         "password" : "def456",
     },

@@ -48,7 +48,7 @@ use Scalar::Util qw/looks_like_number blessed reftype/;
 use Unicode::UTF8 qw/decode_utf8 valid_utf8 encode_utf8/;
 use B;
 
-our $VERSION = '0.34';
+our $VERSION = '0.35';
 
 sub create_json
 {

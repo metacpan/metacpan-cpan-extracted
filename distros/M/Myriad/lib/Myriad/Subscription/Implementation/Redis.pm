@@ -1,6 +1,6 @@
 package Myriad::Subscription::Implementation::Redis;
 
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.010'; # VERSION
 our $AUTHORITY = 'cpan:DERIV'; # AUTHORITY
 
 use Myriad::Class extends => qw(IO::Async::Notifier);
@@ -157,7 +157,7 @@ async method receive_items {
                 }
                 await $redis->ack(
                     $stream,
-                    $client,
+                    $uuid,
                     $event->{id}
                 );
             }

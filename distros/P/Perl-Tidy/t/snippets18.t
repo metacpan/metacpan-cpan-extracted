@@ -119,6 +119,9 @@ catch {
         'comments' => <<'----------',
 #!/usr/bin/perl -w
 # an initial hash bang line cannot be deleted with -dp
+#<<< format skipping of first code can cause an error message in perltidy v20210625
+my $rvar = [ [ 1, 2, 3 ], [ 4, 5, 6 ] ];
+#>>>
 sub length { return length($_[0]) }    # side comment
                              # hanging side comment
                              # very longgggggggggggggggggggggggggggggggggggggggggggggggggggg hanging side comment
@@ -291,7 +294,9 @@ my ( $a, $b, $c ) = @_;    # test -nsak="my for"
             expect => <<'#1...........',
                     # do not weld paren to opening one-line non-paren container
                     $Self->_Add(
-                        $SortOrderDisplay{ $Field->GenerateFieldForSelectSQL() }
+                        $SortOrderDisplay{
+                            $Field->GenerateFieldForSelectSQL()
+                        }
                     );
 
                     # this will not get welded with -wn
@@ -363,6 +368,9 @@ my ( $a, $b, $c ) = @_;    # test -nsak="my for"
             expect => <<'#4...........',
 #!/usr/bin/perl -w
 # an initial hash bang line cannot be deleted with -dp
+#<<< format skipping of first code can cause an error message in perltidy v20210625
+my $rvar = [ [ 1, 2, 3 ], [ 4, 5, 6 ] ];
+#>>>
 sub length { return length( $_[0] ) }
 
 # a blank will be inserted to prevent forming a hanging side comment

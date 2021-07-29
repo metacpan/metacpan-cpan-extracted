@@ -1,9 +1,9 @@
 package Perinci::CmdLine::Help;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-04-27'; # DATE
+our $DATE = '2021-07-10'; # DATE
 our $DIST = 'Perinci-CmdLine-Help'; # DIST
-our $VERSION = '0.173'; # VERSION
+our $VERSION = '0.174'; # VERSION
 
 use 5.010001;
 use strict;
@@ -113,6 +113,7 @@ sub gen_help {
         $clidocdata = $res->[2];
         my $usage = $clidocdata->{usage_line};
         $usage =~ s/\[\[prog\]\]/$progname/;
+        local $Text::Wrap::break = '(?=\s)\X|(?<=\\|)';
         push @help, Text::Wrap::wrap("  ", "    ", "$usage\n");
     }
 
@@ -265,7 +266,7 @@ Perinci::CmdLine::Help - Generate help message for Perinci::CmdLine-based app
 
 =head1 VERSION
 
-This document describes version 0.173 of Perinci::CmdLine::Help (from Perl distribution Perinci-CmdLine-Help), released on 2020-04-27.
+This document describes version 0.174 of Perinci::CmdLine::Help (from Perl distribution Perinci-CmdLine-Help), released on 2021-07-10.
 
 =head1 DESCRIPTION
 
@@ -280,7 +281,7 @@ formatting options first though).
 
 Usage:
 
- gen_help(%args) -> [status, msg, payload, meta]
+ gen_help(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Generate help message for Perinci::CmdLine-based app.
 
@@ -321,12 +322,12 @@ Function metadata.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -356,7 +357,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

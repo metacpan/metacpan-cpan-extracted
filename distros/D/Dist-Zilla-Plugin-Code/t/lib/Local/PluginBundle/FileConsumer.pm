@@ -28,15 +28,13 @@ sub bundle_config {
         $plugin_name,
         $plugin_class,
         {
-            $code => [
-                sub {
-                    my ($self) = @_;
-                    $self->log($input);
-                    $RESULT = $input * $input;
-                    my @modules = grep { $_->name =~ m{ ^ lib/file- [23] .* [.] pm }xsm } @{ $self->zilla->files };
-                    return \@modules;
-                },
-            ],
+            $code => sub {
+                my ($self) = @_;
+                $self->log($input);
+                $RESULT = $input * $input;
+                my @modules = grep { $_->name =~ m{ ^ lib/file- [23] .* [.] pm }xsm } @{ $self->zilla->files };
+                return \@modules;
+            },
         },
       ],
       [

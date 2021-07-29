@@ -132,10 +132,9 @@ You shouldn't make instances of this class. Each attribute should be used as a n
     # Results:
     my $DNSName = $CreateAccessPointOutput->DNSName;
 
-    # Returns a L<Paws::ELB::CreateAccessPointOutput> object.
-    # To create an internal load balancer
-    # This example creates an internal load balancer with an HTTP listener in a
-    # VPC.
+# Returns a L<Paws::ELB::CreateAccessPointOutput> object.
+# To create an internal load balancer
+# This example creates an internal load balancer with an HTTP listener in a VPC.
     my $CreateAccessPointOutput = $elasticloadbalancing->CreateLoadBalancer(
       'Listeners' => [
 
@@ -180,7 +179,7 @@ using EnableAvailabilityZonesForLoadBalancer.
 The listeners.
 
 For more information, see Listeners for Your Classic Load Balancer
-(http://docs.aws.amazon.com/elasticloadbalancing/latest/classic/elb-listener-config.html)
+(https://docs.aws.amazon.com/elasticloadbalancing/latest/classic/elb-listener-config.html)
 in the I<Classic Load Balancers Guide>.
 
 
@@ -204,7 +203,7 @@ By default, Elastic Load Balancing creates an Internet-facing load
 balancer with a DNS name that resolves to public IP addresses. For more
 information about Internet-facing and Internal load balancers, see Load
 Balancer Scheme
-(http://docs.aws.amazon.com/elasticloadbalancing/latest/userguide/how-elastic-load-balancing-works.html#load-balancer-scheme)
+(https://docs.aws.amazon.com/elasticloadbalancing/latest/userguide/how-elastic-load-balancing-works.html#load-balancer-scheme)
 in the I<Elastic Load Balancing User Guide>.
 
 Specify C<internal> to create a load balancer with a DNS name that
@@ -232,7 +231,7 @@ A list of tags to assign to the load balancer.
 
 For more information about tagging your load balancer, see Tag Your
 Classic Load Balancer
-(http://docs.aws.amazon.com/elasticloadbalancing/latest/classic/add-remove-tags.html)
+(https://docs.aws.amazon.com/elasticloadbalancing/latest/classic/add-remove-tags.html)
 in the I<Classic Load Balancers Guide>.
 
 

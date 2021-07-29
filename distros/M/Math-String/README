@@ -1,19 +1,46 @@
+Math-String
+
 Math with strings that are represented by big integers
 
-(C) ..--- ----- ----- .---- by - . .-.. ... .-.-.-  All rights reserved.
+INSTALLATION
 
-See INSTALL onhow to unpack and install this package.
+To install this module, unpack the distribution file, and run the following
+commands:
 
-You will very likely need newer versions of Math::BigInt and Math::BigFloat.
+    perl Makefile.PL
+    make
+    make test
+    make install
 
-See also ./examples for some example scripts.
+SUPPORT AND DOCUMENTATION
 
-More information including HTMLified help and preliminary benchmark results
-are available under:
+After installing, you can find documentation for this module with the
+perldoc command.
 
-	http://bloodgate.com/perl/
+    perldoc Math::String
 
-Please send me test-reports, your experiences with this and your ideas - I love
-to hear about my work!
+You can also look for information at:
 
-Tels <http://bloodgate.com/>
+    GitHub
+        https://github.com/pjacklam/p5-Math-String
+
+    RT: CPAN's request tracker
+        https://rt.cpan.org/Dist/Display.html?Name=Math-String
+
+    MetaCPAN
+        https://metacpan.org/release/Math-String
+
+    CPAN Testers Matrix
+        http://matrix.cpantesters.org/?dist=Math-String
+
+    CPAN Ratings
+        https://cpanratings.perl.org/dist/Math-String
+
+COPYRIGHT AND LICENCE
+
+Copyright 2001-2008 Tels, http://bloodgate.com
+
+Copyright 2017- Peter John Acklam, pjacklam@gmail.com
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

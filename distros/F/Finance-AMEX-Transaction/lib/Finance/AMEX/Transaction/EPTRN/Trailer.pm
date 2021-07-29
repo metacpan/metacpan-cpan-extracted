@@ -1,5 +1,5 @@
 package Finance::AMEX::Transaction::EPTRN::Trailer;
-$Finance::AMEX::Transaction::EPTRN::Trailer::VERSION = '0.003';
+$Finance::AMEX::Transaction::EPTRN::Trailer::VERSION = '0.004';
 use strict;
 use warnings;
 
@@ -43,7 +43,7 @@ Finance::AMEX::Transaction::EPTRN::Trailer - Parse AMEX Transaction/Invoice Leve
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 
@@ -148,11 +148,11 @@ Finance::AMEX::Transaction::EPTRN::Footer - Object methods for AMEX Transaction/
 
 =head1 AUTHOR
 
-Tom Heady <theady@ziprecruiter.com>
+Tom Heady <cpan@punch.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by ZipRecruiter.
+This software is copyright (c) 2021 by ZipRecruiter.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

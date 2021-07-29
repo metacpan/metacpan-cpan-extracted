@@ -1,5 +1,9 @@
 Release history for FCGI
 
+Version 0.80 --  2021-07-24
+
+  - Add test for FCGI over unix domain socket (Michal Josef Špaček, PR #6)
+
 Version 0.79 --  2019-12-14
 
   - Check socket path length in OS_CreateLocalIpcFd() and OS_FcgiConnect()

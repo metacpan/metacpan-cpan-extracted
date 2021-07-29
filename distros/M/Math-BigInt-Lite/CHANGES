@@ -1,3 +1,22 @@
+0.23 2021-07-14
+
+ * Sync with the Math-BigInt distribution.
+
+ * Reorganize existing test files and add more test files.
+
+0.22 2021-07-10
+
+ * Add the bdfac() (double factorial) method to make Math::BigInt::Lite more
+   comparible with Math::BigInt.
+
+0.21 2021-07-09
+
+ * Make the methods from_hex(), from_oct(), from_bin(), and new() accept
+   prefixes without a leading "0".
+
+ * Make from_hex(), from_oct(), and from_bin() accept leading and trailing
+   whitespace.
+
 0.20 2021-07-08
 
  * Sync with recent changes to the Math-BigInt distribution.
@@ -155,7 +174,7 @@
 
  * test that Math::BigFloat with Math::BigInt::Lite really works
 
-Unknown Release Date v0.09 Tels
+0.09 Unknown Release Date Tels
 
  * ?
 

@@ -29,14 +29,12 @@ sub configure {
             $moniker,
             $plugin_name,
             {
-                $code => [
-                    sub {
-                        my ($self) = @_;
-                        $self->log($input);
-                        $RESULT = $input * $input;
-                        return;
-                    },
-                ],
+                $code => sub {
+                    my ($self) = @_;
+                    $self->log($input);
+                    $RESULT = $input * $input;
+                    return;
+                },
             },
         ],
     );

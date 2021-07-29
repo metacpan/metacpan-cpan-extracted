@@ -1,10 +1,17 @@
 #---------------------------------------------------------------------
-# $Header: /Perl/OlleDB/t/C_character.t 3     19-07-17 22:44 Sommar $
+# $Header: /Perl/OlleDB/t/C_character.t 4     21-06-27 17:47 Sommar $
 #
 # Tests that varchar data is passed and received correctly with
 # regards to the code page of the current database.
 #
 # $History: C_character.t $
+# 
+# *****************  Version 4  *****************
+# User: Sommar       Date: 21-06-27   Time: 17:47
+# Updated in $/Perl/OlleDB/t
+# Removed tests for retriving sql_variant with varchar data, since
+# MSOLEDBSQL 18.4 and later always converts data to the current code
+# page.
 # 
 # *****************  Version 3  *****************
 # User: Sommar       Date: 19-07-17   Time: 22:44
@@ -187,18 +194,6 @@ SQLEND
       SELECT  latin1, greek, czech FROM tbl2 WHERE id = 20
 SQLEND
 
-   # variant_result only returns the first result above, since
-   # we don't support sql_variant data with different collation
-   # from database collation.
-   $setup->sql(<<'SQLEND');
-   CREATE PROCEDURE variant_result AS
-      SELECT  convert(sql_variant, latin1a) AS latin1a,
-              convert(sql_variant, greek) AS greek, 
-              convert(sql_variant, czech) AS czech
-      FROM    tbl1 
-      WHERE   id = 20
-SQLEND
-
    $setup->sql(<<'SQLEND');
    CREATE PROCEDURE plain_outparam @latin1 varchar(20) OUTPUT,
                                    @greek  varchar(20) OUTPUT,
@@ -210,16 +205,6 @@ SQLEND
       WHERE  id = 20
 SQLEND
 
-   $setup->sql(<<'SQLEND');
-   CREATE PROCEDURE variant_outparam @latin1 sql_variant OUTPUT,
-                                     @greek  sql_variant OUTPUT,
-                                     @czech  sql_variant OUTPUT AS
-      SELECT @latin1 = latin1a,
-             @greek  = greek,
-             @czech  = czech
-      FROM   tbl1
-      WHERE  id = 20
-SQLEND
 }
 
 my @testres;
@@ -418,9 +403,6 @@ SQLEND
          compare_out_result($result, $dbix, 'plain_result', undef);
       }
 
-      $result = $olle->sql_sp('variant_result');
-      compare_out_result($result, $dbix, 'variant_result', undef);
-
       my ($platin1, $pgreek, $pczech);
       my $outparams = {'@latin1' => \$platin1, 
                        '@greek'  => \$pgreek, 
@@ -429,13 +411,6 @@ SQLEND
       compare_out_params($platin1, $pgreek, $pczech,
                          $dbix, 'plain_outparam', undef);
 
-      $platin1 = $pgreek = $pczech = undef;
-      $outparams = {'@latin1' => \$platin1, 
-                    '@greek'  => \$pgreek, 
-                    '@czech'  => \$pczech};
-      $olle->sql_sp('variant_outparam', $outparams, Win32::SqlServer::NORESULT);
-      compare_out_params($platin1, $pgreek, $pczech, 
-                         $dbix, 'variant_outparam', undef);
    }
 }
 
@@ -458,8 +433,6 @@ foreach my $line (@testres) {
       print "$line\n";
    }
 }
-
-
 
 # Cleanup. Supress messages from ROLLBACK IMMEDIATE-
 $setup->sql("USE tempdb");

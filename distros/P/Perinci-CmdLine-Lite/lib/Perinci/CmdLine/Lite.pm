@@ -1,9 +1,9 @@
 package Perinci::CmdLine::Lite;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-06-23'; # DATE
+our $DATE = '2021-07-11'; # DATE
 our $DIST = 'Perinci-CmdLine-Lite'; # DIST
-our $VERSION = '1.905'; # VERSION
+our $VERSION = '1.906'; # VERSION
 
 use 5.010001;
 # use strict; # already enabled by Mo
@@ -659,7 +659,7 @@ Perinci::CmdLine::Lite - A Rinci/Riap-based command-line application framework
 
 =head1 VERSION
 
-This document describes version 1.905 of Perinci::CmdLine::Lite (from Perl distribution Perinci-CmdLine-Lite), released on 2021-06-23.
+This document describes version 1.906 of Perinci::CmdLine::Lite (from Perl distribution Perinci-CmdLine-Lite), released on 2021-07-11.
 
 =head1 SYNOPSIS
 
@@ -806,6 +806,12 @@ All those supported by L<Perinci::CmdLine::Base>, plus:
 If set to true, then when formatting to C<text> formats, this class won't print
 any newline to keep the data being printed unmodified.
 
+=head1 CONTRIBUTOR
+
+=for stopwords Steven Haryanto
+
+Steven Haryanto <sharyanto@cpan.org>
+
 =head1 ATTRIBUTES
 
 All the attributes of L<Perinci::CmdLine::Base>, plus:
@@ -860,7 +866,7 @@ Source repository is at L<https://github.com/perlancar/perl-Perinci-CmdLine-Lite
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Perinci-CmdLine-Lite/issues>
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-CmdLine-Lite>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

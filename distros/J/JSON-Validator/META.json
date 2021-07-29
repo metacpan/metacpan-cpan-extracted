@@ -4,7 +4,7 @@
       "Jan Henning Thorsen <jhthorsen@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -61,8 +61,8 @@
          "url" : "https://github.com/mojolicious/json-validator.git",
          "web" : "https://github.com/mojolicious/json-validator"
       },
-      "x_IRC" : "irc://irc.freenode.net/#perl-openapi"
+      "x_IRC" : "ircs://irc.libera.chat:6697/#perl-openapi"
    },
-   "version" : "4.20",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "4.21",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

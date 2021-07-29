@@ -61,6 +61,15 @@ my $tests = [
         get => { dsn => 'DATABASE', user => 'U', password => 'P', foo => "bar", hostname => 'hostname' },
         title => "Ensure (string, string, string, hashref, hashref) format works correctly.",
     },
+    {
+        put => [ 'postgresql://username:password@hostname/minion' ],
+        get => {
+            dsn      => 'postgresql://username:password@hostname/minion',
+            user     => undef,
+            password => undef,
+        },
+        title => "Mojo-like postgresql:// lines pass through.",
+    },
 
 ];
 

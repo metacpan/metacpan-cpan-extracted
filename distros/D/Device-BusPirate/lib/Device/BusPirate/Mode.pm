@@ -3,10 +3,11 @@
 #
 #  (C) Paul Evans, 2014-2021 -- leonerd@leonerd.org.uk
 
-package Device::BusPirate::Mode 0.22;
+use v5.26;
+use Object::Pad 0.45;
 
-use v5.14;
-use warnings;
+package Device::BusPirate::Mode 0.23;
+class Device::BusPirate::Mode;
 
 use Carp;
 
@@ -31,22 +32,12 @@ The following methods are implemented by all the various mode subclasses.
 
 =cut
 
-sub new
-{
-   my $class = shift;
-   my ( $bp ) = @_;
+has $_pirate :reader :param;
 
-   my $self = bless {
-      bp => $bp,
-   }, $class;
-
-   $self->{cs}     = 0;
-   $self->{power}  = 0;
-   $self->{pullup} = 0;
-   $self->{aux}    = 0;
-
-   return $self;
-}
+has $_cs     = 0;
+has $_power  = 0;
+has $_pullup = 0;
+has $_aux    = 0;
 
 =head1 METHODS
 
@@ -60,17 +51,10 @@ Returns the underlying L<Device::BusPirate> instance.
 
 =cut
 
-sub pirate
-{
-   my $self = shift;
-   return $self->{bp};
-}
+# generated accessor
 
-async sub _start_mode_and_await
+async method _start_mode_and_await ( $send, $await )
 {
-   my $self = shift;
-   my ( $send, $await ) = @_;
-
    my $pirate = $self->pirate;
 
    $pirate->write( $send );
@@ -88,10 +72,9 @@ Enable or disable the C<VREG> 5V and 3.3V power outputs.
 
 =cut
 
-sub power
+method power ( $on )
 {
-   my $self = shift;
-   $self->{power} = !!shift;
+   $_power = !!$on;
    $self->_update_peripherals;
 }
 
@@ -104,10 +87,9 @@ to the C<MISO>, C<CLK>, C<MOSI> and C<CS> pins.
 
 =cut
 
-sub pullup
+method pullup ( $on )
 {
-   my $self = shift;
-   $self->{pullup} = !!shift;
+   $_pullup = !!$on;
    $self->_update_peripherals;
 }
 
@@ -119,10 +101,9 @@ Set the C<AUX> output pin level.
 
 =cut
 
-sub aux
+method aux ( $on )
 {
-   my $self = shift;
-   $self->{aux} = !!shift;
+   $_aux = !!$on;
    $self->_update_peripherals;
 }
 
@@ -134,22 +115,22 @@ Set the C<CS> output pin level.
 
 =cut
 
-sub cs
+# For SPI subclass
+method _set_cs { $_cs = shift }
+
+method cs ( $on )
 {
-   my $self = shift;
-   $self->{cs} = !!shift;
+   $_cs = !!$on;
    $self->_update_peripherals;
 }
 
-sub _update_peripherals
+method _update_peripherals
 {
-   my $self = shift;
-
    $self->pirate->write_expect_ack( chr( 0x40 |
-      ( $self->{power}  ? CONF_POWER  : 0 ) |
-      ( $self->{pullup} ? CONF_PULLUP : 0 ) |
-      ( $self->{aux}    ? CONF_AUX    : 0 ) |
-      ( $self->{cs}     ? CONF_CS     : 0 ) ), "_update_peripherals" );
+      ( $_power  ? CONF_POWER  : 0 ) |
+      ( $_pullup ? CONF_PULLUP : 0 ) |
+      ( $_aux    ? CONF_AUX    : 0 ) |
+      ( $_cs     ? CONF_CS     : 0 ) ), "_update_peripherals" );
 }
 
 =head2 set_pwm
@@ -168,11 +149,8 @@ use constant {
    PRESCALE_256 => 3,
 };
 
-sub set_pwm
+method set_pwm ( %args )
 {
-   my $self = shift;
-   my %args = @_;
-
    $self->MODE eq "BB" or
       croak "Cannot ->set_pwm except in BB mode";
 
@@ -209,10 +187,8 @@ Reads the voltage on the ADC pin and returns it as a numerical value in volts.
 
 =cut
 
-async sub read_adc_voltage
+async method read_adc_voltage ()
 {
-   my $self = shift;
-
    $self->MODE eq "BB" or
       croak "Cannot ->read_adc except in BB mode";
 

@@ -1,10 +1,10 @@
 package App::realpath;
 
-our $DATE = '2019-10-09'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2021-07-15'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 1;
-# ABSTRACT: Print the resolved path
+# ABSTRACT: Print the resolved (absolute) path
 
 __END__
 
@@ -14,15 +14,15 @@ __END__
 
 =head1 NAME
 
-App::realpath - Print the resolved path
+App::realpath - Print the resolved (absolute) path
 
 =head1 VERSION
 
-This document describes version 0.001 of App::realpath (from Perl distribution App-realpath), released on 2019-10-09.
+This document describes version 0.002 of App::realpath (from Perl distribution App-realpath), released on 2021-07-15.
 
 =head1 DESCRIPTION
 
-See the included script L<realpath>.
+See the included script L<realpath> (or its alias (L<abspath>).
 
 =head1 HOMEPAGE
 
@@ -42,13 +42,17 @@ feature.
 
 =head1 SEE ALSO
 
+L<App::relpath>
+
+L<App::quickabspath>
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

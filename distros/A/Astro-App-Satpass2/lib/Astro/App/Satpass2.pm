@@ -84,7 +84,7 @@ use constant NULL_REF	=> ref NULL;
 
 use constant SUN_CLASS_DEFAULT	=> 'Astro::Coord::ECI::Sun';
 
-our $VERSION = '0.047';
+our $VERSION = '0.048';
 
 # The following 'cute' code is so that we do not determine whether we
 # actually have optional modules until we really need them, and yet do
@@ -261,6 +261,7 @@ my %mutator = (
     edge_of_earths_shadow => \&_set_unmodified,
     ellipsoid => \&_set_ellipsoid,
     error_out => \&_set_unmodified,
+    events	=> \&_set_unmodified,
     exact_event => \&_set_unmodified,
     execute_filter => \&_set_code_ref,	# Undocumented and unsupported
     explicit_macro_delete => \&_set_unmodified,
@@ -339,7 +340,7 @@ my %shower = (
     local_coord => \&_show_formatter_attribute,
     pass_variant	=> \&_show_pass_variant,
     sun		=> \&_show_sun_class,	# only in {level1}
-    time_parser => \&_show_copyable,
+    time_parser => \&_show_time_parser,
     time_format => \&_show_formatter_attribute,
     time_formatter	=> \&_show_formatter_attribute,
 );
@@ -369,6 +370,7 @@ my %static = (
     edge_of_earths_shadow => 1,
     ellipsoid => Astro::Coord::ECI->get ('ellipsoid'),
     error_out => 0,
+    events	=> 0,
     exact_event => 1,
     execute_filter => sub { return 1 },	# Undocumented and unsupported
 ##  explicit_macro_delete => 1,			# Deprecated
@@ -533,6 +535,11 @@ sub almanac : Verb( choose=s@ dump! horizon|rise|set! transit! twilight! quarter
 	    $almanac_start, $almanac_end);
     }
 
+    # Record number of events found
+
+    @almanac = grep { $opt->{$_->{almanac}{event}} } @almanac;
+    $self->{events} += @almanac;
+
     # Localize the event descriptions if appropriate.
 
     foreach my $event ( @almanac ) {
@@ -549,7 +556,6 @@ sub almanac : Verb( choose=s@ dump! horizon|rise|set! transit! twilight! quarter
     return $self->__format_data(
 	almanac => [
 	    sort { $a->{time} <=> $b->{time} }
-	    grep { $opt->{$_->{almanac}{event}} }
 	    @almanac
 	], $opt );
 
@@ -615,7 +621,7 @@ sub dispatch {
 
     defined $verb or return;
 
-    my $unsatisfied = $self->{_unsatisfied_if};
+    my $unsatisfied = $self->_in_unsatisfied_if();
 
     if ( $self->{macro}{$verb} ) {
 	$unsatisfied
@@ -685,25 +691,41 @@ sub drop : Verb() {
     return;
 }
 
-sub dump : method Verb() {	## no critic (ProhibitBuiltInHomonyms)
+sub dump : method Verb() Tweak( -unsatisfied ) {	## no critic (ProhibitBuiltInHomonyms)
     my ( $self, undef, @arg ) = __arguments( @_ );	# $opt unused
-    my @dump;
-    @arg
-	or push @dump, $self;
+
     local $self->{time_parser} = ref $self->{time_parser};
-    foreach ( @arg ) {
-	if ( ref ) {
-	    push @dump, $_;
-	} elsif ( 'twilight' eq $_ ) {
-	    push @dump, { map { $_ => $self->{$_} } qw{ twilight _twilight } };
-	} else {
-	    push @dump, $self->__choose( [ $_ ], $self->{bodies} );
-	    if ( defined( my $inx = $self->_find_in_sky( $_ ) ) ) {
-		push @dump, $self->{sky}[$inx];
-	    }
-	}
+
+    my $dumper = $self->_get_dumper();
+
+    @arg
+	or return $dumper->( $self );
+
+    local $_ = shift @arg;
+
+    ref
+	and return $dumper->( $_ );
+
+    m/ \A frames? \z /smxi
+	and return $dumper->( $self->{frame} );
+
+    m/ \A tokens? \z /smxi
+	and return $dumper->( $self->__tokenize( @arg ) );
+
+    m/ \A twilight \z /smxi
+	and return $dumper->(
+	{ map { $_ => $self->{$_} } qw{ twilight _twilight } } );
+
+    my @stuff = $self->__choose( [ $_ ], $self->{bodies} );
+    if ( defined( my $inx = $self->_find_in_sky( $_ ) ) ) {
+	push @stuff, $self->{sky}[$inx];
     }
-    return $self->_get_dumper()->( @dump );
+    @stuff
+	and return $dumper->( @stuff );
+
+    $self->whinge( "Dump argument '$_' not recognized" );
+ 
+    return;
 }
 
 sub echo : Verb( n! ) {
@@ -711,6 +733,43 @@ sub echo : Verb( n! ) {
     my $output = join( ' ', @args );
     $opt->{n} or $output .= "\n";
     return $output;
+}
+
+sub else : method Verb() Tweak( -unsatisfied ) {	## no critic (ProhibitBuiltInHomonyms)
+    my ( $self ) = __arguments( @_ );	# $opt, @args unused
+
+    @{ $self->{frame} } > 1
+	and 'begin' eq $self->{frame}[-1]{type}
+	and 'if' eq $self->{frame}[-2]{type}
+	or $self->wail( 'Else without if ... then begin' );
+
+    $self->{frame}[-1]{in_else}++
+	and $self->wail( 'Only one else may follow an if' );
+
+    return $self->_twiddle_condition( ! $self->{frame}[-2]{condition} );
+}
+
+sub _twiddle_condition {
+    my ( $self, $cond ) = @_;
+
+    # Here is where I pay for the convenience of the if()
+    # implementation. The if() itself is a frame because I do not yet
+    # know if it will entail a begin(). But I can't do an else() unless
+    # there is in fact a begin(), which creates another frame. So I end
+    # up twiddling values in both frames.
+
+    $self->{frame}[-1]{unsatisfied_if} =
+	$self->{frame}[-2]{unsatisfied_if} =
+	! $cond || (
+	    @{ $self->{frame} } > 2 ?
+		$self->{frame}[-3]{unsatisfied_if} :
+		0
+	    );
+
+    $self->{frame}[-1]{condition} =
+	$self->{frame}[-2]{condition} = $cond;
+
+    return;
 }
 
 sub end : Verb() Tweak( -unsatisfied ) {
@@ -940,14 +999,15 @@ sub flare : Verb( algorithm=s am! choose=s@ day! dump! pm! questionable|spare! q
 	};
     }
 
-    return $self->__format_data(
-	flare => [
-	    sort { $a->{time} <=> $b->{time} }
+    # Record number of events found
+
+    @flares = sort { $a->{time} <=> $b->{time} }
 	    grep { $_->{magnitude} <= $flare_mag[
 	    ( $_->{type} eq 'day' ? 1 : 0 ) ] }
-	    @flares
-	], $opt );
+	    @flares;
+    $self->{events} += @flares;
 
+    return $self->__format_data( flare => \@flares, $opt );
 }
 
 sub formatter : Verb() {
@@ -1285,22 +1345,30 @@ EOD
 		    1 == @{ $ctx }
 			or $self->wail( 'Unclosed left parentheses' );
 		    my $last = pop @{ $ctx };
-		    my @arg = splice @{ $tokens }, 0
-			or return;
-		    $self->_dispatch_check( if => $arg[0] );
-		    unless ( $last->{value}[-1] ) {
-			$self->{_unsatisfied_if} = 1;
-			$self->_add_post_dispatch( sub {
-				my ( $self ) = @_;
-				delete $self->{_unsatisfied_if};
-				return;
+		    my @arg = splice @{ $tokens };
+		    if ( $last->{dispatch} ) {
+			$self->_dispatch_check( if => $arg[0] );
+			$self->_frame_push( if => [], {
+				condition	=> $last->{value}[-1],
 			    },
 			);
+			$self->_add_post_dispatch( sub {
+				$self->_frame_pop( if => undef );
+			    },
+			);
+			return $self->dispatch( @arg );
+		    } else {
+			$self->_twiddle_condition( $last->{value}[-1] );
 		    }
-		    return $self->dispatch( @arg );
 		},
-		validation	=> 'infix',
+		validation	=> 'terminal',
 	    },
+	},
+	val	=> sub {
+	    # my ( $self, $def, $ctx, $tkn, $tokens ) = @_;
+	    my ( undef, undef, $ctx, $tkn ) = @_;
+	    push @{ $ctx->[-1]{value} }, $tkn;
+	    return;
 	},
 	vld	=> {
 	    infix	=> sub {
@@ -1319,14 +1387,51 @@ EOD
 		    or $self->wail( "'$tkn' requires an argument" );
 		return;
 	    },
+	    terminal	=> sub {
+		# my ( $self, $def, $ctx, $tkn, $tokens ) = @_;
+		my ( $self, undef, $ctx, $tkn, $tokens ) = @_;
+		@{ $ctx->[-1]{value} }
+		    or $self->wail( "'$tkn' requires a left argument" );
+		if ( $ctx->[-1]{dispatch} ) {
+		    @{ $tokens }
+			or $self->wail( "Command required after '$tkn'" );
+		} else {
+		    @{ $tokens }
+			and $self->wail( "Command not allowed after '$tkn'" );
+		}
+		return;
+	    }
 	},
     );
+
+    sub elsif : method Verb() Tweak( -unsatisfied ) {	## no critic (ProhibitBuiltInHomonyms)
+	my ( $self, @args ) = @_;
+	@args
+	    or $self->wail( 'Arguments required' );
+
+	@{ $self->{frame} } > 1
+	    and 'begin' eq $self->{frame}[-1]{type}
+	    and 'if' eq $self->{frame}[-2]{type}
+	    or $self->wail( 'Elsif without if ... then begin' );
+
+	my @ctx = ( {
+		dispatch	=> 0,
+		value	=> [],
+	    } );
+
+	# If any previous if() or elsif() evaluates true, we do not
+	# evaluate subsequent elsif() calls.
+	$self->{frame}[-2]{condition}
+	    and return;
+	return $self->__infix_engine( \%define, \@ctx, @args );
+    }
 
     sub if : method Verb() Tweak( -unsatisfied ) {	## no critic (ProhibitBuiltInHomonyms)
 	my ( $self, @args ) = @_;
 	@args
 	    or $self->wail( 'Arguments required' );
 	my @ctx = ( {
+		dispatch	=> 1,
 		value	=> [],
 	    } );
 	return $self->__infix_engine( \%define, \@ctx, @args );
@@ -1388,18 +1493,43 @@ sub initfile : Verb( create-directory! quiet! ) {
     return File::Spec->catfile( $init_dir, 'satpass2rc' );
 }
 
+sub _in_unsatisfied_if {
+    my ( $self ) = @_;
+    return @{ $self->{frame} } ? $self->{frame}[-1]{unsatisfied_if} : 0;
+}
+
 # This is a generalized infix expression engine. It does not implement
 # operator precedence and is therefore very small. The arguments are:
 #   - $self is the invocant, which must be an
 #     Astro::App::Satpass2::Copier.
-#   - $def is the hash that defines the grammar. This needs keys {oper}
-#     and {validation}. Key {oper} defines operators, and needs key
-#     {handler} to be a code reference, and {vld} to be the name of a
-#     validation style, meaning a string that must be a key in the
-#     {validation} sub-hash. The values in {validation} are code
-#     references.
-#   - $ctx is context for the operations and is not used by the engine
-#     itself. See if() for an example.
+#   - $def is the hash that defines the grammar. This provides the
+#     following keys:
+#     {done} is an optional code reference. If present, the code
+#	 reference is called once the parse is complete, and passed
+#	 ( $self, $def, $ctx, \@tokens ). It returns nothing. The intent
+#	 is to throw an exception if the parse is incomplete.
+#     {oper} defines the operators. This is a hash keyed by the literal
+#        operator (i.e. '+' to implement a '+' operator), and having the
+#        following values:
+#        {handler} is a required code reference, which implements the
+#           operator. It is passed ( $self, $def, $ctx, \@tokens ). The
+#           @tokens do not include the operator itself.
+#        {validation} is an optional validation specification. If
+#           present it is a key in the {vld} (see below).
+#     {val} is an optional code reference. If present, it is called if a
+#        token is not recognized as an operator, and passed ( $self,
+#        $def, $ctx, \@tokens ). The @tokens include the unrecognized
+#        token, which is presumed to be a value, and must be removed
+#        from @tokens.
+#     {vld} is a hash of validators. The keys are values in the
+#        {validation} key documented under {oper} (above), and the
+#        values are code references which are called with ( $self, $ctx,
+#        $tkn, \@tokens ) where $tkn is the token being validated, and
+#        @tokens is the rest of the tokens. This hash must exist if the
+#        {validation} key is used in {oper}; otherwise it is optional.
+#   - $ctx is context for the operations. It is not used by the engine
+#     itself, but the individual operator code will need to use it as
+#     context for the parse.  See if() for an example.
 #   - @tokens are the tokens to be evaluated by the engine.
 sub __infix_engine {
     my ( $self, $def, $ctx, @tokens ) = @_;
@@ -1419,12 +1549,17 @@ sub _infix_engine_dispatch {
     @{ $tokens }
 	or return;
     my $tkn = shift @{ $tokens };
-    my $info = $def->{oper}{$tkn}
-	or $self->wail( "Unrecognized token '$tkn'" );
-    $info->{validation}
-	and $def->{vld}{ $info->{validation} }->(
-	$self, $def, $ctx, $tkn, $tokens );
-    return $info->{handler}->( $self, $def, $ctx, $tokens );
+    if ( my $info = $def->{oper}{$tkn} ) {
+	$info->{validation}
+	    and $def->{vld}{ $info->{validation} }->(
+	    $self, $def, $ctx, $tkn, $tokens );
+	return $info->{handler}->( $self, $def, $ctx, $tokens );
+    } elsif ( $def->{val} ) {
+	return $def->{val}->( $self, $def, $ctx, $tkn, $tokens );
+    } else {
+	$self->wail( "Unrecognized token '$tkn'" );
+    }
+    return;	# We can't get here, but Perl::Critic does not know this.
 }
 
 #	$file_name = _init_file_01()
@@ -1720,8 +1855,7 @@ sub magnitude_table : Verb( name! reload! ) {
 
 # Attributes must all be on one line to process correctly under Perl
 # 5.8.8.
-sub pass : Verb( choose=s@ am! appulse! brightest|magnitude! chronological! dump! events! horizon|rise|set! illumination! pm! quiet! transit|maximum|culmination! )
-{
+sub pass : Verb( :compute ) {
     my ( $self, $opt, @args ) = __arguments( @_ );
 
     $self->_apply_boolean_default(
@@ -1820,19 +1954,29 @@ sub pass : Verb( choose=s@ am! appulse! brightest|magnitude! chronological! dump
 	}
     }
 
-    my $template;
+    $opt->{chronological}
+	and @accumulate = sort { $a->{time} <=> $b->{time} }
+	    @accumulate;
 
-    if ( $opt->{events} ) {
-	$template = 'pass_events';
-    } else {
-	$template = 'pass';
-	$opt->{chronological}
-	    and @accumulate = sort { $a->{time} <=> $b->{time} }
-		@accumulate;
-    }
+    # Record number of events found
+
+    $self->{events} += @accumulate;
 
     return $self->__format_data(
-	$template => \@accumulate, $opt );
+	$opt->{_template} => \@accumulate, $opt );
+
+}
+
+sub __pass_options {
+    my ( $self, $opt ) = @_;
+    return [
+	qw{
+	    choose=s@ am! appulse! brightest|magnitude!
+	    chronological! dump! horizon|rise|set! illumination! pm!
+	    quiet! transit|maximum|culmination!
+	},
+	$self->_templates_to_options( pass => $opt ),
+    ];
 }
 
 # Compute local time of day in seconds since midnight.
@@ -2029,6 +2173,10 @@ sub pwd : Verb() {
 		argument	=> $event->{body},
 	    );
 	}
+
+	# Record number of events found
+
+	$self->{events} += @almanac;
 
 	# Sort and display the quarter-phase information.
 
@@ -2567,7 +2715,7 @@ sub _set_time_parser {
 
     if ( CODE_REF eq ref $val ) {
 	$val = _set_time_parser_code( $val );
-    } elsif ( my $macro = $self->{macro}{$val} ) {
+    } elsif ( defined $val and my $macro = $self->{macro}{$val} ) {
 	$val = _set_time_parser_code(
 	    $macro->implements( $val, required => 1 ),
 	    $val,
@@ -2705,6 +2853,16 @@ sub _show_sun_class {
     my ( $self, $name ) = @_;
     $self->_attribute_exists( $name );
     return $self->_sky_class_components( $name );
+}
+
+sub _show_time_parser {
+    my ( $self, $name ) = @_;
+    my $obj = $self->get( $name );
+    my $val = $obj->class_name_of_record();
+    if ( my $back_end = $obj->back_end() ) {
+	$val = "$val,back_end=$back_end";
+    }
+    return ( set => $name, $val );
 }
 
 sub _show_unmodified {
@@ -3256,7 +3414,7 @@ sub time : method Verb() Tweak( -unsatisfied ) {	## no critic (ProhibitBuiltInHo
     my $start = Time::HiRes::time();
     # If we're inside an unsatisfied if() we do not do the timing,
     # because dispatch() is probably a no-op.
-    $self->{_unsatisfied_if}
+    $self->_in_unsatisfied_if()
 	or $self->_add_post_dispatch(
 	sub {
 	    return sprintf "%.3f seconds\n", Time::HiRes::time() - $start;
@@ -3277,28 +3435,20 @@ sub tle : Verb( :compute ) {
 	and $opt->{choose} = \@args;
 
     my $bodies = $self->__choose( $opt->{choose}, $self->{bodies} );
+    @{ $bodies } = map { $_->[0] }
+	sort { $a->[1] <=> $b->[1] || $a->[2] <=> $b->[2] }
+	map { [ $_, $_->get( 'id' ), $_->get( 'epoch' ) ] }
+	@{ $bodies };
     my $tplt_name = delete $opt->{_template};
     return $self->__format_data( $tplt_name => $bodies, $opt );
 }
 
 sub __tle_options {
     my ( $self, $opt ) = @_;
-    my @lgl = qw{ choose=s@ };
-    $opt->{_template} = 'tle';
-    my $code = sub {
-	my ( $name, $value ) = @_;
-	$opt->{_template} = $value ? "tle_$name" : 'tle';
-	return;
-    };
-    my $fmtr = $self->get( 'formatter' );
-    if ( $fmtr->can( '__list_templates' ) ) {
-	foreach ( $fmtr->__list_templates() ) {
-	    m/ \A tle_ ( \w+ ) \z /smx
-		or next;
-	    push @lgl, "$1!", $code;
-	}
-    }
-    return \@lgl;
+    return [
+	qw{ choose=s@ },
+	$self->_templates_to_options( tle => $opt ),
+    ];
 }
 
 sub unexport : Verb() {
@@ -3661,7 +3811,14 @@ sub _drop_from_sky {
 sub _file_opener {
     my ( $self, $name, $mode ) = @_;
 
-    my $fh = IO::File->new( $name, $mode )
+    # NOTE special case for &1 (stdout) and &2 (stderr).
+    my $fh = ( $name =~ m/ \A & ( [12] ) \z /smx ) ?
+	[
+	    undef,
+	    $self->{frame}[-1]{localout} || \*STDOUT,
+	    \*STDERR,
+	]->[ $1 ] :
+	IO::File->new( $name, $mode )
 	or $self->wail( "Unable to open $name: $!" );
 
     if ( $mode =~ m/ \A (?: [+>] | [|] - ) /smx ) {
@@ -3873,27 +4030,31 @@ sub __format_data {
 #	was added.
 
 sub _frame_push {
-    my $self = shift;
-    my $type = shift;
-    my $args = shift || [];
+    my ( $self, $type, $args, $opt ) = @_;
+    $args ||= [];
+    $opt ||= {};
     my $frames = scalar @{$self->{frame} ||= []};
-    my $stdout;
-    @{$self->{frame}}
-	and $stdout = exists $self->{frame}[-1]{localout} ?
-	    $self->{frame}[-1]{localout} :
-	    $self->{frame}[-1]{stdout};
+    my $prior = $frames ? $self->{frame}[-1] : {
+	condition	=> 1,
+	stdout		=> select(),
+    };
+    my $condition = exists $opt->{condition} ?
+	$opt->{condition} :
+	$prior->{condition};
 ####    defined $stdout or $stdout = select();
     my ( undef, $filename, $line ) = caller;
     push @{$self->{frame}}, {
 	type => $type,
 	args => $args,
+	condition	=> $condition,
 	define => {},		# Macro defaults done with :=
 	local => {},
 	localout => undef,	# Output for statement.
 	macro => {},
 	pushed_by => "$filename line $line",
 	spacetrack => {},
-	stdout => $stdout,
+	stdout => $prior->{localout} || $prior->{stdout},
+	unsatisfied_if	=> $prior->{unsatisfied_if} || ! $condition,
     };
     return $frames;
 }
@@ -3922,7 +4083,9 @@ sub _frame_push {
 	my ($self, @args) = @_;
 ##	my $type = @args > 1 ? shift @args : undef;
 	@args > 1 and shift @args;	# Currently unused
-	my $frames = @args ? shift @args : @{$self->{frame}} - 1;
+	my $frames = ( @args && defined $args[0] ) ?
+	    shift @args :
+	    @{$self->{frame}} - 1;
 	while (@{$self->{frame}} > $frames) {
 	    my $frame = pop @{$self->{frame}}
 		or $self->weep( 'No frame to pop' );
@@ -4506,7 +4669,11 @@ sub __parse_angle {
 
 sub __parse_time {
     my ($self, $time, $default) = @_;
-    my $pt = $self->{time_parser};
+    my $pt = $self->{time_parser}
+	or $self->wail( 'No time parser available' );
+    $self->{time_parser}->can( 'station' )
+	and $self->_set_time_parser_attribute(
+	station => $self->station() );
     if ( defined( my $time = $pt->parse( $time, $default ) ) ) {
 	return $time;
     }
@@ -4888,6 +5055,27 @@ EOD
     $rslt[3] and $rslt[3] /= 1000;
     $rslt[4] and $rslt[4] /= 1000;
     return wantarray ? @rslt : join ' ', @rslt;
+}
+
+sub _templates_to_options {
+    my ( $self, $name, $opt ) = @_;
+    $opt->{_template} = $name;
+    my $code = sub {
+	my ( $opt_name, $opt_value ) = @_;
+	$opt->{_template} = $opt_value ? "${name}_$opt_name" : $name;
+	return;
+    };
+    my $re = qr< \A \Q$name\E _ ( \w+ ) \z >smx;
+    my @rslt;
+    my $fmtr = $self->get( 'formatter' );
+    if ( $fmtr->can( '__list_templates' ) ) {
+	foreach ( $fmtr->__list_templates() ) {
+	    $_ =~ $re
+		or next;
+	    push @rslt, "$1!", $code;
+	}
+    }
+    return @rslt;
 }
 
 #	($tokens, $redirect) = $self->__tokenize(
@@ -6059,6 +6247,25 @@ purposes. It may disappear, or its functionality change, without notice.
 Currently it loads a dumper class (either some C<YAML> module or
 C<Data::Dumper>) and returns a dump of the C<Astro::App::Satpass2> object.
 
+If it is given arguments, those arguments are dumped. Specifically:
+
+=over
+
+=item A reference specifies that the referent is dumped;
+
+=item C<'frame'> specifies that the frame stack is dumped;
+
+=item C<'tokens'> specifies that the next argument is tokenized and dumped;
+
+=item C<'twilight'> specifies the twilight settings are dumped;
+
+=item Anything else causes the specified body to be dumped.
+
+=back
+
+This interactive method will be executed even inside an unsatisfied
+L<if()|/if>.
+
 =head2 echo
 
  $output = $satpass2->echo( 'Hello, sailor!' );
@@ -6071,6 +6278,25 @@ anticipated that the caller will print the result.
 The following option may be specified:
 
  -n to suppress the newline at the end of the echoed text.
+
+=head2 elsif
+
+ $output = $satpass2->elsif( qw{ env FUBAR then } );
+ satpass2> elsif env FUBAR then
+
+This interactive method can appear only after an C<if ... then begin> or
+another C<elsif ... then>. It is not evaluated if the previous C<if()>
+or any previous C<elsif()> was true, and causes all subsequent
+C<elsif()> or C<else()> not to be evaluated until the closing C<end()>.
+
+=head2 else
+
+ $satpass2->else();
+ satpass2> else
+
+This interactive method can appear only after an C<if ... then begin>.
+It inverts the sense of the original test, so that if it was true
+statements after the C<else> are B<not> executed, and vice versa.
 
 =head2 end
 
@@ -6374,14 +6600,17 @@ In any case, nothing is returned.
  $output = $satpass2->if(
      qw{ env FUBAR then echo FUBAR is defined } );
  satpass2> if env FUBAR then echo FUBAR is defined
+ satpass2> if "$FUBAR" then echo FUBAR is defined
 
 This interactive method performs a test, and executes the specified
 method if the test is true. The test is an infix expression, with prefix
 operators binding more tightly than infix operators, but otherwise all
 operators having the same precedence. You can use parentheses to group
-operations.
+operations. Anything that is not an operator is assumed to be a value.
+Values coming from substitution may need to be quoted to guard against
+embedded white space.
 
-The method name after C<'then'> may not be C<'end'>.
+The method name after C<'then'> may not be C<'else'> or C<'end'>.
 
 The method name after C<'then'> may be C<'begin'> only if C<if()> was
 called interactively. If you do this and the C<if()> is not satisfied,
@@ -6840,12 +7069,16 @@ notice.
 
 C<-events> causes the output to be individual events rather than passes.
 These events will be displayed in chronological order irrespective of
-satellite. The C<-chronological> option is not needed for this.
+satellite. This is implemented by template C<pass_events>. The
+C<-chronological> option is not needed for this.
 
 C<-horizon> selects the satellite rise and set for display. Synonyms are
 C<-rise> and C<-set> -- that is C<-rise> selects both rise and set, as
 does C<-set>. This can be negated by specifying C<-nohorizon>,
 C<-norise>, or C<-noset>.
+
+C<-ics> causes the output to be in iCal format, as implemented by
+template C<pass_ics>.
 
 C<-illumination> selects passage of the satellite into or out of the
 Earth's shadow for display. This can be negated by specifying
@@ -6874,6 +7107,12 @@ default. Otherwise, unspecified options are considered to be negated.
 The C<-am> and C<-pm> select morning or evening passes for output. By
 default, both are selected. These can be negated: C<-noam> is equivalent
 to C<-pm>, and vice versa.
+
+Actually, the presence of any template whose name begins with C<'pass_'>
+causes the trailing part of the name to be valid as an option selecting
+that template. For example, loading F<eg/pass_json.tt> as template
+C<'pass_json'> makes C<-json> a valid option that uses template
+C<'pass_json'> to format the TLE.
 
 B<Note well> that unlike the F<satpass> script, the output from this
 method does not normally include location. The location is included only
@@ -7969,6 +8208,19 @@ If this attribute is false, errors are reported, but otherwise ignored.
 
 The default is 0 (i.e. false).
 
+=head2 events
+
+This attribute records the cumulative number of events generated by the
+most-recent invocation of L<almanac|/almanac>, L<flare|/flare>,
+L<pass|/pass>, or L<quarters|/quarters>. In the case of L<pass()|/pass>,
+the number of events is the number of passes reported.
+
+This attribute was added on the speculation that it would be useful in
+an L<if()|/if>.  It can be modified by the user (to restart the
+accumulation, for example), though except for testing the value in an
+L<if()|/if> such modifications have no effect on the operation of this
+package.
+
 =head2 exact_event
 
 This boolean attribute specifies whether the L</pass> method should
@@ -8508,7 +8760,7 @@ The default is 1 (i.e. true).
 
 This string attribute specifies the system command to spawn to display a
 web page. If not the empty string, the L<help|/help> method uses it to
-display L<https://metacpan.org/release/Astro-App-Satpass2>. Mac OS
+display L<https://metacpan.org/dist/Astro-App-Satpass2>. Mac OS
 X users will find C<'open'> a useful setting, and Windows users will
 find C<'start'> useful.
 

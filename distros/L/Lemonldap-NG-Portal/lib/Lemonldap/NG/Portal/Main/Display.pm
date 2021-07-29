@@ -2,7 +2,7 @@
 # Display functions for LemonLDAP::NG Portal
 package Lemonldap::NG::Portal::Main::Display;
 
-our $VERSION = '2.0.11';
+our $VERSION = '2.0.12';
 
 package Lemonldap::NG::Portal::Main;
 use strict;
@@ -53,6 +53,7 @@ sub displayInit {
       || $self->conf->{passwordPolicyMinLower}
       || $self->conf->{passwordPolicyMinUpper}
       || $self->conf->{passwordPolicyMinDigit}
+      || $self->conf->{passwordPolicyMinSpeChar}
       || $speChars;
     $self->isPP($isPP);
 }
@@ -243,16 +244,17 @@ sub display {
             PING           => $self->conf->{portalPingInterval},
             REQUIRE_OLDPASSWORD =>
               $self->requireOldPwd->( $req, $req->userData ),
-            HIDE_OLDPASSWORD   => 0,
-            PPOLICY_NOPOLICY   => !$self->isPP(),
-            DISPLAY_PPOLICY    => $self->conf->{portalDisplayPasswordPolicy},
-            PPOLICY_MINSIZE    => $self->conf->{passwordPolicyMinSize},
-            PPOLICY_MINLOWER   => $self->conf->{passwordPolicyMinLower},
-            PPOLICY_MINUPPER   => $self->conf->{passwordPolicyMinUpper},
-            PPOLICY_MINDIGIT   => $self->conf->{passwordPolicyMinDigit},
-            PPOLICY_MINSPECHAR => $self->conf->{passwordPolicyMinSpeChar},
+            DONT_STORE_PASSWORD => $self->conf->{browsersDontStorePassword},
+            HIDE_OLDPASSWORD    => 0,
+            PPOLICY_NOPOLICY    => !$self->isPP(),
+            DISPLAY_PPOLICY     => $self->conf->{portalDisplayPasswordPolicy},
+            PPOLICY_MINSIZE     => $self->conf->{passwordPolicyMinSize},
+            PPOLICY_MINLOWER    => $self->conf->{passwordPolicyMinLower},
+            PPOLICY_MINUPPER    => $self->conf->{passwordPolicyMinUpper},
+            PPOLICY_MINDIGIT    => $self->conf->{passwordPolicyMinDigit},
+            PPOLICY_MINSPECHAR  => $self->conf->{passwordPolicyMinSpeChar},
             (
-                $self->conf->{passwordPolicyMinSpeChar}
+                $self->conf->{passwordPolicyMinSpeChar} || $self->speChars()
                 ? ( PPOLICY_ALLOWEDSPECHAR => $self->speChars() )
                 : ()
             ),
@@ -395,6 +397,8 @@ sub display {
                 ? ( CUSTOM_SCRIPT => $req->data->{customScript} )
                 : ()
             ),
+            ENABLE_PASSWORD_DISPLAY =>
+              $self->conf->{portalEnablePasswordDisplay},
         );
 
         # Display captcha if it's enabled
@@ -440,8 +444,9 @@ sub display {
                 OLDPASSWORD           => $self->checkXSSAttack( 'oldpassword',
                     $req->data->{oldpassword} ) ? ""
                 : $req->data->{oldpassword},
-                HIDE_OLDPASSWORD => $self->conf->{hideOldPassword},
-                PPOLICY_NOPOLICY => !$self->isPP(),
+                HIDE_OLDPASSWORD    => $self->conf->{hideOldPassword},
+                DONT_STORE_PASSWORD => $self->conf->{browsersDontStorePassword},
+                PPOLICY_NOPOLICY    => !$self->isPP(),
                 DISPLAY_PPOLICY  => $self->conf->{portalDisplayPasswordPolicy},
                 PPOLICY_MINSIZE  => $self->conf->{passwordPolicyMinSize},
                 PPOLICY_MINLOWER => $self->conf->{passwordPolicyMinLower},
@@ -449,7 +454,7 @@ sub display {
                 PPOLICY_MINDIGIT => $self->conf->{passwordPolicyMinDigit},
                 PPOLICY_MINSPECHAR => $self->conf->{passwordPolicyMinSpeChar},
                 (
-                    $self->conf->{passwordPolicyMinSpeChar}
+                    $self->conf->{passwordPolicyMinSpeChar} || $self->speChars()
                     ? ( PPOLICY_ALLOWEDSPECHAR => $self->speChars() )
                     : ()
                 ),
@@ -483,12 +488,13 @@ sub display {
               $self->loadedModules->{
                 "Lemonldap::NG::Portal::Plugins::FindUser"};
             my $fields = [];
+            my $slogin;
             if (   $plugin
                 && $self->conf->{findUser}
                 && $self->conf->{impersonationRule}
                 && $self->conf->{findUserSearchingAttributes} )
             {
-                $login  = $req->data->{findUser};
+                $slogin = $req->data->{findUser};
                 $fields = $plugin->buildForm();
             }
 
@@ -505,9 +511,9 @@ sub display {
                     DISPLAY_FORM         => 0,
                     DISPLAY_OPENID_FORM  => 0,
                     DISPLAY_YUBIKEY_FORM => 0,
+                    DISPLAY_FINDUSER     => scalar @$fields,
                     FIELDS               => $fields,
-                    SPOOFID              => $login,
-                    FINDUSER             => scalar @$fields
+                    SPOOFID              => $slogin
                 );
             }
 
@@ -532,16 +538,16 @@ sub display {
                     DISPLAY_SSL_FORM  => $displayType =~ /sslform/ ? 1 : 0,
                     DISPLAY_GPG_FORM  => $displayType =~ /gpgform/ ? 1 : 0,
                     DISPLAY_LOGO_FORM => $displayType eq "logo"    ? 1 : 0,
+                    DISPLAY_FINDUSER  => scalar @$fields,
                     module            => $displayType eq "logo"
                     ? $self->getModule( $req, 'auth' )
                     : "",
                     AUTH_LOOP => [],
                     PORTAL_URL =>
                       ( $displayType eq "logo" ? $self->conf->{portal} : 0 ),
-                    MSG      => $req->info(),
-                    FIELDS   => $fields,
-                    SPOOFID  => $login,
-                    FINDUSER => scalar @$fields
+                    MSG     => $req->info(),
+                    FIELDS  => $fields,
+                    SPOOFID => $slogin
                 );
             }
         }

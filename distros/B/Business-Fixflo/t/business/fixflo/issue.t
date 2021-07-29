@@ -41,6 +41,7 @@ can_ok(
         CostCode
         Quotes
         QuoteEndTime
+        QuoteNotes
         QuoteRequests
 		FaultTitle
 		TermsAccepted

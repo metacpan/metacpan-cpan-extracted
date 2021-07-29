@@ -5,7 +5,7 @@ use Mojo::Loader qw/load_class/;
 use Storable qw/dclone/;
 use Class::Method::Modifiers qw/after/;
 
-our $VERSION = '1.03';
+our $VERSION = '1.04';
 
 has 'databases' => sub {
     [qw/Pg mysql SQLite Redis/]
@@ -17,11 +17,11 @@ after register => sub {
     $conf = dclone $conf;
 
     # check if need camelize moniker
-    my $path = $app->home . '/lib/' . $app->moniker;
-    $app->moniker(camelize($app->moniker)) unless -d $path;
+    my $moniker = camelize($app->moniker);
+    $moniker    = $app->moniker unless -d $app->home . '/lib/' . $moniker;
 
     my $namespace  = $conf->{namespace}  // 'DB';
-    my $namespaces = $conf->{namespaces} // [$app->moniker . '::Model'];
+    my $namespaces = $conf->{namespaces} // [$moniker . '::Model'];
     @{$conf->{namespaces}} = map $_ . "::$namespace", @$namespaces;
     my $databases = _load_class_databases($plugin, $conf);
 
@@ -33,8 +33,9 @@ after register => sub {
             my $model;
             return $model if $model = $plugin->{models}{$name};
 
-            my $class = Mojolicious::Plugin::Model::_load_class_for_name($plugin, $app, $conf, $name)
-                or return undef;
+            my $class = Mojolicious::Plugin::Model::_load_class_for_name(
+                $plugin, $app, $conf, $name, $moniker
+            ) or return undef;
 
             # define attr to database
             $class->attr($_) for keys %{$databases};
@@ -60,6 +61,7 @@ sub _load_class_databases {
         if (defined $conf->{$_}) {
             my $class = 'Mojo::' . $_;
             my $e     = load_class $class;
+            die "Loading '$class' failed: $e" if $e;
 
             $databases->{lc($_)} = $class->new($conf->{$_});
         }

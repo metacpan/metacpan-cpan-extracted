@@ -13,7 +13,7 @@ use Encode::Locale    qw();
 #use Text::CSV         qw();                # required
 
 use Term::Choose           qw();
-use Term::Choose::LineFold qw( line_fold );
+use Term::Choose::LineFold qw( line_fold print_columns );
 use Term::Choose::Util     qw( get_term_size get_term_width unicode_sprintf insert_sep );
 use Term::Form             qw();
 
@@ -128,20 +128,21 @@ sub __print_template_info {
     $second_part_begin--;
     my $end_idx = $#{$rows};
     my $dots = $sf->{i}{dots}[ $sf->{o}{G}{dots} ];
+    my $dots_w = print_columns( $dots );
     if ( @$rows > $avail_h ) {
         for my $row ( @{$rows}[ 0 .. $first_part_end ] ) {
-            $info .= "\n" . unicode_sprintf( $row, $term_w, { mark_if_truncated => $dots } );
+            $info .= "\n" . unicode_sprintf( $row, $term_w, { mark_if_truncated => [ $dots, $dots_w ] } );
         }
         $info .= "\n[...]";
         for my $row ( @{$rows}[ $end_idx - $second_part_begin .. $end_idx ] ) {
-            $info .= "\n" . unicode_sprintf( $row, $term_w, { mark_if_truncated => $dots } );
+            $info .= "\n" . unicode_sprintf( $row, $term_w, { mark_if_truncated => [ $dots, $dots_w ] } );
         }
         my $row_count = scalar( @$rows );
-        $info .= "\n" . unicode_sprintf( '[' . insert_sep( $row_count, $sf->{o}{G}{thsd_sep} ) . ' rows]', $term_w, { mark_if_truncated => $dots } );
+        $info .= "\n" . unicode_sprintf( '[' . insert_sep( $row_count, $sf->{o}{G}{thsd_sep} ) . ' rows]', $term_w, { mark_if_truncated => [ $dots, $dots_w ] } );
     }
     else {
         for my $row ( @$rows ) {
-            $info .= "\n" . unicode_sprintf( $row, $term_w, { mark_if_truncated => $dots } );
+            $info .= "\n" . unicode_sprintf( $row, $term_w, { mark_if_truncated => [ $dots, $dots_w ] } );
         }
     }
     $info .= "\n";

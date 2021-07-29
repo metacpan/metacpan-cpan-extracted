@@ -1,4 +1,4 @@
-#!/usr/bin/perl 
+#!/usr/bin/env perl
 ###############################################################
 use FindBin;
 use lib $FindBin::RealBin;        # for special REST::Client 
@@ -38,7 +38,7 @@ my $page=0;
 my @transactions; 
 # while ($aa=$ig->transactions(++$page,(scalar localtime)-10*30*24*3600,scalar localtime))
 #while ($aa=$ig->transactions(++$page,Time::Piece->strptime("2020-01-01","%Y-%m-%d-%H.%M"),scalar localtime))
-while ($aa=$ig->transactions(++$page,Time::Piece->strptime("2020-01-01","%Y-%m-%d-%H.%M"),'2020-12-11T18:15:00'))
+while ($aa=$ig->transactions(++$page,Time::Piece->strptime("2020-01-01-00.00","%Y-%m-%d-%H.%M"),'2020-12-11T18:15:00'))
 {  
    @$aa=grep { $_->{status} ne 'REJECTED' } @$aa; 
    push(@transactions,@$aa); 

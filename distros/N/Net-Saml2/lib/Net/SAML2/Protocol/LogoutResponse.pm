@@ -14,18 +14,20 @@ has 'response_to' => (isa => 'Str', is => 'ro', required => 1);
 sub new_from_xml {
     my ($class, %args) = @_;
 
-    my $xpath = XML::XPath->new( xml => no_comments($args{xml}) );
-    $xpath->set_namespace('saml', 'urn:oasis:names:tc:SAML:2.0:assertion');
-    $xpath->set_namespace('samlp', 'urn:oasis:names:tc:SAML:2.0:protocol');
+    my $dom = no_comments($args{xml});
+
+    my $xpath = XML::LibXML::XPathContext->new($dom);
+    $xpath->registerNs('saml', 'urn:oasis:names:tc:SAML:2.0:assertion');
+    $xpath->registerNs('samlp', 'urn:oasis:names:tc:SAML:2.0:protocol');
 
     my $self = $class->new(
-        id          => $xpath->findvalue('/samlp:LogoutResponse/@ID')->value,
-        response_to => $xpath->findvalue('/samlp:LogoutResponse/@InResponseTo')->value,
-        destination => $xpath->findvalue('/samlp:LogoutResponse/@Destination')->value,
-        session     => $xpath->findvalue('/samlp:LogoutResponse/samlp:SessionIndex')->value,
-        issuer      => $xpath->findvalue('/samlp:LogoutResponse/saml:Issuer')->value,
-        status      => $xpath->findvalue('/samlp:LogoutResponse/samlp:Status/samlp:StatusCode/@Value')->value,
-        substatus   => $xpath->findvalue('/samlp:LogoutResponse/samlp:Status/samlp:StatusCode/samlp:StatusCode/@Value')->value,
+        id          => $xpath->findvalue('/samlp:LogoutResponse/@ID'),
+        response_to => $xpath->findvalue('/samlp:LogoutResponse/@InResponseTo'),
+        destination => $xpath->findvalue('/samlp:LogoutResponse/@Destination'),
+        session     => $xpath->findvalue('/samlp:LogoutResponse/samlp:SessionIndex'),
+        issuer      => $xpath->findvalue('/samlp:LogoutResponse/saml:Issuer'),
+        status      => $xpath->findvalue('/samlp:LogoutResponse/samlp:Status/samlp:StatusCode/@Value'),
+        substatus   => $xpath->findvalue('/samlp:LogoutResponse/samlp:Status/samlp:StatusCode/samlp:StatusCode/@Value'),
     );
 
     return $self;
@@ -83,7 +85,7 @@ Net::SAML2::Protocol::LogoutResponse
 
 =head1 VERSION
 
-version 0.34
+version 0.40
 
 =head1 SYNOPSIS
 
@@ -150,18 +152,11 @@ Returns true if the Response's status is Success.
 
 =head1 AUTHOR
 
-Original Author: Chris Andrews  <chrisa@cpan.org>
+Chris Andrews  <chrisa@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Chris Andrews and Others; in detail:
-
-  Copyright 2010-2011  Chris Andrews
-            2012       Peter Marschall
-            2017       Alessandro Ranellucci
-            2019       Timothy Legge
-            2020       Timothy Legge, Wesley Schwengle
-
+This software is copyright (c) 2021 by Chris Andrews and Others, see the git log.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

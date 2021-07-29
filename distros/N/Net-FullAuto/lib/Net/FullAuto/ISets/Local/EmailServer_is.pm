@@ -101,6 +101,7 @@ my $configure_emailserver=sub {
    my $recpatcha_secret_key=$_[7]||'';
    my ($stdout,$stderr)=('','');
    my $handle=connect_shell();my $connect_error='';
+   my $build_php=0;
    my $sudo=($^O eq 'cygwin')?'':
          'sudo env "LD_LIBRARY_PATH='.
          '/usr/local/lib64:$LD_LIBRARY_PATH" '.
@@ -207,7 +208,7 @@ my $configure_emailserver=sub {
          ' libpng-devel.x86_64 freetype-devel.x86_64 expat-devel'.
          ' oniguruma oniguruma-devel tcl tcl-devel git-all'.
          ' lzip libffi-devel libc-client-devel texinfo cmake'.
-         ' systemd-devel bind-utils',
+         ' systemd-devel bind-utils mailx',
          '__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
          'yum -y update','__display__');
@@ -480,8 +481,12 @@ if ($do==1) {
       ($hash,$output,$error)=run_aws_cmd($c);
       Net::FullAuto::FA_Core::handle_error($error) if $error
          && $error!~/already exists/;
-
-
+      $c='aws ec2 authorize-security-group-ingress '.
+         '--group-name EmailServerSecurityGroup --protocol '.
+         'tcp --port 11334 --cidr '.$cidr." 2>&1";
+      ($hash,$output,$error)=run_aws_cmd($c);
+      Net::FullAuto::FA_Core::handle_error($error) if $error
+         && $error!~/already exists/;
    } else {
       ($stdout,$stderr)=$handle->cmd($sudo.
          'firewall-cmd --zone=public --permanent --add-port=25/tcp',
@@ -517,6 +522,9 @@ if ($do==1) {
          'firewall-cmd --zone=public --permanent --add-port=11333/tcp',
          '__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
+         'firewall-cmd --zone=public --permanent --add-port=11334/tcp',
+         '__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
          'firewall-cmd --reload',
          '__display__');
    }
@@ -545,17 +553,47 @@ if ($do==1) {
       "ln -s /usr/local/bin/make gmake");
    ($stdout,$stderr)=$handle->cwd('/opt/source');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      'git clone git://sourceware.org/git/bzip2.git',
-      '__display__');
-   ($stdout,$stderr)=$handle->cwd('bzip2');
+      'wget -qO- https://www.sourceware.org/bzip2/');
+   $stdout=~s/^.*?stable version is bzip2 ([\d\.]*\d)\..*$/$1/s;
    ($stdout,$stderr)=$handle->cmd($sudo.
-      'make -f Makefile-libbz2_so','__display__');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      'cp -v libbz2.so* /usr/local/lib','__display__');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      'make','__display__');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      'make install','__display__');
+      "ls -1 /usr/local/lib | grep libbz2.so.$stdout");
+   unless ($stdout) {
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'ls -1 | grep bzip2');
+      if ($stdout=~/^\s*bzip2\s*$/s) {
+         ($stdout,$stderr)=$handle->cmd($sudo.
+             'rm -rvf bzip2-old','__display__');
+         ($stdout,$stderr)=$handle->cmd($sudo.
+             'mv -v bzip2 bzip-old','__display__');
+      }
+      my $done=0;my $gittry=0;
+      while ($done==0) {
+         ($stdout,$stderr)=$handle->cmd($sudo.
+            'git clone git://sourceware.org/git/bzip2.git',
+            '__display__');
+         if (++$gittry>5) {
+            print "\n\n   FATAL ERROR: $stderr\n\n";
+            cleanup();
+         }
+         my $gittest='Connection reset by peer|'.
+                     'Could not read from remote repository';
+         $done=1 if $stderr!~/$gittest/s;
+         last if $done;
+         sleep 30;
+      }
+      ($stdout,$stderr)=$handle->cwd('bzip2');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'make -f Makefile-libbz2_so','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'cp -v libbz2.so* /usr/local/lib','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'make','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'make install','__display__');
+      $build_php=1;
+   } else {
+      print "bzip2 is up to date.\n";
+   }
    ($stdout,$stderr)=$handle->cwd('/opt/source');
    # https://bipulkkuri.medium.com/install-latest-gcc-on-centos-linux-release-7-6-a704a11d943d
    ($stdout,$stderr)=$handle->cmd($sudo.
@@ -626,9 +664,21 @@ if ($do==1) {
          'rm -rfv build','__display__');
    }
    ($stdout,$stderr)=$handle->cwd('/opt/source');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      'git clone --recursive https://github.com/madler/zlib.git',
-      '__display__');
+   my $done=0;my $gittry=0;
+   while ($done==0) {
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'git clone --recursive https://github.com/madler/zlib.git',
+         '__display__');
+      if (++$gittry>5) {
+         print "\n\n   FATAL ERROR: $stderr\n\n";
+         cleanup();
+      }
+      my $gittest='Connection reset by peer|'.
+                  'Could not read from remote repository';
+      $done=1 if $stderr!~/$gittest/s;
+      last if $done;
+      sleep 30;
+   }
    ($stdout,$stderr)=$handle->cwd('zlib');
    ($stdout,$stderr)=$handle->cmd($sudo.
       'wget -qO- https://zlib.net');
@@ -641,20 +691,49 @@ if ($do==1) {
       'make install','__display__');
    ($stdout,$stderr)=$handle->cwd('/opt/source');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      'git clone https://gitlab.gnome.org/GNOME/libxml2.git',
-      '__display__');
-   ($stdout,$stderr)=$handle->cwd('libxml2');
+      'wget -qO- http://xmlsoft.org/news.html');
+   $stdout=~s/^.*?public releases.*?v(.*?):.*$/$1/s;
    ($stdout,$stderr)=$handle->cmd($sudo.
-      'ACLOCAL_PATH=/usr/share/aclocal '.
-      './autogen.sh','__display__');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      'make','__display__');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      'make install','__display__');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      'cp -v libxml-2.0.pc /usr/lib64/pkgconfig','__display__');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      'ldconfig -v','__display__');
+      "ls -1 /usr/local/lib | grep libxml2.so.$stdout");
+   unless ($stdout) {
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'ls -1 | grep libxml2');
+      if ($stdout=~/^\s*libxml2\s*$/s) {
+         ($stdout,$stderr)=$handle->cmd($sudo.
+             'rm -rvf libxml2-old','__display__');
+         ($stdout,$stderr)=$handle->cmd($sudo.
+             'mv -v libxml2 libxml2-old','__display__');
+      }
+      my $done=0;my $gittry=0;
+      while ($done==0) {
+         ($stdout,$stderr)=$handle->cmd($sudo.
+            'git https://gitlab.gnome.org/GNOME/libxml2.git',
+            '__display__');
+         if (++$gittry>5) {
+            print "\n\n   FATAL ERROR: $stderr\n\n";
+            cleanup();
+         }
+         my $gittest='Connection reset by peer|'.
+                     'Could not read from remote repository';
+         $done=1 if $stderr!~/$gittest/s;
+         last if $done;
+         sleep 30;
+      }
+      ($stdout,$stderr)=$handle->cwd('libxml2');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         './autogen.sh','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'make','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'make install','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'cp -v libxml-2.0.pc /usr/lib64/pkgconfig','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'ldconfig -v','__display__');
+      $build_php=1;
+   } else {
+      print "libxml2 is up to date.\n";
+   }
    ($stdout,$stderr)=$handle->cwd('/opt/source');
    ($stdout,$stderr)=$handle->cmd($sudo.
       'wget --random-wait --progress=dot '.
@@ -691,38 +770,68 @@ if ($do==1) {
    ($stdout,$stderr)=$handle->cmd($sudo.'make install','__display__');
    ($stdout,$stderr)=$handle->cwd('/opt/source');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      'git clone --recursive https://github.com/openssl/openssl.git',
-      '__display__');
-   ($stdout,$stderr)=$handle->cwd('openssl');
-   # https://www.thegeekstuff.com/2015/02/rpm-build-package-example/
+      'wget -qO- https://en.wikipedia.org/wiki/OpenSSL');
+   $stdout=~s/^.*?Stable release.*?-data["][>](.*?) *[(].*$/$1/s;
+   my $osslv=$stdout;
    ($stdout,$stderr)=$handle->cmd($sudo.
-      'wget --random-wait --progress=dot '.
-      'https://git.sailfishos.org/mer-core/'.
-      'openssl/raw/master/rpm/openssl.spec',
-      '__display__');
-   ($stdout,$stderr)=$handle->cmd($sudo.'git -P tag -l');
-   $stdout=~s/^.*(OpenSSL_1_1_1.)\n.*$/$1/s;
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      "git checkout $stdout",'__display__');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      './config  LDFLAGS="-Wl,-rpath /usr/local/lib -Wl,'.
-      '-rpath /usr/local/lib64"','__display__');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      'make install','__display__');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      'cp -Pv /etc/ssl/certs/* /usr/local/ssl/certs',
-      '__display__');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      'cp -v *.pc /usr/local/lib/pkgconfig',
-      '__display__');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      'ldconfig -v','__display__');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      'ln -s /usr/local/lib64/libssl.so.1.1 '.
-      '/usr/lib64/libssl.so.1.1');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      'ln -s /usr/local/lib64/libcrypto.so.1.1 '.
-      '/usr/lib64/libcrypto.so.1.1');
+      'strings /usr/local/lib64/libssl.so | grep OpenSSL');
+   unless ($stdout=~/$osslv/s) {
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'ls -1 | grep openssl');
+      if ($stdout=~/^\s*openssl\s*$/s) {
+         ($stdout,$stderr)=$handle->cmd($sudo.
+             'rm -rvf openssl-old','__display__');
+         ($stdout,$stderr)=$handle->cmd($sudo.
+             'mv -v openssl openssl-old','__display__');
+      }
+      my $done=0;my $gittry=0;
+      while ($done==0) {
+         ($stdout,$stderr)=$handle->cmd($sudo.
+            'git clone --recursive https://github.com/openssl/openssl.git',
+            '__display__');
+         if (++$gittry>5) {
+            print "\n\n   FATAL ERROR: $stderr\n\n";
+            cleanup();
+         }
+         my $gittest='Connection reset by peer|'.
+                     'Could not read from remote repository';
+         $done=1 if $stderr!~/$gittest/s;
+         last if $done;
+         sleep 30;
+      }
+      ($stdout,$stderr)=$handle->cwd('openssl');
+      # https://www.thegeekstuff.com/2015/02/rpm-build-package-example/
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'wget --random-wait --progress=dot '.
+         'https://git.sailfishos.org/mer-core/'.
+         'openssl/raw/master/rpm/openssl.spec',
+         '__display__');
+      $osslv=~s/\./_/g;
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         "git checkout OpenSSL_$osslv",'__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         './config LDFLAGS="-Wl,-rpath /usr/local/lib -Wl,'.
+         '-rpath /usr/local/lib64"','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'make install','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'cp -Pv /etc/ssl/certs/* /usr/local/ssl/certs',
+         '__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'cp -v *.pc /usr/local/lib/pkgconfig',
+         '__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'ldconfig -v','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'ln -s /usr/local/lib64/libssl.so.1.1 '.
+         '/usr/lib64/libssl.so.1.1');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'ln -s /usr/local/lib64/libcrypto.so.1.1 '.
+         '/usr/lib64/libcrypto.so.1.1');
+      $build_php=1;
+   } else {
+      print "libssl is up to date.\n";
+   }
    ($stdout,$stderr)=$handle->cwd('/opt/source');
    ($stdout,$stderr)=$handle->cmd('wget --version');
    $stdout=~s/^.*?\d[.](\d+).*$/$1/s;
@@ -1084,11 +1193,17 @@ END
        '%NL%            include fastcgi_params;'.
        '%NL%        }'.
        '%NL%'.
+       '%NL%        location /rspamd {'.
+       '%NL%            proxy_pass http://127.0.0.1:11334/;'.
+       '%NL%            proxy_set_header Host $host;'.
+       '%NL%            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;'.
+       '%NL%        }'.
+       '%NL%'.
        '%NL%        location ~ ^/(README.md|INSTALL|LICENSE|CHANGELOG|UPGRADING)$ {'.
        '%NL%            deny all;'.
        '%NL%        }'.
        '%NL%'.
-       '%NL%        location ~ ^/(config|temp|logs)/ {'.
+       '%NL%        location ~ ^/(bin|SQL|config|temp|logs)/ {'.
        '%NL%            deny all;'.
        '%NL%        }'.
        '%NL%'.
@@ -1310,9 +1425,21 @@ END
       ($stdout,$stderr)=$handle->cmd($sudo.
          'ls -1 /opt','__display__');
       if ($stdout!~/mariadb/i) {
-         ($stdout,$stderr)=$handle->cmd($sudo.
-            'git clone https://github.com/MariaDB/server.git '.
-            'mariadb','__display__');
+         my $done=0;my $gittry=0;
+         while ($done==0) {
+            ($stdout,$stderr)=$handle->cmd($sudo.
+               'git clone https://github.com/MariaDB/server.git '.
+               'mariadb','__display__');
+            if (++$gittry>5) {
+               print "\n\n   FATAL ERROR: $stderr\n\n";
+               cleanup();
+            }
+            my $gittest='Connection reset by peer|'.
+                        'Could not read from remote repository';
+            $done=1 if $stderr!~/$gittest/s;
+            last if $done;
+            sleep 30;
+         }
          ($stdout,$stderr)=$handle->cwd('mariadb');
          ($stdout,$stderr)=$handle->cmd($sudo.
             'yum-builddep -y mariadb-server',
@@ -1515,6 +1642,9 @@ END
    # https://www.tecmint.com/install-roundcube-webmail-on-centos-7/  => ClamAV
    # https://www.linuxbabe.com/redhat/run-your-own-email-server-centos-postfix-smtp-server
    # https://www.linode.com/docs/guides/email-with-postfix-dovecot-and-mariadb-on-centos-7/
+
+   # https://linuxize.com/series/setting-up-and-configuring-a-mail-server/
+
    $handle->cmd('echo');
    $handle->print($sudo.'mysql -u root');
    $prompt=$handle->prompt();
@@ -1720,7 +1850,14 @@ END
    #($stdout,$stderr)=$handle->cmd($sudo.'chmod -R 777 /opt/source',
    #   '__display__');
    ($stdout,$stderr)=$handle->cwd('/opt/source');
-   if (-1==index `php -v`,'PHP') {
+   #
+   #  Set PHP 7 or 8 here
+   #
+   #  roundcube does not work with php 8 as of 7/8/2021
+   my $vn=7;
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'strings /usr/local/lib/libmcrypt.so | grep libmcrypt-2.5.8');
+   unless ($stdout) {
       ($stdout,$stderr)=$handle->cmd($sudo.
          'wget --random-wait --progress=dot -O libmcrypt-2.5.8.tar.gz '.
          'https://sourceforge.net/projects/mcrypt/files/Libmcrypt/2.5.8/'.
@@ -1732,28 +1869,66 @@ END
          './configure','__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
          'make install','__display__');
-      ($stdout,$stderr)=$handle->cwd('/opt/source');
-      ($stdout,$stderr)=$handle->cmd($sudo.
-         'cmake --version','__display__');
-      $stdout=~s/^.*?\s(\d+\.\d+).*$/$1/;
-      if (!(-e '/usr/local/bin/cmake') && $stdout<3.02) {
+      $build_php=1;
+   } else {
+      print "libmcrypt is up to date\n";
+   }
+   ($stdout,$stderr)=$handle->cwd('/opt/source');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'cmake --version','__display__');
+   $stdout=~s/^.*?\s(\d+\.\d+).*$/$1/;
+   if (!(-e '/usr/local/bin/cmake') && $stdout<3.02) {
+      my $done=0;my $gittry=0;
+      while ($done==0) {
          ($stdout,$stderr)=$handle->cmd($sudo.
             'git clone https://github.com/Kitware/CMake.git',
             '__display__');
-         ($stdout,$stderr)=$handle->cwd('CMake');
-         ($stdout,$stderr)=$handle->cmd($sudo.
-            './bootstrap --system-curl -- '.
-            '-DCMAKE_INSTALL_RPATH="/usr/local/lib64"',
-            '__display__');
-         ($stdout,$stderr)=$handle->cmd($sudo.
-            'make','3600','__display__');
-         ($stdout,$stderr)=$handle->cmd($sudo.
-            'make install','__display__');
-         ($stdout,$stderr)=$handle->cwd('/opt/source');
+         if (++$gittry>5) {
+            print "\n\n   FATAL ERROR: $stderr\n\n";
+            cleanup();
+         }
+         my $gittest='Connection reset by peer|'.
+                     'Could not read from remote repository';
+         $done=1 if $stderr!~/$gittest/s;
+         last if $done;
+         sleep 30;
       }
+      ($stdout,$stderr)=$handle->cwd('CMake');
       ($stdout,$stderr)=$handle->cmd($sudo.
-         'git clone https://github.com/nih-at/libzip.git',
+         './bootstrap --system-curl -- '.
+         '-DCMAKE_INSTALL_RPATH="/usr/local/lib64"',
          '__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'make','3600','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'make install','__display__');
+      $build_php=1;
+   } else {
+      print "cmake is up to date.\n";
+   }
+   ($stdout,$stderr)=$handle->cwd('/opt/source');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'wget -qO- https://libzip.org/');
+   $stdout=~s/^.*?Current version is (.*?)[<].*$/$1/s;
+   $stdout='1.6.1';
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "strings /usr/local/lib64/libzip.so | grep $stdout");
+   unless ($stdout) {
+      my $done=0;my $gittry=0;
+      while ($done==0) {
+         ($stdout,$stderr)=$handle->cmd($sudo.
+            'git clone https://github.com/nih-at/libzip.git',
+            '__display__');
+         if (++$gittry>5) {
+            print "\n\n   FATAL ERROR: $stderr\n\n";
+            cleanup();
+         }
+         my $gittest='Connection reset by peer|'.
+                     'Could not read from remote repository';
+         $done=1 if $stderr!~/$gittest/s;
+         last if $done;
+         sleep 30;
+      }
       ($stdout,$stderr)=$handle->cwd('libzip');
       ($stdout,$stderr)=$handle->cmd($sudo.
          'git -P tag -l','__display__');
@@ -1783,10 +1958,40 @@ $stdout='rel-1-6-1';
          '__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
          'ldconfig -v','__display__');
-      ($stdout,$stderr)=$handle->cwd('/opt/source');
+      $build_php=1;
+   } else {
+      print "libzip is up to date\n";
+   }
+   ($stdout,$stderr)=$handle->cwd('/opt/source');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'wget -qO- https://doc.libsodium.org/#downloading-libsodium');
+   $stdout=~s/^.*?libsodium (.*?)-stable.*$/$1/s;
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "strings /usr/local/lib/libsodium.so | grep $stdout");
+   unless ($stdout) {
       ($stdout,$stderr)=$handle->cmd($sudo.
-         'git clone https://github.com/jedisct1/libsodium 2>&1',
-         '__display__');
+         'ls -1 | grep libsodium');
+      if ($stdout=~/^\s*libsodium\s*$/s) {
+         ($stdout,$stderr)=$handle->cmd($sudo.
+             'rm -rvf libsodium-old','__display__');
+         ($stdout,$stderr)=$handle->cmd($sudo.
+             'mv -v libsodium libsodium-old','__display__');
+      }
+      my $done=0;my $gittry=0;
+      while ($done==0) {
+         ($stdout,$stderr)=$handle->cmd($sudo.
+            'git clone https://github.com/jedisct1/libsodium 2>&1',
+            '__display__');
+         if (++$gittry>5) {
+            print "\n\n   FATAL ERROR: $stderr\n\n";
+            cleanup();
+         }
+         my $gittest='Connection reset by peer|'.
+                     'Could not read from remote repository';
+         $done=1 if $stderr!~/$gittest/s && $stdout!~/$gittest/s;
+         last if $done;
+         sleep 30;
+      }
       ($stdout,$stderr)=$handle->cwd('libsodium');
       ($stdout,$stderr)=$handle->cmd($sudo.
          'git checkout -b remotes/origin/stable',
@@ -1802,20 +2007,49 @@ $stdout='rel-1-6-1';
          '__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
          'ldconfig -v','__display__');
-      ($stdout,$stderr)=$handle->cwd('/opt/source');
+      $build_php=1;
+   } else {
+      print "libsodium is up to date.\n";
+   }
+   ($stdout,$stderr)=$handle->cwd('/opt/source');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'wget -qO- https://www.php.net/releases/index.php');
+   $stdout=~s/^.*?php-($vn.*?)\.tar\.gz.*$/$1/s;
+   my $phpv=$stdout;
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'ls -1 | grep php-src$');
+   my $php_build=0;
+   if ($stdout=~/^\s*php-src\s*$/s) {
       ($stdout,$stderr)=$handle->cmd($sudo.
-         'git clone https://github.com/php/php-src.git',
-         '__display__');
+         'head -n5 php-src/NEWS');
+      $stdout=~s/^.*, PHP (.*?)\n.*$/$1/s;
+      unless ($phpv eq $stdout) {
+         ($stdout,$stderr)=$handle->cmd($sudo.
+            'rm -rvf php-src-old','__display__');
+         ($stdout,$stderr)=$handle->cmd($sudo.
+            'mv -v php-src php-src-old','__display__');
+         $php_build=1;
+      }
+   } else { $php_build=1 }
+   if ($php_build || $build_php) {
+      my $done=0;my $gittry=0;
+      while ($done==0) {
+         ($stdout,$stderr)=$handle->cmd($sudo.
+            'git clone https://github.com/php/php-src.git',
+            '__display__');
+         if (++$gittry>5) {
+            print "\n\n   FATAL ERROR: $stderr\n\n";
+            cleanup();
+         }
+         my $gittest='Connection reset by peer|'.
+                     'Could not read from remote repository';
+         $done=1 if $stderr!~/$gittest/s;
+         last if $done;
+         sleep 30;
+      }
       ($stdout,$stderr)=$handle->cwd('php-src');
       ($stdout,$stderr)=$handle->cmd($sudo.
-         'git tag -l');
-      #$stdout=~s/^.*(php-[\d.]+?)\s.*$/$1/s;
-      # roundcube does not work with php 8 as of 7/8/2021
-      $stdout=~s/^.*(php-7.[\d.]+?)\s.*$/$1/s;
-      my $vn=$stdout;
-      $vn=~s/^php-(\d).*$/$1/;
-      ($stdout,$stderr)=$handle->cmd($sudo.
-         "git checkout $stdout",'__display__');
+         "git checkout php-$phpv",'__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
          './buildconf --force','__display__');
       my $pear=($vn eq 8)?'--with-pear ':'';
@@ -1870,6 +2104,10 @@ $stdout='rel-1-6-1';
          "sed -i \'s/post_max_size = 8M/post_max_size = 500M/\' ".
          "/usr/local/php$vn/etc/php.ini");
       ($stdout,$stderr)=$handle->cmd($sudo.
+         "sed -i \'s#^.*pdo_mysql.default_socket.*\$#".
+         "pdo_mysql.default_socket = /var/run/mysqld/mysqld.sock#\' ".
+         "/usr/local/php$vn/etc/php.ini");
+      ($stdout,$stderr)=$handle->cmd($sudo.
          "sed -i \'s#;date.timezone =#date.timezone = \"America/Chicago\"#\' ".
          "/usr/local/php$vn/etc/php.ini");
       ($stdout,$stderr)=$handle->cmd($sudo.
@@ -1888,9 +2126,11 @@ $stdout='rel-1-6-1';
          'mkdir -vp /usr/local/php'.$vn.'/etc/conf.d','__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
          'mkdir -vp /usr/local/php'.$vn.'/etc/php-fpm.d','__display__');
+      # https://myshell.co.uk/blog/2012/07/adjusting-child-processes-for-php-fpm-nginx/
+      # find DNS server for domain:  dig ns getwisdom.com
       ($stdout,$stderr)=$handle->cmd($sudo.
-         'cp -v ./sapi/fpm/www.conf /usr/local/php'.$vn.'/etc/php-fpm.d/www.conf',
-         '__display__');
+         'cp -v ./sapi/fpm/www.conf /usr/local/php'.$vn.
+         '/etc/php-fpm.d/www.conf','__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
          'cp -v ./sapi/fpm/php-fpm.conf /usr/local/php'.$vn.'/etc',
          '__display__');
@@ -2030,6 +2270,8 @@ END
          '/opt/cpanel/ea-php70/root/etc/php-fpm.d/www.conf','__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
          '/etc/init.d/ea-php70-php-fpm start','__display__');
+   } else {
+      print "php is up to date.\n";
    }
 
    ($stdout,$stderr)=$handle->cwd('/opt/source');
@@ -2141,7 +2383,7 @@ END
    my $mysql_virtual_domains_maps=<<END;
 user = postfixadmin
 password = $service_and_cert_password
-hosts = 127.0.0.1
+hosts = unix:/var/run/mysqld/mysqld.sock
 dbname = postfixadmin
 query = SELECT domain FROM domain WHERE domain='\\x25s' AND active = '1'
 #query = SELECT domain FROM domain WHERE domain='\\x25s'
@@ -2157,7 +2399,7 @@ END
    my $mysql_virtual_mailbox_maps=<<END;
 user = postfixadmin
 password = $service_and_cert_password
-hosts = 127.0.0.1
+hosts = unix:/var/run/mysqld/mysqld.sock
 dbname = postfixadmin
 query = SELECT maildir FROM mailbox WHERE username='\\x25s' AND active = '1'
 #expansion_limit = 100
@@ -2172,7 +2414,7 @@ user = postfixadmin
 password = $service_and_cert_password
 dbname = postfixadmin
 query = SELECT maildir FROM mailbox,alias_domain WHERE alias_domain.alias_domain = '\\x25d' and mailbox.username = CONCAT('\\x25u', '\@', alias_domain.target_domain) AND mailbox.active = 1 AND alias_domain.active='1'
-hosts = 127.0.0.1
+hosts = unix:/var/run/mysqld/mysqld.sock
 END
    ($stdout,$stderr)=$handle->cmd(
       "echo -e \"$mysql_virtual_alias_mailbox_maps\" > ".
@@ -2186,7 +2428,7 @@ password = $service_and_cert_password
 dbname = postfixadmin
 query = SELECT goto FROM alias WHERE address='\\x25s' AND active = '1'
 #expansion_limit = 100
-hosts = 127.0.0.1
+hosts = unix:/var/run/mysqld/mysqld.sock
 END
    ($stdout,$stderr)=$handle->cmd("echo -e \"$mysql_virtual_alias_maps\" > ".
       "${home_dir}mysql_virtual_alias_maps.cf");
@@ -2198,7 +2440,7 @@ user = postfixadmin
 password = $service_and_cert_password
 dbname = postfixadmin
 query = SELECT goto FROM alias,alias_domain WHERE alias_domain.alias_domain = '\\x25d' and alias.address = CONCAT('\\x25u', '\@', alias_domain.target_domain) AND alias.active = 1 AND alias_domain.active='1'
-hosts = 127.0.0.1
+hosts = unix:/var/run/mysqld/mysqld.sock
 END
    ($stdout,$stderr)=$handle->cmd(
       "echo -e \"$mysql_virtual_alias_domain_maps\" > ".
@@ -2211,7 +2453,7 @@ user = postfixadmin
 password = $service_and_cert_password
 dbname = postfixadmin
 query = SELECT maildir FROM mailbox,alias_domain WHERE alias_domain.alias_domain = '\\x25d' and mailbox.username = CONCAT('\\x25u', '\@', alias_domain.target_domain) AND mailbox.active = 1 AND alias_domain.active='1'
-hosts = 127.0.0.1
+hosts = unix:/var/run/mysqld/mysqld.sock
 END
    ($stdout,$stderr)=$handle->cmd(
       "echo -e \"$mysql_virtual_alias_domain_mailbox_maps\" > ".
@@ -2225,7 +2467,7 @@ user = postfixadmin
 password = $service_and_cert_password
 dbname = postfixadmin
 query = SELECT goto FROM alias,alias_domain WHERE alias_domain.alias_domain = '\\x25d' and alias.address = CONCAT('\@', alias_domain.target_domain) AND alias.active = 1 AND alias_domain.active='1'
-hosts = 127.0.0.1
+hosts = unix:/var/run/mysqld/mysqld.sock
 END
    ($stdout,$stderr)=$handle->cmd(
       "echo -e \"$mysql_virtual_alias_domain_catchall_maps\" > ".
@@ -2251,11 +2493,11 @@ END
       'useradd vmail --system --uid 2000 -s /usr/bin/nologin '.
       '--user-group --no-create-home');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      'mkdir -v /var/vmail','__display__');
+      'mkdir -v /var/mail/vmail','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      'chown -Rv vmail:vmail /var/vmail/','__display__');
+      'chown -Rv vmail:vmail /var/mail/vmail/','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      'chcon -Rv -t mail_spool_t /var/vmail/','__display__');
+      'chcon -Rv -t mail_spool_t /var/mail/vmail/','__display__');
    #($stdout,$stderr)=$handle->cmd($sudo.
    #   'openssl req -new -outform PEM -out /etc/postfix/smtpd.cert '.
    #   '-newkey rsa:2048 -nodes -keyout /etc/postfix/smtpd.key '.
@@ -2271,17 +2513,17 @@ END
    ($stdout,$stderr)=$handle->cmd($sudo.
       'postconf -e "inet_interfaces = all"','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      'postconf -e "mydestination = '.$domain_url.', \$myhostname, '.
+      'postconf -e "mydestination = mail.'.$domain_url.', \$myhostname, '.
       'localhost.\$mydomain, localhost"',
       '__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
       'postconf -e "myhostname = mail.'.$domain_url.'"','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      'postconf -e "mydomain = '.$domain_url.'"','__display__');
+      'postconf -e "mydomain = mail.'.$domain_url.'"','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      'postconf -e "myorigin = '.$domain_url.'"','__display__');
+      'postconf -e "myorigin = mail.'.$domain_url.'"','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      'postconf -e "virtual_mailbox_base = /var/vmail"','__display__');
+      'postconf -e "virtual_mailbox_base = /var/mail/vmail"','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
       'postconf -e "virtual_minimum_uid = 2000"','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
@@ -2297,10 +2539,22 @@ END
    ($stdout,$stderr)=$handle->cmd($sudo.
       'postconf -e \'broken_sasl_auth_clients = yes\'',
       '__display__');
+   #($stdout,$stderr)=$handle->cmd($sudo.
+   #   'postconf -e \'smtpd_sender_restrictions '.
+   #   '= permit_mynetworks, permit_sasl_authenticated, '.
+   #   'reject_unknown_sender_domain, '.
+   #   'reject_unknown_reverse_client_hostname, '.
+   #   'reject_unknown_client_hostname\'',
+   #   '__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
       'postconf -e \'smtpd_recipient_restrictions '.
       '= permit_mynetworks, permit_sasl_authenticated, '.
       'reject_unauth_destination\'',
+      '__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'postconf -e \'smtpd_relay_restrictions '.
+      '= permit_mynetworks, permit_sasl_authenticated, '.
+      'defer_unauth_destination\'',
       '__display__');
    # https://serverfault.com/questions/803920/postfix-configure-to-use-tlsv1-2
    # https://www.howtoforge.com/howto_postfix_smtp_auth_tls_howto
@@ -2320,6 +2574,9 @@ END
       '__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
       'postconf -e \'disable_vrfy_command = yes\'',
+      '__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'postconf -e \'mailbox_size_limit = 0\'',
       '__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
       'postconf -e \'message_size_limit = 0\'',
@@ -2727,7 +2984,8 @@ END
       'setfacl -R -m u:www-data:rx /etc/letsencrypt/live/ '.
       '/etc/letsencrypt/archive/','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      'php -r \'echo password_hash("password", PASSWORD_DEFAULT);\'');
+      'php -r \'echo password_hash("'.$service_and_cert_password.
+      '", PASSWORD_DEFAULT);\'');
    my $pfapassword=$stdout;
    #
    # echo-ing/streaming files over ssh can be tricky. Use echo -e
@@ -2748,10 +3006,32 @@ END
 \\x24CONF['database_port'] = '3306';
 \\x24CONF['database_user'] = 'postfixadmin';
 \\x24CONF['database_password'] = \'$service_and_cert_password\';
+\\x24CONF['database_socket'] = '/var/run/mysqld/mysqld.sock';
 \\x24CONF['database_name'] = 'postfixadmin';
 \\x24CONF['encrypt'] = 'dovecot:SHA512';
-\\x24CONF['dovecotpw'] = \\x22/usr/bin/doveadm pw -r 12\\x22;
+\\x24CONF['dovecotpw'] = \\x22/usr/local/bin/doveadm pw -r 12\\x22;
 \\x24CONF['setup_password'] = \'$pfapassword\';
+
+\\x24CONF['default_aliases'] = array (
+  'abuse'      => \'abuse\@$domain_url\',
+  'hostmaster' => \'hostmaster\@$domain_url\',
+  'postmaster' => \'postmaster\@$domain_url\',
+  'webmaster'  => \'webmaster\@$domain_url\'
+);
+
+\\x24CONF['fetchmail'] = 'NO';
+\\x24CONF['show_footer_text'] = 'NO';
+
+\\x24CONF['quota'] = 'YES';
+\\x24CONF['domain_quota'] = 'YES';
+\\x24CONF['quota_multiplier'] = '1024000';
+\\x24CONF['used_quotas'] = 'YES';
+\\x24CONF['new_quota_table'] = 'YES';
+
+\\x24CONF['aliases'] = '0';
+\\x24CONF['mailboxes'] = '0';
+\\x24CONF['maxquota'] = '0';
+\\x24CONF['domain_quota_default'] = '0';
 END
    ($stdout,$stderr)=$handle->cmd("echo -e \"$ad\" > ".
       "~/pfa_config");
@@ -2762,6 +3042,11 @@ END
    ($stdout,$stderr)=$handle->cmd($sudo.
       'chown -R www-data:www-data /var/www/html/postfixadmin',
       '__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'bash /var/www/postfixadmin/scripts/postfixadmin-cli '.
+      'admin add superadmin@'.$domain_url.' --superadmin 1 '.
+      '--active 1 --password '.$service_and_cert_password.' --password2 '.
+      $service_and_cert_password,'__display__');
    $ad=<<END;
     server {
         listen 80;
@@ -2841,7 +3126,7 @@ END
 
    ($stdout,$stderr)=$handle->cmd($sudo.
       'wget -qO- https://dovecot.org/download');
-   $stdout=~s/^.*?EOL statement.*?[<]a href=["]([^"]+)?["]\s.*$/$1/s;
+   $stdout=~s/^.*?Stable releases.*?[<]a href=["]([^"]+)?["]\s.*$/$1/s;
    $gtarfile=$stdout;
    ($stdout,$stderr)=$handle->cmd($sudo.
       "wget --random-wait --progress=dot ".$stdout,
@@ -2852,8 +3137,9 @@ END
    $gtarfile=~s/.tar.gz$//;
    ($stdout,$stderr)=$handle->cwd($gtarfile);
    ($stdout,$stderr)=$handle->cmd($sudo.
-      '"LDFLAGS=-L/usr/local/lib64 -Wl,-rpath /usr/local/lib -Wl,'.
-      '-rpath /usr/local/lib64" '.
+      '"LDFLAGS=-L/usr/local/lib64 -Wl,'.
+      '-rpath /usr/local/lib64 -Wl,'.
+      '-rpath /usr/local/mysql/lib" '.
       '"CFLAGS=-I/usr/local/openssl/include" '.
       './configure --localstatedir=/var '.
       '--with-mysql --with-ssl=openssl','__display__');
@@ -2868,6 +3154,9 @@ END
       "sed -i \'s/#protocols/protocols/\' ".
       "/usr/local/etc/dovecot/dovecot.conf");
    ($stdout,$stderr)=$handle->cmd($sudo.
+      "sed -i \'s/lmtp submission/lmtp submission sieve/\' ".
+      "/usr/local/etc/dovecot/dovecot.conf");
+   ($stdout,$stderr)=$handle->cmd($sudo.
       "sed -i \'s/#base_dir/base_dir/\' ".
       "/usr/local/etc/dovecot/dovecot.conf");
    ($stdout,$stderr)=$handle->cmd($sudo.
@@ -2875,7 +3164,7 @@ END
    ($stdout,$stderr)=$handle->cmd($sudo.
       "cp -v conf.d/10-mail.conf /usr/local/etc/dovecot/conf.d",
       '__display__');
-   $ad='mail_location = maildir:/var/vmail/%d/%n/';
+   $ad='mail_location = maildir:/var/mail/vmail/%d/%n/';
    ($stdout,$stderr)=$handle->cmd($sudo.
       "sed -i \'s*#mail_location =*$ad*\' ".
       "/usr/local/etc/dovecot/conf.d/10-mail.conf");
@@ -2883,11 +3172,10 @@ END
    ($stdout,$stderr)=$handle->cmd($sudo.
       "sed -i \'s/#mail_privileged_group =/$ad/\' ".
       "/usr/local/etc/dovecot/conf.d/10-mail.conf");
+   $ad='mail_plugins = quota';
    ($stdout,$stderr)=$handle->cmd($sudo.
-      "sudo mkdir -vp /var/vmail/$domain_url",
-      '__display__');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      'chown -Rv vmail:vmail /var/vmail/','__display__');
+      "sed -i \'s/#mail_plugins =/$ad/\' ".
+      "/usr/local/etc/dovecot/conf.d/10-mail.conf");
    ($stdout,$stderr)=$handle->cmd($sudo.
       "cp -v conf.d/10-auth.conf /usr/local/etc/dovecot/conf.d",
       '__display__');
@@ -2936,7 +3224,7 @@ END
       '__display__');
    $ad='%NL%'.
        'driver = mysql%NL%'.
-       'connect = host=127.0.0.1 dbname=postfixadmin '.
+       'connect = host=/var/run/mysqld/mysqld.sock dbname=postfixadmin '.
        "user=postfixadmin password=$service_and_cert_password%NL%".
        'default_pass_scheme = SHA512-CRYPT%NL%'.
        'password_query = SELECT username as user, '.
@@ -3042,6 +3330,9 @@ END
        "sed -i \"s/#user = root/user = vmail/\" ".
        "/usr/local/etc/dovecot/conf.d/10-master.conf");
    ($stdout,$stderr)=$handle->cmd($sudo.
+       "sed -i \"s/#port = 587/port = 8587/\" ".
+       "/usr/local/etc/dovecot/conf.d/10-master.conf");
+   ($stdout,$stderr)=$handle->cmd($sudo.
        "cp -v conf.d/auth-system.conf.ext ".
        "/usr/local/etc/dovecot/conf.d",
        '__display__');
@@ -3104,6 +3395,8 @@ END
       "gpasswd -d $name dovecot",'__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
       'gpasswd -a www-data dovecot','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'gpasswd -a www-data vmail','__display__');
    ($stdout,$stderr)=$handle->cwd("/opt/source/$gtarfile");
    ($stdout,$stderr)=$handle->cmd($sudo.
       'mkdir -vp /var/run/dovecot','__display__');
@@ -3124,6 +3417,12 @@ END
       '/etc/systemd/system/dovecot.service');
    ($stdout,$stderr)=$handle->cmd($sudo.
       'sed -i "s*.rundir.*/var/run/dovecot*" '.
+      '/etc/systemd/system/dovecot.service');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'sed -i "s*@systemdservicetype@*simple*" '.
+      '/etc/systemd/system/dovecot.service');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'sed -i "/ExecStop/iKillMode=none" '.
       '/etc/systemd/system/dovecot.service');
    ($stdout,$stderr)=$handle->cmd($sudo.
       'systemctl daemon-reload');
@@ -3233,11 +3532,55 @@ END
          'chmod -v 755 '.$dir,'__display__');
    }
    ($stdout,$stderr)=$handle->cmd($sudo.
+      'gpasswd -a www-data mysql','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
       "setfacl -R -m u:www-data:rwx /var/www/html/roundcube/temp/ ".
       "/var/www/html/roundcube/logs/",'__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
       'cp -vp /var/www/html/roundcube/config/config.inc.php.sample '.
       '/var/www/html/roundcube/config/config.inc.php','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'cp -vp /var/www/html/roundcube/plugins/managesieve/config.inc.php.dist '.
+      '/var/www/html/roundcube/plugins/managesieve/config.inc.php',
+      '__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'sed -i "s/_vacation\'\] = 0/_vacation\'\] = 1/" '.
+      '/var/www/html/roundcube/plugins/managesieve/config.inc.php');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'sed -i "s/_forward\'\] = 0/_forward\'\] = 1/" '.
+      '/var/www/html/roundcube/plugins/managesieve/config.inc.php');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'mkdir -vp /var/mail/vmail/pgp-keys','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'chown -v vmail:vmail /var/mail/vmail/pgp-keys',
+      '__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'chmod -v 775 /var/mail/vmail/pgp-keys',
+      '__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'cp -vp /var/www/html/roundcube/plugins/enigma/config.inc.php.dist '.
+      '/var/www/html/roundcube/plugins/enigma/config.inc.php',
+      '__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'cp -vp /var/www/html/roundcube/plugins/markasjunk/config.inc.php.dist '.
+      '/var/www/html/roundcube/plugins/markasjunk/config.inc.php',
+      '__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'sed -i "s#_pgp_homedir\'\] = null;#_pgp_homedir\'\]'.
+      ' = \'/var/mail/vmail/pgp-keys\';#" '.
+      '/var/www/html/roundcube/plugins/enigma/config.inc.php');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'sed -i "/zipdownload/a%SP%%SP%%SP%%SP%\'managesieve\'," '.
+      '/var/www/html/roundcube/config/config.inc.php');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'sed -i "/managesieve/a%SP%%SP%%SP%%SP%\'enigma\'," '.
+      '/var/www/html/roundcube/config/config.inc.php');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'sed -i "/enigma/a%SP%%SP%%SP%%SP%\'markasjunk\'," '.
+      '/var/www/html/roundcube/config/config.inc.php');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+       "sed -i \"s/%SP%/ /g\" ".
+      '/var/www/html/roundcube/config/config.inc.php');
    ($stdout,$stderr)=$handle->cmd($sudo.
       'sed -i "s#roundcube:pass#roundcube:'.$service_and_cert_password.
       '#" /var/www/html/roundcube/config/config.inc.php');
@@ -3256,6 +3599,41 @@ END
    ($stdout,$stderr)=$handle->cmd($sudo.
       'sed -i "s#\'\'#\'https://www.getwisdom.com/contact-us\'#" '.
       '/var/www/html/roundcube/config/config.inc.php');
+   my $p_wrd=
+      $Net::FullAuto::ISets::Local::EmailServer_is::create_strong_password->(24);
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'sed -i "s#rcmail-\!24ByteDESkey\*Str#'.$p_wrd.'#" '.
+      '/var/www/html/roundcube/config/config.inc.php');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      '/usr/local/php'.$vn.'/bin/pear channel-update pear.php.net',
+      '__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      '/usr/local/php'.$vn.'/bin/pear install Mail_Mime',
+      '__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      '/usr/local/php'.$vn.'/bin/pear install Net_SMTP',
+      '__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      '/usr/local/php7/bin/pear install '.
+      'channel://pear.php.net/Net_IDNA2-0.2.0',
+      '__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      '/usr/local/php'.$vn.'/bin/pear install Auth_SASL',
+      '__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      '/usr/local/php'.$vn.'/bin/pear install '.
+      'channel://pear.php.net/Auth_SASL2-0.2.0',
+      '__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      '/usr/local/php'.$vn.'/bin/pear install Net_Sieve',
+      '__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      '/usr/local/php'.$vn.'/bin/pear install '.
+      'channel://pear.horde.org/Horde_ManageSieve',
+      '__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      '/usr/local/php'.$vn.'/bin/pear install Crypt_GPG',
+      '__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
       'service php-fpm stop','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
@@ -3266,6 +3644,10 @@ END
       'service php-fpm restart','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
       'service php-fpm status -l','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'crontab -u www-data -l | { cat; echo "18 11 * * * '.
+      '/var/www/html/roundcube/bin/cleandb.sh"; } | '.
+      'sudo crontab -u www-data -','__display__');
 
    my $install_redis=<<'END';
 
@@ -3296,9 +3678,21 @@ END
    ($stdout,$stderr)=$handle->cwd('/opt/source');
    print $install_redis;
    sleep 5;
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      'git clone --recursive https://github.com/redis/redis.git',
-      '__display__');
+   my $done=0;my $gittry=0;
+   while ($done==0) {
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'git clone --recursive https://github.com/redis/redis.git',
+         '__display__');
+      if (++$gittry>5) {
+         print "\n\n   FATAL ERROR: $stderr\n\n";
+         cleanup();
+      }
+      my $gittest='Connection reset by peer|'.
+                  'Could not read from remote repository';
+      $done=1 if $stderr!~/$gittest/s;
+      last if $done;
+      sleep 30;
+   }
    ($stdout,$stderr)=$handle->cwd('redis');
    ($stdout,$stderr)=$handle->cmd($sudo.
       'git tag --list');
@@ -3568,13 +3962,37 @@ END
    ($stdout,$stderr)=$handle->cwd('/opt/source');
    print $install_rspamd;
    sleep 5;
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      'git clone --recursive https://github.com/vstakhov/rspamd.git',
-      '__display__');
+   $done=0;$gittry=0;
+   while ($done==0) {
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'git clone --recursive https://github.com/vstakhov/rspamd.git',
+         '__display__');
+      if (++$gittry>5) {
+         print "\n\n   FATAL ERROR: $stderr\n\n";
+         cleanup();
+      }
+      my $gittest='Connection reset by peer|'.
+                  'Could not read from remote repository';
+      $done=1 if $stderr!~/$gittest/s;
+      last if $done;
+      sleep 30;
+   }
    # https://ninja-build.org/
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      'git clone git://github.com/ninja-build/ninja.git',
-      '__display__');
+   $done=0;$gittry=0;
+   while ($done==0) {
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'git clone git://github.com/ninja-build/ninja.git',
+         '__display__');
+      if (++$gittry>5) {
+         print "\n\n   FATAL ERROR: $stderr\n\n";
+         cleanup();
+      }
+      my $gittest='Connection reset by peer|'.
+                  'Could not read from remote repository';
+      $done=1 if $stderr!~/$gittest/s;
+      last if $done;
+      sleep 30;
+   }
    ($stdout,$stderr)=$handle->cwd('ninja');
    ($stdout,$stderr)=$handle->cmd($sudo.
       'git checkout release','__display__');
@@ -3586,9 +4004,21 @@ END
       'cp -v ./build-cmake/ninja /usr/local/bin','__display__');
    # https://developer.gnome.org/glib/stable/glib-building.html
    ($stdout,$stderr)=$handle->cwd('/opt/source');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      'git clone --recursive https://gitlab.gnome.org/GNOME/glib.git',
-      '__display__');
+   $done=0;$gittry=0;
+   while ($done==0) {
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'git clone --recursive https://gitlab.gnome.org/GNOME/glib.git',
+         '__display__');
+      if (++$gittry>5) {
+         print "\n\n   FATAL ERROR: $stderr\n\n";
+         cleanup();
+      }
+      my $gittest='Connection reset by peer|'.
+                  'Could not read from remote repository';
+      $done=1 if $stderr!~/$gittest/s;
+      last if $done;
+      sleep 30;
+   }
    ($stdout,$stderr)=$handle->cwd('glib');
    ($stdout,$stderr)=$handle->cmd($sudo.
       'PATH=/usr/local/bin:$PATH /usr/local/bin/meson _build',
@@ -3617,16 +4047,40 @@ END
    ($stdout,$stderr)=$handle->cmd($sudo.
       "make install",'__display__');
    ($stdout,$stderr)=$handle->cwd('/opt/source');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      'git clone https://luajit.org/git/luajit-2.0.git',
-      '__display__');
+   $done=0;$gittry=0;
+   while ($done==0) {
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'git clone https://luajit.org/git/luajit-2.0.git',
+         '__display__');
+      if (++$gittry>5) {
+         print "\n\n   FATAL ERROR: $stderr\n\n";
+         cleanup();
+      }
+      my $gittest='Connection reset by peer|'.
+                  'Could not read from remote repository';
+      $done=1 if $stderr!~/$gittest/s;
+      last if $done;
+      sleep 30;
+   }
    ($stdout,$stderr)=$handle->cwd('luajit-2.0');
    ($stdout,$stderr)=$handle->cmd($sudo.
       'make install','__display__');
    ($stdout,$stderr)=$handle->cwd('/opt/source');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      'git clone --recursive https://github.com/boostorg/boost.git',
-      '__display__');
+   $done=0;$gittry=0;
+   while ($done==0) {
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'git clone --recursive https://github.com/boostorg/boost.git',
+         '__display__');
+      if (++$gittry>5) {
+         print "\n\n   FATAL ERROR: $stderr\n\n";
+         cleanup();
+      }
+      my $gittest='Connection reset by peer|'.
+                  'Could not read from remote repository';
+      $done=1 if $stderr!~/$gittest/s;
+      last if $done;
+      sleep 30;
+   }
    ($stdout,$stderr)=$handle->cwd('boost');
    my $boost_tag='';
    foreach my $tag (reverse split /\n/, $stdout) {
@@ -3641,9 +4095,21 @@ END
    ($stdout,$stderr)=$handle->cmd($sudo.
       './b2 install','3600','__display__');
    ($stdout,$stderr)=$handle->cwd('/opt/source');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      'git clone https://github.com/intel/hyperscan.git',
-      '__display__');
+   $done=0;$gittry=0;
+   while ($done==0) {
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'git clone https://github.com/intel/hyperscan.git',
+         '__display__');
+      if (++$gittry>5) {
+         print "\n\n   FATAL ERROR: $stderr\n\n";
+         cleanup();
+      }
+      my $gittest='Connection reset by peer|'.
+                  'Could not read from remote repository';
+      $done=1 if $stderr!~/$gittest/s;
+      last if $done;
+      sleep 30;
+   }
    ($stdout,$stderr)=$handle->cwd('hyperscan');
    ($stdout,$stderr)=$handle->cmd($sudo.
       '/usr/local/bin/cmake -DCMAKE_POSITION_INDEPENDENT_CODE=ON .',
@@ -3651,9 +4117,21 @@ END
    ($stdout,$stderr)=$handle->cmd($sudo.
       'make install','3600','__display__');
    ($stdout,$stderr)=$handle->cwd('/opt/source');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      'git clone https://github.com/file/file.git '.
-      'libmagic','__display__');
+   $done=0;$gittry=0;
+   while ($done==0) {
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'git clone https://github.com/file/file.git '.
+         'libmagic','__display__');
+      if (++$gittry>5) {
+         print "\n\n   FATAL ERROR: $stderr\n\n";
+         cleanup();
+      }
+      my $gittest='Connection reset by peer|'.
+                  'Could not read from remote repository';
+      $done=1 if $stderr!~/$gittest/s;
+      last if $done;
+      sleep 30;
+   }
    ($stdout,$stderr)=$handle->cwd('libmagic');
    ($stdout,$stderr)=$handle->cmd($sudo.
       'aclocal -I .','__display__');
@@ -3685,48 +4163,29 @@ END
       'mkdir -v rspamd.build','__display__');
    ($stdout,$stderr)=$handle->cwd('rspamd.build');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      'cmake .. -DENABLE_HYPERSCAN=ON -DENABLE_LUAJIT=ON '.
+      '/usr/local/bin/cmake .. -DENABLE_HYPERSCAN=ON -DENABLE_LUAJIT=ON '.
       '-DCMAKE_BUILD_TYPE=RelWithDebuginfo '.
       '-DCMAKE_CXX_COMPILER=/usr/local/bin/g++ '.
       '-DCMAKE_C_COMPILER=/usr/local/bin/gcc '.
-      '-DCMAKE_INSTALL_RPATH=/usr/local/lib64',
+      '-DCMAKE_INSTALL_RPATH=/usr/local/lib64 '.
+      '-DOPENSSL_ROOT_DIR=/usr/local/include/openssl',
       '__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
       'make','3600','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
       'make install','__display__');
+   # https://linuxize.com/post/install-and-integrate-rspamd/
    ($stdout,$stderr)=$handle->cmd($sudo.
       'sed -i \'/include/a\/usr/local/lib64\' /etc/ld.so.conf');
    ($stdout,$stderr)=$handle->cmd($sudo.
       'ldconfig -v','__display__');
-   $ad='bind_socket = "127.0.0.1:11333";';
    ($stdout,$stderr)=$handle->cmd($sudo.
-       "sed -i \'/mime/a$ad\' /usr/local/etc/rspamd/worker-normal.inc");
-   $ad='bind_socket = "127.0.0.1:11332";';
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      "sed -i \'/milter/i$ad\' /usr/local/etc/rspamd/worker-proxy.inc");
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      'sed -i \'s/hosts = "localhost"/self_scan = yes/\' '.
-      '/usr/local/etc/rspamd/worker-proxy.inc');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      "rspamadm pw --encrypt -p $service_and_cert_password");
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      "sed -i \'s/q1/$stdout/\' ".
-      '/usr/local/etc/rspamd/worker-controller.inc');
-   $ad='servers = "127.0.0.1";%NL%backend = "redis";';
-   ($stdout,$stderr)=$handle->cmd("echo -e \"$ad\" > ".
-      "~/classifier-bayes.conf");
-   ($stdout,$stderr)=$handle->cmd($sudo.
-       "sed -i \'s/%NL%/\'\"`echo \\\\\\n`/g\" ".
-       "~/classifier-bayes.conf");
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      'mv -fv ~/classifier-bayes.conf /usr/local/etc/rspamd',
-      '__display__');
+      'mkdir -vp /usr/local/etc/rspamd/local.d','__display__');
    $ad='use = ["x-spamd-bar", "x-spam-level", "authentication-results"];';
    ($stdout,$stderr)=$handle->cmd("echo -e \"$ad\" > ".
       "~/milter_headers.conf");
    ($stdout,$stderr)=$handle->cmd($sudo.
-      'mv -fv ~/milter_headers.conf /usr/local/etc/rspamd',
+      'mv -fv ~/milter_headers.conf /usr/local/etc/rspamd/local.d',
       '__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
       'cp -v ../rspamd.service /etc/systemd/system','__display__');
@@ -3747,6 +4206,364 @@ END
       'mkdir -vp /var/lib/rspamd','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
       'chown -v _rspamd:_rspamd /var/lib/rspamd','__display__');
+   ($stdout,$stderr)=$handle->cmd(
+      'echo -e "bind_socket = \\x22127.0.0.1:11333\\x22;" > ~/wn.inc');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'mv -v ~/wn.inc /usr/local/etc/rspamd/local.d/worker-normal.inc',
+      '__display__');
+   my $wp_inc=<<END;
+bind_socket = \\x22127.0.0.1:11332\\x22;
+milter = yes;
+timeout = 120s;
+upstream \\x22local\\x22 {
+  default = yes;
+  self_scan = yes;
+}
+END
+   ($stdout,$stderr)=$handle->cmd(
+      "echo -e \"$wp_inc\" > ~/wp.inc");
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'mv -v ~/wp.inc /usr/local/etc/rspamd/local.d/worker-proxy.inc',
+      '__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "/usr/local/bin/rspamadm pw --encrypt -p ".
+      $service_and_cert_password);
+   $stdout=~s#\$#\\\\x24#g;
+   ($stdout,$stderr)=$handle->cmd(
+      "echo -e \"password = \\x22$stdout\\x22;\" > ~/wc.inc");
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'mv -v ~/wc.inc /usr/local/etc/rspamd/local.d/worker-controller.inc',
+      '__display__');
+   my $cb_conf=<<END;
+servers = \\x22127.0.0.1\\x22;
+backend = \\x22redis\\x22;
+END
+   ($stdout,$stderr)=$handle->cmd(
+      "echo -e \"$cb_conf\" > ~/cb.conf");
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'mv -v ~/cb.conf /usr/local/etc/rspamd/local.d/classifier-bayes.conf',
+      '__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'postconf -e "milter_protocol = 6"',
+      '__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'postconf -e "milter_mail_macros = i {mail_addr} '.
+      '{client_addr} {client_name} {auth_authen}"',
+      '__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'postconf -e "milter_default_action = accept"',
+      '__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'postconf -e "smtpd_milters = inet:127.0.0.1:11332"',
+      '__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'postconf -e "non_smtpd_milters = inet:127.0.0.1:11332"',
+      '__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'service postfix restart','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'service postfix status -l','__display__');
+   ($stdout,$stderr)=$handle->cwd('/opt/source');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'wget -qO- https://pigeonhole.dovecot.org/download.html');
+   $stdout=~s/^.*?Stable releases.*?href=["]([^"]+)["].*$/$1/s;
+   my $pg_rl=$stdout;
+   $pg_rl=~s/^.*\///;
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'wget --random-wait --progress=dot '.
+      $stdout,'__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "tar xvf $pg_rl",'__display__');
+   $pg_rl=~s/.tar.gz$//;
+   ($stdout,$stderr)=$handle->cwd($pg_rl);
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      './configure','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'make install','__display__');
+   $ad=<<END;
+protocol lmtp {
+  postmaster_address = postmaster\@$domain_url
+  mail_plugins = \\x24mail_plugins quota sieve
+}
+END
+   ($stdout,$stderr)=$handle->cmd(
+      "echo -e \"$ad\" >> ~/20-lmtp.conf");
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'mv -v ~/20-lmtp.conf /usr/local/etc/dovecot/conf.d/20-lmtp.conf',
+      '__display__');
+   $ad=<<END;
+namespace inbox {
+  inbox = yes
+  location =
+  mailbox Archive {
+    auto = subscribe
+    special_use = \\x5CArchive
+  }
+  mailbox Drafts {
+    auto = subscribe
+    special_use = \\x5CDrafts
+  }
+  mailbox Spam {
+    special_use = \\x5CJunk
+    auto = subscribe
+  }
+  mailbox Junk {
+    auto = subscribe
+    special_use = \\x5CJunk
+  }
+  mailbox Sent {
+    auto = subscribe
+    special_use = \\x5CSent
+  }
+  mailbox Trash {
+    auto = subscribe
+    special_use = \\x5CTrash
+  }
+  prefix =
+  separator = /
+}
+END
+   ($stdout,$stderr)=$handle->cmd(
+      "echo -e \"$ad\" >> ~/15-mailboxes.conf");
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'mv -v ~/15-mailboxes.conf '.
+      '/usr/local/etc/dovecot/conf.d/15-mailboxes.conf',
+      '__display__');
+   $ad=<<END;
+plugin {
+  quota = dict:User quota::proxy::sqlquota
+  quota_rule = \\x2A:storage=5GB
+  quota_rule2 = Trash:storage=+100M
+  quota_grace = 10\\x25\\x25
+  quota_exceeded_message = Quota exceeded, please contact your system administrator.
+  quota_warning = storage=100\\x25\\x25 quota-warning 100 \\x25u
+  quota_warning2 = storage=95\\x25\\x25 quota-warning 95 \\x25u
+  quota_warning3 = storage=90\\x25\\x25 quota-warning 90 \\x25u
+  quota_warning4 = storage=85\\x25\\x25 quota-warning 85 \\x25u
+}
+
+service quota-warning {
+  executable = script /usr/local/bin/quota-warning.sh
+  user = vmail
+
+  unix_listener quota-warning {
+    group = vmail
+    mode = 0660
+    user = vmail
+  }
+}
+
+dict {
+  sqlquota = mysql:/usr/local/etc/dovecot/dovecot-dict-sql.conf.ext
+}
+END
+   ($stdout,$stderr)=$handle->cmd(
+      "echo -e \"$ad\" >> ~/90-quota.conf");
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'mv -v ~/90-quota.conf '.
+      '/usr/local/etc/dovecot/conf.d/90-quota.conf',
+      '__display__');
+   $ad=<<END;
+#\\x21/bin/sh
+PERCENT=\\x241
+USER=\\x242
+cat << EOF | /usr/lib/dovecot/dovecot-lda -d \\x24USER -o \\x22plugin/quota=dict:User quota::noenforcing:proxy::sqlquota\\x22
+From: postmaster\@$domain_url
+Subject: Quota warning
+
+Your mailbox is now \\x24PERCENT\\x25 full.
+EOF
+END
+   ($stdout,$stderr)=$handle->cmd(
+      "echo -e \"$ad\" >> ~/quota-warning.sh");
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'mv -v ~/quota-warning.sh /usr/local/bin/quota-warning.sh',
+      '__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'chmod -v +x /usr/local/bin/quota-warning.sh',
+      '__display__');
+   $ad=<<END;
+connect = host=/var/run/mysqld/mysqld.sock dbname=postfixadmin user=postfixadmin password=$service_and_cert_password
+map {
+  pattern = priv/quota/storage
+  table = quota2
+  username_field = username
+  value_field = bytes
+}
+map {
+  pattern = priv/quota/messages
+  table = quota2
+  username_field = username
+  value_field = messages
+}
+# map {
+#   pattern = shared/expire/\\x24user/\\x24mailbox
+#   table = expires
+#   value_field = expire_stamp
+#
+#   fields {
+#     username = \\x24user
+#     mailbox = \\x24mailbox
+#   }
+# }
+END
+   ($stdout,$stderr)=$handle->cmd(
+      "echo -e \"$ad\" >> ~/dovecot-dict-sql.conf.ext");
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'mv -v ~/dovecot-dict-sql.conf.ext '.
+      '/usr/local/etc/dovecot/conf.d/dovecot-dict-sql.conf.ext',
+      '__display__');
+   $ad=<<END;
+protocol imap {
+  mail_plugins = \\x24mail_plugins imap_quota imap_sieve
+}
+END
+   ($stdout,$stderr)=$handle->cmd(
+      "echo -e \"$ad\" >> ~/20-imap.conf");
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'mv -v ~/20-imap.conf '.
+      '/usr/local/etc/dovecot/conf.d/20-imap.conf',
+      '__display__');
+   $ad=<<END;
+service managesieve-login {
+  inet_listener sieve {
+    port = 4190
+  }
+}
+service managesieve {
+  process_limit = 1024
+}
+END
+   ($stdout,$stderr)=$handle->cmd(
+      "echo -e \"$ad\" >> ~/20-managesieve.conf");
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'mv -v ~/20-managesieve.conf '.
+      '/usr/local/etc/dovecot/conf.d/20-managesieve.conf',
+      '__display__');
+   #
+   # echo-ing/streaming files over ssh can be tricky. Use echo -e
+   #          and replace these characters with thier HEX
+   #          equivalents (use an external editor for quick
+   #          search and replace - and paste back results.
+   #          use copy/paste or cat file and copy/paste results.):
+   #
+   #          !  -   \\x21     `  -  \\x60   * - \\x2A
+   #          "  -   \\x22     \  -  \\x5C
+   #          $  -   \\x24     %  -  \\x25
+   #
+   $ad=<<END;
+plugin {
+    sieve = file:~/sieve;active=~/.dovecot.sieve
+    sieve_plugins = sieve_imapsieve sieve_extprograms
+    sieve_before = /var/mail/vmail/sieve/global/spam-global.sieve
+    sieve = file:/var/mail/vmail/sieve/\\x25d/\\x25n/scripts;active=/var/mail/vmail/sieve/\\x25d/\\x25n/active-script.sieve
+
+    imapsieve_mailbox1_name = Spam
+    imapsieve_mailbox1_causes = COPY
+    imapsieve_mailbox1_before = file:/var/mail/vmail/sieve/global/report-spam.sieve
+
+    imapsieve_mailbox2_name = \\x2A
+    imapsieve_mailbox2_from = Spam
+    imapsieve_mailbox2_causes = COPY
+    imapsieve_mailbox2_before = file:/var/mail/vmail/sieve/global/report-ham.sieve
+
+    sieve_pipe_bin_dir = /usr/bin
+    sieve_global_extensions = +vnd.dovecot.pipe
+}
+END
+   ($stdout,$stderr)=$handle->cmd(
+      "echo -e \"$ad\" >> ~/90-sieve.conf");
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'mv -v ~/90-sieve.conf '.
+      '/usr/local/etc/dovecot/conf.d/90-sieve.conf',
+      '__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'mkdir -vp /var/mail/vmail/sieve/global','__display__');
+   $ad=<<END;
+require [\\x22fileinto\\x22,\\x22mailbox\\x22];
+
+if anyof(
+    header :contains [\\x22X-Spam-Flag\\x22] \\x22YES\\x22,
+    header :contains [\\x22X-Spam\\x22] \\x22Yes\\x22,
+    header :contains [\\x22Subject\\x22] \\x22\\x2A\\x2A\\x2A SPAM \\x2A\\x2A\\x2A\\x22
+    )
+{
+    fileinto :create \\x22Spam\\x22;
+    stop;
+}
+END
+   ($stdout,$stderr)=$handle->cmd(
+      "echo -e \"$ad\" >> ~/spam-global.sieve");
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'mv -v ~/spam-global.sieve '.
+      '/var/mail/vmail/sieve/global/spam-global.sieve',
+      '__display__');
+   $ad=<<END;
+require [\\x22vnd.dovecot.pipe\\x22, \\x22copy\\x22, \\x22imapsieve\\x22];
+pipe :copy \\x22rspamc\\x22 [\\x22learn_spam\\x22];
+END
+   ($stdout,$stderr)=$handle->cmd(
+      "echo -e \"$ad\" >> ~/report-spam.sieve");
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'mv -v ~/report-spam.sieve '.
+      '/var/mail/vmail/sieve/global/report-spam.sieve',
+      '__display__');
+   $ad=<<END;
+require [\\x22vnd.dovecot.pipe\\x22, \\x22copy\\x22, \\x22imapsieve\\x22];
+pipe :copy \\x22rspamc\\x22 [\\x22learn_ham\\x22];
+END
+   ($stdout,$stderr)=$handle->cmd(
+      "echo -e \"$ad\" >> ~/report-ham.sieve");
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'mv -v ~/report-ham.sieve '.
+      '/var/mail/vmail/sieve/global/report-ham.sieve',
+      '__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'service dovecot restart','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'service dovecot status -l','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      '/usr/local/bin/sievec '.
+      '/var/mail/vmail/sieve/global/spam-global.sieve',
+      '__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      '/usr/local/bin/sievec '.
+      '/var/mail/vmail/sieve/global/report-spam.sieve',
+      '__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      '/usr/local/bin/sievec '.
+      '/var/mail/vmail/sieve/global/report-ham.sieve',
+      '__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'chown -Rv vmail: /var/mail/vmail/sieve/',
+      '__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'mkdir -vp /var/lib/rspamd/dkim/','__display__');
+   ($stdout,$stderr)=$handle->cmd('sudo '.
+      '/usr/local/bin/rspamadm dkim_keygen -b 2048 -s mail -k '.
+      '/var/lib/rspamd/dkim/mail.key | sudo tee -a '.
+      '/var/lib/rspamd/dkim/mail.pub','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'chown -Rv _rspamd: /var/lib/rspamd/dkim',
+      '__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'chmod -v 440 /var/lib/rspamd/dkim/*','__display__');
+   $ad=<<END;
+selector = \\x22mail\\x22;
+path = \\x22/var/lib/rspamd/dkim/\\x24selector.key\\x22;
+allow_username_mismatch = true;
+END
+   ($stdout,$stderr)=$handle->cmd(
+      "echo -e \"$ad\" >> ~/dkim_signing.conf");
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'mv -v ~/dkim_signing.conf '.
+      '/usr/local/etc/rspamd/local.d/dkim_signing.conf',
+      '__display__');
+   sleep 2;
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'cp -v /usr/local/etc/rspamd/local.d/dkim_signing.conf '.
+      '/usr/local/etc/rspamd/local.d/arc.conf',
+      '__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
       'systemctl enable rspamd.service','__display__');
    sleep 2;
@@ -3754,6 +4571,129 @@ END
       'service rspamd restart','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
       'service rspamd status -l','__display__');
+   ($stdout,$stderr)=$handle->cwd('/opt/source');
+   $done=0;$gittry=0;
+   while ($done==0) {
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'git clone https://github.com/YJesus/Unhide.git',
+         '__display__');
+      if (++$gittry>5) {
+         print "\n\n   FATAL ERROR: $stderr\n\n";
+         cleanup();
+      }
+      my $gittest='Connection reset by peer|'.
+                  'Could not read from remote repository';
+      $done=1 if $stderr!~/$gittest/s;
+      last if $done;
+      sleep 30;
+   }
+   ($stdout,$stderr)=$handle->cwd('Unhide');
+   ($stdout,$stderr)=$handle->cmd(
+      'sudo /usr/local/bin/gcc -Wall -O2 -l:libpthread.so '.
+      'unhide-linux*.c unhide-output.c -o unhide-linux',
+      '__display__');
+   ($stdout,$stderr)=$handle->cmd(
+      'sudo /usr/local/bin/gcc -Wall -O2 unhide_rb.c -o unhide_rb',
+      '__display__');
+   ($stdout,$stderr)=$handle->cmd(
+      'sudo /usr/local/bin/gcc -Wall -O2 unhide-tcp.c '.
+      'unhide-tcp-fast.c unhide-output.c  -o unhide-tcp',
+      '__display__');
+   ($stdout,$stderr)=$handle->cmd(
+      'sudo /usr/local/bin/gcc -Wall -O2 unhide-posix.c -o unhide-posix',
+      '__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'cp -v unhide-linux unhide_rb unhide-tcp unhide-posix /usr/bin',
+      '__display__');
+   ($stdout,$stderr)=$handle->cwd('/usr/bin');
+   ($stdout,$stderr)=$handle->cmd($sudo.'ln -s unhide-linux unhide');
+   ($stdout,$stderr)=$handle->cwd('/opt/source');
+   # https://salsa.debian.org/pkg-security-team/rkhunter/blob/debian/master/debian/README.Debian#L108
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "wget --random-wait --progress=dot ".
+      "https://dvgevers.home.xs4all.nl/skdet/skdet-1.0.tar.bz2",
+      '__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'tar xvf skdet-1.0.tar.bz2','__display__');
+   ($stdout,$stderr)=$handle->cwd('skdet-1.0/src');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'wget --random-wait --progress=dot '.
+      'https://dvgevers.home.xs4all.nl/skdet/skdet-fix-includes.diff');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'patch --verbose --force skdet.c <skdet-fix-includes.diff',
+      '__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'patch --verbose --force usage.c <skdet-fix-includes.diff',
+      '__display__');
+   ($stdout,$stderr)=$handle->cwd('..');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'make clean','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'make','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'cp -v skdet /usr/bin','__display__');
+   ($stdout,$stderr)=$handle->cwd('/opt/source');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "wget --random-wait --progress=dot ".
+      "-O rkhunter.tar.gz https://sourceforge.net/".
+      "projects/rkhunter/files/latest/download",
+      '__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'tar xvf rkhunter.tar.gz','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.'ls -1');
+   $stdout=~s/^.*(rkhunter-.*?)\n.*$/$1/s;
+   ($stdout,$stderr)=$handle->cwd($stdout);
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      './installer.sh --install','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'rkhunter --propupd','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "cat /var/lib/rspamd/dkim/mail.pub");
+   $stdout=~s/^.*?["](.*)["].*$/$1/s;
+   $stdout=~s/\n//g;
+   $stdout=~s/"\s+"//g;
+   my $txt_r=$stdout;
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "dig -x $public_ip");
+   my $dkim=<<END;
+
+   In DNS, create a new TXT record with  mail._domainkey  as a name
+   while the value/content of the TXT record should look like this:
+
+   $txt_r
+
+   Also, create a DMARC policy with  _dmarc  as a name while the
+   value/content of the TXT record should look like this:
+
+   v=DMARC1; p=none; adkim=r; aspf=r;
+
+   It may take a while for the DNS changes to propagate.
+   You can check whether the records have propagated using the dig command:
+
+      dig mail._domainkey.$domain_url TXT +short
+
+      dig _dmarc.$domain_url TXT +short
+
+   You can also inspect DMARC here:  https://dmarcian.com/dmarc-inspector/
+
+   Create these accounts with PostFixAdmin:
+
+      abuse\@$domain_url           hostmaster\@$domain_url
+      postmaster\@$domain_url      webmaster\@$domain_url
+
+   Finally, ask your hosting provider to create a PTR record:
+
+   $stdout 
+   
+END
+   print $dkim;
+   sleep 60;
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "dig mail._domainkey.$domain_url TXT +short",
+      '__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "dig _dmarc.$domain_url TXT +short",
+      '__display__');
 
 #cleanup;
 
@@ -4020,21 +4960,13 @@ END
 
 };
 
-our $choose_strong_password=sub {
+our $create_strong_password=sub {
 
-   package choose_strong_password;
-   my $password_banner=<<'END';
-
-    ___ _                       ___                              _
-   / __| |_ _ _ ___ _ _  __ _  | _ \__ _ _______ __ _____ _ _ __| |
-   \__ \  _| '_/ _ \ ' \/ _` | |  _/ _` (_-<_-< V  V / _ \ '_/ _` |
-   |___/\__|_| \___/_||_\__, | |_| \__,_/__/__/\_/\_/\___/_| \__,_|
-                        |___/
-END
-
+   package create_strong_password;
    use Crypt::GeneratePassword qw(chars);
-   my $minlen=15;
-   my $maxlen=15;
+   my $length=$_[0]||15;
+   my $minlen=$length;
+   my $maxlen=$length;
    my @set=("A".."Z","a".."z",0..9,"#","-","_","@","%","^","=");
    my $word='';
    foreach my $count (1..50) {
@@ -4051,15 +4983,33 @@ END
          die if -1<index $word,'/';
          die if -1<index $word,'!';
          die if -1<index $word,'^';
+         die if -1<index $word,'#';
          die if $word!~/\d/;
          die if $word!~/[A-Z]/;
          die if $word!~/[a-z]/;
-         die if $word!~/[@#%=]/;
+         die if $word!~/[@%=]/;
          return $word;
       };
       alarm 0;
       last if $word;
    }
+   return $word;
+
+};
+
+our $choose_strong_password=sub {
+
+   package choose_strong_password;
+   my $password_banner=<<'END';
+
+    ___ _                       ___                              _
+   / __| |_ _ _ ___ _ _  __ _  | _ \__ _ _______ __ _____ _ _ __| |
+   \__ \  _| '_/ _ \ ' \/ _` | |  _/ _` (_-<_-< V  V / _ \ '_/ _` |
+   |___/\__|_| \___/_||_\__, | |_| \__,_/__/__/\_/\_/\___/_| \__,_|
+                        |___/
+END
+
+   my $word=$create_strong_password->(15);
    $password_banner.=<<END;
    The Web Server (NGINX) and the SSL Certificate each need a strong password.
    Use the one supplied here, or create your own. To create your own, use the
@@ -4175,21 +5125,20 @@ our $domain_url=sub {
    | |) / _ \ '  \/ _` | | ' \  | |_| |   / |__
    |___/\___/_|_|_\__,_|_|_||_|  \___/|_|_\____|
 
-
 END
    $domain_url_banner.=<<END;
    Type or paste the domain url for the site:
 
    *** A properly registered domain url is necessary! ***
    $tried
-   Make sure the DNS A/AAAA record(s) for this domain
-   contain(s) this IP address --> $public_ip
+   Create the DNS A/AAAA record(s) for this domain:
 
    A      @                       $public_ip
    A      mail.domain_url         $public_ip
    CNAME  mail                    @
    CNAME  postfixadmin            @
-
+   MX     @                10     mail.domain_url   3600
+   TXT                            v=spf1 mx ~all    3600
 
    Domain URL
                 ]I[{1,'fullauto.com',46}

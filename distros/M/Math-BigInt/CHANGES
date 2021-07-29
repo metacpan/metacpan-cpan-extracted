@@ -1,3 +1,25 @@
+1.999823 2021-07-12
+
+ * Improve the handling of the backend libraries. Provide more useful warnings
+   and error messages. Update the documentation.
+
+1.999822 2021-07-09
+
+  * Make the from_hex(), from_oct(), and from_bin() methods consistent with
+  CORE::oct(), which does not require a leading "0" before the letter ("x",
+   "o", or "b").
+
+ * Make the from_oct() and new() methods accept octal numbers with prefix
+   "0o", "0O", "o" (lowercase letter o), and "O" (capital letter O).
+
+ * Make the from_bin() and new() methods accept binary numbers with
+   prefix "0b", "0B", "b", and "B".
+
+ * Make the from_hex() and new() methods accept hexadecimal numbers with
+   prefix "0x", "0X", "x", and "X".
+
+ * Update test files to match with the above.
+
 1.999821 2021-07-06
 
  * Make new() and from_hex() accept the "0X" prefix, not just the "0x" prefix,

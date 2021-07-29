@@ -54,8 +54,8 @@ subtest 'run a plan' => sub {
 
     subtest 'create run form' => sub {
         $t->get_ok( "/plan/$plan_id/run" )->status_is( 200 )
-            ->element_exists( "form[action=/run]", 'form exists' )
-            ->attr_is( "form[action=/run]", enctype => 'multipart/form-data', 'form allows uploads' )
+            ->element_exists( "main form[action=/run]", 'form exists' )
+            ->attr_is( "main form[action=/run]", enctype => 'multipart/form-data', 'form allows uploads' )
             ->element_exists( "[name=plan_id]", 'plan_id field exists' )
             ->attr_is( "[name=plan_id]", value => $plan_id, 'plan_id value is correct' )
             ->text_is( '[data-input=0] [data-input-name]', 'destination', 'input label correct' )
@@ -197,12 +197,12 @@ subtest 'replay a run' => sub {
 
     subtest 'replay run form' => sub {
         $t->get_ok( "/run/$run->{run_id}/replay" )->status_is( 200 )
-            ->element_exists( "form[action=/run]", 'form exists' )
-            ->attr_is( "form[action=/run]", enctype => 'multipart/form-data', 'form allows uploads' )
+            ->element_exists( "main form[action=/run]", 'form exists' )
+            ->attr_is( "main form[action=/run]", enctype => 'multipart/form-data', 'form allows uploads' )
             ->element_exists( "[name=run_id]", 'run_id field exists' )
             ->attr_is( "[name=run_id]", value => $run->{run_id}, 'run_id value is correct' )
             ->text_is( '[data-input=0] [data-input-name]', 'Champagne', 'input label correct' )
-            ->or( sub { diag $t->tx->res->dom->at( 'form[action=/run]' ) } )
+            ->or( sub { diag $t->tx->res->dom->at( 'main form[action=/run]' ) } )
             ->element_exists( '[name="input[0].value"]', 'input field exists' )
             ->attr_is( '[name="input[0].value"]', value => 'Snootie', 'input default value is correct' )
             ->element_exists( '[name="input[0].name"]', 'input name exists' )
@@ -631,9 +631,9 @@ subtest 'stop/kill run' => sub {
 
         # Show stop run form
         $t->get_ok( "/run/$run->{run_id}/stop" )->status_is( 200 )
-            ->element_exists( 'form' )
-            ->attr_is( 'form', action => "/run/$run->{run_id}/stop" )
-            ->attr_like( 'form', method => qr{post}i )
+            ->element_exists( 'main form' )
+            ->attr_is( 'main form', action => "/run/$run->{run_id}/stop" )
+            ->attr_like( 'main form', method => qr{post}i )
             ->element_exists( 'textarea' )
             ->attr_is( 'textarea', name => 'note' )
             ->element_exists( 'button' )
@@ -739,9 +739,9 @@ subtest 'stop/kill run' => sub {
 
         # Show kill run form
         $t->get_ok( "/run/$run->{run_id}/kill" )->status_is( 200 )
-            ->element_exists( 'form' )
-            ->attr_is( 'form', action => "/run/$run->{run_id}/kill" )
-            ->attr_like( 'form', method => qr{post}i )
+            ->element_exists( 'main form' )
+            ->attr_is( 'main form', action => "/run/$run->{run_id}/kill" )
+            ->attr_like( 'main form', method => qr{post}i )
             ->element_exists( 'textarea' )
             ->attr_is( 'textarea', name => 'note' )
             ->element_exists( 'button' )

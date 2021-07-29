@@ -2,18 +2,25 @@ NAME
     App::IndonesianHolidayUtils - List Indonesian holidays
 
 VERSION
-    This document describes version 0.061 of App::IndonesianHolidayUtils
+    This document describes version 0.064 of App::IndonesianHolidayUtils
     (from Perl distribution App-IndonesianHolidayUtils), released on
-    2021-01-17.
+    2021-07-24.
 
 SYNOPSIS
     This distribution contains several CLI's related to Indonesian holidays:
 
+    *   count-idn-workdays
+
     *   is-idn-holiday
+
+    *   is-idn-workday
 
     *   list-idn-holidays
 
     *   list-idn-workdays
+
+CONTRIBUTOR
+    perlancar (@pc-office) <perlancar@gmail.com>
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -25,7 +32,8 @@ SOURCE
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website
-    <https://github.com/perlancar/perl-App-IndonesianHolidayUtils/issues>
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-IndonesianHoliday
+    Utils>
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.

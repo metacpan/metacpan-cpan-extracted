@@ -1,5 +1,5 @@
 package Getopt::EX::Loader;
-use version; our $VERSION = version->declare("v1.23.3");
+use version; our $VERSION = version->declare("v1.24.1");
 
 use v5.14;
 use warnings;
@@ -12,6 +12,8 @@ our %EXPORT_TAGS = ( );
 our @EXPORT_OK   = qw();
 
 use Data::Dumper;
+use List::Util qw(pairmap);
+
 use Getopt::EX::Module;
 use Getopt::EX::Func qw(parse_func);
 use Getopt::EX::Colormap qw(colorize);
@@ -114,6 +116,16 @@ sub calls {
 sub builtins {
     my $obj = shift;
     map { $_->builtin } $obj->buckets;
+}
+
+sub hashed_builtins {
+    my $obj = shift;
+    my $hash = shift;
+    pairmap {
+	my($key) = $a =~ /^([-\w]+)/ or die;
+	$hash->{$key} = $b;
+	$a;
+    } $obj->builtins;
 }
 
 sub deal_with {
@@ -306,7 +318,6 @@ sub debug_argv {
     my $opt = ref $_[0] eq 'HASH' ? shift : {};
     my($before, $default, $working, $follow) = @_;
     my $color = $opt->{color} // 'R';
-    use List::Util qw(pairmap);
     printf STDERR
 	"\@ARGV = %s\n",
 	array_to_str(pairmap { $a ? colorize($b, array_to_str(@$a)) : () }
@@ -363,7 +374,9 @@ Getopt::EX::Loader - RC/Module loader
   $loader->deal_with(\@ARGV);
 
   my $parser = Getopt::Long::Parser->new;
-  $parser->getoptions( ... , $loader->builtins )
+  $parser->getoptions(... , $loader->builtins);
+    or
+  $parser->getoptions(\%hash, ... , $loader->hashed_builtins(\%hash));
 
 =head1 DESCRIPTION
 
@@ -382,6 +395,11 @@ are inserted to the arguments.
 Module can define built-in options which should be handled option
 parser.  They can be taken by C<builtins> method, so you should give
 them to option parser.
+
+If option values are stored in a hash, use C<hashed_builtins> with the
+hash reference.  Actually, C<builtins> works even for hash storage in
+the current version of B<Getopt::Long> module, but it is not
+documented.
 
 If C<App::example> is given as a C<BASECLASS> of the loader object, it
 is prepended to all module names.  So command line

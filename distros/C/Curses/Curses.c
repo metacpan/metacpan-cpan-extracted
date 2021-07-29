@@ -6,7 +6,7 @@
 **  or the GNU General Public License, as specified in the README file.
 */
 
-#define _XOPEN_SOURCE_EXTENDED  /* We expect wide character functions */
+#define _XOPEN_SOURCE_EXTENDED 1  /* We expect wide character functions */
 
 #include "CursesDef.h"
 #include "CursesTyp.h"

@@ -1,12 +1,12 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /Calendar/Indonesia/Holiday/is_idn_holiday
-# and generated automatically using Perinci::CmdLine::Gen version 0.497
+# and generated automatically using Perinci::CmdLine::Gen version 0.499
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-01-17'; # DATE
+our $DATE = '2021-07-24'; # DATE
 our $DIST = 'App-IndonesianHolidayUtils'; # DIST
-our $VERSION = '0.061'; # VERSION
+our $VERSION = '0.064'; # VERSION
 
 use 5.010001;
 use strict;
@@ -38,17 +38,13 @@ is-idn-holiday - Check whether a date is an Indonesian holiday
 
 =head1 VERSION
 
-This document describes version 0.061 of is-idn-holiday (from Perl distribution App-IndonesianHolidayUtils), released on 2021-01-17.
+This document describes version 0.064 of is-idn-holiday (from Perl distribution App-IndonesianHolidayUtils), released on 2021-07-24.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % is-idn-holiday [--day=s] [--detail] [--exclude-joint-leave]
-     [--format=name] [--include-joint-leave] [-j] [--json] [-l] [--month=s]
-     [--(no)naked-res] [--no-detail] [--no-quiet] [--no-reverse]
-     [--nodetail] [--noquiet] [--noreverse] [--page-result[=program]] [-q]
-     [--quiet] [-r] [--reverse] [--view-result[=program]] [--year=s] [date]
+% B<is-idn-holiday> [B<--day>=I<int>] [B<--detail>|B<-l>|B<--no-detail>|B<--nodetail>] [B<--format>=I<name>|B<--json>] [B<--include-joint-leave>|B<-j>|B<--exclude-joint-leave>] [B<--month>=I<int>] [B<--(no)naked-res>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] [B<--quiet>|B<-q>|B<--no-quiet>|B<--noquiet>] [B<--reverse>|B<-r>|B<--no-reverse>|B<--noreverse>] [B<--year>=I<int>] -- [I<date>]
 
 =head1 DESCRIPTION
 
@@ -75,6 +71,8 @@ C<*> marks required options.
 =over
 
 =item B<--date>=I<s>
+
+Can also be specified as the 1st command-line argument.
 
 =item B<--day>=I<s>
 
@@ -197,7 +195,7 @@ Source repository is at L<https://github.com/perlancar/perl-App-IndonesianHolida
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-App-IndonesianHolidayUtils/issues>
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-IndonesianHolidayUtils>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

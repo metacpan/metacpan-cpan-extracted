@@ -6,7 +6,7 @@
 # change 'tests => 1' to 'tests => last_test_to_print';
 
 use strict;
-use Test::More tests => 17;
+use Test::More tests => 20;
 require 't/test.pm';
 BEGIN { use_ok('Lemonldap::NG::Handler::Main::Jail') }
 
@@ -51,7 +51,16 @@ ok( ( defined($code) and ref($code) eq 'CODE' ),
     'listMatch function is defined' );
 ok( &$code eq '0', 'Get good result' );
 
-$sub  = "sub { return(checkDate('20000000000000','21000000000000')) }";
+$sub  = "sub { return(checkDate('20000101000000','21000101000000')) }";
+$code = $jail->jail_reval($sub);
+ok(
+    ( defined($code) and ref($code) eq 'CODE' ),
+    'checkDate extended function is defined'
+);
+ok( $res = &$code, "Function works" );
+ok( $res == 1, 'Get good result' );
+
+$sub  = "sub { return(checkDate('20000101000000+0100','21000101000000+0100')) }";
 $code = $jail->jail_reval($sub);
 ok(
     ( defined($code) and ref($code) eq 'CODE' ),

@@ -26,14 +26,12 @@ sub bundle_config {
         $plugin_name,
         $plugin_class,
         {
-            $code => [
-                sub {
-                    my ($self) = @_;
-                    $self->log($input);
-                    $RESULT = $input * $input;
-                    return;
-                },
-            ],
+            $code => sub {
+                my ($self) = @_;
+                $self->log($input);
+                $RESULT = $input * $input;
+                return;
+            },
         },
     ];
 }

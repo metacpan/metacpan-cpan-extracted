@@ -9,6 +9,7 @@ build_requires:
   Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
+  File::ShareDir::Install: '0.06'
 dynamic_config: 0
 generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
 license: perl
@@ -28,7 +29,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-hr
   homepage: https://metacpan.org/release/App-hr
   repository: git://github.com/perlancar/perl-App-hr.git
-version: '0.264'
+version: '0.266'
 x_Dist_Zilla:
   perl:
     version: '5.034000'
@@ -397,6 +398,10 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::UploadToCPAN::WWWPAUSESimple
       name: '@Author::PERLANCAR/UploadToCPAN::WWWPAUSESimple'
       version: '0.04'
+    -
+      class: Dist::Zilla::Plugin::InsertDistImage
+      name: InsertDistImage
+      version: '0.005'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:

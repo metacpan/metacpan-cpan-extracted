@@ -1,9 +1,9 @@
 package App::hr;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-07-08'; # DATE
+our $DATE = '2021-07-09'; # DATE
 our $DIST = 'App-hr'; # DIST
-our $VERSION = '0.264'; # VERSION
+our $VERSION = '0.266'; # VERSION
 
 use feature 'say';
 use strict 'subs', 'vars';
@@ -253,7 +253,7 @@ App::hr - Print horizontal bar on the terminal
 
 =head1 VERSION
 
-This document describes version 0.264 of App::hr (from Perl distribution App-hr), released on 2021-07-08.
+This document describes version 0.266 of App::hr (from Perl distribution App-hr), released on 2021-07-09.
 
 =head1 SYNOPSIS
 
@@ -278,11 +278,12 @@ Use random color and random pattern:
 
 You can also use the provided CLI L<hr>.
 
-=for Pod::Coverage ^(pick)$
+=head1 DESCRIPTION
 
-=head1 NO_COLOR
+A demo screencast:
 
-=head2 COLOR
+=for html <img src="https://st.aticpan.org/source/PERLANCAR/App-hr-0.266/share/images/screencast1.gif" />
+
 
 =head1 CONTRIBUTOR
 
@@ -418,7 +419,13 @@ that contains extra information, much like how HTTP response headers provide add
 
 Return value:  (any)
 
+=for Pod::Coverage ^(pick)$
+
 =head1 ENVIRONMENT
+
+=head2 NO_COLOR
+
+=head2 COLOR
 
 =head1 HOMEPAGE
 

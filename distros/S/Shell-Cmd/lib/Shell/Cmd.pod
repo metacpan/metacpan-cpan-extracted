@@ -1,4 +1,4 @@
-# Copyright (c) 2013-2018 Sullivan Beck. All rights reserved.
+# Copyright (c) 2013-2021 Sullivan Beck. All rights reserved.
 # This program is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 
@@ -31,7 +31,7 @@ run the shell command(s) for me with added functionality.
 
 This module is designed to take a list of shell commands and
 automatically turn them into a shell script (using only basic shell
-commands which are available in any bourne shell variation) which adds
+commands which are available in any bourne shell variant) which adds
 some common desirable functionality including:
 
 =over 4
@@ -715,10 +715,9 @@ Also, shell functions are not currently supported.
 When commands are run in the 'script' mode, the output is stored in the
 object.
 
-To access the output, use one of the following calls to the B<output>
-method:
+To access the output, use the following:
 
-   $obj->output(%options);
+   @out = $obj->output(%options);
 
 Each call to the method will return one part of the output.  To following
 options may be used to determine what is returned.

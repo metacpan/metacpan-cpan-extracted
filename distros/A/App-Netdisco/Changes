@@ -1,3 +1,28 @@
+2.047008 - 2021-07-21
+
+  [BUG FIXES]
+
+  * #767 reverted - circular dependency
+
+2.047007 - 2021-07-14
+
+  [BUG FIXES]
+
+  * #778 exec hooks were not configured to be high priority
+
+2.047006 - 2021-07-14
+
+  [ENHANCEMENTS]
+
+  * #782 Allow <"> in remote_port
+  * #775 include /contrib/raddb/* in distribution
+
+  [BUG FIXES]
+
+  * #784 empty device_skip table when also emptying job queue
+  * #788 use device.name instead of device.dns for pseudo devices
+  * #783 fix FQDN discovery in node monitor emails
+
 2.047005 - 2021-02-24
 
   [BUG FIXES]
@@ -673,7 +698,7 @@
 
   [NEW FEATURES]
 
-  * #401 Autodiscovery via EIGRP peers
+  * #401 Autodiscovery via EIGRP peers
 
   [BUG FIXES]
 
@@ -740,7 +765,7 @@
 
   [NEW FEATURES]
 
-  * #48 Node Monitor supports matching on OUI
+  * #48 Node Monitor supports matching on OUI
   * #31 configurable Free Time in Port Utilization Report
   * improvements to network map, location filtering and auto saving
 

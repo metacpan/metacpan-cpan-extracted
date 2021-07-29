@@ -6,7 +6,7 @@ use JSON qw(to_json from_json);
 BEGIN {
     require 't/test-lib.pm';
 }
-my $maintests = 63;
+my $maintests = 76;
 
 SKIP: {
     require Lemonldap::NG::Common::TOTP;
@@ -460,6 +460,108 @@ JjTJecOOS+88fK8qL1TrYv5rapIdqUI7aQ==
 
     $client->logout($id);
     $client->logout($id2);
+
+    ## Try to authenticate
+    ok( $res = $client->_get( '/', accept => 'text/html' ), 'Get Menu', );
+    ( $host, $url, $query ) =
+      expectForm( $res, '#', undef, 'user', 'password' );
+
+    $query =~ s/user=/user=dwho/;
+    $query =~ s/password=/password=dwho/;
+    ok(
+        $res = $client->_post(
+            '/',
+            IO::String->new($query),
+            length => length($query),
+            accept => 'text/html',
+        ),
+        'Auth query'
+    );
+    $id = expectCookie($res);
+    expectRedirection( $res, 'http://auth.example.com/' );
+
+    # Get Menu
+    # ------------------------
+    ok(
+        $res = $client->_get(
+            '/',
+            cookie => "lemonldap=$id",
+            accept => 'text/html'
+        ),
+        'Get Menu',
+    );
+    expectOK($res);
+    ok(
+        $res->[2]->[0] =~
+          m%<span trspan="connectedAs">Connected as</span> dwho%,
+        'Connected as dwho'
+    ) or print STDERR Dumper( $res->[2]->[0] );
+    expectAuthenticatedAs( $res, 'dwho' );
+    ok(
+        $res->[2]->[0] =~
+          m%<span trspan="contextSwitching_ON">contextSwitching_ON</span>%,
+        'contextSwitching allowed'
+    ) or print STDERR Dumper( $res->[2]->[0] );
+
+    # Try to switch context 'rtyler'
+    # ContextSwitching form
+    ok(
+        $res = $client->_get(
+            '/switchcontext',
+            cookie => "lemonldap=$id",
+            accept => 'text/html'
+        ),
+        'ContextSwitching form',
+    );
+
+    ( $host, $url, $query ) =
+      expectForm( $res, undef, '/switchcontext', 'spoofId' );
+    ok( $res->[2]->[0] =~ m%<span trspan="contextSwitching_ON">%,
+        'Found trspan="contextSwitching_ON"' )
+      or explain( $res->[2]->[0], 'trspan="contextSwitching_ON"' );
+
+    ## POST form
+    $query =~ s/spoofId=/spoofId=rtyler/;
+    ok(
+        $res = $client->_post(
+            '/switchcontext',
+            IO::String->new($query),
+            cookie => "lemonldap=$id",
+            length => length($query),
+            accept => 'text/html',
+        ),
+        'POST switchcontext'
+    );
+    expectRedirection( $res, 'http://auth.example.com/' );
+    $id2 = expectCookie($res);
+    ok(
+        $res = $client->_get(
+            '/',
+            cookie => "lemonldap=$id2",
+            accept => 'text/html'
+        ),
+        'Get Menu',
+    );
+    expectAuthenticatedAs( $res, 'rtyler' );
+    ok( $res->[2]->[0] =~ m%<span trspan="contextSwitching_OFF">%,
+        'Found trspan="contextSwitching_OFF"' )
+      or explain( $res->[2]->[0], 'trspan="contextSwitching_OFF"' );
+
+    # 2fregisters
+    ok(
+        $res = $client->_get(
+            '/2fregisters',
+            cookie => "lemonldap=$id2",
+            accept => 'text/html',
+        ),
+        'Form 2fregisters'
+    );
+    ok( $res->[2]->[0] =~ /<span id="msg" trspan="notAuthorized">/,
+        'Found choose 2F' )
+      or print STDERR Dumper( $res->[2]->[0] );
+    ok( $res->[2]->[0] !~ m%<span device=\'(TOTP|U2F)\' epoch=\'\d{10}\'%g,
+        'No 2F device found' )
+      or print STDERR Dumper( $res->[2]->[0] );
 }
 
 count($maintests);

@@ -1,4 +1,4 @@
-# Copyrights 2001-2020 by [Mark Overmeer <markov@cpan.org>].
+# Copyrights 2001-2021 by [Mark Overmeer <markov@cpan.org>].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.02.
@@ -8,7 +8,7 @@
 
 package Mail::Message::Field;
 use vars '$VERSION';
-$VERSION = '3.010';
+$VERSION = '3.011';
 
 use base 'Mail::Reporter';
 
@@ -25,7 +25,7 @@ my $default_wrap_length = 78;
 
 
 use overload
-    qq("") => sub { $_[0]->unfoldedBody }
+   qq("")  => sub { $_[0]->unfoldedBody }
  , '0+'    => sub { $_[0]->toInt || 0 }
  , bool    => sub {1}
  , cmp     => sub { $_[0]->unfoldedBody cmp "$_[1]" }

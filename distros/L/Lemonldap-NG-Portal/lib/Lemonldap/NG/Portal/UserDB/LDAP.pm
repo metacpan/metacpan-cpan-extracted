@@ -7,7 +7,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(PE_OK);
 
 extends 'Lemonldap::NG::Portal::Lib::LDAP';
 
-our $VERSION = '2.0.6';
+our $VERSION = '2.0.12';
 
 has ldapGroupAttributeNameSearch => (
     is      => 'rw',
@@ -50,7 +50,8 @@ sub setSessionInfo {
 
         $req->sessionInfo->{$k} = $value;
     }
-    PE_OK;
+
+    return PE_OK;
 }
 
 # Load all groups in $groups.
@@ -100,7 +101,8 @@ sub setGroups {
 
     $req->{sessionInfo}->{groups}  = $groups;
     $req->{sessionInfo}->{hGroups} = $hGroups;
-    PE_OK;
+
+    return PE_OK;
 }
 
 1;

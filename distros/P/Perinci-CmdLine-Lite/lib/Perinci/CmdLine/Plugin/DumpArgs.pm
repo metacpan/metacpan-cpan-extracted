@@ -1,9 +1,9 @@
 package Perinci::CmdLine::Plugin::DumpArgs;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-06-23'; # DATE
+our $DATE = '2021-07-11'; # DATE
 our $DIST = 'Perinci-CmdLine-Lite'; # DIST
-our $VERSION = '1.905'; # VERSION
+our $VERSION = '1.906'; # VERSION
 
 # IFUNBUILT
 # use strict;
@@ -45,7 +45,7 @@ Perinci::CmdLine::Plugin::DumpArgs
 
 =head1 VERSION
 
-This document describes version 1.905 of Perinci::CmdLine::Plugin::DumpArgs (from Perl distribution Perinci-CmdLine-Lite), released on 2021-06-23.
+This document describes version 1.906 of Perinci::CmdLine::Plugin::DumpArgs (from Perl distribution Perinci-CmdLine-Lite), released on 2021-07-11.
 
 =head1 SYNOPSIS
 
@@ -84,7 +84,7 @@ Source repository is at L<https://github.com/perlancar/perl-Perinci-CmdLine-Lite
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Perinci-CmdLine-Lite/issues>
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-CmdLine-Lite>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

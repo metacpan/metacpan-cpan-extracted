@@ -39,7 +39,7 @@ SKIP: {
 
         like(
             dies { $obj->cakes },
-            qr/can't locate object method/i,
+            qr/can't locate object method.*subclass.t/i,
             "bad element"
         );
 

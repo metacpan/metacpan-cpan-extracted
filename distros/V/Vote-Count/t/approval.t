@@ -190,7 +190,7 @@ subtest 'weighted approval' => sub {
           'CHOCOLATE' => 27.8,
           'CARAMEL' => .5,
   };
-  my $W2Result = $W2->Approval();
+  my $W2Result = $W2->approval();
   is_deeply( $W2Result->RawCount(), $W2Expect,
     'Assigned Floating Point weights to data2' );
   is( $W2Result->Leader()->{'winner'}, 'VANILLA', 'picked winner with float weights.');

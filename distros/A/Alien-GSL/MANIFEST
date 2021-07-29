@@ -1,3 +1,4 @@
+.gitattributes
 .github/workflows/linux.yml
 _alien/state.json
 alienfile

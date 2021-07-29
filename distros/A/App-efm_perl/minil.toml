@@ -1,0 +1,9 @@
+name = 'App-efm_perl'
+readme_from = 'script/efm-perl'
+license = 'mit'
+module_maker = 'ModuleBuildTiny'
+static_install = 'auto'
+badges = ['github-actions']
+
+[release]
+pause_config = '/Users/jinnouchi.yasushi/.config/.pause'

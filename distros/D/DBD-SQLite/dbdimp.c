@@ -239,11 +239,11 @@ void
 init_cxt() {
     dTHX;
     MY_CXT_INIT;
-    MY_CXT.last_dbh_is_unicode = 0;
+    MY_CXT.last_dbh_string_mode = DBD_SQLITE_STRING_MODE_PV;
 }
 
 SV *
-stacked_sv_from_sqlite3_value(pTHX_ sqlite3_value *value, int is_unicode)
+stacked_sv_from_sqlite3_value(pTHX_ sqlite3_value *value, dbd_sqlite_string_mode_t string_mode)
 {
     STRLEN len;
     sqlite_int64 iv;
@@ -271,9 +271,7 @@ stacked_sv_from_sqlite3_value(pTHX_ sqlite3_value *value, int is_unicode)
     case SQLITE_TEXT:
         len = sqlite3_value_bytes(value);
         sv = newSVpvn((const char *)sqlite3_value_text(value), len);
-        if (is_unicode) {
-            SvUTF8_on(sv);
-        }
+        DBD_SQLITE_UTF8_DECODE_IF_NEEDED(sv, string_mode);
         return sv_2mortal(sv);
     case SQLITE_BLOB:
         len = sqlite3_value_bytes(value);
@@ -296,6 +294,7 @@ sqlite_set_result(pTHX_ sqlite3_context *context, SV *result, int is_error)
     sqlite3_int64 iv;
     AV *av;
     SV *result2, *type;
+    SV **presult2, **ptype;
 
     if ( is_error ) {
         s = SvPV(result, len);
@@ -309,8 +308,10 @@ sqlite_set_result(pTHX_ sqlite3_context *context, SV *result, int is_error)
     } else if( SvROK(result) && SvTYPE(SvRV(result)) == SVt_PVAV ) {
         av = (AV*)SvRV(result);
         if ( av_len(av) == 1 ) {
-            result2 = av_shift(av);
-            type    = av_shift(av);
+            presult2 = av_fetch(av, 0, 0);
+            ptype    = av_fetch(av, 1, 0);
+            result2 = presult2 ? *presult2 : &PL_sv_undef;
+            type    = ptype ? *ptype : &PL_sv_undef;
             if ( SvIOK(type) ) {
                 switch(sqlite_type_from_odbc_type(SvIV(type))) {
                     case SQLITE_INTEGER:
@@ -404,7 +405,11 @@ sqlite_is_number(pTHX_ const char *v, int sql_type)
         if (!_sqlite_atoi64(v, &iv)) return 1;
     }
     if (sql_type != SQLITE_INTEGER) {
-        sprintf(format, (has_plus ? "+%%.%df" : "%%.%df"), precision);
+#ifdef USE_QUADMATH
+        sprintf(format, (has_plus ? "+%%.%dQf" : "%%.%dQf"), precision);
+#else
+        sprintf(format, (has_plus ? "+%%.%df"  : "%%.%df" ), precision);
+#endif
         if (strEQ(form(format, atof(v)), v)) return 2;
     }
     return 0;
@@ -428,6 +433,44 @@ sqlite_discon_all(SV *drh, imp_drh_t *imp_drh)
     return FALSE; /* no way to do this */
 }
 
+#define _croak_invalid_value(name, value) \
+    croak("Invalid value (%s) given for %s", value, name);
+
+/* Like SvUV but croaks on anything other than an unsigned int. */
+static inline int
+my_SvUV_strict(pTHX_ SV *input, const char* name)
+{
+    if (SvUOK(input)) {
+        return SvUV(input);
+    }
+
+    const char* pv = SvPVbyte_nolen(input);
+
+    UV uv;
+    int numtype = grok_number(pv, strlen(pv), &uv);
+
+    /* Anything else is invalid: */
+    if (numtype != IS_NUMBER_IN_UV) _croak_invalid_value(name, pv);
+
+    return uv;
+}
+
+static inline dbd_sqlite_string_mode_t
+_extract_sqlite_string_mode_from_sv( pTHX_ SV* input )
+{
+    if (SvOK(input)) {
+        UV val = my_SvUV_strict(aTHX_ input, "sqlite_string_mode");
+
+        if (val >= _DBD_SQLITE_STRING_MODE_COUNT) {
+            _croak_invalid_value("sqlite_string_mode", SvPVbyte_nolen(input));
+        }
+
+        return val;
+    }
+
+    return DBD_SQLITE_STRING_MODE_PV;
+}
+
 int
 sqlite_db_login6(SV *dbh, imp_dbh_t *imp_dbh, char *dbname, char *user, char *pass, SV *attr)
 {
@@ -437,7 +480,7 @@ sqlite_db_login6(SV *dbh, imp_dbh_t *imp_dbh, char *dbname, char *user, char *pa
     SV **val;
     int extended = 0;
     int flag = 0;
-    int unicode = 0;
+    dbd_sqlite_string_mode_t string_mode = DBD_SQLITE_STRING_MODE_PV;
 
     sqlite_trace(dbh, imp_dbh, 3, form("login '%s' (version %s)", dbname, sqlite3_version));
 
@@ -460,13 +503,24 @@ sqlite_db_login6(SV *dbh, imp_dbh_t *imp_dbh, char *dbname, char *user, char *pa
                 hv_stores(hv, "ReadOnly", newSViv(1));
             }
         }
-        /* sqlite_unicode should be detected earlier, to register default functions correctly */
-        if (hv_exists(hv, "sqlite_unicode", 14)) {
+
+        /* sqlite_string_mode should be detected earlier, to register default functions correctly */
+
+        SV** string_mode_svp = hv_fetchs(hv, "sqlite_string_mode", 0);
+        if (string_mode_svp != NULL && SvOK(*string_mode_svp)) {
+            string_mode = _extract_sqlite_string_mode_from_sv(aTHX_ *string_mode_svp);
+
+        /* Legacy alternatives to sqlite_string_mode: */
+        } else if (hv_exists(hv, "sqlite_unicode", 14)) {
             val = hv_fetch(hv, "sqlite_unicode", 14, 0);
-            unicode = (val && SvOK(*val)) ? SvIV(*val) : 0;
+            if ( (val && SvOK(*val)) ? SvIV(*val) : 0 ) {
+                string_mode = DBD_SQLITE_STRING_MODE_UNICODE_NAIVE;
+            }
         } else if (hv_exists(hv, "unicode", 7)) {
             val = hv_fetch(hv, "unicode", 7, 0);
-            unicode = (val && SvOK(*val)) ? SvIV(*val) : 0;
+            if ( (val && SvOK(*val)) ? SvIV(*val) : 0 ) {
+                string_mode = DBD_SQLITE_STRING_MODE_UNICODE_NAIVE;
+            }
         }
     }
     rc = sqlite_open2(dbname, &(imp_dbh->db), flag, extended);
@@ -475,7 +529,7 @@ sqlite_db_login6(SV *dbh, imp_dbh_t *imp_dbh, char *dbname, char *user, char *pa
     }
     DBIc_IMPSET_on(imp_dbh);
 
-    imp_dbh->unicode                   = unicode;
+    imp_dbh->string_mode               = string_mode;
     imp_dbh->functions                 = newAV();
     imp_dbh->aggregates                = newAV();
     imp_dbh->collation_needed_callback = newSVsv( &PL_sv_undef );
@@ -543,9 +597,7 @@ sqlite_db_do_sv(SV *dbh, imp_dbh_t *imp_dbh, SV *sv_statement)
     }
 
     /* sqlite3_prepare wants an utf8-encoded SQL statement */
-    if (imp_dbh->unicode) {
-        sv_utf8_upgrade(sv_statement);
-    }
+    DBD_SQLITE_PREP_SV_FOR_SQLITE(sv_statement, imp_dbh->string_mode);
 
     statement = SvPV_nolen(sv_statement);
 
@@ -732,6 +784,10 @@ sqlite_db_destroy(SV *dbh, imp_dbh_t *imp_dbh)
     DBIc_IMPSET_off(imp_dbh);
 }
 
+#define _warn_deprecated_if_possible(old, new) \
+    if (DBIc_has(imp_dbh, DBIcf_WARN)) \
+        warn("\"%s\" attribute will be deprecated. Use \"%s\" instead.", old, new);
+
 int
 sqlite_db_STORE_attrib(SV *dbh, imp_dbh_t *imp_dbh, SV *keysv, SV *valuesv)
 {
@@ -784,26 +840,33 @@ sqlite_db_STORE_attrib(SV *dbh, imp_dbh_t *imp_dbh, SV *keysv, SV *valuesv)
         imp_dbh->prefer_numeric_type = !(! SvTRUE(valuesv));
         return TRUE;
     }
-    if (strEQ(key, "sqlite_unicode")) {
+
+    if (strEQ(key, "sqlite_string_mode")) {
+        dbd_sqlite_string_mode_t string_mode = _extract_sqlite_string_mode_from_sv(aTHX_ valuesv);
+
+#if PERL_UNICODE_DOES_NOT_WORK_WELL
+        if (string_mode & DBD_SQLITE_STRING_MODE_UNICODE_ANY) {
+            sqlite_trace(dbh, imp_dbh, 3, form("Unicode support is disabled for this version of perl."));
+            string_mode = DBD_SQLITE_STRING_MODE_PV;
+        }
+#endif
+
+        imp_dbh->string_mode = string_mode;
+
+        return TRUE;
+    }
+
+    if (strEQ(key, "sqlite_unicode") || strEQ(key, "unicode")) {
+        _warn_deprecated_if_possible(key, "sqlite_string_mode");
 #if PERL_UNICODE_DOES_NOT_WORK_WELL
         sqlite_trace(dbh, imp_dbh, 3, form("Unicode support is disabled for this version of perl."));
-        imp_dbh->unicode = 0;
+        imp_dbh->string_mode = DBD_SQLITE_STRING_MODE_PV;
 #else
-        imp_dbh->unicode = !(! SvTRUE(valuesv));
+        imp_dbh->string_mode = SvTRUE(valuesv) ? DBD_SQLITE_STRING_MODE_UNICODE_NAIVE : DBD_SQLITE_STRING_MODE_PV;
 #endif
         return TRUE;
     }
-    if (strEQ(key, "unicode")) {
-        if (DBIc_has(imp_dbh, DBIcf_WARN))
-            warn("\"unicode\" attribute will be deprecated. Use \"sqlite_unicode\" instead.");
-#if PERL_UNICODE_DOES_NOT_WORK_WELL
-        sqlite_trace(dbh, imp_dbh, 3, form("Unicode support is disabled for this version of perl."));
-        imp_dbh->unicode = 0;
-#else
-        imp_dbh->unicode = !(! SvTRUE(valuesv));
-#endif
-        return TRUE;
-    }
+
     return FALSE;
 }
 
@@ -831,22 +894,18 @@ sqlite_db_FETCH_attrib(SV *dbh, imp_dbh_t *imp_dbh, SV *keysv)
    if (strEQ(key, "sqlite_prefer_numeric_type")) {
        return sv_2mortal(newSViv(imp_dbh->prefer_numeric_type ? 1 : 0));
    }
-   if (strEQ(key, "sqlite_unicode")) {
-#if PERL_UNICODE_DOES_NOT_WORK_WELL
-       sqlite_trace(dbh, imp_dbh, 3, "Unicode support is disabled for this version of perl.");
-       return sv_2mortal(newSViv(0));
-#else
-       return sv_2mortal(newSViv(imp_dbh->unicode ? 1 : 0));
-#endif
+
+   if (strEQ(key, "sqlite_string_mode")) {
+       return sv_2mortal(newSVuv(imp_dbh->string_mode));
    }
-   if (strEQ(key, "unicode")) {
-        if (DBIc_has(imp_dbh, DBIcf_WARN))
-            warn("\"unicode\" attribute will be deprecated. Use \"sqlite_unicode\" instead.");
+
+   if (strEQ(key, "sqlite_unicode") || strEQ(key, "unicode")) {
+        _warn_deprecated_if_possible(key, "sqlite_string_mode");
 #if PERL_UNICODE_DOES_NOT_WORK_WELL
        sqlite_trace(dbh, imp_dbh, 3, "Unicode support is disabled for this version of perl.");
        return sv_2mortal(newSViv(0));
 #else
-       return sv_2mortal(newSViv(imp_dbh->unicode ? 1 : 0));
+       return sv_2mortal(newSViv(imp_dbh->string_mode == DBD_SQLITE_STRING_MODE_UNICODE_NAIVE ? 1 : 0));
 #endif
    }
 
@@ -879,7 +938,7 @@ sqlite_st_prepare_sv(SV *sth, imp_sth_t *imp_sth, SV *sv_statement, SV *attribs)
     stmt_list_s * new_stmt;
     D_imp_dbh_from_sth;
 
-    MY_CXT.last_dbh_is_unicode = imp_dbh->unicode;
+    MY_CXT.last_dbh_string_mode = imp_dbh->string_mode;
 
     if (!DBIc_ACTIVE(imp_dbh)) {
         sqlite_error(sth, -2, "attempt to prepare on inactive database handle");
@@ -887,9 +946,7 @@ sqlite_st_prepare_sv(SV *sth, imp_sth_t *imp_sth, SV *sv_statement, SV *attribs)
     }
 
     /* sqlite3_prepare wants an utf8-encoded SQL statement */
-    if (imp_dbh->unicode) {
-        sv_utf8_upgrade(sv_statement);
-    }
+    DBD_SQLITE_PREP_SV_FOR_SQLITE(sv_statement, imp_dbh->string_mode);
 
     statement = SvPV_nolen(sv_statement);
 
@@ -1003,10 +1060,15 @@ sqlite_st_execute(SV *sth, imp_sth_t *imp_sth)
             const char *data;
             int numtype = 0;
 
-            if (imp_dbh->unicode) {
-                sv_utf8_upgrade(value);
+            if (imp_dbh->string_mode & DBD_SQLITE_STRING_MODE_UNICODE_ANY) {
+                data = SvPVutf8(value, len);
             }
-            data = SvPV(value, len);
+            else if (imp_dbh->string_mode == DBD_SQLITE_STRING_MODE_BYTES) {
+                data = SvPVbyte(value, len);
+            }
+            else {
+                data = SvPV(value, len);
+            }
 
             /*
              *  XXX: For backward compatibility, it'd be better to
@@ -1217,11 +1279,9 @@ sqlite_st_fetch(SV *sth, imp_sth_t *imp_sth)
                     }
                 }
                 sv_setpvn(AvARRAY(av)[i], val, len);
-                if (imp_dbh->unicode) {
-                    SvUTF8_on(AvARRAY(av)[i]);
-                } else {
-                    SvUTF8_off(AvARRAY(av)[i]);
-                }
+
+                DBD_SQLITE_UTF8_DECODE_IF_NEEDED(AvARRAY(av)[i], imp_dbh->string_mode);
+
                 break;
             case SQLITE_BLOB:
                 sqlite_trace(sth, imp_sth, 5, form("fetch column %d as blob", i));
@@ -1393,8 +1453,9 @@ sqlite_st_FETCH_attrib(SV *sth, imp_sth_t *imp_sth, SV *keysv)
                 /* if (dot)  drop table name from field name */
                 /*    fieldname = ++dot;     */
                 SV *sv_fieldname = newSVpv(fieldname, 0);
-                if (imp_dbh->unicode)
-                    SvUTF8_on(sv_fieldname);
+
+                DBD_SQLITE_UTF8_DECODE_IF_NEEDED(sv_fieldname, imp_dbh->string_mode);
+
                 av_store(av, n, sv_fieldname);
             }
         }
@@ -1688,7 +1749,7 @@ sqlite_db_busy_timeout(pTHX_ SV *dbh, SV *timeout )
 }
 
 static void
-sqlite_db_func_dispatcher(int is_unicode, sqlite3_context *context, int argc, sqlite3_value **value)
+sqlite_db_func_dispatcher(dbd_sqlite_string_mode_t string_mode, sqlite3_context *context, int argc, sqlite3_value **value)
 {
     dTHX;
     dSP;
@@ -1703,7 +1764,7 @@ sqlite_db_func_dispatcher(int is_unicode, sqlite3_context *context, int argc, sq
 
     PUSHMARK(SP);
     for ( i=0; i < argc; i++ ) {
-        XPUSHs(stacked_sv_from_sqlite3_value(aTHX_ value[i], is_unicode));
+        XPUSHs(stacked_sv_from_sqlite3_value(aTHX_ value[i], string_mode));
     }
     PUTBACK;
 
@@ -1734,16 +1795,45 @@ sqlite_db_func_dispatcher(int is_unicode, sqlite3_context *context, int argc, sq
 }
 
 static void
-sqlite_db_func_dispatcher_unicode(sqlite3_context *context, int argc, sqlite3_value **value)
+sqlite_db_func_dispatcher_unicode_naive(sqlite3_context *context, int argc, sqlite3_value **value)
 {
-    sqlite_db_func_dispatcher(1, context, argc, value);
+    sqlite_db_func_dispatcher(DBD_SQLITE_STRING_MODE_UNICODE_NAIVE, context, argc, value);
 }
 
 static void
-sqlite_db_func_dispatcher_no_unicode(sqlite3_context *context, int argc, sqlite3_value **value)
+sqlite_db_func_dispatcher_unicode_fallback(sqlite3_context *context, int argc, sqlite3_value **value)
 {
-    sqlite_db_func_dispatcher(0, context, argc, value);
+    sqlite_db_func_dispatcher(DBD_SQLITE_STRING_MODE_UNICODE_FALLBACK, context, argc, value);
 }
+
+static void
+sqlite_db_func_dispatcher_unicode_strict(sqlite3_context *context, int argc, sqlite3_value **value)
+{
+    sqlite_db_func_dispatcher(DBD_SQLITE_STRING_MODE_UNICODE_STRICT, context, argc, value);
+}
+
+static void
+sqlite_db_func_dispatcher_bytes(sqlite3_context *context, int argc, sqlite3_value **value)
+{
+    sqlite_db_func_dispatcher(DBD_SQLITE_STRING_MODE_BYTES, context, argc, value);
+}
+
+static void
+sqlite_db_func_dispatcher_pv(sqlite3_context *context, int argc, sqlite3_value **value)
+{
+    sqlite_db_func_dispatcher(DBD_SQLITE_STRING_MODE_PV, context, argc, value);
+}
+
+typedef void (*dispatch_func_t)(sqlite3_context*, int, sqlite3_value**);
+
+static dispatch_func_t _FUNC_DISPATCHER[_DBD_SQLITE_STRING_MODE_COUNT] = {
+    sqlite_db_func_dispatcher_pv,
+    sqlite_db_func_dispatcher_bytes,
+    NULL, NULL,
+    sqlite_db_func_dispatcher_unicode_naive,
+    sqlite_db_func_dispatcher_unicode_fallback,
+    sqlite_db_func_dispatcher_unicode_strict,
+};
 
 int
 sqlite_db_create_function(pTHX_ SV *dbh, const char *name, int argc, SV *func, int flags)
@@ -1766,8 +1856,7 @@ sqlite_db_create_function(pTHX_ SV *dbh, const char *name, int argc, SV *func, i
     /* warn("create_function %s with %d args\n", name, argc); */
     rc = sqlite3_create_function( imp_dbh->db, name, argc, SQLITE_UTF8|flags,
                                   func_sv,
-                                  imp_dbh->unicode ? sqlite_db_func_dispatcher_unicode
-                                                   : sqlite_db_func_dispatcher_no_unicode,
+                                  _FUNC_DISPATCHER[imp_dbh->string_mode],
                                   NULL, NULL );
     if ( rc != SQLITE_OK ) {
         sqlite_error(dbh, rc, form("sqlite_create_function failed with error %s", sqlite3_errmsg(imp_dbh->db)));
@@ -1932,7 +2021,7 @@ sqlite_db_aggr_step_dispatcher(sqlite3_context *context,
 {
     dTHX;
     dSP;
-    int i, is_unicode = 0;  /* TODO : find out from db handle */
+    int i, string_mode = DBD_SQLITE_STRING_MODE_PV;  /* TODO : find out from db handle */
     aggrInfo *aggr;
 
     aggr = sqlite3_aggregate_context(context, sizeof (aggrInfo));
@@ -1954,7 +2043,7 @@ sqlite_db_aggr_step_dispatcher(sqlite3_context *context,
     PUSHMARK(SP);
     XPUSHs( sv_2mortal( newSVsv( aggr->aggr_inst ) ));
     for ( i=0; i < argc; i++ ) {
-        XPUSHs(stacked_sv_from_sqlite3_value(aTHX_ value[i], is_unicode));
+        XPUSHs(stacked_sv_from_sqlite3_value(aTHX_ value[i], string_mode));
     }
     PUTBACK;
 
@@ -2070,70 +2159,77 @@ sqlite_db_create_aggregate(pTHX_ SV *dbh, const char *name, int argc, SV *aggr_p
     return TRUE;
 }
 
+#define SQLITE_DB_COLLATION_BASE(func, sv1, sv2) STMT_START { \
+    int cmp = 0;                        \
+    int n_retval, i;                    \
+                                        \
+    ENTER;                              \
+    SAVETMPS;                           \
+    PUSHMARK(SP);                       \
+    XPUSHs( sv_2mortal( sv1 ) );        \
+    XPUSHs( sv_2mortal( sv2 ) );        \
+    PUTBACK;                            \
+    n_retval = call_sv(func, G_SCALAR); \
+    SPAGAIN;                            \
+    if (n_retval != 1) {                \
+        warn("collation function returned %d arguments", n_retval); \
+    }                                   \
+    for(i = 0; i < n_retval; i++) {     \
+        cmp = POPi;                     \
+    }                                   \
+    PUTBACK;                            \
+    FREETMPS;                           \
+    LEAVE;                              \
+                                        \
+    return cmp;                         \
+} STMT_END
+
 int
 sqlite_db_collation_dispatcher(void *func, int len1, const void *string1,
                                            int len2, const void *string2)
 {
     dTHX;
     dSP;
-    int cmp = 0;
-    int n_retval, i;
 
-    ENTER;
-    SAVETMPS;
-    PUSHMARK(SP);
-    XPUSHs( sv_2mortal( newSVpvn( string1, len1) ) );
-    XPUSHs( sv_2mortal( newSVpvn( string2, len2) ) );
-    PUTBACK;
-    n_retval = call_sv(func, G_SCALAR);
-    SPAGAIN;
-    if (n_retval != 1) {
-        warn("collation function returned %d arguments", n_retval);
-    }
-    for(i = 0; i < n_retval; i++) {
-        cmp = POPi;
-    }
-    PUTBACK;
-    FREETMPS;
-    LEAVE;
-
-    return cmp;
+    SQLITE_DB_COLLATION_BASE(func, newSVpvn( string1, len1), newSVpvn( string2, len2));
 }
 
 int
-sqlite_db_collation_dispatcher_utf8(void *func, int len1, const void *string1,
+sqlite_db_collation_dispatcher_utf8_naive(void *func, int len1, const void *string1,
                                                 int len2, const void *string2)
 {
     dTHX;
     dSP;
-    int cmp = 0;
-    int n_retval, i;
-    SV *sv1, *sv2;
 
-    ENTER;
-    SAVETMPS;
-    PUSHMARK(SP);
-    sv1 = newSVpvn(string1, len1);
-    SvUTF8_on(sv1);
-    sv2 = newSVpvn(string2, len2);
-    SvUTF8_on(sv2);
-    XPUSHs( sv_2mortal( sv1 ) );
-    XPUSHs( sv_2mortal( sv2 ) );
-    PUTBACK;
-    n_retval = call_sv(func, G_SCALAR);
-    SPAGAIN;
-    if (n_retval != 1) {
-        warn("collation function returned %d arguments", n_retval);
-    }
-    for(i = 0; i < n_retval; i++) {
-        cmp = POPi;
-    }
-    PUTBACK;
-    FREETMPS;
-    LEAVE;
-
-    return cmp;
+    SQLITE_DB_COLLATION_BASE(func, newSVpvn_flags( string1, len1, SVf_UTF8), newSVpvn_flags( string2, len2, SVf_UTF8));
 }
+
+int
+sqlite_db_collation_dispatcher_utf8_fallback(void *func, int len1, const void *string1,
+                                                int len2, const void *string2)
+{
+    dTHX;
+    dSP;
+
+    SV* sv1 = newSVpvn( string1, len1);
+    SV* sv2 = newSVpvn( string2, len2);
+
+    DBD_SQLITE_UTF8_DECODE_WITH_FALLBACK(sv1);
+    DBD_SQLITE_UTF8_DECODE_WITH_FALLBACK(sv2);
+
+    SQLITE_DB_COLLATION_BASE(func, sv1, sv2);
+}
+
+typedef int (*collation_dispatch_func_t)(void *, int, const void *, int, const void *);
+
+static collation_dispatch_func_t _COLLATION_DISPATCHER[_DBD_SQLITE_STRING_MODE_COUNT] = {
+    sqlite_db_collation_dispatcher,
+    sqlite_db_collation_dispatcher,
+    NULL, NULL,
+    sqlite_db_collation_dispatcher_utf8_naive,
+    sqlite_db_collation_dispatcher_utf8_fallback,
+    sqlite_db_collation_dispatcher_utf8_fallback,
+};
 
 int
 sqlite_db_create_collation(pTHX_ SV *dbh, const char *name, SV *func)
@@ -2170,8 +2266,7 @@ sqlite_db_create_collation(pTHX_ SV *dbh, const char *name, SV *func)
     rv = sqlite3_create_collation(
         imp_dbh->db, name, SQLITE_UTF8,
         func_sv,
-        imp_dbh->unicode ? sqlite_db_collation_dispatcher_utf8
-                         : sqlite_db_collation_dispatcher
+        _COLLATION_DISPATCHER[imp_dbh->string_mode]
       );
 
     if ( rv != SQLITE_OK ) {
@@ -2842,6 +2937,21 @@ sqlite_db_get_autocommit(pTHX_ SV *dbh)
 {
     D_imp_dbh(dbh);
     return sqlite3_get_autocommit(imp_dbh->db);
+}
+
+int
+sqlite_db_txn_state(pTHX_ SV *dbh, SV *schema)
+{
+#if SQLITE_VERSION_NUMBER >= 3034000
+    D_imp_dbh(dbh);
+    if (SvOK(schema) && SvPOK(schema)) {
+        return sqlite3_txn_state(imp_dbh->db, SvPV_nolen(schema));
+    } else {
+        return sqlite3_txn_state(imp_dbh->db, NULL);
+    }
+#else
+    return -1;
+#endif
 }
 
 #include "dbdimp_tokenizer.inc"

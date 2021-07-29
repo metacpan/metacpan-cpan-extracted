@@ -1,0 +1,41 @@
+---
+abstract: "It's new $module"
+author:
+  - 'delphinus <me@delphinus.dev>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.12, CPAN::Meta::Converter version 2.150010'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-efm_perl
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  App::efm_perl:
+    file: lib/App/efm_perl.pm
+    version: v1.0.0
+requires:
+  File::Temp: '0'
+  Getopt::Long: '0'
+  Pod::Usage: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/delphinus/p5-App-efm_perl/issues
+  homepage: https://github.com/delphinus/p5-App-efm_perl
+  repository: git://github.com/delphinus/p5-App-efm_perl.git
+version: 1.0.0
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

@@ -6,7 +6,7 @@ use JSON qw(to_json from_json);
 BEGIN {
     require 't/test-lib.pm';
 }
-my $maintests = 64;
+my $maintests = 88;
 
 SKIP: {
     require Lemonldap::NG::Common::TOTP;
@@ -133,6 +133,7 @@ SKIP: {
     ok( $res->{result} == 1, 'TOTP is registered' );
 
     ## Try to register an U2F key
+    Time::Fake->offset("+3s");
     ok(
         $res = $client->_get(
             '/2fregisters/u',
@@ -278,6 +279,26 @@ JjTJecOOS+88fK8qL1TrYv5rapIdqUI7aQ==
     expectOK($res);
     expectAuthenticatedAs( $res, 'rtyler' );
 
+    # 2fregisters
+    ok(
+        $res = $client->_get(
+            '/2fregisters',
+            cookie => "lemonldap=$id",
+            accept => 'text/html',
+        ),
+        'Form 2fregisters'
+    );
+    ok( $res->[2]->[0] =~ /<span id="msg" trspan="choose2f">/,
+        'Found choose 2F' )
+      or print STDERR Dumper( $res->[2]->[0] );
+    my $devices;
+    ok(
+        $devices = $res->[2]->[0] =~ s%<span device=\'(?:TOTP|U2F)\' epoch=\'\d{10}\'%%g,
+        '2F device found'
+    ) or print STDERR Dumper( $res->[2]->[0] );
+    ok( $devices == 2, '2F devices found' )
+      or explain( $devices, '2F devices registered' );
+
     # Try to switch context 'dwho'
     # ContextSwitching form
     ok(
@@ -321,25 +342,8 @@ JjTJecOOS+88fK8qL1TrYv5rapIdqUI7aQ==
     ok( $res->[2]->[0] =~ m%<span trspan="contextSwitching_OFF">%,
         'Found trspan="contextSwitching_OFF"' )
       or explain( $res->[2]->[0], 'trspan="contextSwitching_OFF"' );
-
-    # 2fregisters
-    ok(
-        $res = $client->_get(
-            '/2fregisters',
-            cookie => "lemonldap=$id2",
-            accept => 'text/html',
-        ),
-        'Form 2fregisters'
-    );
-    ok( $res->[2]->[0] =~ /<span id="msg" trspan="choose2f">/,
-        'Found choose 2F' )
-      or print STDERR Dumper( $res->[2]->[0] );
-    my $devices;
-    ok( $devices = $res->[2]->[0] =~ s%<span device=\'(TOTP|U2F)\' epoch=\'\d{10}\'%%g,
-        '2F devices found' )
-      or print STDERR Dumper( $res->[2]->[0] );
-    ok( $devices == 2, 'two 2F devices found' )
-      or explain( $devices, 'Two 2F devices registered' );
+    ok( $id2 ne $id, 'New SSO session created' )
+      or explain( $id2, 'New SSO session created' );
 
     ## Try to register a TOTP
     # TOTP form
@@ -351,9 +355,7 @@ JjTJecOOS+88fK8qL1TrYv5rapIdqUI7aQ==
         ),
         'Form registration'
     );
-    ok( $res->[2]->[0] =~ /totpregistration\.(?:min\.)?js/, 'Found TOTP js' )
-      or print STDERR Dumper( $res->[2]->[0] );
-
+    ok( $res->[2]->[0] =~ /totpregistration\.(?:min\.)?js/, 'Found TOTP js' );
     ok(
         $res->[2]->[0] =~ qr%<img src="/static/common/logos/logo_llng_old.png"%,
         'Found custom Main Logo'
@@ -371,28 +373,18 @@ JjTJecOOS+88fK8qL1TrYv5rapIdqUI7aQ==
     eval { $res = JSON::from_json( $res->[2]->[0] ) };
     ok( not($@), 'Content is JSON' )
       or explain( $res->[2]->[0], 'JSON content' );
-    ok( $res->{error} eq 'totpExistingKey', 'TOTP already registered' )
-      or explain( $res, 'Bad result' );
+    ok( $key   = $res->{secret}, 'Found secret' ) or print STDERR Dumper($res);
+    ok( $token = $res->{token},  'Found token' )  or print STDERR Dumper($res);
+    ok( $res->{user} eq 'dwho', 'Found user' )
+      or print STDERR Dumper($res);
+    $key = Convert::Base32::decode_base32($key);
 
-    # Try to unregister TOTP
-    ok(
-        $res = $client->_post(
-            '/2fregisters/totp/delete',
-            IO::String->new("epoch=1234567890"),
-            length => 16,
-            cookie => "lemonldap=$id2",
-        ),
-        'Delete TOTP query'
-    );
-    eval { $data = JSON::from_json( $res->[2]->[0] ) };
-    ok( not($@), ' Content is JSON' )
-      or explain( [ $@, $res->[2] ], 'JSON content' );
-    ok(
-        $data->{error} eq '2FDeviceNotFound', '2F device not found'
-    ) or explain( $data, 'Bad result' );
-
-    # Try to verify TOTP
-    $s = "code=123456&token=1234567890&TOTPName=myTOTP";
+    # Post code
+    ok( $code = Lemonldap::NG::Common::TOTP::_code( undef, $key, 0, 30, 6 ),
+        'Code' );
+    ok( $code =~ /^\d{6}$/, 'Code contains 6 digits' );
+    my $s     = "code=$code&token=$token&TOTPName=myTOTP";
+    my $epoch = time();
     ok(
         $res = $client->_post(
             '/2fregisters/totp/verify',
@@ -402,61 +394,199 @@ JjTJecOOS+88fK8qL1TrYv5rapIdqUI7aQ==
         ),
         'Post code'
     );
-    eval { $data = JSON::from_json( $res->[2]->[0] ) };
-    ok( not($@), ' Content is JSON' )
-      or explain( [ $@, $res->[2] ], 'JSON content' );
-    ok( $data->{error} eq 'PE82', 'PE82' )
-      or explain( $data, 'Bad result' );
+    eval { $res = JSON::from_json( $res->[2]->[0] ) };
+    ok( not($@), 'Content is JSON' )
+      or explain( $res->[2]->[0], 'JSON content' );
+    ok( $res->{result} == 1, 'TOTP is registered' );
 
-    ## Try to register an U2F key
-    # U2F form
+    # 2fregisters
     ok(
         $res = $client->_get(
-            '/2fregisters/u',
+            '/2fregisters',
             cookie => "lemonldap=$id2",
             accept => 'text/html',
         ),
-        'Form registration'
+        'Form 2fregisters'
     );
-    ok( $res->[2]->[0] =~ /u2fregistration\.(?:min\.)?js/, 'Found U2F js' );
+    ok( $res->[2]->[0] =~ /<span id="msg" trspan="choose2f">/,
+        'Found choose 2F' )
+      or print STDERR Dumper( $res->[2]->[0] );
+    my $devices;
     ok(
-        $res->[2]->[0] =~ qr%<img src="/static/common/logos/logo_llng_old.png"%,
-        'Found custom Main Logo'
+        $devices = $res->[2]->[0] =~ s%<span device=\'TOTP\' epoch=\'\d{10}\'%%g,
+        '2F device found'
     ) or print STDERR Dumper( $res->[2]->[0] );
+    ok( $devices == 1, '2F device found' )
+      or explain( $devices, '2F device registered' );
 
-    # Ajax registration request
+    # Try to unregister TOTP
     ok(
         $res = $client->_post(
-            '/2fregisters/u/register', IO::String->new(''),
-            accept => 'application/json',
-            cookie => "lemonldap=$id2",
-            length => 0,
-        ),
-        'Get registration challenge'
-    );
-    eval { $data = JSON::from_json( $res->[2]->[0] ) };
-    ok( not($@), ' Content is JSON' )
-      or explain( [ $@, $res->[2] ], 'JSON content' );
-    ok(
-        $data->{challenge} =~ /\w+/, 'Get challenge'
-    ) or explain( $data, 'Bad result' );
-
-    # Try to unregister U2F key
-    ok(
-        $res = $client->_post(
-            '/2fregisters/u/delete',
-            IO::String->new("epoch=1234567890"),
+            '/2fregisters/totp/delete',
+            IO::String->new("epoch=$epoch"),
             length => 16,
             cookie => "lemonldap=$id2",
         ),
-        'Delete U2F key query'
+        'Delete TOTP query'
     );
     eval { $data = JSON::from_json( $res->[2]->[0] ) };
     ok( not($@), ' Content is JSON' )
       or explain( [ $@, $res->[2] ], 'JSON content' );
+    ok( $data->{result} == 1, 'TOTP removed' )
+      or explain( $data, '"result":1' );
+
+    $client->logout($id);
+    $client->logout($id2);
+
+    ## Try to authenticate
+    ok( $res = $client->_get( '/', accept => 'text/html' ), 'Get Menu', );
+    ( $host, $url, $query ) =
+      expectForm( $res, '#', undef, 'user', 'password' );
+
+    $query =~ s/user=/user=dwho/;
+    $query =~ s/password=/password=dwho/;
     ok(
-        $data->{error} eq '2FDeviceNotFound', '2F device not found'
-    ) or explain( $data, 'Bad result' );
+        $res = $client->_post(
+            '/',
+            IO::String->new($query),
+            length => length($query),
+            accept => 'text/html',
+        ),
+        'Auth query'
+    );
+    $id = expectCookie($res);
+    expectRedirection( $res, 'http://auth.example.com/' );
+
+    # Get Menu
+    # ------------------------
+    ok(
+        $res = $client->_get(
+            '/',
+            cookie => "lemonldap=$id",
+            accept => 'text/html'
+        ),
+        'Get Menu',
+    );
+    expectOK($res);
+    ok(
+        $res->[2]->[0] =~
+          m%<span trspan="connectedAs">Connected as</span> dwho%,
+        'Connected as dwho'
+    ) or print STDERR Dumper( $res->[2]->[0] );
+    expectAuthenticatedAs( $res, 'dwho' );
+    ok(
+        $res->[2]->[0] =~
+          m%<span trspan="contextSwitching_ON">contextSwitching_ON</span>%,
+        'contextSwitching allowed'
+    ) or print STDERR Dumper( $res->[2]->[0] );
+
+    # Try to switch context 'rtyler'
+    # ContextSwitching form
+    ok(
+        $res = $client->_get(
+            '/switchcontext',
+            cookie => "lemonldap=$id",
+            accept => 'text/html'
+        ),
+        'ContextSwitching form',
+    );
+
+    ( $host, $url, $query ) =
+      expectForm( $res, undef, '/switchcontext', 'spoofId' );
+    ok( $res->[2]->[0] =~ m%<span trspan="contextSwitching_ON">%,
+        'Found trspan="contextSwitching_ON"' )
+      or explain( $res->[2]->[0], 'trspan="contextSwitching_ON"' );
+
+    ## POST form
+    $query =~ s/spoofId=/spoofId=rtyler/;
+    ok(
+        $res = $client->_post(
+            '/switchcontext',
+            IO::String->new($query),
+            cookie => "lemonldap=$id",
+            length => length($query),
+            accept => 'text/html',
+        ),
+        'POST switchcontext'
+    );
+    expectRedirection( $res, 'http://auth.example.com/' );
+    $id2 = expectCookie($res);
+    ok(
+        $res = $client->_get(
+            '/',
+            cookie => "lemonldap=$id2",
+            accept => 'text/html'
+        ),
+        'Get Menu',
+    );
+    expectAuthenticatedAs( $res, 'rtyler' );
+    ok( $res->[2]->[0] =~ m%<span trspan="contextSwitching_OFF">%,
+        'Found trspan="contextSwitching_OFF"' )
+      or explain( $res->[2]->[0], 'trspan="contextSwitching_OFF"' );
+    ok( $id2 ne $id, 'New SSO session created' )
+      or explain( $id2, 'New SSO session created' );
+
+    # 2fregisters
+    ok(
+        $res = $client->_get(
+            '/2fregisters',
+            cookie => "lemonldap=$id2",
+            accept => 'text/html',
+        ),
+        'Form 2fregisters'
+    );
+    ok( $res->[2]->[0] =~ /<span id="msg" trspan="choose2f">/,
+        'Found choose 2F' )
+      or print STDERR Dumper( $res->[2]->[0] );
+    ok(
+        $res->[2]->[0] =~ m%<span device=\'TOTP\' epoch=\'(\d{10})\'%,
+        'TOTP found'
+    ) or print STDERR Dumper( $res->[2]->[0] );
+    $epoch = $1;
+    ok(
+        $devices = $res->[2]->[0] =~ s%<span device=\'(?:TOTP|U2F)\' epoch=\'(?:\d{10})\'%%g,
+        '2F devices found'
+    ) or print STDERR Dumper( $res->[2]->[0] );
+    ok( $devices == 2, '2F devices registered' )
+      or explain( $devices, '2F devices registered' );
+
+    # Try to unregister TOTP
+    ok(
+        $res = $client->_post(
+            '/2fregisters/totp/delete',
+            IO::String->new("epoch=$epoch"),
+            length => 16,
+            cookie => "lemonldap=$id2",
+        ),
+        'Delete TOTP query'
+    );
+    eval { $data = JSON::from_json( $res->[2]->[0] ) };
+    ok( not($@), ' Content is JSON' )
+      or explain( [ $@, $res->[2] ], 'JSON content' );
+    ok( $data->{result} == 1, '2F removed' )
+      or explain( $data, '"result":1' );
+
+    # 2fregisters
+    ok(
+        $res = $client->_get(
+            '/2fregisters',
+            cookie => "lemonldap=$id2",
+            accept => 'text/html',
+        ),
+        'Form 2fregisters'
+    );
+    ok( $res->[2]->[0] =~ /<span trspan="remove2fWarning">/,
+        'Found 2F modal' )
+      or print STDERR Dumper( $res->[2]->[0] );
+    ok( $res->[2]->[0] =~ /<span id="msg" trspan="choose2f">/,
+        'Found choose 2F' )
+      or print STDERR Dumper( $res->[2]->[0] );
+    ok(
+        $devices = $res->[2]->[0] =~ s%<span device=\'(?:TOTP|U2F)\' epoch=\'(\d{10})\'%%g,
+        '2F device found'
+    ) or print STDERR Dumper( $res->[2]->[0] );
+    ok( $devices == 1, '2F device registered' )
+      or explain( $devices, '2F device registered' );
 
     $client->logout($id);
     $client->logout($id2);

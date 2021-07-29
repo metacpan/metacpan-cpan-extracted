@@ -20,6 +20,8 @@ sub reject : Tests(1) {
         my ($reason) = @_;
         is $reason, 'oh my god';
     });
+
+    return;
 }
 
 sub reject_undef : Tests(2) {
@@ -58,7 +60,7 @@ sub reject_nothing : Tests(2) {
 }
 
 sub reject_undef_via_callback : Tests(2) {
-    my @warnings;
+   my @warnings;
 
     local $SIG{'__WARN__'} = sub { push @warnings, @_ };
 
@@ -86,17 +88,29 @@ sub reject_nothing_via_callback : Tests(2) {
 }
 
 sub reject_promise : Tests(2) {
+    my ($self) = @_;
+
     my $p2 = Promise::ES6->resolve(123);
 
-    Promise::ES6->reject($p2)->catch( sub {
-        my $reason = shift;
-        is( $reason, $p2, 'reject() - promise as rejection is literal rejection value' );
-    } );
+  SKIP: {
+        skip 'Devel::Cover causes memory leaks here.', $self->num_tests() if $INC{'Devel/Cover.pm'};
 
-    Promise::ES6->new( sub { $_[1]->($p2) } )->catch( sub {
-        my $reason = shift;
+        my $reason;
+
+        Promise::ES6->reject($p2)->catch( sub {
+            $reason = shift;
+        } );
+
+        is( $reason, $p2, 'reject() - promise as rejection is literal rejection value' );
+
+        Promise::ES6->new( sub { $_[1]->($p2) } )->catch( sub {
+            $reason = shift;
+        } );
+
         is( $reason, $p2, 'callback - promise as rejection is literal rejection value' );
-    } );
+    }
+
+    return;
 }
 
 __PACKAGE__->runtests;

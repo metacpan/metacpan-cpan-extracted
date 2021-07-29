@@ -5,7 +5,7 @@ use CallBackery::Exception qw(mkerror);
 use Text::CSV;
 use Excel::Writer::XLSX;
 use Mojo::JSON qw(true false);
-use POSIX qw(strftime);
+use Time::Piece;
 
 =head1 NAME
 
@@ -129,7 +129,7 @@ sub makeExportAction {
     my $type = $args{type} // 'XLSX';
     my $label = $args{label} // trm("Export %1", $type);
     my $filename = $args{filename}
-        // strftime('export-%Y-%m-%d-%H-%M-%S.',localtime(time)).lc($type);
+        // localtime->strftime('export-%Y-%m-%d-%H-%M-%S.').lc($type);
 
     return  {
         label            => $label,
@@ -149,22 +149,27 @@ sub makeExportAction {
             # Or the keys if undefined.
             my $loc = CallBackery::Translate->new(localeRoot=>$self->app->home->child("share"));
             $loc->setLocale($self->user->userInfo->{lang} // 'en');
+            my $tCfg = $self->tableCfg;
+
             my @titles = map {
                 $_->{label}
                     ? ((ref $_->{label} eq 'CallBackery::Translate')
                         ? $loc->tra($_->{label}[0])
                         : $_->{label})
                     : $_->{key};
-            } @{$self->tableCfg};
-
-            my @keys = map {$_->{key}} @{$self->tableCfg};
+            } @$tCfg;
 
             if ($type eq 'CSV') {
                 my $csv = Text::CSV->new;
                 $csv->combine(@titles);
                 my $csv_str = $csv->string . "\n";
                 for my $record (@$data) {
-                    $csv->combine(map {$record->{$_}} @keys);
+                    $csv->combine(map {
+                        my $v = $record->{$_->{key}};
+                        if ($_->{type} eq 'date') {
+                            $v= localtime($v/1000)->strftime("%Y-%m-%d %H:%M:%S %z");
+                        }
+                        $v} @$tCfg);
                     $csv_str .= $csv->string . "\n";
                 }
                 my $asset = Mojo::Asset::Memory->new;
@@ -184,9 +189,21 @@ sub makeExportAction {
                 map {$worksheet->write(0, $col, $_); $col++} @titles;
 
                 my $row = 2;
+                my %date_format;
                 for my $record (@$data) {
                     $col = 0;
-                    map {$worksheet->write($row, $col, $record->{$_}); $col++} @keys;
+                    for my $tc (@$tCfg) {
+                        my $v = $record->{$tc->{key}};
+                        if ($tc->{type} eq 'date') {
+                            my $fmt = $tc->{format} //'yyyy-mm-dd hh:mm:ss';
+                            $date_format{$fmt} //=
+                                $workbook->add_format(num_format => $fmt);
+                            $worksheet->write_date_time($row,$col,localtime($v/1000)->strftime("%Y-%m-%dT%H:%M:%S"),$date_format{$fmt}) if $v;
+                        }
+                        else {
+                            $worksheet->write($row, $col, $v) if defined $v;
+                        }
+                        $col++}
                     $row++;
                 }
 

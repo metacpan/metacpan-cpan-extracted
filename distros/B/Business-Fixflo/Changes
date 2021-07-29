@@ -1,5 +1,9 @@
 Revision history for Business-Fixflo
 
+0.44     2021-07-23
+        - Add IsNotManaged to Business::Fixflo::Property
+        - Add QuoteNotes to Business::Fixflo::Issue
+
 0.43     2021-07-01
         - Fix out of date URLs to Fixflo API docs (GH #3)
 

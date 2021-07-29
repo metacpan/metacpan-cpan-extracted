@@ -1,5 +1,8 @@
 Revision history for Prometheus-Tiny-Shared
 
+0.024     2021-07-21 14:27:51+10:00 Australia/Melbourne
+- Update for Prometheus::Tiny 0.008 enum support
+
 0.023     2021-06-07 13:57:38+10:00 Australia/Melbourne
 - Get compiling under 5.8 again
 

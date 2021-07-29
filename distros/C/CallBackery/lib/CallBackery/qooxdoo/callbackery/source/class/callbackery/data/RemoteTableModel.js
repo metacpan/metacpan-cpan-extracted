@@ -103,7 +103,7 @@ qx.Class.define('callbackery.data.RemoteTableModel', {
                     for (var id in col) {
                         switch (that.__types[id]){
                             case 'date':
-                                col[id] = new Date(col[id]);
+                                col[id] = col[id] === null ? null : new Date(col[id]);
                                 break;
                             case 'string':
                             case 'str':
@@ -111,7 +111,7 @@ qx.Class.define('callbackery.data.RemoteTableModel', {
                                 break;
                             case 'number':
                             case 'num':
-                                col[id] = parseFloat(col[id]);
+                                col[id] = col[id] === null ? null : parseFloat(col[id]);
                                 break;
                         }
                     }

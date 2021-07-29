@@ -10,16 +10,18 @@
 #       not to re-calculate the lower numbers
 
 package Math::String::Charset::Nested;
-use base Math::String::Charset;
 
-use vars qw($VERSION);
-$VERSION = '1.29';	# Current version of this package
 require  5.005;		# requires this Perl version or later
-
 use strict;
+
+use base 'Math::String::Charset';
+
+our $VERSION;
+$VERSION = '1.30';	# Current version of this package
+
 use Math::BigInt;
 
-use vars qw/$die_on_error/;
+our $die_on_error;
 $die_on_error = 1;		# set to 0 to not die
 
 # following hash values are used:
@@ -295,7 +297,7 @@ sub _calc
 #  my $end = $self->{_end};
 #  %$counts = map { $_, $end->{$_} } keys %$end; 	# make copy
 
-  my ($c,$cf,$cnt,$last,$count);
+  my ($last,$count);
   my $i = $self->{_cnt}+1;		# start with next undefined level
   while ($i <= $max)
     {
@@ -379,7 +381,7 @@ sub is_valid
   return 0 if !defined $str;
   return 1 if $str eq '' && $self->{_minlen} <= 0;
 
-  my $int = Math::BigInt::bzero();
+  #my $int = Math::BigInt::bzero();
   my @chars;
   if (defined $self->{_sep})
     {
@@ -1348,7 +1350,7 @@ positive BigInt. Returns 'inf' if no maxlen is defined, because there should
 be no upper bound on how many strings are possible. (This might change if we
 can calculate an upper bound - not sure if this is possible with bigrams).
 
-If maxlen is defined, forces a calculation of all possible L<class()> values
+If maxlen is defined, forces a calculation of all possible L</class()> values
 and may therefore be very slow on the first call, it also caches possible
 lot's of values.
 
@@ -1396,14 +1398,14 @@ to (but much faster):
 	$order = $charset->order();
 
 Return the order of the charset: 2 (bi-grams), 3 etc for higher orders.
-See also L<type()>.
+See also L</type()>.
 
 =item type()
 
 	$type = $charset->type();
 
 Return the type of the charset and is always 0 for nested charsets.
-See also L<order>.
+See also L</order()>.
 
 =item charlen()
 

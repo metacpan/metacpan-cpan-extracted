@@ -4,34 +4,33 @@
 
     <div id="color" class="message message-<TMPL_VAR NAME="ALERT"> alert"><span id="msg" trspan="<TMPL_VAR NAME="MSG">"></span></div>
 
-    <div class="card">
+    <div id="divToHide" class="card">
       <div class="card-body">
 
       <div class="row">
-        <div id="divToHide" class="col-md-6 text-center">
+        <div class="col-md-6 text-center">
           <div >
+            <p>&#x2460; <span trspan="totpQrCode"></span></p>
             <canvas id="qr"></canvas>
-            <pre id="serialized"></pre>
+
+            <p><span trspan="totpSecretKey"></span></p>
+            <tt id="secret"></tt>
           </div>
         </div>
 
         <div class="col-md-6">
           <div class="form-group">
-            <label for="TOTPName"><span trspan="name">Name</span></label>
+            <label for="TOTPName">&#x2461; <span trspan="totpRegisterName">Name</span></label>
             <input type="text" class="form-control" id="TOTPName" name="TOTPName" value="MyTOTP" trplaceholder="name" />
           </div>
           <div class="form-group">
-            <label for="code"><span trspan="code">Code</span></label>
-            <input id="code" class="form-control" name="code" type="number" autocomplete="off" />
+            <label for="code">&#x2462; <span trspan="totpRegisterCode">Code</span></label>
+            <input id="code" class="form-control" name="code" autocomplete="off" />
           </div>
         </div>
       </div>
 
       <div class="buttons">
-        <span id="changekey" class="btn btn-info" role="button">
-          <span class="fa fa-refresh"></span>
-          <span trspan="changeKey">Change key</span>
-        </span>
         <span id="verify" class="btn btn-success" role="button">
           <span class="fa fa-floppy-o"></span>
           <span trspan="register">Register</span>

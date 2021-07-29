@@ -1,6 +1,6 @@
 # z2folio - the Z39.50-to-FOLIO gateway
 
-Copyright (C) 2018-2020 The Open Library Foundation
+Copyright (C) 2018-2021 The Open Library Foundation
 
 This software is distributed under the terms of the Apache License,
 Version 2.0. See the file "[LICENSE](LICENSE)" for more information.
@@ -8,6 +8,8 @@ Version 2.0. See the file "[LICENSE](LICENSE)" for more information.
 ## Introduction
 
 [`z2folio`](bin/z2folio) is a Z39.50 server for FOLIO bibliographic and holdings data, supporting record retrieval in USMARC, OPAC, XML and JSON formats. The functionality is all provided by [the `Net::Z3950::FOLIO` library](lib/Net/Z3950/FOLIO.pm), which is also part of this distribution. It is written in Perl, and follows standard Perl-module conventions.
+
+The name of the Docker container is `mod-z3950`.
 
 ## Dependencies
 
@@ -52,6 +54,8 @@ If you don't want to install, you can run directly from the development checkout
     Z> show 1
 
 Note: if running in Kubernetes, it may be useful to turn of session logging by adding the `-v-session` parameter to the arguments. For example, `perl -I lib bin/z2folio -c etc/config -- -f etc/yazgfs.xml -v-session`. Session logs can be quite noisy on Kubernetes due to tcp healthchecks.
+
+Docker containers get published as [folioorg/mod-z3950](https://hub.docker.com/r/folioorg/mod-z3950/tags?page=1&ordering=last_updated) and [folioci/mod-z3950](https://hub.docker.com/r/folioci/mod-z3950/tags?page=1&ordering=last_updated).
 
 ## Authentication
 

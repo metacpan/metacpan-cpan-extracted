@@ -70,6 +70,21 @@ AC_CHECK_HEADERS([sys/mkdev.h])
 dnl readv / preadv, vmsplice
 AC_CHECK_HEADERS([sys/uio.h])
 
+AC_CACHE_CHECK([for siginfo_t], ac_cv_siginfo_t, [AC_LINK_IFELSE([AC_LANG_SOURCE([
+#include <signal.h>
+int main (void)
+{
+   siginfo_t si;
+   si.si_code;
+   si.si_pid;
+   si.si_uid;
+   si.si_value.sival_int;
+   si.si_value.sival_ptr;
+   return 0;
+}
+])],ac_cv_siginfo_t=yes,ac_cv_siginfo_t=no)])
+test $ac_cv_siginfo_t = yes && AC_DEFINE(HAVE_SIGINFO_T, 1, have siginfo_t in signal.h)
+
 AC_CACHE_CHECK([for unix-style syscall interface], ac_cv_syscall, [AC_LINK_IFELSE([AC_LANG_SOURCE([
 #include <unistd.h>
 #include <sys/syscall.h>

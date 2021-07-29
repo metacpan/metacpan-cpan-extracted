@@ -1,5 +1,5 @@
 package Chrome::DevToolsProtocol;
-use 5.010; # for //
+use 5.012; # for say, //
 use strict;
 use warnings;
 use Moo;
@@ -17,7 +17,7 @@ use Scalar::Util 'weaken', 'isweak';
 use Try::Tiny;
 use URI;
 
-our $VERSION = '0.66';
+our $VERSION = '0.67';
 our @CARP_NOT;
 
 =head1 NAME
@@ -203,6 +203,24 @@ Returns the URL endpoint to talk to for the connected tab
 
 =cut
 
+has 'json_log_fh' => (
+    is => 'rw', # actually, it isn't really rw, but set-once
+);
+
+=head2 C<< json_log_fh >>
+
+Filehandle where all communications will be logged to, one line
+per message/response. Each line will be of the format
+
+  { type: "message", payload: { ... } }
+  { type: "reply", payload: { ... } }
+  { type: "event", payload: { ... } }
+
+The filehandle must be opened as :raw , as UTF-8 encoded bytes will
+be written to it.
+
+=cut
+
 has 'endpoint' => (
     is => 'rw', # actually, it isn't really rw, but set-once
 );
@@ -309,6 +327,13 @@ sub connect( $self, %args ) {
     } elsif( $args{ endpoint }) {
         $endpoint = $args{ endpoint } || $self->endpoint;
         $self->log('trace', "Using endpoint $endpoint");
+
+        # Set these values so anyone reusing the parameters will find them
+        my $ws = URI->new( $endpoint );
+        if( $s ) {
+            $s->{port} = $ws->port;
+            $s->{host} = $ws->host;
+        };
     };
 
     my $got_endpoint;
@@ -317,7 +342,7 @@ sub connect( $self, %args ) {
             die "Can't connect without knowing the port?! " . $self->port;
         };
         $got_endpoint = $self->version_info()->then(sub( $info ) {
-            $self->log('debug', "Found webSocket URL", $info );
+            $s->log('debug', "Found webSocket URL", $info );
             #$self->tab( $info );
             return Future->done( $info->{webSocketDebuggerUrl} );
         });
@@ -328,13 +353,13 @@ sub connect( $self, %args ) {
             # We need to somehow find the tab id for our tab, so let's fake it:
             $endpoint =~ m!/([^/]+)$!
                 or die "Couldn't find tab id in '$endpoint'";
-            $self->{tab} = {
+            $s->{tab} = {
                 targetId => $1,
             };
         };
     };
     $got_endpoint = $got_endpoint->then(sub($endpoint) {
-        $self->{ endpoint } = $endpoint;
+        $s->{ endpoint } = $endpoint;
         return Future->done( $endpoint );
     })->catch(sub(@args) {
         #croak @args;
@@ -430,6 +455,10 @@ sub on_response( $self, $connection, $message ) {
         return;
     };
 
+    if( my $fh = $self->json_log_fh ) {
+        say $fh $self->json->encode( { type => 'response', payload => $response } );
+    };
+
     if( ! exists $response->{id} ) {
         # Generic message, dispatch that:
         if( my $error = $response->{error} ) {
@@ -518,6 +547,9 @@ sub on_response( $self, $connection, $message ) {
         if( ! $receiver) {
             $self->log( 'debug', "Ignored response to unknown receiver", $response )
 
+        } elsif( $receiver eq 'ignore') {
+            # silently ignore that reply
+
         } elsif( $response->{error} ) {
             $self->log( 'debug', "Replying to error $response->{id}", $response );
             $receiver->die( join "\n", $response->{error}->{message},$response->{error}->{data} // '',$response->{error}->{code} // '');
@@ -548,9 +580,10 @@ sub build_url( $self, %options ) {
         $url->path('json');
         $url = "$url";
     } else {
-        $url = URI->new('json', 'http');
-        $url->port( $self->port );
+        $url = URI->new('json','http');
+        $url->scheme('http');
         $url->host( $self->host );
+        $url->port( $self->port );
         $url = "$url";
     };
     $url .= '/' . $options{domain} if $options{ domain };
@@ -581,15 +614,24 @@ sub _send_packet( $self, $response, $method, %params ) {
         $self->{receivers}->{ $id } = $response;
     };
 
+    my $msg = {
+        id     => 0+$id,
+        method => $method,
+        params => \%params
+    };
     my $payload = eval {
-        $self->json->encode({
-            id     => 0+$id,
-            method => $method,
-            params => \%params
-        });
+        $self->json->encode($msg);
     };
     if( my $err = $@ ) {
         $self->log('error', $@ );
+    };
+
+    if( my $fh = $self->json_log_fh ) {
+        say $fh
+        $self->json->encode({
+            type   => "message",
+            payload => $msg
+        });
     };
 
     $self->log( 'trace', "Sent message", $payload );
@@ -632,9 +674,6 @@ has sent a response to this query.
 
 sub send_message( $self, $method, %params ) {
     my $response = $self->future;
-    # We add our response listener before we've even sent our request to
-    # Chrome. This ensures that no amount of buffering etc. will make us
-    # miss a reply from Chrome to a request
     $self->_send_packet( $response, $method, %params )->retain;
     $response
 }
@@ -911,7 +950,7 @@ use Filter::signatures;
 no warnings 'experimental::signatures';
 use feature 'signatures';
 
-our $VERSION = '0.66';
+our $VERSION = '0.67';
 
 has 'protocol' => (
     is => 'ro',

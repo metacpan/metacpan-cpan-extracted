@@ -1,6 +1,12 @@
 Changelog for HealthCheck-Diagnostic-WebRequest
 
-v1.4.1 2020-08-25T15:46:55
+v1.4.2 2021-07-19T17:43:44
+ - Pull request #8: run make update (Mark Flickinger)
+ - run make update (Mark Flickinger)
+ - Pull request #7: Patch - SM-3125 (Matthew Ito)
+ - Allow results to come back without info (Matthew Ito)
+
+v1.4.1 2020-08-25T15:42:42
  - Update README (Andrew Hewus Fresh)
  - Provide Location header in 302 test (Andrew Hewus Fresh)
 
@@ -27,8 +33,8 @@ v1.3.2 2019-12-10T20:17:09
 
 v1.3.1 2019-10-24T21:14:21
  - Create distribution files (Andrew Hewus Fresh)
- - Convert to Bitbucket workflow (Andrew Hewus Fresh)
  - Remove gitc metadata (Andrew Hewus Fresh)
+ - Convert to Bitbucket workflow (Andrew Hewus Fresh)
 
 v1.3.0.0 2019-10-24T14:49:06
  - Merge remote-tracking branch 'origin/stage' into prod (Randy Sofia)

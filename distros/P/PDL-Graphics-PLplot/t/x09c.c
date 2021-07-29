@@ -69,7 +69,7 @@ static void polar( void )
 //Perimeter
     for ( i = 0; i < PERIMETERPTS; i++ )
     {
-        t     = ( 2. * M_PI / ( PERIMETERPTS - 1 ) ) * (double) i;
+        t     = ( 2. * M_PI / ( PERIMETERPTS - 1 ) ) * (PLFLT) i;
         px[i] = cos( t );
         py[i] = sin( t );
     }
@@ -84,10 +84,10 @@ static void polar( void )
 
     for ( i = 0; i < RPTS; i++ )
     {
-        r = i / (double) ( RPTS - 1 );
+        r = i / (PLFLT) ( RPTS - 1 );
         for ( j = 0; j < THETAPTS; j++ )
         {
-            theta           = ( 2. * M_PI / (double) ( THETAPTS - 1 ) ) * (double) j;
+            theta           = ( 2. * M_PI / (PLFLT) ( THETAPTS - 1 ) ) * (PLFLT) j;
             cgrid2.xg[i][j] = r * cos( theta );
             cgrid2.yg[i][j] = r * sin( theta );
             z[i][j]         = r;
@@ -96,11 +96,11 @@ static void polar( void )
 
     for ( i = 0; i < 10; i++ )
     {
-        lev[i] = 0.05 + 0.10 * (double) i;
+        lev[i] = 0.05 + 0.10 * (PLFLT) i;
     }
 
     plcol0( 2 );
-    plcont( (const PLFLT * const *) z, RPTS, THETAPTS, 1, RPTS, 1, THETAPTS, lev, 10,
+    plcont( (PLFLT_MATRIX) z, RPTS, THETAPTS, 1, RPTS, 1, THETAPTS, lev, 10,
         pltr2, (void *) &cgrid2 );
     plcol0( 1 );
     pllab( "", "", "Polar Contour Plot" );
@@ -158,10 +158,10 @@ static void potential( void )
 
     for ( i = 0; i < PRPTS; i++ )
     {
-        r = 0.5 + (double) i;
+        r = 0.5 + (PLFLT) i;
         for ( j = 0; j < PTHETAPTS; j++ )
         {
-            theta           = ( 2. * M_PI / (double) ( PTHETAPTS - 1 ) ) * ( 0.5 + (double) j );
+            theta           = ( 2. * M_PI / (PLFLT) ( PTHETAPTS - 1 ) ) * ( 0.5 + (PLFLT) j );
             cgrid2.xg[i][j] = r * cos( theta );
             cgrid2.yg[i][j] = r * sin( theta );
         }
@@ -218,12 +218,12 @@ static void potential( void )
 //        xmin, xmax, ymin, ymax, zmin, zmax);
 
     // Positive and negative contour levels.
-    dz        = ( zmax - zmin ) / (double) PNLEVEL;
+    dz        = ( zmax - zmin ) / (PLFLT) PNLEVEL;
     nlevelneg = 0;
     nlevelpos = 0;
     for ( i = 0; i < PNLEVEL; i++ )
     {
-        clevel2 = zmin + ( (double) i + 0.5 ) * dz;
+        clevel2 = zmin + ( (PLFLT) i + 0.5 ) * dz;
         if ( clevel2 <= 0. )
             clevelneg[nlevelneg++] = clevel2;
         else
@@ -247,7 +247,7 @@ static void potential( void )
     {
         // Negative contours
         pllsty( 2 );
-        plcont( (const PLFLT * const *) z, PRPTS, PTHETAPTS, 1, PRPTS, 1, PTHETAPTS,
+        plcont( (PLFLT_MATRIX) z, PRPTS, PTHETAPTS, 1, PRPTS, 1, PTHETAPTS,
             clevelneg, nlevelneg, pltr2, (void *) &cgrid2 );
     }
 
@@ -255,14 +255,14 @@ static void potential( void )
     {
         // Positive contours
         pllsty( 1 );
-        plcont( (const PLFLT * const *) z, PRPTS, PTHETAPTS, 1, PRPTS, 1, PTHETAPTS,
+        plcont( (PLFLT_MATRIX) z, PRPTS, PTHETAPTS, 1, PRPTS, 1, PTHETAPTS,
             clevelpos, nlevelpos, pltr2, (void *) &cgrid2 );
     }
 
     // Draw outer boundary
     for ( i = 0; i < PPERIMETERPTS; i++ )
     {
-        t     = ( 2. * M_PI / ( PPERIMETERPTS - 1 ) ) * (double) i;
+        t     = ( 2. * M_PI / ( PPERIMETERPTS - 1 ) ) * (PLFLT) i;
         px[i] = x0 + rmax * cos( t );
         py[i] = y0 + rmax * sin( t );
     }
@@ -286,7 +286,7 @@ static void potential( void )
 //--------------------------------------------------------------------------
 
 int
-main( int argc, const char *argv[] )
+main( int argc, char *argv[] )
 {
     int          i, j;
     PLFLT        xx, yy, argx, argy, distort;
@@ -312,10 +312,10 @@ main( int argc, const char *argv[] )
 
     for ( i = 0; i < XPTS; i++ )
     {
-        xx = (double) ( i - ( XPTS / 2 ) ) / (double) ( XPTS / 2 );
+        xx = (PLFLT) ( i - ( XPTS / 2 ) ) / (PLFLT) ( XPTS / 2 );
         for ( j = 0; j < YPTS; j++ )
         {
-            yy      = (double) ( j - ( YPTS / 2 ) ) / (double) ( YPTS / 2 ) - 1.0;
+            yy      = (PLFLT) ( j - ( YPTS / 2 ) ) / (PLFLT) ( YPTS / 2 ) - 1.0;
             z[i][j] = xx * xx - yy * yy;
             w[i][j] = 2 * xx * yy;
         }
@@ -367,10 +367,10 @@ main( int argc, const char *argv[] )
     pl_setcontlabelparam( 0.006, 0.3, 0.1, 1 );
     plenv( -1.0, 1.0, -1.0, 1.0, 0, 0 );
     plcol0( 2 );
-    plcont( (const PLFLT * const *) z, XPTS, YPTS, 1, XPTS, 1, YPTS, clevel, 11, mypltr, NULL );
+    plcont( (PLFLT_MATRIX) z, XPTS, YPTS, 1, XPTS, 1, YPTS, clevel, 11, mypltr, NULL );
     plstyl( 1, &mark, &space );
     plcol0( 3 );
-    plcont( (const PLFLT * const *) w, XPTS, YPTS, 1, XPTS, 1, YPTS, clevel, 11, mypltr, NULL );
+    plcont( (PLFLT_MATRIX) w, XPTS, YPTS, 1, XPTS, 1, YPTS, clevel, 11, mypltr, NULL );
     plstyl( 0, &mark, &space );
     plcol0( 1 );
     pllab( "X Coordinate", "Y Coordinate", "Streamlines of flow" );
@@ -380,12 +380,12 @@ main( int argc, const char *argv[] )
 
     plenv( -1.0, 1.0, -1.0, 1.0, 0, 0 );
     plcol0( 2 );
-    plcont( (const PLFLT * const *) z, XPTS, YPTS, 1, XPTS, 1, YPTS, clevel, 11,
+    plcont( (PLFLT_MATRIX) z, XPTS, YPTS, 1, XPTS, 1, YPTS, clevel, 11,
         pltr1, (void *) &cgrid1 );
 
     plstyl( 1, &mark, &space );
     plcol0( 3 );
-    plcont( (const PLFLT * const *) w, XPTS, YPTS, 1, XPTS, 1, YPTS, clevel, 11,
+    plcont( (PLFLT_MATRIX) w, XPTS, YPTS, 1, XPTS, 1, YPTS, clevel, 11,
         pltr1, (void *) &cgrid1 );
     plstyl( 0, &mark, &space );
     plcol0( 1 );
@@ -410,12 +410,12 @@ main( int argc, const char *argv[] )
 
     plenv( -1.0, 1.0, -1.0, 1.0, 0, 0 );
     plcol0( 2 );
-    plcont( (const PLFLT * const *) z, XPTS, YPTS, 1, XPTS, 1, YPTS, clevel, 11,
+    plcont( (PLFLT_MATRIX) z, XPTS, YPTS, 1, XPTS, 1, YPTS, clevel, 11,
         pltr2, (void *) &cgrid2 );
 
     plstyl( 1, &mark, &space );
     plcol0( 3 );
-    plcont( (const PLFLT * const *) w, XPTS, YPTS, 1, XPTS, 1, YPTS, clevel, 11,
+    plcont( (PLFLT_MATRIX) w, XPTS, YPTS, 1, XPTS, 1, YPTS, clevel, 11,
         pltr2, (void *) &cgrid2 );
     plstyl( 0, &mark, &space );
     plcol0( 1 );

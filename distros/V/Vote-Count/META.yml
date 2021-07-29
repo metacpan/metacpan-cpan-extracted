@@ -4,9 +4,9 @@ author:
   - 'John Karr <brainbuz@cpan.org>'
 build_requires:
   Carp::Always: '0'
-  Data::Printer: '0'
   File::Temp: '0'
   Test2::Bundle::More: '0'
+  Test2::Tools::Class: '0'
   Test2::Tools::Exception: '0'
   Test2::Tools::Warnings: '0'
   Test2::V0: '0'
@@ -35,6 +35,7 @@ requires:
   Carp: '0'
   Cpanel::JSON::XS: '4.19'
   Data::Dumper: '0'
+  Data::Printer: '0'
   Exporter: '0'
   Exporter::Easy: '0'
   JSON::MaybeXS: '1.004000'
@@ -44,6 +45,7 @@ requires:
   Mojo::Template: '0'
   Moose: '0'
   Moose::Role: '0'
+  MooseX::StrictConstructor: '0'
   Path::Tiny: '0.108'
   Ref::Util: '0.202'
   Sort::Hash: '0'
@@ -66,7 +68,7 @@ resources:
   bugtracker: https://github.com/brainbuz/Vote-Count/issues
   homepage: https://github.com/brainbuz/Vote-Count
   repository: https://github.com/brainbuz/Vote-Count.git
-version: '2.00'
+version: '2.01'
 x_generated_by_perl: v5.32.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: GPL-3.0-only

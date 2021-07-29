@@ -19,7 +19,7 @@ do { my $x = {
                                       'Test::More' => '0',
                                       'Text::Balanced' => '0',
                                       'Time::Piece' => '0',
-                                      'Yancy' => '1.067',
+                                      'Yancy' => '1.074',
                                       'perl' => '5.028'
                                     }
                     },

@@ -25,7 +25,7 @@ my @tests = (
 );
 
 BOOLEAN_TESTS:
-note '$MOJO_BOOLEANS = '.(0+!!$JSON::Schema::Tiny::MOJO_BOOLEANS);
+note '$SCALARREF_BOOLEANS = '.(0+!!$JSON::Schema::Tiny::SCALARREF_BOOLEANS);
 foreach my $test (@tests) {
   my $data = 'hello';
   is(
@@ -49,9 +49,9 @@ foreach my $test (@tests) {
   );
 }
 
-if (not $JSON::Schema::Tiny::MOJO_BOOLEANS) {
+if (not $JSON::Schema::Tiny::SCALARREF_BOOLEANS) {
   # schemas still do not accept mojo booleans
-  $JSON::Schema::Tiny::MOJO_BOOLEANS = 1;
+  $JSON::Schema::Tiny::SCALARREF_BOOLEANS = 1;
   goto BOOLEAN_TESTS;
 }
 
@@ -82,7 +82,7 @@ cmp_deeply(
       },
     ],
   },
-  'scalarref for schema results in error, even when $MOJO_BOOLEANS is true',
+  'scalarref for schema results in error, even when $SCALARREF_BOOLEANS is true',
 );
 
 done_testing;

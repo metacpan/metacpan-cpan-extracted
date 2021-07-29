@@ -12,7 +12,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_SENDRESPONSE
 );
 
-our $VERSION = '2.0.6';
+our $VERSION = '2.0.12';
 
 extends 'Lemonldap::NG::Portal::Main::Auth', 'Lemonldap::NG::Portal::Lib::CAS';
 
@@ -72,6 +72,7 @@ sub init {
           or $a->{val} cmp $b->{val}
       } @list;
     $self->srvList( \@list );
+
     return 1;
 }
 
@@ -247,15 +248,16 @@ sub extractFormInfo {
 }
 
 sub authenticate {
-    PE_OK;
+    return PE_OK;
 }
 
 # Set authenticationLevel.
 sub setAuthSessionInfo {
     my ( $self, $req ) = @_;
     $req->{sessionInfo}->{authenticationLevel} = $self->conf->{casAuthnLevel};
-    $req->{sessionInfo}->{_casSrv}             = $req->data->{_casSrvCurrent};
-    PE_OK;
+    $req->{sessionInfo}->{_casSrv}  
+               = $req->data->{_casSrvCurrent};
+    return PE_OK;
 }
 
 sub authLogout {
@@ -271,7 +273,7 @@ sub authLogout {
     # Register CAS logout URL in logoutServices
     $req->data->{logoutServices}->{CASserver} = $logout_url;
 
-    PE_OK;
+    return PE_OK;
 }
 
 sub getDisplayType {

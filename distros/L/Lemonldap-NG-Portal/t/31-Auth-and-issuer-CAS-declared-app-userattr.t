@@ -200,11 +200,7 @@ count(1);
 # Query IdP with iframe src
 my $url = $1;
 $query = $2;
-ok( getHeader( $res, 'Content-Security-Policy' ) =~ /child-src auth.idp.com/,
-    'Frame is authorized' )
-  or
-  explain( $res->[1], 'Content-Security-Policy => ...child-src auth.idp.com' );
-count(1);
+expectCspChildOK($res, "auth.idp.com");
 
 switch ('issuer');
 ok(

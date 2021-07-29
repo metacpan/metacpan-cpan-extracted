@@ -89,8 +89,8 @@ __END__
 
 0xcafe:51966
 0Xcafe:51966
-xcafe:NaN
-Xcafe:NaN
+xcafe:51966
+Xcafe:51966
 cafe:51966
 
 0x1.9p+3:12.5

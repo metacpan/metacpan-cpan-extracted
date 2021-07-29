@@ -1,10 +1,25 @@
 #---------------------------------------------------------------------
-# $Header: /Perl/OlleDB/makefile.pl 28    19-05-05 17:50 Sommar $
+# $Header: /Perl/OlleDB/makefile.pl 31    21-07-10 22:22 Sommar $
 #
 # Makefile.pl for MSSQL::OlleDB. Note that you may need to specify where
 # you ave the include files for OLE DB.
 #
 # $History: makefile.pl $
+# 
+# *****************  Version 31  *****************
+# User: Sommar       Date: 21-07-10   Time: 22:22
+# Updated in $/Perl/OlleDB
+# MSOLEDBSQL 1i8.6.
+# 
+# *****************  Version 30  *****************
+# User: Sommar       Date: 21-04-25   Time: 21:49
+# Updated in $/Perl/OlleDB
+# Compile against MSOLEDBSQL 18.5.
+# 
+# *****************  Version 29  *****************
+# User: Sommar       Date: 20-04-11   Time: 12:11
+# Updated in $/Perl/OlleDB
+# Newer version MSOLEDBSQL.
 # 
 # *****************  Version 28  *****************
 # User: Sommar       Date: 19-05-05   Time: 17:50
@@ -174,7 +189,7 @@ elsif ($clversion < 13) {
    exit 0
 }
 
-my $SQLDIR  = '\Program Files\Microsoft SQL Server\Client SDK\OLEDB\182\SDK';
+my $SQLDIR  = '\Program Files\Microsoft SQL Server\Client SDK\OLEDB\186\SDK';
 my $oleheader = "$SQLDIR\\INCLUDE\\msoledbsql.h";
 foreach my $device ('A'..'Z') {
    if (-r "$device:$oleheader") {

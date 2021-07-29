@@ -1,94 +1,88 @@
-#!/usr/bin/perl -w
+#!perl
 
 use strict;
-use Test;
+use warnings;
 
-BEGIN
-  {
-  $| = 1;
-  # chdir 't' if -d 't';
-  unshift @INC, '../lib'; # for running manually
-  plan tests => 1097;
-  }
+use Test::More;
+
+$| = 1;
+plan tests => 1097;
 
 use Math::Roman qw/roman/;
 
-my (@args,$try,$rc,$x,$i,$y);
+my (@args, $try, $rc, $x, $i, $y);
 $| = 1;
-while (<DATA>)
-  {
-  chop;
-  @args = split(/:/,$_,99);
+while (<DATA>) {
+    chop;
+    @args = split(/:/, $_, 99);
 
-  # test Roman => Arabic
-  $try = "\$x = Math::Roman->new('$args[0]')";
-  $try .= "->as_number(); ";
+    # test Roman => Arabic
 
-  $rc = eval $try;
+    $try = qq|\$x = Math::Roman->new("$args[0]")->as_number();|;
+    $rc = eval $try;
+    die $@ if $@;               # should never happen
+    is("$rc", $args[1], $try);
 
-  print "# For '$try'\n" if (!ok "$rc" , $args[1]);
+    # test Arabic => Roman
 
-  # test Arabic => Roman
-  next if $args[1] eq 'NaN'; # dont test NaNs reverse
-  $try = "\$x = Math::Roman->new('$args[1]');";
+    next if $args[1] eq 'NaN';  # don't test NaNs reverse
+    $try = qq|\$x = Math::Roman->new("$args[1]");|;
+    $rc = eval $try;
+    die $@ if $@;               # should never happen
+    is("$rc", $args[2] || $args[0], $try);
 
-  $rc = eval $try;
-  print "# For '$try'\n" if (!ok "$rc" , $args[2] || $args[0]);
-
-  }
+}
 close DATA;
 
 # check if negative numbers give same output as positives
-  $try =  "\$x = Math::Roman->new(-12);";
-  $rc = eval $try;
-  print "# For '$try'\n" if (!ok "$rc" , "XII" );
+$try =  "\$x = Math::Roman->new(-12);";
+$rc = eval $try;
+print "# For '$try'\n" if (!ok "$rc", "XII" );
 
 # roman('1234') should work
 
-$x = roman('M'); ok ($x,'M');
-$x = roman('1000'); ok ($x,'M');
+$x = roman('M'); ok ($x, 'M');
+$x = roman('1000'); ok ($x, 'M');
 
 ###############################################################################
 # check if output of bstr is again a valid Roman number
 
-for ($i = 1; $i < 1004; $i++)
-  {
-  $try = "\$x = Math::Roman->new($i);";
-  $try .= "\$y = Math::Roman->new(\"\$x\")->as_number(); # ";
-  $rc = eval $try;
-  # not worth the effort to eliminate eval
-  print "# For '$try'\n" if (!ok "$rc" , $i );
-  }
+for ($i = 1; $i < 1004; $i++) {
+    $try = qq|\$x = Math::Roman->new($i);|;
+    $try .= qq| \$y = Math::Roman->new("\$x")->as_number();|;
+    $rc = eval $try;
+    # not worth the effort to eliminate eval
+    is("$rc", $i, $try);
+}
 
 # test wether + works
-  $try =  '$x = Math::Roman->new("MXI");';
-  $try .=  '$x += "M";';
+$try =  '$x = Math::Roman->new("MXI");';
+$try .= ' $x += "M";';
 
-  $rc = eval $try;
-  print "# For '$try'\n" if (!ok "$rc" , 'MMXI');
+$rc = eval $try;
+is("$rc", 'MMXI', $try);
 
 # test wether ++ and -- work correctly
-  $try =  '$x = Math::Roman->new("MCMLXII");';
-  $try .=  '$y = $x; $y++; "true" if $x < $y';
+$try =  '$x = Math::Roman->new("MCMLXII");';
+$try .=  '$y = $x; $y++; "true" if $x < $y';
 
-  $rc = eval $try;
-  print "# For '$try'\n" if (!ok "$rc" , 'true');
+$rc = eval $try;
+is("$rc", 'true', $try);
 
-  $try =  '$x = Math::Roman->new("MCMLXII");';
-  $try =  '$y = $x; $y++; $y--; "true" if $x == $y;';
-  $rc = eval $try;
-  print "# For '$try'\n" if (!ok "$rc" , 'true');
+$try =  '$x = Math::Roman->new("MCMLXII");';
+$try =  '$y = $x; $y++; $y--; "true" if $x == $y;';
+$rc = eval $try;
+is("$rc", 'true', $try);
 
 # test wether tokens works correctly
 
-  $try = 'use Math::Roman; Math::Roman::tokens ( qw( I 1  V 5  X 10  L 50  C 100  D 500  M 1000) );';
-  $try .= '$x = new Math::Roman "XIIII"; $x = $x->as_number();';
-  $rc = eval $try;
-  print "# For '$try'\n" if (!ok "$rc" , "14" );
+$try = 'use Math::Roman; Math::Roman::tokens';
+$try .= ' (qw( I 1  V 5  X 10  L 50  C 100  D 500  M 1000));';
+$try .= ' $x = new Math::Roman "XIIII"; $x = $x->as_number();';
+$rc = eval $try;
+is("$rc", "14", $try);
 
 ############ watch out - changed tokens from now on! ###########
-
-1;
 
 __END__
 abc:NaN

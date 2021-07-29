@@ -1,6 +1,6 @@
 package Lemonldap::NG::Manager::Api::Providers::OidcRp;
 
-our $VERSION = '2.0.10';
+our $VERSION = '2.0.12';
 
 package Lemonldap::NG::Manager::Api;
 
@@ -277,6 +277,7 @@ sub deleteOidcRp {
     delete $conf->{oidcRPMetaDataExportedVars}->{$confKey};
     delete $conf->{oidcRPMetaDataOptionsExtraClaims}->{$confKey};
     delete $conf->{oidcRPMetaDataMacros}->{$confKey};
+    delete $conf->{oidcRPMetaDataScopeRules}->{$confKey};
 
     # Save configuration
     $self->_saveApplyConf($conf);
@@ -303,6 +304,9 @@ sub _getOidcRpByConfKey {
     # Get macros
     my $macros = $conf->{oidcRPMetaDataMacros}->{$confKey} || {};
 
+    # Get scope rules
+    my $scopeRules = $conf->{oidcRPMetaDataScopeRules}->{$confKey} || {};
+
     # Redirect URIs, filled later
     my $redirectUris = $self->_translateValueConfToApi(
         'oidcRPMetaDataOptionsRedirectUris',
@@ -328,6 +332,7 @@ sub _getOidcRpByConfKey {
         exportedVars => $exportedVars,
         extraClaims  => $extraClaims,
         macros       => $macros,
+        scopeRules   => $scopeRules,
         options      => $options
     };
 }
@@ -434,8 +439,24 @@ sub _pushOidcRp {
         else {
             return {
                 res => 'ko',
-                msg =>
-"Invalid input: macros is not a hash object with \"key\":\"value\" attributes"
+                msg => "Invalid input: macros is not a hash object"
+                  . " with \"key\":\"value\" attributes"
+            };
+        }
+    }
+
+    if ( defined $push->{scopeRules} ) {
+        if ( $self->_isSimpleKeyValueHash( $push->{scopeRules} ) ) {
+            foreach ( keys %{ $push->{scopeRules} } ) {
+                $conf->{oidcRPMetaDataScopeRules}->{$confKey}->{$_} =
+                  $push->{scopeRules}->{$_};
+            }
+        }
+        else {
+            return {
+                res => 'ko',
+                msg => "Invalid input: scopeRules is not a hash object"
+                  . " with \"key\":\"value\" attributes"
             };
         }
     }
@@ -450,8 +471,8 @@ sub _pushOidcRp {
         else {
             return {
                 res => 'ko',
-                msg =>
-"Invalid input: extraClaims is not a hash object with \"key\":\"value\" attributes"
+                msg => "Invalid input: extraClaims is not a hash object"
+                  . " with \"key\":\"value\" attributes"
             };
         }
     }

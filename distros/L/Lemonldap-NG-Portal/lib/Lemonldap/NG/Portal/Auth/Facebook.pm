@@ -7,7 +7,7 @@ use Lemonldap::NG::Common::FormEncode;
 use Lemonldap::NG::Portal::Main::Constants qw(PE_OK PE_ERROR PE_BADCREDENTIALS);
 use utf8;
 
-our $VERSION = '2.0.3';
+our $VERSION = '2.0.12';
 
 extends 'Lemonldap::NG::Portal::Main::Auth';
 
@@ -129,26 +129,27 @@ sub extractFormInfo {
     $self->logger->debug( "Redirect user to " . $req->{urldc} );
     $req->continue(1);
     $req->steps( [] );
-    PE_OK;
+
+    return PE_OK;
 }
 
 sub authenticate {
-    PE_OK;
+    return PE_OK;
 }
 
 sub setAuthSessionInfo {
     my ( $self, $req ) = @_;
     $req->{sessionInfo}->{authenticationLevel} =
       $self->conf->{facebookAuthnLevel};
-    PE_OK;
+    return PE_OK;
 }
 
 sub authFinish {
-    PE_OK;
+    return PE_OK;
 }
 
 sub authLogout {
-    PE_OK;
+    return PE_OK;
 }
 
 sub getDisplayType {
@@ -170,6 +171,7 @@ sub fb {
         );
     };
     $self->logger->error($@) if ($@);
+
     return $fb;
 }
 

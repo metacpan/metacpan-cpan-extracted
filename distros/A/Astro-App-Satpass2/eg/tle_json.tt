@@ -3,6 +3,11 @@
 
     satpass2> formatter format eg/tle_json.tt
 
+    or,
+
+    satpass2> formatter template tle_json <eg/tle_json.tt
+    satpass2> tle -json
+
     -%]
 [% UNLESS data %]
     [%- SET data = sp.tle( arg ) %]

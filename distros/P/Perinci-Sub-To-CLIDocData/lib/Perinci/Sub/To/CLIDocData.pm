@@ -1,9 +1,9 @@
 package Perinci::Sub::To::CLIDocData;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-07-08'; # DATE
+our $DATE = '2021-07-11'; # DATE
 our $DIST = 'Perinci-Sub-To-CLIDocData'; # DIST
-our $VERSION = '0.296'; # VERSION
+our $VERSION = '0.298'; # VERSION
 
 use 5.010001;
 use strict;
@@ -391,7 +391,9 @@ sub gen_cli_doc_data_from_meta {
     $clidocdata->{opts} = \%opts;
 
   GEN_USAGE_LINE: {
-        my @args;
+        my @plain_args;
+        my @pod_args;
+
         my %args_prop = %$args_prop; # copy because we want to iterate & delete
         my $max_pos = -1;
         for (values %args_prop) {
@@ -417,22 +419,28 @@ sub gen_cli_doc_data_from_meta {
                     defined $arg_spec->{'x.name.singular'};
             }
             if ($arg_spec->{req}) {
-                push @args, "<$arg>";
+                push @plain_args, "<$arg>";
+                push @pod_args  , "E<lt>I<$arg>E<gt>";
             } else {
-                push @args, "[$arg]";
+                push @plain_args, "[$arg]";
+                push @pod_args  , "[I<$arg>]";
             }
-            $args[-1] .= " ..." if ($arg_spec->{slurpy} // $arg_spec->{greedy});
+            $plain_args[-1] .= " ..." if ($arg_spec->{slurpy} // $arg_spec->{greedy});
+            $pod_args  [-1] .= " ..." if ($arg_spec->{slurpy} // $arg_spec->{greedy});
             delete $args_prop{$arg};
         }
 
         # XXX utilize information from args_rels
 
         require Getopt::Long::Util;
-        my @opts;
-        my %opt_locations; # key=argname
+        my @plain_opts;
+        my @pod_opts;
+        my %opt_locations; # key=$ARGNAME or "common:$SOMEKEY"
         for my $ospec (sort {
             ($ggls_res->[3]{'func.specmeta'}{$a}{is_neg} ? 1:0) <=> ($ggls_res->[3]{'func.specmeta'}{$b}{is_neg} ? 1:0) ||
             ($ggls_res->[3]{'func.specmeta'}{$a}{is_alias} ? 1:0) <=> ($ggls_res->[3]{'func.specmeta'}{$b}{is_alias} ? 1:0) ||
+            ($ggls_res->[3]{'func.specmeta'}{$a}{is_json} ? 1:0) <=> ($ggls_res->[3]{'func.specmeta'}{$b}{is_json} ? 1:0) ||
+            ($ggls_res->[3]{'func.specmeta'}{$a}{is_yaml} ? 1:0) <=> ($ggls_res->[3]{'func.specmeta'}{$b}{is_yaml} ? 1:0) ||
                 $a cmp $b
             } keys %{ $ggls_res->[3]{'func.specmeta'} }) {
             my $ospecmeta = $ggls_res->[3]{'func.specmeta'}{$ospec};
@@ -443,37 +451,76 @@ sub gen_cli_doc_data_from_meta {
             # only inlude common options that are not a specific action that are
             # invoked on its own
 
-            #use DD; print "ospec: $ospec, ospecmeta: "; dd $ospecmeta;
-
             my $copt = defined $ospecmeta->{common_opt} ? $common_opts->{ $ospecmeta->{common_opt} } : undef;
+
             next if defined $ospecmeta->{common_opt} && $copt->{usage};
-            my $opt = Getopt::Long::Util::humanize_getopt_long_opt_spec({
-                separator=>" | ",
+            my $caption_from_schema;
+            if ($argprop && $argprop->{schema} &&
+                    ref $argprop->{schema} eq 'ARRAY' # ignore non-normalized schema for now
+                ) {
+                my $type = $argprop->{schema}[0];
+                my $cset = $argprop->{schema}[1];
+                if ($type eq 'array') {
+                    if ($cset->{of} && ref $cset->{of} eq 'ARRAY') {
+                        $caption_from_schema = $cset->{of}[0];
+                    }
+                } elsif ($type eq 'hash') {
+                    if ($cset->{of} && ref $cset->{of} eq 'ARRAY') {
+                        $caption_from_schema = $cset->{of}[0];
+                    }
+                } else {
+                    $caption_from_schema = $type;
+                }
+            }
+            my $hres = Getopt::Long::Util::humanize_getopt_long_opt_spec({
+                extended=>1,
+                separator=>"|",
                 value_label=>(
-                    $argprop ?
-                        ($argprop->{'x.cli.opt_value_label'} // $argprop->{caption}) :
-                        ($copt->{value_label})
+                    $ospecmeta->{is_json} ? 'json' :
+                    $ospecmeta->{is_yaml} ? 'yaml' :
+                        $argprop ?
+                        ($argprop->{'x.cli.opt_value_label'} // $argprop->{caption} // $caption_from_schema) :
+                        $copt->{value_label}
                     ),
             }, $ospec);
+            my $plain_opt = $hres->{plaintext};
+            my $pod_opt   = $hres->{pod};
 
-            # put option from arg and its cmdline aliases together as alternates
-            if ($ospecmeta->{is_alias} || $ospecmeta->{is_neg}) {
-                push @{ $opts[ $opt_locations{$ospecmeta->{arg}} ] }, $opt;
+            my $key;
+            if ($copt && defined $copt->{key}) {
+                # group common options by key.
+                $key = "00common:" . $copt->{key};
+            } elsif ($ospecmeta->{is_alias} || $ospecmeta->{is_neg} || $ospecmeta->{is_json} || $ospecmeta->{is_yaml}) {
+                # put option from arg and its cmdline aliases or its json/yaml
+                # version and its negation version together as alternates.
+                $key = $ospecmeta->{arg};
             } else {
-                $opt_locations{$ospecmeta->{arg} // $ospec} //= scalar @opts;
-                push @opts, [$opt];
+                $key = $ospec;
             }
+            $key =~ s/_/-/g;
+
+            $opt_locations{$key} //= scalar @plain_opts;
+            push @{ $plain_opts[ $opt_locations{$key} ] }, $plain_opt;
+            push @{ $pod_opts  [ $opt_locations{$key} ] }, $pod_opt;
+            #use Data::Dmp; print "key: $key, ospec: $ospec, ospecmeta: ", dmp($ospecmeta), ", argprop: ", dmp($argprop), ", copt: ", dmp($copt), "\n";
         }
 
         $clidocdata->{compact_usage_line} = "[[prog]]".
             (keys(%args_prop) || keys(%$common_opts) ? " [options]" : ""). # XXX translatable?
-            (@args ? " ".join(" ", @args) : "");
+            (@plain_args ? " ".join(" ", @plain_args) : "");
         $clidocdata->{usage_line} = "[[prog]]".
-            (@opts+@args ? " ".
+            (@plain_opts+@plain_args ? " ".
              join(" ",
-                  (map { "[". join(" | ", @$_) . "]" } @opts),
-                  (@opts && @args ? ("--") : ()),
-                  @args,
+                  (map { "[". join("|", @$_) . "]" } @plain_opts),
+                  (@plain_opts && @plain_args ? ("--") : ()),
+                  @plain_args,
+              ) : "");
+        $clidocdata->{'usage_line.alt.fmt.pod'} = "B<[[prog]]>".
+            (@pod_opts+@pod_args ? " ".
+             join(" ",
+                  (map { "[". join("|", @$_) . "]" } @pod_opts),
+                  (@pod_opts && @pod_args ? ("--") : ()),
+                  @pod_args,
               ) : "");
     } # GEN_USAGE_LINE
 
@@ -544,7 +591,7 @@ Perinci::Sub::To::CLIDocData - From Rinci function metadata, generate structure 
 
 =head1 VERSION
 
-This document describes version 0.296 of Perinci::Sub::To::CLIDocData (from Perl distribution Perinci-Sub-To-CLIDocData), released on 2021-07-08.
+This document describes version 0.298 of Perinci::Sub::To::CLIDocData (from Perl distribution Perinci-Sub-To-CLIDocData), released on 2021-07-11.
 
 =head1 SYNOPSIS
 
@@ -590,9 +637,9 @@ Sample result:
      200,
      "OK",
      {
-       compact_usage_line => "[[prog]] [options] <str1>",
-       example_categories => { Examples => { order => 99 } },
-       examples => [
+       "compact_usage_line" => "[[prog]] [options] <str1>",
+       "example_categories" => { Examples => { order => 99 } },
+       "examples" => [
          {
            categories   => ["Examples"],
            category     => "Examples",
@@ -606,8 +653,8 @@ Sample result:
            summary      => "Summary for an example",
          },
        ],
-       option_categories => { "Cat1 options" => { order => 50 }, "Main options" => { order => 0 } },
-       opts => {
+       "option_categories" => { "Cat1 options" => { order => 50 }, "Main options" => { order => 0 } },
+       "opts" => {
          "--bool1" => {
            arg         => "bool1",
            arg_spec    => {
@@ -676,14 +723,15 @@ Sample result:
            tags        => 'fix',
          },
        },
-       usage_line => "[[prog]] [--bool1 | -z | --no-bool1 | --nobool1] [--flag1 | -f] -- <str1>",
+       "usage_line" => "[[prog]] [--bool1|-z|--no-bool1|--nobool1] [--flag1|-f] -- <str1>",
+       "usage_line.alt.fmt.pod" => "B<[[prog]]> [B<--bool1>|B<-z>|B<--no-bool1>|B<--nobool1>] [B<--flag1>|B<-f>] -- E<lt>I<str1>E<gt>",
      },
    ];
-   $a->[2]{opts}{"--bool1"}{tags} = $a->[2]{opts}{"--bool1"}{arg_spec}{tags};
-   $a->[2]{opts}{"--flag1, -f"}{tags} = $a->[2]{opts}{"--flag1, -f"}{arg_spec}{tags};
-   $a->[2]{opts}{"-z"}{alias_spec} = $a->[2]{opts}{"--bool1"}{arg_spec}{cmdline_aliases}{z};
-   $a->[2]{opts}{"-z"}{arg_spec} = $a->[2]{opts}{"--bool1"}{arg_spec};
-   $a->[2]{opts}{"-z"}{tags} = $a->[2]{opts}{"--bool1"}{arg_spec}{tags};
+   $a->[2]{"opts"}{"--bool1"}{tags} = $a->[2]{"opts"}{"--bool1"}{arg_spec}{tags};
+   $a->[2]{"opts"}{"--flag1, -f"}{tags} = $a->[2]{"opts"}{"--flag1, -f"}{arg_spec}{tags};
+   $a->[2]{"opts"}{"-z"}{alias_spec} = $a->[2]{"opts"}{"--bool1"}{arg_spec}{cmdline_aliases}{z};
+   $a->[2]{"opts"}{"-z"}{arg_spec} = $a->[2]{"opts"}{"--bool1"}{arg_spec};
+   $a->[2]{"opts"}{"-z"}{tags} = $a->[2]{"opts"}{"--bool1"}{arg_spec}{tags};
    $a;
  }
 For a more complete sample, see function metadata for C<demo_cli_opts> in
@@ -789,7 +837,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020, 2019, 2016, 2015, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2019, 2016, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

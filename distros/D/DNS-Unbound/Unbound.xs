@@ -12,49 +12,45 @@
 typedef struct ub_ctx dns_unbound_ub_ctx;
 
 SV* _ub_result_to_svhv_and_free (struct ub_result* result) {
-    SV *val;
 
     AV *data = newAV();
-    unsigned int i = 0;
+    unsigned datasize = 0;
 
     if (result->data != NULL) {
-        while (result->data[i] != NULL) {
-            val = newSVpvn(result->data[i], result->len[i]);
-            av_push(data, val);
-            i++;
+        while (result->data[datasize] != NULL) {
+            datasize++;
+        }
+
+        if (datasize) {
+            av_extend(data, datasize - 1);
+
+            for (unsigned i=0; i<datasize; i++) {
+                av_store(data, i, newSVpvn(result->data[i], result->len[i]));
+            }
         }
     }
 
     HV * rh = newHV();
 
-    val = newSVpv(result->qname, 0);
-    hv_stores(rh, "qname", val);
+    hv_stores(rh, "qname", newSVpv(result->qname, 0));
 
-    val = newSViv(result->qtype);
-    hv_stores(rh, "qtype", val);
+    hv_stores(rh, "qtype", newSViv(result->qtype));
 
-    val = newSViv(result->qclass);
-    hv_stores(rh, "qclass", val);
+    hv_stores(rh, "qclass", newSViv(result->qclass));
 
-    hv_stores(rh, "data", newRV_inc((SV *)data));
+    hv_stores(rh, "data", newRV_noinc((SV *)data));
 
-    val = newSVpv(result->canonname, 0);
-    hv_stores(rh, "canonname", val);
+    hv_stores(rh, "canonname", newSVpv(result->canonname, 0));
 
-    val = newSViv(result->rcode);
-    hv_stores(rh, "rcode", val);
+    hv_stores(rh, "rcode", newSViv(result->rcode));
 
-    val = newSViv(result->havedata);
-    hv_stores(rh, "havedata", val);
-
-    val = newSViv(result->nxdomain);
-    hv_stores(rh, "nxdomain", val);
-
-    val = newSViv(result->secure);
-    hv_stores(rh, "secure", val);
-
-    val = newSViv(result->bogus);
-    hv_stores(rh, "bogus", val);
+    /* Ideally these could use boolSV(), but the efficiency gains
+       probably don’t justify the API change. libunbound(3) documents
+       these as ints, not bools, so we should preserve that. */
+    hv_stores(rh, "havedata",   newSViv(result->havedata));
+    hv_stores(rh, "nxdomain",   newSViv(result->nxdomain));
+    hv_stores(rh, "secure",     newSViv(result->secure));
+    hv_stores(rh, "bogus",      newSViv(result->bogus));
 
     hv_stores(rh, "why_bogus",
 #if HAS_WHY_BOGUS
@@ -72,8 +68,7 @@ SV* _ub_result_to_svhv_and_free (struct ub_result* result) {
 #endif
     );
 
-    val = newSVpvn(result->answer_packet, result->answer_len);
-    hv_stores(rh, "answer_packet", val);
+    hv_stores(rh, "answer_packet", newSVpvn(result->answer_packet, result->answer_len));
 
     ub_resolve_free(result);
 
@@ -192,7 +187,7 @@ _ub_ctx_get_option( dns_unbound_ub_ctx *ctx, SV* opt)
             SV *val = newSVpv(str, 0);
 
             // On success, return a reference to an SV that gives the value.
-            RETVAL = newRV_inc(val);
+            RETVAL = newRV_noinc(val);
         }
 
         free(str);
@@ -326,10 +321,11 @@ _resolve_async( dns_unbound_ub_ctx *ctx, SV *name_sv, int type, int class, SV *r
         );
 
         AV *ret = newAV();
-        av_push( ret, newSViv(reserr) );
-        av_push( ret, newSViv(async_id) );
+        av_extend(ret, 1);  // 2 elems - 1
+        av_store( ret, 0, newSViv(reserr) );
+        av_store( ret, 1, newSViv(async_id) );
 
-        RETVAL = newRV_inc((SV *)ret);
+        RETVAL = newRV_noinc((SV *)ret);
     OUTPUT:
         RETVAL
 
@@ -346,7 +342,7 @@ _resolve( dns_unbound_ub_ctx *ctx, SV *name, int type, int class = 1 )
         }
         else {
             SV *svhv = _ub_result_to_svhv_and_free(result);
-            RETVAL = newRV_inc(svhv);
+            RETVAL = newRV_noinc(svhv);
         }
 
     OUTPUT:

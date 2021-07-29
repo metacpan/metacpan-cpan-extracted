@@ -6,6 +6,7 @@ package Paws::IAM::UploadServerCertificate;
   has Path => (is => 'ro', isa => 'Str');
   has PrivateKey => (is => 'ro', isa => 'Str', required => 1);
   has ServerCertificateName => (is => 'ro', isa => 'Str', required => 1);
+  has Tags => (is => 'ro', isa => 'ArrayRef[Paws::IAM::Tag]');
 
   use MooseX::ClassAttribute;
 
@@ -31,9 +32,9 @@ You shouldn't make instances of this class. Each attribute should be used as a n
 =head1 SYNOPSIS
 
     my $iam = Paws->service('IAM');
-    # To upload a server certificate to your AWS account
-    # The following upload-server-certificate command uploads a server
-    # certificate to your AWS account:
+  # To upload a server certificate to your AWS account
+  # The following upload-server-certificate command uploads a server certificate
+  # to your AWS account:
     my $UploadServerCertificateResponse = $iam->UploadServerCertificate(
       'CertificateBody' =>
 '-----BEGIN CERTIFICATE-----<a very long certificate text string>-----END CERTIFICATE-----',
@@ -117,7 +118,7 @@ carriage return (C<\u000D>)
 =head2 Path => Str
 
 The path for the server certificate. For more information about paths,
-see IAM Identifiers
+see IAM identifiers
 (https://docs.aws.amazon.com/IAM/latest/UserGuide/Using_Identifiers.html)
 in the I<IAM User Guide>.
 
@@ -175,6 +176,20 @@ This parameter allows (through its regex pattern
 (http://wikipedia.org/wiki/regex)) a string of characters consisting of
 upper and lowercase alphanumeric characters with no spaces. You can
 also include any of the following characters: _+=,.@-
+
+
+
+=head2 Tags => ArrayRef[L<Paws::IAM::Tag>]
+
+A list of tags that you want to attach to the new IAM server
+certificate resource. Each tag consists of a key name and an associated
+value. For more information about tagging, see Tagging IAM resources
+(https://docs.aws.amazon.com/IAM/latest/UserGuide/id_tags.html) in the
+I<IAM User Guide>.
+
+If any one of the tags is invalid or if you exceed the allowed maximum
+number of tags, then the entire request fails and the resource is not
+created.
 
 
 

@@ -3,7 +3,7 @@ package Beekeeper::Worker;
 use strict;
 use warnings;
 
-our $VERSION = '0.07';
+our $VERSION = '0.09';
 
 use Beekeeper::Client ':worker';
 use Beekeeper::Logger ':log_levels';
@@ -12,7 +12,7 @@ use Beekeeper::JSONRPC;
 use JSON::XS;
 use Time::HiRes;
 use Sys::Hostname;
-use Digest::SHA 'sha256_hex';
+use Digest::MD5 'md5_base64';
 use Scalar::Util 'blessed';
 use Carp;
 
@@ -148,11 +148,11 @@ sub __init_auth_tokens {
     # but it is not an effective access restriction: anyone with access to the backend
     # bus credentials can easily inspect and clone auth data tokens
 
-    my $salt = $self->{_CLIENT}->{auth_salt} || '';
+    my $salt = $self->{_CLIENT}->{auth_salt};
 
-    $AUTH_TOKENS{'BKPR_SYSTEM'} = sha256_hex('BKPR_SYSTEM'. $salt);
-    $AUTH_TOKENS{'BKPR_ADMIN'}  = sha256_hex('BKPR_ADMIN' . $salt);
-    $AUTH_TOKENS{'BKPR_ROUTER'} = sha256_hex('BKPR_ROUTER'. $salt);
+    $AUTH_TOKENS{'BKPR_SYSTEM'} = md5_base64('BKPR_SYSTEM'. $salt);
+    $AUTH_TOKENS{'BKPR_ADMIN'}  = md5_base64('BKPR_ADMIN' . $salt);
+    $AUTH_TOKENS{'BKPR_ROUTER'} = md5_base64('BKPR_ROUTER'. $salt);
 }
 
 sub __has_authorization_token {
@@ -202,9 +202,10 @@ sub __init_client {
     my $self = shift;
 
     my $bus_id = $self->{_WORKER}->{bus_id};
+    my $config = $self->{_WORKER}->{bus_config}->{$bus_id};
 
     my $client = Beekeeper::Client->new(
-        bus_id   => $bus_id,
+        %$config,
         timeout  => 0,  # retry forever
         on_error => sub { 
             my $errmsg = $_[0] || ""; $errmsg =~ s/\s+/ /sg;
@@ -872,7 +873,7 @@ sub stop_working {
     return if $worker->{shutting_down};
     $worker->{shutting_down} = 1;
 
-    unless (exists $worker->{stop_cv}) {
+    unless (defined $worker->{stop_cv}) {
         # Worker did not completed initialization yet
         CORE::exit(0);
     }
@@ -989,7 +990,7 @@ Beekeeper::Worker - Base class for creating services
 
 =head1 VERSION
 
-Version 0.07
+Version 0.09
 
 =head1 SYNOPSIS
 

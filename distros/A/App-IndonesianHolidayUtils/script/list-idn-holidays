@@ -1,12 +1,12 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /Calendar/Indonesia/Holiday/list_idn_holidays
-# and generated automatically using Perinci::CmdLine::Gen version 0.497
+# and generated automatically using Perinci::CmdLine::Gen version 0.499
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-01-17'; # DATE
+our $DATE = '2021-07-24'; # DATE
 our $DIST = 'App-IndonesianHolidayUtils'; # DIST
-our $VERSION = '0.061'; # VERSION
+our $VERSION = '0.064'; # VERSION
 
 use 5.010001;
 use strict;
@@ -41,53 +41,13 @@ list-idn-holidays - List Indonesian holidays in calendar
 
 =head1 VERSION
 
-This document describes version 0.061 of list-idn-holidays (from Perl distribution App-IndonesianHolidayUtils), released on 2021-01-17.
+This document describes version 0.064 of list-idn-holidays (from Perl distribution App-IndonesianHolidayUtils), released on 2021-07-24.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % list-idn-holidays [--date-in-json=s] [--date-in=s+] [--date-is=s]
-     [--date-isnt=s] [--date-max=s] [--date-min=s] [--date-not-in-json=s]
-     [--date-not-in=s+] [--date-xmax=s] [--date-xmin=s] [--date=s]
-     [--day-in-json=s] [--day-in=s+] [--day-is=s] [--day-isnt=s]
-     [--day-max=s] [--day-min=s] [--day-not-in-json=s] [--day-not-in=s+]
-     [--day-xmax=s] [--day-xmin=s] [--day=s] [--decree-date-contains=s]
-     [--decree-date-in-json=s] [--decree-date-in=s+] [--decree-date-is=s]
-     [--decree-date-isnt=s] [--decree-date-max=s] [--decree-date-min=s]
-     [--decree-date-not-contains=s] [--decree-date-not-in-json=s]
-     [--decree-date-not-in=s+] [--decree-date-xmax=s]
-     [--decree-date-xmin=s] [--decree-date=s] [--decree-note-contains=s]
-     [--decree-note-in-json=s] [--decree-note-in=s+] [--decree-note-is=s]
-     [--decree-note-isnt=s] [--decree-note-max=s] [--decree-note-min=s]
-     [--decree-note-not-contains=s] [--decree-note-not-in-json=s]
-     [--decree-note-not-in=s+] [--decree-note-xmax=s]
-     [--decree-note-xmin=s] [--decree-note=s] [--detail] [--dow-in-json=s]
-     [--dow-in=s+] [--dow-is=s] [--dow-isnt=s] [--dow-max=s] [--dow-min=s]
-     [--dow-not-in-json=s] [--dow-not-in=s+] [--dow-xmax=s] [--dow-xmin=s]
-     [--dow=s] [--exclude-field=s+] [--exclude-fields-json=s] [--field=s+]
-     [--fields-json=s] [--format=name] [--is-holiday] [--is-holiday-is]
-     [--is-holiday-isnt] [--is-joint-leave] [--is-joint-leave-is]
-     [--is-joint-leave-isnt] [--isnt-holiday] [--isnt-holiday-is]
-     [--isnt-holiday-isnt] [--isnt-joint-leave] [--isnt-joint-leave-is]
-     [--isnt-joint-leave-isnt] [--json] [-l] [--month-in-json=s]
-     [--month-in=s+] [--month-is=s] [--month-isnt=s] [--month-max=s]
-     [--month-min=s] [--month-not-in-json=s] [--month-not-in=s+]
-     [--month-xmax=s] [--month-xmin=s] [--(no)naked-res] [--no-detail]
-     [--no-random] [--nodetail] [--norandom] [--note-contains=s]
-     [--note-in-json=s] [--note-in=s+] [--note-is=s] [--note-isnt=s]
-     [--note-max=s] [--note-min=s] [--note-not-contains=s]
-     [--note-not-in-json=s] [--note-not-in=s+] [--note-xmax=s]
-     [--note-xmin=s] [--note=s] [--page-result[=program]] [--random]
-     [--result-limit=s] [--result-start=s] [--sort-json=s] [--sort=s+]
-     [--tags-has-json=s] [--tags-has=s+] [--tags-is-json=s] [--tags-is=s]
-     [--tags-isnt-json=s] [--tags-isnt=s] [--tags-json=s]
-     [--tags-lacks-json=s] [--tags-lacks=s+] [--tags=s]
-     [--view-result[=program]] [--with-field-names] [--without-field-names]
-     [--year-in-json=s] [--year-in=s+] [--year-is=s] [--year-isnt=s]
-     [--year-max=s] [--year-min=s] [--year-not-in-json=s]
-     [--year-not-in=s+] [--year-xmax=s] [--year-xmin=s] [--year=s] [query]
-     [month]
+% B<list-idn-holidays> [(B<--date-in>=I<date>)+] [B<--date-is>=I<date>] [B<--date-isnt>=I<date>] [B<--date-max>=I<date>] [B<--date-min>=I<date>] [(B<--date-not-in>=I<date>)+] [B<--date-xmax>=I<date>] [B<--date-xmin>=I<date>] [B<--date>=I<date>] [(B<--day-in>=I<int>)+] [B<--day-is>=I<int>] [B<--day-isnt>=I<int>] [B<--day-max>=I<int>] [B<--day-min>=I<int>] [(B<--day-not-in>=I<int>)+] [B<--day-xmax>=I<int>] [B<--day-xmin>=I<int>] [B<--day>=I<int>] [B<--decree-date-contains>=I<str>] [(B<--decree-date-in>=I<str>)+] [B<--decree-date-is>=I<str>] [B<--decree-date-isnt>=I<str>] [B<--decree-date-max>=I<str>] [B<--decree-date-min>=I<str>] [B<--decree-date-not-contains>=I<str>] [(B<--decree-date-not-in>=I<str>)+] [B<--decree-date-xmax>=I<str>] [B<--decree-date-xmin>=I<str>] [B<--decree-date>=I<str>] [B<--decree-note-contains>=I<str>] [(B<--decree-note-in>=I<str>)+] [B<--decree-note-is>=I<str>] [B<--decree-note-isnt>=I<str>] [B<--decree-note-max>=I<str>] [B<--decree-note-min>=I<str>] [B<--decree-note-not-contains>=I<str>] [(B<--decree-note-not-in>=I<str>)+] [B<--decree-note-xmax>=I<str>] [B<--decree-note-xmin>=I<str>] [B<--decree-note>=I<str>] [B<--detail>|B<-l>|B<--no-detail>|B<--nodetail>] [(B<--dow-in>=I<int>)+] [B<--dow-is>=I<int>] [B<--dow-isnt>=I<int>] [B<--dow-max>=I<int>] [B<--dow-min>=I<int>] [(B<--dow-not-in>=I<int>)+] [B<--dow-xmax>=I<int>] [B<--dow-xmin>=I<int>] [B<--dow>=I<int>] [(B<--exclude-field>=I<str>)+] [(B<--field>=I<str>)+] [B<--format>=I<name>|B<--json>] [B<--is-holiday>|B<--isnt-holiday>] [B<--is-holiday-is>] [B<--is-holiday-isnt>] [B<--is-joint-leave>|B<--isnt-joint-leave>] [B<--is-joint-leave-is>] [B<--is-joint-leave-isnt>] [(B<--month-in>=I<int>)+] [B<--month-is>=I<int>] [B<--month-isnt>=I<int>] [B<--month-max>=I<int>] [B<--month-min>=I<int>] [(B<--month-not-in>=I<int>)+] [B<--month-xmax>=I<int>] [B<--month-xmin>=I<int>] [B<--(no)naked-res>] [B<--note-contains>=I<str>] [(B<--note-in>=I<str>)+] [B<--note-is>=I<str>] [B<--note-isnt>=I<str>] [B<--note-max>=I<str>] [B<--note-min>=I<str>] [B<--note-not-contains>=I<str>] [(B<--note-not-in>=I<str>)+] [B<--note-xmax>=I<str>] [B<--note-xmin>=I<str>] [B<--note>=I<str>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] [B<--query>=I<str>] [B<--random>|B<--no-random>|B<--norandom>] [B<--result-limit>=I<int>] [B<--result-start>=I<int>] [(B<--sort>=I<str>)+] [(B<--tags-has>=I<str>)+] [B<--tags-is>=I<s>] [B<--tags-isnt>=I<s>] [(B<--tags-lacks>=I<str>)+] [B<--tags>=I<s>] [B<--with-field-names>|B<--without-field-names>] [(B<--year-in>=I<int>)+] [B<--year-is>=I<int>] [B<--year-isnt>=I<int>] [B<--year-max>=I<int>] [B<--year-min>=I<int>] [(B<--year-not-in>=I<int>)+] [B<--year-xmax>=I<int>] [B<--year-xmin>=I<int>] [B<--date-in-json>=I<json>] [B<--date-not-in-json>=I<json>] [B<--day-in-json>=I<json>] [B<--day-not-in-json>=I<json>] [B<--decree-date-in-json>=I<json>] [B<--decree-date-not-in-json>=I<json>] [B<--decree-note-in-json>=I<json>] [B<--decree-note-not-in-json>=I<json>] [B<--dow-in-json>=I<json>] [B<--dow-not-in-json>=I<json>] [B<--exclude-fields-json>=I<json>] [B<--fields-json>=I<json>] [B<--month-in-json>=I<json>] [B<--month-not-in-json>=I<json>] [B<--note-in-json>=I<json>] [B<--note-not-in-json>=I<json>] [B<--sort-json>=I<json>] [B<--tags-has-json>=I<json>] [B<--tags-is-json>=I<json>] [B<--tags-isnt-json>=I<json>] [B<--tags-json>=I<json>] [B<--tags-lacks-json>=I<json>] [B<--year-in-json>=I<json>] [B<--year-not-in-json>=I<json>] [B<-q>=I<str>] [B<--isnt-holiday-is>] [B<--isnt-holiday-isnt>] [B<--isnt-joint-leave-is>] [B<--isnt-joint-leave-isnt>] -- [I<year>] [I<month>]
 
 =head1 DESCRIPTION
 
@@ -543,6 +503,8 @@ Only return records where the 'month' field is greater than specified value.
 
 Only return records where the 'month' field equals specified value.
 
+Can also be specified as the 2nd command-line argument.
+
 =back
 
 =head2 Filtering for note options
@@ -727,6 +689,8 @@ Only return records where the 'year' field is greater than specified value.
 
 Only return records where the 'year' field equals specified value.
 
+Can also be specified as the 1st command-line argument.
+
 =back
 
 =head2 Filtering options
@@ -888,7 +852,7 @@ Source repository is at L<https://github.com/perlancar/perl-App-IndonesianHolida
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-App-IndonesianHolidayUtils/issues>
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-IndonesianHolidayUtils>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

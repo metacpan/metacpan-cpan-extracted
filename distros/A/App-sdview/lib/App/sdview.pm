@@ -8,15 +8,10 @@ use utf8;
 
 use Object::Pad;
 
-package App::sdview 0.02;
-class App::sdview;
+package App::sdview 0.03;
+class App::sdview :strict(params);
 
 use List::Keywords qw( first );
-
-use Term::Size;
-use Convert::Color;
-use Convert::Color::XTerm 0.06;
-use String::Tagged::Terminal;
 
 =head1 NAME
 
@@ -39,30 +34,20 @@ To actually use it, you likely wanted wanted to see the F<bin/sdview> script.
 
 =cut
 
-my %FORMATSTYLES = (
-   B => { bold => 1 },
-   I => { italic => 1 },
-   F => { italic => 1, under => 1 },
-   C => { monospace => 1, bg => Convert::Color->new( "xterm:235" ) },
-   L => { under => 1, fg => Convert::Color->new( "xterm:rgb(3,3,5)" ) }, # light blue
-);
-
-my %PARASTYLES = (
-   head1    => { fg => Convert::Color->new( "vga:yellow" ), bold => 1 },
-   head2    => { fg => Convert::Color->new( "vga:cyan" ), bold => 1, indent => 2 },
-   head3    => { fg => Convert::Color->new( "vga:green" ), bold => 1, indent => 4 },
-   # TODO head4
-   plain    => { indent => 6, blank_after => 1 },
-   verbatim => { indent => 8, blank_after => 1, $FORMATSTYLES{C}->%* },
-);
-$PARASTYLES{item} = $PARASTYLES{plain};
-
 my @PARSER_CLASSES = qw(
    App::sdview::Parser::Pod
    App::sdview::Parser::Markdown
 );
 
 require ( "$_.pm" =~ s{::}{/}gr ) for @PARSER_CLASSES;
+
+my @OUTPUT_CLASSES = qw(
+   App::sdview::Output::Terminal
+   App::sdview::Output::Pod
+   App::sdview::Output::Markdown
+);
+
+require ( "$_.pm" =~ s{::}{/}gr ) for @OUTPUT_CLASSES;
 
 method run ( $file, %opts )
 {
@@ -74,10 +59,15 @@ method run ( $file, %opts )
    }
 
    if( ! -f $file ) {
-      open my $f, "-|", "perldoc", "-l", $file;
-      $file = <$f>; chomp $file if defined $file;
-      close $f;
-      $? and return $? >> 8;
+      my $name = $file;
+
+      foreach my $class ( $parser_class ? ( $parser_class ) : @PARSER_CLASSES ) {
+         defined( $file = $class->find_file( $name ) ) and
+            $parser_class = $class, last;
+      }
+
+      defined $file or
+         die "Unable to find a file for '$name'\n";
    }
 
    $parser_class //= do {
@@ -85,113 +75,14 @@ method run ( $file, %opts )
          die "Unable to find a handler for $file\n";
    };
 
+   $opts{output} //= "terminal";
+
+   my $output_class = first { $_->format eq $opts{output} } @OUTPUT_CLASSES or
+      die "Unrecognised output name $opts{output}\n";
+
    my @paragraphs = $parser_class->new->parse_file( $file );
 
-   # Unless -n switch
-   open my $outh, "|-", "less", "-R";
-   $outh->binmode( ":encoding(UTF-8)" );
-   select $outh;
-
-   my $TERMWIDTH = Term::Size::chars;
-
-   my $nextblank;
-
-   # To avoid recusion over a bunch of variables as state, we'll maintain a queue
-   while ( @paragraphs ) {
-      my $para = shift @paragraphs;
-
-      my $margin;
-      my $leader;
-      my %typestyle;
-
-      if( ref $para eq "HASH" ) {
-         $margin = $para->{margin};
-         $leader = sprintf "%-*s", $margin, $para->{leader};
-
-         %typestyle = ( $para->%* );
-
-         $para = $para->{para};
-      }
-
-      if( $para->type =~ m/^list-(.*)$/ ) {
-         my $listtype = $1;
-
-         my $n = 1;
-
-         unshift @paragraphs, map {
-            my $item = $_;
-            if( $item->type ne "item" ) {
-               # non-items just stand as they are + indent
-               { para => $item, margin => $margin + $para->indent }
-            }
-            elsif( $listtype eq "bullet" ) {
-               { para => $item, margin => $margin + $para->indent, leader => "*" }
-            }
-            elsif( $listtype eq "number" ) {
-               { para => $item, margin => $margin + $para->indent, leader => sprintf "%d.", $n++ }
-            }
-            elsif( $listtype eq "text" ) {
-               { para => $item, margin => $margin, blank_after => 0 }
-            }
-         } $para->items;
-         next;
-      }
-
-      say "" if $nextblank;
-
-      %typestyle = ( $PARASTYLES{ $para->type }->%*, %typestyle );
-
-      my $s = $para->text->clone(
-         convert_tags => {
-            ( map { $_ => do { my $k = $_; sub { $FORMATSTYLES{$k}->%* } } } keys %FORMATSTYLES ),
-         },
-      );
-
-      $typestyle{$_} and $s->apply_tag( 0, -1, $_ => $typestyle{$_} )
-         for qw( fg bg bold under italic monospace );
-
-      $nextblank = !!$typestyle{blank_after};
-
-      my @lines = $s->split( qr/\n/ );
-
-      my $indent = $typestyle{indent} // 0;
-      $indent += $margin;
-
-      foreach my $line ( @lines ) {
-         length $line or
-            ( print "\n" ), next;
-
-         $s = String::Tagged::Terminal->new_from_formatting( $line );
-
-         my $width = $TERMWIDTH - $indent - length($leader // "");
-
-         while( length $s ) {
-            my $part;
-            if( length($s) > $width ) {
-               if( substr($s, 0, $width) =~ m/(\s+)\S*$/ ) {
-                  my $partlen = $-[1];
-                  my $chopat = $+[1];
-
-                  $part = $s->substr( 0, $partlen );
-                  $s->set_substr( 0, $chopat, "" );
-               }
-               else {
-                  die "ARGH: notsure how to trim this one\n";
-               }
-            }
-            else {
-               $part = $s;
-               $s = "";
-            }
-
-            print " "x($indent - length($leader // ""));
-            print $leader if defined $leader;
-            print $part->build_terminal . "\n";
-
-            undef $leader;
-         }
-      }
-   }
+   $output_class->new->output( @paragraphs );
 }
 
 =head1 TODO

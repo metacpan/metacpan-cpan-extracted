@@ -7,8 +7,8 @@
 use warnings;
 use strict;
 
-our $VERSION = '3.022'; # VERSION
-my $LAST_UPDATE = '3.017'; # manually update whenever code is changed
+our $VERSION = '3.023'; # VERSION
+our $LAST_UPDATE = '3.023'; # manually update whenever code is changed
 
 use PDF::Builder;
 
@@ -66,7 +66,7 @@ my $font = $pdf->corefont('Times-Roman');
 $page = $pdf->page();
 $text = $page->text();
 $text->font($font, $fontsize);
-$text->lead($fontsize*1.25);
+$text->leading($fontsize*1.25);
 
 $width = $pageDim[2];
 $height = $pageDim[3];
@@ -105,7 +105,7 @@ $margins{'R'} = $marginTop;
 
 $text = $page->text();
 $text->font($font, $fontsize);
-$text->lead($fontsize*1.25);
+$text->leading($fontsize*1.25);
 
 $contR = 0;
 # two columns, half width of page
@@ -144,7 +144,7 @@ $margins{'R'} = $marginTop;
 
 $text = $page->text();
 $text->font($font, $fontsize);
-$text->lead($fontsize*1.25);
+$text->leading($fontsize*1.25);
 
 # two columns, half width of page
 $text->translate($margins{'L'}, $height-$margins{'T'}-$fontsize);
@@ -173,7 +173,7 @@ $text->text_center('-- 3 --');
 $page = $pdf->page();
 $text = $page->text();
 $text->font($font, $fontsize);
-$text->lead($fontsize*1.25);
+$text->leading($fontsize*1.25);
 
 $width = $pageDim[2];
 $height = $pageDim[3];

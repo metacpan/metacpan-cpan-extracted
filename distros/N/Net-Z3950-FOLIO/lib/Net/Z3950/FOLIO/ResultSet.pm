@@ -18,6 +18,7 @@ sub new {
 	barcode => $barcode,
 	totalCount => undef,
 	records => [],
+	id2record => {},
     }, $class;
 }
 
@@ -45,7 +46,10 @@ sub insertRecords {
     my($offset, $records) = @_;
 
     for (my $i = 0; $i < @$records; $i++) {
-	$this->{records}->[$offset + $i] = new Net::Z3950::FOLIO::Record($this, $offset + $i, $records->[$i]);
+	my $rec = new Net::Z3950::FOLIO::Record($this, $offset + $i, $records->[$i]);
+	$this->{records}->[$offset + $i] = $rec;
+	my $id = $rec->id();
+	$this->{id2record}->{$id} = $rec;
     }
 }
 
@@ -54,6 +58,13 @@ sub record {
     my($index0) = @_;
 
     return $this->{records}->[$index0];
+}
+
+sub recordById {
+    my $this = shift();
+    my($id) = @_;
+
+    return $this->{id2record}->{$id};
 }
 
 # If the $cql query is a search for a barcode, return that barcode;

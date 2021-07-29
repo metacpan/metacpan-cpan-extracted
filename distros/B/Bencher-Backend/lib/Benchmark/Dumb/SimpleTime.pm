@@ -1,7 +1,7 @@
 package Benchmark::Dumb::SimpleTime;
 
-our $DATE = '2021-04-10'; # DATE
-our $VERSION = '1.053'; # VERSION
+our $DATE = '2021-07-23'; # DATE
+our $VERSION = '1.057'; # VERSION
 
 use strict;
 use warnings;
@@ -47,7 +47,7 @@ Benchmark::Dumb::SimpleTime - Benchmark::Dumb interface for simple time() based 
 
 =head1 VERSION
 
-This document describes version 1.053 of Benchmark::Dumb::SimpleTime (from Perl distribution Bencher-Backend), released on 2021-04-10.
+This document describes version 1.057 of Benchmark::Dumb::SimpleTime (from Perl distribution Bencher-Backend), released on 2021-07-23.
 
 =head1 DESCRIPTION
 

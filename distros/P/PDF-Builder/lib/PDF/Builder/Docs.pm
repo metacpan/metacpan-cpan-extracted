@@ -3,8 +3,8 @@ package PDF::Builder::Docs;
 use strict;
 use warnings;
 
-our $VERSION = '3.022'; # VERSION
-my $LAST_UPDATE = '3.020'; # manually update whenever code is changed
+our $VERSION = '3.023'; # VERSION
+our $LAST_UPDATE = '3.023'; # manually update whenever code is changed
 
 # originally part of Builder.pm, it was split out due to its length
 
@@ -519,6 +519,15 @@ PDF::API2 as possible, although it is likely that there will be some drift
 PDF::API2 should be convertible to PDF::Builder simply by changing "API2" 
 anywhere it occurs to "Builder". See the INFO/KNOWN_INCOMP known 
 incompatibilities file for further information.
+
+=head3 Thanks...
+
+Many users have helped out by reporting bugs and requesting enhancements. A
+special shout out goes to those who have contributed code and tests, or
+coordinated their package development with the needs of PDF::Builder:
+Ben Bullock, Cary Gravel, Gregor Herrmann, Petr Pisar, Jeffrey Ratcliffe,
+Steve Simms (via PDF::API2 fixes), and Johan Vromans.
+Drop me a line if I've overlooked your contribution!
 
 =head1 DETAILED NOTES ON METHODS
 

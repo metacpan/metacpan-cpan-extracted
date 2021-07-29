@@ -9,7 +9,7 @@ use parent qw{ Astro::App::Satpass2::ParseTime };
 
 use Astro::App::Satpass2::Utils qw{ CODE_REF HASH_REF @CARP_NOT };
 
-our $VERSION = '0.047';
+our $VERSION = '0.048';
 
 use constant DUMMY	=> 'DUMMY';
 
@@ -200,7 +200,7 @@ return.
 The code reference will be called when the time zone is set (to give the
 code a chance to reject it), and to request a parse.
 
-In the first case the arguments are C<( $self, tz => $zone )>, where
+In the first case the arguments are C<< ( $self, tz => $zone ) >>, where
 C<$self> is a reference to this object, and C<$zone> is the prospective
 new time zone. When called this way the code would reject the zone by
 calling C<< $self->wail( $some_message ) >>. The code accepts the zone

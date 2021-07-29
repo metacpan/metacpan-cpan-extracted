@@ -10,13 +10,11 @@ use Proc::Background;
 use String::Koremutake;
 use YAML;
 use Module::Pluggable require => 1;
-use File::Which ();
-use FindBin qw($Bin);  ## no critic (Freenode::DiscouragedModules)
 
 use base qw(Class::Accessor::Chained::Fast);
 
 # ABSTRACT: A simple, extensible Perl debugger
-our $VERSION = '0.63'; # VERSION
+our $VERSION = '0.64'; # VERSION
 
 __PACKAGE__->mk_accessors(qw(
     backend
@@ -39,12 +37,8 @@ sub load {
   my $port   = 3141 + ($rand % 1024);
 
   $ENV{SECRET} = $secret;
-  my $backend = $self->backend || do {
-    -x "$Bin/ebug_backend_perl"
-      ? "$Bin/ebug_backend_perl"
-      : File::Which::which("ebug_backend_perl");
-  };
-  my $command = "$backend $program";;
+  my $backend = $self->backend || "$^X -d:ebug::Backend";
+  my $command = "$backend $program";
   my $proc = Proc::Background->new(
     {'die_upon_destroy' => 1},
     $command
@@ -141,7 +135,7 @@ Devel::ebug - A simple, extensible Perl debugger
 
 =head1 VERSION
 
-version 0.63
+version 0.64
 
 =head1 SYNOPSIS
 
@@ -234,7 +228,7 @@ can happen concurrently.
 
 =head2 new
 
-The constructor creats a Devel::ebug object:
+The constructor creats a L<Devel::ebug> object:
 
   my $ebug = Devel::ebug->new;
 
@@ -526,13 +520,32 @@ the result of YAML's Dump() method:
 
 =head1 SEE ALSO
 
-L<perldebguts>
+=over 4
 
-=head1 BUGS
+=item L<perldebguts>
 
-Devel::ebug does not quite work under 5.8.0.
+The guts of debugging Perl
 
-Devel::ebug does not handle signals under Windows.
+=item L<Devel::Chitin>
+
+A class that exposes the Perl debugging facilities as an API, with
+some functional overlap with L<Devel::ebug>.
+
+=item L<ebug>
+
+Command-line interface to L<Devel::ebug>
+
+=item L<ebug_http>
+
+Web based interface to L<Devel::ebug>
+
+=back
+
+=head1 CAVEATS
+
+L<Devel::ebug> does not support Perls prior to 5.10.1.
+
+L<Devel::ebug> does not handle signals under Windows.
 
 =head1 AUTHOR
 
@@ -548,7 +561,7 @@ Taisuke Yamada
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2005-2020 by Leon Brocard.
+This software is copyright (c) 2005-2021 by Leon Brocard.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

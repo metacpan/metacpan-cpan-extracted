@@ -37,11 +37,11 @@ __PACKAGE__->meta->make_immutable;
 1;
 __END__
 
-=head 1 Name
+=head1 Name
 
 Connector::Builtin::Simple
 
-=head 1 Description
+=head1 Description
 
 Return a static value regardless of the requested key.
 Set the value using the "LOCATION" parameter. Supports only

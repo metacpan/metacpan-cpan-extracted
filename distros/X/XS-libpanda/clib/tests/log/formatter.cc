@@ -86,6 +86,8 @@ TEST("set formatter string") {
         set_formatter("MSG=%m");
         panda_log_alert("mymsg");
         CHECK(c.fstr == "MSG=mymsg");
+        panda_log_alert("mymsg1\nmymsg2");
+        CHECK(c.fstr == "MSG=mymsg1\nmymsg2");
     }
 
     SECTION("current time") {
@@ -162,5 +164,19 @@ TEST("set formatter string") {
         set_program_name("Void Linux");
         panda_log_alert();
         REGCHECK(c.fstr, "TITLE=Void Linux");
+    }
+
+    SECTION("multiline message") {
+        set_formatter("MSG=%1m!");
+        panda_log_alert("msg1");
+        CHECK(c.fstr == "MSG=msg1!");
+        panda_log_alert("msg1\nmsg2");
+        CHECK(c.fstr == "MSG=msg1!\nMSG=msg2!");
+        panda_log_alert("msg1\nmsg2\n");
+        CHECK(c.fstr == "MSG=msg1!\nMSG=msg2!\nMSG=!");
+        panda_log_alert("\nmsg1\nmsg2");
+        CHECK(c.fstr == "MSG=!\nMSG=msg1!\nMSG=msg2!");
+        panda_log_alert("\n");
+        CHECK(c.fstr == "MSG=!\nMSG=!");
     }
 }

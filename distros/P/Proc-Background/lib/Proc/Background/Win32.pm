@@ -1,5 +1,5 @@
 package Proc::Background::Win32;
-$Proc::Background::Win32::VERSION = '1.21';
+$Proc::Background::Win32::VERSION = '1.22';
 # ABSTRACT: Windows-specific implementation of process create/wait/kill
 require 5.004_04;
 
@@ -141,10 +141,6 @@ __END__
 
 Proc::Background::Win32 - Windows-specific implementation of process create/wait/kill
 
-=head1 VERSION
-
-version 1.21
-
 =head1 SYNOPSIS
 
 Do not use this module directly.
@@ -177,9 +173,13 @@ Michael Conrad <mike@nrdvana.net>
 
 =back
 
+=head1 VERSION
+
+version 1.22
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Michael Conrad, (C) 1998-2009 by Blair Zajac.
+This software is copyright (c) 2021 by Michael Conrad, (C) 1998-2009 by Blair Zajac.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

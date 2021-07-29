@@ -4,7 +4,7 @@ Devel::Cover::Report::Codecovbash - Generate a JSON file to be uploaded with the
 
 # VERSION
 
-version 0.03
+version 0.04
 
 # DESCRIPTION
 
@@ -29,21 +29,24 @@ Use the codecov bash script:
 
 # SUPPORT
 
-Bugs may be submitted at [https://github.com/houseabsolute/Devel-Cover-Report-Codecovbash/issues](https://github.com/houseabsolute/Devel-Cover-Report-Codecovbash/issues).
-
 I am also usually active on IRC as 'autarch' on `irc://irc.perl.org`.
 
 # SOURCE
 
-The source code repository for Devel-Cover-Report-Codecovbash can be found at [https://github.com/houseabsolute/Devel-Cover-Report-Codecovbash](https://github.com/houseabsolute/Devel-Cover-Report-Codecovbash).
+The source code repository for Devel-Cover-Report-Codecovbash can be found at [https://github.com/perlpunk/Devel-Cover-Report-Codecovbash](https://github.com/perlpunk/Devel-Cover-Report-Codecovbash).
 
 # AUTHOR
 
-Dave Rolsky <autarch@urth.org>
+Tina Müller <tinita@cpan.org>
+
+# CONTRIBUTORS
+
+- Dave Rolsky <autarch@urth.org>
+- Tina Müller <cpan2@tinita.de>
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by Pine Mizune.
+This software is Copyright (c) 2019 - 2021 by Pine Mizune.
 
 This is free software, licensed under:
 

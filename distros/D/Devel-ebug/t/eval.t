@@ -7,7 +7,6 @@ use Devel::ebug;
 
 my $ebug = Devel::ebug->new;
 $ebug->program("corpus/calc.pl");
-$ebug->backend("$^X bin/ebug_backend_perl");
 $ebug->load;
 $ebug->break_point(6);
 $ebug->run;

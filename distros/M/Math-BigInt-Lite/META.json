@@ -30,13 +30,14 @@
       },
       "runtime" : {
          "requires" : {
-            "Carp" : "1.22",
+            "Carp" : "0",
             "Math::BigInt" : "1.999821",
-            "perl" : "5.006"
+            "perl" : "5.006002"
          }
       },
       "test" : {
          "requires" : {
+            "Math::BigRat" : "0.2616",
             "Test::More" : "0.94"
          }
       }
@@ -49,6 +50,6 @@
          "web" : "https://github.com/pjacklam/p5-Math-BigInt-Lite"
       }
    },
-   "version" : "0.20",
+   "version" : "0.23",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

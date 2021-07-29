@@ -13,7 +13,7 @@ sure you change the first line.
 
 =head1 NAME
 
-Myriad::Plugin
+Myriad::Plugin - extensible L<Myriad> functionality using attributes
 
 =head1 DESCRIPTION
 

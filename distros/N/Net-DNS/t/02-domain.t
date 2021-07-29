@@ -1,10 +1,10 @@
 #!/usr/bin/perl
-# $Id: 02-domain.t 1815 2020-10-14 21:55:18Z willem $	-*-perl-*-
+# $Id: 02-domain.t 1841 2021-06-23 20:34:28Z willem $	-*-perl-*-
 #
 
 use strict;
 use warnings;
-use Test::More tests => 53;
+use Test::More tests => 46;
 
 
 use_ok('Net::DNS::Domain');
@@ -142,24 +142,6 @@ use constant ESC => '\\';
 
 
 {
-	foreach my $char (qw(" ( ) ; @)) {
-		my $name   = $char . 'example.com.';
-		my $domain = Net::DNS::Domain->new($name);
-		is( $domain->string, ESC . $name, "escape leading $char in string" );
-	}
-}
-
-
-{
-	foreach my $part (qw(_rvp._tcp *)) {
-		my $name   = "$part.example.com.";
-		my $domain = Net::DNS::Domain->new($name);
-		is( $domain->string, $name, "permit leading $part" );
-	}
-}
-
-
-{
 	my $ldh	   = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-0123456789';
 	my $domain = Net::DNS::Domain->new($ldh);
 	is( $domain->name, $ldh, '63 octet LDH character label' );
@@ -208,10 +190,10 @@ use constant ESC => '\\';
 
 {
 	foreach my $case (
-		'\032!"#$%&\'()*+,-\./',			#  32 .. 47
-		'0123456789:;<=>?',				#  48 ..
+		'\032!\034#$%&\'\(\)*+,-\./',			#  32 .. 47
+		'0123456789:\;<=>?',				#  48 ..
 		'@ABCDEFGHIJKLMNO',				#  64 ..
-		'PQRSTUVWXYZ[\\\\]^_',				#  80 ..
+		'PQRSTUVWXYZ[\092]^_',				#  80 ..
 		'`abcdefghijklmno',				#  96 ..
 		'pqrstuvwxyz{|}~\127'				# 112 ..
 		) {

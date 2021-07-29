@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary::Validation;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Validation vocabulary
 
-our $VERSION = '0.513';
+our $VERSION = '0.514';
 
 use 5.016;
 no if "$]" >= 5.031009, feature => 'indirect';
@@ -43,7 +43,7 @@ sub _traverse_keyword_type {
   my ($self, $schema, $state) = @_;
 
   if (is_plain_arrayref($schema->{type})) {
-    abort($state, 'type array is empty') if not @{$schema->{type}};
+    return E($state, 'type array is empty') if not @{$schema->{type}};
     foreach my $type (@{$schema->{type}}) {
       return E($state, 'unrecognized type "%s"', $type//'<null>')
         if not any { ($type//'') eq $_ } qw(null boolean object array string number integer);
@@ -356,7 +356,7 @@ JSON::Schema::Modern::Vocabulary::Validation - Implementation of the JSON Schema
 
 =head1 VERSION
 
-version 0.513
+version 0.514
 
 =head1 DESCRIPTION
 
@@ -366,7 +366,11 @@ version 0.513
 
 Implementation of the JSON Schema Draft 2019-09 "Validation" vocabulary, indicated in metaschemas
 with the URI C<https://json-schema.org/draft/2019-09/vocab/validation> and formally specified in
-L<https://json-schema.org/draft/2019-09/json-schema-validation.html#rfc.section.6>.
+L<https://datatracker.ietf.org/doc/html/draft-handrews-json-schema-validation-02#section-6>.
+
+Support is also provided for the equivalent Draft 7 keywords that correspond to this vocabulary and
+are formally specified in
+L<https://datatracker.ietf.org/doc/html/draft-handrews-json-schema-validation-01#section-6>.
 
 =head1 SUPPORT
 

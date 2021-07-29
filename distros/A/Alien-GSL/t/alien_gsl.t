@@ -16,6 +16,7 @@ __DATA__
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
+#include <gsl/gsl_sf_bessel.h>
 
 int
 thetest(const char *class)

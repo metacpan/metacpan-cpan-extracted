@@ -69,7 +69,7 @@ Zapp::Trigger::Webhook - Trigger a plan from a web request
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 

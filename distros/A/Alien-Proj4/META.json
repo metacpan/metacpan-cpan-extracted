@@ -4,7 +4,7 @@
       "Shawn Laffan <shawnlaffan@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -25,10 +25,18 @@
             "Alien::Build" : "1.41",
             "Alien::Build::MM" : "1.41",
             "Alien::Build::Plugin::Cleanse::BuildDir" : "0",
+            "Archive::Tar" : "0",
+            "Config" : "0",
             "ExtUtils::MakeMaker" : "6.52",
             "File::Find::Rule" : "0",
+            "HTTP::Tiny" : "0.044",
+            "IO::Zlib" : "0",
+            "Mojo::DOM" : "0",
+            "Mojolicious" : "7.00",
             "PkgConfig" : "0.19026",
-            "Sort::Versions" : "0"
+            "Sort::Versions" : "0",
+            "URI" : "0",
+            "URI::Escape" : "0"
          }
       },
       "configure" : {
@@ -69,16 +77,17 @@
          "url" : "https://github.com/PDLPorters/Alien-Proj4"
       }
    },
-   "version" : "2.019110",
+   "version" : "2.019111",
    "x_alienfile" : {
-      "generated_by" : "Alien::Build::MM version 1.68",
+      "generated_by" : "Alien::Build::MM version 2.38",
       "requires" : {
          "share" : {
             "Archive::Tar" : "0",
             "Config" : "0",
-            "HTML::LinkExtor" : "0",
             "HTTP::Tiny" : "0.044",
             "IO::Zlib" : "0",
+            "Mojo::DOM" : "0",
+            "Mojolicious" : "7.00",
             "Sort::Versions" : "0",
             "URI" : "0",
             "URI::Escape" : "0"
@@ -86,5 +95,5 @@
          "system" : {}
       }
    },
-   "x_serialization_backend" : "JSON::PP version 4.00"
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

@@ -11,7 +11,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_ERROR
 );
 
-our $VERSION = '2.0.10';
+our $VERSION = '2.0.12';
 
 extends 'Lemonldap::NG::Common::Module';
 
@@ -107,7 +107,7 @@ sub createNotification {
 sub canUpdateSfa {
     my ( $self, $req, $action ) = @_;
     my $user = $req->userData->{ $self->conf->{whatToTrace} };
-    my $msg = undef;
+    my $msg  = undef;
 
     # Test action
     if ( $action && $action eq 'delete' ) {
@@ -157,7 +157,7 @@ sub canUpdateSfa {
             $msg = 'notAuthorized';
         }
     }
-    $self->userLogger->info("$user is allowed to update 2FA") unless $msg;
+    $self->logger->debug("$user is allowed to update 2FA") unless $msg;
     return $msg;
 }
 

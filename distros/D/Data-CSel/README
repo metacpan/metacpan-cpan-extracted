@@ -2,16 +2,18 @@ NAME
     Data::CSel - Select tree node objects using CSS Selector-like syntax
 
 VERSION
-    This document describes version 0.126 of Data::CSel (from Perl
-    distribution Data-CSel), released on 2021-07-03.
+    This document describes version 0.127 of Data::CSel (from Perl
+    distribution Data-CSel), released on 2021-07-13.
 
 SYNOPSIS
      use Data::CSel qw(csel csel_each);
 
+     # using csel():
      my @cells = csel("Table[name=~/data/i] TCell[value != '']:first", $tree);
      for (@cells) { say $_->value }
 
-    Using "csel_each":
+     # using csel_each():
+     csel_each { say $_->value } "Table[name=~/data/i] TCell[value != '']:first", $tree;
 
     Using selection object:
 

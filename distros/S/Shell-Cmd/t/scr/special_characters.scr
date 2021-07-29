@@ -1,1 +1,4 @@
 echo "Dollar \$ Backtick \` Backslash \\ Quote \""
+echo "SC_VAR_1 = $SC_VAR_1"
+echo "SC_VAR_2 = $SC_VAR_2"
+echo "SC_VAR_3 = $SC_VAR_3"

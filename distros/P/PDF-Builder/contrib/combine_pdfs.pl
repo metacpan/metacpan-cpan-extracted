@@ -3,8 +3,8 @@
 use strict;
 use warnings;
 
-our $VERSION = '3.022'; # VERSION
-my $LAST_UPDATE = '2.029'; # manually update whenever code is changed
+our $VERSION = '3.023'; # VERSION
+our $LAST_UPDATE = '2.029'; # manually update whenever code is changed
 
 use PDF::Builder;
 

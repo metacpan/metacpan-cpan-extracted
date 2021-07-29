@@ -6,7 +6,7 @@ use 5.010;
 use Moo;
 
 # ABSTRACT: base class for AnyEvent::FTP::Client::Site::* classes
-our $VERSION = '0.16'; # VERSION
+our $VERSION = '0.17'; # VERSION
 
 sub BUILDARGS
 {
@@ -30,7 +30,7 @@ AnyEvent::FTP::Client::Site::Base - base class for AnyEvent::FTP::Client::Site::
 
 =head1 VERSION
 
-version 0.16
+version 0.17
 
 =head1 AUTHOR
 
@@ -46,7 +46,7 @@ José Joaquín Atria
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Graham Ollis.
+This software is copyright (c) 2017-2021 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

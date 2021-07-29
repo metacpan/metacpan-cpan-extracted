@@ -30,9 +30,8 @@ You shouldn't make instances of this class. Each attribute should be used as a n
 =head1 SYNOPSIS
 
     my $elasticbeanstalk = Paws->service('ElasticBeanstalk');
-    # To validate configuration settings
-    # The following operation validates a CloudWatch custom metrics config
-    # document:
+# To validate configuration settings
+# The following operation validates a CloudWatch custom metrics config document:
     my $ConfigurationSettingsValidationMessages =
       $elasticbeanstalk->ValidateConfigurationSettings(
       'ApplicationName' => 'my-app',

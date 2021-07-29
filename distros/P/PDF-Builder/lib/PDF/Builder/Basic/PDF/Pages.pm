@@ -20,8 +20,8 @@ use warnings;
 
 use base 'PDF::Builder::Basic::PDF::Dict';
 
-our $VERSION = '3.022'; # VERSION
-my $LAST_UPDATE = '3.022'; # manually update whenever code is changed
+our $VERSION = '3.023'; # VERSION
+our $LAST_UPDATE = '3.022'; # manually update whenever code is changed
 
 use PDF::Builder::Basic::PDF::Array;
 use PDF::Builder::Basic::PDF::Dict;

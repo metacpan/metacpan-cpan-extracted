@@ -1,6 +1,8 @@
 package LinkEmbedder::Link::Github;
 use Mojo::Base 'LinkEmbedder::Link';
 
+use Mojo::Util qw(html_unescape trim);
+
 use constant DEBUG => $ENV{LINK_EMBEDDER_DEBUG} || 0;
 
 has provider_name => 'GitHub';
@@ -17,13 +19,9 @@ sub _learn_from_dom {
 
   $self->SUPER::_learn_from_dom($dom);
 
-  # Clean up title
-  if ($e = $dom->at('title')) {
-    $e = $e->all_text;
-    $e =~ s!^\s*GitHub\W+!!si;
-    $e =~ s![^\w\)\]\}]+GitHub\s*$!!si;
-    $self->title($e);
-  }
+  # Sometimes the og:title is less informative than <title>
+  $e = $dom->at('title');
+  $self->title($e->all_text) if $e and length($e->all_text) > length($self->title);
 
   # Pages with readme
   $e = $dom->find('#readme p');
@@ -31,32 +29,35 @@ sub _learn_from_dom {
 
   # Pages with source code
   $e = $dom->find('table.highlight');
-  $self->_learn_from_code($e->first) if $e->size == 1;
+  $self->_learn_from_code($e->first, $dom) if $e->size == 1;
+
+  # Clean up title
+  my $title = $self->title;
+  $title =~ s!^\s*GitHub\W+!!si;
+  $title =~ s![^\w\)\]\}]+GitHub\s*$!!si;
+  $self->title($title);
 }
 
 sub _learn_from_code {
-  my ($self, $e) = @_;
-  my @code;
-
+  my ($self, $e, $dom) = @_;
   my $selector = '';
 
   # Handle line number possibly with range
   my $fragment = $self->url->fragment;
   if ($fragment =~ /L(\d+)(?:-L(\d+))?/) {
     my $from = $1;
-    my $to = $2 // $from + 10;
-    $selector .= '.blob-num:is(' . join(', ', map { qq([data-line-number="$_"]) } $from .. $to) . ') + ';
+    my $to   = $2 // $from + 10;
+    $selector .= '.blob-num:is(' . join(', ', map {qq([data-line-number="$_"])} $from .. $to) . ') + ';
   }
 
   $selector .= '.blob-code';
+  return unless my @code = $e->find($selector)->map('all_text')->each;
 
-  for my $line ($e->find($selector)->each) {
-    push @code, $line->all_text;
-  }
+  $self->{paste}       = join '', map { $_ .= "\n" unless /\n$/; $_ } @code;
+  $self->template->[1] = 'paste.html.ep';
 
-  if (@code) {
-    $self->{paste} = join '', map {"$_\n"} @code;
-    $self->template->[1] = 'paste.html.ep';
+  if ($e = $dom->at('#blob-path')) {
+    $self->title(trim html_unescape $e->all_text) if $e->all_text;
   }
 }
 

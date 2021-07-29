@@ -11,7 +11,7 @@ BEGIN {
     require 't/saml-lib.pm';
 }
 
-my $maintests = 18;
+my $maintests = 17;
 my $debug     = 'error';
 my ( $issuer, $sp, $res );
 
@@ -117,12 +117,7 @@ m#iframe src="http://auth.sp.com(/saml/proxySingleLogout)\?(SAMLRequest=.*?)"#,
     );
     $url = $1;
     my $query = $2;
-    ok(
-        getHeader( $res, 'Content-Security-Policy' ) =~ /child-src auth.sp.com/,
-        'Frame is authorized'
-      )
-      or explain( $res->[1],
-        'Content-Security-Policy => ...child-src auth.idp.com' );
+    expectCspChildOK($res, "auth.sp.com");
 
     my $removedCookie = expectCookie($res);
     is( $removedCookie, 0, "SSO cookie removed" );

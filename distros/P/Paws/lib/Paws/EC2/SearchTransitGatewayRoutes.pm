@@ -33,8 +33,10 @@ You shouldn't make instances of this class. Each attribute should be used as a n
     my $SearchTransitGatewayRoutesResult = $ec2->SearchTransitGatewayRoutes(
       Filters => [
         {
-          Name   => 'MyString',
-          Values => [ 'MyString', ... ],    # OPTIONAL
+          Name   => 'MyString',    # OPTIONAL
+          Values => [
+            'MyString', ...        # OPTIONAL
+          ],    # OPTIONAL
         },
         ...
       ],
@@ -83,8 +85,13 @@ attachment.
 
 =item *
 
-C<attachment.resource-type> - The attachment resource type (C<vpc> |
-C<vpn>).
+C<attachment.resource-type> - The attachment resource type. Valid
+values are C<vpc> | C<vpn> | C<direct-connect-gateway> | C<peering> |
+C<connect>.
+
+=item *
+
+C<prefix-list-id> - The ID of the prefix list.
 
 =item *
 

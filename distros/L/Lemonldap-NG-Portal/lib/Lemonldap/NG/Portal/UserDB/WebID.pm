@@ -3,29 +3,29 @@ package Lemonldap::NG::Portal::UserDB::WebID;
 use strict;
 use Mouse;
 use Lemonldap::NG::Portal::Main::Constants qw(
+  PE_OK
   PE_ERROR
   PE_MISSINGREQATTR
-  PE_OK
 );
 
 extends 'Lemonldap::NG::Common::Module';
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.12';
 
 # INITIALIZATION
 
 sub init {
-    1;
+    return 1;
 }
 
 # RUNNING METHODS
 
 sub getUser {
-    PE_OK;
+    return PE_OK;
 }
 
 sub findUser {
-    PE_OK;
+    return PE_OK;
 }
 
 sub setSessionInfo {
@@ -52,11 +52,12 @@ sub setSessionInfo {
             return PE_MISSINGREQATTR;
         }
     }
-    PE_OK;
+
+    return PE_OK;
 }
 
 sub setGroups {
-    PE_OK;
+    return PE_OK;
 }
 
 1;

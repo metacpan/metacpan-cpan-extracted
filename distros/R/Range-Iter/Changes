@@ -1,9 +1,16 @@
-0.002   2019-04-23 (PERLANCAR)
+0.003   2021-07-17  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Mention IntRange::Iter.
+
+
+0.002   2019-04-23  Released-By: PERLANCAR
 
 	- Use Scalar::Util's looks_like_number() instead of regex to check
 	  for number, to allow using Inf.
 
 
-0.001   2019-04-16 (PERLANCAR)
+0.001   2019-04-16  Released-By: PERLANCAR
 
         - first release.

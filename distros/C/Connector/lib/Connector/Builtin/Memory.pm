@@ -20,6 +20,12 @@ extends 'Connector::Builtin';
 
 has '+LOCATION' => ( required => 0 );
 
+has 'primary_attribute' => (
+    is => 'ro',
+    isa => 'Str',
+    predicate => 'has_primary_attribute',
+);
+
 sub _build_config {
     my $self = shift;
     $self->_config( {} );
@@ -65,7 +71,16 @@ sub get {
     return $self->_node_not_exists() unless (defined $value);
 
     if (ref $value ne '') {
-        die "requested value is not a scalar";
+        die "requested value is not a scalar"
+            unless ($self->has_primary_attribute() && ref $value eq 'HASH');
+
+        return $self->_node_not_exists()
+            unless (defined $value->{$self->primary_attribute});
+
+        die "primary_attribute is not a scalar"
+            unless (ref $value->{$self->primary_attribute} eq '');
+
+        return $value->{$self->primary_attribute};
     }
 
     return $value;
@@ -220,10 +235,35 @@ __PACKAGE__->meta->make_immutable;
 1;
 __END__
 
-=head 1 Name
+=head1 Name
 
 Connector::Builtin::Memory
 
-=head 1 Description
+=head1 Description
 
 A connector implementation to allow memory based caching
+
+=head1 Parameters
+
+=over
+
+=item LOCATION
+
+Not used
+
+=item primary_attribute
+
+If your data consists of hashes as leaf nodes, set this to the name of
+the node that is considered the primary attribute, e.g. the name of a
+person. If you now access the key on the penultimate level using I<get>
+you will receive the value of this attribute back.
+
+    user1234:
+        name: John Doe
+        email: john.doe@acme.com
+
+When you call I<get(user1234)> on this structure, the connector will
+usually die with a "not a scalar" error. With I<primary_attribute = name>
+you will get back I<John Doe>.
+
+=back

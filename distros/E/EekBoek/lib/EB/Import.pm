@@ -6,8 +6,8 @@ use utf8;
 # Author          : Johan Vromans
 # Created On      : Tue Feb  7 11:56:50 2006
 # Last Modified By: Johan Vromans
-# Last Modified On: Thu Aug 31 10:01:16 2017
-# Update Count    : 139
+# Last Modified On: Thu Jan 14 20:51:53 2021
+# Update Count    : 143
 # Status          : Unknown, Use with caution!
 
 package main;
@@ -85,7 +85,7 @@ sub do_import {
 	$cmdobj->attach_lines(["journal --quiet 0"]) if $jnl_state;
 
 	my $att = EB::Tools::Attachments->new;
-	my @atts = sort glob("$dir/[0-9]???????_*");
+	my @atts = sort glob("$dir/" . ("[0-9]" x 8) . "_*");
 	my $max_id = -1;
 	foreach my $file ( @atts ) {
 	    my ($id, $name) = substr($file, length($dir)+1) =~ m;^(\d+)_(.+);;

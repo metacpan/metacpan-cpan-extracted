@@ -1,7 +1,9 @@
 package Sah::Schema::unix::username;
 
-our $DATE = '2020-10-16'; # DATE
-our $VERSION = '0.013'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-07-22'; # DATE
+our $DIST = 'Sah-Schemas-Unix'; # DIST
+our $VERSION = '0.017'; # VERSION
 
 our $schema = [str => {
     summary => 'Unix account name',
@@ -28,10 +30,10 @@ _
         {value=>'andy2', valid=>1},
         {value=>'an dy', valid=>0},
         {value=>'an.dy', valid=>1},
-        {value=>'a' x 33, value=>0, summary=>'Too long'},
+        {value=>'a' x 33, valid=>0, summary=>'Too long'},
     ],
 
-}, {}];
+}];
 
 1;
 # ABSTRACT: Unix account name
@@ -48,7 +50,7 @@ Sah::Schema::unix::username - Unix account name
 
 =head1 VERSION
 
-This document describes version 0.013 of Sah::Schema::unix::username (from Perl distribution Sah-Schemas-Unix), released on 2020-10-16.
+This document describes version 0.017 of Sah::Schema::unix::username (from Perl distribution Sah-Schemas-Unix), released on 2021-07-22.
 
 =head1 SYNOPSIS
 
@@ -78,7 +80,8 @@ To specify schema in L<Rinci> function metadata and use the metadata with
 L<Perinci::CmdLine> to create a CLI:
 
  # in lib/MyApp.pm
- package MyApp;
+ package
+   MyApp;
  our %SPEC;
  $SPEC{myfunc} = {
      v => 1.1,
@@ -98,7 +101,8 @@ L<Perinci::CmdLine> to create a CLI:
  1;
 
  # in myapp.pl
- package main;
+ package
+   main;
  use Perinci::CmdLine::Any;
  Perinci::CmdLine::Any->new(url=>'MyApp::myfunc')->run;
 
@@ -127,7 +131,7 @@ Sample data:
 
  "an.dy"  # valid
 
- 0  # INVALID (Too long)
+ "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"  # INVALID (Too long)
 
 =head1 DESCRIPTION
 
@@ -161,7 +165,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,39 +1,44 @@
-SYNOPSIS
+NAME
+    Module::Path::More - Get path to locally installed Perl module
 
+VERSION
+    This document describes version 0.340 of Module::Path::More (from Perl
+    distribution Module-Path-More), released on 2021-07-20.
+
+SYNOPSIS
      use Module::Path::More qw(module_path pod_path);
-    
+
      $path = module_path(module=>'Test::More');
      if (defined($path)) {
        print "Test::More found at $path\n";
      } else {
        print "Danger Will Robinson!\n";
      }
-    
+
      # find all found modules, as well as .pmc and .pod files
      $paths = module_path(module=>'Foo::Bar', all=>1, find_pmc=>1, find_pod=>1);
-    
+
      # just a shortcut for module_path(module=>'Foo',
      #                                 find_pm=>0, find_pmc=>0, find_pod=>1);
      $path = pod_path(module=>'Foo');
 
 DESCRIPTION
-
-    Module::Path::More provides a function, module_path(), which will find
+    Module::Path::More provides a function, "module_path()", which will find
     where a module (or module prefix, or .pod file) is installed locally.
-    (There is also another function pod_path() which is just a convenience
+    (There is also another function "pod_path()" which is just a convenience
     wrapper.)
 
     It works by looking in all the directories in @INC for an appropriately
-    named file. If module is Foo::Bar, will search for Foo/Bar.pm,
-    Foo/Bar.pmc (if find_pmc argument is true), Foo/Bar directory (if
-    find_prefix argument is true), or Foo/Bar.pod (if find_pod argument is
-    true).
+    named file. If module is "Foo::Bar", will search for "Foo/Bar.pm",
+    "Foo/Bar.pmc" (if "find_pmc" argument is true), "Foo/Bar" directory (if
+    "find_prefix" argument is true), or "Foo/Bar.pod" (if "find_pod"
+    argument is true).
 
-    Caveats: Obviously this only works where the module you're after has
-    its own .pm file. If a file defines multiple packages, this won't work.
+    Caveats: Obviously this only works where the module you're after has its
+    own ".pm" file. If a file defines multiple packages, this won't work.
     This also won't find any modules that are being loaded in some special
     way, for example using a code reference in @INC, as described in
-    require in perlfunc.
+    "require" in perlfunc.
 
     To check whether a module is available/loadable, it's generally better
     to use something like:
@@ -52,34 +57,201 @@ DESCRIPTION
     then it only works if the module is locatable in the filesystem. But on
     the other hand this method can avoid actual loading of the module.
 
-SEE ALSO
+CONTRIBUTOR
+    Steven Haryanto <sharyanto@cpan.org>
 
+FUNCTIONS
+  module_path
+    Usage:
+
+     module_path(%args) -> str|array[str]
+
+    Get path to locally installed Perl module.
+
+    Examples:
+
+    *   Find the first Foo::Bar (.pm or .pmc) in @INC:
+
+         module_path(module => "Foo::Bar");
+
+        Result:
+
+         "/home/s1/perl5/perlbrew/perls/perl-5.30.2/lib/site_perl/5.30.2/Foo/Bar.pm"
+
+    *   Find all Foo::Bar (.pm or .pmc) in @INC, return absolute paths:
+
+         module_path(module => "Foo::Bar", abs => 1, all => 1);
+
+        Result:
+
+         [
+           "/zpool_host_mnt/mnt/home/s1/perl5/perlbrew/perls/perl-5.30.2/lib/site_perl/5.30.2/Foo/Bar.pm",
+         ]
+
+    *   Find the Rinci (.pod first, then .pm) in @INC:
+
+         module_path(module => "Rinci", find_pm => 2, find_pmc => 0, find_pod => 1);
+
+        Result:
+
+         "/home/s1/perl5/perlbrew/perls/perl-5.30.2/lib/site_perl/5.30.2/Rinci.pod"
+
+    Search @INC (reference entries are skipped) and return path(s) to Perl
+    module files with the requested name.
+
+    This function is like the one from Module::Path, except with a different
+    interface and more options (finding all matches instead of the first,
+    the option of not absolutizing paths, finding ".pmc" & ".pod" files,
+    finding module prefixes).
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   abs => *bool* (default: 0)
+
+        Whether to return absolute paths.
+
+    *   all => *bool* (default: 0)
+
+        Return all results instead of just the first.
+
+    *   find_pm => *int* (default: 1)
+
+        Whether to find .pm files.
+
+        The value of this option is an integer number from 0. 0 means to not
+        search for .pm files, while number larger than 0 means to search for
+        .pm files. The larger the number, the lower the priority. If more
+        than one type is found (prefix, .pm, .pmc, .pod) then the type with
+        the lowest number is returned first.
+
+    *   find_pmc => *int* (default: 2)
+
+        Whether to find .pmc files.
+
+        The value of this option is an integer number from 0. 0 means to not
+        search for .pmc files, while number larger than 0 means to search
+        for .pmc files. The larger the number, the lower the priority. If
+        more than one type is found (prefix, .pm, .pmc, .pod) then the type
+        with the lowest number is returned first.
+
+    *   find_pod => *int* (default: 0)
+
+        Whether to find .pod files.
+
+        The value of this option is an integer number from 0. 0 means to not
+        search for .pod files, while number larger than 0 means to search
+        for .pod files. The larger the number, the lower the priority. If
+        more than one type is found (prefix, .pm, .pmc, .pod) then the type
+        with the lowest number is returned first.
+
+    *   find_prefix => *int* (default: 0)
+
+        Whether to find module prefixes.
+
+        The value of this option is an integer number from 0. 0 means to not
+        search for module prefix, while number larger than 0 means to search
+        for module prefix. The larger the number, the lower the priority. If
+        more than one type is found (prefix, .pm, .pmc, .pod) then the type
+        with the lowest number is returned first.
+
+    *   module* => *str*
+
+        Module name to search.
+
+    Return value: (str|array[str])
+
+  pod_path
+    Usage:
+
+     pod_path(%args) -> str|array[str]
+
+    Get path to locally installed POD.
+
+    This is a shortcut for:
+
+     module_path(%args, find_pm=>0, find_pmc=>0, find_pod=>1, find_prefix=>0)
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   abs => *bool* (default: 0)
+
+        Whether to return absolute paths.
+
+    *   all => *bool* (default: 0)
+
+        Return all results instead of just the first.
+
+    *   module* => *str*
+
+        Module name to search.
+
+    Return value: (str|array[str])
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Module-Path-More>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Module-Path-More>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Module-Path-More>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+  Similar modules
     Module::Path. Module::Path::More is actually a fork of Module::Path.
     Module::Path::More contains features that are not (or have not been
-    accepted) in the original module, namely: finding all matches instead
-    of the first found match, and finding .pmc/.pod in addition to .pm
-    files. Note that the interface is different (Module::Path::More accepts
+    accepted) in the original module, namely: finding all matches instead of
+    the first found match, and finding ".pmc/.pod" in addition to .pm files.
+    Note that the interface is different (Module::Path::More accepts
     hash/named arguments) so the two modules are not drop-in replacements
     for each other. Also, note that by default Module::Path::More does not
-    do an abs_path() to each file it finds. I think this module's choice
+    do an "abs_path()" to each file it finds. I think this module's choice
     (not doing abs_path) is a more sensible default, because usually there
     is no actual need to do so and doing abs_path() or resolving symlinks
     will sometimes fail or expose filesystem quirks that we might not want
     to deal with at all. However, if you want to do abs_path, you can do so
-    by setting abs option to true.
+    by setting "abs" option to true.
 
     Command-line utility is not included in this distribution, unlike mpath
-    in Module-Path. However, you can use pmpath
+    in "Module-Path". However, you can use pmpath
     <https://metacpan.org/pod/distribution/App-PMUtils/bin/pmpath> from
     App::PMUtils distribution which uses this module.
 
     References:
 
-      * https://github.com/neilbowers/Module-Path/issues/6
+    *   <https://github.com/neilbowers/Module-Path/issues/6>
 
-      * https://github.com/neilbowers/Module-Path/issues/7
+    *   <https://github.com/neilbowers/Module-Path/issues/7>
 
-      * https://github.com/neilbowers/Module-Path/issues/10
+    *   <https://github.com/neilbowers/Module-Path/issues/10>
 
-      * https://rt.cpan.org/Public/Bug/Display.html?id=100979
+    *   <https://rt.cpan.org/Public/Bug/Display.html?id=100979>
+
+  Task-related
+    If you want to check if a module is "installed", use
+    Module::Installed::Tiny instead. Module::Path::More only tries to find
+    the module file in the filesystem, but Perl can actually search for
+    modules in other sources (read about %INC hook in "require()" section of
+    perlfunc). Module::Installed::Tiny can mimic Perl's behavior in
+    searching for modules, without actually loading the module.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2021, 2017, 2016, 2015, 2014 by
+    perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

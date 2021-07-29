@@ -1,0 +1,7 @@
+Revision history for JSONSchema-Validator
+
+0.002  2021-07-22
+    - Fix bug with import JSON::PP
+
+0.001  2021-07-22
+    - First release.

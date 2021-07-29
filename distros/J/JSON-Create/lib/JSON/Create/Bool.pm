@@ -5,7 +5,7 @@ use strict;
 
 our @ISA = qw!Exporter!;
 our @EXPORT = qw!true false!;
-our $VERSION = '0.34';
+our $VERSION = '0.35';
 
 my $t = 1;
 my $f = 0;
@@ -28,7 +28,7 @@ sub false
 
 =head1 NAME
 
-JSON::Create::Bool - booleans for JSON::Create
+JSON::Create::Bool - Booleans for JSON::Create
 
 =head1 SYNOPSIS
 
@@ -48,6 +48,11 @@ please try other modules like L<boolean>.
 =head1 EXPORTS
 
 C<true> and C<false> are exported by default.
+
+=head1 SEE ALSO
+
+See the documentation for L<JSON::Create> for author, copyright, date,
+and version information.
 
 =cut
 

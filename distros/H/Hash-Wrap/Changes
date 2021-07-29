@@ -1,5 +1,32 @@
 Revision history for Hash-Wrap
 
+0.17      2021-07-07 23:27:11-04:00 America/New_York
+
+  [BUG FIX]
+
+    * 0.16 broke -immutable
+    * tests didn't distinguish between compile errors and actual errors.
+
+0.16      2021-07-07 23:27:11-04:00 America/New_York
+
+  [BUG FIX]
+
+    * previous release broke custom cloning.
+
+
+0.15      2021-07-07 23:27:11-04:00 America/New_York
+
+  [ENHANCEMENT]
+
+    * a reference to the constructor may now be stored in a user provided scalar
+      via -as => \$scalar.  This avoids pollution of the caller's namespace.
+
+    * recursive hash wrapping is now possible with -recurse, which specifies the
+      recursion level limit
+
+    * constructors may now be returned from the import() method via -as => -return.
+
+
 0.14      2021-06-21 16:39:56-04:00 America/New_York
 
   [ENHANCEMENT]

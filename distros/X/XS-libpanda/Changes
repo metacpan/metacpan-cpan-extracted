@@ -1,3 +1,5 @@
+1.5.4    xx.xx.2021
+            - add logger multiline message decorator support
 1.5.3    02.07.2021
             - improve platform-dependent code, remove clang warnings
 1.5.2    14.05.2021

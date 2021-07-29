@@ -21,7 +21,7 @@
 package Perl::Tidy::Tokenizer;
 use strict;
 use warnings;
-our $VERSION = '20210625';
+our $VERSION = '20210717';
 
 use Perl::Tidy::LineBuffer;
 use Carp;
@@ -567,7 +567,8 @@ EOM
     }
 
     if ( $tokenizer_self->[_in_skipped_] ) {
-        warning("hit EOF while in lines skipped with --code-skipping\n");
+        write_logfile_entry(
+            "hit EOF while in lines skipped with --code-skipping\n");
     }
 
     if ( $tokenizer_self->[_in_pod_] ) {
@@ -2119,7 +2120,12 @@ EOM
                         my ( $next_nonblank_token, $i_next ) =
                           find_next_nonblank_token( $i, $rtokens,
                             $max_token_index );
-                        if ( $next_nonblank_token ne ')' ) {
+
+                        # Patch for c029: give up error check if
+                        # a side comment follows
+                        if (   $next_nonblank_token ne ')'
+                            && $next_nonblank_token ne '#' )
+                        {
                             my $hint;
 
                             error_if_expecting_OPERATOR('(');
@@ -2287,9 +2293,11 @@ EOM
 
             # a pattern cannot follow certain keywords which take optional
             # arguments, like 'shift' and 'pop'. See also '?'.
-            if ( $last_nonblank_type eq 'k'
+            if (
+                $last_nonblank_type eq 'k'
                 && $is_keyword_rejecting_slash_as_pattern_delimiter{
-                    $last_nonblank_token} )
+                    $last_nonblank_token}
+              )
             {
                 $is_pattern = 0;
             }
@@ -2319,11 +2327,11 @@ EOM
                     $type = $tok;
                 }
 
-              #DEBUG - collecting info on what tokens follow a divide
-              # for development of guessing algorithm
-              #if ( numerator_expected( $i, $rtokens, $max_token_index ) < 0 ) {
-              #    #write_diagnostics( "DIVIDE? $input_line\n" );
-              #}
+           #DEBUG - collecting info on what tokens follow a divide
+           # for development of guessing algorithm
+           #if ( is_possible_numerator( $i, $rtokens, $max_token_index ) < 0 ) {
+           #    #write_diagnostics( "DIVIDE? $input_line\n" );
+           #}
             }
         },
         '{' => sub {
@@ -2528,9 +2536,11 @@ EOM
             # Patch for rt #126965
             # a pattern cannot follow certain keywords which take optional
             # arguments, like 'shift' and 'pop'. See also '/'.
-            if ( $last_nonblank_type eq 'k'
+            if (
+                $last_nonblank_type eq 'k'
                 && $is_keyword_rejecting_question_as_pattern_delimiter{
-                    $last_nonblank_token} )
+                    $last_nonblank_token}
+              )
             {
                 $is_pattern = 0;
             }
@@ -2575,7 +2585,10 @@ EOM
         '*' => sub {    # typeglob, or multiply?
 
             if ( $expecting == UNKNOWN && $last_nonblank_type eq 'Z' ) {
-                if ( $next_type ne 'b' && $next_type ne '(' ) {
+                if (   $next_type ne 'b'
+                    && $next_type ne '('
+                    && $next_type ne '#' )    # Fix c036
+                {
                     $expecting = TERM;
                 }
             }
@@ -2904,6 +2917,15 @@ EOM
 
             # if -> points to a bare word, we must scan for an identifier,
             # otherwise something like ->y would look like the y operator
+
+            # NOTE: this will currently allow things like
+            #     '->@array'    '->*VAR'  '->%hash'
+            # to get parsed as identifiers, even though these are not currently
+            # allowed syntax.  To catch syntax errors like this we could first
+            # check that the next character and skip this call if it is one of
+            # ' @ % * '.  A disadvantage with doing this is that this would
+            # have to be fixed if the perltidy syntax is ever extended to make
+            # any of these valid.  So for now this check is not done.
             scan_identifier_fast();
         },
 
@@ -2911,8 +2933,17 @@ EOM
         '++' => sub {
             if    ( $expecting == TERM ) { $type = 'pp' }
             elsif ( $expecting == UNKNOWN ) {
+
                 my ( $next_nonblank_token, $i_next ) =
                   find_next_nonblank_token( $i, $rtokens, $max_token_index );
+
+                # Fix for c042: look past a side comment
+                if ( $next_nonblank_token eq '#' ) {
+                    ( $next_nonblank_token, $i_next ) =
+                      find_next_nonblank_token( $max_token_index,
+                        $rtokens, $max_token_index );
+                }
+
                 if ( $next_nonblank_token eq '$' ) { $type = 'pp' }
             }
         },
@@ -2934,6 +2965,14 @@ EOM
             elsif ( $expecting == UNKNOWN ) {
                 my ( $next_nonblank_token, $i_next ) =
                   find_next_nonblank_token( $i, $rtokens, $max_token_index );
+
+                # Fix for c042: look past a side comment
+                if ( $next_nonblank_token eq '#' ) {
+                    ( $next_nonblank_token, $i_next ) =
+                      find_next_nonblank_token( $max_token_index,
+                        $rtokens, $max_token_index );
+                }
+
                 if ( $next_nonblank_token eq '$' ) { $type = 'mm' }
             }
         },
@@ -3003,8 +3042,8 @@ EOM
     @is_use_require{@_} = (1) x scalar(@_);
 
     # This hash holds the array index in $tokenizer_self for these keywords:
-    my %is_format_END_DATA = (
-        'format'   => _in_format_,
+    # Fix for issue c035: removed 'format' from this hash
+    my %is_END_DATA = (
         '__END__'  => _in_end_,
         '__DATA__' => _in_data_,
     );
@@ -3410,6 +3449,21 @@ EOM
                 $last_nonblank_container_type = $container_type;
                 $last_nonblank_type_sequence  = $type_sequence;
                 $last_nonblank_i              = $i_tok;
+
+                # Patch for c030: Fix things in case a '->' got separated from
+                # the subsequent identifier by a side comment.  We need the
+                # last_nonblank_token to have a leading -> to avoid triggering
+                # an operator expected error message at the next '('. See also
+                # fix for git #63.
+                if ( $last_last_nonblank_token eq '->' ) {
+                    if (   $last_nonblank_type eq 'w'
+                        || $last_nonblank_type eq 'i'
+                        && substr( $last_nonblank_token, 0, 1 ) eq '$' )
+                    {
+                        $last_nonblank_token = '->' . $last_nonblank_token;
+                        $last_nonblank_type  = 'i';
+                    }
+                }
             }
 
             # store previous token type
@@ -3553,8 +3607,11 @@ EOM
                 print STDOUT "TOKENIZE:(@debug_list)\n";
             };
 
-            # turn off attribute list on first non-blank, non-bareword
-            if ( $pre_type ne 'w' ) { $in_attribute_list = 0 }
+            # Turn off attribute list on first non-blank, non-bareword.
+            # Added '#' to fix c038.
+            if ( $pre_type ne 'w' && $pre_type ne '#' ) {
+                $in_attribute_list = 0;
+            }
 
             ###############################################################
             # We have the next token, $tok.
@@ -3567,6 +3624,14 @@ EOM
             if ( $pre_type eq 'w' ) {
                 $expecting =
                   operator_expected( [ $prev_type, $tok, $next_type ] );
+
+                # Patch for c043, part 3: A bareword after '->' expects a TERM
+                # FIXME: It would be cleaner to give method calls a new type 'M'
+                # and update sub operator_expected to handle this.
+                if ( $last_nonblank_type eq '->' ) {
+                    $expecting = TERM;
+                }
+
                 my ( $next_nonblank_token, $i_next ) =
                   find_next_nonblank_token( $i, $rtokens, $max_token_index );
 
@@ -3697,6 +3762,18 @@ EOM
                     next;
                 }
 
+                # Scan a bare word following a -> as an identifir; it could
+                # have a long package name.  Fixes c037, c041.
+                if ( $last_nonblank_token eq '->' ) {
+                    scan_bare_identifier();
+
+                    # Patch for c043, part 4; use type 'w' after a '->'.
+                    # This is just a safety check on sub scan_bare_identifier,
+                    # which should get this case correct.
+                    $type = 'w';
+                    next;
+                }
+
                 # a bare word immediately followed by :: is not a keyword;
                 # use $tok_kw when testing for keywords to avoid a mistake
                 my $tok_kw = $tok;
@@ -3704,6 +3781,23 @@ EOM
                     && $rtokens->[ $i + 2 ] eq ':' )
                 {
                     $tok_kw .= '::';
+                }
+
+                # Decide if 'sub :' can be the start of a sub attribute list.
+                # We will decide based on if the colon is followed by a
+                # bareword which is not a keyword.
+                my $sub_attribute_ok_here;
+                if (   $is_sub{$tok_kw}
+                    && $expecting != OPERATOR
+                    && $next_nonblank_token eq ':' )
+                {
+                    my ( $nn_nonblank_token, $i_nn ) =
+                      find_next_nonblank_token( $i_next + 1,
+                        $rtokens, $max_token_index );
+                    $sub_attribute_ok_here =
+                         $nn_nonblank_token =~ /^\w/
+                      && $nn_nonblank_token !~ /^\d/
+                      && !$is_keyword{$nn_nonblank_token};
                 }
 
                 # handle operator x (now we know it isn't $x=)
@@ -3867,7 +3961,8 @@ EOM
                 elsif (
                        ( $next_nonblank_token eq ':' )
                     && ( $rtokens->[ $i_next + 1 ] ne ':' )
-                    && ( $i_next <= $max_token_index )    # colon on same line
+                    && ( $i_next <= $max_token_index )   # colon on same line
+                    && !$sub_attribute_ok_here           # like 'sub : lvalue' ?
                     && label_ok()
                   )
                 {
@@ -3896,15 +3991,23 @@ EOM
                     scan_id();
                 }
 
+                # Fix for c035: split 'format' from 'is_format_END_DATA' to be
+                # more restrictive. Require a new statement to be ok here.
+                elsif ( $tok_kw eq 'format' && new_statement_ok() ) {
+                    $type = ';';    # make tokenizer look for TERM next
+                    $tokenizer_self->[_in_format_] = 1;
+                    last;
+                }
+
                 # Note on token types for format, __DATA__, __END__:
                 # It simplifies things to give these type ';', so that when we
                 # start rescanning we will be expecting a token of type TERM.
                 # We will switch to type 'k' before outputting the tokens.
-                elsif ( $is_format_END_DATA{$tok_kw} ) {
+                elsif ( $is_END_DATA{$tok_kw} ) {
                     $type = ';';    # make tokenizer look for TERM next
 
                     # Remember that we are in one of these three sections
-                    $tokenizer_self->[ $is_format_END_DATA{$tok_kw} ] = 1;
+                    $tokenizer_self->[ $is_END_DATA{$tok_kw} ] = 1;
                     last;
                 }
 
@@ -4630,7 +4733,9 @@ EOM
 # /^(\}|\{|BEGIN|END|CHECK|INIT|AUTOLOAD|DESTROY|UNITCHECK|continue|;|if|elsif|else|unless|while|until|for|foreach)$/
                         elsif (
                             $is_zero_continuation_block_type{
-                                $routput_block_type->[$i] } )
+                                $routput_block_type->[$i]
+                            }
+                          )
                         {
                             $in_statement_continuation = 0;
                         }
@@ -4639,7 +4744,9 @@ EOM
                         #     /^(sort|grep|map|do|eval)$/ )
                         elsif (
                             $is_not_zero_continuation_block_type{
-                                $routput_block_type->[$i] } )
+                                $routput_block_type->[$i]
+                            }
+                          )
                         {
                         }
 
@@ -4875,14 +4982,16 @@ BEGIN {
     @{op_expected_table}{@q} = (TERM) x scalar(@q);
 
     # Always UNKNOWN following these types:
-    @q = qw( w );
+    # Fix for c030: added '->' to this list
+    @q = qw( w -> );
     @{op_expected_table}{@q} = (UNKNOWN) x scalar(@q);
 
     # Always expecting OPERATOR ...
     # 'n' and 'v' are currently excluded because they might be VERSION numbers
     # 'i' is currently excluded because it might be a package
     # 'q' is currently excluded because it might be a prototype
-    @q = qw( -- C -> h R ++ ] Q <> );    ## n v q i );
+    # Fix for c030: removed '->' from this list:
+    @q = qw( -- C h R ++ ] Q <> );    ## n v q i );
     push @q, ')';
     @{op_expected_table}{@q} = (OPERATOR) x scalar(@q);
 
@@ -4945,6 +5054,8 @@ sub operator_expected {
 
     my ($rarg) = @_;
 
+    my $msg = "";
+
     ##############
     # Table lookup
     ##############
@@ -4952,7 +5063,10 @@ sub operator_expected {
     # Many types are can be obtained by a table lookup given the previous type.
     # This typically handles half or more of the calls.
     my $op_expected = $op_expected_table{$last_nonblank_type};
-    goto RETURN if ( defined($op_expected) );
+    if ( defined($op_expected) ) {
+        $msg = "Table lookup";
+        goto RETURN;
+    }
 
     ######################
     # Handle special cases
@@ -4992,10 +5106,12 @@ sub operator_expected {
 
             # // may follow perl functions which may be unary operators
             # see test file dor.t (defined or);
-            if (   $tok eq '/'
+            if (
+                   $tok eq '/'
                 && $next_type eq '/'
                 && $is_keyword_rejecting_slash_as_pattern_delimiter{
-                    $last_nonblank_token} )
+                    $last_nonblank_token}
+              )
             {
                 $op_expected = OPERATOR;
             }
@@ -5163,7 +5279,7 @@ sub operator_expected {
 
     DEBUG_OPERATOR_EXPECTED && do {
         print STDOUT
-"OPERATOR_EXPECTED: returns $op_expected for last type $last_nonblank_type token $last_nonblank_token\n";
+"OPERATOR_EXPECTED: $msg: returns $op_expected for last type $last_nonblank_type token $last_nonblank_token\n";
     };
 
     return $op_expected;
@@ -5857,7 +5973,7 @@ sub peek_ahead_for_nonblank_token {
         }
         last;
     }
-    return $rtokens;
+    return;
 }
 
 #########i#############################################################
@@ -5972,8 +6088,15 @@ sub guess_if_pattern_or_division {
     }
     else {
         my $ibeg = $i;
-        my $divide_expected =
-          numerator_expected( $i, $rtokens, $max_token_index );
+        my $divide_possible =
+          is_possible_numerator( $i, $rtokens, $max_token_index );
+
+        if ( $divide_possible < 0 ) {
+            $msg        = "pattern (division not possible here)\n";
+            $is_pattern = 1;
+            goto RETURN;
+        }
+
         $i = $ibeg + 1;
         my $next_token = $rtokens->[$i];    # first token after slash
 
@@ -6008,7 +6131,7 @@ sub guess_if_pattern_or_division {
 
             # we didn't find an ending / on this line, so we bias towards
             # division
-            if ( $divide_expected >= 0 ) {
+            if ( $divide_possible >= 0 ) {
                 $is_pattern = 0;
                 $msg .= "division (no ending / on this line)\n";
             }
@@ -6032,12 +6155,12 @@ sub guess_if_pattern_or_division {
             if ( $pattern_expected >= 0 ) {
 
                 # pattern looks possible...
-                if ( $divide_expected >= 0 ) {
+                if ( $divide_possible >= 0 ) {
 
                     # Both pattern and divide can work here...
 
                     # Increase weight of divide if a pure number follows
-                    $divide_expected += $next_token =~ /^\d+$/;
+                    $divide_possible += $next_token =~ /^\d+$/;
 
                     # Check for known constants in the numerator, like 'pi'
                     if ( $is_known_constant{$last_nonblank_token} ) {
@@ -6054,7 +6177,7 @@ sub guess_if_pattern_or_division {
                     }
 
                     # If one rule is more definite, use it
-                    elsif ( $divide_expected > $pattern_expected ) {
+                    elsif ( $divide_possible > $pattern_expected ) {
                         $msg .=
                           "division (more likely based on following tokens)\n";
                         $is_pattern = 0;
@@ -6073,7 +6196,7 @@ sub guess_if_pattern_or_division {
                     }
                 }
 
-                # divide_expected < 0 means divide can not work here
+                # divide_possible < 0 means divide can not work here
                 else {
                     $is_pattern = 1;
                     $msg .= "pattern (division not possible)\n";
@@ -6083,7 +6206,7 @@ sub guess_if_pattern_or_division {
             # pattern does not look possible...
             else {
 
-                if ( $divide_expected >= 0 ) {
+                if ( $divide_possible >= 0 ) {
                     $is_pattern = 0;
                     $msg .= "division (pattern not possible)\n";
                 }
@@ -6102,6 +6225,8 @@ sub guess_if_pattern_or_division {
             }
         }
     }
+
+  RETURN:
     return ( $is_pattern, $msg );
 }
 
@@ -6219,13 +6344,14 @@ sub scan_bare_identifier_do {
         else {
             $package = $current_package;
 
-            if ( $is_keyword{$tok} ) {
+            # patched for c043, part 1: keyword does not follow '->'
+            if ( $is_keyword{$tok} && $last_nonblank_type ne '->' ) {
                 $type = 'k';
             }
         }
 
-        # if it is a bareword..
-        if ( $type eq 'w' ) {
+        # if it is a bareword..  patched for c043, part 2: not following '->'
+        if ( $type eq 'w' && $last_nonblank_type ne '->' ) {
 
             # check for v-string with leading 'v' type character
             # (This seems to have precedence over filehandle, type 'Y')
@@ -6583,7 +6709,8 @@ sub do_scan_package {
         # knows that the number is in a package statement.
         # Examples of valid primitive tokens that might follow are:
         #  1235  . ; { } v3  v
-        if ( $next_nonblank_token =~ /^([v\.\d;\{\}])|v\d|\d+$/ ) {
+        # FIX: added a '#' since a side comment may also follow
+        if ( $next_nonblank_token =~ /^([v\.\d;\{\}\#])|v\d|\d+$/ ) {
             $statement_type = $tok;
         }
         else {
@@ -6755,30 +6882,39 @@ sub scan_identifier_do {
                 #  howdy::123::bubba();
                 #
             }
+            elsif ( $tok eq '#' ) {
 
-            # $# and POSTDEFREF ->$#
-            elsif (
-                   ( $tok eq '#' )
-                && ( $identifier =~ /\$$/ )
+                # side comment or identifier?
+                if (
 
-                # a # inside a prototype or signature can only start a comment
-                && !$in_prototype_or_signature
-              )
-            {
-                # A '#' starts a comment if it follows a space. For example,
-                # the following is equivalent to $ans=40.
-                #   my $ #
-                #     ans = 40;
-                if ($last_tok_is_blank) {
-                    $type = 'i';
-                    if ( $id_scan_state eq '$' ) { $type = 't' }
+                    # A '#' starts a comment if it follows a space. For example,
+                    # the following is equivalent to $ans=40.
+                    #   my $ #
+                    #     ans = 40;
+                    !$last_tok_is_blank
+
+                    # a # inside a prototype or signature can only start a
+                    # comment
+                    && !$in_prototype_or_signature
+
+                    # these are valid punctuation vars: *# %# @# $#
+                    # May also be '$#array' or POSTDEFREF ->$#
+                    && ( $identifier =~ /^[\%\@\$\*]$/ || $identifier =~ /\$$/ )
+
+                  )
+                {
+                    $identifier .= $tok;    # keep same state, a $ could follow
+                }
+                else {
+
+                    # otherwise it is a side comment
+                    if    ( $identifier eq '->' )   { }
+                    elsif ( $id_scan_state eq '$' ) { $type = 't' }
+                    else                            { $type = 'i' }
                     $i             = $i_save;
                     $id_scan_state = '';
                     last;
                 }
-
-                # May be '$#' or '$#array'
-                $identifier .= $tok;    # keep same state, a $ could follow
             }
 
             elsif ( $tok eq '{' ) {
@@ -7114,7 +7250,9 @@ sub scan_identifier_do {
                 #   Prima::PodView::COLOR_CODE_FOREGROUND
                 #   & ~tb::COLOR_INDEX ] =
                 #   $sec->{ColorCode}
-                if ( $identifier eq '&' && $expecting ) {
+
+                # Fix for case c033: a '#' here starts a side comment
+                if ( $identifier eq '&' && $expecting && $tok ne '#' ) {
                     $identifier .= $tok;
                 }
                 else {
@@ -7559,52 +7697,60 @@ sub scan_identifier_do {
 sub find_next_nonblank_token {
     my ( $i, $rtokens, $max_token_index ) = @_;
 
+    # Returns the next nonblank token after the token at index $i
+    # To skip past a side comment, and any subsequent block comments
+    # and blank lines, call with i=$max_token_index
+
     if ( $i >= $max_token_index ) {
         if ( !peeked_ahead() ) {
             peeked_ahead(1);
-            $rtokens =
-              peek_ahead_for_nonblank_token( $rtokens, $max_token_index );
+            peek_ahead_for_nonblank_token( $rtokens, $max_token_index );
         }
     }
+
     my $next_nonblank_token = $rtokens->[ ++$i ];
+    return ( " ", $i ) unless defined($next_nonblank_token);
 
     if ( $next_nonblank_token =~ /^\s*$/ ) {
         $next_nonblank_token = $rtokens->[ ++$i ];
+        return ( " ", $i ) unless defined($next_nonblank_token);
     }
     return ( $next_nonblank_token, $i );
 }
 
-sub numerator_expected {
+sub is_possible_numerator {
 
-    # this is a filter for a possible numerator, in support of guessing
-    # for the / pattern delimiter token.
-    # returns -
+    # Look at the next non-comment character and decide if it could be a
+    # numerator.  Return
     #   1 - yes
     #   0 - can't tell
     #  -1 - no
-    # Note: I am using the convention that variables ending in
-    # _expected have these 3 possible values.
+
     my ( $i, $rtokens, $max_token_index ) = @_;
-    my $numerator_expected = 0;
+    my $is_possible_numerator = 0;
 
     my $next_token = $rtokens->[ $i + 1 ];
     if ( $next_token eq '=' ) { $i++; }    # handle /=
     my ( $next_nonblank_token, $i_next ) =
       find_next_nonblank_token( $i, $rtokens, $max_token_index );
 
+    if ( $next_nonblank_token eq '#' ) {
+        ( $next_nonblank_token, $i_next ) =
+          find_next_nonblank_token( $max_token_index, $rtokens,
+            $max_token_index );
+    }
+
     if ( $next_nonblank_token =~ /(\(|\$|\w|\.|\@)/ ) {
-        $numerator_expected = 1;
+        $is_possible_numerator = 1;
+    }
+    elsif ( $next_nonblank_token =~ /^\s*$/ ) {
+        $is_possible_numerator = 0;
     }
     else {
-
-        if ( $next_nonblank_token =~ /^\s*$/ ) {
-            $numerator_expected = 0;
-        }
-        else {
-            $numerator_expected = -1;
-        }
+        $is_possible_numerator = -1;
     }
-    return $numerator_expected;
+
+    return $is_possible_numerator;
 }
 
 {    ## closure for sub pattern_expected
@@ -7646,7 +7792,10 @@ sub numerator_expected {
         }
         else {
 
-            if ( $next_nonblank_token =~ /^\s*$/ ) {
+            # Added '#' to fix issue c044
+            if (   $next_nonblank_token =~ /^\s*$/
+                || $next_nonblank_token eq '#' )
+            {
                 $is_pattern = 0;
             }
             else {

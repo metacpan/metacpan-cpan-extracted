@@ -15,7 +15,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
 
 extends 'Lemonldap::NG::Common::Module';
 
-our $VERSION = '2.0.11';
+our $VERSION = '2.0.12';
 
 # Sample accounts from Doctor Who characters
 our %demoAccounts = (
@@ -45,7 +45,7 @@ our %demoGroups = (
 # INITIALIZATION
 
 sub init {
-    1;
+    return 1;
 }
 
 # RUNNING METHODS

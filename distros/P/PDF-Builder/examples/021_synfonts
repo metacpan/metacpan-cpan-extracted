@@ -303,7 +303,7 @@ foreach my $fn (@font_list) {
     $txt->transform(-translate => [50, 800]);
     $txt->fillcolor('black');
     $txt->font($f1, 18);  # Hevetica labels
-    $txt->lead(18*1.25);
+    $txt->leading(18*1.25);
     my $title = "caps 1, bold 8, oblique -15, condense 1.5, space 300.";
     my $toprint;
     print STDERR ".";

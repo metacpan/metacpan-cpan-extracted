@@ -1,0 +1,68 @@
+NAME
+    IntRange::Iter - Generate a coderef iterator from an int range
+    specification (e.g. '1,5-10,20')
+
+VERSION
+    This document describes version 0.004 of IntRange::Iter (from Perl
+    distribution IntRange-Iter), released on 2021-07-17.
+
+SYNOPSIS
+      use IntRange::Iter qw(intrange_iter);
+
+      my $iter = intrange_iter('1,5-10,15-17'); # or: intrange_iter({allow_dotdot=>1}, '1,5-10,15..17');
+
+      while (my $val = $iter->()) { ... } # 1, 5,6,7,8,9,10, 15,16,17 undef, ...
+
+DESCRIPTION
+    This module provides a simple (coderef) iterator which you can call
+    repeatedly to get numbers specified in an integer range specification
+    (string). When the numbers are exhausted, the coderef will return undef.
+    No class/object involved.
+
+FUNCTIONS
+  intrange_iter
+    Usage:
+
+     $iter = intrange_iter([ \%opts ], $spec); # coderef
+
+    Options:
+
+    *   allow_dash
+
+        Bool. Default true. At least one of "allow_dash" or "allow_dotdot"
+        must be true.
+
+    *   allow_dotdot
+
+        Bool. Default false. At least one of "allow_dash" or "allow_dotdot"
+        must be true.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/IntRange-Iter>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-IntRange-Iter>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=IntRange-Iter>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Range::Iter
+
+    NumSeq::Iter
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2021 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

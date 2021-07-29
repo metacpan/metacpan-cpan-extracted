@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 5 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 7 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/IndonesianHolidayUtils.pm',
@@ -14,7 +14,9 @@ my @module_files = (
 );
 
 my @scripts = (
+    'script/count-idn-workdays',
     'script/is-idn-holiday',
+    'script/is-idn-workday',
     'script/list-idn-holidays',
     'script/list-idn-workdays'
 );

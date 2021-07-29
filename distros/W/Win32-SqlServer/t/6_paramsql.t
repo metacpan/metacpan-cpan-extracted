@@ -1,9 +1,14 @@
 #---------------------------------------------------------------------
-# $Header: /Perl/OlleDB/t/6_paramsql.t 24    19-07-08 22:13 Sommar $
+# $Header: /Perl/OlleDB/t/6_paramsql.t 25    21-07-16 19:05 Sommar $
 #
 # This test suite concerns sql with parameterised SQL statements.
 #
 # $History: 6_paramsql.t $
+# 
+# *****************  Version 25  *****************
+# User: Sommar       Date: 21-07-16   Time: 19:05
+# Updated in $/Perl/OlleDB/t
+# Added missing else for one case where test could be skipped.
 # 
 # *****************  Version 24  *****************
 # User: Sommar       Date: 19-07-08   Time: 22:13
@@ -1272,6 +1277,9 @@ unless ($codepage == 65001 and $X->{Provider} == PROVIDER_SQLOLEDB) {
    my $result = $X->sql_one('SELECT a = upper(?)',
                  [['char',  'Hello Dolly! ' x 1854]], HASH);
    push (@testres, compare($expect, $result));
+}
+else {
+   push (@testres, 'skip, UTF8 (var)char > 4000 does not work with SQLOLEDB');
 }
 
 blurb("too long char OUTPUT");

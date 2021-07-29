@@ -1,6 +1,6 @@
 package Lemonldap::NG::Portal::Main::Process;
 
-our $VERSION = '2.0.10';
+our $VERSION = '2.0.12';
 
 package Lemonldap::NG::Portal::Main;
 
@@ -56,6 +56,10 @@ sub processHook {
         else {
             $self->logger->debug("Not a code ref: $sub");
         }
+    }
+    if ( $err != PE_OK ) {
+        $self->logger->warn(
+            "Hook $hookName returned " . portalConsts->{$err} );
     }
     return $err;
 }
@@ -152,12 +156,16 @@ sub controlUrl {
         }
 
         # Unprotected hosts
-        my ( $proto, $vhost, $appuri ) = $tmp =~ m#^(https?://)([^/]*)(.*)#;
-        $vhost =~ s/:\d+$//;
+        if ( $tmp and ( $tmp !~ URIRE ) ) {
+            $self->userLogger->error("Bad URL $tmp");
+            delete $req->{urldc};
+            return PE_BADURL;
+        }
+        my ( $proto, $vhost, $appuri ) = ( $2, $3, $5 );
 
         # Try to resolve alias
         my $originalVhost = $self->HANDLER->resolveAlias($vhost);
-        $vhost = $proto . $originalVhost;
+        $vhost = $proto . '://' . $originalVhost;
         $self->logger->debug( "Required URL (param: "
               . ( $req->param('logout') ? 'HTTP Referer' : 'urldc' )
               . " | value: $tmp | alias: $vhost)" );
@@ -328,7 +336,7 @@ sub checkXSSAttack {
 
     # Test value
     $value =~ s/\%25/\%/g;
-    if ( $value =~ m/(?:\0|<|'|"|`|\%(?:00|3C|22|27|2C))/ ) {
+    if ( $value =~ m/(?:\0|<|'|"|`|\%(?:00|3C|22|27))/ ) {
         $self->userLogger->error(
             "XSS attack detected (param: $name | value: $value)");
         return $self->conf->{checkXSS};
@@ -392,7 +400,7 @@ sub authenticate {
     $req->steps( [
             'setSessionInfo',           'setMacros',
             'setPersistentSessionInfo', 'storeHistory',
-            @{ $self->afterData },      sub { PE_BADCREDENTIALS }
+            @{ $self->afterData }, sub { PE_BADCREDENTIALS }
         ]
     );
 
@@ -471,13 +479,12 @@ sub setGroups {
 }
 
 sub setPersistentSessionInfo {
-
-    # $user passed by BruteForceProtection plugin
-    my ( $self, $req, $user ) = @_;
+    my ( $self, $req ) = @_;
 
     # Do not restore infos if session already opened
     unless ( $req->id ) {
-        my $key = $req->{sessionInfo}->{ $self->conf->{whatToTrace} } || $user;
+        my $key = $req->{sessionInfo}->{ $self->conf->{whatToTrace} };
+
         return PE_OK unless ( $key and length($key) );
 
         my $persistentSession = $self->getPersistentSession($key);
@@ -616,9 +623,9 @@ sub secondFactor {
 }
 
 sub storeHistory {
-    my ( $self, $req, $uid ) = @_;  # $uid passed by BruteForceProtection plugin
+    my ( $self, $req ) = @_;
     if ( $self->conf->{loginHistoryEnabled} ) {
-        $self->registerLogin( $req, $uid );
+        $self->registerLogin($req);
     }
     PE_OK;
 }

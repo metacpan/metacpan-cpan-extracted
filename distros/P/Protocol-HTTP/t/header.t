@@ -52,4 +52,17 @@ subtest 'multi header' => sub {
     is_deeply [$msg->multiheader("a")], [3,4];    
 };
 
+subtest 'objects should stringify in header values' => sub {
+    my $msg = new Protocol::HTTP::Request({
+        headers => { Location => URI::XS->new("https://example.com") }
+    });
+    is $msg->header("Location"), "https://example.com";
+    
+    $msg->headers({ Hello => URI::XS->new("/world") });
+    is $msg->header("Hello"), "/world";
+    
+    $msg->header("Key", URI::XS->new("/world"));
+    is $msg->header("Key"), "/world";
+};
+
 done_testing();

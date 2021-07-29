@@ -173,7 +173,7 @@ use common::sense;
 use base 'Exporter';
 
 BEGIN {
-   our $VERSION = 4.75;
+   our $VERSION = 4.76;
 
    our @AIO_REQ = qw(aio_sendfile aio_seek aio_read aio_write aio_open aio_close
                      aio_stat aio_lstat aio_unlink aio_rmdir aio_readdir aio_readdirx
@@ -2331,8 +2331,12 @@ C<IO::AIO::MAP_NONBLOCK>,
 C<IO::AIO::MAP_FIXED>,
 C<IO::AIO::MAP_GROWSDOWN>,
 C<IO::AIO::MAP_32BIT>,
-C<IO::AIO::MAP_HUGETLB> or
-C<IO::AIO::MAP_STACK>.
+C<IO::AIO::MAP_HUGETLB>,
+C<IO::AIO::MAP_STACK>,
+C<IO::AIO::MAP_FIXED_NOREPLACE>,
+C<IO::AIO::MAP_SHARED_VALIDATE>,
+C<IO::AIO::MAP_SYNC> or
+C<IO::AIO::MAP_UNINITIALIZED>.
 
 If C<$fh> is C<undef>, then a file descriptor of C<-1> is passed.
 

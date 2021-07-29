@@ -1,6 +1,6 @@
 package App::colsummary ;  
-our $VERSION = '0.058' ; 
-our $DATE = '2021-06-29T02:07+09:00' ; 
+our $VERSION = '0.060' ; 
+our $DATE = '2021-07-10T16:12+09:00' ; 
 
 =encoding utf8
 

@@ -66,7 +66,7 @@ Zapp::Controller::Trigger - Web handlers for trigger management
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 METHODS
 

@@ -134,24 +134,45 @@ __PACKAGE__->method_documentation({
     	format => '',
     	read_only => '',
     		},
-    'built_in' => {
-    	datatype => 'string',
-    	base_name => 'BuiltIn',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
     'name' => {
     	datatype => 'string',
     	base_name => 'Name',
-    	description => '',
+    	description => 'Returns the name of the property.             ',
     	format => '',
     	read_only => '',
     		},
     'value' => {
     	datatype => 'string',
     	base_name => 'Value',
-    	description => '',
+    	description => 'Gets or sets the value of the property.',
+    	format => '',
+    	read_only => '',
+    		},
+    'is_linked_to_content' => {
+    	datatype => 'string',
+    	base_name => 'IsLinkedToContent',
+    	description => 'Indicates whether this property is linked to content',
+    	format => '',
+    	read_only => '',
+    		},
+    'source' => {
+    	datatype => 'string',
+    	base_name => 'Source',
+    	description => 'The linked content source.',
+    	format => '',
+    	read_only => '',
+    		},
+    'type' => {
+    	datatype => 'string',
+    	base_name => 'Type',
+    	description => 'Gets the data type of the property.             ',
+    	format => '',
+    	read_only => '',
+    		},
+    'is_generated_name' => {
+    	datatype => 'string',
+    	base_name => 'IsGeneratedName',
+    	description => 'Returns true if this property does not have a name in the OLE2 storage and a   unique name was generated only for the public API.             ',
     	format => '',
     	read_only => '',
     		},
@@ -159,16 +180,22 @@ __PACKAGE__->method_documentation({
 
 __PACKAGE__->swagger_types( {
     'link' => 'Link',
-    'built_in' => 'string',
     'name' => 'string',
-    'value' => 'string'
+    'value' => 'string',
+    'is_linked_to_content' => 'string',
+    'source' => 'string',
+    'type' => 'string',
+    'is_generated_name' => 'string'
 } );
 
 __PACKAGE__->attribute_map( {
     'link' => 'link',
-    'built_in' => 'BuiltIn',
     'name' => 'Name',
-    'value' => 'Value'
+    'value' => 'Value',
+    'is_linked_to_content' => 'IsLinkedToContent',
+    'source' => 'Source',
+    'type' => 'Type',
+    'is_generated_name' => 'IsGeneratedName'
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

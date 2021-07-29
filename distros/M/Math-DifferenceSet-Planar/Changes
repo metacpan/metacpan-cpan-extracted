@@ -1,5 +1,10 @@
 Revision history for Perl extension Math::DifferenceSet::Planar.
 
+0.015   Fri, 16 Jul 2021 21:23:57 +0200
+        - fixed an inefficiency in iterate_rotators()
+        - fixed documentation typos
+        - reviewed examples/pds_databases
+
 0.014   Sat, 19 Jun 2021 07:59:59 +0200
         - added persistent rotator space data
         - new methods:

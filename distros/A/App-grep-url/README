@@ -3,8 +3,11 @@ NAME
     criteria) in them
 
 VERSION
-    This document describes version 0.001 of App::grep::url (from Perl
-    distribution App-grep-url), released on 2021-07-01.
+    This document describes version 0.003 of App::grep::url (from Perl
+    distribution App-grep-url), released on 2021-07-11.
+
+CONTRIBUTOR
+    perlancar (on netbook-dell-xps13) <perlancar@gmail.com>
 
 FUNCTIONS
   grep_url
@@ -20,26 +23,11 @@ FUNCTIONS
 
     Arguments ('*' denotes required arguments):
 
-    *   all => *true*
-
-        Require all patterns to match, instead of just one.
-
     *   color => *str* (default: "auto")
 
     *   count => *true*
 
         Supress normal output, return a count of matching lines.
-
-    *   dash_prefix_inverts => *bool*
-
-        When given pattern that starts with dash "-FOO", make it to mean
-        "^(?!.*FOO)".
-
-        This is a convenient way to search for lines that do not match a
-        pattern. Instead of using "-v" to invert the meaning of all
-        patterns, this option allows you to invert individual pattern using
-        the dash prefix, which is also used by Google search and a few other
-        search engines.
 
     *   files => *array[filename]*
 
@@ -48,6 +36,8 @@ FUNCTIONS
     *   host_matches => *re*
 
     *   host_not_contains => *str*
+
+    *   ignore_case => *bool*
 
     *   invert_match => *bool*
 

@@ -1,3 +1,7 @@
+0.020  2021-07-18
+   - Further changes on header/cookie being optional
+     (Mikko Koivunalho)
+
 0.019  2021-05-22
    - Set authorization header/cookie optional on response
      (Mikko Koivunalho)

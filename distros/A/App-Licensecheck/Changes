@@ -7,6 +7,29 @@ Home page:    <https://metacpan.org/release/App-Licensecheck>
 Bug tracker:  <https://bugs.debian.org/cgi-bin/pkgreport.cgi?pkg=licensecheck>
 Maintainer:   Jonas Smedegaard (JONASS) <jonass@cpan.org>
 
+v3.2.5	2021-07-22
+
+ [ Bug Fixes ]
+ - fix shebang to use /usr/bin/env (don't hardcode /usr/bin/perl)
+ - strip all trailing dash a.k.a. soft-wraps (not only first instance)
+
+ [ Packaging ]
+ - tighten test-recommendation on Regexp::Pattern::License
+
+ [ Other ]
+ - extend functions clean_cruft() clean_cruft_and_spaces() to strip html
+   tags
+
+v3.2.4	2021-07-17
+
+ [ Test Suite ]
+ - update testsuite to cover Regexp::Pattern::License v3.7.0
+
+ [ Other ]
+ - extend function clean_cruft_and_spaces() to strip trailing dash,
+   assuming it is soft-wrap
+ - refine resolving of license names to cover more variants
+
 v3.2.3	2021-07-07
 
  [ Bug Fixes ]

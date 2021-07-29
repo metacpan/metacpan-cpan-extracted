@@ -7,7 +7,6 @@ use Devel::ebug;
 
 my $ebug = Devel::ebug->new;
 $ebug->program("corpus/calc_oo.pl");
-$ebug->backend("$^X bin/ebug_backend_perl");
 $ebug->load;
 my %filenames;
 $filenames{$_}++ foreach $ebug->filenames;

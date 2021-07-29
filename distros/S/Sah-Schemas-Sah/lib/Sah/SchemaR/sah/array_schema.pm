@@ -1,9 +1,9 @@
 package Sah::SchemaR::sah::array_schema;
 
-our $DATE = '2020-05-08'; # DATE
-our $VERSION = '0.9.49.1'; # VERSION
+our $DATE = '2021-07-23'; # DATE
+our $VERSION = '0.9.50.0'; # VERSION
 
-our $rschema = ["array",[{elems=>[["sah::type_name",{req=>1},{}],["sah::clause_set",{},{}],["sah::extras",{},{}]],max_len=>3,min_len=>1}],["array"]];
+our $rschema = ["array",[{elems=>[["sah::type_name",{req=>1},{}],["sah::clause_set",{},{}]],examples=>[{valid=>0,value=>[]},{valid=>1,value=>["int"]},{valid=>1,value=>["int",{}]},{valid=>1,value=>["int",{max=>1,min=>1}]}],max_len=>2,min_len=>1}],["array"]];
 
 1;
 # ABSTRACT: 
@@ -20,7 +20,7 @@ Sah::SchemaR::sah::array_schema -
 
 =head1 VERSION
 
-This document describes version 0.9.49.1 of Sah::SchemaR::sah::array_schema (from Perl distribution Sah-Schemas-Sah), released on 2020-05-08.
+This document describes version 0.9.50.0 of Sah::SchemaR::sah::array_schema (from Perl distribution Sah-Schemas-Sah), released on 2021-07-23.
 
 =head1 DESCRIPTION
 
@@ -50,7 +50,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -12,7 +12,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_SENDRESPONSE
 );
 
-our $VERSION = '2.0.9';
+our $VERSION = '2.0.12';
 
 extends 'Lemonldap::NG::Portal::Main::Auth';
 
@@ -216,18 +216,18 @@ sub _checkDomains {
 }
 
 sub authenticate {
-    PE_OK;
+    return PE_OK;
 }
 
 sub authLogout {
-    PE_OK;
+    return PE_OK;
 }
 
 sub setAuthSessionInfo {
     my ( $self, $req ) = @_;
     $req->{sessionInfo}->{authenticationLevel} = $self->conf->{krbAuthnLevel};
     $req->{sessionInfo}->{_krbUser}            = $req->data->{_krbUser};
-    PE_OK;
+    return PE_OK;
 }
 
 sub getDisplayType {

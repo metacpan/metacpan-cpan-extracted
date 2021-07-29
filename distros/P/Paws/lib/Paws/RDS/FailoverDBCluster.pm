@@ -28,14 +28,18 @@ You shouldn't make instances of this class. Each attribute should be used as a n
 =head1 SYNOPSIS
 
     my $rds = Paws->service('RDS');
-    # To perform a failover for a DB cluster
-    # This example performs a failover for the specified DB cluster to the
-    # specified DB instance.
+# To perform a failover for a DB cluster
+# This example performs a failover for the specified DB cluster to the specified
+# DB instance.
     my $FailoverDBClusterResult = $rds->FailoverDBCluster(
       'DBClusterIdentifier'        => 'myaurorainstance-cluster',
       'TargetDBInstanceIdentifier' => 'myaurorareplica'
     );
 
+    # Results:
+    my $DBCluster = $FailoverDBClusterResult->DBCluster;
+
+    # Returns a L<Paws::RDS::FailoverDBClusterResult> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
 For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/rds/FailoverDBCluster>

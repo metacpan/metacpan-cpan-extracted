@@ -1,5 +1,8 @@
 package DefHash; # just to make PodWeaver happy
 
+# AUTHORITY
+# DATE
+our $DIST = 'DefHash'; # DIST
 # VERSION
 
 1;
@@ -21,7 +24,7 @@ DefHash - Define things according to a specification, using hashes
 
 =head1 VERSION
 
-This document describes version 1.0.12 of DefHash (from Perl distribution DefHash), released on 2019-06-18.
+This document describes version 1.0.13 of DefHash (from Perl distribution DefHash), released on 2021-07-21.
 
 =head1 SYNOPSIS
 
@@ -55,7 +58,7 @@ L<Sah>, L<Rinci>, L<Riap>, L<Module::Patch>.
 =head1 SPECIFICATION
 
 In this document, hashes are written in JSON or pseudo-JSON (e.g. contains
-ellipsis C<...> or JavaScript-style comments C<// ...>).
+ellipsis C<...> or JavaScript-style comments C<// ...> or dangling comma).
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL "NOT", "SHOULD",
 "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be
@@ -77,12 +80,15 @@ values. The same hash key/value pairs are used to store B<property attributes>:
      "v": 1,                         // set value for property 'v'
      "prop1": "value1",              // set value for property 'prop1'
      "prop2": ["value2", ...],       // set value for property 'prop2'
+
      "prop1.attr1": ...,             // set value for prop1's attribute
      "prop1.attr1.subattr1": ...,    // set value for prop1's attribute
+
      "_extra1": ...,                 // ignored property, starts with _
      "prop1._extra_attr": ...,       // ignored attribute, starts with _
 
-     "prop(en)",                     // equivalent/normalizable to prop.alt.lang.en
+     ".attr1": ...,                  // set value for the hash's attribute
+     ".attr1.subattr1": ...,         // set value for the hash's attribute
  }
 
 The above defhash defines two properties: C<prop1> and C<prop2>. C<prop1> has
@@ -90,11 +96,10 @@ two attributes, C<attr1> and C<attr1.subattr1>. Properties with names starting
 with underscore (C<_>) are ignored; this can be used to put extra information.
 Likewise for attribute names which start with underscore.
 
-Property names must follow this regex '\A[a-z][a-z0-9_]*\z' (an
-Lowercase-alphanumeric-only word). Property attributes must follow this regex:
-'\A[a-z][a-z0-9_]*(\.[a-z][a-z0-9_]*)*\z' (a dotted lowercase-alphanumeric
-word). An exception is some shortcuts which will be normalized during further
-processing: "foo(LANG)" is a shortcut for "foo.alt.lang.LANG".
+Property names must follow this regex '\A[A-Za-z_][A-Za-z0-9_]*\z' (an
+alphanumeric-only word). Property attributes must follow this regex:
+'\A([A-Za-z_][A-Za-z0-9_]*)?(\.[A-Za-z_][A-Za-z0-9_]*)+\z' (a dotted
+alphanumeric-only word).
 
 Property value can be anything. It can contain another defhash for defining
 subentities, for example. In Rinci, a function metadata has a property called
@@ -262,36 +267,29 @@ Below is the list of property attributes that must be supported.
 
 =item * alt
 
-This attribute can be used to store alternate property values. The most common
-is alternative language (C<alt.lang.LANG_CODE>), where you want to provide
-translations. Example:
+This attribute can be used to store alternate property values.
+
+B<alt.lang>. The most common is alternative language (C<alt.lang.LANG_CODE>),
+where you want to provide translations. Example:
 
  {
      "summary": "An English summary",
      "summary.alt.lang.id_ID": "Ringkasan dalam bahasa Indonesia",
  }
 
-There is a shortcut form for C<alt.lang>, which should be normalized to
-C<alt.lang> when processing:
-
- {
-     "summary": "An English summary",
-     "summary(id_ID)": "Ringkasan dalam bahasa Indonesia",
- }
-
-Another kind of alternate is environment (C<alt.env.NAME>), for example we might
-want to use different summary when displayed in a CLI program vs web
-application. Example (in a Rinci function argument's specification):
+B<alt.env>. Another kind of alternate is environment (C<alt.env.NAME>), for
+example we might want to use different summary when displayed in a CLI program
+vs web application. Example (in a Rinci function argument's specification):
 
  {
      "summary.alt.env.cmdline": "Like --foo, do something foobar-ish",
      "summary.alt.env.web": "Like the `foo` field, do something foobar-ish",
  }
 
-Another kind of alternate is boolean logic (C<alt.bool.WHICH>, where C<WHICH>
-can be C<not>), when you want to specify the negative sense/sentence instead of
-the regular positive one. Example (in a Rinci function argument's
-specification):
+B<alt.bool>. Another kind of alternate is boolean logic (C<alt.bool.WHICH>,
+where C<WHICH> can be C<not>), when you want to specify the negative
+sense/sentence instead of the regular positive one. Example (in a Rinci function
+argument's specification):
 
  "tcp": {
      "schema": "bool",
@@ -300,11 +298,11 @@ specification):
      "summary.alt.bool.not": "Do not parse TCP connections",
  }
 
-Another kind of alternate is grammatical variance based on noun plurality
-(C<alt.plurality.WHICH> where C<WHICH> can be C<singular> or C<plural>). Example
-(in a Rinci function argument's specification, where an array argument like
-C<files> translates in a CLI environment to multiple C<--file> option
-specification):
+B<alt.plurality>. Another kind of alternate is grammatical variance based on
+noun plurality (C<alt.plurality.WHICH> where C<WHICH> can be C<singular> or
+C<plural>). Example (in a Rinci function argument's specification, where an
+array argument like C<files> translates in a CLI environment to multiple
+C<--file> option specification):
 
  "files": {
      "schema": ["array*", {"of":"str*"}],
@@ -312,14 +310,18 @@ specification):
      "summary.alt.plurality.singular": "Add a file to check (can be specified multiple times)",
  }
 
-Combination of alternates. When two or more alternates is combined, they must be
-ordered asciibetically and separated with an underscore C<_>. For example:
+B<Combination of alternates.> Example:
 
  {
      "default_lang": "en_US",
+
      "summary": "An English summary",
-     "summary.alt.env_lang.web.id_ID":"(Summary in Indonesian, for web)",
-     "summary.alt.env_lang.cmdline.id_ID":"(Summary in Indonesian, for cmdline)"
+
+     "summary.alt.lang.id_ID.env.web":"(Summary in Indonesian, for web)",
+     "summary.alt.env.web.lang.id_ID":"(Summary in Indonesian, for web)", // equivalent to previous line
+
+     "summary.alt.lang.id_ID.env.cmdline":"(Summary in Indonesian, for cmdline)",
+     "summary.alt.env.cmdline.lang.id_ID":"(Summary in Indonesian, for cmdline)", // equivalent to previous line
  }
 
 =back
@@ -355,13 +357,17 @@ Semantic Versioning, L<http://semver.org>
 
 Markdown specification
 
+Implementation: L<Hash::DefHash> is the official implementation in Perl to check
+and manipulate DefHash. Other modules: L<Regexp::Pattern::DefHash>,
+L<Sah::Schemas::DefHash>.
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2019, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

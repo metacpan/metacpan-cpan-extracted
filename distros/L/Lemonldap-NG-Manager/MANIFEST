@@ -248,6 +248,7 @@ t/15-combination.t
 t/16-cli.t
 t/17-extra2f.t
 t/20-test-coverage.t
+t/30-DBI-Cli.t
 t/40-sessions.t
 t/50-notifications-DBI.t
 t/50-notifications.t
@@ -267,6 +268,7 @@ t/jsonfiles/14-bad.json
 t/jsonfiles/15-combination.json
 t/jsonfiles/17-extra2f.json
 t/jsonfiles/70-diff.json
+t/lemonldap-ng-DBI-conf.ini
 t/lemonldap-ng-dbi.ini
 t/lemonldap-ng-noDiff.ini
 t/lemonldap-ng.ini

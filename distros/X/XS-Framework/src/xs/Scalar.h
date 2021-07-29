@@ -6,6 +6,22 @@ namespace xs {
 
 using xs::my_perl;
 
+namespace detail {
+    template <typename T> inline panda::enable_if_signed_integral_t<T>   _getnum (SV* sv) { return SvIV(sv); }
+    template <typename T> inline panda::enable_if_unsigned_integral_t<T> _getnum (SV* sv) { return SvUV(sv); }
+    template <typename T> inline panda::enable_if_floatp_t<T>            _getnum (SV* sv) { return SvNV(sv); }
+
+    struct AutoNumber {
+        AutoNumber(SV* sv) : sv(sv) {}
+
+        template <class T, typename = panda::enable_if_arithmetic_t<T>>
+        operator T () const { return sv ? _getnum<T>(sv) : T(); }
+
+    private:
+        SV* sv;
+    };
+}
+
 struct Scalar : Sv {
     static const Scalar undef;
     static const Scalar yes;
@@ -80,9 +96,17 @@ struct Scalar : Sv {
         Sv::upgrade(type);
     }
 
-    template <class T = panda::string> T as_string () const;
+    template <class T = panda::string>
+    T as_string () const {
+        if (!sv) return T();
+        STRLEN len;
+        const char* buf = SvPV_const(sv, len);
+        return T(buf, len);
+    }
 
-    template <class T = int> T as_number () const;
+    template <class T = int> T as_number () const { return sv ? detail::_getnum<T>(sv) : T(); }
+
+    detail::AutoNumber number () const { return detail::AutoNumber(sv); }
 
     static void __at_perl_destroy ();
 

@@ -18,12 +18,16 @@ DROLSKY's
 Dave
 Devel
 Mizune
+Müller
 PayPal
 Pine
 Report
 Rolsky
 Rolsky's
+Tina
 autarch
 codecov
+cpan2
 drolsky
 lib
+tinita

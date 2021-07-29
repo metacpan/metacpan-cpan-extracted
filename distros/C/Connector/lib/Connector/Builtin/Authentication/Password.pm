@@ -124,11 +124,11 @@ __PACKAGE__->meta->make_immutable;
 1;
 __END__
 
-=head 1 Name
+=head1 Name
 
 Connector::Builtin::Authentication::Password
 
-=head 1 Description
+=head1 Description
 
 Lightweight connector to check passwords against a unix style password file.
 Path to the password file is taken from LOCATION.

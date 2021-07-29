@@ -1,0 +1,34 @@
+Changes
+CONTRIBUTING.md
+lib/Text/PO.pm
+lib/Text/PO/Element.pm
+lib/Text/PO/Gettext.pm
+lib/Text/PO/MO.pm
+LICENSE
+Makefile.PL
+MANIFEST
+README
+README.md
+scripts/po.pl
+scripts/settings.json
+share/gettext.js
+share/lib/sprintf.js
+share/package.json
+share/README
+share/README.md
+share/test.html
+share/test.js
+t/001_load.t
+t/002_po.t
+t/003_mo.t
+t/004_gettext.t
+t/090_pod.t
+t/091_pod_coverage.t
+t/099_kwalitee.t
+t/fr_FR/LC_MESSAGES/com.example.api.json
+t/fr_FR/LC_MESSAGES/com.example.api.mo
+t/fr_FR/LC_MESSAGES/com.example.api.po
+t/ja_JP/LC_MESSAGES/com.example.api.json
+t/ru_RU.po
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

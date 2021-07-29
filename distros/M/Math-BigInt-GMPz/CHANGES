@@ -1,3 +1,9 @@
+0.0007 2021-07-09
+
+ * Require GMP version 5.1.0.
+
+ * Display the version of GMP during configuratino and tests are run.
+
 0.0006 2021-07-03
 
  * Require Math::GMPz version 0.36.

@@ -1,5 +1,8 @@
 Revision history for Task-MusicBundle
 
+0.1904 2021-07-11 11:15:16
+    - Add Music::Guidonian.
+
 0.1903 2020-12-19 08:08:21
     - Remove MIDI::Ngram because it is not about composition.
     - Add Music::MelodicDevice::Inversion.

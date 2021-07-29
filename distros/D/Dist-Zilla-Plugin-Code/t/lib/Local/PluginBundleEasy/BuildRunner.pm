@@ -29,15 +29,13 @@ sub configure {
             $moniker,
             $plugin_name,
             {
-                $code => [
-                    sub {
-                        my ($self) = @_;
-                        $self->log($input);
-                        $RESULT = $input * $input;
-                        mkdir 'blib';    ## no critic (InputOutput::RequireCheckedSyscalls)
-                        return;
-                    },
-                ],
+                $code => sub {
+                    my ($self) = @_;
+                    $self->log($input);
+                    $RESULT = $input * $input;
+                    mkdir 'blib';    ## no critic (InputOutput::RequireCheckedSyscalls)
+                    return;
+                },
             },
         ],
     );

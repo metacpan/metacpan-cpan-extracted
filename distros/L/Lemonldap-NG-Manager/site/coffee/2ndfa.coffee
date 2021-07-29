@@ -175,7 +175,6 @@ llapp.controller 'SessionsExplorerCtrl', ['$scope', '$translator', '$location', 
 						title: title
 						nodes: tmp
 			time = session._utime
-			id = session._session_id
 
 			# 1. Replace values if needed
 			for key, value of session
@@ -236,7 +235,6 @@ llapp.controller 'SessionsExplorerCtrl', ['$scope', '$translator', '$location', 
 						nodes: subres
 			return {
 				_utime: time
-				id: id
 				nodes: res
 			}
 
@@ -244,6 +242,7 @@ llapp.controller 'SessionsExplorerCtrl', ['$scope', '$translator', '$location', 
 		sessionId = scope.$modelValue.session
 		$http.get("#{scriptname}sfa/#{sessionType}/#{sessionId}").then (response) ->
 			$scope.currentSession = transformSession response.data
+			$scope.currentSession.id = sessionId
 		$scope.showT = false
 
 	$scope.localeDate = (s) ->

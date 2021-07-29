@@ -3,7 +3,7 @@ package PDF::API2;
 use strict;
 no warnings qw[ deprecated recursion uninitialized ];
 
-our $VERSION = '2.040'; # VERSION
+our $VERSION = '2.041'; # VERSION
 
 use Carp;
 use Encode qw(:all);
@@ -47,7 +47,7 @@ PDF::API2 - Facilitates the creation and modification of PDF files
     $page = $pdf->page();
 
     # Retrieve an existing page
-    $page = $pdf->openpage($page_number);
+    $page = $pdf->open_page($page_number);
 
     # Set the page size
     $page->mediabox('Letter');
@@ -1164,7 +1164,7 @@ sub page {
     return $page;
 }
 
-=item $page = $pdf->openpage($page_number)
+=item $page = $pdf->open_page($page_number)
 
 Returns the L<PDF::API2::Page> object of page $page_number.
 
@@ -1174,14 +1174,17 @@ document.
 B<Example:>
 
     $pdf = PDF::API2->open('our/99page.pdf');
-    $page = $pdf->openpage(1);   # returns the first page
-    $page = $pdf->openpage(99);  # returns the last page
-    $page = $pdf->openpage(-1);  # returns the last page
-    $page = $pdf->openpage(999); # returns undef
+    $page = $pdf->open_page(1);   # returns the first page
+    $page = $pdf->open_page(99);  # returns the last page
+    $page = $pdf->open_page(-1);  # returns the last page
+    $page = $pdf->open_page(999); # returns undef
 
 =cut
 
-sub openpage {
+# Deprecated (renamed)
+sub openpage { return open_page(@_); } ## no critic
+
+sub open_page {
     my $self = shift();
     my $index = shift() || 0;
     my ($page, $rotate, $media, $trans);
@@ -1204,7 +1207,7 @@ sub openpage {
         weaken $page->{' apipdf'};
         weaken $page->{' api'};
         $self->{'pdf'}->out_obj($page);
-        if (($rotate = $page->find_prop('Rotate')) and (not defined($page->{' fixed'}) or $page->{' fixed'} < 1)) {
+        if (($rotate = $page->find_prop('Rotate')) and not $page->{' opened'}) {
             $rotate = ($rotate->val() + 360) % 360;
 
             if ($rotate != 0 and not $self->default('nounrotate')) {
@@ -1239,7 +1242,7 @@ sub openpage {
             $trans = '';
         }
 
-        if (defined $page->{'Contents'} and (not defined($page->{' fixed'}) or $page->{' fixed'} < 1)) {
+        if (defined $page->{'Contents'} and not $page->{' opened'}) {
             $page->fixcontents();
             my $uncontent = delete $page->{'Contents'};
             my $content = $page->gfx();
@@ -1256,19 +1259,15 @@ sub openpage {
                 $content->{' stream'} .= ' Q ';
             }
 
-            ## $content->{'Length'} = PDFNum(length($content->{' stream'}));
-            # this will be fixed by the following code or content or filters
-
-            ## if we like compress we will do it now to do quicker saves
+            # if we like compress we will do it now to do quicker saves
             if ($self->{'forcecompress'}) {
-                # $content->compressFlate();
                 $content->{' stream'} = dofilter($content->{'Filter'}, $content->{' stream'});
                 $content->{' nofilt'} = 1;
                 delete $content->{'-docompress'};
                 $content->{'Length'} = PDFNum(length($content->{' stream'}));
             }
         }
-        $page->{' fixed'} = 1;
+        $page->{' opened'} = 1;
     }
 
     $self->{'pdf'}->out_obj($page);
@@ -1374,7 +1373,7 @@ sub importPageIntoForm {
         $s_page = $s_idx;
     }
     else {
-        $s_page = $s_pdf->openpage($s_idx);
+        $s_page = $s_pdf->open_page($s_idx);
     }
 
     $self->{'apiimportcache'} ||= {};
@@ -1408,23 +1407,23 @@ sub importPageIntoForm {
 
     # create a whole content stream
     ## technically it is possible to submit an unfinished
-    ## (eg. newly created) source-page, but thats nonsense,
-    ## so we expect a page fixed by openpage and die otherwise
-    die "page not processed via openpage ..." unless $s_page->{' fixed'} == 1;
+    ## (eg. newly created) source-page, but that's nonsense,
+    ## so we expect a page fixed by open_page and die otherwise
+    unless ($s_page->{' opened'}) {
+        croak join(' ',
+                   "Pages may only be imported from a complete PDF.",
+                   "Save and reopen the source PDF object first");
+    }
 
-    # since the source page comes from openpage it may already
-    # contain the required starting 'q' without the final 'Q'
-    # if forcecompress is in effect
     if (defined $s_page->{'Contents'}) {
         $s_page->fixcontents();
 
         $xo->{' stream'} = '';
-        # openpage pages only contain one stream
+        # open_page pages only contain one stream
         my ($k) = $s_page->{'Contents'}->elements();
         $k->realise();
         if ($k->{' nofilt'}) {
-          # we have a finished stream here
-          # so we unfilter
+          # we have a finished stream here so we unfilter
           $xo->add('q', unfilter($k->{'Filter'}, $k->{' stream'}), 'Q');
         }
         else {
@@ -1481,7 +1480,7 @@ sub import_page {
         $s_page = $s_idx;
     }
     else {
-        $s_page = $s_pdf->openpage($s_idx);
+        $s_page = $s_pdf->open_page($s_idx);
     }
 
     if (ref($t_idx) eq 'PDF::API2::Page') {
@@ -2089,8 +2088,10 @@ Imports and returns a new PNM image object.  C<$file> may be either a filename o
 sub image_pnm {
     my ($self, $file, %opts) = @_;
 
+    $opts{'-compress'} //= $self->{'forcecompress'};
+
     require PDF::API2::Resource::XObject::Image::PNM;
-    my $obj = PDF::API2::Resource::XObject::Image::PNM->new($self->{'pdf'}, $file);
+    my $obj = PDF::API2::Resource::XObject::Image::PNM->new($self->{'pdf'}, $file, %opts);
 
     $self->{'pdf'}->out_obj($self->{'pages'});
 
@@ -2431,13 +2432,20 @@ sub outlines {
     my $self = shift();
 
     require PDF::API2::Outlines;
-    $self->{'pdf'}->{'Root'}->{'Outlines'} ||= PDF::API2::Outlines->new($self);
-
     my $obj = $self->{'pdf'}->{'Root'}->{'Outlines'};
+    if ($obj) {
+        bless $obj, 'PDF::API2::Outlines';
+        $obj->{' api'} = $self;
+        weaken $obj->{' api'};
+    }
+    else {
+        $obj = PDF::API2::Outlines->new($self);
 
-    $self->{'pdf'}->new_obj($obj) unless $obj->is_obj($self->{'pdf'});
-    $self->{'pdf'}->out_obj($obj);
-    $self->{'pdf'}->out_obj($self->{'pdf'}->{'Root'});
+        $self->{'pdf'}->{'Root'}->{'Outlines'} = $obj;
+        $self->{'pdf'}->new_obj($obj) unless $obj->is_obj($self->{'pdf'});
+        $self->{'pdf'}->out_obj($obj);
+        $self->{'pdf'}->out_obj($self->{'pdf'}->{'Root'});
+    }
 
     return $obj;
 }
@@ -2502,7 +2510,8 @@ This module does not work with perl's -l command-line switch.
 PDF::API2 was originally written by Alfred Reibenschuh, extending code written
 by Martin Hosken.
 
-It is currently being maintained and developed by Steve Simms.
+It is currently being maintained and developed by Steve Simms, with patches from
+numerous contributors who are credited in the Changes file.
 
 =head1 LICENSE
 

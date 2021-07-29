@@ -1,6 +1,6 @@
 use Test2::V0;
 use Test2::Require::Module 'Software::LicenseUtils'   => '0.103014';
-use Test2::Require::Module 'Regexp::Pattern::License' => '3.6.0';
+use Test2::Require::Module 'Regexp::Pattern::License' => '3.7.0';
 
 use Test::Command::Simple;
 
@@ -40,14 +40,13 @@ my %LICENSES = (
 	'MPL-2.0'  => 'MPL-2.0',
 
 #	None                                    => 'UNKNOWN',
-	OpenSSL => 'OpenSSL',
-	'Artistic-1.0-Perl OR GPL-1.0-or-later' =>
-		'Artistic or GPL-1+ and/or GPL-1',
-	PostgreSQL => 'PostgreSQL',
-	'QPL-1.0'  => 'QPL-1.0',
-	SSLeay     => 'SSLeay',
-	SISSL      => 'SISSL',
-	Zlib       => 'Zlib',
+	OpenSSL                                 => 'OpenSSL',
+	'Artistic-1.0-Perl OR GPL-1.0-or-later' => 'GPL-1 and/or Perl',
+	PostgreSQL                              => 'PostgreSQL',
+	'QPL-1.0'                               => 'QPL-1.0',
+	SSLeay                                  => 'SSLeay',
+	SISSL                                   => 'SISSL',
+	Zlib                                    => 'Zlib',
 );
 
 my $workdir = Path::Tiny->tempdir( CLEANUP => ( not $ENV{PRESERVE} ) );

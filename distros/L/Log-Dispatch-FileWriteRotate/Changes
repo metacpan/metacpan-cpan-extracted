@@ -1,3 +1,13 @@
+0.062   2021-07-21  Released-By: PERLANCAR; Urgency: medium
+
+	- Expose File::Write::Rotate object (RT#137914).
+
+
+0.061   2021-07-21  Released-By: PERLANCAR; Urgency: medium
+
+	- Pass hook_* arguments to File:Write::Rotate (RT#137914).
+
+
 0.060   2019-01-09 (PERLANCAR)
 
 	- No functional changes.

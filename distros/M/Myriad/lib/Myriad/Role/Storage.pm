@@ -3,7 +3,7 @@ package Myriad::Role::Storage;
 use strict;
 use warnings;
 
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.010'; # VERSION
 our $AUTHORITY = 'cpan:DERIV'; # AUTHORITY
 
 use utf8;
@@ -51,7 +51,7 @@ use experimental qw(signatures);
 
 use Role::Tiny;
 
-our @WRITE_METHODS = qw(set getset push unshift pop shift hash_set hash_add);
+our @WRITE_METHODS = qw(set getset incr push unshift pop shift hash_set hash_add);
 our @READ_METHODS = qw(get observe watch_keyspace hash_get hash_keys hash_values hash_exists hash_count hash_as_list);
 
 requires $_ for @WRITE_METHODS;

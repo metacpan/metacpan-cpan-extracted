@@ -1,16 +1,23 @@
 package List::Util::Uniq;
 
-our $DATE = '2018-03-06'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-07-23'; # DATE
+our $DIST = 'List-Util-Uniq'; # DIST
+our $VERSION = '0.003'; # VERSION
 
-use 5.010001;
 use strict;
 use warnings;
 
 require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT_OK = qw(
-                       uniq_adj uniq_adj_ci uniq_ci
+                           uniq_adj
+                           uniq_adj_ci
+                           uniq_ci
+                           is_uniq
+                           is_uniq_ci
+                           is_monovalued
+                           is_monovalued_ci
                );
 
 sub uniq_adj {
@@ -60,6 +67,40 @@ sub uniq_ci {
     @res;
 }
 
+sub is_uniq {
+    my %vals;
+    for (@_) {
+        return 0 if $vals{$_}++;
+    }
+    1;
+}
+
+sub is_uniq_ci {
+    my %vals;
+    for (@_) {
+        return 0 if $vals{lc $_}++;
+    }
+    1;
+}
+
+sub is_monovalued {
+    my %vals;
+    for (@_) {
+        $vals{$_} = 1;
+        return 0 if keys(%vals) > 1;
+    }
+    1;
+}
+
+sub is_monovalued_ci {
+    my %vals;
+    for (@_) {
+        $vals{lc $_} = 1;
+        return 0 if keys(%vals) > 1;
+    }
+    1;
+}
+
 1;
 # ABSTRACT: List utilities related to finding unique items
 
@@ -75,7 +116,7 @@ List::Util::Uniq - List utilities related to finding unique items
 
 =head1 VERSION
 
-This document describes version 0.002 of List::Util::Uniq (from Perl distribution List-Util-Uniq), released on 2018-03-06.
+This document describes version 0.003 of List::Util::Uniq (from Perl distribution List-Util-Uniq), released on 2021-07-23.
 
 =head1 SYNOPSIS
 
@@ -89,19 +130,61 @@ This document describes version 0.002 of List::Util::Uniq (from Perl distributio
 
 Not exported by default but exportable.
 
-=head2 uniq_adj(@list) => LIST
+=head2 uniq_adj
+
+Usage:
+
+ my @uniq = uniq_adj(@list);
 
 Remove I<adjacent> duplicates from list, i.e. behave more like Unix utility's
 B<uniq> instead of L<List::MoreUtils>'s C<uniq> function. Uses string equality
 test.
 
-=head2 uniq_adj_ci(@list) => LIST
+=head2 uniq_adj_ci
 
-Like C<uniq_adj> except case-insensitive.
+Like L</uniq_adj> except case-insensitive.
 
-=head2 uniq_ci(@list) => LIST
+=head2 uniq_ci
 
-Like C<List::MoreUtils>' C<uniq> except case-insensitive.
+Like C<List::MoreUtils>' C<uniq> (C<uniqstr>) except case-insensitive.
+
+=head2 is_uniq
+
+Usage:
+
+ my $is_uniq = is_uniq(@list);
+
+Return true when the values in C<@list> is unique (compared string-wise).
+Knowing whether a list has unique values is faster using this function compared
+to doing:
+
+ my @uniq = uniq(@list);
+ @uniq == @list;
+
+because of short-circuiting.
+
+=head2 is_uniq_ci
+
+Like L</is_uniq> except case-insensitive.
+
+=head2 is_monovalued
+
+Usage:
+
+ my $is_monovalued = is_monovalued(@list);
+
+Examples:
+
+ is_monovalued(qw/a b c/); # => 0
+ is_monovalued(qw/a a a/); # => 1
+
+Return true if C<@list> contains only a single value. Returns true for empty
+list. Undef is coerced to empty string, so C<< is_monovalued(undef) >> and C<<
+is_monovalued(undef, undef) >> return true.
+
+=head2 is_monovalued_ci
+
+Like L</is_monovalued> except case-insensitive.
 
 =head1 HOMEPAGE
 
@@ -129,7 +212,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -5,8 +5,8 @@ use utf8;
 # Author          : Johan Vromans
 # Created On      : Tue Jul 19 19:01:33 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Thu Jan 26 16:40:41 2017
-# Update Count    : 653
+# Last Modified On: Mon Sep 14 16:52:07 2020
+# Update Count    : 655
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -776,10 +776,12 @@ sub kleine_ondernemers {
     # veranderen. Sinds 2002 zijn de bedragen ongewijzigd. Alle
     # officiële documentatie spreeekt over "Als de afdracht van
     # omzetbelasting beneden de 1.345 per jaar blijft, ...".
-
+    # Vanaf 2020 gelden andere regels en kan KOR worden aangevraagd
+    # bij kleine omzet, waarna niet langer btw-aangifte en afdracht
+    # gedaan hoeft te worden.
     # Code change: beschouw de huidige bedragen als vaststaand.
 
-    return if $year < 2002;
+    return if $year < 2002 || $year >= 2020;
 
     # my %mmtab = ( 2002 => [ 1345, 1883 ],
     #		  2003 => [ 1345, 1883 ],

@@ -16,9 +16,10 @@ use Mouse;
 use Lemonldap::NG::Portal::Main::Constants qw(
   PE_OK
   PE_FORMEMPTY
+  URIRE
 );
 
-our $VERSION = '2.0.10';
+our $VERSION = '2.0.12';
 
 extends qw(
   Lemonldap::NG::Portal::Main::Plugin
@@ -26,7 +27,6 @@ extends qw(
 );
 
 has server => ( is => 'rw' );
-
 has configStorage => (
     is      => 'ro',
     lazy    => 1,
@@ -34,7 +34,6 @@ has configStorage => (
         $_[0]->{p}->HANDLER->localConfig->{configStorage};
     }
 );
-
 has exportedAttr => (
     is      => 'rw',
     lazy    => 1,
@@ -53,9 +52,13 @@ has exportedAttr => (
             if ( my $exportedAttr = $conf->{exportedAttr} ) {
                 $exportedAttr =~ s/^\s*\+\s+//;
                 @attributes = ( @attributes, split( /\s+/, $exportedAttr ) );
+
+                # Convert @attributes into hash to remove duplicates
+                my %attributes = map( { $_ => 1 } @attributes );
+                return '[' . join( ',', keys %attributes ) . ']';
             }
 
-            # convert @attributes into hash to remove duplicates
+            # Convert @attributes into hash to remove duplicates
             my %attributes = map( { $_ => 1 } @attributes );
             %attributes =
               ( %attributes, %{ $conf->{exportedVars} }, %{ $conf->{macros} },
@@ -456,7 +459,7 @@ sub isAuthorizedURI {
     my ( $self, $req, $id, $url ) = @_;
     die 'id is required'  unless ($id);
     die 'uri is required' unless ($url);
-    die 'Bad uri'         unless ( $url =~ m#^https?://([^/]+)(/.*)?$# );
+    die 'Bad uri'         unless ( $url =~ URIRE );
     my ( $host, $uri ) = ( $1, $2 );
 
     # Get user session.

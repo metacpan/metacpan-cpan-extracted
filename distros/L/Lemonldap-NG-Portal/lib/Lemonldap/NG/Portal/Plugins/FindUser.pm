@@ -5,11 +5,11 @@ use Mouse;
 use Lemonldap::NG::Portal::Main::Constants qw(
   PE_OK
   PE_NOTOKEN
-  PE_TOKENEXPIRED
   PE_FIRSTACCESS
+  PE_TOKENEXPIRED
 );
 
-our $VERSION = '2.0.11';
+our $VERSION = '2.0.12';
 
 extends qw(
   Lemonldap::NG::Portal::Main::Plugin
@@ -32,13 +32,11 @@ sub init {
     my ($self) = @_;
     ( my $imp = grep /::Plugins::Impersonation$/, $self->p->enabledPlugins )
       ? $self->addUnauthRoute( finduser => 'provideUser', ['POST'] )
+      ->addAuthRoute( finduser => 'provideUser',
+        ['POST'] )    # Allow findUser with reAuth
       : $self->logger->warn('FindUser plugin enabled without Impersonation');
     $self->logger->warn('FindUser plugin enabled without searching attribute')
       unless keys %{ $self->conf->{findUserSearchingAttributes} };
-
-    # Add warning in log
-    $self->logger->warn(
-        "FindUser plugin is enabled. You are using a beta version!");
 
     return 1;
 }
@@ -50,28 +48,27 @@ sub provideUser {
 
     # Check token
     if ( $self->ottRule->( $req, {} ) ) {
-        my $token = $req->param('token');
-        unless ($token) {
-            $self->userLogger->warn('FindUser called without token');
-            $error = PE_NOTOKEN;
-        }
-        else {
+        if ( my $token = $req->param('token') ) {
             unless ( $self->ott->getToken($token) ) {
                 $self->userLogger->warn(
                     'FindUser called with an expired/bad token');
                 $error = PE_TOKENEXPIRED;
             }
         }
+        else {
+            $self->userLogger->warn('FindUser called without token');
+            $error = PE_NOTOKEN;
+        }
     }
-    return $self->sendResult( $req, $error ) if $error;
+    return $self->_sendResult( $req, $error ) if $error;
 
     $req->steps( ['findUser'] );
     $req->data->{findUserChoice} = $self->conf->{authChoiceFindUser};
     if ( $error = $self->p->process($req) ) {
         $self->logger->debug("Process returned error: $error");
-        return $self->sendResult( $req, $error );
+        return $self->_sendResult( $req, $error );
     }
-    return $self->sendResult($req);
+    return $self->_sendResult($req);
 }
 
 sub retreiveFindUserParams {
@@ -101,7 +98,7 @@ sub retreiveFindUserParams {
         }
         else {
             $self->logger->warn(
-                "Parameter $key has been reject by findUserControl")
+                "Parameter $key has been rejected by findUserControl")
               if $defined;
             ();
         }
@@ -145,6 +142,7 @@ sub retreiveFindUserParams {
 sub buildForm {
     my $self   = shift;
     my $fields = [];
+
     $self->logger->debug('Building array ref with searching fields...');
     @$fields =
       sort { $a->{select} <=> $b->{select} || $a->{value} cmp $b->{value} }
@@ -184,30 +182,30 @@ sub buildForm {
     return $fields;
 }
 
-sub sendResult {
+sub _sendResult {
     my ( $self, $req, $error ) = @_;
 
-    if ($error) {
-        eval { $self->p->_authentication->setSecurity($req) };
-        return $req->wantJSON
-          ? $self->p->sendJSONresponse(
-            $req,
-            {
-                user  => '',
-                error => $error
-            }
-          )
-          : $self->p->do( $req, [ sub { $error } ] );
-    }
+    eval { $self->p->_authentication->setSecurity($req) };
+    my $res =
+      $error
+      ? {
+        user  => '',
+        error => $error,
+      }
+      : {
+        result => 1,
+        user   => ( $req->data->{findUser} ? $req->data->{findUser} : '' )
+      };
+    $res = {
+        %$res,
+        ( $req->token   ? ( token   => $req->token )   : () ),
+        ( $req->captcha ? ( captcha => $req->captcha ) : () )
+    };
+    $error ||= PE_FIRSTACCESS;
+
     return $req->wantJSON
-      ? $self->p->sendJSONresponse(
-        $req,
-        {
-            user   => ( $req->data->{findUser} ? $req->data->{findUser} : '' ),
-            result => 1
-        }
-      )
-      : $self->p->do( $req, [ sub { PE_FIRSTACCESS } ] );
+      ? $self->p->sendJSONresponse( $req, $res )
+      : $self->p->do( $req, [ sub { $error } ] );
 }
 
 1;

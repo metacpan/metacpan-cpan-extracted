@@ -5,16 +5,31 @@ use strict;
 use warnings;
 
 use Error::Pure qw(err);
+use ISO::639::3 qw(convert_iso639);
 use Readonly;
 
-Readonly::Array our @EXPORT_OK => qw(check_entity check_lexeme check_property);
+Readonly::Array our @EXPORT_OK => qw(check_entity check_language check_lexeme check_property);
 
-our $VERSION = 0.08;
+our $VERSION = 0.10;
 
 sub check_entity {
 	my ($self, $key) = @_;
 
 	_check_item_with_char($self, $key, 'Q');
+
+	return;
+}
+
+sub check_language {
+	my ($self, $key) = @_;
+
+	if (convert_iso639('iso639-1', $self->{$key}) ne $self->{$key}) {
+		err "Language code '".$self->{$key}."' isn't ISO 639-1 code.";
+	}
+
+	if (convert_iso639('name', $self->{$key}) eq 'unknown') {
+		err "Language with ISO 639-1 code '".$self->{$key}."' doesn't exist.";
+	}
 
 	return;
 }
@@ -63,9 +78,10 @@ Wikibase::Datatype::Utils - Wikibase datatype utilities.
 
 =head1 SYNOPSIS
 
- use Wikibase::Datatype::Utils qw(check_entity check_lexeme check_property);
+ use Wikibase::Datatype::Utils qw(check_entity check_language check_lexeme check_property);
 
  check_entity($self, $key);
+ check_language($self, $key);
  check_lexeme($self, $key);
  check_property($self, $key);
 
@@ -79,7 +95,15 @@ Datatype utilities for checking of data objects.
 
  check_entity($self, $key);
 
-Check parameter defined by C<$key> whith is entity (/^Q\d+/).
+Check parameter defined by C<$key> if it's entity (/^Q\d+/).
+
+Returns undef.
+
+=head2 C<check_language>
+
+ check_language($self, $key);
+
+Check parameter defined by C<$key> if it's ISO 639-1 language code and if language exists.
 
 Returns undef.
 
@@ -87,7 +111,7 @@ Returns undef.
 
  check_lexeme($self, $key);
 
-Check parameter defined by C<$key> whith is entity (/^L\d+/).
+Check parameter defined by C<$key> if it's entity (/^L\d+/).
 
 Returns undef.
 
@@ -95,7 +119,7 @@ Returns undef.
 
  check_property($self, $key);
 
-Check parameter defined by C<$key> whith is property (/^P\d+/).
+Check parameter defined by C<$key> if it's property (/^P\d+/).
 
 Returns undef.
 
@@ -103,6 +127,10 @@ Returns undef.
 
  check_entity():
          Parameter '%s' must begin with 'Q' and number after it.";
+
+ check_language():
+         Language code '%s' isn't ISO 639-1 code.
+         Language with ISO 639-1 code '%s' doesn't exist.
 
  check_lexeme():
          Parameter '%s' must begin with 'L' and number after it.";
@@ -231,6 +259,7 @@ Returns undef.
 
 L<Exporter>,
 L<Error::Pure>,
+L<ISO::639::3>,
 L<Readonly>.
 
 =head1 SEE ALSO
@@ -261,6 +290,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.08
+0.10
 
 =cut

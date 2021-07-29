@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.21
+    version 0.23
 
 SYNOPSIS
 
@@ -21,62 +21,88 @@ DESCRIPTION
 
     Generate strings based on a template.
 
+ template language
+
+    Replacement tokens are denoted with angle brackets. That is <fieldname>
+    is replaced by the values in the \%fields hash reference provided.
+
+    Some special characters can be used after the field name to impose
+    formatting on the fields:
+
+    %
+
+      Treat like a sprintf format, example: <int%02d>.
+
+    :
+
+      Treat like a "strftime" in POSIX format, example <date:%Y-%m-%d>.
+
+      The field is parsed by Date::Parse, so it can handle any format that
+      it can handle.
+
+    !
+
+      [version 0.05]
+
+      Same as :, but with gmtime instead of localtime.
+
+    #
+
+      Treat like args to substr; example <str#0,2> or <str#4>.
+
+    { and }
+
+      [version 0.20]
+
+      The { character is specially special, since it allows fields to
+      contain additional characters that are not intended for formatting.
+      This is specially useful for specifying additional content inside a
+      field that may not exist in the hash, and which should be entirely
+      replaced with the empty string.
+
+      This makes it possible to have templates like this:
+
+       my $template = '<name><nick{ "%s"}><surname{ %s}>';
+       
+       my $mack = { name => 'Mack', nick    => 'The Knife' };
+       my $jack = { name => 'Jack', surname => 'Sheppard'  };
+       
+       expand_string( $template, $mack ); # Returns 'Mack "The Knife"'
+       expand_string( $template, $jack ); # Returns 'Jack Sheppard'
+
 FUNCTIONS
+
+    All functions are exported by default, or by request, except for
+    "expand_hash"
 
  expand_string
 
+     my $str = expand_string($template, \%fields);
      my $str = expand_string($template, \%fields, $undef_flag);
 
     Fills in a simple template with values from a hash, replacing tokens
-    like "<fieldname>" with the value from the hash $fields->{fieldname}.
-
-    Some special characters can be used to impose formatting on the fields:
-
-     % - treat like a sprintf() format
-         e.g.  <int%02d>
-    
-     : - treat like a L<POSIX::strftime()> format
-         e.g. <date:%Y-%m-%d>
-    
-     ! - Just like ':', but with gmtime instead of localtime
-         e.g. <gmdate!%Y-%m-%d %H:%M>
-    
-     # - treat like args to substr()
-         e.g. <str#0,2> or <str#4>
-
-    For the ':' strftime formats, the field is parsed by Date::Parse, so it
-    can handle any format that can handle.
+    with the value from the hash $fields{fieldname}.
 
     Handling of undefined fields can be controlled with $undef_flag. If it
-    is false (default), undefined fields are simply replace with an empty
+    is false (default), undefined fields are simply replaced with an empty
     string. If set to true, the field is kept verbatim. This can be useful
     for multiple expansion passes.
 
-    The { character is specially special, since it allows fields to contain
-    additional characters that are not intended for formatting. This is
-    specially useful for specifying additional content inside a field that
-    may not exist in the hash, and which should be entirely replaced with
-    the empty string.
-
-    This makes it possible to have templates like this:
-
-     my $template = '<name><nick{ "%s"}><surname{ %s}>';
-    
-     my $mack = { name => 'Mack', nick    => 'The Knife' };
-     my $jack = { name => 'Jack', surname => 'Sheppard'  };
-    
-     expand_string( $template, $mack ); # Returns 'Mack "The Knife"'
-     expand_string( $template, $jack ); # Returns 'Jack Sheppard'
-
  expand_stringi
 
+    [version 0.08]
+
+     my $str = expand_stringi($template, \%fields);
      my $str = expand_stringi($template, \%fields, $undef_flag);
 
-    expand_stringi works just like expand_string, except that tokens and
+    expand_stringi works just like "expand_string", except that tokens and
     hash keys are treated case insensitively.
 
  missing_values
 
+    [version 0.06]
+
+     my @missing = missing_values($template, \%fields);
      my @missing = missing_values($template, \%fields, $dont_allow_undefs);
 
     Checks to see if the template variables in a string template exist in a
@@ -88,14 +114,19 @@ FUNCTIONS
 
  expand_hash
 
-     my $status = expand_hash($hash[, $maxdepth]);
+    [version 0.07]
+
+     my $status = expand_hash($hash);
+     my $status = expand_hash($hash, $maxdepth);
 
     Expand a hash of templates/values. This function will repeatedly
     replace templates in the values of the hash with the values of the hash
-    they reference, until either all "<>" templates are gone, or it has
-    iterated $maxdepth times (default 10).
+    they reference, until either all <fieldname> templates are gone, or it
+    has iterated $maxdepth times (default 10).
 
     Returns undef if there are unexpanded templates left, otherwise true.
+
+    This function must be explicitly exported.
 
 SEE ALSO
 

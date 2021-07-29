@@ -5,7 +5,7 @@ use base 'PDF::API2::Basic::PDF::Dict';
 use strict;
 no warnings qw[ recursion uninitialized ];
 
-our $VERSION = '2.040'; # VERSION
+our $VERSION = '2.041'; # VERSION
 
 use Encode qw(:all);
 

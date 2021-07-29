@@ -216,7 +216,7 @@ setCookie = (name, value, exdays) ->
 # Function to change password using Ajax (instead of POST)
 # NOT USED FOR NOW
 #changePwd = (event) ->
-#	event.preventDefault();
+#	event.preventDefault()
 #	$.ajax
 #		type: 'POST'
 #		url: datas['scriptname']
@@ -515,6 +515,23 @@ $(window).on 'load', () ->
 	if window.datas.ppolicy? and $('#newpassword').length
 		$('#reset').change togglecheckpassword
 
+	# Functions to show/hide display password button
+	if datas['enablePasswordDisplay']
+		if datas['dontStorePassword']
+			$(".toggle-password").mousedown () ->
+				$(this).toggleClass("fa-eye fa-eye-slash")
+				$("input[name=password]").attr('class', 'form-control')
+			$(".toggle-password").mouseup () ->
+				$(this).toggleClass("fa-eye fa-eye-slash")
+				$("input[name=password]").attr('class', 'form-control key') if $("input[name=password]").get(0).value 
+		else
+			$(".toggle-password").mousedown () ->
+				$(this).toggleClass("fa-eye fa-eye-slash")
+				$("input[name=password]").attr("type", "text")
+			$(".toggle-password").mouseup () ->
+				$(this).toggleClass("fa-eye fa-eye-slash")
+				$("input[name=password]").attr("type", "password")
+
 	# Ping if asked
 	if datas['pingInterval'] and datas['pingInterval'] > 0
 		window.setTimeout ping, datas['pingInterval']
@@ -529,21 +546,84 @@ $(window).on 'load', () ->
 
 	# Functions to show/hide change password inputs
 	$('#show-hide-button').on 'click', () ->
-		if  $("#newpassword").attr('type') == 'password'
-			console.log 'Show passwords'
-			$("#newpassword").attr('type', 'input')
-			$("#confirmpassword").attr('type', 'input')
-			$("#show-hide-icon-button").removeClass 'fa-eye'
-			$("#show-hide-icon-button").addClass 'fa-eye-slash'
+		if datas['dontStorePassword']
+			if  $("#newpassword").attr('class') == 'form-control key' || $("#confirmpassword").attr('class') == 'form-control key'
+				console.log 'Show passwords'
+				$("#newpassword").attr('class', 'form-control')
+				$("#confirmpassword").attr('class', 'form-control')
+				$("#show-hide-icon-button").attr('class', 'fa fa-eye-slash')
+			else
+				console.log 'Hide passwords'
+				$("#newpassword").attr('class', 'form-control key') if $("#newpassword").get(0).value
+				$("#confirmpassword").attr('class', 'form-control key') if $("#confirmpassword").get(0).value
+				$("#show-hide-icon-button").attr('class', 'fa fa-eye') if ($("#newpassword").get(0).value || $("#confirmpassword").get(0).value)
 		else
-			console.log 'Hide passwords'
-			$("#newpassword").attr('type', 'password')
-			$("#confirmpassword").attr('type', 'password')
-			$("#show-hide-icon-button").removeClass 'fa-eye-slash'
-			$("#show-hide-icon-button").addClass 'fa-eye'
+			if  $("#newpassword").attr('type') == 'password'
+				console.log 'Show passwords'
+				$("#newpassword").attr('type', 'text')
+				$("#confirmpassword").attr('type', 'text')
+				$("#show-hide-icon-button").attr('class', 'fa fa-eye-slash')
+			else
+				console.log 'Hide passwords'
+				$("#newpassword").attr('type', 'password')
+				$("#confirmpassword").attr('type', 'password')
+				$("#show-hide-icon-button").attr('class', 'fa fa-eye')
+
+	# Functions to show/hide placeholder password inputs
+	$('#passwordfield').on 'input', () ->
+		if $('#passwordfield').get(0).value && datas['dontStorePassword']
+			$("#passwordfield").attr('class', 'form-control key')
+		else
+			$("#passwordfield").attr('class', 'form-control')
+	$('#oldpassword').on 'input', () ->
+		if $('#oldpassword').get(0).value && datas['dontStorePassword']
+			$("#oldpassword").attr('class', 'form-control key')
+		else
+			$("#oldpassword").attr('class', 'form-control')
+	$('#newpassword').on 'input', () ->
+		if $('#newpassword').get(0).value && datas['dontStorePassword']
+			$("#newpassword").attr('class', 'form-control key') if $("#show-hide-icon-button").attr('class') == 'fa fa-eye'
+		else
+			$("#newpassword").attr('class', 'form-control')
+	$('#confirmpassword').on 'input', () ->
+		if $('#confirmpassword').get(0).value && datas['dontStorePassword']
+			$("#confirmpassword").attr('class', 'form-control key') if $("#show-hide-icon-button").attr('class') == 'fa fa-eye'
+		else
+			$("#confirmpassword").attr('class', 'form-control')
 
 	#$('#formpass').on 'submit', changePwd
 
-	if window.location.href.match /\/finduser/
-		console.log 'Set Portal URL: ' + portal
-		window.history.pushState({page: 'Portal'}, 'Portal', portal)
+	$('#resetfinduserform').on 'click', () ->
+		console.log 'Reset form'
+		$('#finduserForm').trigger('reset')
+
+	$('#closefinduserform').on 'click', () ->
+		console.log 'Clear modal'
+		$('#finduserForm').trigger('reset')
+
+	$('#finduserbutton').on 'click', (event) ->
+		event.preventDefault()
+		document.body.style.cursor = 'progress'
+		str = $("#finduserForm").serialize()
+		console.log 'Send findUser request with parameters', str
+		$.ajax
+			type: "POST"
+			url: "#{portal}finduser"
+			dataType: 'json'
+			data: str
+			# On success, values are set
+			success: (data) ->
+				document.body.style.cursor = 'default'
+				user = data.user
+				console.log 'Suggested spoofId=', user
+				$('#spoofIdfield').attr 'value', user
+				$('#captcha').attr 'src', data.captcha if data.captcha
+				if data.token
+					$('#finduserToken').attr 'value', data.token 
+					$('#token').attr 'value', data.token
+			error: (j, status, err) ->
+				document.body.style.cursor = 'default'
+				console.log 'Error', err  if err
+				res = JSON.parse j.responseText if j
+				if res and res.error
+					console.log 'Returned error', res

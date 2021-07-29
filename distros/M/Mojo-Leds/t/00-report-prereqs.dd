@@ -1,0 +1,54 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'File::Spec' => '0',
+                                      'IO::Handle' => '0',
+                                      'IPC::Open3' => '0',
+                                      'Test::More' => '0',
+                                      'Test::Pod' => '1.41',
+                                      'strict' => '0',
+                                      'warnings' => '0'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'BSON::OID' => '0',
+                                      'File::Basename' => '0',
+                                      'Mojo::Base' => '0',
+                                      'Mojo::JSON' => '0',
+                                      'Mojo::Log' => '0',
+                                      'Mojo::Util' => '0',
+                                      'Mojolicious::Plugin::AutoRoutePm' => '0',
+                                      'Mojolicious::Plugin::Mongodbv2' => '0',
+                                      'Mojolicious::Plugin::RenderFile' => '0',
+                                      'Mojolicious::Plugin::Restify::OtherActions' => '0',
+                                      'Scalar::Util' => '0',
+                                      'Tie::IxHash' => '0',
+                                      'boolean' => '0',
+                                      'perl' => '5.014'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'Mojo::File' => '0',
+                                   'MongoDB' => '0',
+                                   'Test::Mojo' => '0',
+                                   'Test::More' => '0',
+                                   'lib' => '0',
+                                   'strict' => '0',
+                                   'warnings' => '0'
+                                 }
+                 }
+     };
+  $x;
+ }

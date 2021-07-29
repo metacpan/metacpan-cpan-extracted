@@ -1,9 +1,9 @@
 package Dist::Zilla::Plugin::Sah::Schemas;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-11-13'; # DATE
+our $DATE = '2021-07-20'; # DATE
 our $DIST = 'Dist-Zilla-Plugin-Sah-Schemas'; # DIST
-our $VERSION = '0.022'; # VERSION
+our $VERSION = '0.023'; # VERSION
 
 use 5.010001;
 use strict;
@@ -231,8 +231,8 @@ sub gather_files {
 
 use Test::More;
 
-eval "use Test::Sah::Schema 0.009";
-plan skip_all => "Test::Sah::Schema 0.001 required for testing Sah::Schema::* modules"
+eval "use Test::Sah::Schema 0.010";
+plan skip_all => "Test::Sah::Schema 0.010 required for testing Sah::Schema::* modules"
   if $@;
 
 sah_schema_modules_ok();
@@ -261,7 +261,7 @@ sub register_prereqs {
             type  => 'requires',
             phase => 'develop',
         },
-        'Test::Sah::Schema' => '0.009',
+        'Test::Sah::Schema' => '0.010',
     );
 
     # add prereqs to base schema modules
@@ -317,7 +317,7 @@ Dist::Zilla::Plugin::Sah::Schemas - Plugin to use when building Sah-Schemas-* di
 
 =head1 VERSION
 
-This document describes version 0.022 of Dist::Zilla::Plugin::Sah::Schemas (from Perl distribution Dist-Zilla-Plugin-Sah-Schemas), released on 2020-11-13.
+This document describes version 0.023 of Dist::Zilla::Plugin::Sah::Schemas (from Perl distribution Dist-Zilla-Plugin-Sah-Schemas), released on 2021-07-20.
 
 =head1 SYNOPSIS
 
@@ -369,6 +369,12 @@ to reduce startup overhead when doing tab completion.
 
 =head2 exclude_module
 
+=head1 CONTRIBUTOR
+
+=for stopwords Steven Haryanto
+
+Steven Haryanto <sharyanto@cpan.org>
+
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/Dist-Zilla-Plugin-Sah-Schemas>.
@@ -399,7 +405,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2018, 2017, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -12,7 +12,6 @@ bin/ebug_http
 corpus/calc.pl
 dist.ini
 lib/Devel/ebug/HTTP.pm
-lib/Devel/ebug/HTTP/View/TT.pm
 share/root/break_point.gif
 share/root/break_point.js
 share/root/break_point_off.gif

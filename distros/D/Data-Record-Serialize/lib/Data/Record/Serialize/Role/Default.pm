@@ -4,7 +4,7 @@ package Data::Record::Serialize::Role::Default;
 
 use Moo::Role;
 
-our $VERSION = '0.20';
+our $VERSION = '0.23';
 
 use Hash::Util qw[ hv_store ];
 use Ref::Util qw[ is_coderef ];
@@ -13,24 +13,24 @@ use Data::Record::Serialize::Error { errors => [ 'fields' ] }, -all;
 
 use namespace::clean;
 
-#pod =for Pod::Coverage
-#pod  cleanup
-#pod  send
-#pod  setup
-#pod  DEMOLISH
-#pod
-#pod =cut
 
-#pod =method B<send>
-#pod
-#pod   $s->send( \%record );
-#pod
-#pod Encode and send the record to the associated sink.
-#pod
-#pod B<WARNING>: the passed hash is modified.  If you need the original
-#pod contents, pass in a copy.
-#pod
-#pod =cut
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 # provide default if not already defined
 sub send {
@@ -154,13 +154,15 @@ __END__
 
 =pod
 
+=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory
+
 =head1 NAME
 
 Data::Record::Serialize::Role::Default - Default methods for Data::Record::Serialize
 
 =head1 VERSION
 
-version 0.20
+version 0.23
 
 =head1 DESCRIPTION
 

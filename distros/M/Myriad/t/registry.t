@@ -58,7 +58,6 @@ subtest "Adding and viewing components" => sub {
         my $add = join '_', 'add', $component;
 
         my  $for = component_for_method($component);
-        note "FFFF: $for";
 
         # Always pass empty $args only with receiver set service name
         $registry->$add($srv_class, $sub_name, $dummy_sub, $component eq 'receiver'? {'service' => $srv_class} : {});
@@ -131,6 +130,10 @@ subtest "Service name" => sub {
     like ($reg_srv_name, qr/^[a-z']+\.[a-z']+$/, 'passing regex service name');
 
     isa_ok(exception {$registry->service_by_name("Not::Found::Service")}, 'Myriad::Exception::Registry::ServiceNotFound', "Exception for trying to get undef service");
+
+    # Should remove the namespace from the service name;
+    $reg_srv_name = $registry->make_service_name('Test::Module::Service', 'Test::Module::');
+    like ($reg_srv_name, qr/^service$/, 'namespace applied correctly');
 };
 
 done_testing;

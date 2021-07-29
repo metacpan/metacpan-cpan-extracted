@@ -35,10 +35,10 @@ You shouldn't make instances of this class. Each attribute should be used as a n
 =head1 SYNOPSIS
 
     my $rds = Paws->service('RDS');
-   # To list information about events
-   # This example lists information for all backup-related events for the
-   # specified DB instance for the past 7 days (7 days * 24 hours * 60 minutes =
-   # 10,080 minutes).
+# To list information about events
+# This example lists information for all backup-related events for the specified
+# DB instance for the past 7 days (7 days * 24 hours * 60 minutes = 10,080
+# minutes).
     my $EventsMessage = $rds->DescribeEvents(
       'Duration'         => 10080,
       'EventCategories'  => ['backup'],
@@ -116,27 +116,38 @@ Constraints:
 
 =item *
 
-If SourceIdentifier is supplied, SourceType must also be provided.
+If C<SourceIdentifier> is supplied, C<SourceType> must also be
+provided.
 
 =item *
 
-If the source type is C<DBInstance>, then a C<DBInstanceIdentifier>
+If the source type is a DB instance, a C<DBInstanceIdentifier> value
 must be supplied.
 
 =item *
 
-If the source type is C<DBSecurityGroup>, a C<DBSecurityGroupName> must
+If the source type is a DB cluster, a C<DBClusterIdentifier> value must
 be supplied.
 
 =item *
 
-If the source type is C<DBParameterGroup>, a C<DBParameterGroupName>
+If the source type is a DB parameter group, a C<DBParameterGroupName>
+value must be supplied.
+
+=item *
+
+If the source type is a DB security group, a C<DBSecurityGroupName>
+value must be supplied.
+
+=item *
+
+If the source type is a DB snapshot, a C<DBSnapshotIdentifier> value
 must be supplied.
 
 =item *
 
-If the source type is C<DBSnapshot>, a C<DBSnapshotIdentifier> must be
-supplied.
+If the source type is a DB cluster snapshot, a
+C<DBClusterSnapshotIdentifier> value must be supplied.
 
 =item *
 

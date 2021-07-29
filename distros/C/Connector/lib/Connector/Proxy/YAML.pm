@@ -36,7 +36,7 @@ sub _build_config {
         }
         $self->log()->debug('Proxy::Yaml loading configuration from file '.$file);
     } else {
-        $self->log()->warn('Proxy::Yaml configuration file '.$file.' not found ');
+        $self->log()->warn('Proxy::Yaml configuration file '.$file.' not found or not readable');
     }
     $self->_config($config);
 }

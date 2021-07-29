@@ -19,10 +19,10 @@ __PACKAGE__->meta->make_immutable;
 1;
 __END__
 
-=head 1 NAME
+=head1 NAME
 
 Connector::Builtin
 
-=head 1 DESCRIPTION
+=head1 DESCRIPTION
 
 This is the base class for all Connector::Builtin implementations.

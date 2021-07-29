@@ -3,8 +3,8 @@
    "author" : [
       "David Muir Sharnoff <muir@idiom.org>"
    ],
-   "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.112150",
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "unknown"
    ],
@@ -22,23 +22,31 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : 0
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : 0
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "runtime" : {
-         "requires" : {}
+         "requires" : {
+            "perl" : "5.006"
+         }
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ap/Text-Tabs/issues"
+      },
       "repository" : {
-         "url" : "http://github.com/muir/Text-Tabs-Wrap"
+         "type" : "git",
+         "url" : "git://github.com/ap/Text-Tabs.git",
+         "web" : "https://github.com/ap/Text-Tabs"
       }
    },
-   "version" : "2013.0523"
+   "version" : "2021.0726",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

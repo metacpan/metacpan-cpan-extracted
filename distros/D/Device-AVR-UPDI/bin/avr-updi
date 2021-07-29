@@ -17,7 +17,7 @@ F<avr-updi> - communicate with an F<AVR> microcontroller over F<UPDI>
 
 =head1 SYNOPSIS
 
-   $ avr-updi [--port PORT] [--part PART] COMMAND ARGS...
+   $ avr-updi [--port PORT] [--part PART] COMMAND ARGS... [COMMAND ARGS ...]
 
 =head1 DESCRIPTION
 
@@ -133,16 +133,28 @@ sub reset_chip
    $updi->request_reset( 0 )->get;
 }
 
-my $OPERATION = shift @ARGV;
-$OPERATION =~ s/-/_/g;
-if( my $code = main->can( "run_$OPERATION" ) ) {
-   $code->();
-}
-else {
-   die "Unrecognised operation '$OPERATION'\n";
+my $RESET_REQUIRED;
+
+while( @ARGV ) {
+   my $OPERATION = shift @ARGV;
+   $OPERATION =~ s/-/_/g;
+   if( my $code = main->can( "run_$OPERATION" ) ) {
+      $code->();
+   }
+   else {
+      die "Unrecognised operation '$OPERATION'\n";
+   }
 }
 
+reset_chip if $RESET_REQUIRED;
+
 =head1 SUBCOMMANDS
+
+Multiple commands may be specified simultaneously; they will be executed in
+the given sequence. This may be useful for writing flash and EEPROM at the
+same time
+
+   $ avr-updi -p t814 write-flash flash.hex write-eeprom eeprom.hex
 
 =cut
 
@@ -208,9 +220,67 @@ sub _generic_write
    }
    print STDERR "\n";
 
-   reset_chip;
+   $RESET_REQUIRED++;
 
    print STDERR "Done\n";
+}
+
+sub _print_decoded_fields
+{
+   my ( $reg, @fields ) = @_;
+
+   while( @fields ) {
+      my $name = shift @fields;
+      my $mask = shift @fields;
+      my $val = $reg & $mask;
+
+      # shift down
+      $mask >>= 1, $val >>= 1 while !( $mask & 1 );
+
+      if( $mask > 1 ) {
+         printf " %s=%X", $name, $val;
+      }
+      elsif( $val ) {
+         printf " %s", $name;
+      }
+      else {
+         printf " !%s", lc $name;
+      }
+   }
+   print "\n";
+}
+
+# Debugging; undocumented
+sub run_show_updi_regs
+{
+   make_updi;
+
+   my @regs = map { $updi->ldcs( $_ )->get } 0 .. 0x0C;
+
+   printf "UPDI.STATUSA        = %02X", $regs[0];
+   _print_decoded_fields $regs[0], UPDIREV => 0xF0;
+   printf "     STATUSB        = %02X", $regs[1];
+   _print_decoded_fields $regs[1], PSIG => 0x0F;
+   printf "     CTRLA          = %02X", $regs[2];
+   _print_decoded_fields $regs[2], IBDLY => (1<<7), PARD => (1<<5), DTD => (1<<4), RSD => (1<<3), GTVAL => 0x07;
+   printf "     CTRLB          = %02X", $regs[3];
+   _print_decoded_fields $regs[3], NACKDIS => (1<<4), CCDETDIS => (1<<3), UPDIDIS => (1<<2);
+
+   # [4] to [6] reserved
+   #
+   printf "     ASI_KEY_STATUS = %02X", $regs[7];
+   _print_decoded_fields $regs[7], UROWWRITE => (1<<5), NVMPROG => (1<<4), CHIPERASE => (1<<3);
+   printf "     ASI_RESET_REQ  = %02X\n", $regs[8];
+
+   printf "     ASI_CTRLA      = %02X", $regs[9];
+   _print_decoded_fields $regs[9], UPDICLKDIV => 0x03;
+   printf "     ASI_SYS_CTRLA  = %02X", $regs[10];
+   _print_decoded_fields $regs[10], UROWDONE => (1<<1), CLKREQ => (1<<0);
+   printf "     ASI_SYS_STATUS = %02X", $regs[11];
+   _print_decoded_fields $regs[11], ERASE_FAILED => (1<<6), SYSRST => (1<<5), INSLEEP => (1<<4),
+      NVMPROG => (1<<3), UROWPROG => (1<<2), LOCKSTATUS => (1<<0);
+   printf "     ASI_CRC_STATUS = %02X", $regs[12];
+   _print_decoded_fields $regs[12], CRC_STATUS => 0x07;
 }
 
 =head2 reset
@@ -254,11 +324,51 @@ sub run_read_sib
    }
 }
 
+=head2 read-signature
+
+Reads the 3-byte signature from the chip and prints it.
+
+   $ avr-updi read-signature -p t814
+
+=cut
+
+sub run_read_signature
+{
+   make_updi;
+
+   unless( $updi->read_asi_sys_status->get & (1<<3) ) {
+      $updi->enable_nvmprog->get;
+   }
+
+   my $sig = $updi->read_signature->get;
+
+   printf "Signature: %v02X\n", $sig;
+}
+
+=head2 erase
+
+Erases the entire chip. Normally not required because a C<write-flash>
+operation will do this anyway, but this command may be handy for erasing a
+chip to reset it back to factory state.
+
+   $ avr-updi erase -p t814
+
+=cut
+
+sub run_erase
+{
+   make_updi;
+
+   $updi->erase_chip( no_reset => 1 )->get;
+}
+
 =head2 read-flash
 
 Reads from the flash portion of non-volatile memory ("NVM").
 
-   $ avr-updi read-flash -p t814 flash-save.hex
+   $ avr-updi read-flash -p t814 flash-save.hex [LENGTH]
+
+Optionally reads only the given length.
 
 =cut
 
@@ -267,10 +377,19 @@ sub run_read_flash
    make_updi;
    check_signature;
 
-   my $data = _generic_read( flash =>
-      $updi->partinfo->pagesize_flash, $updi->partinfo->size_flash );
+   my $outfile = open_output_file;
 
-   open_output_file->output( $data );
+   my $length = $updi->partinfo->size_flash;
+
+   if( @ARGV and $ARGV[0] =~ m/^\d/ ) {
+      $length = shift @ARGV;
+      $length = hex $length if $length =~ m/^0/;
+   }
+
+   my $data = _generic_read( flash =>
+      $updi->partinfo->pagesize_flash, $length );
+
+   $outfile->output( $data );
 }
 
 =head2 write-flash
@@ -384,8 +503,6 @@ sub run_read_fuses
          }
       }
    }
-
-   reset_chip;  # is this necessary?
 }
 
 =head2 write-fuses
@@ -415,8 +532,9 @@ sub run_write_fuses
 
    my @values;
 
-   foreach( @ARGV ) {
-      my ( $name, $value ) = split m/=/, $_;
+   while( @ARGV ) {
+      my ( $name, $value ) = split m/=/, $ARGV[0] or last;
+      shift @ARGV;
 
       if( $name =~ m/\./ ) {
          my ( $regname, $fusename ) = $name =~ m/^(.*?)\.(.*)$/;
@@ -461,7 +579,7 @@ sub run_write_fuses
       $updi->write_fuse( $idx, $value )->get;
    }
 
-   reset_chip;
+   $RESET_REQUIRED++;
 }
 
 # IO formats
@@ -533,13 +651,17 @@ package main::Fileformat::IntelHex {
          next unless my ( $clen, $addr, $type, $data, $cksum ) =
             $line =~ m/^:([0-9a-f]{2})([0-9a-f]{4})([0-9a-f]{2})([0-9a-f]*)([0-9a-f]{2})$/i;
          # TODO: check checksum
-         $type = hex $type;
+         $_ = hex $_ for $clen, $addr, $type;
          last if $type == 1; # EOF
          next if $type != 0; # unrecognised record
          warn "Bad record length on line $.\n" and next if
-            length $data != 2 * hex $clen;
+            length $data != 2 * $clen;
          $data = pack "H*", $data;
-         substr( $bytes, hex $addr, length $data ) = $data;
+         if( $addr > length $bytes ) {
+            # TODO: at write time this could be optimised away after chip erase
+            $bytes .= "\xFF" x ( $addr - length $bytes );
+         }
+         substr( $bytes, $addr, length $data ) = $data;
       }
       return $bytes;
    }

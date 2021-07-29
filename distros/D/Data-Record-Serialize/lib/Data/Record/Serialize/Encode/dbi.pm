@@ -12,7 +12,7 @@ use Data::Record::Serialize::Error { errors =>
         insert
    )] }, -all;
 
-our $VERSION = '0.20';
+our $VERSION = '0.23';
 
 use Data::Record::Serialize::Types -types;
 
@@ -26,23 +26,23 @@ use DBI;
 
 use namespace::clean;
 
-#pod =attr C<dsn>
-#pod
-#pod I<Required> The DBI Data Source Name (DSN) passed to B<L<DBI>>.  It
-#pod may either be a string or an arrayref containing strings or arrayrefs,
-#pod which should contain key-value pairs.  Elements in the sub-arrays are
-#pod joined with C<=>, elements in the top array are joined with C<:>.  For
-#pod example,
-#pod
-#pod   [ 'SQLite', { dbname => $db } ]
-#pod
-#pod is transformed to
-#pod
-#pod   SQLite:dbname=$db
-#pod
-#pod The standard prefix of C<dbi:> will be added if not present.
-#pod
-#pod =cut
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 has dsn => (
     is       => 'ro',
@@ -68,12 +68,12 @@ has dsn => (
     },
 );
 
-#pod =attr C<table>
-#pod
-#pod I<Required> The name of the table in the database which will contain the records.
-#pod It will be created if it does not exist.
-#pod
-#pod =cut
+
+
+
+
+
+
 
 has table => (
     is       => 'ro',
@@ -81,13 +81,13 @@ has table => (
     required => 1,
 );
 
-#pod =attr C<schema>
-#pod
-#pod The schema to which the table belongs.  Optional.
-#pod
-#pod =for  Pod::Coverage has_schema
-#pod
-#pod =cut
+
+
+
+
+
+
+
 
 
 has schema => (
@@ -96,11 +96,11 @@ has schema => (
     isa       => Str,
 );
 
-#pod =attr C<drop_table>
-#pod
-#pod If true, the table is dropped and a new one is created.
-#pod
-#pod =cut
+
+
+
+
+
 
 has drop_table => (
     is      => 'ro',
@@ -109,11 +109,11 @@ has drop_table => (
 );
 
 
-#pod =attr C<create_table>
-#pod
-#pod If true, a table will be created if it does not exist.
-#pod
-#pod =cut
+
+
+
+
+
 
 has create_table => (
     is      => 'ro',
@@ -121,13 +121,13 @@ has create_table => (
     default => 1,
 );
 
-#pod =attr C<primary>
-#pod
-#pod A single output column name or an array of output column names which
-#pod should be the primary key(s).  If not specified, no primary keys are
-#pod defined.
-#pod
-#pod =cut
+
+
+
+
+
+
+
 
 has primary => (
     is      => 'ro',
@@ -136,11 +136,11 @@ has primary => (
     default => sub { [] },
 );
 
-#pod =attr C<db_user>
-#pod
-#pod The name of the database user
-#pod
-#pod =cut
+
+
+
+
+
 
 has db_user => (
     is      => 'ro',
@@ -148,11 +148,11 @@ has db_user => (
     default => '',
 );
 
-#pod =attr C<db_pass>
-#pod
-#pod The database password
-#pod
-#pod =cut
+
+
+
+
+
 
 has db_pass => (
     is      => 'ro',
@@ -194,14 +194,14 @@ has column_defs => (
 
 );
 
-#pod =attr C<batch>
-#pod
-#pod The number of rows to write to the database at once.  This defaults to 100.
-#pod
-#pod If greater than 1, C<batch> rows are cached and then sent out in a
-#pod single transaction.  See L</Performance> for more information.
-#pod
-#pod =cut
+
+
+
+
+
+
+
+
 
 has batch => (
     is      => 'ro',
@@ -210,25 +210,25 @@ has batch => (
     coerce  => sub { $_[0] > 1 ? $_[0] : 0 },
 );
 
-#pod =attr C<dbitrace>
-#pod
-#pod A trace setting passed to  L<DBI>.
-#pod
-#pod =cut
+
+
+
+
+
 
 has dbitrace => ( is => 'ro', );
 
-#pod =method C<queue>
-#pod
-#pod   $queue = $obj->queue;
-#pod
-#pod The queue containing records not yet successfully transmitted
-#pod to the database.  This is only of interest if L</batch> is not C<0>.
-#pod
-#pod Each element is an array containing values to be inserted into the database,
-#pod in the same order as the fields in L<Data::Serialize/output_fields>.
-#pod
-#pod =cut
+
+
+
+
+
+
+
+
+
+
+
 
 has queue => (
     is       => 'ro',
@@ -268,9 +268,9 @@ sub _fq_table_name {
     join( '.', ( $self->has_schema ? ( $self->schema ) : () ), $self->table );
 }
 
-#pod =for Pod::Coverage setup
-#pod
-#pod =cut
+
+
+
 
 my %producer = (
     DB2       => 'DB2',
@@ -363,56 +363,56 @@ sub setup {
     return;
 }
 
-#pod =method flush
-#pod
-#pod   $s->flush;
-#pod
-#pod Flush the queue of records to the database. It returns true if
-#pod all of the records have been successfully written.
-#pod
-#pod If writing fails:
-#pod
-#pod =over
-#pod
-#pod =item *
-#pod
-#pod Writing of records ceases.
-#pod
-#pod =item *
-#pod
-#pod The failing record is left at the head of the queue.  This ensures
-#pod that it is possible to retry writing the record.
-#pod
-#pod =item *
-#pod
-#pod an exception object (in the
-#pod C<Data::Record::Serialize::Error::Encode::dbi::insert> class) will be
-#pod thrown.  The failing record (in its final form after formatting, etc)
-#pod is available via the object's C<payload> method.
-#pod
-#pod =back
-#pod
-#pod If a record fails to be written, it will still be queued for the next
-#pod attempt at writing to the database.  If this behavior is undesired,
-#pod make sure to remove it from the queue:
-#pod
-#pod   use Data::Dumper;
-#pod
-#pod   if ( ! eval { $output->flush } ) {
-#pod       warn "$@", Dumper( $@->payload );
-#pod       shift $output->queue->@*;
-#pod   }
-#pod
-#pod As an example of completely flushing the queue while notifying of errors:
-#pod
-#pod   use Data::Dumper;
-#pod
-#pod   until ( eval { $output->flush } ) {
-#pod       warn "$@", Dumper( $@->payload );
-#pod       shift $output->queue->@*;
-#pod   }
-#pod
-#pod =cut
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 sub flush {
 
@@ -443,22 +443,22 @@ sub flush {
     1;
 }
 
-#pod =method send
-#pod
-#pod   $s->send( \%record );
-#pod
-#pod Send a record to the database.
-#pod If there is an error, an exception object (with class
-#pod C<Data::Record::Serialize::Error::Encode::dbi::insert>) will be
-#pod thrown, and the record which failed to be written will be available
-#pod via the object's C<payload> method.
-#pod
-#pod If in L</batch> mode, the record is queued for later transmission.
-#pod When the number of records queued reaches that specified by the
-#pod L</batch> attribute, the C<flush> method is called.  See L</flush> for
-#pod more information on how errors are handled.
-#pod
-#pod =cut
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 sub send {
 
@@ -493,26 +493,26 @@ after '_trigger_output_types' => sub {
 };
 
 
-#pod =method close
-#pod
-#pod   $s->close;
-#pod
-#pod Close the database handle. If writing is batched, records in the queue
-#pod are written to the database via L</flush>. An exception will be thrown
-#pod if a record cannot be written.  See L</flush> for more details.
-#pod
-#pod As an example of draining the queue while notifying of errors:
-#pod
-#pod   use Data::Dumper;
-#pod
-#pod   until ( eval { $output->close } ) {
-#pod       warn "$@", Dumper( $@->payload );
-#pod       shift $output->queue->@*;
-#pod   }
-#pod
-#pod
-#pod
-#pod =cut
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 sub close {
 
@@ -528,15 +528,15 @@ sub close {
 }
 
 
-#pod =method DEMOLISH
-#pod
-#pod This method is called when the object is destroyed.  It closes the
-#pod database handle B<but does not flush the record queue>.
-#pod
-#pod A warning is emitted if the record queue is not empty; turn off the
-#pod C<Data::Record::Serialize::Encode::dbi::queue> warning to silence it.
-#pod
-#pod =cut
+
+
+
+
+
+
+
+
+
 
 sub DEMOLISH {
 
@@ -554,12 +554,12 @@ sub DEMOLISH {
 # these are required by the Sink/Encode interfaces but should never be
 # called in the ordinary run of things.
 
-#pod =for  Pod::Coverage
-#pod   say
-#pod   print
-#pod   encode
-#pod
-#pod =cut
+
+
+
+
+
+
 
 
 sub say    { error( 'Encode::stub_method', 'internal error: stub method <say> invoked' ) }
@@ -586,13 +586,15 @@ __END__
 
 =pod
 
+=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory
+
 =head1 NAME
 
 Data::Record::Serialize::Encode::dbi - store a record in a database
 
 =head1 VERSION
 
-version 0.20
+version 0.23
 
 =head1 SYNOPSIS
 
@@ -639,6 +641,69 @@ Transaction errors result in an exception in the
 C<Data::Record::Serialize::Error::Encode::dbi::insert> class. See
 L<Data::Record::Serialize::Error> for more information on exception
 objects.
+
+=head1 ATTRIBUTES
+
+These attributes are available in addition to the standard attributes
+defined for L<Data::Record::Serialize-E<gt>new>|Data::Record::Serialize/new>.
+
+=head2 C<dsn>
+
+I<Required> The DBI Data Source Name (DSN) passed to B<L<DBI>>.  It
+may either be a string or an arrayref containing strings or arrayrefs,
+which should contain key-value pairs.  Elements in the sub-arrays are
+joined with C<=>, elements in the top array are joined with C<:>.  For
+example,
+
+  [ 'SQLite', { dbname => $db } ]
+
+is transformed to
+
+  SQLite:dbname=$db
+
+The standard prefix of C<dbi:> will be added if not present.
+
+=head2 C<table>
+
+I<Required> The name of the table in the database which will contain the records.
+It will be created if it does not exist.
+
+=head2 C<schema>
+
+The schema to which the table belongs.  Optional.
+
+=head2 C<drop_table>
+
+If true, the table is dropped and a new one is created.
+
+=head2 C<create_table>
+
+If true, a table will be created if it does not exist.
+
+=head2 C<primary>
+
+A single output column name or an array of output column names which
+should be the primary key(s).  If not specified, no primary keys are
+defined.
+
+=head2 C<db_user>
+
+The name of the database user
+
+=head2 C<db_pass>
+
+The database password
+
+=head2 C<batch>
+
+The number of rows to write to the database at once.  This defaults to 100.
+
+If greater than 1, C<batch> rows are cached and then sent out in a
+single transaction.  See L</Performance> for more information.
+
+=head2 C<dbitrace>
+
+A trace setting passed to  L<DBI>.
 
 =head1 METHODS
 
@@ -740,69 +805,6 @@ database handle B<but does not flush the record queue>.
 
 A warning is emitted if the record queue is not empty; turn off the
 C<Data::Record::Serialize::Encode::dbi::queue> warning to silence it.
-
-=head1 ATTRIBUTES
-
-These attributes are available in addition to the standard attributes
-defined for L<Data::Record::Serialize-E<gt>new>|Data::Record::Serialize/new>.
-
-=head2 C<dsn>
-
-I<Required> The DBI Data Source Name (DSN) passed to B<L<DBI>>.  It
-may either be a string or an arrayref containing strings or arrayrefs,
-which should contain key-value pairs.  Elements in the sub-arrays are
-joined with C<=>, elements in the top array are joined with C<:>.  For
-example,
-
-  [ 'SQLite', { dbname => $db } ]
-
-is transformed to
-
-  SQLite:dbname=$db
-
-The standard prefix of C<dbi:> will be added if not present.
-
-=head2 C<table>
-
-I<Required> The name of the table in the database which will contain the records.
-It will be created if it does not exist.
-
-=head2 C<schema>
-
-The schema to which the table belongs.  Optional.
-
-=head2 C<drop_table>
-
-If true, the table is dropped and a new one is created.
-
-=head2 C<create_table>
-
-If true, a table will be created if it does not exist.
-
-=head2 C<primary>
-
-A single output column name or an array of output column names which
-should be the primary key(s).  If not specified, no primary keys are
-defined.
-
-=head2 C<db_user>
-
-The name of the database user
-
-=head2 C<db_pass>
-
-The database password
-
-=head2 C<batch>
-
-The number of rows to write to the database at once.  This defaults to 100.
-
-If greater than 1, C<batch> rows are cached and then sent out in a
-single transaction.  See L</Performance> for more information.
-
-=head2 C<dbitrace>
-
-A trace setting passed to  L<DBI>.
 
 =for Pod::Coverage has_schema
 

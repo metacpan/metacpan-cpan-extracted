@@ -1,7 +1,11 @@
-# $Id: msie.t,v 1.11 2005/12/25 00:03:06 Daddy Exp $
+
+use strict;
+use warnings;
 
 use ExtUtils::testlib;
-use Test::More no_plan;
+use Test::More;
+
+our $VERSION = 1.12;
 
 BEGIN { use_ok('Data::Dumper') };
 BEGIN { use_ok('HTTP::Cookies::Find') };
@@ -15,38 +19,45 @@ SKIP:
   diag(q{Using real MSIE info from your system});
   # goto DEBUG_NOW;
   my $o = new HTTP::Cookies::Find(q{no host in the world matches this});
-  &dump_errors;
-  isa_ok($o, 'HTTP::Cookies::Microsoft');
-  $iCount = 0;
-  $o->scan(\&cb_count);
-  is($iCount, 0, 'no cookies for impossible host');
+  dump_errors();
+  if (ref($o) && $o->isa('HTTP::Cookies::Microsoft'))
+    {
+    $iCount = 0;
+    $o->scan(\&cb_count);
+    is($iCount, 0, 'no cookies for impossible host');
+    } # if
 
   $o = new HTTP::Cookies::Find();
-  &dump_errors;
-  isa_ok($o, 'HTTP::Cookies::Microsoft');
-  # diag(q{The object created is of type }. ref $o);
-  $iCount = 0;
-  $o->scan(\&cb_count);
-  diag(sprintf(q{You have a total of %d cookies in MSIE}, $iCount));
-  cmp_ok(0, '<', $iCount, 'found ANY msie cookies');
+  dump_errors();
+  if (ref($o) && $o->isa('HTTP::Cookies::Microsoft'))
+    {
+    # diag(q{The object created is of type }. ref $o);
+    $iCount = 0;
+    $o->scan(\&cb_count);
+    diag(sprintf(q{You have a total of %d cookies in MSIE}, $iCount));
+    cmp_ok(0, '<', $iCount, 'found ANY msie cookies');
+    } # if
 
   my $sHost = 'soft';
   $o = new HTTP::Cookies::Find($sHost);
-  &dump_errors;
-  isa_ok($o, 'HTTP::Cookies::Microsoft');
-  $iCount = 0;
-  $o->scan(\&cb_count);
-  diag(sprintf(qq{Found %d MSIE cookies that match host $sHost}, $iCount));
+  dump_errors();
+  if (ref($o) && $o->isa('HTTP::Cookies::Microsoft'))
+    {
+    $iCount = 0;
+    $o->scan(\&cb_count);
+    diag(sprintf(qq{Found %d MSIE cookies that match host $sHost}, $iCount));
+    }
 
   $sHost = qr'yaho+';
   $o = new HTTP::Cookies::Find($sHost);
-  &dump_errors;
-  isa_ok($o, 'HTTP::Cookies::Microsoft');
-  $iCount = 0;
-  $o->scan(\&cb_count);
-  diag(sprintf(qq{Found %d MSIE cookies that match host $sHost}, $iCount));
-  # cmp_ok(0, '<', $iCount);
-
+  dump_errors();
+  if (ref($o) && $o->isa('HTTP::Cookies::Microsoft'))
+    {
+    $iCount = 0;
+    $o->scan(\&cb_count);
+    diag(sprintf(qq{Found %d MSIE cookies that match host $sHost}, $iCount));
+    # cmp_ok(0, '<', $iCount);
+    }
   if (0)
     {
     diag(q{Here is a list of all the cookies:});
@@ -60,7 +71,7 @@ SKIP:
   $ENV{WINDIR} = './t';
   diag(qq{Using fake Netscape info from directory $ENV{WINDIR}});
   my @ao1 = HTTP::Cookies::Find->new($sHost);
-  &dump_errors;
+  dump_errors();
   foreach my $o1 (@ao1)
     {
     ok(ref($o1));
@@ -103,9 +114,12 @@ sub dump_errors
   {
   foreach my $sError (HTTP::Cookies::Find::errors)
     {
+    # print STDERR $sError;
     diag($sError);
     } # foreach
   } # dump_errors
+
+done_testing();
 
 1;
 

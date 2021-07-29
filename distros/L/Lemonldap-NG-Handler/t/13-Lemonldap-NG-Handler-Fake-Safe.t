@@ -5,7 +5,7 @@
 
 # change 'tests => 1' to 'tests => last_test_to_print';
 
-use Test::More tests => 13;
+use Test::More tests => 14;
 require 't/test.pm';
 BEGIN { use_ok('Lemonldap::NG::Handler::Main::Jail') }
 
@@ -38,26 +38,31 @@ my $encode_base64 = $jail->jail_reval($sub2);
 like( &$encode_base64, '/^dGVzdA==$/',
     'encode_base64 extended function working without Safe Jail' );
 
-my $sub3      = "sub { return(checkDate('20000000000000','21000000000000')) }";
+my $sub3      = "sub { return(checkDate('20000101000000','21000101000000')) }";
 my $checkDate = $jail->jail_reval($sub3);
 ok( &$checkDate == "1",
     'checkDate extended function working without Safe Jail' );
 
-my $sub4      = "sub { return ( listMatch('ABC; DEF; GHI','abc', 1) ) }";
-my $listMatch = $jail->jail_reval($sub4);
+my $sub4      = "sub { return(checkDate('20000101000000+0100','21000101000000+0100')) }";
+my $checkDate = $jail->jail_reval($sub4);
+ok( &$checkDate == "1",
+    'checkDate extended function working without Safe Jail' );
+
+my $sub5      = "sub { return ( listMatch('ABC; DEF; GHI','abc', 1) ) }";
+my $listMatch = $jail->jail_reval($sub5);
 ok( ( defined($listMatch) and ref($listMatch) eq 'CODE' ),
     'listMatch function is defined' );
 ok( &$listMatch eq '1', 'Get good result' );
 
-my $sub5 = "sub { return ( listMatch('ABC; DEF; GHI','ab', 1) ) }";
-$listMatch = $jail->jail_reval($sub5);
+my $sub6 = "sub { return ( listMatch('ABC; DEF; GHI','ab', 1) ) }";
+$listMatch = $jail->jail_reval($sub6);
 ok( ( defined($listMatch) and ref($listMatch) eq 'CODE' ),
     'listMatch function is defined' );
 ok( &$listMatch eq '0', 'Get good result' );
 
 # Test has2f method
-my $sub6  = "sub { return(has2f(\$_[0],\$_[1])) }";
-my $has2f = $jail->jail_reval($sub6);
+my $sub7  = "sub { return(has2f(\$_[0],\$_[1])) }";
+my $has2f = $jail->jail_reval($sub7);
 ok(
     ( defined($has2f) and ref($has2f) eq 'CODE' ),
     'checkDate extended function is defined'

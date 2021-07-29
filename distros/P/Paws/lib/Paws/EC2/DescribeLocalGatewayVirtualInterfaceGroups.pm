@@ -36,8 +36,10 @@ You shouldn't make instances of this class. Each attribute should be used as a n
       DryRun  => 1,    # OPTIONAL
       Filters => [
         {
-          Name   => 'MyString',
-          Values => [ 'MyString', ... ],    # OPTIONAL
+          Name   => 'MyString',    # OPTIONAL
+          Values => [
+            'MyString', ...        # OPTIONAL
+          ],    # OPTIONAL
         },
         ...
       ],    # OPTIONAL
@@ -74,6 +76,25 @@ C<DryRunOperation>. Otherwise, it is C<UnauthorizedOperation>.
 =head2 Filters => ArrayRef[L<Paws::EC2::Filter>]
 
 One or more filters.
+
+=over
+
+=item *
+
+C<local-gateway-id> - The ID of a local gateway.
+
+=item *
+
+C<local-gateway-virtual-interface-id> - The ID of the virtual
+interface.
+
+=item *
+
+C<local-gateway-virtual-interface-group-id> - The ID of the virtual
+interface group.
+
+=back
+
 
 
 

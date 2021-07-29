@@ -1,3 +1,10 @@
+# Managing build with Minilla
+
+    minil test      - run test cases
+    minil dist      - make your dist tarball
+    minil install   - install your dist
+    minil release   - release your dist to CPAN
+
 # To build a release:
 
 Note: Replace '1.10' in the examples below with the current version.
@@ -17,14 +24,7 @@ Note: Replace '1.10' in the examples below with the current version.
 
 * Run unit tests
 
-    perl Makefile.PL
-    make test
-
-* Run unit tests for multiple Perl versions using perlbrew on Vagrant
-
-    vagrant up
-    vagrant ssh --command "perlbrew exec --halt-on-error /vagrant/vag-tests.sh" 1>&2 | tee test.out
-    vagrant halt
+    minil test
 
 * Bump version number in lib/Connector.pm
 
@@ -35,7 +35,7 @@ Note: Replace '1.10' in the examples below with the current version.
 
 * Make any last-minute fixes and re-test
 
-    perl Makefile.PL && make test
+    minil test
 
 * Finalize release (write the version number in the TAG\_MSG)
 
@@ -44,11 +44,11 @@ Note: Replace '1.10' in the examples below with the current version.
 
 * Build tarball
 
-    perl Makefile.PL && make manifest && make dist
+    minil dist
 
 * Upload tarball to https://pause.perl.org
 
-    cpan-upload Connector-$connver.tar.gz
+    minil release
 
 # If the build env is not already set up, run the following:
 
@@ -71,11 +71,5 @@ Note: Replace '1.10' in the examples below with the current version.
     cpanm Module::Install
     cpanm --installdeps --notest .
 
-## Setting up Vagrant Tests
-
-    vagrant init ubuntu/bionic64
-    vagrant up
-    vagrant ssh --command /vagrant/vag-provision.sh
-    vagrant ssh --command /vagrant/vag-add-perl.sh
 
 

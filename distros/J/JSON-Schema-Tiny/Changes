@@ -1,5 +1,13 @@
 Revision history for JSON-Schema-Tiny
 
+0.007     2021-07-22 05:20:31Z
+          - add incomplete prereq declaration for Mojo::URL
+          - skip acceptance test for integer overflow when nvsize is too
+            large to produce the expected error
+          - fix parsing of $recursiveAnchor in inner scope
+          - the $MOJO_BOOLEANS option is now $SCALARREF_BOOLEANS (all JSON
+            backends support them, not just Mojo::JSON)
+
 0.006     2021-06-06 18:20:19Z
           - properly update initial_schema_uri in the state object while passing
             through $id keywords, to keep error locations accurate

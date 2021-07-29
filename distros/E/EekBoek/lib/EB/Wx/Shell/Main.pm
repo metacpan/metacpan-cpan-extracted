@@ -5,8 +5,8 @@ use utf8;
 # Author          : Johan Vromans
 # Created On      : Sun Jul 31 23:35:10 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Wed Feb  1 14:47:19 2017
-# Update Count    : 446
+# Last Modified On: Thu Jan 28 20:44:43 2021
+# Update Count    : 448
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -25,6 +25,7 @@ use warnings;
 use EekBoek;
 use EB;
 use Getopt::Long 2.13;
+use File::Basename qw(dirname);
 
 ################ The Process ################
 
@@ -150,7 +151,13 @@ sub run {
 	$config = $cfg->std_config;
 	$config = $cfg->std_config_alt unless -f $config;
     }
-    $frame->{_ebcfg} = $config if -e $config;
+
+    # Change to config dir.
+    if ( -e $config ) {
+	$frame->{_ebcfg} = $config;
+	chdir(dirname($config));
+    }
+
     $frame->FillHistory($histfile);
     $frame->GetPreferences;
 

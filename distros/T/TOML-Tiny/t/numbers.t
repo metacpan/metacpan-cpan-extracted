@@ -35,6 +35,7 @@ subtest 'integers' => sub{
     is from_toml('x=0xdeadbeef'), {x => 0xDEADBEEF}, 'all lower';
     is from_toml('x=0xDeAdBeEf'), {x => 0xDEADBEEF}, 'mixed caps';
     is from_toml('x=0xDEAD_BEEF'), {x => 0xDEADBEEF}, 'underscores';
+    is from_toml('x=0xDEADBEEF '), {x => 0xDEADBEEF}, 'trailing space';
 
     is from_toml('x=0x7fffffffffffffff'), hash{
       field x => validator(sub{

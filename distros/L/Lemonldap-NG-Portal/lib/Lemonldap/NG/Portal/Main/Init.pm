@@ -8,7 +8,7 @@
 #                  of lemonldap-ng.ini) and underlying handler configuration
 package Lemonldap::NG::Portal::Main::Init;
 
-our $VERSION = '2.0.10';
+our $VERSION = '2.0.12';
 
 package Lemonldap::NG::Portal::Main;
 
@@ -125,8 +125,9 @@ sub init {
 
     # Purge loaded module list
     $self->loadedModules( {} );
-    $self->afterSub( {} );
-    $self->aroundSub( {} );
+    $self->afterSub(      {} );
+    $self->aroundSub(     {} );
+    $self->hook(          {} );
 
     # Insert `reloadConf` in handler reload stack
     Lemonldap::NG::Handler::Main->onReload( $self, 'reloadConf' );
@@ -210,9 +211,10 @@ sub reloadConf {
     foreach ( qw(_macros _groups), @entryPoints ) {
         $self->{$_} = [];
     }
-    $self->afterSub( {} );
+    $self->afterSub(  {} );
     $self->aroundSub( {} );
-    $self->spRules( {} );
+    $self->spRules(   {} );
+    $self->hook(      {} );
 
     # Load conf in portal object
     foreach my $key ( keys %$conf ) {
@@ -250,8 +252,7 @@ sub reloadConf {
       $self->conf->{templateDir} . '/' . $self->conf->{portalSkin}
       if ( $self->conf->{templateDir} and $self->conf->{portalSkin} );
     unless ( -d $self->{templateDir} ) {
-        $self->error("Template dir $self->{templateDir} doesn't exist")
-          if ref( $self->{templateDir} ) eq 'SCALAR';
+        $self->error("Template dir $self->{templateDir} doesn't exist");
         return $self->fail;
     }
     $self->templateDir(
@@ -376,9 +377,17 @@ sub reloadConf {
             $p =~ s#https?://([^/]*).*$#$1#;
             $re->add( quotemeta($p) );
         }
+
         foreach my $vhost ( keys %{ $self->conf->{locationRules} } ) {
+            my $expr = quotemeta($vhost);
+
+            # Handle wildcards
+            if ( $vhost =~ /[\%\*]/ ) {
+                $expr =~ s/\\\*/[A-Za-z0-9\.]\*/;
+                $expr =~ s/\\\%/[A-Za-z0-9]\*/;
+            }
+            $re->add($expr);
             $self->logger->debug("Vhost $vhost added in trusted domains");
-            $re->add( quotemeta($vhost) );
             $self->conf->{vhostOptions} ||= {};
             if ( my $tmp =
                 $self->conf->{vhostOptions}->{$vhost}->{vhostAliases} )
@@ -391,7 +400,7 @@ sub reloadConf {
             }
         }
 
-        my $tmp = 'https?://' . $re->as_string . '(?::\d+)?(?:/|$)';
+        my $tmp = '^https?://' . $re->as_string . '(?::\d+)?(?:/|$)';
         $self->trustedDomainsRe(qr/$tmp/);
 
     }

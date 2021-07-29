@@ -3,7 +3,7 @@ package Myriad::Storage::Implementation::Redis;
 use strict;
 use warnings;
 
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.010'; # VERSION
 our $AUTHORITY = 'cpan:DERIV'; # AUTHORITY
 
 use Future::AsyncAwait;
@@ -19,9 +19,14 @@ use experimental qw(signatures);
 
 =head1 NAME
 
-Myriad::Storage::Redis - microservice storage abstraction
+Myriad::Storage::Implementation::Redis - access to microservice storage via Redis
 
-=head1 SYNOPSIS
+=head1 DESCRIPTION
+
+This provides an implementation of L<Myriad::Role::Storage> using L<https://redis.io>
+as the underlying storage mechanism and transport layer.
+
+See L<Myriad::Role::Storage> for API details.
 
 =cut
 
@@ -110,6 +115,24 @@ Returns a L<Future> which will resolve to the original value on completion.
 async method getset ($k, $v) {
     die 'value cannot be a reference for ' . $k . ' - ' . ref($v) if ref $v;
     return await $redis->getset($self->apply_prefix($k) => $v);
+}
+
+=head2 incr
+
+Takes the following parameters:
+
+=over 4
+
+=item * C<< $k >> - the relative key in storage
+
+=back
+
+Returns a L<Future> which will resolve to the corresponding incremented value, or C<undef> if none.
+
+=cut
+
+async method incr ($k) {
+    await $redis->incr($self->apply_prefix($k));
 }
 
 =head2 observe

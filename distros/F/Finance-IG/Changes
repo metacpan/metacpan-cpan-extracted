@@ -1,16 +1,20 @@
 Revision history for Finance-IG
 
-0.01    First release, 16 December 2020
-0.02    Small progress towards passing the tests on CPAN
-0.03    Updated Makefile.PL dependencies  as progress towards passing tests on CPAN 
-0.04    Updated Makefile.PL dependencies  as progress towards passing tests on CPAN again. 
-0.05    Improvements imported from ugraded original
-0.06    Changes directory layouts to make publishable, 0.05 cannot be published as it exports someone elses module. 
-0.07, 8 Unsuccesful attemps to correct the problem in 0.05
-0.09    Using Package::Alias to rename package on the fly. 
-0.92    Fixes record REST::CLient, prevent pod_coverage from testing installed version.  Add extra tests for transaction listings. 
-0.93    A couple of extra options added. Also changed perl version needed (older) 
-0.94    Still messing with perl version, get the message in 0.93 
+0.001    First release, 16 December 2020
+0.002    Small progress towards passing the tests on CPAN
+0.003    Updated Makefile.PL dependencies  as progress towards passing tests on CPAN 
+0.004    Updated Makefile.PL dependencies  as progress towards passing tests on CPAN again. 
+0.005    Improvements imported from ugraded original
+0.006    Changes directory layouts to make publishable, 0.05 cannot be published as it exports someone elses module. 
+0.007, 8 Unsuccesful attemps to correct the problem in 0.05
+0.009    Using Package::Alias to rename package on the fly. 
+0.092    Fixes record REST::CLient, prevent pod_coverage from testing installed version.  Add extra tests for transaction listings. 
+0.093    A couple of extra options added. Also changed perl version needed (older) 
+0.094    Still messing with perl version, get the message in 0.93 
          Installing the dependencies failed: Your Perl (5.032001) is not in the range '5.10'
         Attempt to fix this. 
+0.098    Dependencies fixed. Some new options in igdisp
+0.099    Extra diagnostics added for tests that fail on some platforms
+0.100    Change to fix sporadic test failures with certain versions of perl. 
+0.101    Further deployment of changes. 
 

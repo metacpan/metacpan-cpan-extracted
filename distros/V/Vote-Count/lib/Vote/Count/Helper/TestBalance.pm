@@ -5,7 +5,7 @@ use 5.024;
 
 package Vote::Count::Helper::TestBalance;
 
-our $VERSION='2.00';
+our $VERSION='2.01';
 
 # ABSTRACT: Custom Test for checking STV charge calculations.
 
@@ -13,7 +13,7 @@ our $VERSION='2.00';
 
 Vote::Count::Helper::TestBalance;
 
-=head1 VERSION 2.00
+=head1 VERSION 2.01
 
 =head1 Synopsis
 

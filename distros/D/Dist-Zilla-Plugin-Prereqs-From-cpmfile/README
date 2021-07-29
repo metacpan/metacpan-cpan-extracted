@@ -1,0 +1,32 @@
+NAME
+
+    Dist::Zilla::Plugin::Prereqs::From::cpmfile - Register prereqs from
+    cpmfile
+
+SYNOPSIS
+
+      ; dist.ini
+      [Prereqs::From::cpmfile]
+
+DESCRIPTION
+
+    Dist::Zilla::Plugin::Prereqs::From::cpmfile registers prereqs from
+    cpmfile.
+
+SEE ALSO
+
+    Dist::Zilla::Plugin::Prereqs::FromCPANfile
+
+    Module::cpmfile
+
+AUTHOR
+
+    Shoichi Kaji <skaji@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    Copyright 2021 Shoichi Kaji <skaji@cpan.org>
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

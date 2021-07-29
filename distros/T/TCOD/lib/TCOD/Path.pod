@@ -1,0 +1,126 @@
+=encoding UTF-8
+
+=head1 NAME
+
+TCOD::Path - An A-star pathfinder
+
+=head1 SYNOPSIS
+
+    use TCOD;
+
+    my $map = TCOD::Map->new( 10, 10 );
+    $map->clear( 1, 1 );
+
+    my $path = TCOD::Path->new_using_map( $map, 1.41 );
+    $path->compute( 3, 0, 9, 9 );
+
+    printf "Step to [%s,%s]\n", $path->walk until $path->is_empty;
+    # OUTPUT:
+    # Step to [4,1]
+    # Step to [4,2]
+    # Step to [5,3]
+    # Step to [6,4]
+    # Step to [7,5]
+    # Step to [8,6]
+    # Step to [8,7]
+    # Step to [9,8]
+    # Step to [9,9]
+
+=head1 DESCRIPTION
+
+This class implements an A* pathfinder to be used in roguelike games.
+
+=head1 METHODS
+
+=head2 new_using_map
+
+    $path = TCOD::Path->new_using_map( $map, $diagonal_cost );
+
+Takes a L<TCOD::Map> object and a diagonal cost value and returns a
+TCOD::Path object that can be used to find paths in that map.
+
+The diagonal cost will determine the cost of diagonal movement compared
+to orthogonal movement. A good standard value to use is 1.41 (C<~sqrt(2)>).
+Set to 0 to disable diagonal movement entirely, or 1 to make all directions
+have the same cost.
+
+=head2 compute
+
+    $path->compute( $x1, $y1, $x2, $y2 );
+
+Takes the coordinates of a starting position and a target destination, and
+computes an A* map from one to the other.
+
+The start and ends points will be stored internally, and can be retrieved with
+L<get_origin|/get_origin> and L<get_destination|/get_destination> (see below).
+
+=head2 reverse
+
+    $path->reverse;
+
+Reverses the origin and destination points for this path.
+
+=head2 is_empty
+
+    $bool = $path->is_empty;
+
+Returns true when the internal iterator has run out of steps in the path.
+
+See L<walk|/walk> for a way to move the internal iterator forward.
+
+=head2 size
+
+    $steps = $path->size;
+
+Returns the number of steps in this path. This number will remain constant
+as long as the object's start and destination points haven't changed after
+computing a path.
+
+=head2 get_origin
+
+    ( $x, $y ) = $path->get_origin;
+
+Returns a list with the coordinates of the point set as the path's origin.
+See L<compute|/compute> for how this is done.
+
+=head2 get_destination
+
+    ( $x, $y ) = $path->get_destination;
+
+Returns a list with the coordinates of the point set as the path's
+destination. See L<compute|/compute> for how this is done.
+
+=head2 get
+
+    ( $x, $y ) = $path->get( $step );
+
+Returns a list with the coordinates of the specified step. Together with
+L<size|/size>, this can be used to iterate through a path without using the
+internal iterator.
+
+=head2 walk
+
+    ( $x, $y ) = $path->walk;
+
+Returns a list with the coordinates of the current step of the internal
+iterator, and moves the iterator forward. The values returned by this method
+will be meaningful as long as L<is_empty|/is_empty> returns false.
+
+=head1 SEE ALSO
+
+=over
+
+=item L<TCOD>
+
+=item L<TCOD::Dijkstra>
+
+=item L<TCOD::Map>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2021 José Joaquín Atria
+
+This library is free software; you can redistribute it and/or modify it under
+the Artistic License 2.0.

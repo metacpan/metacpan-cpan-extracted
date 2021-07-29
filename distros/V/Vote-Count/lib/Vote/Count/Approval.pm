@@ -10,13 +10,13 @@ use Moose::Role;
 no warnings 'experimental';
 use Carp;
 
-our $VERSION='2.00';
+our $VERSION='2.01';
 
 =head1 NAME
 
 Vote::Count::Approval
 
-=head1 VERSION 2.00
+=head1 VERSION 2.01
 
 =cut
 
@@ -104,6 +104,8 @@ sub Approval ( $self, $active = undef, $cutoff = 0 ) {
     $self->_approval_rcv_do( $active, $BallotSet{'ballots'} );
   }
 }
+
+sub approval { Approval(@_) }
 
 sub _non_approval_rcv_do ( $I, $ballots ) {
   my $active = $I->Active();

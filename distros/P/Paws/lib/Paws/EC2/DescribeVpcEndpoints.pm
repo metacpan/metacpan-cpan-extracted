@@ -35,8 +35,10 @@ You shouldn't make instances of this class. Each attribute should be used as a n
       DryRun  => 1,    # OPTIONAL
       Filters => [
         {
-          Name   => 'MyString',
-          Values => [ 'MyString', ... ],    # OPTIONAL
+          Name   => 'MyString',    # OPTIONAL
+          Values => [
+            'MyString', ...        # OPTIONAL
+          ],    # OPTIONAL
         },
         ...
       ],    # OPTIONAL
@@ -89,6 +91,11 @@ C<vpc-endpoint-id> - The ID of the endpoint.
 C<vpc-endpoint-state> - The state of the endpoint (C<pendingAcceptance>
 | C<pending> | C<available> | C<deleting> | C<deleted> | C<rejected> |
 C<failed>).
+
+=item *
+
+C<vpc-endpoint-type> - The type of VPC endpoint (C<Interface> |
+C<Gateway> | C<GatewayLoadBalancer>).
 
 =item *
 

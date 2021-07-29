@@ -35,8 +35,10 @@ You shouldn't make instances of this class. Each attribute should be used as a n
       DryRun  => 1,    # OPTIONAL
       Filters => [
         {
-          Name   => 'MyString',
-          Values => [ 'MyString', ... ],    # OPTIONAL
+          Name   => 'MyString',    # OPTIONAL
+          Values => [
+            'MyString', ...        # OPTIONAL
+          ],    # OPTIONAL
         },
         ...
       ],    # OPTIONAL
@@ -120,9 +122,8 @@ C<owner-id> - The ID of the AWS account that owns the transit gateway.
 
 =item *
 
-C<state> - The state of the attachment (C<available> | C<deleted> |
-C<deleting> | C<failed> | C<modifying> | C<pendingAcceptance> |
-C<pending> | C<rollingBack> | C<rejected> | C<rejecting>).
+C<state> - The state of the transit gateway (C<available> | C<deleted>
+| C<deleting> | C<modifying> | C<pending>).
 
 =item *
 

@@ -1,9 +1,9 @@
 package Perinci::CmdLine::Base;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-06-23'; # DATE
+our $DATE = '2021-07-11'; # DATE
 our $DIST = 'Perinci-CmdLine-Lite'; # DIST
-our $VERSION = '1.905'; # VERSION
+our $VERSION = '1.906'; # VERSION
 
 use 5.010001;
 use strict;
@@ -155,6 +155,7 @@ our %copts = (
             $r->{action} = 'version';
             $r->{skip_parse_subcommand_argv} = 1;
         },
+        key => 'action',
     },
 
     help => {
@@ -167,6 +168,7 @@ our %copts = (
             $r->{skip_parse_subcommand_argv} = 1;
         },
         order => 0, # high
+        key => 'action',
     },
 
     format => {
@@ -180,6 +182,7 @@ our %copts = (
         default => undef,
         tags => ['category:output'],
         is_settable_via_config => 1,
+        key => 'format',
     },
     json => {
         getopt  => 'json',
@@ -189,6 +192,7 @@ our %copts = (
             $r->{format} = (-t STDOUT) ? 'json-pretty' : 'json';
         },
         tags => ['category:output'],
+        key => 'format',
     },
 
     page_result => {
@@ -201,6 +205,7 @@ our %copts = (
             $r->{pager} = $val if length $val;
         },
         tags => ['category:output'],
+        key => 'send_output',
     },
 
     view_result => {
@@ -213,6 +218,7 @@ our %copts = (
             $r->{viewer} = $val if length $val;
         },
         tags => ['category:output'],
+        key => 'send_output',
     },
 
     naked_res => {
@@ -256,6 +262,7 @@ _
             $r->{action} = 'subcommands';
             $r->{skip_parse_subcommand_argv} = 1;
         },
+        key => 'action',
     },
 
     # 'cmd=SUBCOMMAND_NAME' can be used to select other subcommands when
@@ -292,6 +299,7 @@ _
             push @{ $r->{config_paths} }, $val;
         },
         tags => ['category:configuration'],
+        key => 'config_path',
     },
     no_config => {
         getopt  => 'no-config',
@@ -301,6 +309,7 @@ _
             $r->{read_config} = 0;
         },
         tags => ['category:configuration'],
+        key => 'config_path',
     },
     no_env => {
         getopt  => 'no-env',
@@ -392,6 +401,7 @@ _
         },
         is_settable_via_config => 1,
         tags => ['category:logging'],
+        key => 'log_level',
     },
     trace => {
         getopt  => "trace",
@@ -401,6 +411,7 @@ _
             $r->{log_level} = 'trace';
         },
         tags => ['category:logging'],
+        key => 'log_level',
     },
     debug => {
         getopt  => "debug",
@@ -410,6 +421,7 @@ _
             $r->{log_level} = 'debug';
         },
         tags => ['category:logging'],
+        key => 'log_level',
     },
     verbose => {
         getopt  => "verbose",
@@ -420,6 +432,7 @@ _
             $r->{_help_verbose} = 1;
         },
         tags => ['category:logging'],
+        key => 'log_level',
     },
     quiet => {
         getopt  => "quiet",
@@ -429,6 +442,7 @@ _
             $r->{log_level} = 'error';
         },
         tags => ['category:logging'],
+        key => 'log_level',
     },
 
 );
@@ -2117,7 +2131,7 @@ Perinci::CmdLine::Base - Base class for Perinci::CmdLine{::Classic,::Lite}
 
 =head1 VERSION
 
-This document describes version 1.905 of Perinci::CmdLine::Base (from Perl distribution Perinci-CmdLine-Lite), released on 2021-06-23.
+This document describes version 1.906 of Perinci::CmdLine::Base (from Perl distribution Perinci-CmdLine-Lite), released on 2021-07-11.
 
 =head1 DESCRIPTION
 
@@ -3250,7 +3264,7 @@ Source repository is at L<https://github.com/perlancar/perl-Perinci-CmdLine-Lite
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Perinci-CmdLine-Lite/issues>
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-CmdLine-Lite>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

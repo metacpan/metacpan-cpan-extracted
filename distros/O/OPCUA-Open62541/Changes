@@ -1,5 +1,10 @@
 Revision history for Perl extension OPCUA::Open62541.
 
+0.027 2021-07-29
+    - Implement wrapper for subscription functions of open62541.
+    - Call back change and delete notifications to Perl.
+    - Call back multiple monitored items change and delete to Perl.
+
 0.026 2020-09-30
     - Fix memory leak in server add node methods.
 

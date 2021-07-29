@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary::Format;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Format vocabulary
 
-our $VERSION = '0.513';
+our $VERSION = '0.514';
 
 use 5.016;
 no if "$]" >= 5.031009, feature => 'indirect';
@@ -180,7 +180,7 @@ JSON::Schema::Modern::Vocabulary::Format - Implementation of the JSON Schema For
 
 =head1 VERSION
 
-version 0.513
+version 0.514
 
 =head1 DESCRIPTION
 
@@ -190,10 +190,16 @@ version 0.513
 
 Implementation of the JSON Schema Draft 2019-09 "Format" vocabulary, indicated in metaschemas
 with the URI C<https://json-schema.org/draft/2019-09/vocab/format> and formally specified in
-L<https://json-schema.org/draft/2019-09/json-schema-validation.html#rfc.section.7>.
+L<https://datatracker.ietf.org/doc/html/draft-handrews-json-schema-validation-02#section-7>.
+
+Support is also provided for the equivalent Draft 7 keyword, as formally specified in
+L<https://datatracker.ietf.org/doc/html/draft-handrews-json-schema-validation-01#section-7>.
 
 Overrides to particular format implementations, or additions of new ones, can be done through
 L<JSON::Schema::Modern/format_validations>.
+
+Formats C<iri-reference> and C<uri-template> are not yet implemented.
+Use of these formats will always evaluate to C<true>.
 
 =head1 SEE ALSO
 

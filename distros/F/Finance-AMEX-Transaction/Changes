@@ -1,3 +1,7 @@
+0.004     2021-07-22 21:25:38-07:00 America/Los_Angeles
+          - support v2.01 GRRCN files with v1.01 back compat
+            Thanks leejo https://github.com/ZipRecruiter/Finance-AMEX-Transaction/pull/1
+
 0.003     2018-09-25 17:05:23-07:00 America/Los_Angeles
           - Update documentation for Finance::AMEX::Transaction::EPPRC::Detail::RecordSummaryPricing->FEE_CODE
             to match May 2018 AMEX documentation

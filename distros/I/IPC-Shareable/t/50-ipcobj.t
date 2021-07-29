@@ -10,7 +10,7 @@ my $ok = 1;
 
 {
     package Dummy;
-    
+
     sub new {
         my $d = {
             _first  => undef,
@@ -59,7 +59,7 @@ if ($pid == 0) {
 } else {
     # parent
 
-    my $s = tie my $d, 'IPC::Shareable', 'obj', { create => 'yes', destroy => 'yes' };
+    my $s = tie my $d, 'IPC::Shareable', 'obj', { create => 1, destroy => 1 };
 
 #    my $id = $s->{_shm}->{_id};
 

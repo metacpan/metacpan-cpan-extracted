@@ -18,7 +18,7 @@ my %WriteMakefileArgs = (
   "NAME" => "Complete::Bash",
   "PREREQ_PM" => {
     "Exporter" => "5.57",
-    "Log::ger" => "0.037",
+    "Log::ger" => "0.038",
     "strict" => 0,
     "warnings" => 0
   },
@@ -29,7 +29,7 @@ my %WriteMakefileArgs = (
     "Test::Exception" => 0,
     "Test::More" => "0.98"
   },
-  "VERSION" => "0.335",
+  "VERSION" => "0.336",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -41,7 +41,7 @@ my %FallbackPrereqs = (
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
-  "Log::ger" => "0.037",
+  "Log::ger" => "0.038",
   "Test::Exception" => 0,
   "Test::More" => "0.98",
   "strict" => 0,

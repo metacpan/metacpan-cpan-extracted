@@ -14,7 +14,7 @@
 
 package Lemonldap::NG::Manager::Build::CTrees;
 
-our $VERSION = '2.0.8';
+our $VERSION = '2.0.12';
 
 sub cTrees {
     return {
@@ -212,6 +212,8 @@ sub cTrees {
                             'oidcRPMetaDataOptionsBypassConsent',
                             'oidcRPMetaDataOptionsUserIDAttr',
                             'oidcRPMetaDataOptionsIDTokenForceClaims',
+                            'oidcRPMetaDataOptionsAccessTokenJWT',
+                            'oidcRPMetaDataOptionsAccessTokenClaims',
                             'oidcRPMetaDataOptionsAdditionalAudiences',
                             'oidcRPMetaDataOptionsRefreshToken',
                         ]
@@ -221,6 +223,8 @@ sub cTrees {
                         form  => 'simpleInputContainer',
                         nodes => [
                             'oidcRPMetaDataOptionsIDTokenSignAlg',
+                            'oidcRPMetaDataOptionsAccessTokenSignAlg',
+                            'oidcRPMetaDataOptionsUserInfoSignAlg',
                             'oidcRPMetaDataOptionsRequirePKCE',
                             'oidcRPMetaDataOptionsAllowOffline',
                             'oidcRPMetaDataOptionsAllowPasswordGrant',
@@ -252,6 +256,7 @@ sub cTrees {
                 ]
             },
             'oidcRPMetaDataMacros',
+            'oidcRPMetaDataScopeRules',
             {
                 title => 'oidcRPMetaDataOptionsDisplay',
                 form  => 'simpleInputContainer',

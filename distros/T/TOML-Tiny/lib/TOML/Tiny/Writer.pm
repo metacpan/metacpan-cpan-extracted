@@ -1,5 +1,5 @@
 package TOML::Tiny::Writer;
-$TOML::Tiny::Writer::VERSION = '0.12';
+$TOML::Tiny::Writer::VERSION = '0.13';
 use strict;
 use warnings;
 no warnings qw(experimental);
@@ -234,7 +234,7 @@ TOML::Tiny::Writer
 
 =head1 VERSION
 
-version 0.12
+version 0.13
 
 =head1 AUTHOR
 

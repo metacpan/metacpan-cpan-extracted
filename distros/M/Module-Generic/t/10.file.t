@@ -464,6 +464,41 @@ diag( "Temporary directory created is: $tmpdir9" ) if( $DEBUG );
 # my $tmpfile11 = $this->new_tempfile( suffix => ".txt", tmpdir => 1, cleanup => 0 );
 # diag( "Temporary file is '$tmpfile11'." );
 
+my $f7 = file( '/some/where/my/file.txt', debug => $DEBUG );
+isa_ok( $f7, 'Module::Generic::File' );
+my $frags = $f7->split;
+isa_ok( $frags, 'Module::Generic::Array', 'split returns Module::Generic::Array object' );
+# diag( "Fragments are: '", join( "', '", @$frags ), "'" );
+is( $frags->length, 5, 'total fragments' );
+is( $frags->last, 'file.txt', 'last fragment' );
+
+my $cwd = cwd();
+my $cwd_n = file( $cwd )->split->length;
+my $f8 = file( './here/we/go/again.txt', debug => $DEBUG );
+$frags = $f8->split;
+# diag( "Fragments are: '", join( "', '", @$frags ), "'" );
+is( $frags->length, $cwd_n + 4, 'total fragments for relative path' );
+
+my $f8 = $cwd->join( $cwd, qw( here we go once more.txt ) );
+my $f8_dirs = File::Spec->catdir( $cwd, qw( here we go once ) );
+my $f8_check = File::Spec->catpath( $f8->volume, $f8_dirs, 'more.txt' );
+is( "$f8", $f8_check, 'join' );
+
+# changing the file extension; new in v0.1.3
+my $f9 = file( "/some/where/file.txt" );
+my $f10 = $f9->extension( 'pl' );
+is( "$f10", '/some/where/file.pl', 'changing extension' );
+my $f11 = $f9->extension( undef() );
+is( "$f11", '/some/where/file', 'removing extension' );
+
+my $frags = $f9->fragments;
+isa_ok( $frags, 'Module::Generic::Array', 'fragments() returns an array object' );
+is( $frags->length, 3, 'fragments() returned array length' );
+is( $frags->first, 'some', 'fragments() value' );
+my $f12 = $f9->parent;
+my $f13 = $f9->join( $f12, qw( in time ) );
+is( "$f13", File::Spec->catfile( $f9->volume, File::Spec->catdir( @{$f12->fragments}, 'in' ), 'time' ), 'join with object in array' );
+
 done_testing();
 
 

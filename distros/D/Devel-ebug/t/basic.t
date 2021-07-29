@@ -6,7 +6,6 @@ use Test::More tests => 36;
 use Devel::ebug;
 
 my $ebug = Devel::ebug->new;
-$ebug->backend("$^X bin/ebug_backend_perl");
 $ebug->program("corpus/calc.pl");
 $ebug->load;
 

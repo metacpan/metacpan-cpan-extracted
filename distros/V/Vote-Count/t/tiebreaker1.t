@@ -77,7 +77,7 @@ subtest 'object tiebreakers' => sub {
 'borda_all returns choice that won (different winner than borda on active!)'
   );
   my @resolve4 =
-    sort $I5->TieBreaker( 'approval', $active, ( 'VANILLA', 'CHOCOLATE' ) );
+    sort $I5->TieBreaker( 'Approval', $active, ( 'VANILLA', 'CHOCOLATE' ) );
   is_deeply(
     \@resolve4,
     [ 'CHOCOLATE', 'VANILLA' ],
@@ -93,24 +93,14 @@ subtest 'object tiebreakers' => sub {
 
   my @resolve7 =
     $I5->TieBreaker( 'all', $active, ( 'VANILLA', 'ROCKYROAD' ) );
-
-  # note( Dumper @resolve7 );
-
   is( @resolve7, 0, 'all returns an empty array.' );
+
+  my @resolve8 =
+    $I5->TieBreaker( 'topcount_active', $active, ( 'VANILLA', 'ROCKYROAD' ) );
+  is_deeply( \@resolve8, ['VANILLA'], 'topcount_active' );
+  my @resolve9 =
+    $I5->TieBreaker( 'topcount_active', $active, ( 'VANILLA', 'CHOCOLATE' ) );
+  is( @resolve9, 2, 'topcount_active with choices that tie returns both' );
 };
 
-# todo 'GrandJunction' => sub {
-#   my $result = $ties->GrandJunctionRank( );
-#   ok $result;
-#   note Dumper $result;
-# };
-
 done_testing();
-
-=pod
-sub TopCount ( $self, $active = undef, $safe=0 ) {
-  # An STV method was performing a TopCount to reset the topchoices
-  # after elimination. Decided it was better to check here.
-  unless( keys( $self->Active()->%* ) or defined( $active) ) {
-    return { 'error' => 'no active choices'};
-  }

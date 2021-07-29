@@ -11,7 +11,7 @@ requires "Symbol" => "0";
 requires "Test::More" => "0";
 requires "Text::Balanced" => "0";
 requires "Time::Piece" => "0";
-requires "Yancy" => "1.067";
+requires "Yancy" => "1.074";
 requires "perl" => "5.028";
 
 on 'test' => sub {

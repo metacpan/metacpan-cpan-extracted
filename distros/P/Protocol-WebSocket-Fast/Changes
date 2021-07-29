@@ -1,4 +1,6 @@
-1.2.2    xx.xx.2021
+1.2.3    xx.xx.2021
+           - internal improvements
+1.2.2    02.07.2021
            - fix compilation warnings
 1.2.1    19.04.2021
            - add MANIFEST.SKIP

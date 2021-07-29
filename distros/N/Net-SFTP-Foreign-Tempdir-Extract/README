@@ -1,15 +1,302 @@
-pod2text Net::SFTP::Foreign::Tempdir::Extract.pm > README
+# File: lib/Net/SFTP/Foreign/Tempdir/Extract.pm
 
-If this is still here it means the programmer was too lazy to create the readme file.
+## NAME
 
-You can create it now by using the command shown above from this directory.
+Net::SFTP::Foreign::Tempdir::Extract - Secure FTP client integrating Path::Class, Tempdir, and Archive Extraction
 
-At the very least you should be able to use this set of instructions
-to install the module...
+## SYNOPSIS
 
-perl Makefile.PL
-make
-make test
-make install
+    use Net::SFTP::Foreign::Tempdir::Extract;
+    my $sftp = Net::SFTP::Foreign::Tempdir::Extract->new(
+                                                         host   => $host,
+                                                         user   => $user,
+                                                         match  => qr/\.zip\Z/,
+                                                         backup => './backup', #default is not to backup
+                                                         delete => 1,          #default is not to delete
+                                                        );
+    my $file = $sftp->next;
 
-If you are on a windows box you should use 'nmake' rather than 'make'.
+## DESCRIPTION
+
+Secure FTP client which downloads files locally to a temp directory for operations and automatically cleans up all temp files after variables are out of scope.
+
+This package assume SSH keys are correctly installed on local account and remote server.
+
+## USAGE
+
+### File Downloader
+
+This is a simple file downloader implementation
+
+    use Net::SFTP::Foreign::Tempdir::Extract;
+    my $sftp = Net::SFTP::Foreign::Tempdir::Extract->new(host=>$remote_host, user=>$remote_user);
+    my $file = $sftp->download($remote_folder, $remote_filename);
+
+### File Watcher
+
+This is a simple file watcher implementation
+
+    use Net::SFTP::Foreign::Tempdir::Extract;
+    my $sftp = Net::SFTP::Foreign::Tempdir::Extract->new(
+                                                         host=>'remote_server',
+                                                         user=>'remote_account',
+                                                         match=>qr/\.zip\Z/,
+                                                         folder=>'/remote_folder'
+                                                        );
+    my $file = $sftp->next or exit;        #nothing to process so exit
+    print "$file";                       #process file here
+
+### Subclass
+
+This is a typical subclass implementation for a particular infrastructure
+
+    {
+      package My::SFTP;
+      use base qw{Net::SFTP::Foreign::Tempdir::Extract};
+      sub host   {'remote_server.domain.tld'};
+      sub folder {'/remote_folder'};
+      sub match  {qr/\.zip\Z/};
+      sub backup {time};
+      1;
+    }
+
+    my $sftp = My::SFTP->new;
+    while (my $file = $sftp->next) {
+      printf "File %s is a %s\n", "$file", ref($file);
+    }
+
+Which outputs something like this.
+
+    File /tmp/hwY9jVeYo3/file1.zip is a Net::SFTP::Foreign::Tempdir::Extract::File
+    File /tmp/ytWaYdPXuD/file2.zip is a Net::SFTP::Foreign::Tempdir::Extract::File
+    File /tmp/JrsrkleBOy/file3.zip is a Net::SFTP::Foreign::Tempdir::Extract::File
+
+## CONSTRUCTOR
+
+### new
+
+## METHODS
+
+### download
+
+Downloads the named file in the folder.
+
+    my $file = $sftp->download('remote_file.zip');                   #isa Net::SFTP::Foreign::Tempdir::Extract::File
+    my $file = $sftp->download('/remote_folder', 'remote_file.zip'); #  which isa Path::Class::File object with an extract method
+
+### next
+
+Downloads the next file in list and saves it locally to a temporary folder. Returns a [Path::Class::File](https://metacpan.org/pod/Path::Class::File) object or undef if there are no more files.
+
+    my $file = $sftp->next or exit;  #get file or exit
+
+    while (my $file = $sftp->next) {
+      print "$file";
+    }
+
+### list
+
+Returns list of filenames remaining to be processed that match the folder and regular expression
+
+Note: List is shifted for each call to next method
+
+### upload
+
+Uploads file to the folder and returns the count of uploaded files.
+
+    $sftp->folder("/remote_folder"); #or set on construction
+    $sftp->upload('local_file.zip');
+    $sftp->upload('local_file1.zip', 'local_file2.zip');
+
+The upload method is a simple wrapper around Net::SFTP::Foreign->mput that is parallel to download.
+
+## PROPERTIES
+
+### host
+
+SFTP server host name.
+
+    $sftp->host("");           #default
+
+### user
+
+SFTP user name (defaults to current user)
+
+    $sftp->user(undef);        #default
+
+### port
+
+SFTP port number (defaults to undef not passed through)
+
+    $sftp->port(undef);        #default
+
+### options
+
+SSH options passed to the more property of [Net::SFTP::Foreign](https://metacpan.org/pod/Net::SFTP::Foreign) as an array reference.
+
+    $sftp->options(['-q']);    #default
+    $sftp->options([]);        #no options
+    $sftp->options(['-v']);    #verbose
+
+### folder
+
+Folder on remote SFTP server.
+
+    $sftp->folder("/home/user/download");
+
+Note: Some SFTP servers put clients in a change rooted environment.
+
+### match
+
+Regular Expression to match file names for the next iterator
+
+    $sftp->match(qr/\Aremote_file\.zip\Z/);   #exact file
+    $sftp->match(qr/\.zip\Z/);                #any zip file
+    $sftp->match(undef);                      #reset to default - all files
+
+### backup
+
+Sets or returns the backup folder property.
+
+    $sftp->backup("");         #don't backup
+    $sftp->backup("./folder"); #backup to folder
+
+Note: If configured, backup overrides delete option.
+
+### delete
+
+Sets or returns the delete boolean property.
+
+    $sftp->delete(0);          #don't delete
+    $sftp->delete(1);          #delete after downloaded
+
+Note: Ineffective when backup option is configured.
+
+## OBJECT ACCESSORS
+
+### sftp
+
+Returns a cached connected [Net::SFTP::Foreign](https://metacpan.org/pod/Net::SFTP::Foreign) object
+
+## BUGS
+
+Send email to author and log on RT.
+
+## SUPPORT
+
+DavisNetworks.com supports all Perl applications including this package.
+
+### Testing
+
+This packages relies on the SSH keys to be operational for the local account.  To test your SSH keys from the command line type  \`sftp user@server\`. If this command prompts the user for a password, then your SSH keys are not installed correctly.  You cannot reliably test with \`ssh user@server\` as the remote administrator may have disabled the terminal service over SSH.
+
+## AUTHOR
+
+    Michael R. Davis
+    CPAN ID: MRDVT
+
+## COPYRIGHT AND LICENSE
+
+MIT License
+
+Copyright (c) 2021 Michael R. Davis
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+## SEE ALSO
+
+### Building Blocks
+
+[Path::Class::File](https://metacpan.org/pod/Path::Class::File), [Net::SFTP::Foreign](https://metacpan.org/pod/Net::SFTP::Foreign), [File::Tempdir](https://metacpan.org/pod/File::Tempdir)
+
+# File: lib/Net/SFTP/Foreign/Tempdir/Extract/File.pm
+
+## NAME
+
+Net::SFTP::Foreign::Tempdir::Extract::File - Path::Class::File with an extract method
+
+## SYNOPSIS
+
+    use Net::SFTP::Foreign::Tempdir::Extract;
+    my $sftp = Net::SFTP::Foreign::Tempdir::Extract->new(user=>$user, match=>qr/\.zip\Z/);
+    my $file = $sftp->next; # isa Net::SFTP::Foreign::Tempdir::Extract::File
+
+## DESCRIPTION
+
+Net::SFTP::Foreign::Tempdir::Extract::File is a convince wrapper around [Path::Class](https://metacpan.org/pod/Path::Class), [Archive::Extract](https://metacpan.org/pod/Archive::Extract) and [File::Tempdir](https://metacpan.org/pod/File::Tempdir)
+
+## USAGE
+
+    my $archive = Net::SFTP::Foreign::Tempdir::Extract::File->new( $path, $filename );
+    my @files = $archive->extract; #array of Net::SFTP::Foreign::Tempdir::Extract::File files
+
+### extract
+
+Extracts tar.gz and Zip files to temporary directory (any format supported by [Archive::Extract](https://metacpan.org/pod/Archive::Extract))
+
+    my @files = $archive->extract; #list of Net::SFTP::Foreign::Tempdir::Extract::File files
+    my $files = $archive->extract; #array reference of Net::SFTP::Foreign::Tempdir::Extract::File files
+
+Note: These files are temporary and will be cleaned up when the file object variable goes out of scope.
+
+## TODO
+
+Support other archive formats besides zip
+
+## BUGS
+
+Send email to author and log on RT.
+
+## SUPPORT
+
+DavisNetworks.com supports all Perl applications including this package.
+
+## AUTHOR
+
+    Michael R. Davis
+    CPAN ID: MRDVT
+
+## COPYRIGHT AND LICENSE
+
+MIT License
+
+Copyright (c) 2021 Michael R. Davis
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+## SEE ALSO
+
+[Path::Class](https://metacpan.org/pod/Path::Class), [File::Tempdir](https://metacpan.org/pod/File::Tempdir), [Archive::Extract](https://metacpan.org/pod/Archive::Extract)
+

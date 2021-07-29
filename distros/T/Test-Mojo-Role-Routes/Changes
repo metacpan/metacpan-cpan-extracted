@@ -1,4 +1,10 @@
 Revision history for Test-Mojo-Role-Routes
 
+0.03  2021-07-19 13:08:48 CDT
+    - Add Role::Tiny dependency.
+
+0.02  2021-07-15 21:58:03 CDT
+    - Updated dependencies.
+
 0.01  2021-07-08 11:44:27 CDT
-    - Initial release
+    - Initial release.

@@ -1,0 +1,806 @@
+=encoding UTF-8
+
+=head1 NAME
+
+TCOD - FFI bindings for libtcod
+
+=head1 SYNOPSIS
+
+    use TCOD;
+    use File::Share 'dist_file';
+
+    use constant {
+        WIDTH  => 80,
+        HEIGHT => 60,
+    };
+
+    my $tileset = TCOD::Tileset->load_tilesheet(
+        path    => dist_file( TCOD => 'fonts/dejavu10x10_gs_tc.png' ),
+        columns => 32,
+        rows    => 8,
+        charmap => TCOD::CHARMAP_TCOD,
+    );
+
+    my $context = TCOD::Context->new(
+        columns => WIDTH,
+        rows    => HEIGHT,
+        tileset => $tileset,
+    );
+
+    my $console = $context->new_console;
+
+    while (1) {
+        $console->clear;
+        $console->print( 0, 0, 'Hello World!' );
+        $context->present( $console );
+
+        my $iter = TCOD::Event::wait;
+        while ( my $event = $iter->() ) {
+            $context->convert_event($event);
+            print $event->as_string . "\n";
+            exit if $event->type eq 'QUIT';
+        }
+    }
+
+=head1 DESCRIPTION
+
+TCOD offers Perl bindings to libtcod, a library for developing roguelike games.
+
+If you're getting started, see L<TCOD::Context> to manage rendering contexts
+and L<TCOD::Tileset> to load custom fonts to display. L<TCOD::Event> can be
+used to interact with input and system events. If you want to calculate
+line-of-sight within a map you can use L<TCOD::Map>, which can also be used
+by L<TCOD::Path> for path-finding.
+
+=head2 On Stability
+
+This distribution is currently B<experimental>, and as such, its API might
+still change without warning. Any change, breaking or not, will be noted in
+the change log, so if you wish to use it, please pin your dependencies and
+make sure to check the change log before upgrading.
+
+=head1 FUNCTIONS
+
+=head2 get_error
+
+    $string = TCOD::get_error;
+
+Get the current error message, if any.
+
+Some functions (eg. L<TCOD::Context::new|TCOD::Context/new> will set this
+string on error. When an error is indicated, you can use this method to
+retrieve the error.
+
+The string returned by this function is only meaningful if an error has been
+indicated by some other function, and will only remain meaningful until a new
+function that uses this mechanism is called.
+
+=head1 ENUMS
+
+The enums listed below are available as constants like the ones defined using
+L<constant>, which means the same caveats apply here.
+
+To provide introspection into the values of the enums, they are also made
+available as package variables with the names of each enum. This makes it
+possible to get the name of a value in a given enum with code like the
+following:
+
+    say $TCOD::Alignment{ TCOD::LEFT }; # Prints 'LEFT'
+
+=head2 Alignment
+
+=over
+
+=item * TCOD::LEFT
+
+=item * TCOD::RIGHT
+
+=item * TCOD::CENTER
+
+=back
+
+=head2 Charmap
+
+=over
+
+=item * TCOD::CHARMAP_TCOD
+
+=item * TCOD::CHARMAP_CP437
+
+=back
+
+=head2 Renderer
+
+=over
+
+=item * TCOD::RENDERER_GLSL
+
+=item * TCOD::RENDERER_OPENGL
+
+=item * TCOD::RENDERER_SDL
+
+=item * TCOD::RENDERER_SDL2
+
+=item * TCOD::RENDERER_OPENGL2
+
+=item * TCOD::NB_RENDERERS
+
+=back
+
+=head2 BackgroundFlag
+
+This flag is used by most functions that modify a cell background colour. It
+defines how the console's current background color is used to modify the
+cell's existing background color.
+
+See the documentation for L<TCOD::Color|TCOD::Color/COLOR ARITHMETIC> for
+details on how color arithmetic works when referenced below.
+
+When equations are listed below, these are applied to each individual
+component in turn, with C<new> being the component for the new color, C<old>
+being the one for the current one, and C<white> standing in for the maximum
+value for a color component (255).
+
+=over
+
+=item * TCOD::BKGND_NONE
+
+The cell's background is not modified.
+
+=item * TCOD::BKGND_SET
+
+The cell's background is replaced with the new color.
+
+=item * TCOD::BKGND_MULTIPLY
+
+The cell's background is multiplied with the new color.
+
+=item * TCOD::BKGND_LIGHTEN
+
+Each of the components of the cell's background is replaced with the
+respective component of the new color if it is lighter.
+
+=item * TCOD::BKGND_DARKEN
+
+Each of the components of the cell's background is replaced with the
+respective component of the new color if it is darker.
+
+=item * TCOD::BKGND_SCREEN
+
+The cell's background color is modified according to the following operation:
+
+    white - ( white - old ) * ( white - new )
+
+=item * TCOD::BKGND_COLOR_DODGE
+
+The cell's background color is modified according to the following operation:
+
+    new / ( white - old )
+
+=item * TCOD::BKGND_COLOR_BURN
+
+The cell's background color is modified according to the following operation:
+
+    white - ( white - old ) / new
+
+=item * TCOD::BKGND_ADD
+
+The new color is added to the cell's background.
+
+=item * TCOD::BKGND_ADDALPHA
+
+Use this as a macro with a float parameter between 0 and 1. The cell's
+background color is modified according to the following operation:
+
+    old + alpha * new
+
+=item * TCOD::BKGND_BURN
+
+The cell's background color is modified according to the following operation:
+
+    old + new - white
+
+=item * TCOD::BKGND_OVERLAY
+
+The cell's background color is modified according to the following operation:
+
+    2 * new * old                                 # if the component is >= 128
+    white - 2 * ( white - new ) * ( white - old ) # if the component is <  128
+
+=item * TCOD::BKGND_ALPHA
+
+Use this as a macro with a float parameter between 0 and 1. The cell's
+background color is modified according to the following operation:
+
+    ( 1 - alpha ) * old + alpha * ( new - old )
+
+=item * TCOD::BKGND_DEFAULT
+
+Use the console's default background flag. See
+L<TCOD::Console::set_background_flag|TCOD::Console/set_background_flag>.
+
+=back
+
+=head2 ColorControl
+
+=over
+
+=item * TCOD::COLCTRL_1
+
+=item * TCOD::COLCTRL_2
+
+=item * TCOD::COLCTRL_3
+
+=item * TCOD::COLCTRL_4
+
+=item * TCOD::COLCTRL_5
+
+=item * TCOD::COLCTRL_NUMBER
+
+=item * TCOD::COLCTRL_FORE_RGB
+
+=item * TCOD::COLCTRL_BACK_RGB
+
+=item * TCOD::COLCTRL_STOP
+
+=back
+
+=head2 Keycode
+
+=over
+
+=item * TCOD::K_NONE
+
+=item * TCOD::K_ESCAPE
+
+=item * TCOD::K_BACKSPACE
+
+=item * TCOD::K_TAB
+
+=item * TCOD::K_ENTER
+
+=item * TCOD::K_SHIFT
+
+=item * TCOD::K_CONTROL
+
+=item * TCOD::K_ALT
+
+=item * TCOD::K_PAUSE
+
+=item * TCOD::K_CAPSLOCK
+
+=item * TCOD::K_PAGEUP
+
+=item * TCOD::K_PAGEDOWN
+
+=item * TCOD::K_END
+
+=item * TCOD::K_HOME
+
+=item * TCOD::K_UP
+
+=item * TCOD::K_LEFT
+
+=item * TCOD::K_RIGHT
+
+=item * TCOD::K_DOWN
+
+=item * TCOD::K_PRINTSCREEN
+
+=item * TCOD::K_INSERT
+
+=item * TCOD::K_DELETE
+
+=item * TCOD::K_LWIN
+
+=item * TCOD::K_RWIN
+
+=item * TCOD::K_APPS
+
+=item * TCOD::K_0
+
+=item * TCOD::K_1
+
+=item * TCOD::K_2
+
+=item * TCOD::K_3
+
+=item * TCOD::K_4
+
+=item * TCOD::K_5
+
+=item * TCOD::K_6
+
+=item * TCOD::K_7
+
+=item * TCOD::K_8
+
+=item * TCOD::K_9
+
+=item * TCOD::K_KP0
+
+=item * TCOD::K_KP1
+
+=item * TCOD::K_KP2
+
+=item * TCOD::K_KP3
+
+=item * TCOD::K_KP4
+
+=item * TCOD::K_KP5
+
+=item * TCOD::K_KP6
+
+=item * TCOD::K_KP7
+
+=item * TCOD::K_KP8
+
+=item * TCOD::K_KP9
+
+=item * TCOD::K_KPADD
+
+=item * TCOD::K_KPSUB
+
+=item * TCOD::K_KPDIV
+
+=item * TCOD::K_KPMUL
+
+=item * TCOD::K_KPDEC
+
+=item * TCOD::K_KPENTER
+
+=item * TCOD::K_F1
+
+=item * TCOD::K_F2
+
+=item * TCOD::K_F3
+
+=item * TCOD::K_F4
+
+=item * TCOD::K_F5
+
+=item * TCOD::K_F6
+
+=item * TCOD::K_F7
+
+=item * TCOD::K_F8
+
+=item * TCOD::K_F9
+
+=item * TCOD::K_F10
+
+=item * TCOD::K_F11
+
+=item * TCOD::K_F12
+
+=item * TCOD::K_NUMLOCK
+
+=item * TCOD::K_SCROLLLOCK
+
+=item * TCOD::K_SPACE
+
+=item * TCOD::K_CHAR
+
+=item * TCOD::K_TEXT
+
+=back
+
+=head2 Char
+
+=over
+
+=item * TCOD::CHAR_HLINE
+
+=item * TCOD::CHAR_VLINE
+
+=item * TCOD::CHAR_NE
+
+=item * TCOD::CHAR_NW
+
+=item * TCOD::CHAR_SE
+
+=item * TCOD::CHAR_SW
+
+=item * TCOD::CHAR_TEEW
+
+=item * TCOD::CHAR_TEEE
+
+=item * TCOD::CHAR_TEEN
+
+=item * TCOD::CHAR_TEES
+
+=item * TCOD::CHAR_CROSS
+
+=item * TCOD::CHAR_DHLINE
+
+=item * TCOD::CHAR_DVLINE
+
+=item * TCOD::CHAR_DNE
+
+=item * TCOD::CHAR_DNW
+
+=item * TCOD::CHAR_DSE
+
+=item * TCOD::CHAR_DSW
+
+=item * TCOD::CHAR_DTEEW
+
+=item * TCOD::CHAR_DTEEE
+
+=item * TCOD::CHAR_DTEEN
+
+=item * TCOD::CHAR_DTEES
+
+=item * TCOD::CHAR_DCROSS
+
+=item * TCOD::CHAR_BLOCK1
+
+=item * TCOD::CHAR_BLOCK2
+
+=item * TCOD::CHAR_BLOCK3
+
+=item * TCOD::CHAR_ARROW_N
+
+=item * TCOD::CHAR_ARROW_S
+
+=item * TCOD::CHAR_ARROW_E
+
+=item * TCOD::CHAR_ARROW_W
+
+=item * TCOD::CHAR_ARROW2_N
+
+=item * TCOD::CHAR_ARROW2_S
+
+=item * TCOD::CHAR_ARROW2_E
+
+=item * TCOD::CHAR_ARROW2_W
+
+=item * TCOD::CHAR_DARROW_H
+
+=item * TCOD::CHAR_DARROW_V
+
+=item * TCOD::CHAR_CHECKBOX_UNSET
+
+=item * TCOD::CHAR_CHECKBOX_SET
+
+=item * TCOD::CHAR_RADIO_UNSET
+
+=item * TCOD::CHAR_RADIO_SET
+
+=item * TCOD::CHAR_SUBP_NW
+
+=item * TCOD::CHAR_SUBP_NE
+
+=item * TCOD::CHAR_SUBP_N
+
+=item * TCOD::CHAR_SUBP_SE
+
+=item * TCOD::CHAR_SUBP_DIAG
+
+=item * TCOD::CHAR_SUBP_E
+
+=item * TCOD::CHAR_SUBP_SW
+
+=item * TCOD::CHAR_SMILIE
+
+=item * TCOD::CHAR_SMILIE_INV
+
+=item * TCOD::CHAR_HEART
+
+=item * TCOD::CHAR_DIAMOND
+
+=item * TCOD::CHAR_CLUB
+
+=item * TCOD::CHAR_SPADE
+
+=item * TCOD::CHAR_BULLET
+
+=item * TCOD::CHAR_BULLET_INV
+
+=item * TCOD::CHAR_MALE
+
+=item * TCOD::CHAR_FEMALE
+
+=item * TCOD::CHAR_NOTE
+
+=item * TCOD::CHAR_NOTE_DOUBLE
+
+=item * TCOD::CHAR_LIGHT
+
+=item * TCOD::CHAR_EXCLAM_DOUBLE
+
+=item * TCOD::CHAR_PILCROW
+
+=item * TCOD::CHAR_SECTION
+
+=item * TCOD::CHAR_POUND
+
+=item * TCOD::CHAR_MULTIPLICATION
+
+=item * TCOD::CHAR_FUNCTION
+
+=item * TCOD::CHAR_RESERVED
+
+=item * TCOD::CHAR_HALF
+
+=item * TCOD::CHAR_ONE_QUARTER
+
+=item * TCOD::CHAR_COPYRIGHT
+
+=item * TCOD::CHAR_CENT
+
+=item * TCOD::CHAR_YEN
+
+=item * TCOD::CHAR_CURRENCY
+
+=item * TCOD::CHAR_THREE_QUARTERS
+
+=item * TCOD::CHAR_DIVISION
+
+=item * TCOD::CHAR_GRADE
+
+=item * TCOD::CHAR_UMLAUT
+
+=item * TCOD::CHAR_POW1
+
+=item * TCOD::CHAR_POW3
+
+=item * TCOD::CHAR_POW2
+
+=item * TCOD::CHAR_BULLET_SQUARE
+
+=back
+
+=head2 FontFlag
+
+=over
+
+=item * TCOD::FONT_LAYOUT_ASCII_INCOL
+
+=item * TCOD::FONT_LAYOUT_ASCII_INROW
+
+=item * TCOD::FONT_TYPE_GREYSCALE
+
+=item * TCOD::FONT_TYPE_GRAYSCALE
+
+=item * TCOD::FONT_LAYOUT_TCOD
+
+=item * TCOD::FONT_LAYOUT_CP437
+
+=back
+
+=head2 FOV
+
+=over
+
+=item * TCOD::FOV_BASIC
+
+=item * TCOD::FOV_DIAMOND
+
+=item * TCOD::FOV_SHADOW
+
+=item * TCOD::FOV_PERMISSIVE_0
+
+=item * TCOD::FOV_PERMISSIVE_1
+
+=item * TCOD::FOV_PERMISSIVE_2
+
+=item * TCOD::FOV_PERMISSIVE_3
+
+=item * TCOD::FOV_PERMISSIVE_4
+
+=item * TCOD::FOV_PERMISSIVE_5
+
+=item * TCOD::FOV_PERMISSIVE_6
+
+=item * TCOD::FOV_PERMISSIVE_7
+
+=item * TCOD::FOV_PERMISSIVE_8
+
+=item * TCOD::FOV_RESTRICTIVE
+
+=item * TCOD::FOV_SYMMETRIC_SHADOWCAST
+
+=item * TCOD::NB_FOV_ALGORITHMS
+
+=back
+
+=head2 RandomAlgo
+
+=over
+
+=item * TCOD::RNG_MT
+
+=item * TCOD::RNG_CMWC
+
+=back
+
+=head2 Distribution
+
+These values are used by L<TCOD::Random> to generate random numbers.
+
+=over
+
+=item * TCOD::DISTRIBUTION_LINEAR
+
+This is the default distribution. It will return a number from a range
+min-max. The numbers will be evenly distributed, ie, each number from the
+range has the exact same chance of being selected.
+
+=item * TCOD::DISTRIBUTION_GAUSSIAN
+
+This distribution does not have minimum and maximum values. Instead, a mean
+and a standard deviation are used. The mean is the central value. It will
+appear with the greatest frequency. The farther away from the mean, the less
+the probability of appearing the possible results have. Although extreme
+values are possible, 99.7% of the results will be within the radius of 3
+standard deviations from the mean. So, if the mean is 0 and the standard
+deviation is 5, the numbers will mostly fall in the (-15,15) range.
+
+=item * TCOD::DISTRIBUTION_GAUSSIAN_RANGE
+
+This one takes minimum and maximum values. Under the hood, it computes the
+mean (which falls right between the minimum and maximum) and the standard
+deviation and applies a standard Gaussian distribution to the values. The
+difference is that the result is always guaranteed to be in the min-max
+range.
+
+=item * TCOD::DISTRIBUTION_GAUSSIAN_INVERSE
+
+Essentially, this is the same as C<TCOD::DISTRIBUTION_GAUSSIAN>. The
+difference is that the values near +3 and -3 standard deviations from the
+mean have the highest possibility of appearing, while the mean has the lowest.
+
+=item * TCOD::DISTRIBUTION_GAUSSIAN_RANGE_INVERSE
+
+Essentially, this is the same as C<TCOD::DISTRIBUTION_GAUSSIAN_RANGE>, but
+the min and max values have the greatest probability of appearing, while the
+values between them, the lowest.
+
+=back
+
+=head2 NoiseType
+
+=over
+
+=item * TCOD::NOISE_PERLIN
+
+=item * TCOD::NOISE_SIMPLEX
+
+=item * TCOD::NOISE_WAVELET
+
+=item * TCOD::NOISE_DEFAULT
+
+=back
+
+=head2 Event
+
+=over
+
+=item * TCOD::EVENT_NONE
+
+=item * TCOD::EVENT_KEY_PRESS
+
+=item * TCOD::EVENT_KEY_RELEASE
+
+=item * TCOD::EVENT_MOUSE_MOVE
+
+=item * TCOD::EVENT_MOUSE_PRESS
+
+=item * TCOD::EVENT_MOUSE_RELEASE
+
+=item * TCOD::EVENT_KEY
+
+=item * TCOD::EVENT_MOUSE
+
+=item * TCOD::EVENT_ANY
+
+=back
+
+=head1 SHARE DATA
+
+This distribution bundles some data to make development simpler.
+
+You can make use of this data with a distribution like L<File::Share>,
+like in this example:
+
+    use File::Share 'dist_file';
+    my $path = dist_file TCOD => 'fonts/dejavu10x10_gs_tc.png';
+
+The C<fonts> directory contains antialiased fonts that can be used with
+TCOD. The names of the font files are of the form:
+
+    <font_name><font_size>_<type>_<layout>.png
+
+    <type>   : aa 32 bits png with alpha channel
+               gs 24 bits or greyscale PNG
+
+    <layout> : as standard ASCII layout
+               ro standard ASCII layout in row
+               tc TCOD layout
+
+The C<terminal8x8> font is provided is every possible format as en example.
+
+The structure of shared files is reproduced below.
+
+    share
+    └── fonts
+        ├── dejavu10x10_gs_tc.png
+        ├── dejavu12x12_gs_tc.png
+        ├── dejavu16x16_gs_tc.png
+        ├── dejavu8x8_gs_tc.png
+        ├── dejavu_wide12x12_gs_tc.png
+        ├── dejavu_wide16x16_gs_tc.png
+        ├── terminal10x10_gs_tc.png
+        ├── terminal10x16_gs_ro.png
+        ├── terminal10x16_gs_tc.png
+        ├── terminal10x18_gs_ro.png
+        ├── terminal12x12_gs_ro.png
+        ├── terminal16x16_gs_ro.png
+        ├── terminal7x7_gs_tc.png
+        ├── terminal8x12_gs_ro.png
+        ├── terminal8x12_gs_tc.png
+        ├── terminal8x14_gs_ro.png
+        ├── terminal8x8_aa_ro.png
+        ├── terminal8x8_aa_tc.png
+        ├── terminal8x8_gs_ro.png
+        ├── terminal8x8_gs_tc.png
+        └── ucs-fonts
+            └── 4x6.bdf
+
+=head1 SEE ALSO
+
+=over
+
+=item L<TCOD::Color>
+
+=item L<TCOD::ColorRGBA>
+
+=item L<TCOD::Console>
+
+=item L<TCOD::Context>
+
+=item L<TCOD::Dijkstra>
+
+=item L<TCOD::Event>
+
+=item L<TCOD::Image>
+
+=item L<TCOD::Key>
+
+=item L<TCOD::Map>
+
+=item L<TCOD::Mouse>
+
+=item L<TCOD::Noise>
+
+=item L<TCOD::Path>
+
+=item L<TCOD::Random>
+
+=item L<TCOD::Sys>
+
+=item L<TCOD::Tileset>
+
+=back
+
+Also, these other external resources might be useful:
+
+=over
+
+=item L<libtcod|https://github.com/libtcod/libtcod>
+
+=item L<rogueliketutorials.com|https://rogueliketutorials.com>
+
+=item L</r/roguelikedev|https://www.reddit.com/r/roguelikedev>
+
+=item L<RogueBasin|http://roguebasin.com>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2021 José Joaquín Atria
+
+This library is free software; you can redistribute it and/or modify it under
+the Artistic License 2.0.

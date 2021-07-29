@@ -1,0 +1,13 @@
+requires 'X1', '1';
+requires 'X2', '2', dist => 'dist2';
+
+recommends 'X3';
+suggests 'X4';
+
+on test => sub {
+    requires 'X5';
+};
+
+feature 'name', 'desc' => sub {
+    requires 'X6';
+};

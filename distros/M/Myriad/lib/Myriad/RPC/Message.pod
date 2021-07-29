@@ -49,7 +49,7 @@ An epoch that represents when the timeout of the message.
 
 A JSON encoded string contains the argument of the procedure.
 
-=head2 resposne
+=head2 response
 
 The response to this message.
 

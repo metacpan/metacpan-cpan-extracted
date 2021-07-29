@@ -69,18 +69,17 @@ sub choose_and_add_operator {
     my $menu_addition;
     my @operators_default;
     my @operators_limited;
-    my $i = $sf->{o}{enable}{'expand_' . $clause};
     if ( $clause eq 'set' ) {
-        $menu_addition = $sf->{i}{menu_additions_set}[$i];
+        $menu_addition = $sf->{i}{menu_addition};
         @operators_default = ( " = " );
         @operators_limited = ( " = " );
     }
     else {
-        $menu_addition = '=' . $sf->{i}{menu_additions}[$i];
+        $menu_addition = '=' . $sf->{i}{menu_addition};
         @operators_default = @{$sf->{o}{G}{operators}};
         @operators_limited = ( " = ", " != ", " < ", " > ", " >= ", " <= ", "IN", "NOT IN" );
     }
-    if ( $i ) {
+    if ( $sf->{o}{enable}{'expand_' . $clause} ) {
         unshift @operators_default, $menu_addition;
     }
 
@@ -230,7 +229,7 @@ sub read_and_add_value {
     my $args = $clause . '_args';
     if ( $is_complex_value ) {
         my $ext = App::DBBrowser::Table::Extensions->new( $sf->{i}, $sf->{o}, $sf->{d} );
-        my $complex_value = $ext->complex_unit( $sql, $clause );
+        my $complex_value = $ext->complex_unit( $sql, $clause, 0 );
         if ( ! defined $complex_value ) {
             return;
         }

@@ -2,8 +2,8 @@ NAME
     List::Util::Uniq - List utilities related to finding unique items
 
 VERSION
-    This document describes version 0.002 of List::Util::Uniq (from Perl
-    distribution List-Util-Uniq), released on 2018-03-06.
+    This document describes version 0.003 of List::Util::Uniq (from Perl
+    distribution List-Util-Uniq), released on 2021-07-23.
 
 SYNOPSIS
      use List::Util::Uniq qw(uniq_adj uniq_adj_ci uniq_ci);
@@ -15,16 +15,54 @@ SYNOPSIS
 FUNCTIONS
     Not exported by default but exportable.
 
-  uniq_adj(@list) => LIST
+  uniq_adj
+    Usage:
+
+     my @uniq = uniq_adj(@list);
+
     Remove *adjacent* duplicates from list, i.e. behave more like Unix
     utility's uniq instead of List::MoreUtils's "uniq" function. Uses string
     equality test.
 
-  uniq_adj_ci(@list) => LIST
+  uniq_adj_ci
     Like "uniq_adj" except case-insensitive.
 
-  uniq_ci(@list) => LIST
-    Like "List::MoreUtils"' "uniq" except case-insensitive.
+  uniq_ci
+    Like "List::MoreUtils"' "uniq" ("uniqstr") except case-insensitive.
+
+  is_uniq
+    Usage:
+
+     my $is_uniq = is_uniq(@list);
+
+    Return true when the values in @list is unique (compared string-wise).
+    Knowing whether a list has unique values is faster using this function
+    compared to doing:
+
+     my @uniq = uniq(@list);
+     @uniq == @list;
+
+    because of short-circuiting.
+
+  is_uniq_ci
+    Like "is_uniq" except case-insensitive.
+
+  is_monovalued
+    Usage:
+
+     my $is_monovalued = is_monovalued(@list);
+
+    Examples:
+
+     is_monovalued(qw/a b c/); # => 0
+     is_monovalued(qw/a a a/); # => 1
+
+    Return true if @list contains only a single value. Returns true for
+    empty list. Undef is coerced to empty string, so "is_monovalued(undef)"
+    and "is_monovalued(undef, undef)" return true.
+
+  is_monovalued_ci
+    Like "is_monovalued" except case-insensitive.
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -48,7 +86,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2018 by perlancar@cpan.org.
+    This software is copyright (c) 2021, 2018 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

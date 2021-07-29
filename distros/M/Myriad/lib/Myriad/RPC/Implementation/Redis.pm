@@ -2,7 +2,7 @@ package Myriad::RPC::Implementation::Redis;
 
 use Myriad::Class extends => qw(IO::Async::Notifier);
 
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.010'; # VERSION
 our $AUTHORITY = 'cpan:DERIV'; # AUTHORITY
 
 =encoding utf8
@@ -83,7 +83,7 @@ async method stop () {
 
 async method create_group ($rpc) {
     unless ($rpc->{group}) {
-        await $self->redis->create_group($rpc->{stream}, $self->group_name);
+        await $self->redis->create_group($rpc->{stream}, $self->group_name, '$', 1);
         $rpc->{group} = 1;
     }
 }

@@ -1,7 +1,7 @@
 package Sah::SchemaR::perl::version;
 
-our $DATE = '2021-01-20'; # DATE
-our $VERSION = '0.035'; # VERSION
+our $DATE = '2021-07-20'; # DATE
+our $VERSION = '0.038'; # VERSION
 
 our $rschema = ["obj",[{description=>"\nUse this schema if you want to accept a version object (see <pm:version>).\nCoercion from string is provided.\n\n",isa=>"version",summary=>"Perl version object","x.perl.coerce_rules"=>["From_str::perl_version"]}],["obj"]];
 
@@ -20,7 +20,7 @@ Sah::SchemaR::perl::version - Perl version object
 
 =head1 VERSION
 
-This document describes version 0.035 of Sah::SchemaR::perl::version (from Perl distribution Sah-Schemas-Perl), released on 2021-01-20.
+This document describes version 0.038 of Sah::SchemaR::perl::version (from Perl distribution Sah-Schemas-Perl), released on 2021-07-20.
 
 =head1 DESCRIPTION
 
@@ -38,7 +38,7 @@ Source repository is at L<https://github.com/perlancar/perl-Sah-Schemas-Perl>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Sah-Schemas-Perl/issues>
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Sah-Schemas-Perl>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

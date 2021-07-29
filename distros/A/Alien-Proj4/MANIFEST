@@ -10,16 +10,5 @@ t/01-config.t
 t/02-use.t
 t/compile.t
 t/src/test.c
-xt/.perlcritic-history
-xt/01-has_versions.t
-xt/03-has_pod.t
-xt/03-test_pod.t
-xt/04-pod-coverage.t
-xt/05-manifest.t
-xt/06-critic.t
-xt/07-notabs.t
-xt/09-use_strict.t
-xt/10-changes_format.t
-xt/README.txt
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

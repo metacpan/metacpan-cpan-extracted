@@ -67,7 +67,14 @@ subtest "service command" => sub {
     wait_for_future( $command->service('Ta::')->get->{code}->() )->get;
     cmp_deeply(\@added_services_modules, ['Ta::Sibling1', 'Ta::Sibling2'], 'Added both modules');
     # Clear it for next test.
-    undef @added_services_modules;
+    @added_services_modules = ();
+
+    # Running services under the same namespace
+    wait_for_future( $command->service('Ta::*')->get->{code}->() )->get;
+    cmp_deeply(\@added_services_modules, ['Ta::Sibling1', 'Ta::Sibling2'], 'Added modules under the namespace');
+    # Clear it for next test.
+    @added_services_modules = ();
+
 
     # Command to run multiple services should not be allowed when service_name option is set
     my $srv_run_name = 'service.test.one';
@@ -100,9 +107,9 @@ sub mock_component {
     my ($component, $cmd, $test_name) = @_;
 
     $test_cmd = $test_name;
-    undef %calls;
+    %calls = ();
     $rmt_svc_cmd_called = {};
-    undef %started_components;
+    %started_components = ();
     $myriad_mod->mock($component, sub {
         my ($self) = @_;
         my $mock = Test::MockObject->new();

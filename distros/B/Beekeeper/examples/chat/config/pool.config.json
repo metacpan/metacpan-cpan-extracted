@@ -14,19 +14,19 @@
 #
 # To start a the worker pools use the "bkpr" command:
 #
-# $ ./bkpr --pool "broker" start
+# $ ./bkpr --pool "myapp-broker" start
 # $ ./bkpr --pool "myapp-A" start
 # $ ./bkpr --pool "myapp-B" start
 
 [
     {
-        "pool_id"       : "myapp-A",
-        "bus_id"        : "backend-1",
-        "description"   : "pool #1 of MyApp workers",
+        "pool_id"     : "myapp-A",
+        "bus_id"      : "backend-1",
+        "description" : "pool #1 of MyApp workers",
 
         "workers" : {
             "Beekeeper::Service::LogTail::Worker" : { "worker_count" : 1 },
-            "Beekeeper::Service::Router::Worker"  : { "worker_count" : 2 },
+            "Beekeeper::Service::Router::Worker"  : { "worker_count" : 4 },
             "MyApp::Service::Chat::Worker"        : { "worker_count" : 4 },
             "MyApp::Service::Auth::Worker"        : { "worker_count" : 2 },
         },
@@ -38,13 +38,13 @@
 
         "workers" : {
             "Beekeeper::Service::LogTail::Worker" : { "worker_count" : 1 },
-            "Beekeeper::Service::Router::Worker"  : { "worker_count" : 2 },
+            "Beekeeper::Service::Router::Worker"  : { "worker_count" : 4 },
             "MyApp::Service::Chat::Worker"        : { "worker_count" : 4 },
             "MyApp::Service::Auth::Worker"        : { "worker_count" : 2 },
         },
     },
     {
-        "pool_id"       : "broker",
+        "pool_id"       : "myapp-broker",
         "bus_id"        : "toybroker",
         "description"   : "ToyBroker",
         "workers"       :  {},

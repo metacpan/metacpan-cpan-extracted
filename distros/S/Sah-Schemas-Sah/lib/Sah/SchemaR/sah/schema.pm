@@ -1,7 +1,7 @@
 package Sah::SchemaR::sah::schema;
 
-our $DATE = '2020-05-08'; # DATE
-our $VERSION = '0.9.49.1'; # VERSION
+our $DATE = '2021-07-23'; # DATE
+our $VERSION = '0.9.50.0'; # VERSION
 
 our $rschema = ["any",[{of=>["sah::str_schema","sah::array_schema"]}],["any"]];
 
@@ -20,7 +20,7 @@ Sah::SchemaR::sah::schema -
 
 =head1 VERSION
 
-This document describes version 0.9.49.1 of Sah::SchemaR::sah::schema (from Perl distribution Sah-Schemas-Sah), released on 2020-05-08.
+This document describes version 0.9.50.0 of Sah::SchemaR::sah::schema (from Perl distribution Sah-Schemas-Sah), released on 2021-07-23.
 
 =head1 DESCRIPTION
 
@@ -50,7 +50,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

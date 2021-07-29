@@ -225,7 +225,7 @@ This file contains:
             title: "cfgLog",
             data: $scope.result ? $scope.result : ''
           });
-          return $http.post(window.confPrefix + "?cfgNum=" + $scope.currentCfg.cfgNum + ($scope.forceSave ? "&force=1" : ''), $scope.data).then(function(response) {
+          return $http.post(window.confPrefix + "?cfgNum=" + $scope.currentCfg.cfgNum + "&cfgDate=" + $scope.currentCfg.cfgDate + ($scope.forceSave ? "&force=1" : ''), $scope.data).then(function(response) {
             $scope.data.pop();
             return _checkSaveResponse(response.data);
           }, function(response) {

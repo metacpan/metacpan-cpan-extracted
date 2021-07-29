@@ -14,7 +14,7 @@
     <currencyCode>EUR</currencyCode>
     <dateCreated>2013-12-31</dateCreated>
     <productID>EekBoek</productID>
-    <productVersion>2.030.1</productVersion>
+    <productVersion>2.051</productVersion>
   </header>
   <generalLedger>
     <taxonomy>geen</taxonomy>

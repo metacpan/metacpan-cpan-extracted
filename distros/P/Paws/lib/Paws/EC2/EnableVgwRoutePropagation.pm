@@ -29,9 +29,9 @@ You shouldn't make instances of this class. Each attribute should be used as a n
 =head1 SYNOPSIS
 
     my $ec2 = Paws->service('EC2');
-    # To enable route propagation
-    # This example enables the specified virtual private gateway to propagate
-    # static routes to the specified route table.
+# To enable route propagation
+# This example enables the specified virtual private gateway to propagate static
+# routes to the specified route table.
     $ec2->EnableVgwRoutePropagation(
       'GatewayId'    => 'vgw-9a4cacf3',
       'RouteTableId' => 'rtb-22574640'
@@ -46,7 +46,10 @@ For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/ec2
 
 =head2 DryRun => Bool
 
-
+Checks whether you have the required permissions for the action,
+without actually making the request, and provides an error response. If
+you have the required permissions, the error response is
+C<DryRunOperation>. Otherwise, it is C<UnauthorizedOperation>.
 
 
 

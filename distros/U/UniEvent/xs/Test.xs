@@ -19,7 +19,7 @@ BOOT {
 
 AsyncTest* AsyncTest::new (Sv events = {}, double timeout = 1, LoopSP loop = {}) {
     if (events.is_array_ref()) RETVAL = new AsyncTest(timeout * 1000, xs::in<std::vector<string>>(events), loop);
-    else                       RETVAL = new AsyncTest(timeout * 1000, (int)Simple(events), loop);
+    else                       RETVAL = new AsyncTest(timeout * 1000, Scalar(events).number(), loop);
 }
 
 LoopSP AsyncTest::loop () {
@@ -32,7 +32,7 @@ void AsyncTest::run_once ()
 
 void AsyncTest::run_nowait ()
     
-void AsyncTest::happens (Simple arg = {}) {
-    if (arg) THIS->happens(arg.as_string());
+void AsyncTest::happens (Sv arg = {}) {
+    if (arg) THIS->happens(xs::in<string>(arg));
     else     THIS->happens();
 }

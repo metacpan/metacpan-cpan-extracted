@@ -1,0 +1,84 @@
+{
+   "abstract" : "Validator for JSON Schema Draft4 and OpenAPI Specification 3.0",
+   "author" : [
+      "Alexey Stavrov <logioniz@ya.ru>",
+      "Ivan Putintsev <uid@rydlab.ru>",
+      "Anton Fedotov <tosha.fedotov.2000@gmail.com>",
+      "Denis Ibaev <dionys@gmail.com>",
+      "Andrey Khozov <andrey@rydlab.ru>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.023, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "JSONSchema-Validator",
+   "no_index" : {
+      "directory" : [
+         "t"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Changes" : "0.19",
+            "Test::Perl::Critic" : "0",
+            "Test::Spelling" : "0.12"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "B" : "0",
+            "Carp" : "0",
+            "Cwd" : "0",
+            "Encode" : "0",
+            "File::Basename" : "0",
+            "JSON::PP" : "0",
+            "Scalar::Util" : "0",
+            "Time::Piece" : "0",
+            "URI" : "1.00",
+            "constant" : "0",
+            "overload" : "0",
+            "parent" : "0",
+            "perl" : "v5.16.0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0",
+            "perl" : "v5.16.0",
+            "utf8" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/skbkontur/perl-jsonschema-validator/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/skbkontur/perl-jsonschema-validator.git",
+         "web" : "https://github.com/skbkontur/perl-jsonschema-validator"
+      }
+   },
+   "version" : "0.002",
+   "x_generated_by_perl" : "v5.32.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.26",
+   "x_spdx_expression" : "MIT"
+}
+

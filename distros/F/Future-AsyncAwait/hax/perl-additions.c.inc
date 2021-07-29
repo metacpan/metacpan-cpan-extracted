@@ -1,4 +1,4 @@
-/* vi: set ft=c */
+/* vi: set ft=c : */
 
 #ifndef av_count
 #  define av_count(av)           (AvFILL(av) + 1)

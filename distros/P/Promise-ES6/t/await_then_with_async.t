@@ -58,6 +58,9 @@ diag "MASTER PID: $$";
     isa_ok $promise, 'Promise::ES6';
     is PromiseTest::await($promise, \@checkers), 123 * 2;
 
+    # To avoid a leak in Devel::Cover:
+    @checkers = ();
+
     waitpid $pid, 0;
 }
 

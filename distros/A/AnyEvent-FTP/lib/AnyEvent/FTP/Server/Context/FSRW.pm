@@ -8,11 +8,12 @@ use File::chdir;
 use File::ShareDir::Dist qw( dist_share );
 use File::Which qw( which );
 use File::Temp qw( tempfile );
+use Capture::Tiny qw( capture );
 
 extends 'AnyEvent::FTP::Server::Context::FS';
 
 # ABSTRACT: FTP Server client context class with full read/write access
-our $VERSION = '0.16'; # VERSION
+our $VERSION = '0.17'; # VERSION
 
 
 with 'AnyEvent::FTP::Server::Role::TransferPrep';
@@ -140,14 +141,14 @@ sub cmd_list
     use autodie;
 
     my @cmd = _shared_cmd('ls', '-l', $dir);
-    my $cmd = join ' ', @cmd;
 
     local $CWD = $self->cwd;
 
     $con->send_response(150 => "Opening ASCII mode data connection for file list");
     my $dh;
     opendir $dh, $dir;
-    $self->data->push_write(join "\015\012", split /\n/, `$cmd`);
+
+    $self->data->push_write(join "\015\012", split /\n/, scalar capture { system @cmd });
     closedir $dh;
     $self->data->push_write("\015\012");
     $self->data->push_shutdown;
@@ -363,12 +364,12 @@ AnyEvent::FTP::Server::Context::FSRW - FTP Server client context class with full
 
 =head1 VERSION
 
-version 0.16
+version 0.17
 
 =head1 SYNOPSIS
 
  use AnyEvent::FTP::Server;
-
+ 
  my $server = AnyEvent::FTP::Server->new(
    default_context => 'AnyEvent::FTP::Server::Context::FSRW',
  );
@@ -429,7 +430,7 @@ José Joaquín Atria
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Graham Ollis.
+This software is copyright (c) 2017-2021 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

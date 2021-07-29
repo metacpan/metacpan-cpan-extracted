@@ -15,6 +15,7 @@ lib/Bencher/Formatter/DeleteConstantFields.pm
 lib/Bencher/Formatter/DeleteNotesFieldIfEmpty.pm
 lib/Bencher/Formatter/DeleteSeqField.pm
 lib/Bencher/Formatter/ModuleStartup.pm
+lib/Bencher/Formatter/RenderAsBenchmarkPm.pm
 lib/Bencher/Formatter/RenderAsTextTable.pm
 lib/Bencher/Formatter/RoundNumbers.pm
 lib/Bencher/Formatter/ScaleRate.pm
@@ -31,7 +32,6 @@ lib/Bencher/Scenario/Example/CommandNotFound.pm
 lib/Bencher/Scenario/Example/MultipleArgValues/Array.pm
 lib/Bencher/Scenario/Example/MultipleArgValues/Hash.pm
 lib/Benchmark/Dumb/SimpleTime.pm
-lib/Sah/Schema/bencher/scenario.pm
 t/00-compile.t
 t/author-critic.t
 t/author-pod-coverage.t

@@ -24,8 +24,9 @@ use HTML::Selector::XPath 'selector_to_xpath';
 use HTTP::Cookies::ChromeDevTools;
 use POSIX ':sys_wait_h';
 #use Future::IO;
+use Time::HiRes ();
 
-our $VERSION = '0.66';
+our $VERSION = '0.67';
 our @CARP_NOT;
 
 # add Browser.setPermission , .grantPermission for
@@ -135,6 +136,8 @@ Don't display a browser window. Default is to display a browser
 window.
 
 =item B<host>
+
+=item B<listen_host>
 
 Set the host the browser listens on:
 
@@ -292,14 +295,6 @@ Higher or lower values can be set based on the speed of the machine. The
 process attempts to connect to the browser once each second over the duration
 of this setting.
 
-=item B<listen_host>
-
-  listen_host => '192.1.168.7'  # set an IP address for listening
-
-Specifies an IP address the launched browser process should listen on. This
-option is useful for controlling the browser from another machine on your
-network.
-
 =item B<driver>
 
   driver => $driver_object  # specify the driver object
@@ -392,6 +387,19 @@ Defaults to false (off). A true value turns syncing on.
 
 Defaults to false (off). A true value turns web resources on.
 
+=item B<json_log_file>
+
+Filename to log all JSON communications to, one line per message/event/reply
+
+=item B<json_log_fh>
+
+Filehandle to log all JSON communications to, one line per message/event/reply
+
+Open this filehandle via
+
+  open my $fh, '>:utf8', $logfilename
+      or die "Couldn't create '$logfilename': $!";
+
 =back
 
 The C<< $ENV{WWW_MECHANIZE_CHROME_TRANSPORT} >> variable can be set to a
@@ -442,8 +450,9 @@ sub build_command_line {
             push @{ $options->{ launch_arg }}, "--remote-debugging-port=$options->{ port }";
         };
 
-        if ($options->{listen_host}) {
-            push @{ $options->{ launch_arg }}, "--remote-debugging-address==$options->{ listen_host }";
+        if ($options->{listen_host} || $options->{host} ) {
+            my $host = $options->{listen_host} || $options->{host};
+            push @{ $options->{ launch_arg }}, "--remote-debugging-address=$host";
         };
     };
 
@@ -471,7 +480,7 @@ sub build_command_line {
         push @{ $options->{ launch_arg }}, "--mute-audio";
     };
 
-    if( ! exists $options->{no_zygote} || $options->{no_zygote}) {
+    if( ! exists $options->{no_zygote} || $options->{no_sandbox}) {
         push @{ $options->{ launch_arg }}, "--no-zygote";
     };
 
@@ -658,6 +667,7 @@ sub _find_free_port( $class, $start ) {
 }
 
 sub _wait_for_socket_connection( $class, $host, $port, $timeout=20 ) {
+    my $res = 0;
     my $wait = time + $timeout;
     while ( time < $wait ) {
         my $t = time;
@@ -668,18 +678,14 @@ sub _wait_for_socket_connection( $class, $host, $port, $timeout=20 ) {
         );
         if( $socket ) {
             close $socket;
-            sleep(1);
+            #Time::HiRes::sleep(0.5);
+            $res = 1;
             last;
         };
-        sleep(1) if time - $t < 1;
+        Time::HiRes::sleep(0.1) if time - $t < 1;
     }
-    my $res = 1;
-    if( time >= $wait ) {
-        # No logger available yet
-        #warn "Got timeout while waiting for Chrome at $host:$port";
-        $res = 0;
-    };
-    $res
+
+    return $res
 };
 
 sub spawn_child_win32( $self, $method, @cmd ) {
@@ -775,7 +781,7 @@ sub spawn_child( $self, $method, @cmd ) {
     } else {
         ($pid,$to_chrome,$from_chrome, $chrome_stdout) = $self->spawn_child_posix($method, @cmd)
     };
-    $self->log('debug', "Spawned child as $pid");
+    $self->log('debug', "Spawned child as $pid, communicating via $method");
 
     return ($pid,$to_chrome,$from_chrome, $chrome_stdout)
 }
@@ -793,7 +799,9 @@ sub read_devtools_url( $self, $fh, $lines = 10 ) {
             $devtools_url = $1;
             $self->log('trace', "Found ws endpoint from child output as '$devtools_url'");
             last;
-        };
+        } elsif( $line =~ m!ERROR:headless_shell.cc! ) {
+            die "Chrome launch error: $line";
+        }
     };
     $devtools_url
 };
@@ -872,6 +880,7 @@ sub new_future($class, %options) {
         unless exists $options{start_url};
 
     my $host = $options{ host } || '127.0.0.1';
+    $options{ host } = $host;
 
     $options{ extra_headers } ||= {};
 
@@ -896,6 +905,7 @@ sub new_future($class, %options) {
             $connection_style = 'pipe';
         };
     };
+    $options{ connection_style } = $connection_style;
 
     if( ! exists $options{ pipe }) {
         $options{ pipe } = 'pipe' eq $connection_style;
@@ -909,7 +919,6 @@ sub new_future($class, %options) {
 
     $self->{log} ||= $self->_build_log;
 
-    my( $to_chrome, $from_chrome );
     if( $options{ pid } ) {
         # Assume some defaults for the already running Chrome executable
         $options{ port } //= 9222;
@@ -917,51 +926,27 @@ sub new_future($class, %options) {
     } elsif ( $options{ driver } and $options{ driver_transport }) {
         # We already have a connection to some Chrome running
 
+    } elsif( $options{ port }) {
+        # User has specified a port, so we will tell Chrome to use it
+        # Check whether the port is readily available
+        my $ok = $self->_wait_for_socket_connection(
+            $host,
+            $self->{port},
+            2 # we don't need a long timeout here since Chrome either runs already
+              # or we need to start it ourselves. But we seem to need two
+              # seconds in most cases on my (fast) machine ...
+        );
+        # If not, launch Chrome with that debugging port
+        if( ! $ok) {
+            $self->log('debug', "No response on $host:$self->{ port }, launching fresh instance");
+            $self->_spawn_new_chrome_instance( \%options );
+        };
+
     } else {
-        #if ( ! defined $options{ port } and ! $options{ pipe }) {
-        #unless ( defined $options{ port } ) {
-        #    # Find free port for Chrome to listen on
-        #    $options{ port } = $class->_find_free_port( 9222 );
-        #};
         # We want Chrome to tell us the address to use
         $options{ port } = 0;
 
-        my @cmd= $class->build_command_line( \%options );
-        $self->log('debug', "Spawning", \@cmd);
-        (my( $pid ), $to_chrome, $from_chrome, my $chrome_stdout )
-            = $self->spawn_child( $connection_style, @cmd );
-        $options{ writer_fh } = $to_chrome;
-        $options{ reader_fh } = $from_chrome;
-        $self->{pid} = $pid;
-        $self->{ kill_pid } = 1;
-        if( $connection_style eq 'pipe') {
-            $options{ writer_fh } = $to_chrome;
-            $options{ reader_fh } = $from_chrome;
-
-        } else {
-            if( $chrome_stdout ) {
-                # Synchronously wait for the URL we can connect to
-                # Maybe this should become part of the transport, or a second
-                # class to asynchronously wait on a filehandle?!
-                $options{ endpoint } = $self->read_devtools_url( $chrome_stdout );
-                close $chrome_stdout;
-            } else {
-
-                # Try a fresh socket connection, blindly
-                # Just to give Chrome time to start up, make sure it accepts connections
-                my $ok = $self->_wait_for_socket_connection(
-                    $host,
-                    $self->{port},
-                    $self->{startup_timeout}
-                );
-                if( ! $ok) {
-                    die join ' ',
-                       "Timeout while connecting to $host:$self->{port}.",
-                       "Do you maybe have a non-debug instance of Chrome",
-                       "already running?";
-                };
-            };
-        };
+        $self->_spawn_new_chrome_instance( \%options );
     };
 
     my @connection;
@@ -980,11 +965,18 @@ sub new_future($class, %options) {
             host => $host,
         );
     };
+
+    if( my $fn = delete $options{ json_log_file }) {
+        open $options{ json_log_fh }, '>:utf8', $fn
+            or die "Couldn't create '$fn': $!";
+    };
+
     # Connect to it via TCP or local pipe
     $options{ driver_transport } ||= Chrome::DevToolsProtocol->new(
-        @connection,
-        transport => $options{ transport },
-        log => $options{ log },
+              @connection,
+              transport   => $options{ transport },
+              log         => $options{ log },
+        maybe json_log_fh => delete $options{ json_log_fh },
     );
 
     $options{ target } ||= Chrome::DevToolsProtocol::Target->new(
@@ -1013,6 +1005,52 @@ sub new_future($class, %options) {
 
     return $res
 };
+
+sub _spawn_new_chrome_instance( $self, $options ) {
+    my $class = ref $self;
+    my @cmd = $class->build_command_line( $options );
+    $self->log('debug', "Spawning for $options->{ connection_style }", \@cmd);
+    (my( $pid , $to_chrome, $from_chrome, $chrome_stdout ))
+        = $self->spawn_child( $options->{ connection_style }, @cmd );
+    $options->{ writer_fh } = $to_chrome;
+    $options->{ reader_fh } = $from_chrome;
+    $self->{pid} = $pid;
+    $self->{ kill_pid } = 1;
+    if( $options->{ connection_style } eq 'pipe') {
+        $options->{ writer_fh } = $to_chrome;
+        $options->{ reader_fh } = $from_chrome;
+
+    } else {
+        if( $chrome_stdout ) {
+            # Synchronously wait for the URL we can connect to
+            # Maybe this should become part of the transport, or a second
+            # class to asynchronously wait on a filehandle?!
+            $options->{ endpoint } = $self->read_devtools_url( $chrome_stdout );
+            close $chrome_stdout;
+
+            # set up host/port here so it can be used later by other instances
+            my $ws = URI->new( $options->{endpoint});
+            $options->{port} = $ws->port;
+            $options->{host} = $ws->host;
+
+        } else {
+
+            # Try a fresh socket connection, blindly
+            # Just to give Chrome time to start up, make sure it accepts connections
+            my $ok = $self->_wait_for_socket_connection(
+                $options->{ host },
+                $self->{port},
+                $self->{startup_timeout}
+            );
+            if( ! $ok) {
+                die join ' ',
+                   "Timeout while connecting to $options->{ host }:$self->{port}.",
+                   "Do you maybe have a non-debug instance of Chrome",
+                   "already running?";
+            };
+        };
+    };
+}
 
 sub new( $class, %args ) {
     # Synchronously connect here, just for easy API compatibility
@@ -1127,12 +1165,20 @@ sub requestId( $self ) {
 
   print $mech->chrome_version;
 
-Returns the version of the Chrome executable being used. This information
+Synonym for C<< ->browser_version >>
+
+=cut
+
+=head2 C<< $mech->browser_version >>
+
+  print $mech->browser_version;
+
+Returns the version of the browser executable being used. This information
 needs launching the browser and asking for the version via the network.
 
 =cut
 
-sub chrome_version_from_stdout( $class, $options={} ) {
+sub browser_version_from_stdout( $class, $options={} ) {
     # We can try to get at the version through the --version command line:
     my @cmd = $class->build_command_line({
         launch_arg => ['--version'],
@@ -1150,12 +1196,17 @@ sub chrome_version_from_stdout( $class, $options={} ) {
     # Chromium 58.0.3029.96 Built on Ubuntu , running on Ubuntu 14.04
     # Chromium 76.0.4809.100 built on Debian 10.0, running on Debian 10.0
     # Google Chrome 78.0.3904.97
-    $v =~ /^(.*?)\s+(\d+\.\d+\.\d+\.\d+)\b/
-        or return; # we didn't find anything
-    return "$1/$2"
+    # Mozilla Firefox 87.0
+    if( $v =~ m!^(.*?)\s+(\d+\.\d+\.\d+\.\d+)\b!) {
+        return "$1/$2"
+    } elsif($v =~ m!^(Mozilla Firefox)[ /](\d+.\d+)\b!) {
+        return "$1/$2.0.0"
+    } else {
+        return; # we didn't find anything
+    }
 }
 
-sub chrome_version_from_executable_win32( $class, $options={} ) {
+sub browser_version_from_executable_win32( $class, $options={} ) {
     require Win32::File::VersionInfo;
 
     my @names = ($options->{launch_exe} ? $options->{launch_exe}: ());
@@ -1181,20 +1232,23 @@ sub chrome_version_from_executable_win32( $class, $options={} ) {
     };
 }
 
-sub chrome_version( $self, %options ) {
+sub browser_version( $self, %options ) {
     if( blessed $self and $self->target ) {
         return $self->chrome_version_info()->{product};
 
     } elsif( $^O !~ /mswin/i ) {
-        my $version = $self->chrome_version_from_stdout(\%options);
+        my $version = $self->browser_version_from_stdout(\%options);
         if( $version ) {
             return $version;
         };
 
     } else {
-        $self->chrome_version_from_executable_win32( \%options )
+        $self->browser_version_from_executable_win32( \%options )
     };
 }
+
+*chrome_version =
+*chrome_version = \&browser_version;
 
 =head2 C<< $mech->chrome_version_info >>
 
@@ -1994,21 +2048,21 @@ got the right nodes.
 
 =cut
 
-sub highlight_node {
-    my ($self,@nodes) = @_;
-    for (@nodes) {
-        #  Overlay.highlightNode
-        my $style= $self->eval_in_page(<<JS, $_);
-        (function(el) {
-            if( 'none' == el.style.display ) {
-                el.style.display= 'block';
-            };
-            el.style.background= 'red';
-            el.style.border= 'solid black 1px';
-        })(arguments[0]);
-JS
-    };
-};
+sub highlight_nodes($self, @nodes) {
+    foreach my $node (@nodes) {
+        $self->callFunctionOn(
+            'function() {
+                if( "none" == this.style.display ) {
+                    this.style.display= "block";
+                };
+                this.style.backgroundColor = "red";
+                this.style.border = "solid black 1px"
+             }',
+             objectId => $node->objectId,
+             arguments => []
+        );
+    }
+}
 
 =head1 NAVIGATION METHODS
 
@@ -3008,6 +3062,7 @@ sub stop( $self ) {
 }
 
 =head2 C<< $mech->uri() >>
+
 =head2 C<< $mech->uri_future() >>
 
     print "We are at " . $mech->uri;
@@ -3829,6 +3884,10 @@ Runs an XPath query in Chrome against the current document.
 If you need more information about the returned results,
 use the C<< ->xpathEx() >> function.
 
+Note that Chrome sometimes returns a node with node id 0. This node then
+cannot be found again using the Chrome API. This is bad luck and results in
+a warning.
+
 The options allow the following keys:
 
 =over 4
@@ -3914,6 +3973,7 @@ sub _performSearch( $self, %args ) {
     my $subTreeId = $args{ subTreeId };
     #my $parentNode = WWW::Mechanize::Chrome::Node->fetchNode( nodeId => $backendNodeId, driver => $self->driver );
     my $query = $args{ query };
+    weaken( my $s = $self );
     $self->target->send_message( 'DOM.performSearch', query => $query )->then(sub($results) {
         $self->log('debug', "XPath query '$query' (". $results->{resultCount} . " node(s))");
 
@@ -3963,8 +4023,14 @@ sub _performSearch( $self, %args ) {
                 # you might get a node with nodeId 0. This one
                 # can't be retrieved. Bad luck.
                 if($response->{nodeIds}->[0] == 0) {
-                    warn "Bad luck: Node with nodeId 0 found. Info for this one cannot be retrieved.";
+                    warn "Bad luck: Node with nodeId 0 found. Info for this one cannot be retrieved";
                     # splice @{ $response->{nodeIds}}, 0, 1;
+                    # Can we retry the whole search from here?!
+                    # Nope, this has never returned better results
+                    #if( ! $args{ _retry }++) {
+                    #    warn "Retrying search";
+                    #    return $s->_performSearch( %args );
+                    #};
                 };
 
                 # Resolve the found nodes directly with the
@@ -6361,14 +6427,24 @@ L<WWW::Mechanize::Chrome::Node> - objects representing HTML in Chrome
 =item *
 
 L<WWW::Mechanize::Firefox> - a similar module with a visible application
-automating Firefox
+automating Firefox , currently on hiatus, since Mozilla does not yet
+implement the Chrome DevTools Protocol properly
 
 =item *
 
 L<WWW::Mechanize::PhantomJS> - a similar module without a visible application
-automating PhantomJS
+automating PhantomJS , now discontinued since PhantomJS is discontinued
 
 =back
+
+=head1 MASQUERADING AS OTHER BROWSERS
+
+Some articles about what you need to change to appear as a different
+browser
+
+L<https://multilogin.com/why-mimicking-a-device-is-almost-impossible/>
+
+L<https://github.com/berstend/puppeteer-extra/tree/master/packages/puppeteer-extra-plugin-stealth>
 
 =head1 REPOSITORY
 
@@ -6414,8 +6490,12 @@ Max Maischein C<corion@cpan.org>
 =head1 CONTRIBUTORS
 
 Andreas König C<andk@cpan.org>
+
 Tobias Leich C<froggs@cpan.org>
+
 Steven Dondley C<s@dondley.org>
+
+Joshua Pollack
 
 =head1 COPYRIGHT (c)
 

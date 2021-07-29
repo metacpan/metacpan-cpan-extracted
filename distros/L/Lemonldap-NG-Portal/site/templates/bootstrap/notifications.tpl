@@ -38,8 +38,10 @@
         <h3 class="card-title"><span trspan="validationDate">Validation date</span>: <span id="notifEpoch"></span> - <span trspan="reference">Reference</span>: <span id="notifRef"></span></h3>
       </div>
       <div class="card-body">
-        <div class="form">
-          <span id='displayNotif'></span>
+        <div class="notif">
+          <div class="form">
+            <span id='displayNotif'></span>
+          </div>
         </div>
       </div>
     </div>

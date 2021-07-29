@@ -1,0 +1,82 @@
+package Sah::Manual::Reference::Schema::Examples::PropertyAttributeIndex; # just to make podweaver happy
+
+# AUTHORITY
+# DATE
+our $DIST = 'Sah-Manual'; # DIST
+# VERSION
+
+1;
+# ABSTRACT: Alphabetical list of properties/attributes used in example specification of Sah schema
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Sah::Manual::Reference::Schema::Examples::PropertyAttributeIndex - Alphabetical list of properties/attributes used in example specification of Sah schema
+
+=head1 VERSION
+
+This document describes version 0.002 of Sah::Manual::Reference::Schema::Examples::PropertyAttributeIndex (from Perl distribution Sah-Manual), released on 2021-07-28.
+
+=head1 DESCRIPTION
+
+=head1 INDEX
+
+=head2 description
+
+Str. From L<DefHash>.
+
+=head2 summary
+
+Str. From L<DefHash>.
+
+=head2 tags
+
+Str. From L<DefHash>.
+
+=head2 valid
+
+Bool. Whether the L</value> validates.
+
+=head2 value
+
+Any.
+
+=head1 INDEX (DEPRECATED)
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/Sah-Manual>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-Sah-Manual>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Sah-Manual>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+Other C<Sah::Manual::Reference::**::PropertyAttributeIndex> pages.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2021 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

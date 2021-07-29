@@ -24,8 +24,7 @@ DEPENDENCIES
 parent
 strict
 warnings
-Attribute::Handlers
-Test::Class 0.37
+Test::Class 0.51
 
 COPYRIGHT AND LICENCE
 

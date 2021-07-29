@@ -497,6 +497,10 @@ Telling the loop for array C<$a> to skip 1:
 
 It works by having the loop for the given array check for a return value assign to it at each iteration. Because it is just a check in an hash, it is very lightweight. When a return value is found, it is reset immediately.
 
+=head2 return_reset
+
+Reset the return value used in methods that implement loop functions.
+
 =head2 reverse
 
 Returns a the array in reverse order in list context or a new L<Module::Generic::Array> object of it in scalar context.

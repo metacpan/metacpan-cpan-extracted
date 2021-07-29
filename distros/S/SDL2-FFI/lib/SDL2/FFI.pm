@@ -1,31 +1,27 @@
-package SDL2::FFI 0.03 {
-    use lib '../lib', 'lib', '/home/sanko/Projects/SDL2.pm/lib';
+package SDL2::FFI 0.05 {
+    use lib '../lib', 'lib';
 
     # ABSTRACT: FFI Wrapper for SDL (Simple DirectMedia Layer) Development Library
     use strictures 2;
-    use SDL2::Utils;
-    #
-    $|++;
-    our %EXPORT_TAGS;
-
-    #use Carp::Always;
-    #$ENV{FFI_PLATYPUS_DLERROR} = 1;
-    #
-    #
     use experimental 'signatures';
     use base 'Exporter::Tiny';
-    #
+    use SDL2::Utils;
     use Config;
-    my $bigendian = $Config{byteorder} != 4321;
+    sub bigendian () { CORE::state $bigendian //= ( $Config{byteorder} != 4321 ); $bigendian }
+    our %EXPORT_TAGS;
 
     # I need these first
-    use SDL2::version;
-    attach( version => { SDL_GetVersion => [ ['SDL_version'] ] } );
+    attach version => { SDL_GetVersion => [ ['SDL_version'] ] };
     #
     SDL_GetVersion( my $ver = SDL2::version->new() );
     my $platform = $^O;                            # https://perldoc.perl.org/perlport#PLATFORMS
     my $Windows  = !!( $platform eq 'MSWin32' );
     #
+    use SDL2::version;
+    use SDL2::Enum;
+    use SDL2::AudioCVT;
+    use SDL2::AudioSpec;
+    use SDL2::Event;                               # Includes all known events
     use SDL2::Point;
     use SDL2::FPoint;
     use SDL2::FRect;
@@ -33,218 +29,39 @@ package SDL2::FFI 0.03 {
     use SDL2::DisplayMode;
     use SDL2::Surface;
     use SDL2::Window;
+    use SDL2::WindowShaper;
+    use SDL2::Texture;
+    use SDL2::Renderer;
+    use SDL2::RendererInfo;
+    use SDL2::GameControllerButtonBind;
+    use SDL2::HapticDirection;
+    use SDL2::HapticEffect;
+    use SDL2::Joystick;
+    use SDL2::JoystickGUID;
+    use SDL2::Keysym;
+    use SDL2::Locale;
+    use SDL2::MessageBoxData;
+    use SDL2::MetalView;
+    use SDL2::Mutex;
+    use SDL2::Semaphore;
+    use SDL2::Cond;
+    use SDL2::Color;
+    use SDL2::Palette;
+    use SDL2::PixelFormat;
     #
-    enum
+    use Data::Dump;
 
-        # https://github.com/libsdl-org/SDL/blob/main/include/SDL_hints.h
-        SDL_HintPriority => [qw[SDL_HINT_DEFAULT SDL_HINT_NORMAL SDL_HINT_OVERRIDE]],
-        SDL_LogCategory  => [
-        qw[
-            SDL_LOG_CATEGORY_APPLICATION SDL_LOG_CATEGORY_ERROR SDL_LOG_CATEGORY_ASSERT
-            SDL_LOG_CATEGORY_SYSTEM      SDL_LOG_CATEGORY_AUDIO SDL_LOG_CATEGORY_VIDEO
-            SDL_LOG_CATEGORY_RENDER      SDL_LOG_CATEGORY_INPUT SDL_LOG_CATEGORY_TEST
-            SDL_LOG_CATEGORY_RESERVED1   SDL_LOG_CATEGORY_RESERVED2
-            SDL_LOG_CATEGORY_RESERVED3   SDL_LOG_CATEGORY_RESERVED4
-            SDL_LOG_CATEGORY_RESERVED5   SDL_LOG_CATEGORY_RESERVED6
-            SDL_LOG_CATEGORY_RESERVED7   SDL_LOG_CATEGORY_RESERVED8
-            SDL_LOG_CATEGORY_RESERVED9   SDL_LOG_CATEGORY_RESERVED10
-            SDL_LOG_CATEGORY_CUSTOM
-        ]
-        ],
-        SDL_LogPriority => [
-        [ SDL_LOG_PRIORITY_VERBOSE => 1 ], qw[SDL_LOG_PRIORITY_DEBUG SDL_LOG_PRIORITY_INFO
-            SDL_LOG_PRIORITY_WARN SDL_LOG_PRIORITY_ERROR SDL_LOG_PRIORITY_CRITICAL
-            SDL_NUM_LOG_PRIORITIES]
-        ];
-    define SDL_Init => [
-        [ SDL_INIT_TIMER          => 0x00000001 ],
-        [ SDL_INIT_AUDIO          => 0x00000010 ],
-        [ SDL_INIT_VIDEO          => 0x00000020 ],
-        [ SDL_INIT_JOYSTICK       => 0x00000200 ],
-        [ SDL_INIT_HAPTIC         => 0x00001000 ],
-        [ SDL_INIT_GAMECONTROLLER => 0x00002000 ],
-        [ SDL_INIT_EVENTS         => 0x00004000 ],
-        [ SDL_INIT_SENSOR         => 0x00008000 ],
-        [ SDL_INIT_NOPARACHUTE    => 0x00100000 ],
-        [   SDL_INIT_EVERYTHING => sub {
-                SDL_INIT_TIMER() | SDL_INIT_AUDIO() | SDL_INIT_VIDEO() | SDL_INIT_EVENTS()
-                    | SDL_INIT_JOYSTICK() | SDL_INIT_HAPTIC() | SDL_INIT_GAMECONTROLLER()
-                    | SDL_INIT_SENSOR();
-            }
-        ]
-        ],
-
-        # https://github.com/libsdl-org/SDL/blob/main/include/SDL_hints.h
-        SDL_Hint => [
-        [ SDL_HINT_ACCELEROMETER_AS_JOYSTICK   => 'SDL_ACCELEROMETER_AS_JOYSTICK' ],
-        [ SDL_HINT_ALLOW_ALT_TAB_WHILE_GRABBED => 'SDL_ALLOW_ALT_TAB_WHILE_GRABBED' ],
-        [ SDL_HINT_ALLOW_TOPMOST               => 'SDL_ALLOW_TOPMOST' ],
-        [   SDL_HINT_ANDROID_APK_EXPANSION_MAIN_FILE_VERSION =>
-                'SDL_ANDROID_APK_EXPANSION_MAIN_FILE_VERSION'
-        ],
-        [   SDL_HINT_ANDROID_APK_EXPANSION_PATCH_FILE_VERSION =>
-                'SDL_ANDROID_APK_EXPANSION_PATCH_FILE_VERSION'
-        ],
-        [ SDL_HINT_ANDROID_BLOCK_ON_PAUSE            => 'SDL_ANDROID_BLOCK_ON_PAUSE' ],
-        [ SDL_HINT_ANDROID_BLOCK_ON_PAUSE_PAUSEAUDIO => 'SDL_ANDROID_BLOCK_ON_PAUSE_PAUSEAUDIO' ],
-        [ SDL_HINT_ANDROID_SEPARATE_MOUSE_AND_TOUCH  => 'SDL_ANDROID_SEPARATE_MOUSE_AND_TOUCH' ],
-        [ SDL_HINT_ANDROID_TRAP_BACK_BUTTON          => 'SDL_ANDROID_TRAP_BACK_BUTTON' ],
-        [ SDL_HINT_APPLE_TV_CONTROLLER_UI_EVENTS     => 'SDL_APPLE_TV_CONTROLLER_UI_EVENTS' ],
-        [ SDL_HINT_APPLE_TV_REMOTE_ALLOW_ROTATION    => 'SDL_APPLE_TV_REMOTE_ALLOW_ROTATION' ],
-        [ SDL_HINT_AUDIO_CATEGORY                    => 'SDL_AUDIO_CATEGORY' ],
-        [ SDL_HINT_AUDIO_DEVICE_APP_NAME             => 'SDL_AUDIO_DEVICE_APP_NAME' ],
-        [ SDL_HINT_AUDIO_DEVICE_STREAM_NAME          => 'SDL_AUDIO_DEVICE_STREAM_NAME' ],
-        [ SDL_HINT_AUDIO_DEVICE_STREAM_ROLE          => 'SDL_AUDIO_DEVICE_STREAM_ROLE' ],
-        [ SDL_HINT_AUDIO_RESAMPLING_MODE             => 'SDL_AUDIO_RESAMPLING_MODE' ],
-        [ SDL_HINT_AUTO_UPDATE_JOYSTICKS             => 'SDL_AUTO_UPDATE_JOYSTICKS' ],
-        [ SDL_HINT_AUTO_UPDATE_SENSORS               => 'SDL_AUTO_UPDATE_SENSORS' ],
-        [ SDL_HINT_BMP_SAVE_LEGACY_FORMAT            => 'SDL_BMP_SAVE_LEGACY_FORMAT' ],
-        [ SDL_HINT_DISPLAY_USABLE_BOUNDS             => 'SDL_DISPLAY_USABLE_BOUNDS' ],
-        [ SDL_HINT_EMSCRIPTEN_ASYNCIFY               => 'SDL_EMSCRIPTEN_ASYNCIFY' ],
-        [ SDL_HINT_EMSCRIPTEN_KEYBOARD_ELEMENT       => 'SDL_EMSCRIPTEN_KEYBOARD_ELEMENT' ],
-        [ SDL_HINT_ENABLE_STEAM_CONTROLLERS          => 'SDL_ENABLE_STEAM_CONTROLLERS' ],
-        [ SDL_HINT_EVENT_LOGGING                     => 'SDL_EVENT_LOGGING' ],
-        [ SDL_HINT_FRAMEBUFFER_ACCELERATION          => 'SDL_FRAMEBUFFER_ACCELERATION' ],
-        [ SDL_HINT_GAMECONTROLLERCONFIG              => 'SDL_GAMECONTROLLERCONFIG' ],
-        [ SDL_HINT_GAMECONTROLLERCONFIG_FILE         => 'SDL_GAMECONTROLLERCONFIG_FILE' ],
-        [ SDL_HINT_GAMECONTROLLERTYPE                => 'SDL_GAMECONTROLLERTYPE' ],
-        [ SDL_HINT_GAMECONTROLLER_IGNORE_DEVICES     => 'SDL_GAMECONTROLLER_IGNORE_DEVICES' ],
-        [   SDL_HINT_GAMECONTROLLER_IGNORE_DEVICES_EXCEPT =>
-                'SDL_GAMECONTROLLER_IGNORE_DEVICES_EXCEPT'
-        ],
-        [ SDL_HINT_GAMECONTROLLER_USE_BUTTON_LABELS   => 'SDL_GAMECONTROLLER_USE_BUTTON_LABELS' ],
-        [ SDL_HINT_GRAB_KEYBOARD                      => 'SDL_GRAB_KEYBOARD' ],
-        [ SDL_HINT_IDLE_TIMER_DISABLED                => 'SDL_IDLE_TIMER_DISABLED' ],
-        [ SDL_HINT_IME_INTERNAL_EDITING               => 'SDL_IME_INTERNAL_EDITING' ],
-        [ SDL_HINT_IOS_HIDE_HOME_INDICATOR            => 'SDL_IOS_HIDE_HOME_INDICATOR' ],
-        [ SDL_HINT_JOYSTICK_ALLOW_BACKGROUND_EVENTS   => 'SDL_JOYSTICK_ALLOW_BACKGROUND_EVENTS' ],
-        [ SDL_HINT_JOYSTICK_HIDAPI                    => 'SDL_JOYSTICK_HIDAPI' ],
-        [ SDL_HINT_JOYSTICK_HIDAPI_CORRELATE_XINPUT   => 'SDL_JOYSTICK_HIDAPI_CORRELATE_XINPUT' ],
-        [ SDL_HINT_JOYSTICK_HIDAPI_GAMECUBE           => 'SDL_JOYSTICK_HIDAPI_GAMECUBE' ],
-        [ SDL_HINT_JOYSTICK_HIDAPI_JOY_CONS           => 'SDL_JOYSTICK_HIDAPI_JOY_CONS' ],
-        [ SDL_HINT_JOYSTICK_HIDAPI_PS4                => 'SDL_JOYSTICK_HIDAPI_PS4' ],
-        [ SDL_HINT_JOYSTICK_HIDAPI_PS4_RUMBLE         => 'SDL_JOYSTICK_HIDAPI_PS4_RUMBLE' ],
-        [ SDL_HINT_JOYSTICK_HIDAPI_PS5                => 'SDL_JOYSTICK_HIDAPI_PS5' ],
-        [ SDL_HINT_JOYSTICK_HIDAPI_PS5_PLAYER_LED     => 'SDL_JOYSTICK_HIDAPI_PS5_PLAYER_LED' ],
-        [ SDL_HINT_JOYSTICK_HIDAPI_PS5_RUMBLE         => 'SDL_JOYSTICK_HIDAPI_PS5_RUMBLE' ],
-        [ SDL_HINT_JOYSTICK_HIDAPI_STADIA             => 'SDL_JOYSTICK_HIDAPI_STADIA' ],
-        [ SDL_HINT_JOYSTICK_HIDAPI_STEAM              => 'SDL_JOYSTICK_HIDAPI_STEAM' ],
-        [ SDL_HINT_JOYSTICK_HIDAPI_SWITCH             => 'SDL_JOYSTICK_HIDAPI_SWITCH' ],
-        [ SDL_HINT_JOYSTICK_HIDAPI_SWITCH_HOME_LED    => 'SDL_JOYSTICK_HIDAPI_SWITCH_HOME_LED' ],
-        [ SDL_HINT_JOYSTICK_HIDAPI_XBOX               => 'SDL_JOYSTICK_HIDAPI_XBOX' ],
-        [ SDL_HINT_JOYSTICK_RAWINPUT                  => 'SDL_JOYSTICK_RAWINPUT' ],
-        [ SDL_HINT_JOYSTICK_THREAD                    => 'SDL_JOYSTICK_THREAD' ],
-        [ SDL_HINT_KMSDRM_REQUIRE_DRM_MASTER          => 'SDL_KMSDRM_REQUIRE_DRM_MASTER' ],
-        [ SDL_HINT_LINUX_JOYSTICK_DEADZONES           => 'SDL_LINUX_JOYSTICK_DEADZONES' ],
-        [ SDL_HINT_MAC_BACKGROUND_APP                 => 'SDL_MAC_BACKGROUND_APP' ],
-        [ SDL_HINT_MAC_CTRL_CLICK_EMULATE_RIGHT_CLICK => 'SDL_MAC_CTRL_CLICK_EMULATE_RIGHT_CLICK' ],
-        [ SDL_HINT_MOUSE_DOUBLE_CLICK_RADIUS          => 'SDL_MOUSE_DOUBLE_CLICK_RADIUS' ],
-        [ SDL_HINT_MOUSE_DOUBLE_CLICK_TIME            => 'SDL_MOUSE_DOUBLE_CLICK_TIME' ],
-        [ SDL_HINT_MOUSE_FOCUS_CLICKTHROUGH           => 'SDL_MOUSE_FOCUS_CLICKTHROUGH' ],
-        [ SDL_HINT_MOUSE_NORMAL_SPEED_SCALE           => 'SDL_MOUSE_NORMAL_SPEED_SCALE' ],
-        [ SDL_HINT_MOUSE_RELATIVE_MODE_WARP           => 'SDL_MOUSE_RELATIVE_MODE_WARP' ],
-        [ SDL_HINT_MOUSE_RELATIVE_SCALING             => 'SDL_MOUSE_RELATIVE_SCALING' ],
-        [ SDL_HINT_MOUSE_RELATIVE_SPEED_SCALE         => 'SDL_MOUSE_RELATIVE_SPEED_SCALE' ],
-        [ SDL_HINT_MOUSE_TOUCH_EVENTS                 => 'SDL_MOUSE_TOUCH_EVENTS' ],
-        [ SDL_HINT_NO_SIGNAL_HANDLERS                 => 'SDL_NO_SIGNAL_HANDLERS' ],
-        [ SDL_HINT_OPENGL_ES_DRIVER                   => 'SDL_OPENGL_ES_DRIVER' ],
-        [ SDL_HINT_ORIENTATIONS                       => 'SDL_ORIENTATIONS' ],
-        [ SDL_HINT_PREFERRED_LOCALES                  => 'SDL_PREFERRED_LOCALES' ],
-        [ SDL_HINT_QTWAYLAND_CONTENT_ORIENTATION      => 'SDL_QTWAYLAND_CONTENT_ORIENTATION' ],
-        [ SDL_HINT_QTWAYLAND_WINDOW_FLAGS             => 'SDL_QTWAYLAND_WINDOW_FLAGS' ],
-        [ SDL_HINT_RENDER_BATCHING                    => 'SDL_RENDER_BATCHING' ],
-        [ SDL_HINT_RENDER_DIRECT3D11_DEBUG            => 'SDL_RENDER_DIRECT3D11_DEBUG' ],
-        [ SDL_HINT_RENDER_DIRECT3D_THREADSAFE         => 'SDL_RENDER_DIRECT3D_THREADSAFE' ],
-        [ SDL_HINT_RENDER_DRIVER                      => 'SDL_RENDER_DRIVER' ],
-        [ SDL_HINT_RENDER_LOGICAL_SIZE_MODE           => 'SDL_RENDER_LOGICAL_SIZE_MODE' ],
-        [ SDL_HINT_RENDER_OPENGL_SHADERS              => 'SDL_RENDER_OPENGL_SHADERS' ],
-        [ SDL_HINT_RENDER_SCALE_QUALITY               => 'SDL_RENDER_SCALE_QUALITY' ],
-        [ SDL_HINT_RENDER_VSYNC                       => 'SDL_RENDER_VSYNC' ],
-        [ SDL_HINT_RETURN_KEY_HIDES_IME               => 'SDL_RETURN_KEY_HIDES_IME' ],
-        [ SDL_HINT_RPI_VIDEO_LAYER                    => 'SDL_RPI_VIDEO_LAYER' ],
-        [   SDL_HINT_THREAD_FORCE_REALTIME_TIME_CRITICAL =>
-                'SDL_THREAD_FORCE_REALTIME_TIME_CRITICAL'
-        ],
-        [ SDL_HINT_THREAD_PRIORITY_POLICY             => 'SDL_THREAD_PRIORITY_POLICY' ],
-        [ SDL_HINT_THREAD_STACK_SIZE                  => 'SDL_THREAD_STACK_SIZE' ],
-        [ SDL_HINT_TIMER_RESOLUTION                   => 'SDL_TIMER_RESOLUTION' ],
-        [ SDL_HINT_TOUCH_MOUSE_EVENTS                 => 'SDL_TOUCH_MOUSE_EVENTS' ],
-        [ SDL_HINT_TV_REMOTE_AS_JOYSTICK              => 'SDL_TV_REMOTE_AS_JOYSTICK' ],
-        [ SDL_HINT_VIDEO_ALLOW_SCREENSAVER            => 'SDL_VIDEO_ALLOW_SCREENSAVER' ],
-        [ SDL_HINT_VIDEO_DOUBLE_BUFFER                => 'SDL_VIDEO_DOUBLE_BUFFER' ],
-        [ SDL_HINT_VIDEO_EXTERNAL_CONTEXT             => 'SDL_VIDEO_EXTERNAL_CONTEXT' ],
-        [ SDL_HINT_VIDEO_HIGHDPI_DISABLED             => 'SDL_VIDEO_HIGHDPI_DISABLED' ],
-        [ SDL_HINT_VIDEO_MAC_FULLSCREEN_SPACES        => 'SDL_VIDEO_MAC_FULLSCREEN_SPACES' ],
-        [ SDL_HINT_VIDEO_MINIMIZE_ON_FOCUS_LOSS       => 'SDL_VIDEO_MINIMIZE_ON_FOCUS_LOSS' ],
-        [ SDL_HINT_VIDEO_WINDOW_SHARE_PIXEL_FORMAT    => 'SDL_VIDEO_WINDOW_SHARE_PIXEL_FORMAT' ],
-        [ SDL_HINT_VIDEO_WIN_D3DCOMPILE               => 'SDL_VIDEO_WIN_D3DCOMPILE' ],
-        [ SDL_HINT_VIDEO_WIN_D3DCOMPILER              => 'SDL_VIDEO_WIN_D3DCOMPILER' ],
-        [ SDL_HINT_VIDEO_X11_FORCE_EGL                => 'SDL_VIDEO_X11_FORCE_EGL' ],
-        [ SDL_HINT_VIDEO_X11_NET_WM_BYPASS_COMPOSITOR => 'SDL_VIDEO_X11_NET_WM_BYPASS_COMPOSITOR' ],
-        [ SDL_HINT_VIDEO_X11_NET_WM_PING              => 'SDL_VIDEO_X11_NET_WM_PING' ],
-        [ SDL_HINT_VIDEO_X11_WINDOW_VISUALID          => 'SDL_VIDEO_X11_WINDOW_VISUALID' ],
-        [ SDL_HINT_VIDEO_X11_XINERAMA                 => 'SDL_VIDEO_X11_XINERAMA' ],
-        [ SDL_HINT_VIDEO_X11_XRANDR                   => 'SDL_VIDEO_X11_XRANDR' ],
-        [ SDL_HINT_VIDEO_X11_XVIDMODE                 => 'SDL_VIDEO_X11_XVIDMODE' ],
-        [ SDL_HINT_WAVE_FACT_CHUNK                    => 'SDL_WAVE_FACT_CHUNK' ],
-        [ SDL_HINT_WAVE_RIFF_CHUNK_SIZE               => 'SDL_WAVE_RIFF_CHUNK_SIZE' ],
-        [ SDL_HINT_WAVE_TRUNCATION                    => 'SDL_WAVE_TRUNCATION' ],
-        [ SDL_HINT_WINDOWS_DISABLE_THREAD_NAMING      => 'SDL_WINDOWS_DISABLE_THREAD_NAMING' ],
-        [ SDL_HINT_WINDOWS_ENABLE_MESSAGELOOP         => 'SDL_WINDOWS_ENABLE_MESSAGELOOP' ],
-        [   SDL_HINT_WINDOWS_FORCE_MUTEX_CRITICAL_SECTIONS =>
-                'SDL_WINDOWS_FORCE_MUTEX_CRITICAL_SECTIONS'
-        ],
-        [ SDL_HINT_WINDOWS_FORCE_SEMAPHORE_KERNEL => 'SDL_WINDOWS_FORCE_SEMAPHORE_KERNEL' ],
-        [ SDL_HINT_WINDOWS_INTRESOURCE_ICON       => 'SDL_WINDOWS_INTRESOURCE_ICON' ],
-        [ SDL_HINT_WINDOWS_INTRESOURCE_ICON_SMALL => 'SDL_WINDOWS_INTRESOURCE_ICON_SMALL' ],
-        [ SDL_HINT_WINDOWS_NO_CLOSE_ON_ALT_F4     => 'SDL_WINDOWS_NO_CLOSE_ON_ALT_F4' ],
-        [ SDL_HINT_WINDOWS_USE_D3D9EX             => 'SDL_WINDOWS_USE_D3D9EX' ],
-        [   SDL_HINT_WINDOW_FRAME_USABLE_WHILE_CURSOR_HIDDEN =>
-                'SDL_WINDOW_FRAME_USABLE_WHILE_CURSOR_HIDDEN'
-        ],
-        [ SDL_HINT_WINRT_HANDLE_BACK_BUTTON        => 'SDL_WINRT_HANDLE_BACK_BUTTON' ],
-        [ SDL_HINT_WINRT_PRIVACY_POLICY_LABEL      => 'SDL_WINRT_PRIVACY_POLICY_LABEL' ],
-        [ SDL_HINT_WINRT_PRIVACY_POLICY_URL        => 'SDL_WINRT_PRIVACY_POLICY_URL' ],
-        [ SDL_HINT_XINPUT_ENABLED                  => 'SDL_XINPUT_ENABLED' ],
-        [ SDL_HINT_XINPUT_USE_OLD_JOYSTICK_MAPPING => 'SDL_XINPUT_USE_OLD_JOYSTICK_MAPPING' ]
-        ];
-    FFI::C::ArrayDef->new(    # Used sparingly when I need to pass a list of SDL_Point objects
-        ffi,
-        name    => 'SDL2x_PointList',
-        class   => 'SDL2x::PointList',
-        members => ['SDL_Point'],
-    );
-    FFI::C::ArrayDef->new(    # Used sparingly when I need to pass a list of SDL_Point objects
-        ffi,
-        name    => 'SDL2x_FPointList',
-        class   => 'SDL2x::FPointList',
-        members => ['SDL_Point'],
-    );
-    FFI::C::ArrayDef->new(    # Used sparingly when I need to pass a list of SDL_Rect objects
-        ffi,
-        name    => 'SDL2x_RectList',
-        class   => 'SDL2x::RectList',
-        members => ['SDL_Rect'],
-    );
-    FFI::C::ArrayDef->new(    # Used sparingly when I need to pass a list of SDL_Rect objects
-        ffi,
-        name    => 'SDL2x_FRectList',
-        class   => 'SDL2x::FRectList',
-        members => ['SDL_FRect'],
-    );
-    #
+    # https://github.com/libsdl-org/SDL/blob/main/include/SDL.h
     push @{ $EXPORT_TAGS{default} }, qw[:init];
     attach init => {
         SDL_Init          => [ ['uint32'] => 'int' ],
         SDL_InitSubSystem => [ ['uint32'] => 'int' ],
-        SDL_QuitSubSystem => [ ['uint32'] ],
-        SDL_WasInit       => [ ['uint32'] => 'uint32' ],
         SDL_Quit          => [ [] ],
+        SDL_QuitSubSystem => [ ['uint32'] ],
+        SDL_WasInit       => [ ['uint32'] => 'uint32' ]
     };
     #
     ffi->type( '(opaque,string,string,string)->void' => 'SDL_HintCallback' );
-    ffi->type( '(opaque,int,int,string)->void'       => 'SDL_LogOutputFunction' );
-    ffi->type( '(opaque,opaque,opaque)->int'         => 'SDL_HitTest' );
     attach hints => {
         SDL_SetHintWithPriority => [ [ 'string', 'string', 'int' ] => 'bool' ],
         SDL_SetHint             => [ [ 'string', 'string' ]        => 'bool' ],
@@ -284,8 +101,9 @@ package SDL2::FFI 0.03 {
             }
         ],
         SDL_ClearError => [ [] => 'void' ]
-        },
-        log => {
+        };
+    ffi->type( '(opaque,int,int,string)->void' => 'SDL_LogOutputFunction' );
+    attach log => {
         SDL_LogSetAllPriority  => [ ['SDL_LogPriority'] ],
         SDL_LogSetPriority     => [ [ 'SDL_LogCategory', 'SDL_LogPriority' ] ],
         SDL_LogGetPriority     => [ ['SDL_LogCategory'] => 'SDL_LogPriority' ],
@@ -343,119 +161,52 @@ package SDL2::FFI 0.03 {
                 return $cb;
             }
         ]
-        };
-    enum
-        SDL_WindowFlags => [
-        [ SDL_WINDOW_FULLSCREEN         => 0x00000001 ],
-        [ SDL_WINDOW_OPENGL             => 0x00000002 ],
-        [ SDL_WINDOW_SHOWN              => 0x00000004 ],
-        [ SDL_WINDOW_HIDDEN             => 0x00000008 ],
-        [ SDL_WINDOW_BORDERLESS         => 0x00000010 ],
-        [ SDL_WINDOW_RESIZABLE          => 0x00000020 ],
-        [ SDL_WINDOW_MINIMIZED          => 0x00000040 ],
-        [ SDL_WINDOW_MAXIMIZED          => 0x00000080 ],
-        [ SDL_WINDOW_MOUSE_GRABBED      => 0x00000100 ],
-        [ SDL_WINDOW_INPUT_FOCUS        => 0x00000200 ],
-        [ SDL_WINDOW_MOUSE_FOCUS        => 0x00000400 ],
-        [ SDL_WINDOW_FULLSCREEN_DESKTOP => sub { ( SDL_WINDOW_FULLSCREEN() | 0x00001000 ) } ],
-        [ SDL_WINDOW_FOREIGN            => 0x00000800 ],
-        [ SDL_WINDOW_ALLOW_HIGHDPI      => 0x00002000 ],
-        [ SDL_WINDOW_MOUSE_CAPTURE      => 0x00004000 ],
-        [ SDL_WINDOW_ALWAYS_ON_TOP      => 0x00008000 ],
-        [ SDL_WINDOW_SKIP_TASKBAR       => 0x00010000 ],
-        [ SDL_WINDOW_UTILITY            => 0x00020000 ],
-        [ SDL_WINDOW_TOOLTIP            => 0x00040000 ],
-        [ SDL_WINDOW_POPUP_MENU         => 0x00080000 ],
-        [ SDL_WINDOW_KEYBOARD_GRABBED   => 0x00100000 ],
-        [ SDL_WINDOW_VULKAN             => 0x10000000 ],
-        [ SDL_WINDOW_METAL              => 0x20000000 ],
-        [ SDL_WINDOW_INPUT_GRABBED      => sub { SDL_WINDOW_MOUSE_GRABBED() } ],
-        ],
-        SDL_WindowFlagsX => [
-        qw[
-            SDL_WINDOWEVENT_NONE
-            SDL_WINDOWEVENT_SHOWN
-            SDL_WINDOWEVENT_HIDDEN
-            SDL_WINDOWEVENT_EXPOSED
-            SDL_WINDOWEVENT_MOVED
-            SDL_WINDOWEVENT_RESIZED
-            SDL_WINDOWEVENT_SIZE_CHANGED
-            SDL_WINDOWEVENT_MINIMIZED
-            SDL_WINDOWEVENT_MAXIMIZED
-            SDL_WINDOWEVENT_RESTORED
-            SDL_WINDOWEVENT_ENTER
-            SDL_WINDOWEVENT_LEAVE
-            SDL_WINDOWEVENT_FOCUS_GAINED
-            SDL_WINDOWEVENT_FOCUS_LOST
-            SDL_WINDOWEVENT_CLOSE
-            SDL_WINDOWEVENT_TAKE_FOCUS
-            SDL_WINDOWEVENT_HIT_TEST
-        ]
-        ],
-        SDL_DisplayEventID => [
-        qw[SDL_DISPLAYEVENT_NONE SDL_DISPLAYEVENT_ORIENTATION
-            SDL_DISPLAYEVENT_CONNECTED SDL_DISPLAYEVENT_DISCONNECTED
-        ]
-        ],
-        SDL_DisplayOrientation => [
-        qw[SDL_ORIENTATION_UNKNOWN
-            SDL_ORIENTATION_LANDSCAPE SDL_ORIENTATION_LANDSCAPE_FLIPPED
-            SDL_ORIENTATION_PORTRAIT  SDL_ORIENTATION_PORTRAIT_FLIPPED
-        ]
-        ];
+    };
+    #
+    package SDL2::AssertData {
+        use SDL2::Utils;
+        has
+            always_ignore => 'int',
+            trigger_count => 'uint',
+            condition     => 'opaque',    # string
+            filename      => 'opaque',    # string
+            linenum       => 'int',
+            function      => 'opaque',    # string
+            next          => 'opaque'     # const struct SDL_AssertData *next
+    };
+    attach assert => {
+        SDL_ReportAssertion    => [ [ 'opaque', 'string', 'string', 'int' ], 'opaque' ],
+        SDL_GetAssertionReport => [ ['SDL_AssertData'] ],
+    };
+    FFI::C::ArrayDef->new(    # Used sparingly when I need to pass a list of SDL_Point objects
+        ffi,
+        name    => 'SDL2x_PointList',
+        class   => 'SDL2x::PointList',
+        members => ['SDL_Point'],
+    );
+    FFI::C::ArrayDef->new(    # Used sparingly when I need to pass a list of SDL_Point objects
+        ffi,
+        name    => 'SDL2x_FPointList',
+        class   => 'SDL2x::FPointList',
+        members => ['SDL_Point'],
+    );
+    FFI::C::ArrayDef->new(    # Used sparingly when I need to pass a list of SDL_Rect objects
+        ffi,
+        name    => 'SDL2x_RectList',
+        class   => 'SDL2x::RectList',
+        members => ['SDL_Rect'],
+    );
+    FFI::C::ArrayDef->new(    # Used sparingly when I need to pass a list of SDL_Rect objects
+        ffi,
+        name    => 'SDL2x_FRectList',
+        class   => 'SDL2x::FRectList',
+        members => ['SDL_FRect'],
+    );
+    #
+    ffi->type( '(opaque,opaque,opaque)->int' => 'SDL_HitTest' );
 
     # An opaque handle to an OpenGL context.
     package SDL2::GLContext { use SDL2::Utils; has() };
-    enum SDL_GLattr => [
-        qw[
-            SDL_GL_RED_SIZE
-            SDL_GL_GREEN_SIZE
-            SDL_GL_BLUE_SIZE
-            SDL_GL_ALPHA_SIZE
-            SDL_GL_BUFFER_SIZE
-            SDL_GL_DOUBLEBUFFER
-            SDL_GL_DEPTH_SIZE
-            SDL_GL_STENCIL_SIZE
-            SDL_GL_ACCUM_RED_SIZE
-            SDL_GL_ACCUM_GREEN_SIZE
-            SDL_GL_ACCUM_BLUE_SIZE
-            SDL_GL_ACCUM_ALPHA_SIZE
-            SDL_GL_STEREO
-            SDL_GL_MULTISAMPLEBUFFERS
-            SDL_GL_MULTISAMPLESAMPLES
-            SDL_GL_ACCELERATED_VISUAL
-            SDL_GL_RETAINED_BACKING
-            SDL_GL_CONTEXT_MAJOR_VERSION
-            SDL_GL_CONTEXT_MINOR_VERSION
-            SDL_GL_CONTEXT_EGL
-            SDL_GL_CONTEXT_FLAGS
-            SDL_GL_CONTEXT_PROFILE_MASK
-            SDL_GL_SHARE_WITH_CURRENT_CONTEXT
-            SDL_GL_FRAMEBUFFER_SRGB_CAPABLE
-            SDL_GL_CONTEXT_RELEASE_BEHAVIOR
-            SDL_GL_CONTEXT_RESET_NOTIFICATION
-            SDL_GL_CONTEXT_NO_ERROR
-        ]
-        ],
-        SDL_GLprofile => [
-        [ SDL_GL_CONTEXT_PROFILE_CORE          => 0x0001 ],
-        [ SDL_GL_CONTEXT_PROFILE_COMPATIBILITY => 0x0002 ],
-        [ SDL_GL_CONTEXT_PROFILE_ES            => 0x0004 ]
-        ],
-        SDL_GLcontextFlag => [
-        [ SDL_GL_CONTEXT_DEBUG_FLAG              => 0x0001 ],
-        [ SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG => 0x0002 ],
-        [ SDL_GL_CONTEXT_ROBUST_ACCESS_FLAG      => 0x0004 ],
-        [ SDL_GL_CONTEXT_RESET_ISOLATION_FLAG    => 0x0008 ]
-        ],
-        SDL_GLcontextReleaseFlag => [
-        [ SDL_GL_CONTEXT_RELEASE_BEHAVIOR_NONE  => 0x0000 ],
-        [ SDL_GL_CONTEXT_RELEASE_BEHAVIOR_FLUSH => 0x0001 ]
-        ],
-        SDL_GLContextResetNotification => [
-        [ SDL_GL_CONTEXT_RESET_NO_NOTIFICATION => 0x0000 ],
-        [ SDL_GL_CONTEXT_RESET_LOSE_CONTEXT    => 0x0001 ]
-        ];
     attach video => {
         SDL_GetNumVideoDrivers     => [ [],         'int' ],
         SDL_GetVideoDriver         => [ ['int'],    'string' ],
@@ -578,67 +329,6 @@ package SDL2::FFI 0.03 {
         SDL_GL_SwapWindow         => [ ['SDL_Window'] ],
         SDL_GL_DeleteContext      => [ ['SDL_GLContext'] ]
         };
-    enum SDL_RendererFlags => [
-        [ SDL_RENDERER_SOFTWARE      => 0x00000001 ],
-        [ SDL_RENDERER_ACCELERATED   => 0x00000002 ],
-        [ SDL_RENDERER_PRESENTVSYNC  => 0x00000004 ],
-        [ SDL_RENDERER_TARGETTEXTURE => 0x00000008 ]
-    ];
-
-    package SDL2::RendererInfo {
-        use SDL2::Utils;
-        has name                => 'opaque',       # string
-            flags               => 'uint32',
-            num_texture_formats => 'uint32',
-            texture_formats     => 'uint32[16]',
-            max_texture_width   => 'int',
-            max_texture_height  => 'int';
-    };
-    enum
-        SDL_ScaleMode     => [qw[SDL_SCALEMODENEAREST SDL_SCALEMODELINEAR SDL_SCALEMODEBEST]],
-        SDL_TextureAccess =>
-        [qw[SDL_TEXTUREACCESS_STATIC SDL_TEXTUREACCESS_STREAMING SDL_TEXTUREACCESS_TARGET]],
-        SDL_TextureModulate => [
-        [ SDL_TEXTUREMODULATE_NONE  => 0x00000000 ],
-        [ SDL_TEXTUREMODULATE_COLOR => 0x00000001 ],
-        [ SDL_TEXTUREMODULATE_ALPHA => 0x00000002 ]
-        ],
-        SDL_RendererFlip => [
-        [ SDL_FLIP_NONE       => 0x00000000 ],
-        [ SDL_FLIP_HORIZONTAL => 0x00000001 ],
-        [ SDL_FLIP_VERTICAL   => 0x00000002 ]
-        ],
-        SDL_BlendMode => [
-        [ SDL_BLENDMODE_NONE    => 0x00000000 ],
-        [ SDL_BLENDMODE_BLEND   => 0x00000001 ],
-        [ SDL_BLENDMODE_ADD     => 0x00000002, ],
-        [ SDL_BLENDMODE_MOD     => 0x00000004, ],
-        [ SDL_BLENDMODE_MUL     => 0x00000008, ],
-        [ SDL_BLENDMODE_INVALID => 0x7FFFFFFF ]
-        ],
-        SDL_BlendOperation => [
-        [ SDL_BLENDOPERATION_ADD          => 0x1 ],
-        [ SDL_BLENDOPERATION_SUBTRACT     => 0x2 ],
-        [ SDL_BLENDOPERATION_REV_SUBTRACT => 0x3 ],
-        [ SDL_BLENDOPERATION_MINIMUM      => 0x4 ],
-        [ SDL_BLENDOPERATION_MAXIMUM      => 0x5 ]
-        ],
-        SDL_BlendFactor => [
-        [ SDL_BLENDFACTOR_ZERO                => 0x1 ],
-        [ SDL_BLENDFACTOR_ONE                 => 0x2 ],
-        [ SDL_BLENDFACTOR_SRC_COLOR           => 0x3 ],
-        [ SDL_BLENDFACTOR_ONE_MINUS_SRC_COLOR => 0x4 ],
-        [ SDL_BLENDFACTOR_SRC_ALPHA           => 0x5 ],
-        [ SDL_BLENDFACTOR_ONE_MINUS_SRC_ALPHA => 0x6 ],
-        [ SDL_BLENDFACTOR_DST_COLOR           => 0x7 ],
-        [ SDL_BLENDFACTOR_ONE_MINUS_DST_COLOR => 0x8 ],
-        [ SDL_BLENDFACTOR_DST_ALPHA           => 0x9 ],
-        [ SDL_BLENDFACTOR_ONE_MINUS_DST_ALPHA => 0xA ]
-        ];
-
-    package SDL2::Renderer { use SDL2::Utils; has() };
-
-    package SDL2::Texture { use SDL2::Utils; has() };
     attach render => {
         SDL_GetNumRenderDrivers     => [ [],                            'int' ],
         SDL_GetRenderDriverInfo     => [ [ 'int', 'SDL_RendererInfo' ], 'int' ],
@@ -657,7 +347,7 @@ package SDL2::FFI 0.03 {
                #}
         ],
         SDL_CreateRenderer         => [ [ 'SDL_Window', 'int', 'uint32' ],      'SDL_Renderer' ],
-        SDL_CreateSoftwareRenderer => [ ['SDL_Renderer'],                       'SDL_Surface' ],
+        SDL_CreateSoftwareRenderer => [ ['SDL_Surface'],                        'SDL_Renderer' ],
         SDL_GetRenderer            => [ ['SDL_Window'],                         'SDL_Renderer' ],
         SDL_GetRendererInfo        => [ [ 'SDL_Renderer', 'SDL_RendererInfo' ], 'int' ],
         SDL_GetRendererOutputSize  => [ [ 'SDL_Renderer', 'int*', 'int*' ],     'int' ],
@@ -912,87 +602,9 @@ package SDL2::FFI 0.03 {
         ],
         SDL_RemoveTimer => [ ['uint32'] => 'bool' ],
     };
-    define audio => [
-        [ SDL_AUDIO_MASK_BITSIZE   => 0xFF ],
-        [ SDL_AUDIO_MASK_DATATYPE  => ( 1 << 8 ) ],
-        [ SDL_AUDIO_MASK_ENDIAN    => ( 1 << 12 ) ],
-        [ SDL_AUDIO_MASK_SIGNED    => ( 1 << 15 ) ],
-        [ SDL_AUDIO_BITSIZE        => sub ($x) { $x & SDL_AUDIO_MASK_BITSIZE() } ],
-        [ SDL_AUDIO_ISFLOAT        => sub ($x) { $x & SDL_AUDIO_MASK_DATATYPE() } ],
-        [ SDL_AUDIO_ISBIGENDIAN    => sub ($x) { $x & SDL_AUDIO_MASK_ENDIAN() } ],
-        [ SDL_AUDIO_ISSIGNED       => sub ($x) { $x & SDL_AUDIO_MASK_SIGNED() } ],
-        [ SDL_AUDIO_ISINT          => sub ($x) { !SDL_AUDIO_ISFLOAT($x) } ],
-        [ SDL_AUDIO_ISLITTLEENDIAN => sub ($x) { !SDL_AUDIO_ISBIGENDIAN($x) } ],
-        [ SDL_AUDIO_ISUNSIGNED     => sub ($x) { !SDL_AUDIO_ISSIGNED($x) } ],
-        [ AUDIO_U8                 => 0x0008 ],
-        [ AUDIO_S8                 => 0x8008 ],
-        [ AUDIO_U16LSB             => 0x0010 ],
-        [ AUDIO_S16LSB             => 0x8010 ],
-        [ AUDIO_U16MSB             => 0x1010 ],
-        [ AUDIO_S16MSB             => 0x9010 ],
-        [ AUDIO_U16                => sub () { AUDIO_U16LSB() } ],
-        [ AUDIO_S16                => sub () { AUDIO_S16LSB() } ],
-        [ AUDIO_S32LSB             => 0x8020 ],
-        [ AUDIO_S32MSB             => 0x9020 ],
-        [ AUDIO_S32                => sub () { AUDIO_S32LSB() } ],
-        [ AUDIO_F32LSB             => 0x8120 ],
-        [ AUDIO_F32MSB             => 0x9120 ],
-        [ AUDIO_F32                => sub () { AUDIO_F32LSB() } ], (
-            $bigendian ? (
-                [ AUDIO_U16SYS => sub () { AUDIO_U16MSB() } ],
-                [ AUDIO_S16SYS => sub () { AUDIO_S16MSB() } ],
-                [ AUDIO_S32SYS => sub () { AUDIO_S32MSB() } ],
-                [ AUDIO_F32SYS => sub () { AUDIO_F32MSB() } ]
-                ) : (
-                [ AUDIO_U16SYS => sub () { AUDIO_U16LSB() } ],
-                [ AUDIO_S16SYS => sub () { AUDIO_S16LSB() } ],
-                [ AUDIO_S32SYS => sub () { AUDIO_S32LSB() } ],
-                [ AUDIO_F32SYS => sub () { AUDIO_F32LSB() } ],
-                )
-        ),
-        [ SDL_AUDIO_ALLOW_FREQUENCY_CHANGE => sub () {0x00000001} ],
-        [ SDL_AUDIO_ALLOW_FORMAT_CHANGE    => sub () {0x00000002} ],
-        [ SDL_AUDIO_ALLOW_CHANNELS_CHANGE  => sub () {0x00000004} ],
-        [ SDL_AUDIO_ALLOW_SAMPLES_CHANGE   => sub () {0x00000008} ],
-        [   SDL_AUDIO_ALLOW_ANY_CHANGE => sub () {
-                ( SDL_AUDIO_ALLOW_FREQUENCY_CHANGE() | SDL_AUDIO_ALLOW_FORMAT_CHANGE()
-                        | SDL_AUDIO_ALLOW_CHANNELS_CHANGE() | SDL_AUDIO_ALLOW_SAMPLES_CHANGE() )
-            }
-        ],
-    ];
     ffi->type( '(opaque,string,int)->void' => 'SDL_AudioCallback' );
     ffi->type( 'int'                       => 'SDL_AudioFormat' );
-
-    package SDL2::AudioSpec {
-        use SDL2::Utils;
-        has
-            freq     => 'int',
-            format   => 'uint16',
-            channels => 'uint8',
-            silence  => 'uint8',
-            samples  => 'uint16',
-            padding  => 'uint16',
-            size     => 'uint32',
-            callback => 'opaque',    # SDL_AudioCallback
-            userdata => 'opaque'     # void *
-    };
-
-    package SDL2::AudioCVT {
-        use SDL2::Utils;
-        has
-            needed       => 'int',
-            src_format   => 'uint16',    # SDL_AudioFormat
-            dst_format   => 'uint16',    # SDL_AudioFormat
-            rate_incr    => 'double',
-            buf          => 'opaque',    # uint8 *
-            len          => 'int',
-            len_cvt      => 'int',
-            len_mult     => 'int',
-            len_ratio    => 'double',
-            filters      => 'opaque',    #SDL_AudioFilter[SDL_AUDIOCVT_MAX_FILTERS + 1];
-            filter_index => 'int';
-    };
-    ffi->type( '(opaque,uint16)->void' => 'SDL_AudioFilter' );
+    ffi->type( '(opaque,uint16)->void'     => 'SDL_AudioFilter' );
 
     package SDL2::AudioStream {
         use SDL2::Utils;
@@ -1000,11 +612,6 @@ package SDL2::FFI 0.03 {
     };
 
     package SDL2::AudioDeviceID {
-        use SDL2::Utils;
-        has();
-    };
-
-    package SDL2::AudioStatus {
         use SDL2::Utils;
         has();
     };
@@ -1108,31 +715,21 @@ END
             'SDL_Surface' );
 
     # https://wiki.libsdl.org/CategoryCPU
-    ffi->attach( SDL_GetCPUCacheLineSize => [] => 'int' );
-    ffi->attach( SDL_GetCPUCount         => [] => 'int' );
-    ffi->attach( SDL_GetSystemRAM        => [] => 'int' );
-    ffi->attach( SDL_Has3DNow            => [] => 'bool' );
-    ffi->attach( SDL_HasAVX              => [] => 'bool' );
-    ffi->attach( SDL_HasAVX2             => [] => 'bool' );
-    ffi->attach( SDL_HasAltiVec          => [] => 'bool' );
-    ffi->attach( SDL_HasMMX              => [] => 'bool' );
-    ffi->attach( SDL_HasRDTSC            => [] => 'bool' );
-    ffi->attach( SDL_HasSSE              => [] => 'bool' );
-    ffi->attach( SDL_HasSSE2             => [] => 'bool' );
-    ffi->attach( SDL_HasSSE3             => [] => 'bool' );
-    ffi->attach( SDL_HasSSE41            => [] => 'bool' );
-    ffi->attach( SDL_HasSSE42            => [] => 'bool' );
-
-    # https://wiki.libsdl.org/CategoryPower
-    FFI::C->enum(
-        'SDL_PowerState',
-        [   qw[
-                SDL_POWERSTATE_UNKNOWN
-                SDL_POWERSTATE_ON_BATTERY SDL_POWERSTATE_NO_BATTERY
-                SDL_POWERSTATE_CHARGING   SDL_POWERSTATE_CHARGED]
-        ]
-    );
-    ffi->attach( SDL_GetPowerInfo => [ 'int*', 'int*' ] => 'int' );
+    ffi->attach( SDL_GetCPUCacheLineSize => []                 => 'int' );
+    ffi->attach( SDL_GetCPUCount         => []                 => 'int' );
+    ffi->attach( SDL_GetSystemRAM        => []                 => 'int' );
+    ffi->attach( SDL_Has3DNow            => []                 => 'bool' );
+    ffi->attach( SDL_HasAVX              => []                 => 'bool' );
+    ffi->attach( SDL_HasAVX2             => []                 => 'bool' );
+    ffi->attach( SDL_HasAltiVec          => []                 => 'bool' );
+    ffi->attach( SDL_HasMMX              => []                 => 'bool' );
+    ffi->attach( SDL_HasRDTSC            => []                 => 'bool' );
+    ffi->attach( SDL_HasSSE              => []                 => 'bool' );
+    ffi->attach( SDL_HasSSE2             => []                 => 'bool' );
+    ffi->attach( SDL_HasSSE3             => []                 => 'bool' );
+    ffi->attach( SDL_HasSSE41            => []                 => 'bool' );
+    ffi->attach( SDL_HasSSE42            => []                 => 'bool' );
+    ffi->attach( SDL_GetPowerInfo        => [ 'int*', 'int*' ] => 'int' );
 
     # https://wiki.libsdl.org/CategoryStandard
     ffi->attach( SDL_acos => ['double'] => 'double' );
@@ -1157,43 +754,6 @@ END
                 sub ($X) { ( ( ($X) & 0xFFFF0000 ) == SDL_WINDOWPOS_CENTERED_MASK() ) }
         ],
     ];
-
-    # https://wiki.libsdl.org/CategoryPixels
-    package SDL2::Color {
-        use SDL2::Utils;
-        has r => 'uint8', g => 'uint8', b => 'uint8', a => 'uint8';
-    };
-
-    package SDL2::Palette {
-        use SDL2::Utils;
-        has
-            ncolors => 'int',
-            colors  => 'SDL_Color';
-    };
-
-    package SDL2::PixelFormat {
-        use SDL2::Utils;
-        has
-            format        => 'uint32',
-            palette       => 'SDL_Palette',
-            BitsPerPixel  => 'uint8',
-            BytesPerPixel => 'uint8',
-            padding       => 'uint32[2]',
-            Rmask         => 'uint32',
-            Gmask         => 'uint32',
-            Bmask         => 'uint32',
-            Amask         => 'uint32',
-            Rloss         => 'uint8',
-            Gloss         => 'uint8',
-            Bloss         => 'uint8',
-            Aloss         => 'uint8',
-            Rshift        => 'uint8',
-            Gshift        => 'uint8',
-            Bshift        => 'uint8',
-            Ashift        => 'uint8',
-            refcount      => 'int',
-            next          => 'opaque'         # SDL_PixelFormat *
-    };
     attach future => {
         SDL_FillRect => [ [ 'SDL_Surface', 'opaque', 'uint32' ], 'int' ],
         SDL_MapRGB   => [
@@ -1204,427 +764,6 @@ END
             }
         ]
     };
-
-    # https://wiki.libsdl.org/CategoryEvents
-    define events => [
-        [ SDL_RELEASED => 0 ], [ SDL_PRESSED => 1 ],
-
-        # SDL_EventType
-        [ SDL_FIRSTEVENT => 0 ],    #     /**< Unused (do not remove) */
-
-        #
-        [ SDL_QUIT                    => 0x100 ],                      # /**< User-requested quit */
-        [ SDL_APP_TERMINATING         => sub () { SDL_QUIT() + 1 } ],
-        [ SDL_APP_LOWMEMORY           => sub () { SDL_QUIT() + 2 } ],
-        [ SDL_APP_WILLENTERBACKGROUND => sub () { SDL_QUIT() + 3 } ],
-        [ SDL_APP_DIDENTERBACKGROUND  => sub () { SDL_QUIT() + 4 } ],
-        [ SDL_APP_WILLENTERFOREGROUND => sub () { SDL_QUIT() + 5 } ],
-        [ SDL_APP_DIDENTERFOREGROUND  => sub () { SDL_QUIT() + 6 } ],
-        #
-        [ SDL_DISPLAYEVENT => 0x150 ],
-        #
-        [ SDL_WINDOWEVENT => 0x200 ], [ SDL_SYSWMEVENT => sub () { SDL_WINDOWEVENT() + 1 } ],
-        #
-        [ SDL_KEYDOWN       => 0x300 ], [ SDL_KEYUP => sub () { SDL_KEYDOWN() + 1 } ],
-        [ SDL_TEXTEDITING   => sub () { SDL_KEYDOWN() + 2 } ],
-        [ SDL_TEXTINPUT     => sub () { SDL_KEYDOWN() + 3 } ],
-        [ SDL_KEYMAPCHANGED => sub () { SDL_KEYDOWN() + 4 } ],
-        #
-        [ SDL_MOUSEMOTION   => 0x400 ], [ SDL_MOUSEBUTTONDOWN => sub () { SDL_MOUSEMOTION() + 1 } ],
-        [ SDL_MOUSEBUTTONUP => sub () { SDL_MOUSEMOTION() + 2 } ],
-        [ SDL_MOUSEWHEEL    => sub () { SDL_MOUSEMOTION() + 3 } ],
-        #
-        [ SDL_JOYAXISMOTION    => 0x600 ],
-        [ SDL_JOYBALLMOTION    => sub () { SDL_JOYAXISMOTION() + 1 } ],
-        [ SDL_JOYHATMOTION     => sub () { SDL_JOYAXISMOTION() + 2 } ],
-        [ SDL_JOYBUTTONDOWN    => sub () { SDL_JOYAXISMOTION() + 3 } ],
-        [ SDL_JOYBUTTONUP      => sub () { SDL_JOYAXISMOTION() + 4 } ],
-        [ SDL_JOYDEVICEADDED   => sub () { SDL_JOYAXISMOTION() + 5 } ],
-        [ SDL_JOYDEVICEREMOVED => sub () { SDL_JOYAXISMOTION() + 6 } ],
-        #
-        [ SDL_CONTROLLERAXISMOTION     => 0x650 ],
-        [ SDL_CONTROLLERBUTTONDOWN     => sub () { SDL_CONTROLLERAXISMOTION() + 1 } ],
-        [ SDL_CONTROLLERBUTTONUP       => sub () { SDL_CONTROLLERAXISMOTION() + 2 } ],
-        [ SDL_CONTROLLERDEVICEADDED    => sub () { SDL_CONTROLLERAXISMOTION() + 3 } ],
-        [ SDL_CONTROLLERDEVICEREMOVED  => sub () { SDL_CONTROLLERAXISMOTION() + 4 } ],
-        [ SDL_CONTROLLERDEVICEREMAPPED => sub () { SDL_CONTROLLERAXISMOTION() + 5 } ],
-        #
-        [ SDL_FINGERDOWN   => 0x700 ], [ SDL_FINGERUP => sub () { SDL_FINGERDOWN() + 1 } ],
-        [ SDL_FINGERMOTION => sub () { SDL_FINGERDOWN() + 2 } ],
-        #
-        [ SDL_DOLLARGESTURE => 0x800 ], [ SDL_DOLLARRECORD => sub () { SDL_DOLLARGESTURE() + 1 } ],
-        [ SDL_MULTIGESTURE  => sub () { SDL_DOLLARGESTURE() + 2 } ],
-        #
-        [ SDL_CLIPBOARDUPDATE => 0x900 ],
-        #
-        [ SDL_DROPFILE     => 0x1000 ], [ SDL_DROPTEXT => sub () { SDL_DROPFILE() + 1 } ],
-        [ SDL_DROPBEGIN    => sub () { SDL_DROPFILE() + 2 } ],
-        [ SDL_DROPCOMPLETE => sub () { SDL_DROPFILE() + 3 } ],
-        #
-        [ SDL_AUDIODEVICEADDED   => 0x1100 ],
-        [ SDL_AUDIODEVICEREMOVED => sub () { SDL_AUDIODEVICEADDED() + 1 } ],
-        #
-        [ SDL_SENSORUPDATE => 0x1200 ],
-        #
-        [ SDL_RENDER_TARGETS_RESET => 0x2000 ],
-        [ SDL_RENDER_DEVICE_RESET  => sub () { SDL_RENDER_TARGETS_RESET() + 1 } ],
-        #
-        [ SDL_USEREVENT => 0x8000 ],
-        #
-        [ SDL_LASTEVENT => 0xFFFF ],
-    ];
-    #
-    package SDL2::CommonEvent {
-        use SDL2::Utils;
-        has
-            type      => 'uint32',
-            timestamp => 'uint32';
-    };
-
-    package SDL2::DisplayEvent {
-        use SDL2::Utils;
-        has
-            type      => 'uint32',
-            timestamp => 'uint32',
-            display   => 'uint32',
-            event     => 'uint8',
-            padding1  => 'uint8',
-            padding2  => 'uint8',
-            padding3  => 'uint8',
-            data1     => 'sint32';
-    };
-
-    package SDL2::WindowEvent {
-        use SDL2::Utils;
-        has
-            type      => 'uint32',
-            timestamp => 'uint32',
-            windowId  => 'uint32',
-            event     => 'uint8',
-            padding1  => 'uint8',
-            padding2  => 'uint8',
-            padding3  => 'uint8',
-            data1     => 'sint32',
-            data2     => 'sint32';
-    };
-
-    package SDL2::KeyboardEvent {
-        use SDL2::Utils;
-        has
-            type      => 'uint32',
-            timestamp => 'uint32',
-            windowId  => 'uint32',
-            state     => 'uint8',
-            repeat    => 'uint8',
-            padding2  => 'uint8',
-            padding3  => 'uint8',
-            keysym    => 'opaque'    # SDL_Keysym
-    };
-
-    package SDL2::TextEditingEvent {
-        use SDL2::Utils;
-        has
-            type      => 'uint32',
-            timestamp => 'uint32',
-            windowId  => 'uint32',
-            text      => 'char[32]',
-            start     => 'sint32',
-            length    => 'sint32';
-    };
-
-    package SDL2::TextInputEvent {
-        use SDL2::Utils;
-        has
-            type      => 'uint32',
-            timestamp => 'uint32',
-            windowId  => 'uint32',
-            text      => 'char[32]';
-    };
-
-    package SDL2::MouseMotionEvent {
-        use SDL2::Utils;
-        has
-            type      => 'uint32',
-            timestamp => 'uint32',
-            windowId  => 'uint32',
-            which     => 'uint32',
-            state     => 'uint8',
-            x         => 'sint32',
-            y         => 'sint32',
-            xrel      => 'sint32',
-            yrel      => 'sint32';
-    };
-
-    package SDL2::MouseButtonEvent {
-        use SDL2::Utils;
-        has
-            type      => 'uint32',
-            timestamp => 'uint32',
-            windowID  => 'uint32',
-            which     => 'uint32',
-            button    => 'uint8',
-            state     => 'uint8',
-            clicks    => 'uint8',
-            padding1  => 'uint8',
-            x         => 'sint32',
-            y         => 'sint32';
-    };
-
-    package SDL2::MouseWheelEvent {
-        use SDL2::Utils;
-        has
-            type      => 'uint32',
-            timestamp => 'uint32',
-            windowId  => 'uint32',
-            which     => 'uint8',
-            x         => 'sint32',
-            y         => 'sint32',
-            direction => 'uint32';
-    };
-
-    package SDL2::JoyAxisEvent {
-        use SDL2::Utils;
-        has
-            type      => 'uint32',
-            timestamp => 'uint32',
-            which     => 'opaque',    # SDL_JoystickID
-            padding1  => 'uint8',
-            padding2  => 'uint8',
-            padding3  => 'uint8',
-            value     => 'sint16',
-            padding4  => 'uint16';
-    };
-
-    package SDL2::JoyBallEvent {
-        use SDL2::Utils;
-        has
-            type      => 'uint32',
-            timestamp => 'uint32',
-            which     => 'opaque',    # SDL_JoystickID
-            padding1  => 'uint8',
-            padding2  => 'uint8',
-            padding3  => 'uint8',
-            xrel      => 'sint16',
-            yrel      => 'uint16',
-            ;
-    };
-
-    package SDL2::JoyHatEvent {
-        use SDL2::Utils;
-        has
-            type      => 'uint32',
-            timestamp => 'uint32',
-            which     => 'opaque',    # SDL_JoystickID
-            hat       => 'uint8',
-            value     => 'uint8',
-            padding1  => 'uint8',
-            padding2  => 'uint8';
-    };
-
-    package SDL2::JoyButtonEvent {
-        use SDL2::Utils;
-        has
-            type      => 'uint32',
-            timestamp => 'uint32',
-            which     => 'opaque',    # SDL_JoystickID
-            button    => 'uint8',
-            state     => 'uint8',
-            padding1  => 'uint8',
-            padding2  => 'uint8';
-    };
-
-    package SDL2::JoyDeviceEvent {
-        use SDL2::Utils;
-        has
-            type      => 'uint32',
-            timestamp => 'uint32',
-            which     => 'sint32';
-    };
-
-    package SDL2::ControllerAxisEvent {
-        use SDL2::Utils;
-        has
-            type      => 'uint32',
-            timestamp => 'uint32',
-            which     => 'opaque',    # SDL_JoystickID
-            axis      => 'uint8',
-            padding1  => 'uint8',
-            padding2  => 'uint8',
-            padding3  => 'uint8',
-            value     => 'sint16',
-            padding4  => 'uint8';
-    };
-
-    package SDL2::ControllerButtonEvent {
-        use SDL2::Utils;
-        has
-            type      => 'uint32',
-            timestamp => 'uint32',
-            which     => 'opaque',    # SDL_JoystickID
-            button    => 'uint8',
-            state     => 'uint8',
-            padding1  => 'uint8',
-            padding2  => 'uint8',
-            ;
-    };
-
-    package SDL2::ControllerDeviceEvent {
-        use SDL2::Utils;
-        has
-            type      => 'uint32',
-            timestamp => 'uint32',
-            which     => 'sint32';
-    };
-
-    package SDL2::AudioDeviceEvent {
-        use SDL2::Utils;
-        has
-            type      => 'uint32',
-            timestamp => 'uint32',
-            which     => 'uint32',
-            iscapture => 'uint8',
-            padding1  => 'uint8',
-            padding2  => 'uint8',
-            padding3  => 'uint8';
-    };
-
-    package SDL2::TouchFingerEvent {
-        use SDL2::Utils;
-        has
-            type      => 'uint32',
-            timestamp => 'uint32',
-            touchId   => 'opaque',    # SDL_TouchID
-            fingerId  => 'opaque',    # SDL_FingerID
-            x         => 'float',
-            y         => 'float',
-            dx        => 'float',
-            dy        => 'float',
-            pressure  => 'float';
-    };
-
-    package SDL2::MultiGestureEvent {
-        use SDL2::Utils;
-        has
-            type       => 'uint32',
-            timestamp  => 'uint32',
-            touchId    => 'opaque',    # SDL_TouchID
-            dTheta     => 'float',
-            dDist      => 'float',
-            x          => 'float',
-            y          => 'float',
-            numFingers => 'uint16',
-            padding    => 'uint16';
-    };
-
-    package SDL2::DollarGestureEvent {
-        use SDL2::Utils;
-        has
-            type       => 'uint32',
-            timestamp  => 'uint32',
-            touchId    => 'opaque',    # SDL_TouchID
-            gestureId  => 'opaque',    # SDL_GestureID
-            numFingers => 'uint32',
-            error      => 'float',
-            x          => 'float',
-            y          => 'float';
-    };
-
-    package SDL2::DropEvent {
-        use SDL2::Utils;
-        has
-            type      => 'uint32',
-            timestamp => 'uint32',
-            file      => 'char[256]',
-            windowID  => 'uint32';
-    };
-
-    package SDL2::SensorEvent {
-        use SDL2::Utils;
-        has
-            type      => 'uint32',
-            timestamp => 'uint32',
-            which     => 'sint32',
-            data      => 'float[6]';
-    };
-
-    package SDL2::QuitEvent {
-        use SDL2::Utils;
-        has type => 'uint32', timestamp => 'uint32';
-    };
-
-    package SDL2::OSEvent {
-        use SDL2::Utils;
-        has
-            type      => 'uint32',
-            timestamp => 'uint32';
-    };
-
-    package SDL2::UserEvent {
-        use SDL2::Utils;
-        has
-            type      => 'uint32',
-            timestamp => 'uint32',
-            windowID  => 'uint32',
-            code      => 'sint32',
-            data1     => 'opaque',    # void *
-            data2     => 'opaque'     # void *
-    };
-
-    package SDL2::SysWMmsg {
-        use SDL2::Utils;
-        has();
-    };
-
-    package SDL2::SysWMEvent {
-        use SDL2::Utils;
-        has
-            type      => 'uint32',
-            timestamp => 'uint32',
-            msg       => 'opaque'    # SDL_SysWMmsg
-    };
-    use FFI::C::UnionDef;
-
-    package SDL2::Event { use SDL2::Utils; };
-    FFI::C::UnionDef->new( ffi,
-        name    => 'SDL_Event',
-        class   => 'SDL2::Event',
-        members => [
-            type     => 'uint32',
-            common   => 'SDL_CommonEvent',
-            display  => 'SDL_DisplayEvent',
-            window   => 'SDL_WindowEvent',
-            key      => 'SDL_KeyboardEvent',
-            edit     => 'SDL_TextEditingEvent',
-            text     => 'SDL_TextInputEvent',
-            motion   => 'SDL_MouseMotionEvent',
-            button   => 'SDL_MouseButtonEvent',
-            wheel    => 'SDL_MouseWheelEvent',
-            jaxis    => 'SDL_JoyAxisEvent',
-            jball    => 'SDL_JoyBallEvent',
-            jhat     => 'SDL_JoyHatEvent',
-            jbutton  => 'SDL_JoyButtonEvent',
-            jdevice  => 'SDL_JoyDeviceEvent',
-            caxis    => 'SDL_ControllerAxisEvent',
-            cbutton  => 'SDL_ControllerButtonEvent',
-            cdevice  => 'SDL_ControllerDeviceEvent',
-            adevice  => 'SDL_AudioDeviceEvent',
-            sensor   => 'SDL_SensorEvent',
-            quit     => 'SDL_QuitEvent',
-            user     => 'SDL_UserEvent',
-            syswm    => 'SDL_SysWMEvent',
-            tfinger  => 'SDL_TouchFingerEvent',
-            mgesture => 'SDL_MultiGestureEvent',
-            dgesture => 'SDL_DollarGestureEvent',
-            drop     => 'SDL_DropEvent',
-            padding  => 'uint8[56]'
-        ]
-    );
-    enum SDL_EventAction => [
-        qw[
-            SDL_ADDEVENT
-            SDL_PEEKEVENT
-            SDL_GETEVENT]
-    ];
     ffi->type( '(opaque, opaque)->int' => 'SDL_EventFilter' );
     attach events => {
         SDL_PeepEvents =>
@@ -1644,10 +783,6 @@ END
         SDL_FilterEvents     => [ [ 'SDL_EventFilter', 'opaque' ] ]
     };
     #
-    sub SDL_QUERY ()   {-1}
-    sub SDL_IGNORE ()  {0}
-    sub SDL_DISABLE () {0}
-    sub SDL_ENABLE ()  {1}
     #
     ffi->attach( SDL_EventState => [ 'uint32', 'int' ] => 'uint8' );
     sub SDL_GetEventState ($type) { SDL_EventState( $type, SDL_QUERY ) }
@@ -1662,28 +797,6 @@ END
     };
 
     # From SDL_mouse.h
-    enum SDL_SystemCursor => [
-        qw[
-            SDL_SYSTEM_CURSOR_ARROW
-            SDL_SYSTEM_CURSOR_IBEAM
-            SDL_SYSTEM_CURSOR_WAIT
-            SDL_SYSTEM_CURSOR_CROSSHAIR
-            SDL_SYSTEM_CURSOR_WAITARROW
-            SDL_SYSTEM_CURSOR_SIZENWSE
-            SDL_SYSTEM_CURSOR_SIZENESW
-            SDL_SYSTEM_CURSOR_SIZEWE
-            SDL_SYSTEM_CURSOR_SIZENS
-            SDL_SYSTEM_CURSOR_SIZEALL
-            SDL_SYSTEM_CURSOR_NO
-            SDL_SYSTEM_CURSOR_HAND
-            SDL_NUM_SYSTEM_CURSORS]
-        ],
-        SDL_MouseWheelDirection => [
-        qw[
-            SDL_MOUSEWHEEL_NORMAL
-            SDL_MOUSEWHEEL_FLIPPED
-        ]
-        ];
     ffi->attach( SDL_GetMouseFocus         => [] => 'SDL_Window' );
     ffi->attach( SDL_GetMouseState         => [ 'int',        'int' ] => 'uint32' );
     ffi->attach( SDL_GetGlobalMouseState   => [ 'int',        'int' ] => 'uint32' );
@@ -1700,364 +813,15 @@ END
     ffi->attach( SDL_GetDefaultCursor   => []      => 'SDL_Cursor' );
     ffi->attach( SDL_FreeCursor         => []      => 'SDL_Cursor' );
     ffi->attach( SDL_ShowCursor         => ['int'] => 'int' );
-
-    # https://wiki.libsdl.org/CategoryPixels
-    sub SDL_ALPHA_OPAQUE()      {255}
-    sub SDL_ALPHA_TRANSPARENT() {0}
-    FFI::C->enum(
-        pixel_type => [
-            qw[
-                SDL_PIXELTYPE_UNKNOWN
-                SDL_PIXELTYPE_INDEX1
-                SDL_PIXELTYPE_INDEX4
-                SDL_PIXELTYPE_INDEX8
-                SDL_PIXELTYPE_PACKED8
-                SDL_PIXELTYPE_PACKED16
-                SDL_PIXELTYPE_PACKED32
-                SDL_PIXELTYPE_ARRAYU8
-                SDL_PIXELTYPE_ARRAYU16
-                SDL_PIXELTYPE_ARRAYU32
-                SDL_PIXELTYPE_ARRAYF16
-                SDL_PIXELTYPE_ARRAYF32
-            ]
-        ]
-    );
-    FFI::C->enum(
-        bitmap_order => [
-            qw[
-                SDL_BITMAPORDER_NONE
-                SDL_BITMAPORDER_4321
-                SDL_BITMAPORDER_1234
-            ]
-        ]
-    );
-    FFI::C->enum(
-        packed_order => [
-            qw[
-                SDL_PACKEDORDER_NONE
-                SDL_PACKEDORDER_XRGB
-                SDL_PACKEDORDER_RGBX
-                SDL_PACKEDORDER_ARGB
-                SDL_PACKEDORDER_RGBA
-                SDL_PACKEDORDER_XBGR
-                SDL_PACKEDORDER_BGRX
-                SDL_PACKEDORDER_ABGR
-                SDL_PACKEDORDER_BGRA
-            ]
-        ]
-    );
-    FFI::C->enum(
-        array_order => [
-            qw[
-                SDL_ARRAYORDER_NONE
-                SDL_ARRAYORDER_RGB
-                SDL_ARRAYORDER_RGBA
-                SDL_ARRAYORDER_ARGB
-                SDL_ARRAYORDER_BGR
-                SDL_ARRAYORDER_BGRA
-                SDL_ARRAYORDER_ABGR
-            ]
-        ]
-    );
-    FFI::C->enum(
-        packed_layout => [
-            qw[
-                SDL_PACKEDLAYOUT_NONE
-                SDL_PACKEDLAYOUT_332
-                SDL_PACKEDLAYOUT_4444
-                SDL_PACKEDLAYOUT_1555
-                SDL_PACKEDLAYOUT_5551
-                SDL_PACKEDLAYOUT_565
-                SDL_PACKEDLAYOUT_8888
-                SDL_PACKEDLAYOUT_2101010
-                SDL_PACKEDLAYOUT_1010102
-            ]
-        ]
-    );
-    sub SDL_DEFINE_PIXELFOURCC ( $A, $B, $C, $D ) { SDL_FOURCC( $A, $B, $C, $D ) }
-
-    sub SDL_DEFINE_PIXELFORMAT ( $type, $order, $layout, $bits, $bytes ) {
-        ( ( 1 << 28 ) | ( ($type) << 24 ) | ( ($order) << 20 ) | ( ($layout) << 16 )
-                | ( ($bits) << 8 ) | ( ($bytes) << 0 ) )
+    #
+    # XXX - From SDL_stding.h
+    # Define a four character code as a Uint32
+    sub SDL_FOURCC ( $A, $B, $C, $D ) {
+        ( $A << 0 ) | ( $B << 8 ) | ( $C << 16 ) | ( $D << 24 );
     }
-    sub SDL_PIXELFLAG    ($X) { ( ( ($X) >> 28 ) & 0x0F ) }
-    sub SDL_PIXELTYPE    ($X) { ( ( ($X) >> 24 ) & 0x0F ) }
-    sub SDL_PIXELORDER   ($X) { ( ( ($X) >> 20 ) & 0x0F ) }
-    sub SDL_PIXELLAYOUT  ($X) { ( ( ($X) >> 16 ) & 0x0F ) }
-    sub SDL_BITSPERPIXEL ($X) { ( ( ($X) >> 8 ) & 0xFF ) }
-
-    sub SDL_BYTESPERPIXEL ($X) {
-        (
-            SDL_ISPIXELFORMAT_FOURCC($X) ? (
-                (
-                    ( ($X) == SDL_PIXELFORMAT_YUY2() )     ||
-                        ( ($X) == SDL_PIXELFORMAT_UYVY() ) ||
-                        ( ($X) == SDL_PIXELFORMAT_YVYU() )
-                ) ? 2 : 1
-                ) :
-                ( ( ($X) >> 0 ) & 0xFF )
-        )
-    }
-
-    sub SDL_ISPIXELFORMAT_INDEXED ($format) {
-        (
-            !SDL_ISPIXELFORMAT_FOURCC($format) &&
-                ( ( SDL_PIXELTYPE($format) == SDL_PIXELTYPE_INDEX1() ) ||
-                ( SDL_PIXELTYPE($format) == SDL_PIXELTYPE_INDEX4() ) ||
-                ( SDL_PIXELTYPE($format) == SDL_PIXELTYPE_INDEX8() ) )
-        )
-    }
-
-    sub SDL_ISPIXELFORMAT_PACKED ($format) {
-        (
-            !SDL_ISPIXELFORMAT_FOURCC($format) &&
-                ( ( SDL_PIXELTYPE($format) == SDL_PIXELTYPE_PACKED8() ) ||
-                ( SDL_PIXELTYPE($format) == SDL_PIXELTYPE_PACKED16() ) ||
-                ( SDL_PIXELTYPE($format) == SDL_PIXELTYPE_PACKED32() ) )
-        )
-    }
-
-    sub SDL_ISPIXELFORMAT_ARRAY ($format) {
-        (
-            !SDL_ISPIXELFORMAT_FOURCC($format) &&
-                ( ( SDL_PIXELTYPE($format) == SDL_PIXELTYPE_ARRAYU8() ) ||
-                ( SDL_PIXELTYPE($format) == SDL_PIXELTYPE_ARRAYU16() ) ||
-                ( SDL_PIXELTYPE($format) == SDL_PIXELTYPE_ARRAYU32() ) ||
-                ( SDL_PIXELTYPE($format) == SDL_PIXELTYPE_ARRAYF16() ) ||
-                ( SDL_PIXELTYPE($format) == SDL_PIXELTYPE_ARRAYF32() ) )
-        )
-    }
-
-    sub SDL_ISPIXELFORMAT_ALPHA ($format) {
-        (
-            (
-                SDL_ISPIXELFORMAT_PACKED($format) &&
-                    ( ( SDL_PIXELORDER($format) == SDL_PACKEDORDER_ARGB() ) ||
-                    ( SDL_PIXELORDER($format) == SDL_PACKEDORDER_RGBA() ) ||
-                    ( SDL_PIXELORDER($format) == SDL_PACKEDORDER_ABGR() ) ||
-                    ( SDL_PIXELORDER($format) == SDL_PACKEDORDER_BGRA() ) )
-            ) ||
-                (
-                SDL_ISPIXELFORMAT_ARRAY($format) &&
-                ( ( SDL_PIXELORDER($format) == SDL_ARRAYORDER_ARGB() ) ||
-                    ( SDL_PIXELORDER($format) == SDL_ARRAYORDER_RGBA() ) ||
-                    ( SDL_PIXELORDER($format) == SDL_ARRAYORDER_ABGR() ) ||
-                    ( SDL_PIXELORDER($format) == SDL_ARRAYORDER_BGRA() ) )
-                )
-        )
-    }
-
-    #/* The flag is set to 1 because 0x1? is not in the printable ASCII range */
-    sub SDL_ISPIXELFORMAT_FOURCC ($format) { ( ($format) && ( SDL_PIXELFLAG($format) != 1 ) ) }
-    sub SDL_PIXELFORMAT_UNKNOWN ()         {0}
-
-    sub SDL_PIXELFORMAT_INDEX1LSB () {
-        SDL_DEFINE_PIXELFORMAT( SDL_PIXELTYPE_INDEX1(), SDL_BITMAPORDER_4321(), 0, 1, 0 );
-    }
-
-    sub SDL_PIXELFORMAT_INDEX1MSB () {
-        SDL_DEFINE_PIXELFORMAT( SDL_PIXELTYPE_INDEX1(), SDL_BITMAPORDER_1234(), 0, 1, 0 );
-    }
-
-    sub SDL_PIXELFORMAT_INDEX4LSB () {
-        SDL_DEFINE_PIXELFORMAT( SDL_PIXELTYPE_INDEX4(), SDL_BITMAPORDER_4321(), 0, 4, 0 );
-    }
-
-    sub SDL_PIXELFORMAT_INDEX4MSB () {
-        SDL_DEFINE_PIXELFORMAT( SDL_PIXELTYPE_INDEX4(), SDL_BITMAPORDER_1234(), 0, 4, 0 );
-    }
-
-    sub SDL_PIXELFORMAT_INDEX8 () {
-        SDL_DEFINE_PIXELFORMAT( SDL_PIXELTYPE_INDEX8(), 0, 0, 8, 1 );
-    }
-
-    sub SDL_PIXELFORMAT_RGB332 () {
-        SDL_DEFINE_PIXELFORMAT( SDL_PIXELTYPE_PACKED8(), SDL_PACKEDORDER_XRGB(),
-            SDL_PACKEDLAYOUT_332(), 8, 1 );
-    }
-
-    sub SDL_PIXELFORMAT_RGB444 () {
-        SDL_DEFINE_PIXELFORMAT( SDL_PIXELTYPE_PACKED16(), SDL_PACKEDORDER_XRGB(),
-            SDL_PACKEDLAYOUT_4444(), 12, 2 );
-    }
-
-    sub SDL_PIXELFORMAT_RGB555 () {
-        SDL_DEFINE_PIXELFORMAT( SDL_PIXELTYPE_PACKED16(), SDL_PACKEDORDER_XRGB(),
-            SDL_PACKEDLAYOUT_1555(), 15, 2 );
-    }
-
-    sub SDL_PIXELFORMAT_BGR555 () {
-        SDL_DEFINE_PIXELFORMAT( SDL_PIXELTYPE_PACKED16(), SDL_PACKEDORDER_XBGR(),
-            SDL_PACKEDLAYOUT_1555(), 15, 2 );
-    }
-
-    sub SDL_PIXELFORMAT_ARGB4444 () {
-        SDL_DEFINE_PIXELFORMAT( SDL_PIXELTYPE_PACKED16(), SDL_PACKEDORDER_ARGB(),
-            SDL_PACKEDLAYOUT_4444(), 16, 2 );
-    }
-
-    sub SDL_PIXELFORMAT_RGBA4444 () {
-        SDL_DEFINE_PIXELFORMAT( SDL_PIXELTYPE_PACKED16(), SDL_PACKEDORDER_RGBA(),
-            SDL_PACKEDLAYOUT_4444(), 16, 2 );
-    }
-
-    sub SDL_PIXELFORMAT_ABGR4444 () {
-        SDL_DEFINE_PIXELFORMAT( SDL_PIXELTYPE_PACKED16(), SDL_PACKEDORDER_ABGR(),
-            SDL_PACKEDLAYOUT_4444(), 16, 2 );
-    }
-
-    sub SDL_PIXELFORMAT_BGRA4444 () {
-        SDL_DEFINE_PIXELFORMAT( SDL_PIXELTYPE_PACKED16(), SDL_PACKEDORDER_BGRA(),
-            SDL_PACKEDLAYOUT_4444(), 16, 2 );
-    }
-
-    sub SDL_PIXELFORMAT_ARGB1555 () {
-        SDL_DEFINE_PIXELFORMAT( SDL_PIXELTYPE_PACKED16(), SDL_PACKEDORDER_ARGB(),
-            SDL_PACKEDLAYOUT_1555(), 16, 2 );
-    }
-
-    sub SDL_PIXELFORMAT_RGBA5551 () {
-        SDL_DEFINE_PIXELFORMAT( SDL_PIXELTYPE_PACKED16(), SDL_PACKEDORDER_RGBA(),
-            SDL_PACKEDLAYOUT_5551(), 16, 2 );
-    }
-
-    sub SDL_PIXELFORMAT_ABGR1555 () {
-        SDL_DEFINE_PIXELFORMAT( SDL_PIXELTYPE_PACKED16(), SDL_PACKEDORDER_ABGR(),
-            SDL_PACKEDLAYOUT_1555(), 16, 2 );
-    }
-
-    sub SDL_PIXELFORMAT_BGRA5551 () {
-        SDL_DEFINE_PIXELFORMAT( SDL_PIXELTYPE_PACKED16(), SDL_PACKEDORDER_BGRA(),
-            SDL_PACKEDLAYOUT_5551(), 16, 2 );
-    }
-
-    sub SDL_PIXELFORMAT_RGB565 () {
-        SDL_DEFINE_PIXELFORMAT( SDL_PIXELTYPE_PACKED16(), SDL_PACKEDORDER_XRGB(),
-            SDL_PACKEDLAYOUT_565(), 16, 2 );
-    }
-
-    sub SDL_PIXELFORMAT_BGR565 () {
-        SDL_DEFINE_PIXELFORMAT( SDL_PIXELTYPE_PACKED16(), SDL_PACKEDORDER_XBGR(),
-            SDL_PACKEDLAYOUT_565(), 16, 2 );
-    }
-
-    sub SDL_PIXELFORMAT_RGB24 () {
-        SDL_DEFINE_PIXELFORMAT( SDL_PIXELTYPE_ARRAYU8(), SDL_ARRAYORDER_RGB(), 0, 24, 3 );
-    }
-
-    sub SDL_PIXELFORMAT_BGR24 () {
-        SDL_DEFINE_PIXELFORMAT( SDL_PIXELTYPE_ARRAYU8(), SDL_ARRAYORDER_BGR(), 0, 24, 3 );
-    }
-
-    sub SDL_PIXELFORMAT_RGB888 () {
-        SDL_DEFINE_PIXELFORMAT( SDL_PIXELTYPE_PACKED32(), SDL_PACKEDORDER_XRGB(),
-            SDL_PACKEDLAYOUT_8888(), 24, 4 );
-    }
-
-    sub SDL_PIXELFORMAT_RGBX8888 () {
-        SDL_DEFINE_PIXELFORMAT( SDL_PIXELTYPE_PACKED32(), SDL_PACKEDORDER_RGBX(),
-            SDL_PACKEDLAYOUT_8888(), 24, 4 );
-    }
-
-    sub SDL_PIXELFORMAT_BGR888 () {
-        SDL_DEFINE_PIXELFORMAT( SDL_PIXELTYPE_PACKED32(), SDL_PACKEDORDER_XBGR(),
-            SDL_PACKEDLAYOUT_8888(), 24, 4 );
-    }
-
-    sub SDL_PIXELFORMAT_BGRX8888 () {
-        SDL_DEFINE_PIXELFORMAT( SDL_PIXELTYPE_PACKED32(), SDL_PACKEDORDER_BGRX(),
-            SDL_PACKEDLAYOUT_8888(), 24, 4 );
-    }
-    define pixel_format => [
-        [   SDL_PIXELFORMAT_ARGB8888 => sub () {
-                SDL_DEFINE_PIXELFORMAT( SDL_PIXELTYPE_PACKED32(), SDL_PACKEDORDER_ARGB(),
-                    SDL_PACKEDLAYOUT_8888(), 32, 4 );
-            }
-        ]
-    ];
-
-    sub SDL_PIXELFORMAT_RGBA8888 () {
-        SDL_DEFINE_PIXELFORMAT( SDL_PIXELTYPE_PACKED32(), SDL_PACKEDORDER_RGBA(),
-            SDL_PACKEDLAYOUT_8888(), 32, 4 );
-    }
-
-    sub SDL_PIXELFORMAT_ABGR8888 () {
-        SDL_DEFINE_PIXELFORMAT( SDL_PIXELTYPE_PACKED32(), SDL_PACKEDORDER_ABGR(),
-            SDL_PACKEDLAYOUT_8888(), 32, 4 );
-    }
-
-    sub SDL_PIXELFORMAT_BGRA8888 () {
-        SDL_DEFINE_PIXELFORMAT( SDL_PIXELTYPE_PACKED32(), SDL_PACKEDORDER_BGRA(),
-            SDL_PACKEDLAYOUT_8888(), 32, 4 );
-    }
-
-    sub SDL_PIXELFORMAT_ARGB2101010 () {
-        SDL_DEFINE_PIXELFORMAT( SDL_PIXELTYPE_PACKED32(), SDL_PACKEDORDER_ARGB(),
-            SDL_PACKEDLAYOUT_2101010(),
-            32, 4 );
-    }
-
-    #    /* Aliases for RGBA byte arrays of color data, for the current platform */
-    #if SDL_BYTEORDER == SDL_BIG_ENDIAN
-    #    SDL_PIXELFORMAT_RGBA32 = SDL_PIXELFORMAT_RGBA8888,
-    #    SDL_PIXELFORMAT_ARGB32 = SDL_PIXELFORMAT_ARGB8888,
-    #    SDL_PIXELFORMAT_BGRA32 = SDL_PIXELFORMAT_BGRA8888,
-    #    SDL_PIXELFORMAT_ABGR32 = SDL_PIXELFORMAT_ABGR8888,
-    #else
-    #    SDL_PIXELFORMAT_RGBA32 = SDL_PIXELFORMAT_ABGR8888,
-    #    SDL_PIXELFORMAT_ARGB32 = SDL_PIXELFORMAT_BGRA8888,
-    #    SDL_PIXELFORMAT_BGRA32 = SDL_PIXELFORMAT_ARGB8888,
-    #    SDL_PIXELFORMAT_ABGR32 = SDL_PIXELFORMAT_RGBA8888,
-    #endif
-    sub SDL_PIXELFORMAT_YV12 () {
-        SDL_DEFINE_PIXELFOURCC( 'Y', 'V', '1', '2' );
-    }
-
-    sub SDL_PIXELFORMAT_IYUV () {
-        SDL_DEFINE_PIXELFOURCC( 'I', 'Y', 'U', 'V' );
-    }
-
-    sub SDL_PIXELFORMAT_YUY2 () {
-        SDL_DEFINE_PIXELFOURCC( 'Y', 'U', 'Y', '2' );
-    }
-
-    sub SDL_PIXELFORMAT_UYVY () {
-        SDL_DEFINE_PIXELFOURCC( 'U', 'Y', 'V', 'Y' );
-    }
-
-    sub SDL_PIXELFORMAT_YVYU () {
-        SDL_DEFINE_PIXELFOURCC( 'Y', 'V', 'Y', 'U' );
-    }
-
-    sub SDL_PIXELFORMAT_NV12 () {
-        SDL_DEFINE_PIXELFOURCC( 'N', 'V', '1', '2' );
-    }
-
-    sub SDL_PIXELFORMAT_NV21 () {
-        SDL_DEFINE_PIXELFOURCC( 'N', 'V', '2', '1' );
-    }
-
-    sub SDL_PIXELFORMAT_EXTERNAL_OES () {
-        SDL_DEFINE_PIXELFOURCC( 'O', 'E', 'S', ' ' );
-    }
-
-    # include/SDL_stdinc.h
-    sub SDL_FOURCC ( $A, $B, $C, $D ) { $A << 0 | $B << 8 | $C << 16 | $D << 24 }
 
 # Unsorted - https://github.com/libsdl-org/SDL/blob/c59d4dcd38c382a1e9b69b053756f1139a861574/include/SDL_keycode.h
 #    https://github.com/libsdl-org/SDL/blob/c59d4dcd38c382a1e9b69b053756f1139a861574/include/SDL_scancode.h#L151
-    sub SDLK_SCANCODE_MASK           { 1 << 30 }
-    sub SDL_SCANCODE_TO_KEYCODE ($X) { $X | SDLK_SCANCODE_MASK }
-    FFI::C->enum(
-        'SDL_Keycode',
-        [   [ SDLK_UP => SDL_SCANCODE_TO_KEYCODE(82) ],    # 82 comes from include/SDL_scancode.h
-
-            # The following are incorrect!!!!!!!!!!!!!!!!!!!
-            qw[SDLK_DOWN
-                SDLK_LEFT
-                SDLK_RIGHT]
-        ]
-    );
     attach(
         all => {
 
@@ -2065,33 +829,11 @@ END
             SDL_SetMainReady => [ [] => 'void' ]
         }
     );
-    define SDL_Mouse => [
-        [ SDL_BUTTON        => sub ($x) { 1 << ( ($x) - 1 ) } ],
-        [ SDL_BUTTON_LEFT   => 1 ],
-        [ SDL_BUTTON_MIDDLE => 2 ],
-        [ SDL_BUTTON_RIGHT  => 3 ],
-        [ SDL_BUTTON_X1     => 4 ],
-        [ SDL_BUTTON_X2     => 5 ],
-        [ SDL_BUTTON_LMASK  => sub () { SDL_BUTTON( SDL_BUTTON_LEFT() ); } ],
-        [ SDL_BUTTON_MMASK  => sub () { SDL_BUTTON( SDL_BUTTON_MIDDLE() ); } ],
-        [ SDL_BUTTON_RMASK  => sub () { SDL_BUTTON( SDL_BUTTON_RIGHT() ); } ],
-        [ SDL_BUTTON_X1MASK => sub () { SDL_BUTTON( SDL_BUTTON_X1() ); } ],
-        [ SDL_BUTTON_X2MASK => sub () { SDL_BUTTON( SDL_BUTTON_X2() ); } ]
-    ];
 
     # TODO
-    package SDL2::assert_data { };
-
-    package SDL2::AssertData {
+    package SDL2::assert_data {
         use SDL2::Utils;
-        has
-            always_ignore => 'int',
-            trigger_count => 'uint',
-            condition     => 'opaque',    # string
-            filename      => 'opaque',    # string
-            linenum       => 'int',
-            function      => 'opaque',    # string
-            next          => 'opaque'     # const struct SDL_AssertData *next
+        has;
     };
 
     package SDL2::atomic_t {
@@ -2099,112 +841,45 @@ END
         has value => 'int';
     };
 
-    package SDL2::AudioCVT {
-    };
-
-    package SDL2::AudioDeviceEvent { };
-
-    package SDL2::AudioStream { };
-
-    package SDL2::Color { };
-
-    package SDL2::ControllerAxisEvent { };
-
-    package SDL2::ControllerButtonEvent { };
-
-    package SDL2::ControllerDeviceEvent { };
-
-    package SDL2::DisplayMode { };
-
-    package SDL2::DollarGestureEvent { };
-
-    package SDL2::DropEvent { };
-
-    package SDL2::Event { };
-
     package SDL2::Finger {
         use SDL2::Utils;
+        ffi->type( 'sint64' => 'SDL_TouchID' );
+        ffi->type( 'sint64' => 'SDL_FingerID' );
         has
-            id       => 'sint64',    # SDL_FingerID
+            id       => 'SDL_FingerID',
             x        => 'float',
             y        => 'float',
             pressure => 'float';
     };
 
-    package SDL2::GameControllerButtonBind { };
-
-    package SDL2::_GameController { };
-
-    package SDL2::GameCrontroller { };
-
-    package SDL2::_Haptic { };
-
-    package SDL2::Haptic { };
-
-    package SDL2::HapticCondition { };
-
-    package SDL2::HapticConstant { };
-
-    package SDL2::HapticCustom { };
-
-    package SDL2::HapticDirection { };
-
-    package SDL2::HapticEffect { };
-
-    package SDL2::HapticLeftRight { };
-
-    package SDL2::HapticPeriodic { };
-
-    package SDL2::HapticRamp { };
-
-    package SDL2::JoyAxisEvent { };
-
-    package SDL2::JoyBallEvent { };
-
-    package SDL2::JoyButtonEvent { };
-
-    package SDL2::JoyDeviceEvent { };
-
-    package SDL2::JoyHatEvent { };
-
-    package SDL2::Joystick { };
-
-    package SDL2::JoystickGUID { };
-
-    package SDL2::JoystickID { };
-
-    package SDL2::_JoyStick { };
-
-    package SDL2::KeyboardEvent { };
-
-    package SDL2::Keysym {
+    package SDL2::_GameController {
         use SDL2::Utils;
-        has
-            scancode => 'opaque',    # SDL_Scancode
-            sym      => 'opaque',    # SDL_Keycode
-            mod      => 'uint16',
-            unused   => 'uint32';
+        has;
     };
 
-    package SDL2::MessageBoxButtonData {
+    package SDL2::GameCrontroller {
         use SDL2::Utils;
-        has
-            flags    => 'uint32',
-            buttonid => 'int',
-            text     => 'opaque'     # 'string'
+        has;
     };
 
-    package SDL2::MessageBoxColor {
+    package SDL2::_Haptic {
         use SDL2::Utils;
-        has
-            r => 'uint8',
-            g => 'uint8',
-            b => 'uint8';
+        has;
     };
 
-    package SDL2::MessageBoxColorScheme {
+    package SDL2::Haptic {
         use SDL2::Utils;
-        has colors => 'opaque'    # SDL_MessageBoxColor colors[SDL_MESSAGEBOX_COLOR_MAX];
+        has;
+    };
+
+    package SDL2::JoystickID {
+        use SDL2::Utils;
+        has;
+    };
+
+    package SDL2::_JoyStick {
+        use SDL2::Utils;
+        has;
     };
     attach messagebox => {
 
@@ -2212,126 +887,173 @@ END
         SDL_ShowSimpleMessageBox => [ [ 'uint32', 'string', 'string', 'SDL_Window' ], 'int' ]
     };
 
-    package SDL2::MessageBoxData {
+    package SDL2::Sensor {
         use SDL2::Utils;
-        has
-            flags       => 'uint32',
-            window      => 'opaque',    # SDL_Window*
-            title       => 'opaque',    # string
-            message     => 'opaque',    # string
-            numbuttons  => 'int',
-            buttons     => 'opaque',    # SDL_MessageBoxButtonData*
-            colorScheme => 'opaque'     # SDL_MessageBoxColorScheme *
+        has;
     };
-
-    package SDL2::MouseButtonEvent { };
-
-    package SDL2::MouseMotionEvent { };
-
-    package SDL2::MouseWheelEvent { };
-
-    package SDL2::MultiGestureEvent { };
-
-    package SDL2::Palette { };
-
-    package SDL2::PixelFormat { };
-
-    package SDL2::QuitEvent { };
-
-    package SDL2::Renderer { };
-
-    package SDL2::RendererInfo { };
-
-    package SDL2::RWops { };
-
-    package SDL2::SensorEvent { };
-
-    package SDL2::SysWMEvent { };
-
-    package SDL2::SysWMinfo { };
-
-    package SDL2::SysWMmsg { };
-
-    package SDL2::Sensor { };
 
     package SDL2::SensorID { };    # type
 
-    package SDL2::TextEditingEvent { };
+    package SDL2::ControllerTouchpadEvent {
+        use SDL2::Utils;
+        has;
+    };
 
-    package SDL2::TextInputEvent { };
+    package SDL2::Mixer {
+        use SDL2::Utils;
+        has;
+    };
 
-    package SDL2::TouchFingerEvent { };
+    package SDL2::Mixer::Mix::Chunk {
+        use SDL2::Utils;
+        has;
+    };
 
-    package SDL2::ControllerTouchpadEvent { };
+    package SDL2::Mixer::Mix::Fading {
+        use SDL2::Utils;
+        has;
+    };
 
-    package SDL2::UserEvent { };
+    package SDL2::Mixer::Mix::MusicType {
+        use SDL2::Utils;
+        has;
+    };
 
-    package SDL2::WindowEvent { };
+    package SDL2::Mixer::Mix::Music {
+        use SDL2::Utils;
+        has;
+    };
 
-    package SDL2::Mixer { };
+    package SDL2::Mixer::Chunk {
+        use SDL2::Utils;
+        has;
+    };
 
-    package SDL2::Mixer::Mix::Chunk { };
+    package SDL2::Mixer::Fading {
+        use SDL2::Utils;
+        has;
+    };
 
-    package SDL2::Mixer::Mix::Fading { };
+    package SDL2::Mixer::MusicType {
+        use SDL2::Utils;
+        has;
+    };
 
-    package SDL2::Mixer::Mix::MusicType { };
+    package SDL2::Mixer::Music {
+        use SDL2::Utils;
+        has;
+    };
 
-    package SDL2::Mixer::Mix::Music { };
+    package SDL2::Image {
+        use SDL2::Utils;
+        has;
+    };
 
-    package SDL2::Mixer::Mix::Chunk { };
+    package SDL2::iconv_t {
+        use SDL2::Utils;
+        has;
+    };    # int ptr
 
-    package SDL2::Mixer::Chunk { };
+    package SDL2::WindowShapeMode {
+        use SDL2::Utils;
+        has;
+    };
 
-    package SDL2::Mixer::Fading { };
+    package SDL2::WindowShapeParams {
+        use SDL2::Utils;
+        has;
+    };    # union
 
-    package SDL2::Mixer::MusicType { };
+    package SDL2::TTF {
+        use SDL2::Utils;
+        has;
+    };
 
-    package SDL2::Mixer::Music { };
+    package SDL2::TTF::Image {
+        use SDL2::Utils;
+        has;
+    };
 
-    package SDL2::Mixer::Chunk { };
+    package SDL2::TTF::Font {
+        use SDL2::Utils;
+        has;
+    };
 
-    package SDL2::Image { };
+    package SDL2::TTF::PosBuf {
+        use SDL2::Utils;
+        has;
+    };
 
-    package SDL2::iconv_t { };    # int ptr
+    package SDL2::Net {
+        use SDL2::Utils;
+        has;
+    };
 
-    package SDL2::WindowShapeMode { };
+    package SDL2::RTF {
+        use SDL2::Utils;
+        has;
+    };
 
-    package SDL2::WindowShapeParams { };    # union
+    package SDL2::RTF::Context {
+        use SDL2::Utils;
+        has;
+    };
 
-    package SDL2::TTF { };
-
-    package SDL2::TTF::Image { };
-
-    package SDL2::TTF::Font { };
-
-    package SDL2::TTF::PosBuf { };
-
-    package SDL2::Net { };
-
-    package SDL2::RTF { };
-
-    package SDL2::RTF::Context { };
-
-    package SDL2::RTF::FontEngine { };
-
-    package SDL2::Mutex { };
-
-    package SDL2::Semaphore { };
-
-    package SDL2::Sem { };
-
-    package SDL2::Cond { };
+    package SDL2::RTF::FontEngine {
+        use SDL2::Utils;
+        has;
+    };
 
     package SDL2::Thread {
         use SDL2::Utils;
         has();
     }
 
-    package SDL2::Locale {
+    package SDL2::ShapeDriver { };
+
+    package SDL2::VideoDisplay {
         use SDL2::Utils;
-        has
-            language => 'opaque',    # string
-            country  => 'opaque'     # string
+        has name              => 'opaque',    # string
+            max_display_modes => 'int',
+            num_display_modes => 'int',
+            display_modes     => 'opaque',    # SDL_DisplayMode
+            desktop_mode      => 'opaque',    # SDL_DisplayMode
+            orientation       => 'opaque',    # SDL_DisplayOrientation
+            fullscreen_window => 'opaque',    # SDL_Window
+            device            => 'opaque',    # SDL_VideoDevice
+            driverdata        => 'opaque';    # void *
+    };
+
+    package SDL2::VideoDevice {
+        use SDL2::Utils;
+        has;
+    };
+
+    package SDL2::WindowUserData {
+        use SDL2::Utils;
+        has name => 'opaque',                 # string
+            data => 'opaque',                 # void *
+            next => 'opaque';                 # SDL_WindowUserData
+    };
+
+    package SDL2::SysWMinfo {
+        use SDL2::Utils;
+        has;
+    };
+
+    package SDL2::VideoBootStrap {
+        use SDL2::Utils;
+        has;
+    };
+
+    package SDL2::SpinLock {
+        use SDL2::Utils;
+        has;
+    };
+
+    package SDL2::AtomicLock {
+        use SDL2::Utils;
+        has;
     };
 
     #warn SDL2::SDLK_UP();
@@ -2346,8 +1068,4866 @@ END
     #use Data::Dump;
     #ddx \%EXPORT_TAGS;
     #ddx \%SDL2::;
-}
+    # plan for the future
+    package SDL3 { };
+};
 1;
+
+=encoding utf-8
+
+=head1 NAME
+
+SDL2::FFI - FFI Wrapper for SDL (Simple DirectMedia Layer) Development Library
+
+=head1 SYNOPSIS
+
+    use SDL2::FFI qw[:all];
+    die 'Error initializing SDL: ' . SDL_GetError() unless SDL_Init(SDL_INIT_VIDEO) == 0;
+    my $win = SDL_CreateWindow( 'Example window!',
+        SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 640, 480, SDL_WINDOW_RESIZABLE );
+    die 'Could not create window: ' . SDL_GetError() unless $win;
+    my $event = SDL2::Event->new;
+    SDL_Init(SDL_INIT_VIDEO);
+    my $renderer = SDL_CreateRenderer( $win, -1, 0 );
+    SDL_SetRenderDrawColor( $renderer, 242, 242, 242, 255 );
+    do {
+        SDL_WaitEventTimeout( $event, 10 );
+        SDL_RenderClear($renderer);
+        SDL_RenderPresent($renderer);
+    } until $event->type == SDL_QUIT;
+    SDL_DestroyRenderer($renderer);
+    SDL_DestroyWindow($win);
+    SDL_Quit();
+
+=head1 DESCRIPTION
+
+SDL2::FFI is an L<FFI::Platypus> backed bindings to the B<S>imple
+B<D>irectMedia B<L>ayer - a cross-platform development library designed to
+provide low level access to audio, keyboard, mouse, joystick, and graphics
+hardware.
+
+=head1 Initialization and Shutdown
+
+The functions in this category are used to set SDL up for use and generally
+have global effects in your program. These functions may be imported with the
+C<:init> or C<:default> tag.
+
+=head2 C<SDL_Init( ... )>
+
+Initializes the SDL library. This must be called before using most other SDL
+functions.
+
+	SDL_Init( SDL_INIT_TIMER | SDL_INIT_VIDEO | SDL_INIT_EVENTS );
+
+C<SDL_Init( ... )> simply forwards to calling L<< C<SDL_InitSubSystem( ...
+)>|/C<SDL_InitSubSystem( ... )> >>. Therefore, the two may be used
+interchangeably. Though for readability of your code L<< C<SDL_InitSubSystem(
+... )>|/C<SDL_InitSubSystem( ... )> >> might be preferred.
+
+The file I/O (for example: L<< C<SDL_RWFromFile( ... )>|/C<SDL_RWFromFile( ...
+)> >>) and threading (L<< C<SDL_CreateThread( ... )>|/C<SDL_CreateThread( ...
+)> >>) subsystems are initialized by default. Message boxes ( L<<
+C<SDL_ShowSimpleMessageBox( ... )>|/C<SDL_ShowSimpleMessageBox( ... )> >> )
+also attempt to work without initializing the video subsystem, in hopes of
+being useful in showing an error dialog when SDL_Init fails. You must
+specifically initialize other subsystems if you use them in your application.
+
+Logging (such as L<< C<SDL_Log( ... )>|/C<SDL_Log( ... )> >> ) works without
+initialization, too.
+
+Expected parameters include:
+
+=over
+
+=item C<flags> which may be any be imported with the L<< C<:init>|SDL2::Enum/C<:init> >> tag and may be OR'd together
+
+=back
+
+Subsystem initialization is ref-counted, you must call L<< C<SDL_QuitSubSystem(
+... )>|/C<SDL_QuitSubSystem( ... )> >> for each L<< C<SDL_InitSubSystem( ...
+)>|/C<SDL_InitSubSystem( ... )> >> to correctly shutdown a subsystem manually
+(or call L<< C<SDL_Quit( )>|/C<SDL_Quit( )> >> to force shutdown). If a
+subsystem is already loaded then this call will increase the ref-count and
+return.
+
+Returns C<0> on success or a negative error code on failure; call L<<
+C<SDL_GetError( )>|/C<SDL_GetError( )> >> for more information.
+
+=head2 C<SDL_InitSubSystem( ... )>
+
+Compatibility function to initialize the SDL library.
+
+In SDL2, this function and L<< C<SDL_Init( ... )>|/C<SDL_Init( ... )> >> are
+interchangeable.
+
+	SDL_InitSubSystem( SDL_INIT_TIMER | SDL_INIT_VIDEO | SDL_INIT_EVENTS );
+
+Expected parameters include:
+
+=over
+
+=item C<flags> which may be any be imported with the L<< C<:init>|SDL2::Enum/C<:init> >> tag and may be OR'd together.
+
+=back
+
+Returns C<0> on success or a negative error code on failure; call L<<
+C<SDL_GetError( )>|/C<SDL_GetError( )> >> for more information.
+
+=head2 C<SDL_Quit( )>
+
+Clean up all initialized subsystems.
+
+	SDL_Quit( );
+
+You should call this function even if you have already shutdown each
+initialized subsystem with L<< C<SDL_QuitSubSystem( )>|/C<SDL_QuitSubSystem( )>
+>>. It is safe to call this function even in the case of errors in
+initialization.
+
+If you start a subsystem using a call to that subsystem's init function (for
+example L<< C<SDL_VideoInit( )>|/C<SDL_VideoInit( )> >>) instead of L<<
+C<SDL_Init( ... )>|/C<SDL_Init( ... )> >> or L<< C<SDL_InitSubSystem( ...
+)>|/C<SDL_InitSubSystem( ... )> >>, then you must use that subsystem's quit
+function (L<< C<SDL_VideoQuit( )>|/C<SDL_VideoQuit( )> >>) to shut it down
+before calling C<SDL_Quit( )>. But generally, you should not be using those
+functions directly anyhow; use L<< C<SDL_Init( ... )>|/C<SDL_Init( ... )> >>
+instead.
+
+You can use this function in an C<END { ... }> block to ensure that it is run
+when your application is shutdown.
+
+=head2 C<SDL_QuitSubSystem( ... )>
+
+Shut down specific SDL subsystems.
+
+	SDL_QuitSubSystem( SDL_INIT_VIDEO );
+
+If you start a subsystem using a call to that subsystem's init function (for
+example L<< C<SDL_VideoInit( )> |/C<SDL_VideoInit( )> >>) instead of L<<
+C<SDL_Init( ... )>|/C<SDL_Init( ... )> >> or L<< C<SDL_InitSubSystem( ...
+)>|/C<SDL_InitSubSystem( ... )> >>, L<< C<SDL_QuitSubSystem( ...
+)>|/C<SDL_QuitSubSystem( ... )> >> and L<< C<SDL_WasInit( ...
+)>|/C<SDL_WasInit( ... )> >> will not work. You will need to use that
+subsystem's quit function ( L<< C<SDL_VideoQuit( )>|/C<SDL_VideoQuit( )> >>
+directly instead. But generally, you should not be using those functions
+directly anyhow; use L<< C<SDL_Init( ... )>|/C<SDL_Init( ... )> >> instead.
+
+You still need to call L<< C<SDL_Quit( )>|/C<SDL_Quit( )> >> even if you close
+all open subsystems with L<< C<SDL_QuitSubSystem( ... )>|/C<SDL_QuitSubSystem(
+... )> >>.
+
+Expected parameters include:
+
+=over
+
+=item C<flags> which may be any be imported with the L<< C<:init>|SDL2::Enum/C<:init> >> tag and may be OR'd together.
+
+=back
+
+=head2 C<SDL_WasInit( ... )>
+
+Get a mask of the specified subsystems which are currently initialized.
+
+	SDL_Init( SDL_INIT_VIDEO | SDL_INIT_AUDIO );
+	warn SDL_WasInit( SDL_INIT_TIMER ); # false
+	warn SDL_WasInit( SDL_INIT_VIDEO ); # true (32 == SDL_INIT_VIDEO)
+	my $mask = SDL_WasInit( );
+	warn 'video init!'  if ($mask & SDL_INIT_VIDEO); # yep
+	warn 'video timer!' if ($mask & SDL_INIT_TIMER); # nope
+
+Expected parameters include:
+
+=over
+
+=item C<flags> which may be any be imported with the L<< C<:init>|SDL2::Enum/C<:init> >> tag and may be OR'd together.
+
+=back
+
+If C<flags> is C<0>, it returns a mask of all initialized subsystems, otherwise
+it returns the initialization status of the specified subsystems.
+
+The return value does not include C<SDL_INIT_NOPARACHUTE>.
+
+=head1 Configuration Variables
+
+This category contains functions to set and get configuration hints, as well as
+listing each of them alphabetically.
+
+The convention for naming hints is C<SDL_HINT_X>, where C<SDL_X> is the
+environment variable that can be used to override the default. You may import
+those recognised by SDL2 with the L<< C<:hints>|SDL2::Enum/C<:hints> >> tag.
+
+In general these hints are just that - they may or may not be supported or
+applicable on any given platform, but they provide a way for an application or
+user to give the library a hint as to how they would like the library to work.
+
+=head2 C<SDL_SetHintWithPriority( ... )>
+
+Set a hint with a specific priority.
+
+	SDL_SetHintWithPriority( SDL_EVENT_LOGGING, 2, SDL_HINT_OVERRIDE );
+
+The priority controls the behavior when setting a hint that already has a
+value. Hints will replace existing hints of their priority and lower.
+Environment variables are considered to have override priority.
+
+Expected parameters include:
+
+=over
+
+=item C<name>
+
+the hint to set
+
+=item C<value>
+
+the value of the hint variable
+
+=item C<priority>
+
+the priority level for the hint
+
+=back
+
+Returns a true if the hint was set, untrue otherwise.
+
+=head2 C<SDL_SetHint( ... )>
+
+Set a hint with normal priority.
+
+	SDL_SetHint( SDL_HINT_XINPUT_ENABLED, 1 );
+
+Hints will not be set if there is an existing override hint or environment
+variable that takes precedence. You can use SDL_SetHintWithPriority( ) to set
+the hint with override priority instead.
+
+Expected parameters:
+
+=over
+
+=item C<name>
+
+the hint to set
+
+=item C<value>
+
+the value of the hint variable
+
+=back
+
+Returns a true value if the hint was set, untrue otherwise.
+
+=head2 C<SDL_GetHint( ... )>
+
+Get the value of a hint.
+
+	SDL_GetHint( SDL_HINT_XINPUT_ENABLED );
+
+Expected parameters:
+
+=over
+
+=item C<name>
+
+the hint to query
+
+=back
+
+Returns the string value of a hint or an undefined value if the hint isn't set.
+
+=head2 C<SDL_GetHintBoolean( ... )>
+
+Get the boolean value of a hint variable.
+
+	SDL_GetHintBoolean( SDL_HINT_XINPUT_ENABLED, 0);
+
+Expected parameters:
+
+=over
+
+=item C<name>
+
+the name of the hint to get the boolean value from
+
+=item C<default_value>
+
+the value to return if the hint does not exist
+
+=back
+
+Returns the boolean value of a hint or the provided default value if the hint
+does not exist.
+
+=head2 C<SDL_AddHintCallback( ... )>
+
+Add a function to watch a particular hint.
+
+	my $cb = SDL_AddHintCallback(
+		SDL_HINT_XINPUT_ENABLED,
+		sub {
+			my ($userdata, $name, $oldvalue, $newvalue) = @_;
+			...;
+		},
+		{ time => time( ), clicks => 3 }
+	);
+
+Expected parameters:
+
+=over
+
+=item C<name>
+
+the hint to watch
+
+=item C<callback>
+
+a code reference that will be called when the hint value changes
+
+=item C<userdata>
+
+a pointer to pass to the callback function
+
+=back
+
+Returns a pointer to a L<FFI::Platypus::Closure> which you may pass to L<<
+C<SDL_DelHintCallback( ... )>|/C<SDL_DelHintCallback( ... )> >>.
+
+=head2 C<SDL_DelHintCallback( ... )>
+
+Remove a callback watching a particular hint.
+
+	SDL_AddHintCallback(
+		SDL_HINT_XINPUT_ENABLED,
+		$cb,
+		{ time => time( ), clicks => 3 }
+	);
+
+Expected parameters:
+
+=over
+
+=item C<name>
+
+the hint to watch
+
+=item C<callback>
+
+L<FFI::Platypus::Closure> object returned by L<< C<SDL_AddHintCallback( ...
+)>|/C<SDL_AddHintCallback( ... )> >>
+
+=item C<userdata>
+
+a pointer to pass to the callback function
+
+=back
+
+=head2 C<SDL_ClearHints( )>
+
+Clear all hints.
+
+	SDL_ClearHints( );
+
+This function is automatically called during L<< C<SDL_Quit( )>|/C<SDL_Quit( )>
+>>.
+
+=head1 Error Handling
+
+Functions in this category provide simple error message routines for SDL. L<<
+C<SDL_GetError( )>|/C<SDL_GetError( )> >> can be called for almost all SDL
+functions to determine what problems are occurring. Check the wiki page of each
+specific SDL function to see whether L<< C<SDL_GetError( )>|/C<SDL_GetError( )>
+>> is meaningful for them or not. These functions may be imported with the
+C<:error> tag.
+
+The SDL error messages are in English.
+
+=head2 C<SDL_SetError( ... )>
+
+Set the SDL error message for the current thread.
+
+Calling this function will replace any previous error message that was set.
+
+This function always returns C<-1>, since SDL frequently uses C<-1> to signify
+an failing result, leading to this idiom:
+
+	if ($error_code) {
+		return SDL_SetError( 'This operation has failed: %d', $error_code );
+	}
+
+Expected parameters:
+
+=over
+
+=item C<fmt>
+
+a C<printf( )>-style message format string
+
+=item C<@params>
+
+additional parameters matching % tokens in the C<fmt> string, if any
+
+=back
+
+=head2 C<SDL_GetError( )>
+
+Retrieve a message about the last error that occurred on the current thread.
+
+	warn SDL_GetError( );
+
+It is possible for multiple errors to occur before calling C<SDL_GetError( )>.
+Only the last error is returned.
+
+The message is only applicable when an SDL function has signaled an error. You
+must check the return values of SDL function calls to determine when to
+appropriately call C<SDL_GetError( )>. You should B<not> use the results of
+C<SDL_GetError( )> to decide if an error has occurred! Sometimes SDL will set
+an error string even when reporting success.
+
+SDL will B<not> clear the error string for successful API calls. You B<must>
+check return values for failure cases before you can assume the error string
+applies.
+
+Error strings are set per-thread, so an error set in a different thread will
+not interfere with the current thread's operation.
+
+The returned string is internally allocated and must not be freed by the
+application.
+
+Returns a message with information about the specific error that occurred, or
+an empty string if there hasn't been an error message set since the last call
+to L<< C<SDL_ClearError( )>|/C<SDL_ClearError( )> >>. The message is only
+applicable when an SDL function has signaled an error. You must check the
+return values of SDL function calls to determine when to appropriately call
+C<SDL_GetError( )>.
+
+=head2 C<SDL_GetErrorMsg( ... )>
+
+Get the last error message that was set for the current thread.
+
+	my $x;
+	warn SDL_GetErrorMsg($x, 300);
+
+This allows the caller to copy the error string into a provided buffer, but
+otherwise operates exactly the same as L<< C<SDL_GetError( )>|/C<SDL_GetError(
+)> >>.
+
+=over
+
+=item C<errstr>
+
+A buffer to fill with the last error message that was set for the current
+thread
+
+=item C<maxlen>
+
+The size of the buffer pointed to by the errstr parameter
+
+=back
+
+Returns the pointer passed in as the C<errstr> parameter.
+
+=head2 C<SDL_ClearError( )>
+
+Clear any previous error message for this thread.
+
+=head1 Log Handling
+
+Simple log messages with categories and priorities. These functions may be
+imported with the C<:logging> tag.
+
+By default, logs are quiet but if you're debugging SDL you might want:
+
+	SDL_LogSetAllPriority( SDL_LOG_PRIORITY_WARN );
+
+Here's where the messages go on different platforms:
+
+	Windows		debug output stream
+	Android		log output
+	Others		standard error output (STDERR)
+
+Messages longer than the maximum size (4096 bytes) will be truncated.
+
+=head2 C<SDL_LogSetAllPriority( ... )>
+
+Set the priority of all log categories.
+
+	SDL_LogSetAllPriority( SDL_LOG_PRIORITY_WARN );
+
+Expected parameters:
+
+=over
+
+=item C<priority>
+
+The SDL_LogPriority to assign. These may be imported with the L<<
+C<:logpriority>|/C<:logpriority> >> tag.
+
+=back
+
+=head2 C<SDL_LogSetPriority( ... )>
+
+Set the priority of all log categories.
+
+	SDL_LogSetPriority( SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_WARN );
+
+Expected parameters:
+
+=over
+
+=item C<category>
+
+The category to assign a priority to. These may be imported with the L<<
+C<:logcategory>|/C<:logcategory> >> tag.
+
+=item C<priority>
+
+The SDL_LogPriority to assign. These may be imported with the L<<
+C<:logpriority>|/C<:logpriority> >> tag.
+
+=back
+
+=head2 C<SDL_LogGetPriority( ... )>
+
+Get the priority of a particular log category.
+
+	SDL_LogGetPriority( SDL_LOG_CATEGORY_ERROR );
+
+Expected parameters:
+
+=over
+
+=item C<category>
+
+The SDL_LogCategory to query. These may be imported with the L<<
+C<:logcategory>|/C<:logcategory> >> tag.
+
+=back
+
+=head2 C<SDL_LogGetPriority( ... )>
+
+Get the priority of a particular log category.
+
+	SDL_LogGetPriority( SDL_LOG_CATEGORY_ERROR );
+
+Expected parameters:
+
+=over
+
+=item C<category>
+
+The SDL_LogCategory to query. These may be imported with the L<<
+C<:logcategory>|/C<:logcategory> >> tag.
+
+=back
+
+=head2 C<SDL_LogResetPriorities( )>
+
+Reset all priorities to default.
+
+	SDL_LogResetPriorities( );
+
+This is called by L<< C<SDL_Quit( )>|/C<SDL_Quit( )> >>.
+
+=head2 C<SDL_Log( ... )>
+
+Log a message with C<SDL_LOG_CATEGORY_APPLICATION> and
+C<SDL_LOG_PRIORITY_INFO>.
+
+	SDL_Log( 'HTTP Status: %s', $http->status );
+
+Expected parameters:
+
+=over
+
+=item C<fmt>
+
+A C<sprintf( )> style message format string.
+
+=item C<...>
+
+Any additional parameters matching C<%> tokens in the C<fmt> string, if any.
+
+=back
+
+=head2 C<SDL_LogVerbose( ... )>
+
+Log a message with C<SDL_LOG_PRIORITY_VERBOSE>.
+
+	SDL_LogVerbose( 'Current time: %s [%ds exec]', +localtime( ), time - $^T );
+
+Expected parameters:
+
+=over
+
+=item C<category>
+
+The category of the message.
+
+=item C<fmt>
+
+A C<sprintf( )> style message format string.
+
+=item C<...>
+
+Additional parameters matching C<%> tokens in the C<fmt> string, if any.
+
+=back
+
+=head2 C<SDL_LogDebug( ... )>
+
+Log a message with C<SDL_LOG_PRIORITY_DEBUG>.
+
+	SDL_LogDebug( 'Current time: %s [%ds exec]', +localtime( ), time - $^T );
+
+Expected parameters:
+
+=over
+
+=item C<category>
+
+The category of the message.
+
+=item C<fmt>
+
+A C<sprintf( )> style message format string.
+
+=item C<...>
+
+Additional parameters matching C<%> tokens in the C<fmt> string, if any.
+
+=back
+
+=head2 C<SDL_LogInfo( ... )>
+
+Log a message with C<SDL_LOG_PRIORITY_INFO>.
+
+	SDL_LogInfo( 'Current time: %s [%ds exec]', +localtime( ), time - $^T );
+
+Expected parameters:
+
+=over
+
+=item C<category>
+
+The category of the message.
+
+=item C<fmt>
+
+A C<sprintf( )> style message format string.
+
+=item C<...>
+
+Additional parameters matching C<%> tokens in the C<fmt> string, if any.
+
+=back
+
+=head2 C<SDL_LogWarn( ... )>
+
+Log a message with C<SDL_LOG_PRIORITY_WARN>.
+
+	SDL_LogWarn( 'Current time: %s [%ds exec]', +localtime( ), time - $^T );
+
+Expected parameters:
+
+=over
+
+=item C<category>
+
+The category of the message.
+
+=item C<fmt>
+
+A C<sprintf( )> style message format string.
+
+=item C<...>
+
+Additional parameters matching C<%> tokens in the C<fmt> string, if any.
+
+=back
+
+=head2 C<SDL_LogError( ... )>
+
+Log a message with C<SDL_LOG_PRIORITY_ERROR>.
+
+	SDL_LogError( 'Current time: %s [%ds exec]', +localtime( ), time - $^T );
+
+Expected parameters:
+
+=over
+
+=item C<category>
+
+The category of the message.
+
+=item C<fmt>
+
+A C<sprintf( )> style message format string.
+
+=item C<...>
+
+Additional parameters matching C<%> tokens in the C<fmt> string, if any.
+
+=back
+
+=head2 C<SDL_LogCritical( ... )>
+
+Log a message with C<SDL_LOG_PRIORITY_CRITICAL>.
+
+	SDL_LogCritical( 'Current time: %s [%ds exec]', +localtime( ), time - $^T );
+
+Expected parameters:
+
+=over
+
+=item C<category>
+
+The category of the message.
+
+=item C<fmt>
+
+A C<sprintf( )> style message format string.
+
+=item C<...>
+
+Additional parameters matching C<%> tokens in the C<fmt> string, if any.
+
+=back
+
+=head2 C<SDL_LogMessage( ... )>
+
+Log a message with the specified category and priority.
+
+	SDL_LogMessage( SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_CRITICAL,
+					'Current time: %s [%ds exec]', +localtime( ), time - $^T );
+
+Expected parameters:
+
+=over
+
+=item C<category>
+
+The category of the message.
+
+=item C<priority>
+
+The priority of the message.
+
+=item C<fmt>
+
+A C<sprintf( )> style message format string.
+
+=item C<...>
+
+Additional parameters matching C<%> tokens in the C<fmt> string, if any.
+
+=back
+
+=head2 C<SDL_LogSetOutputFunction( ... )>
+
+Replace the default log output function with one of your own.
+
+	my $cb = SDL_LogSetOutputFunction( sub { ... }, {} );
+
+Expected parameters:
+
+=over
+
+=item C<callback>
+
+A coderef to call instead of the default callback.
+
+This coderef should expect the following parameters:
+
+=over
+
+=item C<userdata>
+
+What was passed as C<userdata> to C<SDL_LogSetOutputFunction( )>.
+
+=item C<category>
+
+The category of the message.
+
+=item C<priority>
+
+The priority of the message.
+
+=item C<message>
+
+The message being output.
+
+=back
+
+=item C<userdata>
+
+Data passed to the C<callback>.
+
+=back
+
+=head1 Querying SDL Version
+
+These functions are used to collect or display information about the version of
+SDL that is currently being used by the program or that it was compiled
+against.
+
+The version consists of three segments (C<X.Y.Z>)
+
+=over
+
+=item X - Major Version, which increments with massive changes, additions, and enhancements
+
+=item Y - Minor Version, which increments with backwards-compatible changes to the major revision
+
+=item Z - Patchlevel, which increments with fixes to the minor revision
+
+=back
+
+Example: The first version of SDL 2 was 2.0.0
+
+The version may also be reported as a 4-digit numeric value where the thousands
+place represents the major version, the hundreds place represents the minor
+version, and the tens and ones places represent the patchlevel (update
+version).
+
+Example: The first version number of SDL 2 was 2000
+
+=head2 C<SDL_GetVersion( ... )>
+
+Get the version of SDL that is linked against your program.
+
+	my $ver = SDL2::Version->new;
+	SDL_GetVersion( $ver );
+
+This function may be called safely at any time, even before L<< C<SDL_Init(
+)>|/C<SDL_Init( )> >>.
+
+Expected parameters include:
+
+=over
+
+=item C<version> - An SDL2::Version object which will be filled with the proper values
+
+=back
+
+=head1 Display and Window Management
+
+This category contains functions for handling display and window actions.
+
+These functions may be imported with the C<:video> tag.
+
+=head2 C<SDL_GetNumVideoDrivers( )>
+
+	my $num = SDL_GetNumVideoDrivers( );
+
+Get the number of video drivers compiled into SDL.
+
+Returns a number >= 1 on success or a negative error code on failure; call L<<
+C<SDL_GetError( )>|/C<SDL_GetError( )> >> for more information.
+
+=head2 C<SDL_GetVideoDriver( ... )>
+
+Get the name of a built in video driver.
+
+    CORE::say SDL_GetVideoDriver($_) for 0 .. SDL_GetNumVideoDrivers( ) - 1;
+
+The video drivers are presented in the order in which they are normally checked
+during initialization.
+
+Expected parameters include:
+
+=over
+
+=item C<index> - the index of a video driver
+
+=back
+
+Returns the name of the video driver with the given C<index>.
+
+=cut
+
+=head2 C<SDL_VideoInit( ... )>
+
+Initialize the video subsystem, optionally specifying a video driver.
+
+	SDL_VideoInit( 'x11' );
+
+This function initializes the video subsystem, setting up a connection to the
+window manager, etc, and determines the available display modes and pixel
+formats, but does not initialize a window or graphics mode.
+
+If you use this function and you haven't used the SDL_INIT_VIDEO flag with
+either SDL_Init( ) or SDL_InitSubSystem( ), you should call SDL_VideoQuit( )
+before calling SDL_Quit( ).
+
+It is safe to call this function multiple times. SDL_VideoInit( ) will call
+SDL_VideoQuit( ) itself if the video subsystem has already been initialized.
+
+You can use SDL_GetNumVideoDrivers( ) and SDL_GetVideoDriver( ) to find a
+specific `driver_name`.
+
+Expected parameters include:
+
+=over
+
+=item C<driver_name> - the name of a video driver to initialize, or undef for the default driver
+
+=back
+
+Returns C<0> on success or a negative error code on failure; call L<<
+C<SDL_GetError( )>|/C<SDL_GetError( )> >> for more information.
+
+=head2 C<SDL_VideoQuit( )>
+
+Shut down the video subsystem, if initialized with L<< C<SDL_VideoInit(
+)>|/C<SDL_VideoInit( )> >>.
+
+	SDL_VideoQuit( );
+
+This function closes all windows, and restores the original video mode.
+
+=head2 C<SDL_GetCurrentVideoDriver( )>
+
+Get the name of the currently initialized video driver.
+
+	my $driver = SDL_GetCurrentVideoDriver( );
+
+Returns the name of the current video driver or NULL if no driver has been
+initialized.
+
+=head2 C<SDL_GetNumVideoDisplays( )>
+
+Get the number of available video displays.
+
+	my $screens = SDL_GetNumVideoDisplays( );
+
+Returns a number >= 1 or a negative error code on failure; call L<<
+C<SDL_GetError( )>|/C<SDL_GetError( )> >> for more information.
+
+=head2 C<SDL_GetDisplayName( ... )>
+
+
+Get the name of a display in UTF-8 encoding.
+
+	my $screen = SDL_GetDisplayName( 0 );
+
+Expected parameters include:
+
+=over
+
+=item C<displayIndex> - the index of display from which the name should be queried
+
+=back
+
+Returns the name of a display or undefined for an invalid display index or
+failure; call L<< C<SDL_GetError( )>|/C<SDL_GetError( )> >> for more
+information.
+
+=head2 C<SDL_GetDisplayBounds( ... )>
+
+Get the desktop area represented by a display.
+
+	my $rect = SDL_GetDisplayBounds( 0 );
+
+The primary display (C<displayIndex == 0>) is always located at 0,0.
+
+Expected parameters include:
+
+=over
+
+=item C<displayIndex> - the index of the display to query
+
+=back
+
+Returns the SDL2::Rect structure filled in with the display bounds on success
+or a negative error code on failure; call L<< C<SDL_GetError(
+)>|/C<SDL_GetError( )> >> for more information.
+
+
+=head2 C<SDL_GetDisplayUsableBounds( ... )>
+
+Get the usable desktop area represented by a display.
+
+	my $rect = SDL_GetDisplayUsableBounds( 0 );
+
+The primary display (C<displayIndex == 0>) is always located at 0,0.
+
+This is the same area as L<< C<SDL_GetDisplayBounds( ...
+)>|/C<SDL_GetDisplayBounds( ... )> >> reports, but with portions reserved by
+the system removed. For example, on Apple's macOS, this subtracts the area
+occupied by the menu bar and dock.
+
+Setting a window to be fullscreen generally bypasses these unusable areas, so
+these are good guidelines for the maximum space available to a non-fullscreen
+window.
+
+Expected parameters include:
+
+=over
+
+=item C<displayIndex> - the index of the display to query
+
+=back
+
+Returns the SDL2::Rect structure filled in with the display bounds on success
+or a negative error code on failure; call L<< C<SDL_GetError(
+)>|/C<SDL_GetError( )> >> for more information. This function also returns
+C<-1> if the parameter C<displayIndex> is out of range.
+
+=head2 C<SDL_GetDisplayDPI( ... )>
+
+Get the dots/pixels-per-inch for a display.
+
+	my ( $ddpi, $hdpi, $vdpi ) = SDL_GetDisplayDPI( 0 );
+
+Diagonal, horizontal and vertical DPI can all be optionally returned if the
+appropriate parameter is non-NULL.
+
+A failure of this function usually means that either no DPI information is
+available or the C<displayIndex> is out of range.
+
+Expected parameters include:
+
+=over
+
+=item C<displayIndex> - the index of the display from which DPI information should be queried
+
+=back
+
+Returns C<[ddpi, hdpi, vdip]> on success or a negative error code on failure;
+call L<< C<SDL_GetError( )>|/C<SDL_GetError( )> >> for more information.
+
+C<ddpi> is the diagonal DPI of the display, C<hdpi> is the horizontal DPI of
+the display, C<vdpi> is the vertical DPI of the display.
+
+=head2 C<SDL_GetDisplayOrientation( ... )>
+
+Get the orientation of a display.
+
+	my $orientation = SDL_GetDisplayOrientation( 0 );
+
+Expected parameters include:
+
+=over
+
+=item C<displayIndex> - the index of the display to query
+
+=back
+
+Returns a value which may be imported with C<:displayOrientation> or
+C<SDL_ORIENTATION_UNKNOWN> if it isn't available.
+
+=head2 C<SDL_GetNumDisplayModes( ... )>
+
+Get the number of available display modes.
+
+	my $modes = SDL_GetNumDisplayModes( 0 );
+
+The C<displayIndex> needs to be in the range from C<0> to
+C<SDL_GetNumVideoDisplays( ) - 1>.
+
+Expected parameters include:
+
+=over
+
+=item C<displayIndex> - the index of the display to query
+
+=back
+
+Returns a number >= 1 on success or a negative error code on failure; call L<<
+C<SDL_GetError( )>|/C<SDL_GetError( > >> for more information.
+
+
+=head2 C<SDL_GetDisplayMode( ... )>
+
+Get information about a specific display mode.
+
+	my $mode = SDL_GetDisplayMode( 0, 0 );
+
+The display modes are sorted in this priority:
+
+=over
+
+=item width - largest to smallest
+
+=item height - largest to smallest
+
+=item bits per pixel - more colors to fewer colors
+
+=item packed pixel layout - largest to smallest
+
+=item refresh rate - highest to lowest
+
+=back
+
+Expected parameters include:
+
+=over
+
+=item C<displayIndex> - the index of the display to query
+
+=item C<modeIndex> - the index of the display mode to query
+
+=back
+
+Returns an L<SDL2::DisplayMode> structure filled in with the mode at
+C<modeIndex> on success or a negative error code on failure; call L<<
+C<SDL_GetError( )>|/C<SDL_GetError( )> >> for more information.
+
+=head2 C<SDL_GetDesktopDisplayMode( ... )>
+
+Get information about the desktop's display mode.
+
+	my $mode = SDL_GetDesktopDisplayMode( 0 );
+
+There's a difference between this function and L<< C<SDL_GetCurrentDisplayMode(
+... )>|/C<SDL_GetCurrentDisplayMode( ... )> >> when SDL runs fullscreen and has
+changed the resolution. In that case this function will return the previous
+native display mode, and not the current display mode.
+
+Expected parameters include:
+
+=over
+
+=item C<displayIndex> - the index of the display to query
+
+=back
+
+Returns an L<SDL2::DisplayMode> structure filled in with the current display
+mode on success or a negative error code on failure; call L<< C<SDL_GetError(
+)>|/C<SDL_GetError( )> >> for more information.
+
+=head2 C<SDL_GetCurrentDisplayMode( ... )>
+
+	my $mode = SDL_GetCurrentDisplayMode( 0 );
+
+There's a difference between this function and L<< C<SDL_GetDesktopDisplayMode(
+... )>|/C<SDL_GetDesktopDisplayMode( ... )> >> when SDL runs fullscreen and has
+changed the resolution. In that case this function will return the current
+display mode, and not the previous native display mode.
+
+Expected parameters include:
+
+=over
+
+=item C<displayIndex> - the index of the display to query
+
+=back
+
+Returns an L<SDL2::DisplayMode> structure filled in with the current display
+mode on success or a negative error code on failure; call L<< C<SDL_GetError(
+)>|/C<SDL_GetError( )> >> for more information.
+
+=head2 C<SDL_GetClosestDisplayMode( ... )>
+
+Get the closes match to the requested display mode.
+
+	$mode = SDL_GetClosestDisplayMode( 0, $mode );
+
+The available display modes are scanned and he closest mode matching the
+requested mode is returned. The mode format and refresh rate default to the
+desktop mode if they are set to 0. The modes are scanned with size being first
+priority, format being second priority, and finally checking the refresh rate.
+If all the available modes are too small, then an undefined value is returned.
+
+Expected parameters include:
+
+=over
+
+=item C<displayIndex> - index of the display to query
+
+=item C<mode> - an L<SDL2::DisplayMode> structure containing the desired display mode
+
+=item C<closest> - an L<SDL2::DisplayMode> structure filled in with the closest match of the available display modes
+
+=back
+
+Returns the passed in value C<closest> or an undefined value if no matching
+video mode was available; call L<< C<SDL_GetError( )>|/C<SDL_GetError( )> >>
+for more information.
+
+=head2 C<SDL_GetWindowDisplayIndex( ... )>
+
+Get the index of the display associated with a window.
+
+	my $index = SDL_GetWindowDisplayIndex( $window );
+
+Expected parameters include:
+
+=over
+
+=item C<window>	- the window to query
+
+=back
+
+Returns the index of the display containing the center of the window on success
+or a negative error code on failure; call  L<< C<SDL_GetError(
+)>|/C<SDL_GetError( )> >> for more information.
+
+=head2 C<SDL_SetWindowDisplayMode( ... )>
+
+Set the display mode to use when a window is visible at fullscreen.
+
+	my $ok = !SDL_SetWindowDisplayMode( $window, $mode );
+
+This only affects the display mode used when the window is fullscreen. To
+change the window size when the window is not fullscreen, use L<<
+C<SDL_SetWindowSize( ... )>|/C<SDL_SetWindowSize( ... )> >>.
+
+=head2 C<SDL_GetWindowDisplayMode( ... )>
+
+Query the display mode to use when a window is visible at fullscreen.
+
+	my $mode = SDL_GetWindowDisplayMode( $window );
+
+Expected parameters include:
+
+=over
+
+=item C<window> - the window to query
+
+=back
+
+Returns a L<SDL2::DisplayMode> structure on success or a negative error code on
+failure; call L<< C<SDL_GetError( )>|/C<SDL_GetError( )> >> for more
+information.
+
+=head2 C<SDL_GetWindowPixelFormat( ... )>
+
+Get the pixel format associated with the window.
+
+	my $format = SDL_GetWindowPixelFormat( $window );
+
+Expected parameters include:
+
+=over
+
+=item C<window> - the window to query
+
+=back
+
+Returns the pixel format of the window on success or C<SDL_PIXELFORMAT_UNKNOWN>
+on failure; call L<< C<SDL_GetError( )>|/C<SDL_GetError( )> >> for more
+information.
+
+=head2 C<SDL_CreateWindow( ... )>
+
+Create a window with the specified position, dimensions, and flags.
+
+    my $window = SDL_CreateWindow( 'Example',
+        SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
+        1280, 720,
+      	SDL_WINDOW_SHOWN
+    );
+
+C<flags> may be any of the following OR'd together:
+
+=over
+
+=item C<SDL_WINDOW_FULLSCREEN> - fullscreen window
+
+=item C<SDL_WINDOW_FULLSCREEN_DESKTOP> - fullscreen window at desktop resolution
+
+=item C<SDL_WINDOW_OPENGL> - window usable with an OpenGL context
+
+=item C<SDL_WINDOW_VULKAN> - window usable with a Vulkan instance
+
+=item C<SDL_WINDOW_METAL> - window usable with a Metal instance
+
+=item C<SDL_WINDOW_HIDDEN> - window is not visible
+
+=item C<SDL_WINDOW_BORDERLESS> - no window decoration
+
+=item C<SDL_WINDOW_RESIZABLE> - window can be resized
+
+=item C<SDL_WINDOW_MINIMIZED> - window is minimized
+
+=item C<SDL_WINDOW_MAXIMIZED> - window is maximized
+
+=item C<SDL_WINDOW_INPUT_GRABBED> - window has grabbed input focus
+
+=item C<SDL_WINDOW_ALLOW_HIGHDPI> - window should be created in high-DPI mode if supported (>= SDL 2.0.1)
+
+=back
+
+C<SDL_WINDOW_SHOWN> is ignored by C<SDL_CreateWindow( ... )>. The SDL_Window is
+implicitly shown if C<SDL_WINDOW_HIDDEN> is not set. C<SDL_WINDOW_SHOWN> may be
+queried later using L<< C<SDL_GetWindowFlags( ... )>|/C<SDL_GetWindowFlags( ...
+)> >>.
+
+On Apple's macOS, you B<must> set the NSHighResolutionCapable Info.plist
+property to YES, otherwise you will not receive a High-DPI OpenGL canvas.
+
+If the window is created with the C<SDL_WINDOW_ALLOW_HIGHDPI> flag, its size in
+pixels may differ from its size in screen coordinates on platforms with
+high-DPI support (e.g. iOS and macOS). Use L<< C<SDL_GetWindowSize( ...
+)>|/C<SDL_GetWindowSize( ... )> >> to query the client area's size in screen
+coordinates, and L<< C<SDL_GL_GetDrawableSize( )>|/C<SDL_GL_GetDrawableSize( )>
+>> or L<< C<SDL_GetRendererOutputSize( )>|/C<SDL_GetRendererOutputSize( )> >>
+to query the drawable size in pixels.
+
+If the window is set fullscreen, the width and height parameters C<w> and C<h>
+will not be used. However, invalid size parameters (e.g. too large) may still
+fail. Window size is actually limited to 16384 x 16384 for all platforms at
+window creation.
+
+If the window is created with any of the C<SDL_WINDOW_OPENGL> or
+C<SDL_WINDOW_VULKAN> flags, then the corresponding LoadLibrary function
+(SDL_GL_LoadLibrary or SDL_Vulkan_LoadLibrary) is called and the corresponding
+UnloadLibrary function is called by L<< C<SDL_DestroyWindow( ...
+)>|/C<SDL_DestroyWindow( ... )> >>.
+
+If C<SDL_WINDOW_VULKAN> is specified and there isn't a working Vulkan driver,
+C<SDL_CreateWindow( ... )> will fail because L<< C<SDL_Vulkan_LoadLibrary(
+)>|/C<SDL_Vulkan_LoadLibrary( )> >> will fail.
+
+If C<SDL_WINDOW_METAL> is specified on an OS that does not support Metal,
+C<SDL_CreateWindow( ... )> will fail.
+
+On non-Apple devices, SDL requires you to either not link to the Vulkan loader
+or link to a dynamic library version. This limitation may be removed in a
+future version of SDL.
+
+Expected parameters include:
+
+=over
+
+=item C<title> - the title of the window, in UTF-8 encoding
+
+=item C<x> - the x position of the window, C<SDL_WINDOWPOS_CENTERED>, or C<SDL_WINDOWPOS_UNDEFINED>
+
+=item C<y> - the y position of the window, C<SDL_WINDOWPOS_CENTERED>, or C<SDL_WINDOWPOS_UNDEFINED>
+
+=item C<w> - the width of the window, in screen coordinates
+
+=item C<h> - the height of the window, in screen coordinates
+
+=item C<flags> - 0, or one or more L<< C<:windowFlags>|SDL2::Enum/C<:windowFlags> >> OR'd together
+
+=back
+
+Returns the window that was created or an undefined value on failure; call L<<
+C<SDL_GetError( )>|/C<SDL_GetError( )> >> for more information.
+
+
+=head2 C<SDL_CreateWindowFrom( ... )>
+
+Create an SDL window from an existing native window.
+
+	my $window = SDL_CreateWindowFrom( $data );
+
+In some cases (e.g. OpenGL) and on some platforms (e.g. Microsoft Windows) the
+hint C<SDL_HINT_VIDEO_WINDOW_SHARE_PIXEL_FORMAT> needs to be configured before
+using C<SDL_CreateWindowFrom( ... )>.
+
+Expected parameters include:
+
+=over
+
+=item C<data> - driver-dependant window creation data, typically your native window
+
+=back
+
+Returns the window that was created or an undefined value on failure; call L<<
+C<SDL_GetError( )>|/C<SDL_GetError( )> >> for more information.
+
+=head2 C<SDL_GetWindowID( ... )>
+
+Get the numeric ID of a window.
+
+	my $id = SDL_GetWindowID( $window );
+
+The numeric ID is what L<SDL2::WindowEvent> references, and is necessary to map
+these events to specific L<SDL2::Window> objects.
+
+Expected parameters include:
+
+=over
+
+=item C<window> - the window to query
+
+=back
+
+Returns the ID of the window on success or C<0> on failure; call L<<
+C<SDL_GetError( )>|/C<SDL_GetError( )> >> for more information.
+
+=head2 C<SDL_GetWindowFromID( ... )>
+
+Get a window from a stored ID.
+
+	my $window = SDL_GetWindowFromID( 2 );
+
+The numeric ID is what L<SDL2::WindowEvent> references, and is necessary to map
+these events to specific L<SDL2::Window> objects.
+
+Expected parameters include:
+
+=over
+
+=item C<id> - the ID of the window
+
+=back
+
+Returns the window associated with C<id> or an undefined value if it doesn't
+exist; call L<< C<SDL_GetError( )>|/C<SDL_GetError( )> >> for more information.
+
+=head2 C<SDL_GetWindowFlags( ... )>
+
+Get the window flags.
+
+	my $id = SDL_GetWindowFlags( $window );
+
+The numeric ID is what L<SDL2::WindowEvent> references, and is necessary to map
+these events to specific L<SDL2::Window> objects.
+
+Expected parameters include:
+
+=over
+
+=item C<window> - the window to query
+
+=back
+
+Returns a mask of the L<< C<:windowFlags>|SDL2::Enum/C<:windowFlags> >>
+associated with C<window>.
+
+=head2 C<SDL_SetWindowTitle( ... )>
+
+Set the title of a window.
+
+	SDL_SetWindowTitle( $window, 'Untitle file *' );
+
+This string is expected to be in UTF-8 encoding.
+
+Expected parameters include:
+
+=over
+
+=item C<window> - the window to change
+
+=item C<title> - the desired window title in UTF-8 format
+
+=back
+
+=head2 C<SDL_GetWindowTitle( ... )>
+
+Get the title of a window.
+
+	my $title = SDL_GetWindowTitle( $window );
+
+Expected parameters include:
+
+=over
+
+=item C<window> - the window to query
+
+=back
+
+Returns the title of the window in UTF-8 format or C<""> (an empty string) if
+there is no title.
+
+=head2 C<SDL_SetWindowIcon( ... )>
+
+Set the icon for a window.
+
+	SDL_SetWindowIcon( $window, $icon );
+
+Expected parameters include:
+
+=over
+
+=item C<window> - the window to change
+
+=item C<icon> - an L<SDL2::Surface> structure containing the icon for the window
+
+=back
+
+=head2 C<SDL_SetWindowData( ... )>
+
+Associate an arbitrary named pointer with a window.
+
+	my $prev = SDL_SetWindowData( $window, 'test', $data );
+
+Expected parameters include:
+
+=over
+
+=item C<window> - the window to change
+
+=item C<name> - the name of the pointer
+
+=item C<userdata> - the associated pointer
+
+=back
+
+Returns the previous value associated with C<name>.
+
+
+=head2 C<SDL_GetWindowData( ... )>
+
+Retrieve the data pointer associated with a window.
+
+	my $data = SDL_SetWindowData( $window, 'test' );
+
+Expected parameters include:
+
+=over
+
+=item C<window> - the window to query
+
+=item C<name> - the name of the pointer
+
+=back
+
+Returns the value associated with C<name>.
+
+=head2 C<SDL_SetWindowPosition( ... )>
+
+Set the position of a window.
+
+	SDL_SetWindowPosition( $window, 100, 100 );
+
+The window coordinate origin is the upper left of the display.
+
+Expected parameters include:
+
+=over
+
+=item C<window> - the window to reposition
+
+=item C<x> - the x coordinate of the window in screen coordinates, or C<SDL_WINDOWPOS_CENTERED> or C<SDL_WINDOWPOS_UNDEFINED>
+
+=item C<y> - the y coordinate of the window in screen coordinates, or C<SDL_WINDOWPOS_CENTERED> or C<SDL_WINDOWPOS_UNDEFINED>
+
+=back
+
+=head2 C<SDL_GetWindowPosition( ... )>
+
+Get the position of a window.
+
+	my ($x, $y) = SDL_GetWindowPosition( $window );
+
+Expected parameters include:
+
+=over
+
+=item C<window> - the window to query
+
+=back
+
+Returns the C<x> and C<y> positions of the window, in screen coordinates,
+either of which may be undefined.
+
+=head2 C<SDL_SetWindowSize( ... )>
+
+Set the size of a window's client area.
+
+	SDL_SetWindowSize( $window, 100, 100 );
+
+The window size in screen coordinates may differ from the size in pixels, if
+the window was created with C<SDL_WINDOW_ALLOW_HIGHDPI> on a platform with
+high-dpi support (e.g. iOS or macOS). Use L<< C<SDL_GL_GetDrawableSize( ...
+)>|C<SDL_GL_GetDrawableSize( ... )> >> or L<< C<SDL_GetRendererOutputSize( ...
+)>|/C<SDL_GetRendererOutputSize( ... )> >> to get the real client area size in
+pixels.
+
+Fullscreen windows automatically match the size of the display mode, and you
+should use L<< C<SDL_SetWindowDisplayMode( ... )>|/C<SDL_SetWindowDisplayMode(
+... )> >> to change their size.
+
+Expected parameters include:
+
+=over
+
+=item C<window> - the window to change
+
+=item C<w> - the width of the window in pixels, in screen coordinates, must be > 0
+
+=item C<h> - the height of the window in pixels, in screen coordinates, must be > 0
+
+=back
+
+=head2 C<SDL_GetWindowSize( ... )>
+
+Get the position of a window.
+
+	my ($w, $h) = SDL_GetWindowSize( $window );
+
+The window size in screen coordinates may differ from the size in pixels, if
+the window was created with C<SDL_WINDOW_ALLOW_HIGHDPI> on a platform with
+high-dpi support (e.g. iOS or macOS). Use L<< C<SDL_GL_GetDrawableSize( ...
+)>|C<SDL_GL_GetDrawableSize( ... )> >>, L<< C<SDL_Vulkan_GetDrawableSize( ...
+)>|/C<SDL_Vulkan_GetDrawableSize( ... )> >>, or L<<
+C<SDL_GetRendererOutputSize( ... )>|/C<SDL_GetRendererOutputSize( ... )> >> to
+get the real client area size in pixels.
+
+Expected parameters include:
+
+=over
+
+=item C<window> - the window to query the width and height from
+
+=back
+
+Returns the C<width> and C<height> of the window, in screen coordinates, either
+of which may be undefined.
+
+=head2 C<SDL_GetWindowBordersSize( ... )>
+
+Get the size of a window's borders (decorations) around the client area.
+
+	my ($top, $left, $bottom, $right) = SDL_GetWindowBorderSize( $window );
+
+Expected parameters include:
+
+=over
+
+=item C<window> - the window to query the size values of the border (decorations) from
+
+=back
+
+Returns the C<top>, C<left>, C<bottom>, and C<right> size values, any of which
+may be undefined.
+
+Note: If this function fails (returns -1), the size values will be initialized
+to C<0, 0, 0, 0>, as if the window in question was borderless.
+
+Note: This function may fail on systems where the window has not yet been
+decorated by the display server (for example, immediately after calling L<<
+C<SDL_CreateWindow( ...  )>|/C<SDL_CreateWindow( ...  )> >> ). It is
+recommended that you wait at least until the window has been presented and
+composited, so that the window system has a chance to decorate the window and
+provide the border dimensions to SDL.
+
+This function also returns C<-1> if getting the information is not supported.
+
+=head2 C<SDL_SetWindowMinimumSize( ... )>
+
+Set the minimum size of a window's client area.
+
+	SDL_SetWindowMinimumSize( $window, 100, 100 );
+
+Expected parameters include:
+
+=over
+
+=item C<window> - the window to change
+
+=item C<w> - the minimum width of the window in pixels
+
+=item C<h> - the minimum height of the window in pixels
+
+=back
+
+=head2 C<SDL_GetWindowMinimumSize( ... )>
+
+Get the minimum size of a window's client area.
+
+	my ($w, $h) = SDL_GetWindowMinimumSize( $window );
+
+Expected parameters include:
+
+=over
+
+=item C<window> - the window to query the minimum width and minimum height from
+
+=back
+
+Returns the minimum C<width> and minimum C<height> of the window, either of
+which may be undefined.
+
+=head2 C<SDL_SetWindowMaximumSize( ... )>
+
+Set the maximum size of a window's client area.
+
+	SDL_SetWindowMaximumSize( $window, 100, 100 );
+
+Expected parameters include:
+
+=over
+
+=item C<window> - the window to change
+
+=item C<w> - the maximum width of the window in pixels
+
+=item C<h> - the maximum height of the window in pixels
+
+=back
+
+=head2 C<SDL_GetWindowMaximumSize( ... )>
+
+Get the maximum size of a window's client area.
+
+	my ($w, $h) = SDL_GetWindowMaximumSize( $window );
+
+Expected parameters include:
+
+=over
+
+=item C<window> - the window to query the maximum width and maximum height from
+
+=back
+
+Returns the maximum C<width> and maximum C<height> of the window, either of
+which may be undefined.
+
+=head2 C<SDL_SetWindowBordered( ... )>
+
+Set the border state of a window.
+
+	SDL_SetWindowBordered( $window, 1 );
+
+This will add or remove the window's C<SDL_WINDOW_BORDERLESS> flag and add or
+remove the border from the actual window. This is a no-op if the window's
+border already matches the requested state.
+
+You can't change the border state of a fullscreen window.
+
+Expected parameters include:
+
+=over
+
+=item C<window> - the window of which to change the border state
+
+=item C<bordered> - false value to remove border, true value to add border
+
+=back
+
+=head2 C<SDL_SetWindowResizable( ... )>
+
+Set the user-resizable state of a window.
+
+	SDL_SetWindowResizable( $window, 1 );
+
+This will add or remove the window's C<SDL_WINDOW_RESIZABLE> flag and
+allow/disallow user resizing of the window. This is a no-op if the window's
+resizable state already matches the requested state.
+
+You can't change the resizable state of a fullscreen window.
+
+Expected parameters include:
+
+=over
+
+=item C<window> - the window of which to change the border state
+
+=item C<bordered> - true value to allow resizing, false value to disallow
+
+=back
+
+=head2 C<SDL_ShowWindow( ... )>
+
+Show a window.
+
+	SDL_ShowWindow( $window );
+
+Expected parameters include:
+
+=over
+
+=item C<window> - the window to show
+
+=back
+
+=head2 C<SDL_HideWindow( ... )>
+
+Hide a window.
+
+	SDL_HideWindow( $window );
+
+Expected parameters include:
+
+=over
+
+=item C<window> - the window to hide
+
+=back
+
+=head2 C<SDL_RaiseWindow( ... )>
+
+Raise a window above other windows and set the input focus.
+
+	SDL_RaiseWindow( $window );
+
+Expected parameters include:
+
+=over
+
+=item C<window> - the window to raise
+
+=back
+
+=head2 C<SDL_MaximizeWindow( ... )>
+
+Make a window as large as possible.
+
+	SDL_MaximizeWindow( $window );
+
+Expected parameters include:
+
+=over
+
+=item C<window> - the window to maximize
+
+=back
+
+=head2 C<SDL_MinimizeWindow( ... )>
+
+Minimize a window to an iconic representation.
+
+	SDL_MinimizeWindow( $window );
+
+Expected parameters include:
+
+=over
+
+=item C<window> - the window to minimize
+
+=back
+
+=head2 C<SDL_RestoreWindow( ... )>
+
+Restore the size and position of a minimized or maximized window.
+
+	SDL_RestoreWindow( $window );
+
+Expected parameters include:
+
+=over
+
+=item C<window> - the window to restore
+
+=back
+
+=head2 C<SDL_SetWindowFullscreen( ... )>
+
+Set a window's fullscreen state.
+
+	SDL_SetWindowFullscreen( $window, SDL_WINDOW_FULLSCREEN );
+
+Expected parameters include:
+
+=over
+
+=item C<window> - the window to change
+
+=item C<flags> - C<SDL_WINDOW_FULLSCREEN>, C<SDL_WINDOW_FULLSCREEN_DESKTOP> or 0
+
+=back
+
+Returns  0 on success or a negative error code on failure; call L<<
+C<SDL_GetError( )>|/C<SDL_GetError( )> >> for more information.
+
+=head2 C<SDL_GetWindowSurface( ... )>
+
+Get the SDL surface associated with the window.
+
+	my $surface = SDL_GetWindowSurface( $window );
+
+A new surface will be created with the optimal format for the window, if
+necessary. This surface will be freed when the window is destroyed. Do not free
+this surface.
+
+This surface will be invalidated if the window is resized. After resizing a
+window this function must be called again to return a valid surface.
+
+You may not combine this with 3D or the rendering API on this window.
+
+This function is affected by C<SDL_HINT_FRAMEBUFFER_ACCELERATION>.
+
+Expected parameters include:
+
+=over
+
+=item C<window> - the window to query
+
+=back
+
+Returns the surface associated with the window, or an undefined on failure;
+call L<< C<SDL_GetError( )>|/C<SDL_GetError( )> >> for more information.
+
+=head2 C<SDL_UpdateWindowSurface( ... )>
+
+Copy the window surface to the screen.
+
+	my $ok = !SDL_UpdateWindowSurface( $window );
+
+This is the function you use to reflect any changes to the surface on the
+screen.
+
+Expected parameters include:
+
+=over
+
+=item C<window> - the window to query
+
+=back
+
+Returns C<0> on success or a negative error code on failure; call L<<
+C<SDL_GetError( )>|/C<SDL_GetError( )> >> for more information.
+
+=head2 C<SDL_UpdateWindowSurfaceRects( ... )>
+
+Copy areas of the window surface to the screen.
+
+	SDL_UpdateWindowSurfaceRects( $window, @recs );
+
+This is the function you use to reflect changes to portions of the surface on
+the screen.
+
+Expected parameters include:
+
+=over
+
+=item C<window> - the window to update
+
+=item C<rects> - an array of L<SDL2::Rect> structures representing areas of the surface to copy
+
+=back
+
+Returns C<0> on success or a negative error code on failure; call L<<
+C<SDL_GetError( )>|/C<SDL_GetError( )> >> for more information.
+
+=head2 C<SDL_SetWindowGrab( ... )>
+
+Set a window's input grab mode.
+
+	SDL_SetWindowGrab( $window, 1 );
+
+When input is grabbed the mouse is confined to the window.
+
+If the caller enables a grab while another window is currently grabbed, the
+other window loses its grab in favor of the caller's window.
+
+Expected parameters include:
+
+=over
+
+=item C<window> - the window for which the input grab mode should be set
+
+=item C<grabbed> - a true value to grab input or a false value to release input
+
+=back
+
+=head2 C<SDL_SetWindowKeyboardGrab( ... )>
+
+Set a window's keyboard grab mode.
+
+	SDL_SetWindowKeyboardGrab( $window, 1 );
+
+If the caller enables a grab while another window is currently grabbed, the
+other window loses its grab in favor of the caller's window.
+
+Expected parameters include:
+
+=over
+
+=item C<window> - The window for which the keyboard grab mode should be set.
+
+=item C<grabbed> - This is true to grab keyboard, and false to release.
+
+=back
+
+=head2 C<SDL_SetWindowMouseGrab( ... )>
+
+Set a window's mouse grab mode.
+
+	SDL_SetWindowMouseGrab( $window, 1 );
+
+Expected parameters include:
+
+=over
+
+=item C<window> - The window for which the mouse grab mode should be set.
+
+=item C<grabbed> - This is true to grab mouse, and false to release.
+
+=back
+
+If the caller enables a grab while another window is currently grabbed, the
+other window loses its grab in favor of the caller's window.
+
+=head2 C<SDL_GetWindowGrab( ... )>
+
+Get a window's input grab mode.
+
+	my $grabbing = SDL_GetWindowGrab( $window );
+
+Expected parameters include:
+
+=over
+
+=item C<window> - the window to query
+
+=back
+
+Returns true if input is grabbed, false otherwise.
+
+=head2 C<SDL_GetWindowKeyboardGrab( ... )>
+
+Get a window's keyboard grab mode.
+
+	my $keyboard = SDL_GetWindowKeyboardGrab( $window );
+
+Expected parameters include:
+
+=over
+
+=item C<window> - the window to query
+
+=back
+
+Returns true if keyboard is grabbed, and false otherwise.
+
+=head2 C<SDL_GetWindowMouseGrab( ... )>
+
+Get a window's mouse grab mode.
+
+	my $mouse = SDL_GetWindowMouseGrab( $window );
+
+Expected parameters include:
+
+=over
+
+=item C<window> - the window to query
+
+=back
+
+This returns true if mouse is grabbed, and false otherwise.
+
+=head2 C<SDL_GetGrabbedWindow( )>
+
+Get the window that currently has an input grab enabled.
+
+	my $window = SDL_GetGrabbedWindow( );
+
+Returns the window if input is grabbed or undefined otherwise.
+
+=head2 C<SDL_SetWindowBrightness( ... )>
+
+Set the brightness (gamma multiplier) for a given window's display.
+
+	my $ok = !SDL_SetWindowBrightness( $window, 2 );
+
+Despite the name and signature, this method sets the brightness of the entire
+display, not an individual window. A window is considered to be owned by the
+display that contains the window's center pixel. (The index of this display can
+be retrieved using L<< C<SDL_GetWindowDisplayIndex( ...
+)>|/C<SDL_GetWindowDisplayIndex( ... )> >>.) The brightness set will not follow
+the window if it is moved to another display.
+
+Many platforms will refuse to set the display brightness in modern times. You
+are better off using a shader to adjust gamma during rendering, or something
+similar.
+
+Expected parameters includes:
+
+=over
+
+=item C<window> - the window used to select the display whose brightness will be changed
+
+=item C<brightness> - the brightness (gamma multiplier) value to set where 0.0 is completely dark and 1.0 is normal brightness
+
+=back
+
+Returns C<0> on success or a negative error code on failure; call L<<
+C<SDL_GetError( )>|/C<SDL_GetError( )> >>( ) for more information.
+
+=head2 C<SDL_GetWindowBrightness( ... )>
+
+Get the brightness (gamma multiplier) for a given window's display.
+
+	my $gamma = SDL_GetWindowBrightness( $window );
+
+Despite the name and signature, this method retrieves the brightness of the
+entire display, not an individual window. A window is considered to be owned by
+the display that contains the window's center pixel. (The index of this display
+can be retrieved using L<< C<SDL_GetWindowDisplayIndex( ...
+)>|/C<SDL_GetWindowDisplayIndex( ... )> >>.)
+
+Expected parameters include:
+
+=over
+
+=item C<window> - the window used to select the display whose brightness will be queried
+
+=back
+
+Returns the brightness for the display where 0.0 is completely dark and C<1.0>
+is normal brightness.
+
+=head2 C<SDL_SetWindowOpacity( ... )>
+
+Set the opacity for a window.
+
+	SDL_SetWindowOpacity( $window, .5 );
+
+The parameter C<opacity> will be clamped internally between C<0.0>
+(transparent) and C<1.0> (opaque).
+
+This function also returns C<-1> if setting the opacity isn't supported.
+
+Expected parameters include:
+
+=over
+
+=item C<window> - the window which will be made transparent or opaque
+
+=item C<opacity> - the opacity value (0.0 - transparent, 1.0 - opaque)
+
+=back
+
+Returns C<0> on success or a negative error code on failure; call L<<
+C<SDL_GetError( )>|/C<SDL_GetError( )> >>( ) for more information.
+
+=head2 C<SDL_GetWindowOpacity( ... )>
+
+Get the opacity of a window.
+
+	my $opacity = SDL_GetWindowOpacity( $window );
+
+If transparency isn't supported on this platform, opacity will be reported as
+1.0 without error.
+
+The parameter C<opacity> is ignored if it is undefined.
+
+This function also returns C<-1> if an invalid window was provided.
+
+Expected parameters include:
+
+=over
+
+=item C<window> - the window to get the current opacity value from
+
+=back
+
+Returns the current opacity on success or a negative error code on failure;
+call L<< C<SDL_GetError( )>|/C<SDL_GetError( )> >>( ) for more information.
+
+=head2 C<SDL_SetWindowModalFor( ... )>
+
+Set the window as a modal for another window.
+
+	my $ok = !SDL_SetWindowModalFor( $winodw, $parent );
+
+Expected parameters include:
+
+=over
+
+=item C<modal_window> - the window that should be set modal
+
+=item C<parent_window> - the parent window for the modal window
+
+=back
+
+Returns C<0> on success or a negative error code on failure; call L<<
+C<SDL_GetError( )>|/C<SDL_GetError( )> >>( ) for more information.
+
+
+=head2 C<SDL_SetWindowInputFocus( ... )>
+
+Explicitly set input focus to the window.
+
+	SDL_SetWindowInputFocus( $window );
+
+You almost certainly want L<< C<SDL_RaiseWindow( ... )>|/C<SDL_RaiseWindow( ...
+)> >> instead of this function. Use this with caution, as you might give focus
+to a window that is completely obscured by other windows.
+
+Expected parameters include:
+
+=over
+
+=item C<window> - the window that should get the input focus
+
+=back
+
+Returns C<0> on success or a negative error code on failure; call L<<
+C<SDL_GetError( )>|/C<SDL_GetError( )> >>( ) for more information.
+
+=head2 C<SDL_SetWindowGammaRamp( ... )>
+
+Set the gamma ramp for the display that owns a given window.
+
+	my $ok = !SDL_SetWindowGammaRamp( $window, \@red, \@green, \@blue );
+
+Set the gamma translation table for the red, green, and blue channels of the
+video hardware. Each table is an array of 256 16-bit quantities, representing a
+mapping between the input and output for that channel. The input is the index
+into the array, and the output is the 16-bit gamma value at that index, scaled
+to the output color precision. Despite the name and signature, this method sets
+the gamma ramp of the entire display, not an individual window. A window is
+considered to be owned by the display that contains the window's center pixel.
+(The index of this display can be retrieved using L<<
+C<SDL_GetWindowDisplayIndex( ... )>|/C<SDL_GetWindowDisplayIndex( ... )> >>.)
+The gamma ramp set will not follow the window if it is moved to another
+display.
+
+Expected parameters include:
+
+=over
+
+=item C<window> - the window used to select the display whose gamma ramp will be changed
+
+=item C<red> - a 256 element array of 16-bit quantities representing the translation table for the red channel, or NULL
+
+=item C<green> - a 256 element array of 16-bit quantities representing the translation table for the green channel, or NULL
+
+=item C<blue> - a 256 element array of 16-bit quantities representing the translation table for the blue channel, or NULL
+
+=back
+
+Returns C<0> on success or a negative error code on failure; call L<<
+C<SDL_GetError( )>|/C<SDL_GetError( )> >>( ) for more information.
+
+=head2 C<SDL_GetWindowGammaRamp( ... )>
+
+Get the gamma ramp for a given window's display.
+
+	my ($red, $green, $blue) = SDL_GetWindowGammaRamp( $window );
+
+Despite the name and signature, this method retrieves the gamma ramp of the
+entire display, not an individual window. A window is considered to be owned by
+the display that contains the window's center pixel. (The index of this display
+can be retrieved using L<< C<SDL_GetWindowDisplayIndex( ...
+)>|/C<SDL_GetWindowDisplayIndex( ... )> >>.)
+
+Expected parameters include:
+
+=over
+
+=item C<window> - the window used to select the display whose gamma ramp will be queried
+
+=back
+
+Returns three 256 element arrays of 16-bit quantities filled in with the
+translation table for the red, gree, and blue channels on success or a negative
+error code on failure; call L<< C<SDL_GetError( )>|/C<SDL_GetError( )> >>( )
+for more information.
+
+=head2 C<SDL_SetWindowHitTest( ... )>
+
+Provide a callback that decides if a window region has special properties.
+
+	SDL_SetWindowHitTest( $window, sub ($win, $point, $data) {
+    	warn sprintf 'Click at x:%d y:%d', $point->x, $point->y;
+    	...;
+	});
+
+Normally, windows are dragged and resized by decorations provided by the system
+window manager (a title bar, borders, etc), but for some apps, it makes sense
+to drag them from somewhere else inside the window itself; for example, one
+might have a borderless window that wants to be draggable from any part, or
+simulate its own title bar, etc.
+
+This function lets the app provide a callback that designates pieces of a given
+window as special. This callback is run during event processing if we need to
+tell the OS to treat a region of the window specially; the use of this callback
+is known as "hit testing."
+
+Mouse input may not be delivered to your application if it is within a special
+area; the OS will often apply that input to moving the window or resizing the
+window and not deliver it to the application.
+
+Specifying undef for a callback disables hit-testing. Hit-testing is disabled
+by default.
+
+Platforms that don't support this functionality will return C<-1>
+unconditionally, even if you're attempting to disable hit-testing.
+
+Your callback may fire at any time, and its firing does not indicate any
+specific behavior (for example, on Windows, this certainly might fire when the
+OS is deciding whether to drag your window, but it fires for lots of other
+reasons, too, some unrelated to anything you probably care about B<and when the
+mouse isn't actually at the location it is testing>). Since this can fire at
+any time, you should try to keep your callback efficient, devoid of
+allocations, etc.
+
+Expected parameters include:
+
+=over
+
+=item C<window> - the window to set hit-testing on
+
+=item C<callback> - the function to call when doing a hit-test
+
+=item C<callback_data> - an app-defined void pointer passed to C<callback>
+
+=back
+
+Returns C<0> on success or C<-1> on error (including unsupported); call L<<
+C<SDL_GetError( )>|/C<SDL_GetError( )> >>( ) for more information.
+
+=head2 C<SDL_FlashWindow( ... )>
+
+Request a window to give a signal, e.g. a visual signal, to demand attention
+from the user.
+
+	SDL_FlashWindow( $window, 10 );
+
+Expected parameters include:
+
+=over
+
+=item C<window> - the window to request the flashing for
+
+=item C<flash_count> - number of times the window gets flashed on systems that support flashing the window multiple times, like Windows, else it is ignored
+
+=back
+
+Returns C<0> on success or a negative error code on failure; call L<<
+C<SDL_GetError( )>|/C<SDL_GetError( )> >>( ) for more information.
+
+=head2 C<SDL_DestroyWindow( ... )>
+
+Destroy a window.
+
+	SDL_DestoryWindow( $window );
+
+If C<window> is undefined, this function will return immediately after setting
+the SDL error message to "Invalid window". See L<< C<SDL_GetError(
+)>|/C<SDL_GetError( )> >>( ).
+
+Expected parameters include:
+
+=over
+
+=item C<window> - the window to destroy
+
+=back
+
+=head2 C<SDL_IsScreenSaverEnabled( ... )>
+
+Check whether the screensaver is currently enabled.
+
+	my $enabled = SDL_IsScreenSaverEnabled( );
+
+The screensaver is disabled by default since SDL 2.0.2. Before SDL 2.0.2 the
+screensaver was enabled by default.
+
+The default can also be changed using C<SDL_HINT_VIDEO_ALLOW_SCREENSAVER>.
+
+Returns true if the screensaver is enabled, false if it is disabled.
+
+=head2 C<SDL_EnableScreenSaver( ... )>
+
+Allow the screen to be blanked by a screen saver.
+
+	SDL_EnableScreenSaver( );
+
+
+=head2 C<SDL_DisableScreenSaver( ... )>
+
+Prevent the screen from being blanked by a screen saver.
+
+	SDL_DisableScreenSaver( );
+
+If you disable the screensaver, it is automatically re-enabled when SDL quits.
+
+=head1 OpenGL Support Functions
+
+These may be imported with the C<:opengl> tag.
+
+=head2 C<SDL_GL_LoadLibrary( ... )>
+
+Dynamically load an OpenGL library.
+
+	my $ok = SDL_GL_LoadLibrary( );
+
+This should be done after initializing the video driver, but before creating
+any OpenGL windows. If no OpenGL library is loaded, the default library will be
+loaded upon creation of the first OpenGL window.
+
+If you do this, you need to retrieve all of the GL functions used in your
+program from the dynamic library using L<< C<SDL_GL_GetProcAddress(
+)>|/C<SDL_GL_GetProcAddress( )> >>.
+
+Expected parameters include:
+
+=over
+
+=item C<path> - the platform dependent OpenGL library name, or undef to open the default OpenGL library
+
+=back
+
+Returns C<0> on success or a negative error code on failure; call L<<
+C<SDL_GetError( )>|/C<SDL_GetError( )> >>( ) for more information.
+
+=head2 C<SDL_GL_GetProcAddress( ... )>
+
+Get an OpenGL function by name.
+
+	my $ptr = SDL_GL_GetProcAddress( 'glGenBuffers' );
+	...; # TODO
+	# TODO: In the future, this should return an XSUB loaded with FFI.
+
+If the GL library is loaded at runtime with L<< C<SDL_GL_LoadLibrary( ...
+)>|/C<SDL_GL_LoadLibrary( ... )> >>, then all GL functions must be retrieved
+this way. Usually this is used to retrieve function pointers to OpenGL
+extensions.
+
+There are some quirks to looking up OpenGL functions that require some extra
+care from the application. If you code carefully, you can handle these quirks
+without any platform-specific code, though:
+
+=over
+
+=item * On Windows, function pointers are specific to the current GL context;
+this means you need to have created a GL context and made it current before
+calling SDL_GL_GetProcAddress( ). If you recreate your context or create a
+second context, you should assume that any existing function pointers
+aren't valid to use with it. This is (currently) a Windows-specific
+limitation, and in practice lots of drivers don't suffer this limitation,
+but it is still the way the wgl API is documented to work and you should
+expect crashes if you don't respect it. Store a copy of the function
+pointers that comes and goes with context lifespan.
+
+=item * On X11, function pointers returned by this function are valid for any
+context, and can even be looked up before a context is created at all. This
+means that, for at least some common OpenGL implementations, if you look up
+a function that doesn't exist, you'll get a non-NULL result that is _NOT_
+safe to call. You must always make sure the function is actually available
+for a given GL context before calling it, by checking for the existence of
+the appropriate extension with L<< C<SDL_GL_ExtensionSupported( ... )>|C<SDL_GL_ExtensionSupported( ... )> >>, or verifying
+that the version of OpenGL you're using offers the function as core
+functionality.
+
+=item * Some OpenGL drivers, on all platforms, B<will> return undef if a function
+isn't supported, but you can't count on this behavior. Check for extensions
+you use, and if you get an undef anyway, act as if that extension wasn't
+available. This is probably a bug in the driver, but you can code
+defensively for this scenario anyhow.
+
+=item * Just because you're on Linux/Unix, don't assume you'll be using X11.
+Next-gen display servers are waiting to replace it, and may or may not make
+the same promises about function pointers.
+
+=item * OpenGL function pointers must be declared C<APIENTRY> as in the example
+code. This will ensure the proper calling convention is followed on
+platforms where this matters (Win32) thereby avoiding stack corruption.
+
+=back
+
+Expected parameters include:
+
+=over
+
+=item C<proc> - the name of an OpenGL function
+
+=back
+
+Returns a pointer to the named OpenGL function. The returned pointer should be
+cast to the appropriate function signature.
+
+=head2 C<SDL_GL_UnloadLibrary( )>
+
+Unload the OpenGL library previously loaded by L<< C<SDL_GL_LoadLibrary( ...
+)>|/C<SDL_GL_LoadLibrary( ... )> >>.
+
+=head2 C<SDL_GL_ExtensionSupported( ... )>
+
+Check if an OpenGL extension is supported for the current context.
+
+	my $ok = SDL_GL_ExtensionSupported( 'GL_ARB_texture_rectangle' );
+
+This function operates on the current GL context; you must have created a
+context and it must be current before calling this function. Do not assume that
+all contexts you create will have the same set of extensions available, or that
+recreating an existing context will offer the same extensions again.
+
+While it's probably not a massive overhead, this function is not an O(1)
+operation. Check the extensions you care about after creating the GL context
+and save that information somewhere instead of calling the function every time
+you need to know.
+
+Expected parameters include:
+
+=over
+
+=item C<extension> - the name of the extension to check
+
+=back
+
+Returns true if the extension is supported, false otherwise.
+
+=head2 C<SDL_GL_ResetAttributes( )>
+
+Reset all previously set OpenGL context attributes to their default values.
+
+	SDL_GL_ResetAttributes( );
+
+=head2 C<SDL_GL_SetAttribute( ... )>
+
+Set an OpenGL window attribute before window creation.
+
+	SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 5);
+	SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 5);
+	SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 5);
+	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 16);
+	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+
+This function sets the OpenGL attribute C<attr> to C<value>. The requested
+attributes should be set before creating an OpenGL window. You should use L<<
+C<SDL_GL_GetAttribute( ... )>|/C<SDL_GL_GetAttribute( ... )> >> to check the
+values after creating the OpenGL context, since the values obtained can differ
+from the requested ones.
+
+Expected parameters include:
+
+=over
+
+=item C<attr> - an SDL_GLattr enum value specifying the OpenGL attribute to set
+
+=item C<value> - the desired value for the attribute
+
+=back
+
+Returns C<0> on success or a negative error code on failure; call L<<
+C<SDL_GetError( )>|/C<SDL_GetError( )> >>( ) for more information.
+
+=head2 C<SDL_GL_GetAttribute( ... )>
+
+Get the actual value for an attribute from the current context.
+
+	my $value = SDL_GL_GetAttribute(SDL_GL_DOUBLEBUFFER);
+
+Expected parameters include:
+
+=over
+
+=item C<attr> - an SDL_GLattr enum value specifying the OpenGL attribute to get
+
+=back
+
+Returns the value on success or a negative error code on failure; call L<<
+C<SDL_GetError( )>|/C<SDL_GetError( )> >>( ) for more information.
+
+=head2 C<SDL_GL_CreateContext( ... )>
+
+Create an OpenGL context for an OpenGL window, and make it current.
+
+	# Window mode MUST include SDL_WINDOW_OPENGL for use with OpenGL.
+	my $window = SDL_CreateWindow(
+    	'SDL2/OpenGL Demo', 0, 0, 640, 480,
+    	SDL_WINDOW_OPENGL|SDL_WINDOW_RESIZABLE);
+
+	# Create an OpenGL context associated with the window
+	my $glcontext = SDL_GL_CreateContext( $window );
+
+	# now you can make GL calls.
+	glClearColor( 0, 0, 0 ,1 );
+	glClear( GL_COLOR_BUFFER_BIT );
+	SDL_GL_SwapWindow( $window );
+
+	# Once finished with OpenGL functions, the SDL_GLContext can be deleted.
+	SDL_GL_DeleteContext( $glcontext );
+
+Windows users new to OpenGL should note that, for historical reasons, GL
+functions added after OpenGL version 1.1 are not available by default. Those
+functions must be loaded at run-time, either with an OpenGL extension-handling
+library or with L<< C<SDL_GL_GetProcAddress( ... )>|/C<SDL_GL_GetProcAddress(
+... )> >> and its related functions.
+
+SDL2::GLContext is opaque to the application.
+
+Expected parameters include:
+
+=over
+
+=item C<window> - the window to associate with the context
+
+=back
+
+Returns the OpenGL context associated with C<window> or undef on error; call
+L<< C<SDL_GetError( )>|/C<SDL_GetError( )> >>( ) for more details.
+
+=head2 C<SDL_GL_MakeCurrent( ... )>
+
+Set up an OpenGL context for rendering into an OpenGL window.
+
+	SDL_GL_MakeCurrent( $window, $gl );
+
+The context must have been created with a compatible window.
+
+Expected parameters include:
+
+=over
+
+=item C<window> - the window to associate with the context
+
+=item C<context> - the OpenGL context to associate with the window
+
+=back
+
+Returns C<0> on success or a negative error code on failure; call L<<
+C<SDL_GetError( )>|/C<SDL_GetError( )> >>( ) for more information.
+
+=head2 C<SDL_GL_GetCurrentWindow( )>
+
+Get the currently active OpenGL window.
+
+	my $window = SDL_GL_GetCurrentWindow( );
+
+Returns the currently active OpenGL window on success or undef on failure; call
+L<< C<SDL_GetError( )>|/C<SDL_GetError( )> >>( ) for more information.
+
+=head2 C<SDL_GL_GetCurrentContext( )>
+
+Get the currently active OpenGL context.
+
+	my $gl = SDL_GL_GetCurrentContext( );
+
+Returns the currently active OpenGL context or NULL on failure; call L<<
+C<SDL_GetError( )>|/C<SDL_GetError( )> >>( ) for more information.
+
+=head2 C<SDL_GL_GetDrawableSize( ... )>
+
+Get the size of a window's underlying drawable in pixels.
+
+	my ($w, $h) = SDL_GL_GetDrawableSize( $window );
+
+This returns info useful for calling C<glViewport( ... )>.
+
+This may differ from L<< C<SDL_GetWindowSize( ... )>|/C<SDL_GetWindowSize( ...
+)> >> if we're rendering to a high-DPI drawable, i.e. the window was created
+with C<SDL_WINDOW_ALLOW_HIGHDPI> on a platform with high-DPI support (Apple
+calls this "Retina"), and not disabled by the
+C<SDL_HINT_VIDEO_HIGHDPI_DISABLED> hint.
+
+Expected parameters include:
+
+=over
+
+=item C<window> - the window from which the drawable size should be queried
+
+=back
+
+Returns the width and height in pixels, either of which may be undefined.
+
+=head2 C<SDL_GL_SetSwapInterval( ... )>
+
+Set the swap interval for the current OpenGL context.
+
+	my $ok = !SDL_GL_SetSwapInterval( 1 );
+
+Some systems allow specifying C<-1> for the interval, to enable adaptive vsync.
+Adaptive vsync works the same as vsync, but if you've already missed the
+vertical retrace for a given frame, it swaps buffers immediately, which might
+be less jarring for the user during occasional framerate drops. If application
+requests adaptive vsync and the system does not support it, this function will
+fail and return C<-1>. In such a case, you should probably retry the call with
+C<1> for the interval.
+
+Adaptive vsync is implemented for some glX drivers with
+C<GLX_EXT_swap_control_tear>:
+L<https://www.opengl.org/registry/specs/EXT/glx_swap_control_tear.txt> and for
+some Windows drivers with C<WGL_EXT_swap_control_tear>:
+L<https://www.opengl.org/registry/specs/EXT/wgl_swap_control_tear.txt>
+
+Read more on the Khronos wiki:
+L<https://www.khronos.org/opengl/wiki/Swap_Interval#Adaptive_Vsync>
+
+Expected parameters include:
+
+=over
+
+=item C<interval> - 0 for immediate updates, 1 for updates synchronized with the vertical retrace, -1 for adaptive vsync
+
+=back
+
+Returns C<0> on success or C<-1> if setting the swap interval is not supported;
+call L<< C<SDL_GetError( )>|/C<SDL_GetError( )> >>( ) for more information.
+
+=head2 C<SDL_GL_GetSwapInterval( )>
+
+Get the swap interval for the current OpenGL context.
+
+	my $interval = SDL_GL_GetSwapInterval( );
+
+If the system can't determine the swap interval, or there isn't a valid current
+context, this function will return 0 as a safe default.
+
+Returns C<0> if there is no vertical retrace synchronization, C<1> if the
+buffer swap is synchronized with the vertical retrace, and C<-1> if late swaps
+happen immediately instead of waiting for the next retrace; call L<<
+C<SDL_GetError( )>|/C<SDL_GetError( )> >>( ) for more information.
+
+=head2 C<SDL_GL_SwapWindow( ... )>
+
+Update a window with OpenGL rendering.
+
+	SDL_GL_SwapWindow( $window );
+
+This is used with double-buffered OpenGL contexts, which are the default.
+
+On macOS, make sure you bind 0 to the draw framebuffer before swapping the
+window, otherwise nothing will happen. If you aren't using C<glBindFramebuffer(
+)>, this is the default and you won't have to do anything extra.
+
+Expected parameters include:
+
+=over
+
+=item C<window> - the window to change
+
+=back
+
+=head2 C<SDL_GL_DeleteContext( ... )>
+
+Delete an OpenGL context.
+
+	SDL_GL_DeleteContext( $context );
+
+Expected parameters include:
+
+=over
+
+=item C<context> - the OpenGL context to be deleted
+
+=back
+
+=head2 2D Accelerated Rendering
+
+This category contains functions for 2D accelerated rendering. You may import
+these functions with the C<:render> tag.
+
+This API supports the following features:
+
+=over
+
+=item single pixel points
+
+=item single pixel lines
+
+=item filled rectangles
+
+=item texture images
+
+=back
+
+All of these may be drawn in opaque, blended, or additive modes.
+
+The texture images can have an additional color tint or alpha modulation
+applied to them, and may also be stretched with linear interpolation, rotated
+or flipped/mirrored.
+
+For advanced functionality like particle effects or actual 3D you should use
+SDL's OpenGL/Direct3D support or one of the many available 3D engines.
+
+This API is not designed to be used from multiple threads, see L<SDL issue
+#986|https://github.com/libsdl-org/SDL/issues/986> for details.
+
+=head2 C<SDL_GetNumRenderDrivers( )>
+
+Get the number of 2D rendering drivers available for the current display.
+
+	my $drivers = SDL_GetNumRenderDrivers( );
+
+A render driver is a set of code that handles rendering and texture management
+on a particular display. Normally there is only one, but some drivers may have
+several available with different capabilities.
+
+There may be none if SDL was compiled without render support.
+
+Returns a number >= 0 on success or a negative error code on failure; call L<<
+C<SDL_GetError( )>|/C<SDL_GetError( )> >>( ) for more information.
+
+=head2 C<SDL_GetRenderDriverInfo( ... )>
+
+Get info about a specific 2D rendering driver for the current display.
+
+	my $info = !SDL_GetRendererDriverInfo( );
+
+Expected parameters include:
+
+=over
+
+=item C<index> - the index of the driver to query information about
+
+=back
+
+Returns an L<SDL2::RendererInfo> structure on success or a negative error code
+on failure; call L<< C<SDL_GetError( )>|/C<SDL_GetError( )> >>( ) for more
+information.
+
+=head2 C<SDL_CreateWindowAndRenderer( ... )>
+
+Create a window and default renderer.
+
+	my ($window, $renderer) = SDL_CreateWindowAndRenderer(640, 480, 0);
+
+Expected parameters include:
+
+=over
+
+=item C<width> - the width of the window
+
+=item C<height> - the height of the window
+
+=item C<window_flags> - the flags used to create the window (see L<< C<SDL_CreateWindow( ... )>|/C<SDL_CreateWindow( ... )> >>)
+
+=back
+
+Returns a L<SDL2::Window> and L<SDL2::Renderer> objects on success, or -1 on
+error; call L<< C<SDL_GetError( )>|/C<SDL_GetError( )> >>( ) for more
+information.
+
+=head2 C<SDL_CreateRenderer( ... )>
+
+Create a 2D rendering context for a window.
+
+	my $renderer = SDL_CreateRenderer( $window, -1, 0);
+
+Expected parameters include:
+
+=over
+
+=item C<window> - the window where rendering is displayed
+
+=item C<index> - the index of the rendering driver to initialize, or C<-1> to initialize the first one supporting the requested flags
+
+=item C<flags> - C<0>, or one or more C<SDL_RendererFlags> OR'd together
+
+=back
+
+Returns a valid rendering context or undefined if there was an error; call L<<
+C<SDL_GetError( )>|/C<SDL_GetError( )> >>( ) for more information.
+
+=head2 C<SDL_CreateSoftwareRenderer( ... )>
+
+Create a 2D software rendering context for a surface.
+
+	my $renderer = SDL_CreateSoftwareRenderer( $surface );
+
+Two other API which can be used to create SDL_Renderer:
+
+L<< C<SDL_CreateRenderer( ... )>|/C<SDL_CreateRenderer( ... )> >> and L<<
+C<SDL_CreateWindowAndRenderer( ... )>|/C<SDL_CreateWindowAndRenderer( ... )>
+>>. These can B<also> create a software renderer, but they are intended to be
+used with an L<SDL2::Window> as the final destination and not an
+L<SDL2::Surface>.
+
+Expected parameters include:
+
+=over
+
+=item C<surface> - the L<SDL2::Surface> structure representing the surface where rendering is done
+
+=back
+
+Returns a valid rendering context or undef if there was an error; call L<<
+C<SDL_GetError( )>|/C<SDL_GetError( )> >>( ) for more information.
+
+=head2 C<SDL_GetRenderer( ... )>
+
+Get the renderer associated with a window.
+
+	my $renderer = SDL_GetRenderer( $window );
+
+Expected parameters include:
+
+=over
+
+=item C<window> - the window to query
+
+=back
+
+Returns the rendering context on success or undef on failure; call L<<
+C<SDL_GetError( )>|/C<SDL_GetError( )> >>( ) for more information.
+
+=head2 C<SDL_GetRendererInfo( ... )>
+
+Get information about a rendering context.
+
+	my $info = !SDL_GetRendererInfo( $renderer );
+
+Expected parameters include:
+
+=over
+
+=item C<renderer> - the rendering context
+
+=back
+
+Returns an L<SDL2::RendererInfo> structure on success or a negative error code
+on failure; call L<< C<SDL_GetError( )>|/C<SDL_GetError( )> >>( ) for more
+information.
+
+=head2 C<SDL_GetRendererOutputSize( ... )>
+
+Get the output size in pixels of a rendering context.
+
+	my ($w, $h) = SDL_GetRendererOutputSize( $renderer );
+
+Due to high-dpi displays, you might end up with a rendering context that has
+more pixels than the window that contains it, so use this instead of L<<
+C<SDL_GetWindowSize( ... )>|/C<SDL_GetWindowSize( ... )> >> to decide how much
+drawing area you have.
+
+Expected parameters include:
+
+=over
+
+=item C<renderer> - the rendering context
+
+=back
+
+Returns the width and height on success or a negative error code on failure;
+call L<< C<SDL_GetError( )>|/C<SDL_GetError( )> >>( ) for more information.
+
+=head2 C<SDL_CreateTexture( ... )>
+
+Create a texture for a rendering context.
+
+    my $texture = SDL_CreateTexture( $renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, 1024, 768);
+
+=for TODO: https://gist.github.com/malja/2193bd656fe50c203f264ce554919976
+
+You can set the texture scaling method by setting
+C<SDL_HINT_RENDER_SCALE_QUALITY> before creating the texture.
+
+Expected parameters include:
+
+=over
+
+=item C<renderer> - the rendering context
+
+=item C<format> - one of the enumerated values in C<:pixelFormatEnum>
+
+=item C<access> - one of the enumerated values in C<:textureAccess>
+
+=item C<w> - the width of the texture in pixels
+
+=item C<h> - the height of the texture in pixels
+
+=back
+
+Returns a pointer to the created texture or undefined if no rendering context
+was active, the format was unsupported, or the width or height were out of
+range; call L<< C<SDL_GetError( )>|/C<SDL_GetError( )> >>( ) for more
+information.
+
+=head2 C<SDL_CreateTextureFromSurface( ... )>
+
+Create a texture from an existing surface.
+
+	use Config;
+	my ($rmask, $gmask, $bmask, $amask) =
+	$Config{byteorder} == 4321 ? (0xff000000,0x00ff0000,0x0000ff00,0x000000ff) :
+    							 (0x000000ff,0x0000ff00,0x00ff0000,0xff000000);
+	my $surface = SDL_CreateRGBSurface( 0, 640, 480, 32, $rmask, $gmask, $bmask, $amask );
+	my $texture = SDL_CreateTextureFromSurface( $renderer, $surface );
+
+The surface is not modified or freed by this function.
+
+The SDL_TextureAccess hint for the created texture is
+C<SDL_TEXTUREACCESS_STATIC>.
+
+The pixel format of the created texture may be different from the pixel format
+of the surface. Use L<< C<SDL_QueryTexture( ... )>|/C<SDL_QueryTexture( ... )>
+>> to query the pixel format of the texture.
+
+Expected parameters include:
+
+=over
+
+=item C<renderer> - the rendering context
+
+=item C<surface> - the L<SDL2::Surface> structure containing pixel data used to fill the texture
+
+=back
+
+Returns the created texture or undef on failure; call L<< C<SDL_GetError(
+)>|/C<SDL_GetError( )> >>( ) for more information.
+
+=head2 C<SDL_QueryTexture( ... )>
+
+Query the attributes of a texture.
+
+	my ( $format, $access, $w, $h ) = SDL_QueryTexture( $texture );
+
+Expected parameters include:
+
+=over
+
+=item C<texture> - the texture to query
+
+=back
+
+Returns the following on success...
+
+=over
+
+=item C<format> - a pointer filled in with the raw format of the texture; the
+actual format may differ, but pixel transfers will use this
+format (one of the L<< C<:pixelFormatEnum>|/C<:pixelFormatEnum> >> values)
+
+=item C<access> - a pointer filled in with the actual access to the texture (one of the L<< C<:textureAccess>|/C<:textureAccess> >> values)
+
+=item C<w> - a pointer filled in with the width of the texture in pixels
+
+=item C<h> - a pointer filled in with the height of the texture in pixels
+
+=back
+
+...or a negative error code on failure; call L<< C<SDL_GetError(
+)>|/C<SDL_GetError( )> >>( ) for more information.
+
+=head2 C<SDL_SetTextureColorMod( ... )>
+
+Set an additional color value multiplied into render copy operations.
+
+	my $ok = !SDL_SetTextureColorMod( $texture, 64, 64, 64 );
+
+When this texture is rendered, during the copy operation each source color
+channel is modulated by the appropriate color value according to the following
+formula:
+
+	srcC = srcC * (color / 255)
+
+Color modulation is not always supported by the renderer; it will return C<-1>
+if color modulation is not supported.
+
+Expected parameters include:
+
+=over
+
+=item C<texture> - the texture to update
+
+=item C<r> - the red color value multiplied into copy operations
+
+=item C<g> - the green color value multiplied into copy operations
+
+=item C<b> - the blue color value multiplied into copy operations
+
+=back
+
+Returns C<0> on success or a negative error code on failure; call L<<
+C<SDL_GetError( )>|/C<SDL_GetError( )> >>( ) for more information.
+
+=head2 C<SDL_GetTextureColorMod( ... )>
+
+Get the additional color value multiplied into render copy operations.
+
+	my ( $r, $g, $b ) = SDL_GetTextureColorMod( $texture );
+
+Expected parameters include:
+
+=over
+
+=item C<texture> - the texture to query
+
+=back
+
+Returns the current red, green, and blue color values on success or a negative
+error code on failure; call L<< C<SDL_GetError( )>|/C<SDL_GetError( )> >>( )
+for more information.
+
+=head2 C<SDL_SetTextureAlphaMod( ... )>
+
+Set an additional alpha value multiplied into render copy operations.
+
+	SDL_SetTextureAlphaMod( $texture, 100 );
+
+When this texture is rendered, during the copy operation the source alpha
+
+value is modulated by this alpha value according to the following formula:
+
+	srcA = srcA * (alpha / 255)
+
+Alpha modulation is not always supported by the renderer; it will return C<-1>
+if alpha modulation is not supported.
+
+Expected parameters include:
+
+=over
+
+=item C<texture> - the texture to update
+
+=item C<alpha> - the source alpha value multiplied into copy operations
+
+=back
+
+Returns C<0> on success or a negative error code on failure; call L<<
+C<SDL_GetError( )>|/C<SDL_GetError( )> >>( ) for more information.
+
+=head2 C<SDL_GetTextureAlphaMod( ... )>
+
+Get the additional alpha value multiplied into render copy operations.
+
+	my $alpha = SDL_GetTextureAlphaMod( $texture );
+
+Expected parameters include:
+
+=over
+
+=item C<texture> - the texture to query
+
+=back
+
+Returns the current alpha value on success or a negative error code on failure;
+call L<< C<SDL_GetError( )>|/C<SDL_GetError( )> >>( ) for more information.
+
+=head2 C<SDL_SetTextureBlendMode( ... )>
+
+Set the blend mode for a texture, used by L<< C<SDL_RenderCopy( ...
+)>|/C<SDL_RenderCopy( ... )> >>.
+
+If the blend mode is not supported, the closest supported mode is chosen and
+this function returns C<-1>.
+
+Expected parameters include:
+
+=over
+
+=item C<texture> - the texture to update
+
+=item C<blendMode> - the L<< C<:blendMode>|/C<:blendMode> >> to use for texture blending
+
+=back
+
+Returns 0 on success or a negative error code on failure; call L<<
+C<SDL_GetError( )>|/C<SDL_GetError( )> >>( ) for more information.
+
+=head2 C<SDL_GetTextureBlendMode( ... )>
+
+Get the blend mode used for texture copy operations.
+
+	SDL_GetTextureBlendMode( $texture, SDL_BLENDMODE_ADD );
+
+Expected parameters include:
+
+=over
+
+=item C<texture> - the texture to query
+
+=back
+
+Returns the current C<:blendMode> on success or a negative error code on
+failure; call L<< C<SDL_GetError( )>|/C<SDL_GetError( )> >>( ) for more
+information.
+
+=head2 C<SDL_SetTextureScaleMode( ... )>
+
+Set the scale mode used for texture scale operations.
+
+	SDL_SetTextureScaleMode( $texture, $scaleMode );
+
+If the scale mode is not supported, the closest supported mode is chosen.
+
+Expected parameters include:
+
+=over
+
+=item C<texture> - The texture to update.
+
+=item C<scaleMode> - the SDL_ScaleMode to use for texture scaling.
+
+=back
+
+Returns C<0> on success, or C<-1> if the texture is not valid.
+
+=head2 C<SDL_GetTextureScaleMode( ... )>
+
+Get the scale mode used for texture scale operations.
+
+	my $ok = SDL_GetTextureScaleMode( $texture );
+
+Expected parameters include:
+
+=over
+
+=item C<texture> - the texture to query.
+
+=back
+
+Returns the current scale mode on success, or C<-1> if the texture is not
+valid.
+
+=head2 C<SDL_UpdateTexture( ... )>
+
+Update the given texture rectangle with new pixel data.
+
+	my $rect = SDL2::Rect->new( { x => 0, y => ..., w => $surface->w, h => $surface->h } );
+	SDL_UpdateTexture( $texture, $rect, $surface->pixels, $surface->pitch );
+
+The pixel data must be in the pixel format of the texture. Use L<<
+C<SDL_QueryTexture( ... )>|/C<SDL_QueryTexture( ... )> >> to query the pixel
+format of the texture.
+
+This is a fairly slow function, intended for use with static textures that do
+not change often.
+
+If the texture is intended to be updated often, it is preferred to create the
+texture as streaming and use the locking functions referenced below. While this
+function will work with streaming textures, for optimization reasons you may
+not get the pixels back if you lock the texture afterward.
+
+Expected parameters include:
+
+=over
+
+=item C<texture> - the texture to update
+
+=item C<rect> - an L<SDL2::Rect> structure representing the area to update, or undef to update the entire texture
+
+=item C<pixels> - the raw pixel data in the format of the texture
+
+=item C<pitch> - the number of bytes in a row of pixel data, including padding between lines
+
+=back
+
+Returns C<0> on success or a negative error code on failure; call L<<
+C<SDL_GetError( )>|/C<SDL_GetError( )> >>( ) for more information.
+
+=head2 C<SDL_UpdateYUVTexture( ... )>
+
+Update a rectangle within a planar YV12 or IYUV texture with new pixel data.
+
+	SDL_UpdateYUVTexture( $texture, $rect, $yPlane, $yPitch, $uPlane, $uPitch, $vPlane, $vPitch );
+
+You can use L<< C<SDL_UpdateTexture( ... )>|/C<SDL_UpdateTexture( ... )> >> as
+long as your pixel data is a contiguous block of Y and U/V planes in the proper
+order, but this function is available if your pixel data is not contiguous.
+
+Expected parameters include:
+
+=over
+
+=item C<texture> - the texture to update
+
+=item C<rect> - a pointer to the rectangle of pixels to update, or undef to update the entire texture
+
+=item C<Yplane> - the raw pixel data for the Y plane
+
+=item C<Ypitch> - the number of bytes between rows of pixel data for the Y plane
+
+=item C<Uplane> - the raw pixel data for the U plane
+
+=item C<Upitch> - the number of bytes between rows of pixel data for the U plane
+
+=item C<Vplane> - the raw pixel data for the V plane
+
+=item C<Vpitch> - the number of bytes between rows of pixel data for the V plane
+
+=back
+
+Returns C<0> on success or -1 if the texture is not valid; call L<<
+C<SDL_GetError( )>|/C<SDL_GetError( )> >>( ) for more information.
+
+=head2 C<SDL_UpdateNVTexture( ... )>
+
+Update a rectangle within a planar NV12 or NV21 texture with new pixels.
+
+	SDL_UpdateNVTexture( $texture, $rect, $yPlane, $yPitch, $uPlane, $uPitch );
+
+You can use L<< C<SDL_UpdateTexture( ... )>|/C<SDL_UpdateTexture( ... )> >> as
+long as your pixel data is a contiguous block of NV12/21 planes in the proper
+order, but this function is available if your pixel data is not contiguous.
+
+Expected parameters include:
+
+=over
+
+=item C<texture> - the texture to update
+
+=item C<rect> - a pointer to the rectangle of pixels to update, or undef to update the entire texture.
+
+=item C<Yplane> - the raw pixel data for the Y plane.
+
+=item C<Ypitch> - the number of bytes between rows of pixel data for the Y plane.
+
+=item C<UVplane> - the raw pixel data for the UV plane.
+
+=item C<UVpitch> - the number of bytes between rows of pixel data for the UV plane.
+
+=back
+
+Returns C<0> on success, or C<-1> if the texture is not valid.
+
+=head2 C<SDL_LockTexture( ... )>
+
+Lock a portion of the texture for B<write-only> pixel access.
+
+	SDL_LockTexture( $texture, $rect, $pixels, $pitch );
+
+As an optimization, the pixels made available for editing don't necessarily
+contain the old texture data. This is a write-only operation, and if you need
+to keep a copy of the texture data you should do that at the application level.
+
+You must use L<< C<SDL_UpdateTexture( ... )>|/C<SDL_UpdateTexture( ... )> >> to
+unlock the pixels and apply any changes.
+
+Expected parameters include:
+
+=over
+
+=item C<texture> - the texture to lock for access, which was created with C<SDL_TEXTUREACCESS_STREAMING>
+
+=item C<rect> - an L<SDL2::Rect> structure representing the area to lock for access; undef to lock the entire texture
+
+=item C<pixels> - this is filled in with a pointer to the locked pixels, appropriately offset by the locked area
+
+=item C<pitch> - this is filled in with the pitch of the locked pixels; the pitch is the length of one row in bytes
+
+=back
+
+Returns 0 on success or a negative error code if the texture is not valid or
+was not created with `SDL_TEXTUREACCESS_STREAMING`; call L<< C<SDL_GetError(
+)>|/C<SDL_GetError( )> >>( ) for more information.
+
+=head2 C<SDL_LockTextureToSurface( ... )>
+
+Lock a portion of the texture for B<write-only> pixel access, and expose it as
+a SDL surface.
+
+	my $surface = SDL_LockTextureSurface( $texture, $rect );
+
+Besides providing an L<SDL2::Surface> instead of raw pixel data, this function
+operates like L<SDL2::LockTexture>.
+
+As an optimization, the pixels made available for editing don't necessarily
+contain the old texture data. This is a write-only operation, and if you need
+to keep a copy of the texture data you should do that at the application level.
+
+You must use L<< C<SDL_UnlockTexture( ... )>|/C<SDL_UnlockTexture( ... )> >> to
+unlock the pixels and apply any changes.
+
+The returned surface is freed internally after calling L<< C<SDL_UnlockTexture(
+... )>|/C<SDL_UnlockTexture( ... )> >> or L<< C<SDL_DestroyTexture( ...
+)>|/C<SDL_DestroyTexture( ... )> >>. The caller should not free it.
+
+Expected parameters include:
+
+=over
+
+=item C<texture> - the texture to lock for access, which was created with C<SDL_TEXTUREACCESS_STREAMING>
+
+=item C<rect> - a pointer to the rectangle to lock for access. If the rect is undef, the entire texture will be locked
+
+=back
+
+Returns the L<SDL2::Surface> structure on success, or C<-1> if the texture is
+not valid or was not created with C<SDL_TEXTUREACCESS_STREAMING>.
+
+=head2 C<SDL_UnlockTexture( ... )>
+
+Unlock a texture, uploading the changes to video memory, if needed.
+
+	SDL_UnlockTexture( $texture );
+
+B<Warning>: Please note that L<< C<SDL_LockTexture( ... )>|/C<SDL_LockTexture(
+... )> >> is intended to be write-only; it will not guarantee the previous
+contents of the texture will be provided. You must fully initialize any area of
+a texture that you lock before unlocking it, as the pixels might otherwise be
+uninitialized memory.
+
+Which is to say: locking and immediately unlocking a texture can result in
+corrupted textures, depending on the renderer in use.
+
+Expected parameters include:
+
+=over
+
+=item C<texture> - a texture locked by L<< C<SDL_LockTexture( ... )>|/C<SDL_LockTexture( ... )> >>
+
+=back
+
+=head2 C<SDL_RenderTargetSupported( ... )>
+
+Determine whether a renderer supports the use of render targets.
+
+	my $bool = SDL_RenderTargetSupported( $renderer );
+
+Expected parameters include:
+
+=over
+
+=item C<renderer> - the renderer that will be checked
+
+=back
+
+Returns true if supported or false if not.
+
+=head2 C<SDL_SetRenderTarget( ... )>
+
+Set a texture as the current rendering target.
+
+	SDL_SetRenderTarget( $renderer, $texture );
+
+Before using this function, you should check the C<SDL_RENDERER_TARGETTEXTURE>
+bit in the flags of L<SDL2::RendererInfo> to see if render targets are
+supported.
+
+The default render target is the window for which the renderer was created. To
+stop rendering to a texture and render to the window again, call this function
+with a undefined C<texture>.
+
+Expected parameters include:
+
+=over
+
+=item C<renderer> - the rendering context
+
+=item C<texture> - the targeted texture, which must be created with the C<SDL_TEXTUREACCESS_TARGET> flag, or undef to render to the window instead of a texture.
+
+=back
+
+Returns C<0> on success or a negative error code on failure; call L<<
+C<SDL_GetError( )>|/C<SDL_GetError( )> >>( ) for more information.
+
+=head2 C<SDL_GetRenderTarget( ... )>
+
+Get the current render target.
+
+	my $texture = SDL_GetRenderTarget( $renderer );
+
+The default render target is the window for which the renderer was created, and
+is reported an undefined value here.
+
+Expected parameters include:
+
+=over
+
+=item C<renderer> - the rendering context
+
+=back
+
+Returns the current render target or undef for the default render target.
+
+=head2 C<SDL_RenderSetLogicalSize( ... )>
+
+Set a device independent resolution for rendering.
+
+	SDL_RenderSetLogicalSize( $renderer, 100, 100 );
+
+This function uses the viewport and scaling functionality to allow a fixed
+logical resolution for rendering, regardless of the actual output resolution.
+If the actual output resolution doesn't have the same aspect ratio the output
+rendering will be centered within the output display.
+
+If the output display is a window, mouse and touch events in the window will be
+filtered and scaled so they seem to arrive within the logical resolution.
+
+If this function results in scaling or subpixel drawing by the rendering
+backend, it will be handled using the appropriate quality hints.
+
+Expected parameters include:
+
+=over
+
+=item C<renderer> - the renderer for which resolution should be set
+
+=item C<w> - the width of the logical resolution
+
+=item C<h> - the height of the logical resolution
+
+=back
+
+Returns C<0> on success or a negative error code on failure; call L<<
+C<SDL_GetError( )>|/C<SDL_GetError( )> >>( ) for more information.
+
+=head2 C<SDL_RenderGetLogicalSize( ... )>
+
+Get device independent resolution for rendering.
+
+	my ($w, $h) = SDL_RenderGetLogicalSize( $renderer );
+
+This may return C<0> for C<w> and C<h> if the L<SDL2::Renderer> has never had
+its logical size set by L<< C<SDL_RenderSetLogicalSize( ...
+)>|/C<SDL_RenderSetLogicalSize( ... )> >> and never had a render target set.
+
+Expected parameters include:
+
+=over
+
+=item C<renderer> - a rendering context
+
+=back
+
+Returns the width and height.
+
+=head2 C<SDL_RenderSetIntegerScale( ... )>
+
+Set whether to force integer scales for resolution-independent rendering.
+
+	SDL_RenderSetIntegerScale( $renderer, 1 );
+
+This function restricts the logical viewport to integer values - that is, when
+a resolution is between two multiples of a logical size, the viewport size is
+rounded down to the lower multiple.
+
+Expected parameters include:
+
+=over
+
+=item C<renderer> - the renderer for which integer scaling should be set
+
+=item C<enable> - enable or disable the integer scaling for rendering
+
+=back
+
+Returns C<0> on success or a negative error code on failure; call L<<
+C<SDL_GetError( )>|/C<SDL_GetError( )> >>( ) for more information.
+
+=head2 C<SDL_RenderGetIntegerScale( ... )>
+
+Get whether integer scales are forced for resolution-independent rendering.
+
+	SDL_RenderGetIntegerScale( $renderer );
+
+Expected parameters include:
+
+=over
+
+=item C<renderer> - the renderer from which integer scaling should be queried
+
+=back
+
+Returns true if integer scales are forced or false if not and on failure; call
+L<< C<SDL_GetError( )>|/C<SDL_GetError( )> >>( ) for more information.
+
+=head2 C<SDL_RenderSetViewport( ... )>
+
+Set the drawing area for rendering on the current target.
+
+	SDL_RenderSetViewport( $renderer, $rect );
+
+When the window is resized, the viewport is reset to fill the entire new window
+size.
+
+Expected parameters include:
+
+=over
+
+=item C<renderer> - the rendering context
+
+=item C<rect> - the L<SDL2::Rect> structure representing the drawing area, or undef to set the viewport to the entire target
+
+=back
+
+Returns C<0> on success or a negative error code on failure; call L<<
+C<SDL_GetError( )>|/C<SDL_GetError( )> >>( ) for more information.
+
+=head2 C<SDL_RenderGetViewport( ... )>
+
+Get the drawing area for the current target.
+
+	my $rect = SDL_RenderGetViewport( $renderer );
+
+Expected parameters include:
+
+=over
+
+=item C<renderer> - the rendering context
+
+=back
+
+Returns an L<SDL2::Rect> structure filled in with the current drawing area.
+
+=head2 C<SDL_RenderSetClipRect( ... )>
+
+Set the clip rectangle for rendering on the specified target.
+
+	SDL_RenderSetClipRect( $renderer, $rect );
+
+Expected parameters include:
+
+=over
+
+=item C<renderer> - the rendering context for which clip rectangle should be set
+
+=item C<rect> - an L<SDL2::Rect> structure representing the clip area, relative to the viewport, or undef to disable clipping
+
+=back
+
+Returns C<0> on success or a negative error code on failure; call L<<
+C<SDL_GetError( )>|/C<SDL_GetError( )> >>( ) for more information.
+
+=head2 C<SDL_RenderGetClipRect( ... )>
+
+Get the clip rectangle for the current target.
+
+	my $rect = SDL_RenderGetClipRect( $renderer );
+
+Expected parameters include:
+
+=over
+
+=item C<renderer> - the rendering context from which clip rectangle should be queried
+
+=back
+
+Returns an L<SDL2::Rect> structure filled in with the current clipping area or
+an empty rectangle if clipping is disabled.
+
+=head2 C<SDL_RenderIsClipEnabled( ... )>
+
+Get whether clipping is enabled on the given renderer.
+
+	my $tf = SDL_RenderIsClipEnabled( $renderer );
+
+Expected parameters include:
+
+=over
+
+=item C<renderer> - the renderer from which clip state should be queried
+
+=back
+
+Returns true if clipping is enabled or false if not; call L<< C<SDL_GetError(
+)>|/C<SDL_GetError( )> >>( ) for more information.
+
+=head2 C<SDL_RenderSetScale( ... )>
+
+Set the drawing scale for rendering on the current target.
+
+	SDL_RenderSetScale( $renderer, .5, 1 );
+
+The drawing coordinates are scaled by the x/y scaling factors before they are
+used by the renderer. This allows resolution independent drawing with a single
+coordinate system.
+
+If this results in scaling or subpixel drawing by the rendering backend, it
+will be handled using the appropriate quality hints. For best results use
+integer scaling factors.
+
+Expected parameters include:
+
+=over
+
+=item C<renderer> - a rendering context
+
+=item C<scaleX> - the horizontal scaling factor
+
+=item C<scaleY> - the vertical scaling factor
+
+=back
+
+Returns C<0> on success or a negative error code on failure; call L<<
+C<SDL_GetError( )>|/C<SDL_GetError( )> >>( ) for more information.
+
+=head2 C<SDL_RenderGetScale( ... )>
+
+Get the drawing scale for the current target.
+
+	my ($scaleX, $scaleY) = SDL_RenderGetScale( $renderer );
+
+Expected parameters include:
+
+=over
+
+=item C<renderer> - the renderer from which drawing scale should be queried
+
+=back
+
+Returns the horizonal and vertical scaling factors.
+
+=head2 C<SDL_SetRenderDrawColor( ... )>
+
+Set the color used for drawing operations (Rect, Line and Clear).
+
+	SDL_SetRenderDrawColor( $renderer, 0, 0, 128, SDL_ALPHA_OPAQUE );
+
+Set the color for drawing or filling rectangles, lines, and points, and for L<<
+C<SDL_RenderClear( ... )>|/C<SDL_RenderClear( ... )> >>.
+
+Expected parameters include:
+
+=over
+
+=item C<renderer> - the rendering context
+
+=item C<r> - the red value used to draw on the rendering target
+
+=item C<g> - the green value used to draw on the rendering target
+
+=item C<b> - the blue value used to draw on the rendering target
+
+=item C<a> - the alpha value used to draw on the rendering target; usually C<SDL_ALPHA_OPAQUE> (255). Use C<SDL_SetRenderDrawBlendMode> to specify how the alpha channel is used
+
+=back
+
+Returns C<0> on success or a negative error code on failure; call L<<
+C<SDL_GetError( )>|/C<SDL_GetError( )> >>( ) for more information.
+
+=head2 C<SDL_GetRenderDrawColor( ... )>
+
+Get the color used for drawing operations (Rect, Line and Clear).
+
+	my ($r, $g, $b, $a) = SDL_GetRenderDrawColor( $renderer );
+
+Expected parameters include:
+
+=over
+
+=item C<renderer> - the rendering context
+
+=back
+
+Returns red, green, blue, and alpha values on success or a negative error code
+on failure; call L<< C<SDL_GetError( )>|/C<SDL_GetError( )> >>( ) for more
+information.
+
+=head2 C<SDL_SetRenderDrawBlendMode( ... )>
+
+Set the blend mode used for drawing operations (Fill and Line).
+
+	SDL_SetRenderDrawBlendMode( $renderer, SDL_BLENDMODE_BLEND );
+
+If the blend mode is not supported, the closest supported mode is chosen.
+
+Expected parameters include:
+
+=over
+
+=item C<renderer> - the rendering context
+
+=item C<blendMode> - the L<< C<:blendMode>|/C<:blendMode> >> to use for blending
+
+=back
+
+Returns C<0> on success or a negative error code on failure; call L<<
+C<SDL_GetError( )>|/C<SDL_GetError( )> >>( ) for more information.
+
+=head2 C<SDL_GetRenderDrawBlendMode( ... )>
+
+Get the blend mode used for drawing operations.
+
+	my $blendMode = SDL_GetRenderDrawBlendMode( $rendering );
+
+Expected parameters include:
+
+=over
+
+=item C<renderer> - the rendering context
+
+=back
+
+Returns the current C<:blendMode> on success or a negative error code on
+failure; call L<< C<SDL_GetError( )>|/C<SDL_GetError( )> >>( ) for more
+information.
+
+=head2 C<SDL_RenderClear( ... )>
+
+Clear the current rendering target with the drawing color.
+
+	SDL_RenderClear( $renderer );
+
+This function clears the entire rendering target, ignoring the viewport and the
+clip rectangle.
+
+=over
+
+=item C<renderer> - the rendering context
+
+=back
+
+Returns C<0> on success or a negative error code on failure; call L<<
+C<SDL_GetError( )>|/C<SDL_GetError( )> >>( ) for more information.
+
+=head2 C<SDL_RenderDrawPoint( ... )>
+
+Draw a point on the current rendering target.
+
+	SDL_RenderDrawPoint( $renderer, 100, 100 );
+
+C<SDL_RenderDrawPoint( ... )> draws a single point. If you want to draw
+multiple, use L<< C<SDL_RenderDrawPoints( ... )>|/C<SDL_RenderDrawPoints( ...
+)> >> instead.
+
+Expected parameters include:
+
+=over
+
+=item C<renderer> - the rendering context
+
+=item C<x> - the x coordinate of the point
+
+=item C<y> - the y coordinate of the point
+
+=back
+
+Returns C<0> on success or a negative error code on failure; call L<<
+C<SDL_GetError( )>|/C<SDL_GetError( )> >>( ) for more information.
+
+=head2 C<SDL_RenderDrawPoints( ... )>
+
+Draw multiple points on the current rendering target.
+
+	my @points = map { SDL2::Point->new( {x => int rand, y => int rand } ) } 1..1024;
+	SDL_RenderDrawPoints( $renderer, @points );
+
+=over
+
+=item C<renderer> - the rendering context
+
+=item C<points> - an array of L<SDL2::Point> structures that represent the points to draw
+
+=back
+
+Returns C<0> on success or a negative error code on failure; call L<<
+C<SDL_GetError( )>|/C<SDL_GetError( )> >>( ) for more information.
+
+=head2 C<SDL_RenderDrawLine( ... )>
+
+Draw a line on the current rendering target.
+
+	SDL_RenderDrawLine( $renderer, 300, 240, 340, 240 );
+
+C<SDL_RenderDrawLine( ... )> draws the line to include both end points. If you
+want to draw multiple, connecting lines use L<< C<SDL_RenderDrawLines( ...
+)>|/C<SDL_RenderDrawLines( ... )> >> instead.
+
+Expected parameters include:
+
+=over
+
+=item C<renderer> - the rendering context
+
+=item C<x1> - the x coordinate of the start point
+
+=item C<y1> - the y coordinate of the start point
+
+=item C<x2> - the x coordinate of the end point
+
+=item C<y2> - the y coordinate of the end point
+
+=back
+
+Returns C<0> on success or a negative error code on failure; call L<<
+C<SDL_GetError( )>|/C<SDL_GetError( )> >>( ) for more information.
+
+=head2 C<SDL_RenderDrawLines( ... )>
+
+Draw a series of connected lines on the current rendering target.
+
+	SDL_RenderDrawLines( $renderer, @points);
+
+Expected parameters include:
+
+=over
+
+=item C<renderer> - the rendering context
+
+=item C<points> - an array of L<SDL2::Point> structures representing points along the lines
+
+=back
+
+Returns C<0> on success or a negative error code on failure; call L<<
+C<SDL_GetError( )>|/C<SDL_GetError( )> >>( ) for more information.
+
+=head2 C<SDL_RenderDrawRect( ... )>
+
+Draw a rectangle on the current rendering target.
+
+	SDL_RenderDrawRect( $renderer, SDL2::Rect->new( { x => 100, y => 100, w => 100, h => 100 } ) );
+
+Expected parameters include:
+
+=over
+
+=item C<renderer> - the rendering context
+
+=item C<rect> - an L<SDL2::Rect> structure representing the rectangle to draw
+
+=for TODO - or undef to outline the entire rendering target
+
+=back
+
+Returns C<0> on success or a negative error code on failure; call L<<
+C<SDL_GetError( )>|/C<SDL_GetError( )> >>( ) for more information.
+
+=head2 C<SDL_RenderDrawRects( ... )>
+
+Draw some number of rectangles on the current rendering target.
+
+	SDL_RenderDrawRects( $renderer,
+		SDL2::Rect->new( { x => 100, y => 100, w => 100, h => 100 } ),
+        SDL2::Rect->new( { x => 75,  y => 75,  w => 50,  h => 50 } )
+    );
+
+Expected parameters include:
+
+=over
+
+=item C<renderer> - the rendering context
+
+=item C<rects> - an array of SDL2::Rect structures representing the rectangles to be drawn
+
+=back
+
+Returns C<0> on success or a negative error code on failure; call L<<
+C<SDL_GetError( )>|/C<SDL_GetError( )> >>( ) for more information.
+
+=head2 C<SDL_RenderFillRect( ... )>
+
+Fill a rectangle on the current rendering target with the drawing color.
+
+	SDL_RenderFillRect( $renderer, SDL2::Rect->new( { x => 100, y => 100, w => 100, h => 100 } ) );
+
+The current drawing color is set by L<< C<SDL_SetRenderDrawColor( ...
+)>|/C<SDL_SetRenderDrawColor( ... )> >>, and the color's alpha value is ignored
+unless blending is enabled with the appropriate call to L<<
+C<SDL_SetRenderDrawBlendMode( ... )>|/C<SDL_SetRenderDrawBlendMode( ... )> >>.
+
+Expected parameters include:
+
+=over
+
+=item C<renderer> - the rendering context
+
+=item C<rect> - the L<SDL2::Rect> structure representing the rectangle to fill
+
+=for TODO - or undef for the entire rendering target
+
+=back
+
+Returns C<0> on success or a negative error code on failure; call L<<
+C<SDL_GetError( )>|/C<SDL_GetError( )> >>( ) for more information.
+
+=head2 C<SDL_RenderFillRects( ... )>
+
+Fill some number of rectangles on the current rendering target with the drawing
+color.
+
+	SDL_RenderFillRects( $renderer,
+		SDL2::Rect->new( { x => 100, y => 100, w => 100, h => 100 } ),
+        SDL2::Rect->new( { x => 75,  y => 75,  w => 50,  h => 50 } )
+    );
+
+Expected parameters include:
+
+=over
+
+=item C<renderer> - the rendering context
+
+=item C<rects> - an array of L<SDL2::Rect> structures representing the rectangles to be filled
+
+=back
+
+Returns C<0> on success or a negative error code on failure; call L<<
+C<SDL_GetError( )>|/C<SDL_GetError( )> >>( ) for more information.
+
+=head2 C<SDL_RenderCopy( ... )>
+
+Copy a portion of the texture to the current rendering target.
+
+	SDL_RenderCopy( $renderer, $blueShapes, $srcR, $destR );
+
+The texture is blended with the destination based on its blend mode set with
+L<< C<SDL_SetTextureBlendMode( ... )>|/C<SDL_SetTextureBlendMode( ... )> >>.
+
+The texture color is affected based on its color modulation set by L<<
+C<SDL_SetTextureColorMod( ... )>|/C<SDL_SetTextureColorMod( ... )> >>.
+
+The texture alpha is affected based on its alpha modulation set by L<<
+C<SDL_SetTextureAlphaMod( ... )>|/C<SDL_SetTextureAlphaMod( ... )> >>.
+
+Expected parameters include:
+
+=over
+
+=item C<renderer> - the rendering context
+
+=item C<texture> - the source texture
+
+=item C<srcrect> - the source L<SDL2::Rect> structure
+
+=for TODO: or NULL for the entire texture
+
+=item C<dstrect> - the destination L<SDL2::Rect> structure; the texture will be stretched to fill the given rectangle
+
+=for TODO or NULL for the entire rendering target;
+
+=back
+
+Returns C<0> on success or a negative error code on failure; call L<<
+C<SDL_GetError( )>|/C<SDL_GetError( )> >>( ) for more information.
+
+=head2 C<SDL_RenderCopyEx( ... )>
+
+Copy a portion of the texture to the current rendering, with optional rotation
+and flipping.
+
+=for TODO: I need an example for this... it's complex
+
+Copy a portion of the texture to the current rendering target, optionally
+rotating it by angle around the given center and also flipping it top-bottom
+and/or left-right.
+
+The texture is blended with the destination based on its blend mode set with
+L<< C<SDL_SetTextureBlendMode( ... )>|/C<SDL_SetTextureBlendMode( ... )> >>.
+
+The texture color is affected based on its color modulation set by L<<
+C<SDL_SetTextureColorMod( ... )>|/C<SDL_SetTextureColorMod( ... )> >>.
+
+The texture alpha is affected based on its alpha modulation set by L<<
+C<SDL_SetTextureAlphaMod( ... )>|/C<SDL_SetTextureAlphaMod( ... )> >>.
+
+Expected parameters include:
+
+=over
+
+=item C<renderer> - the rendering context
+
+=item C<texture> - the source texture
+
+=item C<srcrect> - the source L<SDL2::Rect> structure
+
+=for TODO: or NULL for the entire texture
+
+=item C<dstrect> - the destination SDL_Rect structure
+
+=for TODO: or NULL for the entire rendering target
+
+=item C<angle> - an angle in degrees that indicates the rotation that will be applied to dstrect, rotating it in a clockwise direction
+
+=item C<center> - a pointer to a point indicating the point around which dstrect will be rotated (if NULL, rotation will be done around C<dstrect.w / 2>, C<dstrect.h / 2>)
+
+=item C<flip> - a L<:rendererFlip> value stating which flipping actions should be performed on the texture
+
+=back
+
+Returns C<0> on success or a negative error code on failure; call L<<
+C<SDL_GetError( )>|/C<SDL_GetError( )> >>( ) for more information.
+
+=head2 C<SDL_RenderDrawPointF( ... )>
+
+Draw a point on the current rendering target at subpixel precision.
+
+	SDL_RenderDrawPointF( $renderer, 25.5, 100.25 );
+
+Expected parameters include:
+
+=over
+
+=item C<renderer> - The renderer which should draw a point.
+
+=item C<x> - The x coordinate of the point.
+
+=item C<y> - The y coordinate of the point.
+
+=back
+
+Returns C<0> on success, or C<-1> on error
+
+=head2 C<SDL_RenderDrawPointsF( ... )>
+
+Draw multiple points on the current rendering target at subpixel precision.
+
+	my @points = map { SDL2::Point->new( {x => int rand, y => int rand } ) } 1..1024;
+	SDL_RenderDrawPointsF( $renderer, @points );
+
+Expected parameters include:
+
+=over
+
+=item C<renderer> - The renderer which should draw multiple points
+
+=item C<points> - The points to draw
+
+=back
+
+Returns C<0> on success, or C<-1> on error; call L<< C<SDL_GetError(
+)>|/C<SDL_GetError( )> >>( ) for more information.
+
+=head2 C<SDL_RenderDrawLineF( ... )>
+
+Draw a line on the current rendering target at subpixel precision.
+
+	SDL_RenderDrawLineF( $renderer, 100, 100, 250, 100);
+
+Expected parameters include:
+
+=over
+
+=item C<renderer> - The renderer which should draw a line.
+
+=item C<x1> - The x coordinate of the start point.
+
+=item C<y1> - The y coordinate of the start point.
+
+=item C<x2> - The x coordinate of the end point.
+
+=item C<y2> - The y coordinate of the end point.
+
+=back
+
+Returns C<0> on success, or C<-1> on error.
+
+=head2 C<SDL_RenderDrawLinesF( ... )>
+
+Draw a series of connected lines on the current rendering target at subpixel
+precision.
+
+	SDL_RenderDrawLines( $renderer, @points);
+
+Expected parameters include:
+
+=over
+
+=item C<renderer> - The renderer which should draw multiple lines.
+
+=item C<points> - The points along the lines
+
+=back
+
+Return C<0> on success, or C<-1> on error.
+
+=head2 C<SDL_RenderDrawRectF( ... )>
+
+Draw a rectangle on the current rendering target at subpixel precision.
+
+	SDL_RenderDrawRectF( $renderer, $point);
+
+Expected parameters include:
+
+=over
+
+=item C<renderer> - The renderer which should draw a rectangle.
+
+=item C<rect> - A pointer to the destination rectangle
+
+=for TODO: or NULL to outline the entire rendering target.
+
+=back
+
+Returns C<0> on success, or C<-1> on error
+
+=head2 C<SDL_RenderDrawRectsF( ... )>
+
+Draw some number of rectangles on the current rendering target at subpixel
+precision.
+
+	SDL_RenderDrawRectsF( $renderer,
+		SDL2::Rect->new( { x => 100, y => 100, w => 100, h => 100 } ),
+        SDL2::Rect->new( { x => 75,  y => 75,  w => 50,  h => 50 } )
+    );
+
+Expected parameters include:
+
+=over
+
+=item C<renderer> - The renderer which should draw multiple rectangles.
+
+=item C<rects> - A pointer to an array of destination rectangles.
+
+=back
+
+Returns C<0> on success, or C<-1> on error.
+
+=head2 C<SDL_RenderFillRectF( ... )>
+
+Fill a rectangle on the current rendering target with the drawing color at
+subpixel precision.
+
+	SDL_RenderFillRectF( $renderer,
+        SDL2::Rect->new( { x => 75,  y => 75,  w => 50,  h => 50 } )
+    );
+
+Expected parameters include:
+
+=over
+
+=item C<renderer> - The renderer which should fill a rectangle.
+
+=item C<rect> - A pointer to the destination rectangle
+
+=for TODO: or NULL for the entire rendering target.
+
+=back
+
+Returns C<0> on success, or C<-1> on error.
+
+=head2 C<SDL_RenderFillRectsF( ... )>
+
+Fill some number of rectangles on the current rendering target with the drawing
+color at subpixel precision.
+
+	SDL_RenderFillRectsF( $renderer,
+		SDL2::Rect->new( { x => 100, y => 100, w => 100, h => 100 } ),
+        SDL2::Rect->new( { x => 75,  y => 75,  w => 50,  h => 50 } )
+    );
+
+Expected parameters include:
+
+=over
+
+=item C<renderer> - The renderer which should fill multiple rectangles.
+
+=item C<rects> - A pointer to an array of destination rectangles.
+
+=back
+
+Returns C<0> on success, or C<-1> on error.
+
+=head2 C<SDL_RenderCopyF( ... )>
+
+Copy a portion of the texture to the current rendering target at subpixel
+precision.
+
+=for TODO: I need to come up with an example for this as well
+
+Expected parameters include:
+
+=over
+
+=item C<renderer> - The renderer which should copy parts of a texture
+
+=item C<texture> - The source texture
+
+=item C<srcrect> - A pointer to the source rectangle
+
+=for TODO: or NULL for the entiretexture.
+
+=item C<dstrect> - A pointer to the destination rectangle
+
+=for TODO: or NULL for the entire rendering target
+
+=back
+
+Returns C<0> on success, or C<-1> on error.
+
+=head2 C<SDL_RenderCopyExF( ... )>
+
+Copy a portion of the source texture to the current rendering target, with
+rotation and flipping, at subpixel precision.
+
+=for TODO: I need to come up with an example for this as well
+
+=over
+
+=item C<renderer> - The renderer which should copy parts of a texture
+
+=item C<texture> - The source texture
+
+=item C<srcrect> - A pointer to the source rectangle
+
+=for TODO: or NULL for the entire texture
+
+=item C<dstrect> - A pointer to the destination rectangle
+
+=for TODO: or NULL for the entire rendering target.
+
+=item C<angle> - An angle in degrees that indicates the rotation that will be applied to dstrect, rotating it in a clockwise direction
+
+=item C<center> - A pointer to a point indicating the point around which dstrect will be rotated (if NULL, rotation will be done around C<dstrect.w/2>, C<dstrect.h/2>)
+
+=item C<flip> - A C<:rendererFlip> value stating which flipping actions should be performed on the texture
+
+=back
+
+Returns C<0> on success, or C<-1> on error
+
+=head2 C<SDL_RenderReadPixels( ... )>
+
+Read pixels from the current rendering target to an array of pixels.
+
+	SDL_RenderReadPixels(
+        $renderer,
+        SDL2::Rect->new( { x => 0, y => 0, w => 640, h => 480 } ),
+        SDL_PIXELFORMAT_RGB888,
+        $surface->pixels, $surface->pitch
+    );
+
+B<WARNING>: This is a very slow operation, and should not be used frequently.
+
+C<pitch> specifies the number of bytes between rows in the destination
+C<pixels> data. This allows you to write to a subrectangle or have padded rows
+in the destination. Generally, C<pitch> should equal the number of pixels per
+row in the `pixels` data times the number of bytes per pixel, but it might
+contain additional padding (for example, 24bit RGB Windows Bitmap data pads all
+rows to multiples of 4 bytes).
+
+Expected parameters include:
+
+=over
+
+=item C<renderer> - the rendering context
+
+=item C<rect> - an L<SDL2::Rect> structure representing the area to read
+
+=for TODO: or NULL for the entire render target
+
+=item C<format> - an C<:pixelFormatEnum> value of the desired format of the pixel data, or C<0> to use the format of the rendering target
+
+=item C<pixels> - pointer to the pixel data to copy into
+
+=item C<pitch> - the pitch of the C<pixels> parameter
+
+=back
+
+Returns C<0> on success or a negative error code on failure; call L<<
+C<SDL_GetError( )>|/C<SDL_GetError( )> >>( ) for more information.
+
+=head2 C<SDL_RenderPresent( ... )>
+
+Update the screen with any rendering performed since the previous call.
+
+	SDL_RenderPresent( $renderer );
+
+SDL's rendering functions operate on a backbuffer; that is, calling a rendering
+function such as L<< C<SDL_RenderDrawLine( ... )>|/C<SDL_RenderDrawLine( ... )>
+>> does not directly put a line on the screen, but rather updates the
+backbuffer. As such, you compose your entire scene and *present* the composed
+backbuffer to the screen as a complete picture.
+
+Therefore, when using SDL's rendering API, one does all drawing intended for
+the frame, and then calls this function once per frame to present the final
+drawing to the user.
+
+The backbuffer should be considered invalidated after each present; do not
+assume that previous contents will exist between frames. You are strongly
+encouraged to call L<< C<SDL_RenderClear( ... )>|/C<SDL_RenderClear( ... )> >>
+to initialize the backbuffer before starting each new frame's drawing, even if
+you plan to overwrite every pixel.
+
+Expected parameters include:
+
+=over
+
+=item C<renderer> - the rendering context
+
+=back
+
+=head2 C<SDL_DestroyTexture( ... )>
+
+Destroy the specified texture.
+
+	SDL_DestroyTexture( $texture );
+
+Passing undef or an otherwise invalid texture will set the SDL error message to
+"Invalid texture".
+
+Expected parameters include:
+
+=over
+
+=item C<texture> - the texture to destroy
+
+=back
+
+
+=head2 C<SDL_DestroyRenderer( ... )>
+
+Destroy the rendering context for a window and free associated textures.
+
+	SDL_DestroyRenderer( $renderer );
+
+Expected parameters include:
+
+=over
+
+=item C<renderer> - the rendering context
+
+=back
+
+=head2 C<SDL_RenderFlush( ... )>
+
+Force the rendering context to flush any pending commands to the underlying
+rendering API.
+
+	SDL_RenderFlush( $renderer );
+
+You do not need to (and in fact, shouldn't) call this function unless you are
+planning to call into OpenGL/Direct3D/Metal/whatever directly in addition to
+using an SDL_Renderer.
+
+This is for a very-specific case: if you are using SDL's render API, you asked
+for a specific renderer backend (OpenGL, Direct3D, etc), you set
+C<SDL_HINT_RENDER_BATCHING> to "C<1>", and you plan to make OpenGL/D3D/whatever
+calls in addition to SDL render API calls. If all of this applies, you should
+call L<< C<SDL_RenderFlush( ... )>|/C<SDL_RenderFlush( ... )> >> between calls
+to SDL's render API and the low-level API you're using in cooperation.
+
+In all other cases, you can ignore this function. This is only here to get
+maximum performance out of a specific situation. In all other cases, SDL will
+do the right thing, perhaps at a performance loss.
+
+This function is first available in SDL 2.0.10, and is not needed in 2.0.9 and
+earlier, as earlier versions did not queue rendering commands at all, instead
+flushing them to the OS immediately.
+
+Expected parameters include:
+
+=over
+
+=item C<renderer> - the rendering context
+
+=back
+
+Returns C<0> on success or a negative error code on failure; call L<<
+C<SDL_GetError( )>|/C<SDL_GetError( )> >>( ) for more information.
+
+
+=head2 C<SDL_GL_BindTexture( ... )>
+
+Bind an OpenGL/ES/ES2 texture to the current context.
+
+	my ($texw, $texh) = SDL_GL_BindTexture( $texture );
+
+This is for use with OpenGL instructions when rendering OpenGL primitives
+directly.
+
+If not NULL, the returned width and height values suitable for the provided
+texture. In most cases, both will be C<1.0>, however, on systems that support
+the GL_ARB_texture_rectangle extension, these values will actually be the pixel
+width and height used to create the texture, so this factor needs to be taken
+into account when providing texture coordinates to OpenGL.
+
+You need a renderer to create an L<SDL2::Texture>, therefore you can only use
+this function with an implicit OpenGL context from L<< C<SDL_CreateRenderer(
+... )>|/C<SDL_CreateRenderer( ... )> >>, not with your own OpenGL context. If
+you need control over your OpenGL context, you need to write your own
+texture-loading methods.
+
+Also note that SDL may upload RGB textures as BGR (or vice-versa), and re-order
+the color channels in the shaders phase, so the uploaded texture may have
+swapped color channels.
+
+Expected parameters include:
+
+=over
+
+=item C<texture> - the texture to bind to the current OpenGL/ES/ES2 context
+
+=back
+
+Returns the texture's with and height on success, or -1 if the operation is not
+supported; call L<< C<SDL_GetError( )>|/C<SDL_GetError( )> >>( ) for more
+information.
+
+=head2 C<SDL_GL_UnbindTexture( ... )>
+
+Unbind an OpenGL/ES/ES2 texture from the current context.
+
+	SDL_GL_UnbindTexture( $texture );
+
+See L<< C<SDL_GL_BindTexture( ... )>|/C<SDL_GL_BindTexture( ... )> >> for
+examples on how to use these functions.
+
+Expected parameters include:
+
+=over
+
+=item C<texture> - the texture to unbind from the current OpenGL/ES/ES2 context
+
+=back
+
+Returns C<0> on success, or C<-1> if the operation is not supported.
+
+=head2 C<SDL_RenderGetMetalLayer( ... )>
+
+Get the CAMetalLayer associated with the given Metal renderer.
+
+	my $opaque = SDL_RenderGetMetalLayer( $renderer );
+
+This function returns C<void *>, so SDL doesn't have to include Metal's
+headers, but it can be safely cast to a C<CAMetalLayer *>.
+
+Expected parameters include:
+
+=over
+
+=item C<renderer> - the renderer to query
+
+=back
+
+Returns C<CAMetalLayer*> on success, or undef if the renderer isn't a Metal
+renderer.
+
+=head2 C<SDL_RenderGetMetalCommandEncoder( ... )>
+
+Get the Metal command encoder for the current frame
+
+	$opaque = SDL_RenderGetMetalCommandEncoder( $renderer );
+
+This function returns C<void *>, so SDL doesn't have to include Metal's
+headers, but it can be safely cast to an
+C<idE<lt>MTLRenderCommandEncoderE<gt>>.
+
+Expected parameters include:
+
+=over
+
+=item C<renderer> - the renderer to query
+
+=back
+
+Returns C<idE<lt>MTLRenderCommandEncoderE<gt>> on success, or undef if the
+renderer isn't a Metal renderer.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+=head2 C<SDL_ComposeCustomBlendMode( ... )>
+
+Compose a custom blend mode for renderers.
+
+
+
+The functions SDL_SetRenderDrawBlendMode and SDL_SetTextureBlendMode accept the
+SDL_BlendMode returned by this function if the renderer supports it.
+
+A blend mode controls how the pixels from a drawing operation (source) get
+combined with the pixels from the render target (destination). First, the
+components of the source and destination pixels get multiplied with their blend
+factors. Then, the blend operation takes the two products and calculates the
+result that will get stored in the render target.
+
+Expressed in pseudocode, it would look like this:
+
+	my $dstRGB = colorOperation( $srcRGB * $srcColorFactor, $dstRGB * $dstColorFactor );
+ 	my $dstA   = alphaOperation( $srcA * $srcAlphaFactor, $dstA * $dstAlphaFactor );
+
+Where the functions C<colorOperation(src, dst)> and C<alphaOperation(src, dst)>
+can return one of the following:
+
+=over
+
+=item C<src + dst>
+
+=item C<src - dst>
+
+=item C<dst - src>
+
+=item C<min(src, dst)>
+
+=item C<max(src, dst)>
+
+=back
+
+The red, green, and blue components are always multiplied with the first,
+second, and third components of the SDL_BlendFactor, respectively. The fourth
+component is not used.
+
+The alpha component is always multiplied with the fourth component of the L<<
+C<:blendFactor>|/C<:blendFactor> >>. The other components are not used in the
+alpha calculation.
+
+Support for these blend modes varies for each renderer. To check if a specific
+L<< C<:blendMode>|/C<:blendMode> >> is supported, create a renderer and pass it
+to either C<SDL_SetRenderDrawBlendMode> or C<SDL_SetTextureBlendMode>. They
+will return with an error if the blend mode is not supported.
+
+This list describes the support of custom blend modes for each renderer in SDL
+2.0.6. All renderers support the four blend modes listed in the L<<
+C<:blendMode>|/C<:blendMode> >> enumeration.
+
+=over
+
+=item B<direct3d> - Supports C<SDL_BLENDOPERATION_ADD> with all factors.
+
+=item B<direct3d11> - Supports all operations with all factors. However, some factors produce unexpected results with C<SDL_BLENDOPERATION_MINIMUM> and C<SDL_BLENDOPERATION_MAXIMUM>.
+
+=item B<opengl> - Supports the C<SDL_BLENDOPERATION_ADD> operation with all factors. OpenGL versions 1.1, 1.2, and 1.3 do not work correctly with SDL 2.0.6.
+
+=item B<opengles> - Supports the C<SDL_BLENDOPERATION_ADD> operation with all factors. Color and alpha factors need to be the same. OpenGL ES 1 implementation specific: May also support C<SDL_BLENDOPERATION_SUBTRACT> and C<SDL_BLENDOPERATION_REV_SUBTRACT>. May support color and alpha operations being different from each other. May support color and alpha factors being different from each other.
+
+=item B<opengles2> - Supports the C<SDL_BLENDOPERATION_ADD>, C<SDL_BLENDOPERATION_SUBTRACT>, C<SDL_BLENDOPERATION_REV_SUBTRACT> operations with all factors.
+
+=item B<psp> - No custom blend mode support.
+
+=item B<software> - No custom blend mode support.
+
+=back
+
+Some renderers do not provide an alpha component for the default render target.
+The C<SDL_BLENDFACTOR_DST_ALPHA> and C<SDL_BLENDFACTOR_ONE_MINUS_DST_ALPHA>
+factors do not have an effect in this case.
+
+Expected parameters include:
+
+=over
+
+=item C<srcColorFactor> -the C<:blendFactor> applied to the red, green, and blue components of the source pixels
+
+=item C<dstColorFactor> - the C<:blendFactor> applied to the red, green, and blue components of the destination pixels
+
+=item C<colorOperation> - the C<:blendOperation> used to combine the red, green, and blue components of the source and destination pixels
+
+=item C<srcAlphaFactor> - the C<:blendFactor> applied to the alpha component of the source pixels
+
+=item C<dstAlphaFactor> - the C<:blendFactor> applied to the alpha component of the destination pixels
+
+=item C<alphaOperation> - the C<:blendOperation> used to combine the alpha component of the source and destination pixels
+
+=back
+
+Returns a C<:blendMode> that represents the chosen factors and operations.
+
+=head1 Time Management Routines
+
+This section contains functions for handling the SDL time management routines.
+They may be imported with the C<:timer> tag.
+
+=head2 C<SDL_GetTicks( )>
+
+Get the number of milliseconds since SDL library initialization.
+
+	my $time = SDL_GetTicks( );
+
+This value wraps if the program runs for more than C<~49> days.
+
+Returns an unsigned 32-bit value representing the number of milliseconds since
+the SDL library initialized.
+
+=head2 C<SDL_GetPerformanceCounter( )>
+
+Get the current value of the high resolution counter.
+
+	my $high_timer = SDL_GetPerformanceCounter( );
+
+This function is typically used for profiling.
+
+The counter values are only meaningful relative to each other. Differences
+between values can be converted to times by using L<<
+C<SDL_GetPerformanceFrequency( )>|/C<SDL_GetPerformanceFrequency( )> >>.
+
+Returns the current counter value.
+
+=head2 C<SDL_GetPerformanceFrequency( ... )>
+
+Get the count per second of the high resolution counter.
+
+	my $hz = SDL_GetPerformanceFrequency( );
+
+Returns a platform-specific count per second.
+
+=head2 C<SDL_Delay( ... )>
+
+Wait a specified number of milliseconds before returning.
+
+	SDL_Delay( 1000 );
+
+This function waits a specified number of milliseconds before returning. It
+waits at least the specified time, but possibly longer due to OS scheduling.
+
+Expected parameters include:
+
+=over
+
+=item C<ms> - the number of milliseconds to delay
+
+=back
+
+=head2 C<SDL_AddTimer( ... )>
+
+Call a callback function at a future time.
+
+   my $id = SDL_AddTimer( 1000, sub ( $interval, $data ) { warn 'ping!'; $interval; } );
+
+If you use this function, you must pass C<SDL_INIT_TIMER> to L<< C<SDL_Init(
+... )>|/C<SDL_Init( ... )> >>.
+
+The callback function is passed the current timer interval and returns the next
+timer interval. If the returned value is the same as the one passed in, the
+periodic alarm continues, otherwise a new alarm is scheduled. If the callback
+returns C<0>, the periodic alarm is cancelled.
+
+The callback is run on a separate thread.
+
+Timers take into account the amount of time it took to execute the callback.
+For example, if the callback took 250 ms to execute and returned 1000 (ms), the
+timer would only wait another 750 ms before its next iteration.
+
+Timing may be inexact due to OS scheduling. Be sure to note the current time
+with L<< C<SDL_GetTicks( )>|/C<SDL_GetTicks( )> >> or  L<<
+C<SDL_GetPerformanceCounter( )>|/C<SDL_GetPerformanceCounter( )> >> in case
+your callback needs to adjust for variances.
+
+Expected parameters include:
+
+=over
+
+=item C<interval> - the timer delay, in milliseconds, passed to C<callback>
+
+=item C<callback> - the C<CODE> reference to call when the specified C<interval> elapses
+
+=item C<param> - a pointer that is passed to C<callback>
+
+=back
+
+Returns a timer ID or C<0> if an error occurs; call L<< C<SDL_GetError(
+)>|/C<SDL_GetError( )> >>( ) for more information.
+
+=head2 C<SDL_RemoveTimer( ... )>
+
+	SDL_RemoveTimer( $id );
+
+Remove a timer created with L<< C<SDL_AddTimer( ... )>|/C<SDL_AddTimer( ... )>
+>>.
+
+Expected parameters include:
+
+=over
+
+=item C<id> - the ID of the timer to remove
+
+=back
+
+Returns true if the timer is removed or false if the timer wasn't found.
+
+=head1 Raw Audio Mixing
+
+These methods provide access to the raw audio mixing buffer for the SDL
+library. They may be imported with the C<:audio> tag.
+
+=head2 C<SDL_GetNumAudioDrivers( )>
+
+Returns a list of built in audio drivers, in the order that they were normally
+initialized by default.
+
+=head2 C<SDL_GetAudioDriver( ... )>
+
+Returns an audio driver by name.
+
+	my $driver = SDL_GetAudioDriver( 1 );
+
+Expected parameters include:
+
+=over
+
+=item C<index> - The zero-based index of the desired audio driver
+
+=back
+
+=head2 C<SDL_AudioInit( ... )>
+
+Audio system initialization.
+
+	SDL_AudioInit( 'pulseaudio' );
+
+This method is used internally, and should not be used unless you have a
+specific need to specify the audio driver you want to use. You should normally
+use L<< C<SDL_Init( ... )>|/C<SDL_Init( ... )> >>.
+
+Returns C<0> on success.
+
+=head2 C<SDL_AudioQuit( )>
+
+Cleaning up initialized audio system.
+
+	SDL_AudioQuit( );
+
+This method is used internally, and should not be used unless you have a
+specific need to close the selected audio driver. You should normally use L<<
+C<SDL_Quit( )>|/C<SDL_Quit( )> >>.
+
+=head2 C<SDL_GetCurrentAudioDriver( )>
+
+Get the name of the current audio driver.
+
+	my $driver = SDL_GetCurrentAudioDriver( );
+
+The returned string points to internal static memory and thus never becomes
+invalid, even if you quit the audio subsystem and initialize a new driver
+(although such a case would return a different static string from another call
+to this function, of course). As such, you should not modify or free the
+returned string.
+
+Returns the name of the current audio driver or undef if no driver has been
+initialized.
+
+=head2 C<SDL_OpenAudio( ... )>
+
+This function is a legacy means of opening the audio device.
+
+    my $obtained = SDL_OpenAudio(
+        SDL2::AudioSpec->new( { freq => 48000, channels => 2, format => AUDIO_F32 } ) );
+
+This function remains for compatibility with SDL 1.2, but also because it's
+slightly easier to use than the new functions in SDL 2.0. The new, more
+powerful, and preferred way to do this is L<< C<SDL_OpenAudioDevice( ...
+)>|/C<SDL_OpenAudioDevice( ... )> >> .
+
+This function is roughly equivalent to:
+
+	SDL_OpenAudioDevice( (), 0, $desired, SDL_AUDIO_ALLOW_ANY_CHANGE );
+
+With two notable exceptions:
+
+=over
+
+=item - If C<obtained> is undefined, we use C<desired> (and allow no changes), which
+means desired will be modified to have the correct values for silence,
+etc, and SDL will convert any differences between your app's specific
+request and the hardware behind the scenes.
+
+=item - The return value is always success or failure, and not a device ID, which
+means you can only have one device open at a time with this function.
+
+=back
+
+ * \param desired an SDL_AudioSpec structure representing the desired output
+ *                format. Please refer to the SDL_OpenAudioDevice documentation
+ *                for details on how to prepare this structure.
+ * \param obtained an SDL_AudioSpec structure filled in with the actual
+ *                 parameters, or NULL.
+ * \returns This function opens the audio device with the desired parameters,
+ *          and returns 0 if successful, placing the actual hardware
+ *          parameters in the structure pointed to by `obtained`.
+ *
+ *          If `obtained` is NULL, the audio data passed to the callback
+ *          function will be guaranteed to be in the requested format, and
+ *          will be automatically converted to the actual hardware audio
+ *          format if necessary. If `obtained` is NULL, `desired` will
+ *          have fields modified.
+ *
+ *          This function returns a negative error code on failure to open the
+ *          audio device or failure to set up the audio thread; call
+ *          SDL_GetError() for more information.
+
+
 
 =head1 LICENSE
 
@@ -2360,6 +5940,22 @@ conditions may apply to data transmitted through this module.
 =head1 AUTHOR
 
 Sanko Robinson E<lt>sanko@cpan.orgE<gt>
+
+=begin stopwords
+
+libSDL enum iOS iPhone tvOS gamepad gamepads bitmap colorkey asyncify keycode
+ctrl+click OpenGL glibc pthread screensaver fullscreen SDL_gamecontroller.h
+XBox XInput pthread pthreads realtime rtkit Keycode mutexes resources imple
+irectMedia ayer errstr coderef patchlevel distro WinRT raspberrypi psp macOS
+NSHighResolutionCapable lowlevel vsync gamecontroller framebuffer XRandR
+XVidMode libc musl non letterbox libsamplerate AVAudioSessionCategoryAmbient
+AVAudioSessionCategoryPlayback VoIP OpenGLES opengl opengles opengles2 spammy
+popup tooltip taskbar subwindow high-dpi subpixel borderless draggable viewport
+user-resizable resizable srcA srcC GiB dstrect rect subrectangle pseudocode ms
+verystrict resampler eglSwapBuffers backbuffer scancode unhandled lifespan wgl
+glX framerate deadzones vice-versa kmsdrm jp CAMetalLayer
+
+=end stopwords
 
 =cut
 

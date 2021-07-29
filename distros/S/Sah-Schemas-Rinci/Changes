@@ -1,3 +1,11 @@
+1.1.98.0 2021-07-20  Released-By: PERLANCAR; Urgency: medium
+
+	 - [schema rinci::result_meta] Add _attr.
+
+         - [build] Build with fixed Pod::Weaver plugin [-Sah::Schemas] (0.064)
+           to properly list schemas in the distribution in lib/Sah/Schemas/*.pm.
+
+
 1.1.94.0  2020-09-23  Released-By: PERLANCAR; Urgency: medium
 
 	  - Adjust to Rinci 1.1.94 (recognize function example's

@@ -22,7 +22,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_MAILCONFIRMATION_ALREADY_SENT
 );
 
-our $VERSION = '2.0.10';
+our $VERSION = '2.0.12';
 
 extends qw(
   Lemonldap::NG::Portal::Lib::SMTP
@@ -114,7 +114,6 @@ sub register {
 # Parameters check
 sub _register {
     my ( $self, $req ) = @_;
-    my %tplPrms;
 
     # Check if it's a first access
     unless ( ( $req->method =~ /^POST$/i and $req->param('mail') )
@@ -301,7 +300,6 @@ sub _register {
           );
 
         # Build mail content
-        $tplPrms{MAIN_LOGO} = $self->conf->{portalMainLogo};
         my $tr      = $self->translate($req);
         my $subject = $self->conf->{registerConfirmSubject};
         unless ($subject) {
@@ -316,14 +314,13 @@ sub _register {
             $req,
             'mail_register_confirm',
             filter => $tr,
-            params => \%tplPrms
+            params => {
+                expMailDate => $req->data->{expMailDate},
+                expMailTime => $req->data->{expMailTime},
+                url         => $url,
+                %{ $req->data->{registerInfo} || {} },
+            },
         );
-
-        # Replace variables in body
-        $body =~ s/\$expMailDate/$req->data->{expMailDate}/g;
-        $body =~ s/\$expMailTime/$req->data->{expMailTime}/g;
-        $body =~ s/\$url/$url/g;
-        $body =~ s/\$(\w+)/$req->data->{registerInfo}->{$1}/eg;
 
         # Send mail
         return PE_MAILERROR
@@ -361,7 +358,6 @@ sub _register {
     }
 
     # Build mail content
-    $tplPrms{MAIN_LOGO} = $self->conf->{portalMainLogo};
     my $tr      = $self->translate($req);
     my $subject = $self->conf->{registerDoneSubject};
     unless ($subject) {
@@ -370,14 +366,6 @@ sub _register {
     }
     my $body;
     my $html = 1;
-
-    # Use HTML template
-    $body = $self->loadMailTemplate(
-        $req,
-        'mail_register_done',
-        filter => $tr,
-        params => \%tplPrms
-    );
 
     # Build portal url
     my $url = $self->conf->{portal};
@@ -390,9 +378,16 @@ sub _register {
         ( $req_url ? ( url => $req_url ) : () ),
       );
 
-    # Replace variables in body
-    $body =~ s/\$url/$url/g;
-    $body =~ s/\$(\w+)/$req->data->{registerInfo}->{$1}/ge;
+    # Use HTML template
+    $body = $self->loadMailTemplate(
+        $req,
+        'mail_register_done',
+        filter => $tr,
+        params => {
+            url => $url,
+            %{ $req->data->{registerInfo} || {} },
+        },
+    );
 
     # Send mail
     return PE_MAILERROR

@@ -1,12 +1,12 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/OfficeUtils/officewp2txt
-# and generated automatically using Perinci::CmdLine::Gen version 0.497
+# and generated automatically using Perinci::CmdLine::Gen version 0.499
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-10-27'; # DATE
+our $DATE = '2021-07-13'; # DATE
 our $DIST = 'App-OfficeUtils'; # DIST
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 use 5.010001;
 use strict;
@@ -40,18 +40,13 @@ doc2txt - Convert Office word-processor format file (.doc, .docx, .odt, etc) to 
 
 =head1 VERSION
 
-This document describes version 0.005 of doc2txt (from Perl distribution App-OfficeUtils), released on 2020-10-27.
+This document describes version 0.006 of doc2txt (from Perl distribution App-OfficeUtils), released on 2021-07-13.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % doc2txt [-O] [--debug] [--fmt] [--format=name] [--json]
-     [--libreoffice-path=s] [--log-level=level] [--(no)naked-res]
-     [--no-fmt] [--no-overwrite] [--no-return-output-file] [--nofmt]
-     [--nooverwrite] [--noreturn-output-file] [--overwrite]
-     [--page-result[=program]] [--quiet] [--return-output-file] [--trace]
-     [--verbose] [--view-result[=program]] <input_file> [output_file]
+% B<doc2txt> [B<--debug>|B<--log-level>=I<level>|B<--quiet>|B<--trace>|B<--verbose>] [B<--fmt>|B<--no-fmt>|B<--nofmt>] [B<--format>=I<name>|B<--json>] [B<--libreoffice-path>=I<filename>] [B<--(no)naked-res>] [B<--overwrite>|B<-O>|B<--no-overwrite>|B<--nooverwrite>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] [B<--return-output-file>|B<--no-return-output-file>|B<--noreturn-output-file>] -- E<lt>I<input_file>E<gt> [I<output_file>]
 
 =head1 DESCRIPTION
 
@@ -79,12 +74,16 @@ Run Unix fmt over the txt output.
 
 Path to input file.
 
+Can also be specified as the 1st command-line argument.
+
 =item B<--output-file>=I<s>
 
 Path to output file.
 
 If not specified, will output to stdout.
 
+
+Can also be specified as the 2nd command-line argument.
 
 =item B<--overwrite>, B<-O>
 
@@ -250,7 +249,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

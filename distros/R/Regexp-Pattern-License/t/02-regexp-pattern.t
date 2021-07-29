@@ -1,19 +1,16 @@
-#!perl
+use Test2::V0;
 
-use utf8;
-use strict;
-use warnings;
-
-use Test::More tests => 11;
 use Test::Regexp::Pattern;
 
 use Regexp::Pattern;
+
+plan 11;
 
 my $re = re( 'License::beerware', subject => 'name' );
 
 # TODO: use embedded examples instead, when figuring out how...
 isa_ok( $re, 'Regexp' );
-like( "$re", qr/\Q|(?:[Tt]he )?\bBeerware\b|/ );
+like( "$re", qr/\Q(?:[Tt]he )?(?:Beerware|/ );
 
 regexp_patterns_in_module_ok('Regexp::Pattern::License');
 

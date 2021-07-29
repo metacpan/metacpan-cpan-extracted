@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Utilities;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Internal utilities for JSON::Schema::Modern
 
-our $VERSION = '0.513';
+our $VERSION = '0.514';
 
 use 5.016;
 no if "$]" >= 5.031009, feature => 'indirect';
@@ -226,7 +226,8 @@ sub A {
 
 # creates an error object, but also aborts evaluation immediately
 # only this error is returned, because other errors on the stack might not actually be "real"
-# errors (consider if we were in the middle of evaluating a "not" or "if")
+# errors (consider if we were in the middle of evaluating a "not" or "if").
+# Therefore this is only appropriate during the evaluation phase, not the traverse phase.
 sub abort {
   my ($state, $error_string, @args) = @_;
   E($state, $error_string, @args);
@@ -306,7 +307,7 @@ JSON::Schema::Modern::Utilities - Internal utilities for JSON::Schema::Modern
 
 =head1 VERSION
 
-version 0.513
+version 0.514
 
 =head1 SYNOPSIS
 

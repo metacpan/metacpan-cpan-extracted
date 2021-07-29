@@ -53,6 +53,11 @@ class AClass {
          'different' =~ m/^(.*)$/;
          is( $slotmeta->name, '$magic', '->add_slot captures FETCH magic' );
       }
+
+      $classmeta->add_slot( '$slot_with_accessors',
+         reader => "get_swa",
+         writer => "set_swa",
+      );
    }
 }
 
@@ -65,6 +70,9 @@ class AClass {
 
    $obj->anonslot = 20;
    is( $obj->anonslot, 20, '->anonslot accessor works' );
+
+   $obj->set_swa( 30 );
+   is( $obj->get_swa, 30, '->get_swa sees value to ->set_swa' );
 }
 
 # param name to constructor

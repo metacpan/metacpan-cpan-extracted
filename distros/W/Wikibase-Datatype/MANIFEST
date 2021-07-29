@@ -146,8 +146,9 @@ t/Wikibase-Datatype-Statement/08-snak.t
 t/Wikibase-Datatype-Utils/01-use.t
 t/Wikibase-Datatype-Utils/02-version.t
 t/Wikibase-Datatype-Utils/03-check_entity.t
-t/Wikibase-Datatype-Utils/04-check_lexeme.t
-t/Wikibase-Datatype-Utils/05-check_property.t
+t/Wikibase-Datatype-Utils/04-check_language.t
+t/Wikibase-Datatype-Utils/05-check_lexeme.t
+t/Wikibase-Datatype-Utils/06-check_property.t
 t/Wikibase-Datatype-Value-Globecoordinate/01-use.t
 t/Wikibase-Datatype-Value-Globecoordinate/02-version.t
 t/Wikibase-Datatype-Value-Globecoordinate/03-new.t

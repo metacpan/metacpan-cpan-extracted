@@ -8,4 +8,3 @@ use Git::MoreHooks::TriggerJenkins;
 
 is( 1, 1, 'Is okay' );
 done_testing();
-

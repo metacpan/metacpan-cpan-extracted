@@ -1,5 +1,5 @@
 package Selenium::Driver::WinApp;
-$Selenium::Driver::WinApp::VERSION = '1.04';
+$Selenium::Driver::WinApp::VERSION = '1.05';
 use strict;
 use warnings;
 
@@ -49,7 +49,7 @@ Selenium::Driver::WinApp - Tell Selenium::Client how to spawn the Windows Applic
 
 =head1 VERSION
 
-version 1.04
+version 1.05
 
 =head1 Mode of Operation
 

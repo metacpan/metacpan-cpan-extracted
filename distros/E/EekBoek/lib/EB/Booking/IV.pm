@@ -12,8 +12,8 @@ package EB::Booking::IV;
 # Author          : Johan Vromans
 # Created On      : Thu Jul  7 14:50:41 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Wed Oct  7 17:11:15 2015
-# Update Count    : 364
+# Last Modified On: Tue Apr 24 12:25:35 2018
+# Update Count    : 371
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -40,11 +40,6 @@ sub perform {
     my $dagboek_type = $opts->{dagboek_type};
     my $bsk_ref = $opts->{ref};
     my $bsk_att = $opts->{bijlage};
-
-    if ( defined $bsk_ref && $bsk_ref =~ /^\d+$/ ) {
-	warn("?".__x("Boekingsreferentie moet tenminste één niet-numeriek teken bevatten: {ref}", ref => $bsk_ref)."\n");
-	return;
-    }
 
     if ( defined $bsk_att ) {
 	return unless $self->check_attachment($bsk_att);
@@ -99,15 +94,21 @@ sub perform {
 
     if ( $cfg->val(qw(general ivdesc), undef) ) {
 	$gdesc  = shift(@$args);
-	$debcode = shift(@$args);
+	my $arg = shift(@$args);
+	( $debcode, $bsk_ref ) = relref($arg, $bsk_ref);
+	if ( defined $bsk_ref && $bsk_ref =~ /^\d+$/ ) {
+	    warn("?".__x("Boekingsreferentie moet tenminste één niet-numeriek teken bevatten: {ref}", ref => $bsk_ref)."\n");
+	    return;
+	}
+
 	$rr = $dbh->do("SELECT rel_code, rel_acc_id, rel_btw_status FROM Relaties" .
 		       " WHERE UPPER(rel_code) = ?" .
 		       "  AND " . ($iv ? "NOT " : "") . "rel_debcrd" .
 		       "  AND rel_ledger = ?",
 		       uc($debcode), $dagboek);
 	unless ( defined($rr) ) {
-	    unshift(@$args, $debcode);
-	    $debcode = $gdesc;
+	    unshift(@$args, $arg);
+	    ( $debcode, $bsk_ref ) = relref($gdesc, $bsk_ref);
 	    $gdesc = "";
 	    $rr = $dbh->do("SELECT rel_code, rel_acc_id, rel_btw_status FROM Relaties" .
 			   " WHERE UPPER(rel_code) = ?" .
@@ -123,15 +124,21 @@ sub perform {
 	}
     }
     else {
-	$debcode = shift(@$args);
+	my $arg = shift(@$args);
+	( $debcode, $bsk_ref ) = relref($arg, $bsk_ref);
+	if ( defined $bsk_ref && $bsk_ref =~ /^\d+$/ ) {
+	    warn("?".__x("Boekingsreferentie moet tenminste één niet-numeriek teken bevatten: {ref}", ref => $bsk_ref)."\n");
+	    return;
+	}
+
 	$rr = $dbh->do("SELECT rel_code, rel_acc_id, rel_btw_status FROM Relaties" .
 		       " WHERE UPPER(rel_code) = ?" .
 		       "  AND " . ($iv ? "NOT " : "") . "rel_debcrd" .
 		       "  AND rel_ledger = ?",
 		       uc($debcode), $dagboek);
 	unless ( defined($rr) ) {
-	    $gdesc = $debcode;
-	    $debcode = shift(@$args);
+	    $gdesc = $arg;
+	    ( $debcode, $bsk_ref ) = relref(shift(@$args), $bsk_ref);
 	    $rr = $dbh->do("SELECT rel_code, rel_acc_id, rel_btw_status FROM Relaties" .
 			   " WHERE UPPER(rel_code) = ?" .
 			   "  AND " . ($iv ? "NOT " : "") . "rel_debcrd" .
@@ -394,6 +401,15 @@ sub perform {
     $opts->{verbose} || 1
       ? join(":", $dbh->lookup($dagboek, qw(Dagboeken dbk_id dbk_desc)), $bsk_nr)
 	: "";
+}
+
+sub relref {
+    my ( $rel, $ref ) = @_;
+    return ( $rel, $ref ) if defined $ref;
+    if ( $rel =~ /^(.+):(.+)/ ) {
+	( $rel, $ref ) = ( $1, $2 );
+    }
+    return ( $rel, $ref );
 }
 
 1;

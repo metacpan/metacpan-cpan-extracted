@@ -4,16 +4,16 @@ use AnyEvent::FTP::Server::Connection;
 
 eval q{
   package Context;
-  
+
   use Moo;
-  
+
   with 'AnyEvent::FTP::Server::Role::Context';
 
   sub push_request
   {
     my $sub = delete shift->{cb};
     $sub->(@_) if $sub;
-  }  
+  }
 };
 die $@ if $@;
 
@@ -27,7 +27,7 @@ isa_ok $con, 'AnyEvent::FTP::Server::Connection';
 
 my $check_user_foo = sub {
   my($con, $req) = @_;
-  
+
   isa_ok $con, 'AnyEvent::FTP::Server::Connection';
   isa_ok $req, 'AnyEvent::FTP::Request';
   is eval { $req->command }, 'USER', 'cmd = USER';
@@ -48,7 +48,7 @@ diag $@ if $@;
 
 $cx->{cb} = sub {
   my($con, $req) = @_;
-  
+
   isa_ok $con, 'AnyEvent::FTP::Server::Connection';
   isa_ok $req, 'AnyEvent::FTP::Request';
   is eval { $req->command }, 'PWD', 'cmd = PWD';

@@ -26,7 +26,7 @@ has multiValuesSeparator => ( is => 'rw', isa => 'Maybe[Str]' );
 has jail                 => ( is => 'rw' );
 has error                => ( is => 'rw' );
 
-our $VERSION = '2.0.11';
+our $VERSION = '2.0.12';
 our @builtCustomFunctions;
 
 ## @imethod protected build_jail()
@@ -122,7 +122,7 @@ sub encrypt {
 }
 
 sub token {
-    return encrypt( join( ':', time, @_ ) );
+    return $_[0] ? encrypt( join( ':', time, @_ ) ) : encrypt(time);
 }
 
 ## @method reval

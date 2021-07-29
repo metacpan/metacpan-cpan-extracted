@@ -248,6 +248,10 @@ Provided with an hash key and this will return whatever value was set.
 
 See L</set> for the opposite method, i.e. setting a key value.
 
+=head2 has
+
+Returns true if the given value exists in the hash. This is effectively an alias for L</exists>
+
 =head2 json
 
 This returns a L<JSON> representation of the hash. You can provided optionally an hash reference of parameters. Currently, only one parameter is supported: I<pretty>, which will make the json result more human readable. With it enabled, you would get something like this :

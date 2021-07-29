@@ -3,11 +3,11 @@ abstract: unknown
 author:
   - 'Peter John Acklam <pjacklam@gmail.com>'
 build_requires:
-  ExtUtils::MakeMaker: '0'
+  Test::More: '0.94'
 configure_requires:
-  ExtUtils::MakeMaker: '0'
+  ExtUtils::MakeMaker: '6.58'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -18,8 +18,10 @@ no_index:
     - t
     - inc
 requires:
-  Math::BigInt: '1.999718'
-  Test::More: '0.88'
+  Carp: '1.22'
+  Math::BigInt: '1.999816'
   perl: '5.006'
-version: '0.2614'
+resources:
+  repository: https://github.com/pjacklam/p5-Math-BigRat.git
+version: '0.2617'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

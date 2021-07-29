@@ -7,16 +7,27 @@ use LWP::UserAgent;
 use MIME::Base64;
 use XML::LibXML;
 
+sub toEntityIDkey {
+    my ( $prefix, $entityID ) = @_;
+
+    my $entityIDKey = $entityID;
+    $entityIDKey =~ s/^https?:\/\///;
+    $entityIDKey =~ s/[^a-zA-Z0-9]/-/g;
+    $entityIDKey =~ s/-+$//g;
+    return ( $prefix . $entityIDKey );
+}
+
 #==============================================================================
 # Get command line options
 #==============================================================================
 my %opts;
 my $result = GetOptions(
-    \%opts,              'metadata|m=s',
-    'certificate|c=s',   'verbose|v',
-    'help|h',            'spconfprefix|s=s',
-    'idpconfprefix|i=s', 'warning|w',
-    'remove|r'
+    \%opts,             'metadata|m=s',
+    'verbose|v',        'help|h',
+    'spconfprefix|s=s', 'idpconfprefix|i=s',
+    'remove|r',         'nagios|a',
+    'ignore-sp=s@',     'ignore-idp=s@',
+    'dry-run|n'
 );
 
 #==============================================================================
@@ -28,14 +39,20 @@ if ( $opts{help} or !$opts{metadata} ) {
     print STDERR "Usage: $0 -m <metadata file URL>\n\n";
     print STDERR "Options:\n";
     print STDERR
-"\t-c (--certificate): URL of certificate, to check metadata document signature\n";
-    print STDERR
       "\t-i (--idpconfprefix): Prefix used to set IDP configuration key\n";
     print STDERR "\t-h (--help): print this message\n";
     print STDERR "\t-m (--metadata): URL of metadata document\n";
     print STDERR
       "\t-s (--spconfprefix): Prefix used to set SP configuration key\n";
-    print STDERR "\t-w (--warning): print debug messages\n";
+    print STDERR
+"\t--ignore-sp: ignore SP maching this entityID (can be specified multiple times)\n";
+    print STDERR
+"\t--ignore-idp: ignore IdP matching this entityID (can be specified multiple times)\n";
+    print STDERR "\t-a (--nagios) : output statistics in Nagios format\n";
+    print STDERR "\t-n (--dry-run): print statistics but do not apply changes\n";
+    print STDERR "\t-v (--verbose): increase verbosity of output\n";
+    print STDERR
+"\t-r (--remove): remove provider from LemonLDAP::NG if it does not appear in metadata\n";
     exit 1;
 }
 
@@ -48,6 +65,7 @@ my $idpConfKeyPrefix = $opts{idpconfprefix} || "idp-";
 
 # Set here attributes that are declared for your SP in the federation
 # They will be set as exported attributes for all IDP
+#
 my $exportedAttributes = {
     'cn'                          => '0;cn',
     'eduPersonPrincipalName'      => '0;eduPersonAffiliation',
@@ -101,15 +119,21 @@ my $idpCounter = {
     'updated'  => 0,
     'created'  => 0,
     'rejected' => 0,
-    'removed'  => 0
+    'removed'  => 0,
+    'ignored'  => 0
 };
 my $spCounter = {
     'found'    => 0,
     'updated'  => 0,
     'created'  => 0,
     'rejected' => 0,
-    'removed'  => 0
+    'removed'  => 0,
+    'ignored'  => 0,
 };
+
+# BlockList initialisation
+my @spIgnorelist  = @{ $opts{'ignore-sp'}  || [] };
+my @idpIgnorelist = @{ $opts{'ignore-idp'} || [] };
 
 #==============================================================================
 # Main
@@ -173,33 +197,6 @@ else {
 
 my $dom = XML::LibXML->load_xml( string => $response->decoded_content );
 
-# Check file signature
-if ( $opts{certificate} ) {
-    my $certificate_file = $opts{certificate};
-    if ( $opts{verbose} ) {
-        print "Try to download certificate file at $certificate_file\n";
-    }
-    my $cert_response = $ua->get($certificate_file);
-
-    if ( $cert_response->is_success ) {
-        if ( $opts{verbose} ) {
-            print "Certificate file found:\n"
-              . $cert_response->decoded_content . "\n";
-        }
-    }
-    else {
-        die $cert_response->status_line;
-    }
-
-    if ( $opts{verbose} ) {
-        print "Check metadata signature with certificate";
-    }
-
-    # TODO
-    print STDERR "[WARN] Signature verification not yet implemented\n"
-      if $opts{warning};
-}
-
 # Remove extensions
 foreach ( $dom->findnodes('//md:Extensions') ) { $_->unbindNode; }
 
@@ -232,57 +229,64 @@ foreach
             my $partner_metadata = $partner->toString;
             $partner_metadata =~ s/\n//g;
 
-            # Check if entityID already in configuration
-            if ( defined $idpList->{$entityID} ) {
+            # test if IDP entityID is inside the block list
 
-                # Update metadata
-                $lastConf->{samlIDPMetaDataXML}->{ $idpList->{$entityID} }
-                  ->{samlIDPMetaDataXML} = $partner_metadata;
-
-                # Update attributes
-                $lastConf->{samlIDPMetaDataExportedAttributes}
-                  ->{ $idpList->{$entityID} } = $exportedAttributes;
-
-                # Update options
-                $lastConf->{samlIDPMetaDataOptions}->{ $idpList->{$entityID} }
-                  = $idpOptions;
-
+            if ( grep { $entityID eq $_ } @idpIgnorelist ) {
                 if ( $opts{verbose} ) {
-                    print "Update IDP $entityID in configuration\n";
+                    print "IDP $entityID won't be update/added \n";
                 }
-                $idpCounter->{updated}++;
+                $idpCounter->{ignored}++;
             }
             else {
-                # Create a new partner
-                my $entityIDKey = $entityID;
-                $entityIDKey =~ s/^https?:\/\///;
-                $entityIDKey =~ s/[^a-zA-Z0-9]/-/g;
-                $entityIDKey =~ s/-+$//g;
-                my $confKey = $idpConfKeyPrefix . $entityIDKey;
+                # Check if entityID already in configuration
+                if ( defined $idpList->{$entityID} ) {
 
-                # Metadata
-                $lastConf->{samlIDPMetaDataXML}->{$confKey}
-                  ->{samlIDPMetaDataXML} = $partner_metadata;
+                    # Update metadata
+                    $lastConf->{samlIDPMetaDataXML}->{ $idpList->{$entityID} }
+                      ->{samlIDPMetaDataXML} = $partner_metadata;
 
-                # Attributes
-                $lastConf->{samlIDPMetaDataExportedAttributes}->{$confKey} =
-                  $exportedAttributes;
+                    # Update attributes
+                    $lastConf->{samlIDPMetaDataExportedAttributes}
+                      ->{ $idpList->{$entityID} } = $exportedAttributes;
 
-                # Options
-                $lastConf->{samlIDPMetaDataOptions}->{$confKey} = $idpOptions;
+                    # Update options
+                    $lastConf->{samlIDPMetaDataOptions}
+                      ->{ $idpList->{$entityID} } = $idpOptions;
 
-                if ( $opts{verbose} ) {
-                    print
-"Declare new IDP $entityID (configuration key $confKey)\n";
+                    if ( $opts{verbose} ) {
+                        print "Update IDP $entityID in configuration\n";
+                    }
+                    $idpCounter->{updated}++;
                 }
-                $idpCounter->{created}++;
+                else {
+                    # Create a new partner
+                    my $confKey = toEntityIDkey( $idpConfKeyPrefix, $entityID );
+
+                    # Metadata
+                    $lastConf->{samlIDPMetaDataXML}->{$confKey}
+                      ->{samlIDPMetaDataXML} = $partner_metadata;
+
+                    # Attributes
+                    $lastConf->{samlIDPMetaDataExportedAttributes}->{$confKey}
+                      = $exportedAttributes;
+
+                    # Options
+                    $lastConf->{samlIDPMetaDataOptions}->{$confKey} =
+                      $idpOptions;
+
+                    if ( $opts{verbose} ) {
+                        print
+"Declare new IDP $entityID (configuration key $confKey)\n";
+                    }
+                    $idpCounter->{created}++;
+                }
             }
 
         }
         else {
             print STDERR
 "[WARN] IDP $entityID is not compatible with SAML 2.0, it will not be imported.\n"
-              if $opts{warning};
+              if $opts{verbose};
             $idpCounter->{rejected}++;
         }
     }
@@ -346,57 +350,78 @@ foreach
             my $partner_metadata = $partner->toString;
             $partner_metadata =~ s/\n//g;
 
-            # Check if entityID already in configuration
-            if ( defined $spList->{$entityID} ) {
+            # test if IDP entityID is inside the block list
 
-                # Update metadata
-                $lastConf->{samlSPMetaDataXML}->{ $spList->{$entityID} }
-                  ->{samlSPMetaDataXML} = $partner_metadata;
-
-                # Update attributes
-                $lastConf->{samlSPMetaDataExportedAttributes}
-                  ->{ $spList->{$entityID} } = $requestedAttributes;
-
-                # Update options
-                $lastConf->{samlSPMetaDataOptions}->{ $spList->{$entityID} } =
-                  $spOptions;
-
+            if ( grep { $entityID eq $_ } @spIgnorelist ) {
                 if ( $opts{verbose} ) {
-                    print "Update SP $entityID in configuration\n";
+                    print "SP $entityID won't be update/added \n";
                 }
-                $spCounter->{updated}++;
+                $spCounter->{ignored}++;
             }
             else {
-                # Create a new partner
-                my $entityIDKey = $entityID;
-                $entityIDKey =~ s/^https?:\/\///;
-                $entityIDKey =~ s/[^a-zA-Z0-9]/-/g;
-                $entityIDKey =~ s/-+$//g;
-                my $confKey = $spConfKeyPrefix . $entityIDKey;
+                # Check if entityID already in configuration
+                if ( defined $spList->{$entityID} ) {
 
-                # Metadata
-                $lastConf->{samlSPMetaDataXML}->{$confKey}->{samlSPMetaDataXML}
-                  = $partner_metadata;
+                    # Update metadata
+                    $lastConf->{samlSPMetaDataXML}->{ $spList->{$entityID} }
+                      ->{samlSPMetaDataXML} = $partner_metadata;
 
-                # Attributes
-                $lastConf->{samlSPMetaDataExportedAttributes}->{$confKey} =
-                  $requestedAttributes;
+                    # Update attributes
+                    $lastConf->{samlSPMetaDataExportedAttributes}
+                      ->{ $spList->{$entityID} } = $requestedAttributes;
 
-                # Options
-                $lastConf->{samlSPMetaDataOptions}->{$confKey} = $spOptions;
+# Update options
+#                  $lastConf->{samlSPMetaDataOptions}->{ $spList->{$entityID} } =
+#                    $spOptions;
+# FIX AGA
+                    $lastConf->{samlSPMetaDataOptions}->{ $spList->{$entityID} }
+                      = { %{$spOptions} };
 
-                if ( $opts{verbose} ) {
-                    print
-                      "Declare new SP $entityID (configuration key $confKey)\n";
+                    if ( $opts{verbose} ) {
+                        print "Update SP $entityID in configuration\n";
+                    }
+                    $spCounter->{updated}++;
                 }
-                $spCounter->{created}++;
+                else {
+                    # Create a new partner
+                    my $confKey = toEntityIDkey( $spConfKeyPrefix, $entityID );
+
+                    # Metadata
+                    $lastConf->{samlSPMetaDataXML}->{$confKey}
+                      ->{samlSPMetaDataXML} = $partner_metadata;
+
+                    # Attributes
+                    $lastConf->{samlSPMetaDataExportedAttributes}->{$confKey} =
+                      $requestedAttributes;
+
+                  # Options
+                  # $lastConf->{samlSPMetaDataOptions}->{$confKey} = $spOptions;
+
+                    # FIX AGA
+                    $lastConf->{samlSPMetaDataOptions}->{$confKey} =
+                      { %{$spOptions} };
+
+                    if ( $opts{verbose} ) {
+                        print
+"Declare new SP $entityID (configuration key $confKey)\n";
+                    }
+                    $spCounter->{created}++;
+                }
+
+                # handle eduPersonTargetedID
+                if ( $requestedAttributes->{eduPersonTargetedID} ) {
+                    delete $requestedAttributes->{eduPersonTargetedID};
+                    $lastConf->{samlSPMetaDataOptions}->{ $spList->{$entityID} }
+                      ->{samlSPMetaDataOptionsNameIDFormat} = 'persistent';
+                }
+
             }
 
         }
         else {
             print STDERR
 "[WARN] SP $entityID is not compatible with SAML 2.0, it will not be imported.\n"
-              if $opts{warning};
+              if $opts{verbose};
             $spCounter->{rejected}++;
         }
 
@@ -406,61 +431,130 @@ foreach
 
 # Remove partners
 if ( $opts{remove} ) {
-    foreach ( keys %$idpList ) {
-        my $idpConfKey = $idpList->{$_};
-        unless ( defined $mdIdpList->{$_} ) {
-            delete $lastConf->{samlIDPMetaDataXML}->{$idpConfKey};
-            delete $lastConf->{samlIDPMetaDataExportedAttributes}
-              ->{$idpConfKey};
-            delete $lastConf->{samlIDPMetaDataOptions}->{$idpConfKey};
-            $idpCounter->{removed}++;
-            if ( $opts{verbose} ) {
-                print "Remove IDP $idpConfKey\n";
+    foreach my $entityID ( keys %$idpList ) {
+        my $idpConfKey = $idpList->{$entityID};
+        unless ( defined $mdIdpList->{$entityID} ) {
+            if ( grep { $entityID eq $_ } @idpIgnorelist ) {
+                $idpCounter->{ignored}++;
+                if ( $opts{verbose} ) {
+                    print "IDP $idpConfKey won't be deleted \n";
+                }
+            }
+            else {
+                delete $lastConf->{samlIDPMetaDataXML}->{$idpConfKey};
+                delete $lastConf->{samlIDPMetaDataExportedAttributes}
+                  ->{$idpConfKey};
+                delete $lastConf->{samlIDPMetaDataOptions}->{$idpConfKey};
+                $idpCounter->{removed}++;
+                if ( $opts{verbose} ) {
+                    print "Remove IDP $idpConfKey\n";
+                }
             }
         }
     }
 
-    foreach ( keys %$spList ) {
-        my $spConfKey = $spList->{$_};
-        unless ( defined $mdSpList->{$_} ) {
-            delete $lastConf->{samlSPMetaDataXML}->{$spConfKey};
-            delete $lastConf->{samlSPMetaDataExportedAttributes}->{$spConfKey};
-            delete $lastConf->{samlSPMetaDataOptions}->{$spConfKey};
-            $spCounter->{removed}++;
-            if ( $opts{verbose} ) {
-                print "Remove SP $spConfKey\n";
+    foreach my $entityID ( keys %$spList ) {
+        my $spConfKey = $spList->{$entityID};
+        unless ( defined $mdSpList->{$entityID} ) {
+            if ( grep { $entityID eq $_ } @spIgnorelist ) {
+                $spCounter->{ignored}++;
+                if ( $opts{verbose} ) {
+                    print "SP $spConfKey won't be deleted \n";
+                }
+            }
+            else {
+                delete $lastConf->{samlSPMetaDataXML}->{$spConfKey};
+                delete $lastConf->{samlSPMetaDataExportedAttributes}
+                  ->{$spConfKey};
+                delete $lastConf->{samlSPMetaDataOptions}->{$spConfKey};
+                $spCounter->{removed}++;
+                if ( $opts{verbose} ) {
+                    print "Remove SP $spConfKey\n";
+                }
             }
         }
     }
 }
 
-# Register configuration
-my $numConf = $conf->saveConf( $lastConf, ( cfgNumFixed => 1 ) );
+my $numConf  = "DRY-RUN";
+my $exitCode = 0;
 
-unless ($numConf) {
-    print "[ERROR] Unable to save configuration\n";
-    exit 1;
+if ( !$opts{'dry-run'} ) {
+
+    # Register configuration
+    if ( $opts{verbose} ) {
+        print "[INFO] run mod EntityID will be inserted\n";
+    }
+    $numConf = $conf->saveConf( $lastConf, ( cfgNumFixed => 1 ) );
+    if ( $opts{verbose} ) {
+        print "[OK] Configuration $numConf saved\n";
+        $exitCode = 0;
+    }
+    unless ($numConf) {
+        print "[ERROR] Unable to save configuration\n";
+        $exitCode = 1;
+    }
+}
+else {
+    if ( $opts{verbose} ) {
+        print "[INFO] Dry-run mod no EntityID inserted\n";
+    }
 }
 
-print "[IDP]\tFound: "
-  . $idpCounter->{found}
-  . "\tUpdated: "
-  . $idpCounter->{updated}
-  . "\tCreated: "
-  . $idpCounter->{created}
-  . "\tRemoved: "
-  . $idpCounter->{removed}
-  . "\tRejected: "
-  . $idpCounter->{rejected} . "\n";
-print "[SP]\tFound: "
-  . $spCounter->{found}
-  . "\tUpdated: "
-  . $spCounter->{updated}
-  . "\tCreated: "
-  . $spCounter->{created}
-  . "\tRemoved: "
-  . $spCounter->{removed}
-  . "\tRejected: "
-  . $spCounter->{rejected} . "\n";
-print "[OK] Configuration $numConf saved\n";
-exit 0;
+if ( $opts{nagios} ) {
+    print "Metadata loaded inside Conf: ["
+      . $numConf
+      . "]|idp_found="
+      . $idpCounter->{found}
+      . ", idp_updated="
+      . $idpCounter->{updated}
+      . ", idp_created="
+      . $idpCounter->{created}
+      . ", idp_removed="
+      . $idpCounter->{removed}
+      . ", idp_rejected="
+      . $idpCounter->{rejected}
+      . ", idp_ignored="
+      . $idpCounter->{ignored}
+      . ", sp_found="
+      . $spCounter->{found}
+      . ", sp_updated="
+      . $spCounter->{updated}
+      . ", sp_created="
+      . $spCounter->{created}
+      . ", sp_removed="
+      . $spCounter->{removed}
+      . ", sp_rejected="
+      . $spCounter->{rejected}
+      . ", sp_ignored="
+      . $spCounter->{ignored} . "\n";
+}
+else {
+    print "[IDP]\tFound: "
+      . $idpCounter->{found}
+      . "\tUpdated: "
+      . $idpCounter->{updated}
+      . "\tCreated: "
+      . $idpCounter->{created}
+      . "\tRemoved: "
+      . $idpCounter->{removed}
+      . "\tRejected: "
+      . $idpCounter->{rejected}
+      . "\tIgnored: "
+      . $idpCounter->{ignored} . "\n";
+    print "[SP]\tFound: "
+      . $spCounter->{found}
+      . "\tUpdated: "
+      . $spCounter->{updated}
+      . "\tCreated: "
+      . $spCounter->{created}
+      . "\tRemoved: "
+      . $spCounter->{removed}
+      . "\tRejected: "
+      . $spCounter->{rejected}
+      . "\tIgnored: "
+      . $spCounter->{ignored} . "\n";
+}
+
+exit $exitCode;
+

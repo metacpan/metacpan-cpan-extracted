@@ -2,7 +2,7 @@ package Net::DNS::Resolver::UNIX;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: UNIX.pm 1811 2020-10-05 08:24:23Z willem $)[2];
+our $VERSION = (qw$Id: UNIX.pm 1843 2021-07-09 09:10:08Z willem $)[2];
 
 
 =head1 NAME
@@ -22,7 +22,7 @@ my @dotpath = grep {defined} $ENV{HOME}, '.';
 my @dotfile = grep { -f $_ && -o _ } map {"$_/$dotfile"} @dotpath;
 
 
-local $ENV{PATH} = '/bin:/usr/bin';
+local $ENV{PATH} = join ':', grep {$_} qw(/bin /usr/bin), $ENV{PATH};
 my $uname = eval {`uname -n 2>/dev/null`} || '';
 chomp $uname;
 my ( $host, @domain ) = split /\./, $uname, 2;

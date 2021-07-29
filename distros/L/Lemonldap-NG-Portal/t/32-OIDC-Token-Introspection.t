@@ -17,43 +17,45 @@ my $debug = 'error';
 # Initialization
 my $op = LLNG::Manager::Test->new( {
         ini => {
-            logLevel                        => $debug,
-            domain                          => 'idp.com',
-            portal                          => 'http://auth.op.com',
-            authentication                  => 'Demo',
-            userDB                          => 'Same',
-            issuerDBOpenIDConnectActivation => 1,
-            issuerDBOpenIDConnectRule       => '$uid eq "french"',
-            oidcRPMetaDataExportedVars      => {
+            logLevel                           => $debug,
+            domain                             => 'op.com',
+            portal                             => 'http://auth.op.com',
+            authentication                     => 'Demo',
+            userDB                             => 'Same',
+            issuerDBOpenIDConnectActivation    => 1,
+            oidcServiceAllowOnlyDeclaredScopes => 1,
+            oidcRPMetaDataExportedVars         => {
                 rp => {
                     email       => "mail",
                     family_name => "cn",
                     name        => "cn"
                 },
-                rp2 => {
+                oauth => {
                     email       => "mail",
                     family_name => "cn",
                     name        => "cn"
                 }
             },
-            oidcServiceMetaDataAuthorizeURI       => "authorize",
-            oidcServiceMetaDataCheckSessionURI    => "checksession.html",
-            oidcServiceMetaDataJWKSURI            => "jwks",
-            oidcServiceMetaDataEndSessionURI      => "logout",
-            oidcServiceMetaDataRegistrationURI    => "register",
-            oidcServiceMetaDataTokenURI           => "token",
-            oidcServiceMetaDataUserInfoURI        => "userinfo",
-            oidcServiceAllowHybridFlow            => 1,
-            oidcServiceAllowImplicitFlow          => 1,
-            oidcServiceAllowDynamicRegistration   => 1,
-            oidcServiceAllowAuthorizationCodeFlow => 1,
-            oidcRPMetaDataOptions                 => {
+            oidcRPMetaDataScopeRules => {
+                rp => {
+                    "read"        => '$requested and $uid eq "french"',
+                    "write"       => '$uid eq "russian"',
+                    "ifrequested" => '$requested and $uid eq "french"',
+                    "always"      => '$uid eq "french"',
+                },
+            },
+            oidcRPMetaDataOptionsExtraClaims => {
+                rp => {
+                    extrascope => "dummy",
+                },
+            },
+            oidcRPMetaDataOptions => {
                 rp => {
                     oidcRPMetaDataOptionsDisplayName           => "RP",
                     oidcRPMetaDataOptionsIDTokenExpiration     => 3600,
                     oidcRPMetaDataOptionsClientID              => "rpid",
                     oidcRPMetaDataOptionsIDTokenSignAlg        => "HS512",
-                    oidcRPMetaDataOptionsClientSecret          => "rpsecret",
+                    oidcRPMetaDataOptionsClientSecret          => "rpid",
                     oidcRPMetaDataOptionsUserIDAttr            => "",
                     oidcRPMetaDataOptionsAccessTokenExpiration => 3600,
                     oidcRPMetaDataOptionsBypassConsent         => 1,
@@ -65,71 +67,33 @@ my $op = LLNG::Manager::Test->new( {
                     oidcRPMetaDataOptionsUserIDAttr   => "",
                 }
             },
-            oidcOPMetaDataOptions           => {},
-            oidcOPMetaDataJSON              => {},
-            oidcOPMetaDataJWKS              => {},
-            oidcServiceMetaDataAuthnContext => {
-                'loa-4' => 4,
-                'loa-1' => 1,
-                'loa-5' => 5,
-                'loa-2' => 2,
-                'loa-3' => 3
-            },
             oidcServicePrivateKeySig => oidc_key_op_private_sig,
             oidcServicePublicKeySig  => oidc_key_op_public_sig,
         }
     }
 );
-my $res;
 
-# Authenticate to LLNG
-my $url   = "/";
-my $query = "user=french&password=french";
-ok(
-    $res = $op->_post(
-        "/",
-        IO::String->new($query),
-        accept => 'text/html',
-        length => length($query),
-    ),
-    "Post authentication"
-);
-my $idpId = expectCookie($res);
+my $idpId = login( $op, "french" );
 
-# Get code for RP1
-$query =
-"response_type=code&scope=openid%20profile%20email&client_id=rpid&state=af0ifjsldkj&redirect_uri=http%3A%2F%2Frp2.com%2F";
-ok(
-    $res = $op->_get(
-        "/oauth2/authorize",
-        query  => "$query",
-        accept => 'text/html',
-        cookie => "lemonldap=$idpId",
-    ),
-    "Get authorization code"
+my $code = authorize(
+    $op, $idpId,
+    {
+        response_type => "code",
+        scope         => "openid profile email read write extrascope unknown",
+        client_id     => "rpid",
+        state         => "af0ifjsldkj",
+        redirect_uri  => "http://rp2.com/"
+    }
 );
 
-my ($code) = expectRedirection( $res, qr#http://rp2\.com/.*code=([^\&]*)# );
+my $json = expectJSON( codeGrant( $op, "rpid", $code, "http://rp2.com/" ) );
 
-# Exchange code for AT
-$query =
-"grant_type=authorization_code&code=$code&redirect_uri=http%3A%2F%2Frp2.com%2F";
-
-ok(
-    $res = $op->_post(
-        "/oauth2/token",
-        IO::String->new($query),
-        accept => 'text/html',
-        length => length($query),
-        custom => {
-            HTTP_AUTHORIZATION => "Basic " . encode_base64("rpid:rpsecret"),
-        },
-    ),
-    "Post token"
-);
-my $json  = from_json( $res->[2]->[0] );
 my $token = $json->{access_token};
 ok( $token, 'Access token present' );
+my $token_resp_scope = $json->{scope};
+ok( $token_resp_scope, 'Token response returned granted scopes' );
+
+my ( $res, $query );
 
 $query = "token=$token";
 
@@ -165,9 +129,23 @@ is( $json->{sub}, "french", "Response contains the correct sub" );
 is( $json->{iss}, "http://auth.op.com",
     "Response contains the correct issuer" );
 is( $json->{client_id}, "rpid", "Response contains the correct client id" );
-like( $json->{scope}, qr/\bopenid\b/,  "Response contains the correct scopes" );
-like( $json->{scope}, qr/\bprofile\b/, "Response contains the correct scopes" );
-like( $json->{scope}, qr/\bemail\b/,   "Response contains the correct scopes" );
+like( $json->{scope}, qr/\bopenid\b/,  "Response contains the default scopes" );
+like( $json->{scope}, qr/\bprofile\b/, "Response contains the default scopes" );
+like( $json->{scope}, qr/\bemail\b/,   "Response contains the default scopes" );
+unlike( $json->{scope}, qr/\bwrite\b/,
+    "Response omits a dynamic scope that evaluates to false" );
+unlike( $json->{scope}, qr/\bifrequested\b/,
+    "Response omits a dynamic scope that was not requested" );
+like( $json->{scope}, qr/\bread\b/,
+    "Response contains a dynamic scope that is sent only when requested" );
+like( $json->{scope}, qr/\balways\b/,
+    "Response contains a dynamic scope that is not requested but always sent" );
+unlike( $json->{scope}, qr/\bunknown\b/,
+    "Response omits a scope that is not declared anywhere" );
+like( $json->{scope}, qr/\bextrascope\b/,
+    "Response contains scope coming from extra claims definition" );
+is( $token_resp_scope, $json->{scope},
+    "Token response scope matches token scope" );
 
 # Check status after expiration
 Time::Fake->offset("+2h");

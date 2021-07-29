@@ -5,10 +5,14 @@ use List::Util 'any';
 use Mojo::Loader ();
 use Mojo::Util 'camelize';
 
-our $VERSION = '0.11';
+our $VERSION = '0.13';
 
 sub register {
   my ($plugin, $app, $conf) = @_;
+
+  # check if need camelize moniker
+  my $moniker = camelize($app->moniker);
+  $moniker    = $app->moniker unless -d $app->home . '/lib/' . $moniker;
 
   $app->helper(
     model => sub {
@@ -18,7 +22,7 @@ sub register {
       my $model;
       return $model if $model = $plugin->{models}{$name};
 
-      my $class = _load_class_for_name($plugin, $app, $conf, $name)
+      my $class = _load_class_for_name($plugin, $app, $conf, $name, $moniker)
         or return undef;
 
       my $params = $conf->{params}{$name};
@@ -33,7 +37,7 @@ sub register {
       my ($self, $name) = @_;
       $name //= $conf->{default};
 
-      my $class = _load_class_for_name($plugin, $app, $conf, $name)
+      my $class = _load_class_for_name($plugin, $app, $conf, $name, $moniker)
         or return undef;
 
       my $params = $conf->{params}{$name};
@@ -54,10 +58,10 @@ sub _load_class {
 }
 
 sub _load_class_for_name {
-  my ($plugin, $app, $conf, $name) = @_;
+  my ($plugin, $app, $conf, $name, $moniker) = @_;
   return $plugin->{classes_loaded}{$name} if $plugin->{classes_loaded}{$name};
 
-  my $ns   = $conf->{namespaces}   // [camelize($app->moniker) . '::Model'];
+  my $ns   = $conf->{namespaces}   // [$moniker . '::Model'];
   my $base = $conf->{base_classes} // [qw(MojoX::Model)];
 
   $name = camelize($name) if $name =~ /^[a-z]/;
@@ -104,7 +108,7 @@ Model Users
 
     # Or HTTP check
     return $self->app->ua->post($url => json => {user => $name, pass => $pass})
-      ->rex->tx->json('/result');
+      ->res->tx->json('/result');
   }
 
   1;

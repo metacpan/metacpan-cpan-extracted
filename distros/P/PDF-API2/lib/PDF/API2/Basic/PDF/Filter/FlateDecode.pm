@@ -5,7 +5,7 @@ use base 'PDF::API2::Basic::PDF::Filter';
 use strict;
 use warnings;
 
-our $VERSION = '2.040'; # VERSION
+our $VERSION = '2.041'; # VERSION
 
 use POSIX qw(ceil floor);
 

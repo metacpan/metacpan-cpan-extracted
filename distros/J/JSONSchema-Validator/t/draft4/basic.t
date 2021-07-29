@@ -1,0 +1,805 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use JSONSchema::Validator::Draft4;
+use JSONSchema::Validator::Util qw/json_decode data_section/;
+
+use Test::More;
+
+my $data = data_section('main');
+
+my $tests = json_decode($data);
+
+for my $test (@$tests) {
+    my $test_topic = $test->{subject};
+    my $validator = JSONSchema::Validator::Draft4->new(schema => $test->{schema});
+    my $subtests = $test->{tests};
+    for my $t (@$subtests) {
+        my $test_name = $test_topic . ': ' . $t->{description};
+        my ($result, $errors) = $validator->validate_schema($t->{data});
+        if ($t->{valid}) {
+            is $result, 1, $test_name;
+            is @$errors, 0, $test_name . '; errors is empty';
+        } else {
+            is $result, 0, $test_name;
+            ok @$errors > 0, $test_name . '; errors is not empty';
+        }
+    }
+}
+
+done_testing;
+
+__DATA__
+[
+    {
+        "subject": "additionalItems",
+        "schema": {
+            "items": [{}, {}, {}],
+            "additionalItems": false
+        },
+        "tests": [
+            {
+                "description": "empty array",
+                "data": [ ],
+                "valid": true
+            },
+            {
+                "description": "fewer number of items present (2)",
+                "data": [ 1, 2 ],
+                "valid": true
+            },
+            {
+                "description": "additional items are not permitted",
+                "data": [ 1, 2, 3, 4 ],
+                "valid": false
+            }
+        ]
+    },
+    {
+        "subject": "additionalItems",
+        "schema": {
+            "items": [{}],
+            "additionalItems": {"type": "integer"}
+        },
+        "tests": [
+            {
+                "description": "additional items match schema",
+                "data": [ null, 2, 3, 4 ],
+                "valid": true
+            },
+            {
+                "description": "additional items do not match schema",
+                "data": [ null, 2, 3, "foo" ],
+                "valid": false
+            }
+        ]
+    },
+    {
+        "subject": "additionalProperties",
+        "schema": {
+            "properties": {"foo": {}, "bar": {}},
+            "additionalProperties": {"type": "boolean"}
+        },
+        "tests": [
+            {
+                "description": "no additional properties is valid",
+                "data": {"foo": 1},
+                "valid": true
+            },
+            {
+                "description": "an additional valid property is valid",
+                "data": {"foo" : 1, "bar" : 2, "quux" : true},
+                "valid": true
+            },
+            {
+                "description": "an additional invalid property is invalid",
+                "data": {"foo" : 1, "bar" : 2, "quux" : 12},
+                "valid": false
+            }
+        ]
+    },
+    {
+        "subject": "allOf",
+        "schema": {
+            "allOf": [
+                {
+                    "properties": {
+                        "bar": {"type": "integer"}
+                    },
+                    "required": ["bar"]
+                },
+                {
+                    "properties": {
+                        "foo": {"type": "string"}
+                    },
+                    "required": ["foo"]
+                }
+            ]
+        },
+        "tests": [
+            {
+                "description": "allOf",
+                "data": {"foo": "baz", "bar": 2},
+                "valid": true
+            },
+            {
+                "description": "mismatch second",
+                "data": {"foo": "baz"},
+                "valid": false
+            },
+            {
+                "description": "mismatch first",
+                "data": {"bar": 2},
+                "valid": false
+            },
+            {
+                "description": "wrong type",
+                "data": {"foo": "baz", "bar": "quux"},
+                "valid": false
+            }
+        ]
+    },
+    {
+        "subject": "anyOf",
+        "schema": {
+            "anyOf": [
+                {
+                    "type": "integer"
+                },
+                {
+                    "minimum": 2
+                }
+            ]
+        },
+        "tests": [
+            {
+                "description": "first anyOf valid",
+                "data": 1,
+                "valid": true
+            },
+            {
+                "description": "second anyOf valid",
+                "data": 2.5,
+                "valid": true
+            },
+            {
+                "description": "both anyOf valid",
+                "data": 3,
+                "valid": true
+            },
+            {
+                "description": "neither anyOf valid",
+                "data": 1.5,
+                "valid": false
+            }
+        ]
+    },
+    {
+        "subject": "dependencies",
+        "schema": {
+            "dependencies": {"bar": ["foo"]}
+        },
+        "tests": [
+            {
+                "description": "neither",
+                "data": {},
+                "valid": true
+            },
+            {
+                "description": "nondependant",
+                "data": {"foo": 1},
+                "valid": true
+            },
+            {
+                "description": "with dependency",
+                "data": {"foo": 1, "bar": 2},
+                "valid": true
+            },
+            {
+                "description": "missing dependency",
+                "data": {"bar": 2},
+                "valid": false
+            },
+            {
+                "description": "ignores arrays",
+                "data": ["bar"],
+                "valid": true
+            },
+            {
+                "description": "ignores strings",
+                "data": "foobar",
+                "valid": true
+            },
+            {
+                "description": "ignores other non-objects",
+                "data": 12,
+                "valid": true
+            }
+        ]
+    },
+    {
+        "subject": "enum",
+        "schema": {"enum": [1, 2, 3]},
+        "tests": [
+            {
+                "description": "one of the enum is valid",
+                "data": 1,
+                "valid": true
+            },
+            {
+                "description": "something else is invalid",
+                "data": 4,
+                "valid": false
+            }
+        ]
+    },
+    {
+        "subject": "items",
+        "schema": {
+            "items": {"type": "integer"}
+        },
+        "tests": [
+            {
+                "description": "valid items",
+                "data": [ 1, 2, 3 ],
+                "valid": true
+            },
+            {
+                "description": "wrong type of items",
+                "data": [1, "x"],
+                "valid": false
+            },
+            {
+                "description": "ignores non-arrays",
+                "data": {"foo" : "bar"},
+                "valid": true
+            },
+            {
+                "description": "JavaScript pseudo-array is valid",
+                "data": {
+                    "0": "invalid",
+                    "length": 1
+                },
+                "valid": true
+            }
+        ]
+    },
+    {
+        "subject": "maxItems",
+        "schema": {"maxItems": 2},
+        "tests": [
+            {
+                "description": "shorter is valid",
+                "data": [1],
+                "valid": true
+            },
+            {
+                "description": "exact length is valid",
+                "data": [1, 2],
+                "valid": true
+            },
+            {
+                "description": "too long is invalid",
+                "data": [1, 2, 3],
+                "valid": false
+            },
+            {
+                "description": "ignores non-arrays",
+                "data": "foobar",
+                "valid": true
+            }
+        ]
+    },
+    {
+        "subject": "maxLength",
+        "schema": {"maxLength": 2},
+        "tests": [
+            {
+                "description": "shorter is valid",
+                "data": "f",
+                "valid": true
+            },
+            {
+                "description": "exact length is valid",
+                "data": "fo",
+                "valid": true
+            },
+            {
+                "description": "too long is invalid",
+                "data": "foo",
+                "valid": false
+            },
+            {
+                "description": "ignores non-strings",
+                "data": 100,
+                "valid": true
+            }
+        ]
+    },
+    {
+        "subject": "maxProperties",
+        "schema": {"maxProperties": 2},
+        "tests": [
+            {
+                "description": "exact length is valid",
+                "data": {"foo": 1, "bar": 2},
+                "valid": true
+            },
+            {
+                "description": "too long is invalid",
+                "data": {"foo": 1, "bar": 2, "baz": 3},
+                "valid": false
+            }
+        ]
+    },
+    {
+        "subject": "maximum",
+        "schema": {"maximum": 3.0},
+        "tests": [
+            {
+                "description": "below the maximum is valid",
+                "data": 2.6,
+                "valid": true
+            },
+            {
+                "description": "boundary point is valid",
+                "data": 3.0,
+                "valid": true
+            },
+            {
+                "description": "above the maximum is invalid",
+                "data": 3.5,
+                "valid": false
+            }
+        ]
+    },
+    {
+        "subject": "minItems",
+        "schema": {"minItems": 1},
+        "tests": [
+            {
+                "description": "longer is valid",
+                "data": [1, 2],
+                "valid": true
+            },
+            {
+                "description": "exact length is valid",
+                "data": [1],
+                "valid": true
+            },
+            {
+                "description": "too short is invalid",
+                "data": [],
+                "valid": false
+            }
+        ]
+    },
+    {
+        "subject": "minLength",
+        "schema": {"minLength": 2},
+        "tests": [
+            {
+                "description": "longer is valid",
+                "data": "foo",
+                "valid": true
+            },
+            {
+                "description": "exact length is valid",
+                "data": "fo",
+                "valid": true
+            },
+            {
+                "description": "too short is invalid",
+                "data": "f",
+                "valid": false
+            }
+        ]
+    },
+    {
+        "subject": "minProperties",
+        "schema": {"minProperties": 1},
+        "tests": [
+            {
+                "description": "longer is valid",
+                "data": {"foo": 1, "bar": 2},
+                "valid": true
+            },
+            {
+                "description": "exact length is valid",
+                "data": {"foo": 1},
+                "valid": true
+            },
+            {
+                "description": "too short is invalid",
+                "data": {},
+                "valid": false
+            }
+        ]
+    },
+    {
+        "subject": "minimum",
+        "schema": {"minimum": 1.1},
+        "tests": [
+            {
+                "description": "above the minimum is valid",
+                "data": 2.6,
+                "valid": true
+            },
+            {
+                "description": "boundary point is valid",
+                "data": 1.1,
+                "valid": true
+            },
+            {
+                "description": "below the minimum is invalid",
+                "data": 0.6,
+                "valid": false
+            }
+        ]
+    },
+    {
+        "subject": "multipleOf",
+        "schema": {"multipleOf": 2},
+        "tests": [
+            {
+                "description": "int by int",
+                "data": 10,
+                "valid": true
+            },
+            {
+                "description": "int by int fail",
+                "data": 7,
+                "valid": false
+            }
+        ]
+    },
+    {
+        "subject": "multipleOf",
+        "schema": {"multipleOf": 1.5},
+        "tests": [
+            {
+                "description": "zero is multiple of anything",
+                "data": 0,
+                "valid": true
+            },
+            {
+                "description": "4.5 is multiple of 1.5",
+                "data": 4.5,
+                "valid": true
+            },
+            {
+                "description": "35 is not multiple of 1.5",
+                "data": 35,
+                "valid": false
+            }
+        ]
+    },
+    {
+        "subject": "not",
+        "schema": {
+            "not": {"type": "integer"}
+        },
+        "tests": [
+            {
+                "description": "allowed",
+                "data": "foo",
+                "valid": true
+            },
+            {
+                "description": "disallowed",
+                "data": 1,
+                "valid": false
+            }
+        ]
+    },
+    {
+        "subject": "oneOf",
+        "schema": {
+            "oneOf": [
+                {
+                    "type": "integer"
+                },
+                {
+                    "minimum": 2
+                }
+            ]
+        },
+        "tests": [
+            {
+                "description": "first oneOf valid",
+                "data": 1,
+                "valid": true
+            },
+            {
+                "description": "second oneOf valid",
+                "data": 2.5,
+                "valid": true
+            },
+            {
+                "description": "both oneOf valid",
+                "data": 3,
+                "valid": false
+            },
+            {
+                "description": "neither oneOf valid",
+                "data": 1.5,
+                "valid": false
+            }
+        ]
+    },
+    {
+        "subject": "pattern",
+        "schema": {"pattern": "^a*$"},
+        "tests": [
+            {
+                "description": "a matching pattern is valid",
+                "data": "aaa",
+                "valid": true
+            },
+            {
+                "description": "a non-matching pattern is invalid",
+                "data": "abc",
+                "valid": false
+            },
+            {
+                "description": "a matching empty pattern is valid",
+                "data": "",
+                "valid": true
+            }
+        ]
+    },
+    {
+        "subject": "patternProperties",
+        "schema": {
+            "patternProperties": {
+                "f.*o": {"type": "integer"}
+            }
+        },
+        "tests": [
+            {
+                "description": "a single valid match is valid",
+                "data": {"foo": 1},
+                "valid": true
+            },
+            {
+                "description": "multiple valid matches is valid",
+                "data": {"foo": 1, "foooooo" : 2},
+                "valid": true
+            },
+            {
+                "description": "a single invalid match is invalid",
+                "data": {"foo": "bar", "fooooo": 2},
+                "valid": false
+            },
+            {
+                "description": "multiple invalid matches is invalid",
+                "data": {"foo": "bar", "foooooo" : "baz"},
+                "valid": false
+            }
+        ]
+    },
+    {
+        "subject": "properties",
+        "schema": {
+            "properties": {
+                "foo": {"type": "integer"},
+                "bar": {"type": "string"}
+            }
+        },
+        "tests": [
+            {
+                "description": "both properties present and valid is valid",
+                "data": {"foo": 1, "bar": "baz"},
+                "valid": true
+            },
+            {
+                "description": "one property invalid is invalid",
+                "data": {"foo": 1, "bar": {}},
+                "valid": false
+            },
+            {
+                "description": "both properties invalid is invalid",
+                "data": {"foo": [], "bar": {}},
+                "valid": false
+            },
+            {
+                "description": "doesn't invalidate other properties",
+                "data": {"quux": []},
+                "valid": true
+            }
+        ]
+    },
+    {
+        "subject": "ref",
+        "schema": {
+            "definitions": {
+                "tilde~field": {"type": "integer"},
+                "slash/field": {"type": "integer"},
+                "percent%field": {"type": "integer"}
+            },
+            "properties": {
+                "tilde": {"$ref": "#/definitions/tilde~0field"},
+                "slash": {"$ref": "#/definitions/slash~1field"},
+                "percent": {"$ref": "#/definitions/percent%25field"}
+            }
+        },
+        "tests": [
+            {
+                "description": "slash invalid",
+                "data": {"slash": "aoeu"},
+                "valid": false
+            },
+            {
+                "description": "tilde invalid",
+                "data": {"tilde": "aoeu"},
+                "valid": false
+            },
+            {
+                "description": "percent invalid",
+                "data": {"percent": "aoeu"},
+                "valid": false
+            },
+            {
+                "description": "slash valid",
+                "data": {"slash": 123},
+                "valid": true
+            },
+            {
+                "description": "tilde valid",
+                "data": {"tilde": 123},
+                "valid": true
+            },
+            {
+                "description": "percent valid",
+                "data": {"percent": 123},
+                "valid": true
+            }
+        ]
+    },
+    {
+        "subject": "ref",
+        "schema": {
+            "id": "http://localhost:1234/root",
+            "allOf": [{
+                "$ref": "http://localhost:1234/nested.json#foo"
+            }],
+            "definitions": {
+                "A": {
+                    "id": "nested.json",
+                    "definitions": {
+                        "B": {
+                            "id": "#foo",
+                            "type": "integer"
+                        }
+                    }
+                }
+            }
+        },
+        "tests": [
+            {
+                "data": 1,
+                "description": "match",
+                "valid": true
+            },
+            {
+                "data": "a",
+                "description": "mismatch",
+                "valid": false
+            }
+        ]
+    },
+    {
+        "subject": "required",
+        "schema": {
+            "properties": {
+                "foo": {},
+                "bar": {}
+            },
+            "required": ["foo"]
+        },
+        "tests": [
+            {
+                "description": "present required property is valid",
+                "data": {"foo": 1},
+                "valid": true
+            },
+            {
+                "description": "non-present required property is invalid",
+                "data": {"bar": 1},
+                "valid": false
+            }
+        ]
+    },
+    {
+        "subject": "type",
+        "schema": {
+            "type": ["array", "object"]
+        },
+        "tests": [
+            {
+                "description": "array is valid",
+                "data": [1,2,3],
+                "valid": true
+            },
+            {
+                "description": "object is valid",
+                "data": {"foo": 123},
+                "valid": true
+            },
+            {
+                "description": "number is invalid",
+                "data": 123,
+                "valid": false
+            },
+            {
+                "description": "string is invalid",
+                "data": "foo",
+                "valid": false
+            },
+            {
+                "description": "null is invalid",
+                "data": null,
+                "valid": false
+            }
+        ]
+    },
+    {
+        "subject": "type",
+        "schema": {
+            "type": "string"
+        },
+        "tests": [
+            {
+                "description": "matching type",
+                "data": "123",
+                "valid": true
+            },
+            {
+                "description": "matching empty type",
+                "data": "",
+                "valid": true
+            },
+            {
+                "description": "non-matching type",
+                "data": [],
+                "valid": false
+            }
+        ]
+    },
+    {
+        "subject": "uniqueItems",
+        "schema": {
+            "items": [{"type": "boolean"}, {"type": "boolean"}],
+            "uniqueItems": true,
+            "additionalItems": false
+        },
+        "tests": [
+            {
+                "description": "[false, true] from items array is valid",
+                "data": [false, true],
+                "valid": true
+            },
+            {
+                "description": "[true, false] from items array is valid",
+                "data": [true, false],
+                "valid": true
+            },
+            {
+                "description": "[false, false] from items array is not valid",
+                "data": [false, false],
+                "valid": false
+            },
+            {
+                "description": "[true, true] from items array is not valid",
+                "data": [true, true],
+                "valid": false
+            },
+            {
+                "description": "extra items are invalid even if unique",
+                "data": [false, true, null],
+                "valid": false
+            }
+        ]
+    }
+]

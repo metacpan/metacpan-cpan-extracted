@@ -35,9 +35,11 @@ You shouldn't make instances of this class. Each attribute should be used as a n
           InstanceGroupId => 'MyXmlStringMaxLen256',    # max: 256
           Configurations  => [
             {
-              Classification => 'MyString',
+              Classification => 'MyString',             # OPTIONAL
               Configurations => <ConfigurationList>,
-              Properties     => { 'MyString' => 'MyString', },    # OPTIONAL
+              Properties     => {
+                'MyString' => 'MyString',    # key: OPTIONAL, value: OPTIONAL
+              },    # OPTIONAL
             },
             ...
           ],    # OPTIONAL

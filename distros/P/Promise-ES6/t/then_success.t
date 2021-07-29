@@ -79,6 +79,9 @@ my $test_value = 'first';
 
     is( PromiseTest::await($p3, \@todo), 'third resolve' );
 
+    # To avoid a leak in Devel::Cover:
+    @todo = ();
+
     waitpid $pid, 0;
 }
 

@@ -7,6 +7,7 @@ package Lemonldap::NG::Portal::2F::U2F;
 use strict;
 use Mouse;
 use JSON qw(from_json to_json);
+use MIME::Base64 qw(decode_base64url);
 use Lemonldap::NG::Portal::Main::Constants qw(
   PE_OK
   PE_ERROR
@@ -15,7 +16,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_BADCREDENTIALS
 );
 
-our $VERSION = '2.0.10';
+our $VERSION = '2.0.12';
 
 extends qw(
   Lemonldap::NG::Portal::Main::SecondFactor
@@ -224,7 +225,7 @@ sub loadUser {
                       . $_->{_userKey}
                       . " / _keyHandle = "
                       . $_->{_keyHandle} );
-                $_->{_userKey} = $self->decode_base64url( $_->{_userKey} );
+                $_->{_userKey} = decode_base64url( $_->{_userKey} );
                 push @u2fs, $_;
             }
         }

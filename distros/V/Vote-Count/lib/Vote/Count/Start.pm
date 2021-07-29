@@ -13,13 +13,13 @@ use Try::Tiny;
 use Vote::Count;
 use Vote::Count::ReadBallots 'read_ballots';
 
-our $VERSION='2.00';
+our $VERSION='2.01';
 
 =head1 NAME
 
 Vote::Count::Start
 
-=head1 VERSION 2.00
+=head1 VERSION 2.01
 
 =cut
 
@@ -200,10 +200,13 @@ sub _do_irv ( $Election, $floorset ) {
 sub StartElection ( %ARGS ) {
   my $winners = {};
   _ballotset( \%ARGS );
+  delete $ARGS{'BallotFile'};
+  my $FloorValue = delete $ARGS{'FloorValue'};
+  my $FloorRule = delete $ARGS{'FloorRule'};
   my $Election = Vote::Count->new(%ARGS);
   $winners->{'plurality'} = _do_plurality($Election);
   $winners->{'approval'}  = _do_approval($Election);
-  my $floorset = _dofloor( $Election, %ARGS );
+  my $floorset = _dofloor( $Election, 'FloorRule' => $FloorRule, 'FloorValue' => $FloorValue );
   $Election->SetActive($floorset);
   $winners->{'majority'}  = _do_majority($Election);
   $winners->{'borda'}     = _do_borda($Election);

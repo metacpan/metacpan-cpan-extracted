@@ -74,9 +74,9 @@ ConnectResponseSP make_response (const Hash& params, const ConnectResponseSP& de
 
 void parser_config_in (Parser::Config& cfg, const Hash& h) {
     Scalar val;
-    if ((val = h.fetch("max_frame_size")))     cfg.max_frame_size     = Simple(val);
-    if ((val = h.fetch("max_message_size")))   cfg.max_message_size   = Simple(val);
-    if ((val = h.fetch("max_handshake_size"))) cfg.max_handshake_size = Simple(val);
+    if ((val = h.fetch("max_frame_size")))     cfg.max_frame_size     = val.number();
+    if ((val = h.fetch("max_message_size")))   cfg.max_message_size   = val.number();
+    if ((val = h.fetch("max_handshake_size"))) cfg.max_handshake_size = val.number();
     if ((val = h.fetch("check_utf8")))         cfg.check_utf8         = val.is_true();
 
     if(h.exists("deflate")) cfg.deflate.reset();
@@ -102,14 +102,14 @@ Hash parser_config_out (Parser::Config& cfg) {
 
 void deflate_config_in (DeflateExt::Config& cfg, const Hash& h) {
     Scalar val;
-    if ((val = h.fetch("server_max_window_bits")))     cfg.server_max_window_bits     = static_cast<std::uint8_t>(Simple(val));
-    if ((val = h.fetch("client_max_window_bits")))     cfg.client_max_window_bits     = static_cast<std::uint8_t>(Simple(val));
+    if ((val = h.fetch("server_max_window_bits")))     cfg.server_max_window_bits     = val.number();
+    if ((val = h.fetch("client_max_window_bits")))     cfg.client_max_window_bits     = val.number();
     if ((val = h.fetch("client_no_context_takeover"))) cfg.client_no_context_takeover = SvTRUE(val);
     if ((val = h.fetch("server_no_context_takeover"))) cfg.server_no_context_takeover = SvTRUE(val);
-    if ((val = h.fetch("mem_level")))                  cfg.mem_level                  = Simple(val);
-    if ((val = h.fetch("compression_level")))          cfg.compression_level          = Simple(val);
-    if ((val = h.fetch("strategy")))                   cfg.strategy                   = Simple(val);
-    if ((val = h.fetch("compression_threshold")))      cfg.compression_threshold      = Simple(val);
+    if ((val = h.fetch("mem_level")))                  cfg.mem_level                  = val.number();
+    if ((val = h.fetch("compression_level")))          cfg.compression_level          = val.number();
+    if ((val = h.fetch("strategy")))                   cfg.strategy                   = val.number();
+    if ((val = h.fetch("compression_threshold")))      cfg.compression_threshold      = val.number();
 }
 
 Sv deflate_config_out (const DeflateExt::Config& cfg) {

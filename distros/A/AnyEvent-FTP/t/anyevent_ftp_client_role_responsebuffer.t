@@ -3,7 +3,7 @@ use Test2::V0 -no_srand => 1;
 eval {
   package Client;
 
-  use Moo;
+  use Moo;  ## no critic (Modules::ProhibitConditionalUseStatements)
 
   with 'AnyEvent::FTP::Client::Role::ResponseBuffer';
 };
@@ -57,7 +57,7 @@ $client->process_message_line("   PASS    STRU    STOR    RNTO    CWD     CDUP  
 $client->process_message_line("   SITE    PORT    STOU    DELE    MKD     NOOP    STAT    HELP\015\012");
 $client->process_message_line("   MODE    EPRT    APPE    LIST    RMD     ABOR    PASV\015\012");
 $client->process_message_line("214 End of Help.\015\012");
-            
+
 is $count1, 3, 'total = 3';
 is $count2, 1, 'single = 1';
 is $count3, 1, 'single = 1';

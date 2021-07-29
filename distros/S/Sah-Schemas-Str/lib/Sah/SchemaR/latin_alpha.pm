@@ -1,7 +1,7 @@
 package Sah::SchemaR::latin_alpha;
 
-our $DATE = '2020-05-27'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2021-07-23'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 our $rschema = ["str",[{examples=>[{valid=>1,value=>""},{valid=>1,value=>"Abz"},{valid=>0,value=>"foo123"}],match=>qr(\A[A-Za-z]*\z),summary=>"String containing only zero or more Latin letters, i.e. A-Z or a-z"}],["str"]];
 
@@ -20,7 +20,7 @@ Sah::SchemaR::latin_alpha - String containing only zero or more Latin letters, i
 
 =head1 VERSION
 
-This document describes version 0.002 of Sah::SchemaR::latin_alpha (from Perl distribution Sah-Schemas-Str), released on 2020-05-27.
+This document describes version 0.003 of Sah::SchemaR::latin_alpha (from Perl distribution Sah-Schemas-Str), released on 2021-07-23.
 
 =head1 DESCRIPTION
 
@@ -50,7 +50,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

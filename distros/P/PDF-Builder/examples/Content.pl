@@ -6,8 +6,8 @@
 use warnings;
 use strict;
 
-our $VERSION = '3.022'; # VERSION
-my $LAST_UPDATE = '3.021'; # manually update whenever code is changed
+our $VERSION = '3.023'; # VERSION
+our $LAST_UPDATE = '3.023'; # manually update whenever code is changed
 
 use Math::Trig;
 use List::Util qw(min max);
@@ -2010,7 +2010,7 @@ drawCaption(['hscale()'], 'LC');
 $grfx->restore();
 
 # ----------------------------------------------------
-# 46. lead(): show 1.1 tight, 1.4 normal, 2.5 double-space * 10 pt font
+# 46. leading(): show 1.1 tight, 1.4 normal, 2.5 double-space * 10 pt font
 @cellLoc = makeCellLoc(0);
 @cellSize = (170, 131); 
 $grfx->save();
@@ -2022,25 +2022,25 @@ makeCell(@cellLoc, @cellSize);
 $text->font($fontR, 10);
 
 $text->translate($base[0]+15, $base[1]+110);
-$text->lead(10*1.1);
+$text->leading(10*1.1);
 $text->text('tight leading');
 $text->cr();
 $text->text('at 110% of font size');
 
 $text->translate($base[0]+15, $base[1]+75);
-$text->lead(10*1.4);
+$text->leading(10*1.4);
 $text->text('normal leading');
 $text->cr();
 $text->text('at 140% of font size');
 
 $text->translate($base[0]+15, $base[1]+40);
-$text->lead(10*2.5);
+$text->leading(10*2.5);
 $text->text('double space leading');
 $text->cr();
 $text->text('at 250% of font size');
 
 # caption
-drawCaption(['lead()'], 'LC');
+drawCaption(['leading()'], 'LC');
 
 $grfx->restore();
 
@@ -2183,7 +2183,7 @@ makeCell(@cellLoc, @cellSize);
 $text->font($fontR, 12);
 $text->strokecolor('black');
 $text->fillcolor('black');
-$text->lead(15);
+$text->leading(15);
 
 $text->translate($base[0]+15, $base[1]+105);
 $text->text('cr()');
@@ -2223,7 +2223,7 @@ makeCell(@cellLoc, @cellSize);
 $text->font($fontR, 12);
 $text->strokecolor('black');
 $text->fillcolor('black');
-$text->lead(15);
+$text->leading(15);
 
 $text->translate($base[0]+25, $base[1]+105);
 $text->text('Here is some text.');
@@ -2258,7 +2258,7 @@ makeCell(@cellLoc, @cellSize);
 $text->font($fontR, 12);
 $text->strokecolor('black');
 $text->fillcolor('black');
-$text->lead(15);
+$text->leading(15);
 
 $text->translate($base[0]+15, $base[1]+100);
 $text->text('Here is some text.');
@@ -2288,7 +2288,7 @@ makeCell(@cellLoc, @cellSize);
 $text->font($fontR, 12);
 $text->strokecolor('black');
 $text->fillcolor('black');
-$text->lead(15);
+$text->leading(15);
 
 $text->translate($base[0]+15, $base[1]+110);
 $text->text('Some underlined text.', -underline=>'auto');
@@ -2323,7 +2323,7 @@ makeCell(@cellLoc, @cellSize);
 $text->font($fontR, 12);
 $text->strokecolor('black');
 $text->fillcolor('black');
-$text->lead(15);
+$text->leading(15);
 
 $text->translate($base[0]+12, $base[1]+85);
 $text->text('Auto ');
@@ -2363,7 +2363,7 @@ makeCell(@cellLoc, @cellSize);
 $text->font($fontR, 12);
 $text->strokecolor('black');
 $text->fillcolor('black');
-$text->lead(15);
+$text->leading(15);
 
 $grfx->linewidth(1);
 $grfx->strokecolor('green');
@@ -2373,7 +2373,7 @@ $text->translate($base[0]+5, $base[1]+ 95);
 $i = ' some text to put in a box ';
 $text->text($i);
 $lw = $text->advancewidth($i);
-$grfx->rect(5,95-$text->lead()/4, $lw,$text->lead());
+$grfx->rect(5,95-$text->leading()/4, $lw,$text->leading());
 $grfx->stroke();
 
 $text->font($fontR, 36);
@@ -2381,7 +2381,7 @@ $text->translate($base[0]+5, $base[1]+ 35);
 $i = ' more text ';
 $text->text($i);
 $lw = $text->advancewidth($i);
-$grfx->rect(5,35-3*$text->lead()/4, $lw,3*$text->lead());
+$grfx->rect(5,35-3*$text->leading()/4, $lw,3*$text->leading());
 $grfx->stroke();
 
 # caption
@@ -2402,7 +2402,7 @@ makeCell(@cellLoc, @cellSize);
 $text->font($fontR, 12);
 $text->strokecolor('black');
 $text->fillcolor('black');
-$text->lead(15);
+$text->leading(15);
 
 $grfx->linewidth(1);
 $grfx->strokecolor('red');

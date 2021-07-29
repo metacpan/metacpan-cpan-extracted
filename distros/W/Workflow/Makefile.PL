@@ -37,6 +37,7 @@ my %WriteMakefileArgs = (
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
     "List::MoreUtils" => 0,
+    "Mock::MonkeyPatch" => 0,
     "Pod::Coverage::TrustPod" => 0,
     "Test::Exception" => 0,
     "Test::Kwalitee" => "1.21",
@@ -44,7 +45,7 @@ my %WriteMakefileArgs = (
     "Test::Pod" => "1.41",
     "Test::Pod::Coverage" => "1.08"
   },
-  "VERSION" => "1.54",
+  "VERSION" => "1.56",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -68,6 +69,7 @@ my %FallbackPrereqs = (
   "IPC::Open3" => 0,
   "List::MoreUtils" => 0,
   "Log::Log4perl" => "0.34",
+  "Mock::MonkeyPatch" => 0,
   "Pod::Coverage::TrustPod" => 0,
   "Safe" => 0,
   "Test::Exception" => 0,

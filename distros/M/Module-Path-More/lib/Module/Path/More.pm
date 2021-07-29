@@ -1,7 +1,9 @@
 package Module::Path::More;
 
-our $DATE = '2017-02-01'; # DATE
-our $VERSION = '0.33'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-07-20'; # DATE
+our $DIST = 'Module-Path-More'; # DIST
+our $VERSION = '0.340'; # VERSION
 
 use 5.010001;
 use strict;
@@ -266,7 +268,7 @@ Module::Path::More - Get path to locally installed Perl module
 
 =head1 VERSION
 
-This document describes version 0.33 of Module::Path::More (from Perl distribution Module-Path-More), released on 2017-02-01.
+This document describes version 0.340 of Module::Path::More (from Perl distribution Module-Path-More), released on 2021-07-20.
 
 =head1 SYNOPSIS
 
@@ -319,10 +321,20 @@ installed. If you use:
 then it only works if the module is locatable in the filesystem. But on the
 other hand this method can avoid actual loading of the module.
 
+=head1 CONTRIBUTOR
+
+=for stopwords Steven Haryanto
+
+Steven Haryanto <sharyanto@cpan.org>
+
 =head1 FUNCTIONS
 
 
-=head2 module_path(%args) -> str|array[str]
+=head2 module_path
+
+Usage:
+
+ module_path(%args) -> str|array[str]
 
 Get path to locally installed Perl module.
 
@@ -332,11 +344,21 @@ Examples:
 
 =item * Find the first Foo::Bar (.pm or .pmc) in @INC:
 
- module_path(module => "Foo::Bar"); # -> undef
+ module_path(module => "Foo::Bar");
+
+Result:
+
+ "/home/s1/perl5/perlbrew/perls/perl-5.30.2/lib/site_perl/5.30.2/Foo/Bar.pm"
 
 =item * Find all Foo::Bar (.pm or .pmc) in @INC, return absolute paths:
 
- module_path(module => "Foo::Bar", abs => 1, all => 1); # -> []
+ module_path(module => "Foo::Bar", abs => 1, all => 1);
+
+Result:
+
+ [
+   "/zpool_host_mnt/mnt/home/s1/perl5/perlbrew/perls/perl-5.30.2/lib/site_perl/5.30.2/Foo/Bar.pm",
+ ]
 
 =item * Find the Rinci (.pod first, then .pm) in @INC:
 
@@ -344,7 +366,7 @@ Examples:
 
 Result:
 
- "/home/u1/perl5/perlbrew/perls/perl-5.24.0/lib/site_perl/5.24.0/Rinci.pod"
+ "/home/s1/perl5/perlbrew/perls/perl-5.30.2/lib/site_perl/5.30.2/Rinci.pod"
 
 =back
 
@@ -413,12 +435,18 @@ first.
 
 Module name to search.
 
+
 =back
 
 Return value:  (str|array[str])
 
 
-=head2 pod_path(%args) -> str|array[str]
+
+=head2 pod_path
+
+Usage:
+
+ pod_path(%args) -> str|array[str]
 
 Get path to locally installed POD.
 
@@ -444,6 +472,7 @@ Return all results instead of just the first.
 
 Module name to search.
 
+
 =back
 
 Return value:  (str|array[str])
@@ -466,6 +495,8 @@ feature.
 
 =head1 SEE ALSO
 
+=head2 Similar modules
+
 L<Module::Path>. Module::Path::More is actually a fork of Module::Path.
 Module::Path::More contains features that are not (or have not been accepted) in
 the original module, namely: finding all matches instead of the first found
@@ -480,8 +511,9 @@ might not want to deal with at all. However, if you want to do abs_path, you can
 do so by setting C<abs> option to true.
 
 Command-line utility is not included in this distribution, unlike L<mpath> in
-C<Module-Path>. However, you can use L<pmpath|https://metacpan.org/pod/distribution/App-PMUtils/bin/pmpath> from L<App::PMUtils> distribution
-which uses this module.
+C<Module-Path>. However, you can use
+L<pmpath|https://metacpan.org/pod/distribution/App-PMUtils/bin/pmpath> from
+L<App::PMUtils> distribution which uses this module.
 
 References:
 
@@ -497,13 +529,22 @@ References:
 
 =back
 
+=head2 Task-related
+
+If you want to check if a module is "installed", use L<Module::Installed::Tiny>
+instead. Module::Path::More only tries to find the module file in the
+filesystem, but Perl can actually search for modules in other sources (read
+about %INC hook in C<require()> section of L<perlfunc>). Module::Installed::Tiny
+can mimic Perl's behavior in searching for modules, without actually loading the
+module.
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

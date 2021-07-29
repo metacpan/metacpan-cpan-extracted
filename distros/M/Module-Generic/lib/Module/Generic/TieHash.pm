@@ -181,3 +181,31 @@ sub _exclude
 1;
 
 __END__
+
+=encoding utf-8
+
+=head1 NAME
+
+Module::Generic - Generic Tie Hash Mechanism for Object Oriented Hashes
+
+=head1 SYNOPSIS
+
+    my $tie = tie( %hash, 'Module::Generic::TieHash' );
+
+=head1 VERSION
+
+    v1.0.0
+
+=head1 AUTHOR
+
+Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright (c) 2020-2021 DEGUEST Pte. Ltd.
+
+You can use, copy, modify and redistribute this package and associated
+files under the same terms as Perl itself.
+
+=cut
+

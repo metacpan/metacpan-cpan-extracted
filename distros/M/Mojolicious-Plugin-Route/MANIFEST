@@ -1,0 +1,17 @@
+Makefile.PL
+Changes
+MANIFEST
+META.json
+META.yml
+README.md
+t/load.t
+t/lite.t
+t/Lite/Route/Bar.pm
+t/Lite/Route/Bar/Qux.pm
+t/Lite/Route/Bar/Qux/B.pm
+t/Lite/Route/Baz.pm
+t/Lite/Route/Baz/A.pm
+t/Lite/Route/Foo.pm
+lib/Mojolicious/Plugin/Route.pm
+lib/MojoX/Route.pm
+cpanfile

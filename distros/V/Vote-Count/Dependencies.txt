@@ -10,6 +10,7 @@ Math::BigInt::GMP
 Math::BigRat
 Moose
 Moose::Role
+MooseX::StrictConstructor;
 namespace::autoclean
 Path::Tiny
 Sort::Hash

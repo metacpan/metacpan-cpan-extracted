@@ -2,14 +2,17 @@ NAME
     Getopt::Long::Util - Utilities for Getopt::Long
 
 VERSION
-    This document describes version 0.892 of Getopt::Long::Util (from Perl
-    distribution Getopt-Long-Util), released on 2020-10-27.
+    This document describes version 0.895 of Getopt::Long::Util (from Perl
+    distribution Getopt-Long-Util), released on 2021-07-10.
+
+CONTRIBUTOR
+    Steven Haryanto <sharyanto@cpan.org>
 
 FUNCTIONS
   detect_getopt_long_script
     Usage:
 
-     detect_getopt_long_script(%args) -> [status, msg, payload, meta]
+     detect_getopt_long_script(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
     Detect whether a file is a Getopt::Long-based CLI script.
 
@@ -43,12 +46,15 @@ FUNCTIONS
 
     Returns an enveloped result (an array).
 
-    First element (status) is an integer containing HTTP status code (200
-    means OK, 4xx caller error, 5xx function error). Second element (msg) is
-    a string containing error message, or 'OK' if status is 200. Third
-    element (payload) is optional, the actual result. Fourth element (meta)
-    is called result metadata and is optional, a hash that contains extra
-    information.
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
 
     Return value: (any)
 
@@ -81,26 +87,36 @@ FUNCTIONS
   humanize_getopt_long_opt_spec
     Usage:
 
-     humanize_getopt_long_opt_spec( [ \%optional_named_args ] , $optspec) -> str
+     humanize_getopt_long_opt_spec( [ \%optional_named_args ] , $optspec) -> str|hash
 
     Convert Getopt::Long option specification into a more human-friendly
     notation that is suitable for including in help/usage text, for example:
 
-     help|h|?       ->  --help, -h, -?
-     help|h|?       ->  --help | -h | -?  (if you provide 'separator')
-     --foo=s        ->  --foo=s
-     --foo=s        ->  --foo=somelabel  (if you provide 'value_label')
-     --foo:s        ->  --foo[=s]
-     --foo=s@       ->  --foo=s+
-     --foo=s%       ->  --foo key=value
-     --foo=s        ->  --foo=somelabel  (if you provide 'value_label')
-     --debug!       ->  --(no)debug
+     help|h|?       ->  "--help, -h, -?"
+     help|h|?       ->  "--help | -h | -?"               # if you provide 'separator')
+     --foo=s        ->  "--foo=s"
+     --foo=s        ->  "--foo=somelabel"                # if you provide 'value_label'
+     --foo:s        ->  "--foo[=s]"
+     --foo=s@       ->  "(--foo=s)+"
+     --foo=s%       ->  "(--foo key=value)+"
+     --foo=s%       ->  "(--foo somelabel1=somelabel2)+" # if you provide 'key_label' and 'value_label'
+     --debug!       ->  "--(no)debug"
+
+    It also produces POD-formatted string for use in POD documentation:
+
+     --foo=s        ->  {plaintext=>"--foo=s", pod=>"B<--foo>=I<s>"}
+                                                         # if you set 'extended' to true
 
     Will die if can't parse the optspec string.
 
     This function is not exported by default, but exportable.
 
     Arguments ('*' denotes required arguments):
+
+    *   extended => *bool*
+
+        If set to true, will return a hash of multiple formats instead of a
+        single plaintext format.
 
     *   key_label => *str* (default: "key")
 
@@ -110,7 +126,7 @@ FUNCTIONS
 
     *   value_label => *str*
 
-    Return value: (str)
+    Return value: (str|hash)
 
   parse_getopt_long_opt_spec
     Usage:
@@ -191,7 +207,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2020, 2016, 2015, 2014 by
+    This software is copyright (c) 2021, 2016, 2015, 2014 by
     perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under

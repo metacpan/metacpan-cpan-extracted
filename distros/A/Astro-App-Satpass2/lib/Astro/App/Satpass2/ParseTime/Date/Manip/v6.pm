@@ -9,7 +9,7 @@ use parent qw{ Astro::App::Satpass2::ParseTime::Date::Manip };
 
 use Astro::App::Satpass2::Utils qw{ load_package @CARP_NOT };
 
-our $VERSION = '0.047';
+our $VERSION = '0.048';
 
 my $invalid;
 
@@ -81,13 +81,34 @@ sub tz {
     return $self->SUPER::tz( @args );
 }
 
+sub __back_end_validate {
+    my ( $self, $cls ) = @_;
+    $cls->can( 'parse' )
+	or $self->wail( "$cls does not have a parse() method" );
+    return;
+}
+
+sub __set_back_end_location {
+    my ( $self, $location ) = @_;
+    if ( my $dm = $self->_get_dm_field( 'object' ) ) {
+	# NOTE that we have no way to introspect Date::Manip::Date (or
+	# any other back end) to see if it has the 'location' config, so
+	# since Date::Manip uses warn() to report errors, we just
+	# blindly set it and swallow the possible warning.
+	local $SIG{__WARN__} = sub {};
+	$dm->config( location => $location );
+    }
+    return;
+}
+
 sub _get_dm_field {
     my ( $self, $field ) = @_;
-    my $info = $self->{+__PACKAGE__} ||= _make_dm_hash();
+    my $info = $self->{+__PACKAGE__} ||= $self->_make_dm_hash();
     return $info->{$field};
 }
 
 sub _make_dm_hash {
+    my ( $self ) = @_;
 
     # Workaround for bug (well, _I_ think it's a bug) introduced into
     # Date::Manip with 6.34, while fixing RT #78566. My bug report is RT
@@ -95,7 +116,8 @@ sub _make_dm_hash {
     my $path = $ENV{PATH};
     local $ENV{PATH} = $path;
 
-    my $dm = Date::Manip::Date->new();
+    my $back_end = $self->back_end() || 'Date::Manip::Date';
+    my $dm = $back_end->new();
     return {
 	default_zone	=> scalar $dm->tz->zone(),
 	object		=> $dm,

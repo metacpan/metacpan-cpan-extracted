@@ -1,0 +1,159 @@
+#!/usr/bin/env perl
+
+use 5.010;
+
+use strict;
+use warnings;
+
+use File::Find;
+use Getopt::Long 2.33 qw{ :config auto_version };
+use Pod::Usage;
+
+our $VERSION = '0.001';
+
+my %opt;
+
+GetOptions( \%opt,
+    qw{ verbose! },
+    help => sub { pod2usage( { -verbose => 2 } ) },
+) and @ARGV < 2 or pod2usage( { -verbose => 0 } );
+
+@ARGV
+    or @ARGV = qw{ ref/Date-Manip/t };
+
+-d $ARGV[0]
+    or die "Directory $ARGV[0] not found\n";
+
+find( \&mung_file, @ARGV );
+
+sub mung_file {
+    -f $_
+	and -T _
+	or return;
+
+    local $/ = undef;
+    open my $fh, '<', $_
+	or die "Unable to open $_ for input: $!\n";
+    my $data = <$fh>;
+    close $fh;
+    $data =~ m/ \b Date::ManipX::Almanac \b /smx
+	and return;
+    {
+	no warnings qw{ uninitialized };
+
+	$data =~ s/ \b Date::Manip \K ( ::Date )? \b (?! : ) /X::Almanac$1/smxg
+	    or return;
+
+	'tests.pl' eq $_
+	    and $data =~ s' \b use \s+ Date::ManipX::Almanac \b [^\n] \n \K '
+{
+    no warnings qw{ redefine };
+    *Date::ManipX::Almanac::Date::__load_language = sub {
+        my $lang = lc $_[0];
+	my $mod = "Date::ManipX::Almanac::Lang::$lang";
+	eval { Module::Load::load( $mod ); 1 }
+	    or $::ti->skip_all( "Language $lang unavailable" );
+	return $mod;
+    };
+}
+
+sub Date::ManipX::Almanac::Date::_init {
+    my ( $self, @arg ) = @_;
+    return $self->dmd()->_init( @arg );
+}
+
+'smx;
+	'obj.t' eq $_
+	    and $data =~ s/ \$type \s+ eq \s* 'TZ' [^\n]* \K \n /
+	 use Scalar::Util qw{ blessed };
+	 blessed( \$a[0] )
+	     and \$a[0]->isa( 'Date::ManipX::Almanac::Date' )
+	     and \$a[0] = \$a[0]->dmd();
+/smx
+    }
+    $opt{verbose}
+	and print "$File::Find::name\n";
+    open $fh, '>', $_
+	or die "Unable to open $_ for output: $!\n";
+    print { $fh } $data;
+    close $fh;
+    return;
+}
+
+__END__
+
+=head1 TITLE
+
+convert-to-almanac - Convert Date::Manip tests to Date::ManipX::Almanac
+
+=head1 SYNOPSIS
+
+ convert-to-almanac
+ convert-to-almanac ../Date-Manip-6.85/t
+ convert-to-almanac --help
+ convert-to-almanac --version
+
+=head1 OPTIONS
+
+=head2 --help
+
+This option displays the documentation for this script. The script then
+exits.
+
+=head2 --verbose
+
+If this Boolean option is true, the name of any file actually modified
+is written to standard output.
+
+The default is C<--no-verbose>.
+
+=head2 --version
+
+This option displays the version of this script. The script then exits.
+
+=head1 DETAILS
+
+This Perl script is designed to read all the files in a C<Date-Manip>
+test directory and modify them for use with C<Date-ManipX-Almanac>.
+
+The path to the C<Date-Manip> test directory is specified on the command
+line. If not specified, the path defaults to F<ref/Date-Manip/t>.
+
+This modification consists of:
+
+=over
+
+=item * Replacing 'Date::Manip' with 'Date::ManipX::Almanac';
+
+=item * Replacing 'Date::Manip::Date' with 'Date::ManipX::Almanac::Date';
+
+=item * Patching tests.pl to turn language load failure into skip_all;
+
+=item * Patching obj.t to pass $date->dmd() to Date::Manip::TZ->new() where appropriate.
+
+=back
+
+This script is (or at least should be) idempotent. That is, if run twice
+the second run should do nothing.
+
+=head1 AUTHOR
+
+Thomas R. Wyant, III F<wyant at cpan dot org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2021 by Thomas R. Wyant, III
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl 5.10.0. For more details, see the Artistic
+License 1.0 at
+L<https://www.perlfoundation.org/artistic-license-10.html>, and/or the
+Gnu GPL at L<http://www.gnu.org/licenses/old-licenses/gpl-1.0.txt>.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+=cut
+
+# ex: set textwidth=72 :

@@ -11,7 +11,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
 
 extends qw(Lemonldap::NG::Portal::Auth::_WebForm);
 
-our $VERSION = '2.0.3';
+our $VERSION = '2.0.12';
 
 # INITIALIZATION
 
@@ -71,17 +71,17 @@ sub authenticate {
         }
     }
     $self->userLogger->notice("Good PAM authentication for $req->{user}");
-    PE_OK;
+    return PE_OK;
 }
 
 sub setAuthSessionInfo {
     my ( $self, $req ) = @_;
     $req->sessionInfo->{authenticationLevel} = $self->conf->{pamAuthnLevel};
-    PE_OK;
+    return PE_OK;
 }
 
 sub authLogout {
-    PE_OK;
+    return PE_OK;
 }
 
 1;

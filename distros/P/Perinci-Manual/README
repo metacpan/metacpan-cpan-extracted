@@ -2,20 +2,18 @@ NAME
     Perinci::Manual - Extra documentation for Perinci
 
 VERSION
-    This document describes version 0.003 of Perinci::Manual (from Perl
-    distribution Perinci-Manual), released on 2021-07-02.
+    This document describes version 0.006 of Perinci::Manual (from Perl
+    distribution Perinci-Manual), released on 2021-07-28.
 
 DESCRIPTION
     The "Perinci" namespace contains several separate frameworks (for
     example: Perinci::Sub::Wrapper, Perinci::CmdLine), all themed around the
     Rinci and Riap specification, and each framework having its own
-    documentation.
+    documentation. This distribution contains additional, mostly
+    cross-framework documentation.
 
-    This distribution contains additional, mostly cross-framework, and
-    heavily task-oriented documentation.
-
-CONTRIBUTOR
-    perlancar (on netbook-dell-xps13) <perlancar@gmail.com>
+    The documentation is organized around the concept of "four types of
+    documentation". See <https://documentation.divio.com/> for more details.
 
 HOMEPAGE
     Please visit the project's homepage at

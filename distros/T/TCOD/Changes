@@ -1,0 +1,132 @@
+Revision history for TCOD
+
+0.009     2021-07-22 19:06:48+01:00 Europe/London
+
+    New:
+        - Add 'ev_undefined' handler to TCOD::Event::Dispatch
+    Fixes:
+        - Add missing FOV_SYMMETRIC_SHADOWCAST constant to list of FOV
+          algorithms.
+
+0.008     2021-07-19 20:51:03+01:00 Europe/London
+
+    New:
+        - TCOD::CHARMAP_TCOD and TCOD::CHARMAP_CP437 are now in the
+          TCOD::Charmap enum to allow for introspection
+        - Arguments to `dispatch` from TCOD::Event::Dispatch propagate to
+          any overridden event handlers
+    Fixes:
+        - Honour the documented default value for `vsync` in TCOD::Context
+          constructor.
+        - Made tests pass in environments without video support
+    Changes:
+        - TCOD::Context constructor returns undefined on error. Use
+          TCOD::get_error to see what happened.
+
+0.007     2021-07-16 19:56:06+01:00 Europe/London
+
+    Fixes:
+        - Fixed an issue with the parsing of positional arguments to
+          TCOD::Tileset::load_tilesheet
+
+0.006     2021-07-16 19:33:07+01:00 Europe/London
+
+    New:
+        - Added TCOD::Line to wrap line functions. This implements the code
+          in the tcod.los module in python-tcod
+        - Documented the `state` key in MouseMotion events, and added the
+          enums needed to read its value.
+        - Added `examples/paint.pl` as an example of event dispatch and line
+          calculation
+    Fixes:
+        - The clear_color argument to TCOD::Context is now correctly handled.
+        - Documentation tweaks
+
+0.005     2021-07-15 22:38:06+01:00 Europe/London
+
+    New:
+        - The TCOD::Tileset::load_tilesheet constructor now accepts named
+          parameters.
+        - Added TCOD::Context::convert_event and related methods to add
+          tile coordinates to an event with pixel coordinates.
+    Fixes:
+        - Expanded TCOD::Event documentation to include information about
+          the individual event types that are generated.
+        - Add documentation about the TCOD::Event::Dispatch role.
+        - An error in the argument parsing of TCOD::Context has been fixed.
+    Changes:
+        - The event types returned by the TCOD::Event functions have been
+          modified for consistency. Please refer to their documentation
+          for their current behaviour.
+
+0.004     2021-07-15 00:00:49+01:00 Europe/London
+
+    New:
+        - Added bindings for some additional TCOD::Context methods:
+          - new_console
+          - recommended_console_size
+    Fixes:
+        - Added missing documentation for TCOD::Context and TCOD::Tileset
+          objects.
+    Changes:
+        - The new_terminal method for TCOD::Context objects has been
+          removed. This is a deprecated method that was implemented in
+          error. The candle that burns twice as fast burns twice as bright.
+        - Some methods for TCOD::Tileset objects that have only been partially
+          implemented have been removed until they are ready for prime-time.
+
+0.003     2021-07-14 22:12:08+01:00 Europe/London
+
+    New:
+        - Added TCOD::ColorRGBA used internally in some of the
+          new API functions
+        - Added TCOD::Event to wrap around SDL2 events. This uses
+          an internal set of SDL2 bindings, while we wait for a
+          stable release on CPAN
+        - Added TCOD::Context and TCOD::Tileset modelled after the
+          recommended API in the upstream python-tcod
+    Fixes:
+        - Fixed the walk method for Path::Dijkstra objects. This
+          method, and the related is_empty, are now documented and tested.
+    Changes:
+        - Imported bundled fonts from python-tcod to replace the
+          old ones with licensing issues.
+        - The TCOD::Console API has been updated to reflect
+          upstream deprecated methods.
+
+          The following methods were removed:
+          - hline
+          - print_ex
+          - print_ex_utf
+          - print_frame
+          - print_rect
+          - print_rect_ex
+          - print_rect_ex_utf
+          - print_rect_utf
+          - print_utf
+          - rect
+          - set_key_color
+          - vline
+
+          The following methods were changed:
+          - blit
+          - clear
+          - print
+
+          The following methods were added
+          - draw_frame
+          - draw_rect
+          - print_box
+
+          Please see the documentation for these methods for more details.
+
+0.002     2021-07-11 16:58:16+01:00 Europe/London
+
+    Fixes:
+        - Dependencies on FFI libraries are properly reported
+    Changes:
+        - The FontFlags enum was renamed to FontFlag for consistency
+
+0.001     2021-07-08 23:58:46+01:00 Europe/London
+
+        First version.

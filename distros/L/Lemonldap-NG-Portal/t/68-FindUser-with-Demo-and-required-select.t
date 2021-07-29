@@ -5,11 +5,10 @@ use IO::String;
 
 require 't/test-lib.pm';
 
-my $maintests = 26;
+my $maintests = 25;
 
 my $res;
 my $json;
-my $request;
 my $client = LLNG::Manager::Test->new( {
         ini => {
             logLevel                    => 'error',
@@ -39,14 +38,14 @@ ok( $res = $client->_get( '/', accept => 'text/html' ), 'Get Portal', );
 my ( $host, $url, $query ) =
   expectForm( $res, '#', undef, 'user', 'password', 'spoofId' );
 
-$request = '';
+my $request = '';
 ok(
     $res = $client->_post(
         '/finduser', IO::String->new($request),
         accept => 'text/html',
         length => length($request)
     ),
-    'Post empty FindFuser request'
+    'Post empty FindUser request'
 );
 ( $host, $url, $query ) =
   expectForm( $res, '#', undef, 'user', 'password', 'spoofId' );
@@ -64,10 +63,8 @@ ok(
         accept => 'text/html',
         length => length($request)
     ),
-    'Post FindFuser request'
+    'Post FindUser request'
 );
-ok( $res->[2]->[0] =~ m%value="davros"%, 'value="davros"' )
-  or explain( $res->[2]->[0], 'value="davros"' );
 ok( $res->[2]->[0] =~ m%autocomplete="off"%, 'autocomplete="off"' )
   or explain( $res->[2]->[0], 'autocomplete="off"' );
 ok(
@@ -110,7 +107,7 @@ ok(
         accept => 'application/json',
         length => length($request)
     ),
-    'Post FindFuser request'
+    'Post FindUser request'
 );
 ok( $json = eval { from_json( $res->[2]->[0] ) }, 'Response is JSON' )
   or print STDERR "$@\n" . Dumper($res);
@@ -124,7 +121,7 @@ ok(
         accept => 'application/json',
         length => length($request)
     ),
-    'Post FindFuser request'
+    'Post FindUser request'
 );
 ok( $json = eval { from_json( $res->[2]->[0] ) }, 'Response is JSON' )
   or print STDERR "$@\n" . Dumper($res);
@@ -140,7 +137,7 @@ ok(
         accept => 'application/json',
         length => length($request)
     ),
-    'Post FindFuser request'
+    'Post FindUser request'
 );
 ok( $json = eval { from_json( $res->[2]->[0] ) }, 'Response is JSON' )
   or print STDERR "$@\n" . Dumper($res);

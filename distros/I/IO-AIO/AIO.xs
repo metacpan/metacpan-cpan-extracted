@@ -229,6 +229,11 @@ static void req_destroy  (eio_req *grp);
 # define PAGESIZE sysconf (_SC_PAGESIZE)
 #endif
 
+/* solaris perl seems to declare a wrong syscall function that clashes with system includes */
+#ifdef __sun
+# undef HAVE_SYSCALL
+#endif
+
 #if HAVE_SYSCALL
 #include <sys/syscall.h>
 #else
@@ -1200,6 +1205,10 @@ BOOT:
     const_iv (MAP_32BIT)
     const_iv (MAP_HUGETLB)
     const_iv (MAP_STACK)
+    const_iv (MAP_FIXED_NOREPLACE)
+    const_iv (MAP_SHARED_VALIDATE)
+    const_iv (MAP_SYNC)
+    const_iv (MAP_UNINITIALIZED)
 
     const_iv (MREMAP_MAYMOVE)
     const_iv (MREMAP_FIXED)
@@ -2675,6 +2684,7 @@ pidfd_send_signal (SV *pidfh, int sig, SV *siginfo = &PL_sv_undef, unsigned int 
 	PPCODE:
 {
 	int res;
+#if HAVE_SIGINFO_T
 	siginfo_t si = { 0 };
 
         if (SvOK (siginfo))
@@ -2683,7 +2693,7 @@ pidfd_send_signal (SV *pidfh, int sig, SV *siginfo = &PL_sv_undef, unsigned int 
             SV **svp;
 
             if (!SvROK (siginfo) || SvTYPE (SvRV (siginfo)) != SVt_PVHV)
-              croak ("siginfo argument must be a hashref code, pid, uid and value_int or value_ptr members, caught");
+              croak ("siginfo argument must be a hashref with 'code', 'pid', 'uid' and 'value_int' or 'value_ptr' members, caught");
 
             hv = (HV *)SvRV (siginfo);
 
@@ -2696,6 +2706,9 @@ pidfd_send_signal (SV *pidfh, int sig, SV *siginfo = &PL_sv_undef, unsigned int 
 
         /*GENDEF0_SYSCALL(pidfd_send_signal,424)*/
         res = syscall (SYS_pidfd_send_signal, s_fileno_croak (pidfh, 0), sig, SvOK (siginfo) ? &si : 0, flags);
+#else
+        res = (errno = ENOSYS, -1);
+#endif
 
         XPUSHs (sv_2mortal (newSViv (res)));
 }

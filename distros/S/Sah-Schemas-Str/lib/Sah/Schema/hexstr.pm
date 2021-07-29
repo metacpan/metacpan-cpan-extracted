@@ -1,9 +1,9 @@
 package Sah::Schema::hexstr;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-05-27'; # DATE
+our $DATE = '2021-07-23'; # DATE
 our $DIST = 'Sah-Schemas-Str'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 our $schema = [str => {
     summary => 'String of bytes in hexadecimal',
@@ -18,7 +18,7 @@ our $schema = [str => {
         {value=>'a0ff12345678', valid=>1},
     ],
 
-}, {}];
+}];
 
 1;
 # ABSTRACT: String of bytes in hexadecimal
@@ -35,7 +35,7 @@ Sah::Schema::hexstr - String of bytes in hexadecimal
 
 =head1 VERSION
 
-This document describes version 0.002 of Sah::Schema::hexstr (from Perl distribution Sah-Schemas-Str), released on 2020-05-27.
+This document describes version 0.003 of Sah::Schema::hexstr (from Perl distribution Sah-Schemas-Str), released on 2021-07-23.
 
 =head1 SYNOPSIS
 
@@ -65,7 +65,8 @@ To specify schema in L<Rinci> function metadata and use the metadata with
 L<Perinci::CmdLine> to create a CLI:
 
  # in lib/MyApp.pm
- package MyApp;
+ package
+   MyApp;
  our %SPEC;
  $SPEC{myfunc} = {
      v => 1.1,
@@ -85,9 +86,10 @@ L<Perinci::CmdLine> to create a CLI:
  1;
 
  # in myapp.pl
- package main;
+ package
+   main;
  use Perinci::CmdLine::Any;
- Perinci::CmdLine::Any->new(url=>'MyApp::myfunc')->run;
+ Perinci::CmdLine::Any->new(url=>'/MyApp/myfunc')->run;
 
  # in command-line
  % ./myapp.pl --help
@@ -134,7 +136,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

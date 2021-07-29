@@ -3,11 +3,11 @@
 #
 #  (C) Paul Evans, 2014-2021 -- leonerd@leonerd.org.uk
 
-package Device::BusPirate::Mode::SPI 0.22;
-
 use v5.14;
-use warnings;
-use base qw( Device::BusPirate::Mode );
+use Object::Pad 0.45;
+
+package Device::BusPirate::Mode::SPI 0.23;
+class Device::BusPirate::Mode::SPI isa Device::BusPirate::Mode;
 
 use Carp;
 
@@ -61,21 +61,27 @@ L<Future> instances.
 
 =cut
 
-async sub start
+has $_open_drain :mutator;
+has $_cke        :mutator;
+has $_ckp        :mutator;
+has $_sample     :mutator;
+has $_cs_high;
+has $_speed;
+has $_version;
+
+async method start
 {
-   my $self = shift;
-
    # Bus Pirate defaults
-   $self->{open_drain} = 1;
-   $self->{cke}        = 0;
-   $self->{ckp}        = 1;
-   $self->{sample}     = 0;
+   $_open_drain = 1;
+   $_cke        = 0;
+   $_ckp        = 1;
+   $_sample     = 0;
 
-   $self->{cs_high} = 0;
-   $self->{speed}   = 0;
+   $_cs_high = 0;
+   $_speed   = 0;
 
    await $self->_start_mode_and_await( "\x01", "SPI" );
-   ( $self->{version} ) = await $self->pirate->read( 1, "SPI start" );
+   ( $_version ) = await $self->pirate->read( 1, "SPI start" );
 
    print STDERR "PIRATE SPI STARTED\n" if PIRATE_DEBUG;
    return $self;
@@ -157,11 +163,8 @@ my %SPEEDS = (
    '8M'   => 7,
 );
 
-sub configure
+method configure ( %args )
 {
-   my $self = shift;
-   my %args = @_;
-
    # Convert other forms of specifying SPI modes
 
    if( defined $args{mode} ) {
@@ -173,31 +176,30 @@ sub configure
    defined $args{cpol} and $args{ckp} =  delete $args{cpol};
    defined $args{cpha} and $args{cke} = !delete $args{cpha};
 
-   defined $args{$_} and $self->{$_} = !!$args{$_}
-      for (qw( cs_high ));
+   defined $args{cs_high} and $_cs_high = !!$args{cs_high};
 
    my @f;
 
-   if( any { defined $args{$_} and !!$args{$_} != $self->{$_} } qw( open_drain ckp cke sample ) ) {
-      defined $args{$_} and $self->{$_} = !!$args{$_} for qw( open_drain ckp cke sample );
+   if( any { defined $args{$_} and !!$args{$_} != $self->$_ } qw( open_drain ckp cke sample ) ) {
+      defined $args{$_} and $self->$_ = !!$args{$_} for qw( open_drain ckp cke sample );
 
       push @f, $self->pirate->write_expect_ack(
          chr( 0x80 |
-            ( $self->{open_drain} ? 0 : 0x08 ) | # sense is reversed
-            ( $self->{ckp}     ? 0x04 : 0 ) |
-            ( $self->{cke}     ? 0x02 : 0 ) |
-            ( $self->{sample}  ? 0x01 : 0 ) ), "SPI configure" );
+            ( $_open_drain ? 0 : 0x08 ) | # sense is reversed
+            ( $_ckp     ? 0x04 : 0 ) |
+            ( $_cke     ? 0x02 : 0 ) |
+            ( $_sample  ? 0x01 : 0 ) ), "SPI configure" );
    }
 
    if( defined $args{speed} ) {{
       my $speed = $SPEEDS{$args{speed}} //
          croak "Unrecognised speed '$args{speed}'";
 
-      last if $speed == $self->{speed};
+      last if $speed == $_speed;
 
-      $self->{speed} = $speed;
+      $_speed = $speed;
       push @f, $self->pirate->write_expect_ack(
-         chr( 0x60 | $self->{speed} ), "SPI set speed" );
+         chr( 0x60 | $_speed ), "SPI set speed" );
    }}
 
    return Future->needs_all( @f );
@@ -213,14 +215,13 @@ depending on the setting of the C<open_drain> configuration.
 
 =cut
 
-sub chip_select
+method chip_select
 {
-   my $self = shift;
-   $self->{cs} = !!shift;
+   $self->_set_cs( my $_cs = !!shift );
 
-   print STDERR "PIRATE SPI CHIP-SELECT(", $self->{cs} || "0", ")\n" if PIRATE_DEBUG;
+   print STDERR "PIRATE SPI CHIP-SELECT(", $_cs || "0", ")\n" if PIRATE_DEBUG;
 
-   $self->pirate->write_expect_ack( $self->{cs} ? "\x03" : "\x02", "SPI chip_select" );
+   $self->pirate->write_expect_ack( $_cs ? "\x03" : "\x02", "SPI chip_select" );
 }
 
 =head2 writeread
@@ -237,18 +238,15 @@ This is performed atomically using the C<enter_mutex> method.
 
 =cut
 
-async sub _writeread
+async method _writeread ( $bytes )
 {
-   my $self = shift;
-   my ( $bytes ) = @_;
-
    printf STDERR "PIRATE SPI WRITEREAD %v02X\n", $bytes if PIRATE_DEBUG;
 
    # "Bulk Transfer" command can only send up to 16 bytes at once.
 
    # The Bus Pirate seems to have a bug, where at the lowest (30k) speed, bulk
    # transfers of more than 6 bytes get stuck and lock up the hardware.
-   my $maxchunk = $self->{speed} == 0 ? 6 : 16;
+   my $maxchunk = $_speed == 0 ? 6 : 16;
 
    my @chunks = $bytes =~ m/(.{1,$maxchunk})/gs;
    my $ret = "";
@@ -265,11 +263,8 @@ async sub _writeread
    return $ret;
 }
 
-sub writeread
+method writeread ( $bytes )
 {
-   my $self = shift;
-   my ( $bytes ) = @_;
-
    $self->pirate->enter_mutex( sub {
       $self->_writeread( $bytes )
    });
@@ -287,15 +282,12 @@ This is performed atomically using the C<enter_mutex> method.
 
 =cut
 
-sub writeread_cs
+method writeread_cs ( $bytes )
 {
-   my $self = shift;
-   my ( $bytes ) = @_;
-
    $self->pirate->enter_mutex( async sub {
-      await $self->chip_select( $self->{cs_high} );
+      await $self->chip_select( $_cs_high );
       my $buf = await $self->_writeread( $bytes );
-      await $self->chip_select( !$self->{cs_high} );
+      await $self->chip_select( !$_cs_high );
       return $buf;
    });
 }

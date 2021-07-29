@@ -31,12 +31,15 @@ You shouldn't make instances of this class. Each attribute should be used as a n
     my $pinpoint = Paws->service('Pinpoint');
     my $CreateEmailTemplateResponse = $pinpoint->CreateEmailTemplate(
       EmailTemplateRequest => {
-        DefaultSubstitutions => 'My__string',
-        HtmlPart             => 'My__string',
-        Subject              => 'My__string',
-        Tags                 => { 'My__string' => 'My__string', },    # OPTIONAL
-        TemplateDescription  => 'My__string',
-        TextPart             => 'My__string',
+        DefaultSubstitutions => 'My__string',    # OPTIONAL
+        HtmlPart             => 'My__string',    # OPTIONAL
+        RecommenderId        => 'My__string',    # OPTIONAL
+        Subject              => 'My__string',    # OPTIONAL
+        Tags                 => {
+          'My__string' => 'My__string',    # key: OPTIONAL, value: OPTIONAL
+        },    # OPTIONAL
+        TemplateDescription => 'My__string',    # OPTIONAL
+        TextPart            => 'My__string',    # OPTIONAL
       },
       TemplateName => 'My__string',
 

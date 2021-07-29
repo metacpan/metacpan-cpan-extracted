@@ -57,8 +57,8 @@ use Promise::ES6;
     waitpid $pid, 0;
 
     # This appears to be needed to solve a garbage-collection problem
-    # that Perl 5.18 fixed.
-    splice @resolves if $^V lt 5.18.0;
+    # that Perl 5.18 fixed but that persists with Devel::Cover.
+    splice @resolves if $^V lt 5.18.0 || $INC{'Devel/Cover.pm'};
 }
 
 done_testing();

@@ -1,6 +1,5 @@
 package Giblog;
 
-use 5.008007;
 use strict;
 use warnings;
 
@@ -11,7 +10,7 @@ use Pod::Usage 'pod2usage';
 use List::Util 'min';
 use File::Spec;
 
-our $VERSION = '1.02';
+our $VERSION = '2.0';
 
 sub new {
   my $class = shift;
@@ -178,39 +177,42 @@ Giblog - Web site and Blog builders you can manage with Git
 
 =head1 DESCRIPTION
 
-Giblog is B<Website and Blog builder> written by Perl.
-You can create B<your website and blog> easily.
-All created files is B<static files>, so you can manage them using B<git>.
-You can B<customize your website by Perl>.
+Giblog is a utility to create your web site or blog.
+You can create your web site or blog using C<giblog> command.
+All created files is static files, so you can manage them using B<git>.
+You can freely customize your website by editting the C<build> command.
 
 =head1 SYNOPSYS
-
+  
   # New empty web site
-  giblog new mysite
+  $ giblog new mysite
 
   # New web site
-  giblog new_website mysite
+  $ giblog new_website mysite
 
   # New blog
-  giblog new_blog mysite
+  $ giblog new_blog mysite
 
   # Change directory
-  cd mysite
+  $ cd mysite
 
   # Add new entry
-  giblog add
+  $ giblog add
 
   # Build web site
-  giblog build
+  $ giblog build
+  
+  # Serve a web site
+  $ giblog serve
 
-  # Check web site in local environment(need Mojolicious)
-  morbo serve.pl
+  # Publish web site
+  $ giblog publish origin main
 
   # Add new entry with home directory
-  giblog add --home /home/kimoto/mysite
+  $ giblog add --home /home/kimoto/mysite
 
   # Build web site with home directory
-  giblog build --home /home/kimoto/mysite
+  $ giblog build --home /home/kimoto/mysite
 
 =head1 FEATURES
 
@@ -491,16 +493,39 @@ If you need to know Giblog API, see L<Giblog::API>.
 
 =head2 Serve web site
 
-If you have L<Mojolicious>, you can serve web site in local environment.
+You can serve web site by C<serve> command.
 
-   morbo serve.pl
+   # Serve web site
+   giblog serve
 
 You see the following message.
 
-   Server available at http://127.0.0.1:3000
-   Server start
+   Web application available at http://127.0.0.1:3000
 
-If files in "templates" directory is changed, Web site is automatically rebuild.
+This command is same as the following code. L<morbo> command of L<Mojolicious> start up C<serve.pl>.
+
+   # Same as the following
+   morbo -w giblog.conf -w lib -w templates serve.pl
+
+If C<giblog.conf>, files in C<templates> or C<lib> directory is changed, Web site is automatically rebuild.
+
+If you use before Giblog 2.0, you can serve a web site by the following way.
+
+   # Old style before Giblog 2.0
+   morbo serve.pl
+
+=head2 Publish web site
+
+You can publish the web site by C<publish> command.
+
+   # Publish the web site
+   giblog publish origin main
+
+This is the same as the following command. In this example, the repository name is origin and the branch name is main. YY-mm-dd HH:MM:SS is current date and time.
+
+  git -C public add --all
+  git -C public commit -m "Published by Giblog at YY-mm-dd HH:MM:SS"
+  git -C public push origin main
 
 =head1 CONFIG FILE
 
@@ -588,6 +613,58 @@ Get Giblog config.
 
 Get home directory.
 
+=head1 DOCUMENT
+
+=over 2
+
+=item * L<Giblog>
+
+=item * L<Giblog::API>
+
+=item * L<Giblog::Command>
+
+=item * L<Giblog::Command::new>
+
+=item * L<Giblog::Command::new_website>
+
+=item * L<Giblog::Command::new_blog>
+
+=item * L<Giblog::Command::add>
+
+=item * L<Giblog::Command::build>
+
+=item * L<Giblog::Command::serve>
+
+=item * L<Giblog::Command::publish>
+
+=back
+
+=head1 FAQ
+
+=head2 Dose Giblog support Windows?
+
+Giblog does'nt support Native Windows(Strawberry Perl, or Active Perl) because Giblog depends on Git and Mojolicious.
+
+If you use Giblog in Windows, you can use WSL2.
+
+=head2 What is the lowest version of Perl supported by Giblog?
+
+Since Giblog depends on L<Mojolicious>, it is the lowest version of Perl required by Mojolicious. Current is Perl 5.16+.
+
+=head2 What is the minimum version of Git required by Giblog?
+
+This is Git 1.8.5+.
+
+=head2 What are the precautions when upgrading from Giblog 1 to Giblog 2?
+
+From Giblog 2.0 the lowest version of Perl depends on Mojolicious, so use the newest Perl possible.
+
+Git 1.8.5+ is needed.
+
+=head1 Giblog Official Site
+
+L<Giblog Official Site|https://jp.giblog.net/>
+
 =head1 AUTHOR
 
 Yuki Kimoto, C<< <kimoto.yuki at gmail.com> >>
@@ -598,7 +675,7 @@ Yasuaki Omokawa, C<< <omokawa at senk-inc.co.jp> >>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2018-2019 Yuki Kimoto.
+Copyright 2018-2021 Yuki Kimoto.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

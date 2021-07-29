@@ -1,5 +1,24 @@
 Revision history for XS-Parse-Keyword
 
+0.10    2021-07-13
+        [CHANGES]
+         * Better configure-time probing for HPUX compiler support
+
+        [BUGFIXES]
+         * Fix for CHOICE/TAGGEDCHOICE corrupting the value of ->i in the
+           result (RT136845)
+
+0.09    2021-07-12
+        [CHANGES]
+         * Attempt to support HPUX, which may need additional compiletime
+           arguments to support anonymous inner unions
+         * Better compiletime error messages by attempting to include some
+           source context in the same style as yyerror()
+         * Slight compiletime performance boost by setting PERL_NO_GET_CONTEXT
+
+        [BUGFIXES]
+         * Check for recursive parser errors and abort (RT137458)
+
 0.08    2021-06-17
         [CHANGES]
          * Support probe in XPK_CHOICE and XPK_TAGGEDCHOICE

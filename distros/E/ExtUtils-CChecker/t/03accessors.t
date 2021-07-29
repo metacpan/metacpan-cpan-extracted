@@ -1,7 +1,10 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
+use v5;
 use strict;
-use Test::More tests => 6;
+use warnings;
+
+use Test::More;
 
 use ExtUtils::CChecker;
 
@@ -21,3 +24,5 @@ is_deeply( $cc->extra_linker_flags, [], 'extra_linker_flags empty initially' );
 
 $cc->push_extra_linker_flags( "-lfoo" );
 is_deeply( $cc->extra_linker_flags, [ "-lfoo" ], 'extra_linker_flags after push_extra_linker_flags' );
+
+done_testing;

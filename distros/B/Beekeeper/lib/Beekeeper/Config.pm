@@ -3,7 +3,7 @@ package Beekeeper::Config;
 use strict;
 use warnings;
 
-our $VERSION = '0.07';
+our $VERSION = '0.09';
 
 use JSON::XS;
 use Carp;
@@ -133,7 +133,7 @@ Beekeeper::Config - Read configuration files
  
 =head1 VERSION
  
-Version 0.07
+Version 0.09
 
 =head1 SYNOPSIS
 

@@ -1,0 +1,118 @@
+# NAME
+
+JSONSchema::Validator - Validator for JSON Schema Draft4 and OpenAPI Specification 3.0
+
+# VERSION
+
+version 0.002
+
+# SYNOPSIS
+
+    # to get OpenAPI validator of schema in YAML format
+    $validator = JSONSchema::Validator->new(resource => 'file:///some/path/to/oas30.yml');
+    my ($result, $errors, $warnings) = $validator->validate_request(
+        method => 'GET',
+        openapi_path => '/user/{id}/profile',
+        parameters => {
+            path => {
+                id => 1234
+            },
+            query => {
+                details => 'short'
+            },
+            header => {
+                header => 'header value'
+            },
+            cookie => {
+                name => 'value'
+            },
+            body => [$is_exists, $content_type, $data]
+        }
+    );
+    my ($result, $errors, $warnings) = $validator->validate_response(
+        method => 'GET',
+        openapi_path => '/user/{id}/profile',
+        status => '200',
+        parameters => {
+            header => {
+                header => 'header value'
+            },
+            body => [$is_exists, $content_type, $data]
+        }
+    )
+
+    # to get Draft4 JSON Schema validator of schema in JSON format
+    $validator = JSONSchema::Validator->new(resource => 'http://example.com/draft4/schema.json')
+    my ($result, $errors) = $validator->validate_schema($object_to_validate)
+
+# DESCRIPTION
+
+OpenAPI specification and Draft4 JSON Schema validators with minimum dependencies.
+
+# CLASS METHODS
+
+## new
+
+Creates one of the following validators: JSONSchema::Validator::Draft4, JSONSchema::Validator::OAS30.
+
+    my $validator = JSONSchema::Validator->new(resource => 'file:///some/path/to/oas30.yml');
+    my $validator = JSONSchema::Validator->new(resource => 'http://example.com/draft4/schema.json');
+    my $validator = JSONSchema::Validator->new(schema => {'$schema' => 'path/to/schema', ...});
+    my $validator = JSONSchema::Validator->new(schema => {...}, specification => 'Draft4');
+
+if parameter `specification` is not specified then type of validator will be determined by `$schema` key
+for Draft4 JSON Schema and by `openapi` key for OpenAPI Specification 3.0 in `schema` parameter.
+
+### Parameters
+
+#### resources
+
+To get schema by uri
+
+#### schema
+
+To get explicitly specified schema
+
+#### specification
+
+To specify specification of schema
+
+#### validate\_schema
+
+Do not validate specified schema
+
+#### base\_uri
+
+To specify base uri of schema.
+This parameter used to build absolute path by relative reference in schema.
+By default `base_uri` is equal to the resource path if the resource parameter is specified otherwise the `$id` key in the schema.
+
+### Additional parameters
+
+Additional parameters need to be looked at in a specific validator class.
+Currently there are validators: JSONSchema::Validator::Draft4, JSONSchema::Validator::OAS30.
+
+## validate\_paths
+
+Validate all files specified by path globs.
+
+    my $result = JSONSchema::Validator->validate_paths(['/some/path/to/openapi.*.yaml', '/some/path/to/jsonschema.*.json']);
+    for my $file (keys %$result) {
+        my ($res, $errors) = @{$result->{$file}};
+    }
+
+# AUTHORS
+
+- Alexey Stavrov <logioniz@ya.ru>
+- Ivan Putintsev <uid@rydlab.ru>
+- Anton Fedotov <tosha.fedotov.2000@gmail.com>
+- Denis Ibaev <dionys@gmail.com>
+- Andrey Khozov <andrey@rydlab.ru>
+
+# COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2021 by Alexey Stavrov.
+
+This is free software, licensed under:
+
+    The MIT (X11) License

@@ -1,0 +1,79 @@
+package Perinci::Manual::Reference::FunctionMetadata::Examples::PropertyAttributeIndex; # just to make podweaver happy
+
+# AUTHORITY
+# DATE
+our $DIST = 'Perinci-Manual'; # DIST
+# VERSION
+
+1;
+# ABSTRACT: Alphabetical list of properties/attributes used in example specification in Rinci function metadata
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Perinci::Manual::Reference::FunctionMetadata::Examples::PropertyAttributeIndex - Alphabetical list of properties/attributes used in example specification in Rinci function metadata
+
+=head1 VERSION
+
+This document describes version 0.006 of Perinci::Manual::Reference::FunctionMetadata::Examples::PropertyAttributeIndex (from Perl distribution Perinci-Manual), released on 2021-07-28.
+
+=head1 INDEX
+
+=head2 x.doc.show_result
+
+2015-09-25.
+
+Bool, default true.
+
+Observed by L<Perinci::To::Doc>, L<Pod::Weaver::Plugin:Rinci>.
+
+=head2 x.doc.max_result_lines
+
+2016-09-28.
+
+Observed by L<Pod::Weaver::Plugin:Rinci>.
+
+If this attribute is set and output is more than the value set in this
+attribute, then ellipsis will be used to clip the middle of the output.
+
+Example usage: L<App::dateseq>.
+
+=head1 INDEX (DEPRECATED)
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/Perinci-Manual>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-Perinci-Manual>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-Manual>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+Other C<Perinci::Manual::Reference::**::PropertyAttributeIndex> pages.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2021 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
