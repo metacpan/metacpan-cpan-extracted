@@ -25,10 +25,6 @@ my $maindir = '..' if (-s "../OPTIONS!");
    $maindir = '.'  if (-s "./OPTIONS!");
 my $plversion = do "$maindir/OPTIONS!";
 
-if (!$plversion->{'c_plwidth'}) {
-  plan skip_all => 'plwidth not found--plplot version needs to be 5.9.10 or greater to run library tests';
-}
-
 my $tmpdir = tempdir( CLEANUP => 1 );
 
 foreach my $plplot_test_script (@scripts) {

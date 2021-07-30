@@ -4,7 +4,7 @@ package App::ElasticSearch::Utilities;
 use strict;
 use warnings;
 
-our $VERSION = '7.8'; # VERSION
+our $VERSION = '7.9'; # VERSION
 
 our $_OPTIONS_PARSED;
 our %_GLOBALS = ();
@@ -14,6 +14,9 @@ our @_CONFIGS = (
 );
 if( $ENV{HOME} ) {
     push @_CONFIGS, map { "$ENV{HOME}/.es-utils.$_" } qw( yaml yml );
+
+    my $xdg_config_home = $ENV{XDG_CONFIG_HOME} || "$ENV{HOME}/.config";
+    push @_CONFIGS, map { "${xdg_config_home}/es-utils/config.$_" } qw( yaml yml );
 }
 
 use CLI::Helpers qw(:all);
@@ -146,8 +149,6 @@ my %DEF = (
 );
 CLI::Helpers::override(verbose => 1) if $DEF{NOOP};
 
-my $BASE_URL = URI->new(sprintf "%s://%s:%d", @DEF{qw(PROTO HOST PORT)});
-
 if( $DEF{NOPROXY} ) {
     debug("Removing any active HTTP Proxies from ENV.");
     delete $ENV{$_} for qw(http_proxy HTTP_PROXY);
@@ -202,9 +203,20 @@ sub es_basic_auth {
     if( $DEF{HOST} eq $host ) {
         %auth = map { lc($_) => $DEF{$_} } qw(USERNAME PASSWORD);
     }
+    my %meta = ();
+    foreach my $k (qw( http-username password-exec )) {
+        foreach my $name ( $DEF{INDEX}, $DEF{BASE} ) {
+            next unless $name;
+            if( my $v = es_local_index_meta($k, $name) ) {
+                $meta{$k} = $v;
+                last;
+            }
+        }
+    }
 
     # Get the Username
-    $auth{username} ||= defined $DEF{USERNAME} ? $DEF{USERNAME}
+    $auth{username} ||= $meta{'http-username'} ? $meta{'http-username'}
+                      : defined $DEF{USERNAME} ? $DEF{USERNAME}
                       : defined $netrc         ? $netrc->login
                       : prompt("Username for '$host': ",
                             defined $DEF{USERNAME} ? (default => $DEF{USERNAME}) : ()
@@ -212,7 +224,7 @@ sub es_basic_auth {
 
     # Prompt for the password
     $auth{password} ||= defined $netrc ? $netrc->password
-                      : (es_pass_exec($host,$auth{username})
+                      : (es_pass_exec($host,$auth{username},$meta{'password-exec'})
                             || prompt(sprintf "Password for '%s' at '%s': ", $auth{username}, $host)
                         );
 
@@ -223,19 +235,20 @@ sub es_basic_auth {
 
 
 sub es_pass_exec {
-    my ($host,$username) = @_;
+    my ($host,$username,$exec) = @_;
     # Simplest case we can't run
-    return unless $DEF{PASSEXEC} and -x $DEF{PASSEXEC};
+    $exec ||= $DEF{PASSEXEC};
+    return unless -x $exec;
 
     my(@out,@err);
     # Run the password command captue out, error and RC
-    run3 [ $DEF{PASSEXEC}, $host, $username ], \undef, \@out, \@err;
+    run3 [ $exec, $host, $username ], \undef, \@out, \@err;
     my $rc = $?;
 
     # Record the error
     if( @err or $rc != 0 ) {
         output({color=>'red',stderr=>1},
-            sprintf("es_pass_exec() called '%s' and met with an error code '%d'", $DEF{PASSEXEC}, $rc),
+            sprintf("es_pass_exec() called '%s' and met with an error code '%d'", $exec, $rc),
             @err
         );
         return;
@@ -262,7 +275,7 @@ sub es_pattern {
 sub _get_es_version {
     return $CURRENT_VERSION if defined $CURRENT_VERSION;
     my $conn = es_connect();
-    my $resp = $conn->ua->get( $BASE_URL->as_string );
+    my $resp = $conn->ua->get( sprintf "%s://%s:%d", $conn->proto, $conn->host, $conn->port );
     if( $resp->is_success ) {
         eval {
             $CURRENT_VERSION = join('.', (split /\./,$resp->content->{version}{number})[0,1]);
@@ -283,9 +296,12 @@ my $ES = undef;
 sub es_connect {
     my ($override_servers) = @_;
 
-    my $server = $DEF{HOST};
-    my $port   = $DEF{PORT};
-    my $proto  = $DEF{PROTO};
+    my %conn = (
+        host    => $DEF{HOST},
+        port    => $DEF{PORT},
+        proto   => $DEF{PROTO},
+        timeout => $DEF{TIMEOUT},
+    );
 
     # If we're overriding, return a unique handle
     if(defined $override_servers) {
@@ -293,7 +309,7 @@ sub es_connect {
         my @servers;
         foreach my $entry ( @overrides ) {
             my ($s,$p) = split /\:/, $entry;
-            $p ||= $port;
+            $p ||= $conn{port};
             push @servers, { host => $s, port => $p };
         }
 
@@ -302,13 +318,21 @@ sub es_connect {
             return App::ElasticSearch::Utilities::Connection->new(%{$pick});
         }
     }
+    else {
+        # Check for index metadata
+        foreach my $k ( keys %conn ) {
+            foreach my $name ( $DEF{INDEX}, $DEF{BASE} ) {
+                next unless $name;
+                if( my $v = es_local_index_meta($k => $name) ) {
+                    $conn{$k} = $v;
+                    last;
+                }
+            }
+        }
+    }
 
     # Otherwise, cache our handle
-    $ES ||= App::ElasticSearch::Utilities::Connection->new(
-        host  => $server,
-        port  => $port,
-        proto => $proto,
-    );
+    $ES ||= App::ElasticSearch::Utilities::Connection->new(%conn);
 
     return $ES;
 }
@@ -348,16 +372,16 @@ sub es_request {
     my $index;
 
     if( exists $options->{index} ) {
-        my $index_in = delete $options->{index};
-
-        # No need to validate _all
-        if( $index_in eq '_all') {
-            $index = $index_in;
-        }
-        else {
-            # Validate each included index
-            my @indexes = is_arrayref($index_in) ? @{ $index_in } : split /\,/, $index_in;
-            $index = join(',', @indexes);
+        if( my $index_in = delete $options->{index} ) {
+            # No need to validate _all
+            if( $index_in eq '_all') {
+                $index = $index_in;
+            }
+            else {
+                # Validate each included index
+                my @indexes = is_arrayref($index_in) ? @{ $index_in } : split /\,/, $index_in;
+                $index = join(',', @indexes);
+            }
         }
     }
 
@@ -884,7 +908,7 @@ App::ElasticSearch::Utilities - Utilities for Monitoring ElasticSearch
 
 =head1 VERSION
 
-version 7.8
+version 7.9
 
 =head1 SYNOPSIS
 
@@ -1124,6 +1148,7 @@ field it needs to sort documents, i.e.:
     meta:
       logstash:
         timestamp: '@timestamp'
+        host: es-cluster-01.int.example.com
       bro:
         timestamp: 'timestamp'
 
@@ -1152,7 +1177,8 @@ See also the "CONNECTION ARGUMENTS" and "INDEX SELECTION ARGUMENTS" sections fro
 
 =head1 ARGUMENT GLOBALS
 
-Some options may be specified in the B</etc/es-utils.yaml> or B<$HOME/.es-utils.yaml> file:
+Some options may be specified in the B</etc/es-utils.yaml>, B<$HOME/.es-utils.yaml>
+or B<$HOME/.config/es-utils/config.yaml> file:
 
     ---
     base: logstash
@@ -1386,7 +1412,7 @@ Brad Lhotsky <brad@divisionbyzero.net>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Alexey Shatlovsky Vitaly Shupak Surikov Daniel Ostermeier Jason Rojas Kang-min Liu Lisa Hare Markus Linnala Mohammad S Anwar Samit Badle Takumi Sakamoto
+=for stopwords Alexey Shatlovsky Samit Badle Takumi Sakamoto Vitaly Shupak Surikov Andrei Grechkin Daniel Ostermeier Jason Rojas Kang-min Liu Lisa Hare Markus Linnala Matthew Feinberg Mohammad S Anwar
 
 =over 4
 
@@ -1396,11 +1422,23 @@ Alexey Shatlovsky <alexey.shatlovsky@booking.com>
 
 =item *
 
+Samit Badle <Samit.Badle@gmail.com>
+
+=item *
+
+Takumi Sakamoto <takumi.saka@gmail.com>
+
+=item *
+
 Vitaly Shupak <vitaly.shupak@deshaw.com>
 
 =item *
 
 Alexey Surikov <ksurent@gmail.com>
+
+=item *
+
+Andrei Grechkin <andrei.grechkin@booking.com>
 
 =item *
 
@@ -1424,19 +1462,15 @@ Markus Linnala <Markus.Linnala@cybercom.com>
 
 =item *
 
+Matthew Feinberg <mattf@intex.com>
+
+=item *
+
 Mohammad S Anwar <mohammad.anwar@yahoo.com>
-
-=item *
-
-Samit Badle <Samit.Badle@gmail.com>
-
-=item *
-
-Takumi Sakamoto <takumi.saka@gmail.com>
 
 =back
 
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
 
@@ -1484,7 +1518,7 @@ L<https://github.com/reyjrar/es-utils>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Brad Lhotsky.
+This software is Copyright (c) 2021 by Brad Lhotsky.
 
 This is free software, licensed under:
 

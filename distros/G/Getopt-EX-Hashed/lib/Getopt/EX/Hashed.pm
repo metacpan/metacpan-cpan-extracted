@@ -1,6 +1,6 @@
 package Getopt::EX::Hashed;
 
-our $VERSION = '0.9903';
+our $VERSION = '0.9904';
 
 =head1 NAME
 
@@ -96,22 +96,29 @@ There is no difference with ones in B<spec> parameter.
 =item B<default> => I<value>
 
 Set default value.  If no default is given, the member is initialized
-as C<undef>.
+as C<undef>.  See B<action>.
 
-If the value is code reference, hash object is passed by C<$_>.
+=item B<action> => I<coderef>
+
+Parameter B<action> takes code reference which called to process the
+option.  When called, hash object is passed through C<$_>.
 
     has [ qw(left right both) ] => spec => '=i';
-    has "+both" => default => sub {
+    has "+both" => action => sub {
         $_->{left} = $_->{right} = $_[1];
-    } ;
+    };
 
-You can use this for C<< "<>" >> too, and spec parameter is not
-required in this case.
+You can use this for C<< "<>" >> too.  In this case, spec parameter
+does not matter and is not required.
 
     has ARGV => default => [];
-    has "<>" => default => sub {
+    has "<>" => action => sub {
         push @{$_->{ARGV}}, $_[0];
     };
+
+In fact, B<default> and B<action> parameters are twins and works same.
+Parameter B<action> is just a little more understandable, one byte
+shorter, and verifies the value.  They are exclusive.
 
 =back
 
@@ -246,12 +253,20 @@ sub new {
     for my $key (@{$order}) {
 	my $m = $member->{$key};
 	$obj->{$key} = do {
-	    if (ref($m->{default}//'') eq 'CODE') {
+	    my($default, $action) = @{$m}{qw(default action)};
+	    if ($action) {
+		defined $default and
+		    die "$key: Don't define both default and action.\n";
+		ref($action) eq 'CODE' or
+		    die "$key: action have to be coderef.\n";
+		$default = $action;
+	    }
+	    if (defined($default) and ref($default) eq 'CODE') {
 		sub {
-		    &{$m->{default}} for $obj;
+		    $default->(@_) for $obj;
 		};
 	    } else {
-		$m->{default};
+		$default;
 	    }
 	};
     }

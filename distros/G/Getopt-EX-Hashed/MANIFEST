@@ -10,6 +10,7 @@ t/00_compile.t
 t/01_hashed.t
 t/02_wrong_incremental.t
 t/03_main.t
+t/04_default_and_action.t
 t/App/Foo.pm
 META.yml
 MANIFEST

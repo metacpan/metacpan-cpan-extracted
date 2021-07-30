@@ -43,7 +43,7 @@ es-open.pl - Open any closed indices matching your paramters.
 
 =head1 VERSION
 
-version 7.8
+version 7.9
 
 =head1 SYNOPSIS
 
@@ -125,7 +125,7 @@ Brad Lhotsky <brad@divisionbyzero.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Brad Lhotsky.
+This software is Copyright (c) 2021 by Brad Lhotsky.
 
 This is free software, licensed under:
 

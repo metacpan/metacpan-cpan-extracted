@@ -50,9 +50,9 @@
          "type" : "git",
          "url" : "git://github.com/PDLPorters/pdl-graphics-plplot.git",
          "web" : "https://github.com/PDLPorters/pdl-graphics-plplot"
-      }
+      },
+      "x_IRC" : "irc://irc.perl.org/#pdl"
    },
-   "version" : "0.76",
-   "x_IRC" : "irc://irc.perl.org/#pdl",
+   "version" : "0.77",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

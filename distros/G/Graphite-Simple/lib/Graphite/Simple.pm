@@ -9,7 +9,7 @@ our %EXPORT_TAGS = ( 'all' => [ ] );
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw();
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 require XSLoader;
 XSLoader::load('Graphite::Simple', $VERSION);
@@ -74,6 +74,7 @@ Graphite::Simple - Perl XS package provides methods to collect metrics and send 
 
 It's a class constructor.
 Takes a hash reference as argument.
+The possible keys of this hash are described below.
 
 =over
 
@@ -81,6 +82,10 @@ Takes a hash reference as argument.
 
 By default this option equals to 0.
 The connection to Graphite host will be established if this value is true.
+
+If value is 0, then it will be still possible to collect mertrics in internal or public structures.
+But you won't allowed to send them to Graphite server via native C<send_bulk> method.
+In this case you can use C<send_bulk_delegate> method to do this work by other code.
 
 =item host
 

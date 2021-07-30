@@ -1,5 +1,9 @@
 Revision history for Perl extension Getopt-EX-Hashed
 
+0.9904 2021-07-30T16:48:14Z
+
+    - introduce 'action' parameter.
+
 0.9903 2021-07-29T09:37:48Z
 
     - avoid inheritance loop when called directly.

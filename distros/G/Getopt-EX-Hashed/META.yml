@@ -26,14 +26,14 @@ no_index:
 provides:
   Getopt::EX::Hashed:
     file: lib/Getopt/EX/Hashed.pm
-    version: '0.9903'
+    version: '0.9904'
 requires:
   perl: v5.14.0
 resources:
   bugtracker: https://github.com/kaz-utashiro/Getopt-EX-Hashed/issues
   homepage: https://github.com/kaz-utashiro/Getopt-EX-Hashed
   repository: git://github.com/kaz-utashiro/Getopt-EX-Hashed.git
-version: '0.9903'
+version: '0.9904'
 x_authority: cpan:UTASHIRO
 x_contributors:
   - 'Kazumasa Utashiro <kaz@utashiro.com>'

@@ -91,22 +91,29 @@ Following parameters are available.
 - **default** => _value_
 
     Set default value.  If no default is given, the member is initialized
-    as `undef`.
+    as `undef`.  See **action**.
 
-    If the value is code reference, hash object is passed by `$_`.
+- **action** => _coderef_
+
+    Parameter **action** takes code reference which called to process the
+    option.  When called, hash object is passed through `$_`.
 
         has [ qw(left right both) ] => spec => '=i';
-        has "+both" => default => sub {
+        has "+both" => action => sub {
             $_->{left} = $_->{right} = $_[1];
-        } ;
+        };
 
-    You can use this for `"<>"` too, and spec parameter is not
-    required in this case.
+    You can use this for `"<>"` too.  In this case, spec parameter
+    does not matter and is not required.
 
         has ARGV => default => [];
-        has "<>" => default => sub {
+        has "<>" => action => sub {
             push @{$_->{ARGV}}, $_[0];
         };
+
+    In fact, **default** and **action** parameters are twins and works same.
+    Parameter **action** is just a little more understandable, one byte
+    shorter, and verifies the value.  They are exclusive.
 
 # METHOD
 

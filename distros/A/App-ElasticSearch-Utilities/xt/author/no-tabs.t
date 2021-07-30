@@ -8,6 +8,7 @@ use Test::NoTabs;
 
 my @files = (
     'lib/App/ElasticSearch/Utilities.pm',
+    'lib/App/ElasticSearch/Utilities/Aggregations.pm',
     'lib/App/ElasticSearch/Utilities/Connection.pm',
     'lib/App/ElasticSearch/Utilities/HTTPRequest.pm',
     'lib/App/ElasticSearch/Utilities/Query.pm',

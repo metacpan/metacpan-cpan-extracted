@@ -20,6 +20,7 @@ my @argv = qw(
     --so-long
     --both 99
     Everything
+    --paranoid Marvin
     );
 
 BEGIN {
@@ -41,6 +42,7 @@ is_deeply($app->{so_long}, 1, "convert underscore");
 is_deeply($app->{list}, [ qw(mostly harmless) ], "List");
 is_deeply($app->{hash}, { animal => 'dolphin', fish => 'babel' }, "Hash");
 is_deeply($app->{left}, 99, "coderef");
+is_deeply($app->{android}, "Marvin", "action");
 if ($App::Foo::TAKE_IT_ALL) {
     is_deeply($app->{ARGV}, [ qw(Life Universe and Everything) ], '<>');
 } else {

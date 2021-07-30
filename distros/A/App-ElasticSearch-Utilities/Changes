@@ -1,9 +1,144 @@
 ==================================================
-Changes from 2018-09-17 00:00:00 +0000 to present.
+Changes from 2019-07-31 00:00:00 +0000 to present.
 ==================================================
 
 ----------------------------------------
-version 7.8 at 2020-09-16 18:12:43 +0000
+version 7.9 at 2021-07-30 18:19:19 +0000
+----------------------------------------
+
+  Change: f386e7003a442a0419fc62aa30d576312afa9efa
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2021-07-30 11:19:09 +0000
+
+    Release 7.9
+
+    * Fix timeout handling * Allow for connection preferences into the `meta`
+    settings section * Allow `_id` to be shown by `es-search.pl` * Look in
+    `~/.config` for `es-utils.yaml` * Started some work on library for handling
+    aggregation queries 
+
+  Change: ba56db091ef15fd365100e034b17a8de530333e6
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2021-07-14 15:07:21 +0000
+
+    WIP: Substantial progress on the multi level aggregation script 
+
+  Change: 5c2517a1264b4a381b11387125e63dada6fcef2a
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2021-07-08 14:50:45 +0000
+
+    Adding es-aggregate.pl script
+
+    `es-search.pl` has a lot of cruft. Creating `es-aggregate.pl` as a
+    proof-of-concept starting from a clean slate to see if I can make the code
+    more readable and more reusable. The idea being to push this code back into
+    the library to make working with aggregations easier and cleaner. 
+
+  Change: cfd98ad2e84ee1ea8791debe7f6e1809bd6a9af6
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2021-07-08 07:34:21 +0000
+
+    Move the aggregation parsing out to it's own sub
+
+    This is a long time coming, the handling of aggregations needs a major
+    cleanup. First step is to break things up into more parseable blocks. 
+
+  Change: ea453e9190173af63adce15b684dcad13e3b13c5
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2021-07-08 07:15:14 +0000
+
+    Pass timeout to the object creation
+
+    When converting to `App::ElasticSearch::Utilities::Connection`, I
+    mistakenly removed the pass through of the `--timeout` parameter to the
+    object creation. This restores the timeout capability. 
+
+  Change: c8f664cfb09b928831945f82607eab5830faa066
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2021-07-08 07:14:50 +0000
+
+    Allow HTTP username/password in meta
+
+    The previous commit allowed overriding the destination for the connection.
+    This allows users to override the HTTP basic auth username/password.
+
+    ```yaml host: es-main.int.example.com meta:
+
+    access:
+
+    timestamp: t
+
+    security:
+
+    timestamp: @timestamp
+
+    host: es-security.int.example.com
+
+    proto: https
+
+    http-username: bob
+
+    password-exec: ~/bin/get-es-security-password.sh ``` 
+
+  Change: 7c56813974cc069a6214daef8667551a8d31de65
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2021-07-08 06:55:14 +0000
+
+    Added connection details to the meta section
+
+    This update allows the metadata in the `~/.es-utils.yaml` file to include
+    the `host`, `port`, and `proto`.
+
+    Example:
+
+    ```yaml host: es-main.int.example.com port: 80 meta:
+
+    security:
+
+    host: es-security.int.example.com
+
+    port: 443
+
+    proto: https ``` 
+
+  Change: 797199f7af436597ffa67c486d5ea275b825e471
+  Author: Matthew Feinberg <mattf@intex.com>
+  Date : 2021-06-24 14:03:07 +0000
+
+    For es-search.pl allow _id to be shown as a column when using --show and
+    display _id when showing full result records. 
+
+  Change: 6547b9893ad05e7cef565f4a2caf51b321091de0
+  Author: Andrei Grechkin <andrei.grechkin@booking.com>
+  Date : 2021-06-11 10:11:34 +0000
+
+    Add support for the XDG Base Directory Specification
+
+    Support configuration file placed in
+    `$XDG_CONFIG_HOME/es-utils/config.yaml` 
+
+  Change: 0f799636f22bf8bff51c25a890f12341f6f7b9d7
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2021-06-05 14:57:35 +0000
+
+    Fix warning in es_request()
+
+    When the index is undefined, the code throws a warning. 
+
+  Change: fa084386a44bbda1a75ee961f8ea6228ab62fe0c
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2021-03-20 17:17:13 +0000
+
+    The GitHub::Meta plugin stopped working and needed configuration 
+
+  Change: c118b27b05d5e5e75b444b9537362d78e099176f
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2020-10-08 13:42:10 +0000
+
+    Fix warnings when we encounter an unallocated shard 
+
+----------------------------------------
+version 7.8 at 2020-09-16 18:12:23 +0000
 ----------------------------------------
 
   Change: 7dbb50ff27914898417120f617def09279f8adc0
@@ -341,396 +476,6 @@ version 7.1 at 2019-08-01 19:25:21 +0000
 
     whiteboard in the world) will be spared from maintenance. 
 
-----------------------------------------
-version 7.0 at 2019-06-27 03:41:36 +0000
-----------------------------------------
-
-  Change: e5dd9b3aac45bdb0f8caeddb012adbd319f18746
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2019-06-26 20:41:36 +0000
-
-    Release 7.0 documentation 
-
-  Change: 4e160f42e8d678df4986da43c12399451a1aebcb
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2019-06-26 20:29:40 +0000
-
-    Fixes for better handling of fields
-
-    * `es_index_fields()` can now handle aliases or wildcards gracefully *
-    `es-search.pl` add --limit as an alias for --size 
-
-  Change: fd91aaa84e608b0a25cce79df238d4a8d0351057
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2019-06-19 21:43:12 +0000
-
-    Documentation updated for v6.9 
-
-----------------------------------------
-version 6.9 at 2019-06-20 03:29:27 +0000
-----------------------------------------
-
-  Change: 3e0c7429bcb83f9ae1613025ddd524d26229d258
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2019-06-19 20:29:27 +0000
-
-    Fix --with argument parsing, add --no-implications
-
-    * Handle the third parameter of the --with gracefully * Statistical facets
-    will be impacted by the presence or absence of a
-
-    field in a document, so imply an _exists_:<field> for any field
-
-    statistically aggregated. 
-
-----------------------------------------
-version 6.8 at 2019-06-18 23:41:33 +0000
-----------------------------------------
-
-  Change: 691d833f341d0104b770c34b588d016ce65539a1
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2019-06-18 16:41:33 +0000
-
-    Docs for 6.8 release 
-
-  Change: 9e49a7ea375770a013a0a3c0eccf46bc545e6125
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2019-06-18 16:25:37 +0000
-
-    Added histogram support to --with
-
-    Allows for the ability to use the histogram aggregation appropriately. 
-
-----------------------------------------
-version 6.7 at 2019-05-30 05:01:39 +0000
-----------------------------------------
-
-  Change: b223877862510dac87c842505b5e4624503fffc7
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2019-05-29 22:01:39 +0000
-
-    Docs updated for the 6.7 release 
-
-  Change: 4c6fb9711924541da25bffb2c606bf0fbc49d3ed
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2019-05-29 21:46:29 +0000
-
-    Make handling of pretty printing consistent and less insane 
-
-  Change: fde91b31d2f38ea3447cb35cb0513b02d540ab9d
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2019-05-29 21:46:29 +0000
-
-    Short-hand --json or --jq to enable JSON output 
-
-  Change: 21ba6625d90306ed6c01897bb0f944baab362370
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2019-05-29 21:46:29 +0000
-
-    Fix the "Displaying X of Y" for aggregations
-
-    This outputs the cardinality of the field in the `--top` option. Care is
-    taken for stepped data, and multi day requests to represent the max
-    displayed and the max available. 
-
-  Change: 2898b207bf4f83845ca887d8bd79718c2db1d71f
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2019-05-29 21:22:10 +0000
-
-    Fix delimiters for .dat/.txt files
-
-    The documentation was incorrect and the logic wasn't great either. Split
-    .txt and .dat lines only by tabs or null characters. Attempting to split on
-    spaces meant fields were not able to contain spaces and the column count
-    could vary between lines. 
-
-  Change: 5ee650b8ee015c3d7a8f5d8388c0024041070117
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2019-05-28 20:11:47 +0000
-
-    TravisCI Integration Updated via App::CISetup 
-
-----------------------------------------
-version 6.6 at 2019-05-26 21:12:14 +0000
-----------------------------------------
-
-  Change: 762f7e14e368ade8b947f92563023a5a416ae152
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2019-05-26 14:12:14 +0000
-
-    Dccoumentation regenerated for 6.6 release 
-
-  Change: d9d69b0e228ee5d07c7a8b18ee6051044192e6d5
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2019-05-26 13:29:52 +0000
-
-    Fix documentation of es_index_fields() 
-
-  Change: 9b032b8ee358990d929f7c120a8edc160151df19
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2019-05-26 13:26:50 +0000
-
-    Use field metadata to automatically set timestamp
-
-    Since we have the field metadata, we can use that metadata to autodiscover
-    the date field for sorting. 
-
-  Change: 63e56193f8eef5f8176843be49709004cec10eaa
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2019-05-26 13:24:37 +0000
-
-    es_index_fields() patched to return field metadata
-
-    Instead of just flagging the presence of a field, the field types are
-    returned along with other meta-data including if the field is nested.
-
-    `es-search.pl` now displays field data types and whether a field is
-    contained within a nested path. 
-
-  Change: 8202a0722d7a29e5fc6dc701806e8ced5dafcc14
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2019-05-21 20:24:47 +0000
-
-    Fix formatting 
-
-  Change: 38aad622f61630b8da086364c7aea778e10081f1
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2019-05-21 20:20:13 +0000
-
-    Regenerate .mkdown prepping for the 6.6 release 
-
-  Change: 2770f819958265a79677c0c0d200ebbf9c5fc7b5
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2019-05-21 20:16:43 +0000
-
-    Fix the defined or so 0 isn't translated to -1 
-
-  Change: ccbcb6c100f218b1c60e619a90d2cd57ac63f49e
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2019-05-21 20:13:41 +0000
-
-    Add .json support to the ::QueryString::FileExpansion plugin 
-
-  Change: 69a1b7dc9d4e4bed31bf0ed103e3ff2e98c78a38
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2019-05-21 08:38:41 +0000
-
-    Documentation Update and set default --days to 1
-
-    Reviewing the documentation found some spelling errors and incorrect
-    wording. Fixed that up. Also changed the default --days a query runs
-    against to 1 as that's a better default setting. 
-
-  Change: d91a9c6a8815a326eafc26f497dc282e9f27c46a
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2019-05-19 12:26:56 +0000
-
-    Documentation consistency patches 
-
-  Change: 06b670f490597d78951fdd5b784f8168f6c98cc7
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2019-05-19 12:12:08 +0000
-
-    Patch documentation for INSTALL to be secure 
-
-----------------------------------------
-version 6.5 at 2019-05-08 02:42:02 +0000
-----------------------------------------
-
-  Change: 0db6a92889a94daf54f17432b53f26a91153e4f7
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2019-05-07 19:42:02 +0000
-
-    Docs ready for the 6.5 release 
-
-  Change: b0ae2e1c9a859b37c8345f1cd24152f6c74c14ef
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2019-05-07 19:41:07 +0000
-
-    Fix priority for ::QueryString::AutoEscape
-
-    Since this plugin is keyed to '=<field>:<value>', I want to make sure it
-    fires before the nested plugin and before any other expansion plugins to
-    avoid issues. 
-
-  Change: 044643c4fcb1183b1ffa46a3575bd01ab028e048
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2019-03-25 21:45:24 +0000
-
-    Collect node local shard dimensions and safe guard some calls to be
-    compatible with ES 5.x and 6.x 
-
-  Change: b13c4a5eb6861898d3b35d567da19838372fadcc
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2019-03-25 17:30:36 +0000
-
-    Report number of indexes with a block set to true. 
-
-  Change: b037da82daf1f23f4940cbb0955e8beaecb69e1b
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2019-01-30 21:29:48 +0000
-
-    Fix the es-copy-index.pl to migrate indices from other clusters. 
-
-----------------------------------------
-version 6.4 at 2019-01-02 22:20:36 +0000
-----------------------------------------
-
-  Change: 470feb7d6e00998906849cbfb49d1904eb79cf6b
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2019-01-02 14:20:36 +0000
-
-    Updated Documentation for the 6.4 release 
-
-  Change: 095da97cc9e9fb29ebcea13851d548e20c6166d6
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2019-01-02 13:40:05 +0000
-
-    Add in the new QueryString Extensions to the documentation 
-
-  Change: 714c9856d382bcc1ee95fc2ecd8ee7257e13aaec
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2019-01-02 12:12:56 +0000
-
-    Scroll search corrected to use the correct API
-
-    Finally migrated off the 0.x version of the scrolled search API which is no
-    longer supported in 6.5. 
-
-  Change: 4a9e798426a21f2ab3543317bea5a56937536b56
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2019-01-02 11:18:28 +0000
-
-    Convert ::QueryString::AutoEscape to use terms filter
-
-    Rather than attempting to escape characters, use the Elastic `terms` filter
-    to perform the lookup if the user specifies `=field:value`.
-
-    This will convert to:
-
-    { terms: { field: 'value' } }
-
-    And that will perform an exact match to the documents in a more predictable
-    and future-proof manner. 
-
-----------------------------------------
-version 6.3 at 2019-01-01 01:00:09 +0000
-----------------------------------------
-
-  Change: 0a032698e44212328cb3bef1acae61812db12353
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2018-12-31 17:00:09 +0000
-
-    Fixes for the 6.x version of ElasticSearch
-
-    * Ensure we set a Content-Type header for requests sending JSON * Handle
-    special casing for index creation in ::Connection * Ensure all _bulk
-    requests end with a "\n" * Fix missing Ref::Util import in es-copy-index.pl
-    * es-copy-index.pl: only send _mappings if defined 
-
-  Change: 4683229bdb8811d7d1122f4a9bd665c61d84f23d
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2018-12-31 16:49:20 +0000
-
-    Fix authordeps 
-
-  Change: 75b43dee4c8313e16891e2bb7bfe8e44b99593a9
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2018-12-31 16:45:25 +0000
-
-    Reset author/copyright_holder because my git settings trip up the
-    auto-discovery. 
-
-  Change: 510aa532e05a9c2cb44af384145c2beaa06c65e2
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2018-12-27 22:37:01 +0000
-
-    Fix up the AutoEscape plugin to run at the correct priority 
-
-  Change: 90d61d84d2c2ece75b7bc5d13690ca1b282c7ad7
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2018-12-27 22:20:31 +0000
-
-    Added an AutoEscape Query String Parser
-
-    While searching for UserAgents or file paths, you need to know the secret
-    Lucene handshakes to match as you expect. This plugin automatically
-    converts common characters users may not expect to cause special behavior. 
-
-----------------------------------------
-version 6.2 at 2018-12-21 02:53:52 +0000
-----------------------------------------
-
-  Change: 81bae677ac93da9eba1c2a3b4859eded645782f9
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2018-12-20 18:53:52 +0000
-
-    Documentation and release fixes
-
-    * Removed Test::Coverage::TrustPod and Test::Critic from requires and
-
-    moved them to the authordeps sections * Fixed Running of Extra Tests on
-    Release * Added a perlcritic.rc 
-
-  Change: 0eab9bf3babfb37064e4af13c579e42013a45057
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2018-12-20 18:37:13 +0000
-
-    Add 'jsonpretty' as a format
-
-    When using `--format 'json'`, default to setting `--no-decorators` since
-    we'll mostly use this with `jq`. 
-
-  Change: 1f6a51a1cca972d441fc9aca2dfd3169c815a87f
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2018-12-20 18:21:56 +0000
-
-    Output tweaks for better usability
-
-    * Added `--no-decorators` option as an override for `--no-header` * When
-    using `--no-decorators`, disable outputting the footers as well * Only
-    display summary information when we're dealing with multi-day output * When
-    an agg is `terms` or `significant_terms` and no other collision
-
-    exists, suppress the `$type` prefix to be prettier 
-
-  Change: 1a8a5394e2c99f4cf59d670d36705ce06b41ae92
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2018-09-26 17:28:02 +0000
-
-    Allow the user to change the max-batch-size/scroll size 
-
-  Change: 298902bf52642fcc081059f9f85853ba7449d865
-  Author: Mohammad S Anwar <mohammad.anwar@yahoo.com>
-  Date : 2018-07-21 10:00:45 +0000
-
-    Autogenerate META.yml as suggested by CPANTS. 
-
-----------------------------------------
-version 6.1 at 2018-09-18 03:10:27 +0000
-----------------------------------------
-
-  Change: 020fddc36e35230b1a275c87c8edddae2fbb7c7b
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2018-09-17 20:10:27 +0000
-
-    Updates for the documentation for 6.1 release 
-
-  Change: 263e77f276c95dbf1f90bba6b77264547e4b7390
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2018-09-17 20:09:05 +0000
-
-    Add --bg-filter option for es-search.pl
-
-    If significant_terms is used for the --top aggregation, this option is able
-    to inject a background_filter into the significant_terms aggregation. 
-
-  Change: e76897d8eefee23d70b9fd5b3e6bd26bd7494b95
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2018-09-17 20:08:24 +0000
-
-    Update to using GitHub::Meta and rearrange Pod::Weaver configs 
-
 =================================================
-Plus 67 releases after 2018-09-17 00:00:00 +0000.
+Plus 77 releases after 2019-07-31 00:00:00 +0000.
 =================================================

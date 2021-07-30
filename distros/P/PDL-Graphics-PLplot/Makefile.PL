@@ -1,3 +1,5 @@
+use strict;
+use warnings;
 use ExtUtils::MakeMaker;
 use Config;
 use File::Spec;
@@ -5,10 +7,8 @@ use Data::Dumper;
 
 use PDL::Core::Dev;
 
-#
-## Search for plplot library and include file
-#
-print "\nChecking PDL::Graphics::PLplot...\n";
+my $PL_MAJOR = 5; # minimum required
+my $PL_MINOR = 15;
 
 unlink ("OPTIONS!"); # remove file used to communicate with plplot.pd
 
@@ -16,21 +16,16 @@ my $libbasename;
 my $libname;
 my $plplot_lib_path;
 
-# PLplot 5.11.0 renamed the library from plplotd to plplot. Search for both of
-# them.
-foreach ('plplot', 'plplotd') {
+foreach ('plplot') {
   # on OS-X the library is called libplplot.dylib, so we
   # use $Config{"so"} to get the extension name
   #
   $libbasename = $_;
   $libname = "lib${libbasename}." . $Config{"so"};
   my $libname_static = "lib{$libbasename}.a";
-  print "Searching for ${libname} library.\n";
-
   foreach my $libdir (
               split(' ', $Config{libpth}), # not perl-in-space friendly
               $ENV{PLPLOT_LIBDIR},
-              $PDL::Config{WHERE_PLPLOT_LIBS},
               '/usr/local/plplot/lib64',
                       '/usr/local/plplot/lib',
               '/usr/local/lib64',
@@ -59,22 +54,19 @@ foreach ('plplot', 'plplotd') {
   }
 
   if (defined $plplot_lib_path) {
-      print "Found in ${plplot_lib_path}.\n";
       last;
   }
 }
 
 unless (defined ($plplot_lib_path)) {
-  buildDummy ("Cannot find plplot library ($libname), skipping PDL::Graphics::PLplot\n");
-  return if (caller); exit;
+  die "Cannot find plplot library $libname\n";
 }
 
 my $incname = "plplot.h";
-my $devnull = File::Spec->devnull(); # Portable null device.
+my $plplot_include_path;
 
 foreach my $incdir (
-		    $ENV{PLPLOT_INCDIR},
-		    $PDL::Config{WHERE_PLPLOT_INCLUDE},
+		    $ENV{PLPLOT_INCDIR} || (),
                     '/usr/local/plplot/include',
                     '/usr/local/plplot/include/plplot',
 		    '/usr/local/include/plplot',
@@ -92,7 +84,7 @@ foreach my $incdir (
   if (-e "$incdir/$incname") {
     $plplot_include_path = "-I$incdir";
     if ($incdir =~ m|/plplot$|) {
-      $inc2 = $incdir;
+      my $inc2 = $incdir;
       $inc2 =~ s|/plplot$||;
       $plplot_include_path .= " -I$inc2";
     }
@@ -101,8 +93,7 @@ foreach my $incdir (
 }
 
 unless (defined ($plplot_include_path)) {
-  buildDummy ("Cannot find plplot header file ($incname), skipping PDL::Graphics::PLplot\n");
-  return if (caller); exit;
+  die "Cannot find plplot header file ($incname)\n";
 }
 
 # Try linking with library.  New if blocks should be added if necessary
@@ -115,14 +106,12 @@ foreach my $l (
 	       ) {
   if (trylink( '', '#include <plplot.h>', 'plinit();', "$l $plplot_include_path")) {
     $libs = $l;
-    print "\tSucceeded linking PLplot with $libs\n";
     last;
   }
 }
 
 unless (defined($libs)) {
-  buildDummy ("Cannot find good set of libraries for linking PLplot, try fiddling perldl.conf\n");
-  return if (caller); exit;
+  die "Cannot find good set of libraries for linking PLplot\n";
 }
 
 # Test that PLplot was compiled --with-double (IE, a PLFLT is a double)
@@ -132,58 +121,49 @@ main () {  printf  ("%d", sizeof (PLFLT)); }
 EOC
 
 unless ($size == 8) {
-  print "          Sizeof(PLFLT) must be 8. PLplot must be compiled --with-double (IE ./configure --with-double)\n";
-  buildDummy ("PLplot was not compiled --with-double, try fiddling perldl.conf\n");
-  return if (caller); exit;
+  die <<'EOF';
+Sizeof(PLFLT) must be 8.
+PLplot must be compiled --with-double (IE ./configure --with-double).
+EOF
 }
 
-#
-## Tests for various PLplot features, present in different versions of PLplot
-#
-my %plversion = (); # Information on which PLplot functions/features available.
-$plversion{'plsmem'}      = test_func_exists('plsmem', 'in-memory plotting', 'plsmem( 0, 0, NULL);');
-$plversion{'plsvect'}     = test_func_exists('plsvect', 'vector plotting',   'plsvect (NULL, NULL, 0, 0);');
-$plversion{'c_plgcoloa'}  = test_func_exists('c_plgcoloa', 'alpha transparency', 'c_plgcol0a(0, 0, 0, 0, NULL);');
-$plversion{'c_plseed'}    = test_func_exists('c_plseed',   'random numbers',     'c_plseed (0 );');
-$plversion{'c_plsfont'}   = test_func_exists('c_plsfont',  'set font',           'c_plsfont (0, 0, 0);');
-$plversion{'c_plimagefr'} = test_func_exists('c_plimagefr','2d matrix',
-                                             'c_plimagefr (NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL);' );
-$plversion{'c_pllegend'}  = test_func_exists('c_pllegend', 'Plot legends',
-                                             'c_pllegend(NULL,NULL,0,   0,   0.0, 0.0, 0.0, 0,   0,   0,
-                                                         0,   0,   0,   NULL,0.0, 0.0, 0.0, 0.0, NULL,NULL,
-                                                         NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);');
-$plversion{'c_plwidth'}   = test_func_exists('c_plwidth',   '5.9.10 width function', 'c_plwidth (0. );');
+my $plgver = compileAndRun ("$plplot_include_path $libs", 1, <<'EOC');
+#include <plplot.h>
+main () {
+  char ver[80];
+  c_plgver(ver);
+  fputs(ver, stdout);
+}
+EOC
+my @plver = split /\./, $plgver;
+unless ($plver[0] > $PL_MAJOR or ($plver[0] == $PL_MAJOR and $plver[1] >= $PL_MINOR)) {
+  die "Insufficient plplot version '$plgver'; need at least $PL_MAJOR.$PL_MINOR\n";
+}
+
+my %plversion = ();
 $plversion{'C_COMPILE'}   = "$Config{cc} $Config{ccflags} $plplot_include_path";
 $plversion{'C_COMPILE_SUFFIX'} = $libs;
 $plversion{'PLPLOT_LIB'}  = $plplot_lib_path;
-
-# Write these options to a file--used by plplot.pd during the 'make' step
+# Write these options to a file--used during the test step
 open my $fh, '>', 'OPTIONS!' or die "Cannot write to OPTIONS! file";
 print  {$fh} Dumper(\%plversion);
 close   $fh;
 
-#
-## new way to get writemakefile args...
-#
-@pack = (["plplot.pd",PLplot,PDL::Graphics::PLplot]);
+my @pack = ([qw(plplot.pd PLplot PDL::Graphics::PLplot)]);
 
-#%hash = pdlpp_stdargs_int(@::pack);  # use this for module inside PDL source
-%hash = pdlpp_stdargs(@::pack);          # use this for separate module
-
+my %hash = pdlpp_stdargs(@pack);
 $hash{'PREREQ_PM'} = { PDL => 0 };
-$hash{CONFIGURE_REQUIRES} = { 'PDL::Core::Dev' => 0 };
+$hash{CONFIGURE_REQUIRES} = {
+  'PDL::Core::Dev' => 0,
+};
 # $hash{'OPTIMIZE'}  = '-g'; # If you want to debug, uncomment this.
 $hash{TEST_REQUIRES} = {
   'Test::More' => '0.88', # done_testing
 };
 $hash{'VERSION_FROM'}   = 'plplot.pd';
 $hash{'LIBS'}      = [$libs];
-# add this to allow one to use the /ops/tools/lib plplot libs even when
-# another plplot is installed in /usr/local/lib. D. Hunt 6/4/2004
-$hash{'LDDLFLAGS'} = " -shared -L$plplot_lib_path -L/usr/local/lib ";
 $hash{'INC'}      .= " $plplot_include_path";
-$hash{'clean'}     = {'FILES'  =>
-                        'PLplot.pm PLplot.xs PLplot.o PLplot.c PLplot.bs *svg.* *.xfig temp* OPTIONS! Makefile.old'};
+$hash{clean}{FILES} .= ' *svg.* *.xfig temp* OPTIONS!';
 $hash{META_MERGE} = {
   "meta-spec" => { version => 2 },
   resources => {
@@ -193,45 +173,16 @@ $hash{META_MERGE} = {
        type => 'git',
        web => 'https://github.com/PDLPorters/pdl-graphics-plplot',
     },
+    x_IRC => 'irc://irc.perl.org/#pdl',
   },
- x_IRC => 'irc://irc.perl.org/#pdl',
 };
 
-my $postamble = pdlpp_postamble(@::pack); # use for external module
-#my $postamble = pdlpp_postamble_int(@::pack); # use for install inside PDL distro
+my $postamble = pdlpp_postamble(@pack);
 
 WriteMakefile(%hash);
 
 # Add genpp rule
 sub MY::postamble { $postamble };
-
-sub test_func_exists {
-
-    my ( $func, $comment, $eval, $option ) = @_;
-
-    $option = $func unless defined $option;
-
-    # Test if PLplot has plsmem, for in memory plotting
-    eval { compileAndRun ("$plplot_include_path $libs", 0, <<"EOC");
-#include <plplot.h>
-main () {  $eval }
-EOC
-       };
-
-    my $have_func;
-    if ($@)
-    {
-	print "\t$func function not found, no $comment available\n";
-	$have_func = 0;
-    }
-    else
-    {
-	print "\t$func function found, $comment available!\n";
-	$have_func = 1;
-    }
-
-    return $have_func;
-}
 
 sub compileAndRun {
   my $flags = shift;
@@ -250,6 +201,7 @@ sub compileAndRun {
 
   # The duplication of $flags seems to be necessary, as some systems
   # need $flags before temp.c and some after.  D. Hunt 2/9/2011
+  my $devnull = File::Spec->devnull();
   system "$cc $ccflags $flags temp.c $flags -o temp > $devnull 2>&1";
   unlink('./temp.c');
   die "Cannot compile test program: $code" unless (-e 'temp' or -e 'temp.exe');
@@ -258,13 +210,4 @@ sub compileAndRun {
   my $res = `./temp`;
   unlink ('./temp');
   return $res;
-}
-
-sub buildDummy {
-  my $msg = shift;
-  $msg .= "\n      Not building PDL::Graphics::PLplot\n";
-  warn $msg . "\n";
-  $msg =~ s/\n//g;
-  write_dummy_make( $msg );
-  $PDL::Config{WITH_PLPLOT} = 0;
 }

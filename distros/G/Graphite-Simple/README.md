@@ -52,10 +52,16 @@
 
 ####   $class->new(\%options)
     It's a class constructor. Takes a hash reference as argument.
+    The possible keys of this hash are described below.
 
 #####   enabled
         By default this option equals to 0. The connection to Graphite host
         will be established if this value is true.
+
+        If value is 0, then it will be still possible to collect mertrics in
+        internal or public structures. But you won't allowed to send them to
+        Graphite server via native "send_bulk" method. In this case you can use
+        "send_bulk_delegate" method to do this work by other code.
 
 #####    host
         Sets the hostname or IPv4 address of Graphite server. This option is

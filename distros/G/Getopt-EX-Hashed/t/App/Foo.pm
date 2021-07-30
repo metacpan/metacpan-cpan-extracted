@@ -1,6 +1,6 @@
 package App::Foo;
 
-use strict;
+use v5.14;
 use warnings;
 use Data::Dumper;
 
@@ -24,9 +24,22 @@ has '+both' => default => sub {
     $_->{left} = $_->{right} = $_[1];
 };
 
+# action
+has android => ;
+has paranoid => spec => '=s',
+		action => sub { $_->{android} = $_[1] };
+
 # erroneous incremental usage: live or die?
 if (our $WRONG_INCREMENTAL) {
     has '+no_no_no' => default => 1;
+}
+
+# erroneous default/action co-exist
+if (our $DEFAULT_AND_ACTION) {
+    has default_action =>
+	spec => '=s',
+	default => "Milliways",
+	action  => sub { say "meet the meat" };
 }
 
 if (our $TAKE_IT_ALL) {

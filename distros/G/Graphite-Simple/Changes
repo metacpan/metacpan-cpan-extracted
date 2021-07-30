@@ -1,5 +1,10 @@
 Revision history for Perl extension Graphite::Simple
 
+0.03 2021 Jul 24
+    = adding some notes into POD
+    - adding META.yml and META.json
+    - getting rid of redundant std::move calls
+
 0.02  2021 Jun 8
     - POD fixes
 

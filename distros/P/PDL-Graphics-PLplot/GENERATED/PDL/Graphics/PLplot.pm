@@ -26,7 +26,7 @@ use Carp qw(confess);
 
 our $VERSION;
 BEGIN {
-$VERSION = '0.76'
+$VERSION = '0.77'
 };
 
 =head1 NAME
@@ -970,13 +970,10 @@ close whenever the PLplot object passes out of scope.
 
 =cut
 
-# pull in low level interface
-use vars qw(%_constants %_actions);
-
 # Colors (from rgb.txt) are stored as RGB triples
 # with each value from 0-255
 sub cc2t { [map {hex} split ' ', shift] }
-%_constants = (
+our %_constants = (
 	       BLACK          => [  0,  0,  0],
 	       RED            => [240, 50, 50],
 	       YELLOW         => [255,255,  0],
@@ -1018,7 +1015,7 @@ sub cc2t { [map {hex} split ' ', shift] }
 # a hash of subroutines to invoke when certain keywords are specified
 # These are called with arg(0) = $self (the plot object)
 #                   and arg(1) = value specified for keyword
-%_actions =
+our %_actions =
   (
 
 
@@ -1043,9 +1040,8 @@ sub cc2t { [map {hex} split ' ', shift] }
                        plschr (0, $self->{CHARSIZE}) unless ($self->{ISNEW}); # do not call plsch from the 'new' routine.
                      },
 
-   COLOR =>
    # maintain color map, set to specified rgb triple
-   sub {
+   COLOR => sub {
      my $self  = shift;
      my $color = _color(shift);
 
@@ -1114,9 +1110,8 @@ sub cc2t { [map {hex} split ' ', shift] }
    FILE       => sub { plsfnam  ($_[1]) },   # this must be specified with call to new!
 
    # set color for index 1, the plot frame and text
-   FRAMECOLOR =>
    # set color index 1, the frame color
-   sub {
+   FRAMECOLOR => sub {
      my $self  = shift;
      my $color = _color(shift);
      $self->{COLORS}[1] = $color;
@@ -1233,10 +1228,8 @@ sub cc2t { [map {hex} split ' ', shift] }
        $self->{PAGESIZE} = $dims;
      },
 
-   PALETTE =>
-
    # load some pre-done color map 1 setups
-   sub {
+   PALETTE => sub {
      my $self = shift;
      my $pal  = shift;
 
@@ -1261,9 +1254,8 @@ sub cc2t { [map {hex} split ' ', shift] }
      }
    },
 
-   PLOTTYPE =>
    # specify plot type (LINE, POINTS, LINEPOINTS, CONTOUR, SHADE)
-   sub {
+   PLOTTYPE => sub {
      my $self = shift;
      my $val  = shift;
 
@@ -1287,9 +1279,8 @@ sub cc2t { [map {hex} split ' ', shift] }
      }
    },
 
-   SUBPAGE =>
    # specify which subpage to plot on 1-N or 0 (meaning 'next')
-   sub {
+   SUBPAGE => sub {
      my $self = shift;
      my $val  = shift;
      my $err  = "SUBPAGE = \$npage where \$npage = 1-N or 0 (for 'next subpage')";
@@ -1300,9 +1291,8 @@ sub cc2t { [map {hex} split ' ', shift] }
      }
    },
 
-   SUBPAGES =>
    # specify number of sub pages [nx, ny]
-   sub {
+   SUBPAGES => sub {
      my $self = shift;
      my $val  = shift;
      my $err  = "SUBPAGES = [\$nx, \$ny] where \$nx and \$ny are between 1 and 127";
@@ -1318,9 +1308,8 @@ sub cc2t { [map {hex} split ' ', shift] }
      }
    },
 
-   SYMBOL =>
    # specify type of symbol to plot
-   sub {
+   SYMBOL => sub {
      my $self = shift;
      my $val  = shift;
 
@@ -1337,20 +1326,17 @@ sub cc2t { [map {hex} split ' ', shift] }
      $self->{SYMBOLSIZE} = $size;
    },
 
-   TEXTPOSITION =>
    # specify placement of text.  Either relative to border, specified as:
    # [$side, $disp, $pos, $just]
    # or
    # inside plot window, specified as:
    # [$x, $y, $dx, $dy, $just] (see POD doc for details)
-   sub {
+   TEXTPOSITION => sub {
      my $self = shift;
      my $val  = shift;
-
      die "TEXTPOSITION value must be an array ref with either:
           [$side, $disp, $pos, $just] or [$x, $y, $dx, $dy, $just]"
        unless ((ref($val) =~ /ARRAY/) and ((@$val == 4) || (@$val == 5)));
-
      if (@$val == 4) {
        $self->{TEXTMODE} = 'border';
      } else {
@@ -1382,17 +1368,14 @@ sub cc2t { [map {hex} split ' ', shift] }
      $self->{VIEWPORT} = $vp;
    },
 
-   XBOX       =>
-     # set X axis label options.  See pod for definitions.
-     sub {
-       my $self = shift;
-       my $opts = lc shift;
-
-       my @opts = split '', $opts;
-       map { 'abcdfghilmnst' =~ /$_/i || die "Illegal option $_.  Only abcdfghilmnst permitted" } @opts;
-
-       $self->{XBOX} = $opts;
-     },
+   # set X axis label options.  See pod for definitions.
+   XBOX       => sub {
+     my $self = shift;
+     my $opts = lc shift;
+     my @opts = split '', $opts;
+     map { 'abcdfghilmnst' =~ /$_/i || die "Illegal option $_.  Only abcdfghilmnst permitted" } @opts;
+     $self->{XBOX} = $opts;
+   },
 
    # draw an X axis label for the graph
    XLAB       => sub {
@@ -1409,17 +1392,14 @@ sub cc2t { [map {hex} split ' ', shift] }
      $self->{XTICK} = $val;
    },
 
-   YBOX       =>
      # set Y axis label options.  See pod for definitions.
-     sub {
-       my $self = shift;
-       my $opts = shift;
-
-       my @opts = split '', $opts;
-       map { 'abcfghilmnstv' =~ /$_/i || die "Illegal option $_.  Only abcfghilmnstv permitted" } @opts;
-
-       $self->{YBOX} = $opts;
-     },
+   YBOX       => sub {
+     my $self = shift;
+     my $opts = shift;
+     my @opts = split '', $opts;
+     map { 'abcfghilmnstv' =~ /$_/i || die "Illegal option $_.  Only abcfghilmnstv permitted" } @opts;
+     $self->{YBOX} = $opts;
+   },
 
    # draw an Y axis label for the graph
    YLAB       => sub {
@@ -1738,13 +1718,6 @@ sub xyplot {
   plflush();
 }
 
-
-# Handle sets of 2D strip plots sharing one X axis.  Input is
-# $self -- PLplot object with existing options
-# $xs   -- Ref to list of 1D PDLs with X values
-# $ys   -- Ref to list of 1D PDLs with Y values
-#          or a 2D PDL
-# %opts -- Options values
 sub stripplots {
 
   my $self    = shift;
@@ -1954,7 +1927,6 @@ sub colorkey {
   plflush();
 }
 
-# handle shade plots of gridded (2D) data
 sub shadeplot {
   my $self   = shift;
   my $z      = shift;
@@ -2047,13 +2019,6 @@ sub shadeplot {
   plflush();
 }
 
-
-# This subroutine plots a histogram of a 1-D PDL of data.
-# An alternative to the 'histogram' subroutine below.  Draws filled
-# bars and scales the Y axis better.
-#
-# @parameter  $data  -- 1-D PDL
-# @           $pl    -- PLplot handle
 sub histogram1 {
   my $self  = shift;
   my $x     = shift;
@@ -2108,7 +2073,6 @@ sub histogram1 {
 
 }
 
-# handle histograms
 sub histogram {
   my $self   = shift;
   my $x      = shift;
@@ -2159,7 +2123,6 @@ sub histogram {
   plflush();
 }
 
-# Draw bar graphs
 sub bargraph {
   my $self   = shift;
   my $labels = shift; # ref to perl list of labels for bars
@@ -2275,7 +2238,6 @@ sub bargraph {
   plflush();
 }
 
-# Add text to a plot
 sub text {
   my $self = shift;
   my $text = shift;
@@ -5217,11 +5179,9 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
   Signature: (xo(); yo())
 
-
 =for ref
 
-info not available
-
+Box drawing primitive, taken from PLPLOT bar graph example
 
 =for bad
 
@@ -5248,11 +5208,9 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
   Signature: (xo(); yo(); bh(); w())
 
-
 =for ref
 
-info not available
-
+Box drawing primitive that allows specifying base height and width in addition to offset and height
 
 =for bad
 
@@ -5279,11 +5237,9 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
   Signature: (xo(); yo())
 
-
 =for ref
 
-info not available
-
+Similar box drawing primitive, but without fill (just draw outline of box)
 
 =for bad
 
@@ -5310,11 +5266,9 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
   Signature: (xo(); yo(); bh(); w())
 
-
 =for ref
 
-info not available
-
+Box drawing primitive that allows specifying base height and width in addition to offset and height
 
 =for bad
 
@@ -5370,11 +5324,9 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
   Signature: (x(n); y(n); int code())
 
-
 =for ref
 
-info not available
-
+Plots a character at the specified points
 
 =for bad
 
@@ -5401,11 +5353,9 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
   Signature: (x(n); y(n); z(n); int code())
 
-
 =for ref
 
-info not available
-
+Plots a character at the specified points in 3 space
 
 =for bad
 
@@ -5432,11 +5382,9 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
   Signature: (x(n); y(n); z(n))
 
-
 =for ref
 
-info not available
-
+Draw a line in 3 space
 
 =for bad
 
@@ -5463,11 +5411,9 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
   Signature: (x(n); y(n); z(n); int draw(m); int ifcc())
 
-
 =for ref
 
-info not available
-
+Draws a polygon in 3 space
 
 =for bad
 
@@ -5494,11 +5440,9 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
   Signature: (data(n); datmin(); datmax(); int nbin(); int oldwin())
 
-
 =for ref
 
-info not available
-
+Plot a histogram from unbinned data
 
 =for bad
 
@@ -5525,11 +5469,9 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
   Signature: (x(n); y(n))
 
-
 =for ref
 
-info not available
-
+Area fill
 
 =for bad
 
@@ -5556,11 +5498,9 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
   Signature: (x(n); y(n); angle())
 
-
 =for ref
 
-info not available
-
+Area fill with color gradient
 
 =for bad
 
@@ -5587,11 +5527,9 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
   Signature: (x(n); y(n); int code())
 
-
 =for ref
 
-info not available
-
+Plots a symbol at the specified points
 
 =for bad
 
@@ -5618,11 +5556,9 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
   Signature: (x(nx); y(ny); z(nx,ny); int opt(); clevel(nlevel))
 
-
 =for ref
 
-info not available
-
+Plot shaded 3-d surface plot
 
 =for bad
 
@@ -5649,11 +5585,9 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
   Signature: (x(nx); y(ny); z(nx,ny); int opt(); clevel(nlevel); int indexxmin(); int indexxmax(); int indexymin(nx); int indexymax(nx))
 
-
 =for ref
 
-info not available
-
+Plot shaded 3-d surface plot with limits
 
 =for bad
 
@@ -5680,11 +5614,9 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
   Signature: (int mark(nms); int space(nms))
 
-
 =for ref
 
-info not available
-
+Set line style
 
 =for bad
 
@@ -5896,11 +5828,9 @@ sub PDL::plmap { _reorder('plmap', 'PDL::_plmap_int', $standard_order, @_) }
 
   Signature: (x(na); y(na); char* string)
 
-
 =for ref
 
-info not available
-
+plot a string along a line
 
 =for bad
 
@@ -5927,11 +5857,9 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
   Signature: (x(na); y(na); z(na); char* string)
 
-
 =for ref
 
-info not available
-
+plot a string along a 3D line
 
 =for bad
 
@@ -5958,11 +5886,9 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
   Signature: (dlong(); dlat(); minlong(); maxlong(); minlat(); maxlat(); SV* mapform)
 
-
 =for ref
 
-info not available
-
+Plot the latitudes and longitudes on the background
 
 =for bad
 
@@ -5992,11 +5918,9 @@ sub PDL::plmeridians { _reorder('plmeridians', 'PDL::_plmeridians_int', $standar
                   clevel(l); int fill_width(); int cont_color();
                   int cont_width(); int rectangular(); SV* defined; SV* pltr; SV* pltr_data)
 
-
 =for ref
 
-info not available
-
+Shade regions on the basis of value
 
 =for bad
 
@@ -6026,7 +5950,7 @@ sub PDL::plshades { _reorder('plshades', 'PDL::_plshades_int', $standard_order, 
 
 =for ref
 
-FIXME: documentation here!
+Plot contours
 
 =for bad
 
@@ -6228,11 +6152,9 @@ sub PDL::plshade1 { _reorder('plshade1', 'PDL::_plshade1_int', $standard_order, 
 
   Signature: (idata(nx,ny); xmin(); xmax(); ymin(); ymax();zmin(); zmax(); Dxmin(); Dxmax(); Dymin(); Dymax())
 
-
 =for ref
 
-info not available
-
+Plot gray-level image
 
 =for bad
 
@@ -6259,11 +6181,9 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
   Signature: (idata(nx,ny); xmin(); xmax(); ymin(); ymax();zmin(); zmax(); valuemin(); valuemax(); SV* pltr; SV* pltr_data)
 
-
 =for ref
 
-info not available
-
+Plot image with transformation
 
 =for bad
 
@@ -6289,6 +6209,9 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
   $status = plxormod ($mode)
 
 =for ref
+
+Set xor mode:
+mode = 1-enter, 0-leave, status = 0 if not interactive device
 
 See the PLplot manual for reference.
 
@@ -6368,6 +6291,8 @@ the created stream.
   $version = plgver ()
 
 =for ref
+
+Get the current library version number
 
 See the PLplot manual for reference.
 
@@ -6500,6 +6425,14 @@ See the PLplot manual for more details.
     return substr (sprintf ("%.0f%s", abs($label_val), $direction_label), 0, $length);
   }
   plslabelfunc(\&geolocation_labeler);
+
+The PDL version of plslabelfunc only has one argument--the perl subroutine
+to do the label translation:
+
+  my $labeltext = perl_labelfunc($axis, $value, $length);
+
+No 'data' argument is used, it is assumed that global data or a closure containing
+necessary data can be used in 'perl_labelfunc'.
 
 See the PLplot manual for more details.
 
