@@ -1,9 +1,9 @@
 package Sah::Schema::unix::local_uid;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-07-22'; # DATE
+our $DATE = '2021-07-29'; # DATE
 our $DIST = 'Sah-Schemas-Unix'; # DIST
-our $VERSION = '0.017'; # VERSION
+our $VERSION = '0.018'; # VERSION
 
 our $schema = ["unix::uid" => {
     summary => 'User identifier (UID) that has to exist (has associated username) on the system',
@@ -33,7 +33,7 @@ Sah::Schema::unix::local_uid - User identifier (UID) that has to exist (has asso
 
 =head1 VERSION
 
-This document describes version 0.017 of Sah::Schema::unix::local_uid (from Perl distribution Sah-Schemas-Unix), released on 2021-07-22.
+This document describes version 0.018 of Sah::Schema::unix::local_uid (from Perl distribution Sah-Schemas-Unix), released on 2021-07-29.
 
 =head1 SYNOPSIS
 
@@ -87,7 +87,7 @@ L<Perinci::CmdLine> to create a CLI:
  package
    main;
  use Perinci::CmdLine::Any;
- Perinci::CmdLine::Any->new(url=>'MyApp::myfunc')->run;
+ Perinci::CmdLine::Any->new(url=>'/MyApp/myfunc')->run;
 
  # in command-line
  % ./myapp.pl --help

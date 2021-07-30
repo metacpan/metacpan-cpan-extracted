@@ -7,7 +7,7 @@ use Carp qw( croak );
 require FFI::Platypus;
 
 # ABSTRACT: Defining types for FFI::Platypus
-our $VERSION = '1.53'; # VERSION
+our $VERSION = '1.55'; # VERSION
 
 # The TypeParser and Type classes are used internally ONLY and
 # are not to be exposed to the user.  External users should
@@ -58,7 +58,7 @@ FFI::Platypus::Type - Defining types for FFI::Platypus
 
 =head1 VERSION
 
-version 1.53
+version 1.55
 
 =head1 SYNOPSIS
 
@@ -1429,6 +1429,8 @@ Eric Brine (IKEGAMI)
 szTheory
 
 José Joaquín Atria (JJATRIA)
+
+Pete Houston (openstrike, HOUSTON)
 
 =head1 COPYRIGHT AND LICENSE
 

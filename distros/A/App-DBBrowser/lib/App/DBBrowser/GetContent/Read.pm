@@ -16,7 +16,6 @@ use Encode::Locale  qw();
 
 use Term::Choose           qw();
 use Term::Choose::LineFold qw( line_fold );
-use Term::Choose::Screen   qw( clear_screen show_cursor hide_cursor );
 use Term::Choose::Util     qw( get_term_width );
 use Term::Form             qw();
 
@@ -148,35 +147,6 @@ sub from_col_by_col {
             last ASK;
         }
     }
-}
-
-
-sub from_copy_and_paste {
-    my ( $sf, $sql ) = @_;
-    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    print clear_screen();
-    print show_cursor();
-    print "Paste multi-row:  (then press Ctrl-D)\n";
-    my $file_fs = $sf->{i}{f_copy_and_paste};
-    if ( ! eval {
-        open my $fh_in, '>', $file_fs or die $!;
-        # STDIN
-        while ( my $row = <STDIN> ) {
-            print $fh_in $row;
-        }
-        close $fh_in;
-        1 }
-    ) {
-        print hide_cursor();
-        $ax->print_error_message( $@ );
-        unlink $file_fs or warn $!;
-        return;
-    }
-    print hide_cursor();
-    if ( ! -s $file_fs ) {
-        return;
-    }
-    return 1, $file_fs;
 }
 
 

@@ -2,18 +2,21 @@ NAME
     Data::Sah::Normalize - Normalize Sah schema
 
 VERSION
-    This document describes version 0.050 of Data::Sah::Normalize (from Perl
-    distribution Data-Sah-Normalize), released on 2018-09-10.
+    This document describes version 0.051 of Data::Sah::Normalize (from Perl
+    distribution Data-Sah-Normalize), released on 2021-07-29.
 
 SYNOPSIS
      use Data::Sah::Normalize qw(normalize_clset normalize_schema);
 
      my $nclset = normalize_clset({'!a'=>1}); # -> {a=>1, 'a.op'=>'not'}
-     my $nsch   = normalize_schema("int");    # -> ["int", {}, {}]
+     my $nsch   = normalize_schema("int");    # -> ["int", {}]
 
 DESCRIPTION
     This often-needed functionality is split from the main Data::Sah to keep
     it in a small and minimal-dependencies package.
+
+CONTRIBUTOR
+    Steven Haryanto <sharyanto@cpan.org>
 
 FUNCTIONS
   normalize_clset($clset) => HASH
@@ -26,8 +29,8 @@ FUNCTIONS
   normalize_schema($sch) => ARRAY
     Normalize a Sah schema (scalar or array). Return an array. Produce a
     2-level copy of schema, so it's safe to add/delete/modify the normalized
-    schema's clause set and extras (but clause set's and extras' values are
-    still references to the original). Die on failure.
+    schema's clause set, but clause set's values are still references to the
+    original. Die on failure.
 
     TODO: recursively normalize clause which contains sah clauses (e.g.
     "of").
@@ -54,7 +57,8 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2018, 2015, 2014 by perlancar@cpan.org.
+    This software is copyright (c) 2021, 2018, 2015, 2014 by
+    perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

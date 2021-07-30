@@ -11,7 +11,7 @@ use constant 1.32 ();
 our @EXPORT = qw( record_layout record_layout_1 );
 
 # ABSTRACT: FFI support for structured records data
-our $VERSION = '1.53'; # VERSION
+our $VERSION = '1.55'; # VERSION
 
 
 sub record_layout_1
@@ -204,7 +204,7 @@ FFI::Platypus::Record - FFI support for structured records data
 
 =head1 VERSION
 
-version 1.53
+version 1.55
 
 =head1 SYNOPSIS
 
@@ -556,6 +556,8 @@ Eric Brine (IKEGAMI)
 szTheory
 
 José Joaquín Atria (JJATRIA)
+
+Pete Houston (openstrike, HOUSTON)
 
 =head1 COPYRIGHT AND LICENSE
 

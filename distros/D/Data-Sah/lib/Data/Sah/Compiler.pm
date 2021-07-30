@@ -1,7 +1,9 @@
 package Data::Sah::Compiler;
 
-our $DATE = '2020-05-21'; # DATE
-our $VERSION = '0.908'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-07-29'; # DATE
+our $DIST = 'Data-Sah'; # DIST
+our $VERSION = '0.909'; # VERSION
 
 use 5.010;
 use strict;
@@ -629,37 +631,26 @@ sub compile {
     $cd->{nschema} = $nschema;
     local $cd->{schema} = $nschema;
 
-    {
-        my $defs = $nschema->[2]{def};
-        if ($defs) {
-            for my $name (sort keys %$defs) {
-                my $def = $defs->{$name};
-                my $opt = $name =~ s/[?]\z//;
-                local $cd->{def_optional} = $opt;
-                local $cd->{def_name}     = $name;
-                $self->_die($cd, "Invalid name syntax in def: '$name'")
-                    unless $name =~ $Data::Sah::type_re;
-                local $cd->{def_def}      = $def;
-                $self->def($cd);
-                #$log->tracef("=> def() name=%s, def=>%s, optional=%s)",
-                #             $name, $def, $opt);
-            }
-        }
+    if ($self->can("before_resolve")) {
+        my $res = $self->before_resolve($cd);
+        return $cd if ($res//0) == 99;
     }
 
     require Data::Sah::Resolve;
     my $res       = Data::Sah::Resolve::resolve_schema(
-        {
-            schema_is_normalized => 1,
-            #return_intermediates => 1,
-        }, $nschema);
-    my $tn        = $res->[0];
+        {schema_is_normalized => 1}, $nschema);
+    my $tn        = $res->{type};
     $cd->{th}     = $self->get_th(name=>$tn, cd=>$cd);
     $cd->{type}   = $tn;
-    $cd->{clsets} = $res->[1];
-    #$cd->{_intermediate_schemas} = $res->[2];
     if ($nschema->[0] ne $tn) {
         $self->add_compile_module($cd, "Sah::Schema::$nschema->[0]");
+    }
+    if ($args{cache} && $res->{base} && $res->{base} ne $res->{type}) {
+        $cd->{base_schema} = $res->{base};
+        $cd->{clsets} = $res->{"clsets_after_base"};
+    } else {
+        delete $cd->{base_schema};
+        $cd->{clsets} = $res->{"clsets_after_type.alt.merge.merged"};
     }
 
     $self->_process_clsets($cd);
@@ -677,25 +668,6 @@ sub compile {
             );
     }
     return $cd;
-}
-
-sub def {
-    my ($self, $cd) = @_;
-    my $name = $cd->{def_name};
-    my $def  = $cd->{def_def};
-    my $opt  = $cd->{def_optional};
-
-    my $th = $self->get_th(cd=>$cd, name=>$name, load=>0);
-    if ($th) {
-        if ($opt) {
-            #$log->tracef("Not redefining already-defined schema/type '$name'");
-            return;
-        }
-        $self->_die($cd, "Redefining existing type ($name) not allowed");
-    }
-
-    my $nschema = $self->main->normalize_schema($def);
-    $cd->{th_map}{$name} = $nschema;
 }
 
 sub _ignore_clause {
@@ -773,7 +745,7 @@ Data::Sah::Compiler - Base class for Sah compilers (Data::Sah::Compiler::*)
 
 =head1 VERSION
 
-This document describes version 0.908 of Data::Sah::Compiler (from Perl distribution Data-Sah), released on 2020-05-21.
+This document describes version 0.909 of Data::Sah::Compiler (from Perl distribution Data-Sah), released on 2021-07-29.
 
 =for Pod::Coverage ^(check_compile_args|def|expr|init_cd|literal|name|add_module|add_compile_module|add_runtime_module)$
 
@@ -1249,7 +1221,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

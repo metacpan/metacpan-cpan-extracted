@@ -1,3 +1,8 @@
+0.846   2021-07-29  Released-By: PERLANCAR; Urgency: medium
+
+	- Update to Data::Sah::Resolve 0.010.
+
+
 0.845   2020-09-09  Released-By: PERLANCAR; Urgency: medium
 
 	- Provide command-line alias summary in func.specmeta (e.g. for tab

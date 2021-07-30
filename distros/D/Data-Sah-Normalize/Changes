@@ -1,4 +1,16 @@
-0.050   2018-09-10 (PERLANCAR)
+0.051   2021-07-29  Released-By: PERLANCAR
+
+        - Mark as non-developer release.
+
+
+0.050_001 2021-07-20  Released-By: PERLANCAR; Backward-Incompatible: yes; Developer-Release: yes
+
+          - [incompatible change] Extras part are now removed to better comply
+            with Sah 0.9.47+; it must also be empty now, normalize_schema() dies
+            on input that contains non-empty extras part.
+
+
+0.050   2018-09-10  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -8,7 +20,7 @@
 	  Bencher::Scenario::DataSah::normalize_schema instead.
 
 
-0.04    2015-09-06 (PERLANCAR)
+0.04    2015-09-06  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -17,7 +29,7 @@
 	  requirement.
 
 
-0.03    2015-04-24 (PERLANCAR)
+0.03    2015-04-24  Released-By: PERLANCAR
 
         - Add prototype to normalize_schema($) to catch common error like
           normalize_schema(int => min=>1) when it should be
@@ -26,7 +38,7 @@
         - Add benchmark devscript.
 
 
-0.02    2015-04-24 (PERLANCAR)
+0.02    2015-04-24  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -35,7 +47,7 @@
 	  documented/tested).
 
 
-0.01     2014-07-08 (SHARYANTO)
+0.01     2014-07-08  Released-By: SHARYANTO
 
          - First release, split from Data-Sah to provide something minimal for
            those that need normalizing functionality only.

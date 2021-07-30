@@ -462,7 +462,7 @@ sub __func_Date_Time {
 
     for my $qt_col ( @$chosen_cols ) {
         my $first_epochs = $sf->{d}{dbh}->selectcol_arrayref(
-            "SELECT $qt_col FROM $sql->{table} WHERE REGEXP(?,$qt_col,0)",
+            "SELECT $qt_col FROM $sql->{table} WHERE " . $plui->regexp( $qt_col, 0, 0 ),
             { Columns=>[1], MaxRows => $maxrows },
             '\S'
         );
@@ -539,7 +539,7 @@ sub __func_Date_Time {
             }
             else {
                 my $first_epochs = $sf->{d}{dbh}->selectcol_arrayref(
-                    "SELECT $qt_col FROM $sql->{table} WHERE REGEXP(?,$qt_col,0)",
+                    "SELECT $qt_col FROM $sql->{table} WHERE " . $plui->regexp( $qt_col, 0, 0 ),
                     { Columns=>[1], MaxRows => $maxrows },
                     '\S'
                 );
@@ -656,7 +656,7 @@ sub __interval_to_converted_epoch { #
         $converted_epoch = $plui->epoch_to_date( $qt_col, $div );
     }
     my $first_dates = $sf->{d}{dbh}->selectcol_arrayref(
-        "SELECT $converted_epoch FROM $sql->{table} WHERE REGEXP(?,$qt_col,0)",
+        "SELECT $converted_epoch FROM $sql->{table} WHERE " . $plui->regexp( $qt_col, 0, 0 ),
         { Columns=>[1], MaxRows => $maxrows },
         '\S'
     );

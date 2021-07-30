@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 1.53
+    version 1.55
 
 SYNOPSIS
 
@@ -47,10 +47,10 @@ DESCRIPTION
       to reduce common interface specifications to a common format like
       JSON that could be shared between different languages.
 
-    FFI / Platypus could be a bridge to Perl 6
+    FFI / Platypus could be a bridge to Raku
 
-      One of those "other" languages could be Perl 6 and Perl 6 already has
-      an FFI interface I am told.
+      One of those "other" languages could be Raku and Raku already has an
+      FFI interface I am told.
 
     FFI / Platypus can be reimplemented
 
@@ -1721,7 +1721,7 @@ SEE ALSO
 
     NativeCall
 
-      Promising interface to Platypus inspired by Perl 6.
+      Promising interface to Platypus inspired by Raku.
 
     FFI::Platypus::Type
 
@@ -1900,6 +1900,8 @@ AUTHOR
     szTheory
 
     José Joaquín Atria (JJATRIA)
+
+    Pete Houston (openstrike, HOUSTON)
 
 COPYRIGHT AND LICENSE
 

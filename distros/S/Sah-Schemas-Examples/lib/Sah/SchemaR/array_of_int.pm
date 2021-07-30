@@ -1,9 +1,9 @@
-package Sah::SchemaR::example::array_of_int;
+package Sah::SchemaR::array_of_int;
 
-our $DATE = '2020-05-27'; # DATE
-our $VERSION = '0.006'; # VERSION
+our $DATE = '2021-07-30'; # DATE
+our $VERSION = '0.007'; # VERSION
 
-our $rschema = ["array",[{examples=>[{valid=>1,value=>[]},{valid=>1,value=>[1,0,-1]},{valid=>0,value=>1},{valid=>0,value=>[1,1.1]}],of=>["int",{req=>1},{}],summary=>"Array of integers"}],["array"]];
+our $rschema = do{my$var={base=>"array",clsets_after_base=>[{examples=>[{valid=>1,value=>[]},{valid=>1,value=>[1,0,-1]},{valid=>0,value=>1},{valid=>0,value=>[1,1.1]}],of=>["int",{req=>1}],summary=>"Array of integers"}],clsets_after_type=>['$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_base}[0]'],resolve_path=>["array"],type=>"array",v=>2};$var->{clsets_after_type}[0]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_base}[0];$var};
 
 1;
 # ABSTRACT: Array of integers
@@ -16,11 +16,11 @@ __END__
 
 =head1 NAME
 
-Sah::SchemaR::example::array_of_int - Array of integers
+Sah::SchemaR::array_of_int - Array of integers
 
 =head1 VERSION
 
-This document describes version 0.006 of Sah::SchemaR::example::array_of_int (from Perl distribution Sah-Schemas-Examples), released on 2020-05-27.
+This document describes version 0.007 of Sah::SchemaR::array_of_int (from Perl distribution Sah-Schemas-Examples), released on 2021-07-30.
 
 =head1 DESCRIPTION
 
@@ -50,7 +50,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

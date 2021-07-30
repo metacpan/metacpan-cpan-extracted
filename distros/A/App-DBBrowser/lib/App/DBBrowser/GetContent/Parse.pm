@@ -127,7 +127,7 @@ sub __print_template_info {
     $first_part_end--;
     $second_part_begin--;
     my $end_idx = $#{$rows};
-    my $dots = $sf->{i}{dots}[ $sf->{o}{G}{dots} ];
+    my $dots = $sf->{i}{dots};
     my $dots_w = print_columns( $dots );
     if ( @$rows > $avail_h ) {
         for my $row ( @{$rows}[ 0 .. $first_part_end ] ) {

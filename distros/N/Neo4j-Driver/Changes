@@ -1,5 +1,16 @@
 Revision history for Neo4j::Driver
 
+0.26  2021-07-30
+
+ - Change in experimental feature behaviour: Most methods that return lists
+   now yield item count when called in scalar context
+ - deprecate experimental list context syntax for run()
+ - deprecate experimental methods Node->deleted() and Relationship->deleted()
+ - deprecate experimental method ServerInfo->protocol();
+   add method ServerInfo->protocol_version() as replacement
+ - ServerInfo->version() is now a discouraged alias of ServerInfo->agent()
+ - change syntax for experimental Cypher parameter conversion config option
+
 0.25  2021-06-30
 
  - deprecate experimental Cypher type system customisation

@@ -1,9 +1,9 @@
-package Sah::SchemaR::example::array_of_posint;
+package Sah::SchemaR::posints;
 
-our $DATE = '2020-05-27'; # DATE
-our $VERSION = '0.006'; # VERSION
+our $DATE = '2021-07-30'; # DATE
+our $VERSION = '0.007'; # VERSION
 
-our $rschema = ["array",[{of=>["posint",{req=>1},{}],summary=>"Array of positive integers"}],["array"]];
+our $rschema = do{my$var={base=>"array",clsets_after_base=>[{of=>["posint",{req=>1}],summary=>"Array of positive integers"}],clsets_after_type=>['$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_base}[0]'],resolve_path=>["array"],type=>"array",v=>2};$var->{clsets_after_type}[0]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_base}[0];$var};
 
 1;
 # ABSTRACT: Array of positive integers
@@ -16,11 +16,11 @@ __END__
 
 =head1 NAME
 
-Sah::SchemaR::example::array_of_posint - Array of positive integers
+Sah::SchemaR::posints - Array of positive integers
 
 =head1 VERSION
 
-This document describes version 0.006 of Sah::SchemaR::example::array_of_posint (from Perl distribution Sah-Schemas-Examples), released on 2020-05-27.
+This document describes version 0.007 of Sah::SchemaR::posints (from Perl distribution Sah-Schemas-Examples), released on 2021-07-30.
 
 =head1 DESCRIPTION
 
@@ -50,7 +50,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -97,6 +97,8 @@ my %tests = (
           '"\N{BUTTERFLY}" eq "\N{U+1F98B}"', 1 ],
         [ 'unicode-scx',
           '"\N{KATAKANA-HIRAGANA DOUBLE HYPHEN}" !~ /\p{Common}/', 1],
+        [ 'scalar%',
+          'my %h = ("key" => "value"); scalar %h', 1],
     ],
 
     '5.024' => [

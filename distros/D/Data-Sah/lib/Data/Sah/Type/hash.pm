@@ -1,7 +1,9 @@
 package Data::Sah::Type::hash;
 
-our $DATE = '2020-05-21'; # DATE
-our $VERSION = '0.908'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-07-29'; # DATE
+our $DIST = 'Data-Sah'; # DIST
+our $VERSION = '0.909'; # VERSION
 
 use Data::Sah::Util::Role 'has_clause', 'has_clause_alias';
 use Role::Tiny;
@@ -21,7 +23,7 @@ has_clause_alias check_each_elem => 'check_each_value';
 has_clause "keys",
     v => 2,
     tags       => ['constraint'],
-    schema     => ['hash' => {req=>1, values => ['sah::schema', {req=>1}, {}]}, {}],
+    schema     => ['hash' => {req=>1, values => ['sah::schema', {req=>1}]}],
     inspect_elem => 1,
     subschema  => sub { values %{ $_[0] } },
     allow_expr => 0,
@@ -43,9 +45,9 @@ has_clause "re_keys",
     tags       => ['constraint'],
     schema     => ['hash' => {
         req=>1,
-        keys   => ['re', {req=>1}, {}],
-        values => ['sah::schema', {req=>1}, {}],
-    }, {}],
+        keys   => ['re', {req=>1}],
+        values => ['sah::schema', {req=>1}],
+    }],
     inspect_elem => 1,
     subschema  => sub { values %{ $_[0] } },
     allow_expr => 0,
@@ -60,7 +62,7 @@ has_clause "re_keys",
 has_clause "req_keys",
     v => 2,
     tags       => ['constraint'],
-    schema     => ['array', {req=>1, of=>['str', {req=>1}, {}]}, {}],
+    schema     => ['array', {req=>1, of=>['str', {req=>1}]}],
     allow_expr => 1,
     ;
 has_clause_alias req_keys => 'req_all_keys';
@@ -69,7 +71,7 @@ has_clause_alias req_keys => 'req_all';
 has_clause "allowed_keys",
     v => 2,
     tags       => ['constraint'],
-    schema     => ['array', {req=>1, of=>['str', {req=>1}, {}]}, {}],
+    schema     => ['array', {req=>1, of=>['str', {req=>1}]}],
     allow_expr => 1,
     ;
 
@@ -77,14 +79,14 @@ has_clause "allowed_keys_re",
     v => 2,
     prio       => 51,
     tags       => ['constraint'],
-    schema     => ['re', {req=>1}, {}],
+    schema     => ['re', {req=>1}],
     allow_expr => 1,
     ;
 
 has_clause "forbidden_keys",
     v => 2,
     tags       => ['constraint'],
-    schema     => ['array', {req=>1, of=>['str', {req=>1}, {}]}, {}],
+    schema     => ['array', {req=>1, of=>['str', {req=>1}]}],
     allow_expr => 1,
     ;
 
@@ -92,7 +94,7 @@ has_clause "forbidden_keys_re",
     v => 2,
     prio       => 51,
     tags       => ['constraint'],
-    schema     => ['re', {req=>1}, {}],
+    schema     => ['re', {req=>1}],
     allow_expr => 1,
     ;
 
@@ -100,7 +102,7 @@ has_clause "choose_one_key",
     v => 2,
     prio       => 50,
     tags       => ['constraint'],
-    schema     => ['array', {req=>1, of=>['str', {req=>1}, {}], min_len=>1}, {}],
+    schema     => ['array', {req=>1, of=>['str', {req=>1}], min_len=>1}],
     allow_expr => 0, # for now
     ;
 has_clause_alias choose_one_key => 'choose_one';
@@ -109,7 +111,7 @@ has_clause "choose_all_keys",
     v => 2,
     prio       => 50,
     tags       => ['constraint'],
-    schema     => ['array', {req=>1, of=>['str', {req=>1}, {}], min_len=>1}, {}],
+    schema     => ['array', {req=>1, of=>['str', {req=>1}], min_len=>1}],
     allow_expr => 0, # for now
     ;
 has_clause_alias choose_all_keys => 'choose_all';
@@ -118,7 +120,7 @@ has_clause "req_one_key",
     v => 2,
     prio       => 50,
     tags       => ['constraint'],
-    schema     => ['array', {req=>1, of=>['str', {req=>1}, {}], min_len=>1}, {}],
+    schema     => ['array', {req=>1, of=>['str', {req=>1}], min_len=>1}],
     allow_expr => 0, # for now
     ;
 has_clause_alias req_one_key => 'req_one';
@@ -133,9 +135,9 @@ has_clause "req_some_keys",
         elems => [
             [int => {req=>1, min=>0}], # min
             [int => {req=>1, min=>0}], # max
-            [array => {req=>1, of=>['str', {req=>1}, {}], min_len=>1}, {}], # keys
+            [array => {req=>1, of=>['str', {req=>1}], min_len=>1}], # keys
         ],
-    }, {}],
+    }],
     allow_expr => 0, # for now
     ;
 has_clause_alias req_some_keys => 'req_some';
@@ -144,10 +146,10 @@ has_clause_alias req_some_keys => 'req_some';
 my $sch_dep = ['array', {
     req => 1,
     elems => [
-        ['str', {req=>1}, {}],
-        ['array', {of=>['str', {req=>1}, {}]}, {}],
+        ['str', {req=>1}],
+        ['array', {of=>['str', {req=>1}]}],
     ],
-}, {}];
+}];
 
 has_clause "dep_any",
     v => 2,
@@ -200,7 +202,7 @@ Data::Sah::Type::hash - hash type
 
 =head1 VERSION
 
-This document describes version 0.908 of Data::Sah::Type::hash (from Perl distribution Data-Sah), released on 2020-05-21.
+This document describes version 0.909 of Data::Sah::Type::hash (from Perl distribution Data-Sah), released on 2021-07-29.
 
 =for Pod::Coverage ^(clause_.+|clausemeta_.+)$
 
@@ -226,7 +228,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

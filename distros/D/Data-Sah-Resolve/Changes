@@ -1,3 +1,32 @@
+0.011   2021-07-29  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+	- [dist] Edit Changes entry for 0.010 for more explanation.
+
+
+0.010   2021-07-29  Released-By: PERLANCAR; Urgency: medium; Backward-Incompatible: yes
+
+        - [incompatible change] Make result into a hash that contains all the
+          info we need. Continuing with 0.009, this change also allows the
+          result of resolve_schema() to be usable for future/varied needs, e.g.
+          support for validator caching in upcoming Data-Sah.
+
+        - Add option: allow_base_with_no_additional_clauses.
+
+
+0.009   2021-07-27  Released-By: PERLANCAR; Urgency: medium; Backward-Incompatible: yes
+
+	[INCOMPATIBLE CHANGES]
+
+        - Make third element of return value a hash so it can contain additional
+	  stuffs in the future; the intermediates is now in the 'intermediates'
+	  key of this hash.
+
+        - [removed] Remove option 'return_intermediates' (we now always return
+	  intermediates.
+
+
 0.008   2021-02-27  Released-By: PERLANCAR; Urgency: medium
 
 	- [test] Re-pass tests by using Test::Deep to ignore schema's

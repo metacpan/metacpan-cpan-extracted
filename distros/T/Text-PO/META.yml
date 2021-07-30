@@ -5,6 +5,7 @@ author:
 build_requires:
   ExtUtils::MakeMaker: '0'
   File::Spec: '3.78'
+  POSIX: 1.53_01
   Test::More: '1.302182'
   Test::Pod: '1.52'
   utf8: '0'
@@ -26,10 +27,12 @@ requires:
   DateTime: '1.54'
   Encode: '3.08'
   Fcntl: '1.13'
+  I18N::Langinfo: '0.18'
   IO::File: '1.41'
   JSON: '4.03'
   Module::Generic: v0.15.4
   Nice::Try: v1.1.2
+  POSIX: 1.53_01
   Scalar::Util: '1.50'
   Text::Wrap: '2013.0523'
   open: '1.11'
@@ -41,5 +44,5 @@ requires:
 resources:
   bugtracker: https://git.deguest.jp/jack/Text-PO/issues
   repository: https://git.deguest.jp/jack/Text-PO
-version: v0.1.2
+version: v0.1.3
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

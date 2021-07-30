@@ -1,4 +1,8 @@
 ---
+doctype: global
+
+distribution_name: String-Nudge
+---
 doctype: dist
 
 header:
@@ -29,6 +33,5 @@ doctype: cpanfile
 
 ---
 doctype: gitignore
+
 config: Author::CSSON
-always:
- - /String-Nudge-*

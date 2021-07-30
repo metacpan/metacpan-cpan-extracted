@@ -29,7 +29,6 @@ sub defaults {
             qualified_table_name => 0,
             quote_identifiers    => 1,
             thsd_sep             => ',',
-            dots                 => 0,
             base_indent          => 1,
             file_find_warnings   => 0,
             round_precision_sign => 0,
@@ -90,14 +89,12 @@ sub defaults {
         insert => {
             file_encoding            => 'UTF-8',
             history_dirs             => 4,
-            parse_mode_input_copy    => 1,
             parse_mode_input_file    => 0,
             enable_input_filter      => 0,
             empty_to_null_plain      => 1,
-            empty_to_null_copy       => 1,
             empty_to_null_file       => 0,
-            data_source_Create_table => 3,
-            data_source_Insert       => 3,
+            data_source_Create_table => 2,
+            data_source_Insert       => 2,
             show_hidden_files        => 0,
             file_filter              => '',
         },
@@ -153,6 +150,28 @@ sub read_config_files {
             }
         }
     }
+    ################################################################ July 2021
+    my $m = 0;
+    for my $key ( keys %{$o->{enable}} ) {
+        if ( $o->{enable}{$key} > 1 ) {
+            $o->{enable}{$key} = 1;
+            $m++;
+        }
+    }
+    if ( $o->{insert}{data_source_Create_table} == 3) {
+        $o->{insert}{data_source_Create_table} = 2;
+        $m++;
+    }
+    if ( $o->{insert}{data_source_Insert} == 3 ) {
+        $o->{insert}{data_source_Insert} = 2;
+        $m++
+    }
+    if ( $m ) {
+        require App::DBBrowser::Opt::Set;
+        my $opt_set = App::DBBrowser::Opt::Set->new( $sf->{i}, $o );
+        $opt_set->__write_config_files();
+    }
+    ################################################################
     return $o;
 }
 

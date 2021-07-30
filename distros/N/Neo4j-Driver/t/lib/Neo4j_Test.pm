@@ -28,7 +28,7 @@ sub driver_maybe {
 	my $pass = $ENV{TEST_NEO4J_PASSWORD} // '';
 	$driver->basic_auth($user, $pass);
 	$driver->config(timeout => 2);  # 2 seconds timeout may speed up testing
-	$driver->config(cypher_filter => 'params') if ($ENV{NEO4J} // 0) =~ m/^4\b/;
+	$driver->config(cypher_params => v2);
 	
 	$bolt = $driver->{uri} && $driver->{uri}->scheme eq 'bolt';
 	if (! $ENV{TEST_NEO4J_PASSWORD} && ! $bolt) {

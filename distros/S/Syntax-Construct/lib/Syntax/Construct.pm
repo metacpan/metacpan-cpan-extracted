@@ -4,7 +4,7 @@ use 5.006002;
 use strict;
 use warnings;
 
-our $VERSION = '1.021';
+our $VERSION = '1.022';
 
 my %introduces = do { no warnings 'qw';
                  ( '5.034' => [qw[
@@ -23,7 +23,7 @@ my %introduces = do { no warnings 'qw';
                                  delete% unicode10.0 state@=
                              ]],
                    '5.026' => [qw[
-                                 <<~ /xx ^CAPTURE unicode9.0 unicode-scx
+                                 <<~ /xx ^CAPTURE unicode9.0 unicode-scx scalar%
                               ]],
                    '5.024' => [qw[
                                  unicode8.0 \b{lb} sprintf-reorder
@@ -144,6 +144,7 @@ my %alias = (
     'heredoc-indent' => '<<~',
     'regex-xx' => '/xx',
     'capture-variable' => '^CAPTURE',
+    'scalar-hash' => 'scalar%',
     # 5.028
     'hash-delete-slice' => 'delete%',
     'unicode-10.0' => 'unicode10.0',
@@ -267,7 +268,7 @@ Syntax::Construct - Explicitly state which non-feature constructs are used in th
 
 =head1 VERSION
 
-Version 1.021
+Version 1.022
 
 =head1 SYNOPSIS
 
@@ -778,6 +779,14 @@ Alias: unicode-9.0
 
 See I<"Use of \p{script} uses the improved Script_Extensions property">
 in L<perl5260delta>.
+
+=head3 scalar%
+
+See L<perl5260delta/scalar(%hash) return signature changed>. Specifying this
+construct means the 5.026+ behaviour, i.e. C<scalar %hash> returns the number
+of keys.
+
+Alias: scalar-hash
 
 =head2 5.028
 

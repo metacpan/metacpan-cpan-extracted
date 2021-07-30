@@ -5,12 +5,13 @@ use utf8;
 
 package Neo4j::Driver::ServerInfo;
 # ABSTRACT: Provides Neo4j server address and version
-$Neo4j::Driver::ServerInfo::VERSION = '0.25';
+$Neo4j::Driver::ServerInfo::VERSION = '0.26';
 
 use URI 1.25;
 
 
 sub new {
+	# uncoverable pod (private method)
 	my ($class, $server_info) = @_;
 	
 	# don't store the full URI here - it may contain auth credentials
@@ -21,8 +22,25 @@ sub new {
 
 
 sub address  { shift->{uri} }
+sub agent    { shift->{version} }
 sub version  { shift->{version} }
-sub protocol { shift->{protocol} }
+
+
+sub protocol_version {
+	shift->{protocol}
+}
+
+
+sub protocol {
+	# uncoverable pod (see Deprecations.pod)
+	my ($self) = @_;
+	warnings::warnif deprecated => __PACKAGE__ . "->protocol() is deprecated; use protocol_version() instead";
+	my $protocol = $self->{protocol_string};
+	return $protocol if defined $protocol;
+	my $bolt_version = $self->{protocol};
+	return "Bolt/$bolt_version" if $bolt_version;
+	return defined $bolt_version ? "Bolt" : "HTTP";
+}
 
 
 1;
@@ -39,7 +57,7 @@ Neo4j::Driver::ServerInfo - Provides Neo4j server address and version
 
 =head1 VERSION
 
-version 0.25
+version 0.26
 
 =head1 SYNOPSIS
 
@@ -66,30 +84,36 @@ L<Neo4j::Driver::ServerInfo> implements the following methods.
 Returns the host name and port number of the server. Takes the form
 of an URL authority string (for example: C<localhost:7474>).
 
-=head2 version
+=head2 agent
 
- $version_string = $session->server->version;
+ $agent_string = $session->server->agent;
 
 Returns the product name and version number. Takes the form of
 a server agent string (for example: C<Neo4j/3.5.17>).
 
-=head1 EXPERIMENTAL FEATURES
+=head2 protocol_version
 
-L<Neo4j::Driver::ServerInfo> implements the following experimental
-features. These are subject to unannounced modification or removal
-in future versions. Expect your code to break if you depend upon
-these features.
+ $bolt_version = $session->server->protocol_version;
 
-=head2 protocol
+Returns the Bolt protocol version with which the remote server
+communicates. Takes the form of a string C<"$major.$minor">
+where the major and minor version numbers both are integers.
 
- $protocol_string = $session->server->protocol;
+When the HTTP protocol is used instead of Bolt, this method
+returns an undefined value.
 
-Returns the protocol name and version number announced by the server.
-Similar to an agent string, this value is formed by the protocol
-name followed by a slash and the version number, usually two digits
-separated by a dot (for example: C<Bolt/1.0> or C<HTTP/1.1>).
+If the Bolt protocol is used, but the version number is unknown,
+an empty string is returned. This situation shouldn't occur unless
+you use L<Neo4j::Bolt> S<version 0.20> or older.
 
-If the protocol version is unknown, just the name is returned.
+=head2 version
+
+ $agent_string = $session->server->version;
+
+Alias for L<C<agent()>|/"agent">.
+
+Use of C<version()> is discouraged since version 0.26.
+This method may be deprecated and removed in future.
 
 =head1 SEE ALSO
 

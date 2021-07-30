@@ -2,14 +2,16 @@ NAME
     Bencher::Scenarios::StringFunctions - Benchmark string functions
 
 VERSION
-    This document describes version 0.003 of
+    This document describes version 0.004 of
     Bencher::Scenarios::StringFunctions (from Perl distribution
-    Bencher-Scenarios-StringFunctions), released on 2021-06-23.
+    Bencher-Scenarios-StringFunctions), released on 2021-07-30.
 
 DESCRIPTION
     This distribution contains the following Bencher scenario modules:
 
     *   Bencher::Scenario::StringFunctions::CommonPrefix
+
+    *   Bencher::Scenario::StringFunctions::Indent
 
     *   Bencher::Scenario::StringFunctions::Trim
 

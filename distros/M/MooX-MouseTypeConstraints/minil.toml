@@ -1,0 +1,7 @@
+name = "MooX-MouseTypeConstraints"
+# badges = ["travis-ci.com"]
+authority="cpan:KARUPA"
+
+module_maker="ModuleBuildTiny"
+static_install = "auto"
+

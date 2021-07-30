@@ -13,7 +13,7 @@ use Path::Tiny qw(path);
 
 # ABSTRACT: parse and model go.mod files
 
-our $VERSION = '0.002';
+our $VERSION = '0.005';
 our $AUTHORITY = 'cpan:bclawsie';
 
 our @EXPORT_OK = qw(read_go_mod parse_go_mod);
@@ -121,6 +121,11 @@ sub parse_go_mod {
               if ( defined $m->{'require'}->{$1} );
             $m->{'require'}->{$1} = $2;
         }
+        elsif ( $line =~ m{^\s*//.*$}mx ) {
+
+            # comment
+
+        }
         else {
             croak "unknown line content: $line";
         }
@@ -145,6 +150,7 @@ C<Lang::Go::Mod> - parse and model go.mod files
    # $ cat go.mod
    # module github.com/example/my-project
    # go 1.16
+   # // comments
    # exclude (
    #    example.com/whatmodule v1.4.0
    # )
@@ -196,5 +202,9 @@ return the hash representation of the contents. All errors C<croak>.
 Lang::Go::Mod is licensed under the same terms as Perl itself.
 
 https://opensource.org/licenses/artistic-license-2.0
+
+=head1 CONTRIBUTORS
+
+Ben Bullock (https://github.com/benkasminbullock)
 
 =cut

@@ -37,7 +37,6 @@ sub get_content {
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my @choices = (
         [ 'plain', '- Plain' ],
-        [ 'copy',  '- Copy & Paste' ],
         [ 'file',  '- From File' ],
     );
     $sf->{i}{gc}{old_idx_menu} //= 0;
@@ -45,7 +44,7 @@ sub get_content {
 
     MENU: while ( 1 ) {
         if ( ! $skip_to ) {
-            if ( $data_source_choice_idx == 3 ) {
+            if ( $data_source_choice_idx == 2 ) {
                 my $prompt = 'Type of data source:';
                 my @pre = ( undef );
                 my $menu = [ @pre, map( $_->[1], @choices ) ];
@@ -79,14 +78,11 @@ sub get_content {
                 if ( $sf->{i}{gc}{source_type} eq 'plain' ) {
                     ( $ok, $sf->{i}{gc}{file_fs} ) = $cr->from_col_by_col( $sql );
                 }
-                elsif ( $sf->{i}{gc}{source_type} eq 'copy' ) {
-                    ( $ok, $sf->{i}{gc}{file_fs} ) = $cr->from_copy_and_paste( $sql );
-                }
                 elsif ( $sf->{i}{gc}{source_type} eq 'file' ) {
                     ( $ok, $sf->{i}{gc}{file_fs} ) = $cr->from_file( $sql );
                 }
                 if ( ! $ok ) {
-                    return if $data_source_choice_idx < 3;
+                    return if $data_source_choice_idx < 2;
                     $skip_to = '';
                     next MENU;
                 }
@@ -101,10 +97,6 @@ sub get_content {
                     my ( $parse_mode_idx, $open_mode );
                     if ( $sf->{i}{gc}{source_type} eq 'plain' ) {
                         $parse_mode_idx = -1;
-                        $open_mode = '<';
-                    }
-                    elsif ( $sf->{i}{gc}{source_type} eq 'copy' ) {
-                        $parse_mode_idx = $sf->{o}{insert}{parse_mode_input_copy};
                         $open_mode = '<';
                     }
                     elsif ( $sf->{i}{gc}{source_type} eq 'file' ) {
@@ -133,7 +125,6 @@ sub get_content {
                         }
                         if ( ! $parse_ok ) {
                             $skip_to = '';
-                            next MENU if $sf->{i}{gc}{source_type} eq 'copy';
                             next GET_DATA;
                         }
                         if ( ! @{$sql->{insert_into_args}} ) {
@@ -143,7 +134,6 @@ sub get_content {
                             );
                             close $fh;
                             $skip_to = '';
-                            next MENU if $sf->{i}{gc}{source_type} eq 'copy';
                             next GET_DATA;
                         }
                     }
@@ -176,7 +166,6 @@ sub get_content {
                             && $sf->{i}{ss}{$file_fs}{sheet_count} >= 2 ) {
                             next PARSE;
                         }
-                        next MENU if $sf->{i}{gc}{source_type} eq 'copy';
                         next GET_DATA;
                     }
                     elsif ( $ok == -1 ) {

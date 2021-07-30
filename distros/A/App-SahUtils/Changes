@@ -1,3 +1,9 @@
+0.478   2021-07-27  Released-By: PERLANCAR; Urgency: medium
+
+	- [cli resolve-sah-schema] Update to Data::Sah::Resolve 0.009 (no
+	  more return_intermediates option).
+
+
 0.477   2020-02-12  Released-By: PERLANCAR; Urgency: medium
 
 	- Adjust to Data::Sah 0.907 (changed return_type values).

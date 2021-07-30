@@ -20,58 +20,169 @@ my $s = $driver->session;
 # those features or moved elsewhere once the features are documented
 # and thus officially supported.
 
-use Test::More 0.96 tests => 11 + 1;
+use Test::More 0.96 tests => 13 + 1;
 use Test::Exception;
 use Test::Warnings qw(warnings);
+
+use Neo4j::Driver;
 
 
 my ($q, $r, @a, $a);
 
 
-subtest 'wantarray' => sub {
-	plan tests => 5 + 6 + 5;
-	$q = <<END;
-RETURN 7 AS n UNION RETURN 11 AS n
-END
-	lives_ok { @a = $s->run($q); } 'get result as list';
-	lives_and { is $a[0]->get('n'), 7; } 'get record 0 in result list';
-	lives_and { is $a[1]->get('n'), 11; } 'get record 1 in result list';
-	lives_ok { $a = $s->run($q)->keys; } 'get keys as array';
-	lives_and { is $a->[0], 'n'; } 'get record 0 in keys array';
+{
+package Neo4j_Test::Result::Keys;
+use parent 'Neo4j_Test::MockHTTP';
+sub response_for { &Neo4j_Test::MockHTTP::response_for }
+no warnings 'qw';
+response_for 'no keys' => { jolt => [qw(
+	{"header":{}} {"summary":{}} {"info":{}}
+)]};
+response_for 'one key' => { jolt => [qw(
+	{"header":{"fields":["A"]}} {"summary":{}} {"info":{}}
+)]};
+response_for 'three keys' => { jolt => [qw(
+	{"header":{"fields":["X","Y","Z"]}} {"summary":{}} {"info":{}}
+)]};
+}
+subtest 'result keys() wantarray' => sub {
+	plan tests => 1 + 3*3;
+	my $d = Neo4j::Driver->new('http:');
+	$d->config(net_module => 'Neo4j_Test::Result::Keys');
+	my $sx;
+	lives_and { ok $sx = $d->session(database => 'dummy') } 'session';
+	lives_and { $r = 0; ok $r = $sx->run('no keys') } 'run 0';
+	lives_and { is_deeply [$r->keys], [] } '0 keys';
+	lives_and { is scalar($r->keys), 0 } '0 keys scalar context';
+	lives_and { $r = 0; ok $r = $sx->run('one key') } 'run 1';
+	lives_and { is_deeply [$r->keys], ['A'] } '1 key';
+	lives_and { is scalar($r->keys), 1 } '1 key scalar context';
+	lives_and { $r = 0; ok $r = $sx->run('three keys') } 'run 3';
+	lives_and { is_deeply [$r->keys], [qw(X Y Z)] } '3 keys';
+	lives_and { is scalar($r->keys), 3 } '3 keys scalar context';
+};
+
+
+{
+package Neo4j_Test::Summary::Notifications;
+use parent 'Neo4j_Test::MockHTTP';
+sub response_for { &Neo4j_Test::MockHTTP::response_for }
+no warnings 'qw';
+response_for 'zero notes' => { jolt => [qw(
+	{"header":{}} {"summary":{"stats":{}}} {"info":{}}
+)]};
+response_for 'one note' => { jolt => [qw(
+	{"header":{}} {"summary":{"stats":{}}} {"info":{"notifications":["foobaz"]}}
+)]};
+response_for 'two notes' => { jolt => [qw(
+	{"header":{}} {"summary":{"stats":{}}} {"info":{"notifications":["foo","bar"]}}
+)]};
+}
+subtest 'summary notifications() wantarray' => sub {
+	plan tests => 1 + 3*3;
+	my $d = Neo4j::Driver->new('http:');
+	$d->config(net_module => 'Neo4j_Test::Summary::Notifications');
+	my $sx;
+	lives_and { ok $sx = $d->session(database => 'dummy') } 'session';
+	lives_and { $r = 0; ok $r = $sx->run('zero notes')->summary } 'run 0';
+	lives_and { is_deeply [$r->notifications], [] } '0 notifications';
+	lives_and { is scalar($r->notifications), 0 } '0 notifications scalar context';
+	lives_and { $r = 0; ok $r = $sx->run('one note')->summary } 'run 1';
+	lives_and { is_deeply [$r->notifications], ['foobaz'] } '1 notification';
+	lives_and { is scalar($r->notifications), 1 } '1 notification scalar context';
+	lives_and { $r = 0; ok $r = $sx->run('two notes')->summary } 'run 2';
+	lives_and { is_deeply [$r->notifications], ['foo','bar'] } '2 notifications';
+	lives_and { is scalar($r->notifications), 2 } '2 notifications scalar context';
+};
+
+
+{
+package Neo4j_Test::Types::Context;
+use parent 'Neo4j_Test::MockHTTP';
+sub response_for { &Neo4j_Test::MockHTTP::response_for }
+sub single_column {[
+	{ header => { fields => [0] } },
+	(map {{ data => [$_] }} @_),
+	{ summary => {} },
+	{ info => {} },
+]}
+response_for 'no labels' => { jolt => single_column(
+	{ '()' => [ 1, undef, {} ] },
+)};
+response_for 'zero labels' => { jolt => single_column(
+	{ '()' => [ 1, [], {} ] },
+)};
+response_for 'one label' => { jolt => single_column(
+	{ '()' => [ 1, ['foobar'], {} ] },
+)};
+response_for 'two labels' => { jolt => single_column(
+	{ '()' => [ 1, ['foo', 'baz'], {} ] },
+)};
+response_for 'no labels' => { jolt => single_column(
+	{ '()' => [ 1, [], {} ] },
+)};
+response_for 'one label' => { jolt => single_column(
+	{ '()' => [ 1, ['foobar'], {} ] },
+)};
+response_for 'path zero' => { jolt => single_column( { '..' => [
+	{ '()' => [ 11, [], {} ] },
+]})};
+response_for 'path one' => { jolt => single_column( { '..' => [
+	{ '()' => [ 2, [], {} ] },
+	{ '->' => [ 3, 2, 'TEST', 4, {} ] },
+	{ '()' => [ 4, [], {} ] },
+]})};
+response_for 'path two' => { jolt => single_column( { '..' => [
+	{ '()' => [ 5, [], {} ] },
+	{ '->' => [ 6, 5, 'TEST', 7, {} ] },
+	{ '()' => [ 7, [], {} ] },
+	{ '->' => [ 8, 7, 'TEST', 9, {} ] },
+	{ '()' => [ 9, [], {} ] },
+]})};
+}
+subtest 'types node/path wantarray' => sub {
+	plan tests => 1 + 4*3 + 3*7;
+	my $d = Neo4j::Driver->new('http:');
+	$d->config(net_module => 'Neo4j_Test::Types::Context');
+	my $sx;
+	lives_and { ok $sx = $d->session(database => 'dummy') } 'session';
 	
-	# notifications
-	lives_ok { $a = 0;  $a = $s->run($q)->summary->notifications; } 'no notifications';
-	lives_and { is $a, undef; } 'no notifications array size';
-	$q = <<END;
-EXPLAIN MATCH (n), (m) RETURN n, m
-END
-	lives_ok { $r = 0;  $r = $s->run($q)->summary; } 'get summary';
-	lives_ok { @a = ();  @a = $r->notifications; } 'get notifications list';
-	SKIP: { skip 'no notifications', 2 unless @a;
-		lives_ok { $a = 0;  $a = $r->notifications; } 'get notifications array';
-		lives_and { is scalar @$a, 1; } 'get notifications array size';
-	}
+	lives_and { $r = 0; ok $r = $sx->run('no labels')->single->get } 'run no labels';
+	lives_and { is_deeply [$r->labels], [] } 'labels undef';
+	lives_and { is scalar($r->labels), 0 } 'labels undef scalar context';
+	lives_and { $r = 0; ok $r = $sx->run('zero labels')->single->get } 'run zero labels';
+	lives_and { is_deeply [$r->labels], [] } '0 labels';
+	lives_and { is scalar($r->labels), 0 } '0 labels scalar context';
+	lives_and { $r = 0; ok $r = $sx->run('one label')->single->get } 'run one label';
+	lives_and { is_deeply [$r->labels], ['foobar'] } '1 label';
+	lives_and { is scalar($r->labels), 1 } '1 label scalar context';
+	lives_and { $r = 0; ok $r = $sx->run('two labels')->single->get } 'run two labels';
+	lives_and { is_deeply [$r->labels], ['foo','baz'] } '2 labels';
+	lives_and { is scalar($r->labels), 2 } '2 labels scalar context';
 	
-	# type objects
-	my $tx = $driver->session->begin_transaction;
-	$tx->{return_stats} = 0;  # optimise sim
-	$q = <<END;
-CREATE p=(a:Test:Want:Array)-[:TEST]->(c)
-RETURN p, a
-END
-	lives_ok { $r = $tx->run($q)->single; } 'get type objects';
-	throws_ok {
-		 $a = $r->get('p')->elements;
-	} qr/\bscalar context\b.*\bnot supported\b/i, 'get path elements as scalar';
-	throws_ok {
-		 $a = $r->get('p')->nodes;
-	} qr/\bscalar context\b.*\bnot supported\b/i, 'get path nodes as scalar';
-	throws_ok {
-		 $a = $r->get('p')->relationships;
-	} qr/\bscalar context\b.*\bnot supported\b/i, 'get path rels as scalar';
-	throws_ok {
-		 $a = $r->get('a')->labels;
-	} qr/\bscalar context\b.*\bnot supported\b/i, 'get node labels as scalar';
+	lives_and { $r = 0; ok $r = $sx->run('path zero')->single->get } 'run path zero';
+	lives_and { is_deeply [map {$_->id} $r->elements], [11] } '1 element';
+	lives_and { is_deeply [map {$_->id} $r->nodes], [11] } '1 node';
+	lives_and { is_deeply [map {$_->id} $r->relationships], [] } '0 rels';
+	lives_and { is scalar($r->elements), 1 } '1 element scalar context';
+	lives_and { is scalar($r->nodes), 1 } '1 node scalar context';
+	lives_and { is scalar($r->relationships), 0 } '0 rels scalar context';
+	
+	lives_and { $r = 0; ok $r = $sx->run('path one')->single->get } 'run path one';
+	lives_and { is_deeply [map {$_->id} $r->elements], [2,3,4] } '3 elements';
+	lives_and { is_deeply [map {$_->id} $r->nodes], [2,4] } '2 nodes';
+	lives_and { is_deeply [map {$_->id} $r->relationships], [3] } '1 rel';
+	lives_and { is scalar($r->elements), 3 } '3 elements scalar context';
+	lives_and { is scalar($r->nodes), 2 } '2 nodes scalar context';
+	lives_and { is scalar($r->relationships), 1 } '1 rel scalar context';
+	
+	lives_and { $r = 0; ok $r = $sx->run('path two')->single->get } 'run path two';
+	lives_and { is_deeply [map {$_->id} $r->elements], [5,6,7,8,9] } '5 elements';
+	lives_and { is_deeply [map {$_->id} $r->nodes], [5,7,9] } '3 nodes';
+	lives_and { is_deeply [map {$_->id} $r->relationships], [6,8] } '2 rels';
+	lives_and { is scalar($r->elements), 5 } '5 elements scalar context';
+	lives_and { is scalar($r->nodes), 3 } '3 nodes scalar context';
+	lives_and { is scalar($r->relationships), 2 } '2 rels scalar context';
 };
 
 

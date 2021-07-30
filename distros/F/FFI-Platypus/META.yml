@@ -17,7 +17,7 @@ configure_requires:
   parent: '0'
   perl: '5.006'
 dynamic_config: 1
-generated_by: 'Dist::Zilla version 6.022, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.023, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -41,7 +41,7 @@ resources:
   bugtracker: https://github.com/PerlFFI/FFI-Platypus/issues
   homepage: https://metacpan.org/pod/FFI::Platypus
   repository: git://github.com/PerlFFI/FFI-Platypus.git
-version: '1.53'
+version: '1.55'
 x_contributors:
   - 'Graham Ollis <plicease@cpan.org>'
   - 'Bakkiaraj Murugesan (bakkiaraj)'
@@ -62,6 +62,7 @@ x_contributors:
   - 'Eric Brine (IKEGAMI)'
   - szTheory
   - 'José Joaquín Atria (JJATRIA)'
+  - 'Pete Houston (openstrike, HOUSTON)'
 x_generated_by_perl: v5.34.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

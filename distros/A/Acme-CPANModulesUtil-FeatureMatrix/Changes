@@ -1,3 +1,8 @@
+0.005   2021-07-29  Released-By: PERLANCAR; Urgency: medium
+
+	- Update to Data::Sah::Resolve 0.010.
+
+
 0.004   2021-02-20  Released-By: PERLANCAR; Urgency: medium
 
 	- Support non-boolean feature.

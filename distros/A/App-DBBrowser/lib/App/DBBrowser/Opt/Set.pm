@@ -97,14 +97,12 @@ sub _options {
             { name => '_binary_filter',      text => "- Binary filter",   section => 'table' },
             { name => '_squash_spaces',      text => "- Squash spaces",   section => 'table' },
             { name => '_base_indent',        text => "- Indentation",     section => 'G'     },
-            { name => '_dots',               text => "- Truncated rows",  section => 'G'     },
             { name => '_set_string',         text => "- Set string",      section => 'table' },
             { name => '_file_find_warnings', text => "- Warnings",        section => 'G'     },
         ],
         group_insert => [
             { name => '_data_source_type',  text => "- Source type of input data",     section => 'insert' },
             { name => '_parse_file',        text => "- Parse tool for 'file'",         section => 'insert' },
-            { name => '_parse_copy',        text => "- Parse tool for 'copy & paste'", section => 'insert' },
             { name => '_csv_char',          text => "- Settings: csv-a",               section => 'csv'    },
             { name => '_csv_options',       text => "- Settings: csv-b",               section => 'csv'    },
             { name => '_split_config',      text => "- Settings: split",               section => 'split'  },
@@ -364,13 +362,6 @@ sub set_options {
                 ];
                 $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
             }
-            elsif ( $opt eq '_parse_copy' ) {
-                my $prompt = 'Parsing "copy & paste" input';
-                my $sub_menu = [
-                    [ 'parse_mode_input_copy', "- Use:", [ 'Text::CSV', 'split', 'Template' ] ],
-                ];
-                $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
-            }
             elsif ( $opt eq '_csv_options' ) {
                 my $prompt = 'Text::CSV-b';
                 my $sub_menu = [
@@ -394,7 +385,6 @@ sub set_options {
                 my $prompt = 'Enable "Empty to NULL" by default:';
                 my $sub_menu = [
                     [ 'empty_to_null_plain',  "- Source type 'plain'",  [ $no, $yes ] ],
-                    [ 'empty_to_null_copy',   "- Source type 'copy'",   [ $no, $yes ] ],
                     [ 'empty_to_null_file',   "- Source tpye 'file'",   [ $no, $yes ] ],
                 ];
                 $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
@@ -402,15 +392,8 @@ sub set_options {
             elsif ( $opt eq '_data_source_type' ) {
                 my $prompt = 'Data source options';
                 my $sub_menu = [
-                    [ 'data_source_Create_table', "- Data source \"Create table\"", [ 'plain', 'copy&paste', 'file', 'menu' ], ],
-                    [ 'data_source_Insert',       "- Data source \"Insert into\"",  [ 'plain', 'copy&paste', 'file', 'menu' ], ],
-                ];
-                $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
-            }
-            elsif ( $opt eq '_dots' ) {
-                my $prompt = '"How to mark truncated lines"';
-                my $sub_menu = [
-                    [ 'dots', "- Mark of truncated lines", [ $sf->{i}{dots}[0], $sf->{i}{dots}[1], 'none' ] ]
+                    [ 'data_source_Create_table', "- Data source \"Create table\"", [ 'plain', 'file', 'menu' ], ],
+                    [ 'data_source_Insert',       "- Data source \"Insert into\"",  [ 'plain', 'file', 'menu' ], ],
                 ];
                 $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
             }
@@ -530,13 +513,6 @@ sub set_options {
                     [ 'expand_order_by', "- ORDER BY", [ $no, $yes ] ],
                     [ 'expand_set',      "- SET",      [ $no, $yes ] ],
                 ];
-                ############################################# 06.07.2021
-                for my $key ( keys %{$sf->{o}{$section}} ) {
-                    if ( $sf->{o}{$section}{$key} > 1 ) {
-                        $sf->{o}{$section}{$key} = 1;
-                    }
-                }
-                #############################################
                 $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
             }
             elsif ( $opt eq '_e_parentheses' ) {

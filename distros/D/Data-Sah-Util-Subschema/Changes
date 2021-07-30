@@ -1,20 +1,23 @@
-Revision history for Data-Sah-Util-Subschema
+0.005   2021-07-29  Released-By: PERLANCAR; Urgency: medium
 
-0.004   2016-07-25 (PERLANCAR)
+	- Update to Data::Sah::Resolve 0.010.
+
+
+0.004   2016-07-25  Released-By: PERLANCAR
 
 	- Avoid deep recursion when given recursive schema.
 
 
-0.003   2016-07-20 (PERLANCAR)
+0.003   2016-07-20  Released-By: PERLANCAR
 
 	- Resolve schema before extracting subschemas.
 
 
-0.002   2016-05-29 (PERLANCAR)
+0.002   2016-05-29  Released-By: PERLANCAR
 
         - [dist] Forgot to declare dependency on Data::Sah 0.79.
 
 
-0.001   2016-05-29 (PERLANCAR)
+0.001   2016-05-29  Released-By: PERLANCAR
 
         - First release.

@@ -1,7 +1,9 @@
 package Data::Sah::Type::Sortable;
 
-our $DATE = '2020-05-21'; # DATE
-our $VERSION = '0.908'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-07-29'; # DATE
+our $DIST = 'Data-Sah'; # DIST
+our $VERSION = '0.909'; # VERSION
 
 use Data::Sah::Util::Role 'has_clause';
 use Role::Tiny;
@@ -11,7 +13,7 @@ requires 'superclause_sortable';
 has_clause 'min',
     v => 2,
     tags       => ['constraint'],
-    schema     => ['_same', {req=>1}, {}],
+    schema     => ['_same', {req=>1}],
     allow_expr => 1,
     code       => sub {
         my ($self, $cd) = @_;
@@ -21,7 +23,7 @@ has_clause 'min',
 has_clause 'xmin',
     v => 2,
     tags       => ['constraint'],
-    schema     => ['_same', {req=>1}, {}],
+    schema     => ['_same', {req=>1}],
     allow_expr => 1,
     code       => sub {
         my ($self, $cd) = @_;
@@ -32,7 +34,7 @@ has_clause 'max',
     v => 2,
     prio       => 51,
     tags       => ['constraint'],
-    schema     => ['_same', {req=>1}, {}],
+    schema     => ['_same', {req=>1}],
     allow_expr => 1,
     code       => sub {
         my ($self, $cd) = @_;
@@ -43,7 +45,7 @@ has_clause 'xmax',
     v => 2,
     prio       => 51,
     tags       => ['constraint'],
-    schema     => ['_same', {req=>1}, {}],
+    schema     => ['_same', {req=>1}],
     allow_expr => 1,
     code       => sub {
         my ($self, $cd) = @_;
@@ -54,9 +56,9 @@ has_clause 'between',
     v => 2,
     tags       => ['constraint'],
     schema     => ['array', {req=>1, len=>2, elems=>[
-        ['_same', {req=>1}, {}],
-        ['_same', {req=>1}, {}],
-    ]}, {}],
+        ['_same', {req=>1}],
+        ['_same', {req=>1}],
+    ]}],
     allow_expr => 1,
     code       => sub {
         my ($self, $cd) = @_;
@@ -67,9 +69,9 @@ has_clause 'xbetween',
     v => 2,
     tags       => ['constraint'],
     schema     => ['array', {req=>1, len=>2, elems=>[
-        ['_same', {req=>1}, {}],
-        ['_same', {req=>1}, {}],
-    ]}, {}],
+        ['_same', {req=>1}],
+        ['_same', {req=>1}],
+    ]}],
     allow_expr => 1,
     code => sub {
         my ($self, $cd) = @_;
@@ -92,7 +94,7 @@ Data::Sah::Type::Sortable - Role for sortable types
 
 =head1 VERSION
 
-This document describes version 0.908 of Data::Sah::Type::Sortable (from Perl distribution Data-Sah), released on 2020-05-21.
+This document describes version 0.909 of Data::Sah::Type::Sortable (from Perl distribution Data-Sah), released on 2021-07-29.
 
 =head1 DESCRIPTION
 
@@ -124,7 +126,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

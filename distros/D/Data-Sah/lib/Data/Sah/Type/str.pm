@@ -1,7 +1,9 @@
 package Data::Sah::Type::str;
 
-our $DATE = '2020-05-21'; # DATE
-our $VERSION = '0.908'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-07-29'; # DATE
+our $DIST = 'Data-Sah'; # DIST
+our $VERSION = '0.909'; # VERSION
 
 use Data::Sah::Util::Role 'has_clause';
 use Role::Tiny;
@@ -14,12 +16,12 @@ with 'Data::Sah::Type::HasElems';
 
 # currently we only support regex instead of hash of regexes
 #my $t_re = 'regex*|{*=>regex*}';
-my $t_re = ['regex', {req=>1}, {}];
+my $t_re = ['regex', {req=>1}];
 
 has_clause 'encoding',
     v => 2,
     tags       => ['constraint'],
-    schema     => ['str', {req=>1}, {}],
+    schema     => ['str', {req=>1}],
     allow_expr => 0,
     ;
 has_clause 'match',
@@ -31,7 +33,7 @@ has_clause 'match',
 has_clause 'is_re',
     v => 2,
     tags       => ['constraint'],
-    schema     => ['bool', {}, {}],
+    schema     => ['bool', {}],
     allow_expr => 1,
     ;
 
@@ -50,7 +52,7 @@ Data::Sah::Type::str - str type
 
 =head1 VERSION
 
-This document describes version 0.908 of Data::Sah::Type::str (from Perl distribution Data-Sah), released on 2020-05-21.
+This document describes version 0.909 of Data::Sah::Type::str (from Perl distribution Data-Sah), released on 2021-07-29.
 
 =for Pod::Coverage ^(clause_.+|clausemeta_.+)$
 
@@ -76,7 +78,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

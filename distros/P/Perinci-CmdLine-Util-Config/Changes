@@ -1,3 +1,8 @@
+1.725   2021-07-29  Released-By: PERLANCAR; Urgency: medium
+
+	- Update to Data::Sah::Resolve 0.010.
+
+
 1.724   2020-10-21  Released-By: PERLANCAR; Urgency: medium
 
 	- get_args_from_config(): Accept argument 'plugins' which will be set

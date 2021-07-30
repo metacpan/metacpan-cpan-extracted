@@ -3,15 +3,15 @@ NAME
     files
 
 VERSION
-    This document describes version 1.724 of Perinci::CmdLine::Util::Config
+    This document describes version 1.725 of Perinci::CmdLine::Util::Config
     (from Perl distribution Perinci-CmdLine-Util-Config), released on
-    2020-10-21.
+    2021-07-29.
 
 FUNCTIONS
   get_args_from_config
     Usage:
 
-     get_args_from_config(%args) -> [status, msg, payload, meta]
+     get_args_from_config(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
     "config" is a HoH (hashes of hashrefs) produced by reading an INI (IOD)
     configuration file using modules like Config::IOD::Reader.
@@ -71,19 +71,22 @@ FUNCTIONS
 
     Returns an enveloped result (an array).
 
-    First element (status) is an integer containing HTTP status code (200
-    means OK, 4xx caller error, 5xx function error). Second element (msg) is
-    a string containing error message, or 'OK' if status is 200. Third
-    element (payload) is optional, the actual result. Fourth element (meta)
-    is called result metadata and is optional, a hash that contains extra
-    information.
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
 
     Return value: (any)
 
   get_default_config_dirs
     Usage:
 
-     get_default_config_dirs() -> [status, msg, payload, meta]
+     get_default_config_dirs() -> [$status_code, $reason, $payload, \%result_meta]
 
     This function is not exported by default, but exportable.
 
@@ -91,19 +94,22 @@ FUNCTIONS
 
     Returns an enveloped result (an array).
 
-    First element (status) is an integer containing HTTP status code (200
-    means OK, 4xx caller error, 5xx function error). Second element (msg) is
-    a string containing error message, or 'OK' if status is 200. Third
-    element (payload) is optional, the actual result. Fourth element (meta)
-    is called result metadata and is optional, a hash that contains extra
-    information.
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
 
     Return value: (any)
 
   read_config
     Usage:
 
-     read_config(%args) -> [status, msg, payload, meta]
+     read_config(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
     This function is not exported by default, but exportable.
 
@@ -121,12 +127,15 @@ FUNCTIONS
 
     Returns an enveloped result (an array).
 
-    First element (status) is an integer containing HTTP status code (200
-    means OK, 4xx caller error, 5xx function error). Second element (msg) is
-    a string containing error message, or 'OK' if status is 200. Third
-    element (payload) is optional, the actual result. Fourth element (meta)
-    is called result metadata and is optional, a hash that contains extra
-    information.
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
 
     Return value: (any)
 
@@ -150,7 +159,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2020, 2019, 2018, 2017 by
+    This software is copyright (c) 2021, 2019, 2018, 2017 by
     perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under

@@ -1,7 +1,7 @@
 package Bencher::Scenario::StringFunctions::CommonPrefix;
 
-our $DATE = '2021-06-23'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2021-07-30'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 use strict;
 use warnings;
@@ -38,7 +38,7 @@ Bencher::Scenario::StringFunctions::CommonPrefix - Benchmark calculating common 
 
 =head1 VERSION
 
-This document describes version 0.003 of Bencher::Scenario::StringFunctions::CommonPrefix (from Perl distribution Bencher-Scenarios-StringFunctions), released on 2021-06-23.
+This document describes version 0.004 of Bencher::Scenario::StringFunctions::CommonPrefix (from Perl distribution Bencher-Scenarios-StringFunctions), released on 2021-07-30.
 
 =head1 SYNOPSIS
 
@@ -100,7 +100,7 @@ Function call template:
 
 =head1 SAMPLE BENCHMARK RESULTS
 
-Run on: perl: I<< v5.34.0 >>, CPU: I<< Intel(R) Core(TM) i5-7200U CPU @ 2.50GHz (2 cores) >>, OS: I<< GNU/Linux Ubuntu version 20.04 >>, OS kernel: I<< Linux version 5.3.0-64-generic >>.
+Run on: perl: I<< v5.34.0 >>, CPU: I<< Intel(R) Core(TM) i7-4770 CPU @ 3.40GHz (4 cores) >>, OS: I<< GNU/Linux LinuxMint version 19 >>, OS kernel: I<< Linux version 5.3.0-68-generic >>.
 
 Benchmark with default options (C<< bencher -m StringFunctions::CommonPrefix >>):
 
@@ -109,64 +109,128 @@ Benchmark with default options (C<< bencher -m StringFunctions::CommonPrefix >>)
  +-------------------------------------+---------+---------+--------+------+-----------+-----------+-----------------------+-----------------------+---------+---------+
  | participant                         | dataset | ds_tags | p_tags | perl | rate (/s) | time (ns) | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors | samples |
  +-------------------------------------+---------+---------+--------+------+-----------+-----------+-----------------------+-----------------------+---------+---------+
- | String::CommonPrefix::common_prefix | elems0  |         |        | perl |   7000000 |       100 |                 0.00% |                 0.00% | 1.9e-09 |      27 |
+ | String::CommonPrefix::common_prefix | elems0  |         |        | perl |   9053000 |     110.5 |                 0.00% |                 0.00% | 4.6e-12 |      20 |
  +-------------------------------------+---------+---------+--------+------+-----------+-----------+-----------------------+-----------------------+---------+---------+
+
+Formatted as L<Benchmark.pm|Benchmark> result:
+
+          Rate     
+     9053000/s  -- 
+ 
+ Legends:
+   : dataset=elems0 ds_tags= p_tags= participant=String::CommonPrefix::common_prefix perl=perl
 
  #table2#
  {dataset=>"elems1"}
- +-------------------------------------+---------+---------+--------+------+-----------+-----------+-----------------------+-----------------------+---------+---------+
- | participant                         | dataset | ds_tags | p_tags | perl | rate (/s) | time (ns) | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors | samples |
- +-------------------------------------+---------+---------+--------+------+-----------+-----------+-----------------------+-----------------------+---------+---------+
- | String::CommonPrefix::common_prefix | elems1  |         |        | perl |   2090000 |       479 |                 0.00% |                 0.00% | 2.1e-10 |      20 |
- +-------------------------------------+---------+---------+--------+------+-----------+-----------+-----------------------+-----------------------+---------+---------+
+ +-------------------------------------+---------+---------+--------+------+-----------+-----------+-----------------------+-----------------------+--------+---------+
+ | participant                         | dataset | ds_tags | p_tags | perl | rate (/s) | time (ns) | pct_faster_vs_slowest | pct_slower_vs_fastest | errors | samples |
+ +-------------------------------------+---------+---------+--------+------+-----------+-----------+-----------------------+-----------------------+--------+---------+
+ | String::CommonPrefix::common_prefix | elems1  |         |        | perl |   2509000 |     398.6 |                 0.00% |                 0.00% |  5e-12 |      20 |
+ +-------------------------------------+---------+---------+--------+------+-----------+-----------+-----------------------+-----------------------+--------+---------+
+
+Formatted as L<Benchmark.pm|Benchmark> result:
+
+          Rate     
+     2509000/s  -- 
+ 
+ Legends:
+   : dataset=elems1 ds_tags= p_tags= participant=String::CommonPrefix::common_prefix perl=perl
 
  #table3#
  {dataset=>"elems1000prefix0"}
  +-------------------------------------+------------------+---------+--------+------+-----------+-----------+-----------------------+-----------------------+---------+---------+
  | participant                         | dataset          | ds_tags | p_tags | perl | rate (/s) | time (μs) | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors | samples |
  +-------------------------------------+------------------+---------+--------+------+-----------+-----------+-----------------------+-----------------------+---------+---------+
- | String::CommonPrefix::common_prefix | elems1000prefix0 |         |        | perl |      4400 |       230 |                 0.00% |                 0.00% | 2.7e-07 |      20 |
+ | String::CommonPrefix::common_prefix | elems1000prefix0 |         |        | perl |      5570 |       179 |                 0.00% |                 0.00% | 5.3e-08 |      20 |
  +-------------------------------------+------------------+---------+--------+------+-----------+-----------+-----------------------+-----------------------+---------+---------+
+
+Formatted as L<Benchmark.pm|Benchmark> result:
+
+       Rate     
+     5570/s  -- 
+ 
+ Legends:
+   : dataset=elems1000prefix0 ds_tags= p_tags= participant=String::CommonPrefix::common_prefix perl=perl
 
  #table4#
  {dataset=>"elems1000prefix1"}
  +-------------------------------------+------------------+---------+--------+------+-----------+-----------+-----------------------+-----------------------+---------+---------+
  | participant                         | dataset          | ds_tags | p_tags | perl | rate (/s) | time (μs) | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors | samples |
  +-------------------------------------+------------------+---------+--------+------+-----------+-----------+-----------------------+-----------------------+---------+---------+
- | String::CommonPrefix::common_prefix | elems1000prefix1 |         |        | perl |      3810 |       263 |                 0.00% |                 0.00% | 2.6e-07 |      21 |
+ | String::CommonPrefix::common_prefix | elems1000prefix1 |         |        | perl |   4850.76 |   206.153 |                 0.00% |                 0.00% | 2.1e-11 |      20 |
  +-------------------------------------+------------------+---------+--------+------+-----------+-----------+-----------------------+-----------------------+---------+---------+
+
+Formatted as L<Benchmark.pm|Benchmark> result:
+
+          Rate     
+     4850.76/s  -- 
+ 
+ Legends:
+   : dataset=elems1000prefix1 ds_tags= p_tags= participant=String::CommonPrefix::common_prefix perl=perl
 
  #table5#
  {dataset=>"elems100prefix0"}
  +-------------------------------------+-----------------+---------+--------+------+-----------+-----------+-----------------------+-----------------------+---------+---------+
  | participant                         | dataset         | ds_tags | p_tags | perl | rate (/s) | time (μs) | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors | samples |
  +-------------------------------------+-----------------+---------+--------+------+-----------+-----------+-----------------------+-----------------------+---------+---------+
- | String::CommonPrefix::common_prefix | elems100prefix0 |         |        | perl |     43401 |    23.041 |                 0.00% |                 0.00% | 3.3e-11 |      20 |
+ | String::CommonPrefix::common_prefix | elems100prefix0 |         |        | perl |     54800 |      18.3 |                 0.00% |                 0.00% | 6.4e-09 |      22 |
  +-------------------------------------+-----------------+---------+--------+------+-----------+-----------+-----------------------+-----------------------+---------+---------+
+
+Formatted as L<Benchmark.pm|Benchmark> result:
+
+        Rate     
+     54800/s  -- 
+ 
+ Legends:
+   : dataset=elems100prefix0 ds_tags= p_tags= participant=String::CommonPrefix::common_prefix perl=perl
 
  #table6#
  {dataset=>"elems100prefix1"}
- +-------------------------------------+-----------------+---------+--------+------+-----------+-----------+-----------------------+-----------------------+--------+---------+
- | participant                         | dataset         | ds_tags | p_tags | perl | rate (/s) | time (μs) | pct_faster_vs_slowest | pct_slower_vs_fastest | errors | samples |
- +-------------------------------------+-----------------+---------+--------+------+-----------+-----------+-----------------------+-----------------------+--------+---------+
- | String::CommonPrefix::common_prefix | elems100prefix1 |         |        | perl |     37300 |      26.8 |                 0.00% |                 0.00% |  1e-08 |      34 |
- +-------------------------------------+-----------------+---------+--------+------+-----------+-----------+-----------------------+-----------------------+--------+---------+
+ +-------------------------------------+-----------------+---------+--------+------+-----------+-----------+-----------------------+-----------------------+---------+---------+
+ | participant                         | dataset         | ds_tags | p_tags | perl | rate (/s) | time (μs) | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors | samples |
+ +-------------------------------------+-----------------+---------+--------+------+-----------+-----------+-----------------------+-----------------------+---------+---------+
+ | String::CommonPrefix::common_prefix | elems100prefix1 |         |        | perl |     47193 |    21.189 |                 0.00% |                 0.00% | 2.1e-11 |      32 |
+ +-------------------------------------+-----------------+---------+--------+------+-----------+-----------+-----------------------+-----------------------+---------+---------+
+
+Formatted as L<Benchmark.pm|Benchmark> result:
+
+        Rate     
+     47193/s  -- 
+ 
+ Legends:
+   : dataset=elems100prefix1 ds_tags= p_tags= participant=String::CommonPrefix::common_prefix perl=perl
 
  #table7#
  {dataset=>"elems10prefix0"}
  +-------------------------------------+----------------+---------+--------+------+-----------+-----------+-----------------------+-----------------------+---------+---------+
  | participant                         | dataset        | ds_tags | p_tags | perl | rate (/s) | time (μs) | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors | samples |
  +-------------------------------------+----------------+---------+--------+------+-----------+-----------+-----------------------+-----------------------+---------+---------+
- | String::CommonPrefix::common_prefix | elems10prefix0 |         |        | perl |    370000 |     2.703 |                 0.00% |                 0.00% | 4.4e-11 |      20 |
+ | String::CommonPrefix::common_prefix | elems10prefix0 |         |        | perl |    465000 |      2.15 |                 0.00% |                 0.00% | 8.3e-10 |      20 |
  +-------------------------------------+----------------+---------+--------+------+-----------+-----------+-----------------------+-----------------------+---------+---------+
+
+Formatted as L<Benchmark.pm|Benchmark> result:
+
+         Rate     
+     465000/s  -- 
+ 
+ Legends:
+   : dataset=elems10prefix0 ds_tags= p_tags= participant=String::CommonPrefix::common_prefix perl=perl
 
  #table8#
  {dataset=>"elems10prefix1"}
  +-------------------------------------+----------------+---------+--------+------+-----------+-----------+-----------------------+-----------------------+---------+---------+
  | participant                         | dataset        | ds_tags | p_tags | perl | rate (/s) | time (μs) | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors | samples |
  +-------------------------------------+----------------+---------+--------+------+-----------+-----------+-----------------------+-----------------------+---------+---------+
- | String::CommonPrefix::common_prefix | elems10prefix1 |         |        | perl |    300000 |         3 |                 0.00% |                 0.00% | 4.2e-08 |      20 |
+ | String::CommonPrefix::common_prefix | elems10prefix1 |         |        | perl |    396800 |    2.5202 |                 0.00% |                 0.00% | 5.3e-12 |      20 |
  +-------------------------------------+----------------+---------+--------+------+-----------+-----------+-----------------------+-----------------------+---------+---------+
+
+Formatted as L<Benchmark.pm|Benchmark> result:
+
+         Rate     
+     396800/s  -- 
+ 
+ Legends:
+   : dataset=elems10prefix1 ds_tags= p_tags= participant=String::CommonPrefix::common_prefix perl=perl
 
 
 Benchmark module startup overhead (C<< bencher -m StringFunctions::CommonPrefix --module-startup >>):
@@ -175,10 +239,20 @@ Benchmark module startup overhead (C<< bencher -m StringFunctions::CommonPrefix 
  +----------------------+-----------+-------------------+-----------------------+-----------------------+---------+---------+
  | participant          | time (ms) | mod_overhead_time | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors | samples |
  +----------------------+-----------+-------------------+-----------------------+-----------------------+---------+---------+
- | String::CommonPrefix |       8.7 |               2.6 |                 0.00% |                42.51% | 8.7e-06 |      20 |
- | perl -e1 (baseline)  |       6.1 |               0   |                42.51% |                 0.00% | 2.5e-05 |      20 |
+ | String::CommonPrefix |         8 |                 4 |                 0.00% |               119.08% | 0.00015 |      20 |
+ | perl -e1 (baseline)  |         4 |                 0 |               119.08% |                 0.00% | 0.00014 |      31 |
  +----------------------+-----------+-------------------+-----------------------+-----------------------+---------+---------+
 
+
+Formatted as L<Benchmark.pm|Benchmark> result:
+
+                Rate   S:C  :perl -e1 ( 
+  S:C          0.1/s    --         -50% 
+  :perl -e1 (  0.2/s  100%           -- 
+ 
+ Legends:
+   :perl -e1 (: mod_overhead_time=0 participant=perl -e1 (baseline)
+   S:C: mod_overhead_time=4 participant=String::CommonPrefix
 
 To display as an interactive HTML table on a browser, you can add option C<--format html+datatables>.
 

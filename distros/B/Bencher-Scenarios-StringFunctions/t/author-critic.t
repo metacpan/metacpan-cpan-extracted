@@ -15,7 +15,7 @@ use warnings;
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/Bencher/Scenario/StringFunctions/CommonPrefix.pm','lib/Bencher/Scenario/StringFunctions/Trim.pm','lib/Bencher/Scenario/StringModules/Startup.pm','lib/Bencher/Scenarios/StringFunctions.pm'];
+my $filenames = ['lib/Bencher/Scenario/StringFunctions/CommonPrefix.pm','lib/Bencher/Scenario/StringFunctions/Indent.pm','lib/Bencher/Scenario/StringFunctions/Trim.pm','lib/Bencher/Scenario/StringModules/Startup.pm','lib/Bencher/Scenarios/StringFunctions.pm','lib/String/Indent/Join.pm'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Type::Relationship;
 # ABSTRACT: Describes a relationship from a Neo4j graph
-$Neo4j::Driver::Type::Relationship::VERSION = '0.25';
+$Neo4j::Driver::Type::Relationship::VERSION = '0.26';
 
 use parent 'Neo4j::Types::Relationship';
 use overload '%{}' => \&_hash, fallback => 1;
@@ -56,8 +56,10 @@ sub id {
 
 
 sub deleted {
+	# uncoverable pod
 	my ($self) = @_;
 	
+	warnings::warnif deprecated => __PACKAGE__ . "->deleted() is deprecated";
 	return $$self->{_meta}->{deleted};
 }
 
@@ -92,7 +94,7 @@ Neo4j::Driver::Type::Relationship - Describes a relationship from a Neo4j graph
 
 =head1 VERSION
 
-version 0.25
+version 0.26
 
 =head1 SYNOPSIS
 
@@ -162,28 +164,6 @@ See L<Neo4j::Types::Relationship/"end_id">.
  $type = $relationship->type;
 
 See L<Neo4j::Types::Relationship/"type">.
-
-=head1 EXPERIMENTAL FEATURES
-
-L<Neo4j::Driver::Type::Relationship> implements the following
-experimental features. These are subject to unannounced modification
-or removal in future versions. Expect your code to break if you
-depend upon these features.
-
-=head2 Deletion indicator
-
- $node_exists = ! $relationship->deleted;
-
-In some circumstances, Cypher statements using C<DELETE> may still
-C<RETURN> relationships that were deleted. To help avoid confusion in
-such cases, the server sometimes reports whether or not a relationship
-was deleted.
-
-This method is experimental because that information is not reliably
-available. In particular, there is a known issue with the Neo4j server
-(L<#12306|https://github.com/neo4j/neo4j/issues/12306>), and old Neo4j
-versions may not report it at all. If unavailable, C<undef> will be
-returned by this method.
 
 =head1 BUGS
 

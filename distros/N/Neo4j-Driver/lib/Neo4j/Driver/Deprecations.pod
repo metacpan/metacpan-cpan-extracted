@@ -13,7 +13,7 @@ Neo4j::Driver::Deprecations - Explains features that have been deprecated, but n
 
 =head1 VERSION
 
-version 0.25
+version 0.26
 
 =head1 OVERVIEW
 
@@ -38,7 +38,7 @@ Originally added in 0.02 as an experimental feature.>
 
  $driver->close;  # no-op
 
-All resources opened by this driver are closed automatically once
+All resources opened by the Perl driver are closed automatically once
 they are no longer required. Explicit calls to C<close()> are neither
 required nor useful.
 
@@ -53,6 +53,31 @@ Originally added in 0.01 as an experimental feature.>
 Early versions allowed modifying the driver object after session
 creation. This is not very useful in practice. The official Neo4j
 drivers are explicitly designed to be immutable.
+
+=head2 Parameter syntax conversion using C<cypher_filter>
+
+I<< Config option C<cypher_filter> deprecated in version 0.26
+and to be removed in 1.00.
+Originally added in 0.14 as an experimental feature. >>
+
+ $driver->config( cypher_filter => 'params' );
+
+When this option is set, the driver automatically uses a regular
+expression to convert the old Cypher parameter syntax C<{param}>
+supported by Neo4j S<versions 2 and 3> to the new syntax C<$param>
+supported by Neo4j S<versions 3 and 4>.
+
+This option was meant to support more general filtering of Cypher
+statements at some point in the future. But custom net modules
+already make that very easy. Therefore the C<cypher_filter>
+option won't be extended any further. However, the existing
+parameter syntax conversion is probably useful enough to stand
+on its own feet if given a more appropriate name.
+
+Instead of this option, C<cypher_params> should be used;
+see L<Neo4j::Driver/"Parameter syntax conversion">.
+
+ $driver->config( cypher_params => v2 );
 
 =head2 Suppress exceptions
 
@@ -288,7 +313,41 @@ L<C<summary()>|Neo4j::Driver::Result/"summary">.
 
  $stats = $session->run('...')->summary->counters;
 
+=head1 Neo4j::Driver::ServerInfo
+
+=head2 Protocol string
+
+I<Deprecated in version 0.26 and to be removed in 1.00.
+Originally added in 0.19 as an experimental feature.>
+
+ $protocol_string = $session->server->protocol;
+
+Returns the protocol name and version number announced by the server.
+Similar to an agent string, this value is formed by the protocol
+name followed by a slash and the version number, usually two digits
+separated by a dot (for example: C<Bolt/1.0> or C<HTTP/1.1>).
+If the protocol version is unknown, just the name is returned.
+
+Since Neo4j 4.3, the driver API has an official method for this
+purpose, L<Neo4j::Driver::ServerInfo/"protocol_version">.
+Therefore the experimental C<protocol()> method is expendable.
+In the future, the behaviour of the deprecated C<protocol()>
+method can be approximated as follows:
+
+ $protocol_string = $_ ? "Bolt/$_" : defined ? "Bolt" : "HTTP/1.1"
+   for $session->server->protocol_version;
+
 =head1 Neo4j::Driver::Session
+
+=head2 Call run() in list context
+
+I<Deprecated in version 0.26 and to be removed in 1.00.
+Originally added in 0.01 as an experimental feature.>
+
+ @records = $session->run('...');
+
+See L<Neo4j::Driver::Transaction|/"Call-run()-in-list-context1">
+below for details.
 
 =head2 close()
 
@@ -297,7 +356,7 @@ Originally added in 0.02 as an experimental feature.>
 
  $session->close;  # no-op
 
-All resources opened by this driver are closed automatically once
+All resources opened by the Perl driver are closed automatically once
 they are no longer required. Explicit calls to C<close()> are neither
 required nor useful.
 
@@ -319,6 +378,39 @@ Use L<Neo4j::Driver::Result> instead.
 
 =head1 Neo4j::Driver::Transaction
 
+=head2 Call run() in list context
+
+I<Deprecated in version 0.26 and to be removed in 1.00.
+Originally added in 0.01 as an experimental feature.>
+
+ @records = $transaction->run('...');
+
+The C<run> method tries to Do What You Mean if called in list
+context. However, this may result in unexpected behaviour.
+For example, consider this code:
+
+ $people = {
+   jane => $tx->run('MATCH (n) WHERE n.name = "Jane" RETURN n'),
+   john => $tx->run('MATCH (n) WHERE n.name = "John" RETURN n'),
+ };
+
+You might expect the result to be a hash with two Neo4j nodes as
+entry values. However, if no nodes match these queries, the list
+context will make C<run()> return empty lists and you might end up
+with the hash C<< {jane => 'john'} >> instead. If one node matches
+and the other doesn't, the code may die.
+
+To avoid this issue, you can wrap every call to C<run()> in
+C<scalar()>. This will always get you a L<Neo4j::Driver::Result>.
+In the next major version of the driver, wrapping the call
+in C<scalar()> will no longer be necessary, because a
+L<Neo4j::Driver::Result> will be returned in every context.
+
+To obtain a list of L<Neo4j::Driver::Record> instances, simply
+use C<list()> in list context:
+
+ @records = $tx->run('...')->list;
+
 =head2 Call run() with an array of multiple statements
 
 I<Deprecated in version 0.25 and to be removed in 1.00.
@@ -332,6 +424,9 @@ Originally added in 0.01 as an experimental feature.>
  foreach $result ( @$results ) {
    say $result->single->get;
  }
+ 
+ # Call in list context (also deprecated):
+ @results = $transaction->run($statements);
 
 The Neo4j HTTP API supports executing multiple statements within a
 single HTTP request. This driver exposes this feature to the client
@@ -342,6 +437,41 @@ and is therefore bug-prone.
 If you need this feature, you should consider using the
 private C<_run_multiple()> method instead; see
 L<Neo4j::Driver::Transaction/"Execute multiple statements at once">.
+
+=head1 Neo4j::Driver::Type::Node, Neo4j::Driver::Type::Relationship
+
+=head2 Deletion indicator
+
+I<Deprecated in version 0.26 and to be removed in 1.00.
+Originally added in 0.13 as an experimental feature.>
+
+ $node_definitely_deleted = $node->deleted;
+ $node_definitely_exists  = ! $node->deleted && defined $node->deleted;
+ $node_status_unknown     = ! defined $node->deleted;
+ 
+ $reln_definitely_deleted = $relationship->deleted;
+ ...
+
+In some circumstances, Cypher statements using C<DELETE> may still
+C<RETURN> nodes or relationships that were deleted. To help avoid
+confusion in such cases, the server sometimes reports whether
+or not a node was deleted. If the deletion status of a node or
+relationship is unknown, C<undef> will be returned by this method.
+
+However, that information is not reliably available. In particular,
+it is only reported for HTTP connections using JSON responses
+(not for Bolt or Jolt). Additionally, some Neo4j server versions
+may not report it at all, and I<if> reported, it may be affected
+by a known bug in the Neo4j server
+(L<#12306|https://github.com/neo4j/neo4j/issues/12306>).
+Finally, the deletion indicator doesn't reflect whether or
+not a transaction was successful or rolled back.
+
+Given the low availability and reliability of this indicator,
+consistency suggests to remove the C<deleted()> method entirely.
+To obtain this indicator in the future, use a custom net module
+to disable Jolt, then try to access the result's raw meta data.
+For caveats, see L<Neo4j::Driver::Net/"USE OF INTERNAL APIS">.
 
 =head1 Neo4j::Driver::Type::Path
 

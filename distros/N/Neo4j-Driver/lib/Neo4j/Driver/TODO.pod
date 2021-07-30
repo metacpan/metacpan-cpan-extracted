@@ -28,33 +28,15 @@ See also L<#7|https://github.com/johannessen/neo4j-driver-perl/issues/7>.
 
 =over
 
-=item * L<Neo4j::Driver/"Parameter syntax conversion">: make stable and move
-filter implementation to C<Transaction> in preparation of Bolt v3 support
-
-=item * L<Neo4j::Driver::Session/"Calling in list context">: make illegal
+=item * L<Neo4j::Driver/"Parameter syntax conversion">: make stable
 
 =item * L<Neo4j::Driver::Session/"Concurrent transactions">: make illegal
 for both nested explicit and nested autocommit transactions (for
 consistency with Bolt), but provide a driver config option (e. g.
 C<< nested_transactions => 1 >>) that lifts this restriction for HTTP
 
-=item * L<Neo4j::Driver::Transaction/"Calling in list context">: make illegal
-
-=item * L<Neo4j::Driver::Transaction/"Execute multiple statements at once">:
-This feature should no longer be exposed to the client. It complicates the API
-significantly and is not that big of an optimisation anyway, because results
-are typically fetched I<before> the next statement is run.
-
 =item * L<Neo4j::Driver::Transaction/"Return results in graph format">,
 L<Neo4j::Driver::Record/"graph">: make driver config option
-
-=item * Calling list methods in scalar context
-(L<in Node|Neo4j::Driver::Type::Node/"Calling in scalar context">,
-L<in Path|Neo4j::Driver::Type::Path/"Calling in scalar context">,
-L<in Result|Neo4j::Driver::Result/"Calling in scalar context">, and
-L<in ResultSummary|Neo4j::Driver::ResultSummary/"Calling in scalar context">)
-should probably generally behave the same way using a list in scalar
-context would: It should return the number of items in the list.
 
 =item * Jolt: The C<jolt> config option will be deprecated once
 Jolt implementation is fully complete. Those who use a modern Neo4j
@@ -83,19 +65,10 @@ C<$a> in expressions like C<< $a->{b} >>; see L<perlref/"Using References">).
 that are not normally necessary. Since this logic seems to work fine, it should
 be simplified. (This may also make it easier to unroll the recursion later.)
 
-=item * The current policy of not documenting deprecated methods is informed by
-the principle to "design interfaces that are: consistent; easy to use correctly;
-hard to use incorrectly". Perhaps simply listing the deprecated method names
-with short note like "deprecated in 0.13" would be an acceptable addition that
-also fulfils the B<pod> coverage requirements.
-
 =item * Documenting each attribute in L<Neo4j::Driver::SummaryCounters> as individual
 methods might be a quick way to bring up the B<pod> coverage stats a bit.
 
 =back
-
-=item * Neo4j::Test should auto-detect the Neo4j server version and
-set the C<cypher_filter> config option accordingly.
 
 =item * Write new unit tests for all modules.
 
@@ -116,8 +89,11 @@ L<majensen/libneo4j-client#8|https://github.com/majensen/libneo4j-client/commit/
 =item * List possible C<croak> output in L<Neo4j::Driver/"DIAGNOSTICS">,
 allowing for indexing by search engines.
 
-=item * L<Neo4j::Driver::ResultSummary/"notifications">: Clarify docs that
-this method is to be called in list context.
+=item * We need complete working code examples, such as that Neo4j movies app.
+Some of the deprecated functionality could also be implemented as a custom
+module named S<e. g.> Neo4j::Driver::Net::HTTP::Extra. Such a module might
+be directly useful to some users, but most importantly, it would serve to
+demonstrate some of the net_module functionality and how that can be used.
 
 =back
 
@@ -143,17 +119,22 @@ it's still allowed to use it in cases such as ours.
 =item * Allow passing config options directly to the constructor, e. g. in
 place of the URL (C<< Neo4j::Driver->new({ url=>"bolt:", timeout=>30 }) >>).
 
-=item * Change the default URI scheme from HTTP to auto-detect, i. e. try
-Bolt first, then HTTP in case of failure. This could be explicitly specified
-as e. g. C<//localhost>.
+=item * The C<neo4j> scheme should work for a community edition server out
+of the box. For starters, C<neo4j> should check if L<Neo4j::Bolt> is loaded
+into C<%INC> and if the specified server actually supports Bolt. If so, it
+should behave identically to C<bolt>, otherwise if should behave identically
+to either C<http> or C<https>, depending on the encryption config.
+This behaviour is different than that of the official drivers; see also
+L<https://community.neo4j.com/t/different-between-neo4j-and-bolt/18498>.
+It should be sufficient to document that the behaviour is subject to
+change (clusters are enterprise-only and therefore currently out of scope,
+and the conditions under which Bolt is chosen may also change in future).
 
-=item * The C<neo4j> scheme could perhaps be mapped onto Bolt or onto the
-default URL scheme, just so that C<neo4j://...> URLs will kind of work.
-
-=item * Consider writing a concrete example that re-creates LOMS logic by
-re-blessing the structural types into custom types from the business logic
-using C<< $cypher_types->{init} >>. (For example, check for Neo4j nodes that
-are labelled C<:Person> and re-bless those as C<Local::Person> or whatever.)
+=item * Change the default URI scheme from C<http> to C<neo4j>. Because
+a C<use Neo4j::Bolt;> statement has so far never been necessary for the
+driver and the driver's behaviour won't change it it is not present, and
+also because HTTP-only features have so far been experimental features
+only, this should not be a breaking change.
 
 =back
 
@@ -168,14 +149,13 @@ API doesn't need to be used again for a new session. This change would keep
 down network utilisation in scenarios where many sessions are created (such
 as running the driver's test suite).
 
-=item * Consider whether to offer
-L<transaction functions|https://neo4j.com/docs/driver-manual/current/session-api/simple/#driver-simple-transaction-fn>.
-If available, these should consist of subrefs passed to methods called
+=item * Add
+L<transaction functions|https://neo4j.com/docs/driver-manual/4.1/session-api/simple/#driver-simple-transaction-fn>.
+These should probably consist of subrefs passed to methods called
 C<write_transaction> and C<read_transaction>. These access modes are only an
 optimisation for Enterprise features. We don't target those at present, but
 C<read_transaction> could then eventually be routed to a high-performance
-read-only server once clusters are supported. It would make sense to offer
-both methods right away even though initially they'd work exactly the same.
+read-only server (for Bolt connections) once clusters are supported.
 
 =back
 
@@ -288,6 +268,7 @@ errors are internal client errors that shouldn't rollback the tx
 (L<majensen/libneo4j-client#7|https://github.com/majensen/libneo4j-client/issues/7#issuecomment-752914015>).
 Not sure if these occur in practice, but we should probably
 be able to handle them correctly anyway.
+(See also L<neo4j#12651|https://github.com/neo4j/neo4j/issues/12651>.)
 
 =back
 
@@ -325,5 +306,11 @@ then cache the results. May not actually have advantages for deep_bless though.
 =item * Add C<property()> as alias for C<get()> in L<Neo4j::Driver::Type::Node>
 and L<Neo4j::Driver::Type::Relationship>, enabling clients to avoid the
 possibly confusing C<< $record->get->get >> pattern.
+Another way to avoid this pattern would be C<< $record->get->properties->{} >>.
+Aside from being longer, this is also S<50 %> slower because of the defensive
+copy that needs to be created. We should probably cache that one at least.
+In the long run, the internal representation of these types will change;
+the C<properties()> hash ref will then actually be the fastest way to get a
+single property (about 8% faster than C<get()>).
 
 =back

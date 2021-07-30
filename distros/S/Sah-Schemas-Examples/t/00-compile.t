@@ -9,25 +9,25 @@ use Test::More;
 plan tests => 20 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
-    'Sah/Schema/example/array_of_int.pm',
-    'Sah/Schema/example/array_of_posint.pm',
-    'Sah/Schema/example/array_of_str.pm',
+    'Sah/Schema/array_of_int.pm',
+    'Sah/Schema/array_of_posint.pm',
     'Sah/Schema/example/foo.pm',
     'Sah/Schema/example/has_merge.pm',
-    'Sah/Schema/example/hash_of_int.pm',
-    'Sah/Schema/example/hash_of_posint.pm',
-    'Sah/Schema/example/hash_of_str.pm',
     'Sah/Schema/example/recurse1.pm',
     'Sah/Schema/example/recurse2a.pm',
     'Sah/Schema/example/recurse2b.pm',
-    'Sah/SchemaR/example/array_of_int.pm',
-    'Sah/SchemaR/example/array_of_posint.pm',
-    'Sah/SchemaR/example/array_of_str.pm',
+    'Sah/Schema/hash_of_int.pm',
+    'Sah/Schema/hash_of_posint.pm',
+    'Sah/Schema/ints.pm',
+    'Sah/Schema/posints.pm',
+    'Sah/SchemaR/array_of_int.pm',
+    'Sah/SchemaR/array_of_posint.pm',
     'Sah/SchemaR/example/foo.pm',
     'Sah/SchemaR/example/has_merge.pm',
-    'Sah/SchemaR/example/hash_of_int.pm',
-    'Sah/SchemaR/example/hash_of_posint.pm',
-    'Sah/SchemaR/example/hash_of_str.pm',
+    'Sah/SchemaR/hash_of_int.pm',
+    'Sah/SchemaR/hash_of_posint.pm',
+    'Sah/SchemaR/ints.pm',
+    'Sah/SchemaR/posints.pm',
     'Sah/Schemas/Examples.pm'
 );
 

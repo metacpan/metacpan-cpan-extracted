@@ -3,17 +3,20 @@ NAME
     being used in the wild
 
 VERSION
-    This document describes version 0.002 of CPAN::Meta::X (from Perl
-    distribution CPAN-Meta-X), released on 2020-10-29.
+    This document describes version 0.003 of CPAN::Meta::X (from Perl
+    distribution CPAN-Meta-X), released on 2021-04-15.
 
 DESCRIPTION
     The CPAN distribution metadata specification allows custom keys (those
-    that begin with "x_" or "X_" to be added to the metadata. Over time,
-    some keys are being used for their specific purposes. This document
-    tries to list them.
+    that begin with "x_" or "X_") to be added to the metadata. This document
+    tries to catalog the custom keys that are being used by CPAN authors.
 
-    This document also lists custom phases and relationships in the prereqs
-    hash that are being used, custom keys in resources hash.
+    In addition to custom metadata keys, this document also lists:
+
+    *   custom phases and relationships in the prereqs hash that are being
+        used by people
+
+    *   custom keys in resources hash
 
 LIST OF CUSTOM DISTRIBUTION METADATA KEYS
   x_Dist_Zilla key
@@ -27,6 +30,8 @@ LIST OF CUSTOM DISTRIBUTION METADATA KEYS
     List of contributors in a release.
 
     Examples:
+
+    TBD
 
     References:
 
@@ -47,8 +52,8 @@ LIST OF CUSTOM DISTRIBUTION METADATA KEYS
   x_generated_by_perl key
   x_help_wanted key
   x_provides_scripts key
-    List what scripts are being provided in the distribution. The structure
-    is modeled after the standard provides hash.
+    List scripts that are being provided in the distribution. The structure
+    is modelled after the standard provides hash.
 
     Examples:
 
@@ -118,7 +123,7 @@ SOURCE
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website
-    <https://rt.cpan.org/Public/Dist/Display.html?Name=CPAN-Meta-X>
+    <https://github.com/perlancar/perl-CPAN-Meta-X/issues>
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.
@@ -130,7 +135,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2020 by perlancar@cpan.org.
+    This software is copyright (c) 2021 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

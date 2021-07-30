@@ -7,6 +7,7 @@ BEGIN
     use Test::More qw( no_plan );
     use_ok( 'Text::PO::Gettext' ) || BAIL_OUT( "Cannot load Text::PO::Gettext" );
     use Module::Generic::File qw( cwd file tempfile );
+    use POSIX ();
     our $DEBUG = 0;
 };
 
@@ -107,6 +108,54 @@ isa_ok( $rv, 'DateTime', 'potCreationDate returns a DateTime object' );
 is( "$rv", '2019-10-03 19-44+0000', 'potCreationDate' );
 is( $po->projectIdVersion, 'MyProject 0.1', 'projectIdVersion' );
 is( $po->reportBugsTo, 'john.doe@example.com', 'reportBugsTo' );
+# XXX Added in v0.1.2 on 2021-07-30
+$rv = $po->getMonthsLong();
+isa_ok( $rv, 'Module::Generic::Array', 'getMonthsLong' );
+is( $rv->length, 12, 'getMonthsLong() -> array size' );
+is( $rv->first, 'janvier', 'getMonthsLong() -> first value' );
+$rv = $po->getMonthsShort();
+isa_ok( $rv, 'Module::Generic::Array', 'getMonthsShort' );
+is( $rv->length, 12, 'getMonthsShort() -> array size' );
+is( $rv->first, 'janv.', 'getMonthsShort() -> first value' );
+$rv = $po->getDaysLong();
+isa_ok( $rv, 'Module::Generic::Array', 'getDaysLong' );
+is( $rv->length, 7, 'getDaysLong() -> array size' );
+is( $rv->first, 'dimanche', 'getDaysLong() -> first value' );
+$rv = $po->getDaysLong( monday_first => 1 );
+isa_ok( $rv, 'Module::Generic::Array', 'getDaysLong( monday_first => 1 )' );
+is( $rv->length, 7, 'getDaysLong( monday_first => 1 ) -> array size' );
+is( $rv->first, 'lundi', 'getDaysLong( monday_first => 1 ) -> first value' );
+$rv = $po->getDaysShort();
+isa_ok( $rv, 'Module::Generic::Array', 'getDaysShort' );
+is( $rv->length, 7, 'getDaysShort() -> array size' );
+is( $rv->first, 'dim.', 'getDaysShort() -> first value' );
+$rv = $po->getDaysShort( monday_first => 1 );
+isa_ok( $rv, 'Module::Generic::Array', 'getDaysShort( monday_first => 1 )' );
+is( $rv->length, 7, 'getDaysShort( monday_first => 1 ) -> array size' );
+is( $rv->first, 'lun.', 'getDaysShort( monday_first => 1 ) -> first value' );
+$rv = $po->getNumericDict();
+isa_ok( $rv, 'Module::Generic::Hash', 'getNumericDict() returns an Module::Generic::Hash object' );
+is( $rv->length, 6, 'getNumericDict() returns 6 properties' );
+is( $rv->keys->sort->join( ',' )->scalar, 'currency,decimal,int_currency,negative_sign,precision,thousand', 'getNumericDict() properties' );
+is( $po->locale, 'fr_FR', 'locale' );
+is( $rv->{currency}, '€', 'getNumericDict() -> currency' );
+is( $rv->{decimal}, ',', 'getNumericDict() -> decimal' );
+is( $rv->{int_currency}, 'EUR ', 'getNumericDict() -> int_currency' );
+is( $rv->{negative_sign}, '-', 'getNumericDict() -> negative_sign' );
+is( $rv->{precision}, 2, 'getNumericDict() -> precision' );
+is( $rv->{thousand}, ' ', 'getNumericDict() -> thousand' );
+$rv = $po->getNumericPosixDict();
+isa_ok( $rv, 'Module::Generic::Hash', 'getNumericPosixDict() returns an Module::Generic::Hash object' );
+is( $rv->length, 23, 'getNumericPosixDict returns 23 properties' );
+my $old = POSIX::setlocale( &POSIX::LC_ALL );
+POSIX::setlocale( &POSIX::LC_ALL, $po->locale );
+my $lconv = POSIX::localeconv();
+$lconv->{ $_ } = unpack( "C*", $lconv->{ $_ } ) for( qw( grouping mon_grouping ) );
+POSIX::setlocale( &POSIX::LC_ALL, $old );
+foreach my $k ( sort( keys( %$lconv ) ) )
+{
+    is( $rv->{ $k }, $lconv->{ $k }, "getNumericPosixDict() -> $k" );
+}
 
 done_testing();
 

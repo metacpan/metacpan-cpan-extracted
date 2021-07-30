@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Net::HTTP;
 # ABSTRACT: Networking delegate for Neo4j HTTP
-$Neo4j::Driver::Net::HTTP::VERSION = '0.25';
+$Neo4j::Driver::Net::HTTP::VERSION = '0.26';
 
 # This package is not part of the public Neo4j::Driver API.
 
@@ -82,7 +82,7 @@ sub _server {
 	$self->{server_info} = Neo4j::Driver::ServerInfo->new({
 		uri => $self->{http_agent}->uri,
 		version => "Neo4j/$neo4j_version",
-		protocol => $self->{http_agent}->protocol,
+		protocol_string => $self->{http_agent}->can('protocol') ? $self->{http_agent}->protocol : undef,
 		time_diff => Time::Piece->new - $date,
 	});
 	

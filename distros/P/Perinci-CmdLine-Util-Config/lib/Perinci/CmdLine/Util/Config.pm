@@ -1,9 +1,9 @@
 package Perinci::CmdLine::Util::Config;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-10-21'; # DATE
+our $DATE = '2021-07-29'; # DATE
 our $DIST = 'Perinci-CmdLine-Util-Config'; # DIST
-our $VERSION = '1.724'; # VERSION
+our $VERSION = '1.725'; # VERSION
 
 use 5.010001;
 use strict;
@@ -375,12 +375,12 @@ sub get_args_from_config {
                     my $sch = $copts->{$k}{schema};
                     if ($sch) {
                         require Data::Sah::Resolve;
-                        my $rsch = Data::Sah::Resolve::resolve_schema($sch);
+                        my $res = Data::Sah::Resolve::resolve_schema($sch);
                         # since IOD might return a scalar or an array (depending on
                         # whether there is a single param=val or multiple param=
                         # lines), we need to arrayify the value if the argument is
                         # expected to be an array.
-                        if (ref($v) ne 'ARRAY' && $rsch->[0] eq 'array') {
+                        if (ref($v) ne 'ARRAY' && $res->{type} eq 'array') {
                             $v = [$v];
                         }
                     }
@@ -396,8 +396,8 @@ sub get_args_from_config {
                     # expected to be an array.
                     if (ref($v) ne 'ARRAY' && $as->{$k} && $as->{$k}{schema}) {
                         require Data::Sah::Resolve;
-                        my $rsch = Data::Sah::Resolve::resolve_schema($as->{$k}{schema});
-                        if ($rsch->[0] eq 'array') {
+                        my $res = Data::Sah::Resolve::resolve_schema($as->{$k}{schema});
+                        if ($res->{type} eq 'array') {
                             $v = [$v];
                         }
                     }
@@ -427,7 +427,7 @@ Perinci::CmdLine::Util::Config - Utility routines related to config files
 
 =head1 VERSION
 
-This document describes version 1.724 of Perinci::CmdLine::Util::Config (from Perl distribution Perinci-CmdLine-Util-Config), released on 2020-10-21.
+This document describes version 1.725 of Perinci::CmdLine::Util::Config (from Perl distribution Perinci-CmdLine-Util-Config), released on 2021-07-29.
 
 =head1 FUNCTIONS
 
@@ -436,7 +436,7 @@ This document describes version 1.724 of Perinci::CmdLine::Util::Config (from Pe
 
 Usage:
 
- get_args_from_config(%args) -> [status, msg, payload, meta]
+ get_args_from_config(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 C<config> is a HoH (hashes of hashrefs) produced by reading an INI (IOD)
 configuration file using modules like L<Config::IOD::Reader>.
@@ -501,12 +501,12 @@ Arguments ('*' denotes required arguments):
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -516,7 +516,7 @@ Return value:  (any)
 
 Usage:
 
- get_default_config_dirs() -> [status, msg, payload, meta]
+ get_default_config_dirs() -> [$status_code, $reason, $payload, \%result_meta]
 
 This function is not exported by default, but exportable.
 
@@ -524,12 +524,12 @@ No arguments.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -539,7 +539,7 @@ Return value:  (any)
 
 Usage:
 
- read_config(%args) -> [status, msg, payload, meta]
+ read_config(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 This function is not exported by default, but exportable.
 
@@ -562,12 +562,12 @@ Arguments ('*' denotes required arguments):
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -593,7 +593,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2018, 2017 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2019, 2018, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

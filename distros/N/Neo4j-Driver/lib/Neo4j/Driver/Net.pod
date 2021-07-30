@@ -13,7 +13,7 @@ Neo4j::Driver::Net - Explains the design of the networking modules
 
 =head1 VERSION
 
-version 0.25
+version 0.26
 
 =head1 OVERVIEW
 
@@ -380,14 +380,6 @@ method L<Neo4j::Driver/"config"> only.
 As of S<version 0.21>, not all aspects of the configuration of
 L<Neo4j::Driver> instances can be queried using C<config()>.
 This issue will be addressed soon.
-
-=item protocol
-
- sub protocol () { $http_version }
-
-Return the HTTP version (S<e. g.> C<"HTTP/1.1">) from the last
-response, or just C<"HTTP"> if the version can't be determined.
-May block until the response headers have been fully received.
 
 =item request
 

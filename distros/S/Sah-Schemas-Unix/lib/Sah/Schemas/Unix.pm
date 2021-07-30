@@ -1,7 +1,7 @@
 package Sah::Schemas::Unix;
 
-our $DATE = '2021-07-22'; # DATE
-our $VERSION = '0.017'; # VERSION
+our $DATE = '2021-07-29'; # DATE
+our $VERSION = '0.018'; # VERSION
 
 1;
 # ABSTRACT: Various Sah schemas for Unix
@@ -18,7 +18,7 @@ Sah::Schemas::Unix - Various Sah schemas for Unix
 
 =head1 VERSION
 
-This document describes version 0.017 of Sah::Schemas::Unix (from Perl distribution Sah-Schemas-Unix), released on 2021-07-22.
+This document describes version 0.018 of Sah::Schemas::Unix (from Perl distribution Sah-Schemas-Unix), released on 2021-07-29.
 
 =head1 SAH SCHEMAS
 
@@ -152,9 +152,9 @@ feature.
 
 =head1 SEE ALSO
 
-L<Sah> - specification
+L<Sah> - schema specification
 
-L<Data::Sah>
+L<Data::Sah> - Perl implementation of Sah
 
 =head1 AUTHOR
 

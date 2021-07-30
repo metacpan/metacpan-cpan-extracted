@@ -1,9 +1,9 @@
 package Data::Sah::Compiler::Prog;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-05-21'; # DATE
+our $DATE = '2021-07-29'; # DATE
 our $DIST = 'Data-Sah'; # DIST
-our $VERSION = '0.908'; # VERSION
+our $VERSION = '0.909'; # VERSION
 
 use 5.010001;
 use strict;
@@ -46,6 +46,7 @@ sub init_cd {
     if (my $ocd = $cd->{outer_cd}) {
         $cd->{vars}    = $ocd->{vars};
         $cd->{modules} = $ocd->{modules};
+        $cd->{functions} = $ocd->{functions};
         $cd->{_hc}     = $ocd->{_hc};
         $cd->{_hcd}    = $ocd->{_hcd};
         $cd->{_subdata_level} = $ocd->{_subdata_level};
@@ -53,6 +54,7 @@ sub init_cd {
     } else {
         $cd->{vars}    = {};
         $cd->{modules} = [];
+        $cd->{functions} = {};
         $cd->{_hc}     = $hc;
         $cd->{_subdata_level} = 0;
     }
@@ -181,6 +183,8 @@ sub add_var {
 
 # XXX requires: expr_eval
 
+# XXX requires: expr_refer_or_call_sub
+
 # XXX requires: stt_declare_local_var
 
 # TODO XXX requires: expr_declare_lexical_var
@@ -191,7 +195,13 @@ sub add_var {
 
 # XXX requires: stmt_assign_hash_value
 
+# XXX requires: stmt_sub
+
 # XXX requires: stmt_return
+
+# XXX requires: valid_subname
+
+# XXX requires: sub_defined
 
 sub _xlt {
     my ($self, $cd, $text) = @_;
@@ -233,6 +243,7 @@ sub expr_preinc_var {
 sub expr_validator_sub {
     my ($self, %args) = @_;
 
+    my $cache      = $args{cache};
     my $log_result = delete $args{log_result};
     my $dt         = $args{data_term};
     my $vt         = delete($args{var_term}) // $dt;
@@ -240,7 +251,9 @@ sub expr_validator_sub {
     my $rt         = $args{return_type} // 'bool_valid';
 
     $args{indent_level} = 1;
-
+    if ($cache) {
+        # ...
+    }
     my $cd = $args{cd} // $self->compile(%args);
     my $et = $cd->{args}{err_term};
 
@@ -254,52 +267,51 @@ sub expr_validator_sub {
     my $needs_expr_block = (grep {$_->{phase} eq 'runtime'} @{ $cd->{modules} })
                                 || $do_log;
 
+    my $code_sub_body = join(
+        "",
+        (map {$self->stmt_declare_local_var(
+                $_, $self->literal($cd->{vars}{$_}))."\n"}
+             sort keys %{ $cd->{vars} }),
+        #$log->tracef('-> (validator)(%s) ...', $dt);\n";
+        $self->stmt_declare_local_var($resv, "\n\n" . $cd->{result})."\n\n",
+
+        # when rt=bool_valid, return true/false result
+        #(";\n\n\$log->tracef('<- validator() = %s', \$res)")
+        #    x !!($do_log && $rt eq 'bool_valid'),
+        ($self->stmt_return($rest)."\n")
+            x !!($rt eq 'bool_valid'),
+
+        # when rt=str_errmsg, return string error message
+        #($log->tracef('<- validator() = %s', ".
+        #     "\$err_data);\n\n";
+        #    x !!($do_log && $rt eq 'str_errmsg'),
+        ($self->expr_set_err_str($et, $self->literal('')).";",
+         "\n\n".$self->stmt_return($et)."\n")
+            x !!($rt eq 'str_errmsg'),
+
+        # when rt=bool_valid+val, return true/false result as well as
+        # final input value
+        ($self->stmt_return($self->expr_array($rest, $dt))."\n")
+            x !!($rt eq 'bool_valid+val'),
+
+        # when rt=str_errmsg+val, return string error message as well as
+        # final input value
+        ($self->expr_set_err_str($et, $self->literal('')).";",
+         "\n\n".$self->stmt_return($self->expr_array($et, $dt))."\n")
+            x !!($rt eq 'str_errmsg+val'),
+
+        # when rt=hash_details, return error hash
+        ($self->stmt_assign_hash_value($et, $self->literal('value'), $dt),
+         "\n".$self->stmt_return($et)."\n")
+            x !!($rt eq 'hash_details'),
+    );
+
     my $code = join(
         "",
         ($self->stmt_require_log_module."\n") x !!$do_log,
         (map { $self->stmt_require_module($_)."\n" }
              grep { $_->{phase} eq 'runtime' } @{ $cd->{modules} }),
-        $self->expr_anon_sub(
-            [$vt],
-            join(
-                "",
-                (map {$self->stmt_declare_local_var(
-                    $_, $self->literal($cd->{vars}{$_}))."\n"}
-                     sort keys %{ $cd->{vars} }),
-                #$log->tracef('-> (validator)(%s) ...', $dt);\n";
-                $self->stmt_declare_local_var($resv, "\n\n" . $cd->{result})."\n\n",
-
-                # when rt=bool_valid, return true/false result
-                #(";\n\n\$log->tracef('<- validator() = %s', \$res)")
-                #    x !!($do_log && $rt eq 'bool_valid'),
-                ($self->stmt_return($rest)."\n")
-                    x !!($rt eq 'bool_valid'),
-
-                # when rt=str_errmsg, return string error message
-                #($log->tracef('<- validator() = %s', ".
-                #     "\$err_data);\n\n";
-                #    x !!($do_log && $rt eq 'str_errmsg'),
-                ($self->expr_set_err_str($et, $self->literal('')).";",
-                 "\n\n".$self->stmt_return($et)."\n")
-                    x !!($rt eq 'str_errmsg'),
-
-                # when rt=bool_valid+val, return true/false result as well as
-                # final input value
-                ($self->stmt_return($self->expr_array($rest, $dt))."\n")
-                    x !!($rt eq 'bool_valid+val'),
-
-                # when rt=str_errmsg+val, return string error message as well as
-                # final input value
-                ($self->expr_set_err_str($et, $self->literal('')).";",
-                 "\n\n".$self->stmt_return($self->expr_array($et, $dt))."\n")
-                    x !!($rt eq 'str_errmsg+val'),
-
-                # when rt=hash_details, return error hash
-                ($self->stmt_assign_hash_value($et, $self->literal('value'), $dt),
-                 "\n".$self->stmt_return($et)."\n")
-                    x !!($rt eq 'hash_details'),
-            )
-        ),
+        $self->expr_anon_sub([$vt], $code_sub_body),
     );
 
     if ($needs_expr_block) {
@@ -884,10 +896,14 @@ sub before_all_clauses {
             join(", ", map {$_->{name}} @$rules);
     } # GEN_PREFILTERS_EXPR
 
-  HANDLE_TYPE_CHECK:
+  HANDLE_TYPE_CHECK_OR_BASE_SCHEMA_CHECK:
     {
-        $self->_die($cd, "BUG: type handler did not produce _ccl_check_type")
-            unless defined($cd->{_ccl_check_type});
+        if (defined $cd->{base_schema}) {
+            #
+        } else {
+            $self->_die($cd, "BUG: type handler did not produce _ccl_check_type")
+                unless defined($cd->{_ccl_check_type});
+        }
         local $cd->{_debug_ccl_note};
 
         # handle coercion
@@ -957,22 +973,40 @@ sub before_all_clauses {
             );
         } # handle prefilters
 
-        $cd->{_debug_ccl_note} = "check type '$cd->{type}'";
-        $self->add_ccl(
-            $cd, $cd->{_ccl_check_type},
-            {
-                err_msg   => sprintf(
-                    $self->_xlt($cd, "Not of type %s"),
-                    $self->_xlt(
-                        $cd,
-                        $cd->{_hc}->get_th(name=>$cd->{type})->name //
-                            $cd->{type}
+        # handle type check (if cache=0) or base schema check (if cache=1)
+        if (defined $cd->{base_schema}) {
+            $cd->{_debug_ccl_note} = "check base schema '$cd->{base_schema}'";
+            $self->add_ccl(
+                $cd, $self->expr_call_sub($self->cached_validator_subname($cd->{base_schema}), [$dt]),
+                {
+                    err_msg   => sprintf(
+                        $self->_xlt($cd, "Not of schema %s"),
+                        $self->_xlt(
+                            $cd,
+                            $cd->{base_schema},
                         ),
-                ),
-                err_level => 'fatal',
-            },
-        );
-    }
+                    ),
+                    err_level => 'fatal',
+                },
+            );
+        } else {
+            $cd->{_debug_ccl_note} = "check type '$cd->{type}'";
+            $self->add_ccl(
+                $cd, $cd->{_ccl_check_type},
+                {
+                    err_msg   => sprintf(
+                        $self->_xlt($cd, "Not of type %s"),
+                        $self->_xlt(
+                            $cd,
+                            $cd->{_hc}->get_th(name=>$cd->{type})->name //
+                                $cd->{type}
+                            ),
+                    ),
+                    err_level => 'fatal',
+                },
+            );
+        }
+    } # HANDLE_TYPE_CHECK_OR_BASE_SCHEMA_CHECK
 }
 
 sub before_clause {
@@ -1077,7 +1111,7 @@ Data::Sah::Compiler::Prog - Base class for programming language compilers
 
 =head1 VERSION
 
-This document describes version 0.908 of Data::Sah::Compiler::Prog (from Perl distribution Data-Sah), released on 2020-05-21.
+This document describes version 0.909 of Data::Sah::Compiler::Prog (from Perl distribution Data-Sah), released on 2021-07-29.
 
 =head1 SYNOPSIS
 
@@ -1253,28 +1287,45 @@ perl compiler sets this to 'shell' while js sets this to 'cpp'.
 
 =head2 $c->compile(%args) => RESULT
 
+Generate a validator (function) for the given schema.
+
 Aside from base class' arguments, this class supports these arguments (suffix
 C<*> denotes required argument):
 
 =over
 
-=item * data_term => STR
+=item * cache
 
-A variable name or an expression in the target language that contains the data,
-defaults to I<var_sigil> + C<name> if not specified.
+Bool, default false. If set to true, will generate validators for base schemas
+when possible, compile them into functions in the
+C<Data::Sah::_GeneratedValidators::*>, then have the generated validator code
+calls these functions. This will result in smaller validator code and shorter
+compilation time especially for large/complex schema that is composed from
+subschemas. But this will also create a (usually insignificant) additional
+overhead of multiple function calls when doing validation using the generated
+validator code.
 
-=item * data_term_is_lvalue => BOOL (default: 1)
+Only relevant when L</name> argument is set. When a certain named
+function is already defined, avoid generating the function declaration again and
+instead call the defined function.
 
-Whether C<data_term> can be assigned to.
+=item * data_term
 
-=item * tmp_data_name => STR
+Str. A variable name or an expression in the target language that contains the
+data, defaults to I<var_sigil> + C<name> if not specified.
 
-Normally need not be set manually, as it will be set to "tmp_" . data_name. Used
-to store temporary data during clause evaluation.
+=item * data_term_is_lvalue
 
-=item * tmp_data_term => STR
+Bool, default true. Whether C<data_term> can be assigned to.
 
-Normally need not be set manually, as it will be set to var_sigil .
+=item * tmp_data_name
+
+Str. Normally need not be set manually, as it will be set to "tmp_" . data_name.
+Used to store temporary data during clause evaluation.
+
+=item * tmp_data_term
+
+Str. Normally need not be set manually, as it will be set to var_sigil .
 tmp_data_name. Used to store temporary data during clause evaluation. For
 example, in JavaScript, the 'int' and 'float' type pass strings in the type
 check. But for further checking with the clauses (like 'min', 'max',
@@ -1297,29 +1348,30 @@ something like:
  // check clause 'min'
  (tmp_data >= 1)
 
-=item * err_term => STR
+=item * err_term
 
-A variable name or lvalue expression to store error message(s), defaults to
+Str. A variable name or lvalue expression to store error message(s), defaults to
 I<var_sigil> + C<err_NAME> (e.g. C<$err_data> in the Perl compiler).
 
-=item * var_prefix => STR (default: _sahv_)
+=item * var_prefix
 
-Prefix for variables declared by generated code.
+Str, default "_sahv_". Prefix for variables declared by generated code.
 
-=item * sub_prefix => STR (default: _sahs_)
+=item * sub_prefix
 
-Prefix for subroutines declared by generated code.
+Str, default "_sahs_". Prefix for subroutines declared by generated code.
 
-=item * code_type => STR (default: validator)
+=item * code_type
 
-The kind of code to generate. For now the only valid (and default) value is
-'validator'. Compiler can perhaps generate other kinds of code in the future.
+Str, default "validator". The kind of code to generate. For now the only valid
+(and default) value is 'validator'. Compiler can perhaps generate other kinds of
+code in the future.
 
-=item * return_type => STR (default: bool)
+=item * return_type
 
-Specify what kind of return value the generated code should produce. Either
-C<bool_valid>, C<bool_valid+val>, C<str_errmsg>, C<str_errmsg+val>, or
-C<hash_details>.
+Str, default "bool". Specify what kind of return value the generated code should
+produce. Either C<bool_valid>, C<bool_valid+val>, C<str_errmsg>,
+C<str_errmsg+val>, or C<hash_details>.
 
 C<bool_valid> means generated validator code should just return true/false
 depending on whether validation succeeds/fails.
@@ -1340,15 +1392,15 @@ C<hash_details> means validation should return a full hash data structure. From
 this structure you can check whether validation succeeds, retrieve all the
 collected errors/warnings, etc.
 
-=item * coerce => bool (default: 1)
+=item * coerce
 
-If set to false, will not include coercion code.
+Bool, default true. If set to false, will not include coercion code.
 
-=item * debug => BOOL (default: 0)
+=item * debug
 
-This is a general debugging option which should turn on all debugging-related
-options, e.g. produce more comments in the generated code, etc. Each compiler
-might have more specific debugging options.
+Bool, default false. This is a general debugging option which should turn on all
+debugging-related options, e.g. produce more comments in the generated code,
+etc. Each compiler might have more specific debugging options.
 
 If turned on, specific debugging options can be explicitly turned off
 afterwards, e.g. C<< debug=>1, debug_log=>0 >> will turn on all debugging
@@ -1364,19 +1416,19 @@ Currently turning on C<debug> means:
 
 =back
 
-=item * debug_log => BOOL (default: 0)
+=item * debug_log
 
-Whether to add logging to generated code. This aids in debugging generated code
-specially for more complex validation.
+Bool, default false. Whether to add logging to generated code. This aids in
+debugging generated code specially for more complex validation.
 
-=item * comment => BOOL (default: 1)
+=item * comment
 
-If set to false, generated code will be devoid of comments.
+Bool, default true. If set to false, generated code will be devoid of comments.
 
-=item * human_hash_values => hash
+=item * human_hash_values
 
-Optional. Will be passed to C<hash_values> argument during C<compile()> by human
-compiler.
+Hash. Optional. Will be passed to C<hash_values> argument during C<compile()> by
+human compiler.
 
 =back
 
@@ -1410,7 +1462,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

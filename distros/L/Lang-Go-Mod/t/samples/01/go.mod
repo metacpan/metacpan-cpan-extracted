@@ -2,6 +2,8 @@ module github.com/example/my-project
 
 go 1.16
 
+// these are comments
+
 exclude (
 	example.com/whatmodule v1.4.0
 )

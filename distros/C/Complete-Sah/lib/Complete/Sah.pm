@@ -1,9 +1,9 @@
 package Complete::Sah;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-04'; # DATE
+our $DATE = '2021-07-29'; # DATE
 our $DIST = 'Complete-Sah'; # DIST
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 use 5.010001;
 use strict;
@@ -67,7 +67,7 @@ sub complete_from_schema {
     my $fres;
     log_trace("[compsah] entering complete_from_schema, word=<%s>, schema=%s", $word, $sch);
 
-    my ($type, $cs) = @{$sch};
+    my ($type, $clset) = @{$sch};
 
     # schema might be based on other schemas, if that is the case, let's try to
     # look at Sah::SchemaR::* module to quickly find the base type
@@ -81,15 +81,16 @@ sub complete_from_schema {
             goto RETURN_RES;
         }
         my $rsch = ${"$pkg\::rschema"};
-        $type = $rsch->[0];
+        $type = ref $rsch eq 'ARRAY' ? $rsch->[0] : $rsch->{type}; # support older (v.009-) version of Data::Sah::Resolve result
+        my $clsets = ref $rsch eq 'ARRAY' ? $rsch->[1] : $rsch->{'clsets_after_type.alt.merge.merged'};
         # let's just merge everything, for quick checking of clause
-        my $merged_cs = {};
-        for my $cs0 (@{ $rsch->[1] // [] }, $cs) {
-            for (keys %$cs0) {
-                $merged_cs->{$_} = $cs0->{$_};
+        my $merged_clset = {};
+        for my $clset0 (@{ $clsets }) {
+            for (keys %$clset0) {
+                $merged_clset->{$_} = $clset0->{$_};
             }
         }
-        $cs = $merged_cs;
+        $clset = $merged_clset;
         log_trace("[compsah] retrieving schema from module %s, base type=%s", $pkg, $type);
     }
 
@@ -97,7 +98,7 @@ sub complete_from_schema {
     my $words;
     my $summaries;
     eval {
-        if (my $xcomp = $cs->{'x.completion'}) {
+        if (my $xcomp = $clset->{'x.completion'}) {
             require Module::Installed::Tiny;
             my $comp;
             if (ref($xcomp) eq 'CODE') {
@@ -134,26 +135,26 @@ sub complete_from_schema {
                 }
             }
 
-        if ($cs->{is} && !ref($cs->{is})) {
+        if ($clset->{is} && !ref($clset->{is})) {
             log_trace("[compsah] adding completion from schema's 'is' clause");
-            push @$words, $cs->{is};
+            push @$words, $clset->{is};
             push @$summaries, undef;
             $static++;
             return; # from eval. there should not be any other value
         }
-        if ($cs->{in}) {
+        if ($clset->{in}) {
             log_trace("[compsah] adding completion from schema's 'in' clause");
-            for my $i (0..$#{ $cs->{in} }) {
-                next if ref $cs->{in}[$i];
-                push @$words    , $cs->{in}[$i];
-                push @$summaries, $cs->{'x.in.summaries'} ? $cs->{'x.in.summaries'}[$i] : undef;
+            for my $i (0..$#{ $clset->{in} }) {
+                next if ref $clset->{in}[$i];
+                push @$words    , $clset->{in}[$i];
+                push @$summaries, $clset->{'x.in.summaries'} ? $clset->{'x.in.summaries'}[$i] : undef;
             }
             $static++;
             return; # from eval. there should not be any other value
         }
-        if ($cs->{'examples'}) {
+        if ($clset->{'examples'}) {
             log_trace("[compsah] adding completion from schema's 'examples' clause");
-            for my $eg (@{ $cs->{'examples'} }) {
+            for my $eg (@{ $clset->{'examples'} }) {
                 if (ref $eg eq 'HASH') {
                     next unless !exists($eg->{valid}) || $eg->{valid};
                     next unless defined $eg->{value};
@@ -174,12 +175,12 @@ sub complete_from_schema {
             # because currently Data::Sah::Normalize doesn't recursively
             # normalize schemas in 'of' clauses, etc.
             require Data::Sah::Normalize;
-            if ($cs->{of} && @{ $cs->{of} }) {
+            if ($clset->{of} && @{ $clset->{of} }) {
 
                 $fres = combine_answers(
                     grep { defined } map {
                         complete_from_schema(schema=>$_, word => $word)
-                    } @{ $cs->{of} }
+                    } @{ $clset->{of} }
                 );
                 goto RETURN_RES; # directly return result
             }
@@ -193,50 +194,50 @@ sub complete_from_schema {
         }
         if ($type eq 'int') {
             my $limit = 100;
-            if ($cs->{between} &&
-                    $cs->{between}[0] - $cs->{between}[0] <= $limit) {
+            if ($clset->{between} &&
+                    $clset->{between}[0] - $clset->{between}[0] <= $limit) {
                 log_trace("[compsah] adding completion from schema's 'between' clause");
-                for ($cs->{between}[0] .. $cs->{between}[1]) {
+                for ($clset->{between}[0] .. $clset->{between}[1]) {
                     push @$words, $_;
                     push @$summaries, undef;
                 }
                 $static++;
-            } elsif ($cs->{xbetween} &&
-                         $cs->{xbetween}[0] - $cs->{xbetween}[0] <= $limit) {
+            } elsif ($clset->{xbetween} &&
+                         $clset->{xbetween}[0] - $clset->{xbetween}[0] <= $limit) {
                 log_trace("[compsah] adding completion from schema's 'xbetween' clause");
-                for ($cs->{xbetween}[0]+1 .. $cs->{xbetween}[1]-1) {
+                for ($clset->{xbetween}[0]+1 .. $clset->{xbetween}[1]-1) {
                     push @$words, $_;
                     push @$summaries, undef;
                 }
                 $static++;
-            } elsif (defined($cs->{min}) && defined($cs->{max}) &&
-                         $cs->{max}-$cs->{min} <= $limit) {
+            } elsif (defined($clset->{min}) && defined($clset->{max}) &&
+                         $clset->{max}-$clset->{min} <= $limit) {
                 log_trace("[compsah] adding completion from schema's 'min' & 'max' clauses");
-                for ($cs->{min} .. $cs->{max}) {
+                for ($clset->{min} .. $clset->{max}) {
                     push @$words, $_;
                     push @$summaries, undef;
                 }
                 $static++;
-            } elsif (defined($cs->{min}) && defined($cs->{xmax}) &&
-                         $cs->{xmax}-$cs->{min} <= $limit) {
+            } elsif (defined($clset->{min}) && defined($clset->{xmax}) &&
+                         $clset->{xmax}-$clset->{min} <= $limit) {
                 log_trace("[compsah] adding completion from schema's 'min' & 'xmax' clauses");
-                for ($cs->{min} .. $cs->{xmax}-1) {
+                for ($clset->{min} .. $clset->{xmax}-1) {
                     push @$words, $_;
                     push @$summaries, undef;
                 }
                 $static++;
-            } elsif (defined($cs->{xmin}) && defined($cs->{max}) &&
-                         $cs->{max}-$cs->{xmin} <= $limit) {
+            } elsif (defined($clset->{xmin}) && defined($clset->{max}) &&
+                         $clset->{max}-$clset->{xmin} <= $limit) {
                 log_trace("[compsah] adding completion from schema's 'xmin' & 'max' clauses");
-                for ($cs->{xmin}+1 .. $cs->{max}) {
+                for ($clset->{xmin}+1 .. $clset->{max}) {
                     push @$words, $_;
                     push @$summaries, undef;
                 }
                 $static++;
-            } elsif (defined($cs->{xmin}) && defined($cs->{xmax}) &&
-                         $cs->{xmax}-$cs->{xmin} <= $limit) {
+            } elsif (defined($clset->{xmin}) && defined($clset->{xmax}) &&
+                         $clset->{xmax}-$clset->{xmin} <= $limit) {
                 log_trace("[compsah] adding completion from schema's 'xmin' & 'xmax' clauses");
-                for ($cs->{xmin}+1 .. $cs->{xmax}-1) {
+                for ($clset->{xmin}+1 .. $clset->{xmax}-1) {
                     push @$words, $_;
                     push @$summaries, undef;
                 }
@@ -256,16 +257,16 @@ sub complete_from_schema {
                         next unless $i =~ /\A-?\d+\z/;
                         next if $i eq '-0';
                         next if $i =~ /\A-?0\d/;
-                        next if $cs->{between} &&
-                            ($i < $cs->{between}[0] ||
-                                 $i > $cs->{between}[1]);
-                        next if $cs->{xbetween} &&
-                            ($i <= $cs->{xbetween}[0] ||
-                                 $i >= $cs->{xbetween}[1]);
-                        next if defined($cs->{min} ) && $i <  $cs->{min};
-                        next if defined($cs->{xmin}) && $i <= $cs->{xmin};
-                        next if defined($cs->{max} ) && $i >  $cs->{max};
-                        next if defined($cs->{xmin}) && $i >= $cs->{xmax};
+                        next if $clset->{between} &&
+                            ($i < $clset->{between}[0] ||
+                                 $i > $clset->{between}[1]);
+                        next if $clset->{xbetween} &&
+                            ($i <= $clset->{xbetween}[0] ||
+                                 $i >= $clset->{xbetween}[1]);
+                        next if defined($clset->{min} ) && $i <  $clset->{min};
+                        next if defined($clset->{xmin}) && $i <= $clset->{xmin};
+                        next if defined($clset->{max} ) && $i >  $clset->{max};
+                        next if defined($clset->{xmin}) && $i >= $clset->{xmax};
                         push @$words, $i;
                         push @$summaries, undef;
                     }
@@ -289,16 +290,16 @@ sub complete_from_schema {
                         next unless $f =~ /\A-?\d+(\.\d+)?\z/;
                         next if $f eq '-0';
                         next if $f =~ /\A-?0\d\z/;
-                        next if $cs->{between} &&
-                            ($f < $cs->{between}[0] ||
-                                 $f > $cs->{between}[1]);
-                        next if $cs->{xbetween} &&
-                            ($f <= $cs->{xbetween}[0] ||
-                                 $f >= $cs->{xbetween}[1]);
-                        next if defined($cs->{min} ) && $f <  $cs->{min};
-                        next if defined($cs->{xmin}) && $f <= $cs->{xmin};
-                        next if defined($cs->{max} ) && $f >  $cs->{max};
-                        next if defined($cs->{xmin}) && $f >= $cs->{xmax};
+                        next if $clset->{between} &&
+                            ($f < $clset->{between}[0] ||
+                                 $f > $clset->{between}[1]);
+                        next if $clset->{xbetween} &&
+                            ($f <= $clset->{xbetween}[0] ||
+                                 $f >= $clset->{xbetween}[1]);
+                        next if defined($clset->{min} ) && $f <  $clset->{min};
+                        next if defined($clset->{xmin}) && $f <= $clset->{xmin};
+                        next if defined($clset->{max} ) && $f >  $clset->{max};
+                        next if defined($clset->{xmin}) && $f >= $clset->{xmax};
                         push @$words, $f;
                         push @$summaries, undef;
                     }
@@ -316,10 +317,10 @@ sub complete_from_schema {
     my $replace_map;
   GET_REPLACE_MAP:
     {
-        last unless $cs->{prefilters};
+        last unless $clset->{prefilters};
         # TODO: make replace_map in Complete::Util equivalent as
         # Str::replace_map's map.
-        for my $entry (@{ $cs->{prefilters} }) {
+        for my $entry (@{ $clset->{prefilters} }) {
             next unless ref $entry eq 'ARRAY';
             next unless $entry->[0] eq 'Str::replace_map';
             $replace_map = {};
@@ -362,7 +363,7 @@ Complete::Sah - Sah-related completion routines
 
 =head1 VERSION
 
-This document describes version 0.007 of Complete::Sah (from Perl distribution Complete-Sah), released on 2020-06-04.
+This document describes version 0.008 of Complete::Sah (from Perl distribution Complete-Sah), released on 2021-07-29.
 
 =head1 SYNOPSIS
 
@@ -377,7 +378,7 @@ This document describes version 0.007 of Complete::Sah (from Perl distribution C
 
 Usage:
 
- complete_from_schema(%args) -> [status, msg, payload, meta]
+ complete_from_schema(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Complete a value from schema.
 
@@ -406,12 +407,12 @@ case schema must already be normalized.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -437,7 +438,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

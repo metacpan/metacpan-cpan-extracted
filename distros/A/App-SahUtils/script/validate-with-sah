@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2020-02-12'; # DATE
-our $VERSION = '0.477'; # VERSION
+our $DATE = '2021-07-27'; # DATE
+our $VERSION = '0.478'; # VERSION
 
 use 5.010;
 use strict;
@@ -495,13 +495,13 @@ validate-with-sah - Validate data with Sah schema
 
 =head1 VERSION
 
-This document describes version 0.477 of validate-with-sah (from Perl distribution App-SahUtils), released on 2020-02-12.
+This document describes version 0.478 of validate-with-sah (from Perl distribution App-SahUtils), released on 2021-07-27.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % validate-with-sah [options] [schema] [data]
+% B<validate-with-sah> [B<--compiler>=I<str>] [(B<--config-path>=I<path>)+|B<--no-config>] [B<--config-profile>=I<profile>|B<-P>] [B<--core>] [B<--core-or-pp>] [B<--data-file-type>=I<str>] [B<--data-file>=I<str>] [B<--data-with-result>|B<-d>] [B<--format>=I<name>|B<--json>] [B<--linenum>|B<-l>] [B<--multiple-data-file>=I<str>] [B<--multiple-data>=I<any>] [B<--(no)naked-res>] [B<--no-env>] [B<--no-modules>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] [B<--pp>] [B<--return-type>=I<str>] [B<--schema-file-type>=I<str>] [B<--schema-file>=I<str>] [B<--schema-module>=I<str>] [B<--show-code>|B<-c>] [B<--show-raw-compile>|B<-R>] [B<--show-schema>|B<-s>] [B<--with-debug>] [B<--multiple-data-json>=I<json>] [B<-C>=I<str>] [B<--bool>|B<--bool-val>|B<--full>|B<-r>=I<str>|B<--str-val>] [B<-f>=I<str>] [B<-m>=I<str>] [B<-t>=I<str>] -- [I<schema>] [I<data>]
 
 Examples:
 
@@ -720,7 +720,11 @@ filename, defaults to JSON.
 
 See C<--data>.
 
+Can also be specified as the 2nd command-line argument.
+
 =item B<--data>=I<s>
+
+Can also be specified as the 2nd command-line argument.
 
 =item B<--multiple-data-file>=I<filename>
 
@@ -799,6 +803,10 @@ you want to pipe the result for more post-processing. In this case you can use
 
 Filter output through a pager.
 
+=item B<--view-result>
+
+View output using a viewer.
+
 =back
 
 =head2 Schema specification options
@@ -825,9 +833,13 @@ filename, defaults to JSON.
 
 See C<--schema>.
 
+Can also be specified as the 1st command-line argument.
+
 =item B<--schema-module>=I<s>, B<-m>
 
 =item B<--schema>=I<s>
+
+Can also be specified as the 1st command-line argument.
 
 =back
 
@@ -975,7 +987,22 @@ You can put multiple profiles in a single file by using section names like C<[pr
 
 You can also put configuration for multiple programs inside a single file, and use filter C<program=NAME> in section names, e.g. C<[program=NAME ...]> or C<[SOMESECTION program=NAME]>. The section will then only be used when the reading program matches.
 
-Finally, you can filter a section by environment variable using the filter C<env=CONDITION> in section names. For example if you only want a section to be read if a certain environment variable is true: C<[env=SOMEVAR ...]> or C<[SOMESECTION env=SOMEVAR ...]>. If you only want a section to be read when the value of an environment variable has value equals something: C<[env=HOSTNAME=blink ...]> or C<[SOMESECTION env=HOSTNAME=blink ...]>. If you only want a section to be read when the value of an environment variable does not equal something: C<[env=HOSTNAME!=blink ...]> or C<[SOMESECTION env=HOSTNAME!=blink ...]>. If you only want a section to be read when an environment variable contains something: C<[env=HOSTNAME*=server ...]> or C<[SOMESECTION env=HOSTNAME*=server ...]>. Note that currently due to simplistic parsing, there must not be any whitespace in the value being compared because it marks the beginning of a new section filter or section name.
+You can also filter a section by environment variable using the filter C<env=CONDITION> in section names. For example if you only want a section to be read if a certain environment variable is true: C<[env=SOMEVAR ...]> or C<[SOMESECTION env=SOMEVAR ...]>. If you only want a section to be read when the value of an environment variable equals some string: C<[env=HOSTNAME=blink ...]> or C<[SOMESECTION env=HOSTNAME=blink ...]>. If you only want a section to be read when the value of an environment variable does not equal some string: C<[env=HOSTNAME!=blink ...]> or C<[SOMESECTION env=HOSTNAME!=blink ...]>. If you only want a section to be read when the value of an environment variable includes some string: C<[env=HOSTNAME*=server ...]> or C<[SOMESECTION env=HOSTNAME*=server ...]>. If you only want a section to be read when the value of an environment variable does not include some string: C<[env=HOSTNAME!*=server ...]> or C<[SOMESECTION env=HOSTNAME!*=server ...]>. Note that currently due to simplistic parsing, there must not be any whitespace in the value being compared because it marks the beginning of a new section filter or section name.
+
+To load and configure plugins, you can use either the C<-plugins> parameter (e.g. C<< -plugins=DumpArgs >> or C<< -plugins=DumpArgs@before_validate_args >>), or use the C<[plugin=NAME ...]> sections, for example:
+
+ [plugin=DumpArgs]
+ -event=before_validate_args
+ -prio=99
+ 
+ [plugin=Foo]
+ -event=after_validate_args
+ arg1=val1
+ arg2=val2
+
+ 
+
+which is equivalent to setting C<< -plugins=-DumpArgs@before_validate_args@99,-Foo@after_validate_args,arg1,val1,arg2,val2 >>.
 
 List of available configuration parameters:
 
@@ -1043,7 +1070,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2018, 2017, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,7 +1,7 @@
 package Perinci::Sub::Gen::AccessTable;
 
-our $DATE = '2020-10-28'; # DATE
-our $VERSION = '0.586'; # VERSION
+our $DATE = '2021-07-29'; # DATE
+our $VERSION = '0.587'; # VERSION
 
 use 5.010001;
 use strict;
@@ -275,7 +275,7 @@ _
         my $fspec   = $table_spec->{fields}{$fname};
         my $fschema = $fspec->{schema};
         my $frschema = Data::Sah::Resolve::resolve_schema($fschema);
-        my $ftype   = $frschema->[0];
+        my $ftype   = $frschema->{type};
 
         next unless $opts->{enable_filtering};
         next if defined($fspec->{filterable}) && !$fspec->{filterable};
@@ -538,9 +538,9 @@ sub __parse_query {
 
     my $cic = $opts->{case_insensitive_comparison};
 
-    for my $f (grep {$frschemas{$_}[0] eq 'bool'} @fields) {
+    for my $f (grep {$frschemas{$_}{type} eq 'bool'} @fields) {
         my $fspec = $fspecs->{$f};
-        my $ftype = $frschemas{$f}[0];
+        my $ftype = $frschemas{$f}{type};
         my $exists;
         if (defined $args->{"$f.is"}) {
             $exists++;
@@ -555,9 +555,9 @@ sub __parse_query {
         push @filter_fields, $f if $exists && !($f ~~ @filter_fields);
     }
 
-    for my $f (grep {$frschemas{$_}[0] eq 'array'} @fields) {
+    for my $f (grep {$frschemas{$_}{type} eq 'array'} @fields) {
         my $fspec = $fspecs->{$f};
-        my $ftype = $frschemas{$f}[0];
+        my $ftype = $frschemas{$f}{type};
         my $exists;
         if (defined $args->{"$f.has"}) {
             $exists++;
@@ -570,9 +570,9 @@ sub __parse_query {
         push @filter_fields, $f if $exists && !($f ~~ @filter_fields);
     }
 
-    for my $f (grep {!($frschemas{$_}[0] ~~ ['array','bool'])} @fields) {
+    for my $f (grep {!($frschemas{$_}{type} ~~ ['array','bool'])} @fields) {
         my $fspec = $fspecs->{$f};
-        my $ftype = $frschemas{$f}[0];
+        my $ftype = $frschemas{$f}{type};
         my $exists;
         if (defined $args->{"$f.in"}) {
             $exists++;
@@ -584,10 +584,10 @@ sub __parse_query {
         }
     }
 
-    for my $f (grep {$frschemas{$_}[0] =~ /^(int|float|str|date)$/}
+    for my $f (grep {$frschemas{$_}{type} =~ /^(int|float|str|date)$/}
                    @fields) { # XXX all Comparable
         my $fspec = $fspecs->{$f};
-        my $ftype = $frschemas{$f}[0];
+        my $ftype = $frschemas{$f}{type};
         my $exists;
         if (defined $args->{"$f.is"}) {
             $exists++;
@@ -624,9 +624,9 @@ sub __parse_query {
         push @filter_fields, $f if $exists && !($f ~~ @filter_fields);
     }
 
-    for my $f (grep {$frschemas{$_}[0] =~ /^str$/} @fields) {
+    for my $f (grep {$frschemas{$_}{type} =~ /^str$/} @fields) {
         my $fspec = $fspecs->{$f};
-        my $ftype = $frschemas{$f}[0];
+        my $ftype = $frschemas{$f}{type};
         my $exists;
         if (defined $args->{"$f.contains"}) {
             $exists++;
@@ -677,10 +677,10 @@ sub __parse_query {
     unless ($opts->{custom_search}) {
         $query->{search_fields} = \@searchable_fields;
         $query->{search_str_fields} = [grep {
-            $frschemas{$_}[0] =~ /^(str)$/
+            $frschemas{$_}{type} =~ /^(str)$/
         } @searchable_fields];
         $query->{search_array_fields} = [grep {
-            $frschemas{$_}[0] =~ /^(array)$/
+            $frschemas{$_}{type} =~ /^(array)$/
         } @searchable_fields];
         $query->{search_re} = $search_re;
     }
@@ -693,7 +693,7 @@ sub __parse_query {
             return err(400, "Unknown field in sort: $f")
                 unless $f ~~ @fields;
             my $fspec = $fspecs->{$f};
-            my $ftype = $frschemas{$f}[0];
+            my $ftype = $frschemas{$f}{type};
             return err(400, "Field $f is not sortable")
                 unless !defined($fspec->{sortable}) || $fspec->{sortable};
             my $op = $ftype =~ /^(int|float)$/ ? '<=>' : 'cmp';
@@ -1597,7 +1597,7 @@ Perinci::Sub::Gen::AccessTable - Generate function (and its metadata) to read ta
 
 =head1 VERSION
 
-This document describes version 0.586 of Perinci::Sub::Gen::AccessTable (from Perl distribution Perinci-Sub-Gen-AccessTable), released on 2020-10-28.
+This document describes version 0.587 of Perinci::Sub::Gen::AccessTable (from Perl distribution Perinci-Sub-Gen-AccessTable), released on 2021-07-29.
 
 =head1 SYNOPSIS
 
@@ -1701,6 +1701,12 @@ paging. The resulting function can then be run via command-line using
 L<Perinci::CmdLine> (as demonstrated in Synopsis), or served via HTTP using
 L<Perinci::Access::HTTP::Server>, or consumed normally by Perl programs.
 
+=head1 CONTRIBUTOR
+
+=for stopwords Steven Haryanto
+
+Steven Haryanto <sharyanto@cpan.org>
+
 =head1 FUNCTIONS
 
 
@@ -1708,7 +1714,7 @@ L<Perinci::Access::HTTP::Server>, or consumed normally by Perl programs.
 
 Usage:
 
- gen_read_table_func(%args) -> [status, msg, payload, meta]
+ gen_read_table_func(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Generate function (and its metadata) to read table data.
 
@@ -2056,12 +2062,12 @@ This will not have effect under 'custom_search'.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value: A hash containing generated function, metadata (hash)
 
@@ -2116,7 +2122,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

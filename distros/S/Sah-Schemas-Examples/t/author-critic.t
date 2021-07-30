@@ -15,7 +15,7 @@ use warnings;
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/Sah/Schema/example/array_of_int.pm','lib/Sah/Schema/example/array_of_posint.pm','lib/Sah/Schema/example/array_of_str.pm','lib/Sah/Schema/example/foo.pm','lib/Sah/Schema/example/has_merge.pm','lib/Sah/Schema/example/hash_of_int.pm','lib/Sah/Schema/example/hash_of_posint.pm','lib/Sah/Schema/example/hash_of_str.pm','lib/Sah/Schema/example/recurse1.pm','lib/Sah/Schema/example/recurse2a.pm','lib/Sah/Schema/example/recurse2b.pm','lib/Sah/SchemaR/example/array_of_int.pm','lib/Sah/SchemaR/example/array_of_posint.pm','lib/Sah/SchemaR/example/array_of_str.pm','lib/Sah/SchemaR/example/foo.pm','lib/Sah/SchemaR/example/has_merge.pm','lib/Sah/SchemaR/example/hash_of_int.pm','lib/Sah/SchemaR/example/hash_of_posint.pm','lib/Sah/SchemaR/example/hash_of_str.pm','lib/Sah/Schemas/Examples.pm'];
+my $filenames = ['lib/Sah/Schema/array_of_int.pm','lib/Sah/Schema/array_of_posint.pm','lib/Sah/Schema/example/foo.pm','lib/Sah/Schema/example/has_merge.pm','lib/Sah/Schema/example/recurse1.pm','lib/Sah/Schema/example/recurse2a.pm','lib/Sah/Schema/example/recurse2b.pm','lib/Sah/Schema/hash_of_int.pm','lib/Sah/Schema/hash_of_posint.pm','lib/Sah/Schema/ints.pm','lib/Sah/Schema/posints.pm','lib/Sah/SchemaR/array_of_int.pm','lib/Sah/SchemaR/array_of_posint.pm','lib/Sah/SchemaR/example/foo.pm','lib/Sah/SchemaR/example/has_merge.pm','lib/Sah/SchemaR/hash_of_int.pm','lib/Sah/SchemaR/hash_of_posint.pm','lib/Sah/SchemaR/ints.pm','lib/Sah/SchemaR/posints.pm','lib/Sah/Schemas/Examples.pm'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

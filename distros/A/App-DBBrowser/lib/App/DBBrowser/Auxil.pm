@@ -185,7 +185,7 @@ sub info_format_insert_args {
 sub __prepare_table_row {
     my ( $sf, $row, $indent, $term_w ) = @_;
     my $list_sep = ', ';
-    my $dots = $sf->{i}{dots}[ $sf->{o}{G}{dots} ];
+    my $dots = $sf->{i}{dots};
     my $dots_w = print_columns( $dots );
     no warnings 'uninitialized';
     my $row_str = join( $list_sep, map { s/\t/  /g; s/\n/[NL]/g; s/\v/[VWS]/g; $_ } @$row );

@@ -1,9 +1,9 @@
 package Data::Sah::Filter::perl::Unix::check_unix_user_exists;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-07-22'; # DATE
+our $DATE = '2021-07-29'; # DATE
 our $DIST = 'Sah-Schemas-Unix'; # DIST
-our $VERSION = '0.017'; # VERSION
+our $VERSION = '0.018'; # VERSION
 
 use 5.010001;
 use strict;
@@ -47,7 +47,7 @@ Data::Sah::Filter::perl::Unix::check_unix_user_exists
 
 =head1 VERSION
 
-This document describes version 0.017 of Data::Sah::Filter::perl::Unix::check_unix_user_exists (from Perl distribution Sah-Schemas-Unix), released on 2021-07-22.
+This document describes version 0.018 of Data::Sah::Filter::perl::Unix::check_unix_user_exists (from Perl distribution Sah-Schemas-Unix), released on 2021-07-29.
 
 =for Pod::Coverage ^(meta|filter)$
 

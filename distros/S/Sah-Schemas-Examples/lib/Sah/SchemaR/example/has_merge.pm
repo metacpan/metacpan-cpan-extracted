@@ -1,9 +1,9 @@
 package Sah::SchemaR::example::has_merge;
 
-our $DATE = '2020-05-27'; # DATE
-our $VERSION = '0.006'; # VERSION
+our $DATE = '2021-07-30'; # DATE
+our $VERSION = '0.007'; # VERSION
 
-our $rschema = ["int",[{description=>"\nZero is not included in this schema because zero is neither positive nor\nnegative. See also `uint` for integers that start from 0.\n\n",div_by=>2,examples=>[{data=>1,valid=>1},{data=>0,valid=>0},{data=>-1,valid=>0}],summary=>"Even integer"}],["posint","int"]];
+our $rschema = do{my$var={base=>"int",clsets_after_base=>[{description=>"\nZero is not included in this schema because zero is neither positive nor\nnegative. See also `uint` for integers that start from 0.\n\n",examples=>[{data=>1,valid=>1},{data=>0,valid=>0},{data=>-1,valid=>0}],min=>1,summary=>"Positive integer (1, 2, ...)"},{description=>"\nThis schema is based on \"posint\", which is [\"int\", {min=>1}], and adds another\nclause div_by=>2. However, this schema also deletes the min=>1 clause using\nmerge key: merge.delete.min=>undef. Thus, the resolved result becomes [\"int\",\n{div_by=>2}] which is basically \"even integer\". Without the merge key, this\nschema would become \"positive even integer.\"\n\n",div_by=>2,"merge.delete.min"=>undef,summary=>"Even integer"}],clsets_after_type=>['$var->{clsets_after_base}[0]','$var->{clsets_after_base}[1]'],"clsets_after_type.alt.merge.merged"=>[{description=>"\nThis schema is based on \"posint\", which is [\"int\", {min=>1}], and adds another\nclause div_by=>2. However, this schema also deletes the min=>1 clause using\nmerge key: merge.delete.min=>undef. Thus, the resolved result becomes [\"int\",\n{div_by=>2}] which is basically \"even integer\". Without the merge key, this\nschema would become \"positive even integer.\"\n\n",div_by=>2,examples=>'$var->{clsets_after_base}[0]{examples}',summary=>"Even integer"}],resolve_path=>["int","posint"],type=>"int",v=>2};$var->{clsets_after_type}[0]=$var->{clsets_after_base}[0];$var->{clsets_after_type}[1]=$var->{clsets_after_base}[1];$var->{"clsets_after_type.alt.merge.merged"}[0]{examples}=$var->{clsets_after_base}[0]{examples};$var};
 
 1;
 # ABSTRACT: Even integer
@@ -20,7 +20,7 @@ Sah::SchemaR::example::has_merge - Even integer
 
 =head1 VERSION
 
-This document describes version 0.006 of Sah::SchemaR::example::has_merge (from Perl distribution Sah-Schemas-Examples), released on 2020-05-27.
+This document describes version 0.007 of Sah::SchemaR::example::has_merge (from Perl distribution Sah-Schemas-Examples), released on 2021-07-30.
 
 =head1 DESCRIPTION
 
@@ -50,7 +50,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

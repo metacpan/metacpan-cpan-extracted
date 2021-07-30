@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Result;
 # ABSTRACT: Result of running a Cypher statement (a stream of records)
-$Neo4j::Driver::Result::VERSION = '0.25';
+$Neo4j::Driver::Result::VERSION = '0.26';
 
 use parent 'Neo4j::Driver::StatementResult';
 
@@ -37,11 +37,7 @@ sub _column_keys {
 sub keys {
 	my ($self) = @_;
 	
-	# Don't break encapsulation by just returning the original reference
-	# because ResultColumns depends on the {columns} field being intact.
-	my @keys = ();
-	@keys = @{ $self->{result}->{columns} } if $self->{result}->{columns};
-	return wantarray ? @keys : [@keys];
+	return @{ $self->{result}->{columns} };
 }
 
 
@@ -213,7 +209,7 @@ Neo4j::Driver::Result - Result of running a Cypher statement (a stream of record
 
 =head1 VERSION
 
-version 0.25
+version 0.26
 
 =head1 SYNOPSIS
 
@@ -352,10 +348,12 @@ depend upon these features.
 
 =head2 Calling in scalar context
 
- $keys = $result->keys;  # arrayref
+ $count = $result->keys;
 
-The C<keys()> method returns an array reference if called in scalar
+The C<keys()> method returns the number of columns if called in scalar
 context.
+
+Until version 0.25, it returned an array reference instead.
 
 =head2 Control result stream attachment
 
@@ -412,7 +410,7 @@ L<Neo4j::Driver::B<ResultSummary>>
 =item * Equivalent documentation for the official Neo4j drivers:
 L<Result (Java)|https://neo4j.com/docs/api/java-driver/current/index.html?org/neo4j/driver/Result.html>,
 L<Result (Python)|https://neo4j.com/docs/api/python-driver/current/api.html#result>,
-L<Result (JavaScript)|https://neo4j.com/docs/api/javascript-driver/current/class/src/result.js~Result.html>,
+L<Result (JavaScript)|https://neo4j.com/docs/api/javascript-driver/4.3/class/lib6/result.js~Result.html>,
 L<IResult (.NET)|https://neo4j.com/docs/api/dotnet-driver/4.0/html/f1ac31ec-c6dd-798b-b5d6-3ca0794d7502.htm>
 
 =back

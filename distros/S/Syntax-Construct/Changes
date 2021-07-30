@@ -1,5 +1,8 @@
 Revision history for Syntax-Construct
 
+1.022   2021-07-30
+        - Add scalar%
+
 1.021   2021-05-25
         - Fix tests on locale sensitive Perl builds
 

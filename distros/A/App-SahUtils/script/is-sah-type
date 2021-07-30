@@ -1,11 +1,12 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/SahUtils/is_sah_type
-# and generated automatically using Perinci::CmdLine::Gen version 0.491
+# and generated automatically using Perinci::CmdLine::Gen version 0.499
 
-our $DATE = '2020-02-12'; # DATE
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-07-27'; # DATE
 our $DIST = 'App-SahUtils'; # DIST
-our $VERSION = '0.477'; # VERSION
+our $VERSION = '0.478'; # VERSION
 
 use 5.010001;
 use strict;
@@ -37,13 +38,13 @@ is-sah-type - Check that a string or array schema is a Sah type
 
 =head1 VERSION
 
-This document describes version 0.477 of is-sah-type (from Perl distribution App-SahUtils), released on 2020-02-12.
+This document describes version 0.478 of is-sah-type (from Perl distribution App-SahUtils), released on 2021-07-27.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % is-sah-type [options] <schema>
+% B<is-sah-type> [B<--format>=I<name>|B<--json>] [B<--(no)naked-res>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] -- E<lt>I<schema>E<gt>
 
 =head1 DESCRIPTION
 
@@ -63,7 +64,11 @@ C<*> marks required options.
 
 See C<--schema>.
 
+Can also be specified as the 1st command-line argument.
+
 =item B<--schema>=I<s>*
+
+Can also be specified as the 1st command-line argument.
 
 =back
 
@@ -107,6 +112,10 @@ you want to pipe the result for more post-processing. In this case you can use
 =item B<--page-result>
 
 Filter output through a pager.
+
+=item B<--view-result>
+
+View output using a viewer.
 
 =back
 
@@ -180,7 +189,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2018, 2017, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

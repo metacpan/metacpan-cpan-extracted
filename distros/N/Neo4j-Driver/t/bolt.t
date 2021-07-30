@@ -5,7 +5,7 @@ use lib qw(./lib t/lib);
 
 use Test::More 0.88;
 use Test::Exception;
-use Test::Warnings;
+use Test::Warnings qw(warning);
 
 
 package Local::Bolt;
@@ -88,10 +88,14 @@ lives_and { ok $s = new_session('Local::Bolt') } 'driver';
 
 
 subtest 'run empty' => sub {
-	plan tests => 3;
+	plan tests => 5;
 	lives_and { ok $r = $s->run('') } 'empty lives';
 	lives_and { is $r->size(), 0 } 'empty no rows';
-	lives_and { is_deeply [$s->run('')], [] } 'empty list';
+	my ($w, @a) = ('', 0);
+	lives_ok { $w = warning { @a = $s->run('') }; } 'empty list run';
+	is_deeply [@a], [], 'empty list';
+	like $w, qr/\brun\b.* in list context\b.* deprecated\b/i, 'result as list deprecated'
+		or diag 'got warning(s): ', explain $w;
 };
 
 

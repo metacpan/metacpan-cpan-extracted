@@ -1,6 +1,45 @@
 Revision history for String-Nudge
 
-1.0001 2016-02-19 13:46:56 UTC
+1.0002 2021-07-29 20:08:10 UTC
+ [Other Changes]
+ - Replaced Travis CI with Github Actions.
+
+ [Stats & Dependency Changes]
+ - 3 files changed, 55 insertions(+), 3 deletions(-)
+ - (dev req) + Badge::Depot::Plugin::Githubactions (any)
+ - (dev req) +
+   Dist::Zilla::Plugin::Author::CSSON::GithubActions::Workflow::TestWithMakefile
+   0.0106
+ - (dev req) + Dist::Zilla::Plugin::MetaConfig (any)
+ - (dev req) + Dist::Zilla::Plugin::PromptIfStale 0.057
+ - (dev req) ~ Dist::Zilla 5.000 --> 6.015
+ - (dev req) ~ Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional
+   0.007 --> 0.009
+ - (dev req) ~ Dist::Zilla::Plugin::ChangeStats::Dependencies::Git 0.0100
+   --> 0.0200
+ - (dev req) ~ Dist::Zilla::Plugin::CheckChangesHasContent 0.008 --> 0.011
+ - (dev req) ~ Dist::Zilla::Plugin::CopyFilesFromBuild 0.151680 -->
+   0.170880
+ - (dev req) ~ Dist::Zilla::Plugin::Git 2.036 --> 2.046
+ - (dev req) ~ Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch 0.013 -->
+   0.014
+ - (dev req) ~ Dist::Zilla::Plugin::Git::Contributors 0.017 --> 0.035
+ - (dev req) ~ Dist::Zilla::Plugin::MetaProvides::Package 2.003001 -->
+   2.004003
+ - (dev req) ~ Dist::Zilla::Plugin::ReadmeAnyFromPod 0.150250 --> 0.163250
+ - (dev req) ~ Dist::Zilla::Plugin::RunExtraTests 0.028 --> 0.029
+ - (dev req) ~ Dist::Zilla::Plugin::Test::Compile 2.054 --> 2.058
+ - (dev req) ~ Dist::Zilla::Plugin::Test::ReportPrereqs 0.021 --> 0.027
+ - (dev req) ~ Dist::Zilla::Plugin::Test::Version 1.05 --> 1.09
+ - (dev req) - Badge::Depot::Plugin::Cpantesters
+ - (dev req) - Badge::Depot::Plugin::Kwalitee
+ - (dev req) - Badge::Depot::Plugin::Travis
+ - (dev req) - Dist::Zilla::Plugin::Test::Kwalitee::Extra
+ - (dev req) - Dist::Zilla::Plugin::TravisYML
+ - (dev sug) ~ Dist::Iller 0.1407 --> 0.1411
+ - (dev sug) ~ Dist::Iller::Config::Author::CSSON 0.0309 --> 0.0328
+
+1.0001 2016-02-19T13:46:56Z UTC
  [Other Changes]
  - Fix a small packaging issue.
 

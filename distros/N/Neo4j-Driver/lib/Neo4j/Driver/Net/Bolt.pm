@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Net::Bolt;
 # ABSTRACT: Networking delegate for Neo4j Bolt
-$Neo4j::Driver::Net::Bolt::VERSION = '0.25';
+$Neo4j::Driver::Net::Bolt::VERSION = '0.26';
 
 # This package is not part of the public Neo4j::Driver API.
 
@@ -43,13 +43,11 @@ sub new {
 		$uri->userinfo( $driver->{auth}->{principal} . ':' . $driver->{auth}->{credentials} );
 	}
 	
-	my $protocol = "Bolt";
 	my $net_module = $driver->{net_module} || 'Neo4j::Bolt';
 	if ($net_module eq 'Neo4j::Bolt') {
 		croak "Protocol scheme 'bolt' is not supported (Neo4j::Bolt not installed)\n"
 			. "Neo4j::Driver will support 'bolt' URLs if the Neo4j::Bolt module is installed.\n"
 			unless eval { require Neo4j::Bolt; 1 };
-		$protocol = "Bolt/1.0" if $Neo4j::Bolt::VERSION le "0.20";
 	}
 	
 	my $cxn;
@@ -63,7 +61,6 @@ sub new {
 		$cxn = $net_module->connect( "$uri", $driver->{http_timeout} );
 	}
 	croak $class->_bolt_error($cxn) unless $cxn->connected;
-	$protocol = "Bolt/" . $cxn->protocol_version if $cxn->can('protocol_version');
 	
 	return bless {
 		net_module => $net_module,
@@ -72,7 +69,7 @@ sub new {
 		server_info => Neo4j::Driver::ServerInfo->new({
 			uri => $uri,
 			version => $cxn->server_id,
-			protocol => $protocol,
+			protocol => $cxn->can('protocol_version') ? $cxn->protocol_version : "",
 		}),
 		cypher_types => $driver->{cypher_types},
 		active_tx => 0,

@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2020-02-12'; # DATE
-our $VERSION = '0.477'; # VERSION
+our $DATE = '2021-07-27'; # DATE
+our $VERSION = '0.478'; # VERSION
 
 use Data::Dump::Color;
 
@@ -32,7 +32,7 @@ normalize-sah-schema - Normalize Sah schema
 
 =head1 VERSION
 
-This document describes version 0.477 of normalize-sah-schema (from Perl distribution App-SahUtils), released on 2020-02-12.
+This document describes version 0.478 of normalize-sah-schema (from Perl distribution App-SahUtils), released on 2021-07-27.
 
 =head1 SYNOPSIS
 
@@ -74,7 +74,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2018, 2017, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

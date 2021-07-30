@@ -1,7 +1,9 @@
 package Data::Sah::Util::Subschema;
 
-our $DATE = '2016-07-25'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-07-29'; # DATE
+our $DIST = 'Data-Sah-Util-Subschema'; # DIST
+our $VERSION = '0.005'; # VERSION
 
 use 5.010001;
 use strict;
@@ -30,13 +32,13 @@ sub extract_subschemas {
         {schema_is_normalized => 1},
         $sch);
 
-    my $typeclass = "Data::Sah::Type::$res->[0]";
+    my $typeclass = "Data::Sah::Type::$res->{type}";
     (my $typeclass_pm = "$typeclass.pm") =~ s!::!/!g;
     require $typeclass_pm;
 
     # XXX handle def and/or resolve schema into builtin types. for now we only
     # have one clause set because we don't handle those.
-    my @clsets = @{ $res->[1] };
+    my @clsets = @{ $res->{'clsets_after_type.alt.merge.merged'} };
 
     my @res;
     for my $clset (@clsets) {
@@ -83,7 +85,7 @@ Data::Sah::Util::Subschema - Extract subschemas from a schema
 
 =head1 VERSION
 
-This document describes version 0.004 of Data::Sah::Util::Subschema (from Perl distribution Data-Sah-Util-Subschema), released on 2016-07-25.
+This document describes version 0.005 of Data::Sah::Util::Subschema (from Perl distribution Data-Sah-Util-Subschema), released on 2021-07-29.
 
 =head1 SYNOPSIS
 
@@ -142,7 +144,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

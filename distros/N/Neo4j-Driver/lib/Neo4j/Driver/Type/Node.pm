@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Type::Node;
 # ABSTRACT: Describes a node from a Neo4j graph
-$Neo4j::Driver::Type::Node::VERSION = '0.25';
+$Neo4j::Driver::Type::Node::VERSION = '0.26';
 
 use parent 'Neo4j::Types::Node';
 use overload '%{}' => \&_hash, fallback => 1;
@@ -23,8 +23,7 @@ sub get {
 sub labels {
 	my ($self) = @_;
 	
-	croak 'labels() in scalar context not supported' unless wantarray;
-	return unless defined $$self->{_meta}->{labels};
+	$$self->{_meta}->{labels} //= [];
 	return @{ $$self->{_meta}->{labels} };
 }
 
@@ -46,8 +45,10 @@ sub id {
 
 
 sub deleted {
+	# uncoverable pod
 	my ($self) = @_;
 	
+	warnings::warnif deprecated => __PACKAGE__ . "->deleted() is deprecated";
 	return $$self->{_meta}->{deleted};
 }
 
@@ -82,7 +83,7 @@ Neo4j::Driver::Type::Node - Describes a node from a Neo4j graph
 
 =head1 VERSION
 
-version 0.25
+version 0.26
 
 =head1 SYNOPSIS
 
@@ -149,24 +150,12 @@ these features.
 
 =head2 Calling in scalar context
 
- $labels = $node->labels;  # fails
+ $count = $node->labels;
 
-The C<labels()> method C<die>s if called in scalar context.
+The C<labels()> method returns the number of labels if called
+in scalar context.
 
-=head2 Deletion indicator
-
- $node_exists = ! $node->deleted;
-
-In some circumstances, Cypher statements using C<DELETE> may still
-C<RETURN> nodes that were deleted. To help avoid confusion in
-such cases, the server sometimes reports whether or not a node
-was deleted.
-
-This method is experimental because that information is not reliably
-available. In particular, there is a known issue with the Neo4j server
-(L<#12306|https://github.com/neo4j/neo4j/issues/12306>), and old Neo4j
-versions may not report it at all. If unavailable, C<undef> will be
-returned by this method.
+Until version 0.25, it C<die>d instead.
 
 =head1 BUGS
 

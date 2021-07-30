@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Session;
 # ABSTRACT: Context of work for database interactions
-$Neo4j::Driver::Session::VERSION = '0.25';
+$Neo4j::Driver::Session::VERSION = '0.26';
 
 use Carp qw(croak);
 our @CARP_NOT = qw(Neo4j::Driver);
@@ -30,6 +30,7 @@ sub _connect {
 	my ($self, $database) = @_;
 	
 	my $neo4j_version = $self->server->version;  # ensure contact with the server has been made
+	$self->{cypher_params_v2} = 0 if $neo4j_version =~ m{^Neo4j/2\.};  # no conversion required
 	return $self if $neo4j_version =~ m{^Neo4j/[123]\.};  # nothing more to do
 	
 	if (! defined $database) {
@@ -85,6 +86,7 @@ sub new {
 	my ($class, $driver) = @_;
 	
 	return bless {
+		cypher_params_v2 => $driver->{cypher_params_v2},
 		driver => $driver,
 		net => Neo4j::Driver::Net::Bolt->new($driver),
 	}, $class;
@@ -107,6 +109,7 @@ sub new {
 	my ($class, $driver) = @_;
 	
 	return bless {
+		cypher_params_v2 => $driver->{cypher_params_v2},
 		driver => $driver,
 		net => Neo4j::Driver::Net::HTTP->new($driver),
 	}, $class;
@@ -132,7 +135,7 @@ Neo4j::Driver::Session - Context of work for database interactions
 
 =head1 VERSION
 
-version 0.25
+version 0.26
 
 =head1 SYNOPSIS
 
@@ -205,14 +208,6 @@ features. These are subject to unannounced modification or removal
 in future versions. Expect your code to break if you depend upon
 these features.
 
-=head2 Calling in list context
-
- @records = $session->run('...');
- @results = $session->run([...]);
-
-The C<run> method tries to Do What You Mean if called in list
-context.
-
 =head2 Concurrent transactions
 
  $session = Neo4j::Driver->new('http://...')->basic_auth(...)->session;
@@ -253,7 +248,7 @@ L<Neo4j::Driver::B<Result>>
 
 =item * Equivalent documentation for the official Neo4j drivers:
 L<Session (Java)|https://neo4j.com/docs/api/java-driver/current/index.html?org/neo4j/driver/Session.html>,
-L<Session (JavaScript)|https://neo4j.com/docs/api/javascript-driver/current/class/src/session.js~Session.html>,
+L<Session (JavaScript)|https://neo4j.com/docs/api/javascript-driver/4.3/class/lib6/session.js~Session.html>,
 L<ISession (.NET)|https://neo4j.com/docs/api/dotnet-driver/4.0/html/6bcf5d8c-98e7-b521-03e7-210cd6155850.htm>
 
 =back

@@ -1,9 +1,9 @@
 package Sah::SchemaR::unix::uid;
 
-our $DATE = '2021-07-22'; # DATE
-our $VERSION = '0.017'; # VERSION
+our $DATE = '2021-07-29'; # DATE
+our $VERSION = '0.018'; # VERSION
 
-our $rschema = ["int",[{description=>"\nSee also `posint` for integers that start from 1.\n\n",examples=>[{data=>0,valid=>1},{data=>1,valid=>1},{data=>-1,valid=>0}],min=>0,summary=>"Non-negative integer (0, 1, 2, ...)"},{description=>"\n",examples=>[{valid=>0,value=>-1},{valid=>1,value=>0},{valid=>1,value=>1}],summary=>"User identifier (UID)"}],["uint","int"]];
+our $rschema = do{my$var={base=>"uint",clsets_after_base=>[{description=>"\n",examples=>[{valid=>0,value=>-1},{valid=>1,value=>0},{valid=>1,value=>1}],summary=>"User identifier (UID)"}],clsets_after_type=>[{description=>"\nSee also `posint` for integers that start from 1.\n\n",examples=>[{data=>0,valid=>1},{data=>1,valid=>1},{data=>-1,valid=>0}],min=>0,summary=>"Non-negative integer (0, 1, 2, ...)"},'$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_type}[0]','$var->{clsets_after_base}[0]'],resolve_path=>["int","uint"],type=>"int",v=>2};$var->{clsets_after_type}[1]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_type}[0];$var->{"clsets_after_type.alt.merge.merged"}[1]=$var->{clsets_after_base}[0];$var};
 
 1;
 # ABSTRACT: User identifier (UID)
@@ -20,7 +20,7 @@ Sah::SchemaR::unix::uid - User identifier (UID)
 
 =head1 VERSION
 
-This document describes version 0.017 of Sah::SchemaR::unix::uid (from Perl distribution Sah-Schemas-Unix), released on 2021-07-22.
+This document describes version 0.018 of Sah::SchemaR::unix::uid (from Perl distribution Sah-Schemas-Unix), released on 2021-07-29.
 
 =head1 DESCRIPTION
 

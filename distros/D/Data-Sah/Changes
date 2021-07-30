@@ -1,3 +1,8 @@
+0.909   2020-07-29  Released-By: PERLANCAR
+
+        - Update to Data::Sah::Normalize 0.051 & Data::Sah::Resolve 0.010.
+
+
 0.908   2020-05-21  Released-By: PERLANCAR; Urgency: low
 
 	- Note a couple of modules's pp/core status.

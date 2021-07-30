@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## PO Files Manipulation - ~/lib/Text/PO.pm
-## Version v0.1.2
+## Version v0.1.3
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2018/06/21
-## Modified 2021/07/28
+## Modified 2021/07/30
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -26,7 +26,7 @@ BEGIN
     use Nice::Try;
     use Scalar::Util;
     use Text::PO::Element;
-    our $VERSION = 'v0.1.2';
+    our $VERSION = 'v0.1.3';
 };
 
 INIT
@@ -206,7 +206,7 @@ sub as_json
         }
         push( @{$hash->{elements}}, $ref );
     }
-    my $j = JSON->new->relaxed;
+    my $j = JSON->new->relaxed->allow_blessed->convert_blessed;
     # canonical = sorting hash keys
     foreach my $t ( qw( pretty utf8 indent canonical ) )
     {
@@ -655,8 +655,16 @@ sub parse
         elsif( /^\#+[[:blank:]]+(.*?)$/ )
         {
             my $c = $1;
-            $self->message( 2, "\tadding line as a comment => '$c'" );
-            $e->add_comment( $c);
+            if( !$self->meta->length && $c =~ /^domain[[:blank:]\h]+\"(.*?)\"/ )
+            {
+                $self->message( 3, "\tAdding domain definition '$1'" );
+                $self->domain( $1 );
+            }
+            else
+            {
+                $self->message( 2, "\tadding line as a comment => '$c'" );
+                $e->add_comment( $c);
+            }
         }
         elsif( /^msgid[[:blank:]]+"(.*?)"$/ )
         {
@@ -1348,7 +1356,7 @@ Text::PO - Read and write PO files
 
 =head1 VERSION
 
-    v0.1.2
+    v0.1.3
 
 =head1 DESCRIPTION
 

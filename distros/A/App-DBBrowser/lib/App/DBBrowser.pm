@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.010001;
 
-our $VERSION = '2.277';
+our $VERSION = '2.279';
 
 use File::Basename        qw( basename );
 use File::Spec::Functions qw( catfile catdir );
@@ -43,7 +43,7 @@ sub new {
         tcu_default => { hide_cursor => 0, clear_screen => 1, page => 2 },
         lyt_h       => { order => 0, alignment => 2 },
         lyt_v       => { undef => '  BACK', layout => 3 },
-        dots        => [ ' ...', '|', '' ],
+        dots        => '...',
         quit        => 'QUIT',
         back        => 'BACK',
         confirm     => 'CONFIRM',
@@ -83,12 +83,10 @@ sub __init {
     $sf->{i}{f_dir_history}        = catfile $app_dir, 'dir_history.json';
     $sf->{i}{f_subqueries}         = catfile $app_dir, 'subqueries.json';
     $sf->{i}{f_search_and_replace} = catfile $app_dir, 'search_and_replace.json';
-    $sf->{i}{f_copy_and_paste}     = catfile $app_dir, 'tmp_file_copy_and_paste.csv';
     $sf->{i}{f_plain}              = catfile $app_dir, 'tmp_file_plain.csv';
     END {
         no warnings qw( closure );
-        unlink $sf->{i}{f_copy_and_paste} if -e $sf->{i}{f_copy_and_paste};
-        unlink $sf->{i}{f_plain}          if -e $sf->{i}{f_plain};
+        unlink $sf->{i}{f_plain} if -e $sf->{i}{f_plain};
     }
 }
 
@@ -135,9 +133,6 @@ sub run {
     my ( $sf ) = @_;
     local $| = 1;
     local $SIG{INT} = local $SIG{TERM} = local $SIG{HUP} = sub {
-        if ( defined $sf->{i}{f_copy_and_paste} && -e $sf->{i}{f_copy_and_paste} ) {
-            unlink $sf->{i}{f_copy_and_paste};
-        }
         if ( defined $sf->{i}{f_plain} && -e $sf->{i}{f_plain} ) {
             unlink $sf->{i}{f_plain};
         }
@@ -603,7 +598,7 @@ App::DBBrowser - Browse SQLite/MySQL/PostgreSQL databases and their tables inter
 
 =head1 VERSION
 
-Version 2.277
+Version 2.279
 
 =head1 DESCRIPTION
 

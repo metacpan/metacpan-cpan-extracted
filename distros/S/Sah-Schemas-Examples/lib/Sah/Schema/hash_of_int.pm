@@ -1,15 +1,17 @@
-package Sah::Schema::example::array_of_posint;
+package Sah::Schema::hash_of_int;
 
-our $DATE = '2020-05-27'; # DATE
-our $VERSION = '0.006'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-07-30'; # DATE
+our $DIST = 'Sah-Schemas-Examples'; # DIST
+our $VERSION = '0.007'; # VERSION
 
-our $schema = [array => {
-    summary => 'Array of positive integers',
-    of => ["posint", {req=>1}, {}],
-}, {}];
+our $schema = [hash => {
+    summary => 'Hash of integers',
+    of => ["int", {req=>1}],
+}];
 
 1;
-# ABSTRACT: Array of positive integers
+# ABSTRACT: Hash of integers
 
 __END__
 
@@ -19,18 +21,18 @@ __END__
 
 =head1 NAME
 
-Sah::Schema::example::array_of_posint - Array of positive integers
+Sah::Schema::hash_of_int - Hash of integers
 
 =head1 VERSION
 
-This document describes version 0.006 of Sah::Schema::example::array_of_posint (from Perl distribution Sah-Schemas-Examples), released on 2020-05-27.
+This document describes version 0.007 of Sah::Schema::hash_of_int (from Perl distribution Sah-Schemas-Examples), released on 2021-07-30.
 
 =head1 SYNOPSIS
 
 To check data against this schema (requires L<Data::Sah>):
 
  use Data::Sah qw(gen_validator);
- my $validator = gen_validator("example::array_of_posint*");
+ my $validator = gen_validator("hash_of_int*");
  say $validator->($data) ? "valid" : "INVALID!";
 
  # Data::Sah can also create validator that returns nice error message string
@@ -44,7 +46,7 @@ To validate function parameters against this schema (requires L<Params::Sah>):
 
  sub myfunc {
      my @args = @_;
-     state $validator = gen_validator("example::array_of_posint*");
+     state $validator = gen_validator("hash_of_int*");
      $validator->(\@args);
      ...
  }
@@ -53,7 +55,8 @@ To specify schema in L<Rinci> function metadata and use the metadata with
 L<Perinci::CmdLine> to create a CLI:
 
  # in lib/MyApp.pm
- package MyApp;
+ package
+   MyApp;
  our %SPEC;
  $SPEC{myfunc} = {
      v => 1.1,
@@ -61,7 +64,7 @@ L<Perinci::CmdLine> to create a CLI:
      args => {
          arg1 => {
              summary => 'The blah blah argument',
-             schema => ['example::array_of_posint*'],
+             schema => ['hash_of_int*'],
          },
          ...
      },
@@ -73,9 +76,10 @@ L<Perinci::CmdLine> to create a CLI:
  1;
 
  # in myapp.pl
- package main;
+ package
+   main;
  use Perinci::CmdLine::Any;
- Perinci::CmdLine::Any->new(url=>'MyApp::myfunc')->run;
+ Perinci::CmdLine::Any->new(url=>'/MyApp/myfunc')->run;
 
  # in command-line
  % ./myapp.pl --help
@@ -108,7 +112,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

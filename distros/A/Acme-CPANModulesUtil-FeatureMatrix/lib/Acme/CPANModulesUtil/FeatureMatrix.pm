@@ -1,9 +1,9 @@
 package Acme::CPANModulesUtil::FeatureMatrix;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-02-20'; # DATE
+our $DATE = '2021-07-29'; # DATE
 our $DIST = 'Acme-CPANModulesUtil-FeatureMatrix'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -92,10 +92,10 @@ sub draw_feature_matrix {
         for my $e (@{ $list->{entries} }) {
             my @row = ($e->{module});
             for my $fname (@features) {
-                my $ftype = Data::Sah::Util::Type::get_type(
-                    Data::Sah::Resolve::resolve_schema(
-                        $list->{entry_features}{$fname}{schema} // 'bool'
-                    ));
+                my $rres = Data::Sah::Resolve::resolve_schema(
+                    $list->{entry_features}{$fname}{schema} // 'bool'
+                );
+                my $ftype = $rres->{type};
 
                 my $fvalue0;
                 my $fvalue;
@@ -162,7 +162,7 @@ Acme::CPANModulesUtil::FeatureMatrix - Draw features matrix of modules in an Acm
 
 =head1 VERSION
 
-This document describes version 0.004 of Acme::CPANModulesUtil::FeatureMatrix (from Perl distribution Acme-CPANModulesUtil-FeatureMatrix), released on 2021-02-20.
+This document describes version 0.005 of Acme::CPANModulesUtil::FeatureMatrix (from Perl distribution Acme-CPANModulesUtil-FeatureMatrix), released on 2021-07-29.
 
 =head1 FUNCTIONS
 
@@ -171,7 +171,7 @@ This document describes version 0.004 of Acme::CPANModulesUtil::FeatureMatrix (f
 
 Usage:
 
- draw_feature_matrix(%args) -> [status, msg, payload, meta]
+ draw_feature_matrix(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Draw features matrix of modules in an Acme::CPANModules::* list.
 
@@ -190,12 +190,12 @@ Name of Acme::CPANModules::* module, without the prefix.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -209,7 +209,7 @@ Source repository is at L<https://github.com/perlancar/perl-Acme-CPANModulesUtil
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Acme-CPANModulesUtil-FeatureMatrix/issues>
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModulesUtil-FeatureMatrix>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

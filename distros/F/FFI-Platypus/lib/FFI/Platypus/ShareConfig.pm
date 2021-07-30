@@ -5,7 +5,7 @@ use warnings;
 use 5.008004;
 use File::Spec;
 
-our $VERSION = '1.53'; # VERSION
+our $VERSION = '1.55'; # VERSION
 
 sub dist_dir ($)
 {
@@ -64,7 +64,7 @@ FFI::Platypus::ShareConfig
 
 =head1 VERSION
 
-version 1.53
+version 1.55
 
 =head1 AUTHOR
 
@@ -107,6 +107,8 @@ Eric Brine (IKEGAMI)
 szTheory
 
 José Joaquín Atria (JJATRIA)
+
+Pete Houston (openstrike, HOUSTON)
 
 =head1 COPYRIGHT AND LICENSE
 

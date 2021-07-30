@@ -1,7 +1,7 @@
 package Bencher::Scenario::StringModules::Startup;
 
-our $DATE = '2021-06-23'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2021-07-30'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 use strict;
 use warnings;
@@ -32,7 +32,7 @@ Bencher::Scenario::StringModules::Startup - Benchmark startup of string modules
 
 =head1 VERSION
 
-This document describes version 0.003 of Bencher::Scenario::StringModules::Startup (from Perl distribution Bencher-Scenarios-StringFunctions), released on 2021-06-23.
+This document describes version 0.004 of Bencher::Scenario::StringModules::Startup (from Perl distribution Bencher-Scenarios-StringFunctions), released on 2021-07-30.
 
 =head1 SYNOPSIS
 
@@ -90,21 +90,37 @@ L<String::Util>
 
 =head1 SAMPLE BENCHMARK RESULTS
 
-Run on: perl: I<< v5.34.0 >>, CPU: I<< Intel(R) Core(TM) i5-7200U CPU @ 2.50GHz (2 cores) >>, OS: I<< GNU/Linux Ubuntu version 20.04 >>, OS kernel: I<< Linux version 5.3.0-64-generic >>.
+Run on: perl: I<< v5.34.0 >>, CPU: I<< Intel(R) Core(TM) i7-4770 CPU @ 3.40GHz (4 cores) >>, OS: I<< GNU/Linux LinuxMint version 19 >>, OS kernel: I<< Linux version 5.3.0-68-generic >>.
 
 Benchmark with default options (C<< bencher -m StringModules::Startup >>):
 
  #table1#
  {dataset=>undef}
- +----------------------+-----------+-------------------+-----------------------+-----------------------+---------+---------+
- | participant          | time (ms) | mod_overhead_time | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors | samples |
- +----------------------+-----------+-------------------+-----------------------+-----------------------+---------+---------+
- | String::Util         |      14   |               7.4 |                 0.00% |               118.92% | 3.4e-05 |      20 |
- | String::CommonPrefix |       9.3 |               2.7 |                54.98% |                41.25% | 4.1e-05 |      22 |
- | String::Trim::More   |       9.2 |               2.6 |                55.86% |                40.46% | 1.1e-05 |      20 |
- | String::CommonSuffix |       9.1 |               2.5 |                57.88% |                38.66% | 5.8e-05 |      20 |
- | perl -e1 (baseline)  |       6.6 |               0   |               118.92% |                 0.00% | 3.5e-05 |      20 |
- +----------------------+-----------+-------------------+-----------------------+-----------------------+---------+---------+
+ +----------------------+-----------+-------------------+-----------------------+-----------------------+-----------+---------+
+ | participant          | time (ms) | mod_overhead_time | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors   | samples |
+ +----------------------+-----------+-------------------+-----------------------+-----------------------+-----------+---------+
+ | String::Util         |        10 |                 5 |                 0.00% |               153.96% |   0.0003  |      20 |
+ | String::Trim::More   |         8 |                 3 |                55.61% |                63.21% |   0.00016 |      20 |
+ | String::CommonSuffix |         8 |                 3 |                57.45% |                61.30% |   0.00015 |      20 |
+ | String::CommonPrefix |         8 |                 3 |                61.00% |                57.74% |   0.0002  |      20 |
+ | perl -e1 (baseline)  |         5 |                 0 |               153.96% |                 0.00% | 7.1e-05   |      21 |
+ +----------------------+-----------+-------------------+-----------------------+-----------------------+-----------+---------+
+
+Formatted as L<Benchmark.pm|Benchmark> result:
+
+                         Rate  String::Util  String::Trim::More  String::CommonSuffix  String::CommonPrefix  perl -e1 (baseline) 
+  String::Util          0.1/s            --                -19%                  -19%                  -19%                 -50% 
+  String::Trim::More    0.1/s           25%                  --                    0%                    0%                 -37% 
+  String::CommonSuffix  0.1/s           25%                  0%                    --                    0%                 -37% 
+  String::CommonPrefix  0.1/s           25%                  0%                    0%                    --                 -37% 
+  perl -e1 (baseline)   0.2/s          100%                 60%                   60%                   60%                   -- 
+ 
+ Legends:
+   String::CommonPrefix: mod_overhead_time=3 participant=String::CommonPrefix
+   String::CommonSuffix: mod_overhead_time=3 participant=String::CommonSuffix
+   String::Trim::More: mod_overhead_time=3 participant=String::Trim::More
+   String::Util: mod_overhead_time=5 participant=String::Util
+   perl -e1 (baseline): mod_overhead_time=0 participant=perl -e1 (baseline)
 
 
 To display as an interactive HTML table on a browser, you can add option C<--format html+datatables>.

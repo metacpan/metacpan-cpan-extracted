@@ -1,3 +1,8 @@
+0.587   2021-07-29  Released-By: PERLANCAR; Urgency: medium
+
+	- Update to Data::Sah::Resolve 0.010.
+
+
 0.586   2020-10-28  Released-By: PERLANCAR; Urgency: medium
 
 	- Add option: case_insensitive_comparison.

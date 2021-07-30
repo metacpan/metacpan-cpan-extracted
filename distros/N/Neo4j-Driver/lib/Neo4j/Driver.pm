@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver;
 # ABSTRACT: Neo4j community graph database driver for Bolt and HTTP
-$Neo4j::Driver::VERSION = '0.25';
+$Neo4j::Driver::VERSION = '0.26';
 
 use Carp qw(croak);
 
@@ -28,6 +28,7 @@ my %NEO4J_DEFAULT_PORT = (
 my %OPTIONS = (
 	ca_file => 'tls_ca',
 	cypher_filter => 'cypher_filter',
+	cypher_params => 'cypher_params_v2',
 	cypher_types => 'cypher_types',
 	jolt => 'jolt',
 	net_module => 'net_module',
@@ -129,6 +130,14 @@ sub _parse_options {
 	my %options = @options;
 	
 	warnings::warnif deprecated => "Config option cypher_types is deprecated" if $options{cypher_types};
+	if ($options{cypher_params}) {
+		croak "Unimplemented cypher params filter '$options{cypher_params}'" if $options{cypher_params} ne v2;
+	}
+	elsif ($options{cypher_filter}) {
+		warnings::warnif deprecated => "Config option cypher_filter is deprecated; use cypher_params";
+		croak "Unimplemented cypher filter '$options{cypher_filter}'" if $options{cypher_filter} ne 'params';
+		$options{cypher_params} = v2;
+	}
 	
 	my @unsupported = ();
 	foreach my $key (keys %options) {
@@ -170,7 +179,7 @@ Neo4j::Driver - Neo4j community graph database driver for Bolt and HTTP
 
 =head1 VERSION
 
-version 0.25
+version 0.26
 
 =head1 SYNOPSIS
 
@@ -380,12 +389,23 @@ for details.
 
 =head2 Parameter syntax conversion
 
- $driver->config(cypher_filter => 'params');
+ $driver->config( cypher_params => v2 );
+ $bar = $driver->session->run('RETURN {foo}', foo => 'bar');
 
 When this option is set, the driver automatically uses a regular
 expression to convert the old Cypher parameter syntax C<{param}>
-supported by Neo4j S<versions 2 and 3> to the new syntax C<$param>
-supported by Neo4j S<versions 3 and 4>.
+supported by Neo4j S<version 2> to the modern syntax C<$param>
+supported by Neo4j S<version 3> and newer.
+
+The only allowed value for this config option is the unquoted
+literal L<v-string|perldata/"Version Strings"> C<v2>.
+
+Cypher's modern C<$> parameter syntax unfortunately may cause string
+interpolations in Perl, which decreases database performance because
+Neo4j can re-use query plans less often. It is also a potential
+security risk (Cypher injection attacks). Using this config option
+enables your code to use the C<{}> parameter syntax instead. This
+option is currently experimental because the API is still evolving.
 
 =head1 CONFIGURATION OPTIONS
 
@@ -483,8 +503,9 @@ driver at present.
 =item * L<Neo4j::Driver::B<Session>>
 
 =item * Official API documentation:
-L<Neo4j Drivers Manual|https://neo4j.com/docs/driver-manual/current/>,
-L<Neo4j HTTP API Docs|https://neo4j.com/docs/http-api/current/>
+L<Neo4j Driver API Specification|https://7687.org/driver_api/driver-api-specification.html>,
+L<Neo4j Drivers Manual|https://neo4j.com/docs/driver-manual/4.1/>,
+L<Neo4j HTTP API Docs|https://neo4j.com/docs/http-api/4.3/>
 
 =item * Other modules for working with Neo4j:
 L<DBD::Neo4p>,

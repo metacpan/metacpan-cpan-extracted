@@ -1,6 +1,13 @@
 Revision history for App-DBBrowser
 
 
+2.279    2021-07-29
+        - Bugfix in functions Epoch_to_Date/Epoch_to_DateTime: use driver specific regex statement.
+
+2.278    2021-07-29
+        - Removed the source type 'Copy&Paste'.
+        - Removed option 'Truncated rows'.
+
 2.277    2021-07-28
         - SQLite: replace 'sqlite_unicode' with 'sqlite_string_mode' if DBD::SQLite version >= 1.68.
         - Bugfix in 'attributes': use the values not the indexes.

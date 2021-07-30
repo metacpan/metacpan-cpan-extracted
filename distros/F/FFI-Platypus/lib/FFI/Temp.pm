@@ -8,7 +8,7 @@ use File::Spec;
 use File::Temp qw( tempdir );
 
 # ABSTRACT: Temp Dir support for FFI::Platypus
-our $VERSION = '1.53'; # VERSION
+our $VERSION = '1.55'; # VERSION
 
 
 # problem with vanilla File::Temp is that is often uses
@@ -25,20 +25,25 @@ my %root;
 sub _root
 {
   my $root = File::Spec->rel2abs(File::Spec->catdir(".tmp"));
-  unless(-d $root)
-  {
-    mkdir $root or die "unable to create temp root $!";
-  }
-
-  # TODO: doesn't account for fork...
   my $lock = File::Spec->catfile($root, "l$$");
-  unless(-f $lock)
+
+  foreach my $try (0..9)
   {
-    open my $fh, '>', $lock;
-    close $fh;
+    sleep $try if $try != 0;
+    mkdir $root or die "unable to create temp root $!" unless -d $root;
+
+    # There is a race condition here if the FFI::Temp is
+    # used in parallel.  To work around we run this 10
+    # times until it works.  There is still a race condition
+    # if it fails 10 times, but hopefully that is unlikely.
+
+    # ??: doesn't account for fork, but probably doesn't need to.
+    open my $fh, '>', $lock or next;
+    close $fh or next;
+
+    $root{$root} = 1;
+    return $root;
   }
-  $root{$root} = 1;
-  $root;
 }
 
 END {
@@ -80,7 +85,7 @@ FFI::Temp - Temp Dir support for FFI::Platypus
 
 =head1 VERSION
 
-version 1.53
+version 1.55
 
 =head1 DESCRIPTION
 
@@ -127,6 +132,8 @@ Eric Brine (IKEGAMI)
 szTheory
 
 José Joaquín Atria (JJATRIA)
+
+Pete Houston (openstrike, HOUSTON)
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/local/bin/perl
 ##----------------------------------------------------------------------------
 ## PO Files Manipulation - ~/scripts/po.pl
 ## Version v0.1.0
@@ -51,6 +51,7 @@ BEGIN
     # Actions
     as_json             => { type => 'boolean' },
     as_po               => { type => 'boolean' },
+    add                 => { type => 'boolean' },
     compile             => { type => 'boolean' },
     dump                => { type => 'boolean' },
     init                => { type => 'boolean' },
@@ -63,6 +64,8 @@ BEGIN
     encoding            => { type => 'string', class => [qw( init meta )], default => '8bit' },
     header              => { type => 'string' },
     lang                => { type => 'string', alias => [qw( language )], class => [qw( init meta )], re => qr/^[a-z]{2}(?:_[A-Z]{2})?$/ },
+    msgid               => { type => 'string', class => [qw( edit )] },
+    msgstr              => { type => 'string', class => [qw( edit )] },
     output              => { type => 'string' },
     output_dir          => { type => 'string' },
     overwrite           => { type => 'boolean', default => 0 },
@@ -142,6 +145,11 @@ EOT
         _message( 3, "Reading file \"$f\" and writing to \"$opts->{output}\"." );
         &to_po( in => $f, out => $opts->{output} );
     }
+    elsif( $opts->{add} )
+    {
+        my $f = shift( @ARGV ) || bailout( "No po file to read was provided.\n" );
+        &add( in => $f );
+    }
     else
     {
         foreach my $f ( @ARGV )
@@ -176,10 +184,97 @@ EOT
     exit(0);
 }
 
+sub add
+{
+    my $p = $opt->_get_args_as_hash( @_ );
+    my $f = $p->{in} || bailout( "No po file to read was specified.\n" );
+    $f = $opt->new_file( $f );
+    if( $f->extension eq 'po' )
+    {
+        my $p = 
+        {
+        debug => $opts->{debug},
+        };
+        $p->{domain} = $opts->{domain} if( length( $opts->{domain} ) );
+        $po = Text::PO->new( %$p ) || bailout( Text::PO->error );
+        $po->parse( $f ) || bailout( $po->error );
+    }
+    elsif( $f->extension eq 'json' )
+    {
+        my $p = 
+        {
+        use_json => 1,
+        debug => $opts->{debug},
+        };
+        $p->{domain} = $opts->{domain} if( length( $opts->{domain} ) );
+        $po = Text::PO->new( %$p ) || bailout( Text::PO->error );
+        $po->parse2object( $f ) || bailout( $po->error );
+    }
+    else
+    {
+        bailout( "Unknown source file \"$f\"" );
+    }
+    _messagec( 3, "Adding id \"<green>$opts->{msgid}</>\" -> \"<green>$opts->{msgstr}</>\"" );
+    $po->add_element(
+        msgid => "$opts->{msgid}",
+        msgstr => "$opts->{msgstr}",
+    ) || bailout( $po->error );
+    _messagec( 3, "Synchronisation back to \"<green>$f</>\"" );
+    $po->sync( $f ) || bailout( $po->error );
+    _messagec( 3, "<green>Done.</>" );
+    return(1);
+}
+
 sub bailout
 {
     $err->print( @_, "\n" );
     exit(1);
+}
+
+sub compile
+{
+    my $p = $opt->_get_args_as_hash( @_ );
+    my $f = $p->{in} || bailout( "No po file to read was specified.\n" );
+    my $o = $p->{out} || bailout( "No mo file to write to was specified.\n" );
+    $f = $opt->new_file( $f );
+    my $po;
+    if( $f->extension() eq 'mo' )
+    {
+        &bailout( "The source file \"$f\" is already a mo file. You can simply copy it yourself." );
+    }
+    elsif( $f->extension eq 'po' )
+    {
+        my $p = 
+        {
+        debug => $opts->{po_debug},
+        };
+        $p->{domain} = $opts->{domain} if( length( $opts->{domain} ) );
+        $po = Text::PO->new( $p ) || bailout( Text::PO->error );
+        $po = $po->parse( $f );
+        bailout( "This does not look like a po file" ) if( !$po->elements->length );
+    }
+    elsif( $f->extension eq 'json' )
+    {
+        my $p = 
+        {
+        use_json => 1,
+        debug => $opts->{po_debug},
+        };
+        $p->{domain} = $opts->{domain} if( length( $opts->{domain} ) );
+        $po = Text::PO->new( %$p ) || bailout( Text::PO->error );
+        $po->parse2object( $f ) || bailout( $po->error );
+    }
+    else
+    {
+        bailout( "Unknown source file \"$f\"" );
+    }
+    # Exchange a string for a Module::Generic::File object
+    $o = $opt->new_file( $o );
+    _message( 3, "Saving data to mo file \"$o\"." );
+    my $mo = Text::PO::MO->new( $o, debug => $opts->{debug} );
+    $o->parent->mkpath;
+    $mo->write( $po ) || bailout( "Unable to write to \"$o\": ", $mo->error, "\n" );
+    return(1);
 }
 
 sub init_po
@@ -325,9 +420,39 @@ sub to_json
     my $p = $opt->_get_args_as_hash( @_ );
     my $f = $p->{in} || bailout( "No po file to read was specified.\n" );
     my $o = $p->{out} || bailout( "No mo file to write to was specified.\n" );
-    my $po = Text::PO->new( debug => $opts->{po_debug} );
-    $po->parse( $f ) || bailout( $po->error, "\n" );
+    $f = $opt->new_file( $f );
+    my $po;
+    if( $f->extension() eq 'json' )
+    {
+        &bailout( "The source file \"$f\" is already a json file. You can simply copy it yourself." );
+    }
+    elsif( $f->extension eq 'mo' )
+    {
+        my $p = 
+        {
+        debug => $opts->{debug},
+        };
+        $p->{domain} = $opts->{domain} if( length( $opts->{domain} ) );
+        my $mo = Text::PO::MO->new( $f, $p );
+        $po = $mo->as_object;
+    }
+    elsif( $f->extension eq 'po' )
+    {
+        my $p = 
+        {
+        debug => $opts->{debug},
+        };
+        $p->{domain} = $opts->{domain} if( length( $opts->{domain} ) );
+        $po = Text::PO->new( %$p ) || bailout( Text::PO->error );
+        $po->parse( $f ) || bailout( $po->error );
+    }
+    else
+    {
+        bailout( "Unknown source file \"$f\"" );
+    }
+    
     my $json = $po->as_json({ pretty => 1, canonical => 1 });
+    _messagec( 3, "<red>", $po->error, "</>" ) if( !$json );
     my $fh;
     if( $o eq '-' )
     {
@@ -338,11 +463,14 @@ sub to_json
     }
     else
     {
+        _messagec( 3, "<green>", $po->elements->length, "</> elements found." );
         _messagec( 3, "Saving as json file to <green>${o}</>" );
         $o = $opt->new_file( $o );
         $o->parent->mkpath;
         $fh = $o->open( '>', { binmode => ':utf8' }) || bailout( "Unable to open output file \"$o\" in write mode: $!\n" );
+        $fh->autoflush(1);
     }
+    # _message( 3, "Saving json '$json'" );
     $fh->print( $json );
     $fh->close unless( $o eq '-' );
     return(1);
@@ -363,8 +491,8 @@ sub to_po
     {
         my $p = {};
         $p->{domain} = $opts->{domain} if( length( $opts->{domain} ) );
-        my $mo = Text::PO::MO->new( $mo_file, $p );
-        $po = $mo->as_object;
+        my $mo = Text::PO::MO->new( $f, $p );
+        $po = $mo->as_object || _messagec( 3, "<red>", $mo->error, "</>" );
     }
     elsif( $f->extension eq 'json' )
     {
@@ -398,52 +526,6 @@ sub to_po
     }
     $po->dump( $fh );
     $fh->close unless( $o eq '-' );
-    return(1);
-}
-
-sub compile
-{
-    my $p = $opt->_get_args_as_hash( @_ );
-    my $f = $p->{in} || bailout( "No po file to read was specified.\n" );
-    my $o = $p->{out} || bailout( "No mo file to write to was specified.\n" );
-    $f = $opt->new_file( $f );
-    my $po;
-    if( $f->extension() eq 'mo' )
-    {
-        &bailout( "The source file \"$f\" is already a mo file. You can simply copy it yourself." );
-    }
-    elsif( $f->extension eq 'po' )
-    {
-        my $p = 
-        {
-        debug => $opts->{po_debug},
-        };
-        $p->{domain} = $opts->{domain} if( length( $opts->{domain} ) );
-        $po = Text::PO->new( $p ) || bailout( Text::PO->error );
-        $po = $po->parse( $f );
-        bailout( "This does not look like a po file" ) if( !$po->elements->length );
-    }
-    elsif( $f->extension eq 'json' )
-    {
-        my $p = 
-        {
-        use_json => 1,
-        debug => $opts->{po_debug},
-        };
-        $p->{domain} = $opts->{domain} if( length( $opts->{domain} ) );
-        $po = Text::PO->new( %$p ) || bailout( Text::PO->error );
-        $po->parse2object( $f ) || bailout( $po->error );
-    }
-    else
-    {
-        bailout( "Unknown source file \"$f\"" );
-    }
-    # Exchange a string for a Module::Generic::File object
-    $o = $opt->new_file( $o );
-    _message( 3, "Saving data to mo file \"$o\"." );
-    my $mo = Text::PO::MO->new( $o, debug => $opts->{debug} );
-    $o->parent->mkpath;
-    $mo->write( $po ) || bailout( "Unable to write to \"$o\": ", $mo->error, "\n" );
     return(1);
 }
 

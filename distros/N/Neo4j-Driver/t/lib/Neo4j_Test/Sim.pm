@@ -16,7 +16,7 @@ my $hash_url = 0;  # not 100% sure if 0 produces correct results, but it might i
 
 sub new {
 	my ($class, $options) = @_;
-	$options->{cypher_filter} = 'params';  # sim uses modern param syntax
+	$options->{cypher_params_v2} = 1;  # sim uses old param syntax
 	return $class if ref $class;  # if the net_module is an object, it'll a pre-configured Neo4j_Test::Sim
 	my $self = bless {
 		auth => $options->{auth} // 1,
@@ -167,7 +167,7 @@ use parent 'Neo4j::Driver::Net::HTTP::LWP';
 sub new {
 	my ($class, $driver) = @_;
 	$driver->{jolt} = 0;  # sim currently only supports JSON
-	$driver->{cypher_filter} = 'params';  # sim uses modern param syntax
+	$driver->{cypher_params_v2} = 1;  # sim uses old param syntax
 	return $class->SUPER::new($driver);
 }
 sub request {

@@ -6,16 +6,19 @@ use warnings;
 
 use Test::More;
 
-plan tests => 7 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 10 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Bencher/Scenario/StringFunctions/CommonPrefix.pm',
+    'Bencher/Scenario/StringFunctions/Indent.pm',
     'Bencher/Scenario/StringFunctions/Trim.pm',
     'Bencher/Scenario/StringModules/Startup.pm',
     'Bencher/ScenarioR/StringFunctions/CommonPrefix.pm',
+    'Bencher/ScenarioR/StringFunctions/Indent.pm',
     'Bencher/ScenarioR/StringFunctions/Trim.pm',
     'Bencher/ScenarioR/StringModules/Startup.pm',
-    'Bencher/Scenarios/StringFunctions.pm'
+    'Bencher/Scenarios/StringFunctions.pm',
+    'String/Indent/Join.pm'
 );
 
 

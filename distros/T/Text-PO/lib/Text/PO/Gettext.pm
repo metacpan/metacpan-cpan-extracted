@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## PO Files Manipulation - ~/lib/Text/PO/Gettext.pm
-## Version v0.1.0
+## Version v0.1.1
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/07/12
-## Modified 2021/07/12
+## Modified 2021/07/30
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -17,7 +17,9 @@ BEGIN
     use warnings;
     use warnings::register;
     use parent qw( Module::Generic );
+    use I18N::Langinfo qw( langinfo );
     use Nice::Try;
+    use POSIX ();
     use Text::PO;
     ## l10n_id => lang => string => local string
     our $L10N = {};
@@ -33,7 +35,7 @@ BEGIN
             (?:\.(?<locale_encoding>[\w-]+))?
         )
     $/x;
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.1.1';
 };
 
 sub init
@@ -214,6 +216,34 @@ sub fetchLocale
 
 sub getDataPath { return( $ENV{TEXTDOMAINDIR} ); }
 
+sub getDaysLong
+{
+    my $self = shift( @_ );
+    my $opts = $self->_get_args_as_hash( @_ );
+    my $ref  = $self->_get_days( $self->locale );
+    my $days = $ref->[1];
+    if( $opts->{monday_first} )
+    {
+        # Move Sunday at the end
+        push( @$days, shift( @$days ) );
+    }
+    return( $days );
+}
+
+sub getDaysShort
+{
+    my $self = shift( @_ );
+    my $opts = $self->_get_args_as_hash( @_ );
+    my $ref  = $self->_get_days( $self->locale );
+    my $days = $ref->[0];
+    if( $opts->{monday_first} )
+    {
+        # Move Sunday at the end
+        push( @$days, shift( @$days ) );
+    }
+    return( $days );
+}
+
 sub getDomainHash
 {
     my $self = shift( @_ );
@@ -318,6 +348,34 @@ sub getMetaValue
     my $hash = $self->getDomainHash({ locale => $self->locale });
     my $po = $hash->{_po} || return( $self->error( "Unable to get the po object in the locale data hash" ) );
     return( $po->meta( $field ) );
+}
+
+sub getMonthsLong
+{
+    my $self = shift( @_ );
+    my $ref  = $self->_get_months( $self->locale );
+    return( $ref->[1] );
+}
+
+sub getMonthsShort
+{
+    my $self = shift( @_ );
+    my $ref  = $self->_get_months( $self->locale );
+    return( $ref->[0] );
+}
+
+sub getNumericDict
+{
+    my $self = shift( @_ );
+    my $ref  = $self->_get_numeric_dict( $self->locale );
+    return( $ref->[0] );
+}
+
+sub getNumericPosixDict
+{
+    my $self = shift( @_ );
+    my $ref  = $self->_get_numeric_dict( $self->locale );
+    return( $ref->[1] );
 }
 
 sub getPlural
@@ -527,6 +585,81 @@ sub textdomain
 
 sub use_json { return( shift->_set_get_boolean( 'use_json', @_ ) ); }
 
+sub _get_days
+{
+    my $self = shift( @_ );
+    my $locale = shift( @_ );
+    my $oldlocale = POSIX::setlocale( &POSIX::LC_ALL );
+    my $short = $self->new_array;
+    my $long  = $self->new_array;
+
+    POSIX::setlocale( &POSIX::LC_ALL, $locale ) if( defined( $locale ) );
+
+    for (my $i = 1; $i <= 7; $i++)
+    {
+        my $const = "I18N::Langinfo::ABDAY_${i}";
+        $self->message( 3, "ABDAY_${i} -> ", &$const, "\n" );
+        $short->[$i-1] = langinfo( &$const );
+    }
+    for (my $i = 1; $i <= 7; $i++)
+    {
+        my $const = "I18N::Langinfo::DAY_${i}";
+        $self->message( 3, "DAY_${i} -> ", &$const, "\n" );
+        $long->[$i-1] = langinfo( &$const );
+    }
+
+    POSIX::setlocale( &POSIX::LC_ALL, $oldlocale) if( defined( $locale ) );
+
+    return( [ $short, $long ] );
+}
+
+sub _get_months
+{
+    my $self   = shift( @_ );
+    my $locale = shift( @_ );
+    my $oldlocale = POSIX::setlocale( &POSIX::LC_ALL );
+    my $short = $self->new_array;
+    my $long  = $self->new_array;
+
+    POSIX::setlocale( &POSIX::LC_ALL, $locale ) if( defined( $locale ) );
+
+    for (my $i = 1; $i <= 12; $i++)
+    {
+        my $const = "I18N::Langinfo::ABMON_${i}";
+        $self->message( 3, "ABMON_${i} -> ", &$const, "\n" );
+        $short->[$i-1] = langinfo( &$const );
+    }
+    for (my $i = 1; $i <= 12; $i++)
+    {
+        my $const = "I18N::Langinfo::MON_${i}";
+        $self->message( 3, "MON_${i} -> ", &$const, "\n" );
+        $long->[$i-1] = langinfo( &$const );
+    }
+
+    POSIX::setlocale( &POSIX::LC_ALL, $oldlocale) if( defined( $locale ) );
+
+    return( [ $short, $long ] );
+}
+
+sub _get_numeric_dict
+{
+    my $self   = shift( @_ );
+    my $locale = shift( @_ );
+    my $oldlocale = POSIX::setlocale( &POSIX::LC_ALL );
+    POSIX::setlocale( &POSIX::LC_ALL, $locale) if( defined( $locale ) );
+    my $lconv = POSIX::localeconv();
+    POSIX::setlocale( &POSIX::LC_ALL, $oldlocale) if( defined( $locale ) );
+    my $def = $self->new_hash;
+    @$def{qw( currency decimal int_currency negative_sign thousand precision )} = 
+    @$lconv{qw( currency_symbol decimal_point int_curr_symbol negative_sign thousands_sep frac_digits )};
+    use utf8;
+    $def->{currency} = '€' if( $def->{currency} eq 'EUR' );
+    $lconv->{grouping} = unpack( "C*", $lconv->{grouping} );
+    $lconv->{mon_grouping} = unpack( "C*", $lconv->{mon_grouping} );
+    $lconv = $self->new_hash( $lconv );
+    return( [ $def, $lconv ] );
+}
+
 sub _get_po
 {
     my $self = shift( @_ );
@@ -561,7 +694,7 @@ Text::PO::Gettext - A GNU Gettext implementation
 
 =head1 VERSION
 
-    v0.1.0
+    v0.1.1
 
 =head1 DESCRIPTION
 
@@ -629,6 +762,10 @@ Takes the following options and returns a Gettext object.
 =item I<category>
 
 If I<category> is defined, such as C<LC_MESSAGES> (by default), it will be used when building the I<path>.
+
+Other possible category values are: C<LC_CTYPE>, C<LC_NUMERIC>, C<LC_TIME>, C<LC_COLLATE>, C<LC_MONETARY>
+
+See L<GNU documentation for more information|https://www.gnu.org/software/gettext/manual/html_node/Locale-Environment-Variables.html> and L<perllocale/"LOCALE CATEGORIES">
 
 On the web, using the path is questionable.
 
@@ -766,6 +903,22 @@ This takes no argument and will check for the environment variables C<TEXTDOMAIN
 
 It returns the value found. This is just a helper method and does not affect the value of the I<path> property set during object instantiation.
 
+=head2 getDaysLong
+
+Returns an array reference containing the 7 days of the week in their long representation.
+
+    my $ref = $po->getDaysLong();
+    # Assuming the locale is fr_FR, this would yield
+    print $ref->[0], "\n"; # dim.
+
+=head2 getDaysShort
+
+Returns an array reference containing the 7 days of the week in their short representation.
+
+    my $ref = $po->getDaysShort();
+    # Assuming the locale is fr_FR, this would yield
+    print $ref->[0], "\n"; # dimanche
+
 =head2 getDomainHash
 
 This takes an optional hash of parameters and return the global hash dictionary used by this class to store the localised data.
@@ -819,6 +972,178 @@ Returns an array of the meta field names used.
 
 Provided with a meta field name and this returns its corresponding value.
 
+=head2 getMonthsLong
+
+Returns an array reference containing the 12 months in their long representation.
+
+    my $ref = $po->getMonthsLong();
+    # Assuming the locale is fr_FR, this would yield
+    print $ref->[0], "\n"; # janvier
+
+=head2 getMonthsShort
+
+Returns an array reference containing the 12 months in their short representation.
+
+    my $ref = $po->getMonthsShort();
+    # Assuming the locale is fr_FR, this would yield
+    print $ref->[0], "\n"; # janv.
+
+=head2 getNumericDict
+
+Returns an hash reference containing the following properties:
+
+    my $ref = $po->getNumericDict();
+
+=over 4
+
+=item I<currency> string
+
+Contains the usual currency symbol, such as C<€>, or C<$>, or C<¥>
+
+=item I<decimal> string
+
+Contains the character used to separate decimal. In English speaking countries, this would typically be a dot.
+
+=item I<int_currency> string
+
+Contains the 3-letters international currency symbol, such as C<USD>, or C<EUR> or C<JPY>
+
+=item I<negative_sign> string
+
+Contains the negative sign used for negative number
+
+=item I<precision> integer
+
+An integer whose value represents the fractional precision allowed for monetary context.
+
+For example, in Japanese, this value would be 0 while in many other countries, it would be 2.
+
+=item I<thousand> string
+
+Contains the character used to group and separate thousands.
+
+For example, in France, it would be a space, such as :
+
+    1 000 000,00
+
+While in English countries, including Japan, it would be a comma :
+
+    1,000,000.00
+
+=back
+
+=head2 getNumericPosixDict
+
+Returns the full hash reference returned by L<POSIX/lconv>. It contains the following properties:
+
+Here the values shown as example are for the locale C<en_US>
+
+=over 4
+
+=item I<currency_symbol> string
+
+The local currency symbol: C<$>
+
+=item I<decimal_point> string
+
+The decimal point character, except for currency values, cannot be an empty string: C<.>
+
+=item I<frac_digits> integer
+
+The number of digits after the decimal point in the local style for currency value: 2
+
+=item I<grouping>
+
+The sizes of the groups of digits, except for currency values. unpack( "C*", $grouping ) will give the number
+
+=item I<int_curr_symbol> string
+
+The standardized international currency symbol: C<USD>
+
+=item I<int_frac_digits> integer
+
+The number of digits after the decimal point in an international-style currency value: 2
+
+=item I<int_n_cs_precedes> integer
+
+Same as n_cs_precedes, but for internationally formatted monetary quantities: 1
+
+=item I<int_n_sep_by_space> integer
+
+Same as n_sep_by_space, but for internationally formatted monetary quantities: 1
+
+=item I<int_n_sign_posn> integer
+
+Same as n_sign_posn, but for internationally formatted monetary quantities: 1
+
+=item I<int_p_cs_precedes> integer
+
+Same as p_cs_precedes, but for internationally formatted monetary quantities: 1
+
+=item I<int_p_sep_by_space> integer
+
+Same as p_sep_by_space, but for internationally formatted monetary quantities: 1
+
+=item I<int_p_sign_posn> integer
+
+Same as p_sign_posn, but for internationally formatted monetary quantities: 1
+
+=item I<mon_decimal_point> string
+
+The decimal point character for currency values: C<.>
+
+=item I<mon_grouping>
+
+Like grouping but for currency values.
+
+=item I<mon_thousands_sep> string
+
+The separator for digit groups in currency values: C<,>
+
+=item I<n_cs_precedes> integer
+
+Like p_cs_precedes but for negative values: 1
+
+=item I<n_sep_by_space> integer
+
+Like p_sep_by_space but for negative values: 0
+
+=item I<n_sign_posn> integer
+
+Like p_sign_posn but for negative currency values: 1
+
+=item I<negative_sign> string
+
+The character used to denote negative currency values, usually a minus sign: C<->
+
+=item I<p_cs_precedes> integer
+
+1 if the currency symbol precedes the currency value for nonnegative values, 0 if it follows: 1
+
+=item I<p_sep_by_space> integer
+
+1 if a space is inserted between the currency symbol and the currency value for nonnegative values, 0 otherwise: 0
+
+=item I<p_sign_posn> integer
+
+The location of the positive_sign with respect to a nonnegative quantity and the currency_symbol, coded as follows:
+
+    0    Parentheses around the entire string.
+    1    Before the string.
+    2    After the string.
+    3    Just before currency_symbol.
+    4    Just after currency_symbol.
+
+=item I<positive_sign> string
+
+The character used to denote nonnegative currency values, usually the empty string
+
+=item I<thousands_sep> string
+
+The separator between groups of digits before the decimal point, except for currency values: C<,>
+
+=back
+
 =head2 getPlural
 
 Calls L<Text::PO/plural> and returns an array object (L<Module::Generic::Array>) with 2 elements.
@@ -864,12 +1189,6 @@ Returns a string containing the value of the header C<Last-Translator>.
 
     $po->lastTranslator();
 
-=head2 mimeVersion
-
-Returns a string containing the value of the header C<MIME-Version>.
-
-    $po->mimeVersion();
-
 =head2 locale
 
 Returns the locale set in the object. if sets, this will trigger the (re)load of po data by calling L</textdomain>
@@ -881,6 +1200,12 @@ Provided with a locale, such as C<en-GB> and this will return its equivalent for
 =head2 locale_web
 
 Provided with a locale, such as C<en_GB> and this will return its equivalent formatted for the web such as C<en-GB>
+
+=head2 mimeVersion
+
+Returns a string containing the value of the header C<MIME-Version>.
+
+    $po->mimeVersion();
 
 =head2 ngettext
 

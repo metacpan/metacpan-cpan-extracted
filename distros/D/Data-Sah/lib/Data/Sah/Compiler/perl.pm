@@ -1,7 +1,9 @@
 package Data::Sah::Compiler::perl;
 
-our $DATE = '2020-05-21'; # DATE
-our $VERSION = '0.908'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-07-29'; # DATE
+our $DIST = 'Data-Sah'; # DIST
+our $VERSION = '0.909'; # VERSION
 
 use 5.010;
 use strict;
@@ -93,6 +95,28 @@ sub init_cd {
     $self->add_runtime_no($cd, 'warnings', ["'void'"]) unless $cd->{args}{no_modules};
 
     $cd;
+}
+
+sub before_resolve {
+    require Data::Cmp;
+
+    my ($self, $cd) = @_;
+
+    # check whether we can optimize and produce a shorter, faster code under
+    # certain conditions (return_type=bool, simple schemas).
+
+    return 0 unless $cd->{args}{return_type} eq 'bool_valid';
+
+    my $nschema = $cd->{nschema};
+    my $dt      = $cd->{args}{data_term};
+    if (Data::Cmp::cmp_data($nschema, ["int", {"req", 1}, {}]) == 0) {
+        #$cd->{result} = "!defined($dt) || (!ref($dt) && length($dt) >= 4)";
+        $self->add_runtime_module($cd, 'Scalar::Util::Numeric');
+        $cd->{result} = "Scalar::Util::Numeric::isint($dt)";
+        return 99;
+    }
+
+    return;
 }
 
 sub true { "1" }
@@ -369,6 +393,7 @@ sub stmt_declare_local_var {
 
 sub expr_anon_sub {
     my ($self, $args, $code) = @_;
+
     join(
         "",
         "sub {\n",
@@ -437,6 +462,22 @@ sub stmt_return {
     }
 }
 
+# currently unused
+sub expr_refer_or_call_sub {
+    my ($self, $name) = @_;
+    "do { no strict 'refs'; \\&{" . $self->literal($name) . "} }";
+}
+
+sub expr_call_sub {
+    my ($self, $name, $args) = @_;
+    "$name(".join(", ", @$args).")";
+}
+
+sub cached_validator_subname {
+    my ($self, $schema_name) = @_;
+    "Data::Sah::_GeneratedValidators::ReturnBool::".$schema_name;
+}
+
 sub expr_validator_sub {
     my ($self, %args) = @_;
 
@@ -470,6 +511,12 @@ sub _str2reliteral {
     Regexp::Stringify::stringify_regexp(regexp=>$re, plver=>5.010);
 }
 
+# check if sub named $name is defined and return true if it's the case
+sub sub_defined {
+    my ($self, $name) = @_;
+    defined &{$name};
+}
+
 1;
 # ABSTRACT: Compile Sah schema to Perl code
 
@@ -485,7 +532,7 @@ Data::Sah::Compiler::perl - Compile Sah schema to Perl code
 
 =head1 VERSION
 
-This document describes version 0.908 of Data::Sah::Compiler::perl (from Perl distribution Data-Sah), released on 2020-05-21.
+This document describes version 0.909 of Data::Sah::Compiler::perl (from Perl distribution Data-Sah), released on 2021-07-29.
 
 =head1 SYNOPSIS
 
@@ -495,7 +542,7 @@ This document describes version 0.908 of Data::Sah::Compiler::perl (from Perl di
 
 Derived from L<Data::Sah::Compiler::Prog>.
 
-=for Pod::Coverage BUILD ^(after_.+|before_.+|name|expr|true|false|literal|expr_.+|stmt_.+|block_uses_sub)$
+=for Pod::Coverage BUILD ^(after_.+|before_.+|name|expr|true|false|literal|expr_.+|stmt_.+|block_uses_sub|sub_defined|cached_validator_subname)$
 
 =head1 VARIABLES
 
@@ -564,28 +611,29 @@ Will return an empty string if compile argument C<comment> is set to false.
 
 =head2 $c->compile(%args) => RESULT
 
-Aside from Prog's arguments, this class supports these arguments:
+Aside from arguments known by the base class (L<Data::Sah::Compiler::Prog>),
+this class supports these arguments:
 
 =over
 
-=item * pp => bool (default: 0)
+=item * pp
 
-If set to true, will avoid the use of XS modules in the generated code and will
-opt instead to use pure-perl modules.
+Bool, default false. If set to true, will avoid the use of XS modules in the
+generated code and will opt instead to use pure-perl modules.
 
-=item * core => bool (default: 0)
+=item * core
 
-If set to true, will avoid the use of non-core modules in the generated code and
-will opt instead to use core modules.
+Bool, default false. If set to true, will avoid the use of non-core modules in
+the generated code and will opt instead to use core modules.
 
-=item * core_or_pp => bool (default: 0)
+=item * core_or_pp
 
-If set to true, will stick to using only core or PP modules in the generated
-code.
+Bool, default false. If set to true, will stick to using only core or PP modules
+in the generated code.
 
-=item * whitelist_modules => array {of=>'str'}
+=item * whitelist_modules
 
-When C<pp>/C<core>/C<core_or_pp> option is set to true, the use of
+Array of str. When C<pp>/C<core>/C<core_or_pp> option is set to true, the use of
 non-appropriate modules will cause failure. However, you can pass a list of
 modules that are allowed nevertheless.
 
@@ -670,7 +718,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

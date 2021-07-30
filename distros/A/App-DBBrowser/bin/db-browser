@@ -3,7 +3,7 @@ use warnings;
 use strict;
 use 5.010001;
 
-our $VERSION = '2.277';
+our $VERSION = '2.279';
 
 use Term::Choose::Screen qw( hide_cursor show_cursor clear_to_end_of_screen );
 
@@ -53,7 +53,7 @@ C<db-browser> - Browse C<SQLite>/C<MySQL>/C<PostgreSQL> databases and their tabl
 
 =head1 VERSION
 
-Version 2.277
+Version 2.279
 
 =head1 SYNOPSIS
 
@@ -343,9 +343,9 @@ L</Insert Data>.
 
 =head3 Create Table
 
-If the option I<Source type of input data> is set to I<menu>, selecting I<Create Table> opens a sub-menu where one can choose the
-type of the data source. If I<Source type of input data> is set to I<plain>, I<copy&paste> or I<file>, the set data source type is
-used automatically without showing a menu.
+If the option I<Source type of input data> is set to I<menu>, selecting I<Create Table> opens a sub-menu where one can
+choose the type of the data source. If I<Source type of input data> is set to I<plain> or I<file>, the set data source
+type is used automatically without showing a menu.
 
 For the meaning of the different data source types see L<Source type of input data>.
 
@@ -393,8 +393,8 @@ L</Insert Data>.
 =head3 Insert Into
 
 If the option I<Source type of input data> is set to I<menu>, selecting I<Insert Into> opens a sub-menu where one can
-choose the type of the data source. If I<Source type of input data> is set to I<plain>, I<copy&paste> or I<file>, the
-set data source type is used without showing a menu.
+choose the type of the data source. If I<Source type of input data> is set to I<plain> or I<file>, the set data source
+type is used without showing a menu.
 
 For the meaning of the different data source types see L<Source type of input data>.
 
@@ -422,10 +422,6 @@ Delete records. The affected records are shown before the user confirms the dele
 =item Plain
 
 Insert the data cell by cell.
-
-=item Copy and Paste
-
-Reads from STDIN until the end of input.
 
 =item File
 
@@ -644,8 +640,8 @@ to the database.
 For the meaning of these driver specific attributes check the appropriate driver documentation.
 
 C<SQLite> unicode handling: if the C<DBD::SQLite> version is equal or greater then C<1.68>, the C<sqlite_string_mode>
-attribute is used, else the deprecated C<sqlite_unicode> attribute. Read in the
-L<SQLite documentation|https://metacpan.org/pod/DBD::SQLite#sqlite_string_mode> how these two attributes are used.
+attribute is used, else the deprecated C<sqlite_unicode> attribute. Read in the C<SQLite>
+L<documentation|https://metacpan.org/pod/DBD::SQLite#sqlite_string_mode> how these two attributes are used.
 
 =item Reset DB
 
@@ -996,10 +992,6 @@ If I<squash_spaces> is enabled, consecutive spaces are squashed to one space and
 
 Set the indentation width for the SQL substatements.
 
-=head3 Truncated rows
-
-How should truncated data source rows be marked at the end: C<...>, C<|> or C<none>.
-
 =head3 Set string
 
 =head4 Undef
@@ -1125,12 +1117,6 @@ Auto-detects the separation character for csv-files
 
 =back
 
-=head3 Parse tool for 'copy & paste'
-
-Set how to parse the "multi row" input.
-
-Same options as in I<Parse file>.
-
 =head3 csv settings-a
 
 Set the Text::CSV options
@@ -1219,8 +1205,7 @@ How to decode text files.
 
 =head3 Source type of input data
 
-Set the data source type to C<plain>, C<copy&paste>, C<file> or C<menu> for C<Insert Into> and for
-C<Create Table>.
+Set the data source type to C<plain>, C<file> or C<menu> for C<Insert Into> and for C<Create Table>.
 
 If this option is set to C<menu>, a menu is offered where the user can choose the type of the data source.
 

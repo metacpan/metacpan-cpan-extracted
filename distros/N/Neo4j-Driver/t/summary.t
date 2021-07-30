@@ -34,11 +34,11 @@ END
 	lives_ok { $r = $s->run($q, @params)->summary; } 'get summary';
 	isa_ok $r, 'Neo4j::Driver::ResultSummary', 'ResultSummary';
 	isa_ok $r->server, 'Neo4j::Driver::ServerInfo', 'ServerInfo';
-	my $param_start = $driver->config('cypher_filter') ? '\$' : '\{';
+	my $param_start = $s->{cypher_params_v2} ? '\$' : '\{';
 	lives_and { like $r->statement->{text}, qr/RETURN ${param_start}fortytwo\b/ } 'statement text';
 	lives_and { is_deeply $r->statement->{parameters}, {@params} } 'statement params';
 	lives_and { ok ! $r->plan; } 'no plan';
-	lives_and { ok ! $r->notifications; } 'no notification';
+	lives_and { is_deeply [$r->notifications], []; } 'no notification';
 #	diag explain $r;
 	$q = <<END;
 EXPLAIN MATCH (n), (m) RETURN n, m

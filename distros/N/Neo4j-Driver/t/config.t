@@ -12,12 +12,7 @@ use Test::Warnings;
 # in the form of the server URL, auth credentials and other options.
 
 use Neo4j_Test;
-
-# Report the Network error if there is one (to aid debugging),
-# but don't skip any of the tests below.
-unless ( $ENV{NO_NETWORK_TESTING} or Neo4j_Test->driver() ) {
-	diag $Neo4j_Test::error;
-}
+use Neo4j_Test::MockHTTP;
 
 my ($d, $r);
 
@@ -190,11 +185,11 @@ subtest 'auth' => sub {
 };
 
 
-subtest 'cypher filter' => sub {
-	plan tests => 17;
+subtest 'cypher params' => sub {
+	plan tests => 19;
 	my ($t, @q);
 	lives_ok { $d = 0; $d = Neo4j::Driver->new(); } 'new driver 1';
-	lives_ok { $d->config(cypher_filter => 'params'); } 'set filter';
+	lives_ok { $d->config(cypher_params => v2); } 'set filter';
 	lives_ok { $t = Neo4j_Test->transaction_unconnected($d); } 'new tx 1';
 	@q = ('RETURN {`ab.`}, {c}, {cd}', 'ab.' => 17, c => 19, cd => 23);
 	lives_ok { $r = 0; $r = $t->_prepare(@q); } 'prepare simple';
@@ -205,17 +200,27 @@ subtest 'cypher filter' => sub {
 	lives_ok { $r = 0; $r = $t->_prepare('RETURN 42'); } 'prepare no params';
 	is $r->{statement}, 'RETURN 42', 'filtered no params';
 	lives_ok { $d = 0; $d = Neo4j::Driver->new(); } 'new driver 2';
-	lives_ok { $d->config(cypher_filter => 'coffee'); } 'set filter unkown name';
-	lives_ok { $t = Neo4j_Test->transaction_unconnected($d); } 'new tx 2';
 	throws_ok {
-		$r = 0; $r = $t->_prepare('RETURN 42');
-	} qr/\bUnimplemented cypher filter\b/i, 'unprepared filter unkown name';
+		$d->config(cypher_params => v3);
+	} qr/\bUnimplemented cypher params filter\b/i, 'set filter unkown name';
 	# no filter (for completeness)
 	lives_ok { $d = 0; $d = Neo4j::Driver->new(); } 'new driver 3';
 	lives_ok { $t = Neo4j_Test->transaction_unconnected($d); } 'new tx 3';
 	@q = ('RETURN {a}', a => 17);
 	lives_ok { $r = 0; $r = $t->_prepare(@q); } 'prepare unfiltered';
 	is $r->{statement}, 'RETURN {a}', 'unfiltered';
+	# verify that filter flag is automatically cleared for Neo4j 2
+	my $d = Neo4j::Driver->new('http:');
+	lives_ok { $d->config(cypher_params => v2, net_module => 'Neo4j_Test::MockHTTP') } 'set filter mock';
+	lives_and { ok !! $d->session(database => 'dummy')->{cypher_params_v2} } 'Neo4j 4: filter';
+	$Neo4j_Test::MockHTTP::res[0]->{json}{neo4j_version} = '2.3.12';
+	$Neo4j_Test::MockHTTP::res[0]->{content} = undef;
+	lives_and { ok !  $d->session(database => 'dummy')->{cypher_params_v2} } 'Neo4j 2: no filter';
+	$Neo4j_Test::MockHTTP::res[0]->{json}{neo4j_version} = '0.0.0';
+	$Neo4j_Test::MockHTTP::res[0]->{content} = undef;
+	lives_and { ok !! $d->session(database => 'dummy')->{cypher_params_v2} } 'Sim (0.0.0): filter';
+	$Neo4j_Test::MockHTTP::res[0]->{json}{neo4j_version} = '4.2.5';
+	$Neo4j_Test::MockHTTP::res[0]->{content} = undef;
 };
 
 

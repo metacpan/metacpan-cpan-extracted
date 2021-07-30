@@ -1,3 +1,17 @@
+0.007   2021-07-30  Released-By: PERLANCAR; Urgency: medium
+
+	- Move schemas: {example::,}array_of_int,
+	  {example::,}array_of_posint, {example::,}hash_of_int,
+	  {example::,}hash_of_posint.
+
+        - Delete schemas because they are already in Sah::Schemas::Collection:
+	  example::array_of_str (there is aos).
+
+        - Add alias ints for array_of_ints, posints for array_of_posint.
+
+	- [doc] Add description to example::has_merge schema.
+
+
 0.006   2020-05-27  Released-By: PERLANCAR; Urgency: low
 
 	- No functional changes.

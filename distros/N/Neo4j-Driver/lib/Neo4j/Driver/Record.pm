@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Record;
 # ABSTRACT: Container for Cypher result values
-$Neo4j::Driver::Record::VERSION = '0.25';
+$Neo4j::Driver::Record::VERSION = '0.26';
 
 use Carp qw(croak);
 use JSON::MaybeXS 1.003003 qw(is_bool);
@@ -110,7 +110,7 @@ Neo4j::Driver::Record - Container for Cypher result values
 
 =head1 VERSION
 
-version 0.25
+version 0.26
 
 =head1 SYNOPSIS
 
@@ -229,7 +229,7 @@ L<Neo4j::Driver::Type::B<Path>>
 
 =item * Equivalent documentation for the official Neo4j drivers:
 L<Record (Java)|https://neo4j.com/docs/api/java-driver/current/index.html?org/neo4j/driver/Record.html>,
-L<Record (JavaScript)|https://neo4j.com/docs/api/javascript-driver/current/class/src/record.js~Record.html>,
+L<Record (JavaScript)|https://neo4j.com/docs/api/javascript-driver/4.3/class/lib6/record.js~Record.html>,
 L<IRecord (.NET)|https://neo4j.com/docs/api/dotnet-driver/4.0/html/ca4ccbd1-2925-945d-fd4c-a5635f3e4b23.htm>
 
 =back

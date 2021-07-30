@@ -674,7 +674,7 @@ sub __merge_rows {
     my $term_w = get_term_width();
     my $stringified_rows;
     {
-        my $dots = $sf->{i}{dots}[ $sf->{o}{G}{dots} ];
+        my $dots = $sf->{i}{dots};
         my $dots_w = print_columns( $dots );
         no warnings 'uninitialized';
         @$stringified_rows = map {

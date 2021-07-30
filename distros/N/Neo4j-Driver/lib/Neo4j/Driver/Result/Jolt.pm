@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Result::Jolt;
 # ABSTRACT: Jolt result handler
-$Neo4j::Driver::Result::Jolt::VERSION = '0.25';
+$Neo4j::Driver::Result::Jolt::VERSION = '0.26';
 
 use parent 'Neo4j::Driver::Result';
 
@@ -332,7 +332,7 @@ Neo4j::Driver::Result::Jolt - Jolt result handler
 
 =head1 VERSION
 
-version 0.25
+version 0.26
 
 =head1 DESCRIPTION
 

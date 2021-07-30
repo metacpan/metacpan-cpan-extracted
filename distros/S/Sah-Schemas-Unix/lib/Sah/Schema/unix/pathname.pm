@@ -1,9 +1,9 @@
 package Sah::Schema::unix::pathname;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-07-22'; # DATE
+our $DATE = '2021-07-29'; # DATE
 our $DIST = 'Sah-Schemas-Unix'; # DIST
-our $VERSION = '0.017'; # VERSION
+our $VERSION = '0.018'; # VERSION
 
 our $schema = ["pathname::unix" => {
     summary => 'Path name (filename or dirname) on a Unix system',
@@ -32,7 +32,7 @@ Sah::Schema::unix::pathname - Path name (filename or dirname) on a Unix system
 
 =head1 VERSION
 
-This document describes version 0.017 of Sah::Schema::unix::pathname (from Perl distribution Sah-Schemas-Unix), released on 2021-07-22.
+This document describes version 0.018 of Sah::Schema::unix::pathname (from Perl distribution Sah-Schemas-Unix), released on 2021-07-29.
 
 =head1 SYNOPSIS
 
@@ -86,7 +86,7 @@ L<Perinci::CmdLine> to create a CLI:
  package
    main;
  use Perinci::CmdLine::Any;
- Perinci::CmdLine::Any->new(url=>'MyApp::myfunc')->run;
+ Perinci::CmdLine::Any->new(url=>'/MyApp/myfunc')->run;
 
  # in command-line
  % ./myapp.pl --help

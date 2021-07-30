@@ -1,3 +1,8 @@
+0.008   2021-07-29  Released-By: PERLANCAR; Urgency: medium
+
+	- Handle Sah::SchemaR::* produced by Data::Sah::Resolve 0.010.
+
+
 0.007   2020-06-04  Released-By: PERLANCAR; Urgency: medium
 
 	- [bugfix] When retrieving schema from Sah::SchemaR::* module, do

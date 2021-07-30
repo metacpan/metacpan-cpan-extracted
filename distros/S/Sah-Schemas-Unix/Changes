@@ -1,3 +1,8 @@
+0.018   2021-07-22  Released-By: PERLANCAR; Urgency: medium
+
+        - [build] Rebuild to refresh Sah::SchemaR::*.
+
+
 0.017   2021-07-22  Released-By: PERLANCAR; Urgency: low
 
 	- No functional changes.

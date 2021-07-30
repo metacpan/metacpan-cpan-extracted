@@ -1,14 +1,14 @@
 package Data::Sah::Compiler::perl::TH;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-05-21'; # DATE
+our $DATE = '2021-07-29'; # DATE
 our $DIST = 'Data-Sah'; # DIST
-our $VERSION = '0.908'; # VERSION
+our $VERSION = '0.909'; # VERSION
 
 use 5.010;
 use strict;
 use warnings;
-#use Log::Any '$log';
+use Log::ger;
 
 use Mo qw(build default);
 use Role::Tiny::With;
@@ -30,6 +30,7 @@ sub gen_each {
     $iargs{data_term}            = $data_term;
     $iargs{schema}               = $cv;
     $iargs{schema_is_normalized} = 0;
+    $iargs{cache}                = $cd->{args}{cache};
     $iargs{indent_level}++;
     $iargs{data_term_includes_topic_var} = 1;
     my $icd = $c->compile(%iargs);
@@ -60,7 +61,7 @@ Data::Sah::Compiler::perl::TH - Base class for perl type handlers
 
 =head1 VERSION
 
-This document describes version 0.908 of Data::Sah::Compiler::perl::TH (from Perl distribution Data-Sah), released on 2020-05-21.
+This document describes version 0.909 of Data::Sah::Compiler::perl::TH (from Perl distribution Data-Sah), released on 2021-07-29.
 
 =for Pod::Coverage ^(compiler|clause_.+|gen_.+)$
 
@@ -86,7 +87,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

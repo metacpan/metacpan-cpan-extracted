@@ -1,9 +1,9 @@
 package Perinci::Sub::GetArgs::Argv;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-09-09'; # DATE
+our $DATE = '2021-07-29'; # DATE
 our $DIST = 'Perinci-Sub-GetArgs-Argv'; # DIST
-our $VERSION = '0.845'; # VERSION
+our $VERSION = '0.846'; # VERSION
 
 use 5.010001;
 use strict;
@@ -101,8 +101,8 @@ sub _arg2opt {
 # types (e.g. 'str_comma_sep', etc).
 sub _is_coercible_from_simple {
     my $nsch = shift;
-    my $cset = $nsch->[1] or return 0;
-    my $rules = $cset->{'x.perl.coerce_rules'} // $cset->{'x.coerce_rules'}
+    my $clset = $nsch->[1] or return 0;
+    my $rules = $clset->{'x.perl.coerce_rules'} // $clset->{'x.coerce_rules'}
         or return 0;
     for my $rule (@$rules) {
         next unless $rule =~ /\A([^_]+)_/;
@@ -127,23 +127,23 @@ sub _is_simple_or_array_of_simple_or_hash_of_simple {
     my $eltype;
 
     my $type = $nsch->[0];
-    my $cset = $nsch->[1];
+    my $clset = $nsch->[1];
 
     {
         # if not known as builtin type, then resolve it first
         unless (is_type($nsch)) {
             require Data::Sah::Resolve;
             my $res = Data::Sah::Resolve::resolve_schema(
-                {merge_clause_sets => 0}, $nsch);
-            $type = $res->[0];
-            $cset = $res->[1][0] // {};
+                {schema_is_normalized=>1}, $nsch);
+            $type  = $res->{type};
+            $clset = $res->{clsets_after_type}[0] // {};
         }
 
-        $is_simple = _is_simple_or_coercible_from_simple([$type, $cset]);
+        $is_simple = _is_simple_or_coercible_from_simple([$type, $clset]);
         last if $is_simple;
 
         if ($type eq 'array') {
-            my $elnsch = $cset->{of} // $cset->{each_elem};
+            my $elnsch = $clset->{of} // $clset->{each_elem};
             last unless $elnsch;
             $elnsch = normalize_schema($elnsch);
             $eltype = $elnsch->[0];
@@ -152,9 +152,9 @@ sub _is_simple_or_array_of_simple_or_hash_of_simple {
             unless (is_type($elnsch)) {
                 require Data::Sah::Resolve;
                 my $res = Data::Sah::Resolve::resolve_schema(
-                    {merge_clause_sets => 0}, $elnsch);
-                $elnsch = [$res->[0], $res->[1][0] // {}]; # XXX we only take the first clause set
-                $eltype = $res->[0];
+                    {schema_is_normalized=>1}, $elnsch);
+                $elnsch = [$res->{type}, $res->{clsets_after_type}[0] // {}]; # XXX we only take the first clause set
+                $eltype = $res->{type};
             }
 
             $is_array_of_simple = _is_simple_or_coercible_from_simple($elnsch);
@@ -162,7 +162,7 @@ sub _is_simple_or_array_of_simple_or_hash_of_simple {
         }
 
         if ($type eq 'hash') {
-            my $elnsch = $cset->{of} // $cset->{each_value} // $cset->{each_elem};
+            my $elnsch = $clset->{of} // $clset->{each_value} // $clset->{each_elem};
             last unless $elnsch;
             $elnsch = normalize_schema($elnsch);
             $eltype = $elnsch->[0];
@@ -171,9 +171,9 @@ sub _is_simple_or_array_of_simple_or_hash_of_simple {
             unless (is_type($elnsch)) {
                 require Data::Sah::Resolve;
                 my $res = Data::Sah::Resolve::resolve_schema(
-                    {merge_clause_sets => 0}, $elnsch);
-                $elnsch = [$res->[0], $res->[1][0] // {}]; # XXX we only take the first clause set
-                $eltype = $res->[0];
+                    {schema_is_normalized=>1}, $elnsch);
+                $elnsch = [$res->{type}, $res->{clsets_after_type}[0] // {}]; # XXX we only take the first clause set
+                $eltype = $res->{type};
             }
 
             $is_hash_of_simple = _is_simple_or_coercible_from_simple($elnsch);
@@ -182,7 +182,7 @@ sub _is_simple_or_array_of_simple_or_hash_of_simple {
     }
 
     #{ no warnings 'uninitialized'; say "D:$nsch->[0]: is_simple=<$is_simple>, is_array_of_simple=<$is_array_of_simple>, is_hash_of_simple=<$is_hash_of_simple>, type=<$type>, eltype=<$eltype>" };
-    ($is_simple, $is_array_of_simple, $is_hash_of_simple, $type, $cset, $eltype);
+    ($is_simple, $is_array_of_simple, $is_hash_of_simple, $type, $clset, $eltype);
 }
 
 # return one or more triplets of Getopt::Long option spec, its parsed structure,
@@ -190,7 +190,7 @@ sub _is_simple_or_array_of_simple_or_hash_of_simple {
 # parse_getopt_long_opt_spec().
 sub _opt2ospec {
     my ($opt, $schema, $arg_spec) = @_;
-    my ($is_simple, $is_array_of_simple, $is_hash_of_simple, $type, $cset, $eltype) =
+    my ($is_simple, $is_array_of_simple, $is_hash_of_simple, $type, $clset, $eltype) =
         _is_simple_or_array_of_simple_or_hash_of_simple($schema);
 
     my (@opts, @types, @isaos, @ishos);
@@ -232,13 +232,13 @@ sub _opt2ospec {
             if (length $opt == 1) {
                 # single-letter option like -b doesn't get --nob.
                 push @res, ($opt, {opts=>[$opt]}), undef;
-            } elsif ($cset->{is} || $cset->{is_true}) {
+            } elsif ($clset->{is} || $clset->{is_true}) {
                 # an always-true bool ('true' or [bool => {is=>1}] or
                 # [bool=>{is_true=>1}] also means it's a flag and should not get
                 # --nofoo.
                 push @res, ($opt, {opts=>[$opt]}), undef;
-            } elsif ((defined $cset->{is} && !$cset->{is}) ||
-                         (defined $cset->{is_true} && !$cset->{is_true})) {
+            } elsif ((defined $clset->{is} && !$clset->{is}) ||
+                         (defined $clset->{is_true} && !$clset->{is_true})) {
                 # an always-false bool ('false' or [bool => {is=>0}] or
                 # [bool=>{is_true=>0}] also means it's a flag and should only be
                 # getting --nofoo.
@@ -289,12 +289,12 @@ sub _args2opts {
         next if grep { $_ eq 'hidden' || $_ eq 'hidden-cli' }
             @{ $arg_spec->{tags} // [] };
         my $sch      = $arg_spec->{schema} // ['any', {}];
-        my ($is_simple, $is_array_of_simple, $is_hash_of_simple, $type, $cset, $eltype) =
+        my ($is_simple, $is_array_of_simple, $is_hash_of_simple, $type, $clset, $eltype) =
             _is_simple_or_array_of_simple_or_hash_of_simple($sch);
 
         # XXX normalization of 'of' clause should've been handled by sah itself
-        if ($type eq 'array' && $cset->{of}) {
-            $cset->{of} = normalize_schema($cset->{of});
+        if ($type eq 'array' && $clset->{of}) {
+            $clset->{of} = normalize_schema($clset->{of});
         }
         my $opt = _arg2opt($fqarg);
         if ($seen_opts->{$opt}) {
@@ -1009,7 +1009,7 @@ sub get_args_from_argv {
                     return [400, "You specified option --$name but also ".
                                 "argument #".$arg_spec->{pos}] if $strict;
                 }
-                my ($is_simple, $is_array_of_simple, $is_hash_of_simple, $type, $cset, $eltype) =
+                my ($is_simple, $is_array_of_simple, $is_hash_of_simple, $type, $clset, $eltype) =
                     _is_simple_or_array_of_simple_or_hash_of_simple($arg_spec->{schema});
 
                 if (($arg_spec->{slurpy} // $arg_spec->{greedy}) && ref($val) eq 'ARRAY' &&
@@ -1139,7 +1139,7 @@ Perinci::Sub::GetArgs::Argv - Get subroutine arguments from command line argumen
 
 =head1 VERSION
 
-This document describes version 0.845 of Perinci::Sub::GetArgs::Argv (from Perl distribution Perinci-Sub-GetArgs-Argv), released on 2020-09-09.
+This document describes version 0.846 of Perinci::Sub::GetArgs::Argv (from Perl distribution Perinci-Sub-GetArgs-Argv), released on 2021-07-29.
 
 =head1 SYNOPSIS
 
@@ -1161,7 +1161,7 @@ processed, see Perinci::CmdLine's documentation.
 
 Usage:
 
- gen_getopt_long_spec_from_meta(%args) -> [status, msg, payload, meta]
+ gen_getopt_long_spec_from_meta(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Generate Getopt::Long spec from Rinci function metadata.
 
@@ -1277,12 +1277,12 @@ arguments, if arguments' schema is not simple scalar.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -1292,7 +1292,7 @@ Return value:  (any)
 
 Usage:
 
- get_args_from_argv(%args) -> [status, msg, payload, meta]
+ get_args_from_argv(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Get subroutine arguments (%args) from command-line arguments (@ARGV).
 
@@ -1433,12 +1433,12 @@ Should probably be named C<ignore_errors> or C<allow_unknown_options>. :-)
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -1483,9 +1483,29 @@ L<Perinci>
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTORS
+
+=for stopwords Olivier Mengué perlancar (@pc-office) Steven Haryanto (on PC)
+
+=over 4
+
+=item *
+
+Olivier Mengué <dolmen@cpan.org>
+
+=item *
+
+perlancar (@pc-office) <perlancar@gmail.com>
+
+=item *
+
+Steven Haryanto (on PC) <stevenharyanto@gmail.com>
+
+=back
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

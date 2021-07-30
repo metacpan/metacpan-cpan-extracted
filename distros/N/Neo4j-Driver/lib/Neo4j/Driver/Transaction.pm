@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Transaction;
 # ABSTRACT: Logical container for an atomic unit of work
-$Neo4j::Driver::Transaction::VERSION = '0.25';
+$Neo4j::Driver::Transaction::VERSION = '0.26';
 
 use Carp qw(croak);
 our @CARP_NOT = qw(
@@ -23,7 +23,7 @@ sub new {
 	my ($class, $session) = @_;
 	
 	my $transaction = {
-		cypher_filter => $session->{driver}->{cypher_filter},
+		cypher_params_v2 => $session->{cypher_params_v2},
 		net => $session->{net},
 		unused => 1,  # for HTTP only
 		closed => 0,
@@ -58,22 +58,10 @@ sub run {
 	
 	if (scalar @statements <= 1) {
 		my $result = $results[0] // Neo4j::Driver::Result->new;
+		warnings::warnif deprecated => "run() in list context is deprecated" if wantarray;
 		return wantarray ? $result->list : $result;
 	}
 	return wantarray ? @results : \@results;
-}
-
-
-sub _run_multiple {
-	my ($self, @statements) = @_;
-	
-	croak 'Transaction already closed' unless $self->is_open;
-	
-	return $self->{net}->_run( $self, map {
-		croak '_run_multiple() expects a list of array references' unless ref eq 'ARRAY';
-		croak '_run_multiple() with empty statements not allowed' unless $_->[0];
-		$self->_prepare(@$_);
-	} @statements );
 }
 
 
@@ -96,13 +84,10 @@ sub _prepare {
 		$params = {@parameters};
 	}
 	
-	if ($self->{cypher_filter}) {
-		croak "Unimplemented cypher filter '$self->{cypher_filter}'" if $self->{cypher_filter} ne 'params';
-		if (defined $params) {
-			my @params_quoted = map {quotemeta} keys %$params;
-			my $params_re = join '|', @params_quoted, map {"`$_`"} @params_quoted;
-			$query =~ s/\{($params_re)}/\$$1/g;
-		}
+	if ($self->{cypher_params_v2} && defined $params) {
+		my @params_quoted = map {quotemeta} keys %$params;
+		my $params_re = join '|', @params_quoted, map {"`$_`"} @params_quoted;
+		$query =~ s/\{($params_re)}/\$$1/g;
 	}
 	
 	my $statement = [$query, $params // {}];
@@ -149,6 +134,7 @@ sub _run_autocommit {
 	$self->{net}->{active_tx} = 0;
 	
 	return $results unless wantarray;
+	warnings::warnif deprecated => "run() in list context is deprecated";
 	return $results->list if ref $query ne 'ARRAY';
 	return @$results;
 }
@@ -205,6 +191,19 @@ use Carp qw(croak);
 # use 'rest' in place of broken 'meta', see neo4j #12306
 my $RESULT_DATA_CONTENTS = ['row', 'rest'];
 my $RESULT_DATA_CONTENTS_GRAPH = ['row', 'rest', 'graph'];
+
+
+sub _run_multiple {
+	my ($self, @statements) = @_;
+	
+	croak 'Transaction already closed' unless $self->is_open;
+	
+	return $self->{net}->_run( $self, map {
+		croak '_run_multiple() expects a list of array references' unless ref eq 'ARRAY';
+		croak '_run_multiple() with empty statements not allowed' unless $_->[0];
+		$self->_prepare(@$_);
+	} @statements );
+}
 
 
 sub _prepare {
@@ -281,7 +280,7 @@ Neo4j::Driver::Transaction - Logical container for an atomic unit of work
 
 =head1 VERSION
 
-version 0.25
+version 0.26
 
 =head1 SYNOPSIS
 
@@ -452,14 +451,6 @@ features. These are subject to unannounced modification or removal
 in future versions. Expect your code to break if you depend upon
 these features.
 
-=head2 Calling in list context
-
- @records = $transaction->run('...');
- @results = $transaction->run([...]);
-
-The C<run> method tries to Do What You Mean if called in list
-context.
-
 =head2 Execute multiple statements at once
 
  @statements = (
@@ -473,6 +464,7 @@ context.
 
 The Neo4j HTTP API supports executing multiple statements within a
 single HTTP request. This driver exposes this feature to the client.
+It is only available on HTTP connections.
 
 This feature might eventually be used to implement lazy statement
 execution for this driver. The private C<_run_multiple()> method
@@ -520,7 +512,7 @@ see L<Neo4j::Driver::Net>.
 
 =item * Equivalent documentation for the official Neo4j drivers:
 L<Transaction (Java)|https://neo4j.com/docs/api/java-driver/current/index.html?org/neo4j/driver/Transaction.html>,
-L<Transaction (JavaScript)|https://neo4j.com/docs/api/javascript-driver/current/class/src/transaction.js~Transaction.html>,
+L<Transaction (JavaScript)|https://neo4j.com/docs/api/javascript-driver/4.3/class/lib6/transaction.js~Transaction.html>,
 L<ITransaction (.NET)|https://neo4j.com/docs/api/dotnet-driver/4.0/html/b64c7dfe-87e9-8b85-5a02-8ff03800b67b.htm>,
 L<Sessions & Transactions (Python)|https://neo4j.com/docs/api/python-driver/current/api.html#transaction>
 

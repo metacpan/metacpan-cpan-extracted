@@ -9,7 +9,7 @@ use Syntax::Construct ();
 is(Syntax::Construct::introduced('//'), '5.010', 'introduced-arg');
 
 my @introduced = Syntax::Construct::introduced();
-is(@introduced, 83, 'introduced all');
+is(@introduced, 84, 'introduced all');
 
 is(Syntax::Construct::removed('auto-deref'), '5.024', 'removed-arg');
 is(Syntax::Construct::removed(), 6, 'removed all');

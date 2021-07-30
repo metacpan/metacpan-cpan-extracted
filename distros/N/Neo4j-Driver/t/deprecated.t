@@ -18,7 +18,7 @@ my $s = $driver->session;
 # functionality. If the behaviour of such functionality changes, we
 # want it to be a conscious decision, hence we test for it.
 
-use Test::More 0.96 tests => 9 + 3;
+use Test::More 0.96 tests => 13 + 3;
 use Test::Exception;
 use Test::Warnings qw(warning warnings);
 my $transaction = $driver->session->begin_transaction;
@@ -70,6 +70,36 @@ subtest 'path()' => sub {
 };
 
 
+{
+package Neo4j_Test::Deprecated::DeletionIndicator;
+use parent 'Neo4j_Test::MockHTTP';
+sub response_for { &Neo4j_Test::MockHTTP::response_for }
+response_for 'deleted' => { json => <<END };
+{"errors":[],"results":[{"columns":["n"],"data":[
+{"meta":[{"deleted":true,"id":1,"type":"node"}],"rest":[{"metadata":{"id":1,"labels":["Test"]},"self":"/db/data/node/1"}],"row":[{}]},
+{"meta":[{"deleted":false,"id":6,"type":"relationship"}],"rest":[{"end":"/db/data/node/5","metadata":{"id":6,"type":"TEST"},"self":"/db/data/relationship/6","start":"/db/data/node/7"}],"row":[{}]},
+{"rest":[{"metadata":{"id":3,"labels":["Test"]},"self":"/db/data/node/3"}],"row":[{}]}
+]}]}
+END
+}
+subtest 'deleted()' => sub {
+	plan tests => 8;
+	my $d = Neo4j::Driver->new('http:');
+	$d->config(net_module => 'Neo4j_Test::Deprecated::DeletionIndicator');
+	lives_and { $r = 0; ok $r = $d->session(database => 'dummy')->run('deleted') } 'run';
+	lives_and { $w = warning { ok $r->fetch->get->deleted }; } 'deleted true';
+	like $w, qr/\bdeleted\b.* deprecated\b/i, 'deleted true deprecated'
+		or diag 'got warning(s): ', explain $w;
+	lives_and { $w = warning { ok ! $r->fetch->get->deleted }; } 'deleted false';
+	like $w, qr/\bdeleted\b.* deprecated\b/i, 'deleted false deprecated'
+		or diag 'got warning(s): ', explain $w;
+	lives_and { $w = warning { ok ! defined $r->fetch->get->deleted }; } 'deleted unknown';
+	like $w, qr/\bdeleted\b.* deprecated\b/i, 'deleted unknown deprecated'
+		or diag 'got warning(s): ', explain $w;
+	lives_and { ok ! $r->has_next } 'no has_next';
+};
+
+
 subtest 'close()' => sub {
 	plan tests => 4;
 	# close() always was a no-op, so we only check the deprecation warning
@@ -114,6 +144,63 @@ subtest 'driver mutability (config/auth)' => sub {
 	lives_ok { $w = warning { $d->basic_auth(@credentials) }; } 'auth mutable lives';
 	(like $w, qr/\bDeprecate.*\bbasic_auth\b.*\bsession\b/i, 'auth mutable deprecated') or diag 'got warning(s): ', explain($w);
 	is $d->{auth}->{principal}, $credentials[0], 'auth mutable';
+};
+
+
+subtest 'cypher_filter' => sub {
+	plan tests => 13;
+	my ($t, @q);
+	lives_ok { $d = 0; $d = Neo4j::Driver->new(); } 'new driver 1';
+	lives_ok { $w = ''; $w = warning { $d->config(cypher_filter => 'params') }; } 'set filter';
+	like $w, qr/\bcypher_filter\b.* deprecated\b/i, 'cypher_filter deprecated'
+		or diag 'got warning(s): ', explain $w;
+	lives_ok { $t = Neo4j_Test->transaction_unconnected($d); } 'new tx 1';
+	@q = ('RETURN {`ab.`}, {c}, {cd}', 'ab.' => 17, c => 19, cd => 23);
+	lives_ok { $r = 0; $r = $t->_prepare(@q); } 'prepare simple';
+	is $r->{statement}, 'RETURN $`ab.`, $c, $cd', 'filtered simple';
+	@q = ('CREATE (a) RETURN {}, {a:a}, {a}, [a]', a => 17);
+	lives_ok { $r = 0; $r = $t->_prepare(@q); } 'prepare composite';
+	is $r->{statement}, 'CREATE (a) RETURN {}, {a:a}, $a, [a]', 'filtered composite';
+	lives_ok { $r = 0; $r = $t->_prepare('RETURN 42'); } 'prepare no params';
+	is $r->{statement}, 'RETURN 42', 'filtered no params';
+	lives_ok { $d = 0; $d = Neo4j::Driver->new(); } 'new driver 2';
+	throws_ok {
+		warning { $d->config(cypher_filter => 'coffee') };
+	} qr/\bUnimplemented cypher filter\b/i, 'unprepared filter unkown name';
+	lives_and {
+		$d = Neo4j::Driver->new()->config( cypher_filter => 'water', cypher_params => v2 );
+		is $d->{cypher_params_v2}, v2;
+	} 'set both params ignores old syntax';
+};
+
+
+{
+package Neo4j_Test::MockHTTP::NoProtocol;
+use parent 'Neo4j_Test::MockHTTP';
+sub can { return if $_[1] eq 'protocol'; return shift->SUPER::can(@_); }
+}
+subtest 'ServerInfo protocol()' => sub {
+	plan tests => 14;
+	my ($si, $w);
+	my %uri = (uri => URI->new('http:'));
+	lives_and { ok $si = Neo4j::Driver::ServerInfo->new({%uri}) } 'new undef';
+	lives_ok { $w = ''; $w = warning { my $p = $si->protocol() }; } 'protocol lives';
+	like $w, qr/\bprotocol\b.*\bdeprecated\b/i, 'protocol deprecated'
+		or diag 'got warning(s): ', explain $w;
+	no warnings 'deprecated';
+	lives_and { is $si->protocol(), 'HTTP' } 'protocol undef';
+	lives_and { ok $si = Neo4j::Driver::ServerInfo->new({%uri, protocol => ''}) } 'new empty';
+	lives_and { is $si->protocol(), 'Bolt' } 'protocol empty';
+	lives_and { ok $si = Neo4j::Driver::ServerInfo->new({%uri, protocol => '2.2'}) } 'new version';
+	lives_and { is $si->protocol(), 'Bolt/2.2' } 'protocol version';
+	lives_and { ok $si = Neo4j::Driver::ServerInfo->new({%uri, protocol_string => 'HTTP/0.9'}) } 'new string';
+	lives_and { is $si->protocol(), 'HTTP/0.9' } 'protocol string';
+	lives_and { ok $si = Neo4j::Driver::ServerInfo->new({%uri, protocol => '0.1', protocol_string => 'HTTP/1.0'}) } 'new both';
+	lives_and { is $si->protocol(), 'HTTP/1.0' } 'protocol string precedence';
+	my $d = Neo4j::Driver->new('http:');
+	$d->config(net_module => 'Neo4j_Test::MockHTTP::NoProtocol');
+	lives_and { $si = 0; ok $si = $d->session(database => 'dummy')->server } 'no protocol()';
+	lives_and { is $si->protocol(), 'HTTP' } 'no protocol() string';
 };
 
 
@@ -175,6 +262,30 @@ subtest 'multiple statements via run([])' => sub {
 	like $w, qr/\bmultiple statements\b.*\bdeprecated\b/i, 'wantarray multiple statements deprecated'
 		or diag 'got warning(s): ', explain $w;
 	lives_and { is $a[0]->single->get * $a[1]->single->get, 7 * 11 } 'wantarray values';
+};
+
+
+subtest 'run in list context' => sub {
+	plan tests => 8;
+	$q = <<END;
+RETURN 7 AS n UNION RETURN 11 AS n
+END
+	my @a;
+	lives_ok { $w = ''; $w = warning { @a = $s->run($q) }; } 'get result as list';
+	like $w, qr/\brun\b.* in list context\b.* deprecated\b/i, 'result as list deprecated'
+		or diag 'got warning(s): ', explain $w;
+	lives_and { is $a[0]->get('n'), 7; } 'get record 0 in result list';
+	lives_and { is $a[1]->get('n'), 11; } 'get record 1 in result list';
+	
+	SKIP: { skip 'explicit transactions unoptimised', 4 if $Neo4j_Test::sim;
+		my $t = $driver->session->begin_transaction;
+		lives_ok { $w = ''; $w = warning { @a = $t->run($q) }; } 'get result as list (explicit tx)';
+		like $w, qr/\brun\b.* in list context\b.* deprecated\b/i, 'result as list deprecated (explicit tx)'
+			or diag 'got warning(s): ', explain $w;
+		lives_and { is $a[0]->get('n'), 7; } 'get record 0 in result list (explicit tx)';
+		lives_and { is $a[1]->get('n'), 11; } 'get record 1 in result list (explicit tx)';
+		eval { $t->rollback }; 1;
+	}
 };
 
 

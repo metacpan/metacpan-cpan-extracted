@@ -21,28 +21,12 @@ my $s = $driver->session;
 # suite, which is by default run on installation on every platform.
 # That's why these internals are in xt/author.
 
-use Test::More 0.96 tests => 6 + 1;
+use Test::More 0.96 tests => 5 + 1;
 use Test::Exception;
 use Test::Warnings qw(warnings);
 
 
 my ($q, $r);
-
-
-subtest 'experimental: wantarray' => sub {
-	plan tests => 3;
-	# notifications internals
-	$q = <<END;
-EXPLAIN MATCH (n), (m) RETURN n, m
-END
-	my ($a, @a);
-	lives_ok { $a = $s->run($q)->summary->notifications;  1; } 'get notifications';
-	SKIP: {
-		skip '(notifications unavailable)', 2 unless $a;
-		lives_ok { @a = $s->run($q)->summary->notifications; } 'get notifications as list';
-		lives_and { like $a[0]->{code}, qr/CartesianProduct/ } 'notification';
-	}
-};
 
 
 subtest 'experimental: die_on_error = 0 for REST 404' => sub {
@@ -74,16 +58,16 @@ subtest 'summary: plan/notification internals' => sub {
 EXPLAIN MATCH (n), (m) RETURN n, m
 END
 	lives_ok { $r = $s->run($q)->summary; } 'get summary with plan';
-	my ($plan, $notifications);
+	my ($plan, @notifications);
 	lives_ok { $plan = $r->plan;  1; } 'get plan';
 	SKIP: {
 		skip '(plan unavailable)', 1 unless $plan;
 		lives_and { is $plan->{root}->{children}->[0]->{operatorType}, 'CartesianProduct' } 'plan detail';
 	}
-	lives_ok { $notifications = $r->notifications;  1; } 'get notifications';
+	lives_ok { @notifications = $r->notifications;  1; } 'get notifications';
 	SKIP: {
-		skip '(notifications unavailable)', 1 unless $notifications;
-		lives_and { like $notifications->[0]->{code}, qr/CartesianProduct/ } 'notifications detail';
+		skip '(notifications unavailable)', 1 unless @notifications;
+		lives_and { like $notifications[0]->{code}, qr/CartesianProduct/ } 'notifications detail';
 	}
 };
 

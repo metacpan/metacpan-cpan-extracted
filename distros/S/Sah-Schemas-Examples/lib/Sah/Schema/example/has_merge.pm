@@ -1,13 +1,24 @@
 package Sah::Schema::example::has_merge;
 
-our $DATE = '2020-05-27'; # DATE
-our $VERSION = '0.006'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-07-30'; # DATE
+our $DIST = 'Sah-Schemas-Examples'; # DIST
+our $VERSION = '0.007'; # VERSION
 
 our $schema = [posint => {
     summary => 'Even integer',
+    description => <<'_',
+
+This schema is based on "posint", which is ["int", {min=>1}], and adds another
+clause div_by=>2. However, this schema also deletes the min=>1 clause using
+merge key: merge.delete.min=>undef. Thus, the resolved result becomes ["int",
+{div_by=>2}] which is basically "even integer". Without the merge key, this
+schema would become "positive even integer."
+
+_
     'merge.delete.min' => undef,
     div_by => 2,
-}, {}];
+}];
 
 1;
 # ABSTRACT: Even integer
@@ -24,7 +35,7 @@ Sah::Schema::example::has_merge - Even integer
 
 =head1 VERSION
 
-This document describes version 0.006 of Sah::Schema::example::has_merge (from Perl distribution Sah-Schemas-Examples), released on 2020-05-27.
+This document describes version 0.007 of Sah::Schema::example::has_merge (from Perl distribution Sah-Schemas-Examples), released on 2021-07-30.
 
 =head1 SYNOPSIS
 
@@ -54,7 +65,8 @@ To specify schema in L<Rinci> function metadata and use the metadata with
 L<Perinci::CmdLine> to create a CLI:
 
  # in lib/MyApp.pm
- package MyApp;
+ package
+   MyApp;
  our %SPEC;
  $SPEC{myfunc} = {
      v => 1.1,
@@ -74,9 +86,10 @@ L<Perinci::CmdLine> to create a CLI:
  1;
 
  # in myapp.pl
- package main;
+ package
+   main;
  use Perinci::CmdLine::Any;
- Perinci::CmdLine::Any->new(url=>'MyApp::myfunc')->run;
+ Perinci::CmdLine::Any->new(url=>'/MyApp/myfunc')->run;
 
  # in command-line
  % ./myapp.pl --help
@@ -86,6 +99,14 @@ L<Perinci::CmdLine> to create a CLI:
  % ./myapp.pl --version
 
  % ./myapp.pl --arg1 ...
+
+=head1 DESCRIPTION
+
+This schema is based on "posint", which is ["int", {min=>1}], and adds another
+clause div_by=>2. However, this schema also deletes the min=>1 clause using
+merge key: merge.delete.min=>undef. Thus, the resolved result becomes ["int",
+{div_by=>2}] which is basically "even integer". Without the merge key, this
+schema would become "positive even integer."
 
 =head1 HOMEPAGE
 
@@ -109,7 +130,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

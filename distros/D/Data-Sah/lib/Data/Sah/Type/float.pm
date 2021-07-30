@@ -1,7 +1,9 @@
 package Data::Sah::Type::float;
 
-our $DATE = '2020-05-21'; # DATE
-our $VERSION = '0.908'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-07-29'; # DATE
+our $DIST = 'Data-Sah'; # DIST
+our $VERSION = '0.909'; # VERSION
 
 use Data::Sah::Util::Role 'has_clause';
 use Role::Tiny;
@@ -12,7 +14,7 @@ with 'Data::Sah::Type::num';
 has_clause 'is_nan',
     v => 2,
     tags        => ['constraint'],
-    schema      => ['bool', {}, {}],
+    schema      => ['bool', {}],
     allow_expr  => 1,
     allow_multi => 0,
     ;
@@ -20,7 +22,7 @@ has_clause 'is_nan',
 has_clause 'is_inf',
     v => 2,
     tags        => ['constraint'],
-    schema      => ['bool', {}, {}],
+    schema      => ['bool', {}],
     allow_expr  => 1,
     allow_multi => 1,
     ;
@@ -28,7 +30,7 @@ has_clause 'is_inf',
 has_clause 'is_pos_inf',
     v => 2,
     tags        => ['constraint'],
-    schema      => ['bool', {}, {}],
+    schema      => ['bool', {}],
     allow_expr  => 1,
     allow_multi => 1,
     ;
@@ -36,7 +38,7 @@ has_clause 'is_pos_inf',
 has_clause 'is_neg_inf',
     v => 2,
     tags        => ['constraint'],
-    schema      => ['bool', {}, {}],
+    schema      => ['bool', {}],
     allow_expr  => 1,
     allow_multi => 1,
     ;
@@ -56,7 +58,7 @@ Data::Sah::Type::float - float type
 
 =head1 VERSION
 
-This document describes version 0.908 of Data::Sah::Type::float (from Perl distribution Data-Sah), released on 2020-05-21.
+This document describes version 0.909 of Data::Sah::Type::float (from Perl distribution Data-Sah), released on 2021-07-29.
 
 =for Pod::Coverage ^(clause_.+|clausemeta_.+)$
 
@@ -82,7 +84,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

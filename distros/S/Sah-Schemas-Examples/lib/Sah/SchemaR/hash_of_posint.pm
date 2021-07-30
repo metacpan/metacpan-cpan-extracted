@@ -1,12 +1,12 @@
-package Sah::SchemaR::example::hash_of_int;
+package Sah::SchemaR::hash_of_posint;
 
-our $DATE = '2020-05-27'; # DATE
-our $VERSION = '0.006'; # VERSION
+our $DATE = '2021-07-30'; # DATE
+our $VERSION = '0.007'; # VERSION
 
-our $rschema = ["hash",[{of=>["int",{req=>1},{}],summary=>"Hash of integers"}],["hash"]];
+our $rschema = do{my$var={base=>"hash",clsets_after_base=>[{of=>["posint",{req=>1}],summary=>"Hash of positive integers"}],clsets_after_type=>['$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_base}[0]'],resolve_path=>["hash"],type=>"hash",v=>2};$var->{clsets_after_type}[0]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_base}[0];$var};
 
 1;
-# ABSTRACT: Hash of integers
+# ABSTRACT: Hash of positive integers
 
 __END__
 
@@ -16,11 +16,11 @@ __END__
 
 =head1 NAME
 
-Sah::SchemaR::example::hash_of_int - Hash of integers
+Sah::SchemaR::hash_of_posint - Hash of positive integers
 
 =head1 VERSION
 
-This document describes version 0.006 of Sah::SchemaR::example::hash_of_int (from Perl distribution Sah-Schemas-Examples), released on 2020-05-27.
+This document describes version 0.007 of Sah::SchemaR::hash_of_posint (from Perl distribution Sah-Schemas-Examples), released on 2021-07-30.
 
 =head1 DESCRIPTION
 
@@ -50,7 +50,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

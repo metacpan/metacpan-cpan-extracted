@@ -2,30 +2,73 @@ NAME
     Data::Sah::Resolve - Resolve Sah schema
 
 VERSION
-    This document describes version 0.008 of Data::Sah::Resolve (from Perl
-    distribution Data-Sah-Resolve), released on 2021-02-27.
+    This document describes version 0.011 of Data::Sah::Resolve (from Perl
+    distribution Data-Sah-Resolve), released on 2021-07-29.
 
 SYNOPSIS
      use Data::Sah::Resolve qw(resolve_schema);
 
      my $sch = resolve_schema("int");
-     # => ["int", []]
+     # => {
+     #      v => 2,
+     #      type=>"int",
+     #      clsets_after_type => [],
+     #      "clsets_after_type.alt.merge.merged" => [],
+     #      base=>"int",
+     #      clsets_after_base => [],
+     #      resolve_path => ["int"],
+     #    }
 
      my $sch = resolve_schema("posint*");
-     # => ["int", [{min=>1}, {req=>1}]
+     # => {
+     #      v => 2,
+     #      type=>"int",
+     #      clsets_after_type => [{min=>1}, {req=>1}],
+     #      "clsets_after_type.alt.merge.merged" => [{min=>1}, {req=>1}],
+     #      base => "posint",
+     #      clsets_after_base => [{req=>1}],
+     #      resolve_path => ["int","posint"],
+     #    }
 
      my $sch = resolve_schema([posint => div_by => 3]);
+     # => {
+     #      v => 2,
+     #      type=>"int",
+     #      clsets_after_type => [{min=>1}, {div_by=>3}],
+     #      "clsets_after_type.alt.merge.merged" => [{min=>1}, {div_by=>3}],
+     #      base => "posint",
+     #      clsets_after_base => [{div_by=>3}],
+     #      resolve_path => ["int","posint"],
+     #    }
      # => ["int", {min=>1}, {div_by=>3}]
 
      my $sch = resolve_schema(["posint", "merge.delete.min"=>undef, div_by => 3]);
-     # => ["int", {div_by=>3}]
+     # basically becomes: ["int", div_by=>3]
+     # => {
+     #      v => 2,
+     #      type=>"int",
+     #      clsets_after_type => [{min=>1}, {"merge.delete.min"=>undef, div_by=>3}],
+     #      "clsets_after_type.alt.merge.merged" => [{div_by=>3}],
+     #      base => undef,
+     #      clsets_after_base => [{div_by=>3}],
+     #      resolve_path => ["int","posint"],
+     #    }
+     # => ["int", {min=>1}, {div_by=>3}]
 
 DESCRIPTION
+    This module provides "resolve_schema".
+
 FUNCTIONS
-  resolve_schema([ \%opts, ] $sch) => sch
-    Sah schemas can be defined in terms of other schemas. The resolving
-    process follows the base schema recursively until it finds a builtin
-    type as the base.
+  resolve_schema
+    Usage:
+
+     my $res = resolve_schema([ \%opts, ] $sch); # => hash
+
+    Sah schemas can be defined in terms of other schemas as base. The
+    resolving process follows the (outermost) base schema until it finds a
+    builtin type as the (innermost) base. It then returns a hash result (a
+    DefHash with "v"=2) containing the type as well other information like
+    the collected clause sets and others.
 
     This routine performs the following steps:
 
@@ -47,35 +90,104 @@ FUNCTIONS
 
     4. If schema's type is neither, we die.
 
-    Returns "[base_type, clause_sets]". If "return_intermediates" option is
-    true, then the third elements will be the list of intermediate schema
-    names.
+    Will also die on circularity or when there is other failures like
+    failing to get schema from the schema module.
 
     Example 1: "int".
 
-    First we normalize to "["int",{},{}]". The type is "int" and it is a
-    builtin type (Data::Sah::Type::int exists) so the final result is
-    "["int", []]".
+    First we normalize to "["int",{}]". The type is "int" and it is a
+    builtin type (Data::Sah::Type::int exists). The final result is:
+
+     {
+       v => 2,
+       type=>"int",
+       clsets_after_type => [],
+       "clsets_after_type.alt.merge.unmerged" => [],
+       base=>undef,
+       clsets_after_base => [],
+       resolve_path => ["int"],
+     }
 
     Example 2: "posint*".
 
-    First we normalize to "["posint",{req=>1},{}]". The type is "posint" and
-    it is the name of another schema (Sah::Schema::posint). We retrieve the
-    schema which is "["int", {summary=>"Positive integer (1,2,3,...)",
-    min=>1}, {}]". We now try to resolve "int" and find that it's a builtin
-    type. So the final result is: "["int", [ {req=>1}, {summary=>"Positive
-    integer (1,2,3,...)", min=>1} ]]".
+    First we normalize to "["posint",{req=>1}]". The type part of this
+    schema is "posint" and it is actually the name of another schema because
+    "Data::Sah::Type::posint" is not found and we find schema module
+    Sah::Schema::posint) instead. We then retrieve the "posint" schema from
+    the schema module's $schema and we get "["int", {min=>1}]" (additional
+    informative clauses omitted for brevity). We now try to resolve "int"
+    and find that it's a builtin type. So the final result is:
+
+     {
+       v => 2,
+       type=>"int",
+       clsets_after_type => [{min=>1}, {req=>1}],
+       "clsets_after_type.alt.merge.unmerged" => [{min=>1}, {req=>1}],
+       base => "posint",
+       clsets_after_base => [{req=>1}],
+       resolve_path => ["int","posint"],
+     }
 
     Known options:
 
-    *   schema_is_normalized => bool (default: 0)
+    *   schema_is_normalized
 
-        When set to true, function will skip normalizing schema and assume
-        input schema is normalized.
+        Bool, default false. When set to true, function will skip
+        normalizing schema and assume input schema is normalized.
 
-    *   merge_clause_sets => bool (default: 1)
+    *   allow_base_with_no_additional_clauses
 
-    *   return_intermediates => bool
+        Bool, default false. Normally, a schema like "posint" or
+        "["posint",{}]" will result in "int" as the base (because the schema
+        does not add any additional clauses to the "posint" schema) while
+        "["posint",{div_by=>2}]" will result in "posint" as the base. But if
+        this setting is set to true, then all the previous examples will
+        result in "posint" as the base.
+
+    As mentioned, result is a hash conforming to the DefHash restriction.
+    The following keys will be returned:
+
+    *   v
+
+        Integer, has the value of 2. A non-compatible change of result will
+        bump this version number.
+
+    *   type
+
+        Str, the Sah builtin type name.
+
+    *   clsets_after_type
+
+        All the collected clause sets, from the deepest base schema to the
+        outermost, and to the clause set of the original unresolved schema.
+
+    *   clsets_after_type.alt.merge.merged
+
+        Like "clsets_after_type", but the clause sets are merged according
+        to the Sah merging specification.
+
+    *   base
+
+        Str. Might be undef. The outermost base schema (or type) that can be
+        used as "base restriction", meaning its restrictions (clause sets)
+        must all be fulfilled. After this base's clause sets, the next
+        additional clause sets will not contain any merge prefixes. Because
+        if additional clause sets contained merge prefixes, they could
+        modify or remove restrictions set by the base instead of just adding
+        more restrictions (which is the whole point of merging).
+
+    *   clsets_after_base
+
+        Clause sets after the "base restriction" base. This is additional
+        restrictions that are imposed to the restrictions of the base
+        schema. They do not contain merge prefixes.
+
+    *   resolve_path
+
+        Array. This is a list of schema type names or builtin type names,
+        from the deepest to the shallowest. The first element of this
+        arrayref is the builtin Sah type and the last element is the
+        original unresolved schema's type.
 
 HOMEPAGE
     Please visit the project's homepage at

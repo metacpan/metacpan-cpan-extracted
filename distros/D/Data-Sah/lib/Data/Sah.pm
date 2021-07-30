@@ -1,9 +1,9 @@
 package Data::Sah;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-05-21'; # DATE
+our $DATE = '2021-07-29'; # DATE
 our $DIST = 'Data-Sah'; # DIST
-our $VERSION = '0.908'; # VERSION
+our $VERSION = '0.909'; # VERSION
 
 use 5.010001;
 use strict;
@@ -126,7 +126,7 @@ Data::Sah - Fast and featureful data structure validation
 
 =head1 VERSION
 
-This document describes version 0.908 of Data::Sah (from Perl distribution Data-Sah), released on 2020-05-21.
+This document describes version 0.909 of Data::Sah (from Perl distribution Data-Sah), released on 2021-07-29.
 
 =head1 SYNOPSIS
 
@@ -304,7 +304,7 @@ C<Sah::Schema::*> modules. For example L<Sah::Schemas::Int> contains various
 schemas for integers such as L<Sah::Schema::uint>, L<Sah::Schema::int8>, and so
 on.
 
-B<Sah::SchemaR::> namespace is reserved to store resolved version of schema. For
+B<Sah::SchemaR::> namespace is reserved to store resolved result of schema. For
 example, L<Sah::Schema::unix::local_username> contains the definition for the
 schema C<unix::local_username> which is C<unix::username> with some additional
 coerce rules. C<unix::username> in turn is defined in
@@ -312,7 +312,7 @@ L<Sah::Schema::unix::username> which is base type C<str> with some clauses like
 minimum and maximum length as well as regular expression for valid pattern. To
 find out the base type of a schema (which might be defined based on another
 schema), one has to perform one to several lookups to C<Sah::Schema::*> modules.
-A C<Sah::SchemaR::*> module, however, contains the "B<r>esolved" version of the
+A C<Sah::SchemaR::*> module, however, contains the "B<r>esolved" result of the
 definition, so by looking at L<Sah::SchemaR::unix::local_username> one can know
 that the schema eventually is based on the base type C<str>. See
 L<Dist::Zilla::Plugin::Sah::Schemas>.
@@ -375,11 +375,19 @@ A mapping of compiler name and compiler (C<Data::Sah::Compiler::*>) objects.
 
 =head1 METHODS
 
-=head2 new() => OBJ
+=head2 new
+
+Usage:
+
+ my $sah = Data::Sah->new;
 
 Create a new Data::Sah instance.
 
-=head2 $sah->get_compiler($name) => OBJ
+=head2 get_compiler
+
+Usage:
+
+ my $comp = $sah->get_compiler($name);
 
 Get compiler object. C<Data::Sah::Compiler::$name> will be loaded first and
 instantiated if not already so. After that, the compiler object is cached.
@@ -388,7 +396,15 @@ Example:
 
  my $plc = $sah->get_compiler("perl"); # loads Data::Sah::Compiler::perl
 
-=head2 $sah->normalize_schema($schema) => HASH
+=head2 normalize_schema
+
+Usage:
+
+ # as method
+ my $nschema = $sah->normalize_schema($schema);
+
+ # as function
+ my $nschema = normalize_schema($schema);
 
 Normalize a schema, e.g. change C<int*> into C<< [int => {req=>1}] >>, as well
 as do some sanity checks on it. Returns the normalized schema if succeeds, or
@@ -400,7 +416,15 @@ Note: this functionality is implemented in L<Data::Sah::Normalize> (distributed
 separately in Data-Sah-Normalize). Use that module instead if you just need
 normalizing schemas, to reduce dependencies.
 
-=head2 $sah->normalize_clset($clset[, \%opts]) => HASH
+=head2 normalize_clset
+
+Usage:
+
+ # as method
+ my $nclset = $sah->normalize_clset($clset[, \%opts]); # => hash
+
+ # as function
+ my $nclset = Data::Sah::normalize_clset($clset[, \%opts]); # => hash
 
 Normalize a clause set, e.g. change C<< {"!match"=>"abc"} >> into C<<
 {"match"=>"abc", "match.op"=>"not"} >>. Produce a shallow copy of the input
@@ -408,7 +432,9 @@ clause set hash.
 
 Can also be used as a function.
 
-=head2 $sah->normalize_var($var) => STR
+=head2 normalize_var
+
+ my $nvarname = $sah->normalize_var($var);
 
 Normalize a variable name in expression into its fully qualified/absolute form.
 
@@ -420,10 +446,19 @@ For example:
 
 $min in the above expression will be normalized as C<schema:clauses.min>.
 
-=head2 $sah->gen_validator($schema, \%opts) => CODE
+=head2 gen_validator
+
+ # as method
+ my $vdr = $sah->gen_validator($schema [ , \%opts ]); # => coderef
+
+ # as function
+ my $vdr = gen_validator($schema [ , \%opts ]); # => coderef
 
 Use the Perl compiler to generate validator code. Can also be used as a
-function. See the documentation as a function for list of known options.
+function. This is a wrapper for L<Data::Sah::Compiler::Prog>'s C<compile()>;
+C<%opts> will be passed to compile()'s arguments, including C<return_type>,
+C<comment>, C<debug>, and so on. See the documentation in
+C<Data::Sah::Compiler::Prog> for more details.
 
 =head1 FAQ
 
@@ -687,9 +722,29 @@ L<Params::ValidationCompiler>
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTORS
+
+=for stopwords Michal Sedlák Steven Haryanto
+
+=over 4
+
+=item *
+
+Michal Sedlák <sedlakmichal@gmail.com>
+
+=item *
+
+Steven Haryanto <sharyanto@cpan.org>
+
+=item *
+
+Steven Haryanto <steven@masterweb.net>
+
+=back
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,7 +1,9 @@
 package Data::Sah::Type::HasElems;
 
-our $DATE = '2020-05-21'; # DATE
-our $VERSION = '0.908'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-07-29'; # DATE
+our $DIST = 'Data-Sah'; # DIST
+our $VERSION = '0.909'; # VERSION
 
 use Data::Sah::Util::Role 'has_clause';
 use Role::Tiny;
@@ -12,7 +14,7 @@ has_clause 'max_len',
     v => 2,
     prio       => 51,
     tags       => ['constraint'],
-    schema     => ['int', {min=>0}, {}],
+    schema     => ['int', {min=>0}],
     allow_expr => 1,
     code       => sub {
         my ($self, $cd) = @_;
@@ -22,7 +24,7 @@ has_clause 'max_len',
 has_clause 'min_len',
     v => 2,
     tags       => ['constraint'],
-    schema     => ['int', {min=>0}, {}],
+    schema     => ['int', {min=>0}],
     allow_expr => 1,
     code       => sub {
         my ($self, $cd) = @_;
@@ -33,9 +35,9 @@ has_clause 'len_between',
     v => 2,
     tags       => ['constraint'],
     schema     => ['array' => {req=>1, len=>2, elems => [
-        [int => {req=>1}, {}],
-        [int => {req=>1}, {}],
-    ]}, {}],
+        [int => {req=>1}],
+        [int => {req=>1}],
+    ]}],
     allow_expr => 1,
     code       => sub {
         my ($self, $cd) = @_;
@@ -45,7 +47,7 @@ has_clause 'len_between',
 has_clause 'len',
     v => 2,
     tags       => ['constraint'],
-    schema     => ['int', {min=>0}, {}],
+    schema     => ['int', {min=>0}],
     allow_expr => 1,
     code       => sub {
         my ($self, $cd) = @_;
@@ -55,7 +57,7 @@ has_clause 'len',
 has_clause 'has',
     v => 2,
     tags       => ['constraint'],
-    schema       => ['_same_elem', {req=>1}, {}],
+    schema       => ['_same_elem', {req=>1}],
     inspect_elem => 1,
     prio         => 55, # we should wait for clauses like e.g. 'each_elem' to coerce elements
     allow_expr   => 1,
@@ -67,7 +69,7 @@ has_clause 'has',
 has_clause 'each_index',
     v => 2,
     tags       => ['constraint'],
-    schema     => ['sah::schema', {req=>1}, {}],
+    schema     => ['sah::schema', {req=>1}],
     subschema  => sub { $_[0] },
     allow_expr => 0,
     code       => sub {
@@ -78,7 +80,7 @@ has_clause 'each_index',
 has_clause 'each_elem',
     v => 2,
     tags       => ['constraint'],
-    schema     => ['sah::schema', {req=>1}, {}],
+    schema     => ['sah::schema', {req=>1}],
     inspect_elem => 1,
     subschema  => sub { $_[0] },
     allow_expr => 0,
@@ -90,7 +92,7 @@ has_clause 'each_elem',
 has_clause 'check_each_index',
     v => 2,
     tags       => ['constraint'],
-    schema     => ['sah::schema', {req=>1}, {}],
+    schema     => ['sah::schema', {req=>1}],
     subschema  => sub { $_[0] },
     allow_expr => 0,
     code       => sub {
@@ -101,7 +103,7 @@ has_clause 'check_each_index',
 has_clause 'check_each_elem',
     v => 2,
     tags       => ['constraint'],
-    schema     => ['sah::schema', {req=>1}, {}],
+    schema     => ['sah::schema', {req=>1}],
     inspect_elem => 1,
     subschema  => sub { $_[0] },
     allow_expr => 0,
@@ -113,7 +115,7 @@ has_clause 'check_each_elem',
 has_clause 'uniq',
     v => 2,
     tags       => ['constraint'],
-    schema     => ['bool', {}, {}],
+    schema     => ['bool', {}],
     inspect_elem => 1,
     prio         => 55, # we should wait for clauses like e.g. 'each_elem' to coerce elements
     subschema  => sub { $_[0] },
@@ -126,7 +128,7 @@ has_clause 'uniq',
 has_clause 'exists',
     v => 2,
     tags       => ['constraint'],
-    schema     => ['sah::schema', {req=>1}, {}],
+    schema     => ['sah::schema', {req=>1}],
     inspect_elem => 1,
     subschema  => sub { $_[0] },
     allow_expr => 0,
@@ -156,7 +158,7 @@ Data::Sah::Type::HasElems - HasElems role
 
 =head1 VERSION
 
-This document describes version 0.908 of Data::Sah::Type::HasElems (from Perl distribution Data-Sah), released on 2020-05-21.
+This document describes version 0.909 of Data::Sah::Type::HasElems (from Perl distribution Data-Sah), released on 2021-07-29.
 
 =for Pod::Coverage ^(clause_.+|clausemeta_.+)$
 
@@ -182,7 +184,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
