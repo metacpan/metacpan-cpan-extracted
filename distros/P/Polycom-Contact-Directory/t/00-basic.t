@@ -3,7 +3,7 @@
 
 #########################
 
-use Test::More tests => 39;
+use Test::More tests => 42;
 BEGIN { use_ok('Polycom::Contact') };
 BEGIN { use_ok('Polycom::Contact::Directory') };
 
@@ -27,6 +27,7 @@ can_ok('Polycom::Contact::Directory', qw(new insert all count equals is_valid sa
           <ar>0</ar>
           <bw>0</bw>
           <bb>0</bb>
+          <up>2</up>
         </item>
         <item>
           <ln>Johnson</ln>
@@ -52,6 +53,7 @@ DIR_XML
     is($contact->{auto_divert}, 0);
     is($contact->{buddy_watching}, 0);
     is($contact->{buddy_block}, 0);
+    is($contact->{user_photo}, 2);
 
     is($contact->first_name, 'John');
     is($contact->last_name,  'Doe');
@@ -63,6 +65,7 @@ DIR_XML
     is($contact->auto_divert, 0);
     is($contact->buddy_watching, 0);
     is($contact->buddy_block, 0);
+    is($contact->user_photo, 2);
 
     # Test searching and deleting from a directory
     my @doe = $dir->search({ last_name => 'Doe' });
@@ -103,6 +106,7 @@ DIR_XML
        {   first_name => 'Jacky',
            last_name  => 'Cheng',
            contact    => '3',
+           user_photo => '8',
        },
      );
 
@@ -116,6 +120,7 @@ DIR_XML
     ok($xml =~ /<fn>Jacky<\/fn>/);
     ok($xml =~ /<ln>Cheng<\/ln>/);
     ok($xml =~ /<ct>3<\/ct>/);
+    ok($xml =~ /<up>8<\/up>/);
 }
 
 # Test saving an empty directory

@@ -1,5 +1,28 @@
 Revision history for Perl extension Web::Reactor
 
+2.10  2021.07.31
+
+    1. update status of the project and docs
+    2. removed already done TODO tickets
+    3. added support for DISABLED buttons
+    4. html_alink() now defaults to using <$$ACCUMULATOR_HTML> space
+    5. fixed expire logic for sessions 
+    6. cookie default path automation
+    7. disable on click added for buttons and class-off argument added as opt
+
+2.09  2021.04.14
+
+    1. cleanup of incoming data charsets
+    2. default CSP is now optional (defined via ENV)
+    3. automatic cookie path if missing (assumed from request uri)
+    4. set_browser_title() function added (requires "<title><$browser_window_title></title>" in html templates)
+    5. default html link hint delay is set to 1sec
+    6. check security cookies and requested schema
+    7. fixed binary rendering support
+    8. option to disable button for specified time
+    
+    ... and more, check git log.
+
 2.06  2017.04.10
 
     1. return to 'main' page if no referer found

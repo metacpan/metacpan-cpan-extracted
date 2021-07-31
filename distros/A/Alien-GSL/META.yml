@@ -3,14 +3,15 @@ abstract: 'Easy installation of the GSL library'
 author:
   - 'Joel A. Berger <joel.a.berger@gmail.com>'
 build_requires:
-  Alien::Build: '0.32'
-  Alien::Build::MM: '0.32'
+  Alien::Build: '2.21'
+  Alien::Build::MM: '2.21'
   ExtUtils::MakeMaker: '6.52'
   Test2::V0: '0'
   Test::Alien: '0'
+  Test::Alien::Diag: '0'
 configure_requires:
-  Alien::Build: '1.19'
-  Alien::Build::MM: '0.32'
+  Alien::Build: '2.21'
+  Alien::Build::MM: '2.21'
   ExtUtils::MakeMaker: '6.52'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
@@ -31,9 +32,9 @@ resources:
   bugtracker: https://github.com/PerlAlien/Alien-GSL/issues
   homepage: https://metacpan.org/pod/Alien::GSL
   repository: https://github.com/PerlAlien/Alien-GSL.git
-version: '1.04'
+version: '1.07'
 x_alienfile:
-  generated_by: 'Alien::Build::MM version 2.40'
+  generated_by: 'Alien::Build::MM version 2.41'
   requires:
     share:
       Alien::Build::Plugin::Gather::IsolateDynamic: '0.48'

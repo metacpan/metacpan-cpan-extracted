@@ -1,8 +1,8 @@
-Polycom::Contact::Directory version 0.05
+Polycom::Contact::Directory version 0.06
 ================================
 
 This module can be used to parse, modify, or create local contact directory files like those used by
-Polycom's SoundPoint IP, SoundStation IP, and VVX 1500 VoIP phones.
+Polycom's SoundPoint IP, SoundStation IP, VVX, Trio, and CCX VoIP phones.
 
 Upon bootup, each phone looks for a file named <Ethernet address>-directory.xml on their boot server,
 and if found, downloads and parses the file to build up its local contact directory. In addition to
@@ -26,15 +26,15 @@ Each <Ethernet address>-directory.xml contains fairly straightforward XML:
      <ar>0</ar>
      <bw>0</bw>
      <bb>0</bb>
+     <up>0</up>
     </item>
       ...
    </item_list>
   </directory>
 
-For more information about administering the Local Contact Directory on Polycom SoundPoint IP phones,
-see the "SoundPoint IP, SoundStation IP and Polycom VVX Administrator's Guide" at
-http://www.polycom.com/support/voice/soundpoint_ip/soundpoint_ip670.html .
-
+For more information about administering the Local Contact Directory on Polycom  phones
+see the "Poly Trio Solution Administrator Guide" at
+https://support.polycom.com/content/dam/polycom-support/products/voice/realpresence-trio/user/en/poly-trio-ag-ucs-7-0-0.pdf .
 
 INSTALLATION
 

@@ -14,3 +14,4 @@ script/add_contact.pl
 script/delete_contact.pl
 script/list_contacts.pl
 script/xml_to_csv.pl
+script/vcard_to_xml.pl

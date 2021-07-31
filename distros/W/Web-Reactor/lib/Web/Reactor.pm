@@ -1,7 +1,7 @@
 ##############################################################################
 ##
 ##  Web::Reactor application machinery
-##  2013-2017 (c) Vladi Belperchinov-Shabanski "Cade"
+##  2013-2021 (c) Vladi Belperchinov-Shabanski "Cade"
 ##  <cade@bis.bg> <cade@biscom.net> <cade@cpan.org>
 ##
 ##  LICENSE: GPLv2
@@ -11,6 +11,7 @@ package Web::Reactor;
 use strict;
 use Storable qw( dclone freeze thaw ); # FIXME: move to Data::Tools (data_freeze/data_thaw)
 use CGI 4.08;
+# use CGI 4.51;
 use CGI::Cookie;
 use MIME::Base64;
 use Data::Tools;
@@ -21,7 +22,7 @@ use Encode;
 use Web::Reactor::Utils;
 use Web::Reactor::HTML::Form;
 
-our $VERSION = '2.07';
+our $VERSION = '2.10';
 
 ##############################################################################
 
@@ -58,7 +59,7 @@ sub new
   my %env = @_;
 
   # FIXME: verify %env content! Data::Validate::Struct
-  boom "request scheme [HTTP] does not match cookies security policy! either enable HTTPS scheme or set DISABLE_SECURE_COOKIES=1"
+  boom "fatal: configuration: request scheme [HTTP] does not match cookies security policy! either enable HTTPS scheme or set DISABLE_SECURE_COOKIES=1"
       if uc $ENV{ 'REQUEST_SCHEME' } eq 'HTTP' and ! $env{ 'DISABLE_SECURE_COOKIES' };
 
   $class = ref( $class ) || $class;
@@ -89,7 +90,8 @@ sub new
     push @INC, $lib_dir;
     $lib_dirs_ok++;
     }
-  boom "invalid or not accessible LIB_DIR's [@$lib_dirs]" unless $lib_dirs_ok;
+  # FIXME: this should not be a fatal error?
+  #boom "invalid or not accessible LIB_DIR's [@$lib_dirs]" unless $lib_dirs_ok;
 
   # sanity, remove '.' from include list, TODO: optionally remove other entries by config (%env)
   for my $z ( 0 .. scalar( @INC ) - 1 )
@@ -123,17 +125,17 @@ sub new
   $self->{ 'REO_ACTS' }->__set_reo( $self );
 
   # debug setup
-  $self->log_debug( "debug: setup: " . Dumper( $self->{ 'ENV' } ) );
+  $self->log_debug( "debug: Reactor[$self] setup: " . Dumper( $self->{ 'ENV' } ) );
 
   return $self;
 }
 
-#sub DESTROY
-#{
-# my $self = shift;
-#
-# print "DESTROY: Reactor: $self\n";
-#}
+sub DESTROY
+{
+  my $self = shift;
+
+  $self->log_debug( "debug: DESTROY: Reactor[$self] destroyed" );
+}
 
 ##############################################################################
 
@@ -159,11 +161,12 @@ sub run
     {
     my $psid = $self->get_page_session_id( 0 ) || 'empty';
     my $rsid = $self->get_page_session_id( 1 ) || 'empty';
+    my $usid = $self->get_user_session_id() || 'empty';
     $self->log_dumper( "USER INPUT -----------------------------------", $self->get_user_input() );
     $self->log_dumper( "SAFE INPUT -----------------------------------", $self->get_safe_input() );
     $self->log_dumper( "FINAL PAGE SESSION [$psid]-----------------------------------", $self->get_page_session() );
     $self->log_dumper( "FINAL REF  SESSION [$rsid]-----------------------------------", $self->get_page_session( 1 ) );
-    #$self->log_dumper( "FINAL USER SESSION [$psid]-----------------------------------", $self->get_user_session() );
+    $self->log_dumper( "FINAL USER SESSION [$usid]-----------------------------------", $self->get_user_session() );
     }
 
 }
@@ -175,11 +178,13 @@ sub main_process
   # 0. load/setup env/config defaults
   my $app_name = $self->{ 'ENV' }{ 'APP_NAME' } or $self->boom( "missing APP_NAME" );
 
-  # 1. loading request header
+  # 1. loading request header and environment
+  $self->{ 'HTTP_ENV' } = { %ENV };
 
   # 2. loading cookie
   my $cookie_name = lc( $self->{ 'ENV' }{ 'COOKIE_NAME' } || "$app_name\_cookie" );
   my $user_sid = $self->get_cookie( $cookie_name );
+  $self->log_debug( "debug: incoming USER_SID cookie name [$cookie_name] value [$user_sid]" );
 
   # 3. loading user session, setup new session and cookie if needed
   my $user_shr = {}; # user session hash ref
@@ -193,9 +198,6 @@ sub main_process
     }
   $self->{ 'SESSIONS' }{ 'SID'  }{ 'USER' } = $user_sid;
   $self->{ 'SESSIONS' }{ 'DATA' }{ 'USER' }{ $user_sid } = $user_shr;
-
-  # read http environment data, used for checks and info
-  $user_shr->{ ":HTTP_ENV_HR"   } = { map { $_ => $ENV{ $_ } } @HTTP_VARS_SAVE  };
 
   if( ( $user_shr->{ ':LOGGED_IN' } and $user_shr->{ ':XTIME' } > 0 and time() > $user_shr->{ ':XTIME' } )
       or
@@ -230,6 +232,9 @@ sub main_process
     last;
     }
 
+  # read and save http environment data into user session, used for checks and info
+  $user_shr->{ ":HTTP_ENV_HR"   } = { map { $_ => $ENV{ $_ } } @HTTP_VARS_SAVE  };
+
   # FIXME: move to single place
   my $user_session_expire = $self->{ 'ENV' }{ 'USER_SESSION_EXPIRE' } || 600; # 10 minutes
   $self->set_user_session_expire_time_in( $user_session_expire );
@@ -243,27 +248,12 @@ sub main_process
   # FIXME: TODO: handle and URL params here. only for EX?
   my $iconv;
   my $app_charset = uc $self->{ 'ENV' }{ 'APP_CHARSET' } || 'UTF-8';
+  my $incoming_charset = $app_charset;
 
-  if( $app_charset )
+  if( uc( CGI::http( 'HTTP_X_REQUESTED_WITH' ) ) eq 'XMLHTTPREQUEST' )
     {
-    my $incoming_charset;
-    if( uc( CGI::http( 'HTTP_X_REQUESTED_WITH' ) ) eq 'XMLHTTPREQUEST' )
-      {
-      $incoming_charset = 'UTF-8';
-      }
-    if( $incoming_charset and $incoming_charset ne $app_charset )
-      {
-      eval
-        {
-        # FIXME: use Encode; instead
-        require 'Text/Iconv.pm';
-        $iconv = Text::Iconv->new( $incoming_charset, $app_charset );
-        };
-      if( $@ )
-        {
-        $self->log( "error: cannot convert charset from [$incoming_charset] to [$app_charset] error: $@" );
-        }
-      }
+    # TODO: it can be different, but nobody seems to use it, should be fixed eventually
+    $incoming_charset = 'UTF-8';
     }
 
   # import plain parameters from GET/POST request
@@ -279,9 +269,19 @@ sub main_process
     my $v = CGI::url_param( $n );
        $v = CGI::param( $n ) if $v eq '';
     my @v = CGI::multi_param( $n ); # TODO: handling of multi-values
+
+    #my $iiuu = Encode::is_utf8( $v );
+    #print STDERR "------------->>>>>>>>>>>>>>. INCOMING PARAM [$n] => [$v] (utf:$iiuu)\n";
     
     $n = uc $n;
+    if( $n eq 'PUTDATA' or $n eq 'POSTDATA' or $n eq 'PATCHDATA' )
+      {
+      # post data is raw, do not process
+      $input_user_hr->{ $n } = $v;
+      next;
+      }
 
+    # process multiple incoming file uploads
     if( @u > 0 )
       {
       my $uc = 0;
@@ -303,14 +303,18 @@ sub main_process
       $v = "$v";
       }
 
-    if( $iconv )
+    #my $iiuu = Encode::is_utf8( $v );
+    #print STDERR "------------->>>>>>>>>>>>>>. PRE ICOV [$v] (utf:$iiuu)\n";
+    if( $incoming_charset ne $app_charset )
       {
-      $v = $iconv->convert( $v );
-      $_ = $iconv->convert( $_ ) for @v;
+      Encode::from_to( $v, $incoming_charset, $app_charset );
+      Encode::from_to( $_, $incoming_charset, $app_charset ) for @v;
       }
 
-    $v = decode( $app_charset, $v );
-    $_ = decode( $app_charset, $_ ) for @v;
+    #print STDERR "------------->>>>>>>>>>>>>>. INCOMING [$v]\n";
+        #$v = decode( $app_charset, $v );
+    #print STDERR "------------->>>>>>>>>>>>>>. DECODED  [$v] from $app_charset\n\n";
+        #$_ = decode( $app_charset, $_ ) for @v;
 
     $self->log_debug( "debug: CGI input param [$n] value [$v] [@v]" );
 
@@ -335,7 +339,6 @@ sub main_process
       }
     else
       {
-      $n = uc $n;
       $input_user_hr->{ $n } = $v;
       }
     }
@@ -470,8 +473,18 @@ sub __create_new_user_session
   $self->{ 'SESSIONS' }{ 'SID'  }{ 'USER' } = $user_sid;
   $self->{ 'SESSIONS' }{ 'DATA' }{ 'USER' }{ $user_sid } = $user_shr;
 
+  my $path = $self->{ 'ENV' }{ 'COOKIE_PATH' };
+  if( ! $path )
+    {
+    $path = $self->{ 'HTTP_ENV' }{ 'REQUEST_URI' };
+    #print STDERR ">>>>>>>>>>>>>>>>>>>111>>>>>>>>>>>>>>> cookie path [$path]\n";
+    $path =~ s/^([^\?]*\/)([^\?\/]*)(\?.*)?$/$1/; # remove args: ?...
+    #print STDERR ">>>>>>>>>>>>>>>>>>>222>>>>>>>>>>>>>>> cookie path [$path]\n";
+    }
+  $path ||= '/';  
+
   my $secure_cookie = $self->{ 'ENV' }{ 'DISABLE_SECURE_COOKIES' } ? 0 : 1;
-  $self->set_cookie( $cookie_name, -value => $user_sid, -httponly => 1, -secure => $secure_cookie );
+  $self->set_cookie( $cookie_name, -value => $user_sid, -path => $path, -httponly => 1, -secure => $secure_cookie );
   $self->log( "debug: creating new user session [$user_sid]" );
 
   my $user_session_expire = $self->{ 'ENV' }{ 'USER_SESSION_EXPIRE' } || 600; # 10 minutes
@@ -482,6 +495,7 @@ sub __create_new_user_session
   $self->set_user_session_expire_time_in( $user_session_expire );
 
   $user_shr->{ ":HTTP_CHECK_HR" } = { map { $_ => $ENV{ $_ } } @HTTP_VARS_CHECK };
+  $user_shr->{ ":HTTP_ENV_HR"   } = { map { $_ => $ENV{ $_ } } @HTTP_VARS_SAVE  };
 
   return ( $user_sid, $user_shr );
 }
@@ -873,7 +887,7 @@ sub __new_crypto_object
 
   my $ci = $self->{ 'ENV' }{ 'ENCRYPT_CIPHER' } || 'Twofish2'; # :)
 
-  return new Crypt::CBC->new( -key => $key, -cipher => $ci );
+  return Crypt::CBC->new( -key => $key, -cipher => $ci );
 }
 
 sub encrypt
@@ -1129,6 +1143,8 @@ sub render
   my $self = shift;
   my %opt  = @_;
 
+#print STDERR Dumper( 'RENDER --- ' x 11, \%opt );
+
   boom "too many nesting levels in rendering, probable bug in actions or pages" if (caller(512))[0] ne ''; # FIXME: config option for max level
 
   my $action = $opt{ 'ACTION' };
@@ -1151,6 +1167,9 @@ sub render
     {
     # FIXME: handle content type also!
     $portray_data = $self->action_call( $action );
+    
+    #print STDERR Dumper( '--------------->>> RENDER >>>>>>>>>>>>>>>>>>>>>', $portray_data );
+    
     $page = undef;
     }
   elsif( $page )
@@ -1185,6 +1204,8 @@ sub render
   my $file_name = $portray_data->{ 'FILE_NAME' };
   my $disp_type = $portray_data->{ 'DISPOSITION_TYPE' } || 'inline'; # default, rest must be handled as 'attachment', ref: rfc6266#section-4.2
 
+  my $page_type_is_text = $page_type =~ /^text\//i;
+
   if( lc $page_type =~ /^text\/html/ )
     {
     my $prep_opt1 = {};
@@ -1209,10 +1230,14 @@ sub render
   $self->set_headers( 'content-disposition' => "$disp_type; filename=$file_name" ) if $file_name;
 
   my $http_csp = $self->{ 'ENV' }{ 'HTTP_CSP' }; # || " default-src 'self' ";
-  $self->set_headers( 'Content-Security-Policy' => $http_csp );
+  $self->set_headers( 'Content-Security-Policy' => $http_csp ) if $http_csp;
 
   my $app_charset = uc $self->{ 'ENV' }{ 'APP_CHARSET' } || 'UTF-8';
-  $self->set_headers( 'content-charset' => $app_charset );
+  if( $page_type_is_text )
+    {
+    # set charset for TEXT only
+    $self->set_headers( 'content-charset' => $app_charset );
+    }
 
   my $page_headers = $self->__make_headers();
 
@@ -1231,10 +1256,12 @@ sub render
   else
     {  
     # TODO: FIXME: check app-charset and convert only if needed
-    print encode( $app_charset, $page_data );
+    #print $page_type_is_text ? encode( $app_charset, $page_data ) : $page_data;
+    #print "[[$page_type_is_text|$app_charset]]";
+    print $page_data;
     }
 
-  $self->log_debug( "debug: page response content: page, action, type, headers, data: " . Dumper( $page, $action, $page_type, $page_headers, $page_type =~ /^text\// ? $page_data : '*binary*' ) ) if $self->is_debug() > 2;
+  $self->log_debug( "debug: page response content: page, action, type, headers:\n" . Dumper( $page, $action, $page_type, $page_headers ) ) if $self->is_debug() > 2;
 
   if( $self->is_debug() > 1 and lc $page_type =~ /^text\/html/ )
     {
@@ -1263,6 +1290,7 @@ sub render
 my %SIMPLE_PORTRAY_TYPE_MAP = (
                               html => 'text/html',
                               text => 'text/plain',
+                              txt  => 'text/plain',
                               jpeg => 'image/jpeg',
                               png  => 'image/png',
                               bin  => 'application/octet-stream',
@@ -1386,8 +1414,8 @@ sub forward_new_action
 sub __param
 {
   my $self = shift;
-  my $peek = shift; # 1 not save, 0 save in cache
-  my $safe = shift; # 1 safe_input, 0 user_input
+  my $save = shift; # 0 not save, 1 save in cache, 2 save in cache and page session (ps)
+  my $safe = shift; # 0 user (unsafe) input, 1 safe input
 
   my $input_hr;
   my $save_key;
@@ -1404,23 +1432,24 @@ sub __param
 
   my $ps = $self->get_page_session();
 
-  $ps->{ $save_key } ||= {} unless $peek;
+  $ps->{ $save_key } ||= {} if $save > 0;
 
   my @res;
   while( @_ )
     {
     my $p = uc shift;
-    if( $peek )
-      {
-      push @res, $input_hr->{ $p };
-      }
-    else
+    if( $save > 0 )
       {  
       if( exists $input_hr->{ $p } )
         {
         $ps->{ $save_key }{ $p } = $input_hr->{ $p };
+        $ps->{ $p } = $input_hr->{ $p } if $save > 1;
         }
       push @res, $ps->{ $save_key }{ $p };
+      }
+    else
+      {
+      push @res, $input_hr->{ $p };
       }
     }
 
@@ -1430,13 +1459,19 @@ sub __param
 sub param_unsafe
 {
   my $self = shift;
-  return $self->__param( 0, 0, @_ );
+  return $self->__param( 1, 0, @_ );
 }
 
 sub param
 {
   my $self = shift;
-  return $self->__param( 0, 1, @_ );
+  return $self->__param( 1, 1, @_ );
+}
+
+sub param_save
+{
+  my $self = shift;
+  return $self->__param( 2, 1, @_ );
 }
 
 sub param_safe
@@ -1448,13 +1483,13 @@ sub param_safe
 sub param_peek_unsafe
 {
   my $self = shift;
-  return $self->__param( 1, 0, @_ );
+  return $self->__param( 0, 0, @_ );
 }
 
 sub param_peek
 {
   my $self = shift;
-  return $self->__param( 1, 1, @_ );
+  return $self->__param( 0, 1, @_ );
 }
 
 sub param_peek_safe
@@ -1558,6 +1593,11 @@ sub get_user_session_expire_time
   my $self = shift;
 
   my $user_shr = $self->get_user_session();
+
+#use Exception::Sink;
+#my $xtt = localtime( $user_shr->{ ':XTIME' } );
+#print STDERR "get_user_session_expire_time($user_shr->{ ':XTIME' })[$xtt]\n" . Exception::Sink::get_stack_trace();
+
   return exists $user_shr->{ ':XTIME' } ? $user_shr->{ ':XTIME' } : undef;
 }
 
@@ -1668,6 +1708,15 @@ sub new_form
   my $form = new Web::Reactor::HTML::Form( @_, REO_REACTOR => $self );
 
   return $form;
+}
+
+##############################################################################
+
+sub set_browser_window_title
+{
+  my $self = shift;
+
+  $self->html_content( 'BROWSER_WINDOW_TITLE', shift() );
 }
 
 ##############################################################################
@@ -2035,13 +2084,15 @@ to add specific functionality which will be readily available everywhere.
 
 =head1 PROJECT STATUS
 
-At the moment Web::Reactor is in beta. API is mostly frozen but it is possible
-to be changed and/or extended. However drastic changes are not planned :)
+Web::Reactor is stable and it is used in many production sites including
+banks, insurance, travel and other smaller companies.
+
+API is frozen but it could be extended
 
 If you are interested in the project or have some notes etc, contact me at:
 
   Vladi Belperchinov-Shabanski "Cade"
-  <cade@bis.bg>
+  <cade@noxrun.com>
   <cade@cpan.org>
   <shabanski@gmail.com>
 
@@ -2084,6 +2135,11 @@ fully functional (however stupid :)) application. It shows how data is processed
 calling pages/views, inspecting page (calling views) stack, html forms automation,
 forwarding.
 
+Additionally you may check DECOR information systems infrastructure, which uses
+Web::Reactor for its main web interface:
+
+    https://github.com/cade-vs/perl-decor
+
 =head1 MAILING LIST
 
   web-reactor@googlegroups.com
@@ -2100,7 +2156,7 @@ forwarding.
 
   <cade@bis.bg> <cade@cpan.org> <shabanski@gmail.com>
 
-  http://cade.datamax.bg
+  http://cade.noxrun.com
 
   https://github.com/cade-vs
 

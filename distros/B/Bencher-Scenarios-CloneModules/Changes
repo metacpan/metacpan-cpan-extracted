@@ -1,4 +1,19 @@
-0.04    2017-01-25 (PERLANCAR)
+0.051   2021-07-31  Released-By: PERLANCAR; Urgency: medium
+
+	- [dist][bugfix] Forgot to enable dzil plugin InsertDistImage to
+	  actually show the sample benchmark charts.
+
+
+0.050   2021-07-31  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+	- [build] Rebuild with and adjust to updated
+          Pod::Weaver::Plugin::Bencher::Scenario (0.251) to tweak texts in
+          generated POD section. Generate charts.
+
+
+0.04    2017-01-25  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -7,18 +22,18 @@
           type=x_benchmarks.
 
 
-0.03    2016-03-10 (PERLANCAR)
+0.03    2016-03-10  Released-By: PERLANCAR
 
         - No functional changes.
 
         - Re-release under fixed distro name.
 
 
-0.02    2016-03-10 (PERLANCAR)
+0.02    2016-03-10  Released-By: PERLANCAR
 
 	- Add datasets: array10k, hashes.
 
 
-0.01    2016-03-10 (PERLANCAR)
+0.01    2016-03-10  Released-By: PERLANCAR
 
         - First release.

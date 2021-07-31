@@ -1,9 +1,9 @@
 package Bencher::Scenario::Example::CmdLineTemplate;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-07-23'; # DATE
+our $DATE = '2021-07-31'; # DATE
 our $DIST = 'Bencher-Backend'; # DIST
-our $VERSION = '1.057'; # VERSION
+our $VERSION = '1.058'; # VERSION
 
 our $scenario = {
     participants => [
@@ -30,7 +30,7 @@ Bencher::Scenario::Example::CmdLineTemplate - Demonstrate cmdline_template
 
 =head1 VERSION
 
-This document describes version 1.057 of Bencher::Scenario::Example::CmdLineTemplate (from Perl distribution Bencher-Backend), released on 2021-07-23.
+This document describes version 1.058 of Bencher::Scenario::Example::CmdLineTemplate (from Perl distribution Bencher-Backend), released on 2021-07-31.
 
 =head1 SYNOPSIS
 

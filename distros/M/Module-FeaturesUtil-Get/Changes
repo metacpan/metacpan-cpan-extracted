@@ -1,3 +1,10 @@
+0.003   2021-02-25  Released-By: PERLANCAR; Urgency: medium
+
+	- get_features_decl(): Add x.source attribute in result.
+
+	- Add routine: get_feature_set_spec.
+
+
 0.002   2021-02-24  Released-By: PERLANCAR; Urgency: medium
 
 	- Add option to load modules in get_features_decl() (currently

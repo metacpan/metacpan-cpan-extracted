@@ -6,13 +6,13 @@ my %WriteMakefileArgs = (
   "ABSTRACT" => "Easy installation of the GSL library",
   "AUTHOR" => "Joel A. Berger <joel.a.berger\@gmail.com>",
   "BUILD_REQUIRES" => {
-    "Alien::Build" => "0.32",
-    "Alien::Build::MM" => "0.32",
+    "Alien::Build" => "2.21",
+    "Alien::Build::MM" => "2.21",
     "ExtUtils::MakeMaker" => "6.52"
   },
   "CONFIGURE_REQUIRES" => {
-    "Alien::Build" => "1.19",
-    "Alien::Build::MM" => "0.32",
+    "Alien::Build" => "2.21",
+    "Alien::Build::MM" => "2.21",
     "ExtUtils::MakeMaker" => "6.52"
   },
   "DISTNAME" => "Alien-GSL",
@@ -25,6 +25,7 @@ my %WriteMakefileArgs = (
     "ExtUtils::MakeMaker" => "6.52",
     "Test2::V0" => 0,
     "Test::Alien" => 0,
+    "Test::Alien::Diag" => 0,
   },
   "VERSION_FROM" => "lib/Alien/GSL.pm",
   "test" => {
@@ -52,8 +53,8 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Alien::Base" => "2.21",
-  "Alien::Build" => "0.32",
-  "Alien::Build::MM" => "0.32",
+  "Alien::Build" => "2.21",
+  "Alien::Build::MM" => "2.21",
   "ExtUtils::MakeMaker" => "6.52",
   "File::Spec" => 0,
   "Sort::Versions" => 0,

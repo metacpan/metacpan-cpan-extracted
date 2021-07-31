@@ -1,7 +1,7 @@
 package Bencher::Scenarios::StringFunctions;
 
-our $DATE = '2021-07-30'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $DATE = '2021-07-31'; # DATE
+our $VERSION = '0.005'; # VERSION
 
 1;
 # ABSTRACT: Benchmark string functions
@@ -18,7 +18,7 @@ Bencher::Scenarios::StringFunctions - Benchmark string functions
 
 =head1 VERSION
 
-This document describes version 0.004 of Bencher::Scenarios::StringFunctions (from Perl distribution Bencher-Scenarios-StringFunctions), released on 2021-07-30.
+This document describes version 0.005 of Bencher::Scenarios::StringFunctions (from Perl distribution Bencher-Scenarios-StringFunctions), released on 2021-07-31.
 
 =head1 DESCRIPTION
 

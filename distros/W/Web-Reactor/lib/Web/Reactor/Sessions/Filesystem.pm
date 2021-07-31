@@ -42,7 +42,7 @@ sub _storage_create
   
   my $fn = $self->_key_to_fn( {}, @_ );
   my $F;
-  if( sysopen $F, $fn, O_CREAT | O_EXCL, oct(600) )
+  if( sysopen $F, $fn, O_CREAT | O_EXCL, 0600 )
     {
     close $F;
     return 1;

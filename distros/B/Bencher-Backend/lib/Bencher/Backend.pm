@@ -1,9 +1,9 @@
 package Bencher::Backend;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-07-23'; # DATE
+our $DATE = '2021-07-31'; # DATE
 our $DIST = 'Bencher-Backend'; # DIST
-our $VERSION = '1.057'; # VERSION
+our $VERSION = '1.058'; # VERSION
 
 use 5.010001;
 use strict;
@@ -1998,13 +1998,14 @@ sub _compact_participant_names {
         # something like this. currently we return FB & FB.
         for (@prefixes) {
             s/(.)[^:]*::/$1/g;
-            $_ = "$_:";
+            $_ = "$_:" if length;
         }
     }
 
     # XXX find unique parts, e.g. foo_bar & foo_baz -> f_bar, f_baz. currently
     # we return f_b.
     for (@funcs) {
+        next if / /; # probably not a function name, don't compact
         s/(\S)\S*?(_|\z)/$1$2/g;
     }
 
@@ -4365,7 +4366,7 @@ Bencher::Backend - Backend for Bencher
 
 =head1 VERSION
 
-This document describes version 1.057 of Bencher::Backend (from Perl distribution Bencher-Backend), released on 2021-07-23.
+This document describes version 1.058 of Bencher::Backend (from Perl distribution Bencher-Backend), released on 2021-07-31.
 
 =head1 FUNCTIONS
 

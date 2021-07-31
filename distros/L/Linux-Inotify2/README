@@ -143,6 +143,9 @@ DESCRIPTION
         non-blocking mode, you are responsible for calling the "poll" method
         when this file descriptor becomes ready for reading.
 
+    $inotify->fh
+        Similar to "fileno", but returns a perl file handle instead.
+
     $inotify->blocking ($blocking)
         Clears ($blocking true) or sets ($blocking false) the "O_NONBLOCK"
         flag on the file descriptor.

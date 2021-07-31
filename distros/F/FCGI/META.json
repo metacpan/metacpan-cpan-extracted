@@ -38,9 +38,10 @@
       },
       "test" : {
          "requires" : {
-            "FCGI::Client" : "0",
+            "Config" : "0",
+            "FCGI::Client" : "0.09",
             "File::Temp" : "0",
-            "IO::Socket::UNIX" : "0",
+            "IO::Socket" : "0",
             "Test::More" : "0"
          }
       }
@@ -57,6 +58,6 @@
          "web" : "https://github.com/perl-catalyst/FCGI"
       }
    },
-   "version" : "0.80",
+   "version" : "0.82",
    "x_serialization_backend" : "JSON::MaybeXS version 1.004003"
 }

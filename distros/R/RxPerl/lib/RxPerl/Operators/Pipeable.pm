@@ -20,6 +20,8 @@ our @EXPORT_OK = qw/
 /;
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
+our $VERSION = "v6.7.1";
+
 sub op_audit_time {
     my ($duration) = @_;
 
@@ -480,13 +482,17 @@ sub op_finalize {
         return rx_observable->new(sub {
             my ($subscriber) = @_;
 
+            my $will_finalize_later = 0;
+
             my $own_subscriber = {
                 %$subscriber,
                 error => sub {
+                    $will_finalize_later = 1;
                     $subscriber->{error}->(@_) if defined $subscriber->{error};
                     $fn->();
                 },
                 complete => sub {
+                    $will_finalize_later = 1;
                     $subscriber->{complete}->() if defined $subscriber->{complete};
                     $fn->();
                 },
@@ -494,7 +500,9 @@ sub op_finalize {
 
             $source->subscribe($own_subscriber);
 
-            return;
+            return sub {
+                $fn->() unless $will_finalize_later;
+            };
         });
     };
 }

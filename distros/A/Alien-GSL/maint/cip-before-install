@@ -11,8 +11,17 @@ fi
 
 if echo $CIP_ENV | grep -q system; then
   echo use system GSL
-  cip sudo apt-get update
-  cip sudo apt-get -y install libgsl-dev
+  if echo $CIP_TAG | grep centos7; then
+    echo 'fedora (yum) based'
+    cip sudo yum -y install gsl-devel
+  elif echo $CIP_TAG | egrep -q 'fedora|centos'; then
+    echo fedora based
+    cip sudo dnf -y install gsl-devel
+  else
+    echo debian based
+    cip sudo apt-get update
+    cip sudo apt-get -y install libgsl-dev
+  fi
 else
   echo use internet GSL
 fi

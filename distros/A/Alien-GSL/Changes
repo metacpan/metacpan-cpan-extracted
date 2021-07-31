@@ -1,5 +1,15 @@
 Revision history for Perl extension Alien::GSL.
 
+1.07 2021-07-30 16:56:07 -0600
+  - Production release otherwise identical to 1.06_01
+
+1.06_01 2021-07-30 12:28:08 -0600
+  - Bump configure time prereqs of AB to match what is
+    required at runtime.  (gh#12, gh#16)
+
+1.05_01 2021-07-26 11:42:15 -0600
+  - Additional diagnostics
+
 1.04 2021-07-25 08:03:00 -0600
   - Work around recent macOS compiler (gh#13)
 

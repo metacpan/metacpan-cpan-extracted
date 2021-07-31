@@ -1,0 +1,45 @@
+---
+abstract: 'load fixture data to storage for Teng'
+author:
+  - 'Masahiro Iuchi <masahiro.iuchi _at_ gmail _dot_ com>'
+build_requires:
+  Test::More: '0.98'
+  Test::Requires: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.12, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-Fixture-Teng
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Test::Fixture::Teng:
+    file: lib/Test/Fixture/Teng.pm
+    version: '0.01'
+requires:
+  Kwalify: '1.16'
+  Params::Validate: '0.89'
+  Teng: '0'
+  YAML::Syck: '1'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/masiuchi/p5-test-fixture-teng/issues
+  homepage: https://github.com/masiuchi/p5-test-fixture-teng
+  repository: git://github.com/masiuchi/p5-test-fixture-teng.git
+version: '0.01'
+x_contributors:
+  - 'Masahiro IUCHI <masahiro.iuchi@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

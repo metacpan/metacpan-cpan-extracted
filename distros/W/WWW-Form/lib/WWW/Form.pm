@@ -5,8 +5,7 @@ use warnings;
 
 use 5.014;
 
-use Data::Dumper;
-use CGI;
+use HTML::Entities ();
 
 our $VERSION = "1.19";
 
@@ -482,6 +481,7 @@ sub _setField
 
 sub asString {
     my $self = shift;
+    require Data::Dumper;
     return Data::Dumper::Dumper($self);
 }
 
@@ -1069,7 +1069,7 @@ sub _getSelectBoxHTML {
 sub _escapeValue {
     my $self = shift;
     my $string = shift;
-    return CGI::escapeHTML($string);
+    return HTML::Entities::encode_entities($string);
 }
 
 1;
@@ -1086,7 +1086,7 @@ WWW::Form
 
 =head1 VERSION
 
-version 1.20
+version 1.21
 
 =head1 SYNOPSIS
 

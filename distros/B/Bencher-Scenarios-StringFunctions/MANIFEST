@@ -17,6 +17,7 @@ lib/Bencher/ScenarioR/StringFunctions/Trim.pm
 lib/Bencher/ScenarioR/StringModules/Startup.pm
 lib/Bencher/Scenarios/StringFunctions.pm
 lib/String/Indent/Join.pm
+share/images/bencher-result-1.png
 t/00-compile.t
 t/author-critic.t
 t/author-pod-coverage.t

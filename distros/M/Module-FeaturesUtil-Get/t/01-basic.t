@@ -8,15 +8,24 @@ use lib "$Bin/lib";
 use Test::More 0.98;
 
 use Local::Declarer1;
+use Module::Features::Local::Definer1;
 use Module::FeaturesUtil::Get qw(
-                                get_features_decl
-                                get_feature_val
-                                module_declares_feature
+                                    get_feature_set_spec
+                                    get_features_decl
+                                    get_feature_val
+                                    module_declares_feature
                             );
+
+subtest get_feature_set_spec => sub {
+    my $feature_set_spec = get_feature_set_spec('Local::Definer1');
+    ok(ref $feature_set_spec eq 'HASH' && keys %$feature_set_spec)
+        or diag explain $feature_set_spec;
+};
 
 subtest get_features_decl => sub {
     my $features_decl = get_features_decl('Local::Declarer1');
-    ok $features_decl;
+    ok(ref $features_decl eq 'HASH' && keys %$features_decl)
+        or diag explain $features_decl;
 };
 
 subtest get_feature_val => sub {

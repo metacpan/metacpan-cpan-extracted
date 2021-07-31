@@ -15,7 +15,7 @@ our @EXPORT_OK = (
 );
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
-our $VERSION = "v6.7.0";
+our $VERSION = "v6.7.1";
 
 1;
 __END__

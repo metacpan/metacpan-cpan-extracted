@@ -1,10 +1,14 @@
 package Getopt::EX::Hashed;
 
-our $VERSION = '0.9904';
+our $VERSION = '0.9905';
 
 =head1 NAME
 
 Getopt::EX::Hashed - Hash store object automation
+
+=head1 VERSION
+
+Version 0.9905
 
 =head1 SYNOPSIS
 
@@ -163,6 +167,20 @@ If you want to access arbitrary keys, unlock the object.
     use Hash::Util 'unlock_keys';
     unlock_keys %{$obj};
 
+=item B<reset>
+
+Reset the class to original state.  Because the hash object keeps all
+information, this does not effect to the existing object.  It returns
+the object itself, so you can reset the class after creating a object
+like this:
+
+    my $obj = Getopt::EX::Hashed->new->reset;
+
+This is almost equivalent to the next code:
+
+    my $obj = Getopt::EX::Hashed->new;
+    Getopt::EX::Hashed->reset;
+
 =back
 
 =head1 SEE ALSO
@@ -205,6 +223,7 @@ my %Member;
 my %Config = (
     LOCK_KEYS          => 1,
     REPLACE_UNDERSCORE => 1,
+    RESET_AFTER_NEW    => 0,
     GETOPT             => 'GetOptions',
     );
 lock_keys %Config;
@@ -271,7 +290,7 @@ sub new {
 	};
     }
     lock_keys %{$obj} if $Config{LOCK_KEYS};
-    @Member = %Member = ();
+    __PACKAGE__->reset if $Config{RESET_AFTER_NEW};
     $obj;
 }
 

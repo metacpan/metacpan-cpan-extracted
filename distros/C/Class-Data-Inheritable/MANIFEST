@@ -9,3 +9,4 @@ README
 t/Inheritable.t
 t/pod-coverage.t
 t/pod.t
+META.json                                Module JSON meta-data (added by MakeMaker)

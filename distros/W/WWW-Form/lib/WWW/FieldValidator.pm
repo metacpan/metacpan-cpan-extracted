@@ -155,7 +155,7 @@ WWW::FieldValidator
 
 =head1 VERSION
 
-version 1.20
+version 1.21
 
 =head1 SYNOPSIS
 

@@ -16,7 +16,8 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "0",
+            "File::ShareDir::Install" : "0.06"
          }
       },
       "develop" : {
@@ -90,7 +91,7 @@
          "web" : "https://github.com/perlancar/perl-Bencher-Scenarios-StringFunctions"
       }
    },
-   "version" : "0.004",
+   "version" : "0.005",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"
@@ -444,7 +445,7 @@
                      {
                         "class" : "Pod::Weaver::Plugin::Bencher::Scenario",
                         "name" : "-Bencher::Scenario",
-                        "version" : "0.248"
+                        "version" : "0.250"
                      }
                   ]
                }
@@ -559,6 +560,11 @@
             "class" : "Dist::Zilla::Plugin::UploadToCPAN::WWWPAUSESimple",
             "name" : "@Author::PERLANCAR/UploadToCPAN::WWWPAUSESimple",
             "version" : "0.04"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::InsertDistImage",
+            "name" : "InsertDistImage",
+            "version" : "0.005"
          },
          {
             "class" : "Dist::Zilla::Plugin::Prereqs",

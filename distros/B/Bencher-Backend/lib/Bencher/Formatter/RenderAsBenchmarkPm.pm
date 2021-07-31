@@ -1,9 +1,9 @@
 package Bencher::Formatter::RenderAsBenchmarkPm;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-07-23'; # DATE
+our $DATE = '2021-07-31'; # DATE
 our $DIST = 'Bencher-Backend'; # DIST
-our $VERSION = '1.057'; # VERSION
+our $VERSION = '1.058'; # VERSION
 
 use 5.010001;
 use strict;
@@ -41,7 +41,7 @@ sub render_result {
         my $it = $items->[$i];
         push @rows, [
             $it->{_succinct_name},
-            (defined($it->{rate}) ? "$it->{rate}/s" : sprintf("%.1f/s", 1/$it->{time})),
+            (defined($it->{rate}) ? "$it->{rate}/s" : sprintf("%.1f/s", 1000/$it->{time})),
         ];
         for my $j (0..$#{$items}) {
             my $pct;
@@ -95,7 +95,7 @@ Bencher::Formatter::RenderAsBenchmarkPm - Scale time to make it convenient
 
 =head1 VERSION
 
-This document describes version 1.057 of Bencher::Formatter::RenderAsBenchmarkPm (from Perl distribution Bencher-Backend), released on 2021-07-23.
+This document describes version 1.058 of Bencher::Formatter::RenderAsBenchmarkPm (from Perl distribution Bencher-Backend), released on 2021-07-31.
 
 =for Pod::Coverage .*
 

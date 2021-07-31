@@ -3,10 +3,11 @@ abstract: 'Fast CGI module'
 author:
   - 'Sven Verdoolaege (skimo@kotnet.org)'
 build_requires:
+  Config: '0'
   ExtUtils::MakeMaker: '0'
-  FCGI::Client: '0'
+  FCGI::Client: '0.09'
   File::Temp: '0'
-  IO::Socket::UNIX: '0'
+  IO::Socket: '0'
   Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -27,5 +28,5 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=FCGI
   repository: https://github.com/perl-catalyst/FCGI.git
-version: '0.80'
+version: '0.82'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

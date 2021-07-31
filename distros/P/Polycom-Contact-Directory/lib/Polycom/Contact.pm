@@ -16,7 +16,7 @@ use overload (
 
 Polycom::Contact->mk_accessors(
     qw(first_name last_name contact speed_index label ring_type divert
-    auto_reject auto_divert buddy_watching buddy_block in_storage)
+    auto_reject auto_divert buddy_watching buddy_block user_photo in_storage)
 );
 
 ###################
@@ -38,6 +38,7 @@ sub new
         auto_divert    => $args{auto_divert} || 0,
         buddy_watching => $args{buddy_watching} || 0,
         buddy_block    => $args{buddy_block} || 0,
+        user_photo     => $args{user_photo} || 0,
         in_storage     => $args{in_storage} || 0,
     };
 
@@ -115,6 +116,14 @@ sub is_valid
         $reason = 'buddy_block must be either "", 0, or 1';
         return;
     }
+    
+    if (   defined $self->user_photo
+        && ($self->user_photo !~ /^\d*$/
+        || $self->user_photo > 24))
+    {
+        $reason = 'user_photo must be a number between 1 and 24';
+        return;
+    }
 
     return 1;
 }
@@ -143,6 +152,7 @@ sub diff
         auto_divert    => 'Auto Divert',
         buddy_watching => 'Buddy Watch',
         buddy_block    => 'Buddy Block',
+        user_photo     => 'User Photo',
     );
 
     my @nonMatchingFields;
@@ -227,6 +237,7 @@ In all, each C<Polycom::Contact> object can have the following fields:
   auto_divert      - automatically divert calls from this contact (0 = no, 1 = yes)
   buddy_watching   - include in the list of watched phones (0 = no, 1 = yes)
   buddy_block      - block from watching this phone (0 = no, 1 = yes)
+  user_photo       - index of a user photo/icon set by the icons.x parameter.
 
 Of those fields, the C<contact> field is the only required field; without a unique C<contact> field, the phone will not load the contact.
 
@@ -309,6 +320,13 @@ Specifies whether to block this contact from watching this phone (0 = no, 1 = ye
   print "$contact is blocked from watching" if ($contact->buddy_block);
   $contact->buddy_block(1);  # Prevent this contact from watching this phone
 
+=head2 user_photo
+
+The index of an optional user photo that has been specified in the configuration using the icons.x parameter.
+
+  # Copy a photo to the provisioning server (e.g. bob.png) and add the following to the phone's configuration:
+  #  <icons icons.1="bob.png" />
+  $contact->user_photo(1);  # Show the image "bob.png" for this contact on Trio and CCX phones
 =head1 METHODS
 
 =head2 is_valid
@@ -337,7 +355,7 @@ Returns an array of contact field names that do not match (e.g. "First Name", "S
 
 =head1 SEE ALSO
 
-C<Polycom::Contact::Directory> - A closely related module that parses the XML-based local contact directory file used by Polycom SoundPoint IP, SoundStation IP, and VVX VoIP phones, and can be used to read, modify, or create contacts in the file. 
+C<Polycom::Contact::Directory> - A closely related module that parses the XML-based local contact directory file used by Polycom SoundPoint IP, SoundStation IP, VVX, Trio and CCX VoIP phones, and can be used to read, modify, or create contacts in the file. 
 
 =head1 AUTHOR
 

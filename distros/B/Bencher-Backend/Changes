@@ -1,3 +1,12 @@
+1.058   2021-07-31  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] When rendering result as Benchmark.pm result, fix
+	  calculating rate from time (time is in ms not s).
+
+	- [bugfix] Avoid mangling non-function participant names when
+	  creating succinct names (e.g. 'perl -e (baseline)'.
+
+
 1.057   2021-07-23  Released-By: PERLANCAR; Urgency: high
 
 	- Doh, typo.

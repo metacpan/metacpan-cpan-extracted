@@ -55,11 +55,6 @@ BOOT:
 int
 inotify_init ()
 
-void
-inotify_close (int fd)
-	CODE:
-        close (fd);
-
 int
 inotify_add_watch (int fd, char *name, U32 mask)
 

@@ -15,3 +15,5 @@ Revision history for Perl extension Polycom::Contact::Directory
 0.05  Mon Jul 05 10:00:00 2010
     - added more unit tests and an example script for converting to CSV
 
+0.06  Mon Jul 30 10:00:00 2021
+    - added support for the <up> (user photo) field, and added a test script for converting from vCard format

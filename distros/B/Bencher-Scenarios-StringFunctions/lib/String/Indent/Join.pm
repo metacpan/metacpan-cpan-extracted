@@ -1,9 +1,9 @@
 package String::Indent::Join;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-07-30'; # DATE
+our $DATE = '2021-07-31'; # DATE
 our $DIST = 'Bencher-Scenarios-StringFunctions'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 #use 5.010001;
 use strict;
@@ -42,7 +42,7 @@ String::Indent::Join - String indenting routines
 
 =head1 VERSION
 
-This document describes version 0.004 of String::Indent::Join (from Perl distribution Bencher-Scenarios-StringFunctions), released on 2021-07-30.
+This document describes version 0.005 of String::Indent::Join (from Perl distribution Bencher-Scenarios-StringFunctions), released on 2021-07-31.
 
 =head1 FUNCTIONS
 

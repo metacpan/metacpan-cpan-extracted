@@ -2,8 +2,8 @@ NAME
     Bencher::Backend - Backend for Bencher
 
 VERSION
-    This document describes version 1.057 of Bencher::Backend (from Perl
-    distribution Bencher-Backend), released on 2021-07-23.
+    This document describes version 1.058 of Bencher::Backend (from Perl
+    distribution Bencher-Backend), released on 2021-07-31.
 
 FUNCTIONS
   bencher

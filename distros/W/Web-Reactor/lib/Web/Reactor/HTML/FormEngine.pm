@@ -178,7 +178,7 @@ sub html_form_engine_display
 
     # print STDERR " form ffffffffffffffffffffffffffff [$name] [$value] [$re_help]\n";
 
-    if( $type =~ /^(STRING|STR|CHAR|TEXT|INPUT)$/ )
+    if( $type =~ /^(STRING|STR|CHAR|INPUT)$/ )
       {
       $text .= $form->input( NAME => $name, SIZE => $size, MAXLEN => $maxlen, VALUE=> $data, PASS => $pass );
       }

@@ -2,8 +2,8 @@ NAME
     Module::FeaturesUtil::Get - Get a feature
 
 VERSION
-    This document describes version 0.002 of Module::FeaturesUtil::Get (from
-    Perl distribution Module-FeaturesUtil-Get), released on 2021-02-24.
+    This document describes version 0.003 of Module::FeaturesUtil::Get (from
+    Perl distribution Module-FeaturesUtil-Get), released on 2021-02-25.
 
 SYNOPSIS
      use Module::FeaturesUtil::Get qw(
@@ -29,6 +29,18 @@ SYNOPSIS
 
 DESCRIPTION
 FUNCTIONS
+  get_feature_set_spec
+    Usage:
+
+     my $feature_set_spec = get_feature_set_spec($feature_set_name);
+
+    Feature set specification will be retrieved from the
+    "Module::Features::$feature_set_name" module. The module will NOT be
+    loaded by this routine; you will need to load the module yourself.
+
+    This module will also NOT check the validity of feature set
+    specification.
+
   get_features_decl
     Usage:
 
@@ -39,7 +51,7 @@ FUNCTIONS
     $module_name*::_ModuleFeatures*. You have to load the modules yourself;
     this routine will not load the modules for you.
 
-    This module will also NOT check the validity of features declaration.
+    This routine will also NOT check the validity of features declaration.
 
   get_feature_val
     Usage:
@@ -58,7 +70,8 @@ FUNCTIONS
 
     Features declaration is retrieved using "get_features_decl".
 
-    This routine will also NOT check the feature set specification.
+    This routine will also NOT check the validity of feature value against
+    the specification's schema.
 
   module_declares_feature
     Usage:

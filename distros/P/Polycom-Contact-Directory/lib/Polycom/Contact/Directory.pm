@@ -69,8 +69,9 @@ sub new
             my ($ad) = $str =~ /<ad>(.*?)<\/ad>/s;
             my ($bw) = $str =~ /<bw>(.*?)<\/bw>/s;
             my ($bb) = $str =~ /<bb>(.*?)<\/bb>/s;
+            my ($up) = $str =~ /<up>(.*?)<\/up>/s;
 
-            foreach ($fn, $ln, $ct, $sd, $lb, $rt, $dc, $ar, $ad, $bw, $bb)
+            foreach ($fn, $ln, $ct, $sd, $lb, $rt, $dc, $ar, $ad, $bw, $bb, $up)
             {
                 next if !defined;
                 s/&amp;/&/g;
@@ -93,6 +94,7 @@ sub new
                 auto_divert    => $ad || 0,
                 buddy_watching => $bw || 0,
                 buddy_block    => $bb || 0,
+                user_photo     => $up || '',
                 in_storage     => 1,
                 );
         }
@@ -179,6 +181,7 @@ sub to_xml
         $xml .= "   <ad>$f{auto_divert}</ad>\n" if defined $f{auto_divert};
         $xml .= "   <bw>$f{buddy_watching}</bw>\n" if defined $f{buddy_watching};
         $xml .= "   <bb>$f{buddy_block}</bb>\n" if defined $f{buddy_block};
+        $xml .= "   <up>$f{user_photo}</up>\n" if defined $f{user_photo};
         $xml .= "  </item>\n";
     }
     $xml .= " </item_list>\n</directory>";

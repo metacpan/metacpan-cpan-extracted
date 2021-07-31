@@ -5,7 +5,7 @@ use Alien::GSL;
 alien_ok 'Alien::GSL';
 
 my $xs = do { local $/; <DATA> };
-xs_ok $xs, with_subtest {
+xs_ok { verbose => 2, xs => $xs }, with_subtest {
   my($module) = @_;
   is($module->thetest, 1);
 };

@@ -18,7 +18,7 @@ DESCRIPTION
     Class::Data::Inheritable is for creating accessor/mutators to class
     data. That is, if you want to store something about your class as a
     whole (instead of about a single object). This data is then inherited by
-    your subclasses and can be overriden.
+    your subclasses and can be overridden.
 
     For example:
 
@@ -50,13 +50,13 @@ DESCRIPTION
       Pere::Ubu->Suitcase('Blue');
 
     However, should Raygun decide to set its own Suitcase() it has now
-    "overridden" Pere::Ubu and is on its own, just like if it had overriden
+    "overridden" Pere::Ubu and is on its own, just like if it had overridden
     a method:
 
       # Raygun has an orange suitcase, Pere::Ubu's is still Blue.
       Raygun->Suitcase('Orange');
 
-    Now that Raygun has overridden Pere::Ubu futher changes by Pere::Ubu no
+    Now that Raygun has overridden Pere::Ubu further changes by Pere::Ubu no
     longer effect Raygun.
 
       # Raygun still has an orange suitcase, but Pere::Ubu is using Samsonite.

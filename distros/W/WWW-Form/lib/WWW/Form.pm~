@@ -6,7 +6,7 @@ use warnings;
 use 5.014;
 
 use Data::Dumper;
-use CGI;
+use HTML::Entities ();
 
 our $VERSION = "1.19";
 
@@ -1966,7 +1966,7 @@ sub _getSelectBoxHTML {
 sub _escapeValue {
     my $self = shift;
     my $string = shift;
-    return CGI::escapeHTML($string);
+    return HTML::Entities::encode_entities($string);
 }
 
 1;

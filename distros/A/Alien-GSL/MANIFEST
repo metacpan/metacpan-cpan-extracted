@@ -1,6 +1,5 @@
 .gitattributes
 .github/workflows/linux.yml
-_alien/state.json
 alienfile
 Changes
 lib/Alien/GSL.pm
@@ -9,6 +8,7 @@ maint/releaseprep
 Makefile.PL
 MANIFEST			This list of files
 README.md
+t/00_diag.t
 t/alien_gsl.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

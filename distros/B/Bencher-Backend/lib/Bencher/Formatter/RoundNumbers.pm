@@ -1,9 +1,9 @@
 package Bencher::Formatter::RoundNumbers;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-07-23'; # DATE
+our $DATE = '2021-07-31'; # DATE
 our $DIST = 'Bencher-Backend'; # DIST
-our $VERSION = '1.057'; # VERSION
+our $VERSION = '1.058'; # VERSION
 
 use 5.010001;
 use strict;
@@ -88,7 +88,7 @@ Bencher::Formatter::RoundNumbers - Round numbers (rate, time) to certain signifi
 
 =head1 VERSION
 
-This document describes version 1.057 of Bencher::Formatter::RoundNumbers (from Perl distribution Bencher-Backend), released on 2021-07-23.
+This document describes version 1.058 of Bencher::Formatter::RoundNumbers (from Perl distribution Bencher-Backend), released on 2021-07-31.
 
 =for Pod::Coverage .*
 

@@ -3,6 +3,10 @@
 
 Getopt::EX::Hashed - Hash store object automation
 
+# VERSION
+
+Version 0.9905
+
 # SYNOPSIS
 
     use App::foo;
@@ -153,6 +157,20 @@ Following parameters are available.
 
         use Hash::Util 'unlock_keys';
         unlock_keys %{$obj};
+
+- **reset**
+
+    Reset the class to original state.  Because the hash object keeps all
+    information, this does not effect to the existing object.  It returns
+    the object itself, so you can reset the class after creating a object
+    like this:
+
+        my $obj = Getopt::EX::Hashed->new->reset;
+
+    This is almost equivalent to the next code:
+
+        my $obj = Getopt::EX::Hashed->new;
+        Getopt::EX::Hashed->reset;
 
 # SEE ALSO
 

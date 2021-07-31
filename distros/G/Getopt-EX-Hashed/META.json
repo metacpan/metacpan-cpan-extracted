@@ -54,7 +54,7 @@
    "provides" : {
       "Getopt::EX::Hashed" : {
          "file" : "lib/Getopt/EX/Hashed.pm",
-         "version" : "0.9904"
+         "version" : "0.9905"
       }
    },
    "release_status" : "stable",
@@ -68,7 +68,7 @@
          "web" : "https://github.com/kaz-utashiro/Getopt-EX-Hashed"
       }
    },
-   "version" : "0.9904",
+   "version" : "0.9905",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>"

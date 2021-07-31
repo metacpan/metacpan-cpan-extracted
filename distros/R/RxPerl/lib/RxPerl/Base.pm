@@ -6,6 +6,8 @@ use warnings;
 use Carp 'croak';
 use Module::Load 'load';
 
+our $VERSION = "v6.7.1";
+
 # Abstract base class for RxPerl::AnyEvent, RxPerl::IOAsync and RxPerl::Mojo
 
 sub set_promise_class {

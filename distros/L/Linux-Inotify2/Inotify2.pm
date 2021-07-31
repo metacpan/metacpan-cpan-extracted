@@ -80,7 +80,7 @@ use common::sense;
 use Exporter qw(import);
 
 BEGIN {
-   our $VERSION = '2.2';
+   our $VERSION = '2.3';
    our @EXPORT = qw(
       IN_ACCESS IN_MODIFY IN_ATTRIB IN_CLOSE_WRITE
       IN_CLOSE_NOWRITE IN_OPEN IN_MOVED_FROM IN_MOVED_TO
@@ -123,7 +123,10 @@ sub new {
 
    return unless $fd >= 0;
 
-   bless { fd => $fd }, $class
+   open my $fh, "<&=", $fd
+      or die "cannot open fd $fd as perl handle\n";
+
+   bless { fd => $fd, fh => $fh }, $class
 }
 
 =item $watch = $inotify->watch ($name, $mask[, $cb])
@@ -214,10 +217,18 @@ Returns the file descriptor for this notify object. When in non-blocking
 mode, you are responsible for calling the C<poll> method when this file
 descriptor becomes ready for reading.
 
+=item $inotify->fh
+
+Similar to C<fileno>, but returns a perl file handle instead.
+
 =cut
 
 sub fileno {
    $_[0]{fd}
+}
+
+sub fh {
+   $_[0]{fh}
 }
 
 =item $inotify->blocking ($blocking)
@@ -334,10 +345,6 @@ sub broadcast {
       local $ev->{w} = $w;
       $w->{cb}($ev) if $w->{cb};
    }
-}
-
-sub DESTROY {
-   inotify_close $_[0]{fd}
 }
 
 =back

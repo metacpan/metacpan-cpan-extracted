@@ -138,9 +138,10 @@ WriteMakefile(
     PM            => {'FCGI.pm' => '$(INST_ARCHLIBDIR)/FCGI.pm'},
     PREREQ_PM     => {'XSLoader' => '0'},
     TEST_REQUIRES => {
-        'FCGI::Client' => 0,
+        'Config' => 0,
+        'FCGI::Client' => 0.09,
         'File::Temp' => 0,
-        'IO::Socket::UNIX' => 0,
+        'IO::Socket' => 0,
         'Test::More' => 0,
     },
     @extras,
