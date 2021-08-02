@@ -58,7 +58,7 @@ my %WriteMakefileArgs = (
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
     "List::Util" => "1.45",
-    "Sah::SpecTest" => "0.9.42",
+    "Sah::SpecTest" => "0.9.50",
     "Test::Exception" => 0,
     "Test::More" => "0.98",
     "Test::NoWarnings" => 0,
@@ -67,7 +67,7 @@ my %WriteMakefileArgs = (
     "lib::filter" => "0.03",
     "overload" => 0
   },
-  "VERSION" => "0.909",
+  "VERSION" => "0.910",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -104,7 +104,7 @@ my %FallbackPrereqs = (
   "Regexp::Stringify" => 0,
   "Role::Tiny" => 0,
   "Role::Tiny::With" => 0,
-  "Sah::SpecTest" => "0.9.42",
+  "Sah::SpecTest" => "0.9.50",
   "Scalar::Util" => 0,
   "Scalar::Util::Numeric::PP" => 0,
   "Test::Exception" => 0,

@@ -1,3 +1,8 @@
+0.38.13 2021-08-02 18:22:16 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - if a (virtualSelectBox) is about to get a non existing value, just select
+   the first value in the list and do NOT go down the rabit hole
+
 0.38.12 2021-07-16 14:41:05 +0200 Tobias Oetiker <tobi@oetiker.ch>
 
  - make the exporter function aware of the date format

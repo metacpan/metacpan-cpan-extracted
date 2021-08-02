@@ -2,7 +2,7 @@ NAME
     HTTP::Tiny - A small, simple, correct HTTP/1.1 client
 
 VERSION
-    version 0.076
+    version 0.078
 
 SYNOPSIS
         use HTTP::Tiny;
@@ -59,8 +59,8 @@ METHODS
     *   "max_redirect" — Maximum number of redirects allowed (defaults to 5)
 
     *   "max_size" — Maximum response size in bytes (only when not using a
-        data callback). If defined, responses larger than this will return
-        an exception.
+        data callback). If defined, requests with responses larger than this
+        will return a 599 status code.
 
     *   "http_proxy" — URL of a proxy server to use for HTTP connections
         (default is $ENV{http_proxy} — if set)
@@ -76,8 +76,8 @@ METHODS
         $ENV{no_proxy} —)
 
     *   "timeout" — Request timeout in seconds (default is 60) If a socket
-        open, read or write takes longer than the timeout, an exception is
-        thrown.
+        open, read or write takes longer than the timeout, the request
+        response status code will be 599.
 
     *   "verify_SSL" — A boolean that indicates whether to validate the SSL
         certificate of an "https" — connection (default is false)
@@ -85,24 +85,26 @@ METHODS
     *   "SSL_options" — A hashref of "SSL_*" — options to pass through to
         IO::Socket::SSL
 
+    An accessor/mutator method exists for each attribute.
+
     Passing an explicit "undef" for "proxy", "http_proxy" or "https_proxy"
     will prevent getting the corresponding proxies from the environment.
 
-    Exceptions from "max_size", "timeout" or other errors will result in a
-    pseudo-HTTP status code of 599 and a reason of "Internal Exception". The
-    content field in the response will contain the text of the exception.
+    Errors during request execution will result in a pseudo-HTTP status code
+    of 599 and a reason of "Internal Exception". The content field in the
+    response will contain the text of the error.
 
     The "keep_alive" parameter enables a persistent connection, but only to
-    a single destination scheme, host and port. Also, if any
-    connection-relevant attributes are modified, or if the process ID or
-    thread ID change, the persistent connection will be dropped. If you want
+    a single destination scheme, host and port. If any connection-relevant
+    attributes are modified via accessor, or if the process ID or thread ID
+    change, the persistent connection will be dropped. If you want
     persistent connections across multiple destinations, use multiple
     HTTP::Tiny objects.
 
     See "SSL SUPPORT" for more on the "verify_SSL" and "SSL_options"
     attributes.
 
-  get|head|put|post|delete
+  get|head|put|post|patch|delete
         $response = $http->get($url);
         $response = $http->get($url, \%options);
         $response = $http->head($url);
@@ -255,9 +257,8 @@ METHODS
         references from redirects in the same order that redirections
         occurred. If it does not exist, then no redirections occurred.
 
-    On an exception during the execution of the request, the "status" field
-    will contain 599, and the "content" field will contain the text of the
-    exception.
+    On an error during the execution of the request, the "status" field will
+    contain 599, and the "content" field will contain the text of the error.
 
   www_form_urlencode
         $params = $http->www_form_urlencode( $data );
@@ -302,9 +303,9 @@ METHODS
 
 SSL SUPPORT
     Direct "https" connections are supported only if IO::Socket::SSL 1.56 or
-    greater and Net::SSLeay 1.49 or greater are installed. An exception will
-    be thrown if new enough versions of these modules are not installed or
-    if the SSL encryption fails. You can also use "HTTP::Tiny::can_ssl()"
+    greater and Net::SSLeay 1.49 or greater are installed. An error will
+    occur if new enough versions of these modules are not installed or if
+    the SSL encryption fails. You can also use "HTTP::Tiny::can_ssl()"
     utility function that returns boolean to see if the required modules are
     installed.
 
@@ -360,8 +361,8 @@ SSL SUPPORT
 
     *   /etc/ssl/ca-bundle.pem
 
-    An exception will be raised if "verify_SSL" is true and no CA
-    certificate file is available.
+    An error will be occur if "verify_SSL" is true and no CA certificate
+    file is available.
 
     If you desire complete control over SSL connections, the "SSL_options"
     attribute lets you provide a hash reference that will be passed through
@@ -393,7 +394,8 @@ PROXY SUPPORT
     If the "REQUEST_METHOD" environment variable is set, then this might be
     a CGI process and "HTTP_PROXY" would be set from the "Proxy:" header,
     which is a security risk. If "REQUEST_METHOD" is set, "HTTP_PROXY" (the
-    upper case variant only) is ignored.
+    upper case variant only) is ignored, but "CGI_HTTP_PROXY" is considered
+    instead.
 
     Tunnelling "https" over an "http" proxy using the CONNECT method is
     supported. If your proxy uses "https" itself, you can not tunnel "https"
@@ -427,7 +429,8 @@ LIMITATIONS
     It attempts to meet all "MUST" requirements of the specification, but
     does not implement all "SHOULD" requirements. (Note: it was developed
     against the earlier RFC 2616 specification and may not yet meet the
-    revised RFC 7230-7235 spec.)
+    revised RFC 7230-7235 spec.) Additionally, HTTP::Tiny supports the
+    "PATCH" method of RFC 5789.
 
     Some particular limitations of note include:
 
@@ -536,6 +539,10 @@ CONTRIBUTORS
 
     *   Felipe Gasper <felipe@felipegasper.com>
 
+    *   Greg Kennedy <kennedy.greg@gmail.com>
+
+    *   James E Keenan <jkeenan@cpan.org>
+
     *   James Raspass <jraspass@gmail.com>
 
     *   Jeremy Mates <jmates@cpan.org>
@@ -550,6 +557,10 @@ CONTRIBUTORS
 
     *   Martin-Louis Bright <mlbright@gmail.com>
 
+    *   Matthew Horsfall <wolfsage@gmail.com>
+
+    *   Michael R. Davis <mrdvt92@users.noreply.github.com>
+
     *   Mike Doherty <doherty@cpan.org>
 
     *   Nicolas Rochelemagne <rochelemagne@cpanel.net>
@@ -559,6 +570,8 @@ CONTRIBUTORS
     *   Olivier Mengué <dolmen@cpan.org>
 
     *   Petr Písař <ppisar@redhat.com>
+
+    *   sanjay-cpu <snjkmr32@gmail.com>
 
     *   Serguei Trouchelle <stro@cpan.org>
 
@@ -578,8 +591,10 @@ CONTRIBUTORS
 
     *   Tony Cook <tony@develop-help.com>
 
+    *   Xavier Guimard <yadd@debian.org>
+
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2018 by Christian Hansen.
+    This software is copyright (c) 2021 by Christian Hansen.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

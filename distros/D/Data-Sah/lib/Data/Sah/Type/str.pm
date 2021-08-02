@@ -1,9 +1,9 @@
 package Data::Sah::Type::str;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-07-29'; # DATE
+our $DATE = '2021-08-01'; # DATE
 our $DIST = 'Data-Sah'; # DIST
-our $VERSION = '0.909'; # VERSION
+our $VERSION = '0.910'; # VERSION
 
 use Data::Sah::Util::Role 'has_clause';
 use Role::Tiny;
@@ -52,7 +52,7 @@ Data::Sah::Type::str - str type
 
 =head1 VERSION
 
-This document describes version 0.909 of Data::Sah::Type::str (from Perl distribution Data-Sah), released on 2021-07-29.
+This document describes version 0.910 of Data::Sah::Type::str (from Perl distribution Data-Sah), released on 2021-08-01.
 
 =for Pod::Coverage ^(clause_.+|clausemeta_.+)$
 

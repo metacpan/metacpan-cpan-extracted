@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 package Software::License::Artistic_1_0;
-$Software::License::Artistic_1_0::VERSION = '0.103014';
+$Software::License::Artistic_1_0::VERSION = '0.104001';
 use parent 'Software::License';
 # ABSTRACT: The Artistic License
 
@@ -61,7 +61,7 @@ Software::License::Artistic_1_0 - The Artistic License
 
 =head1 VERSION
 
-version 0.103014
+version 0.104001
 
 =head1 OPTIONS
 
@@ -86,11 +86,11 @@ By default this method returns true on instances and dies on the class.
 
 =head1 AUTHOR
 
-Ricardo Signes <rjbs@cpan.org>
+Ricardo Signes <rjbs@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Ricardo Signes.
+This software is copyright (c) 2021 by Ricardo Signes.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
@@ -113,21 +113,21 @@ Definitions:
 
   - "Package" refers to the collection of files distributed by the Copyright
     Holder, and derivatives of that collection of files created through
-    textual modification. 
+    textual modification.
   - "Standard Version" refers to such a Package if it has not been modified,
     or has been modified in accordance with the wishes of the Copyright
-    Holder. 
+    Holder.
   - "Copyright Holder" is whoever is named in the copyright or copyrights for
-    the package. 
+    the package.
   - "You" is you, if you're thinking about copying or distributing this Package.
   - "Reasonable copying fee" is whatever you can justify on the basis of media
     cost, duplication charges, time of people involved, and so on. (You will
     not be required to justify it to the Copyright Holder, but only to the
-    computing community at large as a market that must bear the fee.) 
+    computing community at large as a market that must bear the fee.)
   - "Freely Available" means that no fee is charged for the item itself, though
     there may be fees involved in handling the item. It also means that
     recipients of the item may redistribute it under the same conditions they
-    received it. 
+    received it.
 
 1. You may make and give away verbatim copies of the source form of the
 Standard Version of this Package without restriction, provided that you
@@ -197,6 +197,6 @@ END_CLAUSE
 } else { return '' }
 }}9. THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
 WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
-MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 
 The End

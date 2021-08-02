@@ -5,7 +5,7 @@ ansifold - fold command handling ANSI terminal sequences
 
 # VERSION
 
-Version 1.0801
+Version 1.0901
 
 # SYNOPSIS
 
@@ -18,7 +18,7 @@ ansifold \[ options \]
           --ambiguous=narrow|wide  Unicode ambiguous character handling
     -p    --paragraph              Print extra newline
           --separate=string        Set separator string (default newline)
-    -n                             Same as --separate ''
+    -n    --nonewline              Same as --separate ''
           --linebreak=mode         Line-break mode (all, runin, runout, none)
           --runin                  Run-in width (default 4)
           --runout                 Run-out width (default 4)

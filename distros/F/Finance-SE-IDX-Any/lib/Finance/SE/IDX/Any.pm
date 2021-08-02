@@ -1,9 +1,9 @@
 package Finance::SE::IDX::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-12-24'; # DATE
+our $DATE = '2021-08-01'; # DATE
 our $DIST = 'Finance-SE-IDX-Any'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -80,7 +80,7 @@ Finance::SE::IDX::Any - Get information from Indonesian Stock Exchange
 
 =head1 VERSION
 
-This document describes version 0.003 of Finance::SE::IDX::Any (from Perl distribution Finance-SE-IDX-Any), released on 2020-12-24.
+This document describes version 0.004 of Finance::SE::IDX::Any (from Perl distribution Finance-SE-IDX-Any), released on 2021-08-01.
 
 =head1 SYNOPSIS
 
@@ -103,11 +103,63 @@ a failure. Default is 4*3600 (4 hours).
 =head1 FUNCTIONS
 
 
+=head2 get_idx_daily_trading_summary
+
+Usage:
+
+ get_idx_daily_trading_summary(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+Get daily trading summary.
+
+This will retrieve end-of-day data for a single trading day, containing list of
+stock names along with their opening price, closing price, highest price, lowest
+price, volume, frequency, foreign buy & sell volume, etc.
+
+To specify date you can either specify C<date> (epoch, or YYYY-MM-DD string in
+command-line, which will be coerced to epoch) or C<day>, C<month>, C<year>.
+
+The data for still-trading current day will not be available, so if you are
+looking for intraday data, this is not it.
+
+At the time of this writing (2021-01-17), the data goes back to Jan 1st, 2015.
+If you are looking for older data, you can visit one of the financial data
+websites like Bloomberg.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<date> => I<date>
+
+=item * B<day> => I<int>
+
+=item * B<month> => I<int>
+
+=item * B<year> => I<int>
+
+
+=back
+
+Returns an enveloped result (an array).
+
+First element ($status_code) is an integer containing HTTP-like status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
+
+Return value:  (any)
+
+
+
 =head2 list_idx_boards
 
 Usage:
 
- list_idx_boards() -> [status, msg, payload, meta]
+ list_idx_boards() -> [$status_code, $reason, $payload, \%result_meta]
 
 List boards.
 
@@ -120,12 +172,12 @@ No arguments.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -135,7 +187,7 @@ Return value:  (any)
 
 Usage:
 
- list_idx_brokers() -> [status, msg, payload, meta]
+ list_idx_brokers() -> [$status_code, $reason, $payload, \%result_meta]
 
 List brokers.
 
@@ -148,12 +200,12 @@ No arguments.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -163,7 +215,7 @@ Return value:  (any)
 
 Usage:
 
- list_idx_firms(%args) -> [status, msg, payload, meta]
+ list_idx_firms(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 List firms.
 
@@ -185,12 +237,12 @@ Arguments ('*' denotes required arguments):
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -200,7 +252,7 @@ Return value:  (any)
 
 Usage:
 
- list_idx_sectors() -> [status, msg, payload, meta]
+ list_idx_sectors() -> [$status_code, $reason, $payload, \%result_meta]
 
 List sectors.
 
@@ -213,12 +265,12 @@ No arguments.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -232,7 +284,7 @@ Source repository is at L<https://github.com/perlancar/perl-Finance-SE-IDX-Any>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Finance-SE-IDX-Any/issues>
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Finance-SE-IDX-Any>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -250,7 +302,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2018 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

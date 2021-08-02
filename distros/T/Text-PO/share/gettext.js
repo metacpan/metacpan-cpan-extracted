@@ -1,7 +1,7 @@
 /*
 * ----------------------------------------------------------------------------
 * PO Files Manipulation - Text-PO/share/gettext.js
-* Version v0.1.0
+* Version v0.1.1
 * Copyright(c) 2021 DEGUEST Pte. Ltd.
 * Author: Jacques Deguest <jack@deguest.jp>
 * Created 2021/06/29
@@ -1302,6 +1302,46 @@
         },
         
         /**
+         * Returns an array reference containing the 7 days of the week in their long representation.
+         *
+         * @example
+         *     p.getDaysLong()
+         *
+         * @return {Array} Array of weekdays
+         */
+        getDaysLong: function()
+        {
+            var self = this;
+            var days = [];
+            var locale = self.locale.replace( '_', '-' );
+            for( var i = 0; i < 12; i++ )
+            {
+                days.push( new Date(0,i).toLocaleString( locale, { weekday: "long" }) );
+            }
+            return( days );
+        },
+        
+        /**
+         * Returns an array reference containing the 7 days of the week in their short representation.
+         *
+         * @example
+         *     p.getDaysShort()
+         *
+         * @return {Array} Array of weekdays
+         */
+        getDaysShort: function()
+        {
+            var self = this;
+            var days = [];
+            var locale = self.locale.replace( '_', '-' );
+            for( var i = 0; i < 12; i++ )
+            {
+                days.push( new Date(0,i).toLocaleString( locale, { weekday: "short" }) );
+            }
+            return( days );
+        },
+        
+        /**
          * Get the hash of all elements for a given domain
          *
          * @example
@@ -1586,6 +1626,71 @@
             return( this.getData({
                 responseType: 'arraybuffer',
             }) );
+        },
+        
+        // <https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toLocaleDateString>
+        /**
+         * Returns an array reference containing the 12 months in their long representation.
+         *
+         * @example
+         *     p.getMonthsLong()
+         *
+         * @return {Array} Array of months name
+         */
+        getMonthsLong: function()
+        {
+            var self = this;
+            var months = [];
+            var locale = self.locale.replace( '_', '-' );
+            for( var i = 0; i < 12; i++ )
+            {
+                months.push( new Date(0,i).toLocaleString( locale, { month: "long" }) );
+            }
+            return( months );
+        },
+        
+        /**
+         * Returns an array reference containing the 12 months in their short representation.
+         *
+         * @example
+         *     p.getMonthsShort()
+         *
+         * @return {Array} Array of months name
+         */
+        getMonthsShort: function()
+        {
+            var self = this;
+            var months = [];
+            var locale = self.locale.replace( '_', '-' );
+            for( var i = 0; i < 12; i++ )
+            {
+                months.push( new Date(0,i).toLocaleString( locale, { month: "short" }) );
+            }
+            return( months );
+        },
+        
+        /**
+         * Returns an hash reference containing the following properties:
+         *      - currency
+         *      - decimal
+         *      - int_currency
+         *      - negative_sign
+         *      - precision
+         *      - thousand
+         *
+         * @example
+         *     p.getNumericDict()
+         *
+         * @return {Object} Hash of properties
+         */
+        getNumericDict: function()
+        {
+            var self = this;
+            var def  = {};
+            var locale = self.locale.replace( '_', '-' );
+            def.thousand = self._getSeparator( locale, 'group' );
+            def.decimal  = self._getSeparator( locale, 'decimal' );
+            return( def );
         },
         
         /**
@@ -2167,7 +2272,17 @@
             {
                 console.warn( message );
             }
-        }
+        },
+        
+        _getSeparator: function(locale, separatorType)
+        {
+            var self = this;
+            const numberWithGroupAndDecimalSeparator = 1000.1;
+            return Intl.NumberFormat(locale)
+                .formatToParts(numberWithGroupAndDecimalSeparator)
+                .find(part => part.type === separatorType)
+                .value;
+        }        
     });
     window.Gettext.L10N = {};
     window.Gettext.ERROR = '';
@@ -2233,6 +2348,7 @@
         return( po.gettext( msgid ) );
     }
     
+    // XXX MOParser class
     /*
     Adapted from work by Oliver Hamlet (gettext mo parser)
     <https://github.com/Ortham/jed-gettext-parser>
@@ -2642,7 +2758,7 @@ Gettext - A GNU Gettext JavaScript implementation
 
 =head1 VERSION
 
-    v0.1.0
+    v0.1.1
 
 =head1 DESCRIPTION
 
@@ -2802,6 +2918,22 @@ This takes no argument and will check among the C<link> html tags for one with a
 
 It returns the value found. This is just a helper method and does not affect the value of the I<path> property set during object instantiation.
 
+=head2 getDaysLong
+
+Returns an array reference containing the 7 days of the week in their long representation.
+
+    var ref = po->getDaysLong();
+    // Assuming the locale is fr_FR, this would yield
+    console.log ref[0]; // dim.
+
+=head2 getDaysShort
+
+Returns an array reference containing the 7 days of the week in their short representation.
+
+    var ref = po->getDaysShort();
+    // Assuming the locale is fr_FR, this would yield
+    console.log ref[0]; // dimanche
+
 =head2 getDomainHash
 
 This takes an optional hash of parameters and return the global hash dictionary used by this class to store the localised data.
@@ -2854,6 +2986,74 @@ This is similar to L</getLocale>, except that it does a sprintf internally befor
 Provided with an uri and this will make an http query to fetch the remove C<.mp> (machine object) file.
 
 It calls L</getData> and returns a promise.
+
+=head2 getMonthsLong
+
+Returns an array reference containing the 12 months in their long representation.
+
+    var ref = po->getMonthsLong();
+    // Assuming the locale is fr_FR, this would yield
+    console.log ref[0]; // janvier
+
+=head2 getMonthsShort
+
+Returns an array reference containing the 12 months in their short representation.
+
+    var ref = po->getMonthsShort();
+    // Assuming the locale is fr_FR, this would yield
+    console.log ref[0]; // janv.
+
+=head2 getNumericDict
+
+Returns an hash reference containing the following properties:
+
+    var ref = po->getNumericDict();
+
+=over 4
+
+=item I<currency> string
+
+(This is not available in the JavaScript interface yet)
+
+Contains the usual currency symbol, such as C<€>, or C<$>, or C<¥>
+
+=item I<decimal> string
+
+Contains the character used to separate decimal. In English speaking countries, this would typically be a dot.
+
+=item I<int_currency> string
+
+(This is not available in the JavaScript interface yet)
+
+Contains the 3-letters international currency symbol, such as C<USD>, or C<EUR> or C<JPY>
+
+=item I<negative_sign> string
+
+(This is not available in the JavaScript interface yet)
+
+Contains the negative sign used for negative number
+
+=item I<precision> integer
+
+(This is not available in the JavaScript interface yet)
+
+An integer whose value represents the fractional precision allowed for monetary context.
+
+For example, in Japanese, this value would be 0 while in many other countries, it would be 2.
+
+=item I<thousand> string
+
+Contains the character used to group and separate thousands.
+
+For example, in France, it would be a space, such as :
+
+    1 000 000,00
+
+While in English countries, including Japan, it would be a comma :
+
+    1,000,000.00
+
+=back
 
 =head2 getPlural
 

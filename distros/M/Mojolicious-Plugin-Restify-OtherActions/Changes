@@ -1,6 +1,9 @@
 Changelog for Mojolicious-Plugin-Restify-OtherActions
 
-0.02 2021-07-20T07:52:45
+0.03 2021-08-02T16:41:18
+ - Update prereq version for M::P::Restify
+
+0.02 2021-07-20T07:52:28
  - Solved a bug where new route is appended to wrong node
  - [Minor] Changes to work with travis-ci.com
  - [MINOR] Add config file for travis-ci.com

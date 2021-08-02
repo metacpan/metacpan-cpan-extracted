@@ -1,9 +1,9 @@
 package Module::FeaturesUtil::Get;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-02-25'; # DATE
+our $DATE = '2021-02-26'; # DATE
 our $DIST = 'Module-FeaturesUtil-Get'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 use strict 'subs', 'vars';
 use warnings;
@@ -17,19 +17,25 @@ our @EXPORT_OK = qw(
                );
 
 sub get_feature_set_spec {
-    my ($fsetname, $load) = @_;
+    my ($fsetname, $load, $fatal_on_load_failure) = @_;
 
     my $mod = "Module::Features::$fsetname";
     if ($load) {
         (my $modpm = "$mod.pm") =~ s!::!/!g;
         eval { require $modpm; 1 };
-        last if $@;
+        if ($@) {
+            if ($fatal_on_load_failure) {
+                die $@;
+            } else {
+                return {};
+            }
+        }
     }
     return \%{"$mod\::FEATURES_DEF"};
 }
 
 sub get_features_decl {
-    my ($mod, $load) = @_;
+    my ($mod, $load, $fatal_on_load_failure) = @_;
 
     my $features_decl;
 
@@ -53,7 +59,13 @@ sub get_features_decl {
         if ($load) {
             (my $modpm = "$mod.pm") =~ s!::!/!g;
             eval { require $modpm; 1 };
-            last if $@;
+            if ($@) {
+                if ($fatal_on_load_failure) {
+                    die $@;
+                } else {
+                    return {};
+                }
+            }
         }
         $features_decl = { %{"$mod\::FEATURES"} };
         $features_decl->{"x.source"} = "pm:$mod";
@@ -99,7 +111,7 @@ Module::FeaturesUtil::Get - Get a feature
 
 =head1 VERSION
 
-This document describes version 0.003 of Module::FeaturesUtil::Get (from Perl distribution Module-FeaturesUtil-Get), released on 2021-02-25.
+This document describes version 0.004 of Module::FeaturesUtil::Get (from Perl distribution Module-FeaturesUtil-Get), released on 2021-02-26.
 
 =head1 SYNOPSIS
 

@@ -1,18 +1,3 @@
-requires "B" => "0";
-requires "Carp" => "0";
-requires "Data::Dumper" => "0";
-requires "Exporter" => "0";
-requires "Fcntl" => "0";
-requires "File::Basename" => "0";
-requires "FindBin" => "0";
-requires "IO::File" => "0";
-requires "List::Util" => "0";
-requires "Storable" => "0";
-requires "Sys::Syslog" => "0";
-requires "Test::Builder" => "0";
-requires "constant" => "0";
-requires "strict" => "0";
-requires "warnings" => "0";
 
 on 'test' => sub {
   requires "ExtUtils::MakeMaker" => "0";

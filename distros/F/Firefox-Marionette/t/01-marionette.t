@@ -29,7 +29,7 @@ if (defined $ENV{WATERFOX}) {
 }
 if ($ENV{FIREFOX_ALARM}) {
 	$SIG{ALRM} = sub { die "Alarm at time exceeded" };
-	alarm 600; # ten minutes is heaps for bulk testing
+	alarm 900; # ten minutes is heaps for bulk testing
 }
 
 my $test_time_limit = 90;
@@ -575,6 +575,9 @@ $profile->set_value('privacy.popups.disable_from_plugin', 0); # no restrictions
 $profile->set_value('security.OCSP.GET.enabled', 'false'); 
 $profile->clear_value('security.OCSP.enabled');  # just testing
 $profile->set_value('security.OCSP.enabled', 0); 
+if ($ENV{FIREFOX_BINARY}) {
+	$profile->set_value('security.sandbox.content.level', 0, 0); # https://wiki.mozilla.org/Security/Sandbox#Customization_Settings
+}
 my $correct_exit_status = 0;
 my $mozilla_pid_support;
 SKIP: {
@@ -856,7 +859,7 @@ SKIP: {
 	my $daemon = HTTP::Daemon->new(LocalAddr => 'localhost') || die "Failed to create HTTP::Daemon";
 	my $localPort = URI->new($daemon->url())->port();
 	my %proxy_parameters = (http => 'localhost:' . $localPort, https => 'proxy.example.org:4343', none => [ 'local.example.org' ], socks => 'socks.example.org:1081');
-	if ($major_version < 90) {
+	if ((defined $major_version) && ($major_version < 90)) {
 		$proxy_parameters{ftp} = 'ftp.example.org:2121';
 	}
 	my $proxy = Firefox::Marionette::Proxy->new(%proxy_parameters);
@@ -2570,7 +2573,11 @@ SKIP: {
 	ok($capabilities->timeouts()->page_load() =~ /^\d+$/, "\$capabilities->timeouts->page_load() is an integer:" . $capabilities->timeouts()->page_load());
 	ok($capabilities->timeouts()->script() =~ /^\d+$/, "\$capabilities->timeouts->script() is an integer:" . $capabilities->timeouts()->script());
 	ok($capabilities->timeouts()->implicit() =~ /^\d+$/, "\$capabilities->timeouts->implicit() is an integer:" . $capabilities->timeouts()->implicit());
-	ok($capabilities->browser_version() =~ /^\d+[.]\d+(?:[a]\d+)?([.]\d+)?$/, "\$capabilities->browser_version() is a major.minor.patch version number:" . $capabilities->browser_version());
+	if ($capabilities->browser_name() eq 'firefox') {
+		ok($capabilities->browser_version() =~ /^\d+[.]\d+(?:[a]\d+)?([.]\d+)?$/, "\$capabilities->browser_version() is a major.minor.patch version number:" . $capabilities->browser_version());
+	} else {
+		ok($capabilities->browser_version() =~ /^\d+[.]\d+(?:[a]\d+)?([.]\d+)?([.]\d+)?$/, "\$capabilities->browser_version() (non-firefox) is a major.minor.patch.whatever version number:" . $capabilities->browser_version());
+	}
 	TODO: {
 		local $TODO = ($major_version < 31) ? "\$capabilities->platform_version() may not exist for Firefox versions less than 31" : undef;
 		ok(defined $capabilities->platform_version() && $capabilities->platform_version() =~ /\d+/, "\$capabilities->platform_version() contains a number:" . ($capabilities->platform_version() || ''));
@@ -2805,7 +2812,7 @@ sub display_name {
 
 SKIP: {
 	my $proxy_host = 'all.example.org';
-	($skip_message, $firefox) = start_firefox(1, import_profile_paths => [ 't/data/logins.json' ], manual_certificate_add => 1, console => 1, debug => 0, capabilities => Firefox::Marionette::Capabilities->new(moz_headless => 0, accept_insecure_certs => 0, page_load_strategy => 'none', moz_webdriver_click => 0, moz_accessibility_checks => 0, proxy => Firefox::Marionette::Proxy->new(host => $proxy_host)), timeouts => Firefox::Marionette::Timeouts->new(page_load => 78_901, script => 76_543, implicit => 34_567));
+	($skip_message, $firefox) = start_firefox(1, import_profile_paths => [ 't/data/logins.json', 't/data/key4.db' ], manual_certificate_add => 1, console => 1, debug => 0, capabilities => Firefox::Marionette::Capabilities->new(moz_headless => 0, accept_insecure_certs => 0, page_load_strategy => 'none', moz_webdriver_click => 0, moz_accessibility_checks => 0, proxy => Firefox::Marionette::Proxy->new(host => $proxy_host)), timeouts => Firefox::Marionette::Timeouts->new(page_load => 78_901, script => 76_543, implicit => 34_567));
 	if (!$skip_message) {
 		$at_least_one_success = 1;
 	}
@@ -2816,7 +2823,12 @@ SKIP: {
 	my $profile_directory = $firefox->profile_directory();
 	ok($profile_directory, "\$firefox->profile_directory() returns $profile_directory");
 	my $possible_logins_path = File::Spec->catfile($profile_directory, 'logins.json');
-	ok(-e $possible_logins_path, "There is a (imported) logins.json file in the profile directory");
+	unless ($ENV{FIREFOX_HOST}) {
+		ok(-e $possible_logins_path, "There is a (imported) logins.json file in the profile directory");
+	}
+	if ($major_version > 56) {
+		ok(scalar $firefox->logins() == 1, "\$firefox->logins() shows the correct number (1) of records (including recent import):" . scalar $firefox->logins());
+	}
 	my $capabilities = $firefox->capabilities();
 	ok((ref $capabilities) eq 'Firefox::Marionette::Capabilities', "\$firefox->capabilities() returns a Firefox::Marionette::Capabilities object");
         ok($capabilities->timeouts()->page_load() == 78_901, "\$firefox->capabilities()->timeouts()->page_load() correctly reflects the timeouts shortcut timeout");
@@ -2942,7 +2954,15 @@ _CERT_
 		foreach my $certificate (sort { display_name($a) cmp display_name($b) } $firefox->certificates()) {
 			ok($certificate, "Found the " . Encode::encode('UTF-8', display_name($certificate)) . " from the certificate database");
 			ok($firefox->certificate_as_pem($certificate) =~ /BEGIN[ ]CERTIFICATE.*MII.*END[ ]CERTIFICATE\-+\s$/smx, Encode::encode('UTF-8', display_name($certificate)) . " looks like a PEM encoded X.509 certificate");
-			ok(ref $firefox->delete_certificate($certificate) eq $class, "Deleted " . Encode::encode('UTF-8', display_name($certificate)) . " from the certificate database");
+			my $delete_class;
+			eval {
+				$delete_class = $firefox->delete_certificate($certificate);
+			} or do {
+				diag("\$firefox->delete_certificate() threw exeception:$@");
+			};
+			if (($ENV{RELEASE_TESTING}) || (defined $delete_class)) {
+				ok(ref $delete_class eq $class, "Deleted " . Encode::encode('UTF-8', display_name($certificate)) . " from the certificate database");
+			}
 			if ($certificate->is_ca_cert()) {
 				ok(1, Encode::encode('UTF-8', display_name($certificate)) . " is a CA cert");
 			} else {
@@ -3129,12 +3149,7 @@ SKIP: {
 		alarm 0;
 		ok($maximise, "\$firefox->maximise()");
 	}
-	if (($ENV{FIREFOX_HOST}) && ($ENV{FIREFOX_HOST} ne 'localhost')) {
-		SKIP: {
-			skip("Not testing dead firefox processes with ssh", 2);	
-		}
-		ok($firefox->quit() == $correct_exit_status, "Firefox has closed with an exit status of $correct_exit_status:" . $firefox->child_error());
-	} elsif (($ENV{FIREFOX_HOST}) && ($ENV{FIREFOX_HOST} eq 'localhost') && ($ENV{FIREFOX_PORT})) {
+	if ($ENV{FIREFOX_HOST}) {
 		SKIP: {
 			skip("Not testing dead firefox processes with ssh", 2);	
 		}

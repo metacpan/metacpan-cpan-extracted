@@ -14,13 +14,15 @@ use JSONSchema::Validator::Util 'json_decode';
 
 use parent 'JSONSchema::Validator::Draft4';
 
-use constant ID => '';
+use constant SPECIFICATION => 'OAS30';
+use constant ID => 'https://spec.openapis.org/oas/3.0/schema/2019-04-02';
+use constant ID_FIELD => '';
 
 sub new {
     my ($class, %params) = @_;
 
     $params{using_id_with_ref} = 0;
-    my $self = $class->SUPER::new(%params);
+    my $self = $class->create(%params);
 
     my $validate_deprecated = $params{validate_deprecated} // 1;
     $self->{validate_deprecated} = $validate_deprecated;
@@ -36,17 +38,17 @@ sub validate_deprecated { shift->{validate_deprecated} }
 sub validate_schema {
     my ($self, $instance, %params) = @_;
 
-    my $schema = $params{schema} || $self->schema;
+    my $schema = $params{schema} // $self->schema;
     my $instance_path = $params{instance_path} // '/';
     my $schema_path = $params{schema_path} // '/';
     my $direction = $params{direction};
     my $scope = $params{scope};
 
     croak 'param "direction" is required' unless $direction;
-    croak '"direction" must have one of values: request, response'
+    croak '"direction" must have one of values: "request", "response"'
         if $direction ne 'request' && $direction ne 'response';
 
-    croak 'No schema specified' unless $schema;
+    croak 'No schema specified' unless defined $schema;
 
     push @{$self->scopes}, $scope if $scope;
 
@@ -381,11 +383,10 @@ JSONSchema::Validator::OAS30 - Validator for OpenAPI Specification 3.0
 
 =head1 VERSION
 
-version 0.002
+version 0.004
 
 =head1 SYNOPSIS
 
-    # to get OpenAPI validator of schema in YAML format
     $validator = JSONSchema::Validator::OAS30->new(schema => {...});
     my ($result, $errors, $warnings) = $validator->validate_request(
         method => 'GET',
@@ -434,7 +435,7 @@ Creates JSONSchema::Validator::OAS30 object.
 
 =head4 schema
 
-Scheme according to which validation occures.
+Scheme according to which validation occurs.
 
 =head4 strict
 
@@ -468,9 +469,9 @@ HTTP method of request.
 
 =head4 openapi_path
 
-Openapi path of request.
+OpenAPI path of request.
 
-Need to specify openapi path, not the real path of request.
+Need to specify OpenAPI path, not the real path of request.
 
 =head4 parameters
 
@@ -518,9 +519,9 @@ HTTP method of request.
 
 =head4 openapi_path
 
-Openapi path of request.
+OpenAPI path of request.
 
-Need to specify openapi path, not the real path of request.
+Need to specify OpenAPI path, not the real path of request.
 
 =head4 status
 

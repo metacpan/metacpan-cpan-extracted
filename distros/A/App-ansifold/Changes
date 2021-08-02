@@ -1,5 +1,14 @@
 Revision history for `ansifold' command.
 
+1.0901 2021-08-01T14:07:13Z
+
+    - Update to use new Getopt::EX::Hashed interface.
+
+1.09 2021-07-29T13:36:29Z
+
+    - Update to use Getopt::EX::Hashed.
+    - Introduce --nonewline as an alias for -n.
+
 1.0801 2021-04-26T08:13:50Z
 
     - Remove uninitialized variable error.

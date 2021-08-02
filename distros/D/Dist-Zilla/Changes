@@ -1,5 +1,11 @@
 Revision history for Dist-Zilla
 
+6.024     2021-08-01 15:38:44-04:00 America/New_York
+        - pass the dist name to Software::License as the program name
+          (thanks, Van de Bugger!)
+        - create the ArchiveBuilder role for building the archive file
+          (thanks, Graham Ollis!)
+
 6.023     2021-07-06 21:37:37-04:00 America/New_York
         - tweak the autoprereqs tests to avoid failing when List::MoreUtils
           (which DZ does not actually need) is not installed)

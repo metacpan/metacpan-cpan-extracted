@@ -1,0 +1,71 @@
+NAME
+    Regexp::Pattern::Email - Regexp patterns related to email
+
+VERSION
+    This document describes version 0.001 of Regexp::Pattern::Email (from
+    Perl distribution Regexp-Pattern-Email), released on 2021-08-01.
+
+SYNOPSIS
+     use Regexp::Pattern; # exports re()
+     my $re = re("Email::email_address");
+
+DESCRIPTION
+    Regexp::Pattern is a convention for organizing reusable regex patterns.
+
+REGEXP PATTERNS
+    *   email_address
+
+        Email address (RFC 2822).
+
+        Currently uses pattern produced by Email::Address.
+
+        Examples:
+
+        Empty.
+
+         "" =~ re("Email::email_address");  # DOESN'T MATCH
+
+        Example #2.
+
+         "foo\@example.com" =~ re("Email::email_address");  # matches
+
+        Not strict enough for most cases.
+
+         "foo\@example!.com" =~ re("Email::email_address");  # matches
+
+        Contains whitespace.
+
+         "foo\@exam ple.com" =~ re("Email::email_address");  # DOESN'T MATCH
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Regexp-Pattern-Email>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Regexp-Pattern-Email>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Regexp-Pattern-Email>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Email::Address, Regexp::Common::Email::Address
+
+    Regexp::Pattern
+
+    Some utilities related to Regexp::Pattern: App::RegexpPatternUtils,
+    rpgrep from App::rpgrep.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2021 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

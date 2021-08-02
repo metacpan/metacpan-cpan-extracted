@@ -1,5 +1,12 @@
 Revision history for JSONSchema-Validator
 
+0.004  2021-08-02
+    - add json schema draft7 validator
+
+0.003  2021-08-01
+    - Fix error "eval-group at runtime" in regexp
+    - add json schema draft6 validator
+
 0.002  2021-07-22
     - Fix bug with import JSON::PP
 

@@ -18,7 +18,7 @@ if( $helpme ){
   exit 0;
 }
 sub usage {
-  print "-p | --path - Path to liblouis table files.\n";
+  print "-p | --path - Path to liblouis table files. Default: /usr/share/liblouis/tables.\n";
   print "-f | --from - The liblouis display table to convert from.\n";
   print "-t | --to - The liblouis display table to convert to.\n";
   print "-h | --help - This help screen.\n";
@@ -40,7 +40,7 @@ brl2brl - Converts between braille character sets found in liblouis.
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =head1 DESCRIPTION
 
@@ -63,7 +63,7 @@ Artistic
 
 Using C<cpan>:
 
-  $ cpan App::brl2brl
+  $ cpan App::Brl2Brl
 
 Manual install:
 

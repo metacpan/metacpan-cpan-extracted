@@ -1,6 +1,6 @@
 package TOML::Tiny::Grammar;
 # ABSTRACT: exports regex definitions used to parse TOML source
-$TOML::Tiny::Grammar::VERSION = '0.13';
+$TOML::Tiny::Grammar::VERSION = '0.14';
 use strict;
 use warnings;
 use v5.18;
@@ -12,6 +12,7 @@ our @EXPORT = qw(
   $CRLF
   $EOL
   $Comment
+  $NonASCII
 
   $BareKey
   $QuotedKey
@@ -31,6 +32,7 @@ our @EXPORT = qw(
   $Date
   $Time
   $DateTime
+  $TimeOffset
 
   $Hex
   $Oct
@@ -42,66 +44,85 @@ our @EXPORT = qw(
   $SpecialFloat
 );
 
-our $WS      = qr/[\x20\x09]/;     # space, tab
-our $CRLF    = qr/\x0D?\x0A/;      # cr? lf
-our $Comment = qr/\x23.*/;         # #comment
-our $EOL     = qr/$Comment?$CRLF/; # crlf or comment + crlf
+#-------------------------------------------------------------------------------
+# Primitives
+#-------------------------------------------------------------------------------
+our $WS          = qr/[\x20\x09]/;          # space, tab
+our $CRLF        = qr/\x0D?\x0A/;           # cr? lf
+our $CommentChar = qr/(?>[^[:cntrl:]]|\t)/; # non-control chars other than tab
+our $Comment     = qr/\x23$CommentChar*/;   # #comment
+our $EOL         = qr/$Comment?$CRLF/;      # crlf or comment + crlf
+our $Boolean     = qr/\b(?:true)|(?:false)\b/;
+our $NonASCII    = qr/[\x80-\x{D7FF}\x{E000}-\x{10FFFF}]/;
 
+#-------------------------------------------------------------------------------
+# Strings
+#-------------------------------------------------------------------------------
 our $Escape = qr{
   \x5C                       # leading \
   (?>
-      [\x5C"btnfr]           # escapes: \\ \" \b \t \n \f \r
+      [\x5C"btfnr]           # escapes: \\ \" \b \t \n \f \r
     | (?> u [_0-9a-fA-F]{4}) # unicode (4 bytes)
     | (?> U [_0-9a-fA-F]{8}) # unicode (8 bytes)
   )
 }x;
 
-our $StringLiteral = qr/'[^']*'/; # single quoted string (no escaped chars allowed)
+our $LiteralChar            = qr{ [\x09\x20-\x26\x28-\x7E] | $NonASCII }x;
+our $StringLiteral          = qr{ ' (?: $LiteralChar )* ' }x;
 
-our $MultiLineStringLiteral = qr{
-  '''                     # opening triple-quote
-  (?> [^'] | '{1,2} )*?
-  '''                     # closing triple-quote
-}x;
+our $MLLChar                = qr{ [\x09\x20-\x26\x28-\x7E] | $NonASCII }x;
+our $MLLContent             = qr{ $MLLChar | $CRLF }x;
+our $MLLQuotes              = qr{ '{1,2} }x;
+our $MLLBody                = qr{ $MLLContent* (?: $MLLQuotes | $MLLContent{0,1} )*?  $MLLQuotes?  }x;
+our $MultiLineStringLiteral = qr{ ''' (?: $CRLF? $MLLBody ) ''' }x;
 
-our $BasicString = qr{
-    "                       # opening quote
-    (?>                     # escape sequences or any char except " or \
-        [^"\\]
-      | $Escape
-    )*
-    "                       # closing quote
-}x;
+our $BasicChar              = qr{ $WS | [\x21\x23-\x5B\x5D-\x7E] | $NonASCII | $Escape }x;
+our $BasicString            = qr{ " (?: $BasicChar )* " }x;
 
-our $MultiLineString = qr{
-  """                       # opening triple-quote
-  (?>
-      [^"\\]
-    | "{1,2}                # 1-2 quotation marks
-    | $Escape               # escape
-    | (?: \\ $CRLF)         # backslash-terminated line
-  )*?
-  """                       # closing triple-quote
-}x;
+our $MLBEscapedNL           = qr{ \x5c $WS* $CRLF (?: $WS | $CRLF)* }x;
+our $MLBUnescaped           = qr{ $WS | [\x21\x23-\x5B\x5D-\x7E] | $NonASCII }x;
+our $MLBQuotes              = qr{ "{1,2} }x;
+our $MLBChar                = qr{ $MLBUnescaped | $Escape }x;
+our $MLBContent             = qr{ $MLBChar | $CRLF | $MLBEscapedNL }x;
+our $MLBasicBody            = qr{ $MLBContent* (?: $MLBQuotes | $MLBContent{0,1} )*? $MLBQuotes? }x;
+our $MultiLineString        = qr{ """ $CRLF? $MLBasicBody """ }x;
 
-our $String = qr/$MultiLineString | $BasicString | $MultiLineStringLiteral | $StringLiteral/x;
+our $String                 = qr/$MultiLineString | $BasicString | $MultiLineStringLiteral | $StringLiteral/x;
 
-our $BareKey   = qr/[-_a-zA-Z0-9]+/;
+#-------------------------------------------------------------------------------
+# Keys
+#-------------------------------------------------------------------------------
+our $BareKey   = qr/[-_\p{PosixAlnum}]+/;
 our $QuotedKey = qr/$BasicString|$StringLiteral/;
-our $SimpleKey = qr/$BareKey|$QuotedKey/;
-our $DottedKey = qr/$SimpleKey(?:\.$SimpleKey)+/;
-our $Key       = qr/$BareKey|$QuotedKey|$DottedKey/;
+our $SimpleKey = qr/$QuotedKey|$BareKey/;
+our $DottedKey = qr/$SimpleKey (?: $WS* \. $WS* $SimpleKey)+/x;
+our $Key       = qr{ (?: $DottedKey | $SimpleKey ) }x;
 
-our $Boolean   = qr/\b(?:true)|(?:false)\b/;
 
 #-----------------------------------------------------------------------------
 # Dates (RFC 3339)
 #   1985-04-12T23:20:50.52Z
 #-----------------------------------------------------------------------------
-our $Date     = qr/\d{4}-\d{2}-\d{2}/;
-our $Offset   = qr/(?: [-+] \d{2}:\d{2} ) | Z/x;
-our $Time     = qr/\d{2}:\d{2}:\d{2} (?: \. \d+)? $Offset?/x;
-our $DateTime = qr/(?> $Date (?> [T ] $Time )?) | $Time/x;
+our $DateFullYear   = qr{ \d{4} }x;
+our $DateMonth      = qr{ (?: 01 | 02 | 03 | 04 | 05 | 06 | 07 | 08 | 09 | 10 | 11 | 12 ) }x;
+our $DateDay        = qr{ (?: 01 | 02 | 03 | 04 | 05 | 06 | 07 | 08 | 09 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21 | 22 | 23 | 24 | 25 | 26 | 27 | 28 | 29 | 30 | 31 ) }x;
+our $TimeDelim      = qr{ (?: [tT] | \x20 ) }x;
+our $TimeHour       = qr{ (?: 00 | 01 | 02 | 03 | 04 | 05 | 06 | 07 | 08 | 09 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21 | 22 | 23 ) }x;
+our $TimeMinute     = qr{ (?: 00 | 01 | 02 | 03 | 04 | 05 | 06 | 07 | 08 | 09 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21 | 22 | 23 | 24 | 25 | 26 | 27 | 28 | 29 | 30 | 31 | 32 | 33 | 34 | 35 | 36 | 37 | 38 | 39 | 40 | 41 | 42 | 43 | 44 | 45 | 46 | 47 | 48 | 49 | 50 | 51 | 52 | 53 | 54 | 55 | 56 | 57 | 58 | 59 ) }x;
+our $TimeSecond     = qr{ (?: 00 | 01 | 02 | 03 | 04 | 05 | 06 | 07 | 08 | 09 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21 | 22 | 23 | 24 | 25 | 26 | 27 | 28 | 29 | 30 | 31 | 32 | 33 | 34 | 35 | 36 | 37 | 38 | 39 | 40 | 41 | 42 | 43 | 44 | 45 | 46 | 47 | 48 | 49 | 50 | 51 | 52 | 53 | 54 | 55 | 56 | 57 | 58 | 59 | 60 ) }x; # may be 60 during leap second
+our $TimeSecFrac    = qr{ \. \d+ }x;
+our $TimeNumOffset  = qr{ (?: [-+] $TimeHour : $TimeMinute ) }x;
+our $TimeOffset     = qr{ (?: [zZ] | $TimeNumOffset ) }x;
+
+our $PartialTime    = qr{ (?: $TimeHour : $TimeMinute : $TimeSecond $TimeSecFrac? ) }x;
+our $FullTime       = qr{ (?: $PartialTime $TimeOffset ) }x;
+our $FullDate       = qr{ (?: $DateFullYear - $DateMonth - $DateDay ) }x;
+
+our $OffsetDateTime = qr{ (?: $FullDate $TimeDelim $FullTime ) }x;
+our $LocalDateTime  = qr{ (?: $FullDate $TimeDelim $PartialTime ) }x;
+our $LocalDate      = qr{ (?: $FullDate ) }x;
+our $LocalTime      = qr{ (?: $PartialTime ) }x;
+our $DateTime       = qr{ (?: $OffsetDateTime | $LocalDateTime | $LocalDate | $LocalTime ) }x;
 
 #-----------------------------------------------------------------------------
 # Integer
@@ -122,9 +143,16 @@ our $Integer      = qr/$Hex | $Oct | $Bin | $Dec/x;
 #-----------------------------------------------------------------------------
 # Float
 #-----------------------------------------------------------------------------
-our $Exponent     = qr/[eE] $Dec/x;
-our $SpecialFloat = qr/[-+]? (?: (?:inf) | (?:nan) )/x;
+our $SpecialFloat = qr/[-+]? (?: (?:inf) | (?:nan) | (?:NaN) )/x;
 our $Fraction     = qr/\. $DecChar (?> _? $DecChar)*/x;
+
+our $Exponent = qr{
+  [eE]
+  (?>
+      $Zero+  # dec matches only one zero, but toml exponents apparently accept e00
+    | $Dec
+  )
+}x;
 
 our $Float = qr{
     (?> $Dec (?> (?> $Fraction $Exponent?) | $Exponent ) )
@@ -146,7 +174,7 @@ TOML::Tiny::Grammar - exports regex definitions used to parse TOML source
 
 =head1 VERSION
 
-version 0.13
+version 0.14
 
 =head1 SYNOPSIS
 

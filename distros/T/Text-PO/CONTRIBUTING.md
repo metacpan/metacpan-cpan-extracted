@@ -43,7 +43,7 @@ Issues are currently reported using CPAN [bug tracker](https://git.deguest.jp/ja
 
 ## More information
 
-Please refer to the [README](https://metacpan.org/source/JDEGUEST/Text-PO-v0.1.2/README.md)
+Please refer to the [README](https://metacpan.org/source/JDEGUEST/Text-PO-v0.1.4/README.md)
 
 ## Author
 

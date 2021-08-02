@@ -4,7 +4,7 @@ use Carp;
 
 package Software::LicenseUtils;
 # ABSTRACT: little useful bits of code for licensey things
-$Software::LicenseUtils::VERSION = '0.103014';
+$Software::LicenseUtils::VERSION = '0.104001';
 use File::Spec;
 use IO::Dir;
 use Module::Load;
@@ -14,8 +14,10 @@ use Module::Load;
 #pod   my @guesses = Software::LicenseUtils->guess_license_from_pod($pm_text);
 #pod
 #pod Given text containing POD, like a .pm file, this method will attempt to guess
-#pod at the license under which the code is available.  This method will either
-#pod a list of Software::License classes (or instances) or false.
+#pod at the license under which the code is available.  This method will return
+#pod either a list of Software::License classes names (as strings) or false.
+#pod
+#pod This method looks for a POD heading like 'license', 'copyright', or 'legal'.
 #pod
 #pod Calling this method in scalar context is a fatal error.
 #pod
@@ -49,6 +51,7 @@ my @phrases = (
   'MIT'                        => 'MIT',
   'has dedicated the work to the Commons' => 'CC0_1_0',
   'waiving all of his or her rights to the work worldwide under copyright law' => 'CC0_1_0',
+  'has waived all copyright and related or neighboring rights to' => 'CC0_1_0',
 );
 
 my %meta_keys  = ();
@@ -216,7 +219,7 @@ sub new_from_short_name {
   Carp::croak "no license short name specified"
     unless defined $arg->{short_name};
   my $short = delete $arg->{short_name};
-  Carp::croak "Unknow license with short name $short"
+  Carp::croak "Unknown license with short name $short"
     unless $short_name{$short};
 
   my $lic_file = my $lic_class = $short_name{$short} ;
@@ -246,7 +249,7 @@ sub new_from_spdx_expression {
   Carp::croak "no license spdx name specified"
     unless defined $arg->{spdx_expression};
   my $spdx = delete $arg->{spdx_expression};
-  Carp::croak "Unknow license with spdx name $spdx"
+  Carp::croak "Unknown license with spdx name $spdx"
     unless $spdx_expression{$spdx};
 
   my ($lic_file) = my ($lic_class) = keys %{$spdx_expression{$spdx}} ;
@@ -269,7 +272,7 @@ Software::LicenseUtils - little useful bits of code for licensey things
 
 =head1 VERSION
 
-version 0.103014
+version 0.104001
 
 =head1 METHODS
 
@@ -278,8 +281,10 @@ version 0.103014
   my @guesses = Software::LicenseUtils->guess_license_from_pod($pm_text);
 
 Given text containing POD, like a .pm file, this method will attempt to guess
-at the license under which the code is available.  This method will either
-a list of Software::License classes (or instances) or false.
+at the license under which the code is available.  This method will return
+either a list of Software::License classes names (as strings) or false.
+
+This method looks for a POD heading like 'license', 'copyright', or 'legal'.
 
 Calling this method in scalar context is a fatal error.
 
@@ -325,11 +330,11 @@ Known spdx license identifiers are C<BSD>, C<MPL-1.0>.
 
 =head1 AUTHOR
 
-Ricardo Signes <rjbs@cpan.org>
+Ricardo Signes <rjbs@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Ricardo Signes.
+This software is copyright (c) 2021 by Ricardo Signes.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

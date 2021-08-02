@@ -21,7 +21,12 @@ my $SEARCH_ID = {
         additionalItems => 1,
         items => 1,
         additionalProperties => 1,
-        not => 1
+        not => 1,
+        propertyNames => 1,
+        contains => 1,
+        if => 1,
+        then => 1,
+        else => 1
     },
     kv_value => {
         properties => 1,
@@ -40,8 +45,11 @@ my $SEARCH_ID = {
 sub new {
     my ($class, %params) = @_;
 
-    my $validator   = $params{validator} || croak 'URIResolver: validator must be specified';
-    my $schema      = $params{schema} || croak 'URIResolver: schema must be specified';
+    croak 'URIResolver: validator must be specified' unless $params{validator};
+    croak 'URIResolver: schema must be specified' unless defined $params{schema};
+
+    my $validator   = $params{validator};
+    my $schema      = $params{schema};
     my $base_uri    = $params{base_uri} // '';
 
     my $scheme_handlers     = $params{scheme_handlers} // {};
@@ -63,7 +71,7 @@ sub new {
         $self->{cache}{$base_uri} = $schema;
     }
 
-    $self->cache_id(URI->new($base_uri), $schema) if $validator->using_id_with_ref;
+    $self->cache_id(URI->new($base_uri), $schema) if $validator->using_id_with_ref && ref $schema eq 'HASH';
 
     return $self;
 }
@@ -154,8 +162,8 @@ sub cache_id_dfs {
     my ($self, $schema, $scopes) = @_;
     return unless ref $schema eq 'HASH';
 
-    if (exists $schema->{$self->validator->ID} && !ref $schema->{$self->validator->ID}) {
-        my $id = URI->new($schema->{$self->validator->ID});
+    if (exists $schema->{$self->validator->ID_FIELD} && !ref $schema->{$self->validator->ID_FIELD}) {
+        my $id = URI->new($schema->{$self->validator->ID_FIELD});
         my $scope = $scopes->[-1];
 
         $id = ($scope && $scope->as_string) ? $id->abs($scope) : $id;
@@ -185,7 +193,7 @@ sub cache_id_dfs {
         }
     }
 
-    if (exists $schema->{$self->validator->ID} && !ref $schema->{$self->validator->ID}) {
+    if (exists $schema->{$self->validator->ID_FIELD} && !ref $schema->{$self->validator->ID_FIELD}) {
         pop @$scopes;
     }
 }
@@ -204,7 +212,7 @@ JSONSchema::Validator::URIResolver - URI resolver
 
 =head1 VERSION
 
-version 0.002
+version 0.004
 
 =head1 AUTHORS
 

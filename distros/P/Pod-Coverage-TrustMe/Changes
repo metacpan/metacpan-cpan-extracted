@@ -1,0 +1,15 @@
+Revision history for Pod-Coverage-TrustMe
+
+0.001002 - 2021-08-01
+  - release as stable
+  - remove unused _CvGV method which was explicitly documented as not existing
+  - fix covered and uncovered methods to return empty lists when no symbols
+    are present
+  - ignore all subs that are not identifiers. they are not callable with
+    normal syntax, so they should only be for internal use.
+  - internal refactoring for easier extension
+  - rename trust_imported to ignore_imported since the imported subs are
+    excluded from the symbol list, not included in the covered list
+
+0.001_001 - 2021-04-07
+  - initial release

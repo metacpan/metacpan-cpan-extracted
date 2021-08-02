@@ -24,7 +24,7 @@ subtest "v1.1" => sub {
 subtest "v1.2 (autoencoding of binary result)" => sub {
     my $srv = Perinci::Access::Simple::Server::Pipe->new;
     $srv->req({v=>1.2, action=>"call",
-               uri=>"/Perinci/Examples/test_binary", args=>{}});
+               uri=>"/Perinci/Examples/binary", args=>{}});
     $srv->handle;
     my ($stdout, undef, $exit) = capture { $srv->send_response() };
     my $exp_output = q(j[200,"OK","AAAA",{"riap.result_encoding":"base64","riap.v":1.2,"x.hint.result_binary":1}])."\015\012";

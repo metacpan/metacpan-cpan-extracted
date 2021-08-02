@@ -1,3 +1,13 @@
+0.005   2021-08-01  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] D'oh, wrong list assignment.
+
+
+0.004   2021-08-01  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] The Test::Random* color themes contained 0-1 item only.
+
+
 0.003   2020-06-13  Released-By: PERLANCAR; Urgency: medium
 
 	- Add themes: Test::RandomANSI16, Test::RandomANSI256.

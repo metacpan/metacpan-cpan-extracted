@@ -3,7 +3,7 @@ use utf8;
 use Moose;
 use XML::LibXML::Reader;
 
-our $VERSION = '1.0';
+our $VERSION = '1.01';
 
 #======================================================================
 # ATTRIBUTES

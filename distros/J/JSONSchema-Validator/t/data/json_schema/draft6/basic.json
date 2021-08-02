@@ -1,0 +1,164 @@
+[
+    {
+        "subject": "type",
+        "schema": {
+            "type": "integer"
+        },
+        "tests": [
+            {
+                "description": "integer with zero fraction part",
+                "data": -12.0,
+                "valid": true
+            },
+            {
+                "description": "integer with non zero fraction part",
+                "data": 7.4,
+                "valid": false
+            },
+            {
+                "description": "integer zero",
+                "data": 0.0,
+                "valid": true
+            }
+        ]
+    },
+
+    {
+        "subject": "exclusiveMaximum",
+        "schema": {
+            "exclusiveMaximum": 10.3
+        },
+        "tests": [
+            {
+                "description": "10.2 < 10.3",
+                "data": 10.2,
+                "valid": true
+            },
+            {
+                "description": "10.3 < 10.3",
+                "data": 10.3,
+                "valid": false
+            },
+            {
+                "description": "10.4 < 10.3",
+                "data": 10.4,
+                "valid": false
+            }
+        ]
+    },
+
+    {
+        "subject": "exclusiveMinimum",
+        "schema": {
+            "exclusiveMinimum": 10.3
+        },
+        "tests": [
+            {
+                "description": "10.4 > 10.3",
+                "data": 10.4,
+                "valid": true
+            },
+            {
+                "description": "10.3 > 10.3",
+                "data": 10.3,
+                "valid": false
+            },
+            {
+                "description": "10.2 > 10.3",
+                "data": 10.2,
+                "valid": false
+            }
+        ]
+    },
+
+    {
+        "subject": "propertyNames",
+        "schema": {
+            "propertyNames": {
+                "pattern" : "^[0-7]\\w*$"
+            }
+        },
+        "tests": [
+            {
+                "description": "valid pattern",
+                "data": {
+                    "5qwe" : 12,
+                    "3" : "string"
+                },
+                "valid": true
+            },
+            {
+                "description": "not valid pattern",
+                "data": {
+                    "7qwe" : 12,
+                    "8" : "string"
+                },
+                "valid": false
+            }
+        ]
+    },
+
+    {
+        "subject": "contains",
+        "schema": {
+            "contains" : {
+                "exclusiveMaximum" : 12
+            }
+        },
+        "tests": [
+            {
+                "description": "valid",
+                "data": [-7, 12, 13],
+                "valid": true
+            },
+            {
+                "description": "not valid",
+                "data": [12, 13, 14],
+                "valid": false
+            }
+        ]
+    },
+
+    {
+        "subject": "const",
+        "schema": {
+            "const" : [{"qwe": "asd", "12": 4}, {"13": 5, "asd": "efg"}]
+        },
+        "tests": [
+            {
+                "description": "valid",
+                "data": [{"qwe": "asd", "12": 4}, {"13": 5, "asd": "efg"}],
+                "valid": true
+            },
+            {
+                "description": "not valid",
+                "data": [{"qwe": "asd", "12": 5}, {"13": 5, "asd": "efg"}],
+                "valid": false
+            }
+        ]
+    },
+
+    {
+        "subject": "schema is true",
+        "schema": true,
+        "tests": [
+            {
+                "description": "valid",
+                "data": [1, 2, 3],
+                "valid": true
+            }
+        ]
+    },
+
+    {
+        "subject": "schema is false",
+        "schema": false,
+        "tests": [
+            {
+                "description": "not valid",
+                "data": [1, 2, 3],
+                "valid": false
+            }
+        ]
+    }
+]

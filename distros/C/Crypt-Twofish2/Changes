@@ -1,5 +1,9 @@
 Revision history for Perl extension Crypt::Twofish2
 
+1.03 Sun Aug  1 20:09:18 CEST 2021
+	- fix array out of bounds error in twofish reference implementation
+          (which, weirdly enough, seemed to have been deliberate).
+
 1.02 Wed Dec  1 03:10:32 CET 2010
 	- make all twofish functions static to avoid namespace issues
           when statically linking perl.

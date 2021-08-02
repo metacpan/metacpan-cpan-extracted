@@ -4,7 +4,7 @@ use warnings;
 use Net::TinyERP::NotaFiscal;
 use Net::TinyERP::NotaFiscalServicos;
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 sub new {
     my ($class, @params) = @_;
@@ -128,7 +128,7 @@ L<Net::TinyERP::NotaFiscalServicos>.
 
 =head1 COPYRIGHT e LICENÇA
 
-Copyright (c) 2016-2019 - Breno G. de Oliveira C<< garu at cpan.org >>.
+Copyright (c) 2016-2021 - Breno G. de Oliveira C<< garu at cpan.org >>.
 Todos os direitos reservados.
 
 Este módulo é software livre; você pode redistribuí-lo e/ou modificá-lo sob os mesmos

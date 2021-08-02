@@ -3,7 +3,7 @@ package Dist::Inkt;
 use 5.010001;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.025';
+our $VERSION   = '0.026';
 
 use Moose;
 use Module::Metadata;
@@ -295,8 +295,7 @@ sub BuildTarball
 	for ($rule->all($root))
 	{
 		my $abs = path($_);
-		$tar->add_files($abs);
-		$tar->rename(substr("$abs", 1), "$pfx/".$abs->relative($root));
+		$tar->add_data( "$pfx/" . $abs->relative($root), $abs->slurp );
 	}
 	
 	$tar->write($file, Archive::Tar::COMPRESS_GZIP());

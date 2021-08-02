@@ -1,0 +1,34 @@
+---
+abstract: 'Pod::Coverage but more powerful'
+author:
+  - 'haarg - Graham Knop (cpan:HAARG) <haarg@haarg.org>'
+build_requires:
+  Test::More: '0.88'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Pod-Coverage-TrustMe
+no_index:
+  directory:
+    - t
+    - xt
+requires:
+  Carp: '0'
+  Cwd: '0'
+  File::Find: '0'
+  File::Spec: '0'
+  Getopt::Long: '0'
+  Pod::Simple: '0'
+  Test::Builder: '0'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Pod-Coverage-TrustMe
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/haarg/Pod-Coverage-TrustMe.git
+version: '0.001002'
+x_authority: cpan:HAARG
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

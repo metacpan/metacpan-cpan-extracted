@@ -8,7 +8,7 @@ use RxPerl::Subscription;
 
 use Scalar::Util 'weaken';
 
-our $VERSION = "v6.7.1";
+our $VERSION = "v6.8.0";
 
 sub new {
     my ($class, $source, $subject_factory) = @_;
@@ -42,7 +42,7 @@ sub connect {
 
     $self->{_subjects_subscription} = RxPerl::Subscription->new;
     weaken(my $weak_self = $self);
-    $self->{_subjects_subscription}->add_dependents(sub {
+    $self->{_subjects_subscription}->add(sub {
         if (defined $weak_self) {
             $weak_self->{_connected} = 0;
             $weak_self->{_subjects_subscription} = undef;

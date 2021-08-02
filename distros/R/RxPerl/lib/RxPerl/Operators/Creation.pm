@@ -16,12 +16,12 @@ use Exporter 'import';
 our @EXPORT_OK = qw/
     rx_behavior_subject rx_combine_latest rx_concat rx_defer rx_EMPTY
     rx_fork_join rx_from rx_from_event rx_from_event_array rx_interval
-    rx_merge rx_NEVER rx_observable rx_of rx_race rx_replay_subject
-    rx_subject rx_throw_error rx_timer
+    rx_merge rx_NEVER rx_observable rx_of rx_partition rx_race
+    rx_replay_subject rx_subject rx_throw_error rx_timer
 /;
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
-our $VERSION = "v6.7.1";
+our $VERSION = "v6.8.0";
 
 sub rx_observable;
 
@@ -41,7 +41,7 @@ sub rx_combine_latest {
         my @latest_values;
         my $num_active = @$sources;
 
-        $subscriber->subscription->add_dependents(
+        $subscriber->subscription->add(
             \%own_subscriptions, sub { undef @$sources },
         );
 
@@ -108,7 +108,7 @@ sub rx_concat {
         my @sources = @sources;
 
         my @active;
-        $subscriber->subscription->add_dependents(
+        $subscriber->subscription->add(
             \@active, sub { undef @sources },
         );
 
@@ -165,7 +165,7 @@ sub rx_fork_join {
         my @keys = keys %$sources;
         @keys = sort {$a <=> $b} @keys if $arg_is_array;
 
-        $subscriber->subscription->add_dependents(
+        $subscriber->subscription->add(
             \%own_subscriptions, sub { undef @keys },
         );
 
@@ -287,7 +287,7 @@ sub rx_from_event {
             $subscriber->{next}->(splice @args, 0, 1) if defined $subscriber->{next};
         };
 
-        $subscriber->subscription->add_dependents(sub {
+        $subscriber->subscription->add(sub {
             $object->unsubscribe($cb) if defined $object;
         });
 
@@ -312,7 +312,7 @@ sub rx_from_event_array {
             $subscriber->{next}->([@args]) if defined $subscriber->{next};
         };
 
-        $subscriber->subscription->add_dependents(sub {
+        $subscriber->subscription->add(sub {
             $object->unsubscribe($cb) if defined $object;
         });
 
@@ -350,7 +350,7 @@ sub rx_merge {
         my @sources = @sources;
 
         my %own_subscriptions;
-        $subscriber->subscription->add_dependents(
+        $subscriber->subscription->add(
             \%own_subscriptions,
             sub { @sources = () },
         );
@@ -406,6 +406,24 @@ sub rx_of {
     });
 }
 
+sub rx_partition {
+    my ($source, $predicate) = @_;
+
+    my $o1 = $source->pipe(
+        RxPerl::Operators::Pipeable::op_filter($predicate),
+    );
+
+    my $i = -1;
+    my $o2 = $source->pipe(
+        RxPerl::Operators::Pipeable::op_filter(sub {
+            $i++;
+            return not $predicate->($_[0], $i);
+        }),
+    );
+
+    return ($o1, $o2);
+}
+
 sub rx_race {
     my (@sources) = @_;
 
@@ -417,7 +435,7 @@ sub rx_race {
         my @sources = @sources;
 
         my @own_subscriptions;
-        $subscriber->subscription->add_dependents(\@own_subscriptions);
+        $subscriber->subscription->add(\@own_subscriptions);
 
         for (my $i = 0; $i < @sources; $i++) {
             my $source = $sources[$i];

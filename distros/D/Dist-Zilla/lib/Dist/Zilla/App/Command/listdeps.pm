@@ -1,4 +1,4 @@
-package Dist::Zilla::App::Command::listdeps 6.023;
+package Dist::Zilla::App::Command::listdeps 6.024;
 # ABSTRACT: print your distribution's prerequisites
 
 # BEGIN BOILERPLATE
@@ -200,7 +200,7 @@ Dist::Zilla::App::Command::listdeps - print your distribution's prerequisites
 
 =head1 VERSION
 
-version 6.023
+version 6.024
 
 =head1 SYNOPSIS
 

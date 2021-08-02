@@ -11,7 +11,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.11, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.12, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -20,10 +20,11 @@ name: WebService-Mailgun
 no_index:
   file:
     - Dockerfile
+    - docker-compose.yml
 provides:
   WebService::Mailgun:
     file: lib/WebService/Mailgun.pm
-    version: '0.10'
+    version: '0.11'
 requires:
   Class::Accessor::Lite: '0'
   Furl: '0'
@@ -37,7 +38,7 @@ resources:
   bugtracker: https://github.com/kan/p5-web-service-mailgun/issues
   homepage: https://github.com/kan/p5-web-service-mailgun
   repository: git://github.com/kan/p5-web-service-mailgun.git
-version: '0.10'
+version: '0.11'
 x_contributors:
   - 'Josh Rabinowitz <joshr@joshr.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,5 +1,10 @@
 Revision history for Perl extension Getopt-EX-Hashed
 
+0.9906 2021-08-01T12:32:40Z
+
+    - Update the way to use Getopt::Long interface and now
+      default and action can co-exist.
+
 0.9905 2021-07-31T12:10:33Z
 
     - Introduce RESET_AFTER_NEW config parameter with zero default.

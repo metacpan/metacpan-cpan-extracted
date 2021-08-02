@@ -34,12 +34,15 @@ if (our $WRONG_INCREMENTAL) {
     has '+no_no_no' => default => 1;
 }
 
-# erroneous default/action co-exist
+# default/action co-exist
 if (our $DEFAULT_AND_ACTION) {
-    has default_action =>
+    has [ 'restaurant', 'shop' ] =>
 	spec => '=s',
-	default => "Milliways",
-	action  => sub { say "meet the meat" };
+	default => "Pizza Hat",
+	action  => sub {
+	    my($name, $s) = @_;
+	    $_->{$name} = "$s at the end of universe.";
+       	};
 }
 
 if (our $TAKE_IT_ALL) {

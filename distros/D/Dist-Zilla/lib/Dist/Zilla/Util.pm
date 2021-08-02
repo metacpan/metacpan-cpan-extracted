@@ -1,4 +1,4 @@
-package Dist::Zilla::Util 6.023;
+package Dist::Zilla::Util 6.024;
 # ABSTRACT: random snippets of code that Dist::Zilla wants
 
 # BEGIN BOILERPLATE
@@ -179,7 +179,7 @@ Dist::Zilla::Util - random snippets of code that Dist::Zilla wants
 
 =head1 VERSION
 
-version 6.023
+version 6.024
 
 =head1 PERL VERSION
 

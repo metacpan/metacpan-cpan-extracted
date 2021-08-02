@@ -1,7 +1,7 @@
 package Dist::Inkt::Role::WriteMetaJSON;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.025';
+our $VERSION   = '0.026';
 
 use Moose::Role;
 use namespace::autoclean;

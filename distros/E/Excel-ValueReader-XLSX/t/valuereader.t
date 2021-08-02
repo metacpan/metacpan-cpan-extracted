@@ -18,6 +18,7 @@ my @expected_values      = (  ["Hello", undef, undef, 22, 33, 55],
                               [undef, "after an empty row and col",
                                undef, undef, undef,
                                "Hello after an empty row and col"],
+                              ["cell\r\nwith\r\nembedded newlines"],
                              );
 
 my @expected_tab_entities  = (
@@ -89,20 +90,28 @@ push @backends, 'LibXML' if check_install(module => 'XML::LibXML::Reader');
 
 foreach my $backend (@backends) {
 
+  # dirty hack when testing with LibXML, because \r\n are silently transformed into \n
+  local $expected_values[-1][0] = "cell\nwith\nembedded newlines"
+    if $backend eq 'LibXML';
+
+  # instantiate the reader
   my $reader = Excel::ValueReader::XLSX->new(xlsx => $xl_file, using => $backend);
+
+  # check sheet names
   my @sheet_names = $reader->sheet_names;
   is_deeply(\@sheet_names, \@expected_sheet_names, "sheet names using $backend");
 
+  # check a regular sheet
   my $values = $reader->values('Test');
-  # note explain $values;
   is_deeply($values, \@expected_values, "values using $backend");
-
   my $nb_cols = max map {scalar @$_} @$values;
   is ($nb_cols, 6, "nb_cols using $backend");
 
+  # check an empty sheet
   my $empty  = $reader->values('Empty');
   is_deeply($empty, [], "empty values using $backend");
 
+  # check a pivot table
   my $tab_entities = $reader->values('Tab_entities');
   is_deeply($tab_entities, \@expected_tab_entities, "tab_entities using $backend");
 }

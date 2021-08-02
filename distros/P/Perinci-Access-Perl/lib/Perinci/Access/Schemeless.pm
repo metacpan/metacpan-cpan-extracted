@@ -1,9 +1,9 @@
 package Perinci::Access::Schemeless;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-05-11'; # DATE
+our $DATE = '2021-08-01'; # DATE
 our $DIST = 'Perinci-Access-Perl'; # DIST
-our $VERSION = '0.894'; # VERSION
+our $VERSION = '0.897'; # VERSION
 
 use 5.010001;
 use strict;
@@ -1050,7 +1050,7 @@ Perinci::Access::Schemeless - Base class for Perinci::Access::Perl
 
 =head1 VERSION
 
-This document describes version 0.894 of Perinci::Access::Schemeless (from Perl distribution Perinci-Access-Perl), released on 2021-05-11.
+This document describes version 0.897 of Perinci::Access::Schemeless (from Perl distribution Perinci-Access-Perl), released on 2021-08-01.
 
 =head1 DESCRIPTION
 

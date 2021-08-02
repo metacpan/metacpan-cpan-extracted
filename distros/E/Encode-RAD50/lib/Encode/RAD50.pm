@@ -71,7 +71,7 @@ use warnings;
 
 use parent qw{ Encode::Encoding };
 
-our $VERSION = '0.016';
+our $VERSION = '0.017';
 
 use Carp;
 use Encode qw{:fallback_all};

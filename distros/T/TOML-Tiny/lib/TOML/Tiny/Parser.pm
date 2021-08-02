@@ -1,6 +1,7 @@
 package TOML::Tiny::Parser;
 # ABSTRACT: parser used by TOML::Tiny
-$TOML::Tiny::Parser::VERSION = '0.13';
+$TOML::Tiny::Parser::VERSION = '0.14';
+use utf8;
 use strict;
 use warnings;
 no warnings qw(experimental);
@@ -8,11 +9,12 @@ use v5.18;
 
 use Carp;
 use Data::Dumper;
+use Encode qw(decode FB_CROAK);
 use TOML::Tiny::Util qw(is_strict_array);
+use TOML::Tiny::Grammar;
 
 require Math::BigFloat;
 require Math::BigInt;
-require TOML::Tiny::Grammar;
 require TOML::Tiny::Tokenizer;
 
 our $TRUE  = 1;
@@ -31,21 +33,29 @@ sub new {
     inflate_float    => $param{inflate_float},
     inflate_datetime => $param{inflate_datetime} || sub{ shift },
     inflate_boolean  => $param{inflate_boolean}  || sub{ shift eq 'true' ? $TRUE : $FALSE },
-    strict_arrays    => $param{strict_arrays},
+    strict           => $param{strict},
   }, $class;
 }
 
 sub next_token {
-  $_[0]->{tokenizer} && $_[0]->{tokenizer}->next_token;
+  my $self = shift;
+  my $token = $self->{tokenizer} && $self->{tokenizer}->next_token;
+  return $token;
 }
 
 sub parse {
   my ($self, $toml) = @_;
 
-  $self->{tokenizer} = TOML::Tiny::Tokenizer->new(source => $toml);
-  $self->{keys}      = [];
-  $self->{root}      = {};
-  $self->{tables}    = {}; # "seen" hash of explicitly defined table names
+  if ($self->{strict}) {
+    $toml = decode('UTF-8', "$toml", FB_CROAK);
+  }
+
+  $self->{tokenizer}    = TOML::Tiny::Tokenizer->new(source => $toml);
+  $self->{keys}         = [];
+  $self->{root}         = {};
+  $self->{tables}       = {}; # "seen" hash of explicitly defined table names (e.g. [foo])
+  $self->{arrays}       = {}; # "seen" hash of explicitly defined static arrays (e.g. foo=[])
+  $self->{array_tables} = {}; # "seen" hash of explicitly defined arrays of tables (e.g. [[foo]])
 
   $self->parse_table;
   my $result = $self->{root};
@@ -54,6 +64,8 @@ sub parse {
   delete $self->{keys};
   delete $self->{root};
   delete $self->{tables};
+  delete $self->{arrays};
+  delete $self->{array_tables};
 
   return $result;
 }
@@ -89,11 +101,18 @@ $src
 
 sub expect_type {
   my ($self, $token, $expected) = @_;
-  my $actual = $token->{type};
+  my $actual = $token ? $token->{type} : 'EOF';
   $self->parse_error($token, "expected $expected, but found $actual")
-    unless $actual eq $expected;
+    unless $actual =~ /$expected/;
 }
 
+
+sub current_key {
+  my $self = shift;
+  my @keys = $self->get_keys;
+  my $key  = join '.', map{ qq{"$_"} } @keys;
+  return $key;
+}
 
 sub push_keys {
   my ($self, $token) = @_;
@@ -110,15 +129,68 @@ sub get_keys {
   return map{ @$_ } @{ $self->{keys} };
 }
 
-sub set_keys {
-  my $self  = shift;
-  my $value = shift // $self->parse_value;
-  my @keys  = $self->get_keys;
-  my $key   = pop @keys;
-  my $node  = $self->scan_to_key(\@keys);
-  $self->parse_error(undef, 'duplicate key: '.join('.', @keys, $key))
-    if exists $node->{$key};
-  $node->{$key} = $value;
+sub set_key {
+  my ($self, $token) = @_;
+  my @keys = $self->get_keys;
+  my $key  = pop @keys;
+  my $node = $self->scan_to_key(\@keys);
+
+  if ($key && exists $node->{$key}) {
+    $self->parse_error($token, 'duplicate key: ' . $self->current_key);
+  }
+
+  $node->{$key} = $self->parse_value($token);
+}
+
+sub declare_key {
+  my ($self, $token) = @_;
+  my $key = $self->current_key || return;
+
+  for ($token->{type}) {
+    when ('inline_array') {
+      $self->parse_error($token, "duplicate key: $key")
+        if exists $self->{array_tables}{$key};
+
+      $self->{arrays}{$key} = 1;
+    }
+
+    when ('array_table') {
+      if (exists $self->{arrays}{$key}) {
+        $self->parse_error($token, "duplicate key: $key");
+      }
+
+      $self->{array_tables}{$key} = 1;
+    }
+
+    when ('table') {
+      $self->parse_error($token, "duplicate key: $key")
+        if exists $self->{arrays}{$key}
+        || exists $self->{array_tables}{$key};
+
+      if (exists $self->{tables}{$key}) {
+        # Tables cannot be redefined, *except* when doing so within a goddamn
+        # table array. Gawd I hate TOML.
+        my $in_a_stupid_table_array = 0;
+        my $node = $self->{root};
+
+        for my $key ($self->get_keys) {
+          if (exists $node->{$key} && ref($node->{$key}) eq 'ARRAY') {
+            $in_a_stupid_table_array = 1;
+            last;
+          } else {
+            $node = $node->{$key};
+          }
+        }
+
+        unless ($in_a_stupid_table_array) {
+          $self->parse_error($token, "duplicate key: $key");
+        }
+      }
+      else {
+        $self->{tables}{$key} = 1;
+      }
+    }
+  }
 }
 
 sub scan_to_key {
@@ -145,35 +217,15 @@ sub scan_to_key {
   return $node;
 }
 
-
 sub parse_table {
   my $self  = shift;
   my $token = shift // $self->next_token // return; # may be undef on first token in empty document
+
   $self->expect_type($token, 'table');
   $self->push_keys($token);
   $self->scan_to_key;
 
-  my @keys = $self->get_keys;
-  my $key = join '.', @keys;
-  if (exists $self->{tables}{$key}) {
-    # Tables cannot be redefined, *except* when doing so within a goddamn table
-    # array. Gawd I hate TOML.
-    my $in_a_stupid_table_array = 0;
-    my $node = $self->{root};
-    for my $key (@keys) {
-      if (exists $node->{$key} && ref($node->{$key}) eq 'ARRAY') {
-        $in_a_stupid_table_array = 1;
-        last;
-      } else {
-        $node = $node->{$key};
-      }
-    }
-
-    $self->parse_error($token, "table $key is already defined")
-      unless $in_a_stupid_table_array;
-  } else {
-    $self->{tables}{$key} = 1;
-  }
+  $self->declare_key($token);
 
   TOKEN: while (my $token = $self->next_token) {
     for ($token->{type}) {
@@ -182,7 +234,7 @@ sub parse_table {
       when ('key') {
         $self->expect_type($self->next_token, 'assign');
         $self->push_keys($token);
-        $self->set_keys;
+        $self->set_key($self->next_token);
         $self->pop_keys;
 
         if (my $eol = $self->next_token) {
@@ -212,10 +264,12 @@ sub parse_table {
 }
 
 sub parse_array_table {
-  my $self = shift;
+  my $self  = shift;
   my $token = shift // $self->next_token;
   $self->expect_type($token, 'array_table');
   $self->push_keys($token);
+
+  $self->declare_key($token);
 
   my @keys = $self->get_keys;
   my $key  = pop @keys;
@@ -230,7 +284,7 @@ sub parse_array_table {
       when ('key') {
         $self->expect_type($self->next_token, 'assign');
         $self->push_keys($token);
-        $self->set_keys;
+        $self->set_key($self->next_token);
         $self->pop_keys;
       }
 
@@ -261,17 +315,17 @@ sub parse_key {
 }
 
 sub parse_value {
-  my $self = shift;
-  my $token = shift // $self->next_token;
+  my $self  = shift;
+  my $token = shift;
 
   for ($token->{type}) {
     return $token->{value} when 'string';
     return $self->inflate_float($token) when 'float';
     return $self->inflate_integer($token) when 'integer';
     return $self->{inflate_boolean}->($token->{value}) when 'bool';
-    return $self->{inflate_datetime}->($token->{value}) when 'datetime';
-    return $self->parse_inline_table when 'inline_table';
-    return $self->parse_inline_array when 'inline_array';
+    return $self->parse_datetime($token) when 'datetime';
+    return $self->parse_inline_table($token) when 'inline_table';
+    return $self->parse_array($token) when 'inline_array';
 
     default{
       $self->parse_error($token, "value expected (bool, number, string, datetime, inline array, inline table), but found $_");
@@ -279,26 +333,54 @@ sub parse_value {
   }
 }
 
-sub parse_inline_array {
-  my $self = shift;
-  my @array;
+#-------------------------------------------------------------------------------
+# TOML permits a space instead of a T, which RFC3339 does not allow. TOML (at
+# least, according to BurntSushi/toml-tests) allows z instead of Z, which
+# RFC3339 also does not permit. We will be flexible and allow them both, but
+# fix them up. TOML also specifies millisecond precision. If fractional seconds
+# are specified. Whatever.
+#-------------------------------------------------------------------------------
+sub parse_datetime {
+  my $self  = shift;
+  my $token = shift;
+  my $value = $token->{value};
 
-  TOKEN: while (my $token = $self->next_token) {
+  # Normalize
+  $value =~ tr/z/Z/;
+  $value =~ tr/ /T/;
+  $value =~ s/t/T/;
+  $value =~ s/(\.\d+)($TimeOffset)$/sprintf(".%06d%s", $1 * 1000000, $2)/e;
+
+  return $self->{inflate_datetime}->($value);
+}
+
+sub parse_array {
+  my $self  = shift;
+  my $token = shift;
+
+  $self->declare_key($token);
+
+  my @array;
+  my $expect = 'EOL|inline_array_close|string|float|integer|bool|datetime|inline_table|inline_array';
+
+  TOKEN: while (1) {
+    my $token = $self->next_token;
+    $self->expect_type($token, $expect);
+
     for ($token->{type}) {
-      next TOKEN when 'comma';
+      when ('comma') {
+        $expect = 'EOL|inline_array_close|string|float|integer|bool|datetime|inline_table|inline_array';
+        next TOKEN;
+      }
+
       next TOKEN when 'EOL';
       last TOKEN when 'inline_array_close';
 
       default{
         push @array, $self->parse_value($token);
+        $expect = 'comma|EOL|inline_array_close';
       }
     }
-  }
-
-  if (@array > 1 && $self->{strict_arrays}) {
-    my ($ok, $err) = is_strict_array(\@array);
-    $self->parse_error(undef, $err)
-      unless $ok;
   }
 
   return \@array;
@@ -306,18 +388,47 @@ sub parse_inline_array {
 
 sub parse_inline_table {
   my $self  = shift;
-  my $table = {};
+  my $token = shift;
 
-  TOKEN: while (my $token = $self->next_token) {
+  my $table  = {};
+  my $expect = 'EOL|inline_table_close|key';
+
+  TOKEN: while (1) {
+    my $token = $self->next_token;
+    $self->expect_type($token, $expect);
+
     for ($token->{type}) {
-      next TOKEN when /comma/;
-      last TOKEN when /inline_table_close/;
+      when ('comma') {
+        $expect = $self->{strict}
+          ? 'EOL|key'
+          : 'EOL|key|inline_table_close';
+
+        next TOKEN;
+      }
 
       when ('key') {
         $self->expect_type($self->next_token, 'assign');
-        my $key = $token->{value}[0];
-        $table->{ $key } = $self->parse_value;
+
+        my $node = $table;
+        my @keys = @{ $token->{value} };
+        my $key  = pop @keys;
+
+        for (@keys) {
+          $node->{$_} ||= {};
+          $node = $node->{$_};
+        }
+
+        if (exists $node->{$key}) {
+          $self->parse_error($token, 'duplicate key: ' .  join('.', map{ qq{"$_"} } @{ $token->{value} }));
+        } else {
+          $node->{ $key } = $self->parse_value($self->next_token);
+        }
+
+        $expect = 'comma|inline_table_close';
+        next TOKEN;
       }
+
+      last TOKEN when 'inline_table_close';
 
       default{
         $self->parse_error($token, "inline table expected key-value pair, but found $_");
@@ -338,8 +449,8 @@ sub inflate_float {
     return $self->{inflate_float}->($value);
   }
 
-  return 'NaN' if $value =~ /^[-+]?nan$/i;
-  return 'inf' if $value =~ /^\+?inf$/i;
+  return 'NaN'  if $value =~ /^[-+]?nan$/i;
+  return 'inf'  if $value =~ /^\+?inf$/i;
   return '-inf' if $value =~ /^-inf$/i;
 
   # Not a bignum
@@ -424,7 +535,7 @@ TOML::Tiny::Parser - parser used by TOML::Tiny
 
 =head1 VERSION
 
-version 0.13
+version 0.14
 
 =head1 AUTHOR
 

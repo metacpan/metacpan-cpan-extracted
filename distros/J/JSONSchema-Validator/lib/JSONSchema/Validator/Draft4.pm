@@ -11,14 +11,18 @@ use JSONSchema::Validator::Error 'error';
 use JSONSchema::Validator::JSONPointer 'json_pointer';
 use JSONSchema::Validator::Constraints::Draft4;
 use JSONSchema::Validator::URIResolver;
+use JSONSchema::Validator::Util qw(is_type);
 
-use constant ID => 'id';
+use constant SPECIFICATION => 'Draft4';
+use constant ID => 'http://json-schema.org/draft-04/schema#';
+use constant ID_FIELD => 'id';
 
-sub new {
+sub create {
     my ($class, %params) = @_;
 
-    my $schema = $params{schema} or croak 'schema is required';
-    my $strict = $params{strict} // 1;
+    croak 'schema is required' unless exists $params{schema};
+
+    my $schema = $params{schema};
     my $using_id_with_ref = $params{using_id_with_ref} // 1;
 
     my $scheme_handlers = $params{scheme_handlers} // {};
@@ -32,11 +36,11 @@ sub new {
 
     bless $self, $class;
 
-    my $base_uri = $params{base_uri} // $schema->{$self->ID} // '';
+    # schema may be boolean value according to json schema draft6
+    my $base_uri = $params{base_uri};
+    $base_uri //= $schema->{$self->ID_FIELD} if ref $schema eq 'HASH';
+    $base_uri //= '';
     $self->{base_uri} = $base_uri;
-
-    my $constraints = JSONSchema::Validator::Constraints::Draft4->new(validator => $self, strict => $strict);
-    $self->{constraints} = $constraints;
 
     my $resolver = JSONSchema::Validator::URIResolver->new(
         validator => $self,
@@ -47,6 +51,17 @@ sub new {
     $self->{resolver} = $resolver;
 
     push @{$self->scopes}, $base_uri;
+
+    return $self;
+}
+
+sub new {
+    my ($class, %params) = @_;
+
+    my $self = $class->create(%params);
+
+    my $constraints = JSONSchema::Validator::Constraints::Draft4->new(validator => $self, strict => $params{strict} // 1);
+    $self->{constraints} = $constraints;
 
     return $self;
 }
@@ -62,12 +77,12 @@ sub using_id_with_ref { shift->{using_id_with_ref} }
 sub validate_schema {
     my ($self, $instance, %params) = @_;
 
-    my $schema = $params{schema} || $self->schema;
+    my $schema = $params{schema} // $self->schema;
     my $instance_path = $params{instance_path} // '/';
     my $schema_path = $params{schema_path} // '/';
     my $scope = $params{scope};
 
-    croak 'No schema specified' unless $schema;
+    croak 'No schema specified' unless defined $schema;
 
     push @{$self->scopes}, $scope if $scope;
 
@@ -82,9 +97,20 @@ sub validate_schema {
 sub _validate_schema {
     my ($self, $instance, $schema, $instance_path, $schema_path, $data, %params) = @_;
 
+    # for json schema draft 6 which allow boolean value for schema
+    if (is_type($schema, 'boolean', 1)) {
+        return 1 if $schema;
+        push @{$data->{errors}}, error(
+            message => 'Schema with value "false" does not allow anything',
+            instance_path => $instance_path,
+            schema_path => $schema_path
+        );
+        return 0;
+    }
+
     my $apply_scope = $params{apply_scope} // 1;
 
-    my $id = $schema->{$self->ID};
+    my $id = $schema->{$self->ID_FIELD};
     if ($id && $apply_scope && $self->using_id_with_ref) {
         my $uri = $id;
         $uri = URI->new($id)->abs($self->scope)->as_string if $self->scope;
@@ -138,11 +164,10 @@ JSONSchema::Validator::Draft4 - Validator for JSON Schema Draft4
 
 =head1 VERSION
 
-version 0.002
+version 0.004
 
 =head1 SYNOPSIS
 
-    # to get OpenAPI validator of schema in YAML format
     $validator = JSONSchema::Validator::Draft4->new(schema => {...});
     my ($result, $errors) = $validator->validate_schema($object_to_validate);
 
@@ -162,7 +187,7 @@ Creates JSONSchema::Validator::Draft4 object.
 
 =head4 schema
 
-Scheme according to which validation occures.
+Scheme according to which validation occurs.
 
 =head4 strict
 

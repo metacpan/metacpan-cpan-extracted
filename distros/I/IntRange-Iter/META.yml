@@ -25,7 +25,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=IntRange-Iter
   homepage: https://metacpan.org/release/IntRange-Iter
   repository: git://github.com/perlancar/perl-IntRange-Iter.git
-version: '0.004'
+version: '0.005'
 x_Dist_Zilla:
   perl:
     version: '5.030002'

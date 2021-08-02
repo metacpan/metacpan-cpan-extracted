@@ -1,4 +1,4 @@
-package Dist::Zilla::App::Command::version 6.023;
+package Dist::Zilla::App::Command::version 6.024;
 # ABSTRACT: display dzil's version
 
 # BEGIN BOILERPLATE
@@ -46,7 +46,7 @@ Dist::Zilla::App::Command::version - display dzil's version
 
 =head1 VERSION
 
-version 6.023
+version 6.024
 
 =head1 SYNOPSIS
 

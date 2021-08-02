@@ -1,6 +1,7 @@
 Changelog for Mojolicious-Plugin-AutoRoutePm
 
-0.16 2021-07-13T15:53:53
+0.17 2021-08-02T16:42:53
+ - Update prereq version for Mojolicious
  - [Minor] Update documentation
  - [Minor] Udate Readme
  - [Minor] Correct syntax for badges
@@ -12,6 +13,10 @@ Changelog for Mojolicious-Plugin-AutoRoutePm
  - [Minor] Add weaver.ini config file for badges
  - Solved a bug where system template paths are changed.
  - Change link to travis badge
+
+0.16 2021-07-13T15:53:37
+ - [Minor] Update documentation
+ - [Minor] Udate Readme
 
 0.15 2021-07-12T10:44:45
  - [Minor] Correct syntax for badges

@@ -1,17 +1,18 @@
 ---
 abstract: 'PDL Interface to the HDF5 Data Format'
 author:
+  - unknown
   - 'Chris Marshall <chm@cpan.org>'
 build_requires:
   ExtUtils::MakeMaker: '0'
   PDL: '2.007'
-  Test::More: '0'
+  Test::More: '0.88'
 configure_requires:
   ExtUtils::MakeMaker: '0'
   PDL: '2.004'
 dynamic_config: 1
-generated_by: 'Chris Marshall, CPAN::Meta::Converter version 2.142060'
-license: perl
+generated_by: 'Chris Marshall, CPAN::Meta::Converter version 2.150010'
+license: open_source
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -20,18 +21,15 @@ no_index:
   directory:
     - t
     - inc
-provides:
-  PDL::IO::HDF5:
-    file: hdf5.pd
-    version: '0.73'
 requires:
   PDL: '2.004'
 resources:
-  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=PDL-IO-HDF5
+  bugtracker: https://github.com/PDLPorters/pdl-io-hdf5/issues
   homepage: http://pdl.perl.org/
   license: http://cpansearch.perl.org/src/CHM/PDL-IO-HDF5-0.73/COPYRIGHT
-  repository: git://git.code.sf.net/p/pdl/pdl-io-hdf5
+  repository: https://github.com/PDLPorters/pdl-io-hdf5
 version: '0.73'
 x_meta_spec:
   url: http://search.cpan.org/perldoc?CPAN::Meta::Spec
   version: '2'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

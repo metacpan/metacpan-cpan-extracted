@@ -1,5 +1,13 @@
 Changelog for Mojolicious-Plugin-Moai
 
+0.013     2021-08-02 10:27:37-05:00 America/Chicago
+
+    [Fixed]
+
+    - Fixed compatibility with Mojolicious 9.0. Thanks @kiwiroy! [Github
+      #2, #3]
+    - Fixed Github's detection of language. Thanks @kiwiroy! [Github #4]
+
 0.012     2020-04-04 15:54:57-05:00 America/Chicago
 
     [Other]

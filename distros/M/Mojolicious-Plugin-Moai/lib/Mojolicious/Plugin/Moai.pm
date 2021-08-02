@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Moai;
-our $VERSION = '0.012';
+our $VERSION = '0.013';
 # ABSTRACT: Mojolicious UI components using modern UI libraries
 
 #pod =head1 SYNOPSIS
@@ -506,7 +506,7 @@ Mojolicious::Plugin::Moai - Mojolicious UI components using modern UI libraries
 
 =head1 VERSION
 
-version 0.012
+version 0.013
 
 =head1 SYNOPSIS
 
@@ -985,11 +985,21 @@ L<Test::Mojo::Role::Moai>, L<Mojolicious::Guides::Rendering>
 
 Doug Bell <preaction@cpan.org>
 
-=head1 CONTRIBUTOR
+=head1 CONTRIBUTORS
 
-=for stopwords Mohammad S Anwar
+=for stopwords Mohammad S Anwar Roy Storey
+
+=over 4
+
+=item *
 
 Mohammad S Anwar <mohammad.anwar@yahoo.com>
+
+=item *
+
+Roy Storey <kiwiroy@users.noreply.github.com>
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 

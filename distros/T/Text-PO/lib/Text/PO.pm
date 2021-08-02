@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## PO Files Manipulation - ~/lib/Text/PO.pm
-## Version v0.1.3
+## Version v0.1.5
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2018/06/21
-## Modified 2021/07/30
+## Modified 2021/08/02
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -26,7 +26,7 @@ BEGIN
     use Nice::Try;
     use Scalar::Util;
     use Text::PO::Element;
-    our $VERSION = 'v0.1.3';
+    our $VERSION = 'v0.1.5';
 };
 
 INIT
@@ -517,16 +517,31 @@ sub parse
     my $elem = [];
     $self->{elements} = $elem;
     my $header = '';
+    my $ignoring_leading_blanks = 1;
     my $n = 0;
+    # Ignore / remove possible leading blank lines
     while( defined( $_ = $io->getline ) )
     {
         $n++;
+        if( /^\S+/ )
+        {
+            $ignoring_leading_blanks = 0;
+        }
+        elsif( $ignoring_leading_blanks && /^[[:blank:]\h]*$/ )
+        {
+            $self->message( 3, "Skiping leading blank line at line $n" );
+            next;
+        }
         #( 1 .. /^[^\#]+$/ ) or last;
         /^\#+/ || last;
-        $header .= $_;
-        if( /^\#+[[:blank:]]*domain[[:blank:]]+\"([^\"]+)\"/ )
+        if( /^\#+[[:blank:]\h]*domain[[:blank:]]+\"([^\"]+)\"/ )
         {
             $self->domain( $1 );
+            $self->message_colour( 3, "Setting domain to <green>$1</>" );
+        }
+        else
+        {
+            $header .= $_;
         }
     }
     ## Make sure to position ourself after the initial blank line if any, since blank lines are used as separators
@@ -584,7 +599,7 @@ sub parse
                 $self->message( 2, "Processing meta information" );
                 my $this = $elem->[0];
                 my $def = $this->msgstr;
-                # $self->message( 3, "Meta data collected are: ", sub{ $self->SUPER::dump( $def ) });
+                $self->message( 3, "Meta data collected are: ", sub{ $self->SUPER::dump( $def ) });
                 # $self->message( 3, "Pre-processing meta for multilines" );
                 $def = [split( /\n/, join( '', @$def ) )];
                 
@@ -1356,7 +1371,7 @@ Text::PO - Read and write PO files
 
 =head1 VERSION
 
-    v0.1.3
+    v0.1.5
 
 =head1 DESCRIPTION
 

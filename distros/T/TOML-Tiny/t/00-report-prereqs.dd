@@ -16,6 +16,7 @@ do { my $x = {
                       'requires' => {
                                       'Carp' => '0',
                                       'Data::Dumper' => '0',
+                                      'Encode' => '0',
                                       'Exporter' => '0',
                                       'Math::BigInt' => '1.999718',
                                       'perl' => '5.018'
@@ -23,7 +24,8 @@ do { my $x = {
                     },
        'test' => {
                    'recommends' => {
-                                     'CPAN::Meta' => '2.120900'
+                                     'CPAN::Meta' => '2.120900',
+                                     'Unicode::GCString' => '0'
                                    },
                    'requires' => {
                                    'Data::Dumper' => '0',

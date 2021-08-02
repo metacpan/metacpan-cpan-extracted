@@ -14,6 +14,7 @@ requires "constant" => "0";
 requires "overload" => "0";
 requires "parent" => "0";
 requires "perl" => "v5.16.0";
+requires "re" => "0";
 requires "strict" => "0";
 requires "warnings" => "0";
 
@@ -22,6 +23,7 @@ on 'test' => sub {
   requires "IO::Handle" => "0";
   requires "IPC::Open3" => "0";
   requires "Test::More" => "0";
+  requires "lib" => "0";
   requires "perl" => "v5.16.0";
   requires "utf8" => "0";
 };

@@ -2,8 +2,8 @@ NAME
     File::Slurper::Temp - File::Slurper + File::Temp
 
 VERSION
-    This document describes version 0.006 of File::Slurper::Temp (from Perl
-    distribution File-Slurper-Temp), released on 2019-07-21.
+    This document describes version 0.008 of File::Slurper::Temp (from Perl
+    distribution File-Slurper-Temp), released on 2021-08-02.
 
 SYNOPSIS
     Use like you would use File::Slurper's "write_text" and "write_binary":
@@ -17,6 +17,13 @@ SYNOPSIS
      use File::Slurper::Temp qw(write_text_to_tempfile write_binary_to_tempfile);
      my $filename1 = write_text_to_tempfile("some text");
      my $filename2 = write_binary_to_tempfile($somedata);
+
+    This module also provides "modify_text" and "modify_binary", like that
+    provided by File::Slurper::Shortcuts:
+
+     use File::Slurper::Temp qw(write_text_to_tempfile write_binary_to_tempfile);
+     modify_text("/path/to/file.txt", sub { s/foo/bar/g });
+     modify_binary("/path/to/file.txt", sub { s/foo/bar/g });
 
 DESCRIPTION
     This module is a simple combination of File::Slurper and File::Temp. It
@@ -34,6 +41,10 @@ DESCRIPTION
     to specify destination path but just content to write, and the functions
     will return the temporary filename created.
 
+VARIABLES
+  $FILE_PERM_DIR
+  $FILE_PERM_PERMS
+  $FILE_PERM_TEMPLATE
 FUNCTIONS
   write_text
     Usage:
@@ -47,9 +58,18 @@ FUNCTIONS
 
     By default, the temporary file is created in the same directory as
     $filename, using "tempfile()"'s option "DIR => dirname($filename)". If
-    you want to set a specific temporary directory, set $FILE_TEMP_DIR (see
-    source code). But keep in mind that "rename()" doesn't work
-    cross-device.
+    you want to set a specific temporary directory, set "$FILE_TEMP_DIR".
+    But keep in mind that "rename()" doesn't work cross-device.
+
+    By default, if the target file exists, the temporary file is also
+    created with the same permission as the target file. Otherwise,
+    permission is default as per File::Temp's default (0600). If you want to
+    set a specific permission, set "$FILE_TEMP_PERMS". Permission setting is
+    done by File::Temp::tempfile() using its PERMS option.
+
+    By default, file ownership is not changed/set. If you run this script as
+    root, you might be creating files owned by root. There's no option yet
+    to set this.
 
   write_binary
     Usage:
@@ -68,6 +88,18 @@ FUNCTIONS
     Usage:
 
      $tempname = write_binary_to_tempfile($content)
+
+  modify_text
+    Like File::Slurper::Shortcuts's "modify_text" except it uses our version
+    of "write_text".
+
+    See File::Slurper::Shortcuts for more details.
+
+  modify_binary
+    Like File::Slurper::Shortcuts's "modify_binary" except it uses our
+    version of "write_binary".
+
+    See File::Slurper::Shortcuts for more details.
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -89,11 +121,13 @@ SEE ALSO
 
     File::Temp
 
+    "modify_text()" and "modify_binary()" follows File::Slurper::Shortcuts.
+
 AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019, 2017 by perlancar@cpan.org.
+    This software is copyright (c) 2021, 2019, 2017 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

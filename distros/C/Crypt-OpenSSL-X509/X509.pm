@@ -6,7 +6,7 @@ use strict;
 use Exporter;
 use base qw(Exporter);
 
-our $VERSION = '1.908';
+our $VERSION = '1.910';
 
 our @EXPORT_OK = qw(
   FORMAT_UNDEF FORMAT_ASN1 FORMAT_TEXT FORMAT_PEM
@@ -219,7 +219,7 @@ C<notAfter> time as a string.
 
 =item email
 
-Email address as a string.
+Email addresses as string, if multiple addresses found, they are seperated by a space (' ').
 
 =item version
 
@@ -423,6 +423,10 @@ Dan Sully
 =head1 CONTRIBUTORS
 
 =over
+
+=item * Timonthy Legge, release 1.9.10
+
+=item * Patrick Cernko, release 1.9.9
 
 =item * Shoichi Kaji, release 1.9.3 and 1.9.8
 

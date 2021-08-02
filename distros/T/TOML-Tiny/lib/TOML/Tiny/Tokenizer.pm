@@ -1,6 +1,6 @@
 package TOML::Tiny::Tokenizer;
 # ABSTRACT: tokenizer used by TOML::Tiny
-$TOML::Tiny::Tokenizer::VERSION = '0.13';
+$TOML::Tiny::Tokenizer::VERSION = '0.14';
 use strict;
 use warnings;
 no warnings qw(experimental);
@@ -21,6 +21,11 @@ sub new {
   }, $class;
 
   return $self;
+}
+
+sub last_token {
+  my $self = shift;
+  return $self->{last_token};
 }
 
 sub next_token {
@@ -84,14 +89,14 @@ sub next_token {
         }
       }
 
-      when (/\G ( [\[\]{}=,] | true | false )/xgc) {
-        $value = $1;
-        $type = $simple->{$value};
-      }
-
       when (/$key_set/gc) {
         $type = 'key';
         $value = $1;
+      }
+
+      when (/\G ( [\[\]{}=,] | true | false )/xgc) {
+        $value = $1;
+        $type = $simple->{$value};
       }
 
       when (/\G($String)/gc) {
@@ -124,12 +129,19 @@ sub next_token {
       state $tokenizers = {};
       my $tokenize = $tokenizers->{$type} //= $self->can("tokenize_$type") || 0;
 
-      $token = $self->{last_token} = {
+      $token = {
         line  => $self->{line},
         pos   => $self->{pos},
         type  => $type,
         value => $tokenize ? $tokenize->($self, $value) : $value,
+        prev  => $self->{last_token},
       };
+
+      # Unset the previous token's 'prev' key to prevent keeping the entire
+      # chain of previously parsed tokens alive for the whole process.
+      undef $self->{last_token}{prev};
+
+      $self->{last_token} = $token;
     }
 
     $self->update_position;
@@ -161,11 +173,14 @@ sub error {
 sub tokenize_key {
   my $self = shift;
   my $toml = shift;
-  my @keys = $toml =~ /($SimpleKey)\.?/g;
+  my @segs = $toml =~ /($SimpleKey)\.?/g;
+  my @keys;
 
-  for (@keys) {
-    s/^["']//;
-    s/["']$//;
+  for my $seg (@segs) {
+    $seg =~ s/^["']//;
+    $seg =~ s/["']$//;
+    $seg = $self->unescape_str($seg);
+    push @keys, $seg;
   }
 
   return \@keys;
@@ -193,7 +208,7 @@ sub tokenize_string {
     $str = substr $toml, 3, length($toml) - 6;
     my @newlines = $str =~ /($CRLF)/g;
     $self->{line} += scalar @newlines;
-    $str =~ s/^$WS* $EOL//x;  # trim leading whitespace
+    $str =~ s/^$WS* $CRLF//x; # trim leading whitespace
     $str =~ s/\\$EOL\s*//xgs; # trim newlines from lines ending in backslash
   } else {
     $str = substr($toml, 1, length($toml) - 2);
@@ -224,7 +239,7 @@ sub unescape_chars {
 
   my $hex = hex substr($_[0], 2);
 
-  if (charnames::viacode($hex)) {
+  if ($hex < 0x10FFFF && charnames::viacode($hex)) {
     return chr $hex;
   }
 
@@ -251,7 +266,7 @@ TOML::Tiny::Tokenizer - tokenizer used by TOML::Tiny
 
 =head1 VERSION
 
-version 0.13
+version 0.14
 
 =head1 AUTHOR
 

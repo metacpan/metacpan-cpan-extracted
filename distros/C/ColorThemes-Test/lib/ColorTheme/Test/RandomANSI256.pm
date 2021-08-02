@@ -1,9 +1,9 @@
 package ColorTheme::Test::RandomANSI256;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-13'; # DATE
+our $DATE = '2021-08-01'; # DATE
 our $DIST = 'ColorThemes-Test'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 use strict;
 use warnings;
@@ -18,6 +18,10 @@ our %THEME = (
             schema => 'bool*',
             default => 1,
         },
+        num => {
+            schema => 'posint*',
+            default => 5,
+        },
         # TODO: whether to set random foreground color or not (default 1)
         # TODO: whether to set random background color or not (default 0)
     },
@@ -30,7 +34,7 @@ sub _rand_ansi256 {
 sub list_items {
     my $self = shift;
 
-    my @list = [];
+    my @list = 0 .. ($self->{args}{num}//5)-1;
     wantarray ? @list : \@list;
 }
 
@@ -59,7 +63,7 @@ ColorTheme::Test::RandomANSI256 - A color theme which gives random 256-color ANS
 
 =head1 VERSION
 
-This document describes version 0.003 of ColorTheme::Test::RandomANSI256 (from Perl distribution ColorThemes-Test), released on 2020-06-13.
+This document describes version 0.005 of ColorTheme::Test::RandomANSI256 (from Perl distribution ColorThemes-Test), released on 2021-08-01.
 
 =head1 HOMEPAGE
 
@@ -83,7 +87,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

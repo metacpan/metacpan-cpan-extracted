@@ -3,7 +3,7 @@ use 5.008001;
 use strict;
 use warnings;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 use Module::cpmfile::Prereqs;
 use Module::cpmfile::Util 'merge_version';

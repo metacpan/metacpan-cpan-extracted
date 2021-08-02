@@ -24,6 +24,8 @@ Anton
 Constraints
 Denis
 Draft4
+Draft6
+Draft7
 Error
 Fedotov
 Format
@@ -33,6 +35,7 @@ JSONPointer
 JSONSchema
 Khozov
 OAS30
+OpenAPI
 Putintsev
 Stavrov
 URIResolver
@@ -44,3 +47,5 @@ lib
 logioniz
 tosha
 uid
+validator
+validators

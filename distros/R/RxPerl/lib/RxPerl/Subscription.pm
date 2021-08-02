@@ -4,7 +4,7 @@ use warnings;
 
 use Scalar::Util 'blessed', 'reftype', 'weaken';
 
-our $VERSION = "v6.7.1";
+our $VERSION = "v6.8.0";
 
 sub new {
     my ($class) = @_;
@@ -60,14 +60,14 @@ sub _add_to_subscribers {
             # wrap with 'unsubscribe'
             my $orig_fn = $subscriber->{$_};
             $subscriber->{$_} = sub {
-                $self->unsubscribe;
                 $orig_fn->(@_) if defined $orig_fn;
+                $self->unsubscribe;
             }
         }
     }
 }
 
-sub add_dependents {
+sub add {
     my ($self, @subrefs) = @_;
 
     # filter out any non-refs

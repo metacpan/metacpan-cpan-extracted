@@ -32,7 +32,7 @@ package Crypt::Twofish2;
 
 use XSLoader;
 
-$VERSION = '1.02';
+$VERSION = '1.03';
 
 XSLoader::load __PACKAGE__, $VERSION;
 

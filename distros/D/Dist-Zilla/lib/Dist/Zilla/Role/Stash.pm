@@ -1,4 +1,4 @@
-package Dist::Zilla::Role::Stash 6.023;
+package Dist::Zilla::Role::Stash 6.024;
 # ABSTRACT: something that stores options or data for later reference
 
 use Moose::Role;
@@ -45,7 +45,7 @@ Dist::Zilla::Role::Stash - something that stores options or data for later refer
 
 =head1 VERSION
 
-version 6.023
+version 6.024
 
 =head1 PERL VERSION
 

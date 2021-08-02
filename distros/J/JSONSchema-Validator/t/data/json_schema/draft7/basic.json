@@ -1,0 +1,39 @@
+[
+    {
+        "subject": "if-then-else",
+        "schema": {
+            "type" : "integer",
+            "if" : {
+                "maximum" : 10
+            },
+            "then" : {
+                "const" : 5
+            },
+            "else" : {
+                "const" : 15
+            }
+        },
+        "tests": [
+            {
+                "description": "5 <= 10 and 5 == 5",
+                "data": 5,
+                "valid": true
+            },
+            {
+                "description": "6 <= 10 and 6 == 5",
+                "data": 6,
+                "valid": false
+            },
+            {
+                "description": "15 > 10 and 15 == 15",
+                "data": 15,
+                "valid": true
+            },
+            {
+                "description": "16 > 10 and 16 == 15",
+                "data": 16,
+                "valid": false
+            }
+        ]
+    }
+]

@@ -1,10 +1,17 @@
-0.020   2018-09-26 (PERLANCAR)
+0.021   2021-08-01  Released-By: PERLANCAR; Urgency: medium
+
+	- [doc] Mention Number::Pad and some other related modules.
+
+	- Accept multiple strings.
+
+
+0.020   2018-09-26  Released-By: PERLANCAR
 
         - No functional changes.
 
 	- [doc] Document $truncate argument.
 
 
-0.01    2014-12-10 (PERLANCAR)
+0.01    2014-12-10  Released-By: PERLANCAR
 
         - First release. Split from SHARYANTO-String-Util.

@@ -4,8 +4,8 @@
 #
 package PDL::IO::HDF5;
 
-@EXPORT_OK  = qw(  );
-%EXPORT_TAGS = (Func=>[@EXPORT_OK]);
+our @EXPORT_OK = qw( );
+our %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
 
 use PDL::Core qw/ barf/;
 use PDL::Exporter;
@@ -13,8 +13,8 @@ use DynaLoader;
 
 
 
-   $PDL::IO::HDF5::VERSION = '0.73';
-   @ISA    = ( 'PDL::Exporter','DynaLoader' );
+   our $VERSION = '0.74';
+   our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::IO::HDF5 $VERSION;
 
@@ -447,7 +447,7 @@ B<Usage:>
    
 Returns undef on failure, 1 on success.
 
-Note: This is a convienence method that is equivalent to:
+Note: This is a convenience method that is equivalent to:
 
   $HDFfile->group("/")->dataset("groupName");
 
@@ -475,7 +475,7 @@ B<Usage:>
 
    @datasets = $HDF5file->datasets;
 
-Note: This is a convienence method that is equivalent to:
+Note: This is a convenience method that is equivalent to:
 
   $HDFfile->group("/")->datasets;
 
@@ -514,7 +514,7 @@ B<Usage:>
 
 Returns undef on failure, 1 on success.
 
-Note: This is a convienence method that is equivalent to:
+Note: This is a convenience method that is equivalent to:
 
   $HDFfile->group("/")->attrSet( 'attr1' => 'attr1Value',
 				 'attr2' => 'attr2 value', 
@@ -586,7 +586,7 @@ B<Usage:>
 
 Returns undef on failure, 1 on success.
 
-Note: This is a convienence method that is equivalent to:
+Note: This is a convenience method that is equivalent to:
 
   $HDFfile->group("/")->attrDel( 'attr1', 
 				 'attr2',
@@ -621,7 +621,7 @@ B<Usage:>
 
    @attrs = $HDFfile->attrs;
 
-Note: This is a convienence method that is equivalent to:
+Note: This is a convenience method that is equivalent to:
 
   $HDFfile->group("/")->attrs
 
@@ -647,7 +647,7 @@ B<Usage:>
 
    $HDFfile->reference;
 
-Note: This is a convienence method that is equivalent to:
+Note: This is a convenience method that is equivalent to:
 
   $HDFfile->group("/")->reference($referenceName,$datasetObj,@regionStart,@regionCount);
 
@@ -1080,7 +1080,7 @@ sub nameGet{
 
 =for ref
 
-PDL::IO::HDF5 Desctructor - Closes the HDF5 file
+PDL::IO::HDF5 Destructor - Closes the HDF5 file
 
 B<Usage:>
 
@@ -1103,7 +1103,7 @@ sub DESTROY {
 # 
 # Utility function (Not a Method!!!)
 #  to pack a perl list into a binary structure
-#  to be interpereted as a C array of long longs. This code is build
+#  to be interpreted as a C array of long longs. This code is build
 #  during the make process to do the Right Thing for big and little
 #  endian machines
 sub packList{

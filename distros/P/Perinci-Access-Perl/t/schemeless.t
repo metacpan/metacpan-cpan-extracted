@@ -414,10 +414,10 @@ subtest 'schema in metadata is normalized' => sub {
             v => 1.1,
             summary => "An example function",
             args => {
-                a1 => {schema=>["int"=>{}, {}]},
+                a1 => {schema=>["int"=>{}]},
             },
             result => {
-                schema => ['int'=>{req=>1}, {}],
+                schema => ['int'=>{req=>1}],
             },
             result_naked=>0,
             _orig_result_naked=>undef,
@@ -442,10 +442,10 @@ subtest 'schema in metadata is normalized' => sub {
             v => 1.1,
             summary => "An example function",
             args => {
-                a1 => {schema=>["int"=>{}, {}]},
+                a1 => {schema=>["int"=>{}]},
             },
             result => {
-                schema => ['int'=>{req=>1}, {}],
+                schema => ['int'=>{req=>1}],
             },
             result_naked=>0,
             _orig_result_naked=>undef,
@@ -734,10 +734,10 @@ test_request(
                 v=>1.1,
                 summary => "An example function",
                 args => {
-                    a1 => {schema=>["int"=>{}, {}]},
+                    a1 => {schema=>["int"=>{}]},
                 },
                 result => {
-                    schema => ['int'=>{req=>1}, {}],
+                    schema => ['int'=>{req=>1}],
                 },
                 args_as => 'hash', result_naked => 0,
                 _orig_args_as => undef, _orig_result_naked => undef,

@@ -17,9 +17,9 @@ subtest 'opt: _schema_is_normalized' => sub {
         posttest => sub {
             my ($wrap_res, $call_res) = @_;
             my $newmeta = $wrap_res->[2]{meta};
-            is_deeply($newmeta->{args}{a}{schema}, [int=>{}, {}],
+            is_deeply($newmeta->{args}{a}{schema}, [int=>{}],
                       "schemas by default are normalized (a)");
-            is_deeply($newmeta->{args}{b}{cmdline_aliases}{B}{schema},[bool=>{},{}],
+            is_deeply($newmeta->{args}{b}{cmdline_aliases}{B}{schema},[bool=>{}],
                       "schemas in cmdline_aliases by default are normalized (b)");
         },
     );

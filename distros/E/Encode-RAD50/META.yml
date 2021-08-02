@@ -18,13 +18,14 @@ meta-spec:
 name: Encode-RAD50
 no_index:
   directory:
+    - eg
     - inc
     - t
     - xt
 provides:
   Encode::RAD50:
     file: lib/Encode/RAD50.pm
-    version: '0.016'
+    version: '0.017'
 requires:
   Carp: '0'
   Encode: '0'
@@ -38,5 +39,5 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Encode-RAD50
   license: http://dev.perl.org/licenses/
   repository: git://github.com/trwyant/perl-Encode-RAD50.git
-version: '0.016'
+version: '0.017'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

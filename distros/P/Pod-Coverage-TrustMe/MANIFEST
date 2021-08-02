@@ -1,0 +1,54 @@
+bin/pod-cover-trustme
+Changes
+lib/Pod/Coverage/TrustMe.pm
+lib/Pod/Coverage/TrustMe/Parser.pm
+lib/Test/Pod/Coverage/TrustMe.pm
+maint/Makefile.PL.include
+Makefile.PL
+MANIFEST			This list of files
+t/basic.t
+t/corpus/OtherFile.pm
+t/corpus/SomeFile.pm
+t/corpus/SomeRole.pm
+t/corpus/UsingRole.pm
+t/Pod-Coverage-TrustPod/basic.t
+t/Pod-Coverage-TrustPod/lib/BaseWithNoPod.pm
+t/Pod-Coverage-TrustPod/lib/ChildWithPod.pm
+t/Pod-Coverage-TrustPod/lib/NoCoverage.pm
+t/Pod-Coverage-TrustPod/lib/PodFor.pm
+t/Pod-Coverage-TrustPod/lib/PodPrivate.pm
+t/Pod-Coverage-TrustPod/lib/TrustMe.pm
+t/Pod-Coverage-TrustPod/lib/TrustStar.pm
+t/Pod-Coverage-TrustPod/no-pod-parent.t
+t/pod-coverage.t
+t/Pod-Coverage/02simple.t
+t/Pod-Coverage/03import.t
+t/Pod-Coverage/05parentage.t
+t/Pod-Coverage/06trustme.t
+t/Pod-Coverage/08tie.t
+t/Pod-Coverage/09whitespace.t
+t/Pod-Coverage/lib/Args.pm
+t/Pod-Coverage/lib/Child.pm
+t/Pod-Coverage/lib/Earle.pm
+t/Pod-Coverage/lib/Empty.pm
+t/Pod-Coverage/lib/Fully/Qualified.pm
+t/Pod-Coverage/lib/GrandParent.pm
+t/Pod-Coverage/lib/Parent.pm
+t/Pod-Coverage/lib/Sibling.pm
+t/Pod-Coverage/lib/Simple1.pm
+t/Pod-Coverage/lib/Simple2.pm
+t/Pod-Coverage/lib/Simple3.pm
+t/Pod-Coverage/lib/Simple4.pm
+t/Pod-Coverage/lib/Simple4.pod
+t/Pod-Coverage/lib/Simple5.pm
+t/Pod-Coverage/lib/Simple6.pm
+t/Pod-Coverage/lib/Simple7.pm
+t/Pod-Coverage/lib/Simple8.pm
+t/Pod-Coverage/lib/Simple9.pm
+t/Pod-Coverage/lib/Tie.pm
+t/Pod-Coverage/lib/Trustme.pm
+t/Pod-Coverage/lib/XS4ALL.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+README                                   README file (added by Distar)
+LICENSE                                  LICENSE file (added by Distar)

@@ -22,7 +22,7 @@ configure_requires:
   ExtUtils::MakeMaker: '6.17'
   perl: '5.006'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.023, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -39,7 +39,7 @@ no_index:
 provides:
   HTTP::Tiny:
     file: lib/HTTP/Tiny.pm
-    version: '0.076'
+    version: '0.078'
 recommends:
   HTTP::CookieJar: '0.001'
   IO::Socket::IP: '0.32'
@@ -61,7 +61,7 @@ resources:
   bugtracker: https://github.com/chansen/p5-http-tiny/issues
   homepage: https://github.com/chansen/p5-http-tiny
   repository: https://github.com/chansen/p5-http-tiny.git
-version: '0.076'
+version: '0.078'
 x_authority: cpan:DAGOLDEN
 x_contributors:
   - 'Alan Gardner <gardner@pythian.com>'
@@ -80,6 +80,8 @@ x_contributors:
   - 'Dean Pearce <pearce@pythian.com>'
   - 'Edward Zborowski <ed@rubensteintech.com>'
   - 'Felipe Gasper <felipe@felipegasper.com>'
+  - 'Greg Kennedy <kennedy.greg@gmail.com>'
+  - 'James E Keenan <jkeenan@cpan.org>'
   - 'James Raspass <jraspass@gmail.com>'
   - 'Jeremy Mates <jmates@cpan.org>'
   - 'Jess Robinson <castaway@desert-island.me.uk>'
@@ -87,11 +89,14 @@ x_contributors:
   - 'Lukas Eklund <leklund@gmail.com>'
   - 'Martin J. Evans <mjegh@ntlworld.com>'
   - 'Martin-Louis Bright <mlbright@gmail.com>'
+  - 'Matthew Horsfall <wolfsage@gmail.com>'
+  - 'Michael R. Davis <mrdvt92@users.noreply.github.com>'
   - 'Mike Doherty <doherty@cpan.org>'
   - 'Nicolas Rochelemagne <rochelemagne@cpanel.net>'
   - 'Olaf Alders <olaf@wundersolutions.com>'
   - 'Olivier Mengué <dolmen@cpan.org>'
   - 'Petr Písař <ppisar@redhat.com>'
+  - 'sanjay-cpu <snjkmr32@gmail.com>'
   - 'Serguei Trouchelle <stro@cpan.org>'
   - 'Shoichi Kaji <skaji@cpan.org>'
   - 'SkyMarshal <skymarshal1729@gmail.com>'
@@ -101,5 +106,7 @@ x_contributors:
   - 'Tatsuhiko Miyagawa <miyagawa@bulknews.net>'
   - 'Tom Hukins <tom@eborcom.com>'
   - 'Tony Cook <tony@develop-help.com>'
-x_generated_by_perl: v5.28.0
+  - 'Xavier Guimard <yadd@debian.org>'
+x_generated_by_perl: v5.34.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

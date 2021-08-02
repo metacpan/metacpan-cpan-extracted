@@ -1,9 +1,9 @@
 package Test::Data::Sah::Perl;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-07-29'; # DATE
+our $DATE = '2021-08-01'; # DATE
 our $DIST = 'Data-Sah'; # DIST
-our $VERSION = '0.909'; # VERSION
+our $VERSION = '0.910'; # VERSION
 
 use 5.010001;
 use strict;
@@ -140,7 +140,7 @@ Test::Data::Sah::Perl - Routines for testing Data::Sah (perl compiler)
 
 =head1 VERSION
 
-This document describes version 0.909 of Test::Data::Sah::Perl (from Perl distribution Data-Sah), released on 2021-07-29.
+This document describes version 0.910 of Test::Data::Sah::Perl (from Perl distribution Data-Sah), released on 2021-08-01.
 
 =head1 FUNCTIONS
 

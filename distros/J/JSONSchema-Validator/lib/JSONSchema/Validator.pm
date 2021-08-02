@@ -1,6 +1,6 @@
 package JSONSchema::Validator;
 
-# ABSTRACT: Validator for JSON Schema Draft4 and OpenAPI Specification 3.0
+# ABSTRACT: Validator for JSON Schema Draft4/Draft6/Draft7 and OpenAPI Specification 3.0
 
 use strict;
 use warnings;
@@ -8,17 +8,23 @@ use URI::file;
 use Carp 'croak';
 use Cwd;
 
+use JSONSchema::Validator::Draft4;
+use JSONSchema::Validator::Draft6;
+use JSONSchema::Validator::Draft7;
+use JSONSchema::Validator::OAS30;
 use JSONSchema::Validator::Util qw(get_resource decode_content read_file);
 
-our $VERSION = '0.002';
+our $VERSION = '0.004';
 
 my $SPECIFICATIONS = {
-    'https://spec.openapis.org/oas/3.0/schema/2019-04-02' => 'OAS30',
-    'http://json-schema.org/draft-04/schema#' => 'Draft4',
-    'http://json-schema.org/draft-04/schema' => 'Draft4'
+    JSONSchema::Validator::OAS30::ID => JSONSchema::Validator::OAS30::SPECIFICATION,
+    JSONSchema::Validator::Draft4::ID => JSONSchema::Validator::Draft4::SPECIFICATION,
+    JSONSchema::Validator::Draft6::ID => JSONSchema::Validator::Draft6::SPECIFICATION,
+    JSONSchema::Validator::Draft7::ID => JSONSchema::Validator::Draft7::SPECIFICATION
 };
 
-my $KNOWN_SPECIFICATIONS = ['OAS30', 'Draft4'];
+our $JSON_SCHEMA_VALIDATORS = ['JSONSchema::Validator::Draft4', 'JSONSchema::Validator::Draft6', 'JSONSchema::Validator::Draft7'];
+our $OAS_VALIDATORS = ['JSONSchema::Validator::OAS30'];
 
 sub new {
     my ($class, %params) = @_;
@@ -30,22 +36,20 @@ sub new {
     my $specification = delete $params{specification};
 
     $schema = resource_schema($resource, \%params) if !$schema && $resource;
-    croak 'resource or schema must be specified' unless $schema;
+    croak 'resource or schema must be specified' unless defined $schema;
 
-    $specification = schema_specification($schema) unless $specification;
-    ($specification) = grep { lc eq lc($specification // '') } @$KNOWN_SPECIFICATIONS;
-    croak 'unknown specification' unless $specification;
+    my $validator_class = find_validator($specification // schema_specification($schema));
+    croak 'unknown specification' unless $validator_class;
 
     if ($validate_schema) {
-        my ($result, $errors) = $class->validate_resource_schema($schema, $specification);
+        my ($result, $errors) = $class->validate_resource_schema($schema, $validator_class->SPECIFICATION);
         croak "invalid schema:\n" . join "\n", @$errors unless $result;
     }
 
-    my $validator_class = "JSONSchema::Validator::${specification}";
-    my $validator_file = $validator_class =~ s!::!/!gr;
-    croak "Unknown specification param $specification: $@" unless eval { require $validator_file . '.pm'; 1 };
-
-    $base_uri //= $resource || $schema->{'$id'} || $schema->{id};
+    # schema may be boolean value according to json schema draft6
+    if (ref $schema eq 'HASH') {
+        $base_uri //= $resource || $schema->{'$id'} || $schema->{id};
+    }
 
     return $validator_class->new(schema => $schema, base_uri => $base_uri, %params);
 }
@@ -68,11 +72,10 @@ sub validate_resource {
     my ($class, $resource, %params) = @_;
     my $schema_to_validate = resource_schema($resource, \%params);
 
-    my $specification = schema_specification($schema_to_validate);
-    ($specification) = grep { lc eq lc($specification // '') } @$KNOWN_SPECIFICATIONS;
-    croak "unknown specification of resource $resource" unless $specification;
+    my $validator_class = find_validator(schema_specification($schema_to_validate));
+    croak "unknown specification of resource $resource" unless $validator_class;
 
-    return $class->validate_resource_schema($schema_to_validate, $specification);
+    return $class->validate_resource_schema($schema_to_validate, $validator_class->SPECIFICATION);
 }
 
 sub validate_resource_schema {
@@ -81,10 +84,11 @@ sub validate_resource_schema {
     my $schema = read_specification($schema_specification);
     my $meta_schema = $schema->{'$schema'};
 
-    my $validator_name = $SPECIFICATIONS->{$meta_schema};
-    my $validator_class = "JSONSchema::Validator::${validator_name}";
-    my $validator_file = $validator_class =~ s!::!/!gr;
-    croak "Can't import module $validator_class: $@" unless eval { require $validator_file . '.pm'; 1 };
+    my $meta_schema_specification = $SPECIFICATIONS->{$meta_schema} // $SPECIFICATIONS->{$meta_schema . '#'};
+    croak "unknown meta schema: $meta_schema" unless $meta_schema_specification;
+
+    my $validator_class = find_validator($meta_schema_specification);
+    croak "can't find validator by meta schema: $meta_schema" unless $validator_class;
 
     my $validator = $validator_class->new(schema => $schema);
     my ($result, $errors) = $validator->validate_schema($schema_to_validate);
@@ -106,11 +110,18 @@ sub resource_schema {
     return $schema;
 }
 
+sub find_validator {
+    my $specification = shift;
+    my ($validator_class) = grep { lc($_->SPECIFICATION) eq lc($specification // '') } @$JSON_SCHEMA_VALIDATORS, @$OAS_VALIDATORS;
+    return $validator_class;
+}
+
 sub schema_specification {
     my $schema = shift;
+    return if ref $schema ne 'HASH';
 
     my $meta_schema = $schema->{'$schema'};
-    my $specification = $meta_schema ? $SPECIFICATIONS->{$meta_schema} : undef;
+    my $specification = $meta_schema ? $SPECIFICATIONS->{$meta_schema} // $SPECIFICATIONS->{$meta_schema . '#'} : undef;
 
     if (!$specification && $schema->{openapi}) {
         my @vers = split /\./, $schema->{openapi};
@@ -130,11 +141,11 @@ __END__
 
 =head1 NAME
 
-JSONSchema::Validator - Validator for JSON Schema Draft4 and OpenAPI Specification 3.0
+JSONSchema::Validator - Validator for JSON Schema Draft4/Draft6/Draft7 and OpenAPI Specification 3.0
 
 =head1 VERSION
 
-version 0.002
+version 0.004
 
 =head1 SYNOPSIS
 
@@ -171,19 +182,19 @@ version 0.002
         }
     )
 
-    # to get Draft4 JSON Schema validator of schema in JSON format
+    # to get JSON Schema Draft4/Draft6/Draft7 validator of schema in JSON format
     $validator = JSONSchema::Validator->new(resource => 'http://example.com/draft4/schema.json')
     my ($result, $errors) = $validator->validate_schema($object_to_validate)
 
 =head1 DESCRIPTION
 
-OpenAPI specification and Draft4 JSON Schema validators with minimum dependencies.
+OpenAPI specification and JSON Schema Draft4/Draft6/Draft7 validators with minimum dependencies.
 
 =head1 CLASS METHODS
 
 =head2 new
 
-Creates one of the following validators: JSONSchema::Validator::Draft4, JSONSchema::Validator::OAS30.
+Creates one of the following validators: JSONSchema::Validator::Draft4, JSONSchema::Validator::Draft6, JSONSchema::Validator::Draft7, JSONSchema::Validator::OAS30.
 
     my $validator = JSONSchema::Validator->new(resource => 'file:///some/path/to/oas30.yml');
     my $validator = JSONSchema::Validator->new(resource => 'http://example.com/draft4/schema.json');
@@ -191,7 +202,7 @@ Creates one of the following validators: JSONSchema::Validator::Draft4, JSONSche
     my $validator = JSONSchema::Validator->new(schema => {...}, specification => 'Draft4');
 
 if parameter C<specification> is not specified then type of validator will be determined by C<$schema> key
-for Draft4 JSON Schema and by C<openapi> key for OpenAPI Specification 3.0 in C<schema> parameter.
+for JSON Schema Draft4/Draft6/Draft7 and by C<openapi> key for OpenAPI Specification 3.0 in C<schema> parameter.
 
 =head3 Parameters
 
@@ -220,7 +231,7 @@ By default C<base_uri> is equal to the resource path if the resource parameter i
 =head3 Additional parameters
 
 Additional parameters need to be looked at in a specific validator class.
-Currently there are validators: JSONSchema::Validator::Draft4, JSONSchema::Validator::OAS30.
+Currently there are validators: JSONSchema::Validator::Draft4, JSONSchema::Validator::Draft6, JSONSchema::Validator::Draft7, JSONSchema::Validator::OAS30.
 
 =head2 validate_paths
 

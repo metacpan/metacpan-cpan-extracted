@@ -1,6 +1,6 @@
 package JSONSchema::Validator::Util;
 
-# ABSTRACT: Usefull functions
+# ABSTRACT: Useful functions
 
 use strict;
 use warnings;
@@ -168,57 +168,56 @@ sub read_file {
     return $file_content, $mime_type;
 }
 
+# params: $value, $type, $is_strict
 sub is_type {
-    my ($value, $type, $strict) = @_;
-    return 0 unless exists TYPE_MAP->{$type};
-    return TYPE_MAP->{$type}->($value, $strict);
+    return 0 unless exists TYPE_MAP->{$_[1]};
+    return TYPE_MAP->{$_[1]}->($_[0], $_[2]);
 }
 
+# params: $value, $is_strict
 sub detect_type {
-    my ($value, $strict) = @_;
-    for my $type (keys %{TYPE_MAP()}) {
-        return $type if TYPE_MAP->{$type}->($value, $strict);
+    for my $type (@{TYPE_LIST()}) {
+        return $type if TYPE_MAP->{$type}->(@_);
     }
     # it must be unreachable code
     croak 'Unknown type detected';
 }
 
+# params: $value, $is_strict
 sub is_array {
     return ref $_[0] eq 'ARRAY';
 }
 
+# params: $value, $is_strict
 sub is_bool {
-    my ($value, $is_strict) = @_;
-    return 1 if ref $value eq 'JSON::PP::Boolean';
-    return 0 if $is_strict;
-    my $is_number = looks_like_number($value) && ($value == 1 || $value == 0);
-    my $is_string = $value eq '';
-    my $is_undef = !defined $value;
+    return 1 if ref $_[0] eq 'JSON::PP::Boolean';
+    return 0 if $_[1]; # is strict
+    my $is_number = looks_like_number($_[0]) && ($_[0] == 1 || $_[0] == 0);
+    my $is_string = $_[0] eq '';
+    my $is_undef = !defined $_[0];
     return 1 if $is_number || $is_string || $is_undef;
     return 0;
 }
 
+# params: $value, $is_strict
 sub is_integer {
-    my ($value, $is_strict) = @_;
-    my $is_int = B::svref_2object(\$value)->FLAGS & B::SVf_IOK();
-    return 1 if $is_int && ((0 + $value) eq $value) && round($value) == $value;
-    return 0 if $is_strict;
-    return 1 if looks_like_number($value) && round($value) == $value;
+    return 1 if B::svref_2object(\$_[0])->FLAGS & B::SVf_IOK();
+    return 0 if $_[1]; # is strict
+    return 1 if looks_like_number($_[0]) && int($_[0]) == $_[0];
     return 0;
 }
 
+# params: $value, $is_strict
 sub is_number {
-    my ($value, $is_strict) = @_;
-    my $is_num = B::svref_2object(\$value)->FLAGS & (B::SVf_IOK() | B::SVf_NOK());
-    return 1 if $is_num && ((0 + $value) eq $value);
-    return 0 if $is_strict;
-    return 1 if looks_like_number($value);
+    return 1 if B::svref_2object(\$_[0])->FLAGS & (B::SVf_IOK() | B::SVf_NOK());
+    return 0 if $_[1]; # is strict
+    return 1 if looks_like_number($_[0]);
     return 0;
 }
 
+# params: $value, $is_strict
 sub is_ref {
-    my ($value, $is_strict) = @_;
-    my $ref = ref $value;
+    my $ref = ref $_[0];
     return 0 unless $ref;
     return 0 if $ref eq 'JSON::PP::Boolean' ||
                 $ref eq 'HASH' ||
@@ -226,17 +225,19 @@ sub is_ref {
     return 1;
 }
 
+# params: $value, $is_strict
 sub is_object {
     return ref $_[0] eq 'HASH';
 }
 
+# params: $value, $is_strict
 sub is_null {
     return !(defined $_[0]);
 }
 
+# params: $value, $is_strict
 sub is_string {
-    my ($value, $is_strict) = @_;
-    return !(ref $_[0]) && !is_number(@_) && defined $_[0] if $is_strict;
+    return !(ref $_[0]) && !is_number(@_) && defined $_[0] if $_[1]; # is strict
     return !(ref $_[0]) && defined $_[0];
 }
 
@@ -262,11 +263,11 @@ __END__
 
 =head1 NAME
 
-JSONSchema::Validator::Util - Usefull functions
+JSONSchema::Validator::Util - Useful functions
 
 =head1 VERSION
 
-version 0.002
+version 0.004
 
 =head1 AUTHORS
 

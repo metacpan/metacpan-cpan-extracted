@@ -9,7 +9,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.42'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -18,13 +18,13 @@ name: Excel-ValueReader-XLSX
 provides:
   Excel::ValueReader::XLSX:
     file: lib/Excel/ValueReader/XLSX.pm
-    version: '1.0'
+    version: '1.01'
   Excel::ValueReader::XLSX::LibXML:
     file: lib/Excel/ValueReader/XLSX/LibXML.pm
-    version: '1.0'
+    version: '1.01'
   Excel::ValueReader::XLSX::Regex:
     file: lib/Excel/ValueReader/XLSX/Regex.pm
-    version: '1.0'
+    version: '1.01'
 recommends:
   XML::LibXML::Reader: '0'
 requires:
@@ -36,5 +36,5 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/damil/Excel-ValueReader-XLSX
-version: '1.0'
+version: '1.01'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

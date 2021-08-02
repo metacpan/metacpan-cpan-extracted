@@ -1,4 +1,4 @@
-package Test::DZil 6.023;
+package Test::DZil 6.024;
 # ABSTRACT: tools for testing Dist::Zilla plugins
 
 # BEGIN BOILERPLATE
@@ -259,7 +259,7 @@ Test::DZil - tools for testing Dist::Zilla plugins
 
 =head1 VERSION
 
-version 6.023
+version 6.024
 
 =head1 DESCRIPTION
 

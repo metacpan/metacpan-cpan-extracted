@@ -1,4 +1,4 @@
-package Dist::Zilla::Role::ShareDir 6.023;
+package Dist::Zilla::Role::ShareDir 6.024;
 # ABSTRACT: something that picks a directory to install as shared files
 
 use Moose::Role;
@@ -34,7 +34,7 @@ Dist::Zilla::Role::ShareDir - something that picks a directory to install as sha
 
 =head1 VERSION
 
-version 6.023
+version 6.024
 
 =head1 PERL VERSION
 

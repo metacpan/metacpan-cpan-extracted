@@ -1,9 +1,11 @@
 package JSON::Decode::Regexp;
 
-our $DATE = '2018-03-25'; # DATE
-our $VERSION = '0.101'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-08-01'; # DATE
+our $DIST = 'JSON-Decode-Regexp'; # DIST
+our $VERSION = '0.102'; # VERSION
 
-use 5.010001;
+use 5.014004;
 use strict;
 use warnings;
 
@@ -190,7 +192,7 @@ JSON::Decode::Regexp - JSON parser as a single Perl Regex
 
 =head1 VERSION
 
-This document describes version 0.101 of JSON::Decode::Regexp (from Perl distribution JSON-Decode-Regexp), released on 2018-03-25.
+This document describes version 0.102 of JSON::Decode::Regexp (from Perl distribution JSON-Decode-Regexp), released on 2021-08-01.
 
 =head1 SYNOPSIS
 
@@ -205,6 +207,12 @@ originally posted at:
  http://perlmonks.org/?node_id=995856
 
 The code is licensed "just like Perl".
+
+=head1 CONTRIBUTOR
+
+=for stopwords Steven Haryanto
+
+Steven Haryanto <sharyanto@cpan.org>
 
 =head1 FUNCTIONS
 
@@ -266,7 +274,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2016, 2013 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2018, 2016, 2013 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

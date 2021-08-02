@@ -6,13 +6,17 @@ use warnings;
 
 use Test::More;
 
-plan tests => 10 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 14 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'JSONSchema/Validator.pm',
     'JSONSchema/Validator/Constraints/Draft4.pm',
+    'JSONSchema/Validator/Constraints/Draft6.pm',
+    'JSONSchema/Validator/Constraints/Draft7.pm',
     'JSONSchema/Validator/Constraints/OAS30.pm',
     'JSONSchema/Validator/Draft4.pm',
+    'JSONSchema/Validator/Draft6.pm',
+    'JSONSchema/Validator/Draft7.pm',
     'JSONSchema/Validator/Error.pm',
     'JSONSchema/Validator/Format.pm',
     'JSONSchema/Validator/JSONPointer.pm',

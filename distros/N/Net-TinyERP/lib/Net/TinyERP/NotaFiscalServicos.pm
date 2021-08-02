@@ -57,13 +57,16 @@ sub obter {
 }
 
 sub consultar {
-    my ($self, $id) = @_;
+    my ($self, $params) = @_;
+    if (!ref $params) {
+        $params = { id => $params, enviarEmail => 'N' };
+    }
     die 'obter() precisa de argumento "id" numérico'
-        unless $id && $id =~ /^\d+$/;
+        unless ($params->{id} && $params->{id} =~ /\A\d+\z/s);
 
-    return $self->_post('https://api.tiny.com.br/api2/nota.servico.consultar.php', {
-        id => $id,
-    });
+    return $self->_post('https://api.tiny.com.br/api2/nota.servico.consultar.php',
+        $params,
+    );
 }
 
 sub incluir {

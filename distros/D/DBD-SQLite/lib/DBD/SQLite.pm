@@ -5,7 +5,7 @@ use strict;
 use DBI   1.57 ();
 use XSLoader ();
 
-our $VERSION = '1.68';
+our $VERSION = '1.70';
 
 # sqlite_version cache (set in the XS bootstrap)
 our ($sqlite_version, $sqlite_version_number);
@@ -1655,7 +1655,7 @@ updates:
 
   use DBI qw(:sql_types);
   use DBD::SQLite::Constants ':dbd_sqlite_string_mode';
-  $dbh->{string_mode} = DBD_SQLITE_STRING_MODE_UNICODE_FALLBACK;
+  $dbh->{sqlite_string_mode} = DBD_SQLITE_STRING_MODE_UNICODE_FALLBACK;
   my $sth = $dbh->prepare("INSERT INTO mytable (blobcolumn) VALUES (?)");
 
   # Binary_data will be stored as is.
@@ -1668,8 +1668,8 @@ DBD_SQLITE_STRING_MODE_UNICODE_FALLBACK but usually throws an exception
 rather than a warning if SQLite sends invalid UTF-8. (In Perl callbacks
 from SQLite we still warn instead.)
 
-=item * DBD_SQLITE_STRING_MODULE_UNICODE_NAIVE: Like
-DBD_SQLITE_STRING_MODE_UNICODE_FALLBACK but uses a "naïve" UTF-8 decoding
+=item * DBD_SQLITE_STRING_MODE_UNICODE_NAIVE: Like
+DBD_SQLITE_STRING_MODE_UNICODE_FALLBACK but uses a "naÃ¯ve" UTF-8 decoding
 method that forgoes validation. This is marginally faster than a validated
 decode, but it can also B<corrupt> B<Perl> B<itself!>
 

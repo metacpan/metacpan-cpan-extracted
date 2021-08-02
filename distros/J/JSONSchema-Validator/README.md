@@ -1,10 +1,10 @@
 # NAME
 
-JSONSchema::Validator - Validator for JSON Schema Draft4 and OpenAPI Specification 3.0
+JSONSchema::Validator - Validator for JSON Schema Draft4/Draft6/Draft7 and OpenAPI Specification 3.0
 
 # VERSION
 
-version 0.002
+version 0.004
 
 # SYNOPSIS
 
@@ -41,19 +41,19 @@ version 0.002
         }
     )
 
-    # to get Draft4 JSON Schema validator of schema in JSON format
+    # to get JSON Schema Draft4/Draft6/Draft7 validator of schema in JSON format
     $validator = JSONSchema::Validator->new(resource => 'http://example.com/draft4/schema.json')
     my ($result, $errors) = $validator->validate_schema($object_to_validate)
 
 # DESCRIPTION
 
-OpenAPI specification and Draft4 JSON Schema validators with minimum dependencies.
+OpenAPI specification and JSON Schema Draft4/Draft6/Draft7 validators with minimum dependencies.
 
 # CLASS METHODS
 
 ## new
 
-Creates one of the following validators: JSONSchema::Validator::Draft4, JSONSchema::Validator::OAS30.
+Creates one of the following validators: JSONSchema::Validator::Draft4, JSONSchema::Validator::Draft6, JSONSchema::Validator::Draft7, JSONSchema::Validator::OAS30.
 
     my $validator = JSONSchema::Validator->new(resource => 'file:///some/path/to/oas30.yml');
     my $validator = JSONSchema::Validator->new(resource => 'http://example.com/draft4/schema.json');
@@ -61,7 +61,7 @@ Creates one of the following validators: JSONSchema::Validator::Draft4, JSONSche
     my $validator = JSONSchema::Validator->new(schema => {...}, specification => 'Draft4');
 
 if parameter `specification` is not specified then type of validator will be determined by `$schema` key
-for Draft4 JSON Schema and by `openapi` key for OpenAPI Specification 3.0 in `schema` parameter.
+for JSON Schema Draft4/Draft6/Draft7 and by `openapi` key for OpenAPI Specification 3.0 in `schema` parameter.
 
 ### Parameters
 
@@ -90,7 +90,7 @@ By default `base_uri` is equal to the resource path if the resource parameter is
 ### Additional parameters
 
 Additional parameters need to be looked at in a specific validator class.
-Currently there are validators: JSONSchema::Validator::Draft4, JSONSchema::Validator::OAS30.
+Currently there are validators: JSONSchema::Validator::Draft4, JSONSchema::Validator::Draft6, JSONSchema::Validator::Draft7, JSONSchema::Validator::OAS30.
 
 ## validate\_paths
 

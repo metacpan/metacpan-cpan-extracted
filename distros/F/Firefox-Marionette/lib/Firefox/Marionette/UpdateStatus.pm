@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use URI();
 
-our $VERSION = '1.10';
+our $VERSION = '1.11';
 
 sub _NUMBER_OF_MILLISECONDS_IN_A_SECOND { return 1000 }
 
@@ -154,7 +154,7 @@ Firefox::Marionette::UpdateStatus - Represents the resulting status of an Firefo
 
 =head1 VERSION
 
-Version 1.10
+Version 1.11
 
 =head1 SYNOPSIS
 
@@ -278,7 +278,7 @@ returns a string to display in the user interface for the version. If you want a
 
 returns a boolean to indicate if an elevation failure has been encountered for this update.
 
-=head2 error_code - 
+=head2 error_code
 
 returns a L<numeric error code|https://hg.mozilla.org/mozilla-central/file/tip/toolkit/mozapps/update/common/updatererrors.h> that conveys additional information about the state of a failed update. If the update is not in the "failed" state the value is zero.
 
@@ -314,7 +314,7 @@ returns the amount of time in seconds before prompting the user to apply an upda
 
 returns the currently selected patch for this update.
 
-=head2 service_url - the Update Service that supplied this update.
+=head2 service_url
 
 returns a L<URI|URI> for the Update Service that supplied this update.
 

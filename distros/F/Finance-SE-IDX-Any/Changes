@@ -1,3 +1,8 @@
+0.004   2021-08-01  Released-By: PERLANCAR; Urgency: medium
+
+	- [test] Update tests (RT#127874).
+
+
 0.003   2020-12-24  Released-By: PERLANCAR; Urgency: medium
 
 	- Add list_brokers() (Finance::SE::IDX 0.005).

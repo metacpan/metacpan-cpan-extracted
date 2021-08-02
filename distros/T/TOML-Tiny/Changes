@@ -1,3 +1,36 @@
+0.14 2021-08-02
+- Fix an issue with serialisation of nan, inf, and -inf (thanks jjatria)
+- Enforcement of homogenous arrays is no longer supported as it has been
+  dropped from the TOML spec
+- strict_arrays is now strict (strict_arrays still accepted for compatibility)
+- strict mode now disallows trailing commas
+- bugfix: table names whose individual segments include a dot can no longer
+  cause parser to incorrectly identify duplicate table names
+- bugfix: correctly fail on arrays without separators
+- bugfix: correctly fail when array ends without closing at EOF
+- bugfix: correctly fail when inline table is missing separators or has
+  trailing separator
+- bugfix: disallow non-permitted control characters in strings and comments
+- bugfix: disallow invalid unicode in input
+- bugfix: allow double-zero exponents (e00)
+- bugfix: correctly parse multi-line literal strings, dealing properly with
+  some edge cases
+- bugfix: correctly parse multi-line basic strings, dealing properly with some
+  edge cases
+- bugfix: correctly escape unicode control characters in toml output
+- bugfix: correctly handle comment-like sequences in multiline strings
+- bugfix: correctly handle keys with names that are toml keywords
+- bugfix: better handling of inf/nan in parsing, writing
+- bugfix: correctly generate empty inline tables within arrays
+- bugfix: make duplicate key enforcement match the toml 1.0 spec
+- bugfix: update datetime support to match toml abnf, w/ workaround for
+  burntsushi tests supporting lowercase z and toml supporting a space instead
+  of T
+- bugfix: fix support for local dates, local times, fractional second precision
+- bugfix: fix parsing of dotted keys in inline tables
+- bugfix: fixes for escapes and unicode in key names, both in parsing and
+  generating toml
+
 0.13 2021-07-26
 -Fix a spurious warning being raised on trailing spaces in hexadecimal numbers (thanks jjatria)
 

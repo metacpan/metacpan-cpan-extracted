@@ -20,4 +20,9 @@ on 'develop' => sub {
     requires 'Pod::Markdown::Github';
     requires 'Version::Next';
     requires 'CPAN::Uploader';
+    requires 'Test::CPAN::Meta';
+    requires 'Test::MinimumVersion::Fast';
+    requires 'Test::PAUSE::Permissions';
+    requires 'Test::Pod';
+    requires 'Test::Spellunker';
 };

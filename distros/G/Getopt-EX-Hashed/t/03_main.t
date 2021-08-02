@@ -18,7 +18,7 @@ has number   => ( spec => '=i' );
 
 use Getopt::Long;
 my $app = Getopt::EX::Hashed->new() or die;
-GetOptions($app, $app->optspec) or die;
+GetOptions($app->optspec) or die;
 
 is($app->{string}, "Alice", "String");
 is($app->{say}, "Hello", "String (default)");

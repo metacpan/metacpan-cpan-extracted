@@ -1,3 +1,9 @@
+0.852   2021-08-01  Released-By: PERLANCAR; Urgency: medium
+
+	- Update test to newer Data::Sah::Normalize (0.051, via Data::Sah
+	  0.909) (RT#138250).
+
+
 0.851   2019-07-04  Released-By: PERLANCAR; Urgency: medium
 
 	- Observe function feature 'validate_args' in Rinci metadata, and

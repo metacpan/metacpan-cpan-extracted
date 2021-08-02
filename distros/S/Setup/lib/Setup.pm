@@ -1,6 +1,6 @@
 package Setup;
 
-our $VERSION = '1.0.5'; # VERSION
+our $VERSION = '1.0.6'; # VERSION
 
 1;
 # ABSTRACT: Specification for setup module
@@ -17,7 +17,13 @@ Setup - Specification for setup module
 
 =head1 VERSION
 
-This document describes version 1.0.5 of Setup (from Perl distribution Setup), released on 2015-09-09.
+This document describes version 1.0.6 of Setup (from Perl distribution Setup), released on 2021-08-02.
+
+=head1 CONTRIBUTOR
+
+=for stopwords Steven Haryanto
+
+Steven Haryanto <sharyanto@cpan.org>
 
 =head1 HOMEPAGE
 
@@ -41,7 +47,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2015, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

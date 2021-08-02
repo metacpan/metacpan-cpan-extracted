@@ -7,7 +7,7 @@ use 5.10.1;
 # GLOBAL VARIABLES
 #======================================================================
 
-our $VERSION = '1.0';
+our $VERSION = '1.01';
 
 my %xml_entities   = ( amp  => '&',
                        lt   => '<',
@@ -37,11 +37,11 @@ sub _strings {
   my $contents = $self->_member_contents('xl/sharedStrings.xml');
 
   # iterate on <si> nodes
-  while ($contents =~ m[<si>(.*?)</si>]g) {
+  while ($contents =~ m[<si>(.*?)</si>]sg) {
     my $innerXML = $1;
 
     # concatenate contents from all <t> nodes (usually there is only 1)
-    my $string   = join "", ($innerXML =~ m[<t[^>]*>(.+?)</t>]g);
+    my $string   = join "", ($innerXML =~ m[<t[^>]*>(.+?)</t>]sg);
 
     # decode entities
     $string =~ s/$regex_entities/$xml_entities{$1}/eg;

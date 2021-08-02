@@ -1,4 +1,4 @@
-package Dist::Zilla::Path 6.023;
+package Dist::Zilla::Path 6.024;
 # ABSTRACT: a helper to get Path::Tiny objects
 
 # BEGIN BOILERPLATE
@@ -68,7 +68,7 @@ Dist::Zilla::Path - a helper to get Path::Tiny objects
 
 =head1 VERSION
 
-version 6.023
+version 6.024
 
 =head1 PERL VERSION
 

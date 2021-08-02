@@ -2,23 +2,31 @@
 use utf8;
 use Test2::V0;
 use Data::Dumper;
-use DateTime;
-use DateTime::Format::RFC3339;
 use Math::BigInt;
 use Math::BigFloat;
 use TOML::Tiny;
 
+local $Data::Dumper::Sortkeys = 1;
+local $Data::Dumper::Useqq    = 1;
+
 binmode STDIN,  ':encoding(UTF-8)';
 binmode STDOUT, ':encoding(UTF-8)';
 
+open my $fh, '<', "./t/toml-test/valid/implicit-groups.toml" or die $!;
+binmode $fh, ':encoding(UTF-8)';
+my $toml = do{ local $/; <$fh>; };
+close $fh;
+
 my $expected1 = {
-               'a' => {
-                        'b' => {
-                                 'c' => {
-                                          'answer' => bless( {
-                                                               '_file' => '(eval 346)',
-                                                               'name' => 'Math::BigInt->new("42")->beq($_)',
-                                                               'code' => sub {
+               "a" => {
+                        "b" => {
+                                 "c" => {
+                                          "answer" => bless( {
+                                                               "_file" => "(eval 201)",
+                                                               "_lines" => [
+                                                                             7
+                                                                           ],
+                                                               "code" => sub {
                                                                              BEGIN {${^WARNING_BITS} = "\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x15\x00\x04\x40\x05\x04\x50"}
                                                                              use strict;
                                                                              no feature ':all';
@@ -27,10 +35,8 @@ my $expected1 = {
                                                                              my $got = 'Math::BigInt'->new($_);
                                                                              'Math::BigInt'->new('42')->beq($got);
                                                                          },
-                                                               '_lines' => [
-                                                                             7
-                                                                           ],
-                                                               'operator' => 'CODE(...)'
+                                                               "name" => "Math::BigInt->new(\"42\")->beq(\$_)",
+                                                               "operator" => "CODE(...)"
                                                              }, 'Test2::Compare::Custom' )
                                         }
                                }
@@ -38,11 +44,13 @@ my $expected1 = {
              };
 
 
-my $actual = from_toml(q{[a.b.c]
-answer = 42
-});
+my $actual = from_toml($toml);
 
 is($actual, $expected1, 'implicit-groups - from_toml') or do{
+  diag 'TOML INPUT:';
+  diag "$toml";
+
+  diag '';
   diag 'EXPECTED:';
   diag Dumper($expected1);
 
@@ -51,19 +59,27 @@ is($actual, $expected1, 'implicit-groups - from_toml') or do{
   diag Dumper($actual);
 };
 
-is(eval{ scalar from_toml(to_toml($actual)) }, $expected1, 'implicit-groups - to_toml') or do{
-  diag "ERROR: $@" if $@;
+my $regenerated = to_toml $actual;
+my $reparsed    = eval{ scalar from_toml $regenerated };
+my $error       = $@;
 
-  diag 'INPUT:';
+ok(!$error, 'implicit-groups - to_toml - no errors')
+  or diag $error;
+
+is($reparsed, $expected1, 'implicit-groups - to_toml') or do{
+  diag "ERROR: $error" if $error;
+
+  diag '';
+  diag 'PARSED FROM TEST SOURCE TOML:';
   diag Dumper($actual);
 
   diag '';
-  diag 'GENERATED TOML:';
-  diag to_toml($actual);
+  diag 'REGENERATED TOML:';
+  diag $regenerated;
 
   diag '';
-  diag 'REPARSED FROM GENERATED TOML:';
-  diag Dumper(scalar from_toml(to_toml($actual)));
+  diag 'REPARSED FROM REGENERATED TOML:';
+  diag Dumper($reparsed);
 };
 
 done_testing;

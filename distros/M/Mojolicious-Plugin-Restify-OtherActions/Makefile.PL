@@ -17,7 +17,7 @@ my %WriteMakefileArgs = (
   "NAME" => "Mojolicious::Plugin::Restify::OtherActions",
   "PREREQ_PM" => {
     "Mojo::Base" => 0,
-    "Mojolicious::Plugin::Restify" => 0
+    "Mojolicious::Plugin::Restify" => "0.10"
   },
   "TEST_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0,
@@ -27,7 +27,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.02",
+  "VERSION" => "0.03",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -38,7 +38,7 @@ my %FallbackPrereqs = (
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
   "Mojo::Base" => 0,
-  "Mojolicious::Plugin::Restify" => 0,
+  "Mojolicious::Plugin::Restify" => "0.10",
   "Test::Mojo" => 0,
   "Test::More" => 0,
   "strict" => 0,

@@ -2,6 +2,13 @@ Revision history for Log-Any
 
 ** denotes an incompatible change
 
+1.710     2021-08-02 10:11:33-05:00 America/Chicago
+
+    [Other]
+
+    - Removed explicit declaration of core dependencies to improve user
+      experience
+
 1.709     2021-02-17 15:16:20-06:00 America/Chicago
 
     [Added]

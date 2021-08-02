@@ -8,7 +8,7 @@ use RxPerl::Utils qw/ get_timer_subs /;
 use RxPerl::Subscription;
 
 use Carp 'croak';
-use Scalar::Util 'reftype', 'refaddr', 'blessed';
+use Scalar::Util 'reftype', 'refaddr', 'blessed', 'weaken';
 
 use Exporter 'import';
 our @EXPORT_OK = qw/
@@ -20,7 +20,7 @@ our @EXPORT_OK = qw/
 /;
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
-our $VERSION = "v6.7.1";
+our $VERSION = "v6.8.0";
 
 sub op_audit_time {
     my ($duration) = @_;
@@ -37,7 +37,7 @@ sub op_audit_time {
             my $in_audit = 0;
             my @last_value;
 
-            $subscriber->subscription->add_dependents(
+            $subscriber->subscription->add(
                 sub { $cancel_timer_sub->($id) },
             );
 
@@ -148,7 +148,7 @@ sub op_catch_error {
             my ($subscriber) = @_;
 
             my $dependents = [];
-            $subscriber->subscription->add_dependents($dependents);
+            $subscriber->subscription->add($dependents);
 
             _op_catch_error_helper(
                 $source, $selector, $subscriber, $dependents,
@@ -482,27 +482,13 @@ sub op_finalize {
         return rx_observable->new(sub {
             my ($subscriber) = @_;
 
-            my $will_finalize_later = 0;
+            my $arr = $subscriber->{_subscription}{_finalize_cbs} //= [];
+            unshift @$arr, $fn;
+            $subscriber->{_subscription}->add( $arr );
 
-            my $own_subscriber = {
-                %$subscriber,
-                error => sub {
-                    $will_finalize_later = 1;
-                    $subscriber->{error}->(@_) if defined $subscriber->{error};
-                    $fn->();
-                },
-                complete => sub {
-                    $will_finalize_later = 1;
-                    $subscriber->{complete}->() if defined $subscriber->{complete};
-                    $fn->();
-                },
-            };
+            $source->subscribe($subscriber);
 
-            $source->subscribe($own_subscriber);
-
-            return sub {
-                $fn->() unless $will_finalize_later;
-            };
+            return;
         });
     };
 }
@@ -583,7 +569,7 @@ sub op_merge_map {
             my %these_subscriptions;
             my $own_subscription = RxPerl::Subscription->new;
 
-            $subscription->add_dependents(\%these_subscriptions, $own_subscription);
+            $subscription->add(\%these_subscriptions, $own_subscription);
 
             my $own_subscriber = {
                 new_subscription => $own_subscription,
@@ -734,12 +720,12 @@ sub op_ref_count {
             if ($count_was == 0) {
                 $connection_subscription = RxPerl::Subscription->new;
 
-                $subscriber->subscription->add_dependents($typical_unsubscription_fn);
+                $subscriber->subscription->add($typical_unsubscription_fn);
                 $source->subscribe($subscriber);
 
                 $connection_subscription = $source->connect;
             } else {
-                $subscriber->subscription->add_dependents($typical_unsubscription_fn);
+                $subscriber->subscription->add($typical_unsubscription_fn);
                 $source->subscribe($subscriber);
             }
 
@@ -791,7 +777,7 @@ sub op_repeat {
             my $own_subscription;
             my $own_subscription_ref = \$own_subscription;
 
-            $subscriber->subscription->add_dependents(
+            $subscriber->subscription->add(
                 $own_subscription_ref,
             );
 
@@ -843,7 +829,7 @@ sub op_retry {
             my $own_subscription;
             my $own_subscription_ref = \$own_subscription;
 
-            $subscriber->subscription->add_dependents(
+            $subscriber->subscription->add(
                 $own_subscription_ref,
             );
 
@@ -875,7 +861,7 @@ sub op_sample_time {
                 }
             });
 
-            $subscriber->subscription->add_dependents($n_s);
+            $subscriber->subscription->add($n_s);
 
             $source->subscribe({
                 %$subscriber,
@@ -1033,7 +1019,7 @@ sub op_switch_map {
             my $this_own_subscription;
             my $own_subscription = RxPerl::Subscription->new;
 
-            $subscriber->subscription->add_dependents(
+            $subscriber->subscription->add(
                 \$this_own_subscription, $own_subscription,
             );
 
@@ -1216,7 +1202,7 @@ sub op_throttle_time {
             my $silent_mode = 0;
             my $silence_timer_id;
 
-            $subscriber->subscription->add_dependents(
+            $subscriber->subscription->add(
                 sub { $cancel_timer_sub->($silence_timer_id) if defined $silence_timer_id }
             );
 
@@ -1259,7 +1245,7 @@ sub op_with_latest_from {
             my @latest_values;
             my %other_subscriptions;
 
-            $subscriber->subscription->add_dependents(
+            $subscriber->subscription->add(
                 \%other_subscriptions, sub { undef @other_observables },
             );
 

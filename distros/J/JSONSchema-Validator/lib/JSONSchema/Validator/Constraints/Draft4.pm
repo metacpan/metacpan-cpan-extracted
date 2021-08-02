@@ -75,11 +75,16 @@ sub new {
 sub validator { shift->{validator} }
 sub strict { shift->{strict} }
 
+# params: $self, $value, $type
+sub check_type {
+    return is_type($_[1], $_[2], $_[0]->strict);
+}
+
 sub type {
     my ($self, $instance, $types, $schema, $instance_path, $schema_path, $data) = @_;
     my @types = ref $types ? @$types : ($types);
 
-    return 1 if grep { is_type($instance, $_, $self->strict) } @types;
+    return 1 if grep { $self->check_type($instance, $_) } @types;
 
     push @{$data->{errors}}, error(
         message => "type mismatch",
@@ -91,7 +96,7 @@ sub type {
 
 sub minimum {
     my ($self, $instance, $minimum, $schema, $instance_path, $schema_path, $data) = @_;
-    return 1 unless is_type($instance, 'number', $self->strict);
+    return 1 unless $self->check_type($instance, 'number');
     return 1 if $instance >= $minimum;
     push @{$data->{errors}}, error(
         message => "${instance} is less than ${minimum}",
@@ -103,7 +108,7 @@ sub minimum {
 
 sub maximum {
     my ($self, $instance, $maximum, $schema, $instance_path, $schema_path, $data) = @_;
-    return 1 unless is_type($instance, 'number', $self->strict);
+    return 1 unless $self->check_type($instance, 'number');
     return 1 if $instance <= $maximum;
     push @{$data->{errors}}, error(
         message => "${instance} is greater than ${maximum}",
@@ -115,7 +120,9 @@ sub maximum {
 
 sub exclusiveMaximum {
     my ($self, $instance, $exclusiveMaximum, $schema, $instance_path, $schema_path, $data) = @_;
-    return 1 unless is_type($instance, 'number', $self->strict);
+    return 1 unless $self->check_type($instance, 'number');
+    return 1 unless exists $schema->{maximum};
+
     my $maximum = $schema->{maximum};
 
     my $res = $self->maximum($instance, $maximum, $schema, $instance_path, $schema_path, $data);
@@ -134,7 +141,9 @@ sub exclusiveMaximum {
 
 sub exclusiveMinimum {
     my ($self, $instance, $exclusiveMinimum, $schema, $instance_path, $schema_path, $data) = @_;
-    return 1 unless is_type($instance, 'number', $self->strict);
+    return 1 unless $self->check_type($instance, 'number');
+    return 1 unless exists $schema->{minimum};
+
     my $minimum = $schema->{minimum};
 
     my $res = $self->minimum($instance, $minimum, $schema, $instance_path, $schema_path, $data);
@@ -153,7 +162,7 @@ sub exclusiveMinimum {
 
 sub minItems {
     my ($self, $instance, $min, $schema, $instance_path, $schema_path, $data) = @_;
-    return 1 unless is_type($instance, 'array', $self->strict);
+    return 1 unless $self->check_type($instance, 'array');
     return 1 if scalar(@$instance) >= $min;
     push @{$data->{errors}}, error(
         message => "minItems (>= ${min}) constraint violated",
@@ -165,7 +174,7 @@ sub minItems {
 
 sub maxItems {
     my ($self, $instance, $max, $schema, $instance_path, $schema_path, $data) = @_;
-    return 1 unless is_type($instance, 'array', $self->strict);
+    return 1 unless $self->check_type($instance, 'array');
     return 1 if scalar(@$instance) <= $max;
     push @{$data->{errors}}, error(
         message => "maxItems (<= ${max}) constraint violated",
@@ -177,7 +186,7 @@ sub maxItems {
 
 sub minLength {
     my ($self, $instance, $min, $schema, $instance_path, $schema_path, $data) = @_;
-    return 1 unless is_type($instance, 'string', $self->strict);
+    return 1 unless $self->check_type($instance, 'string');
     return 1 if length $instance >= $min;
     push @{$data->{errors}}, error(
         message => "minLength (>= ${min}) constraint violated",
@@ -189,7 +198,7 @@ sub minLength {
 
 sub maxLength {
     my ($self, $instance, $max, $schema, $instance_path, $schema_path, $data) = @_;
-    return 1 unless is_type($instance, 'string', $self->strict);
+    return 1 unless $self->check_type($instance, 'string');
     return 1 if length $instance <= $max;
     push @{$data->{errors}}, error(
         message => "maxLength (<= ${max}) constraint violated",
@@ -203,7 +212,7 @@ sub dependencies {
     my ($self, $instance, $dependencies, $schema, $instance_path, $schema_path, $data) = @_;
 
     # ignore non-object
-    return 1 unless is_type($instance, 'object', $self->strict);
+    return 1 unless $self->check_type($instance, 'object');
 
     my $result = 1;
 
@@ -212,10 +221,7 @@ sub dependencies {
         my $dep = $dependencies->{$prop};
         my $spath = json_pointer->append($schema_path, $prop);
 
-        if (is_type($dep, 'object', $self->strict)) {
-            my $r = $self->validator->_validate_schema($instance, $dep, $instance_path, $spath, $data);
-            $result = 0 unless $r;
-        } elsif (is_type($dep, 'array', $self->strict)) {
+        if ($self->check_type($dep, 'array')) {
             for my $idx (0 .. $#{$dep}) {
                 my $p = $dep->[$idx];
                 next if exists $instance->{$p};
@@ -227,6 +233,10 @@ sub dependencies {
                 );
                 $result = 0;
             }
+        } else {
+            # $dep is object or boolean (starting draft 6 boolean is valid schema)
+            my $r = $self->validator->_validate_schema($instance, $dep, $instance_path, $spath, $data);
+            $result = 0 unless $r;
         }
     }
 
@@ -235,12 +245,12 @@ sub dependencies {
 
 sub additionalItems {
     my ($self, $instance, $additionalItems, $schema, $instance_path, $schema_path, $data) = @_;
-    return 1 unless is_type($instance, 'array', $self->strict);
-    return 1 if is_type($schema->{items} // {}, 'object', $self->strict);
+    return 1 unless $self->check_type($instance, 'array');
+    return 1 if $self->check_type($schema->{items} // {}, 'object');
 
     my $len_items = scalar @{$schema->{items}};
 
-    if (is_type($additionalItems, 'boolean', $self->strict)) {
+    if ($self->check_type($additionalItems, 'boolean')) {
         return 1 if $additionalItems;
         if  (scalar @$instance > $len_items) {
             push @{$data->{errors}}, error(
@@ -272,7 +282,7 @@ sub additionalItems {
 
 sub additionalProperties {
     my ($self, $instance, $addProps, $schema, $instance_path, $schema_path, $data) = @_;
-    return 1 unless is_type($instance, 'object', $self->strict);
+    return 1 unless $self->check_type($instance, 'object');
 
     my $patterns = join '|', keys %{$schema->{patternProperties} // {}};
 
@@ -285,7 +295,7 @@ sub additionalProperties {
 
     return 1 unless @extra_props;
 
-    if (is_type($addProps, 'object', $self->strict)) {
+    if ($self->check_type($addProps, 'object')) {
         my $result = 1;
         for my $p (@extra_props) {
             my $ipath = json_pointer->append($instance_path, $p);
@@ -334,7 +344,7 @@ sub anyOf {
         $result = $self->validator->_validate_schema($instance, $anyOf->[$idx], $instance_path, $spath, $data);
         unless ($result) {
             push @{$local_errors}, error(
-                message => "$idx part of anyOf",
+                message => qq'${idx} part of "anyOf" has errors',
                 context => $data->{errors},
                 instance_path => $instance_path,
                 schema_path => $spath
@@ -346,7 +356,7 @@ sub anyOf {
     return 1 if $result;
 
     push @{$data->{errors}}, error(
-        message => 'instance does not satisfy any schema',
+        message => 'instance does not satisfy any schema of "anyOf"',
         context => $local_errors,
         instance_path => $instance_path,
         schema_path => $schema_path
@@ -369,7 +379,7 @@ sub oneOf {
             push @{$valid_schemas}, $spath;
         } else {
             push @{$local_errors}, error(
-                message => "$idx part of oneOf",
+                message => qq'${idx} part of "oneOf" has errors',
                 context => $data->{errors},
                 instance_path => $instance_path,
                 schema_path => $spath
@@ -382,13 +392,13 @@ sub oneOf {
 
     if ($num > 1) {
         push @{$data->{errors}}, error(
-            message => 'instance is valid under more than one schema ' . join(' ', @$valid_schemas),
+            message => 'instance is valid under more than one schema of "oneOf": ' . join(' ', @$valid_schemas),
             instance_path => $instance_path,
             schema_path => $schema_path
         );
     } else {
         push @{$data->{errors}}, error(
-            message => 'instance is not valid under any of given schemas',
+            message => 'instance is not valid under any of given schemas of "oneOf"',
             context => $local_errors,
             instance_path => $instance_path,
             schema_path => $schema_path
@@ -403,17 +413,17 @@ sub enum {
 
     my $result = 0;
     for my $e (@$enum) {
-        if (is_type($e, 'boolean', $self->strict)) {
-            $result = is_type($instance, 'boolean', $self->strict)
+        if ($self->check_type($e, 'boolean')) {
+            $result = $self->check_type($instance, 'boolean')
                         ? unbool($instance) eq unbool($e)
                         : 0
-        } elsif (is_type($e, 'object', $self->strict) || is_type($e, 'array', $self->strict)) {
-            $result =   is_type($instance, 'object', $self->strict) ||
-                        is_type($instance, 'array', $self->strict)
+        } elsif ($self->check_type($e, 'object') || $self->check_type($e, 'array')) {
+            $result =   $self->check_type($instance, 'object') ||
+                        $self->check_type($instance, 'array')
                         ? serialize($instance) eq serialize($e)
                         : 0;
-        } elsif (is_type($e, 'number', $self->strict)) {
-            $result =   is_type($instance, 'number', $self->strict)
+        } elsif ($self->check_type($e, 'number')) {
+            $result =   $self->check_type($instance, 'number')
                         ? $e == $instance
                         : 0;
         } elsif (defined $e && defined $instance) {
@@ -438,10 +448,10 @@ sub enum {
 
 sub items {
     my ($self, $instance, $items, $schema, $instance_path, $schema_path, $data) = @_;
-    return 1 unless is_type($instance, 'array', $self->strict);
+    return 1 unless $self->check_type($instance, 'array');
 
     my $result = 1;
-    if (is_type($items, 'array', $self->strict)) {
+    if ($self->check_type($items, 'array')) {
         my $min = $#{$items} > $#{$instance} ? $#{$instance} : $#{$items};
         for my $i (0 .. $min) {
             my $item = $instance->[$i];
@@ -468,7 +478,7 @@ sub format {
     return 1 unless exists FORMAT_VALIDATIONS->{$format};
 
     my ($type, $checker) = @{FORMAT_VALIDATIONS->{$format}};
-    return 1 unless is_type($instance, $type, $self->strict);
+    return 1 unless $self->check_type($instance, $type);
 
     my $result = $checker->($instance);
     return 1 if $result;
@@ -483,7 +493,7 @@ sub format {
 
 sub maxProperties {
     my ($self, $instance, $maxProperties, $schema, $instance_path, $schema_path, $data) = @_;
-    return 1 unless is_type($instance, 'object', $self->strict);
+    return 1 unless $self->check_type($instance, 'object');
     return 1 if scalar(keys %$instance) <= $maxProperties;
 
     push @{$data->{errors}}, error(
@@ -496,7 +506,7 @@ sub maxProperties {
 
 sub minProperties {
     my ($self, $instance, $minProperties, $schema, $instance_path, $schema_path, $data) = @_;
-    return 1 unless is_type($instance, 'object', $self->strict);
+    return 1 unless $self->check_type($instance, 'object');
     return 1 if scalar(keys %$instance) >= $minProperties;
 
     push @{$data->{errors}}, error(
@@ -509,11 +519,11 @@ sub minProperties {
 
 sub multipleOf {
     my ($self, $instance, $multipleOf, $schema, $instance_path, $schema_path, $data) = @_;
-    return 1 unless is_type($instance, 'number', $self->strict);
+    return 1 unless $self->check_type($instance, 'number');
 
     my $result = 1;
     my $div = $instance / $multipleOf;
-    $result = 0 if abs($div - round($div)) > EPSILON;
+    $result = 0 if $div == 'Inf' || abs($div - round($div)) > EPSILON;
 
     return 1 if $result;
 
@@ -546,7 +556,7 @@ sub not {
 
 sub pattern {
     my ($self, $instance, $pattern, $schema, $instance_path, $schema_path, $data) = @_;
-    return 1 unless is_type($instance, 'string', $self->strict);
+    return 1 unless $self->check_type($instance, 'string');
     return 1 if $instance =~ m/$pattern/u;
 
     push @{$data->{errors}}, error(
@@ -559,7 +569,7 @@ sub pattern {
 
 sub patternProperties {
     my ($self, $instance, $patternProperties, $schema, $instance_path, $schema_path, $data) = @_;
-    return 1 unless is_type($instance, 'object', $self->strict);
+    return 1 unless $self->check_type($instance, 'object');
 
     my $result = 1;
     for my $pattern (keys %$patternProperties) {
@@ -579,7 +589,7 @@ sub patternProperties {
 
 sub properties {
     my ($self, $instance, $properties, $schema, $instance_path, $schema_path, $data) = @_;
-    return 1 unless is_type($instance, 'object', $self->strict);
+    return 1 unless $self->check_type($instance, 'object');
 
     my $result = 1;
     for my $prop (keys %$properties) {
@@ -596,7 +606,7 @@ sub properties {
 
 sub required {
     my ($self, $instance, $required, $schema, $instance_path, $schema_path, $data) = @_;
-    return 1 unless is_type($instance, 'object', $self->strict);
+    return 1 unless $self->check_type($instance, 'object');
 
     my $result = 1;
     for my $idx (0 .. $#{$required}) {
@@ -615,7 +625,7 @@ sub required {
 # doesn't work for string that looks like number with the same number in array
 sub uniqueItems {
     my ($self, $instance, $uniqueItems, $schema, $instance_path, $schema_path, $data) = @_;
-    return 1 unless is_type($instance, 'array', $self->strict);
+    return 1 unless $self->check_type($instance, 'array');
     # uniqueItems is boolean
     return 1 unless $uniqueItems;
 
@@ -691,7 +701,7 @@ JSONSchema::Validator::Constraints::Draft4 - JSON Schema Draft4 specification co
 
 =head1 VERSION
 
-version 0.002
+version 0.004
 
 =head1 AUTHORS
 

@@ -1,5 +1,3 @@
-#!/usr/local/bin/perl -w
-
 package PDL::IO::HDF5::tkview;
 
 # Experimental module to view HDF5 using perl/tk and PDL::IO::HDF5 modules

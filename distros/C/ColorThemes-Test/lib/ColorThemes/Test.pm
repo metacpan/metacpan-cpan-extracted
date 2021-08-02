@@ -1,9 +1,9 @@
 package ColorThemes::Test;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-13'; # DATE
+our $DATE = '2021-08-01'; # DATE
 our $DIST = 'ColorThemes-Test'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 1;
 # ABSTRACT: A collection of color themes, mainly for testing
@@ -20,7 +20,7 @@ ColorThemes::Test - A collection of color themes, mainly for testing
 
 =head1 VERSION
 
-This document describes version 0.003 of ColorThemes::Test (from Perl distribution ColorThemes-Test), released on 2020-06-13.
+This document describes version 0.005 of ColorThemes::Test (from Perl distribution ColorThemes-Test), released on 2021-08-01.
 
 =head1 HOMEPAGE
 
@@ -50,7 +50,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

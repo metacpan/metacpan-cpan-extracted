@@ -1,4 +1,4 @@
-package Dist::Zilla::App 6.023;
+package Dist::Zilla::App 6.024;
 # ABSTRACT: Dist::Zilla's App::Cmd
 
 # BEGIN BOILERPLATE
@@ -183,7 +183,7 @@ Dist::Zilla::App - Dist::Zilla's App::Cmd
 
 =head1 VERSION
 
-version 6.023
+version 6.024
 
 =head1 PERL VERSION
 

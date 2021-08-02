@@ -1,0 +1,157 @@
+#!/usr/bin/env perl
+# Copyright (C) 2017–2020  Alex Schroeder <alex@gnu.org>
+
+# This program is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, either version 3 of the License, or (at your option) any
+# later version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <https://www.gnu.org/licenses/>.
+
+=encoding utf8
+
+=head1 NAME
+
+gemini - a command line client for the Gemini protocol
+
+=head1 SYNOPSIS
+
+B<gemini> [B<--help>] [B<--verbose>] [B<--cert_file=>I<filename>
+B<--key_file=>I<filename>] I<URL>
+
+=head1 DESCRIPTION
+
+This is a very simple client. All it does is print the response. The header is
+printed to standard error so the rest can be redirected to get just the content.
+
+Usage:
+
+    gemini gemini://alexschroeder.ch/Test
+
+Download an image:
+
+    gemini gemini://alexschroeder.ch:1965/do/gallery/2016-aminona/thumbs/Bisse_de_Tsittoret.jpg \
+      > Bisse_de_Tsittoret.jpg
+
+Download all the images on a page:
+
+    for url in $(./gemini gemini://alexschroeder.ch:1965/do/gallery/2016-aminona \
+                 | grep thumbs | cut --delimiter=' ' --fields=2); do
+      echo $url
+      ./gemini "$url" > $(basename "$url")
+    done
+
+In the shell script above, the first call to gemini gets the page with all the
+links, grep then filters for the links to thumbnails, extract the URL using cut
+(assuming a space between "=>" and the URL), and download each URL, and save the
+output in the filename indicated by the URL.
+
+=head2 Client Certificates
+
+You can provide a certificate and a key file:
+
+        gemini --cert_file=cert.pem --key_file=key.pem \
+          gemini://campaignwiki.org/play/ijirait
+
+=cut
+
+use Modern::Perl '2018';
+use Mojo::IOLoop;
+use Pod::Text;
+use Getopt::Long;
+use Encode::Locale qw(decode_argv);
+use Encode qw(decode decode_utf8 encode_utf8);
+use Net::IDN::Encode qw(:all);
+use URI::Escape;
+use IRI;
+
+my $cert;
+my $key;
+my $help;
+my $verbose;
+
+GetOptions(
+  'help' => \$help,
+  'verbose' => \$verbose,
+  'cert_file=s' => \$cert,
+  'key_file=s' => \$key)
+    or die("Error in command line arguments\n");
+
+# Help
+if ($help) {
+  my $parser = Pod::Text->new();
+  $parser->parse_file($0);
+  exit;
+}
+
+# Regular arguments
+decode_argv();
+my ($uri) = @ARGV;
+
+die "⚠ You must provide an URI\n" unless $uri;
+
+my $iri = IRI->new(value => encode_utf8 $uri);
+
+die "⚠ The URI '$uri' must use the gemini scheme\n" unless $iri->scheme and $iri->scheme eq 'gemini';
+die "⚠ The URI '$uri' must have an authority\n" unless $iri->authority;
+
+my $host = domain_to_ascii(decode_utf8 $iri->host);
+my $port = $iri->port || 1965;
+my $unsafe = "^A-Za-z0-9\-\._~"; # the default
+my $path = uri_escape_utf8($iri->path, $unsafe . "/"); # path separator are safe
+my $query = uri_escape_utf8($iri->query, $unsafe . "&;="); # parameter separators are safe
+my $fragment = uri_escape_utf8($iri->fragment); # use the default
+
+$uri = $iri->scheme . '://' . $host . ':' . $port;
+$uri .= $path if $path;
+$uri .= '?' . $query if $query;
+$uri .= '#' . $fragment if $fragment;
+
+warn "Contacting $host:$port" if $verbose;
+
+# create client
+Mojo::IOLoop->client({
+  address => $host,
+  port => $port,
+  tls => 1,
+  tls_cert => $cert,
+  tls_key => $key,
+  tls_options => { SSL_verify_mode => 0x00 }} => sub {
+    my ($loop, $err, $stream) = @_;
+    die $err if $err;
+    # 1h timeout (for chat)
+    $stream->timeout(3600);
+    my ($header, $mimetype, $encoding);
+    $stream->on(read => sub {
+      my ($stream, $bytes) = @_;
+      if ($header and $encoding) {
+	print decode($encoding, $bytes);
+      } elsif ($header) {
+	print $bytes;
+      } else {
+	($header) = $bytes =~ /^(.*?)\r\n/;
+	$header = decode_utf8 $header;
+	warn "$header\n";
+	if ($header =~ /^2\d* (?:text\/\S+)?(?:; *charset=(\S+))?$/g) {
+	  # empty, or text without charset defaults to UTF-8
+	  $encoding = $1 || 'UTF-8';
+	}
+	$bytes =~ s/^(.*?)\r\n//;
+	if ($encoding) {
+	  print decode($encoding, $bytes);
+	} else {
+	  print $bytes;
+	}
+      }});
+    # Write request
+    warn "Requesting $uri\n" if $verbose;
+    $stream->write("$uri\r\n")});
+
+# Start event loop if necessary
+Mojo::IOLoop->start unless Mojo::IOLoop->is_running;

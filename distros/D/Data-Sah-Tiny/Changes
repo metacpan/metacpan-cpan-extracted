@@ -1,3 +1,8 @@
+0.000001 2021-08-01  Released-By: PERLANCAR; Urgency: medium
+
+	 - Update test to newer Data::Sah::Normalize (0.051) (RT#138213).
+
+
 0.000    2020-05-10  Released-By: PERLANCAR
 
          - Very early release, for testing.

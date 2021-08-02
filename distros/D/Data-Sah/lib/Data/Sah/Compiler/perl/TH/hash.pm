@@ -1,7 +1,7 @@
 package Data::Sah::Compiler::perl::TH::hash;
 
-our $DATE = '2021-07-29'; # DATE
-our $VERSION = '0.909'; # VERSION
+our $DATE = '2021-08-01'; # DATE
+our $VERSION = '0.910'; # VERSION
 
 use 5.010;
 use strict;
@@ -154,7 +154,7 @@ sub _clause_keys_or_re_keys {
             my $kre = $c->_str2reliteral($cd, $k);
             local $cd->{spath} = [@{ $cd->{spath} }, $k];
             ++$i;
-            my $sch = $c->main->normalize_schema($cv->{$k});
+            my $nsch = $c->main->normalize_schema($cv->{$k});
             my $kdn = $k; $kdn =~ s/\W+/_/g;
             my $klit = $which eq 're_keys' ? '$_' : $c->literal($k);
             my $kdt = "$dt\->{$klit}";
@@ -162,7 +162,7 @@ sub _clause_keys_or_re_keys {
             $iargs{outer_cd}             = $cd;
             $iargs{data_name}            = $kdn;
             $iargs{data_term}            = $kdt;
-            $iargs{schema}               = $sch;
+            $iargs{schema}               = $nsch;
             $iargs{schema_is_normalized} = 1;
             $iargs{cache}                = $cd->{args}{cache};
             $iargs{indent_level}++;
@@ -170,7 +170,7 @@ sub _clause_keys_or_re_keys {
             my $icd = $c->compile(%iargs);
 
             # should we set default for hash value?
-            my $sdef = $cdef && defined($sch->[1]{default});
+            my $sdef = $cdef && defined($nsch->[1]{default});
 
             # stack is used to store (non-bool) subresults
             $c->add_var($cd, '_sahv_stack', []) if $cd->{use_dpath};
@@ -500,7 +500,7 @@ Data::Sah::Compiler::perl::TH::hash - perl's type handler for type "hash"
 
 =head1 VERSION
 
-This document describes version 0.909 of Data::Sah::Compiler::perl::TH::hash (from Perl distribution Data-Sah), released on 2021-07-29.
+This document describes version 0.910 of Data::Sah::Compiler::perl::TH::hash (from Perl distribution Data-Sah), released on 2021-08-01.
 
 =for Pod::Coverage ^(clause_.+|superclause_.+)$
 

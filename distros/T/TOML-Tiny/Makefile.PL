@@ -19,6 +19,7 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Carp" => 0,
     "Data::Dumper" => 0,
+    "Encode" => 0,
     "Exporter" => 0,
     "Math::BigInt" => "1.999718"
   },
@@ -33,9 +34,9 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "Test::Pod" => 0
   },
-  "VERSION" => "0.13",
+  "VERSION" => "0.14",
   "test" => {
-    "TESTS" => "t/*.t t/toml-test/invalid/*.t t/toml-test/valid/*.t"
+    "TESTS" => "t/*.t t/toml-test/invalid/array/*.t t/toml-test/invalid/bool/*.t t/toml-test/invalid/control/*.t t/toml-test/invalid/datetime/*.t t/toml-test/invalid/encoding/*.t t/toml-test/invalid/float/*.t t/toml-test/invalid/inline-table/*.t t/toml-test/invalid/integer/*.t t/toml-test/invalid/key/*.t t/toml-test/invalid/string/*.t t/toml-test/invalid/table/*.t t/toml-test/valid/*.t t/toml-test/valid/array/*.t t/toml-test/valid/bool/*.t t/toml-test/valid/comment/*.t t/toml-test/valid/datetime/*.t t/toml-test/valid/float/*.t t/toml-test/valid/inline-table/*.t t/toml-test/valid/integer/*.t t/toml-test/valid/key/*.t t/toml-test/valid/string/*.t t/toml-test/valid/table/*.t"
   }
 );
 
@@ -45,6 +46,7 @@ my %FallbackPrereqs = (
   "Data::Dumper" => 0,
   "DateTime::Format::ISO8601" => 0,
   "DateTime::Format::RFC3339" => 0,
+  "Encode" => 0,
   "Exporter" => 0,
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,

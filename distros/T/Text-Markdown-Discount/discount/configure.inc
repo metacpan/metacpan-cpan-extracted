@@ -879,10 +879,11 @@ AC_SCALAR_TYPES () {
 	TLOG " (defined in WinDef.h)"
 	return 0
     fi
-	
+
     cat > ngc$$.c << EOF
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 int pound_define = 1;
 
@@ -1053,6 +1054,7 @@ AC_CHECK_FLOCK() {
 #include <sys/file.h>
 #include <sys/types.h>
 #include <fcntl.h>
+#include <stdlib.h>
 
 main()
 {

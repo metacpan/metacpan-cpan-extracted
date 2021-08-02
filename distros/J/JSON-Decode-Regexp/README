@@ -2,8 +2,8 @@ NAME
     JSON::Decode::Regexp - JSON parser as a single Perl Regex
 
 VERSION
-    This document describes version 0.101 of JSON::Decode::Regexp (from Perl
-    distribution JSON-Decode-Regexp), released on 2018-03-25.
+    This document describes version 0.102 of JSON::Decode::Regexp (from Perl
+    distribution JSON-Decode-Regexp), released on 2021-08-01.
 
 SYNOPSIS
      use JSON::Decode::Regexp qw(from_json);
@@ -16,6 +16,9 @@ DESCRIPTION
      http://perlmonks.org/?node_id=995856
 
     The code is licensed "just like Perl".
+
+CONTRIBUTOR
+    Steven Haryanto <sharyanto@cpan.org>
 
 FUNCTIONS
   from_json($str) => DATA
@@ -68,7 +71,8 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2018, 2016, 2013 by perlancar@cpan.org.
+    This software is copyright (c) 2021, 2018, 2016, 2013 by
+    perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

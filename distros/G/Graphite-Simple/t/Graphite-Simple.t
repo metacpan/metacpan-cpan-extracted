@@ -4,31 +4,35 @@ use 5.026;
 use utf8;
 use strict;
 use warnings;
-use experimental qw/ signatures /;
 
 our %flushed_metrics;
 
-sub receiver_ok ($metrics) {
+sub receiver_ok {
+    my ($metrics) = @_;
     %flushed_metrics = %$metrics;
     return 1;
 }
 
-sub receiver_fail_undef ($metrics) {
+sub receiver_fail_undef {
+    my ($metrics) = @_; 
     %flushed_metrics = %$metrics;
     return undef;
 }
 
-sub receiver_fail_hash ($metrics) {
+sub receiver_fail_hash {
+    my ($metrics) = @_;
     %flushed_metrics = %$metrics;
     return undef;
 }
 
-sub receiver_fail_array ($metrics) {
+sub receiver_fail_array {
+    my ($metrics) = @_;
     %flushed_metrics = %$metrics;
     return undef;
 }
 
-sub receiver_fail_string ($metrics) {
+sub receiver_fail_string {
+    my ($metrics) = @_;
     %flushed_metrics = %$metrics;
     return "string";
 }
@@ -41,7 +45,6 @@ use 5.026;
 use utf8;
 use strict;
 use warnings;
-use experimental qw/ signatures /;
 
 use Test::LeakTrace qw/ no_leaks_ok /;
 use Test::Deep qw/ cmp_deeply num /;
@@ -74,7 +77,8 @@ my %expected_flushed_metrics = (
 
     my $warns_cnt = 0;
 
-    local $SIG{'__WARN__'} = sub ($msg) {
+    local $SIG{'__WARN__'} = sub {
+        my ($msg) = @_;
         like($msg, qr/The sender must return a number type of status. Using 0 as sender status now./, "Checking the warn message");
         $warns_cnt++;
     };
@@ -212,7 +216,8 @@ cmp_deeply($graphite->get_bulk_metrics(), \%expected_bulk_metrics, "Checking bul
 
     my $warns_cnt = 0;
 
-    local $SIG{'__WARN__'} = sub ($msg) {
+    local $SIG{'__WARN__'} = sub {
+        my ($msg) = @_;
         is($msg, "", "Checking the warn message");
         $warns_cnt++;
     };
@@ -227,7 +232,8 @@ cmp_deeply($graphite->get_bulk_metrics(), \%expected_bulk_metrics, "Checking bul
 
     my $warns_cnt = 0;
 
-    local $SIG{'__WARN__'} = sub ($msg) {
+    local $SIG{'__WARN__'} = sub {
+        my ($msg) = @_;
         like($msg, qr/Value type of key '[a-z]+.metric' is not a number/, "Checking the warn message");
         $warns_cnt++;
     };

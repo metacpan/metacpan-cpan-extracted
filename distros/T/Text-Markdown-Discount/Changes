@@ -1,5 +1,10 @@
 Revision history for Perl extension Text::Markdown::XS.
 
+0.13 Mon Aug  2 00:40:26 UTC 2021
+	- 473efac discount/configure.inc: include stdlib.h to find WORD/DWORD @Hugmeir
+	- 89de73e discount/configure.sh: include strings.h to find bzero & memset @Hugmeir
+	- 7c84bff add configure option "--with-fenced-code --with-dl=both" @Songmu
+
 0.12 Tue Jan 21 00:34:46 UTC 2020
 	- 686fab5 Added cpan repository metadata @dsteinbrunner
 	- 4074458 Removed unnecessary comment in POD @anirvan

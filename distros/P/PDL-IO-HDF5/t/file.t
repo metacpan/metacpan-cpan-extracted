@@ -1,6 +1,7 @@
+use strict;
+use warnings;
 use PDL::IO::HDF5;
-
-use Test::More tests => 3;
+use Test::More;
 
 # New File Check:
 my $filename = "newFile.hdf5";
@@ -16,3 +17,5 @@ ok(new PDL::IO::HDF5($filename));
 
 # clean up file
 unlink $filename if( -e $filename);
+
+done_testing;

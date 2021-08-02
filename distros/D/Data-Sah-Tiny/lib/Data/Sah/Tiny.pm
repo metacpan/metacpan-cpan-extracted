@@ -1,9 +1,9 @@
 package Data::Sah::Tiny;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-05-10'; # DATE
+our $DATE = '2021-08-01'; # DATE
 our $DIST = 'Data-Sah-Tiny'; # DIST
-our $VERSION = '0.000'; # VERSION
+our $VERSION = '0.000001'; # VERSION
 
 use 5.010001;
 use strict 'refs', 'vars';
@@ -142,7 +142,7 @@ Data::Sah::Tiny - Validate Sah schemas with as little code as possible
 
 =head1 VERSION
 
-This document describes version 0.000 of Data::Sah::Tiny (from Perl distribution Data-Sah-Tiny), released on 2020-05-10.
+This document describes version 0.000001 of Data::Sah::Tiny (from Perl distribution Data-Sah-Tiny), released on 2021-08-01.
 
 =head1 SYNOPSIS
 
@@ -226,7 +226,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by perlancar@cpan.org.
+This software is copyright (c) 2021 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

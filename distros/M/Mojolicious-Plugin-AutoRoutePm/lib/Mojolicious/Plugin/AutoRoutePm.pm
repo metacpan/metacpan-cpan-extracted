@@ -130,7 +130,7 @@ Mojolicious::Plugin::AutoRoutePm - Mojolicious plugin to create routes by *.pm m
 
 =head1 VERSION
 
-version 0.16
+version 0.17
 
 =head1 SYNOPSIS
 

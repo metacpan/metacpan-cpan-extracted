@@ -15,23 +15,7 @@ my %WriteMakefileArgs = (
   "DISTNAME" => "Log-Any",
   "LICENSE" => "perl",
   "NAME" => "Log::Any",
-  "PREREQ_PM" => {
-    "B" => 0,
-    "Carp" => 0,
-    "Data::Dumper" => 0,
-    "Exporter" => 0,
-    "Fcntl" => 0,
-    "File::Basename" => 0,
-    "FindBin" => 0,
-    "IO::File" => 0,
-    "List::Util" => 0,
-    "Storable" => 0,
-    "Sys::Syslog" => 0,
-    "Test::Builder" => 0,
-    "constant" => 0,
-    "strict" => 0,
-    "warnings" => 0
-  },
+  "PREREQ_PM" => {},
   "TEST_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0,
     "File::Spec" => 0,
@@ -39,7 +23,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "1.709",
+  "VERSION" => "1.710",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -47,26 +31,11 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "B" => 0,
-  "Carp" => 0,
-  "Data::Dumper" => 0,
-  "Exporter" => 0,
   "ExtUtils::MakeMaker" => 0,
-  "Fcntl" => 0,
-  "File::Basename" => 0,
   "File::Spec" => 0,
-  "FindBin" => 0,
-  "IO::File" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
-  "List::Util" => 0,
-  "Storable" => 0,
-  "Sys::Syslog" => 0,
-  "Test::Builder" => 0,
-  "Test::More" => 0,
-  "constant" => 0,
-  "strict" => 0,
-  "warnings" => 0
+  "Test::More" => 0
 );
 
 

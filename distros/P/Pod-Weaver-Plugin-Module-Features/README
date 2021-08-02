@@ -1,0 +1,60 @@
+NAME
+    Pod::Weaver::Plugin::Module::Features - Plugin to use when building
+    distribution that has feature definer or featurer declarer modules
+
+VERSION
+    This document describes version 0.001 of
+    Pod::Weaver::Plugin::Module::Features (from Perl distribution
+    Pod-Weaver-Plugin-Module-Features), released on 2021-02-25.
+
+SYNOPSIS
+    In your weaver.ini:
+
+     [-Module::Features]
+
+DESCRIPTION
+    This plugin is to be used when building distribution that has feature
+    definer or featurer declarer modules. For more details on module
+    features, see Module::Features. Currently it does the following:
+
+    For feature defined modules ("Module::Features::*" modules):
+
+    *   Add a description in the feature definer's Description section
+
+    *   Add a Defined Features section
+
+    For feature defined modules:
+
+    *   Add a Declared Features section for a feature declarer module
+
+CONFIGURATION
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Pod-Weaver-Plugin-Module-Features>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Pod-Weaver-Plugin-Module-Features>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://github.com/perlancar/perl-Pod-Weaver-Plugin-Module-Features/iss
+    ues>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Module::Features
+
+    Dist::Zilla::Plugin::Module::Features
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2021 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

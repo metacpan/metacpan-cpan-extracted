@@ -1,3 +1,11 @@
+3.007     2021-08-01 20:17:42 EDT
+  - Increase DBD::SQLite dependency to 1.68 to support and use sqlite_string_mode over sqlite_unicode (#22, Adam Williamson)
+  - The default options now set sqlite_string_mode to DBD_SQLITE_STRING_MODE_UNICODE_FALLBACK,
+    unless sqlite_unicode is specified explicitly in from_string or from_filename. This is equivalent
+    to the previous behavior but ensures that DBD::SQLite will not return malformed strings.
+  - Support wal_mode option to enable WAL journaling mode, which is still currently the default,
+    but may not be set by default in a future release.
+
 3.006     2021-06-16 00:30:47 EDT
   - Set default abstract generator to an SQL::Abstract::Pg object, enabling additional features.
   - Update IRC metadata to libera.chat

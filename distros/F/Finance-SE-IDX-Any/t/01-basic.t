@@ -23,17 +23,16 @@ subtest list_idx_boards => sub {
 subtest list_idx_brokers => sub {
     $res = list_idx_brokers();
     is($res->[0], 200);
-    is(scalar(@{ $res->[2] }), 98);
+    is(scalar(@{ $res->[2] }), 99);
 };
 
 subtest list_idx_firms => sub {
     $res = list_idx_firms();
     is($res->[0], 200);
-    is(scalar(@{ $res->[2] }), 712);
-
+    is(scalar(@{ $res->[2] }), 716);
     $res = list_idx_firms(sector => "AGRI", board => "PENGEMBANGAN");
     is($res->[0], 200);
-    is(scalar(@{ $res->[2] }), 9);
+    is(scalar(@{ $res->[2] }), 10);
 };
 
 subtest list_idx_sectors => sub {

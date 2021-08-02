@@ -13,11 +13,11 @@ App::Brl2Brl - Convert between braille character sets.
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 
 =head1 SYNOPSIS
@@ -31,7 +31,7 @@ our $VERSION = '0.01';
       print "$s";
     }
 
-
+=cut
 
 sub new {
   my $class = shift;
@@ -54,7 +54,7 @@ sub switch_map {
 
 =head2 parse_dis
 
-Parses a liblouis .dis table file and return a hash with the
+Parses a liblouis display table file (.dis) and return a hash with the
 characters and dots respectively.
 
 =cut
@@ -68,6 +68,9 @@ sub parse_dis {
     $dots = 0;
     next unless( $line =~ /^display/i);
     ($char, $dots) = $line =~ /display\s+(\S+)\s+(\S+)/i;
+    if( $char =~ /\\s/ ){
+	$char = " ";
+    }
     if( length($char) >=4 ){ # $char is a hex value, not a char.
       #$charhex = "u";
       #$charhex = sprintf '%2.2x', unpack('U0U*', $char);
@@ -84,6 +87,19 @@ sub parse_dis {
     }
   }
   close( DIS );
+
+  my( $chr, $dts );
+  while( ($chr, $dts) = each (%table) ){
+      $dts = $table{$chr};
+      next unless( $dts == 1 );
+      last;
+  } # while
+  if( $chr =~ /⠁/ ){ # if dot 1 is x2801
+    $table{"⠀"} = 0; # inject unicode brl space
+  } else {
+    $table{" "} = "0";
+  } # if
+
   return( %table );
 }
 
@@ -179,7 +195,7 @@ L<http://search.cpan.org/dist/App-Brl2Brl/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017 Lars Bjørndal.
+Copyright 2017-2021 Lars Bjørndal.
 
 LICENSE
 

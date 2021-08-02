@@ -1,7 +1,7 @@
 package Perinci::Sub::Wrapper;
 
-our $DATE = '2019-07-04'; # DATE
-our $VERSION = '0.851'; # VERSION
+our $DATE = '2021-08-01'; # DATE
+our $VERSION = '0.852'; # VERSION
 
 use 5.010001;
 use strict;
@@ -1478,7 +1478,7 @@ Perinci::Sub::Wrapper - A multi-purpose subroutine wrapping framework
 
 =head1 VERSION
 
-This document describes version 0.851 of Perinci::Sub::Wrapper (from Perl distribution Perinci-Sub-Wrapper), released on 2019-07-04.
+This document describes version 0.852 of Perinci::Sub::Wrapper (from Perl distribution Perinci-Sub-Wrapper), released on 2021-08-01.
 
 =head1 SYNOPSIS
 
@@ -1635,7 +1635,7 @@ mil/sec.
 
 Usage:
 
- wrap_sub(%args) -> [status, msg, payload, meta]
+ wrap_sub(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Wrap subroutine to do various things, like enforcing Rinci properties.
 
@@ -1727,16 +1727,17 @@ If set to true, will validate sub's result. Validation error will cause wrapper
 to return status 500 instead of sub's result. The default is to enable this
 unless previous wrapper(s) have already done this.
 
+
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value: The wrapped subroutine along with its new metadata (hash)
 
@@ -1880,9 +1881,25 @@ L<Dist::Zilla::Plugin::Rinci::Validate>
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTORS
+
+=for stopwords s1 Steven Haryanto
+
+=over 4
+
+=item *
+
+s1 <s1@backpacker.localdomain>
+
+=item *
+
+Steven Haryanto <sharyanto@cpan.org>
+
+=back
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2019, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

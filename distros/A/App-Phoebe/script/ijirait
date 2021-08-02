@@ -1,0 +1,265 @@
+#!/usr/bin/env perl
+# Copyright (C) 2017–2021  Alex Schroeder <alex@gnu.org>
+
+# This program is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, either version 3 of the License, or (at your option) any
+# later version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <https://www.gnu.org/licenses/>.
+
+=encoding utf8
+
+=head1 NAME
+
+ijirait - a command line client for the Gemini protocol to play the Ijirait MUSH
+
+=head1 SYNOPSIS
+
+B<ijirait> [B<--help>] [B<--verbose>] [B<--stream>] [B<--cert_file=>I<filename>
+B<--key_file=>I<filename>] I<URL>
+
+=head1 DESCRIPTION
+
+This is a command-line client for Ijirait, a Gemini-based MUSH that can be run
+by Phoebe. See L<App::Phoebe::Ijirait>.
+
+First, generate your client certificate for as many or as few days as you like:
+
+    openssl req -new -x509 -newkey ec -subj "/CN=Alex" \
+      -pkeyopt ec_paramgen_curve:prime256v1 -days 100 \
+      -nodes -out cert.pem -keyout key.pem
+
+Then start this program to play:
+
+    ijirait --cert_file=cert.pem --key_file=key.pem \
+      gemini://campaignwiki.org/play/ijirait
+
+You can also use it to stream, i.e. get notified of events in real time:
+
+    ijirait --cert_file=cert.pem --key_file=key.pem --stream \
+      gemini://campaignwiki.org/play/ijirait/stream
+
+Here are the Debian package names to satisfy the dependencies. Use C<cpan> or
+C<cpanm> to install them.
+
+=over
+
+=item L<Modern::Perl> from C<libmodern-perl-perl>
+
+=item L<Mojo::IOLoop> from C<libmojolicious-perl>
+
+=item L<Term::ReadLine::Gnu> from C<libterm-readline-gnu-perl>
+
+=item L<URI::Escape> from C<liburi-escape-xs-perl>
+
+=item L<Encode::Locale> from C<libencode-locale-perl>
+
+=item L<Text::Wrapper> from C<libtext-wrapper-perl>
+
+=back
+
+=cut
+
+use Modern::Perl '2018';
+use Mojo::IOLoop;
+use Pod::Text;
+use Getopt::Long;
+use Term::ReadLine; # install Term::ReadLine::Gnu
+use Term::ANSIColor qw(colorstrip colored);
+use URI::Escape qw(uri_escape uri_unescape);
+use Encode::Locale;
+use Encode qw(decode_utf8 encode_utf8 decode encode);
+use Text::Wrapper;
+use File::Slurper qw(read_text write_text);
+use IPC::Open2;
+
+my $cert;
+my $key;
+my $help;
+my $stream;
+my $verbose;
+my $wrapper = Text::Wrapper->new();
+
+GetOptions(
+  'cert_file=s' => \$cert,
+  'key_file=s' => \$key,
+  'help' => \$help,
+  'verbose' => \$verbose,
+  'stream' => \$stream)
+    or die("Error in command line arguments\n");
+
+# Help
+if ($help) {
+  my $parser = Pod::Text->new();
+  $parser->parse_file($0);
+  exit;
+}
+
+# Regular arguments
+my ($url) = @ARGV;
+
+die "⚠ You must provide a URL, e.g. gemini://campaignwiki.org/play/ijirait\n" unless $url;
+die "⚠ You must provide --cert_file, e.g. --cert_file=cert.pem\n" unless $cert;
+die "⚠ You must provide --key_file, e.g. --key_file=key.pem\n" unless $key;
+die "⚠ You must provide an existing --cert_file\n" unless -f $cert;
+die "⚠ You must provide an existing --key_file\n" unless -f $key;
+
+$stream = 1 if $url =~ /\/stream$/;
+
+my $talk_url = "$url/type";
+
+my($scheme, $authority, $path, $query, $fragment) =
+    $url =~ m|(?:([^:/?#]+):)?(?://([^/?#]*))?([^?#]*)(?:\?([^#]*))?(?:#(.*))?|;
+
+die "⚠ The URL '$url' must use the gemini scheme\n" unless $scheme and $scheme eq 'gemini';
+
+my ($host, $port) = split(/:/, $authority, 2);
+$port //= 1965;
+
+if ($stream) {
+  stream();
+} else {
+  play();
+}
+
+sub stream {
+  say "Use 'Ctrl+C' to quit.";
+  # Start client for listening
+  Mojo::IOLoop->client({
+    address => $host,
+    port => $port,
+    tls => 1,
+    tls_cert => $cert,
+    tls_key => $key,
+    tls_options => { SSL_verify_mode => 0x00 }} => sub {
+      my ($loop, $err, $stream) = @_;
+      # 1h timeout (for chat)
+      $stream->timeout(3600);
+      $stream->on(read => sub {
+	my ($stream, $bytes) = @_;
+	my $text = to_text(decode_utf8($bytes));
+	print encode(locale => $text) });
+      $stream->on(close => sub {
+	say "Connection closed";
+	exit });
+      # Write request to the server
+      $stream->write("$url\r\n")});
+  # Start event loop if necessary
+  Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
+}
+
+sub play {
+  say "Use 'quit' to leave the game. Use '\\' to send a newline.";
+
+  my @queue = qw(look);
+
+  # start read loop for saying stuff
+  my $term = Term::ReadLine->new("Ijirait");
+  my $prompt = "> ";
+  my $OUT = $term->OUT || \*STDOUT;
+  while (defined ($_ = shift(@queue) || $term->readline($prompt))) {
+    exit if $_ eq "quit";
+    # Handle <
+    my $command = decode(locale => $_);
+    if ($command =~ /^(.*?)\s*<\s*([^|<>]+?)\s*$/s) {
+      if (-f $2) {
+	$command = $1 . " " . decode_utf8(read_text($2));
+      } else {
+	say "Cannot read $2";
+	next;
+      }
+    }
+    # Handle | >
+    my $shell_command;
+    if ($command =~ /^([^<>]*?)(\|[^<]+)/s
+	or $command =~ /^([^<|]*?)(>[^|<>]+)/s) {
+      # matches if we're in a pipe such as look|tail>test, or just a redirect to
+      # a file like look>test; constructs like look>test|tail save the complete
+      # output of look into test and tail nothing
+      $command = $1;
+      $shell_command = $2;
+    }
+    # create client
+    Mojo::IOLoop->client({
+      address => $host,
+      port => $port,
+      tls => 1,
+      tls_cert => $cert,
+      tls_key => $key,
+      tls_options => { SSL_verify_mode => 0x00 }, } => sub {
+	my ($loop, $err, $stream) = @_;
+	return say $err unless $stream;
+	$stream->on(read => sub {
+	  my ($stream, $bytes) = @_;
+	  if ($shell_command) {
+	    open(my $fh, $shell_command)
+		or die "Can't run $shell_command: $!";
+	    $bytes =~ s/^2.*\n//; # skip header
+	    print $fh $bytes;
+	  } else {
+	    my $text = to_text(decode_utf8($bytes));
+	    print encode(locale => $text);
+	  }
+	  if ($bytes =~ m!^30 /play/ijirait(?:/([a-z]+))?(?:\?(.*))?!) {
+	    my $command = ($1 || "look") . ($2 ? " " . decode_utf8 uri_unescape($2) : "");
+	    $command =~ s/[[:cntrl:]]+//g;
+	    push(@queue, $command);
+	  }});
+	# Write request to the server
+	say "$talk_url?$command" if $verbose;
+	$command =~ s/\\\\/\n/g;
+	my $bytes = uri_escape(encode_utf8($command));
+	$stream->write("$talk_url?$bytes\r\n")});
+    # Start event loop if necessary
+    Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
+    # Add to history
+    $term->addhistory($_) if /\S/;
+  }
+}
+
+sub to_text {
+  my $text = shift;
+  $text =~ s/^[23].*\n//; # skip headers
+  $text =~ s/^=> \S+ (type|Back)\n//gm; # drop type command from the list, and the help page
+  my @lines = split(/\n/, $text);
+  my $section = "";
+  for (@lines) {
+    if ($section =~ /^(Hidden )?(Exits|Things)$/
+	and s/^=> \S+\s+(.*?) \((\S+)\)$/"* $1 (" . colored($2, 'bold') . ")"/e) {
+      # exits and things come in lists and their shortcuts are bold
+    } elsif (s/^=> \/play\/ijirait\S*\s+(.*)/"* " . colored($1, 'bold')/e) {
+      # internal links are commands, come in lists, and they are all bold
+    } elsif (s/^=> \/\/(\S+)\s+(.*)/"* " . colored($2, 'italic') . " → gemini:\/\/$1"/e) {
+      # external links without protocol come in lists, italic, and the URL
+      # is printed separately for clicking in a terminal emulator, with gemini:
+      # scheme added
+    } elsif (s/^=> (\S+)\s+(.*)/"* " . colored($2, 'italic') . " → $1"/e) {
+      # external links are treated as above but gemini: is not prefixed to the
+      # URL
+    } elsif (s/^# (.*)/colored($1, 'bold underline')/e) {
+      $_ = $wrapper->wrap($_);
+    } elsif (s/^## (.*)/colored($1, 'underline')/e) {
+      $section = $1;
+      $_ = $wrapper->wrap($_);
+    } elsif (s/^### (.*)/colored($1, 'italic')/e) {
+      $_ = $wrapper->wrap($_);
+    } elsif (s/^> *(.*)/colored($1, 'italic')/e) {
+      $wrapper->par_start("  ");
+      $wrapper->body_start("  ");
+      $_ = $wrapper->wrap($_);
+      $wrapper->par_start("");
+      $wrapper->body_start("");
+    } else {
+      $_ = $wrapper->wrap($_);
+    }
+    s/\n+$//g; # the wrapper adds extra whitespace at the end
+  }
+  return join("\n", @lines, "");
+}

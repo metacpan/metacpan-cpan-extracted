@@ -1,0 +1,129 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+close DATA;
+
+use Getopt::Long qw(:config gnu_getopt);
+use Pod::Coverage::TrustMe ();
+use Cwd ();
+use File::Find ();
+
+GetOptions(
+  my %options,
+  'parents!',
+  'roles!',
+) or pod2usage("Invalid options!");
+
+my $package_declare_re = qr{
+  \A\s*
+  package \s+
+  ($Pod::Coverage::TrustMe::PACKAGE_RE)\b
+  (?: \s+ v?[0-9.]+ )?
+  \s*
+  (?: ; | \{ | \z )
+}x;
+
+my @files;
+for my $arg (@ARGV) {
+  if (-d $arg) {
+    File::Find::find({
+      no_chdir => 1,
+      wanted => sub {
+        my $file = $File::Find::name;
+        if (-f $file && $file =~ /\.pm/) {
+          push @files, $file;
+        }
+      },
+    }, $arg);
+  }
+  else {
+    push @files, $arg;
+  }
+}
+
+my $covered = 0;
+my $uncovered = 0;
+
+for my $file (@files) {
+  my %args = %options;
+  local @INC = @INC;
+  if (-e $file) {
+    $args{pod_from} = $file;
+
+    open my $fh, '<', $file
+      or die "Can't read $file: $!\n";
+    my @packages;
+    my $in_pod = 0;
+    while (<$fh>) {
+      if (/\A__(?:DATA|END)__\b/) {
+        last;
+      }
+      elsif (/\A=(\w+)/) {
+        if (!$in_pod) {
+          $in_pod = 1;
+        }
+        elsif ($1 eq 'cut') {
+          $in_pod = 0;
+        }
+      }
+      elsif ($in_pod) { }
+      elsif (/$package_declare_re/) {
+        push @packages, $1;
+      }
+    }
+    close $fh;
+
+    die "Unable to find any package declarations in $file!\n"
+      if !@packages;
+
+    my $full_file = Cwd::abs_path($file);
+
+    my @found =
+      map {
+        (my $fragment = $_) =~ s{::}{.}g;
+        $full_file =~ /\A(.*)\b$fragment\.pm\z/ ? [ $_ => $1 ] : ();
+      }
+      @packages;
+
+    die "Unable to find any package declarations matching file name in $file!\n"
+      if !@found;
+
+    (my $package, my $inc) = @{$found[0]};
+    $inc = Cwd::abs_path($inc);
+
+    warn "Found multiple possible packages for $file. Guessing $package."
+      if @found > 1;
+
+    if (!grep $inc eq Cwd::abs_path($_), @INC) {
+      warn "Adding $inc to \@INC for $file\n";
+      unshift @INC, $inc;
+    }
+    $args{package} = $package;
+  }
+  elsif ($file =~ $Pod::Coverage::TrustMe::PACKAGE_RE) {
+    $args{package} = $file;
+  }
+  else {
+    die "$file does not appear to be a file or a package!\n";
+  }
+
+  my $cover = Pod::Coverage::TrustMe->new(%args);
+  $cover->print_report;
+  print "\n";
+
+  $covered += $cover->covered || 0;
+  $uncovered += $cover->uncovered || 0;
+}
+
+my $total = $covered + $uncovered;
+my $average
+  = $total == 0 ? 'unknown'
+                : sprintf '%0.2f', $covered / $total * 100;
+
+print "Summary:\n";
+print "  subroutines total     : $total\n";
+print "  subroutines covered   : $covered\n";
+print "  subroutines uncovered : $uncovered\n";
+print "  total coverage        : $average%\n\n";
+
+__END__

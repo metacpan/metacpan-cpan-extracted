@@ -1,0 +1,91 @@
+NAME
+    Number::Pad - Pad numbers so the decimal point (or "E" if in exponential
+    notation) align
+
+VERSION
+    This document describes version 0.001 of Number::Pad (from Perl
+    distribution Number-Pad), released on 2021-08-01.
+
+SYNOPSIS
+     use Number::Pad qw(pad_numbers);
+
+     my $res = pad_numbers(
+           ["1",
+            "-20",
+            "3.1",
+            "-400.56",
+            "5e1",
+            "6.78e02",
+            "-7.8e-10",
+            "Inf",
+            "NaN"],         # 1st arg: (required) the numbers
+           20,              # 2nd arg: (optional) number of characters; if unspecified will just pad so all numbers fit
+           'right',         # 3rd arg: (optional) alignment: l/left/r/right/c/center. default is l
+           undef,           # 4th arg: (optional) pad character, default is space
+           0,               # 5th arg: (optional) whether we should truncate if the length of widest number exceeds specified number of characters. default is false.
+     );
+
+    Result:
+
+     [ #12345678901234567890
+       "             1      ",
+       "           -20      ",
+       "             3.1    ",
+       "          -400.56   ",
+       "             5e1    ",
+       "             6.78e02",
+       "            -7.8e-10",
+       "           Inf      ",
+       "           NaN      ",
+     ]
+
+FUNCTIONS
+  pad_numbers
+    Usage:
+
+     $res = pad_numbers($text | \@numbers, $width [, $which [, $padchar=' ' [, $truncate=0] ] ] ); # => str or arrayref
+
+    Return an arrayref of numbers padded with $padchar to $width columns.
+
+    $width can be undef or -1, in which case the width will be determined
+    from the widest number.
+
+    $which is either "r" or "right" for padding on the right, "l" or "left"
+    for padding on the right (the default if not specified), or "c" or
+    "center" or "centre" for left+right padding to center the text. Note
+    that "r" will mean "left justified", while "l" will mean "right
+    justified".
+
+    $padchar is whitespace if not specified. It should be string having the
+    width of 1 column.
+
+    $truncate is boolean. When set to 1, then text will be truncated when it
+    is longer than $width.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Number-Pad>.
+
+SOURCE
+    Source repository is at <https://github.com/perlancar/perl-Number-Pad>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Number-Pad>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    String::Pad has the same interface, but does not have the
+    decimal-point-aligning logic.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2021 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

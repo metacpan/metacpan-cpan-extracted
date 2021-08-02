@@ -1,0 +1,1020 @@
+#!/usr/bin/perl
+# Copyright (C) 2017–2021  Alex Schroeder <alex@gnu.org>
+
+# This program is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, either version 3 of the License, or (at your option) any
+# later version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <https://www.gnu.org/licenses/>.
+
+=encoding utf8
+
+=head1 NAME
+
+phoebe - a Gemini-first wiki server
+
+=head1 SYNOPSIS
+
+B<phoebe> [B<--host=>I<hostname> ...] [B<--port=>I<port>]
+[B<--cert_file=>I<filename>] [B<--key_file=>I<filename>]
+[B<--log_level=error>|B<warn>|B<info>|B<debug>] [B<--log_file=>I<filename>]
+[B<--wiki_dir=>I<directory>] [B<--wiki_token=>I<token> ...]
+[B<--wiki_page=>I<pagename> ...] [B<--wiki_main_page=>I<pagename>]
+[B<--wiki_mime_type=>I<mimetype> ...] [B<--wiki_page_size_limit=>I<n>]
+[B<--wiki_space=>I<space> ...]
+
+=head1 DESCRIPTION
+
+Phoebe does two and a half things:
+
+It's a program that you run on a computer and other people connect to it using
+their Gemini client in order to read the pages on it.
+
+It's a wiki, which means that people can edit the pages without needing an
+account. All they need is a client that speaks both Gemini and Titan, and the
+password. The default password is "hello". 😃
+
+Optionally, people can also access it using a regular web browser.
+
+Gemini itself is very simple network protocol, like Gopher or Finger, but with
+TLS. Gemtext is a very simple markup language, a bit like Markdown, but line
+oriented. See L</GEMTEXT>.
+
+To take a look for yourself, check out the test wiki via the web or via the web.
+
+=over
+
+=item * L<What is Gemini?|https://gemini.circumlunar.space/>
+
+=item * L<Gemini link collection|https://git.sr.ht/~kr1sp1n/awesome-gemini>
+
+=item * L<Test site, via the web|https://transjovian.org:1965/test>
+
+=item * L<Test site, via Gemini|gemini://transjovian.org/test>
+
+=back
+
+=head1 GEMTEXT
+
+Pages are written in gemtext, a lightweight hypertext format. You can use your
+favourite text editor to write them.
+
+A text line is a paragraph of text.
+
+    This is a paragraph.
+    This is another paragraph.
+
+A link line starts with "=>", a space, a URL, optionally followed by whitespace
+and some text; the URL can be absolute or relative.
+
+    => http://transjovian.org/ The Transjovian Council on the web
+    => Welcome                 Welcome to The Transjovian Council
+
+A line starting with "```" toggles preformatting on and off.
+
+    Example:
+    ```
+    ./phoebe
+    ```
+
+A line starting with "#", "##", or "###", followed by a space and some text is a
+heading.
+
+    ## License
+    The GNU Affero General Public License.
+
+A line starting with "*", followed by a space and some text is a list item.
+
+    * one item
+    * another item
+
+A line starting with ">", followed by a space and some text is a quote.
+
+    The monologue at the end is fantastic, with the city lights and the rain.
+    > I've seen things you people wouldn't believe.
+
+=head1 EDITING THE WIKI
+
+How do you edit a Phoebe wiki? You need to use a Titan-enabled client.
+
+Titan is a companion protocol to Gemini: it allows clients to upload files to
+Gemini sites, if servers allow this. On Phoebe, you can edit "raw" pages. That
+is, at the bottom of a page you'll see a link to the "raw" page. If you follow
+it, you'll see the page content as plain text. You can submit a changed version
+of this text to the same URL using Titan. There is more information for
+developers available on Community Wiki. L<https://communitywiki.org/wiki/Titan>
+
+Known clients:
+
+This repository comes with a Perl script called F<titan> to upload files.
+L<https://alexschroeder.ch/cgit/phoebe/plain/script/titan>
+
+I<Gemini Write> is an extension for the Emacs Gopher and Gemini client
+I<Elpher>. L<https://alexschroeder.ch/cgit/gemini-write/>
+L<https://thelambdalab.xyz/elpher/>
+
+Gemini & Titan for Bash are two shell functions that allow you to download and
+upload files. L<https://alexschroeder.ch/cgit/gemini-titan/about/>
+
+=head2 Editing via the web
+
+The Configuration section of the Phoebe space on I<The Transjovian Council> has
+an example config on how to enable editing via the web.
+
+=over
+
+=item * L<https://transjovian.org:1965/phoebe/page/Configuration>
+
+=item * L<gemini://transjovian.org/phoebe/page/Configuration>
+
+=back
+
+=head1 INSTALLATION
+
+Using C<cpan>:
+
+    cpan App::Phoebe
+
+Manual install:
+
+    perl Makefile.PL
+    make
+    make install
+
+=head2 Dependencies
+
+If you are not using C<cpan> or C<cpanm> to install Phoebe, you'll need to
+install the following dependencies:
+
+=over
+
+=item * L<Algorithm::Diff>, or C<libalgorithm-diff-xs-perl>
+
+=item * L<File::ReadBackwards>, or C<libfile-readbackwards-perl>
+
+=item * L<File::Slurper>, or C<libfile-slurper-perl>
+
+=item * L<Mojolicious>, or C<libmojolicious-perl>
+
+=item * L<IO::Socket::SSL>, or C<libio-socket-ssl-perl>
+
+=item * L<Modern::Perl>, or C<libmodern-perl-perl>
+
+=item * L<URI::Escape>, or C<liburi-escape-xs-perl>
+
+=item * L<Net::IDN::Encode>, or C<libnet-idn-encode-perl>
+
+=item * L<Encode::Locale>, or C<libencode-locale-perl>
+
+=back
+
+I'm going to be using F<curl> and F<openssl> in the L</Quickstart> instructions,
+so you'll need those tools as well. And finally, when people download their
+data, the code calls C<tar> (available from packages with the same name on
+Debian derived systems).
+
+The F<update-readme.pl> script I use to generate F<README.md> also requires some
+libraries:
+
+=over
+
+=item * L<Pod::Markdown>, or C<libpod-markdown-perl>
+
+=item * L<Text::Slugify>, which has no Debian package, apparently 😭
+
+=back
+
+=head2 Quickstart
+
+I'm going to assume that you're going to create a new user just to be safe.
+
+    sudo adduser --disabled-login --disabled-password phoebe
+    sudo su phoebe --shell=/bin/bash
+    cd
+
+Now you're in your home directory, F</home/phoebe>. We're going to install
+things right here.
+
+    cpan App::Phoebe
+
+Start Phoebe. It's going to prompt you for a hostname and create certificates
+for you. If in doubt, answer C<localhost>. The certificate and a private key are
+stored in the F<cert.pem> and F<key.pem> files, using elliptic curves, valid for
+five years, without password protection.
+
+    perl5/bin/phoebe
+
+This starts the server in the foreground. If it aborts, see the
+L</Troubleshooting> section below. If it runs, open a second terminal and test
+it:
+
+    perl5/bin/gemini gemini://localhost/
+
+You should see a Gemini page starting with the following:
+
+    20 text/gemini; charset=UTF-8
+    Welcome to Phoebe!
+
+Success!! 😀 🚀🚀
+
+Let's create a new page using the Titan protocol, from the command line:
+
+    echo "Welcome to the wiki!" > test.txt
+    echo "Please be kind." >> test.txt
+    perl5/bin/titan --url=titan://localhost/raw/Welcome --token=hello test.txt
+
+You should get a nice redirect message, with an appropriate date.
+
+    30 gemini://localhost:1965/page/Welcome
+
+You can check the page, now (replacing the appropriate date):
+
+    perl5/bin/gemini gemini://localhost:1965/page/Welcome
+
+You should get back a page that starts as follows:
+
+    20 text/gemini; charset=UTF-8
+    Welcome to the wiki!
+    Please be kind.
+
+Yay! 😁🎉 🚀🚀
+
+If you have a bunch of Gemtext files in a directory, you can upload them all in
+one go:
+
+    titan --url=titan://localhost/ --token=hello *.gmi
+
+=head2 Image uploads
+
+OK, how do image uploads work? First, we need to specify which MIME types Phoebe
+accepts. The files are going to be served back with that MIME type, so even if
+somebody uploads an executable and claim it's an image, other people's clients
+will treat it as an image instead of executing it (one hopes!) – so let's start
+with a list of common MIME types.
+
+=over
+
+=item * C<image/jpeg> is for photos (usually with the C<jpg> extension)
+
+=item * C<image/png> is for graphics (usually with the C<png> extension)
+
+=item * C<audio/mpeg> is for sound (usually with the C<mp3> extension)
+
+=back
+
+Let's continue using the setup we used for the L</Quickstart> section. Restart
+the server and allow photos:
+
+    perl5/bin/phoebe --wiki_mime_type=image/jpeg
+
+Upload the image using the C<titan> script:
+
+    perl5/bin/titan --url=titan://localhost:1965/jupiter.jpg \
+      --token=hello Pictures/Planets/Juno.jpg
+
+You should get back a redirect to the uploaded image:
+
+    30 gemini://localhost:1965/file/jupiter.jpg
+
+How did the C<titan> script know the MIME-type to use for the upload? If you
+don't specify a MIME-type using C<--mime>, the C<file> utility is called to
+guess the MIME type of the file.
+
+Test it:
+
+    file --mime-type --brief Pictures/Planets/Juno.jpg
+
+The result is the MIME-type we enabled for our wiki:
+
+    image/jpeg
+
+Here's what happens when you're trying to upload an unsupported MIME-type:
+
+    titan --url=titan://localhost:1965/earth.png \
+      --token=hello Pictures/Planets/Earth.png
+
+What you get back explains the problem:
+
+    59 This wiki does not allow image/png
+
+In order to allow such graphics as well, you need to restart Phoebe:
+
+    phoebe --wiki_mime_type=image/jpeg --wiki_mime_type=image/png
+
+Except that in my case, the image is too big:
+
+    59 This wiki does not allow more than 100000 bytes per page
+
+I could scale it down before I upload the image, using C<convert> (which is part
+of ImageMagick):
+
+    convert -scale 20% Pictures/Planets/Earth.png earth-small.png
+
+Try again:
+
+    titan --url=titan://localhost:1965/earth.png \
+      --token=hello earth-small.png
+
+Alternatively, you can increase the size limit using the
+C<--wiki_page_size_limit> option, but you need to restart Phoebe:
+
+    phoebe --wiki_page_size_limit=10000000 \
+      --wiki_mime_type=image/jpeg --wiki_mime_type=image/png
+
+Now you can upload about 10MB…
+
+=head2 Using systemd
+
+Systemd is going to handle daemonisation for us. There's more documentation
+available online.
+L<https://www.freedesktop.org/software/systemd/man/systemd.service.html>.
+
+Basically, this is the template for our service:
+
+    [Unit]
+    Description=Phoebe
+    After=network.target
+    [Service]
+    Type=simple
+    WorkingDirectory=/home/phoebe
+    ExecStart=/home/phoebe/phoebe
+    Restart=always
+    User=phoebe
+    Group=phoebe
+    MemoryMax=100M
+    MemoryHigh=90M
+    [Install]
+    WantedBy=multi-user.target
+
+Save this as F<phoebe.service>, and then link it:
+
+    sudo ln -s /home/phoebe/phoebe.service /etc/systemd/system/
+
+Reload systemd:
+
+    sudo systemctl daemon-reload
+
+Start Phoebe:
+
+    sudo systemctl start phoebe
+
+Check the log output:
+
+    sudo journalctl --unit phoebe
+
+=head2 Troubleshooting
+
+🔥 B<1408A0C1:SSL routines:ssl3_get_client_hello:no shared cipher> 🔥 If you
+created a new certificate and key using elliptic curves using an older OpenSSL,
+you might run into this. Try to create a RSA key instead. It is larger, but at
+least it'll work.
+
+    openssl req -new -x509 -newkey rsa \
+    -days 1825 -nodes -out cert.pem -keyout key.pem
+
+=head1 FILES
+
+Your home directory should now also contain a wiki directory called F<wiki>,
+your wiki directory. In it, you'll find a few more files:
+
+F<page> is the directory with all the page files in it; each file has the C<gmi>
+extension and should be written in Gemtext format
+
+F<index> is a file containing all the files in your F<page> directory for quick
+access; if you create new files in the F<page> directory, you should delete the
+F<index> file – it will get regenerated when needed; the format is one page name
+(without the C<.gmi> extension) per line, with lines separated from each other
+by a single C<\n>
+
+F<keep> is the directory with all the old revisions of pages in it – if you've
+only made one change, then it won't exist; if you don't care about the older
+revisions, you can delete them; assuming you have a page called C<Welcome> and
+edit it once, you have the current revision as F<page/Welcome.gmi>, and the old
+revision in F<keep/Welcome/1.gmi> (the page name turns into a subdirectory and
+each revision gets an apropriate number)
+
+F<file> is the directory with all the uploaded files in it – if you haven't
+uploaded any files, then it won't exist; you must explicitly allow MIME types
+for upload using the C<--wiki_mime_type> option (see I<Options> below)
+
+F<meta> is the directory with all the meta data for uploaded files in it – there
+should be a file here for every file in the F<file> directory; if you create new
+files in the F<file> directory, you should create a matching file here; if you
+have a file F<file/alex.jpg> you want to create a file F<meta/alex.jpg>
+containing the line C<content-type: image/jpeg>
+
+F<changes.log> is a file listing all the pages made to the wiki; if you make
+changes to the files in the F<page> or F<file> directory, they aren't going to
+be listed in this file and thus people will be confused by the changes you made
+– your call (but in all fairness, if you're collaborating with others you
+probably shouldn't do this); the format is one change per line, with lines
+separated from each other by a single C<\n>, and each line consisting of time
+stamp, pagename or filename, revision number if a page or 0 if a file, and the
+numeric code of the user making the edit (see L</Privacy> below), all separated
+from each other with a C<\x1f>
+
+F<config> probably doesn't exist, yet; it is an optional file containing Perl
+code where you can add new features and change how Phoebe works (see
+L</Configuration> below)
+
+F<conf.d> probably doesn't exist, either; it is an optional directory containing
+even more Perl files where you can add new features and change how Phoebe works
+(see L</Configuration> below); the idea is that people can share stand-alone
+configurations that you can copy into this directory without having to edit your
+own F<config> file.
+
+=head1 OPTIONS
+
+=over
+
+=item * C<--wiki_token> is for the token that users editing pages have to
+      provide; the default is "hello"; you can use this option multiple times
+      and give different users different passwords, if you want
+
+=item * C<--wiki_page> is an extra page to show in the main menu; you can use
+      this option multiple times; this is ideal for general items like I<About>
+      or I<Contact>
+
+=item * C<--wiki_main_page> is the page containing your header for the main
+      page; that's were you would put your ASCII art header, your welcome
+      message, and so on, see L</Main Page and Title> below
+
+=item * C<--wiki_mime_type> is a MIME type to allow for uploads; text/plain is
+      always allowed and doesn't need to be listed; you can also just list the
+      type without a subtype, eg. C<image> will allow all sorts of images (make
+      sure random people can't use your server to exchange images – set a
+      password using C<--wiki_token>)
+
+=item * C<--wiki_page_size_limit> is the number of bytes to allow for uploads,
+      both for pages and for files; the default is 10000 (10kB)
+
+=item * C<--host> is the hostname to serve; the default is C<localhost> – you
+      probably want to pick the name of your machine, if it is reachable from
+      the Internet; if you use it multiple times, each host gets its own wiki
+      space (see C<--wiki_space> below)
+
+=item * C<--port> is the port to use; the default is 1965
+
+=item * C<--wiki_dir> is the wiki data directory to use; the default is either
+      the value of the C<PHOEBE_DATA_DIR> environment variable, or the "./wiki"
+      subdirectory
+
+=item * C<--wiki_space> adds an extra space that acts as its own wiki; a
+      subdirectory with the same name gets created in your wiki data directory
+      and thus you shouldn't name spaces like any of the files and directories
+      already there (see L</FILES>); not that settings such as
+      C<--wiki_page> and C<--wiki_main_page> apply to all spaces, but the page
+      content will be different for every wiki space
+
+=item * C<--cert_file> is the certificate PEM file to use; the default is
+      F<cert.pem>
+
+=item * C<--key_file> is the private key PEM file to use; the default is
+      F<key.pem>
+
+=item * C<--log_level> is the log level to use (C<fatal>, C<error>, C<warn>,
+      C<info>, C<debug>); the default is C<warn>
+
+=item * C<--log_file> is the log file to use; the default is undefined, which
+      means that STDERR is used
+
+=back
+
+=head2 UPLOADS
+
+If you allow uploads of binary files, these are stored separately from the
+regular pages; the wiki doesn't keep old revisions of files around. If somebody
+overwrites a file, the old revision is gone.
+
+You definitely don't want random people uploading all sorts of images, videos
+and binaries to your server. Make sure you set up those L<tokens|/Security>
+using C<--wiki_token>!
+
+=head1 NOTES
+
+=head2 Security
+
+The server uses "access tokens" to check whether people are allowed to edit
+files. You could also call them "passwords", if you want. They aren't associated
+with a username. You set them using the C<--wiki_token> option. By default, the
+only password is "hello". That's why the Titan command above contained
+"token=hello". 😊
+
+If you're going to check up on your wiki often (daily!), you could just tell
+people about the token on a page of your wiki. Spammers would at least have to
+read the instructions and in my experience the hardly ever do.
+
+You could also create a separate password for every contributor and when they
+leave the project, you just remove the token from the options and restart
+Phoebe. They will no longer be able to edit the site.
+
+=head2 Privacy
+
+The server only actively logs changes to pages. It calculates a "code" for every
+contribution: it is a four digit octal code. The idea is that you could colour
+every digit using one of the eight standard terminal colours and thus get little
+four-coloured flags.
+
+This allows you to make a pretty good guess about edits made by the same person,
+without telling you their IP numbers.
+
+The code is computed as follows: the IP numbers is turned into a 32bit number
+using a hash function, converted to octal, and the first four digits are the
+code. Thus all possible IP numbers are mapped into 8⁴=4096 codes.
+
+If you increase the log level, the server will produce more output, including
+information about the connections happening, like C<2020/06/29-15:35:59 CONNECT
+SSL Peer: "[::1]:52730" Local: "[::1]:1965"> and the like (in this case C<::1>
+is my local address so that isn't too useful but it could also be your visitor's
+IP numbers, in which case you will need to tell them about it using in order to
+comply with the
+L<GDPR|https://en.wikipedia.org/wiki/General_Data_Protection_Regulation>.
+
+=head1 EXAMPLE
+
+Here's an example for how to start Phoebe. It listens on C<localhost> port 1965,
+adds the "Welcome" and the "About" page to the main menu, and allows editing
+using one of two tokens.
+
+    phoebe \
+      --wiki_token=Elrond \
+      --wiki_token=Thranduil \
+      --wiki_page=Welcome \
+      --wiki_page=About
+
+Here's what my F<phoebe.service> file actually looks like:
+
+    [Unit]
+    Description=Phoebe
+    After=network.target
+    [Install]
+    WantedBy=multi-user.target
+    [Service]
+    Type=simple
+    WorkingDirectory=/home/alex/farm
+    Restart=always
+    User=alex
+    Group=ssl-cert
+    MemoryMax=100M
+    MemoryHigh=90M
+    ExecStart=/home/alex/src/phoebe/script/phoebe \
+     --port=1965 \
+     --log_level=debug \
+     --wiki_dir=/home/alex/phoebe \
+     --host=transjovian.org \
+     --cert_file=/var/lib/dehydrated/certs/transjovian.org/fullchain.pem \
+     --key_file=/var/lib/dehydrated/certs/transjovian.org/privkey.pem \
+     --host=toki.transjovian.org \
+     --cert_file=/var/lib/dehydrated/certs/transjovian.org/fullchain.pem \
+     --key_file=/var/lib/dehydrated/certs/transjovian.org/privkey.pem \
+     --host=vault.transjovian.org \
+     --cert_file=/var/lib/dehydrated/certs/transjovian.org/fullchain.pem \
+     --key_file=/var/lib/dehydrated/certs/transjovian.org/privkey.pem \
+     --host=communitywiki.org \
+     --cert_file=/var/lib/dehydrated/certs/communitywiki.org/fullchain.pem \
+     --key_file=/var/lib/dehydrated/certs/communitywiki.org/privkey.pem \
+     --host=alexschroeder.ch \
+     --cert_file=/var/lib/dehydrated/certs/alexschroeder.ch/fullchain.pem \
+     --key_file=/var/lib/dehydrated/certs/alexschroeder.ch/privkey.pem \
+     --host=next.oddmuse.org \
+     --cert_file=/var/lib/dehydrated/certs/oddmuse.org/fullchain.pem \
+     --key_file=/var/lib/dehydrated/certs/oddmuse.org/privkey.pem \
+     --host=emacswiki.org \
+     --cert_file=/var/lib/dehydrated/certs/emacswiki.org/fullchain.pem \
+     --key_file=/var/lib/dehydrated/certs/emacswiki.org/privkey.pem \
+     --wiki_main_page=Welcome \
+     --wiki_page=About \
+     --wiki_mime_type=image/png \
+     --wiki_mime_type=image/jpeg \
+     --wiki_mime_type=audio/mpeg \
+     --wiki_space=transjovian.org/test \
+     --wiki_space=transjovian.org/phoebe \
+     --wiki_space=transjovian.org/anthe \
+     --wiki_space=transjovian.org/gemini \
+     --wiki_space=transjovian.org/titan
+
+=head2 Certificates and File Permission
+
+In the example above, I'm using certificates I get from Let's Encrypt. Thus, the
+regular website served on port 443 and the Phoebe website on port 1965 use the
+same certificates. My problem is that for the regular website, Apache can read
+the certificates, but in the setup above Phoebe runs as the user C<alex> and
+cannot access the certificates. My solution is to use the group C<ssl-cert>.
+This is the group that already has read access to F</etc/ssl/private> on my
+system. I granted the following permissions:
+
+    drwxr-x--- root ssl-cert /var/lib/dehydrated/certs
+    drwxr-s--- root ssl-cert /var/lib/dehydrated/certs/*
+    drwxr----- root ssl-cert /var/lib/dehydrated/certs/*/*.pem
+
+=head2 Main Page and Title
+
+The main page will include ("transclude") a page of your choosing if you use the
+C<--wiki_main_page> option. This also sets the title of your wiki in various
+places like the RSS and Atom feeds.
+
+In order to be more flexible, the name of the main page does not get printed. If
+you want it, you need to add it yourself using a header. This allows you to keep
+the main page in a page called "Welcome" containing some ASCII art such that the
+word "Welcome" does not show on the main page. This assumes you're using
+C<--wiki_main_page=Welcome>, of course.
+
+If you have pages with names that start with an ISO date like 2020-06-30, then
+I'm assuming you want some sort of blog. In this case, up to ten of them will be
+shown on your front page.
+
+=head2 robots.txt
+
+There are search machines out there that will index your site. Ideally, these
+wouldn't index the history pages and all that: they would only get the list of
+all pages, and all the pages. I'm not even sure that we need them to look at all
+the files. The Robots Exclusion Standard lets you control what the bots ought to
+index and what they ought to skip. It doesn't always work.
+L<https://en.wikipedia.org/wiki/Robots_exclusion_standard>
+
+Here's my suggestion:
+
+    User-agent: *
+    Disallow: /raw
+    Disallow: /html
+    Disallow: /diff
+    Disallow: /history
+    Disallow: /do/comment
+    Disallow: /do/changes
+    Disallow: /do/all/changes
+    Disallow: /do/all/latest/changes
+    Disallow: /do/rss
+    Disallow: /do/atom
+    Disallow: /do/all/atom
+    Disallow: /do/new
+    Disallow: /do/more
+    Disallow: /do/match
+    Disallow: /do/search
+    # allowing do/index!
+    Crawl-delay: 10
+
+In fact, as long as you don't create a page called C<robots> then this is what
+gets served. I think it's a good enough way to start. If you're using spaces,
+the C<robots> pages of all the spaces are concatenated.
+
+If you want to be more paranoid, create a page called C<robots> and put this on
+it:
+
+    User-agent: *
+    Disallow: /
+
+Note that if you've created your own C<robots> page, and you haven't decided to
+disallow them all, then you also have to do the right thing for all your spaces,
+if you use them at all.
+
+=head2 Configuration
+
+See L<App::Phoebe> for more information.
+
+=head2 Wiki Spaces
+
+Wiki spaces are separate wikis managed by the same Phoebe server, on the
+same machine, but with data stored in a different directory. If you used
+C<--wiki_space=alex> and C<--wiki_space=berta>, for example, then you'd have
+three wikis in total:
+
+=over
+
+=item * C<gemini://localhost/> is the main space that continues to be available
+
+=item * C<gemini://localhost/alex/> is the wiki space for Alex
+
+=item * C<gemini://localhost/berta/> is the wiki space for Berta
+
+=back
+
+Note that all three spaces are still editable by anybody who knows any of the
+L<tokens|/Security>.
+
+=head2 Tokens per Wiki Space
+
+Per default, there is simply one set of tokens which allows the editing of the
+wiki, and all the wiki spaces you defined. If you want to give users a token
+just for their space, you can do that, too. Doing this is starting to strain the
+command line interface, however, and therefore the following illustrates how to
+do more advanced configuration using the config file:
+
+    package App::Phoebe;
+    use Modern::Perl;
+    our ($server);
+    $server->{wiki_space_token}->{alex} = ["*secret*"];
+
+The code above sets up the C<wiki_space_token> property. It's a hash reference
+where keys are existing wiki spaces and values are array references listing the
+valid tokens for that space (in addition to the global tokens that you can set
+up using C<--wiki_token> which defaults to the token "hello"). Thus, the above
+code sets up the token C<*secret*> for the C<alex> wiki space.
+
+You can use the config file to change the values of other properties as well,
+even if these properties are set via the command line.
+
+    package App::Phoebe;
+    use Modern::Perl;
+    our ($server);
+    $server->{wiki_token} = [];
+
+This code simply deactivates the token list. No more tokens!
+
+=head2 Virtual Hosting
+
+Sometimes you want have a machine reachable under different domain names and you
+want each domain name to have their own wiki space, automatically. You can do
+this by using multiple C<--host> options.
+
+Here's a simple, stand-alone setup that will work on your local machine. These
+are usually reachable using the IPv4 C<127.0.0.1> or the name C<localhost>. The
+following command tells Phoebe to serve both C<127.0.0.1> and C<localhost>
+(the default is to just serve C<localhost>).
+
+    phoebe --host=127.0.0.1 --host=localhost
+
+Visit both at L<gemini://localhost/> and L<gemini://127.0.0.1/>, and create a
+new page in each one, then examine the data directory F<wiki>. You'll see both
+F<wiki/localhost> and F<wiki/127.0.0.1>.
+
+If you're using more wiki spaces, you need to prefix them with the respective
+hostname if you use more than one:
+
+    phoebe --host=127.0.0.1 --host=localhost \
+        --wiki_space=127.0.0.1/alex --wiki_space=localhost/berta
+
+In this situation, you can visit L<gemini://127.0.0.1/>,
+L<gemini://127.0.0.1/alex/>, L<gemini://localhost/>, and
+L<gemini://localhost/berta/>, and they will all be different.
+
+If this is confusing, remember that not using virtual hosting and not using
+spaces is fine, too. 😀
+
+=head2 Multiple Certificates
+
+If you're using virtual hosting as discussed above, you have two options: you
+can use one certificate for all your hostnames, or you can use different
+certificates for the hosts. If you want to use just one certificate for all your
+hosts, you don't need to do anything else. If you want to use different
+certificates for different hosts, you have to specify them all on the command
+line. Generally speaking, use C<--host> to specifiy one or more hosts, followed
+by both C<--cert_file> and C<--key_file> to specifiy the certificate and key to
+use for the hosts.
+
+For example:
+
+    phoebe --host=transjovian.org \
+        --cert_file=/var/lib/dehydrated/certs/transjovian.org/cert.pem \
+        --key_file=/var/lib/dehydrated/certs/transjovian.org/privkey.pem \
+        --host=alexschroeder.ch \
+        --cert_file=/var/lib/dehydrated/certs/alexschroeder.ch/cert.pem \
+        --key_file=/var/lib/dehydrated/certs/alexschroeder.ch/privkey.pem
+
+=head1 SEE ALSO
+
+As you might have guessed, the system is easy to tinker with, if you know some
+Perl. The Transjovian Council has a wiki space dedicated to Phoebe, and it
+includes a section with more configuration examples.
+See L<gemini://transjovian.org/> or L<https://transjovian.org:1965/>.
+
+=head1 LICENSE
+
+GNU Affero General Public License
+
+=cut
+
+use App::Phoebe qw($log $server host_regex handle_request get_ip_numbers);
+use Modern::Perl '2018';
+use File::Slurper qw(read_dir);
+use Encode qw(decode);
+use Encode::Locale;
+use IO::Socket::SSL;
+use Mojo::IOLoop;
+use Getopt::Long;
+use Pod::Text;
+use utf8;
+use B;
+
+# Some of these need to be decoded (hostnames, pagenames).
+GetOptions(
+  $server,
+  'help' => \&help,
+  'log_level=s' => sub { $log->level($_[1]), },
+  'log_file=s' => sub { $log->path($_[1]) },
+  'cert_file=s' => \&host_setup,
+  'key_file=s' => \&host_setup,
+  'host=s' => \&host_setup,
+  'port=i@', # same ports for all hosts!
+  'wiki_dir=s',
+  'wiki_space=s@' => \&utf8_list_item,
+  'wiki_token=s@' => \&utf8_list_item,
+  'wiki_page=s@' => \&utf8_list_item,
+  'wiki_main_page=s' => \&utf8_item,
+  'wiki_mime_type=s@',
+  'wiki_page_size_limit=i')
+    or die("Error in command line arguments\n");
+
+sub utf8_list_item { my ($key, $value) = @_; push(@{$server->{$key}}, decode(locale => $value)) };
+sub utf8_item { my ($key, $value) = @_; $server->{$key} = decode(locale => $value) };
+
+{
+  # use a block so that these variables stay local
+  my ($cert_file, $key_file, @host);
+
+  sub host_setup {
+    my ($opt, $val) = @_;
+    if ($opt eq 'host') {
+      push @host, decode(locale => $val);
+      return;
+    };
+    die "$val does not exist\n" unless -f $val;
+    if ($opt eq 'cert_file') { $cert_file = $val }
+    elsif ($opt eq 'key_file') { $key_file = $val }
+    if ($cert_file and $key_file) {
+      if (not @host) {
+	$server->{host}->{'localhost'} = 1;
+	$server->{cert_file}->{'localhost'} = $cert_file;
+	$server->{key_file}->{'localhost'} = $key_file;
+      }
+      for (@host) {
+	$server->{host}->{$_} = 1;
+	$server->{cert_file}->{$_} = $cert_file;
+	$server->{key_file}->{$_} = $key_file;
+      }
+      $cert_file = $key_file = undef;
+      @host = ();
+    }
+  }
+
+  # if, at the end, there is a left-over
+  if ($cert_file or $key_file) {
+    die "I must have both --key_file and --cert_file\n";
+  }
+
+  # let's see if we need to generate certificates
+  my $default_certs = 0;
+
+  # if, at the end, we have some hosts but no certs and keys
+  for (@host) {
+    $default_certs = 1;
+    $server->{host}->{$_} = 1;
+    $server->{cert_file}->{$_} = 'cert.pem';
+    $server->{key_file}->{$_} = 'key.pem';
+  }
+
+  # if, at the end, we had no hosts at all, the default still needs cert and key
+  if (not keys %{$server->{host}}) {
+    $default_certs = 1;
+    $server->{host}->{localhost} = 1;
+    $server->{cert_file}->{localhost} = 'cert.pem';
+    $server->{key_file}->{localhost} = 'key.pem';
+  }
+
+  # if the certs don't exist, generate them
+  if ($default_certs
+      and (not -f 'cert.pem'
+	   or not -f 'key.pem')) {
+    generate_certificates();
+  }
+}
+
+sub generate_certificates {
+  say "The default certificate (and key) files are missing.";
+  say "Do you want to create them right now?";
+  say "The certificate uses eliptic curves and is valid for five years.";
+  say "If so, please provide your hostname (e.g. localhost).";
+  say "If not, just press Enter.";
+  local $SIG{'ALRM'} = sub {
+    die "Timed out!\n";
+  };
+  alarm(30); # timeout for the following prompt
+  my $hostname = <STDIN>;
+  alarm(0);  # done, no more alarm
+  chomp $hostname;
+  die "The hostname may not contain any whitespace\n" if $hostname =~ /\s/;
+  my $cmd = qq(openssl req -new -x509 -newkey ec -subj "/CN=$hostname" )
+      . qq(-pkeyopt ec_paramgen_curve:prime256v1 -days 1825 -nodes -out cert.pem -keyout key.pem);
+  if ($hostname) {
+    say $cmd;
+    system($cmd) == 0
+      or die "openssl failed: $?";
+  }
+}
+
+sub help {
+  my $parser = Pod::Text->new();
+  $parser->parse_file($0);
+  exit;
+}
+
+sub verify_fingerprint {
+  my ($ok, $ctx_store, $certname, $error, $cert, $depth) = @_;
+  return 1;
+}
+
+# defaults
+$server->{port} ||= [1965];
+$server->{wiki_token} ||= ['hello'];
+$server->{wiki_space} ||= [];
+$server->{wiki_mime_type} ||= [];
+$server->{wiki_dir} ||= $ENV{PHOEBE_DATA_DIR} || './wiki';
+$server->{wiki_page} ||= [];
+$server->{wiki_main_page} ||= '';
+$server->{wiki_page_size_limit} ||= 100000;
+
+configure();
+
+# Reconfigure if we get SIGHUP (via kill -s SIGHUP $pid, for example)
+$SIG{HUP} = sub { Mojo::IOLoop->next_tick(\&configure) };
+
+start_servers();
+
+sub configure {
+  # config file with extra code; restart server if you change it
+  my $dir = $server->{wiki_dir};
+  my @config;
+  push(@config, map { "$dir/conf.d/$_" } grep(/\.p[lm]$/, read_dir("$dir/conf.d"))) if -d "$dir/conf.d";
+  # allow override of config files in conf.d
+  push(@config, "$dir/config") if -f "$dir/config";
+  for my $config (@config) {
+    $log->info("Running $config");
+    $log->error("$config cannot be read") unless -r $config;
+    $log->warn("$config did not return a true value") unless do $config;
+    $log->error("$@") if $@;
+    $log->error("$!") if $!;
+  }
+  # summarize config results
+  $log->info("PID: $$");
+  $log->info("Host: " . join(" ", keys %{$server->{host}}));
+  $log->info("Port: @{$server->{port}}");
+    $log->info("Space: @{$server->{wiki_space}}");
+  if (keys %{$server->{host}} > 1) {
+    my $hosts = host_regex();
+    for (grep(!/^$hosts\//, @{$server->{wiki_space}})) {
+      $log->warn("Space $_ is not prefixed with a known host");
+    }
+  } else {
+    for (grep(/\//, @{$server->{wiki_space}})) {
+      $log->warn("Space $_ is prefixed with a host but we serve just one");
+    }
+  }
+  $log->info("Token: @{$server->{wiki_token}}");
+  $log->info("Main page: $server->{wiki_main_page}");
+  $log->info("Pages: @{$server->{wiki_page}}");
+  $log->info("MIME types: @{$server->{wiki_mime_type}}");
+  $log->info("Wiki data directory: $server->{wiki_dir}");
+}
+
+sub start_servers {
+  # Figure out what IP numbers we need to listen to because we need to start
+  # servers for both IPv4 and IPv6. Only do this if phoebe is actually executing.
+  # If it is called under a different name, it's probably just being loaded as a
+  # library, in which case we don't want to start the servers.
+  if ($0 eq __FILE__) {
+    for my $host (keys %{$server->{host}}) {
+      for my $address (get_ip_numbers($host)) {
+	$server->{address}->{$address} = $host;
+	for my $port (@{$server->{port}}) {
+	  $log->info("$host: listening on $address:$port (Gemini)");
+	  Mojo::IOLoop->server({
+	    address => $address,
+	    port => $port,
+	    tls => 1,
+	    tls_cert => $server->{cert_file},
+	    tls_key  => $server->{key_file},
+	    tls_options => {
+	      # request client certificates and accept them
+	      SSL_verify_mode => SSL_VERIFY_PEER,
+	      SSL_verify_callback => \&verify_fingerprint,
+	      SSL_create_ctx_callback => sub {
+		my $ctx = shift;
+		Net::SSLeay::CTX_sess_set_cache_size($ctx, 64);
+	      }
+	    }
+	  } => sub {
+	    my ($loop, $stream) = @_;
+	    my $data = { buffer => '', handler => \&handle_request };
+	    $stream->on(read => sub {
+	      my ($stream, $bytes) = @_;
+	      $log->debug("Received " . length($bytes) . " bytes");
+	      $data->{buffer} .= $bytes;
+	      $data->{handler}->($stream, $data)})});
+	}
+      }
+    }
+
+    # Start event loop if necessary
+    Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
+  }
+}
+
+1;
+
+__DATA__

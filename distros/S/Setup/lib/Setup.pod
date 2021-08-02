@@ -15,13 +15,13 @@ __END__
 
 Setup - Specification for setup module
 
-=head1 VERSION
-
-This document describes version 1.0.5 of Setup (from Perl distribution Setup), released on 2015-09-09.
-
 =head1 SPECIFICATION VERSION
 
 1.0
+
+=head1 VERSION
+
+This document describes version 1.0.6 of Setup (from Perl distribution Setup), released on 2021-08-02.
 
 =head1 SPECIFICATION
 
@@ -38,7 +38,7 @@ interpreted as described in RFC 2119.
 
 Setup functions MUST have metadata, as specified in L<Rinci> specification.
 
-Setup function MUST use L<Log::Any> for logging.
+Setup function MUST use L<Log::ger> for logging.
 
 Setup functions MUST support transactions, as described in
 L<Rinci::Transaction>.
@@ -92,7 +92,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2015, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

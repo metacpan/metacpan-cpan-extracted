@@ -1,9 +1,9 @@
 package Data::Sah::Compiler::perl::TH::array;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-07-29'; # DATE
+our $DATE = '2021-08-01'; # DATE
 our $DIST = 'Data-Sah'; # DIST
-our $VERSION = '0.909'; # VERSION
+our $VERSION = '0.910'; # VERSION
 
 use 5.010;
 use strict;
@@ -104,13 +104,13 @@ sub clause_elems {
 
         for my $i (0..@$cv-1) {
             local $cd->{spath} = [@{$cd->{spath}}, $i];
-            my $sch = $c->main->normalize_schema($cv->[$i]);
+            my $nsch = $c->main->normalize_schema($cv->[$i]);
             my $edt = "$dt\->[$i]";
             my %iargs = %{$cd->{args}};
             $iargs{outer_cd}             = $cd;
             $iargs{data_name}            = "$cd->{args}{data_name}_$i";
             $iargs{data_term}            = $edt;
-            $iargs{schema}               = $sch;
+            $iargs{schema}               = $nsch;
             $iargs{schema_is_normalized} = 1;
             $iargs{cache}                = $cd->{args}{cache};
             $iargs{indent_level}++;
@@ -121,7 +121,7 @@ sub clause_elems {
             );
             my $ires = join("", @code);
             local $cd->{_debug_ccl_note} = "elem: $i";
-            if ($cdef && defined($sch->[1]{default})) {
+            if ($cdef && defined($nsch->[1]{default})) {
                 $c->add_ccl($cd, $ires);
             } else {
                 $c->add_ccl($cd, "\@{$dt} < ".($i+1)." || ($ires)");
@@ -148,7 +148,7 @@ Data::Sah::Compiler::perl::TH::array - perl's type handler for type "array"
 
 =head1 VERSION
 
-This document describes version 0.909 of Data::Sah::Compiler::perl::TH::array (from Perl distribution Data-Sah), released on 2021-07-29.
+This document describes version 0.910 of Data::Sah::Compiler::perl::TH::array (from Perl distribution Data-Sah), released on 2021-08-01.
 
 =for Pod::Coverage ^(clause_.+|superclause_.+)$
 

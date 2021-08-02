@@ -1,4 +1,4 @@
-package Dist::Zilla::Chrome::Test 6.023;
+package Dist::Zilla::Chrome::Test 6.024;
 # ABSTRACT: the chrome used by Dist::Zilla::Tester
 
 use Moose;
@@ -97,7 +97,7 @@ Dist::Zilla::Chrome::Test - the chrome used by Dist::Zilla::Tester
 
 =head1 VERSION
 
-version 6.023
+version 6.024
 
 =head1 PERL VERSION
 

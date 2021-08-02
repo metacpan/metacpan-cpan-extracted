@@ -1,5 +1,16 @@
 Revision history for Perl extension Crypt::OpenSSL::X509.
 
+1.9.10 Sun Aug  1 09:48:08 CEST 2021
+
+  - MANIFEST was not updated with the latest contributions from 1.9.9
+    REF: https://github.com/dsully/perl-crypt-openssl-x509/issues/89
+
+1.9.9 Sat Jul 31 17:58:56 CEST 2021
+
+  - Contribution by Patrick Cernko. The email method has been extended to return multiple email addresses if available.
+    The addresses are concatenated using space (' ') as seperator in order for consumers to extract the multiple email addresses
+    REF: https://github.com/dsully/perl-crypt-openssl-x509/pull/88
+
 1.9.8 Thu May 13 18:04:17 CEST 2021
 
   - Addressed minor issue, via PR #87, with the implementation added in 1.9.3 - Thanks Shoichi Kaji

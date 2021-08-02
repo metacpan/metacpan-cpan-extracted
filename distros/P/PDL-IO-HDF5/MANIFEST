@@ -5,8 +5,9 @@ HDF5/Group.pm
 HDF5/tkview.pm
 Makefile.PL
 MANIFEST			This list of files
+MANIFEST.SKIP
 README
-Release_Notes
+Changes
 t/attribPDL.t
 t/file.t
 t/group.t
@@ -19,6 +20,7 @@ t/ztotal_index.t
 tkviewtest
 typemap
 varlen.hdf5
+xt/01-checkmanifest.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)
 GENERATED/PDL/IO/HDF5.pm                 mod=PDL::IO::HDF5 pd=hdf5.pd (added by pdlpp_mkgen)

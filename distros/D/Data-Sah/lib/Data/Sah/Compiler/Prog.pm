@@ -1,9 +1,9 @@
 package Data::Sah::Compiler::Prog;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-07-29'; # DATE
+our $DATE = '2021-08-01'; # DATE
 our $DIST = 'Data-Sah'; # DIST
-our $VERSION = '0.909'; # VERSION
+our $VERSION = '0.910'; # VERSION
 
 use 5.010001;
 use strict;
@@ -185,9 +185,9 @@ sub add_var {
 
 # XXX requires: expr_refer_or_call_sub
 
-# XXX requires: stt_declare_local_var
-
 # TODO XXX requires: expr_declare_lexical_var
+
+# XXX requires: stmt_declare_local_var
 
 # XXX requires: stmt_require_module
 
@@ -199,9 +199,9 @@ sub add_var {
 
 # XXX requires: stmt_return
 
-# XXX requires: valid_subname
-
 # XXX requires: sub_defined
+
+# XXX requires: gen_cached_validator
 
 sub _xlt {
     my ($self, $cd, $text) = @_;
@@ -244,7 +244,7 @@ sub expr_validator_sub {
     my ($self, %args) = @_;
 
     my $cache      = $args{cache};
-    my $log_result = delete $args{log_result};
+    my $log_result = $args{log_result};
     my $dt         = $args{data_term};
     my $vt         = delete($args{var_term}) // $dt;
     my $do_log     = $args{debug_log} // $args{debug};
@@ -899,7 +899,7 @@ sub before_all_clauses {
   HANDLE_TYPE_CHECK_OR_BASE_SCHEMA_CHECK:
     {
         if (defined $cd->{base_schema}) {
-            #
+            $self->gen_cached_validator($cd, $cd->{base_schema});
         } else {
             $self->_die($cd, "BUG: type handler did not produce _ccl_check_type")
                 unless defined($cd->{_ccl_check_type});
@@ -977,7 +977,7 @@ sub before_all_clauses {
         if (defined $cd->{base_schema}) {
             $cd->{_debug_ccl_note} = "check base schema '$cd->{base_schema}'";
             $self->add_ccl(
-                $cd, $self->expr_call_sub($self->cached_validator_subname($cd->{base_schema}), [$dt]),
+                $cd, $self->expr_call_cached_validator($cd, $cd->{base_schema}),
                 {
                     err_msg   => sprintf(
                         $self->_xlt($cd, "Not of schema %s"),
@@ -1111,7 +1111,7 @@ Data::Sah::Compiler::Prog - Base class for programming language compilers
 
 =head1 VERSION
 
-This document describes version 0.909 of Data::Sah::Compiler::Prog (from Perl distribution Data-Sah), released on 2021-07-29.
+This document describes version 0.910 of Data::Sah::Compiler::Prog (from Perl distribution Data-Sah), released on 2021-08-01.
 
 =head1 SYNOPSIS
 

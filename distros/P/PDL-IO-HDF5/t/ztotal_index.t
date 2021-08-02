@@ -1,19 +1,19 @@
+# Script to test the attribute index functionality of the PDL::IO::HDF5 Class
+
+use strict;
+use warnings;
 use PDL;
 use PDL::Char;
 use PDL::IO::HDF5;
-use PDL::Types;
-
-# Script to test the attribute index functionality of the PDL::IO::HDF5 Class
 
 use Data::Dumper;
 
-use Test::More tests => 7;
+use Test::More;
 
 # New File Check:
 my $filename = "total.hdf5";
 
-my $hdfobj;
-ok($hdfobj = new PDL::IO::HDF5($filename));
+ok(my $hdfobj = new PDL::IO::HDF5($filename));
 
 # It is normally a no-no to call a internal method, but we
 #  are just testing here:
@@ -42,8 +42,7 @@ q!{
 }
 !;
 
-# print $result;
-ok($baseline eq $result );
+is($result, $baseline);
 
 # die;
 
@@ -58,9 +57,8 @@ q![
 ]
 !;
 
-#print recursiveDump(\@values);
 $result = recursiveDump(\@values);
-ok($baseline eq $result );
+is($result, $baseline);
 
 @values = $hdfobj->allAttrValues('attr1','attr2');
 $baseline = 
@@ -84,9 +82,8 @@ q![
 ]
 !;
 
-#print recursiveDump(\@values);
 $result = recursiveDump(\@values);
-ok($baseline eq $result );
+is($result, $baseline);
 
 my @names = $hdfobj->allAttrNames;
 
@@ -97,9 +94,8 @@ q![
 ]
 !;
 
-#print recursiveDump(\@names);
 $result = recursiveDump(\@names);
-ok($baseline eq $result );
+is($result, $baseline);
 
 # Test building the groupIndex
 $hdfobj->_buildGroupIndex('attr1','attr2');
@@ -135,12 +131,8 @@ $baseline =
 }
 ";
 
-#print $baseline;
-#print recursiveDump($hdfobj->{groupIndex});
 $result = recursiveDump($hdfobj->{groupIndex});
-ok($baseline eq $result );
-
-
+is($result, $baseline);
 
 my @groups = $hdfobj->getGroupsByAttr( 'attr1'  => 'dudeman23',
 					'attr2' => 'What??');
@@ -152,17 +144,18 @@ q![
     /mygroup/subgroup,
 ]
 !;
-#print recursiveDump(\@groups);
 $result = recursiveDump(\@groups);
-ok($baseline eq $result );
+is($result, $baseline);
 
 # clean up file
-unlink $filename if( -e $filename);					
+unlink $filename if( -e $filename);
+
+done_testing;
 
 # Dump of recursive array/hash.
 # We Could use Data:Dumper for this but it doesn't 
 #  order the keys, which causes problems 
-#  in regression testing on different platforsm
+#  in regression testing on different platforms
 sub recursiveDump{
 	my ($ref, $level) = @_;
 	
@@ -216,7 +209,4 @@ sub recursiveDump{
 	$returnString .= $unindent."]\n" if($arrayFlag); # Dumping aray ref
 		
 	$returnString;
-	
 }
-
-		

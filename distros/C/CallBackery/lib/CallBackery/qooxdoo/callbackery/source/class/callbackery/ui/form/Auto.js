@@ -43,6 +43,7 @@ qx.Class.define("callbackery.ui.form.Auto", {
      */
     construct : function(structure, layout, formRenderer) {
         this.base(arguments);
+        this._settingData = 0;
         this._setLayout(layout || new qx.ui.layout.Grow());
         var form = this._form = new qx.ui.form.Form();
         this._ctrl = {};
@@ -140,7 +141,6 @@ qx.Class.define("callbackery.ui.form.Auto", {
 
                 case 'selectBox':
                     tm[s.key] = 'selectBox';
-                    console.warn('Using callbackery.ui.form.VirtualSelectBox');
                     control = new callbackery.ui.form.VirtualSelectBox().set({
                         // defaults
                         incrementalSearch : false,
@@ -154,27 +154,16 @@ qx.Class.define("callbackery.ui.form.Auto", {
                             controller.bindProperty('title', 'label', null, item, index);
                         }
                     });
-                    cfg.structure.forEach(function(item){
-                        item.title = item.title != null ? this.xtr(item.title) : null;
-                    },this);
-                    var sbModel = qx.data.marshal.Json.createModel(cfg.structure ||
-                    [ {
-                        title : '',
-                        key   : null
-                    } ]);
-                    var lookup = {};
-                    sbModel.forEach(function(item, index, model) {
-                        lookup[item.getKey()] = item;
-                    }, this);
-                    this._selectBoxKeyToItem[s.key] = lookup;
-                    control.setModel(sbModel);
+                    this.setSelectBoxData(s.key,cfg.structure);
+
                     // to be removed as soon as fritz.zaucker@oetiker.ch
                     // has cleaned up the Camas application (fz, 2021-05-05)
                     // set initial selection
                     if (s.set && s.set.modelSelection) {
+                        console.error('FRITZ! Do NOT use set => { value => ...} in formCfg!');
                         let sel = s.set.modelSelection;
                         delete s.set.modelSelection;
-                        control.setValue(lookup[sel]);
+                        control.setValue(this._selectBoxKeyToItem[s.key][sel]);
                     }
                     break;
 
@@ -276,7 +265,7 @@ qx.Class.define("callbackery.ui.form.Auto", {
         var model = this._model = formCtrl.createModel(true);
 
         model.addListener('changeBubble', function(e) {
-            if (!this._settingData) {
+            if (this._settingData == 0) {
                 this.fireDataEvent('changeData', this.getData());
             }
         },
@@ -301,7 +290,7 @@ qx.Class.define("callbackery.ui.form.Auto", {
         _ctrl : null,
         _form : null,
         _model : null,
-        _settingData : false,
+        _settingData :null,
         _typeMap : null,
         _keyToFormKey: null,
         _formKeyToKey: null,
@@ -367,34 +356,42 @@ qx.Class.define("callbackery.ui.form.Auto", {
          */
         setSelectBoxData : function(box, data) {
             let model;
-            let settingData = this._settingData;
-            this._settingData = true;
-            let ctrl  = this._boxCtrl[box];
-            let selectionKey = ctrl.getValue().getKey();
-            let newSelectionIndex;
+
             if (data.length == 0) {
                 model = qx.data.marshal.Json.createModel([ {
                     title : '',
                     key   : null
-                } ]);
+                }]);
             }
             else {
-                let i = 0;
-                data.forEach(function(item){
-                    if (item.key == selectionKey) {
-                        newSelectionIndex = i;
-                    }
-                    item.title = item.title != null ? this.xtr(item.title) : null;
-                    i++;
+                data.forEach(function(item,i){
+                    // if (item.key == selectionKey) {
+                    //     newSelectionIndex = i;
+                    // }
+                    item.title = item.title != null 
+                        ? this.xtr(item.title) 
+                        : null;
                 },this);
                 model = qx.data.marshal.Json.createModel(data);
             }
-            let newSelection = model.getItem(newSelectionIndex);
+            let lookup = {};
+            model.forEach((item,idx) => {
+                lookup[item.getKey()] = item;
+            });
+            this._selectBoxKeyToItem[box] = lookup;
+            let ctrl  = this._boxCtrl[box];
+            let oldItem = ctrl.getValue();
+            let newItem = null;
+            if (oldItem){
+                newItem = lookup[oldItem.getKey()];
+                if (!newItem){
+                  console.warn(`SelectBox ${box} has no entry for ${oldItem.getKey()} selecting first item.`);
+                }
+            }
+            this._settingData++;
             ctrl.setModel(model);
-            // next two lines are equivalent
-            ctrl.setValue(newSelection);
-            // ctrl.getSelection().setItem(0, newSelection);
-            this._settingData = settingData;
+            ctrl.setValue(newItem);
+            this._settingData--;
         },
 
 
@@ -407,7 +404,7 @@ qx.Class.define("callbackery.ui.form.Auto", {
          * @param relax {var} TODOC
          */
         _setData : function(model, data, relax) {
-            this._settingData = true;
+            this._settingData++;
             for (var key in data) {
                 var formKey = this._keyToFormKey[key];
                 if (!formKey) {
@@ -434,31 +431,16 @@ qx.Class.define("callbackery.ui.form.Auto", {
                         model[setter](qx.lang.Type.isBoolean(value) ? value : parseInt(value) != 0);
                         break;
 
+                    case 'dateTime':
                     case 'date':
                         model[setter](value);
-                        break;
-
-                     case 'dateTime':
-                        model[setter](value);
-                        break;
-                     case 'selectBox':
-                        let sbModel = this._boxCtrl[key].getModel();
-                        let newSelectionIndex,  i = 0;
-                        sbModel.forEach(function(item){
-                            if (item.getKey() == value) {
-                                newSelectionIndex = i;
-                            }
-                            item.title = item.title != null ? this.xtr(item.title) : null;
-                            i++;
-                        },this);
-                        let newSelection = sbModel.getItem(newSelectionIndex);
-                        // TODO: why do we need both variants?
-                        if (newSelection) {
-                            this._boxCtrl[key].getSelection().setItem(0, newSelection);
+                    
+                    case 'selectBox':
+                        let newItem = this._selectBoxKeyToItem[key][value];
+                        if (!newItem) {
+                            console.warn(`SelectBox ${key} has no entry for ${value} selecting first Item.`);
                         }
-                        else {
-                            this._boxCtrl[key].getSelection().setItem(0, this._selectBoxKeyToItem[key][value]);
-                        }
+                        this._boxCtrl[key].setValue(newItem);
                         break;
 
                     default:
@@ -466,7 +448,7 @@ qx.Class.define("callbackery.ui.form.Auto", {
                         break;
                 }
             }
-            this._settingData = false;
+            this._settingData--;
 
             /* only fire ONE if there was an attempt at change */
 

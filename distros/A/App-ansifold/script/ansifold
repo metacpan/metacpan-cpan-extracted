@@ -4,7 +4,7 @@ use v5.14;
 use warnings;
 use utf8;
 
-our $VERSION = "1.0801";
+our $VERSION = "1.0901";
 
 =encoding utf-8
 
@@ -14,7 +14,7 @@ ansifold - fold command handling ANSI terminal sequences
 
 =head1 VERSION
 
-Version 1.0801
+Version 1.0901
 
 =head1 SYNOPSIS
 
@@ -27,7 +27,7 @@ ansifold [ options ]
           --ambiguous=narrow|wide  Unicode ambiguous character handling
     -p    --paragraph              Print extra newline
           --separate=string        Set separator string (default newline)
-    -n                             Same as --separate ''
+    -n    --nonewline              Same as --separate ''
           --linebreak=mode         Line-break mode (all, runin, runout, none)
           --runin                  Run-in width (default 4)
           --runout                 Run-out width (default 4)
@@ -278,72 +278,62 @@ if ($0 =~ /expand$/) {
     $DEFAULT_EXPAND = 1;
 }
 
-my %opt = (
-    width     => [],
-    boundary  => "none",
-    padding   => undef,
-    padchar   => undef,
-    ambiguous => undef,
-    paragraph => 0,
-    separate  => "\n",
-    linebreak => LINEBREAK_NONE,
-    runin     => 4,
-    runout    => 4,
-    expand    => $DEFAULT_EXPAND,
-    tabstop   => undef,
-    tabhead   => undef,
-    tabspace  => undef,
-    tabstyle  => undef,
-    discard   => [],
-    );
+use Getopt::EX::Hashed 'has';
 
-lock_keys %opt;
+has width     => spec => "w =s " , default => [];
+has boundary  => spec => "  =s " , default => "none";
+has padding   => spec => "  !  " , ;
+has padchar   => spec => "  =s " , ;
+has ambiguous => spec => "  =s " , ;
+has paragraph => spec => "p +  " , default => 0;
+has separate  => spec => "  =s " , default => "\n";
+has runin     => spec => "  =i " , default => 4;
+has runout    => spec => "  =i " , default => 4;
+has nonewline => spec => "n    " , action  => sub { $_{separate} = "" };
+has expand    => spec => "x :-1" , default => $DEFAULT_EXPAND;
+has tabstop   => spec => "  =i " ;
+has tabhead   => spec => "  =s " ;
+has tabspace  => spec => "  =s " ;
+has tabstyle  => spec => "  =s " ;
+has discard   => spec => "  =s " , default => [];
+has version   => spec => "v    " , action  => sub {
+    print "Version: $VERSION\n ";
+    exit;
+};
 
-my @optargs = (
-    "width|w=s"      =>  $opt{width},
-    "boundary=s"     => \$opt{boundary},
-    "padding!"       => \$opt{padding},
-    "padchar=s"      => \$opt{padchar},
-    "ambiguous=s"    => \$opt{ambiguous},
-    "paragraph|p+"   => \$opt{paragraph},
-    "separate=s"     => \$opt{separate},
-    "linebreak|lb=s" => sub {
-	$opt{linebreak} = do {
-	    local $_ = $_[1];
+has linebreak =>
+    spec => "=s lb",
+    default => LINEBREAK_NONE,
+    action => sub {
+	my($name, $value) = @_;
+	$_->{$name} = do {
+	    local $_ = $value;
 	    my $v = LINEBREAK_NONE;
-	    $v |= LINEBREAK_ALL    if /all/i;
-	    $v |= LINEBREAK_RUNIN  if /runin/i;
-	    $v |= LINEBREAK_RUNOUT if /runout/i;
+	    $v   |= LINEBREAK_ALL    if /all/i;
+	    $v   |= LINEBREAK_RUNIN  if /runin/i;
+	    $v   |= LINEBREAK_RUNOUT if /runout/i;
 	    $v;
 	};
-    },
-    "runin=i"  => \$opt{runin},
-    "runout=i" => \$opt{runout},
-    "n" => sub { $opt{separate} = "" },
-    "smart|s!" => sub {
-	($opt{boundary}, $opt{linebreak}) = do {
+    };
+
+has smart =>
+    spec => "s !",
+    action => sub {
+	($_->{boundary}, $_->{linebreak}) = do {
 	    if ($_[1]) {
 		('word', LINEBREAK_ALL);
 	    } else {
 		('none', LINEBREAK_NONE);
 	    }
 	};
-    },
-    "expand|x:-1" => \$opt{expand},
-    "tabstop=i"   => \$opt{tabstop},
-    "tabhead=s"   => \$opt{tabhead},
-    "tabspace=s"  => \$opt{tabspace},
-    "tabstyle=s"  => \$opt{tabstyle},
-    "discard=s"   =>  $opt{discard},
-    "version|v"   => sub {
-	print "Version: $VERSION\n";
-	exit;
-    },
-    );
+    };
+
+no Getopt::EX::Hashed;
 
 use Getopt::EX::Long;
 Getopt::Long::Configure("bundling");
-GetOptions(@optargs) || pod2usage();
+my $opt = Getopt::EX::Hashed->new() or die;
+GetOptions($opt, $opt->optspec) || pod2usage();
 
 my @width_map;
 my @width_index;
@@ -363,10 +353,10 @@ my @width = do {
 	}
     }
     map { split /,/, $_, -1 }
-    @{$opt{width}};
+    @{$opt->{width}};
 };
 
-$opt{width} = do {
+$opt->{width} = do {
     if    (@width == 0) { $DEFAULT_WIDTH }
     elsif (@width == 1) { $width[0] }
     else {
@@ -378,26 +368,26 @@ $opt{width} = do {
     }
 };
 
-if ($opt{expand} > 0) {
-    $opt{tabstop} = $opt{expand};
+if ($opt->{expand} > 0) {
+    $opt->{tabstop} = $opt->{expand};
 }
 
 use charnames ':loose';
-for (@opt{qw(tabhead tabspace)}) {
+for (@{$opt}{qw(tabhead tabspace)}) {
     defined && length > 1 or next;
     $_ = charnames::string_vianame($_) || die "$_: invalid name\n";
 }
 
 my $fold = Text::ANSI::Fold->new(
-    map  { $_ => $opt{$_} }
-    grep { defined $opt{$_} }
+    map  { $_ => $opt->{$_} }
+    grep { defined $opt->{$_} }
     qw(width boundary padding padchar ambiguous
        linebreak runin runout
        expand tabstyle tabstop tabhead tabspace discard)
     );
 
 my $separator = do {
-    $opt{separate} =~ s{ ( \\ (.) ) } {
+    $opt->{separate} =~ s{ ( \\ (.) ) } {
 	{ '\\' => '\\', n => "\n" }->{$2} // $1
     }gexr;
 };
@@ -410,7 +400,7 @@ while (<>) {
     }
     print join $separator, @chops;
     print "\n" if $chomped;
-    print "\n" x $opt{paragraph} if $opt{paragraph} > 0;
+    print "\n" x $opt->{paragraph} if $opt->{paragraph} > 0;
 }
 
 exit;

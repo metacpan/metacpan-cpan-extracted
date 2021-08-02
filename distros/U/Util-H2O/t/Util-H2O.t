@@ -20,7 +20,7 @@ L<http://perldoc.perl.org/perlartistic.html>.
 
 =cut
 
-use Test::More tests => 191;
+use Test::More tests => 234;
 use Scalar::Util qw/blessed/;
 
 sub exception (&) { eval { shift->(); 1 } ? undef : ($@ || die) }  ## no critic (ProhibitSubroutinePrototypes, RequireFinalReturn, RequireCarping)
@@ -30,7 +30,7 @@ sub warns (&) { my @w; { local $SIG{__WARN__} = sub { push @w, shift }; shift->(
 
 diag "This is Perl $] at $^X on $^O";
 BEGIN { use_ok 'Util::H2O' }
-is $Util::H2O::VERSION, '0.12';
+is $Util::H2O::VERSION, '0.14';
 
 diag "If all tests pass, you can ignore the \"this Perl is too old\" warnings"
 	if $] lt '5.008009';
@@ -150,6 +150,48 @@ my $PACKRE = qr/\AUtil::H2O::_[0-9A-Fa-f]+\z/;
 	is $o7a->ijk, undef;
 	is $o7a->rst, 'efg';
 	is $o7a->ijk, 'wxy';
+}
+
+# -isa
+{
+	sub get_isa {
+		my $x = shift;
+		$x = ref $x if ref $x;
+		no strict 'refs';  ## no critic (ProhibitNoStrict)
+		return \@{$x.'::ISA'};
+	}
+	{ package IsaTest2;  ## no critic (ProhibitMultiplePackages)
+		sub foo { return "foo" }
+	}
+	{ package IsaTest3;  ## no critic (ProhibitMultiplePackages)
+		our @ISA = ('IsaTest2');  ## no critic (ProhibitExplicitISA)
+		sub bar { return "bar" }
+	}
+	{ package IsaTest5;  ## no critic (ProhibitMultiplePackages)
+		sub quz { return "quz" }
+	}
+	my $o1 = h2o {};
+	is_deeply get_isa($o1), [];
+	h2o -class=>'IsaTest1', {};
+	is_deeply \@IsaTest1::ISA, [];
+	my $o2 = h2o -isa=>'IsaTest2', {};
+	is_deeply get_isa($o2), ['IsaTest2'];
+	isa_ok $o2, 'IsaTest2';
+	ok $o2->can("foo");
+	is $o2->foo, "foo";
+	h2o -classify=>'IsaTest4', -isa=>'IsaTest3', {
+		foo => sub { "Foo!" } };
+	my $o3 = IsaTest4->new();
+	isa_ok $o3, 'IsaTest4';
+	isa_ok $o3, 'IsaTest3';
+	isa_ok $o3, 'IsaTest2';
+	is_deeply \@IsaTest4::ISA, ['IsaTest3'];
+	is $o3->bar, "bar";
+	is $o3->foo, "Foo!";
+	my $o4 = h2o -isa=>['IsaTest5','IsaTest3'], {};
+	ok $o4->can("foo");
+	ok $o4->can("bar");
+	ok $o4->can("quz");
 }
 
 # -clean
@@ -361,6 +403,58 @@ SKIP: {
 	ok exception { h2o -ro, -nolock, { foo=>123 } };
 }
 
+# -destroy
+{
+	my $dest=0;
+	my $o1 = h2o -destroy=>sub{$dest++}, {};
+	is $dest, 0;
+	$o1=undef;
+	is $dest, 1;
+	my $o2 = h2o -new, -destroy=>sub{$dest++}, {};
+	is $dest, 1;
+	$o2->new;
+	is $dest, 2;
+	h2o -classify=>'DestTest', -destroy=>sub{
+			isa_ok shift, 'DestTest'; $dest++;
+		}, {}; # note this object is immediately DESTROYed
+	is $dest, 3;
+	my $o3 = DestTest->new();
+	is $dest, 3;
+	$o3=undef;
+	is $dest, 4;
+	
+	# For a reason I can't explain yet, Perls before 5.26 don't capture the warning here.
+	# perlbrew exec perl -e 'sub Foo::DESTROY{warn"x"}my$x=bless{},"Foo";local$SIG{__WARN__}=sub{print"<<".shift().">>"};$x=undef'
+	# Both the "local" and the "$x=undef" appear to be significant in the above.
+	is grep({/foobar/} warns {
+		my $exp;
+		my $od = h2o -destroy=>sub {
+			is ref $_[0], $exp or diag explain $_[0];
+			die "this warning is expected: foobar" }, {};  ## no critic (RequireCarping)
+		$exp = ref $od;
+		$od = undef;
+	}), $] ge '5.026' ? 1 : 0; # Possible To-Do for Later: I'm not too happy with this
+
+}
+
+# DESTROY
+{
+	ok h2o -class=>'DestroyTest1', -meth, { DESTROY=>sub{} };
+	ok h2o -clean=>0, -meth, { DESTROY=>sub{} };
+	ok exception { h2o -class=>'DestroyTest2', -clean=>1, -meth, { DESTROY=>sub{} } };
+	ok exception { h2o -class=>'DestroyTest3', -meth, { DESTROY=>'' } };
+	ok exception { h2o -class=>'DestroyTest4', -meth, { DESTROY=>undef } };
+	ok exception { h2o -class=>'DestroyTest5', { DESTROY=>sub{} } };
+	ok exception { h2o -class=>'DestroyTest6', -meth, destroy=>sub{}, { DESTROY=>sub{} } };
+	ok exception { h2o -clean=>0, -meth, { DESTROY=>'' } };
+	ok exception { h2o -clean=>0, -meth, { DESTROY=>undef } };
+	ok exception { h2o -clean=>0, { DESTROY=>sub{} } };
+	ok exception { h2o -clean=>0, -meth, -destroy=>sub{}, { DESTROY=>sub{} } };
+	ok exception { h2o -meth, { DESTROY=>sub{} } };
+	ok exception { h2o { DESTROY=>sub{} } };
+	ok exception { h2o { DESTROY=>undef } };
+}
+
 # plain AUTOLOAD
 {
 	my $o = h2o { AUTOLOAD => 123, baz => 789 }, 'abc';  ## no critic (ProhibitCommaSeparatedStatements)
@@ -428,5 +522,8 @@ ok exception { h2o(-class=>[]) };
 ok exception { h2o(-classify) };
 ok exception { h2o(-classify=>'') };
 ok exception { h2o(-classify=>[]) };
+ok exception { h2o(-destroy=>'') };
+ok exception { h2o(-destroy=>undef) };
+ok exception { h2o(-isa=>{}) };
 
 done_testing;

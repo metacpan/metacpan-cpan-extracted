@@ -13,8 +13,8 @@ use Data::Sah::Tiny qw(
                   );
 
 subtest normalize_schema => sub {
-    is_deeply(normalize_schema("int"), ["int", {}, {}]);
-    is_deeply(normalize_schema(["int*"]), ["int", {req=>1}, {}]);
+    is_deeply(normalize_schema("int"), ["int", {}]);
+    is_deeply(normalize_schema(["int*"]), ["int", {req=>1}]);
 };
 
 subtest gen_validator => sub {
@@ -30,7 +30,7 @@ subtest gen_validator => sub {
 
     subtest "opt: schema_is_normalized" => sub {
         dies_ok  { gen_validator("int", {schema_is_normalized=>1}) };
-        lives_ok { gen_validator(["int", {}, {}], {schema_is_normalized=>1}) };
+        lives_ok { gen_validator(["int", {}], {schema_is_normalized=>1}) };
     };
 
     subtest "unknown type -> dies" => sub {

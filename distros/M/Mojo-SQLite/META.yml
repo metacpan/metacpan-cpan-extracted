@@ -9,7 +9,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.034'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.022, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,26 +26,26 @@ no_index:
 provides:
   Mojo::SQLite:
     file: lib/Mojo/SQLite.pm
-    version: '3.006'
+    version: '3.007'
   Mojo::SQLite::Database:
     file: lib/Mojo/SQLite/Database.pm
-    version: '3.006'
+    version: '3.007'
   Mojo::SQLite::Migrations:
     file: lib/Mojo/SQLite/Migrations.pm
-    version: '3.006'
+    version: '3.007'
   Mojo::SQLite::PubSub:
     file: lib/Mojo/SQLite/PubSub.pm
-    version: '3.006'
+    version: '3.007'
     x_deprecated: 1
   Mojo::SQLite::Results:
     file: lib/Mojo/SQLite/Results.pm
-    version: '3.006'
+    version: '3.007'
   Mojo::SQLite::Transaction:
     file: lib/Mojo/SQLite/Transaction.pm
-    version: '3.006'
+    version: '3.007'
 requires:
   Carp: '0'
-  DBD::SQLite: '1.64'
+  DBD::SQLite: '1.68'
   DBI: '1.627'
   File::Spec::Functions: '0'
   File::Temp: '0'
@@ -61,8 +61,9 @@ resources:
   bugtracker: https://github.com/Grinnz/Mojo-SQLite/issues
   homepage: https://github.com/Grinnz/Mojo-SQLite
   repository: https://github.com/Grinnz/Mojo-SQLite.git
-version: '3.006'
+version: '3.007'
 x_contributors:
+  - 'Adam Williamson <awilliam@redhat.com>'
   - 'Dan Book <grinnz@gmail.com>'
   - 'Dan Book <grinnz@grinnz.com>'
   - 'Stefan Adams <stefan@adams.fm>'

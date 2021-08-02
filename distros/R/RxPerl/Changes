@@ -1,9 +1,20 @@
 Revision history for Perl extension RxPerl
 
+v6.8.0 2021-08-02T05:38:17Z
+
+    - added rx_partition
+    - FIXED: op_finalize to work like in rxjs v7
+    - renamed internal $subscription->add_dependents method to just 'add'
+
+v6.7.2 2021-08-01T13:50:59Z
+
+    - multiple op_finalize operators placed together will have their
+      callbacks executed in the rxjs v7 order
+
 v6.7.1 2021-07-31T09:47:43Z
 
     - added $VERSION strings to all modules
-    - FIXED: finalize calls its callback also on unsubscription
+    - FIXED: op_finalize now calls its callback also on unsubscription
 
 v6.7.0 2021-03-08T00:09:20Z
 

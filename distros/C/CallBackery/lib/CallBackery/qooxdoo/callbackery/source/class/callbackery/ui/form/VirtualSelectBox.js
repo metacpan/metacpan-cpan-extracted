@@ -159,12 +159,9 @@ qx.Class.define("callbackery.ui.form.VirtualSelectBox",
      * @returns {null|TypeError} The status of this operation.
      */
     setValue : function(selected) {
-      if (null === selected) {
-        this.getSelection().removeAll();
-        return null;
-      }
-
-      this.getSelection().setItem(0, selected);
+      // if no item is set, select the first item in the model
+      this.getSelection().setItem(0, 
+        selected ? selected : this.getModel().getItem(0));
       return null;
     },
 

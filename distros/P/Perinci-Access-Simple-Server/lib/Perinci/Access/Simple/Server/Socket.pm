@@ -1,7 +1,7 @@
 package Perinci::Access::Simple::Server::Socket;
 
-our $DATE = '2020-05-08'; # DATE
-our $VERSION = '0.28'; # VERSION
+our $DATE = '2021-08-01'; # DATE
+our $VERSION = '0.290'; # VERSION
 
 use 5.010001;
 use strict;
@@ -484,7 +484,7 @@ Perinci::Access::Simple::Server::Socket - Implement Riap::Simple server over soc
 
 =head1 VERSION
 
-This document describes version 0.28 of Perinci::Access::Simple::Server::Socket (from Perl distribution Perinci-Access-Simple-Server), released on 2020-05-08.
+This document describes version 0.290 of Perinci::Access::Simple::Server::Socket (from Perl distribution Perinci-Access-Simple-Server), released on 2021-08-01.
 
 =head1 SYNOPSIS
 
@@ -659,7 +659,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2017, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2017, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

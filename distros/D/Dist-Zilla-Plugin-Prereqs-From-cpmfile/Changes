@@ -1,4 +1,7 @@
 Revision history for Dist-Zilla-Plugin-Prereqs-From-cpmfile
 
+v0.0.2  2021-08-01 02:15:03 JST
+  - Add __PACKAGE__->meta->make_immutable
+
 v0.0.1  2021-07-21 12:32:06 JST
   - Initial release

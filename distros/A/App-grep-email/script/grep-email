@@ -1,0 +1,337 @@
+#!perl
+
+# Note: This script is a CLI for Riap function /App/grep/email/grep_email
+# and generated automatically using Perinci::CmdLine::Gen version 0.499
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-08-02'; # DATE
+our $DIST = 'App-grep-email'; # DIST
+our $VERSION = '0.001'; # VERSION
+
+use 5.010001;
+use strict;
+use warnings;
+use Log::ger;
+
+use Perinci::CmdLine::Any;
+
+my $cmdline = Perinci::CmdLine::Any->new(
+    url => "/App/grep/email/grep_email",
+    program_name => "grep-email",
+    log => 1,
+    read_config => 0,
+    read_env => 0,
+);
+
+$cmdline->{common_opts}{version}{getopt} = "version|V";
+
+$cmdline->run;
+
+# ABSTRACT: Print lines having email address(es) (optionally of certain criteria) in them
+# PODNAME: grep-email
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+grep-email - Print lines having email address(es) (optionally of certain criteria) in them
+
+=head1 VERSION
+
+This document describes version 0.001 of grep-email (from Perl distribution App-grep-email), released on 2021-08-02.
+
+=head1 SYNOPSIS
+
+Usage:
+
+% B<grep-email> [B<--address-contains>=I<str>] [B<--address-matches>=I<re>] [B<--address-not-contains>=I<str>] [B<--color>=I<str>] [B<--comment-contains>=I<str>] [B<--comment-matches>=I<re>] [B<--comment-not-contains>=I<str>] [B<--count>|B<-c>] [B<--debug>|B<--log-level>=I<level>|B<--quiet>|B<--trace>|B<--verbose>] [(B<--file>=I<filename>)+] [B<--format>=I<name>|B<--json>] [B<--host-contains>=I<str>] [B<--host-matches>=I<re>] [B<--host-not-contains>=I<str>] [B<--ignore-case>|B<-i>|B<--no-ignore-case>|B<--noignore-case>] [B<--invert-match>|B<-v>|B<--no-invert-match>|B<--noinvert-match>] [B<--line-number>|B<-n>] [B<--max-emails>=I<int>] [B<--min-emails>=I<uint>] [B<--(no)naked-res>] [B<--name-contains>=I<str>] [B<--name-matches>=I<re>] [B<--name-not-contains>=I<str>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] [B<--quiet-arg>] [B<--user-contains>=I<str>] [B<--user-matches>=I<re>] [B<--user-not-contains>=I<str>] [B<--files-json>=I<json>] [B<-q>|B<--silent>] -- [I<file>] ...
+
+Examples:
+
+Show lines that contain at least 2 emails:
+
+ % grep-email --min-emails 2 file.txt
+
+Show lines that contain emails from gmail:
+
+ % grep-email --host-contains gmail.com file.txt
+
+=head1 DESCRIPTION
+
+This is a grep-like utility that greps for emails of certain criteria.
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Main options
+
+=over
+
+=item B<--file>=I<s@>
+
+Can also be specified as the 1st command-line argument and onwards.
+
+Can be specified multiple times.
+
+=item B<--files-json>=I<s>
+
+See C<--file>.
+
+Can also be specified as the 1st command-line argument and onwards.
+
+=back
+
+=head2 Email criteria options
+
+=over
+
+=item B<--address-contains>=I<s>
+
+=item B<--address-matches>=I<s>
+
+=item B<--address-not-contains>=I<s>
+
+=item B<--comment-contains>=I<s>
+
+=item B<--comment-matches>=I<s>
+
+=item B<--comment-not-contains>=I<s>
+
+=item B<--host-contains>=I<s>
+
+=item B<--host-matches>=I<s>
+
+=item B<--host-not-contains>=I<s>
+
+=item B<--name-contains>=I<s>
+
+=item B<--name-matches>=I<s>
+
+=item B<--name-not-contains>=I<s>
+
+=item B<--user-contains>=I<s>
+
+=item B<--user-matches>=I<s>
+
+=item B<--user-not-contains>=I<s>
+
+=back
+
+=head2 Filtering options
+
+=over
+
+=item B<--max-emails>=I<s>
+
+Default value:
+
+ -1
+
+=item B<--min-emails>=I<s>
+
+Default value:
+
+ 1
+
+=back
+
+=head2 General output control options
+
+=over
+
+=item B<--color>=I<s>
+
+Default value:
+
+ "auto"
+
+Valid values:
+
+ ["never","always","auto"]
+
+=item B<--count>, B<-c>
+
+Supress normal output, return a count of matching lines.
+
+=item B<--quiet-arg>, B<--silent>, B<-q>
+
+=back
+
+=head2 Logging options
+
+=over
+
+=item B<--debug>
+
+Shortcut for --log-level=debug.
+
+=item B<--log-level>=I<s>
+
+Set log level.
+
+=item B<--quiet>
+
+Shortcut for --log-level=error.
+
+=item B<--trace>
+
+Shortcut for --log-level=trace.
+
+=item B<--verbose>
+
+Shortcut for --log-level=info.
+
+=back
+
+=head2 Matching control options
+
+=over
+
+=item B<--ignore-case>, B<-i>
+
+=item B<--invert-match>, B<-v>
+
+Invert the sense of matching.
+
+=back
+
+=head2 Output line prefix control options
+
+=over
+
+=item B<--line-number>, B<-n>
+
+=back
+
+=head2 Output options
+
+=over
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--naked-res>
+
+When outputing as JSON, strip result envelope.
+
+Default value:
+
+ 0
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+    [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+`--naked-res` so you just get:
+
+    [1,2,3]
+
+
+=item B<--page-result>
+
+Filter output through a pager.
+
+=item B<--view-result>
+
+View output using a viewer.
+
+=back
+
+=head2 Other options
+
+=over
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--version>, B<-V>
+
+Display program's version and exit.
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C grep-email grep-email
+
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete grep-email 'p/*/`grep-email`/'
+
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install L<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install L<shcompgen> as described above.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-grep-email>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-grep-email>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-grep-email>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+L<grep-url>.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2021 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

@@ -1,20 +1,20 @@
---- #YAML:1.0
-name:               Crypt-Twofish2
-version:            1.02
-abstract:           ~
-author:  []
-license:            unknown
-distribution_type:  module
-configure_requires:
-    ExtUtils::MakeMaker:  0
+---
+abstract: unknown
+author:
+  - unknown
 build_requires:
-    ExtUtils::MakeMaker:  0
-requires:  {}
-no_index:
-    directory:
-        - t
-        - inc
-generated_by:       ExtUtils::MakeMaker version 6.56
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150001'
+license: unknown
 meta-spec:
-    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
-    version:  1.4
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Crypt-Twofish2
+no_index:
+  directory:
+    - t
+    - inc
+version: '1.03'

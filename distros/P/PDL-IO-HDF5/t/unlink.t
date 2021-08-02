@@ -1,12 +1,9 @@
+# Test case for HDF5 unlink function
+use strict;
+use warnings;
 use PDL;
 use PDL::IO::HDF5;
-use PDL::Types;
-
-
-# Test case for HDF5 unlink function
-#   This is a new feature as-of version 0.64
-#
-use Test::More tests => 2;
+use Test::More;
 
 my $filename = "unlink.hdf5";
 # get rid of filename if it already exists
@@ -19,12 +16,12 @@ my $group=$hdf5->group('group1');
 # Store a dataset
 my $dataset=$group->dataset('data1');
 my $data = pdl [ 2.0, 3.0, 4.0 ];
-$dataset->set($data);
+$dataset->set($data, unlimited => 1);
 
-$expected = 'data1';
+my $expected = 'data1';
 my @datasets1=$group->datasets();
 #print "datasets '".join(", ",@datasets1)."'\n";
-ok(join(', ',@datasets1) eq $expected);
+is(join(', ',@datasets1), $expected);
 
 # Remove the dataset.
 $group->unlink('data1');
@@ -32,7 +29,9 @@ $group->unlink('data1');
 $expected = '';
 my @datasets2=$group->datasets();
 #print "datasets '".join(", ",@datasets2)."'\n";
-ok(join(', ',@datasets2) eq $expected);
+is(join(', ',@datasets2), $expected);
 
 # clean up file
 unlink $filename if( -e $filename);
+
+done_testing;

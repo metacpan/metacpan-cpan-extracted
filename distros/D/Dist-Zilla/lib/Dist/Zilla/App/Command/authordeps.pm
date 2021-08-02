@@ -1,4 +1,4 @@
-package Dist::Zilla::App::Command::authordeps 6.023;
+package Dist::Zilla::App::Command::authordeps 6.024;
 # ABSTRACT: List your distribution's author dependencies
 
 # BEGIN BOILERPLATE
@@ -70,7 +70,7 @@ Dist::Zilla::App::Command::authordeps - List your distribution's author dependen
 
 =head1 VERSION
 
-version 6.023
+version 6.024
 
 =head1 SYNOPSIS
 

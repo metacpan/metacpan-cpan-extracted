@@ -1,4 +1,4 @@
-package Dist::Zilla::File::OnDisk 6.023;
+package Dist::Zilla::File::OnDisk 6.024;
 # ABSTRACT: a file that comes from your filesystem
 
 use Moose;
@@ -62,7 +62,7 @@ Dist::Zilla::File::OnDisk - a file that comes from your filesystem
 
 =head1 VERSION
 
-version 6.023
+version 6.024
 
 =head1 DESCRIPTION
 

@@ -1,4 +1,4 @@
-package Dist::Zilla::App::Command::nop 6.023;
+package Dist::Zilla::App::Command::nop 6.024;
 # ABSTRACT: initialize dzil, then exit
 
 # BEGIN BOILERPLATE
@@ -50,7 +50,7 @@ Dist::Zilla::App::Command::nop - initialize dzil, then exit
 
 =head1 VERSION
 
-version 6.023
+version 6.024
 
 =head1 SYNOPSIS
 

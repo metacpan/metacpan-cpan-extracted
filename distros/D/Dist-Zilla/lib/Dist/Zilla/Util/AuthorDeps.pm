@@ -1,4 +1,4 @@
-package Dist::Zilla::Util::AuthorDeps 6.023;
+package Dist::Zilla::Util::AuthorDeps 6.024;
 # ABSTRACT: Utils for listing your distribution's author dependencies
 
 # BEGIN BOILERPLATE
@@ -152,7 +152,7 @@ Dist::Zilla::Util::AuthorDeps - Utils for listing your distribution's author dep
 
 =head1 VERSION
 
-version 6.023
+version 6.024
 
 =head1 PERL VERSION
 

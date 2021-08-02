@@ -4,7 +4,7 @@
       "Laurent Dami <dami@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4224",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "perl_5"
    ],
@@ -42,15 +42,15 @@
    "provides" : {
       "Excel::ValueReader::XLSX" : {
          "file" : "lib/Excel/ValueReader/XLSX.pm",
-         "version" : "1.0"
+         "version" : "1.01"
       },
       "Excel::ValueReader::XLSX::LibXML" : {
          "file" : "lib/Excel/ValueReader/XLSX/LibXML.pm",
-         "version" : "1.0"
+         "version" : "1.01"
       },
       "Excel::ValueReader::XLSX::Regex" : {
          "file" : "lib/Excel/ValueReader/XLSX/Regex.pm",
-         "version" : "1.0"
+         "version" : "1.01"
       }
    },
    "release_status" : "stable",
@@ -62,6 +62,6 @@
          "url" : "https://github.com/damil/Excel-ValueReader-XLSX"
       }
    },
-   "version" : "1.0",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "1.01",
+   "x_serialization_backend" : "JSON::PP version 4.05"
 }

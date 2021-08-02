@@ -1,5 +1,11 @@
 Revision history for Perl module Text::PO
 
+v0.1.5 2021-08-02T09:46:24+0900
+    - Corrected test units
+
+v0.1.4 2021-07-31T06:22:04+0900
+    - Improved parsing of po files when there are leading blank lines to be ignored
+
 v0.1.3 2021-07-30T18:36:27+0900
     - Added methods getDaysLong, getDaysShort, getMonthsLong, getMonthsShort, getNumericDict, getNumericPosixDIct to Text::PO::Gettext
 

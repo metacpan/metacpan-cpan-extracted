@@ -7,7 +7,7 @@ use 5.016000;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Validator for JSON Schema Draft4 and OpenAPI Specification 3.0",
+  "ABSTRACT" => "Validator for JSON Schema Draft4/Draft6/Draft7 and OpenAPI Specification 3.0",
   "AUTHOR" => "Alexey Stavrov <logioniz\@ya.ru>, Ivan Putintsev <uid\@rydlab.ru>, Anton Fedotov <tosha.fedotov.2000\@gmail.com>, Denis Ibaev <dionys\@gmail.com>, Andrey Khozov <andrey\@rydlab.ru>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -29,6 +29,7 @@ my %WriteMakefileArgs = (
     "constant" => 0,
     "overload" => 0,
     "parent" => 0,
+    "re" => 0,
     "strict" => 0,
     "warnings" => 0
   },
@@ -37,11 +38,12 @@ my %WriteMakefileArgs = (
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
     "Test::More" => 0,
+    "lib" => 0,
     "utf8" => 0
   },
-  "VERSION" => "0.002",
+  "VERSION" => "0.004",
   "test" => {
-    "TESTS" => "t/*.t t/draft4/*.t t/oas30/*.t"
+    "TESTS" => "t/*.t t/oas30/*.t"
   }
 );
 
@@ -61,8 +63,10 @@ my %FallbackPrereqs = (
   "Time::Piece" => 0,
   "URI" => "1.00",
   "constant" => 0,
+  "lib" => 0,
   "overload" => 0,
   "parent" => 0,
+  "re" => 0,
   "strict" => 0,
   "utf8" => 0,
   "warnings" => 0

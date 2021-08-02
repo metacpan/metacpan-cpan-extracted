@@ -1,4 +1,4 @@
-package Dist::Zilla::Dist::Minter 6.023;
+package Dist::Zilla::Dist::Minter 6.024;
 # ABSTRACT: distribution builder; installer not included!
 
 use Moose 0.92; # role composition fixes
@@ -160,7 +160,7 @@ Dist::Zilla::Dist::Minter - distribution builder; installer not included!
 
 =head1 VERSION
 
-version 6.023
+version 6.024
 
 =head1 PERL VERSION
 

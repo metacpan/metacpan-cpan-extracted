@@ -1,5 +1,11 @@
 Revision history for Perl extension Util::H2O.
 
+0.14	Mon, Aug  2 2021
+	- WARNING: Potentially Incompatible Changes:
+		- limited conditions under which a key DESTROY is allowed
+	- added the "-destroy" option
+	- added the "-isa" option
+
 0.12	Mon, Jul 19 2021
 	- added the "-ro" option for immutable objects/hashes
 	- WARNING: Potentially Incompatible Changes:

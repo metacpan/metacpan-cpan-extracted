@@ -1,0 +1,140 @@
+#!/usr/bin/env perl
+# Copyright (C) 2017–2021  Alex Schroeder <alex@gnu.org>
+
+# This program is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, either version 3 of the License, or (at your option) any
+# later version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <https://www.gnu.org/licenses/>.
+
+=encoding utf8
+
+=head1 NAME
+
+gemini-chat - a command line client for the Gemini protocol to send lines you type
+
+=head1 SYNOPSIS
+
+B<gemini-chat> [B<--help>] [B<--cert_file=>I<filename>
+B<--key_file=>I<filename>] I<URL>
+
+=head1 DESCRIPTION
+
+All C<gemini-chat> does is repeatedly post stuff to a Gemini URL. For example,
+assume that there is a Phoebe wiki with chat enabled via L<App::Phoebe::Chat>.
+First, you connect to the I<listen> URL using C<gemini>:
+
+    gemini --cert_file=cert.pem --key_file=key.pem \
+      gemini://localhost/do/chat/listen
+
+Then you connect the chat client to the I<say> URL using C<gemini-chat>:
+
+    gemini-chat --cert=cert.pem --key=key.pem \
+      gemini://transjovian.org/do/chat/say
+
+At the prompt, type your message. What effectively happens is that all you type
+ends up being sent to the server via a Gemini request:
+C<gemini://transjovian.org/do/chat/say?your%20text%20here>.
+
+To generate your client certificate for 100 days and using “Alex” as your common
+name:
+
+    openssl req -new -x509 -newkey ec -subj "/CN=Alex" \
+      -pkeyopt ec_paramgen_curve:prime256v1 -days 100 \
+      -nodes -out cert.pem -keyout key.pem
+
+=cut
+
+use Modern::Perl '2018';
+use Mojo::IOLoop;
+use Pod::Text;
+use Getopt::Long;
+use Term::ReadLine;
+use Encode::Locale qw(decode_argv);
+use Encode qw(decode_utf8 encode_utf8);
+use Net::IDN::Encode qw(:all);
+use URI::Escape;
+use IRI;
+
+my $cert;
+my $key;
+my $help;
+my $listen_url;
+my $say_url;
+
+GetOptions(
+  'help' => \$help,
+  'cert_file=s' => \$cert,
+  'key_file=s' => \$key)
+    or die("Error in command line arguments\n");
+
+# Help
+if ($help) {
+  my $parser = Pod::Text->new();
+  $parser->parse_file($0);
+  exit;
+}
+
+die "⚠ You must provide an existing certificate and key file\n"
+    unless $cert and $key and -f $cert and -f $key;
+
+# Regular arguments
+decode_argv();
+my ($uri) = @ARGV;
+
+die "⚠ You must provide an URI\n" unless $uri;
+
+my $iri = IRI->new(value => encode_utf8 $uri);
+
+die "⚠ The URI '$uri' must use the gemini scheme\n" unless $iri->scheme and $iri->scheme eq 'gemini';
+die "⚠ The URI '$uri' must have an authority\n" unless $iri->authority;
+warn "⚠ Ignoring path '" . $iri->path . "'\n" if $iri->path;
+warn "⚠ Ignoring fragment '" . $iri->fragment . "'\n" if $iri->fragment;
+
+my $host = domain_to_ascii(decode_utf8 $iri->host);
+my $port = $iri->port || 1965;
+my $unsafe = "^A-Za-z0-9\-\._~"; # the default
+my $path = uri_escape_utf8($iri->path, $unsafe . "/"); # path separator are safe
+
+$uri = $iri->scheme . '://' . $host . ':' . $port;
+$uri .= $path if $path;
+
+# start read loop for saying stuff
+my $term = Term::ReadLine->new($uri);
+my $prompt = "> ";
+my $OUT = $term->OUT || \*STDOUT;
+while (defined ($_ = $term->readline($prompt))) {
+  exit if $_ eq "quit";
+  # create client
+  my $text = uri_escape_utf8($_);
+  Mojo::IOLoop->client({
+    address => $host,
+    port => $port,
+    tls => 1,
+    tls_cert => $cert,
+    tls_key => $key,
+    tls_options => { SSL_verify_mode => 0x00 }} => sub {
+      my ($loop, $err, $stream) = @_;
+      die $err if $err;
+      $stream->on(read => sub {
+	my ($stream, $bytes) = @_;
+	if ($bytes =~ /^[123]/) {
+	  # Do nothing
+	} else {
+	  # Print server result
+	  print "\e[31m$bytes\e[0m"; # red
+	}});
+      # Write request to the server
+      $stream->write("$uri?$text\r\n")});
+  # Start event loop if necessary
+  Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
+  # Add to history
+  $term->addhistory($_) if /\S/;
+}

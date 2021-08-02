@@ -324,4 +324,16 @@ subtest 'op_skip_until' => sub {
     obs_is $o, ['(123)'], 'of with of notifier';
 };
 
+subtest 'rx_partition' => sub {
+    my $source = cold('0123456789');
+
+    my ($o1, $o2) = rx_partition(
+        $source,
+        sub { $_[0] % 2 == 1 },
+    );
+
+    obs_is $o1, ['-1-3-5-7-9'], 'o1';
+    obs_is $o2, ['0-2-4-6-8-'], 'o2';
+};
+
 done_testing();

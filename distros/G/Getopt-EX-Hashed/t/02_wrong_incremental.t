@@ -25,6 +25,6 @@ BEGIN {
 }
 
 eval q{ use App::Foo };
-like($@, qr/Not defined/, "wrong incremental");
+like($@, qr/Not found/, "wrong incremental");
 
 done_testing;

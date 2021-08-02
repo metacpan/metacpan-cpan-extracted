@@ -1,0 +1,64 @@
+{
+   "abstract" : "Pod::Coverage but more powerful",
+   "author" : [
+      "haarg - Graham Knop (cpan:HAARG) <haarg@haarg.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Pod-Coverage-TrustMe",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {},
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Cwd" : "0",
+            "File::Find" : "0",
+            "File::Spec" : "0",
+            "Getopt::Long" : "0",
+            "Pod::Simple" : "0",
+            "Test::Builder" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Pod-Coverage-TrustMe@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Pod-Coverage-TrustMe"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/haarg/Pod-Coverage-TrustMe.git",
+         "web" : "https://github.com/haarg/Pod-Coverage-TrustMe"
+      }
+   },
+   "version" : "0.001002",
+   "x_authority" : "cpan:HAARG",
+   "x_serialization_backend" : "JSON::PP version 4.06"
+}

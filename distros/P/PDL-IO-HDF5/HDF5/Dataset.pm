@@ -365,7 +365,7 @@ The I<get> method can also be used to obtain particular slices or hyperslabs
 of the dataset array. For example, if $dataset is three dimensional with dimensions
 (20,100,90) then we could do:
 
- $start=pdl([0,0,0]);      # We begin the slice at the very beggining
+ $start=pdl([0,0,0]);      # We begin the slice at the very beginning
  $end=pdl([19,0,0]);       # We take the first vector of the array,
  $stride=pdl([2,1,1]);     # taking only every two values of the vector 
 

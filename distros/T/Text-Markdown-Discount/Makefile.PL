@@ -61,7 +61,7 @@ sub MY::postamble {
     return sprintf('
 $(MYEXTLIB):
 	%s
-', qq{( cd $extdir; CC='cc -fPIC' sh configure.sh; make )\n});
+', qq{( cd $extdir; CC='cc -fPIC' sh configure.sh --with-fenced-code --with-dl=both; make )\n});
 }
 
 WriteMakefile(

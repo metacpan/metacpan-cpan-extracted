@@ -3,8 +3,8 @@ NAME
     specification (e.g. '1,5-10,20')
 
 VERSION
-    This document describes version 0.004 of IntRange::Iter (from Perl
-    distribution IntRange-Iter), released on 2021-07-17.
+    This document describes version 0.005 of IntRange::Iter (from Perl
+    distribution IntRange-Iter), released on 2021-07-25.
 
 SYNOPSIS
       use IntRange::Iter qw(intrange_iter);
@@ -56,6 +56,8 @@ SEE ALSO
     Range::Iter
 
     NumSeq::Iter
+
+    Modules that might also interest you: Set::IntSpan and Array::IntSpan.
 
 AUTHOR
     perlancar <perlancar@cpan.org>

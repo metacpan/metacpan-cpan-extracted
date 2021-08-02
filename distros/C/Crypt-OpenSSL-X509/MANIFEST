@@ -1,5 +1,8 @@
 certs/balt.pem
 certs/broken-utf8.pem
+certs/smime.conf
+certs/smime.pem
+certs/smime.sh
 certs/thawte-ec.pem
 certs/thawte.pem
 certs/turk.pem
@@ -23,6 +26,7 @@ Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
 META.yml
+ppport.h
 README
 t/00-version.t
 t/pod.t
@@ -33,4 +37,3 @@ TODO
 typemap
 X509.pm
 X509.xs
-ppport.h

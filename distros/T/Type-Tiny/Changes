@@ -7,6 +7,13 @@ Home page:    <https://metacpan.org/release/Type-Tiny>
 Bug tracker:  <https://github.com/tobyink/p5-type-tiny/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+1.012004	2021-07-29
+
+ [ Documentation ]
+ - Fixed typo in Types::Standard documentation where StrMatch regexp
+   parameter didn't use qr// properly.
+   Lucas Tiago de Moraes++
+
 1.012003	2021-05-09
 
  [ Documentation ]
@@ -376,7 +383,7 @@ Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
  - Fix bareword errors if certain Type::Tiny subclasses were loaded prior
    to Type::Tiny.
    Fixes RT#131401.
-   <https://rt.cpan.org/Ticket/Display.html?id=131401>
+   <https://rt.cpan.org/Public/Bug/Display.html?id=131401>
 
  [ Documentation ]
  - Fix typos.
@@ -565,7 +572,7 @@ Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
    it; this may use more memory in some cases, but will improve exceptions
    thrown.
    Fixes RT#121763.
-   <https://rt.cpan.org/Ticket/Display.html?id=121763>
+   <https://rt.cpan.org/Public/Bug/Display.html?id=121763>
  - Type::Tiny better mimics the Moose::Meta::TypeConstraint::Parameterized
    API, adding `parameterized_from` and `has_parameterized_from` methods.
    Fixes RT#114915.
@@ -573,12 +580,12 @@ Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
  - Type::Tiny::Enum will now avoid triggering a Type::Tiny::XS bug
    involving hyphens in strings.
    Fixes RT#129729.
-   <https://rt.cpan.org/Ticket/Display.html?id=129729>
+   <https://rt.cpan.org/Public/Bug/Display.html?id=129729>
  - When extending a MooseX::Types library, be more careful checking to see
    if types have coercions, because a Moose::Meta::TypeCoercion object may
    be an empty list of coercions.
    Fixes RT#102748.
-   <https://rt.cpan.org/Ticket/Display.html?id=102748>
+   <https://rt.cpan.org/Public/Bug/Display.html?id=102748>
 
  [ Test Suite ]
  - Add a test that Specio type constraints can be converted to Type::Tiny
@@ -652,7 +659,7 @@ Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
    Type::Coercion.
    Fixes RT#130823.
    Ivanov Anton++
-   <https://rt.cpan.org/Ticket/Display.html?id=130823>
+   <https://rt.cpan.org/Public/Bug/Display.html?id=130823>
  - Eval::TypeTiny's API is now considered to be stable.
  - Fix Types::Standard's LazyLoad implementation.
  - The `values` attribute of Type::Tiny::Enum now preserves order.
@@ -759,7 +766,7 @@ Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
    types.
    Fixes RT#125765.
    KB Jørgensen++
-   <https://rt.cpan.org/Ticket/Display.html?id=125765>
+   <https://rt.cpan.org/Public/Bug/Display.html?id=125765>
 
  [ Test Suite ]
  - Improve test coverage.
@@ -811,7 +818,7 @@ Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
    will sometimes slow down Int checks a little, but is needed for
    correctness).
    Fixes RT#125132.
-   <https://rt.cpan.org/Ticket/Display.html?id=125132>
+   <https://rt.cpan.org/Public/Bug/Display.html?id=125132>
 
  [ Documentation ]
  - Better documentation of environment variables.
@@ -1183,7 +1190,7 @@ Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
    Fixes RT#98113.
    Dagfinn Ilmari Mannsåker++
    Peter Flanigan++
-   <https://rt.cpan.org/Ticket/Display.html?id=98113>
+   <https://rt.cpan.org/Public/Bug/Display.html?id=98113>
 
 1.000001	2014-08-18
 
@@ -1604,7 +1611,7 @@ Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
    `$_`.
    Fixes RT#94196.
    Diab Jerius++
-   <https://rt.cpan.org/Ticket/Display.html?id=94196>
+   <https://rt.cpan.org/Public/Bug/Display.html?id=94196>
 
  [ Documentation ]
  - Type::Tiny::Manual links to various parts of the test suite to document
@@ -1730,7 +1737,7 @@ Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
  - Make Type::Utils::declare_coercion work outside type libraries.
    Fixes RT#92591.
    Diab Jerius++
-   <https://rt.cpan.org/Ticket/Display.html?id=92591>
+   <https://rt.cpan.org/Public/Bug/Display.html?id=92591>
  - Weak reference from Type::Coercion objects to target type constraint
    caused bad behaviour in some cases. This has been fixed by retaining
    enough information within the Type::Coercion to be able to reconstruct
@@ -1738,7 +1745,7 @@ Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
    to zero.
    Fixes RT#92571.
    Diab Jerius++
-   <https://rt.cpan.org/Ticket/Display.html?id=92571>
+   <https://rt.cpan.org/Public/Bug/Display.html?id=92571>
 
 0.039_02	2014-01-25
 
@@ -1852,7 +1859,7 @@ Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
  - Type::Params now localizes $_ before trying to assign anything to it.
    Fixes RT#90096.
    Samuel Kaufman++
-   <https://rt.cpan.org/Ticket/Display.html?id=90096>
+   <https://rt.cpan.org/Public/Bug/Display.html?id=90096>
 
  [ Test Suite ]
  - Test case using a Type::Params compiled check within the scope of a
@@ -2541,11 +2548,11 @@ Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
    could not be inlined.
    Fixes RT#86233.
    Vyacheslav Matyukhin++
-   <https://rt.cpan.org/Ticket/Display.html?id=86233>
+   <https://rt.cpan.org/Public/Bug/Display.html?id=86233>
  - Fix unintuitive Dict deep coercions.
    Fixes RT#86239.
    Vyacheslav Matyukhin++
-   <https://rt.cpan.org/Ticket/Display.html?id=86239>
+   <https://rt.cpan.org/Public/Bug/Display.html?id=86239>
 
  [ Test Suite ]
  - Bundle various tests for deep Dict coercions.
@@ -2626,7 +2633,7 @@ Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
    Type::Params attempted to inline them anyway, leading to death.
    Fixes RT#85911.
    Diab Jerius++
-   <https://rt.cpan.org/Ticket/Display.html?id=85911>
+   <https://rt.cpan.org/Public/Bug/Display.html?id=85911>
 
  [ Documentation ]
  - Better document Type::Tiny's 'parents' method which differs from the

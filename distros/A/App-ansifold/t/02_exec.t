@@ -1,13 +1,11 @@
-use strict;
+use v5.14;
 use warnings;
-use utf8;
+
 use Test::More;
-use File::Spec;
-use open IO => ':utf8';
 
 use lib '.';
 use t::Util;
 
-is(run(qw(ansifold /dev/null))->result, "", "/dev/null");
+is(ansifold('/dev/null')->{stdout}, "", '/dev/null');
 
 done_testing;

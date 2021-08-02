@@ -1,3 +1,11 @@
+0.910   2021-08-01  Released-By: PERLANCAR; Urgency: medium
+
+	- Bump prereq of Sah::SpecTest to 0.9.50 (RT#131729).
+
+	- Add support for cached validator for base schema (does not yet pass
+	  error message or details). This is not documented yet.
+
+
 0.909   2020-07-29  Released-By: PERLANCAR
 
         - Update to Data::Sah::Normalize 0.051 & Data::Sah::Resolve 0.010.

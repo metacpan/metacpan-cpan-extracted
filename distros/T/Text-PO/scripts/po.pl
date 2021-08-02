@@ -1,11 +1,11 @@
 #!/usr/local/bin/perl
 ##----------------------------------------------------------------------------
 ## PO Files Manipulation - ~/scripts/po.pl
-## Version v0.1.0
+## Version v0.1.1
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/07/24
-## Modified 2021/07/24
+## Modified 2021/07/30
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -15,7 +15,7 @@ BEGIN
 {
     use strict;
     use warnings;
-    use lib './lib';
+    # use lib './lib';
     use DateTime;
     use Getopt::Class;
     use IO::File;
@@ -25,7 +25,7 @@ BEGIN
     use Text::PO::MO;
     use Text::Wrap ();
     our $PLURALS = {};
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.1.1';
 };
 
 {
@@ -55,6 +55,7 @@ BEGIN
     compile             => { type => 'boolean' },
     dump                => { type => 'boolean' },
     init                => { type => 'boolean' },
+    sync                => { type => 'boolean' },
     
     # Attributes
     bugs_to             => { type => 'string', class => [qw( init meta )] },
@@ -149,6 +150,12 @@ EOT
     {
         my $f = shift( @ARGV ) || bailout( "No po file to read was provided.\n" );
         &add( in => $f );
+    }
+    elsif( $opts->{sync} && $opts->{output} )
+    {
+        my $f = shift( @ARGV ) || bailout( "No (json) po file to read was provided.\n" );
+        _message( 3, "Reading file \"$f\" and writing to \"$opts->{output}\"." );
+        &sync( in => $f, out => $opts->{output} );
     }
     else
     {
@@ -347,6 +354,7 @@ sub init_po
         my $lines = [split( /\n/, $opts->{header} )];
         for( my $i = 0; $i < scalar( @$lines ); $i++ )
         {
+            substr( $lines->[$i], 0, 0, '# ' ) unless( substr( $lines->[$i], 0, 1 ) eq '#' );
             if( length( $lines->[$i] ) > 80 )
             {
                 my $new = Text::Wrap::wrap( '', '', $lines->[$i] );
@@ -413,6 +421,51 @@ sub init_po
     $po->dump( $fh );
     $fh->close;
     return(1);
+}
+
+sub sync
+{
+    my $p = $opt->_get_args_as_hash( @_ );
+    my $f = $p->{in} || bailout( "No po file to read was specified.\n" );
+    my $o = $p->{out} || bailout( "No mo file to write to was specified.\n" );
+    $f = $opt->new_file( $f );
+    my $po;
+    if( $f->extension eq 'po' )
+    {
+        my $p = 
+        {
+        debug => $opts->{debug},
+        };
+        $p->{domain} = $opts->{domain} if( length( $opts->{domain} ) );
+        $po = Text::PO->new( %$p ) || bailout( Text::PO->error );
+        _messagec( 3, "Reading po file <green>$f</>" );
+        $po->parse( $f ) || bailout( $po->error );
+    }
+    elsif( $f->extension eq 'mo' )
+    {
+        my $p = 
+        {
+        debug => $opts->{debug},
+        };
+        $p->{domain} = $opts->{domain} if( length( $opts->{domain} ) );
+        my $mo = Text::PO::MO->new( $f, $p );
+        _messagec( 3, "Reading mo file <green>$f</>" );
+        $po = $mo->as_object;
+    }
+    elsif( $f->extension eq 'json' )
+    {
+        my $p = 
+        {
+        use_json => 1,
+        debug => $opts->{debug},
+        };
+        $p->{domain} = $opts->{domain} if( length( $opts->{domain} ) );
+        $po = Text::PO->new( %$p ) || bailout( Text::PO->error );
+        _messagec( 3, "Reading json po file <green>$f</>" );
+        $po->parse2object( $f ) || bailout( $po->error );
+    }
+    _messagec( 3, "Synchronising against po file <green>$o</>" );
+    $po->sync( $o ) || bailout( $po->error );
 }
 
 sub to_json
@@ -820,6 +873,7 @@ po - GNU PO file manager
     Options
     
     Basic options:
+    --add                   Add an msgsid/msgstr entry in the po file
     --as-po                 Write the file as a po file
     --as-json               Write the po file as json on the STDOUT
     --compile               Create a machine object file (.mo)
@@ -834,6 +888,8 @@ po - GNU PO file manager
     --encoding              Sets the value for the meta field C<Content-Transfer-Encoding>
     --header                The string to be used as the header for the C<.po> file only.
     --lang                  The locale to use, such as en_US
+    --msgid                 The C<msgid> to add
+    --msgstr                The localised text to add for the given C<msgid>
     --output                The output file
     --output-dir            Output directory
     --overwrite             Boolean. If true, this will allow overwriting existing file
@@ -857,7 +913,17 @@ po - GNU PO file manager
     --verbose               Enable verbose mode
     --noverbose             Disable verbose mode
 
+=head1 VERSION
+
+    v0.1.1
+
 =head1 OPTIONS
+
+=head2 --add
+
+Adds an C<msgid> and C<msgstr> pair to the po file
+
+    po --add --msgid "Hello!" --msgstr "Salut !" --output fr_FR/LC_MESSAGES/com.example.api.po
 
 =head2 --as-json
 

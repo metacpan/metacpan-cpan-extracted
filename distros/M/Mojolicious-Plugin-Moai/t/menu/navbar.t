@@ -47,8 +47,9 @@ sub test_navbar {
     for my $path ( qw( home about contact ) ) {
         $app->routes->get( '/' . $path )->name( $path );
     }
-    $app->routes->get( '/*template' )->to( cb => sub {
+    $app->routes->get( '/*moai_x_template' )->to( cb => sub {
         my ( $c ) = @_;
+        $c->stash( template => $c->param('moai_x_template') );
         $c->stash( %test_args );
         $c->render;
     } );

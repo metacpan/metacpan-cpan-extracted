@@ -654,6 +654,7 @@ sub _get_numeric_dict
     @$lconv{qw( currency_symbol decimal_point int_curr_symbol negative_sign thousands_sep frac_digits )};
     use utf8;
     $def->{currency} = '€' if( $def->{currency} eq 'EUR' );
+    $lconv->{currency_symbol} = '€' if( $lconv->{currency_symbol} eq 'EUR' );
     $lconv->{grouping} = unpack( "C*", $lconv->{grouping} );
     $lconv->{mon_grouping} = unpack( "C*", $lconv->{mon_grouping} );
     $lconv = $self->new_hash( $lconv );

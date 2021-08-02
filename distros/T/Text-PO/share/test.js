@@ -4,7 +4,7 @@ window.addEventListener('load', function()
     var testNo = 0;
     var failed = 0;
     var startTime, endTime;
-    var DEBUG = 0;
+    var DEBUG = 3;
     var OK = 'ok';
     var NOT_OK = '<span style="color:#ff0000">not ok</span>';
     
@@ -420,6 +420,18 @@ window.addEventListener('load', function()
         is( typeof( l10n ), 'object', 'getLanguageDict() returns an hash' );
         is( po.getLocale(), 'fr-FR', 'getLocale()' );
         ok( Array.isArray( po.getMetaKeys() ), 'getMetaKeys() returns array' );
+        var months = po.getMonthsLong();
+        ok( Array.isArray( months ), 'getMonthsLong() returns array' );
+        is( months[0], 'janvier', 'getMonthsLong() -> janvier' );
+        months = po.getMonthsShort();
+        ok( Array.isArray( months ), 'getMonthsShort() returns array' );
+        is( months[0], 'janv.', 'getMonthsShort() -> janv.' );
+        var days = po.getDaysLong();
+        ok( Array.isArray( days ), 'getDaysLong() returns array' );
+        is( days[0], 'lundi', 'getDaysLong() -> lundi' );
+        days = po.getDaysShort();
+        ok( Array.isArray( days ), 'getDaysShort() returns array' );
+        is( days[0], 'lun.', 'getDaysShort() -> lun.' );
         
         diag( "Getting new po object for Japanese locale" );
         var po_ja = new Gettext({ domain: "com.example.api", locale: "ja-JP", path: "../t", useCategory: true, debug: DEBUG });

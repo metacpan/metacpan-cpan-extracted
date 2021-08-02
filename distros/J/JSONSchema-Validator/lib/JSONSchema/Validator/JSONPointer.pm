@@ -85,7 +85,7 @@ sub xget {
     }
 
     if (ref $current_value eq 'HASH' && $self->validator->using_id_with_ref) {
-        my $id = $current_value->{$self->validator->ID};
+        my $id = $current_value->{$self->validator->ID_FIELD};
         if ($id && !ref $id) {
             $current_scope = $current_scope
                 ? URI->new($id)->abs($current_scope)->as_string
@@ -110,7 +110,7 @@ sub xget {
         }
 
         if (ref $current_value eq 'HASH' && $self->validator->using_id_with_ref) {
-            my $id = $current_value->{$self->validator->ID};
+            my $id = $current_value->{$self->validator->ID_FIELD};
             if ($id && !ref $id) {
                 $current_scope = $current_scope
                     ? URI->new($id)->abs($current_scope)->as_string
@@ -169,7 +169,7 @@ JSONSchema::Validator::JSONPointer - JSON Pointer with URI resolving
 
 =head1 VERSION
 
-version 0.002
+version 0.004
 
 =head1 AUTHORS
 

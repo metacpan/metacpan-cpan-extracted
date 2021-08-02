@@ -1,0 +1,113 @@
+NAME
+    App::FileModifyUtils - Utilities related to modifying files
+
+VERSION
+    This document describes version 0.002 of App::FileModifyUtils (from Perl
+    distribution App-FileModifyUtils), released on 2021-08-02.
+
+DESCRIPTION
+    This distribution provides the following command-line utilities:
+
+    *   add-line-to-file
+
+    *   remove-line-from-file
+
+FUNCTIONS
+  add_line_to_file
+    Usage:
+
+     add_line_to_file(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Add line to file.
+
+    Uses Setup::File::Line which supports undo, but the undo feature is not
+    used. See App::FileModifyUtils::Undoable for file-modifying CLIs which
+    support undo.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   file* => *filename*
+
+    *   line* => *str*
+
+    *   top_style => *bool*
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
+  remove_line_from_file
+    Usage:
+
+     remove_line_from_file(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Remove all occurrences of a line from file.
+
+    Uses Setup::File::Line which supports undo, but the undo feature is not
+    used. See App::FileModifyUtils::Undoable for file-modifying CLIs which
+    support undo.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   case_insensitive => *bool*
+
+    *   file* => *filename*
+
+    *   line* => *str*
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-FileModifyUtils>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-FileModifyUtils>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-FileModifyUtils>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Other similar distributions: App::FileRenameUtils,
+    App::FileRemoveUtilities.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2021 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

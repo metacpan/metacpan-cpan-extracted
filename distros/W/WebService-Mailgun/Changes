@@ -1,5 +1,8 @@
 Revision history for Perl extension WebService-Mailgun
 
+0.11 2021-08-02T05:51:59Z
+    - Fix parsing previous URL.
+
 0.10 2020-10-02T06:06:25Z
     - Fix message() to support both HashRef and ArrayRef
 

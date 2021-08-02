@@ -3,7 +3,7 @@ use warnings;
 use 5.006; # warnings
 package Software::License;
 # ABSTRACT: packages that provide templated software licenses
-$Software::License::VERSION = '0.103014';
+$Software::License::VERSION = '0.104001';
 use Data::Section -setup => { header_re => qr/\A__([^_]+)__\Z/ };
 use Text::Template ();
 
@@ -22,8 +22,19 @@ use Text::Template ();
 #pod This method returns a new license object for the given license class.  Valid
 #pod arguments are:
 #pod
-#pod   holder - the holder of the copyright; required
-#pod   year   - the year of copyright; defaults to current year
+#pod =for :list
+#pod = holder
+#pod the holder of the copyright; required
+#pod = year
+#pod the year of copyright; defaults to current year
+#pod = program
+#pod the name of software for use in the middle of a sentence
+#pod = Program
+#pod the name of software for use in the beginning of a sentence
+#pod
+#pod C<program> and C<Program> arguments may be specified both, either one or none.
+#pod Each argument, if not specified, is defaulted to another one, or to properly
+#pod capitalized "this program", if both arguments are omitted.
 #pod
 #pod =cut
 
@@ -47,10 +58,33 @@ sub year   { defined $_[0]->{year} ? $_[0]->{year} : (localtime)[5]+1900 }
 sub holder { $_[0]->{holder}     }
 
 sub _dotless_holder {
-    my $holder = $_[0]->holder;
-    $holder =~ s/\.$//;
-    return $holder;
+  my $holder = $_[0]->holder;
+  $holder =~ s/\.$//;
+  return $holder;
 }
+
+#pod =method program
+#pod
+#pod Name of software for using in the middle of a sentence.
+#pod
+#pod The method returns value of C<program> constructor argument (if it evaluates as true, i. e.
+#pod defined, non-empty, non-zero), or value of C<Program> constructor argument (if it is true), or
+#pod "this program" as the last resort.
+#pod
+#pod =cut
+
+sub program { $_[0]->{program} || $_[0]->{Program} || 'this program' }
+
+#pod =method Program
+#pod
+#pod Name of software for using in the middle of a sentence.
+#pod
+#pod The method returns value of C<Program> constructor argument (if it is true), or value of C<program>
+#pod constructor argument (if it is true), or "This program" as the last resort.
+#pod
+#pod =cut
+
+sub Program { $_[0]->{Program} || $_[0]->{program} || 'This program' }
 
 #pod =method name
 #pod
@@ -213,6 +247,8 @@ sub _fill_in {
 #pod * L<Software::License::Sun>
 #pod * L<Software::License::Zlib>
 #pod
+#pod Extra licenses are maintained on CPAN in separate modules.
+#pod
 #pod The L<App::Software::License> module comes with a script
 #pod L<software-license|https://metacpan.org/pod/distribution/App-Software-License/script/software-license>,
 #pod which provides a command-line interface
@@ -232,7 +268,7 @@ Software::License - packages that provide templated software licenses
 
 =head1 VERSION
 
-version 0.103014
+version 0.104001
 
 =head1 SYNOPSIS
 
@@ -251,14 +287,50 @@ version 0.103014
 This method returns a new license object for the given license class.  Valid
 arguments are:
 
-  holder - the holder of the copyright; required
-  year   - the year of copyright; defaults to current year
+=over 4
+
+=item holder
+
+the holder of the copyright; required
+
+=item year
+
+the year of copyright; defaults to current year
+
+=item program
+
+the name of software for use in the middle of a sentence
+
+=item Program
+
+the name of software for use in the beginning of a sentence
+
+=back
+
+C<program> and C<Program> arguments may be specified both, either one or none.
+Each argument, if not specified, is defaulted to another one, or to properly
+capitalized "this program", if both arguments are omitted.
 
 =head2 year
 
 =head2 holder
 
 These methods are attribute readers.
+
+=head2 program
+
+Name of software for using in the middle of a sentence.
+
+The method returns value of C<program> constructor argument (if it evaluates as true, i. e.
+defined, non-empty, non-zero), or value of C<Program> constructor argument (if it is true), or
+"this program" as the last resort.
+
+=head2 Program
+
+Name of software for using in the middle of a sentence.
+
+The method returns value of C<Program> constructor argument (if it is true), or value of C<program>
+constructor argument (if it is true), or "This program" as the last resort.
 
 =head2 name
 
@@ -456,6 +528,8 @@ L<Software::License::Zlib>
 
 =back
 
+Extra licenses are maintained on CPAN in separate modules.
+
 The L<App::Software::License> module comes with a script
 L<software-license|https://metacpan.org/pod/distribution/App-Software-License/script/software-license>,
 which provides a command-line interface
@@ -463,17 +537,25 @@ to Software::License.
 
 =head1 AUTHOR
 
-Ricardo Signes <rjbs@cpan.org>
+Ricardo Signes <rjbs@semiotic.systems>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Alex Kapranoff Bernardo Rechea Bernhard Amann bowtie Brian Cassidy Phillips Craig Scrivner Curtis Brandt Dave Rolsky David E. Wheeler Golden Dominique Dumont Dylan William Hardison Flavio Poletti Florian Ragwitz Graham Knop Karen Etheridge Kenichi Ishigaki Leon Timmermans magnolia mikegrb Neil Bowers Olivier Mengué Pablo Rodríguez González Shlomi Fish Syohei YOSHIDA Wesley Schwengle
+=for stopwords Alex Kapranoff Andrew Grangaard Axel Beckert Bernardo Rechea Bernhard Amann bowtie Brian Cassidy Phillips Craig Scrivner Curtis Brandt Dave Rolsky David E. Wheeler Golden Dominique Dumont Dylan William Hardison Flavio Poletti Florian Ragwitz Graham Knop Kang-min Liu Karen Etheridge Kenichi Ishigaki Kivanc Yazan Leon Timmermans magnolia mikegrb Neil Bowers Nicolas Rochelemagne Olivier Mengué Pablo Rodríguez González Shlomi Fish Syohei YOSHIDA Tomasz Konojacki Van de Bugger Wesley Schwengle
 
 =over 4
 
 =item *
 
 Alex Kapranoff <kappa@yandex.ru>
+
+=item *
+
+Andrew Grangaard <granny-github@ofb.net>
+
+=item *
+
+Axel Beckert <abe@deuxchevaux.org>
 
 =item *
 
@@ -537,11 +619,19 @@ Graham Knop <haarg@haarg.org>
 
 =item *
 
+Kang-min Liu <gugod@gugod.org>
+
+=item *
+
 Karen Etheridge <ether@cpan.org>
 
 =item *
 
 Kenichi Ishigaki <ishigaki@cpan.org>
+
+=item *
+
+Kivanc Yazan <kivancyazan@gmail.com>
 
 =item *
 
@@ -561,6 +651,10 @@ Neil Bowers <neil@bowers.com>
 
 =item *
 
+Nicolas Rochelemagne <rochelemagne@cpanel.net>
+
+=item *
+
 Olivier Mengué <dolmen@cpan.org>
 
 =item *
@@ -577,13 +671,21 @@ Syohei YOSHIDA <syohex@gmail.com>
 
 =item *
 
+Tomasz Konojacki <me@xenu.pl>
+
+=item *
+
+Van de Bugger <van.de.bugger@gmail.com>
+
+=item *
+
 Wesley Schwengle <wesley@schwengle.net>
 
 =back
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Ricardo Signes.
+This software is copyright (c) 2021 by Ricardo Signes.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -4,19 +4,7 @@ use Test::More;
 use lib './t';
 
 my @argv = qw(
-    --string Alice
-    Life
-    --number 42
-    --list mostly --list harmless
-    Universe and
-    --hash animal=dolphin --hash fish=babel
-    --implicit
-    -s -42
-    --end 999
-    --beeblebrox
-    --so-long
-    --both 99
-    Everything
+    --restaurant Milliways
     );
 
 BEGIN {
@@ -25,7 +13,9 @@ BEGIN {
 }
 
 use App::Foo;
-eval { App::Foo->new };
-like($@, qr/both/, "default and action");
+@argv = (my $app = App::Foo->new)->run(@argv);
+
+is($app->{restaurant}, "Milliways at the end of universe.", "default and action (called)");
+is($app->{shop}, "Pizza Hat", "default and action (not called)");
 
 done_testing;

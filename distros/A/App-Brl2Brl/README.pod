@@ -4,7 +4,7 @@ brl2brl - Converts between braille character sets found in liblouis.
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =head1 DESCRIPTION
 
@@ -27,7 +27,7 @@ Artistic
 
 Using C<cpan>:
 
-  $ cpan App::brl2brl
+  $ cpan App::Brl2Brl
 
 Manual install:
 

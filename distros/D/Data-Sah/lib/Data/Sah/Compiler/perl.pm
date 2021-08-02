@@ -1,13 +1,14 @@
 package Data::Sah::Compiler::perl;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-07-29'; # DATE
+our $DATE = '2021-08-01'; # DATE
 our $DIST = 'Data-Sah'; # DIST
-our $VERSION = '0.909'; # VERSION
+our $VERSION = '0.910'; # VERSION
 
 use 5.010;
 use strict;
 use warnings;
+use Log::ger;
 
 use Data::Dmp qw(dmp);
 use Mo qw(build default);
@@ -473,9 +474,10 @@ sub expr_call_sub {
     "$name(".join(", ", @$args).")";
 }
 
-sub cached_validator_subname {
-    my ($self, $schema_name) = @_;
-    "Data::Sah::_GeneratedValidators::ReturnBool::".$schema_name;
+sub expr_call_cached_validator {
+    my ($self, $cd, $schema_name) = @_;
+    my $subname = $self->cached_validator_subname($cd, $schema_name);
+    $self->expr_call_sub($subname, [$cd->{data_term}]);
 }
 
 sub expr_validator_sub {
@@ -517,6 +519,31 @@ sub sub_defined {
     defined &{$name};
 }
 
+sub cached_validator_subname {
+    my ($self, $cd, $schema_name) = @_;
+    local $cd->{args}{return_type} = 'bool_valid'; # XXX temp
+    die unless $cd->{args}{return_type} =~ /\A(bool|str|hash)_/;
+    "Data::Sah::_GeneratedValidators::Returns".ucfirst($1)."::".$schema_name;
+}
+
+sub gen_cached_validator {
+    my ($self, $cd, $schema_name) = @_;
+    my $subname = $self->cached_validator_subname($cd, $schema_name);
+    return if defined &{$subname};
+    log_trace "Generating cached validator for base schema %s", $schema_name;
+    my $sub_code = $self->expr_validator_sub(
+        %{$cd->{args}},
+        schema => $schema_name,
+        schema_is_normalized => 0,
+        data_name => "data",
+        resolve_opts=>{allow_base_with_no_additional_clauses=>0},
+        return_type => "bool_valid", # XXX temp
+    );
+    my $code = "*$subname = $sub_code;";
+    eval $code;
+    $self->_die($cd, "Cannot generate cached validator for '$schema_name': $@") if $@;
+}
+
 1;
 # ABSTRACT: Compile Sah schema to Perl code
 
@@ -532,7 +559,7 @@ Data::Sah::Compiler::perl - Compile Sah schema to Perl code
 
 =head1 VERSION
 
-This document describes version 0.909 of Data::Sah::Compiler::perl (from Perl distribution Data-Sah), released on 2021-07-29.
+This document describes version 0.910 of Data::Sah::Compiler::perl (from Perl distribution Data-Sah), released on 2021-08-01.
 
 =head1 SYNOPSIS
 
@@ -542,7 +569,7 @@ This document describes version 0.909 of Data::Sah::Compiler::perl (from Perl di
 
 Derived from L<Data::Sah::Compiler::Prog>.
 
-=for Pod::Coverage BUILD ^(after_.+|before_.+|name|expr|true|false|literal|expr_.+|stmt_.+|block_uses_sub|sub_defined|cached_validator_subname)$
+=for Pod::Coverage BUILD ^(after_.+|before_.+|name|expr|true|false|literal|expr_.+|stmt_.+|block_uses_sub|sub_defined|cached_validator_subname|gen_cached_validator)$
 
 =head1 VARIABLES
 

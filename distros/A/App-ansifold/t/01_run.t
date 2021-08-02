@@ -1,15 +1,12 @@
-use strict;
+use v5.14;
 use warnings;
-use utf8;
+
 use Test::More;
-use File::Spec;
-use open IO => ':utf8';
-use Text::ParseWords;
 
 use lib '.';
 use t::Util;
 
-is(run(qw'ansifold /dev/null')->status, 0, "/dev/null");
-is(run(qw'ansifold --invalid')->status, 2, "invalid option");
+is(ansifold('/dev/null')->{result} >> 8, 0, "/dev/null");
+is(ansifold('--invalid')->{result} >> 8, 2, "invalid option");
 
 done_testing;

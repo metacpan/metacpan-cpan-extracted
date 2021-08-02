@@ -3,8 +3,8 @@ NAME
     Riap
 
 VERSION
-    This document describes version 0.894 of Perinci::Access::Perl (from
-    Perl distribution Perinci-Access-Perl), released on 2021-05-11.
+    This document describes version 0.897 of Perinci::Access::Perl (from
+    Perl distribution Perinci-Access-Perl), released on 2021-08-01.
 
 SYNOPSIS
     First write your code and add Rinci metadata to them:
@@ -57,6 +57,9 @@ DESCRIPTION
     constructor).
 
     You should probably use this through Perinci::Access.
+
+CONTRIBUTOR
+    Steven Haryanto <sharyanto@cpan.org>
 
 FUNCTIONS
   new(%opts) => OBJ

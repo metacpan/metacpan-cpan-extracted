@@ -1,7 +1,6 @@
-package Dist::Zilla::Plugin::Prereqs::From::cpmfile v0.0.1 {
+package Dist::Zilla::Plugin::Prereqs::From::cpmfile v0.0.2 {
     use 5.34.0;
     use Moose;
-    use warnings;
 
     use experimental 'signatures';
     use Module::cpmfile;
@@ -41,6 +40,8 @@ package Dist::Zilla::Plugin::Prereqs::From::cpmfile v0.0.1 {
         }
         return { optional_features => $optional_features };
     }
+
+    __PACKAGE__->meta->make_immutable;
 }
 
 1;

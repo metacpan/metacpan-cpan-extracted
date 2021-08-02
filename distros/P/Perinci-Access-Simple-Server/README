@@ -2,9 +2,12 @@ NAME
     Perinci::Access::Simple::Server - Riap::Simple server implementations
 
 VERSION
-    This document describes version 0.28 of Perinci::Access::Simple::Server
+    This document describes version 0.290 of Perinci::Access::Simple::Server
     (from Perl distribution Perinci-Access-Simple-Server), released on
-    2020-05-08.
+    2021-08-01.
+
+CONTRIBUTOR
+    Steven Haryanto <sharyanto@cpan.org>
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -31,8 +34,8 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2020, 2017, 2015, 2014, 2013, 2012 by
-    perlancar@cpan.org.
+    This software is copyright (c) 2021, 2020, 2017, 2015, 2014, 2013, 2012
+    by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

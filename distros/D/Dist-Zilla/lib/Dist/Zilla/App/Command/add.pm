@@ -1,4 +1,4 @@
-package Dist::Zilla::App::Command::add 6.023;
+package Dist::Zilla::App::Command::add 6.024;
 # ABSTRACT: add a module to a dist
 
 # BEGIN BOILERPLATE
@@ -98,7 +98,7 @@ Dist::Zilla::App::Command::add - add a module to a dist
 
 =head1 VERSION
 
-version 6.023
+version 6.024
 
 =head1 SYNOPSIS
 

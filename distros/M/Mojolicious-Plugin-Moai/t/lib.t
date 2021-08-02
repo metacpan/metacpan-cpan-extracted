@@ -29,8 +29,9 @@ sub test_lib {
     my ( $lib, %attr ) = @_;
     my $app = Mojolicious->new;
     $app->plugin( Moai => [ $lib ] );
-    $app->routes->get( '/*template' )->to( cb => sub {
+    $app->routes->get( '/*moai_x_template' )->to( cb => sub {
         my ( $c ) = @_;
+        $c->stash( template => $c->param('moai_x_template') );
         $c->stash( map { $_ => $c->param( $_ ) } @{ $c->req->params->names } );
         $c->render;
     } );
@@ -66,8 +67,9 @@ sub test_lib {
     # Test version config
     $app = Mojolicious->new;
     $app->plugin( Moai => [ $lib, { version => $attr{version} } ] );
-    $app->routes->get( '/*template' )->to( cb => sub {
+    $app->routes->get( '/*moai_x_template' )->to( cb => sub {
         my ( $c ) = @_;
+        $c->stash( template => $c->param('moai_x_template') );
         $c->stash( map { $_ => $c->param( $_ ) } @{ $c->req->params->names } );
         $c->render;
     } );

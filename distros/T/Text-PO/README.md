@@ -36,7 +36,7 @@ SYNOPSIS
 VERSION
 =======
 
-        v0.1.0
+        v0.1.3
 
 DESCRIPTION
 ===========
@@ -54,7 +54,7 @@ of GNU. It is better if you have them though.
 Also, this distribution provides a way to export the `po` files in json
 format to be used from within JavaScript and a JavaScript class to load
 and use those files is also provided along with some command line
-scripts. See the `share` folder alone with its own test units.
+scripts. See the `share` folder along with its own test units.
 
 Also, there is a script in `scripts` that can be used to transcode `.po`
 or `mo` files into json format and vice versa.
@@ -68,7 +68,9 @@ new
 Create a new Text::PO object acting as an accessor.
 
 One object should be created per po file, because it stores internally
-the po data for that file in the `Text::PO` object instantiated.
+the po data for that file in the
+[Text::PO](https://metacpan.org/pod/Text::PO){.perl-module} object
+instantiated.
 
 Returns the object.
 
@@ -78,9 +80,11 @@ METHODS
 add\_element
 ------------
 
-Given either a `Text::PO::Element` object, or an hash ref with keys like
-`msgid` and `msgstr`, or given a `msgid` followed by an optional hash
-ref, [\"add\_element\"](#add_element){.perl-module} will add this to the
+Given either a
+[Text::PO::Element](https://metacpan.org/pod/Text::PO::Element){.perl-module}
+object, or an hash ref with keys like `msgid` and `msgstr`, or given a
+`msgid` followed by an optional hash ref,
+[\"add\_element\"](#add_element){.perl-module} will add this to the
 stack of elements.
 
 It returns the newly created element if it did not already exist, or the
@@ -185,12 +189,15 @@ output of the dump back to another po file like
 
         ./po_script.pl en_GB.po > new_en_GB.po
 
-It returns the `Text::PO` object used.
+It returns the
+[Text::PO](https://metacpan.org/pod/Text::PO){.perl-module} object used.
 
 elements
 --------
 
-Returns the array reference of all the `Text::PO::Element` objects
+Returns the array reference of all the
+[Text::PO::Element](https://metacpan.org/pod/Text::PO::Element){.perl-module}
+objects
 
 encoding
 --------
@@ -201,8 +208,9 @@ this should be `utf-8`
 exists
 ------
 
-Given a `Text::PO::Element` object, it will check if this object exists
-in its current stack.
+Given a
+[Text::PO::Element](https://metacpan.org/pod/Text::PO::Element){.perl-module}
+object, it will check if this object exists in its current stack.
 
 It returns true of false accordingly.
 
@@ -540,13 +548,14 @@ Takes a meta field name and sets or gets its value.
 AUTHOR
 ======
 
-Jacques Deguest \<`jack@deguest.jp`{classes="ARRAY(0x561ece7f9728)"}\>
+Jacques Deguest \<`jack@deguest.jp`{classes="ARRAY(0x56303c9d3578)"}\>
 
 SEE ALSO
 ========
 
 [Text::PO::Element](https://metacpan.org/pod/Text::PO::Element){.perl-module},
-[Text::PO::MO](https://metacpan.org/pod/Text::PO::MO){.perl-module}
+[Text::PO::MO](https://metacpan.org/pod/Text::PO::MO){.perl-module},
+[Text::PO::Gettext](https://metacpan.org/pod/Text::PO::Gettext){.perl-module}
 
 <https://www.gnu.org/software/gettext/manual/html_node/PO-Files.html>,
 

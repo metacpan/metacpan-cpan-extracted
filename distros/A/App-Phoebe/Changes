@@ -1,0 +1,166 @@
+4.01
+
+- It's now App::Phoebe instead of App::phoebe.
+
+- App::Phoebe::RegisteredEditorsOnly now works if you use
+  App::Phoebe::WebEdit.
+
+- App::Phoebe::Ijirait has a backup command to allow players to
+  download the world data (without fingerprints); the rooms command
+  now allows you to list ghosts (inactive characters).
+
+- Both ijirait and titan scripts no longer use --url= as there is
+  exactly one URL and it is mandatory.
+
+4.00
+
+If you are using contributions or have a config that heavily interacts
+with the Phoebe code, this is a backwards-incompatible upgrade! Please
+review the documentation and rewrite your extensions.
+
+Review your conf.d folder; if you are linking any contributions from
+this directory, you will have to change the setup. For example,
+instead of linking web-edit.pl into your conf.d directory, you would
+edit your config file and add:
+
+    use App::Phoebe::WebEdit;
+
+Serving a web site is now also plugin. Add the following to
+your config file:
+
+    use App::Phoebe::Web;
+
+Other changes:
+
+- Search is now case insensitive
+
+- Changed how contributions work: instead of linking extensions into
+  your wiki dir's conf.d directory, you just "use" the appropriate
+  module; all modules now come with documentation and tests
+
+- App::Phoebe::StaticFiles is new; use it to serve static files from
+  directories on your server
+
+- App::Phoebe::Ijirait is new; a MUSH, i.e. a shared world for all
+  participants to build and interact in; script/ijirait is also new, a
+  custom CLI client for the game
+
+- App::Phoebe::Spartan is new; an alternative to Gemini and Titan
+  since it's very simply, suggests gemtext for text formatting, allows
+  uploads, but doesn't do TLS
+
+- App::Phoebe::Iapetus is new; an alternative to the Titan protocol
+  for uploading
+
+- App::Phoebe::SpeedBump loads the block list on startup; as it saves
+  every half an hour, that means you no longer have to worry too much
+  about losing information on the blocked IP numbers and networks
+
+- App::Gopher is new and improved; it no longer just prints the Gemini
+  text but does line wrapping and all that
+
+3.00
+
+- Add special feeds for the blog, i.e. the pages starting with an ISO
+  date
+
+2.08
+
+- Updated dependencies to Mojolicious 9.0 (because the tls_verify
+  parameter was replaced by a more general tls_options).
+
+- Reduced the SSL session cache to 64 in attempt to fix a memory leak
+  but which I was unable to do: the solution I'm using right now is to
+  use memory parameters in the systemd service definition.
+
+- Fixed colour links in /changes within wiki spaces.
+
+- Fixed output of /robots.txt.
+
+- contrib/oddmuse.pl: New, in case you want to serve an Oddmuse wiki
+  from Phoebe (like I do); working on support to translate Oddmuse
+  namespaces to wiki spaces transparently.
+
+- contrib/gopher.pl: New, in case you want to serve your Phoebe wiki
+  via Gopher; this does not work with contrib/oddmuse.pl – if you want
+  to serve your Oddmuse wiki via Gopher, use the gopher-server.pl
+  which is part of Oddmuse.
+
+- contrib/speed-bump.pl: Improved detection of non-human behaviour;
+  added client finger print requirements for admin views, debug view,
+  and status view; save stats every half hour; load them on startup;
+  add network range blocking.
+
+- contrib/wikipedia.pl: There are constellations where the spanning
+  table code goes nuts and throws a gazillion warnings. I still
+  haven't fixed this, so for the time being, tables are simple no
+  longer handled.
+
+- contrib/heap-dump.pl: New, in case you need to debug heap dumps of
+  the Phoebe process.
+
+2.07
+
+- Fixed serving of robots.txt in a virtual hosting environment;
+  ignoring query and fragment when deciding whether to serve the
+  default robots.txt.
+
+- phoebe-ctl can export HTML.
+
+2.02
+
+- Handle international domain names: when you provide them with the
+  --host option, the address lookup happens using their punycode
+  representation, and URIs containing these punycode representations
+  of the international domain name are served correctly.
+
+- Improvements to the gemini script (the simple command line client):
+  knows how to stream; decodes text appropriately; has a --verbose
+  flag; takes client certificates.
+
+- Add all the extensions from the Phoebe wiki as config files for your
+  conf.d directory.
+
+- Add a gemini-chat script to work with the chat.pl config file.
+
+- Man pages look more like man pages.
+
+- Fixed a bug in printing the source code.
+
+- Fixed several instances of streams not being closed correctly,
+  leading to timeouts for clients that kept waiting for the end of
+  file.
+
+- Fixed the bug that config was running before the config files in
+  conf.d, making it impossible to overwrite our variables.
+
+- Changed some functions to no longer take a $stream argument.
+
+2.00
+
+- This is a .00 release. I expect things to break. That said, I run my
+  sites with it. :)
+
+- Change the framework underneath, from Net::Server to Mojo::IOLoop;
+  this is a breaking change and you should carefully review the way
+  your extensions are written!
+
+- Phoebe no longer uses STDIN and STDOUT to serve requests but a
+  Mojo::IOLoop::Stream object. Phoebe is no longer a class so the
+  $self parameter of many calls either fell away or got replaced with
+  a $stream object to which you $stream->write.
+
+- Phoebe lost many options and capabilities for daemonisation. Using
+  systemd is now the recommended way to run Phoebe (using a
+  traditional setup is still possible, but there are no longer any
+  options to set a PID file, to background the process, and so on).
+
+- The huge config file of mine I mined for code examples got split
+  into smaller files, and where you previously had one big config file
+  you can now also have a conf.d/ directory with even more config
+  files. All the files in the contrib/ directory of this distribution
+  are lifted straight from my setup.
+
+1.20
+
+- Add conf.d directory next to the config file for easier code sharing

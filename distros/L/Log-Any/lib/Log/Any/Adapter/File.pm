@@ -5,7 +5,7 @@ use warnings;
 package Log::Any::Adapter::File;
 
 # ABSTRACT: Simple adapter for logging to files
-our $VERSION = '1.709';
+our $VERSION = '1.710';
 
 use Config;
 use Fcntl qw/:flock/;
@@ -80,7 +80,7 @@ Log::Any::Adapter::File - Simple adapter for logging to files
 
 =head1 VERSION
 
-version 1.709
+version 1.710
 
 =head1 SYNOPSIS
 

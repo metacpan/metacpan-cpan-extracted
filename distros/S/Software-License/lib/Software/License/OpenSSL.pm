@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 package Software::License::OpenSSL;
-$Software::License::OpenSSL::VERSION = '0.103014';
+$Software::License::OpenSSL::VERSION = '0.104001';
 use parent 'Software::License';
 # ABSTRACT: The OpenSSL License
 
@@ -33,15 +33,15 @@ Software::License::OpenSSL - The OpenSSL License
 
 =head1 VERSION
 
-version 0.103014
+version 0.104001
 
 =head1 AUTHOR
 
-Ricardo Signes <rjbs@cpan.org>
+Ricardo Signes <rjbs@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Ricardo Signes.
+This software is copyright (c) 2021 by Ricardo Signes.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

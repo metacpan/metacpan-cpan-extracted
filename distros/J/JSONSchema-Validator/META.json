@@ -1,5 +1,5 @@
 {
-   "abstract" : "Validator for JSON Schema Draft4 and OpenAPI Specification 3.0",
+   "abstract" : "Validator for JSON Schema Draft4/Draft6/Draft7 and OpenAPI Specification 3.0",
    "author" : [
       "Alexey Stavrov <logioniz@ya.ru>",
       "Ivan Putintsev <uid@rydlab.ru>",
@@ -50,6 +50,7 @@
             "overload" : "0",
             "parent" : "0",
             "perl" : "v5.16.0",
+            "re" : "0",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -60,6 +61,7 @@
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
             "Test::More" : "0",
+            "lib" : "0",
             "perl" : "v5.16.0",
             "utf8" : "0"
          }
@@ -76,7 +78,7 @@
          "web" : "https://github.com/skbkontur/perl-jsonschema-validator"
       }
    },
-   "version" : "0.002",
+   "version" : "0.004",
    "x_generated_by_perl" : "v5.32.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.26",
    "x_spdx_expression" : "MIT"

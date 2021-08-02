@@ -1,0 +1,140 @@
+NAME
+    Setup::File::Line - Insert/delete a line in a file (with undo support)
+
+VERSION
+    This document describes version 0.001 of Setup::File::Line (from Perl
+    distribution Setup-File-Line), released on 2021-08-02.
+
+DESCRIPTION
+    Experimental.
+
+FUNCTIONS
+  setup_file_line
+    Usage:
+
+     setup_file_line(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Insert/delete a line in a file (with undo support).
+
+    1. On do (and when "should_exist" is true): will insert a specified line
+    to file at the end. There's an option to add line at the top instead
+    (set "top_style" to true). Will not add line if line already exists.
+    There's an option to do case-insensitive matching when checking for
+    existence of line.
+
+    Unfixable state: file does not exist or not a regular file (directory
+    and symlink included) or not open-able for read/write.
+
+    Fixed state: file exists, line already exists in file.
+
+    Fixable state: file exists, line doesn't exist.
+
+    1. On do (and when "should_exist" is false): will remove specified line
+    from the file. All occurence of the line will be removed.
+
+    Unfixable state: file does not exist or not a regular file (directory
+    and symlink included) or not open-able for read/write.
+
+    Fixed state: file exists, line already does not exist in file.
+
+    Fixable state: file exists, line exists in file.
+
+    Note that unlike Setup::File::TextFragment's "setup_text_fragment", this
+    routine does save/restore original file content on undo. Instead, this
+    routine will delete all lines with same content when undoing an add, and
+    adding a line when undoing a delete. This means the file might not be
+    restored to an identical previous content upon undo.
+
+    This function is not exported by default, but exportable.
+
+    This function is idempotent (repeated invocations with same arguments
+    has the same effect as single invocation). This function supports
+    transactions.
+
+    Arguments ('*' denotes required arguments):
+
+    *   case_insensitive => *bool*
+
+    *   line_content* => *str*
+
+        Line (without the newline; newline will be stripped first).
+
+    *   path* => *str*
+
+        Path to file.
+
+    *   should_exist => *bool* (default: 1)
+
+        Whether line should exist.
+
+    *   top_style => *bool*
+
+        If set to true, will insert at the top of file instead of at the
+        end.
+
+    Special arguments:
+
+    *   -tx_action => *str*
+
+        For more information on transaction, see L<Rinci::Transaction>.
+
+    *   -tx_action_id => *str*
+
+        For more information on transaction, see L<Rinci::Transaction>.
+
+    *   -tx_recovery => *str*
+
+        For more information on transaction, see L<Rinci::Transaction>.
+
+    *   -tx_rollback => *str*
+
+        For more information on transaction, see L<Rinci::Transaction>.
+
+    *   -tx_v => *str*
+
+        For more information on transaction, see L<Rinci::Transaction>.
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Setup-File-Line>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Setup-File-Line>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Setup-File-Line>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Other modules to setup file content: Setup::File::Edit,
+    Setup::File::TextFragment.
+
+    The Setup framework: Setup
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2021 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

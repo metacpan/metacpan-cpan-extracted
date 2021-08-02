@@ -77,6 +77,7 @@ my $HOSTNAME_PATTERN = do {
 };
 
 my $EMAIL_PATTERN = do {
+    use re 'eval';
     my $obs_NO_WS_CTL = qr/[\x01-\x08\x0b\x0c\x0e-\x1f\x7f]/;
     my $obs_qp = qr/\\(?:\x00|${obs_NO_WS_CTL}|\n|\r)/;
     my $quoted_pair = qr/\\(?:[\x21-\x7e]|[ \t])|${obs_qp}/;
@@ -441,7 +442,7 @@ JSONSchema::Validator::Format - Formats of JSON Schema specification
 
 =head1 VERSION
 
-version 0.002
+version 0.004
 
 =head1 AUTHORS
 

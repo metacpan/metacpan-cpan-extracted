@@ -1,4 +1,4 @@
-package Dist::Zilla::App::Command::install 6.023;
+package Dist::Zilla::App::Command::install 6.024;
 # ABSTRACT: install your dist
 
 # BEGIN BOILERPLATE
@@ -76,7 +76,7 @@ Dist::Zilla::App::Command::install - install your dist
 
 =head1 VERSION
 
-version 6.023
+version 6.024
 
 =head1 SYNOPSIS
 

@@ -7,7 +7,7 @@ build_requires:
   IO::Handle: '0'
   IPC::Open3: '0'
   List::Util: '1.45'
-  Sah::SpecTest: v0.9.42
+  Sah::SpecTest: v0.9.50
   Test::Exception: '0'
   Test::More: '0.98'
   Test::NoWarnings: '0'
@@ -71,7 +71,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Sah
   homepage: https://metacpan.org/release/Data-Sah
   repository: git://github.com/perlancar/perl-Data-Sah.git
-version: '0.909'
+version: '0.910'
 x_Dist_Zilla:
   perl:
     version: '5.034000'

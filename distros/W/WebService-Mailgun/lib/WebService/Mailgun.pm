@@ -10,7 +10,7 @@ use Try::Tiny;
 use Carp;
 use HTTP::Request::Common;
 
-our $VERSION = "0.10";
+our $VERSION = "0.11";
 our $API_BASE = 'api.mailgun.net/v3';
 
 use Class::Accessor::Lite (
@@ -58,8 +58,10 @@ sub recursive {
         my $res = $self->client->get($api_uri->as_string);
         my $json = $self->decode_response($res);
         unless($json && scalar @{$json->{$key}}) {
-            $previous = URI->new($json->{paging}->{previous});
-            $previous->userinfo('api:'.$self->api_key);
+            try {
+                $previous = URI->new($json->{paging}->{previous});
+                $previous->userinfo('api:'.$self->api_key);
+            } catch {};
             last;
         }
         push @result, @{$json->{$key}};

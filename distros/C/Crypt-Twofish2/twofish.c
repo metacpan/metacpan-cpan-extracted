@@ -7,13 +7,13 @@
         John Kelsey,    Counterpane Systems
         Chris Hall,     Counterpane Systems
         David Wagner,   UC Berkeley
-            
+
     Code Author:        Doug Whiting,   Hi/fn
-        
+
     Version  1.00       April 1998
-        
+
     Copyright 1998, Hi/fn and Counterpane Systems.  All rights reserved.
-        
+
     Notes:
         *   Optimized version
         *   Tab size is set to 4 characters in this file
@@ -105,14 +105,14 @@ static      fullSbox _sBox_;        /* permuted MDStab based on keys */
 #define sbSet(N,i,J,v) { _sBox8_(N)[i+J] = v; }
 #define GetSboxKey  DWORD SKEY0 = key->sboxKeys[0]      /* local copy */
 /*----------------------------------------------------------------*/
-#elif defined(PART_KEY) 
+#elif defined(PART_KEY)
 #define MOD_STRING  "(Partial keying)"
 #define Fe32_(x,R)(MDStab[0][_sBox8_(0)[_b(x,R  )]] ^ \
                    MDStab[1][_sBox8_(1)[_b(x,R+1)]] ^ \
                    MDStab[2][_sBox8_(2)[_b(x,R+2)]] ^ \
                    MDStab[3][_sBox8_(3)[_b(x,R+3)]])
 #define sbSet(N,i,J,v) { _sBox8_(N)[i+J] = v; }
-#define GetSboxKey  
+#define GetSboxKey
 /*----------------------------------------------------------------*/
 #else   /* default is FULL_KEY */
 #ifndef FULL_KEY
@@ -135,8 +135,9 @@ static      fullSbox _sBox_;        /* permuted MDStab based on keys */
 #define Fe32_(x,R) (_sBox_[0][2*_b(x,R  )] ^ _sBox_[0][2*_b(x,R+1)+1] ^ \
                     _sBox_[2][2*_b(x,R+2)] ^ _sBox_[2][2*_b(x,R+3)+1])
         /* set a single S-box value, given the input byte */
-#define sbSet(N,i,J,v) { _sBox_[N&2][2*i+(N&1)+2*J]=MDStab[N][v]; }
-#define GetSboxKey  
+//#define sbSet(N,i,J,v) { _sBox_[N&2][2*i+(N&1)+2*J]=MDStab[N][v]; }
+#define sbSet(N,i,J,v) { *((DWORD *)_sBox_ + (N&2)*256 + 2*i + (N&1) + 2*J) = MDStab[N][v]; }
+#define GetSboxKey
 #endif
 
 /* macro(s) for debugging help */
@@ -159,7 +160,7 @@ static DWORD TwofishCodeStart(void) { return Here(0); }
 *
 * Arguments:        op  =   what to do  (see TAB_* defns in AES.H)
 *
-* Return:           TRUE --> done (for TAB_QUERY)       
+* Return:           TRUE --> done (for TAB_QUERY)
 *
 * Notes: This routine is for use in generating the tables KAT file.
 *        For this optimized version, we don't actually track table usage,
@@ -205,10 +206,10 @@ static int TableOp(int op)
 *
 * Notes:
 *   This function is a keyed 32-bit permutation.  It is the major building
-*   block for the Twofish round function, including the four keyed 8x8 
+*   block for the Twofish round function, including the four keyed 8x8
 *   permutations and the 4x4 MDS matrix multiply.  This function is used
 *   both for generating round subkeys and within the round function on the
-*   block being encrypted.  
+*   block being encrypted.
 *
 *   This version is fairly slow and pedagogical, although a smartcard would
 *   probably perform the operation exactly this way in firmware.   For
@@ -222,7 +223,7 @@ static int TableOp(int op)
 static DWORD f32(DWORD x,CONST DWORD *k32,int keyLen)
     {
     BYTE  b[4];
-    
+
     /* Run each byte thru 8x8 S-boxes, xoring with key byte at each stage. */
     /* Note that each byte goes through a different combination of S-boxes.*/
 
@@ -286,7 +287,7 @@ static DWORD RS_MDS_Encode(DWORD k0,DWORD k1)
         {
         r ^= (i) ? k0 : k1;         /* merge in 32 more key bits */
         for (j=0;j<4;j++)           /* shift one byte at a time */
-            RS_rem(r);              
+            RS_rem(r);
         }
     return r;
     }
@@ -328,7 +329,7 @@ static void BuildMDS(void)
 #undef  Mul_X
 #undef  Mul_Y
 #define Mul_1   m1              /* It will now access m01[], m5B[], and mEF[] */
-#define Mul_X   mX              
+#define Mul_X   mX
 #define Mul_Y   mY
 
 #define SetMDS(N)                   \
@@ -349,7 +350,7 @@ static void BuildMDS(void)
 #define Mul_1   Mx_1            /* re-enable true multiply */
 #define Mul_X   Mx_X
 #define Mul_Y   Mx_Y
-    
+
 #if BIG_TAB
     {
     int j,k;
@@ -433,7 +434,7 @@ static void ReverseRoundSubkeys(keyInstance *key,BYTE newDir)
 *
 -****************************************************************************/
 #if defined(__BORLANDC__)   /* do it inline */
-#define Xor32(dst,src,i) { ((DWORD *)dst)[i] = ((DWORD *)src)[i] ^ tmpX; } 
+#define Xor32(dst,src,i) { ((DWORD *)dst)[i] = ((DWORD *)src)[i] ^ tmpX; }
 #define Xor256(dst,src,b)               \
     {                                   \
     register DWORD tmpX=0x01010101u * b;\
@@ -468,7 +469,7 @@ static void Xor256(void *dst,void *src,BYTE b)
 *
 * Notes:
 *   Here we precompute all the round subkeys, although that is not actually
-*   required.  For example, on a smartcard, the round subkeys can 
+*   required.  For example, on a smartcard, the round subkeys can
 *   be generated on-the-fly using f32()
 *
 -****************************************************************************/
@@ -547,7 +548,7 @@ if (useAsm & 4)
 else
 #endif
     {
-    for (i=q=0;i<subkeyCnt/2;i++,q+=SK_STEP)    
+    for (i=q=0;i<subkeyCnt/2;i++,q+=SK_STEP)
         {                           /* compute round subkeys for PHT */
         F32(A,q        ,k32e);      /* A uses even key dwords */
         F32(B,q+SK_BUMP,k32o);      /* B uses odd  key dwords */
@@ -641,7 +642,7 @@ else
     }
 #endif /* CHECK_TABLE */
 
-    if (key->direction == DIR_ENCRYPT)  
+    if (key->direction == DIR_ENCRYPT)
         ReverseRoundSubkeys(key,DIR_ENCRYPT);   /* reverse the round subkey order */
 
     return TRUE;
@@ -669,7 +670,7 @@ static int makeKey(keyInstance *key, BYTE direction, int keyLen,CONST char *keyM
     int i;
 
 #if VALIDATE_PARMS              /* first, sanity check on parameters */
-    if (key == NULL)            
+    if (key == NULL)
         return BAD_KEY_INSTANCE;/* must have a keyInstance to initialize */
     if ((direction != DIR_ENCRYPT) && (direction != DIR_DECRYPT))
         return BAD_KEY_DIR;     /* must have valid direction */
@@ -689,7 +690,7 @@ static int makeKey(keyInstance *key, BYTE direction, int keyLen,CONST char *keyM
 
     if (keyMaterial == NULL)
         return TRUE;            /* allow a "dummy" call */
-        
+
     for (i=0;i<keyLen/32;i++)   /* make byte-oriented copy for CFB1 */
         key->key32[i] = (((unsigned char *)keyMaterial)[i*4+0] <<  0)
                       | (((unsigned char *)keyMaterial)[i*4+1] <<  8)
@@ -719,7 +720,7 @@ static int cipherInit(cipherInstance *cipher, BYTE mode,CONST char *IV)
     {
     int i;
 #if VALIDATE_PARMS              /* first, sanity check on parameters */
-    if (cipher == NULL)         
+    if (cipher == NULL)
         return BAD_PARAMS;      /* must have a cipherInstance to initialize */
     if ((mode != MODE_ECB) && (mode != MODE_CBC) && (mode != MODE_CFB1))
         return BAD_CIPHER_MODE; /* must have valid cipher mode */
@@ -760,7 +761,7 @@ static int cipherInit(cipherInstance *cipher, BYTE mode,CONST char *IV)
 *
 * Notes: The only supported block size for ECB/CBC modes is BLOCK_SIZE bits.
 *        If inputLen is not a multiple of BLOCK_SIZE bits in those modes,
-*        an error BAD_INPUT_LEN is returned.  In CFB1 mode, all block 
+*        an error BAD_INPUT_LEN is returned.  In CFB1 mode, all block
 *        sizes can be supported.
 *
 -****************************************************************************/
@@ -826,7 +827,7 @@ static int blockEncrypt(cipherInstance *cipher, keyInstance *key,CONST BYTE *inp
   #ifdef COMPILE_KEY
         if (key->keySig == VALID_SIG)
             return ((CipherProc *)(key->encryptFuncPtr))(cipher,key,input,inputLen,outBuffer);
-  #else 
+  #else
         return (*blockEncrypt_86)(cipher,key,input,inputLen,outBuffer);
   #endif
 #endif
@@ -917,7 +918,7 @@ static int blockEncrypt(cipherInstance *cipher, keyInstance *key,CONST BYTE *inp
 *
 * Notes: The only supported block size for ECB/CBC modes is BLOCK_SIZE bits.
 *        If inputLen is not a multiple of BLOCK_SIZE bits in those modes,
-*        an error BAD_INPUT_LEN is returned.  In CFB1 mode, all block 
+*        an error BAD_INPUT_LEN is returned.  In CFB1 mode, all block
 *        sizes can be supported.
 *
 -****************************************************************************/
@@ -983,7 +984,7 @@ static int blockDecrypt(cipherInstance *cipher, keyInstance *key,CONST BYTE *inp
   #ifdef COMPILE_KEY
         if (key->keySig == VALID_SIG)
             return ((CipherProc *)(key->decryptFuncPtr))(cipher,key,input,inputLen,outBuffer);
-  #else 
+  #else
         return (*blockDecrypt_86)(cipher,key,input,inputLen,outBuffer);
   #endif
 #endif

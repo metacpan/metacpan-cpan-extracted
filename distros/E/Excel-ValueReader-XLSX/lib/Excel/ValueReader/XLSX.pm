@@ -5,7 +5,7 @@ use Archive::Zip          qw(AZ_OK);
 use Module::Load          qw/load/;
 use feature 'state';
 
-our $VERSION = '1.0';
+our $VERSION = '1.01';
 
 #======================================================================
 # ATTRIBUTES
@@ -187,7 +187,7 @@ It is probably safer but about three times slower than the Regex backend
                                              using => $backend);
 
 The C<xlsx> argument is mandatory and points to the C<.xlsx> file to be parsed.
-The C<using> argument is optional; it specifies the backend to be used for parsing; 
+The C<using> argument is optional; it specifies the backend to be used for parsing;
 default is 'Regex'.
 
 As syntactic sugar, a shorter form is admitted :
@@ -222,11 +222,17 @@ like this :
   my $nb_cols = max map {scalar @$_} @$grid; # must import List::Util::max
 
 
-=head1 CAVEAT
+=head1 CAVEATS
+
+=over
+
+=item *
 
 This module was optimized for speed, not for completeness of
 OOXML-SpreadsheetML support; so there may be some edge cases where the
 output is incorrect with respect to the original Excel data.
+
+=item *
 
 Excel dates are stored internally as numbers, so they will appear as
 numbers in the output. To convert numbers to dates, use the
@@ -235,6 +241,15 @@ currently no support for identifying which cells contain dates; this
 would require to parse cell formats -- maybe this will be implemented
 in a future release.
 
+=item *
+
+Embedded newline characters in strings are stored in Excel as C<< \r\n >>,
+following the old Windows convention. When retrieved through the C<Regex>
+backend, the result contains the original C<< \r >> and C<< \n >> characters;
+but when retrieved through the LibXML, C<< \r >> are silently removed by the
+C<XML::LibXML> package.
+
+=back
 
 =head1 SEE ALSO
 
@@ -275,6 +290,17 @@ Modules
 C<Excel::Reader::XLSX> (unpublished) and L<Data::XLSX::Parser>
 are based on L<XML::LibXML> like L<Excel::ValueReader::XLSX::LibXML>;
 execution times for those three modules are very close.
+
+=head1 ACKNOWLEDGEMENTS
+
+=over
+
+=item * 
+
+David Flink signaled (and fixed) a bug about strings with embedded newline characters
+
+=back
+
 
 =head1 AUTHOR
 

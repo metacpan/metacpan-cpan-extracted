@@ -20,7 +20,8 @@ do { my $x = {
                       'requires' => {
                                       'File::Find::Rule' => '0',
                                       'Module::Load' => '0',
-                                      'Mojo::Base' => '0'
+                                      'Mojo::Base' => '0',
+                                      'Mojolicious' => '8.23'
                                     }
                     },
        'test' => {

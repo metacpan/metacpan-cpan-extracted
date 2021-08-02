@@ -2,8 +2,8 @@ NAME
     File::Slurper::Shortcuts - Some convenience additions for File::Slurper
 
 VERSION
-    This document describes version 0.003 of File::Slurper::Shortcuts (from
-    Perl distribution File-Slurper-Shortcuts), released on 2019-10-06.
+    This document describes version 0.004 of File::Slurper::Shortcuts (from
+    Perl distribution File-Slurper-Shortcuts), released on 2021-08-02.
 
 SYNOPSIS
      use File::Slurper::Shortcuts qw(modify_text modify_binary);
@@ -16,15 +16,24 @@ FUNCTIONS
 
      $orig_content = modify_text($filename, $code, $encoding, $crlf);
 
-    This is like File::Slurper's "write_text" except that instead of
-    $content in the second argument, this routine accepts $code. Code should
-    modify $_ (which contains the content of the file) and return true. This
-    routine will die if: file can't be read with "read_text()", code does
-    not return true, file can't be written to with "write_text()".
+    This is File::Slurper's "read_text" and "write_text" combined. First,
+    "read_text" is performed then the content of file is put into $_. Then
+    $code will be called and should modify $_ to modify the content of file.
+    Finally, "write_text" is called to write the new content. If content
+    ($_) does not change, file will not be written.
 
-    If content ($_) does not change, file will not be written.
+    If file can't be read with "read_text()" an exception will be thrown by
+    File::Slurper.
+
+    This function will also die if code does not return true.
+
+    If file can't be written with "write_text()" an exception will be thrown
+    by File::Slurper.
 
     Return the original content of file.
+
+    Note that no locking is performed and file is opened twice, so there
+    might be race condition etc.
 
   modify_binary
 HOMEPAGE
@@ -50,7 +59,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019, 2018 by perlancar@cpan.org.
+    This software is copyright (c) 2021, 2019, 2018 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

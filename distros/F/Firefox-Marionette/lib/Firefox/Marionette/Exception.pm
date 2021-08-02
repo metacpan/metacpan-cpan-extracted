@@ -5,7 +5,7 @@ use warnings;
 use Carp();
 use overload '""' => 'string';
 
-our $VERSION = '1.10';
+our $VERSION = '1.11';
 
 sub throw {
     my ( $class, $string ) = @_;
@@ -27,7 +27,7 @@ sub _throw {
 
 sub string {
     my ($self) = @_;
-    return $self->{string};
+    return $self->{string} . qq[\n];
 }
 
 1;    # Magic true value required at end of module
@@ -39,7 +39,7 @@ Firefox::Marionette::Exception - Represents an base exception class for exceptio
 
 =head1 VERSION
 
-Version 1.10
+Version 1.11
 
 =head1 SYNOPSIS
 

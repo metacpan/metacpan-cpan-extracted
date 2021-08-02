@@ -2,13 +2,16 @@ NAME
     Perinci::Sub::Normalize - Normalize Rinci function metadata
 
 VERSION
-    This document describes version 0.200 of Perinci::Sub::Normalize (from
-    Perl distribution Perinci-Sub-Normalize), released on 2018-09-10.
+    This document describes version 0.202 of Perinci::Sub::Normalize (from
+    Perl distribution Perinci-Sub-Normalize), released on 2021-08-01.
 
 SYNOPSIS
      use Perinci::Sub::Normalize qw(normalize_function_metadata);
 
      my $nmeta = normalize_function_metadata($meta);
+
+CONTRIBUTOR
+    Steven Haryanto <sharyanto@cpan.org>
 
 FUNCTIONS
   normalize_function_metadata($meta[ , \%opts ]) => HASH
@@ -57,7 +60,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2018, 2016, 2015, 2014 by
+    This software is copyright (c) 2021, 2018, 2016, 2015, 2014 by
     perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under

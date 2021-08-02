@@ -20,6 +20,7 @@ lib/RxPerl/SyncTimers.pm
 lib/RxPerl/Test.pm
 lib/RxPerl/Utils.pm
 minil.toml
+t/finalize.t
 t/marble.t
 t/promises.t
 t/simple.t

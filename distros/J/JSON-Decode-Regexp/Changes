@@ -1,16 +1,22 @@
-0.101   2018-03-25 (PERLANCAR)
+0.102   2021-08-01  Released-By: PERLANCAR; Urgency: medium
+
+	- Bump perl minimum version from 5.10.1 to 5.14.4 because CPAN
+	  Testers reports failures with <= 5.12.5 (RT#138217).
+
+
+0.101   2018-03-25  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- [doc] Mention Regexp::Pattern::JSON, Regexp::Common::json.
 
 
-0.100   2018-02-14 (PERLANCAR)
+0.100   2018-02-14  Released-By: PERLANCAR
 
 	- Replace \d with [0-9] [RT#124392].
 
 
-0.09    2016-11-04 (PERLANCAR)
+0.09    2016-11-04  Released-By: PERLANCAR
 
 	- Grok hex and octal escape in string.
 
@@ -19,7 +25,7 @@
 	  (reported by Андрей Шедько/ayshedko).
 
 
-0.08    2016-03-31 (PERLANCAR)
+0.08    2016-03-31  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -27,12 +33,12 @@
           [RT#113476].
 
 
-0.07    2016-03-24 (PERLANCAR)
+0.07    2016-03-24  Released-By: PERLANCAR
 
 	- [Optimization] Don't repeatedly recompile main regex pattern.
 
 
-0.06    2016-03-18 (PERLANCAR)
+0.06    2016-03-18  Released-By: PERLANCAR
 
         - Add some error messages so parsing failure does not just return with
           'No match' but shows more detailed error messages and input position.
@@ -42,7 +48,7 @@
           the parsing but the data structure building.
 
 
-0.05    2016-02-18 (PERLANCAR)
+0.05    2016-02-18  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -50,7 +56,7 @@
 	  0.04), mention some other JSON modules.
 
 
-0.04    2016-02-18 (PERLANCAR)
+0.04    2016-02-18  Released-By: PERLANCAR
 
 	- [Optimization] reuse previous array/hash when building
 	  array/object, this results in several times of speed increase
@@ -68,16 +74,16 @@
           directly). UPDATE: removed in 0.06.
 
 
-0.03    2013-10-26 (SHARYANTO)
+0.03    2013-10-26  Released-By: SHARYANTO
 
         - Minor tweak to regex: allow more whitespaces.
 
 
-0.02    2013-10-19 (SHARYANTO)
+0.02    2013-10-19  Released-By: SHARYANTO
 
         - Minor tweak to regex: allow whitespaces between ":".
 
 
-0.01    2013-10-19 (SHARYANTO)
+0.01    2013-10-19  Released-By: SHARYANTO
 
         - First release.

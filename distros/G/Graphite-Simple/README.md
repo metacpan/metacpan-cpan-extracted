@@ -199,3 +199,6 @@
 
 ###  AUTHOR
     Chernenko Dmitiry cdn@cpan.org
+
+### LICENSE
+    This module can be freely distributed under Perl 5 license.

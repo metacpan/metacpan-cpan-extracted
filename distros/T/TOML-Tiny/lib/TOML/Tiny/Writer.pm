@@ -1,5 +1,5 @@
 package TOML::Tiny::Writer;
-$TOML::Tiny::Writer::VERSION = '0.13';
+$TOML::Tiny::Writer::VERSION = '0.14';
 use strict;
 use warnings;
 no warnings qw(experimental);
@@ -13,85 +13,16 @@ use TOML::Tiny::Util qw(is_strict_array);
 my @KEYS;
 
 sub to_toml {
-  my $data = shift;
+  my $data  = shift;
   my $param = ref($_[1]) eq 'HASH' ? $_[1] : undef;
-  my @buff_assign;
-  my @buff_tables;
 
   for (ref $data) {
     when ('HASH') {
-      # Generate simple key/value pairs for scalar data
-      for my $k (grep{ ref($data->{$_}) !~ /HASH|ARRAY/ } sort keys %$data) {
-        my $key = to_toml_key($k);
-        my $val = to_toml($data->{$k}, $param);
-        push @buff_assign, "$key=$val";
-      }
-
-      # For values which are arrays, generate inline arrays for non-table
-      # values, array-of-tables for table values.
-      ARRAY: for my $k (grep{ ref $data->{$_} eq 'ARRAY' } sort keys %$data) {
-        # Empty table
-        if (!@{$data->{$k}}) {
-          my $key = to_toml_key($k);
-          push @buff_assign, "$key=[]";
-          next ARRAY;
-        }
-
-        my @inline;
-        my @table_array;
-
-        # Sort table and non-table values into separate containers
-        for my $v (@{$data->{$k}}) {
-          if (ref $v eq 'HASH') {
-            push @table_array, $v;
-          } else {
-            push @inline, $v;
-          }
-        }
-
-        # Non-table values become an inline table
-        if (@inline) {
-          my $key = to_toml_key($k);
-          my $val = to_toml(\@inline, $param);
-          push @buff_assign, "$key=$val";
-        }
-
-        # Table values become an array-of-tables
-        if (@table_array) {
-          push @KEYS, $k;
-
-          for (@table_array) {
-            push @buff_tables, '', '[[' . join('.', map{ to_toml_key($_) } @KEYS) . ']]';
-            push @buff_tables, to_toml($_);
-          }
-
-          pop @KEYS;
-        }
-      }
-
-      # Sub-tables
-      for my $k (grep{ ref $data->{$_} eq 'HASH' } sort keys %$data) {
-        if (!keys(%{$data->{$k}})) {
-          # Empty table
-          my $key = to_toml_key($k);
-          push @buff_assign, "$key={}";
-        } else {
-          # Generate [table]
-          push @KEYS, $k;
-          push @buff_tables, '', '[' . join('.', map{ to_toml_key($_) } @KEYS) . ']';
-          push @buff_tables, to_toml($data->{$k}, $param);
-          pop @KEYS;
-        }
-      }
+      return to_toml_table($data, $param);
     }
 
     when ('ARRAY') {
-      if (@$data && $param->{strict_arrays}) {
-        my ($ok, $err) = is_strict_array($data);
-        die "toml: found heterogenous array, but strict_arrays is set ($err)\n" unless $ok;
-      }
-
-      push @buff_tables, '[' . join(', ', map{ to_toml($_, $param) } @$data) . ']';
+      return to_toml_array($data, $param);
     }
 
     when ('SCALAR') {
@@ -100,19 +31,19 @@ sub to_toml {
       } elsif ($$data eq '0') {
         return 'false';
       } else {
-        push @buff_assign, to_toml($$_, $param);
+        return to_toml($$_, $param);
       }
     }
 
-    when (/JSON::PP::Boolean/) {
+    when ('JSON::PP::Boolean') {
       return $$data ? 'true' : 'false';
     }
 
-    when (/Types::Serializer::Boolean/) {
+    when ('Types::Serializer::Boolean') {
       return $data ? 'true' : 'false';
     }
 
-    when (/DateTime/) {
+    when ('DateTime') {
       return strftime_rfc3339($data);
     }
 
@@ -121,15 +52,27 @@ sub to_toml {
     }
 
     when ('Math::BigFloat') {
-      return $data->bstr;
+      if ($data->is_inf || $data->is_nan) {
+        return lc $data->bstr;
+      } else {
+        return $data->bstr;
+      }
     }
 
     when ('') {
       # Thanks to ikegami on Stack Overflow for the trick!
       # https://stackoverflow.com/questions/12686335/how-to-tell-apart-numeric-scalars-and-string-scalars-in-perl/12693984#12693984
       # note: this must come before any regex can flip this flag off
-      return $data if svref_2object(\$data)->FLAGS & (SVf_IOK | SVf_NOK);
+      if (svref_2object(\$data)->FLAGS & (SVf_IOK | SVf_NOK)) {
+        return 'inf'  if Math::BigFloat->new($data)->is_inf;
+        return '-inf' if Math::BigFloat->new($data)->is_inf('-');
+        return 'nan'  if Math::BigFloat->new($data)->is_nan;
+        return $data;
+      }
+      #return $data if svref_2object(\$data)->FLAGS & (SVf_IOK | SVf_NOK);
       return $data if $data =~ /$DateTime/;
+      return lc($data) if $data =~ /$SpecialFloat/;
+
       return to_toml_string($data);
     }
 
@@ -137,16 +80,117 @@ sub to_toml {
       die 'unhandled: '.Dumper($_);
     }
   }
+}
+
+sub to_toml_inline_table {
+  my ($data, $param) = @_;
+  my @buff;
+
+  for my $key (keys %$data) {
+    my $value = $data->{$key};
+
+    if (ref $value eq 'HASH') {
+      push @buff, $key . '=' . to_toml_inline_table($value);
+    } else {
+      push @buff, $key . '=' . to_toml($value);
+    }
+  }
+
+  return '{' . join(', ', @buff) . '}';
+}
+
+sub to_toml_table {
+  my ($data, $param) = @_;
+  my @buff_assign;
+  my @buff_tables;
+
+  # Generate simple key/value pairs for scalar data
+  for my $k (grep{ ref($data->{$_}) !~ /HASH|ARRAY/ } sort keys %$data) {
+    my $key = to_toml_key($k);
+    my $val = to_toml($data->{$k}, $param);
+    push @buff_assign, "$key=$val";
+  }
+
+  # For arrays, generate an array of tables if all elements of the array are
+  # hashes. For mixed arrays, generate an inline array.
+  ARRAY: for my $k (grep{ ref $data->{$_} eq 'ARRAY' } sort keys %$data) {
+    # Empty table
+    if (!@{$data->{$k}}) {
+      my $key = to_toml_key($k);
+      push @buff_assign, "$key=[]";
+      next ARRAY;
+    }
+
+    # Mixed array
+    if (grep{ ref $_ ne 'HASH' } @{$data->{$k}}) {
+      my $key = to_toml_key($k);
+      my $val = to_toml($data->{$k}, $param);
+      push @buff_assign, "$key=$val";
+    }
+    # Array of tables
+    else {
+      push @KEYS, $k;
+
+      for (@{ $data->{$k} }) {
+        push @buff_tables, '', '[[' . join('.', map{ to_toml_key($_) } @KEYS) . ']]';
+        push @buff_tables, to_toml($_);
+      }
+
+      pop @KEYS;
+    }
+  }
+
+  # Sub-tables
+  for my $k (grep{ ref $data->{$_} eq 'HASH' } sort keys %$data) {
+    if (!keys(%{$data->{$k}})) {
+      # Empty table
+      my $key = to_toml_key($k);
+      push @buff_assign, "$key={}";
+    } else {
+      # Generate [table]
+      push @KEYS, $k;
+      push @buff_tables, '', '[' . join('.', map{ to_toml_key($_) } @KEYS) . ']';
+      push @buff_tables, to_toml($data->{$k}, $param);
+      pop @KEYS;
+    }
+  }
 
   join "\n", @buff_assign, @buff_tables;
+}
+
+sub to_toml_array {
+  my ($data, $param) = @_;
+
+  if (@$data && $param->{strict}) {
+    my ($ok, $err) = is_strict_array($data);
+    die "toml: found heterogenous array, but strict is set ($err)\n" unless $ok;
+  }
+
+  my @items;
+
+  for my $item (@$data) {
+    if (ref $item eq 'HASH') {
+      push @items, to_toml_inline_table($item, $param);
+    } else {
+      push @items, to_toml($item, $param);
+    }
+  }
+
+  return "[\n" . join("\n", map{ "  $_," } @items) . "\n]";
 }
 
 sub to_toml_key {
   my $str = shift;
 
-  if ($str =~ /^[-_A-Za-z0-9]+$/) {
+  if ($str =~ /^$BareKey$/) {
     return $str;
   }
+
+  # Escape control characters
+  $str =~ s/([\p{General_Category=Control}])/'\\u00' . unpack('H2', $1)/eg;
+
+  # Escape unicode characters
+  #$str =~ s/($NonASCII)/'\\u00' . unpack('H2', $1)/eg;
 
   if ($str =~ /^"/) {
     return qq{'$str'};
@@ -168,8 +212,8 @@ sub to_toml_string {
   };
 
   my ($arg) = @_;
-  $arg =~ s/([\x22\x5c\n\r\t\f\b])/$escape->{$1}/g;
-  $arg =~ s/([\x00-\x08\x0b\x0e-\x1f])/'\\u00' . unpack('H2', $1)/eg;
+  $arg =~ s/(["\\\b\f\n\r\t])/$escape->{$1}/g;
+  $arg =~ s/([\p{General_Category=Control}])/'\\u00' . unpack('H2', $1)/eg;
 
   return '"' . $arg . '"';
 }
@@ -234,7 +278,7 @@ TOML::Tiny::Writer
 
 =head1 VERSION
 
-version 0.13
+version 0.14
 
 =head1 AUTHOR
 

@@ -1,3 +1,9 @@
+0.004   2021-02-26  Released-By: PERLANCAR; Urgency: medium
+
+	- Add argument fatal_on_load_failure in get_feature_set_spec(),
+	  get_features_decl() (currently undocumented).
+
+
 0.003   2021-02-25  Released-By: PERLANCAR; Urgency: medium
 
 	- get_features_decl(): Add x.source attribute in result.

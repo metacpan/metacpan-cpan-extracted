@@ -1,0 +1,309 @@
+#!/usr/bin/env perl
+# Copyright (C) 2017–2020  Alex Schroeder <alex@gnu.org>
+
+# This program is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, either version 3 of the License, or (at your option) any
+# later version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <https://www.gnu.org/licenses/>.
+
+=encoding utf8
+
+=head1 NAME
+
+phoebe-ctl - admin control for a Phoebe wiki
+
+=head1 DESCRIPTION
+
+This script helps you maintain your Phoebe installation.
+
+=over
+
+=item B<--wiki_dir=>I<DIR>
+
+This the wiki data directory to use; the default is either the value of the
+C<GEMINI_WIKI_DATA_DIR> environment variable, or the C<./wiki> subdirectory. Use
+it to specify a space, too.
+
+=item B<--log=>I<NUMBER>
+
+This is the log level to use. 1 only prints errors; 2 also prints warnings (this
+is the default); 3 prints any kind of information; 4 prints all sorts of info
+the developer wanted to see as they were fixing bugs.
+
+=back
+
+=head2 Commands
+
+B<phoebe-ctl help>
+
+This is what you're reading right now.
+
+B<phoebe-ctl update-changes>
+
+This command looks at all the pages in the F<page> directory and generates new
+entries for your changes log into F<changes.log>.
+
+B<phoebe-ctl erase-page>
+
+This command removes pages from the F<page> directory, removes all the kept
+revisions in the F<keep> directory, and all the mentions in the F<change.log>.
+Use this if spammers and vandals created page names you want to eliminate.
+
+B<phoebe-ctl html-export> [B<--source=>F<subdirectory> ...]
+[B<--target=>F<directory>] [B<--no-extension>]
+
+This command converts all the pages in the subdirectories provided to HTML and
+writes the HTML files into the target directory. The subdirectories must exist
+inside your wiki data directory. The default wiki data directory is F<wiki> and
+the default source subdirectory is undefined, so the actual files to be
+processed are F<wiki/page/*.gmi>; if you're using virtual hosting, the
+subdirectory might be your host name; if you're using spaces, those need to be
+appended as well.
+
+Example:
+
+    phoebe-ctl html-export --wiki_dir=/home/alex/phoebe \
+      --source=transjovian.org \
+      --source=transjovian.org/phoebe \
+      --source=transjovian.org/gemini \
+      --source=transjovian.org/titan \
+      --target=/home/alex/transjovian.org
+
+This will create HTML files in F</home/alex/transjovian.org>,
+F</home/alex/transjovian.org/phoebe>, F</home/alex/transjovian.org/gemini>, and
+F</home/alex/transjovian.org/titan>.
+
+Note that the I<links> in these HTML files do not include the F<.html> extension
+(e.g. C</test>), so this relies on your web server doing the right thing: if a
+visitor requests C</test> the web server must serve F</test.html>. If that
+doesn't work, perhaps using C<--no-extension> is your best bet: the HTML files
+will be written without the F<.html> extension. This should also work for local
+browsing, although it does look strange, all those pages with the F<.html>
+extension.
+
+=cut
+
+package Gemini::Wiki::Control;
+use Modern::Perl '2018';
+use File::Slurper qw(read_dir read_lines read_text write_text);
+use Encode qw(encode_utf8 decode_utf8);
+use Getopt::Long;
+use Pod::Text;
+use File::Path qw(remove_tree);
+use utf8;
+
+binmode(STDOUT, ":utf8");
+
+my $log = 2;
+my $dir = "./wiki";
+my @sources;
+my $target;
+my $no_extension;
+GetOptions (
+  "log=i" => \$log,
+  "wiki_dir=s" => \$dir,
+  "source=s" => \@sources,
+  "target=s" => \$target,
+  "no-extension" => \$no_extension, );
+@sources = ("") unless @sources;
+
+my $subcommands = {
+  "help" => 0,
+  "update-changes" => \&update_changes,
+  "erase-page" => \&erase_page,
+  "html-export" => \&html_export, };
+
+my $subcommand;
+$subcommand = shift(@ARGV) if @ARGV;
+die "No subcommand\n" unless $subcommand;
+$subcommand = $subcommands->{$subcommand};
+die "No known subcommand\n" unless defined $subcommand;
+if (not $subcommand) {
+  my $parser = Pod::Text->new();
+  $parser->parse_file($0);
+  exit;
+}
+
+$subcommand->(@ARGV);
+
+exit;
+
+sub update_changes {
+  my %pages;
+  my $now = time;
+  $pages{decode_utf8($_)} = modified("$dir/page/$_.gmi") for map { s/\.gmi$//; $_ } grep /\.gmi$/, read_dir("$dir/page");
+  say "Read " . scalar(keys %pages) . " pages" if $log >= 3;
+  say join("\n", map { $_ . "\t" . $pages{$_} } sort keys %pages) if $log >= 4;
+  my %files;
+  $files{decode_utf8($_)} = modified("$dir/file/$_") for read_dir("$dir/file");
+  say "Read " . scalar(keys %files) . " files" if $log >= 3;
+  say join("\n", map { $_ . "\t" . $files{$_} } sort keys %files) if $log >= 4;
+  my %revisions;
+  my %changes;
+  for (read_lines("$dir/changes.log")) {
+    my ($ts, $id, $revision) = split(/\x1f/);
+    $revisions{$id} = $revision;
+    if ($revision) {
+      $changes{$id} = $ts;
+    } else {
+      $changes{$id . "\x1c"} = $ts;
+    }
+  };
+  say "Read " . scalar(keys %changes) . " changes" if $log >= 3;
+  say join("\n", map { $_ . "\t" . $changes{$_} } sort keys %changes) if $log >= 4;
+  open(my $fh, ">>:encoding(UTF-8)", "$dir/changes.log") or die "Cannot write $dir/changes.log: $!";
+  for (keys %pages) {
+    if (not $changes{$_} or $pages{$_} > $changes{$_}) {
+      say "Page $_ is added to changes" if $log >= 4;
+      my $revision = $revisions{$_} || 0;
+      say $fh join("\x1f", $now, $_, 1 + $revision, "0000");
+      utime($now, $now, "$dir/page/$_.gmi") or warn "Could not set utime for $dir/page/$_.gmi\n";
+    }
+  }
+  for (keys %files) {
+    if (not $changes{$_ . "\x1c"} or $files{$_} > $changes{$_ . "\x1c"}) {
+      say "File $_ is added to changes" if $log >= 4;
+      say $fh join("\x1f", $now, $_, 0, "0000");
+      utime($now, $now, "$dir/file/$_") or warn "Could not set utime for $dir/file/$_\n";
+    }
+  }
+  close($fh);
+}
+
+sub modified {
+  my $ts = (stat(shift))[9];
+  return $ts;
+}
+
+sub erase_page {
+  my @page = @_;
+  die "You need to list the pages to erase\n" unless @page;
+  for my $page (@page) {
+    if (not -f "$dir/page/$page.gmi") {
+      warn "$page does not exist\n";
+      next;
+    }
+  }
+  my $n = unlink map { "$dir/page/$_.gmi" } @page;
+  warn "Deleted $n pages: $!\n" if $n < @page;
+  my @dirs = grep { -d } map { "$dir/keep/$_" } @page;
+  remove_tree(@dirs, { safe => 1});
+  if (-f "$dir/changes.log") {
+    my @log = grep {
+      my ($ts, $id, $revision, $code) = split(/\x1f/);
+      0 == grep { $id eq $_ } @page; # only keep log lines that are not mentioned
+    } read_lines("$dir/changes.log");
+    rename("$dir/changes.log", "$dir/changes.log~")
+	or die "Cannot rename $dir/changes.log to changes.log~: $!";
+    write_text("$dir/changes.log", join("\n", @log));
+  }
+  if (-f "$dir/index") {
+    my @index = grep {
+      my $id = $_;
+      0 == grep { $id eq $_ } @page; # only keep index pages that are not mentioned
+    } read_lines("$dir/index");
+    rename("$dir/index", "$dir/index~")
+	or die "Cannot rename $dir/index to index~: $!";
+    write_text("$dir/index", join("\n", @index));
+  }
+}
+
+sub html_export {
+  die "You need to provide a target directory for the HTML files using --target=directory\n" unless $target;
+  for my $source (@sources) {
+    my $source_dir = "$dir$source";
+    die "Source directory $source_dir does not exist\n" unless -d $source_dir;
+    my $target_dir = "$target$source";
+    mkdir $target_dir or die "Cannot create target directory $target_dir: $!\n"
+	unless -d $target_dir;
+    for my $page (map { s/\.gmi$//; $_ } grep /\.gmi$/, read_dir("$source_dir/page")) {
+      my $id = decode_utf8 $page;
+      my $text = read_text("$source_dir/page/$page.gmi"); # fatal if it does not exist
+      say "Converting $id";
+      my $filename = "$target_dir/$page";
+      $filename .= ".html" unless $no_extension;
+      open(my $fh, ">:utf8", $filename)
+	  or die "Cannot write $filename: $!\n";
+      say $fh "<!DOCTYPE html>";
+      say $fh "<html>";
+      say $fh "<head>";
+      say $fh "<meta charset=\"utf-8\">";
+      say $fh "<title>" . quote_html($id) . "</title>";
+      say $fh "<link type=\"text/css\" rel=\"stylesheet\" href=\"/default.css\"/>";
+      say $fh "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">";
+      say $fh "</head>";
+      say $fh "<body>";
+      say $fh "<h1>" . quote_html($id) . "</h1>";
+      say $fh to_html($text);
+      # skipping footers
+      say $fh "</body>";
+      say $fh "</html>";
+    }
+  }
+}
+
+sub quote_html {
+  my $html = shift;
+  $html =~ s/&/&amp;/g;
+  $html =~ s/</&lt;/g;
+  $html =~ s/>/&gt;/g;
+  $html =~ s/[\x00-\x08\x0b\x0c\x0e-\x1f]/ /g; # legal xml: #x9 | #xA | #xD | [#x20-#xD7FF] | [#xE000-#xFFFD] | [#x10000-#x10FFFF]
+  return $html;
+}
+
+# returns lines!
+sub to_html {
+  my $text = shift;
+  my @lines;
+  my $list;
+  my $code;
+  for (split /\n/, quote_html($text)) {
+    if (/^```(?:type=([a-z]+))?/) {
+      my $type = $1||"default";
+      if ($code) {
+	push @lines, "</pre>";
+	$code = 0;
+      } else {
+	push @lines, "</ul>" if $list;
+	$list = 0;
+	push @lines, "<pre class=\"$type\">";
+	$code = 1;
+      }
+    } elsif ($code) {
+      push @lines, $_;
+    } elsif (/^\* +(.*)/) {
+      push @lines, "<ul>" unless $list;
+      push @lines, "<li>$1";
+      $list = 1;
+    } elsif (my ($url, $text) = /^=&gt;\s*(\S+)\s*(.*)/) { # quoted HTML!
+      push @lines, "<ul>" unless $list;
+      $text ||= $url;
+      push @lines, "<li><a href=\"$url\">$text</a>";
+      $list = 1;
+    } elsif (/^(#{1,6})\s*(.*)/) {
+      push @lines, "</ul>" if $list;
+      $list = 0;
+      my $level = length($1);
+      push @lines, "<h$level>$2</h$level>";
+    } elsif (/^&gt;\s*(.*)/) { # quoted HTML!
+      push @lines, "</ul>" if $list;
+      $list = 0;
+      push @lines, "<blockquote>$1</blockquote>";
+    } else {
+      push @lines, "</ul>" if $list;
+      $list = 0;
+      push @lines, "<p>$_";
+    }
+  }
+  push @lines, "</pre>" if $code;
+  push @lines, "</ul>" if $list;
+  return join("\n", @lines);
+}

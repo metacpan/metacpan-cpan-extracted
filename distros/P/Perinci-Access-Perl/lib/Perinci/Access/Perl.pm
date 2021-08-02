@@ -1,7 +1,7 @@
 package Perinci::Access::Perl;
 
-our $DATE = '2021-05-11'; # DATE
-our $VERSION = '0.894'; # VERSION
+our $DATE = '2021-08-01'; # DATE
+our $VERSION = '0.897'; # VERSION
 
 use 5.010001;
 use strict;
@@ -53,7 +53,7 @@ Perinci::Access::Perl - Access Perl module, functions, variables through Riap
 
 =head1 VERSION
 
-This document describes version 0.894 of Perinci::Access::Perl (from Perl distribution Perinci-Access-Perl), released on 2021-05-11.
+This document describes version 0.897 of Perinci::Access::Perl (from Perl distribution Perinci-Access-Perl), released on 2021-08-01.
 
 =head1 SYNOPSIS
 
@@ -107,6 +107,12 @@ for package metadata, or C<$NAME> for variables. Functions will be wrapped
 before executed (unless you pass C<< wrap => 0 >> to the constructor).
 
 You should probably use this through L<Perinci::Access>.
+
+=head1 CONTRIBUTOR
+
+=for stopwords Steven Haryanto
+
+Steven Haryanto <sharyanto@cpan.org>
 
 =head1 FUNCTIONS
 

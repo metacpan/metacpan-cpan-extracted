@@ -1,4 +1,4 @@
-package Dist::Zilla::App::Command::new 6.023;
+package Dist::Zilla::App::Command::new 6.024;
 # ABSTRACT: mint a new dist
 
 # BEGIN BOILERPLATE
@@ -115,7 +115,7 @@ Dist::Zilla::App::Command::new - mint a new dist
 
 =head1 VERSION
 
-version 6.023
+version 6.024
 
 =head1 SYNOPSIS
 

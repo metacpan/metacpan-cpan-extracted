@@ -15,7 +15,7 @@ our @EXPORT_OK = (
 );
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
-our $VERSION = "v6.7.1";
+our $VERSION = "v6.8.0";
 
 1;
 __END__
@@ -256,6 +256,18 @@ L<https://rxjs.dev/api/index/function/of>
     # 10, 20, 30, complete
     rx_of(10, 20, 30)->subscribe($observer);
 
+=item rx_partition
+
+L<https://rxjs.dev/api/index/function/partition>
+
+    # 1, 3, 5, 7, 9, 0, 2, 4, 6, 8, complete
+    my $source = rx_interval(1)->pipe( op_take(10) );
+    my ($o1, $o2) = rx_partition(
+        $source,
+        sub { $_[0] % 2 == 1 },
+    );
+    rx_concat($o1, $o2)->subscribe($observer);
+
 =item rx_race
 
 L<https://rxjs.dev/api/index/function/race>
@@ -475,10 +487,23 @@ L<https://rxjs.dev/api/operators/filter>
 
 L<https://rxjs.dev/api/operators/finalize>
 
+I<< Note: >> Observe, in the second example below, that the order of execution of
+the finalize callbacks obeys the rxjs v7 order ('f1' first) rather than the rxjs v6
+order ('f2' first).
+
     # 1, 2, 3, complete, 'hi there'
     rx_of(1, 2, 3)->pipe(
-        op_finalize(sub {print "hi there\n"}),
+        op_finalize(sub { say "hi there" }),
     )->subscribe($observer);
+
+    # 0, f1, f2
+    my $s; $s = rx_interval(1)->pipe(
+        op_finalize(sub { say "f1" }),
+        op_finalize(sub { say "f2" }),
+    )->subscribe(sub {
+        say $_[0];
+        $s->unsubscribe;
+    });
 
 =item op_first
 

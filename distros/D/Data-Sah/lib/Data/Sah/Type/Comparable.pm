@@ -1,9 +1,9 @@
 package Data::Sah::Type::Comparable;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-07-29'; # DATE
+our $DATE = '2021-08-01'; # DATE
 our $DIST = 'Data-Sah'; # DIST
-our $VERSION = '0.909'; # VERSION
+our $VERSION = '0.910'; # VERSION
 
 use Data::Sah::Util::Role 'has_clause';
 use Role::Tiny;
@@ -44,7 +44,7 @@ Data::Sah::Type::Comparable - Comparable type role
 
 =head1 VERSION
 
-This document describes version 0.909 of Data::Sah::Type::Comparable (from Perl distribution Data-Sah), released on 2021-07-29.
+This document describes version 0.910 of Data::Sah::Type::Comparable (from Perl distribution Data-Sah), released on 2021-08-01.
 
 =head1 DESCRIPTION
 

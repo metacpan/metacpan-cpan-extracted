@@ -1,7 +1,7 @@
 package Perinci::Sub::Normalize;
 
-our $DATE = '2018-09-10'; # DATE
-our $VERSION = '0.200'; # VERSION
+our $DATE = '2021-08-01'; # DATE
+our $VERSION = '0.202'; # VERSION
 
 use 5.010001;
 use strict;
@@ -164,13 +164,19 @@ Perinci::Sub::Normalize - Normalize Rinci function metadata
 
 =head1 VERSION
 
-This document describes version 0.200 of Perinci::Sub::Normalize (from Perl distribution Perinci-Sub-Normalize), released on 2018-09-10.
+This document describes version 0.202 of Perinci::Sub::Normalize (from Perl distribution Perinci-Sub-Normalize), released on 2021-08-01.
 
 =head1 SYNOPSIS
 
  use Perinci::Sub::Normalize qw(normalize_function_metadata);
 
  my $nmeta = normalize_function_metadata($meta);
+
+=head1 CONTRIBUTOR
+
+=for stopwords Steven Haryanto
+
+Steven Haryanto <sharyanto@cpan.org>
 
 =head1 FUNCTIONS
 
@@ -227,7 +233,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2016, 2015, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2018, 2016, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

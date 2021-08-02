@@ -1,0 +1,163 @@
+NAME
+    Pod::Coverage::TrustMe - Pod::Coverage but more powerful
+
+SYNOPSIS
+      use Pod::Coverage::TrustMe;
+
+      Pod::Coverage::TrustMe->new(package => 'My::Package')->print_report;
+
+DESCRIPTION
+    Checks that all of the functions or methods provided by a package have
+    documentation. Compatible with most uses of Pod::Coverage, but with
+    additional features.
+
+CONSTRUCTOR OPTIONS
+    These options can be passed to "Pod::Coverage::TrustMe->new".
+
+    package
+        The package to check coverage for. The module must be loadable.
+
+    pod_from
+        The Pod file to parse. By default, the module that is loaded will be
+        used, or a pod file existing in the same directory, if it exists.
+
+    private
+        An array ref of regular expressions for subs to consider private and
+        not needing to be documented. If non-regular expressions are
+        included in the list, they will be taken as literal sub names.
+        Defaults to "DEFAULT_PRIVATE".
+
+    also_private
+        An array ref of items to add to the private list. Makes it easy to
+        augment the default list.
+
+    trustme
+        An array ref of subs to consider documented even if no pod can be
+        found. Has a similar effect to "private", but will include the subs
+        in the list of covered subs, rather than excluding them from the
+        list entirely.
+
+    nonwhitespace
+        Requires that the pod section for the sub have some non-whitespace
+        characters in it to be counted as covering the sub.
+
+    trust_parents
+        Includes Pod from parent classes in list of covered subs. Like
+        Pod::Coverage::CountParents. Defaults to true.
+
+    trust_roles
+        Includes Pod from consumed roles in list of covered subs. Like
+        Pod::Coverage::CountParents, but checking "does" or "DOES". Defaults
+        to true.
+
+    trust_pod
+        Trusts subs or regexes listed in "Pod::Coverage" blocks in Pod. Like
+        Pod::Coverage::TrustPod. Defaults to true.
+
+        A section like:
+
+          =for Pod::Coverage sub1 sub2 [A-Z_]+
+
+        will allow the subs "sub1", "sub2", and any sub that is all upper
+        case to exist without being documented.
+
+    require_link
+        Requires a link in the Pod to parent classes or roles to include
+        them in the coverage. If the documentation for subs is in different
+        files, they should be linked to in some way.
+
+    export_only
+        Only requires subs listed in @EXPORT and @EXPORT_OK to be covered.
+
+    ignore_imported
+        Ignore subs that were imported from other packages. If set to false,
+        every sub in the package needs to be covered, even if it is imported
+        from another package. Subs that aren't part of the API should be
+        cleaned using a tool like namespace::clean, or excluded in some way.
+        See also Test::CleanNamespaces. Defaults to true.
+
+METHODS
+    coverage
+        Returns the percentage of subs covered as a value between 0 and 1.
+
+    why_unrated
+    covered
+        Returns a list of subs that are covered by the documentation.
+
+    uncovered
+        Returns a list of subs that are not covered by the documentation.
+
+    naked
+        An alias for uncovered.
+
+    report
+        Returns a text report on the covered and uncovered subroutines.
+
+    print_report
+        Print a text report on the covered and uncovered subroutines.
+
+    symbols
+        Returns the a hashref of symbols detected, with a value of true or
+        false for if the symbol is covered by pod.
+
+    trusted_packages
+        Returns the other packages that will have their pod checked for
+        symbols to treat as covered.
+
+METHODS FOR SUBCLASSES
+    There are some private methods provided that could be overridden in
+    subclasses to adjust the behavior.
+
+    _get_syms($package)
+        Returns the list of symbols for a given package.
+
+    _get_pods($package)
+        Returns an array ref of all of the covered items in the pod.
+
+    _private_check($symbol)
+        Returns true if the given symbol should be considered private.
+
+    _trustme_check($symbol)
+        Returns true if the given symbol should be treated as covered even
+        without any documentation found.
+
+CONSTANTS
+    DEFAULT_PRIVATE
+        An array reference of the default list of private regular
+        expressions.
+
+TESTING
+    See Test::Pod::Coverage::TrustMe for using this module in tests.
+
+Pod::Coverage::TrustMe vs Pod::Coverage
+    There are some important differences between this module and
+    Pod::Coverage, aside from the additional features.
+
+    No _CvGV method
+        Pod::Coverage provides and documents the _CvGV method, but doesn't
+        use it itself. This module does not provide the method.
+
+    No import method
+        Pod::Coverage provides an import method to allow you to run code
+        like "perl -MPod::Coverage=Some::Package -e1". This module does not
+        provide this, instead encouraging the use of the pod-cover script.
+
+    Uses Pod::Simple
+        Pod::Coverage parses pod using Pod::Parser, which has been removed
+        from perl core and its use is discouraged. This module uses
+        Pod::Simple instead.
+
+AUTHOR
+    haarg - Graham Knop (cpan:HAARG) <haarg@haarg.org>
+
+CONTRIBUTORS
+    None so far.
+
+COPYRIGHT
+    Copyright (c) 2020 the Pod::Coverage::TrustMe "AUTHOR" and
+    "CONTRIBUTORS" as listed above.
+
+LICENSE
+    This library is free software and may be distributed under the same
+    terms as perl itself. See <https://dev.perl.org/licenses/>.
+

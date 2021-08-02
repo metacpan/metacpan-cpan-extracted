@@ -1,9 +1,9 @@
 package Data::Sah::Compiler;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-07-29'; # DATE
+our $DATE = '2021-08-01'; # DATE
 our $DIST = 'Data-Sah'; # DIST
-our $VERSION = '0.909'; # VERSION
+our $VERSION = '0.910'; # VERSION
 
 use 5.010;
 use strict;
@@ -637,8 +637,13 @@ sub compile {
     }
 
     require Data::Sah::Resolve;
-    my $res       = Data::Sah::Resolve::resolve_schema(
-        {schema_is_normalized => 1}, $nschema);
+    my $res = Data::Sah::Resolve::resolve_schema(
+        {
+            schema_is_normalized => 1,
+            allow_base_with_no_additional_clauses => 1,
+            %{$args{resolve_opts} // {}},
+        },
+        $nschema);
     my $tn        = $res->{type};
     $cd->{th}     = $self->get_th(name=>$tn, cd=>$cd);
     $cd->{type}   = $tn;
@@ -661,7 +666,8 @@ sub compile {
 
     if ($args{log_result}) {# && $log->is_trace) {
         log_trace(
-            "Schema compilation result:\n%s",
+            "Schema compilation result (compiler=%s):\n%s",
+            ref($self),
             !ref($cd->{result}) && ($ENV{LINENUM} // 1) ?
                 __linenum($cd->{result}) :
                 $cd->{result}
@@ -745,7 +751,7 @@ Data::Sah::Compiler - Base class for Sah compilers (Data::Sah::Compiler::*)
 
 =head1 VERSION
 
-This document describes version 0.909 of Data::Sah::Compiler (from Perl distribution Data-Sah), released on 2021-07-29.
+This document describes version 0.910 of Data::Sah::Compiler (from Perl distribution Data-Sah), released on 2021-08-01.
 
 =for Pod::Coverage ^(check_compile_args|def|expr|init_cd|literal|name|add_module|add_compile_module|add_runtime_module)$
 

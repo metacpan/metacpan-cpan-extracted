@@ -18,7 +18,8 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "File::Find::Rule" => 0,
     "Module::Load" => 0,
-    "Mojo::Base" => 0
+    "Mojo::Base" => 0,
+    "Mojolicious" => "8.23"
   },
   "TEST_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0,
@@ -31,7 +32,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.16",
+  "VERSION" => "0.17",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -45,6 +46,7 @@ my %FallbackPrereqs = (
   "Module::Load" => 0,
   "Mojo::Base" => 0,
   "Mojo::File" => 0,
+  "Mojolicious" => "8.23",
   "Mojolicious::Lite" => 0,
   "Test::Mojo" => 0,
   "Test::More" => 0,

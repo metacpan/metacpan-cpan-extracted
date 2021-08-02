@@ -7,16 +7,15 @@ use warnings;
 use URI;
 use Carp 'croak';
 
-use parent 'JSONSchema::Validator::Constraints::Draft4';
-
 use JSONSchema::Validator::JSONPointer 'json_pointer';
 use JSONSchema::Validator::Error 'error';
-use JSONSchema::Validator::Util qw(is_type serialize unbool round detect_type);
+
+use parent 'JSONSchema::Validator::Constraints::Draft4';
 
 sub type {
     my ($self, $instance, $type, $schema, $instance_path, $schema_path, $data) = @_;
 
-    if (is_type($instance, 'null', $self->strict)) {
+    if ($self->check_type($instance, 'null')) {
         return $self->nullable( $instance,
                                 $schema->{nullable} // 0,
                                 $schema,
@@ -26,7 +25,7 @@ sub type {
     }
 
     my $result = 1;
-    $result = 0 unless is_type($instance, $type, $self->strict);
+    $result = 0 unless $self->check_type($instance, $type);
 
     # # items must be present if type eq array
     # if ($result && $type eq 'array') {
@@ -45,7 +44,7 @@ sub type {
 
 sub items {
     my ($self, $instance, $items, $schema, $instance_path, $schema_path, $data) = @_;
-    return 1 unless is_type($instance, 'array', $self->strict);
+    return 1 unless $self->check_type($instance, 'array');
 
     # items is object and NOT array
 
@@ -103,7 +102,7 @@ sub writeOnly {
 
 sub required {
     my ($self, $instance, $required, $schema, $instance_path, $schema_path, $data) = @_;
-    return 1 unless is_type($instance, 'object', $self->strict);
+    return 1 unless $self->check_type($instance, 'object');
 
     my $result = 1;
     for my $idx (0 .. $#{$required}) {
@@ -132,7 +131,7 @@ sub required {
 
 sub discriminator {
     my ($self, $instance, $discriminator, $origin_schema, $instance_path, $schema_path, $data) = @_;
-    return 1 unless is_type($instance, 'object', $self->strict);
+    return 1 unless $self->check_type($instance, 'object');
 
     my $path = $instance_path;
 
@@ -215,7 +214,7 @@ JSONSchema::Validator::Constraints::OAS30 - OpenAPI 3.0 specification constraint
 
 =head1 VERSION
 
-version 0.002
+version 0.004
 
 =head1 AUTHORS
 

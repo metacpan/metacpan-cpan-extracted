@@ -1,4 +1,4 @@
-package Dist::Zilla::App::Command::test 6.023;
+package Dist::Zilla::App::Command::test 6.024;
 # ABSTRACT: test your dist
 
 # BEGIN BOILERPLATE
@@ -106,7 +106,7 @@ Dist::Zilla::App::Command::test - test your dist
 
 =head1 VERSION
 
-version 6.023
+version 6.024
 
 =head1 SYNOPSIS
 

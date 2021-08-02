@@ -40,7 +40,7 @@ Util::H2O - Hash to Object: turns hashrefs into objects with accessors for keys
 
 =cut
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 # For AUTHOR, COPYRIGHT, AND LICENSE see the bottom of this file
 
 our @EXPORT = qw/ h2o /;  ## no critic (ProhibitAutomaticExportation)
@@ -125,6 +125,12 @@ C<-new>.
 
 Short form of the options C<< -new, -meth, -class => I<classname> >>.
 
+=item C<< -isa => I<arrayref or scalar> >>
+
+Convenience option to set the L<C<@ISA>|perlvar/"@ISA"> variable in the package
+of the object, so that the object inherits from that/those package(s).
+This option was added in v0.14.
+
 =item C<-new>
 
 Generates a constructor named C<new> in the package. The constructor
@@ -133,6 +139,14 @@ arguments that it doesn't know about. If you want more advanced
 features, like required arguments, validation, or other
 initialization, you should probably switch to something like L<Moo>
 instead.
+
+=item C<< -destroy => I<coderef> >>
+
+Allows you to specify a custom destructor. This coderef will be called from the
+object's actual C<DESTROY> in void context with the first argument being the
+same as the first argument to the C<DESTROY> method. Errors will be converted
+to warnings.
+This option was added in v0.14.
 
 =item C<< -clean => I<bool> >>
 
@@ -190,14 +204,63 @@ An accessor will be set up for each key in the hash; note that the
 keys must of course be valid Perl identifiers for you to be able to
 call the method normally.
 
-When C<-clean> is I<true> (the default, unless you use C<-class>),
-the hash may not contain a key named C<DESTROY>. When C<-new> is
-used, the hash may not contain a key named C<new>.
-If the hash contains a key named C<AUTOLOAD>, see L</AUTOLOAD>.
+The following keys will be treated specially by this module. Please note that
+there are further keys that are treated specially by Perl and/or that other
+code may expect to be special, such as L<UNIVERSAL>'s C<isa>. See also
+L<perlsub> and the references therein.
+
+=over
+
+=item C<new>
+
+This key is not allowed in the hash if the C<-new> option is on.
+
+=item C<DESTROY>
+
+This key is not allowed except if all of the following apply:
+
+=over
+
+=item *
+
+C<-destroy> is not used,
+
+=item *
+
+C<-clean> is off (which happens by default when you use C<-class>),
+
+=item *
+
+C<-meth> is on, and
+
+=item *
+
+the value of the key C<DESTROY> is a coderef.
+
+=back
+
+Versions of this module before v0.14 allowed a C<DESTROY> key in more
+circumstances (whenever C<-clean> was off).
+
+=item C<AUTOLOAD>
+
+If your hash contains a key named C<AUTOLOAD>, or this key is present in
+C<@additional_keys>, this module will set up a method called C<AUTOLOAD>, which
+is subject to Perl's normal autoloading behavior - see L<perlsub/Autoloading>
+and L<perlobj/AUTOLOAD>. Without the C<-meth> option, you will get a
+"catch-all" accessor to which all method calls to unknown method names will go,
+and with C<-meth> enabled (which is implied by C<-classify>), you can install
+your own custom C<AUTOLOAD> handler by passing a coderef as the value for this
+key. However, it is important to note that enabling autoloading removes any
+typo protection on method names.
+
+=back
 
 =head3 C<@additional_keys>
 
 Methods will be set up for these keys even if they do not exist in the hash.
+
+Please see the list of keys that are treated specially above.
 
 =head3 Returns
 
@@ -206,7 +269,7 @@ The (now blessed and optionally locked) C<$hashref>.
 =cut
 
 sub h2o {  ## no critic (RequireArgUnpacking, ProhibitExcessComplexity)
-	my ($recurse,$meth,$class,$new,$clean,$lock,$ro);
+	my ($recurse,$meth,$class,$isa,$destroy,$new,$clean,$lock,$ro);
 	while ( @_ && $_[0] && !ref$_[0] ) {
 		if ($_[0] eq '-recurse' ) { $recurse = shift }  ## no critic (ProhibitCascadingIfElse)
 		elsif ($_[0] eq '-meth' ) { $meth    = shift }
@@ -226,6 +289,15 @@ sub h2o {  ## no critic (RequireArgUnpacking, ProhibitExcessComplexity)
 				if !defined $class || ref $class || !length $class;
 			$meth = 1; $new = 1;
 		}
+		elsif ($_[0] eq '-isa') {
+			$isa = (shift, shift);
+			croak "invalid -isa option value" if !( ref($isa) eq 'ARRAY' || !ref($isa) );
+			$isa = [$isa] unless ref $isa;
+		}
+		elsif ($_[0] eq '-destroy') {
+			$destroy = (shift, shift);
+			croak "invalid -destroy option value" unless ref $destroy eq 'CODE';
+		}
 		else { croak "unknown option to h2o: '$_[0]'" }
 	}
 	$clean = !defined $class unless defined $clean;
@@ -236,7 +308,7 @@ sub h2o {  ## no critic (RequireArgUnpacking, ProhibitExcessComplexity)
 	my %ak   = map {$_=>1} @_;
 	my %keys = map {$_=>1} @_, keys %$hash;
 	croak "h2o hashref may not contain a key named DESTROY"
-		if $clean && exists $keys{DESTROY};
+		if exists $keys{DESTROY} && ( $destroy || $clean || !$meth || ref $hash->{DESTROY} ne 'CODE' );
 	croak "h2o hashref may not contain a key named new if you use the -new option"
 		if $new && exists $keys{new};
 	croak "h2o can't turn off -lock if -ro is on" if $ro && !$lock;
@@ -250,8 +322,10 @@ sub h2o {  ## no critic (RequireArgUnpacking, ProhibitExcessComplexity)
 			{ $sub = delete $$hash{$k}; $ak{$k} or delete $keys{$k} }
 		{ no strict 'refs'; *{"${pack}::$k"} = $sub }  ## no critic (ProhibitNoStrict)
 	}
-	if ( $clean ) {
-		my $sub = sub { delete_package($pack) };
+	if ( $destroy || $clean ) {
+		my $sub = sub {
+			$destroy and ( eval { $destroy->($_[0]); 1 } or carp $@ );  ## no critic (ProhibitMixedBooleanOperators)
+			$clean and delete_package($pack) };
 		{ no strict 'refs'; *{$pack.'::DESTROY'} = $sub }  ## no critic (ProhibitNoStrict)
 	}
 	if ( $new ) {
@@ -268,6 +342,7 @@ sub h2o {  ## no critic (RequireArgUnpacking, ProhibitExcessComplexity)
 		};
 		{ no strict 'refs'; *{$pack.'::new'} = $sub }  ## no critic (ProhibitNoStrict)
 	}
+	if ($isa) { no strict 'refs'; @{$pack.'::ISA'} = @$isa }  ## no critic (ProhibitNoStrict)
 	bless $hash, $pack;
 	if ($ro) { lock_hashref $hash }
 	elsif ($lock) { lock_ref_keys $hash, keys %keys }
@@ -276,20 +351,6 @@ sub h2o {  ## no critic (RequireArgUnpacking, ProhibitExcessComplexity)
 
 1;
 __END__
-
-=head1 Notes
-
-=head2 C<AUTOLOAD>
-
-If your hash contains a key named C<AUTOLOAD>, or this key is present in
-C<@additional_keys>, this module will set up a method called C<AUTOLOAD>, which
-is subject to Perl's normal autoloading behavior - see L<perlsub/Autoloading>
-and L<perlobj/AUTOLOAD>. Without the C<-meth> option, you will get a
-"catch-all" accessor to which all method calls to unknown method names will go,
-and with C<-meth> enabled (which is implied by C<-classify>), you can install
-your own custom C<AUTOLOAD> handler by passing a coderef as the value for this
-key. However, it is important to note that enabling autoloading removes any
-typo protection on method names.
 
 =head1 See Also
 

@@ -2,12 +2,9 @@
 abstract: 'fast function for converting markdown to HTML (requires C compiler)'
 author:
   - 'Masayoshi Sekimura <sekimura@cpan.org>'
-build_requires:
-  ExtUtils::MakeMaker: '0'
-configure_requires:
-  ExtUtils::MakeMaker: '0'
+build_requires: {}
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690'
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.133380'
 license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -17,7 +14,6 @@ no_index:
   directory:
     - t
     - inc
-requires: {}
 resources:
   repository: https://github.com/sekimura/text-markdown-discount.git
-version: '0.12'
+version: '0.13'

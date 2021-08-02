@@ -15,23 +15,6 @@ subtest basics => sub{
   is $got, $data, 'to_toml <=> from_toml';
 };
 
-subtest strict_arrays => sub{
-  subtest with_bad_array => sub{
-    my ($data, $error) = from_toml $src, strict_arrays => 1;
-    is $data, U, 'result undefined';
-    ok $error, 'error message';
-    like $error, qr/expected value of type/, $error, 'expected error';
-  };
-
-  subtest without_bad_array => sub{
-    my $toml = $src;
-    $toml =~ s/^hetero_array.*$//m;
-    my ($data, $error) = from_toml $toml, strict_arrays => 1;
-    ok $data, 'result defined';
-    ok !$error, 'no error';
-  };
-};
-
 #-------------------------------------------------------------------------------
 # Adapted from DateTime::Format::RFC3339.
 #-------------------------------------------------------------------------------

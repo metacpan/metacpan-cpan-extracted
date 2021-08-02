@@ -4,7 +4,7 @@ use Mojo::Base 'Mojo::EventEmitter';
 use Carp 'croak';
 use DBI;
 use DBD::SQLite;
-use DBD::SQLite::Constants ':database_connection_configuration_options';
+use DBD::SQLite::Constants qw(:database_connection_configuration_options :dbd_sqlite_string_mode);
 use File::Spec::Functions 'catfile';
 use File::Temp;
 use Mojo::SQLite::Database;
@@ -14,7 +14,7 @@ use SQL::Abstract::Pg;
 use URI;
 use URI::db;
 
-our $VERSION = '3.006';
+our $VERSION = '3.007';
 
 has abstract => sub { SQL::Abstract::Pg->new(name_sep => '.', quote_char => '"') };
 has 'auto_migrate';
@@ -28,7 +28,8 @@ has options => sub {
     AutoInactiveDestroy => 1,
     PrintError          => 0,
     RaiseError          => 1,
-    sqlite_unicode      => 1,
+    sqlite_string_mode  => DBD_SQLITE_STRING_MODE_UNICODE_FALLBACK,
+    wal_mode            => 1,
   };
 };
 has 'parent';
@@ -49,6 +50,8 @@ sub from_string {
   # Options
   my %options = $url->query_form;
   $url->query(undef);
+  # don't set default string_mode if sqlite_unicode legacy option is set
+  delete $self->options->{sqlite_string_mode} if exists $options{sqlite_unicode};
   @{$self->options}{keys %options} = values %options;
 
   # Parse URL based on scheme
@@ -81,7 +84,7 @@ sub _dequeue {
     // croak "DBI connection to @{[$self->dsn]} failed: $DBI::errstr"; # RaiseError disabled
   $dbh->sqlite_db_config(SQLITE_DBCONFIG_DQS_DDL, 0);
   $dbh->sqlite_db_config(SQLITE_DBCONFIG_DQS_DML, 0);
-  unless ($self->options->{no_wal}) {
+  if ($self->options->{wal_mode} and !$self->options->{no_wal}) {
     $dbh->do('pragma journal_mode=WAL');
     $dbh->do('pragma synchronous=NORMAL');
   }
@@ -222,18 +225,23 @@ statement, which returns a L<Mojo::SQLite::Results> object. And finally we call
 the method L<Mojo::SQLite::Results/"hash"> to retrieve the first row as a hash
 reference.
 
-All I/O and queries are performed synchronously. However, the "Write-Ahead Log"
-journal is enabled for all connections, allowing multiple processes to read and
-write concurrently to the same database file (but only one can write at a
-time). You can prevent this mode from being enabled by passing the option
-C<no_wal>, but note that this is incompatible with SQLite databases that have
-already had WAL mode enabled. See L<http://sqlite.org/wal.html> and
-L<DBD::SQLite/"journal_mode"> for more information.
+All I/O and queries are performed synchronously, and SQLite's default journal
+mode only supports concurrent reads from multiple processes while the database
+is not being written. The "Write-Ahead Log" journal mode allows multiple
+processes to read and write concurrently to the same database file (but only
+one can write at a time). WAL mode is enabled by the C<wal_mode> option,
+currently enabled by default, and persists when opening that same database in
+the future.
 
-  # Performed concurrently
+  # Performed concurrently (concurrent with writing only with WAL journaling mode)
   my $pid = fork || die $!;
   say $sql->db->query(q{select datetime('now','localtime') as time})->hash->{time};
   exit unless $pid;
+
+The C<no_wal> option prevents WAL mode from being enabled in new databases but
+doesn't affect databases where it has already been enabled. C<wal_mode> may not
+be set by default in a future release. See L<http://sqlite.org/wal.html> and
+L<DBD::SQLite/"journal_mode"> for more information.
 
 The L<double-quoted string literal misfeature
 |https://sqlite.org/quirks.html#double_quoted_string_literals_are_accepted> is
@@ -359,10 +367,11 @@ more easily.
   my $options = $sql->options;
   $sql        = $sql->options({AutoCommit => 1, RaiseError => 1});
 
-Options for database handles, defaults to activating C<sqlite_unicode>,
-C<AutoCommit>, C<AutoInactiveDestroy> as well as C<RaiseError> and deactivating
-C<PrintError>. Note that C<AutoCommit> and C<RaiseError> are considered
-mandatory, so deactivating them would be very dangerous. See
+Options for database handles, defaults to setting C<sqlite_string_mode> to
+C<DBD_SQLITE_STRING_MODE_UNICODE_FALLBACK>, setting C<AutoCommit>,
+C<AutoInactiveDestroy> and C<RaiseError>, and deactivating C<PrintError>.
+Note that C<AutoCommit> and C<RaiseError> are considered mandatory, so
+deactivating them would be very dangerous. See
 L<DBI/"ATTRIBUTES COMMON TO ALL HANDLES"> and
 L<DBD::SQLite/"DRIVER PRIVATE ATTRIBUTES"> for more information on available
 options.
@@ -436,6 +445,10 @@ passed as the second argument.
   
   # Readonly connection without WAL mode
   $sql->from_filename($filename, { ReadOnly => 1, no_wal => 1 });
+  
+  # Strict unicode strings and WAL mode
+  use DBD::SQLite::Constants ':dbd_sqlite_string_mode';
+  $sql->from_filename($filename, { sqlite_string_mode => DBD_SQLITE_STRING_MODE_UNICODE_STRICT, wal_mode => 1 });
 
 =head2 from_string
 
@@ -489,6 +502,11 @@ and applied to L</"options">.
 
   # Readonly connection without WAL mode
   $sql->from_string('data.db?ReadOnly=1&no_wal=1');
+
+  # String unicode strings and WAL mode
+  use DBD::SQLite::Constants ':dbd_sqlite_string_mode';
+  $sql->from_string(Mojo::URL->new->scheme('sqlite')->path('data.db')
+    ->query(sqlite_string_mode => DBD_SQLITE_STRING_MODE_UNICODE_STRICT, wal_mode => 1));
 
 =head1 DEBUGGING
 

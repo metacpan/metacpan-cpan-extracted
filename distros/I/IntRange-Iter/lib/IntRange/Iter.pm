@@ -1,9 +1,9 @@
 package IntRange::Iter;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-07-17'; # DATE
+our $DATE = '2021-07-25'; # DATE
 our $DIST = 'IntRange-Iter'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 use strict;
 use warnings;
@@ -112,7 +112,7 @@ IntRange::Iter - Generate a coderef iterator from an int range specification (e.
 
 =head1 VERSION
 
-This document describes version 0.004 of IntRange::Iter (from Perl distribution IntRange-Iter), released on 2021-07-17.
+This document describes version 0.005 of IntRange::Iter (from Perl distribution IntRange-Iter), released on 2021-07-25.
 
 =head1 SYNOPSIS
 
@@ -175,6 +175,8 @@ feature.
 L<Range::Iter>
 
 L<NumSeq::Iter>
+
+Modules that might also interest you: L<Set::IntSpan> and L<Array::IntSpan>.
 
 =head1 AUTHOR
 

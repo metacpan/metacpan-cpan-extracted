@@ -1,4 +1,4 @@
-package Dist::Zilla::Dist::Builder 6.023;
+package Dist::Zilla::Dist::Builder 6.024;
 # ABSTRACT: dist zilla subclass for building dists
 
 use Moose 0.92; # role composition fixes
@@ -449,6 +449,23 @@ sub dist_basename {
   );
 }
 
+#pod =method archive_basename
+#pod
+#pod   my $basename = $zilla->archive_basename;
+#pod
+#pod This method will return the filename, without the format extension
+#pod (e.g. C<Dist-Name-1.01> or C<Dist-Name-1.01-TRIAL>).
+#pod
+#pod =cut
+
+sub archive_basename {
+  my ($self) = @_;
+  return join q{},
+    $self->dist_basename,
+    ( $self->is_trial && $self->version !~ /_/ ? '-TRIAL' : '' ),
+  ;
+}
+
 #pod =method archive_filename
 #pod
 #pod   my $tarball = $zilla->archive_filename;
@@ -462,11 +479,7 @@ sub dist_basename {
 
 sub archive_filename {
   my ($self) = @_;
-  return join(q{},
-    $self->dist_basename,
-    ( $self->is_trial && $self->version !~ /_/ ? '-TRIAL' : '' ),
-    '.tar.gz'
-  );
+  return join q{}, $self->archive_basename, '.tar.gz';
 }
 
 #pod =method build_archive
@@ -483,17 +496,21 @@ sub build_archive {
 
   my $built_in = $self->ensure_built;
 
-  my $basename = $self->dist_basename;
-  my $basedir = path($basename);
+  my $basedir = path($self->dist_basename);
 
-  $_->before_archive for @{ $self->plugins_with(-BeforeArchive) };
+  $_->before_archive for $self->plugins_with(-BeforeArchive)->@*;
+
+  for my $builder ($self->plugins_with(-ArchiveBuilder)->@*) {
+    my $file = $builder->build_archive($self->archive_basename, $built_in, $basedir);
+    return $file if defined $file;
+  }
 
   my $method = eval { +require Archive::Tar::Wrapper;
                       Archive::Tar::Wrapper->VERSION('0.15'); 1 }
              ? '_build_archive_with_wrapper'
              : '_build_archive';
 
-  my $archive = $self->$method($built_in, $basename, $basedir);
+  my $archive = $self->$method($built_in, $basedir);
 
   my $file = path($self->archive_filename);
 
@@ -504,7 +521,7 @@ sub build_archive {
 }
 
 sub _build_archive {
-  my ($self, $built_in, $basename, $basedir) = @_;
+  my ($self, $built_in, $basedir) = @_;
 
   $self->log("building archive with Archive::Tar; install Archive::Tar::Wrapper 0.15 or newer for improved speed");
 
@@ -536,7 +553,7 @@ sub _build_archive {
 }
 
 sub _build_archive_with_wrapper {
-  my ($self, $built_in, $basename, $basedir) = @_;
+  my ($self, $built_in, $basedir) = @_;
 
   $self->log("building archive with Archive::Tar::Wrapper");
 
@@ -883,7 +900,7 @@ Dist::Zilla::Dist::Builder - dist zilla subclass for building dists
 
 =head1 VERSION
 
-version 6.023
+version 6.024
 
 =head1 PERL VERSION
 
@@ -954,6 +971,13 @@ with no object for the preposition!
 This method will return the dist's basename (e.g. C<Dist-Name-1.01>.
 The basename is used as the top-level directory in the tarball.  It
 does not include C<-TRIAL>, even if building a trial dist.
+
+=head2 archive_basename
+
+  my $basename = $zilla->archive_basename;
+
+This method will return the filename, without the format extension
+(e.g. C<Dist-Name-1.01> or C<Dist-Name-1.01-TRIAL>).
 
 =head2 archive_filename
 

@@ -9,7 +9,7 @@ our %EXPORT_TAGS = ( 'all' => [ ] );
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw();
 
-our $VERSION = '0.03';
+our $VERSION = '0.06';
 
 require XSLoader;
 XSLoader::load('Graphite::Simple', $VERSION);
@@ -229,5 +229,9 @@ Destructor. Destroys object.
 =head1 AUTHOR
 
 Chernenko Dmitiry cdn@cpan.org
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it and/or modify it under the terms of the the Artistic License (2.0).
 
 =cut
