@@ -58,8 +58,6 @@ subtest 'query_hash' => sub{
 
 subtest 'split_path' => sub{
   is uri('//foo/baz.png')->split_path, array{
-    item '';
-    item 'foo';
     item 'baz.png';
     end;
   }, 'double leading slashes';

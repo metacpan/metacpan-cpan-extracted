@@ -38,7 +38,7 @@
             "Test2::API" : "0",
             "Test::More" : "0",
             "Time::HiRes" : "0",
-            "perl" : "5.16",
+            "perl" : "v5.16.0",
             "utf8" : "0"
          }
       }
@@ -46,7 +46,7 @@
    "provides" : {
       "Data::Table::Text" : {
          "file" : "lib/Data/Table/Text.pm",
-         "version" : "20210728"
+         "version" : "20210729"
       }
    },
    "release_status" : "stable",
@@ -61,6 +61,6 @@
          "url" : "https://github.com/philiprbrenan/DataTableText"
       }
    },
-   "version" : "20210728",
+   "version" : "20210729",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

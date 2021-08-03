@@ -16,7 +16,7 @@ if( $Config{ccname} eq "gcc" ) {
 my $build = Module::Build->new(
    module_name => 'Object::Pad::SlotAttr::Trigger',
    requires => {
-      'Object::Pad' => '0.47',
+      'Object::Pad' => '0.48',
    },
    test_requires => {
       'Test::More' => '0.88', # done_testing

@@ -3,11 +3,12 @@ Changes
 include/object_pad.h
 lib/Object/Pad/SlotAttr/Final.pm
 lib/Object/Pad/SlotAttr/Final.xs
+LICENSE
 MANIFEST			This list of files
+META.json
+META.yml
+README
 t/00use.t
 t/01final.t
+t/02writer.t
 t/99pod.t
-README
-LICENSE
-META.yml
-META.json

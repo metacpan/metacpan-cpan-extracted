@@ -1,5 +1,11 @@
 Revision history for JSON-Schema-Tiny
 
+0.008     2021-08-03 03:50:09Z
+          - better handling of blessed data types and other references
+          - support for specification versions draft7 and draft2020-12,
+            through the "$schema" keyword and the new $SPECIFICATION_VERSION
+            variable
+
 0.007     2021-07-22 05:20:31Z
           - add incomplete prereq declaration for Mojo::URL
           - skip acceptance test for integer overflow when nvsize is too

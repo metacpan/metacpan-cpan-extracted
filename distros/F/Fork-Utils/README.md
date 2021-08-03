@@ -1,8 +1,9 @@
+
 # perl_fork_utils
 
 ### NAME
 
-    Fork::Utils - set of usefull methods to work with processes and signals
+    Fork::Utils - set of usefull methods to work with processes and signals on Linux platform
 
 ### SYNOPSIS
 
@@ -118,3 +119,6 @@
 
 ### AUTHOR
     Chernenko Dmitiry cdn@cpan.org
+
+### LICENSE
+    This program is free software; you can redistribute it and/or modify it under the terms of the the Artistic License (2.0).

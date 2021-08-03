@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary::Validation;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Validation vocabulary
 
-our $VERSION = '0.514';
+our $VERSION = '0.515';
 
 use 5.016;
 no if "$]" >= 5.031009, feature => 'indirect';
@@ -23,6 +23,7 @@ sub vocabulary {
   my ($self, $spec_version) = @_;
   return
       $spec_version eq 'draft2019-09' ? 'https://json-schema.org/draft/2019-09/vocab/validation'
+    : $spec_version eq 'draft2020-12' ? 'https://json-schema.org/draft/2020-12/vocab/validation'
     : undef;
 }
 
@@ -55,19 +56,23 @@ sub _traverse_keyword_type {
     return E($state, 'unrecognized type "%s"', $schema->{type}//'<null>')
       if not any { ($schema->{type}//'') eq $_ } qw(null boolean object array string number integer);
   }
+  return 1;
 }
 
 sub _eval_keyword_type {
   my ($self, $data, $schema, $state) = @_;
 
   if (is_plain_arrayref($schema->{type})) {
+    # return 1 if any { is_type($_, $data) } @{$schema->{type}};
     foreach my $type (@{$schema->{type}}) {
-      return 1 if is_type($type, $data);
+      return 1 if is_type($type, $data)
+        or ($type eq 'boolean' and $state->{scalarref_booleans} and is_type('reference to SCALAR', $data));
     }
     return E($state, 'wrong type (expected one of %s)', join(', ', @{$schema->{type}}));
   }
   else {
-    return 1 if is_type($schema->{type}, $data);
+    return 1 if is_type($schema->{type}, $data)
+      or ($schema->{type} eq 'boolean' and $state->{scalarref_booleans} and is_type('reference to SCALAR', $data));
     return E($state, 'wrong type (expected %s)', $schema->{type});
   }
 }
@@ -76,23 +81,28 @@ sub _traverse_keyword_enum {
   my ($self, $schema, $state) = @_;
   return if not assert_keyword_type($state, $schema, 'array');
   return E($state, '"enum" values are not unique') if not is_elements_unique($schema->{enum});
+  return 1;
 }
 
 sub _eval_keyword_enum {
   my ($self, $data, $schema, $state) = @_;
 
   my @s; my $idx = 0;
-  return 1 if any { is_equal($data, $_, $s[$idx++] = {}) } @{$schema->{enum}};
+  my %s = ( scalarref_booleans => $state->{scalarref_booleans} );
+  return 1 if any { is_equal($data, $_, $s[$idx++] = {%s}) } @{$schema->{enum}};
 
   return E($state, 'value does not match'
     .(!(grep $_->{path}, @s) ? ''
       : ' (differences start '.join(', ', map 'from item #'.$_.' at "'.$s[$_]->{path}.'"', 0..$#s).')'));
 }
 
+sub _traverse_keyword_const { 1 }
+
 sub _eval_keyword_const {
   my ($self, $data, $schema, $state) = @_;
 
-  return 1 if is_equal($data, $schema->{const}, my $s = {});
+  my %s = ( scalarref_booleans => $state->{scalarref_booleans} );
+  return 1 if is_equal($data, $schema->{const}, my $s = { scalarref_booleans => $state->{scalarref_booleans} });
   return E($state, 'value does not match'
     .($s->{path} ? ' (differences start at "'.$s->{path}.'")' : ''));
 }
@@ -101,6 +111,7 @@ sub _traverse_keyword_multipleOf {
   my ($self, $schema, $state) = @_;
   return if not assert_keyword_type($state, $schema, 'number');
   return E($state, 'multipleOf value is not a positive number') if $schema->{multipleOf} <= 0;
+  return 1;
 }
 
 sub _eval_keyword_multipleOf {
@@ -175,8 +186,9 @@ sub _eval_keyword_minLength {
 
 sub _traverse_keyword_pattern {
   my ($self, $schema, $state) = @_;
-  return if not assert_keyword_type($state, $schema, 'string');
-  assert_pattern($state, $schema->{pattern});
+  return if not assert_keyword_type($state, $schema, 'string')
+    or not assert_pattern($state, $schema->{pattern});
+  return 1;
 }
 
 sub _eval_keyword_pattern {
@@ -211,6 +223,7 @@ sub _eval_keyword_minItems {
 sub _traverse_keyword_uniqueItems {
   my ($self, $schema, $state) = @_;
   return if not assert_keyword_type($state, $schema, 'boolean');
+  return 1;
 }
 
 sub _eval_keyword_uniqueItems {
@@ -280,6 +293,7 @@ sub _traverse_keyword_required {
   return E($state, '"required" element is not a string')
     if any { !is_type('string', $_) } @{$schema->{required}};
   return E($state, '"required" values are not unique') if not is_elements_unique($schema->{required});
+  return 1;
 }
 
 sub _eval_keyword_required {
@@ -297,18 +311,20 @@ sub _traverse_keyword_dependentRequired {
 
   return if not assert_keyword_type($state, $schema, 'object');
 
+  my $valid = 1;
   foreach my $property (sort keys %{$schema->{dependentRequired}}) {
-    E({ %$state, _schema_path_suffix => $property }, 'dependentRequired value is not an array'), next
+    $valid = E({ %$state, _schema_path_suffix => $property }, 'dependentRequired value is not an array'), next
       if not is_type('array', $schema->{dependentRequired}{$property});
 
     foreach my $index (0..$#{$schema->{dependentRequired}{$property}}) {
-      E({ %$state, _schema_path_suffix => $property }, 'element #%d is not a string', $index)
+      $valid = E({ %$state, _schema_path_suffix => $property }, 'element #%d is not a string', $index)
         if not is_type('string', $schema->{dependentRequired}{$property}[$index]);
     }
 
-    E({ %$state, _schema_path_suffix => $property }, 'elements are not unique')
+    $valid = E({ %$state, _schema_path_suffix => $property }, 'elements are not unique')
       if not is_elements_unique($schema->{dependentRequired}{$property});
   }
+  return $valid;
 }
 
 sub _eval_keyword_dependentRequired {
@@ -333,6 +349,7 @@ sub _eval_keyword_dependentRequired {
 sub _assert_number {
   my ($self, $schema, $state) = @_;
   return if not assert_keyword_type($state, $schema, 'number');
+  return 1;
 }
 
 sub _assert_non_negative_integer {
@@ -340,6 +357,7 @@ sub _assert_non_negative_integer {
   return if not assert_keyword_type($state, $schema, 'integer');
   return E($state, '%s value is not a non-negative integer', $state->{keyword})
     if $schema->{$state->{keyword}} < 0;
+  return 1;
 }
 
 1;
@@ -356,7 +374,7 @@ JSON::Schema::Modern::Vocabulary::Validation - Implementation of the JSON Schema
 
 =head1 VERSION
 
-version 0.514
+version 0.515
 
 =head1 DESCRIPTION
 
@@ -364,13 +382,23 @@ version 0.514
 
 =for stopwords metaschema
 
-Implementation of the JSON Schema Draft 2019-09 "Validation" vocabulary, indicated in metaschemas
-with the URI C<https://json-schema.org/draft/2019-09/vocab/validation> and formally specified in
-L<https://datatracker.ietf.org/doc/html/draft-handrews-json-schema-validation-02#section-6>.
+Implementation of the JSON Schema Draft 2020-12 "Validation" vocabulary, indicated in metaschemas
+with the URI C<https://json-schema.org/draft/2020-12/vocab/validation> and formally specified in
+L<https://datatracker.ietf.org/doc/html/draft-bhutton-json-schema-validation-00#section-6>.
 
-Support is also provided for the equivalent Draft 7 keywords that correspond to this vocabulary and
-are formally specified in
-L<https://datatracker.ietf.org/doc/html/draft-handrews-json-schema-validation-01#section-6>.
+Support is also provided for
+
+=over 4
+
+=item *
+
+the equivalent Draft 2019-09 keywords, indicated in metaschemas with the URI C<https://json-schema.org/draft/2019-09/vocab/validation> and formally specified in L<https://datatracker.ietf.org/doc/html/draft-handrews-json-schema-validation-02#section-6>.
+
+=item *
+
+the equivalent Draft 7 keywords that correspond to this vocabulary and are formally specified in L<https://datatracker.ietf.org/doc/html/draft-handrews-json-schema-validation-01#section-6>.
+
+=back
 
 =head1 SUPPORT
 

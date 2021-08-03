@@ -8,7 +8,7 @@
 #include "perl-additions.c.inc"
 
 /* Empty MGVTBL simply for locating instance slots AV */
-MGVTBL vtbl_slotsav = {};
+static MGVTBL vtbl_slotsav = {};
 
 SV *ObjectPad_obj_get_slotsav(pTHX_ SV *self, enum ReprType repr, bool create)
 {
@@ -87,6 +87,9 @@ SV *ObjectPad_obj_get_slotsav(pTHX_ SV *self, enum ReprType repr, bool create)
 #define embed_cv(cv, embedding)  S_embed_cv(aTHX_ cv, embedding)
 static CV *S_embed_cv(pTHX_ CV *cv, RoleEmbedding *embedding)
 {
+  assert(cv);
+  assert(CvOUTSIDE(cv));
+
   CV *embedded_cv = cv_clone(cv);
   SV *embeddingsv = embedding->embeddingsv;
 
@@ -358,6 +361,19 @@ static void S_generate_initslots_method(pTHX_ ClassMeta *meta)
 
   ENTER;
 
+  if(!PL_compcv) {
+    /* We require the initslots CV to have a CvOUTSIDE, or else cv_clone()
+     * will segv when we compose role slots. Any class dynamically generated
+     * by string eval() will likely not get one, because it won't inherit a
+     * PL_compcv here. We'll fake it up
+     *   See also  https://rt.cpan.org/Ticket/Display.html?id=137952
+     */
+    SAVEVPTR(PL_compcv);
+    PL_compcv = find_runcv(0);
+
+    assert(PL_compcv);
+  }
+
   I32 floor_ix = start_subparse(FALSE, 0);
   SAVEFREESV(PL_compcv);
 
@@ -383,7 +399,8 @@ static void S_generate_initslots_method(pTHX_ ClassMeta *meta)
 
   ops = op_append_list(OP_LINESEQ, ops,
     newMETHSTARTOP(OPf_MOD |
-      (meta->type == METATYPE_ROLE ? OPf_SPECIAL : 0), repr)
+      (meta->type == METATYPE_ROLE ? OPf_SPECIAL : 0) |
+      (repr << 8))
   );
 
   /* TODO: Icky horrible implementation; if our slotoffset > 0 then
@@ -439,7 +456,12 @@ static void S_generate_initslots_method(pTHX_ ClassMeta *meta)
       switch(sigil) {
         case '$':
           /* push ..., $defaultsv */
-          op = ObjectPad_newSVOP(slotmeta->defaultsv ? slotmeta->defaultsv : &PL_sv_undef);
+
+          /* An OP_CONST whose op_type is OP_CUSTOM.
+           * This way we avoid the opchecker and finalizer doing bad things to
+           * our defaultsv SV by setting it SvREADONLY_on().
+           */
+          op = newSVOP_CUSTOM(PL_ppaddr[OP_CONST], 0, slotmeta->defaultsv ? slotmeta->defaultsv : &PL_sv_undef);
           break;
         case '@':
           /* push ..., [] */
@@ -513,6 +535,9 @@ static void S_generate_initslots_method(pTHX_ ClassMeta *meta)
 
   meta->initslots = newATTRSUB(floor_ix, NULL, NULL, NULL, ops);
 
+  assert(meta->initslots);
+  assert(CvOUTSIDE(meta->initslots));
+
   LEAVE;
 }
 
@@ -573,6 +598,46 @@ void ObjectPad_mop_class_seal(pTHX_ ClassMeta *meta)
   if(meta->strict_params && meta->buildblocks)
     croak("Class %" SVf " cannot be :strict(params) because it has BUILD blocks",
       SVfARG(meta->name));
+
+  {
+    U32 slotix;
+    for(slotix = 0; slotix < av_count(meta->slots); slotix++) {
+      SlotMeta *slotmeta = (SlotMeta *)AvARRAY(meta->slots)[slotix];
+
+      U32 hooki;
+      for(hooki = 0; slotmeta->hooks && hooki < av_count(slotmeta->hooks); hooki++) {
+        struct SlotHook *h = (struct SlotHook *)AvARRAY(slotmeta->hooks)[hooki];
+
+        if(*h->funcs->post_initslot) {
+          if(!meta->slothooks_postslots)
+            meta->slothooks_postslots = newAV();
+
+          struct SlotHook *fasth;
+          Newx(fasth, 1, struct SlotHook);
+
+          fasth->slotix   = slotix;
+          fasth->funcs    = h->funcs;
+          fasth->hookdata = h->hookdata;
+
+          av_push(meta->slothooks_postslots, (SV *)fasth);
+        }
+
+        if(*h->funcs->post_construct) {
+          if(!meta->slothooks_construct)
+            meta->slothooks_construct = newAV();
+
+          struct SlotHook *fasth;
+          Newx(fasth, 1, struct SlotHook);
+
+          fasth->slotix   = slotix;
+          fasth->funcs    = h->funcs;
+          fasth->hookdata = h->hookdata;
+
+          av_push(meta->slothooks_construct, (SV *)fasth);
+        }
+      }
+    }
+  }
 
   S_generate_initslots_method(aTHX_ meta);
 
@@ -763,6 +828,34 @@ XS_INTERNAL(injected_constructor)
   AV *slotsav = (AV *)get_obj_slotsav(self, meta->repr, 0);
   SV **slotsv = AvARRAY(slotsav);
 
+  if(meta->slothooks_postslots || meta->slothooks_construct) {
+    /* We need to set up a fake pad so these hooks can still get PADIX_SELF / PADIX_SLOTS */
+
+    /* This MVP is just sufficient enough to let PAD_SVl(PADIX_SELF) work */
+    SAVEVPTR(PL_curpad);
+    Newx(PL_curpad, 3, SV *);
+    SAVEFREEPV(PL_curpad);
+
+    PAD_SVl(PADIX_SELF)  = self;
+    PAD_SVl(PADIX_SLOTS) = (SV *)slotsav;
+  }
+
+  if(meta->slothooks_postslots) {
+    CopLINE_set(PL_curcop, __LINE__);
+
+    AV *slothooks = meta->slothooks_postslots;
+    AV *slots     = meta->slots;
+
+    U32 i;
+    for(i = 0; i < av_count(slothooks); i++) {
+      struct SlotHook *h = (struct SlotHook *)AvARRAY(slothooks)[i];
+      SLOTOFFSET slotix = h->slotix;
+      struct SlotMeta *slotmeta = (struct SlotMeta *)AvARRAY(slots)[slotix];
+
+      (*h->funcs->post_initslot)(aTHX_ slotmeta, h->hookdata, slotsv[slotix]);
+    }
+  }
+
   if(meta->parammap) {
     /* Assign params from parammap */
     CopLINE_set(PL_curcop, __LINE__);
@@ -797,7 +890,7 @@ XS_INTERNAL(injected_constructor)
 
       SV *slot = slotsv[slotix];
 
-      sv_setsv(slot, value);
+      sv_setsv_mg(slot, value);
       missingvec[slotix / 8] &= ~(1 << (slotix % 8));
     }
 
@@ -888,14 +981,19 @@ XS_INTERNAL(injected_constructor)
     }
   }
 
-  /* TODO: This is going to be slooooow
-   * At class seal time we should generate a shortlist of post_initslot hooks */
-  {
-    U32 slotix;
-    for(slotix = 0; slotix < av_count(meta->slots); slotix++) {
-      SlotMeta *slotmeta = (SlotMeta *)AvARRAY(meta->slots)[slotix];
+  if(meta->slothooks_construct) {
+    CopLINE_set(PL_curcop, __LINE__);
 
-      MOP_SLOT_RUN_HOOKS(slotmeta, post_initslot, slotsv[slotix]);
+    AV *slothooks = meta->slothooks_construct;
+    AV *slots     = meta->slots;
+
+    U32 i;
+    for(i = 0; i < av_count(slothooks); i++) {
+      struct SlotHook *h = (struct SlotHook *)AvARRAY(slothooks)[i];
+      SLOTOFFSET slotix = h->slotix;
+      struct SlotMeta *slotmeta = (struct SlotMeta *)AvARRAY(slots)[slotix];
+
+      (*h->funcs->post_construct)(aTHX_ slotmeta, h->hookdata, slotsv[slotix]);
     }
   }
 
@@ -1003,6 +1101,9 @@ ClassMeta *ObjectPad_mop_create_class(pTHX_ enum MetaType type, SV *name, SV *su
   meta->adjustblocks = NULL;
   meta->initslots = NULL;
 
+  meta->slothooks_postslots = NULL;
+  meta->slothooks_construct = NULL;
+
   if(!PL_parser) {
     /* We need to generate just enough of a PL_parser to keep newSTATEOP()
      * happy, otherwise it will SIGSEGV (RT133258)
@@ -1027,7 +1128,7 @@ ClassMeta *ObjectPad_mop_create_class(pTHX_ enum MetaType type, SV *name, SV *su
     SV *isaname = newSVpvf("%" SVf "::ISA", name);
     SAVEFREESV(isaname);
 
-    isa = get_av(SvPV_nolen(isaname), GV_ADD | (SvUTF8(name) ? SVf_UTF8 : 0));
+    isa = get_av(SvPV_nolen(isaname), GV_ADD | (SvFLAGS(isaname) & SVf_UTF8));
   }
 
   if(superclassname && SvOK(superclassname)) {
@@ -1119,14 +1220,14 @@ ClassMeta *ObjectPad_mop_create_class(pTHX_ enum MetaType type, SV *name, SV *su
     SV *newname = newSVpvf("%" SVf "::new", name);
     SAVEFREESV(newname);
 
-    CV *newcv = newXS(SvPV_nolen(newname), injected_constructor, __FILE__);
+    CV *newcv = newXS_flags(SvPV_nolen(newname), injected_constructor, __FILE__, NULL, SvFLAGS(newname) & SVf_UTF8);
     CvXSUBANY(newcv).any_ptr = meta;
   }
 
   {
     SV *doesname = newSVpvf("%" SVf "::DOES", name);
     SAVEFREESV(doesname);
-    CV *doescv = newXS(SvPV_nolen(doesname), injected_DOES, __FILE__);
+    CV *doescv = newXS_flags(SvPV_nolen(doesname), injected_DOES, __FILE__, NULL, SvFLAGS(doesname) & SVf_UTF8);
     CvXSUBANY(doescv).any_ptr = meta;
   }
 

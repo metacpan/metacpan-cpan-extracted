@@ -64,6 +64,7 @@ WriteMakefile(
   },
 
   TEST_REQUIRES => {
+    'Data::Dumper'      => '0',
     'ExtUtils::testlib' => '0',
     'Test2'             => '1.302125',
     'Test2::Suite'      => '0.000100',

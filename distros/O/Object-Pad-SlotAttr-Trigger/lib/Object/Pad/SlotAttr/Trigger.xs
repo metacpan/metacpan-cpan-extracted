@@ -30,10 +30,20 @@ static void trigger_gen_accessor_ops(pTHX_ SlotMeta *slotmeta, SV *hookdata, enu
   return;
 }
 
+static void trigger_seal(pTHX_ SlotMeta *slotmeta, SV *hookdata, int __dummy)
+{
+  if(mop_slot_get_attribute(slotmeta, "writer"))
+    return;
+
+  warn("Applying :Trigger attribute to slot %" SVf " is not useful without a :writer",
+    SVfARG(slotmeta->name));
+}
+
 static const struct SlotHookFuncs trigger_hooks = {
   .flags = OBJECTPAD_FLAG_ATTR_MUST_VALUE,
   .permit_hintkey = "Object::Pad::SlotAttr::Trigger/Trigger",
 
+  .seal_slot        = &trigger_seal,
   .gen_accessor_ops = &trigger_gen_accessor_ops,
 };
 

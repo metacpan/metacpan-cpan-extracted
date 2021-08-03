@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Base role for JSON Schema vocabulary classes
 
-our $VERSION = '0.514';
+our $VERSION = '0.515';
 
 use 5.016;
 no if "$]" >= 5.031009, feature => 'indirect';
@@ -35,10 +35,12 @@ sub traverse_array_schemas {
   return if not assert_keyword_type($state, $schema, 'array');
   return E($state, '%s array is empty', $state->{keyword}) if not @{$schema->{$state->{keyword}}};
 
+  my $valid = 1;
   foreach my $idx (0 .. $#{$schema->{$state->{keyword}}}) {
-    $state->{evaluator}->_traverse_subschema($schema->{$state->{keyword}}[$idx],
+    $valid = 0 if not $state->{evaluator}->_traverse_subschema($schema->{$state->{keyword}}[$idx],
       +{ %$state, schema_path => $state->{schema_path}.'/'.$state->{keyword}.'/'.$idx });
   }
+  return $valid;
 }
 
 sub traverse_object_schemas {
@@ -46,10 +48,12 @@ sub traverse_object_schemas {
 
   return if not assert_keyword_type($state, $schema, 'object');
 
+  my $valid = 1;
   foreach my $property (sort keys %{$schema->{$state->{keyword}}}) {
-    $state->{evaluator}->_traverse_subschema($schema->{$state->{keyword}}{$property},
+    $valid = 0 if not $state->{evaluator}->_traverse_subschema($schema->{$state->{keyword}}{$property},
       +{ %$state, schema_path => jsonp($state->{schema_path}, $state->{keyword}, $property) });
   }
+  return $valid;
 }
 
 sub traverse_property_schema {
@@ -80,7 +84,7 @@ JSON::Schema::Modern::Vocabulary - Base role for JSON Schema vocabulary classes
 
 =head1 VERSION
 
-version 0.514
+version 0.515
 
 =head1 SYNOPSIS
 

@@ -297,6 +297,12 @@ set_thread_enable (pTHX_ void *arg)
   thread_enable = PTR2IV (arg);
 }
 
+static void
+atfork_child (void)
+{
+  s_epipe_renew (&ep);
+}
+
 MODULE = Coro::Multicore		PACKAGE = Coro::Multicore
 
 PROTOTYPES: DISABLE
@@ -314,6 +320,8 @@ BOOT:
 
         if (s_epipe_new (&ep))
           croak ("Coro::Multicore: unable to initialise event pipe.\n");
+
+        pthread_atfork (0, 0, atfork_child);
 
         perl_thx = PERL_GET_CONTEXT;
 

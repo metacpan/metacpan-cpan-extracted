@@ -1,5 +1,8 @@
 Revision history for Perl module Text::PO
 
+0.1.6 2021-08-03T11:58:28+0900
+    - Corrected test units
+
 v0.1.5 2021-08-02T09:46:24+0900
     - Corrected test units
 

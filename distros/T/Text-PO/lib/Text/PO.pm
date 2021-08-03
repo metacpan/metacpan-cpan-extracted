@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## PO Files Manipulation - ~/lib/Text/PO.pm
-## Version v0.1.5
+## Version v0.1.6
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2018/06/21
-## Modified 2021/08/02
+## Modified 2021/08/03
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -26,7 +26,7 @@ BEGIN
     use Nice::Try;
     use Scalar::Util;
     use Text::PO::Element;
-    our $VERSION = 'v0.1.5';
+    our $VERSION = 'v0.1.6';
 };
 
 INIT
@@ -1371,7 +1371,7 @@ Text::PO - Read and write PO files
 
 =head1 VERSION
 
-    v0.1.5
+    v0.1.6
 
 =head1 DESCRIPTION
 

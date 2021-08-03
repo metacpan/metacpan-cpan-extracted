@@ -15,6 +15,8 @@ my $build = Module::Build->new(
         'Test::More' => 0,
     },
     requires       => {
+        'perl'  => 5.012001,
+        'POSIX' => 0,
     },
     needs_compiler => 0,
     meta_merge     => {

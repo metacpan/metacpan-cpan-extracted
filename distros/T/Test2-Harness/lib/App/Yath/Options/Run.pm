@@ -2,7 +2,7 @@ package App::Yath::Options::Run;
 use strict;
 use warnings;
 
-our $VERSION = '1.000063';
+our $VERSION = '1.000064';
 
 use Test2::Harness::Util::UUID qw/gen_uuid/;
 
@@ -51,11 +51,6 @@ option_group {prefix => 'run', category => "Run Options", builds => 'Test2::Harn
     option dbi_profiling => (
         type => 'b',
         description => "Use Test2::Plugin::DBIProfile to collect database profiling data",
-    );
-
-    option cover_files => (
-        type => 'b',
-        description => "Use Test2::Plugin::Cover to collect coverage data for what files are touched by what tests. Unlike Devel::Cover this has very little performance impact (About 4% difference)",
     );
 
     option author_testing => (
@@ -155,12 +150,6 @@ sub post_process {
 
     $settings->run->env_vars->{AUTHOR_TESTING} = 1 if $settings->run->author_testing;
 
-    if ($settings->run->cover_files) {
-        eval { require Test2::Plugin::Cover; 1 } or die "Could not enable file coverage, could not load 'Test2::Plugin::Cover': $@";
-        push @{$settings->run->load_import->{'@'}} => 'Test2::Plugin::Cover';
-        $settings->run->load_import->{'Test2::Plugin::Cover'} = [];
-    }
-
     if ($settings->run->dbi_profiling) {
         eval { require Test2::Plugin::DBIProfile; 1 } or die "Could not enable DBI profiling, could not load 'Test2::Plugin::DBIProfile': $@";
         push @{$settings->run->load_import->{'@'}} => 'Test2::Plugin::DBIProfile';
@@ -222,13 +211,6 @@ This is where command lines options for a single test run are defined.
 =item --no-author-testing
 
 This will set the AUTHOR_TESTING environment to true
-
-
-=item --cover-files
-
-=item --no-cover-files
-
-Use Test2::Plugin::Cover to collect coverage data for what files are touched by what tests. Unlike Devel::Cover this has very little performance impact (About 4% difference)
 
 
 =item --dbi-profiling

@@ -17,10 +17,10 @@ name: Object-Pad-SlotAttr-Trigger
 provides:
   Object::Pad::SlotAttr::Trigger:
     file: lib/Object/Pad/SlotAttr/Trigger.pm
-    version: '0.01'
+    version: '0.02'
 requires:
-  Object::Pad: '0.47'
+  Object::Pad: '0.48'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.01'
+version: '0.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

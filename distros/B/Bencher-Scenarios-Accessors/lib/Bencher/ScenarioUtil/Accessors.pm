@@ -1,7 +1,9 @@
 package Bencher::ScenarioUtil::Accessors;
 
-our $DATE = '2017-01-25'; # DATE
-our $VERSION = '0.14'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-08-03'; # DATE
+our $DIST = 'Bencher-Scenarios-Accessors'; # DIST
+our $VERSION = '0.150'; # VERSION
 
 our %classes = (
     # manual
@@ -28,6 +30,8 @@ our %classes = (
     # Class::Accessors and variants
     'Perl::Examples::Accessors::ClassAccessor'        => {backend=>'hash'  , immutable=>0, generator=>'Class::Accessor'},
     'Perl::Examples::Accessors::ClassAccessorArray'   => {backend=>'array' , immutable=>0, generator=>'Class::Accessor::Array'},
+    'Perl::Examples::Accessors::ClassAccessorPackedString'    => {backend=>'scalar' , immutable=>0, generator=>'Class::Accessor::PackedString'},
+    'Perl::Examples::Accessors::ClassAccessorPackedStringSet' => {backend=>'scalar' , immutable=>0, generator=>'Class::Accessor::PackedString::Set'},
     'Perl::Examples::Accessors::ClassInsideOut'       => {backend=>'hash'  , immutable=>0, generator=>'Class::InsideOut', name=>'Class::InsideOut'},
     #'Perl::Examples::Accessors::ClassAccessorArrayGlob' => {backend=>'array' , immutable=>0, generator=>'Class::Accessor::Array::Glob'},
     #'Perl::Examples::Accessors::ClassBuildArrayGlob'  => {backend=>'array'  , immutable=>0, generator=>'Class::Build::Array::Glob'},
@@ -45,8 +49,11 @@ our %classes = (
     'Perl::Examples::Accessors::ObjectTinyRW'         => {backend=>'hash'  , immutable=>0, generator=>'Object::Tiny::RW'},
     'Perl::Examples::Accessors::ObjectTinyRWXS'       => {backend=>'hash'  , immutable=>0, generator=>'Object::Tiny::RW::XS'},
 
+    # Object::Pad
+    'Perl::Examples::Accessors::ObjectPad'            => {backend=>'hash'  , immutable=>0, generator=>'Object::Pad', supports_setters=>1, setter_name=>"set_attr1"},
+
     # others
-    'Perl::Examples::Accessors::EvoClass'             => {backend=>'hash'  , immutable=>0, generator=>'Evo::Class'},
+    #'Perl::Examples::Accessors::EvoClass'             => {backend=>'hash'  , immutable=>0, generator=>'Evo::Class'}, # removed 2021-08-03 in Perl-Examples-Accessors due to non-working code
 
 );
 
@@ -69,7 +76,7 @@ Bencher::ScenarioUtil::Accessors - Utility routines
 
 =head1 VERSION
 
-This document describes version 0.14 of Bencher::ScenarioUtil::Accessors (from Perl distribution Bencher-Scenarios-Accessors), released on 2017-01-25.
+This document describes version 0.150 of Bencher::ScenarioUtil::Accessors (from Perl distribution Bencher-Scenarios-Accessors), released on 2021-08-03.
 
 =head1 HOMEPAGE
 
@@ -93,7 +100,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

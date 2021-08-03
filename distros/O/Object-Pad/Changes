@@ -1,5 +1,19 @@
 Revision history for Object-Pad
 
+0.48    2021-08-02
+        [CHANGES]
+         * Added features to slothooks:
+            + New hooks `.seal_slot` and `.post_construct`
+            + `.post_initslot` now runs earlier before `:param`
+            + Added a MOP function to query slot attributes
+            + Set a minimal pad during construction-time slot hooks
+         * Ensure that `:param` logic in constructor invokes setmagic
+
+        [BUGFIXES]
+         * Fixed many classes of UTF-8 bug on class/slot/method names
+           (RT138073)
+         * Fixed segfault caused by runtime generation of roles (RT137952)
+
 0.47    2021-07-29
         [CHANGES]
          * Large internal rewrites

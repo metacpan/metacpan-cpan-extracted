@@ -18,14 +18,13 @@ SlotMeta *ObjectPad_mop_create_slot(pTHX_ SV *slotname, ClassMeta *classmeta)
   slotmeta->class = classmeta;
   slotmeta->slotix = classmeta->next_slotix;
   slotmeta->defaultsv = NULL;
-  slotmeta->readername = slotmeta->writername = slotmeta->mutatorname = NULL;
 
   slotmeta->hooks = NULL;
 
   return slotmeta;
 }
 
-void ObjectPad_mop_slot_set_param(pTHX_ SlotMeta *slotmeta, const char *paramname)
+void ObjectPad_mop_slot_set_param(pTHX_ SlotMeta *slotmeta, SV *paramname)
 {
   ClassMeta *classmeta = slotmeta->class;
 
@@ -34,25 +33,24 @@ void ObjectPad_mop_slot_set_param(pTHX_ SlotMeta *slotmeta, const char *paramnam
 
   HV *parammap = classmeta->parammap;
 
-  I32 klen = strlen(paramname);
-  SV **svp;
-  if((svp = hv_fetch(parammap, paramname, klen, 0))) {
-    SlotMeta *colliding_slotmeta = *((SlotMeta **)svp);
+  HE *he;
+  if((he = hv_fetch_ent(parammap, paramname, 0, 0))) {
+    SlotMeta *colliding_slotmeta = (SlotMeta *)HeVAL(he);
     if(colliding_slotmeta->class != classmeta)
-      croak("Already have a named constructor parameter called '%s' inherited from %" SVf,
-        paramname, SVfARG(colliding_slotmeta->class->name));
+      croak("Already have a named constructor parameter called '%" SVf "' inherited from %" SVf,
+        SVfARG(paramname), SVfARG(colliding_slotmeta->class->name));
     else
-      croak("Already have a named constructor parameter called '%s'", paramname);
+      croak("Already have a named constructor parameter called '%" SVf "'", SVfARG(paramname));
   }
 
   ParamMeta *parammeta;
   Newx(parammeta, 1, struct ParamMeta);
 
-  parammeta->name = newSVpvn(paramname, klen);
+  parammeta->name = SvREFCNT_inc(paramname);
   parammeta->slot = slotmeta;
   parammeta->slotix = slotmeta->slotix;
 
-  hv_store(parammap, paramname, klen, (SV *)parammeta, 0);
+  hv_store_ent(parammap, paramname, (SV *)parammeta, 0);
 }
 
 typedef struct SlotAttributeRegistration SlotAttributeRegistration;
@@ -127,13 +125,50 @@ void ObjectPad_mop_slot_apply_attribute(pTHX_ SlotMeta *slotmeta, const char *na
   croak("Unrecognised slot attribute :%s", name);
 }
 
+struct SlotHook *ObjectPad_mop_slot_get_attribute(pTHX_ SlotMeta *slotmeta, const char *name)
+{
+  HV *hints = GvHV(PL_hintgv);
+
+  /* First, work out what hookfuncs the name maps to */
+
+  SlotAttributeRegistration *reg;
+  for(reg = slotattrs; reg; reg = reg->next) {
+    if(!strEQ(name, reg->name))
+      continue;
+
+    if(reg->funcs->permit_hintkey &&
+        (!hints || !hv_fetch(hints, reg->funcs->permit_hintkey, reg->permit_hintkeylen, 0)))
+      continue;
+
+    break;
+  }
+
+  if(!reg)
+    return NULL;
+
+  /* Now lets see if slotmeta has one */
+
+  if(!slotmeta->hooks)
+    return NULL;
+
+  U32 hooki;
+  for(hooki = 0; hooki < av_count(slotmeta->hooks); hooki++) {
+    struct SlotHook *hook = (struct SlotHook *)AvARRAY(slotmeta->hooks)[hooki];
+
+    if(hook->funcs == reg->funcs)
+      return hook;
+  }
+
+  return NULL;
+}
+
 /*******************
  * Attribute hooks *
  *******************/
 
 /* :weak */
 
-static void slothook_weak_post_initslot(pTHX_ SlotMeta *slotmeta, SV *_hookdata, SV *slot)
+static void slothook_weak_post_construct(pTHX_ SlotMeta *slotmeta, SV *_hookdata, SV *slot)
 {
   sv_rvweaken(slot);
 }
@@ -156,7 +191,7 @@ static void slothook_weak_gen_accessor(pTHX_ SlotMeta *slotmeta, SV *hookdata, e
 
 static struct SlotHookFuncs slothooks_weak = {
   .flags = OBJECTPAD_FLAG_ATTR_NO_VALUE,
-  .post_initslot = &slothook_weak_post_initslot,
+  .post_construct = &slothook_weak_post_construct,
   .gen_accessor_ops = &slothook_weak_gen_accessor,
 };
 
@@ -169,13 +204,22 @@ static bool slothook_param_apply(pTHX_ SlotMeta *slotmeta, SV *value)
 
   char *paramname = value ? SvPVX(value) : NULL;
 
+  U32 flags = 0;
+  if(value && SvUTF8(value))
+    flags |= SVf_UTF8;
+
   if(!paramname) {
     paramname = SvPVX(slotmeta->name) + 1;
     if(paramname[0] == '_')
       paramname++;
+    if(SvUTF8(slotmeta->name))
+      flags |= SVf_UTF8;
   }
 
-  mop_slot_set_param(slotmeta, paramname);
+  SV *namesv = newSVpvn_flags(paramname, strlen(paramname), flags);
+  SAVEFREESV(namesv);
+
+  mop_slot_set_param(slotmeta, namesv);
 
   return FALSE;
 }
@@ -186,7 +230,7 @@ static struct SlotHookFuncs slothooks_param = {
 
 /* :reader */
 
-static SV *make_accessor_mnamesv(pTHX_ SlotMeta *slotmeta, const char *mname, const char *fmt)
+static SV *make_accessor_mnamesv(pTHX_ SlotMeta *slotmeta, SV *mname, const char *fmt)
 {
   if(SvPVX(slotmeta->name)[0] != '$')
     /* TODO: A reader for an array or hash slot should also be fine */
@@ -196,21 +240,83 @@ static SV *make_accessor_mnamesv(pTHX_ SlotMeta *slotmeta, const char *mname, co
     croak("Invalid accessor method name");
     */
 
-  if(mname)
-    return newSVpv(mname, 0);
+  if(mname && SvPOK(mname))
+    return SvREFCNT_inc(mname);
 
+  const char *pv;
   if(SvPVX(slotmeta->name)[1] == '_')
-    mname = SvPVX(slotmeta->name) + 2;
+    pv = SvPVX(slotmeta->name) + 2;
   else
-    mname = SvPVX(slotmeta->name) + 1;
+    pv = SvPVX(slotmeta->name) + 1;
 
-  return newSVpvf(fmt, mname);
+  mname = newSVpvf(fmt, pv);
+  if(SvUTF8(slotmeta->name))
+    SvUTF8_on(mname);
+  return mname;
 }
 
-static bool slothook_reader_apply(pTHX_ SlotMeta *slotmeta, SV *value)
+static void S_generate_slot_accessor_method(pTHX_ SlotMeta *slotmeta, SV *mname, int type)
 {
-  slotmeta->readername = make_accessor_mnamesv(aTHX_ slotmeta, value ? SvPVX(value) : NULL, "%s");
-  return FALSE;
+  ENTER;
+
+  ClassMeta *classmeta = slotmeta->class;
+
+  SV *mname_fq = newSVpvf("%" SVf "::%" SVf, classmeta->name, mname);
+
+  I32 floor_ix = start_subparse(FALSE, 0);
+  SAVEFREESV(PL_compcv);
+
+  I32 save_ix = block_start(TRUE);
+
+  extend_pad_vars(classmeta);
+
+  struct AccessorGenerationCtx ctx = { 0 };
+
+  ctx.padix = pad_add_name_sv(slotmeta->name, 0, NULL, NULL);
+  intro_my();
+
+  OP *ops = op_append_list(OP_LINESEQ, NULL,
+    newSTATEOP(0, NULL, NULL));
+  ops = op_append_list(OP_LINESEQ, ops,
+    newMETHSTARTOP(0 |
+      (classmeta->type == METATYPE_ROLE ? OPf_SPECIAL : 0) |
+      (classmeta->repr << 8)));
+
+  ops = op_append_list(OP_LINESEQ, ops,
+    make_argcheck_ops((type == ACCESSOR_WRITER) ? 1 : 0, 0, 0, mname_fq));
+
+  ops = op_append_list(OP_LINESEQ, ops,
+    newSLOTPADOP(OPpSLOTPAD_SV << 8, ctx.padix, slotmeta->slotix));
+
+  MOP_SLOT_RUN_HOOKS(slotmeta, gen_accessor_ops, type, &ctx);
+
+  if(ctx.bodyop)
+    ops = op_append_list(OP_LINESEQ, ops, ctx.bodyop);
+
+  if(ctx.post_bodyops)
+    ops = op_append_list(OP_LINESEQ, ops, ctx.post_bodyops);
+
+  if(!ctx.retop)
+    croak("Require ctx.retop");
+  ops = op_append_list(OP_LINESEQ, ops, ctx.retop);
+
+  SvREFCNT_inc(PL_compcv);
+  ops = block_end(save_ix, ops);
+
+  CV *cv = newATTRSUB(floor_ix, newSVOP(OP_CONST, 0, mname_fq), NULL, NULL, ops);
+  CvMETHOD_on(cv);
+
+  mop_class_add_method(classmeta, mname);
+
+  LEAVE;
+}
+
+static void slothook_reader_seal(pTHX_ SlotMeta *slotmeta, SV *hookdata, int __dummy)
+{
+  SV *mname = make_accessor_mnamesv(aTHX_ slotmeta, hookdata, "%s");
+  SAVEFREESV(mname);
+
+  S_generate_slot_accessor_method(aTHX_ slotmeta, mname, ACCESSOR_READER);
 }
 
 static void slothook_gen_reader_ops(pTHX_ SlotMeta *slotmeta, SV *hookdata, enum AccessorType type, struct AccessorGenerationCtx *ctx)
@@ -224,16 +330,18 @@ static void slothook_gen_reader_ops(pTHX_ SlotMeta *slotmeta, SV *hookdata, enum
 }
 
 static struct SlotHookFuncs slothooks_reader = {
-  .apply = &slothook_reader_apply,
+  .seal_slot = &slothook_reader_seal,
   .gen_accessor_ops = &slothook_gen_reader_ops,
 };
 
 /* :writer */
 
-static bool slothook_writer_apply(pTHX_ SlotMeta *slotmeta, SV *value)
+static void slothook_writer_seal(pTHX_ SlotMeta *slotmeta, SV *hookdata, int __dummy)
 {
-  slotmeta->writername = make_accessor_mnamesv(aTHX_ slotmeta, value ? SvPVX(value) : NULL, "set_%s");
-  return FALSE;
+  SV *mname = make_accessor_mnamesv(aTHX_ slotmeta, hookdata, "set_%s");
+  SAVEFREESV(mname);
+
+  S_generate_slot_accessor_method(aTHX_ slotmeta, mname, ACCESSOR_WRITER);
 }
 
 static void slothook_gen_writer_ops(pTHX_ SlotMeta *slotmeta, SV *hookdata, enum AccessorType type, struct AccessorGenerationCtx *ctx)
@@ -251,16 +359,18 @@ static void slothook_gen_writer_ops(pTHX_ SlotMeta *slotmeta, SV *hookdata, enum
 }
 
 static struct SlotHookFuncs slothooks_writer = {
-  .apply = &slothook_writer_apply,
+  .seal_slot = &slothook_writer_seal,
   .gen_accessor_ops = &slothook_gen_writer_ops,
 };
 
 /* :mutator */
 
-static bool slothook_mutator_apply(pTHX_ SlotMeta *slotmeta, SV *value)
+static void slothook_mutator_seal(pTHX_ SlotMeta *slotmeta, SV *hookdata, int __dummy)
 {
-  slotmeta->mutatorname = make_accessor_mnamesv(aTHX_ slotmeta, value ? SvPVX(value) : NULL, "%s");
-  return FALSE;
+  SV *mname = make_accessor_mnamesv(aTHX_ slotmeta, hookdata, "%s");
+  SAVEFREESV(mname);
+
+  S_generate_slot_accessor_method(aTHX_ slotmeta, mname, ACCESSOR_LVALUE_MUTATOR);
 }
 
 static void slothook_gen_mutator_ops(pTHX_ SlotMeta *slotmeta, SV *hookdata, enum AccessorType type, struct AccessorGenerationCtx *ctx)
@@ -276,7 +386,7 @@ static void slothook_gen_mutator_ops(pTHX_ SlotMeta *slotmeta, SV *hookdata, enu
 }
 
 static struct SlotHookFuncs slothooks_mutator = {
-  .apply = &slothook_mutator_apply,
+  .seal_slot = &slothook_mutator_seal,
   .gen_accessor_ops = &slothook_gen_mutator_ops,
 };
 

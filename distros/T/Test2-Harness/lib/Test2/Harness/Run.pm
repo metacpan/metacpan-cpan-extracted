@@ -2,7 +2,7 @@ package Test2::Harness::Run;
 use strict;
 use warnings;
 
-our $VERSION = '1.000063';
+our $VERSION = '1.000064';
 
 use Carp qw/croak/;
 
@@ -21,7 +21,6 @@ use Test2::Harness::Util::HashBase qw{
     <io_events
 
     <dbi_profiling
-    <cover_files
 
     <input <input_file <test_args
 

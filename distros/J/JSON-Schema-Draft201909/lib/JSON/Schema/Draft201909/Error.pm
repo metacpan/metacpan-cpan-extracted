@@ -4,7 +4,7 @@ package JSON::Schema::Draft201909::Error;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: (DEPRECATED) Contains a single error from a JSON Schema evaluation
 
-our $VERSION = '0.128';
+our $VERSION = '0.129';
 
 use 5.016;
 no if "$]" >= 5.031009, feature => 'indirect';
@@ -30,7 +30,7 @@ JSON::Schema::Draft201909::Error - (DEPRECATED) Contains a single error from a J
 
 =head1 VERSION
 
-version 0.128
+version 0.129
 
 =head1 DESCRIPTION
 

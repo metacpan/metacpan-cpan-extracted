@@ -1,3 +1,4 @@
+MANIFEST.SKIP
 Build.PL
 Changes
 lib/Fork/Utils.pm
@@ -5,3 +6,6 @@ LICENSE
 MANIFEST
 README
 README.md
+META.json
+META.yml
+t/fork_utils_safe_exec.t

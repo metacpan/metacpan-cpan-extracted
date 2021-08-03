@@ -4,19 +4,10 @@ use warnings;
 
 use charnames ':full';
 
-sub make_options {
+sub decode_argv {
     map {
-	# "foo_bar" -> "foo_bar|foo-bar|foobar"
-	s{^(?=\w+_)(\w+)\K}{
-	    "|" . $1 =~ tr[_][-]r . "|" . $1 =~ tr[_][]dr
-	}er;
+	utf8::is_utf8($_) ? $_ : decode('utf8', $_);
     }
-    grep {
-	s/#.*//;
-	s/\s+//g;
-	/\S/;
-    }
-    map { split /\n+/ }
     @_;
 }
 

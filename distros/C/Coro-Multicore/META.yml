@@ -23,4 +23,4 @@ no_index:
 requires:
   AnyEvent: '7'
   Coro: '6.44'
-version: '1.06'
+version: '1.07'

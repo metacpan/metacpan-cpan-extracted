@@ -1,4 +1,12 @@
-0.49 2018-08-02
+0.50 2021-08-03
+-behavior: correct uri_split and uri to treat leading double-slash in input
+ string as the beginning of the authority section, as URI and URI::Split do,
+ instead of as the beginning of the path with ad leading empty segment
+-feature: new subroutine html_url, which scrubs whitespace permitted by URLs
+ read from HTML documents (tab, newline, carriage return) and replaces
+ backslashes with forward slashes (also allowed in HTML, I'm afraid)
+
+0.49 2019-08-02
 -make 0.48_01 official
 
 0.48_01 2019-07-31

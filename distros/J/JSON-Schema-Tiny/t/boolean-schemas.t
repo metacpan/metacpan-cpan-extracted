@@ -15,13 +15,13 @@ use lib 't/lib';
 use Helper;
 
 my @tests = (
-  { schema => false, result => false },
-  { schema => true, result => true },
-  { schema => {}, result => true },
-  { schema => 0, result => false },
-  { schema => 1, result => false },
-  { schema => \0, result => false },
-  { schema => \1, result => false },
+  { schema => false, valid => false },
+  { schema => true, valid => true },
+  { schema => {}, valid => true },
+  { schema => 0, valid => false },
+  { schema => 1, valid => false },
+  { schema => \0, valid => false },
+  { schema => \1, valid => false },
 );
 
 BOOLEAN_TESTS:
@@ -34,15 +34,15 @@ foreach my $test (@tests) {
       cmp_deeply(
         $result,
         {
-          valid => $test->{result},
-          $test->{result} ? () : (errors => supersetof()),
+          valid => $test->{valid},
+          $test->{valid} ? () : (errors => supersetof()),
         },
         'invalid result structure looks correct',
       );
 
       local $JSON::Schema::Tiny::BOOLEAN_RESULT = 1;
       my $bool_result = evaluate($data, $test->{schema});
-      ok(!($bool_result xor $test->{result}), json_sprintf('schema: %s evaluates to: %s', $test->{schema}, $test->{result}));
+      ok(!($bool_result xor $test->{valid}), json_sprintf('schema: %s evaluates to: %s', $test->{schema}, $test->{valid}));
     },
     undef,
     'no exceptions in evaluate',
@@ -67,7 +67,7 @@ cmp_deeply(
       },
     ],
   },
-  'array for schema results in error',
+  'invalid schema type results in error',
 );
 
 cmp_deeply(

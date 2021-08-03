@@ -1,5 +1,13 @@
 Revision history for Perl script App-ansiecho
 
+0.03 2021-08-03T06:02:00Z
+
+    - Deprecate -r option.
+    - Rename -s, -z => -i, -a.
+    - Introduce -s, -S option to produce ANSI sequence as an argument.
+    - Introduce --help and --version option.
+    - Use Getopt::EX::Hashed instead of Moo.
+
 0.02 2021-05-21T07:16:40Z
 
     - Add -C,-F,-E options.

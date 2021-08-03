@@ -2,7 +2,7 @@ package App::Yath::Command::test;
 use strict;
 use warnings;
 
-our $VERSION = '1.000063';
+our $VERSION = '1.000064';
 
 use App::Yath::Options;
 
@@ -49,8 +49,6 @@ use Test2::Harness::Util::HashBase qw/
     +state
 
     <final_data
-
-    <coverage_aggregator
 /;
 
 include_options(
@@ -255,7 +253,13 @@ sub setup_plugins {
 
 sub teardown_plugins {
     my $self = shift;
-    $_->teardown($self->settings) for @{$self->settings->harness->plugins};
+    my ($renderers, $logger) = @_;
+    $_->teardown($self->settings, $renderers, $logger) for @{$self->settings->harness->plugins};
+}
+
+sub finalize_plugins {
+    my $self = shift;
+    $_->finalize($self->settings) for @{$self->settings->harness->plugins};
 }
 
 sub render {
@@ -266,12 +270,6 @@ sub render {
     my $renderers = $self->renderers;
     my $logger    = $self->logger;
     my $plugins = $self->settings->harness->plugins;
-
-    my $cover = $settings->logging->write_coverage;
-    if ($cover) {
-        require Test2::Harness::Log::CoverageAggregator;
-        $self->{+COVERAGE_AGGREGATOR} //= Test2::Harness::Log::CoverageAggregator->new();
-    }
 
     $plugins = [grep {$_->can('handle_event')} @$plugins];
 
@@ -311,12 +309,6 @@ sub render {
         }
         else {
             $_->render_event($e) for @$renderers;
-
-            $self->{+COVERAGE_AGGREGATOR}->process_event($e) if $cover && (
-                $e->{facet_data}->{coverage} ||
-                $e->{facet_data}->{harness_job_end} ||
-                $e->{facet_data}->{harness_job_start}
-            );
         }
 
         $self->{+TESTS_SEEN}++   if $e->{facet_data}->{harness_job_launch};
@@ -335,9 +327,9 @@ sub stop {
     my $settings  = $self->settings;
     my $renderers = $self->renderers;
     my $logger    = $self->logger;
-    close($logger) if $logger;
 
-    $self->teardown_plugins();
+    $self->teardown_plugins($renderers, $logger);
+    close($logger) if $logger;
 
     $_->finish() for @$renderers;
 
@@ -345,19 +337,6 @@ sub stop {
     print STDERR "Waiting for child processes to exit...\n" if $self->{+SIGNAL};
     $ipc->wait(all => 1);
     $ipc->stop;
-
-    my $cover = $settings->logging->write_coverage;
-    if ($cover) {
-        my $coverage = $self->{+COVERAGE_AGGREGATOR}->coverage;
-
-        if (open(my $fh, '>', $cover)) {
-            print $fh encode_json($coverage);
-            close($fh);
-        }
-        else {
-            warn "Could not write coverage file '$cover': $!";
-        }
-    }
 
     unless ($settings->display->quiet > 2) {
         printf STDERR "\nNo tests were seen!\n" unless $self->{+TESTS_SEEN};
@@ -368,8 +347,7 @@ sub stop {
         print "\nWrote log file: " . $settings->logging->log_file . "\n"
             if $settings->logging->log;
 
-        print "\nWrote coverage file: $cover\n"
-            if $cover;
+        $self->finalize_plugins();
     }
 }
 
@@ -934,6 +912,72 @@ Can be specified multiple times
 
 =head2 COMMAND OPTIONS
 
+=head3 Cover Options
+
+=over 4
+
+=item --cover-dirs ARG
+
+=item --cover-dirs=ARG
+
+=item --cover-dir ARG
+
+=item --cover-dir=ARG
+
+=item --no-cover-dirs
+
+NO DESCRIPTION - FIX ME
+
+Can be specified multiple times
+
+
+=item --cover-exclude-private
+
+=item --no-cover-exclude-private
+
+
+
+
+=item --cover-files
+
+=item --no-cover-files
+
+Use Test2::Plugin::Cover to collect coverage data for what files are touched by what tests. Unlike Devel::Cover this has very little performance impact (About 4% difference)
+
+
+=item --cover-metrics
+
+=item --no-cover-metrics
+
+
+
+
+=item --cover-types ARG
+
+=item --cover-types=ARG
+
+=item --cover-type ARG
+
+=item --cover-type=ARG
+
+=item --no-cover-types
+
+NO DESCRIPTION - FIX ME
+
+Can be specified multiple times
+
+
+=item --cover-write
+
+=item --cover-write=coverage.json
+
+=item --no-cover-write
+
+Create a json file of all coverage data seen during the run (This implies --cover-files).
+
+
+=back
+
 =head3 Display Options
 
 =over 4
@@ -1410,15 +1454,6 @@ Specify the format for automatically-generated log files. Overridden by --log-fi
 Can also be set with the following environment variables: C<YATH_LOG_FILE_FORMAT>, C<TEST2_HARNESS_LOG_FORMAT>
 
 
-=item --write-coverage
-
-=item --write-coverage=coverage.json
-
-=item --no-write-coverage
-
-Create a json file of all coverage data seen during the run (This implies --cover-files).
-
-
 =back
 
 =head3 Notification Options
@@ -1550,13 +1585,6 @@ Use the specified module to generate messages for emails and/or slack.
 =item --no-author-testing
 
 This will set the AUTHOR_TESTING environment to true
-
-
-=item --cover-files
-
-=item --no-cover-files
-
-Use Test2::Plugin::Cover to collect coverage data for what files are touched by what tests. Unlike Devel::Cover this has very little performance impact (About 4% difference)
 
 
 =item --dbi-profiling

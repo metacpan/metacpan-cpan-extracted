@@ -1,5 +1,10 @@
 Revision history for XS-Parse-Keyword
 
+0.11    2021-08-03
+        [BUGFIXES]
+         * Split Builder.pm into two parts (static + dynamic), so the static
+           part can be indexed as normal by usual CPAN toolchain (RT138313)
+
 0.10    2021-07-13
         [CHANGES]
          * Better configure-time probing for HPUX compiler support

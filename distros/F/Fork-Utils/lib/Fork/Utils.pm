@@ -7,7 +7,7 @@ use Config ();
 use POSIX ();
 use Carp qw/ croak /;
 
-our $VERSION = '0.05';
+our $VERSION = '0.07';
 our @EXPORT_OK = qw/ safe_exec /;
 
 sub safe_exec  {
@@ -61,7 +61,7 @@ __END__
 
 =head1 NAME
 
-Fork::Utils - set of usefull methods to work with processes and signals
+Fork::Utils - set of usefull methods to work with processes and signals on Linux platform
 
 =head1 SYNOPSIS
 
@@ -173,5 +173,9 @@ In case of any error in the executed code reference the standard C<$@> variable 
 =head1 AUTHOR
 
 Chernenko Dmitiry cdn@cpan.org
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it and/or modify it under the terms of the the Artistic License (2.0).
 
 =cut

@@ -331,7 +331,7 @@ INTERACTION WITH OTHER SOFTWARE
 
         Future versions of this module might do this automatically.
 
-BUGS
+BUGS & LIMITATIONS
     (OS-) threads are never released
         At the moment, threads that were created once will never be freed.
         They will be reused for asynchronous requests, though, so as long as
@@ -344,11 +344,17 @@ BUGS
 
         Future versions will likely lift this limitation.
 
-    AnyEvent is initalised at module load time
-        AnyEvent is initialised on module load, as opposed to at a later
-        time.
+    The enable_times feature of Coro is messed up
+        The enable_times feature uses the per-thread timer to measure
+        per-thread execution time, but since Coro::Multicore runs threads on
+        different pthreads it will get the wrong times. Real times are not
+        affected.
 
-        Future versions will likely change this.
+    Fork support
+        Due to the nature of threads, you are not allowed to use this module
+        in a forked child normally, with one exception: If you don't create
+        any threads in the parent, then it is safe to start using it in a
+        forked child.
 
 AUTHOR
      Marc Lehmann <schmorp@schmorp.de>

@@ -20,6 +20,13 @@ BEGIN {
     if not -d '.git' and not grep $ENV{$_}, @variables;
 }
 
+if (-d '.git' or $ENV{AUTHOR_TESTING} or $ENV{EXTENDED_TESTING}) {
+  eval { +require Time::Moment; 1 } or fail $@;
+  eval { +require Email::Address::XS; Email::Address::XS->VERSION(1.01); 1 } or fail $@;
+  eval { +require Data::Validate::Domain; 1 } or fail $@;
+  eval { +require Net::IDN::Encode; 1 } or fail $@;
+}
+
 my $version = 'draft2019-09';
 
 acceptance_tests(
@@ -30,17 +37,17 @@ acceptance_tests(
   evaluator => {
     validate_formats => 1,
   },
-  output_file => $version.'-format.txt',
+  output_file => $version.'-acceptance-format.txt',
   test => {
     $ENV{NO_TODO} ? () : ( todo_tests => [
       { file => [
           'iri-reference.json',                       # not yet implemented
           'uri-template.json',                        # not yet implemented
           # these all depend on optional prereqs
-          $ENV{AUTOMATED_TESTING} && !eval { +require 'Time::Moment'; 1 } ? qw(date-time.json date.json time.json) : (),
-          $ENV{AUTOMATED_TESTING} && !eval { +require 'Email::Address::XS'; Email::Address::XS->VERSION(1.01); 1 } ? qw(email.json idn-email.json) : (),
-          $ENV{AUTOMATED_TESTING} && !eval { +require 'Data::Validate::Domain'; 1 } ? 'hostname.json' : (),
-          $ENV{AUTOMATED_TESTING} && !eval { +require 'Net::IDN::Encode'; 1 } ? 'idn-hostname.json' : (),
+          $ENV{AUTOMATED_TESTING} && !eval { +require Time::Moment; 1 } ? qw(date-time.json date.json time.json) : (),
+          $ENV{AUTOMATED_TESTING} && !eval { +require Email::Address::XS; Email::Address::XS->VERSION(1.01); 1 } ? qw(email.json idn-email.json) : (),
+          $ENV{AUTOMATED_TESTING} && !eval { +require Data::Validate::Domain; 1 } ? 'hostname.json' : (),
+          $ENV{AUTOMATED_TESTING} && !eval { +require Net::IDN::Encode; 1 } ? 'idn-hostname.json' : (),
         ] },
       # various edge cases that are difficult to accomodate
       { file => 'iri.json', group_description => 'validation of IRIs',  # see test suite issue 395
@@ -68,4 +75,4 @@ DIAG
 
 done_testing;
 __END__
-see t/results/draft2019-09-format.txt for test results
+see t/results/draft2019-09-acceptance-format.txt for test results

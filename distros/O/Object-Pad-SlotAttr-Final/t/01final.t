@@ -9,7 +9,7 @@ use Object::Pad;
 use Object::Pad::SlotAttr::Final;
 
 class Example {
-   has $slot :reader :writer :param :Final;
+   has $slot :reader :param :Final;
 
    ADJUST { $slot = uc $slot }
 
@@ -27,12 +27,6 @@ class Example {
    $e = $@;
    like( $e, qr/^Modification of a read-only value attempted at /,
       'Failure message from assignment attempt' );
-
-   ok( !defined eval { $obj->set_slot( "changed" ) },
-      '$obj->set_slot dies' );
-   $e = $@;
-   like( $e, qr/^Modification of a read-only value attempted at /,
-      'Failure message from writer method attempt' );
 }
 
 done_testing;

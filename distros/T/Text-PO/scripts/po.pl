@@ -325,6 +325,13 @@ sub init_po
             my $data = $f->load;
             my $j = JSON->new->utf8->relaxed;
             my $json = $j->decode( $data );
+            # Make sure all fields are normalised
+            foreach my $k ( keys( %$json ) )
+            {
+                ( my $k2 = $k ) =~ tr/-/_/;
+                $json->{ $k2 } = CORE::delete( $json->{ $k } );
+            }
+            
             foreach my $k ( @$fields )
             {
                 # command line options take priority

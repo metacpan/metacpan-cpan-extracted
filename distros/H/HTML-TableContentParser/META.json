@@ -5,7 +5,7 @@
       "Tom Wyant (wyant at cpan dot org)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.60, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -48,7 +48,7 @@
    "provides" : {
       "HTML::TableContentParser" : {
          "file" : "lib/HTML/TableContentParser.pm",
-         "version" : "0.304"
+         "version" : "0.305"
       }
    },
    "release_status" : "stable",
@@ -66,6 +66,6 @@
          "web" : "https://github.com/trwyant/perl-HTML-TableContentParser"
       }
    },
-   "version" : "0.304",
+   "version" : "0.305",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

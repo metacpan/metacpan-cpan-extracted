@@ -2,7 +2,7 @@ package App::Yath::Command::reload;
 use strict;
 use warnings;
 
-our $VERSION = '1.000063';
+our $VERSION = '1.000064';
 
 use File::Spec();
 use Test2::Harness::Util::File::JSON;
@@ -189,6 +189,72 @@ Can be specified multiple times
 =back
 
 =head2 COMMAND OPTIONS
+
+=head3 Cover Options
+
+=over 4
+
+=item --cover-dirs ARG
+
+=item --cover-dirs=ARG
+
+=item --cover-dir ARG
+
+=item --cover-dir=ARG
+
+=item --no-cover-dirs
+
+NO DESCRIPTION - FIX ME
+
+Can be specified multiple times
+
+
+=item --cover-exclude-private
+
+=item --no-cover-exclude-private
+
+
+
+
+=item --cover-files
+
+=item --no-cover-files
+
+Use Test2::Plugin::Cover to collect coverage data for what files are touched by what tests. Unlike Devel::Cover this has very little performance impact (About 4% difference)
+
+
+=item --cover-metrics
+
+=item --no-cover-metrics
+
+
+
+
+=item --cover-types ARG
+
+=item --cover-types=ARG
+
+=item --cover-type ARG
+
+=item --cover-type=ARG
+
+=item --no-cover-types
+
+NO DESCRIPTION - FIX ME
+
+Can be specified multiple times
+
+
+=item --cover-write
+
+=item --cover-write=coverage.json
+
+=item --no-cover-write
+
+Create a json file of all coverage data seen during the run (This implies --cover-files).
+
+
+=back
 
 =head3 Git Options
 

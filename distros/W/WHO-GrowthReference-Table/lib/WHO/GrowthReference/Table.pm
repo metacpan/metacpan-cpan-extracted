@@ -1,9 +1,9 @@
 package WHO::GrowthReference::Table;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-04-11'; # DATE
+our $DATE = '2021-04-12'; # DATE
 our $DIST = 'WHO-GrowthReference-Table'; # DIST
-our $VERSION = '0.009'; # VERSION
+our $VERSION = '0.011'; # VERSION
 
 use 5.010001;
 use strict;
@@ -1239,6 +1239,20 @@ _
         req_one => ['dob', 'age'],
         dep_any => ['now', ['dob']],
     },
+    examples => [
+        {
+            summary => 'Get weight/height information for a boy that is born on May 4, 2017',
+            args => {gender => 'M', dob => '2017-05-04'},
+        },
+        {
+            summary => 'Get weight/height information for a 6.5yo girl',
+            args => {gender => 'F', age => '6.5y'},
+        },
+        {
+            summary => 'See percentiles/z-scores for a 6yo boy weighing 17kg and having a height of 102cm',
+            args => {gender => 'M', age => '6y', weight=>17, height=>102},
+        },
+    ],
 };
 sub get_who_growth_reference {
     no strict 'refs';
@@ -1523,7 +1537,7 @@ WHO::GrowthReference::Table - Lookup height/weight in the WHO growth chart (a.k.
 
 =head1 VERSION
 
-This document describes version 0.009 of WHO::GrowthReference::Table (from Perl distribution WHO-GrowthReference-Table), released on 2021-04-11.
+This document describes version 0.011 of WHO::GrowthReference::Table (from Perl distribution WHO-GrowthReference-Table), released on 2021-04-12.
 
 =head1 SYNOPSIS
 
@@ -1563,6 +1577,8 @@ This document describes version 0.009 of WHO::GrowthReference::Table (from Perl 
  #      weight_potential_10y_Z0 => ...,
  #     }]
 
+=head1 DESCRIPTION
+
 =head1 FUNCTIONS
 
 
@@ -1573,6 +1589,352 @@ Usage:
  get_who_growth_reference(%args) -> [status, msg, payload, meta]
 
 Lookup heightE<sol>weight in the WHO growth chart (a.k.a. growth reference, growth standards).
+
+Examples:
+
+=over
+
+=item * Get weightE<sol>height information for a boy that is born on May 4, 2017:
+
+ get_who_growth_reference(gender => "M", dob => "2017-05-04");
+
+Result:
+
+ [
+   200,
+   "OK",
+   {
+     age           => "47.0 month(s)",
+     bmi_mean      => 15.3,
+     bmi_P1        => 12.8,
+     bmi_P15       => 14.1,
+     bmi_P25       => 14.5,
+     bmi_P3        => 13.2,
+     bmi_P5        => 13.5,
+     bmi_P50       => 15.3,
+     bmi_P75       => 16.2,
+     bmi_P85       => 16.7,
+     bmi_P95       => 17.6,
+     bmi_P97       => "18.0",
+     bmi_P99       => 18.7,
+     bmi_SD0       => 15.3,
+     bmi_SD1       => 16.7,
+     bmi_SD1neg    => 14.2,
+     bmi_SD2       => 18.2,
+     bmi_SD2neg    => 13.1,
+     bmi_SD3       => 19.9,
+     bmi_SD3neg    => 12.1,
+     gender        => "M",
+     height_mean   => 102.92,
+     height_P01    => 90.042,
+     height_P1     => 93.225,
+     height_P10    => 97.579,
+     height_P15    => 98.6,
+     height_P25    => 100.109,
+     height_P3     => 95.082,
+     height_P5     => 96.065,
+     height_P50    => 102.92,
+     height_P75    => 105.73,
+     height_P85    => 107.239,
+     height_P90    => 108.26,
+     height_P95    => 109.774,
+     height_P97    => 110.757,
+     height_P99    => 112.614,
+     height_P999   => 115.797,
+     height_SD0    => "102.920",
+     height_SD1    => 107.087,
+     height_SD1neg => 98.752,
+     height_SD2    => 111.254,
+     height_SD2neg => 94.585,
+     height_SD3    => 115.421,
+     height_SD3neg => 90.418,
+     height_SD4    => 119.588,
+     height_SD4neg => 86.251,
+     weight_mean   => 16.2,
+     weight_P01    => 11,
+     weight_P1     => 12.1,
+     weight_P10    => 13.8,
+     weight_P15    => 14.2,
+     weight_P25    => 14.9,
+     weight_P3     => 12.8,
+     weight_P5     => 13.2,
+     weight_P50    => 16.2,
+     weight_P75    => 17.6,
+     weight_P85    => 18.5,
+     weight_P90    => 19.1,
+     weight_P95    => 20,
+     weight_P97    => 20.6,
+     weight_P99    => 21.9,
+     weight_P999   => 24.2,
+     weight_SD0    => 16.2,
+     weight_SD1    => 18.4,
+     weight_SD1neg => 14.3,
+     weight_SD2    => 20.9,
+     weight_SD2neg => 12.6,
+     weight_SD3    => 23.9,
+     weight_SD3neg => 11.1,
+   },
+   {
+     "func.raw_weight" => [
+       47,
+       -0.1097,
+       16.1827,
+       0.127,
+       11,
+       12.1,
+       12.8,
+       13.2,
+       13.8,
+       14.2,
+       14.9,
+       16.2,
+       17.6,
+       18.5,
+       19.1,
+       20,
+       20.6,
+       21.9,
+       24.2,
+     ],
+   },
+ ]
+
+=item * Get weightE<sol>height information for a 6.5yo girl:
+
+ get_who_growth_reference(gender => "F", age => "6.5y");
+
+Result:
+
+ [
+   200,
+   "OK",
+   {
+     age           => "78.0 month(s)",
+     bmi_mean      => 15.32,
+     bmi_P01       => 11.645,
+     bmi_P1        => 12.365,
+     bmi_P10       => 13.525,
+     bmi_P15       => 13.832,
+     bmi_P25       => 14.315,
+     bmi_P3        => 12.832,
+     bmi_P5        => 13.096,
+     bmi_P50       => 15.32,
+     bmi_P75       => 16.492,
+     bmi_P85       => 17.206,
+     bmi_P90       => 17.728,
+     bmi_P95       => 18.57,
+     bmi_P97       => 19.165,
+     bmi_P99       => 20.41,
+     bmi_P999      => 23.013,
+     bmi_SD0       => 15.32,
+     bmi_SD1       => 17.131,
+     bmi_SD1neg    => 13.879,
+     bmi_SD2       => 19.482,
+     bmi_SD2neg    => 12.704,
+     bmi_SD3       => 22.668,
+     bmi_SD3neg    => 11.725,
+     bmi_SD4       => 25.855,
+     bmi_SD4neg    => 10.746,
+     gender        => "F",
+     height_mean   => 117.977,
+     height_P01    => 101.611,
+     height_P1     => 105.657,
+     height_P10    => 111.19,
+     height_P15    => 112.488,
+     height_P25    => 114.405,
+     height_P3     => 108.016,
+     height_P5     => 109.266,
+     height_P50    => 117.977,
+     height_P75    => 121.549,
+     height_P85    => 123.466,
+     height_P90    => 124.764,
+     height_P95    => 126.688,
+     height_P97    => 127.938,
+     height_P99    => 130.297,
+     height_P999   => 134.343,
+     height_SD0    => 117.977,
+     height_SD1    => 123.273,
+     height_SD1neg => 112.681,
+     height_SD2    => 128.569,
+     height_SD2neg => 107.385,
+     height_SD3    => 133.865,
+     height_SD3neg => 102.089,
+     height_SD4    => 139.161,
+     height_SD4neg => 96.793,
+     weight_mean   => 21.227,
+     weight_P01    => 13.932,
+     weight_P1     => 15.333,
+     weight_P10    => 17.626,
+     weight_P15    => 18.239,
+     weight_P25    => 19.206,
+     weight_P3     => 16.252,
+     weight_P5     => 16.773,
+     weight_P50    => 21.227,
+     weight_P75    => 23.591,
+     weight_P85    => 25.028,
+     weight_P90    => 26.077,
+     weight_P95    => 27.761,
+     weight_P97    => 28.945,
+     weight_P99    => 31.399,
+     weight_P999   => 36.41,
+     weight_SD0    => 21.227,
+     weight_SD1    => 24.877,
+     weight_SD1neg => 18.333,
+     weight_SD2    => 29.572,
+     weight_SD2neg => 15.998,
+     weight_SD3    => 35.757,
+     weight_SD3neg => 14.087,
+     weight_SD4    => 41.942,
+     weight_SD4neg => 12.175,
+   },
+   {
+     "func.raw_weight" => [
+       78,
+       -0.5185,
+       21.2274,
+       0.1523,
+       13.932,
+       15.333,
+       16.252,
+       16.773,
+       17.626,
+       18.239,
+       19.206,
+       21.227,
+       23.591,
+       25.028,
+       26.077,
+       27.761,
+       28.945,
+       31.399,
+       36.41,
+     ],
+   },
+ ]
+
+=item * See percentilesE<sol>z-scores for a 6yo boy weighing 17kg and having a height of 102cm:
+
+ get_who_growth_reference(gender => "M", age => "6y", height => 102, weight => 17);
+
+Result:
+
+ [
+   200,
+   "OK",
+   {
+     age                  => "72.0 month(s)",
+     bmi                  => 16.3398692810458,
+     bmi_mean             => 15.306,
+     bmi_P01              => 12.066,
+     bmi_P1               => 12.733,
+     bmi_P10              => 13.773,
+     bmi_P15              => 14.042,
+     bmi_P25              => 14.459,
+     bmi_P3               => 13.157,
+     bmi_P5               => 13.393,
+     bmi_P50              => 15.306,
+     bmi_P75              => 16.258,
+     bmi_P85              => 16.819,
+     bmi_P90              => 17.221,
+     bmi_P95              => 17.854,
+     bmi_P97              => 18.291,
+     bmi_P99              => 19.176,
+     bmi_P999             => 20.91,
+     bmi_percentile       => 76.4593454731863,
+     bmi_SD0              => 15.306,
+     bmi_SD1              => 16.761,
+     bmi_SD1neg           => 14.083,
+     bmi_SD2              => 18.52,
+     bmi_SD2neg           => 13.04,
+     bmi_SD3              => 20.689,
+     bmi_SD3neg           => 12.141,
+     bmi_SD4              => 22.858,
+     bmi_SD4neg           => 11.242,
+     bmi_zscore           => 0.71056307975653,
+     gender               => "M",
+     height_mean          => 115.951,
+     height_P01           => 100.726,
+     height_P1            => 104.49,
+     height_P10           => 109.637,
+     height_P15           => 110.845,
+     height_P25           => 112.628,
+     height_P3            => 106.685,
+     height_P5            => 107.847,
+     height_P50           => 115.951,
+     height_P75           => 119.274,
+     height_P85           => 121.057,
+     height_P90           => 122.265,
+     height_P95           => 124.055,
+     height_P97           => 125.217,
+     height_P99           => 127.412,
+     height_P999          => 131.176,
+     height_percentile    => 0.404622741764081,
+     height_potential     => 155.876968650372,
+     height_potential_SD0 => 176.543,
+     height_SD0           => 115.951,
+     height_SD1           => 120.878,
+     height_SD1neg        => 111.024,
+     height_SD2           => 125.804,
+     height_SD2neg        => 106.097,
+     height_SD3           => 130.731,
+     height_SD3neg        => 101.171,
+     height_SD4           => 135.658,
+     height_SD4neg        => 96.244,
+     height_zscore        => -2.83170929760455,
+     weight_mean          => 20.514,
+     weight_P01           => 13.913,
+     weight_P1            => 15.248,
+     weight_P10           => 17.361,
+     weight_P15           => 17.912,
+     weight_P25           => 18.768,
+     weight_P3            => 16.105,
+     weight_P5            => 16.585,
+     weight_P50           => 20.514,
+     weight_P75           => 22.48,
+     weight_P85           => 23.637,
+     weight_P90           => 24.467,
+     weight_P95           => 25.767,
+     weight_P97           => 26.661,
+     weight_P99           => 28.464,
+     weight_P999          => 31.948,
+     weight_percentile    => 7.67396907216494,
+     weight_SD0           => 20.514,
+     weight_SD1           => 23.517,
+     weight_SD1neg        => 17.996,
+     weight_SD2           => 27.129,
+     weight_SD2neg        => 15.87,
+     weight_SD3           => 31.508,
+     weight_SD3neg        => 14.063,
+     weight_SD4           => 35.888,
+     weight_SD4neg        => 12.256,
+     weight_zscore        => -1.46848541862653,
+   },
+   {
+     "func.raw_weight" => [
+       72,
+       -0.318,
+       20.5137,
+       0.13372,
+       13.913,
+       15.248,
+       16.105,
+       16.585,
+       17.361,
+       17.912,
+       18.768,
+       20.514,
+       22.48,
+       23.637,
+       24.467,
+       25.767,
+       26.661,
+       28.464,
+       31.948,
+     ],
+   },
+ ]
+
+=back
 
 Caveats:
 
@@ -1627,7 +1989,7 @@ Source repository is at L<https://github.com/perlancar/perl-WHO-GrowthReference-
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=WHO-GrowthReference-Table>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-WHO-GrowthReference-Table/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -1635,11 +1997,13 @@ feature.
 
 =head1 SEE ALSO
 
-L<WHO::GrowthReference::GenChart>
+L<WHO::GrowthReference::GenChart> uses this module to make growth charts.
 
-L<App::WHOGrowthReferenceUtils>
+For CLI frontends for this module and more, see L<App::WHOGrowthReferenceUtils>.
 
-L<http://www.who.int/childgrowth/standards/en/>
+Source data is from L<http://www.who.int/childgrowth/standards/en/>. Note that
+CDC also publishes growth standards; I might write
+L<CDC::GrowthReference::Table> too someday.
 
 =head1 AUTHOR
 

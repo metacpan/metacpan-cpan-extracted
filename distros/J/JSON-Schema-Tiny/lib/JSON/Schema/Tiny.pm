@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package JSON::Schema::Tiny; # git description: v0.006-22-g9909903
+package JSON::Schema::Tiny; # git description: v0.007-10-gafb2a2f
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate data against a schema, minimally
 # KEYWORDS: JSON Schema data validation structure specification tiny
 
-our $VERSION = '0.007';
+our $VERSION = '0.008';
 
 use 5.016;  # for the unicode_strings feature
 no if "$]" >= 5.031009, feature => 'indirect';
@@ -36,7 +36,9 @@ our $SCALARREF_BOOLEANS;
 our $SPECIFICATION_VERSION;
 
 my %version_uris = (
+  'https://json-schema.org/draft/2020-12/schema' => 'draft2020-12',
   'https://json-schema.org/draft/2019-09/schema' => 'draft2019-09',
+  'http://json-schema.org/draft-07/schema#'      => 'draft7',
 );
 
 sub new {
@@ -102,10 +104,21 @@ sub evaluate {
 
 # current spec version => { keyword => undef, or arrayref of alternatives }
 my %removed_keywords = (
+  'draft7' => {
+    id => [ '$id' ],
+  },
   'draft2019-09' => {
     id => [ '$id' ],
     definitions => [ '$defs' ],
     dependencies => [ qw(dependentSchemas dependentRequired) ],
+  },
+  'draft2020-12' => {
+    id => [ '$id' ],
+    definitions => [ '$defs' ],
+    dependencies => [ qw(dependentSchemas dependentRequired) ],
+    '$recursiveAnchor' => [ '$dynamicAnchor' ],
+    '$recursiveRef' => [ '$dynamicRef' ],
+    additionalItems => [ 'items' ],
   },
 );
 
@@ -140,22 +153,40 @@ sub _eval_subschema {
 
   foreach my $keyword (
     # CORE KEYWORDS
-    qw($id $schema $anchor $recursiveAnchor $ref $recursiveRef $vocabulary $comment $defs),
+    qw($id $schema),
+    !$spec_version || $spec_version ne 'draft7' ? '$anchor' : (),
+    !$spec_version || $spec_version eq 'draft2019-09' ? '$recursiveAnchor' : (),
+    !$spec_version || $spec_version eq 'draft2020-12' ? '$dynamicAnchor' : (),
+    '$ref',
+    !$spec_version || $spec_version eq 'draft2019-09' ? '$recursiveRef' : (),
+    !$spec_version || $spec_version eq 'draft2020-12' ? '$dynamicRef' : (),
+    !$spec_version || $spec_version ne 'draft7' ? qw($vocabulary $comment) : (),
+    !$spec_version || $spec_version eq 'draft7' ? 'definitions' : (),
+    !$spec_version || $spec_version ne 'draft7' ? '$defs' : (),
     # APPLICATOR KEYWORDS
-    qw(allOf anyOf oneOf not if dependentSchemas
-      items additionalItems contains
-      properties patternProperties additionalProperties propertyNames),
+    qw(allOf anyOf oneOf not if),
+    !$spec_version || $spec_version ne 'draft7' ? 'dependentSchemas' : (),
+    !$spec_version || $spec_version eq 'draft7' ? 'dependencies' : (),
+    !$spec_version || $spec_version !~ qr/^draft(7|2019-09)$/ ? 'prefixItems' : (),
+    'items',
+    !$spec_version || $spec_version =~ qr/^draft(7|2019-09)$/ ? 'additionalItems' : (),
+    qw(contains properties patternProperties additionalProperties propertyNames),
     # UNEVALUATED KEYWORDS
-    qw(unevaluatedItems unevaluatedProperties),
+    !$spec_version || $spec_version ne 'draft7' ? qw(unevaluatedItems unevaluatedProperties) : (),
     # VALIDATOR KEYWORDS
     qw(type enum const
       multipleOf maximum exclusiveMaximum minimum exclusiveMinimum
       maxLength minLength pattern
-      maxItems minItems uniqueItems
-      maxContains minContains
-      maxProperties minProperties required dependentRequired),
+      maxItems minItems uniqueItems),
+    !$spec_version || $spec_version ne 'draft7' ? qw(maxContains minContains) : (),
+    qw(maxProperties minProperties required),
+    !$spec_version || $spec_version ne 'draft7' ? 'dependentRequired' : (),
   ) {
     next if not exists $schema->{$keyword};
+
+    # keywords adjacent to $ref (except for definitions) are not evaluated before draft2019-09
+    next if $keyword ne '$ref' and $keyword ne 'definitions'
+      and exists $schema->{'$ref'} and $spec_version eq 'draft7';
 
     $state->{keyword} = $keyword;
     my $error_count = @{$state->{errors}};
@@ -192,7 +223,7 @@ sub _eval_subschema {
 sub _eval_keyword_schema {
   my ($data, $schema, $state) = @_;
 
-  return if not assert_keyword_type($state, $schema, 'string');
+  assert_keyword_type($state, $schema, 'string');
   assert_uri($state, $schema);
 
   return abort($state, '$schema can only appear at the schema resource root')
@@ -206,22 +237,27 @@ sub _eval_keyword_schema {
   abort($state, '"$schema" indicates a different version than that requested by $JSON::Schema::Tiny::SPECIFICATION_VERSION')
     if defined $SPECIFICATION_VERSION and $SPECIFICATION_VERSION ne $spec_version;
 
+  # we special-case this because the check in _eval for older drafts + $ref has already happened
+  abort($state, '$schema and $ref cannot be used together in older drafts')
+    if exists $schema->{'$ref'} and $spec_version eq 'draft7';
+
   $state->{spec_version} = $spec_version;
 }
 
 sub _eval_keyword_ref {
   my ($data, $schema, $state) = @_;
 
-  return if not assert_keyword_type($state, $schema, 'string');
+  assert_keyword_type($state, $schema, 'string');
+  assert_uri_reference($state, $schema);
 
-  my $uri = Mojo::URL->new($schema->{'$ref'})->to_abs($state->{initial_schema_uri});
-  abort($state, '$refs to anchors are not supported')
+  my $uri = Mojo::URL->new($schema->{$state->{keyword}})->to_abs($state->{initial_schema_uri});
+  abort($state, '%ss to anchors are not supported', $state->{keyword})
     if ($uri->fragment//'') !~ m{^(/(?:[^~]|~[01])*|)$};
 
   # the base of the $ref uri must be the same as the base of the root schema
   # unfortunately this means that many uses of $ref won't work, because we don't
   # track the locations of $ids in this or other documents.
-  abort($state, 'only same-document, same-base JSON pointers are supported in $ref')
+  abort($state, 'only same-document, same-base JSON pointers are supported in %s', $state->{keyword})
     if $uri->clone->fragment(undef) ne Mojo::URL->new($state->{root_schema}{'$id'}//'');
 
   my $subschema = Mojo::JSON::Pointer->new($state->{root_schema})->get($uri->fragment);
@@ -229,7 +265,7 @@ sub _eval_keyword_ref {
 
   return _eval_subschema($data, $subschema,
     +{ %$state,
-      traversed_schema_path => $state->{traversed_schema_path}.$state->{schema_path}.'/$ref',
+      traversed_schema_path => $state->{traversed_schema_path}.$state->{schema_path}.'/'.$state->{keyword},
       initial_schema_uri => $uri,
       schema_path => '',
     });
@@ -238,13 +274,14 @@ sub _eval_keyword_ref {
 sub _eval_keyword_recursiveRef {
   my ($data, $schema, $state) = @_;
 
-  return if not assert_keyword_type($state, $schema, 'string');
+  assert_keyword_type($state, $schema, 'string');
+  assert_uri_reference($state, $schema);
 
   my $uri = Mojo::URL->new($schema->{'$recursiveRef'})->to_abs($state->{initial_schema_uri});
-  abort($state, '$refs to anchors are not supported')
+  abort($state, '$recursiveRefs to anchors are not supported')
     if ($uri->fragment//'') !~ m{^(/(?:[^~]|~[01])*|)$};
 
-  # the base of the $ref uri must be the same as the base of the root schema.
+  # the base of the $recursiveRef uri must be the same as the base of the root schema.
   # unfortunately this means that nearly all usecases of $recursiveRef won't work, because we don't
   # track the locations of $ids in this or other documents.
   abort($state, 'only same-document, same-base JSON pointers are supported in $recursiveRef')
@@ -268,16 +305,34 @@ sub _eval_keyword_recursiveRef {
     });
 }
 
+sub _eval_keyword_dynamicRef { goto \&_eval_keyword_ref }
+
 sub _eval_keyword_id {
   my ($data, $schema, $state) = @_;
 
-  return if not assert_keyword_type($state, $schema, 'string');
+  assert_keyword_type($state, $schema, 'string');
+  assert_uri_reference($state, $schema);
 
   my $uri = Mojo::URL->new($schema->{'$id'});
-  abort($state, '$id value should not equal "%s"', $uri) if $uri eq '' or $uri eq '#';
-  abort($state, '$id value "%s" cannot have a non-empty fragment', $uri) if length $uri->fragment;
+
+  if (($state->{spec_version}//'') eq 'draft7') {
+    if (length($uri->fragment)) {
+      abort($state, '$id cannot change the base uri at the same time as declaring an anchor')
+        if length($uri->clone->fragment(undef));
+
+      abort($state, '$id value does not match required syntax')
+        if $uri->fragment !~ m/^[A-Za-z][A-Za-z0-9_:.-]*$/;
+
+      return 1;
+    }
+  }
+  else {
+    abort($state, '$id value "%s" cannot have a non-empty fragment', $uri) if length $uri->fragment;
+  }
 
   $uri->fragment(undef);
+  return E($state, '$id cannot be empty') if not length $uri;
+
   $state->{initial_schema_uri} = $uri->is_abs ? $uri : $uri->to_abs($state->{initial_schema_uri});
   $state->{traversed_schema_path} = $state->{traversed_schema_path}.$state->{schema_path};
   $state->{schema_path} = '';
@@ -288,16 +343,22 @@ sub _eval_keyword_id {
 sub _eval_keyword_anchor {
   my ($data, $schema, $state) = @_;
 
-  return if not assert_keyword_type($state, $schema, 'string');
+  assert_keyword_type($state, $schema, 'string');
 
-  return 1 if $schema->{'$anchor'} =~ /^[A-Za-z][A-Za-z0-9_:.-]*$/;
+  return 1 if
+    (!$state->{spec_version} or $state->{spec_version} eq 'draft2019-09')
+        and ($schema->{'$anchor'}//'') =~ /^[A-Za-z][A-Za-z0-9_:.-]*$/
+      or
+    (!$state->{spec_version} or $state->{spec_version} eq 'draft2020-12')
+        and ($schema->{'$anchor'}//'') =~ /^[A-Za-z_][A-Za-z0-9._-]*$/;
+
   abort($state, '$anchor value does not match required syntax');
 }
 
 sub _eval_keyword_recursiveAnchor {
   my ($data, $schema, $state) = @_;
 
-  return if not assert_keyword_type($state, $schema, 'boolean');
+  assert_keyword_type($state, $schema, 'boolean');
   return 1 if not $schema->{'$recursiveAnchor'} or exists $state->{recursive_anchor_uri};
 
   # this is required because the location is used as the base URI for future resolution
@@ -312,10 +373,20 @@ sub _eval_keyword_recursiveAnchor {
   return 1;
 }
 
+sub _eval_keyword_dynamicAnchor {
+  my ($data, $schema, $state) = @_;
+
+  return if not assert_keyword_type($state, $schema, 'string');
+
+  abort($state, '$dynamicAnchor value does not match required syntax')
+    if $schema->{'$dynamicAnchor'} !~ /^[A-Za-z_][A-Za-z0-9._-]*$/;
+  return 1;
+}
+
 sub _eval_keyword_vocabulary {
   my ($data, $schema, $state) = @_;
 
-  return if not assert_keyword_type($state, $schema, 'object');
+  assert_keyword_type($state, $schema, 'object');
 
   foreach my $property (sort keys %{$schema->{'$vocabulary'}}) {
     abort($state, '$vocabulary/%s value is not a boolean', $property)
@@ -335,13 +406,15 @@ sub _eval_keyword_vocabulary {
 
 sub _eval_keyword_comment {
   my ($data, $schema, $state) = @_;
-  return if not assert_keyword_type($state, $schema, 'string');
+  assert_keyword_type($state, $schema, 'string');
   return 1;
 }
 
+sub _eval_keyword_definitions { goto \&_eval_keyword_defs }
+
 sub _eval_keyword_defs {
   my ($data, $schema, $state) = @_;
-  return if not assert_keyword_type($state, $schema, 'object');
+  assert_keyword_type($state, $schema, 'object');
   return 1;
 }
 
@@ -363,7 +436,7 @@ sub _eval_keyword_type {
     return E($state, 'wrong type (expected one of %s)', join(', ', @{$schema->{type}}));
   }
   else {
-    return if not assert_keyword_type($state, $schema, 'string');
+    assert_keyword_type($state, $schema, 'string');
     abort($state, 'unrecognized type "%s"', $schema->{type}//'<null>')
       if not any { ($schema->{type}//'') eq $_ } qw(null boolean object array string number integer);
 
@@ -376,7 +449,7 @@ sub _eval_keyword_type {
 sub _eval_keyword_enum {
   my ($data, $schema, $state) = @_;
 
-  return if not assert_keyword_type($state, $schema, 'array');
+  assert_keyword_type($state, $schema, 'array');
   abort($state, '"enum" values are not unique') if not is_elements_unique($schema->{enum});
 
   my @s; my $idx = 0;
@@ -398,7 +471,7 @@ sub _eval_keyword_const {
 sub _eval_keyword_multipleOf {
   my ($data, $schema, $state) = @_;
 
-  return if not assert_keyword_type($state, $schema, 'number');
+  assert_keyword_type($state, $schema, 'number');
   abort($state, 'multipleOf value is not a positive number') if $schema->{multipleOf} <= 0;
 
   return 1 if not is_type('number', $data);
@@ -411,7 +484,7 @@ sub _eval_keyword_multipleOf {
 sub _eval_keyword_maximum {
   my ($data, $schema, $state) = @_;
 
-  return if not assert_keyword_type($state, $schema, 'number');
+  assert_keyword_type($state, $schema, 'number');
   return 1 if not is_type('number', $data);
   return 1 if $data <= $schema->{maximum};
   return E($state, 'value is larger than %g', $schema->{maximum});
@@ -420,7 +493,7 @@ sub _eval_keyword_maximum {
 sub _eval_keyword_exclusiveMaximum {
   my ($data, $schema, $state) = @_;
 
-  return if not assert_keyword_type($state, $schema, 'number');
+  assert_keyword_type($state, $schema, 'number');
   return 1 if not is_type('number', $data);
   return 1 if $data < $schema->{exclusiveMaximum};
   return E($state, 'value is equal to or larger than %g', $schema->{exclusiveMaximum});
@@ -429,7 +502,7 @@ sub _eval_keyword_exclusiveMaximum {
 sub _eval_keyword_minimum {
   my ($data, $schema, $state) = @_;
 
-  return if not assert_keyword_type($state, $schema, 'number');
+  assert_keyword_type($state, $schema, 'number');
   return 1 if not is_type('number', $data);
   return 1 if $data >= $schema->{minimum};
   return E($state, 'value is smaller than %g', $schema->{minimum});
@@ -438,7 +511,7 @@ sub _eval_keyword_minimum {
 sub _eval_keyword_exclusiveMinimum {
   my ($data, $schema, $state) = @_;
 
-  return if not assert_keyword_type($state, $schema, 'number');
+  assert_keyword_type($state, $schema, 'number');
   return 1 if not is_type('number', $data);
   return 1 if $data > $schema->{exclusiveMinimum};
   return E($state, 'value is equal to or smaller than %g', $schema->{exclusiveMinimum});
@@ -447,7 +520,7 @@ sub _eval_keyword_exclusiveMinimum {
 sub _eval_keyword_maxLength {
   my ($data, $schema, $state) = @_;
 
-  return if not assert_non_negative_integer($schema, $state);
+  assert_non_negative_integer($schema, $state);
 
   return 1 if not is_type('string', $data);
   return 1 if length($data) <= $schema->{maxLength};
@@ -457,7 +530,7 @@ sub _eval_keyword_maxLength {
 sub _eval_keyword_minLength {
   my ($data, $schema, $state) = @_;
 
-  return if not assert_non_negative_integer($schema, $state);
+  assert_non_negative_integer($schema, $state);
 
   return 1 if not is_type('string', $data);
   return 1 if length($data) >= $schema->{minLength};
@@ -467,8 +540,8 @@ sub _eval_keyword_minLength {
 sub _eval_keyword_pattern {
   my ($data, $schema, $state) = @_;
 
-  return if not assert_keyword_type($state, $schema, 'string');
-  return if not assert_pattern($state, $schema->{pattern});
+  assert_keyword_type($state, $schema, 'string');
+  assert_pattern($state, $schema->{pattern});
 
   return 1 if not is_type('string', $data);
   return 1 if $data =~ m/$schema->{pattern}/;
@@ -478,7 +551,7 @@ sub _eval_keyword_pattern {
 sub _eval_keyword_maxItems {
   my ($data, $schema, $state) = @_;
 
-  return if not assert_non_negative_integer($schema, $state);
+  assert_non_negative_integer($schema, $state);
 
   return 1 if not is_type('array', $data);
   return 1 if @$data <= $schema->{maxItems};
@@ -488,7 +561,7 @@ sub _eval_keyword_maxItems {
 sub _eval_keyword_minItems {
   my ($data, $schema, $state) = @_;
 
-  return if not assert_non_negative_integer($schema, $state);
+  assert_non_negative_integer($schema, $state);
 
   return 1 if not is_type('array', $data);
   return 1 if @$data >= $schema->{minItems};
@@ -498,7 +571,7 @@ sub _eval_keyword_minItems {
 sub _eval_keyword_uniqueItems {
   my ($data, $schema, $state) = @_;
 
-  return if not assert_keyword_type($state, $schema, 'boolean');
+  assert_keyword_type($state, $schema, 'boolean');
   return 1 if not is_type('array', $data);
   return 1 if not $schema->{uniqueItems};
   return 1 if is_elements_unique($data, my $equal_indices = []);
@@ -508,7 +581,7 @@ sub _eval_keyword_uniqueItems {
 sub _eval_keyword_maxContains {
   my ($data, $schema, $state) = @_;
 
-  return if not assert_non_negative_integer($schema, $state);
+  assert_non_negative_integer($schema, $state);
   return 1 if not exists $state->{_num_contains};
   return 1 if not is_type('array', $data);
 
@@ -521,7 +594,7 @@ sub _eval_keyword_maxContains {
 sub _eval_keyword_minContains {
   my ($data, $schema, $state) = @_;
 
-  return if not assert_non_negative_integer($schema, $state);
+  assert_non_negative_integer($schema, $state);
   return 1 if not exists $state->{_num_contains};
   return 1 if not is_type('array', $data);
 
@@ -534,7 +607,7 @@ sub _eval_keyword_minContains {
 sub _eval_keyword_maxProperties {
   my ($data, $schema, $state) = @_;
 
-  return if not assert_non_negative_integer($schema, $state);
+  assert_non_negative_integer($schema, $state);
 
   return 1 if not is_type('object', $data);
   return 1 if keys %$data <= $schema->{maxProperties};
@@ -545,7 +618,7 @@ sub _eval_keyword_maxProperties {
 sub _eval_keyword_minProperties {
   my ($data, $schema, $state) = @_;
 
-  return if not assert_non_negative_integer($schema, $state);
+  assert_non_negative_integer($schema, $state);
 
   return 1 if not is_type('object', $data);
   return 1 if keys %$data >= $schema->{minProperties};
@@ -556,7 +629,7 @@ sub _eval_keyword_minProperties {
 sub _eval_keyword_required {
   my ($data, $schema, $state) = @_;
 
-  return if not assert_keyword_type($state, $schema, 'array');
+  assert_keyword_type($state, $schema, 'array');
   abort($state, '"required" element is not a string')
     if any { !is_type('string', $_) } @{$schema->{required}};
   abort($state, '"required" values are not unique') if not is_elements_unique($schema->{required});
@@ -571,7 +644,7 @@ sub _eval_keyword_required {
 sub _eval_keyword_dependentRequired {
   my ($data, $schema, $state) = @_;
 
-  return if not assert_keyword_type($state, $schema, 'object');
+  assert_keyword_type($state, $schema, 'object');
 
   foreach my $property (sort keys %{$schema->{dependentRequired}}) {
     E({ %$state, _schema_path_suffix => $property }, 'dependentRequired value is not an array'), next
@@ -605,7 +678,7 @@ sub _eval_keyword_dependentRequired {
 sub _eval_keyword_allOf {
   my ($data, $schema, $state) = @_;
 
-  return if not assert_array_schemas($schema, $state);
+  assert_array_schemas($schema, $state);
 
   my @invalid;
   foreach my $idx (0 .. $#{$schema->{allOf}}) {
@@ -625,7 +698,7 @@ sub _eval_keyword_allOf {
 sub _eval_keyword_anyOf {
   my ($data, $schema, $state) = @_;
 
-  return if not assert_array_schemas($schema, $state);
+  assert_array_schemas($schema, $state);
 
   my $valid = 0;
   my @errors;
@@ -644,7 +717,7 @@ sub _eval_keyword_anyOf {
 sub _eval_keyword_oneOf {
   my ($data, $schema, $state) = @_;
 
-  return if not assert_array_schemas($schema, $state);
+  assert_array_schemas($schema, $state);
 
   my (@valid, @errors);
   foreach my $idx (0 .. $#{$schema->{oneOf}}) {
@@ -691,7 +764,7 @@ sub _eval_keyword_if {
 sub _eval_keyword_dependentSchemas {
   my ($data, $schema, $state) = @_;
 
-  return if not assert_keyword_type($state, $schema, 'object');
+  assert_keyword_type($state, $schema, 'object');
 
   return 1 if not is_type('object', $data);
 
@@ -709,10 +782,92 @@ sub _eval_keyword_dependentSchemas {
   return 1;
 }
 
+sub _eval_keyword_dependencies {
+  my ($data, $schema, $state) = @_;
+
+  assert_keyword_type($state, $schema, 'object');
+
+  return 1 if not is_type('object', $data);
+
+  my $valid = 1;
+  foreach my $property (sort keys %{$schema->{dependencies}}) {
+    if (is_type('array', $schema->{dependencies}{$property})) {
+      # as in dependentRequired
+
+      foreach my $index (0..$#{$schema->{dependencies}{$property}}) {
+        abort({ %$state, _schema_path_suffix => $property }, 'element #%d is not a string', $index)
+          if not is_type('string', $schema->{dependencies}{$property}[$index]);
+      }
+
+      abort({ %$state, _schema_path_suffix => $property }, 'elements are not unique')
+        if not is_elements_unique($schema->{dependencies}{$property});
+
+      next if not exists $data->{$property};
+
+      if (my @missing = grep !exists($data->{$_}), @{$schema->{dependencies}{$property}}) {
+        $valid = E({ %$state, _schema_path_suffix => $property },
+          'missing propert%s: %s', @missing > 1 ? 'ies' : 'y', join(', ', @missing));
+      }
+    }
+    else {
+      # as in dependentSchemas
+      next if not exists $data->{$property}
+        or _eval_subschema($data, $schema->{dependencies}{$property},
+          +{ %$state, schema_path => jsonp($state->{schema_path}, 'dependencies', $property) });
+
+      $valid = 0;
+      last if $state->{short_circuit};
+    }
+  }
+
+  return 1 if $valid;
+  return E($state, 'not all dependencies are satisfied');
+}
+
+# drafts 4, 6, 7, 2019-09:
+# prefixItems: ignored
+# items - array-based  - start at 0; set $state->{_last_items_index} to last evaluated (not successfully).
+# items - schema-based - start at 0; set $state->{_last_items_index} to last data item.
+#                        booleans NOT accepted in draft4.
+# additionalItems - schema-based. consume $state->{_last_items_index} as starting point.
+#                                 booleans accepted in all versions.
+
+# draft2020-12:
+# prefixItems - array-based - start at 0; set $state->{_last_items_index} to last evaluated (not successfully).
+# items - array-based: error
+# items - schema-based - consume $state->{_last_items_index} as starting point.
+# additionalItems - ignored
+
+# no $SPECIFICATION_VERSION specified:
+# prefixItems - array-based - set $state->{_last_items_index} to last evaluated (not successfully).
+# items - array-based  -  starting index is always 0
+#                             set $state->{_last_items_index} to last evaluated (not successfully).
+# items - schema-based -  consume $state->{_last_items_index} as starting point
+#                             set $state->{_last_items_index} to last data item.
+#                                  booleans accepted.
+# additionalItems - schema-based. consume $state->{_last_items_index} as starting point.
+#                                 booleans accepted.
+
+# prefixItems + items(array-based): items will generate an error
+# prefixItems + additionalItems: additionalItems will be ignored
+# items(schema-based) + additionalItems: additionalItems does nothing.
+
+sub _eval_keyword_prefixItems {
+  my ($data, $schema, $state) = @_;
+
+  return if not assert_array_schemas($schema, $state);
+  goto \&_eval_keyword__items_array_schemas;
+}
+
 sub _eval_keyword_items {
   my ($data, $schema, $state) = @_;
 
-  goto \&_eval_keyword__items_array_schemas if is_plain_arrayref($schema->{items});
+  if (is_plain_arrayref($schema->{items})) {
+    abort($state, 'array form of "items" not supported in %s', $state->{spec_version})
+      if ($state->{spec_version}//'') eq 'draft2020-12';
+
+    goto \&_eval_keyword__items_array_schemas;
+  }
 
   $state->{_last_items_index} //= -1;
   goto \&_eval_keyword__items_schema;
@@ -725,7 +880,7 @@ sub _eval_keyword_additionalItems {
   goto \&_eval_keyword__items_schema;
 }
 
-# array-based items
+# prefixItems (draft 2020-12), array-based items (all drafts)
 sub _eval_keyword__items_array_schemas {
   my ($data, $schema, $state) = @_;
 
@@ -750,14 +905,17 @@ sub _eval_keyword__items_array_schemas {
     }
 
     $valid = 0;
-    last if $state->{short_circuit} and not exists $schema->{additionalItems};
+    last if $state->{short_circuit} and not exists $schema->{
+        $state->{keyword} eq 'prefixItems' ? 'items'
+      : $state->{keyword} eq 'items' ? 'additionalItems' : die
+    };
   }
 
   return E($state, 'not all items are valid') if not $valid;
   return 1;
 }
 
-# schema-based items and additionalItems
+# schema-based items (all drafts), and additionalItems (drafts 4,6,7,2019-09)
 sub _eval_keyword__items_schema {
   my ($data, $schema, $state) = @_;
 
@@ -765,12 +923,13 @@ sub _eval_keyword__items_schema {
   return 1 if $state->{_last_items_index} == $#{$data};
 
   my $valid = 1;
-
   foreach my $idx ($state->{_last_items_index}+1 .. $#{$data}) {
-    if (is_type('boolean', $schema->{$state->{keyword}})) {
+    if (is_type('boolean', $schema->{$state->{keyword}})
+        and ($state->{keyword} eq 'additionalItems')) {
       next if $schema->{$state->{keyword}};
       $valid = E({ %$state, data_path => $state->{data_path}.'/'.$idx },
-        '%sitem not permitted', $state->{keyword} eq 'additionalItems' ? 'additional ' : '');
+        '%sitem not permitted',
+        exists $schema->{prefixItems} || $state->{keyword} eq 'additionalItems' ? 'additional ' : '');
     }
     else {
       next if _eval_subschema($data->[$idx], $schema->{$state->{keyword}},
@@ -785,7 +944,8 @@ sub _eval_keyword__items_schema {
   $state->{_last_items_index} = $#{$data};
 
   return E($state, 'subschema is not valid against all %sitems',
-    $state->{keyword} eq 'additionalItems' ? 'additional ' : '') if not $valid;
+      exists $schema->{prefixItems} || $state->{keyword} eq 'additionalItems' ? 'additional ' : '')
+    if not $valid;
   return 1;
 }
 
@@ -810,7 +970,8 @@ sub _eval_keyword_contains {
   }
 
   # note: no items contained is only valid when minContains is explicitly 0
-  if (not $state->{_num_contains} and ($schema->{minContains}//1) > 0) {
+  if (not $state->{_num_contains} and (($schema->{minContains}//1) > 0
+      or $state->{spec_version} and $state->{spec_version} eq 'draft7')) {
     push @{$state->{errors}}, @errors;
     return E($state, 'subschema is not valid against any item');
   }
@@ -821,7 +982,7 @@ sub _eval_keyword_contains {
 sub _eval_keyword_properties {
   my ($data, $schema, $state) = @_;
 
-  return if not assert_keyword_type($state, $schema, 'object');
+  assert_keyword_type($state, $schema, 'object');
   return 1 if not is_type('object', $data);
 
   my $valid = 1;
@@ -851,10 +1012,10 @@ sub _eval_keyword_properties {
 sub _eval_keyword_patternProperties {
   my ($data, $schema, $state) = @_;
 
-  return if not assert_keyword_type($state, $schema, 'object');
+  assert_keyword_type($state, $schema, 'object');
 
   foreach my $property (sort keys %{$schema->{patternProperties}}) {
-    return if not assert_pattern({ %$state, _schema_path_suffix => $property }, $property);
+    assert_pattern({ %$state, _schema_path_suffix => $property }, $property);
   }
 
   return 1 if not is_type('object', $data);
@@ -981,11 +1142,11 @@ sub is_type {
     }
   }
 
-  if ($type eq 'reference to SCALAR') {
-    return ref($value) eq 'SCALAR';
+  if ($type =~ /^reference to (.+)$/) {
+    return !blessed($value) && ref($value) eq $1;
   }
 
-  croak sprintf('unknown type "%s"', $type);
+  return ref($value) eq $type;
 }
 
 # only the core six types are reported (integers are numbers)
@@ -998,10 +1159,7 @@ sub get_type {
   return 'array' if is_plain_arrayref($value);
   return 'boolean' if is_bool($value);
 
-  if (my $ref = ref($value)) {
-    return 'reference to SCALAR' if $ref eq 'SCALAR';
-    croak sprintf('unsupported reference type %s', $ref);
-  }
+  return (blessed($value) ? '' : 'reference to ').ref($value) if is_ref($value);
 
   my $flags = B::svref_2object(\$value)->FLAGS;
   return 'string' if $flags & B::SVf_POK && !($flags & (B::SVf_IOK | B::SVf_NOK));
@@ -1012,7 +1170,7 @@ sub get_type {
 }
 
 # compares two arbitrary data payloads for equality, as per
-# https://json-schema.org/draft/2019-09/json-schema-core.html#rfc.section.4.2.3
+# https://json-schema.org/draft/2020-12/json-schema-core.html#rfc.section.4.2.2
 # if provided with a state hashref, any differences are recorded within
 sub is_equal {
   my ($x, $y, $state) = @_;
@@ -1132,6 +1290,23 @@ sub assert_pattern {
   return 1;
 }
 
+sub assert_uri_reference {
+  my ($state, $schema) = @_;
+
+  my $ref = $schema->{$state->{keyword}};
+
+  abort($state, '%s value is not a valid URI reference', $state->{keyword})
+    # see also uri-reference format sub
+    if fc(Mojo::URL->new($ref)->to_unsafe_string) ne fc($ref)
+      or $ref =~ /[^[:ascii:]]/
+      or $ref =~ /#/
+        and $ref !~ m{#$}                          # empty fragment
+        and $ref !~ m{#[A-Za-z][A-Za-z0-9_:.-]*$}  # plain-name fragment
+        and $ref !~ m{#/(?:[^~]|~[01])*$};         # json pointer fragment
+
+  return 1;
+}
+
 sub assert_uri {
   my ($state, $schema, $override) = @_;
 
@@ -1154,8 +1329,8 @@ sub assert_uri {
 sub assert_non_negative_integer {
   my ($schema, $state) = @_;
 
-  return if not assert_keyword_type($state, $schema, 'integer');
-  return E($state, '%s value is not a non-negative integer', $state->{keyword})
+  assert_keyword_type($state, $schema, 'integer');
+  abort($state, '%s value is not a non-negative integer', $state->{keyword})
     if $schema->{$state->{keyword}} < 0;
   return 1;
 }
@@ -1163,7 +1338,7 @@ sub assert_non_negative_integer {
 sub assert_array_schemas {
   my ($schema, $state) = @_;
 
-  return if not assert_keyword_type($state, $schema, 'array');
+  assert_keyword_type($state, $schema, 'array');
   abort($state, '%s array is empty', $state->{keyword}) if not @{$schema->{$state->{keyword}}};
   return 1;
 }
@@ -1184,7 +1359,7 @@ JSON::Schema::Tiny - Validate data against a schema, minimally
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 SYNOPSIS
 
@@ -1213,7 +1388,7 @@ validator, supporting the most popular keywords.
 
 =for Pod::Coverage is_type get_type is_equal is_elements_unique jsonp canonical_schema_uri E abort
 assert_keyword_type assert_pattern assert_uri assert_non_negative_integer assert_array_schemas
-new
+new assert_uri_reference
 
 =head2 evaluate
 
@@ -1301,7 +1476,15 @@ Supported values for this option, and the corresponding values for the C<$schema
 
 =item *
 
+L<C<draft2020-12>|https://json-schema.org/specification-links.html#2020-12>, corresponding to metaschema C<https://json-schema.org/draft/2020-12/schema>
+
+=item *
+
 L<C<draft2019-09>|https://json-schema.org/specification-links.html#2019-09-formerly-known-as-draft-8>, corresponding to metaschema C<https://json-schema.org/draft/2019-09/schema>.
+
+=item *
+
+L<C<draft7>|https://json-schema.org/specification-links.html#draft-7>, corresponding to metaschema C<http://json-schema.org/draft-07/schema#>
 
 =back
 

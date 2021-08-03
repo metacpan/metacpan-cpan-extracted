@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Utilities;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Internal utilities for JSON::Schema::Modern
 
-our $VERSION = '0.514';
+our $VERSION = '0.515';
 
 use 5.016;
 no if "$]" >= 5.031009, feature => 'indirect';
@@ -15,6 +15,7 @@ use B;
 use Carp 'croak';
 use JSON::MaybeXS 1.004001 'is_bool';
 use Ref::Util 0.100 qw(is_ref is_plain_arrayref is_plain_hashref);
+use Scalar::Util 'blessed';
 use Storable 'dclone';
 use Feature::Compat::Try;
 use JSON::Schema::Modern::Error;
@@ -80,7 +81,11 @@ sub is_type {
     }
   }
 
-  croak sprintf('unknown type "%s"', $type);
+  if ($type =~ /^reference to (.+)$/) {
+    return !blessed($value) && ref($value) eq $1;
+  }
+
+  return ref($value) eq $type;
 }
 
 # only the core six types are reported (integers are numbers)
@@ -93,7 +98,7 @@ sub get_type {
   return 'array' if is_plain_arrayref($value);
   return 'boolean' if is_bool($value);
 
-  croak sprintf('unsupported reference type %s', ref $value) if is_ref($value);
+  return (blessed($value) ? '' : 'reference to ').ref($value) if is_ref($value);
 
   my $flags = B::svref_2object(\$value)->FLAGS;
   return 'string' if $flags & B::SVf_POK && !($flags & (B::SVf_IOK | B::SVf_NOK));
@@ -104,13 +109,19 @@ sub get_type {
 }
 
 # compares two arbitrary data payloads for equality, as per
-# https://json-schema.org/draft/2019-09/json-schema-core.html#rfc.section.4.2.3
+# https://json-schema.org/draft/2020-12/json-schema-core.html#rfc.section.4.2.2
 # if provided with a state hashref, any differences are recorded within
 sub is_equal {
   my ($x, $y, $state) = @_;
   $state->{path} //= '';
 
   my @types = map get_type($_), $x, $y;
+
+  if ($state->{scalarref_booleans}) {
+    ($x, $types[0]) = (0+!!$$x, 'boolean') if $types[0] eq 'reference to SCALAR';
+    ($y, $types[1]) = (0+!!$$y, 'boolean') if $types[1] eq 'reference to SCALAR';
+  }
+
   return 0 if $types[0] ne $types[1];
   return 1 if $types[0] eq 'null';
   return $x eq $y if $types[0] eq 'string';
@@ -145,7 +156,7 @@ sub is_elements_unique {
   my ($array, $equal_indices) = @_;
   foreach my $idx0 (0 .. $#{$array}-1) {
     foreach my $idx1 ($idx0+1 .. $#{$array}) {
-      if (is_equal($array->[$idx0], $array->[$idx1])) {
+      if (is_equal($array->[$idx0], $array->[$idx1], { scalarref_booleans => 1 })) {
         push @$equal_indices, $idx0, $idx1 if defined $equal_indices;
         return 0;
       }
@@ -178,6 +189,7 @@ sub canonical_schema_uri {
 
 # shorthand for creating error objects
 sub E {
+  croak 'E called in void context' if not defined wantarray;
   my ($state, $error_string, @args) = @_;
 
   # sometimes the keyword shouldn't be at the very end of the schema path
@@ -230,17 +242,19 @@ sub A {
 # Therefore this is only appropriate during the evaluation phase, not the traverse phase.
 sub abort {
   my ($state, $error_string, @args) = @_;
-  E($state, $error_string, @args);
+  ()= E($state, $error_string, @args);
   die pop @{$state->{errors}};
 }
 
 sub assert_keyword_type {
+  croak 'assert_keyword_type called in void context' if not defined wantarray;
   my ($state, $schema, $type) = @_;
   return 1 if is_type($type, $schema->{$state->{keyword}});
   E($state, '%s value is not a%s %s', $state->{keyword}, ($type =~ /^[aeiou]/ ? 'n' : ''), $type);
 }
 
 sub assert_pattern {
+  croak 'assert_pattern called in void context' if not defined wantarray;
   my ($state, $pattern) = @_;
   try {
     local $SIG{__WARN__} = sub { die @_ };
@@ -251,6 +265,7 @@ sub assert_pattern {
 }
 
 sub assert_uri_reference {
+  croak 'assert_uri_reference called in void context' if not defined wantarray;
   my ($state, $schema) = @_;
 
   my $ref = $schema->{$state->{keyword}};
@@ -268,6 +283,7 @@ sub assert_uri_reference {
 }
 
 sub assert_uri {
+  croak 'assert_uri called in void context' if not defined wantarray;
   my ($state, $schema, $override) = @_;
 
   my $string = $override // $schema->{$state->{keyword}};
@@ -307,7 +323,7 @@ JSON::Schema::Modern::Utilities - Internal utilities for JSON::Schema::Modern
 
 =head1 VERSION
 
-version 0.514
+version 0.515
 
 =head1 SYNOPSIS
 

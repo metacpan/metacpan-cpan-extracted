@@ -17,6 +17,11 @@ is(ansiecho(qw(-j a b c))->{stdout}, "abc\n", '-j a b c');
 is(ansiecho(qw(-nj a b c))->{stdout}, "abc", '-nj a b c');
 is(ansiecho(qw(--separate=: a b c))->{stdout}, "a:b:c\n", '--seprate=: a b c');
 
+is(ansiecho(qw(\\-c))->{stdout}, "-c\n", '\\-c');
+is(ansiecho(qw(\\055c))->{stdout}, "-c\n", '\\055c');
+is(ansiecho(qw(\\x2dc))->{stdout}, "-c\n", '\\x2dc');
+is(ansiecho(qw(\\N{U+002D}c))->{stdout}, "-c\n", '\\N{U+002D}c');
+
 SKIP: {
 
 my $smiley =
@@ -33,7 +38,7 @@ is(ansiecho('\N{WHITE SMILING FACE}')->{stdout},
 
 is(ansiecho('--escape', '\N{WHITE SMILING FACE}')->{stdout},
    "$smiley\n",
-   '-e \N{WHITE SMILING FACE}');
+   '--escape \N{WHITE SMILING FACE}');
 
 }
 
@@ -127,42 +132,34 @@ is(ansiecho(qw(-f %5s -c -f %s/%s -f %s W -f %s R abc))->{stdout},
 is(ansiecho(qw(-f -f %%%ds 5 -c R abc))->{stdout},
    sprintf("  %s\n", R("abc")), "-f -f %%%ds 5 -c R abc");
 
-# -s, -z, -r
-is(ansiecho(qw(-r 0 ))      ->{stdout}, "0\n", '-r 0');
-is(ansiecho(qw(-r0 ))       ->{stdout}, "0\n", '-r0');
-is(ansiecho(qw(-r -c ))     ->{stdout}, "-c\n", '-r -c');
-is(ansiecho(qw(-r -c -r -f))->{stdout}, "-c-f\n", '-r -c -r -f');
+# -i, -a
 
-is(ansiecho(qw(-s R RED -z ZE))->{stdout},
+is(ansiecho(qw(-i R RED -a ZE))->{stdout},
    R("RED")."\n",
-   '-s R RED -z ZE');
+   '-i R RED -a ZE');
 
-is(ansiecho(qw(-s R RED -r \e[m\e[K))->{stdout},
-   R("RED")."\n",
-   '-s R RED -r \\e[m\\e[K');
-
-is(ansiecho(qw(-s R RED -z ZE -s G GREEN -z ZE))->{stdout},
+is(ansiecho(qw(-i R RED -a ZE -i G GREEN -a ZE))->{stdout},
    sprintf("%s %s\n",
 	   R("RED"),
 	   G("GREEN"),
    ),
-   '-s R RED -z ZE -s G GREEN -z ZE');
+   '-i R RED -a ZE -i G GREEN -a ZE');
 
-is(ansiecho(qw(-s R RED -s G GREEN -z ZE))->{stdout},
+is(ansiecho(qw(-i R RED -i G GREEN -a ZE))->{stdout},
    sprintf("%s %s\n",
 	   ansi_code("R")."RED",
 	   G("GREEN"),
    ),
-   '-s R RED -s G GREEN -z ZE');
+   '-i R RED -i G GREEN -a ZE');
 
-is(ansiecho(qw(-s R RED -s G GREEN -z ZE))->{stdout},
+is(ansiecho(qw(-i R RED -i G GREEN -a ZE))->{stdout},
    sprintf("%s %s\n",
 	   ansi_code("R")."RED",
 	   G("GREEN"),
    ),
-   '-s R RED -s G GREEN -z ZE');
+   '-i R RED -i G GREEN -a ZE');
 
-is(ansiecho(qw(-s R R -s U RU -s I RUI -s S RUIS -s F RUISF -z Z))->{stdout},
+is(ansiecho(qw(-i R R -i U RU -i I RUI -i S RUIS -i F RUISF -a Z))->{stdout},
    join(' ',
 	ansi_code("R")."R",
 	ansi_code("U")."RU",
@@ -170,7 +167,7 @@ is(ansiecho(qw(-s R R -s U RU -s I RUI -s S RUIS -s F RUISF -z Z))->{stdout},
 	ansi_code("S")."RUIS",
 	ansi_code("F")."RUISF".ansi_code("Z")."\n",
    ),
-   '-s R R -s U RU -s I RUI -s S RUIS -s F RUISF -z Z');
+   '-i R R -i U RU -i I RUI -i S RUIS -i F RUISF -a Z');
 
 # -C, -F, -E
 
@@ -217,5 +214,23 @@ is(ansiecho(qw(-F -%s- -CR a b c))->{stdout},
 is(ansiecho(qw(-F [%s] -F -%s- -CR a b c))->{stdout},
    join(' ', '[-'.R('a').'-]', '[-'.R('b').'-]', '[-'.R('c').'-]')."\n",
    '-F [%s] -F -%s- -CR a b c');
+
+# -S
+
+is(ansiecho(qw(-S R))->{stdout},
+   ansi_code('R')."\n",
+   '-S R');
+
+is(ansiecho(qw(-S R R R))->{stdout},
+   join(' ', ((ansi_code('R')) x 3)) . "\n",
+   '-S R R R');
+
+is(ansiecho(qw(-S R R R -E H))->{stdout},
+   join(' ', ((ansi_code('R')) x 3)) . " H\n",
+   '-S R R R -E H');
+
+is(ansiecho(qw(-j -S R R R -E H))->{stdout},
+   join('', ((ansi_code('R')) x 3)) . "H\n",
+   '-j -S R R R -E H');
 
 done_testing;

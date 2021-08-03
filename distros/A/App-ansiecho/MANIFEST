@@ -5,6 +5,8 @@ META.json
 README.md
 cpanfile
 eg/colortable
+eg/vars.sh
+eg/zsh-sample.sh
 lib/App/ansiecho.pm
 lib/App/ansiecho/Util.pm
 minil.toml

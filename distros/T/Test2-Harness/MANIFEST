@@ -45,6 +45,7 @@ lib/App/Yath/Options/Run.pm
 lib/App/Yath/Options/Runner.pm
 lib/App/Yath/Options/Workspace.pm
 lib/App/Yath/Plugin.pm
+lib/App/Yath/Plugin/Cover.pm
 lib/App/Yath/Plugin/Git.pm
 lib/App/Yath/Plugin/Notify.pm
 lib/App/Yath/Plugin/SysInfo.pm

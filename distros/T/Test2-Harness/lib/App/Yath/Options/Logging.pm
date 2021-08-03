@@ -2,7 +2,7 @@ package App::Yath::Options::Logging;
 use strict;
 use warnings;
 
-our $VERSION = '1.000063';
+our $VERSION = '1.000064';
 
 use POSIX qw/strftime/;
 use Test2::Harness::Util qw/clean_path/;
@@ -50,21 +50,6 @@ option_group {prefix => 'logging', category => "Logging Options"} => sub {
         type         => 's',
         normalize    => \&clean_path,
         description  => "Specify the name of the log file. This option implies -L.",
-    );
-
-    option write_coverage => (
-        type => 'd',
-        normalize => \&clean_path,
-        long_examples => ['', '=coverage.json'],
-        description => "Create a json file of all coverage data seen during the run (This implies --cover-files).",
-        action      => sub {
-            my ($prefix, $field, $raw, $norm, $slot, $settings) = @_;
-
-            $settings->run->field('cover_files' => 1) if $settings->check_prefix('runner');
-
-            return $$slot = clean_path("coverage.json") if $raw eq '1';
-            return $$slot = $norm;
-        },
     );
 
     post \&post_process;
@@ -227,15 +212,6 @@ Specify the name of the log file. This option implies -L.
 Specify the format for automatically-generated log files. Overridden by --log-file, if given. This option implies -L (Default: \$YATH_LOG_FILE_FORMAT, if that is set, or else "%!P%Y-%m-%d~%H:%M:%S~%!U~%!p.jsonl"). This is a string in which percent-escape sequences will be replaced as per POSIX::strftime. The following special escape sequences are also replaced: (%!P : Project name followed by a ~, if a project is defined, otherwise empty string) (%!U : the unique test run ID) (%!p : the process ID) (%!S : the number of seconds since local midnight UTC)
 
 Can also be set with the following environment variables: C<YATH_LOG_FILE_FORMAT>, C<TEST2_HARNESS_LOG_FORMAT>
-
-
-=item --write-coverage
-
-=item --write-coverage=coverage.json
-
-=item --no-write-coverage
-
-Create a json file of all coverage data seen during the run (This implies --cover-files).
 
 
 =back

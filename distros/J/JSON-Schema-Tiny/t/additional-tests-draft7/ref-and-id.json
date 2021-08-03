@@ -1,0 +1,30 @@
+[
+    {
+        "description": "$id must be evaluated before $ref to get the proper $ref destination (with json pointers)",
+        "schema": {
+            "$id": "https://localhost:1234",
+            "$comment": "if $ref is evaluated before $id, then the $ref will be relative to the root, so the overall result will be true. actually, the $ref should fail to resolve because the base has changed.",
+            "oneOf": [
+                {
+                    "$id": "subdir/",
+                    "$ref": "#/oneOf/1",
+                    "oneOf": [
+                        { "type": "number" },
+                        { "type": "string" }
+
+                    ]
+                },
+                {
+                    "type": "null"
+                }
+            ]
+        },
+        "tests": [
+            {
+                "description": "changing the base uri is not supported",
+                "data": null,
+                "valid": false
+            }
+        ]
+    }
+]

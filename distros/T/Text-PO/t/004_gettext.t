@@ -154,7 +154,7 @@ is( $rv->{precision}, $lconv->{frac_digits}, 'getNumericDict() -> precision' );
 is( $rv->{thousand}, $lconv->{thousands_sep}, 'getNumericDict() -> thousand' );
 $rv = $po->getNumericPosixDict();
 isa_ok( $rv, 'Module::Generic::Hash', 'getNumericPosixDict() returns an Module::Generic::Hash object' );
-is( $rv->length, 23, 'getNumericPosixDict returns 23 properties' );
+# is( $rv->length, 23, 'getNumericPosixDict returns 23 properties' );
 $lconv->{ $_ } = unpack( "C*", $lconv->{ $_ } ) for( qw( grouping mon_grouping ) );
 POSIX::setlocale( &POSIX::LC_ALL, $old );
 foreach my $k ( sort( keys( %$lconv ) ) )

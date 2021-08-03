@@ -1,18 +1,26 @@
 Changes
 =======
 
-0.05 - 2021 Jul 22
+0.07  2021 Aug 03
+    - fixes in META files
+
+0.06  2021 Aug 02
+    - minor POD chqnges
+    - move MYMETA.* files into META.* files
+    - some fixes in MANIFEST file
+
+0.05  2021 Jul 22
     - POD fixes
 
-0.04 - 2021 Apr 26
+0.04  2021 Apr 26
     - provide more comprehensive example
 
-0.03 - 2021 Apr 26
+0.03  2021 Apr 26
     - fix documentation
 
-0.02 - 2021 Apr 26
+0.02  2021 Apr 26
     - Update documentation.
     - Add MYMETA.* files
 
-0.01 - 2014 May 23
+0.01  2014 May 23
     - Initial version.

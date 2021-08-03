@@ -241,7 +241,7 @@ add_slot(self, slotname, ...)
           break;
 
         case 1: /* param */
-          mop_slot_set_param(slotmeta, SvPV_nolen(kwval));
+          mop_slot_set_param(slotmeta, kwval);
           break;
 
         case 2: /* reader */
@@ -266,12 +266,7 @@ add_slot(self, slotname, ...)
       }
     }
 
-    if(slotmeta->readername)
-      S_generate_slot_accessor_method(aTHX_ slotmeta, slotmeta->readername, ACCESSOR_READER);
-    if(slotmeta->writername)
-      S_generate_slot_accessor_method(aTHX_ slotmeta, slotmeta->writername, ACCESSOR_WRITER);
-    if(slotmeta->mutatorname)
-      S_generate_slot_accessor_method(aTHX_ slotmeta, slotmeta->mutatorname, ACCESSOR_LVALUE_MUTATOR);
+    MOP_SLOT_RUN_HOOKS(slotmeta, seal_slot, 0);
 
     RETVAL = newSV(0);
     sv_setref_uv(RETVAL, "Object::Pad::MOP::Slot", PTR2UV(slotmeta));

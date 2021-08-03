@@ -1,19 +1,43 @@
 [![Actions Status](https://github.com/kaz-utashiro/App-ansiecho/workflows/test/badge.svg)](https://github.com/kaz-utashiro/App-ansiecho/actions) [![MetaCPAN Release](https://badge.fury.io/pl/App-ansiecho.svg)](https://metacpan.org/release/App-ansiecho)
 # NAME
 
-ansiecho - Echo command with ANSI terminal code
+ansiecho - Colored echo command using ANSI terminal sequence
 
 # VERSION
 
-Version 0.02
+Version 0.03
 
 # SYNOPSIS
 
-ansiecho -c R Red -c M/551 Magenta/Yellow -c FSDB BlinkReverseBoldBlue
+ansiecho \[ options \] args ...
 
-ansiecho -f '\[ %12s \]' -c SR -f '%+06d' 123
+Command Options:
 
-ansiecho -C '555/(132,0,41)' d i g i t a l
+    -n                 Do not print the trailing newline
+    -j --join          Do not print space between arguments
+    -e --escape        Enable backslash escape notation
+       --rgb24         Produce 24bit color sequence
+       --separate=s    Set argument separator
+    -h --help          Print this message
+    -v --version       Print version
+
+Prefix Options:
+
+    -s/-S SPEC         Produce ANSI sequence
+    -c/-C SPEC ARG     Colorize next argument
+    -f/-F FORMAT ARGS  Format arguments
+    -E                 Terminate -C -S -F effect
+    -i/-a SPEC         Insert/Append ANSI sequence
+
+Example:
+
+    ansiecho -c R Red -c M/551 Magenta/Yellow -c FSDB BlinkReverseBoldBlue
+
+    ansiecho -f '[ %12s ]' -c SR -f '%+06d' 123
+
+    ansiecho -C '555/(132,0,41)' d i g i t a l
+
+    read -a color < <( ansiecho -S ZE K/544 K/454 K/445 )
 
 # DESCRIPTION
 
@@ -30,7 +54,16 @@ Like [echo](https://metacpan.org/pod/echo) command, option **-n** disables to pr
 end.  Option **-j** (or **--join**) removes white space between
 arguments.
 
-## COLOR
+Arguments can include backslash escaped characters, such as `\n` for
+a new line.  There is an bash-echo-compatible **-e** option, but it is
+enabled by default.  You can include control and named Unicode
+characters using this.
+
+    ansiecho '\t\N{ALARM CLOCK}\a'
+
+See ["STRING LITERAL"](#string-literal) section for detail.
+
+## COLOR and EFFECT
 
 You can specify color of each argument by preceding with **-c** option:
 
@@ -40,41 +73,29 @@ This command print strings `a`, `b` and `c` according to the color
 spec of `R` (Red), `GI` (_Green Italic_) and `BD` (**Blue Bold**)
 respectively.
 
-Foreground/Background color can be specified by 8+8 standard colors,
-24 gray scales, 6x6x6 216 colors, RGB values or color names, with
-special effects such as I (Italic), D (Double-struck; Bold), S
-(Stand-out; Reverse Video) and such.
+Foreground and background color is specified in the form of
+`fore/back`.
 
-Color example:
+    ansiecho -c B/M 'Blue on Magenta' -c '<pink>/<salmon>' fish
 
-    RGB  6x6x6    12bit      24bit           color name
-    ===  =======  =========  =============  ==================
-    B    005      #00F       (0,0,255)      <blue>
-     /M     /505      /#F0F   /(255,0,255)  /<magenta>
-    K/W  000/555  #000/#FFF  000000/FFFFFF  <black>/<white>
-    R/G  500/050  #F00/#0F0  FF0000/00FF00  <red>/<green>
-    W/w  L03/L20  #333/#ccc  303030/c6c6c6  <dimgrey>/<lightgrey>
-
-More information is described in ["COLOR SPEC"](#color-spec) section.
-
-12bit/24bit colors are converted to 216 colors because most terminal
-can not display them.  If you are using full-color terminal, such as
-iTerm2 on Mac, use **--rgb24** option or set `GETOPTEX_RGB24`
-environment variable to produce full-color sequence.
+Color can be described by 8+8 standard colors, 24 gray scales, 6x6x6
+216 colors, RGB values or color names, with special effects such as I
+(Italic), D (Double-struck; Bold), S (Stand-out; Reverse Video) and
+such.  More information is described in ["COLOR SPEC"](#color-spec) section.
 
 ## FORMAT
 
-Format string can be specified with **-f** option, and it behaves like
-a [printf](https://metacpan.org/pod/printf) command.
+Format string can be specified by **-f** option, and it behaves like a
+[printf(1)](http://man.he.net/man1/printf) command.
 
     ansiecho -f '[ %5s : %5s : %5s ]' -c R RED -c G GREEN -c B BLUE
 
-You can use backslash escape characters in the format string.
-See ["STRING LITERAL"](#string-literal) section.
+As in above example, colored text can be given as an argument for
+**-f** option, and the string width is calculated as you expect.
 
 Formatted result becomes a single argument, and can be a subject of
-other operation.  In next example, numbers are formatted, colored, and
-gave to other format.
+other operation.  In the next example, numbers are formatted, colored,
+and gave to other format.
 
     ansiecho -f '\N{ALARM CLOCK} %s' -c KF/544 -f ' %02d:%02d:%02d ' 1 2 3
 
@@ -83,56 +104,81 @@ Formatting is done by Perl `sprintf` function.  See
 
 ## ANSI SEQUENCE
 
-With normal usage, **ansiecho** print given argument with introducer
-and reset sequences.
-
-To get just a desired sequence, use **-s** option.  Next example
-produce ANSI terminal sequence to indicate `deeppink` color with
-`lightyellow` background.
+To get desired ANSI sequence, use **-s** option.  Next example produce
+ANSI terminal sequence to indicate `deeppink` color on `lightyellow`
+background.
 
     ansiecho -n -s '<deeppink>/<lightyellow>'
 
-You will get the next result with 256-color terminal:
+You will get the next result for the 256-color terminal:
 
     ^[[38;5;198;48;5;230m
 
-and the next with full-color terminal:
+and the next for the full-color terminal:
 
     ^[[38;2;255;20;147;48;2;255;255;224m
 
-Option **-z** does almost same thing, but it append a sequence to the
-final argument.  Next two commands are equivalent.
+Using **-S** option, you can set multiple ANSI sequences at once in a
+shell script.  Next **bash** code will initialize multiple variables
+with the sequence for given color specs.
 
-    ansiecho -c R Red
-    ansiecho -s R Red -z ZE
+    read ZE C1 C2 C3 < <( ansiecho -S ZE K/544 K/454 K/445 )
 
-Color spec `ZE` produces RESET and ERASE LINE sequence.
+Or you can set array variable.
 
-Because **-s** and **-z** does not produce RESET sequence, you can use
-them to accumulate the effects.
+    read -a color < <( ansiecho -S ZE K/544 K/454 K/445 )
 
-    ansiecho -s R R -s U RU -s I RUI -s S RUIS -s F RUISF -z Z
+Then use this variable like:
 
-# OPTIONS
+    echo "${C1} COLOR 1 ${ZE}"
+    echo "${C2} COLOR 2 ${ZE}"
+    echo "${C3} COLOR 3 ${ZE}"
 
-In general, argument strings can include backslash escaped characters.
-For example, `\n` stands for a new line.  As for normal argument
-other than option parameter, option **--escape** can control this
-behavior.  See ["STRING LITERAL"](#string-literal) section.
+    reset=${color[0]}
+    echo "${color[1]} COLOR 1 ${reset}"
+    echo "${color[2]} COLOR 2 ${reset}"
+    echo "${color[3]} COLOR 3 ${reset}"
+
+# COMMAND OPTIONS
 
 - **-n**
 
     Do not print newline at the end.
 
-- **-e**, **--**\[**-no**\]**escape**
+- **-e**, **--**\[**no-**\]**escape**
 
     Enable interpretation of backslash escapes in the normal string
-    argument.  This option is enabled by default, unlink normal [echo(1)](http://man.he.net/man1/echo)
-    command.  Use **--no-escape** to disable it.
+    argument.  This option is enabled by default, unlike bash built-in
+    [echo(1)](http://man.he.net/man1/echo) command.  Use **--no-escape** to disable it.
 
 - **-j**, **--join**
 
-    Do not print space between arguments.
+    Do not print space between arguments.  This is a short-cut for
+    `--separate ''`.
+
+- **--separate** _string_
+
+    Set separator string between each arguments.  Option **-j** is a
+    short-cut for **--separate ''**.
+
+- **--**\[**no**\]**rgb24**
+
+    Produce 24bit full-color sequence for 12bit/24bit specified colors.
+    They are converted to 216 colors by default.
+
+- **-h**, **--help**
+
+    Print help.
+
+- **-v**, **--version**
+
+    Print version.
+
+# PREFIX OPTIONS
+
+- **-s** _spec_
+
+    Print raw ANSI sequence for given _spec_.
 
 - **-c** _spec_ _string_
 
@@ -140,7 +186,8 @@ behavior.  See ["STRING LITERAL"](#string-literal) section.
 
 - **-f** _format_ _args_ ...
 
-    Print _args_ in a given _format_.
+    Print _args_ in a given _format_.  Backslash escape is always
+    interpreted in the format string.
 
     The result of **-f** sequence ends up to a single argument, and can be
     a subject of other **-c** or **-f** option.
@@ -155,6 +202,17 @@ behavior.  See ["STRING LITERAL"](#string-literal) section.
         ansiecho -f -f '%%%ds' 16 hello
 
         ansiecho -f '%*s' 16 hello
+
+- **-S** _spec_
+
+    If option `-S` found, all following argument is considered as a color
+    spec given to **-s** option, until option **-E** found.
+
+    Next two commands are equivalent.
+
+        ansiecho -s ZE -s K/544 -s K/454 -s K/445
+
+        ansiecho -S ZE K/544 K/454 K/445
 
 - **-C** _spec_
 
@@ -195,47 +253,35 @@ behavior.  See ["STRING LITERAL"](#string-literal) section.
 
         ansiecho -CRF -F'->%s' -CUD A B C
 
-- **-E** _spec_
+- **-E**
 
-    Terminate **-C** and **-F** effects.
+    Terminate **-C**, **-F** and **-S** effects.
 
-- **-s** _spec_
-- **-z** _spec_
+- **-i** _spec_
+- **-a** _spec_
 
-    Add raw ANSI sequence given by _spec_.  Option **-s** add the sequence
-    to the new argument, while **-z** add to the final argument.  There are
-    no difference when used with **-j** option or with single-or-less
+    Add raw ANSI sequence given by _spec_.  Option **-i** insert the
+    sequence before the next argument, while **-a** append to the final
     argument.
 
-- **-r** _string_ (raw)
+    Next two commands are equivalent.
 
-    Append next string to the final argument with backslash escape
-    interpretation.
+        ansiecho -c R Red
 
-    This option can be used to stringify the option argument.  Next
-    example does not work without **-r**.
+        ansiecho -i R Red -a ZE
 
-        ansiecho -c R -r -c
+    Color spec `ZE` produces RESET and ERASE LINE sequence.
 
-        ansiecho -f %s -r -c
+    Because **-i** and **-a** does not produce RESET sequence, you can use
+    them to accumulate the effects.
 
-    In these cases, be aware that string _-c_ is mixed up with next
-    argument.
-
-- **--separate** _string_
-
-    Set separator string between each arguments.  Option **-j** is a
-    short-cut for **--separate ''**.
-
-- **--**\[**no**\]**rgb24**
-
-    Produce 24bit full-color sequence for 12bit/24bit specified colors.
-    They are converted to 216 colors by default.
+        ansiecho -i R R -i U RU -i I RUI -i S RUIS -i F RUISF -a Z
 
 # STRING LITERAL
 
 This is a backslash escape samples described in ["Quote and
-Quote-like Operators" in perlop](https://metacpan.org/pod/perlop#Quote-and-Quote-like-Operators).
+Quote-like Operators" in perlop](https://metacpan.org/pod/perlop#Quote-and-Quote-like-Operators).  Non-alphabetical character after backslash is
+always correspond to the character itself.
 
     Sequence     Description
     \t           tab               (HT, TAB)
@@ -316,6 +362,13 @@ Samples:
     K/W  000/555  #000/#FFF  000000/FFFFFF  <black>/<white>
     R/G  500/050  #F00/#0F0  FF0000/00FF00  <red>/<green>
     W/w  L03/L20  #333/#ccc  303030/c6c6c6  <dimgrey>/<lightgrey>
+
+# 256/24BIT COLORS
+
+12bit/24bit colors are converted to 216 colors because most terminal
+can not display them.  If you are using full-color terminal, such as
+iTerm2 on Mac, use **--rgb24** option or set `GETOPTEX_RGB24`
+environment variable to produce full-color sequence.
 
 # INSTALL
 

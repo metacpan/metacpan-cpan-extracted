@@ -1,7 +1,9 @@
 package Class::Accessor::Array;
 
-our $DATE = '2017-08-27'; # DATE
-our $VERSION = '0.031'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-08-03'; # DATE
+our $DIST = 'Class-Accessor-Array'; # DIST
+our $VERSION = '0.032'; # VERSION
 
 #IFUNBUILT
 # use strict 'subs', 'vars';
@@ -17,6 +19,10 @@ sub import {
 #IFUNBUILT
 #     no warnings 'redefine';
 #END IFUNBUILT
+
+    # user does not specify 'accessors', perhaps she just loads it. so we just
+    # return.
+    return unless exists $spec->{accessors};
 
     # generate accessors
     for my $meth (keys %{$spec->{accessors}}) {
@@ -70,7 +76,7 @@ Class::Accessor::Array - Generate accessors/constructor for array-based object
 
 =head1 VERSION
 
-This document describes version 0.031 of Class::Accessor::Array (from Perl distribution Class-Accessor-Array), released on 2017-08-27.
+This document describes version 0.032 of Class::Accessor::Array (from Perl distribution Class-Accessor-Array), released on 2021-08-03.
 
 =head1 SYNOPSIS
 
@@ -143,6 +149,12 @@ L<Class::Accessor::PackedString>.
 
 =for Pod::Coverage .+
 
+=head1 CONTRIBUTOR
+
+=for stopwords Steven Haryanto
+
+Steven Haryanto <sharyanto@cpan.org>
+
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/Class-Accessor-Array>.
@@ -173,7 +185,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

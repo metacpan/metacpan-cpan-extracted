@@ -142,9 +142,7 @@ static OP *pp_methstart(pTHX)
   }
 
   if(classstash) {
-    const char *stashname = HvNAME(classstash);
-
-    if(!stashname || !sv_derived_from(self, stashname))
+    if(!HvNAME(classstash) || !sv_derived_from_hv(self, classstash))
       croak("Cannot invoke foreign method on non-derived instance");
   }
 
@@ -188,19 +186,12 @@ static OP *pp_methstart(pTHX)
   return PL_op->op_next;
 }
 
-OP *ObjectPad_newMETHSTARTOP(I32 flags, U8 private)
+OP *ObjectPad_newMETHSTARTOP(pTHX_ U32 flags)
 {
   OP *op = newOP_CUSTOM(&pp_methstart, flags);
-  op->op_private = private;
+  op->op_private = (U8)(flags >> 8);
   return op;
 }
-
-/* op_private flags on SLOTPAD ops */
-enum {
-  OPpSLOTPAD_SV,  /* has $x */
-  OPpSLOTPAD_AV,  /* has @y */
-  OPpSLOTPAD_HV,  /* has %z */
-};
 
 static XOP xop_slotpad;
 static OP *pp_slotpad(pTHX)
@@ -249,17 +240,7 @@ static OP *pp_slotpad(pTHX)
   return PL_op->op_next;
 }
 
-/* Just like OP_CONST except it doesn't set SvREADONLY on the target SV */
-static OP *pp_sv(pTHX)
-{
-  dSP;
-  EXTEND(SP, 1);
-  PUSHs(cSVOP->op_sv);
-  PUTBACK;
-  return PL_op->op_next;
-}
-
-static OP *newSLOTPADOP(I32 flags, U8 private, PADOFFSET padix, SLOTOFFSET slotix)
+OP *ObjectPad_newSLOTPADOP(pTHX_ U32 flags, PADOFFSET padix, SLOTOFFSET slotix)
 {
 #ifdef HAVE_UNOP_AUX
   OP *op = newUNOP_AUX(OP_CUSTOM, flags, NULL, NUM2PTR(UNOP_AUX_item *, slotix));
@@ -267,15 +248,10 @@ static OP *newSLOTPADOP(I32 flags, U8 private, PADOFFSET padix, SLOTOFFSET sloti
   OP *op = newUNOP_with_IV(OP_CUSTOM, flags, NULL, slotix);
 #endif
   op->op_targ = padix;
-  op->op_private = private;
+  op->op_private = (U8)(flags >> 8);
   op->op_ppaddr = &pp_slotpad;
 
   return op;
-}
-
-OP *ObjectPad_newSVOP(SV *sv)
-{
-  return newSVOP_CUSTOM(&pp_sv, 0, sv);
 }
 
 /* The metadata on the currently-compiling class */
@@ -653,61 +629,6 @@ static void check_has(pTHX_ void *hookdata)
     croak("Cannot add slot data to an invokable role");
 }
 
-static void S_generate_slot_accessor_method(pTHX_ SlotMeta *slotmeta, SV *mname, int type)
-{
-  ENTER;
-
-  ClassMeta *classmeta = slotmeta->class;
-
-  SV *mname_fq = newSVpvf("%" SVf "::%" SVf, classmeta->name, mname);
-
-  I32 floor_ix = start_subparse(FALSE, 0);
-  SAVEFREESV(PL_compcv);
-
-  I32 save_ix = block_start(TRUE);
-
-  extend_pad_vars(classmeta);
-
-  struct AccessorGenerationCtx ctx = { 0 };
-
-  ctx.padix = pad_add_name_sv(slotmeta->name, 0, NULL, NULL);
-  intro_my();
-
-  OP *ops = op_append_list(OP_LINESEQ, NULL,
-    newSTATEOP(0, NULL, NULL));
-  ops = op_append_list(OP_LINESEQ, ops,
-    newMETHSTARTOP(0 |
-      (classmeta->type == METATYPE_ROLE ? OPf_SPECIAL : 0), classmeta->repr));
-
-  ops = op_append_list(OP_LINESEQ, ops,
-    make_argcheck_ops((type == ACCESSOR_WRITER) ? 1 : 0, 0, 0, mname_fq));
-
-  ops = op_append_list(OP_LINESEQ, ops,
-    newSLOTPADOP(0, OPpSLOTPAD_SV, ctx.padix, slotmeta->slotix));
-
-  MOP_SLOT_RUN_HOOKS(slotmeta, gen_accessor_ops, type, &ctx);
-
-  if(ctx.bodyop)
-    ops = op_append_list(OP_LINESEQ, ops, ctx.bodyop);
-
-  if(ctx.post_bodyops)
-    ops = op_append_list(OP_LINESEQ, ops, ctx.post_bodyops);
-
-  if(!ctx.retop)
-    croak("Require ctx.retop");
-  ops = op_append_list(OP_LINESEQ, ops, ctx.retop);
-
-  SvREFCNT_inc(PL_compcv);
-  ops = block_end(save_ix, ops);
-
-  CV *cv = newATTRSUB(floor_ix, newSVOP(OP_CONST, 0, mname_fq), NULL, NULL, ops);
-  CvMETHOD_on(cv);
-
-  mop_class_add_method(classmeta, mname);
-
-  LEAVE;
-}
-
 static int build_has(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t nargs, void *hookdata)
 {
   int argi = 0;
@@ -733,13 +654,6 @@ static int build_has(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t nargs, 
     }
   }
 
-  if(slotmeta->readername)
-    S_generate_slot_accessor_method(aTHX_ slotmeta, slotmeta->readername, ACCESSOR_READER);
-  if(slotmeta->writername)
-    S_generate_slot_accessor_method(aTHX_ slotmeta, slotmeta->writername, ACCESSOR_WRITER);
-  if(slotmeta->mutatorname)
-    S_generate_slot_accessor_method(aTHX_ slotmeta, slotmeta->mutatorname, ACCESSOR_LVALUE_MUTATOR);
-
   /* It would be nice to just yield some OP to represent the has slot here
    * and let normal parsing of normal scalar assignment accept it. But we can't
    * because scalar assignment tries to peephole far too deply into us and
@@ -760,8 +674,14 @@ static int build_has(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t nargs, 
 
     *out = newBINOP(OP_SASSIGN, 0,
       op,
-      ObjectPad_newSVOP(SvREFCNT_inc(slotmeta->defaultsv)));
+      /* An OP_CONST whose op_type is OP_CUSTOM.
+       * This way we avoid the opchecker and finalizer doing bad things to
+       * our defaultsv SV by setting it SvREADONLY_on().
+       */
+      newSVOP_CUSTOM(PL_ppaddr[OP_CONST], 0, SvREFCNT_inc(slotmeta->defaultsv)));
   }
+
+  MOP_SLOT_RUN_HOOKS(slotmeta, seal_slot, 0);
 
   return KEYWORD_PLUGIN_STMT;
 }
@@ -795,7 +715,7 @@ enum PhaserType {
   PHASER_ADJUST,
 };
 
-const char *phasertypename[] = {
+static const char *phasertypename[] = {
   [PHASER_BUILD]  = "BUILD",
   [PHASER_ADJUST] = "ADJUST",
 };
@@ -964,7 +884,8 @@ static void parse_pre_blockend(pTHX_ struct XSParseSublikeContext *ctx, void *ho
     newSTATEOP(0, NULL, NULL));
   slotops = op_append_list(OP_LINESEQ, slotops,
     newMETHSTARTOP(0 |
-      (compclassmeta->type == METATYPE_ROLE ? OPf_SPECIAL : 0), compclassmeta->repr));
+      (compclassmeta->type == METATYPE_ROLE ? OPf_SPECIAL : 0) |
+      (compclassmeta->repr << 8)));
 
   int i;
   for(i = 0; i < nslots; i++) {
@@ -981,7 +902,6 @@ static void parse_pre_blockend(pTHX_ struct XSParseSublikeContext *ctx, void *ho
       )
         continue;
 
-    const char *pv = SvPVX(slotmeta->name);
     SLOTOFFSET slotix = slotmeta->slotix;
     PADOFFSET padix = find_padix_for_slot(slotmeta);
 
@@ -989,7 +909,7 @@ static void parse_pre_blockend(pTHX_ struct XSParseSublikeContext *ctx, void *ho
       continue;
 
     U8 private = 0;
-    switch(pv[0]) {
+    switch(SvPV_nolen(slotmeta->name)[0]) {
       case '$': private = OPpSLOTPAD_SV; break;
       case '@': private = OPpSLOTPAD_AV; break;
       case '%': private = OPpSLOTPAD_HV; break;
@@ -997,7 +917,7 @@ static void parse_pre_blockend(pTHX_ struct XSParseSublikeContext *ctx, void *ho
 
     slotops = op_append_list(OP_LINESEQ, slotops,
       /* alias the padix from the slot */
-      newSLOTPADOP(0, private, padix, slotix));
+      newSLOTPADOP(private << 8, padix, slotix));
 
 #if HAVE_PERL_VERSION(5, 22, 0)
     /* Unshare the padname so the one in the scopeslot returns to refcount 1 */

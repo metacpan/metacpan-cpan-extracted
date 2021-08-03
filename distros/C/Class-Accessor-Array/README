@@ -3,8 +3,8 @@ NAME
     object
 
 VERSION
-    This document describes version 0.031 of Class::Accessor::Array (from
-    Perl distribution Class-Accessor-Array), released on 2017-08-27.
+    This document describes version 0.032 of Class::Accessor::Array (from
+    Perl distribution Class-Accessor-Array), released on 2021-08-03.
 
 SYNOPSIS
     In lib/Your/Class.pm:
@@ -73,6 +73,9 @@ DESCRIPTION
     the hash-based object. Try representing an object as a pack()-ed string
     instead using Class::Accessor::PackedString.
 
+CONTRIBUTOR
+    Steven Haryanto <sharyanto@cpan.org>
+
 HOMEPAGE
     Please visit the project's homepage at
     <https://metacpan.org/release/Class-Accessor-Array>.
@@ -99,7 +102,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
+    This software is copyright (c) 2021, 2017, 2016 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

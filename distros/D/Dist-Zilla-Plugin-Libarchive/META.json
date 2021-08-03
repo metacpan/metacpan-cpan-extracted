@@ -1,0 +1,82 @@
+{
+   "abstract" : "Create dist archives using Archive::Libarchive",
+   "author" : [
+      "Graham Ollis <plicease@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Dist-Zilla-Plugin-Libarchive",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.020"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "FindBin" : "0",
+            "Perl::Critic" : "0",
+            "Test2::Require::Module" : "0.000121",
+            "Test2::Tools::PerlCritic" : "0",
+            "Test2::V0" : "0.000121",
+            "Test::CPAN::Changes" : "0",
+            "Test::EOL" : "0",
+            "Test::Fixme" : "0.07",
+            "Test::More" : "0.98",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "0",
+            "Test::Pod::Coverage" : "0",
+            "Test::Pod::Spelling::CommonMistakes" : "0",
+            "Test::Spelling" : "0",
+            "Test::Strict" : "0",
+            "YAML" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Archive::Libarchive" : "0",
+            "Dist::Zilla" : "6.024",
+            "Dist::Zilla::Role::ArchiveBuilder" : "0",
+            "Moose" : "0",
+            "Moose::Util::TypeConstraints" : "0",
+            "Path::Tiny" : "0",
+            "namespace::autoclean" : "0",
+            "perl" : "v5.20.0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test2::V0" : "0.000121",
+            "Test::DZil" : "0",
+            "perl" : "v5.20.0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/uperl/Dist-Zilla-Plugin-Libarchive/issues"
+      },
+      "homepage" : "https://metacpan.org/pod/Dist::Zilla::Plugin::Libarchive",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/uperl/Dist-Zilla-Plugin-Libarchive.git",
+         "web" : "https://github.com/uperl/Dist-Zilla-Plugin-Libarchive"
+      }
+   },
+   "version" : "0.02",
+   "x_generated_by_perl" : "v5.34.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.26",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
+   "x_use_unsafe_inc" : 0
+}
+

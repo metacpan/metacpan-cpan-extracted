@@ -18,10 +18,13 @@ name: XS-Parse-Keyword
 provides:
   XS::Parse::Keyword:
     file: lib/XS/Parse/Keyword.pm
-    version: '0.10'
+    version: '0.11'
+  XS::Parse::Keyword::Builder:
+    file: lib/XS/Parse/Keyword/Builder.pm
+    version: '0.11'
 requires:
   perl: '5.014'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.10'
+version: '0.11'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -3,37 +3,7 @@
 #
 #  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
 
-use v5.14;
-use warnings;
-
-use B qw( perlstring );
-use Module::Build;
-
-open my $outh, ">", $ARGV[0] or
-   die "Cannot write $ARGV[0] - $!\n";
-
-local $/;
-
-my $build = Module::Build->resume;
-
-my @ccflags = @{ $build->notes( "builder_cflags" ) };
-my $quoted_cflags = join ", ", map { perlstring $_ } @ccflags;
-
-$outh->print( scalar do { <DATA> }
-   =~ s/__BUILDER_CFLAGS__/$quoted_cflags/r );
-
-$outh->print( scalar do {
-   open my $in_h, "<", "XSParseKeyword.h" or
-      die "Cannot open XSParseKeyword.h - $!";
-   <$in_h> } );
-
-__DATA__
-#  You may distribute under the terms of either the GNU General Public License
-#  or the Artistic License (the same terms as Perl itself)
-#
-#  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
-
-package XS::Parse::Keyword::Builder 0.10;
+package XS::Parse::Keyword::Builder 0.11;
 
 use v5.14;
 use warnings;
@@ -68,10 +38,7 @@ distribution to be able to make use of C<XS::Parse::Keyword>.
 
 =cut
 
-my $XSParseKeyword_h = do {
-   local $/;
-   readline DATA;
-};
+require XS::Parse::Keyword::Builder_data;
 
 =head1 FUNCTIONS
 
@@ -93,7 +60,7 @@ sub write_XSParseKeyword_h
    open my $out, ">", "XSParseKeyword.h" or
       die "Cannot open XSParseKeyword.h for writing - $!\n";
 
-   $out->print( $XSParseKeyword_h );
+   $out->print( XS::Parse::Keyword::Builder_data->XSPARSEKEYWORD_H );
 }
 
 =head2 extra_compiler_flags
@@ -106,12 +73,10 @@ F<XSParseKeyword.h> file.
 
 =cut
 
-use constant BUILDER_CFLAGS => __BUILDER_CFLAGS__;
-
 sub extra_compiler_flags
 {
    shift;
-   return "-I.", BUILDER_CFLAGS;
+   return "-I.", XS::Parse::Keyword::Builder_data->BUILDER_CFLAGS;
 }
 
 =head2 extend_module_build
@@ -147,5 +112,3 @@ Paul Evans <leonerd@leonerd.org.uk>
 =cut
 
 0x55AA;
-
-__DATA__

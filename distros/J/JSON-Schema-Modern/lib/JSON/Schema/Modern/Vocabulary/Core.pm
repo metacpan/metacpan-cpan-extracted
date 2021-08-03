@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary::Core;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Core vocabulary
 
-our $VERSION = '0.514';
+our $VERSION = '0.515';
 
 use 5.016;
 no if "$]" >= 5.031009, feature => 'indirect';
@@ -21,6 +21,7 @@ sub vocabulary {
   my ($self, $spec_version) = @_;
   return
       $spec_version eq 'draft2019-09' ? 'https://json-schema.org/draft/2019-09/vocab/core'
+    : $spec_version eq 'draft2020-12' ? 'https://json-schema.org/draft/2020-12/vocab/core'
     : undef;
 }
 
@@ -30,14 +31,17 @@ sub keywords {
     qw($id $schema),
     $spec_version ne 'draft7' ? '$anchor' : (),
     $spec_version eq 'draft2019-09' ? '$recursiveAnchor' : (),
+    $spec_version eq 'draft2020-12' ? '$dynamicAnchor' : (),
     '$ref',
     $spec_version eq 'draft2019-09' ? '$recursiveRef' : (),
+    $spec_version eq 'draft2020-12' ? '$dynamicRef' : (),
     $spec_version eq 'draft7' ? 'definitions' : qw($vocabulary $comment $defs),
   );
 }
 
 # supported metaschema URIs. is a subset of JSON::Schema::Modern::CACHED_METASCHEMAS
 my %version_uris = (
+  'https://json-schema.org/draft/2020-12/schema'  => 'draft2020-12',
   'https://json-schema.org/draft/2019-09/schema'  => 'draft2019-09',
   'http://json-schema.org/draft-07/schema#'       => 'draft7',
 );
@@ -50,10 +54,10 @@ my %version_uris = (
 sub _traverse_keyword_id {
   my ($self, $schema, $state) = @_;
 
-  return if not assert_keyword_type($state, $schema, 'string');
+  return if not assert_keyword_type($state, $schema, 'string')
+    or not assert_uri_reference($state, $schema);
 
   my $uri = Mojo::URL->new($schema->{'$id'});
-  return E($state, '$id value should not equal "%s"', $uri) if $uri eq '' or $uri eq '#';
 
   if ($state->{spec_version} eq 'draft7') {
     if (length($uri->fragment)) {
@@ -69,6 +73,8 @@ sub _traverse_keyword_id {
   }
 
   $uri->fragment(undef);
+  return E($state, '$id cannot be empty') if not length $uri;
+
   $state->{initial_schema_uri} = $uri->is_abs ? $uri : $uri->to_abs($state->{initial_schema_uri});
   $state->{traversed_schema_path} = $state->{traversed_schema_path}.$state->{schema_path};
   # we don't set or update document_path because it is identical to traversed_schema_path
@@ -79,6 +85,7 @@ sub _traverse_keyword_id {
       path => $state->{traversed_schema_path},
       canonical_uri => $state->{initial_schema_uri}->clone,
     };
+  return 1;
 }
 
 sub _eval_keyword_id {
@@ -89,6 +96,8 @@ sub _eval_keyword_id {
     $state->{traversed_schema_path} = $state->{traversed_schema_path}.$state->{schema_path};
     $state->{document_path} = $state->{document_path}.$state->{schema_path};
     $state->{schema_path} = '';
+    push @{$state->{dynamic_scope}}, $canonical_uri;
+
     return 1;
   }
 
@@ -99,8 +108,7 @@ sub _eval_keyword_id {
 sub _traverse_keyword_schema {
   my ($self, $schema, $state) = @_;
 
-  return if not assert_keyword_type($state, $schema, 'string');
-  assert_uri($state, $schema);
+  return if not assert_keyword_type($state, $schema, 'string') or not assert_uri($state, $schema);
 
   # note: we need not be at the document root, but simply adjacent to an $id
   return E($state, '$schema can only appear at the schema resource root')
@@ -115,7 +123,8 @@ sub _traverse_keyword_schema {
   # condition involved in supporting different core keyword semantics before we can parse the
   # keywords that tell us what those semantics are.
   # To support different dialects, we will record the local dialect in the document object for
-  # swapping out during evaluation and following $refs..
+  # swapping out during evaluation and following $refs. We must also store a value to be populated
+  # into $state->{validate_formats}, if one of the format vocabularies is included.
   return E($state, '"$schema" indicates a different version than that requested by \'specification_version\'')
     if $state->{evaluator}->specification_version
       and $spec_version ne $state->{evaluator}->specification_version;
@@ -128,6 +137,7 @@ sub _traverse_keyword_schema {
     if exists $schema->{'$ref'} and $spec_version eq 'draft7';
 
   $state->{spec_version} = $spec_version;
+  return 1;
 }
 
 # In the future, at traversal time we will fetch the schema at the value of this keyword and examine
@@ -144,8 +154,11 @@ sub _traverse_keyword_anchor {
   return if not assert_keyword_type($state, $schema, 'string');
 
   return E($state, '%s value "%s" does not match required syntax',
-      $state->{keyword}, $schema->{$state->{keyword}})
-    if $schema->{$state->{keyword}} !~ /^[A-Za-z][A-Za-z0-9_:.-]*$/;
+      $state->{keyword}, ($state->{keyword} eq '$id' ? '#' : '').$schema->{$state->{keyword}})
+    if $state->{spec_version} =~ /^draft(7|2019-09)$/
+        and $schema->{$state->{keyword}} !~ /^[A-Za-z][A-Za-z0-9_:.-]*$/
+      or $state->{spec_version} eq 'draft2020-12'
+        and $schema->{$state->{keyword}} !~ /^[A-Za-z_][A-Za-z0-9._-]*$/;
 
   my $canonical_uri = canonical_schema_uri($state);
 
@@ -154,6 +167,7 @@ sub _traverse_keyword_anchor {
       path => $state->{traversed_schema_path}.$state->{schema_path},
       canonical_uri => $canonical_uri,
     };
+  return 1;
 }
 
 # we already indexed the $anchor uri, so there is nothing more to do at evaluation time.
@@ -164,12 +178,11 @@ sub _traverse_keyword_recursiveAnchor {
 
   return if not assert_keyword_type($state, $schema, 'boolean');
 
-  return if not $schema->{'$recursiveAnchor'};
-
   # this is required because the location is used as the base URI for future resolution
   # of $recursiveRef, and the fragment would be disregarded in the base
   return E($state, '"$recursiveAnchor" keyword used without "$id"')
     if length($state->{schema_path});
+  return 1;
 }
 
 sub _eval_keyword_recursiveAnchor {
@@ -183,10 +196,16 @@ sub _eval_keyword_recursiveAnchor {
   return 1;
 }
 
+sub _traverse_keyword_dynamicAnchor { goto \&_traverse_keyword_anchor }
+
+# we already indexed the $dynamicAnchor uri, so there is nothing more to do at evaluation time.
+# we explicitly do NOT set $state->{initial_schema_uri}.
+
 sub _traverse_keyword_ref {
   my ($self, $schema, $state) = @_;
-  return if not assert_keyword_type($state, $schema, 'string');
-  return if not assert_uri_reference($state, $schema);
+  return if not assert_keyword_type($state, $schema, 'string')
+    or not assert_uri_reference($state, $schema);
+  return 1;
 }
 
 sub _eval_keyword_ref {
@@ -238,15 +257,56 @@ sub _eval_keyword_recursiveRef {
     });
 }
 
+sub _traverse_keyword_dynamicRef { goto \&_traverse_keyword_ref }
+
+sub _eval_keyword_dynamicRef {
+  my ($self, $data, $schema, $state) = @_;
+
+  my $uri = Mojo::URL->new($schema->{'$dynamicRef'})->to_abs($state->{initial_schema_uri});
+  my ($subschema, $canonical_uri, $document, $document_path) = $state->{evaluator}->_fetch_schema_from_uri($uri);
+  abort($state, 'EXCEPTION: unable to find resource %s', $uri) if not defined $subschema;
+
+  # If the initially resolved starting point URI includes a fragment that was created by the
+  # "$dynamicAnchor" keyword, ...
+  if (length $uri->fragment and exists $subschema->{'$dynamicAnchor'}
+      and $uri->fragment eq (my $anchor = $subschema->{'$dynamicAnchor'})) {
+    # ...the initial URI MUST be replaced by the URI (including the fragment) for the outermost
+    # schema resource in the dynamic scope that defines an identically named fragment with
+    # "$dynamicAnchor".
+    foreach my $base_scope (@{$state->{dynamic_scope}}) {
+      $uri = Mojo::URL->new($base_scope)->fragment($anchor);
+      my ($dynamic_anchor_subschema) = $state->{evaluator}->_fetch_schema_from_uri($uri);
+      if ((($dynamic_anchor_subschema//{})->{'$dynamicAnchor'}//'') eq $anchor) {
+        ($subschema, $canonical_uri, $document, $document_path) = $state->{evaluator}->_fetch_schema_from_uri($uri);
+        abort($state, 'EXCEPTION: unable to find resource %s', $uri) if not defined $subschema;
+        last;
+      }
+    }
+  }
+
+  return $self->eval($data, $subschema,
+    +{
+      %{$document->evaluation_configs},
+      %$state,
+      traversed_schema_path => $state->{traversed_schema_path}.$state->{schema_path}.'/$dynamicRef',
+      initial_schema_uri => $canonical_uri,
+      document => $document,
+      document_path => $document_path,
+      spec_version => $document->specification_version,
+      schema_path => '',
+    });
+}
+
 sub _traverse_keyword_vocabulary {
   my ($self, $schema, $state) = @_;
   return if not assert_keyword_type($state, $schema, 'object');
 
+  my $valid = 1;
   foreach my $property (sort keys %{$schema->{'$vocabulary'}}) {
-    E($state, '$vocabulary/%s value is not a boolean', $property)
+    $valid = E($state, '$vocabulary/%s value is not a boolean', $property)
       if not is_type('boolean', $schema->{'$vocabulary'}{$property});
 
-    assert_uri($state, $schema, $property);
+    $valid = 0 if not assert_uri($state, $schema, $property);
   }
 
   return E($state, '$vocabulary can only appear at the schema resource root')
@@ -254,6 +314,8 @@ sub _traverse_keyword_vocabulary {
 
   return E($state, '$vocabulary can only appear at the document root')
     if length($state->{traversed_schema_path}.$state->{schema_path});
+
+  return $valid;
 }
 
 # we do nothing with $vocabulary yet at evaluation time. When we know we are in a metaschema,
@@ -264,6 +326,7 @@ sub _traverse_keyword_comment {
   my ($self, $schema, $state) = @_;
 
   return if not assert_keyword_type($state, $schema, 'string');
+  return 1;
 }
 
 # we do nothing with $comment at evaluation time, including not collecting its value for annotations.
@@ -288,7 +351,7 @@ JSON::Schema::Modern::Vocabulary::Core - Implementation of the JSON Schema Core 
 
 =head1 VERSION
 
-version 0.514
+version 0.515
 
 =head1 DESCRIPTION
 
@@ -296,13 +359,23 @@ version 0.514
 
 =for stopwords metaschema
 
-Implementation of the JSON Schema Draft 2019-09 "Core" vocabulary, indicated in metaschemas
-with the URI C<https://json-schema.org/draft/2019-09/vocab/core> and formally specified in
-L<https://datatracker.ietf.org/doc/html/draft-handrews-json-schema-02#section-8>.
+Implementation of the JSON Schema Draft 2020-12 "Core" vocabulary, indicated in metaschemas
+with the URI C<https://json-schema.org/draft/2020-12/vocab/core> and formally specified in
+L<https://datatracker.ietf.org/doc/html/draft-bhutton-json-schema-00#section-8>.
 
-Support is also provided for the equivalent Draft 7 keywords that correspond to this vocabulary and
-are formally specified in
-L<https://datatracker.ietf.org/doc/html/draft-handrews-json-schema-01>.
+Support is also provided for
+
+=over 4
+
+=item *
+
+the equivalent Draft 2019-09 keywords, indicated in metaschemas with the URI C<https://json-schema.org/draft/2019-09/vocab/core> and formally specified in L<https://datatracker.ietf.org/doc/html/draft-handrews-json-schema-02#section-8>.
+
+=item *
+
+the equivalent Draft 7 keywords that correspond to this vocabulary and are formally specified in L<https://datatracker.ietf.org/doc/html/draft-handrews-json-schema-01>.
+
+=back
 
 =head1 SUPPORT
 

@@ -14,8 +14,7 @@ use lib 't/lib';
 use Helper;
 
 foreach my $keyword (
-    # APPLICATOR KEYWORDS
-    qw(unevaluatedItems unevaluatedProperties),
+  qw(unevaluatedItems unevaluatedProperties),
 ) {
   cmp_deeply(
     evaluate(true, { $keyword => {} }),
@@ -46,6 +45,7 @@ my %schemas = (
 );
 
 my @warnings = (
+  [ draft7 => [ qw(id) ] ],
   [ 'draft2019-09' => [ qw(id definitions dependencies) ] ],
 );
 

@@ -42,14 +42,20 @@ struct SlotHookFuncs {
   /* called immediately at apply time; return TRUE means it did its thing immediately */
   bool (*apply)(pTHX_ SlotMeta *slotmeta, SV *value);
 
+  /* called at the end of `has` statement compiletime */
+  void (*seal_slot)(pTHX_ SlotMeta *slotmeta, SV *hookdata, int __dummy);
+
   /* called as part of accessor generation */
   void (*gen_accessor_ops)(pTHX_ SlotMeta *slotmeta, SV *hookdata, enum AccessorType type,
           struct AccessorGenerationCtx *ctx);
 
-  void (*post_initslot)(pTHX_ SlotMeta *slotmeta, SV *hookdata, SV *slot); /* called by constructor */
+  /* called by constructor */
+  void (*post_initslot)(pTHX_ SlotMeta *slotmeta, SV *hookdata, SV *slot);
+  void (*post_construct)(pTHX_ SlotMeta *slotmeta, SV *hookdata, SV *slot);
 };
 
 struct SlotHook {
+  SLOTOFFSET slotix; /* unused when in SlotMeta->hooks; used by ClassMeta->slothooks_* */
   const struct SlotHookFuncs *funcs;
   SV *hookdata;
 };
@@ -59,7 +65,6 @@ struct SlotMeta {
   ClassMeta *class;
   SV *defaultsv;
   SLOTOFFSET slotix;
-  SV *readername, *writername, *mutatorname; /* accessor method names */
   AV *hooks; /* NULL, or AV of raw pointers directly to SlotHook structs */
 };
 
@@ -117,6 +122,9 @@ struct ClassMeta {
   AV *buildblocks;     /* the BUILD {} phaser blocks; each elem is a CV* directly */
   AV *adjustblocks;    /* the ADJUST {} phaser blocks; each elem is a CV* directly */
 
+  AV *slothooks_postslots; /* NULL, or AV of struct SlotHook, all of whose ->funcs->post_initslot exist */
+  AV *slothooks_construct; /* NULL, or AV of struct SlotHook, all of whose ->funcs->post_construct exist */
+
   COP *tmpcop;         /* a COP to use during generated constructor */
   CV *methodscope;     /* a temporary CV used just during compilation of a `method` */
 };
@@ -143,10 +151,18 @@ enum {
 #define extend_pad_vars(meta)  ObjectPad_extend_pad_vars(aTHX_ meta)
 void ObjectPad_extend_pad_vars(pTHX_ const ClassMeta *meta);
 
-#define newMETHSTARTOP(flags, private)  ObjectPad_newMETHSTARTOP(flags, private)
-OP *ObjectPad_newMETHSTARTOP(I32 flags, U8 private);
+#define newMETHSTARTOP(flags)  ObjectPad_newMETHSTARTOP(aTHX_ flags)
+OP *ObjectPad_newMETHSTARTOP(pTHX_ U32 flags);
 
-OP *ObjectPad_newSVOP(SV *sv);
+/* op_private flags on SLOTPAD ops */
+enum {
+  OPpSLOTPAD_SV,  /* has $x */
+  OPpSLOTPAD_AV,  /* has @y */
+  OPpSLOTPAD_HV,  /* has %z */
+};
+
+#define newSLOTPADOP(flags, padix, slotix)  ObjectPad_newSLOTPADOP(aTHX_ flags, padix, slotix)
+OP *ObjectPad_newSLOTPADOP(pTHX_ U32 flags, PADOFFSET padix, SLOTOFFSET slotix);
 
 #define get_obj_slotsav(self, repr, create)  ObjectPad_obj_get_slotsav(aTHX_ self, repr, create)
 SV *ObjectPad_obj_get_slotsav(pTHX_ SV *self, enum ReprType repr, bool create);
@@ -180,10 +196,13 @@ void ObjectPad_mop_class_compose_role(pTHX_ ClassMeta *classmeta, ClassMeta *rol
 SlotMeta *ObjectPad_mop_create_slot(pTHX_ SV *slotname, ClassMeta *classmeta);
 
 #define mop_slot_set_param(slotmeta, paramname)  ObjectPad_mop_slot_set_param(aTHX_ slotmeta, paramname)
-void ObjectPad_mop_slot_set_param(pTHX_ SlotMeta *slotmeta, const char *paramname);
+void ObjectPad_mop_slot_set_param(pTHX_ SlotMeta *slotmeta, SV *paramname);
 
 #define mop_slot_apply_attribute(slotmeta, name, value)  ObjectPad_mop_slot_apply_attribute(aTHX_ slotmeta, name, value)
 void ObjectPad_mop_slot_apply_attribute(pTHX_ SlotMeta *slotmeta, const char *name, SV *value);
+
+#define mop_slot_get_attribute(slotmeta, name)  ObjectPad_mop_slot_get_attribute(aTHX_ slotmeta, name)
+struct SlotHook *ObjectPad_mop_slot_get_attribute(pTHX_ SlotMeta *slotmeta, const char *name);
 
 #define MOP_SLOT_RUN_HOOKS(slotmeta, func, ...)                                           \
   {                                                                                       \

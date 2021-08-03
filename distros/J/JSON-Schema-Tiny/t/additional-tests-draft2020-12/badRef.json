@@ -1,0 +1,31 @@
+[
+    {
+        "description": "good references in schemas",
+        "schema": {
+            "if": false,
+            "then": {
+                "allOf": [
+                    { "$ref": "foo/bar.json" },
+                    { "$ref": "foo/bar.json#" },
+                    { "$ref": "foo/bar.json#anchor" },
+                    { "$ref": "foo/bar.json#/" },
+                    { "$ref": "foo/bar.json#/foo" },
+                    { "$ref": "foo/bar.json#/~1/foo" },
+                    { "$dynamicRef": "foo/bar.json" },
+                    { "$dynamicRef": "foo/bar.json#" },
+                    { "$dynamicRef": "foo/bar.json#anchor" },
+                    { "$dynamicRef": "foo/bar.json#/" },
+                    { "$dynamicRef": "foo/bar.json#/foo" },
+                    { "$dynamicRef": "foo/bar.json#/~1/foo" }
+                ]
+            }
+        },
+        "tests": [
+            {
+                "description": "this data is never used",
+                "data": "ignore",
+                "valid": true
+            }
+        ]
+    }
+]

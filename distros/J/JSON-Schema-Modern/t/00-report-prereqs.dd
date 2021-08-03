@@ -13,13 +13,11 @@ do { my $x = {
                                         'Dist::Zilla::PluginBundle::Git::VersionManager' => '0.007'
                                       },
                       'requires' => {
-                                      'Data::Validate::Domain' => '0',
                                       'Email::Address::XS' => '1.01',
                                       'Encode' => '0',
                                       'File::Spec' => '0',
                                       'IO::Handle' => '0',
                                       'IPC::Open3' => '0',
-                                      'Net::IDN::Encode' => '0',
                                       'Pod::Coverage::TrustPod' => '0',
                                       'Pod::Wordlist' => '0',
                                       'Test::CPAN::Changes' => '0.19',
@@ -35,8 +33,7 @@ do { my $x = {
                                       'Test::Pod::Coverage' => '1.08',
                                       'Test::Pod::No404s' => '0',
                                       'Test::Portability::Files' => '0',
-                                      'Test::Spelling' => '0.12',
-                                      'Time::Moment' => '0'
+                                      'Test::Spelling' => '0.12'
                                     }
                     },
        'runtime' => {
@@ -61,6 +58,7 @@ do { my $x = {
                                       'Path::Tiny' => '0',
                                       'Ref::Util' => '0.100',
                                       'Safe::Isa' => '0',
+                                      'Scalar::Util' => '0',
                                       'Storable' => '0',
                                       'Types::Standard' => '1.010002',
                                       'constant' => '0',
@@ -75,11 +73,8 @@ do { my $x = {
                       'suggests' => {
                                       'Class::XSAccessor' => '0',
                                       'Cpanel::JSON::XS' => '0',
-                                      'Data::Validate::Domain' => '0',
                                       'Email::Address::XS' => '1.01',
-                                      'Net::IDN::Encode' => '0',
                                       'Ref::Util::XS' => '0',
-                                      'Time::Moment' => '0',
                                       'Type::Tiny::XS' => '0'
                                     }
                     },
@@ -88,14 +83,14 @@ do { my $x = {
                                      'CPAN::Meta' => '2.120900'
                                    },
                    'requires' => {
+                                   'Data::Dumper' => '0',
                                    'File::Spec' => '0',
                                    'Module::Metadata' => '0',
-                                   'Scalar::Util' => '0',
                                    'Test::Deep' => '0',
                                    'Test::Deep::UnorderedPairs' => '0',
                                    'Test::Fatal' => '0',
                                    'Test::File::ShareDir' => '0',
-                                   'Test::JSON::Schema::Acceptance' => '1.011',
+                                   'Test::JSON::Schema::Acceptance' => '1.012',
                                    'Test::Memory::Cycle' => '0',
                                    'Test::More' => '0.96',
                                    'Test::Warnings' => '0',

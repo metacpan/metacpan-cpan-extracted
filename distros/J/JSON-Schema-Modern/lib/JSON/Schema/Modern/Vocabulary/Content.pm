@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary::Content;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Content vocabulary
 
-our $VERSION = '0.514';
+our $VERSION = '0.515';
 
 use 5.016;
 no if "$]" >= 5.031009, feature => 'indirect';
@@ -22,6 +22,7 @@ sub vocabulary {
   my ($self, $spec_version) = @_;
   return
       $spec_version eq 'draft2019-09' ? 'https://json-schema.org/draft/2019-09/vocab/content'
+    : $spec_version eq 'draft2020-12' ? 'https://json-schema.org/draft/2020-12/vocab/content'
     : undef;
 }
 
@@ -36,6 +37,7 @@ sub keywords {
 sub _traverse_keyword_contentEncoding {
   my ($self, $schema, $state) = @_;
   return if not assert_keyword_type($state, $schema, 'string');
+  return 1;
 }
 
 sub _eval_keyword_contentEncoding {
@@ -51,8 +53,6 @@ sub _eval_keyword_contentMediaType { goto \&_eval_keyword_contentEncoding }
 
 sub _traverse_keyword_contentSchema {
   my ($self, $schema, $state) = @_;
-
-  return if not exists $schema->{contentMediaType};
 
   # since contentSchema should never be evaluated in the context of the containing schema, it is
   # not appropriate to gather identifiers found therein -- but we can still validate the subschema.
@@ -82,7 +82,7 @@ JSON::Schema::Modern::Vocabulary::Content - Implementation of the JSON Schema Co
 
 =head1 VERSION
 
-version 0.514
+version 0.515
 
 =head1 DESCRIPTION
 
@@ -90,13 +90,23 @@ version 0.514
 
 =for stopwords metaschema
 
-Implementation of the JSON Schema Draft 2019-09 "Content" vocabulary, indicated in metaschemas
-with the URI C<https://json-schema.org/draft/2019-09/vocab/content> and formally specified in
-L<https://datatracker.ietf.org/doc/html/draft-handrews-json-schema-validation-02#section-8>.
+Implementation of the JSON Schema Draft 2020-12 "Content" vocabulary, indicated in metaschemas
+with the URI C<https://json-schema.org/draft/2020-12/vocab/content> and formally specified in
+L<https://datatracker.ietf.org/doc/html/draft-bhutton-json-schema-validation-00#section-8>.
 
-Support is also provided for the equivalent Draft 7 keywords that correspond to this vocabulary and
-are formally specified in
-L<https://datatracker.ietf.org/doc/html/draft-handrews-json-schema-validation-01#section-8>.
+Support is also provided for
+
+=over 4
+
+=item *
+
+the equivalent Draft 2019-09 keywords, indicated in metaschemas with the URI C<https://json-schema.org/draft/2019-09/vocab/content> and formally specified in L<https://datatracker.ietf.org/doc/html/draft-handrews-json-schema-validation-02#section-8>.
+
+=item *
+
+the equivalent Draft 7 keywords that correspond to this vocabulary and are formally specified in L<https://datatracker.ietf.org/doc/html/draft-handrews-json-schema-validation-01#section-8>.
+
+=back
 
 =head1 SUPPORT
 

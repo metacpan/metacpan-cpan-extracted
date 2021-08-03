@@ -248,7 +248,7 @@ package Coro::Multicore;
 use Coro ();
 
 BEGIN {
-   our $VERSION = '1.06';
+   our $VERSION = '1.07';
 
    use XSLoader;
    XSLoader::load __PACKAGE__, $VERSION;
@@ -386,7 +386,7 @@ Future versions of this module might do this automatically.
 
 =back
 
-=head1 BUGS
+=head1 BUGS & LIMITATIONS
 
 =over 4
 
@@ -403,11 +403,17 @@ whatever the kernel needs (probably less than 8KiB).
 
 Future versions will likely lift this limitation.
 
-=item AnyEvent is initalised at module load time
+=item The enable_times feature of Coro is messed up
 
-AnyEvent is initialised on module load, as opposed to at a later time.
+The enable_times feature uses the per-thread timer to measure per-thread
+execution time, but since Coro::Multicore runs threads on different
+pthreads it will get the wrong times. Real times are not affected.
 
-Future versions will likely change this.
+=item Fork support
+
+Due to the nature of threads, you are not allowed to use this module in a
+forked child normally, with one exception: If you don't create any threads
+in the parent, then it is safe to start using it in a forked child.
 
 =back
 

@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Result;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Contains the result of a JSON Schema evaluation
 
-our $VERSION = '0.514';
+our $VERSION = '0.515';
 
 use 5.016;
 no if "$]" >= 5.031009, feature => 'indirect';
@@ -45,6 +45,7 @@ has $_.'s' => (
   },
 ) foreach qw(error annotation);
 
+# strict_basic can only be used with draft2019-09.
 use constant OUTPUT_FORMATS => [qw(flag basic strict_basic detailed verbose terse)];
 
 has output_format => (
@@ -95,7 +96,8 @@ sub format {
           or (
             not grep $keyword eq $_, qw(allOf anyOf if then else dependentSchemas contains propertyNames)
             and ($keyword ne 'oneOf' or $error ne 'no subschemas are valid')
-            and ($keyword ne 'items' or $error eq 'item not permitted' )
+            and ($keyword ne 'prefixItems' or $error eq 'item not permitted')
+            and ($keyword ne 'items' or $error eq 'item not permitted' or $error eq 'additional item not permitted')
             and ($keyword ne 'additionalItems' or $error eq 'additional item not permitted')
             and (not grep $keyword eq $_, qw(properties patternProperties)
               or $error eq 'property not permitted')
@@ -168,7 +170,7 @@ JSON::Schema::Modern::Result - Contains the result of a JSON Schema evaluation
 
 =head1 VERSION
 
-version 0.514
+version 0.515
 
 =head1 SYNOPSIS
 

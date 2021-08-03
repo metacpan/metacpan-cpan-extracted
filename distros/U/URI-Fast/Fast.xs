@@ -233,7 +233,6 @@ size_t maxnum(size_t x, size_t y) {
   return x >= y ? x : y;
 }
 
-
 /*------------------------------------------------------------------------------
  * Resizable strings
  -----------------------------------------------------------------------------*/
@@ -829,24 +828,27 @@ void uri_scan(pTHX_ uri_t *uri, const char *src, size_t len) {
   while (my_isspace(src[idx]) == 1)     ++idx; // Trim leading whitespace
   while (my_isspace(src[len - 1]) == 1) --len; // Trim trailing whitespace
 
-  // Scheme
+  // scheme
   brk = strncspn(&src[idx], len - idx, ":/@?#");
 
   if (brk > 0 && src[idx + brk] == ':') {
     str_set(aTHX_ uri->scheme, &src[idx], brk);
-    idx += brk + 1;
+    idx += brk;
+    ++idx; // skip past ":"
+  }
 
-    // Authority section following scheme must be separated by //
-    if (idx + 1 < len && src[idx] == '/' && src[idx + 1] == '/') {
-      idx += 2;
+  // authority
+  if (idx + 1 < len         // src is long enough to hold two slashes
+   && src[idx]     == '/'   // next char is a slash
+   && src[idx + 1] == '/')  // char after that is a slash
+  {
+    idx += 2;               // skip past the double slashes
 
-      // Authority
-      brk = strncspn(&src[idx], len - idx, "/?#");
-      uri_scan_auth(aTHX_ uri, &src[idx], brk);
+    brk = strncspn(&src[idx], len - idx, "/?#");
+    uri_scan_auth(aTHX_ uri, &src[idx], brk);
 
-      if (brk > 0) {
-        idx += brk;
-      }
+    if (brk > 0) {
+      idx += brk;
     }
   }
 
@@ -1635,12 +1637,14 @@ void uri_split(pTHX_ SV *uri) {
   }
   // The object is defined
   else if (SvOK(uri)) {
-    const char *src;
     size_t idx = 0;
     size_t brk = 0;
+
+    // Read the string from the SV
+    const char *src;
     size_t len;
 
-    if (!SvTRUE(uri)) {
+    if (sv_len(uri) == 0) {
       src = "";
       len = 0;
     }
@@ -1656,31 +1660,36 @@ void uri_split(pTHX_ SV *uri) {
       }
     }
 
-    // Scheme
+    // scheme
     brk = strcspn(&src[idx], ":/@?#");
 
     if (brk > 0 && src[idx + brk] == ':') {
       XPUSHs(sv_2mortal(newSVpvn(&src[idx], brk)));
-      idx += brk + 1;
-
-      // Authority section following scheme must be separated by //
-      if (idx + 1 < len && src[idx] == '/' && src[idx + 1] == '/') {
-        idx += 2;
-
-        // Authority
-        brk = strcspn(&src[idx], "/?#");
-
-        if (brk > 0) {
-          XPUSHs(sv_2mortal(newSVpvn(&src[idx], brk)));
-          idx += brk;
-        }
-        else {
-          XPUSHs(sv_2mortal(newSVpvn("", 0)));
-        }
-      }
+      idx += brk;
+      ++idx; // skip past ":"
     }
     else {
       XPUSHs(&PL_sv_undef);
+    }
+
+    // authority
+    if (idx + 1 < len         // src is long enough to hold two slashes
+     && src[idx]     == '/'   // next char is a slash
+     && src[idx + 1] == '/')  // char after that is a slash
+    {
+      idx += 2;               // skip past the double slashes
+
+      brk = strcspn(&src[idx], "/?#");
+
+      if (brk > 0) {
+        XPUSHs(sv_2mortal(newSVpvn(&src[idx], brk)));
+        idx += brk;
+      }
+      else {
+        XPUSHs(sv_2mortal(newSVpvn("", 0)));
+      }
+    }
+    else {
       XPUSHs(&PL_sv_undef);
     }
 

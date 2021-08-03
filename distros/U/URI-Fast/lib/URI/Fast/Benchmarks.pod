@@ -9,173 +9,173 @@ Various operations comparing L<URI::Fast> with other modules' performance.
 =head2 Constructor
 
                             Rate            URI      URI::Fast
-              URI        62893/s             --           -86%
-        URI::Fast       441176/s           601%             --
+              URI       174825/s             --           -87%
+        URI::Fast      1388889/s           694%             --
 
 
 =head2 Get scheme
 
                             Rate            URI      URI::Fast
-              URI        58366/s             --           -87%
-        URI::Fast       441176/s           656%             --
+              URI       145985/s             --           -87%
+        URI::Fast      1123596/s           670%             --
 
 
 =head2 Set scheme
 
                             Rate            URI      URI::Fast
-              URI        30675/s             --           -95%
-        URI::Fast       588235/s          1818%             --
+              URI        78309/s             --           -93%
+        URI::Fast      1075269/s          1273%             --
 
 
 =head2 Get authority
 
                             Rate            URI      URI::Fast
-              URI        44379/s             --           -89%
-        URI::Fast       416667/s           839%             --
+              URI       120482/s             --           -89%
+        URI::Fast      1086957/s           802%             --
 
 
 =head2 Set authority
 
                             Rate            URI      URI::Fast
-              URI        27675/s             --           -91%
-        URI::Fast       300000/s           984%             --
+              URI        79365/s             --           -92%
+        URI::Fast      1030928/s          1199%             --
 
 
 =head2 Get path (scalar)
 
                             Rate            URI      URI::Fast
-              URI        50934/s             --           -82%
-        URI::Fast       283019/s           456%             --
+              URI       153139/s             --           -79%
+        URI::Fast       746269/s           387%             --
 
 
 =head2 Get path (list)
 
                             Rate            URI      URI::Fast
-              URI        38265/s             --           -84%
-        URI::Fast       234375/s           512%             --
+              URI       119474/s             --           -83%
+        URI::Fast       714286/s           498%             --
 
 
 =head2 Set path (scalar)
 
                             Rate            URI      URI::Fast
-              URI        43796/s             --           -85%
-        URI::Fast       285714/s           552%             --
+              URI       132275/s             --           -85%
+        URI::Fast       892857/s           575%             --
 
 
 =head2 Set path (array)
 
                             Rate            URI      URI::Fast
-              URI        45113/s             --           -80%
-        URI::Fast       230769/s           412%             --
+              URI       130208/s             --           -81%
+        URI::Fast       684932/s           426%             --
 
 
 =head2 Get query
 
                             Rate            URI      URI::Fast
-              URI        27498/s             --           -86%
-        URI::Fast       198675/s           623%             --
+              URI        76864/s             --           -87%
+        URI::Fast       613497/s           698%             --
 
 
 =head2 Set query parameter
 
                             Rate            URI      URI::Fast
-              URI        31024/s             --           -84%
-        URI::Fast       200000/s           545%             --
+              URI        93023/s             --           -86%
+        URI::Fast       645161/s           594%             --
 
 
 =head2 Get query (hash)
 
                             Rate            URI      URI::Fast
-              URI        24390/s             --           -85%
-        URI::Fast       165746/s           580%             --
+              URI        77101/s             --           -86%
+        URI::Fast       540541/s           601%             --
 
 
 =head2 Get query keys
 
                             Rate            URI      URI::Fast
-              URI        24019/s             --           -88%
-        URI::Fast       197368/s           722%             --
+              URI        73206/s             --           -88%
+        URI::Fast       591716/s           708%             --
 
 
 =head2 Stringification
 
                             Rate            URI      URI::Fast
-              URI        55970/s             --           -78%
-        URI::Fast       258621/s           362%             --
+              URI       174825/s             --           -72%
+        URI::Fast       628931/s           260%             --
 
 
 =head2 Build relative path
 
                             Rate            URI      URI::Fast
-              URI        10345/s             --           -82%
-        URI::Fast        57143/s           452%             --
+              URI        26810/s             --           -86%
+        URI::Fast       196078/s           631%             --
 
 
 =head2 Build absolute path
 
                             Rate            URI      URI::Fast
-              URI        14375/s             --           -93%
-        URI::Fast       197368/s          1273%             --
+              URI        39216/s             --           -92%
+        URI::Fast       483092/s          1132%             --
 
 
 =head2 Normalize (canonical)
 
                             Rate            URI      URI::Fast
-              URI         9488/s             --           -97%
-        URI::Fast       375000/s          3852%             --
+              URI        24704/s             --           -98%
+        URI::Fast      1234568/s          4898%             --
 
 
 =head2 uri_split
 
                             Rate     URI::Split      URI::Fast
-       URI::Split       258621/s             --           -66%
-        URI::Fast       769231/s           197%             --
+       URI::Split      1052632/s             --           -52%
+        URI::Fast      2173913/s           107%             --
 
 
 =head2 Encode
 
-                            Rate    URI::Escape    URL::EncodeURI::Encode::XS      URI::Fast
-      URI::Escape         3285/s             --           -27%          -100%          -100%
-      URL::Encode         4483/s            36%             --           -99%           -99%
-  URI::Encode::XS       666667/s         20196%         14771%             --            -7%
-        URI::Fast       714286/s         21645%         15833%             7%             --
+                            Rate    URI::Escape    URL::Encode      URI::FastURI::Encode::XS
+      URI::Escape         8273/s             --           -32%          -100%          -100%
+      URL::Encode        12077/s            46%             --           -99%           -99%
+        URI::Fast      1694915/s         20388%         13934%             --           -25%
+  URI::Encode::XS      2272727/s         27373%         18718%            34%             --
 
 
 =head2 Decode
 
-                            Rate    URI::Escape    URL::Encode      URI::FastURI::Encode::XS
-      URI::Escape         3484/s             --            -3%           -99%           -99%
-      URL::Encode         3574/s             3%             --           -99%           -99%
-        URI::Fast       394737/s         11230%         10943%             --           -17%
-  URI::Encode::XS       476190/s         13568%         13222%            21%             --
+                            Rate    URL::Encode    URI::Escape      URI::FastURI::Encode::XS
+      URL::Encode         9051/s             --            -2%           -99%           -99%
+      URI::Escape         9203/s             2%             --           -99%           -99%
+        URI::Fast       869565/s          9507%          9349%             --           -10%
+  URI::Encode::XS       961538/s         10523%         10348%            11%             --
 
 
 =head2 IRI - ctor
 
                             Rate            IRI      URI::Fast
-              IRI         8923/s             --           -98%
-        URI::Fast       526316/s          5798%             --
+              IRI        24038/s             --           -99%
+        URI::Fast      1785714/s          7329%             --
 
 
 =head2 IRI - set query (hash)
 
                             Rate            IRI      URI::Fast
-              IRI         7422/s             --           -98%
-        URI::Fast       454545/s          6024%             --
+              IRI        19535/s             --           -98%
+        URI::Fast       884956/s          4430%             --
 
 
 =head2 IRI - set param
 
                             Rate            IRI      URI::Fast
-              IRI         8060/s             --           -98%
-        URI::Fast       361446/s          4384%             --
+              IRI        19639/s             --           -98%
+        URI::Fast       826446/s          4108%             --
 
 
 =head2 IRI - set path
 
                             Rate            IRI      URI::Fast
-              IRI         8132/s             --           -97%
-        URI::Fast       303030/s          3626%             --
+              IRI        20517/s             --           -98%
+        URI::Fast      1086957/s          5198%             --
 
 
 
@@ -184,32 +184,32 @@ Various operations comparing L<URI::Fast> with other modules' performance.
 
 =over
 
-=item URI::Fast 0.40_01
+=item URI::Fast 0.50
 
-=item URI 1.74
+=item URI 5.05
 
-=item URI::Split 1.74
+=item URI::Split 5.05
 
 =item URL::Encode 0.03
 
-=item URI::Escape 3.31
+=item URI::Escape 5.05
 
 =item URI::Encode::XS 0.11
 
-=item IRI 0.008
+=item IRI 0.011
 
 =back
 
 =head1 PERL
 
-  Summary of my perl5 (revision 5 version 26 subversion 2) configuration:
+  Summary of my perl5 (revision 5 version 32 subversion 0) configuration:
      
     Platform:
       osname=linux
-      osvers=4.14.56-05956-g5b9b9e14a8dc
+      osvers=5.4.0-48-generic
       archname=x86_64-linux
-      uname='linux penguin 4.14.56-05956-g5b9b9e14a8dc #1 smp preempt wed jul 25 14:33:50 pdt 2018 x86_64 gnulinux '
-      config_args='-de -Dprefix=/home/user/perl5/perlbrew/perls/perl-5.26.2-fast -Dusemymalloc -Doptimize=-O3 -Aeval:scriptdir=/home/user/perl5/perlbrew/perls/perl-5.26.2-fast/bin'
+      uname='linux lucy 5.4.0-48-generic #52-ubuntu smp thu sep 10 10:58:49 utc 2020 x86_64 x86_64 x86_64 gnulinux '
+      config_args='-de -Dprefix=/home/user/perl5/perlbrew/perls/perl-5.32.0 -Dcc=clang -Aeval:scriptdir=/home/user/perl5/perlbrew/perls/perl-5.32.0/bin'
       hint=recommended
       useposix=true
       d_sigaction=define
@@ -218,16 +218,16 @@ Various operations comparing L<URI::Fast> with other modules' performance.
       use64bitint=define
       use64bitall=define
       uselongdouble=undef
-      usemymalloc=y
+      usemymalloc=n
       default_inc_excludes_dot=define
       bincompat5005=undef
     Compiler:
-      cc='cc'
-      ccflags ='-fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -D_FORTIFY_SOURCE=2'
-      optimize='-O3'
-      cppflags='-fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include'
+      cc='clang'
+      ccflags ='-fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64'
+      optimize='-O2'
+      cppflags='-fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include'
       ccversion=''
-      gccversion='6.3.0 20170516'
+      gccversion='Clang 10.0.0 '
       gccosandvers=''
       intsize=4
       longsize=8
@@ -249,22 +249,22 @@ Various operations comparing L<URI::Fast> with other modules' performance.
       alignbytes=8
       prototype=define
     Linker and Libraries:
-      ld='cc'
+      ld='clang'
       ldflags =' -fstack-protector-strong -L/usr/local/lib'
-      libpth=/usr/local/lib /usr/lib/gcc/x86_64-linux-gnu/6/include-fixed /usr/include/x86_64-linux-gnu /usr/lib /lib/x86_64-linux-gnu /lib/../lib /usr/lib/x86_64-linux-gnu /usr/lib/../lib /lib /lib64 /usr/lib64
+      libpth=/usr/local/lib /usr/lib/llvm-10/lib/clang/10.0.0/lib /usr/include/x86_64-linux-gnu /usr/lib /lib/x86_64-linux-gnu /lib/../lib /usr/lib/x86_64-linux-gnu /usr/lib/../lib /lib
       libs=-lpthread -lnsl -ldl -lm -lcrypt -lutil -lc
       perllibs=-lpthread -lnsl -ldl -lm -lcrypt -lutil -lc
-      libc=libc-2.24.so
+      libc=libc-2.31.so
       so=so
       useshrplib=false
       libperl=libperl.a
-      gnulibc_version='2.24'
+      gnulibc_version='2.31'
     Dynamic Linking:
       dlsrc=dl_dlopen.xs
       dlext=so
       d_dlsymun=undef
       ccdlflags='-Wl,-E'
       cccdlflags='-fPIC'
-      lddlflags='-shared -O3 -L/usr/local/lib -fstack-protector-strong'
+      lddlflags='-shared -O2 -L/usr/local/lib -fstack-protector-strong'
 
 =cut

@@ -17,7 +17,8 @@ Core
 Document
 Error
 Etheridge
-Format
+FormatAnnotation
+FormatAssertion
 JSON
 Karen
 MetaData
