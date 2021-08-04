@@ -1,15 +1,13 @@
 package Mojo::Leds;
-
+$Mojo::Leds::VERSION = '1.04';
 use Mojo::Base 'Mojolicious';
 use Mojo::Log;
+use Mojo::File 'path';
 
 sub startup() {
     my $s = shift;
 
     # plugins
-    $s->plugin( Config => { file => 'cfg/app.cfg' } );
-
-    # lo leggo due volte per valorizzare dentro al cfg app->config->...
     $s->plugin( Config => { file => 'cfg/app.cfg' } );
 
     # log
@@ -47,6 +45,11 @@ sub startup() {
 
     # ridefinisco la root dei template
     $s->app->renderer->paths->[0] = $s->home->rel_file($docs_root)->to_string;
+
+    #  add bundled templates
+    my $templates_bundled = path(__FILE__)->sibling('Leds')->child('resources');
+    push @{$s->app->renderer->paths}, $templates_bundled->child('templates');
+    push @{$s->app->static->paths}, $templates_bundled->child('public');
 }
 
 1;
@@ -61,7 +64,7 @@ Mojo::Leds - Leds aka Light Environment (emi) for Development System based on Mo
 
 =head1 VERSION
 
-version 1.02
+version 1.04
 
 =head1 SYNOPSIS
 

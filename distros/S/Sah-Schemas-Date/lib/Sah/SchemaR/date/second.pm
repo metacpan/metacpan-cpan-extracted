@@ -1,12 +1,12 @@
 package Sah::SchemaR::date::second;
 
-our $DATE = '2020-03-08'; # DATE
-our $VERSION = '0.013'; # VERSION
+our $DATE = '2021-08-04'; # DATE
+our $VERSION = '0.017'; # VERSION
 
-our $rschema = ["int",[{examples=>[{valid=>0,value=>""},{valid=>1,value=>0},{valid=>1,value=>59},{valid=>1,value=>60},{valid=>0,value=>61}],max=>60,min=>0,summary=>"Second of minute"}],["int"]];
+our $rschema = do{my$var={base=>"int",clsets_after_base=>[{examples=>[{summary=>"Empty string",valid=>0,value=>""},{valid=>1,value=>0},{valid=>1,value=>59},{valid=>1,value=>60},{summary=>"Not in 0-60",valid=>0,value=>61}],max=>60,min=>0,summary=>"Second of minute (0-60)"}],clsets_after_type=>['$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_base}[0]'],resolve_path=>["int"],type=>"int",v=>2};$var->{clsets_after_type}[0]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_base}[0];$var};
 
 1;
-# ABSTRACT: Second of minute
+# ABSTRACT: Second of minute (0-60)
 
 __END__
 
@@ -16,11 +16,11 @@ __END__
 
 =head1 NAME
 
-Sah::SchemaR::date::second - Second of minute
+Sah::SchemaR::date::second - Second of minute (0-60)
 
 =head1 VERSION
 
-This document describes version 0.013 of Sah::SchemaR::date::second (from Perl distribution Sah-Schemas-Date), released on 2020-03-08.
+This document describes version 0.017 of Sah::SchemaR::date::second (from Perl distribution Sah-Schemas-Date), released on 2021-08-04.
 
 =head1 DESCRIPTION
 
@@ -50,7 +50,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

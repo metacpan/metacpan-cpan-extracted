@@ -1,0 +1,14 @@
+Index Scan using pg_class_relname_nsp_index on pg_class  (cost=0.72..8.74 rows=1 width=372) (actual time=0.018..0.019 rows=1 loops=1)
+  Index Cond: (relname = $1)
+  Filter: (relkind = $0)
+  Buffers: shared hit=6
+  InitPlan 1 (returns $0,$1)
+    ->  Limit  (cost=0.28..0.45 rows=1 width=69) (actual time=0.009..0.009 rows=1 loops=1)
+          Buffers: shared hit=3
+          ->  Index Scan using pg_class_oid_index on pg_class pg_class_1  (cost=0.28..223.91 rows=1324 width=69) (actual time=0.008..0.008 rows=1 loops=1)
+                Buffers: shared hit=3
+Planning:
+  Buffers: shared hit=134 read=34
+  I/O Timings: read=7.122
+Planning Time: 7.633 ms
+Execution Time: 0.124 ms

@@ -7,8 +7,6 @@ use 5.014;
 
 use HTML::Entities ();
 
-our $VERSION = "1.19";
-
 
 sub new {
     my $class = shift;
@@ -1086,7 +1084,7 @@ WWW::Form
 
 =head1 VERSION
 
-version 1.21
+version 1.22
 
 =head1 SYNOPSIS
 

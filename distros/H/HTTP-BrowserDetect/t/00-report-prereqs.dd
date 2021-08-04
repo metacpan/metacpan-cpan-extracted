@@ -55,9 +55,9 @@ do { my $x = {
                                    'List::Util' => '1.49',
                                    'Path::Tiny' => '0',
                                    'Test::Differences' => '0',
-                                   'Test::FailWarnings' => '0',
-                                   'Test::More' => '0',
-                                   'Test::NoWarnings' => '0'
+                                   'Test::More' => '0.96',
+                                   'Test::NoWarnings' => '0',
+                                   'Test::Warnings' => '0'
                                  }
                  }
      };

@@ -1,3 +1,15 @@
+0.069   2021-08-04  Released-By: PERLANCAR; Urgency: medium
+
+	- In generated Synopsis, show more code on using with Data::Sah.
+
+
+0.068   2021-08-04  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux] Tweak generated Synopsis: use subheadings, move sample data
+	  section to the beginning, change title to Sample Data &
+	  Validation results.
+
+
 0.067   2021-07-22  Released-By: PERLANCAR; Urgency: medium
 
 	- Fix typo in generated example.

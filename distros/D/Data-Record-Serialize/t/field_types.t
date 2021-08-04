@@ -33,7 +33,7 @@ subtest "types from first record" => sub {
 
     ok(
         lives {
-            $s = Data::Record::Serialize->new( encode => 'types_nis', );
+            $s = Data::Record::Serialize->new( encode => '+My::Test::Encode::types_nis', );
         },
         'create serializer'
     ) or diag $@;
@@ -53,9 +53,9 @@ subtest "types from first record" => sub {
     is(
         $s->output_types,
         {
-            string  => 'S',
-            integer => 'I',
-            float   => 'N',
+            string  => 's',
+            integer => 'i',
+            float   => 'n',
         },
         'derived output types',
     );
@@ -69,7 +69,7 @@ subtest "allow type fields to differ from fields" => sub {
     ok(
         lives {
             $s = Data::Record::Serialize->new(
-                encode       => 'types_nis',
+                encode       => '+My::Test::Encode::types_nis',
                 types        => { a => 'N' },
                 fields       => [qw( b )],
                 default_type => 'S',
@@ -89,7 +89,7 @@ subtest "allow type fields to differ from fields" => sub {
 
     is(
         $s->output_types,
-        { b => 'S' },
+        { b => 's' },
         'no output type for non-existent field',
     );
 };
@@ -102,7 +102,7 @@ subtest "fold I type into N" => sub {
     ok(
         lives {
             $s = Data::Record::Serialize->new(
-                encode => 'types_ns',
+                encode => '+My::Test::Encode::types_ns',
                 types  => { a => 'I' },
             );
         },
@@ -120,7 +120,7 @@ subtest "fold I type into N" => sub {
     is(
         $s->output_types,
         {
-            a => 'N',
+            a => 'n',
         },
         'I transformed to N upon output',
     );
@@ -133,7 +133,7 @@ subtest "encoder mapped types " => sub {
     ok(
         lives {
             $s = Data::Record::Serialize->new(
-                encode => 'types_map',
+                encode => '+My::Test::Encode::types_nis',
                 types  => {
                     string => 'S',
                     flat   => 'N',
@@ -172,7 +172,7 @@ subtest "encoder mapped types, auto map I => N " => sub {
     ok(
         lives {
             $s = Data::Record::Serialize->new(
-                encode => 'types_map_ns',
+                encode => '+My::Test::Encode::types_ns',
                 types  => {
                     string => 'S',
                     flat   => 'N',

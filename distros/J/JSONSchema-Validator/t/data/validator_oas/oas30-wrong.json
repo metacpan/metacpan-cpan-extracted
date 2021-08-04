@@ -1,0 +1,34 @@
+{
+    "request" : {
+        "method" : "get",
+        "openapi_path" : "/pets",
+        "parameters" : {
+            "path" : {},
+            "query" : {
+                "limit" : "twelve"
+            },
+            "header" : {},
+            "body" : [0, "application/x-www-form-urlencoded", null]
+        }
+    },
+    "response" : {
+        "method" : "get",
+        "openapi_path" : "/pets",
+        "status" : "200",
+        "parameters" : {
+            "header" : {
+                "X-Next" : "http://petstore.oas.com/page/1"
+            },
+            "body" : [1, "application/json", [
+                {
+                    "id" : 1,
+                    "name" : "Aaron"
+                },
+                {
+                    "id" : 2,
+                    "tag" : "burmilla"
+                }
+            ]]
+        }
+    }
+}

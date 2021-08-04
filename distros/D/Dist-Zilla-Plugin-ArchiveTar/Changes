@@ -1,0 +1,12 @@
+Revision history for Dist-Zilla-Plugin-ArchiveTar},
+
+0.03      2021-08-03 12:08:35 -0600
+  - Indexing fixes (gh#4)
+
+0.02      2021-08-03 11:19:59 -0600
+  - First CPAN release
+
+0.01      2021-08-03 10:31:25 -0600
+  - initial version
+
+

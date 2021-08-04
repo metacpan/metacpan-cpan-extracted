@@ -12,7 +12,7 @@ configure_requires:
   File::Which: '0'
   perl: '5.020'
 dynamic_config: 1
-generated_by: 'Dist::Zilla version 6.023, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -28,6 +28,7 @@ requires:
   Config::INI::Reader: '0'
   Data::Section: '0'
   Dist::Zilla: '6.00'
+  Dist::Zilla::Plugin::ArchiveTar: '0.03'
   Dist::Zilla::Plugin::AutoMetaResources: '1.20'
   Dist::Zilla::Plugin::CopyFilesFromBuild: '0.150250'
   Dist::Zilla::Plugin::InsertExample: '0.04'
@@ -66,7 +67,7 @@ resources:
   bugtracker: https://github.com/uperl/Dist-Zilla-PluginBundle-Author-Plicease/issues
   homepage: https://metacpan.org/pod/Dist::Zilla::PluginBundle::Author::Plicease
   repository: git://github.com/uperl/Dist-Zilla-PluginBundle-Author-Plicease.git
-version: '2.67'
+version: '2.68'
 x_generated_by_perl: v5.34.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

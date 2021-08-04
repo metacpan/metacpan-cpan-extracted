@@ -19,7 +19,7 @@ my %module_build_args = (
     "Shlomi Fish <shlomif\@cpan.org>"
   ],
   "dist_name" => "WWW-Form",
-  "dist_version" => "1.21",
+  "dist_version" => "1.22",
   "license" => "perl",
   "module_name" => "WWW::Form",
   "recursive_test_files" => 1,

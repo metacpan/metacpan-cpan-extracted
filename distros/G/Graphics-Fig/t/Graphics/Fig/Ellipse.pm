@@ -15,7 +15,7 @@
 # program.  If not, see <http://www.perlfoundation.org/artistic_license_2_0>.
 #
 package Graphics::Fig::Ellipse;
-our $VERSION = 'v1.0.4';
+our $VERSION = 'v1.0.5';
 
 use strict;
 use warnings;
@@ -591,11 +591,11 @@ sub ellipse {
 	} elsif (@{$points} == 5) {
 	    if (defined($parameters{"center"})) {
 		croak("ellipse: error: center may not be given " .
-		      "with 3 points");
+		      "with 5 points");
 	    }
 	    if (defined($parameters{"rotation"})) {
 		croak("ellipse: error: rotation may not be given " .
-		      "with 3 points");
+		      "with 5 points");
 	    }
 
 	    #
@@ -770,7 +770,7 @@ sub scale {
 }
 
 #
-# Graphics::Fig::Polyline return [[xmin, ymin], [xmax, ymax]]
+# Graphics::Fig::Elliipse return [[xmin, ymin], [xmax, ymax]]
 #   $self:       object
 #   $parameters: getbbox parameters
 #

@@ -160,6 +160,7 @@ Method | HTTP request | Description
 [**cells_put_insert_worksheet_columns**](CellsApi.md#cells_put_insert_worksheet_columns) | **PUT** /cells/{name}/worksheets/{sheetName}/cells/columns/{columnIndex} | Insert worksheet columns.
 [**cells_put_insert_worksheet_row**](CellsApi.md#cells_put_insert_worksheet_row) | **PUT** /cells/{name}/worksheets/{sheetName}/cells/rows/{rowIndex} | Insert new worksheet row.
 [**cells_put_insert_worksheet_rows**](CellsApi.md#cells_put_insert_worksheet_rows) | **PUT** /cells/{name}/worksheets/{sheetName}/cells/rows | Insert several new worksheet rows.
+[**cells_ranges_delete_worksheet_cells_range**](CellsApi.md#cells_ranges_delete_worksheet_cells_range) | **DELETE** /cells/{name}/worksheets/{sheetName}/ranges | Delete range in the worksheet
 [**cells_ranges_get_worksheet_cells_range_value**](CellsApi.md#cells_ranges_get_worksheet_cells_range_value) | **GET** /cells/{name}/worksheets/{sheetName}/ranges/value | Get cells list in a range by range name or row column indexes  
 [**cells_ranges_post_worksheet_cells_range_column_width**](CellsApi.md#cells_ranges_post_worksheet_cells_range_column_width) | **POST** /cells/{name}/worksheets/{sheetName}/ranges/columnWidth | Set column width of range
 [**cells_ranges_post_worksheet_cells_range_merge**](CellsApi.md#cells_ranges_post_worksheet_cells_range_merge) | **POST** /cells/{name}/worksheets/{sheetName}/ranges/merge | Combines a range of cells into a single cell.              
@@ -170,6 +171,7 @@ Method | HTTP request | Description
 [**cells_ranges_post_worksheet_cells_range_unmerge**](CellsApi.md#cells_ranges_post_worksheet_cells_range_unmerge) | **POST** /cells/{name}/worksheets/{sheetName}/ranges/unmerge | Unmerges merged cells of this range.             
 [**cells_ranges_post_worksheet_cells_range_value**](CellsApi.md#cells_ranges_post_worksheet_cells_range_value) | **POST** /cells/{name}/worksheets/{sheetName}/ranges/value | Puts a value into the range, if appropriate the value will be converted to other data type and cell&#39;s number format will be reset.             
 [**cells_ranges_post_worksheet_cells_ranges**](CellsApi.md#cells_ranges_post_worksheet_cells_ranges) | **POST** /cells/{name}/worksheets/{sheetName}/ranges | copy range in the worksheet
+[**cells_ranges_put_worksheet_cells_range**](CellsApi.md#cells_ranges_put_worksheet_cells_range) | **PUT** /cells/{name}/worksheets/{sheetName}/ranges | Put range in the worksheet
 [**cells_save_as_post_document_save_as**](CellsApi.md#cells_save_as_post_document_save_as) | **POST** /cells/{name}/SaveAs | Convert document and save result to storage.
 [**cells_shapes_delete_worksheet_shape**](CellsApi.md#cells_shapes_delete_worksheet_shape) | **DELETE** /cells/{name}/worksheets/{sheetName}/shapes/{shapeindex} | Delete a shape in worksheet
 [**cells_shapes_delete_worksheet_shapes**](CellsApi.md#cells_shapes_delete_worksheet_shapes) | **DELETE** /cells/{name}/worksheets/{sheetName}/shapes | delete all shapes in worksheet
@@ -197,6 +199,7 @@ Method | HTTP request | Description
 [**cells_workbook_get_workbook_names**](CellsApi.md#cells_workbook_get_workbook_names) | **GET** /cells/{name}/names | Read workbook&#39;s names.
 [**cells_workbook_get_workbook_settings**](CellsApi.md#cells_workbook_get_workbook_settings) | **GET** /cells/{name}/settings | Get Workbook Settings DTO
 [**cells_workbook_get_workbook_text_items**](CellsApi.md#cells_workbook_get_workbook_text_items) | **GET** /cells/{name}/textItems | Read workbook&#39;s text items.
+[**cells_workbook_post_autofit_workbook_columns**](CellsApi.md#cells_workbook_post_autofit_workbook_columns) | **POST** /cells/{name}/autofitcolumns | Autofit workbook columns.
 [**cells_workbook_post_autofit_workbook_rows**](CellsApi.md#cells_workbook_post_autofit_workbook_rows) | **POST** /cells/{name}/autofitrows | Autofit workbook rows.
 [**cells_workbook_post_encrypt_document**](CellsApi.md#cells_workbook_post_encrypt_document) | **POST** /cells/{name}/encryption | Encript document.
 [**cells_workbook_post_import_data**](CellsApi.md#cells_workbook_post_import_data) | **POST** /cells/{name}/importdata | 
@@ -2552,7 +2555,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **cells_delete_worksheet_columns**
-> ColumnsResponse cells_delete_worksheet_columns(name => $name, sheet_name => $sheet_name, column_index => $column_index, columns => $columns, update_reference => $update_reference, folder => $folder, storage_name => $storage_name)
+> CellsCloudResponse cells_delete_worksheet_columns(name => $name, sheet_name => $sheet_name, column_index => $column_index, columns => $columns, update_reference => $update_reference, folder => $folder, storage_name => $storage_name)
 
 Delete worksheet columns.
 
@@ -2594,7 +2597,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**ColumnsResponse**](ColumnsResponse.md)
+[**CellsCloudResponse**](CellsCloudResponse.md)
 
 ### Authorization
 
@@ -7372,7 +7375,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **cells_post_set_cell_html_string**
-> CellResponse cells_post_set_cell_html_string(name => $name, sheet_name => $sheet_name, cell_name => $cell_name, folder => $folder, storage_name => $storage_name)
+> CellResponse cells_post_set_cell_html_string(name => $name, sheet_name => $sheet_name, cell_name => $cell_name, html_string => $html_string, folder => $folder, storage_name => $storage_name)
 
 Set htmlstring value into cell
 
@@ -7386,11 +7389,12 @@ my $api_instance = AsposeCellsCloud::CellsApi->new(
 my $name = 'name_example'; # string | Workbook name.
 my $sheet_name = 'sheet_name_example'; # string | Worksheet name.
 my $cell_name = 'cell_name_example'; # string | The cell name.
+my $html_string = AsposeCellsCloud::Object::string->new(); # string | 
 my $folder = 'folder_example'; # string | The workbook folder.
 my $storage_name = 'storage_name_example'; # string | storage name.
 
 eval { 
-    my $result = $api_instance->cells_post_set_cell_html_string(name => $name, sheet_name => $sheet_name, cell_name => $cell_name, folder => $folder, storage_name => $storage_name);
+    my $result = $api_instance->cells_post_set_cell_html_string(name => $name, sheet_name => $sheet_name, cell_name => $cell_name, html_string => $html_string, folder => $folder, storage_name => $storage_name);
     print Dumper($result);
 };
 if ($@) {
@@ -7405,6 +7409,7 @@ Name | Type | Description  | Notes
  **name** | **string**| Workbook name. | 
  **sheet_name** | **string**| Worksheet name. | 
  **cell_name** | **string**| The cell name. | 
+ **html_string** | **string**|  | 
  **folder** | **string**| The workbook folder. | [optional] 
  **storage_name** | **string**| storage name. | [optional] 
 
@@ -7480,7 +7485,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **cells_post_set_worksheet_column_width**
-> ColumnResponse cells_post_set_worksheet_column_width(name => $name, sheet_name => $sheet_name, column_index => $column_index, width => $width, folder => $folder, storage_name => $storage_name)
+> CellsCloudResponse cells_post_set_worksheet_column_width(name => $name, sheet_name => $sheet_name, column_index => $column_index, width => $width, folder => $folder, storage_name => $storage_name)
 
 Set worksheet column width.
 
@@ -7520,7 +7525,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**ColumnResponse**](ColumnResponse.md)
+[**CellsCloudResponse**](CellsCloudResponse.md)
 
 ### Authorization
 
@@ -7864,7 +7869,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **cells_post_update_worksheet_row**
-> RowResponse cells_post_update_worksheet_row(name => $name, sheet_name => $sheet_name, row_index => $row_index, height => $height, folder => $folder, storage_name => $storage_name)
+> CellsCloudResponse cells_post_update_worksheet_row(name => $name, sheet_name => $sheet_name, row_index => $row_index, height => $height, folder => $folder, storage_name => $storage_name)
 
 Update worksheet row.
 
@@ -7904,7 +7909,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**RowResponse**](RowResponse.md)
+[**CellsCloudResponse**](CellsCloudResponse.md)
 
 ### Authorization
 
@@ -8340,7 +8345,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **cells_put_insert_worksheet_columns**
-> ColumnsResponse cells_put_insert_worksheet_columns(name => $name, sheet_name => $sheet_name, column_index => $column_index, columns => $columns, update_reference => $update_reference, folder => $folder, storage_name => $storage_name)
+> CellsCloudResponse cells_put_insert_worksheet_columns(name => $name, sheet_name => $sheet_name, column_index => $column_index, columns => $columns, update_reference => $update_reference, folder => $folder, storage_name => $storage_name)
 
 Insert worksheet columns.
 
@@ -8382,7 +8387,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**ColumnsResponse**](ColumnsResponse.md)
+[**CellsCloudResponse**](CellsCloudResponse.md)
 
 ### Authorization
 
@@ -8396,7 +8401,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **cells_put_insert_worksheet_row**
-> RowResponse cells_put_insert_worksheet_row(name => $name, sheet_name => $sheet_name, row_index => $row_index, folder => $folder, storage_name => $storage_name)
+> CellsCloudResponse cells_put_insert_worksheet_row(name => $name, sheet_name => $sheet_name, row_index => $row_index, folder => $folder, storage_name => $storage_name)
 
 Insert new worksheet row.
 
@@ -8434,7 +8439,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**RowResponse**](RowResponse.md)
+[**CellsCloudResponse**](CellsCloudResponse.md)
 
 ### Authorization
 
@@ -8486,6 +8491,60 @@ Name | Type | Description  | Notes
  **total_rows** | **int**| Number of rows to be operated. | [optional] [default to 1]
  **update_reference** | **boolean**| Indicates if update references in other worksheets. | [optional] [default to true]
  **folder** | **string**| The document folder. | [optional] 
+ **storage_name** | **string**| storage name. | [optional] 
+
+### Return type
+
+[**CellsCloudResponse**](CellsCloudResponse.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **cells_ranges_delete_worksheet_cells_range**
+> CellsCloudResponse cells_ranges_delete_worksheet_cells_range(name => $name, sheet_name => $sheet_name, range => $range, shift => $shift, folder => $folder, storage_name => $storage_name)
+
+Delete range in the worksheet
+
+### Example 
+```perl
+use Data::Dumper;
+use AsposeCellsCloud::CellsApi;
+my $api_instance = AsposeCellsCloud::CellsApi->new(
+);
+
+my $name = 'name_example'; # string | workbook name
+my $sheet_name = 'sheet_name_example'; # string | worksheet name
+my $range = 'range_example'; # string | range
+my $shift = 'shift_example'; # string | Represent the shift options when deleting a range of cells. (Left,Up) 
+my $folder = 'folder_example'; # string | Workbook folder.
+my $storage_name = 'storage_name_example'; # string | storage name.
+
+eval { 
+    my $result = $api_instance->cells_ranges_delete_worksheet_cells_range(name => $name, sheet_name => $sheet_name, range => $range, shift => $shift, folder => $folder, storage_name => $storage_name);
+    print Dumper($result);
+};
+if ($@) {
+    warn "Exception when calling CellsApi->cells_ranges_delete_worksheet_cells_range: $@\n";
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **name** | **string**| workbook name | 
+ **sheet_name** | **string**| worksheet name | 
+ **range** | **string**| range | 
+ **shift** | **string**| Represent the shift options when deleting a range of cells. (Left,Up)  | 
+ **folder** | **string**| Workbook folder. | [optional] 
  **storage_name** | **string**| storage name. | [optional] 
 
 ### Return type
@@ -9045,6 +9104,60 @@ No authorization required
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **cells_ranges_put_worksheet_cells_range**
+> CellsCloudResponse cells_ranges_put_worksheet_cells_range(name => $name, sheet_name => $sheet_name, range => $range, shift => $shift, folder => $folder, storage_name => $storage_name)
+
+Put range in the worksheet
+
+### Example 
+```perl
+use Data::Dumper;
+use AsposeCellsCloud::CellsApi;
+my $api_instance = AsposeCellsCloud::CellsApi->new(
+);
+
+my $name = 'name_example'; # string | workbook name
+my $sheet_name = 'sheet_name_example'; # string | worksheet name
+my $range = 'range_example'; # string | range
+my $shift = 'shift_example'; # string | Represent the shift options when deleting a range of cells. (Right,Down) 
+my $folder = 'folder_example'; # string | Workbook folder.
+my $storage_name = 'storage_name_example'; # string | storage name.
+
+eval { 
+    my $result = $api_instance->cells_ranges_put_worksheet_cells_range(name => $name, sheet_name => $sheet_name, range => $range, shift => $shift, folder => $folder, storage_name => $storage_name);
+    print Dumper($result);
+};
+if ($@) {
+    warn "Exception when calling CellsApi->cells_ranges_put_worksheet_cells_range: $@\n";
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **name** | **string**| workbook name | 
+ **sheet_name** | **string**| worksheet name | 
+ **range** | **string**| range | 
+ **shift** | **string**| Represent the shift options when deleting a range of cells. (Right,Down)  | 
+ **folder** | **string**| Workbook folder. | [optional] 
+ **storage_name** | **string**| storage name. | [optional] 
+
+### Return type
+
+[**CellsCloudResponse**](CellsCloudResponse.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **cells_save_as_post_document_save_as**
 > SaveResponse cells_save_as_post_document_save_as(name => $name, save_options => $save_options, newfilename => $newfilename, is_auto_fit_rows => $is_auto_fit_rows, is_auto_fit_columns => $is_auto_fit_columns, folder => $folder, storage_name => $storage_name)
 
@@ -9426,7 +9539,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **cells_sparkline_groups_delete_worksheet_sparkline_group**
-> CellsCloudResponse cells_sparkline_groups_delete_worksheet_sparkline_group(name => $name, sheet_name => $sheet_name, sparkline_index => $sparkline_index, folder => $folder)
+> CellsCloudResponse cells_sparkline_groups_delete_worksheet_sparkline_group(name => $name, sheet_name => $sheet_name, sparkline_index => $sparkline_index, folder => $folder, storage_name => $storage_name)
 
 
 
@@ -9441,9 +9554,10 @@ my $name = 'name_example'; # string |
 my $sheet_name = 'sheet_name_example'; # string | 
 my $sparkline_index = 56; # int | 
 my $folder = 'folder_example'; # string | 
+my $storage_name = 'storage_name_example'; # string | storage name.
 
 eval { 
-    my $result = $api_instance->cells_sparkline_groups_delete_worksheet_sparkline_group(name => $name, sheet_name => $sheet_name, sparkline_index => $sparkline_index, folder => $folder);
+    my $result = $api_instance->cells_sparkline_groups_delete_worksheet_sparkline_group(name => $name, sheet_name => $sheet_name, sparkline_index => $sparkline_index, folder => $folder, storage_name => $storage_name);
     print Dumper($result);
 };
 if ($@) {
@@ -9459,6 +9573,7 @@ Name | Type | Description  | Notes
  **sheet_name** | **string**|  | 
  **sparkline_index** | **int**|  | 
  **folder** | **string**|  | [optional] 
+ **storage_name** | **string**| storage name. | [optional] 
 
 ### Return type
 
@@ -9476,7 +9591,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **cells_sparkline_groups_delete_worksheet_sparkline_groups**
-> CellsCloudResponse cells_sparkline_groups_delete_worksheet_sparkline_groups(name => $name, sheet_name => $sheet_name, folder => $folder)
+> CellsCloudResponse cells_sparkline_groups_delete_worksheet_sparkline_groups(name => $name, sheet_name => $sheet_name, folder => $folder, storage_name => $storage_name)
 
 
 
@@ -9490,9 +9605,10 @@ my $api_instance = AsposeCellsCloud::CellsApi->new(
 my $name = 'name_example'; # string | 
 my $sheet_name = 'sheet_name_example'; # string | 
 my $folder = 'folder_example'; # string | 
+my $storage_name = 'storage_name_example'; # string | storage name.
 
 eval { 
-    my $result = $api_instance->cells_sparkline_groups_delete_worksheet_sparkline_groups(name => $name, sheet_name => $sheet_name, folder => $folder);
+    my $result = $api_instance->cells_sparkline_groups_delete_worksheet_sparkline_groups(name => $name, sheet_name => $sheet_name, folder => $folder, storage_name => $storage_name);
     print Dumper($result);
 };
 if ($@) {
@@ -9507,6 +9623,7 @@ Name | Type | Description  | Notes
  **name** | **string**|  | 
  **sheet_name** | **string**|  | 
  **folder** | **string**|  | [optional] 
+ **storage_name** | **string**| storage name. | [optional] 
 
 ### Return type
 
@@ -9524,7 +9641,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **cells_sparkline_groups_get_worksheet_sparkline_group**
-> SparklineGroupResponse cells_sparkline_groups_get_worksheet_sparkline_group(name => $name, sheet_name => $sheet_name, sparkline_index => $sparkline_index, folder => $folder)
+> SparklineGroupResponse cells_sparkline_groups_get_worksheet_sparkline_group(name => $name, sheet_name => $sheet_name, sparkline_index => $sparkline_index, folder => $folder, storage_name => $storage_name)
 
 
 
@@ -9539,9 +9656,10 @@ my $name = 'name_example'; # string |
 my $sheet_name = 'sheet_name_example'; # string | 
 my $sparkline_index = 56; # int | 
 my $folder = 'folder_example'; # string | 
+my $storage_name = 'storage_name_example'; # string | storage name.
 
 eval { 
-    my $result = $api_instance->cells_sparkline_groups_get_worksheet_sparkline_group(name => $name, sheet_name => $sheet_name, sparkline_index => $sparkline_index, folder => $folder);
+    my $result = $api_instance->cells_sparkline_groups_get_worksheet_sparkline_group(name => $name, sheet_name => $sheet_name, sparkline_index => $sparkline_index, folder => $folder, storage_name => $storage_name);
     print Dumper($result);
 };
 if ($@) {
@@ -9557,6 +9675,7 @@ Name | Type | Description  | Notes
  **sheet_name** | **string**|  | 
  **sparkline_index** | **int**|  | 
  **folder** | **string**|  | [optional] 
+ **storage_name** | **string**| storage name. | [optional] 
 
 ### Return type
 
@@ -9574,7 +9693,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **cells_sparkline_groups_get_worksheet_sparkline_groups**
-> SparklineGroupsResponse cells_sparkline_groups_get_worksheet_sparkline_groups(name => $name, sheet_name => $sheet_name, folder => $folder)
+> SparklineGroupsResponse cells_sparkline_groups_get_worksheet_sparkline_groups(name => $name, sheet_name => $sheet_name, folder => $folder, storage_name => $storage_name)
 
 Get worksheet charts description.
 
@@ -9588,9 +9707,10 @@ my $api_instance = AsposeCellsCloud::CellsApi->new(
 my $name = 'name_example'; # string | Document name.
 my $sheet_name = 'sheet_name_example'; # string | The worksheet name.
 my $folder = 'folder_example'; # string | Document's folder.
+my $storage_name = 'storage_name_example'; # string | storage name.
 
 eval { 
-    my $result = $api_instance->cells_sparkline_groups_get_worksheet_sparkline_groups(name => $name, sheet_name => $sheet_name, folder => $folder);
+    my $result = $api_instance->cells_sparkline_groups_get_worksheet_sparkline_groups(name => $name, sheet_name => $sheet_name, folder => $folder, storage_name => $storage_name);
     print Dumper($result);
 };
 if ($@) {
@@ -9605,6 +9725,7 @@ Name | Type | Description  | Notes
  **name** | **string**| Document name. | 
  **sheet_name** | **string**| The worksheet name. | 
  **folder** | **string**| Document&#39;s folder. | [optional] 
+ **storage_name** | **string**| storage name. | [optional] 
 
 ### Return type
 
@@ -9622,7 +9743,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **cells_sparkline_groups_post_worksheet_sparkline_group**
-> CellsCloudResponse cells_sparkline_groups_post_worksheet_sparkline_group(name => $name, sheet_name => $sheet_name, sparkline_group_index => $sparkline_group_index, sparkline_group => $sparkline_group, folder => $folder)
+> CellsCloudResponse cells_sparkline_groups_post_worksheet_sparkline_group(name => $name, sheet_name => $sheet_name, sparkline_group_index => $sparkline_group_index, sparkline_group => $sparkline_group, folder => $folder, storage_name => $storage_name)
 
 
 
@@ -9638,9 +9759,10 @@ my $sheet_name = 'sheet_name_example'; # string |
 my $sparkline_group_index = 56; # int | 
 my $sparkline_group = AsposeCellsCloud::Object::SparklineGroup->new(); # SparklineGroup | 
 my $folder = 'folder_example'; # string | 
+my $storage_name = 'storage_name_example'; # string | storage name.
 
 eval { 
-    my $result = $api_instance->cells_sparkline_groups_post_worksheet_sparkline_group(name => $name, sheet_name => $sheet_name, sparkline_group_index => $sparkline_group_index, sparkline_group => $sparkline_group, folder => $folder);
+    my $result = $api_instance->cells_sparkline_groups_post_worksheet_sparkline_group(name => $name, sheet_name => $sheet_name, sparkline_group_index => $sparkline_group_index, sparkline_group => $sparkline_group, folder => $folder, storage_name => $storage_name);
     print Dumper($result);
 };
 if ($@) {
@@ -9657,6 +9779,7 @@ Name | Type | Description  | Notes
  **sparkline_group_index** | **int**|  | 
  **sparkline_group** | [**SparklineGroup**](SparklineGroup.md)|  | 
  **folder** | **string**|  | [optional] 
+ **storage_name** | **string**| storage name. | [optional] 
 
 ### Return type
 
@@ -9674,7 +9797,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **cells_sparkline_groups_put_worksheet_sparkline_group**
-> CellsCloudResponse cells_sparkline_groups_put_worksheet_sparkline_group(name => $name, sheet_name => $sheet_name, type => $type, data_range => $data_range, is_vertical => $is_vertical, location_range => $location_range, folder => $folder)
+> CellsCloudResponse cells_sparkline_groups_put_worksheet_sparkline_group(name => $name, sheet_name => $sheet_name, type => $type, data_range => $data_range, is_vertical => $is_vertical, location_range => $location_range, folder => $folder, storage_name => $storage_name)
 
 
 
@@ -9692,9 +9815,10 @@ my $data_range = 'data_range_example'; # string |
 my $is_vertical = 1; # boolean | 
 my $location_range = 'location_range_example'; # string | 
 my $folder = 'folder_example'; # string | 
+my $storage_name = 'storage_name_example'; # string | storage name.
 
 eval { 
-    my $result = $api_instance->cells_sparkline_groups_put_worksheet_sparkline_group(name => $name, sheet_name => $sheet_name, type => $type, data_range => $data_range, is_vertical => $is_vertical, location_range => $location_range, folder => $folder);
+    my $result = $api_instance->cells_sparkline_groups_put_worksheet_sparkline_group(name => $name, sheet_name => $sheet_name, type => $type, data_range => $data_range, is_vertical => $is_vertical, location_range => $location_range, folder => $folder, storage_name => $storage_name);
     print Dumper($result);
 };
 if ($@) {
@@ -9713,6 +9837,7 @@ Name | Type | Description  | Notes
  **is_vertical** | **boolean**|  | 
  **location_range** | **string**|  | 
  **folder** | **string**|  | [optional] 
+ **storage_name** | **string**| storage name. | [optional] 
 
 ### Return type
 
@@ -10417,6 +10542,60 @@ No authorization required
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **cells_workbook_post_autofit_workbook_columns**
+> CellsCloudResponse cells_workbook_post_autofit_workbook_columns(name => $name, auto_fitter_options => $auto_fitter_options, start_column => $start_column, end_column => $end_column, folder => $folder, storage_name => $storage_name)
+
+Autofit workbook columns.
+
+### Example 
+```perl
+use Data::Dumper;
+use AsposeCellsCloud::CellsApi;
+my $api_instance = AsposeCellsCloud::CellsApi->new(
+);
+
+my $name = 'name_example'; # string | Document name.
+my $auto_fitter_options = AsposeCellsCloud::Object::AutoFitterOptions->new(); # AutoFitterOptions | Auto Fitter Options.
+my $start_column = 56; # int | Start column.
+my $end_column = 56; # int | End column.
+my $folder = 'folder_example'; # string | Document's folder.
+my $storage_name = 'storage_name_example'; # string | storage name.
+
+eval { 
+    my $result = $api_instance->cells_workbook_post_autofit_workbook_columns(name => $name, auto_fitter_options => $auto_fitter_options, start_column => $start_column, end_column => $end_column, folder => $folder, storage_name => $storage_name);
+    print Dumper($result);
+};
+if ($@) {
+    warn "Exception when calling CellsApi->cells_workbook_post_autofit_workbook_columns: $@\n";
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **name** | **string**| Document name. | 
+ **auto_fitter_options** | [**AutoFitterOptions**](AutoFitterOptions.md)| Auto Fitter Options. | [optional] 
+ **start_column** | **int**| Start column. | [optional] 
+ **end_column** | **int**| End column. | [optional] 
+ **folder** | **string**| Document&#39;s folder. | [optional] 
+ **storage_name** | **string**| storage name. | [optional] 
+
+### Return type
+
+[**CellsCloudResponse**](CellsCloudResponse.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **cells_workbook_post_autofit_workbook_rows**
 > CellsCloudResponse cells_workbook_post_autofit_workbook_rows(name => $name, auto_fitter_options => $auto_fitter_options, start_row => $start_row, end_row => $end_row, only_auto => $only_auto, folder => $folder, storage_name => $storage_name)
 
@@ -11034,7 +11213,7 @@ No authorization required
 
 ### HTTP request headers
 
- - **Content-Type**: application/json
+ - **Content-Type**: multipart/form-data
  - **Accept**: application/json
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)

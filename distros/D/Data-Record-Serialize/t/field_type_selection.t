@@ -15,7 +15,7 @@ subtest "N, N, N" => sub {
 
     ok(
         lives {
-            $s = Data::Record::Serialize->new( encode => 'types_nis', );
+            $s = Data::Record::Serialize->new( encode => '+My::Test::Encode::types_nis', );
         },
         'construct'
     ) or note $@;
@@ -44,7 +44,7 @@ subtest "N, N, N" => sub {
         'output fields'
     );
 
-    is( $s->output_types, { a => 'I', b => 'S', c => 'N' }, 'output types' );
+    is( $s->output_types, { a => 'i', b => 's', c => 'n' }, 'output types' );
 };
 
 subtest "all, N, N" => sub {
@@ -53,7 +53,7 @@ subtest "all, N, N" => sub {
     ok(
         lives {
             $s = Data::Record::Serialize->new(
-                encode => 'types_nis',
+                encode => '+My::Test::Encode::types_nis',
                 fields => 'all'
             );
         },
@@ -84,7 +84,7 @@ subtest "all, N, N" => sub {
         'output fields'
     );
 
-    is( $s->output_types, { a => 'I', b => 'S', c => 'N' }, 'output types' );
+    is( $s->output_types, { a => 'i', b => 's', c => 'n' }, 'output types' );
 };
 
 
@@ -94,7 +94,7 @@ subtest "N, N, Y" => sub {
     ok(
         lives {
             $s = Data::Record::Serialize->new(
-                encode       => 'types_nis',
+                encode       => '+My::Test::Encode::types_nis',
                 default_type => 'S'
             );
         },
@@ -125,7 +125,7 @@ subtest "N, N, Y" => sub {
         'output fields'
     );
 
-    is( $s->output_types, { a => 'S', b => 'S', c => 'S' }, 'output types' );
+    is( $s->output_types, { a => 's', b => 's', c => 's' }, 'output types' );
 };
 
 subtest "all, N, Y" => sub {
@@ -134,7 +134,7 @@ subtest "all, N, Y" => sub {
     ok(
         lives {
             $s = Data::Record::Serialize->new(
-                encode       => 'types_nis',
+                encode       => '+My::Test::Encode::types_nis',
                 default_type => 'S',
                 fields       => 'all'
             );
@@ -166,7 +166,7 @@ subtest "all, N, Y" => sub {
         'output fields'
     );
 
-    is( $s->output_types, { a => 'S', b => 'S', c => 'S' }, 'output types' );
+    is( $s->output_types, { a => 's', b => 's', c => 's' }, 'output types' );
 };
 
 subtest "Y, N, N" => sub {
@@ -175,7 +175,7 @@ subtest "Y, N, N" => sub {
     ok(
         lives {
             $s = Data::Record::Serialize->new(
-                encode => 'types_nis',
+                encode => '+My::Test::Encode::types_nis',
                 fields => [ 'a', 'b' ] );
         },
         'construct'
@@ -203,7 +203,7 @@ subtest "Y, N, N" => sub {
         'output fields'
     );
 
-    is( $s->output_types, { a => 'I', b => 'S' }, 'output types' );
+    is( $s->output_types, { a => 'i', b => 's' }, 'output types' );
 };
 
 subtest "Y, Y, N" => sub {
@@ -212,7 +212,7 @@ subtest "Y, Y, N" => sub {
     ok(
         lives {
             $s = Data::Record::Serialize->new(
-                encode => 'types_nis',
+                encode => '+My::Test::Encode::types_nis',
                 fields => [ 'a', 'c' ],
                 types  => { a => 'S' } );
         },
@@ -241,7 +241,7 @@ subtest "Y, Y, N" => sub {
         'output fields'
     );
 
-    is( $s->output_types, { a => 'S', c => 'N' }, 'output types' );
+    is( $s->output_types, { a => 's', c => 'n' }, 'output types' );
 };
 
 subtest "Y, Y, Y" => sub {
@@ -250,7 +250,7 @@ subtest "Y, Y, Y" => sub {
     ok(
         lives {
             $s = Data::Record::Serialize->new(
-                encode       => 'types_nis',
+                encode       => '+My::Test::Encode::types_nis',
                 fields       => [ 'a', 'b' ],
                 types        => { a => 'S' },
                 default_type => 'I'
@@ -281,7 +281,7 @@ subtest "Y, Y, Y" => sub {
         'output fields'
     );
 
-    is( $s->output_types, { a => 'S', b => 'I' }, 'output types' );
+    is( $s->output_types, { a => 's', b => 'i' }, 'output types' );
 };
 
 subtest "all, Y, N" => sub {
@@ -290,7 +290,7 @@ subtest "all, Y, N" => sub {
     ok(
         lives {
             $s = Data::Record::Serialize->new(
-                encode => 'types_nis',
+                encode => '+My::Test::Encode::types_nis',
                 fields => 'all',
                 types  => { a => 'S' },
             );
@@ -322,7 +322,7 @@ subtest "all, Y, N" => sub {
         'output fields'
     );
 
-    is( $s->output_types, { a => 'S', b => 'S', c => 'N' }, 'output types' );
+    is( $s->output_types, { a => 's', b => 's', c => 'n' }, 'output types' );
 };
 
 subtest "all, Y, Y" => sub {
@@ -331,7 +331,7 @@ subtest "all, Y, Y" => sub {
     ok(
         lives {
             $s = Data::Record::Serialize->new(
-                encode       => 'types_nis',
+                encode       => '+My::Test::Encode::types_nis',
                 fields       => 'all',
                 types        => { a => 'S' },
                 default_type => 'I'
@@ -364,7 +364,7 @@ subtest "all, Y, Y" => sub {
         'output fields'
     );
 
-    is( $s->output_types, { a => 'S', b => 'I', c => 'I' }, 'output types' );
+    is( $s->output_types, { a => 's', b => 'i', c => 'i' }, 'output types' );
 };
 
 subtest "N, Y, Y" => sub {
@@ -373,7 +373,7 @@ subtest "N, Y, Y" => sub {
     ok(
         lives {
             $s = Data::Record::Serialize->new(
-                encode       => 'types_nis',
+                encode       => '+My::Test::Encode::types_nis',
                 types        => { a => 'S' },
                 default_type => 'I'
             );
@@ -386,7 +386,7 @@ subtest "N, Y, Y" => sub {
     is( $s->fields,        ['a'], 'input fields' );
     is( $s->output_fields, ['a'], 'output fields' );
 
-    is( $s->output_types, { a => 'S' }, 'output types' );
+    is( $s->output_types, { a => 's' }, 'output types' );
 };
 
 subtest "N, Y, N" => sub {
@@ -395,7 +395,7 @@ subtest "N, Y, N" => sub {
     ok(
         lives {
             $s = Data::Record::Serialize->new(
-                encode => 'types_nis',
+                encode => '+My::Test::Encode::types_nis',
                 types  => { a => 'S' },
             );
         },
@@ -407,7 +407,7 @@ subtest "N, Y, N" => sub {
     is( $s->fields,        ['a'], 'input fields' );
     is( $s->output_fields, ['a'], 'output fields' );
 
-    is( $s->output_types, { a => 'S' }, 'output types' );
+    is( $s->output_types, { a => 's' }, 'output types' );
 };
 
 subtest "field order" => sub {
@@ -419,7 +419,7 @@ subtest "field order" => sub {
         ok(
             lives {
                 $s = Data::Record::Serialize->new(
-                    encode => 'types_nis',
+                    encode => '+My::Test::Encode::types_nis',
                     fields => [ 'c', 'b', 'a' ],
                 );
             },
@@ -439,7 +439,7 @@ subtest "field order" => sub {
         ok(
             lives {
                 $s = Data::Record::Serialize->new(
-                    encode => 'types_nis',
+                    encode => '+My::Test::Encode::types_nis',
                     types => [ 'c' => 'N', 'b' => 'I', 'a' => 'S' ],
                 );
             },
@@ -450,7 +450,7 @@ subtest "field order" => sub {
 
         is( $s->fields,        [ 'c', 'b', 'a' ], 'input fields' );
 
-        is( $s->output_types, { c => 'N', 'b' => 'I', a => 'S' }, 'output types' );
+        is( $s->output_types, { c => 'n', 'b' => 'i', a => 's' }, 'output types' );
         is( $s->output_fields, [ 'c', 'b', 'a' ], 'output fields' );
     };
 

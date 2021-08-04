@@ -6,12 +6,13 @@ use warnings;
 
 use Test::More;
 
-plan tests => 5;
+plan tests => 6;
 
 my @module_files = (
     'Mojo/Leds.pm',
     'Mojo/Leds/Page.pm',
     'Mojo/Leds/Rest.pm',
+    'Mojo/Leds/Rest/DBIx.pm',
     'Mojo/Leds/Rest/MongoDB.pm'
 );
 

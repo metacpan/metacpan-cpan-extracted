@@ -1,0 +1,21 @@
+<%init>
+
+my $result = RT::Extension::MessageSizeLimit::CheckMessageSizeLimit(
+        Subject => $$ARGSRef{'Subject'},
+        Content => $$ARGSRef{'Content'},
+        Attachments => $session{Attachments}{$$ARGSRef{'Token'}},
+        CurrentUser => $session{'CurrentUser'},
+    );
+
+if ( $result ) {
+    push @$Actions, $result;
+    $r->content_type('application/json; charset=utf-8');
+    $m->out( JSON( { actions => \@$Actions } ) );
+    $m->abort;
+}
+
+</%init>
+<%args>
+$ARGSRef => undef
+$Actions => undef
+</%args>

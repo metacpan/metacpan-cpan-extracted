@@ -4,8 +4,6 @@ use 5.014;
 use strict;
 use warnings;
 
-our $VERSION = "1.19";
-
 # The following constants represent the validator types that can be used to
 # validate the specified user input.
 use constant WELL_FORMED_EMAIL => 1;
@@ -155,7 +153,7 @@ WWW::FieldValidator
 
 =head1 VERSION
 
-version 1.21
+version 1.22
 
 =head1 SYNOPSIS
 

@@ -1,31 +1,40 @@
 package Sah::Schema::date::month_nums::id;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-03-08'; # DATE
+our $DATE = '2021-08-04'; # DATE
 our $DIST = 'Sah-Schemas-Date-ID'; # DIST
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 our $schema = ['array' => {
-    summary => 'Array of month numbers',
-    of => ['date::month_num::id', {}, {}],
+    summary => 'Array of required month numbers, coercible from Indonesian full/abbreviated month names',
+    of => ['date::month_num::id', {req=>1}],
     'x.perl.coerce_rules' => ['From_str::comma_sep'],
+    description => <<'_',
+
+See also related schemas for other locales, e.g.
+<pm:Sah::Schema::date::month_nums> (English),
+<pm:Sah::Schema::date::month_nums::en_or_id> (English/Indonesian), etc.
+
+_
     examples => [
         {value=>'', valid=>1, validated_value=>[]},
         {value=>'jan', valid=>1, validated_value=>[1]},
         {value=>'AGU', valid=>1, validated_value=>[8]},
         {value=>'aug', valid=>0},
-        {value=>0, valid=>0},
+        {value=>0, valid=>0, summary=>'Has number not in 1-12'},
+        {value=>[1,undef], valid=>0, summary=>'Has undef'},
         {value=>"1,agu", valid=>1, validated_value=>[1,8]},
+        {value=>"1,foo", valid=>0, summary=>'Has unknown month name'},
         {value=>[1,"agu"], valid=>1, validated_value=>[1,8]},
         {value=>"1,12", valid=>1, validated_value=>[1,12]},
-        {value=>"1,12,13", valid=>0},
-        {value=>[1,12,13], valid=>0},
+        {value=>"1,12,13", valid=>0, summary=>'Has number not in 1-12'},
+        {value=>[1,12,13], valid=>0, summary=>'Has number not in 1-12'},
     ],
-}, {}];
+}];
 
 1;
 
-# ABSTRACT: Array of month numbers
+# ABSTRACT: Array of required month numbers, coercible from Indonesian full/abbreviated month names
 
 __END__
 
@@ -35,27 +44,106 @@ __END__
 
 =head1 NAME
 
-Sah::Schema::date::month_nums::id - Array of month numbers
+Sah::Schema::date::month_nums::id - Array of required month numbers, coercible from Indonesian full/abbreviated month names
 
 =head1 VERSION
 
-This document describes version 0.005 of Sah::Schema::date::month_nums::id (from Perl distribution Sah-Schemas-Date-ID), released on 2020-03-08.
+This document describes version 0.007 of Sah::Schema::date::month_nums::id (from Perl distribution Sah-Schemas-Date-ID), released on 2021-08-04.
 
 =head1 SYNOPSIS
 
-Using with L<Data::Sah>:
+=head2 Sample data and validation results against this schema
+
+ ""  # valid, becomes []
+
+ "jan"  # valid, becomes [1]
+
+ "AGU"  # valid, becomes [8]
+
+ "aug"  # INVALID
+
+ 0  # INVALID (Has number not in 1-12)
+
+ [1,undef]  # INVALID (Has undef)
+
+ "1,agu"  # valid, becomes [1,8]
+
+ "1,foo"  # INVALID (Has unknown month name)
+
+ [1,"agu"]  # valid, becomes [1,8]
+
+ "1,12"  # valid, becomes [1,12]
+
+ "1,12,13"  # INVALID (Has number not in 1-12)
+
+ [1,12,13]  # INVALID (Has number not in 1-12)
+
+=head2 Using with Data::Sah
+
+To check data against this schema (requires L<Data::Sah>):
 
  use Data::Sah qw(gen_validator);
- my $vdr = gen_validator("date::month_nums::id*");
- say $vdr->($data) ? "valid" : "INVALID!";
+ my $validator = gen_validator("date::month_nums::id*");
+ say $validator->($data) ? "valid" : "INVALID!";
 
- # Data::Sah can also create a validator to return error message, coerced value,
- # even validators in other languages like JavaScript, from the same schema.
- # See its documentation for more details.
+The above schema returns a boolean value (true if data is valid, false if
+otherwise). To return an error message string instead (empty string if data is
+valid, a non-empty error message otherwise):
 
-Using in L<Rinci> function metadata (to be used with L<Perinci::CmdLine>, etc):
+ my $validator = gen_validator("date::month_nums::id", {return_type=>'str_errmsg'});
+ my $errmsg = $validator->($data);
+ 
+ # a sample valid data
+ $data = [1,"agu"];
+ my $errmsg = $validator->($data); # => ""
+ 
+ # a sample invalid data
+ $data = "aug";
+ my $errmsg = $validator->($data); # => "\@[0]: Not of type integer"
 
- package MyApp;
+Often a schema has coercion rule or default value, so after validation the
+validated value is different. To return the validated (set-as-default, coerced,
+prefiltered) value:
+
+ my $validator = gen_validator("date::month_nums::id", {return_type=>'str_errmsg+val'});
+ my $res = $validator->($data); # [$errmsg, $validated_val]
+ 
+ # a sample valid data
+ $data = [1,8];
+ my $res = $validator->($data); # => ["",[1,8]]
+ 
+ # a sample invalid data
+ $data = "aug";
+ my $res = $validator->($data); # => ["\@[0]: Not of type integer",["aug"]]
+
+Data::Sah can also create validator that returns a hash of detaild error
+message. Data::Sah can even create validator that targets other language, like
+JavaScript, from the same schema. Other things Data::Sah can do: show source
+code for validator, generate a validator code with debug comments and/or log
+statements, generate human text from schema. See its documentation for more
+details.
+
+=head2 Using with Params::Sah
+
+To validate function parameters against this schema (requires L<Params::Sah>):
+
+ use Params::Sah qw(gen_validator);
+
+ sub myfunc {
+     my @args = @_;
+     state $validator = gen_validator("date::month_nums::id*");
+     $validator->(\@args);
+     ...
+ }
+
+=head2 Using with Perinci::CmdLine::Lite
+
+To specify schema in L<Rinci> function metadata and use the metadata with
+L<Perinci::CmdLine> (L<Perinci::CmdLine::Lite>) to create a CLI:
+
+ # in lib/MyApp.pm
+ package
+   MyApp;
  our %SPEC;
  $SPEC{myfunc} = {
      v => 1.1,
@@ -72,28 +160,22 @@ Using in L<Rinci> function metadata (to be used with L<Perinci::CmdLine>, etc):
      my %args = @_;
      ...
  }
+ 1;
 
-Sample data:
+ # in myapp.pl
+ package
+   main;
+ use Perinci::CmdLine::Any;
+ Perinci::CmdLine::Any->new(url=>'/MyApp/myfunc')->run;
 
- ""  # valid, becomes []
+ # in command-line
+ % ./myapp.pl --help
+ myapp - Routine to do blah ...
+ ...
 
- "jan"  # valid, becomes [1]
+ % ./myapp.pl --version
 
- "AGU"  # valid, becomes [8]
-
- "aug"  # INVALID
-
- 0  # INVALID
-
- "1,agu"  # valid, becomes [1,8]
-
- [1,"agu"]  # valid, becomes [1,8]
-
- "1,12"  # valid, becomes [1,12]
-
- "1,12,13"  # INVALID
-
- [1,12,13]  # INVALID
+ % ./myapp.pl --arg1 ...
 
 =head1 DESCRIPTION
 
@@ -131,7 +213,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

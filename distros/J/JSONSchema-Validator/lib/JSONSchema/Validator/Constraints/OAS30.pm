@@ -214,7 +214,7 @@ JSONSchema::Validator::Constraints::OAS30 - OpenAPI 3.0 specification constraint
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 AUTHORS
 

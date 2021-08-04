@@ -308,7 +308,6 @@ sub _validate_attributes {
   }
   return undef;
 }
-
 sub _runCmd(@) {
   if ( ref($_[0]) eq 'FASTX::ScriptHelper' ) {
      shift @_;
@@ -345,27 +344,17 @@ FASTX::ScriptHelper - Shared routines for binaries using FASTX::Reader and FASTX
 
 =head1 VERSION
 
-version 1.0.5
+version 1.1.0
 
 =head2 new()
 
 Initialize a new FASTX::ScriptHelper object. Notable parameters:
 
-  my $S = FASTX::ScriptHelper->new({ verbose => 0, logfile => $log });
-
 =over 4
 
 =item I<verbose>
 
-Print verbose information
-
 =item I<logfile>
-
-File where to print log info
-
-=item I<linesize>
-
-Default size for FASTA lines
 
 =back
 

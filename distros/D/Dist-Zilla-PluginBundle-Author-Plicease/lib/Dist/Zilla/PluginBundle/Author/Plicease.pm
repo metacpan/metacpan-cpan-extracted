@@ -1,4 +1,4 @@
-package Dist::Zilla::PluginBundle::Author::Plicease 2.67 {
+package Dist::Zilla::PluginBundle::Author::Plicease 2.68 {
 
   use 5.020;
   use Moose;
@@ -53,20 +53,6 @@ package Dist::Zilla::PluginBundle::Author::Plicease 2.67 {
         $bad = 1;
       }
       die "unsuppor" if $bad;
-    }
-
-    if($INC{"Archive/Tar/Wrapper.pm"})
-    {
-      # https://github.com/PerlAlien/Alien-Build/issues/228
-      # But honestly?    FUCK HP-UX
-      die "Somehow Archive::Tar::Wrapper was loaded before the plugin bundle.";
-    }
-    else
-    {
-      package
-        Archive::Tar::Wrapper;
-      *new = sub { die "do not use ATW" };
-      $INC{"Archive/Tar/Wrapper.pm"} = __FILE__;
     }
 
     # undocumented for a reason: sometimes I need to release on
@@ -305,6 +291,15 @@ package Dist::Zilla::PluginBundle::Author::Plicease 2.67 {
 
     }
 
+    if(eval { require Dist::Zilla::Plugin::Libarchive; Dist::Zilla::Plugin::Libarchive->VERSION('0.03'); 1 })
+    {
+      $self->_my_add_plugin(['Libarchive']);
+    }
+    else
+    {
+      $self->_my_add_plugin(['ArchiveTar']);
+    }
+
   }
 
   __PACKAGE__->meta->make_immutable;
@@ -324,7 +319,7 @@ Dist::Zilla::PluginBundle::Author::Plicease - Dist::Zilla plugin bundle used by 
 
 =head1 VERSION
 
-version 2.67
+version 2.68
 
 =head1 SYNOPSIS
 
@@ -443,6 +438,7 @@ This plugin bundle is mostly equivalent to
  type = gfm
  
  [Author::Plicease::NoUnsafeInc]
+ [ArchiveTar]
 
 =head1 OPTIONS
 

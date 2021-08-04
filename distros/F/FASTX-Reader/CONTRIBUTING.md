@@ -1,5 +1,5 @@
 ## Contributing to FASTX::Reader
 
-Feel free to contact the author to collaborate, or refer to the github page:
+Feel free to contact the author to collaborate, or refer to the GitHub page:
 
 [https://github.com/telatin/FASTQ-Parser](https://github.com/telatin/FASTQ-Parser)

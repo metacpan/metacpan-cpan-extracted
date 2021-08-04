@@ -280,7 +280,7 @@ sub _validate_content {
 
     my $content_ptr = $ptr->xget('content');
     # content in body is required but in params is optional
-    return 1, [] unless $content_ptr;
+    return 1, [], [] unless $content_ptr;
 
     my $ctype_ptr;
     if ($content_type) {
@@ -383,7 +383,7 @@ JSONSchema::Validator::OAS30 - Validator for OpenAPI Specification 3.0
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 

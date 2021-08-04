@@ -5,7 +5,7 @@ package Data::Record::Serialize::Error;
 use strict;
 use warnings;
 
-our $VERSION = '0.23';
+our $VERSION = '0.24';
 
 use Exporter::Shiny qw( error );
 
@@ -25,7 +25,6 @@ use custom::failures ( qw[
 
 
 sub _exporter_validate_opts {
-
     my $class = shift;
 
     my ( $globals ) = @_;
@@ -57,22 +56,18 @@ sub _exporter_validate_opts {
 
 sub error {
     my $class = shift;
-
     _resolve_class( $class, scalar caller(), __PACKAGE__ )->throw( @_ );
 }
 
 sub _resolve_class {
-
     my ( $class, $caller, @prefix ) = @_;
 
     return join(
         '::', @prefix,
         do {
-
             if ( $class =~ /^::(.*)/ ) {
                 $1;
             }
-
             elsif ( $caller =~ /Data::Record::Serialize::(.*)/ ) {
                 $1 . '::' . $class;
             }
@@ -107,7 +102,7 @@ Data::Record::Serialize::Error - Error objects
 
 =head1 VERSION
 
-version 0.23
+version 0.24
 
 =head1 SYNOPSIS
 

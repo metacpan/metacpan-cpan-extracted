@@ -10,6 +10,8 @@
 
 #include "object_pad.h"
 
+#include "perl-backcompat.c.inc"
+
 static void trigger_gen_accessor_ops(pTHX_ SlotMeta *slotmeta, SV *hookdata, enum AccessorType type, struct AccessorGenerationCtx *ctx)
 {
   if(type != ACCESSOR_WRITER)

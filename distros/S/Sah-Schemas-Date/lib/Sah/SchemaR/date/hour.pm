@@ -1,12 +1,12 @@
 package Sah::SchemaR::date::hour;
 
-our $DATE = '2020-03-08'; # DATE
-our $VERSION = '0.013'; # VERSION
+our $DATE = '2021-08-04'; # DATE
+our $VERSION = '0.017'; # VERSION
 
-our $rschema = ["int",[{examples=>[{valid=>0,value=>""},{valid=>1,value=>0},{valid=>1,value=>23},{valid=>0,value=>24}],max=>23,min=>0,summary=>"Hour of day"}],["int"]];
+our $rschema = do{my$var={base=>"int",clsets_after_base=>[{examples=>[{summary=>"Empty string",valid=>0,value=>""},{valid=>1,value=>0},{valid=>1,value=>23},{summary=>"Not in 0-23",valid=>0,value=>24}],max=>23,min=>0,summary=>"Hour of day (0-23)"}],clsets_after_type=>['$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_base}[0]'],resolve_path=>["int"],type=>"int",v=>2};$var->{clsets_after_type}[0]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_base}[0];$var};
 
 1;
-# ABSTRACT: Hour of day
+# ABSTRACT: Hour of day (0-23)
 
 __END__
 
@@ -16,11 +16,11 @@ __END__
 
 =head1 NAME
 
-Sah::SchemaR::date::hour - Hour of day
+Sah::SchemaR::date::hour - Hour of day (0-23)
 
 =head1 VERSION
 
-This document describes version 0.013 of Sah::SchemaR::date::hour (from Perl distribution Sah-Schemas-Date), released on 2020-03-08.
+This document describes version 0.017 of Sah::SchemaR::date::hour (from Perl distribution Sah-Schemas-Date), released on 2021-08-04.
 
 =head1 DESCRIPTION
 
@@ -50,7 +50,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

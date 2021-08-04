@@ -1,5 +1,5 @@
 ---
-abstract: 'interact with Healthchecks API'
+abstract: 'Interact with Healthchecks API'
 author:
   - 'Luc DIDRY'
 build_requires:
@@ -26,13 +26,13 @@ no_index:
 provides:
   Healthchecks:
     file: lib/Healthchecks.pm
-    version: '0.01'
+    version: '0.02'
 requires:
-  Mojolicious: '0'
-  perl: '5.016000'
+  Mojolicious: '9.00'
+  perl: '5.020000'
 resources:
   repository: git://framagit.org/fiat-tux/perl-modules/healthchecks.git
-version: '0.01'
+version: '0.02'
 x_authority: cpan:LDIDRY
 x_contributors:
   - 'Luc Didry <luc@didry.org>'

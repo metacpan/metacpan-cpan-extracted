@@ -1,5 +1,8 @@
 Revision history for Bot::IRC
 
+1.36      2021-08-03 13:26:10-07:00 America/Los_Angeles
+        - Encode UTF-8 input/output in logs and messages
+
 1.35      2021-02-07 16:29:25-08:00 America/Los_Angeles
         - Emotes now use CTCP ACTION
 

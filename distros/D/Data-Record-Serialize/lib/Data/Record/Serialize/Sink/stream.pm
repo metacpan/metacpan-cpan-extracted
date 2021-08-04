@@ -7,7 +7,7 @@ use Moo::Role;
 
 use Data::Record::Serialize::Error { errors => [ '::create' ] }, -all;
 
-our $VERSION = '0.23';
+our $VERSION = '0.24';
 
 use IO::File;
 
@@ -17,20 +17,15 @@ has output => (
     is      => 'ro',
 );
 
-
 has fh => (
-
     is => 'lazy',
-
     builder => sub {
         my $self = shift;
-
         return ( ! defined $self->output || $self->output eq '-' )
           ? \*STDOUT
           : ( IO::File->new( $self->output, 'w' )
               or error( '::create', "unable to create @{[ $self->output ]}" ) );
     },
-
 );
 
 
@@ -70,7 +65,7 @@ Data::Record::Serialize::Sink::stream - output encoded data to a stream.
 
 =head1 VERSION
 
-version 0.23
+version 0.24
 
 =head1 SYNOPSIS
 

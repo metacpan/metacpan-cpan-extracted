@@ -1,9 +1,9 @@
 package Sah::Schema::date::month::en;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-03-08'; # DATE
+our $DATE = '2021-08-04'; # DATE
 our $DIST = 'Sah-Schemas-Date'; # DIST
-our $VERSION = '0.013'; # VERSION
+our $VERSION = '0.017'; # VERSION
 
 our $schema = [cistr => {
     summary => 'Month number/name (abbreviated or full, in English)',
@@ -12,16 +12,26 @@ our $schema = [cistr => {
         qw/jan feb mar apr may jun jul aug sep oct nov dec/,
         qw/january february march april june july august september october november december/,
     ],
+    description => <<'_',
+
+Note that name is not coerced to number; use
+<pm:Sah::Schema::date::month_num::id> for that.
+
+See also related schemas for other locales, e.g.
+<pm:Sah::Schema::date::month::id> (Indonesian),
+<pm:Sah::Schema::date::month::en_or_id> (English/Indonesian), etc.
+
+_
     examples => [
-        {value=>'', valid=>0},
+        {value=>'', valid=>0, summary=>'Empty string'},
         {value=>1, valid=>1},
         {value=>'jan', valid=>1},
         {value=>'FeB', valid=>1},
         {value=>'March', valid=>1},
-        {value=>'foo', valid=>0},
-        {value=>13, valid=>0},
+        {value=>'foo', valid=>0, summary=>'Not a month name/number'},
+        {value=>13, valid=>0, summary=>'Number not in 1-12'},
     ],
-}, {}];
+}];
 
 1;
 
@@ -39,23 +49,92 @@ Sah::Schema::date::month::en - Month number/name (abbreviated or full, in Englis
 
 =head1 VERSION
 
-This document describes version 0.013 of Sah::Schema::date::month::en (from Perl distribution Sah-Schemas-Date), released on 2020-03-08.
+This document describes version 0.017 of Sah::Schema::date::month::en (from Perl distribution Sah-Schemas-Date), released on 2021-08-04.
 
 =head1 SYNOPSIS
 
-Using with L<Data::Sah>:
+=head2 Sample data and validation results against this schema
+
+ ""  # INVALID (Empty string)
+
+ 1  # valid
+
+ "jan"  # valid
+
+ "FeB"  # valid
+
+ "March"  # valid
+
+ "foo"  # INVALID (Not a month name/number)
+
+ 13  # INVALID (Number not in 1-12)
+
+=head2 Using with Data::Sah
+
+To check data against this schema (requires L<Data::Sah>):
 
  use Data::Sah qw(gen_validator);
- my $vdr = gen_validator("date::month::en*");
- say $vdr->($data) ? "valid" : "INVALID!";
+ my $validator = gen_validator("date::month::en*");
+ say $validator->($data) ? "valid" : "INVALID!";
 
- # Data::Sah can also create a validator to return error message, coerced value,
- # even validators in other languages like JavaScript, from the same schema.
- # See its documentation for more details.
+The above schema returns a boolean value (true if data is valid, false if
+otherwise). To return an error message string instead (empty string if data is
+valid, a non-empty error message otherwise):
 
-Using in L<Rinci> function metadata (to be used with L<Perinci::CmdLine>, etc):
+ my $validator = gen_validator("date::month::en", {return_type=>'str_errmsg'});
+ my $errmsg = $validator->($data);
+ 
+ # a sample valid data
+ $data = "FeB";
+ my $errmsg = $validator->($data); # => ""
+ 
+ # a sample invalid data
+ $data = "";
+ my $errmsg = $validator->($data); # => "Must be one of [1,2,3,4,5,6,7,8,9,10,11,12,\"jan\",\"feb\",\"mar\",\"apr\",\"may\",\"jun\",\"jul\",\"aug\",\"sep\",\"oct\",\"nov\",\"dec\",\"january\",\"february\",\"march\",\"april\",\"june\",\"july\",\"august\",\"september\",\"october\",\"november\",\"december\"]"
 
- package MyApp;
+Often a schema has coercion rule or default value, so after validation the
+validated value is different. To return the validated (set-as-default, coerced,
+prefiltered) value:
+
+ my $validator = gen_validator("date::month::en", {return_type=>'str_errmsg+val'});
+ my $res = $validator->($data); # [$errmsg, $validated_val]
+ 
+ # a sample valid data
+ $data = "FeB";
+ my $res = $validator->($data); # => ["","FeB"]
+ 
+ # a sample invalid data
+ $data = "";
+ my $res = $validator->($data); # => ["Must be one of [1,2,3,4,5,6,7,8,9,10,11,12,\"jan\",\"feb\",\"mar\",\"apr\",\"may\",\"jun\",\"jul\",\"aug\",\"sep\",\"oct\",\"nov\",\"dec\",\"january\",\"february\",\"march\",\"april\",\"june\",\"july\",\"august\",\"september\",\"october\",\"november\",\"december\"]",""]
+
+Data::Sah can also create validator that returns a hash of detaild error
+message. Data::Sah can even create validator that targets other language, like
+JavaScript, from the same schema. Other things Data::Sah can do: show source
+code for validator, generate a validator code with debug comments and/or log
+statements, generate human text from schema. See its documentation for more
+details.
+
+=head2 Using with Params::Sah
+
+To validate function parameters against this schema (requires L<Params::Sah>):
+
+ use Params::Sah qw(gen_validator);
+
+ sub myfunc {
+     my @args = @_;
+     state $validator = gen_validator("date::month::en*");
+     $validator->(\@args);
+     ...
+ }
+
+=head2 Using with Perinci::CmdLine::Lite
+
+To specify schema in L<Rinci> function metadata and use the metadata with
+L<Perinci::CmdLine> (L<Perinci::CmdLine::Lite>) to create a CLI:
+
+ # in lib/MyApp.pm
+ package
+   MyApp;
  our %SPEC;
  $SPEC{myfunc} = {
      v => 1.1,
@@ -72,22 +151,31 @@ Using in L<Rinci> function metadata (to be used with L<Perinci::CmdLine>, etc):
      my %args = @_;
      ...
  }
+ 1;
 
-Sample data:
+ # in myapp.pl
+ package
+   main;
+ use Perinci::CmdLine::Any;
+ Perinci::CmdLine::Any->new(url=>'/MyApp/myfunc')->run;
 
- ""  # INVALID
+ # in command-line
+ % ./myapp.pl --help
+ myapp - Routine to do blah ...
+ ...
 
- 1  # valid
+ % ./myapp.pl --version
 
- "jan"  # valid
+ % ./myapp.pl --arg1 ...
 
- "FeB"  # valid
+=head1 DESCRIPTION
 
- "March"  # valid
+Note that name is not coerced to number; use
+L<Sah::Schema::date::month_num::id> for that.
 
- "foo"  # INVALID
-
- 13  # INVALID
+See also related schemas for other locales, e.g.
+L<Sah::Schema::date::month::id> (Indonesian),
+L<Sah::Schema::date::month::en_or_id> (English/Indonesian), etc.
 
 =head1 HOMEPAGE
 
@@ -111,7 +199,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -22,5 +22,6 @@
             'actual_time_first'      => 0.003,
             'is_analyzed'            => 1,
         },
-    ]
+    ],
+    'initplans_metainfo'     => [ undef ],
 }

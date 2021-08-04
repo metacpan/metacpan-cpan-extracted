@@ -2,7 +2,6 @@
 
 use Test::More;
 use Test::Deep;
-use Test::Exception;
 use autodie;
 
 use Pg::Explain;
@@ -27,7 +26,7 @@ my $expected_struct = {
     }
 };
 
-plan 'tests' => 7;
+plan 'tests' => 8;
 
 my $explain = Pg::Explain->new( 'source' => $plan );
 isa_ok( $explain,           'Pg::Explain' );
@@ -40,5 +39,8 @@ my $work_table = $explain->top_node->ctes->{ 'foo' }->sub_nodes->[ 1 ];
 is( $work_table->type, 'WorkTable Scan', 'Properly got WorkTable type' );
 
 cmp_deeply( $work_table->get_struct, $expected_struct, 'Structure of WorkTable is OK' );
+
+my $as_text = $explain->as_text;
+ok( $as_text =~ /WorkTable Scan on foo foo_1/, 'Text format of plan contains correct worktable info' );
 
 exit;

@@ -3,9 +3,9 @@ NAME
     Sah-Schemas-* distribution
 
 VERSION
-    This document describes version 0.024 of
+    This document describes version 0.027 of
     Dist::Zilla::Plugin::Sah::Schemas (from Perl distribution
-    Dist-Zilla-Plugin-Sah-Schemas), released on 2021-07-29.
+    Dist-Zilla-Plugin-Sah-Schemas), released on 2021-07-30.
 
 SYNOPSIS
     In dist.ini:
@@ -41,6 +41,11 @@ DESCRIPTION
 
 CONFIGURATION
   exclude_module
+    Currently this means to exclude loading the specified schema module
+    during build, skip resolving the schema, skip parsing the schema and
+    extracting prerequisites from the schema, the and skip creating the
+    corresponding "Sah::SchemaR::*" module.
+
 CONTRIBUTOR
     Steven Haryanto <sharyanto@cpan.org>
 

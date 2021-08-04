@@ -6,6 +6,7 @@
 
 #include <EXTERN.h>
 #include <perl.h>
+#define PY_SSIZE_T_CLEAN
 #include <Python.h>
 
 #include "pycompat.h"

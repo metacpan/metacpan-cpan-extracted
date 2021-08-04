@@ -2,10 +2,117 @@ NAME
     Sah::Schemas::Date::ID - Sah schemas related to date (Indonesian)
 
 VERSION
-    This document describes version 0.005 of Sah::Schemas::Date::ID (from
-    Perl distribution Sah-Schemas-Date-ID), released on 2020-03-08.
+    This document describes version 0.007 of Sah::Schemas::Date::ID (from
+    Perl distribution Sah-Schemas-Date-ID), released on 2021-08-04.
 
 SYNOPSIS
+SAH SCHEMAS
+    The following schemas are included in this distribution:
+
+    *   date::dow_name::id
+
+        Day-of-week name (abbreviated or full, in Indonesian).
+
+        See also related schemas for other locales, e.g.
+        Sah::Schema::date::dow_name::en (English),
+        Sah::Schema::date::dow_name::en_or_id (English/Indonesian), etc.
+
+    *   date::dow_num::en_or_id
+
+        Day-of-week number (1-7, 1=Monday, like DateTime), coercible from
+        English/Indonesian day-of-week name (Mo/Sn/MON/SEN/monday/senin).
+
+        See also related schemas that coerce from other locales, e.g.
+        Sah::Schema::date::dow_num (English), Sah::Schema::date::dow_num::id
+        (Indonesian), etc.
+
+    *   date::dow_num::id
+
+        Day-of-week number (1-7, 1=Monday, like DateTime), coercible from
+        Indonesian day-of-week name (Sn/SEN/senin).
+
+        See also related schemas that coerce from other locales, e.g.
+        Sah::Schema::date::dow_num (English),
+        Sah::Schema::date::dow_num::en_or_id (English or Indonesian), etc.
+
+    *   date::dow_nums::en_or_id
+
+        Array of day-of-week numbers (1-7, 1=Monday).
+
+        See also Sah::Schema::date::dow_num which is the schema for the
+        elements.
+
+        See also related schemas that coerce from other locales, e.g.
+        Sah::Schema::date::dow_nums::id (Indonesian),
+        Sah::Schema::date::dow_num::en_or_id (English/Indonesian), etc.
+
+    *   date::dow_nums::id
+
+        Array of required day-of-week numbers (1-7, 1=Monday, like DateTime,
+        with coercions).
+
+        See also Sah::Schema::date::dow_num::id which is the schema for the
+        elements.
+
+        See also related schemas that coerce from other locales, e.g.
+        Sah::Schema::date::dow_nums (English),
+        Sah::Schema::date::dow_num::en_or_id (English/Indonesian), etc.
+
+    *   date::month::id
+
+        Month number/name (abbreviated or full, in Indonesian).
+
+        Note that name is not coerced to number; use
+        Sah::Schema::date::month_num::id for that.
+
+        See also related schemas for other locales, e.g.
+        Sah::Schema::date::month::en (English),
+        Sah::Schema::date::month::en_or_id (English/Indonesian), etc.
+
+    *   date::month_name::id
+
+        Month name (abbreviated or full, in Indonesian).
+
+        See also related schemas for other locales, e.g.
+        Sah::Schema::date::month_name::en (English),
+        Sah::Schema::date::month_name::en_or_id (English/Indonesian), etc.
+
+    *   date::month_num::en_or_id
+
+        Month number (1-12), coercible from English/Indonesian
+        full/abbreviated name (Dec/Des/DECEMBER/DESEMber).
+
+        See also related schemas for other locales, e.g.
+        Sah::Schema::date::month_num (English),
+        Sah::Schema::date::month_num::id (Indonesian), etc.
+
+    *   date::month_num::id
+
+        Month number (1-12), coercible from Indonesian full/abbreviated
+        month name (Des/DeSEMBER).
+
+        See also related schemas for other locales, e.g.
+        Sah::Schema::date::month (English),
+        Sah::Schema::date::month::en_or_id (English/Indonesian), etc.
+
+    *   date::month_nums::en_or_id
+
+        Array of required month numbers, coercible from English/Indonesian
+        full/abbreviated month names.
+
+        See also related schemas for other locales, e.g.
+        Sah::Schema::date::month_nums (English),
+        Sah::Schema::date::month_nums::id (Indonesian), etc.
+
+    *   date::month_nums::id
+
+        Array of required month numbers, coercible from Indonesian
+        full/abbreviated month names.
+
+        See also related schemas for other locales, e.g.
+        Sah::Schema::date::month_nums (English),
+        Sah::Schema::date::month_nums::en_or_id (English/Indonesian), etc.
+
 HOMEPAGE
     Please visit the project's homepage at
     <https://metacpan.org/release/Sah-Schemas-Date-ID>.
@@ -26,15 +133,15 @@ SEE ALSO
 
     Sah::Schemas::Date
 
-    Sah - specification
+    Sah - schema specification
 
-    Data::Sah
+    Data::Sah - Perl implementation of Sah
 
 AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
+    This software is copyright (c) 2021, 2020, 2019 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

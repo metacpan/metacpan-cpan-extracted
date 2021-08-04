@@ -57,3 +57,5 @@ allow_leading_tabs = 0
 [ValuesAndExpressions::RequireUpperCaseHeredocTerminator]
 [Variables::ProhibitPerl4PackageNames]
 [Variables::ProhibitUnusedVariables]
+[Plicease::ProhibitLeadingZeros]
+[Plicease::ProhibitUnicodeDigitInRegexp]

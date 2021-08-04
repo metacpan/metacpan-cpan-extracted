@@ -1,12 +1,12 @@
 package Sah::SchemaR::date::dow_num::id;
 
-our $DATE = '2020-03-08'; # DATE
-our $VERSION = '0.005'; # VERSION
+our $DATE = '2021-08-04'; # DATE
+our $VERSION = '0.007'; # VERSION
 
-our $rschema = ["int",[{examples=>[{valid=>0,value=>""},{valid=>0,value=>0},{valid=>1,value=>1},{valid=>1,value=>7},{valid=>0,value=>8}],max=>7,min=>1,summary=>"Day-of-week number (1-7, 1=Monday)","x.completion"=>["date_dow_num_id"],"x.perl.coerce_rules"=>["From_str::convert_id_dow_name_to_num"]}],["int"]];
+our $rschema = do{my$var={base=>"int",clsets_after_base=>[{description=>"\nSee also related schemas that coerce from other locales, e.g.\n<pm:Sah::Schema::date::dow_num> (English),\n<pm:Sah::Schema::date::dow_num::en_or_id> (English or Indonesian), etc.\n\n",examples=>[{summary=>"Not in 1-7",valid=>0,value=>""},{summary=>"Not in 1-7",valid=>0,value=>0},{valid=>1,value=>1},{valid=>1,validated_value=>2,value=>"Sel"},{valid=>1,value=>7},{summary=>"Not in 1-7",valid=>0,value=>8}],max=>7,min=>1,summary=>"Day-of-week number (1-7, 1=Monday, like DateTime), coercible from Indonesian day-of-week name (Sn/SEN/senin)","x.completion"=>["date_dow_num_id"],"x.perl.coerce_rules"=>["From_str::convert_id_dow_name_to_num"]}],clsets_after_type=>['$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_base}[0]'],resolve_path=>["int"],type=>"int",v=>2};$var->{clsets_after_type}[0]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_base}[0];$var};
 
 1;
-# ABSTRACT: Day-of-week number (1-7, 1=Monday)
+# ABSTRACT: Day-of-week number (1-7, 1=Monday, like DateTime), coercible from Indonesian day-of-week name (Sn/SEN/senin)
 
 __END__
 
@@ -16,11 +16,11 @@ __END__
 
 =head1 NAME
 
-Sah::SchemaR::date::dow_num::id - Day-of-week number (1-7, 1=Monday)
+Sah::SchemaR::date::dow_num::id - Day-of-week number (1-7, 1=Monday, like DateTime), coercible from Indonesian day-of-week name (Sn/SEN/senin)
 
 =head1 VERSION
 
-This document describes version 0.005 of Sah::SchemaR::date::dow_num::id (from Perl distribution Sah-Schemas-Date-ID), released on 2020-03-08.
+This document describes version 0.007 of Sah::SchemaR::date::dow_num::id (from Perl distribution Sah-Schemas-Date-ID), released on 2021-08-04.
 
 =head1 DESCRIPTION
 
@@ -50,7 +50,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

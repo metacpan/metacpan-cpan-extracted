@@ -15,8 +15,9 @@ ok(
     "constructor"
 ) or diag $@;
 
-$s->send( { a => 1, b => 2, c => 'nyuck nyuck' } );
-
-ok( ! $s->has_types, "no types were derived" );
+ok(
+   lives { $s->send( { a => 1, b => 2, c => 'nyuck nyuck' } ) },
+   'send'
+  );
 
 done_testing;

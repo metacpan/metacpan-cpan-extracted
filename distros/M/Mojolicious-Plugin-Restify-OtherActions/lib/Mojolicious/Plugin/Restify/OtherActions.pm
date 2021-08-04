@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Restify::OtherActions;
-
+$Mojolicious::Plugin::Restify::OtherActions::VERSION = '0.04';
 use Mojo::Base 'Mojolicious::Plugin::Restify';
 
 sub register() {
@@ -45,7 +45,7 @@ Mojolicious::Plugin::Restify::OtherActions - Mojolicious plug-in which extends R
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 

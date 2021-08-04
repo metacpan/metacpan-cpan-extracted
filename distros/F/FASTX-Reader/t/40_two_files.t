@@ -26,7 +26,7 @@ while (my $seq1 = $f1->getRead() ) {
 	my $seq2 = $f2->getRead();
   $c++;
 
-	ok( $seq1->{name} =~/^file1/, "[FILE1.$c] seqname has <file1>:    $seq1->{name}");
+	ok( $seq1->{name} =~/^file1/, "[FILE1.$c] seqname has <file1>: $seq1->{name}");
 	ok( $seq2->{name} =~/^file2/, "[FILE2.$c] seqname has <file2>: $seq2->{name}");
 }
 

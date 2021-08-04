@@ -18,7 +18,6 @@ my $b = Module::Build->new(
     'File::Temp'      => 0,
     'IO::Socket::UNIX'=> 0,
      JSON             => 0,
-     perl             => '5.16.0',
      POSIX            => 0,
     'Scalar::Util'    => 0,
      Storable         => 0,
@@ -33,6 +32,7 @@ my $b = Module::Build->new(
       bugtracker => 'https://github.com/philiprbrenan/DataTableText/issues'
      }
    },
+  perl           => '5.26.0',
  );
 
 $b->create_build_script();

@@ -1,5 +1,5 @@
 package Mojo::Leds::Rest;
-
+$Mojo::Leds::Rest::VERSION = '1.04';
 use Mojo::Base 'Mojo::Leds::Page';
 use Mojo::Util qw(decamelize class_to_path);
 use Mojo::JSON qw(decode_json);
@@ -19,7 +19,7 @@ sub create {
     return unless ($rec);
     $rec = $c->_create($rec);
     return unless ($rec);
-    $c->render_json($rec);
+    $c->render_json($c->_rec2json($rec));
 }
 
 sub delete {
@@ -62,9 +62,7 @@ sub resource_lookup {
 }
 
 sub tableDB {
-    my $c      = shift;
-    my $helper = $c->dbHelper;
-    return $c->helpers->$helper->coll( $c->table );
+    return shift->_tableDB;
 }
 
 sub update {
@@ -117,7 +115,7 @@ Mojo::Leds::Rest - Abstract class for RESTFul webservices interface
 
 =head1 VERSION
 
-version 1.02
+version 1.04
 
 =head1 RESTFul API
 

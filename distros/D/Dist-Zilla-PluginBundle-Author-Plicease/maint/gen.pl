@@ -1,6 +1,12 @@
 use strict;
 use warnings;
 
+# dummy version of [Libarchive] so that doesn't get
+# used
+package Dist::Zilla::Plugin::Libarchive 0.1 {
+  $INC{'Dist/Zilla/Plugin/Libarchive.pm'} = __FILE__;
+};
+
 my @list = sort map { chomp; s/\.pm$//; s/^lib\///; s/\//::/g; $_ } `find lib -name \*.pm`;
 
 open my $fh, '>', 't/01_use.t';

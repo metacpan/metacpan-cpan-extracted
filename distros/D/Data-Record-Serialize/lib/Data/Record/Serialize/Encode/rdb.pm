@@ -4,26 +4,13 @@ package Data::Record::Serialize::Encode::rdb;
 
 use Moo::Role;
 
-our $VERSION = '0.23';
-
-has '+_need_types' => (
-    is      => 'rwp',
-    default => 1,
-);
-has '+_use_integer' => (
-    is      => 'rwp',
-    default => 0,
-);
-has '+_map_types' => (
-    is      => 'rwp',
-    default => sub { { N => 'N', I => 'N', S => 'S' } },
-);
-has '+_needs_eol' => (
-    is      => 'rwp',
-    default => 1,
-);
+our $VERSION = '0.24';
 
 use namespace::clean;
+
+sub _needs_eol { 1 }
+sub _map_types { { N => 'N', I => 'N', S => 'S'  } }
+
 
 
 
@@ -31,12 +18,10 @@ use namespace::clean;
 
 
 sub setup {
-
     my $self = shift;
 
     $self->say( join( "\t", @{ $self->output_fields } ) );
     $self->say( join( "\t", @{ $self->output_types }{ @{ $self->output_fields } } ) );
-
 }
 
 
@@ -77,7 +62,7 @@ Data::Record::Serialize::Encode::rdb - encoded a record as /rdb
 
 =head1 VERSION
 
-version 0.23
+version 0.24
 
 =head1 SYNOPSIS
 

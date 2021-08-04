@@ -1,5 +1,8 @@
 Revision history for JSONSchema-Validator
 
+0.005  2021-08-04
+    - fixed bug with dereference undefined value (j-waters)
+
 0.004  2021-08-02
     - add json schema draft7 validator
 

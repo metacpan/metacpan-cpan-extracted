@@ -49,7 +49,7 @@ subtest "encode includes sink ; don't specify sink" => sub {
     isa_ok( (
             $error = dies {
                 Data::Record::Serialize->new(
-                    encode => 'both',
+                    encode => '+My::Test::Encode::both',
                     sink   => 'stream'
                   )
             }

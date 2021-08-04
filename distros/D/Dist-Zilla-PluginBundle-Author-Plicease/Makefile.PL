@@ -73,6 +73,7 @@ my %WriteMakefileArgs = (
     "Config::INI::Reader"                     => 0,
     "Data::Section"                           => 0,
     "Dist::Zilla"                             => "6.00",
+    "Dist::Zilla::Plugin::ArchiveTar"         => "0.03",
     "Dist::Zilla::Plugin::AutoMetaResources"  => "1.20",
     "Dist::Zilla::Plugin::CopyFilesFromBuild" => "0.150250",
     "Dist::Zilla::Plugin::InsertExample"      => "0.04",
@@ -111,7 +112,7 @@ my %WriteMakefileArgs = (
     "Test2::V0"    => "0.000121",
     "Test::Script" => "1.10"
   },
-  "VERSION" => "2.67",
+  "VERSION" => "2.68",
   "test"    => {
     "TESTS" => "t/*.t"
   }

@@ -1,3 +1,15 @@
+0.48 Tue  3 Aug 19:13:22 BST 2021
+* Allow to specify the preput argument for the Term::ReadLine::Gnu
+  (Constantin Kulikov)
+* RT#134899 Regex metacharacters in the choices can cause breakage
+  (Valery Kalesnik)
+* Better width for choice number field
+  (Valery Kalesnik)
+* RT#68198 Better processing of 'default' holding numbers
+  (Valery Kalesnik)
+* Modernisation of distribution and coding
+  (Valery Kalesnik)
+
 0.46 Mon May 25 18:47:04 BST 2015
 * Fix test skip count for non-terminals
   (Alexandr Ciornii)

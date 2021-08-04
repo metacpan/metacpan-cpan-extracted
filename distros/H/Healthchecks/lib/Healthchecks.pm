@@ -1,6 +1,6 @@
 # vim:set sw=4 ts=4 sts=4 ft=perl expandtab:
 package Healthchecks;
-# ABSTRACT: interact with Healthchecks API
+# ABSTRACT: Interact with Healthchecks API
 use Mojo::Base -base, -signatures;
 
 use Mojo::UserAgent;
@@ -8,7 +8,7 @@ use Mojo::JSON qw(decode_json encode_json);
 use Carp qw(carp);
 use Data::Dumper;
 
-our $VERSION = "0.01";
+our $VERSION = "0.02";
 
 has 'url';
 has 'apikey';

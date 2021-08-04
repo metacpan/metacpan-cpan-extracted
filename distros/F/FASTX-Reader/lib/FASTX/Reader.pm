@@ -5,7 +5,7 @@ use Carp qw(confess);
 use Data::Dumper;
 $Data::Dumper::Sortkeys = 1;
 use File::Basename;
-$FASTX::Reader::VERSION = '1.0.5';
+$FASTX::Reader::VERSION = '1.1.0';
 require Exporter;
 our @ISA = qw(Exporter);
 #ABSTRACT: A simple module to parse FASTA and FASTQ files, supporting compressed files and paired-ends.
@@ -36,7 +36,7 @@ sub new {
 
     # Check if a filename was provided and not {{STDIN}}
     # uncoverable branch false
-    
+
     if (defined $self->{filename} and $self->{filename} ne '{{STDIN}}') {
       open my $initial_fh, '<', $self->{filename} or confess "Unable to read file ", $self->{filename}, "\n";
       read( $initial_fh, my $magic_byte, 4 );
@@ -65,7 +65,7 @@ sub new {
       } else {
 
 	       #close $fh;
-      	 open (my $fh,  '<:encoding(utf8)', $self->{filename}) or confess "Unable to read file ", $self->{filename}, ": ", $!, "\n";
+      	 open (my $fh,  '<:encoding(utf8):crlf', $self->{filename}) or confess "Unable to read file ", $self->{filename}, ": ", $!, "\n";
          $self->{fh} = $fh;
       }
 
@@ -79,19 +79,19 @@ sub new {
 
 
 
-    
+
     if ($self->{loadseqs}) {
       _load_seqs($self);
     }
-    
+
     return $self;
 
 }
 
- 
+
+
 sub getRead {
   my $self   = shift;
-  #tate $self->{line};
 
   #@<instrument>:<run number>:<flowcell ID>:<lane>:<tile>:<x-pos>:<y-pos>:<UMI> <read>:<is filtered>:<control number>:<index>
 
@@ -419,7 +419,7 @@ FASTX::Reader - A simple module to parse FASTA and FASTQ files, supporting compr
 
 =head1 VERSION
 
-version 1.0.5
+version 1.1.0
 
 =head1 SYNOPSIS
 

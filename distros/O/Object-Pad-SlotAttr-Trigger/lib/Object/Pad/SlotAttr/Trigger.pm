@@ -3,14 +3,14 @@
 #
 #  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
 
-package Object::Pad::SlotAttr::Trigger 0.02;
+package Object::Pad::SlotAttr::Trigger 0.03;
 
 use v5.14;
 use warnings;
 
 use Object::Pad 0.48;
 BEGIN {
-   $Object::Pad::VERSION eq "0.48" or
+   $Object::Pad::VERSION eq "0.48" or $Object::Pad::XSAPI_VERSION eq "0.48" or
       die "Require exactly Object::Pad version 0.48";
 }
 

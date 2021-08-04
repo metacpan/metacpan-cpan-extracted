@@ -9,7 +9,7 @@ use JSON::XS qw(decode_json);
 
 my $cmd = join(" ", $0, @ARGV);
 
-my $tag = shift || 'v1.48.0';
+my $tag = shift || 'v1.49.0';
 
 $tag = "v$tag" unless $tag =~ /^v/;
 

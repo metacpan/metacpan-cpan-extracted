@@ -1,12 +1,12 @@
 package Sah::SchemaR::date::minute;
 
-our $DATE = '2020-03-08'; # DATE
-our $VERSION = '0.013'; # VERSION
+our $DATE = '2021-08-04'; # DATE
+our $VERSION = '0.017'; # VERSION
 
-our $rschema = ["int",[{examples=>[{valid=>0,value=>""},{valid=>1,value=>0},{valid=>1,value=>59},{valid=>0,value=>60}],max=>59,min=>0,summary=>"Minute of hour"}],["int"]];
+our $rschema = do{my$var={base=>"int",clsets_after_base=>[{examples=>[{summary=>"Empty string",valid=>0,value=>""},{valid=>1,value=>0},{valid=>1,value=>59},{summary=>"Not in 0-59",valid=>0,value=>60}],max=>59,min=>0,summary=>"Minute of hour (0-59)"}],clsets_after_type=>['$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_base}[0]'],resolve_path=>["int"],type=>"int",v=>2};$var->{clsets_after_type}[0]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_base}[0];$var};
 
 1;
-# ABSTRACT: Minute of hour
+# ABSTRACT: Minute of hour (0-59)
 
 __END__
 
@@ -16,11 +16,11 @@ __END__
 
 =head1 NAME
 
-Sah::SchemaR::date::minute - Minute of hour
+Sah::SchemaR::date::minute - Minute of hour (0-59)
 
 =head1 VERSION
 
-This document describes version 0.013 of Sah::SchemaR::date::minute (from Perl distribution Sah-Schemas-Date), released on 2020-03-08.
+This document describes version 0.017 of Sah::SchemaR::date::minute (from Perl distribution Sah-Schemas-Date), released on 2021-08-04.
 
 =head1 DESCRIPTION
 
@@ -50,7 +50,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

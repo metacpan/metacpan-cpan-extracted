@@ -5,7 +5,7 @@ use 5.006;
 
 package HTTP::BrowserDetect;
 
-our $VERSION = '3.33';
+our $VERSION = '3.34';
 
 # Operating Systems
 our @OS_TESTS = qw(
@@ -760,6 +760,13 @@ sub _init_core {
         $browser = 'silk';
         $browser_tests->{$browser} = 1;
     }
+    elsif ( index( $ua, 'ucbrowser' ) != -1 ) {
+
+        # Has to go above Safari, Mozilla and Chrome
+
+        $browser = 'ucbrowser';
+        $browser_tests->{$browser} = 1;
+    }
     elsif (index( $ua, 'chrome/' ) != -1
         || index( $ua, 'crios' ) != -1 ) {
 
@@ -778,13 +785,6 @@ sub _init_core {
 
         # Has to go above Safari
         $browser = 'blackberry';    # test gets set during device check
-    }
-    elsif ( index( $ua, 'ucbrowser' ) != -1 ) {
-
-        # Has to go above both Safari and Mozilla
-
-        $browser = 'ucbrowser';
-        $browser_tests->{$browser} = 1;
     }
     elsif (( index( $ua, 'safari' ) != -1 )
         || ( index( $ua, 'applewebkit' ) != -1 ) ) {
@@ -2988,7 +2988,7 @@ HTTP::BrowserDetect - Determine Web browser, version, and platform from an HTTP 
 
 =head1 VERSION
 
-version 3.33
+version 3.34
 
 =head1 SYNOPSIS
 

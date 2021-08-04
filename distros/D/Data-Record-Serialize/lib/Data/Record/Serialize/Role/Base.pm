@@ -4,14 +4,18 @@ package Data::Record::Serialize::Role::Base;
 
 use Moo::Role;
 
-our $VERSION = '0.23';
+our $VERSION = '0.24';
 
-use Data::Record::Serialize::Error { errors => [ 'fields' ] }, -all;
+use Data::Record::Serialize::Error { errors => [ 'fields', 'types' ] }, -all;
+
+use Data::Record::Serialize::Util -all;
 
 use Types::Standard
-  qw[ ArrayRef CodeRef CycleTuple HashRef Enum Str Bool is_HashRef Undef ];
+  qw[ ArrayRef CodeRef CycleTuple HashRef Enum Str Bool is_HashRef Maybe ];
+use Data::Record::Serialize::Types qw( SerializeType );
 
-use Ref::Util qw[ is_coderef is_arrayref ];
+use Ref::Util qw( is_coderef is_arrayref );
+use List::Util 1.33 qw( any );
 
 use POSIX ();
 
@@ -32,18 +36,9 @@ use namespace::clean;
 
 
 
-
-
-
-
-
-
-
-
-
 has types => (
     is  => 'rwp',
-    isa => ( HashRef [ Enum [qw( N I S )] ] | CycleTuple [ Str, Enum [qw( N I S )] ] ),   # need parens for perl <= 5.12.5
+    isa => ( HashRef [ SerializeType ] | CycleTuple [ Str, SerializeType ] ),   # need parens for perl <= 5.12.5
     predicate => 1,
     trigger   => sub {
         $_[0]->clear_type_index;
@@ -60,31 +55,14 @@ has types => (
 
 
 
+
+
+
 has default_type => (
     is  => 'ro',
-    isa => Enum [qw( N I S )] | Undef,
+    isa => SerializeType,
+    predicate => 1
 );
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -117,7 +95,7 @@ has _fieldh => (
     builder  => sub {
         my $self = shift;
         my %fieldh;
-        @fieldh{ @{ $self->fields } } = ( 1 ) x @{ $self->fields };
+        @fieldh{ @{ $self->fields } } = ();
         return \%fieldh;
     },
 );
@@ -143,6 +121,7 @@ has output_fields => (
     init_arg => undef,
 );
 
+# something for other roles to wrap.
 sub _trigger_output_fields { }
 
 has _run_setup => (
@@ -152,36 +131,72 @@ has _run_setup => (
     default   => 1,
 );
 
-has _need_types => (
-    is       => 'rwp',
-    isa      => Bool,
-    init_arg => undef,
-    default  => 1,
-);
 
-has _use_integer => (
+# have we initialized types? can't simply use $self->has_types, as
+# the caller may have provided some.
+has _have_initialized_types => (
     is       => 'rwp',
-    isa      => Bool,
     init_arg => undef,
-    default  => 1,
-    # just in case need_types isn't explicitly set...
-    trigger => sub { $_[0]->_set__need_types( 1 ) },
-);
-
-has _needs_eol => (
-    is       => 'rwp',
     isa      => Bool,
-    init_arg => undef,
-    default  => 1,
-);
-
-has _numify => (
-    is       => 'rwp',
-    isa      => Bool,
-    init_arg => undef,
     default  => 0,
 );
 
+has _boolify => (
+    is       => 'lazy',
+    isa      => Bool,
+    init_arg => undef,
+    builder  => sub { $_[0]->_can_bool || $_[0]->_convert_boolean_to_int },
+);
+
+has _convert_boolean_to_int => (
+    is      => 'rwp',
+    default => 0,
+);
+
+has _can_bool => (
+    is       => 'lazy',
+    isa      => Bool,
+    init_arg => undef,
+    builder  => sub { !! $_[0]->can( 'to_bool' ) },
+);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+sub _build_field_list_with_type {
+    my ( $self, $list_spec, $type, $error_label ) = @_;
+
+    my $list = do {
+        if ( is_coderef( $list_spec ) ) {
+            ( ArrayRef [Str] )->assert_return( $list_spec->( $self ) );
+        }
+        elsif ( is_arrayref( $list_spec ) ) {
+            [@$list_spec];
+        }
+        else {
+            [ $list_spec ? @{ $self->type_index->[ $type ] } : () ];
+        }
+    };
+    my $fieldh    = $self->_fieldh;
+    my @not_field = grep { !exists $fieldh->{$_} } @{$list};
+    error( 'fields', "unknown $error_label fields: " . join( ', ', @not_field ) )
+      if @not_field;
+
+    return $list;
+}
 
 
 
@@ -217,19 +232,16 @@ has _numify => (
 
 
 
-
-
-
-
-
-
-
-has nullify => (
+has [ 'nullify', 'numify', 'stringify' ] => (
     is        => 'rw',
     isa       => ( ArrayRef [Str] | CodeRef | Bool ),  # need parens for perl <= 5.12.5
     predicate => 1,
-    trigger   => sub { $_[0]->_clear_nullify },
+    trigger   => 1,
 );
+
+sub _trigger_nullify   { $_[0]->_clear_nullified }
+sub _trigger_numify    { $_[0]->_clear_numified }
+sub _trigger_stringify { $_[0]->_clear_stringified }
 
 
 
@@ -248,58 +260,83 @@ has nullify => (
 
 
 sub nullified {
-
     my $self = shift;
-
-    return unless $self->has_fields;
-
-    return [ @ { $self->_nullify } ];
+    return [ $self->has_fields ? @{$self->_nullified} : () ];
 }
 
 
-has _nullify => (
-    is       => 'rwp',
-    lazy     => 1,
-    isa      => ArrayRef [Str],
-    clearer  => 1,
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+sub numified {
+    my $self = shift;
+    return [ $self->has_fields ? @{$self->_numified} : () ];
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+sub stringified {
+    my $self = shift;
+    return [ $self->has_fields ? @{$self->_stringified} : () ];
+}
+
+
+has [ '_nullified', '_numified', '_stringified' ] => (
+    is        => 'lazy',
+    isa       => ArrayRef [Str],
+    clearer   => 1,
     predicate => 1,
-    init_arg => undef,
-    builder  => sub {
-
-        my $self = shift;
-
-        if ( $self->has_nullify ) {
-
-            my $nullify = $self->nullify;
-
-            if ( is_coderef( $nullify ) ) {
-
-                $nullify = (ArrayRef[Str])->assert_return( $nullify->( $self ) );
-            }
-
-            elsif ( is_arrayref( $nullify ) ) {
-                $nullify = [ @$nullify ];
-            }
-
-            else {
-                $nullify = [ $nullify ? @{$self->fields} : () ];
-            }
-
-            my $fieldh = $self->_fieldh;
-            my @not_field = grep { ! exists $fieldh->{$_} } @{ $nullify };
-            error( 'fields', "unknown nullify fields: ", join( ', ', @not_field ) )
-              if @not_field;
-
-            return $nullify;
-        }
-
-        # this allows encoder's to use a before or around modifier
-        # applied to _build__nullify to specify a default via
-        # $self->_set__nullify.
-        $self->_has_nullify ? $self->_nullify : [];
-    },
+    init_arg  => undef,
+    builder   => 1,
 );
 
+sub _build__nullified {
+    my $self = shift;
+    return $self->has_nullify
+      ? $self->_build_field_list_with_type( $self->nullify, ANY, 'nullify' )
+      : [];
+}
+
+sub _build__numified {
+    my $self = shift;
+    return $self->has_numify
+      ? $self->_build_field_list_with_type( $self->numify, NUMBER, 'numify' )
+      : [];
+}
+
+sub _build__stringified {
+    my $self = shift;
+    return $self->has_stringify
+      ? $self->_build_field_list_with_type( $self->stringify, STRING, 'stringify' )
+      : [];
+}
 
 
 
@@ -309,7 +346,35 @@ has _nullify => (
 
 
 
-sub numeric_fields { return $_[0]->type_index->{'numeric'} }
+
+sub string_fields { $_[0]->type_index->[STRING] }
+
+
+
+
+
+
+
+
+
+
+sub numeric_fields { $_[0]->type_index->[NUMBER] }
+
+
+
+
+
+
+
+
+
+
+sub boolean_fields { $_[0]->type_index->[ BOOLEAN ] }
+
+
+
+
+
 
 
 
@@ -341,27 +406,14 @@ sub numeric_fields { return $_[0]->type_index->{'numeric'} }
 
 
 has type_index => (
-    is       => 'ro',
-    lazy     => 1,
+    is       => 'lazy',
     init_arg => undef,
     clearer  => 1,
     builder  => sub {
-        my $self  = shift;
-        my $types = $self->types;
-
-        my %index = map {
-            my ( $type, $re ) = @$_;
-            {
-                $type => [ grep { $types->{$_} =~ $re } keys %{$types} ]
-            }
-          }
-          [ S          => qr/S/i ],
-          [ N          => qr/N/i ],
-          [ I          => qr/I/i ],
-          [ numeric    => qr/[NI]/i ],
-          [ not_string => qr/^[^S]+$/ ];
-
-        return \%index;
+        my $self = shift;
+        error( 'types', "no types for fields are available" )
+          unless $self->has_types;
+        index_types( $self->types );
     },
 );
 
@@ -380,50 +432,53 @@ has output_types => (
     init_arg => undef,
     clearer  => 1,
     trigger  => 1,
-    builder  => sub {
-        my $self = shift;
-
-        my %types;
-
-        return unless $self->has_types;
-
-        my @int_fields = grep { defined $self->types->{$_} } @{ $self->fields };
-        @types{@int_fields} = @{ $self->types }{@int_fields};
-
-        unless ( $self->_use_integer ) {
-            $_ = 'N' foreach grep { $_ eq 'I' } values %types;
-        }
-
-        if ( $self->_has_map_types ) {
-
-            $types{$_} = $self->_map_types->{ $types{$_} } foreach keys %types;
-
-        }
-
-        for my $key ( keys %types ) {
-
-            my $rename = $self->rename_fields->{$key}
-              or next;
-
-            $types{$rename} = delete $types{$key};
-        }
-
-        \%types;
-    },
 );
 
+sub _build_output_types {
+    my $self = shift;
+    my %types;
+
+    return
+      unless $self->has_types;
+
+    my @int_fields = grep { defined $self->types->{$_} } @{ $self->fields };
+    @types{@int_fields} = @{ $self->types }{@int_fields};
+
+    unless ( $self->_encoder_has_type(BOOLEAN) ) {
+        $types{$_} = T_INTEGER for @{ $self->boolean_fields };
+        $self->_set__convert_boolean_to_int(1);
+    }
+
+    unless ( $self->_encoder_has_type(INTEGER) ) {
+        $types{$_} = T_NUMBER for @{ $self->numeric_fields };
+    }
+
+    if ( my $map_types = $self->_map_types ) {
+        for my $field ( keys %types ) {
+            my $type = $types{$field};
+            next unless  exists $map_types->{$type};
+            $types{$field} = $map_types->{ $type }
+        }
+    }
+
+    for my $key ( keys %types ) {
+        my $rename = $self->rename_fields->{$key}
+          or next;
+
+        $types{$rename} = delete $types{$key};
+    }
+
+    \%types;
+}
+
+# something for other roles to wrap.
 sub _trigger_output_types { }
 
-has _map_types => (
-    is        => 'rwp',
-    init_arg  => undef,
-    predicate => 1,
-);
 
-
-
-
-
+sub _encoder_has_type {
+    my ( $self, $type ) = @_;
+    any { is_type($_, $type ) } keys %{ $self->_map_types // {} };
+}
 
 
 
@@ -443,20 +498,10 @@ has format_fields => (
 
 
 
-
-
-
-
-
-
-
 has format_types => (
-    is  => 'ro',
-    isa => HashRef [Str | CodeRef],
-    # we'll need to gather types
-    trigger => sub { $_[0]->_set__need_types( 1 ) if keys %{ $_[1] }; },
+    is        => 'ro',
+    isa       => HashRef [ Str | CodeRef ],
 );
-
 
 
 
@@ -500,12 +545,9 @@ has _format => (
     is      => 'rwp',
     lazy    => 1,
     default => sub {
-
         my $self = shift;
 
-
         if ( $self->format ) {
-
             my %format;
 
             # first consider types; they'll be overridden by per field
@@ -525,15 +567,12 @@ has _format => (
             }
 
             if ( $self->format_fields ) {
-
                 for my $field ( @{ $self->fields } ) {
-
                     my $format = $self->format_fields->{$field}
                       or next;
 
                     $format{$field} = $format;
                 }
-
             }
 
             return \%format
@@ -551,52 +590,42 @@ has _format => (
 
 
 sub BUILD {
-
     my $self = shift;
 
     # if types is passed, set fields if it's not set.
     # convert types to hash if it's an array
-
-    my $types;
-    if ( defined( $types = $self->types ) ) {
+    if ( $self->has_types ) {
+        my $types = $self->types;
 
         if ( 'HASH' eq ref $types ) {
-
             $self->_set_fields( [ keys %{$types} ] )
              unless $self->has_fields;
         }
-
         elsif ( 'ARRAY' eq ref $types ) {
-
             $self->_set_types( { @{$types} } );
 
             if ( ! $self->has_fields ) {
-
                 my @fields;
-                push @fields, $types->[ 2 * $_ ] for 0 .. ( @{$types} / 2 ) - 1;
-
+                # pull off "keys"
+                push @fields, ( shift @$types, shift @$types )[0] while @$types;
                 $self->_set_fields( \@fields );
             }
         }
         else {
             error( '::attribute::value', "internal error" );
         }
-
     }
 
     if ( $self->has_fields ) {
 
         if ( ref $self->fields ) {
-
             # in this specific case everything can be done before the first
             # record is read.  this is kind of overkill, but at least one
             # test depended upon being able to determine types prior
             # to sending the first record, so need to do this here rather
             # than in Default::setup
-            if ( $self->_need_types && defined $self->default_type ) {
-                $self->_set_types_from_default;
-                $self->_set__need_types( 0 );
-            }
+            $self->_set_types_from_default
+              if $self->has_default_type;
         }
 
         # if fields eq 'all', clear out the attribute so that it will get
@@ -610,30 +639,31 @@ sub BUILD {
 }
 
 sub _set_types_from_record {
-
     my ( $self, $data ) = @_;
+
+    return if $self->_have_initialized_types;
 
     my $types = $self->has_types ? $self->types : {};
 
     for my $field ( grep !defined $types->{$_}, @{ $self->fields } ) {
-
         my $value = $data->{$field};
-        my $def = Scalar::Util::looks_like_number( $value ) ? 'N' : 'S';
+        my $def = Scalar::Util::looks_like_number( $value ) ? T_NUMBER : T_STRING;
 
-        $def = 'I'
-          if $self->_use_integer
-          && $def eq 'N'
+        $def = T_INTEGER
+          if $def eq T_NUMBER
           && POSIX::floor( $value ) == POSIX::ceil( $value );
 
         $types->{$field} = $def;
     }
 
     $self->_set_types( $types );
+    $self->_set__have_initialized_types( 1 );
 }
 
 sub _set_types_from_default {
-
     my $self = shift;
+
+    return if $self->_have_initialized_types;
 
     my $types = $self->has_types ? $self->types : {};
 
@@ -641,6 +671,7 @@ sub _set_types_from_default {
       for grep { !defined $types->{$_} } @{ $self->fields };
 
     $self->_set_types( $types );
+    $self->_set__have_initialized_types( 1 );
 }
 
 
@@ -668,7 +699,7 @@ Data::Record::Serialize::Role::Base - Base Role for Data::Record::Serialize
 
 =head1 VERSION
 
-version 0.23
+version 0.24
 
 =head1 DESCRIPTION
 
@@ -680,113 +711,50 @@ as a role there is no overhead during method lookup
 
 =head2 C<types>
 
-A hash or array mapping input field names to types (C<N>, C<I>,
-C<S>).  If an array, the fields will be output in the specified
-order, provided the encoder permits it (see below, however).  For example,
+If no types are available, returns C<undef>; see also L</has_types>.
 
-  # use order if possible
-  types => [ c => 'N', a => 'N', b => 'N' ]
-
-  # order doesn't matter
-  types => { c => 'N', a => 'N', b => 'N' }
-
-If C<fields> is specified, then its order will override that specified
-here.
-
-To understand how this attribute works in concert with L</fields> and
-L</default_type>, please see L</Fields and their types>.
+Otherwise, returns a hashref whose keys are the input field names and
+whose values are the types (C<N>, C<I>, C<S>, C<B>). If types are
+deduced from the data, this mapping is finalized (and thus accurate)
+only after the first record has been sent.
 
 =head2 C<default_type> I<type>
 
-If set, output fields whose types were not
-specified via the C<types> attribute will be assigned this type.
-To understand how this attribute works in concert with L</fields> and
-L</types>, please see L</Fields and their types>.
+The value passed to the constructor (if any).
 
 =head2 C<fields>
 
-Which fields to output.  It may be one of:
-
-=over
-
-=item *
-
-An array containing the input names of the fields to be output. The
-fields will be output in the specified order, provided the encoder
-permits it.
-
-=item *
-
-The string C<all>, indicating that all input fields will be output.
-
-=item *
-
-Unspecified or undefined.
-
-=back
-
-To understand how this attribute works in concert with L</types> and
-L</default_type>, please see L<Data::Record::Serialize/Fields and their types>.
+The names of the input fields that will be output.
 
 =head2 nullify
 
-Specify which fields should be set to C<undef> if they are
-empty. Sinks should encode C<undef> as the C<null> value.  By default,
-no fields are nullified.
+The value passed to the constructor (if any).
 
-B<nullify> may be passed:
+=head2 numify
 
-=over
+   $bool = $s->numify;
 
-=item *  an array
+The value passed to the constructor (if any).
+See the discussion for the L<< numify|Data::Record::Serialize/numify >> constructor option.
 
-It should be a list of input field names.  These names are verified
-against the input fields after the first record is read.
+=head2 stringify
 
-=item * a code ref
+   $bool = $s->stringify;
 
-The coderef is passed the object, and should return a list of input
-field names.  These names are verified against the input fields after
-the first record is read.
-
-=item * a boolean
-
-If true, all field names are added to the list. When false, the list
-is emptied.
-
-=back
-
-During verification, a
-C<Data::Record::Serialize::Error::Role::Base::fields> error is thrown
-if non-existent fields are specified.  Verification is I<not>
-performed until the next record is sent (or the L</nullified> method
-is called), so there is no immediate feedback.
+The value passed to the constructor (if any).
+See the discussion for the L<< stringify|Data::Record::Serialize/stringify >> constructor option.
 
 =head2 C<format_fields>
 
-A hash mapping the input field names to either a C<sprintf> style
-format or a coderef. This will be applied prior to encoding the
-record, but only if the C<format> attribute is also set.  Formats
-specified here override those specified in C<format_types>.
-
-The coderef will be called with the value to format as its first
-argument, and should return the formatted value.
+The value passed to the constructor (if any).
 
 =head2 C<format_types>
 
-A hash mapping a field type (C<N>, C<I>, C<S>) to a C<sprintf> style
-format or a coderef.  This will be applied prior to encoding the
-record, but only if the C<format> attribute is also set.  Formats
-specified here may be overridden for specific fields using the
-C<format_fields> attribute.
-
-The coderef will be called with the value to format as its first
-argument, and should return the formatted value.
+The value passed to the constructor (if any).
 
 =head2 C<rename_fields>
 
-A hash mapping input to output field names.  By default the input
-field names are used unaltered.
+The value passed to the constructor (if any).
 
 =head2 C<format>
 
@@ -799,6 +767,10 @@ C<format_fields> and/or C<format_types> options.  The default is false.
 
 returns true if L</types> has been set.
 
+=head2 has_default_type
+
+returns true if L</default_type> has been set.
+
 =head2 has_fields
 
 returns true if L</fields> has been set.
@@ -807,12 +779,20 @@ returns true if L</fields> has been set.
 
   $array_ref = $s->output_fields;
 
-The names of the transformed output fields, in order of output (not
-obeyed by all encoders);
+The names of the output fields, in order of requested output.  This takes into account
+fields which have been renamed.
 
 =head2 has_nullify
 
 returns true if L</nullify> has been set.
+
+=head2 has_numify
+
+returns true if L</numify> has been set.
+
+=head2 has_stringify
+
+returns true if L</stringify> has been set.
 
 =head2 nullified
 
@@ -828,36 +808,80 @@ verification of the list of nullified fields against the list of
 actual fields.  A disparity will result in an exception of class
 C<Data::Record::Serialize::Error::Role::Base::fields>.
 
+=head2 numified
+
+  $fields = $obj->numified;
+
+Returns a list of fields which are converted to numbers.
+
+This will return C<undef> if the list is not yet available (for example, if
+fields names are determined from the first output record and none has been sent).
+
+If the list of fields is available, calling B<numified> may result in
+verification of the list of numified fields against the list of
+actual fields.  A disparity will result in an exception of class
+C<Data::Record::Serialize::Error::Role::Base::fields>.
+
+=head2 stringified
+
+  $fields = $obj->stringified;
+
+Returns a list of fields which are converted to strings.
+
+This will return C<undef> if the list is not yet available (for example, if
+fields names are determined from the first output record and none has been sent).
+
+If the list of fields is available, calling B<stringified> may result in
+verification of the list of stringified fields against the list of
+actual fields.  A disparity will result in an exception of class
+C<Data::Record::Serialize::Error::Role::Base::fields>.
+
+=head2 B<string_fields>
+
+  $array_ref = $s->string_fields;
+
+The input field names for those fields deemed to be strings
+
 =head2 B<numeric_fields>
 
   $array_ref = $s->numeric_fields;
 
-The input field names for those fields deemed to be numeric.
+The input field names for those fields deemed to be numeric (either N or I).
+
+=head2 B<boolean_fields>
+
+  $array_ref = $s->boolean_fields;
+
+The input field names for those fields deemed to be boolean.
 
 =head2 B<type_index>
 
-  $hash = $s->type_index;
+  $arrayref = $s->type_index;
 
-A hash, keyed off of field type or category.  The values are
-an array of field names.  I<Don't edit this!>.
+An array, with indices representing field type or category.  The values are
+an array of field names. This is finalized (and thus accurate) only after the first record is written.
 
-The hash keys are:
+I<Don't edit this!>.
+
+The indices are available via L<Data::Record::Serialize::Util> and are:
 
 =over
 
-=item C<I>
+=item INTEGER
 
-=item C<N>
+=item FLOAT
 
-=item C<S>
+=item NUMBER
 
-=item C<numeric>
+C<FLOAT> and C<INTEGER>
 
-C<N> and C<I>.
+=item STRING
 
-=item C<not_string>
+=item NOT_STRING
 
-Everything but C<S>.
+everything that's not C<STRING>
+
+=item BOOLEAN
 
 =back
 
@@ -865,9 +889,21 @@ Everything but C<S>.
 
   $hash_ref = $s->output_types;
 
-The mapping between output field name and output field type.  If the
+The fully resolved mapping between output field name and output field type.  If the
 encoder has specified a type map, the output types are the result of
-that mapping.
+that mapping.  This is only valid after the first record has been sent.
+
+=begin internals
+
+=sub _build_field_list_with_type
+
+  $list = $s->_build_field_list_with_type( $list_spec, $type, $error_label );
+
+Given a specification for a list (see the nullify, stringify, and
+numify attributes) and the field type (e.g. STRING, NUMERIC, BOOLEAN,
+ANY ) if the specification is boolean, return a list.
+
+=end internals
 
 =for Pod::Coverage BUILD
 

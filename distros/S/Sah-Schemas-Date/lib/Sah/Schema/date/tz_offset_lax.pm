@@ -1,9 +1,9 @@
 package Sah::Schema::date::tz_offset_lax;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-03-08'; # DATE
+our $DATE = '2021-08-04'; # DATE
 our $DIST = 'Sah-Schemas-Date'; # DIST
-our $VERSION = '0.013'; # VERSION
+our $VERSION = '0.017'; # VERSION
 
 our $schema = ['date::tz_offset' => {
     summary => 'Timezone offset in seconds from UTC',
@@ -40,7 +40,7 @@ _
         {value=>'UTC-13', valid=>0},
         {value=>'UTC+12:01', valid=>1, validated_value=>+(12*3600+60)},
     ],
-}, {}];
+}];
 
 1;
 
@@ -58,41 +58,11 @@ Sah::Schema::date::tz_offset_lax - Timezone offset in seconds from UTC
 
 =head1 VERSION
 
-This document describes version 0.013 of Sah::Schema::date::tz_offset_lax (from Perl distribution Sah-Schemas-Date), released on 2020-03-08.
+This document describes version 0.017 of Sah::Schema::date::tz_offset_lax (from Perl distribution Sah-Schemas-Date), released on 2021-08-04.
 
 =head1 SYNOPSIS
 
-Using with L<Data::Sah>:
-
- use Data::Sah qw(gen_validator);
- my $vdr = gen_validator("date::tz_offset_lax*");
- say $vdr->($data) ? "valid" : "INVALID!";
-
- # Data::Sah can also create a validator to return error message, coerced value,
- # even validators in other languages like JavaScript, from the same schema.
- # See its documentation for more details.
-
-Using in L<Rinci> function metadata (to be used with L<Perinci::CmdLine>, etc):
-
- package MyApp;
- our %SPEC;
- $SPEC{myfunc} = {
-     v => 1.1,
-     summary => 'Routine to do blah ...',
-     args => {
-         arg1 => {
-             summary => 'The blah blah argument',
-             schema => ['date::tz_offset_lax*'],
-         },
-         ...
-     },
- };
- sub myfunc {
-     my %args = @_;
-     ...
- }
-
-Sample data:
+=head2 Sample data and validation results against this schema
 
  ""  # INVALID
 
@@ -117,6 +87,105 @@ Sample data:
  "UTC-13"  # INVALID
 
  "UTC+12:01"  # valid, becomes 43260
+
+=head2 Using with Data::Sah
+
+To check data against this schema (requires L<Data::Sah>):
+
+ use Data::Sah qw(gen_validator);
+ my $validator = gen_validator("date::tz_offset_lax*");
+ say $validator->($data) ? "valid" : "INVALID!";
+
+The above schema returns a boolean value (true if data is valid, false if
+otherwise). To return an error message string instead (empty string if data is
+valid, a non-empty error message otherwise):
+
+ my $validator = gen_validator("date::tz_offset_lax", {return_type=>'str_errmsg'});
+ my $errmsg = $validator->($data);
+ 
+ # a sample valid data
+ $data = "UTC";
+ my $errmsg = $validator->($data); # => ""
+ 
+ # a sample invalid data
+ $data = "";
+ my $errmsg = $validator->($data); # => "Cannot be empty"
+
+Often a schema has coercion rule or default value, so after validation the
+validated value is different. To return the validated (set-as-default, coerced,
+prefiltered) value:
+
+ my $validator = gen_validator("date::tz_offset_lax", {return_type=>'str_errmsg+val'});
+ my $res = $validator->($data); # [$errmsg, $validated_val]
+ 
+ # a sample valid data
+ $data = "UTC";
+ my $res = $validator->($data); # => ["",0]
+ 
+ # a sample invalid data
+ $data = "";
+ my $res = $validator->($data); # => ["Cannot be empty",""]
+
+Data::Sah can also create validator that returns a hash of detaild error
+message. Data::Sah can even create validator that targets other language, like
+JavaScript, from the same schema. Other things Data::Sah can do: show source
+code for validator, generate a validator code with debug comments and/or log
+statements, generate human text from schema. See its documentation for more
+details.
+
+=head2 Using with Params::Sah
+
+To validate function parameters against this schema (requires L<Params::Sah>):
+
+ use Params::Sah qw(gen_validator);
+
+ sub myfunc {
+     my @args = @_;
+     state $validator = gen_validator("date::tz_offset_lax*");
+     $validator->(\@args);
+     ...
+ }
+
+=head2 Using with Perinci::CmdLine::Lite
+
+To specify schema in L<Rinci> function metadata and use the metadata with
+L<Perinci::CmdLine> (L<Perinci::CmdLine::Lite>) to create a CLI:
+
+ # in lib/MyApp.pm
+ package
+   MyApp;
+ our %SPEC;
+ $SPEC{myfunc} = {
+     v => 1.1,
+     summary => 'Routine to do blah ...',
+     args => {
+         arg1 => {
+             summary => 'The blah blah argument',
+             schema => ['date::tz_offset_lax*'],
+         },
+         ...
+     },
+ };
+ sub myfunc {
+     my %args = @_;
+     ...
+ }
+ 1;
+
+ # in myapp.pl
+ package
+   main;
+ use Perinci::CmdLine::Any;
+ Perinci::CmdLine::Any->new(url=>'/MyApp/myfunc')->run;
+
+ # in command-line
+ % ./myapp.pl --help
+ myapp - Routine to do blah ...
+ ...
+
+ % ./myapp.pl --version
+
+ % ./myapp.pl --arg1 ...
 
 =head1 DESCRIPTION
 
@@ -155,7 +224,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

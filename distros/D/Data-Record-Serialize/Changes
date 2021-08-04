@@ -1,3 +1,22 @@
+0.24      2021-07-30 23:35:07-04:00 America/New_York
+
+  [API BREAKAGE]
+
+    * the consistency of the return values of the types, output_types, and fields methods was
+      inconsistent. they're now consistent, and different.
+
+    * type_index now returns an arrayref; it will probably change further, so use with caution.
+
+  [ENHANCEMENTS]
+
+    * booleans are now supported
+    * json and yaml properly support booleans and string/number differentiation.
+    * dbi supports booleans
+    * new sink, array.
+    * alternate namespaces for Sink and Encoders now possible
+    * dbi connections may be opened in cached mode
+
+
 0.23      2021-07-26 12:39:08-04:00 America/New_York
 
   [BUILD]

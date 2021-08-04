@@ -4,7 +4,7 @@
       "Andrea Telatin <andrea@telatin.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "mit"
    ],
@@ -38,15 +38,15 @@
    "provides" : {
       "FASTX::PE" : {
          "file" : "lib/FASTX/PE.pm",
-         "version" : "v1.0.5"
+         "version" : "v1.1.0"
       },
       "FASTX::Reader" : {
          "file" : "lib/FASTX/Reader.pm",
-         "version" : "v1.0.5"
+         "version" : "v1.1.0"
       },
       "FASTX::ScriptHelper" : {
          "file" : "lib/FASTX/ScriptHelper.pm",
-         "version" : "v1.0.5"
+         "version" : "v1.1.0"
       }
    },
    "release_status" : "stable",
@@ -55,9 +55,7 @@
          "url" : "https://github.com/telatin/FASTQ-Parser"
       }
    },
-   "version" : "1.0.5",
-   "x_generated_by_perl" : "v5.22.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.10",
-   "x_spdx_expression" : "MIT"
+   "version" : "1.1.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

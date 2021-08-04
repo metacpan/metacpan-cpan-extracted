@@ -13,23 +13,27 @@ foreach my $format (qw( tar tar.gz ))
   my $dir_check = sub ($name) {
     return object {
       call [ isa => 'Archive::Tar::File' ] => T();
-      call name => $name;
-      call mode => oct('0755');
-      call size => 0;
-      call uid  => 0;
-      call gid  => 0;
-      call type => Archive::Tar::DIR();
+      call name  => $name;
+      call mode  => oct('0755');
+      call size  => 0;
+      call uid   => 0;
+      call uname => 'root';
+      call gid   => 0;
+      call gname => 'root';
+      call type  => Archive::Tar::DIR();
     };
   };
 
   my $file_check = sub ($name, $content=undef) {
     return object {
       call [ isa => 'Archive::Tar::File' ] => T();
-      call name => $name;
-      call mode => oct('0644');
-      call uid  => 0;
-      call gid  => 0;
-      call type => Archive::Tar::FILE();
+      call name  => $name;
+      call mode  => oct('0644');
+      call uid   => 0;
+      call uname => 'root';
+      call gid   => 0;
+      call gname => 'root';
+      call type  => Archive::Tar::FILE();
       if($content)
       {
         call has_content => T();

@@ -22,6 +22,9 @@ use DynaLoader;
 
 
 
+use strict;
+use warnings;
+
 $PDL::onlinedoc->scan(__FILE__) if $PDL::onlinedoc;
 
 =head1 NAME
@@ -98,7 +101,7 @@ These functions compute the cumulative distribution functions P(x), Q(x) and the
 
 =for sig
 
-  Signature: (double x(); double a(); double b();  [o]out())
+  Signature: (double x(); double a(); double b(); double [o]out())
 
 =for ref
 
@@ -127,7 +130,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double p(); double a(); double b();  [o]out())
+  Signature: (double p(); double a(); double b(); double [o]out())
 
 =for ref
 
@@ -156,7 +159,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double x(); double a(); double b();  [o]out())
+  Signature: (double x(); double a(); double b(); double [o]out())
 
 =for ref
 
@@ -185,7 +188,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double q(); double a(); double b();  [o]out())
+  Signature: (double q(); double a(); double b(); double [o]out())
 
 =for ref
 
@@ -223,7 +226,7 @@ These functions compute the cumulative distribution functions P(k), Q(k) for the
 
 =for sig
 
-  Signature: (ushort k(); double p(); ushort n();  [o]out())
+  Signature: (ushort k(); double p(); ushort n(); double [o]out())
 
 =for ref
 
@@ -252,7 +255,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (ushort k(); double p(); ushort n();  [o]out())
+  Signature: (ushort k(); double p(); ushort n(); double [o]out())
 
 =for ref
 
@@ -290,7 +293,7 @@ These functions compute the cumulative distribution functions P(x), Q(x) and the
 
 =for sig
 
-  Signature: (double x(); double a();  [o]out())
+  Signature: (double x(); double a(); double [o]out())
 
 =for ref
 
@@ -319,7 +322,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double p(); double a();  [o]out())
+  Signature: (double p(); double a(); double [o]out())
 
 =for ref
 
@@ -348,7 +351,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double x(); double a();  [o]out())
+  Signature: (double x(); double a(); double [o]out())
 
 =for ref
 
@@ -377,7 +380,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double q(); double a();  [o]out())
+  Signature: (double q(); double a(); double [o]out())
 
 =for ref
 
@@ -415,7 +418,7 @@ These functions compute the cumulative distribution functions P(x), Q(x) and the
 
 =for sig
 
-  Signature: (double x(); double nu();  [o]out())
+  Signature: (double x(); double nu(); double [o]out())
 
 =for ref
 
@@ -444,7 +447,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double p(); double nu();  [o]out())
+  Signature: (double p(); double nu(); double [o]out())
 
 =for ref
 
@@ -473,7 +476,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double x(); double nu();  [o]out())
+  Signature: (double x(); double nu(); double [o]out())
 
 =for ref
 
@@ -502,7 +505,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double q(); double nu();  [o]out())
+  Signature: (double q(); double nu(); double [o]out())
 
 =for ref
 
@@ -540,7 +543,7 @@ These functions compute the cumulative distribution functions P(x), Q(x) and the
 
 =for sig
 
-  Signature: (double x(); double mu();  [o]out())
+  Signature: (double x(); double mu(); double [o]out())
 
 =for ref
 
@@ -569,7 +572,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double p(); double mu();  [o]out())
+  Signature: (double p(); double mu(); double [o]out())
 
 =for ref
 
@@ -598,7 +601,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double x(); double mu();  [o]out())
+  Signature: (double x(); double mu(); double [o]out())
 
 =for ref
 
@@ -627,7 +630,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double q(); double mu();  [o]out())
+  Signature: (double q(); double mu(); double [o]out())
 
 =for ref
 
@@ -665,7 +668,7 @@ These functions compute the cumulative distribution functions P(x), Q(x) for the
 
 =for sig
 
-  Signature: (double x(); double a(); double b();  [o]out())
+  Signature: (double x(); double a(); double b(); double [o]out())
 
 =for ref
 
@@ -694,7 +697,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double x(); double a(); double b();  [o]out())
+  Signature: (double x(); double a(); double b(); double [o]out())
 
 =for ref
 
@@ -732,7 +735,7 @@ These functions compute the cumulative distribution functions P(x), Q(x) and the
 
 =for sig
 
-  Signature: (double x(); double nua(); double nub();  [o]out())
+  Signature: (double x(); double nua(); double nub(); double [o]out())
 
 =for ref
 
@@ -761,7 +764,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double p(); double nua(); double nub();  [o]out())
+  Signature: (double p(); double nua(); double nub(); double [o]out())
 
 =for ref
 
@@ -790,7 +793,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double x(); double nua(); double nub();  [o]out())
+  Signature: (double x(); double nua(); double nub(); double [o]out())
 
 =for ref
 
@@ -819,7 +822,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double q(); double nua(); double nub();  [o]out())
+  Signature: (double q(); double nua(); double nub(); double [o]out())
 
 =for ref
 
@@ -857,7 +860,7 @@ These functions compute the cumulative distribution functions P(x), Q(x) and the
 
 =for sig
 
-  Signature: (double x(); double a(); double b();  [o]out())
+  Signature: (double x(); double a(); double b(); double [o]out())
 
 =for ref
 
@@ -886,7 +889,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double p(); double a(); double b();  [o]out())
+  Signature: (double p(); double a(); double b(); double [o]out())
 
 =for ref
 
@@ -915,7 +918,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double x(); double a(); double b();  [o]out())
+  Signature: (double x(); double a(); double b(); double [o]out())
 
 =for ref
 
@@ -944,7 +947,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double q(); double a(); double b();  [o]out())
+  Signature: (double q(); double a(); double b(); double [o]out())
 
 =for ref
 
@@ -982,7 +985,7 @@ These functions compute the cumulative distribution functions P(x), Q(x) and the
 
 =for sig
 
-  Signature: (double x(); double a(); double b();  [o]out())
+  Signature: (double x(); double a(); double b(); double [o]out())
 
 =for ref
 
@@ -1011,7 +1014,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double p(); double a(); double b();  [o]out())
+  Signature: (double p(); double a(); double b(); double [o]out())
 
 =for ref
 
@@ -1040,7 +1043,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double x(); double a(); double b();  [o]out())
+  Signature: (double x(); double a(); double b(); double [o]out())
 
 =for ref
 
@@ -1069,7 +1072,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double q(); double a(); double b();  [o]out())
+  Signature: (double q(); double a(); double b(); double [o]out())
 
 =for ref
 
@@ -1107,7 +1110,7 @@ These functions compute the cumulative distribution functions P(x), Q(x) and the
 
 =for sig
 
-  Signature: (double x(); double sigma();  [o]out())
+  Signature: (double x(); double sigma(); double [o]out())
 
 =for ref
 
@@ -1136,7 +1139,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double p(); double sigma();  [o]out())
+  Signature: (double p(); double sigma(); double [o]out())
 
 =for ref
 
@@ -1165,7 +1168,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double x(); double sigma();  [o]out())
+  Signature: (double x(); double sigma(); double [o]out())
 
 =for ref
 
@@ -1194,7 +1197,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double q(); double sigma();  [o]out())
+  Signature: (double q(); double sigma(); double [o]out())
 
 =for ref
 
@@ -1232,7 +1235,7 @@ These functions compute the cumulative distribution functions P(k), Q(k) for the
 
 =for sig
 
-  Signature: (ushort k(); double p();  [o]out())
+  Signature: (ushort k(); double p(); double [o]out())
 
 =for ref
 
@@ -1261,7 +1264,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (ushort k(); double p();  [o]out())
+  Signature: (ushort k(); double p(); double [o]out())
 
 =for ref
 
@@ -1299,7 +1302,7 @@ These functions compute the cumulative distribution functions P(x), Q(x) and the
 
 =for sig
 
-  Signature: (double x(); double a(); double b();  [o]out())
+  Signature: (double x(); double a(); double b(); double [o]out())
 
 =for ref
 
@@ -1328,7 +1331,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double p(); double a(); double b();  [o]out())
+  Signature: (double p(); double a(); double b(); double [o]out())
 
 =for ref
 
@@ -1357,7 +1360,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double x(); double a(); double b();  [o]out())
+  Signature: (double x(); double a(); double b(); double [o]out())
 
 =for ref
 
@@ -1386,7 +1389,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double q(); double a(); double b();  [o]out())
+  Signature: (double q(); double a(); double b(); double [o]out())
 
 =for ref
 
@@ -1424,7 +1427,7 @@ These functions compute the cumulative distribution functions P(x), Q(x) and the
 
 =for sig
 
-  Signature: (double x(); double a(); double b();  [o]out())
+  Signature: (double x(); double a(); double b(); double [o]out())
 
 =for ref
 
@@ -1453,7 +1456,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double p(); double a(); double b();  [o]out())
+  Signature: (double p(); double a(); double b(); double [o]out())
 
 =for ref
 
@@ -1482,7 +1485,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double x(); double a(); double b();  [o]out())
+  Signature: (double x(); double a(); double b(); double [o]out())
 
 =for ref
 
@@ -1511,7 +1514,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double q(); double a(); double b();  [o]out())
+  Signature: (double q(); double a(); double b(); double [o]out())
 
 =for ref
 
@@ -1549,7 +1552,7 @@ These functions compute the cumulative distribution functions P(k), Q(k) for the
 
 =for sig
 
-  Signature: (ushort k(); ushort na(); ushort nb(); ushort t();  [o]out())
+  Signature: (ushort k(); ushort na(); ushort nb(); ushort t(); double [o]out())
 
 =for ref
 
@@ -1578,7 +1581,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (ushort k(); ushort na(); ushort nb(); ushort t();  [o]out())
+  Signature: (ushort k(); ushort na(); ushort nb(); ushort t(); double [o]out())
 
 =for ref
 
@@ -1616,7 +1619,7 @@ These functions compute the cumulative distribution functions P(x), Q(x) and the
 
 =for sig
 
-  Signature: (double x(); double a();  [o]out())
+  Signature: (double x(); double a(); double [o]out())
 
 =for ref
 
@@ -1645,7 +1648,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double p(); double a();  [o]out())
+  Signature: (double p(); double a(); double [o]out())
 
 =for ref
 
@@ -1674,7 +1677,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double x(); double a();  [o]out())
+  Signature: (double x(); double a(); double [o]out())
 
 =for ref
 
@@ -1703,7 +1706,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double q(); double a();  [o]out())
+  Signature: (double q(); double a(); double [o]out())
 
 =for ref
 
@@ -1741,7 +1744,7 @@ These functions compute the cumulative distribution functions P(x), Q(x) and the
 
 =for sig
 
-  Signature: (double x(); double a();  [o]out())
+  Signature: (double x(); double a(); double [o]out())
 
 =for ref
 
@@ -1770,7 +1773,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double p(); double a();  [o]out())
+  Signature: (double p(); double a(); double [o]out())
 
 =for ref
 
@@ -1799,7 +1802,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double x(); double a();  [o]out())
+  Signature: (double x(); double a(); double [o]out())
 
 =for ref
 
@@ -1828,7 +1831,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double q(); double a();  [o]out())
+  Signature: (double q(); double a(); double [o]out())
 
 =for ref
 
@@ -1866,7 +1869,7 @@ These functions compute the cumulative distribution functions P(x), Q(x) and the
 
 =for sig
 
-  Signature: (double x(); double zeta(); double sigma();  [o]out())
+  Signature: (double x(); double zeta(); double sigma(); double [o]out())
 
 =for ref
 
@@ -1895,7 +1898,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double p(); double zeta(); double sigma();  [o]out())
+  Signature: (double p(); double zeta(); double sigma(); double [o]out())
 
 =for ref
 
@@ -1924,7 +1927,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double x(); double zeta(); double sigma();  [o]out())
+  Signature: (double x(); double zeta(); double sigma(); double [o]out())
 
 =for ref
 
@@ -1953,7 +1956,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double q(); double zeta(); double sigma();  [o]out())
+  Signature: (double q(); double zeta(); double sigma(); double [o]out())
 
 =for ref
 
@@ -1982,7 +1985,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (ushort k(); double p(); double n();  [o]out())
+  Signature: (ushort k(); double p(); double n(); double [o]out())
 
 =for ref
 
@@ -2011,7 +2014,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (ushort k(); double p(); double n();  [o]out())
+  Signature: (ushort k(); double p(); double n(); double [o]out())
 
 =for ref
 
@@ -2049,7 +2052,7 @@ These functions compute the cumulative distribution functions P(x), Q(x) and the
 
 =for sig
 
-  Signature: (double x(); double a(); double b();  [o]out())
+  Signature: (double x(); double a(); double b(); double [o]out())
 
 =for ref
 
@@ -2078,7 +2081,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double p(); double a(); double b();  [o]out())
+  Signature: (double p(); double a(); double b(); double [o]out())
 
 =for ref
 
@@ -2107,7 +2110,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double x(); double a(); double b();  [o]out())
+  Signature: (double x(); double a(); double b(); double [o]out())
 
 =for ref
 
@@ -2136,7 +2139,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double q(); double a(); double b();  [o]out())
+  Signature: (double q(); double a(); double b(); double [o]out())
 
 =for ref
 
@@ -2174,7 +2177,7 @@ These functions compute the cumulative distribution functions P(k), Q(k) for the
 
 =for sig
 
-  Signature: (ushort k(); double p(); ushort n();  [o]out())
+  Signature: (ushort k(); double p(); ushort n(); double [o]out())
 
 =for ref
 
@@ -2203,7 +2206,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (ushort k(); double p(); ushort n();  [o]out())
+  Signature: (ushort k(); double p(); ushort n(); double [o]out())
 
 =for ref
 
@@ -2241,7 +2244,7 @@ These functions compute the cumulative distribution functions P(k), Q(k) for the
 
 =for sig
 
-  Signature: (ushort k(); double mu();  [o]out())
+  Signature: (ushort k(); double mu(); double [o]out())
 
 =for ref
 
@@ -2270,7 +2273,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (ushort k(); double mu();  [o]out())
+  Signature: (ushort k(); double mu(); double [o]out())
 
 =for ref
 
@@ -2308,7 +2311,7 @@ These functions compute the cumulative distribution functions P(x), Q(x) and the
 
 =for sig
 
-  Signature: (double x(); double sigma();  [o]out())
+  Signature: (double x(); double sigma(); double [o]out())
 
 =for ref
 
@@ -2337,7 +2340,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double p(); double sigma();  [o]out())
+  Signature: (double p(); double sigma(); double [o]out())
 
 =for ref
 
@@ -2366,7 +2369,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double x(); double sigma();  [o]out())
+  Signature: (double x(); double sigma(); double [o]out())
 
 =for ref
 
@@ -2395,7 +2398,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double q(); double sigma();  [o]out())
+  Signature: (double q(); double sigma(); double [o]out())
 
 =for ref
 
@@ -2433,7 +2436,7 @@ These functions compute the cumulative distribution functions P(x), Q(x) and the
 
 =for sig
 
-  Signature: (double x(); double nu();  [o]out())
+  Signature: (double x(); double nu(); double [o]out())
 
 =for ref
 
@@ -2462,7 +2465,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double p(); double nu();  [o]out())
+  Signature: (double p(); double nu(); double [o]out())
 
 =for ref
 
@@ -2491,7 +2494,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double x(); double nu();  [o]out())
+  Signature: (double x(); double nu(); double [o]out())
 
 =for ref
 
@@ -2520,7 +2523,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double q(); double nu();  [o]out())
+  Signature: (double q(); double nu(); double [o]out())
 
 =for ref
 
@@ -2558,7 +2561,7 @@ These functions compute the cumulative distribution functions P(x), Q(x) and the
 
 =for sig
 
-  Signature: (double x();  [o]out())
+  Signature: (double x(); double [o]out())
 
 =for ref
 
@@ -2587,7 +2590,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double p();  [o]out())
+  Signature: (double p(); double [o]out())
 
 =for ref
 
@@ -2616,7 +2619,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double x();  [o]out())
+  Signature: (double x(); double [o]out())
 
 =for ref
 
@@ -2645,7 +2648,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double q();  [o]out())
+  Signature: (double q(); double [o]out())
 
 =for ref
 
@@ -2683,7 +2686,7 @@ These functions compute the cumulative distribution functions P(x), Q(x) and the
 
 =for sig
 
-  Signature: (double x(); double a(); double b();  [o]out())
+  Signature: (double x(); double a(); double b(); double [o]out())
 
 =for ref
 
@@ -2712,7 +2715,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double p(); double a(); double b();  [o]out())
+  Signature: (double p(); double a(); double b(); double [o]out())
 
 =for ref
 
@@ -2741,7 +2744,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double x(); double a(); double b();  [o]out())
+  Signature: (double x(); double a(); double b(); double [o]out())
 
 =for ref
 
@@ -2770,7 +2773,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double q(); double a(); double b();  [o]out())
+  Signature: (double q(); double a(); double b(); double [o]out())
 
 =for ref
 

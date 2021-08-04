@@ -5,6 +5,7 @@
 #include "perl.h"
 #include "XSUB.h"
 
+#define PY_SSIZE_T_CLEAN
 #include <Python.h>
 #include "PerlPyErr.h"
 #include "../pycompat.h"
@@ -789,7 +790,7 @@ PyEval_CallObjectWithKeywords(o,...)
         }
 
         ENTER_PYTHON;
-        RETVAL = PyEval_CallObjectWithKeywords(o, alist, kwdict);
+        RETVAL = PyObject_Call(o, alist, kwdict);
         done:
             Py_XDECREF(t1);
             Py_XDECREF(t2);

@@ -15,7 +15,7 @@
 # program.  If not, see <http://www.perlfoundation.org/artistic_license_2_0>.
 #
 package Graphics::Fig::Parameters;
-our $VERSION = 'v1.0.4';
+our $VERSION = 'v1.0.5';
 
 use strict;
 use warnings;
@@ -1478,7 +1478,7 @@ sub getbboxFromPoints {
 }
 
 #
-# Graphics::Fig::Parmeters::copyArrowParameters: set fArrow, bArrow in object
+# Graphics::Fig::Parameters::copyArrowParameters: set fArrow, bArrow in object
 #   $object:     object to modify
 #   $parameters: parameter list (center, scale)
 #
@@ -1519,7 +1519,7 @@ sub copyArrowParameters {
 }
 
 #
-# Graphics::Fig::Parmeters::compareArrowParameters: compare arrow parameters
+# Graphics::Fig::Parameters::compareArrowParameters: compare arrow parameters
 #   $object:     object to modify
 #   $parameters: parameter list (center, scale)
 #
@@ -1575,7 +1575,7 @@ sub compareArrowParameters {
 }
 
 #
-# Graphics::Fig::Parmeters::printArrowParameters
+# Graphics::Fig::Parameters::printArrowParameters
 #   $object:     fig sub-object
 #   $fh:         reference to file handle
 #   $parameters: save parameters

@@ -1,5 +1,9 @@
 Revision history for Dist-Zilla-PluginBundle-Author-Plicease
 
+2.68      2021-08-03 12:23:20 -0600
+  - Use [ArchiveTar] or [Libarchive] to build archive
+  - Removed workaround to disable Archive::Tar::Wrapper
+
 2.67      2021-07-17 14:57:49 -0600
   - Minting templates refer to Community instead of
     deprecated Freenode alias

@@ -21,17 +21,24 @@ use Clone qw( clone );
 use HOP::Lexer qw( string_lexer );
 use Carp;
 
+# I'm reasonably sure that there are no infinite recusion paths, but in some cases the plan is just deep enough to cause Perl to
+# issue warning about it. Since the warnings don't bring anything good to the table, let's disable them.
+no warnings 'recursion';
+
 =head1 NAME
 
 Pg::Explain::Node - Class representing single node from query plan
 
 =head1 VERSION
 
-Version 1.11
+Version 1.13
 
 =cut
 
-our $VERSION = '1.11';
+our $VERSION = '1.13';
+
+# Start counter for all node ids.
+our $base_id = 1;
 
 =head1 SYNOPSIS
 
@@ -45,6 +52,10 @@ Perhaps a little code snippet.
     ...
 
 =head1 FUNCTIONS
+
+=head2 id
+
+Unique identifier of this node in this explain. It's read-only, autoincrementing integer.
 
 =head2 actual_loops
 
@@ -155,6 +166,20 @@ ArrayRef of Pg::Explain::Node objects, which represent init plan.
 
 For more details, check ->add_initplan method description.
 
+=head2 initplans_metainfo
+
+ArrayRef of Hashrefs, where each hashref can contains:
+
+=over
+
+=item * 'name' - name of the InitPlan, generally number
+
+=item * 'returns' - string listing what the initplan returns. Generally a list of $X values (where X is 0 or positive integer) separated by comma.
+
+=back
+
+For more details, check ->add_initplan method description.
+
 =head2 subplans
 
 ArrayRef of Pg::Explain::Node objects, which represent sub plan.
@@ -181,12 +206,13 @@ Returns true if given node was not executed, according to plan.
 
 Parent node of current node, or undef if it's top node.
 
-=head2 explain
+=head2 exclusive_fix
 
-Returns Pg::Explain for this node.
+Numeric value that will be added to total_exclusive_time. It is set by Pg::Explain::check_for_exclusive_time_fixes method once after parsing the explain.
 
 =cut
 
+sub id                     { my $self = shift; return $self->{ 'id' }; }
 sub actual_loops           { my $self = shift; $self->{ 'actual_loops' }           = $_[ 0 ] if 0 < scalar @_; return $self->{ 'actual_loops' }; }
 sub actual_rows            { my $self = shift; $self->{ 'actual_rows' }            = $_[ 0 ] if 0 < scalar @_; return $self->{ 'actual_rows' }; }
 sub actual_time_first      { my $self = shift; $self->{ 'actual_time_first' }      = $_[ 0 ] if 0 < scalar @_; return $self->{ 'actual_time_first' }; }
@@ -197,9 +223,9 @@ sub estimated_rows         { my $self = shift; $self->{ 'estimated_rows' }      
 sub estimated_row_width    { my $self = shift; $self->{ 'estimated_row_width' }    = $_[ 0 ] if 0 < scalar @_; return $self->{ 'estimated_row_width' }; }
 sub estimated_startup_cost { my $self = shift; $self->{ 'estimated_startup_cost' } = $_[ 0 ] if 0 < scalar @_; return $self->{ 'estimated_startup_cost' }; }
 sub estimated_total_cost   { my $self = shift; $self->{ 'estimated_total_cost' }   = $_[ 0 ] if 0 < scalar @_; return $self->{ 'estimated_total_cost' }; }
-sub explain                { my $self = shift; $self->{ 'explain' }                = $_[ 0 ] if 0 < scalar @_; return $self->{ 'explain' }; }
 sub extra_info             { my $self = shift; $self->{ 'extra_info' }             = $_[ 0 ] if 0 < scalar @_; return $self->{ 'extra_info' }; }
 sub initplans              { my $self = shift; $self->{ 'initplans' }              = $_[ 0 ] if 0 < scalar @_; return $self->{ 'initplans' }; }
+sub initplans_metainfo     { my $self = shift; $self->{ 'initplans_metainfo' }     = $_[ 0 ] if 0 < scalar @_; return $self->{ 'initplans_metainfo' }; }
 sub never_executed         { my $self = shift; $self->{ 'never_executed' }         = $_[ 0 ] if 0 < scalar @_; return $self->{ 'never_executed' }; }
 sub parent                 { my $self = shift; $self->{ 'parent' }                 = $_[ 0 ] if 0 < scalar @_; return $self->{ 'parent' }; }
 sub scan_on                { my $self = shift; $self->{ 'scan_on' }                = $_[ 0 ] if 0 < scalar @_; return $self->{ 'scan_on' }; }
@@ -209,6 +235,7 @@ sub type                   { my $self = shift; $self->{ 'type' }                
 sub workers_launched       { my $self = shift; $self->{ 'workers_launched' }       = $_[ 0 ] if 0 < scalar @_; return $self->{ 'workers_launched' }; }
 sub workers                { my $self = shift; $self->{ 'workers' }                = $_[ 0 ] if 0 < scalar @_; return $self->{ 'workers' } || 1; }
 sub buffers                { my $self = shift; $self->{ 'buffers' }                = $_[ 0 ] if 0 < scalar @_; return $self->{ 'buffers' }; }
+sub exclusive_fix          { my $self = shift; $self->{ 'exclusive_fix' }          = $_[ 0 ] if 0 < scalar @_; return $self->{ 'exclusive_fix' } // 0; }
 
 =head2 new
 
@@ -218,7 +245,7 @@ Object constructor.
 
 sub new {
     my $class = shift;
-    my $self  = bless {}, $class;
+    my $self  = bless { 'id' => $base_id++ }, $class;
 
     my %args;
     if ( 0 == scalar @_ ) {
@@ -294,6 +321,24 @@ sub new {
         $self->scan_on( { 'subquery_name' => $name, } );
     }
     return $self;
+}
+
+=head2 explain
+
+Returns/sets Pg::Explain for this node.
+
+Also, calls $explain->node( $id, $self );
+
+=cut
+
+sub explain {
+    my $self    = shift;
+    my $explain = shift;
+    if ( defined $explain ) {
+        $self->{ 'explain' } = $explain;
+        $explain->node( $self->id, $self );
+    }
+    return $self->{ 'explain' };
 }
 
 =head2 add_extra_info
@@ -374,7 +419,9 @@ sub add_subplan {
 
 Adds new initplan node.
 
-It will be available at $node->initplans (returns arrayref)
+Expects to get node object and hashred with metainformation.
+
+It will be available at $node->initplans (returns arrayref) and $node->initplans_metainfo (also arrayref);
 
 Example of plan with initplan:
 
@@ -390,14 +437,15 @@ Example of plan with initplan:
 =cut
 
 sub add_initplan {
-    my $self  = shift;
-    my @nodes = map { $_->parent( $self ); $_ } @_;
-    if ( $self->initplans ) {
-        push @{ $self->initplans }, @nodes;
-    }
-    else {
-        $self->initplans( [ @nodes ] );
-    }
+    my $self = shift;
+    my ( $node, $node_info ) = @_;
+
+    $self->initplans( [] )          unless $self->initplans;
+    $self->initplans_metainfo( [] ) unless $self->initplans_metainfo;
+
+    $node->parent( $self );
+    push @{ $self->initplans },          $node;
+    push @{ $self->initplans_metainfo }, $node_info;
     return;
 }
 
@@ -497,17 +545,18 @@ sub get_struct {
     my $self  = shift;
     my $reply = {};
 
-    $reply->{ 'estimated_row_width' }    = $self->estimated_row_width        if defined $self->estimated_row_width;
-    $reply->{ 'estimated_rows' }         = $self->estimated_rows             if defined $self->estimated_rows;
-    $reply->{ 'estimated_startup_cost' } = 0 + $self->estimated_startup_cost if defined $self->estimated_startup_cost;    # "0+" to remove .00 in case of integers
-    $reply->{ 'estimated_total_cost' }   = 0 + $self->estimated_total_cost   if defined $self->estimated_total_cost;      # "0+" to remove .00 in case of integers
-    $reply->{ 'actual_loops' }           = $self->actual_loops               if defined $self->actual_loops;
-    $reply->{ 'actual_rows' }            = $self->actual_rows                if defined $self->actual_rows;
-    $reply->{ 'actual_time_first' }      = 0 + $self->actual_time_first      if defined $self->actual_time_first;         # "0+" to remove .00 in case of integers
-    $reply->{ 'actual_time_last' }       = 0 + $self->actual_time_last       if defined $self->actual_time_last;          # "0+" to remove .00 in case of integers
-    $reply->{ 'type' }                   = $self->type                       if defined $self->type;
-    $reply->{ 'scan_on' }                = clone( $self->scan_on )           if defined $self->scan_on;
-    $reply->{ 'extra_info' }             = clone( $self->extra_info )        if defined $self->extra_info;
+    $reply->{ 'estimated_row_width' }    = $self->estimated_row_width         if defined $self->estimated_row_width;
+    $reply->{ 'estimated_rows' }         = $self->estimated_rows              if defined $self->estimated_rows;
+    $reply->{ 'estimated_startup_cost' } = 0 + $self->estimated_startup_cost  if defined $self->estimated_startup_cost;    # "0+" to remove .00 in case of integers
+    $reply->{ 'estimated_total_cost' }   = 0 + $self->estimated_total_cost    if defined $self->estimated_total_cost;      # "0+" to remove .00 in case of integers
+    $reply->{ 'actual_loops' }           = $self->actual_loops                if defined $self->actual_loops;
+    $reply->{ 'actual_rows' }            = $self->actual_rows                 if defined $self->actual_rows;
+    $reply->{ 'actual_time_first' }      = 0 + $self->actual_time_first       if defined $self->actual_time_first;         # "0+" to remove .00 in case of integers
+    $reply->{ 'actual_time_last' }       = 0 + $self->actual_time_last        if defined $self->actual_time_last;          # "0+" to remove .00 in case of integers
+    $reply->{ 'type' }                   = $self->type                        if defined $self->type;
+    $reply->{ 'scan_on' }                = clone( $self->scan_on )            if defined $self->scan_on;
+    $reply->{ 'extra_info' }             = clone( $self->extra_info )         if defined $self->extra_info;
+    $reply->{ 'initplans_metainfo' }     = clone( $self->initplans_metainfo ) if defined $self->initplans_metainfo;
 
     $reply->{ 'is_analyzed' } = $self->is_analyzed;
 
@@ -603,13 +652,12 @@ sub total_exclusive_time {
         $time -= ( $node->total_inclusive_time || 0 );
     }
 
-    for my $init ( map { @{ $_ } } grep { defined $_ } ( $self->initplans ) ) {
-        $time -= ( $init->total_inclusive_time || 0 );
-    }
-
     for my $plan ( map { @{ $_ } } grep { defined $_ } ( $self->subplans ) ) {
         $time -= ( $plan->total_inclusive_time || 0 );
     }
+
+    # Apply fix from ->exclusive_fix
+    $time += $self->exclusive_fix;
 
     # ignore negative times - these come from rounding errors on nodes with loops > 1.
     return 0 if $time < 0;
@@ -745,6 +793,10 @@ sub as_text {
         elsif ( $S->{ 'subquery_name' } ) {
             $heading_line .= " on " . $S->{ 'subquery_name' },;
         }
+        elsif ( $S->{ 'worktable_name' } ) {
+            $heading_line .= " on " . $S->{ 'worktable_name' },;
+            $heading_line .= " " . $S->{ 'worktable_alias' } if $S->{ 'worktable_alias' };
+        }
         else {
             $heading_line .= " on " . $S->{ 'table_name' };
             $heading_line .= " " . $S->{ 'table_alias' } if $S->{ 'table_alias' };
@@ -786,8 +838,17 @@ sub as_text {
     }
 
     if ( $self->initplans ) {
-        for my $ip ( @{ $self->initplans } ) {
-            $textual .= $prefix_on_spaces . "InitPlan\n";
+        for my $i ( 0 .. $#{ $self->initplans } ) {
+            my $ip   = $self->initplans->[ $i ];
+            my $meta = $self->initplans_metainfo->[ $i ];
+            my $init_name;
+            if ( $meta ) {
+                $init_name = sprintf "InitPlan %d (returns %s)\n", $meta->{ 'name' }, $meta->{ 'returns' };
+            }
+            else {
+                $init_name = "InitPlan\n";
+            }
+            $textual .= $prefix_on_spaces . $init_name;
             $textual .= $ip->as_text( $prefix_on_spaces . "  " );
         }
     }

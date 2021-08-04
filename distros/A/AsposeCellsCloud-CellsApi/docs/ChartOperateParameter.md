@@ -9,7 +9,7 @@ use AsposeCellsCloud::Object::ChartOperateParameter;
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **operate_type** | **string** |  | [optional] 
-**string** | **string** |  | [optional] 
+**title** | **string** |  | [optional] 
 **area** | **string** |  | [optional] 
 **category_data** | **string** |  | [optional] 
 **upper_left_row** | **int** |  | [optional] 

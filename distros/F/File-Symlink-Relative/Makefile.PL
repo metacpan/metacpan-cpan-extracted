@@ -32,8 +32,9 @@ $mmv >= 6.31
 if ( $mmv >= 6.4501 ) {
     $args{META_ADD} = {
 	no_index => $meta->no_index(),
+	$meta->provides(),
     };
-    $args{META_MERGE} = $meta->meta_merge( $meta->provides() );
+    $args{META_MERGE} = $meta->meta_merge();
 }
 
 $mmv >= 6.4701

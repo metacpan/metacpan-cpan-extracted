@@ -9,6 +9,7 @@ requires 'Clone';
 requires 'Digest::SHA';
 requires 'HOP::Lexer';
 requires 'JSON';
+requires 'List::Util';
 requires 'XML::Simple';
 requires 'YAML', '>= 1.15';
 

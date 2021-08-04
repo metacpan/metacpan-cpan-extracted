@@ -1,0 +1,4 @@
+Result  (cost=0.00..0.01 rows=1 width=4) (actual time=0.003..0.004 rows=1 loops=1)
+Settings: random_page_cost = '13.666'
+Planning Time: 0.175 ms
+Execution Time: 0.089 ms

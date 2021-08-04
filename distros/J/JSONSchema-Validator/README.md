@@ -4,7 +4,7 @@ JSONSchema::Validator - Validator for JSON Schema Draft4/Draft6/Draft7 and OpenA
 
 # VERSION
 
-version 0.004
+version 0.005
 
 # SYNOPSIS
 

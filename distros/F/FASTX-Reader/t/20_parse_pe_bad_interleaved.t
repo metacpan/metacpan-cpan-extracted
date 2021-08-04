@@ -15,14 +15,15 @@ if (! -e $seq_file) {
   exit 0;
 }
 
-my $data = FASTX::PE->new({ 
-    filename => "$seq_file", 
+my $data = FASTX::PE->new({
+    filename => "$seq_file",
     interleaved => 1 });
-    
 
- 
+
+
 eval {
-    my $pe = $data->getReads();  
+    my $pe = $data->getReads();
+    1;
 };
 ok($@, "[ERROR EXPECTED] Bad interleaved file didnt pass check [$@]");
 done_testing();

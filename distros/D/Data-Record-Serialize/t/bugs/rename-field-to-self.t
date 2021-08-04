@@ -7,7 +7,7 @@ use Data::Record::Serialize;
 use Test::Lib;
 
 {
-    package Data::Record::Serialize::Encode::pass;
+    package My::Test::Encode::pass;
     use Moo::Role;
 
     use Types::Standard 'HashRef';
@@ -27,7 +27,7 @@ subtest 'test role' => sub {
     my %dest;
 
     my $s = Data::Record::Serialize->new(
-        encode => 'pass',
+        encode => '+My::Test::Encode::pass',
         dest   => \%dest,
         sink   => 'null'
     );
@@ -42,7 +42,7 @@ subtest 'rename field to something else' => sub {
     my %dest;
 
     my $s = Data::Record::Serialize->new(
-        encode        => 'pass',
+        encode        => '+My::Test::Encode::pass',
         dest          => \%dest,
         sink          => 'null',
         rename_fields => { foo => 'bar' } );
@@ -56,7 +56,7 @@ subtest 'rename field to itself' => sub {
     my %dest;
 
     my $s = Data::Record::Serialize->new(
-        encode        => 'pass',
+        encode        => '+My::Test::Encode::pass',
         dest          => \%dest,
         sink          => 'null',
         rename_fields => { foo => 'foo' } );

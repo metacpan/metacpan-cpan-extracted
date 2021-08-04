@@ -50,22 +50,6 @@ sub splitprotected ($$) {
   return @chunks;
 }
 
-# null != [0]
-#  - in Core.
-
-#{package PDL;
-# sub isnull {
-#   my $this = shift;
-#   return ($this->getndims==1 && $this->getdim(0)==0) ? 1:0 }
-#}
-
-1;
-
-#__DATA__
-
-# need for $badflag is due to hacked get_xsdatapdecl() 
-# - this should disappear when (if?) things are done sensibly
-#
 my $typeregex = join '|', map $_->ppforcetype, types;
 my $complex_regex = join '|', qw(real complex);
 our $pars_re = qr/^
@@ -77,9 +61,9 @@ our $pars_re = qr/^
 	\(([^)]*)\)  		# $4: The indices
 /x;
 sub new {
-	my($type,$string,$number,$badflag) = @_;
+	my($type,$string,$badflag,$sig) = @_;
 	$badflag ||= 0;
-	my $this = bless {Number => $number, BadFlag => $badflag},$type;
+	my $this = bless {Number => "PDL_UNDEF_NUMBER", BadFlag => $badflag, Sig => $sig},$type;
 	# Parse the parameter string. Note that the regexes for this match were
 	# originally defined here, but were moved to PDL::PP for FullDoc parsing.
 	$string =~ $pars_re
@@ -94,19 +78,15 @@ sub new {
 	for(@{$this->{Flags}}) {
 		/^io$/ and $this->{FlagW}=1 or
 		/^nc$/ and $this->{FlagNCreat}=1 or
-		/^o$/ and $this->{FlagOut}=1 and $this->{FlagCreat}=1 and $this->{FlagW}=1 or
-		/^oca$/ and $this->{FlagOut}=1 and $this->{FlagCreat}=1 and $this->{FlagW}=1
-			and $this->{FlagCreateAlways}=1 or
-		/^t$/ and $this->{FlagTemp}=1 and $this->{FlagCreat}=1 and $this->{FlagW}=1 or
+		/^o$/ and $this->{FlagOut}=$this->{FlagCreat}=$this->{FlagW}=1 or
+		/^oca$/ and $this->{FlagOut}=$this->{FlagCreat}=$this->{FlagW}=$this->{FlagCreateAlways}=1 or
+		/^t$/ and $this->{FlagTemp}=$this->{FlagCreat}=$this->{FlagW}=1 or
 		/^phys$/ and $this->{FlagPhys} = 1 or
 		/^real$/ and $this->{FlagReal} = 1 or
 		/^complex$/ and $this->{FlagComplex} = 1 or
 		/^((?:$typeregex)[+]*)$/ and $this->{Type} = $1 and $this->{FlagTyped} = 1 or
 		confess("Invalid flag $_ given for $string\n");
 	}
-#	if($this->{FlagPhys}) {
-#		# warn("Warning: physical flag not implemented yet");
-#	}
 	if ($this->{FlagTyped} && $this->{Type} =~ s/[+]$// ) {
 	  $this->{FlagTplus} = 1;
 	}
@@ -204,66 +184,69 @@ sub get_nnflag { my($this) = @_;
 
 
 # XXX There might be weird backprop-of-changed stuff for [phys].
-#
-# Have changed code to assume that, if(!$this->{FlagCreat})
-# then __creating[] will == 0
-#  -- see make_redodims_thread() in ../PP.pm
-#
-sub get_xsnormdimchecks { 
+sub get_xsnormdimchecks {
     my($this) = @_;
     my $pdl   = $this->get_nname;
     my $iref  = $this->{IndObjs};
     my $ninds = 0+scalar(@$iref);
-
+    my @sizevars = map $_->get_size(), @$iref;
     my $str = PDL::PP::pp_line_numbers(__LINE__, "");
     $str .= "if(!__creating[$this->{Number}]) {\n" if $this->{FlagCreat};
-    
     # Dimensional Promotion when number of dims is less than required:
-    #   Previous warning message now commented out,
-    #   which means we only need include the code if $ninds > 0
-    #
     if ( $ninds > 0 ) {
 	$str .= "   if(($pdl)->ndims < $ninds) {\n" .
-	    join('', map { 
-		my $size = $iref->[$_-1]->get_size();      
-		"      if (($pdl)->ndims < $_ && $size <= 1) $size = 1;\n"
-		} (1..$ninds)) 
-# XXX why is this here, commented, and not removed? If re-inserted, be sure to use PDL_COMMENT
-##		."      /* \$CROAK(\"Too few dimensions for argument \'$this->{Name}\'\\n\"); */\n"
-		. "   }\n";
+	    join('', map
+		"      if (($pdl)->ndims < $_ && $sizevars[$_-1] <= 1) $sizevars[$_-1] = 1;\n",
+		1..$ninds)
+	    . "   }\n";
     }
-
     # Now, the real check.
-    my $no = 0;
-    for( @$iref ) {
-	my $siz = $_->get_size();
-	my $dim = "($pdl)->dims[$no]";
+    for( 0..$#$iref ) {
+	my $dim = "($pdl)->dims[$_]";
 	my $ndims = "($pdl)->ndims";
-	$str .= "   if($siz == -1 || ($ndims > $no && $siz == 1)) {\n" .
-	        "      $siz = $dim;\n" .
-		"   } else if($ndims > $no && $siz != $dim) {\n" .
-		"      if($dim != 1) {\n" .
-                "         \$CROAK(\"Wrong dimensions for parameter '@{[ $this->name ]}'\\n\");\n" .
-		"      }\n   }\n";
-	$no++;
-    } 
-
+	$str .= <<EOF;
+    if($sizevars[$_] == -1 || ($ndims > $_ && $sizevars[$_] == 1)) {
+      $sizevars[$_] = $dim;
+    } else if($ndims > $_ && $sizevars[$_] != $dim) {
+      if($dim != 1) {
+         \$CROAK("Wrong dimensions for parameter '@{[ $this->name ]}'\\n");
+      }
+    }
+EOF
+    }
     $str .= "PDL->make_physical(($pdl));\n" if $this->{FlagPhys};
-
-    if ( $this->{FlagCreat} ) { 
+    if ( $this->{FlagCreat} ) {
 	$str .= "} else {\n";
-	
-	# We are creating this pdl.
 	$str .= " PDL_Indx dims[".($ninds+1)."]; PDL_COMMENT(\"Use ninds+1 to avoid smart (stupid) compilers\")";
-	$str .= join "",
-	(map {"dims[$_] = ".$iref->[$_]->get_size().";"} 0 .. $#$iref);
+	$str .= join "", map "dims[$_] = $sizevars[$_];", 0..$#$iref;
 	my $istemp = $this->{FlagTemp} ? 1 : 0;
 	$str .="\n PDL->thread_create_parameter(&\$PRIV(__pdlthread),$this->{Number},dims,$istemp);\n";
 	$str .= "}";
     }
     return $str;
-    
-} # sub: get_xsnormdimchecks()
+}
+
+sub get_xsphysdimchecks {
+    my($this) = @_;
+    return '' if !$this->{FlagPhys};
+    my $iref = $this->{IndObjs};
+    return '' unless my $ninds = 0+scalar(@$iref);
+    my @sizevars = map $_->get_size, @$iref;
+    my $pdl = $this->get_nname;
+    my $str = PDL::PP::pp_line_numbers(__LINE__, "");
+    for( 0..$#$iref ) {
+        my $iname = $iref->[$_]->name;
+        next if @{ $this->{Sig}->ind_used($iname) } == 1;
+	my $dim = "($pdl)->dims[$_]";
+	$str .= <<EOF;
+    if($sizevars[$_] > 1 && $sizevars[$_] != $dim) {
+        PDL_Indx d = $dim;
+        \$CROAK("Parameter '@{[ $this->name ]}' index '$iname' size %d, but ndarray dim has size %d\\n", $sizevars[$_], d);
+    }
+EOF
+    }
+    $str;
+}
 
 sub get_incname {
 	my($this,$ind) = @_;
@@ -395,11 +378,6 @@ sub do_indterm { my($this,$pdl,$ind,$subst,$context) = @_;
                "PP_INDTERM(".$this->{IndObjs}[$ind]->get_size().", $index))";
 }
 
-# XXX hacked to create a variable containing the bad value for 
-# this ndarray. 
-# This is a HACK (Doug Burke 07/08/00)
-# XXX
-#
 sub get_xsdatapdecl { 
     my($this,$genlooptype,$asgnonly) = @_;
     my $ptype = $this->adjusted_type($genlooptype);
@@ -409,11 +387,7 @@ sub get_xsdatapdecl {
     my $name = $this->{Name};
     my $declini = ($asgnonly ? "" : "$type *");
     my $cast = ($type ? "($type *)" : "");
-    my $macro = "PDL_REDODIMS";
-    # assuming we always need this
-    # - may not be true - eg if $asgnonly ??
-    # - not needed for floating point types when using NaN as bad values
-    $macro = "PDL_REDODIMS_BADVAL" if $this->{BadFlag} and $ptype;
+    my $macro = ($this->{BadFlag} && $ptype) ? "PDL_REDODIMS_BADVAL" : "PDL_REDODIMS";
     PDL::PP::pp_line_numbers(__LINE__, "$macro($declini, $cast, $type, $flag, $name, $pdl)");
 }
 

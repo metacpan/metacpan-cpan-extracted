@@ -18,8 +18,9 @@ do { my $x = {
                     },
        'runtime' => {
                       'requires' => {
-                                      'Mojo::Base' => '0',
-                                      'Mojolicious::Plugin::Restify' => '0.10'
+                                      'Mojolicious' => '8.23',
+                                      'Mojolicious::Plugin::Restify' => '0.10',
+                                      'perl' => '5.008'
                                     }
                     },
        'test' => {

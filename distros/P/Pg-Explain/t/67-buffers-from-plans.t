@@ -2,7 +2,6 @@
 
 use strict;
 use Test::More;
-use Test::Exception;
 use Test::Deep;
 use File::Basename;
 use autodie;

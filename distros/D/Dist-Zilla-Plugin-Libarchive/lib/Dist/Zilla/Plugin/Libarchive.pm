@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use 5.020;
 
-package Dist::Zilla::Plugin::Libarchive 0.02 {
+package Dist::Zilla::Plugin::Libarchive 0.03 {
 
   use Moose;
   use Archive::Libarchive qw( ARCHIVE_WARN );
@@ -65,10 +65,12 @@ package Dist::Zilla::Plugin::Libarchive 0.02 {
     my %dirs;
 
     my $e = Archive::Libarchive::Entry->new;
+    $e->set_mtime(time);
+    $e->set_uname('root');
+    $e->set_gname('root');
 
     my $verbose = $VERBOSE || $self->zilla->logger->get_debug;
 
-    my $time = time;
     foreach my $distfile (sort { $a->name cmp $b->name } $self->zilla->files->@*)
     {
       {
@@ -87,7 +89,6 @@ package Dist::Zilla::Plugin::Libarchive 0.02 {
           $e->set_size(0);
           $e->set_filetype('dir');
           $e->set_perm( oct('0755') );
-          $e->set_mtime($time);
 
           $ret = $w->write_header($e);
           $self->_check_ret($ret);
@@ -98,8 +99,7 @@ package Dist::Zilla::Plugin::Libarchive 0.02 {
       $e->set_pathname($basedir->child($distfile->name));
       $e->set_size(-s $built_in->child($distfile->name));
       $e->set_filetype('reg');
-      $e->set_perm( oct('0644') );
-      $e->set_mtime($time);
+      $e->set_perm( -x $built_in->child($distfile->name) ? oct('0755') : oct('0644') );
 
       $ret = $w->write_header($e);
       $self->_check_ret($ret);
@@ -133,7 +133,7 @@ Dist::Zilla::Plugin::Libarchive - Create dist archives using Archive::Libarchive
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 
@@ -194,6 +194,8 @@ carefully before not using the default.  Supported formats:
 =item L<Archive::Libarchive>
 
 =item L<Dist::Zilla>
+
+=item L<Dist::Zilla::Plugin::ArchiveTar>
 
 =item L<Dist::Zilla::Role::ArchiveBuilder>
 

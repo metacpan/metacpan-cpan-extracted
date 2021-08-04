@@ -1,4 +1,41 @@
-0.013   2020-03-08  Released-By: PERLANCAR; Urgency: medium
+0.017   2021-08-04  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+        - [build] Rebuild with updated Pod::Weaver::Plugin::Sah::Schemas (0.069)
+          to tweak Synopsis POD section.
+
+	- Tweak examples.
+
+
+0.016   2021-08-04  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [build] Rebuild with updated Pod::Weaver::Plugin::Sah::Schemas (0.068)
+          to tweak Synopsis POD section.
+
+
+0.015   2021-08-04  Released-By: PERLANCAR; Urgency: medium
+
+        - [schema date::year] Restrict to AD only (from 1).
+
+        - [schema date::dow_nums][schema date::month_nums] Make elements
+          required (forbid undef elements), because that's what's expected most
+          of the time.
+
+        - [ux] Add more examples, tweak Summary & Description.
+
+
+0.014   2021-07-19  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+	- [build] Rebuild with updated Pod::Weaver plugin [-Sah::Schemas] to
+          correctly show examples.
+
+
+0.013   2020-03-08  Released-By: PERLANCAR; Urgency: low
 
         - No functional changes.
 

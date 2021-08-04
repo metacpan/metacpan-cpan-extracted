@@ -10,14 +10,51 @@ to manipulate the records prior to encoding and output.
 
 *   All records are assumed to have the same structure.
 
-*   Fields may have simple types which may be determined automatically.
-    Some encoders use this information during encoding.
+*   Fields may have simple types.
 
-*   Fields may be renamed upon output
+*   Fields may be renamed upon output.
 
 *   A subset of the fields may be selected for output.
 
-*   Fields may be formatted via "sprintf" prior to output
+*   Field values may be transformed prior to output.
+
+  Types
+
+Some output encoders care about the type of a field.
+Data::Record::Serialize recognizes these types:
+
+*   "N" - Number (any number)
+
+*   "I" - Integer
+
+*   "S" - String
+
+*   "B" - Boolean
+
+Not all encoders support separate integer or Boolean types. Where not
+supported, integers are encoded as numbers and Booleans as integers.
+
+Types may be specified for fields, or may be automatically determined
+from the first record which is output. It is not possible to
+deterministically determine if a field is Boolean, so such fields must
+be explicitly specified. Boolean fields should be "truthy", e.g., when
+used in a conditional, they evaluate to true or false.
+
+  Field transformation
+
+Transformations can be applied to fields prior to output, and may be
+specified globally for data types as well as for specifically for
+fields. The latter take precedence.
+
+Transformations are specified via the "format_fields" and "format_types"
+parameters. They can either be a "sprintf" compatible format string,
+
+    format_types => { N => '%0.4f' },
+    format_fields => { obsid => '%05d' },
+
+ or a code reference:
+
+    format_types => { B => sub { Lingua::Boolean::Tiny::boolean( $_[0] ) } }
 
   Encoders
 
@@ -33,8 +70,9 @@ The available encoders and their respective documentation are:
 
 *   "json" - Data::Record::Serialize::Encode::json
 
-*   "null" - send the data to the bit bucket. This is a combined encoder
-    and sink.
+*   "null" - Data::Record::Serialize::Sink::null
+
+    This is a combined encoder and sink.
 
 *   "rdb" - Data::Record::Serialize::Encode::rdb
 
@@ -48,26 +86,26 @@ The available sinks and their documentation are:
 
 *   "stream" - Data::Record::Serialize::Sink::stream
 
-*   "null" - send the encoded data to the bit bucket.
+    write to a stream
 
-  Types
+*   "null" - Data::Record::Serialize::Sink::null
 
-Some output encoders care about the type of a field.
-Data::Record::Serialize recognizes three types:
+    send the encoded data to the bit bucket.
 
-*   "N" - Numeric
+*   "array" - Data::Record::Serialize::Sink::array
 
-*   "I" - Integral
+    append the encoded data to an array.
 
-*   "S" - String
-
-Not all encoders support a separate integral type; in those cases
-integer fields are treated as general numeric fields.
+Refer to the documentation for additional constructor options, and
+object and class methods and attributes;
 
   Fields and their types
 
 Which fields are output and how their types are determined depends upon
 the "fields", "types", and "default_type" attributes.
+
+This seems a bit complicated, but the idea is to provide a DWIM
+interface requiring minimal specification.
 
 In the following table:
 
@@ -76,7 +114,7 @@ In the following table:
  X   => doesn't matter
  all => the string 'all'
 
-Automatic type determination is done by examining the first record send
+Automatic type determination is done by examining the first record sent
 to the output stream.
 
   fields types default_type  Result

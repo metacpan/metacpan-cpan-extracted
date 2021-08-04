@@ -2,10 +2,142 @@ NAME
     Sah::Schemas::Date - Sah schemas related to date
 
 VERSION
-    This document describes version 0.013 of Sah::Schemas::Date (from Perl
-    distribution Sah-Schemas-Date), released on 2020-03-08.
+    This document describes version 0.017 of Sah::Schemas::Date (from Perl
+    distribution Sah-Schemas-Date), released on 2021-08-04.
 
 SYNOPSIS
+SAH SCHEMAS
+    The following schemas are included in this distribution:
+
+    *   date::day
+
+        Day of month (1-31).
+
+    *   date::dow_name::en
+
+        Day-of-week name (abbreviated or full, in English).
+
+        See also: Sah::Schema::date::dow_num.
+
+        See also related schemas for other locales, e.g.
+        Sah::Schema::date::dow_name::id (Indonesian),
+        Sah::Schema::date::dow_name::en_or_id (English/Indonesian), etc.
+
+    *   date::dow_num
+
+        Day-of-week number (1-7, 1=Monday, like DateTime), coercible from
+        English day-of-week name (Mo/mon/MONDAY).
+
+        See also related schemas that coerce from other locales, e.g.
+        Sah::Schema::date::dow_num::id (Indonesian),
+        Sah::Schema::date::dow_num::en_or_id (English/Indonesian), etc.
+
+    *   date::dow_nums
+
+        Array of required date::dow_num (day-of-week, 1-7, 1=Monday, like
+        DateTime, with coercions).
+
+        See also Sah::Schema::date::dow_num which is the schema for the
+        elements.
+
+        See also related schemas that coerce from other locales, e.g.
+        Sah::Schema::date::dow_nums::id (Indonesian),
+        Sah::Schema::date::dow_num::en_or_id (English/Indonesian), etc.
+
+    *   date::hour
+
+        Hour of day (0-23).
+
+    *   date::minute
+
+        Minute of hour (0-59).
+
+    *   date::month::en
+
+        Month number/name (abbreviated or full, in English).
+
+        Note that name is not coerced to number; use
+        Sah::Schema::date::month_num::id for that.
+
+        See also related schemas for other locales, e.g.
+        Sah::Schema::date::month::id (Indonesian),
+        Sah::Schema::date::month::en_or_id (English/Indonesian), etc.
+
+    *   date::month_name::en
+
+        Month name (abbreviated or full, in English).
+
+        See also: Sah::Schema::date::month_num.
+
+        See also related schemas for other locales, e.g.
+        Sah::Schema::date::month_name::id (Indonesian),
+        Sah::Schema::date::month_name::en_or_id (English/Indonesian), etc.
+
+    *   date::month_num
+
+        Month number, coercible from English month names (Dec/DECEMBER).
+
+        See also related schemas that coerce from other locales, e.g.
+        Sah::Schema::date::month_num::id (Indonesian),
+        Sah::Schema::date::month_num::en_or_id (English/Indonesian), etc.
+
+    *   date::month_nums
+
+        Array of required month numbers (1-12, with coercions).
+
+        See also related schemas that coerce from other locales, e.g.
+        Sah::Schema::date::month_nums::id (Indonesian),
+        Sah::Schema::date::month_nums::en_or_id (English/Indonesian), etc.
+
+    *   date::second
+
+        Second of minute (0-60).
+
+    *   date::tz_name
+
+        Timezone name, e.g. Asia/Jakarta.
+
+        Currently no validation for valid timezone names. But completion is
+        provided.
+
+    *   date::tz_offset
+
+        Timezone offset in seconds from UTC.
+
+        Only timezone offsets that are known to exist are allowed. For
+        example, 1 second (+00:00:01) is not allowed. See
+        "date::tz_offset_lax" for a more relaxed validation.
+
+        A coercion from these form of string is provided:
+
+         UTC
+ 
+         UTC-14 or UTC+12 or UTC+12:45 or UTC-00:25:21
+         -14 or +12, -1400 or +12:00
+
+        A coercion from timezone name is also provided.
+
+    *   date::tz_offset_lax
+
+        Timezone offset in seconds from UTC.
+
+        This schema allows timezone offsets that are not known to exist,
+        e.g. 1 second (+00:00:01). If you only want ot allow timezone
+        offsets that are known to exist, see the "date::tz_offset" schema.
+
+        A coercion from these form of string is provided:
+
+         UTC
+ 
+         UTC-14 or UTC+12 or UTC+12:45 or UTC-00:25:21
+         -14 or +12, -1400 or +12:00
+
+        A coercion from timezone name is also provided.
+
+    *   date::year
+
+        Year number (AD, starting from 1).
+
 HOMEPAGE
     Please visit the project's homepage at
     <https://metacpan.org/release/Sah-Schemas-Date>.
@@ -24,15 +156,15 @@ BUGS
 SEE ALSO
     Data::Sah::Type::date
 
-    Sah - specification
+    Sah - schema specification
 
-    Data::Sah
+    Data::Sah - Perl implementation of Sah
 
 AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
+    This software is copyright (c) 2021, 2020, 2019 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

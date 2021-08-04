@@ -1,0 +1,4 @@
+Result  (cost=0.00..0.01 rows=1 width=4) (actual time=0.002..0.003 rows=1 loops=1)
+Settings: random_page_cost = '13.666', search_path = 'public, test', work_mem = '666MB'
+Planning Time: 0.153 ms
+Execution Time: 0.077 ms

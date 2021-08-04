@@ -1,12 +1,12 @@
 package Sah::SchemaR::date::tz_name;
 
-our $DATE = '2020-03-08'; # DATE
-our $VERSION = '0.013'; # VERSION
+our $DATE = '2021-08-04'; # DATE
+our $VERSION = '0.017'; # VERSION
 
-our $rschema = ["str",[{examples=>[{valid=>1,value=>"Asia/Jakarta"}],summary=>"Timezone name","x.completion"=>sub{package Sah::Schema::date::tz_name;require Complete::TZ;my(%args) = @_;Complete::TZ::complete_tz('word', $args{'word'})}}],["str"]];
+our $rschema = do{my$var={base=>"str",clsets_after_base=>[{description=>"\nCurrently no validation for valid timezone names. But completion is provided.\n\n",examples=>[{valid=>1,value=>"Asia/Jakarta"}],summary=>"Timezone name, e.g. Asia/Jakarta","x.completion"=>sub{package Sah::Schema::date::tz_name;require Complete::TZ;my(%args) = @_;Complete::TZ::complete_tz('word', $args{'word'})}}],clsets_after_type=>['$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_base}[0]'],resolve_path=>["str"],type=>"str",v=>2};$var->{clsets_after_type}[0]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_base}[0];$var};
 
 1;
-# ABSTRACT: Timezone name
+# ABSTRACT: Timezone name, e.g. Asia/Jakarta
 
 __END__
 
@@ -16,11 +16,11 @@ __END__
 
 =head1 NAME
 
-Sah::SchemaR::date::tz_name - Timezone name
+Sah::SchemaR::date::tz_name - Timezone name, e.g. Asia/Jakarta
 
 =head1 VERSION
 
-This document describes version 0.013 of Sah::SchemaR::date::tz_name (from Perl distribution Sah-Schemas-Date), released on 2020-03-08.
+This document describes version 0.017 of Sah::SchemaR::date::tz_name (from Perl distribution Sah-Schemas-Date), released on 2021-08-04.
 
 =head1 DESCRIPTION
 
@@ -50,7 +50,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

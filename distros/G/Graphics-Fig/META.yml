@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.46, CPAN::Meta::Converter version 2.150010'
 license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -19,8 +19,8 @@ no_index:
     - t
     - inc
 requires:
-  Graphics::ColorNames: '3.5'
+  Graphics::ColorNames: v3.5.0
   Image::Info: '1.37'
   Math::Trig: '1'
-version: v1.0.4
+version: v1.0.5
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

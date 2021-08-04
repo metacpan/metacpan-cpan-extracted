@@ -2,7 +2,6 @@
 
 use Test::More;
 use Test::Deep;
-use Test::Exception;
 use autodie;
 
 use Pg::Explain;

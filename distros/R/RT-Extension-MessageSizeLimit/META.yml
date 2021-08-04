@@ -22,8 +22,8 @@ no_index:
 resources:
   license: http://dev.perl.org/licenses/
   repository: git://git.home-dn.net/manu/RT-Extension-MessageSizeLimit.git
-version: 0.02
+version: 0.03
 provides:
     RT::Extension::MessageSizeLimit:
       file: lib/RT/Extension/MessageSizeLimit.pm
-      version: 0.02
+      version: 0.03

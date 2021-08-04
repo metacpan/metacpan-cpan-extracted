@@ -187,7 +187,7 @@ class my_install(install):
         install.run(self)
 
 setup (name        = "pyperl",
-        version     = "1.0.2",
+        version     = "1.0.3",
         description = "Embed a Perl interpreter",
         url         = "http://www.ActiveState.com",
         author      = "ActiveState",

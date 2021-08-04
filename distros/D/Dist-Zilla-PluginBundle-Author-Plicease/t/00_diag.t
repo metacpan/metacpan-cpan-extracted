@@ -13,11 +13,13 @@ $modules{$_} = $_ for qw(
   Config::INI::Reader
   Data::Section
   Dist::Zilla
+  Dist::Zilla::Plugin::ArchiveTar
   Dist::Zilla::Plugin::AutoMetaResources
   Dist::Zilla::Plugin::CopyFilesFromBuild
   Dist::Zilla::Plugin::Git
   Dist::Zilla::Plugin::InsertExample
   Dist::Zilla::Plugin::InstallGuide
+  Dist::Zilla::Plugin::Libarchive
   Dist::Zilla::Plugin::MinimumPerl
   Dist::Zilla::Plugin::OurPkgVersion
   Dist::Zilla::Plugin::PkgVersion::Block

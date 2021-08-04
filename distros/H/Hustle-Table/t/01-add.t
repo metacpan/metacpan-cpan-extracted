@@ -4,7 +4,7 @@ use warnings;
 use Hustle::Table;
 use Test::More;
 
-plan  tests=>12;
+plan  tests=>14;
 my $table=Hustle::Table->new;
 
 #add entries
@@ -27,6 +27,12 @@ ok eval {
 }, "Added single entry";
 
 ok eval {
+	my @id=$table->add("c"=>sub {});
+	ok $id[0] ==3, "Unique id => $id[0]";
+	1;
+}, "Added simple pair entry";
+
+ok eval {
 	my @id=$table->add(
 		["d",sub {},"label",undef],
 		{matcher=>"e", sub=>sub {}},
@@ -34,8 +40,8 @@ ok eval {
 	);
 	ok @id ==3, "Added three entries @id";
 	ok $id[0] eq "label", "User supplied label => $id[0]";
-	ok $id[1] == 3 ,"Unique id => $id[1]";
-	ok $id[2] == 4 ,"Unique id => $id[1]";
+	ok $id[1] == 4 ,"Unique id => $id[1]";
+	ok $id[2] == 5 ,"Unique id => $id[1]";
 
 	1;
 }, "Added multiple entries";

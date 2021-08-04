@@ -1,12 +1,17 @@
 package Sah::Schema::date::tz_name;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-03-08'; # DATE
+our $DATE = '2021-08-04'; # DATE
 our $DIST = 'Sah-Schemas-Date'; # DIST
-our $VERSION = '0.013'; # VERSION
+our $VERSION = '0.017'; # VERSION
 
 our $schema = [str => {
-    summary => 'Timezone name',
+    summary => 'Timezone name, e.g. Asia/Jakarta',
+    description => <<'_',
+
+Currently no validation for valid timezone names. But completion is provided.
+
+_
     'x.completion' => sub {
         require Complete::TZ;
 
@@ -17,11 +22,11 @@ our $schema = [str => {
     examples => [
         {value=>'Asia/Jakarta', valid=>1},
     ],
-}, {}];
+}];
 
 1;
 
-# ABSTRACT: Timezone name
+# ABSTRACT: Timezone name, e.g. Asia/Jakarta
 
 __END__
 
@@ -31,27 +36,76 @@ __END__
 
 =head1 NAME
 
-Sah::Schema::date::tz_name - Timezone name
+Sah::Schema::date::tz_name - Timezone name, e.g. Asia/Jakarta
 
 =head1 VERSION
 
-This document describes version 0.013 of Sah::Schema::date::tz_name (from Perl distribution Sah-Schemas-Date), released on 2020-03-08.
+This document describes version 0.017 of Sah::Schema::date::tz_name (from Perl distribution Sah-Schemas-Date), released on 2021-08-04.
 
 =head1 SYNOPSIS
 
-Using with L<Data::Sah>:
+=head2 Sample data and validation results against this schema
+
+ "Asia/Jakarta"  # valid
+
+=head2 Using with Data::Sah
+
+To check data against this schema (requires L<Data::Sah>):
 
  use Data::Sah qw(gen_validator);
- my $vdr = gen_validator("date::tz_name*");
- say $vdr->($data) ? "valid" : "INVALID!";
+ my $validator = gen_validator("date::tz_name*");
+ say $validator->($data) ? "valid" : "INVALID!";
 
- # Data::Sah can also create a validator to return error message, coerced value,
- # even validators in other languages like JavaScript, from the same schema.
- # See its documentation for more details.
+The above schema returns a boolean value (true if data is valid, false if
+otherwise). To return an error message string instead (empty string if data is
+valid, a non-empty error message otherwise):
 
-Using in L<Rinci> function metadata (to be used with L<Perinci::CmdLine>, etc):
+ my $validator = gen_validator("date::tz_name", {return_type=>'str_errmsg'});
+ my $errmsg = $validator->($data);
+ 
+ # a sample valid data
+ $data = "Asia/Jakarta";
+ my $errmsg = $validator->($data); # => ""
 
- package MyApp;
+Often a schema has coercion rule or default value, so after validation the
+validated value is different. To return the validated (set-as-default, coerced,
+prefiltered) value:
+
+ my $validator = gen_validator("date::tz_name", {return_type=>'str_errmsg+val'});
+ my $res = $validator->($data); # [$errmsg, $validated_val]
+ 
+ # a sample valid data
+ $data = "Asia/Jakarta";
+ my $res = $validator->($data); # => ["","Asia/Jakarta"]
+
+Data::Sah can also create validator that returns a hash of detaild error
+message. Data::Sah can even create validator that targets other language, like
+JavaScript, from the same schema. Other things Data::Sah can do: show source
+code for validator, generate a validator code with debug comments and/or log
+statements, generate human text from schema. See its documentation for more
+details.
+
+=head2 Using with Params::Sah
+
+To validate function parameters against this schema (requires L<Params::Sah>):
+
+ use Params::Sah qw(gen_validator);
+
+ sub myfunc {
+     my @args = @_;
+     state $validator = gen_validator("date::tz_name*");
+     $validator->(\@args);
+     ...
+ }
+
+=head2 Using with Perinci::CmdLine::Lite
+
+To specify schema in L<Rinci> function metadata and use the metadata with
+L<Perinci::CmdLine> (L<Perinci::CmdLine::Lite>) to create a CLI:
+
+ # in lib/MyApp.pm
+ package
+   MyApp;
  our %SPEC;
  $SPEC{myfunc} = {
      v => 1.1,
@@ -68,10 +122,22 @@ Using in L<Rinci> function metadata (to be used with L<Perinci::CmdLine>, etc):
      my %args = @_;
      ...
  }
+ 1;
 
-Sample data:
+ # in myapp.pl
+ package
+   main;
+ use Perinci::CmdLine::Any;
+ Perinci::CmdLine::Any->new(url=>'/MyApp/myfunc')->run;
 
- "Asia/Jakarta"  # valid
+ # in command-line
+ % ./myapp.pl --help
+ myapp - Routine to do blah ...
+ ...
+
+ % ./myapp.pl --version
+
+ % ./myapp.pl --arg1 ...
 
 =head1 DESCRIPTION
 
@@ -99,7 +165,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

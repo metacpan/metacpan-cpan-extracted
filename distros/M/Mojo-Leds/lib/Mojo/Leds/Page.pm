@@ -1,8 +1,7 @@
 package Mojo::Leds::Page;
-
+$Mojo::Leds::Page::VERSION = '1.04';
 use 5.014;    # because s///r usage
 use Mojo::Base 'Mojolicious::Controller';
-use File::Basename;
 use Mojo::Util qw(class_to_path);
 
 sub route {
@@ -50,7 +49,7 @@ sub render_html {
     while ( my ( $k, $v ) = each %$query ) {
         $c->stash( $k => $v );
     }
-    return { template => Mojo::Util::class_to_path( ref($c) ) =~ s/\.pm//r };
+    return { template => class_to_path( ref($c) ) =~ s/\.pm//r };
 }
 
 sub render_json {
@@ -120,7 +119,7 @@ Mojo::Leds::Page - Standard page controller for Mojo::Leds
 
 =head1 VERSION
 
-version 1.02
+version 1.04
 
 =head1 SYNOPSIS
 

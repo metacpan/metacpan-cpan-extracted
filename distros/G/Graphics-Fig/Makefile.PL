@@ -10,6 +10,6 @@ WriteMakefile(
     PREREQ_PM	    => {
 	Image::Info		=> 1.37,
 	Math::Trig		=> 1.0,
-	Graphics::ColorNames	=> 3.5,
+	Graphics::ColorNames	=> 'v3.5.0',
     },
 );

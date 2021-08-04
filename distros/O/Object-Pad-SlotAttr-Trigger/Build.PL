@@ -3,7 +3,7 @@ use warnings;
 
 use Module::Build;
 
-my @extra_compiler_flags = qw( -Iinclude );
+my @extra_compiler_flags = qw( -Ihax -Iinclude );
 
 push @extra_compiler_flags, qw( -DDEBUGGING=-g ) if $^X =~ m|/debugperl|;
 

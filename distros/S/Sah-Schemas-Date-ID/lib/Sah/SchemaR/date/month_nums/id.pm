@@ -1,12 +1,12 @@
 package Sah::SchemaR::date::month_nums::id;
 
-our $DATE = '2020-03-08'; # DATE
-our $VERSION = '0.005'; # VERSION
+our $DATE = '2021-08-04'; # DATE
+our $VERSION = '0.007'; # VERSION
 
-our $rschema = ["array",[{examples=>[{valid=>1,validated_value=>[],value=>""},{valid=>1,validated_value=>[1],value=>"jan"},{valid=>1,validated_value=>[8],value=>"AGU"},{valid=>0,value=>"aug"},{valid=>0,value=>0},{valid=>1,validated_value=>[1,8],value=>"1,agu"},{valid=>1,validated_value=>[1,8],value=>[1,"agu"]},{valid=>1,validated_value=>[1,12],value=>"1,12"},{valid=>0,value=>"1,12,13"},{valid=>0,value=>[1,12,13]}],of=>["date::month_num::id",{},{}],summary=>"Array of month numbers","x.perl.coerce_rules"=>["From_str::comma_sep"]}],["array"]];
+our $rschema = do{my$var={base=>"array",clsets_after_base=>[{description=>"\nSee also related schemas for other locales, e.g.\n<pm:Sah::Schema::date::month_nums> (English),\n<pm:Sah::Schema::date::month_nums::en_or_id> (English/Indonesian), etc.\n\n",examples=>[{valid=>1,validated_value=>[],value=>""},{valid=>1,validated_value=>[1],value=>"jan"},{valid=>1,validated_value=>[8],value=>"AGU"},{valid=>0,value=>"aug"},{summary=>"Has number not in 1-12",valid=>0,value=>0},{summary=>"Has undef",valid=>0,value=>[1,undef]},{valid=>1,validated_value=>[1,8],value=>"1,agu"},{summary=>"Has unknown month name",valid=>0,value=>"1,foo"},{valid=>1,validated_value=>[1,8],value=>[1,"agu"]},{valid=>1,validated_value=>[1,12],value=>"1,12"},{summary=>"Has number not in 1-12",valid=>0,value=>"1,12,13"},{summary=>"Has number not in 1-12",valid=>0,value=>[1,12,13]}],of=>["date::month_num::id",{req=>1}],summary=>"Array of required month numbers, coercible from Indonesian full/abbreviated month names","x.perl.coerce_rules"=>["From_str::comma_sep"]}],clsets_after_type=>['$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_base}[0]'],resolve_path=>["array"],type=>"array",v=>2};$var->{clsets_after_type}[0]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_base}[0];$var};
 
 1;
-# ABSTRACT: Array of month numbers
+# ABSTRACT: Array of required month numbers, coercible from Indonesian full/abbreviated month names
 
 __END__
 
@@ -16,11 +16,11 @@ __END__
 
 =head1 NAME
 
-Sah::SchemaR::date::month_nums::id - Array of month numbers
+Sah::SchemaR::date::month_nums::id - Array of required month numbers, coercible from Indonesian full/abbreviated month names
 
 =head1 VERSION
 
-This document describes version 0.005 of Sah::SchemaR::date::month_nums::id (from Perl distribution Sah-Schemas-Date-ID), released on 2020-03-08.
+This document describes version 0.007 of Sah::SchemaR::date::month_nums::id (from Perl distribution Sah-Schemas-Date-ID), released on 2021-08-04.
 
 =head1 DESCRIPTION
 
@@ -50,7 +50,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

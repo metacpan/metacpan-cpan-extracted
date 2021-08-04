@@ -4,14 +4,26 @@ package Data::Record::Serialize::Encode::json;
 
 use Moo::Role;
 
-our $VERSION = '0.23';
+our $VERSION = '0.24';
 
 use JSON::MaybeXS qw[ encode_json ];
 
 use namespace::clean;
 
-has '+_numify'    => ( is => 'rwp', default => 1 );
-has '+_needs_eol' => ( is => 'rwp', default => 1 );
+has '+numify' => ( is => 'ro', default => 1 );
+has '+stringify' => ( is => 'ro', default => 1 );
+
+sub _needs_eol { 1 }
+
+
+
+
+
+
+
+
+
+sub to_bool { $_[1] ? \1 : \0 }
 
 
 
@@ -46,7 +58,7 @@ Data::Record::Serialize::Encode::json - encoded a record as JSON
 
 =head1 VERSION
 
-version 0.23
+version 0.24
 
 =head1 SYNOPSIS
 
@@ -61,7 +73,10 @@ version 0.23
 B<Data::Record::Serialize::Encode::json> encodes a record as JSON.
 
 If a field's type is C<N> or C<I>, it will be properly encoded by JSON
-as a number.
+as a number.  Field's with type C<S> are force to be strings.
+
+Boolean fields (type C<B>) are transformed into values recognized by
+the back-end encoder.
 
 The output consists of I<concatenated> JSON objects, and is mostly easily
 read by an incremental decoder, e.g.
@@ -72,12 +87,23 @@ read by an incremental decoder, e.g.
 
 It performs the L<Data::Record::Serialize::Role::Encode> role.
 
+=head1 METHODS
+
+=head2 to_bool
+
+   $bool = $self->to_bool( $truthy );
+
+Convert a truthy value to something that the JSON encoders will recognize as a boolean.
+
 =for Pod::Coverage encode
+
+=for Pod::Coverage numify
+stringify
 
 =head1 INTERFACE
 
 There are no additional attributes which may be passed to
-L<Data::Record::Serialize-E<gt>new>|Data::Record::Serialize/new>.
+L<< Data::Record::Serialize::new|Data::Record::Serialize/new >>.
 
 =head1 SUPPORT
 

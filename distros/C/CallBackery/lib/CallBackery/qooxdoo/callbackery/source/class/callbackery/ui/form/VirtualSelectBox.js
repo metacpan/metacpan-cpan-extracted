@@ -154,17 +154,28 @@ qx.Class.define("callbackery.ui.form.VirtualSelectBox",
     __bindings : null,
 
 
-    /**
-     * @param selected {var|null} Item to select as value.
+   /**
+     * @param item {var|null} Item to select as value.
      * @returns {null|TypeError} The status of this operation.
+     * 
+     * If null or an item which does not exit in the model is
+     * input the first item from the model will be selected.
      */
-    setValue : function(selected) {
+    setValue : function(item) {
       // if no item is set, select the first item in the model
-      this.getSelection().setItem(0, 
-        selected ? selected : this.getModel().getItem(0));
+      let selection = this.getSelection();
+      if (item !== null && item !== undefined) {
+        try {
+            selection.setItem(0,item);
+            return true;
+        }
+        catch(e) {
+            console.warn(e);
+        }
+      }
+      selection.setItem(0,this.getModel().getItem(0));
       return null;
     },
-
 
     /**
      * @returns {null|var} The currently selected item or null if there is none.

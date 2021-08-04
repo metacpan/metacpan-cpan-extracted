@@ -5,6 +5,7 @@
 
 #include <EXTERN.h>
 #include <perl.h>
+#define PY_SSIZE_T_CLEAN
 #include <Python.h>
 #include <stdbool.h>
 
@@ -449,7 +450,7 @@ static PyObject*
 pysvrv_get(PySVRV *self, PyObject *args)
 {
     char *key;
-    int keylen;
+    Py_ssize_t keylen;
     PyObject *failobj = Py_None;
     SV** svp;
     dCTXP;

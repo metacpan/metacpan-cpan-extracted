@@ -190,29 +190,29 @@
 
 <p>Array entries must contain four elements, in the order of:</p>
 
-<pre><code>        add([$matcher,$sub,$label,$count]);</code></pre>
+<pre><code>        $table-&gt;add([$matcher,$sub,$label,$count]);</code></pre>
 
 <p>Hashes ref format only need to specify the matcher and sub pairs</p>
 
-<pre><code>        add({matcher=&gt;$matcher, sub=&gt;$sub, label=&gt;$label, count=&gt;$count});</code></pre>
+<pre><code>        $table-&gt;add({matcher=&gt;$matcher, sub=&gt;$sub, label=&gt;$label, count=&gt;$count});</code></pre>
 
 <p>Single flattened format takes a list directly</p>
 
-<pre><code>        add(matcher=&gt;$matcher, sub =&gt; $sub);</code></pre>
+<pre><code>        $table-&gt;add(matcher=&gt;$matcher, sub =&gt; $sub);</code></pre>
 
-<p>Or add using formats together</p>
+<p>Or add at once using mixed formats together</p>
 
-<pre><code>        add(
+<pre><code>        $table-&gt;add(
                 [$matcher, $sub, $label, $count],
                 {matcher=&gt; $matcher, sub=&gt;$sub},
                 matcher=&gt;$matcher, sub=&gt;$sub
         );</code></pre>
 
-<p>In any case,<code>$matcher</code> and <code>$sub</code> are the only items which must be defined. It <code>$sub</code> must also be a CODE reference.</p>
+<p>In any case,<code>$matcher</code> and <code>$sub</code> are the only items which must be defined. <code>$sub</code> must also be a CODE reference.</p>
 
 <p>If a label is not specified, one will be generated automatically. All the labels used in a call to <code>add</code> are returned in the same order as the input arguments.</p>
 
-<p>Note the auto generated labels are only unique in the lifetime of a single table. If permanent/globally unique labels are need, the user will need to generate them.</p>
+<p>Auto generated labels are only unique in the lifetime of a single table. If permanent/globally unique labels are need, the user will need to generate them.</p>
 
 <h2 id="REMOVING">REMOVING</h2>
 

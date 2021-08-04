@@ -13,6 +13,7 @@ dist.ini~
 examples/form_test.pl
 inc/Test/Run/Builder.pm
 lib/WWW/FieldValidator.pm
+lib/WWW/FieldValidator.pm~
 lib/WWW/Form.pm
 lib/WWW/Form.pm~
 t/00-compile.t

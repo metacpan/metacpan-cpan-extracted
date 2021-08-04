@@ -15,7 +15,7 @@
 # program.  If not, see <http://www.perlfoundation.org/artistic_license_2_0>.
 #
 package Graphics::Fig::Polyline;
-our $VERSION = 'v1.0.4';
+our $VERSION = 'v1.0.5';
 
 use strict;
 use warnings;
@@ -151,7 +151,7 @@ sub _convertResolution {
 }
 
 #
-# Graphics::Fig::Parameters::convertResolution
+# Graphics::Fig::Polyline::convertResolution
 #   $fig:     Fig instance
 #   $prefix:  error message prefix
 #   $value:   angle (degrees)

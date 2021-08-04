@@ -1,5 +1,9 @@
 Revision history for Perl module enum
 
+1.12 2021-08-04 NEILB
+    - Fixed documentation bug RT#132219, with PR#1 from JJ Atria.
+    - Switched to Dist::Zilla
+
 1.11 2015-10-27 NEILB
     - Updated github repo URL after changing my github username
 

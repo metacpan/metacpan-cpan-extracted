@@ -37,7 +37,7 @@ our $VERSION = '2.009';
 
 =head1 NAME
 
-PDL::Complex - handle complex numbers
+PDL::Complex - handle complex numbers (DEPRECATED - use native complex)
 
 =head1 SYNOPSIS
 
@@ -45,6 +45,12 @@ PDL::Complex - handle complex numbers
   use PDL::Complex;
 
 =head1 DESCRIPTION
+
+This module is deprecated in favour of using "native complex" data types, e.g.:
+
+  use PDL;
+  my $complex_pdl = cdouble('[1+3i]');
+  print $complex_pdl * pdl('i'); # [-3+i]
 
 This module features a growing number of functions manipulating complex
 numbers. These are usually represented as a pair C<[ real imag ]> or

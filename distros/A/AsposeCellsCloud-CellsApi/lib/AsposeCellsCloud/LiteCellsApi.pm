@@ -35,7 +35,7 @@ use Carp qw( croak );
 use Log::Any qw($log);
 use JSON;
 use AsposeCellsCloud::ApiClient;
-
+use AsposeCellsCloud::Object::CellsDocumentProperty;
 use base "Class::Data::Inheritable";
 
 __PACKAGE__->mk_classdata('method_documentation' => {});
@@ -660,21 +660,9 @@ sub post_metadata {
         while ( my ($filename,$value) = each( %$map_file ) ) {
              $form_params->{$filename} = [$value ,$filename,'application/octet-stream'];
         }
-
-        # body params
-        # if ( exists $args{'document_properties'}) {
-            # print "1. document_properties\n";
-            # my $document_properties = 'ARRAY[';
-            # # $form_params->{'documentproperties'}  =  [ encode_json ( $args{'document_properties'}) , 'documentproperties',  {'Content_Type' => 'application/json'} ];
-            # foreach my $item ( $args{'document_properties'} ) {
-            #    document_properties .= $item->to_json();
-            #    document_properties .= ' , ';
-            # }
-            # document_properties .= ' ]';
-            # print  ($args{'document_properties'}[0])->TO_JSON();
-            # $form_params->{'documentproperties'} = $args{'document_properties'};# $self->{api_client}->deserialize('ARRAY[CellsDocumentProperty]', $args{'document_properties'} );   
-            # print "\n2. document_properties\n";          
-        # }
+        if ( exists $args{'document_properties'} ) {
+            $form_params->{'documentproperties'} =  $args{'document_properties'};
+        }
     }
 
     

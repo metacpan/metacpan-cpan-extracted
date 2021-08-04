@@ -20,6 +20,7 @@ if ( grep /\P{ASCII}/ => @ARGV ) {
 use Carp;
 use Clone qw( clone );
 use autodie;
+use List::Util qw( sum uniq );
 use Pg::Explain::StringAnonymizer;
 use Pg::Explain::FromText;
 use Pg::Explain::FromYAML;
@@ -32,11 +33,11 @@ Pg::Explain - Object approach at reading explain analyze output
 
 =head1 VERSION
 
-Version 1.11
+Version 1.13
 
 =cut
 
-our $VERSION = '1.11';
+our $VERSION = '1.13';
 
 =head1 SYNOPSIS
 
@@ -105,6 +106,12 @@ If there was no JIT info, it will return undef.
 
 What query this explain is for. This is available only for auto-explain plans. If not available, it will be undef.
 
+=head2 settings
+
+If explain contains information about specific settings that were changed in Pg, this hashref will contain it.
+
+If there are none - if will be undef.
+
 =cut
 
 sub source_format    { my $self = shift; $self->{ 'source_format' }    = $_[ 0 ] if 0 < scalar @_; return $self->{ 'source_format' }; }
@@ -115,6 +122,7 @@ sub total_runtime    { my $self = shift; $self->{ 'total_runtime' }    = $_[ 0 ]
 sub trigger_times    { my $self = shift; $self->{ 'trigger_times' }    = $_[ 0 ] if 0 < scalar @_; return $self->{ 'trigger_times' }; }
 sub jit              { my $self = shift; $self->{ 'jit' }              = $_[ 0 ] if 0 < scalar @_; return $self->{ 'jit' }; }
 sub query            { my $self = shift; $self->{ 'query' }            = $_[ 0 ] if 0 < scalar @_; return $self->{ 'query' }; }
+sub settings         { my $self = shift; $self->{ 'settings' }         = $_[ 0 ] if 0 < scalar @_; return $self->{ 'settings' }; }
 
 sub total_buffers {
     my $self = shift;
@@ -157,6 +165,23 @@ sub runtime {
     return $self->total_runtime // $self->execution_time // $self->top_node->actual_time_last;
 }
 
+=head2 node
+
+Returns node with given id from current explain.
+
+If there is second argument present, and it's Pg::Explain::Node object, it sets internal cache for this id and this node.
+
+=cut
+
+sub node {
+    my $self = shift;
+    my $id   = shift;
+    return unless defined $id;
+    my $node = shift;
+    $self->{ 'node_by_id' }->{ $id } = $node if defined $node;
+    return $self->{ 'node_by_id' }->{ $id };
+}
+
 =head2 source
 
 Returns original source (text version) of explain.
@@ -184,40 +209,48 @@ Currently there are only two filters:
 =cut
 
 sub source_filtered {
-    my $self   = shift;
-    my $source = $self->source;
+    my $self = shift;
 
-    # Remove frames around, handles |, ║, │
-    $source =~ s/^(\||║|│)(.*)\1\r?\n/$2\n/gm;
+    my $filtered = '';
 
-    # Remove separator lines from various types of borders
-    $source =~ s/^\+-+\+\r?\n//gm;
-    $source =~ s/^(-|─|═)\1+\r?\n//gm;
-    $source =~ s/^(├|╟|╠|╞)(─|═)\2*(┤|╢|╣|╡)\r?\n//gm;
+    # use default variable, to avoid having to type variable name in all regexps below
+    for ( split /\r?\n/, $self->source ) {
 
-    # Remove more horizontal lines
-    $source =~ s/^\+-+\+\r?\n//gm;
-    $source =~ s/^└(─)+┘\r?\n//gm;
-    $source =~ s/^╚(═)+╝\r?\n//gm;
-    $source =~ s/^┌(─)+┐\r?\n//gm;
-    $source =~ s/^╔(═)+╗\r?\n//gm;
+        # Remove separator lines from various types of borders
+        next if /^\+-+\+\z/;
+        next if /^[-─═]+\z/;
+        next if /^(?:├|╟|╠|╞)[─═]+(?:┤|╢|╣|╡)\z/;
 
-    # Remove quotes around lines, both ' and "
-    $source =~ s/^(["'])(.*)\1(\r?\n|\z)/$2\n/gm;
+        # Remove more horizontal lines
+        next if /^\+-+\+\z/;
+        next if /^└─+┘\z/;
+        next if /^╚═+╝\z/;
+        next if /^┌─+┐\z/;
+        next if /^╔═+╗\z/;
 
-    # Remove "+" line continuations
-    $source =~ s/\s*\+\r?\n/\n/g;
+        # Remove frames around, handles |, ║, │
+        s/^(\||║|│)(.*)\1\z/$2/;
 
-    # Remove "↵" line continuations
-    $source =~ s/↵\r?\n/\n/g;
+        # Remove quotes around lines, both ' and "
+        s/^(["'])(.*)\1\z/$2/;
 
-    # Remove "query plan" header
-    $source =~ s/^\s*QUERY PLAN\s*\r?\n//m;
+        # Remove "+" line continuations
+        s/\s*\+\z//;
 
-    # Remove rowcount
-    $source =~ s/^\(\d+ rows?\)(\r?\n|\z)//gm;
+        # Remove "↵" line continuations
+        s/\s*↵\z//;
 
-    return $source;
+        # Remove "query plan" header
+        next if /^\s*QUERY PLAN\s*\z/;
+
+        # Remove rowcount
+        next if /^\(\d+ rows?\)\z/;
+
+        # Accumulate filtered source
+        $filtered .= $_ . "\n";
+    }
+
+    return $filtered;
 }
 
 =head2 new
@@ -269,6 +302,10 @@ sub new {
 
     # Initialize jit to undef
     $self->{ 'jit' } = undef;
+
+    # Initialize node_by_id hash to empty
+    $self->{ 'node_by_id' } = {};
+
     return $self;
 }
 
@@ -352,6 +389,176 @@ sub parse_source {
     $self->{ 'top_node' } = $parser->parse_source( $source );
 
     $self->check_for_parallelism();
+
+    $self->check_for_exclusive_time_fixes();
+
+    return;
+}
+
+=head2 check_for_exclusive_time_fixes
+
+Certain types of nodes (CTE Scans, and InitPlans) can cause issues with "naive" calculations of node exclusive time.
+
+To fix that whole tree will be scanned, and, if neccessary, node->exclusive_fix will be modified.
+
+=cut
+
+sub check_for_exclusive_time_fixes {
+    my $self = shift;
+    $self->check_for_exclusive_time_fixes_cte();
+    $self->check_for_exclusive_time_fixes_init();
+}
+
+=head2 check_for_exclusive_time_fixes_cte
+
+Modifies node->exclusive_fix according to times that were used by CTEs.
+
+=cut
+
+sub check_for_exclusive_time_fixes_cte {
+    my $self = shift;
+
+    # Safeguard against endless loop in some edge cases.
+    return unless defined $self->{ 'top_node' };
+
+    # There is no point in checking if the plan is not analyzed.
+    return unless $self->top_node->is_analyzed;
+
+    # Find nodes that have any ctes in them
+    my @nodes_with_cte = grep { $_->ctes && 0 < scalar keys %{ $_->ctes } } ( $self->top_node, $self->top_node->all_recursive_subnodes );
+
+    # For each node with cte in it...
+    for my $node ( @nodes_with_cte ) {
+
+        # Find all nodes that are 'CTE Scan' - from given node, and all of its subnodes (recursively)
+        my @cte_scans = grep { $_->type eq 'CTE Scan' } ( $node, $node->all_recursive_subnodes );
+        next if 0 == scalar @cte_scans;
+
+        # Iterate over defined ctes
+        while ( my ( $cte_name, $cte_node ) = each %{ $node->ctes } ) {
+
+            # Find all CTE Scans that were scanning current CTE
+            my @matching_cte_scans = grep { $_->scan_on->{ 'cte_name' } eq $cte_name } @cte_scans;
+            next if 0 == scalar @matching_cte_scans;
+
+            # How much time did Pg spend in given CTE itself
+            my $cte_total_time = $cte_node->total_inclusive_time;
+
+            # How much time did all the CTE Scans used
+            my $total_time_of_scans = sum( map { $_->total_inclusive_time // 0 } @matching_cte_scans );
+
+            # Don't fail on divide by 0, and don't warn on undef
+            next unless $total_time_of_scans;
+            next unless $cte_total_time;
+
+            # Subtract exclusive time proportionally.
+            for my $scan ( grep { $_->total_inclusive_time } @matching_cte_scans ) {
+                $scan->exclusive_fix( $scan->exclusive_fix - ( $scan->total_inclusive_time / $total_time_of_scans ) * $cte_total_time );
+            }
+        }
+    }
+    return;
+}
+
+=head2 check_for_exclusive_time_fixes_init
+
+Modifies node->exclusive_fix according to times that were used by InitScans.
+
+=cut
+
+sub check_for_exclusive_time_fixes_init {
+    my $self = shift;
+
+    # Safeguard against endless loop in some edge cases.
+    return unless defined $self->{ 'top_node' };
+
+    # There is no point in checking if the plan is not analyzed.
+    return unless $self->top_node->is_analyzed;
+
+    # Find nodes that have any init plans in them
+    my @nodes_with_init = grep { $_->initplans && 0 < scalar @{ $_->initplans } } ( $self->top_node, $self->top_node->all_recursive_subnodes );
+
+    # Check them all, one by one, to build "init-plan-visibility" info
+    for my $parent ( @nodes_with_init ) {
+
+        # Nodes that see what initplan returned even if they don't refer to returned $*
+        my @all_implicits      = map { $_->id } ( $parent, $parent->all_recursive_subnodes );
+        my %skip_self_implicit = ();
+
+        # Scan all initplans
+        for my $idx ( 0 .. $#{ $parent->initplans } ) {
+            my $initnode = $parent->initplans->[ $idx ];
+
+            # There is no point in adjusting things for no-time.
+            next unless $initnode->total_inclusive_time;
+
+            # Place to store implicit and explicit nodes
+            my @implicitnodes = ();
+            my @explicitnodes = ();
+
+            my $explicit_re;
+
+            # If there is metainfo, we can build regexp to find nodes explicitly using this init
+            if ( $parent->initplans_metainfo->[ $idx ] ) {
+
+                # List of $* variables that this initplan returns
+                my $returns_string  = $parent->initplans_metainfo->[ $idx ]->{ 'returns' };
+                my @returns_numbers = ();
+                for my $element ( split /,/, $returns_string ) {
+                    push @returns_numbers, $element if $element =~ s/\A\$(\d+)\z/$1/;
+                }
+                my $returns = join( '|', @returns_numbers );
+
+                # Regular expression to check in extra-info for nodes.
+                $explicit_re = qr{\$(?:${returns})(?!\d)};
+            }
+
+            # Add current node, and it's kids to skip list
+            for my $skip_node ( $initnode, $initnode->all_recursive_subnodes ) {
+                $skip_self_implicit{ $skip_node->id } = 1;
+            }
+
+            # Iterate over all nodes that could have used data from this initplan
+            for my $user_id ( grep { !$skip_self_implicit{ $_ } } @all_implicits ) {
+
+                my $user = $self->node( $user_id );
+
+                # Add node to implicit ones,always
+                push @implicitnodes, $user;
+
+                # If there is explicit_re, try to find what is using this int explicitly
+                next unless $explicit_re;
+                next unless $user->extra_info;
+                my $full_extra_info = join( "\n", @{ $user->extra_info } );
+                push @explicitnodes, $user if $full_extra_info =~ $explicit_re;
+            }
+
+            # Total times
+            my $implicittime = sum( map { $_->total_exclusive_time // 0 } @implicitnodes ) // 0;
+            my $explicittime = sum( map { $_->total_exclusive_time // 0 } @explicitnodes ) // 0;
+
+            # Where to adjusct exclusive time
+            my @adjust_these = ();
+            my $ratio;
+            if (   ( 0 < scalar @explicitnodes )
+                && ( $explicittime > $initnode->total_inclusive_time ) )
+            {
+                @adjust_these = @explicitnodes;
+                $ratio        = $initnode->total_inclusive_time / $explicittime;
+            }
+            elsif ( $implicittime > $initnode->total_inclusive_time ) {
+                @adjust_these = @implicitnodes;
+                $ratio        = $initnode->total_inclusive_time / $implicittime;
+            }
+
+            # Actually adjust exclusive times
+            for my $node ( @adjust_these ) {
+                next unless $node->total_exclusive_time;
+                my $adjust = $ratio * $node->total_exclusive_time;
+                $node->exclusive_fix( $node->exclusive_fix - $adjust );
+            }
+        }
+    }
 
     return;
 }
@@ -491,6 +698,7 @@ sub get_struct {
     $reply->{ 'total_runtime' }    = $self->total_runtime                if $self->total_runtime;
     $reply->{ 'trigger_times' }    = clone( $self->trigger_times )       if $self->trigger_times;
     $reply->{ 'query' }            = $self->query                        if $self->query;
+    $reply->{ 'settings' }         = $self->settings                     if $self->settings;
 
     if ( $self->jit ) {
         $reply->{ 'jit' }                  = {};

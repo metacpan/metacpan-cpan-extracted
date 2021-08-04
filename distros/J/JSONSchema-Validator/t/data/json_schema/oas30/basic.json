@@ -1,0 +1,523 @@
+[
+    {
+        "subject": "integer nullable",
+        "schema": {
+            "type" : "integer",
+            "nullable" : true
+        },
+        "tests": [
+            {
+                "description": "integer",
+                "data": 123,
+                "valid": true
+            },
+            {
+                "description": "interger as string",
+                "data": "321",
+                "valid": true
+            },
+            {
+                "description": "null value",
+                "data": null,
+                "valid": true
+            },
+            {
+                "description": "wrong type",
+                "data": [],
+                "valid": false
+            }
+        ]
+    },
+
+    {
+        "subject": "integer",
+        "schema": {
+            "type" : "integer"
+        },
+        "tests": [
+            {
+                "description": "integer",
+                "data": 123,
+                "valid": true
+            },
+            {
+                "description": "interger as string",
+                "data": "321",
+                "valid": true
+            },
+            {
+                "description": "null value",
+                "data": null,
+                "valid": false
+            },
+            {
+                "description": "wrong type",
+                "data": {},
+                "valid": false
+            }
+        ]
+    },
+
+    {
+        "subject": "nullable true",
+        "schema": {
+            "nullable" : "true"
+        },
+        "tests": [
+            {
+                "description": "null",
+                "data": null,
+                "valid": true
+            }
+        ]
+    },
+
+    {
+        "subject": "nullable false",
+        "schema": {
+            "nullable" : "false"
+        },
+        "tests": [
+            {
+                "description": "null",
+                "data": null,
+                "valid": true
+            }
+        ]
+    },
+
+    {
+        "subject": "items",
+        "schema": {
+            "items" : {
+                "type" : "integer",
+                "minimum" : 3
+            }
+        },
+        "tests": [
+            {
+                "description": "check valid",
+                "data": [4, 5, 6],
+                "valid": true
+            },
+            {
+                "description": "check valid empty",
+                "data": [],
+                "valid": true
+            },
+            {
+                "description": "check not valid",
+                "data": [1],
+                "valid": false
+            }
+        ]
+    },
+
+    {
+        "subject": "readOnly",
+        "schema": {
+            "type": "object",
+            "properties" : {
+                "name": { "type": "string" },
+                "age": { "type": "integer" },
+                "id": { "type": "integer", "readOnly": true }
+            },
+            "required" : ["name", "age", "id"]
+        },
+        "tests": [
+            {
+                "description": "check valid request without \"id\"",
+                "data": {
+                    "name": "ilya",
+                    "age": 12
+                },
+                "valid": true,
+                "v_params" : {
+                    "direction" : "request"
+                }
+            },
+            {
+                "description": "check not valid request with \"id\"",
+                "data": {
+                    "name": "ilya",
+                    "age": 12,
+                    "id": 13
+                },
+                "valid": false,
+                "v_params" : {
+                    "direction" : "request"
+                }
+            },
+            {
+                "description": "check valid response with \"id\"",
+                "data": {
+                    "name": "ilya",
+                    "age": 12,
+                    "id": 13
+                },
+                "valid": true,
+                "v_params" : {
+                    "direction" : "response"
+                }
+            },
+            {
+                "description": "check not valid response without \"id\"",
+                "data": {
+                    "name": "ilya",
+                    "age": 12
+                },
+                "valid": false,
+                "v_params" : {
+                    "direction" : "response"
+                }
+            }
+        ]
+    },
+
+    {
+        "subject": "writeOnly",
+        "schema": {
+            "type": "object",
+            "properties" : {
+                "name": { "type": "string" },
+                "offset" : { "type": "integer", "writeOnly": true }
+            },
+            "required" : ["name", "offset"]
+        },
+        "tests": [
+            {
+                "description": "check valid request with \"offset\"",
+                "data": {
+                    "name": "ilya",
+                    "offset": 12
+                },
+                "valid": true,
+                "v_params" : {
+                    "direction" : "request"
+                }
+            },
+            {
+                "description": "check not valid request without \"offset\"",
+                "data": {
+                    "name": "ilya"
+                },
+                "valid": false,
+                "v_params" : {
+                    "direction" : "request"
+                }
+            },
+            {
+                "description": "check not valid response with \"offset\"",
+                "data": {
+                    "name": "ilya",
+                    "offset": 13
+                },
+                "valid": false,
+                "v_params" : {
+                    "direction" : "response"
+                }
+            },
+            {
+                "description": "check valid response without \"offset\"",
+                "data": {
+                    "name": "ilya"
+                },
+                "valid": true,
+                "v_params" : {
+                    "direction" : "response"
+                }
+            }
+        ]
+    },
+
+    {
+        "subject": "discriminator",
+        "schema": {
+            "oneOf": [
+                { "$ref": "#/components/schemas/Cat" },
+                { "$ref": "#/components/schemas/Dog" }
+            ],
+            "discriminator": {
+                "propertyName": "petType"
+            },
+            "components" : {
+                "schemas" : {
+                    "Pet": {
+                        "type": "object",
+                        "properties": {
+                            "name": {
+                                "type": "string"
+                            },
+                            "petType": {
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "name",
+                            "petType"
+                        ]
+                    },
+                    "Cat": {
+                        "description": "A representation of a cat. Note that `Cat` will be used as the discriminator value.",
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/Pet"
+                            },
+                            {
+                                "type": "object",
+                                "properties": {
+                                    "huntingSkill": {
+                                        "type": "string",
+                                        "description": "The measured skill for hunting",
+                                        "default": "lazy",
+                                        "enum": [
+                                            "clueless",
+                                            "lazy",
+                                            "adventurous",
+                                            "aggressive"
+                                        ]
+                                    }
+                                },
+                                "required": [
+                                    "huntingSkill"
+                                ]
+                            }
+                        ]
+                    },
+                    "Dog": {
+                        "description": "A representation of a dog. Note that `Dog` will be used as the discriminator value.",
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/Pet"
+                            },
+                            {
+                                "type": "object",
+                                "properties": {
+                                    "packSize": {
+                                        "type": "integer",
+                                        "format": "int32",
+                                        "description": "the size of the pack the dog is from",
+                                        "default": 0,
+                                        "minimum": 0
+                                    }
+                                },
+                                "required": [
+                                    "packSize"
+                                ]
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        "tests": [
+            {
+                "description": "dog ok",
+                "data": {
+                    "name": "Terminator",
+                    "petType": "Dog",
+                    "packSize": 123
+                },
+                "valid": true
+            },
+            {
+                "description": "cat ok",
+                "data": {
+                    "name": "Terminator",
+                    "petType": "Cat",
+                    "huntingSkill": "adventurous"
+                },
+                "valid": true
+            },
+            {
+                "description": "dog failed",
+                "data": {
+                    "name": "Terminator",
+                    "petType": "Dog",
+                    "packSize": "qwe"
+                },
+                "valid": false
+            },
+            {
+                "description": "cat failed",
+                "data": {
+                    "name": "Terminator",
+                    "petType": "Cat",
+                    "huntingSkill": "fast"
+                },
+                "valid": false
+            }
+        ]
+    },
+
+    {
+        "subject": "discriminator inherit",
+        "schema": {
+            "type" : "object",
+            "properties" : {
+                "shape" : {
+                    "$ref": "#/components/schemas/Shape"
+                }
+            },
+            "components" : {
+                "schemas" : {
+                    "Shape" : {
+                        "type": "object",
+                        "discriminator": {
+                            "propertyName": "shapeType",
+                            "mapping" : {
+                                "sqr" : "Square",
+                                "rect" : "#/components/schemas/Rectangle"
+                            }
+                        },
+                        "properties": {
+                            "name": {
+                                "type": "string"
+                            },
+                            "shapeType": {
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "name",
+                            "shapeType"
+                        ]
+                    },
+                    "Square" : {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/Shape"
+                            },
+                            {
+                                "type": "object",
+                                "properties": {
+                                    "side": {
+                                        "type": "integer"
+                                    }
+                                },
+                                "required": [ "side" ]
+                            }
+                        ]
+                    },
+                    "Rectangle" : {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/Shape"
+                            },
+                            {
+                                "type": "object",
+                                "properties": {
+                                    "length": { "type": "integer" },
+                                    "width": { "type": "integer" }
+                                },
+                                "required": [ "length", "width" ]
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        "tests": [
+            {
+                "description": "square ok",
+                "data": {
+                    "shape" : {
+                        "name": "A",
+                        "shapeType": "sqr",
+                        "side": 123
+                    }
+                },
+                "valid": true
+            },
+            {
+                "description": "rect ok",
+                "data": {
+                    "shape" : {
+                        "name": "B",
+                        "shapeType": "rect",
+                        "length": 12,
+                        "width": 10
+                    }
+                },
+                "valid": true
+            },
+            {
+                "description": "square failed",
+                "data": {
+                    "shape" : {
+                        "name": "A",
+                        "shapeType": "sqr"
+                    }
+                },
+                "valid": false
+            },
+            {
+                "description": "rect failed",
+                "data": {
+                    "shape" : {
+                        "name": "B",
+                        "shapeType": "rect",
+                        "length": 12
+                    }
+                },
+                "valid": false
+            }
+        ]
+    },
+
+    {
+        "subject": "deprecated",
+        "schema": {
+            "type" : "string",
+            "enum" : ["deprecated"],
+            "deprecated": true
+        },
+        "tests": [
+            {
+                "description": "validate_deprected = true, ok",
+                "data": "deprecated",
+                "valid": true
+            },
+            {
+                "description": "validate_deprected = true, fail",
+                "data": "another value",
+                "valid": false
+            },
+            {
+                "description": "validate_deprected = false, ok",
+                "data": "another value",
+                "valid": true,
+                "new_params" : {
+                    "validate_deprecated" : 0
+                }
+            }
+        ]
+    },
+
+    {
+        "subject": "deprecated, empty schema",
+        "schema": {
+            "deprecated": true
+        },
+        "tests": [
+            {
+                "description": "validate_deprected = true, object ok",
+                "data": {},
+                "valid": true
+            },
+            {
+                "description": "validate_deprected = true, string ok",
+                "data": "value",
+                "valid": true
+            },
+            {
+                "description": "validate_deprected = false, object ok",
+                "data": {},
+                "valid": true,
+                "new_params" : {
+                    "validate_deprecated" : 0
+                }
+            }
+        ]
+    }
+]

@@ -434,7 +434,8 @@ qx.Class.define("callbackery.ui.form.Auto", {
                     case 'dateTime':
                     case 'date':
                         model[setter](value);
-                    
+                        break;
+                        
                     case 'selectBox':
                         let newItem = this._selectBoxKeyToItem[key][value];
                         if (!newItem) {

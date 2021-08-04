@@ -5,6 +5,7 @@
 
 #include <EXTERN.h>
 #include <perl.h>
+#define PY_SSIZE_T_CLEAN
 #include <Python.h>
 
 #include "pycompat.h"
@@ -264,7 +265,7 @@ safecall(self, args, keywds)
 {
     char *root;
     char *op_mask;
-    int op_mask_len;
+    Py_ssize_t op_mask_len;
     char op_mask_buf[OP_MASK_BUF_SIZE];
     PyObject *realargs;
     PyObject *ret;

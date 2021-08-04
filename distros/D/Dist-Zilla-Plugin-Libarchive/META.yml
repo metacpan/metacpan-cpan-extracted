@@ -16,6 +16,9 @@ meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Dist-Zilla-Plugin-Libarchive
+no_index:
+  directory:
+    - corpus
 requires:
   Archive::Libarchive: '0'
   Dist::Zilla: '6.024'
@@ -29,7 +32,7 @@ resources:
   bugtracker: https://github.com/uperl/Dist-Zilla-Plugin-Libarchive/issues
   homepage: https://metacpan.org/pod/Dist::Zilla::Plugin::Libarchive
   repository: git://github.com/uperl/Dist-Zilla-Plugin-Libarchive.git
-version: '0.02'
+version: '0.03'
 x_generated_by_perl: v5.34.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

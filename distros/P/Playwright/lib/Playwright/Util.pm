@@ -1,5 +1,5 @@
 package Playwright::Util;
-$Playwright::Util::VERSION = '0.011';
+$Playwright::Util::VERSION = '0.012';
 use strict;
 use warnings;
 
@@ -19,6 +19,17 @@ use feature qw{signatures};
 
 sub request ( $method, $url, $port, $ua, %args ) {
     my $fullurl = "http://localhost:$port/$url";
+
+    # Handle passing Playwright elements as arguments
+    if ( ref $args{args} eq 'ARRAY' ) {
+        @{ $args{args} } = map {
+            my $transformed = $_;
+            if ( ref($_) eq 'Playwright::ElementHandle' ) {
+                $transformed = { uuid => $_->{guid} };
+            }
+            $transformed;
+        } @{ $args{args} };
+    }
 
     my $request = HTTP::Request->new( $method, $fullurl );
     $request->header( 'Content-type' => 'application/json' );
@@ -58,6 +69,8 @@ sub _child ( $filename, $subroutine ) {
 
 sub await ($to_wait) {
     waitpid( $to_wait->{pid}, 0 );
+    confess("Timed out while waiting for event.")
+      unless -f $to_wait->{file} && -s _;
     return Sereal::Decoder->decode_from_file( $to_wait->{file} );
 }
 
@@ -75,7 +88,7 @@ Playwright::Util - Common utility functions for the Playwright module
 
 =head1 VERSION
 
-version 0.011
+version 0.012
 
 =head2 request(STRING method, STRING url, INTEGER port, LWP::UserAgent ua, HASH args) = HASH
 

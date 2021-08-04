@@ -4,7 +4,7 @@
       "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.46, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
@@ -33,13 +33,13 @@
       },
       "runtime" : {
          "requires" : {
-            "Graphics::ColorNames" : "3.5",
+            "Graphics::ColorNames" : "v3.5.0",
             "Image::Info" : "1.37",
             "Math::Trig" : "1"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "v1.0.4",
+   "version" : "v1.0.5",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

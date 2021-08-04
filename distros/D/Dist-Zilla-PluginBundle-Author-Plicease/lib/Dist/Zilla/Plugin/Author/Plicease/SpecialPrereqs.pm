@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::Author::Plicease::SpecialPrereqs 2.67 {
+package Dist::Zilla::Plugin::Author::Plicease::SpecialPrereqs 2.68 {
 
   use 5.020;
   use Moose;
@@ -292,7 +292,7 @@ Dist::Zilla::Plugin::Author::Plicease::SpecialPrereqs - Special prereq handling
 
 =head1 VERSION
 
-version 2.67
+version 2.68
 
 =head1 SYNOPSIS
 

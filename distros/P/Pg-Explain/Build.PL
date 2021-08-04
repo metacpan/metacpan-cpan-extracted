@@ -17,7 +17,7 @@ my $builder = Module::Build->new(
         'Test::Exception' => 0,
     },
     add_to_cleanup => [ 'Pg-Explain-*' ],
-    requires       => { 'Clone' => 0, 'YAML' => '1.15', 'JSON' => 0, 'XML::Simple' => 0, 'Digest::SHA' => 0, 'HOP::Lexer' => 0, 'perl' => '5.018' },
+    requires       => { 'Clone' => 0, 'YAML' => '1.15', 'JSON' => 0, 'XML::Simple' => 0, 'Digest::SHA' => 0, 'HOP::Lexer' => 0, 'perl' => '5.018', 'List::Util' => 0, },
     meta_merge     => {
         'meta-spec' => {
             version => 2,

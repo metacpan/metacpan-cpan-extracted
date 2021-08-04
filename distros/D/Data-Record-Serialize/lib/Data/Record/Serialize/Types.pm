@@ -5,12 +5,12 @@ package Data::Record::Serialize::Types;
 use strict;
 use warnings;
 
-our $VERSION = '0.23';
+our $VERSION = '0.24';
 
 use Type::Utils -all;
-use Types::Standard -types;
+use Types::Standard qw( ArrayRef Str Enum );
 use Type::Library -base,
-  -declare => qw[ ArrayOfStr ];
+  -declare => qw[ ArrayOfStr SerializeType ];
 
 use namespace::clean;
 
@@ -20,6 +20,8 @@ declare ArrayOfStr,
 coerce ArrayOfStr,
   from Str, q { [ $_ ] };
 
+declare SerializeType,
+  as Enum[ qw( N I S B) ];
 
 #
 # This file is part of Data-Record-Serialize
@@ -45,7 +47,7 @@ Data::Record::Serialize::Types - Types for Data::Record::Serialize
 
 =head1 VERSION
 
-version 0.23
+version 0.24
 
 =head1 SUPPORT
 

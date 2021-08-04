@@ -3,7 +3,7 @@ NAME
     extends Restify with more actions
 
 VERSION
-    version 0.03
+    version 0.04
 
 SYNOPSIS
         plugin 'Restify::OtherActions';

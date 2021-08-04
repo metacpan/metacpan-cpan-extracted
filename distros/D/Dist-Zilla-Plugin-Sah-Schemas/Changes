@@ -1,3 +1,21 @@
+0.027   2021-07-30  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- Add description for exclude_module configuration.
+
+
+0.026   2021-07-29  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Still assume old Data::Sah::Resolve (0.009-) return
+	  structure.
+
+
+0.025   2021-07-29  Released-By: PERLANCAR; Urgency: medium
+
+	- Bump prereq version Data::Sah::Util::Subschema to 0.005.
+
+
 0.024   2021-07-29  Released-By: PERLANCAR; Urgency: medium
 
 	- Update to Data::Sah::Resolve 0.010.

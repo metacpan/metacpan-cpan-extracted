@@ -1,0 +1,24 @@
+<explain xmlns="http://www.postgresql.org/2009/explain">
+  <Query>
+    <Plan>
+      <Node-Type>Result</Node-Type>
+      <Parallel-Aware>false</Parallel-Aware>
+      <Async-Capable>false</Async-Capable>
+      <Startup-Cost>0.00</Startup-Cost>
+      <Total-Cost>0.01</Total-Cost>
+      <Plan-Rows>1</Plan-Rows>
+      <Plan-Width>4</Plan-Width>
+      <Actual-Startup-Time>0.001</Actual-Startup-Time>
+      <Actual-Total-Time>0.001</Actual-Total-Time>
+      <Actual-Rows>1</Actual-Rows>
+      <Actual-Loops>1</Actual-Loops>
+    </Plan>
+    <Settings>
+      <random_page_cost>13.666</random_page_cost>
+    </Settings>
+    <Planning-Time>0.051</Planning-Time>
+    <Triggers>
+    </Triggers>
+    <Execution-Time>0.028</Execution-Time>
+  </Query>
+</explain>

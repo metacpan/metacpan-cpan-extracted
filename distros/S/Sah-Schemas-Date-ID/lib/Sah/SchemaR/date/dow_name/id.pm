@@ -1,9 +1,9 @@
 package Sah::SchemaR::date::dow_name::id;
 
-our $DATE = '2020-03-08'; # DATE
-our $VERSION = '0.005'; # VERSION
+our $DATE = '2021-08-04'; # DATE
+our $VERSION = '0.007'; # VERSION
 
-our $rschema = ["cistr",[{examples=>[{valid=>0,value=>""},{valid=>1,value=>"mg"},{valid=>1,value=>"min"},{valid=>1,value=>"minggu"},{summary=>"English",valid=>0,value=>"sun"},{valid=>0,value=>1}],in=>["mg","sn","sl","rb","km","jm","sb","min","sen","sel","rab","kam","jum","sab","minggu","senin","selasa","rabu","kamis","jumat","sabtu"],summary=>"Day-of-week name (abbreviated or full, in Indonesian)"}],["cistr"]];
+our $rschema = do{my$var={base=>"cistr",clsets_after_base=>[{description=>"\nSee also related schemas for other locales, e.g.\n<pm:Sah::Schema::date::dow_name::en> (English),\n<pm:Sah::Schema::date::dow_name::en_or_id> (English/Indonesian), etc.\n\n",examples=>[{summary=>"Empty string",valid=>0,value=>""},{valid=>1,value=>"mg"},{valid=>1,value=>"min"},{valid=>1,value=>"minggu"},{summary=>"English",valid=>0,value=>"sun"},{summary=>"Not a name",valid=>0,value=>1}],in=>["mg","sn","sl","rb","km","jm","sb","min","sen","sel","rab","kam","jum","sab","minggu","senin","selasa","rabu","kamis","jumat","sabtu"],summary=>"Day-of-week name (abbreviated or full, in Indonesian)"}],clsets_after_type=>['$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_base}[0]'],resolve_path=>["cistr"],type=>"cistr",v=>2};$var->{clsets_after_type}[0]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_base}[0];$var};
 
 1;
 # ABSTRACT: Day-of-week name (abbreviated or full, in Indonesian)
@@ -20,7 +20,7 @@ Sah::SchemaR::date::dow_name::id - Day-of-week name (abbreviated or full, in Ind
 
 =head1 VERSION
 
-This document describes version 0.005 of Sah::SchemaR::date::dow_name::id (from Perl distribution Sah-Schemas-Date-ID), released on 2020-03-08.
+This document describes version 0.007 of Sah::SchemaR::date::dow_name::id (from Perl distribution Sah-Schemas-Date-ID), released on 2021-08-04.
 
 =head1 DESCRIPTION
 
@@ -50,7 +50,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

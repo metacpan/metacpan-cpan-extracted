@@ -1,6 +1,33 @@
 Changelog for Mojo-Leds
 
-1.02 2021-07-28T14:01:04
+1.04 2021-08-04T13:52:08
+ - [Minor] Removed Test::Needs for imcompatibility with Dist::Zilla. Manual
+   check of modules in tests
+ - [Minor] Travis perl version changed
+ - [Minor] Reduced loaded modules
+ - Reduced number of prereqs
+ - [Minor] Renamed tests
+ - [Minor] cosmetic changes to the error pages
+ - Solved a bug where keys is used with a scalar
+
+1.03 2021-08-03T17:07:50
+ - Add test for server errors
+ - [Minor] Add background images to customized server error code
+ - Add customized server errors (404, 500) pages
+ - [Minor] Removed comments
+ - [Minor] Changes
+ - Removed recursive load of config file
+ - DBIx fully implemented
+ - Riorganizzazione librerie REST e attuale implementazione parziale della
+   libreria M::L::Rest::DBIx
+ - Add Rest module for Class::DBIx interface
+ - Removed two required plugins that was required only for tests and can be
+   optionally installed to use Mojo::Leds with MongoDB or other DB
+   (M::P::Restify::OtherActions and M::P::Mongodbv2)
+ - [Minor] Add Dockerfile
+ - [Minor] Add $...::VERSION to modules
+
+1.02 2021-07-28T12:20:57
  - Better identification of static files managed by controller (e.g. .js,
    .css local to the controller)
  - Add minimum version for perl owing to s///r usage in Page.pm

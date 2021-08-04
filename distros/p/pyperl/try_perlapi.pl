@@ -20,6 +20,7 @@ print {$C} <<"EOT";
 #include <EXTERN.h>
 #define PERL_EXT 1
 #include <perl.h>
+#define PY_SSIZE_T_CLEAN
 #include <Python.h>
 
 #include "try_perlapi.h"

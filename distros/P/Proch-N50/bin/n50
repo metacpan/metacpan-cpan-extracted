@@ -21,7 +21,7 @@ our %program = (
     'NAME'    => 'FASTX N50',
     'AUTHOR'  => 'Andrea Telatin',
     'MAIL'    => 'andrea@telatin.com',
-    'VERSION' => '4.0.0',
+    'VERSION' => '4.0.1',
 );
 my $hasJSON = undef;
 my $t;
@@ -239,10 +239,12 @@ if ( defined $opt_format ) {
 foreach my $file (@ARGV) {
 
     # Check if file exists / check if '-' supplied read STDIN
-    if ( ( !-e "$file" ) and ( $file ne '-' ) ) {
+    if ( ( ! -e "$file" ) and ( $file ne '-' ) ) {
         die " FATAL ERROR:\n File not found ($file).\n";
-    }
-    elsif ( $file eq '-' ) {
+    } elsif (-d "$file") {
+        print STDERR "WARNING: Ignoring directory $file.\n";
+        next;
+    } elsif ( $file eq '-' ) {
 
         # Set file to <STDIN>
         $file = '-';
@@ -490,7 +492,7 @@ sub version {
 
     printMessage("Program to calculate N50 from multiple FASTA/FASTQ files,\n" .
 
-  "https://metacpan.org/pod/distribution/Proch-N50/bin/n50", '', 'blue', 'blue'
+  	"https://metacpan.org/pod/distribution/Proch-N50/bin/n50", '', 'blue', 'blue'
     );
     printMessage("Using Proch::N50 $Proch::N50::VERSION", '', undef, 'red');
 
@@ -580,7 +582,7 @@ n50 - A script to calculate N50 from one or multiple FASTA/FASTQ files.
 
 =head1 VERSION
 
-version 1.3.0
+version 1.4.1
 
 =head1 SYNOPSIS
 
@@ -594,6 +596,14 @@ It will print the result in different formats, by default only the N50 is printe
 for a single file and all metrics in TSV format for multiple files.
 
 I<*>: See L<https://lh3.github.io/2020/04/08/a-new-metric-on-assembly-contiguity>
+
+=head1 NAME
+
+n50 - A script to calculate N50 from one or multiple FASTA/FASTQ files.
+
+=head1 VERSION
+
+version 1.3.0
 
 =head1 PARAMETERS
 
@@ -753,7 +763,7 @@ Use C<-j> as shortcut for C<--format json>.
 =item I<custom>
 
 Will print the output using the template string provided with -t TEMPLATE.
-Fields are in the C<{field_name}> format. C<{new}>/C<{n}>/C<\n> is the newline, C<{tab}>/C<{t}>/C<\t> is a tab.
+Fields are in theÂ C<{field_name}> format. C<{new}>/C<{n}>/C<\n> is the newline, C<{tab}>/C<{t}>/C<\t> is a tab.
 All the keys of the JSON object are valid fields: C<{seqs}>, C<{N50}>, C<{min}>, C<{max}>, C<{size}>.
 
 =back
@@ -792,6 +802,30 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+=head1 CITING
+
+Telatin A, Fariselli P, Birolo G.
+I<SeqFu: A Suite of Utilities for the Robust and Reproducible Manipulation of Sequence Files>.
+Bioengineering 2021, 8, 59. L<https://doi.org/10.3390/bioengineering8050059>
+
+=head1 CONTRIBUTING, BUGS
+
+The repository of this project is available at
+L<https://github.com/quadram-institute-bioscience/seqfu/>.
+The Perl module is inside the "n50" subdirectory.
+
+=head1 AUTHOR
+
+Andrea Telatin <andrea@telatin.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2018-2020 by Andrea Telatin.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
 
 =head1 AUTHOR
 

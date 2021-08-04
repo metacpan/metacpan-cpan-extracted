@@ -15,7 +15,7 @@
 # program.  If not, see <http://www.perlfoundation.org/artistic_license_2_0>.
 #
 package Graphics::Fig::Spline;
-our $VERSION = 'v1.0.4';
+our $VERSION = 'v1.0.5';
 
 use strict;
 use warnings;
@@ -163,7 +163,7 @@ sub new {
 }
 
 #
-# Graphics::Fig::Splint::addPoints: add points and shapeFactors
+# Graphics::Fig::Spline::addPoints: add points and shapeFactors
 #   $self:       object
 #   $parameters: reference to parameter hash
 #   $newPoints:  reference to array of points to add
@@ -436,7 +436,7 @@ sub scale {
 }
 
 #
-# Graphics::Fig::Spline return [[xmin, ymin], [xmax, ymax]]
+# Graphics::Fig::Spline::getbox: return [[xmin, ymin], [xmax, ymax]]
 #   $self:       object
 #   $parameters: getbbox parameters
 #

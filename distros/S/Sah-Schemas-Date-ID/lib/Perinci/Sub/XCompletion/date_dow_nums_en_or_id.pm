@@ -1,7 +1,7 @@
 package Perinci::Sub::XCompletion::date_dow_nums_en_or_id;
 
-our $DATE = '2020-03-08'; # DATE
-our $VERSION = '0.005'; # VERSION
+our $DATE = '2021-08-04'; # DATE
+our $VERSION = '0.007'; # VERSION
 
 use 5.010001;
 use strict;
@@ -48,7 +48,7 @@ Perinci::Sub::XCompletion::date_dow_nums_en_or_id - Generate completion for date
 
 =head1 VERSION
 
-This document describes version 0.005 of Perinci::Sub::XCompletion::date_dow_nums_en_or_id (from Perl distribution Sah-Schemas-Date-ID), released on 2020-03-08.
+This document describes version 0.007 of Perinci::Sub::XCompletion::date_dow_nums_en_or_id (from Perl distribution Sah-Schemas-Date-ID), released on 2021-08-04.
 
 =head1 CONFIGURATION
 
@@ -59,7 +59,7 @@ This document describes version 0.005 of Perinci::Sub::XCompletion::date_dow_num
 
 Usage:
 
- gen_completion() -> [status, msg, payload, meta]
+ gen_completion() -> [$status_code, $reason, $payload, \%result_meta]
 
 This function is not exported.
 
@@ -67,12 +67,12 @@ No arguments.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -102,7 +102,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

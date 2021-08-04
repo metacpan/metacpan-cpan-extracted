@@ -12,7 +12,7 @@ use Data::Record::Serialize::Error { errors =>
         insert
    )] }, -all;
 
-our $VERSION = '0.23';
+our $VERSION = '0.24';
 
 use Data::Record::Serialize::Types -types;
 
@@ -32,23 +32,10 @@ use namespace::clean;
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
 has dsn => (
     is       => 'ro',
     required => 1,
     coerce   => sub {
-
         my $arg = 'ARRAY' eq ref $_[0] ? $_[0] : [ $_[0] ];
         my @dsn;
         for my $el ( @{$arg} ) {
@@ -66,6 +53,12 @@ has dsn => (
 
         return join( ':', @dsn );
     },
+);
+
+has _cached => (
+    is       => 'ro',
+    default  => 0,
+    init_arg => 'cached',
 );
 
 
@@ -114,14 +107,11 @@ has drop_table => (
 
 
 
-
 has create_table => (
     is      => 'ro',
     isa     => Bool,
     default => 1,
 );
-
-
 
 
 
@@ -160,11 +150,11 @@ has db_pass => (
     default => '',
 );
 
-
 has _sth => (
     is       => 'rwp',
     init_arg => undef,
 );
+
 has _dbh => (
     is       => 'rwp',
     init_arg => undef,
@@ -176,12 +166,10 @@ has column_defs => (
     clearer  => 1,
     init_arg => undef,
     builder  => sub {
-
         my $self = shift;
 
         my @column_defs;
         for my $field ( @{ $self->output_fields } ) {
-
             push @column_defs,
               join( ' ',
                 $field,
@@ -191,11 +179,7 @@ has column_defs => (
 
         return join ', ', @column_defs;
     },
-
 );
-
-
-
 
 
 
@@ -236,24 +220,41 @@ has queue => (
     default  => sub { [] },
 );
 
-has '+_use_integer' => ( is => 'rwp', default => 1 );
+around '_build__nullified' => sub {
+    my $orig = shift;
+    my $self = $_[0];
 
-has '+_need_types' => ( is => 'rwp', default => 1 );
+    my $nullified = $self->$orig( @_ );
 
-has '+_map_types' => (
-    is      => 'rwp',
-    default => sub { {S => 'text', N => 'real', I => 'integer'} },
-);
+    # defer to the caller
+    return $nullified if $self->has_nullify;
 
-before '_build__nullify' => sub {
-
-    my $self = shift;
-    $self->_set__nullify( $self->type_index->{'numeric'} );
+    # add all of the numeric fields
+    [ @{ $self->numeric_fields } ];
 
 };
 
-sub _table_exists {
+my %MapTypes = (
+    Pg      => { S => 'text', N => 'real', I => 'integer', B => 'boolean' },
+    SQLite  => { S => 'text', N => 'real', I => 'integer', B => 'integer' },
+    Default => { S => 'text', N => 'real', I => 'integer', B => 'integer' },
+);
 
+sub _map_types {
+    $MapTypes{ $_[0]->_dbi_driver } // $MapTypes{ Default }
+}
+
+
+
+
+
+
+
+
+
+sub to_bool { $_[0] ? 1 : 0 }
+
+sub _table_exists {
     my $self = shift;
 
     return
@@ -262,15 +263,24 @@ sub _table_exists {
 }
 
 sub _fq_table_name {
-
     my $self = shift;
 
     join( '.', ( $self->has_schema ? ( $self->schema ) : () ), $self->table );
 }
 
+has _dsn_components => (
+    is       => 'lazy',
+    init_arg => undef,
+    builder  => sub {
+        my @dsn = DBI->parse_dsn( $_[0]->dsn )
+            or error( 'param', "unable to parse DSN: ", $_[0]->dsn );
+        \@dsn;
+    },
+);
 
-
-
+sub _dbi_driver {
+    $_[0]->_dsn_components->[1];
+}
 
 my %producer = (
     DB2       => 'DB2',
@@ -282,36 +292,45 @@ my %producer = (
     Sybase    => 'Sybase',
 );
 
-sub setup {
+has _producer => (
+    is       => 'lazy',
+    init_arg => undef,
+    builder  => sub {
+        my $dbi_driver = $_[0]->_dbi_driver;
+        $producer{$dbi_driver} || $dbi_driver;
+    },
+);
 
+
+
+
+
+
+sub setup {
     my $self = shift;
 
     return if $self->_dbh;
 
-    my @dsn = DBI->parse_dsn( $self->dsn )
-      or error( 'param', "unable to parse DSN: ", $self->dsn );
-    my $dbi_driver = $dsn[1];
-
-    my $producer = $producer{$dbi_driver} || $dbi_driver;
-
     my %attr = (
-        AutoCommit => !$self->batch,
-        RaiseError => 1,
-        PrintError => 0,
+        AutoCommit               => !$self->batch,
+        RaiseError               => 1,
+        PrintError               => 0,
+        'private_' . __PACKAGE__ => __FILE__ . __LINE__,
     );
 
     $attr{sqlite_allow_multiple_statements} = 1
-      if $dbi_driver eq 'SQLite';
+      if $self->_dbi_driver eq 'SQLite';
+
+    my $connect = $self->_cached ? 'connect_cached' : 'connect';
 
     $self->_set__dbh(
-        DBI->connect( $self->dsn, $self->db_user, $self->db_pass, \%attr ) )
+        DBI->$connect( $self->dsn, $self->db_user, $self->db_pass, \%attr ) )
       or error( 'connect', 'error connecting to ', $self->dsn, "\n" );
 
     $self->_dbh->trace( $self->dbitrace )
       if $self->dbitrace;
 
-    if ( $self->drop_table || ( $self->create_table && !$self->_table_exists ) )
-    {
+    if ( $self->drop_table || ( $self->create_table && !$self->_table_exists ) ) {
         my $tr = SQL::Translator->new(
             from => sub {
                 my $schema = $_[0]->schema;
@@ -319,7 +338,6 @@ sub setup {
                   or error( 'schema', $schema->error );
 
                 for my $field_name ( @{ $self->output_fields } ) {
-
                     $table->add_field(
                         name      => $field_name,
                         data_type => $self->output_types->{$field_name}
@@ -333,11 +351,10 @@ sub setup {
 
                 1;
             },
-            to             => $producer,
+            to             => $self->_producer,
             producer_args  => { no_transaction => 1 },
             add_drop_table => $self->drop_table && $self->_table_exists,
         );
-
 
         my $sql = $tr->translate
           or error( 'schema', $tr->error );
@@ -415,13 +432,11 @@ sub setup {
 
 
 sub flush {
-
     my $self = shift;
 
     my $queue = $self->queue;
 
     if ( @{ $queue } ) {
-
         my $last;
         eval {
             $self->_sth->execute( @$last )
@@ -461,26 +476,21 @@ sub flush {
 
 
 sub send {
-
     my $self = shift;
 
     if ( $self->batch ) {
-
         push @{ $self->queue }, [ @{ $_[0] }{ @{ $self->output_fields } } ];
-
         $self->flush
           if @{ $self->queue } == $self->batch;
 
     }
     else {
-
         eval {
             $self->_sth->execute( @{ $_[0] }{ @{ $self->output_fields } } );
         };
         error( "insert", { msg => "record insertion failed: $@", payload => $_[0] } )
           if $@;
     }
-
 }
 
 
@@ -512,10 +522,7 @@ after '_trigger_output_types' => sub {
 
 
 
-
-
 sub close {
-
     my $self = shift;
 
     $self->flush
@@ -539,7 +546,6 @@ sub close {
 
 
 sub DEMOLISH {
-
     my $self = shift;
 
     warnings::warnif( 'Data::Record::Serialize::Encode::dbi::queue', __PACKAGE__.": record queue is not empty in object destruction" )
@@ -547,7 +553,6 @@ sub DEMOLISH {
 
     $self->_dbh->disconnect
       if defined $self->_dbh;
-
 }
 
 
@@ -561,14 +566,7 @@ sub DEMOLISH {
 
 
 
-
-sub say    { error( 'Encode::stub_method', 'internal error: stub method <say> invoked' ) }
-sub print  { error( 'Encode::stub_method', 'internal error: stub method <print> invoked' ) }
-sub encode { error( 'Encode::stub_method', 'internal error: stub method <encode> invoked' ) }
-
-with 'Data::Record::Serialize::Role::Sink';
-with 'Data::Record::Serialize::Role::Encode';
-
+with 'Data::Record::Serialize::Role::EncodeAndSink';
 
 1;
 
@@ -586,7 +584,7 @@ __END__
 
 =pod
 
-=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory
+=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory Postgres
 
 =head1 NAME
 
@@ -594,7 +592,7 @@ Data::Record::Serialize::Encode::dbi - store a record in a database
 
 =head1 VERSION
 
-version 0.23
+version 0.24
 
 =head1 SYNOPSIS
 
@@ -623,6 +621,10 @@ Field types are recognized and converted to SQL types via the following map:
   N => 'real'
   I => 'integer'
 
+For Postgres, C<< B => 'boolean' >>. For other databases, C<< B => 'integer' >>.
+This encoder handles transformation of the input "truthy" Boolean value into
+a form appropriate for the database to ingest.
+
 =head2 NULL values
 
 By default numeric fields are set to C<NULL> if they are empty.  This
@@ -645,65 +647,47 @@ objects.
 =head1 ATTRIBUTES
 
 These attributes are available in addition to the standard attributes
-defined for L<Data::Record::Serialize-E<gt>new>|Data::Record::Serialize/new>.
+defined for L<< Data::Record::Serialize::new|Data::Record::Serialize/new >>.
 
 =head2 C<dsn>
 
-I<Required> The DBI Data Source Name (DSN) passed to B<L<DBI>>.  It
-may either be a string or an arrayref containing strings or arrayrefs,
-which should contain key-value pairs.  Elements in the sub-arrays are
-joined with C<=>, elements in the top array are joined with C<:>.  For
-example,
-
-  [ 'SQLite', { dbname => $db } ]
-
-is transformed to
-
-  SQLite:dbname=$db
-
-The standard prefix of C<dbi:> will be added if not present.
+The value passed to the constructor.
 
 =head2 C<table>
 
-I<Required> The name of the table in the database which will contain the records.
-It will be created if it does not exist.
+The value passed to the constructor.
 
 =head2 C<schema>
 
-The schema to which the table belongs.  Optional.
+The value passed to the constructor.
 
 =head2 C<drop_table>
 
-If true, the table is dropped and a new one is created.
+The value passed to the constructor.
 
 =head2 C<create_table>
 
-If true, a table will be created if it does not exist.
+The value passed to the constructor.
 
 =head2 C<primary>
 
-A single output column name or an array of output column names which
-should be the primary key(s).  If not specified, no primary keys are
-defined.
+The value passed to the constructor.
 
 =head2 C<db_user>
 
-The name of the database user
+The value passed to the constructor.
 
 =head2 C<db_pass>
 
-The database password
+The value passed to the constructor.
 
 =head2 C<batch>
 
-The number of rows to write to the database at once.  This defaults to 100.
-
-If greater than 1, C<batch> rows are cached and then sent out in a
-single transaction.  See L</Performance> for more information.
+The value passed to the constructor.
 
 =head2 C<dbitrace>
 
-A trace setting passed to  L<DBI>.
+The value passed to the constructor.
 
 =head1 METHODS
 
@@ -716,6 +700,12 @@ to the database.  This is only of interest if L</batch> is not C<0>.
 
 Each element is an array containing values to be inserted into the database,
 in the same order as the fields in L<Data::Serialize/output_fields>.
+
+=head2 to_bool
+
+   $bool = $self->to_bool( $truthy );
+
+Convert a truthy value to something that the JSON encoders will recognize as a boolean.
 
 =head2 flush
 
@@ -813,6 +803,75 @@ C<Data::Record::Serialize::Encode::dbi::queue> warning to silence it.
 =for Pod::Coverage say
   print
   encode
+
+=head1 CONSTRUCTOR OPTIONS
+
+=over
+
+=item C<dsn>
+
+I<Required> The DBI Data Source Name (DSN) passed to B<L<DBI>>.  It
+may either be a string or an arrayref containing strings or arrayrefs,
+which should contain key-value pairs.  Elements in the sub-arrays are
+joined with C<=>, elements in the top array are joined with C<:>.  For
+example,
+
+  [ 'SQLite', { dbname => $db } ]
+
+is transformed to
+
+  SQLite:dbname=$db
+
+The standard prefix of C<dbi:> will be added if not present.
+
+=item C<cached>
+
+If true, the database connection is made with L<DBI::connect_cached|DBI/connect_cached> rather than
+L<DBI::connect|DBI/connect>
+
+=item C<table>
+
+I<Required> The name of the table in the database which will contain the records.
+It will be created if it does not exist.
+
+=item C<schema>
+
+The schema to which the table belongs.  Optional.
+
+=item C<drop_table>
+
+If true, the table is dropped and a new one is created.
+
+=item C<create_table>
+
+If true, a table will be created if it does not exist.
+
+=item C<primary>
+
+A single output column name or an array of output column names which
+should be the primary key(s).  If not specified, no primary keys are
+defined.
+
+=item C<db_user>
+
+The name of the database user
+
+=item C<db_pass>
+
+The database password
+
+=item C<batch>
+
+The number of rows to write to the database at once.  This defaults to 100.
+
+If greater than 1, C<batch> rows are cached and then sent out in a
+single transaction.  See L</Performance> for more information.
+
+=item C<dbitrace>
+
+A trace setting passed to  L<DBI>.
+
+=back
 
 =head1 SUPPORT
 

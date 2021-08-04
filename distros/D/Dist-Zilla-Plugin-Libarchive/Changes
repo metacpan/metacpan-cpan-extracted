@@ -1,5 +1,10 @@
 Revision history for Dist-Zilla-Plugin-Libarchive},
 
+0.03      2021-08-03 12:03:25 -0600
+  - Exclude corpus from indexing oops (gh#7)
+  - Set uname and gname to root instead of leaving them blank (gh#6, gh#7)
+  - Set execute permissions in archive for scripts that are executable (gh#5, gh#7)
+
 0.02      2021-08-03 09:29:15 -0600
   - First CPAN release
 

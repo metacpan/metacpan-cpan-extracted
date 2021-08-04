@@ -1,5 +1,5 @@
 package Hustle::Table;
-use version; our $VERSION=version->declare("v0.2.2");
+use version; our $VERSION=version->declare("v0.2.3");
 
 use strict;
 use warnings;
@@ -11,6 +11,10 @@ use feature "state";
 
 use Carp qw<carp croak>;
 
+use Exporter 'import';
+
+our @EXPORT_OK=qw< hustle_add hustle_remove hustle_set_default hustle_reset_counter hustle_prepare_dispatcher >;
+our @EXPORT=@EXPORT_OK;
 
 use constant DEBUG=>0;
 
@@ -28,7 +32,8 @@ use enum (qw<matcher_ sub_ label_ count_>);
 #
 sub new {
 	my $class=shift//__PACKAGE__;
-	bless [[undef,sub {1},"default",0]],$class;	#Prefill with default handler
+	my $default=shift//sub {1};
+	bless [[undef,$default,"default",0]],$class;	#Prefill with default handler
 }
 
 #Add and sort accorind to count/priority
@@ -49,15 +54,25 @@ sub add {
 				$entry=[$item->@{qw<matcher sub label count>}];
 			}
 			default {
-				my %item=@list;
-				$entry=[@item{qw<matcher sub label count>}];
-				$rem =1;
+				if(@list>=4){		#Flat hash/list key pairs passed in sub call
+					my %item=@list;
+					$entry=[@item{qw<matcher sub label count>}];
+					$rem =1;
+				}
+				elsif(@list==2){
+					# matcher=>sub
+					$entry=[$list[0],$list[1],undef,undef];
+					$rem=1;
+				}
+				else{
+					
+				}
 			}
 
 		}
 		$entry->[label_]=$id++ unless defined $entry->[label_];
 		$entry->[count_]= 0 unless defined $entry->[count_];
-		croak "target is not a sub refernce" unless ref $entry->[sub_] eq "CODE";
+		croak "target is not a sub reference" unless ref $entry->[sub_] eq "CODE";
 		croak "matcher not specified" unless defined $entry->[matcher_];
 		#Append the item to the of the list (minus defaut)
 		if(defined $entry->[matcher_]){
@@ -304,8 +319,12 @@ sub _prepare_online_cached {
 }
 
 
+*hustle_add=*add;
+*hustle_remove=*remove;
+*hustle_set_default=*set_default;
+*hustle_reset_counter=*reset_counter;
+*hustle_prepare_dispatcher=*prepare_dispatcher;
 
-# Autoload methods go after =cut, and are processed by the autosplit program.
 
 1;
 __END__

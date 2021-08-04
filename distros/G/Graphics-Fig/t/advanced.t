@@ -72,7 +72,7 @@ eval {
     $fig->circle(0.5, { center => $triangle[0], color => "brown3" });
 
     #
-    # Dran an ellipse that exactly passes through the first three points
+    # Draw an ellipse that exactly passes through the first three points
     # of the pentagon and the first two points of the triangle.
     #
     $fig->ellipse([ $polygon[0], $polygon[1], $polygon[2],

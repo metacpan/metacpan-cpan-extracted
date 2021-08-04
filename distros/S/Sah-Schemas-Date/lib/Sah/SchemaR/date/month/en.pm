@@ -1,9 +1,9 @@
 package Sah::SchemaR::date::month::en;
 
-our $DATE = '2020-03-08'; # DATE
-our $VERSION = '0.013'; # VERSION
+our $DATE = '2021-08-04'; # DATE
+our $VERSION = '0.017'; # VERSION
 
-our $rschema = ["cistr",[{examples=>[{valid=>0,value=>""},{valid=>1,value=>1},{valid=>1,value=>"jan"},{valid=>1,value=>"FeB"},{valid=>1,value=>"March"},{valid=>0,value=>"foo"},{valid=>0,value=>13}],in=>[1,2,3,4,5,6,7,8,9,10,11,12,"jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec","january","february","march","april","june","july","august","september","october","november","december"],summary=>"Month number/name (abbreviated or full, in English)"}],["cistr"]];
+our $rschema = do{my$var={base=>"cistr",clsets_after_base=>[{description=>"\nNote that name is not coerced to number; use\n<pm:Sah::Schema::date::month_num::id> for that.\n\nSee also related schemas for other locales, e.g.\n<pm:Sah::Schema::date::month::id> (Indonesian),\n<pm:Sah::Schema::date::month::en_or_id> (English/Indonesian), etc.\n\n",examples=>[{summary=>"Empty string",valid=>0,value=>""},{valid=>1,value=>1},{valid=>1,value=>"jan"},{valid=>1,value=>"FeB"},{valid=>1,value=>"March"},{summary=>"Not a month name/number",valid=>0,value=>"foo"},{summary=>"Number not in 1-12",valid=>0,value=>13}],in=>[1,2,3,4,5,6,7,8,9,10,11,12,"jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec","january","february","march","april","june","july","august","september","october","november","december"],summary=>"Month number/name (abbreviated or full, in English)"}],clsets_after_type=>['$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_base}[0]'],resolve_path=>["cistr"],type=>"cistr",v=>2};$var->{clsets_after_type}[0]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_base}[0];$var};
 
 1;
 # ABSTRACT: Month number/name (abbreviated or full, in English)
@@ -20,7 +20,7 @@ Sah::SchemaR::date::month::en - Month number/name (abbreviated or full, in Engli
 
 =head1 VERSION
 
-This document describes version 0.013 of Sah::SchemaR::date::month::en (from Perl distribution Sah-Schemas-Date), released on 2020-03-08.
+This document describes version 0.017 of Sah::SchemaR::date::month::en (from Perl distribution Sah-Schemas-Date), released on 2021-08-04.
 
 =head1 DESCRIPTION
 
@@ -50,7 +50,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

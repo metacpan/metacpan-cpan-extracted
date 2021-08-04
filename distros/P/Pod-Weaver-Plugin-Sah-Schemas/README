@@ -1,11 +1,157 @@
+  Using with Data::Sah
+    To check data against this schema (requires Data::Sah):
+
+     use Data::Sah qw(gen_validator);
+     my \$validator = gen_validator("$sch_name*");
+     say \$validator->(\$data) ? "valid" : "INVALID!";
+
+    The above schema returns a boolean value (true if data is valid, false
+    if otherwise). To return an error message string instead (empty string
+    if data is valid, a non-empty error message otherwise):
+
+     my \$validator = gen_validator("$sch_name", {return_type=>'str_errmsg'});
+     my \$errmsg = \$validator->(\$data);
+    _
+
+                        my $v = Data::Sah::gen_validator($sch, {return_type=>"str_errmsg"});
+                        if ($random_valid_eg) {
+                            push @pod, " \n";
+                            push @pod, " # a sample valid data\n";
+                            push @pod, " \$data = ".Data::Dmp::dmp($random_valid_eg->{value}).";\n";
+                            push @pod, " my \$errmsg = \$validator->(\$data); # => ".Data::Dmp::dmp($v->($random_valid_eg->{value}))."\n";
+                        }
+                        if ($random_invalid_eg) {
+                            push @pod, " \n";
+                            push @pod, " # a sample invalid data\n";
+                            push @pod, " \$data = ".Data::Dmp::dmp($random_invalid_eg->{value}).";\n";
+                            push @pod, " my \$errmsg = \$validator->(\$data); # => ".Data::Dmp::dmp($v->($random_invalid_eg->{value}))."\n";
+                        }
+
+                        push @pod, <<"_";
+
+    Often a schema has coercion rule or default value, so after validation
+    the validated value is different. To return the validated
+    (set-as-default, coerced, prefiltered) value:
+
+     my \$validator = gen_validator("$sch_name", {return_type=>'str_errmsg+val'});
+     my \$res = \$validator->(\$data); # [\$errmsg, \$validated_val]
+    _
+
+                        $v = Data::Sah::gen_validator($sch, {return_type=>"str_errmsg+val"});
+                        if ($random_valid_eg) {
+                            push @pod, " \n";
+                            push @pod, " # a sample valid data\n";
+                            push @pod, " \$data = ".Data::Dmp::dmp($random_valid_eg->{value}).";\n";
+                            push @pod, " my \$res = \$validator->(\$data); # => ".Data::Dmp::dmp($v->($random_valid_eg->{value}))."\n";
+                        }
+                        if ($random_invalid_eg) {
+                            push @pod, " \n";
+                            push @pod, " # a sample invalid data\n";
+                            push @pod, " \$data = ".Data::Dmp::dmp($random_invalid_eg->{value}).";\n";
+                            push @pod, " my \$res = \$validator->(\$data); # => ".Data::Dmp::dmp($v->($random_invalid_eg->{value}))."\n";
+                        }
+
+                        push @pod, <<"_";
+
+    Data::Sah can also create validator that returns a hash of detaild error
+    message. Data::Sah can even create validator that targets other
+    language, like JavaScript, from the same schema. Other things Data::Sah
+    can do: show source code for validator, generate a validator code with
+    debug comments and/or log statements, generate human text from schema.
+    See its documentation for more details.
+
+  Using with Params::Sah
+    To validate function parameters against this schema (requires
+    Params::Sah):
+
+     use Params::Sah qw(gen_validator);
+
+     sub myfunc {
+         my \@args = \@_;
+         state \$validator = gen_validator("$sch_name*");
+         \$validator->(\\\@args);
+         ...
+     }
+
+  Using with Perinci::CmdLine::Lite
+    To specify schema in Rinci function metadata and use the metadata with
+    Perinci::CmdLine (Perinci::CmdLine::Lite) to create a CLI:
+
+     # in lib/MyApp.pm
+     package
+       MyApp;
+     our \%SPEC;
+     \$SPEC{myfunc} = {
+         v => 1.1,
+         summary => 'Routine to do blah ...',
+         args => {
+             arg1 => {
+                 summary => 'The blah blah argument',
+                 schema => ['$sch_name*'],
+             },
+             ...
+         },
+     };
+     sub myfunc {
+         my \%args = \@_;
+         ...
+     }
+     1;
+
+     # in myapp.pl
+     package
+       main;
+     use Perinci::CmdLine::Any;
+     Perinci::CmdLine::Any->new(url=>'/MyApp/myfunc')->run;
+
+     # in command-line
+     % ./myapp.pl --help
+     myapp - Routine to do blah ...
+     ...
+
+     % ./myapp.pl --version
+
+     % ./myapp.pl --arg1 ...
+
+    _ }
+
+                    $self->add_text_to_section(
+                        $document, join("", @pod), 'SYNOPSIS',
+                        {ignore => 1},
+                    );
+                }
+
+                # add POD section: DESCRIPTION
+                {
+                    last unless $sch->[1]{description};
+                    require Markdown::To::POD;
+                    my @pod;
+                    push @pod, Markdown::To::POD::markdown_to_pod(
+                        $sch->[1]{description}), "\n\n";
+                    $self->add_text_to_section(
+                        $document, join("", @pod), 'DESCRIPTION',
+                        {ignore => 1},
+                    );
+                }
+
+                $self->log(["Generated POD for '%s'", $filename]);
+
+            } # Sah::Schema::*
+        }
+    }
+
+    1; # ABSTRACT: Plugin to use when building Sah::Schemas::* distribution
+
+    __END__
+
 NAME
     Pod::Weaver::Plugin::Sah::Schemas - Plugin to use when building
     Sah::Schemas::* distribution
 
 VERSION
-    This document describes version 0.067 of
+    This document describes version 0.069 of
     Pod::Weaver::Plugin::Sah::Schemas (from Perl distribution
-    Pod-Weaver-Plugin-Sah-Schemas), released on 2021-07-22.
+    Pod-Weaver-Plugin-Sah-Schemas), released on 2021-08-04.
 
 SYNOPSIS
     In your weaver.ini:

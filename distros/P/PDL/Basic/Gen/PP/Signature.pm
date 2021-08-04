@@ -19,15 +19,27 @@ Internal module to handle signatures
 
 =cut
 
-# we pass on $bvalflag to the PdlParObj's created by parse
-# (a hack for PdlParObj::get_xsdatapdecl() which should
-# disappear when (if?) things are done sensibly)
-#
+# Eliminate whitespace entries
+sub nospacesplit {grep /\S/, split $_[0],$_[1]}
+
 sub new {
   my ($type,$str,$bvalflag) = @_;
   $bvalflag ||= 0;
-  my ($namep,$objp) = parse($str,$bvalflag);
-  return bless {Names => $namep, Objects => $objp},$type;
+  my $this = bless {}, $type;
+  my @objects = map PDL::PP::PdlParObj->new($_,$bvalflag, $this), nospacesplit ';',$str;
+  $this->{Names} = [ map $_->name, @objects ];
+  $this->{Objects} = { map +($_->name => $_), @objects };
+  my @objects_sorted = ((grep !$_->{FlagW}, @objects), (grep $_->{FlagW}, @objects));
+  $objects_sorted[$_]{Number} = $_ for 0..$#objects_sorted;
+  $this->{NamesSorted} = [ map $_->name, @objects_sorted ];
+  $this->{DimsObj} = my $dimsobj = PDL::PP::PdlDimsObj->new;
+  $_->add_inds($dimsobj) for @objects;
+  my %ind2use;
+  for my $o (@objects) {
+    push @{$ind2use{$_}}, $o for map $_->name, @{$o->{IndObjs}};
+  }
+  $this->{Ind2Use} = \%ind2use;
+  $this;
 }
 
 *with = \&new;
@@ -44,19 +56,16 @@ the copyright notice should be included in the file.
 
 =cut
 
-# Eliminate whitespace entries
-sub nospacesplit {grep /\S/, split $_[0],$_[1]}
-
 sub names { $_[0]->{Names} }
+sub names_sorted { $_[0]->{NamesSorted} }
 
 sub objs { $_[0]->{Objects} }
 
-# Pars -> ParNames, Parobjs
-sub parse {
-  my($str,$bvalflag) = @_;
-  my @objects = map PDL::PP::PdlParObj->new($_,"PDL_UNDEF_NUMBER",$bvalflag), nospacesplit ';',$str;
-  ([ map $_->name, @objects ], { map +($_->name => $_), @objects }, 1);
-}
+sub dims_obj { $_[0]->{DimsObj} }
+sub dims_count { scalar keys %{$_[0]->{DimsObj}} }
+sub dims_values { values %{$_[0]->{DimsObj}} }
+
+sub ind_used { $_[0]->{Ind2Use}{$_[1]} }
 
 sub realdims {
   my $this = shift;

@@ -1,5 +1,8 @@
 Revision history for Perl extension WWW::Form.
 
+1.22    2021-08-04
+    - Update $VERSION.
+
 1.21    2021-07-31
     - Avoid loading CGI.pm and Data::Dumper at startup
         - https://rt.cpan.org/Ticket/Display.html?id=136787

@@ -27,11 +27,11 @@ Pg::Explain::From - Base class for parsers of non-text explain formats.
 
 =head1 VERSION
 
-Version 1.11
+Version 1.13
 
 =cut
 
-our $VERSION = '1.11';
+our $VERSION = '1.13';
 
 =head1 SYNOPSIS
 
@@ -284,16 +284,26 @@ sub make_node_from {
             @plans = @{ $struct->{ 'Plans' } };
         }
         for my $subplan ( @plans ) {
-            my $subnode = $self->make_node_from( $subplan );
-            if ( $subplan->{ 'Parent Relationship' } eq 'InitPlan' ) {
+            my $subnode             = $self->make_node_from( $subplan );
+            my $parent_relationship = $subplan->{ 'Parent Relationship' } // '';
+            if ( $parent_relationship eq 'InitPlan' ) {
                 if ( $subplan->{ 'Subplan Name' } =~ m{ \A \s* CTE \s+ (\S+) \s* \z }xsm ) {
                     $new_node->add_cte( $1, $subnode );
+                }
+                elsif ( $subplan->{ 'Subplan Name' } =~ m{ \A InitPlan \s+ (\d+) \s+ \(returns \s+ ( .* )\) \z}xms ) {
+                    $new_node->add_initplan(
+                        $subnode,
+                        {
+                            'name'    => $1,
+                            'returns' => $2,
+                        }
+                    );
                 }
                 else {
                     $new_node->add_initplan( $subnode );
                 }
             }
-            elsif ( $subplan->{ 'Parent Relationship' } eq 'SubPlan' ) {
+            elsif ( $parent_relationship eq 'SubPlan' ) {
                 $new_node->add_subplan( $subnode );
             }
             else {

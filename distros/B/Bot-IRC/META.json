@@ -4,7 +4,7 @@
       "Gryphon Shafer <gryphon@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.023, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -44,6 +44,8 @@
             "DateTime::Format::Human::Duration" : "0",
             "Email::Mailer" : "0",
             "Email::Valid" : "0",
+            "Encode" : "0",
+            "Encode::Detect::Detector" : "0",
             "File::Grep" : "0",
             "IO::Socket::IP" : "0",
             "IO::Socket::SSL" : "0",
@@ -86,9 +88,9 @@
          "web" : "https://github.com/gryphonshafer/Bot-IRC"
       }
    },
-   "version" : "1.35",
-   "x_generated_by_perl" : "v5.32.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.25",
+   "version" : "1.36",
+   "x_generated_by_perl" : "v5.35.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.26",
    "x_spdx_expression" : "Artistic-2.0"
 }
 

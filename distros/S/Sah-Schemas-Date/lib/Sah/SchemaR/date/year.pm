@@ -1,12 +1,12 @@
 package Sah::SchemaR::date::year;
 
-our $DATE = '2020-03-08'; # DATE
-our $VERSION = '0.013'; # VERSION
+our $DATE = '2021-08-04'; # DATE
+our $VERSION = '0.017'; # VERSION
 
-our $rschema = ["int",[{examples=>[{valid=>0,value=>""},{valid=>1,value=>1},{valid=>1,value=>2020},{valid=>0,value=>1.1}],summary=>"Year number"}],["int"]];
+our $rschema = do{my$var={base=>"int",clsets_after_base=>[{examples=>[{summary=>"Empty string",valid=>0,value=>""},{summary=>"There is no AD 0; AD starts from 1",valid=>0,value=>0},{valid=>1,value=>1},{valid=>1,value=>2021},{valid=>1,value=>10000},{summary=>"Not an integer",valid=>0,value=>1.1}],min=>1,summary=>"Year number (AD, starting from 1)"}],clsets_after_type=>['$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_base}[0]'],resolve_path=>["int"],type=>"int",v=>2};$var->{clsets_after_type}[0]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_base}[0];$var};
 
 1;
-# ABSTRACT: Year number
+# ABSTRACT: Year number (AD, starting from 1)
 
 __END__
 
@@ -16,11 +16,11 @@ __END__
 
 =head1 NAME
 
-Sah::SchemaR::date::year - Year number
+Sah::SchemaR::date::year - Year number (AD, starting from 1)
 
 =head1 VERSION
 
-This document describes version 0.013 of Sah::SchemaR::date::year (from Perl distribution Sah-Schemas-Date), released on 2020-03-08.
+This document describes version 0.017 of Sah::SchemaR::date::year (from Perl distribution Sah-Schemas-Date), released on 2021-08-04.
 
 =head1 DESCRIPTION
 
@@ -50,7 +50,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

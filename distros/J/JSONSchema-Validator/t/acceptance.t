@@ -6,6 +6,13 @@ use Test::More;
 use JSONSchema::Validator;
 use JSONSchema::Validator::Util qw/get_resource/;
 
+BEGIN {
+  unless ($ENV{ACCEPTANCE_TESTING}) {
+    print qq{1..0 # SKIP these tests are for testing by the developer\n};
+    exit
+  }
+}
+
 unless (eval { require Test::JSON::Schema::Acceptance; 1; }) {
     plan skip_all => 'Test::JSON::Schema::Acceptance is not installed'
 }

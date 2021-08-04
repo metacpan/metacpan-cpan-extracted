@@ -4,52 +4,115 @@ use Test2::V0;
 
 use Test::Lib;
 
+use My::Test::Util -all;
+
 use Data::Record::Serialize;
 
-use YAML::Any qw[ Load ];
+use YAML::PP;
+use JSON::PP;
 
 my ( $s, $buf );
 
+my @output;
 ok(
     lives {
         $s = Data::Record::Serialize->new(
-            encode => 'yaml',
-            output => \$buf,
-            nullify => [ 'c' ],
-          ),
-          ;
+            encode  => 'yaml',
+            sink    => 'array',
+            output  => \@output,
+            nullify => ['string2'],
+            fields  => [ 'integer', 'number', 'string1', 'string2', 'bool' ],
+            types   => { bool => 'B' },
+        );
     },
     "constructor"
 ) or diag $@;
 
-$s->send( { a => 1, b => 2, c => 'nyuck nyuck' } );
-$s->send( { a => 1, b => 2, } );
-$s->send( { a => 1, b => 2, c => '' } );
+my $yaml = YAML::PP->new( boolean => 'JSON::PP' );
 
-ok ( ! $s->has_types, "no types were derived" );
+subtest 'record does not require transformation' => sub {
 
-my @VAR1;
+    # prime types
+    $s->send( {
+        integer => 1,
+        number  => 2.2,
+        string1 => 'string',
+        string2 => 'nyuck nyuck'
+    } );
 
-ok( lives { @VAR1 = Load( $buf ) }, 'deserialize record', ) or diag $@;
+    my $got;
 
-is(
-    \@VAR1,
-    [ {
-            a => '1',
-            b => '2',
-            c => 'nyuck nyuck',
+    # read and make sure round trip types are correct
+    ok( lives { $got = $yaml->load_string( $output[-1] ) },
+        'deserialize record' )
+      or diag $@;
+
+    is(
+        $got,
+        hash {
+            field integer => 1;
+            field number  => 2.2;
+            field string1 => 'string';
+            field string2 => 'nyuck nyuck';
+            end;
         },
-        {
-            a => '1',
-            b => '2',
+        'round-trip values'
+    );
+
+
+  SKIP: {
+        skip 'Need Convert::Scalar' unless $have_Convert_Scalar;
+        subtest "output field values properly retained" => sub {
+            ok( is_number( $got->{number} ),  'number' );
+            ok( is_number( $got->{integer} ), 'integer' );
+            ok( is_string( $got->{string1} ), 'string1' );
+            ok( is_string( $got->{string2} ), 'string2' );
+        };
+    }
+
+};
+
+subtest 'record requires transformation' => sub {
+    # now try something that needs numify & stringify
+    $s->send( {
+        integer => '1',
+        number  => '2.2',
+        string1 => 99,
+        string2 => 'nyuck nyuck',
+        bool    => 1
+    } );
+
+    my $got;
+
+    ok( lives { $got = $yaml->load_string( $output[-1] ) },
+        'deserialize record' )
+      or diag $@;
+
+    is(
+        $got,
+        hash {
+            field integer => 1;
+            field number  => 2.2;
+            field string1 => '99';
+            field string2 => 'nyuck nyuck';
+            field bool    => object {
+                prop blessed => 'JSON::PP::Boolean';
+                prop this => 1;
+            };
+            end;
         },
-        {
-            a => '1',
-            b => '2',
-            c => undef,
-        },
-    ],
-    'properly formatted'
-);
+        'round-trip values'
+    );
+
+  SKIP: {
+        skip 'Need Convert::Scalar' unless $have_Convert_Scalar;
+        subtest "output field values properly converted" => sub {
+            ok( is_number( $got->{number} ),  'number' );
+            ok( is_number( $got->{integer} ), 'integer' );
+            ok( is_string( $got->{string1} ), 'string1' );
+            ok( is_string( $got->{string2} ), 'string2' );
+        };
+    }
+};
 
 done_testing;

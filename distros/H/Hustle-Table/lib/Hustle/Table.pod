@@ -1,7 +1,6 @@
-ok 
 =head1 NAME
 
-Hustle::Table - Pattern dispatching to subroutines
+Hustle::Table - Percomiled pattern dispatch to code with optional optimisation
 
 =head1 SYNOPSIS
 
@@ -178,9 +177,13 @@ Hashes ref format only need to specify the matcher and sub pairs
 
 	$table->add({matcher=>$matcher, sub=>$sub, label=>$label, count=>$count});
 
-Single flattened format takes a list directly
+Single flattened format takes a list directly. It must contain 4 elements
 
 	$table->add(matcher=>$matcher, sub => $sub);
+
+Single simple format takes two elements
+
+	$table->add(qr{some matcher}=>sub { say "run me" })
 
 Or add at once using mixed formats together
 

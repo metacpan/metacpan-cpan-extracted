@@ -5,6 +5,7 @@
 typedef int Py_ssize_t;
 #endif*/
 
+#define PY_SSIZE_T_CLEAN
 #include <Python.h>
 
 /* Python < 2.5 compat */

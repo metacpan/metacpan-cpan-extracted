@@ -37,6 +37,12 @@ $VAR1 = {
                              'actual_loops' => '1'
                            }
                          ],
+          'initplans_metainfo' => [
+                                    {
+                                      'name' => '2',
+                                      'returns' => '$1',
+                                    },
+          ],
           'subplans' => [
                           {
                             'is_analyzed' => 1,

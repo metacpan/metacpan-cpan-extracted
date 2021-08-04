@@ -132,11 +132,14 @@ coerced to agree according to simple rules:
 
 =item * Dims with sizes other than 1 must all agree in size.
 
-=item * Dims of size 1 are expanded as necessary.
+=item * Dims of size 1 are silently repeated as necessary except for C<[phys]> PDLs.
 
 =item * Missing dims are expanded appropriately.
 
 =back
+
+A size-1 dim for C<[phys]> PDLs causes an exception if the dim is used
+in another parameter and has a size greater than 1.
 
 The "size 1" rule implements "generalized scalar" operation, by
 analogy to scalar multiplication.  The "missing dims" rule
@@ -1635,19 +1638,19 @@ sub PDL::thread_define ($$) {
   my ($name,$sigstr) = ($1,$2);
   print "defining '$name' with signature '$sigstr' and $others extra args\n"
 						  if $PDL::debug;
-  my $sig = new PDL::PP::Signature($sigstr);
+  my $sig = PDL::PP::Signature->new($sigstr);
   my $args = @{$sig->names}; # number of ndarray arguments
   barf "no ndarray args" if $args == 0;
   $args--;
   # TODO: $sig->dimcheck(@_) + proper creating generation
-  my $def = "\@_[0..$args] = map {PDL::Core::topdl(\$_)} \@_[0..$args];\n".
-            '$sig->checkdims(@_);
-	     PDL::threadover($others,@_,$sig->realdims,$sig->creating,$sub)';
   my $package = caller;
-  local $^W = 0; # supress the 'not shared' warnings
-  print "defining...\nsub $name { $def }\n" if $PDL::debug;
-  eval ("package $package; sub $name { $def }");
-  barf "error defining $name: $@\n" if $@;
+  print "defining... $name\n" if $PDL::debug;
+  no strict 'refs';
+  *{"$package\::$name"} = sub {
+    @_[0..$args] = map PDL::Core::topdl($_), @_[0..$args];
+    $sig->checkdims(@_);
+    PDL::threadover($others,@_,$sig->realdims,$sig->creating,$sub);
+  };
 }
 
 =head2 thread

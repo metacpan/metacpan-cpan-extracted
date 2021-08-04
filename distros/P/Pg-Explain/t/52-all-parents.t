@@ -1,7 +1,6 @@
 #!perl
 
 use Test::More;
-use Test::Exception;
 use Test::Deep;
 use Pg::Explain;
 

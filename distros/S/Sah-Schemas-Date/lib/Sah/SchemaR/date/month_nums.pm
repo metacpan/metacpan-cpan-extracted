@@ -1,12 +1,12 @@
 package Sah::SchemaR::date::month_nums;
 
-our $DATE = '2020-03-08'; # DATE
-our $VERSION = '0.013'; # VERSION
+our $DATE = '2021-08-04'; # DATE
+our $VERSION = '0.017'; # VERSION
 
-our $rschema = ["array",[{examples=>[{valid=>1,validated_value=>[],value=>""},{valid=>0,value=>0},{valid=>1,validated_value=>[1],value=>1},{valid=>1,value=>[1]},{valid=>1,value=>[1,12]},{valid=>1,validated_value=>[1,12],value=>"1,12"},{valid=>0,value=>[1,12,13]},{valid=>0,value=>"1,12,13"}],of=>["date::month_num",{},{}],summary=>"Array of month numbers","x.completion"=>["date_month_num"],"x.perl.coerce_rules"=>["From_str::comma_sep"]}],["array"]];
+our $rschema = do{my$var={base=>"array",clsets_after_base=>[{description=>"\nSee also related schemas that coerce from other locales, e.g.\n<pm:Sah::Schema::date::month_nums::id> (Indonesian),\n<pm:Sah::Schema::date::month_nums::en_or_id> (English/Indonesian), etc.\n\n",examples=>[{valid=>1,validated_value=>[],value=>""},{summary=>"Has number not in 1-12",valid=>0,value=>0},{valid=>1,validated_value=>[1],value=>1},{valid=>1,value=>[1]},{valid=>1,value=>[1,12]},{summary=>"Contains undef",valid=>0,value=>[1,undef]},{valid=>1,validated_value=>[1,6],value=>["Jan","JUN"]},{valid=>1,validated_value=>[1,6],value=>"January,JUNE"},{summary=>"Has number not in 1-12",valid=>0,value=>[1,12,13]},{summary=>"Has number not in 1-12",valid=>0,value=>"1,12,13"}],of=>["date::month_num",{req=>1}],summary=>"Array of required month numbers (1-12, with coercions)","x.completion"=>["date_month_num"],"x.perl.coerce_rules"=>["From_str::comma_sep"]}],clsets_after_type=>['$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_base}[0]'],resolve_path=>["array"],type=>"array",v=>2};$var->{clsets_after_type}[0]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_base}[0];$var};
 
 1;
-# ABSTRACT: Array of month numbers
+# ABSTRACT: Array of required month numbers (1-12, with coercions)
 
 __END__
 
@@ -16,11 +16,11 @@ __END__
 
 =head1 NAME
 
-Sah::SchemaR::date::month_nums - Array of month numbers
+Sah::SchemaR::date::month_nums - Array of required month numbers (1-12, with coercions)
 
 =head1 VERSION
 
-This document describes version 0.013 of Sah::SchemaR::date::month_nums (from Perl distribution Sah-Schemas-Date), released on 2020-03-08.
+This document describes version 0.017 of Sah::SchemaR::date::month_nums (from Perl distribution Sah-Schemas-Date), released on 2021-08-04.
 
 =head1 DESCRIPTION
 
@@ -50,7 +50,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

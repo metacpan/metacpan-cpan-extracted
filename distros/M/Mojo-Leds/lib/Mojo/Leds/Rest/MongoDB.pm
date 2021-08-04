@@ -1,5 +1,5 @@
 package Mojo::Leds::Rest::MongoDB;
-
+$Mojo::Leds::Rest::MongoDB::VERSION = '1.04';
 use boolean;
 
 use Mojo::Base 'Mojo::Leds::Rest';
@@ -50,6 +50,12 @@ sub _patch {
     return $rec;
 }
 
+sub _tableDB {
+    my $c = shift;
+    my $helper = $c->dbHelper;
+    return $c->helpers->$helper->coll( $c->table );
+}
+
 sub _update {
     my $c   = shift;
     my $set = shift;
@@ -84,7 +90,7 @@ sub list {
     my $rec  = $c->_dbfind( $qry, $opt );
     my @recs = $rec->all;
 
-    my $ret = {};
+    my $ret = [@recs];
 
     if ($with_count) {
         my $count =
@@ -92,9 +98,6 @@ sub list {
           ? $c->tableDB->count_documents($qry)
           : scalar(@recs);
         $ret = { count => $count, recs => [@recs] };
-    }
-    else {
-        $ret = [@recs];
     }
 
     $c->render_json($ret);
@@ -134,11 +137,11 @@ sub listupdate {
 
 # da spostare sul parent una volta capito come funziona DBIx
 sub _qs2q {
-    my $c          = shift;
-    my $flt        = $c->req->query_params->to_hash;
-    my $qry        = {};
-    my $opt        = {};
-    my $with_count = 0;
+    my $c   = shift;
+    my $flt = $c->req->query_params->to_hash;
+    my $qry = {};
+    my $opt = {};
+    my $rc  = 0;
 
     $opt->{sort} = new Tie::IxHash;
 
@@ -163,7 +166,7 @@ sub _qs2q {
             elsif (/^sort\[(.*?)\]/) { $opt->{sort}->Push( $1 => $v ) }
             elsif ( $_ eq 'limit' )  { $opt->{limit} = $v }
             elsif ( $_ eq 'skip' )   { $opt->{skip} = $v }
-            elsif ( $_ eq 'rc' )     { $with_count = $v }
+            elsif ( $_ eq 'rc' )     { $rc = $v }
         }
     }
 
@@ -184,7 +187,7 @@ sub _qs2q {
           . "\nOpt: "
           . Data::Dumper::Dumper($opt) );
 
-    return ( $qry, $opt, $with_count );
+    return ( $qry, $opt, $rc );
 }
 
 sub _dbfind {
@@ -253,7 +256,7 @@ Mojo::Leds::Rest::MongoDB - A RESTFul interface to MongoDB
 
 =head1 VERSION
 
-version 1.02
+version 1.04
 
 =head1 SYNOPSIS
 

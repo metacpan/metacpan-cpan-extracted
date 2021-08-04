@@ -1,9 +1,13 @@
+#!/usr/bin/env perl
+
 ### Term::UI test suite ###
 
 use strict;
+use warnings;
+
 use lib qw[../lib lib];
-use Test::More tests => 22;
-use Term::ReadLine;
+use Test::More 'tests' => 23;
+use Term::ReadLine ();
 
 use_ok( 'Term::UI' );
 
@@ -78,6 +82,20 @@ my $tmpl = {
 
     is_deeply( [ $term->get_reply( %$args ) ], [qw|blue red|], q[Checking reply with multible defaults] );
 }
+
+{
+  my $args =
+    { 'prompt' => "What is your favourite colour?",
+      'choices' => [ qw| blue red green [ | ],
+      'multi' => 1,
+      'default' => [ qw| blue red | ],
+    };
+
+  is_deeply( [ $term->get_reply( %$args ) ], [ qw| blue red | ],
+             q[Checking reply with multible defaults and choices (including a broken regex)],
+           );
+}
+
 
 {
     my $args = {

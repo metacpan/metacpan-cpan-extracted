@@ -26,8 +26,6 @@ $s->send( { a => 1, b => 2, c => 'nyuck nyuck' } );
 $s->send( { a => 1, b => 2 } );
 $s->send( { a => 1, b => 2, c => '' } );
 
-ok ( ! $s->has_types, "no types were derived" );
-
 my @VAR1;
 
 ok( lives { @VAR1 = eval $buf }, 'deserialize record', ) or diag $@;

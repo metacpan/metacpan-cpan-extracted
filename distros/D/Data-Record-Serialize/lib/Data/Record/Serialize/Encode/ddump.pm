@@ -4,15 +4,13 @@ package Data::Record::Serialize::Encode::ddump;
 
 use Moo::Role;
 
-our $VERSION = '0.23';
+our $VERSION = '0.24';
 
 use Data::Dumper;
 
 use namespace::clean;
 
-has '+_need_types' => ( is => 'rwp', default => 0 );
-has '+_needs_eol' => ( is => 'rwp', default => 1 );
-
+sub _needs_eol { 1 }
 
 
 
@@ -27,7 +25,6 @@ sub encode {
 }
 
 with 'Data::Record::Serialize::Role::Encode';
-
 
 1;
 
@@ -53,7 +50,7 @@ Data::Record::Serialize::Encode::ddump - encoded a record using Data::Dumper
 
 =head1 VERSION
 
-version 0.23
+version 0.24
 
 =head1 SYNOPSIS
 
@@ -77,7 +74,7 @@ It performs the L<Data::Record::Serialize::Role::Encode> role.
 =head1 INTERFACE
 
 There are no additional attributes which may be passed to
-L<Data::Record::Serialize-E<gt>new>|Data::Record::Serialize/new>.
+L<< Data::Record::Serialize::new|Data::Record::Serialize/new >>.
 
 =head1 SUPPORT
 

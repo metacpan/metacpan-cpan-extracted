@@ -1,5 +1,31 @@
 Revision history for Pg-Explain
 
+1.13    2021/08/03
+        - New functionality:
+          - Nodes have now ->id() method which returns numeric value, which is
+            unique within explain
+          - Explain object can call ->node( ID ) to get node with specified ID
+          - Parse properly metainformation about InitPlans (name, and what it
+            returns)
+        - Fixes:
+          - Fix generating of text representation of plans with worktable scan
+            nodes.
+          - Fix exclusive time calculations for plans with InitPlans and CTEs
+          - Speedup of parsing of some edge-case plans
+
+1.12    2021/07/18
+        - New functionality:
+          - Parse GUC settings from plans, per:
+            https://gitlab.com/depesz/Pg--Explain/-/issues/11
+          - Helper script (dump.pl) - change it so that substructs are dumped
+            at the end
+        - Fixes:
+          - Fix exclusive buffers calcualtion, per:
+            https://gitlab.com/depesz/explain.depesz.com/-/issues/24
+          - Remove various warnings that can happen with badly wrapped plans
+          - Remove warning when parsing plans with VERY long lines (over 60k
+            characters)
+
 1.11    2021/07/04
         - Added parsing of Buffers info
 

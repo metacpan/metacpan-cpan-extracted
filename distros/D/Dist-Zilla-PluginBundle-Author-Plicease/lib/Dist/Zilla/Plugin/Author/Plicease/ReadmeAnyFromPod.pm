@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::Author::Plicease::ReadmeAnyFromPod 2.67 {
+package Dist::Zilla::Plugin::Author::Plicease::ReadmeAnyFromPod 2.68 {
 
   use 5.020;
   use Moose;
@@ -6,6 +6,8 @@ package Dist::Zilla::Plugin::Author::Plicease::ReadmeAnyFromPod 2.67 {
   use File::Which ();
   use Ref::Util qw( is_plain_hashref );
   use experimental qw( postderef );
+
+# ABSTRACT: Personal subclass of Dist::Zilla::Plugin::ReadmeAnyFromPod
 
 
   extends 'Dist::Zilla::Plugin::ReadmeAnyFromPod';
@@ -115,7 +117,7 @@ package Dist::Zilla::Plugin::Author::Plicease::ReadmeAnyFromPod 2.67 {
     };
 
     $content =~ s{# NAME\s+(.*?) - (.*?#)}{# $1$status\n\n$2}s;
-    $content =~ s{# VERSION\s+version (\d+\.|)\d+\.\d+(\\_\d+|)\s+#}{#};
+    $content =~ s{# VERSION\s+version (\d+\.|)\d+\.\d+(\\_\d+|)\s+#}{#}a;
     return $content;
   };
 
@@ -132,11 +134,11 @@ __END__
 
 =head1 NAME
 
-Dist::Zilla::Plugin::Author::Plicease::ReadmeAnyFromPod
+Dist::Zilla::Plugin::Author::Plicease::ReadmeAnyFromPod - Personal subclass of Dist::Zilla::Plugin::ReadmeAnyFromPod
 
 =head1 VERSION
 
-version 2.67
+version 2.68
 
 =head1 SYNOPSIS
 

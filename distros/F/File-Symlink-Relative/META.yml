@@ -26,7 +26,7 @@ no_index:
 provides:
   File::Symlink::Relative:
     file: lib/File/Symlink/Relative.pm
-    version: '0.004'
+    version: '0.005'
 requires:
   Carp: '0'
   Exporter: '0'
@@ -40,5 +40,5 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=File-Symlink-Relative
   license: http://dev.perl.org/licenses/
   repository: git://github.com/trwyant/perl-File-Symlink-Relative.git
-version: '0.004'
+version: '0.005'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,12 +1,12 @@
 package Sah::SchemaR::date::month_num;
 
-our $DATE = '2020-03-08'; # DATE
-our $VERSION = '0.013'; # VERSION
+our $DATE = '2021-08-04'; # DATE
+our $VERSION = '0.017'; # VERSION
 
-our $rschema = ["int",[{examples=>[{valid=>0,value=>""},{valid=>0,value=>0},{valid=>1,value=>1},{valid=>1,value=>12},{valid=>0,value=>13}],max=>12,min=>1,summary=>"Month number","x.completion"=>["date_month_num"],"x.perl.coerce_rules"=>["From_str::convert_en_month_name_to_num"]}],["int"]];
+our $rschema = do{my$var={base=>"int",clsets_after_base=>[{description=>"\nSee also related schemas that coerce from other locales, e.g.\n<pm:Sah::Schema::date::month_num::id> (Indonesian),\n<pm:Sah::Schema::date::month_num::en_or_id> (English/Indonesian), etc.\n\n",examples=>[{summary=>"Empty string",valid=>0,value=>""},{summary=>"Not between 1-12",valid=>0,value=>0},{valid=>1,value=>1},{valid=>1,validated_value=>6,value=>"JUN"},{valid=>1,value=>12},{summary=>"Not between 1-12",valid=>0,value=>13}],max=>12,min=>1,summary=>"Month number, coercible from English month names (Dec/DECEMBER)","x.completion"=>["date_month_num"],"x.perl.coerce_rules"=>["From_str::convert_en_month_name_to_num"]}],clsets_after_type=>['$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_base}[0]'],resolve_path=>["int"],type=>"int",v=>2};$var->{clsets_after_type}[0]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_base}[0];$var};
 
 1;
-# ABSTRACT: Month number
+# ABSTRACT: Month number, coercible from English month names (Dec/DECEMBER)
 
 __END__
 
@@ -16,11 +16,11 @@ __END__
 
 =head1 NAME
 
-Sah::SchemaR::date::month_num - Month number
+Sah::SchemaR::date::month_num - Month number, coercible from English month names (Dec/DECEMBER)
 
 =head1 VERSION
 
-This document describes version 0.013 of Sah::SchemaR::date::month_num (from Perl distribution Sah-Schemas-Date), released on 2020-03-08.
+This document describes version 0.017 of Sah::SchemaR::date::month_num (from Perl distribution Sah-Schemas-Date), released on 2021-08-04.
 
 =head1 DESCRIPTION
 
@@ -50,7 +50,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

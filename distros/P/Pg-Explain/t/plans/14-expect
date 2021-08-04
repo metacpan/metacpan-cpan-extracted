@@ -113,6 +113,7 @@
                                                             'is_analyzed'            => 1,
                                                         }
                                                     ],
+                                                    'initplans_metainfo' => [ undef, undef ],
                                                 }
                                             ],
                                         },

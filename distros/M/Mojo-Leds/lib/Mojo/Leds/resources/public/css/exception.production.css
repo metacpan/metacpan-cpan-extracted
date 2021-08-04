@@ -1,0 +1,5 @@
+.bg-img {
+	background: url(/img/exception.production.gif) no-repeat left center fixed;
+	background-size: 75% 100%;
+	background-color: #000;
+}

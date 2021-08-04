@@ -1,9 +1,9 @@
 package Dist::Zilla::Plugin::Sah::Schemas;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-07-29'; # DATE
+our $DATE = '2021-07-30'; # DATE
 our $DIST = 'Dist-Zilla-Plugin-Sah-Schemas'; # DIST
-our $VERSION = '0.024'; # VERSION
+our $VERSION = '0.027'; # VERSION
 
 use 5.010001;
 use strict;
@@ -141,9 +141,9 @@ sub munge_files {
                     $self->log(["Can't resolve schema (%s), skipped collecting base schemas for %s", $@, $pkg]);
                     last COLLECT_BASE_SCHEMAS;
                 }
-                my $intermediates = $res->[2]{intermediates};
-                for my $i (0..$#{$intermediates}-1) {
-                    my $mod = "Sah::Schema::$intermediates->[$i]";
+                my $resolve_path = $res->{resolve_path};
+                for my $i (1..$#{$resolve_path}) {
+                    my $mod = "Sah::Schema::$resolve_path->[$i]";
                     $self->{_used_schema_modules}{$mod}++;
                 }
             }
@@ -316,7 +316,7 @@ Dist::Zilla::Plugin::Sah::Schemas - Plugin to use when building Sah-Schemas-* di
 
 =head1 VERSION
 
-This document describes version 0.024 of Dist::Zilla::Plugin::Sah::Schemas (from Perl distribution Dist-Zilla-Plugin-Sah-Schemas), released on 2021-07-29.
+This document describes version 0.027 of Dist::Zilla::Plugin::Sah::Schemas (from Perl distribution Dist-Zilla-Plugin-Sah-Schemas), released on 2021-07-30.
 
 =head1 SYNOPSIS
 
@@ -367,6 +367,11 @@ to reduce startup overhead when doing tab completion.
 =head1 CONFIGURATION
 
 =head2 exclude_module
+
+Currently this means to exclude loading the specified schema module during
+build, skip resolving the schema, skip parsing the schema and extracting
+prerequisites from the schema, the and skip creating the corresponding
+C<Sah::SchemaR::*> module.
 
 =head1 CONTRIBUTOR
 

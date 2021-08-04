@@ -1,6 +1,9 @@
 Changelog for Mojolicious-Plugin-Restify-OtherActions
 
-0.03 2021-08-02T16:41:18
+0.04 2021-08-04T13:29:35
+ - Add version number to module
+
+0.03 2021-08-02T16:41:27
  - Update prereq version for M::P::Restify
 
 0.02 2021-07-20T07:52:28

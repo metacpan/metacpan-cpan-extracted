@@ -3,7 +3,7 @@ NAME
     by *.pm modules which are a controller
 
 VERSION
-    version 0.17
+    version 0.18
 
 SYNOPSIS
         use Mojolicious::Lite;

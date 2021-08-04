@@ -21,7 +21,7 @@ is( $sub->total_exclusive_time, 0.007 * 588, 'same as total_inclusive_time since
 
 $explain = Pg::Explain->new( 'source_file' => 't/plans/13-plan', );
 $top     = $explain->top_node;
-ok( abs( $top->total_exclusive_time - 1.694 ) < 0.001, 'total exclusive time (1.694)' );
+ok( abs( $top->total_exclusive_time - 1.698 ) < 0.001, 'total exclusive time (1.698)' );
 
 my $plan = 'Seq Scan on tenk1  (cost=0.00..333.00 rows=10000 width=148)';
 $explain = Pg::Explain->new( 'source' => $plan );

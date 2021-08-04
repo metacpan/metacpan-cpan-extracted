@@ -236,15 +236,15 @@ TYPES = {
 
 class TYPE:
     def __init__(self,*values):
-	self.values = values
+        self.values = values
 
     def __cmp__(self,other):
-	if other in self.values:
-	    return 0
-	if other < self.values:
-	    return 1
-	else:
-	    return -1
+        if other in self.values:
+            return 0
+        if other < self.values:
+            return 1
+        else:
+            return -1
 
 STRING   = TYPE("CHAR", "VARCHAR", "LONGVARCHAR")
 BINARY   = TYPE("BINARY", "VARBINARY", "LONGVARBINARY")

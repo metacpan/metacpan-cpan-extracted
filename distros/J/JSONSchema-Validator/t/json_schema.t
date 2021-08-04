@@ -10,7 +10,7 @@ use Helper 'test_dir';
 use JSONSchema::Validator;
 use JSONSchema::Validator::Util qw/get_resource decode_content/;
 
-for my $validator_class (@{$JSONSchema::Validator::JSON_SCHEMA_VALIDATORS}) {
+for my $validator_class (@{$JSONSchema::Validator::JSON_SCHEMA_VALIDATORS}, @{$JSONSchema::Validator::OAS_VALIDATORS}) {
     my $specification = lc($validator_class->SPECIFICATION);
     my $glob_file_tests = test_dir("data/json_schema/${specification}/*.json");
     my @file_tests = glob($glob_file_tests);
@@ -19,11 +19,13 @@ for my $validator_class (@{$JSONSchema::Validator::JSON_SCHEMA_VALIDATORS}) {
         my $tests = decode_content(get_resource({}, $uri), $uri);
         for my $test (@$tests) {
             my $test_topic = $test->{subject};
-            my $validator = $validator_class->new(schema => $test->{schema});
             my $subtests = $test->{tests};
             for my $t (@$subtests) {
+                my %new_params = %{$t->{new_params} // {}};
+                my %validate_params = ((direction => 'request'), %{$t->{v_params} // {}}); # for OAS30 need to set "direction" params
+                my $validator = $validator_class->new(schema => $test->{schema}, %new_params);
                 my $test_name = $specification . ': ' . $test_topic . ': ' . $t->{description};
-                my ($result, $errors) = $validator->validate_schema($t->{data});
+                my ($result, $errors) = $validator->validate_schema($t->{data}, %validate_params);
                 if ($t->{valid}) {
                     is $result, 1, $test_name;
                     is @$errors, 0, $test_name . '; errors is empty';

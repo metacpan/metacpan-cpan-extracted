@@ -2,6 +2,9 @@ This is the changelog for FASTX::Reader. Version prior to v 0.1 are preliminary 
 Some APIs *can change* with the release of the first stable release (v 1.0).
 Version 0.61 has been available via BioConda
 
+1.1.0 2021-08-04
+  * Support for Windows line endings (experimental)
+
 1.0.5 2021-04-21
   * Improved test suite
   * Minor code cleanup

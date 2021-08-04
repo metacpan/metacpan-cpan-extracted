@@ -29,11 +29,11 @@ Pg::Explain::FromText - Parser for text based explains
 
 =head1 VERSION
 
-Version 1.11
+Version 1.13
 
 =cut
 
-our $VERSION = '1.11';
+our $VERSION = '1.13';
 
 =head1 SYNOPSIS
 
@@ -86,7 +86,7 @@ sub split_into_lines {
         if ( $l =~ m{ \A Trigger \s+ }xms ) {
             push @out, $l;
         }
-        elsif ( $l =~ m{ \A (?: Total \s+ runtime | Planning \s+ time | Execution \s+ time | Time | Filter | Output | JIT | Planning ): }xmsi ) {
+        elsif ( $l =~ m{ \A (?: Total \s+ runtime | Planning \s+ time | Execution \s+ time | Time | Filter | Output | JIT | Planning | Settings ): }xmsi ) {
             push @out, $l;
         }
         elsif ( $l =~ m{\A\S} ) {
@@ -141,6 +141,11 @@ sub parse_source {
                                 (?<never_executed> never \s+ executed )
                             )
                         \) }xms;
+
+    my $guc_name      = qr{ [a-zA-Z_.]+ }xms;
+    my $guc_value     = qr{ ' (?:[^']+|'' )* ' }xms;
+    my $single_guc    = qr{ ( $guc_name ) \s* = \s* ( $guc_value ) }xms;
+    my $multiple_gucs = qr{ $single_guc (?: , \s* $single_guc )* }xms;
 
     my $query        = '';
     my $plan_started = 0;
@@ -203,7 +208,10 @@ sub parse_source {
                 delete $element_at_depth{ $key };
             }
 
-            my $maximal_depth    = ( sort { $b <=> $a } keys %element_at_depth )[ 0 ];
+            my $maximal_depth = ( sort { $b <=> $a } keys %element_at_depth )[ 0 ];
+            if ( !defined $maximal_depth ) {
+                croak( "Didn't find current_element by depth - this shouldn't happen - please contact author.\n" );
+            }
             my $previous_element = $element_at_depth{ $maximal_depth };
 
             $element_at_depth{ $prefix_length } = $element;
@@ -212,7 +220,7 @@ sub parse_source {
                 $previous_element->{ 'node' }->add_sub_node( $new_node );
             }
             elsif ( $previous_element->{ 'subelement-type' } eq 'initplan' ) {
-                $previous_element->{ 'node' }->add_initplan( $new_node );
+                $previous_element->{ 'node' }->add_initplan( $new_node, $previous_element->{ 'metainfo' } );
             }
             elsif ( $previous_element->{ 'subelement-type' } eq 'subplan' ) {
                 $previous_element->{ 'node' }->add_subplan( $new_node );
@@ -222,24 +230,51 @@ sub parse_source {
                 delete $element_at_depth{ $maximal_depth };
             }
             else {
-                my $msg = "Bad subelement-type in previous_element - this shouldn't happen - please contact author.\n";
-                croak( $msg );
+                croak( "Bad subelement-type in previous_element - this shouldn't happen - please contact author.\n" );
             }
         }
-        elsif ( $line =~ m{ \A (\s*) ((?:Sub|Init)Plan) \s* (?: \d+ \s* )? \s* (?: \( returns .* \) \s* )? \z }xms ) {
-            my ( $prefix, $type ) = ( $1, $2 );
+        elsif ( $line =~ m{ \A (\s*) InitPlan \s* ( \d+ )? \s* (?: \( returns \s+ (.*) \) \s* )? \z }xms ) {
+            my ( $prefix, $name, $returns ) = ( $1, $2, $3 );
+            $in_jit = undef;
+
+            my @remove_elements = grep { $_ >= length $prefix } keys %element_at_depth;
+            delete @element_at_depth{ @remove_elements } unless 0 == scalar @remove_elements;
+
+            my $maximal_depth = ( sort { $b <=> $a } keys %element_at_depth )[ 0 ];
+            if ( !defined $maximal_depth ) {
+                croak( "Didn't find current_element by depth - this shouldn't happen - please contact author (subplan).\n" );
+            }
+            my $previous_element = $element_at_depth{ $maximal_depth };
+
+            my $metainfo = {};
+            $metainfo->{ 'name' }    = $name    if defined $name;
+            $metainfo->{ 'returns' } = $returns if defined $returns;
+            $metainfo                = undef    if 0 == scalar keys %{ $metainfo };
+
+            $element_at_depth{ 1 + length $prefix } = {
+                'node'            => $previous_element->{ 'node' },
+                'subelement-type' => 'initplan',
+                'metainfo'        => $metainfo,
+            };
+            next LINE;
+        }
+        elsif ( $line =~ m{ \A (\s*) SubPlan \s* (?: \d+ \s* )? \s* (?: \( returns .* \) \s* )? \z }xms ) {
+            my $prefix = $1;
 
             $in_jit = undef;
 
             my @remove_elements = grep { $_ >= length $prefix } keys %element_at_depth;
             delete @element_at_depth{ @remove_elements } unless 0 == scalar @remove_elements;
 
-            my $maximal_depth    = ( sort { $b <=> $a } keys %element_at_depth )[ 0 ];
+            my $maximal_depth = ( sort { $b <=> $a } keys %element_at_depth )[ 0 ];
+            if ( !defined $maximal_depth ) {
+                croak( "Didn't find current_element by depth - this shouldn't happen - please contact author (subplan).\n" );
+            }
             my $previous_element = $element_at_depth{ $maximal_depth };
 
             $element_at_depth{ 1 + length $prefix } = {
                 'node'            => $previous_element->{ 'node' },
-                'subelement-type' => lc $type,
+                'subelement-type' => 'subplan',
             };
             next LINE;
         }
@@ -251,7 +286,10 @@ sub parse_source {
             my @remove_elements = grep { $_ >= length $prefix } keys %element_at_depth;
             delete @element_at_depth{ @remove_elements } unless 0 == scalar @remove_elements;
 
-            my $maximal_depth    = ( sort { $b <=> $a } keys %element_at_depth )[ 0 ];
+            my $maximal_depth = ( sort { $b <=> $a } keys %element_at_depth )[ 0 ];
+            if ( !defined $maximal_depth ) {
+                croak( "Didn't find current_element by depth - this shouldn't happen - please contact author (CTE).\n" );
+            }
             my $previous_element = $element_at_depth{ $maximal_depth };
 
             $element_at_depth{ length $prefix } = {
@@ -275,6 +313,18 @@ sub parse_source {
             $in_jit = undef;
 
             $self->explain->total_runtime( $time );
+        }
+        elsif ( $line =~ m{ \A \s* Settings: \s* ( $multiple_gucs ) \s* \z }xmsi ) {
+            my $gucs     = $1;
+            my $settings = {};
+            my @elements = $gucs =~ m{ $single_guc }xmsg;
+            for ( my $i = 0 ; $i < @elements ; $i += 2 ) {
+                my $val = $elements[ $i + 1 ];
+                $val =~ s/\A'|'\z//g;
+                $val =~ s/''/'/g;
+                $settings->{ $elements[ $i ] } = $val;
+            }
+            $self->explain->settings( $settings ) if 0 < scalar keys %{ $settings };
         }
         elsif ( $line =~ m{ \A \s* Trigger \s+ (.*) : \s+ time=(\d+\.\d+) \s+ calls=(\d+) \s* \z }xmsi ) {
             my ( $name, $time, $calls ) = ( $1, $2, $3 );

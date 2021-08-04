@@ -1,0 +1,19 @@
+- Plan: 
+    Node Type: "Result"
+    Parallel Aware: false
+    Async Capable: false
+    Startup Cost: 0.00
+    Total Cost: 0.01
+    Plan Rows: 1
+    Plan Width: 4
+    Actual Startup Time: 0.002
+    Actual Total Time: 0.002
+    Actual Rows: 1
+    Actual Loops: 1
+  Settings: 
+    random_page_cost: "13.666"
+    search_path: "public, test"
+    work_mem: "666MB"
+  Planning Time: 0.072
+  Triggers: 
+  Execution Time: 0.042

@@ -28,6 +28,13 @@ With Miniconda:
 conda install -c bioconda perl-fastx-reader
 ```
 
+### Citing FASTX::Reader
+
+
+Telatin A, Fariselli P, Birolo G. *SeqFu: A Suite of Utilities for the Robust and Reproducible Manipulation of Sequence Files*. 
+Bioengineering 2021, 8, 59. [doi.org/10.3390/bioengineering8050059](https://doi.org/10.3390/bioengineering8050059)
+
+
 ### Using 'fqc'
 ```bash
 fqc [options] FILE1 FILE2 ... FILEn

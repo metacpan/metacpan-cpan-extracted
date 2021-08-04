@@ -1,28 +1,29 @@
 ---
-abstract: unknown
+abstract: 'C style enumerated types and bitmask flags in Perl'
 author:
-  - unknown
+  - 'Byron Brummer <zenin@bawdycaste.org>'
 build_requires:
-  ExtUtils::MakeMaker: '0'
+  Test::More: '0.88'
+  vars: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
-dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.02, CPAN::Meta::Converter version 2.150005'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: enum
-no_index:
-  directory:
-    - t
-    - inc
 requires:
   Carp: '0'
   perl: '5.006'
   strict: '0'
   warnings: '0'
 resources:
-  repository: git://github.com/neilbowers/enum.git
-version: '1.11'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.016'
+  bugtracker: https://github.com/neilb/enum/issues
+  homepage: https://github.com/neilb/enum
+  repository: https://github.com/neilb/enum.git
+version: '1.12'
+x_generated_by_perl: v5.28.2
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

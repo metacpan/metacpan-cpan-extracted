@@ -34,27 +34,27 @@ perl.require("DBI")
 
 
 def connect(data_source, username, password="", **attr):
-	"""Make a new connection to the database
+    """Make a new connection to the database
 
 The first parameter is the data_source string (something beginning with "DBI:").
 Then there is a username and a password and at last other named configuration
 parameters like; RaiseError, PrintError and AutoCommit.
 """
-        dbh = perl.callm("connect", "DBI", data_source, username, password,
-			            dict2hash(attr))
-	return dbh
+    dbh = perl.callm("connect", "DBI", data_source, username, password,
+            dict2hash(attr))
+    return dbh
 
 def available_drivers():
-	return perl.callm_tuple("available_drivers", "DBI")
+    return perl.callm_tuple("available_drivers", "DBI")
 
 def data_sources(driver):
-	return perl.callm_tuple("data_sources", "DBI", driver)
+    return perl.callm_tuple("data_sources", "DBI", driver)
 
 def trace(level, filename=None):
-	return perl.callm("trace", "DBI", level, filename)
+    return perl.callm("trace", "DBI", level, filename)
 
-def dict2hash(dict):
-	hash = perl.get_ref("%")
-	hash.update(dict)
-	return hash
+def dict2hash(dict_):
+    hash_ = perl.get_ref("%")
+    hash_.update(dict_)
+    return hash_
 

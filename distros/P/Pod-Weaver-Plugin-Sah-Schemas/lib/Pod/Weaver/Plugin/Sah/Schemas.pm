@@ -1,9 +1,9 @@
 package Pod::Weaver::Plugin::Sah::Schemas;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-07-22'; # DATE
+our $DATE = '2021-08-04'; # DATE
 our $DIST = 'Pod-Weaver-Plugin-Sah-Schemas'; # DIST
-our $VERSION = '0.067'; # VERSION
+our $VERSION = '0.069'; # VERSION
 
 use 5.010001;
 use Moose;
@@ -107,19 +107,115 @@ sub weave_section {
             {
                 my @pod;
 
+                # sample data & validation results
+                {
+                    require Data::Dmp;
+                    my $egs = $sch->[1]{examples};
+                    last unless $egs && @$egs;
+                    push @pod, "=head2 Sample data and validation results against this schema\n\n";
+                    for my $eg (@$egs) {
+                        # normalize non-defhash example
+                        $eg = {value=>$eg, valid=>1} if ref $eg ne 'HASH';
+
+                        # XXX if dump is too long, use Data::Dump instead
+                        my $value = exists $eg->{value} ? $eg->{value} :
+                            $eg->{data};
+                        push @pod, " ", Data::Dmp::dmp($value);
+                        if ($eg->{valid}) {
+                            push @pod, "  # valid";
+                            my $has_validated_value;
+                            my $validated_value;
+                            if (exists $eg->{validated_value}) {
+                                $has_validated_value++; $validated_value = $eg->{validated_value};
+                            } elsif (exists $eg->{res}) {
+                                $has_validated_value++; $validated_value = $eg->{res};
+                            }
+                            if ($has_validated_value) {
+                                push @pod, ", becomes ", Data::Dmp::dmp($validated_value);
+                            }
+                        } else {
+                            push @pod, "  # INVALID";
+                            push @pod, " ($eg->{summary})"
+                                if defined $eg->{summary};
+                        }
+                        push @pod, "\n\n";
+                    } # for eg
+                } # examples
+
+                my $egs = $sch->[1]{examples} // [];
+                my @valid_egs = grep { $_->{valid} } @$egs;
+                my @invalid_egs = grep { !$_->{valid} } @$egs;
+                my $random_valid_eg = $valid_egs[rand @valid_egs];
+                my $random_invalid_eg = $invalid_egs[rand @invalid_egs];
+
                 # example on how to use
                 {
+                    require Data::Sah;
                     push @pod, <<"_";
+=head2 Using with Data::Sah
+
 To check data against this schema (requires L<Data::Sah>):
 
  use Data::Sah qw(gen_validator);
  my \$validator = gen_validator("$sch_name*");
  say \$validator->(\$data) ? "valid" : "INVALID!";
 
- # Data::Sah can also create validator that returns nice error message string
- # and/or coerced value. Data::Sah can even create validator that targets other
- # language, like JavaScript. All from the same schema. See its documentation
- # for more details.
+The above schema returns a boolean value (true if data is valid, false if
+otherwise). To return an error message string instead (empty string if data is
+valid, a non-empty error message otherwise):
+
+ my \$validator = gen_validator("$sch_name", {return_type=>'str_errmsg'});
+ my \$errmsg = \$validator->(\$data);
+_
+
+                    my $v = Data::Sah::gen_validator($sch, {return_type=>"str_errmsg"});
+                    if ($random_valid_eg) {
+                        push @pod, " \n";
+                        push @pod, " # a sample valid data\n";
+                        push @pod, " \$data = ".Data::Dmp::dmp($random_valid_eg->{value}).";\n";
+                        push @pod, " my \$errmsg = \$validator->(\$data); # => ".Data::Dmp::dmp($v->($random_valid_eg->{value}))."\n";
+                    }
+                    if ($random_invalid_eg) {
+                        push @pod, " \n";
+                        push @pod, " # a sample invalid data\n";
+                        push @pod, " \$data = ".Data::Dmp::dmp($random_invalid_eg->{value}).";\n";
+                        push @pod, " my \$errmsg = \$validator->(\$data); # => ".Data::Dmp::dmp($v->($random_invalid_eg->{value}))."\n";
+                    }
+
+                    push @pod, <<"_";
+
+Often a schema has coercion rule or default value, so after validation the
+validated value is different. To return the validated (set-as-default, coerced,
+prefiltered) value:
+
+ my \$validator = gen_validator("$sch_name", {return_type=>'str_errmsg+val'});
+ my \$res = \$validator->(\$data); # [\$errmsg, \$validated_val]
+_
+
+                    $v = Data::Sah::gen_validator($sch, {return_type=>"str_errmsg+val"});
+                    if ($random_valid_eg) {
+                        push @pod, " \n";
+                        push @pod, " # a sample valid data\n";
+                        push @pod, " \$data = ".Data::Dmp::dmp($random_valid_eg->{value}).";\n";
+                        push @pod, " my \$res = \$validator->(\$data); # => ".Data::Dmp::dmp($v->($random_valid_eg->{value}))."\n";
+                    }
+                    if ($random_invalid_eg) {
+                        push @pod, " \n";
+                        push @pod, " # a sample invalid data\n";
+                        push @pod, " \$data = ".Data::Dmp::dmp($random_invalid_eg->{value}).";\n";
+                        push @pod, " my \$res = \$validator->(\$data); # => ".Data::Dmp::dmp($v->($random_invalid_eg->{value}))."\n";
+                    }
+
+                    push @pod, <<"_";
+
+Data::Sah can also create validator that returns a hash of detaild error
+message. Data::Sah can even create validator that targets other language, like
+JavaScript, from the same schema. Other things Data::Sah can do: show source
+code for validator, generate a validator code with debug comments and/or log
+statements, generate human text from schema. See its documentation for more
+details.
+
+=head2 Using with Params::Sah
 
 To validate function parameters against this schema (requires L<Params::Sah>):
 
@@ -132,8 +228,10 @@ To validate function parameters against this schema (requires L<Params::Sah>):
      ...
  }
 
+=head2 Using with Perinci::CmdLine::Lite
+
 To specify schema in L<Rinci> function metadata and use the metadata with
-L<Perinci::CmdLine> to create a CLI:
+L<Perinci::CmdLine> (L<Perinci::CmdLine::Lite>) to create a CLI:
 
  # in lib/MyApp.pm
  package
@@ -173,41 +271,6 @@ L<Perinci::CmdLine> to create a CLI:
 
 _
                 }
-
-                # sample data
-                {
-                    require Data::Dmp;
-                    my $egs = $sch->[1]{examples};
-                    last unless $egs && @$egs;
-                    push @pod, "Sample data:\n\n";
-                    for my $eg (@$egs) {
-                        # normalize non-defhash example
-                        $eg = {value=>$eg, valid=>1} if ref $eg ne 'HASH';
-
-                        # XXX if dump is too long, use Data::Dump instead
-                        my $value = exists $eg->{value} ? $eg->{value} :
-                            $eg->{data};
-                        push @pod, " ", Data::Dmp::dmp($value);
-                        if ($eg->{valid}) {
-                            push @pod, "  # valid";
-                            my $has_validated_value;
-                            my $validated_value;
-                            if (exists $eg->{validated_value}) {
-                                $has_validated_value++; $validated_value = $eg->{validated_value};
-                            } elsif (exists $eg->{res}) {
-                                $has_validated_value++; $validated_value = $eg->{res};
-                            }
-                            if ($has_validated_value) {
-                                push @pod, ", becomes ", Data::Dmp::dmp($validated_value);
-                            }
-                        } else {
-                            push @pod, "  # INVALID";
-                            push @pod, " ($eg->{summary})"
-                                if defined $eg->{summary};
-                        }
-                        push @pod, "\n\n";
-                    } # for eg
-                } # examples
 
                 $self->add_text_to_section(
                     $document, join("", @pod), 'SYNOPSIS',
@@ -249,7 +312,7 @@ Pod::Weaver::Plugin::Sah::Schemas - Plugin to use when building Sah::Schemas::* 
 
 =head1 VERSION
 
-This document describes version 0.067 of Pod::Weaver::Plugin::Sah::Schemas (from Perl distribution Pod-Weaver-Plugin-Sah-Schemas), released on 2021-07-22.
+This document describes version 0.069 of Pod::Weaver::Plugin::Sah::Schemas (from Perl distribution Pod-Weaver-Plugin-Sah-Schemas), released on 2021-08-04.
 
 =head1 SYNOPSIS
 
